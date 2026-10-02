@@ -61,6 +61,45 @@ convincingly. It is never a caption.
   and its error; and, element by element, what is shown and in what format, what each action
   produces and where the user goes next. Draw exactly that.
 
+## The processes these screens belong to
+
+Written by the owner of each process (`handoff/design-notes/`). Read before any screen: it says how the process runs end to end and which words the screens must use.
+
+### Ticketing & Guest Commerce, as the venue and TICVAI configure and run it
+
+WHAT THE PROCESS IS. Everything a guest can buy is set up, priced, promoted and serviced here, on Venue Management (P08, the venue's own back office, served inside the venue's cell) and on the TICVAI Console (P09, TICVAI's control plane, outside every cell). End to end: (1) CATALOGUE. A product has one of twelve kinds (admission, timedAdmission, datedAdmission, openDated, seated, membership, bundle, fnb, retail, rental, addOn, giftCard). Its ticket types (adult, child, senior, resident...) are not typed one by one: they are generated from the product's attributes (components) and each value combination becomes a sellable ticket type with no extra setup (DI-164). What a ticket grants (validity, entries, re-entry, days of week, blackout dates, expiry anchor, fast track, transfer) lives on a reusable entitlement template, not on the product. Who may take part (age, height, supervision, certification) is the eligibility rule; what the guest must answer is the data mask and the consent questions; how the guest sees it is guestListing (bookable, infoOnly, hidden), display tags (at most six), media and the booking flow. Group, family and corporate products and every after-sales policy (reschedule, exchange, refund, cancellation, upgrade, transfer) are configured inside the one product configuration, never on separate screens (DI-465, DI-466). (2) LIFECYCLE AND PUBLICATION. A product moves draft, inReview, approved, live, withdrawn, archived. Approval and publication are two acts with two permissions (PRODUCT_APPROVE, PRODUCT_PUBLISH, R091); every product is authorised before it sells online or on site (DI-438). Approved is still not on a till: a till sells only what is in the signed catalogue release it pulled (publishBundle, ADR-0013), so a saved price is a back-office fact until the venue publishes to tills. Changing something that has sold is preceded by an impact check (assessProductChange: orders affected, entitlements issued, future performances, open carts); restoring a version creates a new version, and sold tickets keep the price and terms they were sold under (restoreProductVersion, DI-938, TRACKER Actions row 145). (3) PRICE. Prices live in price lists: per venue, per channel set, with validity dates and a priority, copied for the next season with an uplift (copyPriceList) and repriced in bulk only after a dry run (bulkChangePrices). Currency and decimal scale are never chosen on a form: they resolve from the venue's region (ADR-0008, ADR-0018; AED 2 places, OMR and BHD 3). When several rules apply, the configured hierarchy decides; there is no "lowest price wins" default (DI-595). Tax on the pre-discount price and three-decimal rounding are regional settings (DI-598). Dynamic rules always show their minimum and maximum price guardrails beside the trigger (getDynamicPriceRule). (4) PROMOTE AND BUNDLE. A promotion is a rule (automatic, or gated by a code) created in draft, made live only by Publish, which first analyses stacking; a …
+*(source: DI-164; DI-171; DI-438; DI-465; DI-466; DI-595; DI-598; DI-387; DI-039; DI-044; DI-474; DI-671; DI-987; DI-019; DI-080; ADR-0008; ADR-0013; ADR-0018; ADR-0019; ADR-0030; R091; R098; R101; R222; REV3-21; contracts/spine/catalogue.yaml#transitionProductLifecycle …)*
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Product | Anything sellable, of one of the twelve kinds. The record that carries names, channels, listing, media and policies. | Item (except on F&B and retail screens), SKU (for tickets), Offering | contracts/spine/catalogue.yaml#/components/schemas/ProductKind |
+| Ticket type | One sellable variant of an admission or event product (Adult, Child, Resident Adult), generated from the product's attributes. For retail and F&B the same record is labelled Variant. | Variant (on ticket screens), Sub-product, Rate (that is a price), Axis value | contracts/spine/catalogue.yaml#updateProductVariant / DI-164 / DI-437 |
+| Attribute | A dimension that generates ticket types (Guest category, Residency, Tier, Length). Each has values; adding a value adds ticket types. | Axis, Component (the client's word; use it only in help text), Option | contracts/spine/catalogue.yaml#setProductAttributes / DI-164 / DI-450 |
+| Entitlement | What a ticket lets the holder do (validity, entries, re-entry, days, blackout dates, expiry, fast track, transfer), defined once on an entitlement template and shared by several products. | Access rights, Ticket rules, Validity profile | contracts/spine/catalogue.yaml#createEntitlementTemplate / DI-171 / DI-451 |
+| Eligibility rule | Who may take part in or buy a product (age, height, supervision, waiver, certification). Distinct from a promotion's eligibility, which decides who gets a discount. | Restriction, Access rule (that is access control) | contracts/spine/catalogue.yaml#setProductEligibilityRule / DI-463 |
+| Price list | A set of prices for one venue and a set of channels, valid between two dates, with a priority. Several coexist (B2C, B2B, season). | Price book, Rate card, Tariff | contracts/spine/catalogue.yaml#createPriceList / DI-140 / DI-163 |
+| Price category | A standard rate type (Adult, Child, Member) reused across lists so venues do not invent "Adult Standard" and "Normal Adult". | Price band (that is a seat-category band), Fare type (transport) | contracts/spine/catalogue.yaml#setPriceCategoryRateType / … |
+| Price band | A priced band on a seat category (code, label, colour, amount, channel, from-date). | Price category, Zone price | contracts/satellite/seating.yaml#/components/schemas/SeatPriceBand |
+| Promotion | A rule that changes a price automatically or when a code is entered; draft until published; declares how it stacks. | Offer (except in guest copy), Deal, Discount rule | contracts/satellite/promotions.yaml#createPromotion / DI-173 / DI-174 |
+| Coupon code | A code issued from a coupon campaign that applies a promotion-style discount; one shared code or many single-use codes. | Voucher, Promo voucher | contracts/satellite/promotions.yaml#createCouponCampaign / DI-173 |
+| Voucher | A code that carries money (face value, balance), sold or issued; a liability until redeemed or expired. | Coupon, Credit note | contracts/satellite/promotions.yaml#listVoucherBatches / … |
+| Bundle | A product sold as one line whose price differs from the sum of its components, with a mandatory revenue allocation. "Package" is acceptable in guest copy. | Combo (that is an F&B meal deal), Catalogue bundle | contracts/satellite/promotions.yaml#createBundle / DI-220 / ADR-0019 |
+| Catalogue release | The signed snapshot of a venue's catalogue, prices, promotions and sale boards that tills, kiosks and devices pull. Its action label is "Publish to tills". | Bundle, Catalogue bundle, Sync, Deploy | contracts/spine/catalogue.yaml#publishBundle / … |
+| Approve / Publish / Save | Save keeps a draft; Approve records that it is authorised (PRODUCT_APPROVE); Publish makes it live for guests and channels (PRODUCT_PUBLISH). Three different buttons, never merged. | Submit, Go live, Activate (except CatalogueConfigStatus active), Deploy | R091 / contracts/spine/catalogue.yaml#transitionProductLifecycle / DI-438 |
+| Product states | Draft, In review, Approved, Live, Withdrawn, Archived (ProductLifecycleState), always as coloured badges with these exact labels. | Published (for a product), Pending, Inactive (for a product) | contracts/spine/catalogue.yaml#/components/schemas/ProductLifecycleState |
+| Channel | Where something is sold. Labels: pos Point of sale; kiosk Kiosk; web and guestWeb Website; mobile and guestApp App; b2b B2B partners; partner Partner; ota Travel agents (OTA); callCentre Call centre; api API; backOffice Back office. | Touchpoint, Outlet (an outlet is a business inside a venue), raw enum values | contracts/spine/catalogue.yaml#/components/schemas/Channel / … |
+| Refund | Money returned after settlement, wholly or for some lines, under the venue's refund policy. | Return (that is retail goods), Reversal, Void | contracts/spine/orders.yaml#createRefund / DI-252 |
+| Void | Cancelling a whole order before settlement, within the same shift, with a reason from the void list. After settlement it is a refund. | Cancel order, Delete | contracts/spine/orders.yaml#voidOrder / R222 |
+| Exchange / Reschedule | Exchange swaps lines for other products or dates and settles only the difference; Reschedule is the same product moved to another date or time. | Rebook, Date change (acceptable only in guest copy), Refund and resell | contracts/spine/orders.yaml#exchangeOrderLines / … |
+| Hold / Capture / Release | A deposit or stored-value amount is held, then partly or fully captured, and the rest released. A held deposit is not a payment. | Charge, Pre-auth (in staff copy), Block funds | contracts/spine/orders.yaml#authoriseStoredValue / … |
+| Wallet (TICVAI wallet) | The guest's stored-value balance on TICVAI, spent by hold and capture. Distinct from the tender "Apple Pay / Google Pay", which the contract also calls wallet. | Digital wallet (for stored value), E-wallet, Credit (without a type) | contracts/spine/orders.yaml#/components/schemas/TenderKind / R080 |
+| Credit lot | One amount of wallet credit of one credit type (cash, bonus, gift) with its own expiry; lots are spent nearest expiry first and the guest sees the breakdown but cannot choose. | Bucket, Batch, Top-up | TRACKER Actions row 171 / contracts/satellite/wallet.yaml#expireCreditLots |
+| Venue map / Seat map | A venue map is the wayfinding map of a park or a floor (points, paths, bookable places); a seat map is the seating layout of an auditorium or stand. Never just "map" where both could be meant. | Layout (alone), Floor plan (unless it is a floor map), Map (alone) | contracts/satellite/venue-map.yaml#createVenueMap / … |
+| Point / Bookable place | A point is a place on a venue map (toilet, ride, restaurant, exit). A bookable place is a cabana, lounger, table or pitch placed on the map and sold through its price band. | Pin, POI, Marker, Resource (in staff copy) | contracts/satellite/venue-map.yaml#setVenuePoint / … |
+| Station / Route / Timetable / Departure / Fare table / Pass … | A route is an ordered list of stations with offsets; a timetable generates departures up to its release horizon; a fare table prices a route per passenger type; a pass type is a multi-trip or unlimited pass sold as a product. | Stop (except in the stop list), Line (except lineCode), Schedule, Trip (except a guest's journey) | contracts/satellite/transport.yaml / REV3-21 |
+| Applies from | The effective date of a change. Every dated change shows it, and sold items keep their old terms. | Effective date (in labels), Start date (for a change) | contracts/satellite/seating.yaml#updateSeatCategory / TRACKER Actions row 194 |
+
+
 ## The screens
 
 Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs count fields; requirements are matrix rows; meeting inputs are the ones naming the screen (the module and platform ones are below); white label says whether the tenant's brand reaches it (guest) or it sets the brand (configures).
@@ -98,6 +137,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Route | `/transport/stations` |
 
 **What the spec says about it.** **Transport setup is the venue's own configuration** (decided 29 September, rev 3 REV3-21: the network is configured by the venue in Venue Management, not supplied by the client). Stations come first: a route is an ordered list of them. **A station carries coordinates** because the route map places it; one without them is listed in the stop list and left off the map.
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** The stations a venue's routes stop at, the first step of transport setup. A station with coordinates is placed on the route map; one without is listed in the stop list only. A station on an active route cannot be deactivated.
 
 #### Inputs: what the user enters or picks
 
@@ -142,6 +183,12 @@ Names the station and says it stops being offered as a stop. Refused while an ac
 | Active `active` | toggle | optional | — | — | — | — | `updateTransportStation` body |
 
 Errors to draw in the form: 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 The station is a stop on one or more active routes and cannot be deactivated.
+
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **code**: Short operator code, unique in the venue, at most 32 characters (SHJ-JUB). *(source: contracts/satellite/transport.yaml#createTransportStation)*
+- **name and shortName**: Every tenant language; the short name is what the route diagram and the map pin show. *(source: contracts/satellite/transport.yaml#createTransportStation)*
+- **coordinates**: Picked on a small map or typed; optional, with the "not on map" consequence stated. *(source: contracts/satellite/transport.yaml#createTransportStation)*
 
 #### Outputs: what the screen shows and produces
 
@@ -199,6 +246,29 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 A business code the request names is already used within its uniqueness scope (the scope the property's `x-ticvai-unique` names; decided 28 September, audit …; 409 The station is a stop on one or more active routes and cannot be deactivated. |
 
+#### Edge cases to draw
+
+- **Deactivate a station on an active route**: Refused; the dialog lists the routes and offers to open them. *(source: contracts/satellite/transport.yaml#updateTransportStation)*
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+stations:
+- code: AQ-METRO
+  name: Al Qudra Metro
+  nameAr: مترو القدرة
+  short: Metro
+- code: DP-MAIN
+  name: Dune Park Main Gate
+  nameAr: البوابة الرئيسية دون بارك
+  short: Main Gate
+- code: HOTEL-D
+  name: Hotel District
+  short: Hotels
+```
+
 #### Permissions
 
 - `listTransportStations` → no permission · guest, public, staff
@@ -239,6 +309,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - [ ] Every transition is wired: `BO-1184`, `BO-1189`.
 - [ ] Every gated control is gated: `TRANSPORT_MANAGE`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 1 edge case(s) from the process notes are drawn.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -260,6 +331,14 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | Route | `/transport/routes` |
 
 **What the spec says about it.** **Transport setup is the venue's own configuration** (decided 29 September, rev 3 REV3-21: the network is configured by the venue in Venue Management, not supplied by the client). A line run both ways is two routes (outbound and inbound) paired by `pairedRouteId`, which is what the guest's swap button lands on. **Creating a route creates its catalogue side** (an event its departures become performances of, and a timed-admission product whose variants are the passenger types), so a one-way ticket sells through the ordinary cart. Lifecycle draft, active, suspended, retired (states/transport-route.yaml).
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Where a venue builds each transport line as an ordered list of its stations and controls whether the line is on sale. A route is created as a draft and sells nothing until it is active with a fare table (BO-1185) and a published timetable (BO-1186); the screen must make that readiness visible per route. Creating a route also creates its catalogue side (an event and a timed product).
+
+#### Decided on this screen
+
+Answered questions: draw the decision, not the old default. Where a decision and the tables below differ, the decision wins.
+
+- **Are the popular-route card's starting fare, featured order and image set per route in the back office?** → Drawn default accepted: Routes carry a featured order and an image; the starting fare is computed from the lowest fare. *(decided by Chinmay, 2026-10-02; DEC-106 / CHG-NOTE-006)*
 
 #### Inputs: what the user enters or picks
 
@@ -336,6 +415,12 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 | Boarding allowed `stops[].boardingAllowed` | toggle | optional | on | — | — | — | `updateTransportRoute` body |
 | Alighting allowed `stops[].alightingAllowed` | toggle | optional | on | — | — | — | `updateTransportRoute` body |
 
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **stops**: An ordered, drag-to-reorder list of stations picked from BO-1183, each with its offset in minutes from the origin; the first is fixed at 0 and each later offset must be greater than the one before; boarding and alighting allowed per stop. *(source: contracts/satellite/transport.yaml#/components/schemas/RouteStopInput / screens/P08-venue-back-office.yaml#BO-1183)*
+- **pairedRouteId**: Optional picker of the route that runs the same line the other way; labelled "Return route". *(source: contracts/satellite/transport.yaml#createTransportRoute)*
+- **bookingCutoffMinutes**: Minutes before departure that online sale stops, 0 to 1440, default 5. *(source: contracts/satellite/transport.yaml#createTransportRoute)*
+
 #### Outputs: what the screen shows and produces
 
 **Shown**
@@ -378,6 +463,14 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 | Activate, suspend or reactivate (secondary button) | `setTransportRouteStatus` PUT `/transport/routes/{routeId}/status` | inline | TransportRoute | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 The transition is not allowed from the current status, the route has no fare table, or retiring a route with … | opens confirmDialog first |
 | Retire route (destructive button) | `setTransportRouteStatus` PUT `/transport/routes/{routeId}/status` | inline | TransportRoute | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 The transition is not allowed from the current status, the route has no fare table, or retiring a route with … | opens confirmDialog first |
 
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **readiness per route**: Three checks on each row, Fare table, Published timetable, Active, so a draft explains why it is not on sale. *(source: screens/P08-venue-back-office.yaml#BO-1184 / REV3-21)*
+
+**What each action does** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **Suspend**: Stops new sales and keeps sold tickets valid; the confirmation says so and a reason is required (PR-6). *(source: contracts/satellite/transport.yaml#setTransportRouteStatus)*
+
 **Data it reads**: `listTransportRoutes` (onLoad, The venue's routes, by status and station); `listTransportStations` (onLoad, Stations to build stops from)
 
 **Where the user goes next**
@@ -402,6 +495,39 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 | Validation (`?state=validation`) | `422` on fewer than two stops, a station repeated, a station inactive or not at this venue, or offsets that do not start at 0 and strictly increase, each marked on the stop row; `409` on a code already used; `409` on a stop change under a published timetable; `409` on a status change the route cannot make (no fare table, or retiring with sold seats), naming what is missing. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 A business code the request names is already used within its uniqueness scope (the scope the property's `x-ticvai-unique` names; decided 28 September, audit …; 409 Stops changed while a published timetable covers a future date.; 409 The transition is not allowed from the current status, the route has no fare table, or retiring a route with sold seats on a departure … |
+
+#### Edge cases to draw
+
+- **Change the stops while a published timetable covers a future date**: Refused; withdraw the timetable first. Name, colour and cut-off can still change. *(source: contracts/satellite/transport.yaml#updateTransportRoute)*
+- **Retire a route with sold departures on sale**: Refused; the dialog lists those departures and links to the departure board (BO-1187). *(source: contracts/satellite/transport.yaml#setTransportRouteStatus)*
+
+#### Consistency with other screens
+
+- Match `BO-1186`: Same route picker and route header (code, colour chip, status badge) on fares, timetables and passes.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+routes:
+- code: E101-Out
+  lineCode: E101
+  name: Dune Park Shuttle, Metro to Main Gate
+  nameAr: حافلة دون بارك، المترو إلى البوابة الرئيسية
+  colour: '#0D6EFD'
+  stops:
+  - Al Qudra Metro 0
+  - Hotel District 12
+  - Main Gate 25
+  status: active
+- code: E101-In
+  pairedWith: E101-Out
+  status: draft
+  readiness:
+    fareTable: false
+    timetable: false
+```
 
 #### Permissions
 
@@ -448,6 +574,8 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - [ ] Every transition is wired: `BO-108`, `BO-1183`, `BO-1185`, `BO-1186`, `BO-1187`, `BO-1188`, `BO-1189`.
 - [ ] Every gated control is gated: `TRANSPORT_MANAGE`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 2 edge case(s) from the process notes are drawn.
+- [ ] The 1 decision(s) taken on this screen are drawn as decided, not as the old default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -469,6 +597,12 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | Route | `/transport/fares` |
 
 **What the spec says about it.** **Transport setup is the venue's own configuration** (decided 29 September, rev 3 REV3-21: the network is configured by the venue in Venue Management, not supplied by the client). **The fares are the venue's, set by a holder of `TRANSPORT_PRICE`**, a separate permission from the timetable because the person who edits a timetable is not the one who sets fares. A route has no fare table until one is set here, and cannot be activated without one. The prototype's values (base AED 5, AED 2.50 per stop; child and student half fare, person of determination free) are seed data for the demo tenant, not a default.
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** A route's fares and the passenger types it sells (adult, child, student, person of determination), and a preview of what a trip costs. Fares are set by a holder of TRANSPORT_PRICE, separately from the timetable, and apply from a date; sold tickets keep their price.
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- The preview calls quoteTransportFare, whose audience is guest, public and service, not staff. (CHG-SBO-005)
 
 #### Inputs: what the user enters or picks
 
@@ -515,6 +649,12 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | Effective from `effectiveFrom` | date and time picker | required | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `setTransportFareTable` body |
 
 Errors to draw in the form: 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 422 A `matrix` model missing a station pair the route serves, a passenger type code repeated, no passenger type with `isDefault`, or a multiplier outside 0 to 1.
+
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **model**: Stop count (base fare plus per stop) or a matrix (one adult fare per ordered pair; the reverse pair is its own cell); the matrix shown as a triangle grid of stations. *(source: contracts/satellite/transport.yaml#setTransportFareTable)*
+- **passengerTypes**: Code, name, picker description ("Age 5-11, half fare"), share of the adult fare 0 to 1, age limits, proof checked at boarding; exactly one default type. *(source: contracts/satellite/transport.yaml#/components/schemas/PassengerType)*
+- **effectiveFrom**: Required; the confirmation names the route and the date and lists passenger types added or removed (each adds or retires a ticket type). *(source: contracts/satellite/transport.yaml#setTransportFareTable / screens/P08-venue-back-office.yaml#BO-1185)*
 
 #### Outputs: what the screen shows and produces
 
@@ -586,6 +726,10 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 | Save fare table (primary button) | `setTransportFareTable` PUT `/transport/routes/{routeId}/fare-table` | SetFareTableRequest | FareTable | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 422 A `matrix` model missing a station pair the route serves, a passenger type code repeated, no passenger type … | opens confirmDialog first |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
 
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **preview**: From, to and party; shows stops travelled, adult fare, price per type and total. *(source: contracts/satellite/transport.yaml#quoteTransportFare)*
+
 **Data it reads**: `listTransportRoutes` (onLoad, The route picker); `getTransportFareTable` (onLoad, The route's fare table and passenger types)
 
 **Where the user goes next**
@@ -604,6 +748,33 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 | Validation (`?state=validation`) | `422` on a matrix missing a station pair, a passenger type code repeated, no default type or a multiplier outside 0 to 1, each marked on its row. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 422 A `matrix` model missing a station pair the route serves, a passenger type code repeated, no passenger type with `isDefault`, or a multiplier outside 0 to 1.; 422 Stations not on the route or in the wrong order, an unknown passenger type, no passengers, or a pass type not offered on this route. |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+fareTable:
+  route: E101-Out
+  model: stopCount
+  baseFare: AED 5.00
+  perStopFare: AED 2.50
+  types:
+  - code: adult
+    share: 1
+  - code: child
+    share: 0.5
+    proof: Age 5-11
+  - code: determination
+    share: 0
+    proof: Sanad card
+  effectiveFrom: '2026-11-01'
+preview:
+  from: Al Qudra Metro
+  to: Main Gate
+  party: 2 adults, 1 child
+  total: AED 25.00
+```
 
 #### Permissions
 
@@ -667,6 +838,14 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | Route | `/transport/timetables` |
 
 **What the spec says about it.** **Transport setup is the venue's own configuration** (decided 29 September, rev 3 REV3-21: the network is configured by the venue in Venue Management, not supplied by the client). A timetable is departure times from the route's origin by day of week, valid over a date range. **Nothing is on sale until it is published**; publishing generates the departures up to the release horizon (proposed 30 days, client to correct) as catalogue performances, and a nightly job releases one more day. A published timetable is never edited: a new one drafted from a later date supersedes it from that date (states/transport-timetable.yaml).
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** A route's timetables: departure times from the origin by day of week, valid over dates, drafted then published. Publishing generates departures up to the release horizon (proposed 30 days) and a nightly job releases one more day; a published timetable is never edited, it is superseded by a new one from a later date.
+
+#### Decided on this screen
+
+Answered questions: draw the decision, not the old default. Where a decision and the tables below differ, the decision wins.
+
+- **Is the 30-day release horizon right for the client?** → Drawn default accepted: 30, editable per timetable. *(decided by Chinmay, 2026-10-02; DEC-107 / CHG-NOTE-006)*
 
 #### Inputs: what the user enters or picks
 
@@ -736,6 +915,11 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 | Departs at `runs[].departsAt` | time picker | required | — | — | HH:mm, 24-hour | Venue local time, 24-hour `HH:MM`, at the route's first stop. | `updateTransportTimetable` body |
 | Days `runs[].days` | multi-select chips | required | — | Mon · Tue · Wed · Thu · Fri · Sat · Sun; at least 1; no duplicates | — | — | `updateTransportTimetable` body |
 
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **runs**: A weekly grid (rows are times HH:MM, columns Mon to Sun) rather than a list; times in venue local time. *(source: contracts/satellite/transport.yaml#/components/schemas/TimetableRun)*
+- **seat capacity and seat map**: Seats per departure 1 to 200; optional coach seat map for seat selection, empty sells unallocated seats. *(source: contracts/satellite/transport.yaml#createTransportTimetable)*
+
 #### Outputs: what the screen shows and produces
 
 **Shown**
@@ -777,6 +961,11 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 | Publish (secondary button) | `publishTransportTimetable` POST `/transport/timetables/{timetableId}/publish` | — | Timetable | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 Not a draft, the route is not active or has no fare table, or a superseded timetable has departures with sold … | opens confirmDialog first |
 | Withdraw (destructive button) | `withdrawTransportTimetable` POST `/transport/timetables/{timetableId}/withdraw` | inline | Timetable | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 Not published, or a future departure has sold seats. | opens confirmDialog first |
 
+**What each action does** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **Publish**: Names the dates and number of departures going on sale and the timetable it supersedes from when. *(source: screens/P08-venue-back-office.yaml#BO-1186 / contracts/satellite/transport.yaml#publishTransportTimetable)*
+- **Withdraw**: Reason required; removes unsold future departures; refused while any future departure has sold seats. *(source: contracts/satellite/transport.yaml#withdrawTransportTimetable)*
+
 **Data it reads**: `listTransportRoutes` (onLoad, The route picker); `listTransportTimetables` (onLoad, The route's timetables, by status)
 
 **Where the user goes next**
@@ -796,6 +985,37 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 | Validation (`?state=validation`) | `400` on a missing name, start date, capacity or run, or a run time out of order, marked on the field; `409` on editing a published timetable, on publishing against an inactive route or one with no fare table, and on withdrawing with sold seats, each naming the cause. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 Not a draft, the route is not active or has no fare table, or a superseded timetable has departures with sold seats on or after this `validFrom`.; 409 Not published, or a future departure has sold seats.; 409 The timetable is not a draft. |
+
+#### Edge cases to draw
+
+- **Edit a published timetable**: Not offered; "Draft a new timetable from" a later date instead. *(source: contracts/satellite/transport.yaml#updateTransportTimetable)*
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+timetable:
+  name: Winter 2026-27
+  validFrom: '2026-11-01'
+  validTo: '2027-03-31'
+  releaseHorizonDays: 30
+  seatCapacity: 49
+  runs:
+  - at: 08:00
+    days:
+    - mon
+    - tue
+    - wed
+    - thu
+    - fri
+    - sat
+    - sun
+  - at: 08:30
+    days:
+    - fri
+    - sat
+```
 
 #### Permissions
 
@@ -840,6 +1060,8 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - [ ] Every transition is wired: `BO-1184`, `BO-1187`.
 - [ ] Every gated control is gated: `TRANSPORT_MANAGE`, `TRANSPORT_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 1 edge case(s) from the process notes are drawn.
+- [ ] The 1 decision(s) taken on this screen are drawn as decided, not as the old default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -861,6 +1083,8 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | Route | `/transport/departures` |
 
 **What the spec says about it.** **Transport setup is the venue's own configuration** (decided 29 September, rev 3 REV3-21: the network is configured by the venue in Venue Management, not supplied by the client). Every departure the published timetables generated, in every status, with seats sold and the vehicle. A bigger or smaller coach on one run is changed here; **a departure is cancelled through its catalogue performance** (`cancelPerformance`), so every guest affected is refunded and told through the ordinary performance-cancelled path (states/transport-departure.yaml).
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Every departure on a route with seats sold; change a run's coach or capacity; cancel a run.
 
 #### Inputs: what the user enters or picks
 
@@ -950,6 +1174,11 @@ Errors to draw in the form: 403 The supervisor step-up is missing or failed (aud
 | Save departure (primary button) | `updateTransportDeparture` PATCH `/transport/departures/{departureId}` | inline | Departure | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 422 Capacity below seats sold. | opens modal first |
 | Cancel departure (destructive button) | `cancelPerformance` POST `/performances/{performanceId}/cancel` | inline | PerformanceCancellationResult | 403 The supervisor step-up is missing or failed (audit R144). The PIN did not verify, or the principal does not hold `PERFORMANCE_CONFIGURE` at this venue.; 409 The performance is `cancelled`, `completed` or `soldOut`. … | step-up: pin (Cancels a performance and queues refunds to every holder; a supervisor signs it in place (proposed by the coordinator …); opens confirmDialog first |
 
+**What each action does** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **Change capacity**: Refused below seats sold. *(source: contracts/satellite/transport.yaml#updateTransportDeparture)*
+- **Cancel run**: Stops sales, notifies holders and queues a bulk refund for approval. *(source: contracts/spine/catalogue.yaml#cancelPerformance)*
+
 **Data it reads**: `listTransportRoutes` (onLoad, The route picker); `listTransportRouteDepartures` (onLoad, Every departure on the route with seats sold)
 
 **Where the user goes next**
@@ -968,6 +1197,23 @@ Errors to draw in the form: 403 The supervisor step-up is missing or failed (aud
 | Validation (`?state=validation`) | `422` on a capacity below the seats sold, naming the count; a cancellation follows the performance cancel rules (reason required, supervisor step-up for a real run). |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 The performance is `cancelled`, `completed` or `soldOut`. `states/performance.yaml` cancels only from `scheduled`, `onSale` and `suspended`.; 422 Capacity below seats sold. |
+
+#### Consistency with other screens
+
+- Match `BO-1184`: Retiring a route sends the user here to cancel sold departures.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+departures:
+- route: E101-Out
+  at: Sat 22 Nov 08:00
+  sold: 41
+  capacity: 49
+  coach: Coach 7
+```
 
 #### Permissions
 
@@ -1039,6 +1285,8 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 
 **What the spec says about it.** **Transport setup is the venue's own configuration** (decided 29 September, rev 3 REV3-21: the network is configured by the venue in Venue Management, not supplied by the client). Multi-trip carnets and unlimited passes. **Creating a pass type creates its catalogue product** (open-dated, with entries allowed equal to the trips, or unlimited), so a pass sells through the ordinary cart and each boarding consumes an entry at the driver's scan. A pass already sold keeps its trips, validity and price. The prototype's four (5-trip, 10-trip, weekly and monthly unlimited) are seed data for the demo tenant, not a default.
 
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Multi-trip and unlimited transport passes. Creating a pass type creates its catalogue product (open-dated, entries equal to trips), so a pass sells through the ordinary basket and each boarding consumes an entry. The price is a multiple of the single adult fare, and the saving is measured against a stated number of trips.
+
 #### Inputs: what the user enters or picks
 
 **Form: New pass type** (modal, opened by *New pass type*; *Create pass type* calls `createTransportPassType`, *Cancel* sends nothing)
@@ -1073,6 +1321,12 @@ Errors to draw in the form: 400 Validation failed; 409 A business code the reque
 | Routes `routeIds` | multi-picker: choose routes | optional | — | — | — | — | `updateTransportPassType` body |
 | Sort order `sortOrder` | number field | optional | — | min 0 | — | — | `updateTransportPassType` body |
 | Active `active` | toggle | optional | — | — | — | — | `updateTransportPassType` body |
+
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **kind, trips and referenceTrips**: Multi-trip needs trips (2 to 100); unlimited needs referenceTrips (the trips a week or month the saving is compared with). *(source: contracts/satellite/transport.yaml#createTransportPassType)*
+- **fareMultiplier**: Shown with the resulting price and saving for a sample journey ("10 trips at 8x the adult fare: AED 120.00, save AED 30.00"). *(source: contracts/satellite/transport.yaml#createTransportPassType)*
+- **routeIds**: Empty means every active route; say so. *(source: contracts/satellite/transport.yaml#createTransportPassType)*
 
 #### Outputs: what the screen shows and produces
 
@@ -1137,6 +1391,31 @@ Errors to draw in the form: 400 Validation failed; 409 A business code the reque
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 A business code the request names is already used within its uniqueness scope (the scope the property's `x-ticvai-unique` names; decided 28 September, audit … |
 
+#### Edge cases to draw
+
+- **Change a pass type that has sold**: Applies to passes sold after it; sold passes keep trips, validity and price. *(source: contracts/satellite/transport.yaml#updateTransportPassType)*
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+passTypes:
+- code: CARNET10
+  name: 10-trip card
+  nameAr: بطاقة 10 رحلات
+  kind: multiTrip
+  trips: 10
+  fareMultiplier: 8
+  validityDays: 60
+- code: WEEK-UNL
+  name: 7-day unlimited
+  kind: unlimited
+  referenceTrips: 14
+  fareMultiplier: 10
+  validityDays: 7
+```
+
 #### Permissions
 
 - `listTransportPassTypes` → `TRANSPORT_VIEW` (read) · staff
@@ -1178,6 +1457,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - [ ] Every transition is wired: `BO-1184`.
 - [ ] Every gated control is gated: `TRANSPORT_PRICE`, `TRANSPORT_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 1 edge case(s) from the process notes are drawn.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -1199,6 +1479,8 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | Route | `/transport/import` |
 
 **What the spec says about it.** **Transport setup is the venue's own configuration** (decided 29 September, rev 3 REV3-21: the network is configured by the venue in Venue Management, not supplied by the client). **Bulk entry for an operator with more than a handful of stations to type**, on the venue-map pattern: upload, validate, review the preview and the findings, then a person applies. **Nothing is written until the preview is applied, and applying never puts anything on sale**: routes arrive as drafts, still need a fare table and activation, and timetables still need publishing. An active route's stops are never changed by an import.
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Bulk entry of a venue's network (stations, routes with stops, timetables) from a CSV bundle or a GTFS feed: upload, validate, review the preview and every finding, then a person applies. Nothing goes on sale on apply: routes arrive as drafts and timetables unpublished.
 
 #### Inputs: what the user enters or picks
 
@@ -1275,6 +1557,14 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 | Apply (secondary button) | `applyTransportNetworkImport` POST `/transport/network-imports/{importId}/apply` | — | TransportNetworkImport | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 Not `previewReady`, has error findings, or the network changed since validation. | opens confirmDialog first |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
 
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **preview**: Counts to create and update per kind (stations, routes, stops, timetables) and findings with row and file, filterable by severity. *(source: contracts/satellite/transport.yaml#getTransportNetworkImport)*
+
+**What each action does** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **Apply**: One transaction; the confirmation repeats that nothing goes on sale until each route is activated with a fare table and a published timetable. *(source: contracts/satellite/transport.yaml#applyTransportNetworkImport)*
+
 **Where the user goes next**
 
 - → `BO-1184` Transport Routes & Stops: *Routes and stops*
@@ -1290,6 +1580,30 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 | Validation (`?state=validation`) | `422` on a file that is not ready, not at this venue or not a zip; a `failed` import names why; error findings block Apply row by row; `409` on Apply when the network changed since validation. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Content type not permitted, or size beyond the limit for that kind. Checked here rather than after a guest has uploaded two hundred megabytes.; 400 Validation failed; 409 Not `previewReady`, has error findings, or the network changed since validation.; 409 The transfer never finished (`transferIncomplete`), the upload ticket expired (`uploadExpired`), or the stored file is larger than the … |
+
+#### Edge cases to draw
+
+- **Import link opened later**: Shows where it stands (validating, ready for review, failed, applied, expired needing a new upload). *(source: screens/P08-venue-back-office.yaml#BO-1189)*
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+import:
+  file: dune-shuttle-network.zip
+  format: csvBundle
+  status: previewReady
+  create:
+    stations: 6
+    routes: 4
+    timetables: 4
+  update:
+    stations: 1
+  findings:
+    errors: 0
+    warnings: 2
+```
 
 #### Permissions
 
@@ -1337,6 +1651,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - [ ] Every transition is wired: `BO-1184`.
 - [ ] Every gated control is gated: `ASSET_LIBRARY_MANAGE`, `TRANSPORT_MANAGE`, `TRANSPORT_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 1 edge case(s) from the process notes are drawn.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---

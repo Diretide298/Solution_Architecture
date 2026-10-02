@@ -24,11 +24,7 @@
    "exitTo": [
     "PTR-033",
     "PTR-034",
-    "PTR-035",
-    "PTR-036",
-    "PTR-037",
     "PTR-038",
-    "PTR-039",
     "PTR-040",
     "PTR-041"
    ],
@@ -48,55 +44,22 @@
      "operation": "listCommercialAgreement"
     },
     {
-     "to": "PTR-037",
-     "trigger": "Works in Deposit, Guarantee & Financial Security Management",
-     "provenance": "flow F131 step 9→10",
-     "operation": "listCommercialAgreement"
-    },
-    {
      "to": "PTR-038",
      "trigger": "Works in Payment Terms, Billing & Account Configuration",
-     "provenance": "flow F131 step 11→12",
+     "provenance": "flow F131 step 5→6",
      "operation": "listCommercialAgreement"
     },
     {
      "to": "PTR-040",
      "trigger": "Works in Booking Limits, Commercial Exceptions & Approval",
-     "provenance": "flow F131 step 15→16",
+     "provenance": "flow F131 step 7→8",
      "operation": "listCommercialAgreement"
     },
     {
      "to": "PTR-041",
      "trigger": "Works in Commercial Agreement 360°, Health & AI Review",
-     "provenance": "flow F131 step 17→18",
+     "provenance": "flow F131 step 9→10",
      "operation": "listCommercialAgreement"
-    },
-    {
-     "to": "PTR-035",
-     "trigger": "Works in Commission, Margin & Incentive Management",
-     "provenance": "flow F131 step 5→6",
-     "operation": "listCommercialAgreement",
-     "carries": [
-      "agreementId"
-     ]
-    },
-    {
-     "to": "PTR-036",
-     "trigger": "Works in Credit Limit & Exposure Management",
-     "provenance": "flow F131 step 7→8",
-     "operation": "listCommercialAgreement",
-     "carries": [
-      "agreementId"
-     ]
-    },
-    {
-     "to": "PTR-039",
-     "trigger": "Works in Commercial Allocation, Quota & Commitment Management",
-     "provenance": "flow F131 step 13→14",
-     "operation": "listCommercialAgreement",
-     "carries": [
-      "agreementId"
-     ]
     }
    ]
   },
@@ -281,7 +244,7 @@
   "states": {
    "loading": "The commercial agreement list; the counts above it resolve separately.",
    "error": "Could not load. Names which read failed and leaves the commercial agreement untouched.",
-   "emptyFirstRun": "No commercial agreement yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No commercial agreements yet. Offers no create action here: agreements are drafted on the terms builder (PTR-033).",
    "emptyNoResults": "The filter narrowed it and the commercial agreement are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -391,12 +354,12 @@
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 25 §Configure"
       },
       {
-       "kind": "selectField",
+       "kind": "textField",
        "label": "Agreement Name",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 25 §Configure"
       },
       {
-       "kind": "selectField",
+       "kind": "textField",
        "label": "Partner",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 25 §Configure"
       },
@@ -406,12 +369,12 @@
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 25 §Configure"
       },
       {
-       "kind": "selectField",
+       "kind": "textField",
        "label": "Contract Reference",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 25 §Configure"
       },
       {
-       "kind": "selectField",
+       "kind": "textField",
        "label": "Legal Entity",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 25 §Configure"
       },
@@ -426,7 +389,7 @@
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 25 §Configure"
       },
       {
-       "kind": "selectField",
+       "kind": "textField",
        "label": "Territory",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 25 §Configure"
       },
@@ -436,7 +399,7 @@
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 25 §Configure"
       },
       {
-       "kind": "selectField",
+       "kind": "datePicker",
        "label": "Effective From",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 25 §Configure"
       },
@@ -476,17 +439,17 @@
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 25 §Configure/reference"
       },
       {
-       "kind": "selectField",
+       "kind": "textField",
        "label": "Credit Terms",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 25 §Configure/reference"
       },
       {
-       "kind": "selectField",
+       "kind": "textField",
        "label": "Allocation Terms",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 25 §Configure/reference"
       },
       {
-       "kind": "selectField",
+       "kind": "textField",
        "label": "Cancellation Conditions",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 25 §Configure/reference"
       },
@@ -634,12 +597,12 @@
      "slot": "fields",
      "components": [
       {
-       "kind": "selectField",
+       "kind": "textField",
        "label": "Partner",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 27 §Configure by"
       },
       {
-       "kind": "selectField",
+       "kind": "textField",
        "label": "Agreement",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 27 §Configure by"
       },
@@ -649,7 +612,7 @@
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 27 §Configure by"
       },
       {
-       "kind": "selectField",
+       "kind": "textField",
        "label": "Product Family",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 27 §Configure by"
       },
@@ -664,17 +627,17 @@
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 27 §Configure by"
       },
       {
-       "kind": "selectField",
+       "kind": "textField",
        "label": "Ticket Type",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 27 §Configure by"
       },
       {
-       "kind": "selectField",
+       "kind": "textField",
        "label": "Price Category",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 27 §Configure by"
       },
       {
-       "kind": "selectField",
+       "kind": "textField",
        "label": "Market",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 27 §Configure by"
       },
@@ -744,625 +707,6 @@
   }
  },
  {
-  "id": "PTR-035",
-  "name": "Commission, Margin & Incentive Management",
-  "module": "Partners",
-  "requiresModule": "partner",
-  "wave": 3,
-  "source": {
-   "pack": "B2B, Reseller & OTA Partner Management_Reference.pdf",
-   "board": "2",
-   "number": "8.2.4",
-   "page": 29
-  },
-  "implementation": {
-   "app": "partner-web",
-   "route": "/partners/commission-margin-incentive-management-ptr-035",
-   "component": "apps/partner-web/src/routes/partners/CommissionMarginIncentiveManagement.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "PTR-032"
-   ],
-   "exitTo": [
-    "PTR-032"
-   ],
-   "inferred": false,
-   "notes": "**Reached from PTR-032, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
-   "transitions": [
-    {
-     "to": "PTR-032",
-     "trigger": "Returns to the board's landing screen",
-     "provenance": "flow F131 step 6→7",
-     "operation": "listCommissionMarginIncentive"
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
-  "purpose": "Configure how partner commissions and commercial incentives are calculated.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
-    "source": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 29"
-   },
-   {
-    "operation": null,
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
-    "source": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 29"
-   }
-  ],
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Campaign Incentive",
-       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 29 §Support"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Save partner commission rules",
-       "operation": "setPartnerCommissionRules",
-       "permission": "PARTNER_MANAGE",
-       "notes": "The writer for PTR-035 (decided 29 September, writers pass; DM4).",
-       "provenance": "contract subscription.yaml PUT /partner-agreements/{agreementId}/commission-rules"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "components": [
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listCommissionMarginIncentive",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The commission margin incentive list.",
-   "error": "Could not load. Names which read failed and leaves the commission margin incentive untouched.",
-   "emptyFirstRun": "No commission margin incentive yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the commission margin incentive are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "listCommissionMarginIncentive",
-    "contract": "subscription",
-    "purpose": "Commission, Margin & Incentive Management",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "setPartnerCommissionRules",
-    "contract": "subscription",
-    "purpose": "Replace the commission and incentive rules of an agreement",
-    "trigger": "onAction",
-    "invalidates": [
-     "listCommissionMarginIncentive"
-    ]
-   }
-  ],
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P10 Partner Web.dc.html#ptr-035",
-   "workshopBoard": "wireframes/WS39 B2B, Reseller & OTA Partner Management Board 2.dc.html#ptr-035"
-  },
-  "apisNote": "Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page 29. 0 of 0 labels bound to a contract property; 1 of 9 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "overlays": [
-   {
-    "id": "formSetPartnerCommissionRules",
-    "component": "modal",
-    "trigger": "Save partner commission rules",
-    "body": "**Collects what `setPartnerCommissionRules` sends before it is called.** Required: `rules`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Save partner commission rules",
-     "operation": "setPartnerCommissionRules"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "rules"
-     ]
-    },
-    "provenance": "contract subscription.yaml PUT /partner-agreements/{agreementId}/commission-rules"
-   }
-  ],
-  "entryState": {
-   "params": [
-    {
-     "name": "agreementId",
-     "from": "navigation",
-     "optional": true
-    }
-   ]
-  },
-  "_platform": {
-   "code": "P10",
-   "audience": "partner",
-   "formFactor": "web",
-   "shortName": "Partner Web",
-   "name": "Partner Web — Reseller Portal",
-   "offlineCapable": false,
-   "app": "partner-web",
-   "operator": "partner",
-   "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
-    "shell": "web",
-    "siblings": [
-     "P09",
-     "P11",
-     "P14",
-     "P17"
-    ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "PTR-036",
-  "name": "Credit Limit & Exposure Management",
-  "module": "Partners",
-  "requiresModule": "partner",
-  "wave": 3,
-  "source": {
-   "pack": "B2B, Reseller & OTA Partner Management_Reference.pdf",
-   "board": "2",
-   "number": "8.2.5",
-   "page": 30
-  },
-  "implementation": {
-   "app": "partner-web",
-   "route": "/partners/credit-limit-exposure-management-ptr-036",
-   "component": "apps/partner-web/src/routes/partners/CreditLimitExposureManagement.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "PTR-032"
-   ],
-   "exitTo": [
-    "PTR-032"
-   ],
-   "inferred": false,
-   "notes": "**Reached from PTR-032, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
-   "transitions": [
-    {
-     "to": "PTR-032",
-     "trigger": "Returns to the board's landing screen",
-     "provenance": "flow F131 step 8→9",
-     "operation": "listCreditLimitExposure"
-    }
-   ]
-  },
-  "density": "compact",
-  "purposeNote": "time visibility of available and utilized credit.",
-  "pattern": "configEditor",
-  "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
-  "purpose": "Control the financial exposure TICVAI permits for partners buying on account. This should be one of the strongest finance-control screens in the B2B module.",
-  "layout": {
-   "template": "form",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "fields",
-     "components": [
-      {
-       "kind": "selectField",
-       "label": "Credit Enabled",
-       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 30 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Approved Credit Limit",
-       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 30 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Currency",
-       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 30 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Temporary Credit Limit",
-       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 30 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Effective Dates",
-       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 30 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Credit Owner",
-       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 30 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Risk Classification",
-       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 30 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Approval Authority",
-       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 30 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Warning at 70%",
-       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 30 §Configure"
-      },
-      {
-       "kind": "textField",
-       "label": "High Risk at 90%",
-       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 30 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Block at 100%",
-       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 30 §Configure"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "publish",
-     "components": [
-      {
-       "kind": "banner",
-       "label": "Permissions this screen separates",
-       "notes": "**The pack separates these permissions and no action on the screen claims them yet:** Increase Limit, Reduce Limit, Temporary Increase, Place Credit Hold, Release Hold, Block Credit Transactions. Each needs attaching to the control it gates, or the screen needs the control.",
-       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 30 §Authorized users can"
-      },
-      {
-       "kind": "primaryButton",
-       "label": "Save partner credit profile",
-       "operation": "setPartnerCreditProfile",
-       "permission": "CREDIT_MANAGE",
-       "notes": "The writer for PTR-036 (decided 29 September, writers pass; DM4).",
-       "provenance": "contract subscription.yaml PUT /partner-agreements/{agreementId}/credit-profile"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The credit limit exposure configuration as saved.",
-   "error": "Could not load. Names which read failed and leaves the credit limit exposure untouched.",
-   "emptyFirstRun": "No credit limit exposure configured yet. Carries the create action and says what the platform does in the meantime.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "listCreditLimitExposure",
-    "contract": "subscription",
-    "purpose": "Credit Limit & Exposure Management",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "setPartnerCreditProfile",
-    "contract": "subscription",
-    "purpose": "Set the credit controls of an agreement",
-    "trigger": "onAction",
-    "invalidates": [
-     "listCreditLimitExposure"
-    ]
-   }
-  ],
-  "entryState": {
-   "preloaded": [
-    "Open Invoices: AED 210,000",
-    "CreditLimitExposureManagementView.unbilledTransactions",
-    "CreditLimitExposureManagementView.activeHoldsReservations",
-    "CreditLimitExposureManagementView.availableCredit"
-   ],
-   "params": [
-    {
-     "name": "agreementId",
-     "from": "navigation",
-     "optional": true
-    }
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P10 Partner Web.dc.html#ptr-036",
-   "workshopBoard": "wireframes/WS39 B2B, Reseller & OTA Partner Management Board 2.dc.html#ptr-036"
-  },
-  "apisNote": "Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page 30. 0 of 0 labels bound to a contract property; 22 of 31 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "overlays": [
-   {
-    "id": "formSetPartnerCreditProfile",
-    "component": "modal",
-    "trigger": "Save partner credit profile",
-    "body": "**Collects what `setPartnerCreditProfile` sends before it is called.** Required: `id`, `partnerId`, `agreementId`, `creditEnabled`, `creditStatus`. Optional: `temporaryCreditLimit`, `temporaryLimitUntil`, `creditOwnerPrincipalId`, `approvalAuthority`, `riskClassification`, `warningThresholdPercent`, `highRiskThresholdPercent`, `blockThresholdPercent`, `effectiveFrom`, `effectiveTo`, `approvalRequestId`, `scopePath`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "PartnerCreditProfile",
-    "confirm": {
-     "label": "Save partner credit profile",
-     "operation": "setPartnerCreditProfile"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "id",
-      "partnerId",
-      "agreementId",
-      "creditEnabled",
-      "creditStatus",
-      "temporaryCreditLimit",
-      "temporaryLimitUntil",
-      "creditOwnerPrincipalId",
-      "approvalAuthority",
-      "riskClassification",
-      "warningThresholdPercent",
-      "highRiskThresholdPercent",
-      "blockThresholdPercent",
-      "effectiveFrom",
-      "effectiveTo",
-      "approvalRequestId",
-      "scopePath"
-     ]
-    },
-    "provenance": "contract subscription.yaml PUT /partner-agreements/{agreementId}/credit-profile"
-   }
-  ],
-  "_platform": {
-   "code": "P10",
-   "audience": "partner",
-   "formFactor": "web",
-   "shortName": "Partner Web",
-   "name": "Partner Web — Reseller Portal",
-   "offlineCapable": false,
-   "app": "partner-web",
-   "operator": "partner",
-   "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
-    "shell": "web",
-    "siblings": [
-     "P09",
-     "P11",
-     "P14",
-     "P17"
-    ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "PTR-037",
-  "name": "Deposit, Guarantee & Financial Security Management",
-  "module": "Partners",
-  "requiresModule": "partner",
-  "wave": 3,
-  "source": {
-   "pack": "B2B, Reseller & OTA Partner Management_Reference.pdf",
-   "board": "2",
-   "number": "8.2.6",
-   "page": 32
-  },
-  "implementation": {
-   "app": "partner-web",
-   "route": "/partners/deposit-guarantee-financial-security-management-ptr-037",
-   "component": "apps/partner-web/src/routes/partners/DepositGuaranteeFinancialSecurityManagement.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "PTR-032"
-   ],
-   "exitTo": [
-    "PTR-032"
-   ],
-   "inferred": false,
-   "notes": "**Reached from PTR-032, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
-   "transitions": [
-    {
-     "to": "PTR-032",
-     "trigger": "Returns to the board's landing screen",
-     "provenance": "flow F131 step 10→11",
-     "operation": "listDepositGuaranteeFinancial"
-    }
-   ]
-  },
-  "density": "compact",
-  "purposeNote": "Finance can track all financial securities supporting partner exposure and automatically enforce configured controls when security becomes insufficient or expires.",
-  "pattern": "listDetail",
-  "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
-  "purpose": "Manage financial security required to support partner credit or commercial access.",
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "collection",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every deposit guarantee financial",
-       "columns": [
-        "DepositGuaranteeFinancialSecurityManagementView.creditExposure",
-        "DepositGuaranteeFinancialSecurityManagementView.securityCoverage",
-        "DepositGuaranteeFinancialSecurityManagementView.unsecuredExposure"
-       ],
-       "bindsTo": "DepositGuaranteeFinancialSecurityManagementView",
-       "operation": "listDepositGuaranteeFinancial",
-       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 32 §Display"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected deposit guarantee financial",
-       "bindsTo": "DepositGuaranteeFinancialSecurityManagementView",
-       "columns": [
-        "DepositGuaranteeFinancialSecurityManagementView.creditExposure",
-        "DepositGuaranteeFinancialSecurityManagementView.securityCoverage",
-        "DepositGuaranteeFinancialSecurityManagementView.unsecuredExposure"
-       ],
-       "notes": null,
-       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 32 §Display"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Cash Deposit",
-       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 32 §Support"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Security Deposit",
-       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 32 §Support"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Prepayment Balance",
-       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 32 §Support"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Other Approved Security",
-       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 32 §Support"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Save partner security",
-       "operation": "setPartnerSecurity",
-       "permission": "CREDIT_MANAGE",
-       "notes": "The writer for PTR-037 (decided 29 September, writers pass; DM4).",
-       "provenance": "contract subscription.yaml PUT /partners/{partnerId}/securities"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The deposit guarantee financial list.",
-   "error": "Could not load. Names which read failed and leaves the deposit guarantee financial untouched.",
-   "emptyFirstRun": "No deposit guarantee financial yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the deposit guarantee financial are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "listDepositGuaranteeFinancial",
-    "contract": "subscription",
-    "purpose": "Deposit, Guarantee & Financial Security Management",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "setPartnerSecurity",
-    "contract": "subscription",
-    "purpose": "Record, amend, verify or reject a partner's deposit or guarantee",
-    "trigger": "onAction",
-    "invalidates": [
-     "listDepositGuaranteeFinancial"
-    ]
-   }
-  ],
-  "entryState": {
-   "preloaded": [
-    "DepositGuaranteeFinancialSecurityManagementView.creditExposure",
-    "DepositGuaranteeFinancialSecurityManagementView.securityCoverage",
-    "DepositGuaranteeFinancialSecurityManagementView.unsecuredExposure"
-   ],
-   "params": [
-    {
-     "name": "partnerId",
-     "from": "session"
-    }
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P10 Partner Web.dc.html#ptr-037",
-   "workshopBoard": "wireframes/WS39 B2B, Reseller & OTA Partner Management Board 2.dc.html#ptr-037"
-  },
-  "apisNote": "Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page 32. 3 of 3 labels bound to a contract property; 24 of 32 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "overlays": [
-   {
-    "id": "formSetPartnerSecurity",
-    "component": "modal",
-    "trigger": "Save partner security",
-    "body": "**Collects what `setPartnerSecurity` sends before it is called.** Required: `id`, `partnerId`, `securityType`, `amount`, `currency`, `effectiveDate`, `verificationStatus`. Optional: `agreementId`, `issuingInstitution`, `reference`, `expiryDate`, `documentId`, `expiryAction`, `scopePath`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "PartnerSecurity",
-    "confirm": {
-     "label": "Save partner security",
-     "operation": "setPartnerSecurity"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "id",
-      "partnerId",
-      "securityType",
-      "amount",
-      "currency",
-      "effectiveDate",
-      "verificationStatus",
-      "agreementId",
-      "issuingInstitution",
-      "reference",
-      "expiryDate",
-      "documentId",
-      "expiryAction",
-      "scopePath"
-     ]
-    },
-    "provenance": "contract subscription.yaml PUT /partners/{partnerId}/securities"
-   }
-  ],
-  "_platform": {
-   "code": "P10",
-   "audience": "partner",
-   "formFactor": "web",
-   "shortName": "Partner Web",
-   "name": "Partner Web — Reseller Portal",
-   "offlineCapable": false,
-   "app": "partner-web",
-   "operator": "partner",
-   "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
-    "shell": "web",
-    "siblings": [
-     "P09",
-     "P11",
-     "P14",
-     "P17"
-    ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
   "id": "PTR-038",
   "name": "Payment Terms, Billing & Account Configuration",
   "module": "Partners",
@@ -1393,7 +737,7 @@
     {
      "to": "PTR-032",
      "trigger": "Returns to the board's landing screen",
-     "provenance": "flow F131 step 12→13",
+     "provenance": "flow F131 step 6→7",
      "operation": "setPaymentTermBilling"
     }
    ]
@@ -1417,6 +761,12 @@
      "name": "contentBody",
      "slot": "collection",
      "components": [
+      {
+       "kind": "multiSelect",
+       "label": "Accepted payment methods",
+       "notes": "The payment methods this partner account may use. Options: Immediate Payment; Credit Account; Deposit Balance; Bank Transfer; Card; Payment Link; Prepaid Balance; Other approved method.",
+       "provenance": "design-notes correction PTR-038, 2 October 2026 (CHG-SOT-015): a choice, not buttons"
+      },
       {
        "kind": "dataTable",
        "label": "Every payment terms billing",
@@ -1460,48 +810,7 @@
     {
      "name": "actionBar",
      "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Immediate Payment",
-       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 33 §Support"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Credit Account",
-       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 33 §Support"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Deposit Balance",
-       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 33 §Support"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Bank Transfer",
-       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 33 §Allow/reference"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Card",
-       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 33 §Allow/reference"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Payment Link",
-       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 33 §Allow/reference"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Prepaid Balance",
-       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 33 §Allow/reference"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Other approved method",
-       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 33 §Allow/reference"
-      }
-     ]
+     "components": []
     }
    ]
   },
@@ -1562,241 +871,6 @@
   }
  },
  {
-  "id": "PTR-039",
-  "name": "Commercial Allocation, Quota & Commitment Management",
-  "module": "Partners",
-  "requiresModule": "partner",
-  "wave": 3,
-  "source": {
-   "pack": "B2B, Reseller & OTA Partner Management_Reference.pdf",
-   "board": "2",
-   "number": "8.2.8",
-   "page": 35
-  },
-  "implementation": {
-   "app": "partner-web",
-   "route": "/partners/commercial-allocation-quota-commitment-management-ptr-039",
-   "component": "apps/partner-web/src/routes/partners/CommercialAllocationQuotaCommitmentManagement.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "PTR-032"
-   ],
-   "exitTo": [
-    "PTR-032"
-   ],
-   "inferred": false,
-   "notes": "**Reached from PTR-032, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
-   "transitions": [
-    {
-     "to": "PTR-032",
-     "trigger": "Returns to the board's landing screen",
-     "provenance": "flow F131 step 14→15",
-     "operation": "listCommercialAllocationQuota"
-    }
-   ]
-  },
-  "density": "compact",
-  "purposeNote": "permitted availability with central capacity management.",
-  "pattern": "listDetail",
-  "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
-  "purpose": "Define the commercial commitment of inventory to a partner. This differs from Area 4's operational channel allocation.",
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "collection",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every commercial allocation quota",
-       "columns": [
-        "CommercialAllocationQuotaCommitmentManagementView.allocated",
-        "CommercialAllocationQuotaCommitmentManagementView.booked",
-        "CommercialAllocationQuotaCommitmentManagementView.sold",
-        "CommercialAllocationQuotaCommitmentManagementView.returned",
-        "CommercialAllocationQuotaCommitmentManagementView.remaining",
-        "CommercialAllocationQuotaCommitmentManagementView.utilization",
-        "CommercialAllocationQuotaCommitmentManagementView.commitmentAchievement"
-       ],
-       "bindsTo": "CommercialAllocationQuotaCommitmentManagementView",
-       "operation": "listCommercialAllocationQuota",
-       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 35 §Display"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected commercial allocation quota",
-       "bindsTo": "CommercialAllocationQuotaCommitmentManagementView",
-       "columns": [
-        "CommercialAllocationQuotaCommitmentManagementView.allocated",
-        "CommercialAllocationQuotaCommitmentManagementView.booked",
-        "CommercialAllocationQuotaCommitmentManagementView.sold",
-        "CommercialAllocationQuotaCommitmentManagementView.returned",
-        "CommercialAllocationQuotaCommitmentManagementView.remaining",
-        "CommercialAllocationQuotaCommitmentManagementView.utilization",
-        "CommercialAllocationQuotaCommitmentManagementView.commitmentAchievement"
-       ],
-       "notes": "The pack groups this record's detail under its own headings: “Area 4 asks”, “This screen asks”, “Integration”.",
-       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 35 §Display"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Guaranteed Allocation",
-       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 35 §Support"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "On-Request Allocation",
-       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 35 §Support"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Shared Allocation",
-       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 35 §Support"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Fixed Quantity",
-       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 35 §Support"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Percentage Allocation",
-       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 35 §Support"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Rolling Allocation",
-       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 35 §Support"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Seasonal Allocation",
-       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 35 §Support"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Take-or-pay where commercially applicable",
-       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 35 §Support"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Save partner allocations",
-       "operation": "setPartnerAllocations",
-       "permission": "PARTNER_MANAGE",
-       "notes": "The writer for PTR-039 (decided 29 September, writers pass; DM4).",
-       "provenance": "contract subscription.yaml PUT /partner-agreements/{agreementId}/allocations"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The commercial allocation quota list.",
-   "error": "Could not load. Names which read failed and leaves the commercial allocation quota untouched.",
-   "emptyFirstRun": "No commercial allocation quota yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the commercial allocation quota are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "listCommercialAllocationQuota",
-    "contract": "subscription",
-    "purpose": "Commercial Allocation, Quota & Commitment Management",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "setPartnerAllocations",
-    "contract": "subscription",
-    "purpose": "Replace the allocations of an agreement",
-    "trigger": "onAction",
-    "invalidates": [
-     "listCommercialAllocationQuota"
-    ]
-   }
-  ],
-  "entryState": {
-   "preloaded": [
-    "CommercialAllocationQuotaCommitmentManagementView.allocated",
-    "CommercialAllocationQuotaCommitmentManagementView.booked",
-    "CommercialAllocationQuotaCommitmentManagementView.sold",
-    "CommercialAllocationQuotaCommitmentManagementView.returned",
-    "CommercialAllocationQuotaCommitmentManagementView.remaining",
-    "CommercialAllocationQuotaCommitmentManagementView.utilization"
-   ],
-   "params": [
-    {
-     "name": "agreementId",
-     "from": "navigation",
-     "optional": true
-    }
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P10 Partner Web.dc.html#ptr-039",
-   "workshopBoard": "wireframes/WS39 B2B, Reseller & OTA Partner Management Board 2.dc.html#ptr-039"
-  },
-  "apisNote": "Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page 35. 7 of 7 labels bound to a contract property; 27 of 45 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "overlays": [
-   {
-    "id": "formSetPartnerAllocations",
-    "component": "modal",
-    "trigger": "Save partner allocations",
-    "body": "**Collects what `setPartnerAllocations` sends before it is called.** Required: `allocations`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Save partner allocations",
-     "operation": "setPartnerAllocations"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "allocations"
-     ]
-    },
-    "provenance": "contract subscription.yaml PUT /partner-agreements/{agreementId}/allocations"
-   }
-  ],
-  "_platform": {
-   "code": "P10",
-   "audience": "partner",
-   "formFactor": "web",
-   "shortName": "Partner Web",
-   "name": "Partner Web — Reseller Portal",
-   "offlineCapable": false,
-   "app": "partner-web",
-   "operator": "partner",
-   "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
-    "shell": "web",
-    "siblings": [
-     "P09",
-     "P11",
-     "P14",
-     "P17"
-    ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
   "id": "PTR-040",
   "name": "Booking Limits, Commercial Exceptions & Approval",
   "module": "Partners",
@@ -1827,7 +901,7 @@
     {
      "to": "PTR-032",
      "trigger": "Returns to the board's landing screen",
-     "provenance": "flow F131 step 16→17",
+     "provenance": "flow F131 step 8→9",
      "operation": "approveBookingLimitCommercial"
     }
    ]
@@ -1902,7 +976,7 @@
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 37 §Capture"
       },
       {
-       "kind": "selectField",
+       "kind": "textField",
        "label": "Agreement",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 37 §Capture"
       },
@@ -1912,12 +986,12 @@
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 37 §Capture"
       },
       {
-       "kind": "selectField",
+       "kind": "textField",
        "label": "Current Rule",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 37 §Capture"
       },
       {
-       "kind": "selectField",
+       "kind": "textField",
        "label": "Requested Exception",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 37 §Capture"
       },
@@ -1927,7 +1001,7 @@
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 37 §Capture"
       },
       {
-       "kind": "selectField",
+       "kind": "textField",
        "label": "Reason",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 37 §Capture"
       },
@@ -1966,6 +1040,20 @@
        "kind": "secondaryButton",
        "label": "Booking Limit Exception",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 37 §Support"
+      },
+      {
+       "kind": "textField",
+       "label": "Authentication code",
+       "operation": "verifyMfaChallenge",
+       "notes": "Asked in place inside the Approve the exception confirmation, because `approveBookingLimitCommercial` needs a fresh step-up token (`x-ticvai-step-up: mfa`); its result is the `stepUpToken`. Five wrong codes lock step-up for the lockout minutes (audit R126).",
+       "provenance": "contract identity.yaml POST /auth/mfa/challenge/{challengeId}/verify"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Email me a code instead",
+       "operation": "createMfaChallenge",
+       "notes": "Opens the step-up challenge for Approve the exception; the emailed code is the fallback to the authenticator app (audit R126 (5)).",
+       "provenance": "contract identity.yaml POST /auth/mfa/challenge"
       }
      ]
     }
@@ -1974,7 +1062,7 @@
   "states": {
    "loading": "The booking limits commercial configuration as saved.",
    "error": "Could not load. Names which read failed and leaves the booking limits commercial untouched.",
-   "emptyFirstRun": "No booking limits commercial configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyFirstRun": "No booking-limit exception waiting: nothing to approve, which is good news. Offers no create action.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
@@ -1983,6 +1071,20 @@
     "contract": "subscription",
     "purpose": "Booking Limits, Commercial Exceptions & Approval",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "createMfaChallenge",
+    "contract": "identity",
+    "purpose": "The step-up challenge Approve the exception asks for in place",
+    "trigger": "onAction",
+    "provenance": "design-notes correction PTR-040, 2 October 2026 (CHG-SOT-015)"
+   },
+   {
+    "operationId": "verifyMfaChallenge",
+    "contract": "identity",
+    "purpose": "Answers the step-up challenge; its token goes into approveBookingLimitCommercial",
+    "trigger": "onAction",
+    "provenance": "design-notes correction PTR-040, 2 October 2026 (CHG-SOT-015)"
    }
   ],
   "wireframe": {
@@ -1992,6 +1094,14 @@
    "workshopBoard": "wireframes/WS39 B2B, Reseller & OTA Partner Management Board 2.dc.html#ptr-040"
   },
   "apisNote": "Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page 37. 0 of 0 labels bound to a contract property; 22 of 39 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "challengeId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P10",
    "audience": "partner",
@@ -2092,7 +1202,7 @@
   "states": {
    "loading": "The commercial agreement 360° list.",
    "error": "Could not load. Names which read failed and leaves the commercial agreement 360° untouched.",
-   "emptyFirstRun": "No commercial agreement 360° yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No agreement to review yet: health appears once an agreement is active. Offers no create action.",
    "emptyNoResults": "The filter narrowed it and the commercial agreement 360° are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },

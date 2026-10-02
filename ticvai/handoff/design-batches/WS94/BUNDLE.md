@@ -1,6 +1,6 @@
 # WS94 — Rental Management board 7
 
-**10 screens · 9 operations · 7 schemas · 3 permissions**
+**10 screens · 8 operations · 6 schemas · 2 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -48,8 +48,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 3 permissions apply here:
-  `MARKETING_SEND, RENTAL_OPERATE, RENTAL_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 2 permissions apply here:
+  `RENTAL_OPERATE, RENTAL_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -60,6 +60,38 @@ convincingly. It is never a caption.
   field, the control, whether it is required, its default, its limits and allowed values, its format
   and its error; and, element by element, what is shown and in what format, what each action
   produces and where the user goes next. Draw exactly that.
+
+## The processes these screens belong to
+
+Written by the owner of each process (`handoff/design-notes/`). Read before any screen: it says how the process runs end to end and which words the screens must use.
+
+### Food, Beverage & Retail
+
+Food & beverage, retail, rentals, inventory and procurement across the till (P04), the kitchen display (P15), the staff app (P06), Venue Management (P08), the guest web and app (P01/P02), the kiosk (P05) and the CMS (P13). COUNTER SERVICE (F108): the cashier takes the order on the Food & Drink board from the outlet's menu in force (sections in the outlet's order, option groups attached to the item), sends it to the kitchen, and only then charges — send to kitchen, then charge, for every POS F&B order (R261, upheld against the v2 frame by POSV2-4). The kitchen ticket is on the rail while the card is in the guest's hand; an unpaid sent order is cancelled while ordered or accepted and voided with a reason after (R125(3), R091(5)); the guest gets an order number, and the customer-facing status board (numbers only) is the kitchen display's KIT-007, mirrored on the till's queue (POSV2-7). TABLE SERVICE (F29, F80, F94): a party is seated with its covers, orders across the visit, courses are fired by the pass (DI-333, DI-407), the bill is printed and settled at the end and split by amount, covers, category, item or seat (DI-106); the client's table statuses are Available → Ordered → Table closed → Reserved with no cleaning status (DI-336); moving and merging tables stay on the staff app until after r2 (POSV2-8). GUEST ORDERING (F11, F48): a guest inside the venue orders in the app or web for pickup or delivery to a seat or a scanned location (DI-288, DI-291); F&B and retail are optional licensed modules completed inside TICVAI (DI-505), kept simple (DI-1091); no food without an admission ticket (DI-292); table reservations and the waitlist do not go through the cart and a dining deposit is a venue option, off by default (DI-1048, DI-1049, R077). KITCHEN (P15, F83, F88): TICVAI's own display on commodity screens (19 September, replacing the 31 July "integration point only", DI-077); one kitchen ticket per preparation station from the outlet's routing rules with a fallback display (DI-323); a fired timer counts up and resets per course, not shown for quick service (DI-334); displays are assigned to stations and filter by course, with no station-load tile in r1 (R277). 86 takes an item off sale on every till and guest menu immediately (R110(c)); guests always see "Sold out", never a missing dish. RETAIL (F17, F34, F51): scan and sell through the same cart, charge and payment as tickets and food (DI-795), one cart, one receipt and one QR per guest (DI-293); system stock per venue gates the sale (DI-294); returns by receipt or order number only in r1 (R139(c)), refund to the original tender with a reason code and note (DI-796, DI-797); Shop & Drop is paid online and collected on the way out (R236), a merchandise reservation lasts to the end of the visit day (R169, R215). TILL MONEY (F32, F73, F74, F87): the float is counted by denomination with note images and typed quantities (DI-775, DI-776, R229) while the hardware checks itself (DI-778); the close is a …
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Send to kitchen | Put the order on the kitchen rail. On the till it always comes before Charge. | Fire, Fire order, Submit order, kitchen fires on payment | R261 / POSV2-4 / F108 step 3 |
+| Charge | The till's single tender step (Payment, POS-005); the button reads "Charge AED 110.25". | Checkout (on staff screens), Pay now | F108 step 4 / screens/P04-point-of-sale.yaml#POS-021 |
+| Fire / Hold (a course) | Kitchen-pass words for releasing or holding the next course of a table, and the "fired" timer. | using "fire" for sending an order from the till | DI-333 / DI-334 / DI-407 |
+| Kitchen ticket | The slip on the kitchen display, one per preparation station. | Order (on the kitchen display), KOT | R210 |
+| Ready · Served · Collected · Delivered | How an order reaches the guest; a server marks Served, a counter Collected, a runner Delivered (with the location). | Done, Complete, Bumped (as a status) | R125 / contracts/satellite/fnb.yaml#recordOrderHandover |
+| Recall (kitchen) / Recall held sale (till) | Bring a mis-bumped kitchen ticket back to the rail; separately, bring a held cart back into a sale. Never "Recall" alone where both could apply. | Undo bump, Restore | contracts/satellite/fnb.yaml#recallKitchenTicket / POSV2-6 |
+| Unavailable (86) / Sold out | Staff screens say "Unavailable" and may add "86"; guest screens say "Sold out". Immediate everywhere. | Out of stock (for food), Disabled, Hidden | R110 / contracts/satellite/fnb.yaml#getGuestMenu |
+| Order type | Dine-in · Quick service · Takeaway · Delivery, chosen in the cart. | Service mode, Fulfilment source (on the till) | DI-789 / contracts/satellite/fnb.yaml#/components/schemas/ServiceMode |
+| Covers | The number of guests at a table, entered when seating; drives split-by-covers. | Pax (except as a small suffix on the floor plan), Heads | DI-104 / contracts/satellite/fnb.yaml#openTableVisit |
+| Vacant · Seated · Ordered · Bill requested · Table closed · … | Table statuses on every floor plan (till and staff app); "Table closed" is the client's word for after payment. | Cleaning, Needs clearing, Dirty | DI-336 / DI-792 |
+| Till · Cash drawer | Staff copy may say "till" for the workstation; the cash drawer is the deposit box. | Terminal id as a heading, Deposit box (on staff screens) | R156 |
+| Float · Count · Blind count · Variance | The opening float; the denomination count; the closing count made without seeing the expected cash; counted minus expected. | Expected in drawer, Discrepancy, Error | R080 / POSV2-3 |
+| Cash out · Cash in · Safe drop | Taking cash out of the drawer mid-shift, adding change, and a supervisor moving cash to the safe with the cashier as witness. | Lift, Withdrawal (as button labels) | DI-274 / contracts/spine/shift.yaml#createCashMovement / … |
+| Menu item · Merchandise item · Inventory item · SKU | The scoped product words; SKU is a variant's code, Product stays the sellable thing. | SKU as the item's name, Article | R131 |
+| Stock on hand · Allocated · Available | Available is on hand minus allocated. | Inventory (as a number), Free stock | R171 / DI-361 |
+| Requisition · Purchase order · Goods receipt · Transfer · … | The procurement and stock words, in that flow. | GRN as the only label, Indent | DI-341 / DI-348 / DI-362 / DI-363 |
+| Shop & Drop | Bought and paid now, collected on the way out. | Click & collect | R236 |
+| Check-out (rental) · Return (rental) | Handing equipment to the guest and taking it back. On the same screens payment is "Charge" or "Pay". | Checkout (for a handover), Check-in (for a return) | DI-758 / DI-765 |
+| Deposit hold · Release · Capture | A refundable deposit held, given back in full, or partly kept for damage with the rest released. | Charge deposit, Refund deposit | DI-752 / R127 |
+| Extension · Swap · Overdue · Late fee | The active-rental words; a quick swap restarts the clock, a late swap earns a free extension. | Renewal, Exchange (for a swap) | DI-761 / DI-762 / DI-764 |
+
 
 ## The screens
 
@@ -74,7 +106,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-558` | Equipment Swap / Replacement | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-559` | Rental Incident & Operational Exception | B–D | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
 | `BO-560` | Due Soon & Customer Notification Management | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-561` | Overdue Rental Management | B–D | 0 | 0 | 6 | 8 | 1 | 6 | — | notStarted (—) |
+| `BO-561` | Overdue Rental Management | B–D | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
 | `BO-562` | Active Group Rental Management | B–D | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
 | `BO-563` | Active Rental Intelligence & Operational Alerts | B–D | 0 | 14 | 6 | 0 | 1 | 6 | — | notStarted (—) |
 
@@ -103,6 +135,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/rentals/active-rental-operations-command-center-bo-554` |
+
+**From the Food, Beverage & Retail process.** The supervisor's live view of everything out, across stations. Same list and chips as EMP-081; the desk adds the station breakdown and is where the venue-wide overdue picture is watched.
 
 #### Inputs: what the user enters or picks
 
@@ -144,6 +178,10 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 **Expected Returns Next Hour** (metric tile)
 
+**Rules for what is shown** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
+
+- **Station breakdown**: Active / due soon / overdue per station in a compact row above the list. *(source: contracts/satellite/rental.yaml#listOverdueRentals / DI-761)*
+
 **Data it reads**: `listRentalBookings` (onLoad, Rentals out right now); `listOverdueRentals` (onLoad, Due soon and late)
 
 **Where the user goes next**
@@ -169,6 +207,28 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the active rental operations are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Consistency with other screens
+
+- Match `EMP-081`: Shared design, counters and corrections (board 7 consolidation, unsourced tiles).
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+sameAs: EMP-081
+stations:
+- station: Kayak station
+  active: 22
+  overdue: 2
+- station: Bike hub
+  active: 31
+  overdue: 1
+- station: Beach Hut
+  active: 11
+  overdue: 0
+```
 
 #### Permissions
 
@@ -246,6 +306,8 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Food, Beverage & Retail process.** Desk form of the rental detail and timeline (EMP-082).
+
 #### Inputs: what the user enters or picks
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
@@ -270,6 +332,18 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the active rental detail are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Consistency with other screens
+
+- Match `EMP-082`: Shared design and correction (no assignments or events in the booking read).
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+sameAs: EMP-082
+```
 
 #### Permissions
 
@@ -336,6 +410,8 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 
 **Known gaps.** **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Food, Beverage & Retail process.** Desk form of the extension availability check (EMP-083).
+
 #### Inputs: what the user enters or picks
 
 **On the screen**
@@ -400,6 +476,18 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the rental extension request are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Consistency with other screens
+
+- Match `EMP-083`: Shared design and corrections.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+sameAs: EMP-083
+```
 
 #### Permissions
 
@@ -466,6 +554,8 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Food, Beverage & Retail process.** Desk form of extension pricing and confirmation (EMP-084); the desk may also approve a free extension (fee waiver).
+
 #### Inputs: what the user enters or picks
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
@@ -494,6 +584,18 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 The equipment is reserved for a later booking. The conflicting booking's window is named, so the counter can offer a shorter extension instead of a refusal.; 422 `quoteExpired` or `quoteMismatch` on `acceptedQuoteId`. |
+
+#### Consistency with other screens
+
+- Match `EMP-084`: Shared design and correction (quote prices a new rental; no payment step).
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+sameAs: EMP-084
+```
 
 #### Permissions
 
@@ -556,6 +658,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Food, Beverage & Retail process.** Desk form of the swap (EMP-085), with the same quick-swap / free-time rule.
+
 #### Inputs: what the user enters or picks
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
@@ -583,6 +687,18 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the equipment swap replacement are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Consistency with other screens
+
+- Match `EMP-085`: Shared design and correction (contract keeps the clock, contradicting DI-762).
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+sameAs: EMP-085
+```
 
 #### Permissions
 
@@ -644,6 +760,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Food, Beverage & Retail process.** Desk form of incident logging (EMP-086). At the desk this is also where High and Critical incidents reported from the handheld are reviewed.
+
 #### Inputs: what the user enters or picks
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
@@ -671,6 +789,18 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the rental incident operational are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Consistency with other screens
+
+- Match `EMP-086`: Shared design and correction (no booking/unit entry parameters).
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+sameAs: EMP-086
+```
 
 #### Permissions
 
@@ -737,6 +867,8 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Food, Beverage & Retail process.** Desk form of due-soon reminders (EMP-087), merged into the active list's Due soon filter.
+
 #### Inputs: what the user enters or picks
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
@@ -770,6 +902,18 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the due soon customer are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Consistency with other screens
+
+- Match `EMP-087`: Shared design and correction.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+sameAs: EMP-087
+```
 
 #### Permissions
 
@@ -822,14 +966,16 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Rentals · wave 3 · needs the `resources` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `MARKETING_SEND`, `RENTAL_VIEW` (1 operate, 1 read); in the flows as venue manager |
+| Who uses it | venue staff holding `RENTAL_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/rentals/overdue-rental-management-bo-561` |
 
-**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built. Removed 2 October 2026 (CHG-WIR-008): sendTransactionalMessage declares the service and partner audiences, not staff, so a staff device cannot call it as declared (design-notes correction fnb-retail …
+
+**From the Food, Beverage & Retail process.** Desk form of overdue management (EMP-088), the Overdue filter of the active list with Send reminder and Call.
 
 #### Inputs: what the user enters or picks
 
@@ -848,13 +994,6 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
 
-**Actions and what each produces**
-
-| Action | Calls | Sends | On success returns | Errors to show | Notes |
-|---|---|---|---|---|---|
-| Send transactional message (primary button) | navigation or local | — | — | — | — |
-| Cancel (secondary button) | navigation or local | — | — | — | — |
-
 **Data it reads**: `listOverdueRentals` (onLoad, Late, and what it is accruing)
 
 **Where the user goes next**
@@ -867,33 +1006,32 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |---|---|
 | Loading (`?state=loading`) | The overdue rental list. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the overdue rental untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No overdue rental yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, first run (`?state=emptyFirstRun`) | No overdue rental yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the overdue rental are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 409 Address suppressed, or the guest has no address for that channel |
+
+#### Consistency with other screens
+
+- Match `EMP-088`: Shared design and correction (message operation's audience).
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+sameAs: EMP-088
+```
 
 #### Permissions
 
 - `listOverdueRentals` → `RENTAL_VIEW` (read) · staff
-- `sendTransactionalMessage` → `MARKETING_SEND` (operate) · service, partner
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
 #### Requirements it meets
 
-8 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
-
-| Ref | Requirement (shortened) | Domain | Verdict | Via |
-|---|---|---|---|---|
-| 19.2.61 | Reservation Notifications - System shall provide reservation reminders. | Guest Mobile App & Branding | CONTRACTED | `sendTransactionalMessage` |
-| 19.2.62 | Ticket Notifications - System shall provide ticket reminders. | Guest Mobile App & Branding | CONTRACTED | `sendTransactionalMessage` |
-| 19.2.64 | Operational Notifications - System shall provide operational notifications. | Guest Mobile App & Branding | CONTRACTED | `sendTransactionalMessage` |
-| 2.7.21 | It is expected that confirmation email can be generated; the email shall include relevant visit information such as the number of tickets, the cost, the order number. | Ticketing Sales | CONTRACTED | `sendTransactionalMessage` |
-| 4.4.8 | The system should be able to reduce the use of paper and send out receipts via phone as SMS or whatsapp or email for all transactions. | Bundles and Promotions | CONTRACTED | `sendTransactionalMessage` |
-| 4.6.14 | The system should be able to reduce the use of paper and send out receipts via phone or email for all transactions. | Bundles and Promotions | CONTRACTED | `sendTransactionalMessage` |
-| 13.3.15 | APIs shall support email, SMS, push notifications, WhatsApp notifications and notification status retrieval. | Developer & API Management | CONTRACTED | `sendTransactionalMessage` |
-| 22.9.2 | Multi-Channel Delivery | Marketing & CRM | CONTRACTED | `sendTransactionalMessage` |
+No matrix row traces to this screen's operations or data.
 
 #### Client meeting inputs
 
@@ -921,12 +1059,12 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (409).
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
 - [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-561?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: Send transactional message, Cancel.
+- [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-554`.
-- [ ] Every gated control is gated: `MARKETING_SEND`, `RENTAL_VIEW`.
+- [ ] Every gated control is gated: `RENTAL_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -949,6 +1087,8 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | Route | `/rentals/active-group-rental-management-bo-562` |
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+**From the Food, Beverage & Retail process.** Desk form of the active group rental (EMP-089), i.e. the rental detail with one row per participant and unit.
 
 #### Inputs: what the user enters or picks
 
@@ -974,6 +1114,18 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the active group rental are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Consistency with other screens
+
+- Match `EMP-089`: Shared design.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+sameAs: EMP-089
+```
 
 #### Permissions
 
@@ -1040,6 +1192,8 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 
 **Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
 
+**From the Food, Beverage & Retail process.** The back office may keep an intelligence panel for rentals (utilisation, incident trends - DI-764), but as reporting, consistent with the agreed AI role; the predictive columns need operations first.
+
 #### Inputs: what the user enters or picks
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
@@ -1079,6 +1233,10 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Location return pressure | text | not in the schema: `Location return pressure` |
 | Expected inventory shortage | text | not in the schema: `Expected inventory shortage` |
 
+**Rules for what is shown** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
+
+- **Panel**: Due next hour and overdue counts from live data; utilisation and incident trends as reported figures with their period; no prediction drawn until an operation provides it. *(source: DI-764 / DI-772 / DI-771)*
+
 **Data it reads**: `listOverdueRentals` (onLoad, Operational alerts)
 
 **Where the user goes next**
@@ -1095,6 +1253,23 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the active rental intelligence are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Consistency with other screens
+
+- Match `EMP-090`: The correction on EMP-090 (plumbing title, unbound predictions) applies here.
+- Match `BO-584`: The rental executive command centre owns trend reporting; avoid two places.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+panel:
+  dueNextHour: 21
+  overdue: 3
+  utilisationToday: 72%
+  incidentsThisWeek: 4 (2 brake faults)
+```
 
 #### Permissions
 
@@ -1242,7 +1417,6 @@ Method, path, parameters, request and response for every operation these screens
 "listRentalBookings": {"method":"GET","path":"/rental-bookings","contract":"rental","summary":"Reservations across venues and locations","permission":"RENTAL_VIEW","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[{"name":"status","in":"query","required":null},{"name":"locationId","in":"query","required":null},{"name":"from","in":"query","required":null},{"name":"to","in":"query","required":null}],"requestBody":null,"responds":"RentalBooking"},
 "quoteRentalPrice": {"method":"POST","path":"/rental-price","contract":"rental","summary":"What this rental would cost, and the deposit it would hold","permission":"RENTAL_VIEW","offlineCapable":null,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"RentalQuoteRequest","responds":"RentalQuote"},
 "reportRentalIncident": {"method":"POST","path":"/rental-incidents","contract":"rental","summary":"Something happened during a rental","permission":"RENTAL_OPERATE","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"RentalIncident","responds":"RentalIncident"},
-"sendTransactionalMessage": {"method":"POST","path":"/messages","contract":"marketing-crm","summary":"Send a transactional message","permission":"MARKETING_SEND","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":null},
 "swapRentalEquipment": {"method":"POST","path":"/rental-bookings/{bookingId}/swap","contract":"rental","summary":"Replace a faulty item mid-rental","permission":"RENTAL_OPERATE","offlineCapable":null,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"RentalBooking"}
 }
 ```
@@ -1253,9 +1427,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
-"MessageChannel": {"type":"string","enum":["email","sms","whatsapp","push","inApp","post"]},
 "RentalAvailability": {"type":"object","description":"Board 3. **A pooled product answers with a count, a serialised one with assets.**","properties":{"productId":{"type":"string","format":"uuid"},"locationId":{"type":"string","format":"uuid","nullable":true},"windows":{"type":"array","items":{"type":"object","properties":{"from":{"type":"string","format":"date-time"},"to":{"type":"string","format":"date-time"},"availableQuantity":{"type":"integer"},"availableAssetIds":{"type":"array","items":{"type":"string","format":"uuid"}}}}},"blockedWindows":{"type":"array","items":{"type":"object","properties":{"from":{"type":"string","format":"date-time"},"to":{"type":"string","format":"date-time"},"reason":{"type":"string","enum":["booked","turnaround","maintenance","blackout","closed","buffer","held"]}}}}}},
-"RentalBooking": {"type":"object","x-ticvai-persistence":"rental.booking","description":"Board 5. **The booking outlives the order** — an order completes at payment and the rental is still out.\n","required":["id","productId","from","to","status"],"properties":{"id":{"type":"string","format":"uuid"},"reference":{"type":"string"},"productId":{"type":"string","format":"uuid"},"locationId":{"type":"string","format":"uuid"},"returnLocationId":{"type":"string","format":"uuid","nullable":true},"customerId":{"type":"string","format":"uuid","nullable":true},"orderId":{"type":"string","format":"uuid","nullable":true},"from":{"type":"string","format":"date-time"},"to":{"type":"string","format":"date-time"},"quantity":{"type":"integer"},"status":{"type":"string","enum":["draft","confirmed","awaitingArrival","checkedOut","overdue","partiallyReturned","completed","completedWithDamage","notReturned","cancelled","noShow"]},"checkedOutAt":{"type":"string","format":"date-time","nullable":true},"dueBackAt":{"type":"string","format":"date-time","nullable":true},"returnedAt":{"type":"string","format":"date-time","nullable":true},"depositAuthorisationId":{"type":"string","format":"uuid","nullable":true},"accruedLateFee":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"readiness":{"type":"array","readOnly":true,"description":"**Computed, not stored** — agreement, requirements, deposit, equipment.","items":{"type":"object","properties":{"check":{"type":"string"},"satisfied":{"type":"boolean"},"detail":{"type":"string","nullable":true}}}},"participants":{"type":"array","items":{"$ref":"#/components/schemas/RentalParticipant"}},"scopePath":{"type":"string"}}},
+"RentalBooking": {"type":"object","x-ticvai-persistence":"rental.booking","description":"Board 5. **The booking outlives the order** — an order completes at payment and the rental is still out.\n","required":["id","productId","from","to","status"],"properties":{"id":{"type":"string","format":"uuid"},"reference":{"type":"string"},"productId":{"type":"string","format":"uuid"},"locationId":{"type":"string","format":"uuid"},"returnLocationId":{"type":"string","format":"uuid","nullable":true},"customerId":{"type":"string","format":"uuid","nullable":true},"orderId":{"type":"string","format":"uuid","nullable":true},"from":{"type":"string","format":"date-time"},"to":{"type":"string","format":"date-time"},"quantity":{"type":"integer"},"status":{"type":"string","enum":["draft","confirmed","awaitingArrival","checkedOut","overdue","partiallyReturned","completed","completedWithDamage","notReturned","cancelled","noShow"]},"checkedOutAt":{"type":"string","format":"date-time","nullable":true},"dueBackAt":{"type":"string","format":"date-time","nullable":true},"returnedAt":{"type":"string","format":"date-time","nullable":true},"depositAuthorisationId":{"type":"string","format":"uuid","nullable":true,"description":"The card deposit's terminal pre-authorisation, written by `checkOutRental` (workbook Q304; CHG-CSA-029). The hold is kept whole until every unit is back (workbook Q306)."},"accruedLateFee":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"readiness":{"type":"array","readOnly":true,"description":"**Computed, not stored** — agreement, requirements, deposit, equipment.","items":{"type":"object","properties":{"check":{"type":"string"},"satisfied":{"type":"boolean"},"detail":{"type":"string","nullable":true}}}},"participants":{"type":"array","items":{"$ref":"#/components/schemas/RentalParticipant"}},"scopePath":{"type":"string"}}},
 "RentalIncident": {"type":"object","x-ticvai-persistence":"rental.incident","description":"Board 7.6. **Distinct from damage** — an incident may carry no charge and still be the most important thing that happened.\n","required":["kind","description"],"properties":{"id":{"type":"string","format":"uuid"},"bookingId":{"type":"string","format":"uuid","nullable":true},"assetId":{"type":"string","format":"uuid","nullable":true},"kind":{"type":"string","enum":["injury","loss","theft","complaint","equipmentFailure","safetyBreach","other"]},"description":{"type":"string"},"severity":{"type":"string","enum":["low","medium","high","critical"]},"reportedBy":{"type":"string","format":"uuid"},"reportedAt":{"type":"string","format":"date-time"},"photoAssetIds":{"type":"array","items":{"type":"string","format":"uuid"}},"workOrderId":{"type":"string","format":"uuid","nullable":true},"authorityNotified":{"type":"boolean","default":false},"scopePath":{"type":"string"}}},
 "RentalParticipant": {"type":"object","x-ticvai-persistence":"rental.participant","description":"Board 5.5. **A group rental is one booking with participants**, because the agreement, the deposit and the return are handled together.\n","properties":{"id":{"type":"string","format":"uuid"},"name":{"type":"string"},"isPrimaryRenter":{"type":"boolean","default":false},"dateOfBirth":{"type":"string","format":"date","nullable":true},"idNumber":{"type":"string","nullable":true},"guardianName":{"type":"string","nullable":true},"emergencyContact":{"type":"string","nullable":true},"hasSignedWaiver":{"type":"boolean","readOnly":true},"customFields":{"type":"object","additionalProperties":true}}},
 "RentalQuote": {"type":"object","x-ticvai-persistence":"rental.quote","description":"Board 4.10. **Rental amount and deposit are returned apart, because the deposit is not revenue.**\n**A quote `quoteRentalPrice` issues is stored until `expiresAt`**, with what was asked, so the figures it gave can be held to and checked later. `explainRentalPrice` and `simulateRentalPricing` return the same shape and store nothing (decided 29 September, data model DM4).\n**Consumed by `acceptedQuoteId`** on `createRentalBooking` and the extension. A quote is not deleted when it is used or expires: a nightly job removes quotes 30 days past `expiresAt` that no booking references, so a booking can always show the quote it was priced at (decided 29 September, writers pass; DM4).\n","required":["quoteId","productId","from","to","rentalAmount","depositAmount"],"properties":{"quoteId":{"type":"string","format":"uuid"},"productId":{"type":"string","format":"uuid","description":"The request's product; with `locationId`, `from`, `to` and `quantity`, what was quoted."},"locationId":{"type":"string","format":"uuid","nullable":true},"from":{"type":"string","format":"date-time"},"to":{"type":"string","format":"date-time"},"quantity":{"type":"integer","default":1},"customerId":{"type":"string","format":"uuid","nullable":true},"rentalAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"taxAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"addOnAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"discountAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"totalPayable":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"depositAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"depositInstrument":{"type":"string","nullable":true},"expiresAt":{"type":"string","format":"date-time","nullable":true},"createdAt":{"type":"string","format":"date-time","readOnly":true},"scopePath":{"type":"string","readOnly":true,"description":"The partition key (ADR-0005), written at `venue` scope."}}},

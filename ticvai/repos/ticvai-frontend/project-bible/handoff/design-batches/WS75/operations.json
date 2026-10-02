@@ -90,50 +90,6 @@
   "requestBody": null,
   "responds": "MediaUsageRow"
  },
- "listAssets": {
-  "method": "GET",
-  "path": "/assets",
-  "contract": "maintenance",
-  "summary": "List assets",
-  "permission": "ASSET_VIEW",
-  "offlineCapable": true,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "venueId",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "categoryId",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "status",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "maintenanceDue",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- },
  "listMediaAssetVersions": {
   "method": "GET",
   "path": "/media-assets/{assetId}/versions",

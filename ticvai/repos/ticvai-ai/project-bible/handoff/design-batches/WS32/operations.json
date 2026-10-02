@@ -42,6 +42,57 @@
   "requestBody": "FailedPaymentCleanupInput",
   "responds": "Payment"
  },
+ "exchangeOrderLines": {
+  "method": "POST",
+  "path": "/orders/{orderId}/exchanges",
+  "contract": "orders",
+  "summary": "Exchange lines for different products or dates",
+  "permission": "ORDER_EXCHANGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ExchangeOrderRequest",
+  "responds": "OrderExchangeResult"
+ },
+ "getOrder": {
+  "method": "GET",
+  "path": "/orders/{orderId}",
+  "contract": "orders",
+  "summary": "Read an order",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Order"
+ },
+ "getRefundPolicy": {
+  "method": "GET",
+  "path": "/venues/{venueId}/refund-policy",
+  "contract": "orders",
+  "summary": "Read a venue's refund policy",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "RefundPolicy"
+ },
  "listAmendmentAfterSale": {
   "method": "GET",
   "path": "/amendment-after-sale",
@@ -184,6 +235,44 @@
   "requestBody": null,
   "responds": "VoidReversalSameDayCorrectionManagementView"
  },
+ "modifyOrder": {
+  "method": "POST",
+  "path": "/orders/{orderId}/modify",
+  "contract": "orders",
+  "summary": "Add or remove lines on an existing order",
+  "permission": "ORDER_MODIFY",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ModifyOrderRequest",
+  "responds": "OrderModificationResult"
+ },
+ "rescheduleOrder": {
+  "method": "POST",
+  "path": "/orders/{orderId}/reschedule",
+  "contract": "orders",
+  "summary": "Move an order to another performance",
+  "permission": "ORDER_RESCHEDULE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "OrderExchangeResult"
+ },
  "setAfterSaleFinancial": {
   "method": "PUT",
   "path": "/after-sale-financial",
@@ -255,30 +344,6 @@
   ],
   "requestBody": "CancellationPartialCancellationPolicyConfigurationInput",
   "responds": "CancellationPartialCancellationPolicyConfigurationView"
- },
- "setOrderAmendment": {
-  "method": "PUT",
-  "path": "/order-amendment",
-  "contract": "orders",
-  "summary": "Order Amendment Workspace",
-  "permission": "ORDER_CREATE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "OrderAmendmentWorkspaceInput",
-  "responds": "OrderAmendmentWorkspaceView"
  },
  "setRefundCalculationPolicy": {
   "method": "PUT",

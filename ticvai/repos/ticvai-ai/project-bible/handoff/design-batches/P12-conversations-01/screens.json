@@ -27,7 +27,7 @@
     {
      "to": "SUP-001",
      "trigger": "Agent Login",
-     "provenance": "derived — SUP-001 declares entryState.params challengeId and SUP-004 holds none of them. The edge carries nothing: SUP-004 is opened from SUP-001, so this edge is the way back and SUP-001 keeps its own state"
+     "provenance": "derived — SUP-001 declares entryState.params challengeId, methodId, providerId and SUP-004 holds none of them. The edge carries nothing: SUP-004 is opened from SUP-001, so this edge is the way back and SUP-001 keeps its own state"
     },
     {
      "to": "SUP-002",
@@ -39,8 +39,8 @@
     },
     {
      "to": "SUP-005",
-     "trigger": "Reads the history and replies",
-     "provenance": "flow F05 step 1→2, F24 step 3→4",
+     "trigger": "The agent answers",
+     "provenance": "flow F24 step 3→4",
      "carries": [
       "caseId",
       "conversationId"
@@ -60,55 +60,6 @@
      "name": "contentBody",
      "slot": "collection",
      "components": [
-      {
-       "kind": "textField",
-       "label": "Status",
-       "operation": "listCases",
-       "notes": "Sends `?status=` to `listCases`.",
-       "provenance": "contract marketing-crm.yaml GET /cases"
-      },
-      {
-       "kind": "textField",
-       "label": "Assigned to principal id",
-       "operation": "listCases",
-       "notes": "Sends `?assignedToPrincipalId=` to `listCases`.",
-       "provenance": "contract marketing-crm.yaml GET /cases"
-      },
-      {
-       "kind": "toggle",
-       "label": "Breached sla",
-       "operation": "listCases",
-       "notes": "Sends `?breachedSla=` to `listCases`.",
-       "provenance": "contract marketing-crm.yaml GET /cases"
-      },
-      {
-       "kind": "textField",
-       "label": "Priority",
-       "operation": "listCases",
-       "notes": "Sends `?priority=` to `listCases`.",
-       "provenance": "contract marketing-crm.yaml GET /cases"
-      },
-      {
-       "kind": "dataTable",
-       "label": "Every case",
-       "bindsTo": "Case",
-       "columns": [
-        "Case.id",
-        "Case.caseNumber",
-        "Case.subjectId",
-        "Case.guestName",
-        "Case.subject",
-        "Case.categoryId",
-        "Case.status",
-        "Case.priority",
-        "Case.assignedToPrincipalId",
-        "Case.venueId",
-        "Case.relatedOrderId",
-        "Case.slaDueAt"
-       ],
-       "operation": "listCases",
-       "provenance": "contract marketing-crm.yaml GET /cases"
-      },
       {
        "kind": "dataTable",
        "label": "Every conversation",
@@ -135,93 +86,12 @@
     {
      "name": "contextPanel",
      "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected case",
-       "bindsTo": "Case",
-       "columns": [
-        "Case.id",
-        "Case.caseNumber",
-        "Case.subjectId",
-        "Case.guestName",
-        "Case.subject",
-        "Case.kind",
-        "Case.channel",
-        "Case.recordedAt",
-        "Case.syncedAt",
-        "Case.categoryId",
-        "Case.status",
-        "Case.priority",
-        "Case.assignedToPrincipalId",
-        "Case.venueId",
-        "Case.relatedOrderId",
-        "Case.slaDueAt"
-       ],
-       "operation": "listCases",
-       "provenance": "contract marketing-crm.yaml GET /cases"
-      },
-      {
-       "kind": "detailPanel",
-       "label": "The case",
-       "bindsTo": "CaseDetail",
-       "columns": [
-        "CaseDetail.id",
-        "CaseDetail.caseNumber",
-        "CaseDetail.subjectId",
-        "CaseDetail.guestName",
-        "CaseDetail.subject",
-        "CaseDetail.kind",
-        "CaseDetail.channel",
-        "CaseDetail.recordedAt",
-        "CaseDetail.syncedAt",
-        "CaseDetail.categoryId",
-        "CaseDetail.status",
-        "CaseDetail.priority",
-        "CaseDetail.assignedToPrincipalId",
-        "CaseDetail.venueId",
-        "CaseDetail.relatedOrderId",
-        "CaseDetail.slaDueAt"
-       ],
-       "operation": "getCase",
-       "provenance": "contract marketing-crm.yaml GET /cases/{caseId}"
-      }
-     ]
+     "components": []
     },
     {
      "name": "actionBar",
      "slot": "rowActions",
      "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Add case message",
-       "operation": "addCaseMessage",
-       "provenance": "contract marketing-crm.yaml POST /cases/{caseId}/messages"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Create case",
-       "operation": "createCase",
-       "provenance": "contract marketing-crm.yaml POST /cases"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Escalate case",
-       "operation": "escalateCase",
-       "provenance": "contract marketing-crm.yaml POST /cases/{caseId}/escalate"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Reopen case",
-       "operation": "reopenCase",
-       "provenance": "contract marketing-crm.yaml POST /cases/{caseId}/reopen"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Save case",
-       "operation": "updateCase",
-       "provenance": "contract marketing-crm.yaml PATCH /cases/{caseId}"
-      },
       {
        "kind": "secondaryButton",
        "label": "Claim conversation",
@@ -241,68 +111,11 @@
   "states": {
    "loading": "The conversation queue list.",
    "error": "Could not load. Names which read failed and leaves the conversation queue untouched.",
-   "emptyFirstRun": "No conversation queue yet. Offers Add case message (`addCaseMessage`); distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No conversation queue yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "Nothing matches the filter on status, assignedToPrincipalId, breachedSla, priority and the conversation queue are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `CASE_VIEW`, which `listCases` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `CASE_VIEW`, which `listConversations` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
-   {
-    "operationId": "listCases",
-    "contract": "marketing-crm",
-    "purpose": "from page inventory",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "addCaseMessage",
-    "contract": "marketing-crm",
-    "purpose": "Add a message or internal note",
-    "trigger": "onAction",
-    "invalidates": [
-     "listCases"
-    ]
-   },
-   {
-    "operationId": "createCase",
-    "contract": "marketing-crm",
-    "purpose": "Raise a service case",
-    "trigger": "onAction",
-    "invalidates": [
-     "listCases"
-    ]
-   },
-   {
-    "operationId": "escalateCase",
-    "contract": "marketing-crm",
-    "purpose": "Escalate a case",
-    "trigger": "onAction",
-    "invalidates": [
-     "listCases"
-    ]
-   },
-   {
-    "operationId": "getCase",
-    "contract": "marketing-crm",
-    "purpose": "Read a case with its thread",
-    "trigger": "onAction"
-   },
-   {
-    "operationId": "reopenCase",
-    "contract": "marketing-crm",
-    "purpose": "Reopen a resolved case",
-    "trigger": "onAction",
-    "invalidates": [
-     "listCases"
-    ]
-   },
-   {
-    "operationId": "updateCase",
-    "contract": "marketing-crm",
-    "purpose": "Assign, reprioritise or resolve a case",
-    "trigger": "onAction",
-    "invalidates": [
-     "listCases"
-    ]
-   },
    {
     "operationId": "listConversations",
     "contract": "marketing-crm",
@@ -313,27 +126,17 @@
     "operationId": "claimConversation",
     "contract": "marketing-crm",
     "purpose": "An agent takes it",
-    "trigger": "onAction",
-    "invalidates": [
-     "listCases"
-    ]
+    "trigger": "onAction"
    },
    {
     "operationId": "transferConversation",
     "contract": "marketing-crm",
     "purpose": "Pass it to another agent or queue",
-    "trigger": "onAction",
-    "invalidates": [
-     "listCases"
-    ]
+    "trigger": "onAction"
    }
   ],
   "entryState": {
    "params": [
-    {
-     "name": "caseId",
-     "from": "deepLink"
-    },
     {
      "name": "conversationId",
      "from": "deepLink"
@@ -356,114 +159,6 @@
   "apisNote": "Rebuilt 9 September 2026 from the 10 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "overlays": [
    {
-    "id": "formAddCaseMessage",
-    "component": "modal",
-    "trigger": "Add case message",
-    "body": "**Collects what `addCaseMessage` sends before it is called.** Required: `id`, `body`, `isInternal`, `recordedAt`. Optional: `channel`, `attachmentRefs`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Add case message",
-     "operation": "addCaseMessage"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "id",
-      "body",
-      "isInternal",
-      "recordedAt",
-      "channel",
-      "attachmentRefs"
-     ]
-    },
-    "provenance": "contract marketing-crm.yaml POST /cases/{caseId}/messages"
-   },
-   {
-    "id": "formCreateCase",
-    "component": "modal",
-    "trigger": "Create case",
-    "body": "**Collects what `createCase` sends before it is called.** Required: `id`, `subject`, `description`, `channel`, `recordedAt`. Optional: `subjectId`, `categoryId`, `priority`, `kind`, `venueId`, `relatedOrderId`, `attachmentRefs`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "CreateCaseRequest",
-    "confirm": {
-     "label": "Create case",
-     "operation": "createCase"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "id",
-      "subject",
-      "description",
-      "channel",
-      "recordedAt",
-      "subjectId",
-      "categoryId",
-      "priority",
-      "kind",
-      "venueId",
-      "relatedOrderId",
-      "attachmentRefs"
-     ]
-    },
-    "provenance": "contract marketing-crm.yaml POST /cases"
-   },
-   {
-    "id": "formEscalateCase",
-    "component": "modal",
-    "trigger": "Escalate case",
-    "body": "**Collects what `escalateCase` sends before it is called.** Required: `reason`. Optional: `assignToPrincipalId`, `newPriority`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Escalate case",
-     "operation": "escalateCase"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "reason",
-      "assignToPrincipalId",
-      "newPriority"
-     ]
-    },
-    "provenance": "contract marketing-crm.yaml POST /cases/{caseId}/escalate"
-   },
-   {
-    "id": "formReopenCase",
-    "component": "modal",
-    "trigger": "Reopen case",
-    "body": "**Collects what `reopenCase` sends before it is called.** Required: `reason`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Reopen case",
-     "operation": "reopenCase"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "reason"
-     ]
-    },
-    "provenance": "contract marketing-crm.yaml POST /cases/{caseId}/reopen"
-   },
-   {
-    "id": "formUpdateCase",
-    "component": "modal",
-    "trigger": "Save case",
-    "body": "**Collects what `updateCase` sends before it is called.** Nothing in the body is required. Optional: `status`, `priority`, `assignedToPrincipalId`, `categoryId`, `resolutionNote`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Save case",
-     "operation": "updateCase"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "status",
-      "priority",
-      "assignedToPrincipalId",
-      "categoryId",
-      "resolutionNote"
-     ]
-    },
-    "provenance": "contract marketing-crm.yaml PATCH /cases/{caseId}"
-   },
-   {
     "id": "formTransferConversation",
     "component": "modal",
     "trigger": "Transfer conversation",
@@ -481,6 +176,50 @@
      ]
     },
     "provenance": "contract marketing-crm.yaml POST /conversations/{conversationId}/transfer"
+   }
+  ],
+  "gaps": [
+   {
+    "operation": "addCaseMessage",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-005): The conversation queue carried the full case toolset; the queue is about conversations and case work happens in SUP-013 and SUP-005. Keep listConversations, claim and transfer (design-notes correction customer-marketing SUP-004).",
+    "source": "screens/P12-support-agent-console.yaml#SUP-004"
+   },
+   {
+    "operation": "createCase",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-005): The conversation queue carried the full case toolset; the queue is about conversations and case work happens in SUP-013 and SUP-005. Keep listConversations, claim and transfer (design-notes correction customer-marketing SUP-004).",
+    "source": "screens/P12-support-agent-console.yaml#SUP-004"
+   },
+   {
+    "operation": "escalateCase",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-005): The conversation queue carried the full case toolset; the queue is about conversations and case work happens in SUP-013 and SUP-005. Keep listConversations, claim and transfer (design-notes correction customer-marketing SUP-004).",
+    "source": "screens/P12-support-agent-console.yaml#SUP-004"
+   },
+   {
+    "operation": "getCase",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-005): The conversation queue carried the full case toolset; the queue is about conversations and case work happens in SUP-013 and SUP-005. Keep listConversations, claim and transfer (design-notes correction customer-marketing SUP-004).",
+    "source": "screens/P12-support-agent-console.yaml#SUP-004"
+   },
+   {
+    "operation": "listCases",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-005): The conversation queue carried the full case toolset; the queue is about conversations and case work happens in SUP-013 and SUP-005. Keep listConversations, claim and transfer (design-notes correction customer-marketing SUP-004).",
+    "source": "screens/P12-support-agent-console.yaml#SUP-004"
+   },
+   {
+    "operation": "reopenCase",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-005): The conversation queue carried the full case toolset; the queue is about conversations and case work happens in SUP-013 and SUP-005. Keep listConversations, claim and transfer (design-notes correction customer-marketing SUP-004).",
+    "source": "screens/P12-support-agent-console.yaml#SUP-004"
+   },
+   {
+    "operation": "updateCase",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-005): The conversation queue carried the full case toolset; the queue is about conversations and case work happens in SUP-013 and SUP-005. Keep listConversations, claim and transfer (design-notes correction customer-marketing SUP-004).",
+    "source": "screens/P12-support-agent-console.yaml#SUP-004"
    }
   ],
   "_platform": {
@@ -536,7 +275,7 @@
     {
      "to": "SUP-001",
      "trigger": "Agent Login",
-     "provenance": "derived — SUP-001 declares entryState.params challengeId and SUP-005 holds none of them. The edge carries nothing: SUP-005 is opened from SUP-001, so this edge is the way back and SUP-001 keeps its own state"
+     "provenance": "derived — SUP-001 declares entryState.params challengeId, methodId, providerId and SUP-005 holds none of them. The edge carries nothing: SUP-005 is opened from SUP-001, so this edge is the way back and SUP-001 keeps its own state"
     },
     {
      "to": "SUP-002",
@@ -552,7 +291,7 @@
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listCases` reads the population and `getCase` reads one of them — list, select, act",
-  "purpose": "Work with live chat workspace for this venue.",
+  "purpose": "Serve one live conversation to its end, with the guest's case beside it.",
   "layout": {
    "template": "split",
    "regions": [
@@ -1018,6 +757,7 @@
    "board": "wireframes/P12 Venue Support.dc.html#sup-005"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 11 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "purposeNote": "Purpose rewritten 2 October 2026 (CHG-WIR-006): The purpose was the generic template (\"Work with live chat workspace for this venue\"); the workspace serves one conversation (design-notes correction customer-marketing SUP-005).",
   "_platform": {
    "code": "P12",
    "audience": "staff",

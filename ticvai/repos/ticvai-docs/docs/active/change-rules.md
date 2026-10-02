@@ -5,7 +5,7 @@
 > **Status:** Authoritative from 1 October 2026 (plan item 1F, C12)
 
 The 26 September pull audit found 293 root issues. They fall into 36 classes, listed with their
-members in the audit's `ROOT-CLASSES.md`. **A class is closed when the next instance of it fails
+members in `docs/active/root-classes.md`. **A class is closed when the next instance of it fails
 something.** Where the mistake is mechanical, that something is a check in `tools/` (the
 `check-*.py` guards, run by `run-checks.py`). Where it is a judgement a checker cannot make (a
 business rule nobody wrote down, a permission that does not fit the action), the guard is a rule
@@ -84,7 +84,7 @@ rest is the reviewer's to check against the list.
 
 Closes: R071 R114 R124 R139 R141 R148 R157 R161 R166 R168 R178 R184 R188 R189 R204 R206 R207
 R208 R224 R225 R226 R230 R231 R232 R242 R243 R244 R245 R259 R277 R279 R280 R284 R285 R286 R290
-R291 R292 (with the checks named in ROOT-CLASSES.md).
+R291 R292 (with the checks named in root-classes.md).
 
 ## CR-4. One concept, one name: the glossary first
 
@@ -117,12 +117,12 @@ Closes: R026 R028 R038.
 
 ## CR-7. A new kind of mistake gets a guard before its fix merges
 
-A finding that fits no class in `ROOT-CLASSES.md` is a new class. The CR that fixes it also adds
+A finding that fits no class in `root-classes.md` is a new class. The CR that fixes it also adds
 the guard: a rule in one of the `check-*.py` guards, or a rule on this page. A fix with no guard
 is the one that comes back.
 
 The eleven "one-offs" root issues of 26 September (R073 R077 R080 R085 R110 R116 R120 R132 R136
-R150 R219) had no shared cause and so no guard. They stay **not closed** in ROOT-CLASSES.md until a
+R150 R219) had no shared cause and so no guard. They stay **not closed** in root-classes.md until a
 recurrence shows their class.
 
 ## CR-8. The audit baseline only shrinks

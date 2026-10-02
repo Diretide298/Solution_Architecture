@@ -125,7 +125,7 @@
    "localLlm",
    "openaiCompatible"
   ],
-  "description": "`openaiCompatible` (added 29 September, AI design 3.3): a customer endpoint that speaks the OpenAI API, taken with no custom development (AIC-009). Any other protocol needs an adapter.\n"
+  "description": "`openaiCompatible` (added 29 September, AI design 3.3): a customer endpoint that speaks the OpenAI API, taken with no custom development (AIC-009). Any other protocol needs an adapter.\n**Core42 Compass is reached through `openaiCompatible`** (Chinmay, 2 October: the AI residency decision, amending AI-D02; CHG-CSA-002). Compass is the provider of the `uaeOnly` residency class (common `AiResidencyClass`): Small tier Compass GPT-4.1 mini (or Seraj), Strong tier Compass GPT-5, with OpenAI UAE and then the in-cell open-weights model as the fallback chain. OpenAI UAE is `openai` with a UAE `endpoint`; the in-cell model is `localLlm`.\n**A kind is a protocol, not a vendor** (Chinmay, 2 October, contract follow-ups: BYOK accepts any provider; CHG-FUP-008). Any vendor is accepted, named in `AiProvider.vendor`: Mistral, Cohere or any other is reached through `openaiCompatible` where its API speaks it, which the compatibility test confirms before activation (`AiProviderCompatibility`). A new native adapter is a new value here, a breaking change for a client built earlier that goes out with an approval (`docs/active/breaking-changes.yaml`); until then a vendor without either protocol is refused `422 provider-protocol-unsupported`.\n"
  },
  "AiSourceList": {
   "type": "array",
@@ -1847,6 +1847,103 @@
    }
   }
  },
+ "BrandIdentity": {
+  "x-ticvai-persistence": "none — embedded in tenant_config",
+  "type": "object",
+  "description": "Every `*AssetRef` here is a `MediaAsset` id from the `assets` library (`createUpload` then `completeUpload`), PNG or SVG and at most 2 MB (decided 28 September, audit R270).\n",
+  "required": [
+   "logoAssetRef"
+  ],
+  "properties": {
+   "logoAssetRef": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The primary logo."
+   },
+   "logoDarkAssetRef": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Used on dark backgrounds. Falls back to the primary logo."
+   },
+   "logoVariant": {
+    "type": "string",
+    "enum": [
+     "light",
+     "dark",
+     "duotone"
+    ],
+    "default": "light",
+    "description": "**Which lockup sits in the nav bar, and whose colours drive the theme (decided 29 September, rev 3 CFG-4).** `light` uses `logoAssetRef`, `dark` uses `logoDarkAssetRef` (falling back to the primary logo), and `duotone` the two-colour reading of the primary logo.\n"
+   },
+   "faviconAssetRef": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The browser tab icon for the guest web app."
+   },
+   "splashImageAssetRefs": {
+    "type": "array",
+    "description": "Splash images, shown in order. Build-time on the native apps (`splashChangeScope`); immediate on web, reaching guests with the publish (audit R163).",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "splashDurationSeconds": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 10,
+    "default": 3
+   },
+   "splashBackgroundColour": {
+    "type": "string",
+    "pattern": "^#[0-9A-Fa-f]{6}$"
+   },
+   "showLoadingIndicator": {
+    "type": "boolean",
+    "default": true
+   },
+   "splashChangeScope": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/ChangeScope"
+     }
+    ],
+    "readOnly": true,
+    "description": "Always `buildTime` for native apps. The guest web app takes a splash change at the publish, with no build (audit R163)."
+   },
+   "introVideoAssetRef": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**The optional intro video (decided 29 September, MOB-5).** A video `MediaAsset` from the media library (CMS-010). Streamed, so a change reaches guests with the publish and needs no app build.\n"
+   },
+   "introVideoMode": {
+    "type": "string",
+    "enum": [
+     "off",
+     "firstLaunch",
+     "everyLaunch"
+    ],
+    "default": "off",
+    "description": "When GST-001 plays it full screen. \"Skip introduction\" is always shown. Anything but `off` needs `introVideoAssetRef`, or 400."
+   },
+   "showPoweredBy": {
+    "type": "boolean",
+    "default": true,
+    "description": "**\"Powered by TICVAI\", a configuration toggle, on by default** (Chinmay, 2 October, workbook Q160 and the pre-apply round; consistent with DI-297; CHG-CSA-036). Shown on the launch screen and at the foot of Account and the web footer while true. **Switching it off needs the tenant's licence to allow it**: `setBrandIdentity` refuses `false` with `403 powered-by-locked` unless the tenant's plan carries the `poweredByRemoval` add-on (subscription `LicencePosition.poweredByRemovable`)."
+   }
+  }
+ },
+ "ChangeScope": {
+  "type": "string",
+  "description": "Whether a change reaches guests on publish or needs a store release.\n",
+  "enum": [
+   "runtime",
+   "buildTime"
+  ]
+ },
  "Channel": {
   "type": "string",
   "enum": [
@@ -1956,6 +2053,24 @@
    },
    "note": {
     "type": "string"
+   },
+   "reviewStatus": {
+    "type": "string",
+    "readOnly": true,
+    "enum": [
+     "notRequired",
+     "pending",
+     "approved",
+     "rejected"
+    ],
+    "default": "notRequired",
+    "description": "The review step, where the tenant's publish-review policy is on (CHG-CSA-042)."
+   },
+   "approvalRequestId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true
    },
    "isCurrent": {
     "type": "boolean"

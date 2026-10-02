@@ -1,10 +1,21 @@
 id: LLD-platform-ops
-title: platform-ops — 37 operations
+title: platform-ops — 40 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
 service: PlatformService
 operations:
+- operation: applyConfigPackage
+  verb: POST
+  path: /config-packages/{packageId}/apply
+  scope: tenant
+  permission: PLATFORM_MIGRATION_APPLY
+  audience:
+  - staff
+  offline: false
+  reads:
+  - control.config_package_application
+  writes: []
 - operation: applyMigration
   verb: POST
   path: /migrations/apply
@@ -53,6 +64,28 @@ operations:
   - cache:idempotency
   - control.release
   - control.release_component
+- operation: diffConfigPackage
+  verb: POST
+  path: /config-packages/{packageId}/diff
+  scope: tenant
+  permission: PLATFORM_RELEASE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - control.config_package_diff
+  writes: []
+- operation: exportConfigPackage
+  verb: POST
+  path: /config-packages
+  scope: tenant
+  permission: PLATFORM_RELEASE_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - control.config_package
+  writes: []
 - operation: getMigrationRun
   verb: GET
   path: /migrations/runs/{runId}

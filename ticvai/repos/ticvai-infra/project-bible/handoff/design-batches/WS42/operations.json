@@ -441,6 +441,65 @@
   "requestBody": null,
   "responds": "PrivacyAnalyticsAiComplianceIntelligenceView"
  },
+ "listPrivacyComplianceExceptions": {
+  "method": "GET",
+  "path": "/privacy-compliance-exception",
+  "contract": "marketing-crm",
+  "summary": "The privacy exception queue",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "category",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "severity",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "ownerPrincipalId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "subjectId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "brandId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "country",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "listPrivacyEvidenceCompliance": {
   "method": "GET",
   "path": "/privacy-evidence-compliance",
@@ -500,6 +559,25 @@
   "requestBody": null,
   "responds": "Page"
  },
+ "runDataRetention": {
+  "method": "POST",
+  "path": "/retention-runs",
+  "contract": "marketing-crm",
+  "summary": "Preview or execute a retention pass",
+  "permission": "GUEST_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "RetentionRunResult"
+ },
  "setDataDiscoveryAccess": {
   "method": "PUT",
   "path": "/data-discovery-access",
@@ -518,6 +596,25 @@
   ],
   "requestBody": "DataDiscoveryAccessExportCorrectionWorkspaceInput",
   "responds": "DataDiscoveryAccessExportCorrectionWorkspaceView"
+ },
+ "setLegalHold": {
+  "method": "PUT",
+  "path": "/data-retention-expiry",
+  "contract": "marketing-crm",
+  "summary": "Place, approve or release a legal or operational hold",
+  "permission": "GUEST_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "PrivacyLegalHold",
+  "responds": "PrivacyLegalHold"
  },
  "setPrivacyComplianceException": {
   "method": "PUT",

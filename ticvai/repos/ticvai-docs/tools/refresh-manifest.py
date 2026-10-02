@@ -950,8 +950,10 @@ def main():
         return 0
 
     if a.cmd == "rebuild":
-        cmd = ["bash", os.path.join(ROOT, "tools", "refresh-safe.sh"), "--trace", "--no-merge",
-               "--skip-checks", "--manifest-out", MANIFEST]
+        # Forward slashes: Git Bash on Windows reads `C:\Users\...` in a script path as escapes and
+        # looked for `C:Users...refresh-safe.sh` (2 October) -- the rebuild never started.
+        cmd = ["bash", os.path.join(ROOT, "tools", "refresh-safe.sh").replace(os.sep, "/"), "--trace",
+               "--no-merge", "--skip-checks", "--manifest-out", MANIFEST.replace(os.sep, "/")]
         if a.wt_dir:
             cmd += ["--wt-dir", a.wt_dir]
         # HEAD unless told otherwise: the shape of the pipeline is what is being measured, and

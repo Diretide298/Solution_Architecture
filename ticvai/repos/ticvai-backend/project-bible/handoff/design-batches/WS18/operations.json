@@ -68,6 +68,19 @@
   "requestBody": null,
   "responds": "IdentityGuestVerificationPolicy"
  },
+ "getPasswordPolicy": {
+  "method": "GET",
+  "path": "/password-policy",
+  "contract": "identity",
+  "summary": "Read the password and MFA policy in force",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "PasswordPolicy"
+ },
  "listApprovalControlPolicies": {
   "method": "GET",
   "path": "/approval-control-policies",
@@ -274,24 +287,5 @@
   ],
   "requestBody": "StepUpPolicy",
   "responds": "StepUpPolicy"
- },
- "signApprovalDecision": {
-  "method": "POST",
-  "path": "/approval-requests/{requestId}/signature",
-  "contract": "approvals",
-  "summary": "Sign a decision, so it can be proved later",
-  "permission": "APPROVAL_DECIDE",
-  "offlineCapable": null,
-  "conflictPolicy": null,
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "ApprovalSignature"
  }
 }

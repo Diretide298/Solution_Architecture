@@ -45,7 +45,7 @@
      "trigger": "Staff-to-Experience Qualification Mapping",
      "provenance": "structural — pack board 5 wiring, 19 September 2026",
      "carries": [
-      "resourceId"
+      "experienceId"
      ]
     },
     {
@@ -261,7 +261,10 @@
      "to": "BO-893",
      "trigger": "Back to Experience Resource Requirement Builder",
      "provenance": "structural — pack board 5 wiring, 19 September 2026",
-     "back": true
+     "back": true,
+     "carries": [
+      "experienceId"
+     ]
     }
    ]
   },
@@ -316,6 +319,24 @@
        "kind": "selectField",
        "label": "Preferred attributes",
        "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 66 §Administrators shall configure"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Requirements",
+       "bindsTo": "ResourceRequirement",
+       "operation": "getExperienceResourceRequirements",
+       "provenance": "contract resources.yaml GET /experiences/{experienceId}/resource-requirements; wiring fix, 2 October 2026"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "components": [
+      {
+       "kind": "secondaryButton",
+       "label": "Save requirements",
+       "operation": "setExperienceResourceRequirements",
+       "provenance": "contract resources.yaml PUT /experiences/{experienceId}/resource-requirements; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -324,24 +345,31 @@
   "states": {
    "loading": "The staff-to-experience qualification mapping configuration as saved.",
    "error": "Could not load. Names which read failed and leaves the staff-to-experience qualification mapping untouched.",
-   "emptyFirstRun": "No staff-to-experience qualification mapping configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyFirstRun": "No staff-to-experience qualification mapping configured yet. Offers no create action — this screen declares no operation that makes one and says what the platform does in the meantime.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },
   "apis": [
-   {
-    "operationId": "setResourceQualifications",
-    "contract": "resources",
-    "purpose": "What a person is certified to do",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026"
-   },
    {
     "operationId": "suggestResources",
     "contract": "resources",
     "purpose": "Staff who qualify",
     "trigger": "onLoad",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "getExperienceResourceRequirements",
+    "contract": "resources",
+    "purpose": "The qualifications the experience requires",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-001)"
+   },
+   {
+    "operationId": "setExperienceResourceRequirements",
+    "contract": "resources",
+    "purpose": "Save the qualifications the experience requires",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-001)"
    }
   ],
   "wireframe": {
@@ -353,11 +381,35 @@
   "entryState": {
    "params": [
     {
-     "name": "resourceId",
+     "name": "experienceId",
      "from": "navigation"
     }
    ]
   },
+  "overlays": [
+   {
+    "id": "formSetExperienceResourceRequirements",
+    "component": "modal",
+    "trigger": "Save requirements",
+    "body": "**Collects what `setExperienceResourceRequirements` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save requirements",
+     "operation": "setExperienceResourceRequirements"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "contract resources.yaml PUT /experiences/{experienceId}/resource-requirements; wiring fix, 2 October 2026"
+   }
+  ],
+  "gaps": [
+   {
+    "operation": "setResourceQualifications",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): setResourceQualifications writes a person's certificates; this screen defines what an experience requires, so it binds the experience requirements read and write and takes the experience, not a resource (design-notes correction venue-operations BO-894).",
+    "source": "contracts/satellite/resources.yaml#setResourceQualifications | contracts/satellite/resources.yaml#setExperienceResourceRequirements"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -455,6 +507,17 @@
        "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 67 §Option B"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "components": [
+      {
+       "kind": "secondaryButton",
+       "label": "Save combination",
+       "operation": "updateResourcePackage",
+       "provenance": "contract resources.yaml PUT /resource-packages/{packageId}; wiring fix, 2 October 2026"
+      }
+     ]
     }
    ]
   },
@@ -482,6 +545,13 @@
     "invalidates": [
      "listResourcePackages"
     ]
+   },
+   {
+    "operationId": "updateResourcePackage",
+    "contract": "resources",
+    "purpose": "Change a combination",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-001)"
    }
   ],
   "wireframe": {
@@ -490,6 +560,30 @@
    "workshopBoard": "wireframes/WS130 Resource Management Configuration Board 5.dc.html#bo-895"
   },
   "apisNote": "Regenerated 9 September 2026 from Resource_Management_Configuration_Reference.pdf page 67. 0 of 0 labels bound to a contract property; 4 of 40 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formUpdateResourcePackage",
+    "component": "modal",
+    "trigger": "Save combination",
+    "body": "**Collects what `updateResourcePackage` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save combination",
+     "operation": "updateResourcePackage"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "contract resources.yaml PUT /resource-packages/{packageId}; wiring fix, 2 October 2026"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "packageId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -796,6 +890,13 @@
    "workshopBoard": "wireframes/WS130 Resource Management Configuration Board 5.dc.html#bo-897"
   },
   "apisNote": "Regenerated 9 September 2026 from Resource_Management_Configuration_Reference.pdf page 70. 0 of 0 labels bound to a contract property; 1 of 32 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-004): No read of the resource selection policy.",
+    "source": "contracts/satellite/resources.yaml#setResourceSelectionPolicy"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1198,34 +1299,41 @@
        "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 73 §Administrators shall configure"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "components": [
+      {
+       "kind": "secondaryButton",
+       "label": "Save allocation policy",
+       "operation": "setResourceAllocationPolicy",
+       "provenance": "contract resources.yaml PUT /resource-allocation-policy; wiring fix, 2 October 2026"
+      }
+     ]
     }
    ]
   },
   "states": {
    "loading": "The dynamic resource allocation configuration as saved.",
    "error": "Could not load. Names which read failed and leaves the dynamic resource allocation untouched.",
-   "emptyFirstRun": "No dynamic resource allocation configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyFirstRun": "No dynamic resource allocation configured yet. Offers no create action — this screen declares no operation that makes one and says what the platform does in the meantime.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },
   "apis": [
-   {
-    "operationId": "allocateResources",
-    "contract": "resources",
-    "purpose": "Allocate against the requirement",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026",
-    "invalidates": [
-     "getResourceCalendar",
-     "listResourceBookings"
-    ]
-   },
    {
     "operationId": "getResourceAllocationPolicy",
     "contract": "resources",
     "purpose": "The strategy in force",
     "trigger": "onLoad",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "setResourceAllocationPolicy",
+    "contract": "resources",
+    "purpose": "Save how resources are chosen automatically",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-001)"
    }
   ],
   "wireframe": {
@@ -1234,6 +1342,31 @@
    "workshopBoard": "wireframes/WS130 Resource Management Configuration Board 5.dc.html#bo-900"
   },
   "apisNote": "Regenerated 9 September 2026 from Resource_Management_Configuration_Reference.pdf page 73. 0 of 0 labels bound to a contract property; 5 of 34 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetResourceAllocationPolicy",
+    "component": "modal",
+    "trigger": "Save allocation policy",
+    "body": "**Collects what `setResourceAllocationPolicy` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save allocation policy",
+     "operation": "setResourceAllocationPolicy"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "contract resources.yaml PUT /resource-allocation-policy; wiring fix, 2 October 2026"
+   }
+  ],
+  "entryState": {},
+  "gaps": [
+   {
+    "operation": "allocateResources",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): allocateResources was bound as a live action on a configuration screen; the save is setResourceAllocationPolicy, which was not bound (design-notes correction venue-operations BO-900).",
+    "source": "contracts/satellite/resources.yaml#allocateResources | contracts/satellite/resources.yaml#setResourceAllocationPolicy"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1424,8 +1557,8 @@
   "density": "compact",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Administrators shall configure) and no display directory — it is settings, not a population",
-  "purpose": "Automatically detect when an assigned resource becomes unavailable and protect the customer's booking by finding a suitable replacement. Provide TICVAI with a centralized Physical Resource & Rental Operations Engine for managing equipment, operational assets, and customer-rental resources throughout their complete lifecycle. Board 6 shall manage resources such as: Towels Strollers Wheelchairs Lockers Cabanas Helmets Sports equipment Cameras Projectors AV equipment Lighting equipment Sound systems Furniture Booths Vehicles Operational equipment Customer-defined physical assets",
-  "purposeNote": "When an assigned resource becomes unavailable, TICVAI detects affected bookings and either automatically replaces the resource or presents governed replacement recommendations without losing the underlying customer reservation. Board 5 Shared Resource Availability Logic Resource-dependent products shall use a common availability calculation:",
+  "purpose": "Detect when an assigned resource becomes unavailable and protect the customer's booking by finding a suitable replacement.",
+  "purposeNote": "When an assigned resource becomes unavailable, TICVAI detects affected bookings and either automatically replaces the resource or presents governed replacement recommendations without losing the underlying customer reservation. Board 5 Shared Resource Availability Logic Resource-dependent products shall use a common availability calculation: Purpose rewritten 2 October 2026 (CHG-WIR-003): The purpose carried the board 6 introduction (\"Provide TICVAI with a centralized Physical Resource and Rental Operations Engine ... Board 6 shall manage resources such as ...\") after the screen's own sentence.",
   "layout": {
    "template": "form",
    "regions": [
@@ -1511,6 +1644,13 @@
     }
    ]
   },
+  "gaps": [
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-004): No read lists the bookings affected by a resource becoming unavailable.",
+    "source": "contracts/satellite/resources.yaml#replaceResourceAllocation"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",

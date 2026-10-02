@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Shift & Deposit Box
   version: 1.0.0
-  x-ticvai-screen-count: 20
+  x-ticvai-screen-count: 25
   x-ticvai-tier: spine
   x-ticvai-module: "2 — Ticketing Sales (cash handling)"
   x-ticvai-capabilities: [C01]
@@ -116,17 +116,14 @@ paths:
     get:
       operationId: listShifts
       x-ticvai-consumed-by:
-        - "P04 POS-001 Begin Shift"
-        - "P04 POS-007 Close Shift"
         - "P04 POS-009 Staff Roster"
         - "P04 POS-019 Shift Templates & Policies"
-        - "P06 EMP-003 Home — on duty"
         - "P06 EMP-008 Shift summary"
         - "P06 EMP-009 End shift"
         - "P08 BO-039 Shift Directory"
         - "P08 BO-040 Variance Approval"
         - "P08 BO-041 Cash Movements"
-        - "P08 BO-042 Banking & Safe"
+        - "P08 BO-043 Daily Reconciliation"
         - "P08 BO-100 Venue Home"
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: primary   # open-shift state gates workstation actions
@@ -172,19 +169,22 @@ paths:
       operationId: openShift
       x-ticvai-consumed-by:
         - "P04 POS-001 Begin Shift"
-        - "P04 POS-007 Close Shift"
-        - "P04 POS-009 Staff Roster"
-        - "P04 POS-012 Omnichannel Order & Fulfilment Center"
-        - "P06 EMP-003 Home — on duty"
-        - "P06 EMP-009 End shift"
-        - "P08 BO-039 Shift Directory"
-        - "P08 BO-040 Variance Approval"
       x-ticvai-audience: [staff]
       summary: Open a shift
       description: >
         Fails if another shift is already open on this workstation. Where the venue is
-        configured to require approval on open, the shift is created in
-        `pendingApproval` and cannot transact until approved.
+        configured to require approval on open (`TillShiftPolicy.requireOpenApproval`), the shift is
+        created in `pendingApproval` and cannot transact until approved.
+
+        **A shift waiting for review never blocks the next one** (decided 2 October 2026, Chinmay,
+        batch 3 #1, POS-007, and batch 6 #173, BO-040: "The cashier may sign out, and the shift stays
+        pending until the supervisor accepts. That must not stop the next cashier starting a shift";
+        DEC-059, DEC-173; CHG-CSP-012; DI-805). Only a shift that is `open` or `suspended` on this
+        workstation refuses a new one. A previous shift that is counted and waiting
+        (`pendingVariance`, `pendingClosure`) has its own deposit box and its own count, so the next
+        cashier opens with a new box and float while it waits; the outgoing cashier's till shows it
+        as "Under review", and the supervisor resolves it at any till or in the daily cash
+        reconciliation (BO-043).
 
         **Online only** (F32, 26 September pull audit R257). An opening float declared offline
         is a float nobody can reconcile against the safe; POS-001's own transition and
@@ -214,11 +214,93 @@ paths:
         '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
         '409':
           description: >
-            A shift is already open on this workstation (problem type `shift-already-open`), or
-            a required device is absent (`required-device-absent`).
+            A shift is already open or suspended on this workstation (problem type
+            `shift-already-open`), or a required device is absent (`required-device-absent`). A
+            shift that is counted and waiting for review is never the cause (CHG-CSP-012).
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+
+  /venues/{venueId}/till-shift-policy:
+    parameters:
+      - name: venueId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: getTillShiftPolicy
+      x-ticvai-consumed-by:
+        - "P04 POS-019 Shift Templates & Policies"
+        - "P08 BO-065 Venue Configuration"
+      x-ticvai-audience: [staff]
+      x-ticvai-read-routing: replica
+      summary: The rules every till in the venue opens and closes to
+      description: >
+        **What `setTillShiftPolicy` writes, read back** (CHG-CSP-020); a venue that has saved none reads the
+        defaults. Tills read it at sign-in, so the open and close screens know whether to ask for a
+        deposit box, a bag number or an approval.
+      tags: [shift]
+      x-ticvai-permission: SCOPE_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: The venue's till shift policy
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TillShiftPolicy' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+    put:
+      operationId: setTillShiftPolicy
+      x-ticvai-consumed-by:
+        - "P04 POS-019 Shift Templates & Policies"
+        - "P08 BO-065 Venue Configuration"
+      x-ticvai-audience: [staff]
+      x-ticvai-config-scope: venue
+      summary: Set the rules every till in the venue opens and closes to
+      description: >
+        **Shift templates and policies, as POS-019 is named** (design-notes correction on POS-019, Block A:
+        "nothing reads or writes a shift template or close policy ... either add the shift-policy operations
+        or rename the screen"; DI-309: opening and closing rules, exceptions and alerts; CHG-CSP-020). The
+        contract has said since August that a shift waits for approval "where the venue is configured to
+        require approval on open", that a deposit box or a bag number is required "where the venue configures
+        it", and that an abandoned shift is closed "past the venue limit"; none of those had a setting.
+        This is it.
+
+        **Venue scope, never per till** (POS-019's own rule: a variance report compares tills against one
+        rule set). The variance threshold and the drawer limit stay where they are
+        (`tenancy.VenueSettings.shiftVarianceThreshold`, `cashDrawerLimit`); this holds the rest. PUT
+        replaces the policy whole; a field left out returns to its default. A change applies to shifts
+        opened after it; a shift already open keeps the rules it opened under.
+      tags: [shift]
+      x-ticvai-permission: WORKSTATION_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/TillShiftPolicy' }
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Set
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TillShiftPolicy' }
+        '400': { $ref: '../shared/common.yaml#/components/responses/BadRequest' }
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
@@ -228,9 +310,6 @@ paths:
       x-ticvai-consumed-by:
         - "P04 POS-001 Begin Shift"
         - "P04 POS-007 Close Shift"
-        - "P04 POS-011 Returns, Refunds & Exchanges"
-        - "P04 POS-012 Omnichannel Order & Fulfilment Center"
-        - "P04 POS-013 Mobile POS, Event Sales & Offline Operations"
         - "P08 BO-1065 Currency, Timezone & Channels"
       summary: The notes and coins a till counts
       description: >
@@ -340,6 +419,7 @@ paths:
       operationId: listDepositBoxes
       x-ticvai-consumed-by:
         - "P04 POS-015 Cash Operations Dashboard"
+        - "P04 POS-018 Safe Drop & Cash Transfer Management"
         - "P08 BO-042 Banking & Safe"
       x-ticvai-audience: [staff]
       summary: Cash boxes and who holds them
@@ -425,12 +505,6 @@ paths:
         schema: { type: string, format: uuid }
     post:
       operationId: adjustDepositBoxFloat
-      x-ticvai-consumed-by:
-        - "P04 POS-001 Begin Shift"
-        - "P04 POS-007 Close Shift"
-        - "P04 POS-011 Returns, Refunds & Exchanges"
-        - "P04 POS-012 Omnichannel Order & Fulfilment Center"
-        - "P04 POS-013 Mobile POS, Event Sales & Offline Operations"
       x-ticvai-audience: [staff]
       summary: Change the initial fund
       description: >
@@ -502,7 +576,6 @@ paths:
     post:
       operationId: withdrawFromDepositBox
       x-ticvai-consumed-by:
-        - "P04 POS-013 Mobile POS, Event Sales & Offline Operations"
         - "P04 POS-018 Safe Drop & Cash Transfer Management"
         - "P08 BO-042 Banking & Safe"
       x-ticvai-audience: [staff]
@@ -513,6 +586,13 @@ paths:
         short by the amount that was taken from them.
 
         Two people sign: the supervisor taking it and the cashier it came from.
+
+        **The cashier signs as witness with their own PIN on the same device** (decided 2 October 2026,
+        Chinmay, batch 6 #178, BO-042: "PIN on the same device"; DEC-178; CHG-CSP-015). Until then the
+        witness was a name the supervisor typed (`witnessPrincipalId` with no credential). The step-up
+        below is answered by the witness, not the caller: the PIN must be that of `witnessPrincipalId`,
+        or the call is refused `403 witness-not-verified`, and the supervisor may not witness their own
+        withdrawal (`403 witness-is-caller`).
 
         **Recorded as one `CashMovement` of kind `lift`** (F32 step 4: a safe drop "is recorded as
         a movement so the settlement adds up"; 26 September, pull audit R099/R104). The row
@@ -527,6 +607,8 @@ paths:
         idempotency key.
       tags: [shift]
       x-ticvai-permission: CASH_LIFT
+      x-ticvai-step-up: pin
+      x-ticvai-step-up-reason: The cashier the cash came from countersigns the withdrawal with their own PIN on the same device (DEC-178; CHG-CSP-015).
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: true
       x-ticvai-conflict-policy: append
@@ -578,7 +660,6 @@ paths:
     post:
       operationId: closeDepositBoxes
       x-ticvai-consumed-by:
-        - "P04 POS-007 Close Shift"
         - "P08 BO-024 Payment Exceptions"
       x-ticvai-audience: [staff]
       summary: Close one box or all of them
@@ -655,16 +736,9 @@ paths:
       x-ticvai-consumed-by:
         - "P04 POS-001 Begin Shift"
         - "P04 POS-007 Close Shift"
-        - "P04 POS-009 Staff Roster"
         - "P04 POS-012 Omnichannel Order & Fulfilment Center"
-        - "P04 POS-025 Till Home"
-        - "P06 EMP-003 Home — on duty"
         - "P06 EMP-008 Shift summary"
         - "P06 EMP-009 End shift"
-        - "P06 EMP-022 My rota"
-        - "P07 SCN-001 Sign in"
-        - "P08 BO-039 Shift Directory"
-        - "P08 BO-040 Variance Approval"
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: primary   # cash position drives close-out
       summary: The open or suspended shift on the session's workstation
@@ -689,6 +763,50 @@ paths:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
+  /shifts/current/overview:
+    get:
+      operationId: getWorkstationShift
+      x-ticvai-consumed-by:
+        - "P04 POS-025 Till Home"
+        - "P06 EMP-003 Home — on duty"
+      x-ticvai-audience: [staff]
+      x-ticvai-read-routing: primary   # the till home shows the live shift, not a replica's
+      summary: Read the open or suspended shift on the session's workstation, without the right to open one
+      description: >
+        **A read needs a view permission, not the right to open a shift** (CHG-DOOR-005, Chinmay,
+        2 October 2026: fix the Block A blockers now; platform-foundation process notes, correction on
+        POS-025). `getCurrentShift` declares SHIFT_OPEN, so a supervisor covering a till who holds no
+        shift of their own could not load the till home (POS-025) at all. This is the same answer for
+        a person who may only look: the shift on the session's workstation under
+        REPORT_VIEW_WORKSTATION, the permission `getShift` and `listShifts` already use to read a shift.
+        `getCurrentShift` keeps SHIFT_OPEN unchanged for the screens that act on the shift (begin,
+        close), so nothing built against r1 changes. The response is the same `Shift`; what a role may
+        see of the figures is decided on the screen (DI-802), not by a second shape.
+      tags: [shift]
+      x-ticvai-permission: REPORT_VIEW_WORKSTATION
+      x-ticvai-scope-level: workstation
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: The open or suspended shift on this workstation
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Shift' }
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+        '404':
+          description: >
+            No shift open or suspended on this workstation, or the session has no workstation
+            (problem type `no-current-shift`). On the till home this is the "no shift open" state,
+            not an error.
+          x-ticvai-problem-types:
+          - no-current-shift
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+
   /shifts/{shiftId}:
     parameters:
       - name: shiftId
@@ -698,16 +816,12 @@ paths:
     get:
       operationId: getShift
       x-ticvai-consumed-by:
-        - "P04 POS-001 Begin Shift"
-        - "P04 POS-007 Close Shift"
-        - "P04 POS-009 Staff Roster"
         - "P06 EMP-003 Home — on duty"
         - "P06 EMP-008 Shift summary"
         - "P06 EMP-009 End shift"
         - "P08 BO-039 Shift Directory"
         - "P08 BO-040 Variance Approval"
         - "P08 BO-041 Cash Movements"
-        - "P08 BO-042 Banking & Safe"
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: primary
       summary: Read a shift
@@ -737,12 +851,6 @@ paths:
       operationId: approveShiftOpen
       x-ticvai-consumed-by:
         - "P04 POS-001 Begin Shift"
-        - "P04 POS-007 Close Shift"
-        - "P04 POS-009 Staff Roster"
-        - "P06 EMP-003 Home — on duty"
-        - "P06 EMP-009 End shift"
-        - "P08 BO-039 Shift Directory"
-        - "P08 BO-040 Variance Approval"
       x-ticvai-audience: [staff]
       summary: Approve a shift opening outside tolerance
       description: >
@@ -791,13 +899,7 @@ paths:
     post:
       operationId: reopenShift
       x-ticvai-consumed-by:
-        - "P04 POS-001 Begin Shift"
-        - "P04 POS-007 Close Shift"
-        - "P04 POS-009 Staff Roster"
-        - "P06 EMP-003 Home — on duty"
-        - "P06 EMP-009 End shift"
-        - "P08 BO-039 Shift Directory"
-        - "P08 BO-040 Variance Approval"
+        - "P04 POS-025 Till Home"
       x-ticvai-audience: [staff]
       summary: Reopen a shift closed in error
       description: >
@@ -878,14 +980,8 @@ paths:
     post:
       operationId: suspendShift
       x-ticvai-consumed-by:
-        - "P04 POS-001 Begin Shift"
-        - "P04 POS-007 Close Shift"
-        - "P04 POS-009 Staff Roster"
-        - "P06 EMP-003 Home — on duty"
-        - "P06 EMP-008 Shift summary"
+        - "P04 POS-025 Till Home"
         - "P06 EMP-009 End shift"
-        - "P08 BO-039 Shift Directory"
-        - "P08 BO-040 Variance Approval"
       x-ticvai-audience: [staff]
       summary: Suspend a shift so another user can log in
       description: >
@@ -941,12 +1037,6 @@ paths:
       operationId: resumeShift
       x-ticvai-consumed-by:
         - "P04 POS-001 Begin Shift"
-        - "P04 POS-007 Close Shift"
-        - "P04 POS-009 Staff Roster"
-        - "P06 EMP-003 Home — on duty"
-        - "P06 EMP-009 End shift"
-        - "P08 BO-039 Shift Directory"
-        - "P08 BO-040 Variance Approval"
       x-ticvai-audience: [staff]
       summary: Resume a suspended shift
       description: >
@@ -1004,13 +1094,9 @@ paths:
     post:
       operationId: closeShift
       x-ticvai-consumed-by:
-        - "P04 POS-001 Begin Shift"
         - "P04 POS-007 Close Shift"
-        - "P04 POS-009 Staff Roster"
-        - "P06 EMP-003 Home — on duty"
-        - "P06 EMP-009 End shift"
-        - "P08 BO-039 Shift Directory"
         - "P08 BO-040 Variance Approval"
+        - "P08 BO-043 Daily Reconciliation"
       x-ticvai-audience: [staff]
       summary: Blind close-out
       description: >
@@ -1033,13 +1119,33 @@ paths:
         Where the venue requires approval on close, the shift waits in `pendingClosure` for
         `approveShiftClose` (SHIFT_APPROVE_CLOSE).
 
+        **The cashier never sees the expected cash** (decided 2 October 2026, Chinmay; CHG-FIN-003).
+        This response carries `expectedCash` and `variance`, so it is the **supervisor and back-office
+        close** (BO-039, BO-040: closing a shift on a cashier's behalf). A cashier counting their own
+        drawer at the till or on the staff app submits the count with `submitShiftCount`, which returns
+        neither figure. A caller closing a shift they opened themselves, without OVERSHORT_ACCEPT, is
+        refused 403 `blind-count-required`. Retail practice and the client's reason are in
+        docs/active/research-uae-vat-and-blind-close-2-october.md (MoM 9 Sep 2026 4.18, DI-271, DI-806).
+
         **Online only** (F32, 26 September pull audit R257). Closing needs the server's total — a
         variance computed against a stale local journal is not a variance — and POS-007 and
         `states/shift.yaml` (`pendingClosure` is not offline-reachable) already said so.
+
+        **The supervisor's close: on POS-007 with a supervisor PIN, at any till, and in the daily cash
+        reconciliation** (decided 2 October 2026, Chinmay, pre-apply round: "closeShift is declared on
+        POS-007 (supervisor PIN, any till) and in the daily cash reconciliation"; batch 3 #1 and batch 6
+        #174; DEC-059, DEC-173; CHG-CSP-012). A supervisor closes a cashier's shift at the till the
+        cashier left (POS-007), at any other till of the venue, or from the daily cash reconciliation
+        (BO-043), which lists every shift of the day and resolves them one by one: a shift still open is
+        closed here, a counted shift waiting for review is accepted (`acceptShiftVariance`) or sent back
+        for a recount (`rejectShiftVariance`). The supervisor presents their own PIN on the device in
+        use; the cashier's own count stays `submitShiftCount`.
       tags: [shift]
       x-ticvai-permission: SHIFT_CLOSE
       x-ticvai-permission-escalated: SHIFT_CLOSE_OTHER   # where the shift belongs to somebody else
-      x-ticvai-scope-level: workstation
+      x-ticvai-step-up: pin
+      x-ticvai-step-up-reason: A supervisor closes a cashier's shift and sees the expected cash and the variance (CHG-FIN-003); their own PIN on the device in use proves who did it (pre-apply round, 2 October; CHG-CSP-012).
+      x-ticvai-scope-level: venue   # was workstation; the supervisor closes from any till or the back office (CHG-CSP-012)
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: append
       parameters:
@@ -1058,8 +1164,18 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/ShiftCloseResult' }
+        '403':
+          description: >
+            The caller is the cashier whose shift it is and does not hold OVERSHORT_ACCEPT (problem
+            type `blind-count-required`): their count goes through `submitShiftCount`, which never
+            returns the expected figure (CHG-FIN-003). Or the caller lacks SHIFT_CLOSE, or
+            SHIFT_CLOSE_OTHER for somebody else's shift (`forbidden`). One `403` since 2 October 2026:
+            the second key this response map carried made YAML drop the first (CHG-CSP-012).
+          x-ticvai-problem-types: [blind-count-required, forbidden]
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
         '400': { $ref: '../shared/common.yaml#/components/responses/BadRequest' }
-        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
         '409':
           description: >
             Shift is not `open` or `suspended` — already closing or closed (problem type
@@ -1087,13 +1203,10 @@ paths:
     post:
       operationId: acceptShiftVariance
       x-ticvai-consumed-by:
-        - "P04 POS-001 Begin Shift"
         - "P04 POS-007 Close Shift"
-        - "P04 POS-009 Staff Roster"
-        - "P06 EMP-003 Home — on duty"
         - "P06 EMP-009 End shift"
-        - "P08 BO-039 Shift Directory"
         - "P08 BO-040 Variance Approval"
+        - "P08 BO-043 Daily Reconciliation"
       x-ticvai-audience: [staff]
       summary: Accept an over/short beyond the threshold
       description: >
@@ -1107,10 +1220,18 @@ paths:
 
         Moves the shift to `closed` and each of its deposit boxes from `closed` to `reconciled`
         (`states/shift.yaml`, `states/deposit-box.yaml`).
+
+        **Any till at the venue, and the daily cash reconciliation, with the supervisor's PIN** (decided
+        2 October 2026, Chinmay, batch 6 #174, BO-040: "Any till, with supervisor PIN"; batch 3 #1 and
+        #173: the cashier signs out, the shift waits as "Under review", the next cashier starts, and the
+        daily cash reconciliation goes through each shift; DEC-059, DEC-173; CHG-CSP-012). The till the
+        shift was counted on may already be another cashier's, so the supervisor accepts from whichever
+        till they are at, or from BO-043. The PIN step-up stays: still one mechanism, still a supervisor
+        in person. The alternative is `rejectShiftVariance`: send it back for a recount (DEC-175).
       tags: [shift]
       x-ticvai-permission: OVERSHORT_ACCEPT
       x-ticvai-step-up: pin
-      x-ticvai-step-up-reason: A supervisor signs off a cashier's over/short at the till, in front of the drawer (audit R080 (e)).
+      x-ticvai-step-up-reason: A supervisor signs off a cashier's over/short in person, with their own PIN on the device they use (audit R080 (e); any till or the daily reconciliation since 2 October, CHG-CSP-012).
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: append
@@ -1150,6 +1271,230 @@ paths:
           description: >
             Shift is not `pendingVariance` (problem type `shift-not-pending-variance`) — within
             tolerance, still open, or already accepted.
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+
+  /shifts/{shiftId}/reject-variance:
+    parameters:
+      - name: shiftId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: rejectShiftVariance
+      x-ticvai-consumed-by:
+        - "P04 POS-007 Close Shift"
+        - "P08 BO-040 Variance Approval"
+        - "P08 BO-043 Daily Reconciliation"
+      x-ticvai-audience: [staff]
+      summary: Send a counted shift back for a recount
+      description: >
+        **A supervisor rejects the variance and the cashier recounts and resubmits** (decided 2 October
+        2026, Chinmay, batch 6 #175, BO-040: "Add Reject + recount (DI-804)"; DEC-175; CHG-CSP-013; MoM
+        9 September 4.18, DI-804). Until 2 October the only way back was `reopenShift` on BO-039, which
+        reopens a closed shift for trading; a recount is narrower and happens before anything is
+        accepted.
+
+        From `pendingVariance` only. The shift **stays `pendingVariance`** with `recountRequestedAt`,
+        `recountRequestedByPrincipalId` and `recountReason` set (`states/shift.yaml`: the recount
+        transition; no new status, so clients built at r1 keep the values they switch on). The cashier
+        whose shift it is sees "Recount requested" rather than "Under review", recounts the box at any
+        till of the venue and submits with `submitShiftCount`; the new lines point at the ones they
+        replace (`CashCountLine.recountOf`), the latest count is the one measured, and the request flags
+        clear. Still blind: the rejection carries the supervisor's reason and never the expected figure
+        or the variance (CHG-FIN-003).
+      tags: [shift]
+      x-ticvai-permission: OVERSHORT_ACCEPT
+      x-ticvai-step-up: pin
+      x-ticvai-step-up-reason: The same supervisor act as accepting a variance, in person with their own PIN (audit R080 (e); DEC-175).
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: append
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason]
+              properties:
+                reason:
+                  type: string
+                  minLength: 3
+                  maxLength: 500
+                  description: >
+                    Why a recount is needed, shown to the cashier. Never the amount: "Count the AED 100 notes
+                    again", not "you are AED 100 short". Retained for audit with the rejecting principal.
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Sent back for a recount; the shift waits for the cashier's new count
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Shift' }
+        '403':
+          description: >
+            The caller lacks OVERSHORT_ACCEPT at this venue, or is the cashier whose shift it is
+            (`approver-is-cashier`).
+          x-ticvai-problem-types: [approver-is-cashier]
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '409':
+          description: >
+            Shift is not `pendingVariance` (`shift-not-pending-variance`), or a recount is already
+            requested and not yet submitted (`recount-already-requested`).
+          x-ticvai-problem-types: [shift-not-pending-variance, recount-already-requested]
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+
+  /shifts/{shiftId}/count-lines:
+    parameters:
+      - name: shiftId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: getShiftCountLines
+      x-ticvai-consumed-by:
+        - "P04 POS-007 Close Shift"
+        - "P08 BO-040 Variance Approval"
+        - "P08 BO-043 Daily Reconciliation"
+      x-ticvai-audience: [staff]
+      x-ticvai-read-routing: replica
+      summary: The denomination breakdown of a shift's counts
+      description: >
+        **The closing count, note by note, for the person reviewing it** (decided 2 October 2026, Chinmay,
+        batch 6 #176, BO-040: "Add a read for the count lines"; DEC-176; CHG-CSP-014; DI-272: the closing
+        receipt itemises denominations). Until 2 October the lines were written (`CashCountLine`) and
+        nothing returned them, so BO-040 could show totals only. Returns the shift's `CashCountLine`
+        rows, filtered by `countKind` (default all), **ordered by `countKind` (opening float, close,
+        movement), then count number (a recount after the first count), then the denomination's
+        counting order, `id` as the tiebreak**. Each recount line names the line it replaces
+        (`recountOf`).
+
+        **What the cashier counted, never what was expected**: a line carries counted quantity and
+        value only (`CashCountLine.expectedQuantity` is derived and not returned), so the read is safe for
+        the shift's own cashier as well as the supervisor; the expected figure and the variance stay on
+        `Shift` for OVERSHORT_ACCEPT or SHIFT_CLOSE_OTHER holders (CHG-FIN-003).
+      tags: [shift]
+      x-ticvai-permission: REPORT_VIEW_WORKSTATION
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: countKind
+          in: query
+          schema:
+            type: string
+            enum: [openingFloat, close, movement]
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: The shift's count lines, one page at a time, in the order above
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/CashCountLine' }
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+
+  /shifts/{shiftId}/count:
+    parameters:
+      - name: shiftId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: submitShiftCount
+      x-ticvai-consumed-by:
+        - "P04 POS-007 Close Shift"
+        - "P06 EMP-009 End shift"
+      x-ticvai-audience: [staff]
+      summary: The cashier's blind count, closing their own shift
+      description: >
+        **Blind close: the cashier never sees the expected cash** (decided 2 October 2026, Chinmay;
+        CHG-FIN-003; MoM 12 Aug 2026 section 19, DI-271; MoM 9 Sep 2026 4.18, DI-803 to DI-806). The
+        cashier counts the drawer by denomination and submits it. The server measures the count against
+        the expected figure (opening float + cash takings − cash refunds paid out + float entries −
+        lifts and withdrawals, `Shift.liftsTotal`) and records the variance, **and returns neither the
+        expected figure nor the variance, nor whether the drawer is over or short**. The receipt says
+        only what happens next: `closed` (within the venue's `shiftVarianceThreshold`),
+        `referredToSupervisor` (beyond it: the shift is `pendingVariance`) or `awaitingCloseApproval`
+        (the venue supervises every close: `pendingClosure`).
+
+        **The variance goes to the supervisor, not the cashier.** Beyond the threshold an alert is
+        raised to the supervisors holding OVERSHORT_ACCEPT at the venue, on the venue's alerting
+        channel (`tenancy.VenueSettings.alerting`); the shift appears on BO-040 and on the till's
+        exceptions list (POS-020) for a supervisor, and the supervisor sees counted, expected and
+        variance there (`getShift`, `closeShift`, `acceptShiftVariance`). The cashier may give a
+        reason and a note with the count (`cashierReason`, `notes`; DI-803) without being told the
+        amount. **A recount the supervisor asks for** (DI-804) is submitted the same way from
+        `pendingVariance`; every count is kept (`CashCountLine`, `countKind` close) and the latest
+        is the one measured.
+
+        **The recount after a rejection** (decided 2 October 2026, Chinmay; DEC-175; CHG-CSP-013): once
+        `rejectShiftVariance` has set `Shift.recountRequestedAt`, the cashier submits the recount here, at
+        any till of the venue, because the till the shift was counted on may be the next cashier's by
+        then (DEC-059). The receipt's `countNumber` rises and the request flags clear.
+
+        `Shift.expectedCash` and `Shift.variance` stay null to the shift's own cashier on every read;
+        they are returned to a caller holding OVERSHORT_ACCEPT or SHIFT_CLOSE_OTHER at the venue.
+
+        Online only, as `closeShift`: the expected figure is the server's.
+      tags: [shift]
+      x-ticvai-permission: SHIFT_CLOSE
+      x-ticvai-scope-level: workstation
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: append
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CloseShiftRequest' }
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Count recorded; the receipt says what happens next and nothing about the variance
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ShiftCountReceipt' }
+        '403':
+          description: >
+            The shift is not the caller's own (problem type `not-shift-operator`): a supervisor closing
+            somebody else's shift uses `closeShift` (SHIFT_CLOSE_OTHER).
+          x-ticvai-problem-types: [not-shift-operator]
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '409':
+          description: >
+            The shift is neither `open`, `suspended` nor `pendingVariance` (problem type
+            `shift-not-countable`).
+          x-ticvai-problem-types: [shift-not-countable]
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
@@ -1222,16 +1567,8 @@ paths:
     post:
       operationId: recordNoSale
       x-ticvai-consumed-by:
-        - "P04 POS-001 Begin Shift"
-        - "P04 POS-007 Close Shift"
-        - "P04 POS-009 Staff Roster"
         - "P04 POS-014 Sales Exceptions, Controls & Operational Actions"
         - "P04 POS-020 Shift Exceptions & Alerts"
-        - "P06 EMP-003 Home — on duty"
-        - "P06 EMP-009 End shift"
-        - "P08 BO-039 Shift Directory"
-        - "P08 BO-040 Variance Approval"
-        - "P08 BO-041 Cash Movements"
       x-ticvai-audience: [staff]
       summary: Open the Deposit Box without a sale
       description: >
@@ -1288,18 +1625,13 @@ paths:
     get:
       operationId: listCashMovements
       x-ticvai-consumed-by:
-        - "P04 POS-001 Begin Shift"
         - "P04 POS-007 Close Shift"
-        - "P04 POS-009 Staff Roster"
-        - "P04 POS-013 Mobile POS, Event Sales & Offline Operations"
         - "P04 POS-015 Cash Operations Dashboard"
-        - "P06 EMP-003 Home — on duty"
         - "P06 EMP-008 Shift summary"
         - "P06 EMP-009 End shift"
         - "P08 BO-039 Shift Directory"
         - "P08 BO-040 Variance Approval"
         - "P08 BO-041 Cash Movements"
-        - "P08 BO-042 Banking & Safe"
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: primary
       summary: Lifts, adds and the opening float
@@ -1331,15 +1663,10 @@ paths:
     post:
       operationId: createCashMovement
       x-ticvai-consumed-by:
-        - "P04 POS-001 Begin Shift"
-        - "P04 POS-007 Close Shift"
-        - "P04 POS-013 Mobile POS, Event Sales & Offline Operations"
         - "P04 POS-017 Cash In / Cash Out Operations"
         - "P04 POS-018 Safe Drop & Cash Transfer Management"
-        - "P06 EMP-009 End shift"
-        - "P08 BO-039 Shift Directory"
-        - "P08 BO-040 Variance Approval"
         - "P08 BO-041 Cash Movements"
+        - "P08 BO-042 Banking & Safe"
       x-ticvai-audience: [staff]
       summary: Record a cash lift or add
       description: >
@@ -1353,6 +1680,15 @@ paths:
         or the last `movement` count if one is later), less every lift recorded since, plus every
         add. A lift larger than that is refused with `lift-exceeds-float`. Cash taken in sales since
         the last count does not count towards it, because nobody has counted it.
+
+        **The drawer limit offers the lift** (decided 2 October 2026, Chinmay, batch 6 #179, BO-042:
+        "Add drawer limit setting (warn + offer cash lift)"; DEC-179; CHG-CSP-016; DI-274). When the cash
+        a till has taken since its last count puts the drawer over the till's limit
+        (`tenancy.Workstation.cashDrawerLimit`, else `tenancy.VenueSettings.cashDrawerLimit`), the till
+        warns and offers a lift recorded here; `DepositBox.overDrawerLimit` flags the box on BO-042. The
+        warning never blocks a sale, and the cashier is told only that the drawer is over its limit, not
+        what it holds (CHG-FIN-003). A supervisor recording the lift counts what they take, which makes it
+        counted cash.
       tags: [cash]
       x-ticvai-permission: CASH_LIFT
       x-ticvai-scope-level: venue
@@ -1394,10 +1730,67 @@ components:
         - pendingApproval    # awaiting SHIFT_APPROVE_OPEN where configured
         - open
         - suspended          # break cover; float intact, workstation released
-        - pendingVariance    # counted, over/short beyond threshold
+        - pendingVariance    # counted, over/short beyond threshold; "Under review" to the cashier, never blocks the next shift (CHG-CSP-012)
         - pendingClosure     # awaiting approveShiftClose (SHIFT_APPROVE_CLOSE) where configured
         - closed
         - autoClosed         # closed by the inactivity job, supervisor notified
+
+    TillShiftPolicy:
+      x-ticvai-persistence: "orders.till_shift_policy"
+      type: object
+      description: >
+        **The venue's opening, closing and exception rules for every till** (CHG-CSP-020; POS-019; DI-309).
+        One per venue. Proposed defaults are ours, client to correct.
+      required: [venueId]
+      properties:
+        id: { type: string, format: uuid, readOnly: true }
+        venueId: { type: string, format: uuid }
+        scopePath: { type: string, readOnly: true }
+        requireOpenApproval:
+          type: boolean
+          default: false
+          description: >
+            Every shift opens `pendingApproval` and waits for `approveShiftOpen` (SHIFT_APPROVE_OPEN). Off
+            by default: only a float outside `openingFloatTolerance` waits.
+        openingFloatTolerance:
+          allOf:
+            - $ref: '../shared/common.yaml#/components/schemas/Money'
+          nullable: true
+          description: >
+            How far a declared opening float may differ from the box's allocated float before the shift
+            waits for approval (`states/shift.yaml`, pendingApproval). Null: any difference waits.
+        depositBoxRequired:
+          type: boolean
+          default: true
+          description: A shift cannot open without a deposit box (`OpenShiftRequest.depositBoxCode`); refused `400` otherwise.
+        bagNumberRequired:
+          type: boolean
+          default: false
+          description: A shift cannot open without a bag number (`OpenShiftRequest.bagNumber`).
+        requireCloseApproval:
+          type: boolean
+          default: false
+          description: >
+            Every counted shift waits in `pendingClosure` for `approveShiftClose` (SHIFT_APPROVE_CLOSE), even
+            within the variance threshold.
+        autoCloseAfterHours:
+          type: integer
+          nullable: true
+          minimum: 1
+          maximum: 48
+          default: 14
+          description: >
+            Hours after which an open or suspended shift nobody closed is closed by the inactivity job as
+            `autoClosed` and the supervisors are told (`states/shift.yaml`). Null never auto-closes.
+        noSaleAlertCount:
+          type: integer
+          nullable: true
+          minimum: 1
+          default: 10
+          description: >
+            No-sales in one shift (`recordNoSale`) at which the supervisors are alerted on the venue's alerting
+            channel; the count is on POS-020. Null sends no alert.
+        updatedAt: { type: string, format: date-time, readOnly: true }
 
     DepositBoxStatus:
       type: string
@@ -1457,6 +1850,18 @@ components:
           description: >
             **Reduces the expected close figure.** Cash skimmed for banking is not a shortfall, and
             a system that treats it as one makes every busy cashier look short.
+        overDrawerLimit:
+          type: boolean
+          readOnly: true
+          default: false
+          x-ticvai-persisted: false
+          x-ticvai-derived: onRead
+          description: >
+            **The box holds more than its till's drawer limit** (decided 2 October 2026, Chinmay, BO-042;
+            DEC-179; CHG-CSP-016): computed on read from the box's expected cash against
+            `tenancy.Workstation.cashDrawerLimit` or the venue's `cashDrawerLimit`. BO-042 flags the box and
+            offers a lift; false where no limit is set. A flag, not a figure: it tells the cashier nothing
+            about the expected cash (CHG-FIN-003).
         foreignHoldings:
           type: array
           description: >
@@ -1726,7 +2131,20 @@ components:
             properties:
               tender: { type: string }
               amount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
-        notes: { type: string, maxLength: 1000 }
+        notes:
+          type: string
+          maxLength: 1000
+          description: >
+            The cashier's note on the count. Asked of every cashier on a blind count, never only
+            after a variance is shown (CHG-FIN-003, DI-803).
+        cashierReason:
+          type: string
+          nullable: true
+          enum: [tillError, unrecordedRefund, miscount, other]
+          description: >
+            Anything the cashier knows went wrong in the shift (DI-803: till error, unrecorded refund,
+            miscount, other). Optional and given without seeing the variance (CHG-FIN-003); the
+            supervisor reads it beside the variance on BO-040.
         releaseHeldLeases:
           type: boolean
           default: true
@@ -1766,6 +2184,30 @@ components:
               declared: { $ref: '../shared/common.yaml#/components/schemas/Money' }
               captured: { $ref: '../shared/common.yaml#/components/schemas/Money' }
               variance: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+
+    ShiftCountReceipt:
+      x-ticvai-persistence: "none — computed"
+      type: object
+      description: >
+        **What `submitShiftCount` returns to the cashier: what happens next, never the figure**
+        (CHG-FIN-003). No expected cash, no variance, no over or short.
+      required: [shiftId, status, outcome, countedAt]
+      properties:
+        shiftId: { type: string, format: uuid }
+        status: { $ref: '#/components/schemas/ShiftStatus' }
+        outcome:
+          type: string
+          enum: [closed, referredToSupervisor, awaitingCloseApproval]
+          description: >
+            `closed`: within the venue's threshold, the shift is closed. `referredToSupervisor`: a
+            supervisor reviews the count (`pendingVariance`); the till says "Your count is with your
+            supervisor" and nothing about the amount. `awaitingCloseApproval`: the venue supervises
+            every close (`pendingClosure`).
+        countedAt: { type: string, format: date-time }
+        countNumber:
+          type: integer
+          minimum: 1
+          description: 1 for the first count of the close, 2 for a recount the supervisor asked for, and so on.
 
     Shift:
       x-ticvai-persistence: "orders.pos_shift + orders.pos_shift_approval + orders.pos_shift_incident"
@@ -1837,7 +2279,10 @@ components:
         salesTotal:
           x-ticvai-column: gross_sales_amount
           $ref: '../shared/common.yaml#/components/schemas/Money'
-          description: What the till took in sales, as the guest paid it — tax included.
+          description: >
+            What the till took in sales, as the guest paid it — tax included: the shift's takings, not
+            Gross sales (CHG-FIN-002, CHG-FIN-010). **Never shown to the shift's own cashier before
+            the count is in** (CHG-FIN-003): with the float and the lifts it gives away the expected cash.
         refundsTotal:
           x-ticvai-column: gross_refunded_amount
           $ref: '../shared/common.yaml#/components/schemas/Money'
@@ -1857,6 +2302,8 @@ components:
             revealed once the count is in — null until then. Until this date only
             `ShiftCloseResult` carried it, returned once by `closeShift`, so BO-040 could not show
             the over/short it exists to accept.
+            **Null to the shift's own cashier on every read** (CHG-FIN-003, 2 October): returned only to
+            a caller holding OVERSHORT_ACCEPT or SHIFT_CLOSE_OTHER at the venue.
         countedCash:
           x-ticvai-column: counted_cash_amount
           allOf:
@@ -1871,6 +2318,22 @@ components:
           readOnly: true
           nullable: true
           description: Counted minus expected, as `ShiftCloseResult.variance`. Negative is short.
+            Null to the shift's own cashier, as `expectedCash` (CHG-FIN-003).
+        cashierReason:
+          type: string
+          nullable: true
+          readOnly: true
+          enum: [tillError, unrecordedRefund, miscount, other]
+          description: >
+            What the cashier said went wrong, given with the blind count (`CloseShiftRequest.cashierReason`,
+            DI-803) without seeing the variance; the supervisor reads it beside the variance on BO-040
+            (CHG-FIN-003).
+        cashierNote:
+          type: string
+          nullable: true
+          readOnly: true
+          maxLength: 1000
+          description: The cashier's note with the count (`CloseShiftRequest.notes`; CHG-FIN-003).
         heldLeaseCount:
           type: integer
           description: >
@@ -1895,6 +2358,35 @@ components:
           description: >
             Who submitted the close count. `reopenShift` refuses an approver who is this principal,
             and until 26 September there was nothing to compare against (pull audit R099).
+        recountRequestedAt:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+          description: >
+            **Set by `rejectShiftVariance`, cleared by the cashier's recount** (decided 2 October 2026,
+            Chinmay; DEC-175; CHG-CSP-013; DI-804). While set, the shift is `pendingVariance` waiting for the
+            cashier rather than the supervisor: the cashier's view says "Recount requested" instead of
+            "Under review".
+        recountRequestedByPrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          description: The supervisor who sent the count back (CHG-CSP-013).
+        recountReason:
+          type: string
+          nullable: true
+          readOnly: true
+          maxLength: 500
+          description: The supervisor's reason, shown to the cashier; never an amount (CHG-CSP-013, CHG-FIN-003).
+        countNumber:
+          type: integer
+          minimum: 0
+          readOnly: true
+          description: >
+            How many close counts the shift has had: 0 before the first, 1 after it, 2 after a recount
+            (CHG-CSP-013). The latest is the one measured.
         syncedAt:
           type: string
           format: date-time

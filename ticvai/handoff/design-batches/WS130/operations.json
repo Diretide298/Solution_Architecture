@@ -65,6 +65,50 @@
   "requestBody": null,
   "responds": "StaffingCoverage"
  },
+ "listRotaAssignments": {
+  "method": "GET",
+  "path": "/rota-assignments",
+  "contract": "workforce",
+  "summary": "The rota",
+  "permission": "WORKFORCE_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "principalId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "departmentId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "setEventResourcePlan": {
   "method": "PUT",
   "path": "/events/{eventId}/resource-plan",

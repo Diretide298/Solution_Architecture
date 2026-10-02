@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Shift & Deposit Box
   version: 1.0.0
-  x-ticvai-screen-count: 20
+  x-ticvai-screen-count: 25
   x-ticvai-tier: spine
   x-ticvai-module: "2 — Ticketing Sales (cash handling)"
   x-ticvai-capabilities: [C01]
@@ -231,6 +231,9 @@ paths:
         schema: { type: string, format: uuid }
     get:
       operationId: getTillShiftPolicy
+      x-ticvai-consumed-by:
+        - "P04 POS-019 Shift Templates & Policies"
+        - "P08 BO-065 Venue Configuration"
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: The rules every till in the venue opens and closes to
@@ -254,6 +257,9 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setTillShiftPolicy
+      x-ticvai-consumed-by:
+        - "P04 POS-019 Shift Templates & Policies"
+        - "P08 BO-065 Venue Configuration"
       x-ticvai-audience: [staff]
       x-ticvai-config-scope: venue
       summary: Set the rules every till in the venue opens and closes to
@@ -1087,6 +1093,10 @@ paths:
         schema: { type: string, format: uuid }
     post:
       operationId: closeShift
+      x-ticvai-consumed-by:
+        - "P04 POS-007 Close Shift"
+        - "P08 BO-040 Variance Approval"
+        - "P08 BO-043 Daily Reconciliation"
       x-ticvai-audience: [staff]
       summary: Blind close-out
       description: >
@@ -1275,6 +1285,10 @@ paths:
         schema: { type: string, format: uuid }
     post:
       operationId: rejectShiftVariance
+      x-ticvai-consumed-by:
+        - "P04 POS-007 Close Shift"
+        - "P08 BO-040 Variance Approval"
+        - "P08 BO-043 Daily Reconciliation"
       x-ticvai-audience: [staff]
       summary: Send a counted shift back for a recount
       description: >
@@ -1352,6 +1366,10 @@ paths:
         schema: { type: string, format: uuid }
     get:
       operationId: getShiftCountLines
+      x-ticvai-consumed-by:
+        - "P04 POS-007 Close Shift"
+        - "P08 BO-040 Variance Approval"
+        - "P08 BO-043 Daily Reconciliation"
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: The denomination breakdown of a shift's counts

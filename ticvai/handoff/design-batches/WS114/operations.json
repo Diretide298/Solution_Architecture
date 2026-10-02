@@ -18,25 +18,6 @@
   "requestBody": "AccreditationDataExport",
   "responds": null
  },
- "exportReportResult": {
-  "method": "POST",
-  "path": "/report-executions/{executionId}/export",
-  "contract": "reporting",
-  "summary": "Export a completed result",
-  "permission": "REPORT_EXPORT",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": null
- },
  "getAccreditationExport": {
   "method": "GET",
   "path": "/accreditation-exports/{exportId}",
@@ -156,73 +137,6 @@
   "requestBody": null,
   "responds": "AccreditationHolder"
  },
- "listMessageTemplates": {
-  "method": "GET",
-  "path": "/message-templates",
-  "contract": "marketing-crm",
-  "summary": "List message templates",
-  "permission": "MARKETING_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "channel",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- },
- "runReport": {
-  "method": "POST",
-  "path": "/reports/{reportId}/run",
-  "contract": "reporting",
-  "summary": "Run a report",
-  "permission": "REPORT_VIEW_VENUE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "RunReportRequest",
-  "responds": "ReportResult"
- },
- "sendTransactionalMessage": {
-  "method": "POST",
-  "path": "/messages",
-  "contract": "marketing-crm",
-  "summary": "Send a transactional message",
-  "permission": "MARKETING_SEND",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": null
- },
  "setAccreditationNotificationRules": {
   "method": "PUT",
   "path": "/accreditation-notifications",
@@ -241,24 +155,5 @@
   ],
   "requestBody": "AccreditationNotificationRules",
   "responds": "AccreditationNotificationRules"
- },
- "setLocalizationBrandingCustomer": {
-  "method": "PUT",
-  "path": "/localization-branding-customer",
-  "contract": "marketing-crm",
-  "summary": "Set a waiver version's languages, branding and channels",
-  "permission": "GUEST_MANAGE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "LocalizationBrandingCustomerExperienceConfigurationInput",
-  "responds": "LocalizationBrandingCustomerExperienceConfigurationView"
  }
 }

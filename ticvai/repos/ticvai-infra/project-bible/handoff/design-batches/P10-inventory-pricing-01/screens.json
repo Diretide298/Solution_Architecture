@@ -41,7 +41,6 @@
      "to": "PTR-008",
      "trigger": "Receives vouchers",
      "provenance": "flow F10 step 2→3",
-     "operation": "createOrder",
      "carries": [
       "orderId"
      ]
@@ -226,36 +225,6 @@
      "slot": "rowActions",
      "components": [
       {
-       "kind": "primaryButton",
-       "label": "Create order",
-       "operation": "createOrder",
-       "provenance": "contract orders.yaml POST /orders"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Apply manual discount",
-       "operation": "applyManualDiscount",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/discounts"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Exchange order lines",
-       "operation": "exchangeOrderLines",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/exchanges"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Hold order",
-       "operation": "holdOrder",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/hold"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Modify order",
-       "operation": "modifyOrder",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/modify"
-      },
-      {
        "kind": "secondaryButton",
        "label": "Release channel allocation",
        "operation": "relinquishChannelAllocation",
@@ -266,152 +235,12 @@
        "label": "Reprint order",
        "operation": "reprintOrder",
        "provenance": "contract orders.yaml POST /orders/{orderId}/reprints"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Reschedule order",
-       "operation": "rescheduleOrder",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/reschedule"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Resume order",
-       "operation": "resumeOrder",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/resume"
-      },
-      {
-       "kind": "destructiveButton",
-       "label": "Void order",
-       "operation": "voidOrder",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/voids"
       }
      ]
     }
    ]
   },
   "overlays": [
-   {
-    "id": "confirmVoidOrder",
-    "component": "confirmDialog",
-    "trigger": "Void order",
-    "body": "**Names what `voidOrder` changes and what it leaves alone**, in the consequence rather than the verb. A inventory allocation this affects should be identified in the dialog, not just counted. **Collects what `voidOrder` sends before it is called.** Required: `id`, `reason`, `recordedAt`.",
-    "provenance": "contract orders.yaml POST /orders/{orderId}/voids"
-   },
-   {
-    "id": "formCreateOrder",
-    "component": "modal",
-    "trigger": "Create order",
-    "body": "**Collects what `createOrder` sends before it is called.** Required: `id`, `venueId`, `channel`, `lines`, `recordedAt`. Optional: `shiftId`, `subjectId`, `guestLinkId`, `catalogueBundleVersion`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "CreateOrderRequest",
-    "confirm": {
-     "label": "Create order",
-     "operation": "createOrder"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "id",
-      "venueId",
-      "channel",
-      "lines",
-      "recordedAt",
-      "shiftId",
-      "subjectId",
-      "guestLinkId",
-      "catalogueBundleVersion"
-     ]
-    },
-    "provenance": "contract orders.yaml POST /orders"
-   },
-   {
-    "id": "formApplyManualDiscount",
-    "component": "modal",
-    "trigger": "Apply manual discount",
-    "body": "**Collects what `applyManualDiscount` sends before it is called.** Required: `id`, `reason`, `recordedAt`. Optional: `lineId`, `amount`, `percentage`, `reasonCode`, `approverPrincipalId`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "ManualDiscountRequest",
-    "confirm": {
-     "label": "Apply manual discount",
-     "operation": "applyManualDiscount"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "id",
-      "reason",
-      "recordedAt",
-      "lineId",
-      "amount",
-      "percentage",
-      "reasonCode",
-      "approverPrincipalId"
-     ]
-    },
-    "provenance": "contract orders.yaml POST /orders/{orderId}/discounts"
-   },
-   {
-    "id": "formExchangeOrderLines",
-    "component": "modal",
-    "trigger": "Exchange order lines",
-    "body": "**Collects what `exchangeOrderLines` sends before it is called.** Required: `id`, `outgoingLineIds`, `incomingLines`, `recordedAt`. Optional: `waiveFee`, `reason`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "ExchangeOrderRequest",
-    "confirm": {
-     "label": "Exchange order lines",
-     "operation": "exchangeOrderLines"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "id",
-      "outgoingLineIds",
-      "incomingLines",
-      "recordedAt",
-      "waiveFee",
-      "reason"
-     ]
-    },
-    "provenance": "contract orders.yaml POST /orders/{orderId}/exchanges"
-   },
-   {
-    "id": "formHoldOrder",
-    "component": "modal",
-    "trigger": "Hold order",
-    "body": "**Collects what `holdOrder` sends before it is called.** Required: `recordedAt`. Optional: `label`, `holdUntil`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Hold order",
-     "operation": "holdOrder"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "recordedAt",
-      "label",
-      "holdUntil"
-     ]
-    },
-    "provenance": "contract orders.yaml POST /orders/{orderId}/hold"
-   },
-   {
-    "id": "formModifyOrder",
-    "component": "modal",
-    "trigger": "Modify order",
-    "body": "**Collects what `modifyOrder` sends before it is called.** Required: `id`, `recordedAt`. Optional: `addLines`, `removeLineIds`, `reason`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "ModifyOrderRequest",
-    "confirm": {
-     "label": "Modify order",
-     "operation": "modifyOrder"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "id",
-      "recordedAt",
-      "addLines",
-      "removeLineIds",
-      "reason"
-     ]
-    },
-    "provenance": "contract orders.yaml POST /orders/{orderId}/modify"
-   },
    {
     "id": "formRelinquishChannelAllocation",
     "component": "modal",
@@ -450,33 +279,12 @@
      ]
     },
     "provenance": "contract orders.yaml POST /orders/{orderId}/reprints"
-   },
-   {
-    "id": "formRescheduleOrder",
-    "component": "modal",
-    "trigger": "Reschedule order",
-    "body": "**Collects what `rescheduleOrder` sends before it is called.** Required: `targetPerformanceId`, `recordedAt`. Optional: `lineIds`, `waiveFee`, `reason`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Reschedule order",
-     "operation": "rescheduleOrder"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "targetPerformanceId",
-      "recordedAt",
-      "lineIds",
-      "waiveFee",
-      "reason"
-     ]
-    },
-    "provenance": "contract orders.yaml POST /orders/{orderId}/reschedule"
    }
   ],
   "states": {
    "loading": "The inventory allocation list.",
    "error": "Could not load. Names which read failed and leaves the inventory allocation untouched.",
-   "emptyFirstRun": "No inventory allocation yet. Offers Create order (`createOrder`); distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No inventory allocation yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "Nothing matches the filter on performanceId and the inventory allocation are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `getChannelAllocations` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -486,30 +294,6 @@
     "contract": "catalogue",
     "purpose": "from page inventory",
     "trigger": "onAction"
-   },
-   {
-    "operationId": "createOrder",
-    "contract": "orders",
-    "purpose": "From the flow it appears in",
-    "trigger": "onAction"
-   },
-   {
-    "operationId": "applyManualDiscount",
-    "contract": "orders",
-    "purpose": "Apply a discount a cashier chose",
-    "trigger": "onAction",
-    "invalidates": [
-     "listChannelCapacities"
-    ]
-   },
-   {
-    "operationId": "exchangeOrderLines",
-    "contract": "orders",
-    "purpose": "Exchange lines for different products or dates",
-    "trigger": "onAction",
-    "invalidates": [
-     "listChannelCapacities"
-    ]
    },
    {
     "operationId": "getOrder",
@@ -522,15 +306,6 @@
     "contract": "orders",
     "purpose": "Full financial history of an order",
     "trigger": "onAction"
-   },
-   {
-    "operationId": "holdOrder",
-    "contract": "orders",
-    "purpose": "Park a sale and free the till",
-    "trigger": "onAction",
-    "invalidates": [
-     "listChannelCapacities"
-    ]
    },
    {
     "operationId": "listChannelCapacities",
@@ -551,15 +326,6 @@
     "trigger": "onLoad"
    },
    {
-    "operationId": "modifyOrder",
-    "contract": "orders",
-    "purpose": "Add or remove lines on an existing order",
-    "trigger": "onAction",
-    "invalidates": [
-     "listChannelCapacities"
-    ]
-   },
-   {
     "operationId": "relinquishChannelAllocation",
     "contract": "catalogue",
     "purpose": "Return unsold channel allocation to the general pool",
@@ -572,33 +338,6 @@
     "operationId": "reprintOrder",
     "contract": "orders",
     "purpose": "Reprint or resend tickets",
-    "trigger": "onAction",
-    "invalidates": [
-     "listChannelCapacities"
-    ]
-   },
-   {
-    "operationId": "rescheduleOrder",
-    "contract": "orders",
-    "purpose": "Move an order to another performance",
-    "trigger": "onAction",
-    "invalidates": [
-     "listChannelCapacities"
-    ]
-   },
-   {
-    "operationId": "resumeOrder",
-    "contract": "orders",
-    "purpose": "Bring a parked sale back to a till",
-    "trigger": "onAction",
-    "invalidates": [
-     "listChannelCapacities"
-    ]
-   },
-   {
-    "operationId": "voidOrder",
-    "contract": "orders",
-    "purpose": "Void an order",
     "trigger": "onAction",
     "invalidates": [
      "listChannelCapacities"
@@ -631,6 +370,56 @@
    "board": "wireframes/P10 Partner Web.dc.html#ptr-005"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 19 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "gaps": [
+   {
+    "operation": "applyManualDiscount",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-018): Order actions (create, discount, exchange, hold, modify, void) on an inventory view; booking is PTR-008 and this view reads and returns allocation (design-notes correction ticketing-guest PTR-005).",
+    "source": "screens/P10-partner-reseller-portal.yaml#PTR-005"
+   },
+   {
+    "operation": "createOrder",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-018): Order actions (create, discount, exchange, hold, modify, void) on an inventory view; booking is PTR-008 and this view reads and returns allocation (design-notes correction ticketing-guest PTR-005).",
+    "source": "screens/P10-partner-reseller-portal.yaml#PTR-005"
+   },
+   {
+    "operation": "exchangeOrderLines",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-018): Order actions (create, discount, exchange, hold, modify, void) on an inventory view; booking is PTR-008 and this view reads and returns allocation (design-notes correction ticketing-guest PTR-005).",
+    "source": "screens/P10-partner-reseller-portal.yaml#PTR-005"
+   },
+   {
+    "operation": "holdOrder",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-018): Order actions (create, discount, exchange, hold, modify, void) on an inventory view; booking is PTR-008 and this view reads and returns allocation (design-notes correction ticketing-guest PTR-005).",
+    "source": "screens/P10-partner-reseller-portal.yaml#PTR-005"
+   },
+   {
+    "operation": "modifyOrder",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-018): Order actions (create, discount, exchange, hold, modify, void) on an inventory view; booking is PTR-008 and this view reads and returns allocation (design-notes correction ticketing-guest PTR-005).",
+    "source": "screens/P10-partner-reseller-portal.yaml#PTR-005"
+   },
+   {
+    "operation": "rescheduleOrder",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-018): Order actions (create, discount, exchange, hold, modify, void) on an inventory view; booking is PTR-008 and this view reads and returns allocation (design-notes correction ticketing-guest PTR-005).",
+    "source": "screens/P10-partner-reseller-portal.yaml#PTR-005"
+   },
+   {
+    "operation": "resumeOrder",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-018): Order actions (create, discount, exchange, hold, modify, void) on an inventory view; booking is PTR-008 and this view reads and returns allocation (design-notes correction ticketing-guest PTR-005).",
+    "source": "screens/P10-partner-reseller-portal.yaml#PTR-005"
+   },
+   {
+    "operation": "voidOrder",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-018): Order actions (create, discount, exchange, hold, modify, void) on an inventory view; booking is PTR-008 and this view reads and returns allocation (design-notes correction ticketing-guest PTR-005).",
+    "source": "screens/P10-partner-reseller-portal.yaml#PTR-005"
+   }
+  ],
   "_platform": {
    "code": "P10",
    "audience": "partner",
@@ -1017,7 +806,7 @@
   "density": "compact",
   "pattern": "statusTracker",
   "patternReason": "`getAvailability` reads one record and nothing reads a population — the screen is about that one thing",
-  "purpose": "Find something when the guest does not know what it is called.",
+  "purpose": "See what is available to sell on the partner channel, by product and performance.",
   "gaps": [
    {
     "operation": "getAvailability",
@@ -1062,6 +851,7 @@
    "board": "wireframes/P10 Partner Web.dc.html#ptr-007"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "purposeNote": "Purpose rewritten 2 October 2026 (CHG-WIR-020): The purpose was copied from the guest search (\"Find something when the guest does not know what it is called\"); the screen is availability for the partner's products (design-notes correction ticketing-guest PTR-007).",
   "_platform": {
    "code": "P10",
    "audience": "partner",

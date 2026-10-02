@@ -1,6 +1,6 @@
 # WS04 — Access Control board 4
 
-**10 screens · 16 operations · 21 schemas · 2 permissions**
+**10 screens · 14 operations · 18 schemas · 2 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -61,6 +61,36 @@ convincingly. It is never a caption.
   and its error; and, element by element, what is shown and in what format, what each action
   produces and where the user goes next. Draw exactly that.
 
+## The processes these screens belong to
+
+Written by the owner of each process (`handoff/design-notes/`). Read before any screen: it says how the process runs end to end and which words the screens must use.
+
+### Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue)
+
+Venue operations is everything that happens after a sale and inside the gates. A guest's ticket is one virtual ticket with interchangeable media (QR, dynamic QR, RFID wristband, NFC, Face Pass or Face Tag); at an access point a scanner (P07, or the scan function inside the Staff App P06) validates the media against the admission profile and the guest admission policy, offline if it must, and every deny carries a reason and a next action. The back office (Venue Management P08) configures that estate: the venue topology (venue, park, zone, attraction, access point, gate and lane, device placement), admission profiles and rules (entry, exit, re-entry, anti-passback, validity, crossover, companions), credential security (dynamic QR, device binding, beacons), biometrics, gate modes, and the live operations, fraud and monitoring views. Accreditation (P08 setup and review, P11 web portal for applicants, web first) takes an applicant from a configurable form through document checks, OCR, duplicate blocking and multi-level approval to a credential with zone rights. Resources and capacity manage bookable resources (rooms, vehicles, equipment, cabanas, instructors) that are booked as a consequence of selling a product, never sold directly. Workforce covers shift templates, rosters, attendance, swaps and breaks, mirrored on the Staff App. Maintenance and safety cover the asset register, preventive calendars, work orders with scored priority, inspections and incidents, with technicians working from the Staff App. Games and rides configure readers, credit types and consumption priority, play entitlements, game pricing, retry pricing, redemption and the card lifecycle. The virtual queue (Q1) gives a guest a live wait time and a return window for a ride; it is not the on-sale waiting room (Q2). Every calendar has day, week and month views. Configuration resolves tenant, region, venue (outlet only for F&B and retail), and a user's permissions, never the device, decide what they may do. The guest apps (P01, P02) show the guest's side of this: My Tickets, the scan code, Face Pass, wait times, the virtual queue, map booking of cabanas and the visit planner.
+*(source: F06 step 1 / F112 step 1 / F111 step 1 / ADR-0002 / ADR-0012 / ADR-0018 / ADR-0041 / ADR-0066 / ADR-0067 / ADR-0068 / DI-652 / DI-627 / DI-640 / DI-654 / DI-666 / DI-482 / DI-483 / DI-907 / DI-919 / DI-923 / DI-865 / DI-678 / TRACKER Actions row 160 / MoM 2026-09-02 AccessControl / MoM 2026-09-07 …)*
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Ticket | The one virtual record a guest owns (ticket number, product, validity, entries). Its number never changes, whatever media carries it or whoever it is transferred or resold to. | Pass (unless the product is a pass), Booking, Order line | DI-652 / DI-620 / contracts/spine/access.yaml#/components/schemas/TicketStatus |
+| Media | What the ticket is presented by at a gate (QR code, dynamic QR, wristband/RFID card, NFC, Face Pass, Face Tag). One ticket can carry several media as fallbacks; a media code can also cover several tickets scanned as one group. Show one … | Credential (for guest media; keep Credential for accreditation badges and staff), Ticket code | DI-180 / DI-608 / DI-652 |
+| Access point | A place where a scan is judged, with a fixed direction (entry, exit, re-entry, crossover). Hierarchy shown to users is Venue > Park > Zone > Attraction > Access point > Gate/lane > Device. | Scanner (that is the device), Door | screens/P08-venue-back-office.yaml#BO-144 / … |
+| Admission profile | The named set of rules an access point enforces (opening window, entries, exit scan, re-entry, validity, crossover). Products point at a profile; tiers such as Bronze/Silver/Gold are profiles with gate allow and deny lists. | Admission rules (as a screen title), Access rule set | DI-185 / contracts/spine/access.yaml#/components/schemas/AdmissionRules |
+| Admitted / Denied / Overridden | The three scan outcomes. A denial is always shown with its reason in plain words and a next action; an override is a supervisor admitting despite a denial, and is always attributed and reasoned. | Valid/Invalid, Success/Fail, Error | contracts/spine/access.yaml#/components/schemas/ScanOutcome / … |
+| Used | A ticket entry is used the moment a scan succeeds, whether or not the guest physically passed. Mistakes are resolved from the scan history, not by un-scanning. | Redeemed (for admission), Checked in (that is group check-in, a different step) | DI-627 / TRACKER Actions row 221 / TRACKER Actions row 189 |
+| Gate mode | What a lane is doing now, set live by the podium or supervisor - Normal, Free flow (counts, does not validate), Drop arm (everybody through, evacuation), Closed (nobody through), Podium (staff validating by eye), Maintenance. Direction is … | Turnstile mode (as a label for direction), Open/Locked | contracts/spine/access.yaml#/components/schemas/AccessPointOperatingMode / R221 |
+| Offline package | What a scanner holds to validate with no network - entitlements, blacklist, admission profiles and the active guest admission policy version - with its age always visible. | Cache, Local DB | F06 step 3 / ADR-0068 |
+| Sync and reconciliation | Sending the offline scan journal to the server, and the duty manager's review of scans the server rejected after the device had already admitted the guest. | Upload, Retry | F06 step 6 / DI-065 |
+| Face Pass / Face Tag | Face Pass is the long-lived face credential for members and season-pass holders (renewable); Face Tag is short-lived, for one day or event. Retention is set per tier by the venue. | Face ID, Biometric login | DI-640 / ADR-0063 |
+| Accreditation / Credential (accreditation) | Accreditation is the application and approval of a person (media, contractor, corporate, staff of a partner) for an event or season; the credential is what is issued after approval (photo badge, QR or RFID) with zone access rights. | Registration (for the whole process), Ticket | DI-654 / DI-662 |
+| Resource | A bookable thing or person a product needs (room, vehicle, cabana, equipment set, instructor). Guests buy products; resources are assigned to the booking, pre-assigned or dynamically. | Asset (that is maintenance), Inventory (that is stock) | DI-475 / DI-482 / TRACKER Actions row 160 |
+| Asset | A physical item maintained by the venue (ride, turnstile, printer, pump) with a register record, documents, warranty and maintenance history. | Resource, Device (unless it is an IT device in the device register) | DI-910 / ADR-0067 |
+| Work order | A unit of maintenance work, lifecycle Created > Assigned > In progress > Review > Closed, with a resolution timer. | Ticket (reserved for guest tickets), Job card | DI-231 |
+| Game / attraction (games module) | In the games and rides module an attraction is an individual game or ride (roller coaster, racing game, bumper cars), not a venue. | Venue, Park | DI-863 |
+| Virtual queue / Return window | A guest's place in a ride's queue held without standing in line, with a return window (for example 4:50 to 5:00 PM) that recalculates live. Distinct from the walk-in line and the VIP/express lane, and from the on-sale waiting room. | Waiting room, Fast pass (that is the express product), Booking | DI-675 / DI-678 / DI-679 / ADR-0066 |
+| Wait time source | Where a ride's wait time comes from - Sensor, Throughput, Manual, or Unavailable - always shown beside the number. | Live (when the source is manual) | contracts/satellite/queue.yaml#/components/schemas/WaitTimeSource / DI-315 |
+
+
 ## The screens
 
 Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs count fields; requirements are matrix rows; meeting inputs are the ones naming the screen (the module and platform ones are below); white label says whether the tenant's brand reaches it (guest) or it sets the brand (configures).
@@ -103,6 +133,17 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/access-venue/media-credential-command-center-bo-174` |
+
+**Known gaps.** Removed 2 October 2026 (CHG-WIR-001): listMediaTypeCredential is the Ticket Media registry of BO-337; the hub needs no media-type catalogue, and the library belongs to BO-175 (VO-R14; design-notes …
+
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** The hub of board 4, the media abstraction layer: one view of every media and verification technology Access Control supports - KPI tiles (active media profiles, QR, RFID, NFC, wallet, biometric and external credentials, media swaps today, failed media reads, unknown credentials, verification exceptions), a media directory and AI highlights - with tiles into the nine media screens. The pack names the visual idea the whole board must carry: ONE VIRTUAL TICKET ID - MANY POSSIBLE MEDIA - ONE ACCESS HISTORY - ONE ENTITLEMENT BALANCE. The one thing to get right: never present a QR, a wristband and a face as three tickets.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **A multiSelect "Filter by" with the option "ai"** Why: The AI highlights are a summary field, not a filter; the pack's filters are tenant, venue, media, credential, product, status, integration. *(source: screens/P08-venue-back-office.yaml#BO-174; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **Table "Every media credential" with no columns** Why: The directory row has five pack columns (VO-R12). *(source: contracts/spine/access.yaml#/components/schemas/MediaCredentialCommandCenterView; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+
+**Fixed on main** (the package already carries these; draw what it says): listMediaTypeCredential (the Ticket Media pack's registry, BO-337) is bound here beside listMediaTypeTechnology's own library (CHG-WIR-001).
 
 #### Inputs: what the user enters or picks
 
@@ -429,7 +470,20 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 **The selected media credential** (detail panel): The pack groups this record's detail under its own headings: “Media Directory”.
 
-**Data it reads**: `listMediaCredential` (onLoad, Media & Credential Command Center); `listVirtualCredentialMedia` (onLoad, Virtual Credential & Media Association); `listMediaTypeCredential` (onLoad, Media Type & Credential Technology Registry)
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **KPI tiles**: The eleven pack tiles as metric tiles (VO-R02); Failed media reads, Unknown credentials and Verification exceptions turn amber/red above zero and open the list behind them. *(source: screens/P08-venue-back-office.yaml#BO-174 / contracts/spine/access.yaml#/components/schemas/MediaCredentialCommandCenterViewSummary)*
+- **Hero diagram**: A central "virtual ticket" node with QR, Barcode, RFID, NFC, Mobile wallet, Face Pass, Face Tag and External credential around it, each with today's count - the board's design concept. *(source: screens/P08-venue-back-office.yaml#BO-174 / screens/P08-venue-back-office.yaml#BO-183 / DI-652)*
+- **Media directory**: Titled "Media profiles"; columns Media profile, Technology, Credential type, Status, Offline (Yes / No / Conditional - Conditional in amber with the reason on hover). *(source: screens/P08-venue-back-office.yaml#BO-174 / contracts/spine/access.yaml#/components/schemas/MediaCredentialCommandCenterView)*
+- **Filters**: Media, Credential, Product, Status, Integration; Tenant and Venue come from the session (VO-R09), not filter fields. *(source: contracts/spine/access.yaml#listMediaCredential)*
+- **AI highlights**: Advisory findings (failing media profiles, unusual read errors, duplicate identifiers, obsolete media, incompatible device/media combinations) each with the profile and gate (VO-R11). *(source: contracts/spine/access.yaml#/components/schemas/MediaCredentialCommandCenterViewSummary)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Open a media screen**: Tiles into BO-175 to BO-183; each returns here. *(source: F114 step 1 / DI-653)*
+- **Look up a ticket**: A search box taking a ticket number or any media code opens the virtual credential view (BO-176) on that ticket. *(source: contracts/spine/access.yaml#listVirtualCredentialMedia / DI-180)*
+
+**Data it reads**: `listMediaCredential` (onLoad, Media & Credential Command Center); `listVirtualCredentialMedia` (onLoad, Virtual Credential & Media Association)
 
 **Where the user goes next**
 
@@ -450,16 +504,69 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | Loading (`?state=loading`) | The media credential list. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the media credential untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No media credential yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, first run (`?state=emptyFirstRun`) | No media credential yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the media credential are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Edge cases to draw
+
+- **Unknown credentials rising at one gate**: Highlight names the gate and the most common unrecognised format, linking to partner mapping (BO-181). *(source: screens/P08-venue-back-office.yaml#BO-174)*
+
+#### Consistency with other screens
+
+- Match `BO-334`: The Virtual Ticket command centre shows the same ticket-with-media idea; same diagram and ticket number format.
+- Match `BO-337`: The media type registry of the Ticket Media pack reads the same media types as BO-175.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+kpis:
+  activeProfiles: 9
+  qr: 21480
+  rfid: 6320
+  nfc: 1140
+  wallet: 3870
+  biometric: 2526
+  external: 410
+  swapsToday: 37
+  failedReads: 118
+  unknown: 12
+  exceptions: 6
+directory:
+- profile: Mobile Dynamic QR
+  technology: QR
+  type: Digital ticket
+  status: Active
+  offline: 'Yes'
+- profile: RFID Wristband
+  technology: RFID
+  type: Wristband
+  status: Active
+  offline: 'Yes'
+- profile: Annual Pass NFC
+  technology: NFC
+  type: Membership
+  status: Active
+  offline: 'Yes'
+- profile: Apple Wallet Pass
+  technology: Wallet
+  type: Digital pass
+  status: Active
+  offline: 'Yes'
+- profile: Partner QR
+  technology: QR
+  type: External ticket
+  status: Active
+  offline: Conditional
+```
 
 #### Permissions
 
 - `listMediaCredential` → `SCOPE_VIEW` (read) · staff
 - `listVirtualCredentialMedia` → `SCOPE_VIEW` (read) · staff
-- `listMediaTypeCredential` → `SCOPE_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -505,6 +612,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-100`, `BO-175`, `BO-176`, `BO-177`, `BO-178`, `BO-179`, `BO-180`, `BO-181`, `BO-182`, `BO-183`.
 - [ ] Every gated control is gated: `SCOPE_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 1 edge case(s) from the process notes are drawn.
+- [ ] The 2 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -524,6 +633,18 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/access-venue/media-type-technology-library-bo-175` |
+
+**Known gaps.** Contract gap recorded 2 October 2026 (CHG-WIR-004): Merge the two media-type catalogues into one record, one read and one write that every media picker reads (BO-175, BO-337).
+
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** The library of media technologies the venue accepts - 1D, 2D and QR barcodes, contact, proximity and ISO 15693 RFID, NFC, app credential, mobile wallet, paper ticket, wristband, plastic card, hotel card, Face Pass, Face Tag, partner QR, external barcode, third-party credential - each with technology, encoding format, reader types, online/offline capability, writable or read-only, security classification and where it applies. New media are added by configuration. The one thing to get right: media are retired, never deleted, because issued credentials still reference them.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **Every property (technology, encoding format, reader types, capability, classification, venues) is a selectField and Save has no permission** Why: Encoding format is text, reader types and venues multi-selects, capability segmented; Save needs ACCESS_POINT_CONFIGURE (VO-R08). *(source: screens/P08-venue-back-office.yaml#BO-175 / contracts/spine/access.yaml#setMediaTypeTechnology; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- Two catalogues of media types (listMediaTypeTechnology here, listMediaTypeCredential on BO-337) with different fields (CHG-WIR-004)
 
 #### Inputs: what the user enters or picks
 
@@ -556,6 +677,16 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Applicable products `applicableProducts` | list of values (chips) | optional | — | — | — | Empty means every product | `setMediaTypeTechnology` body |
 | Active `active` | toggle | optional | on | — | — | False retires the media type: no new credential is issued on it; credentials already issued stay valid until they expire | `setMediaTypeTechnology` body |
 
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **mediaType**: Grouped select in the pack's families - Barcode, RFID, NFC, Mobile, Physical, Identity, External; the family sets technology automatically (editable). *(source: screens/P08-venue-back-office.yaml#BO-175 / contracts/spine/access.yaml#setMediaTypeTechnology)*
+- **name**: Required, max 200, Arabic variant, e.g. "RFID Wristband (ISO 15693)". *(source: contracts/spine/access.yaml#setMediaTypeTechnology)*
+- **encodingFormat / supportedReaderTypes**: Encoding format max 100 (e.g. "ISO/IEC 18004 QR, ECC M"); reader types as chips from the reader list of BO-199 (QR/barcode, RFID, NFC, biometric camera). *(source: contracts/spine/access.yaml#setMediaTypeTechnology / screens/P08-venue-back-office.yaml#BO-199)*
+- **onlineOfflineCapability / writableReadOnly**: Segmented controls Online only / Offline only / Online and offline (required) and Writable / Read-only. *(source: screens/P08-venue-back-office.yaml#BO-176 / contracts/spine/access.yaml#setMediaTypeTechnology)*
+- **securityClassification**: Select (placeholder Low / Standard / High until the client gives a scale), not free text. *(source: contracts/spine/access.yaml#setMediaTypeTechnology)*
+- **applicableVenues / applicableProducts**: Multi-selects; empty must read "All venues" / "All products". *(source: contracts/spine/access.yaml#setMediaTypeTechnology)*
+- **active**: Shown as status Active / Retired; retiring explains "No new credentials on this media; issued ones stay valid until they expire". *(source: contracts/spine/access.yaml#setMediaTypeTechnology)*
+
 #### Outputs: what the screen shows and produces
 
 **Actions and what each produces**
@@ -563,6 +694,15 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
 | Save media type (primary button) | `setMediaTypeTechnology` PUT `/media-type-technology` | MediaTypeTechnologyLibraryInput | MediaTypeTechnologyLibraryView | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 Retiring a media type an active encoding profile still uses | — |
+
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Library list**: Grouped by family with name, technology, offline capability, readers, venues, status; retired rows greyed with the retire date. *(source: contracts/spine/access.yaml#listMediaTypeTechnology)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Add / Save media type**: Upsert keyed by mediaTypeId (absent creates); whole record replaced (VO-R04). *(source: contracts/spine/access.yaml#setMediaTypeTechnology)*
+- **Retire**: Sets active false after a confirmation naming credentials issued on it; refused (409) while an active encoding profile names it - the message names the profile. *(source: contracts/spine/access.yaml#setMediaTypeTechnology)*
 
 **Data it reads**: `listMediaTypeTechnology` (onLoad, Media Type & Technology Library)
 
@@ -580,6 +720,44 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 Retiring a media type an active encoding profile still uses |
+
+#### Edge cases to draw
+
+- **Adding a media type no reader in the venue supports**: Warn "No registered reader supports this media" with a link to BO-183. *(source: screens/P08-venue-back-office.yaml#BO-183)*
+
+#### Consistency with other screens
+
+- Match `BO-337`: Media Type & Credential Technology Registry (ticket media process) is the same catalogue with a different read (listMediaTypeCredential); one should survive (VO-R14), the other link to it.
+- Match `BO-178`: Encoding profiles pick a media type from this library.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+types:
+- name: Mobile Dynamic QR
+  family: Barcode
+  type: QR
+  offline: Online and offline
+  rw: Read-only
+  venues: All
+- name: RFID Wristband ISO 15693
+  family: RFID
+  type: ISO 15693
+  offline: Online and offline
+  rw: Writable
+  venues: Aqua Park
+- name: Hotel room card
+  family: Physical
+  type: Hotel card
+  offline: Online only
+  status: Active
+- name: Paper ticket 1D
+  family: Barcode
+  type: Linear barcode
+  status: Retired 30 Jun 2026
+```
 
 #### Permissions
 
@@ -618,6 +796,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-174`.
 - [ ] Every gated control is gated: `ACCESS_POINT_CONFIGURE`, `SCOPE_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 1 edge case(s) from the process notes are drawn.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -640,15 +820,37 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** Shows one virtual credential with every medium linked to it and which of them may be used now - the pack's VC-9837241, Adventure Park Annual Pass: Dynamic QR Active, RFID Wristband Active, Mobile Wallet Provisioned, Face Pass Enrolled - and proves that any of them (QR 8X72..., RFID 298173..., Wallet 827...) resolves to the same ticket, guest, entitlements, access history and consumption state. The one thing to get right: linked is not the same as usable; show both, with the verification priority (primary Dynamic QR, alternatives RFID / NFC / Face Pass).
+
+**Known correction pending (do not draw the wrong version)**
+
+- **Content region is an empty unbound table and the read is not attached to it; no search input** Why: The read returns ticket, guest, entitlements, linked and active media; the pack gives a full credential view (p46-47). *(source: screens/P08-venue-back-office.yaml#BO-176 / contracts/spine/access.yaml#listVirtualCredentialMedia; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **Verification priority is configured on this pack page but has no write here** Why: The priority belongs to media activation rules (BO-341); link to it rather than a second editor. *(source: screens/P08-venue-back-office.yaml#BO-176 / contracts/spine/access.yaml#listMediaActivationPriority; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+
 #### Inputs: what the user enters or picks
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Search**: One search box accepting a ticket number, a virtual credential id or any media code; the result is always the one virtual credential. *(source: screens/P08-venue-back-office.yaml#BO-176 / screens/P08-venue-back-office.yaml#BO-177)*
+- **Verification priority**: Primary method and ordered alternatives, drag to reorder; this is the product's media activation rule (BO-341), shown here read-only with Edit. *(source: screens/P08-venue-back-office.yaml#BO-176 / contracts/spine/access.yaml#listMediaActivationPriority)*
 
 #### Outputs: what the screen shows and produces
 
 **Shown**
 
 **Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Credential card**: Virtual credential id, ticket product, guest, entitlements with balances and consumption state; the ticket number never changes. *(source: contracts/spine/access.yaml#/components/schemas/VirtualCredentialMediaAssociationView / DI-652)*
+- **Linked media**: One row per medium with masked code, state (Active, Provisioned, Enrolled, Revoked) and a "Usable now" tick from activeMedia; Face Pass shows "Enrolled", never an image. *(source: screens/P08-venue-back-office.yaml#BO-176 / contracts/spine/access.yaml#/components/schemas/VirtualCredentialMediaAssociationView)*
+- **Identity resolution**: The pack's diagram - three media codes arrowing into the one credential, then Ticket, Guest, Entitlements, Access history, Consumption state. *(source: screens/P08-venue-back-office.yaml#BO-177)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Open history / Swap media**: History opens the investigation console (BO-226); Swap opens BO-179 with the credential selected. *(source: screens/P08-venue-back-office.yaml#BO-179)*
 
 **Data it reads**: `listVirtualCredentialMedia` (onLoad, Virtual Credential & Media Association)
 
@@ -666,6 +868,46 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the virtual credential media are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Edge cases to draw
+
+- **Code that matches no credential**: "Unknown credential" with the reader-side meaning (Deny or Refer to operator per partner policy) and no partial match list of other guests. *(source: screens/P08-venue-back-office.yaml#BO-181)*
+- **Viewer without guest data rights**: Guest name masked; media states still visible (VO-R08). *(source: ADR-0002 / DI-387)*
+
+#### Consistency with other screens
+
+- Match `BO-338`: Which media may be linked to which product is set in Multi-Media Binding & Association Rules; this screen shows the result per ticket.
+- Match `BO-355`: The 360 workspace shows the same credential card; one component.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+credential:
+  id: VC-9837241
+  ticket: VT0010
+  product: Aqua Park Annual Pass
+  guest: Sara Al Nuaimi
+  entitlements: Park entry 1 per day, Fast Pass 3 left
+media:
+- medium: Dynamic QR
+  code: QR-7F3K-92LD
+  state: Active
+  usable: true
+- medium: RFID wristband
+  code: RFID-882910
+  state: Active
+  usable: true
+- medium: Apple Wallet
+  code: WAL-827...
+  state: Provisioned
+  usable: false
+- medium: Face Pass
+  state: Enrolled
+  usable: true
+priority: Primary Dynamic QR; alternatives RFID, NFC, Face Pass
+```
 
 #### Permissions
 
@@ -703,6 +945,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-174`.
 - [ ] Every gated control is gated: `SCOPE_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 2 edge case(s) from the process notes are drawn.
+- [ ] The 2 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -725,6 +969,14 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** For each product, which verification methods a guest may choose (dynamic QR, physical card, RFID, Face Pass, Face Tag), that the choice locks on the first successful entry, and who may change it afterwards (nobody, or operations with supervisor approval) for which reasons (lost phone, damaged wristband, accessibility, device failure, guest service, other). The one thing to get right: the journey "Ticket issued > guest selects Dynamic QR > first successful access > verification method locked" and the audited operator change after it.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **The read returns reason as one value per row while the write holds reasonCodes as a list** Why: The policy's reason vocabulary cannot be reopened (VO-R04). *(source: contracts/spine/access.yaml#listVerificationMethodSelection / contracts/spine/access.yaml#setVerificationMethodPolicy; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **The write requires id and scopePath though it is keyed on productId** Why: Server-owned (VO-R03). *(source: contracts/spine/access.yaml#setVerificationMethodPolicy; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **No operation changes a ticket's method after lock** Why: The contract lists it as "no operation yet"; the supervisor-approved change cannot happen. *(source: contracts/spine/access.yaml#listVerificationMethodSelection; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+
 #### Inputs: what the user enters or picks
 
 **Form: Save verification method policy** (modal, opened by *Save verification method policy*; *Save verification method policy* calls `setVerificationMethodPolicy`, *Cancel* sends nothing)
@@ -743,6 +995,15 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 Errors to draw in the form: 400 Validation failed; 403 Authenticated but not permitted at the requested scope; 422 A method named is not enabled at this venue.
 
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **productId**: Picked product; one policy per product (the upsert key). *(source: contracts/spine/access.yaml#setVerificationMethodPolicy)*
+- **availableMethods**: Required chips of the five methods; Face Pass only offered for products that allow it (memberships, passes) per BO-185. *(source: screens/P08-venue-back-office.yaml#BO-177 / contracts/spine/access.yaml#setVerificationMethodPolicy)*
+- **lockOnFirstSuccessfulAccess**: Default on, with "Guests can change their method until their first successful entry". *(source: screens/P08-venue-back-office.yaml#BO-177 / contracts/spine/access.yaml#setVerificationMethodPolicy)*
+- **changeAfterLock**: Not allowed / Supervisor approval (default); guests may never change after lock, so there is no guest option. *(source: contracts/spine/access.yaml#setVerificationMethodPolicy)*
+- **reasonCodes**: Multi-select of the six reasons offered to the operator; at least one when changes after lock are allowed. *(source: screens/P08-venue-back-office.yaml#BO-178 / contracts/spine/access.yaml#setVerificationMethodPolicy)*
+- **id, scopePath, timestamps**: Not inputs (VO-R03); the product is the key. *(source: contracts/spine/access.yaml#setJourneySequenceRule)*
+
 #### Outputs: what the screen shows and produces
 
 **Shown**
@@ -754,6 +1015,16 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
 | Save verification method policy (primary button) | `setVerificationMethodPolicy` PUT `/verification-method-policies` | AccessVerificationMethodPolicy | AccessVerificationMethodPolicy | 400 Validation failed; 403 Authenticated but not permitted at the requested scope; 422 A method named is not enabled at this venue. | gated `ACCESS_POINT_CONFIGURE`; opens modal first |
+
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Lock journey**: Ticket issued > Guest selects > First successful access > Method locked, with Operator change branching off after the lock. *(source: screens/P08-venue-back-office.yaml#BO-177 / screens/P08-venue-back-office.yaml#BO-178)*
+- **Policies list**: Product, methods as icons, lock on/off, change rule. *(source: contracts/spine/access.yaml#listVerificationMethodSelection)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Save policy**: Upsert keyed by product (whole record, VO-R04). *(source: contracts/spine/access.yaml#setVerificationMethodPolicy)*
+- **Change a ticket's method after lock**: An operator flow (supervisor approval, reason, audited); drawn as an action on a ticket, not yet backed by an operation. *(source: contracts/spine/access.yaml#listVerificationMethodSelection / DI-649)*
 
 **Data it reads**: `listVerificationMethodSelection` (onLoad, Verification Method Selection & Locking)
 
@@ -772,6 +1043,32 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 422 A method named is not enabled at this venue. |
+
+#### Edge cases to draw
+
+- **Guest's locked method fails at the gate (face not matched, phone dead)**: The fallback media of the ticket still admit per DI-641; the lock limits the guest's own changes, not the gate's fallback. *(source: DI-641)*
+
+#### Consistency with other screens
+
+- Match `GST-055`: The guest's method choice and the "locked" state use these method names.
+- Match `BO-176`: The ticket hub shows the chosen and fallback methods.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+policies:
+- product: Summit Peaks Annual Pass
+  methods: Dynamic QR, RFID, Face Pass
+  lock: true
+  afterLock: Supervisor approval
+  reasons: Lost phone, Damaged wristband, Accessibility, Device failure
+- product: Aqua Park Day Pass
+  methods: Dynamic QR, Face Tag
+  lock: true
+  afterLock: Not allowed
+```
 
 #### Permissions
 
@@ -810,6 +1107,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-174`.
 - [ ] Every gated control is gated: `ACCESS_POINT_CONFIGURE`, `SCOPE_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 1 edge case(s) from the process notes are drawn.
+- [ ] The 3 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -830,6 +1129,14 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | nothing: it opens on its own |
 | Route | `/access-venue/media-issuance-encoding-profile-bo-178` |
 
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** Encoding profiles: how a ticket's identity is written onto each medium (the pack's "RFID Wristband - Adventure Park"): credential identifier, randomised media identifier, ticket ID reference, secure token, encoding format, offline payload, checksum or signature, for outputs E-ticket, M-ticket, paper wristband, RFID wristband, physical card, wallet. Uniqueness controls (collision check, randomisation, duplicate prevention) are shown as ENABLED. The one thing to get right: no key material on the page - the signing profile is chosen from the platform's managed list.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **Table columns are only the three uniqueness booleans plus a column literally labelled "Duplicate Prevention - ENABLED"** Why: Sample text used as a label; the read has name, media type, formats and payload profile to list. *(source: screens/P08-venue-back-office.yaml#BO-178 / contracts/spine/access.yaml#/components/schemas/MediaIssuanceEncodingProfileView; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **offlinePayloadProfile and checksumSignatureWhereApplicable are free strings** Why: They name a payload design and a managed signing profile; references, not text. *(source: screens/P08-venue-back-office.yaml#BO-179 / contracts/spine/access.yaml#/components/schemas/MediaIssuanceEncodingProfileInput; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **The pack's output profiles (E-ticket, M-ticket, paper wristband ...) have no field** Why: The profile cannot say which output it produces. *(source: screens/P08-venue-back-office.yaml#BO-178 / screens/P08-venue-back-office.yaml#BO-179; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+
 #### Inputs: what the user enters or picks
 
 **Sent by *Save issuance and encoding profile*** (`setMediaIssuanceEncoding`; no form is declared, so these are filled from the screen or collected inline)
@@ -845,6 +1152,15 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Randomization enabled `randomizationEnabled` | toggle | optional | on | — | — | Media identifiers are random rather than sequential | `setMediaIssuanceEncoding` body |
 | Identifier collision check enabled `identifierCollisionCheckEnabled` | toggle | optional | on | — | — | — | `setMediaIssuanceEncoding` body |
 | Duplicate prevention enabled `duplicatePreventionEnabled` | toggle | optional | on | — | — | — | `setMediaIssuanceEncoding` body |
+
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **name / mediaTypeId**: Name required; media type picked from the library (BO-175), active types only. *(source: contracts/spine/access.yaml#setMediaIssuanceEncoding)*
+- **encodingFormat**: Required, max 100, prefilled from the media type. *(source: contracts/spine/access.yaml#setMediaIssuanceEncoding)*
+- **offlinePayloadProfile**: Picker of payload designs from BO-172, not free text. *(source: contracts/spine/access.yaml#setMediaIssuanceEncoding / screens/P08-venue-back-office.yaml#BO-172)*
+- **checksumSignatureWhereApplicable**: Select of the platform's signing profiles by name ("TICVAI managed - ECDSA P-256"); never a key field. *(source: screens/P08-venue-back-office.yaml#BO-179 / contracts/spine/access.yaml#setMediaIssuanceEncoding)*
+- **randomizationEnabled / identifierCollisionCheckEnabled / duplicatePreventionEnabled**: Three switches, default on; turning one off needs a confirmation explaining the fraud risk (sequential identifiers can be guessed). *(source: screens/P08-venue-back-office.yaml#BO-179 / contracts/spine/access.yaml#setMediaIssuanceEncoding)*
+- **Identifier format**: The virtual ticket ID format (prefix, suffix, length) is set in the ticket media process; show it read-only with a link. *(source: TRACKER Actions row 209 / screens/P08-venue-back-office.yaml#BO-335)*
 
 #### Outputs: what the screen shows and produces
 
@@ -872,6 +1188,15 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|---|---|---|---|
 | Save issuance and encoding profile (primary button) | `setMediaIssuanceEncoding` PUT `/media-issuance-encoding` | MediaIssuanceEncodingProfileInput | MediaIssuanceEncodingProfileView | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 422 The media type is retired or does not exist | — |
 
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Profile list**: Name, Media type, Output (E-ticket, M-ticket, Paper wristband, RFID wristband, Physical card, Wallet), Uniqueness badges, Media issued on it. *(source: screens/P08-venue-back-office.yaml#BO-179 / contracts/spine/access.yaml#listMediaIssuanceEncoding)*
+- **Uniqueness panel**: The pack's three lines "Identifier Collision Check - ENABLED", "Randomization - ENABLED", "Duplicate Prevention - ENABLED", green when on, red when off. *(source: screens/P08-venue-back-office.yaml#BO-179)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Save encoding profile**: Upsert keyed by encodingProfileId (absent creates); applies to media issued after the save; media already encoded keep their profile - the confirmation says so. *(source: contracts/spine/access.yaml#setMediaIssuanceEncoding)*
+
 **Data it reads**: `listMediaIssuanceEncoding` (onLoad, Media Issuance & Encoding Profile)
 
 **Where the user goes next**
@@ -889,6 +1214,35 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 422 The media type is retired or does not exist |
+
+#### Edge cases to draw
+
+- **Media type retired after the profile was created**: Profile shown with "Media type retired - no new issuance" and cannot be saved active. *(source: contracts/spine/access.yaml#setMediaTypeTechnology)*
+
+#### Consistency with other screens
+
+- Match `EMP-036`: Issue media on the staff app encodes with these profiles.
+- Match `BO-335`: Ticket identifier format and this media identifier are different things; label them "Ticket number" and "Media code".
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+profiles:
+- name: RFID Wristband - Aqua Park
+  mediaType: RFID Wristband ISO 15693
+  output: RFID wristband
+  signing: TICVAI managed - ECDSA P-256
+  randomised: true
+  collision: true
+  duplicates: true
+  issued: 4180
+- name: Mobile dynamic QR
+  mediaType: Mobile Dynamic QR
+  output: M-ticket
+  payload: Day ticket offline payload
+```
 
 #### Permissions
 
@@ -927,6 +1281,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-174`.
 - [ ] Every gated control is gated: `ACCESS_POINT_CONFIGURE`, `SCOPE_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 1 edge case(s) from the process notes are drawn.
+- [ ] The 3 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -949,15 +1305,39 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** Moves a ticket from one medium to another without changing the ticket - the pack's lost RFID wristband: search VC-9837241, current media RFID-882910, Swap media from RFID wristband to Dynamic QR, preserving ticket, guest, remaining entitlements, entry history, re-entry status, Fast Pass balance, reservations and membership; old RFID REVOKED, new QR ACTIVE. Agreed as a zero-value transaction (scan an online QR at a kiosk, get a wristband). The one thing to get right: the preserve checklist is shown ticked before confirming, so the operator sees that nothing is lost, and the swap history below proves it afterwards.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **Read-only screen (swap history) with an empty table and no swap operation** Why: The pack's purpose is to perform the swap; the only replacement write (replaceCredential) is bound to BO-359 under ORDER_EXCHANGE. Bind it here or make this screen the history view of BO-359. *(source: contracts/spine/access.yaml#listMediaSwapReplacement / contracts/spine/access.yaml#replaceCredential; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **Media swap, media replacement rules and credential replacement live on three screens (BO-179, BO-342, BO-359)** Why: One transaction, one place to do it (VO-R14); the rules screen configures, one screen performs. *(source: contracts/spine/access.yaml#setMediaReplacementRevocation; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+
 #### Inputs: what the user enters or picks
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Credential search**: Ticket number, virtual credential id or current media code; shows the credential card of BO-176. *(source: screens/P08-venue-back-office.yaml#BO-179)*
+- **From / To medium**: From = a currently linked medium (pre-selected when only one is active); To = a medium allowed for the product by its binding rules (BO-338), with the new media code scanned or generated. *(source: screens/P08-venue-back-office.yaml#BO-179 / contracts/spine/access.yaml#setMediaBindingRule)*
+- **reason**: Required, one of Lost, Damaged, Device change, Upgrade, Guest request, Operational replacement, Fraud/security, Accessibility. *(source: screens/P08-venue-back-office.yaml#BO-180 / contracts/spine/access.yaml#/components/schemas/MediaSwapReplacementView)*
+- **Supervisor approval**: For high-risk swaps (Fraud/security, more than N swaps on one ticket - per the replacement rules of BO-342) a supervisor approves in place (PIN or second sign-in). *(source: screens/P08-venue-back-office.yaml#BO-180 / contracts/spine/access.yaml#setMediaReplacementRevocation)*
 
 #### Outputs: what the screen shows and produces
 
 **Shown**
 
 **Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Preserve checklist**: The pack's eight items, each ticked with its current value ("Fast Pass balance 2", "Re-entry status - inside park"). *(source: screens/P08-venue-back-office.yaml#BO-180)*
+- **Result**: Two status lines "Old RFID-882910 - REVOKED" (red) and "New QR-7F3K-92LD - ACTIVE" (green); price line "AED 0.00 - zero-value swap". *(source: screens/P08-venue-back-office.yaml#BO-180 / DI-637)*
+- **Swap history**: Time, Ticket, From (type and code), To, Reason, Operator; ticket number column never changes across rows; cursor paging (VO-R12). *(source: contracts/spine/access.yaml#/components/schemas/MediaSwapReplacementView)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Swap media**: Confirmation lists what is preserved and that the old medium stops working at once online and at the next package offline. *(source: screens/P08-venue-back-office.yaml#BO-180)*
 
 **Data it reads**: `listMediaSwapReplacement` (onLoad, Media Swap & Replacement)
 
@@ -975,6 +1355,46 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the media swap replacement are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Edge cases to draw
+
+- **Gate offline when the old wristband is revoked**: Note that offline gates refuse it once their revocation cache refreshes (BO-171 maximum cache age). *(source: contracts/spine/access.yaml#setGateOfflinePolicy)*
+- **Guest inside the park at the moment of swap**: Re-entry status carried over; the new medium can exit and re-enter without a fresh entry. *(source: screens/P08-venue-back-office.yaml#BO-180)*
+
+#### Consistency with other screens
+
+- Match `BO-342`: Replacement rules (approval, number of replacements, grace period) are configured there; this screen applies them.
+- Match `EMP-036`: The staff app's Issue media / swap at a kiosk or counter does the same transaction with the same reasons.
+- Match `KSK-011`: The kiosk swap of an online QR for a wristband (DI-637).
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+swap:
+  credential: VC-9837241
+  ticket: VT0010
+  guest: Khalid Al Zaabi
+  from: RFID wristband RFID-882910
+  to: Dynamic QR QR-7F3K-92LD
+  reason: Lost
+  operator: Maria Santos
+  price: AED 0.00
+history:
+- time: 1 Oct 2026 12:31
+  ticket: VT0010
+  from: RFID-882910
+  to: QR-7F3K-92LD
+  reason: Lost
+  operator: Maria Santos
+- time: 30 Sep 2026 16:05
+  ticket: VT0144
+  from: QR-2KD9-11PA
+  to: RFID-901244
+  reason: Guest request
+  operator: Omar Haddad
+```
 
 #### Permissions
 
@@ -1014,6 +1434,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-174`.
 - [ ] Every gated control is gated: `SCOPE_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 2 edge case(s) from the process notes are drawn.
+- [ ] The 2 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -1034,6 +1456,26 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | nothing: it opens on its own |
 | Route | `/access-venue/rfid-nfc-configuration-bo-180` |
 
+**Known gaps.** Removed 2 October 2026 (CHG-WIR-001): setRfidNfcCard is the physical card and wristband designer of the ticket media pack (BO-349); artwork, printing and deposit do not belong on reader-side RFID … Contract gap recorded 2 October 2026 (CHG-WIR-004): No read of RFID and NFC reader profiles (setRfidNfc has no list or get).
+
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** Dedicated configuration for proximity credentials: RFID profiles (standard incl. ISO 15693, tag/card type, frequency/interface, reader compatibility, read/write behaviour, encoding and security profile), read range (near for an attraction, medium for a Fast Pass lane, far for seamless detection) associated with a venue, zone, gate, credential or journey, NFC uses (ticket, membership, mobile device, wallet) and what far-range readers do when several credentials are detected at once. The one thing to get right: range is chosen per place with the pack's examples beside each option.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **Standard, tag type, frequency, read/write, encoding and security profiles are free strings; NFC uses drawn as four separate selectFields** Why: Closed lists and references; NFC uses are values of one field. *(source: contracts/spine/access.yaml#/components/schemas/RfidNfcConfigurationInput / screens/P08-venue-back-office.yaml#BO-180; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- Write-only; rfidNfcProfileId required; no field for far-range collision handling or for several range associations (CHG-WIR-004)
+
+**Fixed on main** (the package already carries these; draw what it says): setRfidNfcCard (the physical card and wristband designer of the ticket media pack) is bound on this screen (CHG-WIR-001).
+
+#### Decided on this screen
+
+Answered questions: draw the decision, not the old default. Where a decision and the tables below differ, the decision wins.
+
+- **Which RFID standards and tag types will the client's wristbands and readers use?** → Drawn default accepted: List ISO 14443A and ISO 15693 with their common tag types. *(decided by Chinmay, 2026-10-02; DEC-235 / CHG-NOTE-008)* **Reviewable:** a default the lead may still overrule before the block is tasked.
+
 #### Inputs: what the user enters or picks
 
 **On the screen**
@@ -1052,6 +1494,16 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | wallet credential | select field | — | — | — | — | — | — |
 | supported readers | select field | — | — | — | — | — | — |
 
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **rfidStandard / tagCardType / frequencyInterfaceProfile**: Selects from closed lists (e.g. ISO 14443A, ISO 15693; MIFARE DESFire EV3, ICODE SLIX2; HF 13.56 MHz, UHF 860-960 MHz) rather than text; the lists start with ISO 14443A and ISO 15693 and their common tag types. *(source: screens/P08-venue-back-office.yaml#BO-180 / contracts/spine/access.yaml#setRfidNfc / decided 2 October 2026 by Chinmay (CHG-NOTE-008))*
+- **readerCompatibility / supportedReaders**: Multi-select of hardware models from the library (BO-195) that support the chosen standard. *(source: contracts/spine/access.yaml#setRfidNfc / screens/P08-venue-back-office.yaml#BO-195)*
+- **readWriteBehavior / encodingProfile / securityProfile**: Read-only / Read-write select; encoding profile from BO-178; security profile from the platform's managed list (no keys). *(source: contracts/spine/access.yaml#setRfidNfc / screens/P08-venue-back-office.yaml#BO-178)*
+- **readRange and its place (venueId, zoneId, gateId, credentialType, journey)**: A small table "Range policy": rows of Place (venue, zone, gate, credential or journey) and Range (Near / Medium / Far) with the pack's example under each option. Venue comes from the session. *(source: screens/P08-venue-back-office.yaml#BO-181 / contracts/spine/access.yaml#setRfidNfc)*
+- **nfcUses / offlineCapability**: Checkboxes NFC ticket, Membership, Mobile device, Wallet credential; Offline capable switch. *(source: screens/P08-venue-back-office.yaml#BO-181 / contracts/spine/access.yaml#setRfidNfc)*
+- **Collision handling (far range)**: Shown for Far only - the pack's chain Identify > Resolve > Validate > Prevent duplicate count with a choice of what happens to unresolved reads; greyed until the contract holds it. *(source: screens/P08-venue-back-office.yaml#BO-181)*
+- **rfidNfcProfileId**: Not an input on create (VO-R03). *(source: contracts/spine/access.yaml#setJourneySequenceRule)*
+
 #### Outputs: what the screen shows and produces
 
 **Actions and what each produces**
@@ -1059,6 +1511,14 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
 | Save changes (primary button) | navigation or local | — | — | — | — |
+
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Profile list**: Name, Standard, Tag type, Frequency, Range (by place), NFC uses, Offline. *(source: designer default)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Save RFID/NFC profile**: Whole-profile upsert (VO-R04); readers pick it up with their next configuration push. *(source: contracts/spine/access.yaml#setRfidNfc)*
 
 **Where the user goes next**
 
@@ -1070,14 +1530,42 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | Loading (`?state=loading`) | The rfid nfc configuration as saved. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the rfid nfc untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No rfid nfc configured yet. Carries the create action and says what the platform does in the meantime. |
+| Empty, first run (`?state=emptyFirstRun`) | No rfid nfc configured yet. Offers no create action — this screen declares no operation that makes one and says what the platform does in the meantime. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Edge cases to draw
+
+- **Far range chosen at a gate whose reader is near-range only**: Warn with the reader model; BO-183 lists it as a compatibility warning. *(source: screens/P08-venue-back-office.yaml#BO-183)*
+
+#### Consistency with other screens
+
+- Match `BO-199`: The RFID range set on a gate's reader there must agree with this policy for the gate.
+- Match `BO-178`: Encoding profiles referenced here.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+profiles:
+- name: Aqua Park wristbands
+  standard: ISO 15693
+  tag: ICODE SLIX2
+  frequency: HF 13.56 MHz
+  rw: Read-only
+  range: Near at Falcon Coaster entry; Medium at Fast Pass lanes
+  offline: true
+- name: Annual pass NFC
+  standard: ISO 14443A
+  tag: MIFARE DESFire EV3
+  nfcUses: Membership, Wallet credential
+  range: Near
+```
 
 #### Permissions
 
 - `setRfidNfc` → `ACCESS_POINT_CONFIGURE` (configure) · staff
-- `setRfidNfcCard` → `ACCESS_POINT_CONFIGURE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -1111,6 +1599,9 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-174`.
 - [ ] Every gated control is gated: `ACCESS_POINT_CONFIGURE`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 1 edge case(s) from the process notes are drawn.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
+- [ ] The 1 decision(s) taken on this screen are drawn as decided, not as the old default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -1131,6 +1622,14 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | nothing: it opens on its own |
 | Route | `/access-venue/external-partner-credential-mapping-bo-181` |
 
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** Teaches access control to read credentials it did not issue (reseller and partner QR codes, external barcodes): per partner, the credential format, a field mapping from the partner's fields to TICVAI's (ProductCode to Ticket product, VisitDate to Validity date, GuestType to Guest category, Entitlement to Access entitlement), the validation mode (local mapping, API, token, cached, offline mapping, hybrid), what happens to an unrecognised code (Deny or Refer to operator), and a test bench (upload a sample > decode > map > simulate > validate). The one thing to get right: the mapping is a two-column table with the sample's decoded values shown next to each row.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **Read-only screen with no write for partner mappings, and no operation for the decode/simulate test** Why: The pack configures and tests mappings; nothing can be saved or tried. *(source: screens/P08-venue-back-office.yaml#BO-181 / contracts/spine/access.yaml#listExternalPartnerCredential; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **The five validation modes are drawn as five selectFields (Local Mapping, API Validation ...) and Hybrid is missing** Why: They are values of one validationMode field, which has six. *(source: screens/P08-venue-back-office.yaml#BO-181 / contracts/spine/access.yaml#/components/schemas/ExternalPartnerCredentialMappingView; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **fieldMappings is an array of strings** Why: A mapping is pairs (external field, TICVAI field) plus value mappings. *(source: contracts/spine/access.yaml#/components/schemas/ExternalPartnerCredentialMappingView; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+
 #### Inputs: what the user enters or picks
 
 **On the screen**
@@ -1143,7 +1642,23 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Cached Validation | select field | — | — | — | — | — | — |
 | Offline Mapping | select field | — | — | — | — | — | — |
 
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **partnerName / credentialFormat**: Partner picked from the reseller and partner list where one exists (e.g. "Hotel Package Provider"); format as a select (QR, Code 128, PDF417, other). *(source: screens/P08-venue-back-office.yaml#BO-181 / contracts/spine/access.yaml#/components/schemas/ExternalPartnerCredentialMappingView)*
+- **fieldMappings**: Rows of External field (from the decoded sample) and TICVAI field (closed list - Ticket product, Validity date, Guest category, Access entitlement, Quantity, Seat), with a value-mapping sub-table for codes (e.g. ADT to Adult). *(source: screens/P08-venue-back-office.yaml#BO-181)*
+- **validationMode**: One radio list of the six modes; API and Token modes need a connection (secret reference, as in BO-182); Offline mapping and Cached are the only ones that work with the gate offline - say so. *(source: screens/P08-venue-back-office.yaml#BO-181 / contracts/spine/access.yaml#/components/schemas/ExternalPartnerCredentialMappingView)*
+- **unrecognisedOutcome**: Deny / Refer to operator. *(source: screens/P08-venue-back-office.yaml#BO-181 / contracts/spine/access.yaml#/components/schemas/ExternalPartnerCredentialMappingView)*
+
 #### Outputs: what the screen shows and produces
+
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Mapping list**: Partner, Format, Validation mode, Unknown outcome, Status (Draft, Active, Inactive). *(source: contracts/spine/access.yaml#listExternalPartnerCredential)*
+- **Test bench**: Upload sample > Decode (raw fields) > Map (TICVAI fields) > Simulate (virtual scan at a chosen gate) > Validate, each step ticked as in BO-163. *(source: screens/P08-venue-back-office.yaml#BO-181 / screens/P08-venue-back-office.yaml#BO-182)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Save mapping / Activate**: No write exists (see corrections); draw Save and Activate disabled until bound, Activate only after a passing test. *(source: contracts/spine/access.yaml#listExternalPartnerCredential)*
 
 **Data it reads**: `listExternalPartnerCredential` (onLoad, External & Partner Credential Mapping)
 
@@ -1160,6 +1675,42 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Empty, first run (`?state=emptyFirstRun`) | No external partner credential configured yet. Carries the create action and says what the platform does in the meantime. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Edge cases to draw
+
+- **Partner ticket under a dynamic-QR event**: External codes are static; show which events accept them (the B2B exception of DI-633). *(source: DI-633 / TRACKER Client Inputs row 50)*
+- **Same external code scanned twice**: Treated like any ticket after mapping (Already used, VO-R06). *(source: contracts/spine/access.yaml#/components/schemas/DenyReason)*
+
+#### Consistency with other screens
+
+- Match `BO-148`: Access points list which external credential sources they accept (externalCredentialSources).
+- Match `SCN-003`: Unknown credential outcome matches the scanner's deny or refer state.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+mapping:
+  partner: Hotel Package Provider
+  format: QR
+  mode: Cached validation
+  unknown: Refer to operator
+  status: Draft
+fields:
+- external: ProductCode
+  ticvai: Ticket product
+  sample: HPP-3D-FAM to Aqua Park 3-Day Family
+- external: VisitDate
+  ticvai: Validity date
+  sample: 20261012 to 12 Oct 2026
+- external: GuestType
+  ticvai: Guest category
+  sample: ADT to Adult
+- external: Entitlement
+  ticvai: Access entitlement
+  sample: PARK+FP2
+```
 
 #### Permissions
 
@@ -1197,6 +1748,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-174`.
 - [ ] Every gated control is gated: `SCOPE_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 2 edge case(s) from the process notes are drawn.
+- [ ] The 3 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -1219,6 +1772,13 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** Connects external credential ecosystems: hotel room cards and the hotel PMS (room lookup, package mapping, charge to room), digital wallets, and future external media. The pack's example: guest presents a hotel room card; TICVAI resolves Room 1408, package "2 Adults + 2 Children / 3-Day Park Access", and the access decision proceeds normally; where supported, attraction or service charges go to the guest's room through the PMS. The one thing to get right: credentials of the external system are never shown or typed - only a reference to the stored secret - and an integration cannot go Active without one.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **Content is an empty unbound table and Save has no permission declared** Why: Bind listHotelWalletExternal; gate Save on ACCESS_POINT_CONFIGURE. *(source: contracts/spine/access.yaml#listHotelWalletExternal / contracts/spine/access.yaml#setHotelWalletExternal; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **The pack's hotel card fields (hotel, card provider, card format, eligible parks, package mapping) have no field** Why: The example's package resolution (Room 1408 to 2 adults + 2 children, 3-day access) cannot be configured. *(source: screens/P08-venue-back-office.yaml#BO-182 / contracts/spine/access.yaml#/components/schemas/HotelWalletExternalMediaIntegrationInput; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+
 #### Inputs: what the user enters or picks
 
 **Sent by *Save integration*** (`setHotelWalletExternal`; no form is declared, so these are filled from the screen or collected inline)
@@ -1234,6 +1794,15 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Maps to virtual credential `mapsToVirtualCredential` | toggle | optional | on | — | — | The external card maps to a TICVAI Virtual Ticket rather than being validated by the external system | `setHotelWalletExternal` body |
 | Status `status` | segmented control | optional | Draft | Draft · Active · Inactive | — | — | `setHotelWalletExternal` body |
 
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **integrationType**: Cards Hotel room card, Hotel PMS, Digital wallet, Other external. *(source: contracts/spine/access.yaml#setHotelWalletExternal)*
+- **name / externalSystem**: Name (e.g. "Yas Hotel - Opera PMS") and external system (e.g. "Oracle Opera Cloud"), both required. *(source: contracts/spine/access.yaml#setHotelWalletExternal / DI-638)*
+- **connectionSecretRef**: "Connection credentials" as a picker of stored secrets with status (Set / Missing) and "Request from client" - never a password field. *(source: contracts/spine/access.yaml#/components/schemas/HotelWalletExternalMediaIntegrationInput)*
+- **roomChargeEnabled**: Switch "Allow charges to the room", only for Hotel PMS; default off. *(source: screens/P08-venue-back-office.yaml#BO-182 / contracts/spine/access.yaml#setHotelWalletExternal)*
+- **mapsToVirtualCredential**: Default on, worded "The card maps to a TICVAI ticket" vs off "The external system validates the card". *(source: contracts/spine/access.yaml#setHotelWalletExternal)*
+- **Hotel, room card provider, card format, eligible parks, package mapping**: The pack's hotel credential fields; draw them in a "Hotel card" section, greyed until the contract holds them. *(source: screens/P08-venue-back-office.yaml#BO-182)*
+
 #### Outputs: what the screen shows and produces
 
 **Shown**
@@ -1245,6 +1814,15 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
 | Save integration (primary button) | `setHotelWalletExternal` PUT `/hotel-wallet-external` | HotelWalletExternalMediaIntegrationInput | HotelWalletExternalMediaIntegrationView | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 422 Activating an integration that has no connectionSecretRef | — |
+
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Integration list**: Name, Type, External system, Room charge, Status (Draft, Active, Inactive) with "Credentials missing" warning. *(source: contracts/spine/access.yaml#listHotelWalletExternal)*
+- **Flow strips**: Room card > Room 1408 resolved > Package 2A+2C / 3-day > Access decision; Billing - Attraction or service > Guest room > PMS > Room charge. *(source: screens/P08-venue-back-office.yaml#BO-182)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Save integration**: Upsert keyed by integrationId (absent creates); moving to Active without a secret reference is refused with "Add connection credentials first". *(source: contracts/spine/access.yaml#setHotelWalletExternal)*
 
 **Data it reads**: `listHotelWalletExternal` (onLoad, Hotel, Wallet & External Media Integration)
 
@@ -1263,6 +1841,43 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 422 Activating an integration that has no connectionSecretRef |
+
+#### Edge cases to draw
+
+- **PMS unreachable at the gate**: Hotel guests are referred to an operator for a zero-value ticket after room lookup and ID check (DI-638), not denied. *(source: DI-638)*
+- **Viewer without configuration rights**: Save disabled with "Needs access configuration rights" (VO-R08). *(source: contracts/spine/access.yaml#setHotelWalletExternal)*
+
+#### Consistency with other screens
+
+- Match `POS-005`: Charge to room as a payment uses the same PMS integration and wording.
+- Match `BO-181`: Partner barcodes are mapped there; hotel cards here.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+integrations:
+- name: Yas Hotel - Opera PMS
+  type: Hotel PMS
+  system: Oracle Opera Cloud
+  roomCharge: true
+  credentials: Set
+  status: Active
+- name: Yas Hotel room cards
+  type: Hotel room card
+  system: Assa Abloy Vostio
+  mapsToTicket: true
+  status: Draft
+- name: Apple Wallet passes
+  type: Digital wallet
+  system: Apple Wallet
+  status: Active
+example:
+  room: '1408'
+  package: 2 Adults + 2 Children / 3-Day Park Access
+  charge: AED 145.00 to room 1408
+```
 
 #### Permissions
 
@@ -1308,6 +1923,8 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 - [ ] Every transition is wired: `BO-174`.
 - [ ] Every gated control is gated: `ACCESS_POINT_CONFIGURE`, `SCOPE_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 2 edge case(s) from the process notes are drawn.
+- [ ] The 2 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -1328,11 +1945,26 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 | Opens with | nothing: it opens on its own |
 | Route | `/access-venue/media-compatibility-testing-publication-bo-183` |
 
-**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built. Contract gap recorded 2 October 2026 (CHG-WIR-004): No operation runs a media compatibility test and returns its results, and no read of the compatibility matrix.
+
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** Proves each medium works on the intended hardware before deployment: a compatibility matrix of media (Dynamic QR, RFID, NFC, Face Pass, Partner QR) against device types (Turnstile A, Handheld, VIP gate, Attraction), a test console (media, reader, test credential - Media detected, Identifier decoded, Virtual credential resolved, Entitlement loaded, Access engine reached, Gate response received), hardware limitation warnings ("Reader TRN-14 does not support NFC validation in offline mode") and publication by tenant, venue, park, gate or device group. The one thing to get right: a medium cannot be published to an incompatible device without an explicit, reasoned exception.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **The publish request carries compatibilityWarnings (a test output) and stage, and Publish is bound to no operation** Why: Warnings are produced by the test, not sent by the user; a test operation that returns them is needed and Publish should call the publish write. *(source: contracts/spine/access.yaml#publishMediaCompatibilityTesting / screens/P08-venue-back-office.yaml#BO-183; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **No read for the compatibility matrix or for test results** Why: The pack's matrix and test console have no source on this screen. *(source: screens/P08-venue-back-office.yaml#BO-183; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **tenantId is an input** Why: Tenant is the session's (VO-R09). *(source: contracts/spine/access.yaml#publishMediaCompatibilityTesting; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
 
 #### Inputs: what the user enters or picks
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **mediaProfileId**: Picked from the media directory (BO-174 profiles); never typed. *(source: contracts/spine/access.yaml#publishMediaCompatibilityTesting)*
+- **Target (venueId, parkId, gateId, deviceGroupId)**: Radio Tenant / Venue / Park / Gate / Device group with a picker; venue and tenant from the session (VO-R09). *(source: screens/P08-venue-back-office.yaml#BO-183 / contracts/spine/access.yaml#publishMediaCompatibilityTesting)*
+- **Test console (media, reader, credential)**: Media profile, a registered reader (e.g. Main Gate Reader 03), and a test credential issued for testing only. *(source: screens/P08-venue-back-office.yaml#BO-183)*
+- **exceptionReason**: Appears only when a target device has a compatibility warning; required, with the warning quoted above it. *(source: screens/P08-venue-back-office.yaml#BO-183 / contracts/spine/access.yaml#publishMediaCompatibilityTesting)*
 
 #### Outputs: what the screen shows and produces
 
@@ -1342,6 +1974,18 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |---|---|---|---|---|---|
 | Publish (primary button) | navigation or local | — | — | — | — |
 | What publishing changes (publish gate) | navigation or local | — | — | — | — |
+
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Compatibility matrix**: Rows media, columns device types (or models); cells Supported (tick), Supported online only (tick with cloud), Not supported (dash) - never colour alone. *(source: screens/P08-venue-back-office.yaml#BO-183)*
+- **Test results**: The six steps ticked in order; the first failure stops and names the step. *(source: screens/P08-venue-back-office.yaml#BO-183)*
+- **Warnings and AI**: Hardware limitation warnings, and advisory AI notes such as "Gate 12 receives approximately 2,400 guests/hour. The configured reader profile may create a throughput bottleneck" (VO-R11). *(source: screens/P08-venue-back-office.yaml#BO-183)*
+- **Lifecycle**: Draft > Compatibility test > Validate > Approval > Publish stepper, as on BO-153 and BO-163. *(source: screens/P08-venue-back-office.yaml#BO-183)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Run test**: Executes the test against the chosen reader and shows the steps; does not consume or admit. *(source: screens/P08-venue-back-office.yaml#BO-183 / DI-639)*
+- **Publish**: Publish gate names media, targets and device count; with warnings it requires the exception reason and records it. *(source: contracts/spine/access.yaml#publishMediaCompatibilityTesting)*
 
 #### States
 
@@ -1353,6 +1997,43 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the media compatibility testing are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Edge cases to draw
+
+- **Reader offline during the test**: Test stops at "Media detected" with "Reader offline - last heartbeat 09:12". *(source: designer default)*
+
+#### Consistency with other screens
+
+- Match `BO-203`: Hardware Compatibility, Health, Testing & Deployment uses the same matrix from the device side; one matrix component.
+- Match `BO-153`: Same lifecycle stepper and publish gate.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+matrix:
+- media: Dynamic QR
+  turnstile: Supported
+  handheld: Supported
+  vipGate: Supported
+  attraction: Supported
+- media: NFC
+  turnstile: Online only (TRN-14)
+  handheld: Supported
+  vipGate: Supported
+  attraction: Not supported
+- media: Face Pass
+  turnstile: Not supported
+  handheld: Not supported
+  vipGate: Supported
+  attraction: Supported
+test:
+  media: RFID wristband
+  reader: Main Plaza Gate 3 Reader
+  credential: TEST-RFID-0001
+  result: All 6 steps passed
+```
 
 #### Permissions
 
@@ -1392,6 +2073,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] No transition is declared; back returns where the user came from.
 - [ ] Every gated control is gated: `ACCESS_POINT_CONFIGURE`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 1 edge case(s) from the process notes are drawn.
+- [ ] The 3 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -1497,7 +2180,6 @@ Method, path, parameters, request and response for every operation these screens
 "listMediaCredential": {"method":"GET","path":"/media-credential","contract":"access","summary":"Media & Credential Command Center","permission":"SCOPE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"tenantId","in":"query","required":false},{"name":"venueId","in":"query","required":false},{"name":"media","in":"query","required":false},{"name":"credentialType","in":"query","required":false},{"name":"productId","in":"query","required":false},{"name":"status","in":"query","required":false},{"name":"integration","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listMediaIssuanceEncoding": {"method":"GET","path":"/media-issuance-encoding","contract":"access","summary":"Media Issuance & Encoding Profile","permission":"SCOPE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"MediaIssuanceEncodingProfileView"},
 "listMediaSwapReplacement": {"method":"GET","path":"/media-swap-replacement","contract":"access","summary":"Media Swap & Replacement","permission":"SCOPE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
-"listMediaTypeCredential": {"method":"GET","path":"/media-type-credential","contract":"access","summary":"Media Type & Credential Technology Registry","permission":"SCOPE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"MediaTypeCredentialTechnologyRegistryView"},
 "listMediaTypeTechnology": {"method":"GET","path":"/media-type-technology","contract":"access","summary":"Media Type & Technology Library","permission":"SCOPE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"MediaTypeTechnologyLibraryView"},
 "listVerificationMethodSelection": {"method":"GET","path":"/verification-method-selection","contract":"access","summary":"Verification Method Selection & Locking","permission":"SCOPE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"VerificationMethodSelectionLockingView"},
 "listVirtualCredentialMedia": {"method":"GET","path":"/virtual-credential-media","contract":"access","summary":"Virtual Credential & Media Association","permission":"SCOPE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
@@ -1506,7 +2188,6 @@ Method, path, parameters, request and response for every operation these screens
 "setMediaIssuanceEncoding": {"method":"PUT","path":"/media-issuance-encoding","contract":"access","summary":"Save a media issuance and encoding profile","permission":"ACCESS_POINT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"MediaIssuanceEncodingProfileInput","responds":"MediaIssuanceEncodingProfileView"},
 "setMediaTypeTechnology": {"method":"PUT","path":"/media-type-technology","contract":"access","summary":"Add, amend or retire a media type","permission":"ACCESS_POINT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"MediaTypeTechnologyLibraryInput","responds":"MediaTypeTechnologyLibraryView"},
 "setRfidNfc": {"method":"PUT","path":"/rfid-nfc","contract":"access","summary":"RFID & NFC Configuration","permission":"ACCESS_POINT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"RfidNfcConfigurationInput","responds":"RfidNfcConfigurationView"},
-"setRfidNfcCard": {"method":"PUT","path":"/rfid-nfc-card","contract":"access","summary":"RFID, NFC, Card & Wristband Media Designer","permission":"ACCESS_POINT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"RfidNfcCardWristbandMediaDesignerInput","responds":"RfidNfcCardWristbandMediaDesignerView"},
 "setVerificationMethodPolicy": {"method":"PUT","path":"/verification-method-policies","contract":"access","summary":"Set the verification method policy of a product","permission":"ACCESS_POINT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"AccessVerificationMethodPolicy","responds":"AccessVerificationMethodPolicy"}
 }
 ```
@@ -1528,12 +2209,9 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "MediaIssuanceEncodingProfileInput": {"type":"object","x-ticvai-persistence":"none — request only; the write configures the rules the matching View reads back (decided 29 September, VM close-out)","description":"**What Media Issuance & Encoding Profile submits** (decided 29 September, VM close-out). The writable fields of its View; the figures the screen computes are deliberately absent, because a figure the system computed is not a figure a client may send back. The per-credential identifiers the View shows (credential identifier, randomised media identifier, ticket reference, secure token and reference) are generated at issue and are not writable.","required":["name","mediaTypeId","encodingFormat"],"properties":{"encodingProfileId":{"type":"string","format":"uuid","description":"Absent creates a profile"},"name":{"type":"string","maxLength":200},"mediaTypeId":{"type":"string","description":"The media type this profile encodes (`MediaTypeTechnologyLibraryView.mediaTypeId`)"},"encodingFormat":{"type":"string","maxLength":100},"offlinePayloadProfile":{"type":"string","description":"Which entitlement data is embedded for offline validation"},"checksumSignatureWhereApplicable":{"type":"string","description":"Checksum or signature scheme, where the media carries one"},"randomizationEnabled":{"type":"boolean","default":true,"description":"Media identifiers are random rather than sequential"},"identifierCollisionCheckEnabled":{"type":"boolean","default":true},"duplicatePreventionEnabled":{"type":"boolean","default":true}}},
 "MediaIssuanceEncodingProfileView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over access state, assembled at read time from tables that already exist","description":"**What Media Issuance & Encoding Profile displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"credentialIdentifier":{"type":"string","description":"Credential identifier"},"randomizedMediaIdentifier":{"type":"string","description":"Randomized media identifier"},"ticketIdReference":{"type":"string","description":"Ticket ID reference"},"secureToken":{"type":"string","description":"Secure token"},"secureReference":{"type":"string","description":"Secure reference"},"encodingFormat":{"type":"string","description":"Encoding format"},"offlinePayloadProfile":{"type":"string","description":"Offline payload profile reference"},"checksumSignatureWhereApplicable":{"type":"string","description":"Reference to the signing profile managed by the secure platform layer; no key material"},"identifierCollisionCheckEnabled":{"type":"boolean","description":"Identifier Collision Check — ENABLED"},"randomizationEnabled":{"type":"boolean","description":"Randomization — ENABLED"},"encodingProfileId":{"type":"string","description":"Encoding profile identifier"},"name":{"type":"string","description":"Profile name, e.g. RFID Wristband, Adventure Park"},"mediaTypeId":{"type":"string","description":"Media type this profile encodes"},"duplicatePreventionEnabled":{"type":"boolean","description":"Duplicate prevention"}}},
 "MediaSwapReplacementView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over access state, assembled at read time from tables that already exist","description":"**What Media Swap & Replacement displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"reason":{"type":"string","enum":["lost","damaged","deviceChange","upgrade","guestRequest","operationalReplacement","fraudSecurity","accessibility"],"description":"Vocabulary listed under Swap Reasons."},"swapId":{"type":"string"},"virtualTicketId":{"type":"string","description":"Unchanged by the swap"},"fromMediaType":{"type":"string"},"fromMediaId":{"type":"string"},"toMediaType":{"type":"string"},"toMediaId":{"type":"string"},"swappedAt":{"type":"string","format":"date-time"},"operatorId":{"type":"string"}}},
-"MediaTypeCredentialTechnologyRegistryView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over access state, assembled at read time from tables that already exist","description":"**What Media Type & Credential Technology Registry displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"mediaTypeId":{"type":"string","description":"Media Type ID"},"name":{"type":"string","description":"Name"},"category":{"type":"string","enum":["digital","physical","biometric","future"],"description":"Media category"},"provider":{"type":"array","items":{"type":"string"},"description":"Provider integrations that implement this media type (media type is not the vendor)"},"technology":{"type":"string","description":"Technology"},"tokenFormat":{"type":"string","description":"Token format"},"generationMethod":{"type":"string","description":"Generation method"},"validationMechanism":{"type":"string","description":"Validation mechanism"},"supportsVisualDesign":{"type":"boolean","description":"Supports visual design"},"supportsDynamicUpdate":{"type":"boolean","description":"Supports dynamic update"},"supportsRevocation":{"type":"boolean","description":"Supports revocation"},"supportsExpiration":{"type":"boolean","description":"Supports expiration"},"supportsOfflineReference":{"type":"boolean","description":"Supports offline reference"},"supportsReplacement":{"type":"boolean","description":"Supports replacement"},"supportsEncryption":{"type":"boolean","description":"Supports encryption"},"supportsSigning":{"type":"boolean","description":"Supports signing"},"supportedChannels":{"type":"array","items":{"type":"string"},"description":"Supported channels"},"supportedDevices":{"type":"array","items":{"type":"string"},"description":"Supported devices"},"integrationAdapter":{"type":"string","description":"Integration adapter"}},"required":["mediaTypeId","name","category"]},
 "MediaTypeTechnologyLibraryInput": {"type":"object","x-ticvai-persistence":"none — request only; the write configures the rules the matching View reads back (decided 29 September, VM close-out)","description":"**What Media Type & Technology Library submits** (decided 29 September, VM close-out). The writable fields of its View; the figures the screen computes are deliberately absent, because a figure the system computed is not a figure a client may send back.","required":["name","mediaType","technology","onlineOfflineCapability"],"properties":{"mediaTypeId":{"type":"string","format":"uuid","description":"Absent adds a media type"},"name":{"type":"string","maxLength":200},"mediaType":{"type":"string","enum":["linearBarcode","twoDimensionalBarcode","qr","rfidContact","rfidProximity","rfidIso15693","rfidOtherStandard","appCredential","mobileWallet","paperTicket","wristband","plasticCard","hotelCard","facePass","faceTag","partnerQr","externalBarcode","thirdPartyCredential"]},"technology":{"type":"string","enum":["barcode","rfid","nfc","magneticStripe","mobile","physical","biometric","external"]},"encodingFormat":{"type":"string","maxLength":100},"supportedReaderTypes":{"type":"array","items":{"type":"string"}},"onlineOfflineCapability":{"type":"string","enum":["onlineOnly","offlineOnly","onlineAndOffline"]},"writableReadOnly":{"type":"string","enum":["writable","readOnly"]},"securityClassification":{"type":"string","maxLength":100},"applicableVenues":{"type":"array","items":{"type":"string"},"description":"Empty means every venue of the tenant"},"applicableProducts":{"type":"array","items":{"type":"string"},"description":"Empty means every product"},"active":{"type":"boolean","default":true,"description":"False retires the media type: no new credential is issued on it; credentials already issued stay valid until they expire"}}},
 "MediaTypeTechnologyLibraryView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over access state, assembled at read time from tables that already exist","description":"**What Media Type & Technology Library displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"active":{"type":"boolean","description":"False once retired through `setMediaTypeTechnology`; issued credentials stay valid (decided 29 September, VM close-out)"},"mediaType":{"type":"string","enum":["linearBarcode","twoDimensionalBarcode","qr","rfidContact","rfidProximity","rfidIso15693","rfidOtherStandard","appCredential","mobileWallet","paperTicket","wristband","plasticCard","hotelCard","facePass","faceTag","partnerQr","externalBarcode","thirdPartyCredential"],"description":"The kind of medium this profile defines"},"technology":{"type":"string","enum":["barcode","rfid","nfc","magneticStripe","mobile","physical","biometric","external"],"description":"Technology family"},"encodingFormat":{"type":"string","description":"encoding format"},"supportedReaderTypes":{"type":"array","items":{"type":"string"},"description":"supported reader types"},"onlineOfflineCapability":{"type":"string","enum":["onlineOnly","offlineOnly","onlineAndOffline"],"description":"online/offline capability"},"writableReadOnly":{"type":"string","enum":["writable","readOnly"],"description":"writable/read-only"},"securityClassification":{"type":"string","description":"security classification"},"applicableVenues":{"type":"array","items":{"type":"string"},"description":"Venue ids"},"applicableProducts":{"type":"array","items":{"type":"string"},"description":"Product ids"},"mediaTypeId":{"type":"string","description":"Media type profile identifier"},"name":{"type":"string","description":"Profile name"}}},
 "Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}},
-"RfidNfcCardWristbandMediaDesignerInput": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures","description":"**What RFID, NFC, Card & Wristband Media Designer submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.","properties":{"templateId":{"type":"string","description":"Media template being designed"},"mediaKind":{"type":"string","enum":["rfidCard","rfidWristband","nfcCard","nfcWristband","membershipCard","staffGuestCard","customWearable"],"description":"Physical medium"},"reusability":{"type":"string","enum":["disposable","reusable"],"description":"Disposable or reusable medium"},"printed":{"type":"boolean","description":"Printed"},"encoded":{"type":"boolean","description":"Encoded"},"colorCategory":{"type":"string","description":"Color/category"},"sizeWhereApplicable":{"type":"string","description":"Size where applicable"},"activationAtCollection":{"type":"boolean","description":"Activation at collection"},"depositReferenceWhereApplicable":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Deposit/reference where applicable"},"mediaDimensions":{"type":"string","description":"Media dimensions"},"front":{"type":"string","description":"Front"},"back":{"type":"string","description":"Back"},"printableArea":{"type":"string","description":"Printable area"},"logo":{"type":"string","description":"Logo"},"printedFields":{"type":"array","items":{"type":"string","enum":["customerName","photo","membershipTier","expiry","serialNumber","qrBarcode"]},"description":"Personal and reference fields printed on the medium"},"customArtwork":{"type":"string","description":"Custom artwork"},"sponsorVenueBranding":{"type":"string","description":"Sponsor/venue branding"},"rfidNfcTechnology":{"type":"string","description":"RFID/NFC technology"},"chipProfile":{"type":"string","description":"Chip/profile"},"uidReferenceHandling":{"type":"string","description":"UID/reference handling"},"encodingProfile":{"type":"string","description":"Encoding profile"},"provider":{"type":"string","description":"Provider"},"readerCompatibility":{"type":"array","items":{"type":"string"},"description":"Reader compatibility"},"printerEncoderIntegration":{"type":"string","description":"Printer/encoder integration"}},"required":["templateId","mediaKind"]},
-"RfidNfcCardWristbandMediaDesignerView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over access state, assembled at read time from tables that already exist","description":"**What RFID, NFC, Card & Wristband Media Designer displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"templateId":{"type":"string","description":"Media template being designed"},"mediaKind":{"type":"string","enum":["rfidCard","rfidWristband","nfcCard","nfcWristband","membershipCard","staffGuestCard","customWearable"],"description":"Physical medium"},"reusability":{"type":"string","enum":["disposable","reusable"],"description":"Disposable or reusable medium"},"printed":{"type":"boolean","description":"Printed"},"encoded":{"type":"boolean","description":"Encoded"},"colorCategory":{"type":"string","description":"Color/category"},"sizeWhereApplicable":{"type":"string","description":"Size where applicable"},"activationAtCollection":{"type":"boolean","description":"Activation at collection"},"depositReferenceWhereApplicable":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Deposit/reference where applicable"},"mediaDimensions":{"type":"string","description":"Media dimensions"},"front":{"type":"string","description":"Front"},"back":{"type":"string","description":"Back"},"printableArea":{"type":"string","description":"Printable area"},"logo":{"type":"string","description":"Logo"},"printedFields":{"type":"array","items":{"type":"string","enum":["customerName","photo","membershipTier","expiry","serialNumber","qrBarcode"]},"description":"Personal and reference fields printed on the medium"},"customArtwork":{"type":"string","description":"Custom artwork"},"sponsorVenueBranding":{"type":"string","description":"Sponsor/venue branding"},"rfidNfcTechnology":{"type":"string","description":"RFID/NFC technology"},"chipProfile":{"type":"string","description":"Chip/profile"},"uidReferenceHandling":{"type":"string","description":"UID/reference handling"},"encodingProfile":{"type":"string","description":"Encoding profile"},"provider":{"type":"string","description":"Provider"},"readerCompatibility":{"type":"array","items":{"type":"string"},"description":"Reader compatibility"},"printerEncoderIntegration":{"type":"string","description":"Printer/encoder integration"}},"required":["templateId","mediaKind"]},
 "RfidNfcConfigurationInput": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures","description":"**What RFID & NFC Configuration submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.","properties":{"name":{"type":"string"},"rfidNfcProfileId":{"type":"string","description":"RFID/NFC profile identifier"},"rfidStandard":{"type":"string","description":"RFID standard"},"tagCardType":{"type":"string","description":"tag/card type"},"frequencyInterfaceProfile":{"type":"string","description":"frequency/interface profile"},"readerCompatibility":{"type":"array","items":{"type":"string"},"description":"reader compatibility"},"readWriteBehavior":{"type":"string","description":"read/write behavior"},"encodingProfile":{"type":"string","description":"encoding profile"},"securityProfile":{"type":"string","description":"security profile"},"nfcUses":{"type":"array","items":{"type":"string","enum":["nfcTicket","membership","mobileDevice","walletCredential"]},"description":"NFC credential uses enabled by this profile"},"supportedReaders":{"type":"array","items":{"type":"string"},"description":"supported readers"},"offlineCapability":{"type":"boolean","description":"offline capability"},"venueId":{"type":"string","description":"Venue"},"zoneId":{"type":"string","description":"Zone"},"gateId":{"type":"string","description":"Gate"},"credentialType":{"type":"string","description":"Credential"},"journey":{"type":"string","description":"Journey"},"readRange":{"type":"string","enum":["near","medium","far"],"description":"Read range associated with the venue, zone, gate, credential or journey"}},"required":["rfidNfcProfileId","venueId","name"]},
 "RfidNfcConfigurationView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over access state, assembled at read time from tables that already exist","description":"**What RFID & NFC Configuration displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"name":{"type":"string"},"rfidNfcProfileId":{"type":"string","description":"RFID/NFC profile identifier"},"rfidStandard":{"type":"string","description":"RFID standard"},"tagCardType":{"type":"string","description":"tag/card type"},"frequencyInterfaceProfile":{"type":"string","description":"frequency/interface profile"},"readerCompatibility":{"type":"array","items":{"type":"string"},"description":"reader compatibility"},"readWriteBehavior":{"type":"string","description":"read/write behavior"},"encodingProfile":{"type":"string","description":"encoding profile"},"securityProfile":{"type":"string","description":"security profile"},"nfcUses":{"type":"array","items":{"type":"string","enum":["nfcTicket","membership","mobileDevice","walletCredential"]},"description":"NFC credential uses enabled by this profile"},"supportedReaders":{"type":"array","items":{"type":"string"},"description":"supported readers"},"offlineCapability":{"type":"boolean","description":"offline capability"},"venueId":{"type":"string","description":"Venue"},"zoneId":{"type":"string","description":"Zone"},"gateId":{"type":"string","description":"Gate"},"credentialType":{"type":"string","description":"Credential"},"journey":{"type":"string","description":"Journey"},"readRange":{"type":"string","enum":["near","medium","far"],"description":"Read range associated with the venue, zone, gate, credential or journey"}},"required":["rfidNfcProfileId","venueId","name"]},
 "VerificationMethodSelectionLockingView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over access state, assembled at read time from tables that already exist","description":"**What Verification Method Selection & Locking displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"availableMethods":{"type":"array","items":{"type":"string","enum":["dynamicQr","physicalCard","rfid","facePass","faceTag"]},"description":"Verification methods the guest may choose from"},"reason":{"type":"string","enum":["lostPhone","damagedWristband","accessibility","deviceFailure","guestService","other"],"description":"Reason code vocabulary for a method change; every change is audited"},"policyId":{"type":"string","description":"Verification method policy identifier"},"productId":{"type":"string","description":"Product the policy applies to"},"lockOnFirstSuccessfulAccess":{"type":"boolean","description":"The chosen method locks at the first successful access"},"changeAfterLock":{"type":"string","enum":["notAllowed","supervisorApproval"],"description":"Who may change the method once locked; guests may not"}}},

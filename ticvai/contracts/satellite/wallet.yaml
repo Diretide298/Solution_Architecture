@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI — Wallet Configuration
   version: 1.0.0
-  x-ticvai-screen-count: 58
+  x-ticvai-screen-count: 60
   x-ticvai-tier: satellite
   x-ticvai-module: 4 — Bundles and Promotions
   x-ticvai-platforms:
@@ -381,10 +381,10 @@ paths:
     get:
       operationId: getCreditConsumptionPolicy
       x-ticvai-consumed-by:
+        - "P08 ADM-604 Stored Value, Gift Card & Voucher Tender Controls"
         - "P08 BO-1107 Consumption Priority Engine"
         - "P08 BO-1110 Split Tender & Multi-Credit Consumption"
         - "P08 BO-1112 Consumption Simulator, Validation & Rule Publication"
-        - "P08 ADM-604 Stored Value, Gift Card & Voucher Tender Controls"
       summary: Which credit is spent first
       tags:
       - wallet
@@ -1204,9 +1204,9 @@ paths:
     put:
       operationId: setWalletRefundPolicy
       x-ticvai-consumed-by:
+        - "P08 ADM-612 Refund Allocation & Original Tender Manager"
         - "P08 BO-1146 Refund-to-Wallet Policy Configuration"
         - "P08 BO-1147 Refund Routing & Credit Restoration Engine"
-        - "P08 ADM-612 Refund Allocation & Original Tender Manager"
       x-ticvai-conflict-policy: serverWins
       summary: What a refund puts back, and where
       description: 'Boards 7.4 and 7.5. **A refund to a wallet and a refund to a card are different
@@ -1520,6 +1520,8 @@ paths:
   /wallet-movement-summary:
     get:
       operationId: getWalletMovementSummary
+      x-ticvai-consumed-by:
+        - "P08 BO-1170 Wallet Financial Period & Closing Controls"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -1576,6 +1578,8 @@ paths:
   /wallet-pre-close-checks:
     get:
       operationId: getWalletPreCloseChecks
+      x-ticvai-consumed-by:
+        - "P08 BO-1170 Wallet Financial Period & Closing Controls"
       x-ticvai-audience:
       - staff
       - service
@@ -1954,6 +1958,7 @@ paths:
     get:
       operationId: getWallet
       x-ticvai-consumed-by:
+        - "P01 WEB-017 My Account Dashboard"
         - "P01 WEB-021 Wallet & Gift Cards"
         - "P02 GST-011 Wallet Overview"
         - "P08 BO-1086 Wallet Ownership & Account Association"
@@ -1966,7 +1971,6 @@ paths:
         - "P08 BO-448 Redemption Wallet & Balance View"
         - "P08 BO-487 Customer Wallet & Balance Summary"
         - "P08 BO-488 Self-Service Wallet Top-Up"
-        - "P01 WEB-017 My Account Dashboard"
       parameters:
       - $ref: '../shared/common.yaml#/components/parameters/ConsistencyToken'
       security:

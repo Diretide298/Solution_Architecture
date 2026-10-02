@@ -25,7 +25,7 @@ platform:
   shortName: Venue Analytics
   audience: staff
   offlineCapable: false
-  screenCount: 70
+  screenCount: 71
   notes: '**26 board screens collapsed to nine.** F&B, Retail and POS each ended their set with an executive
     command centre, a sales and revenue view, a performance view, a forecasting view and an AI centre
     — and **two of them are word-for-word identical across domains.**
@@ -213,7 +213,15 @@ screens:
     When these screens were repointed from the client pack to their own board on 24 August, the status
     stayed `designed` — **which claimed a client had drawn a board this package generated.** `derivedFrom`
     keeps the pack frame, which is where the design came from; `status` describes the file being pointed
-    at, and those are different facts.'
+    at, and those are different facts.
+
+
+    **Combo, matrix, waterfall, treemap and scatter now bind** (CHG-FIN-007, 2 October 2026) through the
+    report column encodings; the correction that they could not is closed. **Measure names, not "Revenue"**
+    (decided 2 October 2026, Chinmay; CHG-FIN-002; BOARDREQ MOM-2758..2761). Takings (money taken less
+    money paid back, a cash-control figure), Gross sales (before discounts, excluding VAT), Net revenue
+    (gross sales less discounts and refunds), Recognised revenue and Deferred revenue are different numbers
+    and never share a label; a tile takes its label from the seeded KPI it is bound to (`ReportingSystemKpi`).'
   density: compact
   boardFrames:
   - FnB Board 6.dc.html#fnb-6a
@@ -911,7 +919,15 @@ screens:
     where the design came from and not where this screen is drawn. **`P15 Kitchen Display.dc.html` and
     `P16 Venue Analytics.dc.html` carry one anchor per screen and nothing referenced either**, so both
     shipped correctly anchored and unreachable. The pack frame is kept in `derivedFrom` because provenance
-    is worth more than the wrong pointer.'
+    is worth more than the wrong pointer.
+
+
+    **Combo, matrix, waterfall, treemap and scatter now bind** (CHG-FIN-007, 2 October 2026) through the
+    report column encodings; the correction that they could not is closed. **Measure names, not "Revenue"**
+    (decided 2 October 2026, Chinmay; CHG-FIN-002; BOARDREQ MOM-2758..2761). Takings (money taken less
+    money paid back, a cash-control figure), Gross sales (before discounts, excluding VAT), Net revenue
+    (gross sales less discounts and refunds), Recognised revenue and Deferred revenue are different numbers
+    and never share a label; a tile takes its label from the seeded KPI it is bound to (`ReportingSystemKpi`).'
   density: compact
   boardFrames:
   - FnB Board 6.dc.html#fnb-6d
@@ -1129,7 +1145,15 @@ screens:
     pack, which is where the design came from and not where this screen is drawn. **`P15 Kitchen Display.dc.html`
     and `P16 Venue Analytics.dc.html` carry one anchor per screen and nothing referenced either**, so
     both shipped correctly anchored and unreachable. The pack frame is kept in `derivedFrom` because provenance
-    is worth more than the wrong pointer.'
+    is worth more than the wrong pointer.
+
+
+    **Combo, matrix, waterfall, treemap and scatter now bind** (CHG-FIN-007, 2 October 2026) through the
+    report column encodings; the correction that they could not is closed. **Measure names, not "Revenue"**
+    (decided 2 October 2026, Chinmay; CHG-FIN-002; BOARDREQ MOM-2758..2761). Takings (money taken less
+    money paid back, a cash-control figure), Gross sales (before discounts, excluding VAT), Net revenue
+    (gross sales less discounts and refunds), Recognised revenue and Deferred revenue are different numbers
+    and never share a label; a tile takes its label from the seeded KPI it is bound to (`ReportingSystemKpi`).'
   density: compact
   boardFrames:
   - FnB Board 6.dc.html#fnb-6e
@@ -2423,6 +2447,10 @@ screens:
       - realisedOutcome
       - note
     provenance: contract ai.yaml POST /ai/suggestions/{suggestionId}/outcome
+  gaps:
+  - operation: null
+    why: 'Contract gap recorded 2 October 2026 (CHG-WIR-014): No listSuggestions read of open suggestions.'
+    source: screens/P16-venue-analytics.yaml#ANL-010
 - id: ANL-012
   name: Live Operations Dashboard
   module: Analytics
@@ -2592,41 +2620,135 @@ screens:
       slot: headline
       components:
       - kind: metricTile
-        label: Revenue Today
-        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 5 §Display
+        label: Gross sales today
+        provenance: contract reporting.yaml ReportingSystemKpi (CHG-FIN-007, 2 October 2026)
+        notes: '`getKpiValues?kpiCodes=grossSales`, today; shows its as-of time (CHG-FIN-002, CHG-FIN-007).'
+        bindsTo: KpiValue
+        operation: getKpiValues
+        columns:
+        - KpiValue.value
+        - KpiValue.comparison
+        - KpiValue.direction
       - kind: metricTile
-        label: Revenue This Hour
-        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 5 §Display
+        label: Gross sales this hour
+        provenance: contract reporting.yaml ReportingSystemKpi (CHG-FIN-007, 2 October 2026)
+        notes: '`getKpiValues?kpiCodes=grossSales`, this hour, interval=hour; shows its as-of time (CHG-FIN-002,
+          CHG-FIN-007).'
+        bindsTo: KpiValue
+        operation: getKpiValues
+        columns:
+        - KpiValue.value
+        - KpiValue.comparison
+        - KpiValue.direction
       - kind: metricTile
-        label: Revenue vs Target
-        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 5 §Display
+        label: Net revenue vs target
+        provenance: contract reporting.yaml ReportingSystemKpi (CHG-FIN-007, 2 October 2026)
+        notes: '`getKpiValues?kpiCodes=netRevenue`, today, with its target; shows its as-of time (CHG-FIN-002,
+          CHG-FIN-007).'
+        bindsTo: KpiValue
+        operation: getKpiValues
+        columns:
+        - KpiValue.value
+        - KpiValue.comparison
+        - KpiValue.direction
       - kind: metricTile
-        label: Revenue vs Yesterday
-        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 5 §Display
+        label: Gross sales vs yesterday
+        provenance: contract reporting.yaml ReportingSystemKpi (CHG-FIN-007, 2 October 2026)
+        notes: '`getKpiValues?kpiCodes=grossSales`, today against yesterday; shows its as-of time (CHG-FIN-002,
+          CHG-FIN-007).'
+        bindsTo: KpiValue
+        operation: getKpiValues
+        columns:
+        - KpiValue.value
+        - KpiValue.comparison
+        - KpiValue.direction
       - kind: metricTile
-        label: Revenue vs Same Day Last Week
-        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 5 §Display
+        label: Gross sales vs same day last week
+        provenance: contract reporting.yaml ReportingSystemKpi (CHG-FIN-007, 2 October 2026)
+        notes: '`getKpiValues?kpiCodes=grossSales`, today against the same day last week; shows its as-of
+          time (CHG-FIN-002, CHG-FIN-007).'
+        bindsTo: KpiValue
+        operation: getKpiValues
+        columns:
+        - KpiValue.value
+        - KpiValue.comparison
+        - KpiValue.direction
       - kind: metricTile
-        label: Revenue vs Same Period Last Year
-        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 5 §Display
+        label: Gross sales vs same period last year
+        provenance: contract reporting.yaml ReportingSystemKpi (CHG-FIN-007, 2 October 2026)
+        notes: '`getKpiValues?kpiCodes=grossSales`, the period against the same period last year; shows
+          its as-of time (CHG-FIN-002, CHG-FIN-007).'
+        bindsTo: KpiValue
+        operation: getKpiValues
+        columns:
+        - KpiValue.value
+        - KpiValue.comparison
+        - KpiValue.direction
       - kind: metricTile
-        label: Revenue by Site
-        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 5 §Display
+        label: Gross sales by site
+        provenance: contract reporting.yaml ReportingSystemKpi (CHG-FIN-007, 2 October 2026)
+        notes: '`getKpiValues?kpiCodes=grossSales`, groupBy=venue; shows its as-of time (CHG-FIN-002,
+          CHG-FIN-007).'
+        bindsTo: KpiValue
+        operation: getKpiValues
+        columns:
+        - KpiValue.value
+        - KpiValue.comparison
+        - KpiValue.direction
       - kind: metricTile
-        label: Revenue by Attraction
-        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 5 §Display
+        label: Gross sales by attraction
+        provenance: contract reporting.yaml ReportingSystemKpi (CHG-FIN-007, 2 October 2026)
+        notes: '`getKpiValues?kpiCodes=grossSales`, groupBy=attraction; shows its as-of time (CHG-FIN-002,
+          CHG-FIN-007).'
+        bindsTo: KpiValue
+        operation: getKpiValues
+        columns:
+        - KpiValue.value
+        - KpiValue.comparison
+        - KpiValue.direction
       - kind: metricTile
-        label: Revenue by Product
-        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 5 §Display
+        label: Gross sales by product
+        provenance: contract reporting.yaml ReportingSystemKpi (CHG-FIN-007, 2 October 2026)
+        notes: '`getKpiValues?kpiCodes=grossSales`, groupBy=product; shows its as-of time (CHG-FIN-002,
+          CHG-FIN-007).'
+        bindsTo: KpiValue
+        operation: getKpiValues
+        columns:
+        - KpiValue.value
+        - KpiValue.comparison
+        - KpiValue.direction
       - kind: metricTile
-        label: Revenue by Channel
-        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 5 §Display
+        label: Gross sales by channel
+        provenance: contract reporting.yaml ReportingSystemKpi (CHG-FIN-007, 2 October 2026)
+        notes: '`getKpiValues?kpiCodes=grossSales`, groupBy=channel; shows its as-of time (CHG-FIN-002,
+          CHG-FIN-007).'
+        bindsTo: KpiValue
+        operation: getKpiValues
+        columns:
+        - KpiValue.value
+        - KpiValue.comparison
+        - KpiValue.direction
       - kind: metricTile
-        label: Revenue by Business Unit
-        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 5 §Display
+        label: Gross sales by business unit
+        provenance: contract reporting.yaml ReportingSystemKpi (CHG-FIN-007, 2 October 2026)
+        notes: '`getKpiValues?kpiCodes=grossSales`, groupBy=businessUnit; shows its as-of time (CHG-FIN-002,
+          CHG-FIN-007).'
+        bindsTo: KpiValue
+        operation: getKpiValues
+        columns:
+        - KpiValue.value
+        - KpiValue.comparison
+        - KpiValue.direction
       - kind: metricTile
-        label: Revenue by Payment Method
-        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 5 §Display
+        label: Takings by payment method
+        provenance: contract reporting.yaml ReportingSystemKpi (CHG-FIN-007, 2 October 2026)
+        notes: '`getKpiValues?kpiCodes=takings`, groupBy=tender; shows its as-of time (CHG-FIN-002, CHG-FIN-007).'
+        bindsTo: KpiValue
+        operation: getKpiValues
+        columns:
+        - KpiValue.value
+        - KpiValue.comparison
+        - KpiValue.direction
   states:
     loading: The revenue pulse list; the counts above it resolve separately.
     error: Could not load. Names which read failed and leaves the revenue pulse untouched.
@@ -2658,6 +2780,16 @@ screens:
     page 5. 0 of 0 labels bound to a contract property; 12 of 21 pack bullets carried onto the screen
     — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
     the contracts rather than here.
+  notes: '**Measure names, not "Revenue"** (decided 2 October 2026, Chinmay; CHG-FIN-002; BOARDREQ MOM-2758..2761).
+    Takings (money taken less money paid back, a cash-control figure), Gross sales (before discounts,
+    excluding VAT), Net revenue (gross sales less discounts and refunds), Recognised revenue and Deferred
+    revenue are different numbers and never share a label; a tile takes its label from the seeded KPI
+    it is bound to (`ReportingSystemKpi`).
+
+
+    Intraday figures are Gross sales (before discounts, excluding VAT) because refunds and recognition
+    settle later; by payment method the figure is Takings, the money taken by tender. Net revenue is shown
+    against target.'
 - id: ANL-014
   name: Attendance & Footfall Intelligence
   module: Analytics
@@ -3304,59 +3436,134 @@ screens:
   density: compact
   purposeNote: Users receive explainable, traceable AI insights linked to the underlying supporting data.
   pattern: listDetail
-  patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no
-    display directory, no configuration directory. It falls to the default, and the fallback is recorded
-    rather than passed off as a decision'
+  patternReason: '`listAiInsights` reads the population and the selected insight is decided or explained
+    — list, select, act (CHG-SOT-011).'
   purpose: Provide management with proactive AI-generated business intelligence rather than requiring
     users to manually analyze every dashboard.
   gaps:
-  - operation: null
-    why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
-      acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere
-      in them. The screen has no content region rather than an empty one, and it needs a person before
-      it is built.'
-    source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 10
-  - operation: null
-    why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
-      a default rather than a reading. It needs a person before it is built.'
-    source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 10
+  - operation: listAnalyticsAnomalies
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-012): Two sources of anomalies on one card list show the same
+      situation twice; ADR-0053 and the insight layer make ai.listAiInsights (kind anomaly) the one list
+      (design-notes correction ai ANL-019).'
+    source: ADR-0053 | contracts/satellite/ai.yaml#listAiInsights | contracts/satellite/reporting.yaml#listAnalyticsAnomalies
+  - operation: explainMetricChange
+    why: '**The explanation carries no query or semantic spec** (design-notes correction ai ANL-019).
+      ADR-0054 says an answer shows the query it ran; `NaturalLanguageAnswer` has `semanticSpec` and `generatedQuery`,
+      `AiMetricChangeExplanation` only evidence, so "Show query" cannot be drawn for an explanation. Logged
+      as a contract gap 2 October 2026 (CHG-SOT-016).'
+    source: contracts/satellite/ai.yaml#explainMetricChange
   layout:
     template: split
     regions:
     - name: contentBody
+      slot: collection
+      components:
+      - kind: selectField
+        label: Kind
+        operation: listAiInsights
+        notes: 'Sends `?kind=`: anomaly, forecast deviation, trend, opportunity, executive summary, root
+          cause.'
+        provenance: contract ai.yaml GET /insights
+      - kind: selectField
+        label: Priority
+        operation: listAiInsights
+        notes: Sends `?priority=`.
+        provenance: contract ai.yaml GET /insights
+      - kind: selectField
+        label: Status
+        operation: listAiInsights
+        notes: Sends `?status=`; new and reviewed first by default.
+        provenance: contract ai.yaml GET /insights
+      - kind: cardList
+        label: Insights
+        bindsTo: AiInsight
+        columns:
+        - AiInsight.title
+        - AiInsight.kind
+        - AiInsight.priority
+        - AiInsight.metricKey
+        - AiInsight.magnitude
+        - AiInsight.status
+        - AiInsight.detectedAt
+        operation: listAiInsights
+        notes: '**One list** (ADR-0053): anomalies are insights of kind anomaly, not a second source.
+          Newest first; each card says what moved, by how much and how sure.'
+        provenance: contract ai.yaml GET /insights; design-notes correction ai ANL-019, 2 October 2026
+      - kind: assistantPanel
+        label: Ask about what moved
+        operation: askReportingQuestion
+        notes: Answers through the semantic layer and shows the query it ran (ADR-0054).
+        provenance: contract reporting.yaml POST /reports/ask
+    - name: contextPanel
+      slot: selection
+      components:
+      - kind: detailPanel
+        label: The selected insight
+        bindsTo: AiInsight
+        columns:
+        - AiInsight.title
+        - AiInsight.narrative
+        - AiInsight.evidence
+        - AiInsight.recommendedAction
+        - AiInsight.expectedImpact
+        - AiInsight.status
+        - AiInsight.decidedAt
+        - AiInsight.measuredImpact
+        operation: listAiInsights
+        notes: '**Explainable and traceable**: the evidence items link to the data behind them.'
+        provenance: contract ai.yaml AiInsight
+      - kind: detailPanel
+        label: Why it changed
+        bindsTo: AiMetricChangeExplanation
+        columns:
+        - AiMetricChangeExplanation.metricKey
+        - AiMetricChangeExplanation.period
+        - AiMetricChangeExplanation.comparison
+        - AiMetricChangeExplanation.change
+        - AiMetricChangeExplanation.changePercent
+        - AiMetricChangeExplanation.drivers
+        - AiMetricChangeExplanation.narrative
+        - AiMetricChangeExplanation.reliability
+        - AiMetricChangeExplanation.dataAsOf
+        operation: explainMetricChange
+        notes: The drivers in order of contribution and how reliable the explanation is (grounded, partial,
+          conflicting sources, insufficient evidence).
+        provenance: contract ai.yaml POST /insights/explain-metric-change
+    - name: actionBar
+      slot: rowActions
       components:
       - kind: primaryButton
-        derived: true
-        impliedBy: askReportingQuestion
-        notes: The act the screen exists for.
-      - kind: dataTable
-        derived: true
-        impliedBy: listAnalyticsAnomalies
-        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
-          a venue''s busiest hour is a list that skips rows.'
+        label: Accept
+        operation: decideAiInsight
+        provenance: contract ai.yaml POST /insights/{insightId}/decide
       - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: askReportingQuestion
+        label: Mark actioned
+        operation: decideAiInsight
+        provenance: contract ai.yaml POST /insights/{insightId}/decide
+      - kind: destructiveButton
+        label: Reject
+        operation: decideAiInsight
+        notes: Asks for the reason; the rejection teaches the detector.
+        provenance: contract ai.yaml POST /insights/{insightId}/decide
+      - kind: secondaryButton
+        label: Why did this change?
+        operation: explainMetricChange
+        provenance: contract ai.yaml POST /insights/explain-metric-change
   states:
     loading: The insights list.
     error: Could not load. Names which read failed and leaves the insights untouched.
-    emptyFirstRun: No insights yet. Carries the create action; distinct from a filter that matched nothing.
-    emptyNoResults: The filter narrowed it and the insights are still there. Names the active filter and
-      offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyFirstRun: 'No insights yet: nothing has moved enough to report. Good news, not a failure; the
+      ask panel stays available.'
+    emptyNoResults: Nothing matches the kind, priority or status filter, and the insights are still there.
+      Names the active filter and offers to clear it.
+    emptyNoAccess: Shown when the caller lacks `AI_USE`, which `listAiInsights` requires, and names that
+      permission. **Never an empty list.**
   apis:
   - operationId: askReportingQuestion
     contract: reporting
     purpose: Ask about what moved
     trigger: onAction
-    provenance: board reading, 19 September 2026
-  - operationId: listAnalyticsAnomalies
-    contract: reporting
-    purpose: What moved unexpectedly
-    trigger: onLoad
     provenance: board reading, 19 September 2026
   - operationId: listAiInsights
     contract: ai
@@ -3385,6 +3592,39 @@ screens:
     params:
     - name: insightId
       from: navigation
+  overlays:
+  - id: formDecideAiInsight
+    component: modal
+    trigger: Accept, Mark actioned or Reject
+    body: '**Collects what `decideAiInsight` sends.** Required: `decision` (set by the button: accept,
+      actioned or reject). Optional: `reason` (asked for on Reject), `actionRef` (the work the insight
+      led to, on Mark actioned). Dismissing sends nothing.'
+    confirm:
+      label: Record decision
+      operation: decideAiInsight
+    dismiss:
+      label: Cancel
+      discards:
+      - decision
+      - reason
+      - actionRef
+    provenance: contract ai.yaml POST /insights/{insightId}/decide
+  - id: formExplainMetricChange
+    component: drawer
+    trigger: Why did this change?
+    body: '**Filled from the selected insight**: `metricKey` and `period` come from it; the person picks
+      the `comparison` (previous period or same period last year) and may add dimensions. Dismissing sends
+      nothing.'
+    confirm:
+      label: Explain
+      operation: explainMetricChange
+    dismiss:
+      label: Cancel
+      discards:
+      - comparison
+      - dimensions
+    provenance: contract ai.yaml POST /insights/explain-metric-change
+  permission: AI_USE
 - id: ANL-020
   name: Multi-Site & Performance Comparison
   module: Analytics
@@ -3457,9 +3697,10 @@ screens:
       slot: headline
       components:
       - kind: metricTile
-        label: Revenue
+        label: Net revenue
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 11 §Comparison
           KPIs
+        notes: '(CHG-FIN-002: never a bare "Revenue")'
       - kind: metricTile
         label: Revenue Growth
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 11 §Comparison
@@ -3576,6 +3817,11 @@ screens:
     page 11. 0 of 0 labels bound to a contract property; 14 of 43 pack bullets carried onto the screen
     — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
     the contracts rather than here.
+  notes: '**Measure names, not "Revenue"** (decided 2 October 2026, Chinmay; CHG-FIN-002; BOARDREQ MOM-2758..2761).
+    Takings (money taken less money paid back, a cash-control figure), Gross sales (before discounts,
+    excluding VAT), Net revenue (gross sales less discounts and refunds), Recognised revenue and Deferred
+    revenue are different numbers and never share a label; a tile takes its label from the seeded KPI
+    it is bound to (`ReportingSystemKpi`).'
 - id: ANL-021
   name: Dashboard Library
   module: Analytics
@@ -3605,6 +3851,7 @@ screens:
     - ANL-028
     - ANL-029
     - ANL-030
+    - ANL-072
     transitions:
     - to: ANL-001
       trigger: Back to Executive Command Center
@@ -3650,6 +3897,10 @@ screens:
       provenance: structural — pack board 2 wiring, 9 September 2026
       carries:
       - dashboardId
+    - to: ANL-072
+      trigger: Finance Dashboard
+      provenance: 'decided 2 October 2026 (DEC-219, CHG-SOT-008): the Finance standard dashboard is one
+        of the library''s system dashboards'
   density: compact
   purposeNote: Authorized users can search, filter, manage, clone and govern dashboards from one central
     catalogue.
@@ -3953,50 +4204,146 @@ screens:
       - dashboardId
   density: compact
   purposeNote: A business analyst can visually construct a dashboard without coding.
-  pattern: listDetail
-  patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no
-    display directory, no configuration directory. It falls to the default, and the fallback is recorded
-    rather than passed off as a decision'
+  pattern: configEditor
+  patternReason: 'A canvas edited and saved as a whole (`updateDashboard` replaces the tiles), drawn 2
+    October 2026 from the client''s dashboard specification (MATRIX 8.7.12: grid, gallery, data pane,
+    field wells, formatting); CHG-SOT-010.'
   purpose: Provide the main visual workspace for dashboard construction.
   gaps:
   - operation: null
-    why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
-      acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere
-      in them. The screen has no content region rather than an empty one, and it needs a person before
-      it is built.'
-    source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 16
-  - operation: null
-    why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
-      a default rather than a reading. It needs a person before it is built.'
-    source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 16
+    why: '**No draft, preview-publish or rollback for a dashboard** (design-notes correction ANL-023,
+      MATRIX 7.1.46). Every save overwrites the live dashboard; the contract has no dashboard version
+      or publish operation. Undo and redo are drawn as session-only. Logged as a contract gap 2 October
+      2026 (CHG-SOT-016).'
+    source: contracts/satellite/reporting.yaml#updateDashboard
   layout:
     template: split
     regions:
-    - name: contentBody
+    - name: toolbar
+      slot: publish
       components:
       - kind: primaryButton
-        derived: true
-        impliedBy: updateDashboard
         label: Save dashboard
-        notes: The act the screen exists for.
-      - kind: detailPanel
-        derived: true
-        impliedBy: getDashboard
-        notes: One record, read-only.
+        operation: updateDashboard
+        notes: Saves the whole dashboard (tiles replace tiles); the confirmation names tiles that will
+          be removed. Refused 422 `tile-encoding-missing` for a tile whose report lacks a well its mark
+          requires, naming the tile and the well.
+        provenance: contract reporting.yaml PUT /dashboards/{dashboardId}
+      - kind: iconButton
+        label: Undo
+        notes: Undo the last change on the canvas, in this editing session only. Nothing is saved until
+          Save dashboard.
+        provenance: design-notes correction ANL-023 (MATRIX 7.1.46), 2 October 2026
+      - kind: iconButton
+        label: Redo
+        notes: Redo, in this editing session only.
+        provenance: design-notes correction ANL-023 (MATRIX 7.1.46), 2 October 2026
       - kind: secondaryButton
         label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: updateDashboard
+        notes: '**A screen that can submit must be leaveable without submitting.** Discards unsaved changes
+          after saying how many.'
+        provenance: derived from updateDashboard
+      - kind: destructiveButton
+        label: Archive dashboard
+        operation: deleteDashboard
+        notes: Archives rather than removes (`archivedAt`); the confirmation names the dashboard and its
+          tile count.
+        provenance: contract reporting.yaml DELETE /dashboards/{dashboardId}
+    - name: gallery
+      slot: collection
+      components:
+      - kind: cardList
+        label: Visuals
+        notes: '**All twenty marks of `DashboardTile.visualisation`, the nine complex ones included**
+          (decided 2 October 2026, Chinmay: "Build all chart types, including the nine complex ones";
+          DEC-080, CHG-FIN-007): number, line, area, bar, stackedBar, stackedBar100, combo, pie, donut,
+          table, matrix, gauge, heatmap, funnel, waterfall, treemap, scatter, map, ribbon and decompositionTree.
+          Each card names the wells its mark requires (the binding table in the contract): combo an x
+          dimension and two or more measures with axis and series type; matrix rows, optional columns
+          and values; funnel ordered stages and a value; waterfall ordered steps and a value, total last;
+          treemap categories with levels and a size; scatter x, y and a label; map a location and a value;
+          ribbon a period, a series and a value; decomposition tree a value and two or more levels. Slicers
+          and narrative text are not marks (`x-ticvai-refuses`).'
+        provenance: contract reporting.yaml DashboardTile.visualisation (CHG-FIN-007)
+    - name: dataPane
+      slot: filters
+      components:
+      - kind: searchField
+        label: Find a report
+        operation: listReports
+        notes: Sends `?search=`; the data pane lists the reports a tile may bind, by category.
+        provenance: contract reporting.yaml GET /reports
+      - kind: treeNav
+        label: Reports and their columns
+        bindsTo: ReportDefinition
+        operation: getReport
+        notes: Each report opens to its columns with `role`, `encoding`, `axis`, `seriesType`, `hierarchyLevel`
+          and `unitLabel` (CHG-FIN-007); a column is dragged into a well.
+        provenance: contract reporting.yaml GET /reports/{reportId}
+    - name: contentBody
+      slot: canvas
+      components:
+      - kind: detailPanel
+        label: Canvas
+        bindsTo: Dashboard
+        columns:
+        - Dashboard.name
+        - Dashboard.module
+        - Dashboard.venueId
+        - Dashboard.isShared
+        - Dashboard.tiles
+        operation: getDashboard
+        notes: A grid; each tile sits at `position` (row, column, width, height). **At most 24 tiles.**
+          Every tile renders its mark with live data, shows its as-of time and a stale warning past its
+          refresh (BOARDREQ MOM-2713/2714).
+        provenance: contract reporting.yaml GET /dashboards/{dashboardId}
+    - name: contextPanel
+      slot: selection
+      components:
+      - kind: detailPanel
+        label: Field wells
+        bindsTo: ReportColumn
+        columns:
+        - ReportColumn.label
+        - ReportColumn.role
+        - ReportColumn.encoding
+        - ReportColumn.axis
+        - ReportColumn.seriesType
+        - ReportColumn.hierarchyLevel
+        - ReportColumn.unitLabel
+        operation: getReport
+        notes: The wells of the selected tile's mark, filled from its report's columns. A required well
+          left empty is named in red, and Save is refused for it rather than drawing an empty chart.
+        provenance: contract reporting.yaml ReportColumn (CHG-FIN-007)
+      - kind: textField
+        label: Tile title
+        bindsTo: DashboardTile.title
+        operation: updateDashboard
+        provenance: contract reporting.yaml DashboardTile
+      - kind: numberField
+        label: Refresh every (seconds)
+        bindsTo: DashboardTile.refreshSeconds
+        operation: updateDashboard
+        notes: Minimum 30.
+        provenance: contract reporting.yaml DashboardTile
+      - kind: detailPanel
+        label: Formatting
+        bindsTo: DashboardTile
+        columns:
+        - DashboardTile.parameters
+        operation: updateDashboard
+        notes: 'The tile''s run parameters and display settings (for `number`: comparison, variance, sparkline
+          and status icon).'
+        provenance: contract reporting.yaml DashboardTile.parameters
   states:
-    loading: The drag-and-drop canvas list.
-    error: Could not load. Names which read failed and leaves the drag-and-drop canvas untouched.
-    emptyFirstRun: No drag-and-drop canvas yet. Carries the create action; distinct from a filter that
-      matched nothing.
-    emptyNoResults: The filter narrowed it and the drag-and-drop canvas are still there. Names the active
-      filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    loading: The dashboard and its tiles.
+    error: Could not load. Names which read failed (the dashboard or a report) and leaves the canvas as
+      it was.
+    emptyFirstRun: A new dashboard with no tiles yet. The gallery is open and says "Drag a visual onto
+      the grid"; nothing is created until Save dashboard.
+    emptyNoResults: The report search matched nothing. Names the search and offers to clear it.
+    emptyNoAccess: Shown when the caller lacks `REPORT_MANAGE`, which saving requires; the dashboard opens
+      read-only and names that permission.
   apis:
   - operationId: updateDashboard
     contract: reporting
@@ -4021,6 +4368,16 @@ screens:
     purpose: Record that a dashboard was opened — fired once when the dashboard renders; nothing on the
       screen waits for it.
     trigger: background
+  - operationId: listReports
+    contract: reporting
+    purpose: The reports a tile may bind, for the data pane
+    trigger: onLoad
+    provenance: '2 October 2026 (CHG-SOT-010): the canvas binds tiles to reports'
+  - operationId: getReport
+    contract: reporting
+    purpose: A report's columns and their encodings, for the field wells
+    trigger: onAction
+    provenance: '2 October 2026 (CHG-SOT-010): the wells come from ReportColumn (CHG-FIN-007)'
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-023
@@ -4033,6 +4390,43 @@ screens:
     params:
     - name: dashboardId
       from: navigation
+    - name: reportId
+      from: navigation
+  notes: '**The nine new marks bind** (decided 2 October 2026, Chinmay; CHG-FIN-007). The canvas offers
+    all twenty marks of `DashboardTile.visualisation` and, for each, field wells filled from the report''s
+    columns (`ReportColumn.role`, `encoding`, `axis`, `seriesType`, `hierarchyLevel`, `unitLabel`): combo
+    (x, bars and lines, primary and secondary axis with units), matrix (rows, columns, values, with drill
+    levels), funnel (ordered stages, value), waterfall (ordered steps of a measure set, total last), treemap
+    (nested categories, size, colour), scatter (x, y, label, size, colour), map (venue, zone or map point,
+    value), ribbon (period, series, value) and decomposition tree (value, levels). A tile whose report
+    lacks a required well cannot be saved (422 `tile-encoding-missing`). At most 24 tiles; every tile
+    shows its as-of time and a stale warning past its refresh (BOARDREQ MOM-2713/2714).'
+  permission: REPORT_MANAGE
+  overlays:
+  - id: confirmUpdateDashboard
+    component: confirmDialog
+    trigger: Save dashboard
+    body: '**Names what the save removes**, because the tiles are replaced as a whole ("Save and remove
+      2 tiles: Refunds by channel, Queue time"). Dismissing keeps editing.'
+    confirm:
+      label: Save dashboard
+      operation: updateDashboard
+    dismiss:
+      label: Keep editing
+      discards: []
+    provenance: contract reporting.yaml PUT /dashboards/{dashboardId}
+  - id: confirmDeleteDashboard
+    component: confirmDialog
+    trigger: Archive dashboard
+    body: Names the dashboard and its tile count; archived dashboards leave the library unless asked for.
+      Dismissing sends nothing.
+    confirm:
+      label: Archive dashboard
+      operation: deleteDashboard
+    dismiss:
+      label: Cancel
+      discards: []
+    provenance: contract reporting.yaml DELETE /dashboards/{dashboardId}
 - id: ANL-024
   name: Widget & Visualization Library
   module: Analytics
@@ -4169,93 +4563,97 @@ screens:
   purpose: Allow authorized business users to create standardized enterprise KPIs.
   gaps:
   - operation: null
-    why: '**KPI Builder declares no operation that writes anything** — its only declared call is `none`,
-      a read. The name promises authoring and the contract offers none, so either the write operations
-      are missing or this screen is a view of something another screen builds.'
-    source: contract — the screen's declared operations
+    why: '**No update or retire operation for a KPI** (design-notes correction ANL-025). `createKpi` writes
+      one; nothing corrects or retires it, so a mistake cannot be put right. Logged as a contract gap
+      2 October 2026 (CHG-SOT-016). The earlier gap ("declares no operation that writes anything") was
+      stale: the screen declares `createKpi`.'
+    source: contracts/satellite/reporting.yaml#createKpi
   layout:
     template: form
     regions:
     - name: contentBody
       slot: fields
       components:
-      - kind: selectField
-        label: KPI Name
-        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 18 §Configure
-      - kind: selectField
-        label: KPI Code
-        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 18 §Configure
-      - kind: selectField
+      - kind: textField
+        label: KPI name
+        bindsTo: KpiDefinition.name
+        provenance: contract reporting.yaml KpiDefinition
+      - kind: textField
+        label: KPI code
+        bindsTo: KpiDefinition.code
+        notes: Unique in the tenant; the seeded codes (`takings`, `admissions`, the finance measures)
+          are taken.
+        provenance: contract reporting.yaml KpiDefinition
+      - kind: textField
         label: Description
-        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 18 §Configure
+        bindsTo: KpiDefinition.description
+        provenance: contract reporting.yaml KpiDefinition
       - kind: selectField
-        label: Business Domain
-        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 18 §Configure
-      - kind: selectField
+        label: Business domain
+        bindsTo: KpiDefinition.domain
+        notes: The semantic model's domains.
+        provenance: contract reporting.yaml KpiDefinition
+      - kind: textField
         label: Owner
-        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 18 §Configure
-      - kind: selectField
-        label: Data Source
-        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 18 §Configure
-      - kind: selectField
-        label: Measure
-        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 18 §Configure
-      - kind: selectField
+        bindsTo: KpiDefinition.owner
+        provenance: contract reporting.yaml KpiDefinition
+      - kind: textField
         label: Formula
-        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 18 §Configure
-      - kind: selectField
-        label: Aggregation
-        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 18 §Configure
+        bindsTo: KpiDefinition.formula
+        notes: '**Against the semantic model, not tables.** The measure, the aggregation and the data
+          source are all in the formula; there are no separate fields for them.'
+        provenance: contract reporting.yaml KpiDefinition.formula
       - kind: selectField
         label: Unit
-        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 18 §Configure
+        bindsTo: KpiDefinition.unit
+        notes: Currency, count, percentage, duration, ratio or score. Currency and decimal places follow
+          the region (AED 2, BHD/KWD/OMR 3), not the KPI.
+        provenance: contract reporting.yaml KpiDefinition.unit
+      - kind: toggle
+        label: Higher is better
+        bindsTo: KpiDefinition.higherIsBetter
+        notes: 'One yes/no. Examples, not fields: revenue and conversion up is better; refund rate, gate
+          rejection rate and queue time down is better.'
+        provenance: contract reporting.yaml KpiDefinition.higherIsBetter
       - kind: selectField
-        label: Currency
-        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 18 §Configure
-      - kind: selectField
-        label: Decimal Precision
-        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 18 §Configure
-      - kind: selectField
-        label: Effective Date
-        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 18 §Configure
-      - kind: selectField
-        label: Status
-        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 18 §Configure
-      - kind: selectField
-        label: Higher = Better
-        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 18 §Define
-          whether
-      - kind: selectField
-        label: Lower = Better
-        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 18 §Define
-          whether
-      - kind: selectField
-        label: Revenue ↑
-        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 18 §Define
-          whether
-      - kind: selectField
-        label: Conversion ↑
-        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 18 §Define
-          whether
-      - kind: selectField
-        label: Refund Rate ↓
-        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 18 §Define
-          whether
-      - kind: textField
-        label: Gate Rejection Rate ↓
-        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 18 §Define
-          whether
-      - kind: selectField
-        label: Queue Time ↓
-        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 18 §Define
-          whether
+        label: Default period
+        bindsTo: KpiDefinition.defaultPeriod
+        provenance: contract reporting.yaml KpiDefinition
+      - kind: toggle
+        label: Active
+        bindsTo: KpiDefinition.isActive
+        notes: 'The KPI''s status: inactive KPIs are kept and not offered on dashboards.'
+        provenance: contract reporting.yaml KpiDefinition.isActive
+      - kind: dataTable
+        label: KPIs already defined
+        bindsTo: KpiDefinition
+        columns:
+        - KpiDefinition.code
+        - KpiDefinition.name
+        - KpiDefinition.domain
+        - KpiDefinition.unit
+        - KpiDefinition.higherIsBetter
+        - KpiDefinition.owner
+        - KpiDefinition.isActive
+        operation: listKpis
+        notes: The seeded KPIs first (takings, admissions and the finance measures, CHG-FIN-007), then
+          the tenant's own.
+        provenance: contract reporting.yaml GET /kpis
+    - name: actionBar
+      slot: publish
+      components:
+      - kind: primaryButton
+        label: Create KPI
+        operation: createKpi
+        notes: Defines it once, for every dashboard and report.
+        provenance: contract reporting.yaml POST /kpis
   states:
-    loading: The kpi configuration as saved.
-    error: Could not load. Names which read failed and leaves the kpi untouched.
-    emptyFirstRun: No kpi configured yet. Carries the create action and says what the platform does in
-      the meantime.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    loading: The KPIs already defined.
+    error: Could not load. Names which read failed and leaves the form untouched.
+    emptyFirstRun: Only the seeded KPIs exist (takings, admissions and the finance measures). Offers Create
+      KPI (`createKpi`) for the tenant's first own KPI.
+    emptyNoAccess: Shown when the caller lacks `REPORT_MANAGE`, which `createKpi` requires; the KPI list
+      stays readable and the form names that permission.
   apis:
   - operationId: listKpis
     contract: reporting
@@ -4278,6 +4676,7 @@ screens:
     page 18. 0 of 0 labels bound to a contract property; 21 of 35 pack bullets carried onto the screen
     — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
     the contracts rather than here.
+  permission: REPORT_VIEW_TENANT
 - id: ANL-026
   name: Targets, Thresholds & KPI Status Rules
   module: Analytics
@@ -6823,19 +7222,12 @@ screens:
   purposeNote: Sharing, export and subscription cannot be used to bypass the underlying TICVAI permission
     model.
   pattern: listDetail
-  patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no
-    display directory, no configuration directory. It falls to the default, and the fallback is recorded
-    rather than passed off as a decision'
+  patternReason: '`listAuthorisationPolicies` reads the population and the selected policy is edited in
+    place — list, select, act. Chosen 2 October 2026 (CHG-SOT-013); the pack gave no directory.'
   purpose: Provide centralized security for reports, dashboards and analytical information. The matrix
     specifically requires reporting access based on group rights, operating-area rights and user access
     rights.
   gaps:
-  - operation: null
-    why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
-      acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere
-      in them. The screen has no content region rather than an empty one, and it needs a person before
-      it is built.'
-    source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 47
   - operation: null
     why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
       a default rather than a reading. It needs a person before it is built.'
@@ -6844,27 +7236,114 @@ screens:
     template: split
     regions:
     - name: contentBody
+      slot: collection
       components:
+      - kind: selectField
+        label: Status
+        operation: listAuthorisationPolicies
+        notes: 'Sends `?status=`: draft, pending approval, active, suspended or retired.'
+        provenance: contract identity.yaml GET /authorisation-policies
       - kind: dataTable
-        derived: true
-        impliedBy: listAuthorisationPolicies
-        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
-          a venue''s busiest hour is a list that skips rows.'
+        label: Who may see which reports
+        bindsTo: AuthorisationPolicy
+        columns:
+        - AuthorisationPolicy.name
+        - AuthorisationPolicy.effect
+        - AuthorisationPolicy.permissions
+        - AuthorisationPolicy.appliesToRoleIds
+        - AuthorisationPolicy.scopePath
+        - AuthorisationPolicy.status
+        - AuthorisationPolicy.effectiveFrom
+        operation: listAuthorisationPolicies
+        notes: The policies whose permissions include a reporting permission (`REPORT_*`). Roles and scopes
+          are shown by name (group rights, operating-area rights, user rights), never as ids. **Cursor
+          pagination, never offset.**
+        provenance: contract identity.yaml GET /authorisation-policies; correction applied 2 October 2026
+          (CHG-SOT-013)
+    - name: contextPanel
+      slot: selection
+      components:
+      - kind: detailPanel
+        label: The selected access policy
+        bindsTo: AuthorisationPolicy
+        columns:
+        - AuthorisationPolicy.code
+        - AuthorisationPolicy.name
+        - AuthorisationPolicy.description
+        - AuthorisationPolicy.effect
+        - AuthorisationPolicy.permissions
+        - AuthorisationPolicy.conditions
+        - AuthorisationPolicy.combining
+        - AuthorisationPolicy.priority
+        - AuthorisationPolicy.appliesToRoleIds
+        - AuthorisationPolicy.scopePath
+        - AuthorisationPolicy.status
+        - AuthorisationPolicy.version
+        - AuthorisationPolicy.effectiveFrom
+        - AuthorisationPolicy.effectiveTo
+        operation: listAuthorisationPolicies
+        provenance: contract identity.yaml GET /authorisation-policies
+      - kind: detailPanel
+        label: Sharing and export rules
+        bindsTo: AnalyticsGovernancePolicy
+        columns:
+        - AnalyticsGovernancePolicy.sharing
+        - AnalyticsGovernancePolicy.export
+        - AnalyticsGovernancePolicy.masking
+        operation: getAnalyticsGovernancePolicy
+        notes: Read-only here; edited on ANL-070 by holders of `REPORT_GOVERNANCE_MANAGE` (DEC-225, CHG-FUP-007).
+          **Sharing, export and subscription cannot bypass the permission model** (the pack's acceptance
+          condition).
+        provenance: contract reporting.yaml GET /analytics-governance-policy (CHG-CSA-021)
+    - name: actionBar
+      slot: rowActions
+      components:
+      - kind: primaryButton
+        label: New access policy
+        operation: createAuthorisationPolicy
+        notes: Created as a draft; it applies only once activated (`setAuthorisationPolicyState`, on the
+          role and policy screens).
+        provenance: contract identity.yaml POST /authorisation-policies
+      - kind: secondaryButton
+        label: Save access policy
+        operation: updateAuthorisationPolicy
+        notes: Writes a new version of the selected policy.
+        provenance: contract identity.yaml PUT /authorisation-policies/{policyId}
   states:
     loading: The report access sharing list.
     error: Could not load. Names which read failed and leaves the report access sharing untouched.
-    emptyFirstRun: No report access sharing yet. Carries the create action; distinct from a filter that
-      matched nothing.
-    emptyNoResults: The filter narrowed it and the report access sharing are still there. Names the active
-      filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyFirstRun: 'No report access policy yet: reports follow the roles'' own reporting permissions
+      alone. Offers New access policy (`createAuthorisationPolicy`) to narrow or widen that by group,
+      operating area or user; distinct from a filter that matched nothing.'
+    emptyNoResults: Nothing matches the status filter, and the access policies are still there. Names
+      the active filter and offers to clear it.
+    emptyNoAccess: Shown when the caller lacks `PERMISSION_VIEW`, which `listAuthorisationPolicies` requires,
+      and names that permission. **Never an empty table** — that reads as *there is no data*.
   apis:
   - operationId: listAuthorisationPolicies
     contract: identity
-    purpose: Who may see which report
+    purpose: 'Who may see which report: the policies that speak to reporting permissions'
     trigger: onLoad
     provenance: board reading, 19 September 2026
+  - operationId: createAuthorisationPolicy
+    contract: identity
+    purpose: A new report access policy, as a draft
+    trigger: onAction
+    invalidates:
+    - listAuthorisationPolicies
+    provenance: design-notes correction ANL-047, 2 October 2026 (CHG-SOT-013)
+  - operationId: updateAuthorisationPolicy
+    contract: identity
+    purpose: A new version of a report access policy
+    trigger: onAction
+    invalidates:
+    - listAuthorisationPolicies
+    provenance: design-notes correction ANL-047, 2 October 2026 (CHG-SOT-013)
+  - operationId: getAnalyticsGovernancePolicy
+    contract: reporting
+    purpose: The sharing and export rules that apply to every report
+    trigger: onLoad
+    provenance: decided 2 October 2026 (DEC-225, CHG-CSA-021); bound by CHG-SOT-009
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-047
@@ -6873,6 +7352,64 @@ screens:
     page 47. 0 of 0 labels bound to a contract property; 0 of 22 pack bullets carried onto the screen
     — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
     the contracts rather than here.
+  overlays:
+  - id: formCreateAuthorisationPolicy
+    component: drawer
+    trigger: New access policy
+    body: '**Collects what `createAuthorisationPolicy` sends.** Required: `code`, `name`, `effect` (permit
+      or deny; deny wins). Optional: `description`, `permissions` (the reporting permissions it speaks
+      to), `conditions`, `combining`, `priority`, `scopePath` (the operating area), `appliesToRoleIds`
+      (the groups), `effectiveFrom`, `effectiveTo`. Never `id`, `status` or `version`: the server sets
+      them. Dismissing sends nothing.'
+    bindsTo: AuthorisationPolicy
+    confirm:
+      label: Create access policy
+      operation: createAuthorisationPolicy
+    dismiss:
+      label: Cancel
+      discards:
+      - code
+      - name
+      - effect
+      - description
+      - permissions
+      - conditions
+      - combining
+      - priority
+      - scopePath
+      - appliesToRoleIds
+      - effectiveFrom
+      - effectiveTo
+    provenance: contract identity.yaml POST /authorisation-policies
+  - id: formUpdateAuthorisationPolicy
+    component: drawer
+    trigger: Save access policy
+    body: '**The selected policy, editable.** The same fields as creating one; saving writes a new version
+      and the panel shows it. Dismissing sends nothing.'
+    bindsTo: AuthorisationPolicy
+    confirm:
+      label: Save access policy
+      operation: updateAuthorisationPolicy
+    dismiss:
+      label: Cancel
+      discards:
+      - name
+      - effect
+      - description
+      - permissions
+      - conditions
+      - combining
+      - priority
+      - scopePath
+      - appliesToRoleIds
+      - effectiveFrom
+      - effectiveTo
+    provenance: contract identity.yaml PUT /authorisation-policies/{policyId}
+  permission: PERMISSION_VIEW
+  entryState:
+    params:
+    - name: policyId
+      from: navigation
 - id: ANL-048
   name: Delivery Monitoring & Failure Management
   module: Analytics
@@ -7235,18 +7772,11 @@ screens:
   states:
     loading: The retention archive governance configuration as saved.
     error: Could not load. Names which read failed and leaves the retention archive governance untouched.
-    emptyFirstRun: No retention archive governance configured yet. Carries the create action and says
-      what the platform does in the meantime.
+    emptyFirstRun: No retention archive governance configured yet. Offers no create action — this screen
+      declares no operation that makes one and says what the platform does in the meantime.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
   apis:
-  - operationId: setApprovalRetentionPolicy
-    contract: approvals
-    purpose: Retention and archive
-    trigger: onAction
-    provenance: board reading, 19 September 2026
-    invalidates:
-    - getApprovalRecord
   - operationId: listDataRetentionSettings
     contract: tenancy
     purpose: Retention period per data class
@@ -7269,6 +7799,13 @@ screens:
     params:
     - name: dataClass
       from: navigation
+  gaps:
+  - operation: setApprovalRetentionPolicy
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-021): setApprovalRetentionPolicy on the analytics retention
+      screen; approval decision records are not reports, and ADM-346 keeps the operation (design-notes
+      correction platform-foundation ANL-050).'
+    source: contracts/spine/approvals.yaml#setApprovalRetentionPolicy
 - id: ANL-051
   name: AI Analytics Command Center
   module: Analytics
@@ -7754,6 +8291,11 @@ screens:
       shape exists.'
     source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 113 §Each Anomaly
       Displays
+  - operation: listAnalyticsAnomalies
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-012): The same duplication as ANL-019; listAiInsights (kind
+      anomaly) is the one list (ADR-0053; design-notes correction ai ANL-055).'
+    source: ADR-0053 | contracts/satellite/ai.yaml#listAiInsights
   layout:
     template: split
     regions:
@@ -7801,18 +8343,13 @@ screens:
   states:
     loading: The anomaly detection list.
     error: Could not load. Names which read failed and leaves the anomaly detection untouched.
-    emptyFirstRun: No anomaly detection yet. Carries the create action; distinct from a filter that matched
-      nothing.
+    emptyFirstRun: No anomaly detection yet. Offers no create action — this screen declares no operation
+      that makes one; distinct from a filter that matched nothing.
     emptyNoResults: The filter narrowed it and the anomaly detection are still there. Names the active
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
   apis:
-  - operationId: listAnalyticsAnomalies
-    contract: reporting
-    purpose: Anomalies, with severity
-    trigger: onLoad
-    provenance: board reading, 19 September 2026
   - operationId: listAiInsights
     contract: ai
     purpose: Insights and anomalies
@@ -8019,9 +8556,10 @@ screens:
       slot: publish
       components:
       - kind: primaryButton
-        label: Revenue
+        label: Net revenue
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 116 §Support
           forecasts for
+        notes: '(CHG-FIN-002: never a bare "Revenue")'
       - kind: secondaryButton
         label: Ticket Sales
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 116 §Support
@@ -8095,6 +8633,11 @@ screens:
     params:
     - name: versionId
       from: navigation
+  notes: '**Measure names, not "Revenue"** (decided 2 October 2026, Chinmay; CHG-FIN-002; BOARDREQ MOM-2758..2761).
+    Takings (money taken less money paid back, a cash-control figure), Gross sales (before discounts,
+    excluding VAT), Net revenue (gross sales less discounts and refunds), Recognised revenue and Deferred
+    revenue are different numbers and never share a label; a tile takes its label from the seeded KPI
+    it is bound to (`ReportingSystemKpi`).'
 - id: ANL-058
   name: AI Recommendation & Next-Best-Action Center
   module: Analytics
@@ -8229,6 +8772,14 @@ screens:
       - kind: textField
         label: Whether recommendation was accepted
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 118 §Capture
+      - kind: dataTable
+        label: Decisions
+        operation: searchAiDecisions
+        provenance: contract ai.yaml GET /decision-records; wiring fix, 2 October 2026
+      - kind: dataTable
+        label: Interactions
+        operation: listAiInteractions
+        provenance: contract ai.yaml GET /interactions; wiring fix, 2 October 2026
   states:
     loading: The insight history evidence configuration as saved.
     error: Could not load. Names which read failed and leaves the insight history evidence untouched.
@@ -8252,6 +8803,16 @@ screens:
     purpose: Review, accept, reject or mark an insight actioned
     trigger: onAction
     provenance: build, 29 September 2026
+  - operationId: searchAiDecisions
+    contract: ai
+    purpose: The decision records behind each insight
+    trigger: onLoad
+    provenance: wiring fix, 2 October 2026 (CHG-WIR-012)
+  - operationId: listAiInteractions
+    contract: ai
+    purpose: Who asked and what was accessed
+    trigger: onLoad
+    provenance: wiring fix, 2 October 2026 (CHG-WIR-012)
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-059
@@ -8300,18 +8861,18 @@ screens:
       columns can be bound. The columns are the pack''s own labels and are carried as text until the response
       shape exists.'
     source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 119 §Display
+  - operation: publishPromptTemplate
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-012): publishPromptTemplate (AI_APPROVE) is model governance
+      on the console (ADM-037); on a venue analytics screen prompts are read-only (design-notes correction
+      ai ANL-060).'
+    source: contracts/satellite/ai.yaml#publishPromptTemplate
   layout:
     template: split
     regions:
     - name: contentBody
       slot: collection
       components:
-      - kind: publishGate
-        impliedBy: publishPromptTemplate
-        notes: 'Declares `publishPromptTemplate`. **The gate names what the publish will affect before
-          it happens**: which tenants, venues or capabilities take the new version, and that the previous
-          one stays available to roll back to.'
-        provenance: check-screens publish rule, 29 September 2026
       - kind: dataTable
         label: Every analytics governance model
         columns:
@@ -8366,8 +8927,8 @@ screens:
   states:
     loading: The analytics governance model list.
     error: Could not load. Names which read failed and leaves the analytics governance model untouched.
-    emptyFirstRun: No analytics governance model yet. Carries the create action; distinct from a filter
-      that matched nothing.
+    emptyFirstRun: No analytics governance model yet. Offers no create action — this screen declares no
+      operation that makes one; distinct from a filter that matched nothing.
     emptyNoResults: The filter narrowed it and the analytics governance model are still there. Names the
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
@@ -8397,11 +8958,6 @@ screens:
     contract: ai
     purpose: The prompt registry
     trigger: onLoad
-    provenance: build, 29 September 2026
-  - operationId: publishPromptTemplate
-    contract: ai
-    purpose: Publish a prompt template version
-    trigger: onAction
     provenance: build, 29 September 2026
   - operationId: runAiEvaluation
     contract: ai
@@ -9122,56 +9678,68 @@ screens:
   purposeNote: Dashboards, reports and AI operate against a consistent governed business-data model rather
     than independently querying raw tables.
   pattern: listDetail
-  patternReason: the pack gives this screen a display directory (§Detect) and no metric row
+  patternReason: '`getSemanticModel` reads the model as a tree; the selection is a domain, dataset or
+    field (CHG-SOT-012).'
   purpose: Create the governed business layer between raw data and dashboards/AI. This is one of the most
     important technical screens in Board 10.
   gaps:
   - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 129 §Detect
+    why: '**No certification, owner, glossary or lineage on a dataset or field** (design-notes correction
+      ANL-066). The client asks for certified badges with owner, glossary and lineage; the model holds
+      none of them. Logged as a contract gap 2 October 2026 (CHG-SOT-016). The earlier gap ("operations
+      return no schema with described properties") was stale: `SemanticModel` is fully described.'
+    source: contracts/satellite/reporting.yaml#/components/schemas/SemanticModel
   layout:
     template: split
     regions:
     - name: contentBody
       slot: collection
       components:
+      - kind: treeNav
+        label: Domains, datasets and fields
+        bindsTo: SemanticModel.domains
+        operation: getSemanticModel
+        notes: 'Domain (code, name), then its datasets (name and **grain: what one row means**), then
+          their fields (label, data type, default aggregation, sensitive).'
+        provenance: contract reporting.yaml GET /semantic-model
       - kind: dataTable
-        label: Every semantic model business
+        label: Relationships
+        bindsTo: SemanticModel.relationships
         columns:
-        - Missing relationships
-        - Circular relationships
-        - Duplicate aggregation risk
-        - Invalid cardinality
-        - Broken references
-        bindsTo: null
-        operation: null
-        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 129 §Detect
+        - SemanticModel.relationships
+        operation: getSemanticModel
+        notes: From dataset, to dataset, cardinality. The pack's checks (missing, circular, duplicate
+          aggregation risk, invalid cardinality, broken references) flag rows here before publish.
+        provenance: contract reporting.yaml SemanticModel.relationships
     - name: contextPanel
       slot: selection
       components:
       - kind: detailPanel
-        label: The selected semantic model business
-        bindsTo: null
+        label: The model
+        bindsTo: SemanticModel
         columns:
-        - Missing relationships
-        - Circular relationships
-        - Duplicate aggregation risk
-        - Invalid cardinality
-        - Broken references
-        notes: 'The pack groups this record''s detail under its own headings: “Customer”, “Order”, “Ticket”,
-          “Admission”, “F&B Sale”.'
-        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 129 §Detect
+        - SemanticModel.version
+        - SemanticModel.publishedAt
+        - SemanticModel.domains
+        - SemanticModel.relationships
+        operation: getSemanticModel
+        provenance: contract reporting.yaml GET /semantic-model
+    - name: actionBar
+      slot: publish
+      components:
+      - kind: primaryButton
+        label: Publish model
+        operation: setSemanticModel
+        notes: A new version; reports and fields re-read it.
+        provenance: contract reporting.yaml PUT /semantic-model
   states:
-    loading: The semantic model business list.
-    error: Could not load. Names which read failed and leaves the semantic model business untouched.
-    emptyFirstRun: No semantic model business yet. Carries the create action; distinct from a filter that
-      matched nothing.
-    emptyNoResults: The filter narrowed it and the semantic model business are still there. Names the
-      active filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    loading: The semantic model.
+    error: Could not load. Names which read failed and leaves the model untouched.
+    emptyFirstRun: No model published yet. Offers Publish model (`setSemanticModel`); until then reports
+      read the seeded catalogue.
+    emptyNoResults: Nothing in the model matches the search. Names it and offers to clear it.
+    emptyNoAccess: Shown when the caller lacks `REPORT_VIEW_TENANT`, which `getSemanticModel` requires,
+      and names that permission.
   apis:
   - operationId: getSemanticModel
     contract: reporting
@@ -9201,6 +9769,22 @@ screens:
     page 129. 0 of 5 labels bound to a contract property; 13 of 30 pack bullets carried onto the screen
     — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
     the contracts rather than here.
+  overlays:
+  - id: confirmSetSemanticModel
+    component: confirmDialog
+    trigger: Publish model
+    body: '**Names what changes for report authors** (fields added, removed or renamed, relationships
+      changed) before the new version is published. Dismissing sends nothing.'
+    confirm:
+      label: Publish model
+      operation: setSemanticModel
+    dismiss:
+      label: Cancel
+      discards:
+      - domains
+      - relationships
+    provenance: contract reporting.yaml PUT /semantic-model
+  permission: REPORT_VIEW_TENANT
 - id: ANL-067
   name: Data Refresh, Pipeline & Data Health Monitor
   module: Analytics
@@ -9606,6 +10190,20 @@ screens:
       columns can be bound. The columns are the pack''s own labels and are carried as text until the response
       shape exists.'
     source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 133 §Monitor
+  - operation: listSecurityDetectionGovernance
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-001): listSecurityDetectionGovernance is access fraud analytics
+      (BO-253); this screen governs BI and analytics, whose data is the platform audit trail and AI usage
+      and interactions. An analytics governance read does not exist yet (contract gap CHG-WIR-004) (design-notes
+      correction venue-operations ANL-070).'
+    source: contracts/spine/access.yaml#listSecurityDetectionGovernance | contracts/spine/tenancy.yaml#listAuditRecords
+      | contracts/satellite/ai.yaml#getAiUsage
+  - operation: null
+    why: 'Contract gap recorded 2 October 2026 (CHG-WIR-004): No analytics governance read (report and
+      dataset access, sharing, sensitivity). **Closed 2 October 2026:** getAnalyticsGovernancePolicy and
+      setAnalyticsGovernancePolicy (CHG-CSA-021, DEC-225) hold the governance policies; bound here by
+      CHG-SOT-009. Field classification and governance exceptions still have no operation.'
+    source: contracts/spine/tenancy.yaml#listAuditRecords
   layout:
     template: split
     regions:
@@ -9635,6 +10233,85 @@ screens:
         bindsTo: null
         operation: null
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 133 §Monitor
+      - kind: dataTable
+        label: Audit trail
+        operation: listAuditRecords
+        provenance: contract tenancy.yaml GET /audit-records; wiring fix, 2 October 2026
+      - kind: detailPanel
+        label: AI usage
+        bindsTo: AiUsageReport
+        operation: getAiUsage
+        provenance: contract ai.yaml GET /usage; wiring fix, 2 October 2026
+      - kind: dataTable
+        label: AI interactions
+        operation: listAiInteractions
+        provenance: contract ai.yaml GET /interactions; wiring fix, 2 October 2026
+    - name: governancePolicy
+      slot: fields
+      components:
+      - kind: multiSelect
+        label: Masked fields
+        bindsTo: AnalyticsGovernancePolicy.masking
+        operation: setAnalyticsGovernancePolicy
+        notes: '`masking.maskedFields` as `schema.table.column`, picked from the semantic model''s sensitive
+          fields; `masking.unmaskedForPermissions` names who may see them unmasked. Masked before a value
+          leaves the query (ADR-0054).'
+        provenance: contract reporting.yaml PUT /analytics-governance-policy (CHG-CSA-021)
+        permission: REPORT_GOVERNANCE_MANAGE
+      - kind: multiSelect
+        label: Export formats allowed
+        bindsTo: AnalyticsGovernancePolicy.export
+        operation: setAnalyticsGovernancePolicy
+        notes: '`export.allowedFormats`; `export.personalDataNeedsPermission` (default on: an export carrying
+          personal data needs `REPORT_EXPORT_PII`) and `export.maxRows` beside it.'
+        provenance: contract reporting.yaml PUT /analytics-governance-policy (CHG-CSA-021)
+        permission: REPORT_GOVERNANCE_MANAGE
+      - kind: numberField
+        label: Keep report results and exports for (days)
+        bindsTo: AnalyticsGovernancePolicy.retention
+        operation: setAnalyticsGovernancePolicy
+        notes: '`retention.resultDays`; empty keeps them until the data-retention settings remove them
+          (ANL-050).'
+        provenance: contract reporting.yaml PUT /analytics-governance-policy (CHG-CSA-021)
+        permission: REPORT_GOVERNANCE_MANAGE
+      - kind: toggle
+        label: Allow external share links
+        bindsTo: AnalyticsGovernancePolicy.sharing
+        operation: setAnalyticsGovernancePolicy
+        notes: '`sharing.externalLinks` (default off) and `sharing.allowedDomains`, the only domains a
+          link may be sent to.'
+        provenance: contract reporting.yaml PUT /analytics-governance-policy (CHG-CSA-021)
+        permission: REPORT_GOVERNANCE_MANAGE
+      - kind: toggle
+        label: AI assistant may answer analytics questions
+        bindsTo: AnalyticsGovernancePolicy.aiAndApiAccess
+        operation: setAnalyticsGovernancePolicy
+        notes: '`aiAndApiAccess.aiAssistant` (default on, through the semantic layer only) and `aiAndApiAccess.publicApi`
+          (default off).'
+        provenance: contract reporting.yaml PUT /analytics-governance-policy (CHG-CSA-021)
+        permission: REPORT_GOVERNANCE_MANAGE
+      - kind: detailPanel
+        label: The policy in force
+        bindsTo: AnalyticsGovernancePolicy
+        columns:
+        - AnalyticsGovernancePolicy.masking
+        - AnalyticsGovernancePolicy.export
+        - AnalyticsGovernancePolicy.retention
+        - AnalyticsGovernancePolicy.sharing
+        - AnalyticsGovernancePolicy.aiAndApiAccess
+        - AnalyticsGovernancePolicy.updatedAt
+        operation: getAnalyticsGovernancePolicy
+        notes: 'A tenant that never set one reads the defaults: personal fields masked, personal-data
+          exports need `REPORT_EXPORT_PII`, no external sharing, AI and API access through the semantic
+          layer only. Shown as "Defaults" until saved.'
+        provenance: contract reporting.yaml GET /analytics-governance-policy (CHG-CSA-021)
+      - kind: primaryButton
+        label: Save governance policy
+        operation: setAnalyticsGovernancePolicy
+        notes: Replaces the whole policy; the confirmation names each section that changes. Needs `REPORT_GOVERNANCE_MANAGE`
+          (joined the vocabulary 2 October, CHG-FUP-007); shown only to its holders.
+        provenance: contract reporting.yaml PUT /analytics-governance-policy (CHG-CSA-021)
+        permission: REPORT_GOVERNANCE_MANAGE
     - name: contextPanel
       slot: selection
       components:
@@ -9665,17 +10342,43 @@ screens:
   states:
     loading: The analytics governance security list.
     error: Could not load. Names which read failed and leaves the analytics governance security untouched.
-    emptyFirstRun: No analytics governance security yet. Carries the create action; distinct from a filter
-      that matched nothing.
+    emptyFirstRun: No analytics governance security yet. Offers no create action — this screen declares
+      no operation that makes one; distinct from a filter that matched nothing.
     emptyNoResults: The filter narrowed it and the analytics governance security are still there. Names
       the active filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: 'Names the missing permission: reading the audit trail and the governance policy needs
+      `REPORT_VIEW_TENANT`, and changing the policy needs `REPORT_GOVERNANCE_MANAGE` (CHG-FUP-007); without
+      it the policy shows read-only and says who can change it. **Never an empty table** — that reads
+      as *there is no data* and sends somebody to support with the wrong question.'
   apis:
-  - operationId: listSecurityDetectionGovernance
-    contract: access
-    purpose: Security Analytics, AI Detection & Governance
+  - operationId: listAuditRecords
+    contract: tenancy
+    purpose: 'Changes to analytics objects: who did what, and when'
     trigger: onLoad
+    provenance: wiring fix, 2 October 2026 (CHG-WIR-001)
+  - operationId: getAiUsage
+    contract: ai
+    purpose: AI usage, cost and performance in analytics
+    trigger: onLoad
+    provenance: wiring fix, 2 October 2026 (CHG-WIR-001)
+  - operationId: listAiInteractions
+    contract: ai
+    purpose: Every AI prompt, response and action
+    trigger: onAction
+    provenance: wiring fix, 2 October 2026 (CHG-WIR-001)
+  - operationId: getAnalyticsGovernancePolicy
+    contract: reporting
+    purpose: 'The tenant''s analytics governance policy: masking, export, retention, sharing, AI and API
+      access'
+    trigger: onLoad
+    provenance: decided 2 October 2026, Chinmay, workbook Q225 (DEC-225, CHG-CSA-021); bound by CHG-SOT-009
+  - operationId: setAnalyticsGovernancePolicy
+    contract: reporting
+    purpose: Set the analytics governance policy (the whole policy is replaced)
+    trigger: onAction
+    invalidates:
+    - getAnalyticsGovernancePolicy
+    provenance: decided 2 October 2026, Chinmay, workbook Q225 (DEC-225, CHG-CSA-021); bound by CHG-SOT-009
   entryState:
     preloaded:
     - Dashboard Permissions
@@ -9692,6 +10395,29 @@ screens:
     page 133. 0 of 17 labels bound to a contract property; 24 of 56 pack bullets carried onto the screen
     — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
     the contracts rather than here.
+  overlays:
+  - id: confirmSetAnalyticsGovernancePolicy
+    component: confirmDialog
+    trigger: Save governance policy
+    body: '**Names what changes before it is saved**, section by section ("Exports of personal data will
+      need REPORT_EXPORT_PII; external share links switched off"). The whole policy is replaced; the semantic
+      layer applies it to every report, dashboard, export and natural-language answer at once. Dismissing
+      sends nothing.'
+    confirm:
+      label: Save governance policy
+      operation: setAnalyticsGovernancePolicy
+    dismiss:
+      label: Cancel
+      discards:
+      - masking
+      - export
+      - retention
+      - sharing
+      - aiAndApiAccess
+    provenance: contract reporting.yaml PUT /analytics-governance-policy (CHG-CSA-021)
+  notes: '**Governance policy bound 2 October 2026 (CHG-SOT-009).** Chinmay, workbook Q225: "Add a governance
+    policy operation (masking, export, retention, sharing, AI/API access)" (DEC-225). This screen edits
+    the one policy per tenant; ANL-047 shows its sharing and export parts beside report access.'
 - id: ANL-071
   name: AI Maturity & Learning
   module: Analytics
@@ -9898,3 +10624,269 @@ screens:
       - sourceSystem
       - dryRun
     provenance: 29 September pass (group A)
+- id: ANL-072
+  name: Finance Dashboard
+  module: Analytics
+  requiresModule: core
+  wave: 3
+  source:
+    pack: TICVAI Finance Backend Structure Reference v1.0.pdf
+    board: '1'
+    number: '1'
+    page: 106
+  implementation:
+    app: venue-management-web
+    route: /analytics/finance-dashboard-anl-072
+    component: apps/venue-management-web/src/routes/analytics/FinanceDashboard.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - ANL-021
+    exitTo:
+    - ANL-021
+    transitions:
+    - to: ANL-021
+      trigger: Back to Dashboard Library
+      provenance: 'decided 2 October 2026 (DEC-219, CHG-SOT-008): the Finance standard dashboard sits
+        in the reporting area'
+      back: true
+  density: compact
+  permission: LEDGER_VIEW
+  pattern: commandCentre
+  patternReason: 'the Finance standard dashboard of the reporting area (DI-721): seeded finance measures
+    over a period, not a population the screen lists'
+  purpose: 'The finance team''s one-glance position for one legal entity and one period: the six finance
+    measures as separate tiles, where the money stands, and the health of tax documents.'
+  purposeNote: '**One P16 Finance dashboard; Orders & Money (P08) shows a link card to it** (decided 2
+    October 2026, Chinmay, workbook Q219, BO-1081; DEC-219). DI-260''s content stands, its location moves
+    to the one reporting area (DI-721).'
+  layout:
+    template: dashboard
+    regions:
+    - name: contentBody
+      slot: filters
+      components:
+      - kind: selectField
+        label: Legal entity
+        operation: getKpiValues
+        notes: Required, first in the filter bar. It fixes the base currency, shown read-only beside it,
+          never offered as a choice (DI-211, DI-282).
+        provenance: design notes BO-1081 inputs; moved 2 October 2026 (DEC-219)
+      - kind: selectField
+        label: Venue
+        operation: getKpiValues
+        notes: Sends the scope as `scopePath`. Lists only the venues the signed-in user may see; a venue
+          manager arrives locked to their venue (DI-061, DI-248).
+        provenance: contract reporting.yaml GET /kpi-values
+      - kind: selectField
+        label: Product category
+        operation: getKpiValues
+        notes: The pack's "Attraction" filter is a product category under the venue, not a scope node
+          (decided 2 October 2026, DEC-218).
+        provenance: design notes BO-1081 decisions (DEC-218)
+      - kind: datePicker
+        label: Period
+        operation: getKpiValues
+        notes: Sends `period`. Month by default; day, week, month, quarter, fiscal year and a custom range
+          (DI-260, DI-263).
+        provenance: contract reporting.yaml GET /kpi-values
+    - name: tiles
+      slot: collection
+      components:
+      - kind: metricTile
+        label: Gross sales
+        bindsTo: KpiValue
+        columns:
+        - KpiValue.value
+        - KpiValue.comparison
+        - KpiValue.direction
+        operation: getKpiValues
+        notes: '`getKpiValues?kpiCodes=grossSales` for the chosen legal entity, venue and period, with
+          its as-of time; formula in `ReportingSystemKpi` (D-185 default, client finance sign-off pending;
+          CHG-FIN-007). Excluding VAT; service fees are not inside it and are footnoted as their own line
+          (decided 2 October 2026, DEC-217).'
+        provenance: contract reporting.yaml ReportingSystemKpi (CHG-FIN-007); moved from BO-1081, 2 October
+          2026 (DEC-219)
+      - kind: metricTile
+        label: Discounts
+        bindsTo: KpiValue
+        columns:
+        - KpiValue.value
+        - KpiValue.comparison
+        - KpiValue.direction
+        operation: getKpiValues
+        notes: '`getKpiValues?kpiCodes=discounts` for the chosen legal entity, venue and period, with
+          its as-of time; formula in `ReportingSystemKpi` (D-185 default, client finance sign-off pending;
+          CHG-FIN-007).'
+        provenance: contract reporting.yaml ReportingSystemKpi (CHG-FIN-007); moved from BO-1081, 2 October
+          2026 (DEC-219)
+      - kind: metricTile
+        label: Refunds
+        bindsTo: KpiValue
+        columns:
+        - KpiValue.value
+        - KpiValue.comparison
+        - KpiValue.direction
+        operation: getKpiValues
+        notes: '`getKpiValues?kpiCodes=refunds` for the chosen legal entity, venue and period, with its
+          as-of time; formula in `ReportingSystemKpi` (D-185 default, client finance sign-off pending;
+          CHG-FIN-007).'
+        provenance: contract reporting.yaml ReportingSystemKpi (CHG-FIN-007); moved from BO-1081, 2 October
+          2026 (DEC-219)
+      - kind: metricTile
+        label: Net revenue
+        bindsTo: KpiValue
+        columns:
+        - KpiValue.value
+        - KpiValue.comparison
+        - KpiValue.direction
+        operation: getKpiValues
+        notes: '`getKpiValues?kpiCodes=netRevenue` for the chosen legal entity, venue and period, with
+          its as-of time; formula in `ReportingSystemKpi` (D-185 default, client finance sign-off pending;
+          CHG-FIN-007). Gross sales less discounts and refunds.'
+        provenance: contract reporting.yaml ReportingSystemKpi (CHG-FIN-007); moved from BO-1081, 2 October
+          2026 (DEC-219)
+      - kind: metricTile
+        label: Recognised revenue
+        bindsTo: KpiValue
+        columns:
+        - KpiValue.value
+        - KpiValue.comparison
+        - KpiValue.direction
+        operation: getKpiValues
+        notes: '`getKpiValues?kpiCodes=recognisedRevenue` for the chosen legal entity, venue and period,
+          with its as-of time; formula in `ReportingSystemKpi` (D-185 default, client finance sign-off
+          pending; CHG-FIN-007).'
+        provenance: contract reporting.yaml ReportingSystemKpi (CHG-FIN-007); moved from BO-1081, 2 October
+          2026 (DEC-219)
+      - kind: metricTile
+        label: Deferred revenue
+        bindsTo: KpiValue
+        columns:
+        - KpiValue.value
+        - KpiValue.comparison
+        - KpiValue.direction
+        operation: getKpiValues
+        notes: '`getKpiValues?kpiCodes=deferredRevenue` for the chosen legal entity, venue and period,
+          with its as-of time; formula in `ReportingSystemKpi` (D-185 default, client finance sign-off
+          pending; CHG-FIN-007). The balance at period end.'
+        provenance: contract reporting.yaml ReportingSystemKpi (CHG-FIN-007); moved from BO-1081, 2 October
+          2026 (DEC-219)
+      - kind: metricTile
+        label: VAT collected
+        bindsTo: KpiValue
+        columns:
+        - KpiValue.value
+        - KpiValue.comparison
+        - KpiValue.direction
+        operation: getKpiValues
+        notes: '`getKpiValues?kpiCodes=taxCollected` for the chosen legal entity, venue and period, with
+          its as-of time; formula in `ReportingSystemKpi` (D-185 default, client finance sign-off pending;
+          CHG-FIN-007).'
+        provenance: contract reporting.yaml ReportingSystemKpi (CHG-FIN-007); moved from BO-1081, 2 October
+          2026 (DEC-219)
+      - kind: chart
+        label: Gross sales to net revenue
+        bindsTo: KpiValue
+        operation: getKpiValues
+        notes: 'The `waterfall` mark (CHG-FIN-007): Gross sales, minus Discounts, minus Refunds, equals
+          Net revenue, from the same seeded KPIs as the tiles. Never gross and net stacked in one bar.'
+        provenance: contract reporting.yaml DashboardTile.visualisation waterfall (CHG-FIN-007)
+    - name: contextPanel
+      slot: selection
+      components:
+      - kind: detailPanel
+        label: Where the money stands
+        bindsTo: UnifiedReconciliation
+        columns:
+        - UnifiedReconciliation.from
+        - UnifiedReconciliation.to
+        - UnifiedReconciliation.sources
+        - UnifiedReconciliation.variances
+        operation: getUnifiedReconciliation
+        notes: POS, gateway, bank, wallet and ledger, each with its total and count, then each variance
+          naming the two sources that disagree ("Gateway vs Ledger, short AED 500.00"). Shown as "Not
+          available with your access" without ledger access, never as zeros.
+        provenance: contract finance.yaml GET /reconciliation/unified
+      - kind: metricTile
+        label: Tax invoices issued
+        operation: listTaxInvoices
+        notes: Count for the legal entity and period.
+        provenance: contract finance.yaml GET /tax-invoices
+      - kind: metricTile
+        label: Credit memos
+        operation: listCreditMemos
+        notes: Count and value for the legal entity and period. "Credit memo", not "Tax credit note",
+          until the label is decided.
+        provenance: contract finance.yaml GET /credit-memos
+      - kind: metricTile
+        label: E-invoice transmissions failed
+        operation: listEInvoiceTransmissions
+        notes: '`status=failed`; red above zero and links to the transmission log.'
+        provenance: contract finance.yaml GET /e-invoicing/transmissions
+  states:
+    loading: The finance measures for the chosen legal entity and period.
+    error: Could not load. Names which read failed (the measures, the money position or the tax documents)
+      and leaves the others on screen.
+    emptyFirstRun: 'No postings for this period yet. Offers no create action: a dashboard has nothing
+      to create; it says which period is empty and offers the previous one.'
+    emptyNoResults: The venue or product category filter matched no sales in the period. Names the active
+      filter and offers to clear it.
+    emptyNoAccess: Shown when the caller lacks `LEDGER_VIEW`, which the money position and tax documents
+      require, and names that permission. **Never an empty table** — that reads as *there is no data*.
+  apis:
+  - operationId: getKpiValues
+    contract: reporting
+    purpose: The finance measures, with their as-of time
+    trigger: onLoad
+    provenance: moved from BO-1081, 2 October 2026 (DEC-219)
+  - operationId: getUnifiedReconciliation
+    contract: finance
+    purpose: Where the money stands
+    trigger: onLoad
+    provenance: moved from BO-1081, 2 October 2026 (DEC-219)
+  - operationId: listTaxInvoices
+    contract: finance
+    purpose: Tax invoices issued in the period
+    trigger: onLoad
+    provenance: moved from BO-1081, 2 October 2026 (DEC-219)
+  - operationId: listCreditMemos
+    contract: finance
+    purpose: Credit memos issued in the period
+    trigger: onLoad
+    provenance: moved from BO-1081, 2 October 2026 (DEC-219)
+  - operationId: listEInvoiceTransmissions
+    contract: finance
+    purpose: E-invoicing transmission failures
+    trigger: onLoad
+    provenance: moved from BO-1081, 2 October 2026 (DEC-219)
+  entryState:
+    params:
+    - name: legalEntityId
+      from: navigation
+    coldEntry: Resolves the legal entity from the caller's scope when none is passed; the Orders & Money
+      link card (P08) opens it with the venue's legal entity.
+  wireframe:
+    status: notStarted
+    board: wireframes/P16 Venue Analytics.dc.html#anl-072
+    workshopBoard: wireframes/WS163 TICVAI Finance Backend Structure Reference v1.0 Board 1.dc.html#bo-1081
+    note: The client's workshop frame for this dashboard is the one drawn for BO-1081 (the same pack,
+      board 1, number 1), whose content ANL-072 carries since DEC-219 (CHG-SOT-008; CHG-GTB-006).
+  notes: '**Issued 2 October 2026 (CHG-SOT-008, DEC-219).** The Finance standard dashboard of the one
+    reporting area (DI-721), carrying DI-260''s content from BO-1081, which becomes a link card on Orders
+    & Money (P08, the back-office agent''s change). The design notes of BO-1081 (finance-insights) apply
+    here in full: tile order, definitions, the money-position sentence, tax-document counts and freshness.
+    **Measure names, not "Revenue"** (CHG-FIN-002): Gross sales, Net revenue, Recognised revenue and Deferred
+    revenue never share a label, and the tiles never bind `takings`. **One reporting area, one set of
+    numbers** (CHG-FIN-006): this screen reads the same seeded KPIs as the till report (POS-008) and the
+    back-office reports for the same scope, period and as-of time, computes no total of its own and shows
+    the as-of time on every figure. **The guard is the frontend comparison test TEST-SAME-NUMBERS** (decided
+    2 October 2026, DEC-559; `docs/active/block-a-extra-tasks.json`), which compares takings, gross sales,
+    net revenue and refunds here with POS-008 and the back office for the same period and scope, and fails
+    when they differ.'
+  gaps:
+  - operation: null
+    why: '**No service-fee measure is seeded.** DEC-217 shows fees as their own line under Gross sales
+      with a footnote; `ReportingSystemKpi` has no fee code yet, so the line is drawn "Definition pending"
+      until finance names one (D-185).'
+    source: contracts/satellite/reporting.yaml#/components/schemas/ReportingSystemKpi

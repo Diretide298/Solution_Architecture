@@ -342,55 +342,6 @@
    }
   }
  },
- "PartnerQuote": {
-  "type": "object",
-  "x-ticvai-persistence": "subscription.partner_quote",
-  "description": "**Drafted 4 September.** A priced offer to a partner, with an expiry. **Not the same as a procurement quotation** - `inventory.quotation` is what a supplier offers this venue, and this is what this venue offers a reseller.",
-  "required": [
-   "id"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "partnerId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "agreementId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "currency": {
-    "type": "string",
-    "x-ticvai-persisted": false,
-    "description": "**Not stored on the row.** Currency is region-scoped and resolves from the scope walk (ADR-0018); a quote that carries its own copy is a quote that disagrees with the region the moment one of them changes."
-   },
-   "totalMinor": {
-    "type": "integer"
-   },
-   "state": {
-    "type": "string",
-    "enum": [
-     "draft",
-     "sent",
-     "accepted",
-     "declined",
-     "expired"
-    ]
-   },
-   "validUntil": {
-    "type": "string",
-    "format": "date-time",
-    "description": "**Stored, not calculated** - an offer whose expiry moves when you read it is not an offer."
-   },
-   "createdAt": {
-    "type": "string",
-    "format": "date-time"
-   }
-  }
- },
  "Plan": {
   "x-ticvai-persistence": "subscription.plan + subscription.plan_module + subscription.plan_limit",
   "description": "**A plan's modules and limits are rows, keyed on `plan_id`.** `licensedModules` and `limits` are required on every plan, and `subscription.plan` alone had no column for either — so the licence position, the downgrade check and every module gate had nothing to read. `plan_module` holds one row per licensed `ModuleKey`; `plan_limit` one row per `EntitlementLimit`. Both belong to the plan version the row is, so a subscriber on an earlier version keeps the modules and limits they were sold.",

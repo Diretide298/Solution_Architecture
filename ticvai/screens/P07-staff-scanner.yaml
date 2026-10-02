@@ -472,9 +472,6 @@ screens:
     inferred: true
     fromFlows: true
     transitions:
-    - to: SCN-007
-      trigger: A school party of forty arrives on one booking
-      provenance: flow F61 step 4→5
     - to: SCN-014
       trigger: Syncs the journal when signal returns
       provenance: flow F06 step 5→6, F19 step 3→4
@@ -508,6 +505,10 @@ screens:
       - rightId
       provenance: derived — SCN-011 declares entryState.params rightId and SCN-003 holds rightId, so an
         edge into it carries them
+    - to: SCN-007
+      trigger: A school party of forty arrives on one booking
+      provenance: flow F61 step 4→5
+      operation: validateAccess
   notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written. **Absorbed SCN-004, SCN-005, SCN-006, SCN-010, SCN-012 on 18 August.** A scanner
     is one screen the device sits on all day, and an outcome is a state of it — **routing to `/access/admitted`
@@ -2240,9 +2241,9 @@ screens:
         permission: ACCESS_DIRECTION_SET
         notes: '**Live, with a specific permission, and logged** (decided 2 October 2026, Chinmay, critical
           set 1, BO-230: "Live direction switch with permission, logged; R221 amended"; DEC-255; CHG-CSP-032).
-          The permission is ACCESS_DIRECTION_SET, the operation''s own (CHG-FUP-006; CHG-CLN-013).
-          Entry to Exit or back, with a reason and an optional time it takes effect; the gate mode change
-          records the from and to direction. Hidden without the permission.'
+          The permission is ACCESS_DIRECTION_SET, the operation''s own (CHG-FUP-006; CHG-CLN-013). Entry
+          to Exit or back, with a reason and an optional time it takes effect; the gate mode change records
+          the from and to direction. Hidden without the permission.'
         provenance: contract access.yaml PUT /access-points/{accessPointId}/direction
   states:
     loading: The gate mode list.

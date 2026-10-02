@@ -56,25 +56,6 @@
   "requestBody": "CreateCampaignRequest",
   "responds": "Campaign"
  },
- "createInvitationCampaign": {
-  "method": "POST",
-  "path": "/invitation-campaigns",
-  "contract": "marketing-crm",
-  "summary": "A quota-bounded, addressed invitation",
-  "permission": "MARKETING_MANAGE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "InvitationCampaign",
-  "responds": "InvitationCampaign"
- },
  "decideAiInsight": {
   "method": "POST",
   "path": "/insights/{insightId}/decide",
@@ -119,6 +100,25 @@
   "parameters": [],
   "requestBody": null,
   "responds": "CampaignPerformance"
+ },
+ "launchCampaign": {
+  "method": "POST",
+  "path": "/campaigns/{campaignId}/launch",
+  "contract": "marketing-crm",
+  "summary": "Launch or schedule a campaign",
+  "permission": "MARKETING_SEND",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
  },
  "listCampaignCalendarTimeline": {
   "method": "GET",
@@ -266,35 +266,6 @@
   "requestBody": null,
   "responds": "Page"
  },
- "listSegments": {
-  "method": "GET",
-  "path": "/segments",
-  "contract": "marketing-crm",
-  "summary": "List segments",
-  "permission": "MARKETING_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "search",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- },
  "proposeMarketingContent": {
   "method": "POST",
   "path": "/ai/content-drafts",
@@ -314,25 +285,6 @@
   "requestBody": null,
   "responds": null
  },
- "recordTouchPoint": {
-  "method": "POST",
-  "path": "/attribution/touches",
-  "contract": "marketing-crm",
-  "summary": "Record a marketing touch",
-  "permission": "MARKETING_MANAGE",
-  "offlineCapable": false,
-  "conflictPolicy": "append",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "TouchPoint",
-  "responds": "TouchPoint"
- },
  "requestSuggestion": {
   "method": "POST",
   "path": "/ai/suggestions",
@@ -351,6 +303,25 @@
   ],
   "requestBody": null,
   "responds": "Suggestion"
+ },
+ "testSendCampaign": {
+  "method": "POST",
+  "path": "/campaigns/{campaignId}/test-send",
+  "contract": "marketing-crm",
+  "summary": "Send a test to named recipients",
+  "permission": "MARKETING_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
  },
  "updateCampaign": {
   "method": "PATCH",

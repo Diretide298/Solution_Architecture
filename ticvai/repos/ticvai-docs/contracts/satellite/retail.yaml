@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Retail
   version: 0.1.0
-  x-ticvai-screen-count: 18
+  x-ticvai-screen-count: 22
   x-ticvai-tier: satellite
   x-ticvai-module: "6 — Retail POS"
   x-ticvai-requirements: 78
@@ -117,6 +117,8 @@ paths:
         schema: { type: string, format: uuid }
     post:
       operationId: collectMerchandiseReservation
+      x-ticvai-consumed-by:
+        - "P06 EMP-068 Reservation, Allocation & Omnichannel Inventory"
       x-ticvai-audience: [staff]
       summary: The guest picked it up
       description: >
@@ -151,6 +153,8 @@ paths:
         schema: { type: string, format: uuid }
     post:
       operationId: cancelMerchandiseReservation
+      x-ticvai-consumed-by:
+        - "P06 EMP-068 Reservation, Allocation & Omnichannel Inventory"
       x-ticvai-audience: [staff]
       summary: Release a reservation
       description: >
@@ -233,12 +237,16 @@ paths:
         - "P01 WEB-042 Retail & Shop and Drop"
         - "P02 GST-026 Retail / Merchandise"
         - "P04 POS-002 Sell — Ticket Catalogue"
-        - "P04 POS-023 Sell — Merchandise"
         - "P05 KSK-017 Shop"
         - "P08 BO-007 Product Directory"
-        - "P08 BO-044 F&B Outlets"
         - "P08 BO-048 Retail Products"
         - "P08 BO-116 Merchandising & Product Presentation"
+      # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
+      # or staff token is still accepted. `{}` makes the credential optional.
+      security:
+      - {}
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-audience: [staff, guest]
       x-ticvai-read-routing: replica
       summary: List merchandise
@@ -426,14 +434,19 @@ paths:
       operationId: lookupMerchandise
       x-ticvai-consumed-by:
         - "P01 WEB-033 Shop"
-        - "P01 WEB-042 Retail & Shop and Drop"
         - "P02 GST-026 Retail / Merchandise"
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-023 Sell — Merchandise"
         - "P05 KSK-017 Shop"
+        - "P06 EMP-062 Store Stock & SKU Availability"
         - "P06 EMP-069 Barcode, RFID, Serialized Stock & Traceability"
-        - "P08 BO-048 Retail Products"
         - "P08 BO-114 Variants, Attributes, Barcode & RFID Management"
+      # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
+      # or staff token is still accepted. `{}` makes the credential optional.
+      security:
+      - {}
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-audience: [staff, guest]
       x-ticvai-read-routing: primary
       summary: Price and stock check by barcode
@@ -634,6 +647,7 @@ paths:
       x-ticvai-consumed-by:
         - "P04 POS-005 Payment"
         - "P04 POS-011 Returns, Refunds & Exchanges"
+        - "P08 BO-021 Order Search"
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: Find a sale from a receipt
@@ -703,8 +717,8 @@ paths:
       operationId: reprintReceipt
       x-ticvai-consumed-by:
         - "P04 POS-005 Payment"
-        - "P04 POS-007 Close Shift"
         - "P04 POS-026 Receipt & Reprint"
+        - "P04 POS-030 Sales Journal"
       x-ticvai-audience: [staff]
       summary: Reprint or resend a receipt
       tags: [sale]
@@ -793,7 +807,6 @@ paths:
     post:
       operationId: createRetailReturn
       x-ticvai-consumed-by:
-        - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-011 Returns, Refunds & Exchanges"
       x-ticvai-audience: [staff]
       summary: Accept a return
@@ -924,6 +937,7 @@ paths:
       x-ticvai-consumed-by:
         - "P04 POS-011 Returns, Refunds & Exchanges"
         - "P08 BO-044 F&B Outlets"
+        - "P08 BO-143 Retail Global Settings & Controls"
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: Read the retail return policy
@@ -949,6 +963,7 @@ paths:
       operationId: setReturnPolicy
       x-ticvai-consumed-by:
         - "P08 BO-044 F&B Outlets"
+        - "P08 BO-143 Retail Global Settings & Controls"
       x-ticvai-audience: [staff]
       x-ticvai-config-scope: outlet   # CF-138: F&B and retail configure at outlet, decided 18 August
       summary: Set the retail return policy
@@ -995,7 +1010,7 @@ paths:
     get:
       operationId: getOutletStock
       x-ticvai-consumed-by:
-        - "P08 BO-044 F&B Outlets"
+        - "P06 EMP-062 Store Stock & SKU Availability"
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: primary
       summary: Stock across an outlet
@@ -1037,6 +1052,8 @@ paths:
   /shop-and-drop:
     post:
       operationId: createShopAndDrop
+      x-ticvai-consumed-by:
+        - "P04 POS-005 Payment"
       x-ticvai-audience: [staff, service]
       security:
         - bearerAuth: []
@@ -1131,8 +1148,12 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-042 Retail & Shop and Drop"
         - "P02 GST-062 Shop & Drop Collection"
+        - "P04 POS-012 Omnichannel Order & Fulfilment Center"
         - "P05 KSK-011 Collect a booking"
         - "P08 BO-143 Retail Global Settings & Controls"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-audience: [staff, guest]
       summary: Find a guest's dropped goods
       description: >
@@ -1181,6 +1202,8 @@ paths:
         schema: { type: string, format: uuid }
     post:
       operationId: collectShopAndDrop
+      x-ticvai-consumed-by:
+        - "P04 POS-012 Omnichannel Order & Fulfilment Center"
       x-ticvai-audience: [staff]
       summary: Hand the goods over
       description: >
@@ -1241,7 +1264,9 @@ paths:
         - "P04 POS-012 Omnichannel Order & Fulfilment Center"
         - "P05 KSK-017 Shop"
         - "P06 EMP-068 Reservation, Allocation & Omnichannel Inventory"
-        - "P08 BO-044 F&B Outlets"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-audience: [staff, guest]
       summary: Reserve an item for collection
       description: >
@@ -1517,9 +1542,10 @@ components:
 
 
         **Which limit field a kind uses.** `refundThreshold` uses `thresholdAmount`. `ageCheck`
-        uses `minimumAgeYears`. **Not yet decided:** whether a `discountLimit` or a
-        `priceOverride` limit is an amount or a percentage, and whether a `managerOverride` has a
-        limit at all. Until that is decided those kinds carry no limit field of their own.'
+        uses `minimumAgeYears`. **A `discountLimit` or a `priceOverride` limit is a percentage or an
+        amount, the venue choosing per limit** (Chinmay, 2 October, workbook Q195; CHG-CSA-019):
+        `limitKind` says which, and the limit is `thresholdAmount` or `thresholdPercent`. Whether a
+        `managerOverride` has a limit at all is still undecided; it carries none.'
       required:
       - id
       properties:
@@ -1544,7 +1570,23 @@ components:
           allOf:
           - $ref: '../shared/common.yaml#/components/schemas/Money'
           nullable: true
-          description: The amount above which `requiresPermission` is needed. For `refundThreshold`.
+          description: The amount above which `requiresPermission` is needed. For `refundThreshold`, and for a
+            `discountLimit` or `priceOverride` whose `limitKind` is `amount`.
+        limitKind:
+          type: string
+          nullable: true
+          enum:
+          - percent
+          - amount
+          description: For `discountLimit` and `priceOverride` (workbook Q195; CHG-CSA-019). `percent` uses
+            `thresholdPercent`; `amount` uses `thresholdAmount`. The venue chooses per limit.
+        thresholdPercent:
+          type: number
+          minimum: 0
+          maximum: 100
+          nullable: true
+          description: The percentage of the line or basket above which `requiresPermission` is needed, where
+            `limitKind` is `percent`.
         minimumAgeYears:
           type: integer
           minimum: 0

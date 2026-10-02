@@ -1,5 +1,5 @@
 id: LLD-Table
-title: Table — 11 transitions
+title: Table — 12 transitions
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/04-lifecycles.yaml
 source: states/table.yaml
@@ -31,17 +31,20 @@ transitions:
   to: needsClearing
   operation: createPayment
   trigger: cascade
-  guard: Paid and the party left
+  guard: Paid and the party left. Shown as **Table closed** (Chinmay, 2 October, workbook Q201; DI-336;
+    CHG-CSA-012)
 - from: needsClearing
   to: free
   operation: clearTable
   trigger: operation
-  guard: Cleared and reset
+  guard: '**Make available**, one tap on the tile (workbook Q201). Staff screens never say clean, clear
+    or reset'
 - from: free
   to: reserved
   operation: createReservation
   trigger: cascade
-  guard: Held for a booking
+  guard: A booking names this table, or a booking pre-allocated to it starts within the outlet's `FnbReservationPolicy.reservedLeadMinutes`
+    (Chinmay, 2 October, workbook Q202; DI-689; CHG-CSA-012)
 - from: reserved
   to: seated
   operation: claimTableSession
@@ -57,6 +60,12 @@ transitions:
   operation: clearTable
   trigger: operation
   guard: Damaged, or the section is closed
+- from: free
+  to: outOfService
+  operation: setTableLayout
+  trigger: operation
+  guard: '"Remove table" on the layout editor: a table is never deleted, it goes out of service (Chinmay,
+    2 October, workbook Q67; CHG-CSA-012)'
 - from: outOfService
   to: free
   operation: clearTable
@@ -69,4 +78,7 @@ transitions:
   trigger: operation
   guard: Party left without ordering
 notes: '`needsClearing` exists so a paid table is not immediately sellable. Seating a new party at an
-  uncleared table is the complaint that follows from collapsing this state into `free`.'
+  uncleared table is the complaint that follows from collapsing this state into `free`. **The client''s
+  names** (DI-336; Chinmay, 2 October, workbook Q201; CHG-CSA-012): `free` is Available, `ordered` is
+  Ordered, `needsClearing` is **Table closed**, a short state ended by **Make available**, and `reserved`
+  is Reserved; there is no cleaning status, and staff screens avoid "clean", "clear" and "reset".'

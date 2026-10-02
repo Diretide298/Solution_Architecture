@@ -1,5 +1,5 @@
 id: LLD-fnb
-title: fnb — 120 operations
+title: fnb — 131 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -380,6 +380,20 @@ operations:
   - cache:idempotency
   - fnb.reservation_table
   - fnb.table_reservation
+- operation: createTableReservationForGuest
+  verb: POST
+  path: /outlets/{outletId}/table-reservations
+  scope: venue
+  permission: ORDER_CREATE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - fnb.reservation_table
+  - fnb.table_reservation
+  writes:
+  - fnb.reservation_table
+  - fnb.table_reservation
 - operation: enterCountLine
   verb: POST
   path: /stock-counts/{countId}/lines
@@ -447,6 +461,17 @@ operations:
   - fnb.service_order
   - fnb.table_session
   - orders.payment
+  writes: []
+- operation: getCourseRules
+  verb: GET
+  path: /outlets/{outletId}/course-rules
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: true
+  reads:
+  - fnb.course_rule
   writes: []
 - operation: getFnbDeliveryPolicy
   verb: GET
@@ -516,6 +541,7 @@ operations:
   permission: null
   audience:
   - guest
+  - staff
   offline: true
   reads:
   - fnb.modifier_group
@@ -547,6 +573,27 @@ operations:
   - fnb.corrective_action
   - fnb.temperature_log
   writes: []
+- operation: getKitchenRoutingRules
+  verb: GET
+  path: /outlets/{outletId}/kitchen-routing
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: true
+  reads:
+  - fnb.kitchen_routing_rule
+  writes: []
+- operation: getKitchenSla
+  verb: GET
+  path: /outlets/{outletId}/kitchen-sla
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: true
+  reads: []
+  writes: []
 - operation: getMenu
   verb: GET
   path: /menus/{menuId}
@@ -559,6 +606,17 @@ operations:
   - fnb.menu
   - fnb.menu_item
   - fnb.menu_section
+  writes: []
+- operation: getPrepSheetTemplate
+  verb: GET
+  path: /prep-sheet-template
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - fnb.prep_sheet_template
   writes: []
 - operation: getProductionRun
   verb: GET
@@ -598,6 +656,17 @@ operations:
   - fnb.service_order
   - fnb.service_order_line
   - fnb.table_visit
+  writes: []
+- operation: getWasteApprovalPolicy
+  verb: GET
+  path: /waste-approval-policy
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - fnb.waste_approval_policy
   writes: []
 - operation: holdCourse
   verb: POST
@@ -1043,6 +1112,16 @@ operations:
   reads:
   - fnb.kitchen_ticket
   writes: []
+- operation: printPrepSheet
+  verb: POST
+  path: /production-plans/{planId}/prep-sheet
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: prioritiseKitchenTicket
   verb: POST
   path: /kitchen/tickets/{ticketId}/prioritise
@@ -1453,6 +1532,18 @@ operations:
   writes:
   - cache:idempotency
   - fnb.menu_item
+- operation: setKitchenRoutingRules
+  verb: PUT
+  path: /outlets/{outletId}/kitchen-routing
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - fnb.kitchen_routing_rule
+  writes:
+  - fnb.kitchen_routing_rule
 - operation: setKitchenSla
   verb: PUT
   path: /outlets/{outletId}/kitchen-sla
@@ -1496,6 +1587,17 @@ operations:
   - cache:idempotency
   - fnb.kitchen_ticket
   - platform.outbox
+- operation: setMenuItemDailyCount
+  verb: PUT
+  path: /menu-items/{itemId}/daily-count
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - fnb.menu_item
+  writes: []
 - operation: setMenuSections
   verb: PUT
   path: /menus/{menuId}/sections
@@ -1525,6 +1627,18 @@ operations:
   reads:
   - fnb.outlet_template
   writes: []
+- operation: setPrepSheetTemplate
+  verb: PUT
+  path: /prep-sheet-template
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - fnb.prep_sheet_template
+  writes:
+  - fnb.prep_sheet_template
 - operation: setRecipe
   verb: PUT
   path: /recipes
@@ -1632,6 +1746,18 @@ operations:
   - fnb.temperature_checkpoint
   writes:
   - fnb.temperature_checkpoint
+- operation: setWasteApprovalPolicy
+  verb: PUT
+  path: /waste-approval-policy
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - fnb.waste_approval_policy
+  writes:
+  - fnb.waste_approval_policy
 - operation: signCorrectiveAction
   verb: POST
   path: /food-safety/corrective-actions/{actionId}/sign

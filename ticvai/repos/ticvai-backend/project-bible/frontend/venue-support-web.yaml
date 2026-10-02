@@ -21,10 +21,11 @@ packages:
 - api-client
 contracts:
 - ai
+- assets
 - finance
 - identity
 - marketing-crm
-- queue
+- orders
 - reporting
 - white-label
 deployment:

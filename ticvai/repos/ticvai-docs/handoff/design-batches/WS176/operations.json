@@ -144,6 +144,19 @@
   "requestBody": null,
   "responds": "RegionSettings"
  },
+ "getSeatMap": {
+  "method": "GET",
+  "path": "/seat-maps/{seatMapId}",
+  "contract": "seating",
+  "summary": "Read a seat map with its structure",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "SeatMap"
+ },
  "getVenueSettings": {
   "method": "GET",
   "path": "/venues/{venueId}/settings",
@@ -169,19 +182,6 @@
   "parameters": [],
   "requestBody": null,
   "responds": "VenueSettings"
- },
- "getWorkstationHealth": {
-  "method": "GET",
-  "path": "/workstations/{workstationId}/health",
-  "contract": "tenancy",
-  "summary": "A score a manager can sort by, and what is dragging it down",
-  "permission": "DEVICE_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [],
-  "requestBody": null,
-  "responds": null
  },
  "listAccessReviewCampaigns": {
   "method": "GET",
@@ -331,6 +331,35 @@
   "parameters": [],
   "requestBody": null,
   "responds": "AuthorisationPolicyVersion"
+ },
+ "listConfigurationProfiles": {
+  "method": "GET",
+  "path": "/configuration-profiles",
+  "contract": "tenancy",
+  "summary": "Every configuration profile, at its current version",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
  },
  "listDenominations": {
   "method": "GET",

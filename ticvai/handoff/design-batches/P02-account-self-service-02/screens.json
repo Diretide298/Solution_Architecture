@@ -36,15 +36,8 @@
   "density": "comfortable",
   "offline": false,
   "pattern": "statusTracker",
-  "patternReason": "`getWaiverStatus` reads one record and nothing reads a population — the screen is about that one thing",
+  "patternReason": "Refund and resale of one order: its state and what happens next (CHG-SGU-020)",
   "purpose": "**A guest could buy a ticket and not ask for their money back.** `createRefundRequest` and `createResaleListing` were back-office only, so every refund began as a phone call.",
-  "gaps": [
-   {
-    "operation": "getWaiverStatus",
-    "why": "**`getWaiverStatus` declares its response inline**, so the component that shows it names fields but binds to no schema. The contract should name the shape.",
-    "source": "contract marketing-crm.yaml GET /guests/{subjectId}/waiver-status"
-   }
-  ],
   "layout": {
    "template": "detail",
    "regions": [
@@ -63,18 +56,6 @@
        "label": "Create resale listing",
        "operation": "createResaleListing",
        "provenance": "contract orders.yaml POST /resale-listings"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "Waiver status",
-       "operation": "getWaiverStatus",
-       "notes": "Shows `isSatisfied`, `missingFormIds`, `expiringWithinDays` from `getWaiverStatus`'s inline response. **The response has no named schema**, so this cannot bind until the contract names one.",
-       "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}/waiver-status"
       }
      ]
     }
@@ -100,13 +81,6 @@
     "contract": "orders",
     "purpose": "List an entitlement for resale",
     "trigger": "onAction"
-   },
-   {
-    "operationId": "getWaiverStatus",
-    "contract": "marketing-crm",
-    "purpose": "Whether this guest may be issued a ticket that requires a wa",
-    "trigger": "onLoad",
-    "offline": false
    }
   ],
   "entryState": {
@@ -241,7 +215,7 @@
   "offline": false,
   "pattern": "statusTracker",
   "patternReason": "`getFacePassEnrolment` reads one record and nothing reads a population — the screen is about that one thing",
-  "purpose": "🔴 **Biometric enrolment had no guest-facing consent step.** `enrolFacePass` was callable by a guest and reachable from nowhere, which means enrolment was happening at a desk with somebody else operat",
+  "purpose": "Register or remove my face for gate entry on my pass, or a linked child's with my consent as guardian.",
   "layout": {
    "template": "detail",
    "regions": [
@@ -258,7 +232,7 @@
         "DelegatedAccess.delegationKind"
        ],
        "operation": "listDelegations",
-       "notes": "**The first step of enrolment** (decided 28 September, audit R205): the signed-in guest, then each child linked to them — the `heldByThisGuest` grants whose `delegationKind` is `familyMember` or `primaryHolder`. The chosen person's id is the `subjectId` that `enrolFacePass` sends. **No guardian field is collected**: the server records the caller as guardian.",
+       "notes": "**The first step of enrolment** (decided 28 September, audit R205): the signed-in guest, then each child linked to them — the `heldByThisGuest` grants whose `delegationKind` is `familyMember` or `primaryHolder`. The chosen person's id is the `subjectId` that `enrolFacePass` sends. **No guardian field is collected**: the server records the caller as guardian. **Children may be enrolled with guardian consent on the venue's consent form** (decided by Chinmay, 2 October 2026; DEC-237, superseding the batch-4 \"not available for under-18s\" default, DEC-138): the minor age is set per country (`RegionSettings.minorAgeThreshold`) and the venue can switch minors off (`VenueSettings.biometrics.allowMinors`); a child is then listed as not available, and `enrolFacePass` answers 422 `minors-not-enrolled` (CHG-SGU-004).",
        "provenance": "contract identity.yaml GET /guests/{subjectId}/delegations"
       },
       {
@@ -314,7 +288,7 @@
     "id": "formEnrolFacePass",
     "component": "modal",
     "trigger": "Enrol face pass",
-    "body": "**Collects what `enrolFacePass` sends before it is called.** Required: `subjectId`, `entitlementId`, `template`, `capturedAt`, `source`, `consent`. `subjectId` is the person picked in **Who is this for** (the guest or a linked child), not typed; **no guardian is asked for** — the server sets `consent.guardianSubjectId` to the signed-in guest (decided 28 September, audit R205). Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `enrolFacePass` sends before it is called.** Required: `subjectId`, `entitlementId`, `template`, `capturedAt`, `source`, `consent`. `subjectId` is the person picked in **Who is this for** (the guest or a linked child), not typed; **no guardian is asked for** — the server sets `consent.guardianSubjectId` to the signed-in guest (decided 28 September, audit R205). Dismissing sends nothing; the screen behind is unchanged. **Consent is the venue's own consent form** (`VenueSettings.biometrics.consentFormId`), shown before the camera opens; for a child the signed-in guest consents as guardian, and the form version is recorded with the enrolment (CHG-SGU-004). **Where:** in this app, at a ticket or annual-pass counter, or at a self-service kiosk with the consent shown (`enrolmentChannel` selfServiceKiosk); never at a turnstile (CHG-CSP-021) (CHG-SGU-021).",
     "confirm": {
      "label": "Enrol face pass",
      "operation": "enrolFacePass"
@@ -525,7 +499,7 @@
        "kind": "secondaryButton",
        "label": "Transfer wallet balance",
        "operation": "transferWalletBalance",
-       "provenance": "contract retail.yaml POST /wallets/{walletId}/transfer"
+       "provenance": "contract wallet.yaml POST /wallets/{walletId}/transfer"
       },
       {
        "kind": "secondaryButton",
@@ -620,7 +594,7 @@
     "verified": "2026-09-28",
     "match": "exact",
     "view": "Account → All screens → Wave 2 → Payment methods",
-    "differences": "The Account → \"Payment methods\" row opens Engine settings instead of this screen."
+    "differences": "The Account → \"Payment methods\" row opens Engine settings instead of this screen. **The frame must open this screen** from Account → Payment methods; the prototype's link to Engine settings is a wiring slip (CHG-SGU-020)."
    }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
@@ -664,7 +638,7 @@
     "id": "formRedeemLoyaltyPoints",
     "component": "modal",
     "trigger": "Redeem loyalty points",
-    "body": "**How many points to spend.** The guest is the caller and the programme is the venue's; `redeemLoyaltyPoints` is sent with both, never typed.",
+    "body": "The reward and the points to spend; the guest is the caller, so no subject or programme is asked.",
     "confirm": {
      "label": "Redeem loyalty points",
      "operation": "redeemLoyaltyPoints"
@@ -672,14 +646,12 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "subjectId",
-      "programmeId",
       "points",
       "rewardId",
       "orderId"
      ]
     },
-    "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
+    "provenance": "corrected 2 October 2026 (CHG-SGU-020, design-notes correction)"
    }
   ],
   "_platform": {
@@ -766,14 +738,8 @@
        "provenance": "contract identity.yaml DELETE /auth/guest/session"
       },
       {
-       "kind": "secondaryButton",
-       "label": "Register guest device",
-       "operation": "registerGuestDevice",
-       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/devices"
-      },
-      {
        "kind": "destructiveButton",
-       "label": "Revoke guest device",
+       "label": "Stop notifications on this device",
        "operation": "revokeGuestDevice",
        "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/devices/{deviceId}"
       },
@@ -796,14 +762,10 @@
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every guest device",
+       "label": "My devices",
        "bindsTo": "GuestDevice",
        "columns": [
-        "GuestDevice.id",
-        "GuestDevice.subjectId",
         "GuestDevice.platform",
-        "GuestDevice.tokenFingerprint",
-        "GuestDevice.tokenRef",
         "GuestDevice.appVersion",
         "GuestDevice.osVersion",
         "GuestDevice.deviceModel",
@@ -813,7 +775,7 @@
         "GuestDevice.registeredAt"
        ],
        "operation": "listGuestDevices",
-       "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}/devices"
+       "provenance": "corrected 2 October 2026 (CHG-SGU-019, design-notes correction)"
       },
       {
        "kind": "detailPanel",
@@ -868,8 +830,8 @@
    {
     "operationId": "registerGuestDevice",
     "contract": "marketing-crm",
-    "purpose": "Trust this device",
-    "trigger": "onAction"
+    "purpose": "The app registers its push token silently at launch; never a button or a typed token",
+    "trigger": "background"
    },
    {
     "operationId": "revokeGuestDevice",
@@ -927,20 +889,6 @@
     "contract": "identity",
     "purpose": "Check the step-up code",
     "trigger": "onAction"
-   },
-   {
-    "operationId": "getMyIdentityVerification",
-    "contract": "identity",
-    "purpose": "Show the guest's ID verification status",
-    "trigger": "onLoad",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "submitGuestIdentityDocument",
-    "contract": "identity",
-    "purpose": "Upload an ID document for verification",
-    "trigger": "onAction",
-    "provenance": "build, 29 September 2026"
    }
   ],
   "entryState": {
@@ -980,31 +928,9 @@
   "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "overlays": [
    {
-    "id": "formRegisterGuestDevice",
-    "component": "modal",
-    "trigger": "Register guest device",
-    "body": "**Collects what `registerGuestDevice` sends before it is called.** Required: `platform`, `token`. Optional: `appVersion`, `osVersion`, `deviceModel`, `locale`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Register guest device",
-     "operation": "registerGuestDevice"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "platform",
-      "token",
-      "appVersion",
-      "osVersion",
-      "deviceModel",
-      "locale"
-     ]
-    },
-    "provenance": "client-verified"
-   },
-   {
     "id": "confirmRevokeGuestDevice",
     "component": "confirmDialog",
-    "trigger": "Revoke guest device",
+    "trigger": "Stop notifications on this device",
     "body": "**Names what `revokeGuestDevice` changes and what it leaves alone**, in the consequence rather than the verb. A security sign-in this affects should be identified in the dialog, not just counted.",
     "provenance": "client-verified"
    },

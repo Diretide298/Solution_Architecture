@@ -153,17 +153,17 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><b>The tenant app status</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>The tenant config</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>The module enablement</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div></div><div class="side"><div class="panel"><b>The feature toggle</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Status</b><div class="strip" style="height:auto;padding:6px 10px;border:0">notice</div><span class="why">Three badges in this order: Published (version and time, or &quot;Never published&quot;), Draft (&quot;Unpublished changes&quot;), Live now (maintenance, sold out today, </span></div><div class="panel"><b>Site Builder</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Shown while the minimum path is not done, with the next unfinished step; opens CMS-102.</span></div><div class="panel"><b>White label</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Tiles: Brand kit, Theme, Typography, Logo and assets, Homepage and pages, Navigation, Banners, Booking settings, Booking flows, Help me choose, Languages, Domain, Version</span></div></div><div class="side"><div class="panel"><b>Other areas</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">The DAM, privacy and waiver command centres (CMS-021 to CMS-100) are other modules&#x27; areas, grouped apart so the white-label path stays short (the 30-minute site, DI-</span></div><div class="panel"><b>The module enablement</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getTenantAppStatus · getTenantConfig · getModuleEnablement · getFeatureToggles +3</div>
+          <div><b>OPERATIONS</b> &middot; getTenantAppStatus · getModuleEnablement · getFeatureToggles · setModuleEnablement +3</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess</span></div>
           
-          <div><b>GOES TO</b> &middot; entry point · <a href="#cms-002">CMS-002</a>  &mdash; <i>Brand Kit</i><br><a href="#cms-003">CMS-003</a>  &mdash; <i>Typography</i> <span class="car">version</span><br><a href="#cms-004">CMS-004</a>  &mdash; <i>Logo &amp; Assets</i><br><a href="#cms-008">CMS-008</a>  &mdash; <i>Content Blocks</i><br><a href="#cms-009">CMS-009</a>  &mdash; <i>Navigation &amp; Menus</i><br><a href="#cms-010">CMS-010</a>  &mdash; <i>Media Library</i><br><a href="#cms-011">CMS-011</a>  &mdash; <i>Translations</i><br><a href="#cms-016">CMS-016</a>  &mdash; <i>Site Settings</i><br><a href="#cms-015">CMS-015</a>  &mdash; <i>Version History</i> <span class="car">version</span><br><a href="#cms-019">CMS-019</a>  &mdash; <i>User Access</i><br><a href="#cms-021">CMS-021</a>  &mdash; <i>Privacy &amp; Consent Configuration Command Cent</i><br><a href="#cms-031">CMS-031</a>  &mdash; <i>Privacy Operations Command Center</i><br><a href="#cms-041">CMS-041</a>  &mdash; <i>Waiver &amp; Consent Command Center</i><br><a href="#cms-051">CMS-051</a>  &mdash; <i>Waiver Operations Command Center</i><br><a href="#cms-061">CMS-061</a>  &mdash; <i>Digital Asset Management Command Center</i><br><a href="#cms-071">CMS-071</a>  &mdash; <i>AI Asset Intelligence Command Center</i><br><a href="#cms-081">CMS-081</a>  &mdash; <i>DAM Governance &amp; Rights Command Center</i><br><a href="#cms-091">CMS-091</a>  &mdash; <i>Asset Distribution &amp; Delivery Command Center</i><br><a href="#cms-102">CMS-102</a>  &mdash; <i>Site Builder</i></div>
+          <div><b>GOES TO</b> &middot; entry point · <a href="#cms-002">CMS-002</a>  &mdash; <i>Brand Kit</i><br><a href="#cms-003">CMS-003</a>  &mdash; <i>Typography</i><br><a href="#cms-004">CMS-004</a>  &mdash; <i>Logo &amp; Assets</i><br><a href="#cms-008">CMS-008</a>  &mdash; <i>Content Blocks</i><br><a href="#cms-009">CMS-009</a>  &mdash; <i>Navigation &amp; Menus</i><br><a href="#cms-010">CMS-010</a>  &mdash; <i>Media Library</i><br><a href="#cms-011">CMS-011</a>  &mdash; <i>Translations</i><br><a href="#cms-016">CMS-016</a>  &mdash; <i>Site Settings</i><br><a href="#cms-015">CMS-015</a>  &mdash; <i>Version History</i> <span class="car">version</span><br><a href="#cms-019">CMS-019</a>  &mdash; <i>User Access</i><br><a href="#cms-021">CMS-021</a>  &mdash; <i>Privacy &amp; Consent Configuration Command Cent</i><br><a href="#cms-031">CMS-031</a>  &mdash; <i>Privacy Operations Command Center</i><br><a href="#cms-041">CMS-041</a>  &mdash; <i>Waiver &amp; Consent Command Center</i><br><a href="#cms-051">CMS-051</a>  &mdash; <i>Waiver Operations Command Center</i><br><a href="#cms-061">CMS-061</a>  &mdash; <i>Digital Asset Management Command Center</i><br><a href="#cms-071">CMS-071</a>  &mdash; <i>AI Asset Intelligence Command Center</i><br><a href="#cms-081">CMS-081</a>  &mdash; <i>DAM Governance &amp; Rights Command Center</i><br><a href="#cms-091">CMS-091</a>  &mdash; <i>Asset Distribution &amp; Delivery Command Center</i><br><a href="#cms-102">CMS-102</a>  &mdash; <i>Site Builder</i></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetModuleEnablement &middot; <i>Save module enablement</i> &middot; <b>Save module enablement</b> &middot; Cancel <span class="dis">discards modules</span></div><div class="ov"><b>modal</b> formSetFeatureToggles &middot; <i>Save feature toggles</i> &middot; <b>Save feature toggles</b> &middot; Cancel <span class="dis">discards features</span></div><div class="ov"><b>modal</b> formSetMaintenanceMode &middot; <i>Save maintenance mode</i> &middot; <b>Save maintenance mode</b> &middot; Cancel <span class="dis">discards isInMaintenance · message · expectedBackAt · minimumAppVersion · contact · availability · availabilityMessage</span></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetModuleEnablement &middot; <i>Save module enablement</i> &middot; <b>Save module enablement</b> &middot; Cancel <span class="dis">discards modules</span></div><div class="ov"><b>modal</b> formSetFeatureToggles &middot; <i>Save feature toggles</i> &middot; <b>Save feature toggles</b> &middot; Cancel <span class="dis">discards features</span></div><div class="ov"><b>modal</b> formSetMaintenanceMode &middot; <i>Live now</i> &middot; <b>Save maintenance mode</b> &middot; Cancel <span class="dis">discards isInMaintenance · message · expectedBackAt · minimumAppVersion · contact · availability · availabilityMessage</span></div></div>
         </div>
       </div>
       <div id="cms-002" class="scr">
@@ -183,7 +183,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><b>The brand identity</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the detail template — not declared on the screen.</span></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>The brand identity</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Upload a logo</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">One upload control: it asks the platform for an upload (`createUpload`), sends the file and completes it (`completeUpload`) behind the one action; nobody types a file nam</span></div></div></div>
             </div>
           </div>
         </div>
@@ -193,14 +193,14 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>ARRIVES WITH</b> &middot; uploadId&larr;deepLink</div>
           <div><b>GOES TO</b> &middot; <a href="#cms-001">CMS-001</a>  &mdash; <i>Tenant Workspace</i><br><a href="#cms-003">CMS-003</a>  &mdash; <i>Typography</i><br><a href="#cms-004">CMS-004</a>  &mdash; <i>Logo &amp; Assets</i><br><a href="#cms-005">CMS-005</a>  &mdash; <i>Sets the colour theme</i></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetBrandIdentity &middot; <i>Save brand identity</i> &middot; <b>Save brand identity</b> &middot; Cancel <span class="dis">discards logoAssetRef · logoDarkAssetRef · logoVariant · faviconAssetRef · splashImageAssetRefs · splashDurationSeconds · splashBackgroundColour · showLoadingIndicator · splashChangeScope</span></div><div class="ov"><b>modal</b> formCreateUpload &middot; <i>Create upload</i> &middot; <b>Create upload</b> &middot; Cancel <span class="dis">discards filename · contentType · sizeBytes · venueId</span></div><div class="ov"><b>modal</b> formCompleteUpload &middot; <i>Complete upload</i> &middot; <b>Complete upload</b> &middot; Cancel <span class="dis">discards title · altText · tags · collectionIds · rights</span></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetBrandIdentity &middot; <i>Save brand identity</i> &middot; <b>Save brand identity</b> &middot; Cancel <span class="dis">discards logoAssetRef · logoDarkAssetRef · logoVariant · faviconAssetRef · splashImageAssetRefs · splashDurationSeconds · splashBackgroundColour · showLoadingIndicator</span></div></div>
         </div>
       </div>
       <div id="cms-003" class="scr">
         <div>
           <div class="hdr"><span class="code">CMS-003</span>
             <span class="ttl">Typography</span></div>
-          <div class="pur">Choose the two typefaces and the scale under them.</div>
+          <div class="pur">Choose the two typefaces, Latin and Arabic; the type scale is TICVAI&#x27;s fixed token set.</div>
         </div>
         <div class="frame">
           <aside class="rail"><div class="brand"><b>TICVAI</b><span>White Label</span></div><nav class="nav"><i class="">Dashboard</i><i class="on">White Label</i><i class="">Settings</i><i class="">Reports</i><i class="">People</i></nav></aside>
@@ -213,17 +213,17 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><b>The font config</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>The theme</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>The font config</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the detail template — not declared on the screen.</span></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getFonts · getTheme · setFonts · setTheme</div>
+          <div><b>OPERATIONS</b> &middot; getFonts · setFonts</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess</span></div>
-          <div><b>ARRIVES WITH</b> &middot; bannerId&larr;deepLink, pageId&larr;deepLink, policyKind&larr;deepLink</div>
-          <div><b>GOES TO</b> &middot; <a href="#cms-001">CMS-001</a>  &mdash; <i>Tenant Workspace</i><br><a href="#cms-002">CMS-002</a>  &mdash; <i>Brand Kit</i><br><a href="#cms-004">CMS-004</a>  &mdash; <i>Logo &amp; Assets</i><br><a href="#cms-006">CMS-006</a>  &mdash; <i>Component Preview</i> <span class="car">bannerId · pageId · policyKind · version</span></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetFonts &middot; <i>Save fonts</i> &middot; <b>Save fonts</b> &middot; Cancel <span class="dis">discards primaryLatin · primaryArabic · secondaryLatin · secondaryArabic · customFontAssetRefs · changeScope</span></div><div class="ov"><b>modal</b> formSetTheme &middot; <i>Save theme</i> &middot; <b>Save theme</b> &middot; Cancel <span class="dis">discards primaryColour · secondaryColour · backgroundColour · textColour · accentColour · darkMode · cornerRadius · surfaceStyle · buttonStyle</span></div></div>
+          <div><b>GOES TO</b> &middot; <a href="#cms-001">CMS-001</a>  &mdash; <i>Tenant Workspace</i><br><a href="#cms-002">CMS-002</a>  &mdash; <i>Brand Kit</i><br><a href="#cms-004">CMS-004</a>  &mdash; <i>Logo &amp; Assets</i><br><a href="#cms-006">CMS-006</a>  &mdash; <i>Component Preview</i></div>
+          
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetFonts &middot; <i>Save fonts</i> &middot; <b>Save fonts</b> &middot; Cancel <span class="dis">discards primaryLatin · primaryArabic · secondaryLatin · secondaryArabic · customFontAssetRefs</span></div></div>
         </div>
       </div>
       <div id="cms-004" class="scr">
@@ -253,7 +253,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           
           <div><b>GOES TO</b> &middot; <a href="#cms-001">CMS-001</a>  &mdash; <i>Tenant Workspace</i><br><a href="#cms-002">CMS-002</a>  &mdash; <i>Brand Kit</i><br><a href="#cms-003">CMS-003</a>  &mdash; <i>Typography</i></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetAppIcons &middot; <i>Save app icons</i> &middot; <b>Save app icons</b> &middot; Cancel <span class="dis">discards sourceAssetRef</span></div><div class="ov"><b>modal</b> formSetBrandIdentity &middot; <i>Save brand identity</i> &middot; <b>Save brand identity</b> &middot; Cancel <span class="dis">discards logoAssetRef · logoDarkAssetRef · logoVariant · faviconAssetRef · splashImageAssetRefs · splashDurationSeconds · splashBackgroundColour · showLoadingIndicator · splashChangeScope · introVideoAssetRef · introVideoMode</span></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetAppIcons &middot; <i>Save app icons</i> &middot; <b>Save app icons</b> &middot; Cancel <span class="dis">discards sourceAssetRef</span></div><div class="ov"><b>modal</b> formSetBrandIdentity &middot; <i>Save brand identity</i> &middot; <b>Save brand identity</b> &middot; Cancel <span class="dis">discards logoAssetRef · logoDarkAssetRef · logoVariant · faviconAssetRef · splashImageAssetRefs · splashDurationSeconds · splashBackgroundColour · showLoadingIndicator · introVideoAssetRef · introVideoMode</span></div></div>
         </div>
       </div>
       <div id="cms-005" class="scr">
@@ -283,7 +283,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           
           <div><b>GOES TO</b> &middot; <a href="#cms-001">CMS-001</a>  &mdash; <i>Tenant Workspace</i><br><a href="#cms-002">CMS-002</a>  &mdash; <i>Brand Kit</i><br><a href="#cms-003">CMS-003</a>  &mdash; <i>Typography</i><br><a href="#cms-006">CMS-006</a>  &mdash; <i>Component Preview</i><br><a href="#cms-007">CMS-007</a>  &mdash; <i>Rearranges the homepage</i></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetTheme &middot; <i>Save theme</i> &middot; <b>Save theme</b> &middot; Cancel <span class="dis">discards primaryColour · secondaryColour · backgroundColour · textColour · accentColour · darkMode · cornerRadius · surfaceStyle · buttonStyle · componentColours</span></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetTheme &middot; <i>Save theme</i> &middot; <b>Save theme</b> &middot; Cancel <span class="dis">discards primaryColour · secondaryColour · backgroundColour · textColour · accentColour · cornerRadius · surfaceStyle · buttonStyle · componentColours</span></div></div>
         </div>
       </div>
       <div id="cms-006" class="scr">
@@ -303,18 +303,17 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><b>Every config version</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div><div class="panel"><span class="kind">publishGate</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Declares `publishTenantConfig`. **The gate names what the publish will affect before it happens** — a disabled Publish with no reason is the state operators escalate.
-</span></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Theme</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Fonts</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Brand</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div></div><div class="side"><div class="panel"><b>Booking flow</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Product for the ticket preview</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">The product whose ticket and passes are previewed.</span></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; createPreview · diffConfigVersion · listConfigVersions · publishTenantConfig +1</div>
+          <div><b>OPERATIONS</b> &middot; createPreview · getTheme · getFonts · getBrandIdentity +2</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          <div><b>ARRIVES WITH</b> &middot; bannerId&larr;deepLink, pageId&larr;deepLink, policyKind&larr;deepLink</div>
-          <div><b>GOES TO</b> &middot; <a href="#cms-001">CMS-001</a>  &mdash; <i>Tenant Workspace</i><br><a href="#cms-002">CMS-002</a>  &mdash; <i>Brand Kit</i><br><a href="#cms-003">CMS-003</a>  &mdash; <i>Typography</i> <span class="car">bannerId · pageId · policyKind · version</span></div>
+          <div><b>ARRIVES WITH</b> &middot; productId&larr;CMS-006</div>
+          <div><b>GOES TO</b> &middot; <a href="#cms-001">CMS-001</a>  &mdash; <i>Tenant Workspace</i><br><a href="#cms-002">CMS-002</a>  &mdash; <i>Brand Kit</i><br><a href="#cms-003">CMS-003</a>  &mdash; <i>Typography</i><br><a href="#cms-014">CMS-014</a>  &mdash; <i>White-Label Branding Management</i></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formCreatePreview &middot; <i>Create preview</i> &middot; <b>Create preview</b> &middot; Cancel <span class="dis">discards platform · theme · language · expiresInHours</span></div><div class="ov"><b>modal</b> formPublishTenantConfig &middot; <i>Publish tenant config</i> &middot; <b>Publish tenant config</b> &middot; Cancel <span class="dis">discards note · scheduledFor</span></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formCreatePreview &middot; <i>Create preview</i> &middot; <b>Create preview</b> &middot; Cancel <span class="dis">discards platform · language · expiresInHours</span></div></div>
         </div>
       </div>
       <div id="cms-007" class="scr">
@@ -334,17 +333,17 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><b>The homepage layout</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">**Also the mobile Home editor (decided 29 September, MOB-3; Site Builder steps 5 and 6).** The `venueOverview` section (description, opening hours, type tiles), the hero&</span></div><div class="panel"><b>Modules the sections need</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">A section whose module is off (mapping on `HomepageSectionKind`) is shown disabled and cannot be added or made visible (decided 28 September, audit R163 (4)).</span></div><div class="panel"><b>Every content page</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Start from a template</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">**For a tenant without its own landing page** (decided by Chinmay, 2 October 2026; DEC-548): the storefront home starts from a TICVAI template (`HomepageLayout.templateKe</span></div><div class="panel"><b>The homepage layout</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">**Also the mobile Home editor (decided 29 September, MOB-3; Site Builder steps 5 and 6).** The `venueOverview` section (description, opening hours, type tiles), the hero&</span></div><div class="panel"><b>Modules the sections need</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">A section whose module is off (mapping on `HomepageSectionKind`) is shown disabled and cannot be added or made visible (decided 28 September, audit R163 (4)).</span></div></div><div class="side"><div class="panel"><b>Every content page</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listContentPages · createContentPage · updateContentPage · setFooter +7</div>
+          <div><b>OPERATIONS</b> &middot; listContentPages · createContentPage · updateContentPage · getHomepageLayout +8</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess</span></div>
-          <div><b>ARRIVES WITH</b> &middot; pageId&larr;navigation, actionId&larr;navigation</div>
-          <div><b>GOES TO</b> &middot; <a href="#cms-001">CMS-001</a>  &mdash; <i>Tenant Workspace</i><br><a href="#cms-002">CMS-002</a>  &mdash; <i>Brand Kit</i><br><a href="#cms-003">CMS-003</a>  &mdash; <i>Typography</i> <span class="car">pageId</span><br><a href="#cms-012">CMS-012</a>  &mdash; <i>Previews in both directions</i></div>
+          <div><b>ARRIVES WITH</b> &middot; pageId&larr;navigation, actionId&larr;navigation, blockId&larr;navigation</div>
+          <div><b>GOES TO</b> &middot; <a href="#cms-001">CMS-001</a>  &mdash; <i>Tenant Workspace</i><br><a href="#cms-002">CMS-002</a>  &mdash; <i>Brand Kit</i><br><a href="#cms-003">CMS-003</a>  &mdash; <i>Typography</i><br><a href="#cms-012">CMS-012</a>  &mdash; <i>Previews in both directions</i></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formCreateContentPage &middot; <i>Create content page</i> &middot; <b>Create content page</b> &middot; Cancel <span class="dis">discards id · slug · title · body · status · isEnabled · iconAssetRef · categoryCode · sortOrder · isReferenced · scopePath</span></div><div class="ov"><b>modal</b> formUpdateContentPage &middot; <i>Save content page</i> &middot; <b>Save content page</b> &middot; Cancel <span class="dis">discards slug · title · body · isEnabled · iconAssetRef · categoryCode · sortOrder · status</span></div><div class="ov"><b>modal</b> formSetFooter &middot; <i>Save footer</i> &middot; <b>Save footer</b> &middot; Cancel <span class="dis">discards id · scopePath · columns · legalLinks · copyrightText · socialLinks</span></div><div class="ov"><b>modal</b> formSetHomepageLayout &middot; <i>Save homepage layout</i> &middot; <b>Save homepage layout</b> &middot; Cancel <span class="dis">discards sections · id</span></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formCreateContentPage &middot; <i>Create content page</i> &middot; <b>Create content page</b> &middot; Cancel <span class="dis">discards slug · title · body · isEnabled · iconAssetRef · categoryCode · sortOrder</span></div><div class="ov"><b>modal</b> formUpdateContentPage &middot; <i>Save content page</i> &middot; <b>Save content page</b> &middot; Cancel <span class="dis">discards slug · title · body · isEnabled · iconAssetRef · categoryCode · sortOrder · status</span></div><div class="ov"><b>modal</b> formSetHomepageLayout &middot; <i>Save homepage layout</i> &middot; <b>Save homepage layout</b> &middot; Cancel <span class="dis">discards sections · id</span></div><div class="ov"><b>modal</b> formCreateContentBlock &middot; <i>New content block</i> &middot; <b>New content block</b> &middot; Cancel</div><div class="ov"><b>modal</b> formPublishContentBlock &middot; <i>Publish block</i> &middot; <b>Publish block</b> &middot; Cancel</div></div>
         </div>
       </div>
       <div id="cms-008" class="scr">
@@ -372,16 +371,16 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>OPERATIONS</b> &middot; createBanner · updateBanner · createPromoBlock · updatePromoBlock +6</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; bannerId&larr;navigation, promoBlockId&larr;navigation, actionId&larr;navigation</div>
-          <div><b>GOES TO</b> &middot; <a href="#cms-001">CMS-001</a>  &mdash; <i>Tenant Workspace</i><br><a href="#cms-002">CMS-002</a>  &mdash; <i>Brand Kit</i><br><a href="#cms-003">CMS-003</a>  &mdash; <i>Typography</i> <span class="car">bannerId</span></div>
+          <div><b>GOES TO</b> &middot; <a href="#cms-001">CMS-001</a>  &mdash; <i>Tenant Workspace</i><br><a href="#cms-002">CMS-002</a>  &mdash; <i>Brand Kit</i><br><a href="#cms-003">CMS-003</a>  &mdash; <i>Typography</i></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formCreateBanner &middot; <i>Create banner</i> &middot; <b>Create banner</b> &middot; Cancel <span class="dis">discards id · title · imageAssetRef · startsAt · subtitle · placement · linkTarget · endsAt · state · sortOrder · isActive</span></div><div class="ov"><b>modal</b> formUpdateBanner &middot; <i>Save banner</i> &middot; <b>Save banner</b> &middot; Cancel <span class="dis">discards title · subtitle · imageAssetRef · placement · linkTarget · startsAt · endsAt · sortOrder · isActive</span></div><div class="ov"><b>modal</b> formCreatePromoBlock &middot; <i>Create promo block</i> &middot; <b>Create promo block</b> &middot; Cancel <span class="dis">discards id · title · description · iconAssetRef · promotionId · linkTarget · startsAt · endsAt · state · sortOrder · scopePath</span></div><div class="ov"><b>modal</b> formUpdatePromoBlock &middot; <i>Save promo block</i> &middot; <b>Save promo block</b> &middot; Cancel <span class="dis">discards title · description · iconAssetRef · promotionId · linkTarget · startsAt · endsAt · sortOrder</span></div><div class="ov"><b>confirmDialog</b> confirmDeletePromoBlock &middot; <i>Delete promo block</i></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formCreateBanner &middot; <i>Create banner</i> &middot; <b>Create banner</b> &middot; Cancel <span class="dis">discards title · imageAssetRef · startsAt · subtitle · placement · linkTarget · endsAt · sortOrder · isActive</span></div><div class="ov"><b>modal</b> formUpdateBanner &middot; <i>Save banner</i> &middot; <b>Save banner</b> &middot; Cancel <span class="dis">discards title · subtitle · imageAssetRef · placement · linkTarget · startsAt · endsAt · sortOrder · isActive</span></div><div class="ov"><b>modal</b> formCreatePromoBlock &middot; <i>Create promo block</i> &middot; <b>Create promo block</b> &middot; Cancel <span class="dis">discards title · description · iconAssetRef · promotionId · linkTarget · startsAt · endsAt · sortOrder</span></div><div class="ov"><b>modal</b> formUpdatePromoBlock &middot; <i>Save promo block</i> &middot; <b>Save promo block</b> &middot; Cancel <span class="dis">discards title · description · iconAssetRef · promotionId · linkTarget · startsAt · endsAt · sortOrder</span></div><div class="ov"><b>confirmDialog</b> confirmDeletePromoBlock &middot; <i>Delete promo block</i></div><div class="ov"><b>confirmDialog</b> confirmDeleteBanner &middot; <i>Delete banner</i> &middot; <b>Delete banner</b> &middot; Cancel</div></div>
         </div>
       </div>
       <div id="cms-009" class="scr">
         <div>
           <div class="hdr"><span class="code">CMS-009</span>
             <span class="ttl">Navigation &amp; Menus</span></div>
-          <div class="pur">Decide what appears in the header, the footer and the mobile tab bar, with the Buy tickets button (Site Builder steps 5 and 6).</div>
+          <div class="pur">Three editors, each saved on its own: the header, the footer and the mobile tab bar with the Buy tickets button (Site Builder steps 5 and 6); and the </div>
         </div>
         <div class="frame">
           <aside class="rail"><div class="brand"><b>TICVAI</b><span>White Label</span></div><nav class="nav"><i class="">Dashboard</i><i class="on">White Label</i><i class="">Settings</i><i class="">Reports</i><i class="">People</i></nav></aside>
@@ -394,17 +393,17 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><b>Outlet id</b><div class="chip">Outlet id</div><span class="why">Sends `?outletId=` to `listMenus`.</span></div><div class="panel"><b>Active at</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Sends `?activeAt=` to `listMenus`.</span></div><div class="panel"><b>Every menu</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the split template — not declared on the screen.</span></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getNavigation · listMenus · getMenu · createMenu +3</div>
-          <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          <div><b>ARRIVES WITH</b> &middot; menuId&larr;deepLink</div>
+          <div><b>OPERATIONS</b> &middot; getNavigation · setNavigation · setHeader · setFooter +2</div>
+          <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess</span></div>
+          
           <div><b>GOES TO</b> &middot; <a href="#cms-001">CMS-001</a>  &mdash; <i>Tenant Workspace</i><br><a href="#cms-002">CMS-002</a>  &mdash; <i>Brand Kit</i><br><a href="#cms-003">CMS-003</a>  &mdash; <i>Typography</i></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetNavigation &middot; <i>Save navigation and tabs</i> &middot; <b>Save navigation</b> &middot; Cancel <span class="dis">discards kind · items · buyButton</span></div><div class="ov"><b>modal</b> formCreateMenu &middot; <i>Create menu</i> &middot; <b>Create menu</b> &middot; Cancel <span class="dis">discards code · name · outletId · availability</span></div><div class="ov"><b>modal</b> formSetMenuSections &middot; <i>Save menu sections</i> &middot; <b>Save menu sections</b> &middot; Cancel <span class="dis">discards sections</span></div><div class="ov"><b>modal</b> formUpdateMenu &middot; <i>Save menu</i> &middot; <b>Save menu</b> &middot; Cancel <span class="dis">discards name · availability · isActive</span></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetNavigation &middot; <i>Save tab bar</i> &middot; <b>Save tab bar</b> &middot; Cancel <span class="dis">discards kind · items · buyButton</span></div><div class="ov"><b>modal</b> formSetHeader &middot; <i>Save header</i> &middot; <b>Save header</b> &middot; Cancel</div><div class="ov"><b>modal</b> formSetFooter &middot; <i>Save footer</i> &middot; <b>Save footer</b> &middot; Cancel</div><div class="ov"><b>modal</b> formBuildDeepLink &middot; <i>Build a link</i> &middot; <b>Build a link</b> &middot; Cancel</div></div>
         </div>
       </div>
       <div id="cms-010" class="scr">
@@ -424,17 +423,17 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><b>Kind</b><div class="chip">Kind</div><span class="why">Sends `?kind=` to `searchMedia`.</span></div><div class="panel"><b>Tag</b><div class="chip">Tag</div><span class="why">Sends `?tag=` to `searchMedia`.</span></div><div class="panel"><b>Collection id</b><div class="chip">Collection id</div><span class="why">Sends `?collectionId=` to `searchMedia`.</span></div></div><div class="side"><div class="panel"><b>Venue id</b><div class="chip">Venue id</div><span class="why">Sends `?venueId=` to `searchMedia`.</span></div><div class="panel"><b>Search</b><div class="chip">Search</div><span class="why">Sends `?search=` to `searchMedia`.</span></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Kind</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">The media kinds (image, video, document, audio) as a choice; sends `kind`.</span></div><div class="panel"><b>Tag</b><div class="chip">Tag</div><span class="why">Tags picked from the taxonomy; sends `tag`.</span></div><div class="panel"><b>Collection</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Collections by name; sends `collectionId`.</span></div></div><div class="side"><div class="panel"><b>Venue</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Venues by name; sends `venueId`.</span></div><div class="panel"><b>Search</b><div class="chip">Search</div><span class="why">Sends `?search=` to `searchMedia`.</span></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getMediaEntitlements · searchMedia · appendEntitlementToMedia · completeUpload +9</div>
+          <div><b>OPERATIONS</b> &middot; searchMedia · completeUpload · createCollection · createUpload +7</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          <div><b>ARRIVES WITH</b> &middot; mediaCode&larr;deepLink, mediaId&larr;deepLink, uploadId&larr;deepLink</div>
+          <div><b>ARRIVES WITH</b> &middot; mediaId&larr;deepLink, uploadId&larr;deepLink</div>
           <div><b>GOES TO</b> &middot; <a href="#cms-001">CMS-001</a>  &mdash; <i>Tenant Workspace</i><br><a href="#cms-002">CMS-002</a>  &mdash; <i>Brand Kit</i> <span class="car">uploadId</span><br><a href="#cms-003">CMS-003</a>  &mdash; <i>Typography</i></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>confirmDialog</b> confirmDeleteMediaAsset &middot; <i>Delete media asset</i></div><div class="ov"><b>confirmDialog</b> confirmRestoreMediaAsset &middot; <i>Restore media asset</i> &middot; <b>Restore</b></div><div class="ov"><b>confirmDialog</b> confirmReleaseMediaAsset &middot; <i>Release from quarantine</i> &middot; <b>Release</b></div><div class="ov"><b>modal</b> formAppendEntitlementToMedia &middot; <i>Append entitlement to media</i> &middot; <b>Append entitlement to media</b> &middot; Cancel <span class="dis">discards id · lines · recordedAt · paymentMethod · note</span></div><div class="ov"><b>modal</b> formCompleteUpload &middot; <i>Complete upload</i> &middot; <b>Complete upload</b> &middot; Cancel <span class="dis">discards title · altText · tags · collectionIds · rights</span></div><div class="ov"><b>modal</b> formCreateCollection &middot; <i>Create collection</i> &middot; <b>Create collection</b> &middot; Cancel <span class="dis">discards name · description · venueId · parentCollectionId</span></div><div class="ov"><b>modal</b> formCreateUpload &middot; <i>Create upload</i> &middot; <b>Create upload</b> &middot; Cancel <span class="dis">discards filename · contentType · sizeBytes · venueId</span></div><div class="ov"><b>modal</b> formReplaceMediaAsset &middot; <i>Replace media asset</i> &middot; <b>Replace media asset</b> &middot; Cancel <span class="dis">discards uploadId · note</span></div><div class="ov"><b>modal</b> formUpdateMediaAsset &middot; <i>Save media asset</i> &middot; <b>Save media asset</b> &middot; Cancel <span class="dis">discards title · description · altText · tags · collectionIds · rights · status</span></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>confirmDialog</b> confirmDeleteMediaAsset &middot; <i>Delete media asset</i></div><div class="ov"><b>confirmDialog</b> confirmRestoreMediaAsset &middot; <i>Restore media asset</i> &middot; <b>Restore</b></div><div class="ov"><b>confirmDialog</b> confirmReleaseMediaAsset &middot; <i>Release from quarantine</i> &middot; <b>Release</b></div><div class="ov"><b>modal</b> formCompleteUpload &middot; <i>Complete upload</i> &middot; <b>Complete upload</b> &middot; Cancel <span class="dis">discards title · altText · tags · collectionIds · rights</span></div><div class="ov"><b>modal</b> formCreateCollection &middot; <i>Create collection</i> &middot; <b>Create collection</b> &middot; Cancel <span class="dis">discards name · description · venueId · parentCollectionId</span></div><div class="ov"><b>modal</b> formCreateUpload &middot; <i>Create upload</i> &middot; <b>Create upload</b> &middot; Cancel <span class="dis">discards filename · contentType · sizeBytes · venueId</span></div><div class="ov"><b>modal</b> formReplaceMediaAsset &middot; <i>Replace media asset</i> &middot; <b>Replace media asset</b> &middot; Cancel <span class="dis">discards uploadId · note</span></div><div class="ov"><b>modal</b> formUpdateMediaAsset &middot; <i>Save media asset</i> &middot; <b>Save media asset</b> &middot; Cancel <span class="dis">discards title · description · altText · tags · collectionIds · rights · status</span></div></div>
         </div>
       </div>
       <div id="cms-013" class="scr">
@@ -454,17 +453,17 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><b>id</b><div class="chip">id</div></div><div class="panel"><b>entityKind</b><div class="chip">entityKind</div></div><div class="panel"><b>entityId</b><div class="chip">entityId</div></div></div><div class="side"><div class="panel"><b>locale</b><div class="chip">locale</div></div><div class="panel"><b>title</b><div class="chip">title</div></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Page</b><div class="chip">Page</div><span class="why">Pick the page (content page, product, event, performance, membership, promotion, venue) from a search, never by id; the kind follows from the pick.</span></div><div class="panel"><b>Language</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">One tab per enabled locale; hreflang pairs are generated from the tabs.</span></div><div class="panel"><b>Title</b><div class="chip">Title</div><span class="why">Counter at about 60 characters; &quot;Generated&quot; badge until edited, with Revert to generated.</span></div></div><div class="side"><div class="panel"><b>Description</b><div class="chip">Description</div><span class="why">Counter at about 160 characters.</span></div><div class="panel"><b>Address (slug)</b><div class="chip">Address (slug)</div><span class="why">Editing a live slug warns that a 301 redirect from the old address is created (`createUrlRedirect`).</span></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; setSeoMetadata</div>
+          <div><b>OPERATIONS</b> &middot; setSeoMetadata · getSeoMetadata · createUrlRedirect</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#cms-001">CMS-001</a>  &mdash; <i>Tenant Workspace</i><br><a href="#cms-002">CMS-002</a>  &mdash; <i>Brand Kit</i><br><a href="#cms-003">CMS-003</a>  &mdash; <i>Typography</i></div>
           
-          
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formCreateUrlRedirect &middot; <i>Add redirect</i> &middot; <b>Add redirect</b> &middot; Cancel</div></div>
         </div>
       </div>
       <div id="cms-011" class="scr">
@@ -484,14 +483,14 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><b>Languages</b><div class="chip">Languages</div><span class="why">Required.</span></div><div class="panel"><b>Default language</b><div class="chip">Default language</div><span class="why">Required.</span></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Languages</b><div class="chip">Languages</div><span class="why">Required.</span></div><div class="panel"><b>Default language</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">One of the enabled languages (`setLanguages` answers 400 otherwise).</span></div><div class="panel"><b>Languages</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div></div><div class="side"><div class="panel"><b>Proposed translations</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">The machine-proposed strings for the missing languages, accepted or edited one by one.</span></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; setLanguages</div>
+          <div><b>OPERATIONS</b> &middot; setLanguages · getTenantConfig · getTranslationProposals</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; translationJobId&larr;CMS-011</div>
           <div><b>GOES TO</b> &middot; <a href="#cms-001">CMS-001</a>  &mdash; <i>Tenant Workspace</i><br><a href="#cms-002">CMS-002</a>  &mdash; <i>Brand Kit</i><br><a href="#cms-003">CMS-003</a>  &mdash; <i>Typography</i></div>
           
           
@@ -514,15 +513,15 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><b>The tenant config</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the detail template — not declared on the screen.</span></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>The site in Arabic</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">`createPreview` with language ar: the draft mirrored right to left on web, iPhone and Android (F22 step 4).</span></div><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Implied by the detail template — not declared on the screen.</span></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getTenantConfig · validateTenantConfig</div>
+          <div><b>OPERATIONS</b> &middot; validateTenantConfig · createPreview</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess</span></div>
           
-          <div><b>GOES TO</b> &middot; <a href="#cms-001">CMS-001</a>  &mdash; <i>Tenant Workspace</i><br><a href="#cms-002">CMS-002</a>  &mdash; <i>Brand Kit</i><br><a href="#cms-003">CMS-003</a>  &mdash; <i>Typography</i> <span class="car">version</span><br><a href="#cms-014">CMS-014</a>  &mdash; <i>Publishes</i></div>
+          <div><b>GOES TO</b> &middot; <a href="#cms-001">CMS-001</a>  &mdash; <i>Tenant Workspace</i><br><a href="#cms-002">CMS-002</a>  &mdash; <i>Brand Kit</i><br><a href="#cms-003">CMS-003</a>  &mdash; <i>Typography</i><br><a href="#cms-014">CMS-014</a>  &mdash; <i>Publishes</i></div>
           
           
         </div>
@@ -544,17 +543,17 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><b>The tenant app status</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><span class="kind">publishGate</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Declares `publishTenantConfig`. **The gate names what the publish will affect before it happens** — a disabled Publish with no reason is the state operators escalate. **B</span></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>The tenant app status</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">What is published and what is waiting in the draft. Maintenance is live state, never published or restored, so it is shown only as context, apart from what Publish change</span></div><div class="panel"><span class="kind">publishGate</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Declares `publishTenantConfig`. **The gate names what the publish will affect before it happens** — a disabled Publish with no reason is the state operators escalate. **B</span></div><div class="panel"><b>Review changes</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div></div><div class="side"><div class="panel"><b>Review before publishing</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">**Simulate, then a single publish by a permission holder** (decided by Chinmay, 2 October 2026; DEC-156). The venue may switch on an optional review step; then Publish an</span></div><div class="panel"><b>Review policy</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; publishTenantConfig · validateTenantConfig · getTenantAppStatus · listBookingFlows</div>
+          <div><b>OPERATIONS</b> &middot; publishTenantConfig · validateTenantConfig · getTenantAppStatus · listBookingFlows +6</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess</span></div>
-          <div><b>ARRIVES WITH</b> &middot; venueId&larr;session</div>
-          <div><b>GOES TO</b> &middot; <a href="#cms-001">CMS-001</a>  &mdash; <i>Tenant Workspace</i><br><a href="#cms-002">CMS-002</a>  &mdash; <i>Brand Kit</i><br><a href="#cms-003">CMS-003</a>  &mdash; <i>Typography</i> <span class="car">version</span><br><a href="#cms-015">CMS-015</a>  &mdash; <i>Rolls back when something is wrong</i> <span class="car">version</span><br><a href="#cms-103">CMS-103</a>  &mdash; <i>Fix a booking flow</i> <span class="car">bookingFlowId</span><br><a href="#cms-104">CMS-104</a>  &mdash; <i>Build the mobile app</i><br><a href="#cms-102">CMS-102</a>  &mdash; <i>Back to the Site Builder</i></div>
+          <div><b>ARRIVES WITH</b> &middot; venueId&larr;session, version&larr;navigation, packageId&larr;navigation</div>
+          <div><b>GOES TO</b> &middot; <a href="#cms-001">CMS-001</a>  &mdash; <i>Tenant Workspace</i><br><a href="#cms-002">CMS-002</a>  &mdash; <i>Brand Kit</i><br><a href="#cms-003">CMS-003</a>  &mdash; <i>Typography</i><br><a href="#cms-015">CMS-015</a>  &mdash; <i>Rolls back when something is wrong</i> <span class="car">version</span><br><a href="#cms-103">CMS-103</a>  &mdash; <i>Fix a booking flow</i> <span class="car">bookingFlowId</span><br><a href="#cms-104">CMS-104</a>  &mdash; <i>Build the mobile app</i><br><a href="#cms-102">CMS-102</a>  &mdash; <i>Back to the Site Builder</i></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formPublishTenantConfig &middot; <i>Publish tenant config</i> &middot; <b>Publish tenant config</b> &middot; Cancel <span class="dis">discards note · scheduledFor</span></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formPublishTenantConfig &middot; <i>Publish</i> &middot; <b>Publish</b> &middot; Cancel <span class="dis">discards note · scheduledFor</span></div><div class="ov"><b>modal</b> formCreatePreview &middot; <i>Simulate</i> &middot; <b>Simulate</b> &middot; Cancel</div><div class="ov"><b>confirmDialog</b> confirmExportSitePackage &middot; <i>Generate site package</i> &middot; <b>Generate site package</b> &middot; Cancel</div></div>
         </div>
       </div>
       <div id="cms-015" class="scr">
@@ -582,7 +581,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>OPERATIONS</b> &middot; listConfigVersions · diffConfigVersion · restoreConfigVersion</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; version&larr;deepLink</div>
-          <div><b>GOES TO</b> &middot; <a href="#cms-001">CMS-001</a>  &mdash; <i>Tenant Workspace</i><br><a href="#cms-002">CMS-002</a>  &mdash; <i>Brand Kit</i><br><a href="#cms-003">CMS-003</a>  &mdash; <i>Typography</i> <span class="car">version</span><br><a href="#cms-014">CMS-014</a>  &mdash; <i>Review and publish the restored draft</i></div>
+          <div><b>GOES TO</b> &middot; <a href="#cms-001">CMS-001</a>  &mdash; <i>Tenant Workspace</i><br><a href="#cms-002">CMS-002</a>  &mdash; <i>Brand Kit</i><br><a href="#cms-003">CMS-003</a>  &mdash; <i>Typography</i><br><a href="#cms-014">CMS-014</a>  &mdash; <i>Review and publish the restored draft</i> <span class="car">version</span></div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>confirmDialog</b> confirmRestoreConfigVersion &middot; <i>Restore config version</i> &middot; <b>Restore into draft</b> &middot; Cancel</div></div>
         </div>
@@ -604,17 +603,17 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><b>The tenant config</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>The booking flow config</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">**Venue-wide booking settings only (decided 29 September, W12).** The settings that belong to one flow (`performanceReveal`, `signInAt`, `seatEventDateMode`, `extrasStep`</span></div><div class="panel"><b>Settings for</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">**Which level is being edited** (decided 29 September, rev 3 CFG-11). *All venues* edits the tenant settings; picking a venue edits that venue&#x27;s entry in `venueOverr</span></div></div><div class="side"><div class="panel"><b>Venues that differ from the tenant</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">**One row per venue that overrides anything** (decided 29 September, rev 3 CFG-11). The editor sets only the fields that differ; a field left empty inherits the tenant va</span></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>The booking flow config</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">**Venue-wide booking settings only (decided 29 September, W12).** The settings that belong to one flow (`performanceReveal`, `signInAt`, `seatEventDateMode`, `extrasStep`</span></div><div class="panel"><b>Settings for</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">**Which level is being edited** (decided 29 September, rev 3 CFG-11). *All venues* edits the tenant settings; picking a venue edits that venue&#x27;s entry in `venueOverr</span></div><div class="panel"><b>Venues that differ from the tenant</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">**One row per venue that overrides anything** (decided 29 September, rev 3 CFG-11). The editor sets only the fields that differ; a field left empty inherits the tenant va</span></div></div><div class="side"><div class="panel"><b>Analytics platforms</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">The platforms the storefront and app report to (GA4, Meta pixel and the like), each with its id and on/off.</span></div><div class="panel"><b>Save analytics platform</b><div class="chip cta">Save analytics platform</div></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getBookingFlowConfig · setBookingFlowConfig · getTenantConfig · listOrgUnits +2</div>
+          <div><b>OPERATIONS</b> &middot; getBookingFlowConfig · setBookingFlowConfig · listOrgUnits · listAnalyticsProviders +1</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyNoResults · emptyFirstRun · emptyNoAccess</span></div>
           
-          <div><b>GOES TO</b> &middot; <a href="#cms-001">CMS-001</a>  &mdash; <i>Tenant Workspace</i><br><a href="#cms-002">CMS-002</a>  &mdash; <i>Brand Kit</i><br><a href="#cms-003">CMS-003</a>  &mdash; <i>Typography</i> <span class="car">version</span><br><a href="#cms-013">CMS-013</a> <br><a href="#cms-017">CMS-017</a>  &mdash; <i>Domain &amp; Certificate</i><br><a href="#cms-018">CMS-018</a>  &mdash; <i>Consent &amp; Legal</i><br><a href="#cms-101">CMS-101</a>  &mdash; <i>Help me choose</i><br><a href="#cms-103">CMS-103</a>  &mdash; <i>Booking flows</i> <span class="car">bookingFlowId</span></div>
+          <div><b>GOES TO</b> &middot; <a href="#cms-001">CMS-001</a>  &mdash; <i>Tenant Workspace</i><br><a href="#cms-002">CMS-002</a>  &mdash; <i>Brand Kit</i><br><a href="#cms-003">CMS-003</a>  &mdash; <i>Typography</i><br><a href="#cms-013">CMS-013</a> <br><a href="#cms-017">CMS-017</a>  &mdash; <i>Domain &amp; Certificate</i><br><a href="#cms-018">CMS-018</a>  &mdash; <i>Consent &amp; Legal</i><br><a href="#cms-101">CMS-101</a>  &mdash; <i>Help me choose</i><br><a href="#cms-103">CMS-103</a>  &mdash; <i>Booking flows</i></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetBookingFlowConfig &middot; <i>Save booking flow config</i> &middot; <b>Save booking flow config</b> &middot; Cancel <span class="dis">discards preset · stepIndicator · cartLayout · cardLayout · cardSize · seatPicker · mapView · density · embedMode · heroBanner · searchInBanner · singleEventPage · quantitiesOnAddOns · cartSideInRtl · eventBannerDates · timesPerPage · dayPartFilter · dayPartBoundaries · seatViewPosition · seatTimeBar · ticketCategories · ticketTags · cardInfo · conciergeMascot · showInfoOnly · locationSwitcher · guestContactFields · dateStripDays · venueOverrides</span></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetBookingFlowConfig &middot; <i>Save booking flow config</i> &middot; <b>Save booking flow config</b> &middot; Cancel <span class="dis">discards preset · stepIndicator · cartLayout · cardLayout · cardSize · seatPicker · mapView · density · embedMode · heroBanner · searchInBanner · singleEventPage · quantitiesOnAddOns · cartSideInRtl · eventBannerDates · timesPerPage · dayPartFilter · dayPartBoundaries · seatViewPosition · seatTimeBar · ticketCategories · ticketTags · cardInfo · conciergeMascot · showInfoOnly · locationSwitcher · guestContactFields · dateStripDays · venueOverrides</span></div><div class="ov"><b>modal</b> formSetAnalyticsProvider &middot; <i>Save analytics platform</i> &middot; <b>Save analytics platform</b> &middot; Cancel</div></div>
         </div>
       </div>
       <div id="cms-017" class="scr">
@@ -634,17 +633,17 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><b>Every custom domain</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Your TICVAI address</b><div class="strip" style="height:auto;padding:6px 10px;border:0">notice</div><span class="why">venue.&lt;cell&gt;.ticvai.app, always working, shown above the custom domains; small tenants run on it and share links use it (DI-283).</span></div><div class="panel"><b>Every custom domain</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listCustomDomains · claimCustomDomain · verifyCustomDomain · relinquishCustomDomain</div>
+          <div><b>OPERATIONS</b> &middot; listCustomDomains · claimCustomDomain · verifyCustomDomain · relinquishCustomDomain +3</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; domainId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#cms-001">CMS-001</a>  &mdash; <i>Tenant Workspace</i><br><a href="#cms-002">CMS-002</a>  &mdash; <i>Brand Kit</i><br><a href="#cms-003">CMS-003</a>  &mdash; <i>Typography</i></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formClaimCustomDomain &middot; <i>Claim custom domain</i> &middot; <b>Claim custom domain</b> &middot; Cancel <span class="dis">discards hostname · kind · verificationMethod</span></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formClaimCustomDomain &middot; <i>Claim custom domain</i> &middot; <b>Claim custom domain</b> &middot; Cancel <span class="dis">discards hostname · kind · verificationMethod</span></div><div class="ov"><b>confirmDialog</b> confirmSetPrimaryDomain &middot; <i>Make primary</i> &middot; <b>Make primary</b> &middot; Cancel</div><div class="ov"><b>confirmDialog</b> confirmRegenerateDomainToken &middot; <i>New validation token</i> &middot; <b>New validation token</b> &middot; Cancel</div></div>
         </div>
       </div>
       <div id="cms-018" class="scr">
@@ -672,7 +671,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>OPERATIONS</b> &middot; listPolicies · setPolicy · listConsentPurposes · setConsentPurposes +4</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; policyKind&larr;navigation, questionId&larr;navigation</div>
-          <div><b>GOES TO</b> &middot; <a href="#cms-001">CMS-001</a>  &mdash; <i>Tenant Workspace</i><br><a href="#cms-002">CMS-002</a>  &mdash; <i>Brand Kit</i><br><a href="#cms-003">CMS-003</a>  &mdash; <i>Typography</i> <span class="car">policyKind · version</span></div>
+          <div><b>GOES TO</b> &middot; <a href="#cms-001">CMS-001</a>  &mdash; <i>Tenant Workspace</i><br><a href="#cms-002">CMS-002</a>  &mdash; <i>Brand Kit</i><br><a href="#cms-003">CMS-003</a>  &mdash; <i>Typography</i></div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetPolicy &middot; <i>Save policy</i> &middot; <b>Save policy</b> &middot; Cancel <span class="dis">discards body · requiresReconsent · effectiveFrom</span></div><div class="ov"><b>modal</b> formSetConsentPurposes &middot; <i>Save consent purposes</i> &middot; <b>Save consent purposes</b> &middot; Cancel <span class="dis">discards purposes</span></div><div class="ov"><b>modal</b> formCreateConsentQuestion &middot; <i>New consent question</i> &middot; <b>Create question</b> &middot; Cancel <span class="dis">discards kind · text · helpText · scope · required · blockingAnswer</span></div><div class="ov"><b>modal</b> formUpdateConsentQuestion &middot; <i>Save as new version</i> &middot; <b>Save new version</b> &middot; Cancel <span class="dis">discards text · helpText · scope · required · blockingAnswer · status</span></div></div>
         </div>
@@ -694,17 +693,17 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><b>Scope path</b><div class="chip">Scope path</div><span class="why">Sends `?scopePath=` to `listPrincipals`.</span></div><div class="panel"><b>Is active</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Sends `?isActive=` to `listPrincipals`.</span></div><div class="panel"><b>Every principal</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div><div class="side"><div class="panel"><b>Every role</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Scope path</b><div class="chip">Scope path</div><span class="why">Sends `?scopePath=` to `listPrincipals`.</span></div><div class="panel"><b>Is active</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Sends `?isActive=` to `listPrincipals`.</span></div><div class="panel"><b>Every principal</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">The role a principal holds and the role another inherits from are shown by name; raw ids only in the detail panel&#x27;s copy action.</span></div></div><div class="side"><div class="panel"><b>Every role</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">The role a principal holds and the role another inherits from are shown by name; raw ids only in the detail panel&#x27;s copy action.</span></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listPrincipals · listRoles</div>
+          <div><b>OPERATIONS</b> &middot; listPrincipals · listRoles · updatePrincipal</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; principalId&larr;session</div>
           <div><b>GOES TO</b> &middot; <a href="#cms-001">CMS-001</a>  &mdash; <i>Tenant Workspace</i><br><a href="#cms-002">CMS-002</a>  &mdash; <i>Brand Kit</i><br><a href="#cms-003">CMS-003</a>  &mdash; <i>Typography</i></div>
           
-          
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formUpdatePrincipal &middot; <i>Change access</i> &middot; <b>Change access</b> &middot; Cancel</div></div>
         </div>
       </div>
       <div id="cms-101" class="scr">
@@ -762,7 +761,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>OPERATIONS</b> &middot; getSiteSetupProgress · setSiteSetupProgress · listBookingFlowTypes · listBookingFlows +3</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; venueId&larr;session</div>
-          <div><b>GOES TO</b> &middot; <a href="#cms-001">CMS-001</a>  &mdash; <i>1 Venue and modules</i><br><a href="#cms-103">CMS-103</a>  &mdash; <i>2 Ticketing flows</i> <span class="car">bookingFlowId</span><br><a href="#cms-101">CMS-101</a>  &mdash; <i>4 Help me choose</i><br><a href="#cms-007">CMS-007</a>  &mdash; <i>5 Look and feel — header, footer and home</i><br><a href="#cms-009">CMS-009</a>  &mdash; <i>5 Look and feel — navigation and menus</i><br><a href="#cms-002">CMS-002</a>  &mdash; <i>5 Look and feel — brand kit</i><br><a href="#cms-004">CMS-004</a>  &mdash; <i>5 Look and feel — logos</i><br><a href="#cms-008">CMS-008</a>  &mdash; <i>5 Look and feel — banners</i><br><a href="#cms-005">CMS-005</a>  &mdash; <i>5 Look and feel — theme</i><br><a href="#cms-003">CMS-003</a>  &mdash; <i>5 Look and feel — fonts</i> <span class="car">version</span><br><a href="#cms-006">CMS-006</a>  &mdash; <i>7 Preview</i> <span class="car">version</span><br><a href="#cms-012">CMS-012</a>  &mdash; <i>7 Preview right to left</i><br><a href="#cms-014">CMS-014</a>  &mdash; <i>7 Publish</i><br><a href="#cms-015">CMS-015</a>  &mdash; <i>Roll back a version</i> <span class="car">version</span><br><a href="#cms-104">CMS-104</a>  &mdash; <i>Build the mobile app</i></div>
+          <div><b>GOES TO</b> &middot; <a href="#cms-001">CMS-001</a>  &mdash; <i>1 Venue and modules</i><br><a href="#cms-103">CMS-103</a>  &mdash; <i>2 Ticketing flows</i> <span class="car">bookingFlowId</span><br><a href="#cms-101">CMS-101</a>  &mdash; <i>4 Help me choose</i><br><a href="#cms-007">CMS-007</a>  &mdash; <i>5 Look and feel — header, footer and home</i><br><a href="#cms-009">CMS-009</a>  &mdash; <i>5 Look and feel — navigation and menus</i><br><a href="#cms-002">CMS-002</a>  &mdash; <i>5 Look and feel — brand kit</i><br><a href="#cms-004">CMS-004</a>  &mdash; <i>5 Look and feel — logos</i><br><a href="#cms-008">CMS-008</a>  &mdash; <i>5 Look and feel — banners</i><br><a href="#cms-005">CMS-005</a>  &mdash; <i>5 Look and feel — theme</i><br><a href="#cms-003">CMS-003</a>  &mdash; <i>5 Look and feel — fonts</i><br><a href="#cms-006">CMS-006</a>  &mdash; <i>7 Preview</i><br><a href="#cms-012">CMS-012</a>  &mdash; <i>7 Preview right to left</i><br><a href="#cms-014">CMS-014</a>  &mdash; <i>7 Publish</i> <span class="car">version</span><br><a href="#cms-015">CMS-015</a>  &mdash; <i>Roll back a version</i> <span class="car">version</span><br><a href="#cms-104">CMS-104</a>  &mdash; <i>Build the mobile app</i></div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formAddPresetFlows &middot; <i>Add these flows</i> &middot; <b>Add flows</b> &middot; Cancel <span class="dis">discards flowTypeKey · name</span></div></div>
         </div>
@@ -792,7 +791,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>OPERATIONS</b> &middot; listBookingFlows · listBookingFlowTypes · getBookingFlow · getPublishedBookingFlow +10</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; venueId&larr;session, bookingFlowId&larr;CMS-102, productId&larr;navigation</div>
-          <div><b>GOES TO</b> &middot; <a href="#cms-102">CMS-102</a>  &mdash; <i>Back to the Site Builder</i><br><a href="#cms-016">CMS-016</a>  &mdash; <i>Venue-wide booking settings</i><br><a href="#cms-101">CMS-101</a>  &mdash; <i>Help me choose</i><br><a href="#cms-014">CMS-014</a>  &mdash; <i>Publish with the site</i></div>
+          <div><b>GOES TO</b> &middot; <a href="#cms-102">CMS-102</a>  &mdash; <i>Back to the Site Builder</i><br><a href="#cms-016">CMS-016</a>  &mdash; <i>Venue-wide booking settings</i><br><a href="#cms-101">CMS-101</a>  &mdash; <i>Help me choose</i><br><a href="#cms-014">CMS-014</a>  &mdash; <i>Publish with the site</i> <span class="car">version</span></div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formCreateBookingFlowDefinition &middot; <i>Add a flow</i> &middot; <b>Add flow</b> &middot; Cancel <span class="dis">discards flowTypeKey · name · isDefaultForType · steps · settings</span></div><div class="ov"><b>confirmDialog</b> confirmDeleteBookingFlow &middot; <i>Remove flow</i> &middot; <b>Remove</b> &middot; Keep it</div><div class="ov"><b>confirmDialog</b> confirmPublishSite &middot; <i>Publish site</i> &middot; <b>Publish</b> &middot; Cancel</div></div>
         </div>
@@ -814,12 +813,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><b>Builds</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Builds</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div><div class="panel"><b>Show &quot;Powered by TICVAI&quot;</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">**A configuration toggle, on by default** (decided by Chinmay, 2 October 2026; DEC-160; CHG-CSA-036). The credit shows on the launch screen under the splash and at the fo</span></div><div class="panel"><b>Credit shown</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Whether the &quot;Powered by TICVAI&quot; credit shows now, and whether the licence lets it be switched off.</span></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getStoreAccounts · setStoreAccounts · listAppBuilds · getAppBuild +3</div>
+          <div><b>OPERATIONS</b> &middot; getStoreAccounts · setStoreAccounts · listAppBuilds · getAppBuild +5</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; appBuildId&larr;navigation, conversationId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#cms-102">CMS-102</a>  &mdash; <i>Back to the Site Builder</i><br><a href="#cms-004">CMS-004</a>  &mdash; <i>App icons and splash</i><br><a href="#cms-014">CMS-014</a>  &mdash; <i>Publish the configuration first</i></div>
@@ -849,7 +848,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listPrivacyConsent · listCustomerPrivacyConsent</div>
+          <div><b>OPERATIONS</b> &middot; listPrivacyConsent</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#cms-001">CMS-001</a>  &mdash; <i>Tenant Workspace</i><br><a href="#cms-022">CMS-022</a>  &mdash; <i>Works in Data Processing Purpose &amp; Lawful Ba</i><br><a href="#cms-023">CMS-023</a>  &mdash; <i>Works in Consent Purpose &amp; Consent Type Buil</i><br><a href="#cms-024">CMS-024</a>  &mdash; <i>Works in Communication Preference &amp; Marketin</i><br><a href="#cms-025">CMS-025</a>  &mdash; <i>Works in Cookie, Tracking &amp; Digital Technolo</i><br><a href="#cms-026">CMS-026</a>  &mdash; <i>Works in Cookie Banner &amp; Preference Center D</i><br><a href="#cms-027">CMS-027</a>  &mdash; <i>Works in Consent Capture Point &amp; Customer Jo</i><br><a href="#cms-028">CMS-028</a>  &mdash; <i>Works in Privacy Notice, Policy &amp; Terms Vers</i><br><a href="#cms-029">CMS-029</a>  &mdash; <i>Works in Minor, Guardian &amp; Age-Based Privacy</i><br><a href="#cms-030">CMS-030</a>  &mdash; <i>Works in Privacy Configuration Testing, Appr</i></div>
@@ -879,12 +878,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listDataProcessingPurpose</div>
+          <div><b>OPERATIONS</b> &middot; listDataProcessingPurpose · setDataProcessingPurpose</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#cms-021">CMS-021</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
           
-          
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetDataProcessingPurpose &middot; <i>Save purpose</i> &middot; <b>Save purpose</b> &middot; Cancel</div></div>
         </div>
       </div>
       <div id="cms-023" class="scr" data-ws="WS41">
@@ -964,17 +963,17 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the split template — not declared on the screen.</span></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Technology type</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">A filter over the registry (first-party cookie, third-party cookie, mobile SDK, analytics tracker, advertising pixel, embedded service, local storage, other); not an acti</span></div><div class="panel"><b>Tracking technologies</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Detected (blocked, needs review) first, then approved, blocked and retired; retired rather than deleted, as evidence of what a site did on a date.</span></div><div class="panel"><b>Scan runs</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">**A bought scanner API (hybrid) runs the scheduled scans** (decided by Chinmay, 2 October 2026; DEC-019; CHG-CSA-023): it feeds `recordCookieScan` through TICVAI&#x27;s a</span></div></div><div class="side"><div class="panel"><b>Loaded before consent</b><div class="rows"><div class="bar"><i style="width:78%"></i></div><div class="bar"><i style="width:54%"></i></div><div class="bar"><i style="width:92%"></i></div><div class="bar"><i style="width:36%"></i></div><div class="bar"><i style="width:61%"></i></div></div><span class="why">**The compliance output, shown first and prominently:** the scan run&#x27;s `preConsentViolationCount`, the technologies seen loading before the visitor decided (CHG-FUP-</span></div><div class="panel"><b>What the scan saw</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Per finding of the selected run: the consent state it was seen in (no decision, rejected all, accepted all), the page, the script that set it, its attributes (domain, Sam</span></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listCookieTrackingDigital · setTrackingTechnology · recordCookieScan · listCookieScans +2</div>
+          <div><b>OPERATIONS</b> &middot; listCookieTrackingDigital · setTrackingTechnology · recordCookieScan · listCookieScans +4</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; scanRunId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#cms-021">CMS-021</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
           
-          
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetTrackingTechnology &middot; <i>Add technology</i> &middot; <b>Add technology</b> &middot; Cancel</div><div class="ov"><b>modal</b> formRecordCookieScan &middot; <i>Upload scan report</i> &middot; <b>Upload scan report</b> &middot; Cancel</div><div class="ov"><b>modal</b> formSetCookieScanPolicy &middot; <i>Save scan schedule</i> &middot; <b>Save scan schedule</b> &middot; Cancel</div></div>
         </div>
       </div>
       <div id="cms-026" class="scr" data-ws="WS41">
@@ -994,7 +993,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><b>Logo</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Title</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Description</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div></div><div class="side"><div class="panel"><b>Buttons</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Position</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Logo</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Title</b><div class="chip">Title</div><span class="why">Text per language (English and Arabic required).</span></div><div class="panel"><b>Description</b><div class="chip">Description</div><span class="why">Text per language (English and Arabic required).</span></div></div><div class="side"><div class="panel"><b>Buttons</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Fixed by the posture, not chosen: Accept all, Reject non-essential (always one click) and Choose.</span></div><div class="panel"><b>Position</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div></div></div>
             </div>
           </div>
         </div>
@@ -1004,7 +1003,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           
           <div><b>GOES TO</b> &middot; <a href="#cms-021">CMS-021</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
           
-          
+          <div><b>OVERLAYS</b><div class="ov"><b>confirmDialog</b> confirmSetCookieBannerDesign &middot; <i>Save version</i> &middot; <b>Save version</b> &middot; Cancel</div></div>
         </div>
       </div>
       <div id="cms-027" class="scr" data-ws="WS41">
@@ -1329,12 +1328,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listDataRetentionExpiry</div>
+          <div><b>OPERATIONS</b> &middot; listDataRetentionExpiry · runDataRetention · setLegalHold</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#cms-031">CMS-031</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>confirmDialog</b> confirmDelete &middot; <i>Delete</i></div><div class="ov"><b>confirmDialog</b> confirmArchive &middot; <i>Archive</i></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>confirmDialog</b> confirmDelete &middot; <i>Delete</i></div><div class="ov"><b>confirmDialog</b> confirmArchive &middot; <i>Archive</i></div><div class="ov"><b>modal</b> formRunDataRetention &middot; <i>Run retention</i> &middot; <b>Run retention</b> &middot; Cancel</div><div class="ov"><b>modal</b> formSetLegalHold &middot; <i>Place or release hold</i> &middot; <b>Place or release hold</b> &middot; Cancel</div></div>
         </div>
       </div>
       <div id="cms-038" class="scr" data-ws="WS42">
@@ -1354,12 +1353,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><b>Every privacy compliance exception</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Every privacy compliance exception</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div><div class="panel"><b>Privacy exceptions</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; setPrivacyComplianceException</div>
+          <div><b>OPERATIONS</b> &middot; setPrivacyComplianceException · listPrivacyComplianceExceptions</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#cms-031">CMS-031</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
@@ -1479,12 +1478,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listWaiverTemplateMaster</div>
+          <div><b>OPERATIONS</b> &middot; listWaiverTemplateMaster · createForm</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#cms-041">CMS-041</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
           
-          
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formCreateForm &middot; <i>Create waiver form</i> &middot; <b>Create waiver form</b> &middot; Cancel</div></div>
         </div>
       </div>
       <div id="cms-043" class="scr" data-ws="WS72">
@@ -1504,17 +1503,17 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the split template — not declared on the screen.</span></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Form kind</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">**The consent-form builder (decided by Chinmay, 2 October 2026; DEC-549):** the existing waiver builder extended, not a second builder. A form is a waiver or a `consentFo</span></div><div class="panel"><b>Guardian consent for minors</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">A child signs through a guardian on the venue&#x27;s form; the minor age is the country&#x27;s (DEC-237) (CHG-SGU-004).</span></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; setDigitalWaiverForm</div>
+          <div><b>OPERATIONS</b> &middot; setDigitalWaiverForm · createForm</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#cms-041">CMS-041</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
           
-          
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formCreateForm &middot; <i>New consent form</i> &middot; <b>New consent form</b> &middot; Cancel</div></div>
         </div>
       </div>
       <div id="cms-044" class="scr" data-ws="WS72">
@@ -1684,12 +1683,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><b>Every localization branding customer</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Every localization branding customer</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div><div class="panel"><b>Current configuration</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; setLocalizationBrandingCustomer</div>
+          <div><b>OPERATIONS</b> &middot; setLocalizationBrandingCustomer · getLocalizationBrandingCustomer</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#cms-041">CMS-041</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
@@ -1864,12 +1863,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><b>Every waiver verification validation</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Every waiver verification validation</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div><div class="panel"><b>Submissions to verify</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; setWaiverVerificationValidation</div>
+          <div><b>OPERATIONS</b> &middot; setWaiverVerificationValidation · listWaiverVerificationQueue</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#cms-051">CMS-051</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
@@ -2044,7 +2043,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><b>Every digital asset</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Total Digital Assets</b><div class="rows"><div class="bar"><i style="width:78%"></i></div><div class="bar"><i style="width:54%"></i></div><div class="bar"><i style="width:92%"></i></div><div class="bar"><i style="width:36%"></i></div><div class="bar"><i style="width:61%"></i></div></div></div><div class="panel"><b>Images</b><div class="rows"><div class="bar"><i style="width:78%"></i></div><div class="bar"><i style="width:54%"></i></div><div class="bar"><i style="width:92%"></i></div><div class="bar"><i style="width:36%"></i></div><div class="bar"><i style="width:61%"></i></div></div></div><div class="panel"><b>Videos</b><div class="rows"><div class="bar"><i style="width:78%"></i></div><div class="bar"><i style="width:54%"></i></div><div class="bar"><i style="width:92%"></i></div><div class="bar"><i style="width:36%"></i></div><div class="bar"><i style="width:61%"></i></div></div></div></div><div class="side"><div class="panel"><b>Uploads</b><div class="rows"><div class="bar"><i style="width:78%"></i></div><div class="bar"><i style="width:54%"></i></div><div class="bar"><i style="width:92%"></i></div><div class="bar"><i style="width:36%"></i></div><div class="bar"><i style="width:61%"></i></div></div></div><div class="panel"><b>Updates</b><div class="rows"><div class="bar"><i style="width:78%"></i></div><div class="bar"><i style="width:54%"></i></div><div class="bar"><i style="width:92%"></i></div><div class="bar"><i style="width:36%"></i></div><div class="bar"><i style="width:61%"></i></div></div></div></div></div>
             </div>
           </div>
         </div>
@@ -2164,7 +2163,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the split template — not declared on the screen.</span></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Metadata fields</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">One row per field of the taxonomy (Asset Name, Asset Type, Venue, Campaign, Event, Attraction, Owner, Source), with its type and whether it is required; edited with `setM</span></div><div class="panel"><b>Save taxonomy</b><div class="chip cta">Save taxonomy</div></div></div></div>
             </div>
           </div>
         </div>
@@ -2174,7 +2173,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           
           <div><b>GOES TO</b> &middot; <a href="#cms-061">CMS-061</a>  &mdash; <i>Back to Digital Asset Management Command Cen</i></div>
           
-          
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetMediaTaxonomy &middot; <i>Save taxonomy</i> &middot; <b>Save taxonomy</b> &middot; Cancel</div></div>
         </div>
       </div>
       <div id="cms-066" class="scr" data-ws="WS74">
@@ -2194,7 +2193,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><b>Venue: Dubai Park</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Category: Marketing</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Campaign: Summer 2026</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div></div><div class="side"><div class="panel"><b>Tags: Family, Outdoor</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Venue</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">e.g. Dubai Park</span></div><div class="panel"><b>Category</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">e.g. Marketing</span></div><div class="panel"><b>Campaign</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">e.g. Summer 2026</span></div></div><div class="side"><div class="panel"><b>Tags</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">e.g. Family, Outdoor</span></div></div></div>
             </div>
           </div>
         </div>
@@ -2344,12 +2343,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><b>Every asset intelligence</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>AI-Processed Assets</b><div class="rows"><div class="bar"><i style="width:78%"></i></div><div class="bar"><i style="width:54%"></i></div><div class="bar"><i style="width:92%"></i></div><div class="bar"><i style="width:36%"></i></div><div class="bar"><i style="width:61%"></i></div></div></div><div class="panel"><b>Pending AI Processing</b><div class="rows"><div class="bar"><i style="width:78%"></i></div><div class="bar"><i style="width:54%"></i></div><div class="bar"><i style="width:92%"></i></div><div class="bar"><i style="width:36%"></i></div><div class="bar"><i style="width:61%"></i></div></div></div><div class="panel"><b>AI Tags Generated</b><div class="rows"><div class="bar"><i style="width:78%"></i></div><div class="bar"><i style="width:54%"></i></div><div class="bar"><i style="width:92%"></i></div><div class="bar"><i style="width:36%"></i></div><div class="bar"><i style="width:61%"></i></div></div></div></div><div class="side"><div class="panel"><b>Duplicate Candidates</b><div class="rows"><div class="bar"><i style="width:78%"></i></div><div class="bar"><i style="width:54%"></i></div><div class="bar"><i style="width:92%"></i></div><div class="bar"><i style="width:36%"></i></div><div class="bar"><i style="width:61%"></i></div></div></div><div class="panel"><b>Version Updates</b><div class="rows"><div class="bar"><i style="width:78%"></i></div><div class="bar"><i style="width:54%"></i></div><div class="bar"><i style="width:92%"></i></div><div class="bar"><i style="width:36%"></i></div><div class="bar"><i style="width:61%"></i></div></div></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listAssets · getMediaUsageAnalytics</div>
+          <div><b>OPERATIONS</b> &middot; getMediaUsageAnalytics</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#cms-001">CMS-001</a>  &mdash; <i>Back to Tenant Workspace</i><br><a href="#cms-072">CMS-072</a>  &mdash; <i>AI Auto-Tagging &amp; Content Understanding</i><br><a href="#cms-073">CMS-073</a>  &mdash; <i>Semantic &amp; Natural-Language Asset Search</i><br><a href="#cms-074">CMS-074</a>  &mdash; <i>Visual Similarity &amp; Related Asset Discovery</i><br><a href="#cms-075">CMS-075</a>  &mdash; <i>Duplicate &amp; Near-Duplicate Management</i><br><a href="#cms-076">CMS-076</a>  &mdash; <i>Asset Version Control &amp; Revision History</i><br><a href="#cms-077">CMS-077</a>  &mdash; <i>Version Comparison &amp; Replacement Impact</i><br><a href="#cms-078">CMS-078</a>  &mdash; <i>Transformation &amp; Rendition Management</i><br><a href="#cms-079">CMS-079</a>  &mdash; <i>Rendition Processing &amp; Delivery Readiness</i><br><a href="#cms-080">CMS-080</a>  &mdash; <i>AI Quality, Intelligence Review &amp; Recommenda</i></div>
@@ -2794,7 +2793,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue&#x27;s busiest hour is a list that skips rows.</span></div><div class="panel"><b>Create access policy</b><div class="chip cta">Create access policy</div><span class="why">The act the screen exists for.</span></div><div class="panel"><b>Cancel</b><div class="chip">Cancel</div><span class="why">**A screen that can submit must be leaveable without submitting.**</span></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Roles and asset actions</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">One row per role, one column per asset action (discover, view, edit, download, share, approve, manage), each allowed or not, with the scope it applies at.</span></div><div class="panel"><b>Grant an asset action to a role</b><div class="chip cta">Grant an asset action to a role</div></div></div></div>
             </div>
           </div>
         </div>
@@ -2804,7 +2803,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           
           <div><b>GOES TO</b> &middot; <a href="#cms-081">CMS-081</a>  &mdash; <i>Back to DAM Governance &amp; Rights Command Cent</i></div>
           
-          
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formCreateAuthorisationPolicy &middot; <i>Grant an asset action to a role</i> &middot; <b>Grant an asset action to a role</b> &middot; Cancel</div></div>
         </div>
       </div>
       <div id="cms-087" class="scr" data-ws="WS76">
@@ -3094,7 +3093,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><b>DAM-IMG-009211 — Default Dubai Park Hero</b><div class="chip">DAM-IMG-009211 — Default Dubai Park Hero</div></div><div class="panel"><span class="kind">primaryButton</span><div class="chip cta">primaryButton</div><span class="why">Implied by the form template — not declared on the screen.</span></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Default fallback asset</b><div class="chip">Default fallback asset</div><span class="why">Picked from the library (e.g. DAM-IMG-009211, &quot;Default Dubai Park Hero&quot;).</span></div><div class="panel"><span class="kind">primaryButton</span><div class="chip cta">primaryButton</div><span class="why">Implied by the form template — not declared on the screen.</span></div></div></div>
             </div>
           </div>
         </div>

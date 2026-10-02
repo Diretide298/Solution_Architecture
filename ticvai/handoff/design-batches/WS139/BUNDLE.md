@@ -61,22 +61,115 @@ convincingly. It is never a caption.
   and its error; and, element by element, what is shown and in what format, what each action
   produces and where the user goes next. Draw exactly that.
 
+## The processes these screens belong to
+
+Written by the owner of each process (`handoff/design-notes/`). Read before any screen: it says how the process runs end to end and which words the screens must use.
+
+### Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers)
+
+Customer & marketing is how a venue knows its guests and talks to them. There is ONE guest profile per person across ticketing, F&B and retail, so a guest who books online and later dines is the same profile (DI-339). A profile needs at least an email or a mobile, never neither (DI-372). Profiles are created by registration, by guest checkout, or by staff at a till or desk. Repeat guest checkouts with the same verified email or phone attach to the same profile automatically (DI-941, R120 default). Two records that might be the same person are NEVER merged automatically: the guest is asked to confirm, and an admin review queue runs alongside (DI-377). Each candidate shows why it matched; the record that loses is superseded, not deleted; consent takes the narrower of the two positions (DI-808). Around the profile sit three things that must never be confused. CONSENT is what the law allows: per purpose and per channel, append-only, with the notice version and the source (recordConsent). It is Given, Withdrawn or Not asked. A SUBSCRIPTION is what the guest asked to receive, e.g. a newsletter list (MarketingSubscription). A PREFERENCE is what they like: table, dietary, accessibility (updateGuestPreferences). An anonymous visitor's cookie decision is recorded against a device key (recordDeviceConsent) and attaches to the guest when they sign in (claimDeviceConsent). Marketing consent at GUEST CHECKOUT is an open client question, and the design follows its default: an unticked opt-in beside the terms, one per channel and purpose. It is recorded with source "checkout" against the order and the verified contact, and nothing is sent without it. Whether that is sufficient consent under PDPL is the client DPO's call (M18-15 (audit R-M18-15), DI-954, DI-940). Marketing reads profiles through SEGMENTS (rules, evaluated when used) and static LISTS (imported). It reaches guests by CAMPAIGNS (one send to an audience) and JOURNEYS (automations started by an event, with waits and branches). Journeys may offer only pre-configured offers, never a free-typed discount (MoM 2026-08-20 4.6). Everything goes through ONE communications module that every other module uses (MoM 2026-08-31 4.6). Consent and suppression are applied at send time, and the number excluded, with the reasons, is reported before anything goes out (launchCampaign). Transactional messages (tickets, receipts, queue calls, case replies) do not need marketing consent and must never carry marketing. LOYALTY pays for spend: points, tiers, rewards and expiry. GAMIFICATION pays for behaviour: challenges, badges, streaks, referrals and leaderboards (createChallenge). A guest reads their own loyalty position (getLoyaltyPosition). A till, the back office or support reads a named guest's (getGuestLoyalty, or identifyGuest at a till). SERVICE: one Case object covers lost property, complaints, questions, accessibility and refund requests (CaseKind). A guest raises one with raiseMyCase, which needs the connection …
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Guest | The person the venue serves, signed in or not. In body copy on every surface. | Customer, User, Subject, Contact, Patron | contracts/satellite/marketing-crm.yaml#/components/schemas/GuestProfile |
+| Guest profile | The CRM record of one person (details, consent, preferences, history). Distinct from the Account, which is how a guest signs in. | Customer record, Contact, Subject | contracts/satellite/marketing-crm.yaml#getGuestProfile |
+| Consent - Given / Withdrawn / Not asked | What the law allows, per purpose (marketing, personalisation, profiling, third-party sharing, AI processing, transactional) and per channel. "Not asked" is not "Withdrawn" and must look different. | Opted in/out as a status, Accepted, Declined, Revoked, Unsubscribed (that is a subscription) | contracts/satellite/marketing-crm.yaml#/components/schemas/ConsentDecision |
+| Subscription | A list the guest asked to receive (a newsletter, event news), per channel. Unsubscribing from a list is not withdrawing consent. | Consent, Opt-in | contracts/satellite/marketing-crm.yaml#/components/schemas/MarketingSubscription |
+| Preferences | What the guest likes or needs (seating, drinks, dietary, accessibility, contact channel). Never grants permission. | Consents, Settings | contracts/satellite/marketing-crm.yaml#updateGuestPreferences |
+| Send me offers and news | The marketing opt-in label beside the terms at checkout, unticked, one per channel and purpose. | I agree to marketing, Pre-ticked boxes, Keep me updated ticked by default | DI-954 |
+| Points / Tier / Points to next tier / Expiring points | The loyalty position. Points are a liability earned per programme; tiers are ranked (Bronze, Silver, Gold, Platinum in the meetings). | Credits, Coins, Balance alone (wallet money is "credit"), Level | DI-382 |
+| Pending points | Points earned on a purchase still inside its refund window; shown apart from spendable points. | Available points for pending ones | contracts/satellite/marketing-crm.yaml#getLoyaltyPosition |
+| Reward | What points can be turned into (rewards catalogue). | Prize (games redemption uses prize), Voucher unless it is one | contracts/satellite/marketing-crm.yaml#listRewards |
+| Challenge / Badge / Streak / Referral | Gamification - rewards for behaviour, not spend. Status badges such as Explorer, Adventurer, Legend. | Mission and Quest used interchangeably on one screen, Loyalty tier for a badge | DI-392 |
+| Case | One service record - lost property, complaint, question, accessibility, refund request or other - with a number (venue prefix plus sequence), a status and an SLA. | Ticket (a ticket is an admission product), Issue, Incident (that is maintenance and safety) | contracts/satellite/marketing-crm.yaml#/components/schemas/CaseKind |
+| Reply to guest / Internal note | The two kinds of case message. The agent always chooses one explicitly; there is no default. | Comment, Message (ambiguous) | F05 step 2 |
+| Conversation | A live chat session (web chat, in-app, WhatsApp, SMS, email, kiosk, voice). With the assistant, then queued, then with an agent. It is not a case. | Ticket, Case (until one is raised from it) | contracts/satellite/marketing-crm.yaml#/components/schemas/ConversationState |
+| Segment / List / Audience | A segment is rules evaluated when used. A list is static, imported or hand-picked. The audience is what a campaign or journey targets. | Group, Cohort, Target list for a segment | DI-381 |
+| Campaign / Journey | A campaign is one send (one-off, scheduled, triggered or recurring) to an audience. A journey is an automation started by an event, with steps, waits and branches. | Flow (booking flows use it), Automation for a one-off send, Blast | R146 |
+| Offer | A pre-configured, system-validated discount or benefit that a campaign or journey references. It is never typed into the builder. | Discount field, Coupon (unless the offer is a coupon code) | MoM 2026-08-20 4.6 |
+| Reachable | How many guests in an audience can actually be sent to on a channel after consent and suppression. Always shown beside the matching count. | Audience size alone | contracts/satellite/marketing-crm.yaml#previewSegment |
+| Possible duplicate / Merge | Two profiles that may be one person. Never called "Duplicate" as a verdict. Merging needs confirmation and stays reversible for 30 days. | Duplicate (as a status), Combine, Auto-merge | DI-808 |
+| Data request | A guest's privacy request - a copy of my data, a correction, erasure, a restriction - with a legal clock. Statuses submitted, in progress, completed. | DSAR on guest screens, Subject data, Ticket | DI-379 |
+| Waiver / Consent question | A waiver is a signed, versioned form. A consent question ("Are you able to swim?", "I accept the risk") is a single question asked per person or per booking and recorded as consent. | Contract, Disclaimer, Form for a waiver in guest copy | DI-1062 |
+| Lost item / Found item / Possible match | The two directions of lost property and the suggested pairing between them. | Lost case, Claim before it is claimed | contracts/satellite/marketing-crm.yaml#/components/schemas/LostItem |
+| Wishlist | Products and dates a guest saved to buy later, including F&B and retail to buy on site. | Favourites (used for transport routes), Saved for later on one surface and Wishlist on another | DI-202 |
+| Notification / Message | A notification is an item in the guest's in-app feed. A message is one send on a channel (email, SMS, WhatsApp, push, in-app). | Alert for marketing content, Inbox for the guest feed | contracts/satellite/marketing-crm.yaml#/components/schemas/GuestNotification |
+| Template | A reusable message body per channel and language with merge fields. Transactional and marketing templates are separate kinds. | Layout, Design | contracts/satellite/marketing-crm.yaml#createMessageTemplate |
+
+### Ticketing & Guest Commerce, as the venue and TICVAI configure and run it
+
+WHAT THE PROCESS IS. Everything a guest can buy is set up, priced, promoted and serviced here, on Venue Management (P08, the venue's own back office, served inside the venue's cell) and on the TICVAI Console (P09, TICVAI's control plane, outside every cell). End to end: (1) CATALOGUE. A product has one of twelve kinds (admission, timedAdmission, datedAdmission, openDated, seated, membership, bundle, fnb, retail, rental, addOn, giftCard). Its ticket types (adult, child, senior, resident...) are not typed one by one: they are generated from the product's attributes (components) and each value combination becomes a sellable ticket type with no extra setup (DI-164). What a ticket grants (validity, entries, re-entry, days of week, blackout dates, expiry anchor, fast track, transfer) lives on a reusable entitlement template, not on the product. Who may take part (age, height, supervision, certification) is the eligibility rule; what the guest must answer is the data mask and the consent questions; how the guest sees it is guestListing (bookable, infoOnly, hidden), display tags (at most six), media and the booking flow. Group, family and corporate products and every after-sales policy (reschedule, exchange, refund, cancellation, upgrade, transfer) are configured inside the one product configuration, never on separate screens (DI-465, DI-466). (2) LIFECYCLE AND PUBLICATION. A product moves draft, inReview, approved, live, withdrawn, archived. Approval and publication are two acts with two permissions (PRODUCT_APPROVE, PRODUCT_PUBLISH, R091); every product is authorised before it sells online or on site (DI-438). Approved is still not on a till: a till sells only what is in the signed catalogue release it pulled (publishBundle, ADR-0013), so a saved price is a back-office fact until the venue publishes to tills. Changing something that has sold is preceded by an impact check (assessProductChange: orders affected, entitlements issued, future performances, open carts); restoring a version creates a new version, and sold tickets keep the price and terms they were sold under (restoreProductVersion, DI-938, TRACKER Actions row 145). (3) PRICE. Prices live in price lists: per venue, per channel set, with validity dates and a priority, copied for the next season with an uplift (copyPriceList) and repriced in bulk only after a dry run (bulkChangePrices). Currency and decimal scale are never chosen on a form: they resolve from the venue's region (ADR-0008, ADR-0018; AED 2 places, OMR and BHD 3). When several rules apply, the configured hierarchy decides; there is no "lowest price wins" default (DI-595). Tax on the pre-discount price and three-decimal rounding are regional settings (DI-598). Dynamic rules always show their minimum and maximum price guardrails beside the trigger (getDynamicPriceRule). (4) PROMOTE AND BUNDLE. A promotion is a rule (automatic, or gated by a code) created in draft, made live only by Publish, which first analyses stacking; a …
+*(source: DI-164; DI-171; DI-438; DI-465; DI-466; DI-595; DI-598; DI-387; DI-039; DI-044; DI-474; DI-671; DI-987; DI-019; DI-080; ADR-0008; ADR-0013; ADR-0018; ADR-0019; ADR-0030; R091; R098; R101; R222; REV3-21; contracts/spine/catalogue.yaml#transitionProductLifecycle …)*
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Product | Anything sellable, of one of the twelve kinds. The record that carries names, channels, listing, media and policies. | Item (except on F&B and retail screens), SKU (for tickets), Offering | contracts/spine/catalogue.yaml#/components/schemas/ProductKind |
+| Ticket type | One sellable variant of an admission or event product (Adult, Child, Resident Adult), generated from the product's attributes. For retail and F&B the same record is labelled Variant. | Variant (on ticket screens), Sub-product, Rate (that is a price), Axis value | contracts/spine/catalogue.yaml#updateProductVariant / DI-164 / DI-437 |
+| Attribute | A dimension that generates ticket types (Guest category, Residency, Tier, Length). Each has values; adding a value adds ticket types. | Axis, Component (the client's word; use it only in help text), Option | contracts/spine/catalogue.yaml#setProductAttributes / DI-164 / DI-450 |
+| Entitlement | What a ticket lets the holder do (validity, entries, re-entry, days, blackout dates, expiry, fast track, transfer), defined once on an entitlement template and shared by several products. | Access rights, Ticket rules, Validity profile | contracts/spine/catalogue.yaml#createEntitlementTemplate / DI-171 / DI-451 |
+| Eligibility rule | Who may take part in or buy a product (age, height, supervision, waiver, certification). Distinct from a promotion's eligibility, which decides who gets a discount. | Restriction, Access rule (that is access control) | contracts/spine/catalogue.yaml#setProductEligibilityRule / DI-463 |
+| Price list | A set of prices for one venue and a set of channels, valid between two dates, with a priority. Several coexist (B2C, B2B, season). | Price book, Rate card, Tariff | contracts/spine/catalogue.yaml#createPriceList / DI-140 / DI-163 |
+| Price category | A standard rate type (Adult, Child, Member) reused across lists so venues do not invent "Adult Standard" and "Normal Adult". | Price band (that is a seat-category band), Fare type (transport) | contracts/spine/catalogue.yaml#setPriceCategoryRateType / … |
+| Price band | A priced band on a seat category (code, label, colour, amount, channel, from-date). | Price category, Zone price | contracts/satellite/seating.yaml#/components/schemas/SeatPriceBand |
+| Promotion | A rule that changes a price automatically or when a code is entered; draft until published; declares how it stacks. | Offer (except in guest copy), Deal, Discount rule | contracts/satellite/promotions.yaml#createPromotion / DI-173 / DI-174 |
+| Coupon code | A code issued from a coupon campaign that applies a promotion-style discount; one shared code or many single-use codes. | Voucher, Promo voucher | contracts/satellite/promotions.yaml#createCouponCampaign / DI-173 |
+| Voucher | A code that carries money (face value, balance), sold or issued; a liability until redeemed or expired. | Coupon, Credit note | contracts/satellite/promotions.yaml#listVoucherBatches / … |
+| Bundle | A product sold as one line whose price differs from the sum of its components, with a mandatory revenue allocation. "Package" is acceptable in guest copy. | Combo (that is an F&B meal deal), Catalogue bundle | contracts/satellite/promotions.yaml#createBundle / DI-220 / ADR-0019 |
+| Catalogue release | The signed snapshot of a venue's catalogue, prices, promotions and sale boards that tills, kiosks and devices pull. Its action label is "Publish to tills". | Bundle, Catalogue bundle, Sync, Deploy | contracts/spine/catalogue.yaml#publishBundle / … |
+| Approve / Publish / Save | Save keeps a draft; Approve records that it is authorised (PRODUCT_APPROVE); Publish makes it live for guests and channels (PRODUCT_PUBLISH). Three different buttons, never merged. | Submit, Go live, Activate (except CatalogueConfigStatus active), Deploy | R091 / contracts/spine/catalogue.yaml#transitionProductLifecycle / DI-438 |
+| Product states | Draft, In review, Approved, Live, Withdrawn, Archived (ProductLifecycleState), always as coloured badges with these exact labels. | Published (for a product), Pending, Inactive (for a product) | contracts/spine/catalogue.yaml#/components/schemas/ProductLifecycleState |
+| Channel | Where something is sold. Labels: pos Point of sale; kiosk Kiosk; web and guestWeb Website; mobile and guestApp App; b2b B2B partners; partner Partner; ota Travel agents (OTA); callCentre Call centre; api API; backOffice Back office. | Touchpoint, Outlet (an outlet is a business inside a venue), raw enum values | contracts/spine/catalogue.yaml#/components/schemas/Channel / … |
+| Refund | Money returned after settlement, wholly or for some lines, under the venue's refund policy. | Return (that is retail goods), Reversal, Void | contracts/spine/orders.yaml#createRefund / DI-252 |
+| Void | Cancelling a whole order before settlement, within the same shift, with a reason from the void list. After settlement it is a refund. | Cancel order, Delete | contracts/spine/orders.yaml#voidOrder / R222 |
+| Exchange / Reschedule | Exchange swaps lines for other products or dates and settles only the difference; Reschedule is the same product moved to another date or time. | Rebook, Date change (acceptable only in guest copy), Refund and resell | contracts/spine/orders.yaml#exchangeOrderLines / … |
+| Hold / Capture / Release | A deposit or stored-value amount is held, then partly or fully captured, and the rest released. A held deposit is not a payment. | Charge, Pre-auth (in staff copy), Block funds | contracts/spine/orders.yaml#authoriseStoredValue / … |
+| Wallet (TICVAI wallet) | The guest's stored-value balance on TICVAI, spent by hold and capture. Distinct from the tender "Apple Pay / Google Pay", which the contract also calls wallet. | Digital wallet (for stored value), E-wallet, Credit (without a type) | contracts/spine/orders.yaml#/components/schemas/TenderKind / R080 |
+| Credit lot | One amount of wallet credit of one credit type (cash, bonus, gift) with its own expiry; lots are spent nearest expiry first and the guest sees the breakdown but cannot choose. | Bucket, Batch, Top-up | TRACKER Actions row 171 / contracts/satellite/wallet.yaml#expireCreditLots |
+| Venue map / Seat map | A venue map is the wayfinding map of a park or a floor (points, paths, bookable places); a seat map is the seating layout of an auditorium or stand. Never just "map" where both could be meant. | Layout (alone), Floor plan (unless it is a floor map), Map (alone) | contracts/satellite/venue-map.yaml#createVenueMap / … |
+| Point / Bookable place | A point is a place on a venue map (toilet, ride, restaurant, exit). A bookable place is a cabana, lounger, table or pitch placed on the map and sold through its price band. | Pin, POI, Marker, Resource (in staff copy) | contracts/satellite/venue-map.yaml#setVenuePoint / … |
+| Station / Route / Timetable / Departure / Fare table / Pass … | A route is an ordered list of stations with offsets; a timetable generates departures up to its release horizon; a fare table prices a route per passenger type; a pass type is a multi-trip or unlimited pass sold as a product. | Stop (except in the stop list), Line (except lineCode), Schedule, Trip (except a guest's journey) | contracts/satellite/transport.yaml / REV3-21 |
+| Applies from | The effective date of a change. Every dated change shows it, and sold items keep their old terms. | Effective date (in labels), Start date (for a change) | contracts/satellite/seating.yaml#updateSeatCategory / TRACKER Actions row 194 |
+
+### AI & Intelligence
+
+AI in TICVAI is one governed engine behind many screens. The guest meets it as Sahli, the concierge (WEB-044, GST-031, GST-033), as the planner agent that refines a rules-built day plan by chat (GST-054), and as upsell and cross-sell offers on a separate Extras step (WEB-008, GST-048). Staff meet it as the Staff App's AI tab (EMP-019/020, knowledge EMP-040/041), the kiosk assistant (KSK-015) and the support copilot (SUP-006, SUP-018). Venue managers meet it in Venue Management (BO-091 policy and spend, BO-919/BO-925..932 resource and staffing forecasts, BO-597/598 configuration drafts, BO-772/782 marketing optimisation, BO-793 translations, BO-970/975 seat-map generation, BO-1048 seat upsell, BO-1160 fraud cases) and in Analytics (ANL-010 suggestions, ANL-019 management insights, ANL-055 anomalies, ANL-057 forecasting studio, ANL-059 insight history, ANL-060 governance, ANL-071 AI maturity). The governance, configuration-assistant, forecasting, oversight, audit and monitoring boards sit on the TICVAI Console (P09: ADM-037 providers, ADM-469..498 configuration assistant, ADM-499..518 forecasting, ADM-519..558 governance, ADM-633/637 fraud, ADM-680..697 recommendation governance). Five rules hold on every one of these screens. (1) Baseline first, then it learns per tenant: every data-driven answer (forecast, suggestion, risk score, recommendation) exists from day one, from the venue AI profile, a starting pattern for the venue type, the UAE calendar and the weather, and shifts to the venue's own data as it trades; nothing says "comes later" or refuses for lack of history - a refusal only names a missing setting. (2) Every answer shows its basis and maturity: a "Based on" line, a stage badge (Starting, Learning, Established, Trained on your data), "Limited historical data" while the starting pattern carries more than half the weight, ranges or bands rather than a bare percentage, a confidence only where the producer really has one, a plain-words explanation always. (3) A trained model replaces the baseline only when it beats it in a shadow run of at least six weeks and an admin promotes it; the platform raises "Ready to promote" and never switches by itself. (4) The LLM never reads raw data: numbers come only from query results the platform runs (the answer shows the query), only the masked prompt and retrieved context leave the platform, and AI only drafts - the owning screen applies. (5) One autonomy scale, L0 Disabled to L4 Controlled auto, with first-release ceilings, separate from user permission and from the approval tier; impactful actions route to a person, who sees current against proposed, impact, risk and what is affected, and can approve within a limit, challenge, override or roll back; every decision is traceable (data, model, approver, time) and searchable by customer, venue and capability. In Block A (5 October to 20 November 2026) the guest concierge with retrieval, Help me choose, translations, the planner agent, the gateway and …
+*(source: ADR-0051; ADR-0050; ADR-0020; ADR-0052; ADR-0053; ADR-0054; ADR-0059; ADR-0051 (AI-D01..AI-D20); ADR-0051 (AI functions review 30 Sep §2 §4 §9); MoM 18 Sep 4.1-4.10; MoM 21 Sep 4.1-4.14; MoM 30 Sep 4.1 4.7; ADR-0059 (Block A slice: tasks.csv))*
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Sahli | The guest concierge's name; the entry reads "Ask Sahli" and shows as mascot art when the venue's Concierge mascot setting is on (default), otherwise a plain button. | Chatbot, Bot, AI Concierge (as a visible label), Virtual agent | DI-1069 / screens/P01-guest-web-storefront.yaml#WEB-044 |
+| Based on | The line on every AI answer that says what it was computed from, e.g. "Based on: your venue profile, UAE calendar, weather, 23 days of your sales". Always present. | Data sources, Model inputs, Powered by AI | ADR-0051 Maturity / contracts/satellite/ai.yaml#/components/schemas/AiMaturity |
+| Starting / Learning / Established / Trained on your data | The four maturity stages (enum starting, learning, established, learned), shown as one badge. Moves by itself from Starting to Established as own data arrives; Trained on your data only after an admin promotion. | Beta, Experimental, Low confidence, Cold start (in UI), Not enough data | ADR-0051 / ADR-0051 (AI functions review 30 Sep §2) |
+| Limited historical data | Shown while own data carries less than half the weight (AiMaturity.limitedHistory, ownDataShare < 0.5). An honest qualifier, never a refusal. | Insufficient data, Not available until, Comes later | ADR-0051 / contracts/satellite/ai.yaml#/components/schemas/AiMaturity |
+| Range | The 10th-90th percentile band a forecast or estimate is shown with (e.g. "1,850-3,400 guests, most likely 2,600"). Never a bare accuracy percentage on an answer; measured accuracy (WAPE, bias, coverage) appears only on accuracy screens … | Accuracy 92%, Confidence 0.87 (on a heuristic), Exact | ADR-0051 / contracts/satellite/ai.yaml#getForecast / … |
+| Running in the background | A trained model in shadow next to the live answer (AiRelease.stage shadow); it changes nothing a person sees. | Live, Active model, Testing in production | ADR-0051 Promotion / ADR-0051 (AI functions review 30 Sep §2) |
+| Ready to promote / Promote | A shadow model passed its gate (governance alert promotionReady); an admin promotes it one stage at a time (canary, then production). The only way a model replaces the baseline. | Deploy, Go live, Auto-switch, Activate model, Upgrade AI | ADR-0051 (AI-D16) / contracts/satellite/ai.yaml#promoteAiRelease |
+| L0 Disabled / L1 Advisory / L2 Prepare / L3 Execute with … | The one autonomy scale for every AI capability, shown as "L2 Prepare" etc. with the capability's ceiling beside it. Lower scopes tighten, never raise. | Autopilot, Copilot mode, Level 0-3 (CFG book), Approval level (for autonomy), Manual/Semi/Auto | ADR-0050 / ADR-0050 (AI-D04) / … |
+| Approval tier | How many people must approve a proposed action (ProposedAction.approvalLevel, 1 or 2). Not an autonomy level. | Autonomy level, Approval level (ambiguous) | ADR-0050 |
+| Suggestion / Draft | What AI produces. A suggestion advises; a draft is a ready-to-review change that a person applies in the owning screen. Copy says "Nothing is applied until you approve it." | AI changed, Auto-applied, AI updated your prices | ADR-0020 / ADR-0051 (AI functions review 30 Sep §4 Configuration assistant) / … |
+| Why this? | The link or expander that opens an answer's explanation (Suggestion.explanation, recommendation template reason, decision trace). Plain words; for guests a template reason. | Explainability, SHAP, Feature importance (in operator copy) | ADR-0052 (AI-D09) / contracts/satellite/ai.yaml#/components/schemas/Suggestion |
+| No thanks | The explicit decline on an offer. Only this counts as a decline and it is remembered across channels; scrolling past or closing the step is not a decline. | Dismiss (as a decline), Skip (as a decline), X (as a decline) | ADR-0052 (AI-D07) / DI-962 / … |
+| Hold for review | What a high fraud or risk score does to a payment or order. The transaction goes through; it is held for a person. | Decline, Block, Reject (for a risk score), Fraud detected | ADR-0053 / ADR-0053 (AI-D06) |
+| Hand over to a person | The concierge passes the whole conversation and its own summary to a live agent; the guest does not repeat themselves. | Escalate, Transfer, Contact bot | contracts/satellite/marketing-crm.yaml#handoverToAgent |
+| Not available yet | The analytics assistant's answer to a question outside the semantic model; it records a knowledge gap and never improvises a number. | I cannot answer, Error, Unknown | ADR-0054 |
+
+
 ## The screens
 
 Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs count fields; requirements are matrix rows; meeting inputs are the ones naming the screen (the module and platform ones are below); white label says whether the tenant's brand reaches it (guest) or it sets the brand (configures).
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-774` | Journey Automation Center | B–D | 0 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
+| `BO-774` | Journey Automation Center | B–D | 0 | 10 | 6 | 0 | 0 | 6 | — | notStarted (—) |
 | `BO-775` | Visual Journey Builder | B–D | 0 | 0 | 6 | 0 | 2 | 6 | — | notStarted (—) |
 | `BO-776` | Trigger Event Catalog | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-777` | Decision Logic & Timing | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-777` | Decision Logic & Timing | B–D | 0 | 20 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-778` | Abandoned Cart Recovery | B–D | 0 | 0 | 6 | 0 | 2 | 6 | — | notStarted (—) |
 | `BO-779` | Lifecycle Journeys | B–D | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
 | `BO-780` | Guest Engagement Journeys | B–D | 0 | 20 | 6 | 9 | 1 | 6 | — | notStarted (—) |
 | `BO-781` | Cross-Sell & Service Recovery | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-782` | AI Journey Optimization | B–D | 0 | 0 | 6 | 13 | 0 | 6 | — | notStarted (—) |
-| `BO-783` | Journey Analytics & Audit | B–D | 0 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
+| `BO-783` | Journey Analytics & Audit | B–D | 0 | 10 | 6 | 0 | 0 | 6 | — | notStarted (—) |
 
 ## Thin screens in this batch
 
@@ -101,10 +194,14 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
 | Offline | online only |
-| Opens with | nothing: it opens on its own |
+| Opens with | `journeyId` (navigation) |
 | Route | `/engagement-support/journey-automation-center-bo-774` |
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+**From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** Health and value of automated journeys: active journeys, guests enrolled, conversions, recovered revenue, exits, errors, upcoming actions, and nodes paused by data or consent problems. Optimisation suggestions are shown, not applied.
+
+**Fixed on main** (the package already carries these; draw what it says): Only listJourneys is declared. (CHG-WIR-005).
 
 #### Inputs: what the user enters or picks
 
@@ -115,6 +212,25 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 **Shown**
 
 **Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+
+**Journey performance** (detail panel, from `getJourneyPerformance`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Journey | the name it points at, never the id | — |
+| Entrants | 1,234 | Everyone who entered, in any status. |
+| By status | grouped details | Entrants per `JourneyEntrant.status`. |
+| Active | 1,234 | — |
+| Paused | 1,234 | — |
+| Completed | 1,234 | — |
+| Exited | 1,234 | — |
+| Suppressed | 1,234 | — |
+| Goal reached | 1,234 | The number that matters. Entrants who left at a step of kind `goal` — their `JourneyEntrant.stepId` when they exited. |
+| Goal rate | 12.5% | `goalReached` over `entrants`. Null while there are no entrants. |
+
+**Rules for what is shown** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
+
+- **Journey row**: Name, template, status, entrants, goal rate (the number that matters, not open rate), errors. *(source: contracts/satellite/marketing-crm.yaml#getJourneyPerformance)*
 
 **Data it reads**: `listJourneys` (onLoad, Journeys running)
 
@@ -142,9 +258,23 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 
+#### Consistency with other screens
+
+- Match `BO-120`: Same journey list.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+journeys:
+- '{name: Abandoned cart - membership, entrants7d: 214, goalRate: 11%, recovered: AED 18,900.00}'
+```
+
 #### Permissions
 
 - `listJourneys` → `MARKETING_VIEW` (read) · staff
+- `getJourneyPerformance` → `MARKETING_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -187,7 +317,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (10 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-774?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-100`, `BO-775`, `BO-776`, `BO-777`, `BO-778`, `BO-779`, `BO-780`, `BO-781`, `BO-782`, `BO-783`.
@@ -215,9 +345,18 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 
 **Known gaps.** **Visual Journey Builder declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** The visual canvas for multi-step journeys: trigger, audience, decision, wait, message, offer, case, task, webhook and goal nodes, with branches and validation. The canvas renders the journey graph the contract holds. A journey is a draft until activated, and pausing keeps guests where they are.
+
 #### Inputs: what the user enters or picks
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+**Rules for these inputs** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
+
+- **Wait node**: Same day, a week, a month, or a custom period. *(source: DI-384)*
+- **Offer node**: Picks only a pre-configured, system-validated offer; no free discount value. *(source: DI-385)*
+- **Message node**: Channel and template; checks the guest's consent for the purpose at the moment of sending. *(source: DI-386; contracts/satellite/marketing-crm.yaml#launchCampaign)*
+- **Re-entry**: Never, after completion, or always. *(source: contracts/satellite/marketing-crm.yaml#/components/schemas/Journey)*
 
 #### Outputs: what the screen shows and produces
 
@@ -228,6 +367,10 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Create journey (primary button) | navigation or local | — | — | — | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
 | What publishing changes (publish gate) | navigation or local | — | — | — | — |
+
+**What each action does** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
+
+- **Activate or pause**: Activation needs MARKETING_SEND; pausing does not evict guests already in the journey. *(source: contracts/satellite/marketing-crm.yaml#activateJourney)*
 
 **Where the user goes next**
 
@@ -244,6 +387,22 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 422 The graph does not terminate, or a step points at nothing. Refused at creation rather than discovered by a guest stuck in a loop. |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+journey: Abandoned cart - membership only
+nodes:
+- Trigger cart abandoned (membership, over AED 500)
+- Wait 2 hours
+- WhatsApp reminder
+- Wait 1 day
+- Decision purchased?
+- Email with offer MEMBER10
+- Goal membership purchased
+```
 
 #### Permissions
 
@@ -312,9 +471,15 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** The catalogue of events that can start, update or stop a journey or fire a message: purchase, cart abandonment, first visit, membership expiry, loyalty milestone, top-up, birthday, reservation, case events. Triggers key off precise event states (a post-visit survey only when the ticket was scanned).
+
 #### Inputs: what the user enters or picks
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+**Rules for these inputs** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
+
+- **Event and state**: Event, required state (e.g. ticket used), delay, and whether it fires transactional or marketing messages; marketing triggers check consent. *(source: contracts/satellite/marketing-crm.yaml#setMessageTrigger; DI-561)*
 
 #### Outputs: what the screen shows and produces
 
@@ -346,6 +511,20 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 `sendTimeMode` `optimised` on a trigger whose `priority` is `operational` or `transactional` (29 September, build pass, group G2), or an `event` not in the … |
+
+#### Consistency with other screens
+
+- Match `ADM-042`: Platform-level event-to-notification mapping; venue triggers sit on top.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+triggers:
+- Ticket scanned -> post-visit survey after 3 hours
+- Order completed -> confirmation (transactional)
+```
 
 #### Permissions
 
@@ -399,14 +578,18 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Engagement & Support · wave 3 · needs the `marketing` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `MARKETING_MANAGE` (1 configure); in the flows as venue manager |
+| Who uses it | venue staff holding `MARKETING_MANAGE`, `MARKETING_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/engagement-support/decision-logic-timing-bo-777` |
 
-**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built. Contract gap recorded 2 October 2026 (CHG-WIR-007): No operation simulates a marketing journey.
+
+**From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** Journey branching, timing and re-entry: conditions, waits, dates, time zones, send windows, blackouts, frequency limits, expiry, exit and goal conditions, and what happens when data is missing. A branch with no safe outcome blocks publication.
+
+**Fixed on main** (the package already carries these; draw what it says): The screen's only operation is createJourney. (CHG-WIR-005).
 
 #### Inputs: what the user enters or picks
 
@@ -414,12 +597,45 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 #### Outputs: what the screen shows and produces
 
+**Shown**
+
+**Journeys** (data table, from `listJourneys`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
+| Name | text | — |
+| Template kind | chip: Abandoned cart, Membership lifecycle, Loyalty lifecycle, Wallet lifecycle … | Which named lifecycle this implements. Set for reporting and for the library, not for behaviour — the steps decide what happens. |
+| Entry event | text | 22.3.2b. From the event catalogue, so a journey cannot enter on something nothing publishes. |
+| Entry conditions | grouped details | Narrows entry — a segment, a tier, a venue. Evaluated once at entry, unlike step conditions. |
+| Steps | list or chips (count when long) | 22.3.1b. What the builder produces. |
+| ID | text | — |
+| Kind | chip: Send, Wait, Branch, Exit, Goal | — |
+| Template | the name it points at, never the id | For `send`. Channel is resolved from the guest's preference at the moment of sending. |
+| Send time mode | chip: Fixed, Optimised | For `send` (29 September, build pass, group G2; 22.3.19). `optimised` delays the send, after the step is reached, to the recipient's … |
+| Channel mode | chip: Preference, Optimised | For `send`. `optimised` tries first the consented channel the send-time suggestion names, then `channelPreference` in order (22.9.16). |
+| Channel preference | list or chips (count when long) | 22.3.3b. Ordered fallback — email, then SMS, then push. |
+| Wait minutes | 1,234 | — |
+| Wait until | grouped details | 22.3.5b. Business hours, time zone and blackout windows — a wallet low-balance alert at 3am is a complaint, and the venue's quiet hours are … |
+| Condition | grouped details | 22.3.4b. IF/THEN over guest profile, behaviour and prior steps. |
+| On true | text | Next step id. |
+| On false | text | — |
+| Next | text | — |
+| Goal event | text | For `goal`. The event that means this journey worked and the guest should leave it — a purchase for abandoned cart, a renewal for … |
+
 **Actions and what each produces**
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
 | Create journey (primary button) | navigation or local | — | — | — | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
+
+**Rules for what is shown** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
+
+- **Path simulation**: Pick representative guests and see which path each takes and why. *(source: screens/P08-venue-back-office.yaml#BO-777)*
+
+**Data it reads**: `listJourneys` (onLoad, The journeys to open and branch)
 
 **Where the user goes next**
 
@@ -437,9 +653,18 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 422 The graph does not terminate, or a step points at nothing. Refused at creation rather than discovered by a guest stuck in a loop. |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+rule: If no purchase within 24 hours and consent for WhatsApp, send reminder; else exit
+```
+
 #### Permissions
 
 - `createJourney` → `MARKETING_MANAGE` (configure) · staff
+- `listJourneys` → `MARKETING_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -469,11 +694,11 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state (422).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-777?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Create journey, Cancel.
 - [ ] Every transition is wired: `BO-774`.
-- [ ] Every gated control is gated: `MARKETING_MANAGE`.
+- [ ] Every gated control is gated: `MARKETING_MANAGE`, `MARKETING_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -497,6 +722,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Carts that lapsed without checkout, feeding recovery; carts the guest emptied on purpose are excluded.
+
 #### Inputs: what the user enters or picks
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
@@ -514,6 +741,10 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
 
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **abandoned carts**: Value, items, guest, lapsed when; consent shown before any recovery. *(source: contracts/spine/orders.yaml#listAbandonedCarts)*
+
 **Data it reads**: `listAbandonedCarts` (onLoad, Carts that lapsed without checking out)
 
 **Where the user goes next**
@@ -530,6 +761,18 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the abandoned cart recovery are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+cart:
+  guest: Hessa Al Mazrouei
+  value: AED 590.00
+  lapsed: 2 h ago
+  consent: true
+```
 
 #### Permissions
 
@@ -597,6 +840,8 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** Reusable lifecycle journeys for membership (onboarding, renewal, expiry, lapse, upgrade), loyalty (enrolment, tier movement, milestone, points expiry) and wallet (top-up, low balance, dormancy, bonus credit expiry). Each has eligibility, channels, goals and stop conditions.
+
 #### Inputs: what the user enters or picks
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
@@ -625,6 +870,21 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 422 The graph does not terminate, or a step points at nothing. Refused at creation rather than discovered by a guest stuck in a loop. |
+
+#### Consistency with other screens
+
+- Match `BO-775`: Templates open in the builder.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+library:
+- Membership renewal - 30/7/1 days before expiry
+- Points expiring - 14 days before
+- Wallet bonus credit expiring - 7 days before
+```
 
 #### Permissions
 
@@ -691,6 +951,8 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** Relationship journeys: birthdays, anniversaries, welcome, first-visit follow-up, inactivity and re-engagement, personalised by language, interests and preferred channel. Quiet hours, consent, frequency and household and minor rules apply before every message.
+
 #### Inputs: what the user enters or picks
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
@@ -740,6 +1002,18 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the guest engagement journeys are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Edge cases to draw
+
+- **Birthday of a minor**: The message goes to the guardian, never to the child; no marketing to minors. *(source: R205; screens/P08-venue-back-office.yaml#BO-780)*
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+journey: Birthday reward - 7 days before - free entry for the birthday guest - WhatsApp
+```
 
 #### Permissions
 
@@ -796,6 +1070,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - [ ] Every transition is wired: `BO-774`.
 - [ ] Every gated control is gated: `MARKETING_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 1 edge case(s) from the process notes are drawn.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -818,6 +1093,8 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** Cross-sell and service recovery after guest events: eligible upsell after purchase or visit; reservation follow-up, survey request, complaint recovery and post-case journeys. Compensation (voucher, points, credit, refund) stays within approval limits, and a journey stops when sentiment, case status, refund or opt-out changes.
+
 #### Inputs: what the user enters or picks
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
@@ -827,6 +1104,10 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 **Shown**
 
 **Detail panel** (detail panel): One record, read-only.
+
+**Rules for what is shown** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
+
+- **Recovery performance**: Entrants, completions, goals reached (return visit after recovery). *(source: contracts/satellite/marketing-crm.yaml#getJourneyPerformance)*
 
 **Where the user goes next**
 
@@ -842,6 +1123,18 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the cross-sell service recovery are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Edge cases to draw
+
+- **The guest opted out or a case is still open**: Upsell steps stop; recovery steps continue only as transactional case messages. *(source: screens/P08-venue-back-office.yaml#BO-781)*
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+journey: Complaint recovery - case resolved -> apology with 500 points -> survey after 2 days
+```
 
 #### Permissions
 
@@ -881,6 +1174,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-774`.
 - [ ] Every gated control is gated: `MARKETING_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 1 edge case(s) from the process notes are drawn.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -902,6 +1196,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Route | `/engagement-support/ai-journey-optimization-bo-782` |
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+**From the AI & Intelligence process.** AI journey optimisation: recommendations on a journey's branch order, waits, channel, message, offer and send time with expected uplift, evidence, affected audience, risks and policy constraints, compared as scenarios. The one thing to get right: each recommendation shows its basis and constraints and is applied by a person.
 
 #### Inputs: what the user enters or picks
 
@@ -928,6 +1224,10 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |  (primary button) | navigation or local | — | — | — | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
 
+**Rules for what is shown** (from the AI & Intelligence process; these refine the tables above and win where they differ)
+
+- **recommendation card**: Change, expected uplift range, audience size, evidence, constraint (e.g. quiet hours, frequency cap), accept/reject. *(source: contracts/satellite/ai.yaml#listMarketingRecommendations / contracts/satellite/ai.yaml#decideAiInsight)*
+
 **Data it reads**: `listJourneys` (onLoad, Automated journeys); `listMarketingRecommendations` (onLoad, AI recommendations on this campaign or journey, with …)
 
 **Where the user goes next**
@@ -945,6 +1245,17 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 The move is not allowed from the insight's state.; 422 A setting the answer cannot do without is missing (29 September, AI functions review). (AiMissingSettingProblem) |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+card:
+  journey: Membership expiring
+  change: Wait 3 days not 7 before the second reminder
+  uplift: +1 to +3 renewals per 100
+```
 
 #### Permissions
 
@@ -1024,10 +1335,14 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
 | Offline | online only |
-| Opens with | nothing: it opens on its own |
+| Opens with | `journeyId` (navigation) |
 | Route | `/engagement-support/journey-analytics-audit-bo-783` |
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+**From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** Journey behaviour at node and goal level: triggered, eligible, enrolled, reached, clicked, converted, exited and failed, with drop-off per node, suppression reasons and an audit of edits, approvals and pauses.
+
+**Fixed on main** (the package already carries these; draw what it says): Only listJourneys is declared. (CHG-WIR-005).
 
 #### Inputs: what the user enters or picks
 
@@ -1038,6 +1353,25 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 **Shown**
 
 **Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+
+**Journey analytics** (detail panel, from `getJourneyPerformance`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Journey | the name it points at, never the id | — |
+| Entrants | 1,234 | Everyone who entered, in any status. |
+| By status | grouped details | Entrants per `JourneyEntrant.status`. |
+| Active | 1,234 | — |
+| Paused | 1,234 | — |
+| Completed | 1,234 | — |
+| Exited | 1,234 | — |
+| Suppressed | 1,234 | — |
+| Goal reached | 1,234 | The number that matters. Entrants who left at a step of kind `goal` — their `JourneyEntrant.stepId` when they exited. |
+| Goal rate | 12.5% | `goalReached` over `entrants`. Null while there are no entrants. |
+
+**Rules for what is shown** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
+
+- **Suppression reasons**: Counts by reason (no consent, quiet hours, frequency cap, minor, already converted). *(source: screens/P08-venue-back-office.yaml#BO-783)*
 
 **Data it reads**: `listJourneys` (onLoad, Automated journeys)
 
@@ -1056,9 +1390,23 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+funnel:
+  triggered: 1200
+  eligible: 860
+  enrolled: 860
+  reached: 790
+  converted: 95
+```
+
 #### Permissions
 
 - `listJourneys` → `MARKETING_VIEW` (read) · staff
+- `getJourneyPerformance` → `MARKETING_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -1091,7 +1439,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (10 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-783?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-774`.

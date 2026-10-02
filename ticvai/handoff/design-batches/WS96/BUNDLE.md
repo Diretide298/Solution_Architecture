@@ -1,6 +1,6 @@
 # WS96 — Rental Management board 9
 
-**10 screens · 26 operations · 29 schemas · 9 permissions**
+**10 screens · 28 operations · 29 schemas · 9 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -61,6 +61,63 @@ convincingly. It is never a caption.
   and its error; and, element by element, what is shown and in what format, what each action
   produces and where the user goes next. Draw exactly that.
 
+## The processes these screens belong to
+
+Written by the owner of each process (`handoff/design-notes/`). Read before any screen: it says how the process runs end to end and which words the screens must use.
+
+### Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue)
+
+Venue operations is everything that happens after a sale and inside the gates. A guest's ticket is one virtual ticket with interchangeable media (QR, dynamic QR, RFID wristband, NFC, Face Pass or Face Tag); at an access point a scanner (P07, or the scan function inside the Staff App P06) validates the media against the admission profile and the guest admission policy, offline if it must, and every deny carries a reason and a next action. The back office (Venue Management P08) configures that estate: the venue topology (venue, park, zone, attraction, access point, gate and lane, device placement), admission profiles and rules (entry, exit, re-entry, anti-passback, validity, crossover, companions), credential security (dynamic QR, device binding, beacons), biometrics, gate modes, and the live operations, fraud and monitoring views. Accreditation (P08 setup and review, P11 web portal for applicants, web first) takes an applicant from a configurable form through document checks, OCR, duplicate blocking and multi-level approval to a credential with zone rights. Resources and capacity manage bookable resources (rooms, vehicles, equipment, cabanas, instructors) that are booked as a consequence of selling a product, never sold directly. Workforce covers shift templates, rosters, attendance, swaps and breaks, mirrored on the Staff App. Maintenance and safety cover the asset register, preventive calendars, work orders with scored priority, inspections and incidents, with technicians working from the Staff App. Games and rides configure readers, credit types and consumption priority, play entitlements, game pricing, retry pricing, redemption and the card lifecycle. The virtual queue (Q1) gives a guest a live wait time and a return window for a ride; it is not the on-sale waiting room (Q2). Every calendar has day, week and month views. Configuration resolves tenant, region, venue (outlet only for F&B and retail), and a user's permissions, never the device, decide what they may do. The guest apps (P01, P02) show the guest's side of this: My Tickets, the scan code, Face Pass, wait times, the virtual queue, map booking of cabanas and the visit planner.
+*(source: F06 step 1 / F112 step 1 / F111 step 1 / ADR-0002 / ADR-0012 / ADR-0018 / ADR-0041 / ADR-0066 / ADR-0067 / ADR-0068 / DI-652 / DI-627 / DI-640 / DI-654 / DI-666 / DI-482 / DI-483 / DI-907 / DI-919 / DI-923 / DI-865 / DI-678 / TRACKER Actions row 160 / MoM 2026-09-02 AccessControl / MoM 2026-09-07 …)*
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Ticket | The one virtual record a guest owns (ticket number, product, validity, entries). Its number never changes, whatever media carries it or whoever it is transferred or resold to. | Pass (unless the product is a pass), Booking, Order line | DI-652 / DI-620 / contracts/spine/access.yaml#/components/schemas/TicketStatus |
+| Media | What the ticket is presented by at a gate (QR code, dynamic QR, wristband/RFID card, NFC, Face Pass, Face Tag). One ticket can carry several media as fallbacks; a media code can also cover several tickets scanned as one group. Show one … | Credential (for guest media; keep Credential for accreditation badges and staff), Ticket code | DI-180 / DI-608 / DI-652 |
+| Access point | A place where a scan is judged, with a fixed direction (entry, exit, re-entry, crossover). Hierarchy shown to users is Venue > Park > Zone > Attraction > Access point > Gate/lane > Device. | Scanner (that is the device), Door | screens/P08-venue-back-office.yaml#BO-144 / … |
+| Admission profile | The named set of rules an access point enforces (opening window, entries, exit scan, re-entry, validity, crossover). Products point at a profile; tiers such as Bronze/Silver/Gold are profiles with gate allow and deny lists. | Admission rules (as a screen title), Access rule set | DI-185 / contracts/spine/access.yaml#/components/schemas/AdmissionRules |
+| Admitted / Denied / Overridden | The three scan outcomes. A denial is always shown with its reason in plain words and a next action; an override is a supervisor admitting despite a denial, and is always attributed and reasoned. | Valid/Invalid, Success/Fail, Error | contracts/spine/access.yaml#/components/schemas/ScanOutcome / … |
+| Used | A ticket entry is used the moment a scan succeeds, whether or not the guest physically passed. Mistakes are resolved from the scan history, not by un-scanning. | Redeemed (for admission), Checked in (that is group check-in, a different step) | DI-627 / TRACKER Actions row 221 / TRACKER Actions row 189 |
+| Gate mode | What a lane is doing now, set live by the podium or supervisor - Normal, Free flow (counts, does not validate), Drop arm (everybody through, evacuation), Closed (nobody through), Podium (staff validating by eye), Maintenance. Direction is … | Turnstile mode (as a label for direction), Open/Locked | contracts/spine/access.yaml#/components/schemas/AccessPointOperatingMode / R221 |
+| Offline package | What a scanner holds to validate with no network - entitlements, blacklist, admission profiles and the active guest admission policy version - with its age always visible. | Cache, Local DB | F06 step 3 / ADR-0068 |
+| Sync and reconciliation | Sending the offline scan journal to the server, and the duty manager's review of scans the server rejected after the device had already admitted the guest. | Upload, Retry | F06 step 6 / DI-065 |
+| Face Pass / Face Tag | Face Pass is the long-lived face credential for members and season-pass holders (renewable); Face Tag is short-lived, for one day or event. Retention is set per tier by the venue. | Face ID, Biometric login | DI-640 / ADR-0063 |
+| Accreditation / Credential (accreditation) | Accreditation is the application and approval of a person (media, contractor, corporate, staff of a partner) for an event or season; the credential is what is issued after approval (photo badge, QR or RFID) with zone access rights. | Registration (for the whole process), Ticket | DI-654 / DI-662 |
+| Resource | A bookable thing or person a product needs (room, vehicle, cabana, equipment set, instructor). Guests buy products; resources are assigned to the booking, pre-assigned or dynamically. | Asset (that is maintenance), Inventory (that is stock) | DI-475 / DI-482 / TRACKER Actions row 160 |
+| Asset | A physical item maintained by the venue (ride, turnstile, printer, pump) with a register record, documents, warranty and maintenance history. | Resource, Device (unless it is an IT device in the device register) | DI-910 / ADR-0067 |
+| Work order | A unit of maintenance work, lifecycle Created > Assigned > In progress > Review > Closed, with a resolution timer. | Ticket (reserved for guest tickets), Job card | DI-231 |
+| Game / attraction (games module) | In the games and rides module an attraction is an individual game or ride (roller coaster, racing game, bumper cars), not a venue. | Venue, Park | DI-863 |
+| Virtual queue / Return window | A guest's place in a ride's queue held without standing in line, with a return window (for example 4:50 to 5:00 PM) that recalculates live. Distinct from the walk-in line and the VIP/express lane, and from the on-sale waiting room. | Waiting room, Fast pass (that is the express product), Booking | DI-675 / DI-678 / DI-679 / ADR-0066 |
+| Wait time source | Where a ride's wait time comes from - Sensor, Throughput, Manual, or Unavailable - always shown beside the number. | Live (when the source is manual) | contracts/satellite/queue.yaml#/components/schemas/WaitTimeSource / DI-315 |
+
+### Food, Beverage & Retail
+
+Food & beverage, retail, rentals, inventory and procurement across the till (P04), the kitchen display (P15), the staff app (P06), Venue Management (P08), the guest web and app (P01/P02), the kiosk (P05) and the CMS (P13). COUNTER SERVICE (F108): the cashier takes the order on the Food & Drink board from the outlet's menu in force (sections in the outlet's order, option groups attached to the item), sends it to the kitchen, and only then charges — send to kitchen, then charge, for every POS F&B order (R261, upheld against the v2 frame by POSV2-4). The kitchen ticket is on the rail while the card is in the guest's hand; an unpaid sent order is cancelled while ordered or accepted and voided with a reason after (R125(3), R091(5)); the guest gets an order number, and the customer-facing status board (numbers only) is the kitchen display's KIT-007, mirrored on the till's queue (POSV2-7). TABLE SERVICE (F29, F80, F94): a party is seated with its covers, orders across the visit, courses are fired by the pass (DI-333, DI-407), the bill is printed and settled at the end and split by amount, covers, category, item or seat (DI-106); the client's table statuses are Available → Ordered → Table closed → Reserved with no cleaning status (DI-336); moving and merging tables stay on the staff app until after r2 (POSV2-8). GUEST ORDERING (F11, F48): a guest inside the venue orders in the app or web for pickup or delivery to a seat or a scanned location (DI-288, DI-291); F&B and retail are optional licensed modules completed inside TICVAI (DI-505), kept simple (DI-1091); no food without an admission ticket (DI-292); table reservations and the waitlist do not go through the cart and a dining deposit is a venue option, off by default (DI-1048, DI-1049, R077). KITCHEN (P15, F83, F88): TICVAI's own display on commodity screens (19 September, replacing the 31 July "integration point only", DI-077); one kitchen ticket per preparation station from the outlet's routing rules with a fallback display (DI-323); a fired timer counts up and resets per course, not shown for quick service (DI-334); displays are assigned to stations and filter by course, with no station-load tile in r1 (R277). 86 takes an item off sale on every till and guest menu immediately (R110(c)); guests always see "Sold out", never a missing dish. RETAIL (F17, F34, F51): scan and sell through the same cart, charge and payment as tickets and food (DI-795), one cart, one receipt and one QR per guest (DI-293); system stock per venue gates the sale (DI-294); returns by receipt or order number only in r1 (R139(c)), refund to the original tender with a reason code and note (DI-796, DI-797); Shop & Drop is paid online and collected on the way out (R236), a merchandise reservation lasts to the end of the visit day (R169, R215). TILL MONEY (F32, F73, F74, F87): the float is counted by denomination with note images and typed quantities (DI-775, DI-776, R229) while the hardware checks itself (DI-778); the close is a …
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Send to kitchen | Put the order on the kitchen rail. On the till it always comes before Charge. | Fire, Fire order, Submit order, kitchen fires on payment | R261 / POSV2-4 / F108 step 3 |
+| Charge | The till's single tender step (Payment, POS-005); the button reads "Charge AED 110.25". | Checkout (on staff screens), Pay now | F108 step 4 / screens/P04-point-of-sale.yaml#POS-021 |
+| Fire / Hold (a course) | Kitchen-pass words for releasing or holding the next course of a table, and the "fired" timer. | using "fire" for sending an order from the till | DI-333 / DI-334 / DI-407 |
+| Kitchen ticket | The slip on the kitchen display, one per preparation station. | Order (on the kitchen display), KOT | R210 |
+| Ready · Served · Collected · Delivered | How an order reaches the guest; a server marks Served, a counter Collected, a runner Delivered (with the location). | Done, Complete, Bumped (as a status) | R125 / contracts/satellite/fnb.yaml#recordOrderHandover |
+| Recall (kitchen) / Recall held sale (till) | Bring a mis-bumped kitchen ticket back to the rail; separately, bring a held cart back into a sale. Never "Recall" alone where both could apply. | Undo bump, Restore | contracts/satellite/fnb.yaml#recallKitchenTicket / POSV2-6 |
+| Unavailable (86) / Sold out | Staff screens say "Unavailable" and may add "86"; guest screens say "Sold out". Immediate everywhere. | Out of stock (for food), Disabled, Hidden | R110 / contracts/satellite/fnb.yaml#getGuestMenu |
+| Order type | Dine-in · Quick service · Takeaway · Delivery, chosen in the cart. | Service mode, Fulfilment source (on the till) | DI-789 / contracts/satellite/fnb.yaml#/components/schemas/ServiceMode |
+| Covers | The number of guests at a table, entered when seating; drives split-by-covers. | Pax (except as a small suffix on the floor plan), Heads | DI-104 / contracts/satellite/fnb.yaml#openTableVisit |
+| Vacant · Seated · Ordered · Bill requested · Table closed · … | Table statuses on every floor plan (till and staff app); "Table closed" is the client's word for after payment. | Cleaning, Needs clearing, Dirty | DI-336 / DI-792 |
+| Till · Cash drawer | Staff copy may say "till" for the workstation; the cash drawer is the deposit box. | Terminal id as a heading, Deposit box (on staff screens) | R156 |
+| Float · Count · Blind count · Variance | The opening float; the denomination count; the closing count made without seeing the expected cash; counted minus expected. | Expected in drawer, Discrepancy, Error | R080 / POSV2-3 |
+| Cash out · Cash in · Safe drop | Taking cash out of the drawer mid-shift, adding change, and a supervisor moving cash to the safe with the cashier as witness. | Lift, Withdrawal (as button labels) | DI-274 / contracts/spine/shift.yaml#createCashMovement / … |
+| Menu item · Merchandise item · Inventory item · SKU | The scoped product words; SKU is a variant's code, Product stays the sellable thing. | SKU as the item's name, Article | R131 |
+| Stock on hand · Allocated · Available | Available is on hand minus allocated. | Inventory (as a number), Free stock | R171 / DI-361 |
+| Requisition · Purchase order · Goods receipt · Transfer · … | The procurement and stock words, in that flow. | GRN as the only label, Indent | DI-341 / DI-348 / DI-362 / DI-363 |
+| Shop & Drop | Bought and paid now, collected on the way out. | Click & collect | R236 |
+| Check-out (rental) · Return (rental) | Handing equipment to the guest and taking it back. On the same screens payment is "Charge" or "Pay". | Checkout (for a handover), Check-in (for a return) | DI-758 / DI-765 |
+| Deposit hold · Release · Capture | A refundable deposit held, given back in full, or partly kept for damage with the rest released. | Charge deposit, Refund deposit | DI-752 / R127 |
+| Extension · Swap · Overdue · Late fee | The active-rental words; a quick swap restarts the clock, a late swap earns a free extension. | Renewal, Exchange (for a swap) | DI-761 / DI-762 / DI-764 |
+
+
 ## The screens
 
 Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs count fields; requirements are matrix rows; meeting inputs are the ones naming the screen (the module and platform ones are below); white label says whether the tenant's brand reaches it (guest) or it sets the brand (configures).
@@ -69,18 +126,18 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-574` | Maintenance Command Center | B–D | 2 | 0 | 6 | 1 | 0 | 2 | — | notStarted (—) |
 | `BO-575` | Maintenance Rule & Service Plan Configuration | B–D | 8 | 0 | 6 | 4 | 1 | 2 | — | notStarted (—) |
-| `BO-576` | Maintenance Calendar & Scheduling | B–D | 7 | 10 | 6 | 10 | 3 | 2 | — | notStarted (—) |
+| `BO-576` | Maintenance Calendar & Scheduling | B–D | 7 | 30 | 6 | 10 | 3 | 2 | — | notStarted (—) |
 | `BO-577` | Maintenance Work Order | B–D | 29 | 20 | 6 | 22 | 3 | 2 | — | notStarted (—) |
-| `BO-578` | Technician Repair Workspace | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-578` | Technician Repair Workspace | B–D | 8 | 0 | 6 | 5 | 1 | 0 | — | notStarted (—) |
 | `BO-579` | Parts, Cost & Maintenance Expense Tracking | B–D | 9 | 5 | 6 | 2 | 2 | 2 | — | notStarted (—) |
 | `BO-580` | Asset Maintenance History & Lifecycle | B–D | 0 | 0 | 6 | 5 | 1 | 2 | — | notStarted (—) |
-| `BO-581` | Return-to-Service Inspection & Approval | B–D | 0 | 0 | 6 | 3 | 1 | 3 | — | notStarted (—) |
+| `BO-581` | Return-to-Service Inspection & Approval | B–D | 5 | 0 | 6 | 3 | 1 | 3 | — | notStarted (—) |
 | `BO-582` | Asset Retirement, Write-Off & Replacement Recommendation | B–D | 0 | 0 | 6 | 5 | 1 | 0 | — | notStarted (—) |
 | `BO-583` | Maintenance Intelligence & Predictive AI | B–D | 0 | 18 | 6 | 1 | 2 | 2 | — | notStarted (—) |
 
 ## Thin screens in this batch
 
-**BO-578, BO-580, BO-581, BO-582, BO-583 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**BO-580, BO-581, BO-582, BO-583 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ---
 
@@ -103,6 +160,22 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/rentals/maintenance-command-center-bo-574` |
+
+**Known gaps.** Contract gap recorded 2 October 2026 (CHG-WIR-004): No maintenance KPI read (counts by state, average downtime).
+
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** The rental board's maintenance command centre: how healthy the rental fleet is and how much maintenance work is in hand - assets under maintenance, inspections waiting, preventive work due or overdue, repairs awaiting parts, items ready to return to service, average downtime - plus the maintenance queue and AI alerts, with tiles opening the board's nine screens. The one thing to get right: it is the shared command-centre pattern with metric tiles and a short queue (per VO-R02), filtered to the rental fleet, not a second maintenance system beside the venue's.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **Ten metric tiles bound to no operation** Why: listWorkOrders and getDueMaintenance (declared) can give counts by status and due, but there is no count or KPI read: Inspection required, Ready for return to service and Average downtime need an aggregate (downtimeMinutes is per work order). *(source: screens/P08-venue-back-office.yaml#BO-574 / contracts/satellite/maintenance.yaml#listWorkOrders; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **Damage repair is a maintenance type the work order cannot carry** Why: WorkOrderKind is corrective, planned, inspectionFollowUp, incidentCorrective, improvement; the pack's type (Preventive, Corrective, Damage) and its source list (return inspection, damage case, customer complaint, recall) have no field. *(source: screens/P08-venue-back-office.yaml#BO-583 / contracts/satellite/maintenance.yaml#/components/schemas/WorkOrderKind; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **Filter "Product" has no parameter on listWorkOrders** Why: Work orders filter by asset, category, status, priority and dates; product would need the asset's linked product. *(source: screens/P08-venue-back-office.yaml#BO-575 / contracts/satellite/maintenance.yaml#listWorkOrders; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+
+#### Decided on this screen
+
+Answered questions: draw the decision, not the old default. Where a decision and the tables below differ, the decision wins.
+
+- **Should the rental maintenance command centre be a saved view of the venue maintenance dashboard (rental categories pre-filtered) rather than its own screen?** → Drawn default accepted: Draw it once as the shared command-centre pattern with the rental filter applied (per VO-R02). *(decided by Chinmay, 2026-10-02; DEC-436 / CHG-NOTE-008)* **Reviewable:** a default the lead may still overrule before the block is tasked.
 
 #### Inputs: what the user enters or picks
 
@@ -130,6 +203,10 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | To | date and time picker | — | — | `getDueMaintenance` ?to |
 | Category | picker: choose a category | — | — | `getDueMaintenance` ?categoryId |
 
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Filters**: Venue comes from the top bar; the filter row offers Location (rental station), Product, Maintenance type (Preventive, Corrective, Damage repair), Priority, Technician, Status and Due date as pickers. Asset is a scan/search box, not a filter list. *(source: screens/P08-venue-back-office.yaml#BO-575)*
+
 #### Outputs: what the screen shows and produces
 
 **Shown**
@@ -153,6 +230,17 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 **Average Downtime** (metric tile)
 
 **Maintenance Alerts** (metric tile)
+
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **KPI tiles**: Ten tiles in the pack's order - Assets under maintenance, Inspection required, Preventive maintenance due, Overdue maintenance (red when above 0), Corrective repairs, Damage repairs, Awaiting parts, Ready for return to service (green, opens BO-581), Average downtime (hours, with the change against last week), Maintenance alerts. Each tile opens the filtered list. *(source: screens/P08-venue-back-office.yaml#BO-574 / screens/P08-venue-back-office.yaml#BO-575)*
+- **Maintenance queue**: Work order, asset, product, type, priority, due ("Today", "10 Sep"), status - top ten by priority and due, "See all" to BO-577. Statuses read Open, Assigned, In progress, Awaiting parts, Repair complete, Inspection, Closed (the work order's states in the rental board's words). *(source: screens/P08-venue-back-office.yaml#BO-575 / contracts/satellite/maintenance.yaml#listWorkOrders)*
+- **AI alert**: A suggestion card - "6 mountain bikes forecast to need scheduled maintenance during next weekend's peak" - with "See which" and "Plan on Monday instead" opening the calendar; nothing is scheduled until a person confirms. *(source: screens/P08-venue-back-office.yaml#BO-575 / DI-772)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Open a board screen**: Tiles for Service plans (BO-575), Calendar (BO-576), Work orders (BO-577), Repair workspace (BO-578), Parts and cost (BO-579), History (BO-580), Return to service (BO-581), Retirement (BO-582), Intelligence (BO-583); each returns here. *(source: F205 step 1 / F205 step 3)*
+- **Open a queue row**: Opens the work order in BO-577 with its id. *(source: screens/P08-venue-back-office.yaml#BO-574)*
 
 **Data it reads**: `listWorkOrders` (onLoad, Open work orders); `getDueMaintenance` (onLoad, What is due)
 
@@ -179,6 +267,56 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the maintenance are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Edge cases to draw
+
+- **No rental assets on the asset register yet**: An empty state "No serialised rental items registered - add them in the equipment registry" instead of zero tiles. *(source: designer default)*
+- **A tile's figure cannot be read**: The tile shows "Not available" with the reason; the other tiles still load. *(source: designer default)*
+
+#### Consistency with other screens
+
+- Match `BO-070`: The queue rows are the same work orders as the venue work order desk, filtered to rental categories; one row component.
+- Match `BO-108`: The venue-wide maintenance attention strip and these tiles count the same records; the rental fleet is one asset category among others.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+tiles:
+  underMaintenance: 7
+  inspectionRequired: 4
+  preventiveDue: 12
+  overdue: 2
+  corrective: 3
+  damage: 5
+  awaitingParts: 2
+  readyForReturn: 3
+  averageDowntime: 18 h (down 4 h)
+  alerts: 1
+queue:
+- wo: WO-2026-01501
+  asset: BIKE-017
+  product: Mountain Bike
+  type: Damage repair
+  priority: High
+  due: Today
+  status: In progress
+- wo: WO-2026-01503
+  asset: KAY-022
+  product: Double Kayak
+  type: Preventive
+  priority: Normal
+  due: 10 Oct
+  status: Scheduled
+- wo: WO-2026-01504
+  asset: BIKE-031
+  product: Mountain Bike
+  type: Corrective
+  priority: Emergency
+  due: Today
+  status: Awaiting parts
+```
 
 #### Permissions
 
@@ -232,6 +370,9 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - [ ] Every transition is wired: `BO-100`, `BO-575`, `BO-576`, `BO-577`, `BO-578`, `BO-579`, `BO-580`, `BO-581`, `BO-582`, `BO-583`.
 - [ ] Every gated control is gated: `ASSET_VIEW`, `WORK_ORDER_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 2 edge case(s) from the process notes are drawn.
+- [ ] The 3 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
+- [ ] The 1 decision(s) taken on this screen are drawn as decided, not as the old default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -252,6 +393,21 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | Opens with | `planId` (navigation) |
 | Route | `/rentals/maintenance-rule-service-plan-configuration-bo-575` |
 
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** Where a rental manager defines when each rental product needs preventive service, so maintenance does not depend on someone noticing: every 30 days, every 50 rentals, every 100 rental hours, when condition drops to Fair, or after a safety incident - whichever happens first - with the checklist, duration, skill, approval and post-service inspection. The one thing to get right: several triggers on one plan, combined with "whichever happens first", shown as one readable sentence.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **Eight select fields bound to no operation** Why: listMaintenancePlans, createMaintenancePlan and updateMaintenancePlan are declared but not bound; Estimated duration should be a number, Service checklist an inspection-template picker. *(source: screens/P08-venue-back-office.yaml#BO-575 / contracts/satellite/maintenance.yaml#createMaintenancePlan; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **Rental-count, condition-based and incident-based triggers are not in the plan** Why: MaintenancePlan has intervalDays and one usageInterval (one unit) only; "every 50 rentals OR 100 rental hours" needs two usage meters, and condition and incident triggers have no field. *(source: screens/P08-venue-back-office.yaml#BO-576 / screens/P08-venue-back-office.yaml#BO-583 / contracts/satellite/maintenance.yaml#/components/schemas/MaintenancePlan; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **Required skill, required approval and post-maintenance inspection have no field on the plan** Why: The task template carries title, priority, minutes, inspection template and parts only; skills live on the work order, verification on the category. *(source: contracts/satellite/maintenance.yaml#/components/schemas/MaintenancePlan; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **A plan for a product (all bikes) must name one asset** Why: MaintenancePlan requires assetId; a product-wide plan needs the category scope without a single asset. *(source: contracts/satellite/maintenance.yaml#/components/schemas/MaintenancePlan; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+
+#### Decided on this screen
+
+Answered questions: draw the decision, not the old default. Where a decision and the tables below differ, the decision wins.
+
+- **Is "product" (rental product) a valid plan scope, or must every rental product map one-to-one to an asset category?** → Drawn default accepted: Draw the product picker and resolve it to the product's asset category. *(decided by Chinmay, 2026-10-02; DEC-437 / CHG-NOTE-008)* **Reviewable:** a default the lead may still overrule before the block is tasked.
+
 #### Inputs: what the user enters or picks
 
 **On the screen**
@@ -267,7 +423,26 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | Required Approval | select field | — | — | — | — | — | — |
 | Post-Maintenance Inspection | select field | — | — | — | — | — | — |
 
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Product / category**: Picker of rental products and categories (Mountain Bike - Adult, Double Kayak); the plan covers every serialised item of that product. *(source: screens/P08-venue-back-office.yaml#BO-576 / contracts/satellite/maintenance.yaml#/components/schemas/MaintenancePlan)*
+- **Maintenance type**: Preventive service, Inspection, Cleaning, Safety check - a select, which becomes the work order's title prefix. *(source: screens/P08-venue-back-office.yaml#BO-576)*
+- **Triggers**: A list of trigger rows, each removable - Every [30] days; Every [50] rentals; Every [100] rental hours; When condition becomes [Fair]; After a safety-related incident. A line under the list reads "Every 50 rentals or 100 rental hours or 30 days - whichever happens first". *(source: screens/P08-venue-back-office.yaml#BO-576 / screens/P08-venue-back-office.yaml#BO-583)*
+- **Service checklist**: Picker of inspection templates for the product's category, with "Create checklist"; not a free-text select. *(source: screens/P08-venue-back-office.yaml#BO-576 / contracts/satellite/maintenance.yaml#listInspectionTemplates)*
+- **Estimated duration**: A number in minutes (e.g. 45), not a select. *(source: contracts/satellite/maintenance.yaml#/components/schemas/MaintenancePlan)*
+- **Required technician skill**: Multi-select of qualification codes (Bike mechanic, Marine hull); these feed smart assignment. *(source: contracts/satellite/maintenance.yaml#createWorkOrder / DI-924)*
+- **Required approval / Post-maintenance inspection**: Two switches - "Supervisor must verify the work" and "Return-to-service inspection required" (default on for safety equipment such as bikes, kayaks, life jackets). *(source: screens/P08-venue-back-office.yaml#BO-576 / screens/P08-venue-back-office.yaml#BO-581)*
+
 #### Outputs: what the screen shows and produces
+
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Plans for this product**: Each plan as its sentence, with next due item ("BIKE-018 in 6 rental hours") and the count of items covered. *(source: contracts/satellite/maintenance.yaml#listMaintenancePlans)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Save plan**: Creates or amends the plan (PATCH for an existing one); the confirm says how many items will fall due in the next 7 days as a result. *(source: contracts/satellite/maintenance.yaml#createMaintenancePlan / contracts/satellite/maintenance.yaml#updateMaintenancePlan)*
+- **Suspend**: Stops raising work for the plan, with a reason; existing work orders stay. *(source: contracts/satellite/maintenance.yaml#updateMaintenancePlan)*
 
 **Data it reads**: `listMaintenancePlans` (onLoad, Service plans)
 
@@ -286,6 +461,33 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | Empty, no results (`?state=emptyNoResults`) | **Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Neither an interval nor a usage trigger supplied |
+
+#### Edge cases to draw
+
+- **No trigger set**: Save disabled with "Add at least one trigger". *(source: contracts/satellite/maintenance.yaml#/components/schemas/MaintenancePlan)*
+- **Peak period**: An AI suggestion may propose moving due work to a quieter day (BO-583); the plan itself is not changed by it. *(source: screens/P08-venue-back-office.yaml#BO-583)*
+
+#### Consistency with other screens
+
+- Match `BO-071`: Same MaintenancePlan record and editor; this is the rental entry into it (per VO-R14).
+- Match `BO-576`: Plans produce the due items on the rental maintenance calendar.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+plan:
+  product: Mountain Bike - Adult (48 items)
+  type: Preventive service
+  triggers: Every 50 rentals or 100 rental hours or 30 days - whichever happens first
+  checklist: Bike preventive service (12 checks)
+  duration: 45 min
+  skills:
+  - Bike mechanic
+  verify: true
+  returnInspection: true
+```
 
 #### Permissions
 
@@ -335,6 +537,9 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - [ ] Every transition is wired: `BO-574`.
 - [ ] Every gated control is gated: `ASSET_MANAGE`, `ASSET_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 2 edge case(s) from the process notes are drawn.
+- [ ] The 4 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
+- [ ] The 1 decision(s) taken on this screen are drawn as decided, not as the old default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -348,12 +553,28 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Rentals · wave 3 · needs the `resources` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `ASSET_VIEW`, `WORK_ORDER_MANAGE` (1 read, 1 configure); in the flows as venue manager |
+| Who uses it | venue staff holding `ASSET_VIEW`, `WORK_ORDER_MANAGE`, `WORK_ORDER_VIEW` (2 read, 1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/rentals/maintenance-calendar-scheduling-bo-576` |
+
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** The rental maintenance calendar: preventive and corrective jobs placed in time against the fleet, so a planner sees what is out when, schedules a job on a free technician and workshop, and is warned before the job takes away items that guests have already booked. The one thing to get right: scheduling a job removes the item from sellable availability for that window, and a clash with existing reservations is shown before confirming, not after.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **Pattern configEditor and template form for a calendar** Why: The pack page is a calendar with Day, Week, Month and Resource views and a scheduling form; draw a calendar screen with a side panel. *(source: screens/P08-venue-back-office.yaml#BO-577 / screens/P08-venue-back-office.yaml#BO-576; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **Planned start, expected completion and workshop have no field on the work order** Why: createWorkOrder carries dueAt only; a job cannot be placed on a calendar from 09:00 to 11:00. *(source: screens/P08-venue-back-office.yaml#BO-577 / contracts/satellite/maintenance.yaml#/components/schemas/CreateWorkOrderRequest; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **Nothing removes the item from rental availability or reports reservation conflicts** Why: The pack's critical integration (board 9 to board 3) has no operation; createRentalBlackout closes a product or location window, not one serialised item. *(source: screens/P08-venue-back-office.yaml#BO-577 / contracts/satellite/rental.yaml#createRentalBlackout; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+
+**Fixed on main** (the package already carries these; draw what it says): The calendar reads only getDueMaintenance, so scheduled corrective jobs never appear (CHG-WIR-001).
+
+#### Decided on this screen
+
+Answered questions: draw the decision, not the old default. Where a decision and the tables below differ, the decision wins.
+
+- **How long is the turnaround added after a maintenance window before the item is rentable again?** → Drawn default accepted: Show "+ turnaround (product setting)" on the card; value from the rental product. *(decided by Chinmay, 2026-10-02; DEC-438 / CHG-NOTE-008)* **Reviewable:** a default the lead may still overrule before the block is tasked.
 
 #### Inputs: what the user enters or picks
 
@@ -377,6 +598,19 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | From | date and time picker | — | — | `getDueMaintenance` ?from |
 | To | date and time picker | — | — | `getDueMaintenance` ?to |
 | Category | picker: choose a category | — | — | `getDueMaintenance` ?categoryId |
+| Assigned to principal | picker: choose an assigned to principal | — | — | `listWorkOrders` ?assignedToPrincipalId |
+| Status | select | — | Open · Assigned · In progress · Paused · Awaiting parts · Completed · Verified · Closed · Cancelled | `listWorkOrders` ?status |
+| Priority | radio group | — | Low · Normal · High · Urgent · Emergency | `listWorkOrders` ?priority |
+| Asset | upload, or pick from the media library | — | — | `listWorkOrders` ?assetId |
+| Overdue only | toggle | off | — | `listWorkOrders` ?overdueOnly |
+| From | date and time picker | — | — | `listWorkOrders` ?from |
+| To | date and time picker | — | — | `listWorkOrders` ?to |
+| Category | picker: choose a category | — | — | `listWorkOrders` ?categoryId |
+
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Schedule maintenance**: Asset (scan or search), maintenance type, start date and time, expected completion (after start), technician (ranked suggestions shown, nobody pre-assigned), workshop or location, priority. Start and completion are date-time pickers, not selects. *(source: screens/P08-venue-back-office.yaml#BO-577 / DI-924)*
+- **Drag to reschedule**: Dragging a job shows the old and new time and whether it now clashes with bookings before it is dropped. *(source: screens/P08-venue-back-office.yaml#BO-576 / designer default)*
 
 #### Outputs: what the screen shows and produces
 
@@ -397,7 +631,42 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | Triggered by | chip: Interval, Usage | — |
 | Work order | the name it points at, never the id | — |
 
-**Data it reads**: `getDueMaintenance` (onLoad, The maintenance calendar)
+**Scheduled jobs** (data table, from `listWorkOrders`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| Downtime minutes | 1,234 | Measured from out-of-service to back-in-service, not from work start to work end. |
+| Root cause | chip: Wear and tear, Operator error, Guest damage, Manufacturing defect, Environmental … | Structured, because free text cannot be counted. *Deferred maintenance* is the value a venue least wants to see and most needs to — a fault … |
+| Root cause note | text | — |
+| Escalated at | 1 Oct 2026, 14:30 | — |
+| Escalation level | 1,234 | Escalation is a clock, not a decision. A work order on a ride nobody has accepted after twenty minutes escalates itself, because the … |
+| ID | the name it points at, never the id | — |
+| Work order number | text | Server-assigned: the venue prefix plus a sequence per venue (decided 28 September, audit R152). |
+| Title | text | — |
+| Venue | the name it points at, never the id | — |
+| Asset | the image or video | — |
+| Asset name | text | The asset's name, copied when the work order is raised or its asset changes, and not updated when the asset is later renamed — the record … |
+| Status | chip: Open, Assigned, In progress, Paused, Awaiting parts, Completed… | — |
+| Priority | chip: Low, Normal, High, Urgent, Emergency | — |
+| Priority score | 1,234 | The score the venue's policy gave the fault when raised; null when a person or the asset set the priority (M17-01). |
+| Priority source | chip: Scored, Asset override, Manual | Where `priority` came from (M17-01). A change through `updateWorkOrder` makes it `manual`. |
+| Fault assessment | grouped details | What the person raising a fault says about it, which the priority score reads (M17-01). |
+| Safety risk | yes / no (icon or chip) | — |
+| Guest impact | chip: None, Degraded, Closed | — |
+| Required qualification codes | list or chips (count when long) | Skills the job needs (M17-13). |
+
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Calendar**: Views Day, Week, Month, Agenda and Resource (one row per technician or workshop). Day view in hours from the venue's day start; filter by asset category and product; each card "BIKE-017 - Brake repair 09:00-11:00", coloured by type, with due-from-plan items shown dashed until scheduled. *(source: screens/P08-venue-back-office.yaml#BO-577 / DI-919 / DI-908)*
+- **Capacity effect**: A strip above the calendar per product - "Mountain bikes available Sat 12 Oct 10:00-14:00 - 41 of 48 (7 in maintenance)". *(source: screens/P08-venue-back-office.yaml#BO-576 / screens/P08-venue-back-office.yaml#BO-583)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Confirm schedule**: Raises (or updates) the work order and blocks the item for the window plus turnaround. If future reservations are affected, a "Reservation conflict" dialog lists them first, with Swap item, Move job or Confirm anyway. *(source: screens/P08-venue-back-office.yaml#BO-577 / screens/P08-venue-back-office.yaml#BO-583)*
+- **Open job**: Opens BO-577 with the work order. *(source: screens/P08-venue-back-office.yaml#BO-577)*
+
+**Data it reads**: `getDueMaintenance` (onLoad, The maintenance calendar); `listWorkOrders` (onLoad, Scheduled work orders in the calendar window)
 
 **Where the user goes next**
 
@@ -415,10 +684,35 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed |
 
+#### Edge cases to draw
+
+- **Job finishes early**: Availability returns from the approved return-to-service time, not the planned end. *(source: screens/P08-venue-back-office.yaml#BO-583)*
+- **Job overruns**: Changing the expected completion re-checks bookings and lists any newly affected reservation. *(source: screens/P08-venue-back-office.yaml#BO-583)*
+
+#### Consistency with other screens
+
+- Match `BO-070`: The venue work order desk's calendar toggle is the same component and views.
+- Match `BO-071`: Due items from plans appear on both calendars identically.
+- Match `BO-520`: Maintenance blocks and rental blackouts show on the rental availability calendar with distinct styles.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+day: 12 Oct 2026
+jobs:
+- 09:00-11:00 BIKE-017 - Brake repair - Rahul Menon - North Station workshop
+- 10:00-12:00 BIKE-031 - Preventive service - Omar Haddad
+- 13:00-16:00 KAY-022 - Hull inspection - Aqua Park marina
+conflict: BIKE-031 is booked 11:30-13:30 (booking RB-2026-00871, Priya Nair) - swap to BIKE-044?
+```
+
 #### Permissions
 
 - `getDueMaintenance` → `ASSET_VIEW` (read) · staff
 - `createWorkOrder` → `WORK_ORDER_MANAGE` (configure) · staff
+- `listWorkOrders` → `WORK_ORDER_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -464,12 +758,15 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (7), with its required mark, default, format and its error state (400).
-- [ ] Every output is drawn (10 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (30 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-576?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, emptyNoResults, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-574`.
-- [ ] Every gated control is gated: `ASSET_VIEW`, `WORK_ORDER_MANAGE`.
+- [ ] Every gated control is gated: `ASSET_VIEW`, `WORK_ORDER_MANAGE`, `WORK_ORDER_VIEW`.
 - [ ] The 3 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 2 edge case(s) from the process notes are drawn.
+- [ ] The 3 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
+- [ ] The 1 decision(s) taken on this screen are drawn as decided, not as the old default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -491,6 +788,22 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | Route | `/rentals/maintenance-work-order-bo-577` |
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** The rental board's maintenance work order: one repair or service job on one rental item, from its source (a return damage case, a preventive plan, an inspection) through assignment, repair, return-to-service inspection and closure. Priority shows its score and where it came from; smart assignment ranks technicians but assigns nobody; outside vendors are tracked on the job. The one thing to get right: this is the same work order as the venue's (BO-070) seen through the rental board, so it uses the same row, priority-with-source and lifecycle - plus the rental fields (product, source case, estimated cost).
+
+**Known correction pending (do not draw the wrong version)**
+
+- **Gap note "nothing that can be drawn"; an unlabelled table and detail panel; Create bound to no operation** Why: Pack page 113 lists the work order fields, statuses and attachment groups; createWorkOrder and listWorkOrders are declared. *(source: screens/P08-venue-back-office.yaml#BO-578 / screens/P08-venue-back-office.yaml#BO-577; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **Source (return damage case), planned start, expected completion, workshop and estimated cost have no field on the work order** Why: WorkOrder links a plan, inspection or incident only, and carries dueAt and actual costs; the rental source case and planning fields are lost. *(source: screens/P08-venue-back-office.yaml#BO-578 / screens/P08-venue-back-office.yaml#BO-583 / contracts/satellite/maintenance.yaml#/components/schemas/WorkOrder; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **"Save priority scoring" (the venue-wide weights and bands) is edited from a single work order** Why: The policy is venue configuration (WORK_ORDER_MANAGE, applies to all later work); show it read-only here with a link to maintenance settings. *(source: contracts/satellite/maintenance.yaml#setWorkOrderPriorityPolicy / DI-923; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **Priority words differ across sources** Why: Contract low, normal, high, urgent, emergency; maintenance pack P1 Emergency, P2 Critical, P3 High, P4 Normal, P5 Low; rental pack High, Medium, Critical. One display vocabulary is needed. *(source: screens/P08-venue-back-office.yaml#BO-577 / screens/P08-venue-back-office.yaml#BO-575 / contracts/satellite/maintenance.yaml#/components/schemas/WorkOrderPriority; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **Duplicate of BO-070** Why: Same work order operations and panels; the rental board entry should open BO-070's component with rental fields shown (per VO-R14). *(source: screens/P08-venue-back-office.yaml#BO-070; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+
+#### Decided on this screen
+
+Answered questions: draw the decision, not the old default. Where a decision and the tables below differ, the decision wins.
+
+- **Display priorities as "P1 Emergency ... P5 Low" (the workshop's words) with Urgent as P2, or keep the contract words?** → Drawn default accepted: Draw "P1 Emergency, P2 Urgent, P3 High, P4 Normal, P5 Low". *(decided by Chinmay, 2026-10-02; DEC-439 / CHG-NOTE-008)* **Reviewable:** a default the lead may still overrule before the block is tasked.
 
 #### Inputs: what the user enters or picks
 
@@ -556,6 +869,12 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | Min score `bands[].minScore` | stepper or slider | required | — | min 0; max 100 | — | — | `setWorkOrderPriorityPolicy` body |
 | Priority `bands[].priority` | radio group | required | — | Low · Normal · High · Urgent · Emergency | — | — | `setWorkOrderPriorityPolicy` body |
 
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Raise a work order**: Asset (scan or search; product filled from it), maintenance type, source (Return damage case with its case number, Preventive plan, Return inspection, Staff inspection, Customer complaint, AI recommendation, Manufacturer recall), issue text, photos first, fault assessment (anyone at risk; guest impact None / Degraded / Closed), required skills, planned start, expected completion, workshop, estimated cost in AED. Priority empty by default with "Will be scored". *(source: screens/P08-venue-back-office.yaml#BO-578 / screens/P08-venue-back-office.yaml#BO-583 / DI-923 / contracts/satellite/maintenance.yaml#createWorkOrder)*
+- **Priority override**: Choosing a priority marks it Manual and asks for a reason; the scored value stays visible beside it. *(source: screens/P08-venue-back-office.yaml#BO-577 / DI-923)*
+- **Vendor request**: Supplier picker, scope (required, max 2000), vendor reference, quoted cost and final cost in AED, visit date and time; status steps Draft > Sent > Accepted > Scheduled > Completed or Cancelled. *(source: contracts/satellite/maintenance.yaml#createVendorServiceRequest / contracts/satellite/maintenance.yaml#updateVendorServiceRequest)*
+
 #### Outputs: what the screen shows and produces
 
 **Shown**
@@ -615,6 +934,21 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | Update vendor request (secondary button) | `updateVendorServiceRequest` PATCH `/vendor-service-requests/{vendorServiceRequestId}` | inline | VendorServiceRequest | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 The request is already `completed` or `cancelled`. | — |
 | Save priority scoring (secondary button) | `setWorkOrderPriorityPolicy` PUT `/work-order-priority-policy` | WorkOrderPriorityPolicy | WorkOrderPriorityPolicy | 400 Weights that do not sum to 100, or bands that do not descend. | — |
 
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Header**: Work order number, asset, product, source with a link ("Return damage case DMG-20261001-0021"), type, priority badge with source, status step bar. *(source: screens/P08-venue-back-office.yaml#BO-577 / DI-923)*
+- **Priority and how it was set**: "High - scored 52 (safety 40 + guest operations 5 + revenue 0 + criticality 7)" or "Emergency - asset override" or "Normal - manual, by Fatima Al Hashimi: parts on site"; the score and its source always side by side. *(source: contracts/satellite/maintenance.yaml#getWorkOrderPriorityPolicy / DI-923)*
+- **Suggested technicians**: Ranked rows - name, all skills (tick) or missing skills named, on shift now or before due, open jobs; an Assign button per row; no row is pre-selected. *(source: contracts/satellite/maintenance.yaml#suggestWorkOrderAssignee / DI-924)*
+- **Attachments**: Grouped as the pack lists - Return photos, Damage photos, Incident records, Technician photos, Documents - each with its evidence stage. *(source: screens/P08-venue-back-office.yaml#BO-578 / contracts/satellite/maintenance.yaml#attachWorkOrderEvidence)*
+- **Status bar**: Open > Assigned > In progress > Awaiting parts > Repair complete > Inspection > Closed, mapped to the work order's states (Repair complete is Completed, Inspection is awaiting the return-to-service inspection). *(source: screens/P08-venue-back-office.yaml#BO-578 / contracts/satellite/maintenance.yaml#/components/schemas/WorkOrderStatus)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Create work order**: Raises it with photos; priority scored unless set; returns the number and score. *(source: contracts/satellite/maintenance.yaml#createWorkOrder)*
+- **Assign (on a suggested row)**: Sets the assignee; the job reads "Assigned - not yet accepted" until the technician accepts on the Staff App. *(source: contracts/satellite/maintenance.yaml#updateWorkOrder / DI-924)*
+- **Request a vendor / Update vendor request**: Adds or moves a vendor request; a closed or cancelled work order refuses a new one (409) and completed or cancelled requests are final. *(source: contracts/satellite/maintenance.yaml#createVendorServiceRequest / contracts/satellite/maintenance.yaml#updateVendorServiceRequest)*
+- **Send to return-to-service inspection**: After Repair complete, opens BO-581 for this asset and job. *(source: screens/P08-venue-back-office.yaml#BO-581)*
+
 **Data it reads**: `listWorkOrders` (onLoad, List work orders)
 
 **Where the user goes next**
@@ -632,6 +966,55 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 400 Weights that do not sum to 100, or bands that do not descend.; 409 The request is already `completed` or `cancelled`.; 409 The work order is closed or cancelled. |
+
+#### Edge cases to draw
+
+- **Item still rented when the job is raised (damage found mid-rental)**: The job is raised; the item shows "With guest until 16:30" and the planned start cannot be before return. *(source: screens/P08-venue-back-office.yaml#BO-583 / designer default)*
+- **Venue scoring weights changed after the job was raised**: The job keeps its original score; the panel says "Scored under the policy of 14 Sep". *(source: contracts/satellite/maintenance.yaml#setWorkOrderPriorityPolicy)*
+- **No technician has all required skills**: The list still ranks, with missing skills in red; "Request a vendor" is highlighted. *(source: contracts/satellite/maintenance.yaml#suggestWorkOrderAssignee / DI-924)*
+
+#### Consistency with other screens
+
+- Match `BO-070`: Same work order, row, priority badge with source, suggestion list and vendor panel; one component set (per VO-R14).
+- Match `BO-578`: The technician's execution of this job.
+- Match `BO-581`: Return to service is a separate step after Repair complete.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+workOrder:
+  wo: WO-2026-01501
+  asset: BIKE-017
+  product: Mountain Bike - Adult
+  source: Return damage case DMG-20261001-0021
+  type: Damage repair
+  issue: Front brake lever bent during rental.
+  priority: High - scored 52
+  status: Assigned - not yet accepted
+  assignee: Rahul Menon
+  plannedStart: 1 Oct 2026 09:00
+  expectedCompletion: 1 Oct 2026 11:00
+  workshop: North Station workshop
+  estimatedCost: AED 130.00
+suggestions:
+- rank: 1
+  name: Rahul Menon
+  skills: All
+  onShift: 'Yes'
+  openJobs: 2
+- rank: 2
+  name: Omar Haddad
+  skills: Missing Bike mechanic L2
+  onShift: 'Yes'
+  openJobs: 1
+vendor:
+  supplier: Gulf Cycles LLC
+  scope: Replace hydraulic brake set
+  status: Sent
+  quoted: AED 420.00
+```
 
 #### Permissions
 
@@ -700,6 +1083,9 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - [ ] Every transition is wired: `BO-574`.
 - [ ] Every gated control is gated: `MAINTENANCE_EXECUTE`, `WORK_ORDER_MANAGE`, `WORK_ORDER_VIEW`.
 - [ ] The 3 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 3 edge case(s) from the process notes are drawn.
+- [ ] The 5 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
+- [ ] The 1 decision(s) taken on this screen are drawn as decided, not as the old default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -722,9 +1108,49 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** The technician's focused workspace for one repair at a workshop terminal or tablet: the asset and issue, the maintenance checklist to tick, Start / Pause / Awaiting parts / Complete repair, a timestamped work log, notes and evidence. It is the desk-size twin of the Staff App task screen (EMP-005), not a separate design. The one thing to get right: every action is timestamped and attributed automatically, and "Complete repair" does not make the item rentable - it hands over to the return-to-service inspection.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **Gap note "nothing that can be drawn"; one unlabelled primary button and Cancel** Why: Pack pages 113-114 give the checklist, the four technician actions, the work log, notes and evidence. *(source: screens/P08-venue-back-office.yaml#BO-579 / screens/P08-venue-back-office.yaml#BO-578; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **No checklist answers and no free-text work-log entries on a work order** Why: timeEntries hold timer actions only; the pack's checklist ticks and "Brake lever confirmed damaged" have nowhere to be stored. *(source: screens/P08-venue-back-office.yaml#BO-579 / contracts/satellite/maintenance.yaml#/components/schemas/WorkOrderDetail; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **Duplicate of EMP-005 at desk width** Why: Same operations and states; draw one component (per VO-R14). *(source: screens/P06-staff-app.yaml#EMP-005; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+
+**Fixed on main** (the package already carries these; draw what it says): Only start, time and complete are declared; pause, resume and evidence are missing (CHG-WIR-001).
+
 #### Inputs: what the user enters or picks
 
-Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+**Form: Pause** (modal, opened by *Pause*; *Pause* calls `pauseWorkOrder`, *Cancel* sends nothing)
+
+**Collects what `pauseWorkOrder` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Reason `reason` | select | required | — | Awaiting parts · Awaiting permit · Awaiting outage window · Awaiting specialist · End of shift · Safety concern · Other | — | — | `pauseWorkOrder` body |
+| Note `note` | text area | optional | — | max length 300; Required where the reason is `other` (decided 28 September, audit R222): `other` with no note is refused `400`, and the notes are reviewed quarterly so the common ones become real reasons. | — | Required where the reason is `other` (decided 28 September, audit R222): `other` with no note is refused `400`, and the notes are reviewed quarterly so the common ones become real … | `pauseWorkOrder` body |
+| Requisition `requisitionId` | picker: choose a requisition | optional | — | — | shows names, sends the id | Where a part was ordered, so the two are linked. | `pauseWorkOrder` body |
+
+Errors to draw in the form: 400 Validation failed
+
+**Form: Add evidence** (modal, opened by *Add evidence*; *Add evidence* calls `attachWorkOrderEvidence`, *Cancel* sends nothing)
+
+**Collects what `attachWorkOrderEvidence` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Kind `kind` | radio group | required | — | Photo · Video · Document · Note · Signature | — | — | `attachWorkOrderEvidence` body |
+| Asset ref `assetRef` | upload, or pick from the media library | optional | — | — | PNG or SVG ≤ 2 MB for logos; images ≥ 1600 px; video MP4 | In the media store | `attachWorkOrderEvidence` body |
+| Text `text` | text area | optional | — | max length 4000 | — | Where the kind is a note | `attachWorkOrderEvidence` body |
+| Captured at `capturedAt` | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `attachWorkOrderEvidence` body |
+| Stage `stage` | radio group | optional | — | Before · During · After · Sign off | — | — | `attachWorkOrderEvidence` body |
+
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Checklist**: The plan's or category's checklist (Inspect brake lever, Inspect brake cable, Replace brake lever, Test braking system, Road/safety test, Final inspection) as tick rows with a note per row; failed safety test blocks Complete repair and offers Continue repair, Escalate, Request specialist. *(source: screens/P08-venue-back-office.yaml#BO-578 / screens/P08-venue-back-office.yaml#BO-579)*
+- **Pause and Awaiting parts**: Two buttons as the pack shows; both use the one pause reason list (Awaiting parts selected for the second), Other needs a note. *(source: screens/P08-venue-back-office.yaml#BO-579 / contracts/satellite/maintenance.yaml#pauseWorkOrder)*
+- **Notes**: Free text added to the work log with time and name (e.g. "Brake cable remains acceptable; lever replacement required"). *(source: screens/P08-venue-back-office.yaml#BO-579 / contracts/satellite/maintenance.yaml#attachWorkOrderEvidence)*
+- **Evidence**: Add photo / Add document, each tagged Before, During or After. *(source: screens/P08-venue-back-office.yaml#BO-579 / contracts/satellite/maintenance.yaml#attachWorkOrderEvidence)*
+- **Complete repair**: Resolution code chips and resolution text (required), completion photos where the category demands; recordedAt from the clock, never asked. *(source: contracts/satellite/maintenance.yaml#completeWorkOrder)*
 
 #### Outputs: what the screen shows and produces
 
@@ -734,6 +1160,21 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |---|---|---|---|---|---|
 |  (primary button) | navigation or local | — | — | — | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
+| Pause (secondary button) | `pauseWorkOrder` POST `/work-orders/{workOrderId}/pause` | inline | WorkOrder | 400 Validation failed | opens modal first |
+| Resume (secondary button) | `resumeWorkOrder` POST `/work-orders/{workOrderId}/resume` | — | WorkOrder | — | — |
+| Add evidence (secondary button) | `attachWorkOrderEvidence` POST `/work-orders/{workOrderId}/attachments` | inline | WorkOrderAttachment | — | opens modal first |
+
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Job header**: Asset BIKE-017, work order number, issue line, priority badge with source, running labour timer and elapsed since raised. *(source: screens/P08-venue-back-office.yaml#BO-578 / DI-231)*
+- **Work log**: Rows Time, Technician, Activity - "09:05 Rahul Menon Inspection started", "09:18 Brake lever confirmed damaged", "09:22 Replacement required" - generated from actions and notes, newest last. *(source: screens/P08-venue-back-office.yaml#BO-579 / MATRIX 17.4.8)*
+- **Parts and cost so far**: Parts reserved and used with unit cost and line total in AED, labour minutes and cost, total - read-only here; recording parts opens the parts panel (BO-579). *(source: screens/P08-venue-back-office.yaml#BO-579 / contracts/satellite/maintenance.yaml#/components/schemas/WorkOrderDetail / DI-769)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Start work**: Starts the work order and the labour timer; logs "Work started". *(source: contracts/satellite/maintenance.yaml#startWorkOrder)*
+- **Pause / Awaiting parts / Resume**: Stops or restarts the timer with the reason in the log; Awaiting parts offers Reserve parts and Request transfer. *(source: contracts/satellite/maintenance.yaml#pauseWorkOrder / contracts/satellite/maintenance.yaml#resumeWorkOrder / DI-925)*
+- **Complete repair**: Moves to Repair complete - awaiting inspection; the screen says "Not yet rentable - return-to-service inspection next" and links BO-581. *(source: screens/P08-venue-back-office.yaml#BO-581 / contracts/satellite/maintenance.yaml#completeWorkOrder)*
 
 **Where the user goes next**
 
@@ -751,17 +1192,65 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Completion photographs required for this category and none supplied; 400 Validation failed; 409 Action inconsistent with the current timer state |
 
+#### Edge cases to draw
+
+- **Two people open the same job**: The second sees "Rahul Menon is working on this (started 09:05)" and the action buttons are disabled for them. *(source: contracts/satellite/maintenance.yaml#startWorkOrder / designer default)*
+- **Required checklist item unticked**: Complete repair disabled with "3 checks left"; skipping a mandatory check needs a reason and a supervisor. *(source: screens/P08-venue-back-office.yaml#BO-578)*
+
+#### Consistency with other screens
+
+- Match `EMP-005`: Same states, buttons, evidence stages, resolution codes and checklist as the Staff App task screen; one design at two widths.
+- Match `BO-579`: Parts recorded there show in this screen's cost panel.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+job:
+  asset: BIKE-017
+  wo: WO-2026-01501
+  issue: Front brake lever damaged.
+  checklist:
+  - Inspect brake lever - done
+  - Inspect brake cable - done
+  - Replace brake lever - done
+  - Test braking system - pending
+  - Road/safety test - pending
+  - Final inspection - pending
+  log:
+  - 09:05 Rahul Menon - Inspection started
+  - 09:18 Rahul Menon - Brake lever confirmed damaged
+  - 09:22 Rahul Menon - Replacement required
+  parts:
+  - Brake lever x1 AED 55.00
+  - Grip x1 AED 15.00
+  labour: 45 min, AED 60.00
+  total: AED 130.00
+```
+
 #### Permissions
 
 - `startWorkOrder` → `MAINTENANCE_EXECUTE` (operate) · staff
 - `recordWorkOrderTime` → `WORK_ORDER_MANAGE` (configure) · staff
 - `completeWorkOrder` → `WORK_ORDER_MANAGE` (configure) · staff
+- `pauseWorkOrder` → `MAINTENANCE_EXECUTE` (operate) · staff
+- `resumeWorkOrder` → `MAINTENANCE_EXECUTE` (operate) · staff
+- `attachWorkOrderEvidence` → `MAINTENANCE_EXECUTE` (operate) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
 #### Requirements it meets
 
-No matrix row traces to this screen's operations or data.
+5 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+
+| Ref | Requirement (shortened) | Domain | Verdict | Via |
+|---|---|---|---|---|
+| 18.5.1 | Photo Capture - Users shall capture photos. | Employee Mobile App & AI Assistant | CONTRACTED | `attachWorkOrderEvidence` |
+| 18.5.2 | Video Capture - Users shall capture videos. | Employee Mobile App & AI Assistant | CONTRACTED | `attachWorkOrderEvidence` |
+| 18.5.3 | Document Upload - Users shall upload documents. | Employee Mobile App & AI Assistant | CONTRACTED | `attachWorkOrderEvidence` |
+| 18.5.4 | Notes Management - Users shall record notes. | Employee Mobile App & AI Assistant | CONTRACTED | `attachWorkOrderEvidence` |
+| 18.5.5 | Signature Capture - Users shall capture signatures. | Employee Mobile App & AI Assistant | CONTRACTED | `attachWorkOrderEvidence` |
 
 #### Client meeting inputs
 
@@ -784,13 +1273,15 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (400, 409).
+- [ ] Every input above is drawn (8), with its required mark, default, format and its error state (400, 409).
 - [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-578?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: , Cancel.
+- [ ] Every action is wired with its success and its failure: , Cancel, Pause, Resume, Add evidence.
 - [ ] Every transition is wired: `BO-574`.
 - [ ] Every gated control is gated: `MAINTENANCE_EXECUTE`, `WORK_ORDER_MANAGE`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 2 edge case(s) from the process notes are drawn.
+- [ ] The 3 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -813,6 +1304,13 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Food, Beverage & Retail process.** Parts and cost for a maintenance work order on rental equipment: parts are reserved from the main inventory (never a separate maintenance stock), issued when used, and released when not needed. Labour and parts cost roll up to the work order. The one thing to get right is that a short-stock refusal names the part, and reserving is hidden offline.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **The primary button has no label and no operation ("The act the screen exists for").** Why: The act is recording parts used against the work order (recordWorkOrderParts). Label it "Record parts used". *(source: screens/P08-venue-back-office.yaml#BO-579 / contracts/satellite/maintenance.yaml#recordWorkOrderParts; Food, Beverage & Retail)*
+- **Nothing on the screen selects or reads the work order whose parts are shown, and a requisition for a missing part cannot be linked to it.** Why: The list filters by work order, but the screen has no work-order read. F15's "linked, so the job and the purchase find each other" has no field. *(source: F15 step 2 / DI-925 / TRACKER Workshops/Actions row 304; Food, Beverage & Retail)*
+
 #### Inputs: what the user enters or picks
 
 **Sent by *Reserve parts*** (`createStockReservation`; no form is declared, so these are filled from the screen or collected inline)
@@ -833,6 +1331,11 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
 | Reason `reason` | text area | optional | — | max length 300 | — | — | `releaseStockReservation` body |
+
+**Rules for these inputs** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
+
+- **Reserve part**: Item (search or scan), location, quantity. The location defaults to the main store. Hidden when the device is offline. *(source: DI-925 / contracts/satellite/inventory.yaml#createStockReservation)*
+- **Record parts used**: Lines with quantity used. Reserved parts are issued first, from the reservation. *(source: contracts/satellite/maintenance.yaml#recordWorkOrderParts)*
 
 #### Outputs: what the screen shows and produces
 
@@ -857,6 +1360,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Reserve parts (secondary button) | `createStockReservation` POST `/stock-reservations` | InventoryStockReservation | InventoryStockReservation | 400 Validation failed; 409 Not enough free stock at the location. | — |
 | Release reservation (secondary button) | `releaseStockReservation` POST `/stock-reservations/{stockReservationId}/release` | inline | InventoryStockReservation | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 The reservation is not `active`. | — |
 
+**Rules for what is shown** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
+
+- **Parts and cost**: Reserved parts (item, location, quantity, status Active / Used / Released / Expired), parts cost, labour cost, total cost (AED). *(source: contracts/satellite/inventory.yaml#listStockReservations / contracts/satellite/maintenance.yaml#recordWorkOrderParts)*
+
 **Where the user goes next**
 
 - → `BO-574` Maintenance Command Center: *Back to Maintenance Command Center*
@@ -872,6 +1379,32 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 Insufficient stock; 409 Not enough free stock at the location.; 409 The reservation is not `active`. |
+
+#### Edge cases to draw
+
+- **Not enough free stock**: Refused, naming the part, e.g. "Not enough free 'Kayak paddle blade, 210 cm' at Main Store (1 free, 2 asked)". *(source: DI-925 / contracts/satellite/inventory.yaml#createStockReservation)*
+
+#### Consistency with other screens
+
+- Match `EMP-005`: The technician reserves and records the same parts on the staff app.
+- Match `BO-078`: A part with no stock is requested on a requisition. See the correction there (no work-order link).
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+workOrder: 'WO-AQP-003317 · Kayak #12 · cracked paddle'
+reserved:
+- item: Kayak paddle blade, 210 cm
+  location: Main Store
+  qty: 2
+  status: Active
+costs:
+  parts: AED 180.00
+  labour: AED 95.00
+  total: AED 275.00
+```
 
 #### Permissions
 
@@ -921,6 +1454,8 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - [ ] Every transition is wired: `BO-574`.
 - [ ] Every gated control is gated: `PROCUREMENT_REQUEST`, `PRODUCT_VIEW`, `WORK_ORDER_MANAGE`.
 - [ ] The 2 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 1 edge case(s) from the process notes are drawn.
+- [ ] The 2 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -943,15 +1478,41 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** The complete maintenance story of one serialised rental item for a manager or auditor: when it was bought, how much it has earned, how often and why it was repaired, what that cost and how long it was out, in one timeline. It answers whether the item is still worth keeping. The one thing to get right: lifetime revenue against lifetime maintenance cost, side by side, with the timeline as the evidence below.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **Only getAssetHistory is bound; the facts, summary and economics have no source** Why: History entries carry kind, summary and time only - no cost, downtime or revenue. Costs are per work order (WorkOrderDetail), revenue and rental counts are rental data; nothing aggregates them per asset. *(source: contracts/satellite/maintenance.yaml#/components/schemas/AssetHistoryEntry / contracts/satellite/maintenance.yaml#/components/schemas/WorkOrderDetail; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **Gap note "nothing that can be drawn"** Why: Pack pages 115-116 give the facts, the maintenance summary, the timeline and the revenue-against-cost view. *(source: screens/P08-venue-back-office.yaml#BO-580 / screens/P08-venue-back-office.yaml#BO-581; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **History entries do not say whether a repair was preventive, corrective or damage** Why: AssetHistoryEntry kinds are workOrder, inspection, incident, statusChange, partReplaced, planCompleted; damage repair is not distinguishable. *(source: screens/P08-venue-back-office.yaml#BO-581 / contracts/satellite/maintenance.yaml#/components/schemas/AssetHistoryEntry; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+
 #### Inputs: what the user enters or picks
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Period**: Lifetime (default), this year, last 12 months; the annual view shows lifecycle cost per item as the client asked. *(source: DI-769)*
+- **Entry filter**: Chips for Preventive, Corrective, Damage repair, Inspection, Status change, Incident. *(source: contracts/satellite/maintenance.yaml#/components/schemas/AssetHistoryEntry)*
 
 #### Outputs: what the screen shows and produces
 
 **Shown**
 
 **Detail panel** (detail panel): One record, read-only.
+
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Asset facts**: Purchased 12 Jan 2026, age 8 months, total rentals 184, rental hours 276, total revenue AED 11,840.00. *(source: screens/P08-venue-back-office.yaml#BO-580)*
+- **Maintenance summary**: Preventive services 4, corrective repairs 2, damage repairs 3, total maintenance cost AED 1,480.00, total downtime 36 hours - as metric tiles. *(source: screens/P08-venue-back-office.yaml#BO-580)*
+- **Asset economics**: Two bars "Lifetime revenue AED 11,840 vs maintenance cost AED 1,480 (12.5%)"; amber above 50%, red above 80% of acquisition cost (the retirement signal on BO-582). *(source: screens/P08-venue-back-office.yaml#BO-581 / screens/P08-venue-back-office.yaml#BO-582)*
+- **Timeline**: Every work order, inspection, incident and status change in date order (12 Jan Activated, 15 Mar Preventive, 4 May Tyre repair, 18 Jul Customer damage, 8 Sep Brake repair), each opening its record; cursor-paged with Load more. *(source: screens/P08-venue-back-office.yaml#BO-581 / contracts/satellite/maintenance.yaml#getAssetHistory)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Open an entry**: Opens the work order, inspection or incident it refers to. *(source: contracts/satellite/maintenance.yaml#/components/schemas/AssetHistoryEntry)*
+- **Export**: A PDF of the history for an insurer or regulator, with the venue's header. *(source: contracts/satellite/maintenance.yaml#getAssetHistory / designer default)*
+- **Consider retirement**: Opens BO-582 for this asset. *(source: screens/P08-venue-back-office.yaml#BO-582)*
 
 **Where the user goes next**
 
@@ -967,6 +1528,43 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the asset maintenance history are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Edge cases to draw
+
+- **Pooled item (life jackets)**: Not available - pooled items have no individual history; the screen says so and links the product's counts. *(source: DI-744)*
+- **Costs recorded in a different currency (vendor invoice in USD)**: Shown in the venue currency with the original amount on hover. *(source: designer default)*
+
+#### Consistency with other screens
+
+- Match `BO-069`: The History tab of the venue asset register is this timeline; same component and entry icons.
+- Match `BO-506`: The profile's Maintenance tab is a short form of this screen.
+- Match `BO-587`: Fleet analytics rows open here.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+asset: BIKE-017
+facts:
+  purchased: 12 Jan 2026
+  age: 8 months
+  rentals: 184
+  rentalHours: 276
+  revenue: AED 11,840.00
+summary:
+  preventive: 4
+  corrective: 2
+  damage: 3
+  cost: AED 1,480.00
+  downtime: 36 h
+timeline:
+- 12 Jan - Activated
+- 15 Mar - Preventive maintenance
+- 04 May - Tyre repair
+- 18 Jul - Customer damage
+- 08 Sep - Brake repair (WO-2026-01501, AED 130.00)
+```
 
 #### Permissions
 
@@ -1015,6 +1613,8 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - [ ] Every transition is wired: `BO-574`.
 - [ ] Every gated control is gated: `ASSET_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 2 edge case(s) from the process notes are drawn.
+- [ ] The 3 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -1028,18 +1628,52 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Rentals · wave 3 · needs the `resources` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `INSPECTION_SUBMIT`, `WORK_ORDER_VERIFY` (2 operate); in the flows as venue manager |
+| Who uses it | venue staff holding `ASSET_MANAGE`, `INSPECTION_SUBMIT`, `WORK_ORDER_VERIFY` (1 configure, 2 operate); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
 | Offline | online only |
-| Opens with | `workOrderId` (navigation) |
+| Opens with | `workOrderId` (navigation), `assetId` (navigation) |
 | Route | `/rentals/return-to-service-inspection-approval-bo-581` |
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** The control that stops a repaired item becoming rentable just because the technician pressed "Repair complete": a return-to-service inspection against the item's checklist, a result, and a supervisor's approval, after which - and only after which - the item is safe for rental and availability is recalculated. The one thing to get right: two separate people and two separate steps (inspect, then approve and return), with the result in large unmistakable words (SAFE FOR RENTAL / REWORK REQUIRED / UNSAFE).
+
+**Known correction pending (do not draw the wrong version)**
+
+- **The inspection is not linked to the work order it checks** Why: SubmitInspectionRequest has templateId and assetId but no workOrderId; a rework inspection cannot be told from the first. *(source: contracts/satellite/maintenance.yaml#/components/schemas/SubmitInspectionRequest; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **Result vocabulary differs** Why: Pack Pass, Rework required, Unsafe, Supervisor review; InspectionOutcome is passed, passedWithObservations, failed. *(source: screens/P08-venue-back-office.yaml#BO-581 / contracts/satellite/maintenance.yaml#/components/schemas/InspectionOutcome; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **Gap note "nothing that can be drawn"** Why: Pack pages 116-117 give the checklist, results, approver and the SAFE FOR RENTAL outcome. *(source: screens/P08-venue-back-office.yaml#BO-581 / screens/P08-venue-back-office.yaml#BO-582; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+
+**Fixed on main** (the package already carries these; draw what it says): The return to service itself (setAssetStatus inService with the inspection) is not bound (CHG-WIR-001).
+
+#### Decided on this screen
+
+Answered questions: draw the decision, not the old default. Where a decision and the tables below differ, the decision wins.
+
+- **Is supervisor approval required for every rental item, or only where the plan or category says so (pack lists Supervisor review as one result)?** → Drawn default accepted: Required when the product's plan has "Supervisor must verify" on; otherwise the inspector's Pass returns the item. *(decided by Chinmay, 2026-10-02; DEC-440 / CHG-NOTE-008)* **Reviewable:** a default the lead may still overrule before the block is tasked.
+
 #### Inputs: what the user enters or picks
 
-Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+**Form: Return to service** (modal, opened by *Return to service*; *Return to service* calls `setAssetStatus`, *Cancel* sends nothing)
+
+**Collects what `setAssetStatus` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Status `status` | select | required | — | In service · Out of service · Under maintenance · Awaiting parts · Retired · Disposed | — | — | `setAssetStatus` body |
+| Reason `reason` | text area | required | — | min length 3; max length 1000 | — | — | `setAssetStatus` body |
+| Inspection `inspectionId` | picker: choose an inspection | optional | — | — | shows names, sends the id | Required for return to service where the asset demands it. | `setAssetStatus` body |
+| Raise work order `raiseWorkOrder` | toggle | optional | off | — | — | — | `setAssetStatus` body |
+| Recorded at `recordedAt` | date and time picker | required | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `setAssetStatus` body |
+
+Errors to draw in the form: 409 Return to service attempted without the inspection this asset category requires.
+
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Inspection checklist**: The item's return-to-service checklist (Brake lever replaced, Brake cable checked, Brake function tested, Tyres checked, Frame inspected, Safety test completed) as pass/fail rows; safety-critical rows marked; a failed row requires a photo and note. *(source: screens/P08-venue-back-office.yaml#BO-581 / contracts/satellite/maintenance.yaml#/components/schemas/InspectionTemplate)*
+- **Result**: Pass, Rework required, Unsafe as three large buttons; Rework and Unsafe need a note. Signature of the inspector at the end. *(source: screens/P08-venue-back-office.yaml#BO-581 / contracts/satellite/maintenance.yaml#submitInspection)*
+- **Supervisor approval**: Shown after a Pass, for a different person - Approve return to service or Send back, with a note; approver name and time recorded. *(source: screens/P08-venue-back-office.yaml#BO-582 / contracts/satellite/maintenance.yaml#verifyWorkOrder)*
 
 #### Outputs: what the screen shows and produces
 
@@ -1049,6 +1683,18 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |---|---|---|---|---|---|
 | Submit inspection (primary button) | navigation or local | — | — | — | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
+| Return to service (secondary button) | `setAssetStatus` PUT `/assets/{assetId}/status` | SetAssetStatusRequest | AssetStatusResult | 409 Return to service attempted without the inspection this asset category requires. | opens modal first |
+
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Queue**: Items with Repair complete waiting for inspection, and inspected items waiting for approval, oldest first, with how long each has been unrentable. *(source: screens/P08-venue-back-office.yaml#BO-574 / contracts/satellite/maintenance.yaml#listWorkOrders)*
+- **Result banner**: "SAFE FOR RENTAL - approved by Fatima Al Hashimi, 1 Oct 2026 11:18" in green; then "Available from 11:18 - Mountain bike availability recalculated". *(source: screens/P08-venue-back-office.yaml#BO-582 / screens/P08-venue-back-office.yaml#BO-583)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Submit inspection**: Records the inspection with the inspector; a failed safety-critical item keeps the item out of service automatically and raises rework. *(source: contracts/satellite/maintenance.yaml#submitInspection)*
+- **Approve return to service**: Verifies the work order and returns the asset to service citing the inspection; refused for the person who did the repair. *(source: contracts/satellite/maintenance.yaml#verifyWorkOrder / contracts/satellite/maintenance.yaml#setAssetStatus)*
+- **Rework required / Send back**: Reopens the same work order to the technician with the note (same history); the item stays out. *(source: screens/P08-venue-back-office.yaml#BO-581 / contracts/satellite/maintenance.yaml#verifyWorkOrder)*
 
 **Where the user goes next**
 
@@ -1064,12 +1710,42 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the return-to-service inspection approval are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 400 A required item was not answered |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 A required item was not answered; 409 Return to service attempted without the inspection this asset category requires. |
+
+#### Edge cases to draw
+
+- **Approver is the technician who did the repair**: Approve disabled with "You repaired this item - another supervisor must approve" (per R106). *(source: contracts/satellite/maintenance.yaml#verifyWorkOrder)*
+- **Inspection done offline at the rental station**: The inspection queues and shows "Inspected on device 11:02 - waiting to sync"; approval needs the network. *(source: contracts/satellite/maintenance.yaml#submitInspection / contracts/satellite/maintenance.yaml#verifyWorkOrder)*
+- **Item had future bookings during the repair**: After approval, the recalculated availability lists bookings that can now keep this item. *(source: screens/P08-venue-back-office.yaml#BO-583)*
+
+#### Consistency with other screens
+
+- Match `BO-030`: The venue verification queue is the same control; same Verify / Reject wording and evidence panel.
+- Match `EMP-048`: Same inspection item component (pass/fail, safety tag, photo on fail, signature).
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+item: BIKE-017
+checklist:
+- Brake lever replaced - Pass
+- Brake cable checked - Pass
+- Brake function tested - Pass
+- Tyres checked - Pass
+- Frame inspected - Pass
+- Safety test completed - Pass
+inspector: Rahul Menon, 11:02
+approver: Fatima Al Hashimi, 1 Oct 2026 11:18
+result: SAFE FOR RENTAL
+```
 
 #### Permissions
 
 - `submitInspection` → `INSPECTION_SUBMIT` (operate) · staff
 - `verifyWorkOrder` → `WORK_ORDER_VERIFY` (operate) · staff
+- `setAssetStatus` → `ASSET_MANAGE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -1106,13 +1782,16 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (400, 403).
+- [ ] Every input above is drawn (5), with its required mark, default, format and its error state (400, 403, 409).
 - [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-581?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: Submit inspection, Cancel.
+- [ ] Every action is wired with its success and its failure: Submit inspection, Cancel, Return to service.
 - [ ] Every transition is wired: `BO-574`.
-- [ ] Every gated control is gated: `INSPECTION_SUBMIT`, `WORK_ORDER_VERIFY`.
+- [ ] Every gated control is gated: `ASSET_MANAGE`, `INSPECTION_SUBMIT`, `WORK_ORDER_VERIFY`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 3 edge case(s) from the process notes are drawn.
+- [ ] The 3 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
+- [ ] The 1 decision(s) taken on this screen are drawn as decided, not as the old default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -1135,9 +1814,31 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** Taking a rental item out of the fleet for good - end of useful life, excessive maintenance cost, safety concern, repeated failure, total loss, obsolete, lost, management decision - through Recommendation > Review > Approval > Retire, with the economics in front of the approver and the record kept forever. The one thing to get right: retirement is a governed decision that names its consequences (future bookings affected, write-off value to finance) and never deletes the asset.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **Retirement reason, write-off value and disposal proceeds cannot be recorded** Why: setAssetStatus takes status and free-text reason only; Asset has retiredOn and disposalProceeds but no operation writes them, so DI-770's write-off value is lost. *(source: contracts/satellite/maintenance.yaml#setAssetStatus / contracts/satellite/maintenance.yaml#/components/schemas/Asset / DI-770; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **No approval step** Why: The pack's workflow is Recommendation > Review > Approval > Retire; setAssetStatus retires immediately for anyone with ASSET_MANAGE. *(source: screens/P08-venue-back-office.yaml#BO-583 / contracts/satellite/maintenance.yaml#setAssetStatus; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **Future bookings affected are not reported** Why: AssetStatusResult reports products suspended and performances affected, not rental bookings that held the item. *(source: screens/P08-venue-back-office.yaml#BO-583 / contracts/satellite/maintenance.yaml#/components/schemas/AssetStatusResult; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **"Save asset status" label and gap note "nothing that can be drawn"** Why: The act is "Submit for retirement" / "Approve and retire"; pack pages 117-118 give reasons, economics and workflow. *(source: screens/P08-venue-back-office.yaml#BO-583 / screens/P08-venue-back-office.yaml#BO-582; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+
+#### Decided on this screen
+
+Answered questions: draw the decision, not the old default. Where a decision and the tables below differ, the decision wins.
+
+- **Does a retirement need finance approval when the write-off value is above a threshold?** → Drawn default accepted: Draw one approver; show "Finance will be notified" on the confirm. *(decided by Chinmay, 2026-10-02; DEC-441 / CHG-NOTE-008)* **Reviewable:** a default the lead may still overrule before the block is tasked.
+
 #### Inputs: what the user enters or picks
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Retirement reason**: The pack's eight reasons as a single choice; "Lost / not recovered" asks for the last booking. *(source: screens/P08-venue-back-office.yaml#BO-582)*
+- **Write-off value**: Book value (from depreciation where recorded) prefilled; disposal proceeds in AED if sold or scrapped; both passed to finance. *(source: DI-770 / contracts/satellite/maintenance.yaml#/components/schemas/Asset)*
+- **Replacement**: Optional "Replace with" - creates a purchase request for the same product; not required to retire. *(source: screens/P08-venue-back-office.yaml#BO-583 / designer default)*
+- **Approval**: Submitting sends for approval to a person other than the requester; the approver sees the same case and approves or rejects with a note. *(source: screens/P08-venue-back-office.yaml#BO-583)*
 
 #### Outputs: what the screen shows and produces
 
@@ -1151,6 +1852,17 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |---|---|---|---|---|---|
 | Save asset status (primary button) | navigation or local | — | — | — | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
+
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Case for retiring**: Purchase cost AED 2,500, lifetime revenue AED 8,920, maintenance cost AED 2,180 (87% of purchase), repairs 12, downtime 18 days, condition Poor - tiles, with the repair timeline below. *(source: screens/P08-venue-back-office.yaml#BO-582 / contracts/satellite/maintenance.yaml#getAssetHistory)*
+- **AI recommendation**: "Maintenance cost has reached 87% of acquisition cost; failure frequency 3.2 times the fleet average - consider retirement" with the reason shown and an explicit "Start retirement" by a person. *(source: screens/P08-venue-back-office.yaml#BO-582 / DI-772)*
+- **Consequences**: Before approval - future bookings that held this item (to be swapped), open work orders on it, and "History kept; removed from availability permanently". *(source: screens/P08-venue-back-office.yaml#BO-583 / contracts/satellite/maintenance.yaml#/components/schemas/AssetStatusResult)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Submit for approval**: Records the recommendation and reason; the item stays as it is until approved. *(source: screens/P08-venue-back-office.yaml#BO-583)*
+- **Approve and retire**: Sets the asset to Retired with the reason (Disposed later when it physically leaves); confirm names the bookings and open work orders affected (per VO-R16). *(source: contracts/satellite/maintenance.yaml#setAssetStatus)*
 
 **Where the user goes next**
 
@@ -1167,6 +1879,36 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 Return to service attempted without the inspection this asset category requires. |
+
+#### Edge cases to draw
+
+- **Open work orders on the item**: Listed in the confirm; each must be cancelled or closed (No longer applicable) before retirement completes. *(source: contracts/satellite/maintenance.yaml#closeWorkOrder / screens/P08-venue-back-office.yaml#BO-069)*
+- **Item later found (was lost)**: A retired asset can be reinstated by a manager with a reason; its history shows both events. *(source: designer default)*
+
+#### Consistency with other screens
+
+- Match `BO-069`: Retire on the venue asset register uses the same confirm and reason list.
+- Match `BO-580`: The economics tiles are the same figures as the history screen.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+asset: BIKE-031
+case:
+  purchase: AED 2,500.00
+  revenue: AED 8,920.00
+  maintenance: AED 2,180.00
+  repairs: 12
+  downtime: 18 days
+  condition: Poor
+recommendation: Maintenance cost 87% of acquisition cost; failures 3.2 times fleet average
+reason: Excessive maintenance cost
+writeOff: AED 310.00 book value
+requestedBy: Rahul Menon
+approver: Ahmed Al Mansoori
+```
 
 #### Permissions
 
@@ -1215,6 +1957,9 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-574`.
 - [ ] Every gated control is gated: `ASSET_MANAGE`, `ASSET_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 2 edge case(s) from the process notes are drawn.
+- [ ] The 4 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
+- [ ] The 1 decision(s) taken on this screen are drawn as decided, not as the old default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -1237,6 +1982,20 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
 
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** Maintenance intelligence for the rental fleet: a health dashboard (assets at risk, predicted failures, repeat failures, high-cost assets, downtime and its effect on availability, MTBF and MTTR) and a feed of AI recommendations - service this bike within 10 rental hours, move eight services from Saturday to Monday, review this brake supplier, replace rather than repair. The one thing to get right: every recommendation is advisory, shows its evidence, and only a person turns it into a scheduled job or a retirement case.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **The nine dashboard measures are drawn as columns of a data table with a detail panel** Why: They are KPIs and charts (per VO-R02); the pack's "Maintenance Health Dashboard" is tiles. *(source: screens/P08-venue-back-office.yaml#BO-583; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **Only getDueMaintenance is bound; no operation returns predictions, MTBF, MTTR or recommendations** Why: Due plans are not predictions. The screen needs a maintenance analytics read and a recommendation feed with accept/dismiss recorded. *(source: contracts/satellite/maintenance.yaml#getDueMaintenance / DI-770 / DI-772; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **Detail panel headings taken from unrelated pack text ("Every 30 Days", "Every 50 Rentals")** Why: Those lines are the trigger architecture on the same page, not this record's sections. *(source: screens/P08-venue-back-office.yaml#BO-583; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+
+#### Decided on this screen
+
+Answered questions: draw the decision, not the old default. Where a decision and the tables below differ, the decision wins.
+
+- **Is the capacity-aware scheduling suggestion in the first release (it needs rental demand forecasts), or reporting only (DI-772)?** → Drawn default accepted: Draw the card type; mark it "Needs demand forecast" greyed when unavailable. *(decided by Chinmay, 2026-10-02; DEC-442 / CHG-NOTE-008)* **Reviewable:** a default the lead may still overrule before the block is tasked.
+
 #### Inputs: what the user enters or picks
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
@@ -1249,6 +2008,11 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Category | picker: choose a category | — | — | `getDueMaintenance` ?categoryId |
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Period and scope**: Last 30 / 90 / 365 days and product filter; venue from the top bar. *(source: screens/P08-venue-back-office.yaml#BO-583)*
+- **Dismiss reason**: Dismissing a recommendation asks why (Already planned, Not accurate, Not now) so the suggestions improve; nothing else is typed here. *(source: designer default)*
 
 #### Outputs: what the screen shows and produces
 
@@ -1282,6 +2046,19 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Mean time between failures | text | not in the schema: `Mean Time Between Failures` |
 | Mean time to repair | text | not in the schema: `Mean Time to Repair` |
 
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Health tiles**: Assets at risk, Predicted failures (next 30 days), Upcoming preventive maintenance, Repeat failures, High maintenance cost assets, Mean time between failures (days), Mean time to repair (hours) as metric tiles; Downtime by product and Maintenance impact on availability as small bar charts. Never as columns of one table. *(source: screens/P08-venue-back-office.yaml#BO-583 / DI-770)*
+- **Spend tiles**: Upcoming maintenance cost (next 30 days, AED) and total maintenance spend (period), as the client asked. *(source: DI-770)*
+- **Recommendation cards**: One card per suggestion with type (Predictive service, Capacity-aware scheduling, Failure pattern, Replace vs repair), the evidence lines ("94 rental hours since last service; inspection scores declining; similar bikes need brake service at 95-110 h"), the recommendation in bold, and the line "Advisory - needs approval". *(source: screens/P08-venue-back-office.yaml#BO-583)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Schedule (on a predictive or capacity card)**: Opens the maintenance calendar (BO-576) with the jobs pre-placed in the suggested window (Monday 09:00-13:00); nothing is saved until the planner confirms there. *(source: screens/P08-venue-back-office.yaml#BO-583 / DI-772 / screens/P08-venue-back-office.yaml#BO-576)*
+- **Start retirement (on a replace-vs-repair card)**: Opens BO-582 with the economics filled in. *(source: screens/P08-venue-back-office.yaml#BO-582)*
+- **Review (on a failure-pattern card)**: Opens the list of the related repairs and the plan for the product (BO-575) to change its frequency. *(source: screens/P08-venue-back-office.yaml#BO-583 / screens/P08-venue-back-office.yaml#BO-575)*
+- **Dismiss**: Hides the card with the reason recorded; dismissed cards are viewable under "Dismissed". *(source: TRACKER Actions row 324 / DI-924)*
+
 **Data it reads**: `getDueMaintenance` (onLoad, Predictive maintenance)
 
 **Where the user goes next**
@@ -1298,6 +2075,38 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the maintenance intelligence predictive are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Edge cases to draw
+
+- **AI not configured or not enough history**: Tiles that are plain arithmetic (MTBF, MTTR, spend) still show; the recommendation feed says "Not enough history yet - 3 months of repairs needed" instead of empty cards. *(source: contracts/satellite/maintenance.yaml#suggestWorkOrderAssignee)*
+- **A suggestion would break a rule (schedule on a day the workshop is closed)**: Not shown as available (per VO-R11). *(source: TRACKER Actions row 324 / DI-924)*
+
+#### Consistency with other screens
+
+- Match `BO-574`: The command centre's AI alert links into this feed; same card style.
+- Match `BO-587`: Repeat-failure and high-cost assets use the same asset health labels (Excellent, Good, Poor).
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+tiles:
+  atRisk: 6
+  predictedFailures: 4
+  upcomingPreventive: 12
+  repeatFailures: 3
+  highCost: 2
+  mtbf: 41 days
+  mttr: 3.2 h
+  upcoming30dCost: AED 4,860.00
+  spend90d: AED 18,240.00
+cards:
+- 'Predictive service - BIKE-018: 94 rental hours since service; schedule within the next 10 rental hours.'
+- 'Capacity-aware - Saturday utilisation 94%, Monday 38%: schedule 8 preventive jobs Monday 09:00-13:00.'
+- 'Failure pattern - 7 of 12 recent Mountain Bike repairs involved front brakes: review frequency and supplier.'
+- 'Replace vs repair - BIKE-031: next repair AED 420, value AED 650, 71% failure risk in 90 days: replace.'
+```
 
 #### Permissions
 
@@ -1343,6 +2152,9 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - [ ] Every transition is wired: `BO-574`.
 - [ ] Every gated control is gated: `ASSET_VIEW`.
 - [ ] The 2 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 2 edge case(s) from the process notes are drawn.
+- [ ] The 3 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
+- [ ] The 1 decision(s) taken on this screen are drawn as decided, not as the old default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -1453,9 +2265,11 @@ Method, path, parameters, request and response for every operation these screens
 "listStockReservations": {"method":"GET","path":"/stock-reservations","contract":"inventory","summary":"Soft holds on stock","permission":"PRODUCT_VIEW","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[{"name":"sourceType","in":"query","required":null},{"name":"sourceId","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listVendorServiceRequests": {"method":"GET","path":"/vendor-service-requests","contract":"maintenance","summary":"Requests sent to outside vendors","permission":"WORK_ORDER_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"workOrderId","in":"query","required":null},{"name":"supplierId","in":"query","required":null},{"name":"status","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listWorkOrders": {"method":"GET","path":"/work-orders","contract":"maintenance","summary":"List work orders","permission":"WORK_ORDER_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"assignedToPrincipalId","in":"query","required":null},{"name":"status","in":"query","required":null},{"name":"priority","in":"query","required":null},{"name":"assetId","in":"query","required":null},{"name":"overdueOnly","in":"query","required":null},{"name":"from","in":"query","required":null},{"name":"to","in":"query","required":null},{"name":"categoryId","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
+"pauseWorkOrder": {"method":"POST","path":"/work-orders/{workOrderId}/pause","contract":"maintenance","summary":"Stopped, and why","permission":"MAINTENANCE_EXECUTE","offlineCapable":true,"conflictPolicy":"lastWriterWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"WorkOrder"},
 "recordWorkOrderParts": {"method":"POST","path":"/work-orders/{workOrderId}/parts","contract":"maintenance","summary":"Record parts consumed","permission":"WORK_ORDER_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"WorkOrderDetail"},
 "recordWorkOrderTime": {"method":"POST","path":"/work-orders/{workOrderId}/time","contract":"maintenance","summary":"Start, pause or stop work","permission":"WORK_ORDER_MANAGE","offlineCapable":true,"conflictPolicy":"append","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"WorkOrder"},
 "releaseStockReservation": {"method":"POST","path":"/stock-reservations/{stockReservationId}/release","contract":"inventory","summary":"Give reserved stock back","permission":"PROCUREMENT_REQUEST","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"InventoryStockReservation"},
+"resumeWorkOrder": {"method":"POST","path":"/work-orders/{workOrderId}/resume","contract":"maintenance","summary":"Back to work","permission":"MAINTENANCE_EXECUTE","offlineCapable":true,"conflictPolicy":"lastWriterWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"WorkOrder"},
 "setAssetStatus": {"method":"PUT","path":"/assets/{assetId}/status","contract":"maintenance","summary":"Take an asset out of service or return it","permission":"ASSET_MANAGE","offlineCapable":true,"conflictPolicy":"append","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"SetAssetStatusRequest","responds":"AssetStatusResult"},
 "setWorkOrderPriorityPolicy": {"method":"PUT","path":"/work-order-priority-policy","contract":"maintenance","summary":"Set how a fault's priority is scored","permission":"WORK_ORDER_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"WorkOrderPriorityPolicy","responds":"WorkOrderPriorityPolicy"},
 "startWorkOrder": {"method":"POST","path":"/work-orders/{workOrderId}/start","contract":"maintenance","summary":"Work has begun","permission":"MAINTENANCE_EXECUTE","offlineCapable":true,"conflictPolicy":"lastWriterWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"WorkOrder"},

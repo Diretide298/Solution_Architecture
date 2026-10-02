@@ -43,7 +43,10 @@
     {
      "to": "BO-874",
      "trigger": "Staff Resource Profile",
-     "provenance": "structural — pack board 3 wiring, 19 September 2026"
+     "provenance": "structural — pack board 3 wiring, 19 September 2026",
+     "carries": [
+      "employeeId"
+     ]
     },
     {
      "to": "BO-875",
@@ -128,6 +131,22 @@
        ],
        "notes": "The pack filters this screen by venue, department, role, staff type, skill, certification and 4 more — which are present is a decision the pack already made.",
        "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 33 §Users shall filter by"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Job title",
+       "bindsTo": "WorkforceJobTitle.id",
+       "operation": "listJobTitles",
+       "notes": "The role filter: job titles by name.",
+       "provenance": "contract workforce.yaml GET /job-titles"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Staff resources",
+       "bindsTo": "WorkforceWorkAssignment",
+       "operation": "listWorkAssignments",
+       "notes": "The workforce postings (job title, venue) beside each person, so the directory is a resource view, not a second copy of the staff directory (BO-053).",
+       "provenance": "contract workforce.yaml GET /work-assignments"
       }
      ]
     }
@@ -136,7 +155,7 @@
   "states": {
    "loading": "The staff resource list.",
    "error": "Could not load. Names which read failed and leaves the staff resource untouched.",
-   "emptyFirstRun": "No staff resource yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No staff resource yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the staff resource are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -147,6 +166,20 @@
     "purpose": "The staff directory",
     "trigger": "onLoad",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "listWorkAssignments",
+    "contract": "workforce",
+    "purpose": "Who is posted to which job title at which venue",
+    "trigger": "onLoad",
+    "provenance": "design-note correction, 2 October 2026 (BO-873)"
+   },
+   {
+    "operationId": "listJobTitles",
+    "contract": "workforce",
+    "purpose": "Job titles, for the role filter",
+    "trigger": "onLoad",
+    "provenance": "design-note correction, 2 October 2026 (BO-873)"
    }
   ],
   "wireframe": {
@@ -463,6 +496,13 @@
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
        "impliedBy": "setResourceQualifications"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Skills",
+       "bindsTo": "Qualification",
+       "operation": "getResourceQualifications",
+       "provenance": "contract resources.yaml GET /resources/{resourceId}/qualifications; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -482,6 +522,13 @@
     "purpose": "Skills and competencies",
     "trigger": "onAction",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "getResourceQualifications",
+    "contract": "resources",
+    "purpose": "The person's skills and certificates as saved",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-001)"
    }
   ],
   "wireframe": {
@@ -730,6 +777,12 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Resource_Management_Configuration_Reference.pdf, page 39"
+   },
+   {
+    "operation": "setResourceQualifications",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): Recording a person's qualifications is BO-098 and BO-876; this screen defines requirements (design-notes correction venue-operations BO-877).",
+    "source": "contracts/satellite/resources.yaml#setResourceQualifications"
    }
   ],
   "layout": {
@@ -741,42 +794,40 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Minimum requirement",
-       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 39 §Support"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Preferred requirement",
-       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 39 §Support"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Mandatory requirement",
-       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 39 §Support"
+       "label": "Save requirements",
+       "operation": "setExperienceResourceRequirements",
+       "provenance": "contract resources.yaml PUT /experiences/{experienceId}/resource-requirements"
       }
      ]
     },
     {
      "name": "contentBody",
-     "components": []
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Requirement rules",
+       "operation": "setExperienceResourceRequirements",
+       "notes": "The editable rule grid: one row per requirement with its strength (minimum, preferred or mandatory) and quantity; the board drew the strengths as buttons. The current mapping of the experience is opened from BO-894.",
+       "provenance": "contract resources.yaml PUT /experiences/{experienceId}/resource-requirements"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Who qualifies",
+       "operation": "suggestResources",
+       "provenance": "contract resources.yaml GET /resource-suggestions"
+      }
+     ]
     }
    ]
   },
   "states": {
    "loading": "The qualification rule list.",
    "error": "Could not load. Names which read failed and leaves the qualification rule untouched.",
-   "emptyFirstRun": "No qualification rule yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No qualification rule yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the qualification rule are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
-   {
-    "operationId": "setResourceQualifications",
-    "contract": "resources",
-    "purpose": "Qualification rules",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026"
-   },
    {
     "operationId": "suggestResources",
     "contract": "resources",
@@ -814,6 +865,25 @@
    ],
    "coldEntry": "Opened from BO-873 with the experience picked there. Opened cold (a bookmark or a refresh), it shows the list to pick from rather than an empty record, and says plainly if the experience no longer exists."
   },
+  "overlays": [
+   {
+    "id": "formSetExperienceResourceRequirements",
+    "component": "modal",
+    "trigger": "Save requirements",
+    "body": "**Collects what `setExperienceResourceRequirements` sends before it is called.** Required: `requirements`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save requirements",
+     "operation": "setExperienceResourceRequirements"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "requirements"
+     ]
+    },
+    "provenance": "contract resources.yaml PUT /experiences/{experienceId}/resource-requirements"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1549,6 +1619,13 @@
    "workshopBoard": "wireframes/WS128 Resource Management Configuration Board 3.dc.html#bo-881"
   },
   "apisNote": "Regenerated 9 September 2026 from Resource_Management_Configuration_Reference.pdf page 44. 0 of 0 labels bound to a contract property; 8 of 26 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Approval required are choices sent by `setStaffingRules` (overtime.requiresApproval).",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-004): No read of staffing rules (no getStaffingRules); affects BO-881 and BO-885.",
+    "source": "contracts/satellite/workforce.yaml#setStaffingRules"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1609,13 +1686,19 @@
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
-  "purpose": "Connect TICVAI Resource Management with external HR, workforce management, payroll, identity, and employee systems where applicable. Provide TICVAI with a centralized, intelligent Workforce Operations & Rostering Engine that converts staff profiles, availability, skills, certifications, working-hour rules, and demand forecasts into executable operational rosters. Board 4 shall enable managers to: Build operational rosters Assign employees to attractions, venues, events, and activities Define minimum staffing requirements Validate role and skill coverage Identify staffing shortages Manage shift swaps, transfers, pickups, and releases Monitor planned versus actual attendance Capture check-in/check-out and attendance exceptions Validate workforce compliance before assignments Calculate and forecast labor costs Use AI to optimize staffing",
-  "purposeNote": "clear field ownership, traceability and operational consistency.",
+  "purpose": "Connect TICVAI Resource Management with external HR, workforce management, payroll, identity and employee systems where applicable.",
+  "purposeNote": "clear field ownership, traceability and operational consistency. Purpose rewritten 2 October 2026 (CHG-WIR-003): The purpose carried the board 4 introduction (\"Provide TICVAI with a centralized, intelligent Workforce Operations and Rostering Engine ... Board 4 shall enable managers to ...\") pasted after the screen's own sentence.",
   "gaps": [
    {
     "operation": null,
     "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
     "source": "pack Resource_Management_Configuration_Reference.pdf, page 45 §Display"
+   },
+   {
+    "operation": "listRotaAssignments",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): listRotaAssignments was bound as \"Rota synchronisation\"; the rota has nothing to do with the integration and synchronisation centre (design-notes correction venue-operations BO-882).",
+    "source": "screens/P08-venue-back-office.yaml#BO-882"
    }
   ],
   "layout": {
@@ -1714,13 +1797,6 @@
   },
   "apis": [
    {
-    "operationId": "listRotaAssignments",
-    "contract": "workforce",
-    "purpose": "Rota synchronisation",
-    "trigger": "onLoad",
-    "provenance": "board reading, 19 September 2026"
-   },
-   {
     "operationId": "listIntegrationSources",
     "contract": "workforce",
     "purpose": "Connected workforce systems",
@@ -1734,7 +1810,6 @@
     "trigger": "onAction",
     "provenance": "decided 29 September, VM close-out (venue management and configuration)",
     "invalidates": [
-     "listRotaAssignments",
      "listIntegrationSources"
     ]
    },
@@ -1752,7 +1827,6 @@
     "trigger": "onAction",
     "provenance": "decided 29 September, VM close-out (venue management and configuration)",
     "invalidates": [
-     "listRotaAssignments",
      "listIntegrationSources",
      "getFieldOwnership"
     ]
@@ -1771,7 +1845,6 @@
     "trigger": "onAction",
     "provenance": "decided 29 September, VM close-out (venue management and configuration)",
     "invalidates": [
-     "listRotaAssignments",
      "listIntegrationSources",
      "getFieldOwnership",
      "listSyncRuns"
@@ -1791,7 +1864,6 @@
     "trigger": "onAction",
     "provenance": "decided 29 September, VM close-out (venue management and configuration)",
     "invalidates": [
-     "listRotaAssignments",
      "listIntegrationSources",
      "getFieldOwnership",
      "listSyncRuns"

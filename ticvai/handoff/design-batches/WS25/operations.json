@@ -1,4 +1,42 @@
 {
+ "addCaseMessage": {
+  "method": "POST",
+  "path": "/cases/{caseId}/messages",
+  "contract": "marketing-crm",
+  "summary": "Add a message or internal note",
+  "permission": "CASE_MANAGE",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "CaseMessage"
+ },
+ "completeUpload": {
+  "method": "POST",
+  "path": "/media/uploads/{uploadId}/complete",
+  "contract": "assets",
+  "summary": "Confirm an upload and create the asset",
+  "permission": "ASSET_LIBRARY_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "MediaAsset"
+ },
  "configureAssistantProfile": {
   "method": "PUT",
   "path": "/assistant-profiles/{profileKey}",
@@ -18,6 +56,25 @@
   "requestBody": "AiAssistantProfile",
   "responds": "AiAssistantProfile"
  },
+ "createCase": {
+  "method": "POST",
+  "path": "/cases",
+  "contract": "marketing-crm",
+  "summary": "Raise a service case",
+  "permission": "CASE_MANAGE",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateCaseRequest",
+  "responds": "Case"
+ },
  "createCaseClassificationIntelligent": {
   "method": "POST",
   "path": "/case-classification-intelligent",
@@ -36,6 +93,38 @@
   ],
   "requestBody": "CaseCreationClassificationIntelligentRoutingInput",
   "responds": "CaseCreationClassificationIntelligentRoutingView"
+ },
+ "createUpload": {
+  "method": "POST",
+  "path": "/media/uploads",
+  "contract": "assets",
+  "summary": "Request a signed upload URL",
+  "permission": "ASSET_LIBRARY_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "UploadTicket"
+ },
+ "getCase": {
+  "method": "GET",
+  "path": "/cases/{caseId}",
+  "contract": "marketing-crm",
+  "summary": "Read a case with its thread",
+  "permission": "CASE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "CaseDetail"
  },
  "listAssistantProfiles": {
   "method": "GET",
@@ -271,6 +360,75 @@
   "requestBody": null,
   "responds": "Page"
  },
+ "listOrders": {
+  "method": "GET",
+  "path": "/orders",
+  "contract": "orders",
+  "summary": "List orders",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "principalId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "shiftId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "createdFrom",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "createdTo",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "workstationId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "subjectId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "tender",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "listUnifiedInteractionCommunication": {
   "method": "GET",
   "path": "/unified-interaction-communication",
@@ -415,5 +573,24 @@
   ],
   "requestBody": "RefundCompensationServiceExceptionWorkspaceInput",
   "responds": "RefundCompensationServiceExceptionWorkspaceView"
+ },
+ "updateCase": {
+  "method": "PATCH",
+  "path": "/cases/{caseId}",
+  "contract": "marketing-crm",
+  "summary": "Assign, reprioritise or resolve a case",
+  "permission": "CASE_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Case"
  }
 }

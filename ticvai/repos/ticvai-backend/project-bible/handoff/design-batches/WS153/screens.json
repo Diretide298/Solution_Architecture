@@ -1,275 +1,7 @@
 [
  {
-  "id": "ADM-619",
-  "name": "Reconciliation & Settlement Command Center\\t139",
-  "module": "Commercial",
-  "requiresModule": "core",
-  "wave": 3,
-  "source": {
-   "pack": "Payment_Payment_Orchestration.pdf",
-   "board": "7",
-   "number": "1",
-   "page": 138
-  },
-  "implementation": {
-   "app": "ticvai-web",
-   "route": "/commercial/reconciliation-settlement-command-center-t139-adm-619",
-   "component": "apps/ticvai-web/src/routes/commercial/ReconciliationSettlementCommandCenterT139.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "ADM-002"
-   ],
-   "exitTo": [
-    "ADM-002",
-    "ADM-620",
-    "ADM-621",
-    "ADM-622",
-    "ADM-623",
-    "ADM-624",
-    "ADM-625",
-    "ADM-626",
-    "ADM-627",
-    "ADM-628"
-   ],
-   "transitions": [
-    {
-     "to": "ADM-002",
-     "trigger": "Back to Platform Dashboard",
-     "provenance": "structural — pack board 7 wiring, 19 September 2026",
-     "back": true
-    },
-    {
-     "to": "ADM-620",
-     "trigger": "Reconciliation Source & Import Manager\\t141",
-     "provenance": "structural — pack board 7 wiring, 19 September 2026"
-    },
-    {
-     "to": "ADM-621",
-     "trigger": "Transaction Matching & Reconciliation Engine\\t142",
-     "provenance": "structural — pack board 7 wiring, 19 September 2026"
-    },
-    {
-     "to": "ADM-622",
-     "trigger": "Reconciliation Exception & Investigation Center\\t143",
-     "provenance": "structural — pack board 7 wiring, 19 September 2026",
-     "carries": [
-      "settlementId"
-     ]
-    },
-    {
-     "to": "ADM-623",
-     "trigger": "Settlement & Payout Manager\\t144",
-     "provenance": "structural — pack board 7 wiring, 19 September 2026"
-    },
-    {
-     "to": "ADM-624",
-     "trigger": "Fees, Commission, FX & Settlement Economics\\t145",
-     "provenance": "structural — pack board 7 wiring, 19 September 2026"
-    },
-    {
-     "to": "ADM-625",
-     "trigger": "Merchant Account & Settlement Calendar Manager\\t146",
-     "provenance": "structural — pack board 7 wiring, 19 September 2026"
-    },
-    {
-     "to": "ADM-626",
-     "trigger": "Settlement Posting, Finance Handoff & Close Manager\\t148",
-     "provenance": "structural — pack board 7 wiring, 19 September 2026"
-    },
-    {
-     "to": "ADM-627",
-     "trigger": "Reconciliation Audit, Trace & Evidence Center\\t149",
-     "provenance": "structural — pack board 7 wiring, 19 September 2026"
-    },
-    {
-     "to": "ADM-628",
-     "trigger": "Reconciliation Simulator, Forecast & AI Operations Advisor\\t150",
-     "provenance": "structural — pack board 7 wiring, 19 September 2026"
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "commandCentre",
-  "patternReason": "the pack gives this screen both a metric directory (§KPI Cards) and a per-row directory (§Show) — counts over a population, then the population",
-  "purpose": "Provide an executive and operational overview of payment reconciliation and settlement health.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Payment_Payment_Orchestration.pdf, page 138 §Show"
-   }
-  ],
-  "layout": {
-   "template": "dashboard",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "headline",
-     "components": [
-      {
-       "kind": "metricTile",
-       "label": "TICVAI Transaction Value",
-       "provenance": "pack Payment_Payment_Orchestration.pdf, page 138 §KPI Cards"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Provider Transaction Value",
-       "provenance": "pack Payment_Payment_Orchestration.pdf, page 138 §KPI Cards"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Matched Transactions",
-       "provenance": "pack Payment_Payment_Orchestration.pdf, page 138 §KPI Cards"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Match Rate",
-       "provenance": "pack Payment_Payment_Orchestration.pdf, page 138 §KPI Cards"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Unmatched Transactions",
-       "provenance": "pack Payment_Payment_Orchestration.pdf, page 138 §KPI Cards"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Unmatched Value",
-       "provenance": "pack Payment_Payment_Orchestration.pdf, page 138 §KPI Cards"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Settlement Expected",
-       "provenance": "pack Payment_Payment_Orchestration.pdf, page 138 §KPI Cards"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Settlement Received",
-       "provenance": "pack Payment_Payment_Orchestration.pdf, page 138 §KPI Cards"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Settlement Variance",
-       "provenance": "pack Payment_Payment_Orchestration.pdf, page 138 §KPI Cards"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Provider Fees",
-       "provenance": "pack Payment_Payment_Orchestration.pdf, page 138 §KPI Cards"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Refund Settlement Value",
-       "provenance": "pack Payment_Payment_Orchestration.pdf, page 138 §KPI Cards"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Open Exceptions",
-       "provenance": "pack Payment_Payment_Orchestration.pdf, page 138 §KPI Cards"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "moduleTiles",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every reconciliation settlement \\t139",
-       "columns": [
-        "Expected",
-        "Pending",
-        "Received",
-        "Partially Received",
-        "Variance",
-        "Overdue"
-       ],
-       "bindsTo": null,
-       "operation": null,
-       "provenance": "pack Payment_Payment_Orchestration.pdf, page 138 §Show"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected reconciliation settlement \\t139",
-       "bindsTo": null,
-       "columns": [
-        "Expected",
-        "Pending",
-        "Received",
-        "Partially Received",
-        "Variance",
-        "Overdue"
-       ],
-       "notes": "The pack groups this record's detail under its own headings: “Matched”, “Match Rate”, “Breakdown”.",
-       "provenance": "pack Payment_Payment_Orchestration.pdf, page 138 §Show"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The reconciliation settlement \\t139 list; the counts above it resolve separately.",
-   "error": "Could not load. Names which read failed and leaves the reconciliation settlement \\t139 untouched.",
-   "emptyFirstRun": "No reconciliation settlement \\t139 yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the reconciliation settlement \\t139 are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "listSettlements",
-    "contract": "finance",
-    "purpose": "Settlements to date",
-    "trigger": "onLoad",
-    "provenance": "board reading, 19 September 2026"
-   },
-   {
-    "operationId": "listReconciliationSources",
-    "contract": "payments",
-    "purpose": "Feeds and their freshness",
-    "trigger": "onLoad",
-    "provenance": "board reading, 19 September 2026"
-   }
-  ],
-  "wireframe": {
-   "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-619",
-   "workshopBoard": "wireframes/WS93 Payment Payment Orchestration Board 7.dc.html#adm-619"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Payment_Payment_Orchestration.pdf page 138. 0 of 6 labels bound to a contract property; 18 of 32 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
-   "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
-   "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
-   "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
-    "shell": "web",
-    "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
-    ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
   "id": "ADM-620",
-  "name": "Reconciliation Source & Import Manager\\t141",
+  "name": "Reconciliation Source & Import Manager",
   "module": "Commercial",
   "requiresModule": "core",
   "wave": 3,
@@ -280,17 +12,19 @@
    "page": 140
   },
   "implementation": {
-   "app": "ticvai-web",
+   "app": "venue-management-web",
    "route": "/commercial/reconciliation-source-import-manager-t141-adm-620",
-   "component": "apps/ticvai-web/src/routes/commercial/ReconciliationSourceImportManagerT141.tsx",
+   "component": "apps/venue-management-web/src/routes/commercial/ReconciliationSourceImportManagerT141.tsx",
    "status": "notStarted"
   },
   "navigation": {
    "entryFrom": [
-    "ADM-619"
+    "ADM-619",
+    "BO-100"
    ],
    "exitTo": [
-    "ADM-619"
+    "ADM-619",
+    "BO-100"
    ],
    "transitions": [
     {
@@ -298,9 +32,16 @@
      "trigger": "Back to Reconciliation & Settlement Command Center\\t139",
      "provenance": "structural — pack board 7 wiring, 19 September 2026",
      "back": true
+    },
+    {
+     "to": "BO-100",
+     "trigger": "Back to Venue Home",
+     "provenance": "moved to Venue Management 2 October 2026 (CHG-MOV-001); its board's hub ADM-619 stays on the console, so Venue Home is its venue-side way in",
+     "back": true
     }
    ]
   },
+  "notes": "**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: \"they are venue screens\"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys. Its board's hub ADM-619 stays on the console (DEC-211 (Chinmay, 2 October, batch 6): a cross-tenant view of TICVAI's payment operations); this screen keeps that edge and is also reached from BO-100 Venue Home.",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
@@ -350,6 +91,13 @@
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
        "impliedBy": "setReconciliationSource"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Sources",
+       "bindsTo": "ReconciliationSource",
+       "operation": "listReconciliationSources",
+       "provenance": "contract payments.yaml GET /reconciliation-sources; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -379,41 +127,48 @@
     "purpose": "Import one",
     "trigger": "onAction",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "listReconciliationSources",
+    "contract": "payments",
+    "purpose": "The files and feeds reconciliation is run against",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-620",
+   "board": "wireframes/P08 Venue Management.dc.html#adm-620",
    "workshopBoard": "wireframes/WS93 Payment Payment Orchestration Board 7.dc.html#adm-620"
   },
   "apisNote": "Regenerated 9 September 2026 from Payment_Payment_Orchestration.pdf page 140. 0 of 0 labels bound to a contract property; 1 of 34 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {},
   "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
+   "code": "P08",
+   "audience": "staff",
    "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
    "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
+   "app": "venue-management-web",
+   "operator": "venue",
    "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
     "shell": "web",
     "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
+     "P12",
+     "P13",
+     "P16"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
     "decided": "10 September 2026"
    }
   }
  },
  {
   "id": "ADM-621",
-  "name": "Transaction Matching & Reconciliation Engine\\t142",
+  "name": "Transaction Matching & Reconciliation Engine",
   "module": "Commercial",
   "requiresModule": "core",
   "wave": 3,
@@ -424,17 +179,19 @@
    "page": 141
   },
   "implementation": {
-   "app": "ticvai-web",
+   "app": "venue-management-web",
    "route": "/commercial/transaction-matching-reconciliation-engine-t142-adm-621",
-   "component": "apps/ticvai-web/src/routes/commercial/TransactionMatchingReconciliationEngineT142.tsx",
+   "component": "apps/venue-management-web/src/routes/commercial/TransactionMatchingReconciliationEngineT142.tsx",
    "status": "notStarted"
   },
   "navigation": {
    "entryFrom": [
-    "ADM-619"
+    "ADM-619",
+    "BO-100"
    ],
    "exitTo": [
-    "ADM-619"
+    "ADM-619",
+    "BO-100"
    ],
    "transitions": [
     {
@@ -442,9 +199,16 @@
      "trigger": "Back to Reconciliation & Settlement Command Center\\t139",
      "provenance": "structural — pack board 7 wiring, 19 September 2026",
      "back": true
+    },
+    {
+     "to": "BO-100",
+     "trigger": "Back to Venue Home",
+     "provenance": "moved to Venue Management 2 October 2026 (CHG-MOV-001); its board's hub ADM-619 stays on the console, so Venue Home is its venue-side way in",
+     "back": true
     }
    ]
   },
+  "notes": "**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: \"they are venue screens\"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys. Its board's hub ADM-619 stays on the console (DEC-211 (Chinmay, 2 October, batch 6): a cross-tenant view of TICVAI's payment operations); this screen keeps that edge and is also reached from BO-100 Venue Home.",
   "density": "compact",
   "pattern": "commandCentre",
   "patternReason": "the pack gives this screen a metric directory (§Display) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's",
@@ -493,37 +257,43 @@
   ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-621",
+   "board": "wireframes/P08 Venue Management.dc.html#adm-621",
    "workshopBoard": "wireframes/WS93 Payment Payment Orchestration Board 7.dc.html#adm-621"
   },
   "apisNote": "Regenerated 9 September 2026 from Payment_Payment_Orchestration.pdf page 141. 0 of 0 labels bound to a contract property; 3 of 27 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-027): No read of reconciliation matching rules (setReconciliationMatchingRules has no get).",
+    "source": "contracts/satellite/payments.yaml#setReconciliationMatchingRules | screens/P08-venue-back-office.yaml#ADM-621"
+   }
+  ],
   "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
+   "code": "P08",
+   "audience": "staff",
    "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
    "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
+   "app": "venue-management-web",
+   "operator": "venue",
    "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
     "shell": "web",
     "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
+     "P12",
+     "P13",
+     "P16"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
     "decided": "10 September 2026"
    }
   }
  },
  {
   "id": "ADM-622",
-  "name": "Reconciliation Exception & Investigation Center\\t143",
+  "name": "Reconciliation Exception & Investigation Center",
   "module": "Commercial",
   "requiresModule": "core",
   "wave": 3,
@@ -534,17 +304,19 @@
    "page": 142
   },
   "implementation": {
-   "app": "ticvai-web",
+   "app": "venue-management-web",
    "route": "/commercial/reconciliation-exception-investigation-center-t143-adm-622",
-   "component": "apps/ticvai-web/src/routes/commercial/ReconciliationExceptionInvestigationCenterT143.tsx",
+   "component": "apps/venue-management-web/src/routes/commercial/ReconciliationExceptionInvestigationCenterT143.tsx",
    "status": "notStarted"
   },
   "navigation": {
    "entryFrom": [
-    "ADM-619"
+    "ADM-619",
+    "BO-100"
    ],
    "exitTo": [
-    "ADM-619"
+    "ADM-619",
+    "BO-100"
    ],
    "transitions": [
     {
@@ -552,9 +324,16 @@
      "trigger": "Back to Reconciliation & Settlement Command Center\\t139",
      "provenance": "structural — pack board 7 wiring, 19 September 2026",
      "back": true
+    },
+    {
+     "to": "BO-100",
+     "trigger": "Back to Venue Home",
+     "provenance": "moved to Venue Management 2 October 2026 (CHG-MOV-001); its board's hub ADM-619 stays on the console, so Venue Home is its venue-side way in",
+     "back": true
     }
    ]
   },
+  "notes": "**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: \"they are venue screens\"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys. Its board's hub ADM-619 stays on the console (DEC-211 (Chinmay, 2 October, batch 6): a cross-tenant view of TICVAI's payment operations); this screen keeps that edge and is also reached from BO-100 Venue Home.",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Show) and no metric row",
@@ -664,37 +443,36 @@
   },
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-622",
+   "board": "wireframes/P08 Venue Management.dc.html#adm-622",
    "workshopBoard": "wireframes/WS93 Payment Payment Orchestration Board 7.dc.html#adm-622"
   },
   "apisNote": "Regenerated 9 September 2026 from Payment_Payment_Orchestration.pdf page 142. 0 of 11 labels bound to a contract property; 11 of 39 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
+   "code": "P08",
+   "audience": "staff",
    "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
    "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
+   "app": "venue-management-web",
+   "operator": "venue",
    "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
     "shell": "web",
     "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
+     "P12",
+     "P13",
+     "P16"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
     "decided": "10 September 2026"
    }
   }
  },
  {
   "id": "ADM-623",
-  "name": "Settlement & Payout Manager\\t144",
+  "name": "Settlement & Payout Manager",
   "module": "Commercial",
   "requiresModule": "core",
   "wave": 3,
@@ -705,23 +483,31 @@
    "page": 143
   },
   "implementation": {
-   "app": "ticvai-web",
+   "app": "venue-management-web",
    "route": "/commercial/settlement-payout-manager-t144-adm-623",
-   "component": "apps/ticvai-web/src/routes/commercial/SettlementPayoutManagerT144.tsx",
+   "component": "apps/venue-management-web/src/routes/commercial/SettlementPayoutManagerT144.tsx",
    "status": "notStarted"
   },
   "navigation": {
    "entryFrom": [
-    "ADM-619"
+    "ADM-619",
+    "BO-100"
    ],
    "exitTo": [
-    "ADM-619"
+    "ADM-619",
+    "BO-100"
    ],
    "transitions": [
     {
      "to": "ADM-619",
      "trigger": "Back to Reconciliation & Settlement Command Center\\t139",
      "provenance": "structural — pack board 7 wiring, 19 September 2026",
+     "back": true
+    },
+    {
+     "to": "BO-100",
+     "trigger": "Back to Venue Home",
+     "provenance": "moved to Venue Management 2 October 2026 (CHG-MOV-001); its board's hub ADM-619 stays on the console, so Venue Home is its venue-side way in",
      "back": true
     }
    ]
@@ -837,37 +623,37 @@
   },
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-623",
+   "board": "wireframes/P08 Venue Management.dc.html#adm-623",
    "workshopBoard": "wireframes/WS93 Payment Payment Orchestration Board 7.dc.html#adm-623"
   },
   "apisNote": "Regenerated 9 September 2026 from Payment_Payment_Orchestration.pdf page 143. 0 of 16 labels bound to a contract property; 16 of 29 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "notes": "**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: \"they are venue screens\"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys. Its board's hub ADM-619 stays on the console (DEC-211 (Chinmay, 2 October, batch 6): a cross-tenant view of TICVAI's payment operations); this screen keeps that edge and is also reached from BO-100 Venue Home.\n\n**Reconciliation is daily, per venue** (decided 2 October 2026, Chinmay; CHG-FIN-009; audit R110 (b)). The unit of work and of sign-off is one venue-day: POS cash, gateway settlements, bank and wallet against the ledger for that day. A longer range reviews days already reconciled; a provider's monthly file (DI-268) is matched day by day.",
   "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
+   "code": "P08",
+   "audience": "staff",
    "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
    "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
+   "app": "venue-management-web",
+   "operator": "venue",
    "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
     "shell": "web",
     "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
+     "P12",
+     "P13",
+     "P16"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
     "decided": "10 September 2026"
    }
   }
  },
  {
   "id": "ADM-624",
-  "name": "Fees, Commission, FX & Settlement Economics\\t145",
+  "name": "Fees, Commission, FX & Settlement Economics",
   "module": "Commercial",
   "requiresModule": "core",
   "wave": 3,
@@ -878,17 +664,19 @@
    "page": 144
   },
   "implementation": {
-   "app": "ticvai-web",
+   "app": "venue-management-web",
    "route": "/commercial/fees-commission-fx-settlement-economics-t145-adm-624",
-   "component": "apps/ticvai-web/src/routes/commercial/FeesCommissionFxSettlementEconomicsT145.tsx",
+   "component": "apps/venue-management-web/src/routes/commercial/FeesCommissionFxSettlementEconomicsT145.tsx",
    "status": "notStarted"
   },
   "navigation": {
    "entryFrom": [
-    "ADM-619"
+    "ADM-619",
+    "BO-100"
    ],
    "exitTo": [
-    "ADM-619"
+    "ADM-619",
+    "BO-100"
    ],
    "transitions": [
     {
@@ -896,9 +684,16 @@
      "trigger": "Back to Reconciliation & Settlement Command Center\\t139",
      "provenance": "structural — pack board 7 wiring, 19 September 2026",
      "back": true
+    },
+    {
+     "to": "BO-100",
+     "trigger": "Back to Venue Home",
+     "provenance": "moved to Venue Management 2 October 2026 (CHG-MOV-001); its board's hub ADM-619 stays on the console, so Venue Home is its venue-side way in",
+     "back": true
     }
    ]
   },
+  "notes": "**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: \"they are venue screens\"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys. Its board's hub ADM-619 stays on the console (DEC-211 (Chinmay, 2 October, batch 6): a cross-tenant view of TICVAI's payment operations); this screen keeps that edge and is also reached from BO-100 Venue Home.",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Compare) and no metric row",
@@ -1033,37 +828,36 @@
   },
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-624",
+   "board": "wireframes/P08 Venue Management.dc.html#adm-624",
    "workshopBoard": "wireframes/WS93 Payment Payment Orchestration Board 7.dc.html#adm-624"
   },
   "apisNote": "Regenerated 9 September 2026 from Payment_Payment_Orchestration.pdf page 144. 0 of 5 labels bound to a contract property; 14 of 27 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
+   "code": "P08",
+   "audience": "staff",
    "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
    "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
+   "app": "venue-management-web",
+   "operator": "venue",
    "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
     "shell": "web",
     "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
+     "P12",
+     "P13",
+     "P16"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
     "decided": "10 September 2026"
    }
   }
  },
  {
   "id": "ADM-625",
-  "name": "Merchant Account & Settlement Calendar Manager\\t146",
+  "name": "Merchant Account & Settlement Calendar Manager",
   "module": "Commercial",
   "requiresModule": "core",
   "wave": 3,
@@ -1074,17 +868,19 @@
    "page": 145
   },
   "implementation": {
-   "app": "ticvai-web",
+   "app": "venue-management-web",
    "route": "/commercial/merchant-account-settlement-calendar-manager-t146-adm-625",
-   "component": "apps/ticvai-web/src/routes/commercial/MerchantAccountSettlementCalendarManagerT146.tsx",
+   "component": "apps/venue-management-web/src/routes/commercial/MerchantAccountSettlementCalendarManagerT146.tsx",
    "status": "notStarted"
   },
   "navigation": {
    "entryFrom": [
-    "ADM-619"
+    "ADM-619",
+    "BO-100"
    ],
    "exitTo": [
-    "ADM-619"
+    "ADM-619",
+    "BO-100"
    ],
    "transitions": [
     {
@@ -1092,9 +888,16 @@
      "trigger": "Back to Reconciliation & Settlement Command Center\\t139",
      "provenance": "structural — pack board 7 wiring, 19 September 2026",
      "back": true
+    },
+    {
+     "to": "BO-100",
+     "trigger": "Back to Venue Home",
+     "provenance": "moved to Venue Management 2 October 2026 (CHG-MOV-001); its board's hub ADM-619 stays on the console, so Venue Home is its venue-side way in",
+     "back": true
     }
    ]
   },
+  "notes": "**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: \"they are venue screens\"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys. Its board's hub ADM-619 stays on the console (DEC-211 (Chinmay, 2 October, batch 6): a cross-tenant view of TICVAI's payment operations); this screen keeps that edge and is also reached from BO-100 Venue Home.",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row Rendered on the calendar template (M17-03, 29 September).",
@@ -1209,37 +1012,36 @@
   },
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-625",
+   "board": "wireframes/P08 Venue Management.dc.html#adm-625",
    "workshopBoard": "wireframes/WS93 Payment Payment Orchestration Board 7.dc.html#adm-625"
   },
   "apisNote": "Regenerated 9 September 2026 from Payment_Payment_Orchestration.pdf page 145. 0 of 4 labels bound to a contract property; 4 of 28 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
+   "code": "P08",
+   "audience": "staff",
    "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
    "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
+   "app": "venue-management-web",
+   "operator": "venue",
    "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
     "shell": "web",
     "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
+     "P12",
+     "P13",
+     "P16"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
     "decided": "10 September 2026"
    }
   }
  },
  {
   "id": "ADM-626",
-  "name": "Settlement Posting, Finance Handoff & Close Manager\\t148",
+  "name": "Settlement Posting, Finance Handoff & Close Manager",
   "module": "Commercial",
   "requiresModule": "core",
   "wave": 3,
@@ -1250,17 +1052,19 @@
    "page": 147
   },
   "implementation": {
-   "app": "ticvai-web",
+   "app": "venue-management-web",
    "route": "/commercial/settlement-posting-finance-handoff-close-manager-t148-adm-626",
-   "component": "apps/ticvai-web/src/routes/commercial/SettlementPostingFinanceHandoffCloseManagerT148.tsx",
+   "component": "apps/venue-management-web/src/routes/commercial/SettlementPostingFinanceHandoffCloseManagerT148.tsx",
    "status": "notStarted"
   },
   "navigation": {
    "entryFrom": [
-    "ADM-619"
+    "ADM-619",
+    "BO-100"
    ],
    "exitTo": [
-    "ADM-619"
+    "ADM-619",
+    "BO-100"
    ],
    "transitions": [
     {
@@ -1268,9 +1072,16 @@
      "trigger": "Back to Reconciliation & Settlement Command Center\\t139",
      "provenance": "structural — pack board 7 wiring, 19 September 2026",
      "back": true
+    },
+    {
+     "to": "BO-100",
+     "trigger": "Back to Venue Home",
+     "provenance": "moved to Venue Management 2 October 2026 (CHG-MOV-001); its board's hub ADM-619 stays on the console, so Venue Home is its venue-side way in",
+     "back": true
     }
    ]
   },
+  "notes": "**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: \"they are venue screens\"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys. Its board's hub ADM-619 stays on the console (DEC-211 (Chinmay, 2 October, batch 6): a cross-tenant view of TICVAI's payment operations); this screen keeps that edge and is also reached from BO-100 Venue Home.",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
@@ -1333,7 +1144,7 @@
   ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-626",
+   "board": "wireframes/P08 Venue Management.dc.html#adm-626",
    "workshopBoard": "wireframes/WS93 Payment Payment Orchestration Board 7.dc.html#adm-626"
   },
   "apisNote": "Regenerated 9 September 2026 from Payment_Payment_Orchestration.pdf page 147. 0 of 0 labels bound to a contract property; 8 of 31 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
@@ -1346,32 +1157,31 @@
    ]
   },
   "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
+   "code": "P08",
+   "audience": "staff",
    "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
    "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
+   "app": "venue-management-web",
+   "operator": "venue",
    "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
     "shell": "web",
     "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
+     "P12",
+     "P13",
+     "P16"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
     "decided": "10 September 2026"
    }
   }
  },
  {
   "id": "ADM-627",
-  "name": "Reconciliation Audit, Trace & Evidence Center\\t149",
+  "name": "Reconciliation Audit, Trace & Evidence Center",
   "module": "Commercial",
   "requiresModule": "core",
   "wave": 3,
@@ -1382,23 +1192,31 @@
    "page": 148
   },
   "implementation": {
-   "app": "ticvai-web",
+   "app": "venue-management-web",
    "route": "/commercial/reconciliation-audit-trace-evidence-center-t149-adm-627",
-   "component": "apps/ticvai-web/src/routes/commercial/ReconciliationAuditTraceEvidenceCenterT149.tsx",
+   "component": "apps/venue-management-web/src/routes/commercial/ReconciliationAuditTraceEvidenceCenterT149.tsx",
    "status": "notStarted"
   },
   "navigation": {
    "entryFrom": [
-    "ADM-619"
+    "ADM-619",
+    "BO-100"
    ],
    "exitTo": [
-    "ADM-619"
+    "ADM-619",
+    "BO-100"
    ],
    "transitions": [
     {
      "to": "ADM-619",
      "trigger": "Back to Reconciliation & Settlement Command Center\\t139",
      "provenance": "structural — pack board 7 wiring, 19 September 2026",
+     "back": true
+    },
+    {
+     "to": "BO-100",
+     "trigger": "Back to Venue Home",
+     "provenance": "moved to Venue Management 2 October 2026 (CHG-MOV-001); its board's hub ADM-619 stays on the console, so Venue Home is its venue-side way in",
      "back": true
     }
    ]
@@ -1471,37 +1289,37 @@
   ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-627",
+   "board": "wireframes/P08 Venue Management.dc.html#adm-627",
    "workshopBoard": "wireframes/WS93 Payment Payment Orchestration Board 7.dc.html#adm-627"
   },
   "apisNote": "Regenerated 9 September 2026 from Payment_Payment_Orchestration.pdf page 148. 0 of 0 labels bound to a contract property; 7 of 35 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "notes": "**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: \"they are venue screens\"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys. Its board's hub ADM-619 stays on the console (DEC-211 (Chinmay, 2 October, batch 6): a cross-tenant view of TICVAI's payment operations); this screen keeps that edge and is also reached from BO-100 Venue Home.\n\n**Reconciliation is daily, per venue** (decided 2 October 2026, Chinmay; CHG-FIN-009; audit R110 (b)). The unit of work and of sign-off is one venue-day: POS cash, gateway settlements, bank and wallet against the ledger for that day. A longer range reviews days already reconciled; a provider's monthly file (DI-268) is matched day by day.",
   "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
+   "code": "P08",
+   "audience": "staff",
    "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
    "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
+   "app": "venue-management-web",
+   "operator": "venue",
    "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
     "shell": "web",
     "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
+     "P12",
+     "P13",
+     "P16"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
     "decided": "10 September 2026"
    }
   }
  },
  {
   "id": "ADM-628",
-  "name": "Reconciliation Simulator, Forecast & AI Operations Advisor\\t150",
+  "name": "Reconciliation Simulator, Forecast & AI Operations Advisor",
   "module": "Commercial",
   "requiresModule": "core",
   "wave": 3,
@@ -1512,17 +1330,19 @@
    "page": 149
   },
   "implementation": {
-   "app": "ticvai-web",
+   "app": "venue-management-web",
    "route": "/commercial/reconciliation-simulator-forecast-ai-operations-advisor--adm-628",
-   "component": "apps/ticvai-web/src/routes/commercial/ReconciliationSimulatorForecastAiOperationsAdvis.tsx",
+   "component": "apps/venue-management-web/src/routes/commercial/ReconciliationSimulatorForecastAiOperationsAdvis.tsx",
    "status": "notStarted"
   },
   "navigation": {
    "entryFrom": [
-    "ADM-619"
+    "ADM-619",
+    "BO-100"
    ],
    "exitTo": [
-    "ADM-619"
+    "ADM-619",
+    "BO-100"
    ],
    "transitions": [
     {
@@ -1530,9 +1350,16 @@
      "trigger": "Back to Reconciliation & Settlement Command Center\\t139",
      "provenance": "structural — pack board 7 wiring, 19 September 2026",
      "back": true
+    },
+    {
+     "to": "BO-100",
+     "trigger": "Back to Venue Home",
+     "provenance": "moved to Venue Management 2 October 2026 (CHG-MOV-001); its board's hub ADM-619 stays on the console, so Venue Home is its venue-side way in",
+     "back": true
     }
    ]
   },
+  "notes": "**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: \"they are venue screens\"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys. Its board's hub ADM-619 stays on the console (DEC-211 (Chinmay, 2 October, batch 6): a cross-tenant view of TICVAI's payment operations); this screen keeps that edge and is also reached from BO-100 Venue Home.",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Forecast) and no metric row",
@@ -1621,30 +1448,29 @@
   },
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-628",
+   "board": "wireframes/P08 Venue Management.dc.html#adm-628",
    "workshopBoard": "wireframes/WS93 Payment Payment Orchestration Board 7.dc.html#adm-628"
   },
   "apisNote": "Regenerated 9 September 2026 from Payment_Payment_Orchestration.pdf page 149. 0 of 7 labels bound to a contract property; 18 of 179 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
+   "code": "P08",
+   "audience": "staff",
    "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
    "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
+   "app": "venue-management-web",
+   "operator": "venue",
    "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
     "shell": "web",
     "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
+     "P12",
+     "P13",
+     "P16"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
     "decided": "10 September 2026"
    }
   }

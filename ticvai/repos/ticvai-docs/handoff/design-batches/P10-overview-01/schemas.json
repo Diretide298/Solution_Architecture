@@ -314,57 +314,6 @@
   "description": "**An exchange rate: a decimal string, never a float**, for the reason `Money.amount` is one — a JavaScript client must not round a rate in transit. **Six decimal places**, the precision `finance.FxRate.rate` asks for, and stored at that precision.\n",
   "pattern": "^\\d+(\\.\\d{1,6})?$"
  },
- "ManualDiscountRequest": {
-  "type": "object",
-  "x-ticvai-persistence": "none — request only",
-  "required": [
-   "id",
-   "reason",
-   "recordedAt"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid",
-    "description": "Client-generated UUIDv7 of this discount, and its idempotency key — it must equal the `Idempotency-Key` header."
-   },
-   "lineId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "Omit to discount the order rather than a line."
-   },
-   "amount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "percentage": {
-    "type": "number",
-    "minimum": 0,
-    "maximum": 100
-   },
-   "reason": {
-    "type": "string",
-    "minLength": 3,
-    "maxLength": 300,
-    "description": "Required, and free text rather than a code list. A cashier forced to pick the nearest reason picks the first one, and the register stops meaning anything.\n"
-   },
-   "reasonCode": {
-    "type": "string",
-    "nullable": true,
-    "description": "Optional alongside the free text, where the venue maintains a list."
-   },
-   "approverPrincipalId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "Required above the venue threshold. May not be the requester."
-   },
-   "recordedAt": {
-    "type": "string",
-    "format": "date-time"
-   }
-  }
- },
  "ModifyOrderRequest": {
   "type": "object",
   "required": [
@@ -397,35 +346,6 @@
    "recordedAt": {
     "type": "string",
     "format": "date-time"
-   }
-  }
- },
- "Money": {
-  "type": "object",
-  "x-ticvai-persistence-kind": "valueObject",
-  "x-ticvai-persistence-column": "numeric(18,4)",
-  "description": "**On the wire this is three fields; in the database it is one column.**\n24 August. Every column typed `Money` was landing as `jsonb` — 129 of them, including `orders.shift.opening_float`, `inventory.purchase_order.total` and `promotions.voucher.balance`. **`orders.cash_movement.amount` was `numeric(18,4)` because somebody hand-typed that one**, and the inconsistency is what made it visible.\n**A jsonb price cannot be summed in SQL.** Every total, variance and reconciliation moves into application code — and a shift variance computed in .NET against a ledger computed in Postgres is two answers to one question. That is F13 month-end and F98 takings-to-ledger, both walked, both assuming the arithmetic is in the database.\n**`currency` and `scale` are not stored per row.** ADR-0018 makes them region-scoped and not overridable below, so they resolve from the scope walk — storing AED against nine million rows in a UAE region is nine million copies of a fact that cannot differ. A row that needed its own currency would be a row in the wrong region.\n**They stay on the wire** because a client reading a figure should not have to walk a hierarchy to know what it means.\n",
-  "required": [
-   "amount",
-   "currency",
-   "scale"
-  ],
-  "properties": {
-   "amount": {
-    "type": "string",
-    "description": "Decimal string, never a float. Up to 4 decimal places. **Persisted as `numeric(18,4)`** — the string is a transport choice, so a JavaScript client cannot round a fare in transit.\n",
-    "pattern": "^-?\\d+(\\.\\d{1,4})?$"
-   },
-   "currency": {
-    "type": "string",
-    "description": "**Resolved from the region, not stored on the row** (ADR-0018). OMR uses 3 decimal places and AED uses 2 — a venue on a different scale from its region is a ledger that cannot consolidate.\n",
-    "pattern": "^[A-Z]{3}$"
-   },
-   "scale": {
-    "type": "integer",
-    "description": "Resolved from the region alongside `currency`.",
-    "minimum": 0,
-    "maximum": 4
    }
   }
  },
@@ -500,6 +420,46 @@
    },
    "refundedAmount": {
     "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "chargeCurrency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**The currency the guest selected and is charged in** (CHG-FIN-001, 2 October 2026). Null or equal to `currency` for a sale in the base currency. Everything else on the order, and every ledger posting, stays in the base currency `currency`."
+   },
+   "chargeFxRate": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/ExchangeRateDecimal"
+     }
+    ],
+    "nullable": true,
+    "readOnly": true,
+    "description": "Units of `chargeCurrency` per one unit of the base currency, from the region's `tender` rate in force at checkout (`finance.FxRate`), stored on the order so the payment, the receipt, the tax invoice and any refund use the same rate (CHG-FIN-001)."
+   },
+   "chargeFxRateId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The `finance.FxRate` row the rate was taken from, for audit."
+   },
+   "chargeTotal": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "readOnly": true,
+    "description": "`grossAmount` converted at `chargeFxRate` and rounded to the charge currency's scale: what the guest pays and what the payment request to the provider asks for (CHG-FIN-001)."
+   },
+   "chargeRateLockedUntil": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The quote holds until then (the cart lease). After it, the next payment attempt re-quotes at the rate then in force and the guest confirms the new amount (CHG-FIN-001)."
    },
    "droppedPromotions": {
     "type": "array",
@@ -1092,7 +1052,7 @@
     "type": "string",
     "pattern": "^[A-Z]{3}$",
     "nullable": true,
-    "description": "4.6.11 is deliberately asymmetric: **accept foreign currency, refund in local.** A till giving change in five currencies needs five floats and five counts, and the variance becomes unattributable.\n"
+    "description": "4.6.11 is deliberately asymmetric: **accept foreign currency, refund in local.** A till giving change in five currencies needs five floats and five counts, and the variance becomes unattributable.\n**Cash at a till only** (CHG-FIN-001, 2 October 2026). A card or wallet payment the guest made in a currency they selected is refunded in that currency (`Refund.tenderCurrency`).\n"
    },
    "amount": {
     "$ref": "../shared/common.yaml#/components/schemas/Money"
@@ -1226,7 +1186,7 @@
      "storeCredit"
     ],
     "default": "originalTender",
-    "description": "BL-086. **A refund could only go back the way it came.** A guest whose card has expired, a partner settling by wire, a guest who would rather have the credit — three real cases with one answer.\n**`originalTender` stays the default** because refunding elsewhere is how money laundering works, and anything else needs a reason.\n"
+    "description": "BL-086. **A refund could only go back the way it came.** A guest whose card has expired, a partner settling by wire, a guest who would rather have the credit — three real cases with one answer.\n**`originalTender` stays the default** because refunding elsewhere is how money laundering works, and anything else needs a reason.\n\n**`storeCredit` is a gift card issued for the refund amount** (decided 2 October 2026, Chinmay, batch 1, POS-011; DEC-061; CHG-CSP-037; DI-796), never a voucher or a wallet top-up.\n"
    },
    "fxVariance": {
     "allOf": [
@@ -1235,6 +1195,22 @@
      }
     ],
     "description": "Where the sale rate and the current rate differ, **the difference is booked as an FX variance rather than hidden in the refund**. `runFxRevaluation` already handles this class of movement and this is the same act at a smaller scale.\n"
+   },
+   "tenderCurrency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**A refund goes back in the currency the guest paid** (decided 2 October 2026, Chinmay; CHG-FIN-001). For a card or wallet payment taken in a guest-selected currency, the refund request to the provider is in that currency, and `tenderAmount` is the refunded share of the original `Payment.tenderAmount` at the sale rate (`fxRate`), so a full refund returns exactly what was charged. `amount` stays in base currency for the ledger. Null for a refund in the base currency. Foreign cash refunded at a till is paid in base currency (DI-282)."
+   },
+   "tenderAmount": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "readOnly": true,
+    "description": "The refund in `tenderCurrency`, at that currency's own scale (CHG-FIN-001)."
    },
    "amount": {
     "$ref": "../shared/common.yaml#/components/schemas/Money"
@@ -1290,17 +1266,5 @@
     "nullable": true
    }
   }
- },
- "VoidReason": {
-  "type": "string",
-  "description": "**The void reason list** (decided 28 September, audit R125 (4)): the one list `voidOrder` takes, and the list `fnb.amendFnbOrder` and `fnb.cancelFnbOrder` point to. `other` requires a note (audit R222), and the notes are reviewed quarterly to add real reasons. Proposed, client to correct.\n",
-  "enum": [
-   "guestChangedMind",
-   "enteredInError",
-   "itemUnavailable",
-   "qualityIssue",
-   "duplicate",
-   "other"
-  ]
  }
 }

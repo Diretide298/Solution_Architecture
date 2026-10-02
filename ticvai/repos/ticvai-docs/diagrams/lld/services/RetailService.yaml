@@ -10,8 +10,8 @@ scale: Follows the sale. Nothing unusual.
 ifDown: Down means the shop stops; the gates and the restaurant do not.
 coverage:
   operations: 25
-  inAFlow: 13
-  percent: 52%
+  inAFlow: 15
+  percent: 60%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
@@ -366,7 +366,7 @@ tables:
   writtenBy: []
   foreignWriters: null
 - table: retail.store_rule
-  columns: 10
+  columns: 12
   store: postgres
   parent: null
   writtenBy:
@@ -405,16 +405,18 @@ screens:
 - P02:GST-062 Shop & Drop Collection
 - P04:POS-002 Sell — Ticket Catalogue
 - P04:POS-005 Payment
-- P04:POS-007 Close Shift
 - P04:POS-011 Returns, Refunds & Exchanges
 - P04:POS-012 Omnichannel Order & Fulfilment Center
 - P04:POS-023 Sell — Merchandise
 - P04:POS-026 Receipt & Reprint
+- P04:POS-030 Sales Journal
 - P05:KSK-011 Collect a booking
 - P05:KSK-017 Shop
+- P06:EMP-062 Store Stock & SKU Availability
 - P06:EMP-068 Reservation, Allocation & Omnichannel Inventory
 - P06:EMP-069 Barcode, RFID, Serialized Stock & Traceability
 - P08:BO-007 Product Directory
+- P08:BO-021 Order Search
 - P08:BO-044 F&B Outlets
 - P08:BO-048 Retail Products
 - P08:BO-114 Variants, Attributes, Barcode & RFID Management

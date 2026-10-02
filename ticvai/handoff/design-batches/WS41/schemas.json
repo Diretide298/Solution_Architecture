@@ -621,6 +621,17 @@
    }
   }
  },
+ "CookieCategory": {
+  "type": "string",
+  "enum": [
+   "strictlyNecessary",
+   "functional",
+   "analytics",
+   "personalisation",
+   "marketing"
+  ],
+  "description": "2.6.53. The five categories the banner design (`CookieBannerPreferenceCenterDesignerView.categories`) offers; the matrix's \"preference\" category is `personalisation` (British spelling, as `ConsentPurpose`)."
+ },
  "CookieConsentChannel": {
   "type": "string",
   "enum": [
@@ -632,6 +643,127 @@
    "partnerMicrosite"
   ],
   "description": "The six governed surfaces, as the registry and the banner design name them (pack 17.1.5-17.1.6)."
+ },
+ "CookieScanFinding": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.cookie_scan_finding",
+  "description": "**One technology one scan saw, in one consent state** (Chinmay, 2 October, contract follow-ups; CHG-FUP-009). Written by `recordCookieScan` from `findings[]`, never edited; read by `listCookieScanFindings`. Kept with its run, so an audit can show what loaded before consent on a given day.",
+  "required": [
+   "scanRunId",
+   "name",
+   "provider",
+   "technologyType",
+   "isThirdParty",
+   "preConsentViolation"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "scanRunId": {
+    "type": "string",
+    "format": "uuid",
+    "x-ticvai-references": "marketing.cookie_scan_run"
+   },
+   "technologyId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The registry entry the finding matched or created (`name` + `provider` + `domainApplication`)."
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "provider": {
+    "type": "string",
+    "maxLength": 150
+   },
+   "technologyType": {
+    "type": "string",
+    "maxLength": 40,
+    "description": "As `RecordCookieScanRequest.findings[].technologyType`."
+   },
+   "isThirdParty": {
+    "type": "boolean"
+   },
+   "durationDays": {
+    "type": "integer",
+    "minimum": 0,
+    "nullable": true
+   },
+   "domainApplication": {
+    "type": "string",
+    "maxLength": 255,
+    "nullable": true
+   },
+   "consentState": {
+    "type": "string",
+    "enum": [
+     "noDecision",
+     "rejectedAll",
+     "acceptedAll"
+    ],
+    "nullable": true
+   },
+   "pageUrl": {
+    "type": "string",
+    "maxLength": 2000,
+    "nullable": true
+   },
+   "initiatorUrl": {
+    "type": "string",
+    "maxLength": 2000,
+    "nullable": true
+   },
+   "cookieDomain": {
+    "type": "string",
+    "maxLength": 255,
+    "nullable": true
+   },
+   "sameSite": {
+    "type": "string",
+    "enum": [
+     "strict",
+     "lax",
+     "none"
+    ],
+    "nullable": true
+   },
+   "secure": {
+    "type": "boolean",
+    "nullable": true
+   },
+   "suggestedCategory": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/CookieCategory"
+     }
+    ],
+    "nullable": true
+   },
+   "classificationSource": {
+    "type": "string",
+    "enum": [
+     "openCookieDatabase",
+     "vendor",
+     "platformCatalogue",
+     "none"
+    ],
+    "nullable": true
+   },
+   "preConsentViolation": {
+    "type": "boolean",
+    "description": "Seen with no decision or after reject-all, and its category (the registry's, else the suggested one) is not `strictlyNecessary`. An unclassified technology counts as a violation, as `detected` is treated as blocked."
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005)."
+   }
+  }
  },
  "CookieScanPolicy": {
   "type": "object",
@@ -684,6 +816,21 @@
      "type": "string",
      "format": "uuid"
     }
+   },
+   "scanSource": {
+    "type": "string",
+    "enum": [
+     "boughtScanner",
+     "manualUpload"
+    ],
+    "default": "boughtScanner",
+    "description": "**Who scans this channel** (Chinmay, 2 October: buy a scanner API, hybrid; CHG-CSA-023). `boughtScanner`: the scheduled run calls the bought scanner API through TICVAI's adapter, which feeds `recordCookieScan`. `manualUpload`: no scheduled scan; an administrator uploads a scan report."
+   },
+   "scannerVendorRef": {
+    "type": "string",
+    "maxLength": 200,
+    "nullable": true,
+    "description": "The scanner vendor and the account or domain group the adapter uses; set by TICVAI when the vendor is contracted."
    },
    "lastRunAt": {
     "type": "string",
@@ -764,6 +911,11 @@
     "type": "integer",
     "minimum": 0,
     "description": "Registry entries for this channel the scan did not see."
+   },
+   "preConsentViolationCount": {
+    "type": "integer",
+    "minimum": 0,
+    "description": "Findings seen with no decision or after reject-all whose category is not `strictlyNecessary` (CHG-FUP-009). Above zero, the administrator alert is raised."
    },
    "alertedAt": {
     "type": "string",
@@ -942,355 +1094,6 @@
     "type": "string",
     "format": "date-time",
     "readOnly": true
-   }
-  }
- },
- "CustomerPrivacyConsentPreference360View": {
-  "type": "object",
-  "x-ticvai-persistence": "none — projection over marketing.guest_profile, marketing.consent_record, marketing.consent_record_channel, marketing.consent_purpose, marketing.privacy_request (new), marketing.tracking_technology, pii.subject",
-  "description": "One customer's privacy position (pack 17.2.2). Consent entries are current state; history is `listConsentEvidenceWithdrawal`.",
-  "required": [
-   "subjectId",
-   "consents",
-   "policyAcceptance"
-  ],
-  "properties": {
-   "subjectId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "displayName": {
-    "type": "string",
-    "nullable": true
-   },
-   "accountStatus": {
-    "type": "string",
-    "enum": [
-     "active",
-     "guest",
-     "suspended",
-     "archived",
-     "erased"
-    ],
-    "description": "`archived` and `erased` are the ADR-0047 lifecycle stages."
-   },
-   "country": {
-    "type": "string",
-    "pattern": "^[A-Z]{2}$",
-    "nullable": true
-   },
-   "preferredLanguage": {
-    "type": "string",
-    "nullable": true,
-    "description": "BCP 47 tag."
-   },
-   "ageCategory": {
-    "type": "string",
-    "enum": [
-     "adult",
-     "minor",
-     "unknown"
-    ]
-   },
-   "guardianSubjectId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "guardianRelationship": {
-    "type": "string",
-    "nullable": true,
-    "enum": [
-     "parent",
-     "legalGuardian",
-     "other"
-    ]
-   },
-   "openExceptionCount": {
-    "type": "integer",
-    "minimum": 0,
-    "description": "The privacy risk/exception indicator; open exceptions naming this customer."
-   },
-   "consents": {
-    "type": "array",
-    "items": {
-     "type": "object",
-     "required": [
-      "purpose",
-      "decision"
-     ],
-     "properties": {
-      "purpose": {
-       "$ref": "#/components/schemas/ConsentPurpose"
-      },
-      "channel": {
-       "allOf": [
-        {
-         "$ref": "#/components/schemas/MessageChannel"
-        }
-       ],
-       "nullable": true
-      },
-      "decision": {
-       "type": "string",
-       "enum": [
-        "granted",
-        "declined",
-        "withdrawn",
-        "expired",
-        "notAsked"
-       ]
-      },
-      "noticeVersion": {
-       "type": "string",
-       "nullable": true
-      },
-      "capturedAt": {
-       "type": "string",
-       "format": "date-time",
-       "nullable": true
-      },
-      "source": {
-       "allOf": [
-        {
-         "$ref": "#/components/schemas/ConsentSource"
-        }
-       ],
-       "nullable": true
-      },
-      "requiresRenewal": {
-       "type": "boolean"
-      }
-     }
-    }
-   },
-   "preferences": {
-    "type": "object",
-    "properties": {
-     "channels": {
-      "type": "array",
-      "items": {
-       "type": "object",
-       "required": [
-        "channel",
-        "optedIn"
-       ],
-       "properties": {
-        "channel": {
-         "$ref": "#/components/schemas/MessageChannel"
-        },
-        "optedIn": {
-         "type": "boolean"
-        }
-       }
-      }
-     },
-     "brandIds": {
-      "type": "array",
-      "items": {
-       "type": "string",
-       "format": "uuid"
-      }
-     },
-     "marketingCategories": {
-      "type": "array",
-      "items": {
-       "type": "string",
-       "maxLength": 80
-      }
-     },
-     "personalisationEnabled": {
-      "type": "boolean"
-     }
-    }
-   },
-   "policyAcceptance": {
-    "type": "array",
-    "items": {
-     "type": "object",
-     "required": [
-      "documentType",
-      "currentVersion"
-     ],
-     "properties": {
-      "documentType": {
-       "type": "string",
-       "enum": [
-        "privacyPolicy",
-        "cookieNotice",
-        "biometricNotice",
-        "childrensPrivacyNotice",
-        "other"
-       ]
-      },
-      "documentName": {
-       "type": "string",
-       "nullable": true
-      },
-      "acceptedVersion": {
-       "type": "string",
-       "nullable": true
-      },
-      "acceptedAt": {
-       "type": "string",
-       "format": "date-time",
-       "nullable": true
-      },
-      "currentVersion": {
-       "type": "string"
-      },
-      "requiresReacceptance": {
-       "type": "boolean"
-      }
-     }
-    }
-   },
-   "trackingChoices": {
-    "type": "array",
-    "description": "Only where the preference is tied to this customer (a signed-in consent).",
-    "items": {
-     "type": "object",
-     "required": [
-      "category",
-      "decision"
-     ],
-     "properties": {
-      "category": {
-       "type": "string",
-       "enum": [
-        "strictlyNecessary",
-        "functional",
-        "analytics",
-        "personalisation",
-        "marketing",
-        "other"
-       ]
-      },
-      "decision": {
-       "type": "string",
-       "enum": [
-        "granted",
-        "declined"
-       ]
-      },
-      "decidedAt": {
-       "type": "string",
-       "format": "date-time"
-      }
-     }
-    }
-   },
-   "privacyRequests": {
-    "type": "array",
-    "description": "Open requests and the 20 most recent completed ones.",
-    "items": {
-     "type": "object",
-     "required": [
-      "requestId",
-      "requestType",
-      "status"
-     ],
-     "properties": {
-      "requestId": {
-       "type": "string",
-       "format": "uuid"
-      },
-      "requestType": {
-       "type": "string"
-      },
-      "status": {
-       "type": "string",
-       "enum": [
-        "submitted",
-        "inProgress",
-        "completed"
-       ]
-      },
-      "submittedAt": {
-       "type": "string",
-       "format": "date-time"
-      },
-      "dueAt": {
-       "type": "string",
-       "format": "date-time",
-       "nullable": true
-      }
-     }
-    }
-   },
-   "dataFootprint": {
-    "type": "array",
-    "description": "Where this customer's data exists, as counts; the records are reached through `setDataDiscoveryAccess`.",
-    "items": {
-     "type": "object",
-     "required": [
-      "system",
-      "recordCount"
-     ],
-     "properties": {
-      "system": {
-       "type": "string",
-       "enum": [
-        "crm",
-        "ticketing",
-        "membership",
-        "orders",
-        "loyalty",
-        "wallet",
-        "marketing",
-        "waiver",
-        "biometricProviderReference",
-        "connectedSystem"
-       ]
-      },
-      "systemName": {
-       "type": "string",
-       "nullable": true,
-       "description": "The connected system's name, when `system` is `connectedSystem`."
-      },
-      "recordCount": {
-       "type": "integer",
-       "minimum": 0
-      }
-     }
-    }
-   },
-   "timeline": {
-    "type": "array",
-    "description": "The 50 most recent privacy events, newest first.",
-    "items": {
-     "type": "object",
-     "required": [
-      "occurredAt",
-      "event"
-     ],
-     "properties": {
-      "occurredAt": {
-       "type": "string",
-       "format": "date-time"
-      },
-      "event": {
-       "type": "string",
-       "enum": [
-        "accountCreated",
-        "policyAccepted",
-        "consentGranted",
-        "consentDeclined",
-        "consentWithdrawn",
-        "preferenceChanged",
-        "privacyRequestCreated",
-        "privacyRequestCompleted",
-        "dataExportGenerated",
-        "anonymised",
-        "archived"
-       ]
-      },
-      "summary": {
-       "type": "string",
-       "maxLength": 300
-      }
-     }
-    }
    }
   }
  },
@@ -2404,9 +2207,153 @@
        "type": "string",
        "maxLength": 255,
        "nullable": true
+      },
+      "consentState": {
+       "type": "string",
+       "enum": [
+        "noDecision",
+        "rejectedAll",
+        "acceptedAll"
+       ],
+       "description": "The consent state the page was loaded in when the technology was seen (CHG-FUP-009). Absent from a scanner that tests one state only; such a finding proves nothing about consent."
+      },
+      "pageUrl": {
+       "type": "string",
+       "format": "uri",
+       "maxLength": 2000,
+       "nullable": true,
+       "description": "The page the technology was seen on."
+      },
+      "initiatorUrl": {
+       "type": "string",
+       "format": "uri",
+       "maxLength": 2000,
+       "nullable": true,
+       "description": "The script or frame that set it, so a violation names its cause (a tag manager, an embed)."
+      },
+      "cookieDomain": {
+       "type": "string",
+       "maxLength": 255,
+       "nullable": true
+      },
+      "sameSite": {
+       "type": "string",
+       "enum": [
+        "strict",
+        "lax",
+        "none"
+       ],
+       "nullable": true
+      },
+      "secure": {
+       "type": "boolean",
+       "nullable": true
+      },
+      "suggestedCategory": {
+       "allOf": [
+        {
+         "$ref": "#/components/schemas/CookieCategory"
+        }
+       ],
+       "nullable": true,
+       "description": "The category the scanner or the catalogue suggests. A suggestion only; the venue's administrator classifies it with `setTrackingTechnology`."
+      },
+      "classificationSource": {
+       "type": "string",
+       "enum": [
+        "openCookieDatabase",
+        "vendor",
+        "platformCatalogue",
+        "none"
+       ],
+       "nullable": true,
+       "description": "Where `suggestedCategory` came from (CHG-FUP-009, CHG-FUP-010)."
       }
      }
     }
+   }
+  }
+ },
+ "TrackingTechnologyCatalogueEntry": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.tracking_technology_catalogue",
+  "description": "**The platform's catalogue of known cookies and trackers** (Chinmay, 2 October, contract follow-ups: \"a platform-wide catalogue of known cookies\"; CHG-FUP-010). One row per known technology, matched on `namePattern` + `provider`, with the category TICVAI's privacy owner approved. Seeded from the Open Cookie Database (Apache-2.0) and curated by platform staff; mastered in the control plane and replicated read-only into every cell with the platform root as `scopePath`, as the platform model catalogue is. **It suggests, it does not decide**: a scan finding that matches takes `suggestedCategory` from it with `classificationSource` `platformCatalogue`, and each venue still approves its own registry entry (`setTrackingTechnology`), so `_ga` is suggested once for every tenant rather than researched by each.",
+  "required": [
+   "namePattern",
+   "provider",
+   "category",
+   "technologyType"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "entryKey": {
+    "type": "string",
+    "readOnly": true,
+    "pattern": "^[a-z0-9][a-z0-9-]{1,119}$",
+    "description": "The stable key the entry is written under (`setTrackingTechnologyCatalogueEntry`), such as `google-analytics-ga`; taken from the path."
+   },
+   "namePattern": {
+    "type": "string",
+    "maxLength": 200,
+    "description": "The cookie or key name, with `*` as a wildcard (`_ga_*`)."
+   },
+   "provider": {
+    "type": "string",
+    "maxLength": 150
+   },
+   "category": {
+    "$ref": "#/components/schemas/CookieCategory"
+   },
+   "technologyType": {
+    "type": "string",
+    "maxLength": 40,
+    "description": "As `RecordCookieScanRequest.findings[].technologyType`."
+   },
+   "purpose": {
+    "type": "string",
+    "maxLength": 1000,
+    "nullable": true
+   },
+   "typicalDurationDays": {
+    "type": "integer",
+    "minimum": 0,
+    "nullable": true
+   },
+   "isThirdParty": {
+    "type": "boolean",
+    "nullable": true
+   },
+   "privacyInformationUrl": {
+    "type": "string",
+    "maxLength": 2000,
+    "nullable": true
+   },
+   "source": {
+    "type": "string",
+    "enum": [
+     "openCookieDatabase",
+     "platformCuration"
+    ],
+    "description": "Imported, or added or corrected by platform staff."
+   },
+   "isActive": {
+    "type": "boolean",
+    "default": true,
+    "description": "A retired entry stops suggesting; it is kept for the findings that cited it."
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005): the platform root on every replicated row."
    }
   }
  }

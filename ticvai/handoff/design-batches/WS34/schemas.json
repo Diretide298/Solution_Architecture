@@ -73,6 +73,18 @@
   ],
   "description": "**The status of a catalogue configuration record** (29 September, data model DM3): price lists, rates, fees and fee rules, tax profiles and rules, calculation and rounding profiles, package pricing and templates. `draft` is being prepared and is never used by a calculation; `active` is in use from its effective date; `inactive` is switched off and may be switched back; `retired` is kept for history only. A record already used by a live price becomes `active` through a published change request, not by an edit."
  },
+ "Channel": {
+  "type": "string",
+  "enum": [
+   "pos",
+   "kiosk",
+   "web",
+   "mobile",
+   "b2b",
+   "ota",
+   "callCentre"
+  ]
+ },
  "CommercialPricingCommandCenterSummary": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
@@ -775,6 +787,39 @@
    }
   }
  },
+ "Price": {
+  "x-ticvai-persistence": "catalogue.price",
+  "type": "object",
+  "required": [
+   "priceListId",
+   "variantId",
+   "amount"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
+   },
+   "priceListId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "variantId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "amount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "taxCodeId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   }
+  }
+ },
  "PriceCategory": {
   "type": "object",
   "x-ticvai-persistence": "catalogue.price_category",
@@ -1119,23 +1164,70 @@
    }
   }
  },
- "PriceListMasterConfigurationInput": {
+ "PriceList": {
+  "x-ticvai-persistence": "catalogue.price_list",
   "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
-  "description": "**What Price List Master Configuration submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "required": [
+   "id",
+   "code",
+   "name",
+   "venueId",
+   "currency",
+   "currencyScale",
+   "channels"
+  ],
   "properties": {
-   "priceListName": {
+   "id": {
     "type": "string",
-    "description": "Price List Name"
+    "format": "uuid"
    },
-   "priceListCode": {
+   "code": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "venueId": {
     "type": "string",
-    "description": "Price List Code; unique within the tenant"
+    "format": "uuid"
+   },
+   "currency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$",
+    "x-ticvai-persisted": false,
+    "description": "**Resolved from the region, not stored** (ADR-0018, 24 August). Region-scoped and not overridable below, so a row in a UAE region is AED and cannot be anything else. **Kept on the wire, removed from the table** — a client should not walk a hierarchy to read a figure, and the database should not hold nine million copies of AED. Four tables genuinely differ from their region and keep a stored currency: `orders.payment.tender_currency`, `inventory.supplier`, `ledger.account`, `control.partner_agreement`.\n"
+   },
+   "currencyScale": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 4,
+    "x-ticvai-persisted": false,
+    "description": "**Resolved from the region, not stored** (ADR-0018, 24 August). Region-scoped and not overridable below, so a row in a UAE region is AED and cannot be anything else — storing it per row is a copy of a fact that cannot differ. **Kept on the wire, removed from the table**: a client reading a figure should not walk a hierarchy to know what it means, and the database should not hold nine million copies of AED. Four tables genuinely differ from their region and keep a stored currency — `orders.payment.tender_currency`, `inventory.supplier`, `ledger.account`, `control.partner_agreement`. **A guest paying USD at an AED venue is a real row; a workstation with its own currency is a misconfiguration.**\n"
+   },
+   "channels": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/Channel"
+    }
+   },
+   "validFrom": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "validTo": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "priority": {
+    "type": "integer",
+    "description": "Where lists overlap, higher priority wins."
    },
    "description": {
     "type": "string",
-    "description": "Description"
+    "nullable": true,
+    "description": "Price list master fields (29 September, data model DM3), set with `createPriceList` and `updatePriceList` since setPriceListMaster was retired in r2 (BC-008, CHG-CLN-001)."
    },
    "priceListType": {
     "type": "string",
@@ -1153,85 +1245,54 @@
      "internal",
      "specialMarket"
     ],
-    "description": "Price List Type (Commercial Types, pp.8-9, and the directory's Price List Types)"
+    "default": "standardRetail"
    },
-   "legalEntity": {
-    "type": "string",
-    "description": "Legal Entity"
+   "status": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/CatalogueConfigStatus"
+     }
+    ],
+    "default": "active"
    },
-   "brand": {
+   "ownerPrincipalId": {
     "type": "string",
-    "description": "Brand"
-   },
-   "businessUnit": {
-    "type": "string",
-    "description": "Business Unit"
-   },
-   "country": {
-    "type": "string",
-    "description": "Country"
-   },
-   "market": {
-    "type": "string",
-    "description": "Market"
-   },
-   "venue": {
-    "type": "string",
-    "description": "Venue"
-   },
-   "defaultCurrency": {
-    "type": "string",
-    "description": "Default Currency: ISO 4217 code",
-    "pattern": "^[A-Z]{3}$"
-   },
-   "owner": {
-    "type": "string",
-    "description": "Owner"
+    "format": "uuid",
+    "nullable": true
    },
    "tags": {
     "type": "array",
     "items": {
      "type": "string"
-    },
-    "description": "Tags"
+    }
    },
-   "status": {
+   "legalEntityId": {
     "type": "string",
-    "description": "Status: draft, configured, inactive or archived are set here; validated is set by structure validation (ADM-057) and active / expired by Board 4 publication"
+    "format": "uuid",
+    "nullable": true
    },
-   "defaultRateCategory": {
+   "brand": {
     "type": "string",
-    "description": "Default Rate Category: code of a price category from the library (ADM-050)"
+    "maxLength": 100,
+    "nullable": true
    },
-   "defaultRoundingProfile": {
+   "businessUnit": {
     "type": "string",
-    "description": "Default Rounding Profile: code of a currency rounding rule (ADM-075)"
+    "maxLength": 100,
+    "nullable": true
    },
-   "defaultPriceHierarchy": {
+   "countryCode": {
     "type": "string",
-    "description": "Default Price Hierarchy: id of the price hierarchy (ADM-055) this list resolves against"
+    "maxLength": 2,
+    "nullable": true,
+    "pattern": "^[A-Z]{2}$"
    },
-   "allowOverrides": {
-    "type": "boolean",
-    "description": "Allow Overrides"
-   },
-   "allowInheritance": {
-    "type": "boolean",
-    "description": "Allow Inheritance"
-   },
-   "allowMultipleCurrencies": {
-    "type": "boolean",
-    "description": "Allow Multiple Currencies"
-   },
-   "allowProductSpecificRates": {
-    "type": "boolean",
-    "description": "Allow Product-Specific Rates"
-   },
-   "priceListId": {
+   "marketCode": {
     "type": "string",
-    "description": "Price List ID; empty on create, the list to update otherwise"
+    "maxLength": 40,
+    "nullable": true
    },
-   "scope": {
+   "scopeLevel": {
     "type": "string",
     "enum": [
      "global",
@@ -1242,163 +1303,49 @@
      "event",
      "businessUnit"
     ],
-    "description": "Scope: where the price list can apply (p.8)"
+    "default": "venue"
    },
-   "clonedFromPriceListId": {
+   "defaultPriceCategoryId": {
     "type": "string",
-    "nullable": true,
-    "description": "The price list this one was duplicated from (Duplicate, p.9: UAE Standard 2026 into UAE Standard 2027); empty when built from scratch"
-   }
-  }
- },
- "PriceListMasterConfigurationView": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
-  "description": "**What Price List Master Configuration displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
-  "properties": {
-   "priceListName": {
-    "type": "string",
-    "description": "Price List Name"
+    "format": "uuid",
+    "nullable": true
    },
-   "priceListCode": {
+   "roundingProfileId": {
     "type": "string",
-    "description": "Price List Code; unique within the tenant"
+    "format": "uuid",
+    "nullable": true
    },
-   "description": {
+   "priceResolutionPolicyId": {
     "type": "string",
-    "description": "Description"
-   },
-   "priceListType": {
-    "type": "string",
-    "enum": [
-     "standardRetail",
-     "venue",
-     "attraction",
-     "event",
-     "membership",
-     "group",
-     "corporate",
-     "b2b",
-     "reseller",
-     "ota",
-     "internal",
-     "specialMarket"
-    ],
-    "description": "Price List Type (Commercial Types, pp.8-9, and the directory's Price List Types)"
-   },
-   "legalEntity": {
-    "type": "string",
-    "description": "Legal Entity"
-   },
-   "brand": {
-    "type": "string",
-    "description": "Brand"
-   },
-   "businessUnit": {
-    "type": "string",
-    "description": "Business Unit"
-   },
-   "country": {
-    "type": "string",
-    "description": "Country"
-   },
-   "market": {
-    "type": "string",
-    "description": "Market"
-   },
-   "venue": {
-    "type": "string",
-    "description": "Venue"
-   },
-   "defaultCurrency": {
-    "type": "string",
-    "description": "Default Currency: ISO 4217 code",
-    "pattern": "^[A-Z]{3}$"
-   },
-   "owner": {
-    "type": "string",
-    "description": "Owner"
-   },
-   "tags": {
-    "type": "array",
-    "items": {
-     "type": "string"
-    },
-    "description": "Tags"
-   },
-   "status": {
-    "type": "string",
-    "description": "Status: draft, configured, inactive or archived are set here; validated is set by structure validation (ADM-057) and active / expired by Board 4 publication"
-   },
-   "defaultRateCategory": {
-    "type": "string",
-    "description": "Default Rate Category: code of a price category from the library (ADM-050)"
-   },
-   "defaultRoundingProfile": {
-    "type": "string",
-    "description": "Default Rounding Profile: code of a currency rounding rule (ADM-075)"
-   },
-   "defaultPriceHierarchy": {
-    "type": "string",
-    "description": "Default Price Hierarchy: id of the price hierarchy (ADM-055) this list resolves against"
+    "format": "uuid",
+    "nullable": true
    },
    "allowOverrides": {
     "type": "boolean",
-    "description": "Allow Overrides"
+    "default": false
    },
    "allowInheritance": {
     "type": "boolean",
-    "description": "Allow Inheritance"
+    "default": true
    },
    "allowMultipleCurrencies": {
     "type": "boolean",
-    "description": "Allow Multiple Currencies"
+    "default": false
    },
    "allowProductSpecificRates": {
     "type": "boolean",
-    "description": "Allow Product-Specific Rates"
-   },
-   "priceListId": {
-    "type": "string",
-    "description": "Price List ID; empty on create, the list to update otherwise"
-   },
-   "scope": {
-    "type": "string",
-    "enum": [
-     "global",
-     "country",
-     "market",
-     "brand",
-     "venue",
-     "event",
-     "businessUnit"
-    ],
-    "description": "Scope: where the price list can apply (p.8)"
+    "default": true
    },
    "clonedFromPriceListId": {
     "type": "string",
-    "nullable": true,
-    "description": "The price list this one was duplicated from (Duplicate, p.9: UAE Standard 2026 into UAE Standard 2027); empty when built from scratch"
+    "format": "uuid",
+    "nullable": true
    },
-   "consumingModules": {
-    "type": "array",
-    "items": {
-     "type": "string",
-     "enum": [
-      "ticketing",
-      "b2c",
-      "pos",
-      "kiosk",
-      "b2b",
-      "groupSales",
-      "membership",
-      "fnb",
-      "retail",
-      "rental"
-     ]
-    },
-    "description": "Dependencies: the modules that consume this list (p.9); read-only"
+   "currentVersion": {
+    "type": "integer",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The active `catalogue.price_list_version`."
    }
   }
  },
@@ -1745,211 +1692,6 @@
    "pricingSource": {
     "type": "string",
     "description": "Price Source Visibility (p.14): the name shown on the product, e.g. UAE Standard Admission 2027; read-only"
-   }
-  }
- },
- "RateStructureBuilderInput": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table covers these fields** — the closest is catalogue.price at 4%, so this is not an update to anything the package stores today and no new table has been decided",
-  "description": "**What Rate Structure Builder submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.\n\n**The pack defines this as a record**, under *Each rate should contain* - one of only 13 drafted writes that does. That is the client writing a row rather than a screen, and it is where the table conversation should start.",
-  "properties": {
-   "rateId": {
-    "type": "string",
-    "description": "Rate ID"
-   },
-   "rateName": {
-    "type": "string",
-    "description": "Rate Name"
-   },
-   "rateCode": {
-    "type": "string",
-    "description": "Rate Code"
-   },
-   "priceCategory": {
-    "type": "string",
-    "description": "Price Category: code of a category from the library (ADM-050)"
-   },
-   "rateType": {
-    "type": "string",
-    "description": "Rate Type: code of a rate type from the library (ADM-050), e.g. standard, reduced, derived"
-   },
-   "amount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Amount; ignored when derivedFrom is set"
-   },
-   "currency": {
-    "type": "string",
-    "description": "Currency: ISO 4217 code",
-    "pattern": "^[A-Z]{3}$"
-   },
-   "unitBasis": {
-    "type": "string",
-    "enum": [
-     "perTicket",
-     "perPerson",
-     "perUnit",
-     "perHour",
-     "perDay",
-     "perPerformance",
-     "perResource",
-     "perPackage",
-     "perMembershipPeriod"
-    ],
-    "description": "Unit Basis (p.12); perPerformance is the pack's \"Per Session\" (a session is a Performance)"
-   },
-   "precision": {
-    "type": "integer",
-    "description": "Precision: decimal places, 0 to 3 (MoM 1 Sep §4.5 requires up to three)",
-    "minimum": 0,
-    "maximum": 3
-   },
-   "roundingProfile": {
-    "type": "string",
-    "description": "Rounding Profile: code of a currency rounding rule (ADM-075)"
-   },
-   "status": {
-    "type": "string",
-    "description": "Status: draft, active or disabled"
-   },
-   "priceListId": {
-    "type": "string",
-    "description": "The price list the rate belongs to"
-   },
-   "derivedFrom": {
-    "type": "object",
-    "nullable": true,
-    "description": "Derived Rates (p.12): this rate is another rate adjusted (Child = Adult - 25%, VIP = Standard + AED 200); a commercial relationship, not dynamic pricing. Empty for an entered amount",
-    "properties": {
-     "baseRateId": {
-      "type": "string"
-     },
-     "adjustmentType": {
-      "type": "string",
-      "enum": [
-       "percentage",
-       "fixedAmount"
-      ]
-     },
-     "adjustmentValue": {
-      "type": "number",
-      "description": "Percent or amount in the rate currency; negative reduces"
-     }
-    }
-   }
-  },
-  "x-ticvai-record-definition": "Each rate should contain"
- },
- "RateStructureBuilderView": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
-  "description": "**What Rate Structure Builder displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
-  "properties": {
-   "rateId": {
-    "type": "string",
-    "description": "Rate ID"
-   },
-   "rateName": {
-    "type": "string",
-    "description": "Rate Name"
-   },
-   "rateCode": {
-    "type": "string",
-    "description": "Rate Code"
-   },
-   "priceCategory": {
-    "type": "string",
-    "description": "Price Category: code of a category from the library (ADM-050)"
-   },
-   "rateType": {
-    "type": "string",
-    "description": "Rate Type: code of a rate type from the library (ADM-050), e.g. standard, reduced, derived"
-   },
-   "amount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Amount; for a derived rate this is the computed value, read-only"
-   },
-   "currency": {
-    "type": "string",
-    "description": "Currency: ISO 4217 code",
-    "pattern": "^[A-Z]{3}$"
-   },
-   "unitBasis": {
-    "type": "string",
-    "enum": [
-     "perTicket",
-     "perPerson",
-     "perUnit",
-     "perHour",
-     "perDay",
-     "perPerformance",
-     "perResource",
-     "perPackage",
-     "perMembershipPeriod"
-    ],
-    "description": "Unit Basis (p.12); perPerformance is the pack's \"Per Session\" (a session is a Performance)"
-   },
-   "precision": {
-    "type": "integer",
-    "description": "Precision: decimal places, 0 to 3 (MoM 1 Sep §4.5 requires up to three)",
-    "minimum": 0,
-    "maximum": 3
-   },
-   "roundingProfile": {
-    "type": "string",
-    "description": "Rounding Profile: code of a currency rounding rule (ADM-075)"
-   },
-   "status": {
-    "type": "string",
-    "description": "Status: draft, active or disabled"
-   },
-   "priceListId": {
-    "type": "string",
-    "description": "The price list the rate belongs to"
-   },
-   "derivedFrom": {
-    "type": "object",
-    "nullable": true,
-    "description": "Derived Rates (p.12): this rate is another rate adjusted (Child = Adult - 25%, VIP = Standard + AED 200); a commercial relationship, not dynamic pricing. Empty for an entered amount",
-    "properties": {
-     "baseRateId": {
-      "type": "string"
-     },
-     "adjustmentType": {
-      "type": "string",
-      "enum": [
-       "percentage",
-       "fixedAmount"
-      ]
-     },
-     "adjustmentValue": {
-      "type": "number",
-      "description": "Percent or amount in the rate currency; negative reduces"
-     }
-    }
-   },
-   "validationIssues": {
-    "type": "array",
-    "description": "Validation (pp.12-13): problems found on this rate; read-only",
-    "items": {
-     "type": "object",
-     "properties": {
-      "code": {
-       "type": "string",
-       "enum": [
-        "duplicateRate",
-        "missingAmount",
-        "unsupportedCurrency",
-        "invalidDerivedRate",
-        "circularRateRelationship"
-       ]
-      },
-      "message": {
-       "type": "string"
-      }
-     }
-    }
    }
   }
  }

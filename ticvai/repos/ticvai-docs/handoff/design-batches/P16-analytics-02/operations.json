@@ -12,6 +12,84 @@
   "requestBody": null,
   "responds": "AiVenueSettings"
  },
+ "getKpiValues": {
+  "method": "GET",
+  "path": "/kpi-values",
+  "contract": "reporting",
+  "summary": "Current values, against target, with movement",
+  "permission": "REPORT_VIEW_VENUE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "kpiIds",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "kpiCodes",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "scopePath",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "period",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "compareTo",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "interval",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "groupBy",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "module",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "KpiValue"
+ },
+ "getUnifiedReconciliation": {
+  "method": "GET",
+  "path": "/reconciliation/unified",
+  "contract": "finance",
+  "summary": "Every money source against the ledger, in one view",
+  "permission": "LEDGER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "from",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": true
+   }
+  ],
+  "requestBody": null,
+  "responds": "UnifiedReconciliation"
+ },
  "getVenueHistoryImport": {
   "method": "GET",
   "path": "/history-imports/{importId}",
@@ -61,6 +139,148 @@
    },
    {
     "name": "capabilityKey",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listCreditMemos": {
+  "method": "GET",
+  "path": "/credit-memos",
+  "contract": "finance",
+  "summary": "Credit memos issued, newest first",
+  "permission": "LEDGER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "region",
+  "parameters": [
+   {
+    "name": "taxInvoiceId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "refundId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "legalEntityId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "issuedFrom",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "issuedTo",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listEInvoiceTransmissions": {
+  "method": "GET",
+  "path": "/e-invoicing/transmissions",
+  "contract": "finance",
+  "summary": "What was sent to the e-invoicing provider, and what came back",
+  "permission": "LEDGER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "region",
+  "parameters": [
+   {
+    "name": "legalEntityId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "documentId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listTaxInvoices": {
+  "method": "GET",
+  "path": "/tax-invoices",
+  "contract": "finance",
+  "summary": "Tax invoices issued, newest first",
+  "permission": "LEDGER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "region",
+  "parameters": [
+   {
+    "name": "orderId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "legalEntityId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "invoiceType",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "issuedFrom",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "issuedTo",
     "in": "query",
     "required": null
    },

@@ -332,6 +332,14 @@
    "guestCallable": false,
    "scopeLevel": "venue"
   },
+  "getAiSpendCeiling": {
+   "path": "/policy/spend-ceiling",
+   "verb": "GET",
+   "summary": "The AI spend ceiling, in money",
+   "permission": "AI_CONFIGURE",
+   "guestCallable": false,
+   "scopeLevel": "venue"
+  },
   "getAiUsage": {
    "path": "/usage",
    "verb": "GET",
@@ -419,6 +427,14 @@
    "permission": "RISK_INVESTIGATE",
    "guestCallable": false,
    "scopeLevel": "venue"
+  },
+  "getTranslationProposals": {
+   "path": "/ai/translate/{translationJobId}",
+   "verb": "GET",
+   "summary": "Follow a translation job",
+   "permission": "TENANT_CONFIGURE",
+   "guestCallable": false,
+   "scopeLevel": "tenant"
   },
   "getVenueHistoryImport": {
    "path": "/history-imports/{importId}",
@@ -752,7 +768,7 @@
    "path": "/releases/{releaseId}/promote",
    "verb": "POST",
    "summary": "Promote a release to its next stage (a person)",
-   "permission": "AI_APPROVE",
+   "permission": "AI_USE",
    "guestCallable": false,
    "scopeLevel": "tenant"
   },
@@ -824,7 +840,7 @@
    "path": "/forecast-versions/{versionId}/publish",
    "verb": "POST",
    "summary": "Publish a forecast version",
-   "permission": "AI_APPROVE",
+   "permission": "AI_USE",
    "guestCallable": false,
    "scopeLevel": "venue"
   },
@@ -1061,6 +1077,14 @@
    "guestCallable": false,
    "scopeLevel": "tenant"
   },
+  "setAiSpendCeiling": {
+   "path": "/policy/spend-ceiling",
+   "verb": "PUT",
+   "summary": "Set the AI spend ceiling, in money",
+   "permission": "AI_CONFIGURE",
+   "guestCallable": false,
+   "scopeLevel": "venue"
+  },
   "setAiTool": {
    "path": "/tools/{toolKey}",
    "verb": "PUT",
@@ -1220,6 +1244,7 @@
   "AiPromptTemplate",
   "AiProvenance",
   "AiProvider",
+  "AiProviderCompatibility",
   "AiProviderKind",
   "AiRecommendationDecision",
   "AiRecommendationDecline",
@@ -1229,6 +1254,7 @@
   "AiRecommendationResult",
   "AiRelease",
   "AiReplayResult",
+  "AiResidencyClass",
   "AiRiskAlert",
   "AiRiskBacktest",
   "AiRiskCase",
@@ -1245,6 +1271,7 @@
   "AiSignalSource",
   "AiSource",
   "AiSourceList",
+  "AiSpendCeiling",
   "AiTool",
   "AiTrainingRun",
   "AiTransactionRiskScore",
@@ -1301,6 +1328,7 @@
   "AiPolicyException.status",
   "AiPromptTemplate.status",
   "AiProvenance",
+  "AiProviderCompatibility.status",
   "AiProviderKind",
   "AiRiskAlert.status",
   "AiRiskCase.status",
@@ -1338,7 +1366,8 @@
   "SuggestionBasis",
   "SuggestionKind",
   "TenantStatus",
-  "TicketTransfer.status"
+  "TicketTransfer.status",
+  "TranslationProposals.status"
  ],
  "states": [
   {
@@ -2173,6 +2202,7 @@
    "ai.risk_register",
    "ai.risk_strategy",
    "ai.signal_source",
+   "ai.spend_ceiling",
    "ai.suggestion",
    "ai.suggestion_outcome",
    "ai.tool",
@@ -2306,6 +2336,7 @@
    "ai.risk_register",
    "ai.risk_strategy",
    "ai.signal_source",
+   "ai.spend_ceiling",
    "ai.suggestion",
    "ai.suggestion_outcome",
    "ai.tool",
@@ -2383,6 +2414,7 @@
     "ai.risk_register",
     "ai.risk_strategy",
     "ai.signal_source",
+    "ai.spend_ceiling",
     "ai.tool",
     "ai.training_run",
     "ai.venue_settings",
@@ -2533,6 +2565,8 @@
    "wave": 2,
    "operations": [
     "createAiConversation",
+    "listAiConversations",
+    "recordAnswerFeedback",
     "requestSuggestion",
     "sendAiMessage"
    ]
@@ -2555,6 +2589,8 @@
    "platformName": "Guest App",
    "wave": 2,
    "operations": [
+    "createAiConversation",
+    "recordAnswerFeedback",
     "sendAiMessage"
    ]
   },
@@ -2609,8 +2645,7 @@
    "platformName": "Venue POS",
    "wave": 2,
    "operations": [
-    "askReportingQuestion",
-    "saveNaturalLanguageQuery"
+    "askReportingQuestion"
    ]
   },
   {
@@ -2620,6 +2655,7 @@
    "platformName": "Guest Kiosk",
    "wave": 2,
    "operations": [
+    "createAiConversation",
     "recordAnswerFeedback",
     "sendAiMessage"
    ]
@@ -2643,6 +2679,7 @@
    "platformName": "Venue Staff App",
    "wave": 1,
    "operations": [
+    "askReportingQuestion",
     "createAiConversation",
     "listAiConversations",
     "recordAnswerFeedback",
@@ -2744,16 +2781,6 @@
    ]
   },
   {
-   "id": "BO-088",
-   "name": "Approval Analytics",
-   "platform": "P08",
-   "platformName": "Venue Management",
-   "wave": 3,
-   "operations": [
-    "listIndexJobs"
-   ]
-  },
-  {
    "id": "BO-091",
    "name": "AI Policy & Spend",
    "platform": "P08",
@@ -2761,13 +2788,16 @@
    "wave": 1,
    "operations": [
     "configureAssistantProfile",
+    "getAiByokEnablement",
     "getAiPolicy",
+    "getAiSpendCeiling",
     "getAiUsage",
     "getEffectiveAiPolicy",
     "listAiCapabilities",
     "listAssistantProfiles",
     "listIndexFailures",
-    "setAiPolicy"
+    "setAiPolicy",
+    "setAiSpendCeiling"
    ]
   },
   {
@@ -2787,18 +2817,7 @@
    "platformName": "Venue Management",
    "wave": 1,
    "operations": [
-    "decideRecommendations",
-    "recordRecommendationEvents"
-   ]
-  },
-  {
-   "id": "BO-115",
-   "name": "Category, Brand & Merchandise Hierarchy",
-   "platform": "P08",
-   "platformName": "Venue Management",
-   "wave": 2,
-   "operations": [
-    "requestSuggestion"
+    "decideRecommendations"
    ]
   },
   {
@@ -2808,8 +2827,7 @@
    "platformName": "Venue Management",
    "wave": 2,
    "operations": [
-    "generateConfiguration",
-    "requestSuggestion"
+    "generateConfiguration"
    ]
   },
   {
@@ -2820,16 +2838,6 @@
    "wave": 2,
    "operations": [
     "decideRecommendations"
-   ]
-  },
-  {
-   "id": "BO-138",
-   "name": "Production Execution & Batch Management",
-   "platform": "P08",
-   "platformName": "Venue Management",
-   "wave": 2,
-   "operations": [
-    "requestSuggestion"
    ]
   },
   {
@@ -2845,6 +2853,16 @@
   {
    "id": "BO-367",
    "name": "Approval Request Detail",
+   "platform": "P08",
+   "platformName": "Venue Management",
+   "wave": 3,
+   "operations": [
+    "getApprovalRequestScore"
+   ]
+  },
+  {
+   "id": "BO-368",
+   "name": "AI Decision Support",
    "platform": "P08",
    "platformName": "Venue Management",
    "wave": 3,
@@ -2890,6 +2908,7 @@
    "platformName": "Venue Management",
    "wave": 3,
    "operations": [
+    "decideProposedAction",
     "generateConfiguration",
     "getActionPlan"
    ]
@@ -3020,6 +3039,8 @@
    "platformName": "Venue Management",
    "wave": 3,
    "operations": [
+    "ingestKnowledgeDocument",
+    "listKnowledgeCollections",
     "listKnowledgeGaps"
    ]
   },
@@ -3065,8 +3086,10 @@
    "wave": 3,
    "operations": [
     "decideOperationalRequirement",
+    "getAiVenueSettings",
     "getForecast",
-    "listOperationalRequirements"
+    "listOperationalRequirements",
+    "setAiVenueSettings"
    ]
   },
   {
@@ -3186,6 +3209,139 @@
    ]
   },
   {
+   "id": "ADM-633",
+   "name": "Fraud Alert, Investigation & Case Management",
+   "platform": "P08",
+   "platformName": "Venue Management",
+   "wave": 3,
+   "operations": [
+    "addRiskCaseEvidence",
+    "closeRiskCase",
+    "createRiskCase",
+    "decideRiskAlert",
+    "expandRiskNetwork",
+    "getEntityRisk",
+    "getRiskCase",
+    "listRiskAlerts",
+    "proposeRiskAction"
+   ]
+  },
+  {
+   "id": "ADM-637",
+   "name": "AI Fraud, Anomaly & Payment Intelligence Center",
+   "platform": "P08",
+   "platformName": "Venue Management",
+   "wave": 3,
+   "operations": [
+    "configureRiskStrategy",
+    "getEntityRisk",
+    "listRiskAlerts"
+   ]
+  },
+  {
+   "id": "ADM-638",
+   "name": "Payment Executive Intelligence, Risk Simulator & AI Advisor",
+   "platform": "P08",
+   "platformName": "Venue Management",
+   "wave": 3,
+   "operations": [
+    "backtestRiskStrategy"
+   ]
+  },
+  {
+   "id": "ADM-678",
+   "name": "Journey Simulator, Decision Trace & AI Optimization",
+   "platform": "P08",
+   "platformName": "Venue Management",
+   "wave": 3,
+   "operations": [
+    "explainRecommendationDecision"
+   ]
+  },
+  {
+   "id": "ADM-680",
+   "name": "Customer Recommendation Profile",
+   "platform": "P08",
+   "platformName": "Venue Management",
+   "wave": 3,
+   "operations": [
+    "explainRecommendationDecision",
+    "getCustomerRecommendationProfile"
+   ]
+  },
+  {
+   "id": "ADM-683",
+   "name": "Next-Best-Offer Decision Studio",
+   "platform": "P08",
+   "platformName": "Venue Management",
+   "wave": 3,
+   "operations": [
+    "explainRecommendationDecision"
+   ]
+  },
+  {
+   "id": "ADM-686",
+   "name": "Anonymous, Known & Identity-Transition Personalization.123",
+   "platform": "P08",
+   "platformName": "Venue Management",
+   "wave": 3,
+   "operations": [
+    "explainRecommendationDecision"
+   ]
+  },
+  {
+   "id": "ADM-687",
+   "name": "AI Explainability, Confidence & Model Governance",
+   "platform": "P08",
+   "platformName": "Venue Management",
+   "wave": 3,
+   "operations": [
+    "explainRecommendationDecision"
+   ]
+  },
+  {
+   "id": "ADM-696",
+   "name": "AI Risk, Fairness, Explainability & Safety Center",
+   "platform": "P08",
+   "platformName": "Venue Management",
+   "wave": 3,
+   "operations": [
+    "explainRecommendationDecision",
+    "pauseAiCapability",
+    "rollbackAiRelease"
+   ]
+  },
+  {
+   "id": "ADM-697",
+   "name": "Recommendation Audit, Decision Trace & Investigation",
+   "platform": "P08",
+   "platformName": "Venue Management",
+   "wave": 3,
+   "operations": [
+    "explainRecommendationDecision"
+   ]
+  },
+  {
+   "id": "ADM-047",
+   "name": "AI Delivery Optimization & Communication Platform Diagnostics",
+   "platform": "P08",
+   "platformName": "Venue Management",
+   "wave": 3,
+   "operations": [
+    "requestSuggestion"
+   ]
+  },
+  {
+   "id": "ADM-366",
+   "name": "AI Approval Intelligence Center",
+   "platform": "P08",
+   "platformName": "Venue Management",
+   "wave": 3,
+   "operations": [
+    "getApprovalRequestScore"
+   ]
+  },
+  {
    "id": "ADM-004",
    "name": "Platform Audit Log",
    "platform": "P09",
@@ -3213,36 +3369,6 @@
     "setAiModel",
     "setAiProvider",
     "testAiProvider"
-   ]
-  },
-  {
-   "id": "ADM-047",
-   "name": "AI Delivery Optimization & Communication Platform Diagnostics",
-   "platform": "P09",
-   "platformName": "TICVAI Web",
-   "wave": 3,
-   "operations": [
-    "requestSuggestion"
-   ]
-  },
-  {
-   "id": "ADM-249",
-   "name": "Unified Approval Inbox & Decision Workspace",
-   "platform": "P09",
-   "platformName": "TICVAI Web",
-   "wave": 3,
-   "operations": [
-    "getApprovalRequestScore"
-   ]
-  },
-  {
-   "id": "ADM-366",
-   "name": "AI Approval Intelligence Center",
-   "platform": "P09",
-   "platformName": "TICVAI Web",
-   "wave": 3,
-   "operations": [
-    "getApprovalRequestScore"
    ]
   },
   {
@@ -3278,7 +3404,8 @@
    "wave": 3,
    "operations": [
     "answerConfigurationQuestion",
-    "getConfigurationBlueprint"
+    "getConfigurationBlueprint",
+    "setAiVenueSettings"
    ]
   },
   {
@@ -3885,8 +4012,7 @@
    "operations": [
     "createAiGovernancePolicyDraft",
     "listAiGovernancePolicyVersions",
-    "listAiTools",
-    "setAiTool"
+    "listAiTools"
    ]
   },
   {
@@ -4037,10 +4163,13 @@
    "platformName": "TICVAI Web",
    "wave": 3,
    "operations": [
+    "getActionPlan",
+    "listAiCapabilities",
     "overrideAiDecision",
     "pauseActionPlan",
     "pauseAiCapability",
-    "resumeAiCapability"
+    "resumeAiCapability",
+    "searchAiDecisions"
    ]
   },
   {
@@ -4294,117 +4423,6 @@
    ]
   },
   {
-   "id": "ADM-633",
-   "name": "Fraud Alert, Investigation & Case Management\\t170",
-   "platform": "P09",
-   "platformName": "TICVAI Web",
-   "wave": 3,
-   "operations": [
-    "addRiskCaseEvidence",
-    "closeRiskCase",
-    "createRiskCase",
-    "decideRiskAlert",
-    "expandRiskNetwork",
-    "getEntityRisk",
-    "getRiskCase",
-    "listRiskAlerts",
-    "proposeRiskAction"
-   ]
-  },
-  {
-   "id": "ADM-637",
-   "name": "AI Fraud, Anomaly & Payment Intelligence Center\\t175",
-   "platform": "P09",
-   "platformName": "TICVAI Web",
-   "wave": 3,
-   "operations": [
-    "configureRiskStrategy",
-    "getEntityRisk",
-    "listRiskAlerts"
-   ]
-  },
-  {
-   "id": "ADM-638",
-   "name": "Payment Executive Intelligence, Risk Simulator & AI Advisor\\t176",
-   "platform": "P09",
-   "platformName": "TICVAI Web",
-   "wave": 3,
-   "operations": [
-    "backtestRiskStrategy"
-   ]
-  },
-  {
-   "id": "ADM-678",
-   "name": "Journey Simulator, Decision Trace & AI Optimization",
-   "platform": "P09",
-   "platformName": "TICVAI Web",
-   "wave": 3,
-   "operations": [
-    "explainRecommendationDecision"
-   ]
-  },
-  {
-   "id": "ADM-680",
-   "name": "Customer Recommendation Profile",
-   "platform": "P09",
-   "platformName": "TICVAI Web",
-   "wave": 3,
-   "operations": [
-    "explainRecommendationDecision",
-    "getCustomerRecommendationProfile"
-   ]
-  },
-  {
-   "id": "ADM-683",
-   "name": "Next-Best-Offer Decision Studio",
-   "platform": "P09",
-   "platformName": "TICVAI Web",
-   "wave": 3,
-   "operations": [
-    "explainRecommendationDecision"
-   ]
-  },
-  {
-   "id": "ADM-686",
-   "name": "Anonymous, Known & Identity-Transition Personalization.123",
-   "platform": "P09",
-   "platformName": "TICVAI Web",
-   "wave": 3,
-   "operations": [
-    "explainRecommendationDecision"
-   ]
-  },
-  {
-   "id": "ADM-687",
-   "name": "AI Explainability, Confidence & Model Governance",
-   "platform": "P09",
-   "platformName": "TICVAI Web",
-   "wave": 3,
-   "operations": [
-    "explainRecommendationDecision"
-   ]
-  },
-  {
-   "id": "ADM-696",
-   "name": "AI Risk, Fairness, Explainability & Safety Center",
-   "platform": "P09",
-   "platformName": "TICVAI Web",
-   "wave": 3,
-   "operations": [
-    "explainRecommendationDecision"
-   ]
-  },
-  {
-   "id": "ADM-697",
-   "name": "Recommendation Audit, Decision Trace & Investigation",
-   "platform": "P09",
-   "platformName": "TICVAI Web",
-   "wave": 3,
-   "operations": [
-    "explainRecommendationDecision"
-   ]
-  },
-  {
    "id": "PTR-018",
    "name": "Reports & Sales Performance",
    "platform": "P10",
@@ -4422,8 +4440,8 @@
    "platformName": "Venue Support",
    "wave": 3,
    "operations": [
-    "listKnowledgeCollections",
-    "listKnowledgeGaps"
+    "listKnowledgeGaps",
+    "semanticSearch"
    ]
   },
   {
@@ -4478,6 +4496,16 @@
    "wave": 2,
    "operations": [
     "semanticSearch"
+   ]
+  },
+  {
+   "id": "CMS-011",
+   "name": "Translations",
+   "platform": "P13",
+   "platformName": "Venue CMS",
+   "wave": 2,
+   "operations": [
+    "getTranslationProposals"
    ]
   },
   {
@@ -4656,7 +4684,9 @@
    "wave": 3,
    "operations": [
     "decideAiInsight",
-    "listAiInsights"
+    "listAiInsights",
+    "listAiInteractions",
+    "searchAiDecisions"
    ]
   },
   {
@@ -4672,8 +4702,18 @@
     "listAiEvaluations",
     "listAiModels",
     "listPromptTemplates",
-    "publishPromptTemplate",
     "runAiEvaluation"
+   ]
+  },
+  {
+   "id": "ANL-070",
+   "name": "Analytics Governance, Security & Audit Center",
+   "platform": "P16",
+   "platformName": "Venue Analytics",
+   "wave": 3,
+   "operations": [
+    "getAiUsage",
+    "listAiInteractions"
    ]
   },
   {
@@ -4954,6 +4994,12 @@
    "mentions": 2
   },
   {
+   "file": "docs\\active\\root-classes.md",
+   "title": "Root issues by class, and the guard that closes each",
+   "status": "",
+   "mentions": 4
+  },
+  {
    "file": "docs\\active\\schema-merge-decision-log.md",
    "title": "Schema merge \u2014 the decision log",
    "status": "",
@@ -5023,6 +5069,12 @@
    "file": "docs\\adr\\0007-hybrid-repository-topology.md",
    "title": "ADR-0007: Hybrid repository topology",
    "status": "Accepted",
+   "mentions": 1
+  },
+  {
+   "file": "docs\\adr\\0009-ai-data-residency.md",
+   "title": "ADR-0009: AI Data Residency",
+   "status": "Accepted \u00b7 section 2 amended by [ADR-0049](0049-vectors-live",
    "mentions": 1
   },
   {
@@ -5148,7 +5200,7 @@
   {
    "file": "docs\\adr\\0063-encryption-keys-and-biometric-templates.md",
    "title": "ADR-0063: Encryption and keys, and biometric templates stay with the biometric vendor",
-   "status": "Proposed \u00b7 waiting on the client's data protection officer (",
+   "status": "Accepted in part \u00b7 2 October 2026: the biometric consent, en",
    "mentions": 1
   },
   {
@@ -5360,14 +5412,14 @@
   }
  ],
  "counts": {
-  "operations": 143,
-  "schemas": 122,
+  "operations": 146,
+  "schemas": 125,
   "states": 42,
   "events": 47,
-  "tables": 137,
-  "screens": 195,
+  "tables": 138,
+  "screens": 194,
   "flows": 11,
-  "documents": 64,
+  "documents": 66,
   "openConflicts": 1
  }
 }

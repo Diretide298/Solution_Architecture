@@ -63,7 +63,7 @@
  },
  "ApprovalKind": {
   "type": "string",
-  "description": "11.1.7 and 11.1.30–11.1.37. **The first four already exist as bespoke implementations** and this contract is what they collapse into.\n**Which actions route here — decided 28 September, audit R144.** Finance and procurement acts go through this engine to a **finance approver**: closing a fiscal period (`periodClose`), reopening one (`periodReopen`), cancelling a purchase order (`purchaseOrderCancel`) and closing one short (`purchaseOrderShortClose`). The tenant default matrix for each of these names the finance approver role; a venue may tighten it and never loosen it. Starting a release rollout routes through `releasePromotion` to the platform release manager (a holder of `PLATFORM_RELEASE_PROMOTE`). **Not every `requiresApproval` goes here:** reopening a shift, recounting a stock count and a retail return above the venue threshold take a supervisor's step-up on the same device instead, and never raise a request.\n**Catalogue change requests route through `productChange` and `pricingChange`** (decided 29 September, writers pass): a product change and a price or pricing change raised in `catalogue` ask for approval under these two kinds, so a venue can route product edits and price edits to different approvers.\n",
+  "description": "11.1.7 and 11.1.30–11.1.37. **The first four already exist as bespoke implementations** and this contract is what they collapse into.\n**Which actions route here — decided 28 September, audit R144.** Finance and procurement acts go through this engine to a **finance approver**: closing a fiscal period (`periodClose`), reopening one (`periodReopen`), cancelling a purchase order (`purchaseOrderCancel`) and closing one short (`purchaseOrderShortClose`). The tenant default matrix for each of these names the finance approver role; a venue may tighten it and never loosen it. Starting a release rollout routes through `releasePromotion` to the platform release manager (a holder of `PLATFORM_RELEASE_PROMOTE`). **Not every `requiresApproval` goes here:** reopening a shift, recounting a stock count and a retail return above the venue threshold take a supervisor's step-up on the same device instead, and never raise a request.\n**Catalogue change requests route through `productChange` and `pricingChange`** (decided 29 September, writers pass): a product change and a price or pricing change raised in `catalogue` ask for approval under these two kinds, so a venue can route product edits and price edits to different approvers.\n\n**Optional review steps a venue switches on, decided 2 October 2026** (Chinmay; CHG-CSP-036, CHG-CSP-028, CHG-CSP-031). Each is an existing kind narrowed by the rule's `subjectTypes`, so no kind is added (a new value here would be a breaking change against r1) and each is off until the venue saves an active matrix for it:\n- **Publishing white-label content** (`configurationChange`, subject `whiteLabelPublication`): simulate, then a single publish by a holder of the permission; a review step only where the venue sets one up (batch 1, CMS-014; DEC-156). - **Recording F&B waste above a value** (`stockWriteOff`, subject `fnbWaste`): the venue's waste-approval policy, value bands as `minAmount` and `maxAmount`, photo evidence above a value held by fnb (batch 6 #192, BO-139; DEC-192; R144). - **Publishing an access topology** (`configurationChange`, subject `topologyPublication`): second-person approval when the venue switches it on (batch 6 #230, BO-153; DEC-230). - **A permanent identity lock, a whitelist entry, or releasing a full-identity or permanent lock** (`accessPermissionChange`, subjects `identityLock`, `whitelistEntry`, `identityLockRelease`): always a second approver, never for an until-end-of-day lock (critical set 1, BO-229 and BO-247; DEC-254, DEC-260); the tenant default matrix names the security approver role and a venue may tighten it, never remove it.\n",
   "enum": [
    "refund",
    "priceOverride",
@@ -245,6 +245,26 @@
     "type": "string",
     "format": "date-time",
     "nullable": true
+   },
+   "assignedToPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "Who claimed or was assigned the request in a shared queue (`assignApprovalRequest`; DI-723; CHG-CSP-042). Null while it sits in the queue."
+   },
+   "assignedToDepartmentId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The department queue it was assigned to, where it went to a department rather than a person (CHG-CSP-042)."
+   },
+   "assignedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
    },
    "requestedAt": {
     "type": "string",
@@ -498,6 +518,57 @@
     "x-ticvai-derived": "onWrite",
     "description": "`recordedAt` of the latest admission counted in `entriesUsed`, written by the same writes. A scan replayed late with an earlier `recordedAt` does not move it back.\n"
    },
+   "firstEntryAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-derived": "onWrite",
+    "description": "`recordedAt` of the first admission, written by the same writes as `lastEntryAt`; it starts a time-bound entitlement's window (DEC-232; CHG-CSP-030). A replayed earlier scan moves it back."
+   },
+   "timeBoundUntil": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-derived": "onWrite",
+    "description": "**Where the template is time-bound, when its window closes**: `firstEntryAt` plus the validity rule's `minutesAfterFirstScan` (decided 2 October 2026, Chinmay, BO-159; DEC-232; CHG-CSP-030). Null until the first scan and on an entitlement with no time bound. A scan after it is denied (`timeBoundWindowElapsed`); it never extends `validTo`, and the earlier of the two wins."
+   },
+   "lifecycleLabel": {
+    "type": "string",
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "x-ticvai-derived": "onRead",
+    "enum": [
+     "created",
+     "pendingFulfillment",
+     "active",
+     "partiallyUsed",
+     "used",
+     "expired",
+     "suspended",
+     "cancelled",
+     "voided",
+     "reissuedSuperseded",
+     "refunded",
+     "transferred",
+     "blocked"
+    ],
+    "description": "**The Virtual Ticket status in the client's 13 names, mapped onto the entitlement model** (decided 2 October 2026, Chinmay, critical set 2, BO-336: \"Map the pack's 13 names onto the model; add any missing states\", and BO-336/DI-670: \"Reserved maps to Pending fulfilment\"; DEC-266; CHG-CSP-033). Computed on read from `status` (orders `EntitlementStatus`), `suspendedReason`, `cancellationKind`, `issuedVia` and an active identity lock; the mapping is in `states/entitlement-status.yaml`. It is what BO-334, BO-336 and the ticket status transition matrix (`AccessTicketStatusTransition`) show; logic still reads `status`."
+   },
+   "cancellationKind": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-derived": "onWrite",
+    "enum": [
+     "voided",
+     "refunded",
+     "performanceCancelled",
+     "superseded"
+    ],
+    "description": "**Which act cancelled the entitlement**, so the pack's Voided, Refunded and Reissued / superseded are told apart while `status` keeps the one r1 value `cancelled` (DEC-266; CHG-CSP-033). Written with the cancelling transition: `voidEntitlement`, `createRefund`, `cancelPerformance`, or a reissue that supersedes it (`supersedesEntitlementId` on the new one). Null unless `cancelled`."
+   },
    "frozenDays": {
     "type": "integer",
     "default": 0,
@@ -629,6 +700,326 @@
    "notes": {
     "type": "string",
     "maxLength": 500,
+    "nullable": true
+   }
+  }
+ },
+ "Member360MembershipAccountWorkspaceInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "description": "**What Member 360° Membership Account Workspace submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "membershipId": {
+    "type": "string",
+    "description": "Membership ID the action applies to"
+   },
+   "action": {
+    "type": "string",
+    "enum": [
+     "activate",
+     "freeze",
+     "suspend",
+     "resume",
+     "renew",
+     "replaceCredential",
+     "addNote",
+     "reviewEligibility",
+     "manageDependents"
+    ],
+    "description": "Operational Action (pack pp.23-24)"
+   },
+   "reason": {
+    "type": "string",
+    "description": "Reason; required for freeze, suspend and resume",
+    "nullable": true
+   },
+   "note": {
+    "type": "string",
+    "description": "Case note text, for addNote",
+    "nullable": true
+   },
+   "effectiveDate": {
+    "type": "string",
+    "format": "date",
+    "description": "Effective date, e.g. freeze start",
+    "nullable": true
+   },
+   "endDate": {
+    "type": "string",
+    "format": "date",
+    "description": "Freeze end date",
+    "nullable": true
+   }
+  }
+ },
+ "Member360MembershipAccountWorkspaceView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
+  "description": "**What Member 360° Membership Account Workspace displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "memberName": {
+    "type": "string",
+    "description": "Member Name"
+   },
+   "customerId": {
+    "type": "string",
+    "description": "Customer ID"
+   },
+   "membershipId": {
+    "type": "string",
+    "description": "Membership ID"
+   },
+   "membershipProduct": {
+    "type": "string",
+    "description": "Membership Product"
+   },
+   "tier": {
+    "type": "string",
+    "description": "Tier"
+   },
+   "status": {
+    "type": "string",
+    "description": "Status: one of the membership lifecycle values active, frozen, suspended, expired or cancelled (shape follows catalogue GuestMembership.status; states/guest-membership-status.yaml): frozen is the member's pause and extends validity, suspended is a sanction and does not"
+   },
+   "activationDate": {
+    "type": "string",
+    "format": "date",
+    "description": "Activation Date",
+    "nullable": true
+   },
+   "expiryDate": {
+    "type": "string",
+    "format": "date",
+    "description": "Expiry Date",
+    "nullable": true
+   },
+   "renewalStatus": {
+    "type": "string",
+    "description": "Renewal Status: renewalNotOpen, renewalEligible, renewalInvitationSent, renewalStarted, paymentPending, renewed, autoRenewScheduled, autoRenewFailed, gracePeriod or expiredWithoutRenewal (pack p.30 Renewal Pipeline)"
+   },
+   "primaryVenue": {
+    "type": "string",
+    "description": "Primary Venue"
+   },
+   "credentialStatus": {
+    "type": "string",
+    "description": "Credential Status: notIssued, active, disabled or replaced"
+   },
+   "primaryMember": {
+    "type": "string",
+    "description": "Primary Member"
+   },
+   "secondaryAdult": {
+    "type": "string",
+    "description": "Secondary Adult name",
+    "nullable": true
+   },
+   "dependents": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "customerId": {
+       "type": "string"
+      },
+      "name": {
+       "type": "string"
+      },
+      "role": {
+       "type": "string",
+       "enum": [
+        "primaryMember",
+        "secondaryAdult",
+        "dependent",
+        "child",
+        "guardian",
+        "authorizedManager"
+       ]
+      }
+     }
+    },
+    "description": "Dependents on the membership"
+   },
+   "sharedBenefits": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "entitlementType": {
+       "type": "string",
+       "enum": [
+        "unlimitedAdmission",
+        "limitedAdmissions",
+        "attractionAccess",
+        "eventAccess",
+        "zoneAccess",
+        "fastTrack",
+        "priorityEntry",
+        "guestTickets",
+        "parking",
+        "fnbBenefit",
+        "retailBenefit",
+        "rentalBenefit",
+        "specialEventAccess",
+        "bookingPrivileges",
+        "other"
+       ]
+      },
+      "allocation": {
+       "type": "integer",
+       "nullable": true,
+       "description": "Empty for unlimited"
+      },
+      "used": {
+       "type": "integer"
+      },
+      "remaining": {
+       "type": "integer",
+       "nullable": true,
+       "description": "Empty for unlimited"
+      },
+      "value": {
+       "type": "string",
+       "nullable": true,
+       "description": "Display value of a discount benefit, from its pricing rule"
+      }
+     }
+    },
+    "description": "Shared Benefits with allocation, used and remaining"
+   },
+   "individualBenefits": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "entitlementType": {
+       "type": "string",
+       "enum": [
+        "unlimitedAdmission",
+        "limitedAdmissions",
+        "attractionAccess",
+        "eventAccess",
+        "zoneAccess",
+        "fastTrack",
+        "priorityEntry",
+        "guestTickets",
+        "parking",
+        "fnbBenefit",
+        "retailBenefit",
+        "rentalBenefit",
+        "specialEventAccess",
+        "bookingPrivileges",
+        "other"
+       ]
+      },
+      "allocation": {
+       "type": "integer",
+       "nullable": true,
+       "description": "Empty for unlimited"
+      },
+      "used": {
+       "type": "integer"
+      },
+      "remaining": {
+       "type": "integer",
+       "nullable": true,
+       "description": "Empty for unlimited"
+      },
+      "value": {
+       "type": "string",
+       "nullable": true,
+       "description": "Display value of a discount benefit, from its pricing rule"
+      }
+     }
+    },
+    "description": "Individual Benefits with allocation, used and remaining"
+   },
+   "membershipVersion": {
+    "type": "integer",
+    "description": "Membership Version the contract is on"
+   },
+   "purchaseDate": {
+    "type": "string",
+    "format": "date",
+    "description": "Purchase Date"
+   },
+   "purchaseChannel": {
+    "$ref": "../shared/common.yaml#/components/schemas/SalesChannel",
+    "description": "Purchase Channel"
+   },
+   "originalOrder": {
+    "type": "string",
+    "description": "Original Order id"
+   },
+   "validity": {
+    "type": "string",
+    "enum": [
+     "fixedCalendar",
+     "durationFromPurchase",
+     "durationFromActivation",
+     "seasonBased",
+     "customPeriod"
+    ],
+    "description": "Validity method"
+   },
+   "activationMethod": {
+    "type": "string",
+    "enum": [
+     "immediateOnPurchase",
+     "fixedStartDate",
+     "firstVisit",
+     "manualActivation",
+     "customerActivation",
+     "membershipCardCollection",
+     "identityVerification",
+     "configuredTrigger"
+    ],
+    "description": "Activation Method"
+   },
+   "renewalPolicy": {
+    "type": "string",
+    "description": "Renewal Policy: the product's renewal modes, e.g. customerSelfService and autoRenewal"
+   },
+   "autoRenewStatus": {
+    "type": "string",
+    "description": "Auto-Renew Status: off, optedIn, scheduled or failed; only the member's explicit opt-in sets optedIn"
+   },
+   "frozenDays": {
+    "type": "integer",
+    "description": "Days lost to a freeze and added back to the expiry (follows catalogue GuestMembership.frozenDays)"
+   },
+   "relatedTransactions": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "kind": {
+       "type": "string",
+       "enum": [
+        "order",
+        "payment",
+        "renewal",
+        "upgrade",
+        "refund",
+        "membershipChange"
+       ]
+      },
+      "id": {
+       "type": "string"
+      },
+      "occurredAt": {
+       "type": "string",
+       "format": "date-time"
+      }
+     }
+    },
+    "description": "Related Transactions (pack p.23)"
+   },
+   "aiSummary": {
+    "type": "string",
+    "description": "AI Member Summary, advisory",
     "nullable": true
    }
   }
@@ -766,6 +1157,396 @@
    }
   }
  },
+ "MemberExceptionsOverridesServiceRecoveryView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
+  "description": "**What Member Exceptions, Overrides & Service Recovery displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "member": {
+    "type": "string",
+    "description": "Member"
+   },
+   "membership": {
+    "type": "string",
+    "description": "Membership"
+   },
+   "requestedAction": {
+    "type": "string",
+    "description": "Requested Action"
+   },
+   "standardPolicyResult": {
+    "type": "string",
+    "description": "Standard Policy Result"
+   },
+   "requestedException": {
+    "type": "string",
+    "description": "Requested Exception"
+   },
+   "reason": {
+    "type": "string",
+    "description": "Reason"
+   },
+   "supportingDocumentation": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Supporting Documentation: document ids"
+   },
+   "financialImpact": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true,
+    "description": "Financial Impact of the exception"
+   },
+   "entitlementImpact": {
+    "type": "string",
+    "description": "Entitlement Impact"
+   },
+   "requestor": {
+    "type": "string",
+    "description": "Requestor"
+   },
+   "exceptionType": {
+    "type": "string",
+    "enum": [
+     "eligibilityOverride",
+     "activationExtension",
+     "expiryExtension",
+     "complimentaryRenewal",
+     "complimentaryBenefit",
+     "entitlementAdjustment",
+     "freezeException",
+     "suspensionOverride",
+     "replacementCredential",
+     "renewalException",
+     "dependentException"
+    ],
+    "description": "Exception Type (pack p.32)"
+   },
+   "exceptionValue": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true,
+    "description": "Value used for approval routing"
+   },
+   "durationDays": {
+    "type": "integer",
+    "description": "Duration in days, for extensions",
+    "nullable": true
+   },
+   "membershipTier": {
+    "type": "string",
+    "description": "Membership Tier"
+   },
+   "exceptionId": {
+    "type": "string",
+    "description": "Exception ID"
+   },
+   "approvalStatus": {
+    "type": "string",
+    "description": "Approval status: pending, approved, rejected or applied"
+   },
+   "approver": {
+    "type": "string",
+    "description": "Approver; must differ from the requestor for high-value exceptions",
+    "nullable": true
+   },
+   "remedy": {
+    "type": "string",
+    "enum": [
+     "extendMembership",
+     "guestTicket",
+     "complimentaryVisit",
+     "feeWaiver",
+     "benefitCredit",
+     "renewalDiscount",
+     "alternativeEntitlement"
+    ],
+    "description": "Service Recovery remedy (pack p.33)",
+    "nullable": true
+   },
+   "aiSuggestion": {
+    "type": "string",
+    "description": "AI suggestion, advisory",
+    "nullable": true
+   }
+  }
+ },
+ "MemberLifecycleHistoryAuditCaseTimelineView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
+  "description": "**What Member Lifecycle History, Audit & Case Timeline displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "eventId": {
+    "type": "string",
+    "description": "Event id"
+   },
+   "membershipId": {
+    "type": "string",
+    "description": "Membership ID"
+   },
+   "occurredAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "When it happened"
+   },
+   "eventType": {
+    "type": "string",
+    "enum": [
+     "purchase",
+     "assignment",
+     "activation",
+     "visit",
+     "benefitUsage",
+     "dependentChange",
+     "credentialChange",
+     "freeze",
+     "suspension",
+     "reactivation",
+     "upgrade",
+     "downgrade",
+     "renewal",
+     "exception",
+     "expiry",
+     "cancellation",
+     "caseNote"
+    ],
+    "description": "Event (pack pp.33-34)"
+   },
+   "field": {
+    "type": "string",
+    "description": "Changed field for configuration-sensitive changes, e.g. expiry",
+    "nullable": true
+   },
+   "previousValue": {
+    "type": "string",
+    "description": "Previous Value",
+    "nullable": true
+   },
+   "newValue": {
+    "type": "string",
+    "description": "New Value",
+    "nullable": true
+   },
+   "reason": {
+    "type": "string",
+    "description": "Reason",
+    "nullable": true
+   },
+   "actorType": {
+    "type": "string",
+    "enum": [
+     "customer",
+     "agent",
+     "manager",
+     "system",
+     "api",
+     "integration"
+    ],
+    "description": "Actor (pack p.34)"
+   },
+   "actorName": {
+    "type": "string",
+    "description": "Actor name or id",
+    "nullable": true
+   },
+   "relatedTransactions": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "kind": {
+       "type": "string",
+       "enum": [
+        "order",
+        "payment",
+        "ticket",
+        "reservation",
+        "accessEvent",
+        "approval",
+        "case",
+        "credential"
+       ]
+      },
+      "id": {
+       "type": "string"
+      }
+     }
+    },
+    "description": "Related Transactions (pack p.34)"
+   },
+   "note": {
+    "type": "string",
+    "description": "Case note text, for caseNote events",
+    "nullable": true
+   }
+  }
+ },
+ "MemberOperationsCommandCenterSummary": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection; the headline tiles over the list, computed at read time for the filters in force",
+  "description": "**The headline figures on Member Operations Command Center.** The pack's KPI cards, split out of the row (decided 29 September, readiness close-out): a count describes the list, not each item in it.",
+  "properties": {
+   "activeMembers": {
+    "type": "integer",
+    "description": "Active Members"
+   },
+   "newMembersToday": {
+    "type": "integer",
+    "description": "New Members Today"
+   },
+   "activatedToday": {
+    "type": "integer",
+    "description": "Activated Today"
+   },
+   "pendingActivation": {
+    "type": "integer",
+    "description": "Pending Activation"
+   },
+   "expiringIn30Days": {
+    "type": "integer",
+    "description": "Expiring in 30 Days"
+   },
+   "renewalDue": {
+    "type": "integer",
+    "description": "Renewal Due: memberships inside their renewal window and not yet renewed"
+   },
+   "renewedThisMonth": {
+    "type": "integer",
+    "description": "Renewed This Month"
+   },
+   "renewalRate": {
+    "type": "number",
+    "description": "Renewal Rate: percentage of memberships that expired in the last 12 months and were renewed (decided 29 September, readiness close-out)"
+   },
+   "suspendedMemberships": {
+    "type": "integer",
+    "description": "Suspended Memberships"
+   },
+   "frozenMemberships": {
+    "type": "integer",
+    "description": "Frozen Memberships"
+   },
+   "membershipExceptions": {
+    "type": "integer",
+    "description": "Membership Exceptions"
+   },
+   "atRiskMembers": {
+    "type": "integer",
+    "description": "At-Risk Members: includes annual-pass holders with no visit in the last 90 days, flagged for churn follow-up (MoM 8 Sep)"
+   },
+   "operationalAlerts": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Operational Alerts (pack p.21), e.g. memberships expiring within seven days, purchases unactivated over 30 days, dependents needing eligibility review"
+   },
+   "aiInsights": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "AI Assistance: advisory observations only; never applied automatically (pack AI sections)"
+   }
+  }
+ },
+ "MemberOperationsCommandCenterView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
+  "description": "**What Member Operations Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "membershipId": {
+    "type": "string",
+    "description": "Membership ID"
+   },
+   "member": {
+    "type": "string",
+    "description": "Member name"
+   },
+   "membershipProduct": {
+    "type": "string",
+    "description": "Membership Product"
+   },
+   "tier": {
+    "type": "string",
+    "description": "Tier"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "activationDate": {
+    "type": "string",
+    "format": "date",
+    "description": "Activation Date",
+    "nullable": true
+   },
+   "expiryDate": {
+    "type": "string",
+    "format": "date",
+    "description": "Expiry Date",
+    "nullable": true
+   },
+   "membershipStatus": {
+    "type": "string",
+    "description": "Membership Status: one of the membership lifecycle values active, frozen, suspended, expired or cancelled (shape follows catalogue GuestMembership.status; states/guest-membership-status.yaml): frozen is the member's pause and extends validity, suspended is a sanction and does not; empty until activated (see activationStage)",
+    "nullable": true
+   },
+   "usageLevel": {
+    "type": "string",
+    "enum": [
+     "none",
+     "low",
+     "regular",
+     "high"
+    ],
+    "description": "Usage Level over the last 90 days: none = no visit, low = 1-2 visits, regular = 3-9, high = 10 or more (decided 29 September, readiness close-out)"
+   },
+   "renewalStatus": {
+    "type": "string",
+    "description": "Renewal Status: renewalNotOpen, renewalEligible, renewalInvitationSent, renewalStarted, paymentPending, renewed, autoRenewScheduled, autoRenewFailed, gracePeriod or expiredWithoutRenewal (pack p.30 Renewal Pipeline)"
+   },
+   "outstandingIssue": {
+    "type": "string",
+    "description": "Outstanding Issue, e.g. dependent eligibility review or failed payment",
+    "nullable": true
+   },
+   "owner": {
+    "type": "string",
+    "description": "Owner"
+   },
+   "customerId": {
+    "type": "string",
+    "description": "Customer ID of the member (CRM profile)"
+   },
+   "activationStage": {
+    "type": "string",
+    "enum": [
+     "purchased",
+     "pendingAssignment",
+     "pendingActivation",
+     "activated"
+    ],
+    "description": "Activation stage before the lifecycle starts (pack p.21: Purchased, Pending Assignment, Pending Activation)"
+   },
+   "atRisk": {
+    "type": "boolean",
+    "description": "Flagged at risk, e.g. no visit in the last 90 days (MoM 8 Sep)"
+   }
+  }
+ },
  "MembershipActivationActionInput": {
   "type": "object",
   "x-ticvai-persistence": "none — request only",
@@ -810,6 +1591,159 @@
     "maxLength": 500,
     "nullable": true,
     "description": "Required for `block` and `escalate`."
+   }
+  }
+ },
+ "MembershipActivationAssignmentCredentialManagementView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
+  "description": "**What Membership Activation, Assignment & Credential Management displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "purchaseDate": {
+    "type": "string",
+    "format": "date",
+    "description": "Purchase Date"
+   },
+   "eligibleActivationDate": {
+    "type": "string",
+    "format": "date",
+    "description": "Eligible Activation Date"
+   },
+   "activationDeadline": {
+    "type": "string",
+    "format": "date",
+    "description": "Activation Deadline; an unactivated membership expires here",
+    "nullable": true
+   },
+   "selectedStartDate": {
+    "type": "string",
+    "format": "date",
+    "description": "Selected Start Date",
+    "nullable": true
+   },
+   "calculatedExpiry": {
+    "type": "string",
+    "format": "date",
+    "description": "Calculated Expiry",
+    "nullable": true
+   },
+   "activationMethod": {
+    "type": "string",
+    "enum": [
+     "immediateOnPurchase",
+     "fixedStartDate",
+     "firstVisit",
+     "manualActivation",
+     "customerActivation",
+     "membershipCardCollection",
+     "identityVerification",
+     "configuredTrigger"
+    ],
+    "description": "Activation Method"
+   },
+   "failureReason": {
+    "type": "string",
+    "enum": [
+     "eligibilityFailed",
+     "missingDocumentation",
+     "duplicateMembership",
+     "credentialFailure",
+     "configurationIssue"
+    ],
+    "description": "Vocabulary listed under Record reason."
+   },
+   "membershipId": {
+    "type": "string",
+    "description": "Membership ID"
+   },
+   "membershipProduct": {
+    "type": "string",
+    "description": "Membership product name"
+   },
+   "purchaserCustomerId": {
+    "type": "string",
+    "description": "Customer who bought it"
+   },
+   "memberCustomerId": {
+    "type": "string",
+    "description": "Customer it is assigned to; empty until assigned",
+    "nullable": true
+   },
+   "queueStage": {
+    "type": "string",
+    "enum": [
+     "awaitingMemberAssignment",
+     "awaitingIdentityVerification",
+     "awaitingDocumentVerification",
+     "awaitingActivation",
+     "activationFailed"
+    ],
+    "description": "Activation Queue stage (pack p.24)"
+   },
+   "requiredChecks": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "check": {
+       "type": "string",
+       "enum": [
+        "eligibility",
+        "age",
+        "residency",
+        "identity",
+        "photograph",
+        "requiredDocuments",
+        "dependentRelationship",
+        "termsAcceptance"
+       ]
+      },
+      "result": {
+       "type": "string",
+       "enum": [
+        "pending",
+        "passed",
+        "failed",
+        "notRequired"
+       ]
+      }
+     }
+    },
+    "description": "Required Checks per Board 1 configuration (pack p.24)"
+   },
+   "credentialTypes": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "dynamicQr",
+      "barcode",
+      "rfid",
+      "nfc",
+      "digitalMembershipCard",
+      "walletPass",
+      "physicalCard"
+     ]
+    },
+    "description": "Credential Assignment (pack p.25)"
+   },
+   "duplicateOf": {
+    "type": "string",
+    "description": "Duplicate Membership Detection: the membership ID the customer already holds",
+    "nullable": true
+   },
+   "duplicateAction": {
+    "type": "string",
+    "enum": [
+     "block",
+     "review",
+     "replace",
+     "link",
+     "escalate"
+    ],
+    "description": "Configured action on a duplicate",
+    "nullable": true
    }
   }
  },
@@ -880,6 +1814,315 @@
     "type": "string",
     "format": "date-time",
     "readOnly": true
+   }
+  }
+ },
+ "MembershipAnalyticsRenewalIntelligenceAiRetentionCenSummary": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection; the headline tiles over the list, computed at read time for the filters in force",
+  "description": "**The headline figures on Membership Analytics, Renewal Intelligence & AI Retention Center.** The pack's KPI cards, split out of the row (decided 29 September, readiness close-out): a count describes the list, not each item in it.",
+  "properties": {
+   "activeMembers": {
+    "type": "integer",
+    "description": "Active Members"
+   },
+   "newMemberships": {
+    "type": "integer",
+    "description": "New Memberships"
+   },
+   "renewalRate": {
+    "type": "number",
+    "description": "Renewal Rate"
+   },
+   "churnRate": {
+    "type": "number",
+    "description": "Churn Rate"
+   },
+   "autoRenewSuccess": {
+    "type": "number",
+    "description": "Auto-Renew Success: percentage of auto-renew attempts that succeeded"
+   },
+   "averageMembershipTenure": {
+    "type": "number",
+    "description": "Average Membership Tenure in months"
+   },
+   "averageVisitsPerMember": {
+    "type": "number",
+    "description": "Average Visits per Member"
+   },
+   "revenuePerMember": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Revenue per Member"
+   },
+   "membershipUtilization": {
+    "type": "number",
+    "description": "Membership Utilization"
+   },
+   "benefitUtilization": {
+    "type": "number",
+    "description": "Benefit Utilization"
+   },
+   "freezeSuspensionRate": {
+    "type": "number",
+    "description": "Freeze/Suspension Rate"
+   },
+   "expectedRenewals": {
+    "type": "integer",
+    "description": "Expected Renewals in the forecast period"
+   },
+   "expectedChurn": {
+    "type": "integer",
+    "description": "Expected Churn in the forecast period"
+   },
+   "renewalRevenue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Renewal Revenue"
+   },
+   "membershipBaseGrowth": {
+    "type": "number",
+    "description": "Membership Base Growth, percent"
+   },
+   "upgradeRate": {
+    "type": "number",
+    "description": "Upgrade Rate, percent (pack p.35)"
+   },
+   "upgradeRevenue": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "Upgrade Revenue forecast (pack p.37)"
+   },
+   "renewalFunnel": {
+    "type": "object",
+    "description": "Renewal Funnel (pack p.36)",
+    "properties": {
+     "eligibleForRenewal": {
+      "type": "integer"
+     },
+     "contacted": {
+      "type": "integer"
+     },
+     "renewalStarted": {
+      "type": "integer"
+     },
+     "paymentAttempted": {
+      "type": "integer"
+     },
+     "renewed": {
+      "type": "integer"
+     },
+     "failed": {
+      "type": "integer"
+     },
+     "expired": {
+      "type": "integer"
+     }
+    }
+   }
+  }
+ },
+ "MembershipAnalyticsRenewalIntelligenceAiRetentionCenView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
+  "description": "**What Membership Analytics, Renewal Intelligence & AI Retention Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "visits": {
+    "type": "integer",
+    "description": "Visits in the current term"
+   },
+   "benefitUsage": {
+    "type": "number",
+    "description": "Benefit usage, percent of allocation used"
+   },
+   "guestTicketUsage": {
+    "type": "integer",
+    "description": "Guest tickets used this term"
+   },
+   "complaintsExceptions": {
+    "type": "integer",
+    "description": "Complaints/Exceptions this term"
+   },
+   "confidence": {
+    "type": "number",
+    "description": "Confidence of the prediction, 0-1"
+   },
+   "keyDrivers": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Key Drivers, e.g. visits down 58%, no visits in 90 days"
+   },
+   "modelVersion": {
+    "type": "string",
+    "description": "Model Version"
+   },
+   "dataFreshness": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Data Freshness: when the inputs were last refreshed"
+   },
+   "membershipId": {
+    "type": "string",
+    "description": "Membership ID"
+   },
+   "memberName": {
+    "type": "string",
+    "description": "Member name"
+   },
+   "membershipProduct": {
+    "type": "string",
+    "description": "Membership product"
+   },
+   "tier": {
+    "type": "string",
+    "description": "Tier",
+    "nullable": true
+   },
+   "expiryDate": {
+    "type": "string",
+    "format": "date",
+    "description": "Expiry date"
+   },
+   "lastVisitDate": {
+    "type": "string",
+    "format": "date",
+    "description": "Last visit",
+    "nullable": true
+   },
+   "renewalProbability": {
+    "type": "number",
+    "description": "Member Renewal Probability, 0-1 (advisory)"
+   },
+   "churnFlag": {
+    "type": "boolean",
+    "description": "No visit in the last 90 days: flagged for churn follow-up (MoM 8 Sep)"
+   },
+   "recommendedActions": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "renewalReminder",
+      "benefitReminder",
+      "membershipEducation",
+      "upgradeOffer",
+      "retentionOffer",
+      "serviceFollowUp"
+     ]
+    },
+    "description": "Recommended Actions (pack p.36), advisory"
+   }
+  }
+ },
+ "MembershipFreezeSuspensionReactivationManagementView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
+  "description": "**What Membership Freeze, Suspension & Reactivation Management displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "startDate": {
+    "type": "string",
+    "format": "date",
+    "description": "Start Date"
+   },
+   "endDate": {
+    "type": "string",
+    "format": "date",
+    "description": "End Date; empty for open-ended suspension",
+    "nullable": true
+   },
+   "durationDays": {
+    "type": "integer",
+    "description": "Duration in days",
+    "nullable": true
+   },
+   "reason": {
+    "type": "string",
+    "description": "Reason in the requester's words"
+   },
+   "requestedBy": {
+    "type": "string",
+    "description": "Requested By (member, agent or system)"
+   },
+   "approvedBy": {
+    "type": "string",
+    "description": "Approved By",
+    "nullable": true
+   },
+   "membershipId": {
+    "type": "string",
+    "description": "Membership ID"
+   },
+   "memberName": {
+    "type": "string",
+    "description": "Member name"
+   },
+   "interruptionType": {
+    "type": "string",
+    "enum": [
+     "freeze",
+     "suspension",
+     "administrativeHold"
+    ],
+    "description": "Freeze (member's permitted pause), Suspension (administrative restriction) or Administrative Hold (pack p.27)"
+   },
+   "suspensionReason": {
+    "type": "string",
+    "enum": [
+     "paymentIssue",
+     "membershipMisuse",
+     "credentialMisuse",
+     "eligibilityIssue",
+     "chargeback",
+     "administrativeReview",
+     "other"
+    ],
+    "description": "Suspension Reason (pack p.28)",
+    "nullable": true
+   },
+   "validityTreatment": {
+    "type": "string",
+    "enum": [
+     "extendExpiry",
+     "doNotExtend"
+    ],
+    "description": "Validity Treatment (pack p.28). Default extendExpiry for a freeze and doNotExtend for a suspension, as the membership state model sets"
+   },
+   "newExpiryDate": {
+    "type": "string",
+    "format": "date",
+    "description": "Expiry after the extension, when validityTreatment is extendExpiry",
+    "nullable": true
+   },
+   "entitlementTreatment": {
+    "type": "object",
+    "description": "Entitlement Treatment during the interruption (pack p.28). Defaults: admission, reservations, benefits and credential blocked; renewal allowed during a freeze and blocked during a suspension (decided 29 September, readiness close-out)",
+    "properties": {
+     "admissionBlocked": {
+      "type": "boolean"
+     },
+     "reservationsRestricted": {
+      "type": "boolean"
+     },
+     "benefitsRestricted": {
+      "type": "boolean"
+     },
+     "renewalAllowed": {
+      "type": "boolean"
+     },
+     "credentialDisabled": {
+      "type": "boolean"
+     }
+    }
+   },
+   "interruptionStatus": {
+    "type": "string",
+    "description": "Interruption status: scheduled, active, ended or cancelled"
    }
   }
  },
@@ -1016,6 +2259,158 @@
    }
   }
  },
+ "MembershipUpgradeDowngradeProductMigrationOperationsView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
+  "description": "**What Membership Upgrade, Downgrade & Product Migration Operations displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "currentMembership": {
+    "type": "string",
+    "description": "Current Membership product and tier"
+   },
+   "targetMembership": {
+    "type": "string",
+    "description": "Target Membership product and tier"
+   },
+   "customerQualification": {
+    "type": "string",
+    "enum": [
+     "eligible",
+     "notEligible",
+     "reviewRequired"
+    ],
+    "description": "Customer Qualification for the target"
+   },
+   "usage": {
+    "type": "integer",
+    "description": "Usage: visits in the current term"
+   },
+   "remainingValidity": {
+    "type": "integer",
+    "description": "Remaining Validity in days"
+   },
+   "entitlementComparison": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "entitlementType": {
+       "type": "string",
+       "enum": [
+        "unlimitedAdmission",
+        "limitedAdmissions",
+        "attractionAccess",
+        "eventAccess",
+        "zoneAccess",
+        "fastTrack",
+        "priorityEntry",
+        "guestTickets",
+        "parking",
+        "fnbBenefit",
+        "retailBenefit",
+        "rentalBenefit",
+        "specialEventAccess",
+        "bookingPrivileges",
+        "other"
+       ]
+      },
+      "current": {
+       "type": "string"
+      },
+      "target": {
+       "type": "string"
+      }
+     }
+    },
+    "description": "Entitlement Comparison (pack pp.29-30)"
+   },
+   "outstandingBalance": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true,
+    "description": "Outstanding Balance on the member's account"
+   },
+   "effectiveDate": {
+    "type": "string",
+    "format": "date",
+    "description": "Effective date, for effectiveTiming fixedDate or once resolved",
+    "nullable": true
+   },
+   "membershipId": {
+    "type": "string",
+    "description": "Membership ID"
+   },
+   "memberName": {
+    "type": "string",
+    "description": "Member name"
+   },
+   "movementType": {
+    "type": "string",
+    "enum": [
+     "upgrade",
+     "downgrade",
+     "migration"
+    ],
+    "description": "Upgrade, downgrade or product migration"
+   },
+   "effectiveTiming": {
+    "type": "string",
+    "enum": [
+     "immediately",
+     "nextVisit",
+     "nextRenewal",
+     "fixedDate",
+     "endOfCurrentTerm"
+    ],
+    "description": "Effective Date option (pack p.29)"
+   },
+   "proRataCredit": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true,
+    "description": "Pro-rata credit for the unused part of the current term, calculated by pricing (MoM 1 Sep §4.9)"
+   },
+   "priceDifference": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true,
+    "description": "Balance to charge after the credit, calculated by pricing (Area 10)"
+   },
+   "consumedBenefitTreatment": {
+    "type": "string",
+    "enum": [
+     "reset",
+     "carryForward",
+     "adjust"
+    ],
+    "description": "Consumed Benefits (pack p.30): per the target product's rules"
+   },
+   "orderId": {
+    "type": "string",
+    "description": "Resulting order (Area 12)",
+    "nullable": true
+   },
+   "bulkMigrationId": {
+    "type": "string",
+    "description": "Bulk Migration batch, when part of one (pack p.30)",
+    "nullable": true
+   },
+   "requestStatus": {
+    "type": "string",
+    "description": "Request status: quoted, pendingPayment, scheduled, completed or cancelled"
+   }
+  }
+ },
  "OrdersMembershipRenewal": {
   "type": "object",
   "x-ticvai-persistence": "orders.membership_renewal",
@@ -1087,6 +2482,371 @@
     "maxLength": 500,
     "nullable": true,
     "readOnly": true
+   }
+  }
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ },
+ "RenewalOperationsAutoRenewalManagementSummary": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection; the headline tiles over the list, computed at read time for the filters in force",
+  "description": "**The headline figures on Renewal Operations & Auto-Renewal Management.** The pack's KPI cards, split out of the row (decided 29 September, readiness close-out): a count describes the list, not each item in it.",
+  "properties": {
+   "renewalNotOpen": {
+    "type": "integer",
+    "description": "Renewal Not Open"
+   },
+   "renewalEligible": {
+    "type": "integer",
+    "description": "Renewal Eligible"
+   },
+   "renewalInvitationSent": {
+    "type": "integer",
+    "description": "Renewal Invitation Sent"
+   },
+   "renewalStarted": {
+    "type": "integer",
+    "description": "Renewal Started"
+   },
+   "paymentPending": {
+    "type": "integer",
+    "description": "Payment Pending"
+   },
+   "renewed": {
+    "type": "integer",
+    "description": "Renewed"
+   },
+   "autoRenewScheduled": {
+    "type": "integer",
+    "description": "Auto-Renew Scheduled"
+   },
+   "autoRenewFailed": {
+    "type": "integer",
+    "description": "Auto-Renew Failed"
+   },
+   "gracePeriod": {
+    "type": "integer",
+    "description": "Grace Period"
+   },
+   "expiredWithoutRenewal": {
+    "type": "integer",
+    "description": "Expired Without Renewal"
+   }
+  }
+ },
+ "RenewalOperationsAutoRenewalManagementView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
+  "description": "**What Renewal Operations & Auto-Renewal Management displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "member": {
+    "type": "string",
+    "description": "Member"
+   },
+   "membership": {
+    "type": "string",
+    "description": "Membership"
+   },
+   "tier": {
+    "type": "string",
+    "description": "Tier"
+   },
+   "expiry": {
+    "type": "string",
+    "format": "date",
+    "description": "Expiry"
+   },
+   "renewalWindow": {
+    "type": "object",
+    "description": "Renewal Window",
+    "properties": {
+     "opens": {
+      "type": "string",
+      "format": "date"
+     },
+     "closes": {
+      "type": "string",
+      "format": "date"
+     }
+    }
+   },
+   "renewalPrice": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true,
+    "description": "Renewal Price from pricing (Area 10)"
+   },
+   "autoRenew": {
+    "type": "boolean",
+    "description": "Auto-Renew: the member has explicitly opted in"
+   },
+   "paymentMethodStatus": {
+    "type": "string",
+    "description": "Payment Method Status: none, valid, expiringSoon, expired or failed"
+   },
+   "eligibility": {
+    "type": "string",
+    "enum": [
+     "eligible",
+     "notEligible",
+     "reviewRequired"
+    ],
+    "description": "Eligibility for renewal"
+   },
+   "renewalStatus": {
+    "type": "string",
+    "description": "Renewal Status: renewalNotOpen, renewalEligible, renewalInvitationSent, renewalStarted, paymentPending, renewed, autoRenewScheduled, autoRenewFailed, gracePeriod or expiredWithoutRenewal (pack p.30 Renewal Pipeline)"
+   },
+   "membershipStatus": {
+    "type": "string",
+    "description": "Current membership status: one of the membership lifecycle values active, frozen, suspended, expired or cancelled (shape follows catalogue GuestMembership.status; states/guest-membership-status.yaml): frozen is the member's pause and extends validity, suspended is a sanction and does not"
+   },
+   "outstandingIssues": {
+    "type": "string",
+    "description": "Outstanding Issues",
+    "nullable": true
+   },
+   "autoRenewConsentAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Consent: when the member accepted the auto-renewal terms; empty means no consent and auto-renew will not run",
+    "nullable": true
+   },
+   "membershipVersion": {
+    "type": "integer",
+    "description": "Membership Version the renewal will be on"
+   },
+   "membershipId": {
+    "type": "string",
+    "description": "Membership ID"
+   },
+   "preNotificationSentAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Pre-renewal reminder sent",
+    "nullable": true
+   },
+   "paymentAttempts": {
+    "type": "integer",
+    "description": "Auto-renew payment attempts so far"
+   },
+   "nextAttemptAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Next scheduled payment attempt",
+    "nullable": true
+   }
+  }
+ },
+ "VisitAdmissionEntitlementUsageMonitorSummary": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection; the headline tiles over the list, computed at read time for the filters in force",
+  "description": "**The headline figures on Visit, Admission & Entitlement Usage Monitor.** The pack's KPI cards, split out of the row (decided 29 September, readiness close-out): a count describes the list, not each item in it.",
+  "properties": {
+   "totalVisits": {
+    "type": "integer",
+    "description": "Total Visits"
+   },
+   "visitsThisMonth": {
+    "type": "integer",
+    "description": "Visits This Month"
+   },
+   "lastVisit": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Last Visit",
+    "nullable": true
+   },
+   "upcomingReservation": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Upcoming Reservation start",
+    "nullable": true
+   },
+   "guestTicketsUsed": {
+    "type": "integer",
+    "description": "Guest Tickets Used"
+   },
+   "guestTicketsRemaining": {
+    "type": "integer",
+    "description": "Guest Tickets Remaining",
+    "nullable": true
+   },
+   "parkingUses": {
+    "type": "integer",
+    "description": "Parking Uses"
+   },
+   "benefitUsage": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "entitlementType": {
+       "type": "string",
+       "enum": [
+        "unlimitedAdmission",
+        "limitedAdmissions",
+        "attractionAccess",
+        "eventAccess",
+        "zoneAccess",
+        "fastTrack",
+        "priorityEntry",
+        "guestTickets",
+        "parking",
+        "fnbBenefit",
+        "retailBenefit",
+        "rentalBenefit",
+        "specialEventAccess",
+        "bookingPrivileges",
+        "other"
+       ]
+      },
+      "allocation": {
+       "type": "integer",
+       "nullable": true,
+       "description": "Empty for unlimited"
+      },
+      "used": {
+       "type": "integer"
+      },
+      "remaining": {
+       "type": "integer",
+       "nullable": true,
+       "description": "Empty for unlimited"
+      },
+      "value": {
+       "type": "string",
+       "nullable": true,
+       "description": "Display value of a discount benefit, from its pricing rule"
+      }
+     }
+    },
+    "description": "Entitlement Consumption (pack p.26): allocation, used and remaining per benefit"
+   },
+   "noShows": {
+    "type": "integer",
+    "description": "No-Shows"
+   },
+   "usageExceptions": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "code": {
+       "type": "string",
+       "enum": [
+        "usageAboveLimit",
+        "invalidReEntry",
+        "benefitExhausted",
+        "blackoutAttempt",
+        "expiredMembershipUsage",
+        "suspendedMembershipAttempt"
+       ]
+      },
+      "count": {
+       "type": "integer"
+      }
+     }
+    },
+    "description": "Usage Exceptions (pack pp.26-27) counted over the filtered visits"
+   },
+   "aiInsights": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "AI Assistance: advisory observations only; never applied automatically (pack AI sections)"
+   }
+  }
+ },
+ "VisitAdmissionEntitlementUsageMonitorView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
+  "description": "**What Visit, Admission & Entitlement Usage Monitor displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "date": {
+    "type": "string",
+    "format": "date",
+    "description": "Date of the visit"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "attraction": {
+    "type": "string",
+    "description": "Attraction",
+    "nullable": true
+   },
+   "gate": {
+    "type": "string",
+    "description": "Gate",
+    "nullable": true
+   },
+   "entryTime": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Entry Time"
+   },
+   "exitTime": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Exit time where the venue records exits",
+    "nullable": true
+   },
+   "credential": {
+    "type": "string",
+    "description": "Credential presented (credential id)"
+   },
+   "reservation": {
+    "type": "string",
+    "description": "Reservation id, where the visit was booked",
+    "nullable": true
+   },
+   "validationResult": {
+    "type": "string",
+    "enum": [
+     "admitted",
+     "usageAboveLimit",
+     "invalidReEntry",
+     "benefitExhausted",
+     "blackoutAttempt",
+     "expiredMembershipUsage",
+     "suspendedMembershipAttempt"
+    ],
+    "description": "Validation Result from Access Control"
+   },
+   "membershipId": {
+    "type": "string",
+    "description": "Membership ID"
+   },
+   "visitId": {
+    "type": "string",
+    "description": "Visit (access event) id"
    }
   }
  }

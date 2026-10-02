@@ -240,6 +240,24 @@
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
        "impliedBy": "setIdentityResolutionRules"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Checkout match policy",
+       "bindsTo": "GuestMatchPolicy",
+       "operation": "getGuestMatchPolicy",
+       "provenance": "contract marketing-crm.yaml GET /guest-match-policy; wiring fix, 2 October 2026"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "components": [
+      {
+       "kind": "secondaryButton",
+       "label": "Save match policy",
+       "operation": "setGuestMatchPolicy",
+       "provenance": "contract marketing-crm.yaml PUT /guest-match-policy; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -270,6 +288,20 @@
      "getIdentityResolutionRules",
      "listDuplicateCandidates"
     ]
+   },
+   {
+    "operationId": "getGuestMatchPolicy",
+    "contract": "marketing-crm",
+    "purpose": "How returning guests are recognised at checkout",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-005)"
+   },
+   {
+    "operationId": "setGuestMatchPolicy",
+    "contract": "marketing-crm",
+    "purpose": "Match returning guests by email",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-005)"
    }
   ],
   "wireframe": {
@@ -278,6 +310,23 @@
    "workshopBoard": "wireframes/WS71 Marketing CRM Configuration Reference v1.0 Board 2.dc.html#bo-745"
   },
   "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 11. 0 of 0 labels bound to a contract property; 0 of 10 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetGuestMatchPolicy",
+    "component": "modal",
+    "trigger": "Save match policy",
+    "body": "**Collects what `setGuestMatchPolicy` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save match policy",
+     "operation": "setGuestMatchPolicy"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "contract marketing-crm.yaml PUT /guest-match-policy; wiring fix, 2 October 2026"
+   }
+  ],
+  "entryState": {},
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -349,6 +398,18 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 11"
+   },
+   {
+    "operation": "getGuestMatchPolicy",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-005): getGuestMatchPolicy and setGuestMatchPolicy configure checkout matching, a policy setting that belongs with identity resolution (BO-745), not the duplicate review screen (design-notes correction customer-marketing BO-746).",
+    "source": "contracts/satellite/marketing-crm.yaml#setGuestMatchPolicy | screens/P08-venue-back-office.yaml#BO-745"
+   },
+   {
+    "operation": "setGuestMatchPolicy",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-005): getGuestMatchPolicy and setGuestMatchPolicy configure checkout matching, a policy setting that belongs with identity resolution (BO-745), not the duplicate review screen (design-notes correction customer-marketing BO-746).",
+    "source": "contracts/satellite/marketing-crm.yaml#setGuestMatchPolicy | screens/P08-venue-back-office.yaml#BO-745"
    }
   ],
   "layout": {
@@ -383,23 +444,11 @@
   "states": {
    "loading": "The duplicate review merge list.",
    "error": "Could not load. Names which read failed and leaves the duplicate review merge untouched.",
-   "emptyFirstRun": "No duplicate review merge yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No duplicate review merge yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the duplicate review merge are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
-   {
-    "operationId": "getGuestMatchPolicy",
-    "contract": "marketing-crm",
-    "purpose": "How returning guests are recognised",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "setGuestMatchPolicy",
-    "contract": "marketing-crm",
-    "purpose": "Match returning guests by email, mobile or either",
-    "trigger": "onAction"
-   },
    {
     "operationId": "listDuplicateCandidates",
     "contract": "marketing-crm",
@@ -542,6 +591,26 @@
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
        "impliedBy": "setConsentPurposes"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Consent forms",
+       "bindsTo": "FormDefinition",
+       "operation": "listForms",
+       "notes": "**Consent-form builder in Venue Management (decided 2 October 2026 by Chinmay, DEC-549; CHG-CSA-026):** the existing form builder extended to `consentForm` forms (biometric, marketing, waiver and other consents), not a second builder. Face Pass and Face Tag (BO-186, BO-188), marketing and waivers pick their form here.",
+       "provenance": "contract marketing-crm.yaml GET /forms"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "New consent form",
+       "operation": "createForm",
+       "provenance": "contract marketing-crm.yaml POST /forms"
       }
      ]
     }
@@ -568,6 +637,20 @@
     "purpose": "Configure them",
     "trigger": "onAction",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "createForm",
+    "contract": "marketing-crm",
+    "purpose": "Build a consent form (kind consentForm) in the shared form builder (DEC-549, CHG-CSA-026)",
+    "trigger": "onAction",
+    "provenance": "design-note correction, 2 October 2026 (BO-747)"
+   },
+   {
+    "operationId": "listForms",
+    "contract": "marketing-crm",
+    "purpose": "The venue's consent forms",
+    "trigger": "onLoad",
+    "provenance": "design-note correction, 2 October 2026 (BO-747)"
    }
   ],
   "wireframe": {
@@ -576,6 +659,37 @@
    "workshopBoard": "wireframes/WS71 Marketing CRM Configuration Reference v1.0 Board 2.dc.html#bo-747"
   },
   "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 12. 0 of 0 labels bound to a contract property; 0 of 10 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formCreateForm",
+    "component": "modal",
+    "trigger": "New consent form",
+    "body": "**Collects what `createForm` sends before it is called.** Required: `name`, `kind`. Optional: `consentPurposes`, `fields`, `requiresSignature`, `signatureKind`, `scoreScale`, `appliesToProductIds`, `validForMonths`, `minimumAge`, `requiresGuardianForMinors`, `legalReviewedBy`, `legalReviewedAt`. `kind` is consentForm; `consentPurposes` names what the consent covers; `requiresGuardianForMinors` and `minimumAge` carry the minors rule (DEC-237). Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "New consent form",
+     "operation": "createForm"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "name",
+      "kind",
+      "consentPurposes",
+      "fields",
+      "requiresSignature",
+      "signatureKind",
+      "scoreScale",
+      "appliesToProductIds",
+      "validForMonths",
+      "minimumAge",
+      "requiresGuardianForMinors",
+      "legalReviewedBy",
+      "legalReviewedAt"
+     ]
+    },
+    "provenance": "contract marketing-crm.yaml POST /forms"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -647,6 +761,17 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 12"
+   },
+   {
+    "operation": "listVersioningEffectiveDate",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-005): listVersioningEffectiveDate lists waiver form versions, not consent statement versions; consent statement versions are policy versions (listPolicies) (design-notes correction customer-marketing BO-748).",
+    "source": "contracts/satellite/marketing-crm.yaml#listVersioningEffectiveDate | contracts/satellite/white-label.yaml#listPolicies"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-007): recordConsent needs the staff audience with the agent-recorded rule (see POS-027).",
+    "source": "contracts/satellite/marketing-crm.yaml#recordConsent"
    }
   ],
   "layout": {
@@ -655,12 +780,6 @@
     {
      "name": "contentBody",
      "components": [
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listVersioningEffectiveDate",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
-      },
       {
        "kind": "primaryButton",
        "derived": true,
@@ -673,6 +792,13 @@
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
        "impliedBy": "recordConsent"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Consent statement versions",
+       "bindsTo": "Policy",
+       "operation": "listPolicies",
+       "provenance": "contract white-label.yaml GET /tenant-config/policies; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -687,13 +813,6 @@
   },
   "apis": [
    {
-    "operationId": "listVersioningEffectiveDate",
-    "contract": "marketing-crm",
-    "purpose": "Consent versions",
-    "trigger": "onLoad",
-    "provenance": "board reading, 19 September 2026"
-   },
-   {
     "operationId": "recordConsent",
     "contract": "marketing-crm",
     "purpose": "Capture a decision",
@@ -703,6 +822,13 @@
      "getGuestConsents",
      "getAudienceOverlap"
     ]
+   },
+   {
+    "operationId": "listPolicies",
+    "contract": "white-label",
+    "purpose": "The consent statements and their versions",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-005)"
    }
   ],
   "wireframe": {
@@ -719,6 +845,7 @@
     }
    ]
   },
+  "notes": "**The forms a consent is captured against are built on BO-747 (decided 2 October 2026 by Chinmay, DEC-549; CHG-CSA-026)**; each capture records the form and its version.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -959,6 +1086,17 @@
        "impliedBy": "setDataDiscoveryAccess"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "components": [
+      {
+       "kind": "secondaryButton",
+       "label": "Update request",
+       "operation": "setPrivacyRequest",
+       "provenance": "contract marketing-crm.yaml PUT /data-subject-customer; wiring fix, 2 October 2026"
+      }
+     ]
     }
    ]
   },
@@ -983,6 +1121,13 @@
     "purpose": "Assemble and respond",
     "trigger": "onAction",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "setPrivacyRequest",
+    "contract": "marketing-crm",
+    "purpose": "Raise or progress a privacy request",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-005)"
    }
   ],
   "wireframe": {
@@ -991,6 +1136,23 @@
    "workshopBoard": "wireframes/WS71 Marketing CRM Configuration Reference v1.0 Board 2.dc.html#bo-750"
   },
   "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 13. 0 of 0 labels bound to a contract property; 0 of 10 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetPrivacyRequest",
+    "component": "modal",
+    "trigger": "Update request",
+    "body": "**Collects what `setPrivacyRequest` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Update request",
+     "operation": "setPrivacyRequest"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "contract marketing-crm.yaml PUT /data-subject-customer; wiring fix, 2 October 2026"
+   }
+  ],
+  "entryState": {},
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1062,6 +1224,12 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 13"
+   },
+   {
+    "operation": "setDataRetentionPolicy",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-005): Retention was set in two places on one screen; decided 29 September that retention is a tenant setting per data class (setDataRetentionSetting), so the marketing-crm policy write comes off the screen (design-notes correction customer-marketing BO-751).",
+    "source": "contracts/spine/tenancy.yaml#setDataRetentionSetting | contracts/satellite/marketing-crm.yaml#setDataRetentionPolicy"
    }
   ],
   "layout": {
@@ -1073,16 +1241,21 @@
       {
        "kind": "primaryButton",
        "derived": true,
-       "impliedBy": "setDataRetentionPolicy",
-       "label": "Save data retention policy",
+       "impliedBy": "runDataRetention",
        "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listDataRetentionSettings",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
       },
       {
        "kind": "secondaryButton",
        "label": "Cancel",
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
-       "impliedBy": "setDataRetentionPolicy"
+       "impliedBy": "runDataRetention"
       }
      ]
     }
@@ -1091,21 +1264,11 @@
   "states": {
    "loading": "The retention anonymization list.",
    "error": "Could not load. Names which read failed and leaves the retention anonymization untouched.",
-   "emptyFirstRun": "No retention anonymization yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No retention anonymization yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the retention anonymization are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
-   {
-    "operationId": "setDataRetentionPolicy",
-    "contract": "marketing-crm",
-    "purpose": "Retention by category and jurisdiction",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026",
-    "invalidates": [
-     "listDataRetentionExpiry"
-    ]
-   },
    {
     "operationId": "runDataRetention",
     "contract": "marketing-crm",

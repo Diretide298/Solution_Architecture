@@ -1,6 +1,6 @@
 # WS17 — Approval Workflows and Governance board 5
 
-**10 screens · 11 operations · 18 schemas · 6 permissions**
+**10 screens · 10 operations · 17 schemas · 5 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -48,8 +48,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 6 permissions apply here:
-  `APPROVAL_ACT, APPROVAL_CONFIGURE, APPROVAL_DECIDE, APPROVAL_REQUEST, APPROVAL_VIEW, GUEST_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 5 permissions apply here:
+  `APPROVAL_ACT, APPROVAL_CONFIGURE, APPROVAL_DECIDE, APPROVAL_REQUEST, APPROVAL_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -61,6 +61,35 @@ convincingly. It is never a caption.
   and its error; and, element by element, what is shown and in what format, what each action
   produces and where the user goes next. Draw exactly that.
 
+## The processes these screens belong to
+
+Written by the owner of each process (`handoff/design-notes/`). Read before any screen: it says how the process runs end to end and which words the screens must use.
+
+### Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management)
+
+Platform Foundation is everything the apps stand on. Five apps each have one door: the guest app and website (WEB-016, GST-042: a six-digit code to email or mobile, a password, Apple or Google, UAE Pass; never enterprise SSO), the till (POS-000: employee number and PIN, recent operators as tiles; the kitchen display is the same app), the staff handheld and scanner (EMP-001, SCN-001), Venue Management (SUP-001, the single door for the back office P08, the CMS P13, analytics P16 and the support desk P12) and TICVAI Control (ADM-001 for TICVAI's own platform operators, PTR-001 for partner users; the developer portal P14 and the sign-up P17 belong to this app too). A second factor is required by permission, not by role or device: ROLE_MANAGE, LEDGER_APPROVE and every PLATFORM_* permission, plus any the tenant adds; so a cashier never sees it and a platform operator always does. The factor is an authenticator app with an emailed code as fallback; five wrong codes lock step-up for the lockout minutes, never permanently. Guests get two-step verification only at a venue that switched it on. One person holds one session per workstation: a second sign-in is refused and only a supervisor ends the other session. Several roles mean a role prompt; one role goes straight in. The workstation decides the Sale Board, hardware and till identity, never what a person may do. Sensitive actions (refund approval, journal approval, credential reset, partner credit, commission rules, opening a platform-staff grant and 17 more) demand a fresh step-up on the operation itself, asked in place in the action's confirmation; the tenant may raise the strength, never remove it. Permission outcomes are three, never one word: self-authorised (proceeds, audited), escalated (a supervisor PIN in place), refused (the denied state, naming the permission); a missing permission is never an empty table, and a record outside the person's venues is "not found", indistinguishable from absent. The hierarchy is binding (tenant, brand, region, venue, department, sub-department, workstation; outlet beside department for F&B and retail); region owns currency, decimals, time zone, date format and fiscal year; configuration resolves nearest-ancestor across tenant, region and venue (outlet for F&B and retail), venue is the floor and a workstation is assigned a profile, never configured; every configuration screen says which level it writes and what it inherits. Venue Management is one tenant-level surface filtering across the venues in the session's scope. TICVAI's Console runs outside every cell: a platform operator picks a tenant and opens a time-boxed, audited platform-staff grant (with step-up) before any tenant action, and the tenant sees every action in its audit log (ADM-412 is the reference implementation). Approval workflows record authorisations and never perform the action; the requester cannot approve their own request; a venue may tighten and never loosen a rule from above; in-flight …
+*(source: screens/P12-support-agent-console.yaml#SUP-001; R135; R126; R167; DI-1072; ADR-0002; ADR-0003; ADR-0004; R184; contracts/spine/identity.yaml#createMfaChallenge; contracts/spine/approvals.yaml#setStepUpPolicy; ADR-0011; ADR-0018; ADR-0029; R098; contracts/spine/approvals.yaml#decideApprovalRequest …)*
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Sign in / Sign out | Entering and leaving any app, staff or guest. | Login, Log in, Logon, Logout | screens/P04-point-of-sale.yaml#POS-000 … |
+| Authentication code | The staff second factor from the authenticator app (or the emailed fallback). | OTP, 2FA code, token | screens/P09-platform-admin-console.yaml#ADM-001 |
+| One-time code | The six-digit code a guest receives to sign in or prove a contact. | OTP, PIN, password | DI-1034; R167 |
+| Two-step verification | The guest's optional second factor, asked only at venues that switched it on. | MFA, 2FA | DI-1072 |
+| Tenant / Brand / Region / Venue / Department / Outlet | The binding hierarchy levels; region owns currency and dates; outlet is F&B or retail inside a venue. | Client, Customer, Org (for tenant), Site, Park, Property (for venue), Area, Territory (for region) | ADR-0011; ADR-0018 |
+| Workstation (back office) / till (operator copy) | A configured device; decides Sale Board, hardware and till identity, never authorisation. | Terminal, Station, POS (for the device), till (for the Deposit Box) | ADR-0002; R156 |
+| Sale Board | The configured front end a workstation loads (ticketing, F&B or retail). | Screen, Layout, Menu | ADR-0003 |
+| Role | A named, fully configurable grouping of permissions; the seeded five are editable starting points. | Group, Profile | R229 |
+| Staff member / Partner user / Platform operator | A tenant's staff principal; a partner's user; a TICVAI employee in the Console. | User (alone), Account, Agent (for venue staff) | F104 step 1; F104 step 4; F104 step 5 |
+| Platform-staff grant | The time-boxed, audited access a platform operator opens into one tenant before acting in it. | Impersonation, Support login | R098 |
+| Escalate / Refused | Escalate is supervisor approval captured in place; Refused is the denied state that names the permission. | Denied (for an action that can be escalated) | R197 |
+| Approve / Reject / Return / Request information | The four decisions on an approval request; Withdraw is the requester's own act and never a rejection. | Accept, Decline, Cancel (for withdraw) | contracts/spine/approvals.yaml#decideApprovalRequest … |
+| Subscription / Plan / Module / Licence | TICVAI's commercial relationship with a tenant, its plan, the modules it licenses and the limits. | Membership (that is the guest's pass) | R214 |
+| Membership / Annual pass | A guest's pass product and its holder (BO-284 to BO-303). | Subscription (that is the tenant's TICVAI plan) | screens/P08-venue-back-office.yaml#BO-284 |
+| Sandbox client / Production client | A developer's own test credential; a TICVAI-issued live credential after certification. | Test key, Live key, API key (without environment) | DI-927 |
+| Asset (DAM) / Media (ticket) | A digital file in the library; ticket media is a wristband or card carrying entitlements. Never mix them. | Media (for a library asset) | contracts/satellite/assets.yaml#searchMedia … |
+
+
 ## The screens
 
 Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs count fields; requirements are matrix rows; meeting inputs are the ones naming the screen (the module and platform ones are below); white label says whether the tenant's brand reaches it (guest) or it sets the brand (configures).
@@ -68,7 +97,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-384` | Delegation & Escalation Command Center | B–D | 9 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-385` | Delegation Management | B–D | 2 | 0 | 5 | 2 | 1 | 0 | — | notStarted (—) |
+| `BO-385` | Delegation Management | B–D | 10 | 0 | 5 | 2 | 1 | 0 | — | notStarted (—) |
 | `BO-386` | Temporary Delegation & Availability Calendar | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-387` | Out-of-Office & Substitute Routing | B–D | 7 | 0 | 5 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-388` | Approval SLA Policy Configuration | B–D | 8 | 0 | 5 | 0 | 1 | 3 | — | notStarted (—) |
@@ -80,7 +109,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 ## Thin screens in this batch
 
-**BO-385, BO-386, BO-389, BO-390, BO-391, BO-392 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**BO-386, BO-389, BO-390, BO-391, BO-392 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ---
 
@@ -103,6 +132,10 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Offline | online only |
 | Opens with | `instanceId` (navigation) |
 | Route | `/venue-operations/delegation-escalation-command-center-bo-384` |
+
+**From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** Delegations, unavailable approvers, SLA at risk and escalations across the venues in scope, with intervention.
+
+**Fixed on main** (the package already carries these; draw what it says): emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything. (CHG-SBO-002).
 
 #### Inputs: what the user enters or picks
 
@@ -179,11 +212,34 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 |---|---|
 | Loading (`?state=loading`) | The delegation escalation list; the counts above it resolve separately. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the delegation escalation untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No delegation escalation yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, first run (`?state=emptyFirstRun`) | **Nothing to show yet**: the figures fill as activity is recorded. Offers no create action — a monitor creates nothing — and says so rather than showing empty tiles. |
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the delegation escalation are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 The instance is completed or cancelled, the action does not apply in its current status (for example `resume` on an instance that has not failed), or the step …; 422 A field the action needs is missing (assigneePrincipalId, extendByMinutes, priority, workflowExceptionId), the node is not skippable or the alternative is not … |
+
+#### Edge cases to draw
+
+- **A person whose grants cover only some venues, or a link to a record in another venue**: The venue filter lists only venues in the session's scope (Session.scope, resolved at sign-in); a record outside it renders Not found, deliberately indistinguishable from absent, never a 'you may not see venue X' message. *(source: ADR-0011; contracts/shared/common.yaml#/components/schemas/Problem; contracts/spine/identity.yaml#getCurrentSession)*
+- **Can read but not change (holds APPROVAL_VIEW only)**: Everything reads; the actions needing another permission are not offered as live buttons: APPROVAL_ACT for Act on workflow instance. Where the person would reasonably expect the action, it shows disabled with the permission named. The server refuses with 403 forbidden regardless. *(source: contracts/spine/approvals.yaml#actOnWorkflowInstance)*
+- **actOnWorkflowInstance answers 409**: Show it as something the person can act on, not a failure: The instance is completed or cancelled, the action does not apply in its current status (for example `resume` on an instance that has not failed), or the step to skip is an approval node *(source: contracts/spine/approvals.yaml#actOnWorkflowInstance)*
+- **actOnWorkflowInstance answers 422**: Show it as something the person can act on, not a failure: A field the action needs is missing (assigneePrincipalId, extendByMinutes, priority, workflowExceptionId), the node is not skippable or the alternative is not an allowed edge, or the assignee is the requester of the approval *(source: contracts/spine/approvals.yaml#actOnWorkflowInstance)*
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+metric tiles:
+  Active Delegations: 128
+  Approvers Unavailable: 46
+  Pending Approvals: 312
+  SLA At Risk: 3 h 20 min
+  SLA Breached: 42 min
+  Escalated Today: 233
+  Unassigned Requests: 0
+  Critical Escalations: 5
+```
 
 #### Permissions
 
@@ -233,6 +289,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-100`, `BO-393`, `BO-385`, `BO-386`, `BO-387`, `BO-388`, `BO-389`, `BO-390`, `BO-391`, `BO-392`.
 - [ ] Every gated control is gated: `APPROVAL_ACT`, `APPROVAL_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 4 edge case(s) from the process notes are drawn.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -246,12 +303,18 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Venue Operations · wave 3 · needs the `core` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `APPROVAL_DECIDE`, `APPROVAL_VIEW`, `GUEST_VIEW` (1 operate, 2 read); in the flows as venue manager |
+| Who uses it | venue staff holding `APPROVAL_DECIDE`, `APPROVAL_VIEW` (1 operate, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Delegation Setup) and no display directory — it is settings, not a population |
 | Offline | online only |
-| Opens with | `subjectId` (navigation), `delegationId` (navigation) · cold entry: **Reached from the list that owns it**, so the identifier arrives with the navigation. Opened cold without one, the screen says what is missing and offers that … |
+| Opens with | `delegationId` (navigation) · cold entry: **Reached from the list that owns it**, so the identifier arrives with the navigation. Opened cold without one, the screen says what is missing and offers that … |
 | Route | `/venue-operations/delegation-management-bo-385` |
+
+**Known gaps.** Removed 2 October 2026 (CHG-WIR-021): listDelegations (GUEST_VIEW) lists who may act for a guest; approval delegation is listApprovalDelegations, already declared (design-notes correction …
+
+**From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** An approver delegates authority to an eligible colleague for a period; the same function as BO-087.
+
+**Fixed on main** (the package already carries these; draw what it says): listDelegations (GUEST_VIEW) is the guest delegation operation. (CHG-WIR-021); Fields are prefilled with sample names ("Delegator Ahmed Raza", "Delegate To Sara Khan"). (CHG-SBO-015).
 
 #### Inputs: what the user enters or picks
 
@@ -259,8 +322,29 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
 |---|---|---|---|---|---|---|---|
-| Delegator: Ahmed Raza | select field | — | — | — | — | — | — |
-| Delegate To: Sara Khan | text field | — | — | — | — | — | — |
+| Delegator | select field | — | — | — | — | A pick list of people by name; sample names belong in the sample data. | — |
+| Delegate to | select field | — | — | — | — | — | — |
+
+**Form: Activate delegation** (modal, opened by *Activate delegation*; *Activate delegation* calls `createApprovalDelegation`, *Cancel* sends nothing)
+
+**Collects what `createApprovalDelegation` sends before it is called.** Required: `delegatorPrincipalId`, `delegatePrincipalId`, `from`, `to`. Optional: `kinds`, `maxAmount`, `reason`. Dismissing sends nothing; the screen behind is unchanged.
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Delegator principal `delegatorPrincipalId` | picker: choose a delegator principal | required | — | — | shows names, sends the id | A principal id (`identity.Principal.id`). This contract stores the id only; the name to show, and the people to pick from, come from `identity.listPrincipals` and … | `createApprovalDelegation` body |
+| Delegate principal `delegatePrincipalId` | picker: choose a delegate principal | required | — | — | shows names, sends the id | A principal id, resolved to a name the same way as `delegatorPrincipalId`. | `createApprovalDelegation` body |
+| Kinds `kinds` | multi-select chips | optional | — | Refund · Price override · Discount override · Complimentary ticket · Membership cancellation · Access permission change · Configuration change · AI recommendation · Release promotion · Requisition · Stock write off · Journal entry … | — | Absent means everything the delegator may approve. | `createApprovalDelegation` body |
+| Max amount `maxAmount` | money field | optional | — | — | AED, 2 decimals shown (up to 4 accepted), currency from the … | A delegate may be given less authority than the delegator, never more. | `createApprovalDelegation` body |
+| From `from` | date and time picker | required | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `createApprovalDelegation` body |
+| To `to` | date and time picker | required | — | — | 1 Oct 2026, 14:30 (venue time zone) | Required. An open-ended delegation is an approver who quietly stopped approving and a delegate who does not know they still hold it. | `createApprovalDelegation` body |
+| Reason `reason` | text area | optional | — | — | — | — | `createApprovalDelegation` body |
+| Scope path `scopePath` | text field | optional | — | — | — | The partition key (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — 49 tables were in that state, so a row … | `createApprovalDelegation` body |
+
+Errors to draw in the form: 400 The delegation is malformed. `refusedReason` is `invalidWindow` where `to` is not after `from`, or `delegateIsDelegator` where both principals are the same … (DelegationRefusedProblem); 403 The delegation would hand over authority that is not there. `refusedReason` is `delegateLacksPermission` where the delegate does not hold the permission being … (DelegationRefusedProblem)
+
+**Rules for these inputs** (from the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process; these refine the tables above and win where they differ)
+
+- **Delegation window and limits**: Always time-bounded: 'to' must follow 'from' (refused invalidWindow); the delegate cannot exceed the delegator's kinds or maxAmount and must hold the permission (exceedsDelegatorAuthority, delegateLacksPermission); a delegate never approves a request the delegator raised. *(source: contracts/spine/approvals.yaml#createApprovalDelegation)*
 
 #### Outputs: what the screen shows and produces
 
@@ -268,7 +352,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Save Draft / Activate Delegation / Cancel (primary button) | navigation or local | — | — | — | — |
+| Activate delegation (primary button) | `createApprovalDelegation` POST `/delegations` | ApprovalDelegation | ApprovalDelegation | 400 The delegation is malformed. `refusedReason` is `invalidWindow` where `to` is not after `from`, or `delegateIsDelegator` where both principals are the same … (DelegationRefusedProblem); 403 The delegation would hand … | opens modal first |
+| Cancel delegation (destructive button) | `revokeApprovalDelegation` DELETE `/delegations/{delegationId}` | — | — | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path. | — |
 
 **Data it reads**: `listApprovalDelegations` (onLoad, List approval delegations (screen currently binds guest …)
 
@@ -287,9 +372,36 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 The delegation is malformed. `refusedReason` is `invalidWindow` where `to` is not after `from`, or `delegateIsDelegator` where both principals are the same … (DelegationRefusedProblem) |
 
+#### Edge cases to draw
+
+- **A person whose grants cover only some venues, or a link to a record in another venue**: The venue filter lists only venues in the session's scope (Session.scope, resolved at sign-in); a record outside it renders Not found, deliberately indistinguishable from absent, never a 'you may not see venue X' message. *(source: ADR-0011; contracts/shared/common.yaml#/components/schemas/Problem; contracts/spine/identity.yaml#getCurrentSession)*
+- **Can read but not change (holds APPROVAL_VIEW, GUEST_VIEW only)**: Everything reads; the actions needing another permission are not offered as live buttons: APPROVAL_DECIDE for createApprovalDelegation, revokeApprovalDelegation. Where the person would reasonably expect the action, it shows disabled with the permission named. The server refuses with 403 forbidden regardless. *(source: contracts/spine/approvals.yaml#createApprovalDelegation)*
+- **createApprovalDelegation answers 403**: Show it as something the person can act on, not a failure: The delegation would hand over authority that is not there. `refusedReason` is `delegateLacksPermission` where the delegate does not hold the permission being delegated, or `exceedsDelegatorAuthority` where `kinds` or `maxAmount` go beyond what the delegator may approve. The shared `Forbidden`, with no `refusedReason`, is the ca... *(source: contracts/spine/approvals.yaml#createApprovalDelegation)*
+
+#### Consistency with other screens
+
+- Match `BO-087`: One delegation editor.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+listApprovalDelegations (ApprovalDelegation):
+- maxAmount: AED 1,250.00
+  from: 01/10/2026 09:14
+  to: 01/10/2026 09:14
+  reason: Guest charged twice at Main Gate Till 3
+  isActive: true
+- maxAmount: AED 48,000.00
+  from: 30/09/2026 18:02
+  to: 30/09/2026 18:02
+  reason: Group of 40 from Desert Gate Tours
+  isActive: true
+```
+
 #### Permissions
 
-- `listDelegations` → `GUEST_VIEW` (read) · staff, guest
 - `createApprovalDelegation` → `APPROVAL_DECIDE` (operate) · staff
 - `listApprovalDelegations` → `APPROVAL_VIEW` (read) · staff
 - `revokeApprovalDelegation` → `APPROVAL_DECIDE` (operate) · staff
@@ -326,13 +438,14 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (2), with its required mark, default, format and its error state (400, 403, 404).
+- [ ] Every input above is drawn (10), with its required mark, default, format and its error state (400, 403, 404).
 - [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-385?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: Save Draft / Activate Delegation / ….
+- [ ] Every action is wired with its success and its failure: Activate delegation, Cancel delegation.
 - [ ] Every transition is wired: `BO-384`.
-- [ ] Every gated control is gated: `APPROVAL_DECIDE`, `APPROVAL_VIEW`, `GUEST_VIEW`.
+- [ ] Every gated control is gated: `APPROVAL_DECIDE`, `APPROVAL_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 3 edge case(s) from the process notes are drawn.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -354,6 +467,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Route | `/venue-operations/temporary-delegation-availability-calendar-bo-386` |
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+**From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** An approver's availability calendar (leave, travel, training) with the delegation that covers each absence and its automatic end.
 
 #### Inputs: what the user enters or picks
 
@@ -388,6 +503,29 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the temporary delegation availability are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Edge cases to draw
+
+- **A person whose grants cover only some venues, or a link to a record in another venue**: The venue filter lists only venues in the session's scope (Session.scope, resolved at sign-in); a record outside it renders Not found, deliberately indistinguishable from absent, never a 'you may not see venue X' message. *(source: ADR-0011; contracts/shared/common.yaml#/components/schemas/Problem; contracts/spine/identity.yaml#getCurrentSession)*
+- **Can read but not change (holds APPROVAL_VIEW only)**: Everything reads; the actions needing another permission are not offered as live buttons: APPROVAL_DECIDE for setApproverAvailability. Where the person would reasonably expect the action, it shows disabled with the permission named. The server refuses with 403 forbidden regardless. *(source: contracts/spine/approvals.yaml#setApproverAvailability)*
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+listApprovalDelegations (ApprovalDelegation):
+- maxAmount: AED 1,250.00
+  from: 01/10/2026 09:14
+  to: 01/10/2026 09:14
+  reason: Guest charged twice at Main Gate Till 3
+  isActive: true
+- maxAmount: AED 48,000.00
+  from: 30/09/2026 18:02
+  to: 30/09/2026 18:02
+  reason: Group of 40 from Desert Gate Tours
+  isActive: true
+```
 
 #### Permissions
 
@@ -428,6 +566,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-384`.
 - [ ] Every gated control is gated: `APPROVAL_DECIDE`, `APPROVAL_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 2 edge case(s) from the process notes are drawn.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -447,6 +586,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/venue-operations/out-of-office-substitute-routing-bo-387` |
+
+**From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** What happens when the approver is unavailable: reroute immediately or after a wait, to a deputy, manager or shared queue, or escalate; the original approver kept informed.
 
 #### Inputs: what the user enters or picks
 
@@ -477,6 +618,22 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Empty, first run (`?state=emptyFirstRun`) | No out-of-office substitute routing configured yet. Carries the create action and says what the platform does in the meantime. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Edge cases to draw
+
+- **A person whose grants cover only some venues, or a link to a record in another venue**: The venue filter lists only venues in the session's scope (Session.scope, resolved at sign-in); a record outside it renders Not found, deliberately indistinguishable from absent, never a 'you may not see venue X' message. *(source: ADR-0011; contracts/shared/common.yaml#/components/schemas/Problem; contracts/spine/identity.yaml#getCurrentSession)*
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+routing:
+  when: approver out of office
+  after: 15 min
+  routeTo: deputy
+  keepOriginalInformed: true
+```
 
 #### Permissions
 
@@ -516,6 +673,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-384`.
 - [ ] Every gated control is gated: `APPROVAL_DECIDE`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 1 edge case(s) from the process notes are drawn.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -536,6 +694,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | nothing: it opens on its own |
 | Route | `/venue-operations/approval-sla-policy-configuration-bo-388` |
 
+**What the spec says about it.** **One SLA policy screen (decided 2 October 2026, merge as proposed; CHG-SBO-021):** reminders and breach notifications (BO-389) and the escalation policy (BO-390) are sections of this one policy object.
+
+**From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** Response-time targets per approval kind, with business or calendar hours, weekends, holidays and priority or risk variants.
+
 #### Inputs: what the user enters or picks
 
 **On the screen**
@@ -550,6 +712,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Venue operating hours | select field | — | — | — | — | — | — |
 | Priority-based SLA | select field | — | — | — | — | — | — |
 | Risk-based SLA | select field | — | — | — | — | — | — |
+
+**Rules for these inputs** (from the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process; these refine the tables above and win where they differ)
+
+- **Scope this applies at**: Not a free choice; each write has one level and the selector says it: setApprovalSlaPolicy: tenant-wide only, no region or venue override is offered. Nearest ancestor wins; a workstation is assigned a profile, never configured. *(source: ADR-0018; ADR-0029; screens/_patterns.yaml#configEditor; contracts/spine/approvals.yaml#setApprovalSlaPolicy)*
 
 #### Outputs: what the screen shows and produces
 
@@ -566,6 +732,18 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Empty, first run (`?state=emptyFirstRun`) | No approval sla policy configured yet. Carries the create action and says what the platform does in the meantime. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+sla:
+  kind: Refund above threshold
+  duration: 30 min
+  hours: venue operating hours
+  weekends: included
+```
 
 #### Permissions
 
@@ -613,34 +791,35 @@ Also apply: 1 for P08 · Venue Operations, 24 for all of P08, 29 for every app (
 
 ### `BO-389` Reminder & Breach Notification Rules
 
-**Configure proactive notifications before and after SLA breaches. The source requires reminders for pending approvals and alerts when SLA thresholds are exceeded.**
+**Configure proactive notifications before and after SLA breaches. The source requires reminders for pending approvals and alerts when SLA thresholds are exceeded (merged into BO-388 Approval SLA Policy Configuration).**
 
 | | |
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Venue Operations · wave 3 · needs the `core` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `APPROVAL_CONFIGURE` (1 configure); in the flows as venue manager |
+| Who uses it | venue; in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/venue-operations/reminder-breach-notification-rules-bo-389` |
 
-**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+**What the spec says about it.** **Merged into BO-388** (decided 2 October 2026, Chinmay: duplicate screens merged as proposed; CHG-SBO-021). Reminders, breach notifications and escalation are parts of the one approval SLA policy (`setApprovalSlaPolicy`), edited on BO-388 (design-note correction platform-foundation BO-389). **One implementation, both ids kept**, as the M24-03 merges do: this id stays for traceability and routes to BO-388, and nothing on it is built separately.
+
+**From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** Reminders before an SLA breach and alerts after, to whom and through which channel.
+
+**Fixed on main** (the package already carries these; draw what it says): Shares setApprovalSlaPolicy with BO-388 and BO-390 and has no fields. (CHG-SBO-021).
 
 #### Inputs: what the user enters or picks
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
 
+**Rules for these inputs** (from the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process; these refine the tables above and win where they differ)
+
+- **Scope this applies at**: Not a free choice; each write has one level and the selector says it: setApprovalSlaPolicy: tenant-wide only, no region or venue override is offered. Nearest ancestor wins; a workstation is assigned a profile, never configured. *(source: ADR-0018; ADR-0029; screens/_patterns.yaml#configEditor; contracts/spine/approvals.yaml#setApprovalSlaPolicy)*
+
 #### Outputs: what the screen shows and produces
-
-**Actions and what each produces**
-
-| Action | Calls | Sends | On success returns | Errors to show | Notes |
-|---|---|---|---|---|---|
-| Save approval SLA policy (primary button) | navigation or local | — | — | — | — |
-| Cancel (secondary button) | navigation or local | — | — | — | — |
 
 **Where the user goes next**
 
@@ -650,18 +829,31 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 | State | What it shows |
 |---|---|
-| Loading (`?state=loading`) | The reminder breach notification list. |
-| Error (`?state=error`) | Could not load. Names which read failed and leaves the reminder breach notification untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No reminder breach notification yet. Carries the create action; distinct from a filter that matched nothing. |
-| Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the reminder breach notification are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Loading (`?state=loading`) | Routes to BO-388 while it opens. |
+| Error (`?state=error`) | Could not open BO-388; says so and offers to retry. |
+| Empty, first run (`?state=emptyFirstRun`) | Never shown: this id routes to BO-388, whose empty states apply. |
+| Empty, no results (`?state=emptyNoResults`) | Never shown: this id routes to BO-388. |
+| Permission denied (`?state=emptyNoAccess`) | As BO-388: shown when the caller lacks the access BO-388 requires, named in words. |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+kind: Refund above threshold
+remindAt: 50% and 80% of SLA
+breachAlertTo:
+- Venue Manager
+- Duty Manager
+channel:
+- in-app
+- email
+```
 
 #### Permissions
 
-- `setApprovalSlaPolicy` → `APPROVAL_CONFIGURE` (configure) · staff
-
-**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** As BO-388: shown when the caller lacks the access BO-388 requires, named in words.
 
 #### Requirements it meets
 
@@ -691,9 +883,9 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
 - [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-389?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: Save approval SLA policy, Cancel.
+- [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-384`.
-- [ ] Every gated control is gated: `APPROVAL_CONFIGURE`.
+- [ ] Sign-in is asked only where the spec asks for it.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -701,34 +893,35 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 ### `BO-390` Escalation Policy Builder
 
-**Define what TICVAI should do when an approval remains unresolved or meets another escalation condition.**
+**Define what TICVAI should do when an approval remains unresolved or meets another escalation condition (merged into BO-388 Approval SLA Policy Configuration).**
 
 | | |
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Venue Operations · wave 3 · needs the `core` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `APPROVAL_CONFIGURE` (1 configure); in the flows as venue manager |
+| Who uses it | venue; in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/venue-operations/escalation-policy-builder-bo-390` |
 
-**Known gaps.** **Escalation Policy Builder declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+**What the spec says about it.** **Merged into BO-388** (decided 2 October 2026, Chinmay: duplicate screens merged as proposed; CHG-SBO-021). Reminders, breach notifications and escalation are parts of the one approval SLA policy (`setApprovalSlaPolicy`), edited on BO-388 (design-note correction platform-foundation BO-390). **One implementation, both ids kept**, as the M24-03 merges do: this id stays for traceability and routes to BO-388, and nothing on it is built separately.
+
+**From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** What happens when an approval stays unresolved: escalation levels, timing and targets.
+
+**Fixed on main** (the package already carries these; draw what it says): No fields; shares setApprovalSlaPolicy. (CHG-SBO-021).
 
 #### Inputs: what the user enters or picks
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
 
+**Rules for these inputs** (from the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process; these refine the tables above and win where they differ)
+
+- **Scope this applies at**: Not a free choice; each write has one level and the selector says it: setApprovalSlaPolicy: tenant-wide only, no region or venue override is offered. Nearest ancestor wins; a workstation is assigned a profile, never configured. *(source: ADR-0018; ADR-0029; screens/_patterns.yaml#configEditor; contracts/spine/approvals.yaml#setApprovalSlaPolicy)*
+
 #### Outputs: what the screen shows and produces
-
-**Actions and what each produces**
-
-| Action | Calls | Sends | On success returns | Errors to show | Notes |
-|---|---|---|---|---|---|
-| Save approval SLA policy (primary button) | navigation or local | — | — | — | — |
-| Cancel (secondary button) | navigation or local | — | — | — | — |
 
 **Where the user goes next**
 
@@ -738,18 +931,28 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 | State | What it shows |
 |---|---|
-| Loading (`?state=loading`) | The escalation policy list. |
-| Error (`?state=error`) | Could not load. Names which read failed and leaves the escalation policy untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No escalation policy yet. Carries the create action; distinct from a filter that matched nothing. |
-| Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the escalation policy are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Loading (`?state=loading`) | Routes to BO-388 while it opens. |
+| Error (`?state=error`) | Could not open BO-388; says so and offers to retry. |
+| Empty, first run (`?state=emptyFirstRun`) | Never shown: this id routes to BO-388, whose empty states apply. |
+| Empty, no results (`?state=emptyNoResults`) | Never shown: this id routes to BO-388. |
+| Permission denied (`?state=emptyNoAccess`) | As BO-388: shown when the caller lacks the access BO-388 requires, named in words. |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+kind: Purchase order
+levels:
+- 'after 4 h: department head'
+- 'after 24 h: venue manager'
+- 'after 48 h: regional director'
+```
 
 #### Permissions
 
-- `setApprovalSlaPolicy` → `APPROVAL_CONFIGURE` (configure) · staff
-
-**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** As BO-388: shown when the caller lacks the access BO-388 requires, named in words.
 
 #### Requirements it meets
 
@@ -779,9 +982,9 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
 - [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-390?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: Save approval SLA policy, Cancel.
+- [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-384`.
-- [ ] Every gated control is gated: `APPROVAL_CONFIGURE`.
+- [ ] Sign-in is asked only where the spec asks for it.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -804,6 +1007,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Route | `/venue-operations/live-escalation-operations-center-bo-391` |
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+**From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** Live view of escalated approvals for managers to intervene (reassign, decide, extend).
+
+**Fixed on main** (the package already carries these; draw what it says): emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything. (CHG-SBO-002).
 
 #### Inputs: what the user enters or picks
 
@@ -850,6 +1057,7 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 **Where the user goes next**
 
 - → `BO-384` Delegation & Escalation Command Center: *Back to Delegation & Escalation Command Center*; carries `instanceId`
+- → `ADM-248` Workflow Operations Command Center: *Returns to the board's landing screen*; calls `listSlaEscalationBottleneck`
 
 #### States
 
@@ -857,11 +1065,32 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 |---|---|
 | Loading (`?state=loading`) | The live escalation operations list. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the live escalation operations untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No live escalation operations yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, first run (`?state=emptyFirstRun`) | No live escalation operations yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the live escalation operations are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 The instance is completed or cancelled, the action does not apply in its current status (for example `resume` on an instance that has not failed), or the step …; 422 A field the action needs is missing (assigneePrincipalId, extendByMinutes, priority, workflowExceptionId), the node is not skippable or the alternative is not … |
+
+#### Edge cases to draw
+
+- **A person whose grants cover only some venues, or a link to a record in another venue**: The venue filter lists only venues in the session's scope (Session.scope, resolved at sign-in); a record outside it renders Not found, deliberately indistinguishable from absent, never a 'you may not see venue X' message. *(source: ADR-0011; contracts/shared/common.yaml#/components/schemas/Problem; contracts/spine/identity.yaml#getCurrentSession)*
+- **Can read but not change (holds APPROVAL_VIEW only)**: Everything reads; the actions needing another permission are not offered as live buttons: APPROVAL_ACT for Act on workflow instance. Where the person would reasonably expect the action, it shows disabled with the permission named. The server refuses with 403 forbidden regardless. *(source: contracts/spine/approvals.yaml#actOnWorkflowInstance)*
+- **actOnWorkflowInstance answers 409**: Show it as something the person can act on, not a failure: The instance is completed or cancelled, the action does not apply in its current status (for example `resume` on an instance that has not failed), or the step to skip is an approval node *(source: contracts/spine/approvals.yaml#actOnWorkflowInstance)*
+- **actOnWorkflowInstance answers 422**: Show it as something the person can act on, not a failure: A field the action needs is missing (assigneePrincipalId, extendByMinutes, priority, workflowExceptionId), the node is not skippable or the alternative is not an allowed edge, or the assignee is the requester of the approval *(source: contracts/spine/approvals.yaml#actOnWorkflowInstance)*
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+listSlaEscalationBottleneck (SlaEscalationBottleneckMonitorView):
+- started: 01/10/2026 09:14
+  target: 01/10/2026 09:14
+  timeRemaining: 12
+- started: 30/09/2026 18:02
+  target: 30/09/2026 18:02
+  timeRemaining: 3
+```
 
 #### Permissions
 
@@ -892,6 +1121,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS34 Approval Workflows and Governance Board 5.dc.html#bo-391`
 - Workshop pack: Approval_Workflows_and_Governance_Reference.pdf board 5
 - Flow F127 *Approval Workflows and Governance board 5: Delegation & Escalation Command …*, step 14: Works in Live Escalation Operations Center → Allow managers to monitor and intervene in currently escalated approvals.
+- Flow F165 *Rules Workflow Approval Automation Engine board 2: Workflow Operations Command …*, step 8: Works in SLA, Escalation & Bottleneck Monitor → Monitor workflows approaching or exceeding configured time limits.
 
 #### Acceptance for the design
 
@@ -899,9 +1129,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-391?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Act on workflow instance.
-- [ ] Every transition is wired: `BO-384`.
+- [ ] Every transition is wired: `BO-384`, `ADM-248`.
 - [ ] Every gated control is gated: `APPROVAL_ACT`, `APPROVAL_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 4 edge case(s) from the process notes are drawn.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -923,6 +1154,14 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Route | `/venue-operations/sla-escalation-performance-analytics-bo-392` |
 
 **Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
+
+**From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** Where approval delays and escalations occur: slowest approvers, stages, workflows, venues, peak periods.
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- The table's columns are the workshop pack's labels with no bound response field (0 of 6 labels bound). (CHG-SBO-005)
+
+**Fixed on main** (the package already carries these; draw what it says): emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything. (CHG-SBO-002).
 
 #### Inputs: what the user enters or picks
 
@@ -973,10 +1212,40 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |---|---|
 | Loading (`?state=loading`) | The sla escalation performance list. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the sla escalation performance untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No sla escalation performance yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, first run (`?state=emptyFirstRun`) | No sla escalation performance yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the sla escalation performance are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Edge cases to draw
+
+- **A person whose grants cover only some venues, or a link to a record in another venue**: The venue filter lists only venues in the session's scope (Session.scope, resolved at sign-in); a record outside it renders Not found, deliberately indistinguishable from absent, never a 'you may not see venue X' message. *(source: ADR-0011; contracts/shared/common.yaml#/components/schemas/Problem; contracts/spine/identity.yaml#getCurrentSession)*
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+Every sla escalation performance:
+- Slowest approvers: Rahul Menon
+  Slowest stages: 1.8 s
+  Slowest workflows: 128
+  High-escalation venues: 128
+  High-escalation departments: Ticketing
+  Peak approval periods: 233
+- Slowest approvers: Fatima Al Mansoori
+  Slowest stages: 3 h 20 min
+  Slowest workflows: 42
+  High-escalation venues: 42
+  High-escalation departments: F&B
+  Peak approval periods: 57
+- Slowest approvers: Omar Haddad
+  Slowest stages: 42 min
+  Slowest workflows: 7
+  High-escalation venues: 7
+  High-escalation departments: Retail
+  Peak approval periods: 11
+```
 
 #### Permissions
 
@@ -1014,6 +1283,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-384`.
 - [ ] Every gated control is gated: `APPROVAL_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 1 edge case(s) from the process notes are drawn.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -1036,6 +1306,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Known gaps.** **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** AI predictions of approval bottlenecks with recommended preventive actions; a recommendation becomes a draft change that goes for approval, never applied directly.
+
+**Fixed on main** (the package already carries these; draw what it says): emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything. (CHG-SBO-002).
+
 #### Inputs: what the user enters or picks
 
 **On the screen**
@@ -1054,7 +1328,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Assigned to me | toggle | — | — | `listApprovalRequests` ?assignedToMe |
 | Raised by me | toggle | — | — | `listApprovalRequests` ?raisedByMe |
 | Status | select | — | Draft · Pending · Escalated · Returned · Information requested · Approved · Rejected · Withdrawn · Expired · Cancelled | `listApprovalRequests` ?status |
-| Kind | select | — | Refund · Price override · Discount override · Complimentary ticket · Membership cancellation · Access permission change · Configuration change · AI recommendation · Release promotion · Requisition · Stock write off · Journal entry … | `listApprovalRequests` ?kind |
+| Kind | select | — | Refund · Price override · Discount override · Complimentary ticket · Membership cancellation · Access permission change · Configuration change · AI recommendation · Release promotion · Requisition · Stock write off · Journal entry …; Each is an existing kind … | `listApprovalRequests` ?kind |
 | Breaching within minutes | number field (minutes) | — | — | `listApprovalRequests` ?breachingWithinMinutes |
 | Sort | segmented control | Sla proximity | Sla proximity · AI priority | `listApprovalRequests` ?sort |
 
@@ -1121,6 +1395,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Send for approval (primary button) | navigation or local | — | — | — | — |
 | Dismiss (destructive button) | navigation or local | — | — | — | — |
 
+**What each action does** (from the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process; these refine the tables above and win where they differ)
+
+- **Create draft change / Send for approval**: Creates a draft; nothing changes until approved. *(source: ADR-0050)*
+
 **Data it reads**: `getApprovalAnalytics` (onLoad, Where the SLA is failing); `listApprovalRequests` (onLoad, Pending requests with AI escalation suggestions …)
 
 **Where the user goes next**
@@ -1133,10 +1411,27 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | Loading (`?state=loading`) | The sla escalation advisor list. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the sla escalation advisor untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No sla escalation advisor yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, first run (`?state=emptyFirstRun`) | No sla escalation advisor yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the sla escalation advisor are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Edge cases to draw
+
+- **A person whose grants cover only some venues, or a link to a record in another venue**: The venue filter lists only venues in the session's scope (Session.scope, resolved at sign-in); a record outside it renders Not found, deliberately indistinguishable from absent, never a 'you may not see venue X' message. *(source: ADR-0011; contracts/shared/common.yaml#/components/schemas/Problem; contracts/spine/identity.yaml#getCurrentSession)*
+- **Can read but not change (holds APPROVAL_VIEW only)**: Everything reads; the actions needing another permission are not offered as live buttons: APPROVAL_REQUEST for escalateApprovalRequest. Where the person would reasonably expect the action, it shows disabled with the permission named. The server refuses with 403 forbidden regardless. *(source: contracts/spine/approvals.yaml#escalateApprovalRequest)*
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+metric tiles:
+  SLA breaches: 3 h 20 min
+  Escalated: 46
+  Predicted SLA breaches (next 60 min): 1.8 s
+  Predicted average wait time: 3 h 20 min
+```
 
 #### Permissions
 
@@ -1188,6 +1483,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-384`.
 - [ ] Every gated control is gated: `APPROVAL_REQUEST`, `APPROVAL_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 2 edge case(s) from the process notes are drawn.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -1294,7 +1590,6 @@ Method, path, parameters, request and response for every operation these screens
 "getApprovalAnalytics": {"method":"GET","path":"/approval-analytics","contract":"approvals","summary":"Volumes, times, rejections and bottlenecks","permission":"APPROVAL_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"from","in":"query","required":null},{"name":"groupBy","in":"query","required":null}],"requestBody":null,"responds":"ApprovalAnalytics"},
 "listApprovalDelegations": {"method":"GET","path":"/delegations","contract":"approvals","summary":"Who is standing in for whom","permission":"APPROVAL_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"ApprovalDelegation"},
 "listApprovalRequests": {"method":"GET","path":"/approval-requests","contract":"approvals","summary":"Requests awaiting a decision, or already decided","permission":"APPROVAL_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"assignedToMe","in":"query","required":null},{"name":"raisedByMe","in":"query","required":null},{"name":"status","in":"query","required":null},{"name":"kind","in":"query","required":null},{"name":"breachingWithinMinutes","in":"query","required":null},{"name":"sort","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
-"listDelegations": {"method":"GET","path":"/guests/{subjectId}/delegations","contract":"identity","summary":"Who may act for this guest, and for whom they may act","permission":"GUEST_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listSlaEscalationBottleneck": {"method":"GET","path":"/sla-escalation-bottleneck","contract":"approvals","summary":"SLA, Escalation & Bottleneck Monitor","permission":"APPROVAL_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"workflow","in":"query","required":false},{"name":"risk","in":"query","required":false},{"name":"escalationLevel","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "revokeApprovalDelegation": {"method":"DELETE","path":"/delegations/{delegationId}","contract":"approvals","summary":"End a delegation early","permission":"APPROVAL_DECIDE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":null},
 "setApprovalSlaPolicy": {"method":"PUT","path":"/approval-sla-policies","contract":"approvals","summary":"How long a decision may take, and what happens when it does not","permission":"APPROVAL_CONFIGURE","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"ApprovalSlaPolicy","responds":"ApprovalSlaPolicy"},
@@ -1311,13 +1606,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "ApprovalAnalytics": {"type":"object","x-ticvai-persistence":"none — aggregated from approvals.request","properties":{"from":{"type":"string","format":"date"},"to":{"type":"string","format":"date"},"groupBy":{"type":"string","description":"The grouping asked for, as the `groupBy` query parameter; each row's `key` is one value of it.","enum":["kind","approver","venue","day","week"]},"rows":{"type":"array","items":{"type":"object","properties":{"key":{"type":"string"},"raised":{"type":"integer"},"approved":{"type":"integer"},"rejected":{"type":"integer"},"withdrawn":{"type":"integer"},"expired":{"type":"integer","description":"**Requests nobody answered.** Usually a routing defect rather than a busy approver, and the number that says the matrix names the wrong person.\n"},"escalated":{"type":"integer"},"slaBreached":{"type":"integer"},"medianMinutes":{"type":"number"},"p95Minutes":{"type":"number"}}}}}},
 "ApprovalDecision": {"type":"object","x-ticvai-persistence":"approvals.decision","required":["level","principalId","decision","decidedAt"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true,"description":"**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"},"level":{"type":"integer"},"principalId":{"type":"string","format":"uuid"},"displayName":{"type":"string"},"isDelegate":{"type":"boolean"},"delegatedFrom":{"type":"string","format":"uuid","nullable":true},"decision":{"type":"string","enum":["approve","reject"]},"comment":{"type":"string","nullable":true},"reason":{"type":"string","nullable":true},"usedMfa":{"type":"boolean"},"signatureRef":{"type":"string","nullable":true},"decidedAt":{"type":"string","format":"date-time"}}},
 "ApprovalDelegation": {"type":"object","x-ticvai-persistence":"approvals.delegation","required":["delegatorPrincipalId","delegatePrincipalId","from","to"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"delegatorPrincipalId":{"type":"string","format":"uuid","description":"A principal id (`identity.Principal.id`). This contract stores the id only; the name to show, and the people to pick from, come from `identity.listPrincipals` and `identity.getPrincipal`.\n"},"delegatePrincipalId":{"type":"string","format":"uuid","description":"A principal id, resolved to a name the same way as `delegatorPrincipalId`."},"kinds":{"type":"array","description":"Absent means everything the delegator may approve.","items":{"$ref":"#/components/schemas/ApprovalKind"}},"maxAmount":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"description":"A delegate may be given less authority than the delegator, never more."},"from":{"type":"string","format":"date-time"},"to":{"type":"string","format":"date-time","description":"**Required.** An open-ended delegation is an approver who quietly stopped approving and a delegate who does not know they still hold it.\n"},"reason":{"type":"string"},"isActive":{"type":"boolean","readOnly":true},"scopePath":{"type":"string","description":"**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"}}},
-"ApprovalKind": {"type":"string","description":"11.1.7 and 11.1.30–11.1.37. **The first four already exist as bespoke implementations** and this contract is what they collapse into.\n**Which actions route here — decided 28 September, audit R144.** Finance and procurement acts go through this engine to a **finance approver**: closing a fiscal period (`periodClose`), reopening one (`periodReopen`), cancelling a purchase order (`purchaseOrderCancel`) and closing one short (`purchaseOrderShortClose`). The tenant default matrix for each of these names the finance approver role; a venue may tighten it and never loosen it. Starting a release rollout routes through `releasePromotion` to the platform release manager (a holder of `PLATFORM_RELEASE_PROMOTE`). **Not every `requiresApproval` goes here:** reopening a shift, recounting a stock count and a retail return above the venue threshold take a supervisor's step-up on the same device instead, and never raise a request.\n**Catalogue change requests route through `productChange` and `pricingChange`** (decided 29 September, writers pass): a product change and a price or pricing change raised in `catalogue` ask for approval under these two kinds, so a venue can route product edits and price edits to different approvers.\n","enum":["refund","priceOverride","discountOverride","complimentaryTicket","membershipCancellation","accessPermissionChange","configurationChange","aiRecommendation","releasePromotion","requisition","stockWriteOff","journalEntry","periodClose","periodReopen","purchaseOrderCancel","purchaseOrderShortClose","tenantMigration","productChange","pricingChange"]},
+"ApprovalKind": {"type":"string","description":"11.1.7 and 11.1.30–11.1.37. **The first four already exist as bespoke implementations** and this contract is what they collapse into.\n**Which actions route here — decided 28 September, audit R144.** Finance and procurement acts go through this engine to a **finance approver**: closing a fiscal period (`periodClose`), reopening one (`periodReopen`), cancelling a purchase order (`purchaseOrderCancel`) and closing one short (`purchaseOrderShortClose`). The tenant default matrix for each of these names the finance approver role; a venue may tighten it and never loosen it. Starting a release rollout routes through `releasePromotion` to the platform release manager (a holder of `PLATFORM_RELEASE_PROMOTE`). **Not every `requiresApproval` goes here:** reopening a shift, recounting a stock count and a retail return above the venue threshold take a supervisor's step-up on the same device instead, and never raise a request.\n**Catalogue change requests route through `productChange` and `pricingChange`** (decided 29 September, writers pass): a product change and a price or pricing change raised in `catalogue` ask for approval under these two kinds, so a venue can route product edits and price edits to different approvers.\n\n**Optional review steps a venue switches on, decided 2 October 2026** (Chinmay; CHG-CSP-036, CHG-CSP-028, CHG-CSP-031). Each is an existing kind narrowed by the rule's `subjectTypes`, so no kind is added (a new value here would be a breaking change against r1) and each is off until the venue saves an active matrix for it:\n- **Publishing white-label content** (`configurationChange`, subject `whiteLabelPublication`): simulate, then a single publish by a holder of the permission; a review step only where the venue sets one up (batch 1, CMS-014; DEC-156). - **Recording F&B waste above a value** (`stockWriteOff`, subject `fnbWaste`): the venue's waste-approval policy, value bands as `minAmount` and `maxAmount`, photo evidence above a value held by fnb (batch 6 #192, BO-139; DEC-192; R144). - **Publishing an access topology** (`configurationChange`, subject `topologyPublication`): second-person approval when the venue switches it on (batch 6 #230, BO-153; DEC-230). - **A permanent identity lock, a whitelist entry, or releasing a full-identity or permanent lock** (`accessPermissionChange`, subjects `identityLock`, `whitelistEntry`, `identityLockRelease`): always a second approver, never for an until-end-of-day lock (critical set 1, BO-229 and BO-247; DEC-254, DEC-260); the tenant default matrix names the security approver role and a venue may tighten it, never remove it.\n","enum":["refund","priceOverride","discountOverride","complimentaryTicket","membershipCancellation","accessPermissionChange","configurationChange","aiRecommendation","releasePromotion","requisition","stockWriteOff","journalEntry","periodClose","periodReopen","purchaseOrderCancel","purchaseOrderShortClose","tenantMigration","productChange","pricingChange"]},
 "ApprovalMode": {"type":"string","description":"11.1.43–11.1.46. **Sequential** asks one at a time, **parallel** asks everyone at once, **consensus** needs all of them, **majority** needs more than half.\nParallel and consensus differ in when it completes: parallel completes on the first approval, consensus waits for all. Conflating them is how a four-eyes rule turns into a one-eye rule.\n","enum":["sequential","parallel","consensus","majority"]},
-"ApprovalRequest": {"type":"object","x-ticvai-persistence":"approvals.request","required":["id","kind","status","requestedByPrincipalId","requestedAt"],"properties":{"id":{"type":"string"},"kind":{"$ref":"#/components/schemas/ApprovalKind"},"rerouteOnNoApprover":{"type":"boolean","default":true,"description":"BL-154. **An approver on leave is an approval that waits for them to come back.** Reroutes to the next in the chain rather than stalling — `workforce` already knows who is on leave, and an approval queue nobody is watching is the thing that stops a venue.\n"},"outOfOfficeDelegateId":{"type":"string","format":"uuid","nullable":true},"allowEmailApproval":{"type":"boolean","default":false,"description":"**Approving from an email link with no second factor is the weakest path in the system**, so it is off by default and available only below a configured value.\n"},"reopenedFrom":{"type":"string","format":"uuid","nullable":true,"description":"**Reopening a decided approval creates a new one that points back.** Editing a decision in place destroys the record of what was originally approved, which is the only thing an audit wants.\n"},"status":{"$ref":"#/components/schemas/ApprovalStatus"},"subjectContract":{"type":"string"},"subjectType":{"type":"string"},"subjectId":{"type":"string"},"scopePath":{"type":"string"},"summary":{"type":"string"},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"justification":{"type":"string","nullable":true},"requestedByPrincipalId":{"type":"string","format":"uuid"},"matrixVersion":{"type":"integer"},"mode":{"$ref":"#/components/schemas/ApprovalMode"},"currentLevel":{"type":"integer"},"totalLevels":{"type":"integer"},"pendingApprovers":{"type":"array","items":{"type":"object","properties":{"principalId":{"type":"string","format":"uuid"},"displayName":{"type":"string"},"isDelegate":{"type":"boolean"}}}},"decisions":{"type":"array","description":"Every decision at every level, in order. **Immutable once the request completes** (11.1.56) — an approval is evidence, and amending one is a different fact.\n","items":{"$ref":"#/components/schemas/ApprovalDecision"}},"escalations":{"type":"array","description":"11.1.48. Who was asked, when, and why it moved up. **Escalation adds an approver rather than replacing one**, so the original stays in the record.\n","items":{"type":"object","properties":{"at":{"type":"string","format":"date-time"},"reason":{"type":"string"},"fromLevel":{"type":"integer"},"toLevel":{"type":"integer"},"wasAutomatic":{"type":"boolean"}}}},"resubmittedFromId":{"type":"string","nullable":true},"reopenedFromId":{"type":"string","nullable":true},"slaDueAt":{"type":"string","format":"date-time","nullable":true},"slaBreached":{"type":"boolean"},"expiresAt":{"type":"string","format":"date-time","nullable":true},"requestedAt":{"type":"string","format":"date-time"},"completedAt":{"type":"string","format":"date-time","nullable":true},"aiAssessment":{"type":"object","nullable":true,"readOnly":true,"description":"**AI context for the reviewer, never an input to the decision** (11.1.73 to 11.1.75; MoM 8 September; 29 September, build pass, group G2). Written by approvals from `ai.scoreApprovalRequest` on submit and on each SLA tick; null where AI is off or has not answered. Shown on the request labelled as AI; orders the inbox only when `sort=aiPriority` is asked for.","properties":{"riskScore":{"type":"integer","minimum":0,"maximum":100},"riskBand":{"type":"string","enum":["low","medium","high","critical"]},"priorityScore":{"type":"integer","minimum":0,"maximum":100},"escalationSuggestion":{"type":"object","description":"A suggestion a person may act on through `escalateApprovalRequest`, or the tenant's own SLA policy may; nothing escalates because of it.","properties":{"action":{"type":"string","enum":["escalate","addBackupApprover","none"]},"reason":{"type":"string","nullable":true}}},"signals":{"type":"array","maxItems":10,"description":"The signals behind the scores, largest first, as `ai.AiApprovalRequestScore.signals`.","items":{"type":"object","properties":{"code":{"type":"string"},"contribution":{"type":"number"},"detail":{"type":"string","nullable":true}}}},"scoreId":{"type":"string","format":"uuid","description":"The `ai.approval_request_score` row it was copied from; `ai.getApprovalRequestScore` gives the full context. Not a foreign key (the score lives in the AI service)."},"decisionRecordId":{"type":"string","description":"The ai decision record, for the audit of what the AI said and why."},"assessedAt":{"type":"string","format":"date-time"}}}}},
+"ApprovalRequest": {"type":"object","x-ticvai-persistence":"approvals.request","required":["id","kind","status","requestedByPrincipalId","requestedAt"],"properties":{"id":{"type":"string"},"kind":{"$ref":"#/components/schemas/ApprovalKind"},"rerouteOnNoApprover":{"type":"boolean","default":true,"description":"BL-154. **An approver on leave is an approval that waits for them to come back.** Reroutes to the next in the chain rather than stalling — `workforce` already knows who is on leave, and an approval queue nobody is watching is the thing that stops a venue.\n"},"outOfOfficeDelegateId":{"type":"string","format":"uuid","nullable":true},"allowEmailApproval":{"type":"boolean","default":false,"description":"**Approving from an email link with no second factor is the weakest path in the system**, so it is off by default and available only below a configured value.\n"},"reopenedFrom":{"type":"string","format":"uuid","nullable":true,"description":"**Reopening a decided approval creates a new one that points back.** Editing a decision in place destroys the record of what was originally approved, which is the only thing an audit wants.\n"},"status":{"$ref":"#/components/schemas/ApprovalStatus"},"subjectContract":{"type":"string"},"subjectType":{"type":"string"},"subjectId":{"type":"string"},"scopePath":{"type":"string"},"summary":{"type":"string"},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"justification":{"type":"string","nullable":true},"requestedByPrincipalId":{"type":"string","format":"uuid"},"matrixVersion":{"type":"integer"},"mode":{"$ref":"#/components/schemas/ApprovalMode"},"currentLevel":{"type":"integer"},"totalLevels":{"type":"integer"},"pendingApprovers":{"type":"array","items":{"type":"object","properties":{"principalId":{"type":"string","format":"uuid"},"displayName":{"type":"string"},"isDelegate":{"type":"boolean"}}}},"decisions":{"type":"array","description":"Every decision at every level, in order. **Immutable once the request completes** (11.1.56) — an approval is evidence, and amending one is a different fact.\n","items":{"$ref":"#/components/schemas/ApprovalDecision"}},"escalations":{"type":"array","description":"11.1.48. Who was asked, when, and why it moved up. **Escalation adds an approver rather than replacing one**, so the original stays in the record.\n","items":{"type":"object","properties":{"at":{"type":"string","format":"date-time"},"reason":{"type":"string"},"fromLevel":{"type":"integer"},"toLevel":{"type":"integer"},"wasAutomatic":{"type":"boolean"}}}},"resubmittedFromId":{"type":"string","nullable":true},"reopenedFromId":{"type":"string","nullable":true},"slaDueAt":{"type":"string","format":"date-time","nullable":true},"slaBreached":{"type":"boolean"},"expiresAt":{"type":"string","format":"date-time","nullable":true},"assignedToPrincipalId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"Who claimed or was assigned the request in a shared queue (`assignApprovalRequest`; DI-723; CHG-CSP-042). Null while it sits in the queue."},"assignedToDepartmentId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"The department queue it was assigned to, where it went to a department rather than a person (CHG-CSP-042)."},"assignedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true},"requestedAt":{"type":"string","format":"date-time"},"completedAt":{"type":"string","format":"date-time","nullable":true},"aiAssessment":{"type":"object","nullable":true,"readOnly":true,"description":"**AI context for the reviewer, never an input to the decision** (11.1.73 to 11.1.75; MoM 8 September; 29 September, build pass, group G2). Written by approvals from `ai.scoreApprovalRequest` on submit and on each SLA tick; null where AI is off or has not answered. Shown on the request labelled as AI; orders the inbox only when `sort=aiPriority` is asked for.","properties":{"riskScore":{"type":"integer","minimum":0,"maximum":100},"riskBand":{"type":"string","enum":["low","medium","high","critical"]},"priorityScore":{"type":"integer","minimum":0,"maximum":100},"escalationSuggestion":{"type":"object","description":"A suggestion a person may act on through `escalateApprovalRequest`, or the tenant's own SLA policy may; nothing escalates because of it.","properties":{"action":{"type":"string","enum":["escalate","addBackupApprover","none"]},"reason":{"type":"string","nullable":true}}},"signals":{"type":"array","maxItems":10,"description":"The signals behind the scores, largest first, as `ai.AiApprovalRequestScore.signals`.","items":{"type":"object","properties":{"code":{"type":"string"},"contribution":{"type":"number"},"detail":{"type":"string","nullable":true}}}},"scoreId":{"type":"string","format":"uuid","description":"The `ai.approval_request_score` row it was copied from; `ai.getApprovalRequestScore` gives the full context. Not a foreign key (the score lives in the AI service)."},"decisionRecordId":{"type":"string","description":"The ai decision record, for the audit of what the AI said and why."},"assessedAt":{"type":"string","format":"date-time"}}}}},
 "ApprovalSlaPolicy": {"type":"object","x-ticvai-persistence":"approvals.sla_policy","description":"Approvals boards 5.5 and 5.6. **A target with no consequence is a number in a table**, so the reminder and breach behaviour are part of the policy.\n","required":["code"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string"},"appliesToRequestKinds":{"type":"array","items":{"$ref":"#/components/schemas/ApprovalKind"}},"targetMinutes":{"type":"integer"},"businessHoursOnly":{"type":"boolean","default":true,"description":"**A four-hour SLA starting at five in the afternoon is breached by nine the next morning with nobody having done anything wrong.**\n"},"calendarId":{"type":"string","format":"uuid","nullable":true},"reminders":{"type":"array","items":{"type":"object","properties":{"atPercentOfTarget":{"type":"integer"},"notify":{"type":"string","enum":["approver","approverManager","requester","escalationGroup"]}}}},"firstReminderAtPercent":{"type":"integer","minimum":1,"maximum":100,"nullable":true,"description":"**Percent of `targetMinutes` at which the first reminder goes** (decided 29 September, readiness close-out: the reminder steps are percentages of target). A column so the SLA, Escalation, Reminder & Timeout Rules screen reads it rather than unpacking `reminders`; the reminder in `reminders` at this percentage says whom it notifies (data model for the agreed operations, 29 September)."},"secondReminderAtPercent":{"type":"integer","minimum":1,"maximum":100,"nullable":true,"description":"Percent of `targetMinutes` at which the second reminder goes; above `firstReminderAtPercent`"},"escalateAtPercent":{"type":"integer","minimum":1,"maximum":100,"nullable":true,"description":"Percent of `targetMinutes` at which the request or workflow escalates; at or above `secondReminderAtPercent`"},"onBreach":{"type":"string","enum":["notifyOnly","escalate","autoApprove","autoReject"],"default":"escalate"},"autoActionAllowed":{"type":"boolean","default":false,"description":"**Auto-approval on breach is off unless somebody says otherwise, in writing.** A queue that approves itself when nobody looks is not an approval process.\n"},"escalationGroupId":{"type":"string","format":"uuid","nullable":true},"scopePath":{"type":"string"}}},
 "ApprovalStatus": {"type":"string","enum":["draft","pending","escalated","returned","informationRequested","approved","rejected","withdrawn","expired","cancelled"]},
 "ApproverAvailability": {"type":"object","x-ticvai-persistence":"approvals.approver_availability","description":"Approvals boards 5.3 and 5.4. **Dated, so nobody has to remember to turn it off.**","properties":{"id":{"type":"string","format":"uuid","description":"One period of absence. The key `setApproverAvailability` replaces by; absent on input to record a new period. Already the table's key (`approvals.approver_availability.id`), and until 26 September missing from the wire, so no period could be addressed.\n"},"principalId":{"type":"string","format":"uuid"},"unavailableFrom":{"type":"string","format":"date-time"},"unavailableTo":{"type":"string","format":"date-time"},"substitutePrincipalId":{"type":"string","format":"uuid","nullable":true},"delegationId":{"type":"string","format":"uuid","nullable":true},"reason":{"type":"string","nullable":true},"appliesToRequestKinds":{"type":"array","items":{"$ref":"#/components/schemas/ApprovalKind"}},"scopePath":{"type":"string"}}},
-"DelegatedAccess": {"x-ticvai-persistence":"identity.delegated_access","type":"object","required":["id","permission","scopePath","effect"],"properties":{"id":{"type":"string","format":"uuid"},"principalId":{"type":"string","format":"uuid","nullable":true},"roleId":{"type":"string","format":"uuid","nullable":true},"permission":{"type":"string","description":"From the permission enum. `*` permitted on DENY only."},"subjectId":{"type":"string","format":"uuid","nullable":true,"description":"CF-132, CL-05. **A grant held by a guest rather than a staff principal.**\nSection 5.5 asks for portfolios — a primary holder assigning entitlements, transfer between linked accounts, shared wallets with individual tracking — and it appears ten times across ten sections. **Every one of those reduces to the same question: who may act on whose behalf, over what, and until when.**\n**That is a grant, not a household table.** A primary holder assigning an entitlement is a grant. A group leader holding tickets for twelve is a grant. A corporate account enrolling members is a grant with a quota. **A shared wallet with individual tracking is a grant over a balance, and the transaction log already records who spent.**\n**A household table would answer one of those four.**\n"},"overSubjectId":{"type":"string","format":"uuid","nullable":true,"description":"Whose behalf. **Null for a staff grant, which is the existing behaviour** — every grant written before 18 August means exactly what it meant before.\n"},"overObjectRef":{"type":"string","nullable":true,"description":"**Where the authority is over a thing rather than a scope** — a wallet, an entitlement, a booking. `scopePath` answers *where*; this answers *what*, and a guest's authority is almost always over a specific object rather than a branch of the tree.\n"},"delegationKind":{"type":"string","nullable":true,"enum":["primaryHolder","familyMember","groupLeader","attendee","corporateAdmin","corporateMember","carer"],"description":"**What kind of relationship this expresses**, for display and for reporting. The mechanism does not branch on it — a family member and a group attendee are the same grant with different words around them, which is the point.\n"},"quota":{"type":"integer","nullable":true,"description":"2.14.15 and 4.3.11. **How many the holder may assign.** A corporate account with fifty allocations and a family with four are the same structure with different numbers.\n"},"isRevocableBySubject":{"type":"boolean","default":true,"description":"**Whether the person it is over can end it.** A guest who linked a family member should be able to unlink them; a corporate member should not be able to revoke their employer's oversight — and **a delegation nobody can end is a delegation somebody will regret.**\n"},"scopePath":{"type":"string"},"effect":{"type":"string","enum":["ALLOW","DENY"]},"permissionId":{"type":"string","format":"uuid","nullable":true,"description":"**Taken from `identity.user_access`, 20 September, when that table was collapsed into this one.** `permission` above is free text; this names a row in `identity.permission`, the catalogue wired the same day. A grant that names a catalogue row can be checked against the keys the contracts actually enforce — which is the whole point of a catalogue that reported *154 on operations, 35 in roles.yaml, 0 shared*.\nNullable because a role grant carries no permission at all.\n"},"revokedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true,"description":"Taken from `identity.user_access`. This table recorded `revokedBy` and not when, so it could say who revoked a grant and not whether it was before or after the thing somebody is asking about.\n"},"validFrom":{"type":"string","format":"date-time","nullable":true},"validTo":{"type":"string","format":"date-time","nullable":true},"createdByPrincipalId":{"type":"string","format":"uuid"},"createdAt":{"type":"string","format":"date-time"}}},
 "Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}},
 "SlaEscalationBottleneckMonitorView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over approvals.workflow_instance, whose SLA and reminder timestamps it lists (data model for the agreed operations, 29 September)","description":"**What SLA, Escalation & Bottleneck Monitor displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"workflow":{"type":"string","description":"Workflow"},"instance":{"type":"string","description":"Instance"},"currentStep":{"type":"string","description":"Current Step"},"owner":{"type":"string","description":"Owner"},"started":{"type":"string","format":"date-time","description":"Started"},"target":{"type":"string","format":"date-time","description":"SLA deadline"},"timeRemaining":{"type":"integer","description":"Minutes until breach; negative once breached"},"risk":{"type":"string","description":"Risk"},"escalationLevel":{"type":"string","description":"Escalation Level"},"firstReminder":{"type":"string","format":"date-time","description":"First Reminder"},"secondReminder":{"type":"string","format":"date-time","description":"Second Reminder"},"managerEscalation":{"type":"string","format":"date-time","description":"Manager Escalation"},"executiveEscalation":{"type":"string","format":"date-time","description":"Executive Escalation"},"finalOutcome":{"type":"string","description":"Final Outcome"}},"required":["instance"]},
 "SlaEscalationBottleneckMonitorViewSummary": {"type":"object","x-ticvai-persistence":"none - aggregate computed at read time over the rows the page lists","description":"The KPI tiles shown above the list on this screen. Computed over the whole filtered set, not the current page (decided 29 September, readiness close-out).","properties":{"withinSla":{"type":"integer","description":"Within SLA"},"atRisk":{"type":"integer","description":"At Risk"},"breached":{"type":"integer","description":"Breached"},"escalated":{"type":"integer","description":"Escalated"},"averageProcessingTime":{"type":"integer","description":"Minutes"},"averageApprovalTime":{"type":"integer","description":"Minutes"},"longestWaitingStep":{"type":"string","description":"Longest Waiting Step"}}},

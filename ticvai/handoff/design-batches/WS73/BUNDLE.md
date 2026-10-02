@@ -1,6 +1,6 @@
 # WS73 — Waiver, Consent & Digital Form Management board 2
 
-**10 screens · 10 operations · 13 schemas · 3 permissions**
+**10 screens · 11 operations · 13 schemas · 3 permissions**
 
 Platform P13 Venue CMS · ships as **venue-management** ·
 staff audience · web ·
@@ -61,6 +61,42 @@ convincingly. It is never a caption.
   and its error; and, element by element, what is shown and in what format, what each action
   produces and where the user goes next. Draw exactly that.
 
+## The processes these screens belong to
+
+Written by the owner of each process (`handoff/design-notes/`). Read before any screen: it says how the process runs end to end and which words the screens must use.
+
+### Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers)
+
+Customer & marketing is how a venue knows its guests and talks to them. There is ONE guest profile per person across ticketing, F&B and retail, so a guest who books online and later dines is the same profile (DI-339). A profile needs at least an email or a mobile, never neither (DI-372). Profiles are created by registration, by guest checkout, or by staff at a till or desk. Repeat guest checkouts with the same verified email or phone attach to the same profile automatically (DI-941, R120 default). Two records that might be the same person are NEVER merged automatically: the guest is asked to confirm, and an admin review queue runs alongside (DI-377). Each candidate shows why it matched; the record that loses is superseded, not deleted; consent takes the narrower of the two positions (DI-808). Around the profile sit three things that must never be confused. CONSENT is what the law allows: per purpose and per channel, append-only, with the notice version and the source (recordConsent). It is Given, Withdrawn or Not asked. A SUBSCRIPTION is what the guest asked to receive, e.g. a newsletter list (MarketingSubscription). A PREFERENCE is what they like: table, dietary, accessibility (updateGuestPreferences). An anonymous visitor's cookie decision is recorded against a device key (recordDeviceConsent) and attaches to the guest when they sign in (claimDeviceConsent). Marketing consent at GUEST CHECKOUT is an open client question, and the design follows its default: an unticked opt-in beside the terms, one per channel and purpose. It is recorded with source "checkout" against the order and the verified contact, and nothing is sent without it. Whether that is sufficient consent under PDPL is the client DPO's call (M18-15 (audit R-M18-15), DI-954, DI-940). Marketing reads profiles through SEGMENTS (rules, evaluated when used) and static LISTS (imported). It reaches guests by CAMPAIGNS (one send to an audience) and JOURNEYS (automations started by an event, with waits and branches). Journeys may offer only pre-configured offers, never a free-typed discount (MoM 2026-08-20 4.6). Everything goes through ONE communications module that every other module uses (MoM 2026-08-31 4.6). Consent and suppression are applied at send time, and the number excluded, with the reasons, is reported before anything goes out (launchCampaign). Transactional messages (tickets, receipts, queue calls, case replies) do not need marketing consent and must never carry marketing. LOYALTY pays for spend: points, tiers, rewards and expiry. GAMIFICATION pays for behaviour: challenges, badges, streaks, referrals and leaderboards (createChallenge). A guest reads their own loyalty position (getLoyaltyPosition). A till, the back office or support reads a named guest's (getGuestLoyalty, or identifyGuest at a till). SERVICE: one Case object covers lost property, complaints, questions, accessibility and refund requests (CaseKind). A guest raises one with raiseMyCase, which needs the connection …
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Guest | The person the venue serves, signed in or not. In body copy on every surface. | Customer, User, Subject, Contact, Patron | contracts/satellite/marketing-crm.yaml#/components/schemas/GuestProfile |
+| Guest profile | The CRM record of one person (details, consent, preferences, history). Distinct from the Account, which is how a guest signs in. | Customer record, Contact, Subject | contracts/satellite/marketing-crm.yaml#getGuestProfile |
+| Consent - Given / Withdrawn / Not asked | What the law allows, per purpose (marketing, personalisation, profiling, third-party sharing, AI processing, transactional) and per channel. "Not asked" is not "Withdrawn" and must look different. | Opted in/out as a status, Accepted, Declined, Revoked, Unsubscribed (that is a subscription) | contracts/satellite/marketing-crm.yaml#/components/schemas/ConsentDecision |
+| Subscription | A list the guest asked to receive (a newsletter, event news), per channel. Unsubscribing from a list is not withdrawing consent. | Consent, Opt-in | contracts/satellite/marketing-crm.yaml#/components/schemas/MarketingSubscription |
+| Preferences | What the guest likes or needs (seating, drinks, dietary, accessibility, contact channel). Never grants permission. | Consents, Settings | contracts/satellite/marketing-crm.yaml#updateGuestPreferences |
+| Send me offers and news | The marketing opt-in label beside the terms at checkout, unticked, one per channel and purpose. | I agree to marketing, Pre-ticked boxes, Keep me updated ticked by default | DI-954 |
+| Points / Tier / Points to next tier / Expiring points | The loyalty position. Points are a liability earned per programme; tiers are ranked (Bronze, Silver, Gold, Platinum in the meetings). | Credits, Coins, Balance alone (wallet money is "credit"), Level | DI-382 |
+| Pending points | Points earned on a purchase still inside its refund window; shown apart from spendable points. | Available points for pending ones | contracts/satellite/marketing-crm.yaml#getLoyaltyPosition |
+| Reward | What points can be turned into (rewards catalogue). | Prize (games redemption uses prize), Voucher unless it is one | contracts/satellite/marketing-crm.yaml#listRewards |
+| Challenge / Badge / Streak / Referral | Gamification - rewards for behaviour, not spend. Status badges such as Explorer, Adventurer, Legend. | Mission and Quest used interchangeably on one screen, Loyalty tier for a badge | DI-392 |
+| Case | One service record - lost property, complaint, question, accessibility, refund request or other - with a number (venue prefix plus sequence), a status and an SLA. | Ticket (a ticket is an admission product), Issue, Incident (that is maintenance and safety) | contracts/satellite/marketing-crm.yaml#/components/schemas/CaseKind |
+| Reply to guest / Internal note | The two kinds of case message. The agent always chooses one explicitly; there is no default. | Comment, Message (ambiguous) | F05 step 2 |
+| Conversation | A live chat session (web chat, in-app, WhatsApp, SMS, email, kiosk, voice). With the assistant, then queued, then with an agent. It is not a case. | Ticket, Case (until one is raised from it) | contracts/satellite/marketing-crm.yaml#/components/schemas/ConversationState |
+| Segment / List / Audience | A segment is rules evaluated when used. A list is static, imported or hand-picked. The audience is what a campaign or journey targets. | Group, Cohort, Target list for a segment | DI-381 |
+| Campaign / Journey | A campaign is one send (one-off, scheduled, triggered or recurring) to an audience. A journey is an automation started by an event, with steps, waits and branches. | Flow (booking flows use it), Automation for a one-off send, Blast | R146 |
+| Offer | A pre-configured, system-validated discount or benefit that a campaign or journey references. It is never typed into the builder. | Discount field, Coupon (unless the offer is a coupon code) | MoM 2026-08-20 4.6 |
+| Reachable | How many guests in an audience can actually be sent to on a channel after consent and suppression. Always shown beside the matching count. | Audience size alone | contracts/satellite/marketing-crm.yaml#previewSegment |
+| Possible duplicate / Merge | Two profiles that may be one person. Never called "Duplicate" as a verdict. Merging needs confirmation and stays reversible for 30 days. | Duplicate (as a status), Combine, Auto-merge | DI-808 |
+| Data request | A guest's privacy request - a copy of my data, a correction, erasure, a restriction - with a legal clock. Statuses submitted, in progress, completed. | DSAR on guest screens, Subject data, Ticket | DI-379 |
+| Waiver / Consent question | A waiver is a signed, versioned form. A consent question ("Are you able to swim?", "I accept the risk") is a single question asked per person or per booking and recorded as consent. | Contract, Disclaimer, Form for a waiver in guest copy | DI-1062 |
+| Lost item / Found item / Possible match | The two directions of lost property and the suggested pairing between them. | Lost case, Claim before it is claimed | contracts/satellite/marketing-crm.yaml#/components/schemas/LostItem |
+| Wishlist | Products and dates a guest saved to buy later, including F&B and retail to buy on site. | Favourites (used for transport routes), Saved for later on one surface and Wishlist on another | DI-202 |
+| Notification / Message | A notification is an item in the guest's in-app feed. A message is one send on a channel (email, SMS, WhatsApp, push, in-app). | Alert for marketing content, Inbox for the guest feed | contracts/satellite/marketing-crm.yaml#/components/schemas/GuestNotification |
+| Template | A reusable message body per channel and language with merge fields. Transactional and marketing templates are separate kinds. | Layout, Design | contracts/satellite/marketing-crm.yaml#createMessageTemplate |
+
+
 ## The screens
 
 Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs count fields; requirements are matrix rows; meeting inputs are the ones naming the screen (the module and platform ones are below); white label says whether the tenant's brand reaches it (guest) or it sets the brand (configures).
@@ -71,7 +107,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `CMS-052` | Participant Waiver Status & Tracking | B–D | 2 | 24 | 6 | 0 | 1 | 4 | — | notStarted (generated) |
 | `CMS-053` | Digital Signing & Collection Operations | B–D | 0 | 14 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
 | `CMS-054` | Minor, Guardian & Group Consent Management | B–D | 0 | 12 | 6 | 0 | 1 | 4 | — | notStarted (generated) |
-| `CMS-055` | Waiver Verification & Validation Workspace | B–D | 0 | 20 | 6 | 0 | 1 | 4 | — | notStarted (generated) |
+| `CMS-055` | Waiver Verification & Validation Workspace | B–D | 0 | 40 | 6 | 0 | 1 | 4 | — | notStarted (generated) |
 | `CMS-056` | Missing, Expired & Invalid Waiver Management | B–D | 0 | 20 | 6 | 0 | 2 | 4 | — | notStarted (generated) |
 | `CMS-057` | On-Site Waiver & Exception Handling | B–D | 7 | 0 | 5 | 0 | 0 | 4 | — | notStarted (generated) |
 | `CMS-058` | Compliance Evidence, Audit & Waiver Repository | B–D | 2 | 0 | 6 | 0 | 0 | 4 | — | notStarted (generated) |
@@ -80,7 +116,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 ## Thin screens in this batch
 
-**CMS-055, CMS-056, CMS-058, CMS-060 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**CMS-056, CMS-058, CMS-060 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ---
 
@@ -103,6 +139,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/policy/waiver-operations-command-center-cms-051` |
+
+**From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** Waiver completion across upcoming and active activities for operations, customer service, compliance and venue teams: required, completed, pending, partial, expiring, invalid, rejected, guardian pending, upcoming participants missing a waiver, access blocked, manual exceptions, completion rate.
 
 #### Inputs: what the user enters or picks
 
@@ -215,6 +253,24 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed |
 
+#### Consistency with other screens
+
+- Match `BO-844`: Same object.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+kpis:
+  required: 340
+  completed: 291
+  pending: 37
+  guardianPending: 9
+  accessBlockedToday: 4
+  completion: 86%
+```
+
 #### Permissions
 
 - `listWaiver` → `GUEST_VIEW` (read) · staff
@@ -286,6 +342,8 @@ Also apply: 8 for all of P13, 29 for every app (section *Design inputs from the 
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/policy/participant-waiver-status-tracking-cms-052` |
+
+**From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** For each participant on a booking, every waiver they need and its status, with delivery channel (email, WhatsApp, SMS) and minor or guardian handling. PII-permissioned.
 
 #### Inputs: what the user enters or picks
 
@@ -369,6 +427,14 @@ Also apply: 8 for all of P13, 29 for every app (section *Design inputs from the 
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+row: ORD-55821 - Layla Haddad (9) - Water activity v3 - guardian pending - link sent WhatsApp 1 Oct
+```
+
 #### Permissions
 
 - `listParticipantWaiverStatus` → `GUEST_VIEW_PII` (operate) · staff
@@ -430,7 +496,13 @@ Also apply: 8 for all of P13, 29 for every app (section *Design inputs from the 
 | Opens with | nothing: it opens on its own |
 | Route | `/policy/digital-signing-collection-operations-cms-053` |
 
-**Known gaps.** **The pack names 5 actions on this screen and the screen declares 1 operation.** Unserved: Email Link, SMS Link, WhatsApp where integrated, POS, Staff-Assisted Device. Each needs an operation, or …
+**Known gaps.** **The pack names 5 actions on this screen and the screen declares 1 operation.** Unserved: Email Link, SMS Link, WhatsApp where integrated, POS, Staff-Assisted Device. Each needs an operation, or … Contract gap recorded 2 October 2026 (CHG-WIR-007): No operation sends or resends a waiver signing link (email, SMS, WhatsApp, QR).
+
+**From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** How waiver links go out and come back: by method (email, SMS, WhatsApp, POS, staff-assisted device) and by stage of signing. These are transactional messages.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **Delivery methods are buttons, but no operation sends a link.** Why: Sending or resending a waiver link has no operation. *(source: contracts/satellite/marketing-crm.yaml#listDigitalSigningCollection; Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers))*
 
 #### Inputs: what the user enters or picks
 
@@ -504,6 +576,18 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+funnel:
+  sent: 120
+  opened: 96
+  started: 80
+  signed: 71
+```
+
 #### Permissions
 
 - `listDigitalSigningCollection` → `GUEST_VIEW` (read) · staff
@@ -542,6 +626,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `CMS-051`.
 - [ ] Every gated control is gated: `GUEST_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -562,7 +647,15 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | nothing: it opens on its own |
 | Route | `/policy/minor-guardian-group-consent-management-cms-054` |
 
+**What the spec says about it.** **Minors (decided by Chinmay, 2 October 2026; DEC-237, superseding the GST-069 default):** a child is enrolled or consents through a guardian on the venue's consent form; the minor age is set per country (`RegionSettings.minorAgeThreshold`) and the venue can switch minors off (`VenueSettings.biometrics.allowMinors`); the guardian links this screen sends go to that form (DEC-549) (CHG-SGU-004).
+
 **Known gaps.** **The pack names 3 actions on this screen and the screen declares 1 operation.** Unserved: Send Guardian Links, Notify Group Leader, Export Missing List. Each needs an operation, or needs removing …
+
+**From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** Minors and groups: each minor's guardians and what each may do, and the group they travel with (camps, academies, schools, family attractions). Missing guardian consents are chased.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **Send Guardian Links, Notify Group Leader and Export Missing List have no operation.** Why: Read-only; the chasing actions cannot run. *(source: contracts/satellite/marketing-crm.yaml#listMinorGuardianGroup; Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers))*
 
 #### Inputs: what the user enters or picks
 
@@ -632,6 +725,14 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+row: Saeed Al Suwaidi (6) - guardian Khalid Al Suwaidi (may book, sign) - Al Noor school trip - consent pending
+```
+
 #### Permissions
 
 - `listMinorGuardianGroup` → `GUEST_VIEW_PII` (operate) · staff
@@ -673,6 +774,7 @@ Also apply: 8 for all of P13, 29 for every app (section *Design inputs from the 
 - [ ] Every transition is wired: `CMS-051`.
 - [ ] Every gated control is gated: `GUEST_VIEW_PII`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -686,14 +788,28 @@ Also apply: 8 for all of P13, 29 for every app (section *Design inputs from the 
 | App · platform | TICVAI Venue Management · P13 Venue CMS (web) |
 | Module | Policy · wave 3 · needs the `core` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `GUEST_MANAGE` (1 configure); in the flows as venue manager |
+| Who uses it | venue staff holding `GUEST_MANAGE`, `GUEST_VIEW_PII` (1 configure, 1 operate); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area, with a live preview of … · LTR and RTL · light theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Display) and no metric row |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/policy/waiver-verification-validation-workspace-cms-055` |
 
+**From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** Staff review submissions that need verification (ID, guardian authority, signature validity). Verified is refused while an automatic check fails or no signature is present; every decision records who and why.
+
+**Fixed on main** (the package already carries these; draw what it says): The list is bound to setWaiverVerificationValidation (a write). (CHG-WIR-005).
+
 #### Inputs: what the user enters or picks
+
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Status | select | — | Automatically validated · Pending manual verification · Verified · Correction required · Rejected · Escalated | `listWaiverVerificationQueue` ?status |
+| Risk | segmented control | — | Low · Medium · High | `listWaiverVerificationQueue` ?risk |
+| Form | picker: choose a form | — | — | `listWaiverVerificationQueue` ?formId |
+| Performance | picker: choose a performance | — | — | `listWaiverVerificationQueue` ?performanceId |
+| Order | picker: choose an order | — | — | `listWaiverVerificationQueue` ?orderId |
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
 
@@ -716,6 +832,31 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Risk | chip: Low, Medium, High | — |
 | Status | chip: Automatically validated, Pending manual verification, Verified, Correction … | — |
 
+**Submissions to verify** (data table, from `listWaiverVerificationQueue`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| Submission | the name it points at, never the id | — |
+| Requirement | the name it points at, never the id | — |
+| Participant | grouped details | — |
+| Subject | the name it points at, never the id | — |
+| Name | text | — |
+| Age | 1,234 | — |
+| Waiver | grouped details | — |
+| Form | the name it points at, never the id | — |
+| Name | text | — |
+| Booking | the name it points at, never the id | — |
+| Signatory | grouped details | — |
+| Subject | the name it points at, never the id | — |
+| Name | text | — |
+| Signatory type | chip: Participant, Guardian, Organisation representative | — |
+| Submitted | 1 Oct 2026, 14:30 | `FormSubmission.submittedAt`, the device time of signing. |
+| Verification reason | chip: Configured manual review, Automatic check failed, Minor signed as adult, Guardian … | — |
+| Risk | chip: Low, Medium, High | — |
+| Status | chip: Automatically validated, Pending manual verification, Verified, Correction … | — |
+| Checks | grouped details | Each check the form's configuration applies; null when it does not apply. The first seven are evaluated by the server, the last three … |
+
 **The selected waiver verification validation** (detail panel): The pack groups this record's detail under its own headings: “Reviewer Actions”, “Human Governance”.
 
 | Shows | Format | Notes |
@@ -737,6 +878,8 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |---|---|---|---|---|---|
 | Save changes (primary button) | navigation or local | — | — | — | — |
 
+**Data it reads**: `listWaiverVerificationQueue` (onLoad, Waiver submissions awaiting or given verification)
+
 **Where the user goes next**
 
 - → `CMS-051` Waiver Operations Command Center: *Returns to the board's landing screen*; calls `setWaiverVerificationValidation`
@@ -753,9 +896,18 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 Idempotency conflict or optimistic concurrency failure. Two causes, so two types.; 422 `verified` while an automatic check fails or no signature is present (`checksFailing`), or a required `note` or `escalatedTo` is missing (`reasonRequired`). |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+submission: SUB-88412 - guardian authority unverified - reviewer Hana Yousef - rejected (relationship not on file)
+```
+
 #### Permissions
 
 - `setWaiverVerificationValidation` → `GUEST_MANAGE` (configure) · staff
+- `listWaiverVerificationQueue` → `GUEST_VIEW_PII` (operate) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -787,12 +939,12 @@ Also apply: 8 for all of P13, 29 for every app (section *Design inputs from the 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (400, 404, 409, 422).
-- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (400, 403, 404, 409, 422).
+- [ ] Every output is drawn (40 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#CMS-055?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save changes.
 - [ ] Every transition is wired: `CMS-051`.
-- [ ] Every gated control is gated: `GUEST_MANAGE`.
+- [ ] Every gated control is gated: `GUEST_MANAGE`, `GUEST_VIEW_PII`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -813,6 +965,8 @@ Also apply: 8 for all of P13, 29 for every app (section *Design inputs from the 
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/policy/missing-expired-invalid-waiver-management-cms-056` |
+
+**From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** The exception queue of waiver requirements standing between a participant and a ready visit (missing, expired, invalid, wrong version) for activities not yet ended, soonest first.
 
 #### Inputs: what the user enters or picks
 
@@ -883,6 +1037,14 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+row: Deep Dive 14:00 today - Omar Haddad - waiver v2 signed, v3 required - re-sign needed
+```
+
 #### Permissions
 
 - `listMissingExpiredInvalid` → `GUEST_VIEW_PII` (operate) · staff
@@ -945,6 +1107,14 @@ Also apply: 8 for all of P13, 29 for every app (section *Design inputs from the 
 | Opens with | nothing: it opens on its own |
 | Route | `/policy/on-site-waiver-exception-handling-cms-057` |
 
+**Known gaps.** Contract gap recorded 2 October 2026 (CHG-WIR-007): No write records an on-site waiver exception with its reason.
+
+**From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** Guests arriving without a completed waiver: look them up by ticket, QR, booking or name and resolve on site (send a mobile link, show a QR, complete on a kiosk or staff tablet, contact the guardian, re-sign an updated version, or request a supervisor exception).
+
+**Known correction pending (do not draw the wrong version)**
+
+- **The resolution options are select fields and only a lookup read is declared.** Why: They are actions; the supervisor exception needs a write with reason. *(source: contracts/satellite/marketing-crm.yaml#listSiteWaiverException; Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers))*
+
 #### Inputs: what the user enters or picks
 
 **On the screen**
@@ -990,6 +1160,14 @@ Also apply: 8 for all of P13, 29 for every app (section *Design inputs from the 
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+lookup: Ticket TK-3381 - Layla Haddad (9) - guardian not present - Contact guardian by WhatsApp
+```
+
 #### Permissions
 
 - `listSiteWaiverException` → `GUEST_VIEW_PII` (operate) · staff
@@ -1029,6 +1207,7 @@ Also apply: 8 for all of P13, 29 for every app (section *Design inputs from the 
 - [ ] Every transition is wired: `CMS-051`.
 - [ ] Every gated control is gated: `GUEST_VIEW_PII`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -1050,6 +1229,8 @@ Also apply: 8 for all of P13, 29 for every app (section *Design inputs from the 
 | Route | `/policy/compliance-evidence-audit-waiver-repository-cms-058` |
 
 **Known gaps.** **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+**From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** The evidentiary record of every waiver signed: what was presented, answered, acknowledged and signed, by whom, on what device and channel, the content hash, and what happened afterwards. The exact version text signed is always retrievable.
 
 #### Inputs: what the user enters or picks
 
@@ -1094,6 +1275,18 @@ Also apply: 8 for all of P13, 29 for every app (section *Design inputs from the 
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed |
+
+#### Consistency with other screens
+
+- Match `BO-853`: Same repository.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+evidence: Water activity v3 - Fatima Al Mansoori - signed 26 Sep 2026 10:12 GST - kiosk 4 - hash 9f2c...e1
+```
 
 #### Permissions
 
@@ -1155,6 +1348,8 @@ Also apply: 8 for all of P13, 29 for every app (section *Design inputs from the 
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/policy/waiver-analytics-compliance-operational-insights-cms-059` |
+
+**From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** Waiver completion and the signing funnel, where people abandon, which reminder timing works, and the on-site workload waivers cause.
 
 #### Inputs: what the user enters or picks
 
@@ -1239,6 +1434,14 @@ Also apply: 8 for all of P13, 29 for every app (section *Design inputs from the 
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+insight: Reminder at T-24h converts 3x better than T-7d; 18% of on-site desk time is waiver completion
+```
+
 #### Permissions
 
 - `listWaiverComplianceOperational` → `GUEST_VIEW` (read) · staff
@@ -1300,6 +1503,8 @@ Also apply: 8 for all of P13, 29 for every app (section *Design inputs from the 
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** AI across the waiver lifecycle: configuration risks (products without a waiver, versions missing Arabic), operational risks (tomorrow's activities with low completion), with recommendations a person acts on.
+
 #### Inputs: what the user enters or picks
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
@@ -1332,6 +1537,14 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+risk: Tomorrow's Deep Dive 10:00 - 40% completion forecast - recommend extra reminder at 18:00 (AI)
+```
 
 #### Permissions
 
@@ -1466,6 +1679,7 @@ Method, path, parameters, request and response for every operation these screens
 "listWaiver": {"method":"GET","path":"/waiver","contract":"marketing-crm","summary":"Waiver Operations Command Center","permission":"GUEST_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":"brandId","in":"query","required":false},{"name":"venueId","in":"query","required":false},{"name":"eventId","in":"query","required":false},{"name":"productId","in":"query","required":false},{"name":"formId","in":"query","required":false},{"name":"from","in":"query","required":false},{"name":"to","in":"query","required":false},{"name":"status","in":"query","required":false},{"name":"participantType","in":"query","required":false},{"name":"bookingChannel","in":"query","required":false},{"name":"breakdownBy","in":"query","required":false}],"requestBody":null,"responds":"WaiverOperationsCommandCenterView"},
 "listWaiverComplianceOperational": {"method":"GET","path":"/waiver-compliance-operational","contract":"marketing-crm","summary":"Waiver Analytics, Compliance & Operational Insights","permission":"GUEST_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":"formId","in":"query","required":false},{"name":"formVersion","in":"query","required":false},{"name":"productId","in":"query","required":false},{"name":"eventId","in":"query","required":false},{"name":"venueId","in":"query","required":false},{"name":"customerType","in":"query","required":false},{"name":"participantType","in":"query","required":false},{"name":"channel","in":"query","required":false},{"name":"language","in":"query","required":false},{"name":"groupBookingId","in":"query","required":false},{"name":"from","in":"query","required":false},{"name":"to","in":"query","required":false}],"requestBody":null,"responds":"WaiverAnalyticsComplianceOperationalInsightsView"},
 "listWaiverComplianceRisk": {"method":"GET","path":"/waiver-compliance-risk","contract":"marketing-crm","summary":"AI Waiver Compliance & Risk Intelligence Center","permission":"GUEST_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":"venueId","in":"query","required":false},{"name":"forecastDate","in":"query","required":false},{"name":"category","in":"query","required":false}],"requestBody":null,"responds":"AiWaiverComplianceRiskIntelligenceCenterView"},
+"listWaiverVerificationQueue": {"method":"GET","path":"/waiver-verification-validation","contract":"marketing-crm","summary":"The waiver submissions awaiting or given verification","permission":"GUEST_VIEW_PII","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"status","in":"query","required":false},{"name":"risk","in":"query","required":false},{"name":"formId","in":"query","required":false},{"name":"performanceId","in":"query","required":false},{"name":"orderId","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "setWaiverVerificationValidation": {"method":"PUT","path":"/waiver-verification-validation","contract":"marketing-crm","summary":"Record a reviewer's verification decision on a waiver submission","permission":"GUEST_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"WaiverVerificationValidationWorkspaceInput","responds":"WaiverVerificationValidationWorkspaceView"}
 }
 ```

@@ -1,6 +1,6 @@
 # WS82 — Game and Ride board 5
 
-**10 screens · 8 operations · 16 schemas · 4 permissions**
+**10 screens · 7 operations · 14 schemas · 4 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -61,6 +61,70 @@ convincingly. It is never a caption.
   and its error; and, element by element, what is shown and in what format, what each action
   produces and where the user goes next. Draw exactly that.
 
+## The processes these screens belong to
+
+Written by the owner of each process (`handoff/design-notes/`). Read before any screen: it says how the process runs end to end and which words the screens must use.
+
+### Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue)
+
+Venue operations is everything that happens after a sale and inside the gates. A guest's ticket is one virtual ticket with interchangeable media (QR, dynamic QR, RFID wristband, NFC, Face Pass or Face Tag); at an access point a scanner (P07, or the scan function inside the Staff App P06) validates the media against the admission profile and the guest admission policy, offline if it must, and every deny carries a reason and a next action. The back office (Venue Management P08) configures that estate: the venue topology (venue, park, zone, attraction, access point, gate and lane, device placement), admission profiles and rules (entry, exit, re-entry, anti-passback, validity, crossover, companions), credential security (dynamic QR, device binding, beacons), biometrics, gate modes, and the live operations, fraud and monitoring views. Accreditation (P08 setup and review, P11 web portal for applicants, web first) takes an applicant from a configurable form through document checks, OCR, duplicate blocking and multi-level approval to a credential with zone rights. Resources and capacity manage bookable resources (rooms, vehicles, equipment, cabanas, instructors) that are booked as a consequence of selling a product, never sold directly. Workforce covers shift templates, rosters, attendance, swaps and breaks, mirrored on the Staff App. Maintenance and safety cover the asset register, preventive calendars, work orders with scored priority, inspections and incidents, with technicians working from the Staff App. Games and rides configure readers, credit types and consumption priority, play entitlements, game pricing, retry pricing, redemption and the card lifecycle. The virtual queue (Q1) gives a guest a live wait time and a return window for a ride; it is not the on-sale waiting room (Q2). Every calendar has day, week and month views. Configuration resolves tenant, region, venue (outlet only for F&B and retail), and a user's permissions, never the device, decide what they may do. The guest apps (P01, P02) show the guest's side of this: My Tickets, the scan code, Face Pass, wait times, the virtual queue, map booking of cabanas and the visit planner.
+*(source: F06 step 1 / F112 step 1 / F111 step 1 / ADR-0002 / ADR-0012 / ADR-0018 / ADR-0041 / ADR-0066 / ADR-0067 / ADR-0068 / DI-652 / DI-627 / DI-640 / DI-654 / DI-666 / DI-482 / DI-483 / DI-907 / DI-919 / DI-923 / DI-865 / DI-678 / TRACKER Actions row 160 / MoM 2026-09-02 AccessControl / MoM 2026-09-07 …)*
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Ticket | The one virtual record a guest owns (ticket number, product, validity, entries). Its number never changes, whatever media carries it or whoever it is transferred or resold to. | Pass (unless the product is a pass), Booking, Order line | DI-652 / DI-620 / contracts/spine/access.yaml#/components/schemas/TicketStatus |
+| Media | What the ticket is presented by at a gate (QR code, dynamic QR, wristband/RFID card, NFC, Face Pass, Face Tag). One ticket can carry several media as fallbacks; a media code can also cover several tickets scanned as one group. Show one … | Credential (for guest media; keep Credential for accreditation badges and staff), Ticket code | DI-180 / DI-608 / DI-652 |
+| Access point | A place where a scan is judged, with a fixed direction (entry, exit, re-entry, crossover). Hierarchy shown to users is Venue > Park > Zone > Attraction > Access point > Gate/lane > Device. | Scanner (that is the device), Door | screens/P08-venue-back-office.yaml#BO-144 / … |
+| Admission profile | The named set of rules an access point enforces (opening window, entries, exit scan, re-entry, validity, crossover). Products point at a profile; tiers such as Bronze/Silver/Gold are profiles with gate allow and deny lists. | Admission rules (as a screen title), Access rule set | DI-185 / contracts/spine/access.yaml#/components/schemas/AdmissionRules |
+| Admitted / Denied / Overridden | The three scan outcomes. A denial is always shown with its reason in plain words and a next action; an override is a supervisor admitting despite a denial, and is always attributed and reasoned. | Valid/Invalid, Success/Fail, Error | contracts/spine/access.yaml#/components/schemas/ScanOutcome / … |
+| Used | A ticket entry is used the moment a scan succeeds, whether or not the guest physically passed. Mistakes are resolved from the scan history, not by un-scanning. | Redeemed (for admission), Checked in (that is group check-in, a different step) | DI-627 / TRACKER Actions row 221 / TRACKER Actions row 189 |
+| Gate mode | What a lane is doing now, set live by the podium or supervisor - Normal, Free flow (counts, does not validate), Drop arm (everybody through, evacuation), Closed (nobody through), Podium (staff validating by eye), Maintenance. Direction is … | Turnstile mode (as a label for direction), Open/Locked | contracts/spine/access.yaml#/components/schemas/AccessPointOperatingMode / R221 |
+| Offline package | What a scanner holds to validate with no network - entitlements, blacklist, admission profiles and the active guest admission policy version - with its age always visible. | Cache, Local DB | F06 step 3 / ADR-0068 |
+| Sync and reconciliation | Sending the offline scan journal to the server, and the duty manager's review of scans the server rejected after the device had already admitted the guest. | Upload, Retry | F06 step 6 / DI-065 |
+| Face Pass / Face Tag | Face Pass is the long-lived face credential for members and season-pass holders (renewable); Face Tag is short-lived, for one day or event. Retention is set per tier by the venue. | Face ID, Biometric login | DI-640 / ADR-0063 |
+| Accreditation / Credential (accreditation) | Accreditation is the application and approval of a person (media, contractor, corporate, staff of a partner) for an event or season; the credential is what is issued after approval (photo badge, QR or RFID) with zone access rights. | Registration (for the whole process), Ticket | DI-654 / DI-662 |
+| Resource | A bookable thing or person a product needs (room, vehicle, cabana, equipment set, instructor). Guests buy products; resources are assigned to the booking, pre-assigned or dynamically. | Asset (that is maintenance), Inventory (that is stock) | DI-475 / DI-482 / TRACKER Actions row 160 |
+| Asset | A physical item maintained by the venue (ride, turnstile, printer, pump) with a register record, documents, warranty and maintenance history. | Resource, Device (unless it is an IT device in the device register) | DI-910 / ADR-0067 |
+| Work order | A unit of maintenance work, lifecycle Created > Assigned > In progress > Review > Closed, with a resolution timer. | Ticket (reserved for guest tickets), Job card | DI-231 |
+| Game / attraction (games module) | In the games and rides module an attraction is an individual game or ride (roller coaster, racing game, bumper cars), not a venue. | Venue, Park | DI-863 |
+| Virtual queue / Return window | A guest's place in a ride's queue held without standing in line, with a return window (for example 4:50 to 5:00 PM) that recalculates live. Distinct from the walk-in line and the VIP/express lane, and from the on-sale waiting room. | Waiting room, Fast pass (that is the express product), Booking | DI-675 / DI-678 / DI-679 / ADR-0066 |
+| Wait time source | Where a ride's wait time comes from - Sensor, Throughput, Manual, or Unavailable - always shown beside the number. | Live (when the source is manual) | contracts/satellite/queue.yaml#/components/schemas/WaitTimeSource / DI-315 |
+
+### Ticketing & Guest Commerce, as the venue and TICVAI configure and run it
+
+WHAT THE PROCESS IS. Everything a guest can buy is set up, priced, promoted and serviced here, on Venue Management (P08, the venue's own back office, served inside the venue's cell) and on the TICVAI Console (P09, TICVAI's control plane, outside every cell). End to end: (1) CATALOGUE. A product has one of twelve kinds (admission, timedAdmission, datedAdmission, openDated, seated, membership, bundle, fnb, retail, rental, addOn, giftCard). Its ticket types (adult, child, senior, resident...) are not typed one by one: they are generated from the product's attributes (components) and each value combination becomes a sellable ticket type with no extra setup (DI-164). What a ticket grants (validity, entries, re-entry, days of week, blackout dates, expiry anchor, fast track, transfer) lives on a reusable entitlement template, not on the product. Who may take part (age, height, supervision, certification) is the eligibility rule; what the guest must answer is the data mask and the consent questions; how the guest sees it is guestListing (bookable, infoOnly, hidden), display tags (at most six), media and the booking flow. Group, family and corporate products and every after-sales policy (reschedule, exchange, refund, cancellation, upgrade, transfer) are configured inside the one product configuration, never on separate screens (DI-465, DI-466). (2) LIFECYCLE AND PUBLICATION. A product moves draft, inReview, approved, live, withdrawn, archived. Approval and publication are two acts with two permissions (PRODUCT_APPROVE, PRODUCT_PUBLISH, R091); every product is authorised before it sells online or on site (DI-438). Approved is still not on a till: a till sells only what is in the signed catalogue release it pulled (publishBundle, ADR-0013), so a saved price is a back-office fact until the venue publishes to tills. Changing something that has sold is preceded by an impact check (assessProductChange: orders affected, entitlements issued, future performances, open carts); restoring a version creates a new version, and sold tickets keep the price and terms they were sold under (restoreProductVersion, DI-938, TRACKER Actions row 145). (3) PRICE. Prices live in price lists: per venue, per channel set, with validity dates and a priority, copied for the next season with an uplift (copyPriceList) and repriced in bulk only after a dry run (bulkChangePrices). Currency and decimal scale are never chosen on a form: they resolve from the venue's region (ADR-0008, ADR-0018; AED 2 places, OMR and BHD 3). When several rules apply, the configured hierarchy decides; there is no "lowest price wins" default (DI-595). Tax on the pre-discount price and three-decimal rounding are regional settings (DI-598). Dynamic rules always show their minimum and maximum price guardrails beside the trigger (getDynamicPriceRule). (4) PROMOTE AND BUNDLE. A promotion is a rule (automatic, or gated by a code) created in draft, made live only by Publish, which first analyses stacking; a …
+*(source: DI-164; DI-171; DI-438; DI-465; DI-466; DI-595; DI-598; DI-387; DI-039; DI-044; DI-474; DI-671; DI-987; DI-019; DI-080; ADR-0008; ADR-0013; ADR-0018; ADR-0019; ADR-0030; R091; R098; R101; R222; REV3-21; contracts/spine/catalogue.yaml#transitionProductLifecycle …)*
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Product | Anything sellable, of one of the twelve kinds. The record that carries names, channels, listing, media and policies. | Item (except on F&B and retail screens), SKU (for tickets), Offering | contracts/spine/catalogue.yaml#/components/schemas/ProductKind |
+| Ticket type | One sellable variant of an admission or event product (Adult, Child, Resident Adult), generated from the product's attributes. For retail and F&B the same record is labelled Variant. | Variant (on ticket screens), Sub-product, Rate (that is a price), Axis value | contracts/spine/catalogue.yaml#updateProductVariant / DI-164 / DI-437 |
+| Attribute | A dimension that generates ticket types (Guest category, Residency, Tier, Length). Each has values; adding a value adds ticket types. | Axis, Component (the client's word; use it only in help text), Option | contracts/spine/catalogue.yaml#setProductAttributes / DI-164 / DI-450 |
+| Entitlement | What a ticket lets the holder do (validity, entries, re-entry, days, blackout dates, expiry, fast track, transfer), defined once on an entitlement template and shared by several products. | Access rights, Ticket rules, Validity profile | contracts/spine/catalogue.yaml#createEntitlementTemplate / DI-171 / DI-451 |
+| Eligibility rule | Who may take part in or buy a product (age, height, supervision, waiver, certification). Distinct from a promotion's eligibility, which decides who gets a discount. | Restriction, Access rule (that is access control) | contracts/spine/catalogue.yaml#setProductEligibilityRule / DI-463 |
+| Price list | A set of prices for one venue and a set of channels, valid between two dates, with a priority. Several coexist (B2C, B2B, season). | Price book, Rate card, Tariff | contracts/spine/catalogue.yaml#createPriceList / DI-140 / DI-163 |
+| Price category | A standard rate type (Adult, Child, Member) reused across lists so venues do not invent "Adult Standard" and "Normal Adult". | Price band (that is a seat-category band), Fare type (transport) | contracts/spine/catalogue.yaml#setPriceCategoryRateType / … |
+| Price band | A priced band on a seat category (code, label, colour, amount, channel, from-date). | Price category, Zone price | contracts/satellite/seating.yaml#/components/schemas/SeatPriceBand |
+| Promotion | A rule that changes a price automatically or when a code is entered; draft until published; declares how it stacks. | Offer (except in guest copy), Deal, Discount rule | contracts/satellite/promotions.yaml#createPromotion / DI-173 / DI-174 |
+| Coupon code | A code issued from a coupon campaign that applies a promotion-style discount; one shared code or many single-use codes. | Voucher, Promo voucher | contracts/satellite/promotions.yaml#createCouponCampaign / DI-173 |
+| Voucher | A code that carries money (face value, balance), sold or issued; a liability until redeemed or expired. | Coupon, Credit note | contracts/satellite/promotions.yaml#listVoucherBatches / … |
+| Bundle | A product sold as one line whose price differs from the sum of its components, with a mandatory revenue allocation. "Package" is acceptable in guest copy. | Combo (that is an F&B meal deal), Catalogue bundle | contracts/satellite/promotions.yaml#createBundle / DI-220 / ADR-0019 |
+| Catalogue release | The signed snapshot of a venue's catalogue, prices, promotions and sale boards that tills, kiosks and devices pull. Its action label is "Publish to tills". | Bundle, Catalogue bundle, Sync, Deploy | contracts/spine/catalogue.yaml#publishBundle / … |
+| Approve / Publish / Save | Save keeps a draft; Approve records that it is authorised (PRODUCT_APPROVE); Publish makes it live for guests and channels (PRODUCT_PUBLISH). Three different buttons, never merged. | Submit, Go live, Activate (except CatalogueConfigStatus active), Deploy | R091 / contracts/spine/catalogue.yaml#transitionProductLifecycle / DI-438 |
+| Product states | Draft, In review, Approved, Live, Withdrawn, Archived (ProductLifecycleState), always as coloured badges with these exact labels. | Published (for a product), Pending, Inactive (for a product) | contracts/spine/catalogue.yaml#/components/schemas/ProductLifecycleState |
+| Channel | Where something is sold. Labels: pos Point of sale; kiosk Kiosk; web and guestWeb Website; mobile and guestApp App; b2b B2B partners; partner Partner; ota Travel agents (OTA); callCentre Call centre; api API; backOffice Back office. | Touchpoint, Outlet (an outlet is a business inside a venue), raw enum values | contracts/spine/catalogue.yaml#/components/schemas/Channel / … |
+| Refund | Money returned after settlement, wholly or for some lines, under the venue's refund policy. | Return (that is retail goods), Reversal, Void | contracts/spine/orders.yaml#createRefund / DI-252 |
+| Void | Cancelling a whole order before settlement, within the same shift, with a reason from the void list. After settlement it is a refund. | Cancel order, Delete | contracts/spine/orders.yaml#voidOrder / R222 |
+| Exchange / Reschedule | Exchange swaps lines for other products or dates and settles only the difference; Reschedule is the same product moved to another date or time. | Rebook, Date change (acceptable only in guest copy), Refund and resell | contracts/spine/orders.yaml#exchangeOrderLines / … |
+| Hold / Capture / Release | A deposit or stored-value amount is held, then partly or fully captured, and the rest released. A held deposit is not a payment. | Charge, Pre-auth (in staff copy), Block funds | contracts/spine/orders.yaml#authoriseStoredValue / … |
+| Wallet (TICVAI wallet) | The guest's stored-value balance on TICVAI, spent by hold and capture. Distinct from the tender "Apple Pay / Google Pay", which the contract also calls wallet. | Digital wallet (for stored value), E-wallet, Credit (without a type) | contracts/spine/orders.yaml#/components/schemas/TenderKind / R080 |
+| Credit lot | One amount of wallet credit of one credit type (cash, bonus, gift) with its own expiry; lots are spent nearest expiry first and the guest sees the breakdown but cannot choose. | Bucket, Batch, Top-up | TRACKER Actions row 171 / contracts/satellite/wallet.yaml#expireCreditLots |
+| Venue map / Seat map | A venue map is the wayfinding map of a park or a floor (points, paths, bookable places); a seat map is the seating layout of an auditorium or stand. Never just "map" where both could be meant. | Layout (alone), Floor plan (unless it is a floor map), Map (alone) | contracts/satellite/venue-map.yaml#createVenueMap / … |
+| Point / Bookable place | A point is a place on a venue map (toilet, ride, restaurant, exit). A bookable place is a cabana, lounger, table or pitch placed on the map and sold through its price band. | Pin, POI, Marker, Resource (in staff copy) | contracts/satellite/venue-map.yaml#setVenuePoint / … |
+| Station / Route / Timetable / Departure / Fare table / Pass … | A route is an ordered list of stations with offsets; a timetable generates departures up to its release horizon; a fare table prices a route per passenger type; a pass type is a multi-trip or unlimited pass sold as a product. | Stop (except in the stop list), Line (except lineCode), Schedule, Trip (except a guest's journey) | contracts/satellite/transport.yaml / REV3-21 |
+| Applies from | The effective date of a change. Every dated change shows it, and sold items keep their old terms. | Effective date (in labels), Start date (for a change) | contracts/satellite/seating.yaml#updateSeatCategory / TRACKER Actions row 194 |
+
+
 ## The screens
 
 Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs count fields; requirements are matrix rows; meeting inputs are the ones naming the screen (the module and platform ones are below); white label says whether the tenant's brand reaches it (guest) or it sets the brand (configures).
@@ -104,6 +168,19 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Opens with | nothing: it opens on its own |
 | Route | `/games-rides/game-ride-pricing-command-center-bo-434` |
 
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** The pricing command centre for games and rides: KPI tiles (priced attractions, active price rules, peak pricing active, VIP enabled, retry enabled, upcoming changes, missing prices, conflicts), a pricing overview per attraction (standard, current, VIP, pricing mode, status), filters and the board's tiles. The backend, not the reader, decides the price. The one thing to get right: "Current price" is the price a tap would be charged now, with the rule that produced it, next to the standard price - the difference is what managers look for.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **getGamePricing requires one gameId, so the overview across all attractions has no list read** Why: The overview, Active price rules, Upcoming changes and Conflicts KPIs need a venue-wide read of pricing configuration and resolutions. *(source: screens/P08-venue-back-office.yaml#BO-435 / contracts/satellite/games.yaml#getGamePricing; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **Three of the pack's eight KPI tiles are missing (Upcoming Price Changes, Missing Prices, Pricing Conflicts) and the Pricing Overview table is absent** Why: Pack p43-p44 list all eight and give the overview with four sample rows. *(source: screens/P08-venue-back-office.yaml#BO-434 / screens/P08-venue-back-office.yaml#BO-435; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+
+#### Decided on this screen
+
+Answered questions: draw the decision, not the old default. Where a decision and the tables below differ, the decision wins.
+
+- **Does Publish exist as a separate step (draft prices vs live prices), or are prices live on save?** → Drawn default accepted: Live on save, delivered to readers on the next deployment; Publish = deploy now. *(decided by Chinmay, 2026-10-02; DEC-404 / CHG-NOTE-008)* **Reviewable:** a default the lead may still overrule before the block is tasked.
+
 #### Inputs: what the user enters or picks
 
 **On the screen**
@@ -122,6 +199,10 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | At | date and time picker | — | — | `getGamePricing` ?at |
 | Guest tier | text field | — | — | `getGamePricing` ?guestTier |
 
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **filters**: Zone, Attraction, Attraction type, Pricing type (Standard, Group, Peak, Non-peak, VIP, Retry, Exception), VIP enabled, Effective date (default now - changes "Current price" to the price at that moment), Status. Venue from the switcher. *(source: screens/P08-venue-back-office.yaml#BO-435 / contracts/satellite/games.yaml#getGamePricing)*
+
 #### Outputs: what the screen shows and produces
 
 **Shown**
@@ -135,6 +216,18 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 **VIP Pricing Enabled** (metric tile)
 
 **Retry Pricing Enabled** (metric tile)
+
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **KPI tiles**: Eight metric tiles (per VO-R02) - the generator carried five; Upcoming price changes, Missing prices and Pricing conflicts are missing. Missing prices = attractions in service with no price that resolves (same as the health check's price finding). *(source: screens/P08-venue-back-office.yaml#BO-434 / screens/P08-venue-back-office.yaml#BO-435 / contracts/satellite/games.yaml#validateGameConfiguration)*
+- **Pricing overview**: Attraction, Type, Standard, Current price, VIP, Pricing mode (Standard / Peak / Non-peak / Exception / Retry enabled), Status. Current price comes from the resolution (effectivePrice and appliedRule) and is highlighted when it differs from Standard; "—" for VIP where none is set. Money as AED 20.00. *(source: screens/P08-venue-back-office.yaml#BO-435 / contracts/satellite/games.yaml#/components/schemas/GamePriceResolution)*
+- **Upcoming changes**: The next scheduled changes in a short list ("Sat 04 Oct 17:00 - Falcon Coaster peak AED 45.00"), linking to the pricing calendar. *(source: screens/P08-venue-back-office.yaml#BO-434)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Create Price / Edit Price**: Opens the attraction's pricing editor (BO-435 onwards) and returns here (per VO-R13). *(source: screens/P08-venue-back-office.yaml#BO-435)*
+- **View Calendar**: Opens BO-438 in week view. *(source: screens/P08-venue-back-office.yaml#BO-435)*
+- **Validate / Publish**: Validate runs the price checks for all attractions; Publish pushes the prices to readers through deployment and says how many readers will update. *(source: screens/P08-venue-back-office.yaml#BO-435 / contracts/satellite/games.yaml#deployReaderConfiguration)*
 
 **Data it reads**: `getGamePricing` (onLoad, Effective prices)
 
@@ -161,6 +254,61 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the game ride pricing are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Edge cases to draw
+
+- **Attraction with no resolvable price**: Row shows "No price" in red and counts in Missing prices; the reader would refuse with "Game unavailable". *(source: contracts/satellite/games.yaml#validateGameConfiguration)*
+
+#### Consistency with other screens
+
+- Match `BO-442`: Effective Pricing & Reader Price Preview shows the same resolution trace for one attraction.
+- Match `BO-441`: Pricing conflicts KPI opens Price Priority & Conflict Rules.
+- Match `BO-394`: Current price on the games dashboard is this column.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+kpis:
+  pricedAttractions: 40
+  activePriceRules: 63
+  peakActive: 6
+  vipEnabled: 18
+  retryEnabled: 9
+  upcomingChanges: 4
+  missingPrices: 2
+  conflicts: 1
+rows:
+- attraction: VR Racing 01
+  type: Video game
+  standard: AED 20.00
+  current: AED 20.00
+  vip: AED 15.00
+  mode: Standard
+  status: Active
+- attraction: Falcon Coaster
+  type: Ride
+  standard: AED 35.00
+  current: AED 45.00
+  vip: AED 30.00
+  mode: Peak
+  status: Active
+- attraction: Basketball Pro 02
+  type: Skill game
+  standard: AED 20.00
+  current: AED 20.00
+  vip: AED 15.00
+  mode: Standard
+  status: Active
+- attraction: Prize Crane 04
+  type: Skill game
+  standard: AED 15.00
+  current: AED 15.00
+  vip: —
+  mode: Retry enabled
+  status: Active
+```
 
 #### Permissions
 
@@ -213,6 +361,9 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - [ ] Every transition is wired: `BO-100`, `BO-435`, `BO-436`, `BO-437`, `BO-438`, `BO-439`, `BO-440`, `BO-441`, `BO-442`, `BO-443`.
 - [ ] Every gated control is gated: `PRICE_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 1 edge case(s) from the process notes are drawn.
+- [ ] The 2 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
+- [ ] The 1 decision(s) taken on this screen are drawn as decided, not as the old default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -233,6 +384,20 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | Opens with | nothing: it opens on its own |
 | Route | `/games-rides/standard-game-ride-price-configuration-bo-435` |
 
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** The normal base price to play one game or ride, with its wallet credit equivalent and effective dates ("VR Racing - Standard price AED 20 - 20 credits"). The reader receives the applicable price from TICVAI at runtime. The one thing to get right: Standard price is the floor every other rule (group, peak, VIP, retry, exception) is compared against, and all six pricing screens edit one pricing record per attraction - so draw them as tabs of one Attraction pricing editor with one Save (per VO-R14).
+
+**Known correction pending (do not draw the wrong version)**
+
+- **setGamePricing is a whole-record PUT bound without any read of the stored pricing** Why: getGamePricing returns a resolution (effective price and trace), not the configuration; editing standard price would wipe group, peak, VIP, retry and exception prices left out (per VO-R04). *(source: contracts/satellite/games.yaml#setGamePricing / contracts/satellite/games.yaml#getGamePricing; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **Effective from / to, status, rule name and credit equivalent have no field on GamePricing** Why: standardPrice is a single Money value per game with no dates; the credit amount lives separately as Game.creditCost. *(source: contracts/satellite/games.yaml#/components/schemas/GamePricing / contracts/satellite/games.yaml#/components/schemas/Game; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **All eleven fields drawn as select fields, including Standard price and Currency** Why: Price is a money input, currency is fixed by the region, dates are pickers. *(source: screens/P08-venue-back-office.yaml#BO-435 / ADR-0011; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+
+#### Decided on this screen
+
+Answered questions: draw the decision, not the old default. Where a decision and the tables below differ, the decision wins.
+
+- **Which is authoritative at the reader - Game.creditCost (credits) or GamePricing.standardPrice (AED)?** → Drawn default accepted: GamePricing in AED, with credits derived at the venue's rate and shown read-only. *(decided by Chinmay, 2026-10-02; DEC-405 / CHG-NOTE-008)* **Reviewable:** a default the lead may still overrule before the block is tasked.
+
 #### Inputs: what the user enters or picks
 
 **On the screen**
@@ -251,7 +416,25 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | Effective To | select field | — | — | — | — | — | — |
 | Status | select field | — | — | — | — | — | — |
 
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **attraction**: Picker; Attraction type, Venue and Zone are shown from the attraction, not entered (the generator drew them as selects). *(source: screens/P08-venue-back-office.yaml#BO-435)*
+- **standard price**: Money in the region's currency and decimal scale (AED 20.00); greater than zero. *(source: contracts/satellite/games.yaml#/components/schemas/GamePricing)*
+- **currency**: Shown, not chosen - the region owns the currency. *(source: ADR-0011)*
+- **wallet / credit equivalent**: Whole credits charged when the guest pays in game credits; defaults to the price at the venue's credit rate (AED 1.00 = 1 credit) and can be overridden. *(source: screens/P08-venue-back-office.yaml#BO-435 / contracts/satellite/games.yaml#/components/schemas/Game)*
+- **effective from / to, status, rule name**: Date pickers (to after from, empty = open-ended); status Draft / Active / Inactive. Rule name is optional here because the standard price is one per attraction. *(source: screens/P08-venue-back-office.yaml#BO-435)*
+
 #### Outputs: what the screen shows and produces
+
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Reader relationship note**: "Readers at VR Racing 01 (R-014) get this price on their next deployment" with the last deployment time. *(source: screens/P08-venue-back-office.yaml#BO-436 / contracts/satellite/games.yaml#deployReaderConfiguration)*
+- **Effective now**: The resolved price right now and which rule wins, so a standard price hidden by a peak rule is not mistaken for the charge. *(source: contracts/satellite/games.yaml#getGamePricing)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Save Draft / Validate / Activate**: Save writes the whole pricing record for the attraction (PUT, per VO-R04) - group, peak, VIP, retry and exceptions included - so the form must hold every current value. Validate checks for overlaps. *(source: screens/P08-venue-back-office.yaml#BO-436 / contracts/satellite/games.yaml#setGamePricing)*
+- **Clone**: Copies this attraction's pricing to selected attractions of the same type (as cloneGame does with includePricing). *(source: screens/P08-venue-back-office.yaml#BO-436 / contracts/satellite/games.yaml#cloneGame)*
 
 **Where the user goes next**
 
@@ -267,6 +450,33 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Empty, no results (`?state=emptyNoResults`) | **Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist |
 | Offline (`?state=offline`) | online only |
+
+#### Edge cases to draw
+
+- **Price changed while plays are in flight**: The new price applies to taps after it reaches the reader; a guest mid-game is not re-charged. *(source: contracts/satellite/games.yaml#updateGame)*
+
+#### Consistency with other screens
+
+- Match `BO-396`: Game.creditCost and GamePricing.standardPrice are two prices of the same play; show them together and keep one as derived.
+- Match `BO-407`: The reader's Required credit is this price.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+price:
+  attraction: VR Racing 01
+  type: Video game
+  venue: Summit Peaks
+  zone: Arcade
+  standard: AED 20.00
+  currency: AED
+  credits: 20
+  from: 01 Oct 2026
+  to: ''
+  status: Active
+```
 
 #### Permissions
 
@@ -315,6 +525,9 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - [ ] Every transition is wired: `BO-434`.
 - [ ] Every gated control is gated: `PRICE_CONFIGURE`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 1 edge case(s) from the process notes are drawn.
+- [ ] The 3 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
+- [ ] The 1 decision(s) taken on this screen are drawn as decided, not as the old default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -335,6 +548,20 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | Opens with | nothing: it opens on its own |
 | Route | `/games-rides/group-pricing-configuration-bo-436` |
 
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** Group pricing as the pack means it: several games or rides share one pricing rule ("Arcade Standard Group - AED 20 - VR Racing, Space Shooter, Moto Racing, Flight Simulator"), inherited by every linked attraction unless an approved attraction override exists (Attraction override beats Group price). The one thing to get right: show for each member whether it inherits or overrides, and what changing the group price will change.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **The contract's groupPricing means a party of players, not a group of attractions** Why: GamePricing.groupPricing is minimumPlayers and pricePerPlayer on one game (a price for groups of people); the pack and the matrix line "Assign prices for the Group" mean one price shared by a group of games. No pricing-group entity, membership or override exists. *(source: screens/P08-venue-back-office.yaml#BO-436 / contracts/satellite/games.yaml#/components/schemas/GamePricing / contracts/satellite/games.yaml#/components/schemas/GamePricingException / MATRIX 10.2.7; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **Add Attraction and Remove Attraction drawn as select fields; Apply price to all and Individual override allowed as text fields** Why: Two are actions, one is an action with confirmation, one is a switch. *(source: screens/P08-venue-back-office.yaml#BO-436; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **setGamePricing is per game** Why: Changing a group price would need one PUT per member game, each replacing that game's whole pricing record. *(source: contracts/satellite/games.yaml#setGamePricing; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+
+#### Decided on this screen
+
+Answered questions: draw the decision, not the old default. Where a decision and the tables below differ, the decision wins.
+
+- **Are party-size prices (group of players, as the contract has it) also wanted, alongside attraction groups?** → Drawn default accepted: Draw attraction groups as the pack asks; show party-size pricing as a separate "Party price" tab greyed until confirmed. *(decided by Chinmay, 2026-10-02; DEC-406 / CHG-NOTE-008)* **Reviewable:** a default the lead may still overrule before the block is tasked.
+
 #### Inputs: what the user enters or picks
 
 **On the screen**
@@ -354,7 +581,22 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | Apply price to all | text field | — | — | — | — | — | — |
 | Individual override allowed: Yes/No | text field | — | — | — | — | — | — |
 
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **pricing group name / group code**: Text (Arabic variant for the name) and a unique code; the generator drew selects. *(source: screens/P08-venue-back-office.yaml#BO-436)*
+- **attraction type, price, effective period, status**: Attraction type limits which attractions can join; price is money (AED 20.00, currency from the region); effective period as from / to pickers. *(source: screens/P08-venue-back-office.yaml#BO-436)*
+- **members**: A member list with Add attraction / Remove attraction (actions, not select fields), "Apply price to all" (resets overrides after confirmation) and "Individual override allowed" switch. *(source: screens/P08-venue-back-office.yaml#BO-436)*
+
 #### Outputs: what the screen shows and produces
+
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Member table**: Attraction, Inherits / Overrides, Effective price - overrides badged and their own price shown. *(source: screens/P08-venue-back-office.yaml#BO-436 / screens/P08-venue-back-office.yaml#BO-437)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Save**: Confirmation names the effect - "Price changes for 4 attractions; 1 override (Flight Simulator AED 25.00) is kept". *(source: screens/P08-venue-back-office.yaml#BO-437)*
+- **Apply price to all**: Removes member overrides after a confirmation naming them (per VO-R16). *(source: screens/P08-venue-back-office.yaml#BO-436)*
 
 **Where the user goes next**
 
@@ -370,6 +612,45 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Empty, no results (`?state=emptyNoResults`) | **Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist |
 | Offline (`?state=offline`) | online only |
+
+#### Edge cases to draw
+
+- **An attraction in two groups**: Refused - one pricing group per attraction - or the priority rule decides; say which. *(source: screens/P08-venue-back-office.yaml#BO-441 / decided 2 October 2026 by Chinmay (CHG-NOTE-008))*
+
+#### Consistency with other screens
+
+- Match `BO-435`: An attraction's standard price tab shows "Inherited from Arcade Standard Group" when it is a member.
+- Match `BO-441`: Group sits below attraction-specific price in the pack's priority example.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+group:
+  name: Arcade Standard Group
+  nameAr: مجموعة الألعاب القياسية
+  code: ARC-STD
+  venue: Summit Peaks
+  type: Video game
+  price: AED 20.00
+  effective: 01 Oct 2026 -
+  status: Active
+  overrideAllowed: true
+members:
+- attraction: VR Racing 01
+  mode: Inherits
+  price: AED 20.00
+- attraction: Space Shooter
+  mode: Inherits
+  price: AED 20.00
+- attraction: Moto Racing
+  mode: Inherits
+  price: AED 20.00
+- attraction: Flight Simulator
+  mode: Override
+  price: AED 25.00
+```
 
 #### Permissions
 
@@ -411,6 +692,9 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-434`.
 - [ ] Every gated control is gated: `PRICE_CONFIGURE`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 1 edge case(s) from the process notes are drawn.
+- [ ] The 3 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
+- [ ] The 1 decision(s) taken on this screen are drawn as decided, not as the old default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -431,6 +715,21 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | nothing: it opens on its own |
 | Route | `/games-rides/peak-non-peak-dynamic-pricing-bo-437` |
 
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** Peak and non-peak prices by day of week and time of day ("Falcon Coaster - Standard AED 35 - Peak Fri-Sun 17:00-23:00 AED 45 - Non-peak Mon-Thu 10:00-17:00 AED 30"), applied automatically by the backend. The pack asks for a calendar view Mon to Sun with the peak and non-peak periods. The one thing to get right: the week grid shows at a glance which price applies at any hour, and overlapping windows are impossible to save silently.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **No calendar view on the screen, though the pack asks for a Mon-Sun view of peak and non-peak periods** Why: A screen placing prices in time needs a calendar with Day, Week and Month views (per VO-R01). *(source: screens/P08-venue-back-office.yaml#BO-437; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **Peak price and Non-peak price as two fields of one rule; Specific date as a field of a weekly rule** Why: The contract stores one price per window (daysOfWeek, from, to, price); a date is a calendar exception. *(source: contracts/satellite/games.yaml#/components/schemas/GamePricingException / contracts/satellite/games.yaml#/components/schemas/GamePricing; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **Rule name, Peak / Non-peak label and effective from / to have no field on a peak window** Why: Windows carry days, times and price only. *(source: contracts/satellite/games.yaml#/components/schemas/GamePricingException; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **Attraction / Group target is not possible** Why: Peak windows hang off one gameId; there is no attraction group to target (see BO-436). *(source: contracts/satellite/games.yaml#/components/schemas/GamePricing; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+
+#### Decided on this screen
+
+Answered questions: draw the decision, not the old default. Where a decision and the tables below differ, the decision wins.
+
+- **Should a window be labelled Peak or Non-peak explicitly, or derived from being above or below standard?** → Drawn default accepted: Explicit label chosen by the user. *(decided by Chinmay, 2026-10-02; DEC-407 / CHG-NOTE-008)* **Reviewable:** a default the lead may still overrule before the block is tasked.
+
 #### Inputs: what the user enters or picks
 
 **On the screen**
@@ -448,7 +747,24 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Non-Peak Price | select field | — | — | — | — | — | — |
 | Effective From / To | text field | — | — | — | — | — | — |
 
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **rule name, attraction / group**: Name text; target is one attraction or a pricing group. *(source: screens/P08-venue-back-office.yaml#BO-437)*
+- **pricing mode**: Peak or Non-peak per window (a label the reader and reports use), not inferred from the price. *(source: screens/P08-venue-back-office.yaml#BO-437)*
+- **days of week, start time, end time**: Weekday chips starting on the venue's first day; HH:MM in venue time, end after start (a window across midnight is split into two). *(source: screens/P08-venue-back-office.yaml#BO-437 / contracts/satellite/games.yaml#/components/schemas/GamePricingException)*
+- **price**: One price per window (Peak AED 45.00 or Non-peak AED 30.00) - not two price fields on one rule. *(source: contracts/satellite/games.yaml#/components/schemas/GamePricingException)*
+- **specific date**: Not here - a specific date is an exception on BO-438; link "Add a date exception". *(source: screens/P08-venue-back-office.yaml#BO-438)*
+- **effective from / to**: Date pickers bounding when the rule applies (e.g. summer season). *(source: screens/P08-venue-back-office.yaml#BO-437)*
+
 #### Outputs: what the screen shows and produces
+
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Week view**: Mon-Sun columns by hour from the venue's day start hour, peak blocks in one colour, non-peak in another, standard as the background, each block labelled with its price; Day and Month views as well (per VO-R01). Right-to-left in Arabic. *(source: screens/P08-venue-back-office.yaml#BO-437)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Save**: Saves the peak windows as part of the attraction's whole pricing record (per VO-R04); overlaps are refused with the overlapping windows named. *(source: contracts/satellite/games.yaml#setGamePricing)*
 
 **Where the user goes next**
 
@@ -464,6 +780,44 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Empty, no results (`?state=emptyNoResults`) | **Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist |
 | Offline (`?state=offline`) | online only |
+
+#### Edge cases to draw
+
+- **Two windows overlap on Friday 17:00-18:00**: Blocked "Peak Fri 17:00-23:00 overlaps Non-peak Fri 10:00-18:00". *(source: screens/P08-venue-back-office.yaml#BO-438)*
+- **Window outside the attraction's operating hours**: Warning; the price would never apply. *(source: contracts/satellite/games.yaml#/components/schemas/GameOperationalConfig)*
+
+#### Consistency with other screens
+
+- Match `BO-438`: The same calendar component, with exceptions as an extra layer; the week view here is the pricing calendar filtered to peak and non-peak.
+- Match `BO-152`: Operating Calendar & Special Access Days uses the same calendar view and day start hour.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+attraction: Falcon Coaster
+standard: AED 35.00
+windows:
+- mode: Peak
+  days:
+  - Fri
+  - Sat
+  - Sun
+  from: '17:00'
+  to: '23:00'
+  price: AED 45.00
+- mode: Non-peak
+  days:
+  - Mon
+  - Tue
+  - Wed
+  - Thu
+  from: '10:00'
+  to: '17:00'
+  price: AED 30.00
+effective: 01 Oct 2026 - 31 Mar 2027
+```
 
 #### Permissions
 
@@ -507,6 +861,9 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-434`.
 - [ ] Every gated control is gated: `PRICE_CONFIGURE`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 2 edge case(s) from the process notes are drawn.
+- [ ] The 4 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
+- [ ] The 1 decision(s) taken on this screen are drawn as decided, not as the old default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -527,6 +884,21 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | nothing: it opens on its own |
 | Route | `/games-rides/pricing-calendar-exception-dates-bo-438` |
 
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** A visual pricing calendar with layers (Standard, Peak, Non-peak, Special day, Temporary override) and date exceptions (public holiday, school holiday, special event, promotional day, venue date) that override time-based pricing without changing the underlying rule ("National Day - Falcon Coaster 12:00-23:00 - Special price AED 50"). The one thing to get right: the calendar is the screen - Day, Week and Month views with layer toggles - and an exception that overlaps a rule says so before saving.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **The screen has no calendar component (calendarView absent)** Why: A pricing calendar must offer Day, Week and Month views (per VO-R01); the generator drew a plain form of selects. *(source: screens/P08-venue-back-office.yaml#BO-438; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **Calendar exceptions have no start / end time, exception type, reason or priority** Why: GamePricingException for calendarException carries date, price and closed only; the pack's National Day 12:00-23:00 example cannot be stored. *(source: screens/P08-venue-back-office.yaml#BO-438 / contracts/satellite/games.yaml#/components/schemas/GamePricingException; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **The contract's Closed flag (game does not run that day) is not on the screen** Why: It is a calendar exception value the pack does not mention; draw it as a pricing type. *(source: contracts/satellite/games.yaml#/components/schemas/GamePricingException; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **Date, Price, Start / End time and Reason drawn as select fields** Why: Pickers, money input and text. *(source: screens/P08-venue-back-office.yaml#BO-438; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+
+#### Decided on this screen
+
+Answered questions: draw the decision, not the old default. Where a decision and the tables below differ, the decision wins.
+
+- **Should public and school holidays come from a venue holiday calendar rather than being entered per attraction?** → Drawn default accepted: Offer "Apply to all attractions in a group" and a holiday picker sourced from the operating calendar, greyed until it exists. *(decided by Chinmay, 2026-10-02; DEC-408 / CHG-NOTE-008)* **Reviewable:** a default the lead may still overrule before the block is tasked.
+
 #### Inputs: what the user enters or picks
 
 **On the screen**
@@ -542,7 +914,24 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Priority | select field | — | — | — | — | — | — |
 | Reason | select field | — | — | — | — | — | — |
 
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **calendar**: Day, Week (default) and Month views, Agenda for a list of exceptions (per VO-R01); day split into hours from the venue's day start hour; filters Attraction / Group and Attraction type; layer toggles for the five layers. *(source: screens/P08-venue-back-office.yaml#BO-438)*
+- **exception date and type**: Date picker (or a range of days created as one exception per day); type from the pack's five as a select (Public holiday, School holiday, Special event, Promotional day, Venue-specific date). *(source: screens/P08-venue-back-office.yaml#BO-438)*
+- **attraction / group, pricing type, price, start / end time**: Pricing type Special day price / Temporary override / Closed (the game does not run that day). Price as money, hidden when Closed. Start and end in venue time; empty = all day. *(source: screens/P08-venue-back-office.yaml#BO-438 / contracts/satellite/games.yaml#/components/schemas/GamePricingException)*
+- **priority, reason**: Priority shown from the price priority rules (BO-441) rather than typed per exception; reason text required. *(source: screens/P08-venue-back-office.yaml#BO-438 / screens/P08-venue-back-office.yaml#BO-441)*
+
 #### Outputs: what the screen shows and produces
+
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Calendar cells**: Each cell shows the price that applies with its layer colour; an exception cell shows its name ("National Day AED 50.00") and the price it replaced struck through. *(source: screens/P08-venue-back-office.yaml#BO-438)*
+- **Conflict warning**: Inline before save - "Existing Peak pricing rule overlaps this period. The exception wins on 02 Dec 12:00-23:00." *(source: screens/P08-venue-back-office.yaml#BO-438)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Add exception (click a day or drag a time range)**: Opens the exception form pre-filled with the date and times. *(source: designer default)*
+- **Save**: Saves exceptions as part of the attraction's whole pricing record (per VO-R04); the underlying standard and peak rules are unchanged. *(source: contracts/satellite/games.yaml#setGamePricing)*
 
 **Where the user goes next**
 
@@ -558,6 +947,39 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Empty, no results (`?state=emptyNoResults`) | **Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist |
 | Offline (`?state=offline`) | online only |
+
+#### Edge cases to draw
+
+- **Exception for New Year's Eve that excludes peak pricing (DI-876)**: The exception sets the standard price for that date and the calendar shows peak suppressed. *(source: DI-876)*
+- **Exception on a date the attraction is closed**: Warn that the price will never apply. *(source: contracts/satellite/games.yaml#/components/schemas/GamePricingException)*
+
+#### Consistency with other screens
+
+- Match `BO-437`: Same calendar component and colours; peak and non-peak layers come from BO-437.
+- Match `BO-152`: Operating Calendar & Special Access Days - holidays and special days should come from one venue calendar, not be retyped here.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+exception:
+  name: National Day
+  type: Public holiday
+  date: 02 Dec 2026
+  attraction: Falcon Coaster
+  pricingType: Special day price
+  price: AED 50.00
+  from: '12:00'
+  to: '23:00'
+  reason: UAE National Day demand
+closed:
+  name: Annual maintenance
+  date: 15 Jan 2027
+  attraction: Wave Rider
+  pricingType: Closed
+conflict: Existing Peak pricing rule overlaps this period.
+```
 
 #### Permissions
 
@@ -601,6 +1023,9 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-434`.
 - [ ] Every gated control is gated: `PRICE_CONFIGURE`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 2 edge case(s) from the process notes are drawn.
+- [ ] The 4 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
+- [ ] The 1 decision(s) taken on this screen are drawn as decided, not as the old default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -621,6 +1046,20 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | nothing: it opens on its own |
 | Route | `/games-rides/normal-vip-pricing-configuration-bo-439` |
 
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** Normal and VIP prices for the same game and reader ("VR Racing - Normal AED 20 - VIP AED 15"), with VIP eligibility coming from a VIP product, membership, package or entitlement. Before identification the reader shows "Normal AED 20 / VIP AED 15"; after a VIP card tap "VIP RECOGNIZED - YOUR PRICE AED 15". The one thing to get right: who counts as VIP is a rule (what makes a guest VIP, valid when, for which games), not a flag typed on the guest.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **VIP eligibility and the VIP rule (qualifying product / membership / package / entitlement, validity, applicable games) have no contract** Why: GamePricing has a single vipPrice and getGamePricing a free-text guestTier; nothing says what makes a card VIP. *(source: screens/P08-venue-back-office.yaml#BO-440 / contracts/satellite/games.yaml#/components/schemas/GamePricing / contracts/satellite/games.yaml#getGamePricing; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **The screen has only a select labelled "Attraction VR Racing" and a Save button** Why: A sample value used as a label; the pack gives the price table, four eligibility sources, the VIP rule and the reader display logic. *(source: screens/P08-venue-back-office.yaml#BO-440; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **The reader cannot be told to show both prices** Why: displayRules has showPrice only, not "Normal and VIP". *(source: contracts/satellite/games.yaml#/components/schemas/Reader; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+
+#### Decided on this screen
+
+Answered questions: draw the decision, not the old default. Where a decision and the tables below differ, the decision wins.
+
+- **Is VIP a guest tier from loyalty / membership, or only a purchased VIP product?** → Drawn default accepted: Any of the four sources the pack lists, configured as rules. *(decided by Chinmay, 2026-10-02; DEC-409 / CHG-NOTE-008)* **Reviewable:** a default the lead may still overrule before the block is tasked.
+
 #### Inputs: what the user enters or picks
 
 **On the screen**
@@ -628,6 +1067,13 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
 |---|---|---|---|---|---|---|---|
 | Attraction: VR Racing | select field | — | — | — | — | — | — |
+
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **attraction and prices**: Attraction picker (not a label "Attraction VR Racing"); a two-row table Customer type / Price - Normal (the standard price, read-only, link to BO-435) and VIP (money, lower than or equal to Normal unless confirmed). *(source: screens/P08-venue-back-office.yaml#BO-440 / contracts/satellite/games.yaml#/components/schemas/GamePricing)*
+- **VIP eligibility**: Chips - VIP product, VIP membership, VIP package, VIP entitlement - each with a picker of the qualifying products / tiers. *(source: screens/P08-venue-back-office.yaml#BO-440)*
+- **VIP rule**: Product / entitlement, valid from, valid to, applicable games / rides (multi-select), status. *(source: screens/P08-venue-back-office.yaml#BO-440)*
+- **reader display**: Switch "Show both prices before a card is tapped" (default on) with a preview. *(source: screens/P08-venue-back-office.yaml#BO-440 / contracts/satellite/games.yaml#/components/schemas/Reader)*
 
 #### Outputs: what the screen shows and produces
 
@@ -637,6 +1083,15 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|---|---|---|---|
 | Save game pricing (primary button) | navigation or local | — | — | — | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
+
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Reader preview**: Idle "Normal AED 20 / VIP AED 15" and after-tap "VIP RECOGNIZED - YOUR PRICE AED 15", English and Arabic. *(source: screens/P08-venue-back-office.yaml#BO-440)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Save game pricing**: Saves vipPrice in the attraction's whole pricing record (per VO-R04). *(source: contracts/satellite/games.yaml#setGamePricing)*
+- **Preview for a guest**: Resolves the price with guestTier VIP at now, showing the trace (VIP beats Peak per the priority rules). *(source: contracts/satellite/games.yaml#getGamePricing)*
 
 **Where the user goes next**
 
@@ -652,6 +1107,40 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Empty, no results (`?state=emptyNoResults`) | **Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist |
 | Offline (`?state=offline`) | online only |
+
+#### Edge cases to draw
+
+- **VIP guest at peak time**: Per the pack's priority example, VIP AED 15 beats Peak AED 25; the preview states "VIP price has higher priority than Peak price". *(source: screens/P08-venue-back-office.yaml#BO-442)*
+- **VIP eligibility expired yesterday**: Guest charged Normal; the reader shows the normal price, no VIP banner. *(source: screens/P08-venue-back-office.yaml#BO-440)*
+
+#### Consistency with other screens
+
+- Match `BO-441`: VIP's place in the price priority comes from Price Priority & Conflict Rules.
+- Match `BO-411`: The VIP RECOGNIZED message is a reader display state; same theme component.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+prices:
+  attraction: VR Racing 01
+  normal: AED 20.00
+  vip: AED 15.00
+rule:
+  eligibility: VIP product
+  product: Summit Peaks VIP Day (AED 350.00)
+  validFrom: 01 Oct 2026
+  validTo: 31 Dec 2026
+  games:
+  - VR Racing 01
+  - Space Shooter
+  - Basketball Pro 02
+  status: Active
+reader:
+  idle: Normal AED 20 | VIP AED 15
+  afterTap: 'VIP RECOGNIZED - YOUR PRICE: AED 15'
+```
 
 #### Permissions
 
@@ -695,6 +1184,9 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-434`.
 - [ ] Every gated control is gated: `PRICE_CONFIGURE`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 2 edge case(s) from the process notes are drawn.
+- [ ] The 3 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
+- [ ] The 1 decision(s) taken on this screen are drawn as decided, not as the old default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -715,11 +1207,33 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | nothing: it opens on its own |
 | Route | `/games-rides/retry-price-configuration-bo-440` |
 
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
+**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape … Contract gap recorded 2 October 2026 (CHG-WIR-004): No read lists stored retry prices.
+
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** A discounted repeat-play price for skill games (requirement 10.2.16): as the game approaches its end the reader offers "CONTINUE? - RETRY AED 10"; a tap within the retry window validates balance and retry eligibility, deducts the lower price and the game continues or restarts. Example Basketball Challenge - original AED 20, retry AED 10, window 30 seconds. The one thing to get right: a retry is a separate, recognisable transaction at the retry price, never a second full-price play and never confused with the free re-run after a machine fault.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **Two different "retry" settings exist in the games contract** Why: ReaderProfile.retryPricing is a free re-run after a machine fault (isFree, withinSeconds, maxRetries); GamePricing.retryPrice is the commercial discounted continue. The screen must say which it sets and the names should differ. *(source: contracts/satellite/games.yaml#/components/schemas/ReaderProfile / contracts/satellite/games.yaml#/components/schemas/GamePricing; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **Maximum retry count, retry validity after first play and retry enabled have no field on GamePricing** Why: Only retryPrice and retryWindowSeconds exist. *(source: screens/P08-venue-back-office.yaml#BO-440 / contracts/satellite/games.yaml#/components/schemas/GamePricing; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **A retry is not recognisable as such in the transaction record** Why: GameplayTransaction has no retry marker, so "recognized separately from a new gameplay transaction" (pack acceptance) cannot be reported. *(source: screens/P08-venue-back-office.yaml#BO-441 / contracts/satellite/games.yaml#/components/schemas/GameplayTransaction; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **Table titled "Every retry price"; gap says no operation returns a described schema** Why: Placeholder label (per VO-R12); and there is no read of stored retry prices to list. *(source: contracts/satellite/games.yaml#getGamePricing; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+
+#### Decided on this screen
+
+Answered questions: draw the decision, not the old default. Where a decision and the tables below differ, the decision wins.
+
+- **Does the retry offer appear before the game ends (pack) or after it (DI-877), and does a retry consume an entitlement play?** → Drawn default stands (answer: "Retry charged in money at the retry price; offered in the last seconds of play and a short window after"): Offer shown in the last seconds of play and for the window after; a retry is charged in money at the retry price, never from an entitlement. *(decided by Chinmay, 2026-10-02; DEC-410 / CHG-NOTE-008)*
 
 #### Inputs: what the user enters or picks
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **attraction**: Picker limited to attractions whose type supports retry (Skill game = Yes is shown, not entered). *(source: screens/P08-venue-back-office.yaml#BO-440 / screens/P08-venue-back-office.yaml#BO-398)*
+- **retry enabled, retry price**: Switch; retry price as money, lower than the standard price (shown beside it read-only). *(source: screens/P08-venue-back-office.yaml#BO-440 / contracts/satellite/games.yaml#/components/schemas/GamePricing)*
+- **retry offer window**: Seconds (default 30) during which the offer is shown and a tap counts as a retry; must be longer than the retap delay on the reader. *(source: screens/P08-venue-back-office.yaml#BO-441 / contracts/satellite/games.yaml#/components/schemas/GamePricing / DI-877)*
+- **maximum retry count, retry validity after first play**: Whole number (e.g. 2 retries per play) and seconds / minutes after the first play during which retries are allowed. *(source: screens/P08-venue-back-office.yaml#BO-440)*
 
 #### Outputs: what the screen shows and produces
 
@@ -737,6 +1251,15 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |---|---|---|
 | ↓ | text | not in the schema: `↓` |
 
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Retry prices list**: Titled "Retry prices" (not "Every retry price") - Attraction, Standard, Retry, Window, Max retries, Status. *(source: screens/P08-venue-back-office.yaml#BO-440)*
+- **Runtime flow**: The pack's sequence as a strip - Initial play AED 20 - Game approaching completion - Reader shows CONTINUE? RETRY AED 10 - Guest taps - Balance and retry eligibility checked - AED 10 deducted - Game continues - with the reader mock-up. *(source: screens/P08-venue-back-office.yaml#BO-441)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Save**: Saves retryPrice and retryWindowSeconds in the attraction's whole pricing record (per VO-R04) and offers deployment to the reader. *(source: contracts/satellite/games.yaml#setGamePricing)*
+
 **Where the user goes next**
 
 - → `BO-434` Game & Ride Pricing Command Center: *Back to Game & Ride Pricing Command Center*
@@ -751,6 +1274,39 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the retry price are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Edge cases to draw
+
+- **Guest taps for retry with an entitlement (e.g. 3 plays on Basketball Pro)**: A retry is charged in money at the retry price, never from an entitlement play; the offer shows in the last seconds of play and for a short window after. Show the rule on the screen. *(source: screens/P08-venue-back-office.yaml#BO-430 / screens/P08-venue-back-office.yaml#BO-441 / decided 2 October 2026 by Chinmay (CHG-NOTE-008))*
+- **Retry tap inside the retap delay**: Treated as the same retry, not a second one (retap protection still applies). *(source: DI-867)*
+
+#### Consistency with other screens
+
+- Match `BO-409`: Show the reader's retap delay next to the retry window; window must exceed it.
+- Match `BO-412`: The retry tap is a distinct outcome in the tap flow ("RETRY AUTHORIZED AED 10").
+- Match `BO-441`: Retry is first in the pack's price priority example.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+rows:
+- attraction: Basketball Challenge
+  standard: AED 20.00
+  retry: AED 10.00
+  windowSeconds: 30
+  maxRetries: 2
+  validityAfterFirstPlay: 2 minutes
+  status: Active
+- attraction: Prize Crane 04
+  standard: AED 15.00
+  retry: AED 8.00
+  windowSeconds: 20
+  maxRetries: 1
+  status: Active
+reader: CONTINUE? RETRY AED 10
+```
 
 #### Permissions
 
@@ -794,6 +1350,9 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-434`.
 - [ ] Every gated control is gated: `PRICE_CONFIGURE`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 2 edge case(s) from the process notes are drawn.
+- [ ] The 4 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
+- [ ] The 1 decision(s) taken on this screen are drawn as decided, not as the old default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -805,7 +1364,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | | |
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
-| Module | Games & Rides · wave 3 · needs the `games` module |
+| Module | Sell · wave 3 · needs the `core` module |
 | Block | Block A · ticket #20659 (APP-SETUP-BO-441) |
 | Who uses it | venue staff holding `PRODUCT_CONFIGURE`, `PRODUCT_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
@@ -814,7 +1373,13 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | nothing: it opens on its own |
 | Route | `/games-rides/price-priority-conflict-rules-bo-441` |
 
+**What the spec says about it.** **Core, not games (2 October 2026, CHG-SBO-023):** the rule order governs every price at the venue, so a tenant without the games licence still needs it; filed under Sell (CHG-SBO-010).
+
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** The order in which pricing rules apply when several are valid at once (standard, group, peak, VIP, retry) and the method that resolves two of them, with a test console that prices a scenario against the order. The client was explicit: the configured hierarchy decides; there is no automatic lowest-price-wins.
+
+**Fixed on main** (the package already carries these; draw what it says): The screen's module is Games & Rides while the rule order governs every price at the venue. (CHG-SBO-003).
 
 #### Inputs: what the user enters or picks
 
@@ -851,6 +1416,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Time to event `testScenario.timeToEvent` | number field | optional | — | min 0 | — | — | `setRulePriorityConflict` body |
 | Expected price `testScenario.expectedPrice` | money field | optional | — | A jsonb price cannot be summed in SQL. | AED, 2 decimals shown (up to 4 accepted), currency from the … | On the wire this is three fields; in the database it is one column. 24 August. | `setRulePriorityConflict` body |
 
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **orderedRuleIds**: Drag-to-order list, highest priority first, with a rank number shown on each row. *(source: contracts/spine/catalogue.yaml#setRulePriorityConflict)*
+- **resolutionMethod**: One of eight methods, each with a one-line worked example (Highest priority wins, Most specific wins, Cumulative, Maximum adjustment, Minimum adjustment, Weighted, Stop processing, Custom governed). *(source: contracts/spine/catalogue.yaml#setRulePriorityConflict / DI-595)*
+- **test scenario**: Product, ticket type, date and time, channel, party; the result shows every rule considered, which applied and the final price. *(source: contracts/spine/catalogue.yaml#setRulePriorityConflict)*
+
 #### Outputs: what the screen shows and produces
 
 **Shown**
@@ -862,6 +1433,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
 | Reorder / Validate / Test / Save (primary button) | `setRulePriorityConflict` PUT `/rule-priority-conflict` | RulePriorityConflictInput | RulePriorityConflictView | 409 `save` while a critical conflict is open (`criticalConflictOpen`); the conflicts are named in the problem.; 422 `test` without a `testScenario` (`testScenarioRequired`), or `orderedRuleIds` naming a rule that does … | — |
+
+**What each action does** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **Validate / Test / Save**: Three buttons over one body; Validate returns conflicts without saving, Test runs the scenario and keeps it as a test case, Save stores the order. *(source: contracts/spine/catalogue.yaml#setRulePriorityConflict)*
 
 **Data it reads**: `listRulePriorityConflict` (onLoad, Rule Priority, Conflict Resolution & Dynamic Pricing Test …)
 
@@ -881,6 +1456,32 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 `save` while a critical conflict is open (`criticalConflictOpen`); the conflicts are named in the problem.; 422 `test` without a `testScenario` (`testScenarioRequired`), or `orderedRuleIds` naming a rule that does not exist or is archived (`unknownRule`). |
 
+#### Consistency with other screens
+
+- Match `ADM-097`: The same operation serves the P09 console screen; same order list and test console.
+- Match `ADM-055`: Price hierarchy (which source of a price wins) is a different question from rule priority (which adjustment wins); label both explicitly.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+order:
+- Commercial protection
+- Contract / member protection
+- Event strategy
+- Occupancy
+- Booking pace
+- Time to event
+- Season / day / time slot
+- Base price
+test:
+  product: Sandstorm Coaster retry
+  date: 2026-11-14 16:00
+  channel: Point of sale
+  result: 'AED 25.00 (Retry price; Peak uplift not applied: Stop processing)'
+```
+
 #### Permissions
 
 - `listRulePriorityConflict` → `PRODUCT_VIEW` (read) · staff
@@ -896,7 +1497,7 @@ No matrix row traces to this screen's operations or data.
 
 None names this screen.
 
-Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 4 for P08 · Sell, 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -907,6 +1508,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Wireframe frame: `wireframes/P08 Venue Management.dc.html#bo-441` · status **notStarted** · provenance —
 - Client workshop board: `wireframes/WS62 Game and Ride Board 5.dc.html#bo-441`
 - Workshop pack: Game_and_Ride_Module.pdf board 5
+- Flow F147 *Pricing Revenue Management board 5: Dynamic Pricing Strategy Command Center*, step 18: Works in Rule Priority, Conflict Resolution & Dynamic Pricing Test Console → Determine the final dynamic price when multiple strategies and rules are simultaneously applicable. This is the final and most important control screen of Board 5.
 - Flow F191 *Game and Ride board 5: Game & Ride Pricing Command Center*, step 14: Works in Price Priority & Conflict Rules → Define which pricing rule wins when several valid prices apply simultaneously. This is required to make the source pricing models operational because Standard, Group, Peak, VIP and Retry prices can …
 
 #### Acceptance for the design
@@ -940,6 +1542,20 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Known gaps.** **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** The pricing simulator for games and rides: an administrator picks a game, a reader, a moment and a kind of guest and sees the one price TICVAI will charge, every rule that was considered, and what the physical reader will show. It answers the board's single question ("when this customer taps this reader at this game at this time, what do we charge?"). The one thing to get right: the screen must visibly connect the backend decision (rule evaluation) to the reader mockup; TICVAI calculates, the reader only displays.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **Retry status and Package / entitlement are drawn as live filters** Why: The price read takes only gameId, readerId, at and guestTier; these two inputs change nothing on the wire. Grey them or route them through the tap simulation. *(source: screens/P08-venue-back-office.yaml#BO-442 / contracts/satellite/games.yaml#getGamePricing; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **Reader preview binds a "Normal price on reader" field** Why: No such field exists; the normal price is a second resolution without guestTier. Say so in the binding rather than inventing a property. *(source: contracts/satellite/games.yaml#/components/schemas/GamePriceResolution; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **The pack's priority list names Date/Time Override and Attraction-Specific Price** Why: The contract's priority vocabulary is calendarException, peak, group, vip, retry, standard; there is no attraction-specific tier (every price is per game). Use the contract's names on this screen and BO-441. *(source: screens/P08-venue-back-office.yaml#BO-441 / contracts/satellite/games.yaml#/components/schemas/GamePricing; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+
+#### Decided on this screen
+
+Answered questions: draw the decision, not the old default. Where a decision and the tables below differ, the decision wins.
+
+- **The pack says "before publishing configuration"; should the preview evaluate a draft price change, not only what is live?** → Drawn default accepted: Show a "Published pricing" badge and a greyed "Include draft changes" toggle until the price read accepts a draft or version parameter. *(decided by Chinmay, 2026-10-02; DEC-411 / CHG-NOTE-008)* **Reviewable:** a default the lead may still overrule before the block is tasked.
+
 #### Inputs: what the user enters or picks
 
 **On the screen**
@@ -961,6 +1577,15 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Reader | picker: choose a reader | — | — | `getGamePricing` ?readerId |
 | At | date and time picker | — | — | `getGamePricing` ?at |
 | Guest tier | text field | — | — | `getGamePricing` ?guestTier |
+
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Venue**: Not a field. The pack lists Venue as a simulation input, but the venue is the one in the top-bar venue switcher; show it as read-only context above the inputs ("Simulating at Summit Peaks"). *(source: screens/P08-venue-back-office.yaml#BO-442)*
+- **Game (gameId)**: Required, searchable select of games in the venue grouped by attraction type (Rides, Skill games, Video games); nothing is evaluated until a game is chosen. Show the game's status beside it; a game that is out of service still simulates but carries an "Out of service" warning. *(source: contracts/satellite/games.yaml#getGamePricing / DI-863)*
+- **Reader (readerId)**: Optional select filtered to readers mapped to the chosen game; defaults to the game's mapped reader. With no reader chosen the preview shows a generic reader frame. *(source: contracts/satellite/games.yaml#getGamePricing / contracts/satellite/games.yaml#/components/schemas/Game)*
+- **Date and time (at)**: One date-time picker in venue local time, default "Now"; quick chips for "Now", "This Saturday 20:00" and "Next public holiday" so peak and calendar-exception rules can be tried in one click. The pack's Date and Time inputs are one value on the wire. *(source: screens/P08-venue-back-office.yaml#BO-442 / contracts/satellite/games.yaml#getGamePricing)*
+- **Customer type / VIP status (guestTier)**: One segmented control (Normal, VIP), not two fields: the pack's Customer Type and VIP Status are the same parameter. Default Normal. *(source: screens/P08-venue-back-office.yaml#BO-440 / contracts/satellite/games.yaml#getGamePricing)*
+- **Retry status, Package / entitlement**: Draw them, greyed, with "Not yet part of the simulation" (per VO-R13): the price read takes no retry or entitlement parameter. Offer instead "Simulate with a real card" which runs the full tap decision (entitlement, funding and price) for a card number and shows the outcome beside the price. *(source: contracts/satellite/games.yaml#getGamePricing / contracts/satellite/games.yaml#simulateGameplayAuthorisation)*
 
 #### Outputs: what the screen shows and produces
 
@@ -996,6 +1621,18 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Normal price on reader | text | not in the schema: `Normal price on reader` |
 | Reader display text | text | not in the schema: `Reader display text` |
 
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Final price tile**: Large "AED 30.00" with the applied rule in words under it ("VIP pricing"); never a bare rule code. When the game is closed by a calendar exception show "Closed on 31 Dec 2026" instead of a price. *(source: contracts/satellite/games.yaml#/components/schemas/GamePriceResolution / contracts/satellite/games.yaml#/components/schemas/GamePricingException)*
+- **Rule evaluation table**: One row per candidate rule in the configured priority order (the order set on BO-441), columns Rule, Price, Result. The winner carries a tick and "Applied"; the others show skippedBecause in plain words ("Lower priority than VIP", "Not peak at 20:00 on Saturday", "Group needs 4 players"). Rules that did not match stay visible; hiding them hides why a price is what it is. *(source: screens/P08-venue-back-office.yaml#BO-442 / contracts/satellite/games.yaml#/components/schemas/GamePriceResolution)*
+- **Reader preview**: A physical reader mockup in two states, side by side: before identification ("SKY COASTER / Normal AED 45 / VIP AED 30 / TAP TO PLAY") and after a VIP tap ("VIP RECOGNIZED / YOUR PRICE AED 30"). The Normal line comes from a second price read without guestTier; the reader frame uses the reader's theme and the tenant brand, in English and Arabic. *(source: screens/P08-venue-back-office.yaml#BO-440 / screens/P08-venue-back-office.yaml#BO-443 / DI-862)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Simulate**: Runs the price read with the chosen inputs; re-runs automatically when any input changes. A failed read keeps the last result greyed with "Could not recalculate, retry". *(source: contracts/satellite/games.yaml#getGamePricing)*
+- **Simulate with a real card**: Asks for a card number and runs the tap simulation; shows Allowed or the refusal reason with the guest message the reader would show. It changes nothing on the card. *(source: contracts/satellite/games.yaml#simulateGameplayAuthorisation)*
+- **Open the rule**: Each rule row links to the screen that owns it (BO-435 standard, BO-436 group, BO-437 peak, BO-438 calendar, BO-439 VIP, BO-440 retry, BO-441 priority). *(source: F191 step 16 / screens/P08-venue-back-office.yaml#BO-434)*
+
 **Data it reads**: `getGamePricing` (onLoad, What the reader will charge)
 
 **Where the user goes next**
@@ -1012,6 +1649,46 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the effective pricing reader are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Edge cases to draw
+
+- **No rule produces a price for this game and time**: Show "No price at this time; the reader would refuse this tap" in red with a link to BO-435, rather than AED 0.00. A zero price is a free game, which is a different statement. *(source: screens/P08-venue-back-office.yaml#BO-468 / contracts/satellite/games.yaml#/components/schemas/GameConfigurationHealth)*
+- **Two rules of equal priority both match**: Cannot happen by construction (priority is an ordered list), so the table always has exactly one Applied row; if the read returns none, treat it as no price. *(source: screens/P08-venue-back-office.yaml#BO-442 / contracts/satellite/games.yaml#/components/schemas/GamePricing)*
+- **Simulated date in the past**: Allowed (for investigating a complaint), with a note that rules are evaluated as configured now, not as they were then. *(source: designer default)*
+- **Viewer without price rights**: The screen is read-only by nature; without PRICE_VIEW show the no-access state naming the permission. *(source: contracts/satellite/games.yaml#getGamePricing)*
+
+#### Consistency with other screens
+
+- Match `BO-441`: The rule order in the evaluation table is the order defined on Price Priority & Conflict Rules; use the same rule names (Retry, VIP, Calendar exception, Peak, Group, Standard).
+- Match `BO-480`: The reader mockup is the same component as the Reader Screen, LED & Sound preview; one drawing, two uses.
+- Match `BO-490`: The guest's "What can I play?" price is resolved by the same priority, so the same card at the same time must show the same price on both.
+- Match `BO-443`: Publication governs what the reader receives; this screen previews pricing before it is published (see open question).
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+simulation:
+  game: Sky Coaster
+  reader: R-001
+  at: Sat 03 Oct 2026 20:00
+  guestTier: VIP
+evaluation:
+- rule: VIP pricing
+  price: AED 30.00
+  result: Applied
+- rule: Peak (Fri-Sat 18:00-23:00)
+  price: AED 45.00
+  result: Lower priority than VIP
+- rule: Standard
+  price: AED 35.00
+  result: Lower priority than VIP
+reader:
+  line1: SKY COASTER
+  line2: Normal AED 45 | VIP AED 30
+  line3: TAP TO PLAY
+```
 
 #### Permissions
 
@@ -1052,6 +1729,9 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-434`.
 - [ ] Every gated control is gated: `PRICE_VIEW`.
 - [ ] The 2 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 4 edge case(s) from the process notes are drawn.
+- [ ] The 3 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
+- [ ] The 1 decision(s) taken on this screen are drawn as decided, not as the old default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -1065,25 +1745,24 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Games & Rides · wave 3 · needs the `games` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `PRICE_CONFIGURE`, `PRICE_VIEW`, `PRODUCT_CONFIGURE`, `PRODUCT_VIEW` (2 configure, 2 read); in the flows as venue manager |
+| Who uses it | venue staff holding `PRICE_CONFIGURE`, `PRICE_VIEW`, `PRODUCT_CONFIGURE` (2 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
 | Offline | online only |
 | Opens with | `ruleId` (navigation) |
 | Route | `/games-rides/pricing-audit-approval-publication-bo-443` |
 
-**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built. Removed 2 October 2026 (CHG-WIR-025): listPricing is the AI pricing intelligence view, not the population of a pricing audit and publication screen; the screen keeps listDynamicPriceRules (the rules …
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Governs pricing changes with a full history: what is approved, what becomes effective when, and only approved prices reaching runtime. Publication can be immediate, scheduled, from a future effective date or staged by market, venue or channel; never retroactive.
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- List operation(s) listDynamicPriceRules return a bare array, not the paged list envelope (items, nextCursor, hasMore). (CHG-SBO-005)
+
+**Fixed on main** (the package already carries these; draw what it says): The screen sits in the Games & Rides module and lists listPricing (an AI pricing intelligence view) as its population. (CHG-WIR-025).
 
 #### Inputs: what the user enters or picks
-
-**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
-
-| Filter | Drawn as | Default | Allowed values, rules | Source |
-|---|---|---|---|---|
-| Venue | text field | — | — | `listPricing` ?venue |
-| Urgency | radio group | — | Low · Medium · High · Critical | `listPricing` ?urgency |
-| Risk | segmented control | — | Low · Medium · High | `listPricing` ?risk |
-| Min confidence | number field | — | — | `listPricing` ?minConfidence |
 
 **Sent by *What publishing changes*** (`publishPricingEffectiveDate`; no form is declared, so these are filled from the screen or collected inline)
 
@@ -1106,6 +1785,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Effective date `stages[].effectiveDate` | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | Effective from | `publishPricingEffectiveDate` body |
 | Cancel `cancel` | toggle | optional | — | — | — | True cancels this scheduled publication; allowed only before activation | `publishPricingEffectiveDate` body |
 
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **effectiveDate**: Cannot be in the past; visit dates may differ from sales dates ("prices for visits from 1 Jan, on sale from 1 Dec"). *(source: contracts/spine/catalogue.yaml#publishPricingEffectiveDate)*
+
 #### Outputs: what the screen shows and produces
 
 **Actions and what each produces**
@@ -1117,7 +1800,11 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Deactivate Rule (destructive button) | navigation or local | — | — | — | — |
 | What publishing changes (publish gate) | `publishPricingEffectiveDate` PUT `/pricing-effective-date` | PricingPublicationEffectiveDateSchedulerInput | PricingPublicationEffectiveDateSchedulerView | — | — |
 
-**Data it reads**: `listPricing` (onLoad, AI Pricing Intelligence Command Center); `listDynamicPriceRules` (onLoad, The dynamic price rules reviewed and published here)
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **pre-publication checks and collisions**: The checks with pass or fail and any collision with another scheduled publication, before Publish. *(source: contracts/spine/catalogue.yaml#publishPricingEffectiveDate)*
+
+**Data it reads**: `listDynamicPriceRules` (onLoad, The dynamic price rules reviewed and published here)
 
 **Where the user goes next**
 
@@ -1133,14 +1820,26 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | Loading (`?state=loading`) | The pricing audit approval list. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the pricing audit approval untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No pricing audit approval yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, first run (`?state=emptyFirstRun`) | No pricing audit approval yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the pricing audit approval are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+publication:
+  version: Games pricing v12
+  mode: futureEffectiveDate
+  effective: 2026-12-01 00:00
+  channel: Point of sale
+  checks: 6 of 6 passed
+```
+
 #### Permissions
 
-- `listPricing` → `PRODUCT_VIEW` (read) · staff
 - `publishPricingEffectiveDate` → `PRODUCT_CONFIGURE` (configure) · staff
 - `setDynamicPriceRule` → `PRICE_CONFIGURE` (configure) · staff
 - `listDynamicPriceRules` → `PRICE_VIEW` (read) · staff
@@ -1191,7 +1890,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - [ ] Every state opens from `#BO-443?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Publish Now, Schedule Publication, Deactivate Rule, What publishing changes.
 - [ ] Every transition is wired: `BO-434`.
-- [ ] Every gated control is gated: `PRICE_CONFIGURE`, `PRICE_VIEW`, `PRODUCT_CONFIGURE`, `PRODUCT_VIEW`.
+- [ ] Every gated control is gated: `PRICE_CONFIGURE`, `PRICE_VIEW`, `PRODUCT_CONFIGURE`.
 - [ ] The module and platform inputs below are applied.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -1275,6 +1974,13 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - Reports and historical searches must still retrieve archived transactions when required; the retention period (e.g. keep 3 of 5+ years live) is configurable per customer, archival manual or automated. *(agreed · MoM 28 Jul 2026, 23. Database Optimisation and Archiving · DI-018)*
 - Back-office controls for the waiting room: configurable maximum active users and admission intervals, set per customer and venue. *(agreed · MoM 28 Jul 2026, 19. Auto-scaling and Virtual Waiting Room · DI-017)*
 
+### In P08 · Sell
+
+- Allam: back-end configuration is the most critical part; the screens must make visually clear how administrators configure products, pricing per channel, attributes/components, entitlements, validity and access permissions, comparable to the structured product/metric-sheet approach of an earlier reference system. *(agreed · MoM 24 Sep 2026, 4.3 Back-End Configuration Detail — Requested Format (Screens, Not Just Functional Lists) · DI-985)*
+- Chinmay: reduce the number of configuration screens/pages and consolidate related settings/toggles to avoid a long, click-heavy admin flow; Allam agreed, citing the previous system's demo as a starting reference. *(agreed · MoM 25 Aug 2026, 4.11 UX Simplification & Distributed Inventory · DI-474)*
+- Retail dashboard gives a consolidated real-time view across outlets — total retail sales, total and average transactions, store performance snapshot, system alerts and out-of-stock indicators — viewable by day, week or month. *(client request · MoM 19 Aug 2026, 4.1 Retail Command Center — Dashboard & Store Setup · DI-349)*
+- Allam/Qossai: the workstation/till/POS wireframes are reference only (partly ChatGPT-generated, with errors) and not to be replicated; Softlabs may consolidate dashboards freely and must cross-check the functionality matrix for missing items. *(agreed · MoM 14 Aug 2026, 11. Wireframe Walkthrough — Workstation, Till & POS Management · DI-312)*
+
 **7 more name particular screens** and are in each screen's block above (*Client meeting inputs*).
 
 ---
@@ -1291,7 +1997,6 @@ Method, path, parameters, request and response for every operation these screens
 {
 "getGamePricing": {"method":"GET","path":"/game-pricing","contract":"games","summary":"The effective price at a reader, and why","permission":"PRICE_VIEW","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[{"name":"gameId","in":"query","required":true},{"name":"readerId","in":"query","required":null},{"name":"at","in":"query","required":null},{"name":"guestTier","in":"query","required":null}],"requestBody":null,"responds":"GamePriceResolution"},
 "listDynamicPriceRules": {"method":"GET","path":"/pricing/dynamic-rules","contract":"catalogue","summary":"Dynamic pricing rules","permission":"PRICE_VIEW","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"PricingDynamicPriceRule"},
-"listPricing": {"method":"GET","path":"/pricing","contract":"catalogue","summary":"AI Pricing Intelligence Command Center","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"venue","in":"query","required":false},{"name":"urgency","in":"query","required":false},{"name":"risk","in":"query","required":false},{"name":"minConfidence","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listRulePriorityConflict": {"method":"GET","path":"/rule-priority-conflict","contract":"catalogue","summary":"Rule Priority, Conflict Resolution & Dynamic Pricing Test Console","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"caseType","in":"query","required":false},{"name":"conflictCode","in":"query","required":false},{"name":"strategyId","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "publishPricingEffectiveDate": {"method":"PUT","path":"/pricing-effective-date","contract":"catalogue","summary":"Pricing Publication & Effective-Date Scheduler","permission":"PRODUCT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"PricingPublicationEffectiveDateSchedulerInput","responds":"PricingPublicationEffectiveDateSchedulerView"},
 "setDynamicPriceRule": {"method":"PUT","path":"/pricing/dynamic-rules/{ruleId}","contract":"catalogue","summary":"Replace a rule, its conditions and its actions","permission":"PRICE_CONFIGURE","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[{"name":"ruleId","in":"path","required":true},{"name":null,"in":null,"required":null}],"requestBody":"DynamicPriceRuleDetail","responds":"DynamicPriceRuleDetail"},
@@ -1306,11 +2011,9 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
-"AiPricingIntelligenceCommandCenterSummary": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection; the headline tiles over the list, computed at read time for the filters in force","description":"**The headline figures on AI Pricing Intelligence Command Center.** The pack's KPI cards, split out of the row (decided 29 September, readiness close-out): a count describes the list, not each item in it.","properties":{"activeAiRecommendations":{"type":"integer","description":"Active AI Recommendations"},"highPriorityOpportunities":{"type":"integer","description":"High-Priority Opportunities"},"estimatedRevenueOpportunity":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Estimated Revenue Opportunity"},"demandSurgesDetected":{"type":"integer","description":"Demand Surges Detected: granules forecast materially above baseline"},"demandRisksDetected":{"type":"integer","description":"Demand Risks Detected: granules forecast materially below baseline"},"externalSignalsActive":{"type":"integer","description":"External Signals Active"},"nearbyEventsDetected":{"type":"integer","description":"Nearby Events Detected within the configured monitoring radius"},"weatherImpacts":{"type":"integer","description":"Weather Impacts"},"competitorMovements":{"type":"integer","description":"Competitor Movements"},"forecastAccuracy":{"type":"number","description":"Forecast Accuracy (100 - MAPE over the last 30 days (decided 29 September, readiness close-out)), percent"},"averageAiConfidence":{"type":"number","description":"Average AI Confidence across active recommendations, percent"},"dataQualityIssues":{"type":"integer","description":"Data Quality Issues"},"aiSummary":{"type":"array","items":{"type":"string"},"description":"AI Summary (pack p.95), e.g. demand forecast 19% above baseline and its drivers. Advisory only: generated narrative never changes a price (decided 29 September, readiness close-out)"}}},
-"AiPricingIntelligenceCommandCenterView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over catalogue state, assembled at read time from tables that already exist","description":"**What AI Pricing Intelligence Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"productEvent":{"type":"string","description":"Product/Event name the opportunity applies to"},"venue":{"type":"string","description":"Venue name"},"currentPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Current Price"},"recommendedPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Recommended Price"},"adjustment":{"type":"number","description":"Adjustment % from current to recommended price, percent"},"demandForecast":{"type":"integer","description":"Demand Forecast: forecast demand (admissions) for the period"},"revenueOpportunity":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Revenue Opportunity"},"confidence":{"type":"number","description":"AI confidence in the recommendation, 0-100, percent"},"risk":{"type":"string","description":"Risk of acting on the recommendation","enum":["low","medium","high"]},"urgency":{"type":"string","description":"Urgency (time to event and velocity)","enum":["low","medium","high","critical"]},"recommendationId":{"type":"string","description":"Recommendation id; drill-down key into listPricingRecommendationExplainability"},"drivers":{"type":"array","items":{"type":"object","properties":{"signal":{"type":"string","enum":["internalSales","bookingVelocity","occupancy","historicalEvents","nearbyEvent","weather","marketTourism","competitor","priceElasticity","other"],"description":"Signal category behind the driver"},"direction":{"type":"string","enum":["up","down"],"description":"Whether the driver pushes the price up or down"},"explanation":{"type":"string","description":"Business-language evidence, e.g. booking velocity 31% above forecast"}}},"description":"Primary drivers of the recommendation (pack's up/down driver list); explanatory, not literal model weights"}}},
 "DynamicPriceRuleDetail": {"type":"object","x-ticvai-persistence":"none — composed from a rule, its conditions and its actions","description":"**A rule is unreadable without both halves.** The conditions say when it fires, the actions say what it does to the price, and `minPrice`/`maxPrice` on the action are the guard rails a reviewer looks for first.\n","required":["rule"],"properties":{"rule":{"$ref":"#/components/schemas/PricingDynamicPriceRule"},"conditions":{"type":"array","items":{"$ref":"#/components/schemas/PricingDynamicPriceCondition"}},"actions":{"type":"array","items":{"$ref":"#/components/schemas/PricingDynamicPriceAction"}}}},
 "GamePriceResolution": {"type":"object","description":"Board 5.9. **What will this actually charge.**","properties":{"gameId":{"type":"string","format":"uuid"},"effectivePrice":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"appliedRule":{"type":"string"},"trace":{"type":"array","items":{"type":"object","properties":{"rule":{"type":"string"},"applied":{"type":"boolean"},"price":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"skippedBecause":{"type":"string","nullable":true}}}}}},
-"GamePricing": {"type":"object","x-ticvai-persistence":"games.pricing","description":"Board 5. **Priority is explicit**, because evaluation order is not a decision anybody made.\n`groupPricing`, `peakPricing` and `calendarExceptions` are stored one row per entry in `games.pricing_exception` (`GamePricingException`); the rest of this shape is `games.pricing`.\n","properties":{"gameId":{"type":"string","format":"uuid"},"standardPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"vipPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"groupPricing":{"type":"array","items":{"type":"object","properties":{"minimumPlayers":{"type":"integer"},"pricePerPlayer":{"$ref":"../shared/common.yaml#/components/schemas/Money"}}}},"peakPricing":{"type":"array","items":{"type":"object","properties":{"daysOfWeek":{"type":"array","items":{"type":"string"}},"from":{"type":"string"},"to":{"type":"string"},"price":{"$ref":"../shared/common.yaml#/components/schemas/Money"}}}},"calendarExceptions":{"type":"array","items":{"type":"object","properties":{"date":{"type":"string","format":"date"},"price":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"closed":{"type":"boolean","default":false}}}},"retryPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"retryWindowSeconds":{"type":"integer","nullable":true},"priority":{"type":"array","items":{"type":"string","enum":["calendarException","peak","group","vip","retry","standard"]}},"scopePath":{"type":"string"}}},
+"GamePricing": {"type":"object","x-ticvai-persistence":"games.pricing","description":"Board 5. **Priority is explicit**, because evaluation order is not a decision anybody made.\n`groupPricing`, `peakPricing` and `calendarExceptions` are stored one row per entry in `games.pricing_exception` (`GamePricingException`); the rest of this shape is `games.pricing`.\n","properties":{"gameId":{"type":"string","format":"uuid"},"standardPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"vipPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"groupPricing":{"type":"array","items":{"type":"object","properties":{"minimumPlayers":{"type":"integer"},"pricePerPlayer":{"$ref":"../shared/common.yaml#/components/schemas/Money"}}}},"peakPricing":{"type":"array","items":{"type":"object","properties":{"daysOfWeek":{"type":"array","items":{"type":"string"}},"from":{"type":"string"},"to":{"type":"string"},"price":{"$ref":"../shared/common.yaml#/components/schemas/Money"}}}},"calendarExceptions":{"type":"array","items":{"type":"object","properties":{"date":{"type":"string","format":"date"},"price":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"closed":{"type":"boolean","default":false}}}},"retryPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"retryWindowSeconds":{"type":"integer","nullable":true,"description":"How long after the game ends the retry offer stays open."},"retryOfferLeadSeconds":{"type":"integer","minimum":0,"nullable":true,"description":"**When the retry offer appears** (Chinmay, 2 October, workbook Q410, default accepted; DI-877; CHG-CSA-028): this many seconds before the game ends, and it stays open `retryWindowSeconds` after. A retry is charged in money at `retryPrice`, never from an entitlement; a retry after a machine fault is the reader's `retryPricing`, not this."},"priority":{"type":"array","items":{"type":"string","enum":["calendarException","peak","group","vip","retry","standard"]}},"scopePath":{"type":"string"}}},
 "Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}},
 "PricingDynamicPriceAction": {"type":"object","x-ticvai-persistence":"pricing.dynamic_price_action","description":"**Taken from the backend workbook, 20 September.** Configurable dynamic pricing component for dynamic price action.","required":["dynamicPriceRuleId","type","value"],"properties":{"id":{"type":"string","format":"uuid"},"dynamicPriceRuleId":{"type":"string","format":"uuid"},"type":{"type":"string","maxLength":30},"value":{"type":"number"},"minPrice":{"type":"number","nullable":true},"maxPrice":{"type":"number","nullable":true}}},
 "PricingDynamicPriceCondition": {"type":"object","x-ticvai-persistence":"pricing.dynamic_price_condition","description":"**Taken from the backend workbook, 20 September.** Configurable dynamic pricing component for dynamic price rule condition.","required":["actionId","dynamicPriceRuleId","type","ruleOperator","valueJson","sequenceNo"],"properties":{"actionId":{"type":"string","format":"uuid"},"dynamicPriceRuleId":{"type":"string","format":"uuid"},"type":{"type":"string","maxLength":50},"ruleOperator":{"type":"string","maxLength":20},"valueJson":{"type":"string"},"sequenceNo":{"type":"integer"}}},

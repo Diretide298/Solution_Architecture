@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Inventory & Procurement
   version: 0.1.0
-  x-ticvai-screen-count: 58
+  x-ticvai-screen-count: 57
   x-ticvai-tier: satellite
   x-ticvai-module: 15 — Inventory Management
   x-ticvai-requirements: 98
@@ -3380,8 +3380,8 @@ paths:
     get:
       operationId: getInventoryKitDefinition
       x-ticvai-consumed-by:
-        - "P08 BO-081 Inventory Items"
         - "P08 ADM-189 Component Inventory & Availability Matrix"
+        - "P08 BO-081 Inventory Items"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: our build plan (retrace 4.4.20); shape follows getInventoryItem'

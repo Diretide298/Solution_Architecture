@@ -27,9 +27,11 @@ steps:
   screen: BO-305
   action: Works in Order Detail & Transaction Workspace
   operations:
-  - setOrderDetailTransaction
+  - getOrder
+  - getOrderStatement
   outcome: Provide the authoritative 360-degree view of a single order. This should become one of the
     most important operational screens in TICVAI.
+  note: '**Repointed 2 October (CHG-WIR-025).** The 360 view reads the order and its statement; setOrderDetailTransaction edited lines outside modify, exchange and refund and came off BO-305.'
 - step: 3
   screen: BO-304
   action: Returns to the board's landing screen

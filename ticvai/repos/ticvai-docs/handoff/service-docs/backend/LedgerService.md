@@ -7,7 +7,7 @@
 | Tier | commerce: The sale path. Highest availability, highest write rate. |
 | Contracts | `finance` |
 | Schemas owned | `ledger` |
-| Operations in the slice | 18 of 72 |
+| Operations in the slice | 15 of 72 |
 | Scale | Write-heavy, batch-tolerant, not latency-critical. Recognition and revaluation are jobs. |
 | If it is down | Correctness over availability. A ledger that is briefly unavailable is recoverable; one that is briefly wrong is not. |
 
@@ -26,171 +26,21 @@
 
 | Group | Operation | Method | Path | Part | Wave | Called by |
 |---|---|---|---|---|---|---|
-| accounts | [`createAccount`](#createaccount) | POST | `/accounts` | setup | 2 | BO-074 |
-| accounts | [`updateAccount`](#updateaccount) | PATCH | `/accounts/{accountId}` | setup | 2 | BO-074 |
 | finance | [`ingestFxRates`](#ingestfxrates) | POST | `/fx-rates/ingest` | setup | 1 | BO-077 |
 | finance | [`setFxProvider`](#setfxprovider) | PUT | `/fx-rates/providers` | setup | 1 |  |
-| fiscal | [`createLegalEntity`](#createlegalentity) | POST | `/legal-entities` | setup | 1 | ADM-411, BO-074, SGN-020 |
+| fiscal | [`createLegalEntity`](#createlegalentity) | POST | `/legal-entities` | setup | 1 | ADM-411, BO-074 |
 | ledger | [`listFxRates`](#listfxrates) | GET | `/fx-rates` | core | 1 | BO-077, GST-044, WEB-035 |
 | ledger | [`setFxRate`](#setfxrate) | PUT | `/fx-rates` | setup | 1 | BO-077 |
-| reporting | [`getFinancialReport`](#getfinancialreport) | GET | `/reports/financial` | core | 2 | BO-029, BO-058, BO-059, BO-060, POS-008, PTR-018 … |
 | tax | [`createTaxCode`](#createtaxcode) | POST | `/tax-codes` | setup | 1 | BO-075 |
-| tax | [`getTaxDocumentRendition`](#gettaxdocumentrendition) | GET | `/tax-documents/{documentId}/rendition` | core | 1 | BO-022, BO-023, GST-019, POS-026, WEB-019 |
+| tax | [`getTaxDocumentRendition`](#gettaxdocumentrendition) | GET | `/tax-documents/{documentId}/rendition` | core | 1 | BO-022, BO-023, GST-019, POS-026, POS-030, WEB-019 |
 | tax | [`getTaxInvoice`](#gettaxinvoice) | GET | `/tax-invoices/{invoiceId}` | core | 1 | BO-022, GST-019, POS-026, WEB-019 |
 | tax | [`issueCreditMemo`](#issuecreditmemo) | POST | `/tax-invoices/{invoiceId}/credit-memos` | core | 1 | BO-022, BO-023, POS-011 |
-| tax | [`issueTaxInvoice`](#issuetaxinvoice) | POST | `/tax-invoices` | core | 1 | BO-022, GST-019, POS-026, WEB-019 |
-| tax | [`listCreditMemos`](#listcreditmemos) | GET | `/credit-memos` | core | 1 | BO-023, BO-1081, GST-019, WEB-019 |
-| tax | [`listTaxInvoices`](#listtaxinvoices) | GET | `/tax-invoices` | core | 1 | ADM-068, BO-022, BO-1081, GST-019, WEB-019 |
+| tax | [`issueTaxInvoice`](#issuetaxinvoice) | POST | `/tax-invoices` | core | 1 | BO-022, GST-019, POS-026, POS-030, WEB-019 |
+| tax | [`listCreditMemos`](#listcreditmemos) | GET | `/credit-memos` | core | 1 | ANL-072, BO-023, BO-1081, GST-019, WEB-019 |
+| tax | [`listTaxInvoices`](#listtaxinvoices) | GET | `/tax-invoices` | core | 1 | ADM-068, ANL-072, BO-022, BO-1081, GST-019, WEB-019 |
 | tax | [`setEInvoicingProvider`](#seteinvoicingprovider) | PUT | `/e-invoicing/providers` | setup | 1 | ADM-069 |
 | tax | [`transmitEInvoices`](#transmiteinvoices) | POST | `/e-invoicing/transmissions` | setup | 1 | ADM-077 |
 | tax | [`updateTaxCode`](#updatetaxcode) | PATCH | `/tax-codes/{taxCodeId}` | setup | 1 | BO-075 |
-
-## Group: accounts
-
-### createAccount
-
-**`POST /accounts`**: Create an account
-
-Accounts may be created natively or mapped to a chart maintained externally in the client's ERP. Where `externalCode` is set, exports use it — the client's finance team continues to see their own codes.
-
-|  |  |
-|---|---|
-| Permission | `ACCOUNT_CONFIGURE` |
-| Scope level | region |
-| Part of slice | setup, makes `ledger.account` non-empty |
-| Wave | 2 |
-| Offline | no |
-| Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `ledger.account` |
-| Writes | `cache:idempotency`, `ledger.account` |
-| Called by | BO-074 |
-
-**Parameters**
-
-| Name | In | Required | Type | Notes |
-|---|---|---|---|---|
-| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
-
-**Request body**: `CreateAccountRequest`
-
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| code | string | yes | (max length 64; pattern ^[A-Za-z0-9._-]+$) |
-| externalCode | string |  | (max length 64) |
-| name | string | yes | (max length 200) |
-| type | AccountType: enum (asset, liability, equity, revenue, expense) | yes |  |
-| parentId | string (uuid) |  |  |
-| legalEntityId | string (uuid) | yes |  |
-| isPostable | boolean |  | (default True) |
-| isSuspense | boolean |  | See Account.isSuspense. (default False) |
-| subType | string |  | See Account.subType. (nullable) |
-| tags | array of string |  | See Account.tags. |
-| notes | string |  | See Account.notes. (nullable) |
-
-**Response**: `Account`
-
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| id | string (uuid) | yes |  |
-| code | string | yes | (max length 64) |
-| externalCode | string |  | Code in the client's own chart. (nullable) |
-| isSuspense | boolean |  | 5.7.x. (default False) |
-| subType | string |  | 5.7.27. (nullable) |
-| tags | array of string |  | How a venue groups accounts for its own reporting. |
-| notes | string |  | 5.7.27. (nullable) |
-| name | string | yes | (max length 200) |
-| type | AccountType: enum (asset, liability, equity, revenue, expense) | yes |  |
-| parentId | string (uuid) |  | (nullable) |
-| legalEntityId | string (uuid) | yes |  |
-| currency | string |  | (pattern ^[A-Z]{3}$) |
-| isPostable | boolean | yes | False for parent accounts, which aggregate only. |
-| isActive | boolean | yes |  |
-| balance | Money |  | On the wire this is three fields; in the database it is one column. |
-| balance.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
-| balance.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
-| balance.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-
-**Responses**
-
-| Code | Shape | Meaning |
-|---|---|---|
-| 201 |  | Created |
-| 400 | BadRequest | Validation failed |
-| 409 |  | Code already in use within this legal entity |
-| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
-
-### updateAccount
-
-**`PATCH /accounts/{accountId}`**: Rename, remap or deactivate an account
-
-The code is immutable once entries exist; until then it can be corrected here. Remapping is `externalCode`, the code in the client's own ERP chart. Deactivation prevents new postings and leaves history intact.
-**Once an account has been posted to, a remap changes `externalCode` only** (decided 28 September, audit R127 (5)). The account `type` is fixed from its first posting, and is not accepted by this call at all.
-**Changed in place.** An account is configuration, not a posting, so this edits the row rather than adding one. The postings made to it are untouched.
-
-|  |  |
-|---|---|
-| Permission | `ACCOUNT_CONFIGURE` |
-| Scope level | region |
-| Part of slice | setup, makes `ledger.account` non-empty |
-| Wave | 2 |
-| Offline | no |
-| Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `ledger.account` |
-| Writes | `cache:idempotency`, `ledger.account` |
-| Called by | BO-074 |
-
-**Parameters**
-
-| Name | In | Required | Type | Notes |
-|---|---|---|---|---|
-| accountId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
-
-**Request body**
-
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| code | string |  | Accepted only while the account has no entries. (max length 64; pattern ^[A-Za-z0-9._-]+$) |
-| name | string |  | (max length 200) |
-| externalCode | string |  | (max length 64) |
-| isActive | boolean |  |  |
-| isSuspense | boolean |  |  |
-| subType | string |  | (nullable) |
-| tags | array of string |  |  |
-| notes | string |  | (nullable) |
-
-**Response**: `Account`
-
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| id | string (uuid) | yes |  |
-| code | string | yes | (max length 64) |
-| externalCode | string |  | Code in the client's own chart. (nullable) |
-| isSuspense | boolean |  | 5.7.x. (default False) |
-| subType | string |  | 5.7.27. (nullable) |
-| tags | array of string |  | How a venue groups accounts for its own reporting. |
-| notes | string |  | 5.7.27. (nullable) |
-| name | string | yes | (max length 200) |
-| type | AccountType: enum (asset, liability, equity, revenue, expense) | yes |  |
-| parentId | string (uuid) |  | (nullable) |
-| legalEntityId | string (uuid) | yes |  |
-| currency | string |  | (pattern ^[A-Z]{3}$) |
-| isPostable | boolean | yes | False for parent accounts, which aggregate only. |
-| isActive | boolean | yes |  |
-| balance | Money |  | On the wire this is three fields; in the database it is one column. |
-| balance.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
-| balance.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
-| balance.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-
-**Responses**
-
-| Code | Shape | Meaning |
-|---|---|---|
-| 200 |  | Updated |
-| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
-| 409 |  | code sent for an account that already has entries, or a new code already in use within the legal entity. |
-| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
-
 
 ## Group: finance
 
@@ -255,6 +105,7 @@ The code is immutable once entries exist; until then it can be corrected here. R
 | rates[].note | string |  | Why this rate, and from where. (max length 500; nullable) |
 | rates[].providerReference | string |  | The provider's own identifier for this quote. (read-only; nullable) |
 | rates[].fetchedAt | string (date-time) |  | When the rate was pulled. (read-only; nullable) |
+| rates[].chargeable | boolean |  | With venueId, true where a guest may select this currency and pay in it at that venue (tenancy.VenueSettings.chargeCurrencies), false where it is shown as an approximate price only (CHG-FIN-001). (read-only) |
 
 **Responses**
 
@@ -327,7 +178,7 @@ The code is immutable once entries exist; until then it can be corrected here. R
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `ledger.legal_entity` |
 | Writes | `cache:idempotency`, `ledger.legal_entity` |
-| Called by | ADM-411, BO-074, SGN-020 |
+| Called by | ADM-411, BO-074 |
 
 **Parameters**
 
@@ -385,6 +236,7 @@ The code is immutable once entries exist; until then it can be corrected here. R
 A guest paying USD 100 in a UAE venue has the dirham equivalent stored at the configured rate. The foreign amount is retained for the cashier's declaration and for the foreign-tender report — it is never what the ledger holds.
 The consequence is that most of the questions FX usually raises do not arise. There is no rate to lock at redemption, none at expiry, and none at refund, because the stored amount was never in a foreign currency. Allam: *"the value of the currency doesn't matter whether it goes high or down. They are purchasing a product equivalent to that currency… at the end they are paying that base currency value, and they get a refund for the base currency value."*
 **Rates are set per region; each venue picks which currencies it shows** (decided 28 September, audit R120 (a)). A guest screen passes `venueId` and gets the region's rates narrowed to the currencies that venue has chosen to display (`tenancy.VenueSettings.displayCurrencies`); the rate itself is never set per venue.
+**Superseded in part, 2 October 2026 (Chinmay; CHG-FIN-001): the guest may now pay in a currency they select.** The ledger still holds base currency only, but a guest-selected currency is charged at the gateway at the region's `tender` rate, locked on the order (`orders.Order.chargeFxRate`), and a refund goes back in the currency paid at the sale rate, so the venue never refunds at today's rate. The quotation above (Allam, 10 August) describes the display-only option this replaces for card and wallet; it still holds for foreign cash at a till (DI-282). `chargeable=true` with `venueId` narrows the list to the currencies the venue lets a guest pay in (`tenancy.VenueSettings.chargeCurrencies`); each rate says `chargeable`.
 
 |  |  |
 |---|---|
@@ -406,6 +258,7 @@ The consequence is that most of the questions FX usually raises do not arise. Th
 | asAt | query |  | string (date-time) | Rates in force at this instant. |
 | purpose | query |  | FxRatePurpose: enum (tender, interEntity, reporting, revaluation) |  |
 | venueId | query |  | string (uuid) | Narrows the region's rates to the currencies this venue shows. |
+| chargeable | query |  | boolean | With venueId, only the currencies a guest may select and pay in at that venue (tenancy.VenueSettings.chargeCurrencies; CHG-FIN-001). |
 | pageSize | query |  | integer |  |
 | cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
 
@@ -426,6 +279,7 @@ The consequence is that most of the questions FX usually raises do not arise. Th
 | items[].note | string |  | Why this rate, and from where. (max length 500; nullable) |
 | items[].providerReference | string |  | The provider's own identifier for this quote. (read-only; nullable) |
 | items[].fetchedAt | string (date-time) |  | When the rate was pulled. (read-only; nullable) |
+| items[].chargeable | boolean |  | With venueId, true where a guest may select this currency and pay in it at that venue (tenancy.VenueSettings.chargeCurrencies), false where it is shown as an approximate price only (CHG-FIN-001). (read-only) |
 | nextCursor | string |  |  |
 | hasMore | boolean | yes |  |
 
@@ -482,6 +336,7 @@ The server sets `source` to `manual` and `setByPrincipalId` to the caller; `fetc
 | note | string |  | Why this rate, and from where. (max length 500; nullable) |
 | providerReference | string |  | The provider's own identifier for this quote. (read-only; nullable) |
 | fetchedAt | string (date-time) |  | When the rate was pulled. (read-only; nullable) |
+| chargeable | boolean |  | With venueId, true where a guest may select this currency and pay in it at that venue (tenancy.VenueSettings.chargeCurrencies), false where it is shown as an approximate price only (CHG-FIN-001). (read-only) |
 
 **Response**: `FxRate`
 
@@ -499,6 +354,7 @@ The server sets `source` to `manual` and `setByPrincipalId` to the caller; `fetc
 | note | string |  | Why this rate, and from where. (max length 500; nullable) |
 | providerReference | string |  | The provider's own identifier for this quote. (read-only; nullable) |
 | fetchedAt | string (date-time) |  | When the rate was pulled. (read-only; nullable) |
+| chargeable | boolean |  | With venueId, true where a guest may select this currency and pay in it at that venue (tenancy.VenueSettings.chargeCurrencies), false where it is shown as an approximate price only (CHG-FIN-001). (read-only) |
 
 **Responses**
 
@@ -507,69 +363,6 @@ The server sets `source` to `manual` and `setByPrincipalId` to the caller; `fetc
 | 201 |  | Set |
 | 400 |  | No note was given. |
 | 409 |  | Effective window overlaps an existing bounded rate for the same pair and purpose, or does not start after the rate in force |
-| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
-
-
-## Group: reporting
-
-### getFinancialReport
-
-**`GET /reports/financial`**: Financial statements, revenue and tax summaries
-
-Served from the reporting replica, never the primary. A month-end report running against the transactional database during a venue spike is the single most likely cause of an outage.
-Six reports, named by `report`: profit and loss, balance sheet, cash flow, revenue by venue, revenue by product, and the tax summary.
-
-|  |  |
-|---|---|
-| Permission | `REPORT_VIEW_VENUE` |
-| Scope level | venue |
-| Part of slice | core |
-| Wave | 2 |
-| Offline | no |
-| Conflict policy | serverWins |
-| Read routing | analytical |
-| Reads | `ledger.account`, `ledger.event_budget`, `ledger.fiscal_period`, `ledger.posting` |
-| Writes | - |
-| Called by | BO-029, BO-058, BO-059, BO-060, POS-008, PTR-018, SUP-008 |
-
-**Parameters**
-
-| Name | In | Required | Type | Notes |
-|---|---|---|---|---|
-| report | query | yes | FinancialReportKind: enum (profitAndLoss, balanceSheet, cashFlow, revenueByVenue, revenueByProduct, taxSummary) |  |
-| fiscalPeriodId | query | yes | string (uuid) |  |
-| legalEntityId | query |  | string (uuid) |  |
-| venueId | query |  | string (uuid) |  |
-| costCenterId | query |  | string (uuid) |  |
-
-**Response**: `FinancialReport`
-
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| report | FinancialReportKind: enum (profitAndLoss, balanceSheet, cashFlow, revenueByVenue, revenueByProduct, taxSummary) | yes | The report getFinancialReport returns. |
-| fiscalPeriodId | string (uuid) | yes |  |
-| legalEntityId | string (uuid) |  | (nullable) |
-| currency | string | yes | (pattern ^[A-Z]{3}$) |
-| currencyScale | integer |  |  |
-| generatedAt | string (date-time) | yes |  |
-| sections | array of object | yes |  |
-| sections[].name | string | yes |  |
-| sections[].lines | array of object | yes |  |
-| sections[].lines[].label | string |  |  |
-| sections[].lines[].accountCode | string |  | (nullable) |
-| sections[].lines[].amount | Money |  | On the wire this is three fields; in the database it is one column. |
-| sections[].lines[].priorPeriodAmount | object |  | The same line for the same period last year (decided 28 September, audit R127 (3)). |
-| sections[].total | Money | yes | On the wire this is three fields; in the database it is one column. |
-| sections[].total.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
-| sections[].total.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
-| sections[].total.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-
-**Responses**
-
-| Code | Shape | Meaning |
-|---|---|---|
-| 200 |  | Report |
-| 403 | Forbidden | Authenticated but not permitted at the requested scope |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
@@ -654,7 +447,7 @@ Supports compound tax — a code may apply on top of another code's result rathe
 | Read routing | replica |
 | Reads | `ledger.credit_memo`, `ledger.tax_invoice` |
 | Writes | - |
-| Called by | BO-022, BO-023, GST-019, POS-026, WEB-019 |
+| Called by | BO-022, BO-023, GST-019, POS-026, POS-030, WEB-019 |
 
 **Parameters**
 
@@ -752,6 +545,19 @@ Supports compound tax — a code may apply on top of another code's result rathe
 | taxAmountInLegalCurrency.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | taxAmountInLegalCurrency.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | taxAmountInLegalCurrency.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| legalCurrency | string |  | The legal entity's currency (AED in the UAE), in which the law requires the tax and the gross amount (CHG-FIN-011). (pattern ^[A-Z]{3}$; read-only) |
+| grossAmountInLegalCurrency | object |  | The gross amount payable in the legal currency (Executive Regulation Art. (read-only) |
+| grossAmountInLegalCurrency.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| grossAmountInLegalCurrency.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| grossAmountInLegalCurrency.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| legalFxRate | object |  | Units of the legal currency per one unit of currency, printed with the tax where the invoice is not in the legal currency (Art. (read-only; nullable) |
+| legalFxRateSource | object |  | uaeCentralBank for a UAE legal entity (Decree-Law Art. (read-only; nullable) |
+| paidCurrency | string |  | Where the guest paid in a currency they selected (orders.Order.chargeCurrency, CHG-FIN-001), printed as payment information with paidAmount and the charge rate. (pattern ^[A-Z]{3}$; read-only; nullable) |
+| paidAmount | object |  | What the guest paid in paidCurrency (orders.Order.chargeTotal). (read-only) |
+| paidAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| paidAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| paidAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| reverseChargeStatement | string |  | Where the recipient must account for the tax, the statement saying so and the Decree-Law provision (Art. (read-only; nullable) |
 | creditedAmount | Money |  | On the wire this is three fields; in the database it is one column. |
 | creditedAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | creditedAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
@@ -794,6 +600,10 @@ Supports compound tax — a code may apply on top of another code's result rathe
 | lines[].creditedAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | lines[].creditedAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | lines[].creditedAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| lines[].grossAmountInLegalCurrency | object |  | The amount payable for the line in the legal currency (AED), Executive Regulation Art. (read-only) |
+| lines[].grossAmountInLegalCurrency.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| lines[].grossAmountInLegalCurrency.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| lines[].grossAmountInLegalCurrency.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | taxSummary | array of object |  | VAT per rate and category, summed from the lines for the response. |
 | taxSummary[].taxCategory | FinTaxCategory: enum (standardRated, zeroRated, exempt, outOfScope, reverseCharge) |  | How a line is treated for VAT. |
 | taxSummary[].taxRate | number |  |  |
@@ -821,6 +631,7 @@ Supports compound tax — a code may apply on top of another code's result rathe
 
 5.7.94. **The document a refund or a cancellation owes the guest when a tax invoice was issued.** `full` credits every remaining line; `partial` credits the lines and amounts given. It is linked to the invoice it credits and, where one caused it, to the refund (`refundId`) or the cancelled order. The platform issues one itself (`service`) when a refund is approved on an invoiced order; staff issue one for a price adjustment or a billing error.
 A credit memo has its **own series** per legal entity (`setTaxInvoiceTemplate`, document kind `creditMemo`), numbered at issue without gaps, and is never edited or deleted. The VAT credited is the invoice's own rate per line, never today's. Issuing one moves the invoice to `partiallyCredited` or `fullyCredited`; the ledger movement is the refund's or the reversal's, not this document's. Who issued it, when and why is kept on the memo and in the audit record.
+**Titled "Tax Credit Note" in the UAE** (research 2 October 2026, CHG-FIN-011; Executive Regulation Art. 60(1)), showing the supplier's name, address and TRN, the recipient's where registered, the date of issue, the invoice's supply value, the corrected value, the difference and the tax on it in AED, a brief explanation, and the invoice it corrects. "Credit memo" stays the contract's name; screens and the document say "Tax credit note". A refund paid in a guest-selected currency (CHG-FIN-001) credits the invoice's own base-currency figures at the invoice's own rate.
 
 |  |  |
 |---|---|
@@ -890,7 +701,22 @@ A credit memo has its **own series** per legal entity (`setTaxInvoiceTemplate`, 
 | taxAmountInLegalCurrency.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | taxAmountInLegalCurrency.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | taxAmountInLegalCurrency.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| note | string |  | (nullable) |
+| legalFxRate | object |  | The invoice's own legalFxRate, never today's (CHG-FIN-011). (read-only; nullable) |
+| invoiceSupplyValue | object |  | The value of the supply shown on the tax invoice (Executive Regulation Art. (read-only) |
+| invoiceSupplyValue.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| invoiceSupplyValue.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| invoiceSupplyValue.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| correctedSupplyValue | object |  | The correct value of the supply after this credit note (Art. (read-only) |
+| correctedSupplyValue.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| correctedSupplyValue.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| correctedSupplyValue.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| supplierName | string |  | Snapshot of the legal entity at issue, as on the invoice (Art. (read-only) |
+| supplierAddress | string |  | (read-only; nullable) |
+| supplierTaxRegistrationNumber | string |  | (read-only; nullable) |
+| buyerName | string |  | The recipient as on the invoice; name, address and TRN where they are registered (Art. (read-only; nullable) |
+| buyerAddress | string |  | (read-only; nullable) |
+| buyerTaxRegistrationNumber | string |  | (read-only; nullable) |
+| note | string |  | The brief explanation of why the credit note was issued, printed on it (Art. (nullable) |
 | renditionAssetId | string (uuid) |  | (read-only; nullable) |
 | eInvoiceStatus | FinEInvoiceTransmissionStatus: enum (notRequired, queued, sent, accepted, rejected, failed) |  | 6.1.1. |
 | issuedByPrincipalId | string (uuid) |  | (read-only; nullable) |
@@ -939,6 +765,7 @@ A credit memo has its **own series** per legal entity (`setTaxInvoiceTemplate`, 
 
 The server takes the lines, rates and tax from the orders as they were posted (`calculateTax` at sale); **nothing on an invoice is re-priced**. The number is assigned from the legal entity's series for the document kind (`setTaxInvoiceTemplate`), in sequence and without gaps, when the invoice is issued; it is never reused. The supplier block is a snapshot of the legal entity at issue. The PDF, in the template's languages, is produced at issue (`getTaxDocumentRendition`).
 An invoice is never edited or deleted: a correction is a credit memo (`issueCreditMemo`) and, where needed, a new invoice. A guest may call this for their own paid orders only.
+**What the UAE requires on each kind** (research 2 October 2026, CHG-FIN-011; Executive Regulation Art. 59, Cabinet Decision 52 of 2017 as amended by Cabinet Decision 100 of 2024; the note is docs/active/research-uae-vat-and-blind-close-2-october.md). A full tax invoice: the words "Tax Invoice"; the supplier's name, address and TRN; the recipient's name, address and TRN where registered; a sequential number; the date of issue and the date of supply where different; a description; per line the unit price, quantity, tax rate and amount payable in AED; any discount; the gross amount in AED; the tax in AED with the exchange rate where converted; and the reverse-charge statement where it applies. A simplified tax invoice: "Tax Invoice"; the supplier's name, address and TRN; the date of issue; a description; the total consideration and the tax in AED. A guest who paid in a currency they selected (CHG-FIN-001) gets an invoice in the base currency with the amount paid in their currency and the rate shown as payment information. **From the e-invoicing go-live of the legal entity** (Ministerial Decisions 243 and 244 of 2025: 1 January 2027 for revenue of AED 50 million or more, 1 July 2027 below it) business-to-business invoices and credit notes are issued as electronic invoices through the accredited service provider (`transmitEInvoices`), and a simplified invoice is no longer available for them (Cabinet Decision 100 of 2025); supplies to consumers stay outside e-invoicing.
 
 |  |  |
 |---|---|
@@ -950,7 +777,7 @@ An invoice is never edited or deleted: a correction is a credit memo (`issueCred
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `ledger.legal_entity`, `ledger.tax_code`, `ledger.tax_invoice`, `ledger.tax_invoice_line`, `ledger.tax_invoice_template`, `orders.order_line`, `orders.payment`, `orders.sales_order` |
 | Writes | `cache:idempotency`, `ledger.tax_invoice`, `ledger.tax_invoice_line`, `ledger.tax_invoice_template`, `platform.audit_record`, `platform.outbox` |
-| Called by | BO-022, GST-019, POS-026, WEB-019 |
+| Called by | BO-022, GST-019, POS-026, POS-030, WEB-019 |
 
 **Parameters**
 
@@ -1018,6 +845,19 @@ An invoice is never edited or deleted: a correction is a credit memo (`issueCred
 | taxAmountInLegalCurrency.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | taxAmountInLegalCurrency.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | taxAmountInLegalCurrency.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| legalCurrency | string |  | The legal entity's currency (AED in the UAE), in which the law requires the tax and the gross amount (CHG-FIN-011). (pattern ^[A-Z]{3}$; read-only) |
+| grossAmountInLegalCurrency | object |  | The gross amount payable in the legal currency (Executive Regulation Art. (read-only) |
+| grossAmountInLegalCurrency.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| grossAmountInLegalCurrency.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| grossAmountInLegalCurrency.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| legalFxRate | object |  | Units of the legal currency per one unit of currency, printed with the tax where the invoice is not in the legal currency (Art. (read-only; nullable) |
+| legalFxRateSource | object |  | uaeCentralBank for a UAE legal entity (Decree-Law Art. (read-only; nullable) |
+| paidCurrency | string |  | Where the guest paid in a currency they selected (orders.Order.chargeCurrency, CHG-FIN-001), printed as payment information with paidAmount and the charge rate. (pattern ^[A-Z]{3}$; read-only; nullable) |
+| paidAmount | object |  | What the guest paid in paidCurrency (orders.Order.chargeTotal). (read-only) |
+| paidAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| paidAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| paidAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| reverseChargeStatement | string |  | Where the recipient must account for the tax, the statement saying so and the Decree-Law provision (Art. (read-only; nullable) |
 | creditedAmount | Money |  | On the wire this is three fields; in the database it is one column. |
 | creditedAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | creditedAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
@@ -1060,6 +900,10 @@ An invoice is never edited or deleted: a correction is a credit memo (`issueCred
 | lines[].creditedAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | lines[].creditedAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | lines[].creditedAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| lines[].grossAmountInLegalCurrency | object |  | The amount payable for the line in the legal currency (AED), Executive Regulation Art. (read-only) |
+| lines[].grossAmountInLegalCurrency.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| lines[].grossAmountInLegalCurrency.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| lines[].grossAmountInLegalCurrency.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | taxSummary | array of object |  | VAT per rate and category, summed from the lines for the response. |
 | taxSummary[].taxCategory | FinTaxCategory: enum (standardRated, zeroRated, exempt, outOfScope, reverseCharge) |  | How a line is treated for VAT. |
 | taxSummary[].taxRate | number |  |  |
@@ -1100,7 +944,7 @@ An invoice is never edited or deleted: a correction is a credit memo (`issueCred
 | Read routing | replica |
 | Reads | `ledger.credit_memo`, `ledger.credit_memo_line` |
 | Writes | - |
-| Called by | BO-023, BO-1081, GST-019, WEB-019 |
+| Called by | ANL-072, BO-023, BO-1081, GST-019, WEB-019 |
 
 **Parameters**
 
@@ -1147,7 +991,22 @@ An invoice is never edited or deleted: a correction is a credit memo (`issueCred
 | items[].taxAmountInLegalCurrency.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | items[].taxAmountInLegalCurrency.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | items[].taxAmountInLegalCurrency.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| items[].note | string |  | (nullable) |
+| items[].legalFxRate | object |  | The invoice's own legalFxRate, never today's (CHG-FIN-011). (read-only; nullable) |
+| items[].invoiceSupplyValue | object |  | The value of the supply shown on the tax invoice (Executive Regulation Art. (read-only) |
+| items[].invoiceSupplyValue.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| items[].invoiceSupplyValue.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| items[].invoiceSupplyValue.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| items[].correctedSupplyValue | object |  | The correct value of the supply after this credit note (Art. (read-only) |
+| items[].correctedSupplyValue.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| items[].correctedSupplyValue.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| items[].correctedSupplyValue.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| items[].supplierName | string |  | Snapshot of the legal entity at issue, as on the invoice (Art. (read-only) |
+| items[].supplierAddress | string |  | (read-only; nullable) |
+| items[].supplierTaxRegistrationNumber | string |  | (read-only; nullable) |
+| items[].buyerName | string |  | The recipient as on the invoice; name, address and TRN where they are registered (Art. (read-only; nullable) |
+| items[].buyerAddress | string |  | (read-only; nullable) |
+| items[].buyerTaxRegistrationNumber | string |  | (read-only; nullable) |
+| items[].note | string |  | The brief explanation of why the credit note was issued, printed on it (Art. (nullable) |
 | items[].renditionAssetId | string (uuid) |  | (read-only; nullable) |
 | items[].eInvoiceStatus | FinEInvoiceTransmissionStatus: enum (notRequired, queued, sent, accepted, rejected, failed) |  | 6.1.1. |
 | items[].issuedByPrincipalId | string (uuid) |  | (read-only; nullable) |
@@ -1189,7 +1048,7 @@ Ordered by `issuedAt` descending, `id` as the tiebreak.
 | Read routing | replica |
 | Reads | `ledger.tax_invoice`, `ledger.tax_invoice_line` |
 | Writes | - |
-| Called by | ADM-068, BO-022, BO-1081, GST-019, WEB-019 |
+| Called by | ADM-068, ANL-072, BO-022, BO-1081, GST-019, WEB-019 |
 
 **Parameters**
 
@@ -1249,6 +1108,19 @@ Ordered by `issuedAt` descending, `id` as the tiebreak.
 | items[].taxAmountInLegalCurrency.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | items[].taxAmountInLegalCurrency.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | items[].taxAmountInLegalCurrency.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| items[].legalCurrency | string |  | The legal entity's currency (AED in the UAE), in which the law requires the tax and the gross amount (CHG-FIN-011). (pattern ^[A-Z]{3}$; read-only) |
+| items[].grossAmountInLegalCurrency | object |  | The gross amount payable in the legal currency (Executive Regulation Art. (read-only) |
+| items[].grossAmountInLegalCurrency.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| items[].grossAmountInLegalCurrency.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| items[].grossAmountInLegalCurrency.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| items[].legalFxRate | object |  | Units of the legal currency per one unit of currency, printed with the tax where the invoice is not in the legal currency (Art. (read-only; nullable) |
+| items[].legalFxRateSource | object |  | uaeCentralBank for a UAE legal entity (Decree-Law Art. (read-only; nullable) |
+| items[].paidCurrency | string |  | Where the guest paid in a currency they selected (orders.Order.chargeCurrency, CHG-FIN-001), printed as payment information with paidAmount and the charge rate. (pattern ^[A-Z]{3}$; read-only; nullable) |
+| items[].paidAmount | object |  | What the guest paid in paidCurrency (orders.Order.chargeTotal). (read-only) |
+| items[].paidAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| items[].paidAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| items[].paidAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| items[].reverseChargeStatement | string |  | Where the recipient must account for the tax, the statement saying so and the Decree-Law provision (Art. (read-only; nullable) |
 | items[].creditedAmount | Money |  | On the wire this is three fields; in the database it is one column. |
 | items[].creditedAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | items[].creditedAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
@@ -1273,6 +1145,7 @@ Ordered by `issuedAt` descending, `id` as the tiebreak.
 | items[].lines[].taxAmount | Money | yes | On the wire this is three fields; in the database it is one column. |
 | items[].lines[].grossAmount | Money | yes | On the wire this is three fields; in the database it is one column. |
 | items[].lines[].creditedAmount | Money |  | On the wire this is three fields; in the database it is one column. |
+| items[].lines[].grossAmountInLegalCurrency | object |  | The amount payable for the line in the legal currency (AED), Executive Regulation Art. (read-only) |
 | items[].taxSummary | array of object |  | VAT per rate and category, summed from the lines for the response. |
 | items[].taxSummary[].taxCategory | FinTaxCategory: enum (standardRated, zeroRated, exempt, outOfScope, reverseCharge) |  | How a line is treated for VAT. |
 | items[].taxSummary[].taxRate | number |  |  |
@@ -1435,7 +1308,7 @@ Rate changes are versioned with an effective date, never applied retrospectively
 |---|---|
 | Permission | `TAX_CONFIGURE` |
 | Scope level | region |
-| Part of slice | setup, makes `ledger.tax_code` non-empty |
+| Part of slice | setup, changes rows of `ledger.tax_code` that another operation creates |
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
@@ -1490,26 +1363,6 @@ Rate changes are versioned with an effective date, never applied retrospectively
 
 Every table this service owns that the slice reads or writes, with its columns as derived into `backend/tenant/*.sql`.
 
-### `ledger.account`
-
-| Column | Type | Required | Notes |
-|---|---|---|---|
-| id | uuid | yes |  |
-| code | text | yes |  |
-| external_code | text | no | Code in the client's own chart. |
-| is_suspense | boolean | no | 5.7.x. |
-| sub_type | text | no | 5.7.27. |
-| tags | text[] | no | How a venue groups accounts for its own reporting. |
-| notes | text | no | 5.7.27. |
-| name | text | yes |  |
-| type | text | yes |  |
-| parent_id | uuid | no |  |
-| legal_entity_id | uuid | yes |  |
-| currency | text | no |  |
-| is_postable | boolean | yes | False for parent accounts, which aggregate only. |
-| is_active | boolean | yes |  |
-| balance | numeric(18,4) | no |  |
-
 ### `ledger.credit_memo`
 
 | Column | Type | Required | Notes |
@@ -1530,7 +1383,16 @@ Every table this service owns that the slice reads or writes, with its columns a
 | tax_amount | numeric(18,4) | yes |  |
 | gross_amount | numeric(18,4) | yes |  |
 | tax_amount_in_legal_currency | numeric(18,4) | no |  |
-| note | text | no |  |
+| legal_fx_rate | numeric(18,6) | no | The invoice's own legalFxRate, never today's (CHG-FIN-011). |
+| invoice_supply_value | numeric(18,4) | no | The value of the supply shown on the tax invoice (Executive Regulation Art. |
+| corrected_supply_value | numeric(18,4) | no | The correct value of the supply after this credit note (Art. |
+| supplier_name | text | no | Snapshot of the legal entity at issue, as on the invoice (Art. |
+| supplier_address | text | no |  |
+| supplier_tax_registration_number | text | no |  |
+| buyer_name | text | no | The recipient as on the invoice; name, address and TRN where they are registered (Art. |
+| buyer_address | text | no |  |
+| buyer_tax_registration_number | text | no |  |
+| note | text | no | The brief explanation of why the credit note was issued, printed on it (Art. |
 | rendition_asset_id | uuid | no |  |
 | e_invoice_status | text | no |  |
 | issued_by_principal_id | uuid | no |  |
@@ -1590,33 +1452,6 @@ Every table this service owns that the slice reads or writes, with its columns a
 | last_accepted_test_at | timestamptz | no |  |
 | scope_path | text | no | The partition key (ADR-0005). |
 
-### `ledger.event_budget`
-
-| Column | Type | Required | Notes |
-|---|---|---|---|
-| id | uuid | yes |  |
-| event_id | uuid | yes |  |
-| cost_center_id | uuid | no |  |
-| budgeted_revenue | numeric(18,4) | yes |  |
-| budgeted_cost | numeric(18,4) | yes |  |
-| actual_revenue | numeric(18,4) | no |  |
-| committed_cost | numeric(18,4) | no | Purchase orders raised, not invoices received. |
-| actual_cost | numeric(18,4) | no |  |
-
-### `ledger.fiscal_period`
-
-| Column | Type | Required | Notes |
-|---|---|---|---|
-| id | uuid | yes |  |
-| legal_entity_id | uuid | yes |  |
-| name | text | yes |  |
-| start_date | date | yes | A day in the region's time zone, local midnight to local midnight. |
-| end_date | date | yes | A day in the region's time zone, local midnight to local midnight. |
-| status | text | yes |  |
-| closed_by_principal_id | uuid | no |  |
-| closed_at | timestamptz | no |  |
-| approval_request_id | uuid | no | The approval request a close or reopen is waiting on (approvals), routed to a finance approver (decided 28 September, audit R144). |
-
 ### `ledger.fx_provider_assignment`
 
 | Column | Type | Required | Notes |
@@ -1661,23 +1496,6 @@ Every table this service owns that the slice reads or writes, with its columns a
 | region_ids | text[] | no |  |
 | is_active | boolean | no |  |
 | scope_path | text | no | The partition key (ADR-0005). |
-
-### `ledger.posting`
-
-| Column | Type | Required | Notes |
-|---|---|---|---|
-| id | text | yes |  |
-| journal_entry_id | uuid | yes |  |
-| account_id | uuid | yes |  |
-| account_code | text | no |  |
-| debit | numeric(18,4) | yes |  |
-| credit | numeric(18,4) | yes |  |
-| venue_id | uuid | no |  |
-| cost_center_id | uuid | no |  |
-| source | text | no |  |
-| source_id | text | no |  |
-| description | text | no |  |
-| posted_at | timestamptz | yes |  |
 
 ### `ledger.tax_code`
 
@@ -1724,7 +1542,14 @@ Every table this service owns that the slice reads or writes, with its columns a
 | discount_amount | numeric(18,4) | no |  |
 | tax_amount | numeric(18,4) | yes |  |
 | gross_amount | numeric(18,4) | yes |  |
-| tax_amount_in_legal_currency | numeric(18,4) | no | The tax in the legal entity's currency (AED in the UAE) where the invoice currency differs, at the rate the orders were stored at. |
+| tax_amount_in_legal_currency | numeric(18,4) | no | The tax in the legal entity's currency (AED in the UAE) where the invoice currency differs. |
+| legal_currency | text | no | The legal entity's currency (AED in the UAE), in which the law requires the tax and the gross amount (CHG-FIN-011). |
+| gross_amount_in_legal_currency | numeric(18,4) | no | The gross amount payable in the legal currency (Executive Regulation Art. |
+| legal_fx_rate | numeric(18,6) | no | Units of the legal currency per one unit of currency, printed with the tax where the invoice is not in the legal currency (Art. |
+| legal_fx_rate_source | text | no | uaeCentralBank for a UAE legal entity (Decree-Law Art. |
+| paid_currency | text | no | Where the guest paid in a currency they selected (orders.Order.chargeCurrency, CHG-FIN-001), printed as payment information with paidAmount and the charge rate. |
+| paid_amount | numeric(18,4) | no | What the guest paid in paidCurrency (orders.Order.chargeTotal). |
+| reverse_charge_statement | text | no | Where the recipient must account for the tax, the statement saying so and the Decree-Law provision (Art. |
 | credited_amount | numeric(18,4) | no |  |
 | languages | text[] | no |  |
 | supersedes_invoice_id | uuid | no |  |
@@ -1752,6 +1577,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | tax_amount | numeric(18,4) | yes |  |
 | gross_amount | numeric(18,4) | yes |  |
 | credited_amount | numeric(18,4) | no |  |
+| gross_amount_in_legal_currency | numeric(18,4) | no | The amount payable for the line in the legal currency (AED), Executive Regulation Art. |
 | id | uuid | yes | Synthesised key. |
 
 ### `ledger.tax_invoice_template`
@@ -1766,12 +1592,12 @@ Every table this service owns that the slice reads or writes, with its columns a
 | next_number | integer | no | May be raised, never lowered below the last number issued. |
 | number_padding | integer | no |  |
 | languages | text[] | yes | Rendered on one page in this order, e.g. |
-| title | jsonb | no | The document title per language, e.g. |
+| title | jsonb | no | The document title per language. |
 | footer_text | jsonb | no |  |
 | logo_asset_id | uuid | no |  |
 | layout_key | text | no |  |
 | is_auto_issue_on_payment | boolean | no | For simplifiedTaxInvoice, issue one on every paid order (the VAT receipt). |
-| simplified_allowed_up_to | numeric(18,4) | no |  |
+| simplified_allowed_up_to | numeric(18,4) | no | For a VAT-registered recipient only: the consideration up to which a simplified invoice is still allowed (UAE AED 10,000, Executive Regulation Art. |
 | show_legal_currency_tax | boolean | no | Show the tax in the legal entity's currency when the invoice currency differs. |
 | effective_from | date | no |  |
 | is_active | boolean | no |  |
@@ -1779,17 +1605,17 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-54 operations, added to this service in later releases without changing any of the above.
+57 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
-| accounts | `createCostCenter`, `getAccount`, `listAccountMappings`, `listAccounts`, `listCostCenters`, `setAccountMappings` |
+| accounts | `createAccount`, `createCostCenter`, `getAccount`, `listAccountMappings`, `listAccounts`, `listCostCenters`, `setAccountMappings`, `updateAccount` |
 | finance | `disputeObligation`, `getUnifiedReconciliation`, `recordDeposit`, `recordSettlement`, `recordWriteOff`, `resolveObligationDispute`, `settleDeposit`, `validateRecognitionSchedules` |
 | fiscal | `closeFiscalPeriod`, `listFiscalPeriods`, `listLegalEntities` |
 | journal | `approveJournalEntry`, `createJournalEntry`, `getJournalEntry`, `listJournalEntries`, `reverseJournalEntry` |
 | ledger | `abandonPeriodClose`, `beginPeriodClose`, `getTrialBalance`, `listInterEntityObligations`, `listLedgerEntries`, `postOrderRevenue`, `rejectJournal`, `reopenPeriod`, `runFxRevaluation` |
 | recognition | `createRecognitionSchedule`, `getDeferredRevenue`, `listRecognitionSchedules`, `runRecognition` |
-| reporting | `getForeignTenderReport`, `getVatReturn` |
+| reporting | `getFinancialReport`, `getForeignTenderReport`, `getVatReturn` |
 | settlement | `getSettlement`, `ingestSettlementFile`, `listSettlementExceptions`, `listSettlements`, `resolveSettlementException` |
 | tax | `calculateTax`, `createTaxExemption`, `listEInvoiceTransmissions`, `listEInvoicingProviders`, `listTaxCodes`, `listTaxExemptions`, `listTaxInvoiceTemplates`, `recordEInvoiceTransmissionStatus`, `setTaxInvoiceTemplate`, `verifyTaxExemption` |
 | variance | `listPriceVariances`, `reviewPriceVariance` |

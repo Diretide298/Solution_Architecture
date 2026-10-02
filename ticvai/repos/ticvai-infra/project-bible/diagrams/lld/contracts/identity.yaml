@@ -1,5 +1,5 @@
 id: LLD-identity
-title: identity — 89 operations
+title: identity — 94 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: spine
@@ -215,6 +215,17 @@ operations:
   - cache:idempotency
   - pii.subject
   - platform.dsar_request
+- operation: endOwnSession
+  verb: POST
+  path: /auth/sessions/mine/{sessionId}/end
+  scope: tenant
+  permission: null
+  audience:
+  - staff
+  - partner
+  offline: false
+  reads: []
+  writes: []
 - operation: enrolMfaMethod
   verb: POST
   path: /auth/mfa/methods
@@ -711,6 +722,17 @@ operations:
   reads:
   - identity.platform_staff_grant
   writes: []
+- operation: listOwnSessions
+  verb: GET
+  path: /auth/sessions/mine
+  scope: tenant
+  permission: null
+  audience:
+  - staff
+  - partner
+  offline: false
+  reads: []
+  writes: []
 - operation: listPermissionFindings
   verb: GET
   path: /permission-findings
@@ -1126,6 +1148,17 @@ operations:
   - identity.access_decision
   writes:
   - identity.authorisation_policy
+- operation: startProspectSignup
+  verb: POST
+  path: /auth/prospect/signup
+  scope: platform
+  permission: null
+  audience:
+  - public
+  - prospect
+  offline: false
+  reads: []
+  writes: []
 - operation: startSsoAuthorization
   verb: GET
   path: /auth/sso/{providerId}/authorize
@@ -1198,6 +1231,17 @@ operations:
   writes:
   - cache:idempotency
   - identity.principal
+- operation: updateRole
+  verb: PATCH
+  path: /roles/{roleId}
+  scope: venue
+  permission: ROLE_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - identity.role
+  writes: []
 - operation: verifyGuestEmail
   verb: POST
   path: /auth/guest/verify-email
@@ -1270,3 +1314,14 @@ operations:
   writes:
   - cache:idempotency
   - identity.mfa_method
+- operation: verifyProspectSignupCode
+  verb: POST
+  path: /auth/prospect/signup/{challengeId}/verify
+  scope: platform
+  permission: null
+  audience:
+  - public
+  - prospect
+  offline: false
+  reads: []
+  writes: []

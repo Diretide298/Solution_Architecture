@@ -154,7 +154,7 @@
         "BookingFlow.steps"
        ],
        "operation": "getPublishedBookingFlow",
-       "notes": "The steps of the published flow in their `sortOrder`, this one (date and time) highlighted. A step the flow has turned off is not shown and is skipped by Continue and Back.",
+       "notes": "The steps of the published flow in their `sortOrder`, this one (date and time) highlighted. A step the flow has turned off is not shown and is skipped by Continue and Back. Drawn in the venue's `BookingFlowSettings.stepIndicator` style; `embedMode` and `singleEventPage` come from the same published settings (CMS-016) (CHG-SGU-022).",
        "provenance": "decided 29 September 2026, W12; CMS-103 Booking Flows"
       },
       {
@@ -472,7 +472,7 @@
        "kind": "cardList",
        "label": "Add-ons",
        "bindsTo": "Product",
-       "notes": "All add-ons on this one step, as the prototype does.",
+       "notes": "Add-ons are on their own Add-ons / Extras step (step 3 in the v4 build; DI-979), not on this one; they appear here only when the published flow has no Extras step (CHG-SGU-020).",
        "operation": "listProducts",
        "provenance": "decided 29 September, rev 3 GAP-D3"
       },
@@ -492,7 +492,7 @@
         "BookingFlow.steps"
        ],
        "operation": "getPublishedBookingFlow",
-       "notes": "The steps of the published flow in their `sortOrder`, this one (tickets) highlighted. A step the flow has turned off is not shown and is skipped by Continue and Back.",
+       "notes": "The steps of the published flow in their `sortOrder`, this one (tickets) highlighted. A step the flow has turned off is not shown and is skipped by Continue and Back. Drawn in the venue's `BookingFlowSettings.stepIndicator` style; `embedMode` and `singleEventPage` come from the same published settings (CMS-016) (CHG-SGU-022).",
        "provenance": "decided 29 September 2026, W12; CMS-103 Booking Flows"
       },
       {
@@ -607,7 +607,7 @@
     "id": "helpMeChoose",
     "component": "modal",
     "trigger": "Help me choose (button, banner, or once on first arrival when the mode is popupOnArrival)",
-    "body": "**One or two questions, three answers each** (title, one-liner, icon, optional badge); the last answer opens its target (a product, a category, an event or a module) through a result card. **Start over** returns to the first question. Answers stay on the device (decided 29 September, rev 3 REV3-11). The prototype draws it as a full-height sheet (r3quiz) opened from the banner, so it is an overlay of this step rather than a screen of its own.",
+    "body": "**One to four questions, three answers each** (W4, 29 September; `GuidedChoice.questions` 1-4) (title, one-liner, icon, optional badge); the answers filter the products by default and the last answer may open an optional target (a product, a category, an event or a module) through a result card. **Start over** returns to the first question. Answers stay on the device (decided 29 September, rev 3 REV3-11). The prototype draws it as a full-height sheet (r3quiz) opened from the banner, so it is an overlay of this step rather than a screen of its own.",
     "bindsTo": "GuidedChoice",
     "confirm": {
      "label": "Show me"
@@ -695,22 +695,19 @@
      "slot": "record",
      "components": [
       {
-       "kind": "detailPanel",
-       "label": "The upsell suggestion",
-       "bindsTo": "UpsellSuggestion",
+       "kind": "cardList",
+       "label": "Suggested for you",
+       "bindsTo": "AiRecommendationItem",
        "columns": [
-        "UpsellSuggestion.variantId",
-        "UpsellSuggestion.bundleId",
-        "UpsellSuggestion.name",
-        "UpsellSuggestion.price",
-        "UpsellSuggestion.discountedPrice",
-        "UpsellSuggestion.source",
-        "UpsellSuggestion.ruleId",
-        "UpsellSuggestion.rank",
-        "UpsellSuggestion.rationale"
+        "AiRecommendationItem.productId",
+        "AiRecommendationItem.kind",
+        "AiRecommendationItem.priceRef",
+        "AiRecommendationItem.reasonText",
+        "AiRecommendationItem.rank"
        ],
-       "operation": "getUpsellSuggestions",
-       "provenance": "contract promotions.yaml POST /upsell-suggestions"
+       "operation": "decideRecommendations",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-016, design-notes correction)",
+       "notes": "The engine's slot (`decideRecommendations`, placement cart, maxItems 3: the client set at most three, DI-959), answered in Block A from the Promotions relationship map (ADR-0052). Each card shows the price from Pricing and the template reason; impressions and clicks go to `recordRecommendationEvents`."
       }
      ]
     },
@@ -729,9 +726,9 @@
    ]
   },
   "states": {
-   "loading": "The upsell cross-sell, read by `getUpsellSuggestions`.",
+   "loading": "The suggestions, read by `decideRecommendations`.",
    "error": "Could not load. Names which read failed and leaves the upsell cross-sell untouched.",
-   "emptyFirstRun": "No upsell cross-sell yet. Offers Add cart line (`addCartLine`).",
+   "emptyFirstRun": "No offers for this basket: the step is skipped and the guest goes straight on (DI-428).",
    "emptyNoAccess": "**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
@@ -745,7 +742,7 @@
    {
     "operationId": "decideRecommendations",
     "contract": "ai",
-    "purpose": "Fill a recommendation slot",
+    "purpose": "Fill the cart slot, maxItems 3 (DI-959)",
     "trigger": "onLoad",
     "provenance": "build, 29 September 2026"
    },
@@ -859,13 +856,32 @@
    "inferred": true,
    "exitTo": [
     "GST-001",
-    "GST-002"
+    "GST-002",
+    "GST-008",
+    "GST-041"
    ],
    "transitions": [
     {
      "to": "GST-001",
      "trigger": "Home – Default",
      "provenance": "derived — GST-001 declares entryState.params  and GST-049 holds none of them. The edge carries nothing: GST-049 is opened from GST-001, so this edge is the way back and GST-001 keeps its own state"
+    },
+    {
+     "to": "GST-008",
+     "trigger": "Continue to add-ons",
+     "provenance": "corrected 2 October 2026 (CHG-SGU-020, design-notes correction)",
+     "carries": [
+      "performanceId"
+     ]
+    },
+    {
+     "to": "GST-041",
+     "trigger": "Go to basket",
+     "provenance": "corrected 2 October 2026 (CHG-SGU-020, design-notes correction)",
+     "carries": [
+      "holdId",
+      "performanceId"
+     ]
     }
    ]
   },
@@ -1555,6 +1571,14 @@
      "name": "contentBody",
      "slot": "collection",
      "components": [
+      {
+       "kind": "datePicker",
+       "label": "Date",
+       "operation": "getAvailability",
+       "notes": "The list is for a date: today by default.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-020, design-notes correction)",
+       "bindsTo": "PerformanceAvailability.performanceId"
+      },
       {
        "kind": "cardList",
        "label": "Cabanas",

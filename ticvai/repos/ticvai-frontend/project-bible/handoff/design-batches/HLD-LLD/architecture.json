@@ -1,5 +1,5 @@
 {
- "date": "30 September 2026",
+ "date": "1 October 2026",
  "linkTypes": {
   "api": {
    "label": "Real-time API call (HTTPS)",
@@ -90,7 +90,7 @@
    {
     "id": "replica",
     "label": "Read replicas",
-    "sub": "x2, zone-redundant",
+    "sub": "x2, operational reads",
     "x": 70,
     "y": 110,
     "w": 150,
@@ -99,7 +99,7 @@
    {
     "id": "blob",
     "label": "Blob storage",
-    "sub": "media, exports, backups",
+    "sub": "media, 3D maps, dumps",
     "x": 70,
     "y": 510,
     "w": 150,
@@ -108,7 +108,7 @@
    {
     "id": "pg",
     "label": "PostgreSQL 16",
-    "sub": "control DB + one DB per tenant",
+    "sub": "zone-redundant; DB per tenant",
     "x": 270,
     "y": 110,
     "w": 180,
@@ -126,7 +126,7 @@
    {
     "id": "redis",
     "label": "Azure Managed Redis",
-    "sub": "sessions, idempotency, cache",
+    "sub": "sessions, budgets, 1 s cache",
     "x": 270,
     "y": 310,
     "w": 180,
@@ -135,7 +135,7 @@
    {
     "id": "broker",
     "label": "Event broker",
-    "sub": "RabbitMQ or Kafka (client)",
+    "sub": "RabbitMQ (rec.) or Kafka",
     "x": 270,
     "y": 410,
     "w": 180,
@@ -196,6 +196,15 @@
     "h": 60
    },
    {
+    "id": "wroom",
+    "label": "Waiting room",
+    "sub": "on-sale; admission token",
+    "x": 780,
+    "y": 165,
+    "w": 170,
+    "h": 60
+   },
+   {
     "id": "qdrant",
     "label": "Qdrant",
     "sub": "one collection per tenant",
@@ -216,7 +225,7 @@
    {
     "id": "posapi",
     "label": "Device API",
-    "sub": "POS, kiosk, KDS",
+    "sub": "one device register",
     "x": 780,
     "y": 600,
     "w": 160,
@@ -351,7 +360,7 @@
    {
     "id": "edge",
     "label": "Venue edge node",
-    "sub": "access + local DB, offline",
+    "sub": "access + policy, offline",
     "x": 560,
     "y": 800,
     "w": 170,
@@ -434,6 +443,18 @@
    {
     "source": "waf",
     "target": "operations",
+    "type": "api",
+    "via": null
+   },
+   {
+    "source": "waf",
+    "target": "wroom",
+    "type": "api",
+    "via": null
+   },
+   {
+    "source": "wroom",
+    "target": "commerce",
     "type": "api",
     "via": null
    },
@@ -554,7 +575,7 @@
    {
     "source": "workers",
     "target": "einv",
-    "type": "sync",
+    "type": "api",
     "via": [
      [
       350,
@@ -569,7 +590,7 @@
    {
     "source": "workers",
     "target": "msg",
-    "type": "sync",
+    "type": "api",
     "via": [
      [
       372,
@@ -654,7 +675,7 @@
   ]
  },
  "lld": {
-  "region": "UAE North, zones 1-3, VNet 10.20.0.0/16",
+  "region": "UAE North, zones 1-3, VNet 10.20.0.0/16; DR in UAE Central (the dr box, outside the region)",
   "nodes": [
    {
     "id": "users",
@@ -673,14 +694,16 @@
     "id": "fd",
     "label": "Azure Front Door Premium",
     "lines": [
-     "WAF: OWASP + bot rules",
+     "WAF: OWASP + bot rules,",
+     "rate rules per client IP",
+     "on-sale waiting-room page",
      "TLS 1.2+, custom domains",
      "Private Link to origin"
     ],
     "x": 220,
-    "y": 320,
+    "y": 310,
     "w": 190,
-    "h": 130
+    "h": 140
    },
    {
     "id": "ilb",
@@ -703,54 +726,67 @@
      "+ ingress gateway pods"
     ],
     "x": 690,
-    "y": 150,
+    "y": 145,
     "w": 190,
-    "h": 80
+    "h": 70
    },
    {
     "id": "wl",
     "label": "AKS workload pool",
     "lines": [
-     "D8s v5, 3-20 nodes",
-     "commerce, access,",
-     "operations, workers"
+     "D8s v5, 3-20 nodes, 3 zones",
+     "floors: commerce 3, access 2,",
+     "operations 2, workers 2"
     ],
     "x": 690,
-    "y": 250,
+    "y": 227,
     "w": 190,
-    "h": 110
+    "h": 90
    },
    {
     "id": "aip",
     "label": "AKS AI pool",
     "lines": [
-     "D8s v5, 2-4 nodes",
-     "ticvai-ai, embeddings,",
-     "reranker (CPU)"
+     "D8s v5, 2-4 nodes, tainted",
+     "ticvai-ai: real-time 2,",
+     "interactive 1, batch 0; models"
     ],
     "x": 690,
-    "y": 380,
+    "y": 329,
     "w": 190,
-    "h": 110
+    "h": 90
    },
    {
-    "id": "data",
-    "label": "AKS data pool",
+    "id": "qdrant",
+    "label": "AKS qdrant pool",
     "lines": [
-     "E4s v5 x3, zones 1-3",
-     "Qdrant 3-node cluster",
-     "broker 3-node cluster"
+     "E4s v5 x3, one per zone",
+     "Qdrant, replication 2, TLS"
     ],
     "x": 690,
-    "y": 510,
+    "y": 431,
     "w": 190,
-    "h": 110
+    "h": 72
+   },
+   {
+    "id": "broker",
+    "label": "AKS broker pool",
+    "lines": [
+     "D2s v5 x3, while self-run;",
+     "recommended: CloudAMQP",
+     "UAE North, Private Link"
+    ],
+    "x": 690,
+    "y": 515,
+    "w": 190,
+    "h": 90
    },
    {
     "id": "pg",
     "label": "PostgreSQL Flexible Server 16",
     "lines": [
      "GP D4ds v5, zone-redundant HA",
+     "on every production tier",
      "control DB + DB per tenant",
      "PITR 35 days, UAE only"
     ],
@@ -790,12 +826,13 @@
      "Azure Managed Redis B10 (12 GB)",
      "Key Vault",
      "Blob storage (ZRS)",
-     "Container Registry"
+     "Container Registry",
+     "managed broker, if chosen"
     ],
     "x": 950,
     "y": 470,
     "w": 220,
-    "h": 120
+    "h": 125
    },
    {
     "id": "bastion",
@@ -845,6 +882,19 @@
     "y": 560,
     "w": 180,
     "h": 100
+   },
+   {
+    "id": "dr",
+    "label": "UAE Central (DR module)",
+    "lines": [
+     "geo-redundant backup; async",
+     "replica for tenants buying DR",
+     "access-restricted, no zone HA"
+    ],
+    "x": 950,
+    "y": 690,
+    "w": 230,
+    "h": 95
    },
    {
     "id": "venue",
@@ -932,22 +982,22 @@
    },
    {
     "source": "aip",
-    "target": "data",
+    "target": "qdrant",
     "type": "direct",
     "via": null
    },
    {
     "source": "wl",
-    "target": "data",
+    "target": "broker",
     "type": "event",
     "via": [
      [
       912,
-      345
+      300
      ],
      [
       912,
-      580
+      560
      ]
     ]
    },
@@ -969,6 +1019,21 @@
      [
       1180,
       405
+     ]
+    ]
+   },
+   {
+    "source": "pg",
+    "target": "dr",
+    "type": "repl",
+    "via": [
+     [
+      1195,
+      185
+     ],
+     [
+      1195,
+      737
      ]
     ]
    },
@@ -1000,7 +1065,7 @@
      ],
      [
       660,
-      190
+      180
      ]
     ]
    },
@@ -1078,12 +1143,12 @@
     "name": "snet-aks-ai",
     "cidr": "10.20.16.0/22",
     "holds": "AI pool: ticvai-ai, embeddings, reranker",
-    "rule": "No NSG; Cilium policy: inbound from the ingress gateway and the workload pool; read-only role on transactional schemas (ADR-0020)"
+    "rule": "No NSG; Cilium policy: inbound from the ingress gateway and the workload pool; read-only role on transactional schemas (ADR-0020, amended by ADR-0049)"
    },
    {
     "name": "snet-aks-data",
     "cidr": "10.20.20.0/23",
-    "holds": "Data pool: Qdrant cluster, broker cluster (tainted)",
+    "holds": "The qdrant pool (Qdrant cluster) and, while the broker is self-run, the broker pool; both tainted ticvai.io/pool=data",
     "rule": "No NSG; Cilium policy: inbound from the workload and AI pools only; Qdrant needs each tenant's collection-scoped JWT"
    },
    {
@@ -1095,7 +1160,7 @@
    {
     "name": "snet-private-endpoints",
     "cidr": "10.20.25.0/24",
-    "holds": "Azure Managed Redis, Key Vault, Blob storage, Container Registry (and a managed broker if chosen)",
+    "holds": "Azure Managed Redis, Key Vault, Blob storage, Container Registry (and the managed broker's Private Link if one is chosen: CloudAMQP is recommended, ADR-0057)",
     "rule": "NSG: inbound from the AKS subnets only; private DNS zones; public access disabled on every resource"
    },
    {
@@ -1160,5 +1225,49 @@
    "what": "No module of its own: the outbox relay (one per region, ADR-0058), every module's event consumers and scheduled jobs. Scales on queue depth.",
    "modules": []
   }
- }
+ },
+ "replicaFloors": [
+  {
+   "unit": "commerce",
+   "deployable": "commerce",
+   "floor": 3,
+   "why": "One per zone: the sale path survives a zone loss without a cold start"
+  },
+  {
+   "unit": "access",
+   "deployable": "access",
+   "floor": 2,
+   "why": "Cloud side only; the gate decides locally (ADR-0013)"
+  },
+  {
+   "unit": "operations",
+   "deployable": "operations",
+   "floor": 2,
+   "why": "Back office tolerates a short scale-out"
+  },
+  {
+   "unit": "workers",
+   "deployable": "workers",
+   "floor": 2,
+   "why": "Relay leases fail over between replicas (ADR-0058, amended 1 October)"
+  },
+  {
+   "unit": "ai-realtime",
+   "deployable": "ticvai-ai",
+   "floor": 2,
+   "why": "Fraud scoring and recommendations; fail open. 3 in a large cell (AI design 4.3)"
+  },
+  {
+   "unit": "ai-interactive",
+   "deployable": "ticvai-ai",
+   "floor": 1,
+   "why": "Assistants tolerate a short outage"
+  },
+  {
+   "unit": "ai-batch",
+   "deployable": "ticvai-ai",
+   "floor": 0,
+   "why": "Scales from zero on queue depth"
+  }
+ ]
 }

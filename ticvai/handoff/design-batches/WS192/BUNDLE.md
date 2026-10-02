@@ -1,6 +1,6 @@
 # WS192 — Wallet Configuration Backend Structure v1.0 board 7
 
-**10 screens · 13 operations · 16 schemas · 6 permissions**
+**10 screens · 19 operations · 23 schemas · 7 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -48,8 +48,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 6 permissions apply here:
-  `APPROVAL_CONFIGURE, ORDER_REFUND, REGION_CONFIGURE, WALLET_CONFIGURE, WALLET_OPERATE, WALLET_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 7 permissions apply here:
+  `APPROVAL_CONFIGURE, ORDER_REFUND, ORDER_VIEW, REGION_CONFIGURE, WALLET_CONFIGURE, WALLET_OPERATE, WALLET_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -61,6 +61,45 @@ convincingly. It is never a caption.
   and its error; and, element by element, what is shown and in what format, what each action
   produces and where the user goes next. Draw exactly that.
 
+## The processes these screens belong to
+
+Written by the owner of each process (`handoff/design-notes/`). Read before any screen: it says how the process runs end to end and which words the screens must use.
+
+### Ticketing & Guest Commerce, as the venue and TICVAI configure and run it
+
+WHAT THE PROCESS IS. Everything a guest can buy is set up, priced, promoted and serviced here, on Venue Management (P08, the venue's own back office, served inside the venue's cell) and on the TICVAI Console (P09, TICVAI's control plane, outside every cell). End to end: (1) CATALOGUE. A product has one of twelve kinds (admission, timedAdmission, datedAdmission, openDated, seated, membership, bundle, fnb, retail, rental, addOn, giftCard). Its ticket types (adult, child, senior, resident...) are not typed one by one: they are generated from the product's attributes (components) and each value combination becomes a sellable ticket type with no extra setup (DI-164). What a ticket grants (validity, entries, re-entry, days of week, blackout dates, expiry anchor, fast track, transfer) lives on a reusable entitlement template, not on the product. Who may take part (age, height, supervision, certification) is the eligibility rule; what the guest must answer is the data mask and the consent questions; how the guest sees it is guestListing (bookable, infoOnly, hidden), display tags (at most six), media and the booking flow. Group, family and corporate products and every after-sales policy (reschedule, exchange, refund, cancellation, upgrade, transfer) are configured inside the one product configuration, never on separate screens (DI-465, DI-466). (2) LIFECYCLE AND PUBLICATION. A product moves draft, inReview, approved, live, withdrawn, archived. Approval and publication are two acts with two permissions (PRODUCT_APPROVE, PRODUCT_PUBLISH, R091); every product is authorised before it sells online or on site (DI-438). Approved is still not on a till: a till sells only what is in the signed catalogue release it pulled (publishBundle, ADR-0013), so a saved price is a back-office fact until the venue publishes to tills. Changing something that has sold is preceded by an impact check (assessProductChange: orders affected, entitlements issued, future performances, open carts); restoring a version creates a new version, and sold tickets keep the price and terms they were sold under (restoreProductVersion, DI-938, TRACKER Actions row 145). (3) PRICE. Prices live in price lists: per venue, per channel set, with validity dates and a priority, copied for the next season with an uplift (copyPriceList) and repriced in bulk only after a dry run (bulkChangePrices). Currency and decimal scale are never chosen on a form: they resolve from the venue's region (ADR-0008, ADR-0018; AED 2 places, OMR and BHD 3). When several rules apply, the configured hierarchy decides; there is no "lowest price wins" default (DI-595). Tax on the pre-discount price and three-decimal rounding are regional settings (DI-598). Dynamic rules always show their minimum and maximum price guardrails beside the trigger (getDynamicPriceRule). (4) PROMOTE AND BUNDLE. A promotion is a rule (automatic, or gated by a code) created in draft, made live only by Publish, which first analyses stacking; a …
+*(source: DI-164; DI-171; DI-438; DI-465; DI-466; DI-595; DI-598; DI-387; DI-039; DI-044; DI-474; DI-671; DI-987; DI-019; DI-080; ADR-0008; ADR-0013; ADR-0018; ADR-0019; ADR-0030; R091; R098; R101; R222; REV3-21; contracts/spine/catalogue.yaml#transitionProductLifecycle …)*
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Product | Anything sellable, of one of the twelve kinds. The record that carries names, channels, listing, media and policies. | Item (except on F&B and retail screens), SKU (for tickets), Offering | contracts/spine/catalogue.yaml#/components/schemas/ProductKind |
+| Ticket type | One sellable variant of an admission or event product (Adult, Child, Resident Adult), generated from the product's attributes. For retail and F&B the same record is labelled Variant. | Variant (on ticket screens), Sub-product, Rate (that is a price), Axis value | contracts/spine/catalogue.yaml#updateProductVariant / DI-164 / DI-437 |
+| Attribute | A dimension that generates ticket types (Guest category, Residency, Tier, Length). Each has values; adding a value adds ticket types. | Axis, Component (the client's word; use it only in help text), Option | contracts/spine/catalogue.yaml#setProductAttributes / DI-164 / DI-450 |
+| Entitlement | What a ticket lets the holder do (validity, entries, re-entry, days, blackout dates, expiry, fast track, transfer), defined once on an entitlement template and shared by several products. | Access rights, Ticket rules, Validity profile | contracts/spine/catalogue.yaml#createEntitlementTemplate / DI-171 / DI-451 |
+| Eligibility rule | Who may take part in or buy a product (age, height, supervision, waiver, certification). Distinct from a promotion's eligibility, which decides who gets a discount. | Restriction, Access rule (that is access control) | contracts/spine/catalogue.yaml#setProductEligibilityRule / DI-463 |
+| Price list | A set of prices for one venue and a set of channels, valid between two dates, with a priority. Several coexist (B2C, B2B, season). | Price book, Rate card, Tariff | contracts/spine/catalogue.yaml#createPriceList / DI-140 / DI-163 |
+| Price category | A standard rate type (Adult, Child, Member) reused across lists so venues do not invent "Adult Standard" and "Normal Adult". | Price band (that is a seat-category band), Fare type (transport) | contracts/spine/catalogue.yaml#setPriceCategoryRateType / … |
+| Price band | A priced band on a seat category (code, label, colour, amount, channel, from-date). | Price category, Zone price | contracts/satellite/seating.yaml#/components/schemas/SeatPriceBand |
+| Promotion | A rule that changes a price automatically or when a code is entered; draft until published; declares how it stacks. | Offer (except in guest copy), Deal, Discount rule | contracts/satellite/promotions.yaml#createPromotion / DI-173 / DI-174 |
+| Coupon code | A code issued from a coupon campaign that applies a promotion-style discount; one shared code or many single-use codes. | Voucher, Promo voucher | contracts/satellite/promotions.yaml#createCouponCampaign / DI-173 |
+| Voucher | A code that carries money (face value, balance), sold or issued; a liability until redeemed or expired. | Coupon, Credit note | contracts/satellite/promotions.yaml#listVoucherBatches / … |
+| Bundle | A product sold as one line whose price differs from the sum of its components, with a mandatory revenue allocation. "Package" is acceptable in guest copy. | Combo (that is an F&B meal deal), Catalogue bundle | contracts/satellite/promotions.yaml#createBundle / DI-220 / ADR-0019 |
+| Catalogue release | The signed snapshot of a venue's catalogue, prices, promotions and sale boards that tills, kiosks and devices pull. Its action label is "Publish to tills". | Bundle, Catalogue bundle, Sync, Deploy | contracts/spine/catalogue.yaml#publishBundle / … |
+| Approve / Publish / Save | Save keeps a draft; Approve records that it is authorised (PRODUCT_APPROVE); Publish makes it live for guests and channels (PRODUCT_PUBLISH). Three different buttons, never merged. | Submit, Go live, Activate (except CatalogueConfigStatus active), Deploy | R091 / contracts/spine/catalogue.yaml#transitionProductLifecycle / DI-438 |
+| Product states | Draft, In review, Approved, Live, Withdrawn, Archived (ProductLifecycleState), always as coloured badges with these exact labels. | Published (for a product), Pending, Inactive (for a product) | contracts/spine/catalogue.yaml#/components/schemas/ProductLifecycleState |
+| Channel | Where something is sold. Labels: pos Point of sale; kiosk Kiosk; web and guestWeb Website; mobile and guestApp App; b2b B2B partners; partner Partner; ota Travel agents (OTA); callCentre Call centre; api API; backOffice Back office. | Touchpoint, Outlet (an outlet is a business inside a venue), raw enum values | contracts/spine/catalogue.yaml#/components/schemas/Channel / … |
+| Refund | Money returned after settlement, wholly or for some lines, under the venue's refund policy. | Return (that is retail goods), Reversal, Void | contracts/spine/orders.yaml#createRefund / DI-252 |
+| Void | Cancelling a whole order before settlement, within the same shift, with a reason from the void list. After settlement it is a refund. | Cancel order, Delete | contracts/spine/orders.yaml#voidOrder / R222 |
+| Exchange / Reschedule | Exchange swaps lines for other products or dates and settles only the difference; Reschedule is the same product moved to another date or time. | Rebook, Date change (acceptable only in guest copy), Refund and resell | contracts/spine/orders.yaml#exchangeOrderLines / … |
+| Hold / Capture / Release | A deposit or stored-value amount is held, then partly or fully captured, and the rest released. A held deposit is not a payment. | Charge, Pre-auth (in staff copy), Block funds | contracts/spine/orders.yaml#authoriseStoredValue / … |
+| Wallet (TICVAI wallet) | The guest's stored-value balance on TICVAI, spent by hold and capture. Distinct from the tender "Apple Pay / Google Pay", which the contract also calls wallet. | Digital wallet (for stored value), E-wallet, Credit (without a type) | contracts/spine/orders.yaml#/components/schemas/TenderKind / R080 |
+| Credit lot | One amount of wallet credit of one credit type (cash, bonus, gift) with its own expiry; lots are spent nearest expiry first and the guest sees the breakdown but cannot choose. | Bucket, Batch, Top-up | TRACKER Actions row 171 / contracts/satellite/wallet.yaml#expireCreditLots |
+| Venue map / Seat map | A venue map is the wayfinding map of a park or a floor (points, paths, bookable places); a seat map is the seating layout of an auditorium or stand. Never just "map" where both could be meant. | Layout (alone), Floor plan (unless it is a floor map), Map (alone) | contracts/satellite/venue-map.yaml#createVenueMap / … |
+| Point / Bookable place | A point is a place on a venue map (toilet, ride, restaurant, exit). A bookable place is a cabana, lounger, table or pitch placed on the map and sold through its price band. | Pin, POI, Marker, Resource (in staff copy) | contracts/satellite/venue-map.yaml#setVenuePoint / … |
+| Station / Route / Timetable / Departure / Fare table / Pass … | A route is an ordered list of stations with offsets; a timetable generates departures up to its release horizon; a fare table prices a route per passenger type; a pass type is a multi-trip or unlimited pass sold as a product. | Stop (except in the stop list), Line (except lineCode), Schedule, Trip (except a guest's journey) | contracts/satellite/transport.yaml / REV3-21 |
+| Applies from | The effective date of a change. Every dated change shows it, and sold items keep their old terms. | Effective date (in labels), Start date (for a change) | contracts/satellite/seating.yaml#updateSeatCategory / TRACKER Actions row 194 |
+
+
 ## The screens
 
 Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs count fields; requirements are matrix rows; meeting inputs are the ones naming the screen (the module and platform ones are below); white label says whether the tenant's brand reaches it (guest) or it sets the brand (configures).
@@ -70,12 +109,12 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-1143` | Wallet Operations Command Center | B–D | 2 | 46 | 6 | 3 | 0 | 6 | — | notStarted (—) |
 | `BO-1144` | Peer-to-Peer Transfer Configuration | B–D | 21 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-1145` | Transfer Eligibility, Limits & Approval Rules | B–D | 19 | 0 | 6 | 0 | 1 | 3 | — | notStarted (—) |
-| `BO-1146` | Refund-to-Wallet Policy Configuration | B–D | 21 | 0 | 6 | 0 | 3 | 6 | — | notStarted (—) |
-| `BO-1147` | Refund Routing & Credit Restoration Engine | B–D | 6 | 0 | 6 | 2 | 0 | 6 | — | notStarted (—) |
-| `BO-1148` | Reversal & Transaction Correction Management | B–D | 11 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-1149` | Administrative Balance Adjustment Studio | B–D | 9 | 0 | 6 | 50 | 1 | 0 | — | notStarted (—) |
-| `BO-1150` | Wallet Block, Freeze & Restriction Management | B–D | 6 | 0 | 6 | 1 | 0 | 6 | — | notStarted (—) |
-| `BO-1151` | Wallet Disputes & Operational Exception Queue | B–D | 19 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
+| `BO-1146` | Refund-to-Wallet Policy Configuration | B–D | 21 | 11 | 6 | 0 | 3 | 6 | — | notStarted (—) |
+| `BO-1147` | Refund Routing & Credit Restoration Engine | B–D | 6 | 40 | 6 | 6 | 0 | 6 | — | notStarted (—) |
+| `BO-1148` | Reversal & Transaction Correction Management | B–D | 11 | 14 | 6 | 3 | 0 | 0 | — | notStarted (—) |
+| `BO-1149` | Administrative Balance Adjustment Studio | B–D | 9 | 35 | 6 | 77 | 1 | 0 | — | notStarted (—) |
+| `BO-1150` | Wallet Block, Freeze & Restriction Management | B–D | 6 | 15 | 6 | 28 | 0 | 6 | — | notStarted (—) |
+| `BO-1151` | Wallet Disputes & Operational Exception Queue | B–D | 24 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
 | `BO-1152` | Operations Simulator, Approval & Audit Trail | B–D | 0 | 0 | 6 | 0 | 0 | 3 | — | notStarted (—) |
 
 ## Thin screens in this batch
@@ -105,6 +144,12 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Route | `/orders-money/wallet-operations-command-center-bo-1143` |
 
 **Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Wallet operational activity and exceptions: disputes, failures, unusual activity.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **List operation(s) listWalletDisputes return a bare array, not the paged list envelope (items, nextCursor, hasMore).** Why: The table cannot page, and a row without an id cannot open, edit or link to the record it summarises. *(source: contracts/satellite/wallet.yaml#listWalletDisputes; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
 
 #### Inputs: what the user enters or picks
 
@@ -181,6 +226,10 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Correction | text | not in the schema: `Correction` |
 | Administrative operation | text | not in the schema: `Administrative Operation` |
 
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **exceptions**: Open disputes and exceptions by age. *(source: contracts/satellite/wallet.yaml#listWalletDisputes)*
+
 **Data it reads**: `listWalletDisputes` (onLoad, Open exceptions)
 
 **Where the user goes next**
@@ -190,7 +239,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 - → `BO-1145` Transfer Eligibility, Limits & Approval Rules: *Transfer Eligibility, Limits & Approval Rules*
 - → `BO-1146` Refund-to-Wallet Policy Configuration: *Refund-to-Wallet Policy Configuration*; carries `venueId`
 - → `BO-1147` Refund Routing & Credit Restoration Engine: *Refund Routing & Credit Restoration Engine*; carries `orderId`
-- → `BO-1148` Reversal & Transaction Correction Management: *Reversal & Transaction Correction Management*
+- → `BO-1148` Reversal & Transaction Correction Management: *Reversal & Transaction Correction Management*; carries `subjectId`
 - → `BO-1149` Administrative Balance Adjustment Studio: *Administrative Balance Adjustment Studio*; carries `subjectId`
 - → `BO-1150` Wallet Block, Freeze & Restriction Management: *Wallet Block, Freeze & Restriction Management*; carries `walletId`
 - → `BO-1151` Wallet Disputes & Operational Exception Queue: *Wallet Disputes & Operational Exception Queue*
@@ -206,6 +255,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the wallet operations are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+open:
+  disputes: 6
+  failedCharges: 2
+```
 
 #### Permissions
 
@@ -265,6 +324,7 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 - [ ] Every transition is wired: `BO-100`, `BO-1144`, `BO-1145`, `BO-1146`, `BO-1147`, `BO-1148`, `BO-1149`, `BO-1150`, `BO-1151`, `BO-1152`.
 - [ ] Every gated control is gated: `WALLET_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -284,6 +344,14 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/orders-money/peer-to-peer-transfer-configuration-bo-1144` |
+
+**Known gaps.** Contract gap recorded 2 October 2026 (CHG-WIR-027): A read (get or list) of the wallet transfer rules that setWalletTransferRules writes.
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Peer-to-peer transfers between guests' wallets: whether allowed (a venue toggle), limits, approvals.
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- No read operation: the screen declares only setWalletTransferRules and nothing that returns the current configuration. (CHG-WIR-027)
 
 #### Inputs: what the user enters or picks
 
@@ -313,6 +381,10 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 | Wallet A | select field | — | — | — | — | — | — |
 | Cash Credit: AED 500 | text field | — | — | — | — | — | — |
 
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **transfer rules**: Off by default; limits and approval when on. *(source: contracts/satellite/wallet.yaml#setWalletTransferRules / DI-535 / TRACKER Actions row 115)*
+
 #### Outputs: what the screen shows and produces
 
 **Actions and what each produces**
@@ -339,6 +411,15 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Empty, no results (`?state=emptyNoResults`) | **Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+rules:
+  enabled: false
+```
 
 #### Permissions
 
@@ -398,6 +479,14 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | nothing: it opens on its own |
 | Route | `/orders-money/transfer-eligibility-limits-approval-rules-bo-1145` |
 
+**Known gaps.** Contract gap recorded 2 October 2026 (CHG-WIR-027): A read (get or list) of the wallet transfer rules that setWalletTransferRules writes.
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Eligibility, limits and approvals of wallet-to-wallet transfers.
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- No read operation: the screen declares only setWalletTransferRules and nothing that returns the current configuration. (CHG-WIR-027)
+
 #### Inputs: what the user enters or picks
 
 **On the screen**
@@ -424,6 +513,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Sender limits | select field | — | — | — | — | — | — |
 | Approval / Authentication | select field | — | — | — | — | — | — |
 
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **limits**: Per transfer, per day, verified accounts only. *(source: contracts/satellite/wallet.yaml#setWalletTransferRules)*
+
 #### Outputs: what the screen shows and produces
 
 **Where the user goes next**
@@ -440,6 +533,17 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Empty, no results (`?state=emptyNoResults`) | **Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+limits:
+  perTransfer: AED 200.00
+  perDay: AED 500.00
+  verifiedOnly: true
+```
 
 #### Permissions
 
@@ -494,12 +598,24 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Orders & Money · wave 3 · needs the `core` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `REGION_CONFIGURE`, `WALLET_CONFIGURE` (2 configure); in the flows as venue manager |
+| Who uses it | venue staff holding `ORDER_VIEW`, `REGION_CONFIGURE`, `WALLET_CONFIGURE` (1 read, 2 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure; Refund policy can define) and no display directory — it is settings, not a population |
 | Offline | online only |
 | Opens with | `venueId` (navigation) · cold entry: **Reached from the list that owns it**, so the identifier arrives with the navigation. Opened cold without one, the screen says what is missing and offers that … |
 | Route | `/orders-money/refund-to-wallet-policy-configuration-bo-1146` |
+
+**What the spec says about it.** **Two sections, gated separately (PR-6; design-note correction, 2 October 2026):** the venue refund policy (`setRefundPolicy`, region configuration) and the refund-to-wallet policy (`setWalletRefundPolicy`, wallet configuration). A user holding one sees the other read-only.
+
+**Known gaps.** Contract gap recorded 2 October 2026 (CHG-WIR-027): A per-source refund destination in the wallet refund policy (ticket, event, F&B, retail, rental, parking, membership, compensation), or a narrowed …
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Where a refund goes: to the original payment method, to the guest's TICVAI wallet, or the guest's choice; whether money returns to the credit lots it came from with their original expiry; any bonus for taking wallet credit. It sits with the venue's refund policy thresholds. A refund to a wallet and a refund to a card are different promises, and which one a guest gets must not depend on who is at the counter.
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- The purpose lists refund sources (ticket, event, F&B, retail, rental, parking, membership, compensation) that the policy cannot distinguish; the wallet refund policy has one default destination for all. (CHG-WIR-027)
+
+**Fixed on main** (the package already carries these; draw what it says): setRefundPolicy needs REGION_CONFIGURE while setWalletRefundPolicy needs WALLET_CONFIGURE on the same screen. (CHG-SBO-010); No read operation: the screen declares only setRefundPolicy, setWalletRefundPolicy and nothing that returns the current configuration. (CHG-WIR-025).
 
 #### Inputs: what the user enters or picks
 
@@ -529,7 +645,34 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 | Example | select field | — | — | — | — | — | — |
 | Wallet → AED 200 returned | text field | — | — | — | — | — | — |
 
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **defaultDestination**: Original payment method, TICVAI wallet, or guest's choice, each with a sentence of what the guest is told. *(source: contracts/satellite/wallet.yaml#setWalletRefundPolicy / DI-468 / DI-673)*
+- **restoreToOriginalLots and restoreOriginalExpiry**: Both on by default; turning off "original expiry" shows the warning that a fresh expiry is a gift. *(source: contracts/satellite/wallet.yaml#/components/schemas/WalletRefundPolicy)*
+- **walletRefundBonusPercent**: Optional incentive shown as "+5% if refunded to wallet". *(source: contracts/satellite/wallet.yaml#/components/schemas/WalletRefundPolicy)*
+- **refund policy thresholds**: Self-authorise limit, second user above, approval above, time bands, refund window days (0 means day of purchase only; empty means no window), partial allowed. *(source: contracts/spine/orders.yaml#setRefundPolicy)*
+
 #### Outputs: what the screen shows and produces
+
+**Shown**
+
+**Read a venue's refund policy** (detail panel, from `getRefundPolicy`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| ID | the name it points at, never the id | Added 20 August. The schema reference derives table columns from API response schemas, and a response is not a table — this one returned … |
+| Venue | the name it points at, never the id | The venue in the path. Not taken from a `setRefundPolicy` body. |
+| Self authorise limit | AED 1,234.50 | Up to this, a holder of ORDER_REFUND refunds alone. Zero means every refund needs a second authoriser. |
+| Requires second user above | AED 1,234.50 | Above this, a second user — cashier OR supervisor — names themselves as audit control. |
+| Requires approval above | AED 1,234.50 | Above this, an ORDER_REFUND_APPROVE holder must approve. |
+| Time bands | list or chips (count when long) | Refundable percentage by time before the performance. Evaluated most-specific first. |
+| Hours before | 1,234 | — |
+| Percentage | 12.5% | — |
+| Allow partial | yes / no (icon or chip) | — |
+| Refund window days | 1,234 | Days after purchase within which a refund may be made. 0 is allowed and means the day of purchase only; null means no window (decided 28 … |
+| Variance threshold | AED 1,234.50 | Price variance above this is an exception requiring review rather than a routine posting (CF-38). |
+
+**Data it reads**: `getRefundPolicy` (onLoad, Read a venue's refund policy)
 
 **Where the user goes next**
 
@@ -547,10 +690,30 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 422 The thresholds do not ascend: `selfAuthoriseLimit` above `requiresSecondUserAbove`, or either above `requiresApprovalAbove` (`refund-thresholds-not-ascending` … |
 
+#### Consistency with other screens
+
+- Match `BO-023`: The refund dialog offers exactly the destinations configured here.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+policy:
+  defaultDestination: guestChoice
+  restoreToOriginalLots: true
+  restoreOriginalExpiry: true
+  walletRefundBonusPercent: 5
+  refundWindowDays: 30
+  selfAuthoriseLimit: AED 500.00
+  approvalAbove: AED 2,000.00
+```
+
 #### Permissions
 
 - `setRefundPolicy` → `REGION_CONFIGURE` (configure) · staff
 - `setWalletRefundPolicy` → `WALLET_CONFIGURE` (configure) · staff
+- `getRefundPolicy` → `ORDER_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -586,12 +749,12 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (21), with its required mark, default, format and its error state (412, 422).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (21), with its required mark, default, format and its error state (404, 412, 422).
+- [ ] Every output is drawn (11 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-1146?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, emptyNoResults, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-1143`.
-- [ ] Every gated control is gated: `REGION_CONFIGURE`, `WALLET_CONFIGURE`.
+- [ ] Every gated control is gated: `ORDER_VIEW`, `REGION_CONFIGURE`, `WALLET_CONFIGURE`.
 - [ ] The 3 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -606,12 +769,16 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Orders & Money · wave 3 · needs the `core` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `ORDER_REFUND`, `WALLET_CONFIGURE` (1 operate, 1 configure); in the flows as venue manager |
+| Who uses it | venue staff holding `ORDER_REFUND`, `ORDER_VIEW`, `WALLET_CONFIGURE` (1 operate, 1 read, 1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population |
 | Offline | online only |
 | Opens with | `orderId` (navigation) |
 | Route | `/orders-money/refund-routing-credit-restoration-engine-bo-1147` |
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Where refunded value goes when a purchase used several credits: back to the lots it came from with their original expiry, not "+AED 200 to cash".
+
+**Fixed on main** (the package already carries these; draw what it says): No read operation: the screen declares only setWalletRefundPolicy, createRefund and nothing that returns the current configuration. (CHG-WIR-025).
 
 #### Inputs: what the user enters or picks
 
@@ -627,6 +794,60 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 | FEFO Interaction | select field | — | — | — | — | — | — |
 
 #### Outputs: what the screen shows and produces
+
+**Shown**
+
+**Read an order** (detail panel, from `getOrder`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| ID | the name it points at, never the id | The client UUIDv7 from `CreateOrderRequest.id`. |
+| Order number | text | The number a guest reads and a cashier types. Server-assigned: the venue prefix and a sequence per venue, for example `DXB1-000123` … |
+| Channel | chip: POS, Kiosk, Guest app, Guest web, Call centre, Partner… | Where it came from. Drives revenue attribution, promotion eligibility and the self-service adoption figures the operator will ask for … |
+| Venue | the name it points at, never the id | — |
+| Status | chip: Pending, Held, Paid, Partially paid, Completed, Voided… | `held` is a parked sale — the cashier freed the till and the guest will return. It holds no inventory and expires, because a till that … |
+| Currency | text | Resolved from the region, not stored (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and … |
+| Currency scale | 1,234 | Resolved from the region, not stored (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and … |
+| Gross amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Tax amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Net amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Refunded amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Charge currency | text | The currency the guest selected and is charged in (CHG-FIN-001, 2 October 2026). |
+| Charge FX rate | text | Units of `chargeCurrency` per one unit of the base currency, from the region's `tender` rate in force at checkout (`finance.FxRate`) … |
+| Charge FX rate | the name it points at, never the id | The `finance.FxRate` row the rate was taken from, for audit. |
+| Charge total | AED 1,234.50 | `grossAmount` converted at `chargeFxRate` and rounded to the charge currency's scale: what the guest pays and what the payment request to … |
+| Charge rate locked until | 1 Oct 2026, 14:30 | The quote holds until then (the cart lease). After it, the next payment attempt re-quotes at the rate then in force and the guest confirms … |
+| Dropped promotions | list or chips (count when long) | Promotions left off this order at checkout because their budget cap would have been exceeded (decided 28 September, audit R101 (8)). |
+| Promotion | the name it points at, never the id | — |
+| Name | text | — |
+| Reason | chip: Budget cap reached | — |
+
+**List refunds against an order** (data table, from `listOrderRefunds`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
+| Order | the name it points at, never the id | — |
+| Batch | the name it points at, never the id | The `RefundBatch` that raised this refund, where `createBulkRefund` did. Null for a refund raised on its own. |
+| FX rate | text | The rate on the original payment, not today's (BL-087, CF-118). `Payment` records `tenderCurrency`, `fxRate` and `fxRateSource` at the … |
+| Tax reversal entry | the name it points at, never the id | A refund reverses the tax entry it created, and this is where that is stated rather than implied. |
+| Settle to | chip: Original tender, Advance balance, Wire transfer, Store credit | BL-086. A refund could only go back the way it came. |
+| FX variance | AED 1,234.50 | Where the sale rate and the current rate differ, the difference is booked as an FX variance rather than hidden in the refund. |
+| Tender currency | text | A refund goes back in the currency the guest paid (decided 2 October 2026, Chinmay; CHG-FIN-001). |
+| Tender amount | AED 1,234.50 | The refund in `tenderCurrency`, at that currency's own scale (CHG-FIN-001). |
+| Amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Applied percentage | 1,234.5 | From the venue's time bands, or an approver override. |
+| Status | chip: Pending approval, Pending gateway, Completed, Declined, Failed | — |
+| Reason | text | — |
+| Requested by principal | the name it points at, never the id | — |
+| Secondary principal | the name it points at, never the id | — |
+| Approved by principal | the name it points at, never the id | — |
+| Ledger entry | the name it points at, never the id | Written before the gateway is called. |
+| Gateway reference | text | — |
+| Completed at | 1 Oct 2026, 14:30 | — |
+
+**Data it reads**: `getOrder` (onLoad, Read an order); `listOrderRefunds` (onLoad, List refunds against an order)
 
 **Where the user goes next**
 
@@ -644,21 +865,43 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 Second authorisation required and absent (`secondAuthorisationRequired`), refund window closed (`refundWindowClosed`), or the amount exceeds what remains … (RefundPolicyProblem) |
 
+#### Consistency with other screens
+
+- Match `BO-1146`: Same wallet refund policy record.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+refund:
+  purchase: AED 200.00 = Bonus 50 + Gift card 150
+  restored:
+  - Bonus AED 50.00 (expires 31 Dec)
+  - Gift card AED 150.00
+```
+
 #### Permissions
 
 - `setWalletRefundPolicy` → `WALLET_CONFIGURE` (configure) · staff
 - `createRefund` → `ORDER_REFUND` (operate) · staff, partner
+- `getOrder` → `ORDER_VIEW` (read) · staff, guest, partner
+- `listOrderRefunds` → `ORDER_VIEW` (read) · staff, partner
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
 #### Requirements it meets
 
-2 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+6 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
 
 | Ref | Requirement (shortened) | Domain | Verdict | Via |
 |---|---|---|---|---|
 | 2.12.3 | The system provide the ability for cashiers to issue refund up to a certain value with another user (cashier or supervisor) putting in their name as an audit control. | Ticketing Sales | CONTRACTED | `createRefund` |
 | 2.12.13 | The system should change ticket status to Refunded after the Refund transaction is posted. Refund transaction should be linked with the ticket identifier to allow for reconciliation. There should be … | Ticketing Sales | CONTRACTED | `createRefund` |
+| 19.2.12 | Ticket Viewing - System shall display ticket details. | Guest Mobile App & Branding | CONTRACTED | `getOrder` |
+| 2.6.2 | Post-order service 1) On the order details page, users can view the order number, amount, time, payment method, user information, refund/change policies, and the QR code of the e-ticket 2) During the … | Ticketing Sales | CONTRACTED | `getOrder` |
+| 2.12.27 | All orders can be finalized for payment registration or modified or even cancelled at the Guest Service or any reservation PC. | Ticketing Sales | CONTRACTED | `getOrder` |
+| 5.7.8 | The system should be able to use of a unique Order or Reference number (PNR) for each transaction, which can be communicated to the Payment Gateway, Acquiring Bank and the ERP system for … | F&B & Guest Management | CONTRACTED | `getOrder` |
 
 #### Client meeting inputs
 
@@ -684,12 +927,12 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (6), with its required mark, default, format and its error state (400, 403, 409, 412).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (6), with its required mark, default, format and its error state (400, 403, 404, 409, 412).
+- [ ] Every output is drawn (40 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-1147?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, emptyNoResults, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-1143`.
-- [ ] Every gated control is gated: `ORDER_REFUND`, `WALLET_CONFIGURE`.
+- [ ] Every gated control is gated: `ORDER_REFUND`, `ORDER_VIEW`, `WALLET_CONFIGURE`.
 - [ ] The module and platform inputs below are applied.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -704,12 +947,22 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Orders & Money · wave 3 · needs the `core` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `WALLET_OPERATE` (1 operate); in the flows as venue manager |
+| Who uses it | venue staff holding `WALLET_OPERATE`, `WALLET_VIEW` (1 operate, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population |
 | Offline | online only |
-| Opens with | nothing: it opens on its own |
+| Opens with | `subjectId` (navigation) |
 | Route | `/orders-money/reversal-transaction-correction-management-bo-1148` |
+
+**Known gaps.** Contract gap recorded 2 October 2026 (CHG-WIR-027): Reversals of payments, transfers and refunds on a wallet (reverseWalletFunding reverses a top-up only).
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Correct wallet transactions while the ledger stays immutable: reversals of payments, transfers, refunds, duplicates.
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- The only operation reverses a top-up; payment, transfer and refund reversals have no operation. (CHG-WIR-027)
+
+**Fixed on main** (the package already carries these; draw what it says): No read operation: the screen declares only reverseWalletFunding and nothing that returns the current configuration. (CHG-WIR-025).
 
 #### Inputs: what the user enters or picks
 
@@ -731,9 +984,36 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 
 #### Outputs: what the screen shows and produces
 
+**Shown**
+
+**Wallet transaction history** (data table, from `listWalletTransactions`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| ID | text | — |
+| Wallet | the name it points at, never the id | The wallet this movement is on (SD-027, 29 September). A shared wallet has many subjects, so the subject alone cannot say which balance … |
+| Wallet hold | the name it points at, never the id | The hold a spend settled, where it came through `holdWalletFunds`. |
+| Kind | chip: Top up, Spend, Refund, Adjustment, Bonus, Expiry… | — |
+| Amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Balance after | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Order | text | — |
+| Venue | the name it points at, never the id | — |
+| Reason | text | — |
+| Principal | the name it points at, never the id | — |
+| Recorded at | 1 Oct 2026, 14:30 | — |
+| Next cursor | text | — |
+| Has more | yes / no (icon or chip) | — |
+
+**What each action does** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **Reverse**: A new reversing entry, never an edit. *(source: contracts/satellite/wallet.yaml#reverseWalletFunding)*
+
+**Data it reads**: `listWalletTransactions` (onLoad, Wallet transaction history)
+
 **Where the user goes next**
 
-- → `BO-1143` Wallet Operations Command Center: *Back to Wallet Operations Command Center*
+- → `BO-1143` Wallet Operations Command Center: *Back to Wallet Operations Command Center*; carries `subjectId`
 
 #### States
 
@@ -747,15 +1027,33 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 Already spent below the reversal amount |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+reversal:
+  transaction: WT-2026-889120
+  type: duplicate debit
+  amount: AED 8.00
+```
+
 #### Permissions
 
 - `reverseWalletFunding` → `WALLET_OPERATE` (operate) · staff
+- `listWalletTransactions` → `WALLET_VIEW` (read) · staff, guest
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
 #### Requirements it meets
 
-No matrix row traces to this screen's operations or data.
+3 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+
+| Ref | Requirement (shortened) | Domain | Verdict | Via |
+|---|---|---|---|---|
+| 1.1.112 | Transaction history | Ticketing Catalogue | CONTRACTED | `listWalletTransactions` |
+| 5.3.17 | Maintain guest wallet balances, top-ups, spending history, refunds, transfers, expirations, and transaction history. | F&B & Guest Management | CONTRACTED | `listWalletTransactions` |
+| 22.2.14 | Wallet History | Marketing & CRM | CONTRACTED | `listWalletTransactions` |
 
 #### Client meeting inputs
 
@@ -776,12 +1074,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (11), with its required mark, default, format and its error state (409).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (11), with its required mark, default, format and its error state (404, 409).
+- [ ] Every output is drawn (14 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-1148?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, emptyNoResults, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-1143`.
-- [ ] Every gated control is gated: `WALLET_OPERATE`.
+- [ ] Every gated control is gated: `WALLET_OPERATE`, `WALLET_VIEW`.
 - [ ] The module and platform inputs below are applied.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -796,7 +1094,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Orders & Money · wave 3 · needs the `core` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `APPROVAL_CONFIGURE`, `WALLET_OPERATE` (1 configure, 1 operate); in the flows as venue manager |
+| Who uses it | venue staff holding `APPROVAL_CONFIGURE`, `WALLET_OPERATE`, `WALLET_VIEW` (1 configure, 1 operate, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population |
 | Offline | online only |
@@ -804,6 +1102,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Route | `/orders-money/administrative-balance-adjustment-studio-bo-1149` |
 
 **Known gaps.** **Administrative Balance Adjustment Studio declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either …
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Governed balance adjustments (compensation, service recovery, corrections) with approval above thresholds.
+
+**Fixed on main** (the package already carries these; draw what it says): No read operation: the screen declares only adjustWallet, setApprovalMatrix and nothing that returns the current configuration. (CHG-WIR-025).
 
 #### Inputs: what the user enters or picks
 
@@ -821,13 +1123,73 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Customer-visible description | select field | — | — | — | — | — | — |
 | Supporting reference | select field | — | — | — | — | — | — |
 
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Kind | select | — | Refund · Price override · Discount override · Complimentary ticket · Membership cancellation · Access permission change · Configuration change · AI recommendation · Release promotion · Requisition · Stock write off · Journal entry …; Each is an existing kind … | `listApprovalMatrices` ?kind |
+| Effective | toggle | off | — | `listApprovalMatrices` ?effective |
+
 #### Outputs: what the screen shows and produces
+
+**Shown**
+
+**Read a guest wallet** (detail panel, from `getWallet`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| ID | the name it points at, never the id | Added 20 August. The schema reference derives table columns from API response schemas, and a response is not a table — this one returned … |
+| Subject | the name it points at, never the id | — |
+| Balance | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Credits | list or chips (count when long) | 4.3.5 and 4.3.19. One balance and one bonus balance with one expiry could not express what the requirement asks for — cash, bonus and … |
+| Kind | chip: Cash, Bonus, Redemption, Refund, Goodwill | `cash` is money the guest paid and the others are not. That distinction decides what is refundable, what expires, and what shows as a … |
+| Amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Expires at | 1 Oct 2026, 14:30 | — |
+| Source ref | text | — |
+| Is refundable | yes / no (icon or chip) | True only for `cash`. A guest cannot cash out a promotional credit, and a wallet that lets them has given away the promotion twice. |
+| Bonus balance | AED 1,234.50 | Promotional value. Typically non-refundable and spent first. |
+| Currency | text | — |
+| Status | chip: Active, Suspended, Closed | — |
+| Home cell name | text | Where the authoritative balance lives. Present when the guest is linked across cells. |
+| Expires at | 1 Oct 2026, 14:30 | — |
+| Last activity at | 1 Oct 2026, 14:30 | — |
+
+**What requires approval here** (data table, from `listApprovalMatrices`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| ID | the name it points at, never the id | — |
+| Kind | chip: Refund, Price override, Discount override, Complimentary ticket, Membership … | 11.1.7 and 11.1.30–11.1.37. The first four already exist as bespoke implementations and this contract is what they collapse into. |
+| Scope level | chip: Tenant, Region, Venue | — |
+| Rules | list or chips (count when long) | — |
+| ID | the name it points at, never the id | Added 20 August. The schema reference derives table columns from API response schemas, and a response is not a table — this one returned … |
+| Order | 1,234 | First match wins. Explicit ordering is what makes a matrix reviewable — an unordered set of overlapping rules is one nobody can reason … |
+| Min amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Max amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Risk score above | 1,234.5 | 11.1.12. Not matched against the AI risk score (29 September, build pass, group G2). |
+| Condition | text | 11.1.13. Evaluated against the attributes the caller supplied. |
+| Approver roles | list or chips (count when long) | Role ids from `identity.listRoles` (`Role.id`), which is where an editor gets the names to show and pick from. |
+| Approver scope level | chip: Venue, Department, Region, Tenant | 11.1.39. Which organisational level the approver must sit at. |
+| Mode | chip: Sequential, Parallel, Consensus, Majority | 11.1.43–11.1.46. Sequential asks one at a time, parallel asks everyone at once, consensus needs all of them, majority needs more than half. |
+| Levels | 1,234 | 11.1.3. Multi-level chains ask each level in turn. |
+| Requires MFA | yes / no (icon or chip) | — |
+| Requires signature | yes / no (icon or chip) | — |
+| Sla minutes | 1,234 | 11.1.14. Null means no SLA, which is different from a long one. |
+| Escalate after minutes | 1,234 | — |
+| Escalate to roles | list or chips (count when long) | Role ids from `identity.listRoles`, as `approverRoleIds`. |
+| Expires after minutes | 1,234 | 11.1.53. An unanswered request eventually stops waiting. |
 
 **Actions and what each produces**
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
 | Multi-level approval (primary button) | navigation or local | — | — | — | — |
+
+**What each action does** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **Adjust**: Type and reason required; approval per the matrix. *(source: contracts/satellite/wallet.yaml#adjustWallet / contracts/spine/approvals.yaml#setApprovalMatrix)*
+
+**Data it reads**: `getWallet` (onLoad, Read a guest wallet); `listApprovalMatrices` (onLoad, What requires approval here)
 
 **Where the user goes next**
 
@@ -845,16 +1207,29 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed. Includes a `scopeLevel` that is not the level of the scope node the caller acts at (audit R183); `errors[]` names `scopeLevel`.; 409 Refused, and nothing is stored. `refusedReason` says which: `loosensParentRule` — the matrix would loosen a rule set at a higher scope (a higher threshold … (ApprovalMatrixRefusedProblem) |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+adjustment:
+  type: Service recovery
+  amount: +AED 50.00
+  approval: Supervisor
+```
+
 #### Permissions
 
 - `adjustWallet` → `WALLET_OPERATE` (operate) · staff
 - `setApprovalMatrix` → `APPROVAL_CONFIGURE` (configure) · staff
+- `getWallet` → `WALLET_VIEW` (read) · staff, guest
+- `listApprovalMatrices` → `APPROVAL_CONFIGURE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
 #### Requirements it meets
 
-50 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+77 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
 
 | Ref | Requirement (shortened) | Domain | Verdict | Via |
 |---|---|---|---|---|
@@ -870,7 +1245,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | 11.1.2 | Approval Workflow Configuration System shall allow administrators to configure approval workflows for different business processes. | Approval Workflows & Governance | CONTRACTED | `setApprovalMatrix` |
 | 11.1.3 | Multi-Level Approval System shall support single-level and multi-level approval chains. | Approval Workflows & Governance | CONTRACTED | `setApprovalMatrix` |
 | 11.1.4 | Role-Based Approval Routing System shall automatically route approval requests based on organizational hierarchy and user roles. | Approval Workflows & Governance | CONTRACTED | `setApprovalMatrix` |
-| … 38 more | | | | `traceability.json` |
+| … 65 more | | | | `traceability.json` |
 
 #### Client meeting inputs
 
@@ -890,15 +1265,16 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS192 Wallet Configuration Backend Structure v1.0 Board 7.dc.html#bo-1149`
 - Workshop pack: Wallet_Configuration_Backend_Structure_v1.0.pdf board 7
 - Flow F299 *Wallet Configuration Backend Structure v1.0 board 7: Wallet Operations Command …*, step 12: Works in Administrative Balance Adjustment Studio → Allow authorized personnel to perform governed wallet balance adjustments. Adjustment Types Credit Customer compensation Service recovery Promotional correction Migration adjustment Balance …
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (9), with its required mark, default, format and its error state (400, 403, 409).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (9), with its required mark, default, format and its error state (400, 403, 404, 409).
+- [ ] Every output is drawn (35 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-1149?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, emptyNoResults, offline.
 - [ ] Every action is wired with its success and its failure: Multi-level approval.
 - [ ] Every transition is wired: `BO-1143`.
-- [ ] Every gated control is gated: `APPROVAL_CONFIGURE`, `WALLET_OPERATE`.
+- [ ] Every gated control is gated: `APPROVAL_CONFIGURE`, `WALLET_OPERATE`, `WALLET_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -913,12 +1289,16 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Orders & Money · wave 3 · needs the `core` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `WALLET_OPERATE` (1 operate); in the flows as venue manager |
+| Who uses it | venue staff holding `WALLET_OPERATE`, `WALLET_VIEW` (1 operate, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population |
 | Offline | online only |
-| Opens with | `walletId` (navigation) · cold entry: Opened from BO-1143 with the wallet picked there. Opened cold (a bookmark or a refresh), it shows the list to pick from rather than an empty record, and says … |
+| Opens with | `walletId` (navigation), `subjectId` (navigation) · cold entry: Opened from BO-1143 with the wallet picked there. Opened cold (a bookmark or a refresh), it shows the list to pick from rather than an empty record, and says … |
 | Route | `/orders-money/wallet-block-freeze-restriction-management-bo-1150` |
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Block, freeze or restrict a wallet; three different things a single suspended flag conflated.
+
+**Fixed on main** (the package already carries these; draw what it says): No read operation: the screen declares only setWalletRestriction, suspendWallet and nothing that returns the current configuration. (CHG-WIR-025).
 
 #### Inputs: what the user enters or picks
 
@@ -935,6 +1315,28 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Outputs: what the screen shows and produces
 
+**Shown**
+
+**Read a guest wallet** (detail panel, from `getWallet`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| ID | the name it points at, never the id | Added 20 August. The schema reference derives table columns from API response schemas, and a response is not a table — this one returned … |
+| Subject | the name it points at, never the id | — |
+| Balance | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Credits | list or chips (count when long) | 4.3.5 and 4.3.19. One balance and one bonus balance with one expiry could not express what the requirement asks for — cash, bonus and … |
+| Kind | chip: Cash, Bonus, Redemption, Refund, Goodwill | `cash` is money the guest paid and the others are not. That distinction decides what is refundable, what expires, and what shows as a … |
+| Amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Expires at | 1 Oct 2026, 14:30 | — |
+| Source ref | text | — |
+| Is refundable | yes / no (icon or chip) | True only for `cash`. A guest cannot cash out a promotional credit, and a wallet that lets them has given away the promotion twice. |
+| Bonus balance | AED 1,234.50 | Promotional value. Typically non-refundable and spent first. |
+| Currency | text | — |
+| Status | chip: Active, Suspended, Closed | — |
+| Home cell name | text | Where the authoritative balance lives. Present when the guest is linked across cells. |
+| Expires at | 1 Oct 2026, 14:30 | — |
+| Last activity at | 1 Oct 2026, 14:30 | — |
+
 **Actions and what each produces**
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
@@ -947,6 +1349,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Disable spending (destructive button) | navigation or local | — | — | — | — |
 | Disable transfers (destructive button) | navigation or local | — | — | — | — |
 | Disable top-up (destructive button) | navigation or local | — | — | — | — |
+
+**What each action does** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **Restrict**: Kind (block, freeze, restrict), reason; the balance is preserved. *(source: contracts/satellite/wallet.yaml#setWalletRestriction)*
+
+**Data it reads**: `getWallet` (onLoad, Read a guest wallet)
 
 **Where the user goes next**
 
@@ -971,20 +1379,44 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 The wallet is closed, and a closed wallet cannot be suspended. (WalletStateProblem) |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+restriction:
+  wallet: DW-0011-9012
+  kind: freeze
+  reason: Suspected card testing
+```
+
 #### Permissions
 
 - `setWalletRestriction` → `WALLET_OPERATE` (operate) · staff
 - `suspendWallet` → `WALLET_OPERATE` (operate) · staff
+- `getWallet` → `WALLET_VIEW` (read) · staff, guest
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
 #### Requirements it meets
 
-1 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+28 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
 
 | Ref | Requirement (shortened) | Domain | Verdict | Via |
 |---|---|---|---|---|
 | 4.3.21 | It shall be possible to block wallet account. | Bundles and Promotions | CONTRACTED | `suspendWallet` |
+| 19.2.9 | Digital Wallet - System shall provide a digital wallet. | Guest Mobile App & Branding | CONTRACTED | `getWallet` |
+| 1.1.105 | Stored value card management | Ticketing Catalogue | CONTRACTED | `getWallet` |
+| 1.1.108 | Balance enquiry | Ticketing Catalogue | CONTRACTED | `getWallet` |
+| 1.1.111 | Expiry management | Ticketing Catalogue | CONTRACTED | `getWallet` |
+| 2.6.48 | System shall provide one unified wallet experience across website, mobile app, POS, kiosk, and membership channels. The wallet shall show stored value, vouchers, loyalty points, membership benefits … | Ticketing Sales | CONTRACTED | `getWallet` |
+| 2.13.34 | Digital Wallet Integration | Ticketing Sales | CONTRACTED | `getWallet` |
+| 4.3.7 | The system should allow guests to use their digital wallet to make online and in-app purchases (through API integrations), buy tickets of all type or purchase any service within venue such as retail … | Bundles and Promotions | CONTRACTED | `getWallet` |
+| 4.3.8 | The system should provide a digital wallet that allows: - multiple channels for payments, including but not limited to the Mobile app and wearable (which is linked to the digital wallet). - multiple … | Bundles and Promotions | CONTRACTED | `getWallet` |
+| 4.3.13 | The system should allow guests to make in-store and attraction payments using digital wallets via contactless methods as RFID, NFC and QR-code. | Bundles and Promotions | CONTRACTED | `getWallet` |
+| 4.3.20 | The system should enable usage of wallet by other systems through integration. All functionalities of the wallet such as credit redemption, balance check and wallet funding should be available … | Bundles and Promotions | CONTRACTED | `getWallet` |
+| 4.3.22 | Support cashless stored-value balances. | Bundles and Promotions | CONTRACTED | `getWallet` |
+| … 16 more | | | | `traceability.json` |
 
 #### Client meeting inputs
 
@@ -1010,12 +1442,12 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (6), with its required mark, default, format and its error state (409).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (6), with its required mark, default, format and its error state (404, 409).
+- [ ] Every output is drawn (15 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-1150?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, emptyNoResults, offline.
 - [ ] Every action is wired with its success and its failure: Block wallet, Unblock wallet, Suspend wallet, Freeze entire balance, Freeze specific credit, Disable spending, Disable transfers, Disable top-up.
 - [ ] Every transition is wired: `BO-1143`.
-- [ ] Every gated control is gated: `WALLET_OPERATE`.
+- [ ] Every gated control is gated: `WALLET_OPERATE`, `WALLET_VIEW`.
 - [ ] The module and platform inputs below are applied.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -1036,6 +1468,14 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 | Offline | online only |
 | Opens with | `disputeId` (navigation) |
 | Route | `/orders-money/wallet-disputes-operational-exception-queue-bo-1151` |
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Wallet disputes and operational exceptions worked to resolution.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **List operation(s) listWalletDisputes return a bare array, not the paged list envelope (items, nextCursor, hasMore).** Why: The table cannot page, and a row without an id cannot open, edit or link to the record it summarises. *(source: contracts/satellite/wallet.yaml#listWalletDisputes; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
+
+**Fixed on main** (the package already carries these; draw what it says): The queue cannot resolve a dispute; resolveWalletDispute exists but is declared only on BO-1179. (CHG-WIR-025).
 
 #### Inputs: what the user enters or picks
 
@@ -1068,6 +1508,20 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 |---|---|---|---|---|
 | Status | text field | — | — | `listWalletDisputes` ?status |
 
+**Form: Resolve dispute** (modal, opened by *Resolve dispute*; *Resolve dispute* calls `resolveWalletDispute`, *Cancel* sends nothing)
+
+**Collects what `resolveWalletDispute` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Action `action` | segmented control | required | — | Reprocess · Escalate · Resolve | — | — | `resolveWalletDispute` body |
+| Outcome `outcome` | segmented control | optional | — | Upheld · Rejected | — | Required with `resolve`. | `resolveWalletDispute` body |
+| Resolution note `resolutionNote` | text area | optional | — | max length 2000 | — | Required with `resolve`. | `resolveWalletDispute` body |
+| Escalate to role `escalateToRoleId` | picker: choose an escalate to role | optional | — | — | shows names, sends the id | Required with `escalate`. | `resolveWalletDispute` body |
+| Adjustment `adjustmentId` | picker: choose an adjustment | optional | — | — | shows names, sends the id | The `adjustWallet` adjustment that settled an upheld dispute, if any. | `resolveWalletDispute` body |
+
+Errors to draw in the form: 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 The dispute is already closed (`upheld`, `rejected` or `withdrawn`).; 422 `resolve` without `outcome` or `resolutionNote`, or `escalate` without `escalateToRoleId`.
+
 **Sent by *Withdraw dispute*** (`withdrawWalletDispute`; no form is declared, so these are filled from the screen or collected inline)
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
@@ -1085,6 +1539,11 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
 | Withdraw dispute (primary button) | `withdrawWalletDispute` POST `/wallet-disputes/{disputeId}/withdraw` | inline | WalletDispute | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 The dispute is already closed (`upheld`, `rejected` or `withdrawn`). | — |
+| Resolve dispute (secondary button) | `resolveWalletDispute` POST `/wallet-disputes/{disputeId}/resolve` | inline | WalletDispute | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 The dispute is already closed (`upheld`, `rejected` or `withdrawn`).; 422 `resolve` without `outcome` or … | opens modal first |
+
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **queue**: Type, amount, age, state; withdraw available while open. *(source: contracts/satellite/wallet.yaml#listWalletDisputes / contracts/satellite/wallet.yaml#withdrawWalletDispute)*
 
 **Data it reads**: `listWalletDisputes` (onLoad, The dispute queue)
 
@@ -1102,13 +1561,25 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Empty, no results (`?state=emptyNoResults`) | **Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 409 The dispute is already closed (`upheld`, `rejected` or `withdrawn`). |
+| Validation and conflict | the form keeps what was entered and marks the problem: 409 The dispute is already closed (`upheld`, `rejected` or `withdrawn`).; 422 `resolve` without `outcome` or `resolutionNote`, or `escalate` without `escalateToRoleId`. |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+dispute:
+  type: Charged but game failed
+  amount: AED 6.00
+  age: 1 day
+```
 
 #### Permissions
 
 - `listWalletDisputes` → `WALLET_VIEW` (read) · staff
 - `raiseWalletDispute` → `WALLET_OPERATE` (operate) · staff
 - `withdrawWalletDispute` → `WALLET_OPERATE` (operate) · staff, guest
+- `resolveWalletDispute` → `WALLET_OPERATE` (operate) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -1140,13 +1611,14 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (19), with its required mark, default, format and its error state (404, 409).
+- [ ] Every input above is drawn (24), with its required mark, default, format and its error state (404, 409, 422).
 - [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-1151?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, emptyNoResults, offline.
-- [ ] Every action is wired with its success and its failure: Withdraw dispute.
+- [ ] Every action is wired with its success and its failure: Withdraw dispute, Resolve dispute.
 - [ ] Every transition is wired: `BO-1143`.
 - [ ] Every gated control is gated: `WALLET_OPERATE`, `WALLET_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -1169,6 +1641,12 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Test sensitive wallet operations and review their history.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **List operation(s) listWalletDisputes return a bare array, not the paged list envelope (items, nextCursor, hasMore).** Why: The table cannot page, and a row without an id cannot open, edit or link to the record it summarises. *(source: contracts/satellite/wallet.yaml#listWalletDisputes; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
+
 #### Inputs: what the user enters or picks
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
@@ -1184,6 +1662,10 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 **Shown**
 
 **Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **history**: Disputes and operations timeline. *(source: contracts/satellite/wallet.yaml#listWalletDisputes)*
 
 **Data it reads**: `listWalletDisputes` (onLoad, Operations audit trail)
 
@@ -1201,6 +1683,16 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the operations simulator approval are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+history:
+- at: 14 Nov 10:12
+  event: dispute resolved, refund AED 6.00
+```
 
 #### Permissions
 
@@ -1240,6 +1732,7 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 - [ ] Every transition is wired: `BO-1143`.
 - [ ] Every gated control is gated: `WALLET_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -1346,9 +1839,15 @@ Method, path, parameters, request and response for every operation these screens
 {
 "adjustWallet": {"method":"POST","path":"/wallets/{subjectId}/adjust","contract":"wallet","summary":"Manually adjust a wallet balance","permission":"WALLET_OPERATE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Wallet"},
 "createRefund": {"method":"POST","path":"/orders/{orderId}/refunds","contract":"orders","summary":"Refund an order, wholly or in part","permission":"ORDER_REFUND","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"CreateRefundRequest","responds":null},
+"getOrder": {"method":"GET","path":"/orders/{orderId}","contract":"orders","summary":"Read an order","permission":"ORDER_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Order"},
+"getRefundPolicy": {"method":"GET","path":"/venues/{venueId}/refund-policy","contract":"orders","summary":"Read a venue's refund policy","permission":"ORDER_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"RefundPolicy"},
+"getWallet": {"method":"GET","path":"/wallets/{subjectId}","contract":"wallet","summary":"Read a guest wallet","permission":"WALLET_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Wallet"},
+"listApprovalMatrices": {"method":"GET","path":"/approval-matrices","contract":"approvals","summary":"What requires approval here","permission":"APPROVAL_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"kind","in":"query","required":null},{"name":"effective","in":"query","required":null}],"requestBody":null,"responds":"ApprovalMatrix"},
+"listOrderRefunds": {"method":"GET","path":"/orders/{orderId}/refunds","contract":"orders","summary":"List refunds against an order","permission":"ORDER_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listWalletDisputes": {"method":"GET","path":"/wallet-disputes","contract":"wallet","summary":"Contested transactions and operational exceptions","permission":"WALLET_VIEW","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[{"name":"status","in":"query","required":null}],"requestBody":null,"responds":"WalletDispute"},
 "listWalletTransactions": {"method":"GET","path":"/wallets/{subjectId}/transactions","contract":"wallet","summary":"Wallet transaction history","permission":"WALLET_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "raiseWalletDispute": {"method":"POST","path":"/wallet-disputes","contract":"wallet","summary":"A guest contests a wallet transaction","permission":"WALLET_OPERATE","offlineCapable":null,"conflictPolicy":"append","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"WalletDispute","responds":"WalletDispute"},
+"resolveWalletDispute": {"method":"POST","path":"/wallet-disputes/{disputeId}/resolve","contract":"wallet","summary":"Work a wallet dispute or integration exception","permission":"WALLET_OPERATE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"WalletDispute"},
 "reverseWalletFunding": {"method":"POST","path":"/wallet-funding/reversals","contract":"wallet","summary":"Undo a top-up, in full or in part","permission":"WALLET_OPERATE","offlineCapable":null,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"WalletAdjustment"},
 "setApprovalMatrix": {"method":"PUT","path":"/approval-matrices","contract":"approvals","summary":"Configure what requires approval","permission":"APPROVAL_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"ApprovalMatrix","responds":"ApprovalMatrix"},
 "setRefundPolicy": {"method":"PUT","path":"/venues/{venueId}/refund-policy","contract":"orders","summary":"Set a venue's refund policy","permission":"REGION_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":"RefundPolicy","responds":"RefundPolicy"},
@@ -1366,18 +1865,25 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
-"ApprovalKind": {"type":"string","description":"11.1.7 and 11.1.30–11.1.37. **The first four already exist as bespoke implementations** and this contract is what they collapse into.\n**Which actions route here — decided 28 September, audit R144.** Finance and procurement acts go through this engine to a **finance approver**: closing a fiscal period (`periodClose`), reopening one (`periodReopen`), cancelling a purchase order (`purchaseOrderCancel`) and closing one short (`purchaseOrderShortClose`). The tenant default matrix for each of these names the finance approver role; a venue may tighten it and never loosen it. Starting a release rollout routes through `releasePromotion` to the platform release manager (a holder of `PLATFORM_RELEASE_PROMOTE`). **Not every `requiresApproval` goes here:** reopening a shift, recounting a stock count and a retail return above the venue threshold take a supervisor's step-up on the same device instead, and never raise a request.\n**Catalogue change requests route through `productChange` and `pricingChange`** (decided 29 September, writers pass): a product change and a price or pricing change raised in `catalogue` ask for approval under these two kinds, so a venue can route product edits and price edits to different approvers.\n","enum":["refund","priceOverride","discountOverride","complimentaryTicket","membershipCancellation","accessPermissionChange","configurationChange","aiRecommendation","releasePromotion","requisition","stockWriteOff","journalEntry","periodClose","periodReopen","purchaseOrderCancel","purchaseOrderShortClose","tenantMigration","productChange","pricingChange"]},
+"ApprovalKind": {"type":"string","description":"11.1.7 and 11.1.30–11.1.37. **The first four already exist as bespoke implementations** and this contract is what they collapse into.\n**Which actions route here — decided 28 September, audit R144.** Finance and procurement acts go through this engine to a **finance approver**: closing a fiscal period (`periodClose`), reopening one (`periodReopen`), cancelling a purchase order (`purchaseOrderCancel`) and closing one short (`purchaseOrderShortClose`). The tenant default matrix for each of these names the finance approver role; a venue may tighten it and never loosen it. Starting a release rollout routes through `releasePromotion` to the platform release manager (a holder of `PLATFORM_RELEASE_PROMOTE`). **Not every `requiresApproval` goes here:** reopening a shift, recounting a stock count and a retail return above the venue threshold take a supervisor's step-up on the same device instead, and never raise a request.\n**Catalogue change requests route through `productChange` and `pricingChange`** (decided 29 September, writers pass): a product change and a price or pricing change raised in `catalogue` ask for approval under these two kinds, so a venue can route product edits and price edits to different approvers.\n\n**Optional review steps a venue switches on, decided 2 October 2026** (Chinmay; CHG-CSP-036, CHG-CSP-028, CHG-CSP-031). Each is an existing kind narrowed by the rule's `subjectTypes`, so no kind is added (a new value here would be a breaking change against r1) and each is off until the venue saves an active matrix for it:\n- **Publishing white-label content** (`configurationChange`, subject `whiteLabelPublication`): simulate, then a single publish by a holder of the permission; a review step only where the venue sets one up (batch 1, CMS-014; DEC-156). - **Recording F&B waste above a value** (`stockWriteOff`, subject `fnbWaste`): the venue's waste-approval policy, value bands as `minAmount` and `maxAmount`, photo evidence above a value held by fnb (batch 6 #192, BO-139; DEC-192; R144). - **Publishing an access topology** (`configurationChange`, subject `topologyPublication`): second-person approval when the venue switches it on (batch 6 #230, BO-153; DEC-230). - **A permanent identity lock, a whitelist entry, or releasing a full-identity or permanent lock** (`accessPermissionChange`, subjects `identityLock`, `whitelistEntry`, `identityLockRelease`): always a second approver, never for an until-end-of-day lock (critical set 1, BO-229 and BO-247; DEC-254, DEC-260); the tenant default matrix names the security approver role and a venue may tighten it, never remove it.\n","enum":["refund","priceOverride","discountOverride","complimentaryTicket","membershipCancellation","accessPermissionChange","configurationChange","aiRecommendation","releasePromotion","requisition","stockWriteOff","journalEntry","periodClose","periodReopen","purchaseOrderCancel","purchaseOrderShortClose","tenantMigration","productChange","pricingChange"]},
 "ApprovalMatrix": {"type":"object","x-ticvai-persistence":"approvals.matrix","required":["kind","scopeLevel","rules"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"kind":{"$ref":"#/components/schemas/ApprovalKind"},"scopeLevel":{"type":"string","enum":["tenant","region","venue"]},"scopePath":{"type":"string","readOnly":true},"version":{"type":"integer","readOnly":true,"description":"11.1.80. **A request is decided by the rules it was raised under.** Changing the matrix mid-flight would mean an approver answering a question that changed while they read it.\n**(`kind`, `scopePath`, `version`) is unique**, and a stored version is never edited: a request's `matrixVersion` names exactly one rule set (decided 28 September, audit R129 (2)).\n"},"rules":{"type":"array","items":{"$ref":"#/components/schemas/ApprovalRule"}},"isActive":{"type":"boolean"}}},
-"ApprovalRule": {"type":"object","x-ticvai-persistence":"approvals.rule","required":["order","approverRoleIds","mode"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true,"description":"**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"},"order":{"type":"integer","description":"**First match wins.** Explicit ordering is what makes a matrix reviewable — an unordered set of overlapping rules is one nobody can reason about.\n"},"minAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"maxAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"riskScoreAbove":{"type":"number","nullable":true,"description":"11.1.12. **Not matched against the AI risk score** (29 September, build pass, group G2). The AI assessment on a request (`ApprovalRequest.aiAssessment`, from `ai.scoreApprovalRequest`) is context for the reviewer only (MoM 8 September: AI never influences approve or reject), and routing a request to more approvers because of it would be influence. A rule with this set matches only a `riskScore` the requesting contract passes in `attributes` from its own deterministic rules (a payment's rule score, for example). Using the AI score here needs the client to say so.\n"},"condition":{"type":"string","nullable":true,"description":"11.1.13. Evaluated against the attributes the caller supplied.\n\n**No condition language is defined yet** (pull audit R104, 26 September): the grammar, the attributes it may name and how two conditions are compared for `unreachableRule` are an open decision, not something to infer from this field.\n"},"approverRoleIds":{"type":"array","minItems":1,"description":"Role ids from `identity.listRoles` (`Role.id`), which is where an editor gets the names to show and pick from. This contract stores the ids only.\n","items":{"type":"string","format":"uuid"}},"approverScopeLevel":{"type":"string","enum":["venue","department","region","tenant"],"description":"11.1.39. Which organisational level the approver must sit at."},"mode":{"$ref":"#/components/schemas/ApprovalMode"},"levels":{"type":"integer","default":1,"description":"11.1.3. Multi-level chains ask each level in turn."},"requiresMfa":{"type":"boolean","default":false},"requiresSignature":{"type":"boolean","default":false},"slaMinutes":{"type":"integer","nullable":true,"description":"11.1.14. Null means no SLA, which is different from a long one."},"escalateAfterMinutes":{"type":"integer","nullable":true},"escalateToRoleIds":{"type":"array","description":"Role ids from `identity.listRoles`, as `approverRoleIds`.","items":{"type":"string","format":"uuid"}},"expiresAfterMinutes":{"type":"integer","nullable":true,"description":"11.1.53. An unanswered request eventually stops waiting."},"externalProviderId":{"type":"string","format":"uuid","nullable":true,"description":"11.1.65 (29 September). **This level is decided in an external workflow system** (`ApprovalExternalProvider`) rather than by a person in TICVAI. `approverRoleIds` stay required: they are who decides if the provider does not answer in time and its `onTimeout` is `fallBackToRoles`.\n"}}},
+"ApprovalRule": {"type":"object","x-ticvai-persistence":"approvals.rule","required":["order","approverRoleIds","mode"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true,"description":"**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"},"order":{"type":"integer","description":"**First match wins.** Explicit ordering is what makes a matrix reviewable — an unordered set of overlapping rules is one nobody can reason about.\n"},"minAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"maxAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"riskScoreAbove":{"type":"number","nullable":true,"description":"11.1.12. **Not matched against the AI risk score** (29 September, build pass, group G2). The AI assessment on a request (`ApprovalRequest.aiAssessment`, from `ai.scoreApprovalRequest`) is context for the reviewer only (MoM 8 September: AI never influences approve or reject), and routing a request to more approvers because of it would be influence. A rule with this set matches only a `riskScore` the requesting contract passes in `attributes` from its own deterministic rules (a payment's rule score, for example). Using the AI score here needs the client to say so.\n"},"condition":{"type":"string","nullable":true,"description":"11.1.13. Evaluated against the attributes the caller supplied.\n\n**No condition language is defined yet** (pull audit R104, 26 September): the grammar, the attributes it may name and how two conditions are compared for `unreachableRule` are an open decision, not something to infer from this field.\n"},"approverRoleIds":{"type":"array","minItems":1,"description":"Role ids from `identity.listRoles` (`Role.id`), which is where an editor gets the names to show and pick from. This contract stores the ids only.\n","items":{"type":"string","format":"uuid"}},"approverScopeLevel":{"type":"string","enum":["venue","department","region","tenant"],"description":"11.1.39. Which organisational level the approver must sit at."},"mode":{"$ref":"#/components/schemas/ApprovalMode"},"levels":{"type":"integer","default":1,"description":"11.1.3. Multi-level chains ask each level in turn."},"requiresMfa":{"type":"boolean","default":false},"requiresSignature":{"type":"boolean","default":false},"slaMinutes":{"type":"integer","nullable":true,"description":"11.1.14. Null means no SLA, which is different from a long one."},"escalateAfterMinutes":{"type":"integer","nullable":true},"escalateToRoleIds":{"type":"array","description":"Role ids from `identity.listRoles`, as `approverRoleIds`.","items":{"type":"string","format":"uuid"}},"expiresAfterMinutes":{"type":"integer","nullable":true,"description":"11.1.53. An unanswered request eventually stops waiting."},"subjectTypes":{"type":"array","description":"**Which subjects of the kind this rule matches** (decided 2 October 2026, Chinmay; CHG-CSP-028, CHG-CSP-036, CHG-CSP-031): the `CreateApprovalRequest.subjectType` values, for example `topologyPublication` or `whiteLabelPublication` under `configurationChange`. Empty matches every subject of the kind. It is how a venue switches an optional review step on for one kind of act without routing every act of the kind.","items":{"type":"string","maxLength":64}},"signatureMethods":{"type":"array","description":"**The signature methods this level accepts, where `requiresSignature` is true** (design-notes correction on ADM-344, Block B: \"Configuring which stages need a signature is a policy write\"; CHG-CSP-045). Values of `ApprovalSignature.method`. Empty accepts any of them. With `requiresSignature` this makes the rule the signature policy: which levels of which kinds need a signature, and how it is given; `signApprovalDecision` refuses a method the level does not accept.","items":{"type":"string","enum":["platformKey","uaePass","externalCertificate","drawnSignature"]}},"externalProviderId":{"type":"string","format":"uuid","nullable":true,"description":"11.1.65 (29 September). **This level is decided in an external workflow system** (`ApprovalExternalProvider`) rather than by a person in TICVAI. `approverRoleIds` stay required: they are who decides if the provider does not answer in time and its `onTimeout` is `fallBackToRoles`.\n"}}},
 "CreateRefundRequest": {"type":"object","required":["id","amount","reason","recordedAt"],"properties":{"id":{"type":"string","format":"uuid","description":"Client-generated UUIDv7 of the refund, and its idempotency key — it must equal the `Idempotency-Key` header."},"lineIds":{"type":"array","items":{"type":"string","format":"uuid"},"description":"Omit to refund the whole order."},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"reason":{"type":"string","minLength":3,"maxLength":500},"secondaryAuthorisation":{"type":"object","description":"Required above the venue's `requiresSecondUserAbove`. A second user — cashier or supervisor — names themselves. This is dual-authorisation, not escalation.\n","required":["principalId","credential"],"properties":{"principalId":{"type":"string","format":"uuid"},"credential":{"type":"string","maxLength":512,"description":"The second person's staff PIN, as they sign in at a till with it. **A PIN, never a password** (decided 28 September, audit R123 (7))."}}},"refundToOriginalTender":{"type":"boolean","default":true},"alternateTender":{"$ref":"#/components/schemas/TenderKind"},"recordedAt":{"type":"string","format":"date-time"}}},
+"ExchangeRateDecimal": {"type":"string","x-ticvai-persistence-kind":"valueObject","x-ticvai-persistence-column":"numeric(18,6)","description":"**An exchange rate: a decimal string, never a float**, for the reason `Money.amount` is one — a JavaScript client must not round a rate in transit. **Six decimal places**, the precision `finance.FxRate.rate` asks for, and stored at that precision.\n","pattern":"^\\d+(\\.\\d{1,6})?$"},
 "Money": {"type":"object","x-ticvai-persistence-kind":"valueObject","x-ticvai-persistence-column":"numeric(18,4)","description":"**On the wire this is three fields; in the database it is one column.**\n24 August. Every column typed `Money` was landing as `jsonb` — 129 of them, including `orders.shift.opening_float`, `inventory.purchase_order.total` and `promotions.voucher.balance`. **`orders.cash_movement.amount` was `numeric(18,4)` because somebody hand-typed that one**, and the inconsistency is what made it visible.\n**A jsonb price cannot be summed in SQL.** Every total, variance and reconciliation moves into application code — and a shift variance computed in .NET against a ledger computed in Postgres is two answers to one question. That is F13 month-end and F98 takings-to-ledger, both walked, both assuming the arithmetic is in the database.\n**`currency` and `scale` are not stored per row.** ADR-0018 makes them region-scoped and not overridable below, so they resolve from the scope walk — storing AED against nine million rows in a UAE region is nine million copies of a fact that cannot differ. A row that needed its own currency would be a row in the wrong region.\n**They stay on the wire** because a client reading a figure should not have to walk a hierarchy to know what it means.\n","required":["amount","currency","scale"],"properties":{"amount":{"type":"string","description":"Decimal string, never a float. Up to 4 decimal places. **Persisted as `numeric(18,4)`** — the string is a transport choice, so a JavaScript client cannot round a fare in transit.\n","pattern":"^-?\\d+(\\.\\d{1,4})?$"},"currency":{"type":"string","description":"**Resolved from the region, not stored on the row** (ADR-0018). OMR uses 3 decimal places and AED uses 2 — a venue on a different scale from its region is a ledger that cannot consolidate.\n","pattern":"^[A-Z]{3}$"},"scale":{"type":"integer","description":"Resolved from the region alongside `currency`.","minimum":0,"maximum":4}}},
+"Order": {"x-ticvai-persistence":"orders.sales_order + orders.order_line","type":"object","required":["id","venueId","scopePath","channel","status","currency","currencyScale","grossAmount","taxAmount","netAmount","lines","createdAt","recordedAt"],"properties":{"id":{"type":"string","format":"uuid","description":"The client UUIDv7 from `CreateOrderRequest.id`."},"orderNumber":{"type":"string","readOnly":true,"description":"The number a guest reads and a cashier types. **Server-assigned: the venue prefix and a sequence per venue**, for example `DXB1-000123` (decided 28 September, audit R152). A till holds a reserved range of the venue sequence, so an order taken offline gets its number on the till and keeps it through `syncOrders`. **Not gapless**: an unused reserved range leaves a gap, and that is allowed. Only tax invoices are gapless, per legal entity. The receipt carries this number.\n"},"channel":{"allOf":[{"$ref":"#/components/schemas/OrderChannel"}],"description":"Where it came from. Drives revenue attribution, promotion eligibility and the self-service adoption figures the operator will ask for within a month of launch.\n"},"venueId":{"type":"string","format":"uuid"},"scopePath":{"type":"string"},"status":{"$ref":"#/components/schemas/OrderStatus"},"currency":{"type":"string","pattern":"^[A-Z]{3}$","x-ticvai-persisted":false,"description":"**Resolved from the region, not stored** (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and cannot be anything else. **Kept on the wire , removed from the table** — a client should not walk a hierarchy to read a figure, and the  database should not hold nine million copies of AED. Four tables genuinely differ from their\n region and keep a stored currency: `orders.payment.tender_currency`, `inventory.supplier`, \n`ledger.account`, `control.partner_agreement`.\n"},"currencyScale":{"type":"integer","minimum":0,"maximum":4,"x-ticvai-persisted":false,"description":"**Resolved from the region, not stored** (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and cannot be anything else — storing it per ro w is a copy of a fact that cannot differ. **Kept on the wire, removed from the table**: a cl ient reading a figure should not walk a hierarchy to know what it means, and the database sh ould not hold nine million copies of AED. Four tables genuinely differ from their region and\n keep a stored currency — `orders.payment.tender_currency`, `inventory.supplier`, `ledger.ac\ncount`, `control.partner_agreement`. **A guest paying USD at an AED venue is a real row; a w orkstation with its own currency is a misconfiguration.**\n"},"grossAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"taxAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"netAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"refundedAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"chargeCurrency":{"type":"string","pattern":"^[A-Z]{3}$","nullable":true,"readOnly":true,"description":"**The currency the guest selected and is charged in** (CHG-FIN-001, 2 October 2026). Null or equal to `currency` for a sale in the base currency. Everything else on the order, and every ledger posting, stays in the base currency `currency`."},"chargeFxRate":{"allOf":[{"$ref":"#/components/schemas/ExchangeRateDecimal"}],"nullable":true,"readOnly":true,"description":"Units of `chargeCurrency` per one unit of the base currency, from the region's `tender` rate in force at checkout (`finance.FxRate`), stored on the order so the payment, the receipt, the tax invoice and any refund use the same rate (CHG-FIN-001)."},"chargeFxRateId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"The `finance.FxRate` row the rate was taken from, for audit."},"chargeTotal":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"readOnly":true,"description":"`grossAmount` converted at `chargeFxRate` and rounded to the charge currency's scale: what the guest pays and what the payment request to the provider asks for (CHG-FIN-001)."},"chargeRateLockedUntil":{"type":"string","format":"date-time","nullable":true,"readOnly":true,"description":"The quote holds until then (the cart lease). After it, the next payment attempt re-quotes at the rate then in force and the guest confirms the new amount (CHG-FIN-001)."},"droppedPromotions":{"type":"array","readOnly":true,"x-ticvai-persisted":false,"description":"**Promotions left off this order at checkout because their budget cap would have been exceeded** (decided 28 September, audit R101 (8)). Empty when none was dropped. Returned by `checkoutCart` and `createOrder`, not stored.\n","items":{"type":"object","required":["promotionId"],"properties":{"promotionId":{"type":"string","format":"uuid"},"name":{"type":"string"},"reason":{"type":"string","enum":["budgetCapReached"]}}}},"totalPriceVariance":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"description":"Sum across lines. Zero on a normal order."},"lines":{"type":"array","items":{"$ref":"#/components/schemas/OrderLine"}},"payments":{"type":"array","items":{"$ref":"#/components/schemas/Payment"}},"principalId":{"type":"string","format":"uuid"},"workstationId":{"type":"string","format":"uuid"},"shiftId":{"type":"string","format":"uuid","nullable":true},"subjectId":{"type":"string","format":"uuid","nullable":true},"holdLabel":{"type":"string","maxLength":60,"nullable":true,"readOnly":true,"description":"The `label` a cashier gave when parking it with `holdOrder` — how they find it again. Null on an order never held."},"heldUntil":{"type":"string","format":"date-time","nullable":true,"readOnly":true,"description":"When a held order expires and is voided (states/order.yaml), from `holdOrder`'s `holdUntil`. Null on an order not currently held."},"createdAt":{"type":"string","format":"date-time"},"recordedAt":{"type":"string","format":"date-time"},"syncedAt":{"type":"string","format":"date-time","nullable":true}}},
+"OrderChannel": {"type":"string","description":"Where the order originated. Added when guest self-ordering was contracted — an order a guest placed on their own phone is commercially and operationally different from one a cashier typed, and reporting that cannot separate them cannot answer whether self-ordering is working.\n","enum":["pos","kiosk","guestApp","guestWeb","callCentre","partner","api","backOffice"]},
+"OrderLine": {"x-ticvai-persistence":"orders.order_line + orders.order_line_eligibility + orders.order_line_discount","x-ticvai-retired-columns":["promotion_id","name","reason"],"allOf":[{"$ref":"#/components/schemas/CreateOrderLine"},{"type":"object","required":["serverUnitPrice","taxAmount","netAmount","grossAmount"],"properties":{"serverUnitPrice":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"description":"What the server computed on ingest."},"priceVariance":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"description":"Server minus quoted. Non-zero means the quoted price was honoured and the difference posted to the variance account.\n"},"taxAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"netAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"grossAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"entitlementIds":{"type":"array","description":"The entitlements this line issued. **These are the ticket ids** — `transferOrderTickets.ticketIds` and `reprintOrder.reissuedTicketIds` take and return them.","items":{"type":"string","format":"uuid"}},"crossRegionRightIds":{"type":"array","items":{"type":"string"},"description":"Redemption rights propagated to other cells for this line."},"reprintCount":{"type":"integer","minimum":0,"default":0,"readOnly":true,"description":"How many times this line's tickets were reprinted or resent. `reprintOrder` increments it; repeated reprints are the signal worth surfacing."},"venueId":{"type":"string","format":"uuid","readOnly":true,"description":"The order's venue, copied onto the line (ADR-0044's own example; system-design review SD-008, 29 September) so a line is scoped and partitionable without its order."},"discounts":{"type":"array","readOnly":true,"description":"**The discounts applied to this line, one row each** (system-design review SD-008, 29 September). Until then a discount object was flattened into the line as `promotion_id NOT NULL`, so a line with no promotion could not be inserted. A line with no discount has none.","items":{"$ref":"#/components/schemas/OrderLineDiscount"}}}}]},
+"OrderStatus": {"type":"string","enum":["pending","held","paid","partiallyPaid","completed","voided","refunded","partiallyRefunded","failed"],"description":"`held` is a parked sale — the cashier freed the till and the guest will return. It holds no inventory and expires, because a till that accumulates parked sales across a shift cannot be closed.\n"},
 "Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}},
+"Payment": {"x-ticvai-persistence":"orders.payment","type":"object","required":["id","orderId","tender","amount","status","recordedAt"],"properties":{"id":{"type":"string","format":"uuid"},"orderId":{"type":"string","format":"uuid"},"tender":{"$ref":"#/components/schemas/TenderKind"},"tenderCurrency":{"type":"string","pattern":"^[A-Z]{3}$","description":"4.6.11. **What the guest actually handed over**, which is not always what the venue books. A tourist paying USD cash at a till is a foreign tender; the sale is still recorded in base currency.\nEqual to the base currency for almost every payment. **Present on all of them so the foreign-tender report has a source** — `getForeignTenderReport` promised *what was taken in which currency* and nothing recorded it until 18 August.\n"},"tenderAmount":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"description":"The amount in `tenderCurrency`, at that currency's own scale."},"fxRate":{"allOf":[{"$ref":"#/components/schemas/ExchangeRateDecimal"}],"nullable":true,"description":"The rate applied, **stored on the payment rather than looked up later** (CF-37). A payment reconciled next month is reconciled at the rate of the day it was taken.\n"},"fxRateSource":{"type":"string","nullable":true,"enum":["manual","feed","cardScheme"],"description":"4.2.8. Manual or fed on a schedule. **`cardScheme` is where the terminal did the conversion and told us** — dynamic currency conversion, the scheme's rate rather than ours.\n"},"changeCurrency":{"type":"string","pattern":"^[A-Z]{3}$","nullable":true,"description":"4.6.11 is deliberately asymmetric: **accept foreign currency, refund in local.** A till giving change in five currencies needs five floats and five counts, and the variance becomes unattributable.\n**Cash at a till only** (CHG-FIN-001, 2 October 2026). A card or wallet payment the guest made in a currency they selected is refunded in that currency (`Refund.tenderCurrency`).\n"},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"changeAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"status":{"type":"string","enum":["authorised","captured","pendingConfirmation","declined","failed","voided","refunded"]},"providerName":{"type":"string","nullable":true},"providerReference":{"type":"string","nullable":true,"description":"The provider's own id for the charge (Stripe PaymentIntent, NI order reference). What `payments.receivePaymentProviderWebhook` matches an incoming event on (SD-034)."},"providerIdempotencyKey":{"type":"string","nullable":true,"readOnly":true,"description":"The idempotency key sent to the provider, which is this payment's `id` (SD-034, 29 September). A retried provider call cannot charge twice."},"terminalId":{"type":"string","format":"uuid","nullable":true,"description":"The card terminal a till payment ran on (ECR flow, SD-034)."},"nextAction":{"type":"object","nullable":true,"x-ticvai-persisted":false,"description":"**What the caller does while the payment is `pendingConfirmation`** (SD-034, 29 September). `redirect`: send the browser to `url` (3-D Secure challenge or hosted page); the provider returns the guest to `returnUrl` and the result arrives by webhook. `terminal`: the card terminal has been instructed; wait for its result. Null once the payment has an outcome.","properties":{"kind":{"type":"string","enum":["redirect","terminal"]},"url":{"type":"string","format":"uri","nullable":true},"expiresAt":{"type":"string","format":"date-time","nullable":true}}},"lastInquiryAt":{"type":"string","format":"date-time","nullable":true},"recordedAt":{"type":"string","format":"date-time"},"syncedAt":{"type":"string","format":"date-time","nullable":true}}},
+"Refund": {"x-ticvai-persistence":"orders.refund","type":"object","required":["id","orderId","amount","status","createdAt"],"properties":{"id":{"type":"string","format":"uuid"},"orderId":{"type":"string","format":"uuid"},"batchId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"The `RefundBatch` that raised this refund, where `createBulkRefund` did. Null for a refund raised on its own."},"fxRate":{"allOf":[{"$ref":"#/components/schemas/ExchangeRateDecimal"}],"nullable":true,"readOnly":true,"description":"**The rate on the original payment, not today's** (BL-087, CF-118).\n`Payment` records `tenderCurrency`, `fxRate` and `fxRateSource` at the moment of sale, so the sale rate is always retrievable. **Refunding at today's rate repays a different amount of money than was taken** — a guest who paid 100 USD at 3.67 and is refunded at 3.72 gets back more AED than they gave, and the venue carries the difference on every refund.\nThe exposure runs both ways and neither direction is defensible: a guest short-changed by a moving rate has a complaint the venue cannot answer, because **the guest did nothing but wait.**\n"},"taxReversalEntryId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"**A refund reverses the tax entry it created, and this is where that is stated rather than implied.** `reverseJournalEntry` and `calculateTax` both exist, so both halves were present and the obligation was assumed — **an implied obligation is one a developer can miss without failing anything.**\nNull only where the original sale carried no tax.\n"},"settleTo":{"type":"string","enum":["originalTender","advanceBalance","wireTransfer","storeCredit"],"default":"originalTender","description":"BL-086. **A refund could only go back the way it came.** A guest whose card has expired, a partner settling by wire, a guest who would rather have the credit — three real cases with one answer.\n**`originalTender` stays the default** because refunding elsewhere is how money laundering works, and anything else needs a reason.\n\n**`storeCredit` is a gift card issued for the refund amount** (decided 2 October 2026, Chinmay, batch 1, POS-011; DEC-061; CHG-CSP-037; DI-796), never a voucher or a wallet top-up.\n"},"fxVariance":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"description":"Where the sale rate and the current rate differ, **the difference is booked as an FX variance rather than hidden in the refund**. `runFxRevaluation` already handles this class of movement and this is the same act at a smaller scale.\n"},"tenderCurrency":{"type":"string","pattern":"^[A-Z]{3}$","nullable":true,"readOnly":true,"description":"**A refund goes back in the currency the guest paid** (decided 2 October 2026, Chinmay; CHG-FIN-001). For a card or wallet payment taken in a guest-selected currency, the refund request to the provider is in that currency, and `tenderAmount` is the refunded share of the original `Payment.tenderAmount` at the sale rate (`fxRate`), so a full refund returns exactly what was charged. `amount` stays in base currency for the ledger. Null for a refund in the base currency. Foreign cash refunded at a till is paid in base currency (DI-282)."},"tenderAmount":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"readOnly":true,"description":"The refund in `tenderCurrency`, at that currency's own scale (CHG-FIN-001)."},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"appliedPercentage":{"type":"number","description":"From the venue's time bands, or an approver override."},"status":{"type":"string","enum":["pendingApproval","pendingGateway","completed","declined","failed"]},"reason":{"type":"string"},"requestedByPrincipalId":{"type":"string","format":"uuid"},"secondaryPrincipalId":{"type":"string","format":"uuid","nullable":true},"approvedByPrincipalId":{"type":"string","format":"uuid","nullable":true},"ledgerEntryId":{"type":"string","format":"uuid","nullable":true,"description":"Written before the gateway is called."},"gatewayReference":{"type":"string","nullable":true},"createdAt":{"type":"string","format":"date-time"},"completedAt":{"type":"string","format":"date-time","nullable":true}}},
 "RefundPolicy": {"x-ticvai-persistence":"orders.refund_policy + orders.refund_policy_time_band","type":"object","description":"Venue-configured. Thresholds are policy, not permission scope — venues run different policies and the permission model should not encode commercial rules.\n**The three thresholds must ascend** (decided 28 September, audit R123 (6)): `selfAuthoriseLimit` <= `requiresSecondUserAbove` <= `requiresApprovalAbove`, where the second is set. `setRefundPolicy` refuses a policy that does not with 422 `refund-thresholds-not-ascending`.\n","required":["venueId","selfAuthoriseLimit","requiresApprovalAbove"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true,"description":"**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"},"venueId":{"type":"string","format":"uuid","readOnly":true,"description":"The venue in the path. Not taken from a `setRefundPolicy` body."},"selfAuthoriseLimit":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"description":"Up to this, a holder of ORDER_REFUND refunds alone. Zero means every refund needs a second authoriser.\n"},"requiresSecondUserAbove":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"description":"Above this, a second user — cashier OR supervisor — names themselves as audit control. Dual-authorisation, not escalation (2.12.3).\n"},"requiresApprovalAbove":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"description":"Above this, an ORDER_REFUND_APPROVE holder must approve."},"timeBands":{"type":"array","description":"Refundable percentage by time before the performance. Evaluated most-specific first.\n","items":{"type":"object","required":["hoursBefore","percentage"],"properties":{"hoursBefore":{"type":"integer","minimum":0},"percentage":{"type":"number","minimum":0,"maximum":100}}}},"allowPartial":{"type":"boolean","default":true},"refundWindowDays":{"type":"integer","nullable":true,"minimum":0,"description":"Days after purchase within which a refund may be made. 0 is allowed and means the day of purchase only; null means no window (decided 28 September, audit R123 (6))."},"varianceThreshold":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"description":"Price variance above this is an exception requiring review rather than a routine posting (CF-38). Venue-configured.\n**A venue setting with a tenant default** (decided 28 September, audit R094). **Proposed default, client to correct (audit R094): AED 5.00 per order line.**\n"}}},
 "TenderKind": {"type":"string","description":"`wallet` is a **digital wallet** (Apple Pay, Google Pay and the like, taken through the gateway), the value the guest channels accept beside `card` (decided 28 September, audit R080 (a)). **The stored-value TICVAI wallet is a separate tender**: it is spent through `authoriseStoredValue` and `captureStoredValue` (`StoredValueKind` `wallet`), never as this value, so the client can see which of the two the decision meant.\n","enum":["cash","card","wallet","voucher","bankTransfer","hotelCharge","installment","giftCard","complimentary"]},
 "Wallet": {"x-ticvai-persistence":"wallet.wallet + wallet.credit_lot","type":"object","required":["subjectId","balance","currency","status"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true,"description":"**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"},"subjectId":{"type":"string","format":"uuid"},"balance":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"credits":{"type":"array","description":"4.3.5 and 4.3.19. **One balance and one bonus balance with one expiry could not express what the requirement asks for** — cash, bonus and redemption credit, each with its own expiry.\n**The expiries are the reason this is a list.** Cash a guest paid for should outlive a promotional credit they were given, and a single `expiresAt` either expires the money they paid or never expires the promotion.\n**Consumed first-expiry-first-out across all three** (4.3.19), which is also the order that is fairest to the guest — spend what is about to die before what is not.\n**One entry per `active` lot in `wallet.credit_lot`** for this wallet: `amount` is the lot's `remaining_amount`, `expiresAt` its `expires_at`, `sourceRef` its `source_reference`. `kind` and `isRefundable` are not stored on the lot; they come from the lot's credit type (`listCreditLots` returns the lots themselves).\n","items":{"type":"object","required":["kind","amount"],"properties":{"kind":{"type":"string","enum":["cash","bonus","redemption","refund","goodwill"],"description":"**`cash` is money the guest paid and the others are not.** That distinction decides what is refundable, what expires, and what shows as a liability.\n","x-ticvai-persisted":false},"amount":{"x-ticvai-column":"remaining_amount","$ref":"../shared/common.yaml#/components/schemas/Money"},"expiresAt":{"type":"string","format":"date-time","nullable":true},"sourceRef":{"type":"string","nullable":true,"x-ticvai-column":"source_reference"},"isRefundable":{"type":"boolean","default":false,"x-ticvai-persisted":false,"description":"**True only for `cash`.** A guest cannot cash out a promotional credit, and a wallet that lets them has given away the promotion twice.\n"}}}},"bonusBalance":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"description":"Promotional value. Typically non-refundable and spent first."},"currency":{"type":"string","pattern":"^[A-Z]{3}$"},"status":{"type":"string","enum":["active","suspended","closed"]},"homeCellName":{"type":"string","nullable":true,"description":"Where the authoritative balance lives. Present when the guest is linked across cells.\n"},"expiresAt":{"type":"string","format":"date-time","nullable":true},"lastActivityAt":{"type":"string","format":"date-time","nullable":true}}},
 "WalletAdjustment": {"type":"object","x-ticvai-persistence":"wallet.adjustment","description":"Board 7.7. **A correction, distinguishable from a spend.**","properties":{"id":{"type":"string","format":"uuid"},"walletId":{"type":"string","format":"uuid"},"kind":{"type":"string","enum":["reversal","chargeback","goodwill","correction","writeOff"]},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"affectedLotIds":{"type":"array","items":{"type":"string","format":"uuid"}},"reason":{"type":"string"},"performedBy":{"type":"string","format":"uuid"},"approvedBy":{"type":"string","format":"uuid","nullable":true},"at":{"type":"string","format":"date-time"},"scopePath":{"type":"string"}}},
 "WalletDispute": {"type":"object","x-ticvai-persistence":"wallet.dispute","description":"Board 7.9. **Internal, and the venue decides it** — unlike a card chargeback.","required":["walletId","description"],"properties":{"id":{"type":"string","format":"uuid"},"walletId":{"type":"string","format":"uuid"},"transactionIds":{"type":"array","items":{"type":"string","format":"uuid"}},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"description":{"type":"string"},"raisedBy":{"type":"string","format":"uuid"},"raisedAt":{"type":"string","format":"date-time"},"status":{"type":"string","enum":["open","investigating","escalated","upheld","rejected","withdrawn"],"description":"`escalated` added with `resolveWalletDispute` (VM close-out, 29 September). `upheld`, `rejected` and `withdrawn` are closed."},"resolution":{"type":"string","nullable":true},"escalatedToRoleId":{"type":"string","format":"uuid","nullable":true,"readOnly":true},"reprocessedTransactionIds":{"type":"array","readOnly":true,"description":"Transactions created by a `reprocess` action.","items":{"type":"string","format":"uuid"}},"resolvedBy":{"type":"string","format":"uuid","nullable":true,"readOnly":true},"resolvedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true},"adjustmentId":{"type":"string","format":"uuid","nullable":true},"scopePath":{"type":"string"}}},
-"WalletRefundPolicy": {"type":"object","x-ticvai-persistence":"wallet.refund_policy","description":"Boards 7.4 and 7.5. **Restoration is to the lot, not to the balance.**","properties":{"defaultDestination":{"type":"string","enum":["originalTender","wallet","guestChoice"]},"walletRefundCreditTypeId":{"type":"string","format":"uuid"},"restoreToOriginalLots":{"type":"boolean","default":true},"restoreOriginalExpiry":{"type":"boolean","default":true,"description":"**Refunding into a new lot with a fresh expiry is a gift.** Sometimes intended, never by accident.\n"},"walletRefundBonusPercent":{"type":"number","nullable":true,"description":"An incentive to take the refund as credit rather than to a card."},"scopePath":{"type":"string"}}},
+"WalletRefundPolicy": {"type":"object","x-ticvai-persistence":"wallet.refund_policy","description":"Boards 7.4 and 7.5. **Restoration is to the lot, not to the balance.**","properties":{"defaultDestination":{"type":"string","enum":["originalTender","wallet","guestChoice"]},"walletRefundCreditTypeId":{"type":"string","format":"uuid"},"restoreToOriginalLots":{"type":"boolean","default":true},"restoreOriginalExpiry":{"type":"boolean","default":true,"description":"**Refunding into a new lot with a fresh expiry is a gift.** Sometimes intended, never by accident.\n"},"walletRefundBonusPercent":{"type":"number","nullable":true,"description":"An incentive to take the refund as credit rather than to a card."},"destinationsBySource":{"x-ticvai-persistence-kind":"valueObject","x-ticvai-persistence-column":"jsonb","type":"array","description":"**A destination per refund source** (contract gap CHG-WIR-027, BO-1146; CHG-CSA-045). A refund of a ticket, an event, F&B, retail, a rental, parking, a membership or a compensation goes to the destination listed for its source; a source not listed takes `defaultDestination`.","items":{"type":"object","properties":{"source":{"type":"string","enum":["ticket","event","fnb","retail","rental","parking","membership","compensation"]},"destination":{"type":"string","enum":["originalTender","wallet","guestChoice"]}}}},"scopePath":{"type":"string"}}},
 "WalletRestriction": {"type":"object","x-ticvai-persistence":"wallet.restriction","description":"Board 7.8. **Freeze, block and restrict are three different things.**","required":["walletId","kind","reason"],"properties":{"id":{"type":"string","format":"uuid"},"walletId":{"type":"string","format":"uuid"},"kind":{"type":"string","enum":["freeze","block","restrict","none"],"description":"**`freeze` stops spending and allows funding** — what you do while investigating. **`block` stops both** — a confirmed fraud. **`restrict` limits channels or categories** — what a parent asked for.\n"},"blockedChannels":{"type":"array","items":{"type":"string"}},"blockedCategoryIds":{"type":"array","items":{"type":"string","format":"uuid"}},"reason":{"type":"string"},"appliedBy":{"type":"string","format":"uuid"},"appliedAt":{"type":"string","format":"date-time"},"expiresAt":{"type":"string","format":"date-time","nullable":true},"scopePath":{"type":"string"}}},
 "WalletTransaction": {"x-ticvai-persistence":"wallet.wallet_transaction","type":"object","required":["id","kind","amount","balanceAfter","recordedAt"],"properties":{"id":{"type":"string"},"walletId":{"type":"string","format":"uuid","x-ticvai-references":"wallet.wallet","description":"The wallet this movement is on (SD-027, 29 September). A shared wallet has many subjects, so the subject alone cannot say which balance moved."},"walletHoldId":{"type":"string","format":"uuid","nullable":true,"x-ticvai-references":"wallet.hold","description":"The hold a spend settled, where it came through `holdWalletFunds`."},"kind":{"$ref":"#/components/schemas/WalletTransactionKind"},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"balanceAfter":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"orderId":{"type":"string","nullable":true},"venueId":{"type":"string","format":"uuid","nullable":true},"reason":{"type":"string","nullable":true},"principalId":{"type":"string","format":"uuid","nullable":true},"recordedAt":{"type":"string","format":"date-time"}}},
 "WalletTransactionKind": {"type":"string","enum":["topUp","spend","refund","adjustment","bonus","expiry","transfer"]},

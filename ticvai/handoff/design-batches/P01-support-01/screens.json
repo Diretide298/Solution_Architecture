@@ -47,6 +47,29 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "selectField",
+       "label": "What did you lose?",
+       "bindsTo": "LostItem.kind",
+       "operation": "recordLostItem",
+       "notes": "Kind (bag, phone, wallet, keys, clothing, jewellery, documents, toy, buggy, other), colour, brand, description, where and when it was last seen, and photos. Sent as `recordLostItem` with foundOrLost lost and the caseId of the case raised with it, so the register (BO-073) can match it to a found item.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)"
+      },
+      {
+       "kind": "textField",
+       "label": "Colour, brand and description",
+       "bindsTo": "LostItem.description",
+       "operation": "recordLostItem",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)"
+      },
+      {
+       "kind": "fileUpload",
+       "label": "Photos",
+       "bindsTo": "LostItem.photoAssetIds",
+       "operation": "recordLostItem",
+       "notes": "Optional photos of the item.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)"
+      },
+      {
        "kind": "dataTable",
        "label": "Every case",
        "bindsTo": "Case",
@@ -152,6 +175,12 @@
     "invalidates": [
      "listMyCases"
     ]
+   },
+   {
+    "operationId": "recordLostItem",
+    "contract": "marketing-crm",
+    "purpose": "The lost-item record BO-073 matches, linked to the guest's case",
+    "trigger": "onAction"
    }
   ],
   "entryState": {
@@ -185,7 +214,7 @@
     "verified": "2026-09-28",
     "match": "partial",
     "view": "Account → 'Lost & found, reports'; Help → 'Your cases' → Raise a case → topic 'Lost property'",
-    "differences": "No lost-item report form (item, where, when, photo); reported via the generic case form."
+    "differences": "No lost-item report form (item, where, when, photo); reported via the generic case form. The prototype has no lost-item form; it uses the generic case form. A prototype gap: the build follows this screen (kind, colour, brand, where last seen, photos), not the prototype (CHG-SGU-017)."
    }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
@@ -194,7 +223,7 @@
     "id": "formRaiseMyCase",
     "component": "modal",
     "trigger": "Raise my case",
-    "body": "**Collects what `raiseMyCase` sends before it is called.** Required: `id`, `kind`, `summary`, `recordedAt`. Optional: `detail`, `venueId`, `orderRef`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "Raises the case (`raiseMyCase`, kind lost property) and records the lost item (`recordLostItem`, foundOrLost lost, caseId) in the same act; the guest fills one form.",
     "confirm": {
      "label": "Raise my case",
      "operation": "raiseMyCase"
@@ -211,7 +240,7 @@
       "orderRef"
      ]
     },
-    "provenance": "client-verified"
+    "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)"
    },
    {
     "id": "formReplyToMyCase",

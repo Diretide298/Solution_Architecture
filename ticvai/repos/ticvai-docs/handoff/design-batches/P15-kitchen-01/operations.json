@@ -56,6 +56,19 @@
   "requestBody": null,
   "responds": "KitchenTicket"
  },
+ "getCourseRules": {
+  "method": "GET",
+  "path": "/outlets/{outletId}/course-rules",
+  "contract": "fnb",
+  "summary": "How this outlet courses by default (read)",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "CourseRules"
+ },
  "getDashboard": {
   "method": "GET",
   "path": "/dashboards/{dashboardId}",
@@ -100,6 +113,19 @@
   "parameters": [],
   "requestBody": null,
   "responds": null
+ },
+ "getKitchenSla": {
+  "method": "GET",
+  "path": "/outlets/{outletId}/kitchen-sla",
+  "contract": "fnb",
+  "summary": "How long a ticket may sit before it is late (read)",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "KitchenSla"
  },
  "holdCourse": {
   "method": "POST",
@@ -446,30 +472,6 @@
   "requestBody": null,
   "responds": "KitchenTicket"
  },
- "setCourseRules": {
-  "method": "PUT",
-  "path": "/outlets/{outletId}/course-rules",
-  "contract": "fnb",
-  "summary": "How this outlet courses by default",
-  "permission": "PRODUCT_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "CourseRules",
-  "responds": "CourseRules"
- },
  "setItemAvailability": {
   "method": "PUT",
   "path": "/menu-items/{itemId}/availability",
@@ -518,35 +520,6 @@
   "requestBody": "KitchenSla",
   "responds": "KitchenSla"
  },
- "setKitchenStations": {
-  "method": "PUT",
-  "path": "/kitchen/stations",
-  "contract": "fnb",
-  "summary": "Configure stations and item routing",
-  "permission": "PRODUCT_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": "outletId",
-    "in": "query",
-    "required": true
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "KitchenStation"
- },
  "setKitchenTicketStatus": {
   "method": "PUT",
   "path": "/kitchen/tickets/{ticketId}/status",
@@ -565,24 +538,5 @@
   ],
   "requestBody": null,
   "responds": "KitchenTicket"
- },
- "setVenueSettings": {
-  "method": "PUT",
-  "path": "/venues/{venueId}/settings",
-  "contract": "tenancy",
-  "summary": "Set support hours, quiet hours, segregated access and alerting",
-  "permission": "TENANT_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "VenueSettings",
-  "responds": "VenueSettings"
  }
 }

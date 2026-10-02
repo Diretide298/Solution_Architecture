@@ -78,6 +78,24 @@ transitions:
   trigger: operation
   guard: '**Suspended is a flag, not a state.** A suspended pass is still issued and can be reinstated
     without reissuing'
+pack_status_map:
+  # Decided 2 October 2026, Chinmay, critical set 2, BO-336: "Map the pack's 13 names onto the model; add any
+  # missing states" (DEC-266; CHG-CSP-033), and "Reserved maps to Pending fulfilment" (DI-670). Every name maps,
+  # so no state is added; access `Entitlement.lifecycleLabel` carries the name and `cancellationKind` tells the
+  # four cancellations apart. created and pendingFulfillment are the order before the entitlement exists.
+  created: 'none yet: the order line is held (orders Order `held`)'
+  pendingFulfillment: 'none yet: paid, not yet issued (deferred seats, DI-423); "Reserved" in DI-670'
+  active: issued
+  partiallyUsed: partiallyConsumed
+  used: fullyConsumed
+  expired: expired
+  suspended: issued, with the suspended flag (suspendEntitlement)
+  blocked: issued, under an active identity lock (access lockIdentity)
+  cancelled: cancelled (cancellationKind null, a cancellation with no other cause)
+  voided: cancelled (cancellationKind voided, voidEntitlement)
+  refunded: cancelled (cancellationKind refunded, createRefund)
+  reissuedSuperseded: cancelled (cancellationKind superseded, a reissue)
+  transferred: surrendered
 notes: "**`expired` and `cancelled` are not interchangeable.** One is time passing and the other is\
   \ a decision, and only the second has money attached.\n\n**`surrendered` exists so a transfer is not\
   \ a void.** Voiding and reissuing produces two records where the truth is one ticket that changed\

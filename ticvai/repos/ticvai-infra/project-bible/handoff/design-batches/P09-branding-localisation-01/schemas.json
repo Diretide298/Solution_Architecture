@@ -274,17 +274,13 @@
     ],
     "default": "off",
     "description": "When GST-001 plays it full screen. \"Skip introduction\" is always shown. Anything but `off` needs `introVideoAssetRef`, or 400."
+   },
+   "showPoweredBy": {
+    "type": "boolean",
+    "default": true,
+    "description": "**\"Powered by TICVAI\", a configuration toggle, on by default** (Chinmay, 2 October, workbook Q160 and the pre-apply round; consistent with DI-297; CHG-CSA-036). Shown on the launch screen and at the foot of Account and the web footer while true. **Switching it off needs the tenant's licence to allow it**: `setBrandIdentity` refuses `false` with `403 powered-by-locked` unless the tenant's plan carries the `poweredByRemoval` add-on (subscription `LicencePosition.poweredByRemovable`)."
    }
   }
- },
- "CellTier": {
-  "type": "string",
-  "enum": [
-   "shared",
-   "dedicated",
-   "isolated",
-   "clientHosted"
-  ]
  },
  "ChangeScope": {
   "type": "string",
@@ -377,6 +373,24 @@
    "note": {
     "type": "string"
    },
+   "reviewStatus": {
+    "type": "string",
+    "readOnly": true,
+    "enum": [
+     "notRequired",
+     "pending",
+     "approved",
+     "rejected"
+    ],
+    "default": "notRequired",
+    "description": "The review step, where the tenant's publish-review policy is on (CHG-CSA-042)."
+   },
+   "approvalRequestId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true
+   },
    "isCurrent": {
     "type": "boolean"
    },
@@ -424,87 +438,6 @@
     "type": "string",
     "readOnly": true,
     "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `tenant` scope.**"
-   }
-  }
- },
- "CreatePlanRequest": {
-  "x-ticvai-persistence": "none — request only",
-  "type": "object",
-  "required": [
-   "code",
-   "name",
-   "cellTier",
-   "licensedModules",
-   "limits",
-   "basePrice"
-  ],
-  "properties": {
-   "code": {
-    "type": "string",
-    "maxLength": 64
-   },
-   "name": {
-    "type": "string",
-    "maxLength": 200
-   },
-   "description": {
-    "type": "string",
-    "maxLength": 1000
-   },
-   "cellTier": {
-    "$ref": "#/components/schemas/CellTier"
-   },
-   "licensedModules": {
-    "type": "array",
-    "minItems": 1,
-    "description": "**A closed set as of 24 August.** `moduleKey` was a free string, so nothing could join a licence to a screen — **a tenant without an F&B licence was still served every F&B screen**, because no screen said which module it belonged to in a form the licence could match.\n**The key is the join.** `screen.requiresModule` names one of these, and navigation is built from the intersection of what a tenant licensed and what their role permits.\n",
-    "items": {
-     "$ref": "#/components/schemas/ModuleKey"
-    }
-   },
-   "limits": {
-    "type": "array",
-    "items": {
-     "$ref": "#/components/schemas/EntitlementLimit"
-    }
-   },
-   "basePrice": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "billingPeriod": {
-    "type": "string",
-    "enum": [
-     "monthly",
-     "quarterly",
-     "annual"
-    ]
-   },
-   "includesBrandedApp": {
-    "type": "boolean",
-    "description": "Branded native publishing carries per-tenant operational cost and is priced, not absorbed.\n"
-   },
-   "includedAiTokens": {
-    "type": "integer",
-    "nullable": true,
-    "description": "AI tokens the package includes per billing period. Usage beyond it is a `metered` invoice line at the AI module's price (decided 29 September)."
-   },
-   "requestLimits": {
-    "$ref": "#/components/schemas/PlanRequestLimits"
-   },
-   "packageKind": {
-    "type": "string",
-    "enum": [
-     "standard",
-     "custom"
-    ],
-    "default": "standard",
-    "description": "**Three standard packages, and custom ones allowed** (decided 29 September, Chinmay)."
-   },
-   "offeredToTenantId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "**Private to one tenant** (decided 29 September, Chinmay): a custom package offered only to this tenant; `listPlans` shows it to no other tenant and `setSubscription` refuses it for any other (422 `plan-not-offered`). Null for a package any tenant may buy. Custom packages only."
    }
   }
  },
@@ -606,85 +539,113 @@
    "failureReason": {
     "type": "string",
     "nullable": true
-   }
-  }
- },
- "EntitlementLimit": {
-  "type": "object",
-  "required": [
-   "metric",
-   "limit"
-  ],
-  "properties": {
-   "metric": {
-    "$ref": "#/components/schemas/UsageMetric"
    },
-   "limit": {
-    "type": "integer",
-    "nullable": true,
-    "x-ticvai-column": "limit_value",
-    "description": "Null means unlimited. Stored as `limit_value` — `limit` is a reserved word, and `subscription.tier_allowance` already names the same figure `limit_value`."
+   "routing": {
+    "type": "string",
+    "enum": [
+     "cname",
+     "delegatedSubdomain",
+     "apex"
+    ],
+    "default": "cname",
+    "description": "**How the hostname reaches TICVAI** (Chinmay, 2 October: \"subdomain plus CNAME\"; CHG-CSA-043). `cname`, the default: a CNAME (e.g. `tickets.venue.com`) straight to the Front Door endpoint, validated by the TXT `_dnsauth` record, with a Front Door managed certificate. `delegatedSubdomain`: the tenant delegates a subdomain to TICVAI's name servers (NS). `apex`: the bare domain, only on request. There is no path proxy."
    },
-   "overageAllowed": {
-    "type": "boolean",
-    "default": false
-   },
-   "overageUnitPrice": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   }
-  }
- },
- "FaqCategory": {
-  "x-ticvai-persistence": "whitelabel.faq_category + whitelabel.faq_entry",
-  "type": "object",
-  "required": [
-   "code",
-   "name",
-   "entries"
-  ],
-  "properties": {
-   "code": {
-    "type": "string"
-   },
-   "name": {
-    "$ref": "#/components/schemas/LocalisedText"
-   },
-   "sortOrder": {
-    "type": "integer"
-   },
-   "entries": {
+   "dnsRecords": {
+    "x-ticvai-persistence-kind": "valueObject",
+    "x-ticvai-persistence-column": "jsonb",
     "type": "array",
+    "readOnly": true,
+    "description": "**Every record the tenant must publish, with what is observed now** (CHG-CSA-043): the TXT `_dnsauth` record, the CNAME, and CAA or NS where they apply. CMS-017 lists them with their status.",
     "items": {
      "type": "object",
      "required": [
-      "id",
-      "question",
-      "answer"
+      "type",
+      "name",
+      "expectedValue",
+      "status"
      ],
      "properties": {
-      "id": {
+      "type": {
        "type": "string",
-       "format": "uuid"
+       "enum": [
+        "TXT",
+        "CNAME",
+        "CAA",
+        "NS"
+       ]
       },
-      "question": {
-       "$ref": "#/components/schemas/LocalisedText"
+      "name": {
+       "type": "string"
       },
-      "answer": {
-       "$ref": "#/components/schemas/LocalisedRichText"
+      "expectedValue": {
+       "type": "string"
       },
-      "sortOrder": {
-       "type": "integer"
+      "observedValue": {
+       "type": "string",
+       "nullable": true
       },
-      "isPublished": {
-       "type": "boolean"
+      "status": {
+       "type": "string",
+       "enum": [
+        "ok",
+        "missing",
+        "wrong"
+       ]
       }
      }
     }
    },
-   "scopePath": {
+   "revalidation": {
     "type": "string",
     "readOnly": true,
-    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `tenant` scope.**"
+    "enum": [
+     "none",
+     "pendingRevalidation",
+     "timedOut"
+    ],
+    "default": "none",
+    "description": "**The two waits CMS-017 shows beside `status`** (CHG-CSA-043). `pendingRevalidation`: an `active` domain whose validation must be renewed (the managed certificate's periodic revalidation, or a record that changed); it keeps serving while the job re-checks. `timedOut`: a claim whose records were not published within the validation window; `regenerateDomainToken` starts it again. Kept beside `status`, not inside it, because a new status value would break a client built at r1 (CHG-CSA-043 notes)."
+   },
+   "cnameLost": {
+    "type": "boolean",
+    "readOnly": true,
+    "description": "**Takeover warning** (CHG-CSA-043). True when a scheduled check finds that an `active` or released hostname's CNAME still points at TICVAI with no tenant serving it, or no longer points at us while `active`. Relinquishing a domain tells the tenant to remove the CNAME first, so nobody else can claim the dangling record."
+   },
+   "isPrimary": {
+    "type": "boolean",
+    "readOnly": true,
+    "description": "The tenant's primary domain for its `kind`; the others redirect to it (`setPrimaryDomain`)."
+   },
+   "readiness": {
+    "type": "object",
+    "readOnly": true,
+    "description": "**Per-domain setup a guest needs** (CHG-CSA-043): the UAE Pass redirect URI registered for this hostname, the Apple Pay merchant domain verified, and the app links (Apple app-site association, Android asset links) served.",
+    "properties": {
+     "uaePassRedirect": {
+      "type": "string",
+      "enum": [
+       "ready",
+       "pending",
+       "notApplicable"
+      ]
+     },
+     "applePayDomain": {
+      "type": "string",
+      "enum": [
+       "ready",
+       "pending",
+       "notApplicable"
+      ]
+     },
+     "appLinks": {
+      "type": "string",
+      "enum": [
+       "ready",
+       "pending",
+       "notApplicable"
+      ]
+     }
+    }
    }
   }
  },
@@ -893,10 +854,25 @@
  "HomepageLayout": {
   "x-ticvai-persistence": "whitelabel.homepage_section",
   "type": "object",
+  "description": "**The client-approved web and app wireframes are the layout** (Chinmay, 2 October, workbook Q163; CHG-CSA-040): sections, their order and their options follow the approved wireframes and change only where the spec breaks. **Landing-page templates** (workbook Q41 batch 2; CHG-CSA-037): a tenant with no landing page of its own starts from a TICVAI template (`templateKey`, `listLandingPageTemplates`); a tenant with its own site links into the storefront with deep links (`getDeepLinkScheme`, `buildDeepLink`).",
   "required": [
    "sections"
   ],
   "properties": {
+   "templateKey": {
+    "type": "string",
+    "nullable": true,
+    "description": "The landing-page template this layout started from (`listLandingPageTemplates`), or null for a layout composed from scratch (CHG-CSA-037)."
+   },
+   "landingSource": {
+    "type": "string",
+    "enum": [
+     "storefront",
+     "ownSite"
+    ],
+    "default": "storefront",
+    "description": "`storefront`: this home is the tenant's landing page. `ownSite`: the tenant's own website is the landing page and links in with deep links; this home is still served at the storefront address."
+   },
    "id": {
     "type": "string",
     "format": "uuid",
@@ -939,7 +915,19 @@
       "maxItems": {
        "type": "integer",
        "nullable": true,
-       "description": "How many items the section shows. On the mobile Home, `attractions`, `dining`, `whatsOn` and `shop` show 1 or 2 highlights (decided 29 September, MOB-3)."
+       "description": "**How many cards the section shows, the venue's choice** (Chinmay, 2 October, workbook Q152: every customisation option of the approved wireframe, including the card count per section; CHG-CSA-040). Replaces the fixed 1 or 2 highlights of MOB-3: the CMS offers the counts the approved wireframe offers."
+      },
+      "scrollAnimation": {
+       "type": "string",
+       "enum": [
+        "rise",
+        "scale",
+        "slide",
+        "blur",
+        "none"
+       ],
+       "default": "rise",
+       "description": "**How the section enters as the guest scrolls** (Chinmay, 2 October, workbook Q153: \"must be there\"; DI-1088; CHG-CSA-040). Rise, Scale, Slide, Blur or None, as the v4 prototype offers; `none` for guests who asked the device for reduced motion is applied whatever is set."
       },
       "heroStyle": {
        "type": "string",
@@ -968,6 +956,7 @@
   "properties": {
    "languages": {
     "type": "array",
+    "description": "**A tenant may add or select interface languages beyond English and Arabic** (Chinmay, 2 October, workbook Q145; CHG-CSA-039). Any ISO 639-1 language. English and Arabic ship with complete interface strings; for any other, the interface strings come as a TICVAI string pack drafted by AI translation and reviewed (T03), and a string with no translation falls back to English. Content (pages, products, banners) is the tenant's to translate (`translationGaps`).",
     "items": {
      "type": "string",
      "pattern": "^[a-z]{2}$"
@@ -976,6 +965,32 @@
    "defaultLanguage": {
     "type": "string",
     "pattern": "^[a-z]{2}$"
+   },
+   "uiStringCoverage": {
+    "type": "array",
+    "readOnly": true,
+    "description": "How complete the interface strings are in each enabled language (CHG-CSA-039). English and Arabic are always complete.",
+    "items": {
+     "type": "object",
+     "properties": {
+      "language": {
+       "type": "string"
+      },
+      "coveragePercent": {
+       "type": "number",
+       "minimum": 0,
+       "maximum": 100
+      },
+      "status": {
+       "type": "string",
+       "enum": [
+        "complete",
+        "draft",
+        "missing"
+       ]
+      }
+     }
+    }
    },
    "rtlLanguages": {
     "type": "array",
@@ -1009,14 +1024,6 @@
      }
     }
    }
-  }
- },
- "LocalisedRichText": {
-  "x-ticvai-persistence": "none — jsonb column",
-  "type": "object",
-  "description": "Keyed by language code. Values are sanitised HTML.",
-  "additionalProperties": {
-   "type": "string"
   }
  },
  "LocalisedText": {
@@ -1076,9 +1083,6 @@
     }
    }
   }
- },
- "ModuleKey": {
-  "$ref": "../shared/common.yaml#/components/schemas/ModuleKey"
  },
  "NavigationConfig": {
   "x-ticvai-persistence": "whitelabel.navigation_item",
@@ -1368,80 +1372,28 @@
    "PROCUREMENT_VIEW",
    "PROCUREMENT_REQUEST",
    "PROCUREMENT_MANAGE",
-   "PROCUREMENT_RECEIVE"
+   "PROCUREMENT_RECEIVE",
+   "CORE_AI_PUBLISH",
+   "TICKETING_AI_PUBLISH",
+   "ACCESS_AI_PUBLISH",
+   "FNB_AI_PUBLISH",
+   "RETAIL_AI_PUBLISH",
+   "INVENTORY_AI_PUBLISH",
+   "SEATING_AI_PUBLISH",
+   "MEMBERSHIP_AI_PUBLISH",
+   "MARKETING_AI_PUBLISH",
+   "RESOURCES_AI_PUBLISH",
+   "QUEUE_AI_PUBLISH",
+   "TRANSPORT_AI_PUBLISH",
+   "GAMES_AI_PUBLISH",
+   "MAINTENANCE_AI_PUBLISH",
+   "ACCREDITATION_AI_PUBLISH",
+   "PARTNER_AI_PUBLISH",
+   "ANALYTICS_AI_PUBLISH",
+   "BIOMETRIC_IMAGE_VIEW",
+   "ACCESS_DIRECTION_SET",
+   "REPORT_GOVERNANCE_MANAGE"
   ]
- },
- "Plan": {
-  "x-ticvai-persistence": "subscription.plan + subscription.plan_module + subscription.plan_limit",
-  "description": "**A plan's modules and limits are rows, keyed on `plan_id`.** `licensedModules` and `limits` are required on every plan, and `subscription.plan` alone had no column for either — so the licence position, the downgrade check and every module gate had nothing to read. `plan_module` holds one row per licensed `ModuleKey`; `plan_limit` one row per `EntitlementLimit`. Both belong to the plan version the row is, so a subscriber on an earlier version keeps the modules and limits they were sold.",
-  "allOf": [
-   {
-    "$ref": "#/components/schemas/CreatePlanRequest"
-   },
-   {
-    "type": "object",
-    "required": [
-     "id",
-     "version",
-     "isActive",
-     "subscriberCount"
-    ],
-    "properties": {
-     "id": {
-      "type": "string",
-      "format": "uuid"
-     },
-     "version": {
-      "type": "string",
-      "description": "Existing subscribers stay on the version they were sold. A price change never applies retroactively.\n"
-     },
-     "isActive": {
-      "type": "boolean"
-     },
-     "subscriberCount": {
-      "type": "integer"
-     },
-     "publishedAt": {
-      "type": "string",
-      "format": "date-time"
-     }
-    }
-   }
-  ]
- },
- "PlanRequestLimits": {
-  "type": "object",
-  "nullable": true,
-  "x-ticvai-persistence": "none — embedded in subscription.plan as its request_limits jsonb column",
-  "description": "**The limits section of a plan: every tenant has a request budget** (ADR-0064, accepted 1 October; it decides the per-tenant limit ADR-0032 deferred). A token bucket per tenant and audience in the kernel middleware of `commerce`, `access` and `operations`, counted in Azure Managed Redis so every replica agrees; a guest browse never spends a till's budget. Over budget, the call is refused `429` with `Retry-After` and the `RateLimit-*` headers (every operation declares it).\n\n**Null takes the platform default**, which starts at twice the tenant's expected peak from its sizing tier (`handoff/sizing.json` venue tiers) and is recalibrated after the benchmark and after four weeks of production. **A tenant may use the whole platform when others are quiet**: the per-replica share (`replicaSharePercent`) is enforced only above `shareEnforcedAbovePercent` of the replica's limit. If Redis is unavailable each replica falls back to its own buckets (the limit divided by the replica count); the request path never fails because the limiter's store did.",
-  "properties": {
-   "guest": {
-    "$ref": "#/components/schemas/RequestBudget"
-   },
-   "staff": {
-    "$ref": "#/components/schemas/RequestBudget"
-   },
-   "service": {
-    "$ref": "#/components/schemas/RequestBudget"
-   },
-   "partner": {
-    "$ref": "#/components/schemas/RequestBudget"
-   },
-   "replicaSharePercent": {
-    "type": "integer",
-    "minimum": 1,
-    "maximum": 100,
-    "default": 25,
-    "description": "The most of one replica's request slots one tenant may hold while the share is enforced."
-   },
-   "shareEnforcedAbovePercent": {
-    "type": "integer",
-    "minimum": 1,
-    "maximum": 100,
-    "default": 70,
-    "description": "The replica load, as a percent of its limit, above which the share is enforced."
-   }
-  }
  },
  "PlatformStaffGrant": {
   "type": "object",
@@ -1499,62 +1451,33 @@
    }
   }
  },
- "Policy": {
-  "x-ticvai-persistence": "whitelabel.policy",
+ "PlatformSubdomain": {
+  "x-ticvai-persistence": "none — derived from the tenant's slug and its cell",
   "type": "object",
+  "description": "**Every tenant's own address on TICVAI** (Chinmay, 2 October: \"subdomain plus CNAME\"; DI-283; CHG-CSA-043). Given at provisioning, one stem per cell (`<venue>.<cell>.ticvai.app`, e.g. `*.ae.ticvai.app`), under a wildcard certificate, with host-only cookies. Always live, whether or not a custom domain is claimed; a custom domain is added on top of it.",
   "required": [
-   "kind",
-   "version",
-   "body",
-   "effectiveFrom",
-   "publishedAt"
+   "hostname",
+   "cell"
   ],
   "properties": {
-   "kind": {
-    "$ref": "#/components/schemas/PolicyKind"
-   },
-   "title": {
+   "hostname": {
     "type": "string",
-    "description": "The heading a guest sees, and the field a refund question retrieves against.\n"
+    "description": "e.g. `aquaventure.ae.ticvai.app`."
    },
-   "version": {
+   "cell": {
+    "type": "string"
+   },
+   "certificate": {
     "type": "string",
-    "description": "Immutable. A guest who consented to version 3 consented to version 3, and a policy that changes under a recorded consent is a compliance failure.\n"
+    "enum": [
+     "wildcard"
+    ]
    },
-   "body": {
-    "$ref": "#/components/schemas/LocalisedRichText"
-   },
-   "requiresReconsent": {
-    "type": "boolean"
-   },
-   "effectiveFrom": {
-    "type": "string",
-    "format": "date"
-   },
-   "publishedByPrincipalId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "publishedAt": {
-    "type": "string",
-    "format": "date-time"
-   },
-   "scopePath": {
-    "type": "string",
-    "readOnly": true,
-    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `tenant` scope.**"
+   "isPrimary": {
+    "type": "boolean",
+    "description": "True while no custom domain is primary."
    }
   }
- },
- "PolicyKind": {
-  "type": "string",
-  "enum": [
-   "privacy",
-   "termsAndConditions",
-   "refund",
-   "cookie",
-   "accessibility"
-  ]
  },
  "Preview": {
   "x-ticvai-persistence": "none — short-lived, cache only",
@@ -1582,18 +1505,106 @@
    },
    "theme": {
     "type": "string",
+    "deprecated": true,
     "enum": [
      "light",
      "dark"
-    ]
+    ],
+    "description": "Deprecated with `Theme.darkMode` (CHG-CSA-035); the preview always renders the venue's theme."
    },
    "language": {
     "type": "string",
     "pattern": "^[a-z]{2}$"
    },
+   "outputPreviews": {
+    "type": "array",
+    "readOnly": true,
+    "description": "**The PDF ticket and the Apple and Google Wallet passes, previewed with the app** (Chinmay, 2 October, workbook Q151: in Block A; CHG-CSA-041). One entry per output asked for in `outputs`.",
+    "items": {
+     "type": "object",
+     "required": [
+      "output",
+      "url"
+     ],
+     "properties": {
+      "output": {
+       "type": "string",
+       "enum": [
+        "app",
+        "pdfTicket",
+        "appleWalletPass",
+        "googleWalletPass"
+       ]
+      },
+      "url": {
+       "type": "string",
+       "description": "A short-lived link to the rendered output (the PDF, the `.pkpass`, or the Google pass preview), expiring with the preview."
+      }
+     }
+    }
+   },
    "expiresAt": {
     "type": "string",
     "format": "date-time"
+   }
+  }
+ },
+ "SitePackage": {
+  "x-ticvai-persistence": "whitelabel.site_package",
+  "type": "object",
+  "description": "A self-hosting package of one published version (`exportSitePackage`, CHG-CSA-038).",
+  "required": [
+   "id",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "version": {
+    "type": "string"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "building",
+     "ready",
+     "failed"
+    ]
+   },
+   "downloadUrl": {
+    "type": "string",
+    "nullable": true,
+    "description": "Short-lived; present when `ready`."
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "requestedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "platformStaffGrantId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The platform-staff grant it was made under, where platform staff made it (R098)."
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "The partition key (ADR-0005). Written at `tenant` scope."
    }
   }
  },
@@ -1961,7 +1972,8 @@
    },
    "darkMode": {
     "type": "object",
-    "description": "Optional dark variant. Derived from the light theme when absent.",
+    "deprecated": true,
+    "description": "**Deprecated and ignored** (Chinmay, 2 October, workbook Q150 and the pre-apply round; CHG-CSA-035). White label has no dark or light mode: the venue's chosen theme is applied, on every device setting. The field is kept so a client built at r1 still parses, is accepted on `setTheme` and returned as stored, and **is never used to render anything or drawn on any screen**; the guest app has no Light/Dark switch.",
     "properties": {
      "primaryColour": {
       "type": "string",
@@ -2222,6 +2234,51 @@
       "nullable": true,
       "default": 0,
       "description": "BL-106. **How long a same-visit Face Tag survives past the close of the operating day**, and zero is the default because that is what 3.2.44 describes. A non-zero value is an operational allowance for a late reconciliation, not a retention period — **`facePass` ignores this entirely** and is bounded by its entitlement.\n"
+     },
+     "consentFormId": {
+      "type": "string",
+      "format": "uuid",
+      "nullable": true,
+      "description": "**The venue's own consent form, which every biometric capture is taken on** (decided 2 October 2026, Chinmay, batch 4, BO-188: \"Consent first, on the venue's consent form\"; DEC-128, DEC-549; CHG-CSP-018). A form from the venue's consent-form builder in Venue Management (the one builder Face Pass, Face Tag, marketing and waivers share; marketing-crm `setDigitalWaiverForm`). Turning `isEnabled` on without one is refused `422 consent-form-required`, as a missing DPIA is; each Face Pass and Face Tag capture records the form and its version it was consented on (access `enrolFacePass`, `enrolFaceTag`).\n"
+     },
+     "templatesHeldByTicvai": {
+      "type": "boolean",
+      "readOnly": true,
+      "description": "**True where TICVAI's platform stores this venue's biometric templates** (rather than the venue's own on-premises reader estate). Derived from the venue's access deployment. While true, Venue Management shows the venue a standing warning that every guest must accept the venue's consent form before capture, because the data sits with TICVAI as the venue's processor (decided 2 October 2026, Chinmay, batch 4, BO-188: \"If we store the data, highlight or notify the venue that the client must accept a consent form\"; DEC-128; CHG-CSP-018).\n"
+     },
+     "allowMinors": {
+      "type": "boolean",
+      "default": true,
+      "description": "**Whether this venue enrols minors at all** (decided 2 October 2026, Chinmay, critical set 1, BO-187 and CMS-029: \"Guardian consent on the venue's form; minor age per country; the venue can switch minors off\"; supersedes the GST-069 default; DEC-237; CHG-CSP-019). On: a minor (below `RegionSettings.minorAgeThreshold`) is enrolled only with a guardian's consent on the venue's consent form. Off: a minor's enrolment is refused (`422 minors-not-enrolled`) and the guest uses another verification method.\n"
+     },
+     "accreditationFaceMatching": {
+      "type": "object",
+      "nullable": true,
+      "description": "**Face matching to find duplicate accreditation applicants, off unless the venue enables it** (decided 2 October 2026, Chinmay, critical set 3, BO-631: \"Only where the venue enables it, with applicant consent and the venue's legal sign-off; off by default\"; DEC-461; CHG-CSP-022). Enabling it is refused without `legalSignOffReference` (`422 legal-sign-off-required`); each applicant matched must have consented on the application (accreditation's own record). Null is off.\n",
+      "properties": {
+       "isEnabled": {
+        "type": "boolean",
+        "default": false
+       },
+       "legalSignOffReference": {
+        "type": "string",
+        "nullable": true,
+        "maxLength": 200,
+        "description": "The venue's own reference for its legal sign-off; the platform records that one was named, by whom and when."
+       },
+       "signedOffByPrincipalId": {
+        "type": "string",
+        "format": "uuid",
+        "nullable": true,
+        "readOnly": true
+       },
+       "signedOffAt": {
+        "type": "string",
+        "format": "date-time",
+        "nullable": true,
+        "readOnly": true
+       }
+      }
      }
     }
    },
@@ -2336,6 +2393,15 @@
      "pattern": "^[A-Z]{3}$"
     }
    },
+   "chargeCurrencies": {
+    "type": "array",
+    "nullable": true,
+    "description": "**Which currencies a guest may select and pay in** (decided 2 October 2026, Chinmay; CHG-FIN-001; MoM 10 Aug 2026 4.7 option (b), DI-211). A subset of `displayCurrencies`: each code must also be one the venue's payment provider can charge (`orders.PaymentProvider.presentmentCurrencies`) and one the region holds a `tender` rate for; anything else is refused `400`. Null or empty: guests pay in the trading (base) currency only and the other display currencies stay approximate. The ledger is always in the base currency, with the rate recorded on every payment and refund.\n",
+    "items": {
+     "type": "string",
+     "pattern": "^[A-Z]{3}$"
+    }
+   },
    "cartLeaseSeconds": {
     "type": "integer",
     "nullable": true,
@@ -2400,6 +2466,15 @@
     ],
     "nullable": true,
     "description": "Over or short at shift close beyond which the shift waits in `pendingVariance` for `shift.acceptShiftVariance`. **Proposed tenant default AED 20.00, bounds 0 to 1,000 in the venue currency; client finance to correct (audit R094).**\n"
+   },
+   "cashDrawerLimit": {
+    "oneOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true,
+    "description": "**The most cash a till drawer should hold before some is lifted to the safe** (decided 2 October 2026, Chinmay, batch 6 set 3, BO-042: \"Add drawer limit setting (warn + offer cash lift)\"; DEC-179; CHG-CSP-016; DI-274: on a busy day the cashier unloads excess cash mid-shift and it is reconciled at close). The venue default; a till may set its own (`Workstation.cashDrawerLimit`). When the cash a till has taken since its last count takes the drawer over it, the till warns and offers a cash lift (`shift.createCashMovement` kind `lift`) and BO-042 flags the box (`shift.DepositBox.overDrawerLimit`). A warning, never a block: a sale is not refused because the drawer is full. Null sets no limit. **No proposed default: the client's finance team sets it.**\n"
    },
    "catalogue": {
     "type": "object",
@@ -2533,6 +2608,15 @@
       "maximum": 60,
       "default": 10,
       "description": "Minutes after a bump during which `recallKitchenTicket` still recalls; after it the act is a refire. Proposed, client to correct (audit R094)."
+     },
+     "tableReservedLeadMinutes": {
+      "type": "integer",
+      "nullable": true,
+      "minimum": 0,
+      "maximum": 240,
+      "default": 30,
+      "deprecated": true,
+      "description": "**Deprecated (2 October 2026, CHG-CLN-009): `fnb.FnbReservationPolicy.reservedLeadMinutes` is canonical.** The table state model reads the reservation policy (`states/table.yaml`); this venue setting is kept for compatibility, never read, and not drawn. Its former meaning: **How long before a pre-allocated booking its table shows Reserved** (decided 2 October 2026, Chinmay, batch 6 set 6b, EMP-052: \"Reserved when a booking names the table, or N minutes (venue-set) before a pre-allocated booking\"; DEC-202; CHG-CSP-017; DI-689, DI-336). A booking that names its table holds it as Reserved for the booking's whole slot; a booking the host pre-allocated shows its table Reserved from this many minutes before it. Zero shows Reserved only once the booking is due. The fnb table state model applies it (`states/table.yaml`, owned by fnb). Proposed default 30 minutes, client to correct.\n"
      },
      "compEscalationAmount": {
       "allOf": [

@@ -281,6 +281,144 @@
    }
   }
  },
+ "Case": {
+  "x-ticvai-persistence": "marketing.case",
+  "x-ticvai-retired-columns": [
+   "guest_name",
+   "subject",
+   "is_sla_breached"
+  ],
+  "type": "object",
+  "required": [
+   "id",
+   "caseNumber",
+   "subject",
+   "status",
+   "priority",
+   "createdAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "description": "Created on the device (`CreateCaseRequest.id`, `raiseMyCase`), so a UUIDv7."
+   },
+   "caseNumber": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**Server-assigned: the venue prefix plus a sequence per venue** (decided 28 September, audit R152). Not gapless; only tax invoices are gapless, per legal entity. Assigned when the case reaches the server, so a retry with the same `id` keeps its number.\n"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "guestName": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "**Resolved from `pii.subject` when the case is read, never stored on the case.** A name copied onto a case row is personal data outside the erasable store (ADR-0023), and it had no source anyway — no request carries it. Returned only to callers holding `GUEST_VIEW_PII`, as `searchGuests` does.\n"
+   },
+   "subject": {
+    "type": "string",
+    "x-ticvai-column": "title",
+    "description": "**The case's one-line title**, not a person. Stored as `title` so the table does not hold `subject` beside `subject_id`; the wire keeps `subject` because screens bind it.\n"
+   },
+   "kind": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/CaseKind"
+     }
+    ],
+    "nullable": true,
+    "description": "What the guest said it was about, where the guest raised it."
+   },
+   "channel": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/MessageChannel"
+     }
+    ],
+    "description": "How the guest reached the venue — `CreateCaseRequest.channel`, or `inApp` for a case raised through `raiseMyCase`."
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Device time the case was raised — the start of the SLA clock."
+   },
+   "syncedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true,
+    "description": "Server time the case arrived. Equal to `recordedAt` for a case raised online."
+   },
+   "categoryId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "queueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The `ServiceQueue` the case waits in, set by routing (`CaseRoutingRule.queueId`). Null once routed straight to an agent. (decided 29 September, data model for the agreed operations)"
+   },
+   "membershipId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The identity membership this case concerns (`identity.customer_membership`); member case notes are cases with this set. (decided 29 September, coordinator decision DM4, writers pass)"
+   },
+   "status": {
+    "$ref": "#/components/schemas/CaseStatus"
+   },
+   "priority": {
+    "$ref": "#/components/schemas/CasePriority"
+   },
+   "assignedToPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "relatedOrderId": {
+    "type": "string",
+    "nullable": true
+   },
+   "slaDueAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "isSlaBreached": {
+    "type": "boolean",
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "**Computed when read, never stored.** True once the case has been open longer than its SLA allows — the time from `recordedAt` to `resolvedAt` (or to now, while unresolved), less `slaPausedSeconds`, is past the target that set `slaDueAt`. A stored flag would need a job to flip it at the moment of breach, and no such job is designed; `listCases?breachedSla` filters on the same computation.\n"
+   },
+   "slaPausedSeconds": {
+    "type": "integer",
+    "description": "Accrued only while awaiting the guest. Waiting on an internal team does not pause the clock.\n"
+   },
+   "escalationCount": {
+    "type": "integer"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "resolvedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
  "CaseCategory": {
   "type": "object",
   "x-ticvai-persistence": "marketing.case_category",
@@ -583,6 +721,32 @@
    }
   }
  },
+ "CaseDetail": {
+  "x-ticvai-persistence": "marketing.case",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/Case"
+   },
+   {
+    "type": "object",
+    "properties": {
+     "description": {
+      "type": "string"
+     },
+     "resolutionNote": {
+      "type": "string",
+      "nullable": true
+     },
+     "messages": {
+      "type": "array",
+      "items": {
+       "$ref": "#/components/schemas/CaseMessage"
+      }
+     }
+    }
+   }
+  ]
+ },
  "CaseInvestigationResolutionWorkspaceInput": {
   "type": "object",
   "x-ticvai-persistence": "marketing.case_linked_record",
@@ -845,6 +1009,66 @@
    "other"
   ]
  },
+ "CaseMessage": {
+  "x-ticvai-persistence": "marketing.case_message",
+  "type": "object",
+  "required": [
+   "id",
+   "body",
+   "isInternal",
+   "authorKind",
+   "recordedAt"
+  ],
+  "properties": {
+   "resolution": {
+    "type": "string",
+    "description": "**What was actually done about it.** Indexed for retrieval: an agent facing a complaint benefits more from how the last one was resolved than from a policy. Without this column `marketing.case` can only embed its subject line.\n"
+   },
+   "id": {
+    "type": "string"
+   },
+   "body": {
+    "type": "string"
+   },
+   "isInternal": {
+    "type": "boolean"
+   },
+   "authorKind": {
+    "type": "string",
+    "enum": [
+     "agent",
+     "guest",
+     "system",
+     "ai"
+    ]
+   },
+   "authorPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "channel": {
+    "$ref": "#/components/schemas/MessageChannel"
+   },
+   "attachmentRefs": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Device time — `addCaseMessage` is offline-capable."
+   },
+   "syncedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true,
+    "description": "Server time the message arrived."
+   }
+  }
+ },
  "CasePriority": {
   "type": "string",
   "enum": [
@@ -1088,6 +1312,78 @@
    "withdrawn",
    "notAsked"
   ]
+ },
+ "CreateCaseRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "id",
+   "subject",
+   "description",
+   "channel",
+   "recordedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "subject": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "description": {
+    "type": "string",
+    "maxLength": 10000
+   },
+   "categoryId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "membershipId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The identity membership this case concerns (`identity.customer_membership`); member case notes are cases with this set. Must belong to `subjectId` when both are given (422). (decided 29 September, coordinator decision DM4, writers pass)"
+   },
+   "priority": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/CasePriority"
+     }
+    ],
+    "default": "normal"
+   },
+   "kind": {
+    "$ref": "#/components/schemas/CaseKind"
+   },
+   "channel": {
+    "$ref": "#/components/schemas/MessageChannel"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "relatedOrderId": {
+    "type": "string"
+   },
+   "attachmentRefs": {
+    "type": "array",
+    "description": "Stored on the opening `CaseMessage`, not on the case.",
+    "items": {
+     "type": "string"
+    }
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Device time the case was raised. The server stamps `Case.syncedAt` on arrival."
+   }
+  }
  },
  "Customer360ServiceProfileView": {
   "type": "object",
@@ -1687,6 +1983,242 @@
    }
   }
  },
+ "LocalisedText": {
+  "x-ticvai-persistence": "none — jsonb column",
+  "type": "object",
+  "additionalProperties": {
+   "type": "string"
+  }
+ },
+ "MediaAsset": {
+  "x-ticvai-persistence": "assets.media_asset",
+  "type": "object",
+  "required": [
+   "id",
+   "kind",
+   "status",
+   "filename",
+   "contentType",
+   "sizeBytes",
+   "referenceCount",
+   "createdAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "kind": {
+    "$ref": "#/components/schemas/MediaKind"
+   },
+   "status": {
+    "$ref": "#/components/schemas/MediaStatus"
+   },
+   "filename": {
+    "type": "string"
+   },
+   "contentType": {
+    "type": "string"
+   },
+   "sizeBytes": {
+    "type": "integer"
+   },
+   "title": {
+    "$ref": "#/components/schemas/LocalisedText"
+   },
+   "description": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/LocalisedText"
+     }
+    ],
+    "description": "Set by `updateMediaAsset` and matched by `searchMedia`'s `search`. It was accepted and searched on before it had anywhere to be stored.\n"
+   },
+   "altText": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/LocalisedText"
+     }
+    ],
+    "description": "Required before use in a guest-facing surface. WCAG 2.2 AA."
+   },
+   "width": {
+    "type": "integer",
+    "nullable": true
+   },
+   "height": {
+    "type": "integer",
+    "nullable": true
+   },
+   "durationSeconds": {
+    "type": "number",
+    "nullable": true
+   },
+   "customMetadata": {
+    "type": "object",
+    "nullable": true,
+    "additionalProperties": true,
+    "description": "BL-178. **`assets` is a strong contract and its metadata was fixed** — kind, title, alt text, dimensions, rights. A venue photographing four thousand products wants its own fields: shoot date, photographer, model release, season.\n**Free-form and searchable, not a schema.** Every venue would want a different one, and a fixed set would be wrong for all of them.\n"
+   },
+   "sharedWithTenantIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    },
+    "description": "BL-178. **Cross-tenant sharing, and it is refused by default for a reason.** A brand operating three venues wants one logo library; two unrelated tenants sharing an asset store is the isolation breach ADR-0011 exists to prevent.\n**Only within one tenant's own scope tree.** A share naming a tenant outside it is refused rather than warned about — this is the one place where a permissive default would be a cross-tenant data leak.\n"
+   },
+   "tags": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "categoryId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The asset's category, one of `MediaTaxonomy.categories[].id`; null while unclassified. Set by `bulkUpdateMediaAssets` (`setCategoryId`) (decided 29 September, data model DM4).\n"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "url": {
+    "type": "string",
+    "description": "Signed and expiring for private assets; stable CDN URL for public ones."
+   },
+   "thumbnailUrl": {
+    "type": "string",
+    "nullable": true
+   },
+   "referenceCount": {
+    "type": "integer",
+    "description": "How many surfaces reference this asset. Non-zero refuses deletion.\n"
+   },
+   "rights": {
+    "$ref": "#/components/schemas/MediaRights"
+   },
+   "isRightsExpired": {
+    "type": "boolean"
+   },
+   "version": {
+    "type": "integer"
+   },
+   "uploadedByPrincipalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "MediaKind": {
+  "type": "string",
+  "enum": [
+   "image",
+   "video",
+   "audio",
+   "document",
+   "vector",
+   "font",
+   "archive"
+  ]
+ },
+ "MediaRights": {
+  "x-ticvai-persistence": "none — embedded in asset",
+  "type": "object",
+  "description": "Licensing terms. Tracked because an expired licence on a live surface is a legal exposure, not a housekeeping item.\n",
+  "properties": {
+   "licenceKind": {
+    "type": "string",
+    "enum": [
+     "owned",
+     "royaltyFree",
+     "rightsManaged",
+     "creativeCommons",
+     "editorialOnly",
+     "unknown"
+    ]
+   },
+   "licensor": {
+    "type": "string",
+    "nullable": true
+   },
+   "licenceReference": {
+    "type": "string",
+    "nullable": true
+   },
+   "validFrom": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "validTo": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "permittedUses": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "web",
+      "print",
+      "socialMedia",
+      "inVenue",
+      "advertising",
+      "internal"
+     ]
+    }
+   },
+   "attributionRequired": {
+    "type": "boolean",
+    "default": false
+   },
+   "attributionText": {
+    "type": "string",
+    "nullable": true
+   },
+   "permittedTerritories": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "ISO country or region codes. **Empty means unrestricted, which is a claim rather than an absence** — an unknown territory and a worldwide licence are not the same thing, and `licenceKind: unknown` is how the second is said.\n"
+   },
+   "permittedChannels": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Distribution channel codes, checked by `setMediaDistributionChannels`. Narrower than `permittedUses`, which describes the medium rather than the route.\n"
+   },
+   "modelReleaseHeld": {
+    "type": "boolean",
+    "default": false
+   },
+   "renewalOwner": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   }
+  }
+ },
+ "MediaStatus": {
+  "type": "string",
+  "enum": [
+   "processing",
+   "ready",
+   "quarantined",
+   "failed",
+   "archived"
+  ]
+ },
  "MessageChannel": {
   "type": "string",
   "enum": [
@@ -1986,6 +2518,95 @@
     ],
     "nullable": true,
     "description": "The action just executed; null on `evaluate`."
+   }
+  }
+ },
+ "OrderChannel": {
+  "type": "string",
+  "description": "Where the order originated. Added when guest self-ordering was contracted — an order a guest placed on their own phone is commercially and operationally different from one a cashier typed, and reporting that cannot separate them cannot answer whether self-ordering is working.\n",
+  "enum": [
+   "pos",
+   "kiosk",
+   "guestApp",
+   "guestWeb",
+   "callCentre",
+   "partner",
+   "api",
+   "backOffice"
+  ]
+ },
+ "OrderStatus": {
+  "type": "string",
+  "enum": [
+   "pending",
+   "held",
+   "paid",
+   "partiallyPaid",
+   "completed",
+   "voided",
+   "refunded",
+   "partiallyRefunded",
+   "failed"
+  ],
+  "description": "`held` is a parked sale — the cashier freed the till and the guest will return. It holds no inventory and expires, because a till that accumulates parked sales across a shift cannot be closed.\n"
+ },
+ "OrderSummary": {
+  "x-ticvai-persistence": "none — projection",
+  "type": "object",
+  "required": [
+   "id",
+   "orderNumber",
+   "status",
+   "grossAmount",
+   "createdAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "orderNumber": {
+    "type": "string"
+   },
+   "status": {
+    "$ref": "#/components/schemas/OrderStatus"
+   },
+   "grossAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "refundedAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "channel": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/OrderChannel"
+     }
+    ],
+    "description": "The same vocabulary as `Order.channel`, which this projects."
+   },
+   "lineCount": {
+    "type": "integer"
+   },
+   "principalId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The cashier who raised it — what the held-orders list shows."
+   },
+   "holdLabel": {
+    "type": "string",
+    "nullable": true,
+    "description": "As `Order.holdLabel`."
+   },
+   "heldUntil": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "As `Order.heldUntil`, so a held-orders list can warn about the ones about to lapse."
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
    }
   }
  },
@@ -2330,6 +2951,73 @@
    "recordId": {
     "type": "string",
     "description": "The row in the source table."
+   }
+  }
+ },
+ "UploadTicket": {
+  "x-ticvai-persistence": "assets.media_upload",
+  "type": "object",
+  "required": [
+   "uploadId",
+   "uploadUrl",
+   "method",
+   "expiresAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
+   },
+   "uploadId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "uploadUrl": {
+    "type": "string",
+    "description": "Signed. PUT the file here, then confirm with `/complete`."
+   },
+   "method": {
+    "type": "string",
+    "enum": [
+     "PUT",
+     "POST"
+    ]
+   },
+   "headers": {
+    "type": "object",
+    "additionalProperties": {
+     "type": "string"
+    }
+   },
+   "maxSizeBytes": {
+    "type": "integer"
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "filename": {
+    "type": "string"
+   },
+   "contentType": {
+    "type": "string"
+   },
+   "sizeBytes": {
+    "type": "integer"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "assetId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The asset this upload became — created by `completeUpload`, or the asset whose file `replaceMediaAsset` swapped. Null while the transfer is outstanding.\n"
    }
   }
  }

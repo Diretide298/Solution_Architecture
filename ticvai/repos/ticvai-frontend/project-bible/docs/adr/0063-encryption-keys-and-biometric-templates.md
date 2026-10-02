@@ -1,6 +1,6 @@
 # ADR-0063: Encryption and keys, and biometric templates stay with the biometric vendor
 
-**Status:** Proposed · waiting on the client's data protection officer (where face templates may be stored, and the biometric retention floor) and on the client naming its facial-reader vendor
+**Status:** Accepted in part · 2 October 2026: the biometric consent, enrolment-channel, minors, image-viewing and face-matching rules decided by Chinmay are in force (section "Decided 2 October 2026"); the rest is still proposed, waiting on the client's data protection officer (where face templates may be stored, and the biometric retention floor, now researched first) and on the client naming its facial-reader vendor
 **Date:** 2026-10-01 (drafted 30 September from the system-design review) · **Deciders:** Chinmay Parab and the client (the client's DPO decides where templates live and the retention floor; both are make-or-break) · **Consulted:** Dinesh (infrastructure)
 **Finding:** SD-058 (medium)
 **Related:** ADR-0023 (PII apart from the ledger) · ADR-0043 (control plane split on personal data) · ADR-0047 (retention and erasure) · ADR-0042 (pinned instances) · ADR-0049 (Qdrant and its token key) · ADR-0057 (broker, proposed) · CF-35 (biometrics under PDPL)
@@ -14,10 +14,39 @@
 | May face templates be held by the biometric vendor, with TICVAI keeping only a reference and a deletion receipt (Option A below)? Or must they be held elsewhere? | The client's DPO | **No.** In the client email of 30 September, item 4 ("where face templates may be stored"), but not in the register |
 | The legal retention floor for Face Pass, Face Tag and failed captures | The client's DPO | Yes ("Biometric retention by law") |
 | Which facial-reader vendor is contracted (it sets the SDK, the template format and where the templates are processed) | The client | Yes ("Facial-reader vendor") |
-| Face capture for guests under 18 | The client's DPO | Yes ("Biometrics for children"); not offered until answered |
+| Face capture for guests under 18 | ~~The client's DPO~~ **Decided by Chinmay, 2 October** | Guardian consent on the venue's form, the minor age per country, and the venue can switch minors off (below) |
 
 The encryption half of this ADR (platform-managed keys, CMK on pinned instances, field-level
 encryption) is ours and does not wait on these answers.
+
+---
+
+## Decided 2 October 2026: consent, channels, minors, and who sees a face
+
+**Decided by Chinmay, 2 October 2026** (batch 4 and critical sets 1 and 3; DEC-128, DEC-236, DEC-237,
+DEC-138, DEC-283, DEC-239, DEC-261 and DEC-461 in `docs/registers/decisions-2-october.md`; the consent-form
+builder is DEC-549; change entry CHG-DOC-007). These are in force whichever way the template question below
+is answered.
+
+1. **Consent first, on the venue's own consent form.** Face Pass and Face Tag capture, and keeping the
+   result, need the guest's consent before capture, given on the consent form the venue publishes (built in
+   Venue Management's consent-form builder, the one used for marketing consent and waivers too). **Where the
+   biometric data is stored by TICVAI** rather than by the venue's own system, the venue is warned in its
+   biometric settings that every guest must accept the consent form before capture.
+2. **Where Face Pass is enrolled:** the guest app, the staffed counters and a self-service kiosk (with the
+   consent shown on the kiosk). **Never at the turnstile** on first use.
+3. **Minors.** A child may be enrolled with a **guardian's consent** on the venue's form. The age below
+   which a guest is a minor is set **per country**, and the venue can **switch minors' enrolment off**. This
+   replaces the earlier default that no one under 18 is enrolled (GST-069), and amends audit R205.
+4. **Who sees a face.** On re-enrolment review and on a security review of a face change, the match score
+   and the references are always visible; the **images** are behind "View images (logged)", which needs a
+   specific permission, and every viewing is logged.
+5. **Face matching to find duplicate accreditations** runs only where the venue switches it on, with the
+   applicant's consent and the venue's legal sign-off; it is **off by default**.
+
+**Still open:** the retention periods per data category and region (the biometric floor among them) are
+researched first against UAE and GCC law and proposed as defaults marked "pending counsel" (DEC-240; see
+ADR-0047's pending items), and the template location and the vendor wait on the client as above.
 
 ---
 
@@ -147,7 +176,7 @@ offer it where the instance is the client's.
 **Before Monday 5 October 2026**
 
 1. [ ] None blocking. Keep POS-005's Face Tag enrolment behind a flag until the client answers.
-2. [ ] Add "Where may face templates be stored?" to the Decisions Register (the retention floor, the vendor and under-18s are there).
+2. [ ] Add "Where may face templates be stored?" to the Decisions Register (the retention floor and the vendor are there; under-18s was decided by Chinmay on 2 October, above).
 
 **Before POS-005 is built (sprint 2 at the latest)**
 

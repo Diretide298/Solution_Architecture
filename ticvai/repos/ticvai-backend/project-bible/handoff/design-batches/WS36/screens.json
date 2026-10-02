@@ -1,390 +1,5 @@
 [
  {
-  "id": "ADM-068",
-  "name": "Tax, Fee & Calculation Command Center",
-  "module": "Commercial",
-  "requiresModule": "ticketing",
-  "wave": 3,
-  "source": {
-   "pack": "Pricing___Revenue_Management_Reference.pdf",
-   "board": "3",
-   "number": "10.3.1",
-   "page": 39
-  },
-  "implementation": {
-   "app": "ticvai-web",
-   "route": "/commercial/tax-fee-calculation-command-center-adm-068",
-   "component": "apps/ticvai-web/src/routes/commercial/TaxFeeCalculationCommandCenter.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "ADM-002"
-   ],
-   "exitTo": [
-    "ADM-002",
-    "ADM-069",
-    "ADM-070",
-    "ADM-071",
-    "ADM-072",
-    "ADM-073",
-    "ADM-074",
-    "ADM-075",
-    "ADM-076",
-    "ADM-077"
-   ],
-   "inferred": false,
-   "notes": "**The board's hub.** The workshop specified this module as boards of ten and opened each with a command centre; the other nine screens are that board's detail, so they are reached from here and return here.",
-   "transitions": [
-    {
-     "to": "ADM-002",
-     "trigger": "Platform Dashboard",
-     "provenance": "derived — ADM-002 declares entryState.params  and ADM-068 holds none of them. The edge carries nothing: ADM-068 is opened from ADM-002, so this edge is the way back and ADM-002 keeps its own state"
-    },
-    {
-     "to": "ADM-069",
-     "trigger": "Works in Tax Profile & Jurisdiction Configuration",
-     "provenance": "flow F145 step 1→2",
-     "operation": "listTaxFeeCalculation"
-    },
-    {
-     "to": "ADM-070",
-     "trigger": "Works in Tax Rule & Treatment Builder",
-     "provenance": "flow F145 step 3→4",
-     "operation": "listTaxFeeCalculation"
-    },
-    {
-     "to": "ADM-071",
-     "trigger": "Works in Fee & Surcharge Library",
-     "provenance": "flow F145 step 5→6",
-     "operation": "listTaxFeeCalculation"
-    },
-    {
-     "to": "ADM-072",
-     "trigger": "Works in Fee Applicability & Charging Rule Builder",
-     "provenance": "flow F145 step 7→8",
-     "operation": "listTaxFeeCalculation"
-    },
-    {
-     "to": "ADM-073",
-     "trigger": "Works in Fee Waiver, Tax Exemption & Exception Rules",
-     "provenance": "flow F145 step 9→10",
-     "operation": "listTaxFeeCalculation"
-    },
-    {
-     "to": "ADM-074",
-     "trigger": "Works in Price Calculation Sequence & Formula Engine",
-     "provenance": "flow F145 step 11→12",
-     "operation": "listTaxFeeCalculation"
-    },
-    {
-     "to": "ADM-075",
-     "trigger": "Works in Currency Precision, Rounding & Monetary Rules",
-     "provenance": "flow F145 step 13→14",
-     "operation": "listTaxFeeCalculation"
-    },
-    {
-     "to": "ADM-076",
-     "trigger": "Works in Price Breakdown, Calculation Simulation & Explainability",
-     "provenance": "flow F145 step 15→16",
-     "operation": "listTaxFeeCalculation"
-    },
-    {
-     "to": "ADM-077",
-     "trigger": "Works in Calculation Validation, Reconciliation & Service Interface",
-     "provenance": "flow F145 step 17→18",
-     "operation": "listTaxFeeCalculation"
-    }
-   ]
-  },
-  "density": "compact",
-  "purposeNote": "Authorized administrators can understand the complete status and health of TICVAI tax, fee and price-calculation configuration from one workspace.",
-  "pattern": "listDetail",
-  "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
-  "purpose": "Provide Finance, Commercial and Pricing administrators with one central view of TICVAI's price-calculation configuration.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack names 6 actions on this screen and the screen declares 1 operation.** Unserved: Create Tax Profile, Create Fee, Create Calculation Profile, Run Simulation, Validate Configuration, View Dependencies. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Pricing___Revenue_Management_Reference.pdf, page 39 §Quick Actions"
-   }
-  ],
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "filters",
-     "components": [
-      {
-       "kind": "searchField",
-       "label": "Search tax fee calculation",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 39 §Filter by"
-      },
-      {
-       "kind": "multiSelect",
-       "label": "Filter by",
-       "columns": [
-        "Tax",
-        "Fee",
-        "Surcharge",
-        "Waiver",
-        "Exemption",
-        "Calculation Profile",
-        "Rounding Profile"
-       ],
-       "notes": "The pack filters this screen by tax, fee, surcharge, waiver, exemption, calculation profile and 1 more — which are present is a decision the pack already made.",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 39 §Filter by"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "headline",
-     "components": [
-      {
-       "kind": "metricTile",
-       "label": "Active Tax Profiles",
-       "bindsTo": "TaxFeeCalculationCommandCenterSummary.activeTaxProfiles",
-       "operation": "listTaxFeeCalculation",
-       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Tax Jurisdictions",
-       "bindsTo": "TaxFeeCalculationCommandCenterSummary.taxJurisdictions",
-       "operation": "listTaxFeeCalculation",
-       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Active Fee Profiles",
-       "bindsTo": "TaxFeeCalculationCommandCenterSummary.activeFeeProfiles",
-       "operation": "listTaxFeeCalculation",
-       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Active Surcharges",
-       "bindsTo": "TaxFeeCalculationCommandCenterSummary.activeSurcharges",
-       "operation": "listTaxFeeCalculation",
-       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Exemption Rules",
-       "bindsTo": "TaxFeeCalculationCommandCenterSummary.exemptionRules",
-       "operation": "listTaxFeeCalculation",
-       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Calculation Profiles",
-       "bindsTo": "TaxFeeCalculationCommandCenterSummary.calculationProfiles",
-       "operation": "listTaxFeeCalculation",
-       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Products missing tax",
-       "bindsTo": "TaxFeeCalculationCommandCenterSummary.productsMissingTax",
-       "operation": "listTaxFeeCalculation",
-       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Products Missing Calculation Profile",
-       "bindsTo": "TaxFeeCalculationCommandCenterSummary.productsMissingCalculationProfile",
-       "operation": "listTaxFeeCalculation",
-       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Configuration Conflicts",
-       "bindsTo": "TaxFeeCalculationCommandCenterSummary.configurationConflicts",
-       "operation": "listTaxFeeCalculation",
-       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Upcoming Tax Changes",
-       "bindsTo": "TaxFeeCalculationCommandCenterSummary.upcomingTaxChanges",
-       "operation": "listTaxFeeCalculation",
-       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Validation Issues",
-       "bindsTo": "TaxFeeCalculationCommandCenterSummary.validationIssues",
-       "operation": "listTaxFeeCalculation",
-       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Recently modified rules",
-       "bindsTo": "TaxFeeCalculationCommandCenterSummary.recentlyModifiedRules",
-       "operation": "listTaxFeeCalculation",
-       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "collection",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every tax fee calculation",
-       "columns": [
-        "TaxFeeCalculationCommandCenterView.profileName",
-        "TaxFeeCalculationCommandCenterView.type",
-        "TaxFeeCalculationCommandCenterView.country",
-        "TaxFeeCalculationCommandCenterView.legalEntity",
-        "TaxFeeCalculationCommandCenterView.market",
-        "TaxFeeCalculationCommandCenterView.currency",
-        "TaxFeeCalculationCommandCenterView.productScope",
-        "TaxFeeCalculationCommandCenterView.status",
-        "TaxFeeCalculationCommandCenterView.owner"
-       ],
-       "bindsTo": "TaxFeeCalculationCommandCenterView",
-       "operation": "listTaxFeeCalculation",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 39 §Display"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected tax fee calculation",
-       "bindsTo": "TaxFeeCalculationCommandCenterView",
-       "columns": [
-        "TaxFeeCalculationCommandCenterView.profileName",
-        "TaxFeeCalculationCommandCenterView.type",
-        "TaxFeeCalculationCommandCenterView.country",
-        "TaxFeeCalculationCommandCenterView.legalEntity",
-        "TaxFeeCalculationCommandCenterView.market",
-        "TaxFeeCalculationCommandCenterView.currency",
-        "TaxFeeCalculationCommandCenterView.productScope",
-        "TaxFeeCalculationCommandCenterView.status",
-        "TaxFeeCalculationCommandCenterView.owner"
-       ],
-       "notes": null,
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 39 §Display"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Create Tax Profile",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 39 §Quick Actions"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Create Fee",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 39 §Quick Actions"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Create Calculation Profile",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 39 §Quick Actions"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Run Simulation",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 39 §Quick Actions"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Validate Configuration",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 39 §Quick Actions"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "View Dependencies",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 39 §Quick Actions"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The tax fee calculation list.",
-   "error": "Could not load. Names which read failed and leaves the tax fee calculation untouched.",
-   "emptyFirstRun": "No tax fee calculation yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the tax fee calculation are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "listTaxFeeCalculation",
-    "contract": "catalogue",
-    "purpose": "Tax, Fee & Calculation Command Center",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "listTaxInvoices",
-    "contract": "finance",
-    "purpose": "List tax invoices",
-    "trigger": "onLoad",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "getVatReturn",
-    "contract": "finance",
-    "purpose": "VAT return (FTA boxes) for a period",
-    "trigger": "onLoad",
-    "provenance": "build, 29 September 2026"
-   }
-  ],
-  "entryState": {
-   "preloaded": [
-    "TaxFeeCalculationCommandCenterSummary.activeTaxProfiles",
-    "TaxFeeCalculationCommandCenterSummary.taxJurisdictions",
-    "TaxFeeCalculationCommandCenterSummary.activeFeeProfiles",
-    "TaxFeeCalculationCommandCenterSummary.activeSurcharges",
-    "TaxFeeCalculationCommandCenterSummary.exemptionRules",
-    "TaxFeeCalculationCommandCenterSummary.calculationProfiles"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-068",
-   "workshopBoard": "wireframes/WS97 Pricing   Revenue Management Board 3.dc.html#adm-068"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 39. 22 of 29 labels bound to a contract property; 35 of 44 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
-   "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
-   "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
-   "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
-    "shell": "web",
-    "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
-    ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
   "id": "ADM-069",
   "name": "Tax Profile & Jurisdiction Configuration",
   "module": "Commercial",
@@ -397,17 +12,19 @@
    "page": 40
   },
   "implementation": {
-   "app": "ticvai-web",
+   "app": "venue-management-web",
    "route": "/commercial/tax-profile-jurisdiction-configuration-adm-069",
-   "component": "apps/ticvai-web/src/routes/commercial/TaxProfileJurisdictionConfiguration.tsx",
+   "component": "apps/venue-management-web/src/routes/commercial/TaxProfileJurisdictionConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
    "entryFrom": [
-    "ADM-068"
+    "ADM-068",
+    "BO-100"
    ],
    "exitTo": [
-    "ADM-068"
+    "ADM-068",
+    "BO-100"
    ],
    "inferred": false,
    "notes": "**Reached from ADM-068, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
@@ -417,6 +34,12 @@
      "trigger": "Returns to the board's landing screen",
      "provenance": "flow F145 step 2→3",
      "operation": "setTaxProfileJurisdiction"
+    },
+    {
+     "to": "BO-100",
+     "trigger": "Back to Venue Home",
+     "provenance": "moved to Venue Management 2 October 2026 (CHG-MOV-001); its board's hub ADM-068 stays on the console, so Venue Home is its venue-side way in",
+     "back": true
     }
    ]
   },
@@ -498,6 +121,27 @@
        "kind": "selectField",
        "label": "Owner",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 40 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Taxable base",
+       "operation": "setTaxProfileJurisdiction",
+       "notes": "**The one place the taxable base is set** (decided 2 October 2026, Chinmay; CHG-FIN-004): \"Price after discount\" (default) or \"Price before discount\" (`TaxProfile.taxBase`). Shown with a worked example that recalculates as it changes: Egypt, VAT 14%, a ticket listed at EGP 100.00 with 20% off is paid at EGP 80.00; after discount the VAT is EGP 11.20 (guest pays EGP 91.20), before discount it is EGP 14.00 (guest pays EGP 94.00). The tax calculation reads it from here and nowhere else.",
+       "provenance": "contract catalogue.yaml TaxProfile.taxBase; MoM 1 Sep 2026 4.5 (DI-598); CHG-FIN-004"
+      },
+      {
+       "kind": "textField",
+       "label": "Document title",
+       "operation": "setTaxInvoiceTemplate",
+       "notes": "Per language. In the UAE fixed by law: \"Tax Invoice\" for the tax invoice and the simplified tax invoice, \"Tax Credit Note\" for the credit note (Executive Regulation Art. 59(1)(a), 59(2)(a), 60(1)(a); CHG-FIN-011). The Arabic wording is the client's tax adviser's to confirm.",
+       "provenance": "contract finance.yaml FinTaxInvoiceTemplate.title; CHG-FIN-011"
+      },
+      {
+       "kind": "toggle",
+       "label": "Issue a tax invoice on every paid order",
+       "operation": "setTaxInvoiceTemplate",
+       "notes": "`autoIssueOnPayment`. On and locked for a UAE VAT-registered legal entity (Decree-Law Art. 65(1), Executive Regulation Art. 59(13)(1)); CHG-FIN-011.",
+       "provenance": "contract finance.yaml FinTaxInvoiceTemplate.autoIssueOnPayment; CHG-FIN-011"
       }
      ]
     },
@@ -579,30 +223,30 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-069",
+   "board": "wireframes/P08 Venue Management.dc.html#adm-069",
    "workshopBoard": "wireframes/WS97 Pricing   Revenue Management Board 3.dc.html#adm-069"
   },
   "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 40. 0 of 0 labels bound to a contract property; 17 of 40 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "notes": "**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: \"they are venue screens\"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys. Its board's hub ADM-068 stays on the console (DEC-207 (Chinmay, 2 October, batch 6): TICVAI staff maintain the country tax templates); this screen keeps that edge and is also reached from BO-100 Venue Home.\n\n**Taxable base: one setting, here** (decided 2 October 2026, Chinmay; CHG-FIN-004). It was set in two places, the tax profile (`TaxProfile.taxBase`) and a venue policy flag on the tax calculation (`discountsAreTaxInclusive`), which could disagree; the flag is deprecated and ignored. The setting shows the Egypt worked example. **Tax documents** (CHG-FIN-011): the template sets the title the law prescribes, the auto-issue of the simplified tax invoice (on for a UAE registrant), and the AED 10,000 limit above which a VAT-registered buyer gets a full tax invoice.",
   "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
+   "code": "P08",
+   "audience": "staff",
    "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
    "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
+   "app": "venue-management-web",
+   "operator": "venue",
    "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
     "shell": "web",
     "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
+     "P12",
+     "P13",
+     "P16"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
     "decided": "10 September 2026"
    }
   }
@@ -620,17 +264,19 @@
    "page": 41
   },
   "implementation": {
-   "app": "ticvai-web",
+   "app": "venue-management-web",
    "route": "/commercial/tax-rule-treatment-builder-adm-070",
-   "component": "apps/ticvai-web/src/routes/commercial/TaxRuleTreatmentBuilder.tsx",
+   "component": "apps/venue-management-web/src/routes/commercial/TaxRuleTreatmentBuilder.tsx",
    "status": "notStarted"
   },
   "navigation": {
    "entryFrom": [
-    "ADM-068"
+    "ADM-068",
+    "BO-100"
    ],
    "exitTo": [
-    "ADM-068"
+    "ADM-068",
+    "BO-100"
    ],
    "inferred": false,
    "notes": "**Reached from ADM-068, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
@@ -640,9 +286,16 @@
      "trigger": "Returns to the board's landing screen",
      "provenance": "flow F145 step 4→5",
      "operation": "setTaxRuleTreatment"
+    },
+    {
+     "to": "BO-100",
+     "trigger": "Back to Venue Home",
+     "provenance": "moved to Venue Management 2 October 2026 (CHG-MOV-001); its board's hub ADM-068 stays on the console, so Venue Home is its venue-side way in",
+     "back": true
     }
    ]
   },
+  "notes": "**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: \"they are venue screens\"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys. Its board's hub ADM-068 stays on the console (DEC-207 (Chinmay, 2 October, batch 6): TICVAI staff maintain the country tax templates); this screen keeps that edge and is also reached from BO-100 Venue Home.",
   "density": "compact",
   "purposeNote": "taxable commercial transaction.",
   "pattern": "listDetail",
@@ -663,6 +316,11 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Pricing___Revenue_Management_Reference.pdf, page 41"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-027): A read (get or list) of the tax rules and treatments that setTaxRuleTreatment writes.",
+    "source": "contracts/spine/catalogue.yaml#setTaxRuleTreatment | screens/P08-venue-back-office.yaml#ADM-070"
    }
   ],
   "layout": {
@@ -723,30 +381,29 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-070",
+   "board": "wireframes/P08 Venue Management.dc.html#adm-070",
    "workshopBoard": "wireframes/WS97 Pricing   Revenue Management Board 3.dc.html#adm-070"
   },
   "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 41. 0 of 0 labels bound to a contract property; 5 of 29 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
+   "code": "P08",
+   "audience": "staff",
    "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
    "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
+   "app": "venue-management-web",
+   "operator": "venue",
    "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
     "shell": "web",
     "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
+     "P12",
+     "P13",
+     "P16"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
     "decided": "10 September 2026"
    }
   }
@@ -764,17 +421,19 @@
    "page": 43
   },
   "implementation": {
-   "app": "ticvai-web",
+   "app": "venue-management-web",
    "route": "/commercial/fee-surcharge-library-adm-071",
-   "component": "apps/ticvai-web/src/routes/commercial/FeeSurchargeLibrary.tsx",
+   "component": "apps/venue-management-web/src/routes/commercial/FeeSurchargeLibrary.tsx",
    "status": "notStarted"
   },
   "navigation": {
    "entryFrom": [
-    "ADM-068"
+    "ADM-068",
+    "BO-100"
    ],
    "exitTo": [
-    "ADM-068"
+    "ADM-068",
+    "BO-100"
    ],
    "inferred": false,
    "notes": "**Reached from ADM-068, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
@@ -784,9 +443,16 @@
      "trigger": "Returns to the board's landing screen",
      "provenance": "flow F145 step 6→7",
      "operation": "listFeeSurcharge"
+    },
+    {
+     "to": "BO-100",
+     "trigger": "Back to Venue Home",
+     "provenance": "moved to Venue Management 2 October 2026 (CHG-MOV-001); its board's hub ADM-068 stays on the console, so Venue Home is its venue-side way in",
+     "back": true
     }
    ]
   },
+  "notes": "**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: \"they are venue screens\"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys. Its board's hub ADM-068 stays on the console (DEC-207 (Chinmay, 2 October, batch 6): TICVAI staff maintain the country tax templates); this screen keeps that edge and is also reached from BO-100 Venue Home.",
   "density": "compact",
   "purposeNote": "than defining them separately within sales channels.",
   "pattern": "configEditor",
@@ -965,7 +631,7 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-071",
+   "board": "wireframes/P08 Venue Management.dc.html#adm-071",
    "workshopBoard": "wireframes/WS97 Pricing   Revenue Management Board 3.dc.html#adm-071"
   },
   "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 43. 0 of 0 labels bound to a contract property; 33 of 43 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
@@ -1006,25 +672,24 @@
    }
   ],
   "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
+   "code": "P08",
+   "audience": "staff",
    "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
    "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
+   "app": "venue-management-web",
+   "operator": "venue",
    "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
     "shell": "web",
     "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
+     "P12",
+     "P13",
+     "P16"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
     "decided": "10 September 2026"
    }
   }
@@ -1042,17 +707,19 @@
    "page": 44
   },
   "implementation": {
-   "app": "ticvai-web",
+   "app": "venue-management-web",
    "route": "/commercial/fee-applicability-charging-rule-builder-adm-072",
-   "component": "apps/ticvai-web/src/routes/commercial/FeeApplicabilityChargingRuleBuilder.tsx",
+   "component": "apps/venue-management-web/src/routes/commercial/FeeApplicabilityChargingRuleBuilder.tsx",
    "status": "notStarted"
   },
   "navigation": {
    "entryFrom": [
-    "ADM-068"
+    "ADM-068",
+    "BO-100"
    ],
    "exitTo": [
-    "ADM-068"
+    "ADM-068",
+    "BO-100"
    ],
    "inferred": false,
    "notes": "**Reached from ADM-068, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
@@ -1062,9 +729,16 @@
      "trigger": "Returns to the board's landing screen",
      "provenance": "flow F145 step 8→9",
      "operation": "setFeeApplicabilityCharging"
+    },
+    {
+     "to": "BO-100",
+     "trigger": "Back to Venue Home",
+     "provenance": "moved to Venue Management 2 October 2026 (CHG-MOV-001); its board's hub ADM-068 stays on the console, so Venue Home is its venue-side way in",
+     "back": true
     }
    ]
   },
+  "notes": "**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: \"they are venue screens\"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys. Its board's hub ADM-068 stays on the console (DEC-207 (Chinmay, 2 October, batch 6): TICVAI staff maintain the country tax templates); this screen keeps that edge and is also reached from BO-100 Venue Home.",
   "density": "compact",
   "purposeNote": "satisfied.",
   "pattern": "configEditor",
@@ -1075,6 +749,11 @@
     "operation": null,
     "why": "**The pack names 16 actions on this screen and the screen declares 1 operation.** Unserved: Product, Product Category, Channel, Venue, Event, Customer Type, Membership, Transaction Type …. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Pricing___Revenue_Management_Reference.pdf, page 44 §Support"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-027): No read of the fee applicability and charging rules (setFeeApplicabilityCharging has no get).",
+    "source": "contracts/spine/catalogue.yaml#setFeeApplicabilityCharging | screens/P08-venue-back-office.yaml#ADM-072"
    }
   ],
   "layout": {
@@ -1176,30 +855,29 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-072",
+   "board": "wireframes/P08 Venue Management.dc.html#adm-072",
    "workshopBoard": "wireframes/WS97 Pricing   Revenue Management Board 3.dc.html#adm-072"
   },
   "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 44. 0 of 0 labels bound to a contract property; 21 of 39 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
+   "code": "P08",
+   "audience": "staff",
    "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
    "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
+   "app": "venue-management-web",
+   "operator": "venue",
    "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
     "shell": "web",
     "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
+     "P12",
+     "P13",
+     "P16"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
     "decided": "10 September 2026"
    }
   }
@@ -1217,17 +895,19 @@
    "page": 46
   },
   "implementation": {
-   "app": "ticvai-web",
+   "app": "venue-management-web",
    "route": "/commercial/fee-waiver-tax-exemption-exception-rules-adm-073",
-   "component": "apps/ticvai-web/src/routes/commercial/FeeWaiverTaxExemptionExceptionRules.tsx",
+   "component": "apps/venue-management-web/src/routes/commercial/FeeWaiverTaxExemptionExceptionRules.tsx",
    "status": "notStarted"
   },
   "navigation": {
    "entryFrom": [
-    "ADM-068"
+    "ADM-068",
+    "BO-100"
    ],
    "exitTo": [
-    "ADM-068"
+    "ADM-068",
+    "BO-100"
    ],
    "inferred": false,
    "notes": "**Reached from ADM-068, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
@@ -1237,9 +917,16 @@
      "trigger": "Returns to the board's landing screen",
      "provenance": "flow F145 step 10→11",
      "operation": "listFeeWaiverTax"
+    },
+    {
+     "to": "BO-100",
+     "trigger": "Back to Venue Home",
+     "provenance": "moved to Venue Management 2 October 2026 (CHG-MOV-001); its board's hub ADM-068 stays on the console, so Venue Home is its venue-side way in",
+     "back": true
     }
    ]
   },
+  "notes": "**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: \"they are venue screens\"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys. Its board's hub ADM-068 stays on the console (DEC-207 (Chinmay, 2 October, batch 6): TICVAI staff maintain the country tax templates); this screen keeps that edge and is also reached from BO-100 Venue Home.",
   "density": "compact",
   "purposeNote": "Fees and taxes can only be waived or exempted through explicitly authorized rules or governed manual exceptions.",
   "pattern": "configEditor",
@@ -1250,6 +937,11 @@
     "operation": null,
     "why": "**The pack names 7 actions on this screen and the screen declares 1 operation.** Unserved: Zero-Rated Tax, Complimentary Transaction, Operational Waiver, Contractual Waiver. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Pricing___Revenue_Management_Reference.pdf, page 46 §Support"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-027): No write for fee waiver and tax exemption rules.",
+    "source": "contracts/spine/catalogue.yaml#listFeeWaiverTax"
    }
   ],
   "layout": {
@@ -1376,30 +1068,29 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-073",
+   "board": "wireframes/P08 Venue Management.dc.html#adm-073",
    "workshopBoard": "wireframes/WS97 Pricing   Revenue Management Board 3.dc.html#adm-073"
   },
   "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 46. 0 of 0 labels bound to a contract property; 18 of 36 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
+   "code": "P08",
+   "audience": "staff",
    "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
    "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
+   "app": "venue-management-web",
+   "operator": "venue",
    "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
     "shell": "web",
     "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
+     "P12",
+     "P13",
+     "P16"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
     "decided": "10 September 2026"
    }
   }
@@ -1417,17 +1108,19 @@
    "page": 47
   },
   "implementation": {
-   "app": "ticvai-web",
+   "app": "venue-management-web",
    "route": "/commercial/price-calculation-sequence-formula-engine-adm-074",
-   "component": "apps/ticvai-web/src/routes/commercial/PriceCalculationSequenceFormulaEngine.tsx",
+   "component": "apps/venue-management-web/src/routes/commercial/PriceCalculationSequenceFormulaEngine.tsx",
    "status": "notStarted"
   },
   "navigation": {
    "entryFrom": [
-    "ADM-068"
+    "ADM-068",
+    "BO-100"
    ],
    "exitTo": [
-    "ADM-068"
+    "ADM-068",
+    "BO-100"
    ],
    "inferred": false,
    "notes": "**Reached from ADM-068, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
@@ -1437,9 +1130,16 @@
      "trigger": "Returns to the board's landing screen",
      "provenance": "flow F145 step 12→13",
      "operation": "listPriceCalculationSequence"
+    },
+    {
+     "to": "BO-100",
+     "trigger": "Back to Venue Home",
+     "provenance": "moved to Venue Management 2 October 2026 (CHG-MOV-001); its board's hub ADM-068 stays on the console, so Venue Home is its venue-side way in",
+     "back": true
     }
    ]
   },
+  "notes": "**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: \"they are venue screens\"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys. Its board's hub ADM-068 stays on the console (DEC-207 (Chinmay, 2 October, batch 6): TICVAI staff maintain the country tax templates); this screen keeps that edge and is also reached from BO-100 Venue Home.",
   "density": "compact",
   "purposeNote": "The system can deterministically calculate the final payable amount using a governed and traceable sequence of commercial components.",
   "pattern": "configEditor",
@@ -1531,7 +1231,7 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-074",
+   "board": "wireframes/P08 Venue Management.dc.html#adm-074",
    "workshopBoard": "wireframes/WS97 Pricing   Revenue Management Board 3.dc.html#adm-074"
   },
   "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 47. 0 of 0 labels bound to a contract property; 7 of 43 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
@@ -1564,25 +1264,24 @@
    }
   ],
   "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
+   "code": "P08",
+   "audience": "staff",
    "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
    "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
+   "app": "venue-management-web",
+   "operator": "venue",
    "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
     "shell": "web",
     "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
+     "P12",
+     "P13",
+     "P16"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
     "decided": "10 September 2026"
    }
   }
@@ -1600,17 +1299,19 @@
    "page": 49
   },
   "implementation": {
-   "app": "ticvai-web",
+   "app": "venue-management-web",
    "route": "/commercial/currency-precision-rounding-monetary-rules-adm-075",
-   "component": "apps/ticvai-web/src/routes/commercial/CurrencyPrecisionRoundingMonetaryRules.tsx",
+   "component": "apps/venue-management-web/src/routes/commercial/CurrencyPrecisionRoundingMonetaryRules.tsx",
    "status": "notStarted"
   },
   "navigation": {
    "entryFrom": [
-    "ADM-068"
+    "ADM-068",
+    "BO-100"
    ],
    "exitTo": [
-    "ADM-068"
+    "ADM-068",
+    "BO-100"
    ],
    "inferred": false,
    "notes": "**Reached from ADM-068, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
@@ -1620,9 +1321,16 @@
      "trigger": "Returns to the board's landing screen",
      "provenance": "flow F145 step 14→15",
      "operation": "listCurrencyPrecisionRounding"
+    },
+    {
+     "to": "BO-100",
+     "trigger": "Back to Venue Home",
+     "provenance": "moved to Venue Management 2 October 2026 (CHG-MOV-001); its board's hub ADM-068 stays on the console, so Venue Home is its venue-side way in",
+     "back": true
     }
    ]
   },
+  "notes": "**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: \"they are venue screens\"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys. Its board's hub ADM-068 stays on the console (DEC-207 (Chinmay, 2 October, batch 6): TICVAI staff maintain the country tax templates); this screen keeps that edge and is also reached from BO-100 Venue Home.",
   "density": "compact",
   "purposeNote": "currency precision and rounding rules.",
   "pattern": "listDetail",
@@ -1716,7 +1424,7 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-075",
+   "board": "wireframes/P08 Venue Management.dc.html#adm-075",
    "workshopBoard": "wireframes/WS97 Pricing   Revenue Management Board 3.dc.html#adm-075"
   },
   "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 49. 0 of 1 labels bound to a contract property; 13 of 28 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
@@ -1753,25 +1461,24 @@
    }
   ],
   "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
+   "code": "P08",
+   "audience": "staff",
    "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
    "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
+   "app": "venue-management-web",
+   "operator": "venue",
    "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
     "shell": "web",
     "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
+     "P12",
+     "P13",
+     "P16"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
     "decided": "10 September 2026"
    }
   }
@@ -1789,17 +1496,19 @@
    "page": 50
   },
   "implementation": {
-   "app": "ticvai-web",
+   "app": "venue-management-web",
    "route": "/commercial/price-breakdown-calculation-simulation-explainability-adm-076",
-   "component": "apps/ticvai-web/src/routes/commercial/PriceBreakdownCalculationSimulationExplainabilit.tsx",
+   "component": "apps/venue-management-web/src/routes/commercial/PriceBreakdownCalculationSimulationExplainabilit.tsx",
    "status": "notStarted"
   },
   "navigation": {
    "entryFrom": [
-    "ADM-068"
+    "ADM-068",
+    "BO-100"
    ],
    "exitTo": [
-    "ADM-068"
+    "ADM-068",
+    "BO-100"
    ],
    "inferred": false,
    "notes": "**Reached from ADM-068, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
@@ -1809,9 +1518,16 @@
      "trigger": "Returns to the board's landing screen",
      "provenance": "flow F145 step 16→17",
      "operation": "simulatePriceBreakdownCalculation"
+    },
+    {
+     "to": "BO-100",
+     "trigger": "Back to Venue Home",
+     "provenance": "moved to Venue Management 2 October 2026 (CHG-MOV-001); its board's hub ADM-068 stays on the console, so Venue Home is its venue-side way in",
+     "back": true
     }
    ]
   },
+  "notes": "**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: \"they are venue screens\"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys. Its board's hub ADM-068 stays on the console (DEC-207 (Chinmay, 2 October, batch 6): TICVAI staff maintain the country tax templates); this screen keeps that edge and is also reached from BO-100 Venue Home.",
   "density": "compact",
   "purposeNote": "Authorized users can reproduce and explain every monetary component contributing to the final payable amount before configuration goes live.",
   "pattern": "configEditor",
@@ -1921,30 +1637,36 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-076",
+   "board": "wireframes/P08 Venue Management.dc.html#adm-076",
    "workshopBoard": "wireframes/WS97 Pricing   Revenue Management Board 3.dc.html#adm-076"
   },
   "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 50. 0 of 0 labels bound to a contract property; 13 of 39 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-027): simulatePriceBreakdownCalculation is a PUT with no read of the calculation sequence it explains.",
+    "source": "contracts/spine/catalogue.yaml#simulatePriceBreakdownCalculation | screens/P08-venue-back-office.yaml#ADM-076"
+   }
+  ],
   "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
+   "code": "P08",
+   "audience": "staff",
    "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
    "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
+   "app": "venue-management-web",
+   "operator": "venue",
    "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
     "shell": "web",
     "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
+     "P12",
+     "P13",
+     "P16"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
     "decided": "10 September 2026"
    }
   }
@@ -1962,21 +1684,37 @@
    "page": 52
   },
   "implementation": {
-   "app": "ticvai-web",
+   "app": "venue-management-web",
    "route": "/commercial/calculation-validation-reconciliation-service-interface-adm-077",
-   "component": "apps/ticvai-web/src/routes/commercial/CalculationValidationReconciliationServiceInterf.tsx",
+   "component": "apps/venue-management-web/src/routes/commercial/CalculationValidationReconciliationServiceInterf.tsx",
    "status": "notStarted"
   },
   "navigation": {
    "entryFrom": [
-    "ADM-068"
+    "ADM-068",
+    "BO-100"
    ],
    "exitTo": [
-    "ADM-068"
+    "ADM-068",
+    "BO-100"
    ],
    "inferred": false,
-   "notes": "**Reached from ADM-068, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
+   "notes": "**Reached from ADM-068, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "BO-100",
+     "trigger": "Back to Venue Home",
+     "provenance": "moved to Venue Management 2 October 2026 (CHG-MOV-001); its board's hub ADM-068 stays on the console, so Venue Home is its venue-side way in",
+     "back": true
+    },
+    {
+     "to": "ADM-068",
+     "trigger": "Tax, Fee & Calculation Command Center",
+     "provenance": "derived — ADM-068 declares entryState.params tenantId and ADM-077 holds none of them. The edge carries nothing: ADM-077 is opened from ADM-068, so this edge is the way back and ADM-068 keeps its own state"
+    }
+   ]
   },
+  "notes": "**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: \"they are venue screens\"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys. Its board's hub ADM-068 stays on the console (DEC-207 (Chinmay, 2 October, batch 6): TICVAI staff maintain the country tax templates); this screen keeps that edge and is also reached from BO-100 Venue Home.",
   "density": "compact",
   "purposeNote": "The calculation engine passes configured reconciliation and regression tests and exposes one authoritative calculation service to all TICVAI sales and operational modules. Board 3 — Final Screen Register # Backend Screen Core Responsibility 10.3. Calculation configuration Tax, Fee & Calculation Command Center 1 health 10.3. Tax Profile & Jurisdiction Configuration Tax master configuration 2 10.3. Tax Rule & Treatment Builder Tax applicability/calculation 3 10.3. Fee & Surcharge Library Reusable fee definitions 4 10.3. Fee Applicability & Charging Rule Builder Fee conditions 5 10.3. Fee Waiver,",
   "pattern": "listDetail",
@@ -2067,30 +1805,29 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-077",
+   "board": "wireframes/P08 Venue Management.dc.html#adm-077",
    "workshopBoard": "wireframes/WS97 Pricing   Revenue Management Board 3.dc.html#adm-077"
   },
   "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 52. 0 of 0 labels bound to a contract property; 0 of 121 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
+   "code": "P08",
+   "audience": "staff",
    "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
    "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
+   "app": "venue-management-web",
+   "operator": "venue",
    "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
     "shell": "web",
     "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
+     "P12",
+     "P13",
+     "P16"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
     "decided": "10 September 2026"
    }
   }

@@ -1,4 +1,91 @@
 {
+ "CreateDashboardRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "name",
+   "module",
+   "tiles"
+  ],
+  "properties": {
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "module": {
+    "$ref": "../shared/common.yaml#/components/schemas/ModuleKey",
+    "description": "**Which module this dashboard belongs to, and therefore who may see it.** Added 22 September for the command centre: one shell that shows each login the dashboards of the modules it is entitled to. **A dashboard with no module could not be placed in that shell at all** — the field the whole design hangs on did not exist.\n**Required, and `core` is the answer for a dashboard that belongs to no optional module.** An empty field and *belongs everywhere* look identical, and only one of them is a decision — the rule `ModuleKey` already states for screens.\n**Creating one is gated twice**, by `REPORT_MANAGE` and by the module: a principal cannot build a dashboard for a module the tenant has not licensed or that the principal holds no permission in. The server refuses with `409`; a client that hides the option has not enforced anything.\n"
+   },
+   "description": {
+    "type": "string",
+    "maxLength": 1000
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "Narrows every tile to one venue. Omitting it shows each viewer everything their own scope permits — it can never show a viewer beyond that. The same rule as `RunReportRequest.venueId`.\n"
+   },
+   "isShared": {
+    "type": "boolean",
+    "default": false
+   },
+   "tiles": {
+    "type": "array",
+    "minItems": 1,
+    "maxItems": 24,
+    "items": {
+     "$ref": "#/components/schemas/DashboardTile"
+    }
+   }
+  }
+ },
+ "Dashboard": {
+  "x-ticvai-persistence": "reporting.dashboard + reporting.dashboard_tile",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/CreateDashboardRequest"
+   },
+   {
+    "type": "object",
+    "required": [
+     "id",
+     "ownerPrincipalId",
+     "aggregateCost",
+     "createdAt"
+    ],
+    "properties": {
+     "id": {
+      "type": "string",
+      "format": "uuid"
+     },
+     "ownerPrincipalId": {
+      "type": "string",
+      "format": "uuid"
+     },
+     "aggregateCost": {
+      "type": "string",
+      "enum": [
+       "low",
+       "medium",
+       "high"
+      ],
+      "description": "Combined refresh load of every tile."
+     },
+     "archivedAt": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true,
+      "readOnly": true,
+      "description": "**Set by `deleteDashboard`, which archives rather than removes.** A dashboard's tiles carry `visualisation`, `parameters` and `refresh_seconds` that somebody configured, and `reporting.dashboard_tile` cascades — so a hard delete takes an afternoon's work with it and leaves nothing to say what was there.\nArchived dashboards are excluded from `listDashboards` unless asked for with `includeArchived=true`.\n"
+     },
+     "createdAt": {
+      "type": "string",
+      "format": "date-time"
+     }
+    }
+   }
+  ]
+ },
  "FinCreditMemo": {
   "x-ticvai-persistence": "ledger.credit_memo + ledger.credit_memo_line",
   "type": "object",
@@ -93,9 +180,69 @@
    "taxAmountInLegalCurrency": {
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
+   "legalFxRate": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/FxRateValue"
+     }
+    ],
+    "nullable": true,
+    "readOnly": true,
+    "description": "The invoice's own `legalFxRate`, never today's (CHG-FIN-011)."
+   },
+   "invoiceSupplyValue": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "readOnly": true,
+    "description": "**The value of the supply shown on the tax invoice** (Executive Regulation Art. 60(1)(e)), adjusted by any earlier credit note on the same invoice. With `correctedSupplyValue` and `netAmount` (the difference) and `taxAmountInLegalCurrency` (the tax on the difference in AED), the four figures the law requires (CHG-FIN-011)."
+   },
+   "correctedSupplyValue": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "readOnly": true,
+    "description": "The correct value of the supply after this credit note (Art. 60(1)(e))."
+   },
+   "supplierName": {
+    "type": "string",
+    "readOnly": true,
+    "description": "Snapshot of the legal entity at issue, as on the invoice (Art. 60(1)(b))."
+   },
+   "supplierAddress": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true
+   },
+   "supplierTaxRegistrationNumber": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true
+   },
+   "buyerName": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The recipient as on the invoice; name, address and TRN where they are registered (Art. 60(1)(c))."
+   },
+   "buyerAddress": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true
+   },
+   "buyerTaxRegistrationNumber": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true
+   },
    "note": {
     "type": "string",
-    "nullable": true
+    "nullable": true,
+    "description": "The brief explanation of why the credit note was issued, printed on it (Art. 60(1)(f)); the reason's own wording when no note is given (CHG-FIN-011)."
    },
    "renditionAssetId": {
     "type": "string",
@@ -400,7 +547,64 @@
    },
    "taxAmountInLegalCurrency": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "The tax in the legal entity's currency (AED in the UAE) where the invoice currency differs, at the rate the orders were stored at."
+    "description": "The tax in the legal entity's currency (AED in the UAE) where the invoice currency differs. **In the UAE the converted amounts use the UAE Central Bank rate at the date of supply** (Decree-Law Art. 69) and the rate is printed (`legalFxRate`, Executive Regulation Art. 59(1)(k)); CHG-FIN-011."
+   },
+   "legalCurrency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$",
+    "readOnly": true,
+    "description": "The legal entity's currency (AED in the UAE), in which the law requires the tax and the gross amount (CHG-FIN-011)."
+   },
+   "grossAmountInLegalCurrency": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "readOnly": true,
+    "description": "The gross amount payable in the legal currency (Executive Regulation Art. 59(1)(j); for a simplified invoice the total consideration, Art. 59(2)(e)). Equal to `grossAmount` when the invoice is in the legal currency (CHG-FIN-011)."
+   },
+   "legalFxRate": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/FxRateValue"
+     }
+    ],
+    "nullable": true,
+    "readOnly": true,
+    "description": "Units of the legal currency per one unit of `currency`, printed with the tax where the invoice is not in the legal currency (Art. 59(1)(k)). Null when it is (CHG-FIN-011)."
+   },
+   "legalFxRateSource": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/FxRateSource"
+     }
+    ],
+    "nullable": true,
+    "readOnly": true,
+    "description": "`uaeCentralBank` for a UAE legal entity (Decree-Law Art. 69)."
+   },
+   "paidCurrency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$",
+    "nullable": true,
+    "readOnly": true,
+    "description": "Where the guest paid in a currency they selected (`orders.Order.chargeCurrency`, CHG-FIN-001), printed as payment information with `paidAmount` and the charge rate. The invoice itself is in the base currency, so the AED amounts the law requires are the invoice's own figures (CHG-FIN-011)."
+   },
+   "paidAmount": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "readOnly": true,
+    "description": "What the guest paid in `paidCurrency` (`orders.Order.chargeTotal`)."
+   },
+   "reverseChargeStatement": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "Where the recipient must account for the tax, the statement saying so and the Decree-Law provision (Art. 59(1)(l), Art. 48). Null otherwise (CHG-FIN-011)."
    },
    "creditedAmount": {
     "$ref": "../shared/common.yaml#/components/schemas/Money"
@@ -531,6 +735,15 @@
    },
    "creditedAmount": {
     "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "grossAmountInLegalCurrency": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "readOnly": true,
+    "description": "The amount payable for the line in the legal currency (AED), Executive Regulation Art. 59(1)(h); equal to `grossAmount` on an invoice in the legal currency (CHG-FIN-011)."
    }
   }
  },
@@ -546,12 +759,30 @@
  },
  "FinTaxInvoiceType": {
   "type": "string",
-  "description": "5.7.93. `simplified` for one order with no recipient details, `full` for one order with them, `consolidated` for several paid orders of one buyer on one invoice.",
+  "description": "5.7.93. `simplified` for one order with no recipient details, `full` for one order with them, `consolidated` for several paid orders of one buyer on one invoice.\n**When a simplified tax invoice is allowed in the UAE** (research 2 October 2026, CHG-FIN-011; Executive Regulation, Cabinet Decision 52 of 2017 as amended, Art. 59(5)): the recipient is not VAT-registered, or is registered and the consideration does not exceed AED 10,000, and the reverse charge does not apply. Otherwise the invoice is `full`. Both kinds carry the title \"Tax Invoice\" (Art. 59(1)(a), 59(2)(a)); a simplified one is issued on the date of supply (Art. 59(13)(1)), a full one within 14 days (Decree-Law Art. 67(1)).",
   "enum": [
    "simplified",
    "full",
    "consolidated"
   ]
+ },
+ "FxRateSource": {
+  "type": "string",
+  "description": "**Where the rate came from, and which provider specifically.** `source: provider` said a feed set it and not which one — two tenants on different feeds were indistinguishable in the ledger, and a rate cannot be defended in an audit without naming its origin.\n\n**`uaeCentralBank` is the default for AED pairs.** The UAE Central Bank publishes an official daily rate and it is what a UAE auditor expects to see — a commercial feed is defensible for tender and awkward for statutory reporting.\n\n**`openExchangeRates` and `ecb` are the commercial and reference options.** ECB publishes daily reference rates free and is the usual fallback for non-AED pairs; Open Exchange Rates is the common commercial feed with intraday granularity. **The choice is per purpose, not per platform** — a tender rate wants intraday, a reporting rate wants the official daily close.",
+  "enum": [
+   "manual",
+   "uaeCentralBank",
+   "ecb",
+   "openExchangeRates",
+   "cardScheme",
+   "provider"
+  ]
+ },
+ "FxRateValue": {
+  "x-ticvai-persistence-column": "numeric(18,6)",
+  "type": "string",
+  "pattern": "^\\d+(\\.\\d{1,6})?$",
+  "description": "**An exchange rate: a decimal string, never a float**, for the reason `Money.amount` is one (naming-and-style 5.1). Up to six decimal places — a two-place rate on a three-place currency loses money on every transaction, quietly — and stored as `numeric(18,6)` so the six places the wire carries survive the database.\n"
  },
  "KpiValue": {
   "type": "object",

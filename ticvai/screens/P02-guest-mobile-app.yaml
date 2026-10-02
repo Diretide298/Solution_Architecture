@@ -227,10 +227,9 @@ screens:
         edge into it carries them
     - to: GST-011
       trigger: Wallet Overview
-      carries:
-      - subjectId
-      provenance: derived — GST-011 declares entryState.params subjectId, walletId and GST-001 holds subjectId,
-        so an edge into it carries them
+      provenance: 'derived — GST-011 declares entryState.params cardCode, walletId and GST-001 holds none
+        of them. The edge carries nothing: cardCode only pre-selects (deep link or optional); GST-011
+        finds walletId (getWallet) itself, and GST-011 opens on its own'
     - to: GST-012
       trigger: My Tickets
       carries:
@@ -253,10 +252,10 @@ screens:
         so an edge into it carries them
     - to: GST-015
       trigger: Memberships
-      carries:
-      - subjectId
-      provenance: derived — GST-015 declares entryState.params caseId, guestLinkId, statementId, subjectId
-        and GST-001 holds subjectId, so an edge into it carries them
+      provenance: 'derived — GST-015 declares entryState.params caseId, guestLinkId, statementId and GST-001
+        holds none of them. The edge carries nothing: guestLinkId only pre-selects (deep link or optional);
+        GST-015 finds statementId (listBillingStatements) itself; GST-015 opens on listBillingStatements,
+        and caseId has no source on GST-015 yet (a gap in GST-015, not in this edge)'
     - to: GST-016
       trigger: My Reservations
       provenance: 'derived — GST-016 declares entryState.params reservationId and GST-001 holds none of
@@ -281,10 +280,9 @@ screens:
         holds orderId, so an edge into it carries them
     - to: GST-020
       trigger: Saved Items / Wishlist
-      carries:
-      - subjectId
-      provenance: derived — GST-020 declares entryState.params itemId, subjectId and GST-001 holds subjectId,
-        so an edge into it carries them
+      provenance: 'derived — GST-020 declares entryState.params itemId and GST-001 holds none of them.
+        The edge carries nothing: itemId only pre-selects (deep link or optional), and GST-020 opens on
+        its own'
     - to: GST-021
       trigger: Interactive Map
       provenance: 'derived — GST-021 declares entryState.params mapId and GST-001 holds none of them.
@@ -309,9 +307,8 @@ screens:
         edge into it carries them
     - to: GST-026
       trigger: Retail / Merchandise
-      provenance: 'derived — GST-026 declares entryState.params cardCode and GST-001 holds none of them.
-        The edge carries nothing: cardCode only pre-selects (deep link or optional), and GST-026 opens
-        on its own'
+      provenance: 'derived — GST-026 declares entryState.params  and GST-001 holds none of them. The edge
+        carries nothing: GST-026 needs nothing to open'
     - to: GST-027
       trigger: Parking – Reserve & Pay
       carries:
@@ -320,9 +317,9 @@ screens:
         so an edge into it carries them
     - to: GST-031
       trigger: AI Concierge – Home
-      provenance: 'derived — GST-031 declares entryState.params conversationId, outletId and GST-001 holds
-        none of them. The edge carries nothing: conversationId, outletId only pre-select (deep link or
-        optional), and GST-031 opens on its own'
+      provenance: 'derived — GST-031 declares entryState.params conversationId, messageId, outletId and
+        GST-001 holds none of them. The edge carries nothing: conversationId, outletId, messageId only
+        pre-select (deep link or optional), and GST-031 opens on its own'
     - to: GST-032
       trigger: AI Concierge – Chat
       carries:
@@ -331,15 +328,14 @@ screens:
         GST-001 holds orderId, so an edge into it carries them
     - to: GST-033
       trigger: AI Concierge – Contextual Help
-      provenance: 'derived — GST-033 declares entryState.params conversationId and GST-001 holds none
-        of them. The edge carries nothing: conversationId only pre-selects (deep link or optional), and
-        GST-033 opens on its own'
+      provenance: 'derived — GST-033 declares entryState.params conversationId, messageId and GST-001
+        holds none of them. The edge carries nothing: conversationId, messageId only pre-select (deep
+        link or optional), and GST-033 opens on its own'
     - to: GST-034
       trigger: Lost & Found
-      carries:
-      - orderId
-      provenance: derived — GST-034 declares entryState.params caseId, orderId and GST-001 holds orderId,
-        so an edge into it carries them
+      provenance: 'derived — GST-034 declares entryState.params caseId and GST-001 holds none of them.
+        The edge carries nothing: caseId only pre-selects (deep link or optional), and GST-034 opens on
+        its own'
     - to: GST-037
       trigger: Offers & Promotions
       provenance: 'derived — GST-037 declares entryState.params code, promotionId and GST-001 holds none
@@ -406,9 +402,9 @@ screens:
         on getWaitTimes, and planId has no source on GST-059 yet (a gap in GST-059, not in this edge)'
     - to: GST-061
       trigger: Menu Item Detail
-      provenance: 'derived — GST-061 declares entryState.params outletId and GST-001 holds none of them.
-        The edge carries nothing: outletId only pre-selects (deep link or optional), and GST-061 opens
-        on its own'
+      provenance: 'derived — GST-061 declares entryState.params menuItemId, outletId and GST-001 holds
+        none of them. The edge carries nothing: outletId, menuItemId only pre-select (deep link or optional),
+        and GST-061 opens on its own'
     - to: GST-070
       trigger: Reserve a Table
       provenance: 'derived — GST-070 declares entryState.params entryId, reservationId and GST-001 holds
@@ -609,7 +605,8 @@ screens:
         operation: listProducts
         notes: The number of items per type the venue chose (`HomepageLayout.sections[].maxItems`, set
           on CMS-007; DEC-152); a highlight opens Item Detail.
-        provenance: corrected 2 October 2026 (CHG-SGU-009, decided by Chinmay 2 October 2026, DEC-152, DEC-153)
+        provenance: corrected 2 October 2026 (CHG-SGU-009, decided by Chinmay 2 October 2026, DEC-152,
+          DEC-153)
     - name: contextPanel
       slot: selection
       components:
@@ -975,6 +972,13 @@ screens:
     - to: GST-056
       trigger: Book a bundle (e.g. meal combo with admission)
       provenance: decided 29 September 2026, MOB-2, MOB-4
+    - to: BO-005
+      trigger: A supervisor sees the queue building
+      provenance: flow F21 step 2→3
+      crossesDevice: true
+      back: false
+      carries:
+      - queueId
   notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement. **Cross-platform navigation
     removed 24 August**: BO-005. **A till does not navigate to a back office and a guest app does not
@@ -2310,12 +2314,14 @@ screens:
   navigation:
     entryFrom:
     - GST-001
+    - GST-027
     - GST-041
     inferred: true
     exitTo:
     - GST-001
     - GST-002
     - GST-010
+    - GST-028
     fromFlows: true
     transitions:
     - to: GST-001
@@ -2323,6 +2329,11 @@ screens:
       provenance: 'derived — GST-001 declares entryState.params  and GST-009 holds none of them. The edge
         carries nothing: GST-009 is opened from GST-001, so this edge is the way back and GST-001 keeps
         its own state'
+    - to: GST-010
+      trigger: 'Paid: the booking confirmation'
+      provenance: corrected 2 October 2026 (CHG-SGU-020, design-notes correction)
+      carries:
+      - orderId
     - to: BO-020
       trigger: Kitchen accepts and prepares
       provenance: flow F11 step 4→5
@@ -2331,9 +2342,11 @@ screens:
       back: false
       carries:
       - orderId
-    - to: GST-010
-      trigger: 'Paid: the booking confirmation'
-      provenance: corrected 2 October 2026 (CHG-SGU-020, design-notes correction)
+    - to: GST-028
+      trigger: It is confirmed with a facility
+      provenance: flow F50 step 2→3
+      carries:
+      - orderId
   notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement. **`createPayment` added
     18 August** — the guest app''s payment screen did not declare the operation that takes a payment,
@@ -2776,8 +2789,12 @@ screens:
     - to: GST-020
       trigger: Saved items carry across sessions
       provenance: flow F53 step 4→5
-      carries:
-      - subjectId
+    - to: BO-395
+      trigger: Machine records the play
+      provenance: flow F18 step 2→3
+      operation: getGameCard
+      crossesDevice: true
+      back: false
   notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
   density: comfortable
@@ -2836,7 +2853,8 @@ screens:
         - GameCard.lastPlayedAt
         - GameCard.expiresAt
         operation: getGameCard
-        notes: An arcade card's balance, read by its code, as the web wallet WEB-021 shows it (flow F18 step 2; CHG-CLN-006).
+        notes: An arcade card's balance, read by its code, as the web wallet WEB-021 shows it (flow F18
+          step 2; CHG-CLN-006).
         provenance: contract games.yaml GET /game-cards/{cardCode}
   states:
     loading: The wallet overview list.
@@ -4684,6 +4702,12 @@ screens:
       provenance: 'derived — GST-001 declares entryState.params  and GST-021 holds none of them. The edge
         carries nothing: GST-021 is opened from GST-001, so this edge is the way back and GST-001 keeps
         its own state'
+    - to: BO-096
+      trigger: The attendant checks what is free for the requested window
+      provenance: flow F25 step 1→2
+      operation: getVenueMap
+      crossesDevice: true
+      back: false
   notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement. **Wired to the venue
     map 18 August (CF-123).** The whole map arrives in one call and the client filters locally — which
@@ -5176,7 +5200,7 @@ screens:
         carries nothing: GST-024 is opened from GST-001, so this edge is the way back and GST-001 keeps
         its own state'
     - to: GST-009
-      trigger: Pays
+      trigger: Pays for the food order on its own
       provenance: flow F11 step 3→4
       operation: createGuestFnbOrder
       carries:
@@ -5285,14 +5309,14 @@ screens:
       - kind: banner
         label: Needs an admission ticket
         operation: createGuestFnbOrder
-        notes: "**Where the outlet is (decided by Chinmay, 2 October 2026; DEC-070, DEC-206).** An outlet
+        notes: '**Where the outlet is (decided by Chinmay, 2 October 2026; DEC-070, DEC-206).** An outlet
           is *Inside the venue (needs an admission ticket)* or *Standalone (no ticket)* (`Outlet.admissionContext`).
           Ordering from an inside-the-venue outlet needs admission: a ticket, or a location claimed inside
           the venue; `createGuestFnbOrder` refuses 403 `entry-ticket-required` otherwise, and the screen
           says so and offers the tickets. A standalone restaurant sells takeaway and delivery without
-          a ticket. **F&B keeps its own payment step and its own receipt** (DEC-071, DEC-052): DI-293's
+          a ticket. **F&B keeps its own payment step and its own receipt** (DEC-071, DEC-052): DI-293''s
           one cart and one receipt does not apply to F&B, so the food order is paid on its own pay step
-          and its receipt does not join the guest's ticket receipt (CHG-SGU-001)."
+          and its receipt does not join the guest''s ticket receipt (CHG-SGU-001).'
         provenance: corrected 2 October 2026 (CHG-SGU-001, decided by Chinmay 2 October 2026, DEC-070/071/052/206)
     - name: actionBar
       slot: rowActions
@@ -5546,6 +5570,12 @@ screens:
       back: false
       carries:
       - merchandiseId
+    - to: GST-041
+      trigger: Checkout Entry
+      carries:
+      - performanceId
+      provenance: derived — GST-041 declares entryState.params holdId, lineId, performanceId, productId
+        and GST-026 holds performanceId, so an edge into it carries them
   notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement. **Cross-platform navigation
     removed 24 August**: BO-048, BO-069. **Buying to collect goes through the cart** (decided 28 September,
@@ -5692,8 +5722,8 @@ screens:
   - id: formReserveMerchandise
     component: modal
     trigger: Reserve merchandise
-    body: 'The item and quantity, held to pay for at the shop until the end of the visit day (R169). No
-      ids are asked.'
+    body: The item and quantity, held to pay for at the shop until the end of the visit day (R169). No
+      ids are asked.
     confirm:
       label: Reserve merchandise
       operation: reserveMerchandise
@@ -5709,8 +5739,8 @@ screens:
   - id: formAddCartLine
     component: modal
     trigger: Add to basket
-    body: 'The item and quantity (a size switches between sibling items); collection point or home delivery
-      is chosen at checkout. No variant, performance or seat ids are asked.'
+    body: The item and quantity (a size switches between sibling items); collection point or home delivery
+      is chosen at checkout. No variant, performance or seat ids are asked.
     bindsTo: AddCartLineRequest
     confirm:
       label: Add to basket
@@ -5743,6 +5773,7 @@ screens:
     exitTo:
     - GST-001
     - GST-002
+    - GST-009
     - GST-028
     transitions:
     - to: GST-001
@@ -5755,6 +5786,12 @@ screens:
       provenance: flow F50 step 2→3
       carries:
       - orderId
+    - to: GST-009
+      trigger: They pay in the basket, and the parking entitlement is issued (R166;
+      provenance: flow F50 step 1→2
+      operation: addCartLine
+      carries:
+      - token
   notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement. **`createParkingEntitlement`
     is declared `service` audience and this is a guest screen.** Either the guest calls it — in which
@@ -5934,6 +5971,7 @@ screens:
   navigation:
     entryFrom:
     - GST-001
+    - GST-009
     - GST-027
     inferred: true
     exitTo:
@@ -6206,8 +6244,9 @@ screens:
         its own state'
     - to: GST-031
       trigger: AI Concierge – Home
-      provenance: derived — GST-031 declares entryState.params conversationId, outletId and GST-030 holds
-        outletId, so an edge into it carries them
+      provenance: 'derived — GST-031 declares entryState.params conversationId, messageId, outletId and
+        GST-030 holds none of them. The edge carries nothing: conversationId, outletId, messageId only
+        pre-select (deep link or optional), and GST-031 opens on its own'
   notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement. **Back in the first
     release** (decided 29 September, rev 3 GAP-C1): the notifications feed is needed in the first release,
@@ -6318,8 +6357,9 @@ screens:
       trigger: AI Concierge – Chat
       carries:
       - conversationId
+      - messageId
       provenance: derived — GST-032 declares entryState.params conversationId, messageId, orderId and
-        GST-031 holds conversationId, so an edge into it carries them
+        GST-031 holds conversationId, messageId, so an edge into it carries them
   notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement. **Guest concierge confirmed
     in Phase 1 on 17 August (CF-14), charged per token and bounded by `AiPolicy.guestCapabilityScope`.**
@@ -6332,8 +6372,8 @@ screens:
     is on (default), otherwise a plain button (CFG-5).'
   density: comfortable
   pattern: statusTracker
-  patternReason: 'The conversation and its state (thinking, answered, handed to a person) are the content;
-    the menu is only a shortcut (design-notes correction ai, CHG-SGU-016)'
+  patternReason: The conversation and its state (thinking, answered, handed to a person) are the content;
+    the menu is only a shortcut (design-notes correction ai, CHG-SGU-016)
   purpose: Ask, and be answered or handed to a person.
   layout:
     template: detail
@@ -6344,10 +6384,10 @@ screens:
       - kind: assistantPanel
         label: Ask Sahli
         operation: sendAiMessage
-        notes: "**The conversation is the content.** The question shows at once and the answer streams
-          with its sources; on 503 (every provider failed) \"Sahli can't answer right now\" with Hand
-          over to a person and Try again. The conversation is opened silently (`createAiConversation`)
-          on the first message, its scope taken from the session; the guest never picks a module."
+        notes: '**The conversation is the content.** The question shows at once and the answer streams
+          with its sources; on 503 (every provider failed) "Sahli can''t answer right now" with Hand over
+          to a person and Try again. The conversation is opened silently (`createAiConversation`) on the
+          first message, its scope taken from the session; the guest never picks a module.'
         provenance: corrected 2 October 2026 (CHG-SGU-016, design-notes correction)
       - kind: textField
         label: Your question
@@ -6505,13 +6545,17 @@ screens:
       trigger: AI Concierge – Contextual Help
       carries:
       - conversationId
-      provenance: derived — GST-033 declares entryState.params conversationId and GST-032 holds conversationId,
-        so an edge into it carries them
-  notes: "States derived from the screen pattern on 17 August, not individually considered. Purpose derived
+      - messageId
+      provenance: derived — GST-033 declares entryState.params conversationId, messageId and GST-032 holds
+        conversationId, messageId, so an edge into it carries them
+  notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement. **Guest concierge confirmed
     in Phase 1 on 17 August (CF-14), charged per token and bounded by `AiPolicy.guestCapabilityScope`.**
-    Still degrades to the manual planner rather than to an error.\n\nThe chat design itself was deferred
-    to the AI workshop (DI-195); this screen keeps the operations it needs until then (CHG-SGU-020)."
+    Still degrades to the manual planner rather than to an error.
+
+
+    The chat design itself was deferred to the AI workshop (DI-195); this screen keeps the operations
+    it needs until then (CHG-SGU-020).'
   density: comfortable
   pattern: statusTracker
   patternReason: '`getGuestOrderStatus` reads one record and nothing reads a population — the screen is
@@ -6823,7 +6867,7 @@ screens:
         provenance: corrected 2 October 2026 (CHG-SGU-016, design-notes correction)
   states:
     loading: 'Sahli is thinking: a typing indicator under the question.'
-    error: "Sahli can't answer right now (every provider failed): Hand over to a person and Try again."
+    error: 'Sahli can''t answer right now (every provider failed): Hand over to a person and Try again.'
     emptyFirstRun: 'No question yet: the sheet opens with the ask box and two starter questions about
       the screen behind it.'
     emptyNoAccess: '**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission`
@@ -7063,8 +7107,8 @@ screens:
   - id: formRaiseMyCase
     component: modal
     trigger: Raise my case
-    body: 'Raises the case (`raiseMyCase`, kind lost property) and records the lost item (`recordLostItem`,
-      foundOrLost lost, caseId) in the same act; the guest fills one form.'
+    body: Raises the case (`raiseMyCase`, kind lost property) and records the lost item (`recordLostItem`,
+      foundOrLost lost, caseId) in the same act; the guest fills one form.
     confirm:
       label: Raise my case
       operation: raiseMyCase
@@ -8284,6 +8328,10 @@ screens:
     - to: GST-009
       trigger: Checkout
       provenance: corrected 2 October 2026 (CHG-SGU-020, design-notes correction)
+      carries:
+      - orderId
+      - paymentId
+      - token
   notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement. **Promo code added 28
     September** (decided 28 September, audit R073 (e)) — the web cart WEB-010 has the field, and the two
@@ -9058,7 +9106,8 @@ screens:
         - FxRate.fetchedAt
         - FxRate.chargeable
         operation: listFxRates
-        provenance: decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3); currency choice CHG-FIN-001
+        provenance: decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3); currency choice
+          CHG-FIN-001
         notes: 'Fixed by the screen: the venue from Home, as at now, purpose tender. A guest never chooses
           a purpose: that would let them browse internal treasury rates. Was the generated table ''Every
           FX rate''; staff and plumbing columns removed (decided by Chinmay, fix before Block A starts,
@@ -9513,10 +9562,10 @@ screens:
         - AiRecommendationItem.rank
         operation: decideRecommendations
         provenance: corrected 2 October 2026 (CHG-SGU-016, design-notes correction)
-        notes: "The engine's slot (`decideRecommendations`, placement cart, maxItems 3: the client set
+        notes: 'The engine''s slot (`decideRecommendations`, placement cart, maxItems 3: the client set
           at most three, DI-959), answered in Block A from the Promotions relationship map (ADR-0052).
           Each card shows the price from Pricing and the template reason; impressions and clicks go to
-          `recordRecommendationEvents`."
+          `recordRecommendationEvents`.'
     - name: actionBar
       slot: rowActions
       components:
@@ -9631,9 +9680,14 @@ screens:
     - to: GST-008
       trigger: Continue to add-ons
       provenance: corrected 2 October 2026 (CHG-SGU-020, design-notes correction)
+      carries:
+      - performanceId
     - to: GST-041
       trigger: Go to basket
       provenance: corrected 2 October 2026 (CHG-SGU-020, design-notes correction)
+      carries:
+      - holdId
+      - performanceId
   notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement. **Drawn 26 August**
     — `Seat Board 4.dc.html` frame `seat-4a`. **The frame names this screen on its own face**, which is
@@ -10045,9 +10099,9 @@ screens:
     `retailTags`, `VisitPlan.unmatchedPreferences`.
 
 
-    **In the first release (Block A, wave 1), stated plainly (CHG-SGU-021).** The R187 note that put the planner
-    out of the first release (wave 4) was superseded by rev 3 (29 September); the Plan tab is in the Block
-    A slice.'
+    **In the first release (Block A, wave 1), stated plainly (CHG-SGU-021).** The R187 note that put the
+    planner out of the first release (wave 4) was superseded by rev 3 (29 September); the Plan tab is
+    in the Block A slice.'
   density: comfortable
   pattern: multiStepForm
   patternReason: The v4 prototype asks six questions one at a time (who, heights, days, pace, likes, food)
@@ -11602,6 +11656,8 @@ screens:
     - to: GST-024
       trigger: Back to the menu
       provenance: corrected 2 October 2026 (CHG-SGU-018, design-notes correction)
+      carries:
+      - outletId
     - to: GST-041
       trigger: Add and view the basket
       provenance: corrected 2 October 2026 (CHG-SGU-018, design-notes correction)
@@ -11615,7 +11671,7 @@ screens:
     & modifiers* toggle is dropped.'
   density: comfortable
   pattern: listDetail
-  patternReason: 'One dish from the outlet''s guest menu, with its modifiers and allergens (CHG-SGU-018)'
+  patternReason: One dish from the outlet's guest menu, with its modifiers and allergens (CHG-SGU-018)
   purpose: Decide on a dish, choose modifiers, check allergens.
   layout:
     template: split
@@ -11646,10 +11702,10 @@ screens:
         - GuestMenu.sections
         operation: getGuestMenu
         provenance: corrected 2 October 2026 (CHG-SGU-018, design-notes correction)
-        notes: "The dish `menuItemId` resolved inside the outlet's `getGuestMenu`: photo, name, description,
+        notes: 'The dish `menuItemId` resolved inside the outlet''s `getGuestMenu`: photo, name, description,
           price, its modifier groups (min and max per group) and allergens. Until the guest menu carries
-          the Allergen object, \"Contains\" is drawn from the current list and \"May contain\" and the
-          diet badges (vegetarian, vegan, halal) are drawn as pending (CHG-SGU-024)."
+          the Allergen object, "Contains" is drawn from the current list and "May contain" and the diet
+          badges (vegetarian, vegan, halal) are drawn as pending (CHG-SGU-024).'
   states:
     loading: Item skeleton
     error: Item unavailable, with a route back to the menu
@@ -11735,6 +11791,14 @@ screens:
       provenance: 'derived — GST-001 declares entryState.params  and GST-062 holds none of them. The edge
         carries nothing: GST-062 is opened from GST-001, so this edge is the way back and GST-001 keeps
         its own state'
+    - to: POS-012
+      trigger: Collected on the way out, at the exit desk
+      provenance: flow F17 step 4→5, F51 step 3→4
+      operation: lookupShopAndDrop
+      crossesDevice: true
+      back: false
+      carries:
+      - orderId
   notes: 4.4.7. Claimed by the entitlement the guest is already carrying, not a paper slip.
   density: comfortable
   pattern: statusTracker
@@ -12467,6 +12531,8 @@ screens:
     params:
     - name: subjectId
       from: session
+    - name: caseId
+      from: navigation
     coldEntry: '**Resolves from the session.** A guest arriving cold is asked to sign in and returned
       here afterwards — never a 404, and never a screen that silently shows somebody else''s data (ADR-0030).'
     preloaded:
@@ -12861,10 +12927,10 @@ screens:
   - id: formCreateTableReservation
     component: modal
     trigger: Reserve
-    body: 'Restaurant, date, time and party size on one screen; an optional note for allergies or requests;
+    body: Restaurant, date, time and party size on one screen; an optional note for allergies or requests;
       optional seating preference (`seatingPreference`) and occasion (`occasion`), fields on the booking
       since 2 October (DEC-204). Name and contact come from the profile. Nothing the server or staff set
-      is asked (id, status, tables, group, actual party size, table visit).'
+      is asked (id, status, tables, group, actual party size, table visit).
     bindsTo: TableReservation
     confirm:
       label: Reserve
@@ -12890,8 +12956,8 @@ screens:
   - id: formUpdateTableReservation
     component: modal
     trigger: Change or cancel
-    body: 'Party size and time only; the restaurant is fixed. With a per-guest deposit, the difference
-      or the release is stated before saving.'
+    body: Party size and time only; the restaurant is fixed. With a per-guest deposit, the difference
+      or the release is stated before saving.
     bindsTo: TableReservation
     confirm:
       label: Change or cancel
@@ -12917,8 +12983,8 @@ screens:
   - id: formJoinRestaurantWaitlist
     component: modal
     trigger: Join the waitlist
-    body: 'Party size and seating (Any, Indoor, Outdoor, Bar, Booth, High chair needed). Name and contact
-      come from the profile; id, status and times are the server''s.'
+    body: Party size and seating (Any, Indoor, Outdoor, Bar, Booth, High chair needed). Name and contact
+      come from the profile; id, status and times are the server's.
     bindsTo: RestaurantWaitlist
     confirm:
       label: Join the waitlist
@@ -13140,8 +13206,7 @@ screens:
   - id: formRedeemLoyaltyPoints
     component: modal
     trigger: Redeem loyalty points
-    body: 'The reward and the points to spend; the guest is the caller, so no subject or programme is
-      asked.'
+    body: The reward and the points to spend; the guest is the caller, so no subject or programme is asked.
     confirm:
       label: Redeem loyalty points
       operation: redeemLoyaltyPoints
@@ -14568,6 +14633,8 @@ screens:
       trigger: Sign in to see saved routes
       returnsTo: GST-079
       provenance: decided 29 September, rev 3 REV3-21
+      carries:
+      - subjectId
   notes: '**New 29 September** (decided 29 September, rev 3 REV3-21: transport ticketing is in scope —
     stations, routes, timetabled departures, one-way trips, multi-trip passes, favourite routes and a
     route map). **One-way:** From and To stations with a swap, the travel date (timetables are released

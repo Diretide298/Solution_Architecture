@@ -860,6 +860,13 @@
    "workshopBoard": "wireframes/WS135 Resource Management Configuration Board 10.dc.html#bo-946"
   },
   "apisNote": "Regenerated 9 September 2026 from Resource_Management_Configuration_Reference.pdf page 157. 0 of 0 labels bound to a contract property; 11 of 25 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-027): A read of resource demand forecasts against actual resource use; listDemandBookingCurve is the ticket booking curve.",
+    "source": "screens/P08-venue-back-office.yaml#BO-946"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1296,7 +1303,7 @@
   "states": {
    "loading": "The approval exception override list.",
    "error": "Could not load. Names which read failed and leaves the approval exception override untouched.",
-   "emptyFirstRun": "No approval exception override yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No approval exception override yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the approval exception override are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },

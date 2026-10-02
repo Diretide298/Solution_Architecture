@@ -39,99 +39,88 @@
     }
    ]
   },
-  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. **Sign in.** A shared device between shifts shows nothing until somebody identifies themselves. **Declared 20 August** — `isEntryPoint` existed in the schema and five platforms used none, so every screen in them read as unreachable. **Removed 24 August**: forceLogout, listActiveSessions, revokeAllSessions. **Bulk-attach residue** — the 18 August defect that put identical operation sets on unrelated screens. A till does not cancel a performance, a staff app does not create roles, and **a scanner does not run a cash shift.**",
+  "notes": "**Rebuilt as a sign-in form on 2 October 2026 (CHG-DOOR-002/003; Chinmay, 2 October 2026: fix the Block A blockers now).** It was generated as a list over active sessions, MFA methods and SSO providers with Force logout and Revoke all sessions on the door, which a person who is not yet signed in can never use (platform-foundation process notes). The sequence is the same on every staff and partner door: credentials (or the organisation's SSO) -> the authentication code only when a permission demands it (R135) -> the role prompt when several roles are held (ADR-0003) -> the landing. Managing sessions moved to the staff directory (BO-053); managing MFA methods stays on each app's own security or profile screen. On the handheld the role and venue prompt is EMP-002, which follows when several roles or venues are held; one of each goes straight to EMP-003. Enrolling a method happens on EMP-042, not at a shared device.",
   "density": "comfortable",
-  "pattern": "listDetail",
-  "patternReason": "`listMfaMethods` reads the population and `getCurrentSession` reads one of them — list, select, act",
-  "purpose": "Get an employee onto a shared device fast.",
-  "gaps": [
-   {
-    "operation": "listSsoProviders",
-    "why": "**1 declared operation reaches no component on this screen**: listSsoProviders. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
+  "pattern": "form",
+  "patternReason": "A sign-in on a shared handheld: number and PIN, the venue's SSO where it has one, the code only when a permission demands it - a form, not a list.",
+  "purpose": "Get an employee onto a shared handheld fast, and resolve the session every other screen of the staff app reads.",
   "layout": {
-   "template": "split",
+   "template": "form",
    "regions": [
     {
      "name": "contentBody",
-     "slot": "collection",
+     "slot": "form",
      "components": [
       {
-       "kind": "dataTable",
-       "label": "Every MFA method",
-       "bindsTo": "MfaMethod",
-       "columns": [
-        "MfaMethod.id",
-        "MfaMethod.kind",
-        "MfaMethod.label",
-        "MfaMethod.maskedTarget",
-        "MfaMethod.isActive",
-        "MfaMethod.isPrimary",
-        "MfaMethod.enrolledAt",
-        "MfaMethod.lastUsedAt"
-       ],
-       "operation": "listMfaMethods",
-       "provenance": "contract identity.yaml GET /auth/mfa/methods"
+       "kind": "textField",
+       "label": "Employee number or username",
+       "notes": "Goes into `LoginRequest.username`."
       },
       {
-       "kind": "dataTable",
-       "label": "Every SSO provider",
+       "kind": "textField",
+       "label": "PIN or password",
+       "notes": "Goes into `LoginRequest.credential`, `method: pin` on the handheld (bounded by the device's `workstationId`, which the device sends; CHG-DOOR-001) or `method: password` for a person with no PIN. Large keypad."
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Sign in",
+       "operation": "login",
+       "notes": "Sends `LoginRequest`. 409 means this person already holds a session elsewhere (audit R184): the screen says where and since when, and that only a holder of SESSION_FORCE_LOGOUT can end it; signing in never ends the other session.",
+       "provenance": "contract identity.yaml POST /auth/login"
+      },
+      {
+       "kind": "cardList",
+       "label": "Sign in with your organisation",
        "bindsTo": "SsoProvider",
        "columns": [
-        "SsoProvider.id",
         "SsoProvider.displayName",
         "SsoProvider.protocol",
-        "SsoProvider.iconAssetRef",
-        "SsoProvider.isEnforced",
-        "SsoProvider.scopePath"
+        "SsoProvider.isEnforced"
        ],
        "operation": "listSsoProviders",
+       "notes": "One button per identity provider the venue configured; **absent, not disabled, when there is none.** Read before sign-in, unauthenticated. When a provider `isEnforced` for this person, the password field is hidden and only this remains.",
        "provenance": "contract identity.yaml GET /auth/sso/providers"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Continue with your organisation",
+       "operation": "startSsoAuthorization",
+       "notes": "Hands off to the identity provider with this door's `redirectUri`; nothing is typed here. Staff and partner doors only, never a guest door (audit R167).",
+       "provenance": "contract identity.yaml GET /auth/sso/{providerId}/authorize"
+      },
+      {
+       "kind": "progressIndicator",
+       "label": "Finishing sign-in with your organisation",
+       "operation": "completeSsoAuthorization",
+       "notes": "On the provider's redirect back (`code` and `state` from the redirect, never typed). Returns the same `LoginResponse` as `login`, so the second factor and the role prompt follow exactly as below. 403: the provider proved who this is and no group maps to a role in this tenant, which grants nothing.",
+       "provenance": "contract identity.yaml POST /auth/sso/{providerId}/callback"
       }
      ]
     },
     {
-     "name": "contextPanel",
-     "slot": "selection",
+     "name": "secondFactor",
+     "slot": "form",
      "components": [
       {
-       "kind": "detailPanel",
-       "label": "The selected MFA method",
-       "bindsTo": "MfaMethod",
-       "columns": [
-        "MfaMethod.id",
-        "MfaMethod.kind",
-        "MfaMethod.label",
-        "MfaMethod.maskedTarget",
-        "MfaMethod.isActive",
-        "MfaMethod.isPrimary",
-        "MfaMethod.enrolledAt",
-        "MfaMethod.lastUsedAt"
-       ],
-       "operation": "listMfaMethods",
-       "provenance": "contract identity.yaml GET /auth/mfa/methods"
+       "kind": "textField",
+       "label": "Authentication code",
+       "operation": "verifyMfaChallenge",
+       "notes": "Shown only when the sign-in comes back `requiresMfa`: the person holds a permission in `PasswordPolicy.mfaRequiredForPermissions` (ROLE_MANAGE, LEDGER_APPROVE, every PLATFORM_* permission, or one the tenant added; audit R135). Six digits from the authenticator app.",
+       "provenance": "contract identity.yaml POST /auth/mfa/challenge/{challengeId}/verify"
       },
       {
-       "kind": "detailPanel",
-       "label": "The session",
-       "bindsTo": "Session",
-       "columns": [
-        "Session.sessionId",
-        "Session.principalId",
-        "Session.roleId",
-        "Session.displayName",
-        "Session.scope",
-        "Session.effectivePermissions",
-        "Session.permissionsByScope",
-        "Session.saleBoardId",
-        "Session.workstation",
-        "Session.openedAt",
-        "Session.expiresAt"
-       ],
-       "operation": "getCurrentSession",
-       "provenance": "contract identity.yaml GET /auth/session"
+       "kind": "primaryButton",
+       "label": "Verify",
+       "operation": "verifyMfaChallenge",
+       "notes": "Completes the sign-in; the session is usable only after it. Five wrong codes lock step-up for the policy's lockout minutes, never permanently (audit R126 (6)), and the screen says until when.",
+       "provenance": "contract identity.yaml POST /auth/mfa/challenge/{challengeId}/verify"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Email me a code instead",
+       "operation": "createMfaChallenge",
+       "notes": "`action: signIn`. The authenticator app is the primary method and an emailed code the fallback (audit R126 (5)).",
+       "provenance": "contract identity.yaml POST /auth/mfa/challenge"
       }
      ]
     },
@@ -140,78 +129,94 @@
      "slot": "rowActions",
      "components": [
       {
-       "kind": "primaryButton",
-       "label": "Login",
-       "operation": "login",
-       "provenance": "contract identity.yaml POST /auth/login"
+       "kind": "banner",
+       "label": "Signed in as",
+       "operation": "getCurrentSession",
+       "notes": "Read once the sign-in is complete (after the code and the role, where asked): the person's name and role, then straight on. One role and one venue go to EMP-003; several go to EMP-002 first.",
+       "provenance": "contract identity.yaml GET /auth/session"
       },
       {
        "kind": "textField",
-       "label": "Authentication code",
-       "operation": "verifyMfaChallenge",
-       "provenance": "contract identity.yaml POST /auth/mfa/challenge/{challengeId}/verify",
-       "notes": "Shown only in the mfaRequired state (audit R135)."
-      },
-      {
-       "kind": "primaryButton",
-       "label": "Verify",
-       "operation": "verifyMfaChallenge",
-       "provenance": "contract identity.yaml POST /auth/mfa/challenge/{challengeId}/verify"
+       "label": "New PIN",
+       "operation": "changeOwnCredential",
+       "notes": "Only when the PIN was reset and is temporary: a new one twice before anything else; the last five cannot be reused (audit R132).",
+       "provenance": "contract identity.yaml POST /auth/credential"
       },
       {
        "kind": "secondaryButton",
-       "label": "Email me a code instead",
-       "operation": "createMfaChallenge",
-       "provenance": "contract identity.yaml POST /auth/mfa/challenge",
-       "notes": "The fallback -- issues the challenge against the principal's email (`emailOtp`) method (audit R126 (5))."
+       "label": "Choose venue and role",
+       "operation": "selectRole",
+       "notes": "Shown when `LoginResponse.requiresRoleSelection` is true: a steward takes a venue and a role (ADR-0003; F64 step 1; design-notes correction platform-foundation EMP-001). EMP-002 is where the role is changed later.",
+       "provenance": "contract identity.yaml POST /auth/select-role"
       }
      ]
     }
    ]
   },
   "states": {
-   "loading": "The sign list.",
-   "error": "Could not load. Names which read failed and leaves the sign untouched.",
-   "emptyFirstRun": "No sign yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
-   "emptyNoResults": "Never shown: `listMfaMethods` takes no filter, so an empty list is always the first-run state above.",
-   "mfaRequired": "**Signed in, not yet through.** The principal holds a permission that requires MFA (ROLE_MANAGE, LEDGER_APPROVE, any platform-staff permission, or one the tenant added), so after `login` the screen calls `createMfaChallenge` and asks for the authenticator code; `verifyMfaChallenge` completes the sign-in. **Email me a code instead** is the fallback. Five wrong codes lock step-up for the policy's lockout minutes and the screen says so. A principal with no enrolled method is sent to enrol first (decided 28 September, audit R135, R126).",
-   "offline": "Signs in against the cached principal list. A technician in a basement still needs their tasks"
+   "loading": "Checking the credential. The form stays visible and disabled.",
+   "emptyFirstRun": "**Nobody signed in** - the normal state of a door. A shared handheld between shifts shows nothing until somebody identifies themselves.",
+   "error": "Identity could not be reached. **Says so rather than saying the password is wrong**, and keeps what was typed.",
+   "denied": "The credential does not match, or the account is locked. One message for both, with the attempts left before the lock; a locked account says when to try again.",
+   "emptyNoAccess": "Signed in, and the person holds no role in this app. Says who at the tenant grants access; distinct from a wrong password. A door has no permission of its own to name, because the person is not signed in until it succeeds.",
+   "emptyNoResults": "Never shown: `listSsoProviders` takes no filter; a tenant with no identity provider shows no SSO buttons at all, and the form is the whole door.",
+   "sessionHeld": "`login` answered 409: this person already holds a session elsewhere (audit R184, ADR-0004). Says where and since when; only a holder of SESSION_FORCE_LOGOUT ends it, on the staff directory (BO-053), and signing in never ends it by itself.",
+   "mfaRequired": "**Signed in, not yet through.** The principal holds a permission that requires MFA (ROLE_MANAGE, LEDGER_APPROVE, any PLATFORM_* permission, or one the tenant added), so the screen calls `createMfaChallenge` (`action: signIn`) and asks for the authentication code; `verifyMfaChallenge` completes the sign-in. **Email me a code instead** is the fallback. Five wrong codes lock step-up for the policy's lockout minutes and the screen says until when (audit R135, R126). A person without such a permission never reaches this state.",
+   "offline": "Signs in against the cached principal list from the last bundle; the status strip says offline. A steward at a gate at 08:00 still signs in."
   },
   "apis": [
    {
     "operationId": "login",
     "contract": "identity",
-    "purpose": "From the flow it appears in",
+    "purpose": "Authenticate at this handheld; the device sends its workstationId",
     "trigger": "onAction"
-   },
-   {
-    "operationId": "getCurrentSession",
-    "contract": "identity",
-    "purpose": "Current session and effective permissions",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "listMfaMethods",
-    "contract": "identity",
-    "purpose": "Enrolled MFA methods",
-    "trigger": "onLoad"
    },
    {
     "operationId": "listSsoProviders",
     "contract": "identity",
-    "purpose": "Identity providers configured for this tenant",
+    "purpose": "Which identity providers this door offers; unauthenticated, read before sign-in",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "startSsoAuthorization",
+    "contract": "identity",
+    "purpose": "Hand off to the identity provider where the tenant has SSO",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "completeSsoAuthorization",
+    "contract": "identity",
+    "purpose": "Exchange the provider's code for the same LoginResponse as login, on the redirect back",
+    "trigger": "background"
    },
    {
     "operationId": "createMfaChallenge",
     "contract": "identity",
-    "purpose": "Second factor after login when the principal holds a permission in mfaRequiredForPermissions; action `signIn`, the primary method (authenticator app), or the email method as the fallback (decided 28 September, audit R135, R126 (5))",
+    "purpose": "Second factor after sign-in when the principal holds a permission in mfaRequiredForPermissions; action `signIn`, the authenticator app, or the email method as the fallback (audit R135, R126 (5))",
     "trigger": "onAction"
    },
    {
     "operationId": "verifyMfaChallenge",
     "contract": "identity",
     "purpose": "Completes sign-in with the code; the session is usable only after it. Five wrong codes lock step-up (audit R126 (6))",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "changeOwnCredential",
+    "contract": "identity",
+    "purpose": "Replace a temporary password or PIN at the first sign-in after a reset (audit R132)",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "getCurrentSession",
+    "contract": "identity",
+    "purpose": "Read the session the sign-in just opened, for the landing",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "selectRole",
+    "contract": "identity",
+    "purpose": "Choose the venue and role to work as when login returns more than one (ADR-0003; F64 step 1)",
     "trigger": "onAction"
    }
   ],
@@ -220,47 +225,21 @@
     {
      "name": "challengeId",
      "from": "navigation"
+    },
+    {
+     "name": "providerId",
+     "from": "deepLink",
+     "optional": true
     }
    ],
-   "coldEntry": "Resolves from the session; a cold arrival is the ordinary case.",
-   "preloaded": [
-    "MfaMethod.id",
-    "MfaMethod.kind",
-    "MfaMethod.label",
-    "MfaMethod.maskedTarget",
-    "MfaMethod.isActive"
-   ]
+   "coldEntry": "**The only screen of the staff app that needs nothing.** The handheld's `workstationId` travels in the sign-in request from the device itself, not from a session (CHG-DOOR-001); `providerId` arrives only on an SSO redirect back."
   },
+  "apisNote": "Declared by hand on 2 October 2026 (CHG-DOOR-003): sign-in, the venue's SSO, the second factor, a temporary PIN's replacement and the session read. The role and venue prompt is EMP-002 (selectRole).",
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P06 Venue Staff App.dc.html#emp-001"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
-  "overlays": [
-   {
-    "id": "formLogin",
-    "component": "modal",
-    "trigger": "Login",
-    "body": "**Collects what `login` sends before it is called.** Required: `username`, `credential`, `workstationId`. Optional: `method`, `deviceFingerprint`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "LoginRequest",
-    "confirm": {
-     "label": "Login",
-     "operation": "login"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "username",
-      "credential",
-      "workstationId",
-      "method",
-      "deviceFingerprint"
-     ]
-    },
-    "provenance": "contract identity.yaml POST /auth/login"
-   }
-  ],
   "_platform": {
    "code": "P06",
    "audience": "staff",
@@ -312,7 +291,7 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-002 holds none of them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-002 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
     },
     {
      "to": "EMP-003",
@@ -332,80 +311,12 @@
     {
      "name": "contentBody",
      "slot": "collection",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every MFA method",
-       "bindsTo": "MfaMethod",
-       "columns": [
-        "MfaMethod.id",
-        "MfaMethod.kind",
-        "MfaMethod.label",
-        "MfaMethod.maskedTarget",
-        "MfaMethod.isActive",
-        "MfaMethod.isPrimary",
-        "MfaMethod.enrolledAt",
-        "MfaMethod.lastUsedAt"
-       ],
-       "operation": "listMfaMethods",
-       "provenance": "contract identity.yaml GET /auth/mfa/methods"
-      },
-      {
-       "kind": "dataTable",
-       "label": "Every SSO provider",
-       "bindsTo": "SsoProvider",
-       "columns": [
-        "SsoProvider.id",
-        "SsoProvider.displayName",
-        "SsoProvider.protocol",
-        "SsoProvider.iconAssetRef",
-        "SsoProvider.isEnforced",
-        "SsoProvider.scopePath"
-       ],
-       "operation": "listSsoProviders",
-       "provenance": "contract identity.yaml GET /auth/sso/providers"
-      },
-      {
-       "kind": "dataTable",
-       "label": "Every role",
-       "bindsTo": "Role",
-       "columns": [
-        "Role.id",
-        "Role.code",
-        "Role.name",
-        "Role.description",
-        "Role.permissions",
-        "Role.inheritsFromRoleId",
-        "Role.isSystem",
-        "Role.principalCount",
-        "Role.grantCount"
-       ],
-       "operation": "listRoles",
-       "provenance": "contract identity.yaml GET /roles"
-      }
-     ]
+     "components": []
     },
     {
      "name": "contextPanel",
      "slot": "selection",
      "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected MFA method",
-       "bindsTo": "MfaMethod",
-       "columns": [
-        "MfaMethod.id",
-        "MfaMethod.kind",
-        "MfaMethod.label",
-        "MfaMethod.maskedTarget",
-        "MfaMethod.isActive",
-        "MfaMethod.isPrimary",
-        "MfaMethod.enrolledAt",
-        "MfaMethod.lastUsedAt"
-       ],
-       "operation": "listMfaMethods",
-       "provenance": "contract identity.yaml GET /auth/mfa/methods"
-      },
       {
        "kind": "detailPanel",
        "label": "The session",
@@ -445,9 +356,9 @@
   "states": {
    "loading": "The select venue role list.",
    "error": "Could not load. Names which read failed and leaves the select venue role untouched.",
-   "emptyFirstRun": "No select venue role yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
-   "emptyNoResults": "Never shown: `listMfaMethods` takes no filter, so an empty list is always the first-run state above.",
-   "emptyNoAccess": "Shown when the caller lacks `ROLE_MANAGE`, which `listRoles` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "**One venue and one role**: nothing to choose, so the app goes straight on. Shown only when the person holds no role at any venue, and says who at the tenant grants one.",
+   "emptyNoResults": "Never shown: nothing on this screen filters its list, so an empty list is always the first-run state above.",
+   "emptyNoAccess": "Shown when the caller lacks the permission the screen requires, and names it. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "Cached from the last session"
   },
   "apis": [
@@ -461,24 +372,6 @@
     "operationId": "getCurrentSession",
     "contract": "identity",
     "purpose": "Current session and effective permissions",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "listMfaMethods",
-    "contract": "identity",
-    "purpose": "Enrolled MFA methods",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "listSsoProviders",
-    "contract": "identity",
-    "purpose": "Identity providers configured for this tenant",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "listRoles",
-    "contract": "identity",
-    "purpose": "Roles this principal may take",
     "trigger": "onLoad"
    }
   ],
@@ -521,6 +414,26 @@
      ]
     },
     "provenance": "contract identity.yaml POST /auth/select-role"
+   }
+  ],
+  "gaps": [
+   {
+    "operation": "listMfaMethods",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-021): Venue-and-role selection listed roles with listRoles (ROLE_MANAGE), which a steward never holds, and tables of MFA methods and SSO providers; the roles to choose from come from the login response (availableRoles) and selectRole takes the choice (design-notes correction platform-foundation EMP-002).",
+    "source": "screens/P06-staff-app.yaml#EMP-002 | ADR-0003"
+   },
+   {
+    "operation": "listRoles",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-021): Venue-and-role selection listed roles with listRoles (ROLE_MANAGE), which a steward never holds, and tables of MFA methods and SSO providers; the roles to choose from come from the login response (availableRoles) and selectRole takes the choice (design-notes correction platform-foundation EMP-002).",
+    "source": "screens/P06-staff-app.yaml#EMP-002 | ADR-0003"
+   },
+   {
+    "operation": "listSsoProviders",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-021): Venue-and-role selection listed roles with listRoles (ROLE_MANAGE), which a steward never holds, and tables of MFA methods and SSO providers; the roles to choose from come from the login response (availableRoles) and selectRole takes the choice (design-notes correction platform-foundation EMP-002).",
+    "source": "screens/P06-staff-app.yaml#EMP-002 | ADR-0003"
    }
   ],
   "_platform": {
@@ -623,7 +536,7 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-003 holds none of them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-003 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
@@ -643,7 +556,7 @@
     {
      "to": "EMP-053",
      "trigger": "Table & Seating Configuration",
-     "provenance": "derived — EMP-053 declares entryState.params outletId, tableId and EMP-003 holds none of them, so the edge carries nothing and EMP-053 opens cold"
+     "provenance": "derived — EMP-053 declares entryState.params outletId and EMP-003 holds none of them, so the edge carries nothing and EMP-053 opens cold"
     },
     {
      "to": "EMP-054",
@@ -653,7 +566,7 @@
     {
      "to": "EMP-055",
      "trigger": "Create / Edit Reservation",
-     "provenance": "derived — EMP-055 declares entryState.params  and EMP-003 holds none of them. The edge carries nothing: EMP-055 needs nothing to open"
+     "provenance": "derived — EMP-055 declares entryState.params outletId, reservationId and EMP-003 holds none of them. The edge carries nothing: EMP-055 finds reservationId (createTableReservationForGuest), outletId (getFnbReservationPolicy) itself, and EMP-055 opens on its own"
     },
     {
      "to": "EMP-056",
@@ -668,7 +581,7 @@
     {
      "to": "EMP-058",
      "trigger": "Live Table & Service Management",
-     "provenance": "derived — EMP-058 declares entryState.params entryId, reservationId, ticketId, visitId and EMP-003 holds none of them. The edge carries nothing: reservationId, entryId, ticketId only pre-select (deep link or optional); EMP-058 finds visitId (openTableVisit) itself, and EMP-058 opens on its own"
+     "provenance": "derived — EMP-058 declares entryState.params reservationId, ticketId, visitId and EMP-003 holds none of them. The edge carries nothing: reservationId, ticketId only pre-select (deep link or optional); EMP-058 finds visitId (openTableVisit) itself, and EMP-058 opens on its own"
     },
     {
      "to": "EMP-059",
@@ -688,7 +601,7 @@
     {
      "to": "EMP-062",
      "trigger": "Store Stock & SKU Availability",
-     "provenance": "derived — EMP-062 declares entryState.params itemId and EMP-003 holds none of them. The edge carries nothing: EMP-062 finds itemId (getStockPositions) itself, and EMP-062 opens on its own"
+     "provenance": "derived — EMP-062 declares entryState.params outletId and EMP-003 holds none of them. The edge carries nothing: EMP-062 finds outletId (lookupMerchandise) itself, and EMP-062 opens on its own"
     },
     {
      "to": "EMP-063",
@@ -708,7 +621,7 @@
     {
      "to": "EMP-066",
      "trigger": "Stock Count & Cycle Count Management",
-     "provenance": "derived — EMP-066 declares entryState.params countId and EMP-003 holds none of them. The edge carries nothing: EMP-066 finds countId (startStockCount) itself, and EMP-066 opens on its own"
+     "provenance": "derived — EMP-066 declares entryState.params countId and EMP-003 holds none of them. The edge carries nothing: EMP-066 opens on listStockCounts, and countId has no source on EMP-066 yet (a gap in EMP-066, not in this edge)"
     },
     {
      "to": "EMP-067",
@@ -718,7 +631,7 @@
     {
      "to": "EMP-068",
      "trigger": "Reservation, Allocation & Omnichannel Inventory",
-     "provenance": "derived — EMP-068 declares entryState.params outletId and EMP-003 holds none of them. The edge carries nothing: EMP-068 opens on getStockPositions, and outletId has no source on EMP-068 yet (a gap in EMP-068, not in this edge)"
+     "provenance": "derived — EMP-068 declares entryState.params outletId, reservationId and EMP-003 holds none of them. The edge carries nothing: EMP-068 opens on getStockPositions, and outletId, reservationId have no source on EMP-068 yet (a gap in EMP-068, not in this edge)"
     },
     {
      "to": "EMP-069",
@@ -853,7 +766,7 @@
     "EMP-091"
    ]
   },
-  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. **createCashMovement removed 18 August** — attached by module resemblance, not by what this screen does. A screen that does not handle money should not be able to move it (CF-87's class).",
+  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. **createCashMovement removed 18 August** — attached by module resemblance, not by what this screen does. A screen that does not handle money should not be able to move it (CF-87's class).\n\n**Blind close** (decided 2 October 2026, Chinmay; CHG-FIN-003): closing from here submits the cashier's blind count with `submitShiftCount` (no expected cash, no variance shown; the supervisor is alerted beyond the threshold); `closeShift`, which returns the expected figure, is the supervisor's path on BO-039 and BO-040.",
   "density": "comfortable",
   "pattern": "approvalInbox",
   "patternReason": "`approveShiftOpen` decides items that `listIncidents` queues — every row is waiting for a person, so the empty state is success",
@@ -906,48 +819,6 @@
        ],
        "operation": "listIncidents",
        "provenance": "contract maintenance.yaml GET /incidents"
-      },
-      {
-       "kind": "dataTable",
-       "label": "Every cash movement",
-       "bindsTo": "CashMovement",
-       "columns": [
-        "CashMovement.id",
-        "CashMovement.kind",
-        "CashMovement.amount",
-        "CashMovement.denominations",
-        "CashMovement.reference",
-        "CashMovement.reason",
-        "CashMovement.recordedAt",
-        "CashMovement.shiftId",
-        "CashMovement.depositBoxId",
-        "CashMovement.witnessPrincipalId",
-        "CashMovement.withdrawalReason",
-        "CashMovement.authorisedByPrincipalId"
-       ],
-       "operation": "listCashMovements",
-       "provenance": "contract shift.yaml GET /shifts/{shiftId}/cash-movements"
-      },
-      {
-       "kind": "dataTable",
-       "label": "Every shift",
-       "bindsTo": "Shift",
-       "columns": [
-        "Shift.id",
-        "Shift.workstationId",
-        "Shift.venueId",
-        "Shift.scopePath",
-        "Shift.principalId",
-        "Shift.principalDisplayName",
-        "Shift.incidents",
-        "Shift.status",
-        "Shift.currency",
-        "Shift.currencyScale",
-        "Shift.depositBoxCode",
-        "Shift.bagNumber"
-       ],
-       "operation": "listShifts",
-       "provenance": "contract shift.yaml GET /shifts"
       }
      ]
     },
@@ -1022,10 +893,7 @@
         "Shift.currencyScale",
         "Shift.depositBoxCode",
         "Shift.bagNumber",
-        "Shift.openingFloat",
-        "Shift.salesTotal",
-        "Shift.refundsTotal",
-        "Shift.liftsTotal"
+        "Shift.openingFloat"
        ],
        "operation": "getShift",
        "provenance": "contract shift.yaml GET /shifts/{shiftId}"
@@ -1047,13 +915,10 @@
         "Shift.currencyScale",
         "Shift.depositBoxCode",
         "Shift.bagNumber",
-        "Shift.openingFloat",
-        "Shift.salesTotal",
-        "Shift.refundsTotal",
-        "Shift.liftsTotal"
+        "Shift.openingFloat"
        ],
-       "operation": "getCurrentShift",
-       "provenance": "contract shift.yaml GET /shifts/current"
+       "operation": "getWorkstationShift",
+       "provenance": "contract shift.yaml GET /shifts/current/overview"
       }
      ]
     },
@@ -1062,30 +927,6 @@
      "slot": "decision",
      "components": [
       {
-       "kind": "primaryButton",
-       "label": "Accept shift variance",
-       "operation": "acceptShiftVariance",
-       "provenance": "contract shift.yaml POST /shifts/{shiftId}/accept-variance"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Approve shift open",
-       "operation": "approveShiftOpen",
-       "provenance": "contract shift.yaml POST /shifts/{shiftId}/approve-open"
-      },
-      {
-       "kind": "destructiveButton",
-       "label": "Close shift",
-       "operation": "closeShift",
-       "provenance": "contract shift.yaml POST /shifts/{shiftId}/close"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Open shift",
-       "operation": "openShift",
-       "provenance": "contract shift.yaml POST /shifts"
-      },
-      {
        "kind": "secondaryButton",
        "label": "Record authority notification",
        "operation": "recordAuthorityNotification",
@@ -1093,33 +934,9 @@
       },
       {
        "kind": "secondaryButton",
-       "label": "Record no sale",
-       "operation": "recordNoSale",
-       "provenance": "contract shift.yaml POST /shifts/{shiftId}/no-sale"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Reopen shift",
-       "operation": "reopenShift",
-       "provenance": "contract shift.yaml POST /shifts/{shiftId}/reopen"
-      },
-      {
-       "kind": "secondaryButton",
        "label": "Report incident",
        "operation": "reportIncident",
        "provenance": "contract maintenance.yaml POST /incidents"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Resume shift",
-       "operation": "resumeShift",
-       "provenance": "contract shift.yaml POST /shifts/{shiftId}/resume"
-      },
-      {
-       "kind": "destructiveButton",
-       "label": "Suspend shift",
-       "operation": "suspendShift",
-       "provenance": "contract shift.yaml POST /shifts/{shiftId}/suspend"
       },
       {
        "kind": "secondaryButton",
@@ -1132,77 +949,6 @@
    ]
   },
   "overlays": [
-   {
-    "id": "confirmCloseShift",
-    "component": "confirmDialog",
-    "trigger": "Close shift",
-    "body": "**Names what `closeShift` changes and what it leaves alone**, in the consequence rather than the verb. A home duty this affects should be identified in the dialog, not just counted. **Collects what `closeShift` sends before it is called.** Required: `countedCash`, `recordedAt`. Optional: `nonCashDeclared`, `notes`, `releaseHeldLeases`.",
-    "provenance": "contract shift.yaml POST /shifts/{shiftId}/close",
-    "bindsTo": "CloseShiftRequest"
-   },
-   {
-    "id": "confirmSuspendShift",
-    "component": "confirmDialog",
-    "trigger": "Suspend shift",
-    "body": "**Names what `suspendShift` changes and what it leaves alone**, in the consequence rather than the verb. A home duty this affects should be identified in the dialog, not just counted. **Collects what `suspendShift` sends before it is called.** Required: `recordedAt`. Optional: `reason`.",
-    "provenance": "contract shift.yaml POST /shifts/{shiftId}/suspend"
-   },
-   {
-    "id": "formAcceptShiftVariance",
-    "component": "modal",
-    "trigger": "Accept shift variance",
-    "body": "**Collects what `acceptShiftVariance` sends before it is called.** Required: `reason`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Accept shift variance",
-     "operation": "acceptShiftVariance"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "reason"
-     ]
-    },
-    "provenance": "contract shift.yaml POST /shifts/{shiftId}/accept-variance"
-   },
-   {
-    "id": "formApproveShiftOpen",
-    "component": "modal",
-    "trigger": "Approve shift open",
-    "body": "**Collects what `approveShiftOpen` sends before it is called.** Required: `reason`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Approve shift open",
-     "operation": "approveShiftOpen"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "reason"
-     ]
-    },
-    "provenance": "contract shift.yaml POST /shifts/{shiftId}/approve-open"
-   },
-   {
-    "id": "formOpenShift",
-    "component": "modal",
-    "trigger": "Open shift",
-    "body": "**Collects what `openShift` sends before it is called.** Required: `workstationId`, `openingFloat`. Optional: `depositBoxCode`, `bagNumber`, `recordedAt`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "OpenShiftRequest",
-    "confirm": {
-     "label": "Open shift",
-     "operation": "openShift"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "workstationId",
-      "openingFloat",
-      "depositBoxCode",
-      "bagNumber",
-      "recordedAt"
-     ]
-    },
-    "provenance": "contract shift.yaml POST /shifts"
-   },
    {
     "id": "formRecordAuthorityNotification",
     "component": "modal",
@@ -1223,44 +969,6 @@
      ]
     },
     "provenance": "contract maintenance.yaml POST /incidents/{incidentId}/notify-authority"
-   },
-   {
-    "id": "formRecordNoSale",
-    "component": "modal",
-    "trigger": "Record no sale",
-    "body": "**Collects what `recordNoSale` sends before it is called.** Required: `id`, `reason`, `recordedAt`. Optional: `note`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Record no sale",
-     "operation": "recordNoSale"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "id",
-      "reason",
-      "recordedAt",
-      "note"
-     ]
-    },
-    "provenance": "contract shift.yaml POST /shifts/{shiftId}/no-sale"
-   },
-   {
-    "id": "formReopenShift",
-    "component": "modal",
-    "trigger": "Reopen shift",
-    "body": "**Collects what `reopenShift` sends before it is called.** Required: `reason`, `supervisorStepUp` {`principalId`, `credential`}: the supervisor enters their staff PIN on this device, and may not be the principal who closed the shift. Refused 403 `approver-is-closer` or `supervisor-step-up-refused` (decided 28 September, audit R144). Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Reopen shift",
-     "operation": "reopenShift"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "reason",
-      "supervisorStepUp"
-     ]
-    },
-    "provenance": "contract shift.yaml POST /shifts/{shiftId}/reopen"
    },
    {
     "id": "formReportIncident",
@@ -1295,23 +1003,6 @@
     "provenance": "contract maintenance.yaml POST /incidents"
    },
    {
-    "id": "formResumeShift",
-    "component": "modal",
-    "trigger": "Resume shift",
-    "body": "**Collects what `resumeShift` sends before it is called.** Required: `recordedAt`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Resume shift",
-     "operation": "resumeShift"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "recordedAt"
-     ]
-    },
-    "provenance": "contract shift.yaml POST /shifts/{shiftId}/resume"
-   },
-   {
     "id": "formUpdateIncident",
     "component": "modal",
     "trigger": "Save incident",
@@ -1341,14 +1032,14 @@
    "error": "Could not load. Names which read failed and leaves the home duty untouched.",
    "emptyFirstRun": "**Nothing is waiting, which is the good outcome.** An empty queue means every item has been decided; it offers no create action, because creating work is not what it needs.",
    "emptyNoResults": "Nothing matches the filter on severity, status, isReportable and the home duty are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `SHIFT_OPEN`, which `getCurrentShift` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "Shown when the caller lacks `REPORT_VIEW_WORKSTATION`, which `getWorkstationShift` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "Last synced view, with its age. The pending count is always current because it is local"
   },
   "apis": [
    {
-    "operationId": "getCurrentShift",
+    "operationId": "getWorkstationShift",
     "contract": "shift",
-    "purpose": "From the flow it appears in",
+    "purpose": "The shift on this handheld, read under a view permission so a steward with no cash shift of their own still opens the home (CHG-DOOR-005; was getCurrentShift, SHIFT_OPEN)",
     "trigger": "onLoad"
    },
    {
@@ -1356,33 +1047,6 @@
     "contract": "maintenance",
     "purpose": "From the flow it appears in",
     "trigger": "onLoad"
-   },
-   {
-    "operationId": "acceptShiftVariance",
-    "contract": "shift",
-    "purpose": "Accept an over/short beyond the threshold",
-    "trigger": "onAction",
-    "invalidates": [
-     "listIncidents"
-    ]
-   },
-   {
-    "operationId": "approveShiftOpen",
-    "contract": "shift",
-    "purpose": "Approve a shift opening outside tolerance",
-    "trigger": "onAction",
-    "invalidates": [
-     "listIncidents"
-    ]
-   },
-   {
-    "operationId": "closeShift",
-    "contract": "shift",
-    "purpose": "Blind close-out",
-    "trigger": "onAction",
-    "invalidates": [
-     "listIncidents"
-    ]
    },
    {
     "operationId": "getIncident",
@@ -1397,27 +1061,6 @@
     "trigger": "onLoad"
    },
    {
-    "operationId": "listCashMovements",
-    "contract": "shift",
-    "purpose": "Lifts, adds and the opening float",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "listShifts",
-    "contract": "shift",
-    "purpose": "List shifts",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "openShift",
-    "contract": "shift",
-    "purpose": "Open a shift",
-    "trigger": "onAction",
-    "invalidates": [
-     "listIncidents"
-    ]
-   },
-   {
     "operationId": "recordAuthorityNotification",
     "contract": "maintenance",
     "purpose": "Record notification to an external authority",
@@ -1427,45 +1070,9 @@
     ]
    },
    {
-    "operationId": "recordNoSale",
-    "contract": "shift",
-    "purpose": "Open the drawer without a sale",
-    "trigger": "onAction",
-    "invalidates": [
-     "listIncidents"
-    ]
-   },
-   {
-    "operationId": "reopenShift",
-    "contract": "shift",
-    "purpose": "Reopen a shift closed in error",
-    "trigger": "onAction",
-    "invalidates": [
-     "listIncidents"
-    ]
-   },
-   {
     "operationId": "reportIncident",
     "contract": "maintenance",
     "purpose": "Report an incident",
-    "trigger": "onAction",
-    "invalidates": [
-     "listIncidents"
-    ]
-   },
-   {
-    "operationId": "resumeShift",
-    "contract": "shift",
-    "purpose": "Resume a suspended shift",
-    "trigger": "onAction",
-    "invalidates": [
-     "listIncidents"
-    ]
-   },
-   {
-    "operationId": "suspendShift",
-    "contract": "shift",
-    "purpose": "Suspend a shift so another user can log in",
     "trigger": "onAction",
     "invalidates": [
      "listIncidents"
@@ -1490,6 +1097,10 @@
     {
      "name": "shiftId",
      "from": "session"
+    },
+    {
+     "name": "workstationId",
+     "from": "session"
     }
    ],
    "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `incidentId`.",
@@ -1507,6 +1118,68 @@
    "board": "wireframes/P06 Venue Staff App.dc.html#emp-003"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 17 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "gaps": [
+   {
+    "operation": "acceptShiftVariance",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-008): Till and cash-shift writes on the staff-app home are bulk-attach residue; the screen's own notes removed createCashMovement because a screen that does not handle money should not move it, and a variance is accepted on the till by a supervisor (R080(e)). F08 step 4 and F64 step 4 need only getCurrentShift and listIncidents (R254; design-notes correction fnb-retail EMP-003).",
+    "source": "R254 | R080 | F08 step 4 | F64 step 4"
+   },
+   {
+    "operation": "approveShiftOpen",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-008): Till and cash-shift writes on the staff-app home are bulk-attach residue; the screen's own notes removed createCashMovement because a screen that does not handle money should not move it, and a variance is accepted on the till by a supervisor (R080(e)). F08 step 4 and F64 step 4 need only getCurrentShift and listIncidents (R254; design-notes correction fnb-retail EMP-003).",
+    "source": "R254 | R080 | F08 step 4 | F64 step 4"
+   },
+   {
+    "operation": "closeShift",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-008): Till and cash-shift writes on the staff-app home are bulk-attach residue; the screen's own notes removed createCashMovement because a screen that does not handle money should not move it, and a variance is accepted on the till by a supervisor (R080(e)). F08 step 4 and F64 step 4 need only getCurrentShift and listIncidents (R254; design-notes correction fnb-retail EMP-003). The cashier's count became submitShiftCount on 2 October (CHG-FIN-003); it is not on this screen either, for the same reason (merge of wiring-fixes).",
+    "source": "R254 | R080 | F08 step 4 | F64 step 4"
+   },
+   {
+    "operation": "listCashMovements",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-008): Till and cash-shift writes on the staff-app home are bulk-attach residue; the screen's own notes removed createCashMovement because a screen that does not handle money should not move it, and a variance is accepted on the till by a supervisor (R080(e)). F08 step 4 and F64 step 4 need only getCurrentShift and listIncidents (R254; design-notes correction fnb-retail EMP-003).",
+    "source": "R254 | R080 | F08 step 4 | F64 step 4"
+   },
+   {
+    "operation": "listShifts",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-008): Till and cash-shift writes on the staff-app home are bulk-attach residue; the screen's own notes removed createCashMovement because a screen that does not handle money should not move it, and a variance is accepted on the till by a supervisor (R080(e)). F08 step 4 and F64 step 4 need only getCurrentShift and listIncidents (R254; design-notes correction fnb-retail EMP-003).",
+    "source": "R254 | R080 | F08 step 4 | F64 step 4"
+   },
+   {
+    "operation": "openShift",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-008): Till and cash-shift writes on the staff-app home are bulk-attach residue; the screen's own notes removed createCashMovement because a screen that does not handle money should not move it, and a variance is accepted on the till by a supervisor (R080(e)). F08 step 4 and F64 step 4 need only getCurrentShift and listIncidents (R254; design-notes correction fnb-retail EMP-003).",
+    "source": "R254 | R080 | F08 step 4 | F64 step 4"
+   },
+   {
+    "operation": "recordNoSale",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-008): Till and cash-shift writes on the staff-app home are bulk-attach residue; the screen's own notes removed createCashMovement because a screen that does not handle money should not move it, and a variance is accepted on the till by a supervisor (R080(e)). F08 step 4 and F64 step 4 need only getCurrentShift and listIncidents (R254; design-notes correction fnb-retail EMP-003).",
+    "source": "R254 | R080 | F08 step 4 | F64 step 4"
+   },
+   {
+    "operation": "reopenShift",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-008): Till and cash-shift writes on the staff-app home are bulk-attach residue; the screen's own notes removed createCashMovement because a screen that does not handle money should not move it, and a variance is accepted on the till by a supervisor (R080(e)). F08 step 4 and F64 step 4 need only getCurrentShift and listIncidents (R254; design-notes correction fnb-retail EMP-003).",
+    "source": "R254 | R080 | F08 step 4 | F64 step 4"
+   },
+   {
+    "operation": "resumeShift",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-008): Till and cash-shift writes on the staff-app home are bulk-attach residue; the screen's own notes removed createCashMovement because a screen that does not handle money should not move it, and a variance is accepted on the till by a supervisor (R080(e)). F08 step 4 and F64 step 4 need only getCurrentShift and listIncidents (R254; design-notes correction fnb-retail EMP-003).",
+    "source": "R254 | R080 | F08 step 4 | F64 step 4"
+   },
+   {
+    "operation": "suspendShift",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-008): Till and cash-shift writes on the staff-app home are bulk-attach residue; the screen's own notes removed createCashMovement because a screen that does not handle money should not move it, and a variance is accepted on the till by a supervisor (R080(e)). F08 step 4 and F64 step 4 need only getCurrentShift and listIncidents (R254; design-notes correction fnb-retail EMP-003).",
+    "source": "R254 | R080 | F08 step 4 | F64 step 4"
+   }
+  ],
   "_platform": {
    "code": "P06",
    "audience": "staff",
@@ -1556,7 +1229,7 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-009 holds none of them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-009 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
@@ -1570,7 +1243,7 @@
     }
    ]
   },
-  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written.",
+  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written.\n\n**Blind close (decided 2 October 2026, Chinmay; CHG-FIN-003).** The cashier never sees the expected cash: not while counting, not after submitting, not as a sales or takings total from which it could be worked out (MoM 12 Aug 2026 section 19, DI-271; MoM 9 Sep 2026 4.18, DI-806: \"if a cashier knew they had a small surplus, they could pocket it\"). The count is submitted with `submitShiftCount`, which answers only what happens next (closed, with your supervisor, or awaiting close approval); the variance alerts the supervisors on the venue's alerting channel and appears on BO-040. The cashier may add a reason and a note with every count (DI-803). A recount the supervisor asks for is counted blind again (DI-804). Retail practice: docs/active/research-uae-vat-and-blind-close-2-october.md.\n\n**No cash count for a server** (decided 2 October 2026, Chinmay; DEC-200; CHG-CSP-039; CHG-SPO-009). A handheld takes no cash, so a server's End shift has no drawer and no count: it closes the service day (unsynced orders, open tables). The blind count and the variance acceptance on this screen are for a cashier whose drawer is on a till.",
   "density": "comfortable",
   "pattern": "approvalInbox",
   "patternReason": "`approveShiftOpen` decides items that `listCashMovements` queues — every row is waiting for a person, so the empty state is success",
@@ -1669,10 +1342,7 @@
         "Shift.currencyScale",
         "Shift.depositBoxCode",
         "Shift.bagNumber",
-        "Shift.openingFloat",
-        "Shift.salesTotal",
-        "Shift.refundsTotal",
-        "Shift.liftsTotal"
+        "Shift.openingFloat"
        ],
        "operation": "getShift",
        "provenance": "contract shift.yaml GET /shifts/{shiftId}"
@@ -1694,10 +1364,7 @@
         "Shift.currencyScale",
         "Shift.depositBoxCode",
         "Shift.bagNumber",
-        "Shift.openingFloat",
-        "Shift.salesTotal",
-        "Shift.refundsTotal",
-        "Shift.liftsTotal"
+        "Shift.openingFloat"
        ],
        "operation": "getCurrentShift",
        "provenance": "contract shift.yaml GET /shifts/current"
@@ -1711,50 +1378,15 @@
       {
        "kind": "destructiveButton",
        "label": "Close shift",
-       "operation": "closeShift",
+       "operation": "submitShiftCount",
        "provenance": "contract shift.yaml POST /shifts/{shiftId}/close"
       },
       {
        "kind": "secondaryButton",
        "label": "Accept shift variance",
        "operation": "acceptShiftVariance",
-       "provenance": "contract shift.yaml POST /shifts/{shiftId}/accept-variance"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Approve shift open",
-       "operation": "approveShiftOpen",
-       "provenance": "contract shift.yaml POST /shifts/{shiftId}/approve-open"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Create cash movement",
-       "operation": "createCashMovement",
-       "provenance": "contract shift.yaml POST /shifts/{shiftId}/cash-movements"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Open shift",
-       "operation": "openShift",
-       "provenance": "contract shift.yaml POST /shifts"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Record no sale",
-       "operation": "recordNoSale",
-       "provenance": "contract shift.yaml POST /shifts/{shiftId}/no-sale"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Reopen shift",
-       "operation": "reopenShift",
-       "provenance": "contract shift.yaml POST /shifts/{shiftId}/reopen"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Resume shift",
-       "operation": "resumeShift",
-       "provenance": "contract shift.yaml POST /shifts/{shiftId}/resume"
+       "provenance": "contract shift.yaml POST /shifts/{shiftId}/accept-variance",
+       "permission": "OVERSHORT_ACCEPT"
       },
       {
        "kind": "destructiveButton",
@@ -1771,9 +1403,22 @@
     "id": "confirmCloseShift",
     "component": "confirmDialog",
     "trigger": "Close shift",
-    "body": "**Names what `closeShift` changes and what it leaves alone**, in the consequence rather than the verb. A end shift this affects should be identified in the dialog, not just counted. **Collects what `closeShift` sends before it is called.** Required: `countedCash`, `recordedAt`. Optional: `nonCashDeclared`, `notes`, `releaseHeldLeases`.",
-    "provenance": "contract shift.yaml POST /shifts/{shiftId}/close",
-    "bindsTo": "CloseShiftRequest"
+    "body": "**Collects what `submitShiftCount` sends.** Required: `countedCash` (by denomination), `recordedAt`. Optional: `cashierReason`, `notes`, `nonCashDeclared`, `releaseHeldLeases`. Says \"Your count is final once submitted\" and shows no expected figure (CHG-FIN-003).",
+    "provenance": "contract shift.yaml POST /shifts/{shiftId}/count (CHG-FIN-003)",
+    "bindsTo": "CloseShiftRequest",
+    "confirm": {
+     "carries": [
+      "shiftId",
+      "countedFloat",
+      "cashierReason"
+     ],
+     "label": "Submit count",
+     "operation": "submitShiftCount"
+    },
+    "dismiss": {
+     "discards": [],
+     "label": "Not yet"
+    }
    },
    {
     "id": "confirmSuspendShift",
@@ -1798,124 +1443,6 @@
      ]
     },
     "provenance": "contract shift.yaml POST /shifts/{shiftId}/accept-variance"
-   },
-   {
-    "id": "formApproveShiftOpen",
-    "component": "modal",
-    "trigger": "Approve shift open",
-    "body": "**Collects what `approveShiftOpen` sends before it is called.** Required: `reason`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Approve shift open",
-     "operation": "approveShiftOpen"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "reason"
-     ]
-    },
-    "provenance": "contract shift.yaml POST /shifts/{shiftId}/approve-open"
-   },
-   {
-    "id": "formCreateCashMovement",
-    "component": "modal",
-    "trigger": "Create cash movement",
-    "body": "**Collects what `createCashMovement` sends before it is called.** Required: `id`, `kind`, `amount`, `recordedAt`. Optional: `denominations`, `reference`, `reason`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "CreateCashMovementRequest",
-    "confirm": {
-     "label": "Create cash movement",
-     "operation": "createCashMovement"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "id",
-      "kind",
-      "amount",
-      "recordedAt",
-      "denominations",
-      "reference",
-      "reason"
-     ]
-    },
-    "provenance": "contract shift.yaml POST /shifts/{shiftId}/cash-movements"
-   },
-   {
-    "id": "formOpenShift",
-    "component": "modal",
-    "trigger": "Open shift",
-    "body": "**Collects what `openShift` sends before it is called.** Required: `workstationId`, `openingFloat`. Optional: `depositBoxCode`, `bagNumber`, `recordedAt`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "OpenShiftRequest",
-    "confirm": {
-     "label": "Open shift",
-     "operation": "openShift"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "workstationId",
-      "openingFloat",
-      "depositBoxCode",
-      "bagNumber",
-      "recordedAt"
-     ]
-    },
-    "provenance": "contract shift.yaml POST /shifts"
-   },
-   {
-    "id": "formRecordNoSale",
-    "component": "modal",
-    "trigger": "Record no sale",
-    "body": "**Collects what `recordNoSale` sends before it is called.** Required: `id`, `reason`, `recordedAt`. Optional: `note`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Record no sale",
-     "operation": "recordNoSale"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "id",
-      "reason",
-      "recordedAt",
-      "note"
-     ]
-    },
-    "provenance": "contract shift.yaml POST /shifts/{shiftId}/no-sale"
-   },
-   {
-    "id": "formReopenShift",
-    "component": "modal",
-    "trigger": "Reopen shift",
-    "body": "**Collects what `reopenShift` sends before it is called.** Required: `reason`, `supervisorStepUp` {`principalId`, `credential`}: the supervisor enters their staff PIN on this device, and may not be the principal who closed the shift. Refused 403 `approver-is-closer` or `supervisor-step-up-refused` (decided 28 September, audit R144). Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Reopen shift",
-     "operation": "reopenShift"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "reason",
-      "supervisorStepUp"
-     ]
-    },
-    "provenance": "contract shift.yaml POST /shifts/{shiftId}/reopen"
-   },
-   {
-    "id": "formResumeShift",
-    "component": "modal",
-    "trigger": "Resume shift",
-    "body": "**Collects what `resumeShift` sends before it is called.** Required: `recordedAt`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Resume shift",
-     "operation": "resumeShift"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "recordedAt"
-     ]
-    },
-    "provenance": "contract shift.yaml POST /shifts/{shiftId}/resume"
    }
   ],
   "states": {
@@ -1928,7 +1455,7 @@
   },
   "apis": [
    {
-    "operationId": "closeShift",
+    "operationId": "submitShiftCount",
     "contract": "shift",
     "purpose": "From the flow it appears in",
     "trigger": "onAction"
@@ -1937,24 +1464,6 @@
     "operationId": "acceptShiftVariance",
     "contract": "shift",
     "purpose": "Accept an over/short beyond the threshold",
-    "trigger": "onAction",
-    "invalidates": [
-     "listCashMovements"
-    ]
-   },
-   {
-    "operationId": "approveShiftOpen",
-    "contract": "shift",
-    "purpose": "Approve a shift opening outside tolerance",
-    "trigger": "onAction",
-    "invalidates": [
-     "listCashMovements"
-    ]
-   },
-   {
-    "operationId": "createCashMovement",
-    "contract": "shift",
-    "purpose": "Record a cash lift or add",
     "trigger": "onAction",
     "invalidates": [
      "listCashMovements"
@@ -1983,42 +1492,6 @@
     "contract": "shift",
     "purpose": "List shifts",
     "trigger": "onLoad"
-   },
-   {
-    "operationId": "openShift",
-    "contract": "shift",
-    "purpose": "Open a shift",
-    "trigger": "onAction",
-    "invalidates": [
-     "listCashMovements"
-    ]
-   },
-   {
-    "operationId": "recordNoSale",
-    "contract": "shift",
-    "purpose": "Open the drawer without a sale",
-    "trigger": "onAction",
-    "invalidates": [
-     "listCashMovements"
-    ]
-   },
-   {
-    "operationId": "reopenShift",
-    "contract": "shift",
-    "purpose": "Reopen a shift closed in error",
-    "trigger": "onAction",
-    "invalidates": [
-     "listCashMovements"
-    ]
-   },
-   {
-    "operationId": "resumeShift",
-    "contract": "shift",
-    "purpose": "Resume a suspended shift",
-    "trigger": "onAction",
-    "invalidates": [
-     "listCashMovements"
-    ]
    },
    {
     "operationId": "suspendShift",
@@ -2052,6 +1525,44 @@
    "board": "wireframes/P06 Venue Staff App.dc.html#emp-009"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 13 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "gaps": [
+   {
+    "operation": "approveShiftOpen",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-008): An end-of-shift screen does not open a shift, approve an opening float or open the drawer; F72 step 3 needs closeShift, acceptShiftVariance and listCashMovements (R254; design-notes correction fnb-retail EMP-009).",
+    "source": "R254 | F72 step 3 | F08 step 8"
+   },
+   {
+    "operation": "createCashMovement",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-008): An end-of-shift screen does not open a shift, approve an opening float or open the drawer; F72 step 3 needs closeShift, acceptShiftVariance and listCashMovements (R254; design-notes correction fnb-retail EMP-009).",
+    "source": "R254 | F72 step 3 | F08 step 8"
+   },
+   {
+    "operation": "openShift",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-008): An end-of-shift screen does not open a shift, approve an opening float or open the drawer; F72 step 3 needs closeShift, acceptShiftVariance and listCashMovements (R254; design-notes correction fnb-retail EMP-009).",
+    "source": "R254 | F72 step 3 | F08 step 8"
+   },
+   {
+    "operation": "recordNoSale",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-008): An end-of-shift screen does not open a shift, approve an opening float or open the drawer; F72 step 3 needs closeShift, acceptShiftVariance and listCashMovements (R254; design-notes correction fnb-retail EMP-009).",
+    "source": "R254 | F72 step 3 | F08 step 8"
+   },
+   {
+    "operation": "reopenShift",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-008): An end-of-shift screen does not open a shift, approve an opening float or open the drawer; F72 step 3 needs closeShift, acceptShiftVariance and listCashMovements (R254; design-notes correction fnb-retail EMP-009).",
+    "source": "R254 | F72 step 3 | F08 step 8"
+   },
+   {
+    "operation": "resumeShift",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-008): An end-of-shift screen does not open a shift, approve an opening float or open the drawer; F72 step 3 needs closeShift, acceptShiftVariance and listCashMovements (R254; design-notes correction fnb-retail EMP-009).",
+    "source": "R254 | F72 step 3 | F08 step 8"
+   }
+  ],
   "_platform": {
    "code": "P06",
    "audience": "staff",
@@ -2102,7 +1613,7 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-010 holds none of them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-010 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
@@ -2129,69 +1640,6 @@
      "slot": "collection",
      "components": [
       {
-       "kind": "textField",
-       "label": "Access point id",
-       "operation": "listScans",
-       "notes": "Sends `?accessPointId=` to `listScans`.",
-       "provenance": "contract access.yaml GET /access/scans"
-      },
-      {
-       "kind": "textField",
-       "label": "Ticket id",
-       "operation": "listScans",
-       "notes": "Sends `?ticketId=` to `listScans`.",
-       "provenance": "contract access.yaml GET /access/scans"
-      },
-      {
-       "kind": "textField",
-       "label": "Outcome",
-       "operation": "listScans",
-       "notes": "Sends `?outcome=` to `listScans`.",
-       "provenance": "contract access.yaml GET /access/scans"
-      },
-      {
-       "kind": "datePicker",
-       "label": "Recorded from",
-       "operation": "listScans",
-       "notes": "Sends `?recordedFrom=` to `listScans`.",
-       "provenance": "contract access.yaml GET /access/scans"
-      },
-      {
-       "kind": "datePicker",
-       "label": "Recorded to",
-       "operation": "listScans",
-       "notes": "Sends `?recordedTo=` to `listScans`.",
-       "provenance": "contract access.yaml GET /access/scans"
-      },
-      {
-       "kind": "dataTable",
-       "label": "Every scan event",
-       "bindsTo": "ScanEvent",
-       "columns": [
-        "ScanEvent.id",
-        "ScanEvent.accessPointId",
-        "ScanEvent.venueId",
-        "ScanEvent.scopePath",
-        "ScanEvent.ticketId",
-        "ScanEvent.mediaCode",
-        "ScanEvent.outcome",
-        "ScanEvent.denyReason",
-        "ScanEvent.direction",
-        "ScanEvent.operatorPrincipalId",
-        "ScanEvent.deviceId",
-        "ScanEvent.overridesScanId"
-       ],
-       "operation": "listScans",
-       "provenance": "contract access.yaml GET /access/scans"
-      },
-      {
-       "kind": "scanTarget",
-       "derived": true,
-       "impliedBy": "listScans",
-       "notes": "**A screen that validates a credential needs somewhere to point the camera.** `denied` and `hardwareError` look different because an operator facing a guest needs to know whether to try again or explain something.",
-       "provenance": "carried from the previous definition"
-      },
-      {
        "kind": "searchField",
        "derived": true,
        "impliedBy": "lookupTicket",
@@ -2204,60 +1652,12 @@
     {
      "name": "contextPanel",
      "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected scan event",
-       "bindsTo": "ScanEvent",
-       "columns": [
-        "ScanEvent.id",
-        "ScanEvent.accessPointId",
-        "ScanEvent.venueId",
-        "ScanEvent.scopePath",
-        "ScanEvent.ticketId",
-        "ScanEvent.mediaCode",
-        "ScanEvent.outcome",
-        "ScanEvent.denyReason",
-        "ScanEvent.direction",
-        "ScanEvent.operatorPrincipalId",
-        "ScanEvent.deviceId",
-        "ScanEvent.overridesScanId",
-        "ScanEvent.overrideReason",
-        "ScanEvent.recordedAt",
-        "ScanEvent.syncedAt"
-       ],
-       "operation": "listScans",
-       "provenance": "contract access.yaml GET /access/scans"
-      },
-      {
-       "kind": "detailPanel",
-       "label": "The offline package",
-       "bindsTo": "OfflinePackage",
-       "columns": [
-        "OfflinePackage.generatedAt",
-        "OfflinePackage.validFrom",
-        "OfflinePackage.validTo",
-        "OfflinePackage.accessPointId",
-        "OfflinePackage.entitlements",
-        "OfflinePackage.delegatedRights",
-        "OfflinePackage.blacklist",
-        "OfflinePackage.admissionRules"
-       ],
-       "operation": "getOfflinePackage",
-       "provenance": "contract access.yaml GET /access/offline-package"
-      }
-     ]
+     "components": []
     },
     {
      "name": "actionBar",
      "slot": "rowActions",
      "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Sync scans",
-       "operation": "syncScans",
-       "provenance": "contract access.yaml POST /access/scans"
-      },
       {
        "kind": "secondaryButton",
        "label": "Lookup ticket",
@@ -2293,24 +1693,6 @@
     "trigger": "Override access",
     "body": "**Names what `overrideAccess` changes and what it leaves alone**, in the consequence rather than the verb. A scan ready this affects should be identified in the dialog, not just counted. **Collects what `overrideAccess` sends before it is called.** Required: `id`, `scanId`, `reason`, `recordedAt`.",
     "provenance": "contract access.yaml POST /access/override"
-   },
-   {
-    "id": "formSyncScans",
-    "component": "modal",
-    "trigger": "Sync scans",
-    "body": "**Collects what `syncScans` sends before it is called.** Required: `deviceId`, `scans`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Sync scans",
-     "operation": "syncScans"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "deviceId",
-      "scans"
-     ]
-    },
-    "provenance": "contract access.yaml POST /access/scans"
    },
    {
     "id": "formValidateAccess",
@@ -2363,31 +1745,10 @@
    "error": "Could not load. Names which read failed and leaves the scan ready untouched.",
    "emptyFirstRun": "No scan ready yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
    "emptyNoResults": "Nothing matches the filter on accessPointId, ticketId, outcome, recordedFrom, recordedTo and the scan ready are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `REPORT_VIEW_VENUE`, which `listScans` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "Shown when the caller lacks `TICKET_LOOKUP`, which `lookupTicket` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**Keep working when the network does not.** The screen already had an `offline` state."
   },
   "apis": [
-   {
-    "operationId": "listScans",
-    "contract": "access",
-    "purpose": "List scan events",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "syncScans",
-    "contract": "access",
-    "purpose": "Replay scans recorded offline",
-    "trigger": "onAction",
-    "invalidates": [
-     "listScans"
-    ]
-   },
-   {
-    "operationId": "getOfflinePackage",
-    "contract": "access",
-    "purpose": "Entitlement and rule set for offline validation",
-    "trigger": "onLoad"
-   },
    {
     "operationId": "lookupTicket",
     "contract": "access",
@@ -2398,28 +1759,19 @@
     "operationId": "overrideAccess",
     "contract": "access",
     "purpose": "Admit against a failed validation",
-    "trigger": "onAction",
-    "invalidates": [
-     "listScans"
-    ]
+    "trigger": "onAction"
    },
    {
     "operationId": "validateAccess",
     "contract": "access",
     "purpose": "Validate media at an access point and admit or deny",
-    "trigger": "onAction",
-    "invalidates": [
-     "listScans"
-    ]
+    "trigger": "onAction"
    },
    {
     "operationId": "validateGroupAccess",
     "contract": "access",
     "purpose": "Admit a group on one read",
-    "trigger": "onAction",
-    "invalidates": [
-     "listScans"
-    ]
+    "trigger": "onAction"
    },
    {
     "operationId": "verifyAccreditationCredential",
@@ -2444,6 +1796,26 @@
    "board": "wireframes/P06 Venue Staff App.dc.html#emp-010"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "gaps": [
+   {
+    "operation": "getOfflinePackage",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): Scan history, sync and offline-package panels on the scan screen; as on SCN-003 the scan screen is idle by design, history is SCN-009's, sync EMP-017's and the package EMP-018's (F06 step 4; design-notes correction venue-operations EMP-010).",
+    "source": "F06 step 4 | contracts/spine/access.yaml#listScans | R254"
+   },
+   {
+    "operation": "listScans",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): Scan history, sync and offline-package panels on the scan screen; as on SCN-003 the scan screen is idle by design, history is SCN-009's, sync EMP-017's and the package EMP-018's (F06 step 4; design-notes correction venue-operations EMP-010).",
+    "source": "F06 step 4 | contracts/spine/access.yaml#listScans | R254"
+   },
+   {
+    "operation": "syncScans",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): Scan history, sync and offline-package panels on the scan screen; as on SCN-003 the scan screen is idle by design, history is SCN-009's, sync EMP-017's and the package EMP-018's (F06 step 4; design-notes correction venue-operations EMP-010).",
+    "source": "F06 step 4 | contracts/spine/access.yaml#listScans | R254"
+   }
+  ],
   "_platform": {
    "code": "P06",
    "audience": "staff",
@@ -2480,24 +1852,12 @@
   },
   "navigation": {
    "exitTo": [
-    "EMP-001",
-    "EMP-002",
     "EMP-003",
     "EMP-005"
    ],
    "inferred": true,
    "fromFlows": true,
    "transitions": [
-    {
-     "to": "EMP-001",
-     "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-004 holds none of them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
-    },
-    {
-     "to": "EMP-002",
-     "trigger": "Select venue & role",
-     "provenance": "derived — EMP-002 declares entryState.params  and EMP-004 holds none of them. The edge carries nothing: EMP-002 needs nothing to open"
-    },
     {
      "to": "EMP-003",
      "trigger": "Home — on duty",
@@ -2529,32 +1889,12 @@
      "slot": "collection",
      "components": [
       {
-       "kind": "textField",
-       "label": "Assigned to principal id",
+       "kind": "multiSelect",
+       "label": "Status and priority",
        "operation": "listWorkOrders",
-       "notes": "Sends `?assignedToPrincipalId=` to `listWorkOrders`.",
-       "provenance": "contract maintenance.yaml GET /work-orders"
-      },
-      {
-       "kind": "textField",
-       "label": "Status",
-       "operation": "listWorkOrders",
-       "notes": "Sends `?status=` to `listWorkOrders`.",
-       "provenance": "contract maintenance.yaml GET /work-orders"
-      },
-      {
-       "kind": "textField",
-       "label": "Priority",
-       "operation": "listWorkOrders",
-       "notes": "Sends `?priority=` to `listWorkOrders`.",
-       "provenance": "contract maintenance.yaml GET /work-orders"
-      },
-      {
-       "kind": "textField",
-       "label": "Asset id",
-       "operation": "listWorkOrders",
-       "notes": "Sends `?assetId=` to `listWorkOrders`.",
-       "provenance": "contract maintenance.yaml GET /work-orders"
+       "notes": "Chips from the closed sets; my own queue is the default, not a filter (VO-R12; design-notes correction venue-operations EMP-004). No ids are typed.",
+       "provenance": "contract maintenance.yaml GET /work-orders",
+       "bindsTo": "WorkOrder.status"
       },
       {
        "kind": "toggle",
@@ -2565,7 +1905,7 @@
       },
       {
        "kind": "dataTable",
-       "label": "Every work order",
+       "label": "My work orders",
        "bindsTo": "WorkOrder",
        "columns": [
         "WorkOrder.downtimeMinutes",
@@ -2665,72 +2005,6 @@
        "operation": "rejectWorkOrder",
        "provenance": "contract maintenance.yaml POST /work-orders/{workOrderId}/reject",
        "notes": "Asks for a reason; when the reason is Other a note is required, and the operation refuses 400 without it (decided 28 September, audit R222)."
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Attach work order evidence",
-       "operation": "attachWorkOrderEvidence",
-       "provenance": "contract maintenance.yaml POST /work-orders/{workOrderId}/attachments"
-      },
-      {
-       "kind": "destructiveButton",
-       "label": "Cancel work order",
-       "operation": "cancelWorkOrder",
-       "provenance": "contract maintenance.yaml POST /work-orders/{workOrderId}/cancel"
-      },
-      {
-       "kind": "destructiveButton",
-       "label": "Close work order",
-       "operation": "closeWorkOrder",
-       "provenance": "contract maintenance.yaml POST /work-orders/{workOrderId}/close"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Complete work order",
-       "operation": "completeWorkOrder",
-       "provenance": "contract maintenance.yaml POST /work-orders/{workOrderId}/complete"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Pause work order",
-       "operation": "pauseWorkOrder",
-       "provenance": "contract maintenance.yaml POST /work-orders/{workOrderId}/pause"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Record work order parts",
-       "operation": "recordWorkOrderParts",
-       "provenance": "contract maintenance.yaml POST /work-orders/{workOrderId}/parts"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Record work order time",
-       "operation": "recordWorkOrderTime",
-       "provenance": "contract maintenance.yaml POST /work-orders/{workOrderId}/time"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Resume work order",
-       "operation": "resumeWorkOrder",
-       "provenance": "contract maintenance.yaml POST /work-orders/{workOrderId}/resume"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Start work order",
-       "operation": "startWorkOrder",
-       "provenance": "contract maintenance.yaml POST /work-orders/{workOrderId}/start"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Save work order",
-       "operation": "updateWorkOrder",
-       "provenance": "contract maintenance.yaml PATCH /work-orders/{workOrderId}"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Verify work order",
-       "operation": "verifyWorkOrder",
-       "provenance": "contract maintenance.yaml POST /work-orders/{workOrderId}/verify"
       }
      ]
     }
@@ -2743,182 +2017,12 @@
     "trigger": "Reject work order",
     "body": "**Names what `rejectWorkOrder` changes and what it leaves alone**, in the consequence rather than the verb. A task list this affects should be identified in the dialog, not just counted. **Collects what `rejectWorkOrder` sends before it is called.** Required: `reason`. Optional: `note`.",
     "provenance": "contract maintenance.yaml POST /work-orders/{workOrderId}/reject"
-   },
-   {
-    "id": "confirmCancelWorkOrder",
-    "component": "confirmDialog",
-    "trigger": "Cancel work order",
-    "body": "**Names what `cancelWorkOrder` changes and what it leaves alone**, in the consequence rather than the verb. A task list this affects should be identified in the dialog, not just counted. **Collects what `cancelWorkOrder` sends before it is called.** Required: `reason`. Optional: `note`, `supersededByWorkOrderId`.",
-    "provenance": "contract maintenance.yaml POST /work-orders/{workOrderId}/cancel"
-   },
-   {
-    "id": "confirmCloseWorkOrder",
-    "component": "confirmDialog",
-    "trigger": "Close work order",
-    "body": "**Names what `closeWorkOrder` changes and what it leaves alone**, in the consequence rather than the verb. A task list this affects should be identified in the dialog, not just counted. **Collects what `closeWorkOrder` sends before it is called.** Required: `outcome`. Optional: `note`, `duplicateOfWorkOrderId`.",
-    "provenance": "contract maintenance.yaml POST /work-orders/{workOrderId}/close"
-   },
-   {
-    "id": "formAttachWorkOrderEvidence",
-    "component": "modal",
-    "trigger": "Attach work order evidence",
-    "body": "**Collects what `attachWorkOrderEvidence` sends before it is called.** Required: `kind`. Optional: `assetRef`, `text`, `capturedAt`, `stage`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Attach work order evidence",
-     "operation": "attachWorkOrderEvidence"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "kind",
-      "assetRef",
-      "text",
-      "capturedAt",
-      "stage"
-     ]
-    },
-    "provenance": "contract maintenance.yaml POST /work-orders/{workOrderId}/attachments"
-   },
-   {
-    "id": "formCompleteWorkOrder",
-    "component": "modal",
-    "trigger": "Complete work order",
-    "body": "**Collects what `completeWorkOrder` sends before it is called.** Required: `resolution`, `recordedAt`. Optional: `resolutionCode`, `attachmentRefs`, `followUpRequired`, `followUpNote`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Complete work order",
-     "operation": "completeWorkOrder"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "resolution",
-      "recordedAt",
-      "resolutionCode",
-      "attachmentRefs",
-      "followUpRequired",
-      "followUpNote"
-     ]
-    },
-    "provenance": "contract maintenance.yaml POST /work-orders/{workOrderId}/complete"
-   },
-   {
-    "id": "formPauseWorkOrder",
-    "component": "modal",
-    "trigger": "Pause work order",
-    "body": "**Collects what `pauseWorkOrder` sends before it is called.** Required: `reason`. Optional: `note`, `requisitionId`. **When the reason is Other, `note` is required** — the operation refuses 400 without it (decided 28 September, audit R222). Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Pause work order",
-     "operation": "pauseWorkOrder"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "reason",
-      "note",
-      "requisitionId"
-     ]
-    },
-    "provenance": "contract maintenance.yaml POST /work-orders/{workOrderId}/pause"
-   },
-   {
-    "id": "formRecordWorkOrderParts",
-    "component": "modal",
-    "trigger": "Record work order parts",
-    "body": "**Collects what `recordWorkOrderParts` sends before it is called.** Required: `lines`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Record work order parts",
-     "operation": "recordWorkOrderParts"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "lines"
-     ]
-    },
-    "provenance": "contract maintenance.yaml POST /work-orders/{workOrderId}/parts"
-   },
-   {
-    "id": "formRecordWorkOrderTime",
-    "component": "modal",
-    "trigger": "Record work order time",
-    "body": "**Collects what `recordWorkOrderTime` sends before it is called.** Required: `id`, `action`, `recordedAt`. Optional: `pauseReason`, `note`. **When the pause reason is Other, `note` is required** — the operation refuses 400 without it (decided 28 September, audit R222). Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Record work order time",
-     "operation": "recordWorkOrderTime"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "id",
-      "action",
-      "recordedAt",
-      "pauseReason",
-      "note"
-     ]
-    },
-    "provenance": "contract maintenance.yaml POST /work-orders/{workOrderId}/time"
-   },
-   {
-    "id": "formStartWorkOrder",
-    "component": "modal",
-    "trigger": "Start work order",
-    "body": "**Collects what `startWorkOrder` sends before it is called.** Nothing in the body is required. Optional: `startedAt`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Start work order",
-     "operation": "startWorkOrder"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "startedAt"
-     ]
-    },
-    "provenance": "contract maintenance.yaml POST /work-orders/{workOrderId}/start"
-   },
-   {
-    "id": "formUpdateWorkOrder",
-    "component": "modal",
-    "trigger": "Save work order",
-    "body": "**Collects what `updateWorkOrder` sends before it is called.** Nothing in the body is required. Optional: `assignedToPrincipalId`, `priority`, `dueAt`, `description`, `categoryId`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Save work order",
-     "operation": "updateWorkOrder"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "assignedToPrincipalId",
-      "priority",
-      "dueAt",
-      "description",
-      "categoryId"
-     ]
-    },
-    "provenance": "contract maintenance.yaml PATCH /work-orders/{workOrderId}"
-   },
-   {
-    "id": "formVerifyWorkOrder",
-    "component": "modal",
-    "trigger": "Verify work order",
-    "body": "**Collects what `verifyWorkOrder` sends before it is called.** Required: `outcome`. Optional: `note`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Verify work order",
-     "operation": "verifyWorkOrder"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "outcome",
-      "note"
-     ]
-    },
-    "provenance": "contract maintenance.yaml POST /work-orders/{workOrderId}/verify"
    }
   ],
   "states": {
    "loading": "The task list list.",
    "error": "Could not load. Names which read failed and leaves the task list untouched.",
-   "emptyFirstRun": "No task list yet. Offers Record work order parts (`recordWorkOrderParts`); distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No task list yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "Nothing matches the filter on assignedToPrincipalId, status, priority, assetId, overdueOnly and the task list are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Shown when the caller lacks `WORK_ORDER_VIEW`, which `listWorkOrders` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "Local queue. Tasks completed offline sync on return"
@@ -2949,109 +2053,10 @@
     ]
    },
    {
-    "operationId": "attachWorkOrderEvidence",
-    "contract": "maintenance",
-    "purpose": "Photo, video, document, note or signature",
-    "trigger": "onAction",
-    "invalidates": [
-     "listWorkOrders"
-    ]
-   },
-   {
-    "operationId": "cancelWorkOrder",
-    "contract": "maintenance",
-    "purpose": "Cancel a work order",
-    "trigger": "onAction",
-    "invalidates": [
-     "listWorkOrders"
-    ]
-   },
-   {
-    "operationId": "closeWorkOrder",
-    "contract": "maintenance",
-    "purpose": "Administratively closed",
-    "trigger": "onAction",
-    "invalidates": [
-     "listWorkOrders"
-    ]
-   },
-   {
-    "operationId": "completeWorkOrder",
-    "contract": "maintenance",
-    "purpose": "Complete a work order",
-    "trigger": "onAction",
-    "invalidates": [
-     "listWorkOrders"
-    ]
-   },
-   {
     "operationId": "getWorkOrder",
     "contract": "maintenance",
     "purpose": "Read a work order",
     "trigger": "onAction"
-   },
-   {
-    "operationId": "pauseWorkOrder",
-    "contract": "maintenance",
-    "purpose": "Stopped, and why",
-    "trigger": "onAction",
-    "invalidates": [
-     "listWorkOrders"
-    ]
-   },
-   {
-    "operationId": "recordWorkOrderParts",
-    "contract": "maintenance",
-    "purpose": "Record parts consumed",
-    "trigger": "onAction",
-    "invalidates": [
-     "listWorkOrders"
-    ]
-   },
-   {
-    "operationId": "recordWorkOrderTime",
-    "contract": "maintenance",
-    "purpose": "Start, pause or stop work",
-    "trigger": "onAction",
-    "invalidates": [
-     "listWorkOrders"
-    ]
-   },
-   {
-    "operationId": "resumeWorkOrder",
-    "contract": "maintenance",
-    "purpose": "Back to work",
-    "trigger": "onAction",
-    "invalidates": [
-     "listWorkOrders"
-    ]
-   },
-   {
-    "operationId": "startWorkOrder",
-    "contract": "maintenance",
-    "purpose": "Work has begun",
-    "trigger": "onAction",
-    "invalidates": [
-     "listWorkOrders"
-    ]
-   },
-   {
-    "operationId": "updateWorkOrder",
-    "contract": "maintenance",
-    "purpose": "Assign, reprioritise or amend",
-    "trigger": "onAction",
-    "invalidates": [
-     "listWorkOrders"
-    ]
-   },
-   {
-    "operationId": "verifyWorkOrder",
-    "contract": "maintenance",
-    "purpose": "Supervisor verification",
-    "trigger": "onAction",
-    "invalidates": [
-     "listWorkOrders"
-    ]
    }
   ],
   "entryState": {
@@ -3076,6 +2081,74 @@
    "board": "wireframes/P06 Venue Staff App.dc.html#emp-004"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 15 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "gaps": [
+   {
+    "operation": "attachWorkOrderEvidence",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): Bulk-attach residue: the task list carried the whole work-order lifecycle. The list needs Accept and Decline only; doing the work is EMP-005, and Verify (WORK_ORDER_VERIFY), Close (MAINTENANCE_APPROVE), Cancel and reassign are supervisor acts on BO-030 and BO-070 (F65 step 3; design-notes correction venue-operations EMP-004).",
+    "source": "F65 step 3 | contracts/satellite/maintenance.yaml#verifyWorkOrder | contracts/satellite/maintenance.yaml#closeWorkOrder"
+   },
+   {
+    "operation": "cancelWorkOrder",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): Bulk-attach residue: the task list carried the whole work-order lifecycle. The list needs Accept and Decline only; doing the work is EMP-005, and Verify (WORK_ORDER_VERIFY), Close (MAINTENANCE_APPROVE), Cancel and reassign are supervisor acts on BO-030 and BO-070 (F65 step 3; design-notes correction venue-operations EMP-004).",
+    "source": "F65 step 3 | contracts/satellite/maintenance.yaml#verifyWorkOrder | contracts/satellite/maintenance.yaml#closeWorkOrder"
+   },
+   {
+    "operation": "closeWorkOrder",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): Bulk-attach residue: the task list carried the whole work-order lifecycle. The list needs Accept and Decline only; doing the work is EMP-005, and Verify (WORK_ORDER_VERIFY), Close (MAINTENANCE_APPROVE), Cancel and reassign are supervisor acts on BO-030 and BO-070 (F65 step 3; design-notes correction venue-operations EMP-004).",
+    "source": "F65 step 3 | contracts/satellite/maintenance.yaml#verifyWorkOrder | contracts/satellite/maintenance.yaml#closeWorkOrder"
+   },
+   {
+    "operation": "completeWorkOrder",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): Bulk-attach residue: the task list carried the whole work-order lifecycle. The list needs Accept and Decline only; doing the work is EMP-005, and Verify (WORK_ORDER_VERIFY), Close (MAINTENANCE_APPROVE), Cancel and reassign are supervisor acts on BO-030 and BO-070 (F65 step 3; design-notes correction venue-operations EMP-004).",
+    "source": "F65 step 3 | contracts/satellite/maintenance.yaml#verifyWorkOrder | contracts/satellite/maintenance.yaml#closeWorkOrder"
+   },
+   {
+    "operation": "pauseWorkOrder",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): Bulk-attach residue: the task list carried the whole work-order lifecycle. The list needs Accept and Decline only; doing the work is EMP-005, and Verify (WORK_ORDER_VERIFY), Close (MAINTENANCE_APPROVE), Cancel and reassign are supervisor acts on BO-030 and BO-070 (F65 step 3; design-notes correction venue-operations EMP-004).",
+    "source": "F65 step 3 | contracts/satellite/maintenance.yaml#verifyWorkOrder | contracts/satellite/maintenance.yaml#closeWorkOrder"
+   },
+   {
+    "operation": "recordWorkOrderParts",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): Bulk-attach residue: the task list carried the whole work-order lifecycle. The list needs Accept and Decline only; doing the work is EMP-005, and Verify (WORK_ORDER_VERIFY), Close (MAINTENANCE_APPROVE), Cancel and reassign are supervisor acts on BO-030 and BO-070 (F65 step 3; design-notes correction venue-operations EMP-004).",
+    "source": "F65 step 3 | contracts/satellite/maintenance.yaml#verifyWorkOrder | contracts/satellite/maintenance.yaml#closeWorkOrder"
+   },
+   {
+    "operation": "recordWorkOrderTime",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): Bulk-attach residue: the task list carried the whole work-order lifecycle. The list needs Accept and Decline only; doing the work is EMP-005, and Verify (WORK_ORDER_VERIFY), Close (MAINTENANCE_APPROVE), Cancel and reassign are supervisor acts on BO-030 and BO-070 (F65 step 3; design-notes correction venue-operations EMP-004).",
+    "source": "F65 step 3 | contracts/satellite/maintenance.yaml#verifyWorkOrder | contracts/satellite/maintenance.yaml#closeWorkOrder"
+   },
+   {
+    "operation": "resumeWorkOrder",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): Bulk-attach residue: the task list carried the whole work-order lifecycle. The list needs Accept and Decline only; doing the work is EMP-005, and Verify (WORK_ORDER_VERIFY), Close (MAINTENANCE_APPROVE), Cancel and reassign are supervisor acts on BO-030 and BO-070 (F65 step 3; design-notes correction venue-operations EMP-004).",
+    "source": "F65 step 3 | contracts/satellite/maintenance.yaml#verifyWorkOrder | contracts/satellite/maintenance.yaml#closeWorkOrder"
+   },
+   {
+    "operation": "startWorkOrder",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): Bulk-attach residue: the task list carried the whole work-order lifecycle. The list needs Accept and Decline only; doing the work is EMP-005, and Verify (WORK_ORDER_VERIFY), Close (MAINTENANCE_APPROVE), Cancel and reassign are supervisor acts on BO-030 and BO-070 (F65 step 3; design-notes correction venue-operations EMP-004).",
+    "source": "F65 step 3 | contracts/satellite/maintenance.yaml#verifyWorkOrder | contracts/satellite/maintenance.yaml#closeWorkOrder"
+   },
+   {
+    "operation": "updateWorkOrder",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): Bulk-attach residue: the task list carried the whole work-order lifecycle. The list needs Accept and Decline only; doing the work is EMP-005, and Verify (WORK_ORDER_VERIFY), Close (MAINTENANCE_APPROVE), Cancel and reassign are supervisor acts on BO-030 and BO-070 (F65 step 3; design-notes correction venue-operations EMP-004).",
+    "source": "F65 step 3 | contracts/satellite/maintenance.yaml#verifyWorkOrder | contracts/satellite/maintenance.yaml#closeWorkOrder"
+   },
+   {
+    "operation": "verifyWorkOrder",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): Bulk-attach residue: the task list carried the whole work-order lifecycle. The list needs Accept and Decline only; doing the work is EMP-005, and Verify (WORK_ORDER_VERIFY), Close (MAINTENANCE_APPROVE), Cancel and reassign are supervisor acts on BO-030 and BO-070 (F65 step 3; design-notes correction venue-operations EMP-004).",
+    "source": "F65 step 3 | contracts/satellite/maintenance.yaml#verifyWorkOrder | contracts/satellite/maintenance.yaml#closeWorkOrder"
+   }
+  ],
   "_platform": {
    "code": "P06",
    "audience": "staff",
@@ -3128,7 +2201,7 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-005 holds none of them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-005 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
@@ -3329,18 +2402,6 @@
        "provenance": "contract maintenance.yaml POST /work-orders/{workOrderId}/attachments"
       },
       {
-       "kind": "destructiveButton",
-       "label": "Cancel work order",
-       "operation": "cancelWorkOrder",
-       "provenance": "contract maintenance.yaml POST /work-orders/{workOrderId}/cancel"
-      },
-      {
-       "kind": "destructiveButton",
-       "label": "Close work order",
-       "operation": "closeWorkOrder",
-       "provenance": "contract maintenance.yaml POST /work-orders/{workOrderId}/close"
-      },
-      {
        "kind": "secondaryButton",
        "label": "Record work order parts",
        "operation": "recordWorkOrderParts",
@@ -3364,18 +2425,6 @@
        "label": "Resume work order",
        "operation": "resumeWorkOrder",
        "provenance": "contract maintenance.yaml POST /work-orders/{workOrderId}/resume"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Save work order",
-       "operation": "updateWorkOrder",
-       "provenance": "contract maintenance.yaml PATCH /work-orders/{workOrderId}"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Verify work order",
-       "operation": "verifyWorkOrder",
-       "provenance": "contract maintenance.yaml POST /work-orders/{workOrderId}/verify"
       }
      ]
     },
@@ -3413,20 +2462,6 @@
    ]
   },
   "overlays": [
-   {
-    "id": "confirmCancelWorkOrder",
-    "component": "confirmDialog",
-    "trigger": "Cancel work order",
-    "body": "**Names what `cancelWorkOrder` changes and what it leaves alone**, in the consequence rather than the verb. A task this affects should be identified in the dialog, not just counted. **Collects what `cancelWorkOrder` sends before it is called.** Required: `reason`. Optional: `note`, `supersededByWorkOrderId`.",
-    "provenance": "contract maintenance.yaml POST /work-orders/{workOrderId}/cancel"
-   },
-   {
-    "id": "confirmCloseWorkOrder",
-    "component": "confirmDialog",
-    "trigger": "Close work order",
-    "body": "**Names what `closeWorkOrder` changes and what it leaves alone**, in the consequence rather than the verb. A task this affects should be identified in the dialog, not just counted. **Collects what `closeWorkOrder` sends before it is called.** Required: `outcome`. Optional: `note`, `duplicateOfWorkOrderId`.",
-    "provenance": "contract maintenance.yaml POST /work-orders/{workOrderId}/close"
-   },
    {
     "id": "confirmRejectWorkOrder",
     "component": "confirmDialog",
@@ -3550,45 +2585,6 @@
      ]
     },
     "provenance": "contract maintenance.yaml POST /work-orders/{workOrderId}/time"
-   },
-   {
-    "id": "formUpdateWorkOrder",
-    "component": "modal",
-    "trigger": "Save work order",
-    "body": "**Collects what `updateWorkOrder` sends before it is called.** Nothing in the body is required. Optional: `assignedToPrincipalId`, `priority`, `dueAt`, `description`, `categoryId`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Save work order",
-     "operation": "updateWorkOrder"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "assignedToPrincipalId",
-      "priority",
-      "dueAt",
-      "description",
-      "categoryId"
-     ]
-    },
-    "provenance": "contract maintenance.yaml PATCH /work-orders/{workOrderId}"
-   },
-   {
-    "id": "formVerifyWorkOrder",
-    "component": "modal",
-    "trigger": "Verify work order",
-    "body": "**Collects what `verifyWorkOrder` sends before it is called.** Required: `outcome`. Optional: `note`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Verify work order",
-     "operation": "verifyWorkOrder"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "outcome",
-      "note"
-     ]
-    },
-    "provenance": "contract maintenance.yaml POST /work-orders/{workOrderId}/verify"
    }
   ],
   "states": {
@@ -3679,24 +2675,6 @@
     ]
    },
    {
-    "operationId": "cancelWorkOrder",
-    "contract": "maintenance",
-    "purpose": "Cancel a work order",
-    "trigger": "onAction",
-    "invalidates": [
-     "listWorkOrders"
-    ]
-   },
-   {
-    "operationId": "closeWorkOrder",
-    "contract": "maintenance",
-    "purpose": "Administratively closed",
-    "trigger": "onAction",
-    "invalidates": [
-     "listWorkOrders"
-    ]
-   },
-   {
     "operationId": "listWorkOrders",
     "contract": "maintenance",
     "purpose": "List work orders",
@@ -3737,24 +2715,6 @@
     "invalidates": [
      "listWorkOrders"
     ]
-   },
-   {
-    "operationId": "updateWorkOrder",
-    "contract": "maintenance",
-    "purpose": "Assign, reprioritise or amend",
-    "trigger": "onAction",
-    "invalidates": [
-     "listWorkOrders"
-    ]
-   },
-   {
-    "operationId": "verifyWorkOrder",
-    "contract": "maintenance",
-    "purpose": "Supervisor verification",
-    "trigger": "onAction",
-    "invalidates": [
-     "listWorkOrders"
-    ]
    }
   ],
   "entryState": {
@@ -3783,6 +2743,32 @@
    "board": "wireframes/P06 Venue Staff App.dc.html#emp-005"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 15 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "gaps": [
+   {
+    "operation": "cancelWorkOrder",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): Verify, Close, Cancel and Save (reassign, reprioritise) are supervisor acts (the verifier may not be the technician); they belong to BO-030 and BO-070, not the technician's task screen (F12 step 4; design-notes correction venue-operations EMP-005).",
+    "source": "contracts/satellite/maintenance.yaml#verifyWorkOrder | F12 step 4"
+   },
+   {
+    "operation": "closeWorkOrder",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): Verify, Close, Cancel and Save (reassign, reprioritise) are supervisor acts (the verifier may not be the technician); they belong to BO-030 and BO-070, not the technician's task screen (F12 step 4; design-notes correction venue-operations EMP-005).",
+    "source": "contracts/satellite/maintenance.yaml#verifyWorkOrder | F12 step 4"
+   },
+   {
+    "operation": "updateWorkOrder",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): Verify, Close, Cancel and Save (reassign, reprioritise) are supervisor acts (the verifier may not be the technician); they belong to BO-030 and BO-070, not the technician's task screen (F12 step 4; design-notes correction venue-operations EMP-005).",
+    "source": "contracts/satellite/maintenance.yaml#verifyWorkOrder | F12 step 4"
+   },
+   {
+    "operation": "verifyWorkOrder",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): Verify, Close, Cancel and Save (reassign, reprioritise) are supervisor acts (the verifier may not be the technician); they belong to BO-030 and BO-070, not the technician's task screen (F12 step 4; design-notes correction venue-operations EMP-005).",
+    "source": "contracts/satellite/maintenance.yaml#verifyWorkOrder | F12 step 4"
+   }
+  ],
   "_platform": {
    "code": "P06",
    "audience": "staff",
@@ -3833,7 +2819,7 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-006 holds none of them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-006 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
@@ -4498,8 +3484,6 @@
   },
   "navigation": {
    "exitTo": [
-    "EMP-001",
-    "EMP-002",
     "EMP-003",
     "EMP-009"
    ],
@@ -4507,24 +3491,15 @@
    "fromFlows": true,
    "transitions": [
     {
-     "to": "EMP-009",
-     "trigger": "Ends the shift",
-     "provenance": "flow F08 step 7→8"
-    },
-    {
-     "to": "EMP-001",
-     "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-007 holds none of them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
-    },
-    {
-     "to": "EMP-002",
-     "trigger": "Select venue & role",
-     "provenance": "derived — EMP-002 declares entryState.params  and EMP-007 holds none of them. The edge carries nothing: EMP-002 needs nothing to open"
-    },
-    {
      "to": "EMP-003",
      "trigger": "Home — on duty",
      "provenance": "derived — EMP-003 declares entryState.params incidentId and EMP-007 holds none of them. The edge carries nothing: incidentId only pre-selects (deep link or optional), and EMP-003 opens on its own"
+    },
+    {
+     "to": "EMP-009",
+     "trigger": "Ends the shift with a blind count (no expected cash shown;",
+     "provenance": "flow F08 step 7→8",
+     "operation": "listWorkOrders"
     }
    ]
   },
@@ -4541,98 +3516,22 @@
      "slot": "collection",
      "components": [
       {
-       "kind": "toggle",
-       "label": "Unacknowledged only",
-       "operation": "listAnnouncements",
-       "notes": "Sends `?unacknowledgedOnly=` to `listAnnouncements`.",
-       "provenance": "contract workforce.yaml GET /announcements"
-      },
-      {
        "kind": "dataTable",
-       "label": "Every announcement",
-       "bindsTo": "Announcement",
-       "columns": [
-        "Announcement.id",
-        "Announcement.title",
-        "Announcement.body",
-        "Announcement.kind",
-        "Announcement.venueIds",
-        "Announcement.departmentIds",
-        "Announcement.roleIds",
-        "Announcement.requiresAcknowledgement",
-        "Announcement.expiresAt",
-        "Announcement.publishedByPrincipalId",
-        "Announcement.publishedAt",
-        "Announcement.locale"
-       ],
-       "operation": "listAnnouncements",
-       "provenance": "contract workforce.yaml GET /announcements"
-      },
-      {
-       "kind": "publishGate",
-       "impliedBy": "publishAnnouncement",
-       "notes": "Declares `publishAnnouncement`. **The gate names what the publish will affect before it happens** — a disabled Publish with no reason is the state operators escalate.\n",
-       "provenance": "carried from the previous definition"
+       "label": "Carried over",
+       "operation": "listWorkOrders",
+       "provenance": "contract maintenance.yaml GET /work-orders; wiring fix, 2 October 2026"
       }
      ]
     },
     {
      "name": "contextPanel",
      "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected announcement",
-       "bindsTo": "Announcement",
-       "columns": [
-        "Announcement.id",
-        "Announcement.title",
-        "Announcement.body",
-        "Announcement.kind",
-        "Announcement.venueIds",
-        "Announcement.departmentIds",
-        "Announcement.roleIds",
-        "Announcement.requiresAcknowledgement",
-        "Announcement.expiresAt",
-        "Announcement.publishedByPrincipalId",
-        "Announcement.publishedAt",
-        "Announcement.locale"
-       ],
-       "operation": "listAnnouncements",
-       "provenance": "contract workforce.yaml GET /announcements"
-      },
-      {
-       "kind": "detailPanel",
-       "label": "The announcement reach",
-       "bindsTo": "AnnouncementReach",
-       "columns": [
-        "AnnouncementReach.announcementId",
-        "AnnouncementReach.targeted",
-        "AnnouncementReach.delivered",
-        "AnnouncementReach.acknowledged",
-        "AnnouncementReach.outstanding"
-       ],
-       "operation": "getAnnouncementReach",
-       "provenance": "contract workforce.yaml GET /announcements/{announcementId}/reach"
-      }
-     ]
+     "components": []
     },
     {
      "name": "actionBar",
      "slot": "rowActions",
      "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Publish announcement",
-       "operation": "publishAnnouncement",
-       "provenance": "contract workforce.yaml POST /announcements"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Acknowledge announcement",
-       "operation": "acknowledgeAnnouncement",
-       "provenance": "contract workforce.yaml POST /announcements/{announcementId}/acknowledge"
-      },
       {
        "kind": "publishGate",
        "label": "What publishing changes",
@@ -4648,48 +3547,19 @@
    "error": "Could not load. Names which read failed and leaves the handover notes untouched.",
    "emptyFirstRun": "No handover notes yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
    "emptyNoResults": "Nothing matches the filter on unacknowledgedOnly and the handover notes are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `WORKFORCE_VIEW`, which `listAnnouncements` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "Shown when the caller lacks `WORK_ORDER_VIEW`, which `listWorkOrders` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "Editable offline and synced at end of shift"
   },
   "apis": [
    {
-    "operationId": "listAnnouncements",
-    "contract": "workforce",
-    "purpose": "What staff have been told",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "publishAnnouncement",
-    "contract": "workforce",
-    "purpose": "Tell staff something",
-    "trigger": "onAction",
-    "invalidates": [
-     "listAnnouncements"
-    ]
-   },
-   {
-    "operationId": "acknowledgeAnnouncement",
-    "contract": "workforce",
-    "purpose": "Confirm you have read it",
-    "trigger": "onAction",
-    "invalidates": [
-     "listAnnouncements"
-    ]
-   },
-   {
-    "operationId": "getAnnouncementReach",
-    "contract": "workforce",
-    "purpose": "Who has acknowledged, and who has not",
-    "trigger": "onAction"
+    "operationId": "listWorkOrders",
+    "contract": "maintenance",
+    "purpose": "Open work carried into the handover, for the next person on the post",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-001)"
    }
   ],
   "entryState": {
-   "params": [
-    {
-     "name": "announcementId",
-     "from": "deepLink"
-    }
-   ],
    "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `announcementId`.",
    "preloaded": [
     "Announcement.id",
@@ -4705,35 +3575,35 @@
    "board": "wireframes/P06 Venue Staff App.dc.html#emp-007"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
-  "overlays": [
+  "gaps": [
    {
-    "id": "formPublishAnnouncement",
-    "component": "modal",
-    "trigger": "Publish announcement",
-    "body": "**Collects what `publishAnnouncement` sends before it is called.** Required: `title`, `body`, `kind`, `publishedAt`. Optional: `id`, `venueIds`, `departmentIds`, `roleIds`, `requiresAcknowledgement`, `expiresAt`, `publishedByPrincipalId`, `locale`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "Announcement",
-    "confirm": {
-     "label": "Publish announcement",
-     "operation": "publishAnnouncement"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "title",
-      "body",
-      "kind",
-      "publishedAt",
-      "id",
-      "venueIds",
-      "departmentIds",
-      "roleIds",
-      "requiresAcknowledgement",
-      "expiresAt",
-      "publishedByPrincipalId",
-      "locale"
-     ]
-    },
-    "provenance": "contract workforce.yaml POST /announcements"
+    "operation": "acknowledgeAnnouncement",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): A handover is not a staff announcement: publishing needs ANNOUNCEMENT_PUBLISH, which a steward does not hold, and reaches the whole audience, not the next person on the post. F65 says the handover is generated from open tasks, so the carried items are read from listWorkOrders; the handover note itself has no operation yet (contract gap CHG-WIR-004) (F65 step 5, F08 step 7; design-notes correction venue-operations EMP-007).",
+    "source": "F65 step 5 | contracts/satellite/workforce.yaml#publishAnnouncement | F08 step 7"
+   },
+   {
+    "operation": "getAnnouncementReach",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): A handover is not a staff announcement: publishing needs ANNOUNCEMENT_PUBLISH, which a steward does not hold, and reaches the whole audience, not the next person on the post. F65 says the handover is generated from open tasks, so the carried items are read from listWorkOrders; the handover note itself has no operation yet (contract gap CHG-WIR-004) (F65 step 5, F08 step 7; design-notes correction venue-operations EMP-007).",
+    "source": "F65 step 5 | contracts/satellite/workforce.yaml#publishAnnouncement | F08 step 7"
+   },
+   {
+    "operation": "listAnnouncements",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): A handover is not a staff announcement: publishing needs ANNOUNCEMENT_PUBLISH, which a steward does not hold, and reaches the whole audience, not the next person on the post. F65 says the handover is generated from open tasks, so the carried items are read from listWorkOrders; the handover note itself has no operation yet (contract gap CHG-WIR-004) (F65 step 5, F08 step 7; design-notes correction venue-operations EMP-007).",
+    "source": "F65 step 5 | contracts/satellite/workforce.yaml#publishAnnouncement | F08 step 7"
+   },
+   {
+    "operation": "publishAnnouncement",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): A handover is not a staff announcement: publishing needs ANNOUNCEMENT_PUBLISH, which a steward does not hold, and reaches the whole audience, not the next person on the post. F65 says the handover is generated from open tasks, so the carried items are read from listWorkOrders; the handover note itself has no operation yet (contract gap CHG-WIR-004) (F65 step 5, F08 step 7; design-notes correction venue-operations EMP-007).",
+    "source": "F65 step 5 | contracts/satellite/workforce.yaml#publishAnnouncement | F08 step 7"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-004): No operation reads or writes a shift handover note (who it is for, the post, the carried items).",
+    "source": "F65 step 5 | F08 step 7"
    }
   ],
   "_platform": {
@@ -4791,7 +3661,7 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-008 holds none of them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-008 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
@@ -4805,7 +3675,7 @@
     }
    ]
   },
-  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. **Removed 24 August**: acceptShiftVariance, approveShiftOpen, closeShift, createCashMovement. **Bulk-attach residue, found by walking a journey.** A device-settings screen does not read guest loyalty, a venue map does not set a refund policy, a shift summary does not close the shift, and **a rota a steward can rewrite is not a rota.** **Removed 24 August**: openShift, recordNoSale, reopenShift, resumeShift. **Bulk-attach residue.** A device-settings screen does not merge guest profiles, a rota view does not author the rota, a shift summary does not open a shift, and **authority notification belongs where the incident is raised, not where it is read.**",
+  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. **Removed 24 August**: acceptShiftVariance, approveShiftOpen, closeShift, createCashMovement. **Bulk-attach residue, found by walking a journey.** A device-settings screen does not read guest loyalty, a venue map does not set a refund policy, a shift summary does not close the shift, and **a rota a steward can rewrite is not a rota.** **Removed 24 August**: openShift, recordNoSale, reopenShift, resumeShift. **Bulk-attach residue.** A device-settings screen does not merge guest profiles, a rota view does not author the rota, a shift summary does not open a shift, and **authority notification belongs where the incident is raised, not where it is read.**\n\n**No figures from which the expected cash could be worked out** (decided 2 October 2026, Chinmay; CHG-FIN-003). The summary shows what the person did (sales count, voids, no-sales, breaks), not sales, refunds or lifts totals, and never expected cash or variance, for their own shift. A supervisor reads those on BO-040.",
   "density": "comfortable",
   "pattern": "listDetail",
   "patternReason": "`listShifts` reads the population and `getCurrentShift` reads one of them — list, select, act",
@@ -4817,6 +3687,14 @@
      "name": "contentBody",
      "slot": "collection",
      "components": [
+      {
+       "kind": "metricTile",
+       "label": "My service today: covers, tables, sales, tips",
+       "bindsTo": "ServiceSummary",
+       "operation": "getServiceSummary",
+       "notes": "For a server without a till (decided 2 October 2026, Chinmay, batch 6, EMP-008: \"Yes: a service summary (covers, tables, sales, tips)\"; DEC-199; CHG-CSA-020). Self-scoped under REPORT_VIEW_OWN. A cashier with a drawer sees the shift instead; neither ever sees expected cash (CHG-FIN-003).",
+       "provenance": "contract reporting.yaml GET /service-summary"
+      },
       {
        "kind": "textField",
        "label": "Workstation id",
@@ -4910,10 +3788,7 @@
         "Shift.currencyScale",
         "Shift.depositBoxCode",
         "Shift.bagNumber",
-        "Shift.openingFloat",
-        "Shift.salesTotal",
-        "Shift.refundsTotal",
-        "Shift.liftsTotal"
+        "Shift.openingFloat"
        ],
        "operation": "getCurrentShift",
        "provenance": "contract shift.yaml GET /shifts/current"
@@ -4935,10 +3810,7 @@
         "Shift.currencyScale",
         "Shift.depositBoxCode",
         "Shift.bagNumber",
-        "Shift.openingFloat",
-        "Shift.salesTotal",
-        "Shift.refundsTotal",
-        "Shift.liftsTotal"
+        "Shift.openingFloat"
        ],
        "operation": "getShift",
        "provenance": "contract shift.yaml GET /shifts/{shiftId}"
@@ -4948,26 +3820,10 @@
     {
      "name": "actionBar",
      "slot": "rowActions",
-     "components": [
-      {
-       "kind": "destructiveButton",
-       "label": "Suspend shift",
-       "operation": "suspendShift",
-       "provenance": "contract shift.yaml POST /shifts/{shiftId}/suspend"
-      }
-     ]
+     "components": []
     }
    ]
   },
-  "overlays": [
-   {
-    "id": "confirmSuspendShift",
-    "component": "confirmDialog",
-    "trigger": "Suspend shift",
-    "body": "**Names what `suspendShift` changes and what it leaves alone**, in the consequence rather than the verb. A shift summary this affects should be identified in the dialog, not just counted. **Collects what `suspendShift` sends before it is called.** Required: `recordedAt`. Optional: `reason`.",
-    "provenance": "contract shift.yaml POST /shifts/{shiftId}/suspend"
-   }
-  ],
   "states": {
    "loading": "The shift summary list.",
    "error": "Could not load. Names which read failed and leaves the shift summary untouched.",
@@ -5002,13 +3858,10 @@
     "trigger": "onLoad"
    },
    {
-    "operationId": "suspendShift",
-    "contract": "shift",
-    "purpose": "Suspend a shift so another user can log in",
-    "trigger": "onAction",
-    "invalidates": [
-     "listShifts"
-    ]
+    "operationId": "getServiceSummary",
+    "contract": "reporting",
+    "purpose": "A server without a till: my covers, tables, sales and tips today (DEC-199; CHG-CSA-020)",
+    "trigger": "onLoad"
    }
   ],
   "entryState": {
@@ -5033,6 +3886,14 @@
    "board": "wireframes/P06 Venue Staff App.dc.html#emp-008"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "gaps": [
+   {
+    "operation": "suspendShift",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-008): F72 step 1 declares the shift summary read-only (\"the person being reviewed could sign off their own review\"); suspending is the break mechanism and belongs on the till (R254; design-notes correction fnb-retail EMP-008).",
+    "source": "F72 step 1 | R254 | contracts/spine/shift.yaml#suspendShift"
+   }
+  ],
   "_platform": {
    "code": "P06",
    "audience": "staff",

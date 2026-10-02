@@ -1,4 +1,23 @@
 {
+ "createForm": {
+  "method": "POST",
+  "path": "/forms",
+  "contract": "marketing-crm",
+  "summary": "Define a waiver, survey or capture form",
+  "permission": "MARKETING_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "FormDefinition",
+  "responds": "FormDefinition"
+ },
  "decideDuplicateCandidate": {
   "method": "POST",
   "path": "/duplicate-candidates/{candidateId}/decide",
@@ -203,6 +222,59 @@
   "requestBody": null,
   "responds": "Page"
  },
+ "listForms": {
+  "method": "GET",
+  "path": "/forms",
+  "contract": "marketing-crm",
+  "summary": "Waivers, surveys and capture forms",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "kind",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listPolicies": {
+  "method": "GET",
+  "path": "/tenant-config/policies",
+  "contract": "white-label",
+  "summary": "List legal policies",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "includeHistory",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "kind",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Policy"
+ },
  "listPrivacy": {
   "method": "GET",
   "path": "/privacy",
@@ -400,45 +472,6 @@
   "requestBody": null,
   "responds": "Page"
  },
- "listVersioningEffectiveDate": {
-  "method": "GET",
-  "path": "/versioning-effective-date",
-  "contract": "marketing-crm",
-  "summary": "Versioning, Effective Dates & Legal Change Control",
-  "permission": "GUEST_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "formId",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "compareWith",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "status",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- },
  "mergeGuests": {
   "method": "POST",
   "path": "/guests/merge",
@@ -572,25 +605,6 @@
   "requestBody": "DataDiscoveryAccessExportCorrectionWorkspaceInput",
   "responds": "DataDiscoveryAccessExportCorrectionWorkspaceView"
  },
- "setDataRetentionPolicy": {
-  "method": "PUT",
-  "path": "/retention-policies",
-  "contract": "marketing-crm",
-  "summary": "How long guest data is kept, and what happens at expiry",
-  "permission": "GUEST_MANAGE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "DataRetentionPolicy",
-  "responds": "DataRetentionPolicy"
- },
  "setDataRetentionSetting": {
   "method": "PUT",
   "path": "/data-retention-settings/{dataClass}",
@@ -647,5 +661,24 @@
   ],
   "requestBody": "IdentityResolutionRules",
   "responds": "IdentityResolutionRules"
+ },
+ "setPrivacyRequest": {
+  "method": "PUT",
+  "path": "/data-subject-customer",
+  "contract": "marketing-crm",
+  "summary": "Raise or progress a privacy request",
+  "permission": "GUEST_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "DataSubjectCustomerPrivacyRequestManagementView",
+  "responds": "DataSubjectCustomerPrivacyRequestManagementView"
  }
 }

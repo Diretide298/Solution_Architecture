@@ -60,6 +60,21 @@ precisely because it was rare.
 `session` meant *authenticated with no specific permission* — ten operations, all of them staff.
 It described a mechanism rather than an audience and folded into `staff`.
 
+### `prospect`, added 2 October 2026
+
+**`prospect`** — a would-be customer on the P17 sign-up journey, between "Start new setup" and
+activation. They prove a work email with a one-time code (`startProspectSignup`,
+`verifyProspectSignupCode`) and hold the `prospectAuth` session, scoped to one onboarding
+application: **no tenant, no permission**. Not `staff` (they hold no staff token), not `guest`
+(they are not a venue's customer), not `public` (what they call is scoped to their own
+application). Decided by Chinmay on 2 October (DEC-167: "Email + one-time code"; CHG-CLN-010,
+CHG-CLN-019) and added to the closed set by CHG-GTB-001 — the contracts used it before
+`check-package` knew it, and the check refused all twelve operations.
+
+The closed set is now eight values: `staff`, `guest`, `partner`, `public`, `anonymous`, `device`,
+`service`, `prospect`. `check-package.py` (`VOCAB`) enforces it; `build-audience.py` publishes it
+as `values` in `handoff/audience-index.json`.
+
 ---
 
 ## Consequences

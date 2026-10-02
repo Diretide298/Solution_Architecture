@@ -356,6 +356,11 @@
     ],
     "default": "off",
     "description": "When GST-001 plays it full screen. \"Skip introduction\" is always shown. Anything but `off` needs `introVideoAssetRef`, or 400."
+   },
+   "showPoweredBy": {
+    "type": "boolean",
+    "default": true,
+    "description": "**\"Powered by TICVAI\", a configuration toggle, on by default** (Chinmay, 2 October, workbook Q160 and the pre-apply round; consistent with DI-297; CHG-CSA-036). Shown on the launch screen and at the foot of Account and the web footer while true. **Switching it off needs the tenant's licence to allow it**: `setBrandIdentity` refuses `false` with `403 powered-by-locked` unless the tenant's plan carries the `poweredByRemoval` add-on (subscription `LicencePosition.poweredByRemovable`)."
    }
   }
  },
@@ -964,6 +969,57 @@
     "readOnly": true,
     "x-ticvai-derived": "onWrite",
     "description": "`recordedAt` of the latest admission counted in `entriesUsed`, written by the same writes. A scan replayed late with an earlier `recordedAt` does not move it back.\n"
+   },
+   "firstEntryAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-derived": "onWrite",
+    "description": "`recordedAt` of the first admission, written by the same writes as `lastEntryAt`; it starts a time-bound entitlement's window (DEC-232; CHG-CSP-030). A replayed earlier scan moves it back."
+   },
+   "timeBoundUntil": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-derived": "onWrite",
+    "description": "**Where the template is time-bound, when its window closes**: `firstEntryAt` plus the validity rule's `minutesAfterFirstScan` (decided 2 October 2026, Chinmay, BO-159; DEC-232; CHG-CSP-030). Null until the first scan and on an entitlement with no time bound. A scan after it is denied (`timeBoundWindowElapsed`); it never extends `validTo`, and the earlier of the two wins."
+   },
+   "lifecycleLabel": {
+    "type": "string",
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "x-ticvai-derived": "onRead",
+    "enum": [
+     "created",
+     "pendingFulfillment",
+     "active",
+     "partiallyUsed",
+     "used",
+     "expired",
+     "suspended",
+     "cancelled",
+     "voided",
+     "reissuedSuperseded",
+     "refunded",
+     "transferred",
+     "blocked"
+    ],
+    "description": "**The Virtual Ticket status in the client's 13 names, mapped onto the entitlement model** (decided 2 October 2026, Chinmay, critical set 2, BO-336: \"Map the pack's 13 names onto the model; add any missing states\", and BO-336/DI-670: \"Reserved maps to Pending fulfilment\"; DEC-266; CHG-CSP-033). Computed on read from `status` (orders `EntitlementStatus`), `suspendedReason`, `cancellationKind`, `issuedVia` and an active identity lock; the mapping is in `states/entitlement-status.yaml`. It is what BO-334, BO-336 and the ticket status transition matrix (`AccessTicketStatusTransition`) show; logic still reads `status`."
+   },
+   "cancellationKind": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-derived": "onWrite",
+    "enum": [
+     "voided",
+     "refunded",
+     "performanceCancelled",
+     "superseded"
+    ],
+    "description": "**Which act cancelled the entitlement**, so the pack's Voided, Refunded and Reissued / superseded are told apart while `status` keeps the one r1 value `cancelled` (DEC-266; CHG-CSP-033). Written with the cancelling transition: `voidEntitlement`, `createRefund`, `cancelPerformance`, or a reissue that supersedes it (`supersedesEntitlementId` on the new one). Null unless `cancelled`."
    },
    "frozenDays": {
     "type": "integer",
@@ -1579,10 +1635,25 @@
  "HomepageLayout": {
   "x-ticvai-persistence": "whitelabel.homepage_section",
   "type": "object",
+  "description": "**The client-approved web and app wireframes are the layout** (Chinmay, 2 October, workbook Q163; CHG-CSA-040): sections, their order and their options follow the approved wireframes and change only where the spec breaks. **Landing-page templates** (workbook Q41 batch 2; CHG-CSA-037): a tenant with no landing page of its own starts from a TICVAI template (`templateKey`, `listLandingPageTemplates`); a tenant with its own site links into the storefront with deep links (`getDeepLinkScheme`, `buildDeepLink`).",
   "required": [
    "sections"
   ],
   "properties": {
+   "templateKey": {
+    "type": "string",
+    "nullable": true,
+    "description": "The landing-page template this layout started from (`listLandingPageTemplates`), or null for a layout composed from scratch (CHG-CSA-037)."
+   },
+   "landingSource": {
+    "type": "string",
+    "enum": [
+     "storefront",
+     "ownSite"
+    ],
+    "default": "storefront",
+    "description": "`storefront`: this home is the tenant's landing page. `ownSite`: the tenant's own website is the landing page and links in with deep links; this home is still served at the storefront address."
+   },
    "id": {
     "type": "string",
     "format": "uuid",
@@ -1625,7 +1696,19 @@
       "maxItems": {
        "type": "integer",
        "nullable": true,
-       "description": "How many items the section shows. On the mobile Home, `attractions`, `dining`, `whatsOn` and `shop` show 1 or 2 highlights (decided 29 September, MOB-3)."
+       "description": "**How many cards the section shows, the venue's choice** (Chinmay, 2 October, workbook Q152: every customisation option of the approved wireframe, including the card count per section; CHG-CSA-040). Replaces the fixed 1 or 2 highlights of MOB-3: the CMS offers the counts the approved wireframe offers."
+      },
+      "scrollAnimation": {
+       "type": "string",
+       "enum": [
+        "rise",
+        "scale",
+        "slide",
+        "blur",
+        "none"
+       ],
+       "default": "rise",
+       "description": "**How the section enters as the guest scrolls** (Chinmay, 2 October, workbook Q153: \"must be there\"; DI-1088; CHG-CSA-040). Rise, Scale, Slide, Blur or None, as the v4 prototype offers; `none` for guests who asked the device for reduced motion is applied whatever is set."
       },
       "heroStyle": {
        "type": "string",
@@ -1654,6 +1737,7 @@
   "properties": {
    "languages": {
     "type": "array",
+    "description": "**A tenant may add or select interface languages beyond English and Arabic** (Chinmay, 2 October, workbook Q145; CHG-CSA-039). Any ISO 639-1 language. English and Arabic ship with complete interface strings; for any other, the interface strings come as a TICVAI string pack drafted by AI translation and reviewed (T03), and a string with no translation falls back to English. Content (pages, products, banners) is the tenant's to translate (`translationGaps`).",
     "items": {
      "type": "string",
      "pattern": "^[a-z]{2}$"
@@ -1662,6 +1746,32 @@
    "defaultLanguage": {
     "type": "string",
     "pattern": "^[a-z]{2}$"
+   },
+   "uiStringCoverage": {
+    "type": "array",
+    "readOnly": true,
+    "description": "How complete the interface strings are in each enabled language (CHG-CSA-039). English and Arabic are always complete.",
+    "items": {
+     "type": "object",
+     "properties": {
+      "language": {
+       "type": "string"
+      },
+      "coveragePercent": {
+       "type": "number",
+       "minimum": 0,
+       "maximum": 100
+      },
+      "status": {
+       "type": "string",
+       "enum": [
+        "complete",
+        "draft",
+        "missing"
+       ]
+      }
+     }
+    }
    },
    "rtlLanguages": {
     "type": "array",
@@ -1723,25 +1833,7 @@
   }
  },
  "ModuleKey": {
-  "type": "string",
-  "enum": [
-   "ticketsAndBooking",
-   "membership",
-   "events",
-   "attractions",
-   "virtualQueue",
-   "diningAndFnb",
-   "shop",
-   "parking",
-   "gamification",
-   "photoGallery",
-   "wallet",
-   "loyalty",
-   "lostAndFound",
-   "map",
-   "visitPlanner"
-  ],
-  "description": "`visitPlanner` (decided 29 September, MOB-1 and the Plan tab in Block A) is the Plan tab and WEB-050; off, the tab and the page are not shown."
+  "$ref": "../shared/common.yaml#/components/schemas/ModuleKey"
  },
  "Money": {
   "type": "object",
@@ -3123,7 +3215,8 @@
    },
    "darkMode": {
     "type": "object",
-    "description": "Optional dark variant. Derived from the light theme when absent.",
+    "deprecated": true,
+    "description": "**Deprecated and ignored** (Chinmay, 2 October, workbook Q150 and the pre-apply round; CHG-CSA-035). White label has no dark or light mode: the venue's chosen theme is applied, on every device setting. The field is kept so a client built at r1 still parses, is accepted on `setTheme` and returned as stored, and **is never used to render anything or drawn on any screen**; the guest app has no Light/Dark switch.",
     "properties": {
      "primaryColour": {
       "type": "string",

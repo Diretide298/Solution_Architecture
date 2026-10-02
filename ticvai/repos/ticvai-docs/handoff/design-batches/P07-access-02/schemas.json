@@ -41,6 +41,24 @@
      }
     ]
    },
+   "fromDirection": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/Direction"
+     }
+    ],
+    "nullable": true,
+    "description": "Set on a live direction switch (`setAccessPointDirection`; DEC-255; CHG-CSP-032); null on a mode change. On a direction switch `targetMode` repeats the unchanged operating mode."
+   },
+   "toDirection": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/Direction"
+     }
+    ],
+    "nullable": true,
+    "description": "The direction switched to (CHG-CSP-032)."
+   },
    "status": {
     "type": "string",
     "enum": [
@@ -148,7 +166,41 @@
       "$ref": "#/components/schemas/Direction"
      }
     ],
-    "description": "**Fixed per access point** (audit R221): set in the back office by `createAccessPoint` and `updateAccessPoint`, never by the podium.\n"
+    "description": "**Fixed per access point** (audit R221): set in the back office by `createAccessPoint` and `updateAccessPoint`, never by the podium.\n\n**R221 amended 2 October 2026: a gate's direction can be switched live** (Chinmay, critical set 1, BO-230: \"Live direction switch with permission, logged\"; DEC-255; CHG-CSP-032; DI-648: more entry gates in the morning, more exit gates in the evening). `setAccessPointDirection` switches it from Live Gate Mode & Lane Control (BO-230) or the scanner's gate mode screen (SCN-016) for a holder of the configuration right, logged; the podium's `setTurnstileMode` still never touches it.\n"
+   },
+   "temporaryClosure": {
+    "type": "object",
+    "nullable": true,
+    "description": "**What the access point does while its attraction is temporarily closed** (decided 2 October 2026, Chinmay, batch 6 set 9, BO-147: \"Deny + reopening time + a virtual-queue return window where enabled\"; DEC-228; CHG-CSP-026). While `isClosed`, every scan is denied (`ValidationResult.denyCause` `attractionTemporarilyClosed`) with the reopening time when it is known; where the venue offers it and the attraction has a virtual queue, the guest is offered a return window (`queue.joinQueue`) instead of being turned away empty-handed. Set with `updateAccessPoint`; null when open. Travels in the offline package, so an offline gate denies the same way.",
+    "properties": {
+     "isClosed": {
+      "type": "boolean",
+      "default": false
+     },
+     "reason": {
+      "type": "string",
+      "maxLength": 200,
+      "nullable": true,
+      "description": "Shown to staff; the guest sees \"Attraction temporarily closed\"."
+     },
+     "reopensAt": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true,
+      "description": "When it is expected to reopen; shown to the guest when known."
+     },
+     "offerVirtualQueueReturn": {
+      "type": "boolean",
+      "default": false,
+      "description": "Offer a virtual-queue return window at the denied scan, where the attraction has a queue."
+     },
+     "queueId": {
+      "type": "string",
+      "format": "uuid",
+      "nullable": true,
+      "description": "The virtual queue the return window is taken in."
+     }
+    }
    },
    "antiPassbackEnabled": {
     "type": "boolean"

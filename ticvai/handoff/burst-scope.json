@@ -5,10 +5,10 @@
  "totals": {
   "services": 17,
   "deployed": 3,
-  "operations": 34,
-  "ofTotalOperations": 2668,
-  "tables": 63,
-  "ofTotalTables": 1095
+  "operations": 32,
+  "ofTotalOperations": 2731,
+  "tables": 62,
+  "ofTotalTables": 1112
  },
  "routing": {
   "note": "**Normal traffic and sale traffic are separate systems running concurrently.** The burst environment carries the on-sale and nothing else; everything a venue does that day continues in the shared cell. **They meet once, afterwards, at reconciliation.**",
@@ -17,8 +17,8 @@
     "name": "normal",
     "target": "shared cell",
     "services": 17,
-    "operations": 2634,
-    "tables": 1095,
+    "operations": 2699,
+    "tables": 1112,
     "exampleLoad": "stadium, routine Saturday: 60,000 guests x 14 requests = 48.5 RPS",
     "description": "**Everything except the sale.** Admission, food, retail, stock, staff back-office, reporting. Runs whether or not a sale is happening."
    },
@@ -26,8 +26,8 @@
     "name": "sale",
     "target": "burst environment",
     "services": 3,
-    "operations": 34,
-    "tables": 63,
+    "operations": 32,
+    "tables": 62,
     "exampleLoad": "same stadium on-sale: 1.25M requests in 2h = 1,045 RPS at a 6x burst; compressed to 20 minutes, 6,270",
     "description": "**The on-sale only.** Provisioned before it opens, torn down after, and **its orders reconcile back into the shared cell** (ADR-0035) — which is the single point the two paths touch."
    }
@@ -43,14 +43,14 @@
    "name": "CatalogueService",
    "tier": "commerce",
    "onBurstPath": true,
-   "weightedShare": 63.6,
+   "weightedShare": 62.3,
    "deployed": true,
    "replicas": {
     "min": 8,
     "max": null,
     "maxNote": "**No ceiling, deliberately.** A cap is a cap on absorbing a peak nobody predicted, and the peak is the whole reason this environment exists. 60,000 seats over two hours is 1,045 RPS; the same sale in twenty minutes is 6,270.",
     "floorIsPeak": true,
-    "derivedFrom": "63.6% of 5000 RPS at 400 RPS per replica",
+    "derivedFrom": "62.3% of 5000 RPS at 400 RPS per replica",
     "absoluteMin": 2,
     "connectionsAtFloor": 320,
     "poolerCapacity": 5000,
@@ -62,14 +62,14 @@
    "name": "OrderService",
    "tier": "commerce",
    "onBurstPath": true,
-   "weightedShare": 21.8,
+   "weightedShare": 22.6,
    "deployed": true,
    "replicas": {
     "min": 5,
     "max": null,
     "maxNote": "**No ceiling, deliberately.** A cap is a cap on absorbing a peak nobody predicted, and the peak is the whole reason this environment exists. 60,000 seats over two hours is 1,045 RPS; the same sale in twenty minutes is 6,270.",
     "floorIsPeak": true,
-    "derivedFrom": "21.8% of 5000 RPS at 250 RPS per replica",
+    "derivedFrom": "22.6% of 5000 RPS at 250 RPS per replica",
     "absoluteMin": 2,
     "connectionsAtFloor": 200,
     "poolerCapacity": 5000,
@@ -81,7 +81,7 @@
    "name": "TenancyService",
    "tier": "foundation",
    "onBurstPath": true,
-   "weightedShare": 3.6,
+   "weightedShare": 3.8,
    "deployed": false,
    "replicas": null,
    "reason": "on the path but not the load — served from the shared cell"
@@ -90,7 +90,7 @@
    "name": "RetailService",
    "tier": "operations",
    "onBurstPath": true,
-   "weightedShare": 3.6,
+   "weightedShare": 3.8,
    "deployed": false,
    "replicas": null,
    "reason": "on the path but not the load — served from the shared cell"
@@ -99,7 +99,7 @@
    "name": "MarketingService",
    "tier": "engagement",
    "onBurstPath": true,
-   "weightedShare": 3.6,
+   "weightedShare": 3.8,
    "deployed": false,
    "replicas": null,
    "reason": "on the path but not the load — served from the shared cell"
@@ -108,14 +108,14 @@
    "name": "IdentityService",
    "tier": "foundation",
    "onBurstPath": true,
-   "weightedShare": 1.8,
+   "weightedShare": 1.9,
    "deployed": true,
    "replicas": {
     "min": 2,
     "max": null,
     "maxNote": "**No ceiling, deliberately.** A cap is a cap on absorbing a peak nobody predicted, and the peak is the whole reason this environment exists. 60,000 seats over two hours is 1,045 RPS; the same sale in twenty minutes is 6,270.",
     "floorIsPeak": true,
-    "derivedFrom": "1.8% of 5000 RPS at 600 RPS per replica",
+    "derivedFrom": "1.9% of 5000 RPS at 600 RPS per replica",
     "absoluteMin": 2,
     "connectionsAtFloor": 80,
     "poolerCapacity": 5000,
@@ -127,7 +127,7 @@
    "name": "AccessService",
    "tier": "commerce",
    "onBurstPath": true,
-   "weightedShare": 1.8,
+   "weightedShare": 1.9,
    "deployed": false,
    "replicas": null,
    "reason": "on the path but not the load — served from the shared cell"
@@ -225,20 +225,9 @@
  ],
  "tables": [
   {
-   "table": "catalogue.channel_capacity",
-   "schema": "catalogue",
-   "columns": 12,
-   "burstOperations": 6,
-   "written": true,
-   "contention": null,
-   "contended": false,
-   "contentionIndeterminate": false,
-   "note": "**How much of a performance each sales channel may sell.** Two hundred seats with eighty to the web, eighty to the box office and forty held back. Renamed from `envelope`, which was unguessable"
-  },
-  {
    "table": "orders.sales_order",
    "schema": "orders",
-   "columns": 20,
+   "columns": 25,
    "burstOperations": 6,
    "written": true,
    "contention": null,
@@ -247,21 +236,15 @@
    "note": "**The sale.** What was bought, by whom, through which channel, at what scope. Every payment, refund, entitlement and ledger posting reaches back to a row here"
   },
   {
-   "table": "catalogue.inventory_hold",
+   "table": "catalogue.channel_capacity",
    "schema": "catalogue",
-   "columns": 18,
+   "columns": 12,
    "burstOperations": 5,
    "written": true,
-   "contention": {
-    "modes": [
-     "single_row"
-    ],
-    "ceilingSource": "pinned",
-    "note": "One counter per (performance, ticket type). Every buyer hits the same row."
-   },
-   "contended": true,
+   "contention": null,
+   "contended": false,
    "contentionIndeterminate": false,
-   "note": "**A short-lived claim on contended stock** while somebody decides. A seat in a basket is held, not sold — CF-115 settled that contended inventory is leased rather than reserved, and the hold expires on its own. Renamed f"
+   "note": "**How much of a performance each sales channel may sell.** Two hundred seats with eighty to the web, eighty to the box office and forty held back. Renamed from `envelope`, which was unguessable"
   },
   {
    "table": "catalogue.product",
@@ -288,13 +271,30 @@
   {
    "table": "access.entitlement",
    "schema": "access",
-   "columns": 26,
+   "columns": 29,
    "burstOperations": 4,
    "written": true,
    "contention": null,
    "contended": false,
    "contentionIndeterminate": false,
    "note": "**What a guest actually holds** — found missing 18 August. The package sold products, defined EntitlementTemplate, recorded ScanEvent.ticketId, transferred ticket_ids and issued wallet passes against entitlementId: **fiv"
+  },
+  {
+   "table": "catalogue.inventory_hold",
+   "schema": "catalogue",
+   "columns": 18,
+   "burstOperations": 4,
+   "written": true,
+   "contention": {
+    "modes": [
+     "single_row"
+    ],
+    "ceilingSource": "pinned",
+    "note": "One counter per (performance, ticket type). Every buyer hits the same row."
+   },
+   "contended": true,
+   "contentionIndeterminate": false,
+   "note": "**A short-lived claim on contended stock** while somebody decides. A seat in a basket is held, not sold — CF-115 settled that contended inventory is leased rather than reserved, and the hold expires on its own. Renamed f"
   },
   {
    "table": "catalogue.performance",
@@ -317,25 +317,6 @@
    "contended": false,
    "contentionIndeterminate": false,
    "note": "**One thing bought on one order**, priced at the moment of sale. A price list changing afterwards does not change what somebody paid"
-  },
-  {
-   "table": "seating.seat_hold",
-   "schema": "seating",
-   "columns": 12,
-   "burstOperations": 4,
-   "written": true,
-   "contention": {
-    "modes": [
-     "per_entity",
-     "allocator_serialised"
-    ],
-    "ceilingSource": "worst_case_unless_pinned",
-    "pinnedBy": "catalogue.performance.seatingRules",
-    "note": "Guest picks a seat: per_entity, 43,693 rows, structurally not contended. System picks best available: allocator_serialised, effectively one row and worse than single_row because losers retry."
-   },
-   "contended": true,
-   "contentionIndeterminate": true,
-   "note": "**A temporary claim on a seat.** Expires, which is what stops two channels selling it"
   },
   {
    "table": "catalogue.event",
@@ -415,6 +396,25 @@
    "note": "**A rule that changes a price**, with eligibility and a budget. Evaluated at the basket rather than stored on a product"
   },
   {
+   "table": "seating.seat_hold",
+   "schema": "seating",
+   "columns": 12,
+   "burstOperations": 3,
+   "written": true,
+   "contention": {
+    "modes": [
+     "per_entity",
+     "allocator_serialised"
+    ],
+    "ceilingSource": "worst_case_unless_pinned",
+    "pinnedBy": "catalogue.performance.seatingRules",
+    "note": "Guest picks a seat: per_entity, 43,693 rows, structurally not contended. System picks best available: allocator_serialised, effectively one row and worse than single_row because losers retry."
+   },
+   "contended": true,
+   "contentionIndeterminate": true,
+   "note": "**A temporary claim on a seat.** Expires, which is what stops two channels selling it"
+  },
+  {
    "table": "approvals.delegation",
    "schema": "approvals",
    "columns": 10,
@@ -439,7 +439,7 @@
   {
    "table": "approvals.rule",
    "schema": "approvals",
-   "columns": 18,
+   "columns": 20,
    "burstOperations": 2,
    "written": false,
    "contention": null,
@@ -534,6 +534,17 @@
    "contended": false,
    "contentionIndeterminate": false,
    "note": "Holds 6 columns. **No description has been written for this table** — the name is the only thing saying what it is"
+  },
+  {
+   "table": "marketing.loyalty_position",
+   "schema": "marketing",
+   "columns": 12,
+   "burstOperations": 2,
+   "written": false,
+   "contention": null,
+   "contended": false,
+   "contentionIndeterminate": false,
+   "note": "**Where a guest stands** — points, tier, progress. A balance, not a history"
   },
   {
    "table": "orders.cart",
@@ -648,7 +659,7 @@
   {
    "table": "approvals.request",
    "schema": "approvals",
-   "columns": 27,
+   "columns": 30,
    "burstOperations": 1,
    "written": true,
    "contention": null,
@@ -756,28 +767,6 @@
    "note": "**What a venue knows about a guest that is not their identity** — preferences, lifetime value, segments, consent. Twenty operations touch it and it references `pii.subject` rather than duplicating it"
   },
   {
-   "table": "marketing.loyalty_position",
-   "schema": "marketing",
-   "columns": 12,
-   "burstOperations": 1,
-   "written": false,
-   "contention": null,
-   "contended": false,
-   "contentionIndeterminate": false,
-   "note": "**Where a guest stands** — points, tier, progress. A balance, not a history"
-  },
-  {
-   "table": "marketing.loyalty_programme",
-   "schema": "marketing",
-   "columns": 7,
-   "burstOperations": 1,
-   "written": false,
-   "contention": null,
-   "contended": false,
-   "contentionIndeterminate": false,
-   "note": "**The rules of earning and burning.** Tiers are children"
-  },
-  {
    "table": "orders.fraud_rule",
    "schema": "orders",
    "columns": 12,
@@ -791,7 +780,7 @@
   {
    "table": "orders.refund",
    "schema": "orders",
-   "columns": 18,
+   "columns": 20,
    "burstOperations": 1,
    "written": true,
    "contention": null,
@@ -835,7 +824,7 @@
   {
    "table": "platform.workstation",
    "schema": "platform",
-   "columns": 17,
+   "columns": 20,
    "burstOperations": 1,
    "written": false,
    "contention": null,
@@ -1285,21 +1274,6 @@
    "lock": null
   },
   {
-   "operationId": "extendSeatHold",
-   "verb": "POST",
-   "path": "/seat-holds/{holdId}/extend",
-   "service": "CatalogueService",
-   "contract": "seating",
-   "callsPerBuyer": 1,
-   "reads": [
-    "seating.seat_hold"
-   ],
-   "writes": [
-    "seating.seat_hold"
-   ],
-   "lock": null
-  },
-  {
    "operationId": "getEvent",
    "verb": "GET",
    "path": "/events/{eventId}",
@@ -1313,14 +1287,14 @@
    "lock": null
   },
   {
-   "operationId": "getLoyaltyPosition",
+   "operationId": "getGuestLoyalty",
    "verb": "GET",
-   "path": "/loyalty/position",
+   "path": "/guests/{subjectId}/loyalty",
    "service": "MarketingService",
    "contract": "marketing-crm",
    "callsPerBuyer": 1,
    "reads": [
-    "marketing.loyalty_programme"
+    "marketing.loyalty_position"
    ],
    "writes": [],
    "lock": null
@@ -1470,23 +1444,6 @@
    "writes": [
     "identity.refresh_token",
     "identity.session"
-   ],
-   "lock": null
-  },
-  {
-   "operationId": "renewInventoryHold",
-   "verb": "POST",
-   "path": "/inventory-holds/{inventoryHoldId}/renew",
-   "service": "CatalogueService",
-   "contract": "catalogue",
-   "callsPerBuyer": 1,
-   "reads": [
-    "catalogue.channel_capacity",
-    "catalogue.inventory_hold"
-   ],
-   "writes": [
-    "catalogue.channel_capacity",
-    "catalogue.inventory_hold"
    ],
    "lock": null
   },

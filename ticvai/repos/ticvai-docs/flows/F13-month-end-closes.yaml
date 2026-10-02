@@ -35,8 +35,8 @@ steps:
   action: Clears outstanding shift variances
   operations:
   - listShifts
-  - acceptShiftVariance
   outcome: A shift left open in the period blocks the close
+  note: 'Corrected 2 October (CHG-WIR-008): a variance is accepted only on the till by a supervisor with a PIN step-up (R080 (e)); BO-040 lists the shifts still waiting, which block the close until accepted at the till.'
 - step: 3
   screen: BO-089
   action: Posts the remaining journals

@@ -1,5 +1,5 @@
 id: LLD-AccessService
-title: AccessService — 246 operations, 77 tables
+title: AccessService — 250 operations, 78 tables
 generatedBy: tools/derive-diagrams.py
 tier: commerce
 deployable: access
@@ -10,20 +10,20 @@ scale: Read-heavy, extreme latency sensitivity, edge-cached. **`frozenDays` is h
   precisely because the gate cannot afford the arithmetic.
 ifDown: Down means the gates stop. Runs at the edge with a local decision cache.
 coverage:
-  operations: 246
-  inAFlow: 161
-  percent: 65%
+  operations: 250
+  inAFlow: 157
+  percent: 63%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
 - schema: access
-  tables: 77
+  tables: 78
   stores:
   - postgres
   largestTable: access.media_type
 operationsByContract:
 - contract: access
-  count: 246
+  count: 250
   operations:
   - operation: addBlacklistEntry
     verb: POST
@@ -230,6 +230,22 @@ operationsByContract:
     path: /face-pass/enrolments/{enrolmentId}
     scope: venue
     permission: GUEST_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: getFaceReenrolmentImages
+    verb: GET
+    path: /face-reenrolment-attempts/{attemptId}/images
+    scope: venue
+    permission: BIOMETRIC_IMAGE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: getHardwareModelCertification
+    verb: GET
+    path: /hardware-models/{modelId}/certification
+    scope: tenant
+    permission: DEVICE_VIEW
     offline: false
     reads: 1
     writes: 0
@@ -1345,6 +1361,14 @@ operationsByContract:
     offline: false
     reads: 3
     writes: 3
+  - operation: setAccessPointDirection
+    verb: PUT
+    path: /access-points/{accessPointId}/direction
+    scope: venue
+    permission: ACCESS_DIRECTION_SET
+    offline: false
+    reads: 2
+    writes: 0
   - operation: setAccessPointGeofence
     verb: PUT
     path: /access-points/{accessPointId}/geofence
@@ -1625,6 +1649,14 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 3
+  - operation: setHardwareModelCertification
+    verb: PUT
+    path: /hardware-models/{modelId}/certification
+    scope: tenant
+    permission: DEVICE_MANAGE
+    offline: false
+    reads: 1
+    writes: 1
   - operation: setHotelWalletExternal
     verb: PUT
     path: /hotel-wallet-external
@@ -2238,7 +2270,7 @@ tables:
   - validateGroupAccess
   - verifyIdentity
 - table: access.access_area
-  columns: 27
+  columns: 28
   store: postgres
   parent: null
   writtenBy:
@@ -2273,7 +2305,7 @@ tables:
   - access
   foreignWriters: null
 - table: access.access_point
-  columns: 17
+  columns: 18
   store: postgres
   parent: null
   writtenBy:
@@ -2494,7 +2526,7 @@ tables:
   writtenBy: []
   foreignWriters: null
 - table: access.entitlement
-  columns: 26
+  columns: 29
   store: postgres
   parent: null
   writtenBy:
@@ -2547,7 +2579,7 @@ tables:
   - access
   foreignWriters: null
 - table: access.gate_mode_change
-  columns: 11
+  columns: 13
   store: postgres
   parent: null
   writtenBy:
@@ -2569,6 +2601,13 @@ tables:
   foreignWriters: null
 - table: access.group_admission_rule
   columns: 12
+  store: postgres
+  parent: null
+  writtenBy:
+  - access
+  foreignWriters: null
+- table: access.hardware_certification
+  columns: 9
   store: postgres
   parent: null
   writtenBy:
@@ -2603,7 +2642,7 @@ tables:
   - access
   foreignWriters: null
 - table: access.journey_sequence_rule
-  columns: 10
+  columns: 11
   store: postgres
   parent: null
   writtenBy:
@@ -2666,7 +2705,7 @@ tables:
   - access
   foreignWriters: null
 - table: access.operating_calendar_entry
-  columns: 13
+  columns: 15
   store: postgres
   parent: null
   writtenBy:
@@ -2854,6 +2893,7 @@ writesOutside:
     - marketing.consent_record
 screens:
 - P01:WEB-001 Home / Landing
+- P01:WEB-017 My Account Dashboard
 - P01:WEB-018 My Tickets
 - P01:WEB-024 Devices, Wishlist & Consent
 - P01:WEB-041 Parking – Reserve & Pay
@@ -2866,7 +2906,6 @@ screens:
 - P02:GST-069 Face Pass
 - P04:POS-002 Sell — Ticket Catalogue
 - P04:POS-005 Payment
-- P04:POS-013 Mobile POS, Event Sales & Offline Operations
 - P06:EMP-010 Scan — ready
 - P06:EMP-015 Group scan
 - P06:EMP-017 Sync & reconciliation
@@ -2886,7 +2925,6 @@ screens:
 - P08:BO-033 Blacklist Management
 - P08:BO-034 Scan Activity
 - P08:BO-035 Override Audit
-- P08:BO-037 Offline Package Status
 - P08:BO-060 Attendance & Footfall
 - P08:BO-064 Zones & Areas
 - P08:BO-103 Access & Venue
@@ -2952,6 +2990,7 @@ screens:
 - P08:BO-203 Hardware Compatibility, Health, Testing & Deployment
 - P08:BO-204 Offline & Edge Operations Command Center
 - P08:BO-205 Edge Node & Local Processing Configuration
+- P08:BO-206 Offline Validation Policy Builder
 - P08:BO-207 Edge Package & Data Distribution
 - P08:BO-208 Offline Credential & Revocation Cache
 - P08:BO-209 Offline Entitlement & Usage Ledger
@@ -3039,10 +3078,8 @@ screens:
 - P08:BO-361 Credential Usage & Cross-Media Traceability
 - P08:BO-362 Credential Security, Audit & Operational Evidence
 - P08:BO-363 Ticket Media Analytics & AI Operations Intelligence
-- P08:BO-644 Credential Issuance Command Center
-- P08:BO-653 Credential Registry & Credential History
-- P08:BO-981 Conflict & Impact Simulation
-- P16:ANL-070 Analytics Governance, Security & Audit Center
+- P08:BO-471 Offline, Synchronization & Recovery Monitor
+- P08:BO-475 Reader Manufacturer & Model Profile
 flows:
 - F06 Guest enters the venue
 - F10 Partner books, uses and settles
@@ -3070,5 +3107,3 @@ flows:
 - F63 A gate goes offline and reconciles
 - F71 A device is prepared, used and handed over
 - F72 A shift ends and the summary is read
-- F87 A till handles a return, a collection and a safe drop
-- F89 Offline policy is set, cached, monitored and reconciled

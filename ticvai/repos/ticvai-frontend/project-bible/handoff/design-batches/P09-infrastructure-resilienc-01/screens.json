@@ -3,7 +3,7 @@
   "id": "ADM-014",
   "name": "Auto-Scaling Configuration",
   "module": "Infrastructure & Resilience",
-  "requiresModule": "membership",
+  "requiresModule": "core",
   "wave": 3,
   "capability": "C96",
   "implementation": {
@@ -27,7 +27,7 @@
     {
      "to": "ADM-001",
      "trigger": "Platform Login / MFA",
-     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId and ADM-014 holds none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and ADM-001 opens on its own"
+     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId, providerId and ADM-014 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and ADM-001 opens on its own"
     },
     {
      "to": "ADM-002",
@@ -40,7 +40,7 @@
      "carries": [
       "cellId"
      ],
-     "provenance": "derived — ADM-003 declares entryState.params cellId, rightId and ADM-014 holds cellId, so an edge into it carries them"
+     "provenance": "derived — ADM-003 declares entryState.params cellId and ADM-014 holds cellId, so an edge into it carries them"
     }
    ]
   },
@@ -51,7 +51,7 @@
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listCellJobs` reads the population and `getCellCapacity` reads one of them — list, select, act",
-  "purpose": "Change how auto-scaling behaves here, and see which level the current value came from.",
+  "purpose": "See how each cell scales: its floors, ceilings and target utilisation.",
   "layout": {
    "template": "split",
    "regions": [
@@ -64,7 +64,6 @@
        "label": "Every cell job",
        "bindsTo": "CellJob",
        "columns": [
-        "CellJob.id",
         "CellJob.kind",
         "CellJob.status",
         "CellJob.progressPercent",
@@ -176,77 +175,14 @@
     {
      "name": "actionBar",
      "slot": "rowActions",
-     "components": [
-      {
-       "kind": "destructiveButton",
-       "label": "Cancel decommission",
-       "operation": "cancelDecommission",
-       "provenance": "contract subscription.yaml POST /cells/{cellId}/cancel-decommission"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Decommission cell",
-       "operation": "decommissionCell",
-       "provenance": "contract subscription.yaml POST /cells/{cellId}/decommission"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Save cell tier",
-       "operation": "updateCellTier",
-       "provenance": "contract subscription.yaml PATCH /cells/{cellId}"
-      }
-     ]
+     "components": []
     }
    ]
   },
-  "overlays": [
-   {
-    "id": "confirmCancelDecommission",
-    "component": "confirmDialog",
-    "trigger": "Cancel decommission",
-    "body": "**Names what `cancelDecommission` changes and what it leaves alone**, in the consequence rather than the verb. A auto-scaling this affects should be identified in the dialog, not just counted. **Collects what `cancelDecommission` sends before it is called.** Required: `reason`.",
-    "provenance": "contract subscription.yaml POST /cells/{cellId}/cancel-decommission"
-   },
-   {
-    "id": "formDecommissionCell",
-    "component": "modal",
-    "trigger": "Decommission cell",
-    "body": "**Collects what `decommissionCell` sends before it is called.** Required: `reason`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Decommission cell",
-     "operation": "decommissionCell"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "reason"
-     ]
-    },
-    "provenance": "contract subscription.yaml POST /cells/{cellId}/decommission"
-   },
-   {
-    "id": "formUpdateCellTier",
-    "component": "modal",
-    "trigger": "Save cell tier",
-    "body": "**Collects what `updateCellTier` sends before it is called.** Required: `tier`. Optional: `scheduledFor`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Save cell tier",
-     "operation": "updateCellTier"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "tier",
-      "scheduledFor"
-     ]
-    },
-    "provenance": "contract subscription.yaml PATCH /cells/{cellId}"
-   }
-  ],
   "states": {
    "loading": "The auto-scaling list.",
    "error": "Could not load. Names which read failed and leaves the auto-scaling untouched.",
-   "emptyFirstRun": "No auto-scaling yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyFirstRun": "No auto-scaling yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "Never shown: `listCellJobs` takes no filter, so an empty list is always the first-run state above.",
    "emptyNoAccess": "Shown when the caller lacks `PLATFORM_CELL_VIEW`, which `getCellCapacity` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -256,24 +192,6 @@
     "contract": "subscription",
     "purpose": "Load against headroom",
     "trigger": "onLoad"
-   },
-   {
-    "operationId": "cancelDecommission",
-    "contract": "subscription",
-    "purpose": "Halt a decommission",
-    "trigger": "onAction",
-    "invalidates": [
-     "listCellJobs"
-    ]
-   },
-   {
-    "operationId": "decommissionCell",
-    "contract": "subscription",
-    "purpose": "Begin decommissioning a cell",
-    "trigger": "onAction",
-    "invalidates": [
-     "listCellJobs"
-    ]
    },
    {
     "operationId": "getCell",
@@ -292,15 +210,6 @@
     "contract": "subscription",
     "purpose": "Provisioning, migration and maintenance jobs",
     "trigger": "onLoad"
-   },
-   {
-    "operationId": "updateCellTier",
-    "contract": "subscription",
-    "purpose": "Change a cell's tier",
-    "trigger": "onAction",
-    "invalidates": [
-     "listCellJobs"
-    ]
    },
    {
     "operationId": "getScalingPolicy",
@@ -331,6 +240,27 @@
    "board": "wireframes/P09 TICVAI Web.dc.html#adm-014"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 8 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "gaps": [
+   {
+    "operation": "cancelDecommission",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-021): The cell operations were copied onto the scaling screen; decommission stays on ADM-003 only and tier changes on ADM-003 and ADM-030 (design-notes corrections platform-foundation ADM-013, ADM-014).",
+    "source": "screens/P09-platform-admin-console.yaml#ADM-003"
+   },
+   {
+    "operation": "decommissionCell",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-021): The cell operations were copied onto the scaling screen; decommission stays on ADM-003 only and tier changes on ADM-003 and ADM-030 (design-notes corrections platform-foundation ADM-013, ADM-014).",
+    "source": "screens/P09-platform-admin-console.yaml#ADM-003"
+   },
+   {
+    "operation": "updateCellTier",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-021): The cell operations were copied onto the scaling screen; decommission stays on ADM-003 only and tier changes on ADM-003 and ADM-030 (design-notes corrections platform-foundation ADM-013, ADM-014).",
+    "source": "screens/P09-platform-admin-console.yaml#ADM-003"
+   }
+  ],
+  "purposeNote": "Purpose rewritten 2 October 2026 (CHG-WIR-023): The purpose was the configuration template (\"Change how auto-scaling behaves here, and see which level the current value came from\") (design-notes correction platform-foundation ADM-014).",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -359,7 +289,7 @@
   "id": "ADM-030",
   "name": "Infrastructure Sizing & Scaling Policy",
   "module": "Infrastructure & Resilience",
-  "requiresModule": "membership",
+  "requiresModule": "core",
   "wave": 3,
   "capability": "C96",
   "implementation": {
@@ -382,7 +312,7 @@
     {
      "to": "ADM-001",
      "trigger": "Platform Login / MFA",
-     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId and ADM-030 holds none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and ADM-001 opens on its own"
+     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId, providerId and ADM-030 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and ADM-001 opens on its own"
     },
     {
      "to": "ADM-002",
@@ -395,7 +325,7 @@
      "carries": [
       "cellId"
      ],
-     "provenance": "derived — ADM-003 declares entryState.params cellId, rightId and ADM-030 holds cellId, so an edge into it carries them"
+     "provenance": "derived — ADM-003 declares entryState.params cellId and ADM-030 holds cellId, so an edge into it carries them"
     }
    ]
   },
@@ -406,95 +336,19 @@
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listCellJobs` reads the population and `getCellCapacity` reads one of them — list, select, act",
-  "purpose": "See infrastructure sizing & scaling policy for this venue.",
+  "purpose": "Set each cell's size and the policy it scales on.",
   "layout": {
    "template": "split",
    "regions": [
     {
      "name": "contentBody",
      "slot": "collection",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every cell job",
-       "bindsTo": "CellJob",
-       "columns": [
-        "CellJob.id",
-        "CellJob.kind",
-        "CellJob.status",
-        "CellJob.progressPercent",
-        "CellJob.message",
-        "CellJob.error",
-        "CellJob.scheduledFor",
-        "CellJob.completedAt"
-       ],
-       "operation": "listCellJobs",
-       "provenance": "contract subscription.yaml GET /cells/{cellId}/jobs"
-      }
-     ]
+     "components": []
     },
     {
      "name": "contextPanel",
      "slot": "selection",
      "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected cell job",
-       "bindsTo": "CellJob",
-       "columns": [
-        "CellJob.id",
-        "CellJob.kind",
-        "CellJob.status",
-        "CellJob.progressPercent",
-        "CellJob.message",
-        "CellJob.error",
-        "CellJob.scheduledFor",
-        "CellJob.completedAt"
-       ],
-       "operation": "listCellJobs",
-       "provenance": "contract subscription.yaml GET /cells/{cellId}/jobs"
-      },
-      {
-       "kind": "detailPanel",
-       "label": "The cell",
-       "bindsTo": "CellDetail",
-       "columns": [
-        "CellDetail.id",
-        "CellDetail.name",
-        "CellDetail.kind",
-        "CellDetail.clusterId",
-        "CellDetail.isReachable",
-        "CellDetail.lastContactAt",
-        "CellDetail.licenceExpiresAt",
-        "CellDetail.participatesInCrossCell",
-        "CellDetail.regionId",
-        "CellDetail.regionName",
-        "CellDetail.countryCode",
-        "CellDetail.tier",
-        "CellDetail.status",
-        "CellDetail.cloudProvider",
-        "CellDetail.cloudRegion",
-        "CellDetail.apiEndpoint"
-       ],
-       "operation": "getCell",
-       "provenance": "contract subscription.yaml GET /cells/{cellId}"
-      },
-      {
-       "kind": "detailPanel",
-       "label": "The cell health",
-       "bindsTo": "CellHealth",
-       "columns": [
-        "CellHealth.isHealthy",
-        "CellHealth.isSchemaBehind",
-        "CellHealth.databaseStatus",
-        "CellHealth.replicationLagSeconds",
-        "CellHealth.lastBackupAt",
-        "CellHealth.lastRestoreDrillAt",
-        "CellHealth.checkedAt"
-       ],
-       "operation": "getCellHealth",
-       "provenance": "contract subscription.yaml GET /cells/{cellId}/health"
-      },
       {
        "kind": "detailPanel",
        "label": "The scaling policy",
@@ -533,24 +387,6 @@
      "slot": "rowActions",
      "components": [
       {
-       "kind": "destructiveButton",
-       "label": "Cancel decommission",
-       "operation": "cancelDecommission",
-       "provenance": "contract subscription.yaml POST /cells/{cellId}/cancel-decommission"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Decommission cell",
-       "operation": "decommissionCell",
-       "provenance": "contract subscription.yaml POST /cells/{cellId}/decommission"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Save cell tier",
-       "operation": "updateCellTier",
-       "provenance": "contract subscription.yaml PATCH /cells/{cellId}"
-      },
-      {
        "kind": "secondaryButton",
        "label": "Save scaling policy",
        "operation": "setScalingPolicy",
@@ -562,52 +398,10 @@
   },
   "overlays": [
    {
-    "id": "confirmCancelDecommission",
-    "component": "confirmDialog",
-    "trigger": "Cancel decommission",
-    "body": "**Names what `cancelDecommission` changes and what it leaves alone**, in the consequence rather than the verb. A infrastructure sizing scaling this affects should be identified in the dialog, not just counted. **Collects what `cancelDecommission` sends before it is called.** Required: `reason`.",
-    "provenance": "contract subscription.yaml POST /cells/{cellId}/cancel-decommission"
-   },
-   {
-    "id": "formDecommissionCell",
-    "component": "modal",
-    "trigger": "Decommission cell",
-    "body": "**Collects what `decommissionCell` sends before it is called.** Required: `reason`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Decommission cell",
-     "operation": "decommissionCell"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "reason"
-     ]
-    },
-    "provenance": "contract subscription.yaml POST /cells/{cellId}/decommission"
-   },
-   {
-    "id": "formUpdateCellTier",
-    "component": "modal",
-    "trigger": "Save cell tier",
-    "body": "**Collects what `updateCellTier` sends before it is called.** Required: `tier`. Optional: `scheduledFor`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Save cell tier",
-     "operation": "updateCellTier"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "tier",
-      "scheduledFor"
-     ]
-    },
-    "provenance": "contract subscription.yaml PATCH /cells/{cellId}"
-   },
-   {
     "id": "formSetScalingPolicy",
     "component": "modal",
     "trigger": "Save scaling policy",
-    "body": "**Collects what `setScalingPolicy` sends before it is called.** Required: `id`. Optional: `service`, `replicaFloor`, `replicaCeiling`, `targetUtilisationPct`, `scaleStepPct`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setScalingPolicy` sends before it is called.** Nothing in the body is required. Optional: `service`, `replicaFloor`, `replicaCeiling`, `targetUtilisationPct`, `scaleStepPct`. **Not asked:** `id` is a client UUIDv7 generated silently (design-note correction, 2 October 2026). Dismissing sends nothing; the screen behind is unchanged.",
     "bindsTo": "ScalingPolicy",
     "confirm": {
      "label": "Save scaling policy",
@@ -616,7 +410,6 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "id",
       "service",
       "replicaFloor",
       "replicaCeiling",
@@ -642,51 +435,6 @@
     "trigger": "onLoad"
    },
    {
-    "operationId": "cancelDecommission",
-    "contract": "subscription",
-    "purpose": "Halt a decommission",
-    "trigger": "onAction",
-    "invalidates": [
-     "listCellJobs"
-    ]
-   },
-   {
-    "operationId": "decommissionCell",
-    "contract": "subscription",
-    "purpose": "Begin decommissioning a cell",
-    "trigger": "onAction",
-    "invalidates": [
-     "listCellJobs"
-    ]
-   },
-   {
-    "operationId": "getCell",
-    "contract": "subscription",
-    "purpose": "Read a cell",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "getCellHealth",
-    "contract": "subscription",
-    "purpose": "Cell health and schema version",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "listCellJobs",
-    "contract": "subscription",
-    "purpose": "Provisioning, migration and maintenance jobs",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "updateCellTier",
-    "contract": "subscription",
-    "purpose": "Change a cell's tier",
-    "trigger": "onAction",
-    "invalidates": [
-     "listCellJobs"
-    ]
-   },
-   {
     "operationId": "getScalingPolicy",
     "contract": "platform-ops",
     "purpose": "The policy as it stands",
@@ -696,10 +444,7 @@
     "operationId": "setScalingPolicy",
     "contract": "platform-ops",
     "purpose": "Change it",
-    "trigger": "onAction",
-    "invalidates": [
-     "listCellJobs"
-    ]
+    "trigger": "onAction"
    }
   ],
   "entryState": {
@@ -724,6 +469,45 @@
    "board": "wireframes/P09 TICVAI Web.dc.html#adm-030"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "gaps": [
+   {
+    "operation": "cancelDecommission",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-021): Copied cell operations; decommission stays on ADM-003 only. The tier change stays here as sizing, beside the scaling policy (getScalingPolicy/setScalingPolicy) (design-notes corrections platform-foundation ADM-030, ADM-013).",
+    "source": "screens/P09-platform-admin-console.yaml#ADM-030"
+   },
+   {
+    "operation": "decommissionCell",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-021): Copied cell operations; decommission stays on ADM-003 only. The tier change stays here as sizing, beside the scaling policy (getScalingPolicy/setScalingPolicy) (design-notes corrections platform-foundation ADM-030, ADM-013).",
+    "source": "screens/P09-platform-admin-console.yaml#ADM-030"
+   },
+   {
+    "operation": "listCellJobs",
+    "removed": true,
+    "why": "Copied cell operations are not part of this screen (design-note correction platform-foundation ADM-030, CHG-SBO-015).",
+    "source": "screens/P09-platform-admin-console.yaml#ADM-012"
+   },
+   {
+    "operation": "updateCellTier",
+    "removed": true,
+    "why": "Copied cell operations are not part of this screen (design-note correction platform-foundation ADM-030, CHG-SBO-015).",
+    "source": "screens/P09-platform-admin-console.yaml#ADM-012"
+   },
+   {
+    "operation": "getCellHealth",
+    "removed": true,
+    "why": "Copied cell operations are not part of this screen (design-note correction platform-foundation ADM-030, CHG-SBO-015).",
+    "source": "screens/P09-platform-admin-console.yaml#ADM-012"
+   },
+   {
+    "operation": "getCell",
+    "removed": true,
+    "why": "Copied cell operations are not part of this screen (design-note correction platform-foundation ADM-030, CHG-SBO-015).",
+    "source": "screens/P09-platform-admin-console.yaml#ADM-012"
+   }
+  ],
+  "purposeNote": "Purpose rewritten 2 October 2026 (CHG-WIR-023): The purpose was the generator template (\"See infrastructure sizing & scaling policy for this venue\").",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -752,7 +536,7 @@
   "id": "ADM-033",
   "name": "Backup & DR Status",
   "module": "Infrastructure & Resilience",
-  "requiresModule": "membership",
+  "requiresModule": "core",
   "wave": 2,
   "capability": "C96",
   "implementation": {
@@ -775,7 +559,7 @@
     {
      "to": "ADM-001",
      "trigger": "Platform Login / MFA",
-     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId and ADM-033 holds none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and ADM-001 opens on its own"
+     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId, providerId and ADM-033 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and ADM-001 opens on its own"
     },
     {
      "to": "ADM-002",
@@ -788,7 +572,7 @@
      "carries": [
       "cellId"
      ],
-     "provenance": "derived — ADM-003 declares entryState.params cellId, rightId and ADM-033 holds cellId, so an edge into it carries them"
+     "provenance": "derived — ADM-003 declares entryState.params cellId and ADM-033 holds cellId, so an edge into it carries them"
     }
    ]
   },
@@ -796,7 +580,7 @@
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listCellJobs` reads the population and `getCellHealth` reads one of them — list, select, act",
-  "purpose": "See backup & dr status for this venue.",
+  "purpose": "See each cell's backups and how old the newest one is.",
   "layout": {
    "template": "split",
    "regions": [
@@ -806,27 +590,9 @@
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every cell job",
-       "bindsTo": "CellJob",
-       "columns": [
-        "CellJob.id",
-        "CellJob.kind",
-        "CellJob.status",
-        "CellJob.progressPercent",
-        "CellJob.message",
-        "CellJob.error",
-        "CellJob.scheduledFor",
-        "CellJob.completedAt"
-       ],
-       "operation": "listCellJobs",
-       "provenance": "contract subscription.yaml GET /cells/{cellId}/jobs"
-      },
-      {
-       "kind": "dataTable",
        "label": "Every backup run",
        "bindsTo": "BackupRun",
        "columns": [
-        "BackupRun.id",
         "BackupRun.scope",
         "BackupRun.startedAt",
         "BackupRun.completedAt",
@@ -844,23 +610,6 @@
      "name": "contextPanel",
      "slot": "selection",
      "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected cell job",
-       "bindsTo": "CellJob",
-       "columns": [
-        "CellJob.id",
-        "CellJob.kind",
-        "CellJob.status",
-        "CellJob.progressPercent",
-        "CellJob.message",
-        "CellJob.error",
-        "CellJob.scheduledFor",
-        "CellJob.completedAt"
-       ],
-       "operation": "listCellJobs",
-       "provenance": "contract subscription.yaml GET /cells/{cellId}/jobs"
-      },
       {
        "kind": "detailPanel",
        "label": "The cell",
@@ -888,22 +637,6 @@
       },
       {
        "kind": "detailPanel",
-       "label": "The cell capacity",
-       "bindsTo": "CellCapacity",
-       "columns": [
-        "CellCapacity.kind",
-        "CellCapacity.tenantCount",
-        "CellCapacity.isConstrained",
-        "CellCapacity.constrainedDimension",
-        "CellCapacity.dimensions",
-        "CellCapacity.forecastBreachAt",
-        "CellCapacity.measuredAt"
-       ],
-       "operation": "getCellCapacity",
-       "provenance": "contract subscription.yaml GET /cells/{cellId}/capacity"
-      },
-      {
-       "kind": "detailPanel",
        "label": "The cell health",
        "bindsTo": "CellHealth",
        "columns": [
@@ -923,77 +656,14 @@
     {
      "name": "actionBar",
      "slot": "rowActions",
-     "components": [
-      {
-       "kind": "destructiveButton",
-       "label": "Cancel decommission",
-       "operation": "cancelDecommission",
-       "provenance": "contract subscription.yaml POST /cells/{cellId}/cancel-decommission"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Decommission cell",
-       "operation": "decommissionCell",
-       "provenance": "contract subscription.yaml POST /cells/{cellId}/decommission"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Save cell tier",
-       "operation": "updateCellTier",
-       "provenance": "contract subscription.yaml PATCH /cells/{cellId}"
-      }
-     ]
+     "components": []
     }
    ]
   },
-  "overlays": [
-   {
-    "id": "confirmCancelDecommission",
-    "component": "confirmDialog",
-    "trigger": "Cancel decommission",
-    "body": "**Names what `cancelDecommission` changes and what it leaves alone**, in the consequence rather than the verb. A backup status this affects should be identified in the dialog, not just counted. **Collects what `cancelDecommission` sends before it is called.** Required: `reason`.",
-    "provenance": "contract subscription.yaml POST /cells/{cellId}/cancel-decommission"
-   },
-   {
-    "id": "formDecommissionCell",
-    "component": "modal",
-    "trigger": "Decommission cell",
-    "body": "**Collects what `decommissionCell` sends before it is called.** Required: `reason`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Decommission cell",
-     "operation": "decommissionCell"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "reason"
-     ]
-    },
-    "provenance": "contract subscription.yaml POST /cells/{cellId}/decommission"
-   },
-   {
-    "id": "formUpdateCellTier",
-    "component": "modal",
-    "trigger": "Save cell tier",
-    "body": "**Collects what `updateCellTier` sends before it is called.** Required: `tier`. Optional: `scheduledFor`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Save cell tier",
-     "operation": "updateCellTier"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "tier",
-      "scheduledFor"
-     ]
-    },
-    "provenance": "contract subscription.yaml PATCH /cells/{cellId}"
-   }
-  ],
   "states": {
    "loading": "The backup status list.",
    "error": "Could not load. Names which read failed and leaves the backup status untouched.",
-   "emptyFirstRun": "No backup status yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyFirstRun": "No backup status yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "Never shown: `listCellJobs` takes no filter, so an empty list is always the first-run state above.",
    "emptyNoAccess": "Shown when the caller lacks `PLATFORM_CELL_VIEW`, which `getCellHealth` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -1005,49 +675,10 @@
     "trigger": "onLoad"
    },
    {
-    "operationId": "cancelDecommission",
-    "contract": "subscription",
-    "purpose": "Halt a decommission",
-    "trigger": "onAction",
-    "invalidates": [
-     "listCellJobs"
-    ]
-   },
-   {
-    "operationId": "decommissionCell",
-    "contract": "subscription",
-    "purpose": "Begin decommissioning a cell",
-    "trigger": "onAction",
-    "invalidates": [
-     "listCellJobs"
-    ]
-   },
-   {
     "operationId": "getCell",
     "contract": "subscription",
     "purpose": "Read a cell",
     "trigger": "onLoad"
-   },
-   {
-    "operationId": "getCellCapacity",
-    "contract": "subscription",
-    "purpose": "Load against headroom",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "listCellJobs",
-    "contract": "subscription",
-    "purpose": "Provisioning, migration and maintenance jobs",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "updateCellTier",
-    "contract": "subscription",
-    "purpose": "Change a cell's tier",
-    "trigger": "onAction",
-    "invalidates": [
-     "listCellJobs"
-    ]
    },
    {
     "operationId": "listBackupRuns",
@@ -1078,6 +709,39 @@
    "board": "wireframes/P09 TICVAI Web.dc.html#adm-033"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 8 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "gaps": [
+   {
+    "operation": "cancelDecommission",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-021): Copied cell actions (decommission, tier) are not part of backup status; decommission stays on ADM-003 only (design-notes corrections platform-foundation ADM-033, ADM-013).",
+    "source": "screens/P09-platform-admin-console.yaml#ADM-033"
+   },
+   {
+    "operation": "decommissionCell",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-021): Copied cell actions (decommission, tier) are not part of backup status; decommission stays on ADM-003 only (design-notes corrections platform-foundation ADM-033, ADM-013).",
+    "source": "screens/P09-platform-admin-console.yaml#ADM-033"
+   },
+   {
+    "operation": "updateCellTier",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-021): Copied cell actions (decommission, tier) are not part of backup status; decommission stays on ADM-003 only (design-notes corrections platform-foundation ADM-033, ADM-013).",
+    "source": "screens/P09-platform-admin-console.yaml#ADM-033"
+   },
+   {
+    "operation": "listCellJobs",
+    "removed": true,
+    "why": "Copied cell operations are not part of this screen (design-note correction platform-foundation ADM-033, CHG-SBO-015).",
+    "source": "screens/P09-platform-admin-console.yaml#ADM-012"
+   },
+   {
+    "operation": "getCellCapacity",
+    "removed": true,
+    "why": "Copied cell operations are not part of this screen (design-note correction platform-foundation ADM-033, CHG-SBO-015).",
+    "source": "screens/P09-platform-admin-console.yaml#ADM-012"
+   }
+  ],
+  "purposeNote": "Purpose rewritten 2 October 2026 (CHG-WIR-023): The purpose was the generator template (\"See backup & dr status for this venue\").",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -1106,7 +770,7 @@
   "id": "ADM-034",
   "name": "Archival Job Monitor",
   "module": "Infrastructure & Resilience",
-  "requiresModule": "membership",
+  "requiresModule": "core",
   "wave": 3,
   "capability": "C96",
   "implementation": {
@@ -1129,7 +793,7 @@
     {
      "to": "ADM-001",
      "trigger": "Platform Login / MFA",
-     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId and ADM-034 holds none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and ADM-001 opens on its own"
+     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId, providerId and ADM-034 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and ADM-001 opens on its own"
     },
     {
      "to": "ADM-002",
@@ -1142,7 +806,7 @@
      "carries": [
       "cellId"
      ],
-     "provenance": "derived — ADM-003 declares entryState.params cellId, rightId and ADM-034 holds cellId, so an edge into it carries them"
+     "provenance": "derived — ADM-003 declares entryState.params cellId and ADM-034 holds cellId, so an edge into it carries them"
     }
    ]
   },
@@ -1153,7 +817,7 @@
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listCellJobs` reads the population and `getCell` reads one of them — list, select, act",
-  "purpose": "Find archival job monitor for this venue.",
+  "purpose": "Watch the archival and retention jobs across the cells.",
   "layout": {
    "template": "split",
    "regions": [
@@ -1163,27 +827,9 @@
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every cell job",
-       "bindsTo": "CellJob",
-       "columns": [
-        "CellJob.id",
-        "CellJob.kind",
-        "CellJob.status",
-        "CellJob.progressPercent",
-        "CellJob.message",
-        "CellJob.error",
-        "CellJob.scheduledFor",
-        "CellJob.completedAt"
-       ],
-       "operation": "listCellJobs",
-       "provenance": "contract subscription.yaml GET /cells/{cellId}/jobs"
-      },
-      {
-       "kind": "dataTable",
        "label": "Every archival job",
        "bindsTo": "ArchivalJob",
        "columns": [
-        "ArchivalJob.id",
         "ArchivalJob.policyName",
         "ArchivalJob.targetTable",
         "ArchivalJob.rowsArchived",
@@ -1200,212 +846,23 @@
     {
      "name": "contextPanel",
      "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected cell job",
-       "bindsTo": "CellJob",
-       "columns": [
-        "CellJob.id",
-        "CellJob.kind",
-        "CellJob.status",
-        "CellJob.progressPercent",
-        "CellJob.message",
-        "CellJob.error",
-        "CellJob.scheduledFor",
-        "CellJob.completedAt"
-       ],
-       "operation": "listCellJobs",
-       "provenance": "contract subscription.yaml GET /cells/{cellId}/jobs"
-      },
-      {
-       "kind": "detailPanel",
-       "label": "The cell capacity",
-       "bindsTo": "CellCapacity",
-       "columns": [
-        "CellCapacity.kind",
-        "CellCapacity.tenantCount",
-        "CellCapacity.isConstrained",
-        "CellCapacity.constrainedDimension",
-        "CellCapacity.dimensions",
-        "CellCapacity.forecastBreachAt",
-        "CellCapacity.measuredAt"
-       ],
-       "operation": "getCellCapacity",
-       "provenance": "contract subscription.yaml GET /cells/{cellId}/capacity"
-      },
-      {
-       "kind": "detailPanel",
-       "label": "The cell health",
-       "bindsTo": "CellHealth",
-       "columns": [
-        "CellHealth.isHealthy",
-        "CellHealth.isSchemaBehind",
-        "CellHealth.databaseStatus",
-        "CellHealth.replicationLagSeconds",
-        "CellHealth.lastBackupAt",
-        "CellHealth.lastRestoreDrillAt",
-        "CellHealth.checkedAt"
-       ],
-       "operation": "getCellHealth",
-       "provenance": "contract subscription.yaml GET /cells/{cellId}/health"
-      },
-      {
-       "kind": "detailPanel",
-       "label": "The cell",
-       "bindsTo": "CellDetail",
-       "columns": [
-        "CellDetail.id",
-        "CellDetail.name",
-        "CellDetail.kind",
-        "CellDetail.clusterId",
-        "CellDetail.isReachable",
-        "CellDetail.lastContactAt",
-        "CellDetail.licenceExpiresAt",
-        "CellDetail.participatesInCrossCell",
-        "CellDetail.regionId",
-        "CellDetail.regionName",
-        "CellDetail.countryCode",
-        "CellDetail.tier",
-        "CellDetail.status",
-        "CellDetail.cloudProvider",
-        "CellDetail.cloudRegion",
-        "CellDetail.apiEndpoint"
-       ],
-       "operation": "getCell",
-       "provenance": "contract subscription.yaml GET /cells/{cellId}"
-      }
-     ]
+     "components": []
     },
     {
      "name": "actionBar",
      "slot": "rowActions",
-     "components": [
-      {
-       "kind": "destructiveButton",
-       "label": "Cancel decommission",
-       "operation": "cancelDecommission",
-       "provenance": "contract subscription.yaml POST /cells/{cellId}/cancel-decommission"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Decommission cell",
-       "operation": "decommissionCell",
-       "provenance": "contract subscription.yaml POST /cells/{cellId}/decommission"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Save cell tier",
-       "operation": "updateCellTier",
-       "provenance": "contract subscription.yaml PATCH /cells/{cellId}"
-      }
-     ]
+     "components": []
     }
    ]
   },
-  "overlays": [
-   {
-    "id": "confirmCancelDecommission",
-    "component": "confirmDialog",
-    "trigger": "Cancel decommission",
-    "body": "**Names what `cancelDecommission` changes and what it leaves alone**, in the consequence rather than the verb. A archival job this affects should be identified in the dialog, not just counted. **Collects what `cancelDecommission` sends before it is called.** Required: `reason`.",
-    "provenance": "contract subscription.yaml POST /cells/{cellId}/cancel-decommission"
-   },
-   {
-    "id": "formDecommissionCell",
-    "component": "modal",
-    "trigger": "Decommission cell",
-    "body": "**Collects what `decommissionCell` sends before it is called.** Required: `reason`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Decommission cell",
-     "operation": "decommissionCell"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "reason"
-     ]
-    },
-    "provenance": "contract subscription.yaml POST /cells/{cellId}/decommission"
-   },
-   {
-    "id": "formUpdateCellTier",
-    "component": "modal",
-    "trigger": "Save cell tier",
-    "body": "**Collects what `updateCellTier` sends before it is called.** Required: `tier`. Optional: `scheduledFor`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Save cell tier",
-     "operation": "updateCellTier"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "tier",
-      "scheduledFor"
-     ]
-    },
-    "provenance": "contract subscription.yaml PATCH /cells/{cellId}"
-   }
-  ],
   "states": {
    "loading": "The archival job list.",
    "error": "Could not load. Names which read failed and leaves the archival job untouched.",
-   "emptyFirstRun": "No archival job yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyFirstRun": "No archival job yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "Never shown: `listCellJobs` takes no filter, so an empty list is always the first-run state above.",
    "emptyNoAccess": "Shown when the caller lacks `PLATFORM_CELL_VIEW`, which `listCellJobs` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
-   {
-    "operationId": "listCellJobs",
-    "contract": "subscription",
-    "purpose": "Provisioning, migration and maintenance jobs",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "cancelDecommission",
-    "contract": "subscription",
-    "purpose": "Halt a decommission",
-    "trigger": "onAction",
-    "invalidates": [
-     "listCellJobs"
-    ]
-   },
-   {
-    "operationId": "decommissionCell",
-    "contract": "subscription",
-    "purpose": "Begin decommissioning a cell",
-    "trigger": "onAction",
-    "invalidates": [
-     "listCellJobs"
-    ]
-   },
-   {
-    "operationId": "getCell",
-    "contract": "subscription",
-    "purpose": "Read a cell",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "getCellCapacity",
-    "contract": "subscription",
-    "purpose": "Load against headroom",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "getCellHealth",
-    "contract": "subscription",
-    "purpose": "Cell health and schema version",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "updateCellTier",
-    "contract": "subscription",
-    "purpose": "Change a cell's tier",
-    "trigger": "onAction",
-    "invalidates": [
-     "listCellJobs"
-    ]
-   },
    {
     "operationId": "listArchivalJobs",
     "contract": "platform-ops",
@@ -1435,6 +892,51 @@
    "board": "wireframes/P09 TICVAI Web.dc.html#adm-034"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 8 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "gaps": [
+   {
+    "operation": "cancelDecommission",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-021): Copied cell actions are not part of archival; decommission stays on ADM-003 only (ADR-0047; design-notes corrections platform-foundation ADM-034, ADM-013).",
+    "source": "ADR-0047 | screens/P09-platform-admin-console.yaml#ADM-034"
+   },
+   {
+    "operation": "decommissionCell",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-021): Copied cell actions are not part of archival; decommission stays on ADM-003 only (ADR-0047; design-notes corrections platform-foundation ADM-034, ADM-013).",
+    "source": "ADR-0047 | screens/P09-platform-admin-console.yaml#ADM-034"
+   },
+   {
+    "operation": "updateCellTier",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-021): Copied cell actions are not part of archival; decommission stays on ADM-003 only (ADR-0047; design-notes corrections platform-foundation ADM-034, ADM-013).",
+    "source": "ADR-0047 | screens/P09-platform-admin-console.yaml#ADM-034"
+   },
+   {
+    "operation": "listCellJobs",
+    "removed": true,
+    "why": "Copied cell operations are not part of this screen (design-note correction platform-foundation ADM-034, CHG-SBO-015).",
+    "source": "screens/P09-platform-admin-console.yaml#ADM-012"
+   },
+   {
+    "operation": "getCellCapacity",
+    "removed": true,
+    "why": "Copied cell operations are not part of this screen (design-note correction platform-foundation ADM-034, CHG-SBO-015).",
+    "source": "screens/P09-platform-admin-console.yaml#ADM-012"
+   },
+   {
+    "operation": "getCellHealth",
+    "removed": true,
+    "why": "Copied cell operations are not part of this screen (design-note correction platform-foundation ADM-034, CHG-SBO-015).",
+    "source": "screens/P09-platform-admin-console.yaml#ADM-012"
+   },
+   {
+    "operation": "getCell",
+    "removed": true,
+    "why": "Copied cell operations are not part of this screen (design-note correction platform-foundation ADM-034, CHG-SBO-015).",
+    "source": "screens/P09-platform-admin-console.yaml#ADM-012"
+   }
+  ],
+  "purposeNote": "Purpose rewritten 2 October 2026 (CHG-WIR-023): The purpose was the generator template (\"Find archival job monitor for this venue\").",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",

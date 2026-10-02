@@ -1,6 +1,6 @@
 # P13-white-label-03 — P13 · White Label (3 of 3)
 
-**3 screens · 25 operations · 40 schemas · 6 permissions**
+**3 screens · 27 operations · 42 schemas · 6 permissions**
 
 Platform P13 Venue CMS · ships as **venue-management** ·
 staff audience · web ·
@@ -61,6 +61,39 @@ convincingly. It is never a caption.
   and its error; and, element by element, what is shown and in what format, what each action
   produces and where the user goes next. Draw exactly that.
 
+## The processes these screens belong to
+
+Written by the owner of each process (`handoff/design-notes/`). Read before any screen: it says how the process runs end to end and which words the screens must use.
+
+### White Label & CMS
+
+A tenant (one operator, one or many venues) brands and arranges its own guest surfaces, the guest web (P01), the guest app (P02) and the kiosk (P05), from the Venue CMS (P13, a section of the Venue Management app), and TICVAI platform staff can do the same from the console (P09 ADM-016..018) only under a time-boxed grant into the tenant. Everything is configuration over a fixed structure: the guest flow, the page structure and the components are TICVAI's and stay the same for every tenant; the tenant chooses graphics, colours, fonts, which modules and tabs appear, the order of homepage sections and booking steps within allowed limits, copy in each language, and its domain. It never adds components. Work happens in ONE working draft per tenant; nothing a guest sees changes until a person with TENANT_PUBLISH publishes the draft as an immutable version (with a note), and a rollback is restore into the draft, review the diff, then publish, never one click. Three things are deliberately outside the draft and take effect at once: the live app status (maintenance, minimum app version, contact, sold out or closed), a venue's Help me choose publish, and policies (each save is a new version). Build-time parts (app icons, native splash, custom font files, wallet and payment integrations) reach guests only with a new store build, which the client publishes under its own Apple and Google accounts (CMS-104). Staff surfaces (POS, scanner, staff app, kitchen display) never take tenant branding; every guest surface carries the "Powered by TICVAI" credit, a toggle that is on by default (decided 2 October 2026, CHG-NOTE-009; DI-297 amended). Arabic is a first-class layout: enabling `ar` requires an Arabic font, the whole layout mirrors (numbers, times, codes and logos do not), and every authored text is a per-language value. The step-based Site Builder (CMS-102) walks a new tenant through seven steps from a venue-type preset so that a logo, four colours and a publish are enough for a working site in about 30 minutes; every step opens the full screen for its details. Vocabulary below; the element-by-element model follows; inputToOutput at the end gives worked examples.
+*(source: contracts/satellite/white-label.yaml#/info; DI-223; DI-285; DI-111; DI-297; DI-296; DI-298; DI-997; DI-998; DI-1014; R139; R073; F22 step 5; F22 step 6; docs/architecture/rtl-and-theming.md)*
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Draft | The tenant's one working configuration. Every Save writes it; guests never see it. | Staging, Unsaved, Pending | contracts/satellite/white-label.yaml#/info |
+| Publish | Make the draft the live version guests read, with a note. Needs TENANT_PUBLISH. | Go live, Deploy, Push, Save and publish | contracts/satellite/white-label.yaml#publishTenantConfig |
+| Save | Write to the draft. Never publishes. | Apply, Update live | contracts/satellite/white-label.yaml#/info |
+| Version | An immutable published snapshot, numbered, with who published it and the note. | Release, Revision, Backup | contracts/satellite/white-label.yaml#/components/schemas/ConfigVersion |
+| Restore into draft | Copy an old version back into the draft. Publishes nothing. | Roll back, Revert, Undo | R139 |
+| Live now | The changes that bypass the draft and apply at once (maintenance, availability, minimum app version, contact, Help me choose publish, policies). | Instant publish | contracts/satellite/white-label.yaml#setMaintenanceMode |
+| Needs an app update | A build-time change (app icon, native splash, uploaded font, wallet or payment integration) that reaches app users only with a new store build. | Rebuild required, Build-time, Pending release | contracts/satellite/white-label.yaml#/components/schemas/ChangeScope |
+| Theme | The tenant's colours, corner radius, surfaces and buttons. | Skin, Template, Style sheet | contracts/satellite/white-label.yaml#/components/schemas/Theme |
+| Booking flow | The ordered steps a guest goes through to book one kind of product at one venue. | Checkout flow, Journey, Funnel, Wizard | contracts/satellite/white-label.yaml#/components/schemas/BookingFlow |
+| Step | One stage of a booking flow (Date, Time, Tickets, Extras, Payment...). Marked Required, Optional or Conditional. | Page, Stage, Screen | contracts/satellite/white-label.yaml#/components/schemas/BookingFlowStepKey |
+| Help me choose | The venue's short set of questions that filters the products shown. Never a consent step. | Quiz, Experience builder, Wizard, Recommender | DI-1005 |
+| Module | A licensed product area a tenant switches on for guests (Dining, Shop, Map...). Off means hidden, not greyed. | Plugin, App, Feature | contracts/satellite/white-label.yaml#setModuleEnablement |
+| Feature | A finer switch inside the guest app (guest checkout, AI concierge, Apple Wallet...). | Module, Add-on | contracts/satellite/white-label.yaml#setFeatureToggles |
+| Buy tickets | The persistent button in the guest app that opens GST-003, and its label. | Book now, Shop, Purchase | DI-1081 |
+| Powered by TICVAI | The platform credit on every guest surface; a toggle, on by default, off only where the venue's licence allows. | Built by TICVAI, Made by TICVAI | DI-297 / decided 2 October 2026 by Chinmay (CHG-NOTE-009) |
+| Site Builder | The seven-step guided set-up (CMS-102). | Wizard, Onboarding, Setup assistant | DI-997 |
+| Venue override | A booking setting one venue sets differently from the tenant; everything else is inherited. | Exception, Custom setting | DI-1063 |
+| Sold out today / Closed | The two availability signals guests see; sold out means come another day, closed means the venue is not open. | Unavailable, Error | R073 |
+| Maintenance | The tenant-branded page shown while the guest web and app are switched off, with when they are expected back. | Down, Outage, Offline | contracts/satellite/white-label.yaml#setMaintenanceMode |
+| Domain | The web address the tenant's guests use; Verify proves the tenant controls it before a certificate is issued. | URL, Site address, DNS | contracts/satellite/white-label.yaml#claimCustomDomain |
+
+
 ## The screens
 
 Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs count fields; requirements are matrix rows; meeting inputs are the ones naming the screen (the module and platform ones are below); white label says whether the tenant's brand reaches it (guest) or it sets the brand (configures).
@@ -69,7 +102,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|---|---|---|---|---|---|---|---|---|
 | `CMS-102` | Site Builder | A | 20 | 15 | 6 | 2 | 7 | 6 | configures | notStarted (generated) |
 | `CMS-103` | Booking Flows | A | 76 | 29 | 6 | 18 | 27 | 6 | configures | notStarted (generated) |
-| `CMS-104` | App Build & Store Publishing | A | 21 | 34 | 6 | 15 | 6 | 6 | configures | notStarted (generated) |
+| `CMS-104` | App Build & Store Publishing | A | 22 | 35 | 6 | 17 | 6 | 6 | configures | notStarted (generated) |
 
 ---
 
@@ -94,6 +127,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Route | `/white-label/site-builder` |
 
 **What the spec says about it.** **Added 29 September for W12 and M24-05: the CMS is a flow builder with a step-based shell.** The configuration side panel of the rev 3 prototype is a reference tool only (W12). The builder is the white-labelling builder M24-05 asks for, not a new set of editors: every step opens a screen that already exists and holds its details.
+
+**From the White Label & CMS process.** The step-based Site Builder: pick a preset (theme park, water park, museum, theatre and arena, single attraction, play centre, several venues), then seven saved steps, each opening the full screen and coming back. The minimum path (logo, four colours, one valid booking flow, a publish) is always visible, so a client gets a working site in about 30 minutes. Every option the builder touches must visibly change something in a preview.
+
+**Fixed on main** (the package already carries these; draw what it says): CMS-009 Navigation & Menus, which steps 5 and 6 open for the header menu, the tab bar and the Buy tickets button, is filed under module … (CHG-WIR-008).
+
+#### Decided on this screen
+
+Answered questions: draw the decision, not the old default. Where a decision and the tables below differ, the decision wins.
+
+- **Which modules, flows, sections and tabs does each preset propose? No source lists them.** → Drawn default accepted: Water park proposes ticketsAndBooking, diningAndFnb, shop, map; datedDayPass and cabanaMap; heroBanner, tickets, attractions, dining; tabs Home, Explore, Map, Tickets. *(decided by Chinmay, 2026-10-02; DEC-159 / CHG-NOTE-009)*
 
 #### Inputs: what the user enters or picks
 
@@ -142,6 +185,11 @@ Errors to draw in the form: 400 An unknown flow type, a step the type does not h
 | Preset key `presetKey` | select | optional | — | Theme park · Water park · Museum · Theatre and arena · Single attraction · Play centre · Multi venue | — | The starting point. Each preset proposes the modules, the booking flow types (with their default step order), the homepage sections, the mobile tabs and a booking-flow `preset` … | `setSiteSetupProgress` body |
 | Current step `currentStep` | select | optional | — | Venue and modules · Ticketing flows · Compose steps · Help me choose · Look and feel · Mobile app · Preview and publish | — | The seven Site Builder steps, in order (decided 29 September, W12): venue and modules (CMS-001), ticketing flows (CMS-103), compose steps (CMS-103), Help me choose (CMS-101), look … | `setSiteSetupProgress` body |
 | Steps `steps` | key and value settings | optional | — | — | — | One entry per `SiteSetupStepKey`. | `setSiteSetupProgress` body |
+
+**Rules for these inputs** (from the White Label & CMS process; these refine the tables above and win where they differ)
+
+- **presetKey**: Seven picture cards; picking one proposes modules, booking flow types, homepage sections and tabs, and writes nothing until each step is accepted. *(source: contracts/satellite/white-label.yaml#/components/schemas/SiteSetupProgress; DI-997)*
+- **steps[].status**: Not started / In progress / Done / Skipped; steps 4 (Help me choose) and 6 (Mobile app) may be skipped. Saved on every return. *(source: contracts/satellite/white-label.yaml#setSiteSetupProgress)*
 
 #### Outputs: what the screen shows and produces
 
@@ -195,6 +243,17 @@ Errors to draw in the form: 400 An unknown flow type, a step the type does not h
 | Add these flows (secondary button) | `createBookingFlowDefinition` POST `/venues/{venueId}/booking-flows` | BookingFlow | BookingFlow | 400 An unknown flow type, a step the type does not have, or a step given twice; 403 Authenticated but not permitted at the requested scope | opens modal first |
 | Check what blocks a publish (secondary button) | `validateTenantConfig` POST `/tenant-config/validate` | — | ConfigValidationReport | — | — |
 
+**Rules for what is shown** (from the White Label & CMS process; these refine the tables above and win where they differ)
+
+- **Step rail**: 1 Venue and modules · 2 Ticketing flows · 3 Compose steps · 4 Help me choose · 5 Look and feel · 6 Mobile app · 7 Preview and publish, each with status and the screens it opens. *(source: contracts/satellite/white-label.yaml#/components/schemas/SiteSetupStepKey)*
+- **Minimum path checklist**: Logo, four theme colours, at least one enabled valid booking flow, a published version; ticked from the server (minimumPathDone). *(source: contracts/satellite/white-label.yaml#/components/schemas/SiteSetupProgress)*
+- **Live preview**: The guest Home updates as steps are accepted. *(source: DI-988)*
+
+**What each action does** (from the White Label & CMS process; these refine the tables above and win where they differ)
+
+- **Add these flows**: Creates each ticked preset flow type at the venue with its default steps (isDefaultForType on). *(source: contracts/satellite/white-label.yaml#createBookingFlowDefinition)*
+- **Mark Preview and publish done**: Refused 409 until a version is published. *(source: contracts/satellite/white-label.yaml#setSiteSetupProgress)*
+
 **Data it reads**: `getSiteSetupProgress` (onLoad, Where the operator is in the seven steps, and the preset …); `listBookingFlowTypes` (onLoad, The flow types the preset proposes for step 2); `listBookingFlows` (onLoad, The venue's flows, to mark steps 2 and 3 done); `getTenantAppStatus` (onLoad, Whether the site is live, for step 7)
 
 **Where the user goes next**
@@ -209,13 +268,13 @@ Errors to draw in the form: 400 An unknown flow type, a step the type does not h
 - → `CMS-004` Logo & Assets: *5 Look and feel — logos*
 - → `CMS-008` Content Blocks: *5 Look and feel — banners*
 - → `CMS-005` Theme Editor: *5 Look and feel — theme*
-- → `CMS-003` Typography: *5 Look and feel — fonts*; carries `version`
+- → `CMS-003` Typography: *5 Look and feel — fonts*
 - → `CMS-009` Navigation & Menus: *6 Mobile app — tabs and the Buy tickets button*
 - → `CMS-004` Logo & Assets: *6 Mobile app — intro video*
 - → `CMS-007` Page Builder: *6 Mobile app — home sections*
-- → `CMS-006` Component Preview: *7 Preview*; carries `version`
+- → `CMS-006` Component Preview: *7 Preview*
 - → `CMS-012` RTL Preview: *7 Preview right to left*
-- → `CMS-014` Publishing Workflow: *7 Publish*
+- → `CMS-014` Publishing Workflow: *7 Publish*; carries `version`
 - → `CMS-015` Version History: *Roll back a version*; carries `version`
 - → `CMS-104` App Build & Store Publishing: *Build the mobile app*; only when the tenant has published at least once
 
@@ -231,6 +290,37 @@ Errors to draw in the form: 400 An unknown flow type, a step the type does not h
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 An unknown flow type, a step the type does not have, or a step given twice; 400 Validation failed; 409 `previewAndPublish` marked done while no version has been published |
 
+#### Edge cases to draw
+
+- **Operator leaves halfway and returns a week later**: Opens on currentStep with the preset still chosen. *(source: contracts/satellite/white-label.yaml#getSiteSetupProgress)*
+- **Tenant with several venues**: Steps 2 and 3 repeat per venue; the rail shows venue progress (2 of 4 venues have valid flows). *(source: contracts/satellite/white-label.yaml#listBookingFlows)*
+
+#### Consistency with other screens
+
+- Match `CMS-001`: Step 1 is CMS-001's module and feature switches.
+- Match `CMS-104`: After the first publish, the builder offers the app build.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+preset: waterPark
+steps:
+  venueAndModules: done
+  ticketingFlows: done
+  composeSteps: inProgress
+  helpMeChoose: skipped
+  lookAndFeel: notStarted
+  mobileApp: notStarted
+  previewAndPublish: notStarted
+minimumPath:
+  logo: true
+  colours: true
+  validFlow: false
+  published: false
+```
+
 #### Permissions
 
 - `getSiteSetupProgress` → `TENANT_CONFIGURE` (configure) · staff
@@ -238,7 +328,7 @@ Errors to draw in the form: 400 An unknown flow type, a step the type does not h
 - `listBookingFlowTypes` → `TENANT_CONFIGURE` (configure) · staff
 - `listBookingFlows` → `TENANT_CONFIGURE` (configure) · staff
 - `createBookingFlowDefinition` → `TENANT_CONFIGURE` (configure) · staff
-- `getTenantAppStatus` → no permission · device, guest
+- `getTenantAppStatus` → no permission · device, guest, staff
 - `validateTenantConfig` → `TENANT_CONFIGURE` (configure) · staff
 
 **A refused user sees:** Shown when the caller lacks `TENANT_CONFIGURE`, which `getSiteSetupProgress` requires, and names that permission. **Never an empty form** — that reads as *there is nothing to set up*.
@@ -312,6 +402,8 @@ Each field here is an **input** a tenant sets; the right column is the **output*
 - [ ] Every gated control is gated: `TENANT_CONFIGURE`.
 - [ ] The 7 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] Every field shows its allowed values and default, and a live preview shows the output on the guest screen it reaches.
+- [ ] The 2 edge case(s) from the process notes are drawn.
+- [ ] The 1 decision(s) taken on this screen are drawn as decided, not as the old default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -333,6 +425,12 @@ Each field here is an **input** a tenant sets; the right column is the **output*
 | Route | `/white-label/booking-flows` |
 
 **What the spec says about it.** **Added 29 September for W12: operators pick their ticketing flows, see which steps are required, optional or conditional, and set their own order.** The catalogue (`listBookingFlowTypes`) is the same for every tenant: dated day pass, timed entry, open-dated, seated (fixed performance, or date and time then seat map), experience or workshop (product first, W8), surf or session (time then level), meeting room by the hour, cabana on a map or by size (W6), guided tour by language, transport, table reservation, membership, gift card and several locations. Flows reach guests with the rest of the site (`publishTenantConfig`); WEB-005..012, GST-007..009 and GST-041 order their steps from the published flow.
+
+**From the White Label & CMS process.** Pick the venue's booking flows from the fixed catalogue, turn optional steps on or off, reorder within the type's constraints with a live preview, set step and flow settings, assign flows to products and categories, and validate. Flows publish with the whole site. The one thing to get right: a drag that breaks a constraint is refused before it lands, with the constraint in words.
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- The surfSession type's level step has a broken stepSettings note in the contract (a stray key "from the products' segmentTags" with a null value). (CHG-SGU-024)
 
 #### Inputs: what the user enters or picks
 
@@ -472,6 +570,13 @@ Errors to draw in the form: 409 Validation failed. (ConfigValidationProblem)
 | Booking flow `categories[].bookingFlowId` | picker: choose a booking flow | optional | — | — | shows names, sends the id | The booking flow for every product filed here that names none of its own (decided 29 September, W12, BO-115). | `setProductCategories` body |
 | Is active `categories[].isActive` | toggle | optional | on | — | — | Deactivated rather than deleted. A category with a season behind it still names the products sold under it, and removing it rewrites last year's report. | `setProductCategories` body |
 
+**Rules for these inputs** (from the White Label & CMS process; these refine the tables above and win where they differ)
+
+- **flowTypeKey**: Cards for the 16 types (dated day pass, timed entry, open-dated, seated fixed performance, seated date-time-seat map, workshop, surf or session, meeting room, cabana on a map, cabana by size, guided tour by language, transport, table reservation, membership, gift card, several locations), each listing its steps with Required / Optional / Conditional marks. *(source: contracts/satellite/white-label.yaml#/components/schemas/BookingFlowType)*
+- **steps[] order and enabled**: Drag handles; Required steps locked on; Conditional steps show their condition in words (e.g. "Only when the tenant has more than one venue"). Each drop is checked with validateBookingFlow and the proposed steps before it lands. *(source: contracts/satellite/white-label.yaml#validateBookingFlow)*
+- **step settings**: Only the names the type gives (e.g. tour languages, room hours 1-8 by 60 minutes, party size 1-12); an unknown name is refused (400). *(source: contracts/satellite/white-label.yaml#/components/schemas/BookingFlowStep)*
+- **flow settings**: Performance reveal Date then time then ticket (default) / All at once; sign in After add-ons (default) / At payment; seated date Inline (default) / Pop-up over the seat map; extras Auto / Always / Never; Quick tour off by default; up to 10 consent questions. *(source: DI-1042; DI-1043; DI-1044; DI-1060; contracts/satellite/white-label.yaml#/components/schemas/BookingFlowLevelSettings)*
+
 #### Outputs: what the screen shows and produces
 
 **Shown**
@@ -550,6 +655,16 @@ Errors to draw in the form: 409 Validation failed. (ConfigValidationProblem)
 | Publish site (secondary button) | `publishTenantConfig` POST `/tenant-config/publish` | inline | ConfigVersion | 409 Validation failed. (ConfigValidationProblem) | gated `TENANT_PUBLISH`; opens confirmDialog first |
 | Remove flow (destructive button) | `deleteBookingFlow` DELETE `/booking-flows/{bookingFlowId}` | — | — | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 A product or category still names this flow, or it is the default for products on sale; the problem names them | opens confirmDialog first |
 
+**Rules for what is shown** (from the White Label & CMS process; these refine the tables above and win where they differ)
+
+- **Live preview**: The flow step by step on web and mobile, with the step indicator style from CMS-016, beside the published flow for comparison. *(source: screens/P13-white-label-cms.yaml#CMS-103)*
+- **Validation**: Problems by kind (required step off, order broken, condition never holds, step not in type, duplicate, unknown setting) each naming the step and the fix. *(source: contracts/satellite/white-label.yaml#/components/schemas/BookingFlowValidation)*
+
+**What each action does** (from the White Label & CMS process; these refine the tables above and win where they differ)
+
+- **Save flow**: Saves to the draft even when invalid (isValid false), so work can stop halfway; the publish refuses an invalid enabled flow. *(source: contracts/satellite/white-label.yaml#updateBookingFlowDefinition)*
+- **Remove flow**: Refused 409 while products or categories name it or it is the default for products on sale; offer reassignment. *(source: contracts/satellite/white-label.yaml#deleteBookingFlow)*
+
 **Data it reads**: `listBookingFlows` (onLoad, The venue's flows in the draft); `listBookingFlowTypes` (onLoad, The flow types to pick from, with their steps and order …); `listConsentQuestions` (onLoad, The consent questions a flow can ask (rev 3 REV3-26))
 
 **Where the user goes next**
@@ -557,7 +672,7 @@ Errors to draw in the form: 409 Validation failed. (ConfigValidationProblem)
 - → `CMS-102` Site Builder: *Back to the Site Builder*
 - → `CMS-016` Site Settings: *Venue-wide booking settings*
 - → `CMS-101` Help Me Choose: *Help me choose*
-- → `CMS-014` Publishing Workflow: *Publish with the site*
+- → `CMS-014` Publishing Workflow: *Publish with the site*; carries `version`
 
 #### States
 
@@ -571,12 +686,44 @@ Errors to draw in the form: 409 Validation failed. (ConfigValidationProblem)
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 A `categoryId` that names no category of the venue, or a `guidedAnswerIds` entry that is not an answer of the venue's published guided choice (W4, 29 …; 400 A step the type does not have, or a step given twice; 400 An unknown flow type, a step the type does not have, or a step given twice; 400 The body contains a cycle — a category that is its own ancestor — or a `parentId` that names no … |
 
+#### Edge cases to draw
+
+- **Turning extras off for a flow whose products have add-ons**: Allowed; the preview shows the flow collapse to Tickets -> Cart -> Checkout. *(source: DI-428)*
+- **A product names a disabled flow**: It falls back to the venue default for its kind; show which products fall back. *(source: contracts/satellite/white-label.yaml#/components/schemas/BookingFlow)*
+
+#### Consistency with other screens
+
+- Match `CMS-016`: Venue-wide settings shown read-only beside the step that uses them.
+- Match `WEB-006`: Times per page, day parts and reveal order drawn there follow these settings.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+venue: Coastal Aqua Yas Island
+flow:
+  name: Day pass with cabana
+  type: cabanaMap
+  steps:
+  - date
+  - resourceMap
+  - consent
+  - extras
+  - review
+  - payment
+  settings:
+    signInAt: afterAddOns
+    extrasStep: auto
+invalidDrop: 'Payment can''t move above Review: payment is always last.'
+```
+
 #### Permissions
 
 - `listBookingFlows` → `TENANT_CONFIGURE` (configure) · staff
 - `listBookingFlowTypes` → `TENANT_CONFIGURE` (configure) · staff
 - `getBookingFlow` → `TENANT_CONFIGURE` (configure) · staff
-- `getPublishedBookingFlow` → no permission · guest
+- `getPublishedBookingFlow` → no permission · guest, staff
 - `createBookingFlowDefinition` → `TENANT_CONFIGURE` (configure) · staff
 - `updateBookingFlowDefinition` → `TENANT_CONFIGURE` (configure) · staff
 - `validateBookingFlow` → `TENANT_CONFIGURE` (configure) · staff
@@ -691,6 +838,7 @@ Each field here is an **input** a tenant sets; the right column is the **output*
 - [ ] Every gated control is gated: `GUEST_VIEW`, `PRODUCT_CONFIGURE`, `PRODUCT_VIEW`, `TENANT_CONFIGURE`, `TENANT_PUBLISH`.
 - [ ] The 27 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] Every field shows its allowed values and default, and a live preview shows the output on the guest screen it reaches.
+- [ ] The 2 edge case(s) from the process notes are drawn.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -713,6 +861,20 @@ Each field here is an **input** a tenant sets; the right column is the **output*
 
 **What the spec says about it.** **Added 29 September for M24-08.** TICVAI never publishes a client's app under its own developer account: each client opens and owns its Apple Developer account (with a D-U-N-S number) and its Google Play account, builds its app here from the published configuration, and uploads it, or lets us submit it with its own API credential. The accounts are make-or-break client inputs (`setStoreAccounts`).
 
+**From the White Label & CMS process.** Get the tenant's branded app into the App Store and Google Play under the client's own accounts: a checklist of what only the client can do (D-U-N-S, Apple and Google developer accounts), the store listing, a build from a published version, then download to upload or submit with the client's credential, and follow store review. A guide walks the client through each outside step.
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- ADR-0006 says TICVAI builds, signs and submits and tenants do not self-publish, and that shared-tier tenants get a branded PWA. (CHG-SGU-025)
+
+**Fixed on main** (the package already carries these; draw what it says): The listing has no place for the TICVAI credit the client asked to keep visible in published apps. (CHG-SGU-011).
+
+#### Decided on this screen
+
+Answered questions: draw the decision, not the old default. Where a decision and the tables below differ, the decision wins.
+
+- **Where does "Powered by TICVAI" appear in the published app (launch, Account, About)?** → "Powered by TICVAI" is a configuration toggle, default on: shown unless the venue's licence allows switching it off (Pre-apply round, 2 October; DI-297 amended). *(decided by Chinmay, 2026-10-02; DEC-160 / CHG-NOTE-009 / CHG-SGU-011)*
+
 #### Inputs: what the user enters or picks
 
 **On the screen**
@@ -720,6 +882,7 @@ Each field here is an **input** a tenant sets; the right column is the **output*
 | Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
 |---|---|---|---|---|---|---|---|
 | Platform | select field | — | — | — | — | Sends `?platform=`, iOS or Android. | — |
+| Show "Powered by TICVAI" | toggle | optional | on | — | — | **A configuration toggle, on by default** (decided by Chinmay, 2 October 2026; DEC-160; CHG-CSA-036). The credit shows on the launch screen under the splash and at the foot of Account (DI-250 … | `BrandIdentity.showPoweredBy` |
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
 
@@ -765,6 +928,12 @@ Errors to draw in the form: 400 An Apple account without a nine-digit D-U-N-S nu
 
 Errors to draw in the form: 403 Authenticated but not permitted at the requested scope; 409 No store account for the platform, nothing published yet, or a build for the platform already running; the problem says which
 
+**Rules for these inputs** (from the White Label & CMS process; these refine the tables above and win where they differ)
+
+- **accounts[] (per store)**: Legal name as the store knows it; Apple needs a nine-digit D-U-N-S number (400); Team ID or Play developer id; bundle / application id (e.g. ae.coastalaqua.app); API credential optional, write-only, shown as "Credential stored". *(source: contracts/satellite/white-label.yaml#/components/schemas/StoreAccount; DI-993)*
+- **listing**: App name, subtitle, description and keywords in every tenant language (400 if one is missing), category, support and privacy URLs, screenshots. *(source: contracts/satellite/white-label.yaml#setStoreAccounts)*
+- **requestAppBuild {platform, configVersion, releaseNotes, submitToStore}**: Platform iOS / Android; version defaults to the current published one; release notes per language; Submit to the store only with a stored credential. *(source: contracts/satellite/white-label.yaml#requestAppBuild)*
+
 #### Outputs: what the screen shows and produces
 
 **Shown**
@@ -787,6 +956,12 @@ Errors to draw in the form: 403 Authenticated but not permitted at the requested
 | Status | chip: Queued, Building, Built, Failed, Submitted, In review… | `queued` to `built` or `failed` is the build service's; from `submitted` on it is read from the store with the client's credential, or … |
 | Requested at | 1 Oct 2026, 14:30 | — |
 | Finished at | 1 Oct 2026, 14:30 | — |
+
+**Credit shown** (detail panel, from `getBrandIdentity`): Whether the "Powered by TICVAI" credit shows now, and whether the licence lets it be switched off.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Show powered by | yes / no (icon or chip) | "Powered by TICVAI", a configuration toggle, on by default (Chinmay, 2 October, workbook Q160 and the pre-apply round; consistent with … |
 
 **The selected build** (detail panel, from `getAppBuild`): Download the signed package to upload it in App Store Connect or the Play Console; with a credential recorded, the store review status follows here (submitted, in review, approved, rejected, released).
 
@@ -831,7 +1006,18 @@ Errors to draw in the form: 403 Authenticated but not permitted at the requested
 | Request a build (primary button) | `requestAppBuild` POST `/tenant-config/app-builds` | inline | AppBuild | 403 Authenticated but not permitted at the requested scope; 409 No store account for the platform, nothing published yet, or a build for the platform already running; the problem says which | gated `TENANT_PUBLISH`; opens confirmDialog first |
 | Save store accounts and listing (secondary button) | `setStoreAccounts` PUT `/tenant-config/store-accounts` | inline | StorePublishingChecklist | 400 An Apple account without a nine-digit D-U-N-S number, a store given twice, or a listing text missing a tenant language | opens modal first |
 
-**Data it reads**: `getStoreAccounts` (onLoad, The client's store accounts and the checklist); `listAppBuilds` (onLoad, The builds and their store status)
+**Rules for what is shown** (from the White Label & CMS process; these refine the tables above and win where they differ)
+
+- **Checklist**: Apple D-U-N-S, Apple Developer account, Google Play account (marked "Only you can do this"), store listing, app icons, a published configuration; each open item with its next step. *(source: contracts/satellite/white-label.yaml#/components/schemas/StorePublishingChecklist; DI-994)*
+- **Builds**: Platform, version name and build number, configuration version, status (Queued, Building, Built, Failed, Submitted, In review, Approved, Rejected, Released), times; download link for the signed .ipa or .aab. *(source: contracts/satellite/white-label.yaml#/components/schemas/AppBuild)*
+- **Powered by TICVAI**: A configuration toggle, default on: shown on the launch screen under the splash and at the foot of Account, unless the venue's licence allows switching it off. *(source: decided 2 October 2026 by Chinmay (CHG-NOTE-009))*
+
+**What each action does** (from the White Label & CMS process; these refine the tables above and win where they differ)
+
+- **Request a build**: 202 queued; 409 says which of no store account, nothing published, or a build already running. Needs TENANT_PUBLISH. *(source: contracts/satellite/white-label.yaml#requestAppBuild)*
+- **Ask the guide**: The in-platform publishing guide answers; unavailable until its assistant profile exists, the checklist guidance still works. *(source: DI-994; screens/P13-white-label-cms.yaml#CMS-104)*
+
+**Data it reads**: `getStoreAccounts` (onLoad, The client's store accounts and the checklist); `listAppBuilds` (onLoad, The builds and their store status); `getBrandIdentity` (onLoad, Whether "Powered by TICVAI" shows …)
 
 **Where the user goes next**
 
@@ -849,7 +1035,38 @@ Errors to draw in the form: 403 Authenticated but not permitted at the requested
 | Empty, no results (`?state=emptyNoResults`) | No build for the platform picked. Names it and offers the other. |
 | Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `TENANT_CONFIGURE`, which `listAppBuilds` requires, and names that permission. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 400 An Apple account without a nine-digit D-U-N-S number, a store given twice, or a listing text missing a tenant language; 409 No store account for the platform, nothing published yet, or a build for the platform already running; the problem says which |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 An Apple account without a nine-digit D-U-N-S number, a store given twice, or a listing text missing a tenant language; 400 An asset is larger than 2 MB, or is not PNG or SVG (audit R270); 409 No store account for the platform, nothing published yet, or a build for the platform already running; the problem says which; 422 The guard model blocked the message or the reply (`guard-refused` … |
+
+#### Edge cases to draw
+
+- **Store rejects the build**: Status Rejected with the store's reason (when a credential is stored) and a link to the guide. *(source: contracts/satellite/white-label.yaml#/components/schemas/AppBuild)*
+- **No credential stored**: Status stays Built after download; the client uploads by hand and the screen says the review status will not update here. *(source: contracts/satellite/white-label.yaml#/components/schemas/AppBuild)*
+
+#### Consistency with other screens
+
+- Match `CMS-004`: The icons and splash built come from there.
+- Match `CMS-001`: After a release, the minimum app version can force older apps to update.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+apple:
+  accountHolderName: Coastal Leisure Group LLC
+  dunsNumber: '565123987'
+  developerAccountId: 9KX2B7Q4LM
+  appIdentifier: ae.coastalaqua.app
+google:
+  developerAccountId: '7182736455091827364'
+  appIdentifier: ae.coastalaqua.app
+build:
+  platform: ios
+  versionName: 2.4.0
+  buildNumber: 41
+  configVersion: '14'
+  status: inReview
+```
 
 #### Permissions
 
@@ -860,12 +1077,14 @@ Errors to draw in the form: 403 Authenticated but not permitted at the requested
 - `requestAppBuild` → `TENANT_PUBLISH` (configure) · staff
 - `createAiConversation` → `AI_USE` (operate) · staff, guest
 - `sendAiMessage` → `AI_USE` (operate) · staff, guest
+- `getBrandIdentity` → `TENANT_CONFIGURE` (configure) · staff
+- `setBrandIdentity` → `TENANT_CONFIGURE` (configure) · staff
 
 **A refused user sees:** Shown when the caller lacks `TENANT_CONFIGURE`, which `listAppBuilds` requires, and names that permission.
 
 #### Requirements it meets
 
-15 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+17 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
 
 | Ref | Requirement (shortened) | Domain | Verdict | Via |
 |---|---|---|---|---|
@@ -881,7 +1100,7 @@ Errors to draw in the form: 403 Authenticated but not permitted at the requested
 | 18.10.4 | Work Order Assistance - AI shall assist users with work order activities. | Employee Mobile App & AI Assistant | CONTRACTED | `sendAiMessage` |
 | 18.10.5 | Knowledge Base Assistance - AI shall provide access to operational knowledge and procedures. | Employee Mobile App & AI Assistant | CONTRACTED | `sendAiMessage` |
 | 22.8.4 | AI Chatbot Assistant | Marketing & CRM | CONTRACTED | `sendAiMessage` |
-| … 3 more | | | | `traceability.json` |
+| … 5 more | | | | `traceability.json` |
 
 #### Client meeting inputs
 
@@ -911,6 +1130,17 @@ Each field here is an **input** a tenant sets; the right column is the **output*
 
 | Field | Allowed values | Default | Reaches | What it changes |
 |---|---|---|---|---|
+| Logo (`brand.logoAssetRef`) | PNG or SVG ≤ 2 MB for logos; images ≥ 1600 px; video MP4 | — | every guest screen (web, app and kiosk) | the logo in the header or nav bar, the splash and the footer |
+| Logo dark image (`brand.logoDarkAssetRef`) | PNG or SVG ≤ 2 MB for logos; images ≥ 1600 px; video MP4 | — | every guest screen (web, app and kiosk) | the logo on dark backgrounds (falls back to the primary logo) |
+| Logo variant (`brand.logoVariant`) | Light · Dark · Duotone | Light | every guest screen (web, app and kiosk) | which logo lockup sits in the nav bar, and whose colours drive the theme |
+| Favicon (`brand.faviconAssetRef`) | PNG or SVG ≤ 2 MB for logos; images ≥ 1600 px; video MP4 | — | every P01 screen | the browser tab icon (website only) |
+| Splash image (`brand.splashImageAssetRefs`) | PNG, JPG, SVG or MP4 from the media library | — | every P02 screen | Splash images, shown in order. Build-time on the native apps (`splashChangeScope`); immediate on web, reaching guests with the publish (audit R163). |
+| Splash duration seconds (`brand.splashDurationSeconds`) | min 0; max 10 | 3 | every guest screen (web, app and kiosk) | — |
+| Splash background colour (`brand.splashBackgroundColour`) | #RRGGBB | — | every guest screen (web, app and kiosk) | — |
+| Show loading indicator (`brand.showLoadingIndicator`) | — | on | every guest screen (web, app and kiosk) | — |
+| Intro video (`brand.introVideoAssetRef`) | PNG or SVG ≤ 2 MB for logos; images ≥ 1600 px; video MP4 | — | GST-001 | The optional intro video (decided 29 September, MOB-5). A video `MediaAsset` from the media library (CMS-010). |
+| Intro video mode (`brand.introVideoMode`) | Off · First launch · Every launch; Anything but `off` needs `introVideoAssetRef`, or 400. | Off | GST-001 | When GST-001 plays it full screen. "Skip introduction" is always shown. |
+| Powered by TICVAI credit (`brand.showPoweredBy`) | — | on | every guest screen (web, app and kiosk) | the *Powered by TICVAI* credit on the launch screen, at the foot of Account and in the web footer; on by default, and switching it off needs the licence add-on (403 powered-by-locked) |
 | Accounts (`storeAccounts.accounts`) | at most 2 | — | no guest screen: the phone's home screen and the store listing | — |
 | Accounts: store (`storeAccounts.accounts[].store`) | Apple app store · Google play | — | no guest screen: the phone's home screen and the store listing | — |
 | Accounts: account holder name (`storeAccounts.accounts[].accountHolderName`) | max length 200 | — | no guest screen: the phone's home screen and the store listing | The client's legal entity as the store knows it. |
@@ -935,17 +1165,20 @@ Each field here is an **input** a tenant sets; the right column is the **output*
 #### References
 
 - Wireframe frame: `wireframes/P13 Venue CMS.dc.html#cms-104` · status **notStarted** · provenance generated
+- ADR-0020 *— Where AI runs, and what it is isolated from* (`docs/adr/0020-ai-isolation-boundary.md`)
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (21), with its required mark, default, format and its error state (400, 403, 404, 409).
-- [ ] Every output is drawn (34 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (22), with its required mark, default, format and its error state (400, 403, 404, 409, 422).
+- [ ] Every output is drawn (35 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#CMS-104?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: What a build and a submission do, Request a build, Save store accounts and listing.
 - [ ] Every transition is wired: `CMS-102`, `CMS-004`, `CMS-014`.
 - [ ] Every gated control is gated: `AI_USE`, `TENANT_CONFIGURE`, `TENANT_PUBLISH`.
 - [ ] The 6 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] Every field shows its allowed values and default, and a live preview shows the output on the guest screen it reaches.
+- [ ] The 2 edge case(s) from the process notes are drawn.
+- [ ] The 1 decision(s) taken on this screen are drawn as decided, not as the old default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -1048,6 +1281,7 @@ Method, path, parameters, request and response for every operation these screens
 "deleteBookingFlow": {"method":"DELETE","path":"/booking-flows/{bookingFlowId}","contract":"white-label","summary":"Remove a booking flow from a venue","permission":"TENANT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":null},
 "getAppBuild": {"method":"GET","path":"/tenant-config/app-builds/{appBuildId}","contract":"white-label","summary":"One app build, with its package and store status","permission":"TENANT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[],"requestBody":null,"responds":"AppBuild"},
 "getBookingFlow": {"method":"GET","path":"/booking-flows/{bookingFlowId}","contract":"white-label","summary":"Read one of a venue's booking flows, every step included","permission":"TENANT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"BookingFlow"},
+"getBrandIdentity": {"method":"GET","path":"/tenant-config/brand","contract":"white-label","summary":"Read brand identity","permission":"TENANT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[],"requestBody":null,"responds":"BrandIdentity"},
 "getPublishedBookingFlow": {"method":"GET","path":"/venues/{venueId}/booking-flow","contract":"white-label","summary":"The published booking flow a product or category books through","permission":null,"offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"productId","in":"query","required":false},{"name":"productCategoryId","in":"query","required":false},{"name":"flowTypeKey","in":"query","required":false}],"requestBody":null,"responds":"BookingFlow"},
 "getSiteSetupProgress": {"method":"GET","path":"/tenant-config/site-setup","contract":"white-label","summary":"Where the tenant is in the Site Builder","permission":"TENANT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[],"requestBody":null,"responds":"SiteSetupProgress"},
 "getStoreAccounts": {"method":"GET","path":"/tenant-config/store-accounts","contract":"white-label","summary":"The client's store accounts and the publishing checklist","permission":"TENANT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[],"requestBody":null,"responds":"StorePublishingChecklist"},
@@ -1061,6 +1295,7 @@ Method, path, parameters, request and response for every operation these screens
 "publishTenantConfig": {"method":"POST","path":"/tenant-config/publish","contract":"white-label","summary":"Publish the working draft","permission":"TENANT_PUBLISH","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"ConfigVersion"},
 "requestAppBuild": {"method":"POST","path":"/tenant-config/app-builds","contract":"white-label","summary":"Build the branded app for a store","permission":"TENANT_PUBLISH","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":null},
 "sendAiMessage": {"method":"POST","path":"/conversations/{conversationId}/messages","contract":"ai","summary":"Ask","permission":"AI_USE","offlineCapable":false,"conflictPolicy":"append","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"AiMessage"},
+"setBrandIdentity": {"method":"PUT","path":"/tenant-config/brand","contract":"white-label","summary":"Set logo, favicon and splash","permission":"TENANT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"BrandIdentity","responds":"BrandIdentity"},
 "setProductCategories": {"method":"PUT","path":"/product-categories","contract":"catalogue","summary":"Define the hierarchy, in the order a guest sees it","permission":"PRODUCT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"ProductCategory"},
 "setSiteSetupProgress": {"method":"PUT","path":"/tenant-config/site-setup","contract":"white-label","summary":"Save the Site Builder's progress","permission":"TENANT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"SiteSetupProgress","responds":"SiteSetupProgress"},
 "setStoreAccounts": {"method":"PUT","path":"/tenant-config/store-accounts","contract":"white-label","summary":"Record the client's own Apple and Google store accounts and listings","permission":"TENANT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"StorePublishingChecklist"},
@@ -1079,7 +1314,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 {
 "AiConversation": {"type":"object","x-ticvai-persistence":"ai.conversation","required":["id","principalId","module","startedAt"],"properties":{"id":{"type":"string","format":"uuid"},"principalId":{"type":"string","format":"uuid"},"scopePath":{"type":"string"},"module":{"$ref":"../shared/common.yaml#/components/schemas/ModuleKey"},"locale":{"type":"string"},"messageCount":{"type":"integer"},"startedAt":{"type":"string","format":"date-time"},"lastMessageAt":{"type":"string","format":"date-time"}}},
 "AiMessage": {"type":"object","x-ticvai-persistence":"ai.message","required":["id","conversationId","role","content","createdAt"],"properties":{"id":{"type":"string","format":"uuid"},"conversationId":{"type":"string","format":"uuid"},"role":{"type":"string","enum":["user","assistant","system"]},"content":{"type":"string"},"sources":{"$ref":"#/components/schemas/AiSourceList"},"confidence":{"type":"number","nullable":true,"description":"8.1.5, 8.3.67. **Nullable on purpose** — a provider that does not report confidence must yield null rather than an invented number, and an interface showing 0.9 because the code defaulted it is worse than showing nothing.\n"},"rationale":{"type":"string","nullable":true,"description":"8.3.68, 8.3.69."},"proposedAction":{"allOf":[{"$ref":"#/components/schemas/ProposedAction"}],"nullable":true,"description":"Present where the answer suggests a change. **A draft, never applied here.**"},"traceId":{"type":"string"},"provider":{"$ref":"#/components/schemas/AiProviderKind"},"model":{"type":"string"},"promptTokens":{"type":"integer"},"completionTokens":{"type":"integer"},"latencyMs":{"type":"integer"},"createdAt":{"type":"string","format":"date-time"}}},
-"AiProviderKind": {"type":"string","enum":["openai","gemini","anthropic","azureOpenai","localLlm","openaiCompatible"],"description":"`openaiCompatible` (added 29 September, AI design 3.3): a customer endpoint that speaks the OpenAI API, taken with no custom development (AIC-009). Any other protocol needs an adapter.\n"},
+"AiProviderKind": {"type":"string","enum":["openai","gemini","anthropic","azureOpenai","localLlm","openaiCompatible"],"description":"`openaiCompatible` (added 29 September, AI design 3.3): a customer endpoint that speaks the OpenAI API, taken with no custom development (AIC-009). Any other protocol needs an adapter.\n**Core42 Compass is reached through `openaiCompatible`** (Chinmay, 2 October: the AI residency decision, amending AI-D02; CHG-CSA-002). Compass is the provider of the `uaeOnly` residency class (common `AiResidencyClass`): Small tier Compass GPT-4.1 mini (or Seraj), Strong tier Compass GPT-5, with OpenAI UAE and then the in-cell open-weights model as the fallback chain. OpenAI UAE is `openai` with a UAE `endpoint`; the in-cell model is `localLlm`.\n**A kind is a protocol, not a vendor** (Chinmay, 2 October, contract follow-ups: BYOK accepts any provider; CHG-FUP-008). Any vendor is accepted, named in `AiProvider.vendor`: Mistral, Cohere or any other is reached through `openaiCompatible` where its API speaks it, which the compatibility test confirms before activation (`AiProviderCompatibility`). A new native adapter is a new value here, a breaking change for a client built earlier that goes out with an approval (`docs/active/breaking-changes.yaml`); until then a vendor without either protocol is refused `422 provider-protocol-unsupported`.\n"},
 "AiSourceList": {"type":"array","x-ticvai-persistence-kind":"valueObject","x-ticvai-persistence-column":"jsonb","description":"**The sources an answer was grounded in, stored with the answer** (8.3.70). One `jsonb` column on the row that carries it — `ai.message.sources` and `ai.activity.sources` — because the grounding audit reads the list as it was when the answer was given, and a source is never queried on its own.\n","items":{"$ref":"#/components/schemas/AiSource"}},
 "AppAvailability": {"type":"string","description":"**The sold-out or closed signal (decided 28 September, audit R073).** `open` is the normal state. `soldOut` shows WEB-029's sold-out state across the app while browsing still works; `closed` shows the closed state (a weather closure, a private event). Neither refuses a request on its own: it is what the guest is told, and a sale is still refused by availability where it applies. Set with `setMaintenanceMode`.\n","enum":["open","soldOut","closed"],"default":"open"},
 "AppBuild": {"x-ticvai-persistence":"whitelabel.app_build","type":"object","description":"**One build of the tenant's branded app (decided 24 September, M24-08).** Made from a published `ConfigVersion`, signed for the client's own store account.\n","required":["id","platform","configVersion","status","requestedAt"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"platform":{"type":"string","enum":["ios","android"]},"configVersion":{"type":"string","description":"The `ConfigVersion.version` built."},"storeAccountId":{"type":"string","format":"uuid","readOnly":true},"versionName":{"type":"string","readOnly":true,"description":"The marketing version, e.g. 1.4.0."},"buildNumber":{"type":"integer","readOnly":true},"status":{"type":"string","readOnly":true,"enum":["queued","building","built","failed","submitted","inReview","approved","rejected","released"],"description":"`queued` to `built` or `failed` is the build service's; from `submitted` on it is read from the store with the client's credential, or stays `built` when the client uploads by hand."},"failureReason":{"type":"string","nullable":true,"readOnly":true},"packageAssetRef":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"The signed .ipa or .aab in the `assets` library, for the client to download and upload."},"releaseNotes":{"$ref":"#/components/schemas/LocalisedText"},"submitToStore":{"type":"boolean","default":false},"requestedAt":{"type":"string","format":"date-time","readOnly":true},"requestedByPrincipalId":{"type":"string","format":"uuid","readOnly":true},"finishedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true},"scopePath":{"type":"string","readOnly":true,"description":"The partition key (ADR-0005). Written at `tenant` scope."}}},
@@ -1090,16 +1325,18 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "BookingFlowType": {"x-ticvai-persistence":"none — system catalogue, shipped with the service and the same for every tenant","type":"object","description":"**A flow type from the system catalogue (decided 29 September, W12).** Read-only: a venue picks one (`createBookingFlowDefinition`) and orders its steps within `orderConstraints`. `requirement` is `required` (cannot be turned off), `optional` (the venue chooses) or `conditional` (shown to a guest only when `condition` holds; the venue may still turn it off where it is not also required by law or by a product, as the condition says). `settingsOwned` names the settings, venue-wide (`BookingFlowSettings`) or flow-level (`BookingFlowLevelSettings`), that the CMS shows beside the step; `stepSettings` are the step's own settings, kept in `BookingFlowStep.settings`.\n","x-ticvai-system-catalogue":{"commonConstraints":[{"kind":"last","stepKey":"payment"},{"kind":"first","stepKey":"location"},{"kind":"before","stepKey":"helpMeChoose","otherStepKey":"tickets"},{"kind":"before","stepKey":"helpMeChoose","otherStepKey":"product"},{"kind":"before","stepKey":"tickets","otherStepKey":"extras"},{"kind":"before","stepKey":"tickets","otherStepKey":"consent"},{"kind":"before","stepKey":"review","otherStepKey":"payment"}],"commonConditions":{"location":"the tenant has more than one active venue and `locationSwitcher` is on","helpMeChoose":"the venue has a published `GuidedChoice`","consent":"the flow's `consentQuestionIds` or a product in the cart asks a consent question (REV3-26); cannot be turned off while either does","attendees":"a product in the cart asks attendee details"},"types":[{"key":"datedDayPass","productKinds":["admission","datedAdmission"],"steps":[{"stepKey":"location","requirement":"conditional"},{"stepKey":"helpMeChoose","requirement":"conditional"},{"stepKey":"date","requirement":"required","settingsOwned":["dateStripDays","performanceReveal"]},{"stepKey":"tickets","requirement":"required","settingsOwned":["ticketCategories","ticketTags","cardInfo","cardLayout","cardSize","showInfoOnly"]},{"stepKey":"consent","requirement":"conditional","settingsOwned":["consentQuestionIds"]},{"stepKey":"extras","requirement":"optional","settingsOwned":["extrasStep","quantitiesOnAddOns"]},{"stepKey":"review","requirement":"optional"},{"stepKey":"payment","requirement":"required","settingsOwned":["signInAt"]}]},{"key":"timedEntry","productKinds":["timedAdmission"],"steps":[{"stepKey":"location","requirement":"conditional"},{"stepKey":"helpMeChoose","requirement":"conditional"},{"stepKey":"date","requirement":"required","settingsOwned":["dateStripDays","performanceReveal"]},{"stepKey":"time","requirement":"required","settingsOwned":["timesPerPage","dayPartFilter","dayPartBoundaries","performanceReveal"]},{"stepKey":"tickets","requirement":"required","settingsOwned":["ticketCategories","ticketTags","cardInfo","cardLayout","cardSize","showInfoOnly"]},{"stepKey":"consent","requirement":"conditional","settingsOwned":["consentQuestionIds"]},{"stepKey":"extras","requirement":"optional","settingsOwned":["extrasStep","quantitiesOnAddOns"]},{"stepKey":"review","requirement":"optional"},{"stepKey":"payment","requirement":"required","settingsOwned":["signInAt"]}],"orderConstraints":[{"kind":"before","stepKey":"date","otherStepKey":"time"}]},{"key":"openDated","productKinds":["openDated","admission"],"steps":[{"stepKey":"location","requirement":"conditional"},{"stepKey":"helpMeChoose","requirement":"conditional"},{"stepKey":"tickets","requirement":"required","settingsOwned":["ticketCategories","ticketTags","cardInfo","cardLayout","cardSize","showInfoOnly"]},{"stepKey":"consent","requirement":"conditional","settingsOwned":["consentQuestionIds"]},{"stepKey":"extras","requirement":"optional","settingsOwned":["extrasStep","quantitiesOnAddOns"]},{"stepKey":"review","requirement":"optional"},{"stepKey":"payment","requirement":"required","settingsOwned":["signInAt"]}]},{"key":"seatedFixedPerformance","productKinds":["seated"],"steps":[{"stepKey":"location","requirement":"conditional"},{"stepKey":"performance","requirement":"required","condition":"skipped for the guest when the event has one on-sale performance"},{"stepKey":"seatMap","requirement":"required","settingsOwned":["seatPicker","seatViewPosition","seatTimeBar","mapView"]},{"stepKey":"tickets","requirement":"conditional","condition":"the seat's price category has more than one ticket type (adult or child)"},{"stepKey":"consent","requirement":"conditional","settingsOwned":["consentQuestionIds"]},{"stepKey":"extras","requirement":"optional","settingsOwned":["extrasStep","quantitiesOnAddOns"]},{"stepKey":"review","requirement":"optional"},{"stepKey":"payment","requirement":"required","settingsOwned":["signInAt"]}],"orderConstraints":[{"kind":"before","stepKey":"performance","otherStepKey":"seatMap"}]},{"key":"seatedDateTimeSeatMap","productKinds":["seated"],"steps":[{"stepKey":"location","requirement":"conditional"},{"stepKey":"date","requirement":"required","settingsOwned":["dateStripDays","seatEventDateMode"]},{"stepKey":"time","requirement":"required","settingsOwned":["timesPerPage","dayPartFilter","dayPartBoundaries","seatEventDateMode"]},{"stepKey":"seatMap","requirement":"required","settingsOwned":["seatPicker","seatViewPosition","seatTimeBar","mapView","seatEventDateMode"]},{"stepKey":"tickets","requirement":"conditional","condition":"the seat's price category has more than one ticket type"},{"stepKey":"consent","requirement":"conditional","settingsOwned":["consentQuestionIds"]},{"stepKey":"extras","requirement":"optional","settingsOwned":["extrasStep","quantitiesOnAddOns"]},{"stepKey":"review","requirement":"optional"},{"stepKey":"payment","requirement":"required","settingsOwned":["signInAt"]}],"orderConstraints":[{"kind":"before","stepKey":"date","otherStepKey":"time"},{"kind":"before","stepKey":"time","otherStepKey":"seatMap"}]},{"key":"experienceWorkshop","productKinds":["timedAdmission","admission"],"steps":[{"stepKey":"location","requirement":"conditional"},{"stepKey":"helpMeChoose","requirement":"conditional"},{"stepKey":"product","requirement":"required","settingsOwned":["cardLayout","cardSize","cardInfo","showInfoOnly"]},{"stepKey":"date","requirement":"required","settingsOwned":["dateStripDays","performanceReveal"]},{"stepKey":"time","requirement":"required","settingsOwned":["timesPerPage","dayPartFilter","dayPartBoundaries"]},{"stepKey":"tickets","requirement":"required","settingsOwned":["ticketCategories","ticketTags"]},{"stepKey":"attendees","requirement":"conditional"},{"stepKey":"consent","requirement":"conditional","settingsOwned":["consentQuestionIds"]},{"stepKey":"extras","requirement":"optional","settingsOwned":["extrasStep","quantitiesOnAddOns"]},{"stepKey":"review","requirement":"optional"},{"stepKey":"payment","requirement":"required","settingsOwned":["signInAt"]}],"orderConstraints":[{"kind":"before","stepKey":"product","otherStepKey":"date"},{"kind":"before","stepKey":"date","otherStepKey":"time"}]},{"key":"surfSession","productKinds":["timedAdmission","rental"],"steps":[{"stepKey":"location","requirement":"conditional"},{"stepKey":"date","requirement":"required","settingsOwned":["dateStripDays"]},{"stepKey":"time","requirement":"required","settingsOwned":["timesPerPage","dayPartFilter","dayPartBoundaries"]},{"stepKey":"level","requirement":"required","stepSettings":[{"name":"levels","type":"string[]","note":"level tags offered","from the products' segmentTags":null}]},{"stepKey":"tickets","requirement":"required","settingsOwned":["ticketTags","cardInfo"]},{"stepKey":"consent","requirement":"conditional","settingsOwned":["consentQuestionIds"]},{"stepKey":"extras","requirement":"optional","settingsOwned":["extrasStep","quantitiesOnAddOns"]},{"stepKey":"review","requirement":"optional"},{"stepKey":"payment","requirement":"required","settingsOwned":["signInAt"]}],"orderConstraints":[{"kind":"before","stepKey":"date","otherStepKey":"time"},{"kind":"before","stepKey":"time","otherStepKey":"level"}]},{"key":"meetingRoomHourly","productKinds":["rental"],"steps":[{"stepKey":"location","requirement":"conditional"},{"stepKey":"date","requirement":"required","settingsOwned":["dateStripDays"]},{"stepKey":"time","requirement":"required","settingsOwned":["timesPerPage","dayPartFilter","dayPartBoundaries"]},{"stepKey":"duration","requirement":"required","stepSettings":[{"name":"minHours","type":"integer","default":1},{"name":"maxHours","type":"integer","default":8},{"name":"stepMinutes","type":"integer","default":60}]},{"stepKey":"partySize","requirement":"optional","stepSettings":[{"name":"minGuests","type":"integer","default":1},{"name":"maxGuests","type":"integer"}]},{"stepKey":"extras","requirement":"optional","settingsOwned":["extrasStep","quantitiesOnAddOns"]},{"stepKey":"review","requirement":"optional"},{"stepKey":"payment","requirement":"required","settingsOwned":["signInAt"]}],"orderConstraints":[{"kind":"before","stepKey":"date","otherStepKey":"time"},{"kind":"before","stepKey":"time","otherStepKey":"duration"}]},{"key":"cabanaMap","productKinds":["rental"],"steps":[{"stepKey":"location","requirement":"conditional"},{"stepKey":"date","requirement":"required","settingsOwned":["dateStripDays"]},{"stepKey":"resourceMap","requirement":"required","condition":"the venue's resource selection policy lets the guest choose (resources setResourceSelectionPolicy guestMayChoose; REV3-15)","settingsOwned":["mapView"]},{"stepKey":"consent","requirement":"conditional","settingsOwned":["consentQuestionIds"]},{"stepKey":"extras","requirement":"optional","settingsOwned":["extrasStep","quantitiesOnAddOns"]},{"stepKey":"review","requirement":"optional"},{"stepKey":"payment","requirement":"required","settingsOwned":["signInAt"]}],"orderConstraints":[{"kind":"before","stepKey":"date","otherStepKey":"resourceMap"}]},{"key":"cabanaBySize","productKinds":["rental"],"steps":[{"stepKey":"location","requirement":"conditional"},{"stepKey":"date","requirement":"required","settingsOwned":["dateStripDays"]},{"stepKey":"partySize","requirement":"required","stepSettings":[{"name":"minGuests","type":"integer","default":1},{"name":"maxGuests","type":"integer"}]},{"stepKey":"resourceSize","requirement":"required","note":"the server assigns a unit of the chosen size"},{"stepKey":"consent","requirement":"conditional","settingsOwned":["consentQuestionIds"]},{"stepKey":"extras","requirement":"optional","settingsOwned":["extrasStep","quantitiesOnAddOns"]},{"stepKey":"review","requirement":"optional"},{"stepKey":"payment","requirement":"required","settingsOwned":["signInAt"]}],"orderConstraints":[{"kind":"before","stepKey":"date","otherStepKey":"resourceSize"},{"kind":"before","stepKey":"partySize","otherStepKey":"resourceSize"}]},{"key":"guidedTourByLanguage","productKinds":["timedAdmission"],"steps":[{"stepKey":"location","requirement":"conditional"},{"stepKey":"date","requirement":"required","settingsOwned":["dateStripDays"]},{"stepKey":"language","requirement":"required","stepSettings":[{"name":"languages","type":"string[]","note":"ISO 639-1 codes the tours run in"}]},{"stepKey":"time","requirement":"required","settingsOwned":["timesPerPage","dayPartFilter","dayPartBoundaries"]},{"stepKey":"tickets","requirement":"required","settingsOwned":["ticketCategories","ticketTags"]},{"stepKey":"extras","requirement":"optional","settingsOwned":["extrasStep","quantitiesOnAddOns"]},{"stepKey":"review","requirement":"optional"},{"stepKey":"payment","requirement":"required","settingsOwned":["signInAt"]}],"orderConstraints":[{"kind":"before","stepKey":"date","otherStepKey":"time"},{"kind":"before","stepKey":"language","otherStepKey":"time"}]},{"key":"transport","productKinds":["admission","timedAdmission"],"steps":[{"stepKey":"route","requirement":"required"},{"stepKey":"date","requirement":"required","settingsOwned":["dateStripDays"]},{"stepKey":"time","requirement":"required","settingsOwned":["timesPerPage","dayPartFilter"]},{"stepKey":"tickets","requirement":"required","settingsOwned":["ticketCategories"]},{"stepKey":"extras","requirement":"optional","settingsOwned":["extrasStep"]},{"stepKey":"review","requirement":"optional"},{"stepKey":"payment","requirement":"required","settingsOwned":["signInAt"]}],"orderConstraints":[{"kind":"before","stepKey":"route","otherStepKey":"time"},{"kind":"before","stepKey":"date","otherStepKey":"time"}]},{"key":"tableReservation","productKinds":["fnb"],"steps":[{"stepKey":"location","requirement":"conditional"},{"stepKey":"date","requirement":"required","settingsOwned":["dateStripDays"]},{"stepKey":"partySize","requirement":"required","stepSettings":[{"name":"minGuests","type":"integer","default":1},{"name":"maxGuests","type":"integer","default":12}]},{"stepKey":"time","requirement":"required","settingsOwned":["timesPerPage","dayPartFilter","dayPartBoundaries"]},{"stepKey":"extras","requirement":"optional","note":"pre-order","settingsOwned":["extrasStep"]},{"stepKey":"review","requirement":"optional"},{"stepKey":"payment","requirement":"conditional","condition":"the venue takes a deposit or pre-order for the table","settingsOwned":["signInAt"]}],"orderConstraints":[{"kind":"before","stepKey":"date","otherStepKey":"time"},{"kind":"before","stepKey":"partySize","otherStepKey":"time"}]},{"key":"membership","productKinds":["membership"],"steps":[{"stepKey":"membershipPlan","requirement":"required"},{"stepKey":"attendees","requirement":"required","note":"each member's details"},{"stepKey":"consent","requirement":"conditional","settingsOwned":["consentQuestionIds"]},{"stepKey":"review","requirement":"optional"},{"stepKey":"payment","requirement":"required","settingsOwned":["signInAt"]}],"orderConstraints":[{"kind":"before","stepKey":"membershipPlan","otherStepKey":"attendees"}]},{"key":"giftCard","productKinds":["giftCard"],"steps":[{"stepKey":"giftCardValue","requirement":"required"},{"stepKey":"recipient","requirement":"required"},{"stepKey":"review","requirement":"optional"},{"stepKey":"payment","requirement":"required","settingsOwned":["signInAt"]}]},{"key":"multiLocation","productKinds":["admission","timedAdmission","datedAdmission"],"steps":[{"stepKey":"location","requirement":"required","settingsOwned":["locationSwitcher"]},{"stepKey":"helpMeChoose","requirement":"conditional"},{"stepKey":"product","requirement":"required","settingsOwned":["cardLayout","cardSize","cardInfo"]},{"stepKey":"date","requirement":"conditional","condition":"the product is dated or timed","settingsOwned":["dateStripDays","performanceReveal"]},{"stepKey":"time","requirement":"conditional","condition":"the product is timed","settingsOwned":["timesPerPage","dayPartFilter","dayPartBoundaries"]},{"stepKey":"tickets","requirement":"required","settingsOwned":["ticketCategories","ticketTags"]},{"stepKey":"consent","requirement":"conditional","settingsOwned":["consentQuestionIds"]},{"stepKey":"extras","requirement":"optional","settingsOwned":["extrasStep","quantitiesOnAddOns"]},{"stepKey":"review","requirement":"optional"},{"stepKey":"payment","requirement":"required","settingsOwned":["signInAt"]}],"orderConstraints":[{"kind":"before","stepKey":"location","otherStepKey":"product"},{"kind":"before","stepKey":"date","otherStepKey":"time"}]}]},"required":["key","name","productKinds","steps","orderConstraints"],"properties":{"key":{"$ref":"#/components/schemas/BookingFlowTypeKey"},"name":{"$ref":"#/components/schemas/LocalisedText"},"description":{"$ref":"#/components/schemas/LocalisedText"},"productKinds":{"type":"array","description":"The catalogue `ProductKind` values this type books. A venue's default flow for a type serves every product of these kinds that names no flow of its own.","items":{"type":"string"}},"steps":{"type":"array","description":"In the type's default order.","items":{"type":"object","required":["stepKey","requirement","defaultSortOrder"],"properties":{"stepKey":{"$ref":"#/components/schemas/BookingFlowStepKey"},"requirement":{"type":"string","enum":["required","optional","conditional"]},"condition":{"allOf":[{"$ref":"#/components/schemas/LocalisedText"}],"nullable":true,"description":"For `conditional`, when a guest meets the step."},"defaultEnabled":{"type":"boolean","default":true},"defaultSortOrder":{"type":"integer","minimum":0},"settingsOwned":{"type":"array","description":"Names of `BookingFlowSettings` (venue-wide) or `BookingFlowLevelSettings` (this flow) fields shown beside the step.","items":{"type":"string"}},"stepSettings":{"type":"array","description":"The step's own settings, kept in `BookingFlowStep.settings`.","items":{"type":"object","required":["name","type"],"properties":{"name":{"type":"string"},"type":{"type":"string"},"default":{"description":"The value when the venue sets none."}}}}}}},"orderConstraints":{"type":"array","description":"`first` and `last` pin a step; `before` puts `stepKey` somewhere ahead of `otherStepKey`. The common constraints (payment last, location first, Help me choose before the products) apply to every type as well as these.","items":{"type":"object","required":["kind","stepKey"],"properties":{"kind":{"type":"string","enum":["first","last","before"]},"stepKey":{"$ref":"#/components/schemas/BookingFlowStepKey"},"otherStepKey":{"allOf":[{"$ref":"#/components/schemas/BookingFlowStepKey"}],"nullable":true,"description":"Required when `kind` is `before`."}}}}}},
 "BookingFlowTypeKey": {"type":"string","description":"**The flow types the system catalogue offers (decided 29 September, W12; impact.md b).** `seatedFixedPerformance` and `seatedDateTimeSeatMap` are the two seated flows; `cabanaMap` and `cabanaBySize` are the two cabana flows (W6); `experienceWorkshop` puts the product before the date (W8); `multiLocation` opens on the location switcher.\n","enum":["datedDayPass","timedEntry","openDated","seatedFixedPerformance","seatedDateTimeSeatMap","experienceWorkshop","surfSession","meetingRoomHourly","cabanaMap","cabanaBySize","guidedTourByLanguage","transport","tableReservation","membership","giftCard","multiLocation"]},
 "BookingFlowValidation": {"x-ticvai-persistence":"none — computed","type":"object","required":["valid","problems"],"properties":{"valid":{"type":"boolean"},"problems":{"type":"array","items":{"type":"object","required":["kind","stepKey","message"],"properties":{"kind":{"type":"string","enum":["requiredStepDisabled","orderConstraintBroken","conditionNeverHolds","stepNotInType","duplicateStep","unknownStepSetting"]},"stepKey":{"$ref":"#/components/schemas/BookingFlowStepKey"},"otherStepKey":{"allOf":[{"$ref":"#/components/schemas/BookingFlowStepKey"}],"nullable":true,"description":"For `orderConstraintBroken`, the step it must come before or after."},"message":{"type":"string"}}}}}},
+"BrandIdentity": {"x-ticvai-persistence":"none — embedded in tenant_config","type":"object","description":"Every `*AssetRef` here is a `MediaAsset` id from the `assets` library (`createUpload` then `completeUpload`), PNG or SVG and at most 2 MB (decided 28 September, audit R270).\n","required":["logoAssetRef"],"properties":{"logoAssetRef":{"type":"string","format":"uuid","description":"The primary logo."},"logoDarkAssetRef":{"type":"string","format":"uuid","nullable":true,"description":"Used on dark backgrounds. Falls back to the primary logo."},"logoVariant":{"type":"string","enum":["light","dark","duotone"],"default":"light","description":"**Which lockup sits in the nav bar, and whose colours drive the theme (decided 29 September, rev 3 CFG-4).** `light` uses `logoAssetRef`, `dark` uses `logoDarkAssetRef` (falling back to the primary logo), and `duotone` the two-colour reading of the primary logo.\n"},"faviconAssetRef":{"type":"string","format":"uuid","nullable":true,"description":"The browser tab icon for the guest web app."},"splashImageAssetRefs":{"type":"array","description":"Splash images, shown in order. Build-time on the native apps (`splashChangeScope`); immediate on web, reaching guests with the publish (audit R163).","items":{"type":"string","format":"uuid"}},"splashDurationSeconds":{"type":"integer","minimum":0,"maximum":10,"default":3},"splashBackgroundColour":{"type":"string","pattern":"^#[0-9A-Fa-f]{6}$"},"showLoadingIndicator":{"type":"boolean","default":true},"splashChangeScope":{"allOf":[{"$ref":"#/components/schemas/ChangeScope"}],"readOnly":true,"description":"Always `buildTime` for native apps. The guest web app takes a splash change at the publish, with no build (audit R163)."},"introVideoAssetRef":{"type":"string","format":"uuid","nullable":true,"description":"**The optional intro video (decided 29 September, MOB-5).** A video `MediaAsset` from the media library (CMS-010). Streamed, so a change reaches guests with the publish and needs no app build.\n"},"introVideoMode":{"type":"string","enum":["off","firstLaunch","everyLaunch"],"default":"off","description":"When GST-001 plays it full screen. \"Skip introduction\" is always shown. Anything but `off` needs `introVideoAssetRef`, or 400."},"showPoweredBy":{"type":"boolean","default":true,"description":"**\"Powered by TICVAI\", a configuration toggle, on by default** (Chinmay, 2 October, workbook Q160 and the pre-apply round; consistent with DI-297; CHG-CSA-036). Shown on the launch screen and at the foot of Account and the web footer while true. **Switching it off needs the tenant's licence to allow it**: `setBrandIdentity` refuses `false` with `403 powered-by-locked` unless the tenant's plan carries the `poweredByRemoval` add-on (subscription `LicencePosition.poweredByRemovable`)."}}},
+"ChangeScope": {"type":"string","description":"Whether a change reaches guests on publish or needs a store release.\n","enum":["runtime","buildTime"]},
 "Channel": {"type":"string","enum":["pos","kiosk","web","mobile","b2b","ota","callCentre"]},
 "ConfigFindingKind": {"type":"string","enum":["missingTranslation","navigationTargetsDisabledModule","homepageReferencesMissingContent","contrastFailure","missingRequiredAsset","policyVersionMissing","noVisibleNavigationItems","unlicensedModuleEnabled","arabicFontMissing","bookingFlowInvalid","bookingFlowMissing"]},
 "ConfigValidationReport": {"x-ticvai-persistence":"none — computed","type":"object","required":["passed","errorCount","warningCount","findings"],"properties":{"passed":{"type":"boolean"},"errorCount":{"type":"integer"},"warningCount":{"type":"integer"},"findings":{"type":"array","items":{"type":"object","required":["kind","severity","message"],"properties":{"kind":{"$ref":"#/components/schemas/ConfigFindingKind"},"severity":{"type":"string","enum":["error","warning"]},"message":{"type":"string"},"area":{"type":"string"},"reference":{"type":"string","nullable":true}}}}}},
-"ConfigVersion": {"x-ticvai-persistence":"whitelabel.config_version","type":"object","required":["version","publishedAt","publishedByPrincipalId","note","isCurrent"],"properties":{"version":{"type":"string"},"publishedAt":{"type":"string","format":"date-time"},"publishedByPrincipalId":{"type":"string","format":"uuid"},"publishedByName":{"type":"string"},"note":{"type":"string"},"isCurrent":{"type":"boolean"},"scheduledFor":{"type":"string","format":"date-time","nullable":true},"contentHash":{"type":"string"},"pendingBuildTimeChanges":{"type":"array","description":"Changes in this version that will not reach guests until the next store release. Surfaced at publish so nobody expects a new icon tomorrow.\n","items":{"type":"object","properties":{"area":{"type":"string"},"description":{"type":"string"},"platforms":{"type":"array","items":{"type":"string","enum":["ios","android","web"]}}}}},"snapshot":{"type":"object","additionalProperties":true,"readOnly":true,"description":"**What this version contained.** The working draft exactly as published, in the shape `getTenantConfig` returns (`TenantConfig`) — so `restoreConfigVersion` has something to copy back and `diffConfigVersion` something to compare. Deliberately an open object here: its shape is `TenantConfig`, and a `$ref` would make it a key to a `tenant_config` row rather than a copy. Written once by `publishTenantConfig` and never changed. Left out of `listConfigVersions` items; a version's content is read with `getTenantConfig?version=`.\n"},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `tenant` scope.**"}}},
+"ConfigVersion": {"x-ticvai-persistence":"whitelabel.config_version","type":"object","required":["version","publishedAt","publishedByPrincipalId","note","isCurrent"],"properties":{"version":{"type":"string"},"publishedAt":{"type":"string","format":"date-time"},"publishedByPrincipalId":{"type":"string","format":"uuid"},"publishedByName":{"type":"string"},"note":{"type":"string"},"reviewStatus":{"type":"string","readOnly":true,"enum":["notRequired","pending","approved","rejected"],"default":"notRequired","description":"The review step, where the tenant's publish-review policy is on (CHG-CSA-042)."},"approvalRequestId":{"type":"string","format":"uuid","nullable":true,"readOnly":true},"isCurrent":{"type":"boolean"},"scheduledFor":{"type":"string","format":"date-time","nullable":true},"contentHash":{"type":"string"},"pendingBuildTimeChanges":{"type":"array","description":"Changes in this version that will not reach guests until the next store release. Surfaced at publish so nobody expects a new icon tomorrow.\n","items":{"type":"object","properties":{"area":{"type":"string"},"description":{"type":"string"},"platforms":{"type":"array","items":{"type":"string","enum":["ios","android","web"]}}}}},"snapshot":{"type":"object","additionalProperties":true,"readOnly":true,"description":"**What this version contained.** The working draft exactly as published, in the shape `getTenantConfig` returns (`TenantConfig`) — so `restoreConfigVersion` has something to copy back and `diffConfigVersion` something to compare. Deliberately an open object here: its shape is `TenantConfig`, and a `$ref` would make it a key to a `tenant_config` row rather than a copy. Written once by `publishTenantConfig` and never changed. Left out of `listConfigVersions` items; a version's content is read with `getTenantConfig?version=`.\n"},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `tenant` scope.**"}}},
 "ConsentQuestion": {"type":"object","x-ticvai-persistence":"marketing.consent_question + marketing.consent_question_version","description":"**A venue-defined consent question asked at booking** (decided 29 September, rev 3 REV3-26). Each version's text is kept in `consent_question_version`, so an answer always points at the exact words the guest saw. Attached to products by the catalogue and to booking flows by the white-label flow configuration; one or several per flow, as the venue chooses.\n","required":["id","kind","text","version","scope","required","blockingAnswer","status"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"kind":{"$ref":"#/components/schemas/ConsentQuestionKind"},"text":{"allOf":[{"$ref":"#/components/schemas/LocalisedText"}],"description":"The question as the guest reads it, per locale."},"helpText":{"allOf":[{"$ref":"#/components/schemas/LocalisedText"}],"nullable":true},"version":{"type":"integer","minimum":1,"readOnly":true,"description":"Raised by one each time the question changes (`updateConsentQuestion`)."},"scope":{"type":"string","enum":["perPerson","perBooking"],"default":"perPerson","description":"Asked for each declared person, or once for the whole booking."},"required":{"type":"boolean","default":true,"description":"Checkout waits until it is answered (`orders.checkoutCart` 422 `consentRequired`)."},"blockingAnswer":{"type":"string","enum":["yes","no","none"],"default":"none","description":"The answer that stops the booking, for the person or the booking it covers. `none` records the answer and blocks nothing."},"status":{"type":"string","enum":["active","retired"],"default":"active"},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005). Operations write it at `venue` scope."},"updatedAt":{"type":"string","format":"date-time","readOnly":true}}},
 "ConsentQuestionKind": {"type":"string","description":"What the question is about (decided 29 September, rev 3 REV3-26). `swim` feeds the derived `confidentSwimmer` on the order line; the others are recorded and checked as the venue set them.","enum":["swim","scuba","risk","custom"]},
 "GuestListing": {"type":"string","enum":["bookable","infoOnly","hidden"],"default":"bookable","description":"**How a product appears to a guest** (decided 29 September, rev 3 REV3-14). `bookable`: listed and searched while it is on sale, and added to the basket. `infoOnly`: listed and searched with its details, photo and `notBookableLabel` whether or not it is on sale, and **never added to a basket** (`addCartLine` refuses it with `409`); the screen opens its details instead. `hidden`: never listed or searched for a guest, and reachable only where a staff channel sells it. Independent of `isSellable`, which says whether a channel may sell it at all.\n"},
 "LocalisedText": {"x-ticvai-persistence":"none — jsonb column","type":"object","additionalProperties":{"type":"string"}},
 "MinimumAppVersion": {"x-ticvai-persistence":"none — embedded in tenant_config","type":"object","nullable":true,"description":"**The oldest guest app build still allowed to run (decided 28 September, audit R073).** A guest app whose own version is below the one for its platform shows the forced-upgrade screen (GST-047) and nothing else. Null, or a platform left null, forces nothing. Live at once through `setMaintenanceMode`, because an upgrade that must wait for a publish is not forced.\n","properties":{"ios":{"type":"string","nullable":true,"pattern":"^\\d+\\.\\d+\\.\\d+$"},"android":{"type":"string","nullable":true,"pattern":"^\\d+\\.\\d+\\.\\d+$"}}},
-"ModuleKey": {"type":"string","enum":["ticketsAndBooking","membership","events","attractions","virtualQueue","diningAndFnb","shop","parking","gamification","photoGallery","wallet","loyalty","lostAndFound","map","visitPlanner"],"description":"`visitPlanner` (decided 29 September, MOB-1 and the Plan tab in Block A) is the Plan tab and WEB-050; off, the tab and the page are not shown."},
+"ModuleKey": {"$ref":"../shared/common.yaml#/components/schemas/ModuleKey"},
 "Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}},
 "Product": {"x-ticvai-persistence":"catalogue.product","type":"object","required":["id","code","name","kind","venueId","scopePath","isSellable","hasVariants"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string","maxLength":64},"familyKey":{"type":"string","maxLength":64,"pattern":"^[A-Za-z0-9_-]+$","nullable":true,"x-ticvai-unique":"venue","description":"**The same product at another location** (decided 29 September, rev 3 REV3-18). Optional. A tenant that sells one attraction at several venues gives each venue's product the same key, e.g. `aquarium-entry`; the key names the family across the tenant and each venue has at most one product in it, so a second product at the same venue with the key is refused with `409 duplicate-code`. **What it is for:** when a guest changes location on the booking screen (the 'Booking at' switcher, `BookingFlowConfig.locationSwitcher`), lines whose product shares a `familyKey` with a product at the new venue are carried over to that product, with times and prices refreshed; every other line is cleared. Null means the product belongs to no family and its lines always clear on a switch. Compared case-insensitively, like `code`.\n"},"name":{"type":"string","maxLength":200},"description":{"type":"string"},"kind":{"$ref":"#/components/schemas/ProductKind"},"venueId":{"type":"string","format":"uuid"},"scopePath":{"type":"string"},"createdByPrincipalId":{"type":"string","format":"uuid","readOnly":true,"description":"1.4.18. **The approval gate refuses an approver who is the author, and nothing recorded either.** `SeatBlock`, `DelegatedAccess` and `ManualDiscountRequest` all carry this and the product passing through approval did not.\n"},"approvedByPrincipalId":{"type":"string","format":"uuid","nullable":true,"readOnly":true},"responsibleDepartmentId":{"type":"string","format":"uuid","nullable":true,"description":"Who owns this product commercially. A scope node at `department` level."},"onSaleFrom":{"type":"string","format":"date-time","nullable":true,"description":"1.4.8. **A seasonal product should not need somebody awake at midnight.** Archiving already runs on a timer in this contract, so the machinery exists; `effectiveFrom` appears on tax codes, FX rates and white-label policies and not here.\n"},"onSaleTo":{"type":"string","format":"date-time","nullable":true,"description":"Retires the product automatically. **Retirement is not deletion** — the product stops selling and every order that referenced it still resolves.\n"},"categoryId":{"type":"string","format":"uuid","nullable":true,"description":"**Taken from their `fnb.product` and `retail.product`, 20 September.** `catalogue.product_category` has existed since 20 August with two operations and nothing could be filed under it — a merchandise hierarchy with a tree and no leaves. Their per-domain product tables both carried this column and ours did not.\n"},"lifecycleState":{"$ref":"#/components/schemas/ProductLifecycleState"},"isSellable":{"type":"boolean","readOnly":true,"description":"True only when live **and** carried by a published bundle. Approval and publication are different acts.\n**Derived, never set.** It changes when `transitionProductLifecycle` moves the product and when `publishBundle` carries it, so `updateProduct` does not take it — `withdraw` is how a product stops selling.\n"},"isStockTracked":{"type":"boolean","default":false,"description":"**Taken from their `fnb.product`, 20 September.** Whether a sale decrements stock, which is not what `isSellable` asks. A ticket is sellable and tracks no stock; a bottle of water is both. Without it, an F&B sale cannot tell inventory whether to move.\n"},"hasVariants":{"type":"boolean"},"variantCount":{"type":"integer"},"segmentTags":{"type":"array","description":"7.3.5. **A channel and a segment tag are mandatory and nothing required either.** A catalogue that cannot be filtered by segment is a catalogue nobody can report on.\n**Hierarchical, not flat** — `family/with-toddlers` narrows `family` without duplicating it, which is how the promotions engine already treats scope.\n**A level is a tag under `level/`** (decided 29 September, rev 3 REV3-19): `level/beginner`, `level/intermediate`, `level/advanced`, `level/expert` (proposed codes, client to correct). A guest screen filters on it with `listProducts` `segmentTag`, and the words a guest reads beside each option come from `ProductCategory.description`, not from the tag.\n","items":{"type":"string"}},"codeSchema":{"type":"string","readOnly":true,"description":"7.3.4 specifies `[ParkCode]-[ProductType]-[Variant]`. **`Product.code` existed and nothing required a format**, so a venue with three thousand products had three thousand conventions.\nThe tenant sets the pattern and the platform generates against it. **Validation is the point, not the string** — a code typed by hand is a code that will not sort.\n"},"channels":{"type":"array","items":{"$ref":"#/components/schemas/Channel"}},"entitlementTemplateId":{"type":"string","format":"uuid","nullable":true,"description":"What the buyer receives. Null for products that grant nothing — F&B and retail. Identity and entitlement are separate concerns.\n"},"blockedOffline":{"type":"boolean","description":"True for seated and retail. Seated because a seat map is not a count; retail because stock depletes in real time.\n"},"dataMaskValues":{"type":"object","additionalProperties":true,"description":"Custom fields. JSONB-backed, defined by the venue's data mask."},"guestListing":{"$ref":"#/components/schemas/GuestListing"},"notBookableLabel":{"allOf":[{"$ref":"#/components/schemas/LocalisedText"}],"nullable":true,"description":"The label a guest reads on an `infoOnly` product, e.g. *Info only* or *Not bookable online; ask at the desk* (decided 29 September, rev 3 REV3-14). Each value at most 60 characters. Null means the guest screen shows its default wording. Ignored unless `guestListing` is `infoOnly`.\n"},"salesContact":{"allOf":[{"$ref":"#/components/schemas/ProductSalesContact"}],"nullable":true,"description":"**Who a guest contacts to book a view-only product** (decided 29 September, W3), e.g. a training course listed with full details and no Book button. Shown as *Call sales* and *Email sales* on an `infoOnly` product. Null means the venue's own contact (white-label `getTenantAppStatus.contact`). Ignored unless `guestListing` is `infoOnly`.\n"},"bookingFlowId":{"type":"string","format":"uuid","nullable":true,"description":"**The booking flow this product is sold through** (decided 29 September, W8 and W12): a white-label `BookingFlow` of the venue, which orders the guest's steps (for a workshop, the product first and then the date and time). Null means the category's flow (`ProductCategory.bookingFlowId`), and failing that the venue's flow for the product's `kind`. Written by `createProduct` and `updateProduct`, which refuse an id that is not a flow of the venue with `422`.\n"},"displayTags":{"type":"array","maxItems":6,"items":{"$ref":"#/components/schemas/ProductDisplayTag"},"description":"**Short facts a guest reads on the ticket card and under *Read more***: *2 Hours*, *Min 1.10 m*, *Free adult entry*, *Valid 90 days*, *Emirates ID* (decided 29 September, 23SEP-3). Not `segmentTags`, which are for reporting and segmentation and which a guest never reads.\n**Derived on read when none are set.** When the venue has written no tags, a read returns tags derived from the product's duration (`clock`), entitlement validity (`calendar`) and the eligibility rule's `minHeightCm` (`height`), each marked `derived: true`; they are never stored. Once the venue writes any tag, only what it wrote is returned. Whether the guest screen shows them is `BookingFlowConfig.ticketTags` (white-label).\n"},"media":{"type":"array","maxItems":20,"items":{"$ref":"#/components/schemas/ProductMedia"},"description":"**The product's own photos and video** (decided 29 September, 23SEP-4). *Read more* opens on the `isPrimary` item, and a listing shows each product's primary image, so two tickets in one category no longer share the category's picture (`ProductCategory.imageAssetId`).\nEvery `assetId` names an asset of the asset library (`assets.yaml` `MediaAsset`) in status `ready` whose kind matches `kind`; anything else is a `422`. **Exactly one item is `isPrimary`** when the list is not empty, and an `assetId` appears once; otherwise `400`. Setting the list records each reference as asset usage (`MediaUsage` with `surface: product`, `referenceId` the product id, `isLive` true while the product is listed to guests), which is what stops a used asset being archived from under the product.\n"},"consentQuestionIds":{"type":"array","maxItems":10,"uniqueItems":true,"items":{"type":"string","format":"uuid"},"description":"**The consent questions a guest answers when booking this product**, in the order they are asked (decided 29 September, rev 3 REV3-26): *Are you able to swim?*, *Do you hold a scuba certification?*, *I accept the risk*. Each id names a consent question defined in marketing-crm (`ConsentQuestion`), which owns the text, its version and whether it is asked per person or once per booking; the answer is stored there as a consent record (question version, answer, who answered, when). **One question or several, as the venue chooses.** A flow can carry its own list too (`white-label.BookingFlow.settings.consentQuestionIds`, on the product's published booking flow as `getPublishedBookingFlow` resolves it: product, then category, then the venue's flow for the kind; moved from `BookingFlowConfig` 29 September, W12); a booking asks the union of the flow's questions and those of every product in the cart, each question once (`orders.Cart.consentQuestions`). An id that names no active consent question of the tenant is a `422`.\n"},"requiresTimeWindow":{"type":"boolean","default":false,"description":"**True for a space sold by the hour**, e.g. a meeting room type (decided 29 September, rev 3 REV3-13). The product is the room type (*focus pod*, *majlis*, *boardroom*, *auditorium*), never a named room; its lengths are a `length` axis (`setProductAttributes`) whose values carry `durationMinutes`, and each length is a variant priced on its own in the price list, so price is the room rate for that length. The cart line carries the booked start and end (orders), the end being the start plus the chosen variant's `durationMinutes`; `resources.listProductStartTimes` supplies the start times for a variant and a date and `allocateResources` picks the room from the product's resource requirements (`setExperienceResourceRequirements`) at checkout. True requires every active variant to have a `durationMinutes`; otherwise `422`.\n"},"productOwnerPrincipalId":{"type":"string","format":"uuid","nullable":true,"description":"The product owner (29 September, data model DM3), set with `setProductContextOwnership`. `responsibleDepartmentId` is the owning department."},"operationalContact":{"type":"string","maxLength":200,"nullable":true,"description":"A principal id or a name, as the context screen takes it."},"businessUnitId":{"type":"string","format":"uuid","nullable":true},"legalEntityId":{"type":"string","format":"uuid","nullable":true,"description":"A `ledger.legal_entity`, read through finance."},"attractionId":{"type":"string","format":"uuid","nullable":true},"siteId":{"type":"string","format":"uuid","nullable":true},"locationId":{"type":"string","format":"uuid","nullable":true},"brandId":{"type":"string","format":"uuid","nullable":true,"description":"The brand, as the context screen names it (a catalogue brand category)."},"marketCode":{"type":"string","maxLength":40,"nullable":true},"salesTerritory":{"type":"string","maxLength":100,"nullable":true}}},
 "ProductCategory": {"type":"object","x-ticvai-persistence":"catalogue.product_category","description":"Retail Board 2 of the client's design set, 20 August. **`listSeatCategories` existed and a product category did not** — a seat category prices a seat, and a merchandise hierarchy groups a catalogue.\n**Brand sits here rather than as its own entity.** A venue with four brands and a hierarchy five levels deep can express that with a parent; a venue with one brand should not have to maintain a table containing one row.\n**`displayOrder` is not alphabetical and that is the point.** A retail category list runs in the order the merchandiser wants a guest to see it, and sorting by name puts *Accessories* above *Apparel* forever.\n","required":["id","name","kind"],"properties":{"id":{"type":"string","format":"uuid"},"name":{"type":"string"},"code":{"type":"string","maxLength":64,"nullable":true,"x-ticvai-unique":"tenant","description":"**Taken from their category tables, 20 September.** Ours had a uuid and a localised name, so an importer matching *Beverages* had to match on a display string that a venue is free to translate.\n**Unique per tenant where set** (decided 28 September, audit R108): two categories in one tenant never share a code, and `setProductCategories` refuses a body that would, with `409 duplicate-code`.\n"},"nameLocalised":{"type":"object","additionalProperties":{"type":"string"}},"kind":{"type":"string","enum":["category","brand","collection","season","department"]},"parentId":{"type":"string","format":"uuid","nullable":true,"description":"**One tree, not four.** A brand under a department under a category is how a real merchandise hierarchy runs, and separate tables for each level cannot express a venue that nests them differently.\n"},"scopePath":{"type":"string","readOnly":true,"description":"Set by the server from the venue the caller acts at; not sent."},"displayOrder":{"type":"integer","default":100},"imageAssetId":{"type":"string","format":"uuid","nullable":true},"description":{"allOf":[{"$ref":"#/components/schemas/LocalisedText"}],"nullable":true,"description":"The short line a guest reads under a category option, e.g. *Surf lessons: learn on the beginner wave with a coach* (decided 29 September, rev 3 REV3-19). Each language value at most 200 characters.\n"},"bookingFlowId":{"type":"string","format":"uuid","nullable":true,"description":"**The booking flow for every product filed here** that names none of its own (decided 29 September, W12, BO-115). Null means the venue's flow for each product's `kind`. A white-label `BookingFlow` of the venue; `setProductCategories` refuses any other id with `422`.\n"},"isActive":{"type":"boolean","default":true,"description":"**Deactivated rather than deleted.** A category with a season behind it still names the products sold under it, and removing it rewrites last year's report.\n"}}},

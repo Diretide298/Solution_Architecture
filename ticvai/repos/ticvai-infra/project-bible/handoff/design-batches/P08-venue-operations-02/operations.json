@@ -1,23 +1,4 @@
 {
- "configureWorkstation": {
-  "method": "PUT",
-  "path": "/workstations/{workstationId}",
-  "contract": "tenancy",
-  "summary": "Configure a workstation",
-  "permission": "WORKSTATION_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "ConfigureWorkstationRequest",
-  "responds": "Workstation"
- },
  "createDeviceFirmware": {
   "method": "POST",
   "path": "/device-firmware",
@@ -36,44 +17,6 @@
   ],
   "requestBody": "DeviceFirmware",
   "responds": "DeviceFirmware"
- },
- "createOrder": {
-  "method": "POST",
-  "path": "/orders",
-  "contract": "orders",
-  "summary": "Create an order",
-  "permission": "ORDER_CREATE",
-  "offlineCapable": true,
-  "conflictPolicy": "append",
-  "scopeLevel": "workstation",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "CreateOrderRequest",
-  "responds": "Order"
- },
- "decideApprovalRequest": {
-  "method": "POST",
-  "path": "/approval-requests/{requestId}/decide",
-  "contract": "approvals",
-  "summary": "Approve, reject, return or ask for information",
-  "permission": "APPROVAL_DECIDE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "ApprovalRequest"
  },
  "deployConfigurationProfile": {
   "method": "POST",
@@ -319,6 +262,25 @@
   ],
   "requestBody": null,
   "responds": "Page"
+ },
+ "resolveSyncRejection": {
+  "method": "POST",
+  "path": "/sync/rejections/{rejectionId}/resolve",
+  "contract": "orders",
+  "summary": "Record what was done about a refused entry",
+  "permission": "ORDER_MODIFY",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ResolveSyncRejectionRequest",
+  "responds": "SyncRejection"
  },
  "rollbackDeviceFirmware": {
   "method": "POST",

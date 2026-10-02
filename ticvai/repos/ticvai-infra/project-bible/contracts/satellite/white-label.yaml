@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI White Label Builder
   version: 0.1.0
-  x-ticvai-screen-count: 77
+  x-ticvai-screen-count: 91
   x-ticvai-tier: satellite
   x-ticvai-module: 19 — Guest Mobile App & Branding (builder)
   x-ticvai-requirements: 107
@@ -135,6 +135,11 @@ paths:
 
         **Refused where another tenant already holds it** — with no detail about who, because telling
         one tenant that another owns a hostname is telling them something about a customer.
+
+        **A CNAME to the Front Door endpoint is the default** (Chinmay, 2 October: "subdomain plus CNAME";
+        CHG-CSA-043): the response lists every record to publish (`dnsRecords`: the TXT `_dnsauth` validation and
+        the CNAME), and Front Door issues a managed certificate. `routing` asks for a delegated subdomain instead;
+        the apex only on request. The tenant''s platform subdomain (`getPlatformSubdomain`) keeps working throughout.
 
         '
       tags:
@@ -283,6 +288,10 @@ paths:
         `setTenantDomainMapping` with status `detached`, so the edge stops routing the host to this
         tenant in the same step; the row is kept for the audit trail, not deleted.
 
+        **The takeover warning** (CHG-CSA-043): the confirmation tells the tenant to remove the CNAME (and the TXT
+        record) from its DNS, because a record left pointing at TICVAI could be claimed by somebody else; a
+        scheduled check flags any that remain (`CustomDomain.cnameLost`).
+
         '
       x-ticvai-calls:
       - tenancy.setTenantDomainMapping
@@ -312,11 +321,441 @@ paths:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /tenant-domains/{domainId}/primary:
+    parameters:
+    - name: domainId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: setPrimaryDomain
+      x-ticvai-consumed-by:
+        - "P09 ADM-017 Domain & Certificate Management"
+        - "P13 CMS-017 Domain & Certificate"
+      x-ticvai-audience:
+      - staff
+      x-ticvai-agreed: '2 October: Chinmay, batch 5 ("subdomain plus CNAME"): a primary domain with redirects; shape
+        follows verifyCustomDomain'
+      summary: Make a domain the primary one
+      description: '**One primary domain per kind; the others redirect to it** (CHG-CSA-043). The domain must be
+        `active`, or 409 `domain-not-active`. The tenant''s platform subdomain redirects to the primary too, and is
+        primary again when none is.
+
+        '
+      tags:
+      - white-label
+      x-ticvai-permission: TENANT_CONFIGURE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Primary
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomDomain'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '409':
+          description: The domain is not `active` (`domain-not-active`).
+          x-ticvai-problem-types:
+          - domain-not-active
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /tenant-domains/{domainId}/token:
+    parameters:
+    - name: domainId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: regenerateDomainToken
+      x-ticvai-consumed-by:
+        - "P09 ADM-017 Domain & Certificate Management"
+        - "P13 CMS-017 Domain & Certificate"
+      x-ticvai-audience:
+      - staff
+      x-ticvai-agreed: '2 October: Chinmay, batch 5 (domains research B1-B6): a claim that timed out starts again with a
+        new token; shape follows verifyCustomDomain'
+      summary: Issue a new validation token
+      description: '**For a claim that timed out, or a revalidation that needs a fresh record** (CHG-CSA-043). Issues a
+        new `_dnsauth` token, returns the records to publish again, and restarts the validation window. The old
+        token stops validating.
+
+        '
+      tags:
+      - white-label
+      x-ticvai-permission: TENANT_CONFIGURE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: A new token and the records to publish
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomDomain'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '409':
+          description: The domain is `revoked` (`domain-revoked`); claim it again instead.
+          x-ticvai-problem-types:
+          - domain-revoked
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /platform-subdomain:
+    get:
+      operationId: getPlatformSubdomain
+      x-ticvai-consumed-by:
+        - "P09 ADM-017 Domain & Certificate Management"
+        - "P13 CMS-017 Domain & Certificate"
+      x-ticvai-audience:
+      - staff
+      x-ticvai-read-routing: replica
+      x-ticvai-agreed: '2 October: Chinmay, batch 5 ("subdomain plus CNAME"); DI-283; shape follows listCustomDomains'
+      summary: The tenant's platform subdomain
+      description: 'The address every tenant gets at provisioning, `<venue>.<cell>.ticvai.app` (CHG-CSA-043). CMS-017
+        shows it as the default address above any custom domains.
+
+        '
+      tags:
+      - white-label
+      x-ticvai-permission: TENANT_CONFIGURE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: The platform subdomain
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlatformSubdomain'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /landing-page-templates:
+    get:
+      operationId: listLandingPageTemplates
+      x-ticvai-consumed-by:
+        - "P13 CMS-007 Page Builder"
+      x-ticvai-audience:
+      - staff
+      x-ticvai-read-routing: replica
+      x-ticvai-agreed: '2 October: Chinmay, batch 2 #41 ("clients with no landing page can use templates we provide"),
+        research B4; shape follows listBookingFlowTypes'
+      summary: The landing-page templates TICVAI provides
+      description: '**For a tenant without its own landing page** (Chinmay, 2 October, batch 2 #41; CHG-CSA-037). One
+        complete home page per Site Builder preset (`SiteSetupProgress.presetKey`): its sections, their order, card
+        counts and animations, ordered by `presetKey`, then `templateKey`. Picking one in the page builder writes it as the draft `HomepageLayout` with its
+        `templateKey`; nothing is published until the tenant publishes.
+
+        '
+      tags:
+      - homepage
+      x-ticvai-permission: TENANT_CONFIGURE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: Templates
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/LandingPageTemplate'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /deep-links:
+    get:
+      operationId: getDeepLinkScheme
+      x-ticvai-consumed-by:
+        - "P13 CMS-009 Navigation & Menus"
+      x-ticvai-audience:
+      - staff
+      x-ticvai-read-routing: replica
+      x-ticvai-agreed: '2 October: Chinmay, batch 2 #41 ("the landing page is owned by the client, who redirects to
+        us"), research B4; shape follows getNavigation'
+      summary: The published deep-link scheme
+      description: '**How a tenant''s own website links into the storefront and the app** (CHG-CSA-037). The URL
+        patterns per target kind (a product, an event, a content page, an app section, the booking flow), on the
+        tenant''s primary domain, with the app-link fallback to the store. The patterns are stable: a link a tenant
+        printed keeps working across releases.
+
+        '
+      tags:
+      - navigation
+      x-ticvai-permission: TENANT_CONFIGURE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: The scheme
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeepLinkScheme'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+    post:
+      operationId: buildDeepLink
+      x-ticvai-consumed-by:
+        - "P13 CMS-009 Navigation & Menus"
+      x-ticvai-audience:
+      - staff
+      x-ticvai-agreed: '2 October: Chinmay, batch 2 #41, research B4: a link builder in the CMS; shape follows
+        createPreview'
+      summary: Build a deep link to a target
+      description: 'The CMS link builder (CHG-CSA-037): given a target, the URL to paste on the tenant''s own site,
+        with optional campaign tags. Writes nothing.
+
+        '
+      tags:
+      - navigation
+      x-ticvai-idempotency-exempt: A computation that writes nothing; a replay returns the same link and duplicates no row.
+      x-ticvai-permission: TENANT_CONFIGURE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - target
+              properties:
+                target:
+                  $ref: '#/components/schemas/LinkTarget'
+                utm:
+                  type: object
+                  additionalProperties:
+                    type: string
+                  description: Campaign tags appended to the link, e.g. `utm_source`.
+      responses:
+        '200':
+          description: The link
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - url
+                properties:
+                  url:
+                    type: string
+                  appLink:
+                    type: string
+                    nullable: true
+                    description: The universal or app link that opens the app where installed.
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /site-package:
+    post:
+      operationId: exportSitePackage
+      x-ticvai-consumed-by:
+        - "P09 ADM-016 White-Label Branding Management"
+        - "P13 CMS-014 Publishing Workflow"
+      x-ticvai-audience:
+      - staff
+      x-ticvai-agreed: '2 October: Chinmay, workbook Q144 ("self-hosted: the venue generates a site package"); shape
+        follows publishTenantConfig'
+      summary: Generate a site package (self-hosted)
+      description: '**For a tenant that hosts its own site** (Chinmay, 2 October, workbook Q144; CHG-CSA-038). Builds a
+        downloadable package of the published configuration: the storefront build, its configuration snapshot and the
+        hosting instructions. A job: answers 202, followed with `getSitePackage`. Only from a published version; the
+        working draft never leaves.
+
+        '
+      tags:
+      - publishing
+      x-ticvai-permission: TENANT_PUBLISH
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                version:
+                  type: string
+                  nullable: true
+                  description: The published version to package; the current one where absent.
+      responses:
+        '202':
+          description: Building
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SitePackage'
+        '409':
+          description: Nothing is published yet (`nothing-published`).
+          x-ticvai-problem-types:
+          - nothing-published
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /site-package/{packageId}:
+    parameters:
+    - name: packageId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    get:
+      operationId: getSitePackage
+      x-ticvai-consumed-by:
+        - "P09 ADM-016 White-Label Branding Management"
+        - "P13 CMS-014 Publishing Workflow"
+      x-ticvai-audience:
+      - staff
+      x-ticvai-read-routing: primary
+      x-ticvai-agreed: '2 October: follows exportSitePackage (CHG-CSA-038)'
+      summary: A site package and its download link
+      description: 'The package job''s status and, once `ready`, a short-lived download link (CHG-CSA-038).
+
+        '
+      tags:
+      - publishing
+      x-ticvai-permission: TENANT_PUBLISH
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: The package
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SitePackage'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /publish-review-policy:
+    get:
+      operationId: getPublishReviewPolicy
+      x-ticvai-consumed-by:
+        - "P13 CMS-014 Publishing Workflow"
+      x-ticvai-audience:
+      - staff
+      x-ticvai-read-routing: replica
+      x-ticvai-agreed: '2 October: Chinmay, workbook Q156 ("optional review step if the venue sets it up"); shape
+        follows getModuleEnablement'
+      summary: Whether publishing needs a review
+      description: 'Off by default: a single publish by a `TENANT_PUBLISH` holder (CHG-CSA-042).
+
+        '
+      tags:
+      - publishing
+      x-ticvai-permission: TENANT_CONFIGURE
+      x-ticvai-scope-level: tenant
+      x-ticvai-config-scope: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: The policy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PublishReviewPolicy'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+    put:
+      operationId: setPublishReviewPolicy
+      x-ticvai-consumed-by:
+        - "P13 CMS-014 Publishing Workflow"
+      x-ticvai-audience:
+      - staff
+      x-ticvai-agreed: '2 October: Chinmay, workbook Q156; shape follows setModuleEnablement'
+      summary: Switch the publish review step on or off
+      description: '**An optional review step the venue can switch on** (Chinmay, 2 October, workbook Q156;
+        CHG-CSA-042). When on, `publishTenantConfig` and `publishContentBlock` raise an approval request instead of
+        publishing, and the version or block goes live when approved; `reviewerMustDifferFromAuthor` keeps the
+        products'' rule. When off, a permission holder simulates (`createPreview`) and publishes in one step.
+
+        '
+      tags:
+      - publishing
+      x-ticvai-permission: TENANT_PUBLISH
+      x-ticvai-scope-level: tenant
+      x-ticvai-config-scope: tenant
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: One policy per tenant, the caller's tenant; there is no key in the path.
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PublishReviewPolicy'
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Saved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PublishReviewPolicy'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /footer:
     put:
       operationId: setFooter
       x-ticvai-consumed-by:
-        - "P13 CMS-007 Page Builder"
+        - "P13 CMS-009 Navigation & Menus"
       summary: Footer columns, legal links and social
       description: 'BL-002. **A header is chrome and a footer is a link surface**, which is why this is
         not `setHeader` with different fields.
@@ -363,6 +802,7 @@ paths:
       operationId: createContentBlock
       x-ticvai-consumed-by:
         - "P08 BO-839 Dynamic Product Pages"
+        - "P13 CMS-007 Page Builder"
       summary: Author a block of content
       description: 'BL-172. **The CMS modelled configuration and not authoring** — a marketer could choose
         between things a developer had built and could not write something new.
@@ -409,12 +849,16 @@ paths:
         format: uuid
     post:
       operationId: publishContentBlock
+      x-ticvai-consumed-by:
+        - "P13 CMS-007 Page Builder"
       summary: Publish now, or schedule it
       description: '**A seasonal banner needing somebody awake at midnight is the same defect `Product.onSaleFrom`
         fixed**, and the answer is the same: a date on the object rather than a person with an alarm.
 
         Approval is separate from authoring where the tenant requires it — **the approver may not be the
-        author**, following the rule already enforced on products.
+        author**, following the rule already enforced on products. **Whether it is required is the tenant''s
+        publish-review policy** (`getPublishReviewPolicy`; Chinmay, 2 October, workbook Q156; CHG-CSA-042), off
+        by default: a single publish by a `TENANT_PUBLISH` holder.
 
         **`expireAt` must follow `publishAt`** when both are sent (decided 28 September, audit R163), or
         400. A scheduled job makes the publish and the expiry at those times (audit R163).
@@ -461,14 +905,9 @@ paths:
     get:
       operationId: getTenantConfig
       x-ticvai-consumed-by:
-        - "P01 WEB-001 Home / Landing"
-        - "P02 GST-001 Home"
-        - "P05 KSK-002 Language Select"
-        - "P08 BO-599 Manual Configuration Center"
         - "P08 BO-834 Digital Experience Center"
-        - "P13 CMS-001 Tenant Workspace"
-        - "P13 CMS-012 RTL Preview"
-        - "P13 CMS-016 Site Settings"
+        - "P09 ADM-018 Interface Languages"
+        - "P13 CMS-011 Translations"
       x-ticvai-audience:
       - staff
       - guest
@@ -479,6 +918,10 @@ paths:
         version**: `version` is ignored and `TENANT_CONFIGURE` is not needed, because reading the published
         app is not configuring it. The dashboard''s status view (published state, module and page counts,
         recent changes) is `getTenantAppStatus`, not this.
+
+        **A visitor with no session reads `getPublishedTenantConfig`** (decided 2 October, GFIX-1): the
+        published, non-sensitive part of this, resolved from the host and cacheable, so a storefront renders
+        in the tenant''s brand before anyone signs in.
 
         '
       tags:
@@ -525,7 +968,6 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-001 Home / Landing"
         - "P01 WEB-025 Help Centre / FAQ"
-        - "P01 WEB-028 Contact & Venue Information"
         - "P01 WEB-029 Error / Sold Out / Maintenance"
         - "P01 WEB-045 Help Centre & Accessibility"
         - "P01 WEB-050 Plan Your Visit"
@@ -542,6 +984,7 @@ paths:
       x-ticvai-audience:
       - device
       - guest
+      - staff
       x-ticvai-read-routing: replica
       summary: App status and recent changes
       description: 'Also the endpoint the guest app calls to discover a maintenance window, which is why
@@ -660,6 +1103,8 @@ paths:
         - "P09 ADM-016 White-Label Branding Management"
         - "P13 CMS-002 Brand Kit"
         - "P13 CMS-004 Logo & Assets"
+        - "P13 CMS-006 Component Preview"
+        - "P13 CMS-104 App Build & Store Publishing"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -688,6 +1133,7 @@ paths:
         - "P09 ADM-016 White-Label Branding Management"
         - "P13 CMS-002 Brand Kit"
         - "P13 CMS-004 Logo & Assets"
+        - "P13 CMS-104 App Build & Store Publishing"
       x-ticvai-audience:
       - staff
       summary: Set logo, favicon and splash
@@ -698,6 +1144,9 @@ paths:
 
         **Each asset is PNG or SVG, up to 2 MB (decided 28 September, audit R270).** Anything else is
         refused with 400 before it is stored against the brand.
+
+        **"Powered by TICVAI" is a toggle, on by default** (Chinmay, 2 October, workbook Q160; CHG-CSA-036):
+        `showPoweredBy` false is accepted only where the tenant''s licence allows it, or 403 `powered-by-locked`.
 
         '
       tags:
@@ -726,6 +1175,15 @@ paths:
                 $ref: '#/components/schemas/BrandIdentity'
         '400':
           description: An asset is larger than 2 MB, or is not PNG or SVG (audit R270)
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '403':
+          description: '`showPoweredBy` false, and the tenant''s licence does not allow removing "Powered by TICVAI"
+            (`powered-by-locked`; workbook Q160, DI-297; CHG-CSA-036).'
+          x-ticvai-problem-types:
+          - powered-by-locked
           content:
             application/problem+json:
               schema:
@@ -825,6 +1283,7 @@ paths:
     get:
       operationId: getBookingFlowConfig
       x-ticvai-consumed-by:
+        - "P13 CMS-006 Component Preview"
         - "P13 CMS-016 Site Settings"
       summary: How the guest booking flow looks and steps
       tags:
@@ -925,8 +1384,8 @@ paths:
       operationId: getTheme
       x-ticvai-consumed-by:
         - "P09 ADM-016 White-Label Branding Management"
-        - "P13 CMS-003 Typography"
         - "P13 CMS-005 Theme Editor"
+        - "P13 CMS-006 Component Preview"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -952,7 +1411,6 @@ paths:
       operationId: setTheme
       x-ticvai-consumed-by:
         - "P09 ADM-016 White-Label Branding Management"
-        - "P13 CMS-003 Typography"
         - "P13 CMS-005 Theme Editor"
       x-ticvai-audience:
       - staff
@@ -962,6 +1420,9 @@ paths:
         is a stated target for the guest app, and a tenant picking two similar colours should be told
         at configuration time rather than at audit. **Refused, not warned (confirmed 28 September,
         audit R139)**: flow F22 is corrected to match.
+
+        **One theme, no dark mode** (Chinmay, 2 October, workbook Q150; CHG-CSA-035): `darkMode` is deprecated
+        and ignored; a body that carries it is accepted and the field is not applied.
 
         **Accepts `Prefer: validate-only`** (29 September, build pass, group G2): validates and answers 200
         with the would-be result without writing, for the AI executor''s plan validation; registered as an
@@ -1006,6 +1467,7 @@ paths:
       operationId: getFonts
       x-ticvai-consumed-by:
         - "P13 CMS-003 Typography"
+        - "P13 CMS-006 Component Preview"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -1085,7 +1547,7 @@ paths:
     put:
       operationId: setHeader
       x-ticvai-consumed-by:
-        - "P13 CMS-007 Page Builder"
+        - "P13 CMS-009 Navigation & Menus"
       x-ticvai-audience:
       - staff
       summary: Configure the header
@@ -1156,6 +1618,10 @@ paths:
       summary: Set main and overflow navigation
       description: 'Items pointing at a disabled module are refused. A navigation entry that leads nowhere
         is worse than an absent one.
+
+        **Three editors, each saved on its own** (Chinmay, 2 October, workbook Q49; DI-285; CHG-CSA-037): the tab
+        bar is this operation (`kind` `bottomNavigation`); the web header is `setHeader` and the web footer
+        `setFooter`. Saving one never rewrites the others.
 
         Bottom navigation is capped at five visible items; the remainder moves to the overflow menu.
 
@@ -1641,9 +2107,6 @@ paths:
     get:
       operationId: listContentPages
       x-ticvai-consumed-by:
-        - "P01 WEB-045 Help Centre & Accessibility"
-        - "P02 GST-040 Help & Support"
-        - "P02 GST-057 Accessibility Information"
         - "P08 BO-837 Page & Landing Builder"
         - "P13 CMS-007 Page Builder"
       x-ticvai-audience:
@@ -1655,6 +2118,9 @@ paths:
         `isEnabled` is true. For a guest `status` is ignored and `TENANT_CONFIGURE` is not needed — reading
         a published page is not configuring it. A staff caller sees every page, and with no `status` gets
         all three states.
+
+        **A guest screen reads `listPublishedContentPages`** (decided 2 October, GFIX-2), which needs no
+        session: help and accessibility pages are public.
 
         '
       tags:
@@ -1856,9 +2322,6 @@ paths:
     get:
       operationId: listFaqs
       x-ticvai-consumed-by:
-        - "P01 WEB-045 Help Centre & Accessibility"
-        - "P02 GST-040 Help & Support"
-        - "P09 ADM-018 Localisation & Language Pack"
         - "P12 SUP-006 Knowledge Base Search"
       x-ticvai-audience:
       - staff
@@ -1867,6 +2330,9 @@ paths:
       summary: List FAQs
       description: 'A guest caller sees only entries whose `isPublished` is true, and needs no `TENANT_CONFIGURE`
         — reading the help content is not configuring it.
+
+        **A guest screen reads `listPublishedFaqs`** (decided 2 October, GFIX-2), which needs no session:
+        help is public.
 
         '
       tags:
@@ -1896,8 +2362,7 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setFaqs
-      x-ticvai-consumed-by:
-        - "P09 ADM-018 Localisation & Language Pack"
+      x-ticvai-consumed-by: []
       x-ticvai-audience:
       - staff
       summary: Set FAQ categories and entries
@@ -1944,8 +2409,7 @@ paths:
     get:
       operationId: listPolicies
       x-ticvai-consumed-by:
-        - "P08 BO-243 Policy Approval, Audit, Analytics & AI Optimization"
-        - "P09 ADM-018 Localisation & Language Pack"
+        - "P08 BO-748 Consent Capture & Versions"
         - "P13 CMS-018 Consent & Legal"
       x-ticvai-audience:
       - staff
@@ -1954,6 +2418,9 @@ paths:
       description: '**The current version of each policy only, with history on request (decided 28
         September, audit R163).** Without `includeHistory` the list holds one entry per `PolicyKind`,
         its current version; with it, every version, newest first within each kind.
+
+        **Staff only. Guests read `listPublishedPolicies`** (decided 2 October, GFIX-2): the current version
+        of each published policy, with no session, for checkout terms, sign-up and the help centre.
 
         '
       tags:
@@ -1995,7 +2462,6 @@ paths:
     put:
       operationId: setPolicy
       x-ticvai-consumed-by:
-        - "P09 ADM-018 Localisation & Language Pack"
         - "P13 CMS-018 Consent & Legal"
       x-ticvai-audience:
       - staff
@@ -2061,6 +2527,7 @@ paths:
     get:
       operationId: getModuleEnablement
       x-ticvai-consumed-by:
+        - "P09 ADM-424 Module Activation & Dependency Validation"
         - "P13 CMS-001 Tenant Workspace"
         - "P13 CMS-007 Page Builder"
       x-ticvai-audience:
@@ -2091,6 +2558,7 @@ paths:
     put:
       operationId: setModuleEnablement
       x-ticvai-consumed-by:
+        - "P09 ADM-424 Module Activation & Dependency Validation"
         - "P13 CMS-001 Tenant Workspace"
       x-ticvai-audience:
       - staff
@@ -2238,7 +2706,7 @@ paths:
     put:
       operationId: setLanguages
       x-ticvai-consumed-by:
-        - "P09 ADM-018 Localisation & Language Pack"
+        - "P09 ADM-018 Interface Languages"
         - "P13 CMS-011 Translations"
       x-ticvai-audience:
       - staff
@@ -2246,6 +2714,10 @@ paths:
       description: 'Enabling a language does not translate existing content. The response reports how
         many content items lack a version in each newly enabled language, so a tenant does not publish
         a half-translated app.
+
+        **Any language, not only English and Arabic** (Chinmay, 2 October, workbook Q145; CHG-CSA-039): a venue
+        adds its own interface languages here (ADM-018 for platform staff under a grant, CMS-011 for the tenant).
+        The response''s `uiStringCoverage` says how far the interface strings reach in each.
 
         '
       tags:
@@ -2299,11 +2771,19 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-016 White-Label Branding Management"
         - "P13 CMS-006 Component Preview"
+        - "P13 CMS-012 RTL Preview"
+        - "P13 CMS-014 Publishing Workflow"
       x-ticvai-audience:
       - staff
       summary: Generate a preview link
       description: 'A short-lived link rendering the working draft as the guest app would, for a chosen
         platform, theme and language. Shareable for review before publishing.
+
+        **Also the PDF ticket and the Wallet passes, in Block A** (Chinmay, 2 October, workbook Q151;
+        CHG-CSA-041). `outputs` asks for them; each is rendered from the draft''s branding and the ticket and pass
+        templates, for `productId` where one is named (a product''s own ticket, as the catalogue''s publish step
+        needs, DI-444) or a sample ticket otherwise. **Simulate, then publish** (workbook Q156, CHG-CSA-042): this is
+        the simulate step.
 
         '
       tags:
@@ -2329,12 +2809,29 @@ paths:
                   - web
                 theme:
                   type: string
+                  deprecated: true
                   enum:
                   - light
                   - dark
+                  description: Deprecated with `Theme.darkMode` (CHG-CSA-035); ignored.
                 language:
                   type: string
                   pattern: ^[a-z]{2}$
+                outputs:
+                  type: array
+                  description: What to render besides the app (CHG-CSA-041). Absent means `app` only.
+                  items:
+                    type: string
+                    enum:
+                    - app
+                    - pdfTicket
+                    - appleWalletPass
+                    - googleWalletPass
+                productId:
+                  type: string
+                  format: uuid
+                  nullable: true
+                  description: The product whose ticket and passes to render; a sample ticket where absent.
                 expiresInHours:
                   type: integer
                   minimum: 1
@@ -2395,7 +2892,6 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-843 Publishing, Analytics & Audit"
         - "P09 ADM-016 White-Label Branding Management"
-        - "P13 CMS-006 Component Preview"
         - "P13 CMS-014 Publishing Workflow"
         - "P13 CMS-103 Booking Flows"
       x-ticvai-audience:
@@ -2414,6 +2910,17 @@ paths:
         **Booking flows are published here (decided 29 September, W12).** Each venue''s enabled flows are copied
         into the snapshot with the rest of the draft; `getPublishedBookingFlow` reads them from the current
         version. An invalid enabled flow fails validation (409, `bookingFlowInvalid`).
+
+        **Simulate, then a single publish by the permission holder; review only if the venue switches it on**
+        (Chinmay, 2 October, workbook Q156; CHG-CSA-042). The simulate step is `createPreview`. With the tenant''s
+        publish-review policy off (the default), a `TENANT_PUBLISH` holder publishes in one step (201). With it on
+        (`setPublishReviewPolicy`), the version is validated and snapshotted and an approval request is raised; the
+        response is 202 with `reviewStatus` `pending`, and the version becomes current when a reviewer (never the
+        author, where the policy says so) approves it.
+
+        **Platform staff publish a hosted tenant''s site** (Chinmay, 2 October, workbook Q144; R098; CHG-CSA-038)
+        only under a platform-staff grant naming `TENANT_PUBLISH`, with step-up. A self-hosted tenant exports a site
+        package (`exportSitePackage`) instead.
 
         '
       tags:
@@ -2456,6 +2963,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ConfigVersion'
+        '202':
+          description: Submitted for review; the venue's publish-review policy is on (CHG-CSA-042). The version is
+            snapshotted with `reviewStatus` `pending` and becomes current when approved.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConfigVersion'
         '409':
           description: Validation failed. Every finding is listed
           content:
@@ -2469,7 +2983,6 @@ paths:
       operationId: listConfigVersions
       x-ticvai-consumed-by:
         - "P09 ADM-016 White-Label Branding Management"
-        - "P13 CMS-006 Component Preview"
         - "P13 CMS-015 Version History"
       x-ticvai-audience:
       - staff
@@ -2511,7 +3024,6 @@ paths:
       operationId: restoreConfigVersion
       x-ticvai-consumed-by:
         - "P09 ADM-016 White-Label Branding Management"
-        - "P13 CMS-006 Component Preview"
         - "P13 CMS-015 Version History"
       x-ticvai-config-scope: tenant
       x-ticvai-audience:
@@ -2555,7 +3067,7 @@ paths:
       operationId: diffConfigVersion
       x-ticvai-consumed-by:
         - "P09 ADM-016 White-Label Branding Management"
-        - "P13 CMS-006 Component Preview"
+        - "P13 CMS-014 Publishing Workflow"
         - "P13 CMS-015 Version History"
       x-ticvai-audience:
       - staff
@@ -3057,7 +3569,10 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
+      # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
+      # or staff token is still accepted. `{}` makes the credential optional.
       security:
+      - {}
       - guestAuth: []
       - bearerAuth: []
       parameters:
@@ -3299,6 +3814,299 @@ paths:
         '429':
           $ref: ../shared/common.yaml#/components/responses/TooManyRequests
 
+  /storefront/tenant-config:
+    get:
+      operationId: getPublishedTenantConfig
+      x-ticvai-consumed-by:
+        - "P01 WEB-001 Home / Landing"
+        - "P01 WEB-028 Contact & Venue Information"
+        - "P01 WEB-029 Error / Sold Out / Maintenance"
+        - "P02 GST-001 Home"
+        - "P02 GST-043 Arabic / RTL Experience"
+        - "P02 GST-047 Maintenance / Upgrade Page"
+        - "P05 KSK-002 Language Select"
+      x-ticvai-audience:
+      - anonymous
+      - guest
+      - device
+      x-ticvai-agreed: '2 October: decided by Chinmay, fix before Block A starts (GFIX-1); the public view of
+        getTenantConfig, shaped like getTenantAppStatus'' public view and served like getCookieConsentRuntime'
+      x-ticvai-read-routing: replica
+      summary: The published guest-facing configuration, before anyone signs in
+      description: '**What a first-time visitor''s storefront renders in** (decided 2 October by Chinmay, GFIX-1).
+        `getTenantConfig` needs a guest or a staff session, so a visitor with neither could not load the
+        tenant''s brand, theme, fonts, header, footer or navigation, and the home page (WEB-001, GST-001), the
+        maintenance and sold-out pages (WEB-029, GST-047) and the kiosk (KSK-002) had nothing to style
+        themselves with. This is that read with no session at all.
+
+
+        **The tenant comes from the host, never from the caller.** The request carries no tenant: the edge
+        resolves the host it arrived on to a tenant with `tenancy.resolveTenantHost` (SD-021), which is the
+        tenant''s verified custom domain or its platform subdomain. The platform subdomain is the tenant slug
+        the guest app and kiosk builds are configured with, so all three shells call the same path. An
+        unknown host is `404` and never falls through to a default tenant.
+
+
+        **Published, non-sensitive fields only.** Read from the current published `ConfigVersion` (never the
+        working draft) plus the live status `setMaintenanceMode` writes. Left out, because a public and
+        cacheable response must not carry them: the draft markers (`isDraft`, `version`, the draft booking
+        flows), notification branding (sender addresses), the enabled payment methods (checkout reads what
+        the gateway offers), licensing, and every CMS status field `getTenantAppStatus` keeps for staff.
+        A module the tenant has not enabled is not listed, so a guest never learns what was not bought.
+
+
+        **Cacheable.** With no session the answer is the same for every visitor of a host and venue and is
+        cached at the edge, invalidated by `publishTenantConfig` and `setMaintenanceMode`; `publishedVersion`
+        lets a client keep its copy when nothing changed. A signed-in guest gets the same answer.
+
+        '
+      tags:
+      - overview
+      x-ticvai-permission: null
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: true
+      x-ticvai-offline-note: '2 October: **servable from a local cache.** The published configuration changes
+        only on a publish, so the app and the kiosk keep the last answer and render from it offline; the
+        language list on KSK-002 comes from it.
+
+        '
+      x-ticvai-conflict-policy: serverWins
+      security:
+      - {}
+      - guestAuth: []
+      parameters:
+      - name: venueId
+        in: query
+        required: false
+        description: The venue the guest picked (WEB-001, GST-001). `bookingFlow` is then the tenant's settings
+          with that venue's `venueOverrides` entry laid over field by field (rev 3 CFG-11); without it, the
+          tenant's own settings.
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: The published guest-facing configuration
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PublishedTenantConfig'
+        '404':
+          description: The host belongs to no tenant (`not-found`), or the tenant has published nothing yet
+            (`not-configured`); the storefront shows the platform's neutral holding page.
+          x-ticvai-problem-types:
+          - not-found
+          - not-configured
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /storefront/policies:
+    get:
+      operationId: listPublishedPolicies
+      x-ticvai-consumed-by:
+        - "P01 WEB-012 Checkout — Payment"
+        - "P01 WEB-045 Help Centre & Accessibility"
+        - "P02 GST-009 Review & Payment"
+        - "P02 GST-040 Help & Support"
+      x-ticvai-audience:
+      - anonymous
+      - guest
+      - device
+      x-ticvai-agreed: '2 October: decided by Chinmay, fix before Block A starts (GFIX-2); the guest view of
+        listPolicies'
+      x-ticvai-read-routing: replica
+      summary: The tenant's current legal policies, readable before sign-in
+      description: '**Terms, privacy, refund, cookie and accessibility, as a guest reads them** (decided 2 October
+        by Chinmay, GFIX-2). `listPolicies` is staff-only (`TENANT_CONFIGURE`), so no guest could read a
+        policy: not the terms they tick at checkout (WEB-012, GST-009), not the privacy notice before they
+        sign up, not the help centre''s policy tab (WEB-045, GST-040). Every policy is public by nature, so
+        this needs no session.
+
+
+        **The current version of each kind only**, one entry per `PolicyKind` that has been published, with
+        its `version` so a consent records exactly what was shown. A kind never published is absent, not
+        empty. History and who published it stay on `listPolicies`. The tenant comes from the host, as for
+        `getPublishedTenantConfig`. Cached at the edge and invalidated by `setPolicy`.
+
+        '
+      tags:
+      - content
+      x-ticvai-permission: null
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: true
+      x-ticvai-offline-note: '2 October: **servable from a local cache.** A policy changes only when the tenant
+        publishes a new version.
+
+        '
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-bounded: one current version per PolicyKind, five kinds
+      security:
+      - {}
+      - guestAuth: []
+      parameters:
+      - name: kind
+        in: query
+        required: false
+        description: Only this policy kind, how the checkout reads the terms alone.
+        schema:
+          $ref: '#/components/schemas/PolicyKind'
+      responses:
+        '200':
+          description: The current version of each published policy
+          content:
+            application/json:
+              schema:
+                type: array
+                maxItems: 5
+                items:
+                  $ref: '#/components/schemas/PublishedPolicy'
+        '404':
+          description: The host belongs to no tenant (`not-found`).
+          x-ticvai-problem-types:
+          - not-found
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /storefront/faqs:
+    get:
+      operationId: listPublishedFaqs
+      x-ticvai-consumed-by:
+        - "P01 WEB-025 Help Centre / FAQ"
+        - "P01 WEB-045 Help Centre & Accessibility"
+        - "P02 GST-040 Help & Support"
+      x-ticvai-audience:
+      - anonymous
+      - guest
+      - device
+      x-ticvai-agreed: '2 October: decided by Chinmay, fix before Block A starts (GFIX-2); the public view of
+        listFaqs'
+      x-ticvai-read-routing: replica
+      summary: The published FAQs, readable before sign-in
+      description: '**Help is public** (decided 2 October by Chinmay, GFIX-2). `listFaqs` needs a guest session,
+        so the help centre (WEB-045, GST-040) told a visitor to sign in before they could read how to sign
+        in. This returns the same categories with only the entries whose `isPublished` is true, ordered by
+        `sortOrder` within each category, and categories ordered by `sortOrder`; a category with no published
+        entry is left out. The tenant comes from the host, as for `getPublishedTenantConfig`. Cached at the
+        edge and invalidated by `setFaqs`.
+
+        '
+      tags:
+      - content
+      x-ticvai-permission: null
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: true
+      x-ticvai-offline-note: '2 October: **servable from a local cache.** FAQ content changes only when the
+        tenant edits it.
+
+        '
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-bounded: a tenant's help categories, written by hand in the CMS
+      security:
+      - {}
+      - guestAuth: []
+      responses:
+        '200':
+          description: Published FAQ categories with their published entries
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PublishedFaqCategory'
+        '404':
+          description: The host belongs to no tenant (`not-found`).
+          x-ticvai-problem-types:
+          - not-found
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /storefront/pages:
+    get:
+      operationId: listPublishedContentPages
+      x-ticvai-consumed-by:
+        - "P01 WEB-045 Help Centre & Accessibility"
+        - "P02 GST-040 Help & Support"
+        - "P02 GST-057 Accessibility Information"
+      x-ticvai-audience:
+      - anonymous
+      - guest
+      - device
+      x-ticvai-agreed: '2 October: decided by Chinmay, fix before Block A starts (GFIX-2); the public view of
+        listContentPages'
+      x-ticvai-read-routing: replica
+      summary: The live content pages, readable before sign-in
+      description: '**The help, accessibility and information pages a visitor reads** (decided 2 October by
+        Chinmay, GFIX-2). `listContentPages` needs a session and answers staff with drafts; this answers
+        anyone with the live pages only: `status` `published` and `isEnabled` true. Ordered by `sortOrder`,
+        then by slug. `slug` fetches one known page; `categoryCode` is how a screen reads its own category
+        (GST-057 reads the accessibility pages), fixed by the screen and never typed by a guest. The tenant
+        comes from the host, as for `getPublishedTenantConfig`. Cached at the edge and invalidated by
+        `publishTenantConfig`.
+
+        '
+      tags:
+      - content
+      x-ticvai-permission: null
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: true
+      x-ticvai-offline-note: '2 October: **servable from a local cache.** Published content changes only on a
+        publish.
+
+        '
+      x-ticvai-conflict-policy: serverWins
+      security:
+      - {}
+      - guestAuth: []
+      parameters:
+      - name: categoryCode
+        in: query
+        required: false
+        description: Only live pages with this `categoryCode`.
+        schema:
+          type: string
+      - name: slug
+        in: query
+        required: false
+        description: Only the live page with this slug.
+        schema:
+          type: string
+          pattern: ^[a-z0-9-]+$
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: Live pages
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/PublishedContentPage'
+        '404':
+          description: The host belongs to no tenant (`not-found`).
+          x-ticvai-problem-types:
+          - not-found
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+
   /booking-flow-types:
     get:
       operationId: listBookingFlowTypes
@@ -3496,6 +4304,7 @@ paths:
         from the published flow); shape follows getPublishedGuidedChoice'
       x-ticvai-audience:
       - guest
+      - staff
       x-ticvai-read-routing: replica
       summary: The published booking flow a product or category books through
       description: '**What the guest booking screens read to order their steps (decided 29 September, W12).**
@@ -3513,9 +4322,12 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: true
       x-ticvai-conflict-policy: serverWins
+      # A staff token is accepted too (contract gap CHG-WIR-017, CMS-103; CHG-CSA-045): the CMS reads the published
+      # flow it composes. Only an alternative was added (2 October, GFIX-5 rule).
       security:
       - {}
       - guestAuth: []
+      - bearerAuth: []
       parameters:
       - name: productId
         in: query
@@ -3748,6 +4560,7 @@ paths:
     get:
       operationId: getSiteSetupProgress
       x-ticvai-consumed-by:
+        - "P13 CMS-001 Tenant Workspace"
         - "P13 CMS-102 Site Builder"
       x-ticvai-agreed: '29 September: W12, M24-05 (a working site in about 30 minutes); shape follows getBrandIdentity'
       x-ticvai-audience:
@@ -5662,6 +6475,245 @@ components:
         failureReason:
           type: string
           nullable: true
+        routing:
+          type: string
+          enum:
+          - cname
+          - delegatedSubdomain
+          - apex
+          default: cname
+          description: '**How the hostname reaches TICVAI** (Chinmay, 2 October: "subdomain plus CNAME"; CHG-CSA-043).
+            `cname`, the default: a CNAME (e.g. `tickets.venue.com`) straight to the Front Door endpoint, validated by
+            the TXT `_dnsauth` record, with a Front Door managed certificate. `delegatedSubdomain`: the tenant delegates
+            a subdomain to TICVAI''s name servers (NS). `apex`: the bare domain, only on request. There is no path
+            proxy.'
+        dnsRecords:
+          x-ticvai-persistence-kind: valueObject
+          x-ticvai-persistence-column: jsonb
+          type: array
+          readOnly: true
+          description: '**Every record the tenant must publish, with what is observed now** (CHG-CSA-043): the TXT
+            `_dnsauth` record, the CNAME, and CAA or NS where they apply. CMS-017 lists them with their status.'
+          items:
+            type: object
+            required:
+            - type
+            - name
+            - expectedValue
+            - status
+            properties:
+              type:
+                type: string
+                enum:
+                - TXT
+                - CNAME
+                - CAA
+                - NS
+              name:
+                type: string
+              expectedValue:
+                type: string
+              observedValue:
+                type: string
+                nullable: true
+              status:
+                type: string
+                enum:
+                - ok
+                - missing
+                - wrong
+        revalidation:
+          type: string
+          readOnly: true
+          enum:
+          - none
+          - pendingRevalidation
+          - timedOut
+          default: none
+          description: '**The two waits CMS-017 shows beside `status`** (CHG-CSA-043). `pendingRevalidation`: an `active`
+            domain whose validation must be renewed (the managed certificate''s periodic revalidation, or a record that
+            changed); it keeps serving while the job re-checks. `timedOut`: a claim whose records were not published
+            within the validation window; `regenerateDomainToken` starts it again. Kept beside `status`, not inside it,
+            because a new status value would break a client built at r1 (CHG-CSA-043 notes).'
+        cnameLost:
+          type: boolean
+          readOnly: true
+          description: '**Takeover warning** (CHG-CSA-043). True when a scheduled check finds that an `active` or
+            released hostname''s CNAME still points at TICVAI with no tenant serving it, or no longer points at us while
+            `active`. Relinquishing a domain tells the tenant to remove the CNAME first, so nobody else can claim the
+            dangling record.'
+        isPrimary:
+          type: boolean
+          readOnly: true
+          description: The tenant's primary domain for its `kind`; the others redirect to it (`setPrimaryDomain`).
+        readiness:
+          type: object
+          readOnly: true
+          description: '**Per-domain setup a guest needs** (CHG-CSA-043): the UAE Pass redirect URI registered for this
+            hostname, the Apple Pay merchant domain verified, and the app links (Apple app-site association, Android
+            asset links) served.'
+          properties:
+            uaePassRedirect:
+              type: string
+              enum:
+              - ready
+              - pending
+              - notApplicable
+            applePayDomain:
+              type: string
+              enum:
+              - ready
+              - pending
+              - notApplicable
+            appLinks:
+              type: string
+              enum:
+              - ready
+              - pending
+              - notApplicable
+    PlatformSubdomain:
+      x-ticvai-persistence: none — derived from the tenant's slug and its cell
+      type: object
+      description: '**Every tenant''s own address on TICVAI** (Chinmay, 2 October: "subdomain plus CNAME"; DI-283;
+        CHG-CSA-043). Given at provisioning, one stem per cell (`<venue>.<cell>.ticvai.app`, e.g. `*.ae.ticvai.app`),
+        under a wildcard certificate, with host-only cookies. Always live, whether or not a custom domain is
+        claimed; a custom domain is added on top of it.'
+      required:
+      - hostname
+      - cell
+      properties:
+        hostname:
+          type: string
+          description: e.g. `aquaventure.ae.ticvai.app`.
+        cell:
+          type: string
+        certificate:
+          type: string
+          enum:
+          - wildcard
+        isPrimary:
+          type: boolean
+          description: True while no custom domain is primary.
+    LandingPageTemplate:
+      x-ticvai-persistence: none — TICVAI's template catalogue, read-only
+      type: object
+      description: A home page TICVAI provides for a tenant with no landing page of its own (CHG-CSA-037).
+      required:
+      - templateKey
+      - name
+      - layout
+      properties:
+        templateKey:
+          type: string
+        name:
+          type: string
+        presetKey:
+          type: string
+          nullable: true
+          description: The Site Builder preset it belongs to (`SiteSetupProgress.presetKey`).
+        thumbnailUrl:
+          type: string
+          nullable: true
+        layout:
+          $ref: '#/components/schemas/HomepageLayout'
+    DeepLinkScheme:
+      x-ticvai-persistence: none — derived from the primary domain and the published configuration
+      type: object
+      description: The URL patterns a tenant's own site uses to link into the storefront and the app (CHG-CSA-037).
+      required:
+      - baseUrl
+      - patterns
+      properties:
+        baseUrl:
+          type: string
+          description: The primary domain, or the platform subdomain where none is primary.
+        patterns:
+          type: array
+          items:
+            type: object
+            required:
+            - kind
+            - pattern
+            properties:
+              kind:
+                type: string
+                description: A `LinkTarget.kind`, or `bookingFlow`.
+              pattern:
+                type: string
+                description: e.g. `/p/{productId}`, `/e/{eventId}`, `/book/{flowKey}`.
+        appLinksEnabled:
+          type: boolean
+    SitePackage:
+      x-ticvai-persistence: whitelabel.site_package
+      type: object
+      description: A self-hosting package of one published version (`exportSitePackage`, CHG-CSA-038).
+      required:
+      - id
+      - status
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        version:
+          type: string
+        status:
+          type: string
+          enum:
+          - building
+          - ready
+          - failed
+        downloadUrl:
+          type: string
+          nullable: true
+          description: Short-lived; present when `ready`.
+        expiresAt:
+          type: string
+          format: date-time
+          nullable: true
+        requestedByPrincipalId:
+          type: string
+          format: uuid
+          readOnly: true
+        platformStaffGrantId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          description: The platform-staff grant it was made under, where platform staff made it (R098).
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+        scopePath:
+          type: string
+          readOnly: true
+          description: The partition key (ADR-0005). Written at `tenant` scope.
+    PublishReviewPolicy:
+      x-ticvai-persistence: whitelabel.publish_review_policy
+      type: object
+      description: Whether publishing goes through a review step (CHG-CSA-042). One row per tenant; off by default.
+      required:
+      - enabled
+      properties:
+        enabled:
+          type: boolean
+          default: false
+        reviewerMustDifferFromAuthor:
+          type: boolean
+          default: true
+        appliesTo:
+          type: array
+          description: What the review covers. Empty means both.
+          items:
+            type: string
+            enum:
+            - tenantConfig
+            - contentBlocks
+        scopePath:
+          type: string
+          readOnly: true
+          description: The partition key (ADR-0005). Written at `tenant` scope.
     FooterConfig:
       type: object
       x-ticvai-persistence: whitelabel.footer_config + whitelabel.footer_config_column + whitelabel.footer_config_social_link
@@ -6194,6 +7246,14 @@ components:
           default: 'off'
           description: When GST-001 plays it full screen. "Skip introduction" is always shown. Anything but
             `off` needs `introVideoAssetRef`, or 400.
+        showPoweredBy:
+          type: boolean
+          default: true
+          description: '**"Powered by TICVAI", a configuration toggle, on by default** (Chinmay, 2 October, workbook
+            Q160 and the pre-apply round; consistent with DI-297; CHG-CSA-036). Shown on the launch screen and at the
+            foot of Account and the web footer while true. **Switching it off needs the tenant''s licence to allow
+            it**: `setBrandIdentity` refuses `false` with `403 powered-by-locked` unless the tenant''s plan carries
+            the `poweredByRemoval` add-on (subscription `LicencePosition.poweredByRemovable`).'
     AppIcons:
       x-ticvai-persistence: none — embedded in tenant_config
       type: object
@@ -6580,7 +7640,12 @@ components:
           pattern: ^#[0-9A-Fa-f]{6}$
         darkMode:
           type: object
-          description: Optional dark variant. Derived from the light theme when absent.
+          deprecated: true
+          description: '**Deprecated and ignored** (Chinmay, 2 October, workbook Q150 and the pre-apply round;
+            CHG-CSA-035). White label has no dark or light mode: the venue''s chosen theme is applied, on every
+            device setting. The field is kept so a client built at r1 still parses, is accepted on `setTheme` and
+            returned as stored, and **is never used to render anything or drawn on any screen**; the guest app has
+            no Light/Dark switch.'
           properties:
             primaryColour:
               type: string
@@ -6876,9 +7941,27 @@ components:
     HomepageLayout:
       x-ticvai-persistence: whitelabel.homepage_section
       type: object
+      description: '**The client-approved web and app wireframes are the layout** (Chinmay, 2 October, workbook Q163;
+        CHG-CSA-040): sections, their order and their options follow the approved wireframes and change only where the
+        spec breaks. **Landing-page templates** (workbook Q41 batch 2; CHG-CSA-037): a tenant with no landing page of its
+        own starts from a TICVAI template (`templateKey`, `listLandingPageTemplates`); a tenant with its own site links
+        into the storefront with deep links (`getDeepLinkScheme`, `buildDeepLink`).'
       required:
       - sections
       properties:
+        templateKey:
+          type: string
+          nullable: true
+          description: The landing-page template this layout started from (`listLandingPageTemplates`), or null for
+            a layout composed from scratch (CHG-CSA-037).
+        landingSource:
+          type: string
+          enum:
+          - storefront
+          - ownSite
+          default: storefront
+          description: '`storefront`: this home is the tenant''s landing page. `ownSite`: the tenant''s own website is
+            the landing page and links in with deep links; this home is still served at the storefront address.'
         id:
           type: string
           format: uuid
@@ -6923,8 +8006,22 @@ components:
               maxItems:
                 type: integer
                 nullable: true
-                description: How many items the section shows. On the mobile Home, `attractions`, `dining`,
-                  `whatsOn` and `shop` show 1 or 2 highlights (decided 29 September, MOB-3).
+                description: '**How many cards the section shows, the venue''s choice** (Chinmay, 2 October, workbook
+                  Q152: every customisation option of the approved wireframe, including the card count per section;
+                  CHG-CSA-040). Replaces the fixed 1 or 2 highlights of MOB-3: the CMS offers the counts the approved
+                  wireframe offers.'
+              scrollAnimation:
+                type: string
+                enum:
+                - rise
+                - scale
+                - slide
+                - blur
+                - none
+                default: rise
+                description: '**How the section enters as the guest scrolls** (Chinmay, 2 October, workbook Q153: "must
+                  be there"; DI-1088; CHG-CSA-040). Rise, Scale, Slide, Blur or None, as the v4 prototype offers;
+                  `none` for guests who asked the device for reduced motion is applied whatever is set.'
               heroStyle:
                 type: string
                 nullable: true
@@ -7375,12 +8472,37 @@ components:
       properties:
         languages:
           type: array
+          description: '**A tenant may add or select interface languages beyond English and Arabic** (Chinmay,
+            2 October, workbook Q145; CHG-CSA-039). Any ISO 639-1 language. English and Arabic ship with complete
+            interface strings; for any other, the interface strings come as a TICVAI string pack drafted by AI
+            translation and reviewed (T03), and a string with no translation falls back to English. Content
+            (pages, products, banners) is the tenant''s to translate (`translationGaps`).'
           items:
             type: string
             pattern: ^[a-z]{2}$
         defaultLanguage:
           type: string
           pattern: ^[a-z]{2}$
+        uiStringCoverage:
+          type: array
+          readOnly: true
+          description: How complete the interface strings are in each enabled language (CHG-CSA-039). English and
+            Arabic are always complete.
+          items:
+            type: object
+            properties:
+              language:
+                type: string
+              coveragePercent:
+                type: number
+                minimum: 0
+                maximum: 100
+              status:
+                type: string
+                enum:
+                - complete
+                - draft
+                - missing
         rtlLanguages:
           type: array
           readOnly: true
@@ -7426,12 +8548,36 @@ components:
           - web
         theme:
           type: string
+          deprecated: true
           enum:
           - light
           - dark
+          description: Deprecated with `Theme.darkMode` (CHG-CSA-035); the preview always renders the venue's theme.
         language:
           type: string
           pattern: ^[a-z]{2}$
+        outputPreviews:
+          type: array
+          readOnly: true
+          description: '**The PDF ticket and the Apple and Google Wallet passes, previewed with the app** (Chinmay,
+            2 October, workbook Q151: in Block A; CHG-CSA-041). One entry per output asked for in `outputs`.'
+          items:
+            type: object
+            required:
+            - output
+            - url
+            properties:
+              output:
+                type: string
+                enum:
+                - app
+                - pdfTicket
+                - appleWalletPass
+                - googleWalletPass
+              url:
+                type: string
+                description: A short-lived link to the rendered output (the PDF, the `.pkpass`, or the Google pass
+                  preview), expiring with the preview.
         expiresAt:
           type: string
           format: date-time
@@ -7525,6 +8671,21 @@ components:
           type: string
         note:
           type: string
+        reviewStatus:
+          type: string
+          readOnly: true
+          enum:
+          - notRequired
+          - pending
+          - approved
+          - rejected
+          default: notRequired
+          description: The review step, where the tenant's publish-review policy is on (CHG-CSA-042).
+        approvalRequestId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
         isCurrent:
           type: boolean
         scheduledFor:
@@ -7782,6 +8943,181 @@ components:
                 - $ref: '#/components/schemas/LocalisedText'
                 nullable: true
                 description: Today's hours as shown to a guest, e.g. "10:00 to 22:00".
+    PublishedTenantConfig:
+      x-ticvai-persistence: none — computed from the current ConfigVersion snapshot and the live status on whitelabel.tenant_config
+      type: object
+      x-ticvai-agreed: '2 October: decided by Chinmay, fix before Block A starts (GFIX-1)'
+      description: '**The public view of the tenant''s configuration** (`getPublishedTenantConfig`, decided 2 October,
+        GFIX-1). The published parts a guest surface renders with, from the current `ConfigVersion`, and the
+        live status `setMaintenanceMode` writes. Nothing a guest cannot see on the page: no draft marker, no
+        CMS counts, no sender addresses, no licensing, no person.
+
+        '
+      required:
+      - tenantId
+      - publishedVersion
+      - publishedAt
+      - isInMaintenance
+      properties:
+        tenantId:
+          type: string
+          format: uuid
+        publishedVersion:
+          type: string
+          description: The `ConfigVersion.version` this answer was read from; a client holding the same version
+            keeps its copy.
+        publishedAt:
+          type: string
+          format: date-time
+        brand:
+          $ref: '#/components/schemas/BrandIdentity'
+        appIcons:
+          $ref: '#/components/schemas/AppIcons'
+        theme:
+          $ref: '#/components/schemas/Theme'
+        fonts:
+          $ref: '#/components/schemas/FontConfig'
+        header:
+          $ref: '#/components/schemas/HeaderConfig'
+        footer:
+          $ref: '#/components/schemas/FooterConfig'
+        navigation:
+          $ref: '#/components/schemas/NavigationConfig'
+        homepage:
+          $ref: '#/components/schemas/HomepageLayout'
+        bookingFlow:
+          allOf:
+          - $ref: '#/components/schemas/BookingFlowConfig'
+          description: The booking-flow display settings, resolved for `venueId` when one was sent (the tenant's
+            values with that venue's `venueOverrides` entry laid over, rev 3 CFG-11).
+        languages:
+          $ref: '#/components/schemas/LanguageConfig'
+        accessibility:
+          $ref: '#/components/schemas/AccessibilitySettings'
+        enabledModules:
+          type: array
+          description: The modules the tenant has enabled and published, so a guest surface hides a tab or a
+            homepage section for a module that is off. Licensing is not shown.
+          items:
+            $ref: '#/components/schemas/ModuleKey'
+        enabledFeatures:
+          type: array
+          description: The `featureKey` of every feature toggle that is on in the published version.
+          items:
+            type: string
+        isInMaintenance:
+          type: boolean
+          description: Live state (`setMaintenanceMode`), as on `getTenantAppStatus`.
+        maintenanceMessage:
+          allOf:
+          - $ref: '#/components/schemas/LocalisedText'
+          nullable: true
+        expectedBackAt:
+          type: string
+          format: date-time
+          nullable: true
+        minimumAppVersion:
+          $ref: '#/components/schemas/MinimumAppVersion'
+        availability:
+          $ref: '#/components/schemas/AppAvailability'
+        availabilityMessage:
+          allOf:
+          - $ref: '#/components/schemas/LocalisedText'
+          nullable: true
+        contact:
+          $ref: '#/components/schemas/VenueContact'
+    PublishedPolicy:
+      x-ticvai-persistence: none — a public projection of whitelabel.policy
+      type: object
+      x-ticvai-agreed: '2 October: decided by Chinmay, fix before Block A starts (GFIX-2)'
+      description: The current version of one policy as a guest reads it (`listPublishedPolicies`). Who published
+        it and the partition key stay on `Policy`.
+      required:
+      - kind
+      - version
+      - body
+      - effectiveFrom
+      properties:
+        kind:
+          $ref: '#/components/schemas/PolicyKind'
+        title:
+          type: string
+        version:
+          type: string
+          description: The version a consent records (a guest who consented to version 3 consented to version 3).
+        body:
+          $ref: '#/components/schemas/LocalisedRichText'
+        effectiveFrom:
+          type: string
+          format: date
+        requiresReconsent:
+          type: boolean
+          description: True when guests who consented to an earlier version are asked again on next launch.
+    PublishedFaqCategory:
+      x-ticvai-persistence: none — a public projection of whitelabel.faq_category + whitelabel.faq_entry
+      type: object
+      x-ticvai-agreed: '2 October: decided by Chinmay, fix before Block A starts (GFIX-2)'
+      description: One FAQ category with its published entries only (`listPublishedFaqs`).
+      required:
+      - code
+      - name
+      - entries
+      properties:
+        code:
+          type: string
+        name:
+          $ref: '#/components/schemas/LocalisedText'
+        sortOrder:
+          type: integer
+        entries:
+          type: array
+          items:
+            type: object
+            required:
+            - id
+            - question
+            - answer
+            properties:
+              id:
+                type: string
+                format: uuid
+              question:
+                $ref: '#/components/schemas/LocalisedText'
+              answer:
+                $ref: '#/components/schemas/LocalisedRichText'
+              sortOrder:
+                type: integer
+    PublishedContentPage:
+      x-ticvai-persistence: none — a public projection of whitelabel.content_page
+      type: object
+      x-ticvai-agreed: '2 October: decided by Chinmay, fix before Block A starts (GFIX-2)'
+      description: A live content page as a guest reads it (`listPublishedContentPages`). Only published and
+        enabled pages exist in this view, so it carries no status.
+      required:
+      - id
+      - slug
+      - title
+      - body
+      properties:
+        id:
+          type: string
+          format: uuid
+        slug:
+          type: string
+          pattern: ^[a-z0-9-]+$
+        title:
+          $ref: '#/components/schemas/LocalisedText'
+        body:
+          $ref: '#/components/schemas/LocalisedRichText'
+        iconAssetRef:
+          type: string
+          format: uuid
+          nullable: true
+        categoryCode:
+          type: string
+          nullable: true
+        sortOrder:
+          type: integer
   responses:
     NotConfigured:
       description: 'This part of the working draft has never been saved. **Not the same as a missing

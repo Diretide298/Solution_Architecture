@@ -1,4 +1,81 @@
 {
+ "ActiveSession": {
+  "x-ticvai-persistence": "none — Redis session registry",
+  "type": "object",
+  "required": [
+   "sessionId",
+   "principalId",
+   "status",
+   "startedAt",
+   "lastSeenAt"
+  ],
+  "properties": {
+   "status": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/SessionStatus"
+     }
+    ],
+    "description": "**A registry that only holds live sessions cannot answer why one ended.** Kept on the record so a supervisor asking *what happened to till 4* gets `terminated` or `expired` rather than an absence.\n"
+   },
+   "sessionId": {
+    "type": "string"
+   },
+   "principalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "principalName": {
+    "type": "string"
+   },
+   "roleId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "roleName": {
+    "type": "string",
+    "nullable": true
+   },
+   "workstationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "workstationName": {
+    "type": "string",
+    "nullable": true
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "ipAddress": {
+    "type": "string",
+    "nullable": true
+   },
+   "deviceInfo": {
+    "type": "string",
+    "nullable": true
+   },
+   "hasOpenShift": {
+    "type": "boolean",
+    "description": "Revoking this session leaves cash unreconciled."
+   },
+   "mfaSatisfied": {
+    "type": "boolean"
+   },
+   "startedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "lastSeenAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
  "AiApprovalRequestScore": {
   "type": "object",
   "x-ticvai-persistence": "ai.approval_request_score",
@@ -371,7 +448,7 @@
  },
  "ApprovalKind": {
   "type": "string",
-  "description": "11.1.7 and 11.1.30–11.1.37. **The first four already exist as bespoke implementations** and this contract is what they collapse into.\n**Which actions route here — decided 28 September, audit R144.** Finance and procurement acts go through this engine to a **finance approver**: closing a fiscal period (`periodClose`), reopening one (`periodReopen`), cancelling a purchase order (`purchaseOrderCancel`) and closing one short (`purchaseOrderShortClose`). The tenant default matrix for each of these names the finance approver role; a venue may tighten it and never loosen it. Starting a release rollout routes through `releasePromotion` to the platform release manager (a holder of `PLATFORM_RELEASE_PROMOTE`). **Not every `requiresApproval` goes here:** reopening a shift, recounting a stock count and a retail return above the venue threshold take a supervisor's step-up on the same device instead, and never raise a request.\n**Catalogue change requests route through `productChange` and `pricingChange`** (decided 29 September, writers pass): a product change and a price or pricing change raised in `catalogue` ask for approval under these two kinds, so a venue can route product edits and price edits to different approvers.\n",
+  "description": "11.1.7 and 11.1.30–11.1.37. **The first four already exist as bespoke implementations** and this contract is what they collapse into.\n**Which actions route here — decided 28 September, audit R144.** Finance and procurement acts go through this engine to a **finance approver**: closing a fiscal period (`periodClose`), reopening one (`periodReopen`), cancelling a purchase order (`purchaseOrderCancel`) and closing one short (`purchaseOrderShortClose`). The tenant default matrix for each of these names the finance approver role; a venue may tighten it and never loosen it. Starting a release rollout routes through `releasePromotion` to the platform release manager (a holder of `PLATFORM_RELEASE_PROMOTE`). **Not every `requiresApproval` goes here:** reopening a shift, recounting a stock count and a retail return above the venue threshold take a supervisor's step-up on the same device instead, and never raise a request.\n**Catalogue change requests route through `productChange` and `pricingChange`** (decided 29 September, writers pass): a product change and a price or pricing change raised in `catalogue` ask for approval under these two kinds, so a venue can route product edits and price edits to different approvers.\n\n**Optional review steps a venue switches on, decided 2 October 2026** (Chinmay; CHG-CSP-036, CHG-CSP-028, CHG-CSP-031). Each is an existing kind narrowed by the rule's `subjectTypes`, so no kind is added (a new value here would be a breaking change against r1) and each is off until the venue saves an active matrix for it:\n- **Publishing white-label content** (`configurationChange`, subject `whiteLabelPublication`): simulate, then a single publish by a holder of the permission; a review step only where the venue sets one up (batch 1, CMS-014; DEC-156). - **Recording F&B waste above a value** (`stockWriteOff`, subject `fnbWaste`): the venue's waste-approval policy, value bands as `minAmount` and `maxAmount`, photo evidence above a value held by fnb (batch 6 #192, BO-139; DEC-192; R144). - **Publishing an access topology** (`configurationChange`, subject `topologyPublication`): second-person approval when the venue switches it on (batch 6 #230, BO-153; DEC-230). - **A permanent identity lock, a whitelist entry, or releasing a full-identity or permanent lock** (`accessPermissionChange`, subjects `identityLock`, `whitelistEntry`, `identityLockRelease`): always a second approver, never for an until-end-of-day lock (critical set 1, BO-229 and BO-247; DEC-254, DEC-260); the tenant default matrix names the security approver role and a venue may tighten it, never remove it.\n",
   "enum": [
    "refund",
    "priceOverride",
@@ -599,6 +676,26 @@
     "format": "date-time",
     "nullable": true
    },
+   "assignedToPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "Who claimed or was assigned the request in a shared queue (`assignApprovalRequest`; DI-723; CHG-CSP-042). Null while it sits in the queue."
+   },
+   "assignedToDepartmentId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The department queue it was assigned to, where it went to a department rather than a person (CHG-CSP-042)."
+   },
+   "assignedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   },
    "requestedAt": {
     "type": "string",
     "format": "date-time"
@@ -685,66 +782,6 @@
       "format": "date-time"
      }
     }
-   }
-  }
- },
- "ApprovalRequirement": {
-  "type": "object",
-  "x-ticvai-persistence": "none — computed",
-  "description": "The answer to \"does this need approval\", returned before the action.",
-  "required": [
-   "isRequired"
-  ],
-  "properties": {
-   "isRequired": {
-    "type": "boolean"
-   },
-   "matchedRule": {
-    "allOf": [
-     {
-      "$ref": "#/components/schemas/ApprovalRule"
-     }
-    ],
-    "nullable": true
-   },
-   "matrixVersion": {
-    "type": "integer",
-    "nullable": true
-   },
-   "approvers": {
-    "type": "array",
-    "description": "Resolved, with delegations applied. **Named so the caller can say \"this needs Sara\"** rather than \"this needs approval\".\n",
-    "items": {
-     "type": "object",
-     "properties": {
-      "principalId": {
-       "type": "string",
-       "format": "uuid"
-      },
-      "displayName": {
-       "type": "string"
-      },
-      "level": {
-       "type": "integer"
-      },
-      "isDelegate": {
-       "type": "boolean"
-      },
-      "delegatedFrom": {
-       "type": "string",
-       "format": "uuid",
-       "nullable": true
-      }
-     }
-    }
-   },
-   "slaMinutes": {
-    "type": "integer",
-    "nullable": true
-   },
-   "noApproverAvailable": {
-    "type": "boolean",
-    "description": "**The case that must not fail silently.** A rule requiring a role nobody at this venue holds means the action is blocked forever, and the caller needs to know that now rather than after raising a request nobody can decide.\n"
    }
   }
  },
@@ -839,6 +876,27 @@
     "type": "integer",
     "nullable": true,
     "description": "11.1.53. An unanswered request eventually stops waiting."
+   },
+   "subjectTypes": {
+    "type": "array",
+    "description": "**Which subjects of the kind this rule matches** (decided 2 October 2026, Chinmay; CHG-CSP-028, CHG-CSP-036, CHG-CSP-031): the `CreateApprovalRequest.subjectType` values, for example `topologyPublication` or `whiteLabelPublication` under `configurationChange`. Empty matches every subject of the kind. It is how a venue switches an optional review step on for one kind of act without routing every act of the kind.",
+    "items": {
+     "type": "string",
+     "maxLength": 64
+    }
+   },
+   "signatureMethods": {
+    "type": "array",
+    "description": "**The signature methods this level accepts, where `requiresSignature` is true** (design-notes correction on ADM-344, Block B: \"Configuring which stages need a signature is a policy write\"; CHG-CSP-045). Values of `ApprovalSignature.method`. Empty accepts any of them. With `requiresSignature` this makes the rule the signature policy: which levels of which kinds need a signature, and how it is given; `signApprovalDecision` refuses a method the level does not accept.",
+    "items": {
+     "type": "string",
+     "enum": [
+      "platformKey",
+      "uaePass",
+      "externalCertificate",
+      "drawnSignature"
+     ]
+    }
    },
    "externalProviderId": {
     "type": "string",
@@ -1046,6 +1104,27 @@
     "items": {
      "type": "string"
     }
+   },
+   "module": {
+    "type": "string",
+    "nullable": true,
+    "description": "**The module a per-module preset belongs to** (a contract name, as `listModuleCapabilities`; CHG-CSP-003). Null for a template that spans modules, such as the Cashier starting configuration.\n"
+   },
+   "presetLevel": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "all",
+     "viewer",
+     "midLevel"
+    ],
+    "description": "**Which of the three per-module presets this is** (decided 2 October 2026, Chinmay; DEC-007; CHG-CSP-003): All, Viewer or Mid-level. Null on a template a tenant saved itself and on a cross-module starting configuration.\n"
+   },
+   "isPreset": {
+    "type": "boolean",
+    "default": false,
+    "readOnly": true,
+    "description": "**Seeded by the platform, not saved by the tenant** (CHG-CSP-003). A preset is offered when a role is created and cannot be deleted; a tenant saves its own tick-sets beside them with `setCapabilityTemplate`.\n"
    },
    "scopePath": {
     "type": "string",
@@ -1501,6 +1580,53 @@
    }
   }
  },
+ "OrgUnit": {
+  "x-ticvai-persistence": "platform.scope",
+  "type": "object",
+  "required": [
+   "id",
+   "level",
+   "path",
+   "code",
+   "name",
+   "isActive"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "level": {
+    "$ref": "#/components/schemas/ScopeLevel"
+   },
+   "parentId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "path": {
+    "type": "string",
+    "description": "Materialised ltree path, e.g. `t_ref.b_alpha.r_north.v_alpha1`.",
+    "pattern": "^[a-z0-9_]+(\\.[a-z0-9_]+)*$"
+   },
+   "code": {
+    "type": "string",
+    "maxLength": 64
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "isActive": {
+    "type": "boolean",
+    "description": "False causes every permission query at or beneath this node to resolve to DENY.\n"
+   },
+   "childCount": {
+    "type": "integer",
+    "minimum": 0
+   }
+  }
+ },
  "Page": {
   "type": "object",
   "required": [
@@ -1519,6 +1645,222 @@
     "type": "boolean"
    }
   }
+ },
+ "Permission": {
+  "type": "string",
+  "enum": [
+   "SESSION_FORCE_LOGOUT",
+   "USER_MANAGE",
+   "ROLE_MANAGE",
+   "PERMISSION_GRANT",
+   "PERMISSION_VIEW",
+   "PERMISSION_MANAGE",
+   "PLATFORM_TENANT_VIEW",
+   "PLATFORM_TENANT_MANAGE",
+   "PLATFORM_TENANT_TERMINATE",
+   "PLATFORM_PLAN_MANAGE",
+   "PLATFORM_CELL_VIEW",
+   "PLATFORM_CELL_MANAGE",
+   "PLATFORM_BILLING_VIEW",
+   "PLATFORM_AI_MANAGE",
+   "PLATFORM_BILLING_MANAGE",
+   "PLATFORM_RELEASE_VIEW",
+   "PLATFORM_RELEASE_MANAGE",
+   "PLATFORM_RELEASE_PROMOTE",
+   "PLATFORM_MIGRATION_VIEW",
+   "PLATFORM_MIGRATION_APPLY",
+   "PLATFORM_TENANT_ACCESS",
+   "TENANT_CONFIGURE",
+   "TENANT_VIEW",
+   "TENANT_PUBLISH",
+   "SCOPE_VIEW",
+   "SCOPE_MANAGE",
+   "REGION_CONFIGURE",
+   "WORKSTATION_CONFIGURE",
+   "PRODUCT_VIEW",
+   "PRODUCT_CONFIGURE",
+   "PRODUCT_APPROVE",
+   "PRODUCT_PUBLISH",
+   "PRICE_VIEW",
+   "PRICE_CONFIGURE",
+   "EVENT_CONFIGURE",
+   "PERFORMANCE_CONFIGURE",
+   "CAPACITY_CONFIGURE",
+   "ORDER_VIEW",
+   "ORDER_VIEW_OTHER",
+   "ORDER_CREATE",
+   "ORDER_MODIFY",
+   "ORDER_DISCOUNT",
+   "ORDER_CANCEL",
+   "ORDER_VOID",
+   "ORDER_REFUND",
+   "ORDER_REFUND_APPROVE",
+   "ORDER_REFUND_BULK",
+   "ORDER_EXCHANGE",
+   "ORDER_RESCHEDULE",
+   "ORDER_REPRINT",
+   "PRICE_OVERRIDE",
+   "DISCOUNT_APPLY",
+   "CREDIT_MANAGE",
+   "CREDIT_OVERRIDE",
+   "WALLET_VIEW",
+   "WALLET_OPERATE",
+   "WALLET_CONFIGURE",
+   "PAYMENT_VIEW",
+   "PAYMENT_CONFIGURE",
+   "PAYMENT_PROVIDER_MANAGE",
+   "PAYMENT_DISPUTE",
+   "SHIFT_OPEN",
+   "SHIFT_CLOSE",
+   "SHIFT_SUSPEND",
+   "SHIFT_CLOSE_OTHER",
+   "SHIFT_APPROVE_OPEN",
+   "SHIFT_APPROVE_CLOSE",
+   "SHIFT_REOPEN",
+   "CASH_LIFT",
+   "CASH_ADD",
+   "CASH_NO_SALE",
+   "DEPOSIT_BOX_MODIFY_OWN",
+   "DEPOSIT_BOX_MODIFY_OTHER",
+   "OVERSHORT_ACCEPT",
+   "ACCESS_VALIDATE",
+   "ACCESS_OVERRIDE",
+   "ACCESS_POINT_CONFIGURE",
+   "TURNSTILE_MODE_SET",
+   "TICKET_LOOKUP",
+   "ACCREDITATION_VIEW",
+   "ACCREDITATION_APPLY",
+   "ACCREDITATION_APPROVE",
+   "ACCREDITATION_ISSUE",
+   "ACCREDITATION_MANAGE",
+   "ACCREDITATION_CONFIGURE",
+   "REPORT_VIEW_OWN",
+   "REPORT_VIEW_WORKSTATION",
+   "REPORT_VIEW_VENUE",
+   "REPORT_VIEW_REGION",
+   "REPORT_VIEW_TENANT",
+   "REPORT_EXPORT",
+   "REPORT_EXPORT_PII",
+   "REPORT_MANAGE",
+   "REPORT_SCHEDULE",
+   "LEDGER_VIEW",
+   "LEDGER_POST",
+   "LEDGER_APPROVE",
+   "TAX_CONFIGURE",
+   "ACCOUNT_CONFIGURE",
+   "SETTLEMENT_VIEW",
+   "SETTLEMENT_RECONCILE",
+   "GUEST_VIEW",
+   "GUEST_VIEW_PII",
+   "GUEST_MANAGE",
+   "VENUE_MAP_VIEW",
+   "VENUE_MAP_MANAGE",
+   "VENUE_MAP_PUBLISH",
+   "RESOURCE_VIEW",
+   "RESOURCE_BOOK",
+   "RESOURCE_MANAGE",
+   "RESOURCE_CONFIGURE",
+   "RENTAL_VIEW",
+   "RENTAL_BOOK",
+   "RENTAL_OPERATE",
+   "RENTAL_MANAGE",
+   "RENTAL_CONFIGURE",
+   "RENTAL_PRICE",
+   "RENTAL_APPROVE",
+   "RENTAL_OVERRIDE",
+   "DEVELOPER_VIEW",
+   "DEVELOPER_MANAGE",
+   "DEVELOPER_ADMIN",
+   "LOYALTY_ACCRUE",
+   "LOYALTY_REDEEM",
+   "LOYALTY_ADJUST",
+   "MARKETING_VIEW",
+   "MARKETING_MANAGE",
+   "MARKETING_SEND",
+   "CASE_VIEW",
+   "CASE_MANAGE",
+   "ASSET_LIBRARY_VIEW",
+   "ASSET_LIBRARY_MANAGE",
+   "ASSET_LIBRARY_APPROVE",
+   "ASSET_LIBRARY_SHARE",
+   "QUEUE_VIEW",
+   "QUEUE_MANAGE",
+   "QUEUE_REDEEM",
+   "QUEUE_OVERRIDE",
+   "TRANSPORT_VIEW",
+   "TRANSPORT_MANAGE",
+   "TRANSPORT_PRICE",
+   "ASSET_VIEW",
+   "ASSET_MANAGE",
+   "WORK_ORDER_VIEW",
+   "WORK_ORDER_MANAGE",
+   "WORK_ORDER_VERIFY",
+   "INSPECTION_VIEW",
+   "INSPECTION_SUBMIT",
+   "INSPECTION_MANAGE",
+   "INCIDENT_REPORT",
+   "INCIDENT_VIEW",
+   "INCIDENT_MANAGE",
+   "KIOSK_ATTEND",
+   "DEVICE_VIEW",
+   "DEVICE_CONFIGURE",
+   "DEVICE_MANAGE",
+   "APPROVAL_ACT",
+   "APPROVAL_DELEGATE",
+   "AI_USE",
+   "AI_CONFIGURE",
+   "AI_APPROVE",
+   "AI_AUDIT_VIEW",
+   "RISK_REVIEW",
+   "RISK_INVESTIGATE",
+   "AUDIT_VIEW",
+   "APPROVAL_VIEW",
+   "APPROVAL_REQUEST",
+   "APPROVAL_DECIDE",
+   "APPROVAL_CONFIGURE",
+   "MAINTENANCE_EXECUTE",
+   "MAINTENANCE_APPROVE",
+   "WORKFORCE_VIEW",
+   "WORKFORCE_MANAGE",
+   "ATTENDANCE_RECORD",
+   "ANNOUNCEMENT_PUBLISH",
+   "ANNOUNCEMENT_EMERGENCY",
+   "PARTNER_VIEW",
+   "PARTNER_MANAGE",
+   "PARKING_CONFIGURE",
+   "PAYMENT_VOID",
+   "PROCUREMENT_VIEW",
+   "PROCUREMENT_REQUEST",
+   "PROCUREMENT_MANAGE",
+   "PROCUREMENT_RECEIVE",
+   "CORE_AI_PUBLISH",
+   "TICKETING_AI_PUBLISH",
+   "ACCESS_AI_PUBLISH",
+   "FNB_AI_PUBLISH",
+   "RETAIL_AI_PUBLISH",
+   "INVENTORY_AI_PUBLISH",
+   "SEATING_AI_PUBLISH",
+   "MEMBERSHIP_AI_PUBLISH",
+   "MARKETING_AI_PUBLISH",
+   "RESOURCES_AI_PUBLISH",
+   "QUEUE_AI_PUBLISH",
+   "TRANSPORT_AI_PUBLISH",
+   "GAMES_AI_PUBLISH",
+   "MAINTENANCE_AI_PUBLISH",
+   "ACCREDITATION_AI_PUBLISH",
+   "PARTNER_AI_PUBLISH",
+   "ANALYTICS_AI_PUBLISH",
+   "BIOMETRIC_IMAGE_VIEW",
+   "ACCESS_DIRECTION_SET",
+   "REPORT_GOVERNANCE_MANAGE"
+  ]
+ },
+ "PermissionSet": {
+  "type": "array",
+  "items": {
+   "$ref": "#/components/schemas/Permission"
+  },
+  "uniqueItems": true
  },
  "Principal": {
   "x-ticvai-persistence": "identity.principal",
@@ -1642,7 +1984,14 @@
    "isSystem": {
     "type": "boolean",
     "default": false,
-    "description": "**Seeded roles ship and are editable; deleting one is refused.** A venue that removes `cashier` and rebuilds it has two roles with one name in the audit log.\n**The seeded system roles are Cashier, Supervisor, Venue Manager, Finance and Tenant Admin** (proposed in `docs/active/seed-data-proposal.md` section 2, client to correct; audit R229).\n"
+    "description": "**Seeded roles ship and are editable; deleting one is refused.** A venue that removes `cashier` and rebuilds it has two roles with one name in the audit log.\n**The seeded system roles are Cashier, Supervisor, Venue Manager, Finance and Tenant Admin** (proposed in `docs/active/seed-data-proposal.md` section 2, client to correct; audit R229).\n\n**Superseded 2 October 2026: no fixed default roles** (Chinmay; DEC-007; CHG-CSP-003). The five are presets (`CapabilityTemplate`, `isPreset`) a role starts from, not roles a tenant is given. The field stays for clients built at r1 and is false on every role created from 2 October.\n"
+   },
+   "presetCode": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "maxLength": 64,
+    "description": "**The preset this role was started from, for the record only** (decided 2 October 2026, Chinmay; DEC-007; CHG-CSP-003): the first of `createRole.presetCodes`, or null for a role ticked by hand. It binds nothing; a later edit of the preset never changes this role.\n"
    },
    "principalCount": {
     "type": "integer"
@@ -1783,6 +2132,113 @@
    "noShow"
   ]
  },
+ "ScopeLevel": {
+  "type": "string",
+  "description": "**The eight organisational levels, plus `subject`.** Restored 24 August.\n`tenancy.yaml` holds the authoritative definition of the eight levels and this mirrors them so a contract can reference a level without depending on the whole tenancy surface. **Seven organisational levels plus `outlet`** — a commercial branch beside the organisational one (CF-138, ADR-0018). **A department has requisitions and rotas; an outlet has a menu and stock**, and modelling a restaurant as a department would put it in the staffing tree.\n\n**`subject` is the one value tenancy does not have, and it is not a level.** It is here because `check-package` reads this enum as the closed vocabulary for `x-ticvai-scope-level`, and some operations act on one guest's own resources, which sit in no node of the venue hierarchy. So `subject` is valid as an operation's scope level and never as a `ScopeRef.level`: every `ScopeRef` is a row of `platform.scope`, and those carry one of the eight.\n",
+  "enum": [
+   "tenant",
+   "brand",
+   "region",
+   "venue",
+   "department",
+   "subDepartment",
+   "workstation",
+   "outlet",
+   "subject"
+  ]
+ },
+ "ScopedPermissions": {
+  "type": "object",
+  "description": "Permissions effective at a given scope path, after deny resolution. Clients filter navigation on this and never compute permissions themselves.\n",
+  "required": [
+   "scopePath",
+   "permissions"
+  ],
+  "properties": {
+   "scopePath": {
+    "type": "string",
+    "pattern": "^[a-z0-9_]+(\\.[a-z0-9_]+)*$"
+   },
+   "permissions": {
+    "$ref": "#/components/schemas/PermissionSet"
+   }
+  }
+ },
+ "Session": {
+  "type": "object",
+  "required": [
+   "sessionId",
+   "principalId",
+   "roleId",
+   "scope",
+   "effectivePermissions"
+  ],
+  "properties": {
+   "sessionId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "principalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "roleId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "displayName": {
+    "type": "string"
+   },
+   "scope": {
+    "type": "array",
+    "description": "Scope nodes this session may act within, resolved once at login from the ltree hierarchy with deny-overrides-allow. Clients filter navigation against this — they never compute it.\n",
+    "items": {
+     "$ref": "../shared/common.yaml#/components/schemas/ScopeRef"
+    }
+   },
+   "effectivePermissions": {
+    "allOf": [
+     {
+      "$ref": "../shared/permissions.yaml#/components/schemas/PermissionSet"
+     }
+    ],
+    "description": "Flattened set across all granted scopes, after deny resolution. Convenience for coarse checks. Anything scope-sensitive must use `permissionsByScope`.\n"
+   },
+   "permissionsByScope": {
+    "type": "array",
+    "description": "Permissions effective at each granted scope path. Clients filter navigation on this and never compute permissions themselves.\n",
+    "items": {
+     "$ref": "../shared/permissions.yaml#/components/schemas/ScopedPermissions"
+    }
+   },
+   "saleBoardId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "Landing surface, derived from the WORKSTATION, not the role (12 Aug 2026 §3). Ticketing, F&B or Retail board.\n\n**Optional since 2 October 2026: only a till session carries it** (Chinmay, door follow-ups; CHG-CSP-002; breaking change against r1 approved as BC-001 to BC-005 in `docs/active/breaking-changes.yaml`). A browser door (ADM-001, SUP-001, PTR-001) and a staff handheld (EMP-001) sign in with no workstation since CHG-DOOR-001, so they have no board to land on and the field is absent. On a till it is the workstation's effective board: the outlet's board unless the till overrides it (`tenancy.Workstation.saleBoardSource`; CHG-CSP-006). A client reads its landing from this field when present and from its own platform otherwise.\n"
+   },
+   "workstation": {
+    "$ref": "#/components/schemas/WorkstationContext"
+   },
+   "openedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "SessionStatus": {
+  "type": "string",
+  "description": "**The life of one signed-in session, which is not the life of a shift.** A shift holds the float and survives a break; a session holds the person and does not. `ShiftStatus.suspended` is where a break lives — *break cover; float intact, workstation released* — and the release of the workstation is exactly why the session ends rather than pausing: the next person opens their own.\n**One principal, one active session per workstation.** Enforced by the `ActiveSession` registry rather than by a state, because it is a fact about the set of sessions and not about any one of them.\n",
+  "enum": [
+   "active",
+   "signedOut",
+   "terminated",
+   "expired"
+  ]
+ },
  "SuggestionBasis": {
   "type": "string",
   "description": "**How the answer was reached, and this is the field the whole design exists for.**\nA venue must be able to see that today's price suggestion is a margin rule and next quarter's is a trained model — **the same operation, the same screen, a different basis** — and a screen that cannot say which is a screen that asks a manager to trust arithmetic it will not show.\n**Swapping a heuristic for a model is a provider change, not a contract change.** That is the point of the abstraction: the frontend, the audit record and the outcome capture all stay exactly as they are.\n",
@@ -1793,6 +2249,51 @@
    "hybrid",
    "manual"
   ]
+ },
+ "TrainingRecord": {
+  "type": "object",
+  "x-ticvai-persistence": "workforce.training_record",
+  "description": "**Drafted 4 September.** One person, one course, one outcome. **The field that matters is the expiry** - a lapsed food-safety or first-aid certificate is a person who may not work a station, and a list without it is a list nobody can roster from.",
+  "required": [
+   "id"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "principalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "courseName": {
+    "type": "string"
+   },
+   "required": {
+    "type": "boolean"
+   },
+   "completedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "state": {
+    "type": "string",
+    "enum": [
+     "notStarted",
+     "inProgress",
+     "passed",
+     "failed",
+     "expired"
+    ]
+   },
+   "evidenceRef": {
+    "type": "string"
+   }
+  }
  },
  "WorkforceJobTitle": {
   "type": "object",
@@ -1904,6 +2405,92 @@
    "createdAt": {
     "type": "string",
     "format": "date-time"
+   }
+  }
+ },
+ "WorkstationContext": {
+  "type": "object",
+  "required": [
+   "id",
+   "code",
+   "venueId",
+   "regionId"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "regionId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "accessPointId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "Inherited from the workstation, never selected by the operator."
+   },
+   "devices": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "kind",
+      "driver"
+     ],
+     "properties": {
+      "kind": {
+       "type": "string",
+       "enum": [
+        "receiptPrinter",
+        "ticketPrinter",
+        "cashDrawer",
+        "barcodeScanner",
+        "rfidReader",
+        "paymentTerminal",
+        "customerDisplay"
+       ]
+      },
+      "driver": {
+       "type": "string"
+      },
+      "identifier": {
+       "type": "string"
+      }
+     }
+    }
+   },
+   "currency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$"
+   },
+   "currencyScale": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 4
+   },
+   "timezone": {
+    "type": "string"
+   },
+   "cellName": {
+    "type": "string",
+    "description": "The cell serving this workstation's region. One cell per tenant per region (ADR-0014). A client uses this only for diagnostics and telemetry tagging — never for routing, which the Control Plane resolves.\n"
+   },
+   "deploymentProfile": {
+    "type": "string",
+    "enum": [
+     "terminalLocal",
+     "venueEdge",
+     "thin"
+    ],
+    "description": "Whether this surface reads catalogue locally (ADR-0013). Determines which flows the client enables offline.\n"
    }
   }
  }

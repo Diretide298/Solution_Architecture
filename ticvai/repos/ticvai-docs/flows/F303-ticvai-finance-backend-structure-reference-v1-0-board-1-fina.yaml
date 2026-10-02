@@ -1,0 +1,59 @@
+id: F303
+name: 'TICVAI Finance Backend Structure Reference v1.0 board 1: Finance Dashboard'
+actor: venueManager
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P08 Venue Management
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as TICVAI Finance Backend Structure Reference v1.0 board 1.
+    **This route is read from the screens' own navigation**, and the reason anyone walks it has still
+    to be written.
+  entryScreen: BO-1081
+  entryPoints:
+  - Arrives at Finance Dashboard
+steps:
+- step: 1
+  screen: BO-1081
+  action: Opens Finance Dashboard
+  operations:
+  - getKpiValues
+  - getUnifiedReconciliation
+  - listTaxInvoices
+  - listCreditMemos
+  outcome: Finance Dashboard
+- step: 2
+  screen: ANL-072
+  action: Works in Finance Dashboard
+  operations:
+  - getKpiValues
+  - getUnifiedReconciliation
+  - listTaxInvoices
+  - listCreditMemos
+  outcome: 'The finance team''s one-glance position for one legal entity and one period: the six finance
+    measures as separate tiles, where the money stands, and the health of tax documents.'
+branches:
+- at: 1
+  condition: Nothing has been set up on Finance Dashboard yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on TICVAI Finance Backend Structure Reference v1.0 board 1 visited
+primaryContract: finance
+contracts:
+- finance
+- reporting

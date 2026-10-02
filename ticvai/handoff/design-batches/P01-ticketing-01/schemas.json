@@ -151,6 +151,13 @@
    }
   }
  },
+ "ExchangeRateDecimal": {
+  "type": "string",
+  "x-ticvai-persistence-kind": "valueObject",
+  "x-ticvai-persistence-column": "numeric(18,6)",
+  "description": "**An exchange rate: a decimal string, never a float**, for the reason `Money.amount` is one — a JavaScript client must not round a rate in transit. **Six decimal places**, the precision `finance.FxRate.rate` asks for, and stored at that precision.\n",
+  "pattern": "^\\d+(\\.\\d{1,6})?$"
+ },
  "FnbReservationTable": {
   "type": "object",
   "x-ticvai-persistence": "fnb.reservation_table",
@@ -252,6 +259,12 @@
     "nullable": true,
     "readOnly": true,
     "description": "When the rate was pulled. **Distinct from `effectiveFrom`**, which is when it applies — a rate fetched at 06:00 for a business day starting at 00:00 has two different times and conflating them makes a late feed look like a backdated rate."
+   },
+   "chargeable": {
+    "type": "boolean",
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "With `venueId`, true where a guest may select this currency and pay in it at that venue (`tenancy.VenueSettings.chargeCurrencies`), false where it is shown as an approximate price only (CHG-FIN-001)."
    }
   }
  },
@@ -640,6 +653,46 @@
    "refundedAmount": {
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
+   "chargeCurrency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**The currency the guest selected and is charged in** (CHG-FIN-001, 2 October 2026). Null or equal to `currency` for a sale in the base currency. Everything else on the order, and every ledger posting, stays in the base currency `currency`."
+   },
+   "chargeFxRate": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/ExchangeRateDecimal"
+     }
+    ],
+    "nullable": true,
+    "readOnly": true,
+    "description": "Units of `chargeCurrency` per one unit of the base currency, from the region's `tender` rate in force at checkout (`finance.FxRate`), stored on the order so the payment, the receipt, the tax invoice and any refund use the same rate (CHG-FIN-001)."
+   },
+   "chargeFxRateId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The `finance.FxRate` row the rate was taken from, for audit."
+   },
+   "chargeTotal": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "readOnly": true,
+    "description": "`grossAmount` converted at `chargeFxRate` and rounded to the charge currency's scale: what the guest pays and what the payment request to the provider asks for (CHG-FIN-001)."
+   },
+   "chargeRateLockedUntil": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The quote holds until then (the cart lease). After it, the next payment attempt re-quotes at the rate then in force and the guest confirms the new amount (CHG-FIN-001)."
+   },
    "droppedPromotions": {
     "type": "array",
     "readOnly": true,
@@ -926,7 +979,7 @@
     "type": "string",
     "pattern": "^[A-Z]{3}$",
     "nullable": true,
-    "description": "4.6.11 is deliberately asymmetric: **accept foreign currency, refund in local.** A till giving change in five currencies needs five floats and five counts, and the variance becomes unattributable.\n"
+    "description": "4.6.11 is deliberately asymmetric: **accept foreign currency, refund in local.** A till giving change in five currencies needs five floats and five counts, and the variance becomes unattributable.\n**Cash at a till only** (CHG-FIN-001, 2 October 2026). A card or wallet payment the guest made in a currency they selected is refunded in that currency (`Refund.tenderCurrency`).\n"
    },
    "amount": {
     "$ref": "../shared/common.yaml#/components/schemas/Money"
@@ -1692,9 +1745,32 @@
    },
    "notes": {
     "type": "string",
-    "description": "Allergies",
-    "occasion": null,
-    "accessibility.": null
+    "description": "Allergies, accessibility needs and other requests, as the guest wrote them."
+   },
+   "seatingPreference": {
+    "type": "string",
+    "maxLength": 64,
+    "nullable": true,
+    "description": "**The seating area the guest asked for**, e.g. indoor, terrace, majlis (Chinmay, 2 October, workbook Q204; DI-791; CHG-CSA-018). The outlet's own area names, as the waitlist's `RestaurantWaitlist.seatingPreference` takes them. A preference, not a table: the host seats the party on the night."
+   },
+   "occasion": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "birthday",
+     "anniversary",
+     "business",
+     "celebration",
+     "other"
+    ],
+    "description": "The occasion the guest named (workbook Q204, DI-337; CHG-CSA-018). Shown to the host and the server; never a price."
+   },
+   "takenByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The staff member who took the booking (`createTableReservationForGuest`); null for a guest's own booking (CHG-CSA-045)."
    },
    "actualPartySize": {
     "type": "integer",

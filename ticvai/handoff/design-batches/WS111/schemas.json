@@ -1,4 +1,66 @@
 {
+ "AccreditationAuditRecord": {
+  "type": "object",
+  "x-ticvai-persistence": "accreditation.audit",
+  "description": "Board 8.7. **Who gave this person access to that place, when, and on whose authority.**\n",
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "at": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "holderId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "action": {
+    "type": "string"
+   },
+   "actorPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "previousValue": {
+    "nullable": true
+   },
+   "newValue": {
+    "nullable": true
+   },
+   "reason": {
+    "type": "string",
+    "nullable": true
+   },
+   "approvalRequestId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "previousRecordHash": {
+    "type": "string",
+    "nullable": true
+   },
+   "recordHash": {
+    "type": "string"
+   },
+   "integrity": {
+    "type": "string",
+    "readOnly": true,
+    "enum": [
+     "intact",
+     "broken",
+     "unverifiable"
+    ]
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
  "AccreditationCredential": {
   "type": "object",
   "x-ticvai-persistence": "accreditation.credential",
@@ -183,6 +245,105 @@
    }
   }
  },
+ "AccreditationHolder": {
+  "type": "object",
+  "x-ticvai-persistence": "accreditation.holder",
+  "description": "**A subject who may never sign in to anything.** `identity` owns principals; this owns accredited people.\n",
+  "required": [
+   "id",
+   "fullName"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "accreditationNumber": {
+    "type": "string"
+   },
+   "fullName": {
+    "type": "string"
+   },
+   "photoAssetId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "dateOfBirth": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "nationality": {
+    "type": "string",
+    "nullable": true
+   },
+   "email": {
+    "type": "string",
+    "format": "email",
+    "nullable": true,
+    "description": "12.1.16. The holder's own address — where a mobile credential and renewal notices go"
+   },
+   "phone": {
+    "type": "string",
+    "nullable": true,
+    "description": "12.1.16. E.164"
+   },
+   "identityDocumentVerified": {
+    "type": "boolean",
+    "default": false
+   },
+   "organisationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "affiliationRole": {
+    "type": "string",
+    "nullable": true
+   },
+   "programmeId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "categoryCode": {
+    "type": "string",
+    "nullable": true
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "active",
+     "suspended",
+     "revoked",
+     "expired",
+     "archived"
+    ]
+   },
+   "validFrom": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "validTo": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "completenessPercent": {
+    "type": "integer",
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
  "BadgePrintJob": {
   "type": "object",
   "x-ticvai-persistence": "accreditation.print_job",
@@ -302,354 +463,6 @@
    },
    "scopePath": {
     "type": "string"
-   }
-  }
- },
- "CredentialGenerationIssuanceMonitorView": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
-  "description": "**What Credential Generation & Issuance Monitor displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
-  "properties": {
-   "trigger": {
-    "type": "string",
-    "enum": [
-     "orderConfirmation",
-     "ticketIssuance",
-     "membershipActivation",
-     "customerRequest",
-     "staffAction",
-     "rfidCollection",
-     "walletRequest",
-     "faceEnrollment",
-     "api",
-     "bulkOperation",
-     "scheduledProcess"
-    ],
-    "description": "What triggered generation"
-   },
-   "requestId": {
-    "type": "string",
-    "description": "Request ID"
-   },
-   "virtualTicket": {
-    "type": "string",
-    "description": "Virtual Ticket"
-   },
-   "media": {
-    "type": "string",
-    "description": "Media"
-   },
-   "template": {
-    "type": "string",
-    "description": "Template"
-   },
-   "templateVersion": {
-    "type": "string",
-    "description": "Template Version"
-   },
-   "product": {
-    "type": "string",
-    "description": "Product"
-   },
-   "customer": {
-    "type": "string",
-    "description": "Customer"
-   },
-   "provider": {
-    "type": "string",
-    "description": "Provider"
-   },
-   "requestedAt": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Requested At"
-   },
-   "generatedAt": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Generated At"
-   },
-   "status": {
-    "type": "string",
-    "enum": [
-     "requested",
-     "queued",
-     "templateResolved",
-     "dataMapped",
-     "credentialGenerated",
-     "bound",
-     "ready",
-     "delivered",
-     "failed"
-    ],
-    "description": "Generation stage"
-   },
-   "error": {
-    "type": "string",
-    "description": "Error"
-   },
-   "brand": {
-    "type": "string",
-    "description": "Brand"
-   },
-   "venue": {
-    "type": "string",
-    "description": "Venue"
-   },
-   "event": {
-    "type": "string",
-    "description": "Event"
-   },
-   "channel": {
-    "type": "string",
-    "description": "Channel"
-   },
-   "language": {
-    "type": "string",
-    "description": "Language"
-   },
-   "customerContext": {
-    "type": "string",
-    "description": "Customer context"
-   },
-   "failureReason": {
-    "type": "string",
-    "enum": [
-     "templateMissing",
-     "requiredDataMissing",
-     "providerUnavailable",
-     "invalidPayload",
-     "tokenGenerationFailure",
-     "walletGenerationFailure",
-     "encoderUnavailable"
-    ],
-    "description": "Failure category when status is failed"
-   }
-  }
- },
- "CredentialOperationsCommandCenterView": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
-  "description": "**What Credential Operations Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
-  "properties": {
-   "virtualTicketId": {
-    "type": "string",
-    "description": "Virtual Ticket ID"
-   },
-   "credentialId": {
-    "type": "string",
-    "description": "Credential ID"
-   },
-   "mediaType": {
-    "type": "string",
-    "description": "Media Type"
-   },
-   "customerParticipant": {
-    "type": "string",
-    "description": "Customer / Participant"
-   },
-   "product": {
-    "type": "string",
-    "description": "Product"
-   },
-   "event": {
-    "type": "string",
-    "description": "Event"
-   },
-   "credentialStatus": {
-    "type": "string",
-    "enum": [
-     "pendingGeneration",
-     "generated",
-     "pendingActivation",
-     "active",
-     "suspended",
-     "revoked",
-     "expired",
-     "failed"
-    ],
-    "description": "Credential status"
-   },
-   "deliveryStatus": {
-    "type": "string",
-    "enum": [
-     "notRequired",
-     "pending",
-     "sent",
-     "delivered",
-     "openedDownloaded",
-     "completed",
-     "failed",
-     "bounced",
-     "expired",
-     "cancelled"
-    ],
-    "description": "Delivery status (15.3.4)"
-   },
-   "activationStatus": {
-    "type": "string",
-    "enum": [
-     "pending",
-     "scheduled",
-     "active",
-     "notRequired"
-    ],
-    "description": "Activation status"
-   },
-   "bindingStatus": {
-    "type": "string",
-    "enum": [
-     "pending",
-     "bound",
-     "unbound",
-     "failed"
-    ],
-    "description": "Binding status"
-   },
-   "provider": {
-    "type": "string",
-    "description": "Provider"
-   },
-   "lastActivity": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Last Activity"
-   },
-   "exception": {
-    "type": "string",
-    "description": "Exception"
-   },
-   "owner": {
-    "type": "string",
-    "description": "Owner"
-   }
-  }
- },
- "CredentialOperationsCommandCenterViewSummary": {
-  "type": "object",
-  "x-ticvai-persistence": "none - aggregate computed at read time over the rows the page lists",
-  "description": "The KPI tiles shown above the list on this screen. Computed over the whole filtered set, not the current page (decided 29 September, readiness close-out).",
-  "properties": {
-   "virtualTicketsIssued": {
-    "type": "integer",
-    "description": "Virtual Tickets Issued"
-   },
-   "credentialsGenerated": {
-    "type": "integer",
-    "description": "Credentials Generated"
-   },
-   "activeCredentials": {
-    "type": "integer",
-    "description": "Active Credentials"
-   },
-   "pendingGeneration": {
-    "type": "integer",
-    "description": "Pending Generation"
-   },
-   "pendingDelivery": {
-    "type": "integer",
-    "description": "Pending Delivery"
-   },
-   "pendingBinding": {
-    "type": "integer",
-    "description": "Pending Binding"
-   },
-   "pendingActivation": {
-    "type": "integer",
-    "description": "Pending Activation"
-   },
-   "suspended": {
-    "type": "integer",
-    "description": "Suspended"
-   },
-   "revoked": {
-    "type": "integer",
-    "description": "Revoked"
-   },
-   "expired": {
-    "type": "integer",
-    "description": "Expired"
-   },
-   "failedGeneration": {
-    "type": "integer",
-    "description": "Failed Generation"
-   },
-   "failedDelivery": {
-    "type": "integer",
-    "description": "Failed Delivery"
-   },
-   "synchronizationExceptions": {
-    "type": "integer",
-    "description": "Synchronization Exceptions"
-   },
-   "multiMediaVirtualTickets": {
-    "type": "integer",
-    "description": "Multi-Media Virtual Tickets"
-   },
-   "virtualTicketsWithoutActiveMedia": {
-    "type": "integer",
-    "description": "Virtual Tickets Without Active Media"
-   },
-   "dynamicQr": {
-    "type": "integer",
-    "description": "Credentials of this media type"
-   },
-   "barcode": {
-    "type": "integer",
-    "description": "Credentials of this media type"
-   },
-   "pdf": {
-    "type": "integer",
-    "description": "Credentials of this media type"
-   },
-   "appleWallet": {
-    "type": "integer",
-    "description": "Credentials of this media type"
-   },
-   "googleWallet": {
-    "type": "integer",
-    "description": "Credentials of this media type"
-   },
-   "rfid": {
-    "type": "integer",
-    "description": "Credentials of this media type"
-   },
-   "nfc": {
-    "type": "integer",
-    "description": "Credentials of this media type"
-   },
-   "faceRecognitionReference": {
-    "type": "integer",
-    "description": "Credentials of this media type"
-   },
-   "card": {
-    "type": "integer",
-    "description": "Credentials of this media type"
-   },
-   "wristband": {
-    "type": "integer",
-    "description": "Credentials of this media type"
-   }
-  }
- },
- "Page": {
-  "type": "object",
-  "required": [
-   "items",
-   "hasMore"
-  ],
-  "properties": {
-   "items": {
-    "type": "array",
-    "items": {}
-   },
-   "nextCursor": {
-    "type": "string"
-   },
-   "hasMore": {
-    "type": "boolean"
    }
   }
  }

@@ -1,6 +1,6 @@
 # WS80 — Game and Ride board 3
 
-**10 screens · 16 operations · 13 schemas · 5 permissions**
+**10 screens · 17 operations · 13 schemas · 5 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -61,6 +61,70 @@ convincingly. It is never a caption.
   and its error; and, element by element, what is shown and in what format, what each action
   produces and where the user goes next. Draw exactly that.
 
+## The processes these screens belong to
+
+Written by the owner of each process (`handoff/design-notes/`). Read before any screen: it says how the process runs end to end and which words the screens must use.
+
+### Ticketing & Guest Commerce, as the venue and TICVAI configure and run it
+
+WHAT THE PROCESS IS. Everything a guest can buy is set up, priced, promoted and serviced here, on Venue Management (P08, the venue's own back office, served inside the venue's cell) and on the TICVAI Console (P09, TICVAI's control plane, outside every cell). End to end: (1) CATALOGUE. A product has one of twelve kinds (admission, timedAdmission, datedAdmission, openDated, seated, membership, bundle, fnb, retail, rental, addOn, giftCard). Its ticket types (adult, child, senior, resident...) are not typed one by one: they are generated from the product's attributes (components) and each value combination becomes a sellable ticket type with no extra setup (DI-164). What a ticket grants (validity, entries, re-entry, days of week, blackout dates, expiry anchor, fast track, transfer) lives on a reusable entitlement template, not on the product. Who may take part (age, height, supervision, certification) is the eligibility rule; what the guest must answer is the data mask and the consent questions; how the guest sees it is guestListing (bookable, infoOnly, hidden), display tags (at most six), media and the booking flow. Group, family and corporate products and every after-sales policy (reschedule, exchange, refund, cancellation, upgrade, transfer) are configured inside the one product configuration, never on separate screens (DI-465, DI-466). (2) LIFECYCLE AND PUBLICATION. A product moves draft, inReview, approved, live, withdrawn, archived. Approval and publication are two acts with two permissions (PRODUCT_APPROVE, PRODUCT_PUBLISH, R091); every product is authorised before it sells online or on site (DI-438). Approved is still not on a till: a till sells only what is in the signed catalogue release it pulled (publishBundle, ADR-0013), so a saved price is a back-office fact until the venue publishes to tills. Changing something that has sold is preceded by an impact check (assessProductChange: orders affected, entitlements issued, future performances, open carts); restoring a version creates a new version, and sold tickets keep the price and terms they were sold under (restoreProductVersion, DI-938, TRACKER Actions row 145). (3) PRICE. Prices live in price lists: per venue, per channel set, with validity dates and a priority, copied for the next season with an uplift (copyPriceList) and repriced in bulk only after a dry run (bulkChangePrices). Currency and decimal scale are never chosen on a form: they resolve from the venue's region (ADR-0008, ADR-0018; AED 2 places, OMR and BHD 3). When several rules apply, the configured hierarchy decides; there is no "lowest price wins" default (DI-595). Tax on the pre-discount price and three-decimal rounding are regional settings (DI-598). Dynamic rules always show their minimum and maximum price guardrails beside the trigger (getDynamicPriceRule). (4) PROMOTE AND BUNDLE. A promotion is a rule (automatic, or gated by a code) created in draft, made live only by Publish, which first analyses stacking; a …
+*(source: DI-164; DI-171; DI-438; DI-465; DI-466; DI-595; DI-598; DI-387; DI-039; DI-044; DI-474; DI-671; DI-987; DI-019; DI-080; ADR-0008; ADR-0013; ADR-0018; ADR-0019; ADR-0030; R091; R098; R101; R222; REV3-21; contracts/spine/catalogue.yaml#transitionProductLifecycle …)*
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Product | Anything sellable, of one of the twelve kinds. The record that carries names, channels, listing, media and policies. | Item (except on F&B and retail screens), SKU (for tickets), Offering | contracts/spine/catalogue.yaml#/components/schemas/ProductKind |
+| Ticket type | One sellable variant of an admission or event product (Adult, Child, Resident Adult), generated from the product's attributes. For retail and F&B the same record is labelled Variant. | Variant (on ticket screens), Sub-product, Rate (that is a price), Axis value | contracts/spine/catalogue.yaml#updateProductVariant / DI-164 / DI-437 |
+| Attribute | A dimension that generates ticket types (Guest category, Residency, Tier, Length). Each has values; adding a value adds ticket types. | Axis, Component (the client's word; use it only in help text), Option | contracts/spine/catalogue.yaml#setProductAttributes / DI-164 / DI-450 |
+| Entitlement | What a ticket lets the holder do (validity, entries, re-entry, days, blackout dates, expiry, fast track, transfer), defined once on an entitlement template and shared by several products. | Access rights, Ticket rules, Validity profile | contracts/spine/catalogue.yaml#createEntitlementTemplate / DI-171 / DI-451 |
+| Eligibility rule | Who may take part in or buy a product (age, height, supervision, waiver, certification). Distinct from a promotion's eligibility, which decides who gets a discount. | Restriction, Access rule (that is access control) | contracts/spine/catalogue.yaml#setProductEligibilityRule / DI-463 |
+| Price list | A set of prices for one venue and a set of channels, valid between two dates, with a priority. Several coexist (B2C, B2B, season). | Price book, Rate card, Tariff | contracts/spine/catalogue.yaml#createPriceList / DI-140 / DI-163 |
+| Price category | A standard rate type (Adult, Child, Member) reused across lists so venues do not invent "Adult Standard" and "Normal Adult". | Price band (that is a seat-category band), Fare type (transport) | contracts/spine/catalogue.yaml#setPriceCategoryRateType / … |
+| Price band | A priced band on a seat category (code, label, colour, amount, channel, from-date). | Price category, Zone price | contracts/satellite/seating.yaml#/components/schemas/SeatPriceBand |
+| Promotion | A rule that changes a price automatically or when a code is entered; draft until published; declares how it stacks. | Offer (except in guest copy), Deal, Discount rule | contracts/satellite/promotions.yaml#createPromotion / DI-173 / DI-174 |
+| Coupon code | A code issued from a coupon campaign that applies a promotion-style discount; one shared code or many single-use codes. | Voucher, Promo voucher | contracts/satellite/promotions.yaml#createCouponCampaign / DI-173 |
+| Voucher | A code that carries money (face value, balance), sold or issued; a liability until redeemed or expired. | Coupon, Credit note | contracts/satellite/promotions.yaml#listVoucherBatches / … |
+| Bundle | A product sold as one line whose price differs from the sum of its components, with a mandatory revenue allocation. "Package" is acceptable in guest copy. | Combo (that is an F&B meal deal), Catalogue bundle | contracts/satellite/promotions.yaml#createBundle / DI-220 / ADR-0019 |
+| Catalogue release | The signed snapshot of a venue's catalogue, prices, promotions and sale boards that tills, kiosks and devices pull. Its action label is "Publish to tills". | Bundle, Catalogue bundle, Sync, Deploy | contracts/spine/catalogue.yaml#publishBundle / … |
+| Approve / Publish / Save | Save keeps a draft; Approve records that it is authorised (PRODUCT_APPROVE); Publish makes it live for guests and channels (PRODUCT_PUBLISH). Three different buttons, never merged. | Submit, Go live, Activate (except CatalogueConfigStatus active), Deploy | R091 / contracts/spine/catalogue.yaml#transitionProductLifecycle / DI-438 |
+| Product states | Draft, In review, Approved, Live, Withdrawn, Archived (ProductLifecycleState), always as coloured badges with these exact labels. | Published (for a product), Pending, Inactive (for a product) | contracts/spine/catalogue.yaml#/components/schemas/ProductLifecycleState |
+| Channel | Where something is sold. Labels: pos Point of sale; kiosk Kiosk; web and guestWeb Website; mobile and guestApp App; b2b B2B partners; partner Partner; ota Travel agents (OTA); callCentre Call centre; api API; backOffice Back office. | Touchpoint, Outlet (an outlet is a business inside a venue), raw enum values | contracts/spine/catalogue.yaml#/components/schemas/Channel / … |
+| Refund | Money returned after settlement, wholly or for some lines, under the venue's refund policy. | Return (that is retail goods), Reversal, Void | contracts/spine/orders.yaml#createRefund / DI-252 |
+| Void | Cancelling a whole order before settlement, within the same shift, with a reason from the void list. After settlement it is a refund. | Cancel order, Delete | contracts/spine/orders.yaml#voidOrder / R222 |
+| Exchange / Reschedule | Exchange swaps lines for other products or dates and settles only the difference; Reschedule is the same product moved to another date or time. | Rebook, Date change (acceptable only in guest copy), Refund and resell | contracts/spine/orders.yaml#exchangeOrderLines / … |
+| Hold / Capture / Release | A deposit or stored-value amount is held, then partly or fully captured, and the rest released. A held deposit is not a payment. | Charge, Pre-auth (in staff copy), Block funds | contracts/spine/orders.yaml#authoriseStoredValue / … |
+| Wallet (TICVAI wallet) | The guest's stored-value balance on TICVAI, spent by hold and capture. Distinct from the tender "Apple Pay / Google Pay", which the contract also calls wallet. | Digital wallet (for stored value), E-wallet, Credit (without a type) | contracts/spine/orders.yaml#/components/schemas/TenderKind / R080 |
+| Credit lot | One amount of wallet credit of one credit type (cash, bonus, gift) with its own expiry; lots are spent nearest expiry first and the guest sees the breakdown but cannot choose. | Bucket, Batch, Top-up | TRACKER Actions row 171 / contracts/satellite/wallet.yaml#expireCreditLots |
+| Venue map / Seat map | A venue map is the wayfinding map of a park or a floor (points, paths, bookable places); a seat map is the seating layout of an auditorium or stand. Never just "map" where both could be meant. | Layout (alone), Floor plan (unless it is a floor map), Map (alone) | contracts/satellite/venue-map.yaml#createVenueMap / … |
+| Point / Bookable place | A point is a place on a venue map (toilet, ride, restaurant, exit). A bookable place is a cabana, lounger, table or pitch placed on the map and sold through its price band. | Pin, POI, Marker, Resource (in staff copy) | contracts/satellite/venue-map.yaml#setVenuePoint / … |
+| Station / Route / Timetable / Departure / Fare table / Pass … | A route is an ordered list of stations with offsets; a timetable generates departures up to its release horizon; a fare table prices a route per passenger type; a pass type is a multi-trip or unlimited pass sold as a product. | Stop (except in the stop list), Line (except lineCode), Schedule, Trip (except a guest's journey) | contracts/satellite/transport.yaml / REV3-21 |
+| Applies from | The effective date of a change. Every dated change shows it, and sold items keep their old terms. | Effective date (in labels), Start date (for a change) | contracts/satellite/seating.yaml#updateSeatCategory / TRACKER Actions row 194 |
+
+### Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue)
+
+Venue operations is everything that happens after a sale and inside the gates. A guest's ticket is one virtual ticket with interchangeable media (QR, dynamic QR, RFID wristband, NFC, Face Pass or Face Tag); at an access point a scanner (P07, or the scan function inside the Staff App P06) validates the media against the admission profile and the guest admission policy, offline if it must, and every deny carries a reason and a next action. The back office (Venue Management P08) configures that estate: the venue topology (venue, park, zone, attraction, access point, gate and lane, device placement), admission profiles and rules (entry, exit, re-entry, anti-passback, validity, crossover, companions), credential security (dynamic QR, device binding, beacons), biometrics, gate modes, and the live operations, fraud and monitoring views. Accreditation (P08 setup and review, P11 web portal for applicants, web first) takes an applicant from a configurable form through document checks, OCR, duplicate blocking and multi-level approval to a credential with zone rights. Resources and capacity manage bookable resources (rooms, vehicles, equipment, cabanas, instructors) that are booked as a consequence of selling a product, never sold directly. Workforce covers shift templates, rosters, attendance, swaps and breaks, mirrored on the Staff App. Maintenance and safety cover the asset register, preventive calendars, work orders with scored priority, inspections and incidents, with technicians working from the Staff App. Games and rides configure readers, credit types and consumption priority, play entitlements, game pricing, retry pricing, redemption and the card lifecycle. The virtual queue (Q1) gives a guest a live wait time and a return window for a ride; it is not the on-sale waiting room (Q2). Every calendar has day, week and month views. Configuration resolves tenant, region, venue (outlet only for F&B and retail), and a user's permissions, never the device, decide what they may do. The guest apps (P01, P02) show the guest's side of this: My Tickets, the scan code, Face Pass, wait times, the virtual queue, map booking of cabanas and the visit planner.
+*(source: F06 step 1 / F112 step 1 / F111 step 1 / ADR-0002 / ADR-0012 / ADR-0018 / ADR-0041 / ADR-0066 / ADR-0067 / ADR-0068 / DI-652 / DI-627 / DI-640 / DI-654 / DI-666 / DI-482 / DI-483 / DI-907 / DI-919 / DI-923 / DI-865 / DI-678 / TRACKER Actions row 160 / MoM 2026-09-02 AccessControl / MoM 2026-09-07 …)*
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Ticket | The one virtual record a guest owns (ticket number, product, validity, entries). Its number never changes, whatever media carries it or whoever it is transferred or resold to. | Pass (unless the product is a pass), Booking, Order line | DI-652 / DI-620 / contracts/spine/access.yaml#/components/schemas/TicketStatus |
+| Media | What the ticket is presented by at a gate (QR code, dynamic QR, wristband/RFID card, NFC, Face Pass, Face Tag). One ticket can carry several media as fallbacks; a media code can also cover several tickets scanned as one group. Show one … | Credential (for guest media; keep Credential for accreditation badges and staff), Ticket code | DI-180 / DI-608 / DI-652 |
+| Access point | A place where a scan is judged, with a fixed direction (entry, exit, re-entry, crossover). Hierarchy shown to users is Venue > Park > Zone > Attraction > Access point > Gate/lane > Device. | Scanner (that is the device), Door | screens/P08-venue-back-office.yaml#BO-144 / … |
+| Admission profile | The named set of rules an access point enforces (opening window, entries, exit scan, re-entry, validity, crossover). Products point at a profile; tiers such as Bronze/Silver/Gold are profiles with gate allow and deny lists. | Admission rules (as a screen title), Access rule set | DI-185 / contracts/spine/access.yaml#/components/schemas/AdmissionRules |
+| Admitted / Denied / Overridden | The three scan outcomes. A denial is always shown with its reason in plain words and a next action; an override is a supervisor admitting despite a denial, and is always attributed and reasoned. | Valid/Invalid, Success/Fail, Error | contracts/spine/access.yaml#/components/schemas/ScanOutcome / … |
+| Used | A ticket entry is used the moment a scan succeeds, whether or not the guest physically passed. Mistakes are resolved from the scan history, not by un-scanning. | Redeemed (for admission), Checked in (that is group check-in, a different step) | DI-627 / TRACKER Actions row 221 / TRACKER Actions row 189 |
+| Gate mode | What a lane is doing now, set live by the podium or supervisor - Normal, Free flow (counts, does not validate), Drop arm (everybody through, evacuation), Closed (nobody through), Podium (staff validating by eye), Maintenance. Direction is … | Turnstile mode (as a label for direction), Open/Locked | contracts/spine/access.yaml#/components/schemas/AccessPointOperatingMode / R221 |
+| Offline package | What a scanner holds to validate with no network - entitlements, blacklist, admission profiles and the active guest admission policy version - with its age always visible. | Cache, Local DB | F06 step 3 / ADR-0068 |
+| Sync and reconciliation | Sending the offline scan journal to the server, and the duty manager's review of scans the server rejected after the device had already admitted the guest. | Upload, Retry | F06 step 6 / DI-065 |
+| Face Pass / Face Tag | Face Pass is the long-lived face credential for members and season-pass holders (renewable); Face Tag is short-lived, for one day or event. Retention is set per tier by the venue. | Face ID, Biometric login | DI-640 / ADR-0063 |
+| Accreditation / Credential (accreditation) | Accreditation is the application and approval of a person (media, contractor, corporate, staff of a partner) for an event or season; the credential is what is issued after approval (photo badge, QR or RFID) with zone access rights. | Registration (for the whole process), Ticket | DI-654 / DI-662 |
+| Resource | A bookable thing or person a product needs (room, vehicle, cabana, equipment set, instructor). Guests buy products; resources are assigned to the booking, pre-assigned or dynamically. | Asset (that is maintenance), Inventory (that is stock) | DI-475 / DI-482 / TRACKER Actions row 160 |
+| Asset | A physical item maintained by the venue (ride, turnstile, printer, pump) with a register record, documents, warranty and maintenance history. | Resource, Device (unless it is an IT device in the device register) | DI-910 / ADR-0067 |
+| Work order | A unit of maintenance work, lifecycle Created > Assigned > In progress > Review > Closed, with a resolution timer. | Ticket (reserved for guest tickets), Job card | DI-231 |
+| Game / attraction (games module) | In the games and rides module an attraction is an individual game or ride (roller coaster, racing game, bumper cars), not a venue. | Venue, Park | DI-863 |
+| Virtual queue / Return window | A guest's place in a ride's queue held without standing in line, with a return window (for example 4:50 to 5:00 PM) that recalculates live. Distinct from the walk-in line and the VIP/express lane, and from the on-sale waiting room. | Waiting room, Fast pass (that is the express product), Booking | DI-675 / DI-678 / DI-679 / ADR-0066 |
+| Wait time source | Where a ride's wait time comes from - Sensor, Throughput, Manual, or Unavailable - always shown beside the number. | Live (when the source is manual) | contracts/satellite/queue.yaml#/components/schemas/WaitTimeSource / DI-315 |
+
+
 ## The screens
 
 Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs count fields; requirements are matrix rows; meeting inputs are the ones naming the screen (the module and platform ones are below); white label says whether the tenant's brand reaches it (guest) or it sets the brand (configures).
@@ -70,12 +134,12 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-414` | Wallet & Credit Management Dashboard | B–D | 2 | 2 | 6 | 19 | 1 | 6 | — | notStarted (—) |
 | `BO-415` | Wallet & Credit Type Configuration | B–D | 10 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
 | `BO-416` | Wallet Account & Balance View | B–D | 0 | 0 | 6 | 18 | 1 | 6 | — | notStarted (—) |
-| `BO-417` | Top-Up Configuration | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-418` | Top-Up Bonus Rule Configuration | B–D | 0 | 0 | 6 | 0 | 2 | 0 | — | notStarted (—) |
+| `BO-417` | Top-Up Configuration | B–D | 0 | 20 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-418` | Top-Up Bonus Rule Configuration | B–D | 0 | 20 | 6 | 0 | 2 | 0 | — | notStarted (—) |
 | `BO-419` | Bonus Usage Restrictions | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-420` | Bonus Validity & Expiry Configuration | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-420` | Bonus Validity & Expiry Configuration | B–D | 0 | 14 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-421` | Free Game & Ride Credit Management | B–D | 8 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
-| `BO-422` | Refund, Adjustment & Manual Bonus Control | B–D | 0 | 0 | 6 | 1 | 1 | 6 | — | notStarted (—) |
+| `BO-422` | Refund, Adjustment & Manual Bonus Control | B–D | 0 | 15 | 6 | 28 | 1 | 6 | — | notStarted (—) |
 | `BO-423` | Wallet Credit Transaction Ledger & Audit | B–D | 0 | 0 | 6 | 3 | 1 | 6 | — | notStarted (—) |
 
 ## Thin screens in this batch
@@ -104,7 +168,13 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Opens with | `subjectId` (navigation) |
 | Route | `/games-rides/wallet-credit-management-dashboard-bo-414` |
 
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
+**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape … Contract gap recorded 2 October 2026 (CHG-WIR-027): A wallet operations dashboard read of aggregates across wallets (getWallet reads one guest wallet).
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Wallet balances, credit issuance, bonus use, free-game credits and top-ups across the games operation.
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- getWallet reads one guest wallet; a dashboard across the operation needs aggregates. (CHG-WIR-027)
 
 #### Inputs: what the user enters or picks
 
@@ -147,6 +217,10 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|---|
 | Top ups | text | not in the schema: `Top-Ups` |
 
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **activity**: KPIs then the transaction stream, newest first. *(source: contracts/satellite/wallet.yaml#listWalletTransactions)*
+
 **Where the user goes next**
 
 - → `BO-100` Venue Home: *Back to Venue Home*
@@ -170,6 +244,17 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the wallet credit are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+kpis:
+  topUpsToday: AED 48,200.00
+  bonusIssued: AED 6,100.00
+  freeGames: 820
+```
 
 #### Permissions
 
@@ -263,6 +348,12 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 
 **What the spec says about it.** **Superseded by `BO-1088` Credit & Balance Type Configuration** from `Wallet_Configuration_Backend_Structure_v1.0.pdf`, 19 September 2026. This screen came from `Game_and_Ride_Module.pdf`, which describes the wallet incidentally; the wallet pack is the workshop dedicated to it and is backed by the 27 August MoM and matrix 4.3.28-4.3.35. It has zero components, so nothing rendered is lost. Not `source.sameAs` - that means twin, and these are not copies of each other.
 
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** The kinds of value a wallet may hold (cash, bonus, free game, redemption, refund, promotional), created by configuration without a release.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **List operation(s) listCreditTypes return a bare array, not the paged list envelope (items, nextCursor, hasMore).** Why: The table cannot page, and a row without an id cannot open, edit or link to the record it summarises. *(source: contracts/satellite/wallet.yaml#listCreditTypes; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
+
 #### Inputs: what the user enters or picks
 
 **On the screen**
@@ -279,6 +370,10 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | Validity Required | select field | — | — | — | — | — | — |
 | Priority | select field | — | — | — | — | — | — |
 | Active / Inactive | select field | — | — | — | — | — | — |
+
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **credit type**: Name, monetary or not, refundable, spendable, expiry; changing expiry does not reach credit already issued. *(source: contracts/satellite/wallet.yaml#createCreditType / contracts/satellite/wallet.yaml#updateCreditType / TRACKER Actions row 105)*
 
 #### Outputs: what the screen shows and produces
 
@@ -298,6 +393,25 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Empty, no results (`?state=emptyNoResults`) | **Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist |
 | Offline (`?state=offline`) | online only |
+
+#### Consistency with other screens
+
+- Match `BO-1088`: Same record and editor.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+types:
+- name: Cash
+  monetary: true
+  refundable: true
+- name: Bonus
+  monetary: true
+  refundable: false
+  expiry: 90 days
+```
 
 #### Permissions
 
@@ -341,6 +455,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - [ ] Every transition is wired: `BO-414`.
 - [ ] Every gated control is gated: `WALLET_CONFIGURE`, `WALLET_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -362,6 +477,12 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | Route | `/games-rides/wallet-account-balance-view-bo-416` |
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Everything in one guest's wallet: balance by credit type, lots and expiry, credentials, auto top-up, exit balance; adjust or suspend with a reason.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **List operation(s) listCreditLots return a bare array, not the paged list envelope (items, nextCursor, hasMore).** Why: The table cannot page, and a row without an id cannot open, edit or link to the record it summarises. *(source: contracts/satellite/wallet.yaml#listCreditLots; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
 
 #### Inputs: what the user enters or picks
 
@@ -386,6 +507,15 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | View Entitlements (secondary button) | navigation or local | — | — | — | — |
 | Block Wallet (secondary button) | navigation or local | — | — | — | — |
 
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **balance breakdown**: By credit type with lots and their expiry, nearest first (FEFO order). *(source: contracts/satellite/wallet.yaml#listCreditLots / TRACKER Actions row 110)*
+
+**What each action does** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **Adjust**: Reason required; reported as an adjustment, never as a spend or top-up. *(source: contracts/satellite/wallet.yaml#adjustWallet)*
+- **Suspend**: The balance is preserved; suspending is not confiscating. *(source: contracts/satellite/wallet.yaml#suspendWallet)*
+
 **Data it reads**: `listCreditLots` (onLoad, The lots behind it); `getWalletAutoReloadSetting` (onLoad, Show auto top-up); `getWalletExitBalance` (onLoad, Balance due / refundable at exit)
 
 **Where the user goes next**
@@ -403,6 +533,19 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 Nothing is due or refundable, or the action does not match the balance (`collect` on a wallet in credit), or `waive` by a guest.; 409 The venue has auto-reload disabled for this wallet type, or the wallet is suspended or closed.; 409 The wallet is closed, and a closed wallet cannot be suspended. (WalletStateProblem); 422 An amount outside the venue's funding rules, or a payment token that is … |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+wallet:
+  holder: Yousef Al Hammadi
+  balance: AED 186.50
+  lots:
+  - Cash AED 150.00 no expiry
+  - Bonus AED 36.50 expires 2026-12-31
+```
 
 #### Permissions
 
@@ -470,6 +613,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - [ ] Every transition is wired: `BO-414`.
 - [ ] Every gated control is gated: `WALLET_OPERATE`, `WALLET_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -483,7 +627,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Games & Rides · wave 3 · needs the `games` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `WALLET_CONFIGURE` (1 configure); in the flows as venue manager |
+| Who uses it | venue staff holding `WALLET_CONFIGURE`, `WALLET_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
 | Offline | online only |
@@ -494,11 +638,42 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Recharge rules for game wallets: amounts, presets, channels, limits.
+
+**Fixed on main** (the package already carries these; draw what it says): No read operation: the screen declares only setWalletFundingRules and nothing that returns the current configuration. (CHG-WIR-025).
+
 #### Inputs: what the user enters or picks
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
 
 #### Outputs: what the screen shows and produces
+
+**Shown**
+
+**How a wallet may be topped up** (detail panel, from `getWalletFundingRules`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Wallet type | the name it points at, never the id | — |
+| Minimum top up | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Maximum top up | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Preset amounts | list or chips (count when long) | — |
+| Allowed channels | list or chips (count when long) | — |
+| Allowed funding sources | list or chips (count when long) | — |
+| Bonus rules | list or chips (count when long) | Board 2.3. *Top up 200, get 20.* The bonus is a separate lot of a separate credit type, which is how it can expire on different terms from … |
+| Minimum amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Bonus amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Bonus percent | 1,234.5 | — |
+| Bonus credit type | the name it points at, never the id | — |
+| Valid from | 1 Oct 2026 | — |
+| Valid to | 1 Oct 2026 | — |
+| Auto reload | grouped details | Board 2.5, matrix 4.3.28. Fires when the balance drops. |
+| Enabled | yes / no (icon or chip) | — |
+| Threshold amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Reload amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Maximum per day | 1,234 | — |
+| Recurring funding | grouped details | Board 2.6, matrix 4.3.29 — *"distinct from auto-reload"*. Fires on a date, which is what an allowance needs. |
+| Enabled | yes / no (icon or chip) | — |
 
 **Actions and what each produces**
 
@@ -506,6 +681,8 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |---|---|---|---|---|---|
 | Save wallet funding rules (primary button) | navigation or local | — | — | — | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
+
+**Data it reads**: `getWalletFundingRules` (onLoad, How a wallet may be topped up)
 
 **Where the user goes next**
 
@@ -522,9 +699,27 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 
+#### Consistency with other screens
+
+- Match `BO-1094`: Same record (setWalletFundingRules); one funding editor with sections.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+rules:
+  minimum: AED 20.00
+  presets:
+  - AED 50.00
+  - AED 100.00
+  - AED 200.00
+```
+
 #### Permissions
 
 - `setWalletFundingRules` → `WALLET_CONFIGURE` (configure) · staff
+- `getWalletFundingRules` → `WALLET_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -554,11 +749,11 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state (412).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-417?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save wallet funding rules, Cancel.
 - [ ] Every transition is wired: `BO-414`.
-- [ ] Every gated control is gated: `WALLET_CONFIGURE`.
+- [ ] Every gated control is gated: `WALLET_CONFIGURE`, `WALLET_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -573,7 +768,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Games & Rides · wave 3 · needs the `games` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `WALLET_CONFIGURE` (1 configure); in the flows as venue manager |
+| Who uses it | venue staff holding `WALLET_CONFIGURE`, `WALLET_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
 | Offline | online only |
@@ -584,11 +779,46 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Bonus value awarded on top-up (top up AED 100, get AED 25 bonus), as a separate credit lot with its own expiry.
+
+**Fixed on main** (the package already carries these; draw what it says): No read operation: the screen declares only setWalletFundingRules and nothing that returns the current configuration. (CHG-WIR-025).
+
 #### Inputs: what the user enters or picks
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
 
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **bonus rule**: Threshold, bonus amount or percent, bonus credit type and its expiry shown together. *(source: contracts/satellite/wallet.yaml#setWalletFundingRules)*
+
 #### Outputs: what the screen shows and produces
+
+**Shown**
+
+**How a wallet may be topped up** (detail panel, from `getWalletFundingRules`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Wallet type | the name it points at, never the id | — |
+| Minimum top up | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Maximum top up | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Preset amounts | list or chips (count when long) | — |
+| Allowed channels | list or chips (count when long) | — |
+| Allowed funding sources | list or chips (count when long) | — |
+| Bonus rules | list or chips (count when long) | Board 2.3. *Top up 200, get 20.* The bonus is a separate lot of a separate credit type, which is how it can expire on different terms from … |
+| Minimum amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Bonus amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Bonus percent | 1,234.5 | — |
+| Bonus credit type | the name it points at, never the id | — |
+| Valid from | 1 Oct 2026 | — |
+| Valid to | 1 Oct 2026 | — |
+| Auto reload | grouped details | Board 2.5, matrix 4.3.28. Fires when the balance drops. |
+| Enabled | yes / no (icon or chip) | — |
+| Threshold amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Reload amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Maximum per day | 1,234 | — |
+| Recurring funding | grouped details | Board 2.6, matrix 4.3.29 — *"distinct from auto-reload"*. Fires on a date, which is what an allowance needs. |
+| Enabled | yes / no (icon or chip) | — |
 
 **Actions and what each produces**
 
@@ -596,6 +826,8 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |---|---|---|---|---|---|
 | Save wallet funding rules (primary button) | navigation or local | — | — | — | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
+
+**Data it reads**: `getWalletFundingRules` (onLoad, How a wallet may be topped up)
 
 **Where the user goes next**
 
@@ -612,9 +844,22 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+bonus:
+  topUp: AED 100.00
+  bonus: AED 25.00
+  type: Bonus
+  expires: 30 days
+```
+
 #### Permissions
 
 - `setWalletFundingRules` → `WALLET_CONFIGURE` (configure) · staff
+- `getWalletFundingRules` → `WALLET_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -645,11 +890,11 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state (412).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-418?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save wallet funding rules, Cancel.
 - [ ] Every transition is wired: `BO-414`.
-- [ ] Every gated control is gated: `WALLET_CONFIGURE`.
+- [ ] Every gated control is gated: `WALLET_CONFIGURE`, `WALLET_VIEW`.
 - [ ] The 2 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -671,11 +916,21 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | `creditTypeId` (navigation) |
 | Route | `/games-rides/bonus-usage-restrictions-bo-419` |
 
-**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built. Contract gap recorded 2 October 2026 (CHG-WIR-027): A read (get or list) of the credit eligibility (where a credit may be spent; CreditType does not carry it) that setCreditEligibilityRules writes.
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Where bonus value may not be spent (games and rides yes, F&B and retail no).
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- No read operation: the screen declares only setCreditEligibilityRules and nothing that returns the current configuration. (CHG-WIR-027)
 
 #### Inputs: what the user enters or picks
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **restrictions**: Same eligibility matrix as BO-399 with bonus pre-selected. *(source: contracts/satellite/wallet.yaml#setCreditEligibilityRules)*
 
 #### Outputs: what the screen shows and produces
 
@@ -700,6 +955,20 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the bonus usage restrictions are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+bonus:
+  allowed:
+  - games
+  - rides
+  blocked:
+  - F&B
+  - retail
+```
 
 #### Permissions
 
@@ -752,7 +1021,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Games & Rides · wave 3 · needs the `games` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `WALLET_CONFIGURE` (1 configure); in the flows as venue manager |
+| Who uses it | venue staff holding `WALLET_CONFIGURE`, `WALLET_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
 | Offline | online only |
@@ -763,11 +1032,40 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** How long bonus credit stays valid; changes apply to new lots only.
+
+**Fixed on main** (the package already carries these; draw what it says): No read operation: the screen declares only updateCreditType and nothing that returns the current configuration. (CHG-WIR-025).
+
 #### Inputs: what the user enters or picks
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
 
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **expiry**: Days from issue or a fixed date; the note "credit already issued keeps its terms". *(source: contracts/satellite/wallet.yaml#updateCreditType)*
+
 #### Outputs: what the screen shows and produces
+
+**Shown**
+
+**The kinds of value that may sit in a wallet** (data table, from `listCreditTypes`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| ID | the name it points at, never the id | — |
+| Code | text | — |
+| Name | text | — |
+| Category | chip: Cash, Refund, Bonus, Promotional, Gift card, Membership… | — |
+| Monetary | yes / no (icon or chip) | Loyalty points are not money. A non-monetary credit has a conversion rate to money or it cannot be spent, and treating points as currency … |
+| Conversion rate | 12.5% | — |
+| Refundable | yes / no (icon or chip) | Promotional credit is not refundable and cash credit is. A venue that refunds promotional credit to a card has converted marketing spend … |
+| Transferable | yes / no (icon or chip) | — |
+| Expires | yes / no (icon or chip) | — |
+| Validity days | 1,234 | — |
+| Breakage eligible | yes / no (icon or chip) | — |
+| Ledger account code | text | — |
+| Priority | 1,234 | — |
+| Is active | yes / no (icon or chip) | — |
 
 **Actions and what each produces**
 
@@ -775,6 +1073,8 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |---|---|---|---|---|---|
 | Save credit type (primary button) | navigation or local | — | — | — | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
+
+**Data it reads**: `listCreditTypes` (onLoad, The kinds of value that may sit in a wallet)
 
 **Where the user goes next**
 
@@ -791,9 +1091,18 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+bonusExpiry: 90 days from issue
+```
+
 #### Permissions
 
 - `updateCreditType` → `WALLET_CONFIGURE` (configure) · staff
+- `listCreditTypes` → `WALLET_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -823,11 +1132,11 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state (412).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (14 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-420?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save credit type, Cancel.
 - [ ] Every transition is wired: `BO-414`.
-- [ ] Every gated control is gated: `WALLET_CONFIGURE`.
+- [ ] Every gated control is gated: `WALLET_CONFIGURE`, `WALLET_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -849,6 +1158,21 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | nothing: it opens on its own |
 | Route | `/games-rides/free-game-ride-credit-management-bo-421` |
 
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** Free game and ride credits: define a free-play credit (name, which games or rides or attraction types, venue, number of free plays or unlimited, valid from / until) and allocate it to guest wallets - to one customer, a campaign, a product or package, customer service, or in bulk - with Revoke unused and View usage. The one thing to get right: defining a free credit and giving it to guests are two different steps, and every allocation is attributed and reasoned because it is value given away.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **Only listGameEntitlements and createGameEntitlement are bound; nothing allocates to wallets or revokes unused plays** Why: The pack's Allocate (five targets), Revoke unused and View usage have no operation; createGameEntitlement defines a product, it does not grant it to a card. *(source: screens/P08-venue-back-office.yaml#BO-421 / contracts/satellite/games.yaml#createGameEntitlement; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **Valid from / Valid until have no field; validity is validityKind and validityDays** Why: GameEntitlement has untilDate as a kind but no from or until dates, so the pack's fixed window cannot be stored. *(source: contracts/satellite/games.yaml#/components/schemas/GameEntitlement; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **Credit name, Game / Ride, Attraction type, Venue, Valid from, Valid until drawn as select fields; Number of free plays and Unlimited / Limited as two controls** Why: Name is text, dates are date pickers, and plays vs unlimited is one choice with a conditional count. *(source: screens/P08-venue-back-office.yaml#BO-421; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **createGameEntitlement lists id and scopePath as request fields** Why: Server-owned (per VO-R03). *(source: contracts/satellite/games.yaml#createGameEntitlement; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+
+#### Decided on this screen
+
+Answered questions: draw the decision, not the old default. Where a decision and the tables below differ, the decision wins.
+
+- **Is a free game credit a game entitlement (games contract) or a wallet credit type (wallet contract, Free Game Credit)?** → Drawn default accepted: Treat it as a freePlay entitlement, shown in the wallet as "Free games", until the owner is decided. *(decided by Chinmay, 2026-10-02; DEC-393 / CHG-NOTE-008)* **Reviewable:** a default the lead may still overrule before the block is tasked.
+
 #### Inputs: what the user enters or picks
 
 **On the screen**
@@ -864,7 +1188,25 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Valid From | select field | — | — | — | — | — | — |
 | Valid Until | select field | — | — | — | — | — | — |
 
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **credit name, applicable games / rides, attraction type, venue**: Name with Arabic variant; applicable attractions as a multi-select of games and rides OR attraction types (at least one); venue from the switcher (per VO-R09). *(source: screens/P08-venue-back-office.yaml#BO-421 / contracts/satellite/games.yaml#/components/schemas/GameEntitlement)*
+- **number of free plays / unlimited**: A choice Limited (then Number of free plays, whole number at least 1) or Unlimited - one control, not a text field plus a separate select. Unlimited offers an optional daily cap and cooldown minutes. *(source: screens/P08-venue-back-office.yaml#BO-421 / contracts/satellite/games.yaml#/components/schemas/GameEntitlement)*
+- **valid from / valid until**: Date pickers (until not before from); the generator drew selects. *(source: screens/P08-venue-back-office.yaml#BO-421)*
+- **allocation**: Target as a choice - Individual customer (search by card or guest), Campaign / promotion, Product / package, Customer service (reason required), Bulk (upload a card list or pick a segment). Allocation above a threshold needs supervisor approval. *(source: screens/P08-venue-back-office.yaml#BO-421 / screens/P08-venue-back-office.yaml#BO-422 / DI-873)*
+
 #### Outputs: what the screen shows and produces
+
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Free credit list**: Name, applicable attractions (first three then "+2"), plays (3 / Unlimited), validity, allocated count, used count, status. *(source: screens/P08-venue-back-office.yaml#BO-421)*
+- **Usage**: Per credit, plays used by attraction and the unused balance still out in wallets (what Revoke unused would remove). *(source: screens/P08-venue-back-office.yaml#BO-421)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Create**: Creates the free-play definition (kind freePlay); it is not in any wallet yet. *(source: contracts/satellite/games.yaml#createGameEntitlement)*
+- **Allocate**: Confirmation names the target and count ("Give Birthday Free Play to 214 guests in segment September birthdays"), records who and why. *(source: screens/P08-venue-back-office.yaml#BO-421 / DI-873)*
+- **Revoke unused**: Confirmation names the number of wallets and unused plays affected (per VO-R16); used plays stay in history. *(source: screens/P08-venue-back-office.yaml#BO-421)*
 
 **Data it reads**: `listGameEntitlements` (onLoad, Free game and ride credit)
 
@@ -882,6 +1224,45 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Empty, no results (`?state=emptyNoResults`) | **Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist |
 | Offline (`?state=offline`) | online only |
+
+#### Edge cases to draw
+
+- **Applicable attraction retired after allocation**: Credit stays valid for the remaining attractions; if none remain, it shows "No longer usable" and appears on the health check. *(source: contracts/satellite/games.yaml#validateGameConfiguration)*
+- **Free credit and bonus credit both available at the tap**: Free credit / entitlement is consumed before money (no money taken), per the deduction rules on BO-426. *(source: contracts/satellite/games.yaml#listGameEntitlements / DI-865)*
+
+#### Consistency with other screens
+
+- Match `BO-410`: A tap that uses this credit shows the free game state on the reader.
+- Match `BO-414`: Free Game/Ride Credits KPI on the wallet dashboard counts what this screen allocates.
+- Match `BO-422`: Manual bonus and customer-service goodwill share the same approval and reason rules.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+credit:
+  name: Birthday Free Play
+  nameAr: لعب مجاني بمناسبة عيد الميلاد
+  applicable:
+  - VR Racing 01
+  - Basketball Pro 02
+  - Bumper Cars
+  venue: Summit Peaks
+  plays: 3
+  validFrom: 01 Oct 2026
+  validUntil: 31 Oct 2026
+allocation:
+  target: Campaign
+  campaign: September birthdays
+  guests: 214
+  requestedBy: Maria Santos
+  approvedBy: Ahmed Al Mansoori
+usage:
+  allocatedPlays: 642
+  used: 311
+  unused: 331
+```
 
 #### Permissions
 
@@ -927,6 +1308,9 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - [ ] Every transition is wired: `BO-414`.
 - [ ] Every gated control is gated: `PRODUCT_CONFIGURE`, `PRODUCT_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 2 edge case(s) from the process notes are drawn.
+- [ ] The 4 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
+- [ ] The 1 decision(s) taken on this screen are drawn as decided, not as the old default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -940,7 +1324,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Games & Rides · wave 3 · needs the `games` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `WALLET_OPERATE` (1 operate); in the flows as venue manager |
+| Who uses it | venue staff holding `WALLET_OPERATE`, `WALLET_VIEW` (1 operate, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
 | Offline | online only |
@@ -949,11 +1333,37 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Governed manual adjustments and refund restrictions for game wallets.
+
+**Fixed on main** (the package already carries these; draw what it says): No read operation: the screen declares only adjustWallet and nothing that returns the current configuration. (CHG-WIR-025).
+
 #### Inputs: what the user enters or picks
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
 
 #### Outputs: what the screen shows and produces
+
+**Shown**
+
+**Read a guest wallet** (detail panel, from `getWallet`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| ID | the name it points at, never the id | Added 20 August. The schema reference derives table columns from API response schemas, and a response is not a table — this one returned … |
+| Subject | the name it points at, never the id | — |
+| Balance | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Credits | list or chips (count when long) | 4.3.5 and 4.3.19. One balance and one bonus balance with one expiry could not express what the requirement asks for — cash, bonus and … |
+| Kind | chip: Cash, Bonus, Redemption, Refund, Goodwill | `cash` is money the guest paid and the others are not. That distinction decides what is refundable, what expires, and what shows as a … |
+| Amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Expires at | 1 Oct 2026, 14:30 | — |
+| Source ref | text | — |
+| Is refundable | yes / no (icon or chip) | True only for `cash`. A guest cannot cash out a promotional credit, and a wallet that lets them has given away the promotion twice. |
+| Bonus balance | AED 1,234.50 | Promotional value. Typically non-refundable and spent first. |
+| Currency | text | — |
+| Status | chip: Active, Suspended, Closed | — |
+| Home cell name | text | Where the authoritative balance lives. Present when the guest is linked across cells. |
+| Expires at | 1 Oct 2026, 14:30 | — |
+| Last activity at | 1 Oct 2026, 14:30 | — |
 
 **Actions and what each produces**
 
@@ -961,6 +1371,12 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |---|---|---|---|---|---|
 |  (primary button) | navigation or local | — | — | — | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
+
+**What each action does** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **Adjust**: Reason and approval above a threshold; the audit records who. *(source: contracts/satellite/wallet.yaml#adjustWallet)*
+
+**Data it reads**: `getWallet` (onLoad, Read a guest wallet)
 
 **Where the user goes next**
 
@@ -977,19 +1393,43 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+adjustment:
+  wallet: W-77120
+  amount: +AED 20.00
+  reason: Machine took credit, no game
+```
+
 #### Permissions
 
 - `adjustWallet` → `WALLET_OPERATE` (operate) · staff
+- `getWallet` → `WALLET_VIEW` (read) · staff, guest
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
 #### Requirements it meets
 
-1 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+28 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
 
 | Ref | Requirement (shortened) | Domain | Verdict | Via |
 |---|---|---|---|---|
 | 1.1.113 | Refund management | Ticketing Catalogue | CONTRACTED | `adjustWallet` |
+| 19.2.9 | Digital Wallet - System shall provide a digital wallet. | Guest Mobile App & Branding | CONTRACTED | `getWallet` |
+| 1.1.105 | Stored value card management | Ticketing Catalogue | CONTRACTED | `getWallet` |
+| 1.1.108 | Balance enquiry | Ticketing Catalogue | CONTRACTED | `getWallet` |
+| 1.1.111 | Expiry management | Ticketing Catalogue | CONTRACTED | `getWallet` |
+| 2.6.48 | System shall provide one unified wallet experience across website, mobile app, POS, kiosk, and membership channels. The wallet shall show stored value, vouchers, loyalty points, membership benefits … | Ticketing Sales | CONTRACTED | `getWallet` |
+| 2.13.34 | Digital Wallet Integration | Ticketing Sales | CONTRACTED | `getWallet` |
+| 4.3.7 | The system should allow guests to use their digital wallet to make online and in-app purchases (through API integrations), buy tickets of all type or purchase any service within venue such as retail … | Bundles and Promotions | CONTRACTED | `getWallet` |
+| 4.3.8 | The system should provide a digital wallet that allows: - multiple channels for payments, including but not limited to the Mobile app and wearable (which is linked to the digital wallet). - multiple … | Bundles and Promotions | CONTRACTED | `getWallet` |
+| 4.3.13 | The system should allow guests to make in-store and attraction payments using digital wallets via contactless methods as RFID, NFC and QR-code. | Bundles and Promotions | CONTRACTED | `getWallet` |
+| 4.3.20 | The system should enable usage of wallet by other systems through integration. All functionalities of the wallet such as credit redemption, balance check and wallet funding should be available … | Bundles and Promotions | CONTRACTED | `getWallet` |
+| 4.3.22 | Support cashless stored-value balances. | Bundles and Promotions | CONTRACTED | `getWallet` |
+| … 16 more | | | | `traceability.json` |
 
 #### Client meeting inputs
 
@@ -1017,12 +1457,12 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (403).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (403, 404).
+- [ ] Every output is drawn (15 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-422?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: , Cancel.
 - [ ] Every transition is wired: `BO-414`.
-- [ ] Every gated control is gated: `WALLET_OPERATE`.
+- [ ] Every gated control is gated: `WALLET_OPERATE`, `WALLET_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -1046,6 +1486,8 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Every change to wallet value, traceable.
+
 #### Inputs: what the user enters or picks
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
@@ -1055,6 +1497,10 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 **Shown**
 
 **Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **ledger**: Newest first, keyset paging; type, amount, lot, channel, operator. *(source: contracts/satellite/wallet.yaml#listWalletTransactions)*
 
 **Where the user goes next**
 
@@ -1070,6 +1516,18 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the wallet credit transaction are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+row:
+  at: '14:02'
+  type: spend
+  amount: -AED 8.00
+  where: Sandstorm arcade
+```
 
 #### Permissions
 
@@ -1222,6 +1680,7 @@ Method, path, parameters, request and response for every operation these screens
 "getWallet": {"method":"GET","path":"/wallets/{subjectId}","contract":"wallet","summary":"Read a guest wallet","permission":"WALLET_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Wallet"},
 "getWalletAutoReloadSetting": {"method":"GET","path":"/wallets/{walletId}/auto-reload","contract":"wallet","summary":"A wallet's own auto top-up, if the holder set one","permission":"WALLET_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"WalletAutoReloadSetting"},
 "getWalletExitBalance": {"method":"GET","path":"/wallets/{walletId}/exit-balance","contract":"wallet","summary":"What the holder owes or is owed on leaving","permission":"WALLET_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"WalletExitBalance"},
+"getWalletFundingRules": {"method":"GET","path":"/wallet-funding-rules","contract":"wallet","summary":"How a wallet may be topped up","permission":"WALLET_VIEW","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"WalletFundingRules"},
 "listCreditLots": {"method":"GET","path":"/credit-lots","contract":"wallet","summary":"The tranches behind a balance, with their expiry","permission":"WALLET_VIEW","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[{"name":"walletId","in":"query","required":true},{"name":"includeExhausted","in":"query","required":null}],"requestBody":null,"responds":"CreditLot"},
 "listCreditTypes": {"method":"GET","path":"/credit-types","contract":"wallet","summary":"The kinds of value that may sit in a wallet","permission":"WALLET_VIEW","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"tenant","parameters":[],"requestBody":null,"responds":"CreditType"},
 "listGameEntitlements": {"method":"GET","path":"/game-entitlements","contract":"games","summary":"Passes, packages and per-game entitlements","permission":"PRODUCT_VIEW","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"GameEntitlement"},
@@ -1244,7 +1703,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "CreditEligibility": {"type":"object","x-ticvai-persistence":"wallet.credit_eligibility","description":"Board 3.4. **Where credit may be spent** — acceptance, not funding.","properties":{"creditTypeId":{"type":"string","format":"uuid"},"allowedVenueIds":{"type":"array","items":{"type":"string","format":"uuid"}},"allowedOutletKinds":{"type":"array","items":{"type":"string"}},"allowedProductCategoryIds":{"type":"array","items":{"type":"string","format":"uuid"}},"excludedProductIds":{"type":"array","items":{"type":"string","format":"uuid"}},"allowedChannels":{"type":"array","items":{"type":"string"}},"minimumSpend":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"maximumPercentOfBasket":{"type":"number","nullable":true,"description":"**Caps how much of a purchase one credit type may cover.** A venue that lets promotional credit pay for everything has run a free day it did not intend.\n"},"validDaysOfWeek":{"type":"array","items":{"type":"string"}},"scopePath":{"type":"string"}}},
 "CreditLot": {"type":"object","x-ticvai-persistence":"wallet.credit_lot","description":"Board 3.7. **The tranche behind a balance.** Expiry belongs here, not on the wallet.","required":["id","walletId","creditTypeId"],"properties":{"id":{"type":"string","format":"uuid"},"walletId":{"type":"string","format":"uuid"},"creditTypeId":{"type":"string","format":"uuid"},"issuedAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"remainingAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"issuedAt":{"type":"string","format":"date-time"},"expiresAt":{"type":"string","format":"date-time","nullable":true},"sourceKind":{"type":"string","enum":["topUp","refund","promotion","giftCard","membershipBenefit","loyaltyConversion","transfer","adjustment"]},"sourceReference":{"type":"string","nullable":true},"termsSnapshot":{"type":"object","additionalProperties":true,"description":"**The credit type's terms as they stood at issue.** Changing a credit type must not retro-expire credit already given, so the lot carries its own terms.\n**Open on purpose, and its shape lives in `CreditType`**: the snapshot is that credit type's properties copied at issue, so it follows `CreditType` as it stood then rather than as it stands now.\n"},"status":{"type":"string","enum":["active","exhausted","expired","forfeited","reversed"]},"scopePath":{"type":"string"}}},
 "CreditType": {"type":"object","x-ticvai-persistence":"wallet.credit_type","description":"Board 1.6. **What value sits inside a wallet** — the second vocabulary, and the one the acceptance condition requires to be a table.\n","required":["code","name"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string"},"name":{"type":"string"},"category":{"type":"string","enum":["cash","refund","bonus","promotional","giftCard","membership","loyalty","ride","attraction","redemption","fnb","retail","parking","event","other"]},"monetary":{"type":"boolean","default":true,"description":"**Loyalty points are not money.** A non-monetary credit has a conversion rate to money or it cannot be spent, and treating points as currency puts them on the balance sheet.\n"},"conversionRate":{"type":"number","nullable":true},"refundable":{"type":"boolean","default":false,"description":"**Promotional credit is not refundable and cash credit is.** A venue that refunds promotional credit to a card has converted marketing spend into cash.\n"},"transferable":{"type":"boolean","default":false},"expires":{"type":"boolean","default":false},"validityDays":{"type":"integer","nullable":true},"breakageEligible":{"type":"boolean","default":false},"ledgerAccountCode":{"type":"string","nullable":true},"priority":{"type":"integer","default":0},"scopePath":{"type":"string"},"isActive":{"type":"boolean","default":true}}},
-"GameEntitlement": {"type":"object","x-ticvai-persistence":"games.entitlement","description":"Board 4. **A right to play, not money** — consumed before money is.","required":["code","kind"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string"},"name":{"type":"string"},"kind":{"type":"string","enum":["allGamesPass","unlimitedSingleGame","limitedSingleGame","package","freePlay"]},"gameIds":{"type":"array","items":{"type":"string","format":"uuid"}},"attractionTypeIds":{"type":"array","items":{"type":"string","format":"uuid"}},"playCount":{"type":"integer","nullable":true,"description":"For `limitedSingleGame` and `package`. Null means unlimited."},"validityKind":{"type":"string","enum":["sameDay","days","untilDate","untilUsed"]},"validityDays":{"type":"integer","nullable":true},"activationKind":{"type":"string","enum":["onPurchase","onFirstUse","onDate"],"default":"onFirstUse","description":"**On first use is what a guest expects from a day pass bought the night before.** On purchase is what a venue defaults to by accident, and it costs them a day.\n"},"dailyPlayCap":{"type":"integer","nullable":true},"cooldownMinutes":{"type":"integer","nullable":true,"description":"**Unlimited does not mean continuous.** A cooldown is how one child does not hold a popular ride all afternoon.\n"},"linkedProductId":{"type":"string","format":"uuid","nullable":true},"scopePath":{"type":"string"},"isActive":{"type":"boolean","default":true}}},
+"GameEntitlement": {"type":"object","x-ticvai-persistence":"games.entitlement","description":"Board 4. **A right to play, not money** — consumed before money is.","required":["code","kind"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string"},"name":{"type":"string"},"kind":{"type":"string","enum":["allGamesPass","unlimitedSingleGame","limitedSingleGame","package","freePlay"]},"gameIds":{"type":"array","items":{"type":"string","format":"uuid"}},"attractionTypeIds":{"type":"array","items":{"type":"string","format":"uuid"}},"coversGamesAddedLater":{"type":"boolean","default":true,"description":"**Whether a pass sold today covers a game added tomorrow** (Chinmay, 2 October, workbook Q397: \"venue configures; default yes\"; CHG-CSA-028). True, the default: an `allGamesPass`, or a pass bound by `attractionTypeIds`, covers games added after it was sold that match it; the coverage summary says so. False: it covers only the games that existed at sale. A pass listing `gameIds` covers those games only, whatever this says."},"playCount":{"type":"integer","nullable":true,"description":"For `limitedSingleGame` and `package`. Null means unlimited."},"validityKind":{"type":"string","enum":["sameDay","days","untilDate","untilUsed"]},"validityDays":{"type":"integer","nullable":true},"activationKind":{"type":"string","enum":["onPurchase","onFirstUse","onDate"],"default":"onFirstUse","description":"**On first use is what a guest expects from a day pass bought the night before.** On purchase is what a venue defaults to by accident, and it costs them a day.\n"},"dailyPlayCap":{"type":"integer","nullable":true},"cooldownMinutes":{"type":"integer","nullable":true,"description":"**Unlimited does not mean continuous.** A cooldown is how one child does not hold a popular ride all afternoon.\n"},"linkedProductId":{"type":"string","format":"uuid","nullable":true},"scopePath":{"type":"string"},"isActive":{"type":"boolean","default":true}}},
 "Money": {"type":"object","x-ticvai-persistence-kind":"valueObject","x-ticvai-persistence-column":"numeric(18,4)","description":"**On the wire this is three fields; in the database it is one column.**\n24 August. Every column typed `Money` was landing as `jsonb` — 129 of them, including `orders.shift.opening_float`, `inventory.purchase_order.total` and `promotions.voucher.balance`. **`orders.cash_movement.amount` was `numeric(18,4)` because somebody hand-typed that one**, and the inconsistency is what made it visible.\n**A jsonb price cannot be summed in SQL.** Every total, variance and reconciliation moves into application code — and a shift variance computed in .NET against a ledger computed in Postgres is two answers to one question. That is F13 month-end and F98 takings-to-ledger, both walked, both assuming the arithmetic is in the database.\n**`currency` and `scale` are not stored per row.** ADR-0018 makes them region-scoped and not overridable below, so they resolve from the scope walk — storing AED against nine million rows in a UAE region is nine million copies of a fact that cannot differ. A row that needed its own currency would be a row in the wrong region.\n**They stay on the wire** because a client reading a figure should not have to walk a hierarchy to know what it means.\n","required":["amount","currency","scale"],"properties":{"amount":{"type":"string","description":"Decimal string, never a float. Up to 4 decimal places. **Persisted as `numeric(18,4)`** — the string is a transport choice, so a JavaScript client cannot round a fare in transit.\n","pattern":"^-?\\d+(\\.\\d{1,4})?$"},"currency":{"type":"string","description":"**Resolved from the region, not stored on the row** (ADR-0018). OMR uses 3 decimal places and AED uses 2 — a venue on a different scale from its region is a ledger that cannot consolidate.\n","pattern":"^[A-Z]{3}$"},"scale":{"type":"integer","description":"Resolved from the region alongside `currency`.","minimum":0,"maximum":4}}},
 "Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}},
 "Wallet": {"x-ticvai-persistence":"wallet.wallet + wallet.credit_lot","type":"object","required":["subjectId","balance","currency","status"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true,"description":"**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"},"subjectId":{"type":"string","format":"uuid"},"balance":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"credits":{"type":"array","description":"4.3.5 and 4.3.19. **One balance and one bonus balance with one expiry could not express what the requirement asks for** — cash, bonus and redemption credit, each with its own expiry.\n**The expiries are the reason this is a list.** Cash a guest paid for should outlive a promotional credit they were given, and a single `expiresAt` either expires the money they paid or never expires the promotion.\n**Consumed first-expiry-first-out across all three** (4.3.19), which is also the order that is fairest to the guest — spend what is about to die before what is not.\n**One entry per `active` lot in `wallet.credit_lot`** for this wallet: `amount` is the lot's `remaining_amount`, `expiresAt` its `expires_at`, `sourceRef` its `source_reference`. `kind` and `isRefundable` are not stored on the lot; they come from the lot's credit type (`listCreditLots` returns the lots themselves).\n","items":{"type":"object","required":["kind","amount"],"properties":{"kind":{"type":"string","enum":["cash","bonus","redemption","refund","goodwill"],"description":"**`cash` is money the guest paid and the others are not.** That distinction decides what is refundable, what expires, and what shows as a liability.\n","x-ticvai-persisted":false},"amount":{"x-ticvai-column":"remaining_amount","$ref":"../shared/common.yaml#/components/schemas/Money"},"expiresAt":{"type":"string","format":"date-time","nullable":true},"sourceRef":{"type":"string","nullable":true,"x-ticvai-column":"source_reference"},"isRefundable":{"type":"boolean","default":false,"x-ticvai-persisted":false,"description":"**True only for `cash`.** A guest cannot cash out a promotional credit, and a wallet that lets them has given away the promotion twice.\n"}}}},"bonusBalance":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"description":"Promotional value. Typically non-refundable and spent first."},"currency":{"type":"string","pattern":"^[A-Z]{3}$"},"status":{"type":"string","enum":["active","suspended","closed"]},"homeCellName":{"type":"string","nullable":true,"description":"Where the authoritative balance lives. Present when the guest is linked across cells.\n"},"expiresAt":{"type":"string","format":"date-time","nullable":true},"lastActivityAt":{"type":"string","format":"date-time","nullable":true}}},

@@ -38,10 +38,11 @@ steps:
   screen: BO-206
   action: Works in Offline Validation Policy Builder
   operations:
-  - setOfflinePolicy
+  - setGateOfflinePolicy
   outcome: Define exactly which access checks are allowed to run locally. The matrix identifies key offline
     criteria including eligible media, eligible site, eligible time, ticket validity and eligible access
     mode.
+  note: '**Repointed 2 October (CHG-WIR-001).** The gate offline validation policy is written by setGateOfflinePolicy (access); setOfflinePolicy is the tenancy POS till policy and was removed from BO-206.'
 - step: 5
   screen: BO-204
   action: Returns to the board's landing screen

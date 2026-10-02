@@ -692,6 +692,11 @@
     "operation": null,
     "source": "pack Rental_Management.pdf, page 96",
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built."
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-011): No read returns a rental booking's inspections.",
+    "source": "contracts/satellite/rental.yaml#recordRentalInspection"
    }
   ],
   "apis": [
@@ -1040,7 +1045,7 @@
    "status": "notStarted"
   },
   "density": "comfortable",
-  "notes": "The staff-app form of `BO-571`, for the attendant at the rental counter. Decided 11 September 2026 that Rental boards 6–8 live on both platforms; `tools/applied/apply-rental-staff-app.py` keeps the two in step.",
+  "notes": "The staff-app form of `BO-571`, for the attendant at the rental counter. Decided 11 September 2026 that Rental boards 6–8 live on both platforms; `tools/applied/apply-rental-staff-app.py` keeps the two in step.\n\n**Extra time is charged at the normal rate** (decided 2 October 2026, Chinmay, batch 6, EMP-098: \"Normal rate (DI-499)\"; DEC-307; CHG-CSA-029): a wheelchair paid for one hour and used for three is charged two more hours at its usual price, not a late-fee rate. `returnRental` prices it; the screen shows the extra hours and their amount beside damage and the deposit.",
   "purpose": "Calculate the customer's final rental financial position. Board 8 should consume, not recreate, the commercial policies configured in Board 4.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
@@ -1193,6 +1198,13 @@
        "kind": "secondaryButton",
        "label": "Cancel",
        "notes": "**A screen that can submit must be leaveable without submitting.**"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Deposit history",
+       "bindsTo": "PaymentsDepositActivity",
+       "operation": "listDepositActivity",
+       "provenance": "contract payments.yaml GET /deposits/{depositId}/activity; wiring fix, 2 October 2026"
       }
      ],
      "name": "contentBody"
@@ -1233,6 +1245,13 @@
     "provenance": "board reading, 19 September 2026",
     "purpose": "Capture or release the deposit",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "listDepositActivity",
+    "contract": "payments",
+    "purpose": "The deposit's movement history",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-008)"
    }
   ],
   "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 100. 0 of 0 labels bound to a contract property; 0 of 4 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
@@ -1262,6 +1281,10 @@
     {
      "from": "navigation",
      "name": "bookingId"
+    },
+    {
+     "name": "depositId",
+     "from": "navigation"
     }
    ]
   },
@@ -1334,7 +1357,7 @@
    "template": "split"
   },
   "states": {
-   "emptyFirstRun": "No return completion equipment yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No return completion equipment yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "emptyNoResults": "The filter narrowed it and the return completion equipment are still there. Names the active filter and offers to clear it.",
    "error": "Could not load. Names which read failed and leaves the return completion equipment untouched.",
@@ -1351,6 +1374,17 @@
     "operation": null,
     "source": "pack Rental_Management.pdf, page 101",
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built."
+   },
+   {
+    "operation": "setAssetStatus",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-008): setAssetStatus needs ASSET_MANAGE (a configure-tier grant on the staff app), offers six maintenance statuses and takes one asset per screen; the unit's next state belongs to the return (DI-500; design-notes correction fnb-retail EMP-100).",
+    "source": "contracts/satellite/maintenance.yaml#setAssetStatus | DI-500"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-011): returnRental carries no per-unit disposition.",
+    "source": "contracts/satellite/rental.yaml#returnRental | DI-500"
    }
   ],
   "apis": [
@@ -1365,17 +1399,6 @@
     "operationId": "returnRental",
     "provenance": "board reading, 19 September 2026",
     "purpose": "Complete, and dispose of the equipment",
-    "trigger": "onAction"
-   },
-   {
-    "contract": "maintenance",
-    "invalidates": [
-     "getAsset",
-     "listAssets"
-    ],
-    "operationId": "setAssetStatus",
-    "provenance": "board reading, 19 September 2026",
-    "purpose": "Back into the pool, or not",
     "trigger": "onAction"
    }
   ],
@@ -1403,10 +1426,6 @@
   },
   "entryState": {
    "params": [
-    {
-     "from": "navigation",
-     "name": "assetId"
-    },
     {
      "from": "navigation",
      "name": "bookingId"

@@ -365,7 +365,7 @@
     "type": "string",
     "pattern": "^[A-Z]{3}$",
     "nullable": true,
-    "description": "The currency the guest handed over, where it is not the venue's — becomes `Payment.tenderCurrency`. Omit for a payment in the venue's own currency."
+    "description": "The currency the guest handed over, where it is not the venue's — becomes `Payment.tenderCurrency`. Omit for a payment in the venue's own currency. For a guest-channel card or wallet payment on an order with a `chargeCurrency`, the server sets it from the order (CHG-FIN-001)."
    },
    "tenderAmount": {
     "allOf": [
@@ -440,6 +440,22 @@
    "outletId": {
     "type": "string",
     "format": "uuid"
+   },
+   "paymentTiming": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/OutletPaymentTiming"
+     }
+    ],
+    "readOnly": true,
+    "description": "The outlet's payment timing when the order was placed (CHG-CSA-010), kept as a snapshot."
+   },
+   "sentToKitchenAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "When the order's kitchen tickets were created. Null on a `payFirst` order not yet paid (CHG-CSA-010)."
    },
    "serviceMode": {
     "$ref": "#/components/schemas/ServiceMode"
@@ -543,6 +559,81 @@
    "cancelled",
    "refunded"
   ]
+ },
+ "FnbReservationPolicy": {
+  "type": "object",
+  "x-ticvai-persistence": "fnb.reservation_policy",
+  "description": "**How long a table is held, and what sits between one seating and the next.** The source of `TableReservation.durationMinutes`, which keeps its own value as the snapshot.",
+  "required": [
+   "defaultTurnMinutes",
+   "isActive"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "outletId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Null is the venue default; an outlet's own policy overrides it."
+   },
+   "defaultTurnMinutes": {
+    "type": "integer",
+    "minimum": 15,
+    "description": "The turn time when no party-size band matches."
+   },
+   "turnTimeBands": {
+    "type": "array",
+    "description": "**Turn time by party size** — a two-top and a table of eight do not turn at the same speed, and a single default is how a restaurant ends up double-booking its large tables. The first band whose range contains the party size wins.",
+    "items": {
+     "type": "object",
+     "required": [
+      "fromPartySize",
+      "turnMinutes"
+     ],
+     "properties": {
+      "fromPartySize": {
+       "type": "integer",
+       "minimum": 1
+      },
+      "toPartySize": {
+       "type": "integer",
+       "nullable": true,
+       "description": "Null means no upper bound."
+      },
+      "turnMinutes": {
+       "type": "integer",
+       "minimum": 15
+      }
+     }
+    }
+   },
+   "seatingBufferMinutes": {
+    "type": "integer",
+    "minimum": 0,
+    "default": 0,
+    "description": "**The reset between seatings** — clearing, laying and a moment for the floor. Zero is a legitimate answer and a stated one."
+   },
+   "maximumDurationMinutes": {
+    "type": "integer",
+    "nullable": true,
+    "description": "**The ceiling on a single booking.** A reservation extended by hand past this needs the manager, because the table after it is somebody else's booking."
+   },
+   "reservedLeadMinutes": {
+    "type": "integer",
+    "minimum": 0,
+    "nullable": true,
+    "description": "**When a table shows Reserved** (Chinmay, 2 October, workbook Q202; DI-689; CHG-CSA-012). **The canonical setting** (CHG-CLN-009): tenancy `VenueSettings.fnb.tableReservedLeadMinutes` is deprecated in its favour. A table shows Reserved when a booking names it; with this set, it also shows Reserved this many minutes before a booking pre-allocated to it starts. Null, the default, means only a named table shows Reserved and other arrivals show in the next-arrivals strip. Set by the venue, per outlet where the outlet has its own policy."
+   },
+   "isActive": {
+    "type": "boolean"
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
  },
  "FnbReservationTable": {
   "type": "object",
@@ -934,6 +1025,87 @@
    "cancelled"
   ]
  },
+ "KpiValue": {
+  "type": "object",
+  "description": "BI board 10.3. **Value, target, variance, direction and freshness in one read.**",
+  "properties": {
+   "kpiId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string"
+   },
+   "bucketStart": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "The start of the bucket this value covers, when `getKpiValues` was asked for an `interval`; null otherwise."
+   },
+   "groupKey": {
+    "type": "string",
+    "nullable": true,
+    "description": "The value of the `groupBy` dimension this row is for (a status, a category code, a tier); null when no `groupBy` was asked."
+   },
+   "name": {
+    "type": "string"
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "period": {
+    "type": "string"
+   },
+   "value": {
+    "$ref": "#/components/schemas/MetricValue"
+   },
+   "target": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/MetricValue"
+     }
+    ],
+    "nullable": true
+   },
+   "comparison": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/MetricValue"
+     }
+    ],
+    "nullable": true
+   },
+   "variancePercent": {
+    "type": "number",
+    "nullable": true
+   },
+   "direction": {
+    "type": "string",
+    "enum": [
+     "up",
+     "down",
+     "flat"
+    ]
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "green",
+     "amber",
+     "red",
+     "noTarget"
+    ]
+   },
+   "asOf": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "stale": {
+    "type": "boolean",
+    "description": "**True when the pipeline behind it has not refreshed.** A number nobody flagged as stale is a number somebody will act on.\n"
+   }
+  }
+ },
  "LoyaltyPosition": {
   "x-ticvai-persistence": "marketing.loyalty_position",
   "type": "object",
@@ -1072,6 +1244,18 @@
     }
    }
   }
+ },
+ "MetricValue": {
+  "x-ticvai-persistence-column": "numeric(18,4)",
+  "description": "**A reading of a metric or KPI, or a threshold on one.** A `Money` where the metric is money-valued — `MetricSource` lists those in `x-ticvai-money-valued`, and a KPI is when its `unit` is `currency` — and a plain number otherwise. naming-and-style 5.1: money is never a float, at any layer.\nStored as `numeric(18,4)` either way: a money value stores its amount, and currency and scale resolve from the scope as they do for every `Money`.\n",
+  "oneOf": [
+   {
+    "type": "number"
+   },
+   {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   }
+  ]
  },
  "Money": {
   "type": "object",
@@ -1306,7 +1490,7 @@
     "type": "string",
     "pattern": "^[A-Z]{3}$",
     "nullable": true,
-    "description": "4.6.11 is deliberately asymmetric: **accept foreign currency, refund in local.** A till giving change in five currencies needs five floats and five counts, and the variance becomes unattributable.\n"
+    "description": "4.6.11 is deliberately asymmetric: **accept foreign currency, refund in local.** A till giving change in five currencies needs five floats and five counts, and the variance becomes unattributable.\n**Cash at a till only** (CHG-FIN-001, 2 October 2026). A card or wallet payment the guest made in a currency they selected is refunded in that currency (`Refund.tenderCurrency`).\n"
    },
    "amount": {
     "$ref": "../shared/common.yaml#/components/schemas/Money"
@@ -1798,9 +1982,32 @@
    },
    "notes": {
     "type": "string",
-    "description": "Allergies",
-    "occasion": null,
-    "accessibility.": null
+    "description": "Allergies, accessibility needs and other requests, as the guest wrote them."
+   },
+   "seatingPreference": {
+    "type": "string",
+    "maxLength": 64,
+    "nullable": true,
+    "description": "**The seating area the guest asked for**, e.g. indoor, terrace, majlis (Chinmay, 2 October, workbook Q204; DI-791; CHG-CSA-018). The outlet's own area names, as the waitlist's `RestaurantWaitlist.seatingPreference` takes them. A preference, not a table: the host seats the party on the night."
+   },
+   "occasion": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "birthday",
+     "anniversary",
+     "business",
+     "celebration",
+     "other"
+    ],
+    "description": "The occasion the guest named (workbook Q204, DI-337; CHG-CSA-018). Shown to the host and the server; never a price."
+   },
+   "takenByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The staff member who took the booking (`createTableReservationForGuest`); null for a guest's own booking (CHG-CSA-045)."
    },
    "actualPartySize": {
     "type": "integer",

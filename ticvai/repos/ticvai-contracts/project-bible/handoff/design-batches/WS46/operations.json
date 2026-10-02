@@ -1,4 +1,23 @@
 {
+ "evaluatePromotions": {
+  "method": "POST",
+  "path": "/promotions/evaluate",
+  "contract": "promotions",
+  "summary": "Evaluate promotions against a cart",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "EvaluatePromotionsRequest",
+  "responds": "PromotionEvaluation"
+ },
  "listCartTransactionThreshold": {
   "method": "GET",
   "path": "/cart-transaction-threshold",
@@ -109,25 +128,6 @@
   "requestBody": null,
   "responds": "VolumeBulkTierDiscountConfiguratorView"
  },
- "setPromotionRule": {
-  "method": "PUT",
-  "path": "/promotion-rule",
-  "contract": "promotions",
-  "summary": "Promotion Rule Builder",
-  "permission": "PRICE_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "PromotionRuleBuilderInput",
-  "responds": "PromotionRuleBuilderView"
- },
  "setPromotionStackingRule": {
   "method": "PUT",
   "path": "/promotion-stacking-rule",
@@ -147,12 +147,12 @@
   "requestBody": "PromotionStackingRuleBuilderInput",
   "responds": "PromotionStackingRuleBuilderView"
  },
- "setRuleTestRecommendation": {
-  "method": "PUT",
-  "path": "/rule-test-recommendation",
+ "simulatePromotion": {
+  "method": "POST",
+  "path": "/promotions/{promotionId}/simulate",
   "contract": "promotions",
-  "summary": "Rule Test, Simulation & AI Recommendation Workspace",
-  "permission": "PRICE_CONFIGURE",
+  "summary": "What this promotion would have cost on real history",
+  "permission": "PRICE_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
@@ -163,7 +163,7 @@
     "required": null
    }
   ],
-  "requestBody": "RuleTestSimulationAiRecommendationWorkspaceInput",
-  "responds": "RuleTestSimulationAiRecommendationWorkspaceView"
+  "requestBody": null,
+  "responds": null
  }
 }

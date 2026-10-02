@@ -139,9 +139,12 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: true
       x-ticvai-conflict-policy: serverWins
+      # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
+      # or staff token is still accepted. `{}` makes the credential optional.
       security:
-        - guestAuth: []
-        - bearerAuth: []
+      - {}
+      - guestAuth: []
+      - bearerAuth: []
       parameters:
         - name: venueId
           in: query
@@ -395,9 +398,12 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: true
       x-ticvai-conflict-policy: serverWins
+      # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
+      # or staff token is still accepted. `{}` makes the credential optional.
       security:
-        - guestAuth: []
-        - bearerAuth: []
+      - {}
+      - guestAuth: []
+      - bearerAuth: []
       responses:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
@@ -557,9 +563,12 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: true
       x-ticvai-conflict-policy: serverWins
+      # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
+      # or staff token is still accepted. `{}` makes the credential optional.
       security:
-        - guestAuth: []
-        - bearerAuth: []
+      - {}
+      - guestAuth: []
+      - bearerAuth: []
       parameters:
         - name: fromStationId
           in: query
@@ -607,9 +616,12 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: true
       x-ticvai-conflict-policy: serverWins
+      # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
+      # or staff token is still accepted. `{}` makes the credential optional.
       security:
-        - guestAuth: []
-        - bearerAuth: []
+      - {}
+      - guestAuth: []
+      - bearerAuth: []
       responses:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
@@ -999,9 +1011,12 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
+      # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
+      # or staff token is still accepted. `{}` makes the credential optional.
       security:
-        - guestAuth: []
-        - bearerAuth: []
+      - {}
+      - guestAuth: []
+      - bearerAuth: []
       parameters:
         - name: fromStationId
           in: query
@@ -1245,9 +1260,12 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
+      # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
+      # or staff token is still accepted. `{}` makes the credential optional.
       security:
-        - guestAuth: []
-        - bearerAuth: []
+      - {}
+      - guestAuth: []
+      - bearerAuth: []
       parameters:
         - name: fromStationId
           in: query

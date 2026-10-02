@@ -18,6 +18,54 @@
   "requestBody": "SharedWallet",
   "responds": "SharedWallet"
  },
+ "getWalletBalance": {
+  "method": "GET",
+  "path": "/wallets/{walletId}/balance",
+  "contract": "wallet",
+  "summary": "A wallet's balance",
+  "permission": "WALLET_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": "walletId",
+    "in": "path",
+    "required": true
+   }
+  ],
+  "requestBody": null,
+  "responds": "WalletBalance"
+ },
+ "listApprovalMatrices": {
+  "method": "GET",
+  "path": "/approval-matrices",
+  "contract": "approvals",
+  "summary": "What requires approval here",
+  "permission": "APPROVAL_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "kind",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "effective",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ApprovalMatrix"
+ },
  "listSharedWallets": {
   "method": "GET",
   "path": "/shared-wallets",

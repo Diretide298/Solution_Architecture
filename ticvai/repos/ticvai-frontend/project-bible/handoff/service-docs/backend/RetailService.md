@@ -7,7 +7,7 @@
 | Tier | operations: What a venue does with what it sold. Licensed per module. |
 | Contracts | `retail` |
 | Schemas owned | `retail` |
-| Operations in the slice | 14 of 25 |
+| Operations in the slice | 16 of 25 |
 | Scale | Follows the sale. Nothing unusual. |
 | If it is down | Down means the shop stops; the gates and the restaurant do not. |
 
@@ -25,22 +25,167 @@ Merchandise, wallets and gift cards. Modest at 35 operations, and separate becau
 
 | Group | Operation | Method | Path | Part | Wave | Called by |
 |---|---|---|---|---|---|---|
-| floor | [`lookupMerchandise`](#lookupmerchandise) | GET | `/merchandise/lookup` | core | 1 | BO-048, BO-114, EMP-069, GST-026, KSK-017, POS-002 … |
-| floor | [`lookupShopAndDrop`](#lookupshopanddrop) | GET | `/shop-and-drop/lookup` | core | 2 | BO-143, GST-062, KSK-011, WEB-042 |
-| floor | [`reserveMerchandise`](#reservemerchandise) | POST | `/outlets/{outletId}/reserve` | core | 1 | BO-044, EMP-068, GST-026, KSK-017, POS-012 |
+| floor | [`collectShopAndDrop`](#collectshopanddrop) | POST | `/shop-and-drop/{dropId}/collect` | core | 1 | POS-012 |
+| floor | [`createShopAndDrop`](#createshopanddrop) | POST | `/shop-and-drop` | core | 1 | POS-005 |
+| floor | [`lookupMerchandise`](#lookupmerchandise) | GET | `/merchandise/lookup` | core | 1 | BO-114, EMP-062, EMP-069, GST-026, KSK-017, POS-002 … |
+| floor | [`lookupShopAndDrop`](#lookupshopanddrop) | GET | `/shop-and-drop/lookup` | core | 1 | BO-143, GST-062, KSK-011, POS-012, WEB-042 |
+| floor | [`reserveMerchandise`](#reservemerchandise) | POST | `/outlets/{outletId}/reserve` | core | 1 | EMP-068, GST-026, KSK-017, POS-012 |
 | merchandise | [`createMerchandise`](#createmerchandise) | POST | `/merchandise` | setup | 1 | BO-007, BO-048 |
-| merchandise | [`listMerchandise`](#listmerchandise) | GET | `/merchandise` | core | 1 | BO-007, BO-044, BO-048, BO-116, GST-026, KSK-017 … |
+| merchandise | [`listMerchandise`](#listmerchandise) | GET | `/merchandise` | core | 1 | BO-007, BO-048, BO-116, GST-026, KSK-017, POS-002 … |
 | merchandise | [`updateMerchandise`](#updatemerchandise) | PATCH | `/merchandise/{merchandiseId}` | setup | 1 | BO-048, BO-116 |
-| return | [`createRetailReturn`](#createretailreturn) | POST | `/retail-returns` | core | 1 | POS-002, POS-011 |
-| return | [`getReturnPolicy`](#getreturnpolicy) | GET | `/outlets/{outletId}/return-policy` | core | 1 | BO-044, POS-011 |
-| return | [`lookupRetailSale`](#lookupretailsale) | GET | `/retail-sales/lookup` | core | 1 | POS-005, POS-011 |
-| return | [`setReturnPolicy`](#setreturnpolicy) | PUT | `/outlets/{outletId}/return-policy` | setup | 1 | BO-044 |
+| return | [`createRetailReturn`](#createretailreturn) | POST | `/retail-returns` | core | 1 | POS-011 |
+| return | [`getReturnPolicy`](#getreturnpolicy) | GET | `/outlets/{outletId}/return-policy` | core | 1 | BO-044, BO-143, POS-011 |
+| return | [`lookupRetailSale`](#lookupretailsale) | GET | `/retail-sales/lookup` | core | 1 | BO-021, POS-005, POS-011 |
+| return | [`setReturnPolicy`](#setreturnpolicy) | PUT | `/outlets/{outletId}/return-policy` | setup | 1 | BO-044, BO-143 |
 | sale | [`createRetailSale`](#createretailsale) | POST | `/retail-sales` | core | 1 | POS-002, POS-005, POS-023 |
 | sale | [`getRetailSale`](#getretailsale) | GET | `/retail-sales/{saleId}` | core | 1 | POS-005 |
 | sale | [`listRetailSales`](#listretailsales) | GET | `/retail-sales` | core | 1 | POS-005 |
-| sale | [`reprintReceipt`](#reprintreceipt) | POST | `/retail-sales/{saleId}/reprint` | core | 1 | POS-005, POS-007, POS-026 |
+| sale | [`reprintReceipt`](#reprintreceipt) | POST | `/retail-sales/{saleId}/reprint` | core | 1 | POS-005, POS-026, POS-030 |
 
 ## Group: floor
+
+### collectShopAndDrop
+
+**`POST /shop-and-drop/{dropId}/collect`**: Hand the goods over
+
+Records who handed over and against what. Partial collection is permitted — a guest may take some and leave the rest for a later trip on the same ticket.
+
+|  |  |
+|---|---|
+| Permission | `ORDER_MODIFY` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `cache:idempotency`, `retail.shop_and_drop`, `retail.shop_and_drop_line` |
+| Writes | `cache:idempotency`, `retail.shop_and_drop` |
+| Called by | POS-012 |
+| State model | Shop and drop ([states/shop-and-drop.yaml](../../../states/shop-and-drop.yaml)): moves `awaitingCollection` -> `partiallyCollected`, `partiallyCollected` -> `collected`, `awaitingCollection` -> `collected`, `uncollected` -> `collected` |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| dropId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| lineIds | array of string |  |  |
+| verifiedBy | enum (entitlementScan, receipt, dropReference, staffOverride) |  |  |
+| note | string |  | (max length 500) |
+| recordedAt | string (date-time) | yes |  |
+
+**Response**: `ShopAndDrop`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string | yes |  |
+| dropReference | string | yes | Short and readable. |
+| saleId | string |  | The till sale. (nullable) |
+| orderId | string (uuid) |  | The paid online order that created this collection (audit R236). (nullable) |
+| entitlementId | string |  | The ticket that claims these goods. (nullable) |
+| subjectId | string (uuid) |  | (nullable) |
+| collectionPointId | string (uuid) | yes |  |
+| collectionPointName | string |  |  |
+| status | enum (awaitingCollection, partiallyCollected, collected, uncollected, disposed) | yes |  |
+| lines | array of object |  |  |
+| lines[].lineId | string |  |  |
+| lines[].merchandiseId | string (uuid) |  |  |
+| lines[].name | string |  |  |
+| lines[].quantity | integer |  |  |
+| lines[].collectedQuantity | integer |  |  |
+| droppedAt | string (date-time) |  |  |
+| collectBy | string (date-time) | yes |  |
+| collectedAt | string (date-time) |  | (nullable) |
+| collectedByPrincipalId | string (uuid) |  | (nullable) |
+| verifiedBy | string |  | (nullable) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Collected |
+| 409 |  | Already collected (alreadyCollected), or past the collection deadline (pastCollectBy). |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
+### createShopAndDrop
+
+**`POST /shop-and-drop`**: Buy now, collect on the way out
+
+4.4.7 — a guest buys in store and leaves the goods behind rather than carrying them round a venue all day. The purchase is **linked to their entitlement**, which is what makes collection possible without a receipt: the ticket they are already carrying is the claim.
+The goods leave stock at purchase, not at collection. They are sold; they are merely somewhere else.
+Not a reservation. `reserveMerchandise` holds unsold stock for someone who has not paid; this is paid goods awaiting handover, and conflating the two produces a stock figure nobody can explain.
+
+**Also called by the order service when an online order is paid** (decided 28 September, audit R236): a guest on the web buys merchandise to collect on the way out, pays at checkout, and on payment the order service calls this with `orderId` (and no `saleId`), once per order, naming the retail lines marked for collection in `lineIds`. A staff caller at a till sends `saleId`. Exactly one of the two is sent.
+
+|  |  |
+|---|---|
+| Permission | `ORDER_CREATE` |
+| Scope level | workstation |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `cache:idempotency`, `retail.shop_and_drop`, `retail.shop_and_drop_line` |
+| Writes | `cache:idempotency`, `retail.shop_and_drop` |
+| Called by | POS-005 |
+| State model | Shop and drop ([states/shop-and-drop.yaml](../../../states/shop-and-drop.yaml)): created as `awaitingCollection` |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) | yes |  |
+| saleId | string |  | The retail sale, from a till. (nullable) |
+| orderId | string |  | The paid online order, when the order service calls on payment (audit R236). (nullable) |
+| entitlementId | string |  | The guest's ticket. (nullable) |
+| collectionPointId | string (uuid) | yes |  |
+| lineIds | array of string |  | Omit to drop the whole sale. |
+| collectBy | string (date-time) |  | Usually venue close. |
+| recordedAt | string (date-time) | yes |  |
+
+**Response**: `ShopAndDrop`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string | yes |  |
+| dropReference | string | yes | Short and readable. |
+| saleId | string |  | The till sale. (nullable) |
+| orderId | string (uuid) |  | The paid online order that created this collection (audit R236). (nullable) |
+| entitlementId | string |  | The ticket that claims these goods. (nullable) |
+| subjectId | string (uuid) |  | (nullable) |
+| collectionPointId | string (uuid) | yes |  |
+| collectionPointName | string |  |  |
+| status | enum (awaitingCollection, partiallyCollected, collected, uncollected, disposed) | yes |  |
+| lines | array of object |  |  |
+| lines[].lineId | string |  |  |
+| lines[].merchandiseId | string (uuid) |  |  |
+| lines[].name | string |  |  |
+| lines[].quantity | integer |  |  |
+| lines[].collectedQuantity | integer |  |  |
+| droppedAt | string (date-time) |  |  |
+| collectBy | string (date-time) | yes |  |
+| collectedAt | string (date-time) |  | (nullable) |
+| collectedByPrincipalId | string (uuid) |  | (nullable) |
+| verifiedBy | string |  | (nullable) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 201 |  | Dropped |
+| 409 |  | Sale already dropped (alreadyDropped), an item is non-droppable — chilled, fragile, oversized — (itemNotDroppable), or the collection point is closed before collectBy (collectionPointClosed). |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### lookupMerchandise
 
@@ -61,7 +206,7 @@ The most-used operation on a shop floor. Returns price after any live promotion,
 | Read routing | primary |
 | Reads | `retail.merchandise` |
 | Writes | - |
-| Called by | BO-048, BO-114, EMP-069, GST-026, KSK-017, POS-002, POS-023, WEB-033, WEB-042 |
+| Called by | BO-114, EMP-062, EMP-069, GST-026, KSK-017, POS-002, POS-023, WEB-033 |
 
 **Parameters**
 
@@ -116,13 +261,13 @@ Scanned at the collection point. Accepts the entitlement, the drop reference, or
 | Permission | `ORDER_VIEW` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | primary |
 | Reads | `retail.shop_and_drop`, `retail.shop_and_drop_line` |
 | Writes | - |
-| Called by | BO-143, GST-062, KSK-011, WEB-042 |
+| Called by | BO-143, GST-062, KSK-011, POS-012, WEB-042 |
 
 **Parameters**
 
@@ -160,7 +305,7 @@ A guest who cannot carry a purchase around a venue collects it on the way out. T
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `retail.reservation`, `retail.reservation_line` |
 | Writes | `cache:idempotency`, `retail.reservation`, `retail.reservation_line` |
-| Called by | BO-044, EMP-068, GST-026, KSK-017, POS-012 |
+| Called by | EMP-068, GST-026, KSK-017, POS-012 |
 | State model | Merchandise reservation ([states/merchandise-reservation.yaml](../../../states/merchandise-reservation.yaml)): created as `reserved` |
 
 **Parameters**
@@ -305,7 +450,7 @@ Two callers. **The back office** lists and manages the range. **The guest shop s
 | Offline note | 24 August: servable from a local cache. |
 | Reads | `retail.merchandise` |
 | Writes | - |
-| Called by | BO-007, BO-044, BO-048, BO-116, GST-026, KSK-017, POS-002, POS-023, WEB-033, WEB-042 |
+| Called by | BO-007, BO-048, BO-116, GST-026, KSK-017, POS-002, WEB-033, WEB-042 |
 
 **Parameters**
 
@@ -342,7 +487,7 @@ Two callers. **The back office** lists and manages the range. **The guest shop s
 |---|---|
 | Permission | `PRODUCT_CONFIGURE` |
 | Scope level | venue |
-| Part of slice | setup, makes `retail.merchandise` non-empty |
+| Part of slice | setup, changes rows of `retail.merchandise` that another operation creates |
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
@@ -429,7 +574,7 @@ Goods returned damaged or opened are written off rather than restocked, and that
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `inventory.kit_component`, `retail.return`, `retail.return_line` |
 | Writes | `cache:idempotency`, `inventory.movement`, `retail.return`, `retail.return_line` |
-| Called by | POS-002, POS-011 |
+| Called by | POS-011 |
 | State model | SerialisedItem ([states/serialised-item.yaml](../../../states/serialised-item.yaml)): moves `sold` -> `returned` |
 
 **Parameters**
@@ -516,7 +661,7 @@ Separate from the ticket refund policy. A t-shirt and a timed admission have not
 | Read routing | replica |
 | Reads | `cache:resolution`, `retail.return_policy` |
 | Writes | `cache:resolution` |
-| Called by | BO-044, POS-011 |
+| Called by | BO-044, BO-143, POS-011 |
 
 **Parameters**
 
@@ -575,7 +720,7 @@ By receipt number, order number or the barcode printed on the receipt. A guest a
 | Read routing | replica |
 | Reads | `retail.sale`, `retail.sale_line` |
 | Writes | - |
-| Called by | POS-005, POS-011 |
+| Called by | BO-021, POS-005, POS-011 |
 
 **Parameters**
 
@@ -657,7 +802,7 @@ By receipt number, order number or the barcode printed on the receipt. A guest a
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `retail.return_policy` |
 | Writes | `cache:idempotency`, `cache:resolution`, `retail.return_policy` |
-| Called by | BO-044 |
+| Called by | BO-044, BO-143 |
 
 **Parameters**
 
@@ -1010,7 +1155,7 @@ Also the receipt lookup a returns desk starts from. Returns whether each line is
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `retail.sale` |
 | Writes | `cache:idempotency`, `retail.sale` |
-| Called by | POS-005, POS-007, POS-026 |
+| Called by | POS-005, POS-026, POS-030 |
 
 **Parameters**
 
@@ -1206,10 +1351,10 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-11 operations, added to this service in later releases without changing any of the above.
+9 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
-| floor | `collectShopAndDrop`, `createShopAndDrop`, `getOutletStock` |
+| floor | `getOutletStock` |
 | retail | `cancelMerchandiseReservation`, `collectMerchandiseReservation`, `disposeShopAndDrop`, `listRetailRecommendations`, `listStoreRules`, `setStoreRules` |
 | return | `createRetailExchange`, `listRetailReturns` |

@@ -1,23 +1,4 @@
 {
- "acknowledgeAnnouncement": {
-  "method": "POST",
-  "path": "/announcements/{announcementId}/acknowledge",
-  "contract": "workforce",
-  "summary": "Confirm you have read it",
-  "permission": "WORKFORCE_VIEW",
-  "offlineCapable": true,
-  "conflictPolicy": "append",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": null
- },
  "amendAttendance": {
   "method": "POST",
   "path": "/attendance/{recordId}/amend",
@@ -55,6 +36,25 @@
   ],
   "requestBody": "ApprovalDelegation",
   "responds": "ApprovalDelegation"
+ },
+ "createMfaChallenge": {
+  "method": "POST",
+  "path": "/auth/mfa/challenge",
+  "contract": "identity",
+  "summary": "Second factor at staff sign-in, and step-up for a sensitive action",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
  },
  "createPrincipal": {
   "method": "POST",
@@ -151,24 +151,29 @@
   "requestBody": null,
   "responds": "ApprovalRequest"
  },
- "evaluateApprovalRequirement": {
+ "forceLogout": {
   "method": "POST",
-  "path": "/approval-requests/evaluate",
-  "contract": "approvals",
-  "summary": "Does this need approval, and from whom",
-  "permission": "APPROVAL_VIEW",
+  "path": "/auth/sessions/{sessionId}/force-logout",
+  "contract": "identity",
+  "summary": "Supervisor termination of an abandoned session",
+  "permission": "SESSION_FORCE_LOGOUT",
   "offlineCapable": false,
-  "conflictPolicy": "serverWins",
+  "conflictPolicy": "append",
   "scopeLevel": "venue",
   "parameters": [
    {
     "name": null,
     "in": null,
     "required": null
+   },
+   {
+    "name": "sessionId",
+    "in": "path",
+    "required": true
    }
   ],
   "requestBody": null,
-  "responds": "ApprovalRequirement"
+  "responds": null
  },
  "getAnnouncementReach": {
   "method": "GET",
@@ -260,6 +265,45 @@
    },
    {
     "name": "findingKind",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listActiveSessions": {
+  "method": "GET",
+  "path": "/auth/sessions",
+  "contract": "identity",
+  "summary": "List active sessions",
+  "permission": "SESSION_FORCE_LOGOUT",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "principalId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "workstationId",
     "in": "query",
     "required": null
    },
@@ -416,6 +460,25 @@
   "requestBody": null,
   "responds": "AttendanceRecord"
  },
+ "listCapabilityTemplates": {
+  "method": "GET",
+  "path": "/capability-templates",
+  "contract": "identity",
+  "summary": "Saved tick-sets",
+  "permission": "PERMISSION_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "module",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "CapabilityTemplate"
+ },
  "listJobTitles": {
   "method": "GET",
   "path": "/job-titles",
@@ -428,6 +491,45 @@
   "parameters": [],
   "requestBody": null,
   "responds": "WorkforceJobTitle"
+ },
+ "listOrgUnits": {
+  "method": "GET",
+  "path": "/org-units",
+  "contract": "tenancy",
+  "summary": "List scope nodes visible to the session",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "under",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "level",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "includeInactive",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
  },
  "listPermissionFindings": {
   "method": "GET",
@@ -590,6 +692,19 @@
   "requestBody": null,
   "responds": "Page"
  },
+ "listTrainingRecords": {
+  "method": "GET",
+  "path": "/training-records",
+  "contract": "workforce",
+  "summary": "Training completed and what is expiring",
+  "permission": "WORKFORCE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "TrainingRecord"
+ },
  "listWorkAssignments": {
   "method": "GET",
   "path": "/work-assignments",
@@ -695,6 +810,25 @@
   "requestBody": "ResetCredentialRequest",
   "responds": null
  },
+ "resolvePermissions": {
+  "method": "POST",
+  "path": "/permissions/resolve",
+  "contract": "identity",
+  "summary": "Simulate a principal's effective permissions",
+  "permission": "PERMISSION_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
  "resubmitApprovalRequest": {
   "method": "POST",
   "path": "/approval-requests/{requestId}/resubmit",
@@ -713,6 +847,25 @@
   ],
   "requestBody": null,
   "responds": "ApprovalRequest"
+ },
+ "revokeAllSessions": {
+  "method": "POST",
+  "path": "/auth/sessions/revoke-all",
+  "contract": "identity",
+  "summary": "Revoke every session in scope",
+  "permission": "SESSION_FORCE_LOGOUT",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
  },
  "revokeApprovalDelegation": {
   "method": "DELETE",
@@ -789,6 +942,25 @@
   ],
   "requestBody": "WorkforceJobTitle",
   "responds": "WorkforceJobTitle"
+ },
+ "setRolePermissions": {
+  "method": "PUT",
+  "path": "/roles/{roleId}/permissions",
+  "contract": "tenancy",
+  "summary": "What this role may do",
+  "permission": "ROLE_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
  },
  "setWorkAssignment": {
   "method": "PUT",
@@ -900,6 +1072,25 @@
   ],
   "requestBody": "RotaAssignment",
   "responds": "RotaAssignment"
+ },
+ "verifyMfaChallenge": {
+  "method": "POST",
+  "path": "/auth/mfa/challenge/{challengeId}/verify",
+  "contract": "identity",
+  "summary": "Complete a sign-in or step-up challenge",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
  },
  "withdrawApprovalRequest": {
   "method": "POST",

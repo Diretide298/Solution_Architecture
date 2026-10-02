@@ -18,25 +18,6 @@
   "requestBody": "CapacityPack",
   "responds": "CapacityPack"
  },
- "createPartnerQuote": {
-  "method": "POST",
-  "path": "/partner-quotes",
-  "contract": "subscription",
-  "summary": "Raise a quote",
-  "permission": "PARTNER_MANAGE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "PartnerQuote",
-  "responds": "PartnerQuote"
- },
  "listModuleCatalogue": {
   "method": "GET",
   "path": "/module-catalogue",
@@ -73,25 +54,6 @@
   ],
   "requestBody": null,
   "responds": "Plan"
- },
- "setModuleListing": {
-  "method": "PUT",
-  "path": "/module-catalogue",
-  "contract": "subscription",
-  "summary": "Define a module's dependencies, incompatibilities and price",
-  "permission": "PLATFORM_PLAN_MANAGE",
-  "offlineCapable": null,
-  "conflictPolicy": null,
-  "scopeLevel": "platform",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "ModuleListing",
-  "responds": "ModuleListing"
  },
  "simulateCommercialPackage": {
   "method": "POST",

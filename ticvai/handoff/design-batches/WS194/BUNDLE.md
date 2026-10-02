@@ -1,6 +1,6 @@
 # WS194 — Wallet Configuration Backend Structure v1.0 board 9
 
-**10 screens · 9 operations · 12 schemas · 5 permissions**
+**10 screens · 11 operations · 14 schemas · 5 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -61,6 +61,75 @@ convincingly. It is never a caption.
   and its error; and, element by element, what is shown and in what format, what each action
   produces and where the user goes next. Draw exactly that.
 
+## The processes these screens belong to
+
+Written by the owner of each process (`handoff/design-notes/`). Read before any screen: it says how the process runs end to end and which words the screens must use.
+
+### Ticketing & Guest Commerce, as the venue and TICVAI configure and run it
+
+WHAT THE PROCESS IS. Everything a guest can buy is set up, priced, promoted and serviced here, on Venue Management (P08, the venue's own back office, served inside the venue's cell) and on the TICVAI Console (P09, TICVAI's control plane, outside every cell). End to end: (1) CATALOGUE. A product has one of twelve kinds (admission, timedAdmission, datedAdmission, openDated, seated, membership, bundle, fnb, retail, rental, addOn, giftCard). Its ticket types (adult, child, senior, resident...) are not typed one by one: they are generated from the product's attributes (components) and each value combination becomes a sellable ticket type with no extra setup (DI-164). What a ticket grants (validity, entries, re-entry, days of week, blackout dates, expiry anchor, fast track, transfer) lives on a reusable entitlement template, not on the product. Who may take part (age, height, supervision, certification) is the eligibility rule; what the guest must answer is the data mask and the consent questions; how the guest sees it is guestListing (bookable, infoOnly, hidden), display tags (at most six), media and the booking flow. Group, family and corporate products and every after-sales policy (reschedule, exchange, refund, cancellation, upgrade, transfer) are configured inside the one product configuration, never on separate screens (DI-465, DI-466). (2) LIFECYCLE AND PUBLICATION. A product moves draft, inReview, approved, live, withdrawn, archived. Approval and publication are two acts with two permissions (PRODUCT_APPROVE, PRODUCT_PUBLISH, R091); every product is authorised before it sells online or on site (DI-438). Approved is still not on a till: a till sells only what is in the signed catalogue release it pulled (publishBundle, ADR-0013), so a saved price is a back-office fact until the venue publishes to tills. Changing something that has sold is preceded by an impact check (assessProductChange: orders affected, entitlements issued, future performances, open carts); restoring a version creates a new version, and sold tickets keep the price and terms they were sold under (restoreProductVersion, DI-938, TRACKER Actions row 145). (3) PRICE. Prices live in price lists: per venue, per channel set, with validity dates and a priority, copied for the next season with an uplift (copyPriceList) and repriced in bulk only after a dry run (bulkChangePrices). Currency and decimal scale are never chosen on a form: they resolve from the venue's region (ADR-0008, ADR-0018; AED 2 places, OMR and BHD 3). When several rules apply, the configured hierarchy decides; there is no "lowest price wins" default (DI-595). Tax on the pre-discount price and three-decimal rounding are regional settings (DI-598). Dynamic rules always show their minimum and maximum price guardrails beside the trigger (getDynamicPriceRule). (4) PROMOTE AND BUNDLE. A promotion is a rule (automatic, or gated by a code) created in draft, made live only by Publish, which first analyses stacking; a …
+*(source: DI-164; DI-171; DI-438; DI-465; DI-466; DI-595; DI-598; DI-387; DI-039; DI-044; DI-474; DI-671; DI-987; DI-019; DI-080; ADR-0008; ADR-0013; ADR-0018; ADR-0019; ADR-0030; R091; R098; R101; R222; REV3-21; contracts/spine/catalogue.yaml#transitionProductLifecycle …)*
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Product | Anything sellable, of one of the twelve kinds. The record that carries names, channels, listing, media and policies. | Item (except on F&B and retail screens), SKU (for tickets), Offering | contracts/spine/catalogue.yaml#/components/schemas/ProductKind |
+| Ticket type | One sellable variant of an admission or event product (Adult, Child, Resident Adult), generated from the product's attributes. For retail and F&B the same record is labelled Variant. | Variant (on ticket screens), Sub-product, Rate (that is a price), Axis value | contracts/spine/catalogue.yaml#updateProductVariant / DI-164 / DI-437 |
+| Attribute | A dimension that generates ticket types (Guest category, Residency, Tier, Length). Each has values; adding a value adds ticket types. | Axis, Component (the client's word; use it only in help text), Option | contracts/spine/catalogue.yaml#setProductAttributes / DI-164 / DI-450 |
+| Entitlement | What a ticket lets the holder do (validity, entries, re-entry, days, blackout dates, expiry, fast track, transfer), defined once on an entitlement template and shared by several products. | Access rights, Ticket rules, Validity profile | contracts/spine/catalogue.yaml#createEntitlementTemplate / DI-171 / DI-451 |
+| Eligibility rule | Who may take part in or buy a product (age, height, supervision, waiver, certification). Distinct from a promotion's eligibility, which decides who gets a discount. | Restriction, Access rule (that is access control) | contracts/spine/catalogue.yaml#setProductEligibilityRule / DI-463 |
+| Price list | A set of prices for one venue and a set of channels, valid between two dates, with a priority. Several coexist (B2C, B2B, season). | Price book, Rate card, Tariff | contracts/spine/catalogue.yaml#createPriceList / DI-140 / DI-163 |
+| Price category | A standard rate type (Adult, Child, Member) reused across lists so venues do not invent "Adult Standard" and "Normal Adult". | Price band (that is a seat-category band), Fare type (transport) | contracts/spine/catalogue.yaml#setPriceCategoryRateType / … |
+| Price band | A priced band on a seat category (code, label, colour, amount, channel, from-date). | Price category, Zone price | contracts/satellite/seating.yaml#/components/schemas/SeatPriceBand |
+| Promotion | A rule that changes a price automatically or when a code is entered; draft until published; declares how it stacks. | Offer (except in guest copy), Deal, Discount rule | contracts/satellite/promotions.yaml#createPromotion / DI-173 / DI-174 |
+| Coupon code | A code issued from a coupon campaign that applies a promotion-style discount; one shared code or many single-use codes. | Voucher, Promo voucher | contracts/satellite/promotions.yaml#createCouponCampaign / DI-173 |
+| Voucher | A code that carries money (face value, balance), sold or issued; a liability until redeemed or expired. | Coupon, Credit note | contracts/satellite/promotions.yaml#listVoucherBatches / … |
+| Bundle | A product sold as one line whose price differs from the sum of its components, with a mandatory revenue allocation. "Package" is acceptable in guest copy. | Combo (that is an F&B meal deal), Catalogue bundle | contracts/satellite/promotions.yaml#createBundle / DI-220 / ADR-0019 |
+| Catalogue release | The signed snapshot of a venue's catalogue, prices, promotions and sale boards that tills, kiosks and devices pull. Its action label is "Publish to tills". | Bundle, Catalogue bundle, Sync, Deploy | contracts/spine/catalogue.yaml#publishBundle / … |
+| Approve / Publish / Save | Save keeps a draft; Approve records that it is authorised (PRODUCT_APPROVE); Publish makes it live for guests and channels (PRODUCT_PUBLISH). Three different buttons, never merged. | Submit, Go live, Activate (except CatalogueConfigStatus active), Deploy | R091 / contracts/spine/catalogue.yaml#transitionProductLifecycle / DI-438 |
+| Product states | Draft, In review, Approved, Live, Withdrawn, Archived (ProductLifecycleState), always as coloured badges with these exact labels. | Published (for a product), Pending, Inactive (for a product) | contracts/spine/catalogue.yaml#/components/schemas/ProductLifecycleState |
+| Channel | Where something is sold. Labels: pos Point of sale; kiosk Kiosk; web and guestWeb Website; mobile and guestApp App; b2b B2B partners; partner Partner; ota Travel agents (OTA); callCentre Call centre; api API; backOffice Back office. | Touchpoint, Outlet (an outlet is a business inside a venue), raw enum values | contracts/spine/catalogue.yaml#/components/schemas/Channel / … |
+| Refund | Money returned after settlement, wholly or for some lines, under the venue's refund policy. | Return (that is retail goods), Reversal, Void | contracts/spine/orders.yaml#createRefund / DI-252 |
+| Void | Cancelling a whole order before settlement, within the same shift, with a reason from the void list. After settlement it is a refund. | Cancel order, Delete | contracts/spine/orders.yaml#voidOrder / R222 |
+| Exchange / Reschedule | Exchange swaps lines for other products or dates and settles only the difference; Reschedule is the same product moved to another date or time. | Rebook, Date change (acceptable only in guest copy), Refund and resell | contracts/spine/orders.yaml#exchangeOrderLines / … |
+| Hold / Capture / Release | A deposit or stored-value amount is held, then partly or fully captured, and the rest released. A held deposit is not a payment. | Charge, Pre-auth (in staff copy), Block funds | contracts/spine/orders.yaml#authoriseStoredValue / … |
+| Wallet (TICVAI wallet) | The guest's stored-value balance on TICVAI, spent by hold and capture. Distinct from the tender "Apple Pay / Google Pay", which the contract also calls wallet. | Digital wallet (for stored value), E-wallet, Credit (without a type) | contracts/spine/orders.yaml#/components/schemas/TenderKind / R080 |
+| Credit lot | One amount of wallet credit of one credit type (cash, bonus, gift) with its own expiry; lots are spent nearest expiry first and the guest sees the breakdown but cannot choose. | Bucket, Batch, Top-up | TRACKER Actions row 171 / contracts/satellite/wallet.yaml#expireCreditLots |
+| Venue map / Seat map | A venue map is the wayfinding map of a park or a floor (points, paths, bookable places); a seat map is the seating layout of an auditorium or stand. Never just "map" where both could be meant. | Layout (alone), Floor plan (unless it is a floor map), Map (alone) | contracts/satellite/venue-map.yaml#createVenueMap / … |
+| Point / Bookable place | A point is a place on a venue map (toilet, ride, restaurant, exit). A bookable place is a cabana, lounger, table or pitch placed on the map and sold through its price band. | Pin, POI, Marker, Resource (in staff copy) | contracts/satellite/venue-map.yaml#setVenuePoint / … |
+| Station / Route / Timetable / Departure / Fare table / Pass … | A route is an ordered list of stations with offsets; a timetable generates departures up to its release horizon; a fare table prices a route per passenger type; a pass type is a multi-trip or unlimited pass sold as a product. | Stop (except in the stop list), Line (except lineCode), Schedule, Trip (except a guest's journey) | contracts/satellite/transport.yaml / REV3-21 |
+| Applies from | The effective date of a change. Every dated change shows it, and sold items keep their old terms. | Effective date (in labels), Start date (for a change) | contracts/satellite/seating.yaml#updateSeatCategory / TRACKER Actions row 194 |
+
+### Finance, Ledger & Tax · Reporting & Analytics
+
+Finance and insights run underneath every sale. A sale at a till (P04), kiosk, web storefront (P01) or guest app (P02) is priced and taxed per line at the moment of sale, recorded in the venue's base currency (AED in the UAE; 2 decimals, or 3 for BHD, KWD and OMR, never rounded away), and posted to an append-only dual ledger through account mappings per money event; anything unmapped lands in suspense. Tax follows the jurisdiction's tax profile: inclusive or exclusive, compound where a tax applies on another, zero-rated or exempt with verified evidence, and computed on the discounted price by default or on the price before discount where the region requires it (Egypt). A guest may select a currency the venue charges and pay in it: the rate is locked on the order, the payment partner is asked in that currency, the ledger keeps the base amount with the rate, and a refund goes back in the currency paid (decided 2 October 2026, Chinmay); a currency shown but not charged is an approximate price. Foreign cash at a till is recorded at its base equivalent and change is given in base currency. A paid order can carry a VAT receipt (simplified tax invoice), a full tax invoice with the buyer's TRN, or a consolidated invoice for a company, each numbered without gaps and never edited; corrections are credit memos. Revenue is recognised by rule: POS-style immediate, tickets on the visit, gift cards and wallet on use, annual passes straight-line or per visit, breakage on expiry; deferred revenue is a balance that ages. Each venue's day is reconciled (POS cash, gateways, bank, wallet against the ledger, provider files matched automatically, only genuine mismatches to a person); chargebacks are defended against the bank's deadline; month end runs seven close checks and goes to a finance approver. Nothing posted is deleted: a correction is a reversal, an approver is never the preparer, and ledger approval needs a second factor. Back-office finance lives in Venue Management (P08: chart of accounts, mapping, FX, journals, recognition, reconciliation, period close, chargebacks); tax profiles, calculation validation and platform reconciliation in the TICVAI Console (P09); partner settlement in P10. Reporting is one consolidated, permission-based area (Analytics, P16): seeded standard dashboards and reports plus no-code builders over a governed business catalogue; the P08 report screens, the POS terminal day view and the kitchen performance view are scoped windows onto the same definitions and must show the same numbers. Every figure is read from a lag-tolerant reporting copy and shows its "as of" time; scope comes from the person's rights, never from a filter; AI explains and recommends but never acts, answers only within the person's role, labels forecasts, and is phase two for finance ledgers.
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Base currency | The venue's region currency; the currency every record and ledger posting is in. A guest may pay in a currency they select (where the venue charges it); the books still hold the base amount and the rate. | Home currency, Local price, Default currency | DI-211 / DI-282 / contracts/spine/orders.yaml#/components/schemas/Order |
+| Pay in USD (a currency the venue charges) | The guest's selected payment currency; the card is charged in it at the rate locked on the order, and refunds go back in it. | Converted price, Approx. (for a charged currency) | contracts/spine/orders.yaml#checkoutCart / … |
+| ≈ (approx.) price in USD / SAR / … | A conversion of a base-currency price for a currency the venue shows but does not charge, always next to the base price. | Converted price, USD price | DI-211 / screens/P02-guest-mobile-app.yaml#GST-044 |
+| Takings | Money received in the period less refunds (cash-basis); the seeded KPI on hubs. | Revenue, Sales, Income | contracts/satellite/reporting.yaml#/components/schemas/ReportingSystemKpi / R283 |
+| Gross sales | Issued sales before discounts and refunds; whether tax is included must be stated on the tile. | Revenue, Turnover | MATRIX 6.1.78 |
+| Net revenue | Gross sales less discounts less refunds, adjusted per finance policy. | Net sales, Revenue, Income | MATRIX 6.1.78 |
+| Recognised revenue / Deferred revenue | Earned under the recognition rules / paid for but not yet earned. Kept distinct from sales. | Realised revenue, Unearned income, Wallet revenue | MATRIX 5.12.6 / DI-260 / contracts/spine/finance.yaml#getDeferredRevenue |
+| VAT receipt | The simplified tax invoice issued on a paid order. | Receipt (when it is a tax document), Bill | contracts/spine/finance.yaml#issueTaxInvoice |
+| Tax invoice / Combined tax invoice | A full invoice with the buyer's details / one invoice for several paid orders of one buyer. | Bill, Statement | contracts/spine/finance.yaml#/components/schemas/FinTaxInvoiceType |
+| Credit memo | The document that corrects an issued invoice after a refund; the invoice itself is never edited. | Credit note (until the client's tax adviser chooses "Tax credit note"), Edit invoice | contracts/spine/finance.yaml#/components/schemas/FinTaxInvoice |
+| VAT (or the jurisdiction's tax name) | Use the tax profile's own name on every surface; "Tax" only where several kinds are summed. | GST in UAE, Service charge for a tax | contracts/spine/catalogue.yaml#setTaxProfileJurisdiction |
+| Price before discount | The taxable base where the jurisdiction taxes the undiscounted price. | Gross price, List tax | DI-598 |
+| Post / Reverse | A journal reaches the ledger when approved and posted; a correction is a reversal, never an edit or delete. | Edit entry, Delete entry, Undo | contracts/spine/finance.yaml#reverseJournalEntry |
+| Period (Open / Closing / Closed) | A fiscal period's state; closing stops postings, closed locks them. | Month locked, Frozen | contracts/spine/finance.yaml#/components/schemas/PeriodStatus |
+| Variance (Over / Short) | The difference between expected and counted or recorded, always saying between which two figures. | Discrepancy, Error, Loss | DI-275 / contracts/spine/finance.yaml#/components/schemas/UnifiedReconciliation |
+| Settlement / Exception / Resolve | A provider's file for a day / a line that did not match / the recorded explanation. | Payout file, Error, Close | contracts/spine/finance.yaml#/components/schemas/SettlementException |
+| Chargeback | A bank-initiated reversal with an evidence deadline; not a refund. | Dispute refund, Reversal | contracts/spine/orders.yaml#/components/schemas/Chargeback |
+| Report / Dashboard / Tile / KPI | A runnable, exportable, schedulable definition / a page of tiles / one visual bound to a report / a company-wide measure defined once. | Widget (outside the builder's library), Board (for a user-facing dashboard) | contracts/satellite/reporting.yaml#/components/schemas/DashboardTile / … |
+| Warning / Critical | KPI status bands set by a target's amber and red thresholds; always words plus colour. | Amber, Red (alone), Bad | contracts/satellite/reporting.yaml#/components/schemas/KpiTarget |
+| As of HH:MM / Updated N sec ago | The freshness of every figure read from the reporting copy; stale shows a warning. | Live (unless refreshed), Real-time | MATRIX 8.7.22 |
+| Forecast | Any projected figure, with its range; never shown as a fact. | Expected, Will be | DI-973 |
+| Outlet / Workstation (till) | A sales point / the device; staff copy may say "till" for the workstation. | Store, POS (in copy), Drawer (for the device) | R156 |
+| Channel | POS, Web, App, Kiosk, B2B, OTA, from one closed list. | Source, Platform | MoM 2026-08-18 4.2 Recipes, Operating Hours & Service Channels / MATRIX 1.4.7 |
+
+
 ## The screens
 
 Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs count fields; requirements are matrix rows; meeting inputs are the ones naming the screen (the module and platform ones are below); white label says whether the tenant's brand reaches it (guest) or it sets the brand (configures).
@@ -74,7 +143,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-1167` | Reconciliation Exception & Resolution Workbench | B–D | 0 | 24 | 6 | 1 | 2 | 0 | — | notStarted (—) |
 | `BO-1168` | Gift Card Liability Management | B–D | 0 | 42 | 6 | 0 | 0 | 6 | — | notStarted (—) |
 | `BO-1169` | Breakage & Revenue Recognition Policy | B–D | 0 | 6 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-1170` | Wallet Financial Period & Closing Controls | B–D | 18 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
+| `BO-1170` | Wallet Financial Period & Closing Controls | B–D | 18 | 18 | 6 | 0 | 0 | 6 | — | notStarted (—) |
 | `BO-1171` | Wallet Analytics & Management Reporting | B–D | 0 | 34 | 6 | 0 | 1 | 6 | — | notStarted (—) |
 | `BO-1172` | Finance Validation, Reporting & Audit Center | B–D | 0 | 10 | 6 | 1 | 1 | 0 | — | notStarted (—) |
 
@@ -105,6 +174,12 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Route | `/orders-money/wallet-finance-liability-command-center-bo-1163` |
 
 **Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** All wallet obligations and movements for finance.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **List operation(s) getWalletLiability return a bare array, not the paged list envelope (items, nextCursor, hasMore); rows of getWalletLiability carry no identifier.** Why: The table cannot page, and a row without an id cannot open, edit or link to the record it summarises. *(source: contracts/satellite/wallet.yaml#getWalletLiability; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
 
 #### Inputs: what the user enters or picks
 
@@ -193,6 +268,10 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | − expirations | text | not in the schema: `− Expirations` |
 | … 3 more | | `schemas.json` |
 
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **finance KPIs**: Outstanding liability, funded, spent, breakage. *(source: contracts/satellite/wallet.yaml#getWalletLiability)*
+
 **Data it reads**: `getWalletLiability` (onLoad, Liability at a glance)
 
 **Where the user goes next**
@@ -218,6 +297,16 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the wallet finance liability are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+kpis:
+  outstanding: AED 2,184,300.00
+  fundedMTD: AED 1,240,000.00
+```
 
 #### Permissions
 
@@ -270,6 +359,7 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 - [ ] Every transition is wired: `BO-100`, `BO-1164`, `BO-1165`, `BO-1166`, `BO-1167`, `BO-1168`, `BO-1169`, `BO-1170`, `BO-1171`, `BO-1172`.
 - [ ] Every gated control is gated: `WALLET_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -289,6 +379,14 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/orders-money/wallet-financial-classification-accounting-mapping-bo-1164` |
+
+**Known gaps.** Contract gap recorded 2 October 2026 (CHG-WIR-027): A read (get or list) of the wallet accounting mapping that setWalletAccountingMapping writes.
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Which ledger account each credit type and transaction type posts to; every wallet transaction maps to a GL entry.
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- No read operation: the screen declares only setWalletAccountingMapping and nothing that returns the current configuration. (CHG-WIR-027)
 
 #### Inputs: what the user enters or picks
 
@@ -320,6 +418,10 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 | Breakage | select field | — | — | — | — | — | — |
 | Mapping Dimensions | select field | — | — | — | — | — | — |
 
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **mapping**: Credit types as rows, accounts picked from the chart of accounts. *(source: contracts/satellite/wallet.yaml#setWalletAccountingMapping / TRACKER Actions row 103)*
+
 #### Outputs: what the screen shows and produces
 
 **Where the user goes next**
@@ -336,6 +438,17 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Empty, no results (`?state=emptyNoResults`) | **Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+mapping:
+  Cash: 2310 Customer wallet liability
+  Bonus: 2315 Promotional credit
+  breakage: 4810 Breakage income
+```
 
 #### Permissions
 
@@ -399,6 +512,12 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 | Route | `/orders-money/wallet-sub-ledger-balance-control-bo-1165` |
 
 **Known gaps.** **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** The wallet sub-ledger behind every balance and its agreement with the general ledger.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **No write operation: a configuration screen (Wallet Sub-Ledger & Balance Control) declares only reads (getWalletReconciliation).** Why: Nothing it shows can be changed from it; either it is a view (and its edits happen on the record editor, which it should link to) or a write is missing. *(source: contracts/satellite/wallet.yaml#getWalletReconciliation; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
 
 #### Inputs: what the user enters or picks
 
@@ -470,6 +589,10 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 | Financial status | text | not in the schema: `Financial status` |
 | Related transaction | text | not in the schema: `Related transaction` |
 
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **sub-ledger**: Movements with the GL reference. *(source: contracts/satellite/wallet.yaml#getWalletReconciliation)*
+
 **Data it reads**: `getWalletReconciliation` (onLoad, Sub-ledger against the ledger)
 
 **Where the user goes next**
@@ -486,6 +609,16 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the wallet sub-ledger balance are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+entry:
+  movement: top-up AED 200.00
+  gl: JE-2026-90112
+```
 
 #### Permissions
 
@@ -528,6 +661,7 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 - [ ] Every transition is wired: `BO-1163`.
 - [ ] Every gated control is gated: `WALLET_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -547,6 +681,8 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/orders-money/multi-source-reconciliation-configuration-bo-1166` |
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Which sources the wallet reconciles against, matched how and when.
 
 #### Inputs: what the user enters or picks
 
@@ -599,6 +735,10 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 | Schedule `sources[].schedule` | radio group | optional | End of business day | Real time · Hourly · Daily · End of business day | — | — | `setWalletReconciliationSources` body |
 | Scope path `scopePath` | text field | optional | — | — | — | — | `setWalletReconciliationSources` body |
 
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **sources**: Each source switched on with matching keys and schedule. *(source: contracts/satellite/wallet.yaml#setWalletReconciliationSources)*
+
 #### Outputs: what the screen shows and produces
 
 **Actions and what each produces**
@@ -630,6 +770,17 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 | Empty, no results (`?state=emptyNoResults`) | **Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 422 `walletLedger` disabled or missing, or a source kind listed twice. |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+sources:
+- name: Network International settlement
+  match: provider reference
+  schedule: daily 06:00
+```
 
 #### Permissions
 
@@ -690,6 +841,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
 
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Investigate reconciliation failures (payment succeeded but wallet not funded, and the reverse) and fix them with an adjustment.
+
 #### Inputs: what the user enters or picks
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
@@ -739,6 +892,10 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Owner | text | not in the schema: `Owner` |
 | Status | text | not in the schema: `Status` |
 
+**What each action does** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **Adjust to resolve**: Reason referencing the exception. *(source: contracts/satellite/wallet.yaml#adjustWallet)*
+
 **Data it reads**: `getWalletReconciliation` (onLoad, Exceptions to resolve)
 
 **Where the user goes next**
@@ -755,6 +912,16 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the reconciliation exception resolution are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+exception:
+  type: Payment OK, wallet not funded
+  amount: AED 200.00
+```
 
 #### Permissions
 
@@ -821,6 +988,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Route | `/orders-money/gift-card-liability-management-bo-1168` |
 
 **Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Outstanding gift card obligations: balances, redeemed, unredeemed, expired.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **List operation(s) getWalletLiability return a bare array, not the paged list envelope (items, nextCursor, hasMore); rows of getWalletLiability carry no identifier.** Why: The table cannot page, and a row without an id cannot open, edit or link to the record it summarises. *(source: contracts/satellite/wallet.yaml#getWalletLiability; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
 
 #### Inputs: what the user enters or picks
 
@@ -889,6 +1062,10 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Corporate program | text | not in the schema: `Corporate program` |
 | Aging analysis | text | not in the schema: `Aging Analysis` |
 
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **gift card liability**: By issue period and status. *(source: contracts/satellite/wallet.yaml#getWalletLiability)*
+
 **Data it reads**: `getWalletLiability` (onLoad, Gift card liability)
 
 **Where the user goes next**
@@ -905,6 +1082,16 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the gift card liability are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+liability:
+  outstanding: AED 612,000.00
+  expired: AED 22,000.00
+```
 
 #### Permissions
 
@@ -947,6 +1134,7 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 - [ ] Every transition is wired: `BO-1163`.
 - [ ] Every gated control is gated: `WALLET_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -967,11 +1155,21 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 | Opens with | nothing: it opens on its own |
 | Route | `/orders-money/breakage-revenue-recognition-policy-bo-1169` |
 
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
+**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape … Contract gap recorded 2 October 2026 (CHG-WIR-027): A read (get or list) of the wallet accounting mapping that setWalletAccountingMapping writes.
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Breakage and revenue recognition rules for expired or unredeemed value.
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- No read operation: the screen declares only setWalletAccountingMapping and nothing that returns the current configuration. (CHG-WIR-027)
 
 #### Inputs: what the user enters or picks
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **breakage account**: Account and recognition timing per credit type. *(source: contracts/satellite/wallet.yaml#setWalletAccountingMapping)*
 
 #### Outputs: what the screen shows and produces
 
@@ -1007,6 +1205,17 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the breakage revenue recognition are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+rule:
+  creditType: Gift card
+  recognise: at expiry
+  account: '4810'
+```
 
 #### Permissions
 
@@ -1064,6 +1273,22 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | nothing: it opens on its own |
 | Route | `/orders-money/wallet-financial-period-closing-controls-bo-1170` |
 
+**From the Finance, Ledger & Tax · Reporting & Analytics process.** Month-end for wallet money: a roll-forward of the wallet liability from opening to closing balance, the checks that must pass before the period closes, and the close itself. Wallet balances are a liability to customers until redeemed or recognised as breakage under policy; the finance manager must see every movement that explains the change and every blocker that stops the close.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **The 18 fields are selectFields under a configEditor pattern, but most of them (Opening liability, Funding, Redemption, Breakage, Closing liability) are figures of a statement, not settings.** Why: A designer would draw dropdowns for amounts. *(source: screens/P08-venue-back-office.yaml#BO-1170; Finance, Ledger & Tax · Reporting & Analytics)*
+- **The purpose lists statuses Open, Closing, Under Review, Closed, Reopened; the contract has open, closing and closed only.** Why: Under review is closing with an approval waiting; reopened is a history event. *(source: contracts/spine/finance.yaml#/components/schemas/PeriodStatus / R144; Finance, Ledger & Tax · Reporting & Analytics)*
+- **getWalletLiability returns outstanding, expiring and breakage at a date; it returns none of the movements (funding, credits issued, redemption, refunds, transfers, adjustments) the roll-forward needs.** Why: The roll-forward cannot be built from the declared reads. *(source: contracts/satellite/wallet.yaml#/components/schemas/WalletLiabilityRow; Finance, Ledger & Tax · Reporting & Analytics)*
+- **"Close by tenant", "Close by venue" and "Close by currency" imply separate closes; a fiscal period belongs to a legal entity and closes at region scope.** Why: There is no per-venue or per-currency close in the contract. *(source: contracts/spine/finance.yaml#/components/schemas/FiscalPeriod / contracts/spine/finance.yaml#closeFiscalPeriod; Finance, Ledger & Tax · Reporting & Analytics)*
+- **The wallet pre-close validations (pending refunds, pending reversals, negative balances, missing accounting mappings, failed integrations, unprocessed expirations, breakage candidates) are not values of the close-check list.** Why: The close cannot block on them, so the screen would show checks nothing runs. *(source: contracts/spine/finance.yaml#/components/schemas/PeriodCloseResult / screens/P08-venue-back-office.yaml#BO-1170; Finance, Ledger & Tax · Reporting & Analytics)*
+
+#### Decided on this screen
+
+Answered questions: draw the decision, not the old default. Where a decision and the tables below differ, the decision wins.
+
+- **Which wallet-specific checks join the period-close checks, and does a wallet movement summary operation get added?** → Add a wallet movement summary operation and wallet pre-close checks. *(decided by Chinmay, 2026-10-02; DEC-220 / CHG-NOTE-003)*
+
 #### Inputs: what the user enters or picks
 
 **On the screen**
@@ -1097,10 +1322,61 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Status | segmented control | — | Open · Closing · Closed | `listFiscalPeriods` ?status |
 | As of | date picker | — | — | `getWalletLiability` ?asOf |
 | Group by | radio group | — | Credit type · Wallet type · Venue · Age band | `getWalletLiability` ?groupBy |
+| From | date picker | — | — | `getWalletMovementSummary` ?from |
+| To | date picker | — | — | `getWalletMovementSummary` ?to |
+| Group by | segmented control | — | Credit type · Wallet type · Venue | `getWalletMovementSummary` ?groupBy |
+| Period end | date picker | — | — | `getWalletPreCloseChecks` ?periodEnd |
+
+**Rules for these inputs** (from the Finance, Ledger & Tax · Reporting & Analytics process; these refine the tables above and win where they differ)
+
+- **period and legal entity**: The fiscal period being closed, chosen from the legal entity's periods; close is per legal entity and region, so "close by tenant / venue / currency" are views of the roll-forward, not separate closes. *(source: contracts/spine/finance.yaml#/components/schemas/FiscalPeriod / contracts/spine/finance.yaml#closeFiscalPeriod)*
+- **Reopen with approval**: Reopening needs a reason (kept in the period's history) and a finance approver who is not the requester; reopening restates figures already reported, so the default advice is a reversal in the open period instead. *(source: contracts/spine/finance.yaml#/components/schemas/FiscalPeriod / F13 step 6 / R144)*
 
 #### Outputs: what the screen shows and produces
 
-**Data it reads**: `listFiscalPeriods` (onLoad, The period being closed); `getWalletLiability` (onLoad, Closing balance)
+**Shown**
+
+**Wallet movement summary** (data table, from `getWalletMovementSummary`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Group key | text | — |
+| Opening | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Top ups | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Refunds in | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Transfers in | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Adjustments in | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Spend | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Transfers out | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Adjustments out | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Refunds out | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Expired | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Breakage recognised | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Closing | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Ties out | yes / no (icon or chip) | Opening plus every movement equals closing. |
+
+**Wallet pre-close checks** (data table, from `getWalletPreCloseChecks`): **A wallet movement summary and wallet pre-close checks (decided 2 October 2026 by Chinmay, DEC-220; CHG-CSA-027, CHG-CSP-040)**; the period close waits in the approvals inbox (DEC-221) with a deep link here.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Code | chip: Roll forward ties, Sub ledger ties to ledger, No expired holds open, No pending … | — |
+| Outcome | chip: Pass, Warn, Fail | — |
+| Detail | text | — |
+| Difference | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+
+**Rules for what is shown** (from the Finance, Ledger & Tax · Reporting & Analytics process; these refine the tables above and win where they differ)
+
+- **liability roll-forward**: A vertical statement, read-only: Opening liability, plus Funding (top-ups), plus Credits issued, minus Redemption, minus Refunds, plus or minus Transfers, plus or minus Adjustments, minus Breakage recognised, equals Closing liability. Expired-this-period is a memo line, because breakage is recognised on policy, not on expiry. The check line "Opening + movements = Closing" shows a tick or the unexplained difference. *(source: contracts/satellite/wallet.yaml#getWalletLiability / contracts/satellite/wallet.yaml#/components/schemas/WalletLiabilityRow / TRACKER Actions row 164)*
+- **liability breakdown**: Grouping switch by credit type, wallet type, venue and age band; one figure per currency. *(source: contracts/satellite/wallet.yaml#getWalletLiability)*
+- **period status**: Open, Closing, Closed. "Awaiting approval" is Closing with an approval request waiting, shown with the approver's name; "Reopened" is an event in the history, not a status. *(source: contracts/spine/finance.yaml#/components/schemas/PeriodStatus / contracts/spine/finance.yaml#/components/schemas/FiscalPeriod)*
+- **pre-close checks**: One row per check with pass or the blocking count and a link to fix it. The ledger's checks are trial balance balances, no unapproved journals, no open shifts, settlements reconciled, recognition run complete, prior period closed and variance exceptions reviewed. The wallet pre-close checks join them, read from a wallet movement summary (an operation to be added), so none is drawn greyed. *(source: contracts/spine/finance.yaml#/components/schemas/PeriodCloseResult / F13 step 1 / decided 2 October 2026 by Chinmay (CHG-NOTE-003))*
+
+**What each action does** (from the Finance, Ledger & Tax · Reporting & Analytics process; these refine the tables above and win where they differ)
+
+- **Export close package**: PDF and Excel of the roll-forward, the checks and the period history, stamped with who and when. *(source: screens/P08-venue-back-office.yaml#BO-1170 / ADR-0047)*
+- **Carry exceptions forward**: Only an exception reviewed and accepted may be carried; it stays visible in the next period's checks with its age. *(source: screens/P08-venue-back-office.yaml#BO-1170 / contracts/spine/finance.yaml#/components/schemas/PeriodCloseResult)*
+
+**Data it reads**: `listFiscalPeriods` (onLoad, The period being closed); `getWalletLiability` (onLoad, Closing balance); `getWalletMovementSummary` (onLoad, Wallet movements for the period (DEC-220)); `getWalletPreCloseChecks` (onLoad, The wallet checks that must pass before the period closes …)
 
 **Where the user goes next**
 
@@ -1116,11 +1392,44 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Empty, no results (`?state=emptyNoResults`) | **Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist |
 | Offline (`?state=offline`) | online only |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed |
+
+#### Edge cases to draw
+
+- **the roll-forward does not tie (opening plus movements differs from closing)**: The difference is shown in red with the wallet-to-ledger and wallet-to-acquirer reconciliation one click away; close is not offered. *(source: contracts/satellite/wallet.yaml#getWalletReconciliation)*
+- **a negative wallet balance exists**: Listed as a blocker with the wallet count; it cannot be netted against other balances. *(source: screens/P08-venue-back-office.yaml#BO-1170)*
+
+#### Consistency with other screens
+
+- Match `BO-090 Period Close and BO-1172`: One close, three doors. The close operations live on BO-090 (F13) and BO-1172; this screen must use the same status words and the same check names, and hand off rather than run a second close.
+- Match `BO-076 Revenue Recognition`: Breakage recognised here equals the breakage posted to revenue there.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+entity: Aquaventure Leisure LLC · September 2026 · Closing (awaiting approval from Fatima Al Mansoori)
+rollForward:
+  openingLiability: AED 1,250,000.00
+  funding: AED 486,300.00
+  creditsIssued: AED 18,750.00
+  redemption: − AED 512,940.00
+  refunds: − AED 9,860.00
+  transfers: AED 0.00
+  adjustments: − AED 1,200.00
+  breakageRecognised: − AED 6,200.00
+  closingLiability: AED 1,224,850.00
+  memoExpired: AED 14,500.00 expired this period, 6,200.00 recognised as breakage under policy, 8,300.00 still held
+checks: 'Settlements reconciled: 2 open exceptions · No open shifts: passed · Recognition run complete: passed'
+```
 
 #### Permissions
 
 - `listFiscalPeriods` → `LEDGER_VIEW` (read) · staff
 - `getWalletLiability` → `WALLET_VIEW` (read) · staff
+- `getWalletMovementSummary` → `WALLET_VIEW` (read) · staff
+- `getWalletPreCloseChecks` → `WALLET_VIEW` (read) · staff, service
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -1152,13 +1461,16 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (18), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (18), with its required mark, default, format and its error state (400).
+- [ ] Every output is drawn (18 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-1170?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, emptyNoResults, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-1163`.
 - [ ] Every gated control is gated: `LEDGER_VIEW`, `WALLET_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 2 edge case(s) from the process notes are drawn.
+- [ ] The 5 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
+- [ ] The 1 decision(s) taken on this screen are drawn as decided, not as the old default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -1180,6 +1492,12 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 | Route | `/orders-money/wallet-analytics-management-reporting-bo-1171` |
 
 **Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Wallet analytics: usage, balances and behaviour by credit type.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **List operation(s) getWalletLiability return a bare array, not the paged list envelope (items, nextCursor, hasMore); rows of getWalletLiability carry no identifier.** Why: The table cannot page, and a row without an id cannot open, edit or link to the record it summarises. *(source: contracts/satellite/wallet.yaml#getWalletLiability; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
 
 #### Inputs: what the user enters or picks
 
@@ -1240,6 +1558,10 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Guest | text | not in the schema: `Guest` |
 | AI insights | text | not in the schema: `AI Insights` |
 
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **analytics**: KPI cards and trends. *(source: contracts/satellite/wallet.yaml#getWalletLiability)*
+
 **Data it reads**: `getWalletLiability` (onLoad, Management reporting)
 
 **Where the user goes next**
@@ -1256,6 +1578,16 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the wallet analytics reporting are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+kpis:
+  activeWallets: 18420
+  avgBalance: AED 118.60
+```
 
 #### Permissions
 
@@ -1300,6 +1632,7 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 - [ ] Every transition is wired: `BO-1163`.
 - [ ] Every gated control is gated: `WALLET_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -1320,7 +1653,24 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 | Opens with | `periodId` (navigation) |
 | Route | `/orders-money/finance-validation-reporting-audit-center-bo-1172` |
 
+**What the spec says about it.** **Reconciliation is daily, per venue** (decided 2 October 2026, Chinmay; CHG-FIN-009; audit R110 (b)). The unit of work and of sign-off is one venue-day: POS cash, gateway settlements, bank and wallet against the ledger for that day. A longer range reviews days already reconciled; a provider's monthly file (DI-268) is matched day by day.
+
 **Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
+
+**From the Finance, Ledger & Tax · Reporting & Analytics process.** The finance controls centre (DI-277): one place that shows the transactions and balances with exceptions or variances needing review, proves that wallet balances, the wallet sub-ledger, the general ledger and the acquirer agree, and moves the period through submit and approve. Get right: the person who submits the close is never the one who approves it, and every check names what to fix.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **"Run Finance Validation" is mapped to getUnifiedReconciliation; the contract's validation is the dry-run close, which returns the failed checks.** Why: A reconciliation read does not tell the user whether the period can close. *(source: screens/P08-venue-back-office.yaml#BO-1172 / contracts/spine/finance.yaml#closeFiscalPeriod / MATRIX 5.7.89; Finance, Ledger & Tax · Reporting & Analytics)*
+- **"Approve Close" is mapped to closeFiscalPeriod, but that operation raises an approval request to a different finance approver and returns with the period still closing; the approval is decided in approvals.** Why: A button labelled Approve that only requests approval misleads, and invites self-approval. *(source: contracts/spine/finance.yaml#closeFiscalPeriod / R144; Finance, Ledger & Tax · Reporting & Analytics)*
+- **The table's column list includes "against", a fragment of the pack sentence, as a column.** Why: Parsing artefact. *(source: screens/P08-venue-back-office.yaml#BO-1172; Finance, Ledger & Tax · Reporting & Analytics)*
+- **The purpose carries board 10's integration-governance text (APIs, webhooks, synchronisation) after "Finance Health Check".** Why: Page bleed from the pack; this screen is the finance health check only. *(source: screens/P08-venue-back-office.yaml#BO-1172; Finance, Ledger & Tax · Reporting & Analytics)*
+
+#### Decided on this screen
+
+Answered questions: draw the decision, not the old default. Where a decision and the tables below differ, the decision wins.
+
+- **Which approval inbox does the finance approver use to decide a period close?** → Drawn default stands (answer: "The approvals inbox, with a deep link to the close checks"): The approvals inbox, with a deep link back to this screen showing the checks. *(decided by Chinmay, 2026-10-02; DEC-221 / CHG-NOTE-003)*
 
 #### Inputs: what the user enters or picks
 
@@ -1334,6 +1684,10 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 | Status | segmented control | — | Open · Closing · Closed | `listFiscalPeriods` ?status |
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+**Rules for these inputs** (from the Finance, Ledger & Tax · Reporting & Analytics process; these refine the tables above and win where they differ)
+
+- **period**: Arrives with the period from navigation; otherwise the oldest period that is open or closing. *(source: contracts/spine/finance.yaml#listFiscalPeriods)*
 
 #### Outputs: what the screen shows and produces
 
@@ -1372,6 +1726,19 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Export Audit (secondary button) | navigation or local | — | — | — | — |
 | Send to Finance (secondary button) | navigation or local | — | — | — | — |
 
+**Rules for what is shown** (from the Finance, Ledger & Tax · Reporting & Analytics process; these refine the tables above and win where they differ)
+
+- **finance health check**: Three tie-outs, each with a tick or the difference: customer wallet balances vs wallet sub-ledger liability; wallet sub-ledger vs general ledger; general ledger vs acquirer. A difference names the pair, the amount, the transactions involved and the likely cause. *(source: contracts/satellite/wallet.yaml#/components/schemas/WalletReconciliation / DI-277)*
+- **money sources vs ledger**: POS, gateway, bank, wallet and ledger totals with each named variance, same layout as BO-1081's strip. *(source: contracts/spine/finance.yaml#/components/schemas/UnifiedReconciliation)*
+- **close checks**: The seven close checks with pass, or the blocking count and a link to the screen that fixes it. *(source: contracts/spine/finance.yaml#/components/schemas/PeriodCloseResult / MATRIX 5.7.89)*
+
+**What each action does** (from the Finance, Ledger & Tax · Reporting & Analytics process; these refine the tables above and win where they differ)
+
+- **Run checks**: Runs the close checks without locking anything and lists what fails. It changes nothing, so no confirmation. *(source: contracts/spine/finance.yaml#closeFiscalPeriod / MATRIX 5.7.89)*
+- **Begin close**: Confirmation "Postings to September stop now. Sales continue and post to October." The period moves to Closing. *(source: contracts/spine/finance.yaml#beginPeriodClose / F13 step 4)*
+- **Request approval to close**: Runs the checks; if they pass, an approval request goes to a finance approver who is not the caller and the period stays Closing with "Awaiting approval from …". If a check fails, the failed checks are listed and nothing is sent. *(source: contracts/spine/finance.yaml#closeFiscalPeriod / R144)*
+- **Generate liability report**: The wallet liability by credit type, age band and venue as at period end, exportable. *(source: contracts/satellite/wallet.yaml#getWalletLiability)*
+
 **Data it reads**: `getWalletReconciliation` (onLoad, Validation and audit); `listFiscalPeriods` (onLoad, The fiscal periods to begin closing or close)
 
 **Where the user goes next**
@@ -1389,6 +1756,31 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 The period is already `closed`, or one or more of the close checks failed. The checks are exactly the values of `PeriodCloseResult.checks[].check` … (PeriodCloseProblem); 409 The period is not `open`. |
+
+#### Edge cases to draw
+
+- **the user has wallet view but not ledger approval**: Tie-outs visible; Begin close and Request approval are absent, with "Needs ledger approval access" in their place. *(source: contracts/spine/finance.yaml#beginPeriodClose / contracts/satellite/wallet.yaml#getWalletReconciliation / DI-387)*
+- **the approver is on leave at month end**: The request follows the approver's time-bounded delegation; the screen shows the delegate's name. *(source: F13 step 3)*
+- **a trial balance that does not balance**: The close stops and is abandoned with a reason; the period reopens for posting. *(source: F13 step 5)*
+
+#### Consistency with other screens
+
+- Match `BO-090 Period Close`: Same three verbs (Begin close, Request approval, Reopen period) and the same check names; F13 runs there.
+- Match `BO-1170`: The liability figure here equals that screen's closing liability.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+period: September 2026 · Aquaventure Leisure LLC · Closing
+tieOuts:
+- Customer wallet balances AED 1,224,850.00 vs wallet sub-ledger AED 1,224,850.00 · tied
+- Wallet sub-ledger vs general ledger · tied
+- Wallet sub-ledger vs acquirer · short AED 2,450.00 · 3 top-ups captured 30 Sep, credited 1 Oct (timing)
+checks: Settlements reconciled · 2 exceptions open (Stripe, 29 Sep) · Fix in Daily Reconciliation
+approval: Requested by Omar Haddad 1 Oct 10:12 · awaiting Fatima Al Mansoori
+```
 
 #### Permissions
 
@@ -1437,6 +1829,9 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-1163`.
 - [ ] Every gated control is gated: `LEDGER_APPROVE`, `LEDGER_VIEW`, `WALLET_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 3 edge case(s) from the process notes are drawn.
+- [ ] The 4 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
+- [ ] The 1 decision(s) taken on this screen are drawn as decided, not as the old default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -1546,6 +1941,8 @@ Method, path, parameters, request and response for every operation these screens
 "closeFiscalPeriod": {"method":"POST","path":"/fiscal-periods/{periodId}/close","contract":"finance","summary":"Close a period and lock postings","permission":"LEDGER_APPROVE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"region","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"PeriodCloseResult"},
 "getUnifiedReconciliation": {"method":"GET","path":"/reconciliation/unified","contract":"finance","summary":"Every money source against the ledger, in one view","permission":"LEDGER_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"from","in":"query","required":true},{"name":"to","in":"query","required":true}],"requestBody":null,"responds":"UnifiedReconciliation"},
 "getWalletLiability": {"method":"GET","path":"/wallet-liability","contract":"wallet","summary":"What is outstanding, and what is breakage","permission":"WALLET_VIEW","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"tenant","parameters":[{"name":"asOf","in":"query","required":null},{"name":"groupBy","in":"query","required":null}],"requestBody":null,"responds":"WalletLiabilityRow"},
+"getWalletMovementSummary": {"method":"GET","path":"/wallet-movement-summary","contract":"wallet","summary":"How the stored-value balance moved over a period","permission":"WALLET_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":"from","in":"query","required":true},{"name":"to","in":"query","required":true},{"name":"groupBy","in":"query","required":null}],"requestBody":null,"responds":"WalletMovementSummary"},
+"getWalletPreCloseChecks": {"method":"GET","path":"/wallet-pre-close-checks","contract":"wallet","summary":"The wallet's checks before a period closes","permission":"WALLET_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":"periodEnd","in":"query","required":true}],"requestBody":null,"responds":"WalletPreCloseCheck"},
 "getWalletReconciliation": {"method":"GET","path":"/wallet-reconciliation","contract":"wallet","summary":"The wallet sub-ledger against the general ledger and the acquirer","permission":"WALLET_VIEW","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"tenant","parameters":[{"name":"from","in":"query","required":true},{"name":"to","in":"query","required":true}],"requestBody":null,"responds":"WalletReconciliation"},
 "listFiscalPeriods": {"method":"GET","path":"/fiscal-periods","contract":"finance","summary":"List fiscal periods","permission":"LEDGER_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"region","parameters":[{"name":"legalEntityId","in":"query","required":null},{"name":"status","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "setWalletAccountingMapping": {"method":"PUT","path":"/wallet-accounting","contract":"wallet","summary":"Which ledger account each credit type sits in","permission":"WALLET_CONFIGURE","offlineCapable":null,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":"WalletAccountingMapping","responds":"WalletAccountingMapping"},
@@ -1563,12 +1960,14 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "FiscalPeriodEvent": {"type":"object","description":"One step in a fiscal period's close. Written by the operation that took the step; never edited.","required":["action","principalId","occurredAt"],"properties":{"action":{"type":"string","enum":["beginClose","abandonClose","close","reopen"]},"reason":{"type":"string","nullable":true,"description":"Required by `abandonPeriodClose` and `reopenPeriod`; null for the other steps."},"principalId":{"type":"string","format":"uuid","description":"Who took the step."},"approverPrincipalId":{"type":"string","format":"uuid","nullable":true,"description":"The approver of a `reopen`. Null for the other steps."},"occurredAt":{"type":"string","format":"date-time"}}},
 "Money": {"type":"object","x-ticvai-persistence-kind":"valueObject","x-ticvai-persistence-column":"numeric(18,4)","description":"**On the wire this is three fields; in the database it is one column.**\n24 August. Every column typed `Money` was landing as `jsonb` — 129 of them, including `orders.shift.opening_float`, `inventory.purchase_order.total` and `promotions.voucher.balance`. **`orders.cash_movement.amount` was `numeric(18,4)` because somebody hand-typed that one**, and the inconsistency is what made it visible.\n**A jsonb price cannot be summed in SQL.** Every total, variance and reconciliation moves into application code — and a shift variance computed in .NET against a ledger computed in Postgres is two answers to one question. That is F13 month-end and F98 takings-to-ledger, both walked, both assuming the arithmetic is in the database.\n**`currency` and `scale` are not stored per row.** ADR-0018 makes them region-scoped and not overridable below, so they resolve from the scope walk — storing AED against nine million rows in a UAE region is nine million copies of a fact that cannot differ. A row that needed its own currency would be a row in the wrong region.\n**They stay on the wire** because a client reading a figure should not have to walk a hierarchy to know what it means.\n","required":["amount","currency","scale"],"properties":{"amount":{"type":"string","description":"Decimal string, never a float. Up to 4 decimal places. **Persisted as `numeric(18,4)`** — the string is a transport choice, so a JavaScript client cannot round a fare in transit.\n","pattern":"^-?\\d+(\\.\\d{1,4})?$"},"currency":{"type":"string","description":"**Resolved from the region, not stored on the row** (ADR-0018). OMR uses 3 decimal places and AED uses 2 — a venue on a different scale from its region is a ledger that cannot consolidate.\n","pattern":"^[A-Z]{3}$"},"scale":{"type":"integer","description":"Resolved from the region alongside `currency`.","minimum":0,"maximum":4}}},
 "Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}},
-"PeriodCloseResult": {"x-ticvai-persistence":"none — computed","type":"object","required":["fiscalPeriodId","dryRun","passed","checks"],"properties":{"fiscalPeriodId":{"type":"string","format":"uuid"},"dryRun":{"type":"boolean"},"passed":{"type":"boolean"},"checks":{"type":"array","items":{"type":"object","required":["check","passed"],"properties":{"check":{"type":"string","enum":["trialBalanceBalances","noUnapprovedJournals","noOpenShifts","settlementsReconciled","recognitionRunComplete","priorPeriodClosed","varianceExceptionsReviewed"]},"passed":{"type":"boolean"},"detail":{"type":"string"},"blockingCount":{"type":"integer"}}}}}},
+"PeriodCloseResult": {"x-ticvai-persistence":"none — computed","type":"object","required":["fiscalPeriodId","dryRun","passed","checks"],"properties":{"fiscalPeriodId":{"type":"string","format":"uuid"},"dryRun":{"type":"boolean"},"passed":{"type":"boolean"},"checks":{"type":"array","items":{"type":"object","required":["check","passed"],"properties":{"check":{"type":"string","enum":["trialBalanceBalances","noUnapprovedJournals","noOpenShifts","settlementsReconciled","recognitionRunComplete","priorPeriodClosed","varianceExceptionsReviewed"]},"passed":{"type":"boolean"},"detail":{"type":"string"},"blockingCount":{"type":"integer"}}}},"walletChecks":{"type":"array","description":"**The wallet pre-close checks** (decided 2 October 2026, Chinmay, batch 6 #220, BO-1170; DEC-220; CHG-CSP-040). Beside `checks`, whose values clients built at r1 already switch on, so no value is added there. `passed` is false while any of these fails. Empty where the tenant has no wallet module.","items":{"type":"object","required":["check","passed"],"properties":{"check":{"type":"string","enum":["walletRollForwardTies","walletLiabilityMatchesLedger","noPendingWalletAuthorisations","expiredBalancesReleased","walletDisputesReviewed"],"description":"`walletRollForwardTies`: opening liability plus top-ups, minus spend, refunds and expiry, equals closing liability. `walletLiabilityMatchesLedger`: that closing liability equals the wallet liability account. `noPendingWalletAuthorisations`: no authorisation is still held open in the period. `expiredBalancesReleased`: balances past expiry were released to breakage. `walletDisputesReviewed`: no wallet dispute raised in the period is unreviewed."},"passed":{"type":"boolean"},"detail":{"type":"string"},"blockingCount":{"type":"integer"}}}},"walletRollForward":{"type":"object","nullable":true,"description":"**The period's wallet movement summary, as the close checked it** (DEC-220; CHG-CSP-040): read from wallet `getWalletMovementSummary` so BO-1170 shows the roll-forward beside the ledger checks. Null where the tenant has no wallet module.","properties":{"openingLiability":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"toppedUp":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"spent":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"refunded":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"expired":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"closingLiability":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"ledgerLiability":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"description":"The wallet liability account's balance, to compare with `closingLiability`."}}}}},
 "PeriodStatus": {"type":"string","enum":["open","closing","closed"]},
 "UnifiedReconciliation": {"type":"object","description":"4.2.19. **Four sources and the variances between them.** A view showing each balanced against itself has not reconciled anything.\n","properties":{"from":{"type":"string","format":"date","description":"A day in the region's time zone, local midnight to local midnight."},"to":{"type":"string","format":"date","description":"A day in the region's time zone, local midnight to local midnight."},"sources":{"type":"array","items":{"type":"object","properties":{"source":{"type":"string","enum":["pos","gateway","bank","wallet","ledger"]},"providerName":{"type":"string","nullable":true},"total":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"transactionCount":{"type":"integer"}}}},"variances":{"type":"array","description":"**Where two sources disagree, named.** A discrepancy is usually the gap between two of them rather than inside one, and *\"out by 240\"* without saying between what is not actionable.\n","items":{"type":"object","properties":{"between":{"type":"array","description":"The two sources that disagree, as named in `sources[].source`.","minItems":2,"maxItems":2,"items":{"type":"string","enum":["pos","gateway","bank","wallet","ledger"]}},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"likelyCause":{"type":"string","nullable":true}}}}}},
 "Wallet": {"x-ticvai-persistence":"wallet.wallet + wallet.credit_lot","type":"object","required":["subjectId","balance","currency","status"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true,"description":"**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"},"subjectId":{"type":"string","format":"uuid"},"balance":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"credits":{"type":"array","description":"4.3.5 and 4.3.19. **One balance and one bonus balance with one expiry could not express what the requirement asks for** — cash, bonus and redemption credit, each with its own expiry.\n**The expiries are the reason this is a list.** Cash a guest paid for should outlive a promotional credit they were given, and a single `expiresAt` either expires the money they paid or never expires the promotion.\n**Consumed first-expiry-first-out across all three** (4.3.19), which is also the order that is fairest to the guest — spend what is about to die before what is not.\n**One entry per `active` lot in `wallet.credit_lot`** for this wallet: `amount` is the lot's `remaining_amount`, `expiresAt` its `expires_at`, `sourceRef` its `source_reference`. `kind` and `isRefundable` are not stored on the lot; they come from the lot's credit type (`listCreditLots` returns the lots themselves).\n","items":{"type":"object","required":["kind","amount"],"properties":{"kind":{"type":"string","enum":["cash","bonus","redemption","refund","goodwill"],"description":"**`cash` is money the guest paid and the others are not.** That distinction decides what is refundable, what expires, and what shows as a liability.\n","x-ticvai-persisted":false},"amount":{"x-ticvai-column":"remaining_amount","$ref":"../shared/common.yaml#/components/schemas/Money"},"expiresAt":{"type":"string","format":"date-time","nullable":true},"sourceRef":{"type":"string","nullable":true,"x-ticvai-column":"source_reference"},"isRefundable":{"type":"boolean","default":false,"x-ticvai-persisted":false,"description":"**True only for `cash`.** A guest cannot cash out a promotional credit, and a wallet that lets them has given away the promotion twice.\n"}}}},"bonusBalance":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"description":"Promotional value. Typically non-refundable and spent first."},"currency":{"type":"string","pattern":"^[A-Z]{3}$"},"status":{"type":"string","enum":["active","suspended","closed"]},"homeCellName":{"type":"string","nullable":true,"description":"Where the authoritative balance lives. Present when the guest is linked across cells.\n"},"expiresAt":{"type":"string","format":"date-time","nullable":true},"lastActivityAt":{"type":"string","format":"date-time","nullable":true}}},
 "WalletAccountingMapping": {"type":"object","x-ticvai-persistence":"wallet.accounting_mapping","description":"Boards 9.2 and 9.3. **Different credit types are different liabilities.**","properties":{"mappings":{"type":"array","items":{"type":"object","properties":{"creditTypeId":{"type":"string","format":"uuid"},"liabilityAccountCode":{"type":"string"},"breakageRevenueAccountCode":{"type":"string","nullable":true},"costAccountCode":{"type":"string","nullable":true,"description":"**For credit the venue gave away.** Promotional credit is a marketing cost already incurred, not money owed back, and booking it as a liability overstates what the venue owes by whatever marketing did last quarter.\n"}}}},"breakagePolicy":{"type":"object","properties":{"recogniseAfterMonths":{"type":"integer","nullable":true,"description":"**Recognised on a policy, not on the expiry date.** Some jurisdictions require the liability to be held long after the printed expiry.\n"},"requiresApproval":{"type":"boolean","default":true}}},"scopePath":{"type":"string"}}},
 "WalletLiabilityRow": {"type":"object","description":"Boards 9.5 and 9.6. **The number the finance director asks for.**","properties":{"key":{"type":"string"},"label":{"type":"string"},"outstanding":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"expiringThisPeriod":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"breakageRecognised":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"walletCount":{"type":"integer"},"oldestLotAt":{"type":"string","format":"date","nullable":true}}},
+"WalletMovementSummary": {"type":"object","x-ticvai-persistence":"none — aggregated from wallet.transaction and wallet.credit_lot","description":"One row of the wallet roll-forward (`getWalletMovementSummary`, CHG-CSA-027). Every amount is in the base currency.","properties":{"groupKey":{"type":"string","nullable":true},"opening":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"topUps":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"refundsIn":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"transfersIn":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"adjustmentsIn":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"spend":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"transfersOut":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"adjustmentsOut":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"refundsOut":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"expired":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"breakageRecognised":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"closing":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"tiesOut":{"type":"boolean","description":"Opening plus every movement equals closing."}}},
+"WalletPreCloseCheck": {"type":"object","x-ticvai-persistence":"none — computed at the call","description":"One wallet check before a period closes (`getWalletPreCloseChecks`, CHG-CSA-027).","properties":{"code":{"type":"string","enum":["rollForwardTies","subLedgerTiesToLedger","noExpiredHoldsOpen","noPendingExpiryRun","noOverdueDisputes","reconciliationSourcesMatched"]},"outcome":{"type":"string","enum":["pass","warn","fail"]},"detail":{"type":"string"},"difference":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"nullable":true}}},
 "WalletReconciliation": {"type":"object","description":"Board 9.4. **Three sources, and the exception names which pair disagrees.**","properties":{"from":{"type":"string","format":"date"},"to":{"type":"string","format":"date"},"subLedgerTotal":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"generalLedgerTotal":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"acquirerTotal":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"exceptions":{"type":"array","items":{"type":"object","properties":{"pair":{"type":"string","enum":["subLedgerVsGeneralLedger","subLedgerVsAcquirer","generalLedgerVsAcquirer"]},"difference":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"transactionIds":{"type":"array","items":{"type":"string","format":"uuid"}},"likelyCause":{"type":"string","nullable":true}}}}}},
 "WalletReconciliationSources": {"type":"object","x-ticvai-persistence":"wallet.reconciliation_source","description":"Board 9, p.105. **What `getWalletReconciliation` compares.** `walletLedger` is always on.","required":["sources"],"properties":{"sources":{"type":"array","minItems":1,"items":{"type":"object","required":["kind","enabled"],"properties":{"kind":{"type":"string","enum":["walletLedger","pos","paymentGateway","paymentServer","giftCard","finance"]},"enabled":{"type":"boolean","default":true},"matchKeys":{"type":"array","description":"Fields a movement is matched on, e.g. transactionId, authorisationCode, terminalId, amount, businessDate.","items":{"type":"string"}},"toleranceAmount":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"description":"A pair differing by no more than this is agreed. Default zero."},"schedule":{"type":"string","enum":["realTime","hourly","daily","endOfBusinessDay"],"default":"endOfBusinessDay"}}}},"scopePath":{"type":"string"}}}
 }

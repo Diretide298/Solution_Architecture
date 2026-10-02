@@ -1,10 +1,20 @@
 id: LLD-white-label
-title: white-label — 79 operations
+title: white-label — 93 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
 service: WhiteLabelService
 operations:
+- operation: buildDeepLink
+  verb: POST
+  path: /deep-links
+  scope: tenant
+  permission: TENANT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: claimCustomDomain
   verb: POST
   path: /tenant-domains
@@ -209,6 +219,17 @@ operations:
   reads:
   - whitelabel.tenant_config
   writes: []
+- operation: exportSitePackage
+  verb: POST
+  path: /site-package
+  scope: tenant
+  permission: TENANT_PUBLISH
+  audience:
+  - staff
+  offline: false
+  reads:
+  - whitelabel.site_package
+  writes: []
 - operation: getAppBuild
   verb: GET
   path: /tenant-config/app-builds/{appBuildId}
@@ -264,6 +285,16 @@ operations:
   offline: false
   reads:
   - whitelabel.tenant_config
+  writes: []
+- operation: getDeepLinkScheme
+  verb: GET
+  path: /deep-links
+  scope: tenant
+  permission: TENANT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
   writes: []
 - operation: getFeatureToggles
   verb: GET
@@ -329,6 +360,27 @@ operations:
   - whitelabel.navigation_item
   writes:
   - cache:resolution
+- operation: getPlatformSubdomain
+  verb: GET
+  path: /platform-subdomain
+  scope: tenant
+  permission: TENANT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: getPublishReviewPolicy
+  verb: GET
+  path: /publish-review-policy
+  scope: tenant
+  permission: TENANT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - whitelabel.publish_review_policy
+  writes: []
 - operation: getPublishedBookingFlow
   verb: GET
   path: /venues/{venueId}/booking-flow
@@ -356,6 +408,34 @@ operations:
   - whitelabel.guided_choice
   - whitelabel.guided_choice_answer
   - whitelabel.guided_choice_question
+  writes: []
+- operation: getPublishedTenantConfig
+  verb: GET
+  path: /storefront/tenant-config
+  scope: tenant
+  permission: null
+  audience:
+  - anonymous
+  - guest
+  - device
+  offline: true
+  reads:
+  - whitelabel.footer_config
+  - whitelabel.footer_config_column
+  - whitelabel.footer_config_social_link
+  - whitelabel.homepage_section
+  - whitelabel.navigation_item
+  writes: []
+- operation: getSitePackage
+  verb: GET
+  path: /site-package/{packageId}
+  scope: tenant
+  permission: TENANT_PUBLISH
+  audience:
+  - staff
+  offline: false
+  reads:
+  - whitelabel.site_package
   writes: []
 - operation: getSiteSetupProgress
   verb: GET
@@ -558,6 +638,17 @@ operations:
   - whitelabel.guided_choice_answer
   - whitelabel.guided_choice_question
   writes: []
+- operation: listLandingPageTemplates
+  verb: GET
+  path: /landing-page-templates
+  scope: tenant
+  permission: TENANT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - whitelabel.homepage_section
+  writes: []
 - operation: listPolicies
   verb: GET
   path: /tenant-config/policies
@@ -579,6 +670,42 @@ operations:
   offline: false
   reads:
   - whitelabel.promo_block
+  writes: []
+- operation: listPublishedContentPages
+  verb: GET
+  path: /storefront/pages
+  scope: tenant
+  permission: null
+  audience:
+  - anonymous
+  - guest
+  - device
+  offline: true
+  reads: []
+  writes: []
+- operation: listPublishedFaqs
+  verb: GET
+  path: /storefront/faqs
+  scope: tenant
+  permission: null
+  audience:
+  - anonymous
+  - guest
+  - device
+  offline: true
+  reads: []
+  writes: []
+- operation: listPublishedPolicies
+  verb: GET
+  path: /storefront/policies
+  scope: tenant
+  permission: null
+  audience:
+  - anonymous
+  - guest
+  - device
+  offline: true
+  reads: []
   writes: []
 - operation: proposeGuidedChoice
   verb: POST
@@ -658,6 +785,17 @@ operations:
   writes:
   - cache:idempotency
   - platform.outbox
+- operation: regenerateDomainToken
+  verb: POST
+  path: /tenant-domains/{domainId}/token
+  scope: tenant
+  permission: TENANT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - whitelabel.custom_domain
+  writes: []
 - operation: relinquishCustomDomain
   verb: DELETE
   path: /tenant-domains/{domainId}
@@ -937,6 +1075,29 @@ operations:
   writes:
   - cache:idempotency
   - whitelabel.policy
+- operation: setPrimaryDomain
+  verb: POST
+  path: /tenant-domains/{domainId}/primary
+  scope: tenant
+  permission: TENANT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - whitelabel.custom_domain
+  writes: []
+- operation: setPublishReviewPolicy
+  verb: PUT
+  path: /publish-review-policy
+  scope: tenant
+  permission: TENANT_PUBLISH
+  audience:
+  - staff
+  offline: false
+  reads:
+  - whitelabel.publish_review_policy
+  writes:
+  - whitelabel.publish_review_policy
 - operation: setSiteSetupProgress
   verb: PUT
   path: /tenant-config/site-setup

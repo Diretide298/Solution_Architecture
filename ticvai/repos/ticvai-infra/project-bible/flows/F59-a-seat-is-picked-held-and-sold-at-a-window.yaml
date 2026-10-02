@@ -36,11 +36,11 @@ steps:
     with them.'
 - step: 3
   screen: POS-004
-  action: The guest is slow. The hold is extended.
+  action: 'The guest is slow. The hold is not extended at the till; when it lapses the seat is held again'
   operations:
-  - extendSeatHold
-  outcome: '**Extended rather than re-taken.** Releasing and re-acquiring loses the seat to whoever
-    is refreshing the web page.'
+  - getSeatHold
+  - createSeatHold
+  outcome: '**No extend at the till** (POSV2-11, DEC-552): the hold runs its venue-set time, and a lapsed hold is taken again if the seat is still free; if it sold meanwhile, the map shows it taken (CHG-CLN-005)'
 - step: 4
   screen: POS-005
   action: They pay.

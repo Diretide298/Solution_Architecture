@@ -494,6 +494,17 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 37"
+   },
+   {
+    "operation": "setCustomerServiceCopilot",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-005): The chatbot screen wrote setCustomerServiceCopilot, the agent-side copilot (the same operation as BO-798); the guest-facing chatbot needs its own configuration (design-notes correction customer-marketing BO-797).",
+    "source": "contracts/satellite/marketing-crm.yaml#setCustomerServiceCopilot"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-007): No chatbot configuration operation (identity, channels, hours, handover).",
+    "source": "contracts/satellite/marketing-crm.yaml#setCustomerServiceCopilot"
    }
   ],
   "layout": {
@@ -501,41 +512,18 @@
    "regions": [
     {
      "name": "contentBody",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "setCustomerServiceCopilot",
-       "label": "Save",
-       "notes": "The act the screen exists for."
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "setCustomerServiceCopilot"
-      }
-     ]
+     "components": []
     }
    ]
   },
   "states": {
    "loading": "The chatbot list.",
    "error": "Could not load. Names which read failed and leaves the chatbot untouched.",
-   "emptyFirstRun": "No chatbot yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No chatbot yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the chatbot are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Not shown: nothing on this screen needs a permission of its own; the app's sign-in decides access."
   },
-  "apis": [
-   {
-    "operationId": "setCustomerServiceCopilot",
-    "contract": "marketing-crm",
-    "purpose": "Chatbot configuration",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026"
-   }
-  ],
+  "apis": [],
   "wireframe": {
    "status": "notStarted",
    "board": "wireframes/P08 Venue Management.dc.html#bo-797",
@@ -634,6 +622,24 @@
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
        "impliedBy": "setCustomerServiceCopilot"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Knowledge sources",
+       "bindsTo": "KnowledgeCollection",
+       "operation": "listKnowledgeCollections",
+       "provenance": "contract ai.yaml GET /collections; wiring fix, 2 October 2026"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "components": [
+      {
+       "kind": "secondaryButton",
+       "label": "Add document",
+       "operation": "ingestKnowledgeDocument",
+       "provenance": "contract ai.yaml POST /collections/{collectionId}/documents; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -660,6 +666,20 @@
     "purpose": "Questions the assistant could not answer",
     "trigger": "onLoad",
     "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "listKnowledgeCollections",
+    "contract": "ai",
+    "purpose": "The knowledge collections the assistant answers from",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-005)"
+   },
+   {
+    "operationId": "ingestKnowledgeDocument",
+    "contract": "ai",
+    "purpose": "Add a document to a collection",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-005)"
    }
   ],
   "wireframe": {
@@ -668,6 +688,30 @@
    "workshopBoard": "wireframes/WS76 Marketing CRM Configuration Reference v1.0 Board 7.dc.html#bo-798"
   },
   "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 37. 0 of 0 labels bound to a contract property; 0 of 9 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formIngestKnowledgeDocument",
+    "component": "modal",
+    "trigger": "Add document",
+    "body": "**Collects what `ingestKnowledgeDocument` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Add document",
+     "operation": "ingestKnowledgeDocument"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "contract ai.yaml POST /collections/{collectionId}/documents; wiring fix, 2 October 2026"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "collectionId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -739,6 +783,12 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 37"
+   },
+   {
+    "operation": "handoverToAgent",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-005): handoverToAgent is the guest's side of the handover (guest audience); the agent claims the conversation (claimConversation) (design-notes correction customer-marketing BO-799).",
+    "source": "contracts/satellite/marketing-crm.yaml#handoverToAgent | contracts/satellite/marketing-crm.yaml#claimConversation"
    }
   ],
   "layout": {
@@ -762,6 +812,17 @@
        "impliedBy": "sendConversationMessage"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "components": [
+      {
+       "kind": "secondaryButton",
+       "label": "Claim conversation",
+       "operation": "claimConversation",
+       "provenance": "contract marketing-crm.yaml POST /conversations/{conversationId}/claim; wiring fix, 2 October 2026"
+      }
+     ]
     }
    ]
   },
@@ -781,13 +842,6 @@
     "provenance": "board reading, 19 September 2026"
    },
    {
-    "operationId": "handoverToAgent",
-    "contract": "marketing-crm",
-    "purpose": "Take it from the bot",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026"
-   },
-   {
     "operationId": "setCallDisposition",
     "contract": "marketing-crm",
     "purpose": "Record why the conversation ended and any callback",
@@ -800,6 +854,13 @@
     "purpose": "Help a guest at a kiosk remotely",
     "trigger": "onAction",
     "provenance": "decided 29 September, VM close-out (venue management and configuration)"
+   },
+   {
+    "operationId": "claimConversation",
+    "contract": "marketing-crm",
+    "purpose": "Take the conversation from the bot",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-005)"
    }
   ],
   "wireframe": {

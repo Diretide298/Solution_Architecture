@@ -1,4 +1,147 @@
 {
+ "AccessOfflinePolicy": {
+  "type": "object",
+  "x-ticvai-persistence": "access.offline_policy",
+  "description": "The offline policy of one venue: what gates validate locally and for how long, how old the revocation cache may get, and how devices step down through degraded modes. Merges access.offline_validation_profile, access.revocation_cache_policy and access.degraded_mode_policy (declared 29 September, data-model close-out DM1)",
+  "required": [
+   "id",
+   "venueId",
+   "scopePath"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "maxOfflineDurationHours": {
+    "type": "integer",
+    "minimum": 0,
+    "nullable": true,
+    "description": "**Hours a reader may validate offline; past it, readers refuse offline taps** (decided 2 October 2026, Chinmay, critical set 1, BO-471: \"Yes: the venue sets a maximum offline duration; readers then refuse offline taps\"; DEC-426; CHG-CSP-035). Counted from the reader's last successful sync. Past the limit an access gate, a handheld and a games reader refuse every tap they would have validated from their local package (`ValidationResult.denyCause` `offlineLimitExceeded`) until they reconnect; `afterThresholdBehavior` decides only what the operator is shown and whether a supervisor may admit by hand (`supervisorMode`), and none of its values lets a reader keep validating unattended. The limit travels in the offline package (ADR-0068), so a reader that has lost the platform still knows it. Null sets no limit beyond the package's own expiry."
+   },
+   "offlineChecks": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "credentialAuthenticity",
+      "digitalSignature",
+      "ticketId",
+      "venue",
+      "park",
+      "zone",
+      "visitDate",
+      "timeWindow",
+      "credentialStatusSnapshot",
+      "ticketType",
+      "guestCategory",
+      "seat",
+      "timeslot",
+      "reservation",
+      "entitlements",
+      "reEntryPermissions",
+      "validityPeriod"
+     ]
+    },
+    "description": "What a gate may validate locally"
+   },
+   "afterThresholdBehavior": {
+    "type": "string",
+    "enum": [
+     "continueRestrictedValidation",
+     "operatorWarning",
+     "supervisorMode",
+     "failClosed",
+     "fallback"
+    ],
+    "nullable": true
+   },
+   "revocationTriggerEvents": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "fraudLock",
+      "refund",
+      "cancellation",
+      "lostCredential",
+      "transfer",
+      "reissue",
+      "manualInvalidation"
+     ]
+    },
+    "description": "Events that push an invalidation into the offline cache"
+   },
+   "revocationMaxAllowedAgeMinutes": {
+    "type": "integer",
+    "minimum": 0,
+    "nullable": true,
+    "description": "Maximum allowed revocation cache age"
+   },
+   "revocationStalenessAction": {
+    "type": "string",
+    "enum": [
+     "continue",
+     "continueWithWarning",
+     "restrictedProductsOnly",
+     "supervisorMode",
+     "denySelectedCredentialClasses",
+     "failClosed"
+    ],
+    "nullable": true,
+    "description": "What devices do when the cache is older than the maximum allowed age"
+   },
+   "operatingModes": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "online",
+      "degraded",
+      "edgeMode",
+      "localOffline",
+      "unsafeExpired"
+     ]
+    },
+    "description": "Operating modes a device moves through as connectivity fails"
+   },
+   "centralUnavailableAfterSeconds": {
+    "type": "integer",
+    "minimum": 0,
+    "nullable": true,
+    "description": "Seconds without central services before switching to edge mode"
+   },
+   "edgeUnavailableAfterSeconds": {
+    "type": "integer",
+    "minimum": 0,
+    "nullable": true,
+    "description": "Seconds without the venue edge before switching to local offline"
+   },
+   "automaticSwitch": {
+    "type": "boolean",
+    "default": true,
+    "description": "Switch modes automatically without stopping guest flow"
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "ltree of the owning scope node (ADR-0005)"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
  "DeviceTelemetryPoint": {
   "type": "object",
   "x-ticvai-persistence": "tenancy.device_telemetry",
@@ -96,6 +239,11 @@
      "type": "string",
      "format": "uuid"
     }
+   },
+   "coversGamesAddedLater": {
+    "type": "boolean",
+    "default": true,
+    "description": "**Whether a pass sold today covers a game added tomorrow** (Chinmay, 2 October, workbook Q397: \"venue configures; default yes\"; CHG-CSA-028). True, the default: an `allGamesPass`, or a pass bound by `attractionTypeIds`, covers games added after it was sold that match it; the coverage summary says so. False: it covers only the games that existed at sale. A pass listing `gameIds` covers those games only, whatever this says."
    },
    "playCount": {
     "type": "integer",

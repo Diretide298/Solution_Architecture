@@ -1,339 +1,4 @@
 {
- "Cell": {
-  "x-ticvai-persistence": "control.cell",
-  "x-ticvai-retired-columns": [
-   "tenant_id"
-  ],
-  "type": "object",
-  "required": [
-   "id",
-   "name",
-   "regionId",
-   "countryCode",
-   "tier",
-   "status"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "name": {
-    "type": "string"
-   },
-   "kind": {
-    "$ref": "#/components/schemas/CellKind"
-   },
-   "clusterId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "isReachable": {
-    "type": "boolean",
-    "default": true,
-    "description": "False for `onPremiseIsolated`, true for `onPremiseConnected` (ADR-0046). When false, the Control Plane holds the record for licensing and support and **cannot reach the installation** — it may sit behind a firewall with no inbound route. Every operation assuming reachability must handle absence rather than timing out, and a cell that has not called home for a month is not necessarily broken.\n"
-   },
-   "lastContactAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true,
-    "description": "When the site last called out. The only liveness signal for an unreachable cell, and the number a support engineer asks for first.\n"
-   },
-   "licenceExpiresAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true,
-    "description": "On-premise only. Licensing cannot be enforced by a Control Plane the site cannot reach, so a signed licence file is verified locally. **An expired licence degrades rather than stops** — a venue whose gates refuse entry because a licence lapsed over a weekend is worse than one running unlicensed until Monday.\n"
-   },
-   "participatesInCrossCell": {
-    "type": "boolean",
-    "default": true,
-    "description": "False by default for `onPremiseIsolated`, available for `onPremiseConnected` (ADR-0046). Redeeming a pass issued elsewhere requires reaching the issuing cell at that moment, and an on-premise site may not be able to. Exclusion is the honest default; local-then-reconcile carries a double-redemption risk that needs a decision rather than an assumption.\n"
-   },
-   "regionId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "regionName": {
-    "type": "string"
-   },
-   "countryCode": {
-    "type": "string"
-   },
-   "tier": {
-    "$ref": "#/components/schemas/CellTier"
-   },
-   "status": {
-    "$ref": "#/components/schemas/CellStatus"
-   },
-   "cloudProvider": {
-    "type": "string",
-    "nullable": true
-   },
-   "cloudRegion": {
-    "type": "string",
-    "nullable": true
-   },
-   "apiEndpoint": {
-    "type": "string",
-    "nullable": true
-   },
-   "venueCount": {
-    "type": "integer"
-   },
-   "provisionedAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "deploymentRef": {
-    "type": "string",
-    "nullable": true,
-    "description": "**A pointer to where this cell runs, not a description of it.** A Kubernetes namespace, an ECS cluster ARN, a stack name — whatever the orchestrator calls the thing.\n\n**The platform does not model instances, nodes or shards** (31 August). Kubernetes already holds instance counts and they change by the second; a table copying them drifts within minutes and the copy would win.\n\n**The line is: routing decisions belong to the platform, provisioning facts belong to the orchestrator.** Qdrant is the proof — ADR-0021 makes the tenant *the* shard key, so nine operations route without a lookup and **a stored shard assignment would be a second copy of something derivable.**\n\n**CF-161 needed a table after all, and this said it did not.** The claim here was that one database per cell or one per service is a build-time decision and the DDL is identical either way. **ADR-0038 answered it per tenant**, which drops `Cell.tenantId`, adds `CellTenant`, `RolloutTenant` and a per-tenant migration row, and takes `control` out of the tenant template. `tools/derive-ddl.py` carried the same claim in its docstring.\n\n**A claim that a question cannot affect your artefact is the one most likely to be left standing after it does**, which is why the correction is recorded here rather than the sentence simply deleted."
-   }
-  }
- },
- "CellCapacity": {
-  "type": "object",
-  "x-ticvai-persistence": "none — measured, not stored",
-  "required": [
-   "cellId",
-   "isConstrained",
-   "dimensions",
-   "measuredAt"
-  ],
-  "properties": {
-   "cellId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "kind": {
-    "$ref": "#/components/schemas/CellKind"
-   },
-   "tenantCount": {
-    "type": "integer",
-    "description": "Reported, and **deliberately not the sizing signal.** Forty quiet tenants may load a cell less than three busy ones.\n"
-   },
-   "isConstrained": {
-    "type": "boolean"
-   },
-   "constrainedDimension": {
-    "type": "string",
-    "nullable": true
-   },
-   "dimensions": {
-    "type": "array",
-    "description": "Per dimension, because the response differs. Short of connections and long on storage is a different problem from short of both.\n",
-    "items": {
-     "type": "object",
-     "required": [
-      "dimension",
-      "used",
-      "headroom"
-     ],
-     "properties": {
-      "dimension": {
-       "type": "string",
-       "enum": [
-        "concurrentUsers",
-        "transactionsPerSecond",
-        "scansPerSecond",
-        "databaseConnections",
-        "storageGb",
-        "replicationLag",
-        "cpu"
-       ]
-      },
-      "used": {
-       "type": "number"
-      },
-      "limit": {
-       "type": "number"
-      },
-      "headroom": {
-       "type": "number",
-       "description": "Fraction remaining. Negative means already over."
-      },
-      "peakAt": {
-       "type": "string",
-       "format": "date-time",
-       "nullable": true
-      }
-     }
-    }
-   },
-   "forecastBreachAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true,
-    "description": "When the constrained dimension is projected to run out at the current trend. Null where there is no trend to project — an honest null beats an invented date.\n"
-   },
-   "measuredAt": {
-    "type": "string",
-    "format": "date-time"
-   }
-  }
- },
- "CellDetail": {
-  "x-ticvai-persistence": "control.cell",
-  "allOf": [
-   {
-    "$ref": "#/components/schemas/Cell"
-   },
-   {
-    "type": "object",
-    "properties": {
-     "health": {
-      "$ref": "#/components/schemas/CellHealth"
-     },
-     "activeJobs": {
-      "type": "array",
-      "items": {
-       "$ref": "#/components/schemas/CellJob"
-      }
-     }
-    }
-   }
-  ]
- },
- "CellHealth": {
-  "x-ticvai-persistence": "none — polled, not stored",
-  "type": "object",
-  "required": [
-   "cellId",
-   "isHealthy",
-   "schemaVersion",
-   "checkedAt"
-  ],
-  "properties": {
-   "cellId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "isHealthy": {
-    "type": "boolean"
-   },
-   "schemaVersion": {
-    "type": "string",
-    "description": "From the cell's version register. Skew across a tenant's cells is expected during rollout; unexplained skew is a defect.\n"
-   },
-   "isSchemaBehind": {
-    "type": "boolean"
-   },
-   "databaseStatus": {
-    "type": "string"
-   },
-   "replicationLagSeconds": {
-    "type": "number",
-    "nullable": true
-   },
-   "lastBackupAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "lastRestoreDrillAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "checkedAt": {
-    "type": "string",
-    "format": "date-time"
-   }
-  }
- },
- "CellJob": {
-  "x-ticvai-persistence": "control.cell_job",
-  "type": "object",
-  "required": [
-   "id",
-   "cellId",
-   "kind",
-   "status",
-   "createdAt"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "cellId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "kind": {
-    "type": "string",
-    "enum": [
-     "provision",
-     "tierMigration",
-     "schemaMigration",
-     "backup",
-     "restore",
-     "decommission"
-    ]
-   },
-   "status": {
-    "type": "string",
-    "enum": [
-     "queued",
-     "running",
-     "completed",
-     "failed",
-     "rolledBack"
-    ]
-   },
-   "progressPercent": {
-    "type": "integer",
-    "minimum": 0,
-    "maximum": 100
-   },
-   "message": {
-    "type": "string",
-    "nullable": true
-   },
-   "error": {
-    "type": "string",
-    "nullable": true
-   },
-   "scheduledFor": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "createdAt": {
-    "type": "string",
-    "format": "date-time"
-   },
-   "completedAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   }
-  }
- },
- "CellKind": {
-  "type": "string",
-  "description": "Two deployment locations (ADR-0017, amended by ADR-0046). `shared` is the default; the others exist because a client asked or a law requires it.\n\n**On-premise is two configurations, not one (ADR-0046).** `onPremiseIsolated` keeps no channel to TICVAI — updates are pull-initiated or physically delivered, licensing is a signed file, support is blind. `onPremiseConnected` keeps an outbound control channel and is reachable, updatable and licensable in the ordinary way. The channel carries control traffic only and no natural person (ADR-0043); **AI inference is data, not control**, so connectivity alone does not grant the assistant.\n\nThere is no `hybrid`. The RFP's third model is answered by `onPremiseConnected`; a genuine split workload has never been asked for and would be a new decision.\n\n\n**`burst` added 31 August.** An environment stood up for one on-sale and torn down after (CF-162 scenario c). **It is not a jurisdiction and it is not permanent** — it holds a catalogue snapshot, three services of sixteen, and 17 tables of 380.\n\n**The other four are places data lives. This one is a place data passes through**, which is why it has its own lifecycle and a reconciliation obligation the others do not.",
-  "enum": [
-   "shared",
-   "dedicated",
-   "onPremiseIsolated",
-   "onPremiseConnected",
-   "controlPlane",
-   "burst"
-  ]
- },
- "CellTier": {
-  "type": "string",
-  "enum": [
-   "shared",
-   "dedicated",
-   "isolated",
-   "clientHosted"
-  ]
- },
  "CreateDashboardRequest": {
   "x-ticvai-persistence": "none — request only",
   "type": "object",
@@ -507,7 +172,7 @@
      "narrative": "**Generated prose belongs with `ai.Suggestion`.** The source's narrative / insight text (*\"Admissions are 12% above last Tuesday\"*) is model output with traceability requirements, not a way of drawing a query result.",
      "cohort": "**Not one of the eighteen.** It appears once in the source as a *usage* — *\"the Customer & Membership dashboard shall use cards, cohort and trend charts\"* — never as a specified component. A cohort view is a `matrix` or `heatmap` over a cohort dimension."
     },
-    "x-ticvai-note": "**These marks cannot yet bind data.** `ReportColumn` carries `field`, `label`, `aggregation` and `format` and **no encoding role** — no axis, series, size or colour. A `number` needs none and an eight-mark enum survived without one; a `scatter` needs x, y, size and colour, and a `combo` needs a secondary axis with stated units. **Adding `ReportColumn.role` is the harder half of this decision and is deliberately not made here** — it is the field-wells model the source's builder specifies, and it belongs with the engine and semantic-layer split that needs an ADR first.\n"
+    "x-ticvai-note": "**The marks bind through the report's column encodings** (decided 2 October 2026, Chinmay; CHG-FIN-007: build the nine). Superseding the note of 22 September, which left `ReportColumn.role` undecided. Each column of the tile's report carries `role` and `encoding` (and `axis`, `seriesType`, `hierarchyLevel`, `unitLabel` where the mark needs them), and `createDashboard` / `updateDashboard` refuse 422 `tile-encoding-missing` a tile whose report lacks what its mark requires:\n\n| Mark | Requires | |---|---| | `combo` | one `x` dimension; two or more measures, each with `axis` and `seriesType`; `unitLabel` on a secondary axis | | `matrix` | `row` dimensions (with `hierarchyLevel`), optional `column` dimensions, one or more `value` measures | | `funnel` | one `stage` dimension in order (`sortOrder`), one `value` measure | | `waterfall` | one `category` dimension of ordered steps, one `value` measure; the steps are a named measure set (for example Gross sales, Discounts, Refunds, Net revenue) and the last is the total | | `treemap` | one or more `category` dimensions with `hierarchyLevel`, one `size` measure, optional `colour` measure | | `scatter` | an `x` and a `y` measure, a `label` dimension, optional `size` and `colour` | | `map` | one `location` dimension (venue, zone or venue-map point), one `value` measure | | `ribbon` | an `x` dimension (period), a `series` dimension, one `value` measure (rank flow) | | `decompositionTree` | one `value` measure and two or more dimensions with `hierarchyLevel` |\n\nThe other eleven marks bind as before (`number` one measure; `line`, `area`, `bar` and the stacked bars an `x` dimension, optional `series`, one or more `y` measures; `pie`, `donut`, `gauge`, `heatmap`, `table` as their names). **Unchanged**: at most 24 tiles a dashboard, and every tile shows its as-of time and goes stale past its refresh (`KpiValue.asOf`, `stale`; BOARDREQ MOM-2713/2714).\n"
    },
    "parameters": {
     "type": "object",
@@ -756,7 +421,27 @@
    "PROCUREMENT_VIEW",
    "PROCUREMENT_REQUEST",
    "PROCUREMENT_MANAGE",
-   "PROCUREMENT_RECEIVE"
+   "PROCUREMENT_RECEIVE",
+   "CORE_AI_PUBLISH",
+   "TICKETING_AI_PUBLISH",
+   "ACCESS_AI_PUBLISH",
+   "FNB_AI_PUBLISH",
+   "RETAIL_AI_PUBLISH",
+   "INVENTORY_AI_PUBLISH",
+   "SEATING_AI_PUBLISH",
+   "MEMBERSHIP_AI_PUBLISH",
+   "MARKETING_AI_PUBLISH",
+   "RESOURCES_AI_PUBLISH",
+   "QUEUE_AI_PUBLISH",
+   "TRANSPORT_AI_PUBLISH",
+   "GAMES_AI_PUBLISH",
+   "MAINTENANCE_AI_PUBLISH",
+   "ACCREDITATION_AI_PUBLISH",
+   "PARTNER_AI_PUBLISH",
+   "ANALYTICS_AI_PUBLISH",
+   "BIOMETRIC_IMAGE_VIEW",
+   "ACCESS_DIRECTION_SET",
+   "REPORT_GOVERNANCE_MANAGE"
   ]
  },
  "PlatformStaffGrant": {

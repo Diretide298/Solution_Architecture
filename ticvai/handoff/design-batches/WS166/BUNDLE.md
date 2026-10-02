@@ -1,6 +1,6 @@
 # WS166 — Seat Management Venue Mapping Reference v1.0 board 2
 
-**10 screens · 13 operations · 20 schemas · 3 permissions**
+**10 screens · 14 operations · 20 schemas · 3 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -61,6 +61,68 @@ convincingly. It is never a caption.
   and its error; and, element by element, what is shown and in what format, what each action
   produces and where the user goes next. Draw exactly that.
 
+## The processes these screens belong to
+
+Written by the owner of each process (`handoff/design-notes/`). Read before any screen: it says how the process runs end to end and which words the screens must use.
+
+### Ticketing & Guest Commerce, as the venue and TICVAI configure and run it
+
+WHAT THE PROCESS IS. Everything a guest can buy is set up, priced, promoted and serviced here, on Venue Management (P08, the venue's own back office, served inside the venue's cell) and on the TICVAI Console (P09, TICVAI's control plane, outside every cell). End to end: (1) CATALOGUE. A product has one of twelve kinds (admission, timedAdmission, datedAdmission, openDated, seated, membership, bundle, fnb, retail, rental, addOn, giftCard). Its ticket types (adult, child, senior, resident...) are not typed one by one: they are generated from the product's attributes (components) and each value combination becomes a sellable ticket type with no extra setup (DI-164). What a ticket grants (validity, entries, re-entry, days of week, blackout dates, expiry anchor, fast track, transfer) lives on a reusable entitlement template, not on the product. Who may take part (age, height, supervision, certification) is the eligibility rule; what the guest must answer is the data mask and the consent questions; how the guest sees it is guestListing (bookable, infoOnly, hidden), display tags (at most six), media and the booking flow. Group, family and corporate products and every after-sales policy (reschedule, exchange, refund, cancellation, upgrade, transfer) are configured inside the one product configuration, never on separate screens (DI-465, DI-466). (2) LIFECYCLE AND PUBLICATION. A product moves draft, inReview, approved, live, withdrawn, archived. Approval and publication are two acts with two permissions (PRODUCT_APPROVE, PRODUCT_PUBLISH, R091); every product is authorised before it sells online or on site (DI-438). Approved is still not on a till: a till sells only what is in the signed catalogue release it pulled (publishBundle, ADR-0013), so a saved price is a back-office fact until the venue publishes to tills. Changing something that has sold is preceded by an impact check (assessProductChange: orders affected, entitlements issued, future performances, open carts); restoring a version creates a new version, and sold tickets keep the price and terms they were sold under (restoreProductVersion, DI-938, TRACKER Actions row 145). (3) PRICE. Prices live in price lists: per venue, per channel set, with validity dates and a priority, copied for the next season with an uplift (copyPriceList) and repriced in bulk only after a dry run (bulkChangePrices). Currency and decimal scale are never chosen on a form: they resolve from the venue's region (ADR-0008, ADR-0018; AED 2 places, OMR and BHD 3). When several rules apply, the configured hierarchy decides; there is no "lowest price wins" default (DI-595). Tax on the pre-discount price and three-decimal rounding are regional settings (DI-598). Dynamic rules always show their minimum and maximum price guardrails beside the trigger (getDynamicPriceRule). (4) PROMOTE AND BUNDLE. A promotion is a rule (automatic, or gated by a code) created in draft, made live only by Publish, which first analyses stacking; a …
+*(source: DI-164; DI-171; DI-438; DI-465; DI-466; DI-595; DI-598; DI-387; DI-039; DI-044; DI-474; DI-671; DI-987; DI-019; DI-080; ADR-0008; ADR-0013; ADR-0018; ADR-0019; ADR-0030; R091; R098; R101; R222; REV3-21; contracts/spine/catalogue.yaml#transitionProductLifecycle …)*
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Product | Anything sellable, of one of the twelve kinds. The record that carries names, channels, listing, media and policies. | Item (except on F&B and retail screens), SKU (for tickets), Offering | contracts/spine/catalogue.yaml#/components/schemas/ProductKind |
+| Ticket type | One sellable variant of an admission or event product (Adult, Child, Resident Adult), generated from the product's attributes. For retail and F&B the same record is labelled Variant. | Variant (on ticket screens), Sub-product, Rate (that is a price), Axis value | contracts/spine/catalogue.yaml#updateProductVariant / DI-164 / DI-437 |
+| Attribute | A dimension that generates ticket types (Guest category, Residency, Tier, Length). Each has values; adding a value adds ticket types. | Axis, Component (the client's word; use it only in help text), Option | contracts/spine/catalogue.yaml#setProductAttributes / DI-164 / DI-450 |
+| Entitlement | What a ticket lets the holder do (validity, entries, re-entry, days, blackout dates, expiry, fast track, transfer), defined once on an entitlement template and shared by several products. | Access rights, Ticket rules, Validity profile | contracts/spine/catalogue.yaml#createEntitlementTemplate / DI-171 / DI-451 |
+| Eligibility rule | Who may take part in or buy a product (age, height, supervision, waiver, certification). Distinct from a promotion's eligibility, which decides who gets a discount. | Restriction, Access rule (that is access control) | contracts/spine/catalogue.yaml#setProductEligibilityRule / DI-463 |
+| Price list | A set of prices for one venue and a set of channels, valid between two dates, with a priority. Several coexist (B2C, B2B, season). | Price book, Rate card, Tariff | contracts/spine/catalogue.yaml#createPriceList / DI-140 / DI-163 |
+| Price category | A standard rate type (Adult, Child, Member) reused across lists so venues do not invent "Adult Standard" and "Normal Adult". | Price band (that is a seat-category band), Fare type (transport) | contracts/spine/catalogue.yaml#setPriceCategoryRateType / … |
+| Price band | A priced band on a seat category (code, label, colour, amount, channel, from-date). | Price category, Zone price | contracts/satellite/seating.yaml#/components/schemas/SeatPriceBand |
+| Promotion | A rule that changes a price automatically or when a code is entered; draft until published; declares how it stacks. | Offer (except in guest copy), Deal, Discount rule | contracts/satellite/promotions.yaml#createPromotion / DI-173 / DI-174 |
+| Coupon code | A code issued from a coupon campaign that applies a promotion-style discount; one shared code or many single-use codes. | Voucher, Promo voucher | contracts/satellite/promotions.yaml#createCouponCampaign / DI-173 |
+| Voucher | A code that carries money (face value, balance), sold or issued; a liability until redeemed or expired. | Coupon, Credit note | contracts/satellite/promotions.yaml#listVoucherBatches / … |
+| Bundle | A product sold as one line whose price differs from the sum of its components, with a mandatory revenue allocation. "Package" is acceptable in guest copy. | Combo (that is an F&B meal deal), Catalogue bundle | contracts/satellite/promotions.yaml#createBundle / DI-220 / ADR-0019 |
+| Catalogue release | The signed snapshot of a venue's catalogue, prices, promotions and sale boards that tills, kiosks and devices pull. Its action label is "Publish to tills". | Bundle, Catalogue bundle, Sync, Deploy | contracts/spine/catalogue.yaml#publishBundle / … |
+| Approve / Publish / Save | Save keeps a draft; Approve records that it is authorised (PRODUCT_APPROVE); Publish makes it live for guests and channels (PRODUCT_PUBLISH). Three different buttons, never merged. | Submit, Go live, Activate (except CatalogueConfigStatus active), Deploy | R091 / contracts/spine/catalogue.yaml#transitionProductLifecycle / DI-438 |
+| Product states | Draft, In review, Approved, Live, Withdrawn, Archived (ProductLifecycleState), always as coloured badges with these exact labels. | Published (for a product), Pending, Inactive (for a product) | contracts/spine/catalogue.yaml#/components/schemas/ProductLifecycleState |
+| Channel | Where something is sold. Labels: pos Point of sale; kiosk Kiosk; web and guestWeb Website; mobile and guestApp App; b2b B2B partners; partner Partner; ota Travel agents (OTA); callCentre Call centre; api API; backOffice Back office. | Touchpoint, Outlet (an outlet is a business inside a venue), raw enum values | contracts/spine/catalogue.yaml#/components/schemas/Channel / … |
+| Refund | Money returned after settlement, wholly or for some lines, under the venue's refund policy. | Return (that is retail goods), Reversal, Void | contracts/spine/orders.yaml#createRefund / DI-252 |
+| Void | Cancelling a whole order before settlement, within the same shift, with a reason from the void list. After settlement it is a refund. | Cancel order, Delete | contracts/spine/orders.yaml#voidOrder / R222 |
+| Exchange / Reschedule | Exchange swaps lines for other products or dates and settles only the difference; Reschedule is the same product moved to another date or time. | Rebook, Date change (acceptable only in guest copy), Refund and resell | contracts/spine/orders.yaml#exchangeOrderLines / … |
+| Hold / Capture / Release | A deposit or stored-value amount is held, then partly or fully captured, and the rest released. A held deposit is not a payment. | Charge, Pre-auth (in staff copy), Block funds | contracts/spine/orders.yaml#authoriseStoredValue / … |
+| Wallet (TICVAI wallet) | The guest's stored-value balance on TICVAI, spent by hold and capture. Distinct from the tender "Apple Pay / Google Pay", which the contract also calls wallet. | Digital wallet (for stored value), E-wallet, Credit (without a type) | contracts/spine/orders.yaml#/components/schemas/TenderKind / R080 |
+| Credit lot | One amount of wallet credit of one credit type (cash, bonus, gift) with its own expiry; lots are spent nearest expiry first and the guest sees the breakdown but cannot choose. | Bucket, Batch, Top-up | TRACKER Actions row 171 / contracts/satellite/wallet.yaml#expireCreditLots |
+| Venue map / Seat map | A venue map is the wayfinding map of a park or a floor (points, paths, bookable places); a seat map is the seating layout of an auditorium or stand. Never just "map" where both could be meant. | Layout (alone), Floor plan (unless it is a floor map), Map (alone) | contracts/satellite/venue-map.yaml#createVenueMap / … |
+| Point / Bookable place | A point is a place on a venue map (toilet, ride, restaurant, exit). A bookable place is a cabana, lounger, table or pitch placed on the map and sold through its price band. | Pin, POI, Marker, Resource (in staff copy) | contracts/satellite/venue-map.yaml#setVenuePoint / … |
+| Station / Route / Timetable / Departure / Fare table / Pass … | A route is an ordered list of stations with offsets; a timetable generates departures up to its release horizon; a fare table prices a route per passenger type; a pass type is a multi-trip or unlimited pass sold as a product. | Stop (except in the stop list), Line (except lineCode), Schedule, Trip (except a guest's journey) | contracts/satellite/transport.yaml / REV3-21 |
+| Applies from | The effective date of a change. Every dated change shows it, and sold items keep their old terms. | Effective date (in labels), Start date (for a change) | contracts/satellite/seating.yaml#updateSeatCategory / TRACKER Actions row 194 |
+
+### AI & Intelligence
+
+AI in TICVAI is one governed engine behind many screens. The guest meets it as Sahli, the concierge (WEB-044, GST-031, GST-033), as the planner agent that refines a rules-built day plan by chat (GST-054), and as upsell and cross-sell offers on a separate Extras step (WEB-008, GST-048). Staff meet it as the Staff App's AI tab (EMP-019/020, knowledge EMP-040/041), the kiosk assistant (KSK-015) and the support copilot (SUP-006, SUP-018). Venue managers meet it in Venue Management (BO-091 policy and spend, BO-919/BO-925..932 resource and staffing forecasts, BO-597/598 configuration drafts, BO-772/782 marketing optimisation, BO-793 translations, BO-970/975 seat-map generation, BO-1048 seat upsell, BO-1160 fraud cases) and in Analytics (ANL-010 suggestions, ANL-019 management insights, ANL-055 anomalies, ANL-057 forecasting studio, ANL-059 insight history, ANL-060 governance, ANL-071 AI maturity). The governance, configuration-assistant, forecasting, oversight, audit and monitoring boards sit on the TICVAI Console (P09: ADM-037 providers, ADM-469..498 configuration assistant, ADM-499..518 forecasting, ADM-519..558 governance, ADM-633/637 fraud, ADM-680..697 recommendation governance). Five rules hold on every one of these screens. (1) Baseline first, then it learns per tenant: every data-driven answer (forecast, suggestion, risk score, recommendation) exists from day one, from the venue AI profile, a starting pattern for the venue type, the UAE calendar and the weather, and shifts to the venue's own data as it trades; nothing says "comes later" or refuses for lack of history - a refusal only names a missing setting. (2) Every answer shows its basis and maturity: a "Based on" line, a stage badge (Starting, Learning, Established, Trained on your data), "Limited historical data" while the starting pattern carries more than half the weight, ranges or bands rather than a bare percentage, a confidence only where the producer really has one, a plain-words explanation always. (3) A trained model replaces the baseline only when it beats it in a shadow run of at least six weeks and an admin promotes it; the platform raises "Ready to promote" and never switches by itself. (4) The LLM never reads raw data: numbers come only from query results the platform runs (the answer shows the query), only the masked prompt and retrieved context leave the platform, and AI only drafts - the owning screen applies. (5) One autonomy scale, L0 Disabled to L4 Controlled auto, with first-release ceilings, separate from user permission and from the approval tier; impactful actions route to a person, who sees current against proposed, impact, risk and what is affected, and can approve within a limit, challenge, override or roll back; every decision is traceable (data, model, approver, time) and searchable by customer, venue and capability. In Block A (5 October to 20 November 2026) the guest concierge with retrieval, Help me choose, translations, the planner agent, the gateway and …
+*(source: ADR-0051; ADR-0050; ADR-0020; ADR-0052; ADR-0053; ADR-0054; ADR-0059; ADR-0051 (AI-D01..AI-D20); ADR-0051 (AI functions review 30 Sep §2 §4 §9); MoM 18 Sep 4.1-4.10; MoM 21 Sep 4.1-4.14; MoM 30 Sep 4.1 4.7; ADR-0059 (Block A slice: tasks.csv))*
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Sahli | The guest concierge's name; the entry reads "Ask Sahli" and shows as mascot art when the venue's Concierge mascot setting is on (default), otherwise a plain button. | Chatbot, Bot, AI Concierge (as a visible label), Virtual agent | DI-1069 / screens/P01-guest-web-storefront.yaml#WEB-044 |
+| Based on | The line on every AI answer that says what it was computed from, e.g. "Based on: your venue profile, UAE calendar, weather, 23 days of your sales". Always present. | Data sources, Model inputs, Powered by AI | ADR-0051 Maturity / contracts/satellite/ai.yaml#/components/schemas/AiMaturity |
+| Starting / Learning / Established / Trained on your data | The four maturity stages (enum starting, learning, established, learned), shown as one badge. Moves by itself from Starting to Established as own data arrives; Trained on your data only after an admin promotion. | Beta, Experimental, Low confidence, Cold start (in UI), Not enough data | ADR-0051 / ADR-0051 (AI functions review 30 Sep §2) |
+| Limited historical data | Shown while own data carries less than half the weight (AiMaturity.limitedHistory, ownDataShare < 0.5). An honest qualifier, never a refusal. | Insufficient data, Not available until, Comes later | ADR-0051 / contracts/satellite/ai.yaml#/components/schemas/AiMaturity |
+| Range | The 10th-90th percentile band a forecast or estimate is shown with (e.g. "1,850-3,400 guests, most likely 2,600"). Never a bare accuracy percentage on an answer; measured accuracy (WAPE, bias, coverage) appears only on accuracy screens … | Accuracy 92%, Confidence 0.87 (on a heuristic), Exact | ADR-0051 / contracts/satellite/ai.yaml#getForecast / … |
+| Running in the background | A trained model in shadow next to the live answer (AiRelease.stage shadow); it changes nothing a person sees. | Live, Active model, Testing in production | ADR-0051 Promotion / ADR-0051 (AI functions review 30 Sep §2) |
+| Ready to promote / Promote | A shadow model passed its gate (governance alert promotionReady); an admin promotes it one stage at a time (canary, then production). The only way a model replaces the baseline. | Deploy, Go live, Auto-switch, Activate model, Upgrade AI | ADR-0051 (AI-D16) / contracts/satellite/ai.yaml#promoteAiRelease |
+| L0 Disabled / L1 Advisory / L2 Prepare / L3 Execute with … | The one autonomy scale for every AI capability, shown as "L2 Prepare" etc. with the capability's ceiling beside it. Lower scopes tighten, never raise. | Autopilot, Copilot mode, Level 0-3 (CFG book), Approval level (for autonomy), Manual/Semi/Auto | ADR-0050 / ADR-0050 (AI-D04) / … |
+| Approval tier | How many people must approve a proposed action (ProposedAction.approvalLevel, 1 or 2). Not an autonomy level. | Autonomy level, Approval level (ambiguous) | ADR-0050 |
+| Suggestion / Draft | What AI produces. A suggestion advises; a draft is a ready-to-review change that a person applies in the owning screen. Copy says "Nothing is applied until you approve it." | AI changed, Auto-applied, AI updated your prices | ADR-0020 / ADR-0051 (AI functions review 30 Sep §4 Configuration assistant) / … |
+| Why this? | The link or expander that opens an answer's explanation (Suggestion.explanation, recommendation template reason, decision trace). Plain words; for guests a template reason. | Explainability, SHAP, Feature importance (in operator copy) | ADR-0052 (AI-D09) / contracts/satellite/ai.yaml#/components/schemas/Suggestion |
+| No thanks | The explicit decline on an offer. Only this counts as a decline and it is remembered across channels; scrolling past or closing the step is not a decline. | Dismiss (as a decline), Skip (as a decline), X (as a decline) | ADR-0052 (AI-D07) / DI-962 / … |
+| Hold for review | What a high fraud or risk score does to a payment or order. The transaction goes through; it is held for a person. | Decline, Block, Reject (for a risk score), Fraud detected | ADR-0053 / ADR-0053 (AI-D06) |
+| Hand over to a person | The concierge passes the whole conversation and its own summary to a live agent; the guest does not repeat themselves. | Escalate, Transfer, Contact bot | contracts/satellite/marketing-crm.yaml#handoverToAgent |
+| Not available yet | The analytics assistant's answer to a question outside the semantic model; it records a knowledge gap and never improvises a number. | I cannot answer, Error, Unknown | ADR-0054 |
+
+
 ## The screens
 
 Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs count fields; requirements are matrix rows; meeting inputs are the ones naming the screen (the module and platform ones are below); white label says whether the tenant's brand reaches it (guest) or it sets the brand (configures).
@@ -74,13 +136,13 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-967` | AI Section Recognition | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-968` | AI Row & Seat Recognition | B–D | 0 | 0 | 6 | 6 | 2 | 6 | — | notStarted (—) |
 | `BO-969` | AI Aisle, VIP & Accessibility | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-970` | AI Numbering & Labeling | B–D | 0 | 0 | 6 | 11 | 0 | 0 | — | notStarted (—) |
+| `BO-970` | AI Numbering & Labeling | B–D | 0 | 0 | 6 | 5 | 0 | 0 | — | notStarted (—) |
 | `BO-971` | Validation & Correction | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-972` | AI Venue Designer & Publish | B–D | 0 | 0 | 6 | 1 | 1 | 0 | — | notStarted (—) |
+| `BO-972` | AI Venue Designer & Publish | B–D | 0 | 38 | 6 | 1 | 1 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 
-**BO-963, BO-964, BO-965, BO-966, BO-967, BO-968, BO-969, BO-970, BO-971, BO-972 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**BO-963, BO-964, BO-965, BO-966, BO-967, BO-968, BO-969, BO-970, BO-971 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ---
 
@@ -106,6 +168,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Every seat map import from submission to publication: queued, processing, review required, completed, failed; what was detected, confidence, what could not be read.
+
 #### Inputs: what the user enters or picks
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
@@ -115,6 +179,10 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 **Shown**
 
 **Detail panel** (detail panel): One record, read-only.
+
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **import jobs**: Source format, venue, owner, elapsed, outcome; an unreadable list with low confidence is shown differently from a named failure. *(source: contracts/satellite/seating.yaml#getSeatMapImport / contracts/satellite/seating.yaml#getImportJob)*
 
 **Where the user goes next**
 
@@ -139,6 +207,18 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the import are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+job:
+  file: amphitheatre-seating.pdf
+  status: reviewRequired
+  seats: 3142
+  confidence: 0.88
+```
 
 #### Permissions
 
@@ -209,9 +289,15 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Import a PDF or image plan, with an Excel or CSV seat manifest, into a draft map a person accepts.
+
 #### Inputs: what the user enters or picks
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **source and manifest**: Plan file plus optional manifest (section, row, seat); scale calibrated from a known dimension. *(source: contracts/satellite/seating.yaml#importSeatMap / DI-145 / TRACKER Actions row 110)*
 
 #### Outputs: what the screen shows and produces
 
@@ -240,6 +326,16 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the pdf image import are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+import:
+  plan: SampleAmphitheater_Seating.pdf
+  manifest: Seating_Manifest.xlsx (396 seats, 4 sections)
+```
 
 #### Permissions
 
@@ -303,9 +399,15 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Import SVG or CAD-origin geometry, mapping source layers (seats, accessible seating, steps) to sections and seats.
+
 #### Inputs: what the user enters or picks
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **layerMapping**: Source layers listed with a target per layer; unmapped layers shown. *(source: contracts/satellite/seating.yaml#importSeatGeometry)*
 
 #### Outputs: what the screen shows and produces
 
@@ -334,6 +436,17 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the svg cad import are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+layers:
+  SEATS: seats
+  WC-SEATS: accessible
+  STEPS: ignore
+```
 
 #### Permissions
 
@@ -401,9 +514,15 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Build or update seat master data from rows (section, row, seat, category, price band, accessibility); the manifest is the authority for which seats exist but carries no geometry.
+
 #### Inputs: what the user enters or picks
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **column mapping**: Columns mapped to fields with a preview of the first rows. *(source: contracts/satellite/seating.yaml#importSeatManifest)*
 
 #### Outputs: what the screen shows and produces
 
@@ -433,6 +552,16 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+manifest:
+  file: Seating_Manifest.xlsx
+  rows: 396
+```
 
 #### Permissions
 
@@ -495,6 +624,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Review the sections, levels and standing zones the import recognised, with per-object confidence.
+
 #### Inputs: what the user enters or picks
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
@@ -512,6 +643,10 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |  (primary button) | navigation or local | — | — | — | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
 
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **detected sections**: Boundaries on the source preview with confidence; low confidence first. *(source: contracts/satellite/seating.yaml#getSeatMapImport)*
+
 **Where the user goes next**
 
 - → `BO-963` Import Command Center: *Back to Import Command Center*; carries `importId`, `seatMapId`
@@ -526,6 +661,16 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the section recognition are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+detected:
+  section: Lower 105
+  confidence: 0.62
+```
 
 #### Permissions
 
@@ -588,6 +733,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Review detected rows and seat positions and correct them in bulk.
+
 #### Inputs: what the user enters or picks
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
@@ -605,6 +752,10 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Save seats (primary button) | navigation or local | — | — | — | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
 
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **confidence heat map**: Seats coloured by detection confidence. *(source: contracts/satellite/seating.yaml#getSeatMapImport / contracts/satellite/seating.yaml#updateSeats)*
+
 **Where the user goes next**
 
 - → `BO-963` Import Command Center: *Back to Import Command Center*; carries `importId`, `seatMapId`
@@ -620,6 +771,16 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 Map is published and the change is structural |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+rows:
+  detected: 118
+  lowConfidence: 7
+```
 
 #### Permissions
 
@@ -697,6 +858,8 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Review detected aisles, entrances, VIP areas, suites and wheelchair positions.
+
 #### Inputs: what the user enters or picks
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
@@ -714,6 +877,10 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Save map zones (primary button) | navigation or local | — | — | — | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
 
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **special geometry**: Detected items by kind with confidence and accept or correct. *(source: contracts/satellite/seating.yaml#getSeatMapImport)*
+
 **Where the user goes next**
 
 - → `BO-963` Import Command Center: *Back to Import Command Center*; carries `importId`, `seatMapId`
@@ -728,6 +895,16 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the aisle vip accessibility are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+detected:
+  wheelchairPositions: 16
+  aisles: 9
+```
 
 #### Permissions
 
@@ -786,7 +963,11 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | `seatMapId` (navigation), `actionId` (navigation), `planId` (navigation) |
 | Route | `/access-venue/ai-numbering-labeling-bo-970` |
 
-**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built. Removed 2 October 2026 (CHG-WIR-012): "Save seats" called updateSeats directly next to the AI proposal; applying the AI's proposal goes through its approval (decideProposedAction, declared), not a …
+
+**From the AI & Intelligence process.** AI numbering and labelling of seats: generate consistent section, row and seat labels from the recognised geometry (alphabetic, numeric, odd/even, continuous, reset by row), preview before/after, then approve. The one thing to get right: the AI proposes; a person previews and approves every map change (decided 21 August).
+
+**Fixed on main** (the package already carries these; draw what it says): "Save seats" calls updateSeats directly next to the AI proposal. (CHG-WIR-012).
 
 #### Inputs: what the user enters or picks
 
@@ -794,12 +975,20 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 #### Outputs: what the screen shows and produces
 
+**Shown**
+
+**Detail panel** (detail panel): One record, read-only.
+
 **Actions and what each produces**
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Save seats (primary button) | navigation or local | — | — | — | — |
+|  (primary button) | navigation or local | — | — | — | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
+
+**What each action does** (from the AI & Intelligence process; these refine the tables above and win where they differ)
+
+- **Propose numbering**: A proposal with before/after labels; approve applies it through Seating. *(source: contracts/satellite/ai.yaml#proposeSeatMapChanges / ADR-0020)*
 
 **Where the user goes next**
 
@@ -811,15 +1000,25 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |---|---|
 | Loading (`?state=loading`) | The numbering labeling list. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the numbering labeling untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No numbering labeling yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, first run (`?state=emptyFirstRun`) | No numbering labeling yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the numbering labeling are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 409 Map is published and the change is structural; 409 The action is no longer `proposed` — already decided, or expired (7 days after it was proposed, audit R213).; 422 The input the kind needs is missing (`numberingScheme` for `numbering`, `stagePosition` for `stageVariant`), or the map has no focal zone for `categories` … |
+| Validation and conflict | the form keeps what was entered and marks the problem: 409 The action is no longer `proposed` — already decided, or expired (7 days after it was proposed, audit R213).; 422 The input the kind needs is missing (`numberingScheme` for `numbering`, `stagePosition` for `stageVariant`), or the map has no focal zone for `categories` … |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+proposal:
+  section: L4
+  scheme: rows A-T, seats odd left / even right
+  conflicts: 2 duplicate labels found in row K
+```
 
 #### Permissions
 
-- `updateSeats` → `CAPACITY_CONFIGURE` (configure) · staff
 - `decideProposedAction` → `AI_USE` (operate) · staff
 - `proposeSeatMapChanges` → `CAPACITY_CONFIGURE` (configure) · staff
 - `getActionPlan` → `AI_USE` (operate) · staff
@@ -828,16 +1027,10 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 #### Requirements it meets
 
-11 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+5 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
 
 | Ref | Requirement (shortened) | Domain | Verdict | Via |
 |---|---|---|---|---|
-| 1.4.30 | Bulk Configuration and Updates AI can: Apply seat categories to thousands of seats simultaneously. Update pricing zones across multiple venues. Clone and modify existing seat maps. Generate … | Ticketing Catalogue | CONTRACTED | `updateSeats` |
-| 21.1.1 | Drag & Drop Venue Builder | Seat Management & Venue Mapping | CONTRACTED | `updateSeats` |
-| 21.1.2 | Section Builder | Seat Management & Venue Mapping | CONTRACTED | `updateSeats` |
-| 21.1.3 | Row Builder | Seat Management & Venue Mapping | CONTRACTED | `updateSeats` |
-| 21.1.4 | Seat Builder | Seat Management & Venue Mapping | CONTRACTED | `updateSeats` |
-| 21.2.15 | Manual Adjustment Layer | Seat Management & Venue Mapping | CONTRACTED | `updateSeats` |
 | 8.1.4 | Approval Before Execution AI recommendations affecting pricing or financial operations shall require approval before execution | Unified Operations Dashboard | CONTRACTED | `decideProposedAction` |
 | 1.4.23 | Event-Specific Configurations For multi-purpose venues, AI can: Create different seat maps for concerts, sports events, exhibitions, and conferences. Configure temporary seating arrangements. … | Ticketing Catalogue | CONTRACTED | `proposeSeatMapChanges` |
 | 1.4.25 | Intelligent Seat Numbering Automatically assign row names (A, B, C, etc.) and seat numbers based on configurable rules. Validate numbering sequences and identify duplicates or missing seats. Apply … | Ticketing Catalogue | CONTRACTED | `proposeSeatMapChanges` |
@@ -860,13 +1053,14 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS141 Seat Management Venue Mapping Reference v1.0 Board 2.dc.html#bo-970`
 - Workshop pack: Seat_Management_Venue_Mapping_Reference v1.0.pdf board 2
 - Flow F275 *Seat Management Venue Mapping Reference v1.0 board 2: Import Command Center*, step 14: Works in AI Numbering & Labeling → Generate consistent section, row and seat identifiers from recognized geometry. Configure alphabetic, numeric, alphanumeric, odd/even, continuous, reset-by-row and venue-specific numbering patterns. …
+- ADR-0020 *— Where AI runs, and what it is isolated from* (`docs/adr/0020-ai-isolation-boundary.md`)
 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state (403, 404, 409, 422).
 - [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-970?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: Save seats, Cancel.
+- [ ] Every action is wired with its success and its failure: , Cancel.
 - [ ] Every transition is wired: `BO-963`.
 - [ ] Every gated control is gated: `AI_USE`, `CAPACITY_CONFIGURE`.
 - [ ] The module and platform inputs below are applied.
@@ -892,6 +1086,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** One workspace to resolve import exceptions: source and generated map side by side with the issue list.
+
 #### Inputs: what the user enters or picks
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
@@ -909,6 +1105,10 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |  (primary button) | navigation or local | — | — | — | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
 
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **side by side**: Source left, map right, issue list below linked to both. *(source: contracts/satellite/seating.yaml#validateSeatMap)*
+
 **Where the user goes next**
 
 - → `BO-963` Import Command Center: *Back to Import Command Center*; carries `importId`, `seatMapId`
@@ -923,6 +1123,16 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the validation correction are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+issue:
+  kind: seat outside section
+  where: Upper 202 row B seat 1
+```
 
 #### Permissions
 
@@ -976,7 +1186,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 3 · needs the `seating` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `CAPACITY_CONFIGURE` (1 configure); in the flows as venue manager |
+| Who uses it | venue staff holding `CAPACITY_CONFIGURE`, `PRODUCT_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
 | Offline | online only |
@@ -985,11 +1195,65 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Known gaps.** **AI Venue Designer & Publish declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Generate or refine a seat map from a brief or an import and release the approved result: apply the parsed import, then validate and publish.
+
+**Fixed on main** (the package already carries these; draw what it says): No read operation: the screen declares only commitImportJob, publishSeatMap and nothing that returns the current configuration. (CHG-WIR-025).
+
 #### Inputs: what the user enters or picks
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
 
 #### Outputs: what the screen shows and produces
+
+**Shown**
+
+**Import progress and findings** (detail panel, from `getImportJob`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| ID | the name it points at, never the id | — |
+| Seat map | the name it points at, never the id | — |
+| Kind | chip: Manifest, Geometry | — |
+| Status | chip: Parsing, Preview ready, Committing, Committed, Failed | — |
+| Parsed seat count | 1,234 | — |
+| Matched seat count | 1,234 | Geometry imports — seats successfully joined to the manifest. |
+| Unmatched seat count | 1,234 | Present in one source but not the other. A seat in the plan with no manifest entry is a finding, not a seat. |
+| Outcome | chip: Parsed, Parsed with findings, No seats found, No layers matched, Unreadable | All four CF-122 defects failed silently — an import that found nothing reported success. |
+| Layers found | list or chips (count when long) | Every layer name in the source, decoded. Shown whether or not extraction worked, so an operator can map a role by reading rather than by … |
+| Findings | list or chips (count when long) | — |
+| Kind | chip: Duplicate seat number, Gap in row, Missing geometry, Seat outside section … | — |
+| Severity | chip: Error, Warning, Info | — |
+| Message | text | — |
+| Section code | text | — |
+| Row label | text | — |
+| Seat numbers | list or chips (count when long) | — |
+| Affected count | 1,234 | — |
+| Completed at | 1 Oct 2026, 14:30 | — |
+
+**Read a seat map with its structure** (detail panel, from `getSeatMap`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| ID | the name it points at, never the id | — |
+| Name | text | — |
+| Venue | the name it points at, never the id | — |
+| Status | chip: Draft, Validated, Published, Archived | — |
+| Seat count | 1,234 | — |
+| Section count | 1,234 | — |
+| Has geometry | yes / no (icon or chip) | False when only a manifest has been imported. Such a map can be sold from a list but not rendered. |
+| Published at | 1 Oct 2026, 14:30 | — |
+| Description | text | — |
+| View box | grouped details | Coordinate space for rendering. Absent when there is no geometry. |
+| Width | 1,234.5 | — |
+| Height | 1,234.5 | — |
+| Stage position | grouped details | — |
+| X | 1,234.5 | — |
+| Y | 1,234.5 | — |
+| Sections | list or chips (count when long) | — |
+| Code | text | — |
+| Name | text | — |
+| Row count | 1,234 | — |
+| Seat count | 1,234 | — |
 
 **Actions and what each produces**
 
@@ -998,6 +1262,12 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |  (primary button) | navigation or local | — | — | — | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
 | What publishing changes (publish gate) | navigation or local | — | — | — | — |
+
+**What each action does** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **Apply import**: Applies the previewed import to a draft; refuses an import that found nothing. *(source: contracts/satellite/seating.yaml#commitImportJob)*
+
+**Data it reads**: `getImportJob` (onLoad, Import progress and findings); `getSeatMap` (onLoad, Read a seat map with its structure)
 
 **Where the user goes next**
 
@@ -1015,10 +1285,20 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 Job has errors, or has already been committed (ValidationProblem); 409 Validation failed. (ValidationProblem) |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+brief: 3,000-seat amphitheatre, end stage, 12 sections, 16 wheelchair positions
+```
+
 #### Permissions
 
 - `commitImportJob` → `CAPACITY_CONFIGURE` (configure) · staff
 - `publishSeatMap` → `CAPACITY_CONFIGURE` (configure) · staff
+- `getImportJob` → `PRODUCT_VIEW` (read) · staff
+- `getSeatMap` → `PRODUCT_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -1051,12 +1331,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (409).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (404, 409).
+- [ ] Every output is drawn (38 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-972?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: , Cancel, What publishing changes.
 - [ ] Every transition is wired: `BO-963`.
-- [ ] Every gated control is gated: `CAPACITY_CONFIGURE`.
+- [ ] Every gated control is gated: `CAPACITY_CONFIGURE`, `PRODUCT_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -1162,6 +1442,7 @@ Method, path, parameters, request and response for every operation these screens
 "decideProposedAction": {"method":"POST","path":"/proposed-actions/{actionId}/decide","contract":"ai","summary":"Approve or reject a proposal","permission":"AI_USE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"ProposedAction"},
 "getActionPlan": {"method":"GET","path":"/action-plans/{planId}","contract":"ai","summary":"A plan with its steps","permission":"AI_USE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"AiActionPlanDetail"},
 "getImportJob": {"method":"GET","path":"/seat-maps/{seatMapId}/import/{jobId}","contract":"seating","summary":"Import progress and findings","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"ImportJob"},
+"getSeatMap": {"method":"GET","path":"/seat-maps/{seatMapId}","contract":"seating","summary":"Read a seat map with its structure","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"SeatMap"},
 "getSeatMapImport": {"method":"GET","path":"/seat-map-imports/{importId}","contract":"seating","summary":"How the import went","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"SeatMapImportJob"},
 "importSeatGeometry": {"method":"POST","path":"/seat-maps/{seatMapId}/import/geometry","contract":"seating","summary":"Import seat geometry from a plan","permission":"CAPACITY_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"ImportGeometryRequest","responds":null},
 "importSeatManifest": {"method":"POST","path":"/seat-maps/{seatMapId}/import/manifest","contract":"seating","summary":"Import the logical seat structure","permission":"CAPACITY_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"ImportManifestRequest","responds":null},

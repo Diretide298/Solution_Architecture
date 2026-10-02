@@ -221,7 +221,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; createAccreditationApplication · submitAccreditationApplication · updateAccreditationApplication</div>
+          <div><b>OPERATIONS</b> &middot; submitAccreditationApplication · updateAccreditationApplication</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · denied · emptyNoResults · emptyFirstRun</span></div>
           <div><b>ARRIVES WITH</b> &middot; applicationRef&larr;ACC-002, applicationId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#acc-002">ACC-002</a>  &mdash; <i>Registration Form</i> <span class="car">applicationId · applicationRef</span><br><a href="#acc-004">ACC-004</a>  &mdash; <i>Application Status Tracking</i> <span class="car">applicationId · applicationRef</span></div>
@@ -315,12 +315,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listAccreditationApplications</div>
+          <div><b>OPERATIONS</b> &middot; listAccreditationApplications · decideAccreditationApplication</div>
           <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error</span></div>
-          <div><b>ARRIVES WITH</b> &middot; programmeId&larr;session</div>
-          <div><b>GOES TO</b> &middot; <a href="#acc-007">ACC-007</a>  &mdash; <i>Reviewer Application Detail</i> <span class="car">documentId</span><br><a href="#acc-008">ACC-008</a>  &mdash; <i>Credential Register</i></div>
+          <div><b>ARRIVES WITH</b> &middot; programmeId&larr;session, applicationId&larr;navigation</div>
+          <div><b>GOES TO</b> &middot; <a href="#acc-007">ACC-007</a>  &mdash; <i>Reviewer Application Detail</i> <span class="car">applicationId · documentId</span><br><a href="#acc-008">ACC-008</a>  &mdash; <i>Credential Register</i></div>
           
-          
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formDecideAccreditationApplication &middot; <i>Approve</i> &middot; <b>Approve</b> &middot; Cancel</div></div>
         </div>
       </div>
       <div id="acc-007" class="scr">
@@ -378,7 +378,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listAccreditationCredentials</div>
+          <div><b>OPERATIONS</b> &middot; listAccreditationCredentials · listAccreditationAccessActivity</div>
           <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error</span></div>
           <div><b>ARRIVES WITH</b> &middot; programmeId&larr;session</div>
           <div><b>GOES TO</b> &middot; <a href="#acc-006">ACC-006</a>  &mdash; <i>Reviewer Queue</i><br><a href="#acc-007">ACC-007</a>  &mdash; <i>Reviewer Application Detail</i></div>

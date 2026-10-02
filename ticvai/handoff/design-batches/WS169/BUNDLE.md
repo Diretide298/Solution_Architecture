@@ -1,6 +1,6 @@
 # WS169 — Seat Management Venue Mapping Reference v1.0 board 5
 
-**10 screens · 11 operations · 13 schemas · 5 permissions**
+**10 screens · 10 operations · 13 schemas · 4 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -48,8 +48,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 5 permissions apply here:
-  `CAPACITY_CONFIGURE, ORDER_CREATE, ORDER_VIEW, PRICE_VIEW, PRODUCT_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 4 permissions apply here:
+  `CAPACITY_CONFIGURE, ORDER_CREATE, ORDER_VIEW, PRODUCT_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -61,6 +61,45 @@ convincingly. It is never a caption.
   and its error; and, element by element, what is shown and in what format, what each action
   produces and where the user goes next. Draw exactly that.
 
+## The processes these screens belong to
+
+Written by the owner of each process (`handoff/design-notes/`). Read before any screen: it says how the process runs end to end and which words the screens must use.
+
+### Ticketing & Guest Commerce, as the venue and TICVAI configure and run it
+
+WHAT THE PROCESS IS. Everything a guest can buy is set up, priced, promoted and serviced here, on Venue Management (P08, the venue's own back office, served inside the venue's cell) and on the TICVAI Console (P09, TICVAI's control plane, outside every cell). End to end: (1) CATALOGUE. A product has one of twelve kinds (admission, timedAdmission, datedAdmission, openDated, seated, membership, bundle, fnb, retail, rental, addOn, giftCard). Its ticket types (adult, child, senior, resident...) are not typed one by one: they are generated from the product's attributes (components) and each value combination becomes a sellable ticket type with no extra setup (DI-164). What a ticket grants (validity, entries, re-entry, days of week, blackout dates, expiry anchor, fast track, transfer) lives on a reusable entitlement template, not on the product. Who may take part (age, height, supervision, certification) is the eligibility rule; what the guest must answer is the data mask and the consent questions; how the guest sees it is guestListing (bookable, infoOnly, hidden), display tags (at most six), media and the booking flow. Group, family and corporate products and every after-sales policy (reschedule, exchange, refund, cancellation, upgrade, transfer) are configured inside the one product configuration, never on separate screens (DI-465, DI-466). (2) LIFECYCLE AND PUBLICATION. A product moves draft, inReview, approved, live, withdrawn, archived. Approval and publication are two acts with two permissions (PRODUCT_APPROVE, PRODUCT_PUBLISH, R091); every product is authorised before it sells online or on site (DI-438). Approved is still not on a till: a till sells only what is in the signed catalogue release it pulled (publishBundle, ADR-0013), so a saved price is a back-office fact until the venue publishes to tills. Changing something that has sold is preceded by an impact check (assessProductChange: orders affected, entitlements issued, future performances, open carts); restoring a version creates a new version, and sold tickets keep the price and terms they were sold under (restoreProductVersion, DI-938, TRACKER Actions row 145). (3) PRICE. Prices live in price lists: per venue, per channel set, with validity dates and a priority, copied for the next season with an uplift (copyPriceList) and repriced in bulk only after a dry run (bulkChangePrices). Currency and decimal scale are never chosen on a form: they resolve from the venue's region (ADR-0008, ADR-0018; AED 2 places, OMR and BHD 3). When several rules apply, the configured hierarchy decides; there is no "lowest price wins" default (DI-595). Tax on the pre-discount price and three-decimal rounding are regional settings (DI-598). Dynamic rules always show their minimum and maximum price guardrails beside the trigger (getDynamicPriceRule). (4) PROMOTE AND BUNDLE. A promotion is a rule (automatic, or gated by a code) created in draft, made live only by Publish, which first analyses stacking; a …
+*(source: DI-164; DI-171; DI-438; DI-465; DI-466; DI-595; DI-598; DI-387; DI-039; DI-044; DI-474; DI-671; DI-987; DI-019; DI-080; ADR-0008; ADR-0013; ADR-0018; ADR-0019; ADR-0030; R091; R098; R101; R222; REV3-21; contracts/spine/catalogue.yaml#transitionProductLifecycle …)*
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Product | Anything sellable, of one of the twelve kinds. The record that carries names, channels, listing, media and policies. | Item (except on F&B and retail screens), SKU (for tickets), Offering | contracts/spine/catalogue.yaml#/components/schemas/ProductKind |
+| Ticket type | One sellable variant of an admission or event product (Adult, Child, Resident Adult), generated from the product's attributes. For retail and F&B the same record is labelled Variant. | Variant (on ticket screens), Sub-product, Rate (that is a price), Axis value | contracts/spine/catalogue.yaml#updateProductVariant / DI-164 / DI-437 |
+| Attribute | A dimension that generates ticket types (Guest category, Residency, Tier, Length). Each has values; adding a value adds ticket types. | Axis, Component (the client's word; use it only in help text), Option | contracts/spine/catalogue.yaml#setProductAttributes / DI-164 / DI-450 |
+| Entitlement | What a ticket lets the holder do (validity, entries, re-entry, days, blackout dates, expiry, fast track, transfer), defined once on an entitlement template and shared by several products. | Access rights, Ticket rules, Validity profile | contracts/spine/catalogue.yaml#createEntitlementTemplate / DI-171 / DI-451 |
+| Eligibility rule | Who may take part in or buy a product (age, height, supervision, waiver, certification). Distinct from a promotion's eligibility, which decides who gets a discount. | Restriction, Access rule (that is access control) | contracts/spine/catalogue.yaml#setProductEligibilityRule / DI-463 |
+| Price list | A set of prices for one venue and a set of channels, valid between two dates, with a priority. Several coexist (B2C, B2B, season). | Price book, Rate card, Tariff | contracts/spine/catalogue.yaml#createPriceList / DI-140 / DI-163 |
+| Price category | A standard rate type (Adult, Child, Member) reused across lists so venues do not invent "Adult Standard" and "Normal Adult". | Price band (that is a seat-category band), Fare type (transport) | contracts/spine/catalogue.yaml#setPriceCategoryRateType / … |
+| Price band | A priced band on a seat category (code, label, colour, amount, channel, from-date). | Price category, Zone price | contracts/satellite/seating.yaml#/components/schemas/SeatPriceBand |
+| Promotion | A rule that changes a price automatically or when a code is entered; draft until published; declares how it stacks. | Offer (except in guest copy), Deal, Discount rule | contracts/satellite/promotions.yaml#createPromotion / DI-173 / DI-174 |
+| Coupon code | A code issued from a coupon campaign that applies a promotion-style discount; one shared code or many single-use codes. | Voucher, Promo voucher | contracts/satellite/promotions.yaml#createCouponCampaign / DI-173 |
+| Voucher | A code that carries money (face value, balance), sold or issued; a liability until redeemed or expired. | Coupon, Credit note | contracts/satellite/promotions.yaml#listVoucherBatches / … |
+| Bundle | A product sold as one line whose price differs from the sum of its components, with a mandatory revenue allocation. "Package" is acceptable in guest copy. | Combo (that is an F&B meal deal), Catalogue bundle | contracts/satellite/promotions.yaml#createBundle / DI-220 / ADR-0019 |
+| Catalogue release | The signed snapshot of a venue's catalogue, prices, promotions and sale boards that tills, kiosks and devices pull. Its action label is "Publish to tills". | Bundle, Catalogue bundle, Sync, Deploy | contracts/spine/catalogue.yaml#publishBundle / … |
+| Approve / Publish / Save | Save keeps a draft; Approve records that it is authorised (PRODUCT_APPROVE); Publish makes it live for guests and channels (PRODUCT_PUBLISH). Three different buttons, never merged. | Submit, Go live, Activate (except CatalogueConfigStatus active), Deploy | R091 / contracts/spine/catalogue.yaml#transitionProductLifecycle / DI-438 |
+| Product states | Draft, In review, Approved, Live, Withdrawn, Archived (ProductLifecycleState), always as coloured badges with these exact labels. | Published (for a product), Pending, Inactive (for a product) | contracts/spine/catalogue.yaml#/components/schemas/ProductLifecycleState |
+| Channel | Where something is sold. Labels: pos Point of sale; kiosk Kiosk; web and guestWeb Website; mobile and guestApp App; b2b B2B partners; partner Partner; ota Travel agents (OTA); callCentre Call centre; api API; backOffice Back office. | Touchpoint, Outlet (an outlet is a business inside a venue), raw enum values | contracts/spine/catalogue.yaml#/components/schemas/Channel / … |
+| Refund | Money returned after settlement, wholly or for some lines, under the venue's refund policy. | Return (that is retail goods), Reversal, Void | contracts/spine/orders.yaml#createRefund / DI-252 |
+| Void | Cancelling a whole order before settlement, within the same shift, with a reason from the void list. After settlement it is a refund. | Cancel order, Delete | contracts/spine/orders.yaml#voidOrder / R222 |
+| Exchange / Reschedule | Exchange swaps lines for other products or dates and settles only the difference; Reschedule is the same product moved to another date or time. | Rebook, Date change (acceptable only in guest copy), Refund and resell | contracts/spine/orders.yaml#exchangeOrderLines / … |
+| Hold / Capture / Release | A deposit or stored-value amount is held, then partly or fully captured, and the rest released. A held deposit is not a payment. | Charge, Pre-auth (in staff copy), Block funds | contracts/spine/orders.yaml#authoriseStoredValue / … |
+| Wallet (TICVAI wallet) | The guest's stored-value balance on TICVAI, spent by hold and capture. Distinct from the tender "Apple Pay / Google Pay", which the contract also calls wallet. | Digital wallet (for stored value), E-wallet, Credit (without a type) | contracts/spine/orders.yaml#/components/schemas/TenderKind / R080 |
+| Credit lot | One amount of wallet credit of one credit type (cash, bonus, gift) with its own expiry; lots are spent nearest expiry first and the guest sees the breakdown but cannot choose. | Bucket, Batch, Top-up | TRACKER Actions row 171 / contracts/satellite/wallet.yaml#expireCreditLots |
+| Venue map / Seat map | A venue map is the wayfinding map of a park or a floor (points, paths, bookable places); a seat map is the seating layout of an auditorium or stand. Never just "map" where both could be meant. | Layout (alone), Floor plan (unless it is a floor map), Map (alone) | contracts/satellite/venue-map.yaml#createVenueMap / … |
+| Point / Bookable place | A point is a place on a venue map (toilet, ride, restaurant, exit). A bookable place is a cabana, lounger, table or pitch placed on the map and sold through its price band. | Pin, POI, Marker, Resource (in staff copy) | contracts/satellite/venue-map.yaml#setVenuePoint / … |
+| Station / Route / Timetable / Departure / Fare table / Pass … | A route is an ordered list of stations with offsets; a timetable generates departures up to its release horizon; a fare table prices a route per passenger type; a pass type is a multi-trip or unlimited pass sold as a product. | Stop (except in the stop list), Line (except lineCode), Schedule, Trip (except a guest's journey) | contracts/satellite/transport.yaml / REV3-21 |
+| Applies from | The effective date of a change. Every dated change shows it, and sold items keep their old terms. | Effective date (in labels), Start date (for a change) | contracts/satellite/seating.yaml#updateSeatCategory / TRACKER Actions row 194 |
+
+
 ## The screens
 
 Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs count fields; requirements are matrix rows; meeting inputs are the ones naming the screen (the module and platform ones are below); white label says whether the tenant's brand reaches it (guest) or it sets the brand (configures).
@@ -69,14 +108,14 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-993` | Experience Command Center | B–D | 0 | 0 | 6 | 8 | 0 | 0 | — | notStarted (—) |
 | `BO-994` | Choose My Seats | B–D | 0 | 0 | 6 | 12 | 1 | 6 | — | notStarted (—) |
-| `BO-995` | Find Seats For Me | B–D | 0 | 0 | 6 | 10 | 2 | 6 | — | notStarted (—) |
+| `BO-995` | Find Seats For Me | B–D | 0 | 20 | 6 | 18 | 2 | 6 | — | notStarted (—) |
 | `BO-996` | Filters & Interactive Legend | B–D | 0 | 0 | 6 | 8 | 0 | 0 | — | notStarted (—) |
-| `BO-997` | Real-Time Availability & Locking | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-998` | Lock Timeout & Concurrency | B–D | 0 | 0 | 6 | 2 | 1 | 4 | — | notStarted (—) |
+| `BO-997` | Real-Time Availability & Locking | B–D | 0 | 17 | 6 | 1 | 0 | 0 | — | notStarted (—) |
+| `BO-998` | Lock Timeout & Concurrency | B–D | 0 | 0 | 6 | 0 | 1 | 4 | — | notStarted (—) |
 | `BO-999` | Cart & Multi-Seat Management | B–D | 0 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
 | `BO-1000` | Mobile & Accessible Selection | B–D | 0 | 0 | 6 | 8 | 0 | 0 | — | notStarted (—) |
-| `BO-1001` | View Preview, Compare & Heat Map | B–D | 0 | 0 | 6 | 12 | 0 | 0 | — | notStarted (—) |
-| `BO-1002` | AI Conversational Seat Assistant | B–D | 0 | 0 | 6 | 12 | 0 | 6 | — | notStarted (—) |
+| `BO-1001` | View Preview, Compare & Heat Map | B–D | 0 | 20 | 6 | 20 | 0 | 0 | — | notStarted (—) |
+| `BO-1002` | AI Conversational Seat Assistant | B–D | 0 | 20 | 6 | 20 | 0 | 6 | — | notStarted (—) |
 
 ## Thin screens in this batch
 
@@ -106,9 +145,15 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Seating rules that shape selection (buffer seats, distancing, orphan-seat prevention, accessibility pairing) and selection performance.
+
 #### Inputs: what the user enters or picks
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **orphan prevention**: On by default with the minimum gap; the rule operators most want and least ask for. *(source: contracts/satellite/seating.yaml#setSeatingRules / TRACKER Actions row 64)*
 
 #### Outputs: what the screen shows and produces
 
@@ -146,6 +191,17 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the experience are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+rules:
+  bufferSeats: 0
+  orphanPrevention: true
+  accessiblePairing: true
+```
 
 #### Permissions
 
@@ -227,6 +283,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Choose exact seats on an interactive map, here for an authorised agent selling on a guest's behalf (call centre, box office); the guest version lives on the guest apps.
+
 #### Inputs: what the user enters or picks
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
@@ -244,6 +302,14 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Create seat hold (primary button) | navigation or local | — | — | — | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
 
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **seat tooltip**: Section, row, seat, price with fees, type, view, accessibility. *(source: contracts/satellite/seating.yaml#getSeatAvailability)*
+
+**What each action does** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **Hold seats**: Named seats held for a short time with a visible countdown. *(source: contracts/satellite/seating.yaml#createSeatHold)*
+
 **Where the user goes next**
 
 - → `BO-993` Experience Command Center: *Back to Experience Command Center*; carries `seatMapId`
@@ -259,6 +325,19 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 One or more seats are no longer available, or the selection breaks a seating rule. (SeatConflictProblem); 422 More seats than one booking may take: above `VenueSettings.seating.maxSeatsPerGuestOrder` on a guest channel (decided 29 September, rev 3 REV3-7), or above 10 … (SeatLimitProblem) |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+selection:
+  seats:
+  - Lower 101 C-14
+  - C-15
+  total: AED 900.00
+  holdExpires: '9:45'
+```
 
 #### Permissions
 
@@ -334,7 +413,7 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 3 · needs the `seating` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `ORDER_CREATE` (1 operate); in the flows as venue manager |
+| Who uses it | venue staff holding `ORDER_CREATE`, `PRODUCT_VIEW` (1 operate, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
 | Offline | online only |
@@ -343,11 +422,51 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Best-available seats picked and held from stated preferences (quantity, zone, price, accessibility).
+
+**Fixed on main** (the package already carries these; draw what it says): No read operation: the screen declares only assignSeats and nothing that returns the current configuration. (CHG-WIR-025).
+
 #### Inputs: what the user enters or picks
+
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Section code | text field | — | — | `getSeatAvailability` ?sectionCode |
+| Category | picker: choose a category | — | — | `getSeatAvailability` ?categoryId |
+| Available only | toggle | off | — | `getSeatAvailability` ?availableOnly |
+| Mode | segmented control | Auto | Auto · Graphical · List | `getSeatAvailability` ?mode |
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
 
 #### Outputs: what the screen shows and produces
+
+**Shown**
+
+**Seat status for a performance** (detail panel, from `getSeatAvailability`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Performance | the name it points at, never the id | — |
+| Seat map | the name it points at, never the id | — |
+| Render mode | chip: Graphical, List | The mode the server actually used. With `mode=auto` this is how a client knows what it got: `list` means the map has no geometry (the seat … |
+| Totals | grouped details | — |
+| Total | 1,234 | — |
+| Available | 1,234 | — |
+| Held | 1,234 | — |
+| Sold | 1,234 | — |
+| Blocked | 1,234 | — |
+| Buffered | 1,234 | — |
+| By category | list or chips (count when long) | — |
+| Category | the name it points at, never the id | — |
+| Available | 1,234 | — |
+| Sold | 1,234 | — |
+| Price | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Sections | list or chips (count when long) | The map's sections with what a guest screen needs to show the view from each (decided 29 September, rev 3 23SEP-14): the photo where the … |
+| Code | text | — |
+| Name | text | — |
+| View image | the image or video | As `Section.viewAssetId`. Null means render the view from geometry. |
+| Boundary | list or chips (count when long) | As `Section.boundary`. Null when `renderMode` is `list`. |
 
 **Actions and what each produces**
 
@@ -356,9 +475,15 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Assign seats (primary button) | navigation or local | — | — | — | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
 
+**What each action does** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **Find and hold**: Contiguous seats where the party needs them; result held immediately. *(source: contracts/satellite/seating.yaml#assignSeats)*
+
+**Data it reads**: `getSeatAvailability` (onLoad, Seat status for a performance)
+
 **Where the user goes next**
 
-- → `BO-993` Experience Command Center: *Back to Experience Command Center*
+- → `BO-993` Experience Command Center: *Back to Experience Command Center*; carries `seatMapId`
 
 #### States
 
@@ -371,15 +496,27 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+request:
+  party: 4
+  zone: Lower
+  maxPrice: AED 450.00
+```
+
 #### Permissions
 
 - `assignSeats` → `ORDER_CREATE` (operate) · staff, guest
+- `getSeatAvailability` → `PRODUCT_VIEW` (read) · staff, guest
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
 #### Requirements it meets
 
-10 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+18 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
 
 | Ref | Requirement (shortened) | Domain | Verdict | Via |
 |---|---|---|---|---|
@@ -393,6 +530,9 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | 21.5.10 | View Filters | Seat Management & Venue Mapping | CONTRACTED | `assignSeats` |
 | 21.5.22 | AI Seat Selection Assistant | Seat Management & Venue Mapping | CONTRACTED | `assignSeats` |
 | 21.5.23 | Conversational Seat Search | Seat Management & Venue Mapping | CONTRACTED | `assignSeats` |
+| 1.3.15 | Define seating layouts, sections, pricing tiers, and total capacity. | Ticketing Catalogue | CONTRACTED | `getSeatAvailability` |
+| 2.6.31 | Selling Event with a seat map, shared inventory with onsite sales. | Ticketing Sales | CONTRACTED | `getSeatAvailability` |
+| … 6 more | | | | `traceability.json` |
 
 #### Client meeting inputs
 
@@ -421,12 +561,12 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (404).
+- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-995?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Assign seats, Cancel.
 - [ ] Every transition is wired: `BO-993`.
-- [ ] Every gated control is gated: `ORDER_CREATE`.
+- [ ] Every gated control is gated: `ORDER_CREATE`, `PRODUCT_VIEW`.
 - [ ] The 2 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -450,6 +590,8 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Filters and legend that make a large seat map understandable: zone, price, group size, amenities, type, accessibility, view, level.
+
 #### Inputs: what the user enters or picks
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
@@ -459,6 +601,10 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 **Shown**
 
 **Detail panel** (detail panel): One record, read-only.
+
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **filter results**: Counts update as filters change. *(source: contracts/satellite/seating.yaml#getSeatAvailability)*
 
 **Where the user goes next**
 
@@ -474,6 +620,17 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the filters interactive legend are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+filter:
+  price: AED 300-450
+  accessible: true
+  results: 14
+```
 
 #### Permissions
 
@@ -535,16 +692,27 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 3 · needs the `seating` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `PRICE_VIEW` (1 read); in the flows as venue manager |
+| Who uses it | venue staff holding `CAPACITY_CONFIGURE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/access-venue/real-time-availability-locking-bo-997` |
 
-**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built. Removed 2 October 2026 (CHG-WIR-025): listRealTimeAvailability is promotions checkout validation, not seat locks; seat locks are seating's, and getSeatInventory returns every seat's state for a …
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Seat locks during selection: owner class, channel, transaction, acquired and expiry, current state, for permitted roles.
+
+**Fixed on main** (the package already carries these; draw what it says): listRealTimeAvailability is promotions checkout validation, not seat locks. (CHG-WIR-025); List operation(s) listRealTimeAvailability return a bare array, not the paged list envelope (items, nextCursor, hasMore). (CHG-WIR-025).
 
 #### Inputs: what the user enters or picks
+
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Performance | picker: choose a performance | — | — | `getSeatInventory` ?performanceId |
+| Section | picker: choose a section | — | — | `getSeatInventory` ?sectionId |
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
 
@@ -552,9 +720,33 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+**Seat states** (detail panel, from `getSeatInventory`)
 
-**Data it reads**: `listRealTimeAvailability` (onLoad, Real-Time Availability & Checkout Validation)
+| Shows | Format | Notes |
+|---|---|---|
+| Performance | the name it points at, never the id | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Totals | grouped details | — |
+| Capacity | 1,234 | — |
+| Available | 1,234 | — |
+| Held | 1,234 | — |
+| Reserved | 1,234 | — |
+| Sold | 1,234 | — |
+| Blocked | 1,234 | — |
+| Out of service | 1,234 | — |
+| Seats | list or chips (count when long) | — |
+| Seat | the name it points at, never the id | — |
+| Label | text | — |
+| State | chip: Available, Held, Reserved, Sold, Blocked, Out of service… | — |
+| Hold pool | the name it points at, never the id | — |
+| Order | the name it points at, never the id | — |
+| Expires at | 1 Oct 2026, 14:30 | — |
+
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **lock table**: Live list with countdown to expiry. *(source: contracts/satellite/promotions.yaml#listRealTimeAvailability)*
+
+**Data it reads**: `getSeatInventory` (onLoad, Every seat's current state, with its locks)
 
 **Where the user goes next**
 
@@ -566,20 +758,36 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |---|---|
 | Loading (`?state=loading`) | The real-time availability locking list. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the real-time availability locking untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No real-time availability locking yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, first run (`?state=emptyFirstRun`) | No real-time availability locking yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the real-time availability locking are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+locks:
+- seat: Balcony C-14
+  owner: Guest basket
+  channel: App
+  expiresIn: 4 min
+```
+
 #### Permissions
 
-- `listRealTimeAvailability` → `PRICE_VIEW` (read) · staff
+- `getSeatInventory` → `CAPACITY_CONFIGURE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
 #### Requirements it meets
 
-No matrix row traces to this screen's operations or data.
+1 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+
+| Ref | Requirement (shortened) | Domain | Verdict | Via |
+|---|---|---|---|---|
+| 1.4.28 | Visual Seat Categorization Automatically color-code seat categories. Generate interactive seat maps. Highlight restricted-view or obstructed seats. Visualize occupancy and sales patterns. | Ticketing Catalogue | CONTRACTED | `getSeatInventory` |
 
 #### Client meeting inputs
 
@@ -601,11 +809,11 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (17 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-997?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-993`.
-- [ ] Every gated control is gated: `PRICE_VIEW`.
+- [ ] Every gated control is gated: `CAPACITY_CONFIGURE`.
 - [ ] The module and platform inputs below are applied.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -620,28 +828,28 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 3 · needs the `seating` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `ORDER_CREATE` (1 operate); in the flows as venue manager |
+| Who uses it | venue; in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
 | Offline | online only |
-| Opens with | `holdId` (navigation) |
+| Opens with | nothing: it opens on its own |
 | Route | `/access-venue/lock-timeout-concurrency-bo-998` |
 
-**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built. Removed 2 October 2026 (CHG-WIR-025): Lock timeouts are configured here, not performed: extending or relinquishing one hold (extendSeatHold, relinquishSeatHold) is a selection-time act; the missing …
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Seat lock duration and concurrency: default hold, warning, grace, extensions up to the venue maximum.
+
+**Fixed on main** (the package already carries these; draw what it says): The configuration screen declares hold operations (extend, release) rather than a policy write. (CHG-WIR-025); No read operation: the screen declares only extendSeatHold, relinquishSeatHold and nothing that returns the current configuration. (CHG-WIR-025).
 
 #### Inputs: what the user enters or picks
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
 
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **extension**: Bounded by the venue's maximum; shown as minutes. *(source: contracts/satellite/seating.yaml#extendSeatHold)*
+
 #### Outputs: what the screen shows and produces
-
-**Actions and what each produces**
-
-| Action | Calls | Sends | On success returns | Errors to show | Notes |
-|---|---|---|---|---|---|
-|  (primary button) | navigation or local | — | — | — | — |
-|  (destructive button) | navigation or local | — | — | — | — |
-| Cancel (secondary button) | navigation or local | — | — | — | — |
 
 **Where the user goes next**
 
@@ -653,27 +861,29 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |---|---|
 | Loading (`?state=loading`) | The lock timeout concurrency list. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the lock timeout concurrency untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No lock timeout concurrency yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, first run (`?state=emptyFirstRun`) | No lock timeout concurrency yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the lock timeout concurrency are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Not shown: nothing on this screen needs a permission of its own; the app's sign-in decides access. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 409 Already expired, or `VenueSettings.seating.seatHoldMaxExtensions` is reached (proposed default 2, audit R094). (SeatHoldExtendProblem); 409 The hold is no longer active (`holdNotActive`) - converted to an order, already released or expired. |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+policy:
+  hold: 10 min
+  warning: 2 min
+  maxExtensions: 1
+```
 
 #### Permissions
 
-- `extendSeatHold` → `ORDER_CREATE` (operate) · staff
-- `relinquishSeatHold` → `ORDER_CREATE` (operate) · staff, guest
-
-**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Not shown: nothing on this screen needs a permission of its own; the app's sign-in decides access.
 
 #### Requirements it meets
 
-2 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
-
-| Ref | Requirement (shortened) | Domain | Verdict | Via |
-|---|---|---|---|---|
-| 21.5.14 | Seat Locking | Seat Management & Venue Mapping | CONTRACTED | `extendSeatHold` |
-| 21.5.15 | Seat Lock Timeout | Seat Management & Venue Mapping | CONTRACTED | `extendSeatHold` |
+No matrix row traces to this screen's operations or data.
 
 #### Client meeting inputs
 
@@ -699,12 +909,12 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (404, 409).
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
 - [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-998?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: , , Cancel.
+- [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-993`.
-- [ ] Every gated control is gated: `ORDER_CREATE`.
+- [ ] Sign-in is asked only where the spec asks for it.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -728,6 +938,8 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Several held seats as one allocation: per seat guest, ticket type, price, lock expiry; remove or release.
+
 #### Inputs: what the user enters or picks
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
@@ -745,6 +957,10 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |  (destructive button) | navigation or local | — | — | — | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
 
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **held seats**: One row per seat with expiry. *(source: contracts/satellite/seating.yaml#getSeatHold)*
+
 **Where the user goes next**
 
 - → `BO-993` Experience Command Center: *Back to Experience Command Center*
@@ -760,6 +976,16 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 The hold is no longer active (`holdNotActive`) - converted to an order, already released or expired. |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+hold:
+  seats: 4
+  expiresIn: 6 min
+```
 
 #### Permissions
 
@@ -825,6 +1051,8 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Accessible seat selection: accessible seats, their routes and who may buy them; map and list modes for keyboard and screen readers.
+
 #### Inputs: what the user enters or picks
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
@@ -840,6 +1068,10 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 **Shown**
 
 **Detail panel** (detail panel): One record, read-only.
+
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **list mode**: Every seat reachable without the map, with route information. *(source: contracts/satellite/seating.yaml#getAccessibleSeating / DI-029)*
 
 **Data it reads**: `getAccessibleSeating` (onLoad, Which seats and routes)
 
@@ -857,6 +1089,17 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the mobile accessible selection are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+seat:
+  id: Lower 101 W-1
+  route: Vom 3, step-free
+  companion: W-2
+```
 
 #### Permissions
 
@@ -928,11 +1171,51 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** View previews and comparisons before choosing, with demand heat.
+
+**Fixed on main** (the package already carries these; draw what it says): No read operation: the screen declares only recommendSeats and nothing that returns the current configuration. (CHG-WIR-025).
+
 #### Inputs: what the user enters or picks
+
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Section code | text field | — | — | `getSeatAvailability` ?sectionCode |
+| Category | picker: choose a category | — | — | `getSeatAvailability` ?categoryId |
+| Available only | toggle | off | — | `getSeatAvailability` ?availableOnly |
+| Mode | segmented control | Auto | Auto · Graphical · List | `getSeatAvailability` ?mode |
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
 
 #### Outputs: what the screen shows and produces
+
+**Shown**
+
+**Seat status for a performance** (detail panel, from `getSeatAvailability`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Performance | the name it points at, never the id | — |
+| Seat map | the name it points at, never the id | — |
+| Render mode | chip: Graphical, List | The mode the server actually used. With `mode=auto` this is how a client knows what it got: `list` means the map has no geometry (the seat … |
+| Totals | grouped details | — |
+| Total | 1,234 | — |
+| Available | 1,234 | — |
+| Held | 1,234 | — |
+| Sold | 1,234 | — |
+| Blocked | 1,234 | — |
+| Buffered | 1,234 | — |
+| By category | list or chips (count when long) | — |
+| Category | the name it points at, never the id | — |
+| Available | 1,234 | — |
+| Sold | 1,234 | — |
+| Price | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Sections | list or chips (count when long) | The map's sections with what a guest screen needs to show the view from each (decided 29 September, rev 3 23SEP-14): the photo where the … |
+| Code | text | — |
+| Name | text | — |
+| View image | the image or video | As `Section.viewAssetId`. Null means render the view from geometry. |
+| Boundary | list or chips (count when long) | As `Section.boundary`. Null when `renderMode` is `list`. |
 
 **Actions and what each produces**
 
@@ -941,9 +1224,15 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |  (primary button) | navigation or local | — | — | — | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
 
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **recommendations**: Best available, best value, closest to stage, accessible with companions. *(source: contracts/satellite/seating.yaml#recommendSeats)*
+
+**Data it reads**: `getSeatAvailability` (onLoad, Seat status for a performance)
+
 **Where the user goes next**
 
-- → `BO-993` Experience Command Center: *Back to Experience Command Center*
+- → `BO-993` Experience Command Center: *Back to Experience Command Center*; carries `seatMapId`
 
 #### States
 
@@ -956,15 +1245,27 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+options:
+- strategy: bestValue
+  seats: Upper 204 A-1..4
+  total: AED 1,040.00
+```
+
 #### Permissions
 
 - `recommendSeats` → `PRODUCT_VIEW` (read) · staff, guest
+- `getSeatAvailability` → `PRODUCT_VIEW` (read) · staff, guest
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
 #### Requirements it meets
 
-12 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+20 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
 
 | Ref | Requirement (shortened) | Domain | Verdict | Via |
 |---|---|---|---|---|
@@ -980,6 +1281,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | 21.10.3 | Closest-to-Stage Recommendations | Seat Management & Venue Mapping | CONTRACTED | `recommendSeats` |
 | 21.10.5 | Accessibility Recommendations | Seat Management & Venue Mapping | CONTRACTED | `recommendSeats` |
 | 21.10.7 | Alternative Seat Suggestions | Seat Management & Venue Mapping | CONTRACTED | `recommendSeats` |
+| … 8 more | | | | `traceability.json` |
 
 #### Client meeting inputs
 
@@ -1001,7 +1303,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state (404).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-1001?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: , Cancel.
 - [ ] Every transition is wired: `BO-993`.
@@ -1029,11 +1331,51 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Natural-language seat search ("four together near the aisle under AED 400") returning only valid seats.
+
+**Fixed on main** (the package already carries these; draw what it says): No read operation: the screen declares only recommendSeats and nothing that returns the current configuration. (CHG-WIR-025).
+
 #### Inputs: what the user enters or picks
+
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Section code | text field | — | — | `getSeatAvailability` ?sectionCode |
+| Category | picker: choose a category | — | — | `getSeatAvailability` ?categoryId |
+| Available only | toggle | off | — | `getSeatAvailability` ?availableOnly |
+| Mode | segmented control | Auto | Auto · Graphical · List | `getSeatAvailability` ?mode |
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
 
 #### Outputs: what the screen shows and produces
+
+**Shown**
+
+**Seat status for a performance** (detail panel, from `getSeatAvailability`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Performance | the name it points at, never the id | — |
+| Seat map | the name it points at, never the id | — |
+| Render mode | chip: Graphical, List | The mode the server actually used. With `mode=auto` this is how a client knows what it got: `list` means the map has no geometry (the seat … |
+| Totals | grouped details | — |
+| Total | 1,234 | — |
+| Available | 1,234 | — |
+| Held | 1,234 | — |
+| Sold | 1,234 | — |
+| Blocked | 1,234 | — |
+| Buffered | 1,234 | — |
+| By category | list or chips (count when long) | — |
+| Category | the name it points at, never the id | — |
+| Available | 1,234 | — |
+| Sold | 1,234 | — |
+| Price | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Sections | list or chips (count when long) | The map's sections with what a guest screen needs to show the view from each (decided 29 September, rev 3 23SEP-14): the photo where the … |
+| Code | text | — |
+| Name | text | — |
+| View image | the image or video | As `Section.viewAssetId`. Null means render the view from geometry. |
+| Boundary | list or chips (count when long) | As `Section.boundary`. Null when `renderMode` is `list`. |
 
 **Actions and what each produces**
 
@@ -1042,9 +1384,15 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |  (primary button) | navigation or local | — | — | — | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
 
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **answer**: Options with why each matches. *(source: contracts/satellite/seating.yaml#recommendSeats)*
+
+**Data it reads**: `getSeatAvailability` (onLoad, Seat status for a performance)
+
 **Where the user goes next**
 
-- → `BO-993` Experience Command Center: *Back to Experience Command Center*
+- → `BO-993` Experience Command Center: *Back to Experience Command Center*; carries `seatMapId`
 
 #### States
 
@@ -1057,15 +1405,24 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+query: 4 seats together, aisle, under AED 400 each
+```
+
 #### Permissions
 
 - `recommendSeats` → `PRODUCT_VIEW` (read) · staff, guest
+- `getSeatAvailability` → `PRODUCT_VIEW` (read) · staff, guest
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
 #### Requirements it meets
 
-12 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+20 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
 
 | Ref | Requirement (shortened) | Domain | Verdict | Via |
 |---|---|---|---|---|
@@ -1081,6 +1438,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | 21.10.3 | Closest-to-Stage Recommendations | Seat Management & Venue Mapping | CONTRACTED | `recommendSeats` |
 | 21.10.5 | Accessibility Recommendations | Seat Management & Venue Mapping | CONTRACTED | `recommendSeats` |
 | 21.10.7 | Alternative Seat Suggestions | Seat Management & Venue Mapping | CONTRACTED | `recommendSeats` |
+| … 8 more | | | | `traceability.json` |
 
 #### Client meeting inputs
 
@@ -1107,7 +1465,7 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state (404).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-1002?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: , Cancel.
 - [ ] Every transition is wired: `BO-993`.
@@ -1215,12 +1573,11 @@ Method, path, parameters, request and response for every operation these screens
 {
 "assignSeats": {"method":"POST","path":"/performances/{performanceId}/assign-seats","contract":"seating","summary":"Pick and hold the best available seats","permission":"ORDER_CREATE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":null},
 "createSeatHold": {"method":"POST","path":"/seat-holds","contract":"seating","summary":"Hold specific seats","permission":"ORDER_CREATE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"CreateSeatHoldRequest","responds":"SeatHold"},
-"extendSeatHold": {"method":"POST","path":"/seat-holds/{holdId}/extend","contract":"seating","summary":"Extend a hold","permission":"ORDER_CREATE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"SeatHold"},
 "getAccessibleSeating": {"method":"GET","path":"/accessible-seating","contract":"seating","summary":"Accessible seats, their routes and who may buy them","permission":"CAPACITY_CONFIGURE","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[{"name":"seatMapId","in":"query","required":true}],"requestBody":null,"responds":"AccessibleSeating"},
 "getSeatAvailability": {"method":"GET","path":"/performances/{performanceId}/seat-availability","contract":"seating","summary":"Seat status for a performance","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"sectionCode","in":"query","required":null},{"name":"categoryId","in":"query","required":null},{"name":"availableOnly","in":"query","required":null},{"name":"mode","in":"query","required":null}],"requestBody":null,"responds":"SeatAvailability"},
 "getSeatHold": {"method":"GET","path":"/seat-holds/{holdId}","contract":"seating","summary":"Read a hold","permission":"ORDER_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"SeatHold"},
+"getSeatInventory": {"method":"GET","path":"/seat-inventory","contract":"seating","summary":"Every seat's state for a performance, in one read","permission":"CAPACITY_CONFIGURE","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[{"name":"performanceId","in":"query","required":true},{"name":"sectionId","in":"query","required":null}],"requestBody":null,"responds":"SeatInventory"},
 "getSeatingRules": {"method":"GET","path":"/seat-maps/{seatMapId}/rules","contract":"seating","summary":"Read seating rules","permission":"PRODUCT_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"SeatingRules"},
-"listRealTimeAvailability": {"method":"GET","path":"/real-time-availability","contract":"promotions","summary":"Real-Time Availability & Checkout Validation","permission":"PRICE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"RealTimeAvailabilityCheckoutValidationView"},
 "recommendSeats": {"method":"POST","path":"/performances/{performanceId}/seat-recommendations","contract":"seating","summary":"Recommend seats for a party","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"SeatRecommendationRequest","responds":null},
 "relinquishSeatHold": {"method":"DELETE","path":"/seat-holds/{holdId}","contract":"seating","summary":"Release a hold","permission":"ORDER_CREATE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":null},
 "setSeatingRules": {"method":"PUT","path":"/seat-maps/{seatMapId}/rules","contract":"seating","summary":"Set seating rules","permission":"CAPACITY_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":"SeatingRules","responds":"SeatingRules"}
@@ -1237,10 +1594,10 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "CreateSeatHoldRequest": {"x-ticvai-persistence":"none — request only","type":"object","required":["id","performanceId","seatIds"],"properties":{"id":{"type":"string","format":"uuid"},"performanceId":{"type":"string","format":"uuid"},"seatIds":{"type":"array","minItems":1,"maxItems":50,"description":"50 is the ceiling of the venue setting, not the limit a caller gets. On a guest channel the limit is `VenueSettings.seating.maxSeatsPerGuestOrder` (default 10, bounds 1 to 50, decided 29 September, rev 3 REV3-7); on a staff channel it stays 10 per sale (audit R080 (c)), as POS-002 shows. Either is refused with `422` `seat-limit-exceeded`.\n","items":{"type":"string"}},"ttlSeconds":{"type":"integer","minimum":60,"maximum":1800,"default":480,"description":"**8 minutes by default, extendable to 30 in all** (decided 28 September, audit R169). Left out, the hold lasts 480 seconds. No hold, first grant or extended, outlives 1800 seconds from its creation.\n"},"subjectId":{"type":"string","format":"uuid"}}},
 "Money": {"type":"object","x-ticvai-persistence-kind":"valueObject","x-ticvai-persistence-column":"numeric(18,4)","description":"**On the wire this is three fields; in the database it is one column.**\n24 August. Every column typed `Money` was landing as `jsonb` — 129 of them, including `orders.shift.opening_float`, `inventory.purchase_order.total` and `promotions.voucher.balance`. **`orders.cash_movement.amount` was `numeric(18,4)` because somebody hand-typed that one**, and the inconsistency is what made it visible.\n**A jsonb price cannot be summed in SQL.** Every total, variance and reconciliation moves into application code — and a shift variance computed in .NET against a ledger computed in Postgres is two answers to one question. That is F13 month-end and F98 takings-to-ledger, both walked, both assuming the arithmetic is in the database.\n**`currency` and `scale` are not stored per row.** ADR-0018 makes them region-scoped and not overridable below, so they resolve from the scope walk — storing AED against nine million rows in a UAE region is nine million copies of a fact that cannot differ. A row that needed its own currency would be a row in the wrong region.\n**They stay on the wire** because a client reading a figure should not have to walk a hierarchy to know what it means.\n","required":["amount","currency","scale"],"properties":{"amount":{"type":"string","description":"Decimal string, never a float. Up to 4 decimal places. **Persisted as `numeric(18,4)`** — the string is a transport choice, so a JavaScript client cannot round a fare in transit.\n","pattern":"^-?\\d+(\\.\\d{1,4})?$"},"currency":{"type":"string","description":"**Resolved from the region, not stored on the row** (ADR-0018). OMR uses 3 decimal places and AED uses 2 — a venue on a different scale from its region is a ledger that cannot consolidate.\n","pattern":"^[A-Z]{3}$"},"scale":{"type":"integer","description":"Resolved from the region alongside `currency`.","minimum":0,"maximum":4}}},
 "Point": {"type":"object","required":["x","y"],"properties":{"x":{"type":"number"},"y":{"type":"number"}}},
-"RealTimeAvailabilityCheckoutValidationView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over promotions state, assembled at read time from tables that already exist","description":"**What Real-Time Availability & Checkout Validation displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"failedChecks":{"type":"array","items":{"type":"string","enum":["productInactive","inventoryUnavailable","capacityUnavailable","timeslotUnavailable","resourceUnavailable","priceInvalid","promotionInvalid","partnerComponentInvalid","componentMappingInvalid"]},"description":"Checkout validations that failed; empty means the bundle is sellable."},"bundleId":{"type":"string","description":"Bundle ID"},"sellable":{"type":"boolean","description":"Whether the bundle can be sold now"}}},
 "SeatAttribute": {"type":"string","description":"BL-168. **Extended from eight values on 18 August.** Amenity and view filters needed attributes the original set did not carry, and a guest filtering for *aisle seat with power* was filtering on something the model could not express.\n","enum":["standard","accessible","companion","obstructedView","restrictedLegroom","premium","houseSeat","buffer","aisle","endOfRow","extraLegroom","powerOutlet","tableService","shaded","covered","nearExit","nearAccessibleWc","wheelchairTransfer","limitedRecline","sofa","beanbag"]},
 "SeatAvailability": {"x-ticvai-persistence":"none — computed from seat, hold and block","type":"object","required":["performanceId","seatMapId","renderMode","totals","seats"],"properties":{"performanceId":{"type":"string","format":"uuid"},"seatMapId":{"type":"string","format":"uuid"},"renderMode":{"type":"string","enum":["graphical","list"],"description":"The mode the server actually used. With `mode=auto` this is how a client knows what it got: `list` means the map has no geometry (the seat map's `noGeometry` state), so the client sells from categories and best-available groups and does not draw a plan. `graphical` means every seat carries `position`.\n"},"totals":{"type":"object","properties":{"total":{"type":"integer"},"available":{"type":"integer"},"held":{"type":"integer"},"sold":{"type":"integer"},"blocked":{"type":"integer"},"buffered":{"type":"integer"}}},"byCategory":{"type":"array","items":{"type":"object","properties":{"categoryId":{"type":"string","format":"uuid"},"available":{"type":"integer"},"sold":{"type":"integer"},"price":{"$ref":"../shared/common.yaml#/components/schemas/Money"}}}},"sections":{"type":"array","description":"The map's sections with what a guest screen needs to show the view from each (decided 29 September, rev 3 23SEP-14): the photo where the venue supplied one, otherwise null and the client renders the view from `boundary` and the seat positions. In this response so WEB-007 and GST-049 need no second call.\n","items":{"type":"object","required":["code","name"],"properties":{"code":{"type":"string"},"name":{"type":"string"},"viewAssetId":{"type":"string","format":"uuid","nullable":true,"description":"As `Section.viewAssetId`. Null means render the view from geometry."},"boundary":{"type":"array","nullable":true,"items":{"$ref":"#/components/schemas/Point"},"description":"As `Section.boundary`. Null when `renderMode` is `list`."}}}},"seats":{"type":"array","items":{"type":"object","required":["seatId","status"],"properties":{"seatId":{"type":"string"},"status":{"$ref":"#/components/schemas/SeatStatus"},"categoryId":{"type":"string","format":"uuid","nullable":true},"displayLabel":{"type":"string","description":"What the guest sees, e.g. `A2-7-11`, as on `Seat`."},"position":{"allOf":[{"$ref":"#/components/schemas/Point"}],"nullable":true,"description":"The seat's coordinates on the map, as on `Seat`. Present when `renderMode` is `graphical`; null when it is `list`."}}}}}},
 "SeatHold": {"x-ticvai-persistence":"seating.seat_hold","type":"object","required":["id","performanceId","seatIds","status","createdAt","expiresAt"],"properties":{"id":{"type":"string"},"performanceId":{"type":"string","format":"uuid"},"seatIds":{"type":"array","items":{"type":"string"}},"bufferedSeatIds":{"type":"array","items":{"type":"string"},"description":"Neighbours implicitly held by a seating rule."},"status":{"type":"string","enum":["held","converted","released","expired"]},"totalPrice":{"x-ticvai-column":"gross_amount","$ref":"../shared/common.yaml#/components/schemas/Money"},"heldByPrincipalId":{"type":"string","format":"uuid","nullable":true},"subjectId":{"type":"string","format":"uuid","nullable":true},"extensionCount":{"type":"integer"},"createdAt":{"type":"string","format":"date-time"},"expiresAt":{"type":"string","format":"date-time"}}},
+"SeatInventory": {"type":"object","description":"Board 4. **One read, because a real-time map assembling four endpoints renders one state late.**\n","properties":{"performanceId":{"type":"string","format":"uuid"},"asOf":{"type":"string","format":"date-time"},"totals":{"type":"object","properties":{"capacity":{"type":"integer"},"available":{"type":"integer"},"held":{"type":"integer"},"reserved":{"type":"integer"},"sold":{"type":"integer"},"blocked":{"type":"integer"},"outOfService":{"type":"integer"}}},"seats":{"type":"array","items":{"type":"object","properties":{"seatId":{"type":"string","format":"uuid"},"label":{"type":"string"},"state":{"type":"string","enum":["available","held","reserved","sold","blocked","outOfService","killed"]},"holdPoolId":{"type":"string","format":"uuid","nullable":true},"orderId":{"type":"string","format":"uuid","nullable":true},"expiresAt":{"type":"string","format":"date-time","nullable":true}}}}}},
 "SeatRecommendation": {"x-ticvai-persistence":"none — computed","type":"object","required":["seatIds","totalPrice","isContiguous","rank"],"properties":{"seatIds":{"type":"array","items":{"type":"string"}},"displayLabels":{"type":"array","items":{"type":"string"}},"totalPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"categoryId":{"type":"string","format":"uuid"},"isContiguous":{"type":"boolean"},"rank":{"type":"integer","description":"Best first."},"rationale":{"type":"string","description":"Why this option was chosen — closest to stage, best value in category, only contiguous block remaining. Shown to a call-centre agent, not the guest.\n"}}},
 "SeatRecommendationRequest": {"x-ticvai-persistence":"none — request only","type":"object","required":["partySize","strategy"],"properties":{"partySize":{"type":"integer","minimum":1,"maximum":50},"strategy":{"$ref":"#/components/schemas/SeatRecommendationStrategy"},"categoryIds":{"type":"array","items":{"type":"string","format":"uuid"}},"maxPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"accessibleCount":{"type":"integer","default":0,"description":"Wheelchair spaces in the party. Companions are added automatically."},"maxOptions":{"type":"integer","default":3,"maximum":10}}},
 "SeatRecommendationStrategy": {"type":"string","enum":["bestAvailable","bestValue","closestToStage","accessible","contiguous"]},

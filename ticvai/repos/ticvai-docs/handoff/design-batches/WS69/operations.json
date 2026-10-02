@@ -1,4 +1,23 @@
 {
+ "createAuthorisationPolicy": {
+  "method": "POST",
+  "path": "/authorisation-policies",
+  "contract": "identity",
+  "summary": "Write a policy without writing code",
+  "permission": "PERMISSION_MANAGE",
+  "offlineCapable": null,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AuthorisationPolicy",
+  "responds": "AuthorisationPolicy"
+ },
  "createReportSchedule": {
   "method": "POST",
   "path": "/report-schedules",
@@ -55,6 +74,19 @@
   ],
   "requestBody": null,
   "responds": null
+ },
+ "getAnalyticsGovernancePolicy": {
+  "method": "GET",
+  "path": "/analytics-governance-policy",
+  "contract": "reporting",
+  "summary": "The tenant's analytics governance policy",
+  "permission": "REPORT_VIEW_TENANT",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "AnalyticsGovernancePolicy"
  },
  "getReportExport": {
   "method": "GET",
@@ -183,25 +215,6 @@
   "requestBody": null,
   "responds": "ReportSubscription"
  },
- "setApprovalRetentionPolicy": {
-  "method": "PUT",
-  "path": "/approval-retention",
-  "contract": "approvals",
-  "summary": "How long decision records are kept, and what survives",
-  "permission": "APPROVAL_CONFIGURE",
-  "offlineCapable": null,
-  "conflictPolicy": null,
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "ApprovalRetentionPolicy",
-  "responds": "ApprovalRetentionPolicy"
- },
  "setDataRetentionSetting": {
   "method": "PUT",
   "path": "/data-retention-settings/{dataClass}",
@@ -220,5 +233,24 @@
   ],
   "requestBody": "TenantDataRetentionSetting",
   "responds": "TenantDataRetentionSetting"
+ },
+ "updateAuthorisationPolicy": {
+  "method": "PUT",
+  "path": "/authorisation-policies/{policyId}",
+  "contract": "identity",
+  "summary": "Change a policy, as a new version",
+  "permission": "PERMISSION_MANAGE",
+  "offlineCapable": null,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AuthorisationPolicy",
+  "responds": "AuthorisationPolicy"
  }
 }

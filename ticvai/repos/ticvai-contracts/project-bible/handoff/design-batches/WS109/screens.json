@@ -426,6 +426,13 @@
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
        "impliedBy": "updateAccreditationHolder"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Holder",
+       "bindsTo": "AccreditationHolder",
+       "operation": "getAccreditationHolder",
+       "provenance": "contract accreditation.yaml GET /accreditation-holders/{holderId}; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -449,6 +456,13 @@
      "getAccreditationHolder",
      "listAccreditationHolders"
     ]
+   },
+   {
+    "operationId": "getAccreditationHolder",
+    "contract": "accreditation",
+    "purpose": "The holder as saved, to edit",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-001)"
    }
   ],
   "wireframe": {
@@ -465,6 +479,7 @@
     }
    ]
   },
+  "notes": "**UAE Pass and the ICP identity check are integrated in release 1, needing the client's access (decided 2 October 2026 by Chinmay, DEC-457; CHG-CSP-034, CHG-CSA-031).** The holder's verification shows which service verified it.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -557,6 +572,13 @@
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
        "impliedBy": "updateAccreditationHolder"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Holder",
+       "bindsTo": "AccreditationHolder",
+       "operation": "getAccreditationHolder",
+       "provenance": "contract accreditation.yaml GET /accreditation-holders/{holderId}; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -580,6 +602,13 @@
      "getAccreditationHolder",
      "listAccreditationHolders"
     ]
+   },
+   {
+    "operationId": "getAccreditationHolder",
+    "contract": "accreditation",
+    "purpose": "The holder as saved, with the current photo",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-001)"
    }
   ],
   "wireframe": {
@@ -933,6 +962,11 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack ACCREDITATION.pdf, page 15"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-004): resolveIdentityConflict has no link or escalate outcome.",
+    "source": "contracts/satellite/accreditation.yaml#resolveIdentityConflict"
    }
   ],
   "layout": {
@@ -1025,6 +1059,7 @@
     }
    ]
   },
+  "notes": "**Face matching for accreditation duplicates runs only where the venue enables it, with applicant consent and the venue's legal sign-off; off by default (decided 2 October 2026 by Chinmay, DEC-461; CHG-CSP-022, `biometrics.accreditationFaceMatching`).**",
   "_platform": {
    "code": "P08",
    "audience": "staff",

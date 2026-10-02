@@ -1,10 +1,10 @@
 {
  "generated_by": "tools/refresh-manifest.py",
  "note": "What each step of tools/refresh.sh reads and writes, measured by tracing a full refresh in a throwaway worktree. Used by `refresh-safe.sh --changed` to run only the steps downstream of a change. A scoped run is not a release: a full refresh is required before a release tag. Rebuild with `python3 tools/refresh-manifest.py rebuild` whenever refresh.sh changes.",
- "traced_at": "2026-10-01 03:37:09",
- "commit": "e39b1cc0029f3e177798b62c894beaaac1398a67",
- "refresh_sh_sha1": "13d9b281412089f0630b6c772a129dcfb528ea0f",
- "steps_signature": "7df3d330afc8e6b12917e4bd12cd03ac523855f1",
+ "traced_at": "2026-10-02 02:54:29",
+ "commit": "56bdb6f63ef4b881190161934138192c09774e4c",
+ "refresh_sh_sha1": "58350ebbfb9cabe52261e47c47974d20feb0fa0c",
+ "steps_signature": "8ddf11db716908658a527e93049e4e4dff02f05e",
  "python": "3.9.0",
  "glob_forms": {
   "path": "one file",
@@ -12,14 +12,14 @@
   "dir/**": "the subtree"
  },
  "summary": {
-  "steps": 61,
+  "steps": 64,
   "confidence": {
-   "high": 48,
+   "high": 51,
    "medium": 8,
    "low": 5
   },
-  "steps_reading_later_outputs": 32,
-  "traced_seconds": 2263
+  "steps_reading_later_outputs": 34,
+  "traced_seconds": 2812
  },
  "derived_roots": [
   "repos/*/project-bible/**",
@@ -57,13 +57,13 @@
    ],
    "untraced_changes": [],
    "external_reads": [],
-   "seconds": 71,
+   "seconds": 70,
    "processes": 1,
    "reads_output_of_later_steps": [
     4,
     23,
     24,
-    33
+    35
    ]
   },
   {
@@ -87,7 +87,7 @@
    "static_only": [],
    "untraced_changes": [],
    "external_reads": [],
-   "seconds": 42,
+   "seconds": 41,
    "processes": 1,
    "reads_output_of_later_steps": [
     19,
@@ -97,7 +97,7 @@
     23,
     24,
     25,
-    32
+    34
    ]
   },
   {
@@ -121,7 +121,7 @@
    "self_reads": [
     "handoff/schema-reference.json"
    ],
-   "changed_in_trace": 0,
+   "changed_in_trace": 1,
    "confidence": "high",
    "why": [],
    "static_only": [],
@@ -134,7 +134,7 @@
     9,
     10,
     23,
-    33
+    35
    ]
   },
   {
@@ -195,15 +195,15 @@
    "static_only": [],
    "untraced_changes": [],
    "external_reads": [],
-   "seconds": 21,
+   "seconds": 23,
    "processes": 1,
    "reads_output_of_later_steps": [
     9,
     10,
     23,
     24,
-    33,
-    44
+    35,
+    47
    ]
   },
   {
@@ -213,7 +213,8 @@
     "tools/derive-ddl.py"
    ],
    "reads": [
-    "backend/**",
+    "backend/control/*",
+    "backend/tenant/*",
     "contracts/**",
     "handoff/schema-reference.json",
     "tools/ddl_forward.py",
@@ -221,37 +222,26 @@
     "tools/release_baseline.py"
    ],
    "writes": [
-    "backend/990-cross-database-references.sql",
-    "backend/control/000-schemas.sql",
-    "backend/control/001-extensions.sql",
-    "backend/control/002-migration-register.sql",
-    "backend/control/010-control.sql",
-    "backend/control/900-foreign-keys.sql",
-    "backend/control/910-indexes.sql",
-    "backend/control/920-row-level-security.sql",
+    "backend/control/V0100__after_r1_20261002.sql",
     "backend/initdb-provision.sh",
     "backend/provision-tenant.sh",
-    "backend/tenant/*",
+    "backend/tenant/V0100__after_r1_20261002.sql",
     "handoff/migration-review.md"
    ],
    "self_reads": [],
-   "changed_in_trace": 0,
-   "confidence": "medium",
-   "why": [
-    "1 path(s) the source writes that the traced run did not (added as writes)"
-   ],
-   "static_only": [
-    "(write) handoff/migration-review.md"
-   ],
+   "changed_in_trace": 3,
+   "confidence": "high",
+   "why": [],
+   "static_only": [],
    "untraced_changes": [],
    "external_reads": [],
-   "seconds": 22,
+   "seconds": 26,
    "processes": 1,
    "reads_output_of_later_steps": [
     9,
     10,
     23,
-    33
+    35
    ]
   },
   {
@@ -271,13 +261,13 @@
     "handoff/burst-scope.json"
    ],
    "self_reads": [],
-   "changed_in_trace": 0,
+   "changed_in_trace": 1,
    "confidence": "high",
    "why": [],
    "static_only": [],
    "untraced_changes": [],
    "external_reads": [],
-   "seconds": 1,
+   "seconds": 0,
    "processes": 1,
    "reads_output_of_later_steps": [
     9,
@@ -309,7 +299,7 @@
    "static_only": [],
    "untraced_changes": [],
    "external_reads": [],
-   "seconds": 2,
+   "seconds": 3,
    "processes": 1,
    "reads_output_of_later_steps": [
     19,
@@ -340,7 +330,7 @@
    "static_only": [],
    "untraced_changes": [],
    "external_reads": [],
-   "seconds": 1,
+   "seconds": 0,
    "processes": 1,
    "reads_output_of_later_steps": [
     10,
@@ -399,11 +389,11 @@
    ],
    "untraced_changes": [],
    "external_reads": [],
-   "seconds": 20,
+   "seconds": 22,
    "processes": 1,
    "reads_output_of_later_steps": [
     23,
-    33
+    35
    ]
   },
   {
@@ -440,7 +430,7 @@
     23,
     24,
     25,
-    32
+    34
    ]
   },
   {
@@ -512,13 +502,13 @@
     "diagrams/hld/03-contracts.yaml",
     "diagrams/hld/04-lifecycles.yaml"
    ],
-   "changed_in_trace": 3,
+   "changed_in_trace": 11,
    "confidence": "high",
    "why": [],
    "static_only": [],
    "untraced_changes": [],
    "external_reads": [],
-   "seconds": 128,
+   "seconds": 125,
    "processes": 1,
    "reads_output_of_later_steps": [
     19,
@@ -528,8 +518,8 @@
     23,
     24,
     25,
-    32,
-    33
+    34,
+    35
    ]
   },
   {
@@ -562,7 +552,7 @@
    ],
    "untraced_changes": [],
    "external_reads": [],
-   "seconds": 1,
+   "seconds": 0,
    "processes": 1,
    "reads_output_of_later_steps": [
     24
@@ -597,13 +587,13 @@
    "static_only": [],
    "untraced_changes": [],
    "external_reads": [],
-   "seconds": 35,
+   "seconds": 32,
    "processes": 1,
    "reads_output_of_later_steps": [
     23,
     24,
-    33,
-    35
+    35,
+    37
    ]
   },
   {
@@ -628,7 +618,7 @@
    "static_only": [],
    "untraced_changes": [],
    "external_reads": [],
-   "seconds": 2,
+   "seconds": 1,
    "processes": 1,
    "reads_output_of_later_steps": [
     24
@@ -655,7 +645,7 @@
    "static_only": [],
    "untraced_changes": [],
    "external_reads": [],
-   "seconds": 1,
+   "seconds": 2,
    "processes": 1,
    "reads_output_of_later_steps": []
   },
@@ -686,7 +676,7 @@
    "static_only": [],
    "untraced_changes": [],
    "external_reads": [],
-   "seconds": 32,
+   "seconds": 30,
    "processes": 1,
    "reads_output_of_later_steps": [
     20,
@@ -695,7 +685,7 @@
     23,
     24,
     25,
-    32
+    34
    ]
   },
   {
@@ -729,7 +719,7 @@
     23,
     24,
     25,
-    32
+    34
    ]
   },
   {
@@ -756,14 +746,14 @@
    "static_only": [],
    "untraced_changes": [],
    "external_reads": [],
-   "seconds": 25,
+   "seconds": 29,
    "processes": 1,
    "reads_output_of_later_steps": [
     22,
     23,
     24,
     25,
-    32
+    34
    ]
   },
   {
@@ -789,14 +779,14 @@
    "static_only": [],
    "untraced_changes": [],
    "external_reads": [],
-   "seconds": 46,
+   "seconds": 74,
    "processes": 1,
    "reads_output_of_later_steps": [
     23,
     24,
     25,
-    32,
-    33
+    34,
+    35
    ]
   },
   {
@@ -826,13 +816,13 @@
    "static_only": [],
    "untraced_changes": [],
    "external_reads": [],
-   "seconds": 30,
+   "seconds": 53,
    "processes": 1,
    "reads_output_of_later_steps": [
     24,
     25,
-    32,
-    33
+    34,
+    35
    ]
   },
   {
@@ -862,11 +852,11 @@
    "static_only": [],
    "untraced_changes": [],
    "external_reads": [],
-   "seconds": 18,
+   "seconds": 28,
    "processes": 1,
    "reads_output_of_later_steps": [
     25,
-    32
+    34
    ]
   },
   {
@@ -893,10 +883,10 @@
    "static_only": [],
    "untraced_changes": [],
    "external_reads": [],
-   "seconds": 18,
+   "seconds": 28,
    "processes": 1,
    "reads_output_of_later_steps": [
-    32
+    34
    ]
   },
   {
@@ -945,14 +935,14 @@
    "static_only": [],
    "untraced_changes": [],
    "external_reads": [],
-   "seconds": 147,
+   "seconds": 242,
    "processes": 1,
    "reads_output_of_later_steps": [
     27,
     28,
-    32,
-    39,
-    42
+    34,
+    42,
+    45
    ]
   },
   {
@@ -978,13 +968,13 @@
    "static_only": [],
    "untraced_changes": [],
    "external_reads": [],
-   "seconds": 54,
+   "seconds": 93,
    "processes": 1,
    "reads_output_of_later_steps": [
     28,
-    32,
-    39,
-    42
+    34,
+    42,
+    45
    ]
   },
   {
@@ -1009,46 +999,134 @@
    "static_only": [],
    "untraced_changes": [],
    "external_reads": [],
-   "seconds": 19,
+   "seconds": 29,
    "processes": 1,
    "reads_output_of_later_steps": [
-    32
+    34
    ]
   },
   {
    "step": 29,
-   "command": "python3 tools/export-design-batch.py --all",
+   "command": "python3 tools/build-design-inputs.py",
    "tools": [
-    "tools/export-design-batch.py"
+    "tools/build-design-inputs.py"
    ],
    "reads": [
-    "contracts/**",
-    "handoff/design-batches/**",
+    "handoff/design-batches/apps/*",
+    "handoff/design-batches/apps/1-guest-app/*",
+    "handoff/design-batches/apps/2-pos/*",
+    "handoff/design-batches/apps/3-scanner/*",
+    "handoff/design-batches/apps/4-staff-app/*",
+    "handoff/design-batches/apps/5-venue-management/*",
+    "handoff/design-batches/apps/6-ticvai-controller/*",
+    "handoff/design-batches/apps/7-partner-portal/*",
+    "handoff/design-inputs/mom-design-inputs.yaml",
     "screens/*",
-    "tools/export-design-batch.py",
-    "wireframes/design-manifest.json"
+    "tools/build-design-inputs.py"
    ],
    "writes": [
-    "handoff/design-batches/**"
+    "handoff/design-inputs/README.md"
    ],
-   "self_reads": [
-    "handoff/design-batches/**"
-   ],
+   "self_reads": [],
    "changed_in_trace": 0,
    "confidence": "high",
    "why": [],
    "static_only": [],
    "untraced_changes": [],
    "external_reads": [],
-   "seconds": 55,
+   "seconds": 3,
    "processes": 1,
    "reads_output_of_later_steps": [
-    32,
-    33
+    30,
+    31,
+    34
    ]
   },
   {
    "step": 30,
+   "command": "python3 tools/build-white-label-map.py",
+   "tools": [
+    "tools/build-white-label-map.py"
+   ],
+   "reads": [
+    "contracts/**",
+    "flows/*",
+    "handoff/design-inputs/mom-design-inputs.yaml",
+    "screens/*",
+    "tools/build-white-label-map.py",
+    "tools/design_spec.py"
+   ],
+   "writes": [
+    "handoff/design-batches/apps/1-guest-app/WHITE-LABEL.md",
+    "handoff/design-inputs/white-label-map.json"
+   ],
+   "self_reads": [],
+   "changed_in_trace": 1,
+   "confidence": "high",
+   "why": [],
+   "static_only": [],
+   "untraced_changes": [],
+   "external_reads": [],
+   "seconds": 11,
+   "processes": 1,
+   "reads_output_of_later_steps": [
+    34,
+    35
+   ]
+  },
+  {
+   "step": 31,
+   "command": "python3 tools/export-design-batch.py --all",
+   "tools": [
+    "tools/export-design-batch.py"
+   ],
+   "reads": [
+    "contracts/**",
+    "docs/adr/*",
+    "flows/*",
+    "handoff/design-batches/apps/*",
+    "handoff/design-batches/apps/1-guest-app/README.md",
+    "handoff/design-batches/apps/2-pos/README.md",
+    "handoff/design-batches/apps/3-scanner/README.md",
+    "handoff/design-batches/apps/4-staff-app/README.md",
+    "handoff/design-batches/apps/5-venue-management/README.md",
+    "handoff/design-batches/apps/6-ticvai-controller/README.md",
+    "handoff/design-batches/apps/7-partner-portal/README.md",
+    "handoff/design-inputs/mom-design-inputs.yaml",
+    "handoff/design-inputs/task-tracker-index.json",
+    "handoff/design-inputs/white-label-map.json",
+    "handoff/service-docs/pms-map.json",
+    "handoff/service-docs/tasks.csv",
+    "handoff/traceability.json",
+    "roles-by-app.yaml",
+    "screens/*",
+    "sources/requirements/Ticvai_matrix_20260621_2.xlsx",
+    "tools/build-design-inputs.py",
+    "tools/design_spec.py",
+    "tools/export-design-batch.py",
+    "wireframes/design-manifest.json"
+   ],
+   "writes": [
+    "handoff/design-batches/**"
+   ],
+   "self_reads": [],
+   "changed_in_trace": 5,
+   "confidence": "high",
+   "why": [],
+   "static_only": [],
+   "untraced_changes": [],
+   "external_reads": [],
+   "seconds": 207,
+   "processes": 1,
+   "reads_output_of_later_steps": [
+    32,
+    34,
+    35,
+    37
+   ]
+  },
+  {
+   "step": 32,
    "command": "python3 tools/derive-app-roles.py",
    "tools": [
     "tools/derive-app-roles.py"
@@ -1069,15 +1147,15 @@
    "static_only": [],
    "untraced_changes": [],
    "external_reads": [],
-   "seconds": 38,
+   "seconds": 53,
    "processes": 1,
    "reads_output_of_later_steps": [
-    32,
-    33
+    34,
+    35
    ]
   },
   {
-   "step": 31,
+   "step": 33,
    "command": "python3 tools/derive-capabilities.py --apply",
    "tools": [
     "tools/derive-capabilities.py"
@@ -1096,14 +1174,14 @@
    "static_only": [],
    "untraced_changes": [],
    "external_reads": [],
-   "seconds": 16,
+   "seconds": 21,
    "processes": 1,
    "reads_output_of_later_steps": [
-    33
+    35
    ]
   },
   {
-   "step": 32,
+   "step": 34,
    "command": "python3 tools/derive-id-register.py --apply",
    "tools": [
     "tools/derive-id-register.py"
@@ -1122,12 +1200,12 @@
    "static_only": [],
    "untraced_changes": [],
    "external_reads": [],
-   "seconds": 22,
+   "seconds": 28,
    "processes": 1,
    "reads_output_of_later_steps": []
   },
   {
-   "step": 33,
+   "step": 35,
    "command": "python3 tools/link-screens-contracts.py",
    "tools": [
     "tools/link-screens-contracts.py"
@@ -1168,12 +1246,12 @@
    "static_only": [],
    "untraced_changes": [],
    "external_reads": [],
-   "seconds": 341,
+   "seconds": 371,
    "processes": 1,
    "reads_output_of_later_steps": []
   },
   {
-   "step": 34,
+   "step": 36,
    "command": "python3 tools/build-api-list.py",
    "tools": [
     "tools/build-api-list.py"
@@ -1194,12 +1272,12 @@
    "static_only": [],
    "untraced_changes": [],
    "external_reads": [],
-   "seconds": 23,
+   "seconds": 22,
    "processes": 1,
    "reads_output_of_later_steps": []
   },
   {
-   "step": 35,
+   "step": 37,
    "command": "python3 tools/build-service-docs.py",
    "tools": [
     "tools/build-service-docs.py"
@@ -1208,17 +1286,22 @@
     "backend/control/*",
     "backend/tenant/*",
     "contracts/**",
+    "docs/active/ai-functions-review-30-september.json",
     "docs/active/block-a-extra-tasks.json",
     "docs/active/team.json",
+    "flows/*",
     "handoff/api-data-lineage.json",
     "handoff/delivery-slice.json",
     "handoff/schema-reference.json",
     "handoff/service-decomposition.json",
+    "handoff/service-docs/backend/MIGRATIONS.md",
+    "handoff/service-docs/op-release.json",
     "handoff/service-docs/pms-map.json",
     "screens/*",
     "states/*",
     "tools/build-service-docs.py",
-    "tools/op-retire.py"
+    "tools/op-retire.py",
+    "tools/sprint_plan.py"
    ],
    "writes": [
     "handoff/service-docs/README.md",
@@ -1231,21 +1314,24 @@
     "handoff/service-docs/frontend/POS.md",
     "handoff/service-docs/frontend/WEB.md",
     "handoff/service-docs/frontend/WL.md",
+    "handoff/service-docs/plan-tasks.csv",
     "handoff/service-docs/tasks.csv"
    ],
-   "self_reads": [],
-   "changed_in_trace": 4,
+   "self_reads": [
+    "handoff/service-docs/backend/MIGRATIONS.md"
+   ],
+   "changed_in_trace": 15,
    "confidence": "high",
    "why": [],
    "static_only": [],
    "untraced_changes": [],
    "external_reads": [],
-   "seconds": 84,
+   "seconds": 94,
    "processes": 1,
    "reads_output_of_later_steps": []
   },
   {
-   "step": 36,
+   "step": 38,
    "command": "python3 tools/derive-block-a-schedule.py",
    "tools": [
     "tools/derive-block-a-schedule.py"
@@ -1253,25 +1339,58 @@
    "reads": [
     "docs/active/block-a-extra-tasks.json",
     "docs/active/team.json",
-    "handoff/service-docs/tasks.csv",
-    "tools/derive-block-a-schedule.py"
+    "handoff/service-docs/op-release.json",
+    "handoff/service-docs/plan-tasks.csv",
+    "tools/derive-block-a-schedule.py",
+    "tools/sprint_plan.py"
    ],
    "writes": [
     "handoff/service-docs/block-a-schedule.json"
    ],
    "self_reads": [],
-   "changed_in_trace": 0,
+   "changed_in_trace": 1,
    "confidence": "high",
    "why": [],
    "static_only": [],
    "untraced_changes": [],
    "external_reads": [],
-   "seconds": 0,
+   "seconds": 1,
    "processes": 1,
    "reads_output_of_later_steps": []
   },
   {
-   "step": 37,
+   "step": 39,
+   "command": "python3 tools/op-descriptions.py --schedule handoff/service-docs/block-a-schedule.json",
+   "tools": [
+    "tools/op-descriptions.py"
+   ],
+   "reads": [
+    "contracts/**",
+    "handoff/api-data-lineage.json",
+    "handoff/delivery-slice.json",
+    "handoff/service-docs/block-a-schedule.json",
+    "handoff/service-docs/pms-map.json",
+    "handoff/service-docs/tasks.csv",
+    "screens/*",
+    "states/*",
+    "tools/op-descriptions.py"
+   ],
+   "writes": [
+    "handoff/service-docs/op-descriptions.json"
+   ],
+   "self_reads": [],
+   "changed_in_trace": 1,
+   "confidence": "high",
+   "why": [],
+   "static_only": [],
+   "untraced_changes": [],
+   "external_reads": [],
+   "seconds": 82,
+   "processes": 1,
+   "reads_output_of_later_steps": []
+  },
+  {
+   "step": 40,
    "command": "python3 tools/build-ticket-links.py",
    "tools": [
     "tools/build-ticket-links.py"
@@ -1291,12 +1410,12 @@
    "static_only": [],
    "untraced_changes": [],
    "external_reads": [],
-   "seconds": 29,
+   "seconds": 28,
    "processes": 1,
    "reads_output_of_later_steps": []
   },
   {
-   "step": 38,
+   "step": 41,
    "command": "python3 tools/build-client-questions-workbook.py",
    "tools": [
     "tools/build-client-questions-workbook.py"
@@ -1317,12 +1436,12 @@
    "static_only": [],
    "untraced_changes": [],
    "external_reads": [],
-   "seconds": 78,
+   "seconds": 75,
    "processes": 1,
    "reads_output_of_later_steps": []
   },
   {
-   "step": 39,
+   "step": 42,
    "command": "python3 tools/build-linkage.py",
    "tools": [
     "tools/build-linkage.py"
@@ -1338,20 +1457,20 @@
     "wireframes/LINKAGE.md"
    ],
    "self_reads": [],
-   "changed_in_trace": 0,
+   "changed_in_trace": 1,
    "confidence": "high",
    "why": [],
    "static_only": [],
    "untraced_changes": [],
    "external_reads": [],
-   "seconds": 52,
+   "seconds": 51,
    "processes": 1,
    "reads_output_of_later_steps": [
-    42
+    45
    ]
   },
   {
-   "step": 40,
+   "step": 43,
    "command": "python3 tools/screen-ledger.py",
    "tools": [
     "tools/screen-ledger.py"
@@ -1397,7 +1516,7 @@
    "reads_output_of_later_steps": []
   },
   {
-   "step": 41,
+   "step": 44,
    "command": "python3 tools/audit-screen-estate.py",
    "tools": [
     "tools/audit-screen-estate.py"
@@ -1421,12 +1540,12 @@
    ],
    "untraced_changes": [],
    "external_reads": [],
-   "seconds": 52,
+   "seconds": 51,
    "processes": 1,
    "reads_output_of_later_steps": []
   },
   {
-   "step": 42,
+   "step": 45,
    "command": "python3 tools/list-undrawn.py",
    "tools": [
     "tools/list-undrawn.py"
@@ -1447,12 +1566,12 @@
    "static_only": [],
    "untraced_changes": [],
    "external_reads": [],
-   "seconds": 29,
+   "seconds": 28,
    "processes": 1,
    "reads_output_of_later_steps": []
   },
   {
-   "step": 43,
+   "step": 46,
    "command": "python3 tools/build-thin-screens-workbook.py 2>/dev/null || true",
    "tools": [
     "tools/build-thin-screens-workbook.py"
@@ -1474,12 +1593,12 @@
    "static_only": [],
    "untraced_changes": [],
    "external_reads": [],
-   "seconds": 60,
+   "seconds": 58,
    "processes": 1,
    "reads_output_of_later_steps": []
   },
   {
-   "step": 44,
+   "step": 47,
    "command": "inline python -> handoff/screen-index.json",
    "tools": [],
    "reads": [
@@ -1490,18 +1609,18 @@
     "handoff/screen-index.json"
    ],
    "self_reads": [],
-   "changed_in_trace": 0,
+   "changed_in_trace": 1,
    "confidence": "high",
    "why": [],
    "static_only": [],
    "untraced_changes": [],
    "external_reads": [],
-   "seconds": 28,
+   "seconds": 29,
    "processes": 1,
    "reads_output_of_later_steps": []
   },
   {
-   "step": 45,
+   "step": 48,
    "command": "python3 tools/derive-domain.py \"$d\" --quiet ; python3 tools/build-status.py --domain \"$d\" >/dev/null ; python3 tools/render-domain.py \"$d\"",
    "tools": [
     "tools/derive-domain.py",
@@ -1542,7 +1661,7 @@
     "handoff/domain-markers.json",
     "handoff/status-ai.json"
    ],
-   "changed_in_trace": 4,
+   "changed_in_trace": 1,
    "confidence": "medium",
    "why": [
     "1 path(s) the source names that the traced run did not read (added as reads)"
@@ -1552,14 +1671,14 @@
    ],
    "untraced_changes": [],
    "external_reads": [],
-   "seconds": 54,
+   "seconds": 68,
    "processes": 3,
    "reads_output_of_later_steps": [
-    57
+    60
    ]
   },
   {
-   "step": 46,
+   "step": 49,
    "command": "python3 tools/build-backlog-index.py",
    "tools": [
     "tools/build-backlog-index.py"
@@ -1583,7 +1702,7 @@
    "reads_output_of_later_steps": []
   },
   {
-   "step": 47,
+   "step": 50,
    "command": "python3 tools/build-cluster-index.py",
    "tools": [
     "tools/build-cluster-index.py"
@@ -1608,7 +1727,7 @@
    "reads_output_of_later_steps": []
   },
   {
-   "step": 48,
+   "step": 51,
    "command": "python3 tools/build-cf-index.py",
    "tools": [
     "tools/build-cf-index.py"
@@ -1632,7 +1751,7 @@
    "reads_output_of_later_steps": []
   },
   {
-   "step": 49,
+   "step": 52,
    "command": "python3 tools/index-packs.py",
    "tools": [
     "tools/index-packs.py"
@@ -1655,12 +1774,12 @@
    "static_only": [],
    "untraced_changes": [],
    "external_reads": [],
-   "seconds": 18,
+   "seconds": 29,
    "processes": 1,
    "reads_output_of_later_steps": []
   },
   {
-   "step": 50,
+   "step": 53,
    "command": "python3 tools/sync-project-bible.py",
    "tools": [
     "tools/sync-project-bible.py"
@@ -1698,7 +1817,15 @@
     "repos/ticvai-docs/events/*",
     "repos/ticvai-docs/flows/*",
     "repos/ticvai-docs/frontend/*",
-    "repos/ticvai-docs/handoff/**",
+    "repos/ticvai-docs/handoff/*",
+    "repos/ticvai-docs/handoff/board-dashboard-data/**",
+    "repos/ticvai-docs/handoff/brand/*",
+    "repos/ticvai-docs/handoff/design-batches/**",
+    "repos/ticvai-docs/handoff/hld-lld/*",
+    "repos/ticvai-docs/handoff/matrix-analysis/*",
+    "repos/ticvai-docs/handoff/prototype-maps/*",
+    "repos/ticvai-docs/handoff/provisional-review/*",
+    "repos/ticvai-docs/handoff/service-docs/**",
     "repos/ticvai-docs/history/*",
     "repos/ticvai-docs/integrations/*",
     "repos/ticvai-docs/plan/*",
@@ -1710,9 +1837,7 @@
     "repos/ticvai-docs/setup/*",
     "repos/ticvai-docs/sources/**",
     "repos/ticvai-docs/states/*",
-    "repos/ticvai-docs/tools/*",
-    "repos/ticvai-docs/tools/applied/*",
-    "repos/ticvai-docs/tools/capture-plans/*",
+    "repos/ticvai-docs/tools/**",
     "repos/ticvai-docs/wireframes/*",
     "repos/ticvai-frontend/*",
     "repos/ticvai-frontend/.github/**",
@@ -1727,183 +1852,163 @@
     "tools/sync-project-bible.py"
    ],
    "writes": [
-    "repos/README.md",
-    "repos/ticvai-ai/README.md",
     "repos/ticvai-ai/project-bible/**",
-    "repos/ticvai-backend/README.md",
-    "repos/ticvai-backend/project-bible/**",
-    "repos/ticvai-backend/src/Ticvai.Migrations/Scripts/README.md",
-    "repos/ticvai-contracts/README.md",
-    "repos/ticvai-contracts/openapi/README.md",
-    "repos/ticvai-contracts/project-bible/**",
-    "repos/ticvai-contracts/standards/README.md",
-    "repos/ticvai-docs/README.md",
-    "repos/ticvai-docs/active/README.md",
-    "repos/ticvai-docs/adr/0012-queue-integration-adaptor-first.md",
-    "repos/ticvai-docs/adr/0015-standards-first-device-drivers.md",
-    "repos/ticvai-docs/adr/README.md",
-    "repos/ticvai-docs/architecture/README.md",
-    "repos/ticvai-docs/compliance/README.md",
+    "repos/ticvai-backend/project-bible/contracts/README.md",
+    "repos/ticvai-backend/project-bible/docs/active/block-a-extra-tasks.json",
+    "repos/ticvai-backend/project-bible/docs/active/build-plan-presentation.md",
+    "repos/ticvai-backend/project-bible/docs/active/claude-design-runbook.md",
+    "repos/ticvai-backend/project-bible/docs/active/team.json",
+    "repos/ticvai-backend/project-bible/docs/adr/0060-availability-targets-high-availability-and-disaster-recovery.md",
+    "repos/ticvai-backend/project-bible/docs/adr/README.md",
+    "repos/ticvai-backend/project-bible/docs/architecture/README.md",
+    "repos/ticvai-backend/project-bible/docs/registers/README.md",
+    "repos/ticvai-backend/project-bible/flows/README.md",
+    "repos/ticvai-backend/project-bible/frontend/README.md",
+    "repos/ticvai-backend/project-bible/handoff/**",
+    "repos/ticvai-backend/project-bible/screens/README.md",
+    "repos/ticvai-backend/project-bible/sources/README.md",
+    "repos/ticvai-backend/project-bible/sources/packs/README.md",
+    "repos/ticvai-backend/project-bible/tools/applied/README.md",
+    "repos/ticvai-contracts/project-bible/contracts/README.md",
+    "repos/ticvai-contracts/project-bible/docs/active/block-a-extra-tasks.json",
+    "repos/ticvai-contracts/project-bible/docs/active/build-plan-presentation.md",
+    "repos/ticvai-contracts/project-bible/docs/active/claude-design-runbook.md",
+    "repos/ticvai-contracts/project-bible/docs/active/team.json",
+    "repos/ticvai-contracts/project-bible/docs/adr/0060-availability-targets-high-availability-and-disaster-recovery.md",
+    "repos/ticvai-contracts/project-bible/docs/adr/README.md",
+    "repos/ticvai-contracts/project-bible/docs/architecture/README.md",
+    "repos/ticvai-contracts/project-bible/docs/registers/README.md",
+    "repos/ticvai-contracts/project-bible/flows/README.md",
+    "repos/ticvai-contracts/project-bible/frontend/README.md",
+    "repos/ticvai-contracts/project-bible/handoff/**",
+    "repos/ticvai-contracts/project-bible/screens/README.md",
+    "repos/ticvai-contracts/project-bible/sources/README.md",
+    "repos/ticvai-contracts/project-bible/sources/packs/README.md",
+    "repos/ticvai-contracts/project-bible/tools/applied/README.md",
     "repos/ticvai-docs/contracts/README.md",
-    "repos/ticvai-docs/delivery/README.md",
-    "repos/ticvai-docs/docs/active/README.md",
-    "repos/ticvai-docs/docs/adr/0012-queue-integration-adaptor-first.md",
-    "repos/ticvai-docs/docs/adr/0015-standards-first-device-drivers.md",
-    "repos/ticvai-docs/docs/adr/0032-load-shedding-and-pooling.md",
-    "repos/ticvai-docs/docs/adr/0055-a-modular-monolith-deployed-as-five-units.md",
-    "repos/ticvai-docs/docs/adr/0057-events-travel-on-rabbitmq-or-kafka.md",
-    "repos/ticvai-docs/docs/adr/0059-ai-phasing-against-the-six-month-plan.md",
+    "repos/ticvai-docs/docs/active/block-a-extra-tasks.json",
+    "repos/ticvai-docs/docs/active/build-plan-presentation.md",
+    "repos/ticvai-docs/docs/active/claude-design-runbook.md",
+    "repos/ticvai-docs/docs/active/team.json",
+    "repos/ticvai-docs/docs/adr/0060-availability-targets-high-availability-and-disaster-recovery.md",
     "repos/ticvai-docs/docs/adr/README.md",
     "repos/ticvai-docs/docs/architecture/README.md",
-    "repos/ticvai-docs/docs/architecture/ai-system-design.md",
     "repos/ticvai-docs/docs/registers/README.md",
     "repos/ticvai-docs/flows/README.md",
     "repos/ticvai-docs/frontend/README.md",
-    "repos/ticvai-docs/handoff/README.md",
-    "repos/ticvai-docs/handoff/ai-index.md",
-    "repos/ticvai-docs/handoff/api-list.md",
-    "repos/ticvai-docs/handoff/board-dashboard-data/README.md",
-    "repos/ticvai-docs/handoff/board-panel-map.json",
-    "repos/ticvai-docs/handoff/design-batches/**",
-    "repos/ticvai-docs/handoff/domain-ai.json",
-    "repos/ticvai-docs/handoff/domain-markers.json",
-    "repos/ticvai-docs/handoff/hld-lld/README.md",
-    "repos/ticvai-docs/handoff/matrix-analysis/README.md",
-    "repos/ticvai-docs/handoff/module-capabilities.json",
-    "repos/ticvai-docs/handoff/prototype-maps/rev3-decisions.json",
-    "repos/ticvai-docs/handoff/provisional-review/README.md",
-    "repos/ticvai-docs/handoff/relationship-graph.json",
-    "repos/ticvai-docs/handoff/schema-history.json",
-    "repos/ticvai-docs/handoff/schema-reference.json",
-    "repos/ticvai-docs/handoff/schema-roots.md",
-    "repos/ticvai-docs/handoff/service-decomposition.json",
-    "repos/ticvai-docs/handoff/service-docs/OPENPROJECT-PUSH.md",
-    "repos/ticvai-docs/handoff/service-docs/README.md",
-    "repos/ticvai-docs/handoff/service-docs/TICKET-LINKS.md",
-    "repos/ticvai-docs/handoff/service-docs/TICKET-STRUCTURE.md",
-    "repos/ticvai-docs/handoff/service-docs/backend/MIGRATIONS.md",
-    "repos/ticvai-docs/handoff/service-docs/pms-map.json",
-    "repos/ticvai-docs/handoff/status-ai.json",
-    "repos/ticvai-docs/history/README.md",
-    "repos/ticvai-docs/integrations/README.md",
-    "repos/ticvai-docs/plan/README.md",
-    "repos/ticvai-docs/product/README.md",
-    "repos/ticvai-docs/product/modules/README.md",
-    "repos/ticvai-docs/registers/README.md",
-    "repos/ticvai-docs/repos/README.md",
-    "repos/ticvai-docs/runbooks/README.md",
+    "repos/ticvai-docs/handoff/**",
     "repos/ticvai-docs/screens/README.md",
-    "repos/ticvai-docs/setup/README.md",
     "repos/ticvai-docs/sources/README.md",
     "repos/ticvai-docs/sources/packs/README.md",
     "repos/ticvai-docs/tools/applied/README.md",
-    "repos/ticvai-docs/wireframes/README.md",
-    "repos/ticvai-frontend/README.md",
-    "repos/ticvai-frontend/project-bible/**",
-    "repos/ticvai-infra/README.md",
-    "repos/ticvai-infra/project-bible/**",
-    "repos/ticvai-infra/terraform/modules/cell/README.md"
+    "repos/ticvai-frontend/project-bible/contracts/README.md",
+    "repos/ticvai-frontend/project-bible/docs/active/block-a-extra-tasks.json",
+    "repos/ticvai-frontend/project-bible/docs/active/build-plan-presentation.md",
+    "repos/ticvai-frontend/project-bible/docs/active/claude-design-runbook.md",
+    "repos/ticvai-frontend/project-bible/docs/active/team.json",
+    "repos/ticvai-frontend/project-bible/docs/adr/0060-availability-targets-high-availability-and-disaster-recovery.md",
+    "repos/ticvai-frontend/project-bible/docs/adr/README.md",
+    "repos/ticvai-frontend/project-bible/docs/architecture/README.md",
+    "repos/ticvai-frontend/project-bible/docs/registers/README.md",
+    "repos/ticvai-frontend/project-bible/flows/README.md",
+    "repos/ticvai-frontend/project-bible/frontend/README.md",
+    "repos/ticvai-frontend/project-bible/handoff/**",
+    "repos/ticvai-frontend/project-bible/screens/README.md",
+    "repos/ticvai-frontend/project-bible/sources/README.md",
+    "repos/ticvai-frontend/project-bible/sources/packs/README.md",
+    "repos/ticvai-frontend/project-bible/tools/applied/README.md",
+    "repos/ticvai-infra/project-bible/**"
    ],
    "self_reads": [
-    "repos/README.md",
-    "repos/ticvai-ai/README.md",
     "repos/ticvai-ai/project-bible/**",
-    "repos/ticvai-backend/README.md",
-    "repos/ticvai-backend/project-bible/**",
-    "repos/ticvai-backend/src/Ticvai.Migrations/Scripts/README.md",
-    "repos/ticvai-contracts/README.md",
-    "repos/ticvai-contracts/openapi/README.md",
-    "repos/ticvai-contracts/project-bible/**",
-    "repos/ticvai-contracts/standards/README.md",
-    "repos/ticvai-docs/README.md",
-    "repos/ticvai-docs/active/README.md",
-    "repos/ticvai-docs/adr/0012-queue-integration-adaptor-first.md",
-    "repos/ticvai-docs/adr/0015-standards-first-device-drivers.md",
-    "repos/ticvai-docs/adr/README.md",
-    "repos/ticvai-docs/architecture/README.md",
-    "repos/ticvai-docs/compliance/README.md",
+    "repos/ticvai-backend/project-bible/contracts/README.md",
+    "repos/ticvai-backend/project-bible/docs/active/block-a-extra-tasks.json",
+    "repos/ticvai-backend/project-bible/docs/active/build-plan-presentation.md",
+    "repos/ticvai-backend/project-bible/docs/active/claude-design-runbook.md",
+    "repos/ticvai-backend/project-bible/docs/active/team.json",
+    "repos/ticvai-backend/project-bible/docs/adr/0060-availability-targets-high-availability-and-disaster-recovery.md",
+    "repos/ticvai-backend/project-bible/docs/adr/README.md",
+    "repos/ticvai-backend/project-bible/docs/architecture/README.md",
+    "repos/ticvai-backend/project-bible/docs/registers/README.md",
+    "repos/ticvai-backend/project-bible/flows/README.md",
+    "repos/ticvai-backend/project-bible/frontend/README.md",
+    "repos/ticvai-backend/project-bible/handoff/**",
+    "repos/ticvai-backend/project-bible/screens/README.md",
+    "repos/ticvai-backend/project-bible/sources/README.md",
+    "repos/ticvai-backend/project-bible/sources/packs/README.md",
+    "repos/ticvai-backend/project-bible/tools/applied/README.md",
+    "repos/ticvai-contracts/project-bible/contracts/README.md",
+    "repos/ticvai-contracts/project-bible/docs/active/block-a-extra-tasks.json",
+    "repos/ticvai-contracts/project-bible/docs/active/build-plan-presentation.md",
+    "repos/ticvai-contracts/project-bible/docs/active/claude-design-runbook.md",
+    "repos/ticvai-contracts/project-bible/docs/active/team.json",
+    "repos/ticvai-contracts/project-bible/docs/adr/0060-availability-targets-high-availability-and-disaster-recovery.md",
+    "repos/ticvai-contracts/project-bible/docs/adr/README.md",
+    "repos/ticvai-contracts/project-bible/docs/architecture/README.md",
+    "repos/ticvai-contracts/project-bible/docs/registers/README.md",
+    "repos/ticvai-contracts/project-bible/flows/README.md",
+    "repos/ticvai-contracts/project-bible/frontend/README.md",
+    "repos/ticvai-contracts/project-bible/handoff/**",
+    "repos/ticvai-contracts/project-bible/screens/README.md",
+    "repos/ticvai-contracts/project-bible/sources/README.md",
+    "repos/ticvai-contracts/project-bible/sources/packs/README.md",
+    "repos/ticvai-contracts/project-bible/tools/applied/README.md",
     "repos/ticvai-docs/contracts/README.md",
-    "repos/ticvai-docs/delivery/README.md",
-    "repos/ticvai-docs/docs/active/README.md",
-    "repos/ticvai-docs/docs/adr/0012-queue-integration-adaptor-first.md",
-    "repos/ticvai-docs/docs/adr/0015-standards-first-device-drivers.md",
-    "repos/ticvai-docs/docs/adr/0032-load-shedding-and-pooling.md",
-    "repos/ticvai-docs/docs/adr/0055-a-modular-monolith-deployed-as-five-units.md",
-    "repos/ticvai-docs/docs/adr/0057-events-travel-on-rabbitmq-or-kafka.md",
-    "repos/ticvai-docs/docs/adr/0059-ai-phasing-against-the-six-month-plan.md",
+    "repos/ticvai-docs/docs/active/block-a-extra-tasks.json",
+    "repos/ticvai-docs/docs/active/build-plan-presentation.md",
+    "repos/ticvai-docs/docs/active/claude-design-runbook.md",
+    "repos/ticvai-docs/docs/active/team.json",
+    "repos/ticvai-docs/docs/adr/0060-availability-targets-high-availability-and-disaster-recovery.md",
     "repos/ticvai-docs/docs/adr/README.md",
     "repos/ticvai-docs/docs/architecture/README.md",
-    "repos/ticvai-docs/docs/architecture/ai-system-design.md",
     "repos/ticvai-docs/docs/registers/README.md",
     "repos/ticvai-docs/flows/README.md",
     "repos/ticvai-docs/frontend/README.md",
-    "repos/ticvai-docs/handoff/README.md",
-    "repos/ticvai-docs/handoff/ai-index.md",
-    "repos/ticvai-docs/handoff/api-list.md",
-    "repos/ticvai-docs/handoff/board-dashboard-data/README.md",
-    "repos/ticvai-docs/handoff/board-panel-map.json",
-    "repos/ticvai-docs/handoff/design-batches/**",
-    "repos/ticvai-docs/handoff/domain-ai.json",
-    "repos/ticvai-docs/handoff/domain-markers.json",
-    "repos/ticvai-docs/handoff/hld-lld/README.md",
-    "repos/ticvai-docs/handoff/matrix-analysis/README.md",
-    "repos/ticvai-docs/handoff/module-capabilities.json",
-    "repos/ticvai-docs/handoff/prototype-maps/rev3-decisions.json",
-    "repos/ticvai-docs/handoff/provisional-review/README.md",
-    "repos/ticvai-docs/handoff/relationship-graph.json",
-    "repos/ticvai-docs/handoff/schema-history.json",
-    "repos/ticvai-docs/handoff/schema-reference.json",
-    "repos/ticvai-docs/handoff/schema-roots.md",
-    "repos/ticvai-docs/handoff/service-decomposition.json",
-    "repos/ticvai-docs/handoff/service-docs/OPENPROJECT-PUSH.md",
-    "repos/ticvai-docs/handoff/service-docs/README.md",
-    "repos/ticvai-docs/handoff/service-docs/TICKET-LINKS.md",
-    "repos/ticvai-docs/handoff/service-docs/TICKET-STRUCTURE.md",
-    "repos/ticvai-docs/handoff/service-docs/backend/MIGRATIONS.md",
-    "repos/ticvai-docs/handoff/service-docs/pms-map.json",
-    "repos/ticvai-docs/handoff/status-ai.json",
-    "repos/ticvai-docs/history/README.md",
-    "repos/ticvai-docs/integrations/README.md",
-    "repos/ticvai-docs/plan/README.md",
-    "repos/ticvai-docs/product/README.md",
-    "repos/ticvai-docs/product/modules/README.md",
-    "repos/ticvai-docs/registers/README.md",
-    "repos/ticvai-docs/repos/README.md",
-    "repos/ticvai-docs/runbooks/README.md",
+    "repos/ticvai-docs/handoff/**",
     "repos/ticvai-docs/screens/README.md",
-    "repos/ticvai-docs/setup/README.md",
     "repos/ticvai-docs/sources/README.md",
     "repos/ticvai-docs/sources/packs/README.md",
     "repos/ticvai-docs/tools/applied/README.md",
-    "repos/ticvai-docs/wireframes/README.md",
-    "repos/ticvai-frontend/README.md",
-    "repos/ticvai-frontend/project-bible/**",
-    "repos/ticvai-infra/README.md",
-    "repos/ticvai-infra/project-bible/**",
-    "repos/ticvai-infra/terraform/modules/cell/README.md"
+    "repos/ticvai-frontend/project-bible/contracts/README.md",
+    "repos/ticvai-frontend/project-bible/docs/active/block-a-extra-tasks.json",
+    "repos/ticvai-frontend/project-bible/docs/active/build-plan-presentation.md",
+    "repos/ticvai-frontend/project-bible/docs/active/claude-design-runbook.md",
+    "repos/ticvai-frontend/project-bible/docs/active/team.json",
+    "repos/ticvai-frontend/project-bible/docs/adr/0060-availability-targets-high-availability-and-disaster-recovery.md",
+    "repos/ticvai-frontend/project-bible/docs/adr/README.md",
+    "repos/ticvai-frontend/project-bible/docs/architecture/README.md",
+    "repos/ticvai-frontend/project-bible/docs/registers/README.md",
+    "repos/ticvai-frontend/project-bible/flows/README.md",
+    "repos/ticvai-frontend/project-bible/frontend/README.md",
+    "repos/ticvai-frontend/project-bible/handoff/**",
+    "repos/ticvai-frontend/project-bible/screens/README.md",
+    "repos/ticvai-frontend/project-bible/sources/README.md",
+    "repos/ticvai-frontend/project-bible/sources/packs/README.md",
+    "repos/ticvai-frontend/project-bible/tools/applied/README.md",
+    "repos/ticvai-infra/project-bible/**"
    ],
-   "changed_in_trace": 9352,
+   "changed_in_trace": 9348,
    "confidence": "high",
    "why": [],
    "static_only": [],
    "untraced_changes": [],
    "external_reads": [],
-   "seconds": 42,
+   "seconds": 55,
    "processes": 1,
    "reads_output_of_later_steps": [
-    51,
-    52,
-    53,
     54,
     55,
+    56,
     57,
-    59,
+    58,
     60,
-    61
+    62,
+    63,
+    64
    ]
   },
   {
-   "step": 51,
+   "step": 54,
    "command": "python3 tools/derive-platform.py",
    "tools": [
     "tools/derive-platform.py"
@@ -1950,18 +2055,18 @@
     "handoff/platform-index.json"
    ],
    "self_reads": [],
-   "changed_in_trace": 16,
+   "changed_in_trace": 24,
    "confidence": "high",
    "why": [],
    "static_only": [],
    "untraced_changes": [],
    "external_reads": [],
-   "seconds": 33,
+   "seconds": 31,
    "processes": 1,
    "reads_output_of_later_steps": []
   },
   {
-   "step": 52,
+   "step": 55,
    "command": "python3 tools/derive-platform-deployment.py",
    "tools": [
     "tools/derive-platform-deployment.py"
@@ -1974,18 +2079,18 @@
     "handoff/platform-deployment.md"
    ],
    "self_reads": [],
-   "changed_in_trace": 0,
+   "changed_in_trace": 1,
    "confidence": "high",
    "why": [],
    "static_only": [],
    "untraced_changes": [],
    "external_reads": [],
-   "seconds": 30,
+   "seconds": 27,
    "processes": 1,
    "reads_output_of_later_steps": []
   },
   {
-   "step": 53,
+   "step": 56,
    "command": "python3 tools/build-audience.py",
    "tools": [
     "tools/build-audience.py"
@@ -2008,12 +2113,12 @@
    "static_only": [],
    "untraced_changes": [],
    "external_reads": [],
-   "seconds": 57,
+   "seconds": 54,
    "processes": 1,
    "reads_output_of_later_steps": []
   },
   {
-   "step": 54,
+   "step": 57,
    "command": "python3 tools/build-status.py",
    "tools": [
     "tools/build-status.py"
@@ -2047,12 +2152,12 @@
    "static_only": [],
    "untraced_changes": [],
    "external_reads": [],
-   "seconds": 58,
+   "seconds": 55,
    "processes": 1,
    "reads_output_of_later_steps": []
   },
   {
-   "step": 55,
+   "step": 58,
    "command": "python3 tools/audit-guest-parity.py",
    "tools": [
     "tools/audit-guest-parity.py"
@@ -2122,7 +2227,7 @@
    "reads_output_of_later_steps": []
   },
   {
-   "step": 56,
+   "step": 59,
    "command": "python3 tools/derive-overview.py",
    "tools": [
     "tools/derive-overview.py"
@@ -2151,7 +2256,7 @@
    "reads_output_of_later_steps": []
   },
   {
-   "step": 57,
+   "step": 60,
    "command": "python3 tools/build-status.py --domain ai",
    "tools": [
     "tools/build-status.py"
@@ -2187,12 +2292,12 @@
    ],
    "untraced_changes": [],
    "external_reads": [],
-   "seconds": 23,
+   "seconds": 22,
    "processes": 1,
    "reads_output_of_later_steps": []
   },
   {
-   "step": 58,
+   "step": 61,
    "command": "python3 tools/sync-counts.py",
    "tools": [
     "tools/sync-counts.py"
@@ -2230,7 +2335,7 @@
    "reads_output_of_later_steps": []
   },
   {
-   "step": 59,
+   "step": 62,
    "command": "python3 tools/build-package-report.py --apply",
    "tools": [
     "tools/build-package-report.py"
@@ -2257,12 +2362,12 @@
    "static_only": [],
    "untraced_changes": [],
    "external_reads": [],
-   "seconds": 1,
+   "seconds": 0,
    "processes": 1,
    "reads_output_of_later_steps": []
   },
   {
-   "step": 60,
+   "step": 63,
    "command": "python3 tools/build-readiness-workbook.py",
    "tools": [
     "tools/build-readiness-workbook.py"
@@ -2292,12 +2397,12 @@
    "static_only": [],
    "untraced_changes": [],
    "external_reads": [],
-   "seconds": 59,
+   "seconds": 58,
    "processes": 1,
    "reads_output_of_later_steps": []
   },
   {
-   "step": 61,
+   "step": 64,
    "command": "python3 tools/derive-mirrors.py",
    "tools": [
     "tools/derive-mirrors.py"
@@ -2323,19 +2428,19 @@
     "repos/ticvai-ai/project-bible/sources/**",
     "repos/ticvai-ai/project-bible/states/*",
     "repos/ticvai-ai/project-bible/tools/**",
-    "repos/ticvai-backend/project-bible/**",
-    "repos/ticvai-contracts/project-bible/*",
-    "repos/ticvai-contracts/project-bible/contracts/**",
-    "repos/ticvai-contracts/project-bible/diagrams/**",
-    "repos/ticvai-contracts/project-bible/docs/**",
-    "repos/ticvai-contracts/project-bible/events/*",
-    "repos/ticvai-contracts/project-bible/flows/*",
-    "repos/ticvai-contracts/project-bible/frontend/*",
-    "repos/ticvai-contracts/project-bible/handoff/**",
-    "repos/ticvai-contracts/project-bible/screens/*",
-    "repos/ticvai-contracts/project-bible/sources/**",
-    "repos/ticvai-contracts/project-bible/states/*",
-    "repos/ticvai-contracts/project-bible/tools/**",
+    "repos/ticvai-backend/project-bible/*",
+    "repos/ticvai-backend/project-bible/contracts/**",
+    "repos/ticvai-backend/project-bible/diagrams/**",
+    "repos/ticvai-backend/project-bible/docs/**",
+    "repos/ticvai-backend/project-bible/events/*",
+    "repos/ticvai-backend/project-bible/flows/*",
+    "repos/ticvai-backend/project-bible/frontend/*",
+    "repos/ticvai-backend/project-bible/handoff/**",
+    "repos/ticvai-backend/project-bible/screens/*",
+    "repos/ticvai-backend/project-bible/sources/**",
+    "repos/ticvai-backend/project-bible/states/*",
+    "repos/ticvai-backend/project-bible/tools/**",
+    "repos/ticvai-contracts/project-bible/**",
     "repos/ticvai-docs/*",
     "repos/ticvai-docs/contracts/**",
     "repos/ticvai-docs/diagrams/**",
@@ -2379,162 +2484,160 @@
    ],
    "writes": [
     "repos/ticvai-ai/project-bible/**",
-    "repos/ticvai-backend/project-bible/contracts/README.md",
-    "repos/ticvai-backend/project-bible/diagrams/README.yaml",
-    "repos/ticvai-backend/project-bible/diagrams/hld/00-platform.yaml",
-    "repos/ticvai-backend/project-bible/diagrams/hld/04-lifecycles.yaml",
-    "repos/ticvai-backend/project-bible/docs/active/breaking-changes.yaml",
-    "repos/ticvai-backend/project-bible/docs/active/broker-decision-pack.md",
-    "repos/ticvai-backend/project-bible/docs/active/change-rules.md",
-    "repos/ticvai-backend/project-bible/docs/active/developer-brief.md",
-    "repos/ticvai-backend/project-bible/docs/active/release-runbook.md",
-    "repos/ticvai-backend/project-bible/docs/active/thin-screens.xlsx",
-    "repos/ticvai-backend/project-bible/docs/adr/**",
-    "repos/ticvai-backend/project-bible/docs/architecture/README.md",
-    "repos/ticvai-backend/project-bible/docs/registers/README.md",
-    "repos/ticvai-backend/project-bible/flows/README.md",
-    "repos/ticvai-backend/project-bible/frontend/README.md",
-    "repos/ticvai-backend/project-bible/handoff/**",
-    "repos/ticvai-backend/project-bible/screens/README.md",
-    "repos/ticvai-backend/project-bible/screens/_id-register.yaml",
-    "repos/ticvai-backend/project-bible/sources/**",
-    "repos/ticvai-backend/project-bible/states/access-device-status.yaml",
-    "repos/ticvai-backend/project-bible/tools/**",
+    "repos/ticvai-backend/project-bible/**",
     "repos/ticvai-contracts/project-bible/**",
     "repos/ticvai-docs/contracts/README.md",
-    "repos/ticvai-docs/diagrams/README.yaml",
+    "repos/ticvai-docs/contracts/satellite/fnb.yaml",
+    "repos/ticvai-docs/contracts/satellite/marketing-crm.yaml",
+    "repos/ticvai-docs/contracts/satellite/retail.yaml",
+    "repos/ticvai-docs/contracts/satellite/workforce.yaml",
+    "repos/ticvai-docs/contracts/spine/finance.yaml",
+    "repos/ticvai-docs/contracts/spine/orders.yaml",
     "repos/ticvai-docs/diagrams/hld/00-platform.yaml",
-    "repos/ticvai-docs/diagrams/hld/04-lifecycles.yaml",
-    "repos/ticvai-docs/docs/active/breaking-changes.yaml",
-    "repos/ticvai-docs/docs/active/broker-decision-pack.md",
-    "repos/ticvai-docs/docs/active/change-rules.md",
-    "repos/ticvai-docs/docs/active/developer-brief.md",
-    "repos/ticvai-docs/docs/active/release-runbook.md",
+    "repos/ticvai-docs/diagrams/lld/**",
+    "repos/ticvai-docs/docs/active/block-test-strategy.md",
     "repos/ticvai-docs/docs/active/thin-screens.xlsx",
-    "repos/ticvai-docs/docs/adr/**",
+    "repos/ticvai-docs/docs/adr/README.md",
     "repos/ticvai-docs/docs/architecture/README.md",
     "repos/ticvai-docs/docs/registers/README.md",
+    "repos/ticvai-docs/docs/registers/pos-v2-decisions.md",
+    "repos/ticvai-docs/flows/F34-a-retail-sale-from-scan-to-return.yaml",
+    "repos/ticvai-docs/flows/F58-a-ticket-is-sold-at-a-till.yaml",
     "repos/ticvai-docs/flows/README.md",
     "repos/ticvai-docs/frontend/README.md",
     "repos/ticvai-docs/handoff/**",
+    "repos/ticvai-docs/screens/P04-point-of-sale.yaml",
+    "repos/ticvai-docs/screens/P08-venue-back-office.yaml",
+    "repos/ticvai-docs/screens/P09-platform-admin-console.yaml",
+    "repos/ticvai-docs/screens/P15-kitchen-display.yaml",
     "repos/ticvai-docs/screens/README.md",
     "repos/ticvai-docs/screens/_id-register.yaml",
+    "repos/ticvai-docs/screens/_schema.yaml",
     "repos/ticvai-docs/sources/README.md",
-    "repos/ticvai-docs/sources/designs/TICVAI_Guest_Booking_v2_single_file.html",
-    "repos/ticvai-docs/sources/designs/guest-rev3-28-september/images/delivery-rider.mp4",
-    "repos/ticvai-docs/sources/designs/guest-rev3-28-september/images/sahli-angel.mp4",
-    "repos/ticvai-docs/sources/designs/guest-rev3-28-september/images/sahli-magician.mp4",
-    "repos/ticvai-docs/sources/designs/guest-rev3-28-september/images/sahli-queen.mp4",
-    "repos/ticvai-docs/sources/designs/guest-rev3-29-september/images/delivery-rider.mp4",
-    "repos/ticvai-docs/sources/designs/guest-rev3-29-september/images/sahli-angel.mp4",
-    "repos/ticvai-docs/sources/designs/guest-rev3-29-september/images/sahli-magician.mp4",
-    "repos/ticvai-docs/sources/designs/guest-rev3-29-september/images/sahli-queen.mp4",
+    "repos/ticvai-docs/sources/mom/TICVAI_MoM_2026-09-30_Tracker_MobileAppRedesign.docx",
     "repos/ticvai-docs/sources/packs-index.json",
     "repos/ticvai-docs/sources/packs/README.md",
-    "repos/ticvai-docs/states/access-device-status.yaml",
-    "repos/ticvai-docs/tools/**",
-    "repos/ticvai-frontend/project-bible/contracts/README.md",
-    "repos/ticvai-frontend/project-bible/diagrams/README.yaml",
-    "repos/ticvai-frontend/project-bible/diagrams/hld/00-platform.yaml",
-    "repos/ticvai-frontend/project-bible/diagrams/hld/04-lifecycles.yaml",
-    "repos/ticvai-frontend/project-bible/docs/active/breaking-changes.yaml",
-    "repos/ticvai-frontend/project-bible/docs/active/broker-decision-pack.md",
-    "repos/ticvai-frontend/project-bible/docs/active/change-rules.md",
-    "repos/ticvai-frontend/project-bible/docs/active/developer-brief.md",
-    "repos/ticvai-frontend/project-bible/docs/active/release-runbook.md",
-    "repos/ticvai-frontend/project-bible/docs/active/thin-screens.xlsx",
-    "repos/ticvai-frontend/project-bible/docs/adr/**",
-    "repos/ticvai-frontend/project-bible/docs/architecture/README.md",
-    "repos/ticvai-frontend/project-bible/docs/registers/README.md",
-    "repos/ticvai-frontend/project-bible/flows/README.md",
-    "repos/ticvai-frontend/project-bible/frontend/README.md",
-    "repos/ticvai-frontend/project-bible/handoff/**",
-    "repos/ticvai-frontend/project-bible/screens/README.md",
-    "repos/ticvai-frontend/project-bible/screens/_id-register.yaml",
-    "repos/ticvai-frontend/project-bible/sources/**",
-    "repos/ticvai-frontend/project-bible/states/access-device-status.yaml",
-    "repos/ticvai-frontend/project-bible/tools/**",
+    "repos/ticvai-docs/tools/applied/README.md",
+    "repos/ticvai-docs/tools/applied/pos-v2-1-october.py",
+    "repos/ticvai-docs/tools/applied/pos-v2-decisions-1-october.py",
+    "repos/ticvai-docs/tools/build-audit-decisions.py",
+    "repos/ticvai-docs/tools/build-decisions-workbook.py",
+    "repos/ticvai-docs/tools/build-design-inputs.py",
+    "repos/ticvai-docs/tools/build-hld-lld.py",
+    "repos/ticvai-docs/tools/build-plan-deck.py",
+    "repos/ticvai-docs/tools/build-plan-doc.py",
+    "repos/ticvai-docs/tools/build-service-docs.py",
+    "repos/ticvai-docs/tools/build-tracker-index.py",
+    "repos/ticvai-docs/tools/build-white-label-map.py",
+    "repos/ticvai-docs/tools/capture-plans/pos-v2.json",
+    "repos/ticvai-docs/tools/check-design-notes.py",
+    "repos/ticvai-docs/tools/check-key-stability.py",
+    "repos/ticvai-docs/tools/check-package.py",
+    "repos/ticvai-docs/tools/derive-block-a-schedule.py",
+    "repos/ticvai-docs/tools/derive-design-manifest.py",
+    "repos/ticvai-docs/tools/design_spec.py",
+    "repos/ticvai-docs/tools/export-design-batch.py",
+    "repos/ticvai-docs/tools/op-release-server.sh",
+    "repos/ticvai-docs/tools/op-release.py",
+    "repos/ticvai-docs/tools/op-release.rb",
+    "repos/ticvai-docs/tools/op-retire.py",
+    "repos/ticvai-docs/tools/push-openproject.py",
+    "repos/ticvai-docs/tools/refresh.sh",
+    "repos/ticvai-docs/tools/run-checks.py",
+    "repos/ticvai-docs/tools/sprint_plan.py",
+    "repos/ticvai-docs/tools/tests/test_op_release.py",
+    "repos/ticvai-frontend/project-bible/**",
     "repos/ticvai-infra/project-bible/**"
    ],
    "self_reads": [
-    "repos/ticvai-ai/project-bible/diagrams/README.yaml",
     "repos/ticvai-ai/project-bible/diagrams/hld/00-platform.yaml",
-    "repos/ticvai-ai/project-bible/handoff/**",
+    "repos/ticvai-ai/project-bible/handoff/TICVAI_Schema_Merge_Tasks.xlsx",
+    "repos/ticvai-ai/project-bible/handoff/TICVAI_Services_and_Data_Segregation.xlsx",
+    "repos/ticvai-ai/project-bible/handoff/audience-index.json",
+    "repos/ticvai-ai/project-bible/handoff/guest-parity-audit.json",
+    "repos/ticvai-ai/project-bible/handoff/guest-parity-audit.md",
+    "repos/ticvai-ai/project-bible/handoff/platform-P01.json",
+    "repos/ticvai-ai/project-bible/handoff/platform-P02.json",
+    "repos/ticvai-ai/project-bible/handoff/platform-P05.json",
+    "repos/ticvai-ai/project-bible/handoff/platform-P06.md",
+    "repos/ticvai-ai/project-bible/handoff/platform-P08.md",
+    "repos/ticvai-ai/project-bible/handoff/platform-P09.md",
+    "repos/ticvai-ai/project-bible/handoff/platform-P10.json",
+    "repos/ticvai-ai/project-bible/handoff/platform-P11.json",
+    "repos/ticvai-ai/project-bible/handoff/platform-P12.json",
+    "repos/ticvai-ai/project-bible/handoff/platform-P13.md",
+    "repos/ticvai-ai/project-bible/handoff/platform-P14.json",
+    "repos/ticvai-ai/project-bible/handoff/platform-P15.json",
+    "repos/ticvai-ai/project-bible/handoff/platform-P16.md",
+    "repos/ticvai-ai/project-bible/handoff/platform-P17.json",
+    "repos/ticvai-ai/project-bible/handoff/platform-index.json",
+    "repos/ticvai-ai/project-bible/handoff/status.json",
     "repos/ticvai-ai/project-bible/screens/_id-register.yaml",
-    "repos/ticvai-ai/project-bible/sources/packs-index.json",
-    "repos/ticvai-backend/project-bible/diagrams/README.yaml",
     "repos/ticvai-backend/project-bible/diagrams/hld/00-platform.yaml",
     "repos/ticvai-backend/project-bible/handoff/**",
     "repos/ticvai-backend/project-bible/screens/_id-register.yaml",
-    "repos/ticvai-backend/project-bible/sources/packs-index.json",
-    "repos/ticvai-contracts/project-bible/diagrams/README.yaml",
     "repos/ticvai-contracts/project-bible/diagrams/hld/00-platform.yaml",
     "repos/ticvai-contracts/project-bible/handoff/**",
     "repos/ticvai-contracts/project-bible/screens/_id-register.yaml",
-    "repos/ticvai-contracts/project-bible/sources/packs-index.json",
-    "repos/ticvai-docs/diagrams/README.yaml",
     "repos/ticvai-docs/diagrams/hld/00-platform.yaml",
-    "repos/ticvai-docs/handoff/TICVAI_Client_Questions.xlsx",
+    "repos/ticvai-docs/handoff/TICVAI_Schema_Merge_Tasks.xlsx",
+    "repos/ticvai-docs/handoff/TICVAI_Services_and_Data_Segregation.xlsx",
     "repos/ticvai-docs/handoff/audience-index.json",
     "repos/ticvai-docs/handoff/guest-parity-audit.json",
     "repos/ticvai-docs/handoff/guest-parity-audit.md",
     "repos/ticvai-docs/handoff/platform-P01.json",
     "repos/ticvai-docs/handoff/platform-P02.json",
-    "repos/ticvai-docs/handoff/platform-P04.json",
     "repos/ticvai-docs/handoff/platform-P05.json",
-    "repos/ticvai-docs/handoff/platform-P06.json",
-    "repos/ticvai-docs/handoff/platform-P07.json",
-    "repos/ticvai-docs/handoff/platform-P08.json",
-    "repos/ticvai-docs/handoff/platform-P09.json",
+    "repos/ticvai-docs/handoff/platform-P06.md",
+    "repos/ticvai-docs/handoff/platform-P08.md",
+    "repos/ticvai-docs/handoff/platform-P09.md",
     "repos/ticvai-docs/handoff/platform-P10.json",
     "repos/ticvai-docs/handoff/platform-P11.json",
     "repos/ticvai-docs/handoff/platform-P12.json",
-    "repos/ticvai-docs/handoff/platform-P13.json",
+    "repos/ticvai-docs/handoff/platform-P13.md",
     "repos/ticvai-docs/handoff/platform-P14.json",
     "repos/ticvai-docs/handoff/platform-P15.json",
-    "repos/ticvai-docs/handoff/platform-P16.json",
+    "repos/ticvai-docs/handoff/platform-P16.md",
     "repos/ticvai-docs/handoff/platform-P17.json",
+    "repos/ticvai-docs/handoff/platform-index.json",
     "repos/ticvai-docs/handoff/status.json",
     "repos/ticvai-docs/screens/_id-register.yaml",
-    "repos/ticvai-docs/sources/packs-index.json",
-    "repos/ticvai-frontend/project-bible/diagrams/README.yaml",
     "repos/ticvai-frontend/project-bible/diagrams/hld/00-platform.yaml",
-    "repos/ticvai-frontend/project-bible/handoff/TICVAI_Client_Questions.xlsx",
-    "repos/ticvai-frontend/project-bible/handoff/audience-index.json",
-    "repos/ticvai-frontend/project-bible/handoff/guest-parity-audit.json",
-    "repos/ticvai-frontend/project-bible/handoff/guest-parity-audit.md",
-    "repos/ticvai-frontend/project-bible/handoff/platform-P01.json",
-    "repos/ticvai-frontend/project-bible/handoff/platform-P02.json",
-    "repos/ticvai-frontend/project-bible/handoff/platform-P04.json",
-    "repos/ticvai-frontend/project-bible/handoff/platform-P05.json",
-    "repos/ticvai-frontend/project-bible/handoff/platform-P06.json",
-    "repos/ticvai-frontend/project-bible/handoff/platform-P07.json",
-    "repos/ticvai-frontend/project-bible/handoff/platform-P08.json",
-    "repos/ticvai-frontend/project-bible/handoff/platform-P09.json",
-    "repos/ticvai-frontend/project-bible/handoff/platform-P10.json",
-    "repos/ticvai-frontend/project-bible/handoff/platform-P11.json",
-    "repos/ticvai-frontend/project-bible/handoff/platform-P12.json",
-    "repos/ticvai-frontend/project-bible/handoff/platform-P13.json",
-    "repos/ticvai-frontend/project-bible/handoff/platform-P14.json",
-    "repos/ticvai-frontend/project-bible/handoff/platform-P15.json",
-    "repos/ticvai-frontend/project-bible/handoff/platform-P16.json",
-    "repos/ticvai-frontend/project-bible/handoff/platform-P17.json",
-    "repos/ticvai-frontend/project-bible/handoff/status.json",
+    "repos/ticvai-frontend/project-bible/handoff/**",
     "repos/ticvai-frontend/project-bible/screens/_id-register.yaml",
-    "repos/ticvai-frontend/project-bible/sources/packs-index.json",
-    "repos/ticvai-infra/project-bible/diagrams/README.yaml",
     "repos/ticvai-infra/project-bible/diagrams/hld/00-platform.yaml",
-    "repos/ticvai-infra/project-bible/handoff/**",
-    "repos/ticvai-infra/project-bible/screens/_id-register.yaml",
-    "repos/ticvai-infra/project-bible/sources/packs-index.json"
+    "repos/ticvai-infra/project-bible/handoff/TICVAI_Schema_Merge_Tasks.xlsx",
+    "repos/ticvai-infra/project-bible/handoff/TICVAI_Services_and_Data_Segregation.xlsx",
+    "repos/ticvai-infra/project-bible/handoff/audience-index.json",
+    "repos/ticvai-infra/project-bible/handoff/guest-parity-audit.json",
+    "repos/ticvai-infra/project-bible/handoff/guest-parity-audit.md",
+    "repos/ticvai-infra/project-bible/handoff/platform-P01.json",
+    "repos/ticvai-infra/project-bible/handoff/platform-P02.json",
+    "repos/ticvai-infra/project-bible/handoff/platform-P05.json",
+    "repos/ticvai-infra/project-bible/handoff/platform-P06.md",
+    "repos/ticvai-infra/project-bible/handoff/platform-P08.md",
+    "repos/ticvai-infra/project-bible/handoff/platform-P09.md",
+    "repos/ticvai-infra/project-bible/handoff/platform-P10.json",
+    "repos/ticvai-infra/project-bible/handoff/platform-P11.json",
+    "repos/ticvai-infra/project-bible/handoff/platform-P12.json",
+    "repos/ticvai-infra/project-bible/handoff/platform-P13.md",
+    "repos/ticvai-infra/project-bible/handoff/platform-P14.json",
+    "repos/ticvai-infra/project-bible/handoff/platform-P15.json",
+    "repos/ticvai-infra/project-bible/handoff/platform-P16.md",
+    "repos/ticvai-infra/project-bible/handoff/platform-P17.json",
+    "repos/ticvai-infra/project-bible/handoff/platform-index.json",
+    "repos/ticvai-infra/project-bible/handoff/status.json",
+    "repos/ticvai-infra/project-bible/screens/_id-register.yaml"
    ],
-   "changed_in_trace": 9654,
-   "confidence": "high",
-   "why": [],
+   "changed_in_trace": 9828,
+   "confidence": "medium",
+   "why": [
+    "shells out (git or a subprocess); reads there are not traced"
+   ],
    "static_only": [],
    "untraced_changes": [],
    "external_reads": [],
-   "seconds": 75,
+   "seconds": 79,
    "processes": 1,
    "reads_output_of_later_steps": []
   }

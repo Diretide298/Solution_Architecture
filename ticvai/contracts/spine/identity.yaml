@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Identity & Authorisation
   version: 1.0.0
-  x-ticvai-screen-count: 74
+  x-ticvai-screen-count: 79
   x-ticvai-tier: spine
   x-ticvai-module: 19 — Guest Mobile App & Branding (auth) + cross-cutting staff auth
   x-ticvai-requirements: 107
@@ -477,6 +477,8 @@ paths:
   /capability-templates:
     get:
       operationId: listCapabilityTemplates
+      x-ticvai-consumed-by:
+        - "P08 BO-054 Role Assignment"
       summary: Saved tick-sets
       description: '3.3.23, BL-110. **A role, without the taxonomy.** *Duty Manager* is a named
         set of ticks somebody saved because they grant it often — useful, and **not a thing access
@@ -943,12 +945,12 @@ paths:
       x-ticvai-consumed-by:
         - "P04 POS-000 Sign In"
         - "P04 POS-001 Begin Shift"
+        - "P06 EMP-001 Sign in"
         - "P06 EMP-002 Select venue & role"
         - "P07 SCN-001 Sign in"
         - "P09 ADM-001 Platform Login / MFA"
         - "P10 PTR-001 Partner Login / MFA"
         - "P12 SUP-001 Venue Management Sign In"
-        - "P06 EMP-001 Sign in"
       x-ticvai-self-service: true
       x-ticvai-audience:
       - staff
@@ -2438,10 +2440,10 @@ paths:
     post:
       operationId: linkGuestCheckout
       x-ticvai-consumed-by:
-        - "P01 WEB-016 Login / Register"
-        - "P02 GST-042 Simple Registration & OTP"
-        - "P02 GST-010 Booking Confirmation"
         - "P01 WEB-013 Booking Confirmation"
+        - "P01 WEB-016 Login / Register"
+        - "P02 GST-010 Booking Confirmation"
+        - "P02 GST-042 Simple Registration & OTP"
       x-ticvai-audience:
       - guest
       summary: Attach a guest checkout to an account
@@ -3085,16 +3087,16 @@ paths:
         - "P08 BO-053 Staff Directory"
         - "P08 BO-284 Membership & Annual Pass Command Center"
         - "P08 BO-293 Membership Product Validation, Approval, Publication & Versioning"
+        - "P08 PTR-029 Partner Access, Roles & Permission Profile"
+        - "P08 PTR-035 Commission, Margin & Incentive Management"
+        - "P08 PTR-036 Credit Limit & Exposure Management"
+        - "P08 PTR-048 Commission Calculation & Settlement Management"
         - "P09 ADM-001 Platform Login / MFA"
         - "P09 ADM-699 My Account & Security"
         - "P09 ADM-700 Configuration Promotion"
         - "P10 PTR-001 Partner Login / MFA"
-        - "P08 PTR-029 Partner Access, Roles & Permission Profile"
         - "P10 PTR-030 Partner Approval, Status & Lifecycle Management"
-        - "P08 PTR-035 Commission, Margin & Incentive Management"
-        - "P08 PTR-036 Credit Limit & Exposure Management"
         - "P10 PTR-040 Booking Limits, Commercial Exceptions & Approval"
-        - "P08 PTR-048 Commission Calculation & Settlement Management"
         - "P12 SUP-001 Venue Management Sign In"
       security:
       - guestAuth: []
@@ -3209,16 +3211,16 @@ paths:
         - "P08 BO-053 Staff Directory"
         - "P08 BO-284 Membership & Annual Pass Command Center"
         - "P08 BO-293 Membership Product Validation, Approval, Publication & Versioning"
+        - "P08 PTR-029 Partner Access, Roles & Permission Profile"
+        - "P08 PTR-035 Commission, Margin & Incentive Management"
+        - "P08 PTR-036 Credit Limit & Exposure Management"
+        - "P08 PTR-048 Commission Calculation & Settlement Management"
         - "P09 ADM-001 Platform Login / MFA"
         - "P09 ADM-699 My Account & Security"
         - "P09 ADM-700 Configuration Promotion"
         - "P10 PTR-001 Partner Login / MFA"
-        - "P08 PTR-029 Partner Access, Roles & Permission Profile"
         - "P10 PTR-030 Partner Approval, Status & Lifecycle Management"
-        - "P08 PTR-035 Commission, Margin & Incentive Management"
-        - "P08 PTR-036 Credit Limit & Exposure Management"
         - "P10 PTR-040 Booking Limits, Commercial Exceptions & Approval"
-        - "P08 PTR-048 Commission Calculation & Settlement Management"
         - "P12 SUP-001 Venue Management Sign In"
       security:
       - guestAuth: []
@@ -3374,6 +3376,8 @@ paths:
   /auth/sessions/mine:
     get:
       operationId: listOwnSessions
+      x-ticvai-consumed-by:
+        - "P09 ADM-699 My Account & Security"
       x-ticvai-self-service: true
       x-ticvai-audience:
       - staff
@@ -3424,6 +3428,8 @@ paths:
         format: uuid
     post:
       operationId: endOwnSession
+      x-ticvai-consumed-by:
+        - "P09 ADM-699 My Account & Security"
       x-ticvai-self-service: true
       x-ticvai-audience:
       - staff
@@ -3553,9 +3559,9 @@ paths:
     get:
       operationId: listAuthorisationPolicies
       x-ticvai-consumed-by:
+        - "P08 ADM-356 Integration Security & Access Control"
         - "P08 BO-1066 Roles, Permissions & Masking"
         - "P08 BO-1177 API Security, Access & Integration Permissions"
-        - "P08 ADM-356 Integration Security & Access Control"
         - "P13 CMS-086 Role-Based Asset Access & Permission Management"
         - "P16 ANL-047 Report Access & Sharing Control"
       summary: Attribute-based authorisation policies
@@ -4184,7 +4190,7 @@ paths:
         - "P09 ADM-015 API Rate Limit & Quota Management"
         - "P09 ADM-016 White-Label Branding Management"
         - "P09 ADM-017 Domain & Certificate Management"
-        - "P09 ADM-018 Localisation & Language Pack"
+        - "P09 ADM-018 Interface Languages"
         - "P09 ADM-019 Global Configuration & Defaults"
         - "P09 ADM-020 Platform User Directory"
         - "P09 ADM-021 Platform Role Management"

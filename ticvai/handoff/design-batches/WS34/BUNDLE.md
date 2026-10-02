@@ -1,14 +1,14 @@
 # WS34 — Pricing   Revenue Management board 1
 
-**10 screens · 15 operations · 24 schemas · 4 permissions**
+**10 screens · 15 operations · 23 schemas · 4 permissions**
 
-Platform P09 TICVAI Web · ships as **ticvai-control** ·
-platformAdmin audience · web ·
+Platform P08 Venue Management · ships as **venue-management** ·
+staff audience · web ·
 online only
 
 ## Who this is for
 
-**platformAdmin on web.** Everything below is how you know what is
+**staff on web.** Everything below is how you know what is
 true. **None of it is the subject.** The subject is the person in front of the screen and the one
 thing they came to do.
 
@@ -61,6 +61,45 @@ convincingly. It is never a caption.
   and its error; and, element by element, what is shown and in what format, what each action
   produces and where the user goes next. Draw exactly that.
 
+## The processes these screens belong to
+
+Written by the owner of each process (`handoff/design-notes/`). Read before any screen: it says how the process runs end to end and which words the screens must use.
+
+### Ticketing & Guest Commerce, as the venue and TICVAI configure and run it
+
+WHAT THE PROCESS IS. Everything a guest can buy is set up, priced, promoted and serviced here, on Venue Management (P08, the venue's own back office, served inside the venue's cell) and on the TICVAI Console (P09, TICVAI's control plane, outside every cell). End to end: (1) CATALOGUE. A product has one of twelve kinds (admission, timedAdmission, datedAdmission, openDated, seated, membership, bundle, fnb, retail, rental, addOn, giftCard). Its ticket types (adult, child, senior, resident...) are not typed one by one: they are generated from the product's attributes (components) and each value combination becomes a sellable ticket type with no extra setup (DI-164). What a ticket grants (validity, entries, re-entry, days of week, blackout dates, expiry anchor, fast track, transfer) lives on a reusable entitlement template, not on the product. Who may take part (age, height, supervision, certification) is the eligibility rule; what the guest must answer is the data mask and the consent questions; how the guest sees it is guestListing (bookable, infoOnly, hidden), display tags (at most six), media and the booking flow. Group, family and corporate products and every after-sales policy (reschedule, exchange, refund, cancellation, upgrade, transfer) are configured inside the one product configuration, never on separate screens (DI-465, DI-466). (2) LIFECYCLE AND PUBLICATION. A product moves draft, inReview, approved, live, withdrawn, archived. Approval and publication are two acts with two permissions (PRODUCT_APPROVE, PRODUCT_PUBLISH, R091); every product is authorised before it sells online or on site (DI-438). Approved is still not on a till: a till sells only what is in the signed catalogue release it pulled (publishBundle, ADR-0013), so a saved price is a back-office fact until the venue publishes to tills. Changing something that has sold is preceded by an impact check (assessProductChange: orders affected, entitlements issued, future performances, open carts); restoring a version creates a new version, and sold tickets keep the price and terms they were sold under (restoreProductVersion, DI-938, TRACKER Actions row 145). (3) PRICE. Prices live in price lists: per venue, per channel set, with validity dates and a priority, copied for the next season with an uplift (copyPriceList) and repriced in bulk only after a dry run (bulkChangePrices). Currency and decimal scale are never chosen on a form: they resolve from the venue's region (ADR-0008, ADR-0018; AED 2 places, OMR and BHD 3). When several rules apply, the configured hierarchy decides; there is no "lowest price wins" default (DI-595). Tax on the pre-discount price and three-decimal rounding are regional settings (DI-598). Dynamic rules always show their minimum and maximum price guardrails beside the trigger (getDynamicPriceRule). (4) PROMOTE AND BUNDLE. A promotion is a rule (automatic, or gated by a code) created in draft, made live only by Publish, which first analyses stacking; a …
+*(source: DI-164; DI-171; DI-438; DI-465; DI-466; DI-595; DI-598; DI-387; DI-039; DI-044; DI-474; DI-671; DI-987; DI-019; DI-080; ADR-0008; ADR-0013; ADR-0018; ADR-0019; ADR-0030; R091; R098; R101; R222; REV3-21; contracts/spine/catalogue.yaml#transitionProductLifecycle …)*
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Product | Anything sellable, of one of the twelve kinds. The record that carries names, channels, listing, media and policies. | Item (except on F&B and retail screens), SKU (for tickets), Offering | contracts/spine/catalogue.yaml#/components/schemas/ProductKind |
+| Ticket type | One sellable variant of an admission or event product (Adult, Child, Resident Adult), generated from the product's attributes. For retail and F&B the same record is labelled Variant. | Variant (on ticket screens), Sub-product, Rate (that is a price), Axis value | contracts/spine/catalogue.yaml#updateProductVariant / DI-164 / DI-437 |
+| Attribute | A dimension that generates ticket types (Guest category, Residency, Tier, Length). Each has values; adding a value adds ticket types. | Axis, Component (the client's word; use it only in help text), Option | contracts/spine/catalogue.yaml#setProductAttributes / DI-164 / DI-450 |
+| Entitlement | What a ticket lets the holder do (validity, entries, re-entry, days, blackout dates, expiry, fast track, transfer), defined once on an entitlement template and shared by several products. | Access rights, Ticket rules, Validity profile | contracts/spine/catalogue.yaml#createEntitlementTemplate / DI-171 / DI-451 |
+| Eligibility rule | Who may take part in or buy a product (age, height, supervision, waiver, certification). Distinct from a promotion's eligibility, which decides who gets a discount. | Restriction, Access rule (that is access control) | contracts/spine/catalogue.yaml#setProductEligibilityRule / DI-463 |
+| Price list | A set of prices for one venue and a set of channels, valid between two dates, with a priority. Several coexist (B2C, B2B, season). | Price book, Rate card, Tariff | contracts/spine/catalogue.yaml#createPriceList / DI-140 / DI-163 |
+| Price category | A standard rate type (Adult, Child, Member) reused across lists so venues do not invent "Adult Standard" and "Normal Adult". | Price band (that is a seat-category band), Fare type (transport) | contracts/spine/catalogue.yaml#setPriceCategoryRateType / … |
+| Price band | A priced band on a seat category (code, label, colour, amount, channel, from-date). | Price category, Zone price | contracts/satellite/seating.yaml#/components/schemas/SeatPriceBand |
+| Promotion | A rule that changes a price automatically or when a code is entered; draft until published; declares how it stacks. | Offer (except in guest copy), Deal, Discount rule | contracts/satellite/promotions.yaml#createPromotion / DI-173 / DI-174 |
+| Coupon code | A code issued from a coupon campaign that applies a promotion-style discount; one shared code or many single-use codes. | Voucher, Promo voucher | contracts/satellite/promotions.yaml#createCouponCampaign / DI-173 |
+| Voucher | A code that carries money (face value, balance), sold or issued; a liability until redeemed or expired. | Coupon, Credit note | contracts/satellite/promotions.yaml#listVoucherBatches / … |
+| Bundle | A product sold as one line whose price differs from the sum of its components, with a mandatory revenue allocation. "Package" is acceptable in guest copy. | Combo (that is an F&B meal deal), Catalogue bundle | contracts/satellite/promotions.yaml#createBundle / DI-220 / ADR-0019 |
+| Catalogue release | The signed snapshot of a venue's catalogue, prices, promotions and sale boards that tills, kiosks and devices pull. Its action label is "Publish to tills". | Bundle, Catalogue bundle, Sync, Deploy | contracts/spine/catalogue.yaml#publishBundle / … |
+| Approve / Publish / Save | Save keeps a draft; Approve records that it is authorised (PRODUCT_APPROVE); Publish makes it live for guests and channels (PRODUCT_PUBLISH). Three different buttons, never merged. | Submit, Go live, Activate (except CatalogueConfigStatus active), Deploy | R091 / contracts/spine/catalogue.yaml#transitionProductLifecycle / DI-438 |
+| Product states | Draft, In review, Approved, Live, Withdrawn, Archived (ProductLifecycleState), always as coloured badges with these exact labels. | Published (for a product), Pending, Inactive (for a product) | contracts/spine/catalogue.yaml#/components/schemas/ProductLifecycleState |
+| Channel | Where something is sold. Labels: pos Point of sale; kiosk Kiosk; web and guestWeb Website; mobile and guestApp App; b2b B2B partners; partner Partner; ota Travel agents (OTA); callCentre Call centre; api API; backOffice Back office. | Touchpoint, Outlet (an outlet is a business inside a venue), raw enum values | contracts/spine/catalogue.yaml#/components/schemas/Channel / … |
+| Refund | Money returned after settlement, wholly or for some lines, under the venue's refund policy. | Return (that is retail goods), Reversal, Void | contracts/spine/orders.yaml#createRefund / DI-252 |
+| Void | Cancelling a whole order before settlement, within the same shift, with a reason from the void list. After settlement it is a refund. | Cancel order, Delete | contracts/spine/orders.yaml#voidOrder / R222 |
+| Exchange / Reschedule | Exchange swaps lines for other products or dates and settles only the difference; Reschedule is the same product moved to another date or time. | Rebook, Date change (acceptable only in guest copy), Refund and resell | contracts/spine/orders.yaml#exchangeOrderLines / … |
+| Hold / Capture / Release | A deposit or stored-value amount is held, then partly or fully captured, and the rest released. A held deposit is not a payment. | Charge, Pre-auth (in staff copy), Block funds | contracts/spine/orders.yaml#authoriseStoredValue / … |
+| Wallet (TICVAI wallet) | The guest's stored-value balance on TICVAI, spent by hold and capture. Distinct from the tender "Apple Pay / Google Pay", which the contract also calls wallet. | Digital wallet (for stored value), E-wallet, Credit (without a type) | contracts/spine/orders.yaml#/components/schemas/TenderKind / R080 |
+| Credit lot | One amount of wallet credit of one credit type (cash, bonus, gift) with its own expiry; lots are spent nearest expiry first and the guest sees the breakdown but cannot choose. | Bucket, Batch, Top-up | TRACKER Actions row 171 / contracts/satellite/wallet.yaml#expireCreditLots |
+| Venue map / Seat map | A venue map is the wayfinding map of a park or a floor (points, paths, bookable places); a seat map is the seating layout of an auditorium or stand. Never just "map" where both could be meant. | Layout (alone), Floor plan (unless it is a floor map), Map (alone) | contracts/satellite/venue-map.yaml#createVenueMap / … |
+| Point / Bookable place | A point is a place on a venue map (toilet, ride, restaurant, exit). A bookable place is a cabana, lounger, table or pitch placed on the map and sold through its price band. | Pin, POI, Marker, Resource (in staff copy) | contracts/satellite/venue-map.yaml#setVenuePoint / … |
+| Station / Route / Timetable / Departure / Fare table / Pass … | A route is an ordered list of stations with offsets; a timetable generates departures up to its release horizon; a fare table prices a route per passenger type; a pass type is a multi-trip or unlimited pass sold as a product. | Stop (except in the stop list), Line (except lineCode), Schedule, Trip (except a guest's journey) | contracts/satellite/transport.yaml / REV3-21 |
+| Applies from | The effective date of a change. Every dated change shows it, and sold items keep their old terms. | Effective date (in labels), Start date (for a change) | contracts/satellite/seating.yaml#updateSeatCategory / TRACKER Actions row 194 |
+
+
 ## The screens
 
 Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs count fields; requirements are matrix rows; meeting inputs are the ones naming the screen (the module and platform ones are below); white label says whether the tenant's brand reaches it (guest) or it sets the brand (configures).
@@ -68,9 +107,9 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `ADM-048` | Commercial Pricing Command Center | B–D | 2 | 26 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
-| `ADM-049` | Price List Master Configuration | A | 21 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
+| `ADM-049` | Price List Master Configuration | A | 21 | 20 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
 | `ADM-050` | Price Category & Rate Type Library | A | 12 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `ADM-051` | Rate Structure Builder | A | 0 | 4 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-051` | Rate Structure Builder | A | 0 | 12 | 6 | 2 | 0 | 0 | — | notStarted (generated) |
 | `ADM-052` | Product & Service Price Assignment | B–D | 0 | 2 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
 | `ADM-053` | Package, Bundle & Add-On Pricing | B–D | 21 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
 | `ADM-054` | Market, Venue & Currency Pricing Structure | B–D | 23 | 0 | 5 | 0 | 1 | 4 | — | notStarted (generated) |
@@ -94,17 +133,28 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `ticketing` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `PRICE_VIEW`, `PRODUCT_VIEW` (2 read); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `PRICE_VIEW`, `PRODUCT_VIEW` (2 read); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | commandCentre (compact density): the pack gives this screen both a metric directory (§Display) and a per-row directory (§Each price list should show) — counts over a population, then the population |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/commercial/commercial-pricing-command-center-adm-048` |
 
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
+
 **Known gaps.** **The pack names 8 actions on this screen and the screen declares 1 operation.** Unserved: Create Price List, Duplicate, Open, Compare, Validate, View Dependencies, Export, Archive. Each needs an …
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** The first page a revenue or pricing administrator sees in the pricing module (TICVAI Console, acting inside a tenant, PR-1): every price list and pricing structure with its status, plus structure validation and package pricing at a glance. The client described the pricing module as about seven sub-screens; this hub links them.
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- Pack actions with no operation: Create Price List, Duplicate, Open, Compare, Validate, View Dependencies, Export, Archive. (CHG-MOV-008)
+- List operation(s) listBundlePricingCommercial return a bare array, not the paged list envelope (items, nextCursor, hasMore); rows of listBundlePricingCommercial carry no identifier. (CHG-MOV-008)
+
+**Fixed on main** (the package already carries these; draw what it says): listMembershipCommercialPricing needs PLATFORM_TENANT_VIEW at tenant scope while the rest of the hub is venue-scoped PRODUCT_VIEW. (CHG-MOV-007).
 
 #### Inputs: what the user enters or picks
 
@@ -212,20 +262,25 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Export (secondary button) | navigation or local | — | — | — | — |
 | Archive (destructive button) | navigation or local | — | — | — | — |
 
-**Data it reads**: `listCommercialPricing` (onLoad, Commercial Pricing Command Center); `listMembershipCommercialPricing` (onLoad, Membership Commercial, Pricing & Channel Association); `listCommercialPricingStructure` (onLoad, Commercial Pricing Structure Validation); `listBundlePricingCommercial` (onLoad, Bundle Pricing & Commercial Model)
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **KPI row**: Total, active, draft and expiring price lists; lists failing validation; each a filter. *(source: contracts/spine/catalogue.yaml#listCommercialPricing / DI-591)*
+- **price list table**: Code, name, type, scope, currency (read-only, from the region), status, valid dates, owner, consuming modules. *(source: contracts/spine/catalogue.yaml#listCommercialPricing / ADR-0018)*
+
+**Data it reads**: `listCommercialPricing` (onLoad, Commercial Pricing Command Center); `listCommercialPricingStructure` (onLoad, Commercial Pricing Structure Validation); `listBundlePricingCommercial` (onLoad, Bundle Pricing & Commercial Model)
 
 **Where the user goes next**
 
-- → `ADM-002` Platform Dashboard: *Platform Dashboard*
-- → `ADM-049` Price List Master Configuration: *Works in Price List Master Configuration*; calls `listCommercialPricing`
+- → `BO-100` Venue Home: *Back to Venue Home*
 - → `ADM-050` Price Category & Rate Type Library: *Works in Price Category & Rate Type Library*; calls `listCommercialPricing`
-- → `ADM-051` Rate Structure Builder: *Works in Rate Structure Builder*; calls `listCommercialPricing`
 - → `ADM-052` Product & Service Price Assignment: *Works in Product & Service Price Assignment*; calls `listCommercialPricing`
 - → `ADM-053` Package, Bundle & Add-On Pricing: *Works in Package, Bundle & Add-On Pricing*; calls `listCommercialPricing`
 - → `ADM-054` Market, Venue & Currency Pricing Structure: *Works in Market, Venue & Currency Pricing Structure*; calls `listCommercialPricing`
 - → `ADM-055` Price Hierarchy & Inheritance Configuration: *Works in Price Hierarchy & Inheritance Configuration*; calls `listCommercialPricing`
 - → `ADM-056` Price List Templates, Clone & Reuse: *Works in Price List Templates, Clone & Reuse*; calls `listCommercialPricing`
 - → `ADM-057` Commercial Pricing Structure Validation: *Works in Commercial Pricing Structure Validation*; calls `listCommercialPricing`
+- → `ADM-049` Price List Master Configuration: *Works in Price List Master Configuration, a section of BO-009, which saves the record with createPriceList…*; calls `listCommercialPricing`
+- → `ADM-051` Rate Structure Builder: *Works in Rate Structure Builder, a section of BO-009, which saves the record with setPrices (setRateStructure…*; carries `priceListId`; calls `listCommercialPricing`
 
 **What opens over it**
 
@@ -241,6 +296,22 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the commercial pricing are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Consistency with other screens
+
+- Match `BO-009`: Same price list columns and status badges as the venue's pricing screen (PR-10).
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+kpis:
+  priceLists: 14
+  active: 9
+  draft: 3
+  failingValidation: 1
+```
 
 #### Permissions
 
@@ -261,7 +332,7 @@ For this screen, newest first. An **Open question** is built to the default it s
 - Workshop packs group screens ten to a board, each opened by a command centre; that grouping is the navigation: the nine detail screens are reached from the board's hub and return to it. *(agreed · screen note 4 Sep 2026, BO-144 and the other board hubs · DI-653)*
 - Pricing module (~7 sub-screens): overview dashboard of all pricing setups and status; price lists per channel, segment or product category (several can coexist); price categories/rate types (adult, child, member); rate structure; product-rate association; bundle/add-on pricing; multi-market/currency pricing. *(client request · MoM 1 Sep 2026, 4.1 Pricing Foundation & Structure · DI-591)*
 
-Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -269,7 +340,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-048` · status **notStarted** · provenance generated
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-048` · status **notStarted** · provenance generated
 - Client workshop board: `wireframes/WS95 Pricing   Revenue Management Board 1.dc.html#adm-048`
 - Workshop pack: Pricing___Revenue_Management_Reference.pdf board 1
 - Flow F143 *Pricing Revenue Management board 1: Commercial Pricing Command Center*, step 1: Opens Commercial Pricing Command Center → Provide the central administrative workspace for all commercial pricing structures across This is the first page a Revenue/Pricing Administrator sees when entering the module.
@@ -290,7 +361,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every output is drawn (26 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-048?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Create Price List, Duplicate, Open, Compare, Validate, View Dependencies, Export, Archive.
-- [ ] Every transition is wired: `ADM-002`, `ADM-049`, `ADM-050`, `ADM-051`, `ADM-052`, `ADM-053`, `ADM-054`, `ADM-055`, `ADM-056`, `ADM-057`.
+- [ ] Every transition is wired: `BO-100`, `ADM-050`, `ADM-052`, `ADM-053`, `ADM-054`, `ADM-055`, `ADM-056`, `ADM-057`, `ADM-049`, `ADM-051`.
 - [ ] Every gated control is gated: `PRICE_VIEW`, `PRODUCT_VIEW`.
 - [ ] The 2 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
@@ -299,19 +370,32 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 ### `ADM-049` Price List Master Configuration
 
-**Create the master container that holds commercial rates. A Price List should be reusable across products and channels.**
+**Create the master container that holds commercial rates. A Price List should be reusable across products and channels. (a section of BO-009 Pricing Rules since 2 October 2026).**
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `ticketing` module |
 | Block | Block A · ticket #20641 (APP-SETUP-ADM-049) |
-| Who uses it | ticvai staff holding `PRODUCT_CONFIGURE` (1 configure); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `PRICE_VIEW` (1 read); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
-| Route | `/commercial/price-list-master-configuration-adm-049` |
+| Route | `/venue-operations/pricing-rules/price-list-master-configuration-adm-049` |
+
+**What the spec says about it.** **Its own writer is retired in r2** (decided 2 October 2026, Chinmay: "13 dupes would be gone in r2"; CHG-CLN-001). `setPriceListMaster` duplicated BO-009 Pricing Rules's createPriceList and updatePriceList, so it is removed from the contract (BC-008) and BO-009 saves this record. This id stays the anchor of its section of BO-009: nothing on it writes separately. **Merged into BO-009 Pricing Rules as a section of it** (decided 2 October 2026, Chinmay: DEC-100, "merge them with BO-008 to BO-011 so one surface edits each record", and the pre-apply round; CHG-MOV-002). It edits the same record as BO-009: it renders inside BO-009's component, under its route, and keeps its own operations, because the first-release slice and its ticket name them. Whether those duplicate writers retire in favour of the venue screen's is a contract and plan question (CHG-MOV-008). **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** The price list master on the TICVAI Console: the container that holds rates, its type, scope, owner, defaults (rate category, rounding profile, price hierarchy) and what it allows (overrides, inheritance, product-specific rates). Duplicate creates a new list from an old one (UAE Standard 2026 into UAE Standard 2027). Approval and publication of a list belong to the governance board, not here.
+
+**Fixed on main** (the package already carries these; draw what it says): setPriceListMaster takes a defaultCurrency, and creates price lists a second way beside createPriceList. (CHG-CLN-001); No read operation: the screen declares only setPriceListMaster and nothing that returns the current configuration. (CHG-WIR-025).
+
+#### Decided on this screen
+
+Answered questions: draw the decision, not the old default. Where a decision and the tables below differ, the decision wins.
+
+- **The pack-derived Commercial screens (ADM-048 to ADM-317, ADM-559 to ADM-698) live on the TICVAI Console but configure venue-scoped records that the venue also edits on P08 (BO-009, BO-010, BO-011). Who uses them: the venue's own commercial team, or TICVAI staff acting for a tenant?** → The 410 workshop-pack screens on the TICVAI Console (370 Commercial, 20 Catalogue lifecycle, 20 Rules and workflow) are venue screens: move them to Venue Management (P08) and merge them with BO-008 product, BO-009 price matrix, BO-010 promotions, BO-011 bundles and the rules/workflow screens, so one surface edits each record. TICVAI staff reach them only through a platform-staff grant (R098). *(decided by Chinmay, 2026-10-02; DEC-100 / CHG-NOTE-006)*
+- **Which way does price list priority run (does the higher or the lower number win)?** → Drawn default stands (answer: "Default: higher number wins"): Label it "Higher number wins" and show the overlapping lists. *(decided by Chinmay, 2026-10-02; DEC-101 / CHG-NOTE-006)*
 
 #### Inputs: what the user enters or picks
 
@@ -341,7 +425,46 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Allow Multiple Currencies | select field | — | — | — | — | — | — |
 | Allow Product-Specific Rates | select field | — | — | — | — | — | — |
 
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Channel | select | — | POS · Kiosk · Web · Mobile · B2B · Ota · Call centre | `listPriceLists` ?channel |
+
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **scope and venue context**: Scope (global, country, market, brand, venue, event, business unit) decides which of market, country, brand and venue are asked; the tenant and venue come from the console context (PR-1). *(source: contracts/spine/catalogue.yaml#/components/schemas/PriceListMasterConfigurationInput / R098)*
+- **defaults**: Default rate category, rounding profile and price hierarchy are pickers of records from ADM-050, ADM-075 and ADM-055, never free codes. *(source: contracts/spine/catalogue.yaml#/components/schemas/PriceListMasterConfigurationInput)*
+- **status**: Only Draft, Configured, Inactive and Archived are set here; Validated comes from structure validation (ADM-057), Active and Expired from governance. Show the others read-only. *(source: contracts/spine/catalogue.yaml#/components/schemas/PriceListMasterConfigurationInput)*
+
 #### Outputs: what the screen shows and produces
+
+**Shown**
+
+**List price lists** (data table, from `listPriceLists`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
+| Code | text | — |
+| Name | text | — |
+| Venue | the name it points at, never the id | — |
+| Currency | text | Resolved from the region, not stored (ADR-0018, 24 August). Region-scoped and not overridable below, so a row in a UAE region is AED and … |
+| Currency scale | 1,234 | Resolved from the region, not stored (ADR-0018, 24 August). Region-scoped and not overridable below, so a row in a UAE region is AED and … |
+| Channels | list or chips (count when long) | — |
+| Valid from | 1 Oct 2026, 14:30 | — |
+| Valid to | 1 Oct 2026, 14:30 | — |
+| Priority | 1,234 | Where lists overlap, higher priority wins. |
+| Description | text | Price list master fields (29 September, data model DM3), set with `createPriceList` and `updatePriceList` since setPriceListMaster was … |
+| Price list type | chip: Standard retail, Venue, Attraction, Event, Membership, Group… | — |
+| Status | chip: Draft, Active, Inactive, Retired | The status of a catalogue configuration record (29 September, data model DM3): price lists, rates, fees and fee rules, tax profiles and … |
+| Owner principal | the name it points at, never the id | — |
+| Tags | list or chips (count when long) | — |
+| Legal entity | the name it points at, never the id | — |
+| Brand | text | — |
+| Business unit | text | — |
+| Country code | text | — |
 
 **Actions and what each produces**
 
@@ -349,9 +472,21 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|---|---|---|---|
 | Save changes (primary button) | navigation or local | — | — | — | — |
 
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **consuming modules**: The modules that use this list (ticketing, B2C, POS, kiosk, B2B, group sales, membership, F&B, retail, rental) as chips, so a change's reach is visible. *(source: contracts/spine/catalogue.yaml#/components/schemas/PriceListMasterConfigurationInput)*
+- **Where this screen lives**: A venue screen: it moves to Venue Management (P08) and merges with BO-008 product, BO-009 price matrix, BO-010 promotions and BO-011 bundles, so one surface edits each record. TICVAI staff reach it only under a platform-staff grant (R098). *(source: decided 2 October 2026 by Chinmay (CHG-NOTE-006))*
+
+**What each action does** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **Duplicate**: New draft list with "copied from" set; the user is asked for the new code and validity. *(source: contracts/spine/catalogue.yaml#/components/schemas/PriceListMasterConfigurationInput / DI-592)*
+
+**Data it reads**: `listPriceLists` (onLoad, List price lists)
+
 **Where the user goes next**
 
-- → `ADM-048` Commercial Pricing Command Center: *Returns to the board's landing screen*; calls `setPriceListMaster`
+- → `ADM-048` Commercial Pricing Command Center: *Returns to the board's landing screen*
+- → `BO-009` Pricing Rules: *Open Pricing Rules*; carries `priceListId`
 
 #### States
 
@@ -363,9 +498,34 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 
+#### Consistency with other screens
+
+- Match `BO-009`: The venue's price lists on P08 are the same concept; same columns, badges and wording (PR-10).
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+list:
+  code: UAE-STD-2027
+  name: UAE Standard 2027
+  nameAr: الأسعار القياسية الإمارات 2027
+  type: venue
+  scope: venue
+  venue: Dune Park
+  owner: Revenue manager
+  clonedFrom: UAE-STD-2026
+  consumingModules:
+  - ticketing
+  - b2c
+  - pos
+  - kiosk
+```
+
 #### Permissions
 
-- `setPriceListMaster` → `PRODUCT_CONFIGURE` (configure) · staff
+- `listPriceLists` → `PRICE_VIEW` (read) · staff, partner
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -379,7 +539,7 @@ For this screen, newest first. An **Open question** is built to the default it s
 
 - Pricing module (~7 sub-screens): overview dashboard of all pricing setups and status; price lists per channel, segment or product category (several can coexist); price categories/rate types (adult, child, member); rate structure; product-rate association; bundle/add-on pricing; multi-market/currency pricing. *(client request · MoM 1 Sep 2026, 4.1 Pricing Foundation & Structure · DI-591)*
 
-Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -387,20 +547,21 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-049` · status **notStarted** · provenance generated
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-049` · status **notStarted** · provenance generated
 - Client workshop board: `wireframes/WS95 Pricing   Revenue Management Board 1.dc.html#adm-049`
 - Workshop pack: Pricing___Revenue_Management_Reference.pdf board 1
-- Flow F143 *Pricing Revenue Management board 1: Commercial Pricing Command Center*, step 2: Works in Price List Master Configuration → Create the master container that holds commercial rates. A Price List should be reusable across products and channels.
+- Flow F143 *Pricing Revenue Management board 1: Commercial Pricing Command Center*, step 2: Works in Price List Master Configuration, a section of BO-009, which saves the record with createPriceList and … → Create the master container that holds commercial rates. A Price List should be reusable across products and channels.
 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (21), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-049?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save changes.
-- [ ] Every transition is wired: `ADM-048`.
-- [ ] Every gated control is gated: `PRODUCT_CONFIGURE`.
+- [ ] Every transition is wired: `ADM-048`, `BO-009`.
+- [ ] Every gated control is gated: `PRICE_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 2 decision(s) taken on this screen are drawn as decided, not as the old default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -411,17 +572,25 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `ticketing` module |
 | Block | Block A · ticket #20627 (APP-SETUP-ADM-050) |
-| Who uses it | ticvai staff holding `PRICE_CONFIGURE`, `PRODUCT_VIEW` (1 configure, 1 read); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `PRICE_CONFIGURE`, `PRODUCT_VIEW` (1 configure, 1 read); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/commercial/price-category-rate-type-library-adm-050` |
 
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
+
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** The tenant's standard library of price categories (who is priced: Adult, Child, Resident) and rate types (how: Standard, Peak, Member), so venues stop inventing "Adult Standard" and "Normal Adult". Standard entries ship with the tenant and can be deactivated, never deleted.
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- The list operation is venue-scoped (PRODUCT_VIEW) while the write is tenant-scoped (PRICE_CONFIGURE). (CHG-MOV-008)
 
 #### Inputs: what the user enters or picks
 
@@ -455,6 +624,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 Errors to draw in the form: 409 `inUse`.; 422 `invalidParent`.
 
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **entryKind and code**: Two tabs, Price categories and Rate types; code unique within its kind in the tenant, at most 40. *(source: contracts/spine/catalogue.yaml#setPriceCategoryRateType)*
+- **parentId**: A parent of the same kind only (Child under Youth), shown as a tree. *(source: contracts/spine/catalogue.yaml#setPriceCategoryRateType)*
+- **localizedDisplayNames**: The guest-facing name per language; the internal name stays English (PR-8). *(source: contracts/spine/catalogue.yaml#/components/schemas/PriceCategory)*
+
 #### Outputs: what the screen shows and produces
 
 **Shown**
@@ -485,6 +660,36 @@ Errors to draw in the form: 409 `inUse`.; 422 `invalidParent`.
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 `inUse`.; 422 `invalidParent`. |
 
+#### Edge cases to draw
+
+- **Deactivate a standard entry in use**: Allowed, with the number of rates and ticket types using it shown first; delete is not offered for standard entries. *(source: contracts/spine/catalogue.yaml#/components/schemas/PriceCategory)*
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+priceCategories:
+- code: ADULT
+  name: Adult
+  nameAr: بالغ
+  standard: true
+- code: CHILD
+  name: Child (3-11)
+  nameAr: طفل (3-11)
+  standard: true
+- code: RESIDENT
+  name: UAE resident
+  nameAr: مقيم في الإمارات
+rateTypes:
+- code: STD
+  name: Standard
+- code: PEAK
+  name: Peak
+- code: MEMBER
+  name: Member
+```
+
 #### Permissions
 
 - `listPriceCategoryRate` → `PRODUCT_VIEW` (read) · staff
@@ -502,7 +707,7 @@ For this screen, newest first. An **Open question** is built to the default it s
 
 - Pricing module (~7 sub-screens): overview dashboard of all pricing setups and status; price lists per channel, segment or product category (several can coexist); price categories/rate types (adult, child, member); rate structure; product-rate association; bundle/add-on pricing; multi-market/currency pricing. *(client request · MoM 1 Sep 2026, 4.1 Pricing Foundation & Structure · DI-591)*
 
-Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -510,7 +715,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-050` · status **notStarted** · provenance generated
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-050` · status **notStarted** · provenance generated
 - Client workshop board: `wireframes/WS95 Pricing   Revenue Management Board 1.dc.html#adm-050`
 - Workshop pack: Pricing___Revenue_Management_Reference.pdf board 1
 - Flow F143 *Pricing Revenue Management board 1: Commercial Pricing Command Center*, step 4: Works in Price Category & Rate Type Library → Define standardized commercial rate categories used across TICVAI. This avoids different venues independently creating categories such as: “Adult,” “Adult Standard,” “Normal Adult,” and “Full Adult.”
@@ -524,42 +729,72 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `ADM-048`.
 - [ ] Every gated control is gated: `PRICE_CONFIGURE`, `PRODUCT_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 1 edge case(s) from the process notes are drawn.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
 
 ### `ADM-051` Rate Structure Builder
 
-**Define the actual monetary rates contained within a price list. This is the core commercial configuration screen.**
+**Define the actual monetary rates contained within a price list. This is the core commercial configuration screen. (a section of BO-009 Pricing Rules since 2 October 2026).**
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `ticketing` module |
 | Block | Block A · ticket #20642 (APP-SETUP-ADM-051) |
-| Who uses it | ticvai staff holding `PRODUCT_CONFIGURE` (1 configure); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `PRICE_VIEW` (1 read); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Detect) and no metric row |
 | Offline | online only |
-| Opens with | nothing: it opens on its own |
-| Route | `/commercial/rate-structure-builder-adm-051` |
+| Opens with | `priceListId` (navigation) |
+| Route | `/venue-operations/pricing-rules/rate-structure-builder-adm-051` |
+
+**What the spec says about it.** **Its own writer is retired in r2** (decided 2 October 2026, Chinmay: "13 dupes would be gone in r2"; CHG-CLN-001). `setRateStructure` duplicated BO-009 Pricing Rules's setPrices, so it is removed from the contract (BC-009) and BO-009 saves this record. This id stays the anchor of its section of BO-009: nothing on it writes separately. **Merged into BO-009 Pricing Rules as a section of it** (decided 2 October 2026, Chinmay: DEC-100, "merge them with BO-008 to BO-011 so one surface edits each record", and the pre-apply round; CHG-MOV-002). It edits the same record as BO-009: it renders inside BO-009's component, under its route, and keeps its own operations, because the first-release slice and its ticket name them. Whether those duplicate writers retire in favour of the venue screen's is a contract and plan question (CHG-MOV-008). **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
 
 **Known gaps.** **The pack names 4 actions on this screen and the screen declares 1 operation.** Unserved: Per Ticket, Per Resource, Per Package, Per Membership Period. Each needs an operation, or needs removing …
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** The core commercial configuration: the monetary rates inside a price list, as a matrix of price category by rate type with a unit basis (per ticket, per person, per hour, per performance, per package, per membership period). Derived rates (Child = Adult minus 25%, VIP = Standard plus AED 200) are relationships, not dynamic pricing. Validation on save: duplicates, missing amounts, unsupported currency, invalid or circular derived rates.
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- Rates are written by setRateStructure here and by setPrices on BO-009, two writers for the price of one ticket type. (CHG-MOV-008)
+- Pack actions with no operation: Per Ticket, Per Resource, Per Package, Per Membership Period. (CHG-MOV-008)
+
+**Fixed on main** (the package already carries these; draw what it says): No read operation: the screen declares only setRateStructure and nothing that returns the current configuration. (CHG-WIR-025).
 
 #### Inputs: what the user enters or picks
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
 
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **amount or derivedFrom**: A cell holds either an amount or a derivation (base rate and adjustment); a derived cell shows its computed amount greyed with the formula on hover; amount is ignored when derived. *(source: contracts/spine/catalogue.yaml#/components/schemas/RateStructureBuilderInput)*
+- **precision**: 0 to 3 decimals, the third kept where the currency needs it. *(source: contracts/spine/catalogue.yaml#/components/schemas/RateStructureBuilderInput / DI-598)*
+
 #### Outputs: what the screen shows and produces
 
 **Shown**
 
-**Every rate structure** (data table, from `setRateStructure`)
+**Every rate structure** (data table)
 
 | Shows | Format | Notes |
 |---|---|---|
 | Duplicate rates | text | not in the schema: `Duplicate Rates` |
 | Validation issues | list or chips (count when long) | Validation (pp.12-13): problems found on this rate; read-only |
+
+**List prices in a list** (data table, from `listPrices`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| ID | the name it points at, never the id | Added 20 August. The schema reference derives table columns from API response schemas, and a response is not a table — this one returned … |
+| Price list | the name it points at, never the id | — |
+| Variant | the name it points at, never the id | — |
+| Amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Tax code | the name it points at, never the id | — |
+| Next cursor | text | — |
+| Has more | yes / no (icon or chip) | — |
 
 **The selected rate structure** (detail panel): The pack groups this record's detail under its own headings: “Adult”, “Child Reduced”, “Senior Reduced”, “Resident Reduced”, “Group Group”, “Each rate should contain”.
 
@@ -577,9 +812,16 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Per Package (secondary button) | navigation or local | — | — | — | — |
 | Per Membership Period (secondary button) | navigation or local | — | — | — | — |
 
+**What each action does** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **Matrix actions**: Add rate, Duplicate, Edit, Disable, Sort, Copy across categories, Compare, as buttons on the matrix. *(source: contracts/spine/catalogue.yaml#/components/schemas/RateStructureBuilderInput)*
+
+**Data it reads**: `listPrices` (onLoad, List prices in a list)
+
 **Where the user goes next**
 
-- → `ADM-048` Commercial Pricing Command Center: *Returns to the board's landing screen*; calls `setRateStructure`
+- → `ADM-048` Commercial Pricing Command Center: *Returns to the board's landing screen*
+- → `BO-009` Pricing Rules: *Open Pricing Rules*; carries `priceListId`
 
 #### States
 
@@ -592,21 +834,49 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 
+#### Edge cases to draw
+
+- **Circular derived rates (Adult from Child, Child from Adult)**: Refused on save with the cycle drawn. *(source: contracts/spine/catalogue.yaml#/components/schemas/RateStructureBuilderInput)*
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+rates:
+- category: Adult
+  type: Standard
+  basis: perTicket
+  amount: AED 295.00
+- category: Child
+  type: Standard
+  derivedFrom: Adult -25%
+  amount: AED 221.25
+- category: Adult
+  type: Peak
+  derivedFrom: Standard +AED 40.00
+```
+
 #### Permissions
 
-- `setRateStructure` → `PRODUCT_CONFIGURE` (configure) · staff
+- `listPrices` → `PRICE_VIEW` (read) · staff, partner
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
 #### Requirements it meets
 
-No matrix row traces to this screen's operations or data.
+2 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+
+| Ref | Requirement (shortened) | Domain | Verdict | Via |
+|---|---|---|---|---|
+| 19.2.22 | Dynamic Pricing Display - System shall display dynamic pricing. | Guest Mobile App & Branding | CONTRACTED | `listPrices` |
+| 2.9.8 | The system should be able to regroup prices by category: Full price / reduced price / complimentary. | Ticketing Sales | CONTRACTED | `listPrices` |
 
 #### Client meeting inputs
 
 None names this screen.
 
-Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -614,45 +884,59 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-051` · status **notStarted** · provenance generated
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-051` · status **notStarted** · provenance generated
 - Client workshop board: `wireframes/WS95 Pricing   Revenue Management Board 1.dc.html#adm-051`
 - Workshop pack: Pricing___Revenue_Management_Reference.pdf board 1
-- Flow F143 *Pricing Revenue Management board 1: Commercial Pricing Command Center*, step 6: Works in Rate Structure Builder → Define the actual monetary rates contained within a price list. This is the core commercial configuration screen.
+- Flow F143 *Pricing Revenue Management board 1: Commercial Pricing Command Center*, step 6: Works in Rate Structure Builder, a section of BO-009, which saves the record with setPrices (setRateStructure retired … → Define the actual monetary rates contained within a price list. This is the core commercial configuration screen.
 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (4 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (12 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-051?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Per Ticket, Per Resource, Per Package, Per Membership Period.
-- [ ] Every transition is wired: `ADM-048`.
-- [ ] Every gated control is gated: `PRODUCT_CONFIGURE`.
+- [ ] Every transition is wired: `ADM-048`, `BO-009`.
+- [ ] Every gated control is gated: `PRICE_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 1 edge case(s) from the process notes are drawn.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
 
 ### `ADM-052` Product & Service Price Assignment
 
-**Connect commercial rates to the actual products and services being sold.**
+**Connect commercial rates to the actual products and services being sold. (a section of BO-009 Pricing Rules since 2 October 2026).**
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `ticketing` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `PRODUCT_CONFIGURE` (1 configure); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `PRODUCT_CONFIGURE` (1 configure); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Product configuration should display) and no metric row |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
-| Route | `/commercial/product-service-price-assignment-adm-052` |
+| Route | `/venue-operations/pricing-rules/product-service-price-assignment-adm-052` |
 
-**Known gaps.** **The pack names 5 actions on this screen and the screen declares 1 operation.** Unserved: Ticket Type, Event, Venue. Each needs an operation, or needs removing from the screen; this is the Phase 3 …
+**What the spec says about it.** **Merged into BO-009 Pricing Rules as a section of it** (decided 2 October 2026, Chinmay: DEC-100, "merge them with BO-008 to BO-011 so one surface edits each record", and the pre-apply round; CHG-MOV-002). It edits the same record as BO-009: it renders inside BO-009's component, under its route, and keeps its own operations, because the first-release slice and its ticket name them. Whether those duplicate writers retire in favour of the venue screen's is a contract and plan question (CHG-MOV-008). **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
+
+**Known gaps.** **The pack names 5 actions on this screen and the screen declares 1 operation.** Unserved: Ticket Type, Event, Venue. Each needs an operation, or needs removing from the screen; this is the Phase 3 … Contract gap recorded 2 October 2026 (CHG-WIR-027): A read (get or list) of the product and service price assignments that setProductServicePrice writes.
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Connect rates to what is sold: assign a price list's category rates to products, ticket types, events, performances, memberships, add-ons, F&B, retail, rentals and services, at the right level. The client's reference is one matrix of channel by variant (adult/child by onsite/online/kiosk); match or improve on it.
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- No read operation: the screen declares only setProductServicePrice and nothing that returns the current configuration. (CHG-WIR-027)
+- Pack actions with no operation: Ticket Type, Event, Venue. (CHG-MOV-008)
 
 #### Inputs: what the user enters or picks
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **assignment**: Object type, then the objects, then the scope (product, ticket type, event, performance, venue); category rates as a matrix of price category by channel. *(source: contracts/spine/catalogue.yaml#setProductServicePrice / DI-582)*
 
 #### Outputs: what the screen shows and produces
 
@@ -683,6 +967,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 **Where the user goes next**
 
 - → `ADM-048` Commercial Pricing Command Center: *Returns to the board's landing screen*; calls `setProductServicePrice`
+- → `BO-009` Pricing Rules: *Open Pricing Rules*; carries `priceListId`
 
 #### States
 
@@ -694,6 +979,33 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the product service price are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Consistency with other screens
+
+- Match `BO-009`: The venue price matrix is the same picture; one component.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+matrix:
+  product: Day Pass
+  rows:
+  - Adult
+  - Child
+  columns:
+  - Onsite
+  - Online
+  - Kiosk
+  values:
+  - - AED 310.00
+    - AED 295.00
+    - AED 299.00
+  - - AED 260.00
+    - AED 245.00
+    - AED 249.00
+```
 
 #### Permissions
 
@@ -712,7 +1024,7 @@ For this screen, newest first. An **Open question** is built to the default it s
 - Pricing module (~7 sub-screens): overview dashboard of all pricing setups and status; price lists per channel, segment or product category (several can coexist); price categories/rate types (adult, child, member); rate structure; product-rate association; bundle/add-on pricing; multi-market/currency pricing. *(client request · MoM 1 Sep 2026, 4.1 Pricing Foundation & Structure · DI-591)*
 - UX reference: a competitor's pricing matrix that configures channel-and-variant pricing in one matrix view (e.g. adult/child x onsite/online/kiosk). Qossai: not to copy it, but match or improve on it. *(client request · MoM 31 Aug 2026, 4.11 Sales Channel, Pricing & Inventory Allocation · DI-582)*
 
-Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -720,7 +1032,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-052` · status **notStarted** · provenance generated
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-052` · status **notStarted** · provenance generated
 - Client workshop board: `wireframes/WS95 Pricing   Revenue Management Board 1.dc.html#adm-052`
 - Workshop pack: Pricing___Revenue_Management_Reference.pdf board 1
 - Flow F143 *Pricing Revenue Management board 1: Commercial Pricing Command Center*, step 8: Works in Product & Service Price Assignment → Connect commercial rates to the actual products and services being sold.
@@ -731,7 +1043,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every output is drawn (2 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-052?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Product Level, Product Variant, Ticket Type, Event, Venue.
-- [ ] Every transition is wired: `ADM-048`.
+- [ ] Every transition is wired: `ADM-048`, `BO-009`.
 - [ ] Every gated control is gated: `PRODUCT_CONFIGURE`.
 - [ ] The 2 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
@@ -740,19 +1052,23 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 ### `ADM-053` Package, Bundle & Add-On Pricing
 
-**Provide dedicated commercial structures for products containing multiple components. This is separate from the Product Relationship/Bundle module. Product Catalogue defines what the bundle contains. Pricing defines how that bundle is priced.**
+**Provide dedicated commercial structures for products containing multiple components. This is separate from the Product Relationship/Bundle module. Product Catalogue defines what the bundle contains. Pricing defines how that bundle is priced. (a section of BO-011 Packages & Bundles since 2 October 2026).**
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `ticketing` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `PRICE_CONFIGURE`, `PRODUCT_VIEW` (1 configure, 1 read); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `PRICE_CONFIGURE`, `PRODUCT_VIEW` (1 configure, 1 read); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure pricing for; Configure whether the customer sees) and no display directory — it is settings, not a population |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
-| Route | `/commercial/package-bundle-add-on-pricing-adm-053` |
+| Route | `/venue-operations/packages-bundles/package-bundle-add-on-pricing-adm-053` |
+
+**What the spec says about it.** **Merged into BO-011 Packages & Bundles as a section of it** (decided 2 October 2026, Chinmay: DEC-100, "merge them with BO-008 to BO-011 so one surface edits each record", and the pre-apply round; CHG-MOV-002). It edits the same record as BO-011: it renders inside BO-011's component, under its route, and keeps its own operations, because the first-release slice and its ticket name them. Whether those duplicate writers retire in favour of the venue screen's is a contract and plan question (CHG-MOV-008). **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** How packages, bundles and add-ons are priced: fixed package price, sum of components, discounted sum or component override, and what the guest sees (total only, components, or component and saving). Composition is defined in the catalogue; pricing here.
 
 #### Inputs: what the user enters or picks
 
@@ -800,6 +1116,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 Errors to draw in the form: 409 `changeRequestRequired`.; 422 `priceRequired` or `circularComponent`.
 
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **pricingModel**: Four models as cards with a worked example; component prices appear only for component override. *(source: contracts/spine/catalogue.yaml#setPackagePricingDefinition)*
+
 #### Outputs: what the screen shows and produces
 
 **Actions and what each produces**
@@ -815,6 +1135,7 @@ Errors to draw in the form: 409 `changeRequestRequired`.; 422 `priceRequired` or
 **Where the user goes next**
 
 - → `ADM-048` Commercial Pricing Command Center: *Returns to the board's landing screen*; calls `listPackageBundleAdd`
+- → `BO-011` Packages & Bundles: *Open Packages & Bundles*; carries `productId`
 
 #### States
 
@@ -826,6 +1147,22 @@ Errors to draw in the form: 409 `changeRequestRequired`.; 422 `priceRequired` or
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 `changeRequestRequired`.; 422 `priceRequired` or `circularComponent`. |
+
+#### Consistency with other screens
+
+- Match `BO-011`: The venue screen saves the same package pricing record.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+package:
+  product: Family Fun Bundle
+  model: discountedComponentSum
+  discount: 15%
+  visibility: componentAndSaving
+```
 
 #### Permissions
 
@@ -844,7 +1181,7 @@ For this screen, newest first. An **Open question** is built to the default it s
 
 - Pricing module (~7 sub-screens): overview dashboard of all pricing setups and status; price lists per channel, segment or product category (several can coexist); price categories/rate types (adult, child, member); rate structure; product-rate association; bundle/add-on pricing; multi-market/currency pricing. *(client request · MoM 1 Sep 2026, 4.1 Pricing Foundation & Structure · DI-591)*
 
-Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -852,7 +1189,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-053` · status **notStarted** · provenance generated
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-053` · status **notStarted** · provenance generated
 - Client workshop board: `wireframes/WS95 Pricing   Revenue Management Board 1.dc.html#adm-053`
 - Workshop pack: Pricing___Revenue_Management_Reference.pdf board 1
 - Flow F143 *Pricing Revenue Management board 1: Commercial Pricing Command Center*, step 10: Works in Package, Bundle & Add-On Pricing → Provide dedicated commercial structures for products containing multiple components. This is separate from the Product Relationship/Bundle module. Product Catalogue defines what the bundle contains. …
@@ -863,7 +1200,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-053?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Fixed Package Price, Component Override, Save package pricing definition.
-- [ ] Every transition is wired: `ADM-048`.
+- [ ] Every transition is wired: `ADM-048`, `BO-011`.
 - [ ] Every gated control is gated: `PRICE_CONFIGURE`, `PRODUCT_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
@@ -876,15 +1213,23 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `ticketing` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `PRICE_CONFIGURE`, `PRODUCT_VIEW` (1 configure, 1 read); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `PRICE_CONFIGURE`, `PRODUCT_VIEW` (1 configure, 1 read); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure; FX-Assisted Setup) and no display directory — it is settings, not a population |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/commercial/market-venue-currency-pricing-structure-adm-054` |
+
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** The pricing structure across global, country, region, market and venue: which price list and rounding profile each node uses and whether it inherits from its parent.
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- The node carries a base and a selling currency and an FX reference rate. (CHG-MOV-008)
 
 #### Inputs: what the user enters or picks
 
@@ -936,6 +1281,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 Errors to draw in the form: 422 `currencyNotVenueCurrency` or `invalidParent`.
 
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **node**: A tree; each node shows Inherited or Set here (PR-4), its price list and rounding profile. *(source: contracts/spine/catalogue.yaml#setMarketPricingConfiguration / ADR-0018)*
+
 #### Outputs: what the screen shows and produces
 
 **Actions and what each produces**
@@ -961,6 +1310,18 @@ Errors to draw in the form: 422 `currencyNotVenueCurrency` or `invalidParent`.
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 422 `currencyNotVenueCurrency` or `invalidParent`. |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+tree:
+- Global
+- UAE (AED)
+- Dubai market
+- 'Dune Park venue: price list UAE-STD-2027'
+```
+
 #### Permissions
 
 - `listMarketVenueCurrency` → `PRODUCT_VIEW` (read) · staff
@@ -978,7 +1339,7 @@ For this screen, newest first. An **Open question** is built to the default it s
 
 - Pricing module (~7 sub-screens): overview dashboard of all pricing setups and status; price lists per channel, segment or product category (several can coexist); price categories/rate types (adult, child, member); rate structure; product-rate association; bundle/add-on pricing; multi-market/currency pricing. *(client request · MoM 1 Sep 2026, 4.1 Pricing Foundation & Structure · DI-591)*
 
-Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -989,7 +1350,7 @@ Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-054` · status **notStarted** · provenance generated
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-054` · status **notStarted** · provenance generated
 - Client workshop board: `wireframes/WS95 Pricing   Revenue Management Board 1.dc.html#adm-054`
 - Workshop pack: Pricing___Revenue_Management_Reference.pdf board 1
 - Flow F143 *Pricing Revenue Management board 1: Commercial Pricing Command Center*, step 12: Works in Market, Venue & Currency Pricing Structure → Support TICVAI's multi-country, multi-market, multi-venue and multi-currency commercial model.
@@ -1014,15 +1375,25 @@ Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the 
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `ticketing` module |
 | Block | Block A · ticket #20643 (APP-SETUP-ADM-055) |
-| Who uses it | ticvai staff holding `PRODUCT_CONFIGURE` (1 configure); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `PRODUCT_CONFIGURE` (1 configure); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Administrators configure; Configure) and no display directory — it is settings, not a population |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/commercial/price-hierarchy-inheritance-configuration-adm-055` |
+
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
+
+**Known gaps.** Contract gap recorded 2 October 2026 (CHG-WIR-027): A read (get or list) of the price hierarchy and inheritance configuration that setPriceHierarchyInheritance writes.
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Where a price comes from when several layers could supply it (global, market, venue, event, product, channel, segment): an ordered list of levels saved as a whole, so two sources can never sit at equal priority. The client decided the hierarchy decides; there is no lowest-price default.
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- No read operation: the screen declares only setPriceHierarchyInheritance and nothing that returns the current configuration. (CHG-WIR-027)
 
 #### Inputs: what the user enters or picks
 
@@ -1041,6 +1412,10 @@ Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the 
 | Override Expiry | select field | — | — | — | — | — | — |
 | Return to Parent Price | text field | — | — | — | — | — | — |
 
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **levels**: Drag-to-order list with a "falls back to" arrow between levels; saving sends the whole order. *(source: contracts/spine/catalogue.yaml#setPriceHierarchyInheritance / DI-592 / DI-595)*
+
 #### Outputs: what the screen shows and produces
 
 **Actions and what each produces**
@@ -1048,6 +1423,10 @@ Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
 | Save changes (primary button) | navigation or local | — | — | — | — |
+
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **worked example**: Pick a product and channel and see which level supplied its price today ("Dune Park venue list, because no event price exists"). *(source: designer default)*
 
 **Where the user goes next**
 
@@ -1062,6 +1441,25 @@ Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the 
 | Empty, first run (`?state=emptyFirstRun`) | No price hierarchy inheritance configured yet. Carries the create action and says what the platform does in the meantime. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Consistency with other screens
+
+- Match `BO-441`: Rule priority (which adjustment wins) is a separate screen; name both clearly so they are not confused.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+hierarchy:
+  name: UAE default
+  levels:
+  - Contract / corporate rate
+  - Event price
+  - Venue price list
+  - Market price list
+  - Global base
+```
 
 #### Permissions
 
@@ -1080,7 +1478,7 @@ For this screen, newest first. An **Open question** is built to the default it s
 - When several rules apply to one sale (e.g. summer rate plus school-group discount) the configurable pricing hierarchy decides; there is no automatic lowest-price-wins default. *(agreed · MoM 1 Sep 2026, 4.4 Seasonal & Date-Based Pricing; Rule Priority · DI-595)*
 - Price hierarchy screen sets which level (category, item, segment) takes precedence; price lists can be cloned (e.g. B2C copied and discounted for B2B); a final validation screen confirms setup is complete. *(client request · MoM 1 Sep 2026, 4.1 Pricing Foundation & Structure · DI-592)*
 
-Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -1088,7 +1486,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-055` · status **notStarted** · provenance generated
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-055` · status **notStarted** · provenance generated
 - Client workshop board: `wireframes/WS95 Pricing   Revenue Management Board 1.dc.html#adm-055`
 - Workshop pack: Pricing___Revenue_Management_Reference.pdf board 1
 - Flow F143 *Pricing Revenue Management board 1: Commercial Pricing Command Center*, step 14: Works in Price Hierarchy & Inheritance Configuration → Define where TICVAI should obtain a price when multiple commercial pricing layers exist. This is essential to prevent conflicting prices.
@@ -1112,17 +1510,25 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `ticketing` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `PRODUCT_CONFIGURE`, `PRODUCT_VIEW` (1 configure, 1 read); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `PRODUCT_CONFIGURE`, `PRODUCT_VIEW` (1 configure, 1 read); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Options) and no display directory — it is settings, not a population |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/commercial/price-list-templates-clone-reuse-adm-056` |
 
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
+
 **Known gaps.** **The pack names 5 actions on this screen and the screen declares 1 operation.** Unserved: Complete Price List, Rate Structure Only, Selected Categories, Product Assignments, Market Structure. Each …
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Templates for products and price lists, and cloning one into a new venue, event, season or market, choosing what is copied and which fields must be reviewed (dates, prices, venue, capacity, tax, channels).
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- Pack actions with no operation: Complete Price List, Rate Structure Only, Selected Categories, Product Assignments, Market Structure. (CHG-MOV-008)
 
 #### Inputs: what the user enters or picks
 
@@ -1166,6 +1572,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 Errors to draw in the form: 422 `sourceRequired`.
 
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **reviewFields**: After a clone the listed fields are highlighted for review and the clone cannot be activated until each is confirmed. *(source: contracts/spine/catalogue.yaml#setConfigurationTemplate)*
+
 #### Outputs: what the screen shows and produces
 
 **Actions and what each produces**
@@ -1196,6 +1606,22 @@ Errors to draw in the form: 422 `sourceRequired`.
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 422 `sourceRequired`. |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+template:
+  name: Water park admission 2027
+  subject: priceList
+  includes:
+  - rates
+  - categories
+  review:
+  - dates
+  - prices
+```
+
 #### Permissions
 
 - `listPriceListTemplate` → `PRODUCT_VIEW` (read) · staff
@@ -1213,7 +1639,7 @@ For this screen, newest first. An **Open question** is built to the default it s
 
 - Price hierarchy screen sets which level (category, item, segment) takes precedence; price lists can be cloned (e.g. B2C copied and discounted for B2B); a final validation screen confirms setup is complete. *(client request · MoM 1 Sep 2026, 4.1 Pricing Foundation & Structure · DI-592)*
 
-Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -1221,7 +1647,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-056` · status **notStarted** · provenance generated
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-056` · status **notStarted** · provenance generated
 - Client workshop board: `wireframes/WS95 Pricing   Revenue Management Board 1.dc.html#adm-056`
 - Workshop pack: Pricing___Revenue_Management_Reference.pdf board 1
 - Flow F143 *Pricing Revenue Management board 1: Commercial Pricing Command Center*, step 16: Works in Price List Templates, Clone & Reuse → Accelerate commercial setup across new venues, events, seasons and markets.
@@ -1245,17 +1671,21 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `ticketing` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `PRODUCT_VIEW` (1 read); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `PRODUCT_VIEW` (1 read); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/commercial/commercial-pricing-structure-validation-adm-057` |
 
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
+
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Checks that the pricing foundation is complete before rules, governance or publication: missing rates, unsupported currency, invalid derived rates, lists without categories. Not the publication screen.
 
 #### Inputs: what the user enters or picks
 
@@ -1275,6 +1705,10 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
 
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **checks**: Per price list, each check passed or failed with a link to fix it; a list moves to Validated only when all pass. *(source: contracts/spine/catalogue.yaml#listCommercialPricingStructure / DI-592)*
+
 **Data it reads**: `listCommercialPricingStructure` (onLoad, Commercial Pricing Structure Validation)
 
 #### States
@@ -1287,6 +1721,18 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the commercial pricing structure are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+result:
+  list: UAE-STD-2027
+  passed: 11
+  failed:
+  - Child rate missing for Twilight Ticket
+```
 
 #### Permissions
 
@@ -1304,7 +1750,7 @@ For this screen, newest first. An **Open question** is built to the default it s
 
 - Price hierarchy screen sets which level (category, item, segment) takes precedence; price lists can be cloned (e.g. B2C copied and discounted for B2B); a final validation screen confirms setup is complete. *(client request · MoM 1 Sep 2026, 4.1 Pricing Foundation & Structure · DI-592)*
 
-Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -1312,7 +1758,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-057` · status **notStarted** · provenance generated
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-057` · status **notStarted** · provenance generated
 - Client workshop board: `wireframes/WS95 Pricing   Revenue Management Board 1.dc.html#adm-057`
 - Workshop pack: Pricing___Revenue_Management_Reference.pdf board 1
 - Flow F143 *Pricing Revenue Management board 1: Commercial Pricing Command Center*, step 18: Works in Commercial Pricing Structure Validation → Validate that the commercial pricing foundation is structurally complete before it proceeds to rule configuration, governance, or publication. This is not the final publication screen. Board 4 owns …
@@ -1334,12 +1780,16 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 ## Reference designs and the trackers for this platform
 
-**P09 reference designs** (from `handoff/design-batches/apps/6-ticvai-controller/README.md`)
+**P08 reference designs** (from `handoff/design-batches/apps/5-venue-management/README.md`)
 
 - `sources/designs/TICVAI_POS_Terminal_client_approved.html`: the client-approved POS, for operator density and components.
 - `sources/designs/TICVAI_Mobile.dc.html`: for finish and motion.
 
-**Design Vision Book rules that apply** (`sources/designs/Ticvai_Design_Vision_Book_v1_1.pdf`): DI-021, DI-022, DI-023, DI-024, DI-025, DI-027, DI-028, DI-029, DI-032, DI-033, DI-034, DI-036, DI-037, DI-038, DI-039, DI-040, DI-041, DI-042, DI-044, DI-045, DI-046, DI-047, DI-048, DI-049, DI-050, DI-051 (each is in the design inputs below).
+**Design Vision Book rules that apply** (`sources/designs/Ticvai_Design_Vision_Book_v1_1.pdf`): DI-021, DI-022, DI-023, DI-024, DI-025, DI-027, DI-028, DI-029, DI-030, DI-032, DI-033, DI-034, DI-036, DI-037, DI-038, DI-039, DI-040, DI-041, DI-042, DI-043, DI-044, DI-045, DI-046, DI-047, DI-048, DI-049, DI-050, DI-051, DI-052 (each is in the design inputs below).
+
+**Workshop tracker rows about P08 as a whole** (1: 1 open, 0 closed). Open first; a closed row says where it went on 30 September.
+
+- **S8** Venue Management back-end configuration wireframes *(Chinmay Parab · In progress · due Fri 2 Oct · 30 Sep 2026 · 30 Sep tracker)*
 
 ## Design inputs from the client meetings
 
@@ -1377,17 +1827,32 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Brand personality: Modern, AI-First, Enterprise, Premium, Reliable, Minimal, Scalable, Human-Centred. Visual essence: intelligent and forward-thinking, clean and minimal, trustworthy and secure, modern and timeless, scalable and flexible. *(agreed · Design Vision Book 29 Jul 2026, 02 Brand Identity (p2) - Brand personality / Visual essence · DI-021)*
 - Arabic is a core requirement, not later localisation: full Arabic RTL across web, mobile, POS, reports, emails, WhatsApp, SMS, notifications, tickets and receipts, and administrative interfaces. *(agreed · MoM 28 Jul 2026, 27. Internationalisation and Arabic Support · DI-019)*
 
-### Across P09 TICVAI Web
+### Across P08 Venue Management
 
-- Portal access exposes TICVAI pricing, so prospects submit contact details and a trade license as proof of a real venue, reviewed and approved by TICVAI before access is granted. *(agreed · MoM 10 Sep 2026, 4.8 Customer Portal Access, Authentication & Verification · DI-827)*
+- Qossai: configuration screens should consolidate related functionality, potentially merging 3-4 previously separate screens into one, rather than the repetitive one-screen-per-concept pattern of the AI-built reference system. *(agreed · MoM 24 Sep 2026, 4.5 Screen Consolidation Philosophy · DI-987)*
+- **Open question.** Open: should AI monitoring live in one centralised AI command dashboard or be distributed as widgets in each functional module's own dashboard? Allam: Softlabs' call; the current proposal is illustrative and Softlabs may propose a better structure. *(open · MoM 18 Sep 2026, 4.4 AI Governance — Risk, Compliance & Continuous Monitoring · DI-936)*
 - Simulation functionality stays embedded within each relevant configuration section rather than being consolidated, since it tests that section's own configuration. *(agreed · MoM 8 Sep 2026, 4.11 Dashboard & Reporting Module Consolidation Strategy · DI-722)*
+- Client boards (POS Frontline, F&B, Retail, Inventory & Procurement) share one architecture: six boards of ten screens per domain, a command centre first and an AI/analytics board last, under the hierarchy Company > Venue > Department > Workstation > Operator/Shift > Transaction > Exception > Reconciliation > Analytics. *(agreed · client-design-boards-audit 20 Aug 2026, Opening / What the boards give us · DI-400)*
+- Decision: RBAC per role, per module, three levels — edit/view, view-only, hidden (e.g. a marketing officer does not see Finance at all) — plus sub-permissions within a module (a CRM role may get Campaigns and Communications but not Journeys). Default role templates, admin-customisable. *(agreed · MoM 20 Aug 2026, 4.7 Role-Based Access Control (RBAC); 5. Key Decisions · DI-387)*
+- **Open question.** Allam: a user's visibility must be restrictable to specific outlets (an F&B manager of one outlet should not see other outlets' items); also relevant for ticketing/event-specific access. Implementation approach still open. *(open · MoM 18 Aug 2026, 4.6 Role-Based & Outlet-Level Access Control — Open Item · DI-331)*
+- Access loads automatically at login on POS and web/admin. A user with one role logs straight in; a user with several roles (e.g. admin, cashier, supervisor, manager) is prompted to choose which role to use. *(agreed · MoM 12 Aug 2026, 4. Multiple Roles per User and Role Switching · DI-249)*
+- Back office is role-driven from any device: a finance user signing in from a workstation, laptop or home sees only finance reports and related information. *(agreed · MoM 12 Aug 2026, 3. Role-Based Access and Workstation-Linked Front-End · DI-248)*
+- Built-in help menu with step-by-step tutorials with screenshots for common tasks (e.g. how to sell a ticket at the POS). *(client request · MoM 7 Aug 2026, 8. Legacy POS Layout Designer & System Logging · DI-160)*
+- Custom data-capture fields ("data mask") at account, event, extended-ticket and product level: field types text, dropdown, radio, true/false; multi-language labels; validation (min/max length, required/optional); reusable value lists (e.g. country list). Standard fields come out of the box. *(agreed · MoM 7 Aug 2026, 6. Data Mask: Flexible Custom Data Capture · DI-155)*
+- Load/traffic dashboards respect the tenancy model: a venue manager sees traffic for their own venue only. *(agreed · MoM 31 Jul 2026, 4. Non-Functional Requirements: Scalability & Availability · DI-061)*
+- Allam: queue management is built into the system (not third-party) so traffic entering the site can be throttled from the back office itself. *(agreed · MoM 31 Jul 2026, 4. Non-Functional Requirements: Scalability & Availability · DI-060)*
 - **Open question.** Proposed tenant hierarchy Tenant > Organization/Brand > Region > Branch > Venue > Department, under review against TICVAI's own organisational hierarchy before finalising. *(open · MoM 30 Jul 2026, 2. Proposed Multi-Tenant Hierarchy · DI-055)*
+- Documentation deliverable includes user guides and help content; the preview shows a TICVAI Help Center with categories (Getting Started, Events, Tickets, Orders, Payments, Memberships, Access Control, Reports, Integrations), a "Welcome to TICVAI" getting-started article and Quick Links (Create an Event, Set Pricing, Manage Access, View Reports). *(agreed · Design Vision Book 29 Jul 2026, 09 Deliverables (p9) - What We Deliver / Key Deliverables Preview · DI-052)*
 - Typeface Inter (Light, Regular, Medium, Semibold, Bold). Scale: H1 32/40 Bold, H2 24/32 Semibold, H3 20/28 Semibold, Body 1 16/24 Regular, Body 2 14/20 Regular, Caption 12/16 Regular. *(agreed · Design Vision Book 29 Jul 2026, 08 Design System (p8) - 2. Typography · DI-047)*
 - Palette ("modern, trustworthy and accessible"): Primary #0D6EFD, #00B8FF, #00D4C4, #0B1324; Neutral #F7F9FC, #E5E7EB, #9CA3AF, #4B5563, #1F2937. *(agreed · Design Vision Book 29 Jul 2026, 08 Design System (p8) - 1. Color Palette · DI-046)*
+- AI Assistant panel: a short framing ("Based on last 30 days, here are 3 actions that can improve your revenue") then actionable recommendations, each with its potential impact (e.g. "Increase pricing for VIP seats, +12%") and a chevron, plus "View all recommendations". *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - AI Panels · DI-043)*
 - Chart cards: title with period dropdown ("This Week"), headline metrics with deltas (Tickets Sold 12,840 +8.7%, Visitors, Conversion). Data visualisations must be easy to read. *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - Charts · DI-041)*
 - Tables: titled card with "View all", columns (e.g. Order ID, Customer, Amount, Status), coloured status badges (Paid, Pending, Refunded) and pagination with "Showing 1 to 5 of 245" and page numbers. *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - Tables · DI-039)*
 - Primary button spec: height 40px, padding 12px 24px, radius 8px, Inter 14 Semibold, colour #0D6EFD, width auto. *(agreed · Design Vision Book 29 Jul 2026, 09 Deliverables (p9) - Developer Handoff preview · DI-037)*
+- Back-office shell: collapsible left sidebar with Overview, Events, Tickets, Orders, Customers, Memberships, Access Control, POS, Reports, Analytics, AI Assistant, Settings, and the signed-in user (name, role) at the bottom; top bar with global search (Cmd+K), current time and date, Notifications with unread dot, and user menu. *(agreed · Design Vision Book 29 Jul 2026, 04 Dashboard Vision (p4) - navigation shell · DI-030)*
 - Dynamic KPIs, forecasts and real-time insights; role-based dashboards, preferences and smart shortcuts for every user (e.g. greeting "Good morning, Ahmed" on the home screen, p2). *(agreed · Design Vision Book 29 Jul 2026, 03 Visual Direction (p3) - Smarter Data / Personalized Experience · DI-028)*
+- Reports and historical searches must still retrieve archived transactions when required; the retention period (e.g. keep 3 of 5+ years live) is configurable per customer, archival manual or automated. *(agreed · MoM 28 Jul 2026, 23. Database Optimisation and Archiving · DI-018)*
+- Back-office controls for the waiting room: configurable maximum active users and admission intervals, set per customer and venue. *(agreed · MoM 28 Jul 2026, 19. Auto-scaling and Virtual Waiting Room · DI-017)*
 
 **12 more name particular screens** and are in each screen's block above (*Client meeting inputs*).
 
@@ -1410,14 +1875,14 @@ Method, path, parameters, request and response for every operation these screens
 "listPackageBundleAdd": {"method":"GET","path":"/package-bundle-add","contract":"catalogue","summary":"Package, Bundle & Add-On Pricing","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"recordKind","in":"query","required":false},{"name":"pricingModel","in":"query","required":false},{"name":"status","in":"query","required":false},{"name":"search","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listPriceCategoryRate": {"method":"GET","path":"/price-category-rate","contract":"catalogue","summary":"Price Category & Rate Type Library","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"entryKind","in":"query","required":false},{"name":"categoryFamily","in":"query","required":false},{"name":"active","in":"query","required":false},{"name":"search","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listPriceListTemplate": {"method":"GET","path":"/price-list-template","contract":"catalogue","summary":"Price List Templates, Clone & Reuse","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"templateType","in":"query","required":false},{"name":"status","in":"query","required":false},{"name":"search","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
+"listPriceLists": {"method":"GET","path":"/price-lists","contract":"catalogue","summary":"List price lists","permission":"PRICE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"channel","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
+"listPrices": {"method":"GET","path":"/price-lists/{priceListId}/prices","contract":"catalogue","summary":"List prices in a list","permission":"PRICE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "setConfigurationTemplate": {"method":"PUT","path":"/configuration-templates","contract":"catalogue","summary":"Create or update a product or price-list template","permission":"PRODUCT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"ConfigurationTemplate","responds":"ConfigurationTemplate"},
 "setMarketPricingConfiguration": {"method":"PUT","path":"/pricing-markets","contract":"catalogue","summary":"Create or update a node of the market pricing structure","permission":"PRICE_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"PricingMarket","responds":"PricingMarket"},
 "setPackagePricingDefinition": {"method":"PUT","path":"/package-pricing","contract":"catalogue","summary":"Set how a package, bundle or add-on is priced","permission":"PRICE_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"PackagePricing","responds":"PackagePricing"},
 "setPriceCategoryRateType": {"method":"PUT","path":"/price-categories","contract":"catalogue","summary":"Create or update a price category or rate type","permission":"PRICE_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"PriceCategory","responds":"PriceCategory"},
 "setPriceHierarchyInheritance": {"method":"PUT","path":"/price-hierarchy-inheritance","contract":"catalogue","summary":"Price Hierarchy & Inheritance Configuration","permission":"PRODUCT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"PriceHierarchyInheritanceConfigurationInput","responds":"PriceHierarchyInheritanceConfigurationView"},
-"setPriceListMaster": {"method":"PUT","path":"/price-list-master","contract":"catalogue","summary":"Price List Master Configuration","permission":"PRODUCT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"PriceListMasterConfigurationInput","responds":"PriceListMasterConfigurationView"},
-"setProductServicePrice": {"method":"PUT","path":"/product-service-price","contract":"catalogue","summary":"Product & Service Price Assignment","permission":"PRODUCT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"ProductServicePriceAssignmentInput","responds":"ProductServicePriceAssignmentView"},
-"setRateStructure": {"method":"PUT","path":"/rate-structure","contract":"catalogue","summary":"Rate Structure Builder","permission":"PRODUCT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"RateStructureBuilderInput","responds":"RateStructureBuilderView"}
+"setProductServicePrice": {"method":"PUT","path":"/product-service-price","contract":"catalogue","summary":"Product & Service Price Assignment","permission":"PRODUCT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"ProductServicePriceAssignmentInput","responds":"ProductServicePriceAssignmentView"}
 }
 ```
 
@@ -1429,6 +1894,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 {
 "BundlePricingCommercialModelView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over promotions state, assembled at read time from tables that already exist","description":"**What Bundle Pricing & Commercial Model displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"basePrice":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Base price"},"currency":{"type":"string","description":"Currency"},"discount":{"type":"number","description":"Discount %"},"discountAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Discount amount"},"minimumPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Minimum price"},"maximumPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Maximum price"},"priceFloor":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Price floor"},"marginFloor":{"type":"number","description":"Margin floor"},"guestSpecificPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Guest-specific price"},"channelSpecificPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Channel-specific price"},"pricingModel":{"type":"string","enum":["fixedBundlePrice","sumMinusDiscount","componentPricing","startingFrom","tieredBundlePrice","dynamicBundlePrice"],"description":"How the bundle is priced; a dynamic bundle price is calculated by the pricing engine"},"upgradeCharge":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Surcharge when the guest picks a premium option"}}},
 "CatalogueConfigStatus": {"type":"string","enum":["draft","active","inactive","retired"],"description":"**The status of a catalogue configuration record** (29 September, data model DM3): price lists, rates, fees and fee rules, tax profiles and rules, calculation and rounding profiles, package pricing and templates. `draft` is being prepared and is never used by a calculation; `active` is in use from its effective date; `inactive` is switched off and may be switched back; `retired` is kept for history only. A record already used by a live price becomes `active` through a published change request, not by an edit."},
+"Channel": {"type":"string","enum":["pos","kiosk","web","mobile","b2b","ota","callCentre"]},
 "CommercialPricingCommandCenterSummary": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection; the headline tiles over the list, computed at read time for the filters in force","description":"**The headline figures on Commercial Pricing Command Center.** The pack's KPI cards, split out of the row (decided 29 September, readiness close-out): a count describes the list, not each item in it.","properties":{"totalPriceLists":{"type":"integer","description":"Total Price Lists"},"activePriceLists":{"type":"integer","description":"Active Price Lists"},"draftPriceLists":{"type":"integer","description":"Draft Price Lists"},"priceCategories":{"type":"integer","description":"Price Categories"},"configuredRates":{"type":"integer","description":"Configured Rates"},"productsWithPricing":{"type":"integer","description":"Products with Pricing: sellable products that reference at least one active price list rate"},"productsMissingPricing":{"type":"integer","description":"Products Missing Pricing: active sellable products with no price list rate"},"markets":{"type":"integer","description":"Markets"},"currencies":{"type":"integer","description":"Currencies"},"pricingValidationIssues":{"type":"integer","description":"Pricing Validation Issues"},"recentlyModifiedPriceLists":{"type":"integer","description":"Recently Modified Price Lists: price lists changed in the last 7 days (decided 29 September, readiness close-out)"},"upcomingPriceStructures":{"type":"integer","description":"Upcoming Price Structures: price lists whose effective-from date is in the future"},"aiInsights":{"type":"array","items":{"type":"string"},"description":"AI observations for this screen; advisory only, never applied automatically"}}},
 "CommercialPricingCommandCenterView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over catalogue state, assembled at read time from tables that already exist","description":"**What Commercial Pricing Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"priceListId":{"type":"string","description":"Price List ID"},"name":{"type":"string","description":"Name"},"code":{"type":"string","description":"Code"},"type":{"type":"string","enum":["standardRetail","venue","attraction","event","membership","group","corporate","b2b","reseller","ota","internal","specialMarket"],"description":"Price List Type (the pack's Price List Types, pp.6-7)"},"currency":{"type":"string","description":"Currency: ISO 4217 code of the default currency","pattern":"^[A-Z]{3}$"},"market":{"type":"string","description":"Market"},"venue":{"type":"string","description":"Venue"},"brand":{"type":"string","description":"Brand"},"productCount":{"type":"integer","description":"Product Count"},"rateCount":{"type":"integer","description":"Rate Count"},"version":{"type":"string","description":"Version"},"status":{"type":"string","description":"Status: draft, configured, validated, active, inactive, expired or archived (p.7); approval and publication are Board 4's"},"owner":{"type":"string","description":"Owner"},"effectiveFrom":{"type":"string","format":"date","description":"Effective From (the first half of the pack's Effective Period)"},"effectiveTo":{"type":"string","format":"date","description":"Effective To; empty for open-ended","nullable":true}}},
 "CommercialPricingStructureValidationView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over catalogue state, assembled at read time from tables that already exist","description":"**What Commercial Pricing Structure Validation displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"findingId":{"type":"string","description":"Finding ID"},"category":{"type":"string","enum":["priceList","rateStructure","productMapping","package","market","hierarchy"],"description":"Validation Category (pp.19-20)"},"check":{"type":"string","enum":["requiredFieldsComplete","currencyDefined","ownershipAssigned","categoriesConfigured","monetaryValuesValid","derivedRelationshipsValid","requiredProductsPriced","noOrphanAssignments","componentPricingValid","currencyAndVenueConfigurationValid","noConflictingSourcePriority","fallbackConfigured"],"description":"The check that failed"},"severity":{"type":"string","enum":["critical","warning","information"],"description":"Validation Results: critical (sale cannot proceed), warning (review), information (optimization suggestion)"},"message":{"type":"string","description":"What was found, e.g. \"7 active ticket products have no Adult rate\""},"subjectType":{"type":"string","enum":["priceList","rate","priceCategory","product","package","venue","market","hierarchy"],"description":"What the finding is about"},"subjectId":{"type":"string","description":"ID of that record"},"aiGenerated":{"type":"boolean","description":"Raised by AI QA rather than a rule; advisory"}}},
@@ -1438,18 +1904,16 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "PackageBundleAddOnPricingView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over catalogue state, assembled at read time from tables that already exist","description":"**What Package, Bundle & Add-On Pricing displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"packagePrice":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Package Price: the fixed or derived price charged for the package (AED 850 in the example)"},"pricingId":{"type":"string","description":"Package / add-on pricing ID"},"recordKind":{"type":"string","enum":["package","bundle","addOn"],"description":"What is priced"},"productId":{"type":"string","description":"The catalogue package, bundle or add-on product"},"name":{"type":"string","description":"Name"},"priceListId":{"type":"string","description":"Price list the pricing belongs to"},"pricingModel":{"type":"string","enum":["fixedPackagePrice","sumOfComponents","discountedComponentSum","componentOverride"],"description":"Package Pricing Model (p.14)","nullable":true},"addOnType":{"type":"string","enum":["fastTrack","parking","meal","photo","equipment","upgrade","additionalPerformance","premiumAccess","other"],"description":"Add-On Pricing kind (p.15); additionalPerformance is the design's \"additional session\"; empty for a package","nullable":true},"components":{"type":"array","items":{"type":"object","properties":{"productId":{"type":"string"},"quantity":{"type":"integer"},"role":{"type":"string","enum":["included","requiredPaid","optionalPaid"]},"componentPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money"}}},"description":"Components with their role (Required vs Optional, p.15) and the price each contributes"},"normalTotal":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Normal Total: sum of the components at their own rates; read-only"},"packageSaving":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Commercial package saving: normal total less package price; read-only"},"componentPriceVisibility":{"type":"string","enum":["packageTotalOnly","individualComponents","componentAndSaving"],"description":"Component Price Visibility (p.15): what the customer sees"},"status":{"type":"string","description":"Status: draft, active, disabled or expired"},"validationIssues":{"type":"array","description":"Bundle Price Integrity (p.15)","items":{"type":"object","properties":{"code":{"type":"string","enum":["componentPriceChanged","missingComponentRate","packageAboveNormalTotal"]},"message":{"type":"string"}}}}}},
 "PackagePricing": {"type":"object","x-ticvai-persistence":"catalogue.package_pricing","description":"**How a package, bundle or add-on is priced from its components** (29 September, data model DM3). ADM-062. The bundle's composition for sale stays `catalogue.published_bundle`; this row is its pricing model. `normalTotal` and `packageSaving` are computed on read from the component rates.","required":["id","scopePath","productId","recordKind","pricingModel","status"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005). Operations write it at `venue` scope."},"productId":{"type":"string","format":"uuid"},"recordKind":{"type":"string","enum":["package","bundle","addOn"]},"name":{"type":"string","maxLength":200,"nullable":true},"priceListId":{"type":"string","format":"uuid","nullable":true},"pricingModel":{"type":"string","enum":["fixedPackagePrice","sumOfComponents","discountedComponentSum","componentOverride"]},"addOnType":{"type":"string","enum":["fastTrack","parking","meal","photo","equipment","upgrade","additionalPerformance","premiumAccess","other",null],"nullable":true},"packagePrice":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"nullable":true},"components":{"type":"object","additionalProperties":true,"description":"`[{productId, quantity, role, componentPrice}]`; `componentPrice` only for `componentOverride`."},"componentPriceVisibility":{"type":"string","enum":["packageTotalOnly","individualComponents","componentAndSaving"],"default":"packageTotalOnly"},"status":{"allOf":[{"$ref":"#/components/schemas/CatalogueConfigStatus"}],"default":"draft"},"createdAt":{"type":"string","format":"date-time","readOnly":true},"updatedAt":{"type":"string","format":"date-time","readOnly":true}}},
 "Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}},
+"Price": {"x-ticvai-persistence":"catalogue.price","type":"object","required":["priceListId","variantId","amount"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true,"description":"**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"},"priceListId":{"type":"string","format":"uuid"},"variantId":{"type":"string","format":"uuid"},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"taxCodeId":{"type":"string","format":"uuid","nullable":true}}},
 "PriceCategory": {"type":"object","x-ticvai-persistence":"catalogue.price_category","description":"**The library of price categories and rate types** (29 September, data model DM3). ADM-059. A price category is who or what is priced (Adult, Child, Resident ...); a rate type is how (Standard, Peak, Member ...). Both are rows here, `entryKind` says which. Distinct from `catalogue.product_category`, which groups merchandise.","required":["id","scopePath","entryKind","code","name","isActive"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005). Operations write it at `tenant` scope."},"entryKind":{"type":"string","enum":["priceCategory","rateType"]},"code":{"type":"string","maxLength":40,"description":"Unique per `entryKind` within the tenant."},"name":{"type":"string","maxLength":200},"description":{"type":"string","nullable":true},"categoryFamily":{"type":"string","maxLength":60,"nullable":true},"displayName":{"type":"string","maxLength":200,"nullable":true},"localizedDisplayNames":{"allOf":[{"$ref":"#/components/schemas/LocalisedText"}],"nullable":true},"iconLabel":{"type":"string","maxLength":40,"nullable":true},"parentId":{"type":"string","format":"uuid","nullable":true,"description":"A parent `catalogue.price_category` of the same `entryKind`."},"isStandard":{"type":"boolean","default":false,"description":"Shipped with the tenant; may be deactivated, not deleted."},"sortOrder":{"type":"integer","default":100},"isActive":{"type":"boolean","default":true},"createdAt":{"type":"string","format":"date-time","readOnly":true},"updatedAt":{"type":"string","format":"date-time","readOnly":true}}},
 "PriceCategoryRateTypeLibraryView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over catalogue state, assembled at read time from tables that already exist","description":"**What Price Category & Rate Type Library displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"categoryId":{"type":"string","description":"Category ID"},"name":{"type":"string","description":"Name"},"code":{"type":"string","description":"Code"},"description":{"type":"string","description":"Description"},"categoryFamily":{"type":"string","description":"Category Family: e.g. Visitor or Member (Parent/Child Structure, p.10)"},"displayName":{"type":"string","description":"Display Name"},"iconLabel":{"type":"string","description":"Icon/Label"},"active":{"type":"boolean","description":"Active/Inactive: true when the category can be used on new rates"},"entryKind":{"type":"string","enum":["priceCategory","rateType"],"description":"Whether the row is a price category (who the price represents) or a rate type (how the rate behaves: standard, reduced, contract, negotiated, complimentary, fixed, derived, package, add-on), p.10"},"standard":{"type":"boolean","description":"A TICVAI standard category (Adult, Child, Junior, Senior, Student, Resident, Non-Resident, Member, VIP, Group, Corporate, B2B, Complimentary, Staff, Promotional) rather than a custom one"},"sortOrder":{"type":"integer","description":"Sort Order"},"parentCategoryId":{"type":"string","nullable":true,"description":"Parent category (Parent/Child Structure: Visitor -> Adult, Member -> Gold); empty for a top-level category"},"localizedDisplayNames":{"type":"object","additionalProperties":{"type":"string"},"description":"Display name per language code, at least en and ar (Localization, p.11)"},"possibleDuplicateOf":{"type":"array","items":{"type":"string"},"description":"AI Standardization: ids of categories that appear to mean the same thing (Kids / Child / Children Rate); advisory"}}},
 "PriceHierarchyInheritanceConfigurationInput": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — request only; **no existing table covers these fields** — the closest is catalogue.price_list at 17%, so this is not an update to anything the package stores today and no new table has been decided","description":"**What Price Hierarchy & Inheritance Configuration submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.","properties":{"hierarchyId":{"type":"string","description":"Price hierarchy ID; empty on create"},"name":{"type":"string","description":"Hierarchy name"},"levels":{"type":"array","items":{"type":"object","properties":{"hierarchyLevel":{"type":"string","enum":["globalMaster","country","market","venue","product","approvedOverride"],"description":"Hierarchy Level (Example Hierarchy, p.17)"},"priority":{"type":"integer","description":"Priority; the lower number is the more general level, the most specific existing price wins"},"inheritance":{"type":"boolean","description":"Inheritance: the level takes its parent's price when it has none of its own"},"overrideAllowed":{"type":"boolean","description":"Override Permission / Override Allowed"},"overrideRequiresReason":{"type":"boolean","description":"Override Requires Reason"},"maximumOverrideRangePercent":{"type":"number","nullable":true,"description":"Maximum Override Range: largest allowed deviation from the parent price, in percent; empty for no limit"},"overrideExpiryDays":{"type":"integer","nullable":true,"description":"Override Expiry: days an override stays in force; empty for no expiry (decided 29 September, readiness close-out)"},"returnToParentPrice":{"type":"boolean","description":"Return to Parent Price when an override expires"},"fallbackBehavior":{"type":"string","enum":["useParent","useDefault","blockSale"],"description":"Fallback (p.18): what happens when a child rate does not exist"}}},"description":"Hierarchy Builder (p.17): the ordered levels; saved as a whole so two sources can never be left at equal priority"}}},
 "PriceHierarchyInheritanceConfigurationView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over catalogue state, assembled at read time from tables that already exist","description":"**What Price Hierarchy & Inheritance Configuration displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"hierarchyId":{"type":"string","description":"Price hierarchy ID; empty on create"},"name":{"type":"string","description":"Hierarchy name"},"levels":{"type":"array","items":{"type":"object","properties":{"hierarchyLevel":{"type":"string","enum":["globalMaster","country","market","venue","product","approvedOverride"],"description":"Hierarchy Level (Example Hierarchy, p.17)"},"priority":{"type":"integer","description":"Priority; the lower number is the more general level, the most specific existing price wins"},"inheritance":{"type":"boolean","description":"Inheritance: the level takes its parent's price when it has none of its own"},"overrideAllowed":{"type":"boolean","description":"Override Permission / Override Allowed"},"overrideRequiresReason":{"type":"boolean","description":"Override Requires Reason"},"maximumOverrideRangePercent":{"type":"number","nullable":true,"description":"Maximum Override Range: largest allowed deviation from the parent price, in percent; empty for no limit"},"overrideExpiryDays":{"type":"integer","nullable":true,"description":"Override Expiry: days an override stays in force; empty for no expiry (decided 29 September, readiness close-out)"},"returnToParentPrice":{"type":"boolean","description":"Return to Parent Price when an override expires"},"fallbackBehavior":{"type":"string","enum":["useParent","useDefault","blockSale"],"description":"Fallback (p.18): what happens when a child rate does not exist"}}},"description":"Hierarchy Builder (p.17): the ordered levels; saved as a whole so two sources can never be left at equal priority"},"validationIssues":{"type":"array","description":"Conflict Detection (p.18); read-only","items":{"type":"object","properties":{"code":{"type":"string","enum":["equalPriority","missingFallback","circularInheritance"]},"message":{"type":"string"}}}}}},
-"PriceListMasterConfigurationInput": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures","description":"**What Price List Master Configuration submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.","properties":{"priceListName":{"type":"string","description":"Price List Name"},"priceListCode":{"type":"string","description":"Price List Code; unique within the tenant"},"description":{"type":"string","description":"Description"},"priceListType":{"type":"string","enum":["standardRetail","venue","attraction","event","membership","group","corporate","b2b","reseller","ota","internal","specialMarket"],"description":"Price List Type (Commercial Types, pp.8-9, and the directory's Price List Types)"},"legalEntity":{"type":"string","description":"Legal Entity"},"brand":{"type":"string","description":"Brand"},"businessUnit":{"type":"string","description":"Business Unit"},"country":{"type":"string","description":"Country"},"market":{"type":"string","description":"Market"},"venue":{"type":"string","description":"Venue"},"defaultCurrency":{"type":"string","description":"Default Currency: ISO 4217 code","pattern":"^[A-Z]{3}$"},"owner":{"type":"string","description":"Owner"},"tags":{"type":"array","items":{"type":"string"},"description":"Tags"},"status":{"type":"string","description":"Status: draft, configured, inactive or archived are set here; validated is set by structure validation (ADM-057) and active / expired by Board 4 publication"},"defaultRateCategory":{"type":"string","description":"Default Rate Category: code of a price category from the library (ADM-050)"},"defaultRoundingProfile":{"type":"string","description":"Default Rounding Profile: code of a currency rounding rule (ADM-075)"},"defaultPriceHierarchy":{"type":"string","description":"Default Price Hierarchy: id of the price hierarchy (ADM-055) this list resolves against"},"allowOverrides":{"type":"boolean","description":"Allow Overrides"},"allowInheritance":{"type":"boolean","description":"Allow Inheritance"},"allowMultipleCurrencies":{"type":"boolean","description":"Allow Multiple Currencies"},"allowProductSpecificRates":{"type":"boolean","description":"Allow Product-Specific Rates"},"priceListId":{"type":"string","description":"Price List ID; empty on create, the list to update otherwise"},"scope":{"type":"string","enum":["global","country","market","brand","venue","event","businessUnit"],"description":"Scope: where the price list can apply (p.8)"},"clonedFromPriceListId":{"type":"string","nullable":true,"description":"The price list this one was duplicated from (Duplicate, p.9: UAE Standard 2026 into UAE Standard 2027); empty when built from scratch"}}},
-"PriceListMasterConfigurationView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over catalogue state, assembled at read time from tables that already exist","description":"**What Price List Master Configuration displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"priceListName":{"type":"string","description":"Price List Name"},"priceListCode":{"type":"string","description":"Price List Code; unique within the tenant"},"description":{"type":"string","description":"Description"},"priceListType":{"type":"string","enum":["standardRetail","venue","attraction","event","membership","group","corporate","b2b","reseller","ota","internal","specialMarket"],"description":"Price List Type (Commercial Types, pp.8-9, and the directory's Price List Types)"},"legalEntity":{"type":"string","description":"Legal Entity"},"brand":{"type":"string","description":"Brand"},"businessUnit":{"type":"string","description":"Business Unit"},"country":{"type":"string","description":"Country"},"market":{"type":"string","description":"Market"},"venue":{"type":"string","description":"Venue"},"defaultCurrency":{"type":"string","description":"Default Currency: ISO 4217 code","pattern":"^[A-Z]{3}$"},"owner":{"type":"string","description":"Owner"},"tags":{"type":"array","items":{"type":"string"},"description":"Tags"},"status":{"type":"string","description":"Status: draft, configured, inactive or archived are set here; validated is set by structure validation (ADM-057) and active / expired by Board 4 publication"},"defaultRateCategory":{"type":"string","description":"Default Rate Category: code of a price category from the library (ADM-050)"},"defaultRoundingProfile":{"type":"string","description":"Default Rounding Profile: code of a currency rounding rule (ADM-075)"},"defaultPriceHierarchy":{"type":"string","description":"Default Price Hierarchy: id of the price hierarchy (ADM-055) this list resolves against"},"allowOverrides":{"type":"boolean","description":"Allow Overrides"},"allowInheritance":{"type":"boolean","description":"Allow Inheritance"},"allowMultipleCurrencies":{"type":"boolean","description":"Allow Multiple Currencies"},"allowProductSpecificRates":{"type":"boolean","description":"Allow Product-Specific Rates"},"priceListId":{"type":"string","description":"Price List ID; empty on create, the list to update otherwise"},"scope":{"type":"string","enum":["global","country","market","brand","venue","event","businessUnit"],"description":"Scope: where the price list can apply (p.8)"},"clonedFromPriceListId":{"type":"string","nullable":true,"description":"The price list this one was duplicated from (Duplicate, p.9: UAE Standard 2026 into UAE Standard 2027); empty when built from scratch"},"consumingModules":{"type":"array","items":{"type":"string","enum":["ticketing","b2c","pos","kiosk","b2b","groupSales","membership","fnb","retail","rental"]},"description":"Dependencies: the modules that consume this list (p.9); read-only"}}},
+"PriceList": {"x-ticvai-persistence":"catalogue.price_list","type":"object","required":["id","code","name","venueId","currency","currencyScale","channels"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string"},"name":{"type":"string"},"venueId":{"type":"string","format":"uuid"},"currency":{"type":"string","pattern":"^[A-Z]{3}$","x-ticvai-persisted":false,"description":"**Resolved from the region, not stored** (ADR-0018, 24 August). Region-scoped and not overridable below, so a row in a UAE region is AED and cannot be anything else. **Kept on the wire, removed from the table** — a client should not walk a hierarchy to read a figure, and the database should not hold nine million copies of AED. Four tables genuinely differ from their region and keep a stored currency: `orders.payment.tender_currency`, `inventory.supplier`, `ledger.account`, `control.partner_agreement`.\n"},"currencyScale":{"type":"integer","minimum":0,"maximum":4,"x-ticvai-persisted":false,"description":"**Resolved from the region, not stored** (ADR-0018, 24 August). Region-scoped and not overridable below, so a row in a UAE region is AED and cannot be anything else — storing it per row is a copy of a fact that cannot differ. **Kept on the wire, removed from the table**: a client reading a figure should not walk a hierarchy to know what it means, and the database should not hold nine million copies of AED. Four tables genuinely differ from their region and keep a stored currency — `orders.payment.tender_currency`, `inventory.supplier`, `ledger.account`, `control.partner_agreement`. **A guest paying USD at an AED venue is a real row; a workstation with its own currency is a misconfiguration.**\n"},"channels":{"type":"array","items":{"$ref":"#/components/schemas/Channel"}},"validFrom":{"type":"string","format":"date-time","nullable":true},"validTo":{"type":"string","format":"date-time","nullable":true},"priority":{"type":"integer","description":"Where lists overlap, higher priority wins."},"description":{"type":"string","nullable":true,"description":"Price list master fields (29 September, data model DM3), set with `createPriceList` and `updatePriceList` since setPriceListMaster was retired in r2 (BC-008, CHG-CLN-001)."},"priceListType":{"type":"string","enum":["standardRetail","venue","attraction","event","membership","group","corporate","b2b","reseller","ota","internal","specialMarket"],"default":"standardRetail"},"status":{"allOf":[{"$ref":"#/components/schemas/CatalogueConfigStatus"}],"default":"active"},"ownerPrincipalId":{"type":"string","format":"uuid","nullable":true},"tags":{"type":"array","items":{"type":"string"}},"legalEntityId":{"type":"string","format":"uuid","nullable":true},"brand":{"type":"string","maxLength":100,"nullable":true},"businessUnit":{"type":"string","maxLength":100,"nullable":true},"countryCode":{"type":"string","maxLength":2,"nullable":true,"pattern":"^[A-Z]{2}$"},"marketCode":{"type":"string","maxLength":40,"nullable":true},"scopeLevel":{"type":"string","enum":["global","country","market","brand","venue","event","businessUnit"],"default":"venue"},"defaultPriceCategoryId":{"type":"string","format":"uuid","nullable":true},"roundingProfileId":{"type":"string","format":"uuid","nullable":true},"priceResolutionPolicyId":{"type":"string","format":"uuid","nullable":true},"allowOverrides":{"type":"boolean","default":false},"allowInheritance":{"type":"boolean","default":true},"allowMultipleCurrencies":{"type":"boolean","default":false},"allowProductSpecificRates":{"type":"boolean","default":true},"clonedFromPriceListId":{"type":"string","format":"uuid","nullable":true},"currentVersion":{"type":"integer","nullable":true,"readOnly":true,"description":"The active `catalogue.price_list_version`."}}},
 "PriceListTemplatesCloneReuseView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over catalogue state, assembled at read time from tables that already exist","description":"**What Price List Templates, Clone & Reuse displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"templateId":{"type":"string","description":"Template ID"},"name":{"type":"string","description":"Template name, e.g. Theme Park Pricing"},"templateType":{"type":"string","description":"Template Library type: standardAttraction, themePark, museum, concert, sports, membership, group, corporate, b2b, rental or custom (p.18)"},"description":{"type":"string","description":"Description"},"components":{"type":"array","items":{"type":"string","enum":["priceCategories","rateTypes","rateMatrixStructure","currencyStructure","hierarchy","productMappingPattern","packagePricingPattern"]},"description":"Template Components the template carries (p.18)"},"sourcePriceListId":{"type":"string","nullable":true,"description":"Price list the template was taken from; empty when built directly"},"aiDrafted":{"type":"boolean","description":"Drafted by AI-assisted template generation and awaiting administrator review"},"status":{"type":"string","description":"Status: draft, active or archived"},"owner":{"type":"string","description":"Owner"}}},
 "PricingMarket": {"type":"object","x-ticvai-persistence":"catalogue.pricing_market","description":"**A node of the market pricing structure: global, country, region, market or venue** (29 September, data model DM3). ADM-064. Says which price list and rounding a market uses and whether it inherits from its parent. **At venue level the selling currency is the venue's trading currency** and cannot differ from it (ADR-0018, frozen once the venue has traded); above venue level the currencies are reporting and base currencies.","required":["id","scopePath","hierarchyLevel"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005). Operations write it at `tenant` scope."},"hierarchyLevel":{"type":"string","enum":["global","country","region","market","venue"]},"parentId":{"type":"string","format":"uuid","nullable":true,"description":"The parent `catalogue.pricing_market`."},"countryCode":{"type":"string","maxLength":2,"nullable":true,"pattern":"^[A-Z]{2}$"},"marketCode":{"type":"string","maxLength":40,"nullable":true},"region":{"type":"string","maxLength":100,"nullable":true},"venueId":{"type":"string","format":"uuid","nullable":true},"brand":{"type":"string","maxLength":100,"nullable":true},"legalEntityId":{"type":"string","format":"uuid","nullable":true},"baseCurrency":{"type":"string","maxLength":3,"nullable":true,"pattern":"^[A-Z]{3}$"},"sellingCurrency":{"type":"string","maxLength":3,"nullable":true,"pattern":"^[A-Z]{3}$"},"roundingProfileId":{"type":"string","format":"uuid","nullable":true},"displayFormat":{"type":"string","maxLength":40,"nullable":true},"priceListId":{"type":"string","format":"uuid","nullable":true},"inheritsFromParent":{"type":"boolean","default":true},"fxReferenceRate":{"type":"number","nullable":true,"description":"Reference only; FX supplies inputs, it never decides a price."},"createdAt":{"type":"string","format":"date-time","readOnly":true},"updatedAt":{"type":"string","format":"date-time","readOnly":true}}},
 "ProductKind": {"type":"string","description":"**`openDated` added 24 August** from the client's *Create Ticket Flow* board, which names six main ticket types and this was the one with no kind: **valid on any date within an eligible range, rather than for a named performance or a fixed date.**\nThe mechanism already existed — `access.entitlement` carries `valid_from`, `valid_to`, `entries_allowed` and `frozen_days`, which is exactly an open-dated pass. **What was missing was the product saying it is one**, so a catalogue could not offer it and a report could not count it.\n**`datedAdmission` is a different thing and the two were being conflated**: dated is *this Tuesday*, open-dated is *any Tuesday between March and June*. A guest buying the second and being sold the first has bought the wrong ticket.\n**Transport uses two existing kinds, not a new one** (decided 29 September, rev 3 REV3-21). A one-way trip is `timedAdmission`: `transport.createTransportRoute` creates the route's product with one variant per passenger type, and each departure is a performance. A multi-trip or unlimited pass is `openDated`: `transport.createTransportPassType` creates it, with `EntitlementTemplate.entriesAllowed` = the pass's trips (null for unlimited), the validity = `validityDays`, and `EntitlementTemplate.transportRestriction` naming the station pair the pass was bought for, so `access` refuses it on another journey. The sale path is unchanged: both are cart lines, priced by `transport.quoteTransportFare` (orders `TransportLineAttributes`).\n","enum":["admission","timedAdmission","datedAdmission","openDated","seated","membership","bundle","fnb","retail","rental","addOn","giftCard"]},
 "ProductServicePriceAssignmentInput": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures","description":"**What Product & Service Price Assignment submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.","properties":{"assignmentId":{"type":"string","description":"Assignment ID; empty on create"},"objectType":{"type":"string","enum":["ticketProduct","ticketType","admission","event","performance","membership","annualPass","addOn","fnbItem","retailProduct","rentalItem","resource","reservationService","experience","otherSellableService"],"description":"Supported Commercial Objects (p.13): the kind of sellable object being priced"},"objectIds":{"type":"array","items":{"type":"string"},"description":"The objects assigned; more than one is a Bulk Assignment (25 attraction products -> one price list)"},"assignmentScope":{"type":"string","enum":["productLevel","productVariant","ticketType","event","performance","venue"],"description":"Assignment Scope (p.14): the level at which the assignment holds"},"scopeRefId":{"type":"string","nullable":true,"description":"The variant, ticket type, event, performance or venue the assignment is limited to; empty at product level"},"priceListId":{"type":"string","description":"The price list assigned"},"categoryRates":{"type":"array","items":{"type":"object","properties":{"priceCategory":{"type":"string"},"rateId":{"type":"string"}}},"description":"Product -> Price List -> Category -> Rate (Assignment Workspace, p.13): which rate of the list serves each category; empty uses every active rate of the list"}}},
-"ProductServicePriceAssignmentView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over catalogue state, assembled at read time from tables that already exist","description":"**What Product & Service Price Assignment displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"assignmentId":{"type":"string","description":"Assignment ID; empty on create"},"objectType":{"type":"string","enum":["ticketProduct","ticketType","admission","event","performance","membership","annualPass","addOn","fnbItem","retailProduct","rentalItem","resource","reservationService","experience","otherSellableService"],"description":"Supported Commercial Objects (p.13): the kind of sellable object being priced"},"objectIds":{"type":"array","items":{"type":"string"},"description":"The objects assigned; more than one is a Bulk Assignment (25 attraction products -> one price list)"},"assignmentScope":{"type":"string","enum":["productLevel","productVariant","ticketType","event","performance","venue"],"description":"Assignment Scope (p.14): the level at which the assignment holds"},"scopeRefId":{"type":"string","nullable":true,"description":"The variant, ticket type, event, performance or venue the assignment is limited to; empty at product level"},"priceListId":{"type":"string","description":"The price list assigned"},"categoryRates":{"type":"array","items":{"type":"object","properties":{"priceCategory":{"type":"string"},"rateId":{"type":"string"}}},"description":"Product -> Price List -> Category -> Rate (Assignment Workspace, p.13): which rate of the list serves each category; empty uses every active rate of the list"},"pricingSource":{"type":"string","description":"Price Source Visibility (p.14): the name shown on the product, e.g. UAE Standard Admission 2027; read-only"}}},
-"RateStructureBuilderInput": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — request only; **no existing table covers these fields** — the closest is catalogue.price at 4%, so this is not an update to anything the package stores today and no new table has been decided","description":"**What Rate Structure Builder submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.\n\n**The pack defines this as a record**, under *Each rate should contain* - one of only 13 drafted writes that does. That is the client writing a row rather than a screen, and it is where the table conversation should start.","properties":{"rateId":{"type":"string","description":"Rate ID"},"rateName":{"type":"string","description":"Rate Name"},"rateCode":{"type":"string","description":"Rate Code"},"priceCategory":{"type":"string","description":"Price Category: code of a category from the library (ADM-050)"},"rateType":{"type":"string","description":"Rate Type: code of a rate type from the library (ADM-050), e.g. standard, reduced, derived"},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Amount; ignored when derivedFrom is set"},"currency":{"type":"string","description":"Currency: ISO 4217 code","pattern":"^[A-Z]{3}$"},"unitBasis":{"type":"string","enum":["perTicket","perPerson","perUnit","perHour","perDay","perPerformance","perResource","perPackage","perMembershipPeriod"],"description":"Unit Basis (p.12); perPerformance is the pack's \"Per Session\" (a session is a Performance)"},"precision":{"type":"integer","description":"Precision: decimal places, 0 to 3 (MoM 1 Sep §4.5 requires up to three)","minimum":0,"maximum":3},"roundingProfile":{"type":"string","description":"Rounding Profile: code of a currency rounding rule (ADM-075)"},"status":{"type":"string","description":"Status: draft, active or disabled"},"priceListId":{"type":"string","description":"The price list the rate belongs to"},"derivedFrom":{"type":"object","nullable":true,"description":"Derived Rates (p.12): this rate is another rate adjusted (Child = Adult - 25%, VIP = Standard + AED 200); a commercial relationship, not dynamic pricing. Empty for an entered amount","properties":{"baseRateId":{"type":"string"},"adjustmentType":{"type":"string","enum":["percentage","fixedAmount"]},"adjustmentValue":{"type":"number","description":"Percent or amount in the rate currency; negative reduces"}}}},"x-ticvai-record-definition":"Each rate should contain"},
-"RateStructureBuilderView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over catalogue state, assembled at read time from tables that already exist","description":"**What Rate Structure Builder displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"rateId":{"type":"string","description":"Rate ID"},"rateName":{"type":"string","description":"Rate Name"},"rateCode":{"type":"string","description":"Rate Code"},"priceCategory":{"type":"string","description":"Price Category: code of a category from the library (ADM-050)"},"rateType":{"type":"string","description":"Rate Type: code of a rate type from the library (ADM-050), e.g. standard, reduced, derived"},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Amount; for a derived rate this is the computed value, read-only"},"currency":{"type":"string","description":"Currency: ISO 4217 code","pattern":"^[A-Z]{3}$"},"unitBasis":{"type":"string","enum":["perTicket","perPerson","perUnit","perHour","perDay","perPerformance","perResource","perPackage","perMembershipPeriod"],"description":"Unit Basis (p.12); perPerformance is the pack's \"Per Session\" (a session is a Performance)"},"precision":{"type":"integer","description":"Precision: decimal places, 0 to 3 (MoM 1 Sep §4.5 requires up to three)","minimum":0,"maximum":3},"roundingProfile":{"type":"string","description":"Rounding Profile: code of a currency rounding rule (ADM-075)"},"status":{"type":"string","description":"Status: draft, active or disabled"},"priceListId":{"type":"string","description":"The price list the rate belongs to"},"derivedFrom":{"type":"object","nullable":true,"description":"Derived Rates (p.12): this rate is another rate adjusted (Child = Adult - 25%, VIP = Standard + AED 200); a commercial relationship, not dynamic pricing. Empty for an entered amount","properties":{"baseRateId":{"type":"string"},"adjustmentType":{"type":"string","enum":["percentage","fixedAmount"]},"adjustmentValue":{"type":"number","description":"Percent or amount in the rate currency; negative reduces"}}},"validationIssues":{"type":"array","description":"Validation (pp.12-13): problems found on this rate; read-only","items":{"type":"object","properties":{"code":{"type":"string","enum":["duplicateRate","missingAmount","unsupportedCurrency","invalidDerivedRate","circularRateRelationship"]},"message":{"type":"string"}}}}}}
+"ProductServicePriceAssignmentView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over catalogue state, assembled at read time from tables that already exist","description":"**What Product & Service Price Assignment displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"assignmentId":{"type":"string","description":"Assignment ID; empty on create"},"objectType":{"type":"string","enum":["ticketProduct","ticketType","admission","event","performance","membership","annualPass","addOn","fnbItem","retailProduct","rentalItem","resource","reservationService","experience","otherSellableService"],"description":"Supported Commercial Objects (p.13): the kind of sellable object being priced"},"objectIds":{"type":"array","items":{"type":"string"},"description":"The objects assigned; more than one is a Bulk Assignment (25 attraction products -> one price list)"},"assignmentScope":{"type":"string","enum":["productLevel","productVariant","ticketType","event","performance","venue"],"description":"Assignment Scope (p.14): the level at which the assignment holds"},"scopeRefId":{"type":"string","nullable":true,"description":"The variant, ticket type, event, performance or venue the assignment is limited to; empty at product level"},"priceListId":{"type":"string","description":"The price list assigned"},"categoryRates":{"type":"array","items":{"type":"object","properties":{"priceCategory":{"type":"string"},"rateId":{"type":"string"}}},"description":"Product -> Price List -> Category -> Rate (Assignment Workspace, p.13): which rate of the list serves each category; empty uses every active rate of the list"},"pricingSource":{"type":"string","description":"Price Source Visibility (p.14): the name shown on the product, e.g. UAE Standard Admission 2027; read-only"}}}
 }
 ```

@@ -18,6 +18,25 @@
   "requestBody": null,
   "responds": "PayInstalmentPlan"
  },
+ "createReferral": {
+  "method": "POST",
+  "path": "/referrals",
+  "contract": "marketing-crm",
+  "summary": "Issue a referral code",
+  "permission": "MARKETING_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "Referral",
+  "responds": "Referral"
+ },
  "decideRecommendations": {
   "method": "POST",
   "path": "/recommendations/decide",
@@ -65,6 +84,19 @@
   ],
   "requestBody": null,
   "responds": "BillingStatement"
+ },
+ "getGameCard": {
+  "method": "GET",
+  "path": "/game-cards/{cardCode}",
+  "contract": "games",
+  "summary": "Read a card's balances",
+  "permission": null,
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "GameCard"
  },
  "getLoyaltyPosition": {
   "method": "GET",
@@ -202,16 +234,21 @@
   "requestBody": null,
   "responds": "Page"
  },
- "listDelegations": {
+ "listCustomerBadges": {
   "method": "GET",
-  "path": "/guests/{subjectId}/delegations",
-  "contract": "identity",
-  "summary": "Who may act for this guest, and for whom they may act",
-  "permission": "GUEST_VIEW",
+  "path": "/customers/{customerId}/badges",
+  "contract": "marketing-crm",
+  "summary": "Badges a guest holds",
+  "permission": "MARKETING_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": "customerId",
+    "in": "path",
+    "required": true
+   },
    {
     "name": null,
     "in": null,
@@ -226,21 +263,16 @@
   "requestBody": null,
   "responds": "Page"
  },
- "listGuestMemberships": {
+ "listDelegations": {
   "method": "GET",
-  "path": "/guest/memberships",
-  "contract": "catalogue",
-  "summary": "A guest's memberships, benefits and history",
-  "permission": "PRODUCT_VIEW",
+  "path": "/guests/{subjectId}/delegations",
+  "contract": "identity",
+  "summary": "Who may act for this guest, and for whom they may act",
+  "permission": "GUEST_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
-   {
-    "name": "includeLapsed",
-    "in": "query",
-    "required": null
-   },
    {
     "name": null,
     "in": null,
@@ -272,6 +304,40 @@
    },
    {
     "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listLeaderboard": {
+  "method": "GET",
+  "path": "/loyalty/leaderboard",
+  "contract": "marketing-crm",
+  "summary": "Standings, by nickname",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "programmeId",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "window",
     "in": "query",
     "required": null
    },
@@ -430,6 +496,35 @@
   "requestBody": null,
   "responds": "Page"
  },
+ "listRewards": {
+  "method": "GET",
+  "path": "/loyalty/rewards",
+  "contract": "marketing-crm",
+  "summary": "What points can be turned into",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "programmeId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "listWalletTransactions": {
   "method": "GET",
   "path": "/wallets/{subjectId}/transactions",
@@ -478,6 +573,25 @@
   "requestBody": null,
   "responds": null
  },
+ "redeemLoyaltyPoints": {
+  "method": "POST",
+  "path": "/loyalty/redemptions",
+  "contract": "marketing-crm",
+  "summary": "Spend points",
+  "permission": "LOYALTY_REDEEM",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "LoyaltyPosition"
+ },
  "retryMyDunningPayment": {
   "method": "POST",
   "path": "/dunning-cases/{caseId}/retry",
@@ -501,6 +615,25 @@
   ],
   "requestBody": "RetryDunningPaymentRequest",
   "responds": "DunningCase"
+ },
+ "setLeaderboardNickname": {
+  "method": "PUT",
+  "path": "/loyalty/leaderboard-nickname",
+  "contract": "marketing-crm",
+  "summary": "Choose the name shown on the board",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "subject",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "LoyaltyPosition"
  },
  "setWalletAutoReloadSetting": {
   "method": "PUT",

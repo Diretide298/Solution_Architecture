@@ -1,6 +1,6 @@
 # WS186 — Wallet Configuration Backend Structure v1.0 board 1
 
-**10 screens · 12 operations · 8 schemas · 3 permissions**
+**10 screens · 13 operations · 9 schemas · 3 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -61,6 +61,45 @@ convincingly. It is never a caption.
   and its error; and, element by element, what is shown and in what format, what each action
   produces and where the user goes next. Draw exactly that.
 
+## The processes these screens belong to
+
+Written by the owner of each process (`handoff/design-notes/`). Read before any screen: it says how the process runs end to end and which words the screens must use.
+
+### Ticketing & Guest Commerce, as the venue and TICVAI configure and run it
+
+WHAT THE PROCESS IS. Everything a guest can buy is set up, priced, promoted and serviced here, on Venue Management (P08, the venue's own back office, served inside the venue's cell) and on the TICVAI Console (P09, TICVAI's control plane, outside every cell). End to end: (1) CATALOGUE. A product has one of twelve kinds (admission, timedAdmission, datedAdmission, openDated, seated, membership, bundle, fnb, retail, rental, addOn, giftCard). Its ticket types (adult, child, senior, resident...) are not typed one by one: they are generated from the product's attributes (components) and each value combination becomes a sellable ticket type with no extra setup (DI-164). What a ticket grants (validity, entries, re-entry, days of week, blackout dates, expiry anchor, fast track, transfer) lives on a reusable entitlement template, not on the product. Who may take part (age, height, supervision, certification) is the eligibility rule; what the guest must answer is the data mask and the consent questions; how the guest sees it is guestListing (bookable, infoOnly, hidden), display tags (at most six), media and the booking flow. Group, family and corporate products and every after-sales policy (reschedule, exchange, refund, cancellation, upgrade, transfer) are configured inside the one product configuration, never on separate screens (DI-465, DI-466). (2) LIFECYCLE AND PUBLICATION. A product moves draft, inReview, approved, live, withdrawn, archived. Approval and publication are two acts with two permissions (PRODUCT_APPROVE, PRODUCT_PUBLISH, R091); every product is authorised before it sells online or on site (DI-438). Approved is still not on a till: a till sells only what is in the signed catalogue release it pulled (publishBundle, ADR-0013), so a saved price is a back-office fact until the venue publishes to tills. Changing something that has sold is preceded by an impact check (assessProductChange: orders affected, entitlements issued, future performances, open carts); restoring a version creates a new version, and sold tickets keep the price and terms they were sold under (restoreProductVersion, DI-938, TRACKER Actions row 145). (3) PRICE. Prices live in price lists: per venue, per channel set, with validity dates and a priority, copied for the next season with an uplift (copyPriceList) and repriced in bulk only after a dry run (bulkChangePrices). Currency and decimal scale are never chosen on a form: they resolve from the venue's region (ADR-0008, ADR-0018; AED 2 places, OMR and BHD 3). When several rules apply, the configured hierarchy decides; there is no "lowest price wins" default (DI-595). Tax on the pre-discount price and three-decimal rounding are regional settings (DI-598). Dynamic rules always show their minimum and maximum price guardrails beside the trigger (getDynamicPriceRule). (4) PROMOTE AND BUNDLE. A promotion is a rule (automatic, or gated by a code) created in draft, made live only by Publish, which first analyses stacking; a …
+*(source: DI-164; DI-171; DI-438; DI-465; DI-466; DI-595; DI-598; DI-387; DI-039; DI-044; DI-474; DI-671; DI-987; DI-019; DI-080; ADR-0008; ADR-0013; ADR-0018; ADR-0019; ADR-0030; R091; R098; R101; R222; REV3-21; contracts/spine/catalogue.yaml#transitionProductLifecycle …)*
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Product | Anything sellable, of one of the twelve kinds. The record that carries names, channels, listing, media and policies. | Item (except on F&B and retail screens), SKU (for tickets), Offering | contracts/spine/catalogue.yaml#/components/schemas/ProductKind |
+| Ticket type | One sellable variant of an admission or event product (Adult, Child, Resident Adult), generated from the product's attributes. For retail and F&B the same record is labelled Variant. | Variant (on ticket screens), Sub-product, Rate (that is a price), Axis value | contracts/spine/catalogue.yaml#updateProductVariant / DI-164 / DI-437 |
+| Attribute | A dimension that generates ticket types (Guest category, Residency, Tier, Length). Each has values; adding a value adds ticket types. | Axis, Component (the client's word; use it only in help text), Option | contracts/spine/catalogue.yaml#setProductAttributes / DI-164 / DI-450 |
+| Entitlement | What a ticket lets the holder do (validity, entries, re-entry, days, blackout dates, expiry, fast track, transfer), defined once on an entitlement template and shared by several products. | Access rights, Ticket rules, Validity profile | contracts/spine/catalogue.yaml#createEntitlementTemplate / DI-171 / DI-451 |
+| Eligibility rule | Who may take part in or buy a product (age, height, supervision, waiver, certification). Distinct from a promotion's eligibility, which decides who gets a discount. | Restriction, Access rule (that is access control) | contracts/spine/catalogue.yaml#setProductEligibilityRule / DI-463 |
+| Price list | A set of prices for one venue and a set of channels, valid between two dates, with a priority. Several coexist (B2C, B2B, season). | Price book, Rate card, Tariff | contracts/spine/catalogue.yaml#createPriceList / DI-140 / DI-163 |
+| Price category | A standard rate type (Adult, Child, Member) reused across lists so venues do not invent "Adult Standard" and "Normal Adult". | Price band (that is a seat-category band), Fare type (transport) | contracts/spine/catalogue.yaml#setPriceCategoryRateType / … |
+| Price band | A priced band on a seat category (code, label, colour, amount, channel, from-date). | Price category, Zone price | contracts/satellite/seating.yaml#/components/schemas/SeatPriceBand |
+| Promotion | A rule that changes a price automatically or when a code is entered; draft until published; declares how it stacks. | Offer (except in guest copy), Deal, Discount rule | contracts/satellite/promotions.yaml#createPromotion / DI-173 / DI-174 |
+| Coupon code | A code issued from a coupon campaign that applies a promotion-style discount; one shared code or many single-use codes. | Voucher, Promo voucher | contracts/satellite/promotions.yaml#createCouponCampaign / DI-173 |
+| Voucher | A code that carries money (face value, balance), sold or issued; a liability until redeemed or expired. | Coupon, Credit note | contracts/satellite/promotions.yaml#listVoucherBatches / … |
+| Bundle | A product sold as one line whose price differs from the sum of its components, with a mandatory revenue allocation. "Package" is acceptable in guest copy. | Combo (that is an F&B meal deal), Catalogue bundle | contracts/satellite/promotions.yaml#createBundle / DI-220 / ADR-0019 |
+| Catalogue release | The signed snapshot of a venue's catalogue, prices, promotions and sale boards that tills, kiosks and devices pull. Its action label is "Publish to tills". | Bundle, Catalogue bundle, Sync, Deploy | contracts/spine/catalogue.yaml#publishBundle / … |
+| Approve / Publish / Save | Save keeps a draft; Approve records that it is authorised (PRODUCT_APPROVE); Publish makes it live for guests and channels (PRODUCT_PUBLISH). Three different buttons, never merged. | Submit, Go live, Activate (except CatalogueConfigStatus active), Deploy | R091 / contracts/spine/catalogue.yaml#transitionProductLifecycle / DI-438 |
+| Product states | Draft, In review, Approved, Live, Withdrawn, Archived (ProductLifecycleState), always as coloured badges with these exact labels. | Published (for a product), Pending, Inactive (for a product) | contracts/spine/catalogue.yaml#/components/schemas/ProductLifecycleState |
+| Channel | Where something is sold. Labels: pos Point of sale; kiosk Kiosk; web and guestWeb Website; mobile and guestApp App; b2b B2B partners; partner Partner; ota Travel agents (OTA); callCentre Call centre; api API; backOffice Back office. | Touchpoint, Outlet (an outlet is a business inside a venue), raw enum values | contracts/spine/catalogue.yaml#/components/schemas/Channel / … |
+| Refund | Money returned after settlement, wholly or for some lines, under the venue's refund policy. | Return (that is retail goods), Reversal, Void | contracts/spine/orders.yaml#createRefund / DI-252 |
+| Void | Cancelling a whole order before settlement, within the same shift, with a reason from the void list. After settlement it is a refund. | Cancel order, Delete | contracts/spine/orders.yaml#voidOrder / R222 |
+| Exchange / Reschedule | Exchange swaps lines for other products or dates and settles only the difference; Reschedule is the same product moved to another date or time. | Rebook, Date change (acceptable only in guest copy), Refund and resell | contracts/spine/orders.yaml#exchangeOrderLines / … |
+| Hold / Capture / Release | A deposit or stored-value amount is held, then partly or fully captured, and the rest released. A held deposit is not a payment. | Charge, Pre-auth (in staff copy), Block funds | contracts/spine/orders.yaml#authoriseStoredValue / … |
+| Wallet (TICVAI wallet) | The guest's stored-value balance on TICVAI, spent by hold and capture. Distinct from the tender "Apple Pay / Google Pay", which the contract also calls wallet. | Digital wallet (for stored value), E-wallet, Credit (without a type) | contracts/spine/orders.yaml#/components/schemas/TenderKind / R080 |
+| Credit lot | One amount of wallet credit of one credit type (cash, bonus, gift) with its own expiry; lots are spent nearest expiry first and the guest sees the breakdown but cannot choose. | Bucket, Batch, Top-up | TRACKER Actions row 171 / contracts/satellite/wallet.yaml#expireCreditLots |
+| Venue map / Seat map | A venue map is the wayfinding map of a park or a floor (points, paths, bookable places); a seat map is the seating layout of an auditorium or stand. Never just "map" where both could be meant. | Layout (alone), Floor plan (unless it is a floor map), Map (alone) | contracts/satellite/venue-map.yaml#createVenueMap / … |
+| Point / Bookable place | A point is a place on a venue map (toilet, ride, restaurant, exit). A bookable place is a cabana, lounger, table or pitch placed on the map and sold through its price band. | Pin, POI, Marker, Resource (in staff copy) | contracts/satellite/venue-map.yaml#setVenuePoint / … |
+| Station / Route / Timetable / Departure / Fare table / Pass … | A route is an ordered list of stations with offsets; a timetable generates departures up to its release horizon; a fare table prices a route per passenger type; a pass type is a multi-trip or unlimited pass sold as a product. | Stop (except in the stop list), Line (except lineCode), Schedule, Trip (except a guest's journey) | contracts/satellite/transport.yaml / REV3-21 |
+| Applies from | The effective date of a change. Every dated change shows it, and sold items keep their old terms. | Effective date (in labels), Start date (for a change) | contracts/satellite/seating.yaml#updateSeatCategory / TRACKER Actions row 194 |
+
+
 ## The screens
 
 Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs count fields; requirements are matrix rows; meeting inputs are the ones naming the screen (the module and platform ones are below); white label says whether the tenant's brand reaches it (guest) or it sets the brand (configures).
@@ -69,14 +108,14 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-1083` | Wallet Command Center | B–D | 26 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
 | `BO-1084` | Wallet Type Library | B–D | 30 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
-| `BO-1085` | Wallet Creation & Provisioning Rules | B–D | 17 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
+| `BO-1085` | Wallet Creation & Provisioning Rules | B–D | 17 | 20 | 6 | 0 | 1 | 6 | — | notStarted (—) |
 | `BO-1086` | Wallet Ownership & Account Association | B–D | 6 | 0 | 6 | 16 | 1 | 6 | — | notStarted (—) |
-| `BO-1087` | Wallet Currency & Monetary Configuration | B–D | 16 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
+| `BO-1087` | Wallet Currency & Monetary Configuration | B–D | 16 | 20 | 6 | 0 | 1 | 6 | — | notStarted (—) |
 | `BO-1088` | Credit & Balance Type Configuration | B–D | 30 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-1089` | Wallet Feature Profile | B–D | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
-| `BO-1090` | Wallet Lifecycle Configuration | B–D | 11 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
-| `BO-1091` | Wallet Numbering, Identity & Digital Credentials | B–D | 17 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
-| `BO-1092` | Wallet Configuration Preview, Validation & Publication | B–D | 18 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
+| `BO-1089` | Wallet Feature Profile | B–D | 0 | 20 | 6 | 0 | 1 | 6 | — | notStarted (—) |
+| `BO-1090` | Wallet Lifecycle Configuration | B–D | 11 | 20 | 6 | 0 | 1 | 6 | — | notStarted (—) |
+| `BO-1091` | Wallet Numbering, Identity & Digital Credentials | B–D | 17 | 20 | 6 | 0 | 1 | 6 | — | notStarted (—) |
+| `BO-1092` | Wallet Configuration Preview, Validation & Publication | B–D | 18 | 10 | 6 | 0 | 1 | 6 | — | notStarted (—) |
 
 ## Thin screens in this batch
 
@@ -103,6 +142,12 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/orders-money/wallet-command-center-bo-1083` |
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** The overview of wallet products: wallet types and the outstanding liability and breakage the finance director asks for.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **List operation(s) listWalletTypes, getWalletLiability return a bare array, not the paged list envelope (items, nextCursor, hasMore); rows of getWalletLiability carry no identifier.** Why: The table cannot page, and a row without an id cannot open, edit or link to the record it summarises. *(source: contracts/satellite/wallet.yaml#listWalletTypes / contracts/satellite/wallet.yaml#getWalletLiability; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
 
 #### Inputs: what the user enters or picks
 
@@ -146,6 +191,10 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 #### Outputs: what the screen shows and produces
 
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **liability**: Outstanding by credit type, breakage recognised this period. *(source: contracts/satellite/wallet.yaml#getWalletLiability)*
+
 **Data it reads**: `listWalletTypes` (onLoad, Wallet types in use); `getWalletLiability` (onLoad, What is outstanding)
 
 **Where the user goes next**
@@ -171,6 +220,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Empty, no results (`?state=emptyNoResults`) | **Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+liability:
+  outstanding: AED 2,184,300.00
+  breakageThisMonth: AED 41,320.00
+```
 
 #### Permissions
 
@@ -226,6 +285,7 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 - [ ] Every transition is wired: `BO-100`, `BO-1084`, `BO-1085`, `BO-1086`, `BO-1087`, `BO-1088`, `BO-1089`, `BO-1090`, `BO-1091`, `BO-1092`.
 - [ ] Every gated control is gated: `WALLET_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -245,6 +305,12 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/orders-money/wallet-type-library-bo-1084` |
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Reusable wallet types: guest, registered, family, parent, child, corporate, school, employee.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **List operation(s) listWalletTypes return a bare array, not the paged list envelope (items, nextCursor, hasMore).** Why: The table cannot page, and a row without an id cannot open, edit or link to the record it summarises. *(source: contracts/satellite/wallet.yaml#listWalletTypes; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
 
 #### Inputs: what the user enters or picks
 
@@ -283,6 +349,10 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 | Wearable support | select field | — | — | — | — | — | — |
 | Online usage | select field | — | — | — | — | — | — |
 
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **wallet type**: Category decides ownership and access rules. *(source: contracts/satellite/wallet.yaml#createWalletType / TRACKER Actions row 102)*
+
 #### Outputs: what the screen shows and produces
 
 **Data it reads**: `listWalletTypes` (onLoad, The type library)
@@ -301,6 +371,17 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Empty, no results (`?state=emptyNoResults`) | **Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+type:
+  name: Dune Park Family Wallet
+  category: family
+  currency: AED
+```
 
 #### Permissions
 
@@ -346,6 +427,7 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 - [ ] Every transition is wired: `BO-1083`.
 - [ ] Every gated control is gated: `WALLET_CONFIGURE`, `WALLET_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -359,7 +441,7 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Orders & Money · wave 3 · needs the `core` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `WALLET_CONFIGURE` (1 configure); in the flows as venue manager |
+| Who uses it | venue staff holding `WALLET_CONFIGURE`, `WALLET_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population |
 | Offline | online only |
@@ -367,6 +449,10 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 | Route | `/orders-money/wallet-creation-provisioning-rules-bo-1085` |
 
 **Known gaps.** **Wallet Creation & Provisioning Rules declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the …
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** When a wallet is created automatically (at registration, first top-up, membership) or manually.
+
+**Fixed on main** (the package already carries these; draw what it says): No read operation: the screen declares only createWalletType, updateWalletType and nothing that returns the current configuration. (CHG-WIR-025).
 
 #### Inputs: what the user enters or picks
 
@@ -392,7 +478,40 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 | One wallet per customer vs multiple wallets | text field | — | — | — | — | — | — |
 | Maximum wallets per account | text field | — | — | — | — | — | — |
 
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **provisioning triggers**: Triggers as checkboxes per wallet type. *(source: contracts/satellite/wallet.yaml#updateWalletType)*
+
 #### Outputs: what the screen shows and produces
+
+**Shown**
+
+**The kinds of wallet that may exist — who owns one** (data table, from `listWalletTypes`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Auto reload allowed | yes / no (icon or chip) | Auto-reload is optional per wallet type (Chinmay, 2 October, workbook Q105, default accepted; CHG-CSA-027). |
+| ID | the name it points at, never the id | — |
+| Code | text | — |
+| Name | text | — |
+| Owner kind | chip: Guest, Registered customer, Family, Parent, Child, Corporate… | — |
+| Stored value capability | yes / no (icon or chip) | Board 1.2. Whether this wallet holds a balance at all. |
+| Top up capability | yes / no (icon or chip) | — |
+| Transfer capability | yes / no (icon or chip) | — |
+| Refund capability | yes / no (icon or chip) | — |
+| Gift card support | yes / no (icon or chip) | — |
+| Voucher support | yes / no (icon or chip) | — |
+| Membership credit support | yes / no (icon or chip) | — |
+| Wearable support | yes / no (icon or chip) | — |
+| Usage channels | list or chips (count when long) | Where this wallet may be used, declared on the type itself. Board 1.2 configures online, POS, mobile-app and API usage per wallet type, and … |
+| Preset name | text | The client's own name for this composition — "Resort Wallet", "Cashless Venue Wallet", "Closed-Loop Wallet". |
+| Holder may differ from owner | yes / no (icon or chip) | A child wallet's owner is the parent. Without this the model has to pretend a seven-year-old holds an account. |
+| Requires identification | yes / no (icon or chip) | — |
+| Maximum balance | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Allowed credit types | list or chips (count when long) | — |
+| Allow negative balance | yes / no (icon or chip) | — |
+
+**Data it reads**: `listWalletTypes` (onLoad, The kinds of wallet that may exist — who owns one)
 
 **Where the user goes next**
 
@@ -410,10 +529,21 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 Live wallets exist that the change would invalidate |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+triggers:
+- on registration
+- on first wristband issue
+```
+
 #### Permissions
 
 - `createWalletType` → `WALLET_CONFIGURE` (configure) · staff
 - `updateWalletType` → `WALLET_CONFIGURE` (configure) · staff
+- `listWalletTypes` → `WALLET_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -448,11 +578,11 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (17), with its required mark, default, format and its error state (409, 412).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-1085?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, emptyNoResults, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-1083`.
-- [ ] Every gated control is gated: `WALLET_CONFIGURE`.
+- [ ] Every gated control is gated: `WALLET_CONFIGURE`, `WALLET_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -473,6 +603,12 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 | Offline | online only |
 | Opens with | `subjectId` (navigation), `walletTypeId` (navigation), `sharedWalletId` (navigation) |
 | Route | `/orders-money/wallet-ownership-account-association-bo-1086` |
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Who owns and controls a wallet: individual, family, organisation; members and their allowances.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **List operation(s) listSharedWallets return a bare array, not the paged list envelope (items, nextCursor, hasMore).** Why: The table cannot page, and a row without an id cannot open, edit or link to the record it summarises. *(source: contracts/satellite/wallet.yaml#listSharedWallets; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
 
 #### Inputs: what the user enters or picks
 
@@ -507,6 +643,10 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 | Primary wallet owner (secondary button) | navigation or local | — | — | — | — |
 | Delegated wallet administration (secondary button) | navigation or local | — | — | — | — |
 
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **structure**: Owner and members as a tree with each member's allowance. *(source: contracts/satellite/wallet.yaml#listSharedWallets / contracts/satellite/wallet.yaml#setSharedWalletMembers)*
+
 **Data it reads**: `listSharedWallets` (onLoad, The shared wallets whose members are set)
 
 **Where the user goes next**
@@ -524,6 +664,18 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 | Empty, no results (`?state=emptyNoResults`) | **Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 Live wallets exist that the change would invalidate |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+family:
+  owner: Fatima Al Nuaimi
+  members:
+  - name: Ali (9)
+    allowance: AED 50.00 a day
+```
 
 #### Permissions
 
@@ -587,6 +739,7 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 - [ ] Every transition is wired: `BO-1083`.
 - [ ] Every gated control is gated: `WALLET_CONFIGURE`, `WALLET_OPERATE`, `WALLET_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -600,12 +753,16 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Orders & Money · wave 3 · needs the `core` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `WALLET_CONFIGURE` (1 configure); in the flows as venue manager |
+| Who uses it | venue staff holding `WALLET_CONFIGURE`, `WALLET_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population |
 | Offline | online only |
 | Opens with | `walletTypeId` (navigation) |
 | Route | `/orders-money/wallet-currency-monetary-configuration-bo-1087` |
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Currencies and monetary rules of wallet balances: supported currencies, maximum balance, FX-converted top-up.
+
+**Fixed on main** (the package already carries these; draw what it says): No read operation: the screen declares only updateWalletType and nothing that returns the current configuration. (CHG-WIR-025).
 
 #### Inputs: what the user enters or picks
 
@@ -630,7 +787,40 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 | Currency-specific limits | select field | — | — | — | — | — | — |
 | Rounding policy | select field | — | — | — | — | — | — |
 
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **currencies**: Base currency from the region (PR-2); foreign top-up converted at the stored rate and shown both ways. *(source: contracts/satellite/wallet.yaml#updateWalletType / ADR-0018 / TRACKER Actions row 104)*
+
 #### Outputs: what the screen shows and produces
+
+**Shown**
+
+**The kinds of wallet that may exist — who owns one** (data table, from `listWalletTypes`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Auto reload allowed | yes / no (icon or chip) | Auto-reload is optional per wallet type (Chinmay, 2 October, workbook Q105, default accepted; CHG-CSA-027). |
+| ID | the name it points at, never the id | — |
+| Code | text | — |
+| Name | text | — |
+| Owner kind | chip: Guest, Registered customer, Family, Parent, Child, Corporate… | — |
+| Stored value capability | yes / no (icon or chip) | Board 1.2. Whether this wallet holds a balance at all. |
+| Top up capability | yes / no (icon or chip) | — |
+| Transfer capability | yes / no (icon or chip) | — |
+| Refund capability | yes / no (icon or chip) | — |
+| Gift card support | yes / no (icon or chip) | — |
+| Voucher support | yes / no (icon or chip) | — |
+| Membership credit support | yes / no (icon or chip) | — |
+| Wearable support | yes / no (icon or chip) | — |
+| Usage channels | list or chips (count when long) | Where this wallet may be used, declared on the type itself. Board 1.2 configures online, POS, mobile-app and API usage per wallet type, and … |
+| Preset name | text | The client's own name for this composition — "Resort Wallet", "Cashless Venue Wallet", "Closed-Loop Wallet". |
+| Holder may differ from owner | yes / no (icon or chip) | A child wallet's owner is the parent. Without this the model has to pretend a seven-year-old holds an account. |
+| Requires identification | yes / no (icon or chip) | — |
+| Maximum balance | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Allowed credit types | list or chips (count when long) | — |
+| Allow negative balance | yes / no (icon or chip) | — |
+
+**Data it reads**: `listWalletTypes` (onLoad, The kinds of wallet that may exist — who owns one)
 
 **Where the user goes next**
 
@@ -648,9 +838,21 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 Live wallets exist that the change would invalidate |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+wallet:
+  base: AED
+  maxBalance: AED 5,000.00
+  foreignTopUp: USD at feed rate + 2%
+```
+
 #### Permissions
 
 - `updateWalletType` → `WALLET_CONFIGURE` (configure) · staff
+- `listWalletTypes` → `WALLET_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -685,11 +887,11 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (16), with its required mark, default, format and its error state (409, 412).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-1087?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, emptyNoResults, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-1083`.
-- [ ] Every gated control is gated: `WALLET_CONFIGURE`.
+- [ ] Every gated control is gated: `WALLET_CONFIGURE`, `WALLET_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -710,6 +912,12 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 | Offline | online only |
 | Opens with | `creditTypeId` (navigation) |
 | Route | `/orders-money/credit-balance-type-configuration-bo-1088` |
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** All value types a wallet may hold (cash, bonus, redemption tickets, gift, refund, promotional), monetary or not.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **List operation(s) listCreditTypes return a bare array, not the paged list envelope (items, nextCursor, hasMore).** Why: The table cannot page, and a row without an id cannot open, edit or link to the record it summarises. *(source: contracts/satellite/wallet.yaml#listCreditTypes; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
 
 #### Inputs: what the user enters or picks
 
@@ -767,6 +975,21 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 | Empty, no results (`?state=emptyNoResults`) | **Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist |
 | Offline (`?state=offline`) | online only |
 
+#### Consistency with other screens
+
+- Match `BO-415`: Same record and editor.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+type:
+  name: Refund credit
+  monetary: true
+  refundable: true
+```
+
 #### Permissions
 
 - `listCreditTypes` → `WALLET_VIEW` (read) · staff
@@ -807,6 +1030,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-1083`.
 - [ ] Every gated control is gated: `WALLET_CONFIGURE`, `WALLET_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -820,7 +1044,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Orders & Money · wave 3 · needs the `core` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `WALLET_CONFIGURE` (1 configure); in the flows as venue manager |
+| Who uses it | venue staff holding `WALLET_CONFIGURE`, `WALLET_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
 | Offline | online only |
@@ -829,11 +1053,46 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Which capabilities each wallet type has (top-up, transfer, unload, P2P, auto-reload).
+
+**Fixed on main** (the package already carries these; draw what it says): No read operation: the screen declares only updateWalletType and nothing that returns the current configuration. (CHG-WIR-025).
+
 #### Inputs: what the user enters or picks
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
 
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **feature profile**: Switches per capability; transfers and unload are venue toggles, off by default. *(source: contracts/satellite/wallet.yaml#updateWalletType / DI-535 / TRACKER Actions row 115)*
+
 #### Outputs: what the screen shows and produces
+
+**Shown**
+
+**The kinds of wallet that may exist — who owns one** (data table, from `listWalletTypes`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Auto reload allowed | yes / no (icon or chip) | Auto-reload is optional per wallet type (Chinmay, 2 October, workbook Q105, default accepted; CHG-CSA-027). |
+| ID | the name it points at, never the id | — |
+| Code | text | — |
+| Name | text | — |
+| Owner kind | chip: Guest, Registered customer, Family, Parent, Child, Corporate… | — |
+| Stored value capability | yes / no (icon or chip) | Board 1.2. Whether this wallet holds a balance at all. |
+| Top up capability | yes / no (icon or chip) | — |
+| Transfer capability | yes / no (icon or chip) | — |
+| Refund capability | yes / no (icon or chip) | — |
+| Gift card support | yes / no (icon or chip) | — |
+| Voucher support | yes / no (icon or chip) | — |
+| Membership credit support | yes / no (icon or chip) | — |
+| Wearable support | yes / no (icon or chip) | — |
+| Usage channels | list or chips (count when long) | Where this wallet may be used, declared on the type itself. Board 1.2 configures online, POS, mobile-app and API usage per wallet type, and … |
+| Preset name | text | The client's own name for this composition — "Resort Wallet", "Cashless Venue Wallet", "Closed-Loop Wallet". |
+| Holder may differ from owner | yes / no (icon or chip) | A child wallet's owner is the parent. Without this the model has to pretend a seven-year-old holds an account. |
+| Requires identification | yes / no (icon or chip) | — |
+| Maximum balance | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Allowed credit types | list or chips (count when long) | — |
+| Allow negative balance | yes / no (icon or chip) | — |
 
 **Actions and what each produces**
 
@@ -841,6 +1100,8 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |---|---|---|---|---|---|
 | Save wallet type (primary button) | navigation or local | — | — | — | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
+
+**Data it reads**: `listWalletTypes` (onLoad, The kinds of wallet that may exist — who owns one)
 
 **Where the user goes next**
 
@@ -858,9 +1119,21 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 Live wallets exist that the change would invalidate |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+profile:
+  topUp: true
+  p2p: false
+  unloadAtExit: true
+```
+
 #### Permissions
 
 - `updateWalletType` → `WALLET_CONFIGURE` (configure) · staff
+- `listWalletTypes` → `WALLET_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -895,11 +1168,11 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state (409, 412).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-1089?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save wallet type, Cancel.
 - [ ] Every transition is wired: `BO-1083`.
-- [ ] Every gated control is gated: `WALLET_CONFIGURE`.
+- [ ] Every gated control is gated: `WALLET_CONFIGURE`, `WALLET_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -914,12 +1187,16 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Orders & Money · wave 3 · needs the `core` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `WALLET_CONFIGURE` (1 configure); in the flows as venue manager |
+| Who uses it | venue staff holding `WALLET_CONFIGURE`, `WALLET_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population |
 | Offline | online only |
 | Opens with | `walletTypeId` (navigation) |
 | Route | `/orders-money/wallet-lifecycle-configuration-bo-1090` |
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Wallet lifecycle: active, suspended, blocked, closed; mandatory validity with the residual balance swept to a finance account.
+
+**Fixed on main** (the package already carries these; draw what it says): No read operation: the screen declares only updateWalletType and nothing that returns the current configuration. (CHG-WIR-025).
 
 #### Inputs: what the user enters or picks
 
@@ -939,7 +1216,40 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 | Archival period | select field | — | — | — | — | — | — |
 | Data retention period | select field | — | — | — | — | — | — |
 
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **validity and sweep**: Validity required; sweep account picked from the chart of accounts. *(source: contracts/satellite/wallet.yaml#updateWalletType / TRACKER Actions row 106)*
+
 #### Outputs: what the screen shows and produces
+
+**Shown**
+
+**The kinds of wallet that may exist — who owns one** (data table, from `listWalletTypes`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Auto reload allowed | yes / no (icon or chip) | Auto-reload is optional per wallet type (Chinmay, 2 October, workbook Q105, default accepted; CHG-CSA-027). |
+| ID | the name it points at, never the id | — |
+| Code | text | — |
+| Name | text | — |
+| Owner kind | chip: Guest, Registered customer, Family, Parent, Child, Corporate… | — |
+| Stored value capability | yes / no (icon or chip) | Board 1.2. Whether this wallet holds a balance at all. |
+| Top up capability | yes / no (icon or chip) | — |
+| Transfer capability | yes / no (icon or chip) | — |
+| Refund capability | yes / no (icon or chip) | — |
+| Gift card support | yes / no (icon or chip) | — |
+| Voucher support | yes / no (icon or chip) | — |
+| Membership credit support | yes / no (icon or chip) | — |
+| Wearable support | yes / no (icon or chip) | — |
+| Usage channels | list or chips (count when long) | Where this wallet may be used, declared on the type itself. Board 1.2 configures online, POS, mobile-app and API usage per wallet type, and … |
+| Preset name | text | The client's own name for this composition — "Resort Wallet", "Cashless Venue Wallet", "Closed-Loop Wallet". |
+| Holder may differ from owner | yes / no (icon or chip) | A child wallet's owner is the parent. Without this the model has to pretend a seven-year-old holds an account. |
+| Requires identification | yes / no (icon or chip) | — |
+| Maximum balance | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Allowed credit types | list or chips (count when long) | — |
+| Allow negative balance | yes / no (icon or chip) | — |
+
+**Data it reads**: `listWalletTypes` (onLoad, The kinds of wallet that may exist — who owns one)
 
 **Where the user goes next**
 
@@ -957,9 +1267,20 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 Live wallets exist that the change would invalidate |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+lifecycle:
+  validity: 24 months of inactivity
+  sweepTo: Breakage income 4810
+```
+
 #### Permissions
 
 - `updateWalletType` → `WALLET_CONFIGURE` (configure) · staff
+- `listWalletTypes` → `WALLET_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -994,11 +1315,11 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (11), with its required mark, default, format and its error state (409, 412).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-1090?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, emptyNoResults, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-1083`.
-- [ ] Every gated control is gated: `WALLET_CONFIGURE`.
+- [ ] Every gated control is gated: `WALLET_CONFIGURE`, `WALLET_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -1013,12 +1334,16 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Orders & Money · wave 3 · needs the `core` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `WALLET_CONFIGURE`, `WALLET_OPERATE` (1 configure, 1 operate); in the flows as venue manager |
+| Who uses it | venue staff holding `WALLET_CONFIGURE`, `WALLET_OPERATE`, `WALLET_VIEW` (1 configure, 1 operate, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population |
 | Offline | online only |
 | Opens with | `walletTypeId` (navigation) |
 | Route | `/orders-money/wallet-numbering-identity-digital-credentials-bo-1091` |
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** How wallets are identified (wallet code format) and which credentials (wristband, card, device) bind to them; a credential is not the wallet.
+
+**Fixed on main** (the package already carries these; draw what it says): No read operation: the screen declares only updateWalletType, linkWalletCredential and nothing that returns the current configuration. (CHG-WIR-025).
 
 #### Inputs: what the user enters or picks
 
@@ -1046,6 +1371,39 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 
 #### Outputs: what the screen shows and produces
 
+**Shown**
+
+**The kinds of wallet that may exist — who owns one** (data table, from `listWalletTypes`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Auto reload allowed | yes / no (icon or chip) | Auto-reload is optional per wallet type (Chinmay, 2 October, workbook Q105, default accepted; CHG-CSA-027). |
+| ID | the name it points at, never the id | — |
+| Code | text | — |
+| Name | text | — |
+| Owner kind | chip: Guest, Registered customer, Family, Parent, Child, Corporate… | — |
+| Stored value capability | yes / no (icon or chip) | Board 1.2. Whether this wallet holds a balance at all. |
+| Top up capability | yes / no (icon or chip) | — |
+| Transfer capability | yes / no (icon or chip) | — |
+| Refund capability | yes / no (icon or chip) | — |
+| Gift card support | yes / no (icon or chip) | — |
+| Voucher support | yes / no (icon or chip) | — |
+| Membership credit support | yes / no (icon or chip) | — |
+| Wearable support | yes / no (icon or chip) | — |
+| Usage channels | list or chips (count when long) | Where this wallet may be used, declared on the type itself. Board 1.2 configures online, POS, mobile-app and API usage per wallet type, and … |
+| Preset name | text | The client's own name for this composition — "Resort Wallet", "Cashless Venue Wallet", "Closed-Loop Wallet". |
+| Holder may differ from owner | yes / no (icon or chip) | A child wallet's owner is the parent. Without this the model has to pretend a seven-year-old holds an account. |
+| Requires identification | yes / no (icon or chip) | — |
+| Maximum balance | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Allowed credit types | list or chips (count when long) | — |
+| Allow negative balance | yes / no (icon or chip) | — |
+
+**What each action does** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **Link credential**: Binds a wristband, card or device; a lost one is unlinked, the wallet stays. *(source: contracts/satellite/wallet.yaml#linkWalletCredential)*
+
+**Data it reads**: `listWalletTypes` (onLoad, The kinds of wallet that may exist — who owns one)
+
 **Where the user goes next**
 
 - → `BO-1083` Wallet Command Center: *Back to Wallet Command Center*
@@ -1062,10 +1420,22 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 Already bound to another wallet; 409 Live wallets exist that the change would invalidate |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+wallet:
+  code: DW-0011-7741
+  credentials:
+  - Wristband WB-0098812
+```
+
 #### Permissions
 
 - `updateWalletType` → `WALLET_CONFIGURE` (configure) · staff
 - `linkWalletCredential` → `WALLET_OPERATE` (operate) · staff
+- `listWalletTypes` → `WALLET_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -1100,11 +1470,11 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (17), with its required mark, default, format and its error state (409, 412).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-1091?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, emptyNoResults, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-1083`.
-- [ ] Every gated control is gated: `WALLET_CONFIGURE`, `WALLET_OPERATE`.
+- [ ] Every gated control is gated: `WALLET_CONFIGURE`, `WALLET_OPERATE`, `WALLET_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -1119,12 +1489,16 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Orders & Money · wave 3 · needs the `core` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `WALLET_CONFIGURE` (1 configure); in the flows as venue manager |
+| Who uses it | venue staff holding `WALLET_CONFIGURE`, `WALLET_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Show configuration summary covering; Every configuration publication records) and no display directory — it is settings, not a population |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/orders-money/wallet-configuration-preview-validation-publication-bo-1092` |
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** The final validation and publication of wallet configuration as a version.
+
+**Fixed on main** (the package already carries these; draw what it says): No read operation: the screen declares only publishWalletConfiguration and nothing that returns the current configuration. (CHG-WIR-025).
 
 #### Inputs: what the user enters or picks
 
@@ -1153,11 +1527,34 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 
 #### Outputs: what the screen shows and produces
 
+**Shown**
+
+**Wallet configuration versions, newest first** (data table, from `listWalletConfigurationVersions`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| Published at | 1 Oct 2026, 14:30 | — |
+| Published by | the name it points at, never the id | — |
+| Note | text | — |
+| Findings | list or chips (count when long) | — |
+| Severity | chip: Blocking, Warning | — |
+| Code | text | — |
+| Message | text | — |
+| Next cursor | text | — |
+| Has more | yes / no (icon or chip) | — |
+
 **Actions and what each produces**
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
 | What publishing changes (publish gate) | navigation or local | — | — | — | — |
+
+**What each action does** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **Publish**: Findings first (a credit type with no accounting mapping, a policy naming a retired type); publishes a version. *(source: contracts/satellite/wallet.yaml#publishWalletConfiguration)*
+
+**Data it reads**: `listWalletConfigurationVersions` (onLoad, Wallet configuration versions, newest first)
 
 **Where the user goes next**
 
@@ -1174,9 +1571,24 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 | Empty, no results (`?state=emptyNoResults`) | **Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist |
 | Offline (`?state=offline`) | online only |
 
+#### Consistency with other screens
+
+- Match `BO-1162`: Same versions and diff.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+publish:
+  version: 15
+  findings: 0 errors, 2 warnings
+```
+
 #### Permissions
 
 - `publishWalletConfiguration` → `WALLET_CONFIGURE` (configure) · staff
+- `listWalletConfigurationVersions` → `WALLET_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -1211,11 +1623,11 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (18), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (10 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-1092?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, emptyNoResults, offline.
 - [ ] Every action is wired with its success and its failure: What publishing changes.
 - [ ] Every transition is wired: `BO-1083`.
-- [ ] Every gated control is gated: `WALLET_CONFIGURE`.
+- [ ] Every gated control is gated: `WALLET_CONFIGURE`, `WALLET_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -1328,6 +1740,7 @@ Method, path, parameters, request and response for every operation these screens
 "linkWalletCredential": {"method":"POST","path":"/wallet-credentials","contract":"wallet","summary":"Bind a wristband, card or device to a wallet","permission":"WALLET_OPERATE","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"WalletCredential","responds":"WalletCredential"},
 "listCreditTypes": {"method":"GET","path":"/credit-types","contract":"wallet","summary":"The kinds of value that may sit in a wallet","permission":"WALLET_VIEW","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"tenant","parameters":[],"requestBody":null,"responds":"CreditType"},
 "listSharedWallets": {"method":"GET","path":"/shared-wallets","contract":"wallet","summary":"Family, household and corporate structures","permission":"WALLET_VIEW","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[{"name":"kind","in":"query","required":null}],"requestBody":null,"responds":"SharedWallet"},
+"listWalletConfigurationVersions": {"method":"GET","path":"/wallet-configuration/versions","contract":"wallet","summary":"Wallet configuration versions, newest first","permission":"WALLET_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listWalletTypes": {"method":"GET","path":"/wallet-types","contract":"wallet","summary":"The kinds of wallet that may exist — who owns one","permission":"WALLET_VIEW","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"tenant","parameters":[],"requestBody":null,"responds":"WalletType"},
 "publishWalletConfiguration": {"method":"POST","path":"/wallet-configuration/publish","contract":"wallet","summary":"Validate and publish the wallet configuration as a version","permission":"WALLET_CONFIGURE","offlineCapable":null,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"WalletConfigurationVersion"},
 "setSharedWalletMembers": {"method":"PUT","path":"/shared-wallets/{sharedWalletId}/members","contract":"wallet","summary":"Allowances, budgets and what each member may spend on","permission":"WALLET_OPERATE","offlineCapable":null,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"SharedWalletMember"},
@@ -1343,12 +1756,13 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 ```json
 {
 "CreditType": {"type":"object","x-ticvai-persistence":"wallet.credit_type","description":"Board 1.6. **What value sits inside a wallet** — the second vocabulary, and the one the acceptance condition requires to be a table.\n","required":["code","name"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string"},"name":{"type":"string"},"category":{"type":"string","enum":["cash","refund","bonus","promotional","giftCard","membership","loyalty","ride","attraction","redemption","fnb","retail","parking","event","other"]},"monetary":{"type":"boolean","default":true,"description":"**Loyalty points are not money.** A non-monetary credit has a conversion rate to money or it cannot be spent, and treating points as currency puts them on the balance sheet.\n"},"conversionRate":{"type":"number","nullable":true},"refundable":{"type":"boolean","default":false,"description":"**Promotional credit is not refundable and cash credit is.** A venue that refunds promotional credit to a card has converted marketing spend into cash.\n"},"transferable":{"type":"boolean","default":false},"expires":{"type":"boolean","default":false},"validityDays":{"type":"integer","nullable":true},"breakageEligible":{"type":"boolean","default":false},"ledgerAccountCode":{"type":"string","nullable":true},"priority":{"type":"integer","default":0},"scopePath":{"type":"string"},"isActive":{"type":"boolean","default":true}}},
+"Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}},
 "SharedWallet": {"type":"object","x-ticvai-persistence":"wallet.shared_wallet","description":"Board 4. **One pot, distributed authority.**","required":["kind","walletId"],"properties":{"id":{"type":"string","format":"uuid"},"walletId":{"type":"string","format":"uuid"},"kind":{"type":"string","enum":["family","household","corporate","school","group"]},"ownerPrincipalId":{"type":"string","format":"uuid","nullable":true},"organisationId":{"type":"string","format":"uuid","nullable":true},"members":{"type":"array","items":{"$ref":"#/components/schemas/SharedWalletMember"}},"totalBudget":{"x-ticvai-column":"budget_amount","$ref":"../shared/common.yaml#/components/schemas/Money"},"approvalAboveAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"scopePath":{"type":"string"}}},
 "SharedWalletMember": {"type":"object","x-ticvai-persistence":"wallet.shared_wallet_member","description":"Boards 4.5 and 4.6. **An allowance is a cap with a refresh, not a transfer.**","required":["subjectId"],"properties":{"subjectId":{"type":"string","format":"uuid"},"role":{"type":"string","enum":["owner","administrator","spender","viewer"]},"allowanceAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"allowanceCadence":{"type":"string","enum":["daily","weekly","monthly","none"],"default":"none"},"spendCapPerTransaction":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"allowedCategoryIds":{"type":"array","items":{"type":"string","format":"uuid"}},"blockedCategoryIds":{"type":"array","items":{"type":"string","format":"uuid"}},"allowedVenueIds":{"type":"array","items":{"type":"string","format":"uuid"}},"activeFrom":{"type":"string","format":"date","nullable":true},"activeTo":{"type":"string","format":"date","nullable":true}}},
 "Wallet": {"x-ticvai-persistence":"wallet.wallet + wallet.credit_lot","type":"object","required":["subjectId","balance","currency","status"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true,"description":"**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"},"subjectId":{"type":"string","format":"uuid"},"balance":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"credits":{"type":"array","description":"4.3.5 and 4.3.19. **One balance and one bonus balance with one expiry could not express what the requirement asks for** — cash, bonus and redemption credit, each with its own expiry.\n**The expiries are the reason this is a list.** Cash a guest paid for should outlive a promotional credit they were given, and a single `expiresAt` either expires the money they paid or never expires the promotion.\n**Consumed first-expiry-first-out across all three** (4.3.19), which is also the order that is fairest to the guest — spend what is about to die before what is not.\n**One entry per `active` lot in `wallet.credit_lot`** for this wallet: `amount` is the lot's `remaining_amount`, `expiresAt` its `expires_at`, `sourceRef` its `source_reference`. `kind` and `isRefundable` are not stored on the lot; they come from the lot's credit type (`listCreditLots` returns the lots themselves).\n","items":{"type":"object","required":["kind","amount"],"properties":{"kind":{"type":"string","enum":["cash","bonus","redemption","refund","goodwill"],"description":"**`cash` is money the guest paid and the others are not.** That distinction decides what is refundable, what expires, and what shows as a liability.\n","x-ticvai-persisted":false},"amount":{"x-ticvai-column":"remaining_amount","$ref":"../shared/common.yaml#/components/schemas/Money"},"expiresAt":{"type":"string","format":"date-time","nullable":true},"sourceRef":{"type":"string","nullable":true,"x-ticvai-column":"source_reference"},"isRefundable":{"type":"boolean","default":false,"x-ticvai-persisted":false,"description":"**True only for `cash`.** A guest cannot cash out a promotional credit, and a wallet that lets them has given away the promotion twice.\n"}}}},"bonusBalance":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"description":"Promotional value. Typically non-refundable and spent first."},"currency":{"type":"string","pattern":"^[A-Z]{3}$"},"status":{"type":"string","enum":["active","suspended","closed"]},"homeCellName":{"type":"string","nullable":true,"description":"Where the authoritative balance lives. Present when the guest is linked across cells.\n"},"expiresAt":{"type":"string","format":"date-time","nullable":true},"lastActivityAt":{"type":"string","format":"date-time","nullable":true}}},
 "WalletConfigurationVersion": {"type":"object","x-ticvai-persistence":"wallet.configuration_version","description":"Boards 1.10 and 10.8. **Ten boards of configuration that interact.**","properties":{"version":{"type":"integer"},"publishedAt":{"type":"string","format":"date-time","nullable":true},"publishedBy":{"type":"string","format":"uuid","nullable":true},"note":{"type":"string","nullable":true},"findings":{"type":"array","items":{"type":"object","properties":{"severity":{"type":"string","enum":["blocking","warning"]},"code":{"type":"string"},"message":{"type":"string"}}}},"scopePath":{"type":"string"}}},
 "WalletCredential": {"type":"object","x-ticvai-persistence":"wallet.credential","description":"Boards 6.4 and 6.5. **A credential is not the wallet** — a lost wristband is relinked, not refunded.\n","required":["walletId","kind","identifier"],"properties":{"id":{"type":"string","format":"uuid"},"walletId":{"type":"string","format":"uuid"},"kind":{"type":"string","enum":["card","wristband","nfc","rfid","qr","mobileApp","digitalKey"]},"identifier":{"type":"string"},"linkedAt":{"type":"string","format":"date-time"},"unlinkedAt":{"type":"string","format":"date-time","nullable":true},"status":{"type":"string","enum":["active","lost","replaced","blocked","expired"]},"replacedByCredentialId":{"type":"string","format":"uuid","nullable":true},"scopePath":{"type":"string"}}},
 "WalletLiabilityRow": {"type":"object","description":"Boards 9.5 and 9.6. **The number the finance director asks for.**","properties":{"key":{"type":"string"},"label":{"type":"string"},"outstanding":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"expiringThisPeriod":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"breakageRecognised":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"walletCount":{"type":"integer"},"oldestLotAt":{"type":"string","format":"date","nullable":true}}},
-"WalletType": {"type":"object","x-ticvai-persistence":"wallet.wallet_type","description":"Board 1.2. **Who owns a wallet** — the first of the two vocabularies.","required":["code","name"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string"},"name":{"type":"string"},"ownerKind":{"type":"string","enum":["guest","registeredCustomer","family","parent","child","corporate","school","employee"]},"storedValueCapability":{"type":"boolean","default":true,"description":"Board 1.2. Whether this wallet holds a balance at all. A pure entitlement wallet — passes and vouchers, no money — does not.\n"},"topUpCapability":{"type":"boolean","default":false},"transferCapability":{"type":"boolean","default":false},"refundCapability":{"type":"boolean","default":false},"giftCardSupport":{"type":"boolean","default":false},"voucherSupport":{"type":"boolean","default":false},"membershipCreditSupport":{"type":"boolean","default":false},"wearableSupport":{"type":"boolean","default":false},"usageChannels":{"type":"array","description":"**Where this wallet may be used, declared on the type itself.** Board 1.2 configures online, POS, mobile-app and API usage per wallet type, and this is what lets one `topUpWallet` serve every caller: the operation is shared and the type says which channel may reach it. `WalletChannelRules` still governs the per-credential detail — PIN thresholds, offline floor limits — and this governs whether the channel is open at all.\n","items":{"type":"string","enum":["online","pos","mobileApp","api","kiosk","reader"]}},"presetName":{"type":"string","description":"**The client's own name for this composition** — \"Resort Wallet\", \"Cashless Venue Wallet\", \"Closed-Loop Wallet\". Board 1.2 lists thirteen such names as examples, not as kinds: they are combinations of `ownerKind`, `allowedCreditTypeIds` and `scopePath`. Naming the preset keeps the client's vocabulary without hard-coding it into an enum.\n"},"holderMayDifferFromOwner":{"type":"boolean","default":false,"description":"**A child wallet's owner is the parent.** Without this the model has to pretend a seven-year-old holds an account.\n"},"requiresIdentification":{"type":"boolean","default":false},"maximumBalance":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"allowedCreditTypeIds":{"type":"array","items":{"type":"string","format":"uuid"}},"allowNegativeBalance":{"type":"boolean","default":false},"sharedStructureAllowed":{"type":"boolean","default":false},"lifecycleStates":{"type":"array","items":{"type":"string"}},"numberingPattern":{"type":"string","nullable":true},"scopePath":{"type":"string"},"isActive":{"type":"boolean","default":true}}}
+"WalletType": {"type":"object","x-ticvai-persistence":"wallet.wallet_type","description":"Board 1.2. **Who owns a wallet** — the first of the two vocabularies.","required":["code","name"],"properties":{"autoReloadAllowed":{"type":"boolean","default":true,"description":"**Auto-reload is optional per wallet type** (Chinmay, 2 October, workbook Q105, default accepted; CHG-CSA-027). Where false, a holder of this type cannot set an auto top-up (`setWalletAutoReloadSetting` refuses it) whatever the venue's `WalletFundingRules.autoReload` says."},"id":{"type":"string","format":"uuid"},"code":{"type":"string"},"name":{"type":"string"},"ownerKind":{"type":"string","enum":["guest","registeredCustomer","family","parent","child","corporate","school","employee"]},"storedValueCapability":{"type":"boolean","default":true,"description":"Board 1.2. Whether this wallet holds a balance at all. A pure entitlement wallet — passes and vouchers, no money — does not.\n"},"topUpCapability":{"type":"boolean","default":false},"transferCapability":{"type":"boolean","default":false},"refundCapability":{"type":"boolean","default":false},"giftCardSupport":{"type":"boolean","default":false},"voucherSupport":{"type":"boolean","default":false},"membershipCreditSupport":{"type":"boolean","default":false},"wearableSupport":{"type":"boolean","default":false},"usageChannels":{"type":"array","description":"**Where this wallet may be used, declared on the type itself.** Board 1.2 configures online, POS, mobile-app and API usage per wallet type, and this is what lets one `topUpWallet` serve every caller: the operation is shared and the type says which channel may reach it. `WalletChannelRules` still governs the per-credential detail — PIN thresholds, offline floor limits — and this governs whether the channel is open at all.\n","items":{"type":"string","enum":["online","pos","mobileApp","api","kiosk","reader"]}},"presetName":{"type":"string","description":"**The client's own name for this composition** — \"Resort Wallet\", \"Cashless Venue Wallet\", \"Closed-Loop Wallet\". Board 1.2 lists thirteen such names as examples, not as kinds: they are combinations of `ownerKind`, `allowedCreditTypeIds` and `scopePath`. Naming the preset keeps the client's vocabulary without hard-coding it into an enum.\n"},"holderMayDifferFromOwner":{"type":"boolean","default":false,"description":"**A child wallet's owner is the parent.** Without this the model has to pretend a seven-year-old holds an account.\n"},"requiresIdentification":{"type":"boolean","default":false},"maximumBalance":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"allowedCreditTypeIds":{"type":"array","items":{"type":"string","format":"uuid"}},"allowNegativeBalance":{"type":"boolean","default":false},"sharedStructureAllowed":{"type":"boolean","default":false},"lifecycleStates":{"type":"array","items":{"type":"string"}},"numberingPattern":{"type":"string","nullable":true},"scopePath":{"type":"string"},"isActive":{"type":"boolean","default":true}}}
 }
 ```

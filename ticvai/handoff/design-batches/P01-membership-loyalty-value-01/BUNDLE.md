@@ -1,6 +1,6 @@
 # P01-membership-loyalty-value-01 — P01 · Membership, Loyalty & Value
 
-**5 screens · 50 operations · 65 schemas · 14 permissions**
+**5 screens · 51 operations · 69 schemas · 14 permissions**
 
 Platform P01 Guest Web · ships as **guest** ·
 guest audience · web ·
@@ -62,6 +62,64 @@ convincingly. It is never a caption.
   and its error; and, element by element, what is shown and in what format, what each action
   produces and where the user goes next. Draw exactly that.
 
+## The processes these screens belong to
+
+Written by the owner of each process (`handoff/design-notes/`). Read before any screen: it says how the process runs end to end and which words the screens must use.
+
+### Ticketing & Guest Commerce (guest web, guest app, kiosk, partner portal, POS ticket sale)
+
+A guest finds something to do, picks when and how many, holds capacity, pays, and receives a ticket they can show at the gate, transfer or resell. The same booking engine serves the guest website (P01, WEB-), the guest app (P02, GST-) and, through the same catalogue, cart and order operations, the kiosk (P05), the cashier at the till (P04) and the staff handheld (P06); partners book on credit through the partner portal (P10). Guest surfaces are white-label (venue logo, colours, fonts, card layouts, step indicator style, cart placement) with "Powered by TICVAI" kept; the till and handheld stay TICVAI-branded. The booking runs in a fixed order that the client set on 29 September and confirmed on 30 September: for a dated product, the date first, then the time (hidden until a date), then the tickets (hidden until a time); undated products go straight to the tickets; product-first flows (workshops) pick the product, then the date; seated events with one performance open on the seat map, sections first, zoom into a section, pinch out to compare. Choosing a date, time or session commits nothing; capacity is held only when a quantity is set (a 15-minute basket window, 8 minutes for seats and cabanas, one extension). The guest counters (adult, child, senior, infant, person of determination) belong to the chosen ticket and take its prices, so a basket line is "<ticket> · <guest type> × <n>"; group and school products start from group ticket cards and a typed headcount (minus, plus, and +10 on the app), supervisors free. Help me choose filters the catalogue on the server (never a consent step) with Show everything; consent questions such as "Are you able to swim?" are asked once after the session is picked and never again where the page already asked. Sign-in or the six-digit guest code is asked when the guest leaves Add-ons (or at payment, per venue), only the fields the venue configured; after the code, only the T&Cs tick remains (W1). Payment creates the order first and treats an unknown outcome as "checking with your bank", never a second charge; tickets issue on payment, go to Apple or Google Wallet, and a dynamic-QR event's ticket lives in the app. The guest app is deliberately not a copy of the website (30 September): its structure is Home, Explore, Plan and Tickets tabs with a persistent Buy tickets button, item pages that propose the right product (a restaurant's meal combo that includes admission), ride videos that play with no loader, a visit planner that plans each day at one park from that park's rides, dining and shops only, and in-park walking navigation; the booking flow inside it is functionally identical to the web. Vocabulary in guest copy follows the glossary's recorded exceptions (Booking, Session, QR). source: [F01, F02, F03, F07, F49, F52, F55, F57, F58, F59, MoM 29 Sep 1 (W1-W12), MoM 29 Sep 2, MoM 29 Sep 3, MoM 30 Sep 4.4-4.8, CLIENT-RESPONSE-30SEP 1-6, CLIENT-RESPONSE-REV3-25SEP, REV3-1, REV3-2, REV3-3, REV3-4, REV3-26, DI-1086 …
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Booking | An order or reservation as the guest reads it (Booking Confirmation, Group Booking, My bookings). Code says Order or Reservation. | Order (in guest copy), Purchase record, Transaction | docs/glossary.md (Recorded exceptions, Booking, audit R145) |
+| Session | A dated, timed performance as the guest reads it (Pick a session, Surf sessions). Staff screens (POS, back office) keep Performance. | Slot, Showtime, Performance (in guest copy) | docs/glossary.md (Recorded exceptions, Session, rev 3 CFG-10); DI-1064 |
+| Basket | The guest's unpaid selection with its held capacity (Add to basket, Your basket). Never a paid order. The till and staff screens say Cart. | Cart (in guest copy), Bag, Order (for an unpaid selection) | CLIENT-RESPONSE-REV3-25SEP (Basket, 10) … |
+| Ticket | The issued instrument a guest shows at the gate. Product names from the catalogue keep their own words (Day Pass, Annual pass, 2 park ticket); the interface around them says ticket. | Admission, Voucher (for a ticket), Pass (in interface copy) | docs/glossary.md (Ticket) |
+| Adult, Child, Senior, Infant, Person of determination | The guest types of a ticket, each with its age or height band shown under it (Child 3-12, Under 1.20 m). A companion of a person of determination is its own free type where the product has one. | Disabled, Handicapped, Kid, Pax | DI-686; screens/P01-guest-web-storefront.yaml#WEB-049 (Passengers notes) … |
+| Held for | The countdown on held capacity ("Your seats are held for 7:42"); the release is Release hold. | Lease, Reserved for (a reservation is a different thing), Locked | contracts/spine/orders.yaml#/components/schemas/CartLine (leaseExpiresAt) … |
+| Reservation | Booked and not yet paid; holds capacity and expires (My Reservations). Paid tickets are in Tickets or My Tickets. | Booking (for an unpaid hold in lists), Pending order | docs/glossary.md (Reservation); DI-199 |
+| Help me choose | The venue's questions whose answers filter the products; Show everything clears them. | Quiz, Wizard, Experience builder, Consent | MoM 29 Sep W4; REV3-11 |
+| Info only / Not bookable online | A product listed with full details that cannot be booked online; it shows Contact sales to book with Call sales and Email sales. | Unavailable, Sold out, Coming soon | REV3-14; MoM 29 Sep W3 |
+| Guest code | The six-digit code sent to the guest's email or mobile to prove the contact at guest checkout; the copy says six digits. | OTP, PIN, Token, Verification key | DI-1034; MoM 29 Sep W1 |
+| How many people | The typed headcount of a group or school booking (number box with minus and plus; +10 on the app), with Supervisors listed separately and free. | Group size (the removed dropdown), Pax | DI-1104; DI-1105; CLIENT-RESPONSE-30SEP 1 |
+| Waiting room | The on-sale queue in front of a high-demand performance's sale (WEB-015, GST-046). | Virtual queue (that is the ride queue), Lobby | screens/P01-guest-web-storefront.yaml#WEB-015 notes (ADR-0066) |
+| QR | The code a guest shows, in guest copy only (Dynamic QR). Staff screens say Media code. | Barcode, Serial, Media code (in guest copy) | docs/glossary.md (Recorded exceptions, QR, audit R210) |
+| Not at this park | The planner's per-day notice that the day's park cannot meet a preference, naming the park that can. | Unavailable, No results | DI-1113 |
+| Book this plan | Turns the whole visit plan (tickets, Fast Track, meal combos) into basket lines. | Checkout plan, Buy itinerary | screens/P02-guest-mobile-app.yaml#GST-053 (Book this plan) |
+
+### Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers)
+
+Customer & marketing is how a venue knows its guests and talks to them. There is ONE guest profile per person across ticketing, F&B and retail, so a guest who books online and later dines is the same profile (DI-339). A profile needs at least an email or a mobile, never neither (DI-372). Profiles are created by registration, by guest checkout, or by staff at a till or desk. Repeat guest checkouts with the same verified email or phone attach to the same profile automatically (DI-941, R120 default). Two records that might be the same person are NEVER merged automatically: the guest is asked to confirm, and an admin review queue runs alongside (DI-377). Each candidate shows why it matched; the record that loses is superseded, not deleted; consent takes the narrower of the two positions (DI-808). Around the profile sit three things that must never be confused. CONSENT is what the law allows: per purpose and per channel, append-only, with the notice version and the source (recordConsent). It is Given, Withdrawn or Not asked. A SUBSCRIPTION is what the guest asked to receive, e.g. a newsletter list (MarketingSubscription). A PREFERENCE is what they like: table, dietary, accessibility (updateGuestPreferences). An anonymous visitor's cookie decision is recorded against a device key (recordDeviceConsent) and attaches to the guest when they sign in (claimDeviceConsent). Marketing consent at GUEST CHECKOUT is an open client question, and the design follows its default: an unticked opt-in beside the terms, one per channel and purpose. It is recorded with source "checkout" against the order and the verified contact, and nothing is sent without it. Whether that is sufficient consent under PDPL is the client DPO's call (M18-15 (audit R-M18-15), DI-954, DI-940). Marketing reads profiles through SEGMENTS (rules, evaluated when used) and static LISTS (imported). It reaches guests by CAMPAIGNS (one send to an audience) and JOURNEYS (automations started by an event, with waits and branches). Journeys may offer only pre-configured offers, never a free-typed discount (MoM 2026-08-20 4.6). Everything goes through ONE communications module that every other module uses (MoM 2026-08-31 4.6). Consent and suppression are applied at send time, and the number excluded, with the reasons, is reported before anything goes out (launchCampaign). Transactional messages (tickets, receipts, queue calls, case replies) do not need marketing consent and must never carry marketing. LOYALTY pays for spend: points, tiers, rewards and expiry. GAMIFICATION pays for behaviour: challenges, badges, streaks, referrals and leaderboards (createChallenge). A guest reads their own loyalty position (getLoyaltyPosition). A till, the back office or support reads a named guest's (getGuestLoyalty, or identifyGuest at a till). SERVICE: one Case object covers lost property, complaints, questions, accessibility and refund requests (CaseKind). A guest raises one with raiseMyCase, which needs the connection …
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Guest | The person the venue serves, signed in or not. In body copy on every surface. | Customer, User, Subject, Contact, Patron | contracts/satellite/marketing-crm.yaml#/components/schemas/GuestProfile |
+| Guest profile | The CRM record of one person (details, consent, preferences, history). Distinct from the Account, which is how a guest signs in. | Customer record, Contact, Subject | contracts/satellite/marketing-crm.yaml#getGuestProfile |
+| Consent - Given / Withdrawn / Not asked | What the law allows, per purpose (marketing, personalisation, profiling, third-party sharing, AI processing, transactional) and per channel. "Not asked" is not "Withdrawn" and must look different. | Opted in/out as a status, Accepted, Declined, Revoked, Unsubscribed (that is a subscription) | contracts/satellite/marketing-crm.yaml#/components/schemas/ConsentDecision |
+| Subscription | A list the guest asked to receive (a newsletter, event news), per channel. Unsubscribing from a list is not withdrawing consent. | Consent, Opt-in | contracts/satellite/marketing-crm.yaml#/components/schemas/MarketingSubscription |
+| Preferences | What the guest likes or needs (seating, drinks, dietary, accessibility, contact channel). Never grants permission. | Consents, Settings | contracts/satellite/marketing-crm.yaml#updateGuestPreferences |
+| Send me offers and news | The marketing opt-in label beside the terms at checkout, unticked, one per channel and purpose. | I agree to marketing, Pre-ticked boxes, Keep me updated ticked by default | DI-954 |
+| Points / Tier / Points to next tier / Expiring points | The loyalty position. Points are a liability earned per programme; tiers are ranked (Bronze, Silver, Gold, Platinum in the meetings). | Credits, Coins, Balance alone (wallet money is "credit"), Level | DI-382 |
+| Pending points | Points earned on a purchase still inside its refund window; shown apart from spendable points. | Available points for pending ones | contracts/satellite/marketing-crm.yaml#getLoyaltyPosition |
+| Reward | What points can be turned into (rewards catalogue). | Prize (games redemption uses prize), Voucher unless it is one | contracts/satellite/marketing-crm.yaml#listRewards |
+| Challenge / Badge / Streak / Referral | Gamification - rewards for behaviour, not spend. Status badges such as Explorer, Adventurer, Legend. | Mission and Quest used interchangeably on one screen, Loyalty tier for a badge | DI-392 |
+| Case | One service record - lost property, complaint, question, accessibility, refund request or other - with a number (venue prefix plus sequence), a status and an SLA. | Ticket (a ticket is an admission product), Issue, Incident (that is maintenance and safety) | contracts/satellite/marketing-crm.yaml#/components/schemas/CaseKind |
+| Reply to guest / Internal note | The two kinds of case message. The agent always chooses one explicitly; there is no default. | Comment, Message (ambiguous) | F05 step 2 |
+| Conversation | A live chat session (web chat, in-app, WhatsApp, SMS, email, kiosk, voice). With the assistant, then queued, then with an agent. It is not a case. | Ticket, Case (until one is raised from it) | contracts/satellite/marketing-crm.yaml#/components/schemas/ConversationState |
+| Segment / List / Audience | A segment is rules evaluated when used. A list is static, imported or hand-picked. The audience is what a campaign or journey targets. | Group, Cohort, Target list for a segment | DI-381 |
+| Campaign / Journey | A campaign is one send (one-off, scheduled, triggered or recurring) to an audience. A journey is an automation started by an event, with steps, waits and branches. | Flow (booking flows use it), Automation for a one-off send, Blast | R146 |
+| Offer | A pre-configured, system-validated discount or benefit that a campaign or journey references. It is never typed into the builder. | Discount field, Coupon (unless the offer is a coupon code) | MoM 2026-08-20 4.6 |
+| Reachable | How many guests in an audience can actually be sent to on a channel after consent and suppression. Always shown beside the matching count. | Audience size alone | contracts/satellite/marketing-crm.yaml#previewSegment |
+| Possible duplicate / Merge | Two profiles that may be one person. Never called "Duplicate" as a verdict. Merging needs confirmation and stays reversible for 30 days. | Duplicate (as a status), Combine, Auto-merge | DI-808 |
+| Data request | A guest's privacy request - a copy of my data, a correction, erasure, a restriction - with a legal clock. Statuses submitted, in progress, completed. | DSAR on guest screens, Subject data, Ticket | DI-379 |
+| Waiver / Consent question | A waiver is a signed, versioned form. A consent question ("Are you able to swim?", "I accept the risk") is a single question asked per person or per booking and recorded as consent. | Contract, Disclaimer, Form for a waiver in guest copy | DI-1062 |
+| Lost item / Found item / Possible match | The two directions of lost property and the suggested pairing between them. | Lost case, Claim before it is claimed | contracts/satellite/marketing-crm.yaml#/components/schemas/LostItem |
+| Wishlist | Products and dates a guest saved to buy later, including F&B and retail to buy on site. | Favourites (used for transport routes), Saved for later on one surface and Wishlist on another | DI-202 |
+| Notification / Message | A notification is an item in the guest's in-app feed. A message is one send on a channel (email, SMS, WhatsApp, push, in-app). | Alert for marketing content, Inbox for the guest feed | contracts/satellite/marketing-crm.yaml#/components/schemas/GuestNotification |
+| Template | A reusable message body per channel and language with merge fields. Transactional and marketing templates are separate kinds. | Layout, Design | contracts/satellite/marketing-crm.yaml#createMessageTemplate |
+
+
 ## The screens
 
 Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs count fields; requirements are matrix rows; meeting inputs are the ones naming the screen (the module and platform ones are below); white label says whether the tenant's brand reaches it (guest) or it sets the brand (configures).
@@ -71,8 +129,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `WEB-021` | Wallet & Gift Cards | A | 4 | 37 | 6 | 37 | 13 | 6 | guest | review (client-verified) |
 | `WEB-022` | Membership Plans | A | 0 | 20 | 6 | 16 | 4 | 0 | guest | review (client-verified) |
 | `WEB-023` | Membership Management | A | 3 | 31 | 6 | 6 | 5 | 0 | guest | review (client-verified) |
-| `WEB-024` | Devices, Wishlist & Consent | A | 24 | 82 | 6 | 60 | 2 | 4 | guest | review (client-verified) |
-| `WEB-043` | Loyalty & Rewards | A | 8 | 30 | 6 | 56 | 2 | 2 | guest | review (client-verified) |
+| `WEB-024` | Devices, Wishlist & Consent | A | 4 | 92 | 6 | 59 | 2 | 4 | guest | review (client-verified) |
+| `WEB-043` | Loyalty & Rewards | A | 9 | 62 | 6 | 54 | 2 | 2 | guest | review (client-verified) |
 
 ## Thin screens in this batch
 
@@ -94,13 +152,17 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Module | Membership, Loyalty & Value · wave 2 · needs the `retail` module |
 | Block | Block A · ticket #18188 (APP-WEB-WEB-021) |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025) |
-| Device and orientation | This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. · LTR and RTL · light theme |
+| Device and orientation | This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. · LTR and RTL · the venue's theme |
 | Pattern | listDetail (compact density): `listWalletTransactions` reads the population and `getWallet` reads one of them — list, select, act |
 | Offline | **The offline banner shows.** Balances and stored cards already loaded stay visible with their age, cards masked. Storing a card and transferring value need the server. |
 | Opens with | `cardCode` (deepLink), `subjectId` (session), `walletId` (navigation) · cold entry: **A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared ticket, a forwarded confirmation … |
 | Route | `/membership-loyalty-and-value/wallet-and-gift-cards` |
 
 **What the spec says about it.** Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+
+**From the Ticketing & Guest Commerce (guest web, guest app, kiosk, partner portal, POS ticket sale) process.** The guest's stored value: wallet balance with its expiry breakdown, transactions, gift cards (balance check by code), game cards, saved cards and auto top-up. Block A. Get right that the guest sees the expiry lots but never chooses which is spent (nearest expiry first), and that top-up and transfer appear only where the venue and the guest's family role allow them.
+
+**Fixed on main** (the package already carries these; draw what it says): Raw "Store payment token" primary button with a form collecting providerId, providerToken, consentPurposeId. (CHG-GST-003); "Every wallet transaction" is bound to retail.yaml in one region and wallet.yaml in another. (CHG-GST-003).
 
 #### Inputs: what the user enters or picks
 
@@ -122,6 +184,12 @@ Errors to draw in the form: 409 The provider cannot hold a stored credential (`t
 **Collects what `transferWalletBalance` sends before it is called.** Required: `amount`. Optional: `toSubjectId`, `toWalletId`, `message`. Dismissing sends nothing; the screen behind is unchanged.
 
 Errors to draw in the form: 409 Insufficient cash credit, distinct from insufficient balance — a guest with 200 of bonus credit and 10 of cash can transfer 10, and telling them they have 200 … (WalletTransferProblem)
+
+**Rules for these inputs** (from the Ticketing & Guest Commerce (guest web, guest app, kiosk, partner portal, POS ticket sale) process; these refine the tables above and win where they differ)
+
+- **gift card code**: Check balance by code (the 16-character code on the card); shows balance, expiry and where it can be used (online, on site or both). *(source: contracts/satellite/wallet.yaml#getGiftCard; DI-533)*
+- **auto top-up**: "When my balance drops below AED 50, add AED 200" with the saved card; minimum and maximum per top-up come from the venue's rules. Off by default. *(source: DI-519; DI-517; contracts/satellite/wallet.yaml#setWalletAutoReloadSetting)*
+- **transfer**: To a linked family member's wallet, or to another guest only where the venue allows peer-to-peer; amount and optional message. Hidden when the venue toggle is off. *(source: DI-532; DI-536)*
 
 #### Outputs: what the screen shows and produces
 
@@ -196,6 +264,17 @@ Errors to draw in the form: 409 Insufficient cash credit, distinct from insuffic
 | Add a card (primary button) | `storePaymentToken` POST `/payment-tokens` | inline | PaymentToken | 409 The provider cannot hold a stored credential (`tokenisationNotSupported`, `PaymentProvider.supportsTokenisation` false), or the guest has not consented to the … (PaymentProblem) | opens modal first |
 | Transfer wallet balance (secondary button) | `transferWalletBalance` POST `/wallets/{walletId}/transfer` | inline | WalletTransaction | 409 Insufficient cash credit, distinct from insufficient balance — a guest with 200 of bonus credit and 10 of cash can transfer 10, and telling them they have 200 … (WalletTransferProblem) | opens modal first |
 
+**Rules for what is shown** (from the Ticketing & Guest Commerce (guest web, guest app, kiosk, partner portal, POS ticket sale) process; these refine the tables above and win where they differ)
+
+- **balance**: Total in AED, split into cash and bonus credit, with the expiry lots ("AED 150 expires 31 Dec"); bonus credit is spent first under its own validity. *(source: DI-523; TRACKER 30-September Old rows row 118 (A167))*
+- **family**: Each linked child with their allowance ("Omar · AED 200 of AED 500"); a child account sees balance and spending but no Top up. *(source: DI-529; DI-509)*
+- **saved cards**: Masked only ("Visa •••• 4242, expires 08/28"); never the full number. *(source: DI-069)*
+
+**What each action does** (from the Ticketing & Guest Commerce (guest web, guest app, kiosk, partner portal, POS ticket sale) process; these refine the tables above and win where they differ)
+
+- **Top up**: Only the payment methods the venue allows online for top-up; a top-up above the venue's approval threshold is not offered online. *(source: DI-517; DI-520)*
+- **Save a card**: Through the gateway's card form with the consent to store it; the guest never sees a token. *(source: contracts/spine/orders.yaml#storePaymentToken)*
+
 **Data it reads**: `getWallet` (onLoad, Read a guest wallet); `listWalletTransactions` (onLoad, Wallet transaction history); `listPaymentTokens` (onLoad, Saved cards on this account); `getWalletAutoReloadSetting` (onLoad, Show auto top-up); `getWalletExitBalance` (onLoad, Balance due / refundable at exit)
 
 **Where the user goes next**
@@ -215,6 +294,28 @@ Errors to draw in the form: 409 Insufficient cash credit, distinct from insuffic
 | Permission denied (`?state=emptyNoAccess`) | **There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the … |
 | Offline (`?state=offline`) | **The offline banner shows.** Balances and stored cards already loaded stay visible with their age, cards masked. Storing a card and transferring value need the server. |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 Insufficient cash credit, distinct from insufficient balance — a guest with 200 of bonus credit and 10 of cash can transfer 10, and telling them they have 200 … (WalletTransferProblem); 409 Nothing is due or refundable, or the action does not match the balance (`collect` on a wallet in credit), or `waive` by a guest.; 409 The provider cannot hold a stored credential … |
+
+#### Edge cases to draw
+
+- **Wallet settled at exit (resort-style wallets)**: Shows the refundable or due balance at exit and Settle; for venues without exit settlement the block is absent. *(source: screens/P01-guest-web-storefront.yaml#WEB-021 apis (getWalletExitBalance, settleWalletAtExit))*
+
+#### Consistency with other screens
+
+- Match `GST-011`: Same balance, lots and family layout; the app adds wristband and NFC.
+- Match `WEB-012`: The wallet tender at payment shows the same balance figure.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+balance: AED 420 (cash AED 350, bonus AED 70 expires 31 Dec)
+giftCard: GC-7Q4M-2KX9-PL3A · AED 250 · online and on site
+family:
+- Omar · AED 200 of AED 500
+- Layla · AED 150 of AED 500
+savedCard: Visa •••• 4242
+```
 
 #### Permissions
 
@@ -283,9 +384,9 @@ Also apply: 39 for all of P01, 29 for every app (section *Design inputs from the
 
 #### Configurable by the tenant
 
-This is a white-label guest screen: it is drawn in the venue's brand, never TICVAI's (except the fixed *Powered by TICVAI* credit). Draw it with the **default theme**, and on the key screens one **alternate tenant theme** (`handoff/design-batches/apps/1-guest-app/WHITE-LABEL.md`).
+This is a white-label guest screen: it is drawn in the venue's brand, never TICVAI's (except the *Powered by TICVAI* credit, a tenant toggle that is on by default: `brand.showPoweredBy`). It has no dark or light mode: the venue's theme applies on every device setting. Draw it with the **default theme**, and on the key screens one **alternate tenant theme** (`handoff/design-batches/apps/1-guest-app/WHITE-LABEL.md`).
 
-**Shell-wide, on every guest screen:** Brand (10, CMS-002, CMS-004, ADM-016); Theme (31, CMS-005, CMS-003, ADM-016); Fonts (5, CMS-003); Header (5, CMS-007); Navigation (17, CMS-009); Footer (website) (15, CMS-007); Languages and right-to-left (2, CMS-011, ADM-018); Modules shown to guests (3, CMS-001); Features (3, CMS-001); Custom domain (website) (3, CMS-017, ADM-017); SEO metadata (website) (13, CMS-013). Each element, its CMS field, allowed values and default: `handoff/design-batches/apps/1-guest-app/WHITE-LABEL.md`.
+**Shell-wide, on every guest screen:** Brand (11, CMS-002, CMS-004, CMS-104); Theme (27, CMS-005, ADM-016); Fonts (5, CMS-003); Header (5, CMS-009); Navigation (17, CMS-009); Footer (website) (15, CMS-009); Languages and right-to-left (2, CMS-011, ADM-018); Modules shown to guests (3, CMS-001, ADM-424); Features (3, CMS-001); Custom domain (website) (3, CMS-017, ADM-017); SEO metadata (website) (13, CMS-013). Each element, its CMS field, allowed values and default: `handoff/design-batches/apps/1-guest-app/WHITE-LABEL.md`.
 
 #### References
 
@@ -303,6 +404,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 - [ ] Sign-in is asked only where the spec asks for it.
 - [ ] The 13 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] Drawn in the default theme; on a key screen also in the alternate tenant theme; nothing hard-codes a brand colour, logo or font.
+- [ ] The 1 edge case(s) from the process notes are drawn.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -317,7 +419,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 | Module | Membership, Loyalty & Value · wave 2 · needs the `ticketing` module |
 | Block | Block A · ticket #18189 (APP-WEB-WEB-022) |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025) |
-| Device and orientation | This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. · LTR and RTL · light theme |
+| Device and orientation | This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. · LTR and RTL · the venue's theme |
 | Pattern | listDetail (compact density): `listProducts` reads the population and `getProduct` reads one of them — list, select, act |
 | Offline | **The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
 | Opens with | `productId` (WEB-001) · cold entry: Resolves from the session; a cold arrival is the ordinary case. |
@@ -326,6 +428,10 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 **What the spec says about it.** Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Wired 24 August**: getMyMemberships, listGuestMemberships. **The web surface drew the screen and could not fetch what it shows** — the app had these and the browser did not, and there is no reason a membership or a bundle should need an app.
 
 **Known gaps.** The staff-shaped membership list; the guest's own are `getMyMemberships`.
+
+**From the Ticketing & Guest Commerce (guest web, guest app, kiosk, partner portal, POS ticket sale) process.** The membership and annual pass plans on sale, compared side by side, and the guest's own plan if they hold one. Block A. In the prototype plans are sold through a booking flow (Annual pass / membership), so this page is a comparison that hands off to that flow.
+
+**Fixed on main** (the package already carries these; draw what it says): Filter fields "Venue id", "Kind" and "Is sellable" and a raw product table. (CHG-GST-003); Both getMyMemberships and listGuestMemberships are declared. (CHG-GST-003).
 
 #### Inputs: what the user enters or picks
 
@@ -381,6 +487,15 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Renews on | 1 Oct 2026 | — |
 | Previous terms | list or chips (count when long) | Prior terms, including lapsed ones. |
 
+**Rules for what is shown** (from the Ticketing & Guest Commerce (guest web, guest app, kiosk, partner portal, POS ticket sale) process; these refine the tables above and win where they differ)
+
+- **plan card**: Name, price per year (or month), validity by dates, the benefits as a short list (free entry, F&B discount, guest passes, Fast Track), blockout days named ("Not valid on public holidays"). *(source: DI-138; DI-452; DI-201)*
+- **current plan**: The guest's plan is marked "Your plan" with its expiry; upgrade shows only inside the venue's upgrade window. *(source: DI-467; contracts/spine/catalogue.yaml#getMyMemberships)*
+
+**What each action does** (from the Ticketing & Guest Commerce (guest web, guest app, kiosk, partner portal, POS ticket sale) process; these refine the tables above and win where they differ)
+
+- **Choose a plan**: Opens the membership booking flow with a quantity stepper once selected (a family buying two), profile capture of each member, and auto-renewal with card-on-file consent. *(source: DI-980; DI-448; DI-138)*
+
 **Data it reads**: `listProducts` (onLoad, List products); `getProduct` (onLoad, Read a product); `getMyMemberships` (onLoad, A guest's own memberships, benefits and history Only when …)
 
 **Where the user goes next**
@@ -400,6 +515,29 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | **There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the … |
 | Offline (`?state=offline`) | **The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 A `categoryId` that names no category of the venue, or a `guidedAnswerIds` entry that is not an answer of the venue's published guided choice (W4, 29 … |
+
+#### Consistency with other screens
+
+- Match `GST-015`: Same plans and benefits wording on the app's Memberships.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+plans:
+- name: Summit Peaks Annual Pass
+  price: AED 1,295 / year
+  benefits:
+  - Unlimited entry
+  - 10% off food
+  - 2 guest passes
+- name: Kids Club Membership
+  price: AED 149 / month
+  benefits:
+  - Unlimited weekday play
+  - Free socks
+```
 
 #### Permissions
 
@@ -446,9 +584,9 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Configurable by the tenant
 
-This is a white-label guest screen: it is drawn in the venue's brand, never TICVAI's (except the fixed *Powered by TICVAI* credit). Draw it with the **default theme**, and on the key screens one **alternate tenant theme** (`handoff/design-batches/apps/1-guest-app/WHITE-LABEL.md`).
+This is a white-label guest screen: it is drawn in the venue's brand, never TICVAI's (except the *Powered by TICVAI* credit, a tenant toggle that is on by default: `brand.showPoweredBy`). It has no dark or light mode: the venue's theme applies on every device setting. Draw it with the **default theme**, and on the key screens one **alternate tenant theme** (`handoff/design-batches/apps/1-guest-app/WHITE-LABEL.md`).
 
-**Shell-wide, on every guest screen:** Brand (10, CMS-002, CMS-004, ADM-016); Theme (31, CMS-005, CMS-003, ADM-016); Fonts (5, CMS-003); Header (5, CMS-007); Navigation (17, CMS-009); Footer (website) (15, CMS-007); Languages and right-to-left (2, CMS-011, ADM-018); Modules shown to guests (3, CMS-001); Features (3, CMS-001); Custom domain (website) (3, CMS-017, ADM-017); SEO metadata (website) (13, CMS-013). Each element, its CMS field, allowed values and default: `handoff/design-batches/apps/1-guest-app/WHITE-LABEL.md`.
+**Shell-wide, on every guest screen:** Brand (11, CMS-002, CMS-004, CMS-104); Theme (27, CMS-005, ADM-016); Fonts (5, CMS-003); Header (5, CMS-009); Navigation (17, CMS-009); Footer (website) (15, CMS-009); Languages and right-to-left (2, CMS-011, ADM-018); Modules shown to guests (3, CMS-001, ADM-424); Features (3, CMS-001); Custom domain (website) (3, CMS-017, ADM-017); SEO metadata (website) (13, CMS-013). Each element, its CMS field, allowed values and default: `handoff/design-batches/apps/1-guest-app/WHITE-LABEL.md`.
 
 #### References
 
@@ -481,7 +619,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 | Module | Membership, Loyalty & Value · wave 2 · needs the `ticketing` module |
 | Block | Block A · ticket #18190 (APP-WEB-WEB-023) |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025) |
-| Device and orientation | This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. · LTR and RTL · light theme |
+| Device and orientation | This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. · LTR and RTL · the venue's theme |
 | Pattern | listDetail (compact density): `listGuestMemberships` reads the population and `getMyMemberships` reads one of them — list, select, act |
 | Offline | **The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
 | Opens with | `subjectId` (session), `orderId` (deepLink), `caseId` (navigation), `statementId` (navigation) · cold entry: **A guest opening an order link weeks later.** Shows the order if it still resolves; if it was refunded or the performance passed, says which and offers the … |
@@ -490,6 +628,10 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 **What the spec says about it.** Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Wired 24 August**: getMyMemberships, listGuestMemberships. **The web surface drew the screen and could not fetch what it shows** — the app had these and the browser did not, and there is no reason a membership or a bundle should need an app. **Rev 3 (decided 29 September, rev 3 DG-2, no contract change).** The billing statement shows the decline states: a **soft decline** offers *Retry now* (`retryMyDunningPayment`) and *Use another card*; a **hard decline** offers another card only; **declined again** shows the next retry date; then **paid**.
 
 **Known gaps.** The staff-shaped membership list; the guest's own are `getMyMemberships`. No use on Membership Management; moving a membership to a family member is a different operation.
+
+**From the Ticketing & Guest Commerce (guest web, guest app, kiosk, partner portal, POS ticket sale) process.** Manage the membership the guest holds: card, benefits, linked members, billing statements and the declined-renewal recovery. Block A. The decline states decided on 29 September are the core of the design.
+
+**Fixed on main** (the package already carries these; draw what it says): "Transfer order tickets" is the primary action on Membership Management. (CHG-GST-003).
 
 #### Inputs: what the user enters or picks
 
@@ -581,6 +723,17 @@ Errors to draw in the form: 409 The case is already resolved, or the decline is 
 |---|---|---|---|---|---|
 | Retry the payment (secondary button) | `retryMyDunningPayment` POST `/dunning-cases/{caseId}/retry` | RetryDunningPaymentRequest | DunningCase | 409 The case is already resolved, or the decline is hard and no other card was given.; 422 The payment was declined again. | opens modal first |
 
+**Rules for what is shown** (from the Ticketing & Guest Commerce (guest web, guest app, kiosk, partner portal, POS ticket sale) process; these refine the tables above and win where they differ)
+
+- **membership card**: Member name and photo, membership ID, validity, tier, QR for entry; linked members listed (view only). *(source: DI-201)*
+- **billing statement**: Line by line, with VAT, invoice number and member savings; send as PDF or CSV. States: soft decline (Retry now + Use another card), hard decline (Use another card only), declined again (Use another card + the next automatic retry date), paid ("Your membership continues"). *(source: DI-1036; REV3 DG-2; AUDIT-29SEP (Account and services))*
+- **instalments**: Where the plan allows, the instalment schedule with paid and upcoming instalments. *(source: screens/P01-guest-web-storefront.yaml#WEB-023 apis (listInstalmentPlans))*
+
+**What each action does** (from the Ticketing & Guest Commerce (guest web, guest app, kiosk, partner portal, POS ticket sale) process; these refine the tables above and win where they differ)
+
+- **Retry now / Use another card**: Retries the declined renewal on the same or a saved card; success shows paid, failure the next state. *(source: contracts/satellite/payments.yaml#retryMyDunningPayment; DI-1036)*
+- **Upgrade, suspend, cancel**: Each offered only within the venue's timing windows (e.g. upgrade only in the final two months); cancel confirms what is lost and when. *(source: DI-467)*
+
 **Data it reads**: `listBillingStatements` (onLoad, Membership billing statements); `listMyPaymentIssues` (onLoad, Declined renewals waiting on the guest); `getMyMemberships` (onLoad, A guest's own memberships, benefits and history); `listInstalmentPlans` (onLoad, Instalment plans and schedule)
 
 **Where the user goes next**
@@ -600,6 +753,19 @@ Errors to draw in the form: 409 The case is already resolved, or the decline is 
 | Permission denied (`?state=emptyNoAccess`) | **There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the … |
 | Offline (`?state=offline`) | **The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 The case is already resolved, or the decline is hard and no other card was given.; 409 The order already has a plan, or is already paid in full.; 422 The order or product does not qualify under the instalment policy, or the count or frequency is outside it, or the first instalment was declined.; 422 The payment was declined again. |
+
+#### Consistency with other screens
+
+- Match `GST-015`: The app shows the same decline states and statement.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+member: Ahmed Al Mansoori, SP-AP-0042317, valid to 30 Sep 2027
+statement: 1 Oct 2026 · Annual pass renewal AED 1,295 (incl. VAT AED 61.67) · Declined (soft)
+```
 
 #### Permissions
 
@@ -644,9 +810,9 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Configurable by the tenant
 
-This is a white-label guest screen: it is drawn in the venue's brand, never TICVAI's (except the fixed *Powered by TICVAI* credit). Draw it with the **default theme**, and on the key screens one **alternate tenant theme** (`handoff/design-batches/apps/1-guest-app/WHITE-LABEL.md`).
+This is a white-label guest screen: it is drawn in the venue's brand, never TICVAI's (except the *Powered by TICVAI* credit, a tenant toggle that is on by default: `brand.showPoweredBy`). It has no dark or light mode: the venue's theme applies on every device setting. Draw it with the **default theme**, and on the key screens one **alternate tenant theme** (`handoff/design-batches/apps/1-guest-app/WHITE-LABEL.md`).
 
-**Shell-wide, on every guest screen:** Brand (10, CMS-002, CMS-004, ADM-016); Theme (31, CMS-005, CMS-003, ADM-016); Fonts (5, CMS-003); Header (5, CMS-007); Navigation (17, CMS-009); Footer (website) (15, CMS-007); Languages and right-to-left (2, CMS-011, ADM-018); Modules shown to guests (3, CMS-001); Features (3, CMS-001); Custom domain (website) (3, CMS-017, ADM-017); SEO metadata (website) (13, CMS-013). Each element, its CMS field, allowed values and default: `handoff/design-batches/apps/1-guest-app/WHITE-LABEL.md`.
+**Shell-wide, on every guest screen:** Brand (11, CMS-002, CMS-004, CMS-104); Theme (27, CMS-005, ADM-016); Fonts (5, CMS-003); Header (5, CMS-009); Navigation (17, CMS-009); Footer (website) (15, CMS-009); Languages and right-to-left (2, CMS-011, ADM-018); Modules shown to guests (3, CMS-001, ADM-424); Features (3, CMS-001); Custom domain (website) (3, CMS-017, ADM-017); SEO metadata (website) (13, CMS-013). Each element, its CMS field, allowed values and default: `handoff/design-batches/apps/1-guest-app/WHITE-LABEL.md`.
 
 #### References
 
@@ -670,7 +836,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 
 ### `WEB-024` Devices, Wishlist & Consent
 
-**See loyalty & rewards for this venue.**
+**Your devices, security, cookie choices and data rights.**
 
 | | |
 |---|---|
@@ -678,7 +844,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 | Module | Membership, Loyalty & Value · wave 3 · needs the `marketing` module |
 | Block | Block A · ticket #18225 (APP-WEB-WEB-024) |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025); in the flows as guest |
-| Device and orientation | This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. · LTR and RTL · light theme |
+| Device and orientation | This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. · LTR and RTL · the venue's theme |
 | Pattern | listDetail (compact density): `listGuestDevices` reads the population and `getWishlist` reads one of them — list, select, act |
 | Offline | **Nothing here is offered offline, and the banner says so.** An erasure request or a device change queued and never sent is worse than one that could not be made — the legal clock starts when the platform receives it, and a device signed out offline is still signed in. |
 | Opens with | `deviceId` (deepLink), `itemId` (deepLink), `subjectId` (session), `enrolmentId` (navigation), `methodId` (navigation) · cold entry: **A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared ticket, a forwarded confirmation … |
@@ -688,12 +854,22 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 
 **Known gaps.** **`getWaiverStatus` declares its response inline**, so the component that shows it names fields but binds to no schema. The contract should name the shape.
 
+**From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** The web account's devices, security, Face Pass status, cookie choices, consent and data rights, built as one implementation with WEB-009 (GAP-D3). From this process's angle it is where a signed-in guest reviews consent and cookie decisions, downloads their data and asks for erasure, all with the same honesty as GST-066. Withdrawing must be one step, and erasure must be explained before it is offered.
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- getWaiverStatus returns an inline response with no named schema. (CHG-SGU-024)
+
+**Fixed on main** (the package already carries these; draw what it says): Purpose still reads "See loyalty & rewards for this venue". (CHG-SGU-017); "Signed-in devices" with "Sign out this device" is bound to listGuestDevices / revokeGuestDevice, which are push-notification registrations. (CHG-SGU-017); Action-bar buttons "Add to wishlist", "Register guest device", "Record consent" and "Grant delegation" sit on the security and privacy pane. (CHG-SGU-017).
+
 #### Inputs: what the user enters or picks
 
 **On the screen**
 
 | Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
 |---|---|---|---|---|---|---|---|
+| What we may send you | repeatable rows | optional | — | — | — | One row per configured purpose (`listConsentPurposes`), its channels as toggles, its plain-language description and the notice version in force; the current position from `getGuestConsents` (Given … | `ConsentState.purposes` |
+| Consent toggle | repeatable rows | optional | — | — | — | Per purpose and channel; recorded at once on change, append-only. | `ConsentState.purposes` |
 | Whose Face Pass | select field | — | — | — | — | **Who is this for** (decided 28 September, audit R205): the signed-in guest and each child linked to them (`heldByThisGuest` with `delegationKind` `familyMember` or `primaryHolder`), so a parent sees … | — |
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
@@ -707,67 +883,17 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 | Channel | select | — | B2C website · Customer portal · Mobile app · Embedded checkout · White label site · Partner microsite | `listPublishedTrackingTechnologies` ?channel |
 | Category | radio group | — | Strictly necessary · Functional · Analytics · Personalisation · Marketing | `listPublishedTrackingTechnologies` ?category |
 
-**Form: Grant delegation** (modal, opened by *Grant delegation*; *Grant delegation* calls `grantDelegation`, *Cancel* sends nothing)
-
-**Collects what `grantDelegation` sends before it is called.** Required: `overSubjectId`, `delegationKind`, `permission`. Optional: `overObjectRef`, `quota`, `validTo`, `isRevocableBySubject`. Dismissing sends nothing; the screen behind is unchanged.
-
-| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
-|---|---|---|---|---|---|---|---|
-| Over subject `overSubjectId` | picker: choose an over subject | required | — | — | shows names, sends the id | — | `grantDelegation` body |
-| Delegation kind `delegationKind` | select | required | — | Primary holder · Family member · Group leader · Attendee · Corporate admin · Corporate member · Carer | — | — | `grantDelegation` body |
-| Permission `permission` | text field | required | — | — | — | — | `grantDelegation` body |
-| Over object ref `overObjectRef` | text field | optional | — | — | — | — | `grantDelegation` body |
-| Quota `quota` | number field | optional | — | — | — | — | `grantDelegation` body |
-| Valid to `validTo` | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `grantDelegation` body |
-| Is revocable by subject `isRevocableBySubject` | toggle | optional | on | — | — | — | `grantDelegation` body |
-
-Errors to draw in the form: 409 A cycle, or a minor granting authority over an adult. Both are refused — a delegation graph with a loop is one nobody can reason about, and the second is a …
-
-**Form: Add to wishlist** (modal, opened by *Add to wishlist*; *Add to wishlist* calls `addToWishlist`, *Cancel* sends nothing)
-
-**Collects what `addToWishlist` sends before it is called.** Required: `variantId`. Optional: `performanceId`, `note`. Dismissing sends nothing; the screen behind is unchanged.
-
-| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
-|---|---|---|---|---|---|---|---|
-| Variant `variantId` | picker: choose a variant | required | — | — | shows names, sends the id | — | `addToWishlist` body |
-| Performance `performanceId` | picker: choose a performance | optional | — | — | shows names, sends the id | Saving a specific date rather than the product generally. | `addToWishlist` body |
-| Note `note` | text area | optional | — | max length 200 | — | — | `addToWishlist` body |
-
-Errors to draw in the form: 404 Variant not found or not sellable in this venue
-
-**Form: Record consent** (modal, opened by *Record consent*; *Record consent* calls `recordConsent`, *Cancel* sends nothing)
-
-**Collects what `recordConsent` sends before it is called.** Required: `purpose`, `decision`, `noticeVersion`, `source`, `recordedAt`. Optional: `channels`. Dismissing sends nothing; the screen behind is unchanged.
-
-| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
-|---|---|---|---|---|---|---|---|
-| Purpose `purpose` | select | required | — | Marketing · Personalisation · Profiling · Third party sharing · AI processing · Transactional | — | — | `recordConsent` body |
-| Decision `decision` | segmented control | required | — | Granted · Withdrawn · Not asked | — | — | `recordConsent` body |
-| Channels `channels` | multi-select chips | optional | — | Email · SMS · Whatsapp · Push · In app · Post | — | Omit to apply to every channel the purpose covers. | `recordConsent` body |
-| Notice version `noticeVersion` | text field | required | — | — | — | — | `recordConsent` body |
-| Source `source` | select | required | — | Guest app · Website · Kiosk · POS · Call centre · Import · Agent recorded · Cookie banner · Checkout | — | `checkout` (30 September, M18-15): an opt-in ticked beside the terms at checkout, carried on orders `checkoutCart` `marketingConsents[]` and recorded by `recordCheckoutConsents` … | `recordConsent` body |
-| Recorded at `recordedAt` | date and time picker | required | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `recordConsent` body |
-
-Errors to draw in the form: 400 Notice version unknown, or the purpose is not configured
-
-**Form: Register guest device** (modal, opened by *Register guest device*; *Register guest device* calls `registerGuestDevice`, *Cancel* sends nothing)
-
-**Collects what `registerGuestDevice` sends before it is called.** Required: `platform`, `token`. Optional: `appVersion`, `osVersion`, `deviceModel`, `locale`. Dismissing sends nothing; the screen behind is unchanged.
-
-| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
-|---|---|---|---|---|---|---|---|
-| Platform `platform` | segmented control | required | — | Ios · Android · Web | — | — | `registerGuestDevice` body |
-| Token `token` | text area | required | — | max length 512 | — | — | `registerGuestDevice` body |
-| App version `appVersion` | text field | optional | — | — | — | — | `registerGuestDevice` body |
-| Os version `osVersion` | text field | optional | — | — | — | — | `registerGuestDevice` body |
-| Device model `deviceModel` | text field | optional | — | — | — | — | `registerGuestDevice` body |
-| Locale `locale` | text field | optional | — | — | — | — | `registerGuestDevice` body |
-
-**Sent by *Export subject data*** (`exportSubjectData`; no form is declared, so these are filled from the screen or collected inline)
+**Sent by *Get a copy of my data*** (`exportSubjectData`; no form is declared, so these are filled from the screen or collected inline)
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
 | Format `format` | segmented control | optional | Json | Json · Csv · Pdf | — | — | `exportSubjectData` body |
+
+**Rules for these inputs** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
+
+- **Cookie preferences**: Categories strictly necessary (always on, not a toggle, with its description), functional, analytics, personalisation and marketing (all off until chosen). "Reject non-essential" is always one click. A change is a new decision row, never an edit. *(source: contracts/satellite/marketing-crm.yaml#recordDeviceConsent; contracts/satellite/marketing-crm.yaml#/components/schemas/CookieCategory; contracts/satellite/marketing-crm.yaml#listCookieBannerPreference)*
+- **Whose Face Pass**: The signed-in guest and each linked child they hold as guardian; a parent sees and withdraws a child's enrolment. Enrolment itself stays mobile-only (GST-069). *(source: R205; DI-1077)*
+- **Data copy format**: JSON, CSV or PDF; PDF is the default for a person, the others for portability. *(source: contracts/spine/identity.yaml#exportSubjectData)*
 
 #### Outputs: what the screen shows and produces
 
@@ -806,6 +932,21 @@ Errors to draw in the form: 400 Notice version unknown, or the purpose is not co
 | Is revocable by subject | yes / no (icon or chip) | Whether the person it is over can end it. A guest who linked a family member should be able to unlink them; a corporate member should not … |
 | Scope path | text | — |
 | Effect | chip: ALLOW, DENY | — |
+
+**Purposes and notices** (card list, from `listConsentPurposes`): The configured purposes with their plain-language description, channels and the notice version in force.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| Purpose | chip: Marketing, Personalisation, Profiling, Third party sharing, AI processing … | — |
+| Display name | text | — |
+| Description | text | — |
+| Channels | list or chips (count when long) | — |
+| Notice version | text | Current version of the notice. A consent against a superseded version is reported as requiring renewal rather than silently honoured. |
+| Is required for service | yes / no (icon or chip) | True for transactional. Withdrawing it means the service cannot be delivered, so it is presented differently. |
+| Expires after months | 1,234 | — |
+| Next cursor | text | — |
+| Has more | yes / no (icon or chip) | — |
 
 **The selected guest device** (detail panel, from `listGuestDevices`)
 
@@ -878,7 +1019,7 @@ Errors to draw in the form: 400 Notice version unknown, or the purpose is not co
 | Enrolled at | 1 Oct 2026, 14:30 | — |
 | Last used at | 1 Oct 2026, 14:30 | — |
 
-**Signed-in devices** (card list, from `listGuestDevices`): The devices signed in to this account, with **Sign out this device** for a lost one (`revokeGuestDevice`).
+**Notifications on my devices** (card list, from `listGuestDevices`): Push registrations (`listGuestDevices`). "Stop notifications on this device" (`revokeGuestDevice`) stops notifications; it does not sign a lost device out. No guest operation lists or ends other sessions yet (CHG-SGU-024).
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -905,17 +1046,24 @@ Errors to draw in the form: 400 Notice version unknown, or the purpose is not co
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
 | Confirm (confirm dialog) | navigation or local | — | — | — | — |
-| Add to wishlist (primary button) | `addToWishlist` POST `/guests/{subjectId}/wishlist` | inline | Wishlist | 404 Variant not found or not sellable in this venue | opens modal first |
-| Record consent (secondary button) | `recordConsent` POST `/guests/{subjectId}/consents` | RecordConsentRequest | ConsentState | 400 Notice version unknown, or the purpose is not configured | opens modal first |
-| Register guest device (secondary button) | `registerGuestDevice` POST `/guests/{subjectId}/devices` | inline | GuestDevice | — | opens modal first |
-| Remove from wishlist (destructive button) | `removeFromWishlist` DELETE `/guests/{subjectId}/wishlist/{itemId}` | — | — | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path. | — |
-| Revoke guest device (destructive button) | `revokeGuestDevice` DELETE `/guests/{subjectId}/devices/{deviceId}` | — | — | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path. | — |
-| Delete guest account (destructive button) | `deleteGuestAccount` DELETE `/auth/guest/account` | — | inline | 409 Open orders or an unexpired entitlement exist. Deleting an account with a valid ticket in it strands the guest at a gate. | — |
-| Export subject data (secondary button) | `exportSubjectData` POST `/guests/{subjectId}/data-export` | inline | inline | — | — |
-| Grant delegation (secondary button) | `grantDelegation` POST `/guests/{subjectId}/delegations` | inline | DelegatedAccess | 409 A cycle, or a minor granting authority over an adult. Both are refused — a delegation graph with a loop is one nobody can reason about, and the second is a … | opens modal first |
+| Stop notifications on this device (destructive button) | `revokeGuestDevice` DELETE `/guests/{subjectId}/devices/{deviceId}` | — | — | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path. | — |
+| Delete my account (destructive button) | `deleteGuestAccount` DELETE `/auth/guest/account` | — | inline | 409 Open orders or an unexpired entitlement exist. Deleting an account with a valid ticket in it strands the guest at a gate. | — |
+| Get a copy of my data (secondary button) | `exportSubjectData` POST `/guests/{subjectId}/data-export` | inline | inline | — | — |
 | Revoke face pass (destructive button) | `revokeFacePass` DELETE `/face-pass/enrolments/{enrolmentId}` | — | — | — | — |
 
-**Data it reads**: `getWishlist` (onLoad, Read a guest's saved items); `listGuestDevices` (onLoad, A guest's registered devices); `getGuestConsents` (onLoad, What this guest has consented to); `getWaiverStatus` (onLoad, Which waivers are signed and which are due); `listDelegations` (onLoad, Who may act for this guest); `listMfaMethods` (onLoad, The guest's enrolled second-factor methods); `getCookieConsentRuntime` (onLoad, Preference centre: categories and the current decision); `listPublishedTrackingTechnologies` (onLoad, Each cookie's name, provider, purpose, expiry and party); `getDeviceConsentHistory` (onLoad, My cookie decisions so far)
+**Rules for what is shown** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
+
+- **Cookie technologies**: Per category, the approved technologies with name, provider, purpose, expiry in days, and first or third party. Detected, blocked and retired entries never appear. *(source: contracts/satellite/marketing-crm.yaml#listPublishedTrackingTechnologies)*
+- **Consent state**: Same rows and states as WEB-020 (Given, Withdrawn, Not asked, Needs renewing). *(source: contracts/satellite/marketing-crm.yaml#getGuestConsents)*
+- **Waiver status**: Whether the guest's tickets need a waiver still unsigned, which one, and those expiring soon, with Sign now. *(source: contracts/satellite/marketing-crm.yaml#getWaiverStatus)*
+
+**What each action does** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
+
+- **Withdraw Face Pass**: The confirmation says the face template is destroyed, not flagged, and that the pass survives so the guest enters another way. After confirming it cannot be undone except by enrolling again in the app. *(source: contracts/spine/access.yaml#revokeFacePass)*
+- **Get a copy of my data**: Raises a data request and shows its reference and estimated completion date; the file arrives by the notification the venue configured. *(source: contracts/spine/identity.yaml#exportSubjectData)*
+- **Delete my account**: Explains first: personal details are erased; bookings and payments stay in the venue's financial records under an anonymous reference; the request is completed by an estimated date. Then a typed confirmation. Raises an erasure request; it is not an instant delete. *(source: contracts/spine/identity.yaml#deleteGuestAccount; DI-379)*
+
+**Data it reads**: `getWishlist` (onLoad, Read a guest's saved items); `listGuestDevices` (onLoad, A guest's registered devices); `getGuestConsents` (onLoad, What this guest has consented to); `getWaiverStatus` (onLoad, Which waivers are signed and which are due); `listDelegations` (onLoad, Who may act for this guest); `listMfaMethods` (onLoad, The guest's enrolled second-factor methods); `getCookieConsentRuntime` (onLoad, Preference centre: categories and the current decision); `listPublishedTrackingTechnologies` (onLoad, Each cookie's name, provider, purpose, expiry and party); `getDeviceConsentHistory` (onLoad, My cookie decisions so far); `listConsentPurposes` (onLoad, The purposes the consent rows show)
 
 **Where the user goes next**
 
@@ -926,9 +1074,8 @@ Errors to draw in the form: 400 Notice version unknown, or the purpose is not co
 
 **What opens over it**
 
-- confirmDialog *Remove from wishlist*: **Names what `removeFromWishlist` changes and what it leaves alone**, in the consequence rather than the verb. A devices wishlist consent this affects should be identified in the dialog, not just counted.
-- confirmDialog *Revoke guest device*: **Names what `revokeGuestDevice` changes and what it leaves alone**, in the consequence rather than the verb. A devices wishlist consent this affects should be identified in the dialog, not just counted.
-- confirmDialog *Delete guest account*: **Names what `deleteGuestAccount` changes and what it leaves alone**, in the consequence rather than the verb. A devices wishlist consent this affects should be identified in the dialog, not just counted.
+- confirmDialog *Stop notifications on this device*: **Names what `revokeGuestDevice` changes and what it leaves alone**, in the consequence rather than the verb. A devices wishlist consent this affects should be identified in the dialog, not just counted.
+- confirmDialog *Delete my account*: **Names what `deleteGuestAccount` changes and what it leaves alone**, in the consequence rather than the verb. A devices wishlist consent this affects should be identified in the dialog, not just counted.
 - confirmDialog *Revoke face pass*: **Names what `revokeFacePass` changes and what it leaves alone**, in the consequence rather than the verb. A devices wishlist consent this affects should be identified in the dialog, not just counted.
 
 #### States
@@ -941,23 +1088,48 @@ Errors to draw in the form: 400 Notice version unknown, or the purpose is not co
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the current filters. **The filters are named and clearable from here** — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone. **Added 25 August with the derived list component**: a screen that lists has to say what it shows when the list is empty, and this screen gained the list before it gained the sentence. |
 | Permission denied (`?state=emptyNoAccess`) | **There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the … |
 | Offline (`?state=offline`) | **Nothing here is offered offline, and the banner says so.** An erasure request or a device change queued and never sent is worse than one that could not be made — the legal clock starts when the platform receives it, and a device signed out offline is still signed in. |
-| Validation and conflict | the form keeps what was entered and marks the problem: 400 No published banner design with this id for the channel, or a category the design does not offer; 400 Notice version unknown, or the purpose is not configured; 409 A cycle, or a minor granting authority over an adult. Both are refused — a delegation graph with a loop is one nobody can reason about, and the second is a …; 409 Last remaining method of a principal who holds a permission that … |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 No published banner design with this id for the channel, or a category the design does not offer; 400 Notice version unknown, or the purpose is not configured; 409 Last remaining method of a principal who holds a permission that requires MFA (audit R135); 409 Open orders or an unexpired entitlement exist. Deleting an account with a valid ticket in it strands the guest at a gate. |
+
+#### Edge cases to draw
+
+- **The guest signed in on a shared browser**: Cookie history from before sign-in now belongs to the guest (claimed); the device history read answers 404 for a claimed key, so show the guest's own consents instead. *(source: contracts/satellite/marketing-crm.yaml#getDeviceConsentHistory)*
+
+#### Consistency with other screens
+
+- Match `GST-066`: Same data-request wording, same erasure explanation, same statuses.
+- Match `GST-073`: The app's devices and security screen uses the same device rows and the same "Sign out this device" wording.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+devices:
+- iPhone 15 - Coastal Aqua app - last active today 09:12
+- Chrome on Windows - last active 28 Sep 2026
+dataRequest:
+  reference: DR-2026-00412
+  kind: Copy of my data
+  raised: 1 Oct 2026
+  due: 31 Oct 2026
+  status: In progress
+cookies:
+  analytics: false
+  marketing: false
+  functional: true
+```
 
 #### Permissions
 
-- `addToWishlist` → no permission · guest
 - `getWishlist` → no permission · guest
 - `listGuestDevices` → no permission · guest
-- `recordConsent` → no permission · guest
-- `registerGuestDevice` → no permission · guest
-- `removeFromWishlist` → no permission · guest
+- `recordConsent` → no permission · guest, staff
 - `revokeGuestDevice` → no permission · guest
 - `deleteGuestAccount` → no permission · guest
 - `exportSubjectData` → `GUEST_VIEW_PII` (operate) · staff, guest
 - `getFacePassEnrolment` → `GUEST_VIEW` (read) · staff, guest
 - `getGuestConsents` → `GUEST_VIEW` (read) · staff, guest
 - `getWaiverStatus` → `GUEST_VIEW` (read) · staff, guest, device
-- `grantDelegation` → `GUEST_MANAGE` (configure) · staff, guest
 - `listDelegations` → `GUEST_VIEW` (read) · staff, guest
 - `revokeFacePass` → `GUEST_MANAGE` (configure) · staff, guest
 - `listMfaMethods` → no permission · staff, partner, guest
@@ -968,16 +1140,16 @@ Errors to draw in the form: 400 Notice version unknown, or the purpose is not co
 - `listPublishedTrackingTechnologies` → no permission · anonymous, guest
 - `getDeviceConsentHistory` → no permission · anonymous, guest
 - `recordDeviceConsent` → no permission · anonymous, guest
+- `listConsentPurposes` → `GUEST_VIEW` (read) · staff, guest
 
 **A refused user sees:** **There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the …
 
 #### Requirements it meets
 
-60 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+59 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
 
 | Ref | Requirement (shortened) | Domain | Verdict | Via |
 |---|---|---|---|---|
-| 2.6.44 | System shall allow guests to save tickets, memberships, events, packages, add-ons, F&B items, retail products, and experiences to a wishlist for future purchase. Wishlist items shall remain linked to … | Ticketing Sales | CONTRACTED | `addToWishlist` |
 | 5.3.9 | The system should allow the guest to explicitly opt in to receive any information from venue or its partners. | F&B & Guest Management | CONTRACTED | `recordConsent` |
 | 5.3.18 | Maintain auditable consent records for Email, SMS, WhatsApp, Push Notifications, Marketing Communications, Privacy Policies, Terms & Conditions, and GDPR compliance. | F&B & Guest Management | CONTRACTED | `recordConsent` |
 | 7.3.9 | Store and manage customer consent preferences for email, SMS, WhatsApp, push notifications and third-party marketing. Record consent status, source, timestamp, IP address and revocation history. … | F&B POS | CONTRACTED | `recordConsent` |
@@ -989,7 +1161,8 @@ Errors to draw in the form: 400 Notice version unknown, or the purpose is not co
 | 22.13.4 | Consent Capture Workflows | Marketing & CRM | CONTRACTED | `recordConsent` |
 | 22.13.9 | Data Processing Consent | Marketing & CRM | CONTRACTED | `recordConsent` |
 | 7.3.10 | Allow authorized users to export customer data in PDF, Excel, CSV or JSON formats. Support anonymization, soft deletion and hard deletion workflows according to configured privacy policies. | F&B POS | CONTRACTED | `exportSubjectData` |
-| … 48 more | | | | `traceability.json` |
+| 7.4.1 | Looking for a customer is quick and simple based on multiple filtering or search criteria. | F&B POS | CONTRACTED | `exportSubjectData` |
+| … 47 more | | | | `traceability.json` |
 
 #### Client meeting inputs
 
@@ -1009,19 +1182,11 @@ Also apply: 39 for all of P01, 29 for every app (section *Design inputs from the
 
 #### Configurable by the tenant
 
-This is a white-label guest screen: it is drawn in the venue's brand, never TICVAI's (except the fixed *Powered by TICVAI* credit). Draw it with the **default theme**, and on the key screens one **alternate tenant theme** (`handoff/design-batches/apps/1-guest-app/WHITE-LABEL.md`).
+This is a white-label guest screen: it is drawn in the venue's brand, never TICVAI's (except the *Powered by TICVAI* credit, a tenant toggle that is on by default: `brand.showPoweredBy`). It has no dark or light mode: the venue's theme applies on every device setting. Draw it with the **default theme**, and on the key screens one **alternate tenant theme** (`handoff/design-batches/apps/1-guest-app/WHITE-LABEL.md`).
 
-**Shell-wide, on every guest screen:** Brand (10, CMS-002, CMS-004, ADM-016); Theme (31, CMS-005, CMS-003, ADM-016); Fonts (5, CMS-003); Header (5, CMS-007); Navigation (17, CMS-009); Footer (website) (15, CMS-007); Languages and right-to-left (2, CMS-011, ADM-018); Modules shown to guests (3, CMS-001); Features (3, CMS-001); Custom domain (website) (3, CMS-017, ADM-017); SEO metadata (website) (13, CMS-013). Each element, its CMS field, allowed values and default: `handoff/design-batches/apps/1-guest-app/WHITE-LABEL.md`.
+**Shell-wide, on every guest screen:** Brand (11, CMS-002, CMS-004, CMS-104); Theme (27, CMS-005, ADM-016); Fonts (5, CMS-003); Header (5, CMS-009); Navigation (17, CMS-009); Footer (website) (15, CMS-009); Languages and right-to-left (2, CMS-011, ADM-018); Modules shown to guests (3, CMS-001, ADM-424); Features (3, CMS-001); Custom domain (website) (3, CMS-017, ADM-017); SEO metadata (website) (13, CMS-013). Each element, its CMS field, allowed values and default: `handoff/design-batches/apps/1-guest-app/WHITE-LABEL.md`.
 
 **Specific to this screen** (the tenant's setting is the input; the right column is what it changes here). Draw each with its default, and the alternate where the alternate theme sets one.
-
-*Footer*, set in `CMS-007` Page Builder:
-
-Also set there, as content the tenant writes: social links: platform.
-
-*SEO metadata*, set in `CMS-013` SEO & Metadata:
-
-Also set there, as content the tenant writes: locale.
 
 *Cookie banner*, set in `CMS-026` Cookie Banner & Preference Center Designer:
 
@@ -1060,14 +1225,15 @@ Also set there, as content the tenant writes: theme, buttons, links.
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (24), with its required mark, default, format and its error state (400, 403, 404, 409, 422).
-- [ ] Every output is drawn (82 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (4), with its required mark, default, format and its error state (400, 403, 404, 409, 422).
+- [ ] Every output is drawn (92 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#WEB-024?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: Confirm, Add to wishlist, Record consent, Register guest device, Remove from wishlist, Revoke guest device, Delete guest account, Export subject data, Grant delegation, Revoke face pass.
+- [ ] Every action is wired with its success and its failure: Confirm, Stop notifications on this device, Delete my account, Get a copy of my data, Revoke face pass.
 - [ ] Every transition is wired: `WEB-021`, `WEB-022`, `WEB-023`, `GST-037`.
 - [ ] Sign-in is asked only where the spec asks for it.
 - [ ] The 2 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] Drawn in the default theme; on a key screen also in the alternate tenant theme; nothing hard-codes a brand colour, logo or font.
+- [ ] The 1 edge case(s) from the process notes are drawn.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -1082,15 +1248,29 @@ Also set there, as content the tenant writes: theme, buttons, links.
 | Module | Membership, Loyalty & Value · wave 2 · needs the `marketing` module |
 | Block | Block A · ticket #18208 (APP-WEB-WEB-043) |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025) |
-| Device and orientation | This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. · LTR and RTL · light theme |
+| Device and orientation | This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. · LTR and RTL · the venue's theme |
 | Pattern | listDetail (compact density): `listLoyaltyProgrammes` reads the population and `getLoyaltyPosition` reads one of them — list, select, act |
 | Offline | **The offline banner shows.** The last known balance stays with its age, and **points earned since are not shown** — and that is said. Redeeming and referring need the connection. |
-| Opens with | `subjectId` (session) · cold entry: **A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared link, a scanned code and a … |
+| Opens with | `subjectId` (session), `customerId` (session) · cold entry: **A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared link, a scanned code and a … |
 | Route | `/loyalty-and-rewards` |
 
 **What the spec says about it.** **P01 Board 3 drew *Membership* with nothing behind it.** `getLoyaltyPosition` and `listLoyaltyProgrammes` were app-only — **the surface a guest checks their points on between visits is the web one.** **`evaluatePromotions` removed 27 September 2026 (audit root R292).** It evaluates promotions against a cart — `EvaluatePromotionsRequest` requires `venueId`, `channel` and at least one line — and this screen arrives with no parameter and holds no cart. Offers apply on WEB-005 and WEB-010, which keep the call.
 
 **Known gaps.** **`getLoyaltyPosition` declares its response inline**, so the component that shows it names fields but binds to no schema. The contract should name the shape.
+
+**From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** The web loyalty page, the surface a guest checks points on between visits. Same position card as GST-036, plus redeem and referral. It sits in the "At the venue" section of the prototype.
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- Same shape and permission issues as GST-036 (getLoyaltyPosition shape, listLoyaltyProgrammes MARKETING_VIEW, rewards and badges unwired). (CHG-SGU-024)
+
+**Fixed on main** (the package already carries these; draw what it says): The "Create referral" modal asks the guest for id, referrerSubjectId, code, status, qualifying action, reward ids and expiry. (CHG-SGU-017).
+
+#### Decided on this screen
+
+Answered questions: draw the decision, not the old default. Where a decision and the tables below differ, the decision wins.
+
+- **Same programme-configuration question as GST-036.** → Drawn default stands (answer: "Default / recommended accepted"): Same sample tiers. *(decided by Chinmay, 2026-10-02; DEC-027 / CHG-NOTE-002)*
 
 #### Inputs: what the user enters or picks
 
@@ -1101,10 +1281,13 @@ Also set there, as content the tenant writes: theme, buttons, links.
 | Programme | picker: choose a programme | — | — | `getLoyaltyPosition` ?programmeId |
 | Status | select | — | Draft · Scheduled · Live · Paused · Expired · Ended | `listPromotions` ?status |
 | Active at | date and time picker | — | — | `listPromotions` ?activeAt |
+| Programme | picker: choose a programme | — | — | `listRewards` ?programmeId |
+| Programme | picker: choose a programme | — | — | `listLeaderboard` ?programmeId |
+| Window | segmented control | Month | Week · Month · Season | `listLeaderboard` ?window |
 
-**Form: Create referral** (modal, opened by *Create referral*; *Create referral* calls `createReferral`, *Cancel* sends nothing)
+**Form: Invite a friend** (confirmDialog, opened by *Invite a friend*; *Invite a friend* calls `createReferral`, *Cancel* sends nothing)
 
-**Collects what `createReferral` sends before it is called.** Required: `id`, `referrerSubjectId`, `code`, `status`. Optional: `refereeSubjectId`, `qualifyingAction`, `referrerRewardId`, `refereeRewardId`, `expiresAt`, `scopePath`. Dismissing sends nothing; the screen behind is unchanged.
+One tap: the code that comes back is shown with Share. Code, status, qualifying action, rewards and expiry are set by the platform; the guest types nothing.
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
@@ -1112,9 +1295,9 @@ Also set there, as content the tenant writes: theme, buttons, links.
 | Qualifying action `qualifyingAction` | segmented control | optional | — | First purchase · First visit · Membership purchase | — | — | `createReferral` body |
 | Expires at `expiresAt` | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `createReferral` body |
 
-**Form: Redeem loyalty points** (modal, opened by *Redeem loyalty points*; *Redeem loyalty points* calls `redeemLoyaltyPoints`, *Cancel* sends nothing)
+**Form: Redeem** (modal, opened by *Redeem*; *Redeem* calls `redeemLoyaltyPoints`, *Cancel* sends nothing)
 
-**Collects what `redeemLoyaltyPoints` sends before it is called.** Required: `subjectId`, `programmeId`, `points`. Optional: `rewardId`, `orderId`. Dismissing sends nothing; the screen behind is unchanged.
+The reward chosen from the list and its points; the guest is the caller, so no subject or programme is asked.
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
@@ -1125,6 +1308,18 @@ Also set there, as content the tenant writes: theme, buttons, links.
 | Order `orderId` | picker: choose an order | optional | — | — | shows names, sends the id | Where points are being used against a sale rather than for a catalogue reward. | `redeemLoyaltyPoints` body |
 
 Errors to draw in the form: 409 The balance does not cover `points` (`insufficientPoints`). Nothing is held. (LoyaltyRefusedProblem)
+
+**Form: Choose my name** (modal, opened by *Choose my name*; *Choose my name* calls `setLeaderboardNickname`, *Cancel* sends nothing)
+
+The nickname shown on the leaderboard.
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Nickname `nickname` | text field | required | — | min length 2; max length 24; pattern `^[\p{L}\p{N}][\p{L}\p{N} _.-]{0,22}[\p{L}\p{N}]$` | — | — | `setLeaderboardNickname` body |
+
+**Rules for these inputs** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
+
+- **Redeem**: Pick a reward; the confirmation shows the points it costs and the balance after. Points cannot be split between programmes. Refused with a clear reason when the tier does not qualify or the balance is short. *(source: contracts/satellite/marketing-crm.yaml#redeemLoyaltyPoints; contracts/satellite/marketing-crm.yaml#/components/schemas/LoyaltyRefusedProblem)*
 
 #### Outputs: what the screen shows and produces
 
@@ -1165,6 +1360,53 @@ Errors to draw in the form: 409 The balance does not cover `points` (`insufficie
 
 **Detail** (detail panel)
 
+**Rewards** (card list, from `listRewards`): What points can be turned into, with the points each needs; Redeem on a reward the guest can afford.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
+| Loyalty program | the name it points at, never the id | — |
+| Code | text | — |
+| Name | text | — |
+| Type | text | — |
+| Product | the name it points at, never the id | — |
+| Points cost | 1,234.5 | — |
+| Discount value | 1,234.5 | — |
+| Validity days | 1,234 | — |
+| Is active | yes / no (icon or chip) | — |
+| Next cursor | text | — |
+| Has more | yes / no (icon or chip) | — |
+
+**My badges** (card list, from `listCustomerBadges`): Status badges the guest holds (DI-392).
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
+| Customer | the name it points at, never the id | — |
+| Badge | the name it points at, never the id | — |
+| Challenge | the name it points at, never the id | — |
+| Source type | text | — |
+| Source reference | the name it points at, never the id | — |
+| Awarded at | 1 Oct 2026, 14:30 | — |
+| Expires at | 1 Oct 2026, 14:30 | — |
+| Status | text | — |
+| Next cursor | text | — |
+| Has more | yes / no (icon or chip) | — |
+
+**Leaderboard** (card list, from `listLeaderboard`): Standings by nickname; the guest sets theirs with Choose my name.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| Rank | 1,234 | — |
+| Nickname | text | Always present, and never their real name. The guest's chosen `leaderboardNickname` where they have set one, and otherwise a generated … |
+| Points | 1,234 | — |
+| Is me | yes / no (icon or chip) | How a client highlights the caller's own row without learning who anybody else is. |
+| Next cursor | text | — |
+| Has more | yes / no (icon or chip) | — |
+
 **Loyalty position** (detail panel, from `getLoyaltyPosition`): Shows `subjectId`, `programmeId`, `pointsBalance`, `pointsPending`, `tier`, `nextTier`, `pointsToNextTier`, `expiringPoints`, `expiringAt` from `getLoyaltyPosition`'s inline response. **The response has no named schema**, so this cannot bind until the contract names one.
 
 | Shows | Format | Notes |
@@ -1183,10 +1425,19 @@ Errors to draw in the form: 409 The balance does not cover `points` (`insufficie
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Create referral (primary button) | `createReferral` POST `/referrals` | Referral | Referral | — | opens modal first |
-| Redeem loyalty points (secondary button) | `redeemLoyaltyPoints` POST `/loyalty/redemptions` | inline | LoyaltyPosition | 409 The balance does not cover `points` (`insufficientPoints`). Nothing is held. (LoyaltyRefusedProblem) | opens modal first |
+| Invite a friend (primary button) | `createReferral` POST `/referrals` | Referral | Referral | — | opens confirmDialog first |
+| Redeem (secondary button) | `redeemLoyaltyPoints` POST `/loyalty/redemptions` | inline | LoyaltyPosition | 409 The balance does not cover `points` (`insufficientPoints`). Nothing is held. (LoyaltyRefusedProblem) | opens modal first |
+| Choose my name (secondary button) | `setLeaderboardNickname` PUT `/loyalty/leaderboard-nickname` | inline | LoyaltyPosition | — | opens modal first |
 
-**Data it reads**: `getLoyaltyPosition` (onLoad, A guest's points, tier and what is within reach); `listLoyaltyProgrammes` (onLoad, List loyalty programmes); `listPromotions` (onLoad, List promotions); `decideRecommendations` (onLoad, Recommendation slot (homepage / loyalty placement …)
+**Rules for what is shown** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
+
+- **Position card**: Same as GST-036. *(source: contracts/satellite/marketing-crm.yaml#getLoyaltyPosition)*
+
+**What each action does** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
+
+- **Get my referral code**: Same as GST-036; the guest never fills in ids, status or reward ids. *(source: contracts/satellite/marketing-crm.yaml#createReferral)*
+
+**Data it reads**: `getLoyaltyPosition` (onLoad, A guest's points, tier and what is within reach); `listLoyaltyProgrammes` (onLoad, List loyalty programmes); `listPromotions` (onLoad, List promotions); `decideRecommendations` (onLoad, Recommendation slot (homepage / loyalty placement …); `listRewards` (onLoad, What points can be turned into); `listCustomerBadges` (onLoad, Badges the guest holds); `listLeaderboard` (onLoad, Standings, by nickname)
 
 #### States
 
@@ -1200,6 +1451,25 @@ Errors to draw in the form: 409 The balance does not cover `points` (`insufficie
 | Offline (`?state=offline`) | **The offline banner shows.** The last known balance stays with its age, and **points earned since are not shown** — and that is said. Redeeming and referring need the connection. |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 The balance does not cover `points` (`insufficientPoints`). Nothing is held. (LoyaltyRefusedProblem) |
 
+#### Consistency with other screens
+
+- Match `GST-036`: Same card and wording.
+- Match `WEB-017`: The account tile links here.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+position:
+  tier: Gold
+  points: 6120
+  pending: 0
+  toNext: 3880 to Platinum
+  expiring: none
+redemption: Cabana upgrade - 2,500 points - balance after 3,620
+```
+
 #### Permissions
 
 - `getLoyaltyPosition` → no permission · guest
@@ -1209,12 +1479,16 @@ Errors to draw in the form: 409 The balance does not cover `points` (`insufficie
 - `redeemLoyaltyPoints` → `LOYALTY_REDEEM` (operate) · staff, guest
 - `decideRecommendations` → `AI_USE` (operate) · staff, guest, anonymous
 - `recordRecommendationEvents` → `AI_USE` (operate) · staff, guest, anonymous
+- `listRewards` → `MARKETING_VIEW` (read) · staff, guest
+- `listCustomerBadges` → `MARKETING_VIEW` (read) · staff, guest
+- `listLeaderboard` → no permission · guest
+- `setLeaderboardNickname` → no permission · guest
 
 **A refused user sees:** **There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that …
 
 #### Requirements it meets
 
-56 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+54 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
 
 | Ref | Requirement (shortened) | Domain | Verdict | Via |
 |---|---|---|---|---|
@@ -1230,7 +1504,7 @@ Errors to draw in the form: 409 The balance does not cover `points` (`insufficie
 | 3.6.12 | The system should be able to manage all promotions in Backoffice application, where the positioning of the promotions fits in with the mechanics of the booking platform. In this way the Shop Cart is … | Admission and Access | CONTRACTED | `listPromotions` |
 | 19.2.44 | Points Redemption - System shall support loyalty redemption. | Guest Mobile App & Branding | CONTRACTED | `redeemLoyaltyPoints` |
 | 19.2.45 | Rewards Catalog - System shall provide rewards catalog access. | Guest Mobile App & Branding | CONTRACTED | `redeemLoyaltyPoints` |
-| … 44 more | | | | `traceability.json` |
+| … 42 more | | | | `traceability.json` |
 
 #### Client meeting inputs
 
@@ -1248,9 +1522,9 @@ Also apply: 39 for all of P01, 29 for every app (section *Design inputs from the
 
 #### Configurable by the tenant
 
-This is a white-label guest screen: it is drawn in the venue's brand, never TICVAI's (except the fixed *Powered by TICVAI* credit). Draw it with the **default theme**, and on the key screens one **alternate tenant theme** (`handoff/design-batches/apps/1-guest-app/WHITE-LABEL.md`).
+This is a white-label guest screen: it is drawn in the venue's brand, never TICVAI's (except the *Powered by TICVAI* credit, a tenant toggle that is on by default: `brand.showPoweredBy`). It has no dark or light mode: the venue's theme applies on every device setting. Draw it with the **default theme**, and on the key screens one **alternate tenant theme** (`handoff/design-batches/apps/1-guest-app/WHITE-LABEL.md`).
 
-**Shell-wide, on every guest screen:** Brand (10, CMS-002, CMS-004, ADM-016); Theme (31, CMS-005, CMS-003, ADM-016); Fonts (5, CMS-003); Header (5, CMS-007); Navigation (17, CMS-009); Footer (website) (15, CMS-007); Languages and right-to-left (2, CMS-011, ADM-018); Modules shown to guests (3, CMS-001); Features (3, CMS-001); Custom domain (website) (3, CMS-017, ADM-017); SEO metadata (website) (13, CMS-013). Each element, its CMS field, allowed values and default: `handoff/design-batches/apps/1-guest-app/WHITE-LABEL.md`.
+**Shell-wide, on every guest screen:** Brand (11, CMS-002, CMS-004, CMS-104); Theme (27, CMS-005, ADM-016); Fonts (5, CMS-003); Header (5, CMS-009); Navigation (17, CMS-009); Footer (website) (15, CMS-009); Languages and right-to-left (2, CMS-011, ADM-018); Modules shown to guests (3, CMS-001, ADM-424); Features (3, CMS-001); Custom domain (website) (3, CMS-017, ADM-017); SEO metadata (website) (13, CMS-013). Each element, its CMS field, allowed values and default: `handoff/design-batches/apps/1-guest-app/WHITE-LABEL.md`.
 
 #### References
 
@@ -1260,14 +1534,15 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (8), with its required mark, default, format and its error state (403, 409).
-- [ ] Every output is drawn (30 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (9), with its required mark, default, format and its error state (403, 409).
+- [ ] Every output is drawn (62 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#WEB-043?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: Create referral, Redeem loyalty points.
+- [ ] Every action is wired with its success and its failure: Invite a friend, Redeem, Choose my name.
 - [ ] No transition is declared; back returns where the user came from.
 - [ ] Sign-in is asked only where the spec asks for it.
 - [ ] The 2 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] Drawn in the default theme; on a key screen also in the alternate tenant theme; nothing hard-codes a brand colour, logo or font.
+- [ ] The 1 decision(s) taken on this screen are drawn as decided, not as the old default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -1278,46 +1553,46 @@ Every guest screen in this batch is white-label. These elements are set by the t
 
 | Element | Configured in | Allowed values | Default | What it changes |
 |---|---|---|---|---|
-| Logo (`brand.logoAssetRef`) | `CMS-002`, `CMS-004`, `ADM-016` | PNG or SVG ≤ 2 MB for logos; images ≥ 1600 px; video MP4 | — | the logo in the header or nav bar, the splash and the footer |
-| Logo dark image (`brand.logoDarkAssetRef`) | `CMS-002`, `CMS-004`, `ADM-016` | PNG or SVG ≤ 2 MB for logos; images ≥ 1600 px; video MP4 | — | the logo on dark backgrounds (falls back to the primary logo) |
-| Logo variant (`brand.logoVariant`) | `CMS-002`, `CMS-004`, `ADM-016` | Light · Dark · Duotone | Light | which logo lockup sits in the nav bar, and whose colours drive the theme |
-| Favicon (`brand.faviconAssetRef`) | `CMS-002`, `CMS-004`, `ADM-016` | PNG or SVG ≤ 2 MB for logos; images ≥ 1600 px; video MP4 | — | the browser tab icon (website only) |
-| Splash image (`brand.splashImageAssetRefs`) | `CMS-002`, `CMS-004`, `ADM-016` | PNG, JPG, SVG or MP4 from the media library | — | Splash images, shown in order. Build-time on the native apps (`splashChangeScope`); immediate on web, reaching guests with the publish (audit R163). |
-| Splash duration seconds (`brand.splashDurationSeconds`) | `CMS-002`, `CMS-004`, `ADM-016` | min 0; max 10 | 3 | — |
-| Splash background colour (`brand.splashBackgroundColour`) | `CMS-002`, `CMS-004`, `ADM-016` | #RRGGBB | — | — |
-| Show loading indicator (`brand.showLoadingIndicator`) | `CMS-002`, `CMS-004`, `ADM-016` | — | on | — |
-| Intro video (`brand.introVideoAssetRef`) | `CMS-002`, `CMS-004`, `ADM-016` | PNG or SVG ≤ 2 MB for logos; images ≥ 1600 px; video MP4 | — | The optional intro video (decided 29 September, MOB-5). A video `MediaAsset` from the media library (CMS-010). |
-| Intro video mode (`brand.introVideoMode`) | `CMS-002`, `CMS-004`, `ADM-016` | Off · First launch · Every launch; Anything but `off` needs `introVideoAssetRef`, or 400. | Off | When GST-001 plays it full screen. "Skip introduction" is always shown. |
-| Primary colour (`theme.primaryColour`) | `CMS-005`, `CMS-003`, `ADM-016` | #RRGGBB | — | the brand colour (the `accentSolid` token): primary buttons (Book, Continue, Add to cart, Pay), the active step of the step indicator, selected date and time chips, focus rings |
-| Secondary colour (`theme.secondaryColour`) | `CMS-005`, `CMS-003`, `ADM-016` | #RRGGBB | — | secondary buttons and secondary emphasis: unselected chips, secondary tabs |
-| Accent colour (`theme.accentColour`) | `CMS-005`, `CMS-003`, `ADM-016` | #RRGGBB | — | highlights: badges (LIMITED, NEW, BESTSELLER), availability counts, sale prices |
-| Background colour (`theme.backgroundColour`) | `CMS-005`, `CMS-003`, `ADM-016` | #RRGGBB | — | the page background behind every screen (the `ground` token) |
-| Text colour (`theme.textColour`) | `CMS-005`, `CMS-003`, `ADM-016` | #RRGGBB | — | body text on the background |
-| Dark mode (`theme.darkMode`) | `CMS-005`, `CMS-003`, `ADM-016` | — | — | the dark variant on a device in dark mode (mobile app); derived from the light theme when absent |
-| Corner radius (`theme.cornerRadius`) | `CMS-005`, `CMS-003`, `ADM-016` | min 0; max 32 | — | the corners of cards, buttons, inputs, sheets and the cart (0 square to 22 the prototype's roundest) |
-| Surface style (`theme.surfaceStyle`) | `CMS-005`, `CMS-003`, `ADM-016` | Glass · Solid | Glass | cards and panels: frosted glass (default) or opaque (the `surfaceRaised` token) |
-| Button style (`theme.buttonStyle`) | `CMS-005`, `CMS-003`, `ADM-016` | Solid · Outline · Pill | Solid | every button's shape: solid fill, outline, or pill |
-| Component colours (`theme.componentColours`) | `CMS-005`, `CMS-003`, `ADM-016` | — | — | Colours for single interactive elements (decided 17 September, M17-11). Each is optional and falls back to the theme colours. |
+| Logo (`brand.logoAssetRef`) | `CMS-002`, `CMS-004`, `CMS-104`, `ADM-016` | PNG or SVG ≤ 2 MB for logos; images ≥ 1600 px; video MP4 | — | the logo in the header or nav bar, the splash and the footer |
+| Logo dark image (`brand.logoDarkAssetRef`) | `CMS-002`, `CMS-004`, `CMS-104`, `ADM-016` | PNG or SVG ≤ 2 MB for logos; images ≥ 1600 px; video MP4 | — | the logo on dark backgrounds (falls back to the primary logo) |
+| Logo variant (`brand.logoVariant`) | `CMS-002`, `CMS-004`, `CMS-104`, `ADM-016` | Light · Dark · Duotone | Light | which logo lockup sits in the nav bar, and whose colours drive the theme |
+| Favicon (`brand.faviconAssetRef`) | `CMS-002`, `CMS-004`, `CMS-104`, `ADM-016` | PNG or SVG ≤ 2 MB for logos; images ≥ 1600 px; video MP4 | — | the browser tab icon (website only) |
+| Splash image (`brand.splashImageAssetRefs`) | `CMS-002`, `CMS-004`, `CMS-104`, `ADM-016` | PNG, JPG, SVG or MP4 from the media library | — | Splash images, shown in order. Build-time on the native apps (`splashChangeScope`); immediate on web, reaching guests with the publish (audit R163). |
+| Splash duration seconds (`brand.splashDurationSeconds`) | `CMS-002`, `CMS-004`, `CMS-104`, `ADM-016` | min 0; max 10 | 3 | — |
+| Splash background colour (`brand.splashBackgroundColour`) | `CMS-002`, `CMS-004`, `CMS-104`, `ADM-016` | #RRGGBB | — | — |
+| Show loading indicator (`brand.showLoadingIndicator`) | `CMS-002`, `CMS-004`, `CMS-104`, `ADM-016` | — | on | — |
+| Intro video (`brand.introVideoAssetRef`) | `CMS-002`, `CMS-004`, `CMS-104`, `ADM-016` | PNG or SVG ≤ 2 MB for logos; images ≥ 1600 px; video MP4 | — | The optional intro video (decided 29 September, MOB-5). A video `MediaAsset` from the media library (CMS-010). |
+| Intro video mode (`brand.introVideoMode`) | `CMS-002`, `CMS-004`, `CMS-104`, `ADM-016` | Off · First launch · Every launch; Anything but `off` needs `introVideoAssetRef`, or 400. | Off | When GST-001 plays it full screen. "Skip introduction" is always shown. |
+| Powered by TICVAI credit (`brand.showPoweredBy`) | `CMS-002`, `CMS-004`, `CMS-104`, `ADM-016` | — | on | the *Powered by TICVAI* credit on the launch screen, at the foot of Account and in the web footer; on by default, and switching it off needs the licence add-on (403 … |
+| Primary colour (`theme.primaryColour`) | `CMS-005`, `ADM-016` | #RRGGBB | — | the brand colour (the `accentSolid` token): primary buttons (Book, Continue, Add to cart, Pay), the active step of the step indicator, selected date and time chips, focus rings |
+| Secondary colour (`theme.secondaryColour`) | `CMS-005`, `ADM-016` | #RRGGBB | — | secondary buttons and secondary emphasis: unselected chips, secondary tabs |
+| Accent colour (`theme.accentColour`) | `CMS-005`, `ADM-016` | #RRGGBB | — | highlights: badges (LIMITED, NEW, BESTSELLER), availability counts, sale prices |
+| Background colour (`theme.backgroundColour`) | `CMS-005`, `ADM-016` | #RRGGBB | — | the page background behind every screen (the `ground` token) |
+| Text colour (`theme.textColour`) | `CMS-005`, `ADM-016` | #RRGGBB | — | body text on the background |
+| Corner radius (`theme.cornerRadius`) | `CMS-005`, `ADM-016` | min 0; max 32 | — | the corners of cards, buttons, inputs, sheets and the cart (0 square to 22 the prototype's roundest) |
+| Surface style (`theme.surfaceStyle`) | `CMS-005`, `ADM-016` | Glass · Solid | Glass | cards and panels: frosted glass (default) or opaque (the `surfaceRaised` token) |
+| Button style (`theme.buttonStyle`) | `CMS-005`, `ADM-016` | Solid · Outline · Pill | Solid | every button's shape: solid fill, outline, or pill |
+| Component colours (`theme.componentColours`) | `CMS-005`, `ADM-016` | — | — | Colours for single interactive elements (decided 17 September, M17-11). Each is optional and falls back to the theme colours. |
 | Primary latin (`fonts.primaryLatin`) | `CMS-003` | — | — | headings and body text in English |
 | Primary arabic (`fonts.primaryArabic`) | `CMS-003` | Required when `ar` is among the tenant's languages (audit R163). | — | headings and body text in Arabic |
 | Secondary latin (`fonts.secondaryLatin`) | `CMS-003` | — | — | the secondary face (eyebrows, numbers) in English |
 | Secondary arabic (`fonts.secondaryArabic`) | `CMS-003` | Required whenever `secondaryLatin` is set and `ar` is among the tenant's languages (decided 28 September, audit R163). | — | the secondary face in Arabic |
 | Custom font images (`fonts.customFontAssetRefs`) | `CMS-003` | PNG, JPG, SVG or MP4 from the media library | — | Uploaded font files, as `MediaAsset` ids. |
-| Header layout (`header.layout`) | `CMS-007` | Logo left · Logo centre · Logo with menu | — | the header: logo left, logo centred, or logo with the menu |
-| Show logo (`header.showLogo`) | `CMS-007` | — | on | — |
-| Show menu (`header.showMenu`) | `CMS-007` | — | on | — |
-| Show notifications (`header.showNotifications`) | `CMS-007` | — | on | — |
-| Background colour (`header.backgroundColour`) | `CMS-007` | #RRGGBB | — | — |
+| Header layout (`header.layout`) | `CMS-009` | Logo left · Logo centre · Logo with menu | — | the header: logo left, logo centred, or logo with the menu |
+| Show logo (`header.showLogo`) | `CMS-009` | — | on | — |
+| Show menu (`header.showMenu`) | `CMS-009` | — | on | — |
+| Show notifications (`header.showNotifications`) | `CMS-009` | — | on | — |
+| Background colour (`header.backgroundColour`) | `CMS-009` | #RRGGBB | — | — |
 | Navigation kind (`navigation.kind`) | `CMS-009` | Bottom navigation · Drawer · Tabs | — | the main navigation: bottom tab bar, drawer, or tabs |
 | Navigation items (`navigation.items`) | `CMS-009` | at most 12 | — | — |
 | Buy button (`navigation.buyButton`) | `CMS-009` | — | — | The persistent Buy tickets button (decided 29 September, MOB-2). On every screen of the mobile app except the booking and checkout steps; it opens GST-003. |
-| Footer columns (`footer.columns`) | `CMS-007` | — | — | — |
-| Legal links (`footer.legalLinks`) | `CMS-007` | — | — | Required links, held separately from the free-form columns — a tenant reorganising their footer must not be able to remove the privacy notice by accident. |
-| Copyright text (`footer.copyrightText`) | `CMS-007` | — | — | — |
-| Social links (`footer.socialLinks`) | `CMS-007` | — | — | — |
+| Footer columns (`footer.columns`) | `CMS-009` | — | — | — |
+| Legal links (`footer.legalLinks`) | `CMS-009` | — | — | Required links, held separately from the free-form columns — a tenant reorganising their footer must not be able to remove the privacy notice by accident. |
+| Copyright text (`footer.copyrightText`) | `CMS-009` | — | — | — |
+| Social links (`footer.socialLinks`) | `CMS-009` | — | — | — |
 | Languages (`languages.languages`) | `CMS-011`, `ADM-018` | at least 1 | — | the language button in the header; Arabic flips every screen right to left |
 | Default language (`languages.defaultLanguage`) | `CMS-011`, `ADM-018` | ISO 639-1 code, shown as the language name | — | the language a first visit opens in |
-| Modules (`modules.modules`) | `CMS-001` | — | — | — |
+| Modules (`modules.modules`) | `CMS-001`, `ADM-424` | — | — | — |
 | Features (`features.features`) | `CMS-001` | — | — | — |
 | Custom domain hostname (`domains.hostname`) | `CMS-017`, `ADM-017` | — | — | — |
 | Custom domain kind (`domains.kind`) | `CMS-017`, `ADM-017` | Guest web · Guest app · Partner portal · Developer portal | — | — |
@@ -1335,15 +1610,17 @@ Every guest screen in this batch is white-label. These elements are set by the t
 | Open graph (`seo.openGraph`) | `CMS-013` | — | — | — |
 | Is auto generated (`seo.isAutoGenerated`) | `CMS-013` | — | on | 22.11.2. Generated by default and overridable. |
 | No index (`seo.noIndex`) | `CMS-013` | — | off | — |
-| Favicon (`brand.faviconAssetRef`) | `CMS-002`, `CMS-004`, `ADM-016` | PNG or SVG ≤ 2 MB for logos; images ≥ 1600 px; video MP4 | — | the browser tab icon (website only) |
-| Component colours: primary CTA (`theme.componentColours.primaryCta`) | `CMS-005`, `CMS-003`, `ADM-016` | — | — | the one main call to action on each screen, when it should differ from the brand colour |
-| Component colours: pay button (`theme.componentColours.payButton`) | `CMS-005`, `CMS-003`, `ADM-016` | — | — | the Pay button at checkout |
+| Favicon (`brand.faviconAssetRef`) | `CMS-002`, `CMS-004`, `CMS-104`, `ADM-016` | PNG or SVG ≤ 2 MB for logos; images ≥ 1600 px; video MP4 | — | the browser tab icon (website only) |
+| Component colours: primary CTA (`theme.componentColours.primaryCta`) | `CMS-005`, `ADM-016` | — | — | the one main call to action on each screen, when it should differ from the brand colour |
+| Component colours: pay button (`theme.componentColours.payButton`) | `CMS-005`, `ADM-016` | — | — | the Pay button at checkout |
 | Buy button: style (`navigation.buyButton.style`) | `CMS-009` | Raised · Floating · Flat · Hidden | Raised | the Buy tickets button in the tab bar: raised (default), floating, flat, or hidden |
 
 **The alternate tenant theme (Coastal Aqua)**: Primary colour #0077B6; Secondary colour #023E8A; Accent colour #FFB703; Background colour #F5FAFC; Text colour #0B1324; Corner radius 18; Surface style Solid; Button style Pill; Logo variant Duotone; Header layout Logo centre; Step indicator Dots; Card layout Cards across; Card size Standard; Cart layout Floating icon; Fonts Poppins / Tajawal.
 **Key screens to show in it:** `WEB-001`, `WEB-005`, `WEB-006`, `WEB-010`, `WEB-012`, `GST-001`, `GST-007`, `GST-041`, `KSK-002`, `KSK-003`.
 
-**Never configurable:** The *Powered by TICVAI* credit in the footer is fixed and never client-editable (MoM 3 Aug, DI-111; MoM 12 Aug, DI-250). Semantic colour pairs (success, warning, danger, neutral) are not overridable: a tenant who recolours danger to their brand green has made a destructive confirmation look like a success (`screens/_design-tokens.yaml` whiteLabel). Site structure and the navigation flow are fixed and adapt to the product configuration (MoM 3 Aug, DI-119); a guest always books a product or package, never a resource (DI-502). A colour pair that fails 4.5:1 contrast is refused by the CMS, not warned (setTheme 400 ContrastProblem, audit R139).
+**Decided for every guest screen:** **No dark or light mode.** The venue's chosen theme applies on every device setting; `Theme.darkMode` is deprecated and ignored, never drawn, and the guest app has no Light/Dark switch (Chinmay, 2 October, Q150; CHG-CSA-035). ***Powered by TICVAI* is a tenant toggle, on by default** (`brand.showPoweredBy`): shown on the launch screen, at the foot of Account and in the web footer; switching it off needs the licence add-on, or 403 `powered-by-locked` (Chinmay, 2 October, Q160; DI-297; CHG-CSA-036). **Each homepage section sets its card count and its scroll animation** (`maxItems`; `scrollAnimation` rise, scale, slide, blur or none, default rise): every customisation option of the approved wireframe (Chinmay, 2 October, Q152 and Q153; DI-1088; CHG-CSA-040). **Landing-page templates.** A tenant with no landing page of its own starts from a TICVAI template (`listLandingPageTemplates`, kept as `HomepageLayout.templateKey`); one with its own site links in with deep links (`landingSource` ownSite) (Chinmay, 2 October, batch 2 #41; CHG-CSA-037).
+
+**Never configurable:** A dark or light mode: the guest surfaces have one theme, the venue's (Chinmay, 2 October; CHG-CSA-035). Semantic colour pairs (success, warning, danger, neutral) are not overridable: a tenant who recolours danger to their brand green has made a destructive confirmation look like a success (`screens/_design-tokens.yaml` whiteLabel). Site structure and the navigation flow are fixed and adapt to the product configuration (MoM 3 Aug, DI-119); a guest always books a product or package, never a resource (DI-502). A colour pair that fails 4.5:1 contrast is refused by the CMS, not warned (setTheme 400 ContrastProblem, audit R139).
 
 ## Reference designs and the trackers for this platform
 
@@ -1464,7 +1741,6 @@ Method, path, parameters, request and response for every operation these screens
 
 ```json
 {
-"addToWishlist": {"method":"POST","path":"/guests/{subjectId}/wishlist","contract":"marketing-crm","summary":"Save an item","permission":null,"offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"subject","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Wishlist"},
 "createInstalmentPlan": {"method":"POST","path":"/instalment-plans","contract":"payments","summary":"Split an order's payment into scheduled instalments on a stored card","permission":"ORDER_CREATE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"PayInstalmentPlan"},
 "createReferral": {"method":"POST","path":"/referrals","contract":"marketing-crm","summary":"Issue a referral code","permission":"MARKETING_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"Referral","responds":"Referral"},
 "decideRecommendations": {"method":"POST","path":"/recommendations/decide","contract":"ai","summary":"Fill a recommendation slot","permission":"AI_USE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"AiRecommendationResult"},
@@ -1486,11 +1762,13 @@ Method, path, parameters, request and response for every operation these screens
 "getWalletAutoReloadSetting": {"method":"GET","path":"/wallets/{walletId}/auto-reload","contract":"wallet","summary":"A wallet's own auto top-up, if the holder set one","permission":"WALLET_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"WalletAutoReloadSetting"},
 "getWalletExitBalance": {"method":"GET","path":"/wallets/{walletId}/exit-balance","contract":"wallet","summary":"What the holder owes or is owed on leaving","permission":"WALLET_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"WalletExitBalance"},
 "getWishlist": {"method":"GET","path":"/guests/{subjectId}/wishlist","contract":"marketing-crm","summary":"Read a guest's saved items","permission":null,"offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"subject","parameters":[],"requestBody":null,"responds":"Wishlist"},
-"grantDelegation": {"method":"POST","path":"/guests/{subjectId}/delegations","contract":"identity","summary":"Let one guest act for another","permission":"GUEST_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"DelegatedAccess"},
 "listBillingStatements": {"method":"GET","path":"/billing-statements","contract":"orders","summary":"What was charged, when, and against which agreement","permission":"ORDER_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":"from","in":"query","required":null},{"name":"to","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
+"listConsentPurposes": {"method":"GET","path":"/consent-purposes","contract":"marketing-crm","summary":"Configured consent purposes","permission":"GUEST_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
+"listCustomerBadges": {"method":"GET","path":"/customers/{customerId}/badges","contract":"marketing-crm","summary":"Badges a guest holds","permission":"MARKETING_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"customerId","in":"path","required":true},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listDelegations": {"method":"GET","path":"/guests/{subjectId}/delegations","contract":"identity","summary":"Who may act for this guest, and for whom they may act","permission":"GUEST_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listGuestDevices": {"method":"GET","path":"/guests/{subjectId}/devices","contract":"marketing-crm","summary":"A guest's registered devices","permission":null,"offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"subject","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listInstalmentPlans": {"method":"GET","path":"/instalment-plans","contract":"payments","summary":"Instalment plans and their schedules","permission":"PAYMENT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"orderId","in":"query","required":null},{"name":"status","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
+"listLeaderboard": {"method":"GET","path":"/loyalty/leaderboard","contract":"marketing-crm","summary":"Standings, by nickname","permission":null,"offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":"programmeId","in":"query","required":true},{"name":"window","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listLoyaltyProgrammes": {"method":"GET","path":"/loyalty/programmes","contract":"marketing-crm","summary":"List loyalty programmes","permission":"MARKETING_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listMfaMethods": {"method":"GET","path":"/auth/mfa/methods","contract":"identity","summary":"Enrolled MFA methods","permission":null,"offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[],"requestBody":null,"responds":"MfaMethod"},
 "listMyPaymentIssues": {"method":"GET","path":"/guests/me/payment-issues","contract":"payments","summary":"A guest's own failed recurring payments","permission":null,"offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
@@ -1498,17 +1776,17 @@ Method, path, parameters, request and response for every operation these screens
 "listProducts": {"method":"GET","path":"/products","contract":"catalogue","summary":"List products","permission":"PRODUCT_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"venueId","in":"query","required":null},{"name":"kind","in":"query","required":null},{"name":"isSellable","in":"query","required":null},{"name":"categoryId","in":"query","required":null},{"name":"segmentTag","in":"query","required":null},{"name":"guidedAnswerIds","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listPromotions": {"method":"GET","path":"/promotions","contract":"promotions","summary":"List promotions","permission":"PRICE_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"venueId","in":"query","required":null},{"name":"status","in":"query","required":null},{"name":"activeAt","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listPublishedTrackingTechnologies": {"method":"GET","path":"/storefront/cookie-consent/technologies","contract":"marketing-crm","summary":"The approved cookie registry, as the preference centre shows it","permission":null,"offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":"channel","in":"query","required":true},{"name":"category","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
+"listRewards": {"method":"GET","path":"/loyalty/rewards","contract":"marketing-crm","summary":"What points can be turned into","permission":"MARKETING_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"programmeId","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listWalletTransactions": {"method":"GET","path":"/wallets/{subjectId}/transactions","contract":"wallet","summary":"Wallet transaction history","permission":"WALLET_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "recordConsent": {"method":"POST","path":"/guests/{subjectId}/consents","contract":"marketing-crm","summary":"Record a consent decision","permission":null,"offlineCapable":false,"conflictPolicy":"append","scopeLevel":"subject","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"RecordConsentRequest","responds":"ConsentState"},
 "recordDeviceConsent": {"method":"POST","path":"/consent/device","contract":"marketing-crm","summary":"Record a visitor's cookie decision, before anyone is known","permission":null,"offlineCapable":false,"conflictPolicy":"append","scopeLevel":"subject","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"RecordDeviceConsentRequest","responds":"DeviceConsent"},
 "recordRecommendationEvents": {"method":"POST","path":"/recommendations/events","contract":"ai","summary":"Report what happened to recommended items","permission":"AI_USE","offlineCapable":false,"conflictPolicy":"append","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":null},
 "redeemLoyaltyPoints": {"method":"POST","path":"/loyalty/redemptions","contract":"marketing-crm","summary":"Spend points","permission":"LOYALTY_REDEEM","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"LoyaltyPosition"},
-"registerGuestDevice": {"method":"POST","path":"/guests/{subjectId}/devices","contract":"marketing-crm","summary":"Register a device for push","permission":null,"offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"subject","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"GuestDevice"},
-"removeFromWishlist": {"method":"DELETE","path":"/guests/{subjectId}/wishlist/{itemId}","contract":"marketing-crm","summary":"Remove a saved item","permission":null,"offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"subject","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":null},
 "removeMfaMethod": {"method":"DELETE","path":"/auth/mfa/methods/{methodId}","contract":"identity","summary":"Remove an MFA method","permission":null,"offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":null},
 "retryMyDunningPayment": {"method":"POST","path":"/dunning-cases/{caseId}/retry","contract":"payments","summary":"Retry a declined membership payment now","permission":null,"offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null},{"name":"caseId","in":"path","required":true}],"requestBody":"RetryDunningPaymentRequest","responds":"DunningCase"},
 "revokeFacePass": {"method":"DELETE","path":"/face-pass/enrolments/{enrolmentId}","contract":"access","summary":"Remove a facial profile","permission":"GUEST_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":null},
 "revokeGuestDevice": {"method":"DELETE","path":"/guests/{subjectId}/devices/{deviceId}","contract":"marketing-crm","summary":"Revoke a device registration","permission":null,"offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"subject","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":null},
+"setLeaderboardNickname": {"method":"PUT","path":"/loyalty/leaderboard-nickname","contract":"marketing-crm","summary":"Choose the name shown on the board","permission":null,"offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"subject","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"LoyaltyPosition"},
 "setWalletAutoReloadSetting": {"method":"PUT","path":"/wallets/{walletId}/auto-reload","contract":"wallet","summary":"Top the wallet up automatically from a stored card when it runs low","permission":"WALLET_OPERATE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"subject","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":"WalletAutoReloadSetting","responds":"WalletAutoReloadSetting"},
 "settleWalletAtExit": {"method":"POST","path":"/wallets/{walletId}/exit-settlement","contract":"wallet","summary":"Settle a short balance, or refund a credit, when the holder leaves","permission":"WALLET_OPERATE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"WalletExitSettlement"},
 "storePaymentToken": {"method":"POST","path":"/payment-tokens","contract":"orders","summary":"Save a payment method for future use","permission":"ORDER_CREATE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"PaymentToken"},
@@ -1532,6 +1810,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "Channel": {"type":"string","enum":["pos","kiosk","web","mobile","b2b","ota","callCentre"]},
 "ConsentDecision": {"type":"string","enum":["granted","withdrawn","notAsked"]},
 "ConsentPurpose": {"type":"string","enum":["marketing","personalisation","profiling","thirdPartySharing","aiProcessing","transactional"]},
+"ConsentPurposeConfig": {"x-ticvai-persistence":"marketing.consent_purpose + marketing.consent_purpose_channel","type":"object","required":["purpose","channels","noticeVersion","isRequiredForService"],"properties":{"purpose":{"$ref":"#/components/schemas/ConsentPurpose"},"displayName":{"type":"string"},"description":{"type":"string"},"channels":{"type":"array","items":{"$ref":"#/components/schemas/MessageChannel"}},"noticeVersion":{"type":"string","description":"Current version of the notice. A consent against a superseded version is reported as requiring renewal rather than silently honoured.\n"},"isRequiredForService":{"type":"boolean","description":"True for transactional. Withdrawing it means the service cannot be delivered, so it is presented differently.\n"},"expiresAfterMonths":{"type":"integer","nullable":true}}},
 "ConsentSource": {"type":"string","enum":["guestApp","website","kiosk","pos","callCentre","import","agentRecorded","cookieBanner","checkout"],"description":"`checkout` (30 September, M18-15): an opt-in ticked beside the terms at checkout, carried on orders `checkoutCart` `marketingConsents[]` and recorded by `recordCheckoutConsents`, bound to the order and the verified contact. `cookieBanner` (29 September, build; BL-073 §4b): a decision made on the cookie banner or preference centre and moved onto the guest by `claimDeviceConsent`. Kept apart from `website`, a form submission, because the audit trail (2.6.56) has to tell the two apart."},
 "ConsentState": {"x-ticvai-persistence":"none — projection over consent_record","type":"object","required":["subjectId","purposes"],"properties":{"subjectId":{"type":"string","format":"uuid"},"purposes":{"type":"array","items":{"type":"object","required":["purpose","decision","requiresRenewal"],"properties":{"purpose":{"$ref":"#/components/schemas/ConsentPurpose"},"decision":{"$ref":"#/components/schemas/ConsentDecision"},"channels":{"type":"array","items":{"$ref":"#/components/schemas/MessageChannel"}},"noticeVersion":{"type":"string","nullable":true},"requiresRenewal":{"type":"boolean","description":"True where the notice has been superseded since consent was given."},"decidedAt":{"type":"string","format":"date-time","nullable":true}}}}}},
 "CookieBannerPreferenceCenterDesignerView": {"type":"object","x-ticvai-persistence":"marketing.cookie_banner_design","description":"One version of a cookie banner and preference-centre design (pack 17.1.6).","required":["channel","position","languages","rejectIsOneClick","categories"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"brandId":{"type":"string","format":"uuid","nullable":true,"description":"Null for the corporate design every brand inherits."},"inheritsFromId":{"type":"string","format":"uuid","nullable":true},"channel":{"type":"string","enum":["b2cWebsite","customerPortal","mobileApp","embeddedCheckout","whiteLabelSite","partnerMicrosite"]},"logoAssetId":{"type":"string","format":"uuid","nullable":true},"title":{"$ref":"#/components/schemas/LocalisedText"},"body":{"$ref":"#/components/schemas/LocalisedText"},"position":{"type":"string","enum":["top","bottom","popup","modal"]},"themeId":{"type":"string","nullable":true,"description":"The white-label theme it takes colours and fonts from."},"buttons":{"type":"array","items":{"type":"object","required":["action"],"properties":{"action":{"type":"string","enum":["acceptAll","rejectNonEssential","managePreferences","savePreferences","doNotSellOrShare"]},"label":{"$ref":"#/components/schemas/LocalisedText"}}}},"rejectIsOneClick":{"type":"boolean","default":true,"description":"Must be true."},"links":{"type":"array","items":{"type":"object","required":["label","policyKind"],"properties":{"label":{"$ref":"#/components/schemas/LocalisedText"},"policyKind":{"type":"string","enum":["privacy","cookie","termsAndConditions"]}}}},"categories":{"type":"array","minItems":1,"items":{"type":"object","required":["category","defaultOn"],"properties":{"category":{"type":"string","enum":["strictlyNecessary","functional","analytics","personalisation","marketing"]},"description":{"$ref":"#/components/schemas/LocalisedText"},"defaultOn":{"type":"boolean","description":"True only for `strictlyNecessary`, which is always active."}}}},"languages":{"type":"array","minItems":1,"items":{"type":"string","maxLength":10},"description":"Every language the storefront serves; Arabic renders right to left."},"regulatoryRegimes":{"type":"array","items":{"type":"string","enum":["gdpr","ePrivacy","ccpaCpra","lgpd","uaePdpl","saudiPdpl"]},"description":"2.6.60 (29 September, build). **The laws this design is published to satisfy**, so compliance is stated rather than assumed. The strictest posture (opt-in, one-click reject, every non-essential category off) already meets GDPR/ePrivacy, LGPD and both PDPLs; `ccpaCpra` adds the \"Do not sell or share\" button (`doNotSellOrShare`) and honours a Global Privacy Control signal as that opt-out."},"recordIpAddress":{"type":"boolean","default":false,"description":"2.6.55, \"if legally permitted\" (29 September, build). On, `recordDeviceConsent` writes the IP address and user agent to `pii.consent_identifier`; off, they are not kept anywhere. Off by default."},"noticeVersion":{"type":"string","readOnly":true,"description":"Moves with the cookie policy (white-label `setPolicy`, kind `cookie`)."},"version":{"type":"integer","minimum":1,"readOnly":true},"status":{"type":"string","enum":["draft","published","superseded"],"readOnly":true},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005)."},"updatedAt":{"type":"string","format":"date-time","readOnly":true}}},
@@ -1543,20 +1822,23 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "DelegatedAccess": {"x-ticvai-persistence":"identity.delegated_access","type":"object","required":["id","permission","scopePath","effect"],"properties":{"id":{"type":"string","format":"uuid"},"principalId":{"type":"string","format":"uuid","nullable":true},"roleId":{"type":"string","format":"uuid","nullable":true},"permission":{"type":"string","description":"From the permission enum. `*` permitted on DENY only."},"subjectId":{"type":"string","format":"uuid","nullable":true,"description":"CF-132, CL-05. **A grant held by a guest rather than a staff principal.**\nSection 5.5 asks for portfolios — a primary holder assigning entitlements, transfer between linked accounts, shared wallets with individual tracking — and it appears ten times across ten sections. **Every one of those reduces to the same question: who may act on whose behalf, over what, and until when.**\n**That is a grant, not a household table.** A primary holder assigning an entitlement is a grant. A group leader holding tickets for twelve is a grant. A corporate account enrolling members is a grant with a quota. **A shared wallet with individual tracking is a grant over a balance, and the transaction log already records who spent.**\n**A household table would answer one of those four.**\n"},"overSubjectId":{"type":"string","format":"uuid","nullable":true,"description":"Whose behalf. **Null for a staff grant, which is the existing behaviour** — every grant written before 18 August means exactly what it meant before.\n"},"overObjectRef":{"type":"string","nullable":true,"description":"**Where the authority is over a thing rather than a scope** — a wallet, an entitlement, a booking. `scopePath` answers *where*; this answers *what*, and a guest's authority is almost always over a specific object rather than a branch of the tree.\n"},"delegationKind":{"type":"string","nullable":true,"enum":["primaryHolder","familyMember","groupLeader","attendee","corporateAdmin","corporateMember","carer"],"description":"**What kind of relationship this expresses**, for display and for reporting. The mechanism does not branch on it — a family member and a group attendee are the same grant with different words around them, which is the point.\n"},"quota":{"type":"integer","nullable":true,"description":"2.14.15 and 4.3.11. **How many the holder may assign.** A corporate account with fifty allocations and a family with four are the same structure with different numbers.\n"},"isRevocableBySubject":{"type":"boolean","default":true,"description":"**Whether the person it is over can end it.** A guest who linked a family member should be able to unlink them; a corporate member should not be able to revoke their employer's oversight — and **a delegation nobody can end is a delegation somebody will regret.**\n"},"scopePath":{"type":"string"},"effect":{"type":"string","enum":["ALLOW","DENY"]},"permissionId":{"type":"string","format":"uuid","nullable":true,"description":"**Taken from `identity.user_access`, 20 September, when that table was collapsed into this one.** `permission` above is free text; this names a row in `identity.permission`, the catalogue wired the same day. A grant that names a catalogue row can be checked against the keys the contracts actually enforce — which is the whole point of a catalogue that reported *154 on operations, 35 in roles.yaml, 0 shared*.\nNullable because a role grant carries no permission at all.\n"},"revokedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true,"description":"Taken from `identity.user_access`. This table recorded `revokedBy` and not when, so it could say who revoked a grant and not whether it was before or after the thing somebody is asking about.\n"},"validFrom":{"type":"string","format":"date-time","nullable":true},"validTo":{"type":"string","format":"date-time","nullable":true},"createdByPrincipalId":{"type":"string","format":"uuid"},"createdAt":{"type":"string","format":"date-time"}}},
 "DeviceConsent": {"type":"object","x-ticvai-persistence":"marketing.device_consent + marketing.device_consent_category","description":"**One cookie decision by a visitor nobody has identified yet** (BL-073 §4b, decided 29 September). Append-only: a change of mind is a new row. Keyed for the visitor by `consentKey`, which the platform mints; the categories are child rows. The IP address and user agent, where recorded at all, are in `pii.consent_identifier` (`ConsentCaptureIdentifier`), never here.","required":["consentKey","channel","action","categories","noticeVersion","decidedAt"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"consentKey":{"type":"string","maxLength":64,"readOnly":true,"description":"**Opaque, minted by us, not a device fingerprint.** It answers 2.6.55's \"user identifier/session ID\" and is the join key `claimDeviceConsent` needs. Shared by all the tenant's domains (2.6.62), never across tenants."},"channel":{"$ref":"#/components/schemas/CookieConsentChannel"},"brandId":{"type":"string","format":"uuid","nullable":true},"bannerDesignId":{"type":"string","format":"uuid","nullable":true,"description":"The published `CookieBannerPreferenceCenterDesignerView` version the visitor was shown."},"action":{"$ref":"#/components/schemas/DeviceConsentAction"},"categories":{"type":"array","minItems":1,"description":"Every category of the design, with the decision this row gives it.","items":{"type":"object","required":["category","decision"],"properties":{"category":{"$ref":"#/components/schemas/CookieCategory"},"decision":{"type":"string","enum":["granted","declined"]}}}},"noticeVersion":{"type":"string","description":"The cookie notice version decided against (white-label `setPolicy`, kind `cookie`)."},"language":{"type":"string","maxLength":10,"nullable":true},"globalPrivacyControl":{"type":"boolean","default":false,"description":"The browser sent a Global Privacy Control signal; honoured as a CCPA/CPRA opt-out of sale and sharing."},"source":{"$ref":"#/components/schemas/ConsentSource"},"country":{"type":"string","pattern":"^[A-Z]{2}$","nullable":true,"readOnly":true,"description":"The edge's geolocation of the request, for the geographic statistics (2.6.63). The address is not kept here."},"decidedAt":{"type":"string","format":"date-time"},"expiresAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true,"description":"**A device consent expires and a subject consent does not.** Set from the tenant's device-consent term; after it the banner asks again."},"claimedBySubjectId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"Set once, by `claimDeviceConsent`. Never cleared."},"claimedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005), tenant-scoped: a decision with no subject still belongs to one tenant."}}},
 "DeviceConsentAction": {"type":"string","enum":["acceptAll","rejectNonEssential","savePreferences","withdraw","doNotSellOrShare"],"description":"What the visitor pressed. `doNotSellOrShare` is the CCPA/CPRA opt-out link, shown where the design's `regulatoryRegimes` include `ccpaCpra`."},
-"Discount": {"x-ticvai-persistence":"none — embedded in promotion","type":"object","required":["kind"],"properties":{"kind":{"$ref":"#/components/schemas/DiscountKind"},"percentage":{"type":"number","minimum":0,"maximum":100},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"fixedPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"buyQuantity":{"type":"integer","minimum":1},"getQuantity":{"type":"integer","minimum":1},"getDiscountPercentage":{"type":"number","minimum":0,"maximum":100,"description":"100 makes the free items actually free; lower values give a partial discount."},"tiers":{"type":"array","description":"For `tieredPercentage` — more units, larger discount.","items":{"type":"object","required":["minQuantity","percentage"],"properties":{"minQuantity":{"type":"integer","minimum":1},"percentage":{"type":"number","minimum":0,"maximum":100}}}},"maxDiscountAmount":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"description":"Cap on a percentage discount. Prevents an unbounded discount on a large basket."},"rewardVariantIds":{"type":"array","nullable":true,"items":{"type":"string","format":"uuid"},"description":"The reward products, where the reward is not the qualifying product: the free gift of `freeItem`, the \"different product\" of a `buyXGetY` (setGiftFreeProduct, setBuyGetBogo). Absent means the reward is taken from the qualifying lines. (DM5, 29 September: data model for the agreed operations)"},"maxApplicationsPerBasket":{"type":"integer","minimum":1,"nullable":true,"description":"How many times the offer repeats in one basket: the \"maximum repetitions\" of an N-for-X offer (setFixedPriceOffer). Null repeats for every complete set. (DM5, 29 September: data model for the agreed operations)"}}},
+"Discount": {"x-ticvai-persistence":"none — embedded in promotion","type":"object","required":["kind"],"properties":{"kind":{"$ref":"#/components/schemas/DiscountKind"},"percentage":{"type":"number","minimum":0,"maximum":100},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"fixedPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"buyQuantity":{"type":"integer","minimum":1},"getQuantity":{"type":"integer","minimum":1},"getDiscountPercentage":{"type":"number","minimum":0,"maximum":100,"description":"100 makes the free items actually free; lower values give a partial discount."},"tiers":{"type":"array","description":"For `tieredPercentage` — more units, larger discount.","items":{"type":"object","required":["minQuantity","percentage"],"properties":{"minQuantity":{"type":"integer","minimum":1},"percentage":{"type":"number","minimum":0,"maximum":100}}}},"maxDiscountAmount":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"description":"Cap on a percentage discount. Prevents an unbounded discount on a large basket."},"rewardVariantIds":{"type":"array","nullable":true,"items":{"type":"string","format":"uuid"},"description":"The reward products, where the reward is not the qualifying product: the free gift of `freeItem`, the \"different product\" of a `buyXGetY` (createPromotion; the builders setGiftFreeProduct and setBuyGetBogo were retired in r2, CHG-CLN-001). Absent means the reward is taken from the qualifying lines. (DM5, 29 September: data model for the agreed operations)"},"maxApplicationsPerBasket":{"type":"integer","minimum":1,"nullable":true,"description":"How many times the offer repeats in one basket: the \"maximum repetitions\" of an N-for-X offer (createPromotion; setFixedPriceOffer was retired in r2, CHG-CLN-001). Null repeats for every complete set. (DM5, 29 September: data model for the agreed operations)"}}},
 "DunningCase": {"x-ticvai-persistence":"payments.dunning_case","type":"object","description":"BL-100. **One recurring charge being chased**, and the row a venue works from.\n","required":["id","state","attemptsMade","firstFailedAt"],"properties":{"id":{"type":"string","format":"uuid"},"subjectId":{"type":"string","format":"uuid"},"orderId":{"type":"string","description":"The order whose renewal failed."},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"state":{"$ref":"#/components/schemas/DunningState"},"declineClass":{"allOf":[{"$ref":"#/components/schemas/DeclineClass"}],"description":"**From the most recent attempt.** A case that begins `soft` and turns `hard` stops immediately rather than finishing its schedule — the card changed underneath it.\n"},"attemptsMade":{"type":"integer"},"nextAttemptAt":{"type":"string","format":"date-time","nullable":true,"description":"**Null where the case has ended or the decline is hard.** A scheduled time on a case nothing will act on is the field that makes a queue untrustworthy.\n"},"firstFailedAt":{"type":"string","format":"date-time"},"resolvedAt":{"type":"string","format":"date-time","nullable":true},"resolution":{"type":"string","nullable":true,"enum":["paidByOtherMeans","cardReplaced","writeOff","cancelledByGuest",null]},"resolutionNote":{"type":"string","nullable":true,"maxLength":500,"description":"**What `resolveDunningCase` was told, which had nowhere to land until now.** The enum above tells `writeOff` from `cardReplaced`; **which invoice, whose phone call and on what authority is the sentence beside it**, and the operation's own reasoning — that these reasons must be told apart afterwards — only works if the sentence survives.\n**Same shape as `marketing.case.resolution_note`**, which is a RAG source for exactly this reason: a resolution note is the most useful free text a support record holds.\n"},"resolvedByPrincipalId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"**Who closed it.** A write-off with no name against it is the one resolution nobody can follow up, and it is also the one that moves money.\n"},"scopePath":{"type":"string","description":"**The partition key** (ADR-0005). Written at `venue` scope.\n"}}},
 "DunningState": {"type":"string","enum":["scheduled","inProgress","exhausted","recovered","resolvedManually"],"description":"BL-100. **`exhausted` and `recovered` are both endings and only one of them is a failure.** A schedule with a single terminal state cannot tell a venue whether dunning is working, which is the only question a venue asks of it.\n"},
-"FacePassEnrolment": {"type":"object","x-ticvai-persistence":"pii.subject_biometric","description":"3.2.43. **Metadata about a facial profile. Never the profile.**\n","required":["id","kind","subjectId","entitlementId","source","capturedAt"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"subjectId":{"type":"string","format":"uuid"},"entitlementId":{"type":"string","format":"uuid","description":"The `Entitlement.id`, a UUIDv7 (`pii.subject_biometric.entitlement_id`)."},"kind":{"$ref":"#/components/schemas/BiometricKind"},"retentionAnchor":{"allOf":[{"$ref":"#/components/schemas/BiometricRetentionAnchor"}],"x-ticvai-derived":"onWrite","description":"BL-106. **Derived from `kind`, never sent.** `facePass` anchors to the entitlement, `faceTag` to the ticket or to the close of the operating day.\n"},"source":{"type":"string","enum":["guestApp","ticketCounter","annualPassCounter","entryGate"],"description":"**`entryGate` is valid for `faceTag` only**, and 3.2.43's omission of it from Face Pass is deliberate: an enduring enrolment is a considered act with consent attached, not something done in a queue. 3.2.44 puts a Face Tag at a gate precisely because it dies the same day.\n"},"capturedAt":{"type":"string","format":"date-time"},"consentPurposeId":{"type":"string","format":"uuid"},"consentGivenAt":{"type":"string","format":"date-time"},"guardianSubjectId":{"type":"string","format":"uuid","nullable":true,"description":"Where the subject is a minor (3.2.12)."},"isActive":{"type":"boolean","readOnly":true},"expiresAt":{"type":"string","format":"date-time","nullable":true,"description":"**Bounded by whatever `retentionAnchor` names**, and a face outliving it is a biometric held for no stated purpose.\n**Settled 20 September by ADR-0047**, which CF-64 had been carrying since 6 August: a `facePass` cannot outlive its entitlement and a `faceTag` does not survive the close of the operating day. **These are ceilings rather than defaults** — they cannot be configured upward, because a retention that a tenant can extend without limit is the breach ADR-0047 gave the platform a ceiling to prevent.\n"}}},
+"FacePassEnrolment": {"type":"object","x-ticvai-persistence":"pii.subject_biometric","description":"3.2.43. **Metadata about a facial profile. Never the profile.**\n","required":["id","kind","subjectId","entitlementId","source","capturedAt"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"subjectId":{"type":"string","format":"uuid"},"entitlementId":{"type":"string","format":"uuid","description":"The `Entitlement.id`, a UUIDv7 (`pii.subject_biometric.entitlement_id`)."},"kind":{"$ref":"#/components/schemas/BiometricKind"},"retentionAnchor":{"allOf":[{"$ref":"#/components/schemas/BiometricRetentionAnchor"}],"x-ticvai-derived":"onWrite","description":"BL-106. **Derived from `kind`, never sent.** `facePass` anchors to the entitlement, `faceTag` to the ticket or to the close of the operating day.\n"},"source":{"type":"string","enum":["guestApp","ticketCounter","annualPassCounter","entryGate"],"description":"**`entryGate` is valid for `faceTag` only**, and 3.2.43's omission of it from Face Pass is deliberate: an enduring enrolment is a considered act with consent attached, not something done in a queue. 3.2.44 puts a Face Tag at a gate precisely because it dies the same day.\n**A self-service kiosk enrolment reads `ticketCounter` here** (an on-site enrolment) so the r1 values stand; the precise channel is `enrolmentChannel` (DEC-236; CHG-CSP-021).\n"},"enrolmentChannel":{"type":"string","readOnly":true,"enum":["guestApp","ticketCounter","annualPassCounter","selfServiceKiosk","entryGate"],"description":"**Where the face was actually captured** (decided 2 October 2026, Chinmay, BO-186; DEC-236; CHG-CSP-021): `source` with `selfServiceKiosk` told apart. `entryGate` for a Face Tag only.\n"},"consentFormId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"The venue's consent form the capture was consented on, and its version below (DEC-128; CHG-CSP-018)."},"consentFormVersion":{"type":"integer","nullable":true,"readOnly":true},"capturedAt":{"type":"string","format":"date-time"},"consentPurposeId":{"type":"string","format":"uuid"},"consentGivenAt":{"type":"string","format":"date-time"},"guardianSubjectId":{"type":"string","format":"uuid","nullable":true,"description":"Where the subject is a minor (3.2.12)."},"isActive":{"type":"boolean","readOnly":true},"expiresAt":{"type":"string","format":"date-time","nullable":true,"description":"**Bounded by whatever `retentionAnchor` names**, and a face outliving it is a biometric held for no stated purpose.\n**Settled 20 September by ADR-0047**, which CF-64 had been carrying since 6 August: a `facePass` cannot outlive its entitlement and a `faceTag` does not survive the close of the operating day. **These are ceilings rather than defaults** — they cannot be configured upward, because a retention that a tenant can extend without limit is the breach ADR-0047 gave the platform a ceiling to prevent.\n"}}},
 "GameCard": {"x-ticvai-persistence":"games.card","type":"object","required":["cardCode","venueId","credits","bonusCredits","points","status","issuedAt"],"properties":{"cardCode":{"type":"string","description":"**A pre-printed card keeps the code printed on it. A generated code** (a digital card, or a card issued with no printed code) **is the venue prefix plus a sequence per venue** (decided 28 September, audit R152). Each till holds a reserved range of that sequence, so a card issued offline takes its code at once. Not gapless; only tax invoices are gapless, per legal entity.\n"},"kind":{"type":"string"},"venueId":{"type":"string","format":"uuid"},"subjectId":{"type":"string","format":"uuid","nullable":true},"credits":{"type":"integer","description":"Bought with money. Buys plays."},"bonusCredits":{"type":"integer","description":"From a promotion. Typically non-refundable and spent before paid credits.\n"},"points":{"type":"integer","description":"Won by playing. Buys prizes. **Not interchangeable with credits** — a guest who wins should not simply be able to play more.\n"},"status":{"type":"string","enum":["active","blocked","expired","transferred"]},"blockedReason":{"type":"string","nullable":true},"transferredToCardCode":{"type":"string","nullable":true},"lastPlayedAt":{"type":"string","format":"date-time","nullable":true},"issuedAt":{"type":"string","format":"date-time"},"expiresAt":{"type":"string","format":"date-time","nullable":true}}},
 "GiftCard": {"x-ticvai-persistence":"wallet.gift_card","type":"object","required":["cardCode","faceValue","balance","status","issuedAt"],"properties":{"cardCode":{"type":"string"},"kind":{"type":"string"},"faceValue":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"balance":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"status":{"type":"string","enum":["issued","active","partiallyRedeemed","redeemed","expired","blocked"]},"blockedReason":{"type":"string","nullable":true},"issuedAt":{"type":"string","format":"date-time"},"activatedAt":{"type":"string","format":"date-time","nullable":true},"expiresAt":{"type":"string","format":"date-time","nullable":true}}},
 "GuestDevice": {"type":"object","x-ticvai-persistence":"marketing.guest_device","required":["id","subjectId","platform","status","registeredAt"],"properties":{"id":{"type":"string","format":"uuid"},"subjectId":{"type":"string","format":"uuid"},"platform":{"type":"string","enum":["ios","android","web"]},"tokenFingerprint":{"type":"string","description":"Hash of the token, not the token. The token itself is write-only — returning it would put a push credential in every response a support agent can read.\n"},"tokenRef":{"type":"string","writeOnly":true,"description":"**A vault reference to the push token**, written by the server from `registerGuestDevice.token` — the same pattern as `PaymentProvider.credentialRef`. Never the token and never returned; the sender resolves it at send time. Without it a registered device could not be sent to.\n"},"appVersion":{"type":"string","nullable":true},"osVersion":{"type":"string","nullable":true},"deviceModel":{"type":"string","nullable":true},"locale":{"type":"string","nullable":true},"status":{"type":"string","enum":["active","revoked","failed"]},"failureCount":{"type":"integer","description":"Consecutive delivery failures. Past the threshold the device is marked failed and stops being targeted — a dead token retried forever is wasted quota and a misleading delivery rate.\n"},"registeredAt":{"type":"string","format":"date-time"},"lastSeenAt":{"type":"string","format":"date-time","nullable":true},"revokedAt":{"type":"string","format":"date-time","nullable":true}}},
 "GuestListing": {"type":"string","enum":["bookable","infoOnly","hidden"],"default":"bookable","description":"**How a product appears to a guest** (decided 29 September, rev 3 REV3-14). `bookable`: listed and searched while it is on sale, and added to the basket. `infoOnly`: listed and searched with its details, photo and `notBookableLabel` whether or not it is on sale, and **never added to a basket** (`addCartLine` refuses it with `409`); the screen opens its details instead. `hidden`: never listed or searched for a guest, and reachable only where a staff channel sells it. Independent of `isSellable`, which says whether a channel may sell it at all.\n"},
 "GuestMembership": {"type":"object","description":"19.2.26 to 19.2.28. **A view, not a table** — assembled from the entitlement, the product that granted it and the order that bought it.\n","required":["entitlementId","productId","name","status"],"properties":{"entitlementId":{"type":"string","format":"uuid","description":"The `access.Entitlement.id` this membership is — a UUIDv7, like every entitlement id."},"productId":{"type":"string","format":"uuid"},"name":{"type":"string"},"tier":{"type":"string","nullable":true},"status":{"type":"string","enum":["active","frozen","suspended","expired","cancelled"],"description":"**Derived from the entitlement, not held here.** This schema is a view assembled from the entitlement, the product that granted it and the order that bought it — the lifecycle lives in `states/entitlement-status.yaml` and `frozen` is what `freezeEntitlement` sets.\nNo state model of its own, deliberately: **two models over one lifecycle drift.**\n"},"validFrom":{"type":"string","format":"date"},"validTo":{"type":"string","format":"date"},"frozenDays":{"type":"integer","description":"Days lost to a freeze and added back to `validTo`. **Shown because a guest who paused a pass will check the maths**, and a validity date that moved without explanation is a support call.\n"},"benefits":{"type":"array","description":"5.4.31. From the product's entitlement template. **Traceable to what grants them**, so a gate can honour what the app promised.\n","items":{"type":"object","properties":{"code":{"type":"string"},"name":{"type":"string"},"value":{"type":"string","nullable":true}}}},"renewsOn":{"type":"string","format":"date","nullable":true},"previousTerms":{"type":"array","description":"Prior terms, including lapsed ones.","items":{"type":"object","properties":{"validFrom":{"type":"string","format":"date"},"validTo":{"type":"string","format":"date"},"endedBecause":{"type":"string","enum":["expired","renewed","cancelled","upgraded"]}}}}}},
 "GuestPromotion": {"x-ticvai-persistence":"none — guest projection of promotions.promotion","type":"object","description":"**What a guest may see of a promotion.** `Promotion` carries the commercial internals (`budgetCap`, `maxRedemptions`, `redemptionCount`, `discountGiven`, `precedence`, `stackingGroup`), and `listPromotions` and `getPromotion` are guest-audience. A guest caller receives this shape instead. `additionalProperties: false` is the point: a server that adds an internal field to it fails validation instead of publishing the field.\n","additionalProperties":false,"required":["id","code","name","discount","validFrom"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string"},"name":{"type":"string"},"description":{"type":"string"},"discount":{"$ref":"#/components/schemas/Discount"},"conditions":{"$ref":"#/components/schemas/PromotionConditions"},"stackingMode":{"$ref":"#/components/schemas/StackingMode"},"validFrom":{"type":"string","format":"date-time"},"validTo":{"type":"string","format":"date-time"},"maxRedemptionsPerGuest":{"type":"integer","nullable":true}}},
+"LeaderboardEntry": {"x-ticvai-persistence":"none — computed from marketing.loyalty_position","type":"object","description":"22.6. **One row of a leaderboard, and deliberately not enough to identify anybody.** There is no `subjectId` here and that is the whole design: a nickname beside a resolvable identifier protects nothing.\n","required":["rank","nickname","points"],"properties":{"rank":{"type":"integer","minimum":1},"nickname":{"type":"string","description":"**Always present, and never their real name.** The guest's chosen `leaderboardNickname` where they have set one, and otherwise a generated `Player-4821`.\n**Not nullable, because a rank with no name is a hole on the board.** The first cut of this returned null and left second place reading as a dash, which tells somebody they do not count every time they look — and being on the board is the whole point of the board.\n**Generated from the loyalty position's own id**, not from the subject id and not from a counter: it is stable across months, so the same guest is the same `Player-N` and can be congratulated by it, and it carries nothing — no rank, no join date, and no sequence anybody can count backwards from to learn how many guests a programme has.\n"},"points":{"type":"integer"},"isMe":{"type":"boolean","default":false,"description":"**How a client highlights the caller's own row without learning who anybody else is.** The alternative — returning identifiers and letting the client match — is the disclosure this schema exists to avoid.\n"}}},
 "LocalisedText": {"x-ticvai-persistence":"none — jsonb column","type":"object","additionalProperties":{"type":"string"}},
 "LoyaltyPosition": {"x-ticvai-persistence":"marketing.loyalty_position","type":"object","required":["subjectId","programmeId","pointsBalance","tierCode"],"properties":{"leaderboardNickname":{"type":"string","nullable":true,"maxLength":24,"description":"BL-173. **The name shown on a leaderboard, chosen by the guest.** Offered whenever they reach the board and changeable afterwards; `setLeaderboardNickname` is the only thing that writes it.\n**Null means the guest has not chosen one yet, and the board shows a generated `Player-4821` in its place** — never `pii.subject.display_name`, which would disclose silently on the day a guest first placed and is the case this field exists to prevent.\n**The generated name is computed at read time and not stored here.** Writing it would make *\"has this guest chosen a name\"* unanswerable, and that flag is what the prompt-on-reaching-the-board depends on.\n"},"subjectId":{"type":"string","format":"uuid"},"programmeId":{"type":"string","format":"uuid"},"pointsBalance":{"type":"integer"},"lifetimePoints":{"type":"integer"},"tierId":{"type":"string","format":"uuid","nullable":true,"description":"**The tier this row's `tierCode` and `tierName` are a copy of.** Added 20 September with `marketing.programme_tier`: the two strings were a cache of something that did not exist, and a cache with no source cannot be rebuilt or audited.\n"},"tierCode":{"type":"string"},"tierName":{"type":"string"},"pointsToNextTier":{"type":"integer","nullable":true},"nextExpiryPoints":{"type":"integer","nullable":true},"nextExpiryAt":{"type":"string","format":"date-time","nullable":true}}},
 "LoyaltyProgramme": {"x-ticvai-persistence":"marketing.loyalty_programme + marketing.points_earning_rule + marketing.programme_tier","type":"object","required":["id","code","name","earnRules","tiers"],"properties":{"tiers":{"type":"array","description":"**Rows of `marketing.programme_tier`**, the same shape `MarketingProgrammeTier` has — one definition of a tier, not a second copy that cannot round-trip. `loyaltyProgrammeId` and `id` are the server's on create.\n","items":{"$ref":"#/components/schemas/MarketingProgrammeTier"}},"id":{"readOnly":true,"type":"string","format":"uuid"},"code":{"type":"string","x-ticvai-unique":"tenant","description":"**Unique per tenant** (decided 28 September, audit R108). A code already used by any loyalty programme in the tenant, at any venue, is refused with `409 duplicate-code`.\n"},"name":{"type":"string"},"venueId":{"type":"string","format":"uuid","nullable":true},"pointsLiabilityAccountId":{"type":"string","format":"uuid","description":"Points post here on accrual. They are a liability from the moment they are earned, not from the moment they are spent.\n"},"earnRules":{"type":"array","items":{"type":"object","required":["trigger","points"],"properties":{"trigger":{"type":"string","enum":["perCurrencyUnit","perVisit","perProduct","onSignup","onBirthday","onReview"]},"points":{"type":"number"},"productKinds":{"type":"array","description":"Limits a `perProduct` or `perCurrencyUnit` rule to these kinds. Empty means every kind.","items":{"$ref":"../spine/catalogue.yaml#/components/schemas/ProductKind"}},"multiplier":{"type":"number"}}}},"pointsExpireAfterMonths":{"type":"integer","nullable":true},"isActive":{"type":"boolean"}}},
+"MarketingCustomerBadge": {"type":"object","x-ticvai-persistence":"marketing.customer_badge","description":"**Taken from the backend workbook, 20 September.** Stores badges actually awarded to customers and the source that generated each award.","required":["customerId","badgeId","awardedAt","status"],"properties":{"id":{"type":"string","format":"uuid"},"customerId":{"type":"string","format":"uuid"},"badgeId":{"type":"string","format":"uuid"},"challengeId":{"type":"string","format":"uuid","nullable":true},"sourceType":{"type":"string","maxLength":30,"nullable":true},"sourceReferenceId":{"type":"string","format":"uuid","nullable":true},"awardedAt":{"type":"string","format":"date-time"},"expiresAt":{"type":"string","format":"date-time","nullable":true},"status":{"type":"string","maxLength":20}}},
 "MarketingProgrammeTier": {"type":"object","x-ticvai-persistence":"marketing.programme_tier","description":"**The tier definition decision 8 promised and nobody built.** `marketing.loyalty_position` carried `tierCode`, `tierName` and `pointsToNextTier` as denormalised strings and a number, with no table saying what tiers exist or what each one requires — so `pointsToNextTier` was computed from a threshold that lived nowhere.\n**Not named `marketing.loyalty_tier`**: that name is recorded in `schema-history.json` as renamed to `marketing.points_earning_rule` on 20 September, and a rename record that contradicts the schema is worse than a longer name. Not named `marketing.tier` either, because `subscription.tier_allowance` is a SaaS plan's tier and one bare `tier` in a package with two tier concepts is how `plan_id` came to point at `subscription.plan`.\n**The denormalised copy on the position stays.** A till rendering *Gold* beside a balance must not join, and must certainly not cross a cell boundary to print a word. This table is the source of truth and those columns are its cache.\n","required":["loyaltyProgrammeId","code","name","rank"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"loyaltyProgrammeId":{"type":"string","format":"uuid","readOnly":true},"code":{"type":"string","maxLength":40},"name":{"type":"string","maxLength":120},"rank":{"type":"integer","description":"**Order, not threshold.** Two tiers can share a qualifying rule and still have an order, and sorting by points breaks the moment a tier is granted rather than earned.\n"},"minLifetimePoints":{"type":"integer","nullable":true,"description":"What reaching this tier requires. **`pointsToNextTier` on the position is this minus the guest's lifetime points**, and until now it was this minus nothing.\n"},"retainLifetimePoints":{"type":"integer","nullable":true,"description":"What keeping it requires, per review period. **Usually lower than reaching it**, and a scheme that cannot express the difference either never demotes or demotes on the day a guest stops earning.\n"},"validityMonths":{"type":"integer","nullable":true,"description":"Null means the tier does not lapse on its own."},"benefits":{"type":"array","description":"What the tier gives, as the guest reads it. Text shown, not rules enforced.","items":{"type":"string"}},"earnMultiplier":{"type":"number","nullable":true,"description":"Applied to every earn rule while the guest holds this tier. Null means 1."},"isActive":{"type":"boolean","default":true}}},
+"MarketingReward": {"type":"object","x-ticvai-persistence":"marketing.reward","description":"**Taken from the backend workbook, 20 September.** Defines a loyalty reward that can be issued to eligible customers.","required":["loyaltyProgramId","code","name","type","isActive"],"properties":{"id":{"type":"string","format":"uuid"},"loyaltyProgramId":{"type":"string","format":"uuid"},"code":{"type":"string","maxLength":100},"name":{"type":"string","maxLength":200},"type":{"type":"string","maxLength":30},"productId":{"type":"string","format":"uuid","nullable":true},"pointsCost":{"type":"number","nullable":true},"discountValue":{"type":"number","nullable":true},"validityDays":{"type":"integer","nullable":true},"isActive":{"type":"boolean"}}},
 "MessageChannel": {"type":"string","enum":["email","sms","whatsapp","push","inApp","post"]},
 "MfaEnrolment": {"x-ticvai-persistence":"none — transient","type":"object","required":["methodId","kind"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true,"description":"**Added 20 August.** The table had no key at all — no id, no parent and no natural key, so **no row could be addressed, updated or deleted.** The response schema returned everything a caller needs and not the row's own identity, which is the difference between an API response and a table.\n"},"methodId":{"type":"string","format":"uuid"},"kind":{"$ref":"#/components/schemas/MfaKind"},"secret":{"type":"string","nullable":true,"description":"TOTP shared secret. Returned once, at enrolment, and never again."},"qrCodeUri":{"type":"string","nullable":true},"recoveryCodes":{"type":"array","description":"Returned once, in this enrolment response (`enrolMfaMethod` writes them, hashed, to `identity.mfa_recovery_code`). Not retrievable afterwards — `verifyMfaEnrolment` does not return them.\n","items":{"type":"string"}},"expiresAt":{"type":"string","format":"date-time"}}},
 "MfaKind": {"type":"string","enum":["totp","smsOtp","emailOtp","biometric","hardwareToken"]},
@@ -1573,7 +1855,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "ProductMedia": {"x-ticvai-persistence":"catalogue.product_media","type":"object","required":["assetId","kind","isPrimary"],"description":"One photo or video of a product, referencing the asset library (decided 29 September, 23SEP-4). One row per product and asset, so the asset library can answer which products use an asset.\n","properties":{"assetId":{"type":"string","format":"uuid","description":"A `MediaAsset` of `assets.yaml`, in status `ready`."},"kind":{"type":"string","enum":["image","video"]},"isPrimary":{"type":"boolean","default":false,"description":"The item *Read more* opens on and a listing shows. Exactly one per product."},"displayOrder":{"type":"integer","default":100},"altText":{"allOf":[{"$ref":"#/components/schemas/LocalisedText"}],"nullable":true}}},
 "ProductSalesContact": {"x-ticvai-persistence":"none — jsonb column on catalogue.product","type":"object","description":"Who to contact to book a view-only product (decided 29 September, W3). At least one of `phone` or `email`.\n","minProperties":1,"properties":{"phone":{"type":"string","maxLength":32,"nullable":true},"email":{"type":"string","format":"email","maxLength":254,"nullable":true},"note":{"allOf":[{"$ref":"#/components/schemas/LocalisedText"}],"nullable":true,"description":"A line shown under the contact, e.g. *Group courses are booked by phone*. At most 200 characters per language."}}},
 "Promotion": {"x-ticvai-persistence":"promotions.promotion","allOf":[{"$ref":"#/components/schemas/CreatePromotionRequest"},{"type":"object","required":["id","status"],"properties":{"id":{"type":"string","format":"uuid"},"status":{"$ref":"#/components/schemas/PromotionStatus"},"isPaused":{"type":"boolean"},"redemptionCount":{"type":"integer"},"discountGiven":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"publishedAt":{"type":"string","format":"date-time","nullable":true},"version":{"type":"integer","minimum":1,"readOnly":true,"description":"Starts at 1 and goes up by one on every saved change. The version the directory, the audit history (`promotions.promotion_audit`) and the channel publication monitor (`promotions.promotion_channel_publication`) name. (DM5, 29 September: data model for the agreed operations)"}}}]},
-"PromotionConditions": {"x-ticvai-persistence":"none — embedded in promotion","type":"object","description":"All conditions must hold. An empty object matches everything.","properties":{"variantIds":{"type":"array","items":{"type":"string","format":"uuid"}},"productKinds":{"type":"array","items":{"type":"string"}},"categoryIds":{"type":"array","items":{"type":"string","format":"uuid"}},"minQuantity":{"type":"integer","minimum":1},"minBasketValue":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"channels":{"type":"array","description":"Empty or absent matches every channel.","items":{"$ref":"../shared/common.yaml#/components/schemas/SalesChannel"}},"purchaseGate":{"type":"boolean","default":false,"description":"BL-037. **`evaluatePromotions` gates a price and nothing gated a sale.** A non-member could buy a member-only product at the member price refused, which is a discount failure rather than an eligibility one.\nTrue makes these conditions a **precondition of purchase**: fail them and the line cannot be added, not merely charged more. **Evaluated at add-to-cart**, because a guest told at payment has already entered a card.\n"},"paymentMethod":{"type":"array","nullable":true,"description":"BL-113. **Card-issuer and payment-type promotions** — *10% with a Network International card* is a real campaign a bank co-funds, and it was unexpressible.\n**Evaluated at payment, not at cart**, which is the awkward part: the discount appears after the tender is chosen, and the basket total must be allowed to move at that point.\n","items":{"type":"string"}},"issuerBins":{"type":"array","nullable":true,"description":"Card BIN ranges, where the campaign is issuer-specific rather than scheme-specific. **The bank supplies these and they change**, so they are data rather than configuration.\n","items":{"type":"string"}},"componentRedemption":{"type":"string","nullable":true,"enum":["allTogether","independently","sequenced"],"description":"BL-112. **Per-component redemption inside a bundle was unstated.** A park-plus-lunch bundle where lunch may be used another day behaves differently from one where both must be used on the same visit, and **the difference is revenue recognition, not just convenience.**\n"},"daysOfWeek":{"type":"array","items":{"type":"integer","minimum":0,"maximum":6}},"startTime":{"type":"string","pattern":"^([01]\\d|2[0-3]):[0-5]\\d$"},"endTime":{"type":"string","pattern":"^([01]\\d|2[0-3]):[0-5]\\d$"},"membershipTierIds":{"type":"array","items":{"type":"string","format":"uuid"}},"requiresCoupon":{"type":"boolean","default":false},"firstPurchaseOnly":{"type":"boolean","default":false},"performanceIds":{"type":"array","items":{"type":"string","format":"uuid"}},"advanceDaysMin":{"type":"integer","description":"Early-bird — booked at least this many days ahead."},"advanceDaysMax":{"type":"integer","description":"Last-minute — booked no more than this many days ahead."},"eligibilityRuleIds":{"type":"array","nullable":true,"items":{"type":"string","format":"uuid"},"description":"Reusable eligibility rules (`promotions.promotion_rule` rows of `ruleType: eligibility` with no promotion of their own, saved by setEligibilityRule) that must also hold. Each is evaluated with its own `effect`. (DM5, 29 September: data model for the agreed operations)"}}},
+"PromotionConditions": {"x-ticvai-persistence":"none — embedded in promotion","type":"object","description":"All conditions must hold. An empty object matches everything.","properties":{"variantIds":{"type":"array","items":{"type":"string","format":"uuid"}},"productKinds":{"type":"array","items":{"type":"string"}},"categoryIds":{"type":"array","items":{"type":"string","format":"uuid"}},"minQuantity":{"type":"integer","minimum":1},"minBasketValue":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"channels":{"type":"array","description":"Empty or absent matches every channel.","items":{"$ref":"../shared/common.yaml#/components/schemas/SalesChannel"}},"purchaseGate":{"type":"boolean","default":false,"description":"BL-037. **`evaluatePromotions` gates a price and nothing gated a sale.** A non-member could buy a member-only product at the member price refused, which is a discount failure rather than an eligibility one.\nTrue makes these conditions a **precondition of purchase**: fail them and the line cannot be added, not merely charged more. **Evaluated at add-to-cart**, because a guest told at payment has already entered a card.\n"},"paymentMethod":{"type":"array","nullable":true,"description":"BL-113. **Card-issuer and payment-type promotions** — *10% with a Network International card* is a real campaign a bank co-funds, and it was unexpressible.\n**Evaluated at payment, not at cart**, which is the awkward part: the discount appears after the tender is chosen, and the basket total must be allowed to move at that point.\n","items":{"type":"string"}},"issuerBins":{"type":"array","nullable":true,"description":"Card BIN ranges, where the campaign is issuer-specific rather than scheme-specific. **The bank supplies these and they change**, so they are data rather than configuration.\n","items":{"type":"string"}},"componentRedemption":{"type":"string","nullable":true,"enum":["allTogether","independently","sequenced"],"description":"BL-112. **Per-component redemption inside a bundle was unstated.** A park-plus-lunch bundle where lunch may be used another day behaves differently from one where both must be used on the same visit, and **the difference is revenue recognition, not just convenience.**\n"},"daysOfWeek":{"type":"array","items":{"type":"integer","minimum":0,"maximum":6}},"startTime":{"type":"string","pattern":"^([01]\\d|2[0-3]):[0-5]\\d$"},"endTime":{"type":"string","pattern":"^([01]\\d|2[0-3]):[0-5]\\d$"},"membershipTierIds":{"type":"array","items":{"type":"string","format":"uuid"}},"requiresCoupon":{"type":"boolean","default":false},"firstPurchaseOnly":{"type":"boolean","default":false},"performanceIds":{"type":"array","items":{"type":"string","format":"uuid"}},"advanceDaysMin":{"type":"integer","description":"Early-bird — booked at least this many days ahead."},"advanceDaysMax":{"type":"integer","description":"Last-minute — booked no more than this many days ahead."},"eligibilityRuleIds":{"type":"array","nullable":true,"items":{"type":"string","format":"uuid"},"description":"Reusable eligibility rules (`promotions.promotion_rule` rows of `ruleType: eligibility` with no promotion of their own) that must also hold. **Deprecated in r2** (CHG-CLN-001): setEligibilityRule, which saved library rules, was retired (BC-017), so no operation creates one; send the conditions inline. Rules already saved still apply. Each is evaluated with its own `effect`. (DM5, 29 September: data model for the agreed operations)"}}},
 "PromotionStatus": {"type":"string","enum":["draft","scheduled","live","paused","expired","ended"]},
 "PublishedTrackingTechnology": {"type":"object","x-ticvai-persistence":"none — the approved rows of marketing.tracking_technology, guest-facing fields only","description":"One approved technology as the preference centre shows it (2.6.54).","required":["name","provider","category","isThirdParty"],"properties":{"name":{"type":"string"},"provider":{"type":"string"},"category":{"$ref":"#/components/schemas/CookieCategory"},"technologyType":{"type":"string"},"purpose":{"type":"string","nullable":true},"durationDays":{"type":"integer","nullable":true,"description":"Null for session storage."},"isThirdParty":{"type":"boolean"},"privacyInformation":{"type":"string","nullable":true}}},
 "RecordConsentRequest": {"x-ticvai-persistence":"none — request only","type":"object","required":["purpose","decision","noticeVersion","source","recordedAt"],"properties":{"purpose":{"$ref":"#/components/schemas/ConsentPurpose"},"decision":{"$ref":"#/components/schemas/ConsentDecision"},"channels":{"type":"array","description":"Omit to apply to every channel the purpose covers.","items":{"$ref":"#/components/schemas/MessageChannel"}},"noticeVersion":{"type":"string"},"source":{"$ref":"#/components/schemas/ConsentSource"},"recordedAt":{"type":"string","format":"date-time"}}},

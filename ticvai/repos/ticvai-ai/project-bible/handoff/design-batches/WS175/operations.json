@@ -81,6 +81,11 @@
     "name": "groupBy",
     "in": "query",
     "required": null
+   },
+   {
+    "name": "module",
+    "in": "query",
+    "required": null
    }
   ],
   "requestBody": null,
@@ -184,45 +189,6 @@
   "requestBody": null,
   "responds": "Page"
  },
- "listInventoryHolds": {
-  "method": "GET",
-  "path": "/inventory-holds",
-  "contract": "catalogue",
-  "summary": "List inventory holds",
-  "permission": "PRODUCT_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "channelCapacityId",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "holderWorkstationId",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "status",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- },
  "listSeatCategories": {
   "method": "GET",
   "path": "/seat-categories",
@@ -241,6 +207,25 @@
   ],
   "requestBody": null,
   "responds": "SeatCategory"
+ },
+ "listSeatHoldPools": {
+  "method": "GET",
+  "path": "/seat-hold-pools",
+  "contract": "seating",
+  "summary": "Held seats, by pool, with what is left and when it releases",
+  "permission": "CAPACITY_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "performanceId",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "SeatHoldPool"
  },
  "listSeats": {
   "method": "GET",

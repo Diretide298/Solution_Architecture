@@ -61,6 +61,36 @@ convincingly. It is never a caption.
   and its error; and, element by element, what is shown and in what format, what each action
   produces and where the user goes next. Draw exactly that.
 
+## The processes these screens belong to
+
+Written by the owner of each process (`handoff/design-notes/`). Read before any screen: it says how the process runs end to end and which words the screens must use.
+
+### Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue)
+
+Venue operations is everything that happens after a sale and inside the gates. A guest's ticket is one virtual ticket with interchangeable media (QR, dynamic QR, RFID wristband, NFC, Face Pass or Face Tag); at an access point a scanner (P07, or the scan function inside the Staff App P06) validates the media against the admission profile and the guest admission policy, offline if it must, and every deny carries a reason and a next action. The back office (Venue Management P08) configures that estate: the venue topology (venue, park, zone, attraction, access point, gate and lane, device placement), admission profiles and rules (entry, exit, re-entry, anti-passback, validity, crossover, companions), credential security (dynamic QR, device binding, beacons), biometrics, gate modes, and the live operations, fraud and monitoring views. Accreditation (P08 setup and review, P11 web portal for applicants, web first) takes an applicant from a configurable form through document checks, OCR, duplicate blocking and multi-level approval to a credential with zone rights. Resources and capacity manage bookable resources (rooms, vehicles, equipment, cabanas, instructors) that are booked as a consequence of selling a product, never sold directly. Workforce covers shift templates, rosters, attendance, swaps and breaks, mirrored on the Staff App. Maintenance and safety cover the asset register, preventive calendars, work orders with scored priority, inspections and incidents, with technicians working from the Staff App. Games and rides configure readers, credit types and consumption priority, play entitlements, game pricing, retry pricing, redemption and the card lifecycle. The virtual queue (Q1) gives a guest a live wait time and a return window for a ride; it is not the on-sale waiting room (Q2). Every calendar has day, week and month views. Configuration resolves tenant, region, venue (outlet only for F&B and retail), and a user's permissions, never the device, decide what they may do. The guest apps (P01, P02) show the guest's side of this: My Tickets, the scan code, Face Pass, wait times, the virtual queue, map booking of cabanas and the visit planner.
+*(source: F06 step 1 / F112 step 1 / F111 step 1 / ADR-0002 / ADR-0012 / ADR-0018 / ADR-0041 / ADR-0066 / ADR-0067 / ADR-0068 / DI-652 / DI-627 / DI-640 / DI-654 / DI-666 / DI-482 / DI-483 / DI-907 / DI-919 / DI-923 / DI-865 / DI-678 / TRACKER Actions row 160 / MoM 2026-09-02 AccessControl / MoM 2026-09-07 …)*
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Ticket | The one virtual record a guest owns (ticket number, product, validity, entries). Its number never changes, whatever media carries it or whoever it is transferred or resold to. | Pass (unless the product is a pass), Booking, Order line | DI-652 / DI-620 / contracts/spine/access.yaml#/components/schemas/TicketStatus |
+| Media | What the ticket is presented by at a gate (QR code, dynamic QR, wristband/RFID card, NFC, Face Pass, Face Tag). One ticket can carry several media as fallbacks; a media code can also cover several tickets scanned as one group. Show one … | Credential (for guest media; keep Credential for accreditation badges and staff), Ticket code | DI-180 / DI-608 / DI-652 |
+| Access point | A place where a scan is judged, with a fixed direction (entry, exit, re-entry, crossover). Hierarchy shown to users is Venue > Park > Zone > Attraction > Access point > Gate/lane > Device. | Scanner (that is the device), Door | screens/P08-venue-back-office.yaml#BO-144 / … |
+| Admission profile | The named set of rules an access point enforces (opening window, entries, exit scan, re-entry, validity, crossover). Products point at a profile; tiers such as Bronze/Silver/Gold are profiles with gate allow and deny lists. | Admission rules (as a screen title), Access rule set | DI-185 / contracts/spine/access.yaml#/components/schemas/AdmissionRules |
+| Admitted / Denied / Overridden | The three scan outcomes. A denial is always shown with its reason in plain words and a next action; an override is a supervisor admitting despite a denial, and is always attributed and reasoned. | Valid/Invalid, Success/Fail, Error | contracts/spine/access.yaml#/components/schemas/ScanOutcome / … |
+| Used | A ticket entry is used the moment a scan succeeds, whether or not the guest physically passed. Mistakes are resolved from the scan history, not by un-scanning. | Redeemed (for admission), Checked in (that is group check-in, a different step) | DI-627 / TRACKER Actions row 221 / TRACKER Actions row 189 |
+| Gate mode | What a lane is doing now, set live by the podium or supervisor - Normal, Free flow (counts, does not validate), Drop arm (everybody through, evacuation), Closed (nobody through), Podium (staff validating by eye), Maintenance. Direction is … | Turnstile mode (as a label for direction), Open/Locked | contracts/spine/access.yaml#/components/schemas/AccessPointOperatingMode / R221 |
+| Offline package | What a scanner holds to validate with no network - entitlements, blacklist, admission profiles and the active guest admission policy version - with its age always visible. | Cache, Local DB | F06 step 3 / ADR-0068 |
+| Sync and reconciliation | Sending the offline scan journal to the server, and the duty manager's review of scans the server rejected after the device had already admitted the guest. | Upload, Retry | F06 step 6 / DI-065 |
+| Face Pass / Face Tag | Face Pass is the long-lived face credential for members and season-pass holders (renewable); Face Tag is short-lived, for one day or event. Retention is set per tier by the venue. | Face ID, Biometric login | DI-640 / ADR-0063 |
+| Accreditation / Credential (accreditation) | Accreditation is the application and approval of a person (media, contractor, corporate, staff of a partner) for an event or season; the credential is what is issued after approval (photo badge, QR or RFID) with zone access rights. | Registration (for the whole process), Ticket | DI-654 / DI-662 |
+| Resource | A bookable thing or person a product needs (room, vehicle, cabana, equipment set, instructor). Guests buy products; resources are assigned to the booking, pre-assigned or dynamically. | Asset (that is maintenance), Inventory (that is stock) | DI-475 / DI-482 / TRACKER Actions row 160 |
+| Asset | A physical item maintained by the venue (ride, turnstile, printer, pump) with a register record, documents, warranty and maintenance history. | Resource, Device (unless it is an IT device in the device register) | DI-910 / ADR-0067 |
+| Work order | A unit of maintenance work, lifecycle Created > Assigned > In progress > Review > Closed, with a resolution timer. | Ticket (reserved for guest tickets), Job card | DI-231 |
+| Game / attraction (games module) | In the games and rides module an attraction is an individual game or ride (roller coaster, racing game, bumper cars), not a venue. | Venue, Park | DI-863 |
+| Virtual queue / Return window | A guest's place in a ride's queue held without standing in line, with a return window (for example 4:50 to 5:00 PM) that recalculates live. Distinct from the walk-in line and the VIP/express lane, and from the on-sale waiting room. | Waiting room, Fast pass (that is the express product), Booking | DI-675 / DI-678 / DI-679 / ADR-0066 |
+| Wait time source | Where a ride's wait time comes from - Sensor, Throughput, Manual, or Unavailable - always shown beside the number. | Live (when the source is manual) | contracts/satellite/queue.yaml#/components/schemas/WaitTimeSource / DI-315 |
+
+
 ## The screens
 
 Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs count fields; requirements are matrix rows; meeting inputs are the ones naming the screen (the module and platform ones are below); white label says whether the tenant's brand reaches it (guest) or it sets the brand (configures).
@@ -69,11 +99,11 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-864` | Resource Calendar Command Center | B–D | 0 | 10 | 6 | 0 | 3 | 0 | — | notStarted (—) |
 | `BO-865` | Calendar Filters, Search & Smart Discovery | B–D | 2 | 0 | 6 | 3 | 1 | 0 | — | notStarted (—) |
-| `BO-866` | Resource Availability Schedule Configuration | A | 30 | 2 | 6 | 47 | 1 | 0 | — | notStarted (—) |
+| `BO-866` | Resource Availability Schedule Configuration | A | 23 | 6 | 6 | 47 | 1 | 0 | — | notStarted (—) |
 | `BO-867` | Resource Time-Slot Configuration | B–D | 13 | 0 | 6 | 1 | 1 | 0 | — | notStarted (—) |
 | `BO-868` | Advance Reservation Management | B–D | 26 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-869` | Recurring Reservation Configuration | B–D | 10 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-870` | Operational Time & Resource Blocking | A | 12 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-870` | Operational Time & Resource Blocking | A | 9 | 5 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-871` | Multi-Event Resource Planning | B–D | 0 | 18 | 6 | 1 | 1 | 0 | — | notStarted (—) |
 | `BO-872` | Smart Assignment & Drag-and-Drop Reallocation | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 
@@ -105,6 +135,15 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** The main operational resource calendar: every permitted resource (staff, rooms, areas, equipment, rental items, vehicles) against time, with its computed state, utilisation colour and conflicts, and the actions an operator takes from a slot or a booking (assign, reserve, block, extend, shorten, reassign, cancel, check in/out). It answers "which of these 10 vehicles is free from 10:00 to 14:00" at a glance. The one thing to get right: it is a workspace, not a picture - every cell is clickable and every refusal names the clash; and resources are normally booked by selling a product, so manual booking is the exception and says so.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **An unlabelled primary button and a Cancel button on a calendar** Why: A calendar has no Cancel; the primary action is New booking (and Smart Assign). *(source: screens/P08-venue-back-office.yaml#BO-864; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **The gap note says the pack gives nothing drawable** Why: The pack lists six views, ten resource groups, twelve statuses, utilisation colours and eleven smart actions. *(source: screens/P08-venue-back-office.yaml#BO-864 / screens/P08-venue-back-office.yaml#BO-865; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **The calendar read has no venue filter and no revenue value** Why: DI-475 asks for filtering by venue and a switchable revenue view; getResourceCalendar takes type, category and granularity only and segments carry no amount. *(source: DI-475 / contracts/satellite/resources.yaml#getResourceCalendar; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **Calendar segments have no setup, teardown or cleaning state** Why: The Block A calendar (BO-096) draws them as bands; the command-centre grid cannot unless the read returns them. *(source: contracts/satellite/resources.yaml#/components/schemas/ResourceCalendarRow / DI-1012; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+
 #### Inputs: what the user enters or picks
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
@@ -118,6 +157,12 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Granularity | radio group | — | Day · Week · Month · Agenda | `getResourceCalendar` ?granularity |
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **View**: Segmented Timeline / Day / Week / Month / Agenda (VO-R01). Timeline and Week put resources as rows; Day may put resources as columns (as on the client's overview) - a Rows/Columns toggle. Day view hour lines start at the venue's calendarDayStartHour; a red now-line on today. *(source: screens/P08-venue-back-office.yaml#BO-864 / DI-919)*
+- **Resource group and filters**: Chips All resources, Staff, Rooms, Areas, Venues, Equipment, Assets, Rental resources, Vehicles, plus the tenant's custom types; type, category and venue selects; the Filters button opens the discovery drawer (BO-865). Saved views listed in a dropdown. *(source: screens/P08-venue-back-office.yaml#BO-864 / DI-475 / DI-480)*
+- **Bookings / Revenue switch**: A two-way switch above the grid; Revenue shows each booking's value in AED and a per-row total instead of guest names. *(source: DI-475)*
 
 #### Outputs: what the screen shows and produces
 
@@ -145,6 +190,18 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |  (primary button) | navigation or local | — | — | — | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
 
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **KPI strip**: Metric tiles above the calendar - Total resources, Today's bookings, Utilisation today, Active staff (on duty now), Pending requests - with deltas (VO-R02); each tile filters the grid. *(source: screens/P08-venue-back-office.yaml#BO-864)*
+- **Calendar cells**: The twelve computed states each with its own fill - Available, Reserved, Assigned, Partially utilised, Fully utilised, Unavailable, On break, On leave, Under maintenance, Operationally blocked (hatched), Pending approval (dashed), Conflict (red outline). Booking blocks show title, time, guest or company and participants. Utilisation as a thin bar per row using Low 0-30% / Medium 31-60% / High 61-80% / Very high 81-100% colours. *(source: screens/P08-venue-back-office.yaml#BO-865 / screens/P08-venue-back-office.yaml#BO-864 / contracts/satellite/resources.yaml#/components/schemas/ResourceCalendarRow)*
+- **Side panels**: Quick assign (type, resource, date, time, duration, purpose), Upcoming bookings, Resource alerts, AI suggestions ("Based on demand, add 2 instructors tomorrow" with Review, per VO-R11). *(source: screens/P08-venue-back-office.yaml#BO-864)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Click a free slot**: Menu - Assign resource, Create reservation (opens BO-868 prefilled), Create block (BO-870 form inline), View availability, View resource profile. A manual reservation asks for a reason because resources are normally booked by the sale. *(source: screens/P08-venue-back-office.yaml#BO-865 / DI-483 / contracts/satellite/resources.yaml#bookResource)*
+- **Click a booking**: View, Edit, Reassign, Extend, Shorten, Cancel, and Check out/in for rentals or Start/Complete for a person. Extend/shorten/reassign re-run conflict detection; a 409 names the clashing booking or block with times. Cancelling a recurring booking asks "This occurrence or the whole series" with nothing preselected. *(source: contracts/satellite/resources.yaml#updateResourceBooking / contracts/satellite/resources.yaml#cancelResourceBooking / contracts/satellite/resources.yaml#/components/schemas/ResourceConflictProblem)*
+- **New booking / Smart Assign (AI)**: New booking opens BO-868; Smart Assign opens the ranked suggestions of BO-872 for the selected requirement. *(source: screens/P08-venue-back-office.yaml#BO-864)*
+
 **Data it reads**: `getResourceCalendar` (onLoad, Every resource against time)
 
 **Where the user goes next**
@@ -170,6 +227,41 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 Bookings already exist in the window. They are listed, because blocking over a booked resource is sometimes right and must never be silent. (ResourceConflictProblem); 409 Conflicts, and the response names them with times. *"Not available"* on a resource a guest can see in front of them is not an answer. (ResourceConflictProblem) |
+
+#### Edge cases to draw
+
+- **Hundreds of resources**: Rows grouped by type with collapsible groups and sticky resource column; virtual scrolling; the grid never pages numerically. *(source: screens/P08-venue-back-office.yaml#BO-865)*
+- **Booking made in another channel while viewing**: The cell updates (the calendar is shared by POS, B2C, Staff App) and a "Updated just now" toast appears; an open edit on that booking warns before save. *(source: screens/P08-venue-back-office.yaml#BO-873)*
+- **User sees only part of the estate**: Rows outside their scope are absent and the header says "Showing 56 of your resources". *(source: ADR-0002 / DI-387 / ADR-0030)*
+
+#### Consistency with other screens
+
+- Match `BO-096`: Same calendar component, legend and booking bands (setup, teardown, cleaning) as the Block A resource calendar; BO-096 is the per-resource drill of this board.
+- Match `BO-519`: The rental-item view is a saved view of this calendar.
+- Match `BO-934`: The employee's own schedule uses the same states and colours.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+day: Sat 10 Oct 2026, Summit Peaks, day starts 08:00
+tiles:
+  totalResources: 1,248
+  todaysBookings: 86 (+12.5%)
+  utilisation: 72%
+  activeStaff: 342 on duty
+  pendingRequests: '18'
+rows:
+- resource: Maria Santos (Ski instructor)
+  cells: 09:00-11:00 Group lesson 12 participants; 12:00-13:00 Private lesson Khalid Al Zaabi; 13:00-14:00 Break
+- resource: Meeting Room A
+  cells: 08:00-10:00 Team meeting Yas Corporate 12 people; 11:00-13:00 Strategy session; 14:00-15:30 Client review
+- resource: Projector P-17
+  cells: 08:30-11:30 Corporate event; 10:00-12:00 Maintenance (conflict)
+- resource: Cabana B09
+  cells: 10:00-17:00 Sara Al Nuaimi
+```
 
 #### Permissions
 
@@ -222,6 +314,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-100`, `BO-865`, `BO-866`, `BO-867`, `BO-868`, `BO-869`, `BO-870`, `BO-871`, `BO-872`.
 - [ ] Every gated control is gated: `RESOURCE_BOOK`, `RESOURCE_MANAGE`, `RESOURCE_VIEW`.
 - [ ] The 3 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 3 edge case(s) from the process notes are drawn.
+- [ ] The 4 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -244,6 +338,14 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Known gaps.** **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** The way to find the right resource without scrolling through hundreds - structured filters that combine ("Ski instructor + Level 3 + English + free tomorrow 10:00-14:00"), universal search, saved views (Ski School, VIP Operations, Weekend Staffing, Waterpark Rentals) and a typed question that becomes those filters. The one thing to get right: matching is by attributes, not AI (26 August decision); the typed question is only turned into editable filter chips, and every result says which criteria it met.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **One multiSelect "Filter by" holding thirteen filter names, and a search field labelled "Search calendar filters search"** Why: Each filter is its own control with its own values; the search is "Search resources, staff, skills". *(source: screens/P08-venue-back-office.yaml#BO-865; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **The pack's ranked match percentages (96% match) and the AI smart search** Why: 26 August decided attribute/keyword matching, not AI matching; suggestResources returns resources with no score, so show criteria met rather than a percentage. *(source: DI-495 / contracts/satellite/resources.yaml#suggestResources; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **No operation stores saved views, and the calendar read has no venue, time-range, skill or certification filter** Why: The pack's saved views and most filters cannot be honoured by getResourceCalendar (type, category, granularity only). *(source: screens/P08-venue-back-office.yaml#BO-866 / contracts/satellite/resources.yaml#getResourceCalendar; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+
 #### Inputs: what the user enters or picks
 
 **On the screen**
@@ -263,7 +365,23 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Category | picker: choose a category | — | — | `getResourceCalendar` ?categoryId |
 | Granularity | radio group | — | Day · Week · Month · Agenda | `getResourceCalendar` ?granularity |
 
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Universal search**: One box searching resource name and code, staff name, skill, certification, venue, room, category, equipment, asset, tag, event and experience; results grouped by kind. *(source: screens/P08-venue-back-office.yaml#BO-865 / screens/P08-venue-back-office.yaml#BO-866)*
+- **Filters**: Separate controls, not one multi-select - date range, time range, resource type, category (tree), resource name, venue, department, availability (Available / Busy / Any), capacity (min), skill with level, certification (valid only), status, assignment status. Filters combine with AND; chips above the results show each active filter with a remove x. *(source: screens/P08-venue-back-office.yaml#BO-866 / contracts/satellite/resources.yaml#suggestResources)*
+- **Ask in words**: "Show available instructors tomorrow between 2 PM and 6 PM" is parsed into chips (Type Instructor, Date 11 Oct, Time 14:00-18:00, Available) that the user can see and change before results load. *(source: screens/P08-venue-back-office.yaml#BO-866 / DI-495)*
+
 #### Outputs: what the screen shows and produces
+
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Results**: Cards or rows with name, type, key attributes (Level 3, English), venue and free window ("Free 14:00-18:00"); instead of an opaque percent, show "Meets 4 of 4" with the met criteria ticked. Sorted by criteria met, then earliest free. *(source: contracts/satellite/resources.yaml#suggestResources / DI-495)*
+- **Saved views**: List of the user's and shared views; selecting one sets filters and the calendar view. *(source: screens/P08-venue-back-office.yaml#BO-866)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Apply filters / View on calendar**: Applies to the BO-864 grid and closes the drawer; the URL carries the filters so a view can be shared. *(source: screens/P08-venue-back-office.yaml#BO-865 / ADR-0030)*
+- **Save as view**: Names the current filter set (personal or shared with the team). *(source: screens/P08-venue-back-office.yaml#BO-866)*
 
 **Data it reads**: `getResourceCalendar` (onLoad, The filtered grid)
 
@@ -281,6 +399,40 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the calendar filters search are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Edge cases to draw
+
+- **No resource meets every criterion**: "No exact match" and the nearest results with the unmet criterion named ("Level 2 - needs Level 3"), never an empty grid. *(source: designer default)*
+- **The question cannot be parsed**: Keep the text, show "Could not turn this into filters" and leave the filter form open. *(source: TRACKER Actions row 324 / DI-924)*
+
+#### Consistency with other screens
+
+- Match `BO-864`: This is the filter drawer of the calendar command centre (VO-R14); draw it as a drawer over BO-864, with BO-865 kept as the board anchor.
+- Match `BO-898`: Same attribute-match result card and "Meets 4 of 4" wording.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+query: Ski instructor, Level 3, English, Sun 11 Oct 2026 14:00-18:00, Summit Peaks
+results:
+- name: Maria Santos
+  attributes: Level 3, English, Arabic
+  free: 14:00-18:00
+  meets: 4 of 4
+- name: Ahmed Al Mansoori
+  attributes: Level 3, English, Arabic
+  free: 14:00-16:30
+  meets: 3 of 4 - not free after 16:30
+savedViews:
+- Ski School
+- VIP Operations
+- Event Resources
+- Weekend Staffing
+- Waterpark Rentals
+- AV Equipment
+```
 
 #### Permissions
 
@@ -327,6 +479,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-864`.
 - [ ] Every gated control is gated: `RESOURCE_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 2 edge case(s) from the process notes are drawn.
+- [ ] The 3 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -347,46 +501,71 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | `resourceId` (navigation) |
 | Route | `/rentals/resource-availability-schedule-configuration-bo-866` |
 
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** The baseline availability of a resource: availability mode (always, scheduled, on request), weekly windows, seasonal and date-specific schedules, exceptions (holidays, closures, maintenance, leave, training, private blocks), slot granularity, booking limits and lead time, inheritance (tenant > venue > department > resource type > resource) and the cleaning policy - with a day preview before saving. The one thing to get right: the preview shows the effective day the guest will see.
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- Inheritance (tenant > venue > department > type > resource) has no operation or field (CHG-SBO-005)
+
+**Fixed on main** (the package already carries these; draw what it says): Twenty-five selectFields named after the pack bullets (including Time zone and the group headings "Availability Exceptions", "Inheritance") (CHG-SBO-009); A per-resource Time zone field (CHG-SBO-009).
+
 #### Inputs: what the user enters or picks
 
 **On the screen**
 
 | Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
 |---|---|---|---|---|---|---|---|
-| Available days | select field | — | — | — | — | — | — |
-| Opening time | select field | — | — | — | — | — | — |
-| Closing time | select field | — | — | — | — | — | — |
-| Effective date | select field | — | — | — | — | — | — |
-| Expiry date | select field | — | — | — | — | — | — |
-| Time zone | select field | — | — | — | — | — | — |
-| Seasonal availability | select field | — | — | — | — | — | — |
-| Venue operating hours | select field | — | — | — | — | — | — |
-| Resource-specific operating hours | select field | — | — | — | — | — | — |
-| Public holidays | select field | — | — | — | — | — | — |
-| Venue closures | select field | — | — | — | — | — | — |
-| Maintenance periods | select field | — | — | — | — | — | — |
-| Staff leave | select field | — | — | — | — | — | — |
-| Training | select field | — | — | — | — | — | — |
-| Private blocks | select field | — | — | — | — | — | — |
-| Operational shutdowns | select field | — | — | — | — | — | — |
-| Special events | select field | — | — | — | — | — | — |
-| Inheritance | select field | — | — | — | — | — | — |
-| Standard weekly schedules | select field | — | — | — | — | — | — |
-| Specific dates | select field | — | — | — | — | — | — |
-| Seasonal schedules | select field | — | — | — | — | — | — |
-| Exception dates | select field | — | — | — | — | — | — |
-| Imported schedules | select field | — | — | — | — | — | — |
-| External workforce schedules | select field | — | — | — | — | — | — |
-| Availability Exceptions | select field | — | — | — | — | — | — |
 | Cleaning | segmented control | optional | — | After every booking · Times per day | — | **How the room is cleaned between uses** (decided 29 September, W10). *After every booking* blocks a fixed buffer after each booking (e.g. 15 minutes); *N times a day* lets the system place N … | `Resource.cleaningPolicy.mode` |
 | Minutes per cleaning | number field (minutes) | optional | — | min 5; max 240 | — | Minutes one cleaning takes. The prototype uses 15 (proposed default, client to correct). | `Resource.cleaningPolicy.bufferMinutes` |
 | Cleanings per day | stepper or slider | optional | — | min 1; max 24 | — | Shown for *N times a day* only. | `Resource.cleaningPolicy.cleaningsPerDay` |
 | Cleaning window from | time picker | optional | — | — | HH:mm, 24-hour | Venue-local time the cleaning window opens. Null means the resource's opening time. | `Resource.cleaningPolicy.windowStart` |
 | Cleaning window to | time picker | optional | — | — | HH:mm, 24-hour | Venue-local time the cleaning window closes. Null means the resource's closing time. | `Resource.cleaningPolicy.windowEnd` |
 
+**Form: Save schedule** (modal, opened by *Save schedule*; *Save schedule* calls `setResourceSchedule`, *Cancel* sends nothing)
+
+**Collects what `setResourceSchedule` sends before it is called.** Nothing in the body is required. Optional: `resourceId`, `availabilityMode`, `windows`, `slotMinutes`, `minimumBookingMinutes`, `maximumBookingMinutes`, `advanceBookingDays`, `exceptions`. Dismissing sends nothing; the screen behind is unchanged.
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Resource `resourceId` | picker: choose a resource | optional | — | — | shows names, sends the id | — | `setResourceSchedule` body |
+| Availability mode `availabilityMode` | segmented control | optional | — | Always available · Scheduled · On request | — | — | `setResourceSchedule` body |
+| Windows `windows` | repeatable rows | optional | — | — | — | — | `setResourceSchedule` body |
+| Days of week `windows[].daysOfWeek` | list of values (chips) | optional | — | — | — | — | `setResourceSchedule` body |
+| From `windows[].from` | text field | optional | — | pattern `^([01]\d/2[0-3]):[0-5]\d$` | — | Local time of day, HH:MM. | `setResourceSchedule` body |
+| To `windows[].to` | text field | optional | — | pattern `^([01]\d/2[0-3]):[0-5]\d$` | — | Local time of day, HH:MM. | `setResourceSchedule` body |
+| Effective from `windows[].effectiveFrom` | date picker | optional | — | — | 1 Oct 2026 (dd MMM yyyy) | — | `setResourceSchedule` body |
+| Effective to `windows[].effectiveTo` | date picker | optional | — | — | 1 Oct 2026 (dd MMM yyyy) | — | `setResourceSchedule` body |
+| Slot minutes `slotMinutes` | number field (minutes) | optional | — | — | — | How finely this resource's time can be cut, which is a property of the resource and not of the product sold against it. | `setResourceSchedule` body |
+| Minimum booking minutes `minimumBookingMinutes` | number field (minutes) | optional | — | — | — | — | `setResourceSchedule` body |
+| Maximum booking minutes `maximumBookingMinutes` | number field (minutes) | optional | — | — | — | — | `setResourceSchedule` body |
+| Advance booking days `advanceBookingDays` | number field (days) | optional | — | — | — | — | `setResourceSchedule` body |
+| Exceptions `exceptions` | repeatable rows | optional | — | — | — | — | `setResourceSchedule` body |
+| Date `exceptions[].date` | date picker | optional | — | — | 1 Oct 2026 (dd MMM yyyy) | — | `setResourceSchedule` body |
+| Closed `exceptions[].closed` | toggle | optional | — | — | — | — | `setResourceSchedule` body |
+| From `exceptions[].from` | text field | optional | — | pattern `^([01]\d/2[0-3]):[0-5]\d$` | — | Local time of day, HH:MM. | `setResourceSchedule` body |
+| To `exceptions[].to` | text field | optional | — | pattern `^([01]\d/2[0-3]):[0-5]\d$` | — | Local time of day, HH:MM. | `setResourceSchedule` body |
+| Scope path `scopePath` | text field | optional | — | — | — | — | `setResourceSchedule` body |
+
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Weekly schedule**: A week grid of availability windows per day (e.g. Mon-Fri 08:00-18:00, weekends off), effective from-to dates. *(source: contracts/satellite/resources.yaml#setResourceSchedule / DI-480)*
+- **Exceptions**: Dated exceptions with a type from the pack list (public holiday, venue closure, maintenance, staff leave, training, private block, operational shutdown, special event). *(source: screens/P08-venue-back-office.yaml#BO-867)*
+- **Slot and booking limits**: Slot minutes, minimum and maximum booking minutes, advance booking days. *(source: contracts/satellite/resources.yaml#setResourceSchedule)*
+- **Cleaning**: None / After every booking (minutes per cleaning) / N times a day (count and the window from-to); the day preview places the cleanings. *(source: DI-1012 / contracts/satellite/resources.yaml#updateResource)*
+- **Inheritance**: Show which level each value comes from ("From venue: 08:00-22:00") and an Override toggle per section. *(source: screens/P08-venue-back-office.yaml#BO-867 / ADR-0018)*
+
 #### Outputs: what the screen shows and produces
 
 **Shown**
+
+**Weekly schedule and exceptions** (calendar view, from `getResourceSchedule`): A week grid of windows with dated exceptions (holidays, closures, maintenance, private blocks): the pack's 25 bullets were headings and examples, not fields. The time zone is the region's (ADR-0011).
+
+| Shows | Format | Notes |
+|---|---|---|
+| Availability mode | chip: Always available, Scheduled, On request | — |
+| Windows | list or chips (count when long) | — |
+| Exceptions | list or chips (count when long) | — |
+| Slot minutes | 1,234 | How finely this resource's time can be cut, which is a property of the resource and not of the product sold against it. |
 
 **Day preview** (timeline, from `getResourceAvailability`): **A day preview before saving** (W10): bookings, holds and the cleanings the policy places, as `cleaning` blocked windows, so an operator sees what the policy takes out of availability.
 
@@ -394,6 +573,20 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|---|
 | Free windows | list or chips (count when long) | — |
 | Blocked windows | list or chips (count when long) | With a reason, because they are not the same. Booked and under repair need different responses from an operator looking for something free … |
+
+**Actions and what each produces**
+
+| Action | Calls | Sends | On success returns | Errors to show | Notes |
+|---|---|---|---|---|---|
+| Save schedule (primary button) | `setResourceSchedule` PUT `/resources/{resourceId}/schedule` | ResourceSchedule | ResourceSchedule | — | opens modal first |
+
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Day preview**: Timeline of one chosen day with bookings, holds, blocks and cleanings as bands. *(source: contracts/satellite/resources.yaml#getResourceAvailability)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Save schedule**: Replaces the resource's schedule (VO-R04); the cleaning policy saves with the resource. *(source: contracts/satellite/resources.yaml#setResourceSchedule / contracts/satellite/resources.yaml#updateResource)*
 
 **Where the user goes next**
 
@@ -410,6 +603,28 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Empty, no results (`?state=emptyNoResults`) | **Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 422 A `cleaningPolicy` with `timesPerDay` and no `cleaningsPerDay`, or whose window ends before it starts (W10, 29 September). |
+
+#### Edge cases to draw
+
+- **New schedule removes hours that already have bookings**: Warn with the affected bookings listed before saving. *(source: designer default)*
+
+#### Consistency with other screens
+
+- Match `BO-870`: Operational blocks are exceptions too; show both on the preview.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+schedule:
+  resource: Meeting Room A
+  mode: Scheduled
+  week: Sun-Thu 08:00-20:00, Fri 14:00-22:00, Sat off
+  slot: 30 min
+  cleaning: After every booking, 15 min
+  exceptions: 2 Dec 2026 National Day - closed
+```
 
 #### Permissions
 
@@ -458,16 +673,18 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS127 Resource Management Configuration Board 2.dc.html#bo-866`
 - Workshop pack: Resource_Management_Configuration_Reference.pdf board 2
 - Flow F265 *Resource Management Configuration board 2: Resource Calendar Command Center*, step 4: Works in Resource Availability Schedule Configuration → Define the baseline schedule controlling when each resource can be used.
+- ADR-0011 *The Hierarchy Is Binding* (`docs/adr/0011-hierarchy-is-binding.md`)
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (30), with its required mark, default, format and its error state (422).
-- [ ] Every output is drawn (2 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (23), with its required mark, default, format and its error state (422).
+- [ ] Every output is drawn (6 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-866?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, emptyNoResults, offline.
-- [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
+- [ ] Every action is wired with its success and its failure: Save schedule.
 - [ ] Every transition is wired: `BO-864`.
 - [ ] Every gated control is gated: `RESOURCE_CONFIGURE`, `RESOURCE_MANAGE`, `RESOURCE_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 1 edge case(s) from the process notes are drawn.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -487,6 +704,14 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Offline | online only |
 | Opens with | `resourceId` (navigation) |
 | Route | `/rentals/resource-time-slot-configuration-bo-867` |
+
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** How finely a resource's time can be cut and the limits on a booking of it - slot length, booking increment, minimum and maximum length, how far ahead and how late it can be booked, setup and teardown buffers - with a one-day slot preview. It matters for resources booked by the window (a meeting room by the hour), not for performances, whose time slots come from the performance calendar (26 August). The one thing to get right: do not let this screen look like it creates sellable time slots for an instructor.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **The screen title and purpose say resource time is converted into reservable time slots** Why: 26 August agreed that time slots are created for performances and events, not for resources; resources are attached to performance slots. Here slots are only booking granularity for resources booked by window. *(source: DI-481 / TRACKER Actions row 152; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **Capacity per slot, concurrent reservations, minimum notice and booking increments have no field** Why: ResourceSchedule stores slot minutes, min/max booking minutes and advance days only. *(source: screens/P08-venue-back-office.yaml#BO-868 / contracts/satellite/resources.yaml#/components/schemas/ResourceSchedule; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **Every setting is a selectField, and "Maximum advance booking period" a textField** Why: Durations are number-with-unit fields; booking period is days. *(source: screens/P08-venue-back-office.yaml#BO-867; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
 
 #### Inputs: what the user enters or picks
 
@@ -508,7 +733,23 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Minimum notice | select field | — | — | — | — | — | — |
 | Maximum advance booking period | text field | — | — | — | — | — | — |
 
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Slot length and increment**: Slot length in minutes (15, 30, 45, 60, 90 as chips plus custom); booking increment defaults to the slot length; start times fall on the increment from opening. *(source: contracts/satellite/resources.yaml#/components/schemas/ResourceSchedule / contracts/satellite/resources.yaml#listProductStartTimes)*
+- **Minimum / maximum duration**: Hours and minutes; maximum not below minimum; e.g. Meeting room 1 h to 8 h. *(source: screens/P08-venue-back-office.yaml#BO-868 / contracts/satellite/resources.yaml#setResourceSchedule)*
+- **Buffer before / after**: These are the resource's setup and teardown minutes (saved on the resource, not the schedule); show them here with "Also on the resource profile". *(source: screens/P08-venue-back-office.yaml#BO-868 / contracts/satellite/resources.yaml#/components/schemas/Resource)*
+- **Booking window**: Maximum advance booking in days; minimum notice in hours (greyed, not yet stored). *(source: screens/P08-venue-back-office.yaml#BO-868 / contracts/satellite/resources.yaml#/components/schemas/ResourceSchedule)*
+- **Capacity per slot / concurrent reservations**: Shown only for shared resources (a room with pods, DI-496); greyed until stored. *(source: screens/P08-venue-back-office.yaml#BO-868 / DI-496)*
+
 #### Outputs: what the screen shows and produces
+
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Slot preview**: For a chosen date, the day's slots for this resource as rows (08:00-09:00 Available, 10:00-11:00 Reserved, 11:00-12:00 Partially available) using the calendar colours, with buffers drawn. *(source: screens/P08-venue-back-office.yaml#BO-867 / contracts/satellite/resources.yaml#getResourceAvailability)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Save configuration**: Loads the current schedule and sends it whole with the changed slot fields (VO-R04), so weekly windows and exceptions set on BO-866 are not wiped; buffers save on the resource. *(source: contracts/satellite/resources.yaml#getResourceSchedule / contracts/satellite/resources.yaml#setResourceSchedule)*
 
 **Where the user goes next**
 
@@ -524,6 +765,33 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Empty, no results (`?state=emptyNoResults`) | **Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist |
 | Offline (`?state=offline`) | online only |
+
+#### Edge cases to draw
+
+- **Maximum length shorter than an existing future booking**: Warn listing the bookings; existing bookings are not cut. *(source: designer default)*
+- **Slot length that does not divide the opening hours**: Preview shows the last partial slot greyed "Too short to book". *(source: contracts/satellite/resources.yaml#listProductStartTimes)*
+
+#### Consistency with other screens
+
+- Match `BO-866`: Same schedule record; this screen edits its slot and limit fields, BO-866 its windows and exceptions.
+- Match `WEB-048`: Guest start times for a space sold by the hour fall on these steps and respect these limits.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+examples:
+- resource: Private instructor (Maria Santos)
+  slot: 60 min
+  buffer: 15 min after
+  capacity: 1
+- resource: Meeting Room A
+  slot: 30 min
+  minimum: 1 h
+  maximum: 8 h
+  advance: 90 days
+```
 
 #### Permissions
 
@@ -568,6 +836,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-864`.
 - [ ] Every gated control is gated: `RESOURCE_CONFIGURE`, `RESOURCE_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 2 edge case(s) from the process notes are drawn.
+- [ ] The 3 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -587,6 +857,20 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Offline | online only |
 | Opens with | `bookingId` (navigation) |
 | Route | `/rentals/advance-reservation-management-bo-868` |
+
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** The exception path for reserving a specific resource ahead of a sale or an operational assignment (holding Meeting Room A for a corporate client, an instructor for a VIP guest). Normally resources are booked by selling the product. The one thing to get right: the screen validates everything the pack lists (availability, capacity, existing bookings, dependencies, venue restrictions, status, blocks) as a visible checklist before Confirm, and asks why the reservation is being made by hand.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **26 selectFields including the reference, the section headings "Reservation States", "Smart Availability" and the seven validation checks** Why: Headings and checks became fields; the reference is server-assigned (VO-R03); the checks are an output checklist. *(source: screens/P08-venue-back-office.yaml#BO-868; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **The pack's states (Draft, Tentative, Pending approval, Confirmed, Checked-in, Completed, Cancelled, Expired, No-show) do not match the booking status enum** Why: ResourceBookingStatus is reserved, checkedOut, returned, overdue, cancelled, noShow; there is no draft, tentative, pending approval or expired. *(source: screens/P08-venue-back-office.yaml#BO-868 / contracts/satellite/resources.yaml#/components/schemas/ResourceBooking; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **bookResource takes no reason, priority, owner, notes, quantity or expiry** Why: DI-483 makes a manual reservation an exception that should carry its reason; the pack lists the rest. *(source: DI-483 / contracts/satellite/resources.yaml#bookResource; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+
+#### Decided on this screen
+
+Answered questions: draw the decision, not the old default. Where a decision and the tables below differ, the decision wins.
+
+- **Is a tentative staff reservation a resource hold (createResourceHold, with expiry and extensions) or a booking with a status?** → Drawn default accepted: Draw Tentative as a hold with an expiry countdown and Confirm turning it into a booking. *(decided by Chinmay, 2026-10-02; DEC-492 / CHG-NOTE-008)* **Reviewable:** a default the lead may still overrule before the block is tasked.
 
 #### Inputs: what the user enters or picks
 
@@ -630,7 +914,26 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | To | date and time picker | — | — | `listResourceBookings` ?to |
 | Status | select | — | Reserved · Checked out · Returned · Overdue · Cancelled · No show | `listResourceBookings` ?status |
 
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Resource or type**: Pick a specific resource, or a type to let the platform pick ("Any meeting room for 20") - the response names the one chosen. *(source: contracts/satellite/resources.yaml#bookResource)*
+- **Date, start, end**: Date picker and time pickers in venue time; end after start; duration shown ("1 h"). *(source: contracts/satellite/resources.yaml#bookResource)*
+- **Customer / event / experience**: Search a guest, company, event or order; at least one when the reservation is for a sale. *(source: contracts/satellite/resources.yaml#bookResource)*
+- **Reason, priority, notes, owner**: Reason required (manual reservations are exceptions); priority Low/Standard/High/Critical; owner defaults to the signed-in user. *(source: screens/P08-venue-back-office.yaml#BO-868 / DI-483)*
+- **Hold settings**: For a tentative reservation - hold duration and expiry ("Released automatically 18:00 tomorrow if not confirmed"); extension allowed yes/no. *(source: screens/P08-venue-back-office.yaml#BO-868 / contracts/satellite/resources.yaml#createResourceHold)*
+
 #### Outputs: what the screen shows and produces
+
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Availability checklist**: Seven lines ticked or crossed live - Available, Capacity, No existing bookings, Dependencies met, Venue allowed, Resource active, No operational block; a cross names the clash. *(source: screens/P08-venue-back-office.yaml#BO-868)*
+- **Reservation summary**: Reference (server-assigned, shown after save), resource, date and time, status, created by and when. *(source: screens/P08-venue-back-office.yaml#BO-868)*
+- **Reservations ahead**: List of upcoming manual reservations with status, cursor paging, filter by status. *(source: contracts/satellite/resources.yaml#listResourceBookings)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Save draft / Confirm reservation**: Confirm books the resource; a conflict (including setup and teardown) is refused with the clashing booking or block and its times. *(source: contracts/satellite/resources.yaml#bookResource / contracts/satellite/resources.yaml#/components/schemas/ResourceConflictProblem)*
+- **Extend / change time / reassign**: One update that re-runs conflict detection; reassigning keeps the order and deposit attached. *(source: contracts/satellite/resources.yaml#updateResourceBooking)*
 
 **Data it reads**: `listResourceBookings` (onLoad, Reservations ahead)
 
@@ -649,6 +952,33 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Empty, no results (`?state=emptyNoResults`) | **Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 Conflicts, and the response names them with times. *"Not available"* on a resource a guest can see in front of them is not an answer. (ResourceConflictProblem); 409 The change conflicts; the response names the times (ResourceConflictProblem) |
+
+#### Edge cases to draw
+
+- **Resource came back damaged and is awaiting inspection**: Refused with "Awaiting inspection after damage on booking RB-2291". *(source: contracts/satellite/resources.yaml#bookResource)*
+- **Hold expires before confirmation**: Status turns Expired, the resource frees, the owner is notified. *(source: screens/P08-venue-back-office.yaml#BO-868)*
+
+#### Consistency with other screens
+
+- Match `BO-864`: Opened from a free slot or New booking there, prefilled.
+- Match `BO-869`: The recurring variant of this same form.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+reservation:
+  reference: RES-202610-1023
+  resource: Meeting Room A
+  date: Wed 14 Oct 2026
+  time: 14:00-16:00
+  for: Yas Corporate - board meeting
+  reason: Holding for corporate client before contract signature
+  status: Tentative
+  expires: 13 Oct 2026 18:00
+  owner: Fatima Al Hashimi
+```
 
 #### Permissions
 
@@ -690,6 +1020,9 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-864`.
 - [ ] Every gated control is gated: `RESOURCE_BOOK`, `RESOURCE_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 2 edge case(s) from the process notes are drawn.
+- [ ] The 3 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
+- [ ] The 1 decision(s) taken on this screen are drawn as decided, not as the old default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -710,6 +1043,14 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | `bookingId` (navigation) |
 | Route | `/rentals/recurring-reservation-configuration-bo-869` |
 
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** Reserve a resource for a repeating pattern (Meeting Room A every Monday and Wednesday 09:00-11:00 until 31 December; a weekly swimming lesson) as one series, with every occurrence checked before anything is written and conflicts listed by date. The one thing to get right: the preview shows every occurrence with its status before saving, and cancelling always asks "this one or the whole series".
+
+**Known correction pending (do not draw the wrong version)**
+
+- **"Selected weekdays" and "Selected dates" drawn as the primary and secondary buttons** Why: They are frequency options; the primary action is Create recurring reservation. *(source: screens/P08-venue-back-office.yaml#BO-869; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **The recurrence object has daily, weekly and monthly with weekdays and an until date only** Why: Selected dates, custom recurrence, number of occurrences, repeat interval and exception dates cannot be sent; "skip conflicting occurrences" therefore has no way to be saved. *(source: screens/P08-venue-back-office.yaml#BO-869 / contracts/satellite/resources.yaml#bookResource; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **Venue drawn as a field** Why: The venue comes from the session (VO-R09). *(source: ADR-0030; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+
 #### Inputs: what the user enters or picks
 
 **On the screen**
@@ -727,6 +1068,11 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Exceptions | select field | — | — | — | — | — | — |
 | Conflict Handling | select field | — | — | — | — | — | — |
 
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Pattern**: Frequency Daily / Weekly / Monthly / Selected weekdays / Selected dates / Custom; weekday chips for Weekly; repeat every N; times from-to; ends on a date or after N occurrences. *(source: screens/P08-venue-back-office.yaml#BO-869 / contracts/satellite/resources.yaml#bookResource)*
+- **Resource and exceptions**: Resource picker; exception dates picked on a mini calendar (skip these). Venue is the session venue (VO-R09), not a field. *(source: screens/P08-venue-back-office.yaml#BO-869)*
+
 #### Outputs: what the screen shows and produces
 
 **Actions and what each produces**
@@ -735,6 +1081,16 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|---|---|---|---|
 | Selected weekdays (primary button) | navigation or local | — | — | — | — |
 | Selected dates (secondary button) | navigation or local | — | — | — | — |
+
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Series preview**: Two tabs - Preview (26 occurrences) listing each date with Available or the clash in words ("Venue closed - National Day"), and Conflicts (1). Unavailable dates, maintenance and closure conflicts separated. *(source: screens/P08-venue-back-office.yaml#BO-869 / contracts/satellite/resources.yaml#/components/schemas/ResourceConflictProblem)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Conflict handling**: Choices Keep resource where available (skip the conflicting dates as exceptions), Choose another resource for conflicting dates, Ask for an AI suggestion; the series is only created when no remaining occurrence clashes, because the platform refuses the whole series rather than part of it. *(source: screens/P08-venue-back-office.yaml#BO-869 / contracts/satellite/resources.yaml#bookResource)*
+- **Create recurring reservation**: One series; the calendar shows each occurrence with a repeat icon. *(source: contracts/satellite/resources.yaml#bookResource)*
+- **Cancel**: Dialog "Cancel this occurrence / Cancel the whole series" with neither preselected and a reason; there is no default. *(source: contracts/satellite/resources.yaml#cancelResourceBooking)*
 
 **Where the user goes next**
 
@@ -751,6 +1107,31 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Empty, no results (`?state=emptyNoResults`) | **Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 Conflicts, and the response names them with times. *"Not available"* on a resource a guest can see in front of them is not an answer. (ResourceConflictProblem) |
+
+#### Edge cases to draw
+
+- **Series runs past the resource's advance booking limit**: Occurrences beyond the limit marked "Too far ahead" in the preview. *(source: contracts/satellite/resources.yaml#/components/schemas/ResourceSchedule)*
+- **Editing one occurrence's time**: Changes only that occurrence; the series pattern is untouched and the occurrence shows "Moved". *(source: contracts/satellite/resources.yaml#updateResourceBooking)*
+
+#### Consistency with other screens
+
+- Match `BO-868`: Same reservation form with a Repeat section; one component.
+- Match `BO-152`: Venue closure days from the operating calendar appear as conflicts here.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+series:
+  resource: Meeting Room A
+  pattern: Weekly, Mon and Wed
+  time: 09:00-11:00
+  from: 5 Oct 2026
+  until: 30 Dec 2026
+  occurrences: 26
+  conflicts: Wed 2 Dec 2026 - venue closed (National Day)
+```
 
 #### Permissions
 
@@ -789,6 +1170,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-864`.
 - [ ] Every gated control is gated: `RESOURCE_BOOK`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 2 edge case(s) from the process notes are drawn.
+- [ ] The 3 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -809,24 +1192,21 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | `blockId` (navigation) |
 | Route | `/rentals/operational-time-resource-blocking-bo-870` |
 
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** Operational time blocks that take a resource out of the bookable pool - setup, teardown, cleaning, maintenance, inspection, travel, break, training, private use, venue closure, operational hold, custom - each with resource, start, end, recurrence, reason, owner, priority, override permission and approval. The one thing to get right: a block shows immediately on the calendar and blocks reservations that would clash.
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- The contract's block reasons (7) do not cover the pack's 12 block types, and recurrence, owner, priority, override permission and approval are absent (CHG-SBO-005)
+
+**Fixed on main** (the package already carries these; draw what it says): Each block type is drawn as its own selectField (CHG-SBO-009).
+
 #### Inputs: what the user enters or picks
 
 **On the screen**
 
 | Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
 |---|---|---|---|---|---|---|---|
-| Setup | select field | — | — | — | — | — | — |
-| Teardown | select field | — | — | — | — | — | — |
-| Cleaning | select field | — | — | — | — | — | — |
-| Maintenance | select field | — | — | — | — | — | — |
-| Inspection | select field | — | — | — | — | — | — |
-| Travel | select field | — | — | — | — | — | — |
-| Break | select field | — | — | — | — | — | — |
-| Training | select field | — | — | — | — | — | — |
-| Private use | select field | — | — | — | — | — | — |
-| Venue closure | select field | — | — | — | — | — | — |
-| Operational hold | select field | — | — | — | — | — | — |
-| Custom block | select field | — | — | — | — | — | — |
+| Block type | select | optional | — | Setup · Teardown · Maintenance · Blackout · Closed · Operational · Training | — | One choice per block. | `ResourceBlock.reason` |
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
 
@@ -836,13 +1216,59 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | From | date and time picker | — | — | `listResourceBlocks` ?from |
 | To | date and time picker | — | — | `listResourceBlocks` ?to |
 
+**Form: Block a window** (modal, opened by *Block a window*; *Block a window* calls `createResourceBlock`, *Cancel* sends nothing)
+
+**Collects what `createResourceBlock` sends before it is called.** Required: `resourceId`, `from`, `to`, `reason`. Optional: `note`, `createdBy`. `id` is a client UUIDv7 generated silently, never asked. Dismissing sends nothing; the screen behind is unchanged.
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| ID `id` | picker: choose an id | optional | — | — | shows names, sends the id | — | `createResourceBlock` body |
+| Resource `resourceId` | picker: choose a resource | required | — | — | shows names, sends the id | — | `createResourceBlock` body |
+| From `from` | date and time picker | required | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `createResourceBlock` body |
+| To `to` | date and time picker | required | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `createResourceBlock` body |
+| Reason `reason` | select | required | — | Setup · Teardown · Maintenance · Blackout · Closed · Operational · Training | — | — | `createResourceBlock` body |
+| Note `note` | text area | optional | — | — | — | — | `createResourceBlock` body |
+| Created by `createdBy` | picker: choose a created by | optional | — | — | shows names, sends the id | — | `createResourceBlock` body |
+| Scope path `scopePath` | text field | optional | — | — | — | — | `createResourceBlock` body |
+
+Errors to draw in the form: 409 Bookings already exist in the window. They are listed, because blocking over a booked resource is sometimes right and must never be silent. (ResourceConflictProblem)
+
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Block type**: The twelve pack types as chips; the contract currently accepts setup, teardown, maintenance, blackout, closed, operational, training. *(source: screens/P08-venue-back-office.yaml#BO-870 / contracts/satellite/resources.yaml#createResourceBlock)*
+- **Resource, start, end, reason/note**: Resource picker (or several), date-time range in venue time, note. *(source: contracts/satellite/resources.yaml#createResourceBlock)*
+- **Recurrence, owner, priority, override permission, approval**: Draw as the pack lists; greyed until the contract carries them. *(source: screens/P08-venue-back-office.yaml#BO-870)*
+
 #### Outputs: what the screen shows and produces
+
+**Shown**
+
+**Blocks in force** (data table, from `listResourceBlocks`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Resource | the name it points at, never the id | — |
+| From | 1 Oct 2026, 14:30 | — |
+| To | 1 Oct 2026, 14:30 | — |
+| Reason | chip: Setup, Teardown, Maintenance, Blackout, Closed, Operational… | — |
+| Note | text | — |
 
 **Actions and what each produces**
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
 | What publishing changes (publish gate) | navigation or local | — | — | — | — |
+| Block a window (primary button) | `createResourceBlock` POST `/resource-blocks` | ResourceBlock | ResourceBlock | 409 Bookings already exist in the window. They are listed, because blocking over a booked resource is sometimes right and must never be silent. (ResourceConflictProblem) | opens modal first |
+| Release block (secondary button) | `releaseResourceBlock` DELETE `/resource-blocks/{blockId}` | — | — | — | — |
+
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Blocks in force**: On a calendar (VO-R01) and as a list with type, resource, window, created by. *(source: contracts/satellite/resources.yaml#listResourceBlocks)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Create block**: Refused if it overlaps a confirmed booking unless the person has override permission; the conflict is named. *(source: screens/P08-venue-back-office.yaml#BO-870 / DI-484)*
+- **Release block**: Puts the resource back into service. *(source: contracts/satellite/resources.yaml#releaseResourceBlock)*
 
 **Data it reads**: `listResourceBlocks` (onLoad, Blocks in force)
 
@@ -861,6 +1287,27 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Empty, no results (`?state=emptyNoResults`) | **Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 Bookings already exist in the window. They are listed, because blocking over a booked resource is sometimes right and must never be silent. (ResourceConflictProblem) |
+
+#### Consistency with other screens
+
+- Match `BO-866`: Blocks appear in the availability preview.
+- Match `BO-910`: Maintenance blocking on the equipment board uses the same blocks.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+blocks:
+- type: Cleaning
+  resource: Meeting Room A
+  window: Sat 10 Oct 12:00-12:15
+  by: Maria Santos
+- type: Maintenance
+  resource: SUV 2
+  window: 1-3 Oct 2026
+  reason: Tyre replacement
+```
 
 #### Permissions
 
@@ -895,10 +1342,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (12), with its required mark, default, format and its error state (409).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (9), with its required mark, default, format and its error state (409).
+- [ ] Every output is drawn (5 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-870?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, emptyNoResults, offline.
-- [ ] Every action is wired with its success and its failure: What publishing changes.
+- [ ] Every action is wired with its success and its failure: What publishing changes, Block a window, Release block.
 - [ ] Every transition is wired: `BO-864`.
 - [ ] Every gated control is gated: `RESOURCE_MANAGE`, `RESOURCE_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
@@ -924,6 +1371,14 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
 
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** Several events and experiences that run at the same time, compared side by side for the resources they all need: required per event, total demand, available, and the gap ("Event A needs 10 security, Event B 8, only 14 qualified available - gap 4"), with event priority deciding who gets what. The one thing to get right: gaps are the headline, in red, per resource line and in total, before anyone allocates.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **Table titled "Every multi-event resource planning" with columns Events, Experiences, Resources, Venues, Time periods, Assignments, Conflicts, Capacity, Resource gaps** Why: Those are the pack's display items, not columns; the grid is resources x events with total, available and gap. *(source: screens/P08-venue-back-office.yaml#BO-871; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **No read returns per-event demand or event priority** Why: getResourceCalendar returns resource states; the required-per-event counts and priorities the pack compares have no source. *(source: screens/P08-venue-back-office.yaml#BO-871 / contracts/satellite/resources.yaml#getResourceCalendar; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **The screen places things in time with no calendar component** Why: The shared timeline needs the calendar component with day/week (VO-R01). *(source: DI-907 / DI-919; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+
 #### Inputs: what the user enters or picks
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
@@ -937,6 +1392,11 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Granularity | radio group | — | Day · Week · Month · Agenda | `getResourceCalendar` ?granularity |
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Date, venue, resource type**: Date (or range), venue scope (session venue or all permitted venues), resource type filter. *(source: screens/P08-venue-back-office.yaml#BO-871 / contracts/satellite/resources.yaml#getResourceCalendar)*
+- **Events to compare**: Pick the events/experiences in the window; each column header shows the event's priority (Critical, High, Standard, Low) editable for this plan. *(source: screens/P08-venue-back-office.yaml#BO-871)*
 
 #### Outputs: what the screen shows and produces
 
@@ -970,6 +1430,17 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Capacity | text | not in the schema: `Capacity` |
 | Resource gaps | text | not in the schema: `Resource gaps` |
 
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Demand grid**: Rows are resources or resource types (Event Hall A, Projector, Sound system, Security staff Level 1), columns per event with required counts, then Total demand, Available, Gap. Negative gaps red, zero green; a Total gaps tile at the bottom. *(source: screens/P08-venue-back-office.yaml#BO-871)*
+- **Timeline**: Below the grid, a shared timeline of the events across the day so overlaps are visible. *(source: screens/P08-venue-back-office.yaml#BO-871)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Allocate**: Fills each event's requirements from the pool by the allocation policy (rotation by default); a requirement that cannot be met is refused by name rather than half-filled. *(source: contracts/satellite/resources.yaml#allocateResources / DI-497 / contracts/satellite/resources.yaml#/components/schemas/ResourceAllocationProblem)*
+- **Optimise with AI**: Shows a proposed redistribution with reasons; a person applies it (VO-R11). *(source: screens/P08-venue-back-office.yaml#BO-872)*
+- **Export plan**: PDF/Excel of the grid. *(source: screens/P08-venue-back-office.yaml#BO-871)*
+
 **Data it reads**: `getResourceCalendar` (onLoad, Several events at once)
 
 **Where the user goes next**
@@ -987,6 +1458,44 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 Nothing available, or a dependency is missing. Both are named — "no instructor free" and "the stage has no sound system" need different actions from the person … (ResourceAllocationProblem) |
+
+#### Edge cases to draw
+
+- **Two Critical events competing for the last resource**: The gap stays red on both and the screen asks for a manual decision; it never silently prefers one. *(source: screens/P08-venue-back-office.yaml#BO-871)*
+- **A resource shared between events across venues**: The travel buffer is counted; the cell shows "Available after 15:40 (travel)". *(source: contracts/satellite/resources.yaml#setResourceVenueAssignment)*
+
+#### Consistency with other screens
+
+- Match `BO-921`: The event board's multi-event optimiser is the same planner (VO-R14); draw one component, with BO-871 showing events and experiences and BO-921 adding cost and scenario comparison.
+- Match `BO-864`: Gaps link to the calendar on the same window.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+date: Fri 16 Oct 2026, Summit Peaks
+events:
+- Corporate Conference (High)
+- Gala Night (Critical)
+- Product Launch (Standard)
+rows:
+- resource: Security staff Level 1
+  required: 10 / 8 / 5
+  total: 23
+  available: 20
+  gap: -3
+- resource: Projector
+  required: 1 / - / 2
+  total: 3
+  available: 2
+  gap: -1
+- resource: Event Hall A
+  required: 1 / - / -
+  total: 1
+  available: 1
+  gap: 0
+```
 
 #### Permissions
 
@@ -1031,13 +1540,15 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-864`.
 - [ ] Every gated control is gated: `RESOURCE_BOOK`, `RESOURCE_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 2 edge case(s) from the process notes are drawn.
+- [ ] The 3 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
 
 ### `BO-872` Smart Assignment & Drag-and-Drop Reallocation
 
-**Provide the fast, visual assignment experience that operational users and cashiers can use when assigning or changing resources. This should become one of the signature TICVAI Resource Management experiences. Provide TICVAI with a centralized backend configuration environment for treating employees, instructors, contractors, technicians, security personnel, event staff, and other personnel as intelligent operational resources.**
+**Provide the fast, visual assignment experience that operational users and cashiers use when assigning or changing resources.**
 
 | | |
 |---|---|
@@ -1053,6 +1564,15 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** The signature assignment experience: drag a booking, staff assignment or requirement onto a resource and time, with valid targets lighting up and invalid ones saying why before the drop; and Smart Assign, which ranks eligible resources and explains the choice. When an assigned resource drops out, the ranked replacements appear next to it. The one thing to get right: validate on hover, not after the drop, and keep the guest, order and deposit attached when a booking moves.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **The screen has only "Save resource booking" and Cancel, and the gap note says nothing is drawable** Why: The pack details drag sources, ten live checks, valid/invalid highlighting, smart reassignment and resource cards. *(source: screens/P08-venue-back-office.yaml#BO-872; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **Match percentages (Maria 96% match) as in the pack** Why: Matching is attribute based (DI-495) and suggestResources returns no score; show criteria met. *(source: DI-495 / contracts/satellite/resources.yaml#suggestResources; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+
+**Fixed on main** (the package already carries these; draw what it says): The purpose text includes board 3's objective ("treating employees, instructors... as intelligent operational resources") (CHG-WIR-003).
+
 #### Inputs: what the user enters or picks
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
@@ -1067,6 +1587,11 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
 
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Drag source**: Reservation, booking, experience, staff assignment or unfilled requirement - each drag shows a ghost with its time and length. *(source: screens/P08-venue-back-office.yaml#BO-872)*
+- **Reason**: Asked in the drop confirmation ("Alex is on sick leave"); prefilled from the trigger when replacing. *(source: contracts/satellite/resources.yaml#updateResourceBooking)*
+
 #### Outputs: what the screen shows and produces
 
 **Actions and what each produces**
@@ -1075,6 +1600,16 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |---|---|---|---|---|---|
 | Save resource booking (primary button) | navigation or local | — | — | — | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
+
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Live validation**: While dragging, rows turn green (valid), amber (valid with warning, e.g. overtime) or grey with a reason chip (Not qualified, Not available, Travel buffer, Under maintenance, Dependency missing). Validation uses the write in validate-only mode, so it is the platform's answer, not the browser's. *(source: screens/P08-venue-back-office.yaml#BO-872 / contracts/satellite/resources.yaml#updateResourceBooking)*
+- **Replacement suggestions**: For an unavailable resource ("Alex Johnson - Sick leave"), a side list of eligible alternatives with the facts that make them eligible (Available, Same certification, Same venue, No overtime) and "Requires venue transfer" where it applies; ranked by criteria met. *(source: screens/P08-venue-back-office.yaml#BO-872 / contracts/satellite/resources.yaml#suggestResources / DI-495)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Drop**: Confirm sheet "Move Private lesson 12:00-13:00 from Alex to Maria Santos" with reason; saves the reassignment (the booking keeps its order, guest and deposit). A clash at save is refused with the clash named and the block snaps back. *(source: contracts/satellite/resources.yaml#updateResourceBooking / contracts/satellite/resources.yaml#/components/schemas/ResourceConflictProblem)*
+- **Smart Assign**: Picks the top-ranked eligible resource, shows why, and waits for the user's Assign (VO-R11); "Authorised automatic reassignment" only where policy allows. *(source: screens/P08-venue-back-office.yaml#BO-872)*
 
 **Data it reads**: `getResourceCalendar` (onLoad, The grid being dragged on)
 
@@ -1093,6 +1628,33 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 The change conflicts; the response names the times (ResourceConflictProblem) |
+
+#### Edge cases to draw
+
+- **Two supervisors drag onto the same slot**: The second save is refused with the first booking named; the grid refreshes. *(source: contracts/satellite/resources.yaml#updateResourceBooking)*
+- **Touch screen**: Long-press to pick up, and a Move to... menu as the non-drag alternative for accessibility. *(source: designer default)*
+
+#### Consistency with other screens
+
+- Match `BO-864`: The same grid and colours; drag-and-drop is a mode of the calendar command centre, not a separate grid.
+- Match `BO-902`: Replacement ranking and wording match the automatic recovery screen.
+- Match `BO-899`: The cashier flow (date, time, available resources, recommended, confirm) is BO-899, not this screen.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+trigger: Alex Johnson - Sick leave, Sat 10 Oct 2026
+affected: Private lesson 12:00-13:00 (Khalid Al Zaabi)
+alternatives:
+- name: Maria Santos
+  facts: Available, Ski L3, same venue, no overtime
+  meets: 4 of 4
+- name: Ahmed Al Mansoori
+  facts: Available, Ski L3, needs 40 min transfer
+  meets: 3 of 4
+```
 
 #### Permissions
 
@@ -1133,6 +1695,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-864`.
 - [ ] Every gated control is gated: `RESOURCE_BOOK`, `RESOURCE_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 2 edge case(s) from the process notes are drawn.
+- [ ] The 2 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---

@@ -297,6 +297,11 @@
     "name": "groupBy",
     "in": "query",
     "required": null
+   },
+   {
+    "name": "module",
+    "in": "query",
+    "required": null
    }
   ],
   "requestBody": null,
@@ -402,6 +407,45 @@
    },
    {
     "name": "priority",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listAiInteractions": {
+  "method": "GET",
+  "path": "/interactions",
+  "contract": "ai",
+  "summary": "Every prompt, response and action",
+  "permission": "AI_AUDIT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "principalId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "outcome",
     "in": "query",
     "required": null
    },
@@ -579,25 +623,6 @@
   "requestBody": null,
   "responds": "Page"
  },
- "publishPromptTemplate": {
-  "method": "POST",
-  "path": "/prompt-templates/{templateKey}/versions",
-  "contract": "ai",
-  "summary": "Publish a prompt template version",
-  "permission": "AI_APPROVE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "AiPromptTemplate"
- },
  "runAiEvaluation": {
   "method": "POST",
   "path": "/evaluations",
@@ -635,5 +660,74 @@
   ],
   "requestBody": null,
   "responds": "ReportDefinition"
+ },
+ "searchAiDecisions": {
+  "method": "GET",
+  "path": "/decision-records",
+  "contract": "ai",
+  "summary": "Find AI decisions",
+  "permission": "AI_AUDIT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "capabilityKey",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "outcome",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "subjectRef",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "traceId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "policyVersion",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "modelVersion",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
  }
 }

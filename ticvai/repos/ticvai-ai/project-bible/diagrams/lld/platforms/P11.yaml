@@ -23,7 +23,7 @@ modulesUsed:
   screens: 8
 servicesCalled:
 - service: TenancyService
-  operationCalls: 20
+  operationCalls: 21
 coverage:
   screens: 8
   inAFlow: 3
@@ -74,7 +74,6 @@ screens:
   goesTo:
   - ACC-001
   - ACC-003
-  - ACC-007
   boardFrames: null
   wireframe: wireframes/P11 Accreditation Web.dc.html#acc-002
   inFlows:
@@ -86,7 +85,6 @@ screens:
   wave: 3
   density: compact
   operations:
-  - createAccreditationApplication
   - submitAccreditationApplication
   - updateAccreditationApplication
   states:
@@ -167,6 +165,7 @@ screens:
   wave: 3
   density: compact
   operations:
+  - decideAccreditationApplication
   - listAccreditationApplications
   states:
   - emptyFirstRun
@@ -205,7 +204,6 @@ screens:
   - applicationId<-ACC-006
   - documentId<-navigation
   goesTo:
-  - ACC-005
   - ACC-006
   - ACC-008
   boardFrames: null
@@ -219,6 +217,7 @@ screens:
   wave: 3
   density: compact
   operations:
+  - listAccreditationAccessActivity
   - listAccreditationCredentials
   states:
   - emptyFirstRun

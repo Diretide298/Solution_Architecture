@@ -1,5 +1,357 @@
 [
  {
+  "id": "BO-017",
+  "name": "Capacity Management",
+  "module": "Sell",
+  "requiresModule": "ticketing",
+  "wave": 1,
+  "capability": "C00",
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/venue-operations/capacity-management",
+   "component": "apps/venue-management-web/src/routes/venue-operations/CapacityManagementDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "exitTo": [
+    "BO-007",
+    "BO-009"
+   ],
+   "inferred": true,
+   "entryFrom": [
+    "BO-102"
+   ],
+   "transitions": [
+    {
+     "to": "BO-007",
+     "trigger": "Product Directory",
+     "provenance": "derived — BO-007 declares entryState.params productId and BO-017 holds none of them. The edge carries nothing: productId only pre-selects (deep link or optional), and BO-007 opens on its own"
+    },
+    {
+     "to": "BO-009",
+     "trigger": "Pricing Rules",
+     "provenance": "derived — BO-009 declares entryState.params priceListId, ruleId and BO-017 holds none of them. The edge carries nothing: priceListId only pre-selects (deep link or optional); BO-009 finds ruleId (listDynamicPriceRules) itself, and BO-009 opens on its own"
+    }
+   ]
+  },
+  "notes": "Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listChannelCapacities` reads the population and `getChannelAllocations` reads one of them — list, select, act",
+  "purpose": "Change how many people a performance can take (renamed from session, decided 28 September, audit R165).",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "textField",
+       "label": "Performance id",
+       "operation": "listChannelCapacities",
+       "notes": "Sends `?performanceId=` to `listChannelCapacities`.",
+       "provenance": "contract catalogue.yaml GET /channel-capacities"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every channel capacity",
+       "bindsTo": "ChannelCapacity",
+       "columns": [
+        "ChannelCapacity.id",
+        "ChannelCapacity.performanceId",
+        "ChannelCapacity.name",
+        "ChannelCapacity.seatCategoryId",
+        "ChannelCapacity.oversellAllowance",
+        "ChannelCapacity.oversellBasis",
+        "ChannelCapacity.capacity",
+        "ChannelCapacity.sold",
+        "ChannelCapacity.leased",
+        "ChannelCapacity.remaining",
+        "ChannelCapacity.hasChannelAllocations",
+        "ChannelCapacity.isSeated"
+       ],
+       "operation": "listChannelCapacities",
+       "provenance": "contract catalogue.yaml GET /channel-capacities"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected channel capacity",
+       "bindsTo": "ChannelCapacity",
+       "columns": [
+        "ChannelCapacity.id",
+        "ChannelCapacity.performanceId",
+        "ChannelCapacity.name",
+        "ChannelCapacity.seatCategoryId",
+        "ChannelCapacity.oversellAllowance",
+        "ChannelCapacity.oversellBasis",
+        "ChannelCapacity.capacity",
+        "ChannelCapacity.sold",
+        "ChannelCapacity.leased",
+        "ChannelCapacity.remaining",
+        "ChannelCapacity.hasChannelAllocations",
+        "ChannelCapacity.isSeated"
+       ],
+       "operation": "listChannelCapacities",
+       "provenance": "contract catalogue.yaml GET /channel-capacities"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The channel allocation set",
+       "bindsTo": "ChannelAllocationSet",
+       "columns": [
+        "ChannelAllocationSet.channelCapacityId",
+        "ChannelAllocationSet.capacity",
+        "ChannelAllocationSet.allocations",
+        "ChannelAllocationSet.generalPoolUnits",
+        "ChannelAllocationSet.totalSold",
+        "ChannelAllocationSet.totalRemaining"
+       ],
+       "operation": "getChannelAllocations",
+       "provenance": "contract catalogue.yaml GET /channel-capacities/{channelCapacityId}/channel-allocations"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Create channel capacity",
+       "operation": "createChannelCapacity",
+       "provenance": "contract catalogue.yaml POST /channel-capacities"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Release channel allocation",
+       "operation": "relinquishChannelAllocation",
+       "provenance": "contract catalogue.yaml POST /channel-capacities/{channelCapacityId}/channel-allocations/release"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save channel allocations",
+       "operation": "setChannelAllocations",
+       "provenance": "contract catalogue.yaml PUT /channel-capacities/{channelCapacityId}/channel-allocations"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save channel capacity",
+       "operation": "updateChannelCapacity",
+       "provenance": "contract catalogue.yaml PATCH /channel-capacities/{channelCapacityId}"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The capacity list.",
+   "error": "Could not load. Names which read failed and leaves the capacity untouched.",
+   "emptyFirstRun": "No capacity yet. Offers Create channel capacity (`createChannelCapacity`); distinct from a filter that matched nothing.",
+   "emptyNoResults": "Nothing matches the filter on performanceId and the capacity are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listChannelCapacities` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listChannelCapacities",
+    "contract": "catalogue",
+    "purpose": "List capacity envelopes",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getChannelAllocations",
+    "contract": "catalogue",
+    "purpose": "Capacity allocated to each channel",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "createChannelCapacity",
+    "contract": "catalogue",
+    "purpose": "Create a capacity envelope",
+    "trigger": "onAction",
+    "invalidates": [
+     "listChannelCapacities"
+    ]
+   },
+   {
+    "operationId": "relinquishChannelAllocation",
+    "contract": "catalogue",
+    "purpose": "Return unsold channel allocation to the general pool",
+    "trigger": "onAction",
+    "invalidates": [
+     "listChannelCapacities"
+    ]
+   },
+   {
+    "operationId": "setChannelAllocations",
+    "contract": "catalogue",
+    "purpose": "Allocate envelope capacity across channels",
+    "trigger": "onAction",
+    "invalidates": [
+     "listChannelCapacities"
+    ]
+   },
+   {
+    "operationId": "updateChannelCapacity",
+    "contract": "catalogue",
+    "purpose": "Amend an envelope",
+    "trigger": "onAction",
+    "invalidates": [
+     "listChannelCapacities"
+    ]
+   },
+   {
+    "operationId": "listWaitlistEntries",
+    "contract": "catalogue",
+    "purpose": "Guests waiting for capacity",
+    "trigger": "onLoad",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)"
+   },
+   {
+    "operationId": "offerWaitlistCapacity",
+    "contract": "catalogue",
+    "purpose": "Tell a waiting guest that capacity appeared",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
+    "invalidates": [
+     "listChannelCapacities",
+     "getChannelAllocations",
+     "listWaitlistEntries"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "channelCapacityId",
+     "from": "deepLink"
+    },
+    {
+     "name": "entryId",
+     "from": "navigation"
+    }
+   ],
+   "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `channelCapacityId`.",
+   "preloaded": [
+    "ChannelCapacity.id",
+    "ChannelCapacity.performanceId",
+    "ChannelCapacity.name",
+    "ChannelCapacity.seatCategoryId",
+    "ChannelCapacity.oversellAllowance"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-017"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formCreateChannelCapacity",
+    "component": "modal",
+    "trigger": "Create channel capacity",
+    "body": "**Collects what `createChannelCapacity` sends before it is called.** Required: `performanceId`, `name`, `capacity`. Optional: `seatCategoryId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateEnvelopeRequest",
+    "confirm": {
+     "label": "Create channel capacity",
+     "operation": "createChannelCapacity"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "performanceId",
+      "name",
+      "capacity",
+      "seatCategoryId"
+     ]
+    },
+    "provenance": "contract catalogue.yaml POST /channel-capacities"
+   },
+   {
+    "id": "formRelinquishChannelAllocation",
+    "component": "modal",
+    "trigger": "Release channel allocation",
+    "body": "**Collects what `relinquishChannelAllocation` sends before it is called.** Required: `channels`. Optional: `reason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Release channel allocation",
+     "operation": "relinquishChannelAllocation"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "channels",
+      "reason"
+     ]
+    },
+    "provenance": "contract catalogue.yaml POST /channel-capacities/{channelCapacityId}/channel-allocations/release"
+   },
+   {
+    "id": "formSetChannelAllocations",
+    "component": "modal",
+    "trigger": "Save channel allocations",
+    "body": "**Collects what `setChannelAllocations` sends before it is called.** Required: `allocations`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save channel allocations",
+     "operation": "setChannelAllocations"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "allocations"
+     ]
+    },
+    "provenance": "contract catalogue.yaml PUT /channel-capacities/{channelCapacityId}/channel-allocations"
+   },
+   {
+    "id": "formUpdateChannelCapacity",
+    "component": "modal",
+    "trigger": "Save channel capacity",
+    "body": "**Collects what `updateChannelCapacity` sends before it is called.** Nothing in the body is required. Optional: `name`, `capacity`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save channel capacity",
+     "operation": "updateChannelCapacity"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "name",
+      "capacity"
+     ]
+    },
+    "provenance": "contract catalogue.yaml PATCH /channel-capacities/{channelCapacityId}"
+   }
+  ],
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
   "id": "BO-018",
   "name": "Allocation & Holds",
   "module": "Sell",
@@ -131,28 +483,10 @@
      "slot": "rowActions",
      "components": [
       {
-       "kind": "primaryButton",
-       "label": "Acquire inventory hold",
-       "operation": "acquireInventoryHold",
-       "provenance": "contract catalogue.yaml POST /inventory-holds"
-      },
-      {
        "kind": "destructiveButton",
        "label": "Force release inventory hold",
        "operation": "forceReleaseInventoryHold",
        "provenance": "contract catalogue.yaml POST /inventory-holds/{inventoryHoldId}/force-release"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Release inventory hold",
-       "operation": "relinquishInventoryHold",
-       "provenance": "contract catalogue.yaml DELETE /inventory-holds/{inventoryHoldId}"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Renew inventory hold",
-       "operation": "renewInventoryHold",
-       "provenance": "contract catalogue.yaml POST /inventory-holds/{inventoryHoldId}/renew"
       }
      ]
     }
@@ -165,63 +499,6 @@
     "trigger": "Force release inventory hold",
     "body": "**Names what `forceReleaseInventoryHold` changes and what it leaves alone**, in the consequence rather than the verb. A allocation holds this affects should be identified in the dialog, not just counted. **Collects what `forceReleaseInventoryHold` sends before it is called.** Required: `reason`.",
     "provenance": "contract catalogue.yaml POST /inventory-holds/{inventoryHoldId}/force-release"
-   },
-   {
-    "id": "formAcquireInventoryHold",
-    "component": "modal",
-    "trigger": "Acquire inventory hold",
-    "body": "**Collects what `acquireInventoryHold` sends before it is called.** Required: `id`, `channelCapacityId`, `requestedUnits`, `ttlSeconds`. Optional: `channel`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "AcquireLeaseRequest",
-    "confirm": {
-     "label": "Acquire inventory hold",
-     "operation": "acquireInventoryHold"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "id",
-      "channelCapacityId",
-      "requestedUnits",
-      "ttlSeconds",
-      "channel"
-     ]
-    },
-    "provenance": "contract catalogue.yaml POST /inventory-holds"
-   },
-   {
-    "id": "formRelinquishInventoryHold",
-    "component": "modal",
-    "trigger": "Release inventory hold",
-    "body": "**Collects what `relinquishInventoryHold` sends before it is called.** Required: `consumedUnits`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Release inventory hold",
-     "operation": "relinquishInventoryHold"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "consumedUnits"
-     ]
-    },
-    "provenance": "contract catalogue.yaml DELETE /inventory-holds/{inventoryHoldId}"
-   },
-   {
-    "id": "formRenewInventoryHold",
-    "component": "modal",
-    "trigger": "Renew inventory hold",
-    "body": "**Collects what `renewInventoryHold` sends before it is called.** Required: `consumedUnits`. Optional: `additionalUnits`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Renew inventory hold",
-     "operation": "renewInventoryHold"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "consumedUnits",
-      "additionalUnits"
-     ]
-    },
-    "provenance": "contract catalogue.yaml POST /inventory-holds/{inventoryHoldId}/renew"
    }
   ],
   "states": {
@@ -239,36 +516,9 @@
     "trigger": "onLoad"
    },
    {
-    "operationId": "acquireInventoryHold",
-    "contract": "catalogue",
-    "purpose": "Acquire an inventory lease",
-    "trigger": "onAction",
-    "invalidates": [
-     "listInventoryHolds"
-    ]
-   },
-   {
     "operationId": "forceReleaseInventoryHold",
     "contract": "catalogue",
     "purpose": "Reclaim a stranded lease",
-    "trigger": "onAction",
-    "invalidates": [
-     "listInventoryHolds"
-    ]
-   },
-   {
-    "operationId": "relinquishInventoryHold",
-    "contract": "catalogue",
-    "purpose": "Return unsold units",
-    "trigger": "onAction",
-    "invalidates": [
-     "listInventoryHolds"
-    ]
-   },
-   {
-    "operationId": "renewInventoryHold",
-    "contract": "catalogue",
-    "purpose": "Extend a lease TTL",
     "trigger": "onAction",
     "invalidates": [
      "listInventoryHolds"
@@ -297,6 +547,26 @@
    "board": "wireframes/P08 Venue Management.dc.html#bo-018"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "gaps": [
+   {
+    "operation": "acquireInventoryHold",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-025): Acquire, renew and relinquish a lease are terminal and order-service calls (workstation scope; guests never call them); the supervisor's act on the holds screen is force release (forceReleaseInventoryHold), which stays with the list (design-notes correction ticketing-backoffice BO-018)",
+    "source": "contracts/spine/catalogue.yaml#acquireInventoryHold"
+   },
+   {
+    "operation": "relinquishInventoryHold",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-025): Acquire, renew and relinquish a lease are terminal and order-service calls (workstation scope; guests never call them); the supervisor's act on the holds screen is force release (forceReleaseInventoryHold), which stays with the list (design-notes correction ticketing-backoffice BO-018)",
+    "source": "contracts/spine/catalogue.yaml#acquireInventoryHold"
+   },
+   {
+    "operation": "renewInventoryHold",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-025): Acquire, renew and relinquish a lease are terminal and order-service calls (workstation scope; guests never call them); the supervisor's act on the holds screen is force release (forceReleaseInventoryHold), which stays with the list (design-notes correction ticketing-backoffice BO-018)",
+    "source": "contracts/spine/catalogue.yaml#acquireInventoryHold"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -335,7 +605,6 @@
   },
   "navigation": {
    "exitTo": [
-    "BO-001",
     "BO-007",
     "BO-009"
    ],
@@ -344,14 +613,6 @@
     "BO-102"
    ],
    "transitions": [
-    {
-     "to": "BO-001",
-     "trigger": "Queue Directory",
-     "carries": [
-      "eventId"
-     ],
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId and BO-019 holds eventId, so an edge into it carries them"
-    },
     {
      "to": "BO-007",
      "trigger": "Product Directory",
@@ -816,6 +1077,13 @@
    "note": "**Drawn by Claude Design on `Seat Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 12 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-027): A write for product blackout dates and venue closure days from the closures screen (blackoutDates sit on entitlement templates, edited on BO-012).",
+    "source": "screens/P08-venue-back-office.yaml#BO-019"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -862,7 +1130,8 @@
    "entryFrom": [
     "BO-102",
     "BO-128",
-    "BO-129"
+    "BO-129",
+    "BO-131"
    ],
    "transitions": [
     {
@@ -879,6 +1148,7 @@
      "to": "BO-128",
      "trigger": "The fleet is monitored",
      "provenance": "flow F89 step 3→4",
+     "operation": "listCatalogueBundles",
      "carries": [
       "workstationId"
      ]
@@ -993,23 +1263,6 @@
       },
       {
        "kind": "detailPanel",
-       "label": "The offline package",
-       "bindsTo": "OfflinePackage",
-       "columns": [
-        "OfflinePackage.generatedAt",
-        "OfflinePackage.validFrom",
-        "OfflinePackage.validTo",
-        "OfflinePackage.accessPointId",
-        "OfflinePackage.entitlements",
-        "OfflinePackage.delegatedRights",
-        "OfflinePackage.blacklist",
-        "OfflinePackage.admissionRules"
-       ],
-       "operation": "getOfflinePackage",
-       "provenance": "contract access.yaml GET /access/offline-package"
-      },
-      {
-       "kind": "detailPanel",
        "label": "The catalogue bundle",
        "bindsTo": "CatalogueBundle",
        "columns": [
@@ -1102,12 +1355,6 @@
     "invalidates": [
      "listCatalogueBundles"
     ]
-   },
-   {
-    "operationId": "getOfflinePackage",
-    "contract": "access",
-    "purpose": "Entitlement and rule set for offline validation",
-    "trigger": "onLoad"
    },
    {
     "operationId": "listSyncRejections",
@@ -1248,6 +1495,19 @@
     "provenance": "contract orders.yaml POST /sync/orders"
    }
   ],
+  "gaps": [
+   {
+    "operation": "getOfflinePackage",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-025): getOfflinePackage is workstation-scoped (the session's access point); a back-office screen cannot read another device's package with it. F89 step 3 keeps listCatalogueBundles; the venue-scoped read is recorded as a contract gap (design-notes correction ticketing-backoffice BO-037)",
+    "source": "contracts/spine/access.yaml#getOfflinePackage | F89 step 3"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-027): A venue-scoped read of the offline package version each device holds (getOfflinePackage answers only for the calling workstation).",
+    "source": "screens/P08-venue-back-office.yaml#BO-037"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1286,7 +1546,6 @@
   },
   "navigation": {
    "exitTo": [
-    "BO-001",
     "BO-007",
     "BO-009"
    ],
@@ -1295,14 +1554,6 @@
     "BO-102"
    ],
    "transitions": [
-    {
-     "to": "BO-001",
-     "trigger": "Queue Directory",
-     "carries": [
-      "eventId"
-     ],
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId and BO-063 holds eventId, so an edge into it carries them"
-    },
     {
      "to": "BO-007",
      "trigger": "Product Directory",
@@ -1331,62 +1582,6 @@
      "slot": "collection",
      "components": [
       {
-       "kind": "calendarView",
-       "label": "Calendar",
-       "operation": "listPerformances",
-       "notes": "Opening days and performances placed in the venue calendar. Day, week, month and agenda views; the day starts at the venue's `calendarDayStartHour`. Sends the visible window as `from`/`to` and the category filter as `categoryId`.",
-       "provenance": "decided 29 September 2026, 17 September minutes M17-03 (applied 30 September)"
-      },
-      {
-       "kind": "datePicker",
-       "label": "From",
-       "operation": "listPerformances",
-       "notes": "Sends `?from=` to `listPerformances`.",
-       "provenance": "contract catalogue.yaml GET /events/{eventId}/performances"
-      },
-      {
-       "kind": "datePicker",
-       "label": "To",
-       "operation": "listPerformances",
-       "notes": "Sends `?to=` to `listPerformances`.",
-       "provenance": "contract catalogue.yaml GET /events/{eventId}/performances"
-      },
-      {
-       "kind": "dataTable",
-       "label": "Every performance",
-       "bindsTo": "Performance",
-       "columns": [
-        "Performance.id",
-        "Performance.eventId",
-        "Performance.startsAt",
-        "Performance.endsAt",
-        "Performance.approvalRequestId",
-        "Performance.requiresApprovalToCancel",
-        "Performance.status",
-        "Performance.admissionRulesId",
-        "Performance.seatMapId"
-       ],
-       "operation": "listPerformances",
-       "provenance": "contract catalogue.yaml GET /events/{eventId}/performances"
-      },
-      {
-       "kind": "dataTable",
-       "label": "Every event",
-       "bindsTo": "Event",
-       "columns": [
-        "Event.id",
-        "Event.code",
-        "Event.name",
-        "Event.venueId",
-        "Event.scopePath",
-        "Event.parentEventId",
-        "Event.performanceCount",
-        "Event.isActive"
-       ],
-       "operation": "listEvents",
-       "provenance": "contract catalogue.yaml GET /events"
-      },
-      {
        "kind": "confirmDialog",
        "derived": true,
        "label": "Confirm",
@@ -1399,56 +1594,6 @@
      "name": "contextPanel",
      "slot": "selection",
      "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected performance",
-       "bindsTo": "Performance",
-       "columns": [
-        "Performance.id",
-        "Performance.eventId",
-        "Performance.startsAt",
-        "Performance.endsAt",
-        "Performance.approvalRequestId",
-        "Performance.requiresApprovalToCancel",
-        "Performance.status",
-        "Performance.admissionRulesId",
-        "Performance.seatMapId"
-       ],
-       "operation": "getPerformance",
-       "provenance": "contract catalogue.yaml GET /performances/{performanceId}"
-      },
-      {
-       "kind": "detailPanel",
-       "label": "The event",
-       "bindsTo": "Event",
-       "columns": [
-        "Event.id",
-        "Event.code",
-        "Event.name",
-        "Event.venueId",
-        "Event.scopePath",
-        "Event.parentEventId",
-        "Event.performanceCount",
-        "Event.isActive"
-       ],
-       "operation": "getEvent",
-       "provenance": "contract catalogue.yaml GET /events/{eventId}"
-      },
-      {
-       "kind": "detailPanel",
-       "label": "The seat availability",
-       "bindsTo": "SeatAvailability",
-       "columns": [
-        "SeatAvailability.performanceId",
-        "SeatAvailability.seatMapId",
-        "SeatAvailability.renderMode",
-        "SeatAvailability.totals",
-        "SeatAvailability.byCategory",
-        "SeatAvailability.seats"
-       ],
-       "operation": "getSeatAvailability",
-       "provenance": "contract seating.yaml GET /performances/{performanceId}/seat-availability"
-      },
       {
        "kind": "detailPanel",
        "label": "The venue settings",
@@ -1474,42 +1619,6 @@
      "slot": "rowActions",
      "components": [
       {
-       "kind": "primaryButton",
-       "label": "Create performances",
-       "operation": "createPerformances",
-       "provenance": "contract catalogue.yaml POST /events/{eventId}/performances"
-      },
-      {
-       "kind": "destructiveButton",
-       "label": "Cancel performance",
-       "operation": "cancelPerformance",
-       "provenance": "contract catalogue.yaml POST /performances/{performanceId}/cancel"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Create event",
-       "operation": "createEvent",
-       "provenance": "contract catalogue.yaml POST /events"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Recommend seats",
-       "operation": "recommendSeats",
-       "provenance": "contract seating.yaml POST /performances/{performanceId}/seat-recommendations"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Save event",
-       "operation": "updateEvent",
-       "provenance": "contract catalogue.yaml PATCH /events/{eventId}"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Save performance",
-       "operation": "updatePerformance",
-       "provenance": "contract catalogue.yaml PATCH /performances/{performanceId}"
-      },
-      {
        "kind": "secondaryButton",
        "label": "Save outlet",
        "operation": "updateOutlet",
@@ -1520,118 +1629,6 @@
    ]
   },
   "overlays": [
-   {
-    "id": "confirmCancelPerformance",
-    "component": "confirmDialog",
-    "trigger": "Cancel performance",
-    "body": "**Names what `cancelPerformance` changes and what it leaves alone**, in the consequence rather than the verb. A opening hours calendar this affects should be identified in the dialog, not just counted. **Collects what `cancelPerformance` sends before it is called.** Required: `reason`. Optional: `guestMessage`, `refundPercentage`, `offerAlternativePerformanceId`, `dryRun`. **A real run needs a supervisor PIN on this device** (`supervisorStepUp` {principalId, credential}); a dry run does not (decided 28 September, audit R144).",
-    "provenance": "contract catalogue.yaml POST /performances/{performanceId}/cancel"
-   },
-   {
-    "id": "formCreatePerformances",
-    "component": "modal",
-    "trigger": "Create performances",
-    "body": "**Collects what `createPerformances` sends before it is called.** Required: `startsAt`, `endsAt`. Optional: `admissionRulesId`, `seatMapId`, `recurrence`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "CreatePerformancesRequest",
-    "confirm": {
-     "label": "Create performances",
-     "operation": "createPerformances"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "startsAt",
-      "endsAt",
-      "admissionRulesId",
-      "seatMapId",
-      "recurrence"
-     ]
-    },
-    "provenance": "contract catalogue.yaml POST /events/{eventId}/performances"
-   },
-   {
-    "id": "formCreateEvent",
-    "component": "modal",
-    "trigger": "Create event",
-    "body": "**Collects what `createEvent` sends before it is called.** Required: `code`, `name`, `venueId`. Optional: `parentEventId`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "CreateEventRequest",
-    "confirm": {
-     "label": "Create event",
-     "operation": "createEvent"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "code",
-      "name",
-      "venueId",
-      "parentEventId"
-     ]
-    },
-    "provenance": "contract catalogue.yaml POST /events"
-   },
-   {
-    "id": "formRecommendSeats",
-    "component": "modal",
-    "trigger": "Recommend seats",
-    "body": "**Collects what `recommendSeats` sends before it is called.** Required: `partySize`, `strategy`. Optional: `categoryIds`, `maxPrice`, `accessibleCount`, `maxOptions`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "SeatRecommendationRequest",
-    "confirm": {
-     "label": "Recommend seats",
-     "operation": "recommendSeats"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "partySize",
-      "strategy",
-      "categoryIds",
-      "maxPrice",
-      "accessibleCount",
-      "maxOptions"
-     ]
-    },
-    "provenance": "contract seating.yaml POST /performances/{performanceId}/seat-recommendations"
-   },
-   {
-    "id": "formUpdateEvent",
-    "component": "modal",
-    "trigger": "Save event",
-    "body": "**Collects what `updateEvent` sends before it is called.** Nothing in the body is required. Optional: `name`, `parentEventId`, `isActive`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Save event",
-     "operation": "updateEvent"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "name",
-      "parentEventId",
-      "isActive"
-     ]
-    },
-    "provenance": "contract catalogue.yaml PATCH /events/{eventId}"
-   },
-   {
-    "id": "formUpdatePerformance",
-    "component": "modal",
-    "trigger": "Save performance",
-    "body": "**Collects what `updatePerformance` sends before it is called.** Nothing in the body is required. Optional: `startsAt`, `endsAt`, `status`, `admissionRulesId`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Save performance",
-     "operation": "updatePerformance"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "startsAt",
-      "endsAt",
-      "status",
-      "admissionRulesId"
-     ]
-    },
-    "provenance": "contract catalogue.yaml PATCH /performances/{performanceId}"
-   },
    {
     "id": "formUpdateOutlet",
     "component": "modal",
@@ -1657,95 +1654,11 @@
   "states": {
    "loading": "The opening hours calendar list.",
    "error": "Could not load. Names which read failed and leaves the opening hours calendar untouched.",
-   "emptyFirstRun": "No opening hours calendar yet. Offers Create performances (`createPerformances`); distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No opening hours calendar yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "Nothing matches the filter on from, to and the opening hours calendar are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listPerformances` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `TENANT_VIEW`, which `getVenueSettings` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
-   {
-    "operationId": "listPerformances",
-    "contract": "catalogue",
-    "purpose": "List performances of an event",
-    "trigger": "onAction"
-   },
-   {
-    "operationId": "getPerformance",
-    "contract": "catalogue",
-    "purpose": "Read a performance",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "createPerformances",
-    "contract": "catalogue",
-    "purpose": "Create performances, singly or by schedule",
-    "trigger": "onAction",
-    "invalidates": [
-     "listPerformances"
-    ]
-   },
-   {
-    "operationId": "cancelPerformance",
-    "contract": "catalogue",
-    "purpose": "Cancel a performance",
-    "trigger": "onAction",
-    "invalidates": [
-     "listPerformances"
-    ]
-   },
-   {
-    "operationId": "createEvent",
-    "contract": "catalogue",
-    "purpose": "Create an event",
-    "trigger": "onAction",
-    "invalidates": [
-     "listPerformances"
-    ]
-   },
-   {
-    "operationId": "getEvent",
-    "contract": "catalogue",
-    "purpose": "Read an event",
-    "trigger": "onAction"
-   },
-   {
-    "operationId": "getSeatAvailability",
-    "contract": "seating",
-    "purpose": "Seat status for a performance",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "listEvents",
-    "contract": "catalogue",
-    "purpose": "List events",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "recommendSeats",
-    "contract": "seating",
-    "purpose": "Recommend seats for a party",
-    "trigger": "onAction",
-    "invalidates": [
-     "listPerformances"
-    ]
-   },
-   {
-    "operationId": "updateEvent",
-    "contract": "catalogue",
-    "purpose": "Amend an event",
-    "trigger": "onAction",
-    "invalidates": [
-     "listPerformances"
-    ]
-   },
-   {
-    "operationId": "updatePerformance",
-    "contract": "catalogue",
-    "purpose": "Amend a performance",
-    "trigger": "onAction",
-    "invalidates": [
-     "listPerformances"
-    ]
-   },
    {
     "operationId": "getVenueSettings",
     "contract": "tenancy",
@@ -1756,10 +1669,7 @@
     "operationId": "updateOutlet",
     "contract": "tenancy",
     "purpose": "Amend an outlet",
-    "trigger": "onAction",
-    "invalidates": [
-     "listPerformances"
-    ]
+    "trigger": "onAction"
    }
   ],
   "entryState": {
@@ -1769,15 +1679,7 @@
      "from": "session"
     },
     {
-     "name": "eventId",
-     "from": "deepLink"
-    },
-    {
      "name": "outletId",
-     "from": "deepLink"
-    },
-    {
-     "name": "performanceId",
      "from": "deepLink"
     }
    ],
@@ -1798,6 +1700,74 @@
    "note": "**Drawn by Claude Design on `Seat Board 1.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 13 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "gaps": [
+   {
+    "operation": "cancelPerformance",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-025): Opening hours are venue and outlet settings; the full performance, event and seat-recommendation set (createPerformances, recommendSeats and the rest) belongs to performance editing on BO-015. The screen keeps getVenueSettings and updateOutlet (design-notes correction ticketing-backoffice BO-063)",
+    "source": "screens/P08-venue-back-office.yaml#BO-063"
+   },
+   {
+    "operation": "createEvent",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-025): Opening hours are venue and outlet settings; the full performance, event and seat-recommendation set (createPerformances, recommendSeats and the rest) belongs to performance editing on BO-015. The screen keeps getVenueSettings and updateOutlet (design-notes correction ticketing-backoffice BO-063)",
+    "source": "screens/P08-venue-back-office.yaml#BO-063"
+   },
+   {
+    "operation": "createPerformances",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-025): Opening hours are venue and outlet settings; the full performance, event and seat-recommendation set (createPerformances, recommendSeats and the rest) belongs to performance editing on BO-015. The screen keeps getVenueSettings and updateOutlet (design-notes correction ticketing-backoffice BO-063)",
+    "source": "screens/P08-venue-back-office.yaml#BO-063"
+   },
+   {
+    "operation": "getEvent",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-025): Opening hours are venue and outlet settings; the full performance, event and seat-recommendation set (createPerformances, recommendSeats and the rest) belongs to performance editing on BO-015. The screen keeps getVenueSettings and updateOutlet (design-notes correction ticketing-backoffice BO-063)",
+    "source": "screens/P08-venue-back-office.yaml#BO-063"
+   },
+   {
+    "operation": "getPerformance",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-025): Opening hours are venue and outlet settings; the full performance, event and seat-recommendation set (createPerformances, recommendSeats and the rest) belongs to performance editing on BO-015. The screen keeps getVenueSettings and updateOutlet (design-notes correction ticketing-backoffice BO-063)",
+    "source": "screens/P08-venue-back-office.yaml#BO-063"
+   },
+   {
+    "operation": "getSeatAvailability",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-025): Opening hours are venue and outlet settings; the full performance, event and seat-recommendation set (createPerformances, recommendSeats and the rest) belongs to performance editing on BO-015. The screen keeps getVenueSettings and updateOutlet (design-notes correction ticketing-backoffice BO-063)",
+    "source": "screens/P08-venue-back-office.yaml#BO-063"
+   },
+   {
+    "operation": "listEvents",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-025): Opening hours are venue and outlet settings; the full performance, event and seat-recommendation set (createPerformances, recommendSeats and the rest) belongs to performance editing on BO-015. The screen keeps getVenueSettings and updateOutlet (design-notes correction ticketing-backoffice BO-063)",
+    "source": "screens/P08-venue-back-office.yaml#BO-063"
+   },
+   {
+    "operation": "listPerformances",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-025): Opening hours are venue and outlet settings; the full performance, event and seat-recommendation set (createPerformances, recommendSeats and the rest) belongs to performance editing on BO-015. The screen keeps getVenueSettings and updateOutlet (design-notes correction ticketing-backoffice BO-063)",
+    "source": "screens/P08-venue-back-office.yaml#BO-063"
+   },
+   {
+    "operation": "recommendSeats",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-025): Opening hours are venue and outlet settings; the full performance, event and seat-recommendation set (createPerformances, recommendSeats and the rest) belongs to performance editing on BO-015. The screen keeps getVenueSettings and updateOutlet (design-notes correction ticketing-backoffice BO-063)",
+    "source": "screens/P08-venue-back-office.yaml#BO-063"
+   },
+   {
+    "operation": "updateEvent",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-025): Opening hours are venue and outlet settings; the full performance, event and seat-recommendation set (createPerformances, recommendSeats and the rest) belongs to performance editing on BO-015. The screen keeps getVenueSettings and updateOutlet (design-notes correction ticketing-backoffice BO-063)",
+    "source": "screens/P08-venue-back-office.yaml#BO-063"
+   },
+   {
+    "operation": "updatePerformance",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-025): Opening hours are venue and outlet settings; the full performance, event and seat-recommendation set (createPerformances, recommendSeats and the rest) belongs to performance editing on BO-015. The screen keeps getVenueSettings and updateOutlet (design-notes correction ticketing-backoffice BO-063)",
+    "source": "screens/P08-venue-back-office.yaml#BO-063"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1943,12 +1913,12 @@
     {
      "to": "BO-063",
      "trigger": "Opening Hours & Calendar",
-     "provenance": "derived — BO-063 declares entryState.params eventId, outletId, performanceId and BO-102 holds none of them. The edge carries nothing: eventId, outletId, performanceId only pre-select (deep link or optional), and BO-063 opens on its own"
+     "provenance": "derived — BO-063 declares entryState.params outletId and BO-102 holds none of them. The edge carries nothing: outletId only pre-selects (deep link or optional), and BO-063 opens on its own"
     },
     {
      "to": "BO-109",
      "trigger": "Menu Builder & POS Layout Designer",
-     "provenance": "derived — BO-109 declares entryState.params menuId, saleBoardId and BO-102 holds none of them. The edge carries nothing: menuId, saleBoardId only pre-select (deep link or optional), and BO-109 opens on its own"
+     "provenance": "derived — BO-109 declares entryState.params menuId and BO-102 holds none of them. The edge carries nothing: BO-109 opens on listSaleBoards, and menuId has no source on BO-109 yet (a gap in BO-109, not in this edge)"
     },
     {
      "to": "BO-110",
@@ -1978,22 +1948,22 @@
     {
      "to": "BO-115",
      "trigger": "Category, Brand & Merchandise Hierarchy",
-     "provenance": "derived — BO-115 declares entryState.params reportId and BO-102 holds none of them. The edge carries nothing: reportId only pre-selects (deep link or optional), and BO-115 opens on its own"
+     "provenance": "derived — BO-115 declares entryState.params  and BO-102 holds none of them. The edge carries nothing: BO-115 needs nothing to open"
     },
     {
      "to": "BO-116",
      "trigger": "Merchandising & Product Presentation",
-     "provenance": "derived — BO-116 declares entryState.params merchandiseId, roleId, saleBoardId and BO-102 holds none of them. The edge carries nothing: merchandiseId, roleId, saleBoardId only pre-select (deep link or optional), and BO-116 opens on its own"
+     "provenance": "derived — BO-116 declares entryState.params merchandiseId, saleBoardId and BO-102 holds none of them. The edge carries nothing: merchandiseId, saleBoardId only pre-select (deep link or optional), and BO-116 opens on its own"
     },
     {
      "to": "BO-117",
      "trigger": "Product Import, Governance & AI Configuration Assistant",
-     "provenance": "derived — BO-117 declares entryState.params jobId, saleBoardId and BO-102 holds none of them. The edge carries nothing: saleBoardId only pre-selects (deep link or optional); BO-117 finds jobId (importProductCatalogue) itself, and BO-117 opens on its own"
+     "provenance": "derived — BO-117 declares entryState.params jobId and BO-102 holds none of them. The edge carries nothing: BO-117 finds jobId (importProductCatalogue) itself, and BO-117 opens on its own"
     },
     {
      "to": "BO-118",
      "trigger": "Campaign & Audience Management",
-     "provenance": "derived — BO-118 declares entryState.params reportId, saleBoardId and BO-102 holds none of them. The edge carries nothing: reportId, saleBoardId only pre-select (deep link or optional), and BO-118 opens on its own"
+     "provenance": "derived — BO-118 declares entryState.params reportId and BO-102 holds none of them. The edge carries nothing: reportId only pre-selects (deep link or optional), and BO-118 opens on its own"
     },
     {
      "to": "BO-119",
@@ -2028,12 +1998,12 @@
     {
      "to": "BO-125",
      "trigger": "Product & Category Button Configuration",
-     "provenance": "derived — BO-125 declares entryState.params deviceId, saleBoardId, workstationId and BO-102 holds none of them. The edge carries nothing: saleBoardId, deviceId, workstationId only pre-select (deep link or optional), and BO-125 opens on its own"
+     "provenance": "derived — BO-125 declares entryState.params saleBoardId and BO-102 holds none of them. The edge carries nothing: saleBoardId only pre-selects (deep link or optional), and BO-125 opens on its own"
     },
     {
      "to": "BO-126",
      "trigger": "Deployment, Preview & Audit",
-     "provenance": "derived — BO-126 declares entryState.params profileId, reportId, rolloutId, saleBoardId and BO-102 holds none of them. The edge carries nothing: profileId, saleBoardId, reportId, rolloutId only pre-select (deep link or optional), and BO-126 opens on its own"
+     "provenance": "derived — BO-126 declares entryState.params profileId, saleBoardId and BO-102 holds none of them. The edge carries nothing: profileId, saleBoardId only pre-select (deep link or optional), and BO-126 opens on its own"
     },
     {
      "to": "BO-142",
@@ -2043,7 +2013,7 @@
     {
      "to": "BO-143",
      "trigger": "Retail Global Settings & Controls",
-     "provenance": "derived — BO-143 declares entryState.params dropId and BO-102 holds none of them. The edge carries nothing: BO-143 opens on lookupShopAndDrop, and dropId has no source on BO-143 yet (a gap in BO-143, not in this edge)"
+     "provenance": "derived — BO-143 declares entryState.params dropId, outletId and BO-102 holds none of them. The edge carries nothing: BO-143 opens on lookupShopAndDrop, and dropId, outletId have no source on BO-143 yet (a gap in BO-143, not in this edge)"
     },
     {
      "to": "BO-1190",
@@ -2135,20 +2105,9 @@
       {
        "kind": "detailPanel",
        "label": "The upsell suggestion",
-       "bindsTo": "UpsellSuggestion",
-       "columns": [
-        "UpsellSuggestion.variantId",
-        "UpsellSuggestion.bundleId",
-        "UpsellSuggestion.name",
-        "UpsellSuggestion.price",
-        "UpsellSuggestion.discountedPrice",
-        "UpsellSuggestion.source",
-        "UpsellSuggestion.ruleId",
-        "UpsellSuggestion.rank",
-        "UpsellSuggestion.rationale"
-       ],
-       "operation": "getUpsellSuggestions",
-       "provenance": "contract promotions.yaml POST /upsell-suggestions"
+       "operation": "decideRecommendations",
+       "provenance": "contract promotions.yaml POST /upsell-suggestions",
+       "notes": "The slot preview, as on WEB-008: `decideRecommendations` with `previewOnly` (ADR-0052)."
       },
       {
        "kind": "detailPanel",
@@ -2198,13 +2157,6 @@
     "purpose": "Fill a recommendation slot",
     "trigger": "onLoad",
     "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "recordRecommendationEvents",
-    "contract": "ai",
-    "purpose": "Report what happened to recommended items",
-    "trigger": "onAction",
-    "provenance": "build, 29 September 2026"
    }
   ],
   "entryState": {
@@ -2229,6 +2181,19 @@
    "board": "wireframes/P08 Venue Management.dc.html#bo-102"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "gaps": [
+   {
+    "operation": "recordRecommendationEvents",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-012): Staff previewing a recommendation slot must not write impressions or declines into the guest decline store; recordRecommendationEvents on a back-office landing does exactly that (design-notes correction ai BO-102).",
+    "source": "contracts/satellite/ai.yaml#recordRecommendationEvents | contracts/satellite/ai.yaml#simulateRecommendationDecision"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-014): No staff preview of a recommendation slot that records nothing.",
+    "source": "contracts/satellite/ai.yaml#simulateRecommendationDecision | contracts/satellite/ai.yaml#decideRecommendations"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -2266,7 +2231,8 @@
   },
   "navigation": {
    "entryFrom": [
-    "BO-102"
+    "BO-102",
+    "BO-045"
    ],
    "exitTo": [
     "BO-102"
@@ -2281,14 +2247,14 @@
     }
    ]
   },
-  "notes": "**Added 20 August from the client design board.** The operations existed and no screen called them. **Drawn 31 August** — `FnB Board 2.dc.html` frame `fnb-2b`. **Matched on frame title against screen name, constrained to this board’s platforms.** These packs label by board position (`GM-6C`) rather than naming the screen, so the title is the only join — *Menu Builder &amp; POS Layout Designer* matched at 1.0. **A cross-platform title match was refused**: `Outlet Management` scored 0.85 against a partner-portal screen, which is how a mapping goes wrong quietly.",
+  "notes": "**Added 20 August from the client design board.** The operations existed and no screen called them. **Drawn 31 August** — `FnB Board 2.dc.html` frame `fnb-2b`. **Matched on frame title against screen name, constrained to this board’s platforms.** These packs label by board position (`GM-6C`) rather than naming the screen, so the title is the only join — *Menu Builder &amp; POS Layout Designer* matched at 1.0. **A cross-platform title match was refused**: `Outlet Management` scored 0.85 against a partner-portal screen, which is how a mapping goes wrong quietly.\n\n**The arranging canvas, opened from BO-045 (2 October 2026, CHG-SBO-008; DI-671, DI-987):** no menu list of its own, one hub entry; the till grid shares one designer with BO-124 and BO-125.",
   "density": "compact",
   "boardFrames": [
    "FnB Board 2.dc.html#fnb-2b"
   ],
   "pattern": "listDetail",
   "patternReason": "`listMenus` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
-  "purpose": "Menu Builder & POS Layout Designer — from the client design board, 20 August.",
+  "purpose": "Arrange one outlet's menu and till grid for the next publish.",
   "layout": {
    "template": "split",
    "regions": [
@@ -2297,63 +2263,38 @@
      "slot": "collection",
      "components": [
       {
-       "kind": "textField",
-       "label": "Outlet id",
-       "operation": "listMenus",
-       "notes": "Sends `?outletId=` to `listMenus`.",
-       "provenance": "contract fnb.yaml GET /menus"
-      },
-      {
-       "kind": "datePicker",
-       "label": "Active at",
-       "operation": "listMenus",
-       "notes": "Sends `?activeAt=` to `listMenus`.",
-       "provenance": "contract fnb.yaml GET /menus"
-      },
-      {
-       "kind": "dataTable",
-       "label": "Every menu",
+       "kind": "detailPanel",
+       "label": "Menu sections",
        "bindsTo": "Menu",
        "columns": [
-        "Menu.id",
-        "Menu.code",
         "Menu.name",
-        "Menu.outletId",
-        "Menu.availability",
         "Menu.sections",
-        "Menu.isActive"
+        "Menu.availability"
        ],
-       "operation": "listMenus",
-       "provenance": "contract fnb.yaml GET /menus"
+       "operation": "getMenu",
+       "notes": "The canvas: sections and items dragged into order. The order saved by Save menu sections is the till's order.",
+       "provenance": "contract fnb.yaml GET /menus/{menuId}"
       },
       {
-       "kind": "searchField",
-       "label": "Search menu builder",
-       "provenance": "carried from the previous definition"
+       "kind": "detailPanel",
+       "label": "Till grid",
+       "bindsTo": "SaleBoard",
+       "columns": [
+        "SaleBoard.name",
+        "SaleBoard.kind",
+        "SaleBoard.pages",
+        "SaleBoard.isActive"
+       ],
+       "operation": "listSaleBoards",
+       "notes": "**Per outlet, with a till override (decided 2 October 2026 by Chinmay, DEC-183; CHG-CSP-006):** the outlet's `saleBoardId` is the layout every till of the outlet loads unless a till overrides it (`Workstation.saleBoardSource`). Only F&B functions can be placed (DEC-184 default).",
+       "provenance": "contract tenancy.yaml GET /sale-boards"
       }
      ]
     },
     {
      "name": "contextPanel",
      "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected menu",
-       "bindsTo": "Menu",
-       "columns": [
-        "Menu.id",
-        "Menu.code",
-        "Menu.name",
-        "Menu.outletId",
-        "Menu.availability",
-        "Menu.sections",
-        "Menu.isActive"
-       ],
-       "operation": "listMenus",
-       "provenance": "contract fnb.yaml GET /menus"
-      }
-     ]
+     "components": []
     },
     {
      "name": "actionBar",
@@ -2370,6 +2311,12 @@
        "label": "Save sale board",
        "operation": "updateSaleBoard",
        "provenance": "contract tenancy.yaml PUT /sale-boards/{saleBoardId}"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "New sale board",
+       "operation": "createSaleBoard",
+       "provenance": "contract tenancy.yaml POST /sale-boards; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -2378,34 +2325,43 @@
   "states": {
    "loading": "The menu pos layout list.",
    "error": "Could not load. Names which read failed and leaves the menu pos layout untouched.",
-   "emptyFirstRun": "No menu pos layout yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
-   "emptyNoResults": "Nothing matches the filter on outletId, activeAt and the menu pos layout are still there. Names the active filter and offers to clear it.",
+   "emptyFirstRun": "The picked menu has no sections yet: the canvas opens empty and Save menu sections (`setMenuSections`) saves the first arrangement; a new outlet layout starts with New sale board.",
+   "emptyNoResults": "Never shown: the canvas does not filter.",
    "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listMenus` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
-    "operationId": "listMenus",
-    "contract": "fnb",
-    "purpose": "List menus",
-    "trigger": "onLoad"
-   },
-   {
     "operationId": "setMenuSections",
     "contract": "fnb",
     "purpose": "Set menu sections and their item ordering",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMenus"
-    ]
+    "trigger": "onAction"
    },
    {
     "operationId": "updateSaleBoard",
     "contract": "tenancy",
     "purpose": "Update a sale board",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "createSaleBoard",
+    "contract": "tenancy",
+    "purpose": "Start the outlet's till grid",
     "trigger": "onAction",
-    "invalidates": [
-     "listMenus"
-    ]
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-008)"
+   },
+   {
+    "operationId": "getMenu",
+    "contract": "fnb",
+    "purpose": "The menu opened from BO-045, its sections and items",
+    "trigger": "onLoad",
+    "provenance": "design-note correction, 2 October 2026 (BO-109)"
+   },
+   {
+    "operationId": "listSaleBoards",
+    "contract": "tenancy",
+    "purpose": "The outlet's till layout and any till overrides",
+    "trigger": "onLoad",
+    "provenance": "design-note correction, 2 October 2026 (BO-109)"
    }
   ],
   "entryState": {
@@ -2416,21 +2372,14 @@
     },
     {
      "name": "menuId",
-     "from": "deepLink"
+     "from": "BO-045"
     },
     {
      "name": "saleBoardId",
-     "from": "deepLink"
+     "from": "navigation"
     }
    ],
-   "coldEntry": "Resolves from the session. A principal with more than one venue is asked which before the page renders.",
-   "preloaded": [
-    "Menu.id",
-    "Menu.code",
-    "Menu.name",
-    "Menu.outletId",
-    "Menu.availability"
-   ]
+   "coldEntry": "Opened from BO-045 with a menu picked there. Opened cold, it says which menu to pick and links back to BO-045."
   },
   "wireframe": {
    "status": "notStarted",
@@ -2462,8 +2411,7 @@
     "id": "formUpdateSaleBoard",
     "component": "modal",
     "trigger": "Save sale board",
-    "body": "**Collects what `updateSaleBoard` sends before it is called.** Required: `id`, `code`, `name`, `venueId`, `kind`, `pages`. Optional: `isActive`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "SaleBoard",
+    "body": "**Collects what `updateSaleBoard` sends before it is called.** Required: `code`, `name`, `venueId`, `kind`, `pages`. Optional: `isActive`. **The canvas is the input:** `pages` and their tiles come from the arranged grid, `venueId` from the session, `code` and `kind` from the outlet; only the name is typed. Dismissing sends nothing; the screen behind is unchanged.",
     "confirm": {
      "label": "Save sale board",
      "operation": "updateSaleBoard"
@@ -2471,7 +2419,6 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "id",
       "code",
       "name",
       "venueId",
@@ -2481,6 +2428,37 @@
      ]
     },
     "provenance": "contract tenancy.yaml PUT /sale-boards/{saleBoardId}"
+   },
+   {
+    "id": "formCreateSaleBoard",
+    "component": "modal",
+    "trigger": "New sale board",
+    "body": "**Collects what `createSaleBoard` sends before it is called.** Required: `code`, `name`, `venueId`, `kind`, `pages`. Optional: `isActive`. **The canvas is the input:** `pages` and their tiles come from the arranged grid, `venueId` from the session, `code` and `kind` from the outlet; only the name is typed. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "New sale board",
+     "operation": "createSaleBoard"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "code",
+      "name",
+      "venueId",
+      "kind",
+      "pages",
+      "isActive"
+     ]
+    },
+    "provenance": "contract tenancy.yaml POST /sale-boards"
+   }
+  ],
+  "purposeNote": "Purpose rewritten 2 October 2026 (CHG-WIR-010): The purpose was a placeholder (\"from the client design board, 20 August\") (design-notes correction fnb-retail BO-109).",
+  "gaps": [
+   {
+    "operation": "listMenus",
+    "removed": true,
+    "why": "The menu list lives on BO-045; this canvas opens on the menu picked there (design-note correction fnb-retail BO-045/BO-109, CHG-SBO-008).",
+    "source": "DI-671 | DI-987"
    }
   ],
   "_platform": {
@@ -2535,109 +2513,39 @@
     }
    ]
   },
-  "notes": "**Added 20 August from the client design board.** The operations existed and no screen called them.",
+  "notes": "**Merged into BO-111** (decided 2 October 2026, Chinmay: duplicate screens merged as proposed; CHG-SBO-021). A dish's recipe, substitutions and allergens are one editing job (design-note correction fnb-retail BO-110). **One implementation, both ids kept**, as the M24-03 merges do: this id stays for traceability and routes to BO-111, and nothing on it is built separately.\n\n**Added 20 August from the client design board.** The operations existed and no screen called them.",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listRecipes` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
-  "purpose": "Recipe & BOM Management — from the client design board, 20 August.",
+  "purpose": "Recipe & BOM Management — from the client design board, 20 August (merged into BO-111 Ingredient Substitution, Allergen & Nutrition).",
   "layout": {
    "template": "split",
    "regions": [
     {
      "name": "contentBody",
      "slot": "collection",
-     "components": [
-      {
-       "kind": "searchField",
-       "label": "Search",
-       "operation": "listRecipes",
-       "notes": "Sends `?search=` to `listRecipes`.",
-       "provenance": "contract fnb.yaml GET /recipes"
-      },
-      {
-       "kind": "textField",
-       "label": "Menu item id",
-       "operation": "listRecipes",
-       "notes": "Sends `?menuItemId=` to `listRecipes`.",
-       "provenance": "contract fnb.yaml GET /recipes"
-      },
-      {
-       "kind": "dataTable",
-       "label": "Every recipe",
-       "bindsTo": "Recipe",
-       "columns": [
-        "Recipe.menuItemId",
-        "Recipe.yield",
-        "Recipe.ingredients",
-        "Recipe.costPerPortion"
-       ],
-       "operation": "listRecipes",
-       "provenance": "contract fnb.yaml GET /recipes"
-      },
-      {
-       "kind": "searchField",
-       "label": "Search recipe",
-       "provenance": "carried from the previous definition"
-      }
-     ]
+     "components": []
     },
     {
      "name": "contextPanel",
      "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected recipe",
-       "bindsTo": "Recipe",
-       "columns": [
-        "Recipe.menuItemId",
-        "Recipe.yield",
-        "Recipe.ingredients",
-        "Recipe.costPerPortion"
-       ],
-       "operation": "listRecipes",
-       "provenance": "contract fnb.yaml GET /recipes"
-      }
-     ]
+     "components": []
     },
     {
      "name": "actionBar",
      "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Save recipe",
-       "operation": "setRecipe",
-       "provenance": "contract fnb.yaml PUT /recipes"
-      }
-     ]
+     "components": []
     }
    ]
   },
   "states": {
-   "loading": "The recipe bom list.",
-   "error": "Could not load. Names which read failed and leaves the recipe bom untouched.",
-   "emptyFirstRun": "No recipe bom yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
-   "emptyNoResults": "Nothing matches the filter on search, menuItemId and the recipe bom are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listRecipes` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "loading": "Routes to BO-111 while it opens.",
+   "error": "Could not open BO-111; says so and offers to retry.",
+   "emptyFirstRun": "Never shown: this id routes to BO-111, whose empty states apply.",
+   "emptyNoResults": "Never shown: this id routes to BO-111.",
+   "emptyNoAccess": "As BO-111: shown when the caller lacks the access BO-111 requires, named in words."
   },
-  "apis": [
-   {
-    "operationId": "listRecipes",
-    "contract": "fnb",
-    "purpose": "List recipes",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "setRecipe",
-    "contract": "fnb",
-    "purpose": "Define a recipe for a menu item",
-    "trigger": "onAction",
-    "invalidates": [
-     "listRecipes"
-    ]
-   }
-  ],
+  "apis": [],
   "entryState": {
    "params": [
     {
@@ -2658,30 +2566,7 @@
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-110"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
-  "overlays": [
-   {
-    "id": "formSetRecipe",
-    "component": "modal",
-    "trigger": "Save recipe",
-    "body": "**Collects what `setRecipe` sends before it is called.** Required: `menuItemId`, `ingredients`. Optional: `yield`, `costPerPortion`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "Recipe",
-    "confirm": {
-     "label": "Save recipe",
-     "operation": "setRecipe"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "menuItemId",
-      "ingredients",
-      "yield",
-      "costPerPortion"
-     ]
-    },
-    "provenance": "contract fnb.yaml PUT /recipes"
-   }
-  ],
+  "apisNote": "No operations of its own since 2 October 2026 (CHG-SBO-021): merged into BO-111, whose operations it routes to.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -2744,9 +2629,10 @@
     }
    ]
   },
-  "notes": "**Added 20 August from the client design board.** The operations existed and no screen called them.",
+  "notes": "**Added 20 August from the client design board.** The operations existed and no screen called them.\n\n**One recipe screen per dish, two tabs: Recipe | Substitutions & allergens** (decided 2 October 2026, merge as proposed; CHG-SBO-021; DI-987, DI-474). BO-110 Recipe & BOM Management is merged in; this id is kept as the home because flows F31 and F93 run on it.",
   "density": "compact",
   "boardFrames": [
+   "FnB Board 2.dc.html#fnb-2f",
    "FnB Board 2.dc.html#fnb-2l"
   ],
   "pattern": "configEditor",
@@ -2760,33 +2646,68 @@
      "slot": "fields",
      "components": [
       {
-       "kind": "textField",
-       "label": "menuItemId",
-       "bindsTo": "Recipe.menuItemId",
-       "provenance": "contract fnb.yaml PUT /recipes"
+       "kind": "searchField",
+       "label": "Search ingredient substitution, allergen",
+       "provenance": "carried from the previous definition",
+       "tab": "Substitutions & allergens"
       },
       {
-       "kind": "textField",
-       "label": "yield",
-       "bindsTo": "Recipe.yield",
-       "provenance": "contract fnb.yaml PUT /recipes"
-      },
-      {
-       "kind": "textField",
-       "label": "ingredients",
-       "bindsTo": "Recipe.ingredients",
-       "provenance": "contract fnb.yaml PUT /recipes"
-      },
-      {
-       "kind": "textField",
-       "label": "costPerPortion",
-       "bindsTo": "Recipe.costPerPortion",
-       "provenance": "contract fnb.yaml PUT /recipes"
+       "kind": "detailPanel",
+       "label": "Last allergen verdict",
+       "bindsTo": "AllergenVerdict",
+       "operation": "getAllergenVerification",
+       "provenance": "contract fnb.yaml GET /menu-items/{menuItemId}/allergen-verification; wiring fix, 2 October 2026",
+       "tab": "Substitutions & allergens"
       },
       {
        "kind": "searchField",
-       "label": "Search ingredient substitution, allergen",
-       "provenance": "carried from the previous definition"
+       "label": "Search",
+       "operation": "listRecipes",
+       "notes": "Sends `?search=` to `listRecipes`.",
+       "provenance": "contract fnb.yaml GET /recipes",
+       "tab": "Recipe"
+      },
+      {
+       "kind": "selectField",
+       "label": "Dish",
+       "operation": "listRecipes",
+       "notes": "Find a dish by name; never a typed menu item id.",
+       "provenance": "contract fnb.yaml GET /recipes",
+       "tab": "Recipe"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Recipes",
+       "bindsTo": "Recipe",
+       "columns": [
+        "Recipe.menuItemId",
+        "Recipe.yield",
+        "Recipe.costPerPortion"
+       ],
+       "operation": "listRecipes",
+       "provenance": "contract fnb.yaml GET /recipes",
+       "tab": "Recipe"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected recipe",
+       "bindsTo": "Recipe",
+       "columns": [
+        "Recipe.menuItemId",
+        "Recipe.yield",
+        "Recipe.ingredients",
+        "Recipe.costPerPortion"
+       ],
+       "operation": "listRecipes",
+       "provenance": "contract fnb.yaml GET /recipes",
+       "notes": "Ingredients are drawn as lines (item, quantity, unit, cost), not one column.",
+       "tab": "Recipe"
       }
      ]
     },
@@ -2798,33 +2719,31 @@
        "kind": "primaryButton",
        "label": "Save recipe",
        "operation": "setRecipe",
-       "provenance": "contract fnb.yaml PUT /recipes"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Save menu",
-       "operation": "updateMenu",
-       "provenance": "contract fnb.yaml PATCH /menus/{menuId}"
+       "provenance": "contract fnb.yaml PUT /recipes",
+       "tab": "Recipe"
       },
       {
        "kind": "secondaryButton",
        "label": "Save substitution rules",
        "operation": "setSubstitutionRules",
-       "provenance": "contract fnb.yaml PUT /substitution-rules"
+       "provenance": "contract fnb.yaml PUT /substitution-rules",
+       "tab": "Substitutions & allergens"
       },
       {
        "kind": "secondaryButton",
        "label": "Re-check allergens (manual)",
        "operation": "verifyAllergens",
        "notes": "**A manual re-check** (decided 28 September, audit R241). The server already runs `verifyAllergens` after every recipe, substitution or modifier change; this button runs it again on demand.",
-       "provenance": "contract fnb.yaml POST /menu-items/{menuItemId}/verify-allergens"
+       "provenance": "contract fnb.yaml POST /menu-items/{menuItemId}/verify-allergens",
+       "tab": "Substitutions & allergens"
       },
       {
        "kind": "detailPanel",
        "label": "Last allergen verdict",
        "operation": "verifyAllergens",
        "notes": "**Shows the last automatic verdict** — `matches`, `undeclared` (with `via` and `sourceRef`, shown first), `overDeclared` — from the check the server runs after every recipe, substitution or modifier change, with when it ran (decided 28 September, audit R241). **The contract records the verdict but exposes no read of it yet**, so until one exists this panel shows the result of the latest manual re-check; the response is inline and binds to no named schema.",
-       "provenance": "contract fnb.yaml POST /menu-items/{menuItemId}/verify-allergens"
+       "provenance": "contract fnb.yaml POST /menu-items/{menuItemId}/verify-allergens",
+       "tab": "Substitutions & allergens"
       }
      ]
     }
@@ -2841,12 +2760,6 @@
     "operationId": "setRecipe",
     "contract": "fnb",
     "purpose": "Define a recipe for a menu item",
-    "trigger": "onAction"
-   },
-   {
-    "operationId": "updateMenu",
-    "contract": "fnb",
-    "purpose": "Amend a menu",
     "trigger": "onAction"
    },
    {
@@ -2867,6 +2780,20 @@
     "purpose": "Define approved ingredient substitutions",
     "trigger": "onAction",
     "provenance": "decided 29 September, VM close-out (venue management and configuration)"
+   },
+   {
+    "operationId": "getAllergenVerification",
+    "contract": "fnb",
+    "purpose": "The last automatic allergen verdict for the dish",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-008)"
+   },
+   {
+    "operationId": "listRecipes",
+    "contract": "fnb",
+    "purpose": "List recipes",
+    "trigger": "onLoad",
+    "provenance": "merged from BO-110, 2 October 2026"
    }
   ],
   "entryState": {
@@ -2901,25 +2828,6 @@
   "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "overlays": [
    {
-    "id": "formUpdateMenu",
-    "component": "modal",
-    "trigger": "Save menu",
-    "body": "**Collects what `updateMenu` sends before it is called.** Nothing in the body is required. Optional: `name`, `availability`, `isActive`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Save menu",
-     "operation": "updateMenu"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "name",
-      "availability",
-      "isActive"
-     ]
-    },
-    "provenance": "contract fnb.yaml PATCH /menus/{menuId}"
-   },
-   {
     "id": "formSetSubstitutionRules",
     "component": "modal",
     "trigger": "Save substitution rules",
@@ -2935,6 +2843,33 @@
      ]
     },
     "provenance": "contract fnb.yaml PUT /substitution-rules"
+   },
+   {
+    "id": "formSetRecipe",
+    "component": "modal",
+    "trigger": "Save recipe",
+    "body": "**Collects what `setRecipe` sends before it is called.** Required: `menuItemId`, `ingredients`. Optional: `yield`. **Cost per portion is computed and read-only** (R125 (9)); the dish is picked by name; ingredients are lines (item, quantity, unit). Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save recipe",
+     "operation": "setRecipe"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "menuItemId",
+      "ingredients",
+      "yield"
+     ]
+    },
+    "provenance": "contract fnb.yaml PUT /recipes"
+   }
+  ],
+  "gaps": [
+   {
+    "operation": "updateMenu",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-008): \"Save menu\" (updateMenu: name, service period, active) has nothing to do with allergens and was attached by name (R254); re-verification is automatic after a change (R241), and the automatic verdict is getAllergenVerification, which exists and names BO-111 (design-notes corrections fnb-retail BO-111).",
+    "source": "R254 | R241 | contracts/satellite/fnb.yaml#getAllergenVerification"
    }
   ],
   "_platform": {
@@ -2978,29 +2913,31 @@
     "BO-102"
    ],
    "exitTo": [
-    "BO-009",
-    "BO-102"
+    "BO-102",
+    "BO-137"
    ],
    "inferred": false,
    "notes": "**Returns to BO-102.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
    "transitions": [
     {
-     "to": "BO-009",
-     "trigger": "Pricing Rules",
-     "provenance": "flow F78 step 3→4",
-     "operation": "planProductionRun"
-    },
-    {
      "to": "BO-102",
      "trigger": "Sell",
      "provenance": "derived — BO-102 declares entryState.params  and BO-112 holds none of them. The edge carries nothing: BO-112 is opened from BO-102, so this edge is the way back and BO-102 keeps its own state"
+    },
+    {
+     "to": "BO-137",
+     "trigger": "Recipe Consumption & Theoretical Inventory",
+     "provenance": "flow F85 step 1→2",
+     "carries": [
+      "runId"
+     ]
     }
    ]
   },
-  "notes": "**Added 20 August from the client design board.** The operations existed and no screen called them.",
+  "notes": "**Added 20 August from the client design board.** The operations existed and no screen called them.\n\n**One Production screen, three tabs: Plan | Commissary | Batches** (decided 2 October 2026, merge as proposed; CHG-SBO-021; DI-987, DI-671). BO-113 Central Kitchen & Commissary and BO-138 Production Execution & Batch are merged in; consumption stays with stock (BO-137). **The commissary is an outlet that produces for others** (DEC-186, DEC-188): a producing outlet's runs are sent to the outlets they serve with Send to outlets.",
   "density": "compact",
   "boardFrames": [
-   "Retail Board 2.dc.html#ret-2e"
+   "FnB Board 2.dc.html#fnb-2m"
   ],
   "pattern": "configEditor",
   "patternReason": "the screen declares only writes (`planProductionRun`) and no read of a population — it is settings, not a list",
@@ -3013,63 +2950,37 @@
      "slot": "fields",
      "components": [
       {
-       "kind": "textField",
-       "label": "id",
-       "bindsTo": "ProductionRun.id",
-       "provenance": "contract fnb.yaml POST /production-runs"
+       "kind": "dataTable",
+       "label": "Production runs",
+       "operation": "listProductionRuns",
+       "provenance": "contract fnb.yaml GET /production-runs; wiring fix, 2 October 2026",
+       "bindsTo": "ProductionRun",
+       "columns": [
+        "ProductionRun.recipeId",
+        "ProductionRun.producingOutletId",
+        "ProductionRun.forOutletIds",
+        "ProductionRun.plannedQuantity",
+        "ProductionRun.scheduledFor",
+        "ProductionRun.status",
+        "ProductionRun.actualQuantity"
+       ],
+       "tab": "Plan"
       },
       {
-       "kind": "textField",
-       "label": "recipeId",
-       "bindsTo": "ProductionRun.recipeId",
-       "provenance": "contract fnb.yaml POST /production-runs"
+       "kind": "publishGate",
+       "impliedBy": "releaseProductionPlan",
+       "operation": "releaseProductionPlan",
+       "notes": "Declares `releaseProductionPlan`. **The gate names what the publish will affect before it happens** — a disabled Publish with no reason is the state operators escalate.",
+       "provenance": "wiring fix, 2 October 2026: the operation moved here",
+       "tab": "Plan"
       },
       {
-       "kind": "textField",
-       "label": "producingOutletId",
-       "bindsTo": "ProductionRun.producingOutletId",
-       "provenance": "contract fnb.yaml POST /production-runs"
-      },
-      {
-       "kind": "textField",
-       "label": "forOutletIds",
-       "bindsTo": "ProductionRun.forOutletIds",
-       "provenance": "contract fnb.yaml POST /production-runs"
-      },
-      {
-       "kind": "textField",
-       "label": "plannedQuantity",
-       "bindsTo": "ProductionRun.plannedQuantity",
-       "provenance": "contract fnb.yaml POST /production-runs"
-      },
-      {
-       "kind": "textField",
-       "label": "actualQuantity",
-       "bindsTo": "ProductionRun.actualQuantity",
-       "provenance": "contract fnb.yaml POST /production-runs"
-      },
-      {
-       "kind": "textField",
-       "label": "scheduledFor",
-       "bindsTo": "ProductionRun.scheduledFor",
-       "provenance": "contract fnb.yaml POST /production-runs"
-      },
-      {
-       "kind": "textField",
-       "label": "status",
-       "bindsTo": "ProductionRun.status",
-       "provenance": "contract fnb.yaml POST /production-runs"
-      },
-      {
-       "kind": "textField",
-       "label": "varianceReason",
-       "bindsTo": "ProductionRun.varianceReason",
-       "provenance": "contract fnb.yaml POST /production-runs"
-      },
-      {
-       "kind": "searchField",
-       "label": "Search production planning",
-       "provenance": "carried from the previous definition"
+       "kind": "detailPanel",
+       "label": "The batch",
+       "bindsTo": "ProductionRun",
+       "operation": "getProductionRun",
+       "provenance": "contract fnb.yaml GET /production-runs/{runId}; wiring fix, 2 October 2026",
+       "tab": "Batches"
       }
      ]
     },
@@ -3081,7 +2992,44 @@
        "kind": "primaryButton",
        "label": "Plan production run",
        "operation": "planProductionRun",
-       "provenance": "contract fnb.yaml POST /production-runs"
+       "provenance": "contract fnb.yaml POST /production-runs",
+       "tab": "Plan"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Build plan",
+       "operation": "buildProductionPlan",
+       "provenance": "contract fnb.yaml POST /production-plans; wiring fix, 2 October 2026",
+       "tab": "Plan"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Release plan",
+       "operation": "releaseProductionPlan",
+       "provenance": "contract fnb.yaml POST /production-plans/{planId}/release; wiring fix, 2 October 2026",
+       "tab": "Plan"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Print prep sheet",
+       "operation": "printPrepSheet",
+       "notes": "**Prep sheets print from the venue's template to the kitchen printers or the browser (decided 2 October 2026 by Chinmay, DEC-185; kitchen printers are in release 1, DEC-187; CHG-CSA-014).**",
+       "provenance": "contract fnb.yaml POST /production-plans/{planId}/prep-sheet",
+       "tab": "Plan"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Complete production run",
+       "operation": "completeProductionRun",
+       "provenance": "contract fnb.yaml POST /production-runs/{runId}/complete",
+       "tab": "Commissary"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Send to outlets",
+       "operation": "createStockTransfer",
+       "provenance": "contract inventory.yaml POST /stock-transfers; wiring fix, 2 October 2026",
+       "tab": "Commissary"
       }
      ]
     }
@@ -3099,6 +3047,55 @@
     "contract": "fnb",
     "purpose": "Plan a batch, for one outlet or several",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "buildProductionPlan",
+    "contract": "fnb",
+    "purpose": "Turn a forecast into a prep list",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-008)"
+   },
+   {
+    "operationId": "releaseProductionPlan",
+    "contract": "fnb",
+    "purpose": "Make the plan real",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-008)"
+   },
+   {
+    "operationId": "listProductionRuns",
+    "contract": "fnb",
+    "purpose": "What is being made",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-008)"
+   },
+   {
+    "operationId": "printPrepSheet",
+    "contract": "fnb",
+    "purpose": "Print a production plan's prep sheet",
+    "trigger": "onAction",
+    "provenance": "design-note correction, 2 October 2026 (BO-112)"
+   },
+   {
+    "operationId": "completeProductionRun",
+    "contract": "fnb",
+    "purpose": "Record what was actually made",
+    "trigger": "onAction",
+    "provenance": "merged from BO-113, 2 October 2026"
+   },
+   {
+    "operationId": "createStockTransfer",
+    "contract": "inventory",
+    "purpose": "Send each outlet its share",
+    "trigger": "onAction",
+    "provenance": "merged from BO-113, 2 October 2026"
+   },
+   {
+    "operationId": "getProductionRun",
+    "contract": "fnb",
+    "purpose": "One batch",
+    "trigger": "onAction",
+    "provenance": "merged from BO-138, 2 October 2026"
    }
   ],
   "entryState": {
@@ -3106,6 +3103,14 @@
     {
      "name": "venueId",
      "from": "session"
+    },
+    {
+     "name": "planId",
+     "from": "navigation"
+    },
+    {
+     "name": "runId",
+     "from": "navigation"
     }
    ],
    "coldEntry": "Resolves from the session. A principal with more than one venue is asked which before the page renders."
@@ -3119,197 +3124,61 @@
    "note": "**Drawn by Claude Design on `Retail Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
-  "_platform": {
-   "code": "P08",
-   "audience": "staff",
-   "formFactor": "web",
-   "shortName": "Venue Management",
-   "name": "Venue Management — Back Office",
-   "offlineCapable": false,
-   "app": "venue-management-web",
-   "operator": "venue",
-   "targetApp": {
-    "app": "venue-management",
-    "name": "TICVAI Venue Management",
-    "shell": "web",
-    "siblings": [
-     "P12",
-     "P13",
-     "P16"
-    ],
-    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "BO-113",
-  "name": "Central Kitchen & Commissary Management",
-  "module": "Sell",
-  "requiresModule": "fnb",
-  "wave": 2,
-  "implementation": {
-   "app": "venue-management-web",
-   "route": "/sell/central-kitchen-commissary-management",
-   "component": "apps/venue-management-web/src/routes/sell/CentralKitchenCommissaryManagementList.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "BO-102"
-   ],
-   "exitTo": [
-    "BO-102"
-   ],
-   "inferred": false,
-   "notes": "**Returns to BO-102.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
-   "transitions": [
-    {
-     "to": "BO-102",
-     "trigger": "Sell",
-     "provenance": "derived — BO-102 declares entryState.params  and BO-113 holds none of them. The edge carries nothing: BO-113 is opened from BO-102, so this edge is the way back and BO-102 keeps its own state"
-    }
-   ]
-  },
-  "notes": "**Added 20 August from the client design board.** The operations existed and no screen called them.",
-  "density": "compact",
-  "boardFrames": [
-   "Retail Board 2.dc.html#ret-2d"
-  ],
-  "pattern": "configEditor",
-  "patternReason": "the screen declares only writes (`planProductionRun`, `completeProductionRun`) and no read of a population — it is settings, not a list",
-  "purpose": "Central Kitchen & Commissary Management — from the client design board, 20 August.",
-  "layout": {
-   "template": "form",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "fields",
-     "components": [
-      {
-       "kind": "textField",
-       "label": "id",
-       "bindsTo": "ProductionRun.id",
-       "provenance": "contract fnb.yaml POST /production-runs"
-      },
-      {
-       "kind": "textField",
-       "label": "recipeId",
-       "bindsTo": "ProductionRun.recipeId",
-       "provenance": "contract fnb.yaml POST /production-runs"
-      },
-      {
-       "kind": "textField",
-       "label": "producingOutletId",
-       "bindsTo": "ProductionRun.producingOutletId",
-       "provenance": "contract fnb.yaml POST /production-runs"
-      },
-      {
-       "kind": "textField",
-       "label": "forOutletIds",
-       "bindsTo": "ProductionRun.forOutletIds",
-       "provenance": "contract fnb.yaml POST /production-runs"
-      },
-      {
-       "kind": "textField",
-       "label": "plannedQuantity",
-       "bindsTo": "ProductionRun.plannedQuantity",
-       "provenance": "contract fnb.yaml POST /production-runs"
-      },
-      {
-       "kind": "textField",
-       "label": "actualQuantity",
-       "bindsTo": "ProductionRun.actualQuantity",
-       "provenance": "contract fnb.yaml POST /production-runs"
-      },
-      {
-       "kind": "textField",
-       "label": "scheduledFor",
-       "bindsTo": "ProductionRun.scheduledFor",
-       "provenance": "contract fnb.yaml POST /production-runs"
-      },
-      {
-       "kind": "textField",
-       "label": "status",
-       "bindsTo": "ProductionRun.status",
-       "provenance": "contract fnb.yaml POST /production-runs"
-      },
-      {
-       "kind": "textField",
-       "label": "varianceReason",
-       "bindsTo": "ProductionRun.varianceReason",
-       "provenance": "contract fnb.yaml POST /production-runs"
-      },
-      {
-       "kind": "searchField",
-       "label": "Search central kitchen",
-       "provenance": "carried from the previous definition"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "publish",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Plan production run",
-       "operation": "planProductionRun",
-       "provenance": "contract fnb.yaml POST /production-runs"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Complete production run",
-       "operation": "completeProductionRun",
-       "provenance": "contract fnb.yaml POST /production-runs/{runId}/complete"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The saved central kitchen commissary.",
-   "error": "Could not load. Names which read failed and leaves the central kitchen commissary untouched.",
-   "emptyFirstRun": "No central kitchen commissary configured. The form opens empty and `planProductionRun` saves the first one; it says what the platform does in the meantime.",
-   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_CONFIGURE`, which `planProductionRun` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
+  "overlays": [
    {
-    "operationId": "planProductionRun",
-    "contract": "fnb",
-    "purpose": "Plan a batch, for one outlet or several",
-    "trigger": "onAction"
+    "id": "formBuildProductionPlan",
+    "component": "modal",
+    "trigger": "Build plan",
+    "body": "**Collects what `buildProductionPlan` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Build plan",
+     "operation": "buildProductionPlan"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "contract fnb.yaml POST /production-plans; wiring fix, 2 October 2026"
    },
    {
-    "operationId": "completeProductionRun",
-    "contract": "fnb",
-    "purpose": "Record what was actually made",
-    "trigger": "onAction"
-   }
-  ],
-  "entryState": {
-   "params": [
-    {
-     "name": "venueId",
-     "from": "session"
+    "id": "formPlanProductionRun",
+    "component": "modal",
+    "trigger": "Plan production run",
+    "body": "**Collects what `planProductionRun` sends before it is called.** Required: `recipeId`, `plannedQuantity`. Optional: `stationId`, `producingOutletId`, `forOutletIds`, `scheduledFor`. `id` is a client UUIDv7 generated silently, never asked. The recipe, producing outlet and the outlets it serves are pickers by name; `status` is the server's (planned); actual quantity and variance belong to completing the run (BO-138), not to planning. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Plan production run",
+     "operation": "planProductionRun"
     },
-    {
-     "name": "runId",
-     "from": "deepLink"
-    }
-   ],
-   "coldEntry": "Resolves from the session. A principal with more than one venue is asked which before the page renders."
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-113",
-   "derivedFrom": "wireframes/reference/Retail Board 2.dc.html",
-   "source": "Claude Design Retail pack, 24 August",
-   "note": "**Drawn by Claude Design on `Retail Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
-  },
-  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
-  "overlays": [
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "recipeId",
+      "plannedQuantity",
+      "stationId",
+      "producingOutletId",
+      "forOutletIds",
+      "scheduledFor"
+     ]
+    },
+    "provenance": "contract fnb.yaml POST /production-runs"
+   },
+   {
+    "id": "formPrintPrepSheet",
+    "component": "modal",
+    "trigger": "Print prep sheet",
+    "body": "**Collects what `printPrepSheet` sends before it is called.** Required: `target`. Optional: `stationIds`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Print prep sheet",
+     "operation": "printPrepSheet"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "target",
+      "stationIds"
+     ]
+    },
+    "provenance": "contract fnb.yaml POST /production-plans/{planId}/prep-sheet"
+   },
    {
     "id": "formCompleteProductionRun",
     "component": "modal",
@@ -3328,6 +3197,27 @@
      ]
     },
     "provenance": "contract fnb.yaml POST /production-runs/{runId}/complete"
+   },
+   {
+    "id": "formCreateStockTransfer",
+    "component": "modal",
+    "trigger": "Send to outlets",
+    "body": "**Collects what `createStockTransfer` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Send to outlets",
+     "operation": "createStockTransfer"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "contract inventory.yaml POST /stock-transfers; wiring fix, 2 October 2026"
+   }
+  ],
+  "gaps": [
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-011): No read of production plans (list or get).",
+    "source": "contracts/satellite/fnb.yaml#/components/schemas/ProductionPlan"
    }
   ],
   "_platform": {

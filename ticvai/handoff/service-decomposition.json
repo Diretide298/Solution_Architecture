@@ -1,5 +1,5 @@
 {
- "note": "How 33 contracts and 1095 tables become 17 modules, deployed as 5 units. **The data boundaries were drawn first and the service boundaries follow them** — no service spans two schemas it does not own. **30 September 2026 (ADR-0055):** the 17 are modules of one .NET solution, and `deployable` on each says which of the five units it ships in; `workers` carries the relay, the consumers and the scheduled jobs and owns no module.",
+ "note": "How 33 contracts and 1112 tables become 17 modules, deployed as 5 units. **The data boundaries were drawn first and the service boundaries follow them** — no service spans two schemas it does not own. **30 September 2026 (ADR-0055):** the 17 are modules of one .NET solution, and `deployable` on each says which of the five units it ships in; `workers` carries the relay, the consumers and the scheduled jobs and owns no module.",
  "generated": "21 September 2026",
  "tiers": {
   "foundation": "Read by everything, reads nothing above. Deploys first and alone.",
@@ -26,7 +26,7 @@
     "identity",
     "pii"
    ],
-   "operations": 89,
+   "operations": 94,
    "tables": 38,
    "why": "**Twelve contracts read it and it reads almost nothing.** The one service nothing can be deployed without, and the only writer of `pii` — which is what makes a subject-access export and a deletion request answerable at all (ADR-0023).",
    "scale": "Read-heavy, latency-critical, cached hard. Every request resolves a principal.",
@@ -67,7 +67,7 @@
     "accreditation",
     "tenancy"
    ],
-   "operations": 204,
+   "operations": 209,
    "tables": 108,
    "why": "**`platform.org_unit` is reached by 304 of 379 tables** — the tenancy spine. Workforce and approvals are folded in because each is small, both read `org_unit` constantly and write it rarely, and splitting them means three services doing the same joins.\n\n**`shift` was folded in here on 24 August and moved to OrderService the same day.** The reasoning was that a shift owns no tables of its own — which is true — and the conclusion was wrong. **A service with no data belongs where its data is**, and a shift's data is entirely in `orders`: `orders.shift`, `orders.deposit_box`, `orders.cash_movement`, `orders.cash_count_line`.\n\n**The coupling made it visible.** All 43 of Tenancy's cross-service touches into `orders` were the `shift` contract — 19 writes and 24 reads, the heaviest coupling in the platform, created to solve a cosmetic problem.",
    "scale": "Read-heavy and highly cacheable. Config changes are rare.",
@@ -106,8 +106,8 @@
     "promotions",
     "seating"
    ],
-   "operations": 449,
-   "tables": 135,
+   "operations": 443,
+   "tables": 137,
    "why": "**What is sold, at what price, in which seat.** Promotions and seating are folded in because both are pricing and availability against the same product — a promotion that cannot see a price list and a seat that cannot see a product are two round trips on the hot path of every sale. **`pricing` joined it on 20 September**, which closes decision 5 of the schema merge — it took all three `pricing` tables and said the schema needed an owner, and that stayed open because the tables had no operations and a service is inferred from the contract that declares them. The operations were written into `catalogue.yaml`, beside the price lists and products a dynamic rule adjusts: a rule that reads `catalogue.price_list` and `catalogue.product` to compute a price belongs on the side of the boundary those live on, or every evaluation is a cross-service call on the sale path.",
    "scale": "Read-heavy, bundle-published to tills. **The catalogue bundle is this service's output** (ADR-0013).",
    "risk": "A bad publish reaches every workstation. Versioned and rollback-able for that reason.",
@@ -145,8 +145,8 @@
     "orders",
     "payments"
    ],
-   "operations": 289,
-   "tables": 113,
+   "operations": 297,
+   "tables": 114,
    "why": "**The transactional core.** 96 operations, 34 tables, and the highest write rate in the platform. Separate because its scaling profile is unlike anything else — a Saturday evening is ten times a Tuesday morning.\n\n**`shift` belongs here and not in Tenancy.** A shift is venue-scoped, which is what made it look like a tenancy concern — but **venue scope is the platform's default rather than a service boundary**: 675 of 1,014 operations are venue-scoped.\n\n**What decides the service is who owns the tables.** A shift holds cash, `orders.deposit_box` reconciles against payments, and `orders.cash_movement` posts to `ledger.posting` at close. **A till's takings and a till's drawer are the same money counted twice** — separating them makes every settlement a distributed join.\n\n**Guest recurring billing lives here, decided by [ADR-0048](../../docs/adr/0048-guest-recurring-billing-is-commerce.md)** rather than in the Control Plane that provisions cells. `payments.dunning_policy` and `payments.dunning_case` are the two newest tables in the service. **A charge on a schedule fails differently from a charge at a till** — nobody is standing at the counter when a renewal declines, so the recovery path is a queue and a timetable rather than a second card.",
    "scale": "Write-heavy, spiky, latency-critical. **The one that autoscales.**",
    "risk": "**Down means no sales.** Highest availability target in the platform.",
@@ -187,8 +187,8 @@
    "schemas": [
     "access"
    ],
-   "operations": 246,
-   "tables": 76,
+   "operations": 250,
+   "tables": 77,
    "why": "**The gate.** Validating an entitlement is a sub-300ms decision made forty times a minute per lane, and it must work when the network does not.",
    "scale": "Read-heavy, extreme latency sensitivity, edge-cached. **`frozenDays` is held rather than replayed** precisely because the gate cannot afford the arithmetic.",
    "risk": "Down means the gates stop. Runs at the edge with a local decision cache.",
@@ -289,8 +289,8 @@
    "schemas": [
     "fnb"
    ],
-   "operations": 120,
-   "tables": 48,
+   "operations": 131,
+   "tables": 51,
    "why": "**96 operations and 34 tables — the largest single domain after marketing.** Its own service because a kitchen pass has a latency profile nothing else shares: a bump must land in under a second on a display that may be offline.",
    "scale": "Write-heavy during service, idle between. **Two peaks a day, sharply.**",
    "risk": "Down means the kitchen falls back to paper. Offline-capable by design.",
@@ -355,8 +355,8 @@
    "schemas": [
     "marketing"
    ],
-   "operations": 264,
-   "tables": 130,
+   "operations": 272,
+   "tables": 132,
    "why": "**93 operations and 37 tables — the biggest thing in the package, and probably two services eventually.** CRM and campaigns have different write patterns: a guest profile is read constantly and written rarely; a campaign send is a burst of millions of rows nobody reads again.\n\n**Kept as one for now** because splitting a service before it has a load profile is guessing.",
    "scale": "Bursty on send, read-heavy otherwise. **The one to watch for a split.**",
    "risk": "Down stops campaigns and guest lookup. Neither stops trading.",
@@ -394,8 +394,8 @@
     "ai",
     "qdrant"
    ],
-   "operations": 141,
-   "tables": 74,
+   "operations": 144,
+   "tables": 75,
    "why": "**Separate at any size, and not because of size.** ADR-0020 makes it a hard boundary: only this service writes AI tables, and it is read-only against the transactional core. **That boundary caught four wrongly-placed writes in one week** — it survives because it is enforced, and enforcing it across a shared deployment is harder than across a network.",
    "scale": "Latency-tolerant, cost-sensitive, token-metered. Different hardware from everything else.",
    "risk": "Down degrades suggestions and the concierge. **Nothing that takes money depends on it.**",
@@ -487,8 +487,8 @@
     "control",
     "subscription"
    ],
-   "operations": 216,
-   "tables": 104,
+   "operations": 221,
+   "tables": 108,
    "why": "**Three contracts, one schema, 41 tables.** Subscription, platform operations and the public API all write `control.*` — **they are one bounded context that was split into three contracts for API-surface reasons, not for data reasons.**\n\nSplitting them would give three services writing one schema, which is the arrangement every distributed-data guide warns about.",
    "scale": "Low volume, high consequence. Tenant provisioning and licensing.",
    "risk": "Down blocks provisioning and the developer API. **Trading is unaffected.**",
@@ -525,8 +525,8 @@
    "schemas": [
     "whitelabel"
    ],
-   "operations": 79,
-   "tables": 25,
+   "operations": 93,
+   "tables": 27,
    "why": "Branding, content, navigation and the tenant's own app configuration. Separate because **it is the only service a tenant edits directly and publishes from** — its deploy cadence follows tenant appetite, not the platform's.",
    "scale": "Read-heavy and heavily cached. Published, not queried.",
    "risk": "Down freezes the current published config. Guests see the last good version.",
@@ -557,8 +557,8 @@
    "schemas": [
     "reporting"
    ],
-   "operations": 48,
-   "tables": 24,
+   "operations": 51,
+   "tables": 25,
    "why": "**Reads almost everything and writes only its own definitions.** Separate because it is the one service that should never touch the transactional primary — ADR-0016 read-write separation exists for this.",
    "scale": "Analytical. Runs against the replica and the analytical store.",
    "risk": "Down stops dashboards. **Nothing operational depends on it.**",
@@ -621,7 +621,7 @@
    "why": "**Eight domains need a wallet and none of them owns it.** A Gold Membership issues F&B credit, parking credits and ride credits into the same wallet, so subscription, games and F&B all read it; `getWalletLiability` aggregates outstanding value across every credit type, so it has to see all of them. The 13 wallet types in the client's library are compositions of owner, credit type and scope rather than thirteen kinds, which is only expressible in one place. **Split out of `retail` on 19 September**, where 13 of retail's 37 operations were the entire wallet runtime while `wallet.yaml` held only its rules.",
    "scale": "Read-heavy on the sale path — every till and reader resolves a balance — and write-heavy on top-up. **Latency-critical in a way LedgerService is not**, which is why the two are separate: the ledger is append-only and batch-tolerant, a balance check is neither.",
    "risk": "**It holds a liability owed to a customer.** A wallet that double-spends is a financial loss, not a bug report. Deduction order across credit lots is FEFO and is decided here, once, rather than per caller.",
-   "operations": 66,
+   "operations": 68,
    "tables": 31,
    "readsFrom": {
     "OrderService": 3,

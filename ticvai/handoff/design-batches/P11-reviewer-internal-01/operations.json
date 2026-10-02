@@ -31,6 +31,40 @@
   "requestBody": null,
   "responds": "AccreditationApplication"
  },
+ "listAccreditationAccessActivity": {
+  "method": "GET",
+  "path": "/accreditation-access-activity",
+  "contract": "accreditation",
+  "summary": "Where accredited people actually went",
+  "permission": "ACCREDITATION_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "holderId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "zoneId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "deniedOnly",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AccreditationAccessEvent"
+ },
  "listAccreditationApplications": {
   "method": "GET",
   "path": "/accreditation-applications",

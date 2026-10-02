@@ -1,6 +1,6 @@
 # WS75 — Digital Asset Management DAM board 2
 
-**10 screens · 12 operations · 15 schemas · 3 permissions**
+**10 screens · 11 operations · 12 schemas · 2 permissions**
 
 Platform P13 Venue CMS · ships as **venue-management** ·
 staff audience · web ·
@@ -48,8 +48,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 3 permissions apply here:
-  `ASSET_LIBRARY_MANAGE, ASSET_LIBRARY_VIEW, ASSET_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 2 permissions apply here:
+  `ASSET_LIBRARY_MANAGE, ASSET_LIBRARY_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -61,13 +61,67 @@ convincingly. It is never a caption.
   and its error; and, element by element, what is shown and in what format, what each action
   produces and where the user goes next. Draw exactly that.
 
+## The processes these screens belong to
+
+Written by the owner of each process (`handoff/design-notes/`). Read before any screen: it says how the process runs end to end and which words the screens must use.
+
+### Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue)
+
+Venue operations is everything that happens after a sale and inside the gates. A guest's ticket is one virtual ticket with interchangeable media (QR, dynamic QR, RFID wristband, NFC, Face Pass or Face Tag); at an access point a scanner (P07, or the scan function inside the Staff App P06) validates the media against the admission profile and the guest admission policy, offline if it must, and every deny carries a reason and a next action. The back office (Venue Management P08) configures that estate: the venue topology (venue, park, zone, attraction, access point, gate and lane, device placement), admission profiles and rules (entry, exit, re-entry, anti-passback, validity, crossover, companions), credential security (dynamic QR, device binding, beacons), biometrics, gate modes, and the live operations, fraud and monitoring views. Accreditation (P08 setup and review, P11 web portal for applicants, web first) takes an applicant from a configurable form through document checks, OCR, duplicate blocking and multi-level approval to a credential with zone rights. Resources and capacity manage bookable resources (rooms, vehicles, equipment, cabanas, instructors) that are booked as a consequence of selling a product, never sold directly. Workforce covers shift templates, rosters, attendance, swaps and breaks, mirrored on the Staff App. Maintenance and safety cover the asset register, preventive calendars, work orders with scored priority, inspections and incidents, with technicians working from the Staff App. Games and rides configure readers, credit types and consumption priority, play entitlements, game pricing, retry pricing, redemption and the card lifecycle. The virtual queue (Q1) gives a guest a live wait time and a return window for a ride; it is not the on-sale waiting room (Q2). Every calendar has day, week and month views. Configuration resolves tenant, region, venue (outlet only for F&B and retail), and a user's permissions, never the device, decide what they may do. The guest apps (P01, P02) show the guest's side of this: My Tickets, the scan code, Face Pass, wait times, the virtual queue, map booking of cabanas and the visit planner.
+*(source: F06 step 1 / F112 step 1 / F111 step 1 / ADR-0002 / ADR-0012 / ADR-0018 / ADR-0041 / ADR-0066 / ADR-0067 / ADR-0068 / DI-652 / DI-627 / DI-640 / DI-654 / DI-666 / DI-482 / DI-483 / DI-907 / DI-919 / DI-923 / DI-865 / DI-678 / TRACKER Actions row 160 / MoM 2026-09-02 AccessControl / MoM 2026-09-07 …)*
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Ticket | The one virtual record a guest owns (ticket number, product, validity, entries). Its number never changes, whatever media carries it or whoever it is transferred or resold to. | Pass (unless the product is a pass), Booking, Order line | DI-652 / DI-620 / contracts/spine/access.yaml#/components/schemas/TicketStatus |
+| Media | What the ticket is presented by at a gate (QR code, dynamic QR, wristband/RFID card, NFC, Face Pass, Face Tag). One ticket can carry several media as fallbacks; a media code can also cover several tickets scanned as one group. Show one … | Credential (for guest media; keep Credential for accreditation badges and staff), Ticket code | DI-180 / DI-608 / DI-652 |
+| Access point | A place where a scan is judged, with a fixed direction (entry, exit, re-entry, crossover). Hierarchy shown to users is Venue > Park > Zone > Attraction > Access point > Gate/lane > Device. | Scanner (that is the device), Door | screens/P08-venue-back-office.yaml#BO-144 / … |
+| Admission profile | The named set of rules an access point enforces (opening window, entries, exit scan, re-entry, validity, crossover). Products point at a profile; tiers such as Bronze/Silver/Gold are profiles with gate allow and deny lists. | Admission rules (as a screen title), Access rule set | DI-185 / contracts/spine/access.yaml#/components/schemas/AdmissionRules |
+| Admitted / Denied / Overridden | The three scan outcomes. A denial is always shown with its reason in plain words and a next action; an override is a supervisor admitting despite a denial, and is always attributed and reasoned. | Valid/Invalid, Success/Fail, Error | contracts/spine/access.yaml#/components/schemas/ScanOutcome / … |
+| Used | A ticket entry is used the moment a scan succeeds, whether or not the guest physically passed. Mistakes are resolved from the scan history, not by un-scanning. | Redeemed (for admission), Checked in (that is group check-in, a different step) | DI-627 / TRACKER Actions row 221 / TRACKER Actions row 189 |
+| Gate mode | What a lane is doing now, set live by the podium or supervisor - Normal, Free flow (counts, does not validate), Drop arm (everybody through, evacuation), Closed (nobody through), Podium (staff validating by eye), Maintenance. Direction is … | Turnstile mode (as a label for direction), Open/Locked | contracts/spine/access.yaml#/components/schemas/AccessPointOperatingMode / R221 |
+| Offline package | What a scanner holds to validate with no network - entitlements, blacklist, admission profiles and the active guest admission policy version - with its age always visible. | Cache, Local DB | F06 step 3 / ADR-0068 |
+| Sync and reconciliation | Sending the offline scan journal to the server, and the duty manager's review of scans the server rejected after the device had already admitted the guest. | Upload, Retry | F06 step 6 / DI-065 |
+| Face Pass / Face Tag | Face Pass is the long-lived face credential for members and season-pass holders (renewable); Face Tag is short-lived, for one day or event. Retention is set per tier by the venue. | Face ID, Biometric login | DI-640 / ADR-0063 |
+| Accreditation / Credential (accreditation) | Accreditation is the application and approval of a person (media, contractor, corporate, staff of a partner) for an event or season; the credential is what is issued after approval (photo badge, QR or RFID) with zone access rights. | Registration (for the whole process), Ticket | DI-654 / DI-662 |
+| Resource | A bookable thing or person a product needs (room, vehicle, cabana, equipment set, instructor). Guests buy products; resources are assigned to the booking, pre-assigned or dynamically. | Asset (that is maintenance), Inventory (that is stock) | DI-475 / DI-482 / TRACKER Actions row 160 |
+| Asset | A physical item maintained by the venue (ride, turnstile, printer, pump) with a register record, documents, warranty and maintenance history. | Resource, Device (unless it is an IT device in the device register) | DI-910 / ADR-0067 |
+| Work order | A unit of maintenance work, lifecycle Created > Assigned > In progress > Review > Closed, with a resolution timer. | Ticket (reserved for guest tickets), Job card | DI-231 |
+| Game / attraction (games module) | In the games and rides module an attraction is an individual game or ride (roller coaster, racing game, bumper cars), not a venue. | Venue, Park | DI-863 |
+| Virtual queue / Return window | A guest's place in a ride's queue held without standing in line, with a return window (for example 4:50 to 5:00 PM) that recalculates live. Distinct from the walk-in line and the VIP/express lane, and from the on-sale waiting room. | Waiting room, Fast pass (that is the express product), Booking | DI-675 / DI-678 / DI-679 / ADR-0066 |
+| Wait time source | Where a ride's wait time comes from - Sensor, Throughput, Manual, or Unavailable - always shown beside the number. | Live (when the source is manual) | contracts/satellite/queue.yaml#/components/schemas/WaitTimeSource / DI-315 |
+
+### Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management)
+
+Platform Foundation is everything the apps stand on. Five apps each have one door: the guest app and website (WEB-016, GST-042: a six-digit code to email or mobile, a password, Apple or Google, UAE Pass; never enterprise SSO), the till (POS-000: employee number and PIN, recent operators as tiles; the kitchen display is the same app), the staff handheld and scanner (EMP-001, SCN-001), Venue Management (SUP-001, the single door for the back office P08, the CMS P13, analytics P16 and the support desk P12) and TICVAI Control (ADM-001 for TICVAI's own platform operators, PTR-001 for partner users; the developer portal P14 and the sign-up P17 belong to this app too). A second factor is required by permission, not by role or device: ROLE_MANAGE, LEDGER_APPROVE and every PLATFORM_* permission, plus any the tenant adds; so a cashier never sees it and a platform operator always does. The factor is an authenticator app with an emailed code as fallback; five wrong codes lock step-up for the lockout minutes, never permanently. Guests get two-step verification only at a venue that switched it on. One person holds one session per workstation: a second sign-in is refused and only a supervisor ends the other session. Several roles mean a role prompt; one role goes straight in. The workstation decides the Sale Board, hardware and till identity, never what a person may do. Sensitive actions (refund approval, journal approval, credential reset, partner credit, commission rules, opening a platform-staff grant and 17 more) demand a fresh step-up on the operation itself, asked in place in the action's confirmation; the tenant may raise the strength, never remove it. Permission outcomes are three, never one word: self-authorised (proceeds, audited), escalated (a supervisor PIN in place), refused (the denied state, naming the permission); a missing permission is never an empty table, and a record outside the person's venues is "not found", indistinguishable from absent. The hierarchy is binding (tenant, brand, region, venue, department, sub-department, workstation; outlet beside department for F&B and retail); region owns currency, decimals, time zone, date format and fiscal year; configuration resolves nearest-ancestor across tenant, region and venue (outlet for F&B and retail), venue is the floor and a workstation is assigned a profile, never configured; every configuration screen says which level it writes and what it inherits. Venue Management is one tenant-level surface filtering across the venues in the session's scope. TICVAI's Console runs outside every cell: a platform operator picks a tenant and opens a time-boxed, audited platform-staff grant (with step-up) before any tenant action, and the tenant sees every action in its audit log (ADM-412 is the reference implementation). Approval workflows record authorisations and never perform the action; the requester cannot approve their own request; a venue may tighten and never loosen a rule from above; in-flight …
+*(source: screens/P12-support-agent-console.yaml#SUP-001; R135; R126; R167; DI-1072; ADR-0002; ADR-0003; ADR-0004; R184; contracts/spine/identity.yaml#createMfaChallenge; contracts/spine/approvals.yaml#setStepUpPolicy; ADR-0011; ADR-0018; ADR-0029; R098; contracts/spine/approvals.yaml#decideApprovalRequest …)*
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Sign in / Sign out | Entering and leaving any app, staff or guest. | Login, Log in, Logon, Logout | screens/P04-point-of-sale.yaml#POS-000 … |
+| Authentication code | The staff second factor from the authenticator app (or the emailed fallback). | OTP, 2FA code, token | screens/P09-platform-admin-console.yaml#ADM-001 |
+| One-time code | The six-digit code a guest receives to sign in or prove a contact. | OTP, PIN, password | DI-1034; R167 |
+| Two-step verification | The guest's optional second factor, asked only at venues that switched it on. | MFA, 2FA | DI-1072 |
+| Tenant / Brand / Region / Venue / Department / Outlet | The binding hierarchy levels; region owns currency and dates; outlet is F&B or retail inside a venue. | Client, Customer, Org (for tenant), Site, Park, Property (for venue), Area, Territory (for region) | ADR-0011; ADR-0018 |
+| Workstation (back office) / till (operator copy) | A configured device; decides Sale Board, hardware and till identity, never authorisation. | Terminal, Station, POS (for the device), till (for the Deposit Box) | ADR-0002; R156 |
+| Sale Board | The configured front end a workstation loads (ticketing, F&B or retail). | Screen, Layout, Menu | ADR-0003 |
+| Role | A named, fully configurable grouping of permissions; the seeded five are editable starting points. | Group, Profile | R229 |
+| Staff member / Partner user / Platform operator | A tenant's staff principal; a partner's user; a TICVAI employee in the Console. | User (alone), Account, Agent (for venue staff) | F104 step 1; F104 step 4; F104 step 5 |
+| Platform-staff grant | The time-boxed, audited access a platform operator opens into one tenant before acting in it. | Impersonation, Support login | R098 |
+| Escalate / Refused | Escalate is supervisor approval captured in place; Refused is the denied state that names the permission. | Denied (for an action that can be escalated) | R197 |
+| Approve / Reject / Return / Request information | The four decisions on an approval request; Withdraw is the requester's own act and never a rejection. | Accept, Decline, Cancel (for withdraw) | contracts/spine/approvals.yaml#decideApprovalRequest … |
+| Subscription / Plan / Module / Licence | TICVAI's commercial relationship with a tenant, its plan, the modules it licenses and the limits. | Membership (that is the guest's pass) | R214 |
+| Membership / Annual pass | A guest's pass product and its holder (BO-284 to BO-303). | Subscription (that is the tenant's TICVAI plan) | screens/P08-venue-back-office.yaml#BO-284 |
+| Sandbox client / Production client | A developer's own test credential; a TICVAI-issued live credential after certification. | Test key, Live key, API key (without environment) | DI-927 |
+| Asset (DAM) / Media (ticket) | A digital file in the library; ticket media is a wristband or card carrying entitlements. Never mix them. | Media (for a library asset) | contracts/satellite/assets.yaml#searchMedia … |
+
+
 ## The screens
 
 Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs count fields; requirements are matrix rows; meeting inputs are the ones naming the screen (the module and platform ones are below); white label says whether the tenant's brand reaches it (guest) or it sets the brand (configures).
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `CMS-071` | AI Asset Intelligence Command Center | B–D | 0 | 34 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `CMS-071` | AI Asset Intelligence Command Center | B–D | 0 | 171 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `CMS-072` | AI Auto-Tagging & Content Understanding | B–D | 0 | 0 | 6 | 1 | 1 | 0 | — | notStarted (—) |
 | `CMS-073` | Semantic & Natural-Language Asset Search | B–D | 0 | 14 | 6 | 5 | 1 | 0 | — | notStarted (—) |
 | `CMS-074` | Visual Similarity & Related Asset Discovery | B–D | 2 | 11 | 6 | 0 | 1 | 0 | — | notStarted (—) |
@@ -97,14 +151,28 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | App · platform | TICVAI Venue Management · P13 Venue CMS (web) |
 | Module | Media Library · wave 3 · needs the `core` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `ASSET_LIBRARY_VIEW`, `ASSET_VIEW` (2 read); in the flows as venue manager |
+| Who uses it | venue staff holding `ASSET_LIBRARY_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area, with a live preview of … · LTR and RTL · light theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Display; Show) and no metric row |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/media-library/ai-asset-intelligence-command-center-cms-071` |
 
-**Known gaps.** **The pack names 5 actions on this screen and the screen declares 0 operations.** Unserved: Review AI Results, Duplicate Review, Version Activity, Rendition Queue, Processing Failures. Each needs an … **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
+**Known gaps.** **The pack names 5 actions on this screen and the screen declares 0 operations.** Unserved: Review AI Results, Duplicate Review, Version Activity, Rendition Queue, Processing Failures. Each needs an … **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape … Removed 2 October 2026 (CHG-WIR-001): The screen is about media files in the DAM (assets.yaml); maintenance listAssets returns rides, turnstiles and pumps from the physical asset register …
+
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** The Digital Asset Management board's AI command centre - media files (images, videos, documents), not physical assets: how many files AI has processed, what is pending, tags generated, duplicate candidates, version updates, renditions, processing failures and items needing review, with processing health and AI confidence distribution. It belongs to the media library (P13), not to maintenance and safety; it is in this chunk only because of the word "asset". The one thing to get right: draw it as the DAM command centre (KPI tiles, health and confidence charts, intelligence alerts, tiles into CMS-072 to CMS-080), and drop the maintenance binding.
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- No operation returns AI processing counts, confidence bands or duplicate candidate counts (CHG-SGU-024)
+
+**Fixed on main** (the package already carries these; draw what it says): Classified under process-module Maintenance & Safety and bound to maintenance listAssets (CHG-WIR-001); KPIs drawn as seventeen columns of one data table with a detail panel (CHG-SGU-023).
+
+#### Decided on this screen
+
+Answered questions: draw the decision, not the old default. Where a decision and the tables below differ, the decision wins.
+
+- **Which process owner takes CMS-071 (DAM / media library) now that it leaves venue operations?** → Drawn default accepted: Leave the screen's design to the DAM chunk; keep only this note here. *(decided by Chinmay, 2026-10-02; DEC-520 / CHG-NOTE-008)* **Reviewable:** a default the lead may still overrule before the block is tasked.
 
 #### Inputs: what the user enters or picks
 
@@ -112,9 +180,6 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | Filter | Drawn as | Default | Allowed values, rules | Source |
 |---|---|---|---|---|
-| Category | picker: choose a category | — | — | `listAssets` ?categoryId |
-| Status | select | — | In service · Out of service · Under maintenance · Awaiting parts · Retired · Disposed | `listAssets` ?status |
-| Maintenance due | toggle | — | — | `listAssets` ?maintenanceDue |
 | From | date and time picker | — | — | `getMediaUsageAnalytics` ?from |
 | To | date and time picker | — | — | `getMediaUsageAnalytics` ?to |
 | Group by | radio group | — | Asset type · Category · Venue · Owner · Channel | `getMediaUsageAnalytics` ?groupBy |
@@ -125,49 +190,271 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Every asset intelligence** (data table)
+**AI-Processed Assets** (metric tile, from `getMediaUsageAnalytics`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| AI processed assets | text | not in the schema: `AI-Processed Assets` |
-| Pending AI processing | text | not in the schema: `Pending AI Processing` |
-| AI tags generated | text | not in the schema: `AI Tags Generated` |
-| Duplicate candidates | text | not in the schema: `Duplicate Candidates` |
-| Version updates | text | not in the schema: `Version Updates` |
-| Renditions generated | text | not in the schema: `Renditions Generated` |
-| Processing failures | text | not in the schema: `Processing Failures` |
-| Assets requiring review | text | not in the schema: `Assets Requiring Review` |
-| Processed | text | not in the schema: `Processed` |
-| Queued | text | not in the schema: `Queued` |
-| Processing | text | not in the schema: `Processing` |
-| Review required | text | not in the schema: `Review Required` |
-| Failed | text | not in the schema: `Failed` |
-| 95–100% | text | not in the schema: `95–100%` |
-| 80–94% | text | not in the schema: `80–94%` |
-| 60–79% | text | not in the schema: `60–79%` |
-| Below threshold | text | not in the schema: `Below Threshold` |
+| Key | text | — |
+| Label | text | — |
+| Asset count | 1,234 | — |
+| Storage bytes | 1,234 | — |
+| Downloads | 1,234 | — |
+| Views | 1,234 | — |
+| Shares | 1,234 | — |
+| Never used count | 1,234 | — |
+| Unclassified count | 1,234 | — |
 
-**The selected asset intelligence** (detail panel)
+**Pending AI Processing** (metric tile, from `getMediaUsageAnalytics`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| AI processed assets | text | not in the schema: `AI-Processed Assets` |
-| Pending AI processing | text | not in the schema: `Pending AI Processing` |
-| AI tags generated | text | not in the schema: `AI Tags Generated` |
-| Duplicate candidates | text | not in the schema: `Duplicate Candidates` |
-| Version updates | text | not in the schema: `Version Updates` |
-| Renditions generated | text | not in the schema: `Renditions Generated` |
-| Processing failures | text | not in the schema: `Processing Failures` |
-| Assets requiring review | text | not in the schema: `Assets Requiring Review` |
-| Processed | text | not in the schema: `Processed` |
-| Queued | text | not in the schema: `Queued` |
-| Processing | text | not in the schema: `Processing` |
-| Review required | text | not in the schema: `Review Required` |
-| Failed | text | not in the schema: `Failed` |
-| 95–100% | text | not in the schema: `95–100%` |
-| 80–94% | text | not in the schema: `80–94%` |
-| 60–79% | text | not in the schema: `60–79%` |
-| Below threshold | text | not in the schema: `Below Threshold` |
+| Key | text | — |
+| Label | text | — |
+| Asset count | 1,234 | — |
+| Storage bytes | 1,234 | — |
+| Downloads | 1,234 | — |
+| Views | 1,234 | — |
+| Shares | 1,234 | — |
+| Never used count | 1,234 | — |
+| Unclassified count | 1,234 | — |
+
+**AI Tags Generated** (metric tile, from `getMediaUsageAnalytics`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Key | text | — |
+| Label | text | — |
+| Asset count | 1,234 | — |
+| Storage bytes | 1,234 | — |
+| Downloads | 1,234 | — |
+| Views | 1,234 | — |
+| Shares | 1,234 | — |
+| Never used count | 1,234 | — |
+| Unclassified count | 1,234 | — |
+
+**Duplicate Candidates** (metric tile, from `getMediaUsageAnalytics`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Key | text | — |
+| Label | text | — |
+| Asset count | 1,234 | — |
+| Storage bytes | 1,234 | — |
+| Downloads | 1,234 | — |
+| Views | 1,234 | — |
+| Shares | 1,234 | — |
+| Never used count | 1,234 | — |
+| Unclassified count | 1,234 | — |
+
+**Version Updates** (metric tile, from `getMediaUsageAnalytics`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Key | text | — |
+| Label | text | — |
+| Asset count | 1,234 | — |
+| Storage bytes | 1,234 | — |
+| Downloads | 1,234 | — |
+| Views | 1,234 | — |
+| Shares | 1,234 | — |
+| Never used count | 1,234 | — |
+| Unclassified count | 1,234 | — |
+
+**Renditions Generated** (metric tile, from `getMediaUsageAnalytics`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Key | text | — |
+| Label | text | — |
+| Asset count | 1,234 | — |
+| Storage bytes | 1,234 | — |
+| Downloads | 1,234 | — |
+| Views | 1,234 | — |
+| Shares | 1,234 | — |
+| Never used count | 1,234 | — |
+| Unclassified count | 1,234 | — |
+
+**Processing Failures** (metric tile, from `getMediaUsageAnalytics`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Key | text | — |
+| Label | text | — |
+| Asset count | 1,234 | — |
+| Storage bytes | 1,234 | — |
+| Downloads | 1,234 | — |
+| Views | 1,234 | — |
+| Shares | 1,234 | — |
+| Never used count | 1,234 | — |
+| Unclassified count | 1,234 | — |
+
+**Assets Requiring Review** (metric tile, from `getMediaUsageAnalytics`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Key | text | — |
+| Label | text | — |
+| Asset count | 1,234 | — |
+| Storage bytes | 1,234 | — |
+| Downloads | 1,234 | — |
+| Views | 1,234 | — |
+| Shares | 1,234 | — |
+| Never used count | 1,234 | — |
+| Unclassified count | 1,234 | — |
+
+**Processed** (metric tile, from `getMediaUsageAnalytics`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Key | text | — |
+| Label | text | — |
+| Asset count | 1,234 | — |
+| Storage bytes | 1,234 | — |
+| Downloads | 1,234 | — |
+| Views | 1,234 | — |
+| Shares | 1,234 | — |
+| Never used count | 1,234 | — |
+| Unclassified count | 1,234 | — |
+
+**Queued** (metric tile, from `getMediaUsageAnalytics`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Key | text | — |
+| Label | text | — |
+| Asset count | 1,234 | — |
+| Storage bytes | 1,234 | — |
+| Downloads | 1,234 | — |
+| Views | 1,234 | — |
+| Shares | 1,234 | — |
+| Never used count | 1,234 | — |
+| Unclassified count | 1,234 | — |
+
+**Processing** (metric tile, from `getMediaUsageAnalytics`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Key | text | — |
+| Label | text | — |
+| Asset count | 1,234 | — |
+| Storage bytes | 1,234 | — |
+| Downloads | 1,234 | — |
+| Views | 1,234 | — |
+| Shares | 1,234 | — |
+| Never used count | 1,234 | — |
+| Unclassified count | 1,234 | — |
+
+**Review Required** (metric tile, from `getMediaUsageAnalytics`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Key | text | — |
+| Label | text | — |
+| Asset count | 1,234 | — |
+| Storage bytes | 1,234 | — |
+| Downloads | 1,234 | — |
+| Views | 1,234 | — |
+| Shares | 1,234 | — |
+| Never used count | 1,234 | — |
+| Unclassified count | 1,234 | — |
+
+**Failed** (metric tile, from `getMediaUsageAnalytics`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Key | text | — |
+| Label | text | — |
+| Asset count | 1,234 | — |
+| Storage bytes | 1,234 | — |
+| Downloads | 1,234 | — |
+| Views | 1,234 | — |
+| Shares | 1,234 | — |
+| Never used count | 1,234 | — |
+| Unclassified count | 1,234 | — |
+
+**95–100%** (metric tile, from `getMediaUsageAnalytics`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Key | text | — |
+| Label | text | — |
+| Asset count | 1,234 | — |
+| Storage bytes | 1,234 | — |
+| Downloads | 1,234 | — |
+| Views | 1,234 | — |
+| Shares | 1,234 | — |
+| Never used count | 1,234 | — |
+| Unclassified count | 1,234 | — |
+
+**80–94%** (metric tile, from `getMediaUsageAnalytics`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Key | text | — |
+| Label | text | — |
+| Asset count | 1,234 | — |
+| Storage bytes | 1,234 | — |
+| Downloads | 1,234 | — |
+| Views | 1,234 | — |
+| Shares | 1,234 | — |
+| Never used count | 1,234 | — |
+| Unclassified count | 1,234 | — |
+
+**60–79%** (metric tile, from `getMediaUsageAnalytics`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Key | text | — |
+| Label | text | — |
+| Asset count | 1,234 | — |
+| Storage bytes | 1,234 | — |
+| Downloads | 1,234 | — |
+| Views | 1,234 | — |
+| Shares | 1,234 | — |
+| Never used count | 1,234 | — |
+| Unclassified count | 1,234 | — |
+
+**Below Threshold** (metric tile, from `getMediaUsageAnalytics`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Key | text | — |
+| Label | text | — |
+| Asset count | 1,234 | — |
+| Storage bytes | 1,234 | — |
+| Downloads | 1,234 | — |
+| Views | 1,234 | — |
+| Shares | 1,234 | — |
+| Never used count | 1,234 | — |
+| Unclassified count | 1,234 | — |
+
+**AI processing over time** (chart, from `getMediaUsageAnalytics`): Per VO-R02: processing volume by day.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Key | text | — |
+| Label | text | — |
+| Asset count | 1,234 | — |
+| Storage bytes | 1,234 | — |
+| Downloads | 1,234 | — |
+| Views | 1,234 | — |
+| Shares | 1,234 | — |
+| Never used count | 1,234 | — |
+| Unclassified count | 1,234 | — |
+
+**Confidence bands** (chart, from `getMediaUsageAnalytics`): Per VO-R02: high, medium and low confidence counts; drawn pending the fields (CHG-SGU-024).
+
+| Shows | Format | Notes |
+|---|---|---|
+| Key | text | — |
+| Label | text | — |
+| Asset count | 1,234 | — |
+| Storage bytes | 1,234 | — |
+| Downloads | 1,234 | — |
+| Views | 1,234 | — |
+| Shares | 1,234 | — |
+| Never used count | 1,234 | — |
+| Unclassified count | 1,234 | — |
 
 **Actions and what each produces**
 
@@ -179,7 +466,18 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Rendition Queue (secondary button) | navigation or local | — | — | — | — |
 | Processing Failures (secondary button) | navigation or local | — | — | — | — |
 
-**Data it reads**: `listAssets` (onLoad, List assets); `getMediaUsageAnalytics` (onLoad, What the library looks like to AI)
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **KPI tiles**: AI-processed assets, Pending AI processing, AI tags generated, Duplicate candidates, Version updates, Renditions generated, Processing failures (red when above 0), Assets requiring review. *(source: screens/P13-white-label-cms.yaml#CMS-071)*
+- **Processing health**: A stacked bar Processed / Queued / Processing / Review required / Failed. *(source: screens/P13-white-label-cms.yaml#CMS-071)*
+- **AI confidence distribution**: Four bands 95-100%, 80-94%, 60-79%, below threshold, as a bar chart; the threshold is the tenant's configured value. *(source: screens/P13-white-label-cms.yaml#CMS-071)*
+- **Intelligence alerts**: "126 potential duplicates detected", "48 assets below the confidence threshold", "18 video jobs failed", "342 renditions generated today" - each opening its board screen. *(source: screens/P13-white-label-cms.yaml#CMS-071)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Review AI results / Duplicate review / Version activity / Rendition queue / Processing failures**: Tiles opening CMS-072/CMS-080, CMS-075, CMS-076, CMS-078 and CMS-079; each returns here. *(source: screens/P13-white-label-cms.yaml#CMS-071 / F184 step 1)*
+
+**Data it reads**: `getMediaUsageAnalytics` (onLoad, What the library looks like to AI)
 
 **Where the user goes next**
 
@@ -200,14 +498,37 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |---|---|
 | Loading (`?state=loading`) | The asset intelligence list. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the asset intelligence untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No asset intelligence yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, first run (`?state=emptyFirstRun`) | No asset intelligence yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the asset intelligence are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 
+#### Edge cases to draw
+
+- **Tenant without AI enabled**: AI tiles show "AI processing not enabled for this tenant"; version and rendition tiles still show. *(source: designer default)*
+
+#### Consistency with other screens
+
+- Match `CMS-001`: Reached from and returns to the Tenant Workspace of the media library.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+tiles:
+  aiProcessed: 46,284
+  pending: 842
+  tags: 184,620
+  duplicateCandidates: 126
+  versionUpdates: 428
+  renditions: 128,420
+  failed: 18
+  reviewRequired: 214
+```
+
 #### Permissions
 
-- `listAssets` → `ASSET_VIEW` (read) · staff
 - `getMediaUsageAnalytics` → `ASSET_LIBRARY_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
@@ -245,13 +566,15 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (403).
-- [ ] Every output is drawn (34 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
+- [ ] Every output is drawn (171 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#CMS-071?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Review AI Results, Duplicate Review, Version Activity, Rendition Queue, Processing Failures.
 - [ ] Every transition is wired: `CMS-001`, `CMS-072`, `CMS-073`, `CMS-074`, `CMS-075`, `CMS-076`, `CMS-077`, `CMS-078`, `CMS-079`, `CMS-080`.
-- [ ] Every gated control is gated: `ASSET_LIBRARY_VIEW`, `ASSET_VIEW`.
+- [ ] Every gated control is gated: `ASSET_LIBRARY_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 1 edge case(s) from the process notes are drawn.
+- [ ] The 1 decision(s) taken on this screen are drawn as decided, not as the old default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -273,6 +596,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Route | `/media-library/ai-auto-tagging-content-understanding-cms-072` |
 
 **Known gaps.** **The pack names 4 actions on this screen and the screen declares 0 operations.** Unserved: Accept, Reject, Edit, Accept All Above Threshold. Each needs an operation, or needs removing from the … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+**From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** AI-generated tags and descriptions for uploaded assets, accepted or rejected by a person; accept-all only above a confidence threshold.
 
 #### Inputs: what the user enters or picks
 
@@ -308,6 +633,26 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 A tag names a closed vocabulary (`MediaTaxonomy.keywordVocabularies[].closed`) and its value is not one of that vocabulary's terms. |
+
+#### Edge cases to draw
+
+- **A person whose grants cover only some venues, or a link to a record in another venue**: The venue filter lists only venues in the session's scope (Session.scope, resolved at sign-in); a record outside it renders Not found, deliberately indistinguishable from absent, never a 'you may not see venue X' message. *(source: ADR-0011; contracts/shared/common.yaml#/components/schemas/Problem; contracts/spine/identity.yaml#getCurrentSession)*
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+asset: lazy-river-sunset.jpg
+suggestedTags:
+- water
+- family
+- sunset
+confidence:
+- 96%
+- 88%
+- 71%
+```
 
 #### Permissions
 
@@ -352,6 +697,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `CMS-071`.
 - [ ] Every gated control is gated: `ASSET_LIBRARY_MANAGE`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 1 edge case(s) from the process notes are drawn.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -373,6 +719,14 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Route | `/media-library/semantic-natural-language-asset-search-cms-073` |
 
 **Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
+
+**From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** Search by meaning ("family on the lazy river at sunset"), with relevance and the reason it matched.
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- The table's columns are the workshop pack's labels with no bound response field (0 of 7 labels bound). (CHG-SGU-024)
+
+**Fixed on main** (the package already carries these; draw what it says): emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything. (CHG-SGU-023).
 
 #### Inputs: what the user enters or picks
 
@@ -429,10 +783,34 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |---|---|
 | Loading (`?state=loading`) | The semantic natural-language asset list. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the semantic natural-language asset untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No semantic natural-language asset yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, first run (`?state=emptyFirstRun`) | Nothing here yet for Semantic & Natural-Language Asset Search. This screen only reads, so it offers no create action and says where the records come from. |
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the semantic natural-language asset are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Edge cases to draw
+
+- **A person whose grants cover only some venues, or a link to a record in another venue**: The venue filter lists only venues in the session's scope (Session.scope, resolved at sign-in); a record outside it renders Not found, deliberately indistinguishable from absent, never a 'you may not see venue X' message. *(source: ADR-0011; contracts/shared/common.yaml#/components/schemas/Problem; contracts/spine/identity.yaml#getCurrentSession)*
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+Every semantic natural-language asset:
+- Thumbnail: 46
+  relevance score: 92%
+  AI tags: 11
+  matching reason: 11
+- Thumbnail: 312
+  relevance score: 78%
+  AI tags: 128
+  matching reason: 128
+- Thumbnail: 74
+  relevance score: 64%
+  AI tags: 46
+  matching reason: 46
+```
 
 #### Permissions
 
@@ -480,6 +858,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `CMS-071`.
 - [ ] Every gated control is gated: `ASSET_LIBRARY_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 1 edge case(s) from the process notes are drawn.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -501,6 +880,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Route | `/media-library/visual-similarity-related-asset-discovery-cms-074` |
 
 **Known gaps.** **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+**From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** Assets visually similar to the selected one.
+
+**Fixed on main** (the package already carries these; draw what it says): emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything. (CHG-SGU-023).
 
 #### Inputs: what the user enters or picks
 
@@ -555,10 +938,27 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | Loading (`?state=loading`) | The visual similarity related list. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the visual similarity related untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No visual similarity related yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, first run (`?state=emptyFirstRun`) | Nothing here yet for Visual Similarity & Related Asset Discovery. This screen only reads, so it offers no create action and says where the records come from. |
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the visual similarity related are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Edge cases to draw
+
+- **A person whose grants cover only some venues, or a link to a record in another venue**: The venue filter lists only venues in the session's scope (Session.scope, resolved at sign-in); a record outside it renders Not found, deliberately indistinguishable from absent, never a 'you may not see venue X' message. *(source: ADR-0011; contracts/shared/common.yaml#/components/schemas/Problem; contracts/spine/identity.yaml#getCurrentSession)*
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+selected: wave-pool-hero.jpg
+similar:
+- asset: wave-pool-hero-v2.jpg
+  similarity: 97%
+- asset: wave-pool-crowd.jpg
+  similarity: 81%
+```
 
 #### Permissions
 
@@ -598,6 +998,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `CMS-071`.
 - [ ] Every gated control is gated: `ASSET_LIBRARY_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 1 edge case(s) from the process notes are drawn.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -621,6 +1022,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 **What the spec says about it.** **Archive and quarantine are reversible; deletion is the only end of an asset's life (decided 28 September, audit STATE-MEDIA).** Archive Duplicate archives the copy (`updateMediaAsset`, `status: archived`) and can be undone with Restore Archived Copy; Delete Duplicate (`deleteMediaAsset`) removes it for good.
 
 **Known gaps.** **The pack names 7 actions on this screen and the screen declares 0 operations.** Unserved: Exact Duplicate, Near Duplicate, Keep Both, Mark Related, Create Version Relationship, Replace Duplicate … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+**From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** Exact and near duplicates with what to do: keep both, relate, version, replace, archive or delete. Deleting a duplicate in use is refused or warned with its usages.
+
+**Fixed on main** (the package already carries these; draw what it says): emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything. (CHG-SGU-023).
 
 #### Inputs: what the user enters or picks
 
@@ -695,11 +1100,33 @@ Errors to draw in the form: 409 Asset is in use. (MediaInUseProblem)
 |---|---|
 | Loading (`?state=loading`) | The duplicate near-duplicate list. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the duplicate near-duplicate untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No duplicate near-duplicate yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, first run (`?state=emptyFirstRun`) | Nothing here yet for Duplicate & Near-Duplicate Management. This screen only reads, so it offers no create action and says where the records come from. |
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the duplicate near-duplicate are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 Asset is in use. (MediaInUseProblem); 409 Status change refused: archiving an asset that is still referenced (`inUse`, with every reference listed), or a transition `states/media.yaml` does not allow … (MediaStatusRefusedProblem) |
+
+#### Edge cases to draw
+
+- **A person whose grants cover only some venues, or a link to a record in another venue**: The venue filter lists only venues in the session's scope (Session.scope, resolved at sign-in); a record outside it renders Not found, deliberately indistinguishable from absent, never a 'you may not see venue X' message. *(source: ADR-0011; contracts/shared/common.yaml#/components/schemas/Problem; contracts/spine/identity.yaml#getCurrentSession)*
+- **Can read but not change (holds ASSET_LIBRARY_VIEW only)**: Everything reads; the actions needing another permission are not offered as live buttons: ASSET_LIBRARY_MANAGE for Delete Duplicate, Archive Duplicate. Where the person would reasonably expect the action, it shows disabled with the permission named. The server refuses with 403 forbidden regardless. *(source: contracts/satellite/assets.yaml#deleteMediaAsset)*
+- **deleteMediaAsset answers 409**: Show it as something the person can act on, not a failure: Asset is in use. Every reference is listed *(source: contracts/satellite/assets.yaml#deleteMediaAsset)*
+- **updateMediaAsset answers 409**: Show it as something the person can act on, not a failure: Status change refused: archiving an asset that is still referenced (`inUse`, with every reference listed), or a transition `states/media.yaml` does not allow from the asset's current status (`transitionNotAllowed`) *(source: contracts/satellite/assets.yaml#updateMediaAsset)*
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+pair:
+- logo-aquacove.png
+- logo-aquacove (1).png
+kind: exact duplicate
+usages:
+- 12
+- 0
+suggestion: Delete the unused copy
+```
 
 #### Permissions
 
@@ -742,6 +1169,7 @@ Also apply: 8 for all of P13, 29 for every app (section *Design inputs from the 
 - [ ] Every transition is wired: `CMS-071`.
 - [ ] Every gated control is gated: `ASSET_LIBRARY_MANAGE`, `ASSET_LIBRARY_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 4 edge case(s) from the process notes are drawn.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -763,6 +1191,10 @@ Also apply: 8 for all of P13, 29 for every app (section *Design inputs from the 
 | Route | `/media-library/asset-version-control-revision-history-cms-076` |
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+**From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** Versions of one logical asset; making a version current updates every usage.
+
+**Fixed on main** (the package already carries these; draw what it says): emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything. (CHG-SGU-023).
 
 #### Inputs: what the user enters or picks
 
@@ -791,11 +1223,35 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |---|---|
 | Loading (`?state=loading`) | The asset version revision list. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the asset version revision untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No asset version revision yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, first run (`?state=emptyFirstRun`) | Nothing here yet for Asset Version Control & Revision History. This screen only reads, so it offers no create action and says where the records come from. |
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the asset version revision are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 The upload cannot be used: it is a different kind — an image cannot replace a document (`kindMismatch`) — or the transfer never finished … (UploadRefusedProblem) |
+
+#### Edge cases to draw
+
+- **A person whose grants cover only some venues, or a link to a record in another venue**: The venue filter lists only venues in the session's scope (Session.scope, resolved at sign-in); a record outside it renders Not found, deliberately indistinguishable from absent, never a 'you may not see venue X' message. *(source: ADR-0011; contracts/shared/common.yaml#/components/schemas/Problem; contracts/spine/identity.yaml#getCurrentSession)*
+- **Can read but not change (holds ASSET_LIBRARY_VIEW only)**: Everything reads; the actions needing another permission are not offered as live buttons: ASSET_LIBRARY_MANAGE for replaceMediaAsset. Where the person would reasonably expect the action, it shows disabled with the permission named. The server refuses with 403 forbidden regardless. *(source: contracts/satellite/assets.yaml#replaceMediaAsset)*
+- **replaceMediaAsset answers 409**: Show it as something the person can act on, not a failure: The upload cannot be used: it is a different kind — an image cannot replace a document (`kindMismatch`) — or the transfer never finished (`transferIncomplete`), the upload ticket expired (`uploadExpired`), or the stored file is larger than the ticket allowed (`sizeExceeded`) *(source: contracts/satellite/assets.yaml#replaceMediaAsset)*
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+listMediaAssetVersions (MediaAssetVersion):
+- version: 12
+  sizeBytes: 12
+  createdAt: 01/10/2026 09:14
+  note: Guest charged twice at Main Gate Till 3
+  isCurrent: true
+- version: 3
+  sizeBytes: 3
+  createdAt: 30/09/2026 18:02
+  note: Group of 40 from Desert Gate Tours
+  isCurrent: false
+```
 
 #### Permissions
 
@@ -840,6 +1296,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `CMS-071`.
 - [ ] Every gated control is gated: `ASSET_LIBRARY_MANAGE`, `ASSET_LIBRARY_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 3 edge case(s) from the process notes are drawn.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -862,6 +1319,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** Compare two versions and see what replacing the current one would change.
+
+**Fixed on main** (the package already carries these; draw what it says): emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything. (CHG-SGU-023).
+
 #### Inputs: what the user enters or picks
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
@@ -882,10 +1343,32 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |---|---|
 | Loading (`?state=loading`) | The version comparison replacement list. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the version comparison replacement untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No version comparison replacement yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, first run (`?state=emptyFirstRun`) | Nothing here yet for Version Comparison & Replacement Impact. This screen only reads, so it offers no create action and says where the records come from. |
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the version comparison replacement are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Edge cases to draw
+
+- **A person whose grants cover only some venues, or a link to a record in another venue**: The venue filter lists only venues in the session's scope (Session.scope, resolved at sign-in); a record outside it renders Not found, deliberately indistinguishable from absent, never a 'you may not see venue X' message. *(source: ADR-0011; contracts/shared/common.yaml#/components/schemas/Problem; contracts/spine/identity.yaml#getCurrentSession)*
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+listMediaAssetVersions (MediaAssetVersion):
+- version: 12
+  sizeBytes: 12
+  createdAt: 01/10/2026 09:14
+  note: Guest charged twice at Main Gate Till 3
+  isCurrent: true
+- version: 3
+  sizeBytes: 3
+  createdAt: 30/09/2026 18:02
+  note: Group of 40 from Desert Gate Tours
+  isCurrent: false
+```
 
 #### Permissions
 
@@ -925,6 +1408,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `CMS-071`.
 - [ ] Every gated control is gated: `ASSET_LIBRARY_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 1 edge case(s) from the process notes are drawn.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -944,6 +1428,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Offline | online only |
 | Opens with | `assetId` (navigation) |
 | Route | `/media-library/transformation-rendition-management-cms-078` |
+
+**From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** Channel renditions generated from a master asset (sizes, formats) by preset.
+
+**Fixed on main** (the package already carries these; draw what it says): emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything. (CHG-SGU-023).
 
 #### Inputs: what the user enters or picks
 
@@ -976,10 +1464,31 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | Loading (`?state=loading`) | The transformation rendition configuration as saved. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the transformation rendition untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No transformation rendition configured yet. Carries the create action and says what the platform does in the meantime. |
+| Empty, first run (`?state=emptyFirstRun`) | Nothing here yet for Transformation & Rendition Management. Offers `requestMediaRendition`, the action this screen has; distinct from a filter that matched nothing. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Empty, no results (`?state=emptyNoResults`) | **Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist |
 | Offline (`?state=offline`) | online only |
+
+#### Edge cases to draw
+
+- **A person whose grants cover only some venues, or a link to a record in another venue**: The venue filter lists only venues in the session's scope (Session.scope, resolved at sign-in); a record outside it renders Not found, deliberately indistinguishable from absent, never a 'you may not see venue X' message. *(source: ADR-0011; contracts/shared/common.yaml#/components/schemas/Problem; contracts/spine/identity.yaml#getCurrentSession)*
+- **Can read but not change (holds ASSET_LIBRARY_VIEW only)**: Everything reads; the actions needing another permission are not offered as live buttons: ASSET_LIBRARY_MANAGE for requestMediaRendition. Where the person would reasonably expect the action, it shows disabled with the permission named. The server refuses with 403 forbidden regardless. *(source: contracts/satellite/assets.yaml#requestMediaRendition)*
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+listMediaRenditions (MediaRendition):
+- width: 12
+  height: 12
+  sizeBytes: 12
+  status: active
+- width: 3
+  height: 3
+  sizeBytes: 3
+  status: pending
+```
 
 #### Permissions
 
@@ -1020,6 +1529,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `CMS-071`.
 - [ ] Every gated control is gated: `ASSET_LIBRARY_MANAGE`, `ASSET_LIBRARY_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 2 edge case(s) from the process notes are drawn.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -1041,6 +1551,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Route | `/media-library/rendition-processing-delivery-readiness-cms-079` |
 
 **Known gaps.** **The pack names 4 actions on this screen and the screen declares 0 operations.** Unserved: Retry, Cancel, View Error, Regenerate. Each needs an operation, or needs removing from the screen; this is … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+**From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** Rendition jobs and whether required formats are ready before distribution; retry failures.
+
+**Fixed on main** (the package already carries these; draw what it says): emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything. (CHG-SGU-023).
 
 #### Inputs: what the user enters or picks
 
@@ -1071,10 +1585,30 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |---|---|
 | Loading (`?state=loading`) | The rendition processing delivery list. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the rendition processing delivery untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No rendition processing delivery yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, first run (`?state=emptyFirstRun`) | Nothing here yet for Rendition Processing & Delivery Readiness. This screen only reads, so it offers no create action and says where the records come from. |
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the rendition processing delivery are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Edge cases to draw
+
+- **A person whose grants cover only some venues, or a link to a record in another venue**: The venue filter lists only venues in the session's scope (Session.scope, resolved at sign-in); a record outside it renders Not found, deliberately indistinguishable from absent, never a 'you may not see venue X' message. *(source: ADR-0011; contracts/shared/common.yaml#/components/schemas/Problem; contracts/spine/identity.yaml#getCurrentSession)*
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+listMediaRenditions (MediaRendition):
+- width: 12
+  height: 12
+  sizeBytes: 12
+  status: active
+- width: 3
+  height: 3
+  sizeBytes: 3
+  status: pending
+```
 
 #### Permissions
 
@@ -1114,6 +1648,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `CMS-071`.
 - [ ] Every gated control is gated: `ASSET_LIBRARY_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 1 edge case(s) from the process notes are drawn.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -1135,6 +1670,14 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Route | `/media-library/ai-quality-intelligence-review-recommendations-cms-080` |
 
 **Known gaps.** **The pack names 12 actions on this screen and the screen declares 0 operations.** Unserved: Accept Recommendation, Reject, Review Asset, Generate Rendition, Resolve Issue, Board 2 — Shared … **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
+
+**From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** Review AI results and content-quality issues with AI consumption and cost.
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- The table's columns are the workshop pack's labels with no bound response field (0 of 9 labels bound). (CHG-SGU-024)
+
+**Fixed on main** (the package already carries these; draw what it says): emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything. (CHG-SGU-023).
 
 #### Inputs: what the user enters or picks
 
@@ -1193,6 +1736,10 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | AI processing enabled/disabled (secondary button) | navigation or local | — | — | — | — |
 | supported AI capabilities (secondary button) | navigation or local | — | — | — | — |
 
+**Rules for what is shown** (from the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process; these refine the tables above and win where they differ)
+
+- **Money columns (estimated/actual AI consumption cost)**: Money in the region's currency and scale, never a bare number: AED to 2 decimals, OMR/BHD/KWD to 3, the third decimal never rounded away (2.013 stays 2.013); the currency code is shown with the figure. *(source: ADR-0008; ADR-0011; DI-306)*
+
 **Data it reads**: `getMediaUsageAnalytics` (onLoad, Quality and coverage)
 
 **Where the user goes next**
@@ -1209,10 +1756,42 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |---|---|
 | Loading (`?state=loading`) | The quality intelligence review list. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the quality intelligence review untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No quality intelligence review yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, first run (`?state=emptyFirstRun`) | Nothing here yet for AI Quality, Intelligence Review & Recommendations. This screen only reads, so it offers no create action and says where the records come from. |
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the quality intelligence review are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+Every quality intelligence review:
+- Assets processed: 128
+  images analyzed: 3 h 20 min
+  video minutes analyzed: 57
+  audio minutes transcribed: 46
+  OCR pages: 3 h 20 min
+  embedding generation: 19
+  semantic searches: 46
+  AI requests: 128
+- Assets processed: 46
+  images analyzed: 42 min
+  video minutes analyzed: 11
+  audio minutes transcribed: 312
+  OCR pages: 42 min
+  embedding generation: 233
+  semantic searches: 312
+  AI requests: 42
+- Assets processed: 312
+  images analyzed: 1.8 s
+  video minutes analyzed: 128
+  audio minutes transcribed: 74
+  OCR pages: 1.8 s
+  embedding generation: 57
+  semantic searches: 74
+  AI requests: 7
+```
 
 #### Permissions
 
@@ -1341,7 +1920,6 @@ Method, path, parameters, request and response for every operation these screens
 "deleteMediaAsset": {"method":"DELETE","path":"/media/{mediaId}","contract":"assets","summary":"Delete an asset","permission":"ASSET_LIBRARY_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":null},
 "findSimilarMediaAssets": {"method":"GET","path":"/media-assets/similar","contract":"assets","summary":"Visually similar, near-duplicate and related assets","permission":"ASSET_LIBRARY_VIEW","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[{"name":"assetId","in":"query","required":true},{"name":"minSimilarity","in":"query","required":null}],"requestBody":null,"responds":"MediaSimilarity"},
 "getMediaUsageAnalytics": {"method":"GET","path":"/media-usage","contract":"assets","summary":"Downloads, views, shares and library health","permission":"ASSET_LIBRARY_VIEW","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"tenant","parameters":[{"name":"from","in":"query","required":null},{"name":"to","in":"query","required":null},{"name":"groupBy","in":"query","required":null}],"requestBody":null,"responds":"MediaUsageRow"},
-"listAssets": {"method":"GET","path":"/assets","contract":"maintenance","summary":"List assets","permission":"ASSET_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"venueId","in":"query","required":null},{"name":"categoryId","in":"query","required":null},{"name":"status","in":"query","required":null},{"name":"maintenanceDue","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listMediaAssetVersions": {"method":"GET","path":"/media-assets/{assetId}/versions","contract":"assets","summary":"Every revision, and what replacing it would affect","permission":"ASSET_LIBRARY_VIEW","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"MediaAssetVersion"},
 "listMediaRenditions": {"method":"GET","path":"/media-assets/{assetId}/renditions","contract":"assets","summary":"The derived sizes and formats, and whether they are ready","permission":"ASSET_LIBRARY_VIEW","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"MediaRendition"},
 "replaceMediaAsset": {"method":"POST","path":"/media/{mediaId}/replace","contract":"assets","summary":"Replace the file behind an asset","permission":"ASSET_LIBRARY_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"MediaReplaceResult"},
@@ -1358,9 +1936,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
-"Asset": {"x-ticvai-persistence":"maintenance.asset","allOf":[{"$ref":"#/components/schemas/CreateAssetRequest"},{"type":"object","x-ticvai-retired-columns":["is_maintenance_overdue","document_refs"],"required":["id","status"],"properties":{"id":{"type":"string","format":"uuid"},"resourceId":{"type":"string","format":"uuid","nullable":true,"description":"1.2.x. **Where this asset is also bookable.** An AV rig is an asset to maintain and a resource to allocate, and they are the same object seen from two sides.\n**`resources` owns the calendar and this owns the condition.** An asset out of service makes its resource unbookable, which is one link rather than two models of availability.\n"},"deviceId":{"type":"string","format":"uuid","nullable":true,"description":"BL-160. **Where this asset is also a registered device.** A turnstile is an asset to maintain and a device to operate, and — exactly as with `resourceId` above — they are the same object seen from two sides.\n**Nothing joined them before this.** A turnstile controller reporting `needsAttention` could not raise a work order against itself, and an engineer closing one had no way back to the device whose firmware caused it.\n**Null for most assets and for most devices.** A chiller is not a device and a signature pad is not on the asset register; the link is sparse, and it lives here rather than on `platform.device` because `platform` is the foundation tier and a foreign key pointing from it into `maintenance` would invert the tiers — every cell running a spine would carry a column for a satellite it may not deploy.\n"},"acquisitionCost":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"acquiredOn":{"type":"string","format":"date","nullable":true},"depreciation":{"type":"object","nullable":true,"description":"**Recorded here and posted by `finance`.** Depreciation is an accounting act and the asset register is where the useful life is actually known — an engineer knows a chiller lasts fifteen years and an accountant knows what to do about it.\n","properties":{"method":{"type":"string","enum":["straightLine","reducingBalance","unitsOfProduction","none"]},"usefulLifeMonths":{"type":"integer"},"residualValue":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"accumulatedDepreciation":{"$ref":"../shared/common.yaml#/components/schemas/Money"}}},"retiredOn":{"type":"string","format":"date","nullable":true,"description":"**Retirement is not deletion.** A work order from three years ago still names this asset, and an inspection record with no asset is an inspection of nothing.\n"},"disposalProceeds":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"status":{"$ref":"#/components/schemas/AssetStatus"},"statusReason":{"type":"string","nullable":true},"openWorkOrderCount":{"type":"integer","readOnly":true,"x-ticvai-derived":"onWrite","description":"Work orders on this asset whose status is `open`, `assigned`, `inProgress`, `paused` or `awaitingParts` — the same set `AssetDetail.openWorkOrders` returns. **Maintained on write**: `createWorkOrder` and every transition into or out of that set (complete, cancel, close, reject back to open) adjust it in the same transaction as the work-order row.\n"},"nextMaintenanceDueAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true,"x-ticvai-derived":"onWrite","description":"The earliest `nextDueAt` among this asset's active maintenance plans; null when none has one. **Maintained on write**: recomputed whenever one of those plans is created, amended, suspended or has its `nextDueAt` moved by a completed work order. `listAssets?maintenanceDue` filters on this column against the clock.\n"},"isMaintenanceOverdue":{"type":"boolean","readOnly":true,"x-ticvai-persisted":false,"x-ticvai-derived":"onRead","description":"`nextMaintenanceDueAt` is in the past at the moment of the read. **Computed on read and not stored** — it depends on the clock, so a stored copy is stale the minute after it is written.\n"},"lastInspectionAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true,"x-ticvai-derived":"onWrite","description":"`performedAt` of the latest inspection submitted against this asset. **Maintained on write** by `submitInspection`, in the same transaction as the inspection row; an inspection synced late with an earlier `performedAt` does not move it back.\n"},"usageCounter":{"type":"number","nullable":true,"description":"Cycles, hours or kilometres. Drives usage-based maintenance."}}}]},
-"AssetStatus": {"type":"string","enum":["inService","outOfService","underMaintenance","awaitingParts","retired","disposed"]},
-"CreateAssetRequest": {"x-ticvai-persistence":"none — request only","type":"object","required":["assetTag","name","venueId","criticality"],"properties":{"assetTag":{"type":"string","maxLength":64,"x-ticvai-unique":"venue","description":"**Unique per venue** (decided 28 September, audit R108). Two assets in one venue never share a tag; `createAsset` refuses a duplicate with `409` `duplicate-code`. Two venues may each have an `A-001`.\n"},"name":{"type":"string","maxLength":200},"venueId":{"type":"string","format":"uuid"},"categoryId":{"type":"string","format":"uuid"},"locationDescription":{"type":"string","maxLength":500},"criticality":{"$ref":"#/components/schemas/AssetCriticality"},"priorityOverride":{"allOf":[{"$ref":"#/components/schemas/WorkOrderPriority"}],"nullable":true,"description":"**\"If this device goes down, raise this priority\"** (decided 17 September, M17-01). A corrective work order raised on this asset takes this priority instead of the score. Null means the score decides.\n"},"manufacturer":{"type":"string","maxLength":200},"model":{"type":"string","maxLength":200},"serialNumber":{"type":"string","maxLength":128},"commissionedAt":{"type":"string","format":"date"},"warrantyExpiresAt":{"type":"string","format":"date"},"supplierId":{"type":"string","format":"uuid"},"linkedProductIds":{"type":"array","description":"Products this asset delivers. A fault here can stop them selling.\n","items":{"type":"string","format":"uuid"}},"linkedAccessPointId":{"type":"string","format":"uuid","nullable":true,"description":"Access point this asset controls. Out of service blocks it."},"requiresInspectionToReturn":{"type":"boolean","default":false,"description":"True means a completed inspection is required before return to service. A technician cannot simply declare a ride safe.\n"},"documents":{"type":"array","description":"Manuals, procedures, certificates, each with its name and kind. Stored one row per document in `maintenance.asset_document`, which is where `AssetDetail.documents` reads them from.\n","items":{"$ref":"#/components/schemas/AssetDocumentInput"}},"documentRefs":{"type":"array","x-ticvai-persisted":false,"description":"**The refs alone, kept for callers that predate `documents`.** Each ref sent here is stored as an `asset_document` row with no name and no kind. Returned as the refs of `documents`, computed on read — there is no second copy to fall out of step.\n","items":{"type":"string"}}}},
 "LocalisedText": {"x-ticvai-persistence":"none — jsonb column","type":"object","additionalProperties":{"type":"string"}},
 "MediaAsset": {"x-ticvai-persistence":"assets.media_asset","type":"object","required":["id","kind","status","filename","contentType","sizeBytes","referenceCount","createdAt"],"properties":{"id":{"type":"string","format":"uuid"},"kind":{"$ref":"#/components/schemas/MediaKind"},"status":{"$ref":"#/components/schemas/MediaStatus"},"filename":{"type":"string"},"contentType":{"type":"string"},"sizeBytes":{"type":"integer"},"title":{"$ref":"#/components/schemas/LocalisedText"},"description":{"allOf":[{"$ref":"#/components/schemas/LocalisedText"}],"description":"Set by `updateMediaAsset` and matched by `searchMedia`'s `search`. It was accepted and searched on before it had anywhere to be stored.\n"},"altText":{"allOf":[{"$ref":"#/components/schemas/LocalisedText"}],"description":"Required before use in a guest-facing surface. WCAG 2.2 AA."},"width":{"type":"integer","nullable":true},"height":{"type":"integer","nullable":true},"durationSeconds":{"type":"number","nullable":true},"customMetadata":{"type":"object","nullable":true,"additionalProperties":true,"description":"BL-178. **`assets` is a strong contract and its metadata was fixed** — kind, title, alt text, dimensions, rights. A venue photographing four thousand products wants its own fields: shoot date, photographer, model release, season.\n**Free-form and searchable, not a schema.** Every venue would want a different one, and a fixed set would be wrong for all of them.\n"},"sharedWithTenantIds":{"type":"array","items":{"type":"string","format":"uuid"},"description":"BL-178. **Cross-tenant sharing, and it is refused by default for a reason.** A brand operating three venues wants one logo library; two unrelated tenants sharing an asset store is the isolation breach ADR-0011 exists to prevent.\n**Only within one tenant's own scope tree.** A share naming a tenant outside it is refused rather than warned about — this is the one place where a permissive default would be a cross-tenant data leak.\n"},"tags":{"type":"array","items":{"type":"string"}},"categoryId":{"type":"string","format":"uuid","nullable":true,"description":"The asset's category, one of `MediaTaxonomy.categories[].id`; null while unclassified. Set by `bulkUpdateMediaAssets` (`setCategoryId`) (decided 29 September, data model DM4).\n"},"venueId":{"type":"string","format":"uuid","nullable":true},"url":{"type":"string","description":"Signed and expiring for private assets; stable CDN URL for public ones."},"thumbnailUrl":{"type":"string","nullable":true},"referenceCount":{"type":"integer","description":"How many surfaces reference this asset. Non-zero refuses deletion.\n"},"rights":{"$ref":"#/components/schemas/MediaRights"},"isRightsExpired":{"type":"boolean"},"version":{"type":"integer"},"uploadedByPrincipalId":{"type":"string","format":"uuid"},"createdAt":{"type":"string","format":"date-time"}}},
 "MediaAssetVersion": {"type":"object","x-ticvai-persistence":"assets.asset_version","description":"Boards 2.6 and 2.7. **Usage impact belongs to the version read**, because replacing a logo is routine or an incident depending on where it appears.\n","properties":{"assetId":{"type":"string","format":"uuid"},"version":{"type":"integer"},"fileName":{"type":"string"},"sizeBytes":{"type":"integer"},"checksum":{"type":"string","nullable":true},"createdBy":{"type":"string","format":"uuid"},"createdAt":{"type":"string","format":"date-time"},"note":{"type":"string","nullable":true},"isCurrent":{"type":"boolean"},"usageImpact":{"type":"array","readOnly":true,"items":{"type":"object","properties":{"surface":{"type":"string","enum":["campaign","journey","ticketTemplate","screen","publishedPage","product","signage"]},"referenceId":{"type":"string","format":"uuid"},"label":{"type":"string"},"live":{"type":"boolean"}}}},"scopePath":{"type":"string"}}},

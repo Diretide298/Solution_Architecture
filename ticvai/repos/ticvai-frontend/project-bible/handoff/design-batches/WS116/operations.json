@@ -157,6 +157,107 @@
   "requestBody": null,
   "responds": "Page"
  },
+ "listOwnPlatformStaffGrants": {
+  "method": "GET",
+  "path": "/platform-staff-grants/mine",
+  "contract": "identity",
+  "summary": "The calling platform operator's own grants into this tenant",
+  "permission": "PLATFORM_TENANT_ACCESS",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "activeOnly",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listTenants": {
+  "method": "GET",
+  "path": "/tenants",
+  "contract": "subscription",
+  "summary": "List tenants",
+  "permission": "PLATFORM_TENANT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "planId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "openPlatformStaffGrant": {
+  "method": "POST",
+  "path": "/platform-staff-grants",
+  "contract": "identity",
+  "summary": "A platform operator opens a time-boxed grant into this tenant",
+  "permission": "PLATFORM_TENANT_ACCESS",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "PlatformStaffGrant"
+ },
+ "setAiVenueSettings": {
+  "method": "PUT",
+  "path": "/venues/{venueId}/ai-settings",
+  "contract": "ai",
+  "summary": "Set the venue AI profile",
+  "permission": "AI_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AiVenueSettings",
+  "responds": "AiVenueSettings"
+ },
  "startConfigurationSession": {
   "method": "POST",
   "path": "/configuration-sessions",

@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Access Control
   version: 1.0.0
-  x-ticvai-screen-count: 240
+  x-ticvai-screen-count: 239
   x-ticvai-tier: spine
   x-ticvai-module: 3 — Admission and Access
   x-ticvai-requirements: 201
@@ -78,14 +78,9 @@ paths:
         - "P06 EMP-015 Group scan"
         - "P06 EMP-017 Sync & reconciliation"
         - "P07 SCN-003 Ready to scan"
-        - "P07 SCN-007 Group admission"
         - "P07 SCN-008 Manual entry"
-        - "P07 SCN-009 Ticket lookup"
         - "P07 SCN-013 Offline journal"
         - "P07 SCN-014 Sync & reconciliation"
-        - "P07 SCN-015 Offline package"
-        - "P08 BO-034 Scan Activity"
-        - "P08 BO-035 Override Audit"
         - "P08 BO-060 Attendance & Footfall"
       x-ticvai-latency-budget-ms: 300
       x-ticvai-audience:
@@ -229,6 +224,7 @@ paths:
       operationId: listMyEntitlements
       x-ticvai-consumed-by:
         - "P01 WEB-001 Home / Landing"
+        - "P01 WEB-017 My Account Dashboard"
         - "P01 WEB-018 My Tickets"
         - "P02 GST-001 Home"
         - "P02 GST-012 My Tickets"
@@ -317,6 +313,7 @@ paths:
         - "P02 GST-012 My Tickets"
         - "P02 GST-013 Ticket Details"
         - "P02 GST-055 Dynamic QR Ticket"
+        - "P08 BO-355 Virtual Ticket & Credential 360° Workspace"
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -373,6 +370,7 @@ paths:
         - "P02 GST-012 My Tickets"
         - "P02 GST-013 Ticket Details"
         - "P02 GST-055 Dynamic QR Ticket"
+        - "P08 BO-355 Virtual Ticket & Credential 360° Workspace"
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -487,6 +485,7 @@ paths:
         - "P01 WEB-018 My Tickets"
         - "P02 GST-012 My Tickets"
         - "P02 GST-013 Ticket Details"
+        - "P08 BO-355 Virtual Ticket & Credential 360° Workspace"
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -582,6 +581,17 @@ paths:
 
         **A template is stored, never an image**, and the template cannot reconstruct the face.
 
+
+        **Consent first, on the venue''s own consent form** (decided 2 October 2026, Chinmay, batch 4, BO-188:
+        "Where needed, consent first, using a consent form from the venue"; DEC-128, DEC-549; CHG-CSP-018).
+        The notice the guest acknowledges is the venue''s form (`VenueSettings.biometrics.consentFormId`, from
+        the consent-form builder in Venue Management), and `consent.consentFormId` and `consentFormVersion`
+        record which form and version were shown; a capture against any other form is `409`. Where TICVAI
+        holds the templates (`VenueSettings.biometrics.templatesHeldByTicvai`) the venue is warned in Venue
+        Management that every guest must accept that form first. A minor is captured only with a guardian''s
+        consent on the same form, and not at all where the venue has switched minors off
+        (`VenueSettings.biometrics.allowMinors`; DEC-237; `422 minors-not-enrolled`).
+
         '
       tags:
       - access
@@ -656,6 +666,17 @@ paths:
                     givenAt:
                       type: string
                       format: date-time
+                    consentFormId:
+                      type: string
+                      format: uuid
+                      nullable: true
+                      description: The venue's consent form the guest accepted (`VenueSettings.biometrics.consentFormId`;
+                        DEC-128; CHG-CSP-018). The server refuses a capture whose form is not the venue's current one.
+                    consentFormVersion:
+                      type: integer
+                      nullable: true
+                      minimum: 1
+                      description: The version of that form shown (CHG-CSP-018).
                     guardianSubjectId:
                       type: string
                       format: uuid
@@ -685,7 +706,10 @@ paths:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
-          description: Capture quality too low to match against later in the visit.
+          description: Capture quality too low to match against later in the visit, or the subject is a minor
+            and the venue does not enrol minors (`minors-not-enrolled`; DEC-237; CHG-CSP-019).
+          x-ticvai-problem-types:
+          - minors-not-enrolled
           content:
             application/problem+json:
               schema:
@@ -824,6 +848,22 @@ paths:
         is a minor is an open value that client counsel sets**; a subject with no date of birth is treated as a minor
         (audit R126).
 
+
+        **Decided 2 October 2026 (Chinmay, critical set 1; CHG-CSP-019, CHG-CSP-021, CHG-CSP-018):**
+
+        - **A self-service kiosk may enrol, with the consent shown on its screen; a turnstile may not** (BO-186: "App +
+          staffed counters + self-service kiosk (consent shown); not the turnstile"; DEC-236; MoM DI-641). `source`
+          gains `selfServiceKiosk` where the venue''s Face Pass configuration enables that channel; a gate stays absent.
+          The 3.2.43 sentence above is amended for the kiosk only. The enrolment reports its channel as
+          `FacePassEnrolment.enrolmentChannel`; its `source` keeps the r1 values and reads `ticketCounter` for a kiosk
+          enrolment (an on-site enrolment), so a client built at r1 meets no value it does not know.
+        - **Minors: guardian consent on the venue''s form; the minor age per country; the venue can switch minors off**
+          (BO-187, CMS-029; supersedes the GST-069 default; DEC-237). The age is `tenancy.RegionSettings.minorAgeThreshold`
+          (default 18, for counsel to confirm per country, R205); with `VenueSettings.biometrics.allowMinors` off a
+          minor''s enrolment is refused `422 minors-not-enrolled`.
+        - **Consent on the venue''s own consent form** (BO-188; DEC-128, DEC-549): `consent.consentFormId` and
+          `consentFormVersion` name the form shown, as for a Face Tag.
+
         No image is stored — a template is. **The template cannot reconstruct the face**, and that is the property that
         makes retention defensible at all (CF-35, CF-64).
 
@@ -885,7 +925,11 @@ paths:
                   - guestApp
                   - ticketCounter
                   - annualPassCounter
-                  description: '**The three surfaces 3.2.43 allows.** A gate and a kiosk are absent deliberately.
+                  - selfServiceKiosk
+                  description: '**The three surfaces 3.2.43 allows, and the self-service kiosk since 2 October 2026**
+                    (Chinmay, BO-186; DEC-236; CHG-CSP-021): a kiosk shows the venue''s consent form on its screen and
+                    enrols only where the venue''s Face Pass configuration enables `selfServiceKiosk`. A gate is absent
+                    deliberately.
 
                     '
                 consent:
@@ -900,6 +944,16 @@ paths:
                     givenAt:
                       type: string
                       format: date-time
+                    consentFormId:
+                      type: string
+                      format: uuid
+                      nullable: true
+                      description: The venue's consent form accepted (DEC-128; CHG-CSP-018).
+                    consentFormVersion:
+                      type: integer
+                      nullable: true
+                      minimum: 1
+                      description: The version of that form shown (CHG-CSP-018).
                     guardianSubjectId:
                       type: string
                       format: uuid
@@ -952,7 +1006,10 @@ paths:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
-          description: Capture quality too low to enrol. Retake rather than store something that will not match.
+          description: Capture quality too low to enrol. Retake rather than store something that will not match. Or the
+            subject is a minor and the venue does not enrol minors (`minors-not-enrolled`; DEC-237; CHG-CSP-019).
+          x-ticvai-problem-types:
+          - minors-not-enrolled
           content:
             application/problem+json:
               schema:
@@ -1063,7 +1120,10 @@ paths:
         - "P02 GST-027 Parking – Reserve & Pay"
         - "P02 GST-028 Parking – Reservation Confirmed"
         - "P08 BO-006 Parking Configuration"
+      # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
+      # or staff token is still accepted. `{}` makes the credential optional.
       security:
+      - {}
       - guestAuth: []
       - bearerAuth: []
       x-ticvai-audience:
@@ -1419,14 +1479,8 @@ paths:
         - "P06 EMP-015 Group scan"
         - "P06 EMP-017 Sync & reconciliation"
         - "P07 SCN-003 Ready to scan"
-        - "P07 SCN-007 Group admission"
-        - "P07 SCN-008 Manual entry"
-        - "P07 SCN-009 Ticket lookup"
         - "P07 SCN-013 Offline journal"
         - "P07 SCN-014 Sync & reconciliation"
-        - "P07 SCN-015 Offline package"
-        - "P08 BO-034 Scan Activity"
-        - "P08 BO-035 Override Audit"
         - "P08 BO-060 Attendance & Footfall"
         - "P08 BO-228 Manual Override & Supervisor Approval"
       x-ticvai-audience:
@@ -1513,6 +1567,7 @@ paths:
         - "P08 BO-034 Scan Activity"
         - "P08 BO-035 Override Audit"
         - "P08 BO-060 Attendance & Footfall"
+        - "P08 BO-358 Media Binding, Activation & Assignment Operations"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -1559,19 +1614,11 @@ paths:
     post:
       operationId: syncScans
       x-ticvai-consumed-by:
-        - "P06 EMP-010 Scan — ready"
         - "P06 EMP-015 Group scan"
         - "P06 EMP-017 Sync & reconciliation"
         - "P06 EMP-049 Hand over the journal"
-        - "P07 SCN-003 Ready to scan"
-        - "P07 SCN-007 Group admission"
-        - "P07 SCN-008 Manual entry"
-        - "P07 SCN-009 Ticket lookup"
         - "P07 SCN-013 Offline journal"
         - "P07 SCN-014 Sync & reconciliation"
-        - "P07 SCN-015 Offline package"
-        - "P08 BO-034 Scan Activity"
-        - "P08 BO-035 Override Audit"
         - "P08 BO-060 Attendance & Footfall"
       x-ticvai-audience:
       - staff
@@ -1637,17 +1684,11 @@ paths:
     get:
       operationId: listScans
       x-ticvai-consumed-by:
-        - "P06 EMP-010 Scan — ready"
         - "P06 EMP-015 Group scan"
         - "P06 EMP-017 Sync & reconciliation"
         - "P06 EMP-049 Hand over the journal"
-        - "P07 SCN-003 Ready to scan"
-        - "P07 SCN-007 Group admission"
-        - "P07 SCN-008 Manual entry"
         - "P07 SCN-009 Ticket lookup"
-        - "P07 SCN-013 Offline journal"
         - "P07 SCN-014 Sync & reconciliation"
-        - "P07 SCN-015 Offline package"
         - "P08 BO-034 Scan Activity"
         - "P08 BO-035 Override Audit"
         - "P08 BO-060 Attendance & Footfall"
@@ -1716,22 +1757,15 @@ paths:
     get:
       operationId: getOfflinePackage
       x-ticvai-consumed-by:
-        - "P04 POS-013 Mobile POS, Event Sales & Offline Operations"
-        - "P06 EMP-010 Scan — ready"
         - "P06 EMP-015 Group scan"
         - "P06 EMP-017 Sync & reconciliation"
-        - "P07 SCN-003 Ready to scan"
         - "P07 SCN-007 Group admission"
         - "P07 SCN-008 Manual entry"
         - "P07 SCN-009 Ticket lookup"
         - "P07 SCN-013 Offline journal"
         - "P07 SCN-014 Sync & reconciliation"
         - "P07 SCN-015 Offline package"
-        - "P08 BO-034 Scan Activity"
-        - "P08 BO-035 Override Audit"
-        - "P08 BO-037 Offline Package Status"
         - "P08 BO-060 Attendance & Footfall"
-        - "P08 BO-207 Edge Package & Data Distribution"
       x-ticvai-note: >-
         **The active admission policy version travels in the package** (ADR-0068, accepted 1 October): the
         dynamic policies at their active versions with their closed-format `conditionRule`, and `policySetVersion`,
@@ -1818,10 +1852,7 @@ paths:
     put:
       operationId: setTurnstileMode
       x-ticvai-consumed-by:
-        - "P07 SCN-002 Access point & direction"
         - "P07 SCN-016 Gate mode"
-        - "P08 BO-064 Zones & Areas"
-        - "P08 BO-194 Device & Gate Command Center"
         - "P08 BO-230 Live Gate Mode & Lane Control"
       x-ticvai-audience:
       - staff
@@ -1846,6 +1877,11 @@ paths:
         **The gate mode policy is enforced here** (`setGateModePolicy`): for `freeFlow` or `dropArm`, a caller whose role
         is not in the policy''s `whoCanActivate` is refused `403`, a missing reason where `reasonRequired` is `400`, and
         an activation whose policy says `createsIncident` opens an access incident.
+
+
+        **R221 amended 2 October 2026** (Chinmay, critical set 1, BO-230; DEC-255; CHG-CSP-032): the direction can now be
+        switched live, by `setAccessPointDirection` and its own permission, not by this operation; a mode change still
+        never changes the direction.
 
         '
       tags:
@@ -1915,7 +1951,6 @@ paths:
       x-ticvai-consumed-by:
         - "P07 SCN-002 Access point & direction"
         - "P07 SCN-016 Gate mode"
-        - "P08 BO-006 Parking Configuration"
         - "P08 BO-064 Zones & Areas"
         - "P08 BO-103 Access & Venue"
         - "P08 BO-148 Access Point Directory"
@@ -1961,7 +1996,7 @@ paths:
       operationId: createAccessPoint
       x-ticvai-consumed-by:
         - "P08 BO-064 Zones & Areas"
-        - "P08 BO-144 Access Control Command Center"
+        - "P08 BO-148 Access Point Directory"
       x-ticvai-audience:
       - staff
       summary: Create an access point
@@ -1994,6 +2029,95 @@ paths:
                 $ref: '#/components/schemas/AccessPoint'
         '400':
           $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /access-points/{accessPointId}/direction:
+    parameters:
+    - name: accessPointId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    put:
+      operationId: setAccessPointDirection
+      x-ticvai-consumed-by:
+        - "P07 SCN-016 Gate mode"
+        - "P08 BO-230 Live Gate Mode & Lane Control"
+      x-ticvai-audience:
+      - staff
+      summary: Switch a gate's direction live
+      description: '**A gate''s direction can be switched live, by a holder of the permission, and the switch is
+        logged** (decided 2 October 2026, Chinmay, critical set 1, BO-230: "Live direction switch with permission,
+        logged; R221 amended"; DEC-255; CHG-CSP-032; DI-648, the client on 2 September: more entry gates in the
+        morning, more exit gates in the evening). Until then direction was fixed per access point and changed only
+        by editing the access point in the back office (audit R221).
+
+
+        **The permission** is `ACCESS_DIRECTION_SET`, the dedicated gate-direction permission (joined the vocabulary
+        2 October, CHG-FUP-006), not the podium''s `TURNSTILE_MODE_SET`: a steward who may switch a lane to free flow
+        may not turn it round, and the live switch is a narrower right than `ACCESS_POINT_CONFIGURE`, which edits the
+        access point itself. **Logged** twice: one `access.gate_mode_change` row (from and to direction,
+        operator, reason, effective time), which Live Gate Mode & Lane Control and the shift handover read, and one
+        `access.configuration_change` row. Takes effect at once, or at a future `effectiveAt` (then `202`,
+        cancelled with `cancelGateModeChange`). Devices pick it up from the next push; an offline device keeps its
+        old direction until it reconnects, and the response''s `AccessPoint` says so through its device status.
+
+        '
+      tags:
+      - accessPoint
+      x-ticvai-permission: ACCESS_DIRECTION_SET
+      x-ticvai-scope-level: venue
+      x-ticvai-config-change-log: Also appends one access.configuration_change row (subjectType, subjectId, before and
+        after) in the same transaction; see "Configuration change log" in the contract header (CHG-CSP-032)
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - direction
+              - reason
+              properties:
+                direction:
+                  $ref: '#/components/schemas/Direction'
+                reason:
+                  type: string
+                  minLength: 3
+                  maxLength: 200
+                  description: Why the gate is turned round, kept on the log.
+                effectiveAt:
+                  type: string
+                  format: date-time
+                  nullable: true
+                  description: Absent or not in the future, at once; in the future, held `pending` until then.
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: ../shared/common.yaml#/components/headers/ConsistencyToken
+          description: Direction switched
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessPoint'
+        '202':
+          description: 'Scheduled: a future `effectiveAt` was sent and the switch is held `pending`'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessGateModeChange'
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /access-points/{accessPointId}:
@@ -2034,8 +2158,9 @@ paths:
     patch:
       operationId: updateAccessPoint
       x-ticvai-consumed-by:
-        - "P08 BO-006 Parking Configuration"
         - "P08 BO-064 Zones & Areas"
+        - "P08 BO-147 Attraction Access Configuration"
+        - "P08 BO-148 Access Point Directory"
       x-ticvai-audience:
       - staff
       summary: Update an access point
@@ -2076,6 +2201,28 @@ paths:
                     vendor-specific.
 
                     '
+                temporaryClosure:
+                  type: object
+                  nullable: true
+                  description: 'Close or reopen the access point''s attraction for a while (`AccessPoint.temporaryClosure`;
+                    DEC-228; CHG-CSP-026). Null reopens it.'
+                  properties:
+                    isClosed:
+                      type: boolean
+                    reason:
+                      type: string
+                      maxLength: 200
+                      nullable: true
+                    reopensAt:
+                      type: string
+                      format: date-time
+                      nullable: true
+                    offerVirtualQueueReturn:
+                      type: boolean
+                    queueId:
+                      type: string
+                      format: uuid
+                      nullable: true
       responses:
         '200':
           headers:
@@ -2096,6 +2243,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-032 Admission Profiles"
         - "P08 BO-154 Access Rule Command Center"
+        - "P08 BO-155 Visual Access Rule Builder"
         - "P08 BO-156 Entry, Exit & Re-entry Rules"
         - "P08 BO-158 Access Validity & Time Rules"
         - "P08 BO-160 Multi-Park & Crossover Rules"
@@ -2139,7 +2287,6 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-032 Admission Profiles"
         - "P08 BO-154 Access Rule Command Center"
-        - "P08 BO-214 Guest Journey Command Center"
         - "P08 BO-222 Special Event, Free View & Alternative Admission"
       x-ticvai-audience:
       - staff
@@ -2253,7 +2400,6 @@ paths:
     get:
       operationId: listBlacklist
       x-ticvai-consumed-by:
-        - "P07 SCN-003 Ready to scan"
         - "P08 BO-033 Blacklist Management"
       x-ticvai-audience:
       - staff
@@ -2294,6 +2440,15 @@ paths:
       description: 'Denies outright regardless of entitlement state. Included in the offline package so
         it holds during an outage — a blacklist that only works online is not a blacklist.
 
+
+        **A whitelist entry needs a second approver; a blacklist entry does not** (decided 2 October 2026, Chinmay,
+        critical set 1, BO-229: "Second approver for permanent locks, whitelist, and releasing identity/permanent
+        locks"; DEC-254; CHG-CSP-031). `listType` `whitelist` (an approved exception to a restriction, BO-229) is not
+        written at once: the call answers `202` with the approval request it raised (approvals kind
+        `accessPermissionChange`, subject type `whitelistEntry`) and the entry is written when a second person
+        approves; the requester cannot approve their own. Until 2 October this write could only blacklist; `listType`
+        and `disableScope` are optional and default to the blacklist behaviour.
+
         **One entry per media code in the tenant** (decided 28 September, audit R108). A media code is
         honoured at every venue of the tenant, so a second entry for the same code is refused `409`
         rather than stored beside the first; change the existing entry by removing and re-adding it.
@@ -2327,6 +2482,24 @@ paths:
                 expiresAt:
                   type: string
                   format: date-time
+                listType:
+                  type: string
+                  enum:
+                  - blacklist
+                  - whitelist
+                  default: blacklist
+                  description: A whitelist entry waits for a second approver (DEC-254; CHG-CSP-031).
+                disableScope:
+                  type: string
+                  enum:
+                  - entireCredential
+                  - venueAccess
+                  - attractionAccess
+                  - reEntry
+                  - fastPass
+                  - specificEntitlement
+                  default: entireCredential
+                  description: What the entry disables (`BlacklistEntry.disableScope`).
       responses:
         '201':
           headers:
@@ -2337,6 +2510,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BlacklistEntry'
+        '202':
+          description: 'A whitelist entry, held for a second approver (DEC-254; CHG-CSP-031). Written when approved.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessPendingSecondApproval'
         '409':
           $ref: ../shared/common.yaml#/components/responses/DuplicateCode
         '429':
@@ -2382,13 +2561,8 @@ paths:
         - "P06 EMP-017 Sync & reconciliation"
         - "P07 SCN-003 Ready to scan"
         - "P07 SCN-007 Group admission"
-        - "P07 SCN-008 Manual entry"
-        - "P07 SCN-009 Ticket lookup"
         - "P07 SCN-013 Offline journal"
         - "P07 SCN-014 Sync & reconciliation"
-        - "P07 SCN-015 Offline package"
-        - "P08 BO-034 Scan Activity"
-        - "P08 BO-035 Override Audit"
         - "P08 BO-060 Attendance & Footfall"
       x-ticvai-audience:
       - staff
@@ -2736,7 +2910,6 @@ paths:
     get:
       operationId: listVirtualTicketStatus
       x-ticvai-consumed-by:
-        - "P08 BO-334 Virtual Ticket Command Center"
         - "P08 BO-336 Virtual Ticket Status & Lifecycle Model"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
@@ -2786,7 +2959,6 @@ paths:
     get:
       operationId: listMediaTypeCredential
       x-ticvai-consumed-by:
-        - "P08 BO-174 Media & Credential Command Center"
         - "P08 BO-337 Media Type & Credential Technology Registry"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
@@ -3162,7 +3334,6 @@ paths:
     get:
       operationId: listVirtualTicketArchitecture
       x-ticvai-consumed-by:
-        - "P08 BO-334 Virtual Ticket Command Center"
         - "P08 BO-343 Virtual Ticket Architecture Testing, Governance & Audit"
       x-ticvai-audience:
       - staff
@@ -3552,7 +3723,6 @@ paths:
     put:
       operationId: setRfidNfcCard
       x-ticvai-consumed-by:
-        - "P08 BO-180 RFID & NFC Configuration"
         - "P08 BO-349 RFID, NFC, Card & Wristband Media Designer"
       x-ticvai-audience:
       - staff
@@ -3890,7 +4060,6 @@ paths:
       operationId: listCredential
       x-ticvai-consumed-by:
         - "P08 BO-354 Credential Operations Command Center"
-        - "P08 BO-653 Credential Registry & Credential History"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Ticket Media & Credential Management'' p.41-42 (15.3.1); MoM
@@ -4017,8 +4186,6 @@ paths:
   /virtual-ticket-credential:
     put:
       operationId: setVirtualTicketCredential
-      x-ticvai-consumed-by:
-        - "P08 BO-355 Virtual Ticket & Credential 360° Workspace"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Ticket Media & Credential Management'' p.43-44 (15.3.2); MoM
@@ -4081,7 +4248,6 @@ paths:
       operationId: listCredentialGenerationIssuance
       x-ticvai-consumed-by:
         - "P08 BO-356 Credential Generation & Issuance Monitor"
-        - "P08 BO-644 Credential Issuance Command Center"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Ticket Media & Credential Management'' p.45-46 (15.3.3); our
@@ -5114,6 +5280,15 @@ paths:
         **The screen''s actions are behaviour, not fields:** Submit for approval (`createApprovalRequest`);
         Roll back to previous configuration (no operation yet).
 
+
+        **Approval is a policy the venue switches on or off** (decided 2 October 2026, Chinmay, batch 6 set 10a,
+        BO-153: "A policy the venue switches on/off (second-person approval when on)"; DEC-230; CHG-CSP-028). Off by
+        default: a holder of ACCESS_POINT_CONFIGURE publishes at once. On (an active approvals matrix of kind
+        `configurationChange` whose rule names subject type `topologyPublication`; approvals
+        `ApprovalRule.subjectTypes`): the publication is held, the `200` response carries `awaitingApproval` true and
+        `approvalRequestId`, and it publishes when a second person approves (the approval inbox follows it); the approvals engine refuses the
+        author as approver (`approverIsRequester`).
+
         '
       tags:
       - access
@@ -5323,8 +5498,6 @@ paths:
   /entry-exit-rule:
     get:
       operationId: listEntryExitRule
-      x-ticvai-consumed-by:
-        - "P08 BO-156 Entry, Exit & Re-entry Rules"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -5571,7 +5744,6 @@ paths:
     get:
       operationId: listMultiParkCrossover
       x-ticvai-consumed-by:
-        - "P08 BO-160 Multi-Park & Crossover Rules"
         - "P08 BO-220 Multi-Park & Crossover Journey Orchestrator"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
@@ -5889,7 +6061,6 @@ paths:
     put:
       operationId: setDynamicSecurityProfile
       x-ticvai-consumed-by:
-        - "P08 BO-164 Digital Credential Security Command Center"
         - "P08 BO-165 Dynamic QR Security Profile Builder"
       x-ticvai-audience:
       - staff
@@ -7249,9 +7420,7 @@ paths:
     put:
       operationId: setBiometricVerificationProfile
       x-ticvai-consumed-by:
-        - "P08 BO-184 Biometric Access Command Center"
         - "P08 BO-185 Biometric Verification Profile Builder"
-        - "P08 BO-191 Biometric Validation at Gate"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Access Control Module'' p.58 (5.2); MoM 2 Sep 2026 (Face Pass,
@@ -7309,7 +7478,6 @@ paths:
     put:
       operationId: setFacePassEnrollment
       x-ticvai-consumed-by:
-        - "P08 BO-184 Biometric Access Command Center"
         - "P08 BO-186 Face Pass Enrollment Configuration"
       x-ticvai-audience:
       - staff
@@ -7370,9 +7538,9 @@ paths:
       x-ticvai-audience:
       - staff
       x-ticvai-provisional: true
-      x-ticvai-make-or-break: 'At what age must a guardian consent to a minor''s Face Pass enrolment, per
-        jurisdiction? — why: (a) biometric data protection and age-of-majority law differ by country; counsel
-        sets the age (R205)'
+      x-ticvai-make-or-break: 'Decided 2 October 2026 (Chinmay, critical set 1, BO-187; DEC-237; CHG-CSP-019): the minor age
+        is set per country (tenancy RegionSettings.minorAgeThreshold, default 18) and the venue can switch minors
+        off; what stays open is counsel confirming the age in each country the client operates (R205)'
       summary: Biometric Consent & Guardian Management
       description: '**Drafted from the workshop pack and checked against it on 29 September.** Access Control
         Module, page 60. The screen says: Manage consent requirements associated with persistent biometric
@@ -7395,6 +7563,14 @@ paths:
 
 
         **The screen''s actions are behaviour, not fields:** Configure consent requirement (no operation yet).
+
+
+        **Minors, decided 2 October 2026** (Chinmay, critical set 1, BO-187 and CMS-029: "Guardian consent on the
+        venue''s form; minor age per country; the venue can switch minors off"; supersedes the GST-069 default;
+        DEC-237; CHG-CSP-019). The age is per country (`tenancy.RegionSettings.minorAgeThreshold`), the switch is
+        the venue''s (`tenancy.VenueSettings.biometrics.allowMinors`), and the consent requirement is configured
+        there and in the venue''s consent form (`VenueSettings.biometrics.consentFormId`; DEC-128, DEC-549), so the
+        action above now has its writes: `setVenueSettings` and `updateRegionSettings`.
 
         '
       tags:
@@ -7534,6 +7710,13 @@ paths:
         no default: it is the one make-or-break value on this screen, and until the client''s counsel names it
         a venue can use every other trigger.
 
+
+        **Consent first, on the venue''s own form, and a warning where TICVAI holds the data** (decided 2 October
+        2026, Chinmay, batch 4, BO-188; DEC-128; CHG-CSP-018). A profile names the consent form its captures are
+        taken on (`consentFormId`); where TICVAI stores the templates the response says so
+        (`FaceTagTemporaryEnrollmentView.templatesHeldByTicvai`) and the screen warns the venue. How long a Face
+        Tag may be kept past its trigger is still for counsel (DEC-240, research pending).
+
         '
       tags:
       - access
@@ -7566,7 +7749,10 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '422':
-          description: operationalRetentionThreshold chosen with no retentionThresholdHours
+          description: operationalRetentionThreshold chosen with no retentionThresholdHours, or no consent form
+            on the profile or the venue (`consent-form-required`; CHG-CSP-018)
+          x-ticvai-problem-types:
+          - consent-form-required
           content:
             application/problem+json:
               schema:
@@ -8080,6 +8266,7 @@ paths:
       operationId: listDeviceTypeHardware
       x-ticvai-consumed-by:
         - "P08 BO-195 Device Type & Hardware Library"
+        - "P08 BO-475 Reader Manufacturer & Model Profile"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -8640,7 +8827,6 @@ paths:
       operationId: setEdgeNodeLocal
       x-ticvai-consumed-by:
         - "P08 BO-205 Edge Node & Local Processing Configuration"
-        - "P08 BO-241 Policy Evaluation Architecture & Offline Distribution"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Access Control Module'' 7.2 p.87; MoM 2 Sep 2026 (offline local
@@ -9053,6 +9239,7 @@ paths:
       operationId: listGuestJourney
       x-ticvai-consumed-by:
         - "P08 BO-214 Guest Journey Command Center"
+        - "P08 BO-223 Journey Simulation, Audit & Publication"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Access Control Module'' 8.1 p.101; MoM 2 Sep 2026 (group/B2B
@@ -9321,8 +9508,6 @@ paths:
   /entry-temporary-exit:
     get:
       operationId: listEntryTemporaryExit
-      x-ticvai-consumed-by:
-        - "P08 BO-219 Re-entry & Temporary Exit Journey"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -10169,6 +10354,7 @@ paths:
       operationId: listDynamicAccessPolicy
       x-ticvai-consumed-by:
         - "P08 BO-234 Dynamic Access Policy Command Center"
+        - "P08 BO-236 Visual Dynamic Policy Builder"
         - "P08 BO-243 Policy Approval, Audit, Analytics & AI Optimization"
       x-ticvai-audience:
       - staff
@@ -10329,7 +10515,6 @@ paths:
     put:
       operationId: setVisualDynamicPolicy
       x-ticvai-consumed-by:
-        - "P08 BO-234 Dynamic Access Policy Command Center"
         - "P08 BO-236 Visual Dynamic Policy Builder"
         - "P08 BO-238 Identity, Membership & Accreditation Policies"
       x-ticvai-audience:
@@ -10391,7 +10576,6 @@ paths:
     put:
       operationId: setContextTimeEvent
       x-ticvai-consumed-by:
-        - "P08 BO-222 Special Event, Free View & Alternative Admission"
         - "P08 BO-237 Context, Time, Event & Capacity Policy Builder"
       x-ticvai-audience:
       - staff
@@ -10698,7 +10882,6 @@ paths:
       operationId: simulatePolicyConflictImpact
       x-ticvai-consumed-by:
         - "P08 BO-242 Policy Simulation, Conflict & Impact Analysis"
-        - "P08 BO-981 Conflict & Impact Simulation"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Access Control Module'' p.144 (10.9 scenario results, Show list,
@@ -11310,7 +11493,6 @@ paths:
       operationId: listSecurityDetectionGovernance
       x-ticvai-consumed-by:
         - "P08 BO-253 Security Analytics, AI Detection & Governance"
-        - "P16 ANL-070 Analytics Governance, Security & Audit Center"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Access Control Module'' p.164 (11.10 Show, Analyze by, Measure,
@@ -12755,6 +12937,7 @@ paths:
     post:
       operationId: replaceCredential
       x-ticvai-consumed-by:
+        - "P08 BO-027 Reissue & Media Replacement"
         - "P08 BO-359 Credential Replacement, Reissue, Revocation & Recovery"
       x-ticvai-audience:
       - staff
@@ -12954,8 +13137,10 @@ paths:
       operationId: setGateOfflinePolicy
       x-ticvai-consumed-by:
         - "P08 BO-171 Offline Cryptographic Validation Profile"
+        - "P08 BO-206 Offline Validation Policy Builder"
         - "P08 BO-208 Offline Credential & Revocation Cache"
         - "P08 BO-210 Connectivity Failure & Degraded Mode Policy"
+        - "P08 BO-471 Offline, Synchronization & Recovery Monitor"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: writers pass; writes the table listOfflineCryptographicValidation, listOfflineCredentialRevocation
@@ -13057,6 +13242,11 @@ paths:
         and `publishTopologyValidation` reports the conflicts; the AI conflict warning is advisory and never blocks
         the write.
 
+
+        **The venue decides which overlapping entry wins** (decided 2 October 2026, Chinmay, BO-152; DEC-229;
+        CHG-CSP-027): the higher `priority`. An entry that overlaps another with the same priority is refused
+        `422 overlapping-entry-same-priority`, naming the other entry.
+
         '
       tags:
       - access
@@ -13102,7 +13292,10 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '422':
-          description: '`endsAt` is not after `startsAt`.'
+          description: '`endsAt` is not after `startsAt`, or the entry overlaps another with the same `priority`
+            (`overlapping-entry-same-priority`; CHG-CSP-027).'
+          x-ticvai-problem-types:
+          - overlapping-entry-same-priority
           content:
             application/problem+json:
               schema:
@@ -13168,6 +13361,7 @@ paths:
       operationId: setHardwareModel
       x-ticvai-consumed-by:
         - "P08 BO-195 Device Type & Hardware Library"
+        - "P08 BO-475 Reader Manufacturer & Model Profile"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: writers pass; writes the table listDeviceTypeHardware reads (pack ''Access Control
@@ -13232,6 +13426,100 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /hardware-models/{modelId}/certification:
+    parameters:
+    - name: modelId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    get:
+      operationId: getHardwareModelCertification
+      x-ticvai-audience:
+      - staff
+      x-ticvai-read-routing: replica
+      summary: A reader model's certification and its test results
+      description: '**What `setHardwareModelCertification` recorded, read back** (CHG-CSP-047): each capability tested,
+        passed or failed, and whether the model is certified and until when. A model never tested answers `404`.
+
+        '
+      tags:
+      - access
+      x-ticvai-permission: DEVICE_VIEW
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: The certification
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessHardwareCertification'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+    put:
+      operationId: setHardwareModelCertification
+      x-ticvai-audience:
+      - staff
+      summary: Certify a reader model, or record that it failed
+      description: '**Test and certify a new reader model before it is deployed** (design-notes correction on BO-483,
+        Block B: "Testing and approving a new reader model before deployment needs a hardware certification record;
+        certifyIntegration certifies API listings and listPaymentTerminalCertifications covers payment terminals
+        only"; CHG-CSP-047). BO-483 called `certifyIntegration` (DEVELOPER_ADMIN, a TICVAI permission no tenant
+        holds) for something that is not an API listing. This records, for one model in the hardware library, each
+        required capability passed or failed (an RFID or NFC tap, a credential read, text, price and balance on the
+        display, offline validation, relay control) and the outcome: `certified` with an end date, or `failed`.
+        A model with any required capability failed cannot be certified (`422 capability-failed`). Devices may still be
+        registered against an uncertified model; `publishHardwareDeployment` warns when one is deployed.
+
+
+        **PUT semantics**: the model has one certification record, replaced whole; a renewed certification replaces
+        the old one and the change log keeps the history.
+
+        '
+      tags:
+      - access
+      x-ticvai-permission: DEVICE_MANAGE
+      x-ticvai-scope-level: tenant
+      x-ticvai-config-change-log: Also appends one access.configuration_change row (subjectType, subjectId, before and
+        after) in the same transaction; see "Configuration change log" in the contract header (CHG-CSP-047)
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: primary
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccessHardwareCertification'
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: ../shared/common.yaml#/components/headers/ConsistencyToken
+          description: Recorded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessHardwareCertification'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '422':
+          description: '`certified` with a required capability failed (`capability-failed`), or with no `validUntil`.'
+          x-ticvai-problem-types:
+          - capability-failed
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /device-placements:
@@ -13324,7 +13612,6 @@ paths:
     put:
       operationId: updateAccessDevicePlacement
       x-ticvai-consumed-by:
-        - "P08 BO-194 Device & Gate Command Center"
         - "P08 BO-196 Physical Device Registration & Provisioning"
       x-ticvai-audience:
       - staff
@@ -13666,7 +13953,6 @@ paths:
       operationId: startPodiumShift
       x-ticvai-consumed-by:
         - "P07 SCN-002 Access point & direction"
-        - "P08 BO-225 Podium Operations Console"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: writers pass; writes the table listPodiumConsole reads (pack ''Access Control
@@ -14275,7 +14561,6 @@ paths:
     put:
       operationId: setDeviceBindingPolicy
       x-ticvai-consumed-by:
-        - "P08 BO-164 Digital Credential Security Command Center"
         - "P08 BO-167 Device Binding & Session Security"
       x-ticvai-audience:
       - staff
@@ -14418,7 +14703,6 @@ paths:
       operationId: releaseCredentialDevice
       x-ticvai-consumed-by:
         - "P08 BO-167 Device Binding & Session Security"
-        - "P08 BO-169 Credential Transfer & Rebinding"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: writers pass; writes the table listDeviceBindingSession reads (pack ''Access
@@ -14948,6 +15232,7 @@ paths:
     post:
       operationId: lockIdentity
       x-ticvai-consumed-by:
+        - "P08 BO-229 Credential Disable, Blacklist & Whitelist Operations"
         - "P08 BO-244 Access Security & Fraud Command Center"
         - "P08 BO-247 Unified Identity & Credential Lock Manager"
       x-ticvai-audience:
@@ -14965,6 +15250,15 @@ paths:
         A fraud rule whose response is `temporarilyLock` or `fullIdentityLock` writes the same row from the detection
         job. A lock for `nHours` needs `lockHours` (`422`). A second active lock on the same subject and scope is
         refused `409 already-locked`.
+
+
+        **A permanent lock needs a second approver; an until-end-of-day lock never does** (decided 2 October 2026,
+        Chinmay, critical set 1, BO-229: "Second approver for permanent locks, whitelist, and releasing identity/permanent
+        locks; none for ''until end of day''"; DEC-254, DEC-260; CHG-CSP-031). A `lockDuration` `permanent` lock is not
+        written at once: the call answers `202` with the approval request it raised (approvals kind
+        `accessPermissionChange`, subject type `identityLock`), and the lock is written when a second person with the
+        security approver role approves it; the requester cannot approve their own (`approverIsRequester`). Every other
+        duration takes effect at once, as before. A lock written by the fraud detection job is never permanent.
 
         '
       tags:
@@ -14996,6 +15290,13 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '202':
+          description: 'A permanent lock, held for a second approver (DEC-254; CHG-CSP-031): the approval request raised.
+            The lock is written when it is approved.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessPendingSecondApproval'
         '409':
           description: '`already-locked`: an active lock covers this subject at this scope.'
           content:
@@ -15021,6 +15322,7 @@ paths:
     post:
       operationId: releaseIdentityLock
       x-ticvai-consumed-by:
+        - "P08 BO-229 Credential Disable, Blacklist & Whitelist Operations"
         - "P08 BO-247 Unified Identity & Credential Lock Manager"
       x-ticvai-audience:
       - staff
@@ -15031,6 +15333,14 @@ paths:
       description: 'Releases an active lock: `status: released`, with who and when. The release propagates the way
         the lock did. A lock tied to an open security investigation (`untilInvestigationComplete`) is refused `409
         investigation-open` until the investigation is resolved; a released lock is `409 lock-released`.
+
+
+        **Releasing a full-identity or a permanent lock needs a second approver** (decided 2 October 2026, Chinmay,
+        critical set 1, BO-229 and BO-247: "Second approver for ... releasing identity/permanent locks"; "As BO-229";
+        DEC-254, DEC-260; CHG-CSP-031). For a lock with `lockScope` `fullIdentity` or `lockDuration` `permanent` the call
+        answers `202` with the approval request it raised (approvals kind `accessPermissionChange`, subject type
+        `identityLockRelease`) and the lock stays active until a second person approves; the requester cannot approve
+        their own. Every other lock, including an until-end-of-day lock, is released at once.
 
         '
       tags:
@@ -15065,6 +15375,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AccessIdentityLock'
+        '202':
+          description: 'The release of a full-identity or permanent lock, held for a second approver (DEC-254, DEC-260;
+            CHG-CSP-031). The lock stays active until it is approved.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessPendingSecondApproval'
         '400':
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '403':
@@ -15157,6 +15474,99 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
           description: The alert is already resolved or dismissed.
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /face-reenrolment-attempts/{attemptId}/images:
+    parameters:
+    - name: attemptId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    get:
+      operationId: getFaceReenrolmentImages
+      x-ticvai-consumed-by:
+        - "P08 BO-190 Face Change, Re-enrollment & Identity Protection"
+        - "P08 BO-248 Biometric & Identity Integrity Monitoring"
+      x-ticvai-audience:
+      - staff
+      x-ticvai-read-routing: primary
+      summary: View the images behind a face re-enrolment review (logged)
+      description: '**Images behind "View images (logged)", for a holder of a specific permission; the match
+        score and the references are always visible without it** (decided 2 October 2026, Chinmay, critical set 1,
+        BO-190: "Images behind ''View images (logged)'', needing a specific permission; score and references always
+        visible"; and BO-248: "As BO-190"; DEC-239; CHG-CSP-023; ADR-0063).
+
+
+        Returns short-lived signed links (five minutes) to the new capture an attempt holds while it is
+        `pendingReview`, and to the enrolled face''s reference image where the enrolment kept one. **Every call
+        writes one `access.biometric_audit_event`** (who, which attempt, when, why), and the reason is required,
+        so a look is a recorded act. No template is ever returned. The new capture is purged when
+        `reviewFaceReenrolment` decides; after that this answers `409 images-purged`. Whether an enrolment keeps a
+        reference image at all is ADR-0063''s (the template-only rule); until it says so `enrolledImageUrl` is null
+        and the reviewer compares against the score and the references.
+
+
+        **The permission**: `BIOMETRIC_IMAGE_VIEW`, the dedicated permission the decision asks for (joined the
+        vocabulary 2 October, CHG-FUP-005), with an MFA step-up. Neither `GUEST_VIEW_PII` nor `GUEST_MANAGE`, which
+        reviews, opens the images; no preset but a module''s `all` ticks it.
+
+        '
+      tags:
+      - access
+      x-ticvai-permission: BIOMETRIC_IMAGE_VIEW
+      x-ticvai-step-up: mfa
+      x-ticvai-step-up-reason: Opens a guest's face images, special-category data under PDPL; every look is logged (DEC-239).
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - name: reason
+        in: query
+        required: true
+        description: Why the reviewer is looking, written to the biometric audit event.
+        schema:
+          type: string
+          minLength: 3
+          maxLength: 300
+      responses:
+        '200':
+          description: Signed links to the images, valid for five minutes
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - attemptId
+                - newCaptureUrl
+                - expiresAt
+                properties:
+                  attemptId:
+                    type: string
+                    format: uuid
+                  newCaptureUrl:
+                    type: string
+                    format: uri
+                  enrolledImageUrl:
+                    type: string
+                    format: uri
+                    nullable: true
+                  expiresAt:
+                    type: string
+                    format: date-time
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '409':
+          description: The attempt is no longer pending review and its images are purged (`images-purged`).
+          x-ticvai-problem-types:
+          - images-purged
           content:
             application/problem+json:
               schema:
@@ -18272,10 +18682,21 @@ components:
     AccessTicketStatusTransition:
       type: object
       x-ticvai-persistence: access.ticket_status_transition
-      description: One Virtual Ticket lifecycle transition rule - from status, to status, whether allowed, whether it
+      description: >
+        One Virtual Ticket lifecycle transition rule - from status, to status, whether allowed, whether it
         needs an authorised exception and where it may originate (declared 29 September, data-model close-out DM1). Seeded
         from states/entitlement-status.yaml when a venue is created; setTicketStatusTransition may narrow a move, never
         add one (decided 29 September, writers pass).
+
+
+        **The 13 names are the client's, mapped onto the entitlement model** (decided 2 October 2026, Chinmay, critical
+        set 2, BO-336; DEC-266; CHG-CSP-033): created and pendingFulfillment (Reserved, DI-670) are the order before an
+        entitlement is issued; active is `issued`; partiallyUsed and used are `partiallyConsumed` and `fullyConsumed`;
+        expired is `expired`; suspended is `issued` with the suspended flag; blocked is `issued` under an active identity
+        lock; cancelled, voided, refunded and reissuedSuperseded are `cancelled` told apart by
+        `Entitlement.cancellationKind`; transferred is `surrendered`. Every name maps, so no state was added to the model;
+        a cell with no model transition behind it is locked "Not in the platform lifecycle". `Entitlement.lifecycleLabel`
+        carries the name.
       required:
       - id
       - fromStatus
@@ -18499,6 +18920,20 @@ components:
         securityClassification:
           type: string
           nullable: true
+          description: 'The venue''s label for the zone''s classification level, renamable per venue (for example
+            "Staff only" for `restricted`). The level itself is `securityClassificationLevel` (DEC-227; CHG-CSP-025).'
+        securityClassificationLevel:
+          type: string
+          nullable: true
+          enum:
+          - public
+          - restricted
+          - secure
+          - critical
+          description: '**The zone''s security classification: Public, Restricted, Secure or Critical, the labels
+            renamable by the venue** (decided 2 October 2026, Chinmay, batch 6 set 9, BO-146: "Public / Restricted
+            / Secure / Critical (renamable)"; DEC-227; CHG-CSP-025). A controlled level so rules and reports compare
+            zones across venues; the venue''s own wording is `securityClassification`. Null on a non-zone row.'
         entryRequirements:
           type: string
           nullable: true
@@ -19043,7 +19478,15 @@ components:
           type: integer
           minimum: 0
           nullable: true
-          description: Hours a gate may validate offline
+          description: '**Hours a reader may validate offline; past it, readers refuse offline taps** (decided 2 October
+            2026, Chinmay, critical set 1, BO-471: "Yes: the venue sets a maximum offline duration; readers then refuse
+            offline taps"; DEC-426; CHG-CSP-035). Counted from the reader''s last successful sync. Past the limit an
+            access gate, a handheld and a games reader refuse every tap they would have validated from their local
+            package (`ValidationResult.denyCause` `offlineLimitExceeded`) until they reconnect; `afterThresholdBehavior`
+            decides only what the operator is shown and whether a supervisor may admit by hand (`supervisorMode`), and
+            none of its values lets a reader keep validating unattended. The limit travels in the offline package
+            (ADR-0068), so a reader that has lost the platform still knows it. Null sets no limit beyond the package''s
+            own expiry.'
         offlineChecks:
           type: array
           items:
@@ -19197,6 +19640,24 @@ components:
           type: boolean
           nullable: true
           description: 'Special windows: operator enters attendance count'
+        venueClosed:
+          type: boolean
+          default: false
+          description: '**A day the whole venue is closed** (design-notes correction on BO-019, Block B: "No operation sets
+            product blackout dates or a venue closure day"; CHG-CSP-051). Every gate refuses admission for the entry''s
+            dates, as `temporaryClosure` does for one attraction, and the closures screen shows it beside the product
+            blackouts (catalogue `setEntitlementTemplateBlackoutDates`). Stopping sales for those dates is the
+            performances'' own (`cancelPerformance`, catalogue).'
+        priority:
+          type: integer
+          minimum: 0
+          maximum: 1000
+          default: 0
+          description: '**Which entry wins where two overlap: the higher priority** (decided 2 October 2026, Chinmay,
+            batch 6 set 10a, BO-152: "The venue sets a priority per entry"; DEC-229; CHG-CSP-027). A holiday inside a
+            season, a private event on a free-entry day: the venue says which applies by giving it the higher
+            number. Two overlapping entries with the same priority are refused `422 overlapping-entry-same-priority`,
+            so the calendar never has to guess.'
         scopePath: *id001
         createdAt: *id002
         updatedAt: *id003
@@ -19346,6 +19807,77 @@ components:
         scopePath: *id001
         createdAt: *id002
         updatedAt: *id003
+    AccessHardwareCertification:
+      type: object
+      x-ticvai-persistence: access.hardware_certification
+      description: '**One reader model''s certification: each required capability tested, and the outcome** (CHG-CSP-047;
+        BO-483). One record per hardware model.'
+      required:
+      - modelId
+      - outcome
+      - results
+      properties:
+        modelId:
+          type: string
+          format: uuid
+          description: The `AccessHardwareModel` certified.
+        outcome:
+          type: string
+          enum:
+          - certified
+          - failed
+        results:
+          x-ticvai-persistence-kind: valueObject
+          x-ticvai-persistence-column: jsonb
+          type: array
+          minItems: 1
+          items:
+            type: object
+            required:
+            - capability
+            - passed
+            properties:
+              capability:
+                type: string
+                enum:
+                - rfidTap
+                - nfcTap
+                - credentialRead
+                - displayText
+                - displayPrice
+                - displayBalance
+                - offlineValidation
+                - relayControl
+              isRequired:
+                type: boolean
+                default: true
+                description: Whether the venue needs this capability; a failed required one blocks certification.
+              passed:
+                type: boolean
+              notes:
+                type: string
+                maxLength: 500
+                nullable: true
+        validUntil:
+          type: string
+          format: date
+          nullable: true
+          description: When the certification ends; required for `certified`. Firmware changes may need a new one.
+        firmwareVersionTested:
+          type: string
+          maxLength: 64
+          nullable: true
+        certifiedByPrincipalId:
+          type: string
+          format: uuid
+          readOnly: true
+        certifiedAt:
+          type: string
+          format: date-time
+          readOnly: true
+        scopePath:
+          type: string
+          readOnly: true
     AccessHardwareModel:
       type: object
       x-ticvai-persistence: access.hardware_model
@@ -19900,6 +20432,17 @@ components:
         targetMode:
           allOf:
           - $ref: '#/components/schemas/AccessPointOperatingMode'
+        fromDirection:
+          allOf:
+          - $ref: '#/components/schemas/Direction'
+          nullable: true
+          description: 'Set on a live direction switch (`setAccessPointDirection`; DEC-255; CHG-CSP-032); null on a
+            mode change. On a direction switch `targetMode` repeats the unchanged operating mode.'
+        toDirection:
+          allOf:
+          - $ref: '#/components/schemas/Direction'
+          nullable: true
+          description: The direction switched to (CHG-CSP-032).
         status:
           type: string
           enum:
@@ -20533,6 +21076,31 @@ components:
             - requireSupervisor
             - allowOverride
             - triggerSecurityAlert
+        appliesTo:
+          type: object
+          nullable: true
+          description: '**What the rule covers: venue-wide by default, or chosen products or admission profiles**
+            (decided 2 October 2026, Chinmay, batch 6 set 10a, BO-157: "An ''Applies to'' picker: venue-wide by
+            default, or chosen products/profiles"; DEC-231; CHG-CSP-029). Null or `mode: venueWide` applies at the
+            rule''s scope to every product; `selected` applies only to the products and admission profiles listed
+            (at least one). Validation reads it with the admission rules and it travels in the offline package.'
+          properties:
+            mode:
+              type: string
+              enum:
+              - venueWide
+              - selected
+              default: venueWide
+            productIds:
+              type: array
+              items:
+                type: string
+                format: uuid
+            admissionProfileIds:
+              type: array
+              items:
+                type: string
+                format: uuid
         createdAt:
           type: string
           format: date-time
@@ -22313,6 +22881,15 @@ components:
           description: 'Used only when deletionTrigger is operationalRetentionThreshold, and then required. **No
             default and no maximum here on purpose**: the longest lawful period is the client counsel''s value
             (make-or-break (a), see the operation)'
+        consentFormId:
+          type: string
+          format: uuid
+          nullable: true
+          description: '**The venue''s own consent form a Face Tag is captured on** (decided 2 October 2026, Chinmay,
+            batch 4, BO-188: "consent first, using a consent form from the venue"; DEC-128, DEC-549; CHG-CSP-018).
+            Null uses the venue''s biometric consent form (`tenancy.VenueSettings.biometrics.consentFormId`); either
+            way the form comes from the one consent-form builder in Venue Management. With neither, the profile is
+            refused `422 consent-form-required`.'
         consentCapture:
           type: string
           enum:
@@ -23635,6 +24212,63 @@ components:
             same writes. A scan replayed late with an earlier `recordedAt` does not move it back.
 
             '
+        firstEntryAt:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+          x-ticvai-derived: onWrite
+          description: '`recordedAt` of the first admission, written by the same writes as `lastEntryAt`; it starts a
+            time-bound entitlement''s window (DEC-232; CHG-CSP-030). A replayed earlier scan moves it back.'
+        timeBoundUntil:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+          x-ticvai-derived: onWrite
+          description: '**Where the template is time-bound, when its window closes**: `firstEntryAt` plus the
+            validity rule''s `minutesAfterFirstScan` (decided 2 October 2026, Chinmay, BO-159; DEC-232; CHG-CSP-030).
+            Null until the first scan and on an entitlement with no time bound. A scan after it is denied
+            (`timeBoundWindowElapsed`); it never extends `validTo`, and the earlier of the two wins.'
+        lifecycleLabel:
+          type: string
+          readOnly: true
+          x-ticvai-persisted: false
+          x-ticvai-derived: onRead
+          enum:
+          - created
+          - pendingFulfillment
+          - active
+          - partiallyUsed
+          - used
+          - expired
+          - suspended
+          - cancelled
+          - voided
+          - reissuedSuperseded
+          - refunded
+          - transferred
+          - blocked
+          description: '**The Virtual Ticket status in the client''s 13 names, mapped onto the entitlement model**
+            (decided 2 October 2026, Chinmay, critical set 2, BO-336: "Map the pack''s 13 names onto the model; add any
+            missing states", and BO-336/DI-670: "Reserved maps to Pending fulfilment"; DEC-266; CHG-CSP-033). Computed
+            on read from `status` (orders `EntitlementStatus`), `suspendedReason`, `cancellationKind`, `issuedVia` and an
+            active identity lock; the mapping is in `states/entitlement-status.yaml`. It is what BO-334, BO-336 and the
+            ticket status transition matrix (`AccessTicketStatusTransition`) show; logic still reads `status`.'
+        cancellationKind:
+          type: string
+          nullable: true
+          readOnly: true
+          x-ticvai-derived: onWrite
+          enum:
+          - voided
+          - refunded
+          - performanceCancelled
+          - superseded
+          description: '**Which act cancelled the entitlement**, so the pack''s Voided, Refunded and Reissued /
+            superseded are told apart while `status` keeps the one r1 value `cancelled` (DEC-266; CHG-CSP-033).
+            Written with the cancelling transition: `voidEntitlement`, `createRefund`, `cancelPerformance`, or a
+            reissue that supersedes it (`supersedesEntitlementId` on the new one). Null unless `cancelled`.'
         frozenDays:
           type: integer
           default: 0
@@ -23784,6 +24418,17 @@ components:
         offering a switch that turns a ticket into a condition.
 
         **Inert while `VenueSettings.biometrics.isEnabled` is false.**
+
+        **What an `offered` or `preferred` product asks of the guest, decided 2 October 2026** (Chinmay;
+        CHG-CSP-018, CHG-CSP-019, CHG-CSP-022). Consent first, on the venue's own consent form
+        (`VenueSettings.biometrics.consentFormId`, from the one consent-form builder in Venue Management that
+        Face Pass, Face Tag, marketing and waivers share; DEC-128, DEC-549), with a standing warning to the
+        venue where TICVAI holds the templates. A minor (below `RegionSettings.minorAgeThreshold`) only with a
+        guardian's consent on that form, and not at all where the venue has switched minors off
+        (`VenueSettings.biometrics.allowMinors`; DEC-237). Face matching to find duplicate accreditation
+        applicants is a separate switch, off by default, enabled only with applicant consent and the venue's
+        legal sign-off (`VenueSettings.biometrics.accreditationFaceMatching`; DEC-461). None of these makes a
+        biometric `required`.
       enum:
       - disabled
       - offered
@@ -23879,6 +24524,31 @@ components:
             Pass is deliberate: an enduring enrolment is a considered act with consent attached,
             not something done in a queue. 3.2.44 puts a Face Tag at a gate precisely because it
             dies the same day.
+
+            **A self-service kiosk enrolment reads `ticketCounter` here** (an on-site enrolment) so the
+            r1 values stand; the precise channel is `enrolmentChannel` (DEC-236; CHG-CSP-021).
+        enrolmentChannel:
+          type: string
+          readOnly: true
+          enum:
+          - guestApp
+          - ticketCounter
+          - annualPassCounter
+          - selfServiceKiosk
+          - entryGate
+          description: >
+            **Where the face was actually captured** (decided 2 October 2026, Chinmay, BO-186; DEC-236;
+            CHG-CSP-021): `source` with `selfServiceKiosk` told apart. `entryGate` for a Face Tag only.
+        consentFormId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          description: The venue's consent form the capture was consented on, and its version below (DEC-128; CHG-CSP-018).
+        consentFormVersion:
+          type: integer
+          nullable: true
+          readOnly: true
         capturedAt:
           type: string
           format: date-time
@@ -24375,6 +25045,34 @@ components:
 
 
             **Operations write it at `venue` scope.**'
+    AccessPendingSecondApproval:
+      type: object
+      x-ticvai-persistence: none — the approval request is approvals.request
+      description: >
+        **An access act held for a second approver** (decided 2 October 2026, Chinmay, critical set 1, BO-229 and
+        BO-247; DEC-254, DEC-260; CHG-CSP-031): a permanent lock, a whitelist entry, or the release of a
+        full-identity or permanent lock. The act is carried out when the approval request is approved (approvals
+        `listApprovedActionExecutions` records it) and dropped if it is rejected, withdrawn or expires. The requester
+        cannot approve their own (`approverIsRequester`).
+      required:
+      - approvalRequestId
+      - subjectType
+      properties:
+        approvalRequestId:
+          type: string
+          format: uuid
+          description: The approvals request (kind `accessPermissionChange`) the act waits on.
+        subjectType:
+          type: string
+          enum:
+          - identityLock
+          - identityLockRelease
+          - whitelistEntry
+        subjectId:
+          type: string
+          format: uuid
+          nullable: true
+          description: The lock being released; null for a lock or an entry not yet written.
     BlacklistEntry:
       x-ticvai-persistence: access.blacklist
       type: object
@@ -24578,6 +25276,41 @@ components:
         denyDetail:
           type: string
           description: Human-readable, localised. For operator display, never for logic.
+        denyCause:
+          type: string
+          nullable: true
+          enum:
+          - attractionTemporarilyClosed
+          - timeBoundWindowElapsed
+          - offlineLimitExceeded
+          description: '**The finer cause of three denials decided on 2 October 2026**, beside the r1 `denyReason` a
+            client already switches on (a new `DenyReason` value would be a breaking change against r1;
+            CHG-CSP-026, CHG-CSP-030, CHG-CSP-035). `attractionTemporarilyClosed` (DEC-228): `denyReason`
+            `outsideAdmissionWindow`, with `reopensAt` and `queueReturnOffer`. `timeBoundWindowElapsed` (DEC-232):
+            a time-bound entitlement scanned after its window from first scan, `denyReason` `expired`.
+            `offlineLimitExceeded` (DEC-426): a reader offline longer than the venue''s
+            `AccessOfflinePolicy.maxOfflineDurationHours` refusing a tap it cannot check, `denyReason`
+            `outsideAdmissionWindow`. Null for every other denial.'
+        reopensAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: When a temporarily closed attraction expects to reopen, where known (DEC-228; CHG-CSP-026).
+        queueReturnOffer:
+          type: object
+          nullable: true
+          description: 'A virtual-queue return window offered at a denied scan of a temporarily closed attraction,
+            where the venue enables it (DEC-228; CHG-CSP-026). Taking it is `queue.joinQueue`.'
+          properties:
+            queueId:
+              type: string
+              format: uuid
+            returnWindowStart:
+              type: string
+              format: date-time
+            returnWindowEnd:
+              type: string
+              format: date-time
         accessPointId:
           type: string
           format: uuid
@@ -24987,7 +25720,47 @@ components:
           description: '**Fixed per access point** (audit R221): set in the back office by `createAccessPoint`
             and `updateAccessPoint`, never by the podium.
 
+
+            **R221 amended 2 October 2026: a gate''s direction can be switched live** (Chinmay, critical set 1,
+            BO-230: "Live direction switch with permission, logged"; DEC-255; CHG-CSP-032; DI-648: more entry
+            gates in the morning, more exit gates in the evening). `setAccessPointDirection` switches it from
+            Live Gate Mode & Lane Control (BO-230) or the scanner''s gate mode screen (SCN-016) for a holder of
+            the configuration right, logged; the podium''s `setTurnstileMode` still never touches it.
+
             '
+        temporaryClosure:
+          type: object
+          nullable: true
+          description: '**What the access point does while its attraction is temporarily closed** (decided 2 October
+            2026, Chinmay, batch 6 set 9, BO-147: "Deny + reopening time + a virtual-queue return window where
+            enabled"; DEC-228; CHG-CSP-026). While `isClosed`, every scan is denied (`ValidationResult.denyCause`
+            `attractionTemporarilyClosed`) with the reopening time when it is known; where the venue offers it and
+            the attraction has a virtual queue, the guest is offered a return window (`queue.joinQueue`) instead
+            of being turned away empty-handed. Set with `updateAccessPoint`; null when open. Travels in the
+            offline package, so an offline gate denies the same way.'
+          properties:
+            isClosed:
+              type: boolean
+              default: false
+            reason:
+              type: string
+              maxLength: 200
+              nullable: true
+              description: Shown to staff; the guest sees "Attraction temporarily closed".
+            reopensAt:
+              type: string
+              format: date-time
+              nullable: true
+              description: When it is expected to reopen; shown to the guest when known.
+            offerVirtualQueueReturn:
+              type: boolean
+              default: false
+              description: Offer a virtual-queue return window at the denied scan, where the attraction has a queue.
+            queueId:
+              type: string
+              format: uuid
+              nullable: true
+              description: The virtual queue the return window is taken in.
         antiPassbackEnabled:
           type: boolean
         requiresExitBeforeReentry:
@@ -29011,7 +29784,16 @@ components:
           description: operating schedule
         securityClassification:
           type: string
-          description: security classification
+          description: 'The venue''s label for the classification level, renamable (DEC-227; CHG-CSP-025)'
+        securityClassificationLevel:
+          type: string
+          enum:
+          - public
+          - restricted
+          - secure
+          - critical
+          description: 'Public, Restricted, Secure or Critical (decided 2 October 2026, Chinmay, BO-146; DEC-227;
+            CHG-CSP-025); the label shown is `securityClassification`'
         entryRequirements:
           type: string
           description: entry requirements
@@ -29077,7 +29859,16 @@ components:
           description: operating schedule
         securityClassification:
           type: string
-          description: security classification
+          description: 'The venue''s label for the classification level, renamable (DEC-227; CHG-CSP-025)'
+        securityClassificationLevel:
+          type: string
+          enum:
+          - public
+          - restricted
+          - secure
+          - critical
+          description: 'Public, Restricted, Secure or Critical (decided 2 October 2026, Chinmay, BO-146; DEC-227;
+            CHG-CSP-025); the label shown is `securityClassification`'
         entryRequirements:
           type: string
           description: entry requirements
@@ -29507,6 +30298,18 @@ components:
         display and configuration directory for this screen; each property names the sentence it came from.
         **Not a row** - the screen is a view over the module''s existing state.'
       properties:
+        awaitingApproval:
+          type: boolean
+          readOnly: true
+          default: false
+          description: 'True when the venue''s approval policy is on and the publication waits for a second person
+            (DEC-230; CHG-CSP-028).'
+        approvalRequestId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          description: The approval request the publication waits on (approvals `ApprovalRequest`), when it waits.
         publishMode:
           type: string
           enum:
@@ -29928,6 +30731,17 @@ components:
         noShowExpiryMinutes:
           type: integer
           description: Credential expires this long after its admission/performance time if unused
+        minutesAfterFirstScan:
+          type: integer
+          nullable: true
+          minimum: 1
+          maximum: 10080
+          description: '**A time-bound entitlement: valid for this many minutes from its first scan** (decided 2 October
+            2026, Chinmay, batch 6 set 10a, BO-159: "Yes: add time-bound entitlements (validity from first scan)";
+            DEC-232; CHG-CSP-030; DI-458). For example 60 for a one-hour pass. The first admitting scan starts the
+            window (`Entitlement.firstEntryAt`), the gate admits until `Entitlement.timeBoundUntil`, and a scan after
+            it is denied (`ValidationResult.denyCause` `timeBoundWindowElapsed`). The window travels in the offline
+            package (ADR-0068), so an offline gate refuses the same scan. Null: no time bound.'
       required:
       - ruleId
       - validityBasis
@@ -30355,7 +31169,13 @@ components:
           type: string
         refreshIntervalSeconds:
           type: integer
-          description: QR rotation interval, e.g. 15, 30, 45, 60 or custom
+          default: 30
+          minimum: 5
+          description: '**QR rotation interval: 30 seconds by default; the screen offers 15, 30, 45 and 60 and a
+            custom value no shorter than 5 seconds** (decided 2 October 2026, Chinmay, batch 1, GST-055: "30
+            seconds", and covered-by-earlier set, BO-165; DEC-136, DEC-233; CHG-CSP-024; DI-1083, DI-632, DI-630).
+            The venue''s setting; the guest app''s countdown (GST-055) shows the same value. The 6 to 12 seconds
+            the client mentioned for beacon-activated codes is reachable as a custom value.'
       required:
       - profileId
       - name
@@ -30403,7 +31223,13 @@ components:
           type: string
         refreshIntervalSeconds:
           type: integer
-          description: QR rotation interval, e.g. 15, 30, 45, 60 or custom
+          default: 30
+          minimum: 5
+          description: '**QR rotation interval: 30 seconds by default; the screen offers 15, 30, 45 and 60 and a
+            custom value no shorter than 5 seconds** (decided 2 October 2026, Chinmay, batch 1, GST-055: "30
+            seconds", and covered-by-earlier set, BO-165; DEC-136, DEC-233; CHG-CSP-024; DI-1083, DI-632, DI-630).
+            The venue''s setting; the guest app''s countdown (GST-055) shows the same value. The 6 to 12 seconds
+            the client mentioned for beacon-activated codes is reachable as a custom value.'
       required:
       - profileId
       - name
@@ -31807,7 +32633,10 @@ components:
             - annualPassCounter
             - selfServiceKiosk
             - otherAuthorizedChannel
-          description: Channels where Face Pass enrolment is enabled
+          description: 'Channels where Face Pass enrolment is enabled. **The app, the staffed counters and a self-service
+            kiosk that shows the consent form; never the turnstile** (decided 2 October 2026, Chinmay, critical set 1,
+            BO-186; DEC-236; CHG-CSP-021). There is no gate or turnstile value, and `otherAuthorizedChannel` cannot
+            name one.'
         accountLoginRequired:
           type: boolean
           description: Account login required
@@ -31856,7 +32685,10 @@ components:
             - annualPassCounter
             - selfServiceKiosk
             - otherAuthorizedChannel
-          description: Channels where Face Pass enrolment is enabled
+          description: 'Channels where Face Pass enrolment is enabled. **The app, the staffed counters and a self-service
+            kiosk that shows the consent form; never the turnstile** (decided 2 October 2026, Chinmay, critical set 1,
+            BO-186; DEC-236; CHG-CSP-021). There is no gate or turnstile value, and `otherAuthorizedChannel` cannot
+            name one.'
         accountLoginRequired:
           type: boolean
           description: Account login required
@@ -31940,6 +32772,17 @@ components:
         and configuration directory for this screen; each property names the sentence it came from. **Not
         a row** - the screen is a view over the module''s existing state.'
       properties:
+        templatesHeldByTicvai:
+          type: boolean
+          readOnly: true
+          description: '**Where TICVAI stores the Face Tag templates, the screen warns the venue** that every guest
+            must accept the venue''s consent form before capture (decided 2 October 2026, Chinmay, batch 4, BO-188;
+            DEC-128; CHG-CSP-018). Read from `tenancy.VenueSettings.biometrics.templatesHeldByTicvai`.'
+        consentFormId:
+          type: string
+          format: uuid
+          nullable: true
+          description: The venue's consent form this profile captures on (DEC-128; CHG-CSP-018).
         enrollmentChannels:
           type: array
           items:

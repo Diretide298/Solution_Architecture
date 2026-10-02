@@ -1,6 +1,6 @@
 # WS26 — Customer Service board 2
 
-**10 screens · 13 operations · 22 schemas · 3 permissions**
+**10 screens · 14 operations · 20 schemas · 2 permissions**
 
 Platform P12 Venue Support · ships as **venue-management** ·
 staff audience · web ·
@@ -48,8 +48,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 3 permissions apply here:
-  `CASE_MANAGE, CASE_VIEW, QUEUE_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 2 permissions apply here:
+  `CASE_MANAGE, CASE_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -61,6 +61,42 @@ convincingly. It is never a caption.
   and its error; and, element by element, what is shown and in what format, what each action
   produces and where the user goes next. Draw exactly that.
 
+## The processes these screens belong to
+
+Written by the owner of each process (`handoff/design-notes/`). Read before any screen: it says how the process runs end to end and which words the screens must use.
+
+### Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers)
+
+Customer & marketing is how a venue knows its guests and talks to them. There is ONE guest profile per person across ticketing, F&B and retail, so a guest who books online and later dines is the same profile (DI-339). A profile needs at least an email or a mobile, never neither (DI-372). Profiles are created by registration, by guest checkout, or by staff at a till or desk. Repeat guest checkouts with the same verified email or phone attach to the same profile automatically (DI-941, R120 default). Two records that might be the same person are NEVER merged automatically: the guest is asked to confirm, and an admin review queue runs alongside (DI-377). Each candidate shows why it matched; the record that loses is superseded, not deleted; consent takes the narrower of the two positions (DI-808). Around the profile sit three things that must never be confused. CONSENT is what the law allows: per purpose and per channel, append-only, with the notice version and the source (recordConsent). It is Given, Withdrawn or Not asked. A SUBSCRIPTION is what the guest asked to receive, e.g. a newsletter list (MarketingSubscription). A PREFERENCE is what they like: table, dietary, accessibility (updateGuestPreferences). An anonymous visitor's cookie decision is recorded against a device key (recordDeviceConsent) and attaches to the guest when they sign in (claimDeviceConsent). Marketing consent at GUEST CHECKOUT is an open client question, and the design follows its default: an unticked opt-in beside the terms, one per channel and purpose. It is recorded with source "checkout" against the order and the verified contact, and nothing is sent without it. Whether that is sufficient consent under PDPL is the client DPO's call (M18-15 (audit R-M18-15), DI-954, DI-940). Marketing reads profiles through SEGMENTS (rules, evaluated when used) and static LISTS (imported). It reaches guests by CAMPAIGNS (one send to an audience) and JOURNEYS (automations started by an event, with waits and branches). Journeys may offer only pre-configured offers, never a free-typed discount (MoM 2026-08-20 4.6). Everything goes through ONE communications module that every other module uses (MoM 2026-08-31 4.6). Consent and suppression are applied at send time, and the number excluded, with the reasons, is reported before anything goes out (launchCampaign). Transactional messages (tickets, receipts, queue calls, case replies) do not need marketing consent and must never carry marketing. LOYALTY pays for spend: points, tiers, rewards and expiry. GAMIFICATION pays for behaviour: challenges, badges, streaks, referrals and leaderboards (createChallenge). A guest reads their own loyalty position (getLoyaltyPosition). A till, the back office or support reads a named guest's (getGuestLoyalty, or identifyGuest at a till). SERVICE: one Case object covers lost property, complaints, questions, accessibility and refund requests (CaseKind). A guest raises one with raiseMyCase, which needs the connection …
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Guest | The person the venue serves, signed in or not. In body copy on every surface. | Customer, User, Subject, Contact, Patron | contracts/satellite/marketing-crm.yaml#/components/schemas/GuestProfile |
+| Guest profile | The CRM record of one person (details, consent, preferences, history). Distinct from the Account, which is how a guest signs in. | Customer record, Contact, Subject | contracts/satellite/marketing-crm.yaml#getGuestProfile |
+| Consent - Given / Withdrawn / Not asked | What the law allows, per purpose (marketing, personalisation, profiling, third-party sharing, AI processing, transactional) and per channel. "Not asked" is not "Withdrawn" and must look different. | Opted in/out as a status, Accepted, Declined, Revoked, Unsubscribed (that is a subscription) | contracts/satellite/marketing-crm.yaml#/components/schemas/ConsentDecision |
+| Subscription | A list the guest asked to receive (a newsletter, event news), per channel. Unsubscribing from a list is not withdrawing consent. | Consent, Opt-in | contracts/satellite/marketing-crm.yaml#/components/schemas/MarketingSubscription |
+| Preferences | What the guest likes or needs (seating, drinks, dietary, accessibility, contact channel). Never grants permission. | Consents, Settings | contracts/satellite/marketing-crm.yaml#updateGuestPreferences |
+| Send me offers and news | The marketing opt-in label beside the terms at checkout, unticked, one per channel and purpose. | I agree to marketing, Pre-ticked boxes, Keep me updated ticked by default | DI-954 |
+| Points / Tier / Points to next tier / Expiring points | The loyalty position. Points are a liability earned per programme; tiers are ranked (Bronze, Silver, Gold, Platinum in the meetings). | Credits, Coins, Balance alone (wallet money is "credit"), Level | DI-382 |
+| Pending points | Points earned on a purchase still inside its refund window; shown apart from spendable points. | Available points for pending ones | contracts/satellite/marketing-crm.yaml#getLoyaltyPosition |
+| Reward | What points can be turned into (rewards catalogue). | Prize (games redemption uses prize), Voucher unless it is one | contracts/satellite/marketing-crm.yaml#listRewards |
+| Challenge / Badge / Streak / Referral | Gamification - rewards for behaviour, not spend. Status badges such as Explorer, Adventurer, Legend. | Mission and Quest used interchangeably on one screen, Loyalty tier for a badge | DI-392 |
+| Case | One service record - lost property, complaint, question, accessibility, refund request or other - with a number (venue prefix plus sequence), a status and an SLA. | Ticket (a ticket is an admission product), Issue, Incident (that is maintenance and safety) | contracts/satellite/marketing-crm.yaml#/components/schemas/CaseKind |
+| Reply to guest / Internal note | The two kinds of case message. The agent always chooses one explicitly; there is no default. | Comment, Message (ambiguous) | F05 step 2 |
+| Conversation | A live chat session (web chat, in-app, WhatsApp, SMS, email, kiosk, voice). With the assistant, then queued, then with an agent. It is not a case. | Ticket, Case (until one is raised from it) | contracts/satellite/marketing-crm.yaml#/components/schemas/ConversationState |
+| Segment / List / Audience | A segment is rules evaluated when used. A list is static, imported or hand-picked. The audience is what a campaign or journey targets. | Group, Cohort, Target list for a segment | DI-381 |
+| Campaign / Journey | A campaign is one send (one-off, scheduled, triggered or recurring) to an audience. A journey is an automation started by an event, with steps, waits and branches. | Flow (booking flows use it), Automation for a one-off send, Blast | R146 |
+| Offer | A pre-configured, system-validated discount or benefit that a campaign or journey references. It is never typed into the builder. | Discount field, Coupon (unless the offer is a coupon code) | MoM 2026-08-20 4.6 |
+| Reachable | How many guests in an audience can actually be sent to on a channel after consent and suppression. Always shown beside the matching count. | Audience size alone | contracts/satellite/marketing-crm.yaml#previewSegment |
+| Possible duplicate / Merge | Two profiles that may be one person. Never called "Duplicate" as a verdict. Merging needs confirmation and stays reversible for 30 days. | Duplicate (as a status), Combine, Auto-merge | DI-808 |
+| Data request | A guest's privacy request - a copy of my data, a correction, erasure, a restriction - with a legal clock. Statuses submitted, in progress, completed. | DSAR on guest screens, Subject data, Ticket | DI-379 |
+| Waiver / Consent question | A waiver is a signed, versioned form. A consent question ("Are you able to swim?", "I accept the risk") is a single question asked per person or per booking and recorded as consent. | Contract, Disclaimer, Form for a waiver in guest copy | DI-1062 |
+| Lost item / Found item / Possible match | The two directions of lost property and the suggested pairing between them. | Lost case, Claim before it is claimed | contracts/satellite/marketing-crm.yaml#/components/schemas/LostItem |
+| Wishlist | Products and dates a guest saved to buy later, including F&B and retail to buy on site. | Favourites (used for transport routes), Saved for later on one surface and Wishlist on another | DI-202 |
+| Notification / Message | A notification is an item in the guest's in-app feed. A message is one send on a channel (email, SMS, WhatsApp, push, in-app). | Alert for marketing content, Inbox for the guest feed | contracts/satellite/marketing-crm.yaml#/components/schemas/GuestNotification |
+| Template | A reusable message body per channel and language with merge fields. Transactional and marketing templates are separate kinds. | Layout, Design | contracts/satellite/marketing-crm.yaml#createMessageTemplate |
+
+
 ## The screens
 
 Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs count fields; requirements are matrix rows; meeting inputs are the ones naming the screen (the module and platform ones are below); white label says whether the tenant's brand reaches it (guest) or it sets the brand (configures).
@@ -70,8 +106,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `SUP-019` | Contact Center Operations Command Center | B–D | 2 | 0 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
 | `SUP-020` | Queue Configuration & Management | B–D | 25 | 6 | 5 | 0 | 0 | 6 | — | notStarted (generated) |
 | `SUP-021` | Intelligent Routing, Skills & Assignment Engine | B–D | 4 | 13 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `SUP-022` | SLA Policy & Service-Level Management | B–D | 6 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
-| `SUP-023` | Agent Workload, Availability & Workforce Control | B–D | 0 | 26 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `SUP-022` | SLA Policy & Service-Level Management | B–D | 18 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
+| `SUP-023` | Agent Workload, Availability & Workforce Control | B–D | 5 | 26 | 6 | 1 | 1 | 0 | — | notStarted (generated) |
 | `SUP-024` | Escalation & Critical Case Monitor | B–D | 0 | 24 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
 | `SUP-025` | Quality Management & Agent Evaluation | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
 | `SUP-026` | Customer Satisfaction, Feedback & Voice of Customer | B–D | 0 | 0 | 6 | 3 | 1 | 0 | — | notStarted (generated) |
@@ -103,6 +139,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/support/contact-center-operations-command-center-sup-019` |
+
+**From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** Supervisors' real-time view of the contact centre: cases today, open, unassigned, customers waiting, critical, SLA at risk and breached, resolved, response and resolution times, first-contact resolution, CSAT, active agents and utilisation; volume by category (general support, refund, ticketing, membership).
 
 #### Inputs: what the user enters or picks
 
@@ -152,6 +190,10 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 **Agent Utilization** (metric tile)
 
+**Rules for what is shown** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
+
+- **Tiles**: Each tile drills into its filtered list; "customers waiting" counts queued conversations, not assistant ones. *(source: contracts/satellite/marketing-crm.yaml#listContact; DI-544)*
+
 **Data it reads**: `listContact` (onLoad, Contact Center Operations Command Center)
 
 **Where the user goes next**
@@ -177,6 +219,22 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the contact operations are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+tiles:
+  casesToday: 64
+  open: 23
+  unassigned: 4
+  waiting: 7
+  slaAtRisk: 5
+  breached: 2
+  csat: 4.4
+  utilisation: 78%
+```
 
 #### Permissions
 
@@ -240,14 +298,22 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | App · platform | TICVAI Venue Management · P12 Venue Support (web) |
 | Module | Support · wave 3 · needs the `marketing` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `CASE_MANAGE`, `CASE_VIEW`, `QUEUE_VIEW` (1 configure, 2 read); in the flows as venue manager |
+| Who uses it | venue staff holding `CASE_MANAGE`, `CASE_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/support/queue-configuration-management-sup-020` |
 
-**Known gaps.** **The pack names 5 actions on this screen and the screen declares 1 operation.** Unserved: Payments, Membership, Wallet, Group Sales Support, Access Control. Each needs an operation, or needs …
+**Known gaps.** **The pack names 5 actions on this screen and the screen declares 1 operation.** Unserved: Payments, Membership, Wallet, Group Sales Support, Access Control. Each needs an operation, or needs … Removed 2 October 2026 (CHG-WIR-005): listQueues reads ride and attraction virtual queues (queue contract); customer-service queues are listServiceQueues (declared) (design-notes correction …
+
+**From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** Configure the customer-service queues: name, code (never changes), department, brand, venue, languages, channels, hours, priority, SLA profile, supervisor, backup queue, maximum workload, overflow, after-hours and VIP handling.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **Name, code, thresholds and hours are select fields.** Why: Typed values. *(source: screens/P12-support-agent-console.yaml#SUP-020; Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers))*
+
+**Fixed on main** (the package already carries these; draw what it says): listQueues (ride and attraction virtual queues, queue contract) is declared. (CHG-WIR-005).
 
 #### Inputs: what the user enters or picks
 
@@ -276,12 +342,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | VIP handling | select field | — | — | — | — | — | — |
 | Emergency handling | select field | — | — | — | — | — | — |
 | Is active | toggle | optional | — | — | — | Sends `?isActive=` to `listServiceQueues`. | `listServiceQueues` ?isActive |
-
-**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
-
-| Filter | Drawn as | Default | Allowed values, rules | Source |
-|---|---|---|---|---|
-| Open only | toggle | off | — | `listQueues` ?openOnly |
 
 **Form: Save service queue definition** (modal, opened by *Save service queue definition*; *Save service queue definition* calls `setServiceQueueDefinition`, *Cancel* sends nothing)
 
@@ -322,11 +382,11 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | Access Control (secondary button) | navigation or local | — | — | — | — |
 | Save service queue definition (secondary button) | `setServiceQueueDefinition` PUT `/service-queues` | ServiceQueue | ServiceQueue | 400 Validation failed; 403 Authenticated but not permitted at the requested scope; 409 Retiring a queue that an active routing rule names, or that an unresolved case still waits in. | gated `CASE_MANAGE`; opens modal first |
 
-**Data it reads**: `listQueues` (onLoad, List queues); `listServiceQueues` (onLoad, List customer-service queues)
+**Data it reads**: `listServiceQueues` (onLoad, List customer-service queues)
 
 **Where the user goes next**
 
-- → `SUP-019` Contact Center Operations Command Center: *Returns to the board's landing screen*; calls `listQueues`
+- → `SUP-019` Contact Center Operations Command Center: *Returns to the board's landing screen*; calls `listServiceQueues`
 
 #### States
 
@@ -334,14 +394,32 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 |---|---|
 | Loading (`?state=loading`) | The queue configuration as saved. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the queue untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No queue configured yet. Carries the create action and says what the platform does in the meantime. |
+| Empty, first run (`?state=emptyFirstRun`) | No queue configured yet. Offers no create action — this screen declares no operation that makes one and says what the platform does in the meantime. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 Retiring a queue that an active routing rule names, or that an unresolved case still waits in. |
 
+#### Consistency with other screens
+
+- Match `BO-800`: Same queues.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+queue:
+  name: Reservations
+  code: RES
+  languages:
+  - EN
+  - AR
+  hours: 08:00-22:00
+  overflow: 180 s to General
+```
+
 #### Permissions
 
-- `listQueues` → `QUEUE_VIEW` (read) · staff, guest
 - `listServiceQueues` → `CASE_VIEW` (read) · staff
 - `setServiceQueueDefinition` → `CASE_MANAGE` (configure) · staff
 
@@ -380,8 +458,9 @@ Also apply: 7 for all of P12, 29 for every app (section *Design inputs from the 
 - [ ] Every state opens from `#SUP-020?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Payments, Membership, Wallet, Group Sales Support, Access Control, Save service queue definition.
 - [ ] Every transition is wired: `SUP-019`.
-- [ ] Every gated control is gated: `CASE_MANAGE`, `CASE_VIEW`, `QUEUE_VIEW`.
+- [ ] Every gated control is gated: `CASE_MANAGE`, `CASE_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -403,6 +482,8 @@ Also apply: 7 for all of P12, 29 for every app (section *Design inputs from the 
 | Route | `/support/intelligent-routing-skills-assignment-engine-sup-021` |
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+**From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** The routing rules that pick the best agent or team: match category, channel, language, customer type, tier, venue, event, product and priority; route by skill, workload and availability; manual override is allowed and recorded.
 
 #### Inputs: what the user enters or picks
 
@@ -467,6 +548,18 @@ Also apply: 7 for all of P12, 29 for every app (section *Design inputs from the 
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 Idempotency conflict or optimistic concurrency failure. Two causes, so two types. |
 
+#### Consistency with other screens
+
+- Match `SUP-012`: The routing preview there applies these rules.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+rule: Arabic + Membership > Renewal + Gold -> Membership & billing, skill Arabic, least load
+```
+
 #### Permissions
 
 - `setIntelligentRoutingSkill` → `CASE_MANAGE` (configure) · staff
@@ -520,7 +613,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | App · platform | TICVAI Venue Management · P12 Venue Support (web) |
 | Module | Support · wave 3 · needs the `marketing` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `CASE_VIEW` (1 read); in the flows as venue manager |
+| Who uses it | venue staff holding `CASE_MANAGE`, `CASE_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population |
 | Offline | online only |
@@ -528,6 +621,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Route | `/support/sla-policy-service-level-management-sup-022` |
 
 **Known gaps.** **The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Venue operating hours. Each needs an operation, or needs removing from the screen; this is the Phase 3 …
+
+**From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** Service-level commitments and their performance: first, next and resolution response; internal escalation; refund processing; complaint resolution; business hours; and the cases forecast to breach.
+
+**Fixed on main** (the package already carries these; draw what it says): Only the performance read is declared; setSlaPolicy is not. (CHG-WIR-005).
 
 #### Inputs: what the user enters or picks
 
@@ -554,6 +651,25 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | From | date and time picker | — | — | `listSlaPolicyService` ?from |
 | To | date and time picker | — | — | `listSlaPolicyService` ?to |
 
+**Form: Save SLA policy** (modal, opened by *Save SLA policy*; *Save SLA policy* calls `setSlaPolicy`, *Cancel* sends nothing)
+
+**Collects what `setSlaPolicy` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| ID `id` | picker: choose an id | optional | — | — | shows names, sends the id | — | `setSlaPolicy` body |
+| Scope path `scopePath` | text field | optional | — | — | — | — | `setSlaPolicy` body |
+| Code `code` | text field | required | — | max length 100 | — | — | `setSlaPolicy` body |
+| Name `name` | text field | required | — | max length 150 | — | — | `setSlaPolicy` body |
+| Priority `priority` | text field | optional | — | max length 20 | — | — | `setSlaPolicy` body |
+| First response minutes `firstResponseMinutes` | number field (minutes) | optional | — | — | — | — | `setSlaPolicy` body |
+| Resolution minutes `resolutionMinutes` | number field (minutes) | optional | — | — | — | — | `setSlaPolicy` body |
+| Escalation minutes `escalationMinutes` | number field (minutes) | optional | — | — | — | — | `setSlaPolicy` body |
+| Business hours only `businessHoursOnly` | toggle | required | — | — | — | — | `setSlaPolicy` body |
+| Is active `isActive` | toggle | required | — | — | — | — | `setSlaPolicy` body |
+| Created at `createdAt` | date and time picker | required | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `setSlaPolicy` body |
+| Updated at `updatedAt` | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `setSlaPolicy` body |
+
 #### Outputs: what the screen shows and produces
 
 **Actions and what each produces**
@@ -561,6 +677,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
 | Venue operating hours (primary button) | navigation or local | — | — | — | — |
+| Save SLA policy (secondary button) | `setSlaPolicy` PUT `/sla-policies` | MarketingSlaPolicy | MarketingSlaPolicy | — | opens modal first |
 
 **Data it reads**: `listSlaPolicyService` (onLoad, SLA Policy & Service-Level Management)
 
@@ -579,9 +696,18 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+policy: Complaint resolution 24 business hours - 94% met this month - 3 forecast to breach today
+```
+
 #### Permissions
 
 - `listSlaPolicyService` → `CASE_VIEW` (read) · staff
+- `setSlaPolicy` → `CASE_MANAGE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -610,12 +736,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (6), with its required mark, default, format and its error state (400, 403).
+- [ ] Every input above is drawn (18), with its required mark, default, format and its error state (400, 403).
 - [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#SUP-022?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: Venue operating hours.
+- [ ] Every action is wired with its success and its failure: Venue operating hours, Save SLA policy.
 - [ ] Every transition is wired: `SUP-019`.
-- [ ] Every gated control is gated: `CASE_VIEW`.
+- [ ] Every gated control is gated: `CASE_MANAGE`, `CASE_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -630,12 +756,16 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | App · platform | TICVAI Venue Management · P12 Venue Support (web) |
 | Module | Support · wave 3 · needs the `marketing` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `CASE_VIEW` (1 read); in the flows as venue manager |
+| Who uses it | venue staff holding `CASE_MANAGE`, `CASE_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Display) and no metric row |
 | Offline | online only |
-| Opens with | nothing: it opens on its own |
+| Opens with | `caseId` (navigation) |
 | Route | `/support/agent-workload-availability-workforce-control-sup-023` |
+
+**From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** Supervisors see every agent's status, skills, languages, queues and live workload, and rebalance by reassigning cases.
+
+**Fixed on main** (the package already carries these; draw what it says): Read-only; reassignment (updateCase) is not declared. (CHG-WIR-005).
 
 #### Inputs: what the user enters or picks
 
@@ -649,7 +779,19 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Skill | text field | — | max length 60 | `listAgentWorkloadAvailability` ?skill |
 | Language | text field | — | max length 10 | `listAgentWorkloadAvailability` ?language |
 
-Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+**Form: Reassign** (modal, opened by *Reassign*; *Reassign* calls `updateCase`, *Cancel* sends nothing)
+
+**Collects what `updateCase` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Status `status` | select | optional | — | Open · In progress · Awaiting guest · Escalated · Resolved · Closed | — | — | `updateCase` body |
+| Priority `priority` | radio group | optional | — | Low · Normal · High · Urgent | — | — | `updateCase` body |
+| Assigned to principal `assignedToPrincipalId` | picker: choose an assigned to principal | optional | — | — | shows names, sends the id | — | `updateCase` body |
+| Category `categoryId` | picker: choose a category | optional | — | — | shows names, sends the id | — | `updateCase` body |
+| Resolution note `resolutionNote` | text area | optional | — | max length 2000 | — | — | `updateCase` body |
+
+Errors to draw in the form: 400 Resolving without a resolution note
 
 #### Outputs: what the screen shows and produces
 
@@ -691,6 +833,12 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Resolution rate | 12.5% | Cases resolved over cases handled. |
 | Utilization | 1,234.5 | Active cases and conversations over `maxConcurrentCases`; above 1 means overloaded. |
 
+**Actions and what each produces**
+
+| Action | Calls | Sends | On success returns | Errors to show | Notes |
+|---|---|---|---|---|---|
+| Reassign (secondary button) | `updateCase` PATCH `/cases/{caseId}` | inline | Case | 400 Resolving without a resolution note | opens modal first |
+
 **Data it reads**: `listAgentWorkloadAvailability` (onLoad, Agent Workload, Availability & Workforce Control)
 
 **Where the user goes next**
@@ -707,16 +855,33 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the agent workload availability are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 Resolving without a resolution note |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+agents:
+- Aisha Rahman - Available - 3/3
+- Joseph Mathew - Busy - 5/5
+- Noor Hassan - Away (lunch)
+```
 
 #### Permissions
 
 - `listAgentWorkloadAvailability` → `CASE_VIEW` (read) · staff
+- `updateCase` → `CASE_MANAGE` (configure) · staff, partner
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
 #### Requirements it meets
 
-No matrix row traces to this screen's operations or data.
+1 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+
+| Ref | Requirement (shortened) | Domain | Verdict | Via |
+|---|---|---|---|---|
+| 22.3.4 | Case Workflow Management | Marketing & CRM | CONTRACTED | `updateCase` |
 
 #### Client meeting inputs
 
@@ -739,12 +904,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (403).
+- [ ] Every input above is drawn (5), with its required mark, default, format and its error state (400, 403).
 - [ ] Every output is drawn (26 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#SUP-023?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
+- [ ] Every action is wired with its success and its failure: Reassign.
 - [ ] Every transition is wired: `SUP-019`.
-- [ ] Every gated control is gated: `CASE_VIEW`.
+- [ ] Every gated control is gated: `CASE_MANAGE`, `CASE_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -765,6 +930,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/support/escalation-critical-case-monitor-sup-024` |
+
+**From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** One workspace for cases needing elevated attention: open escalations with level and reason, and suspected major incidents (many similar cases at once).
 
 #### Inputs: what the user enters or picks
 
@@ -834,6 +1001,14 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+incident: 14 cases in 30 min - "Payment failed at Gate 2 kiosks" - suspected major incident
+```
+
 #### Permissions
 
 - `listEscalationCriticalCase` → `CASE_VIEW` (read) · staff
@@ -894,6 +1069,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Known gaps.** **The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Case. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** Whether interactions meet the service standard: evaluations per call, chat, email, WhatsApp thread or case, scored on resolution time and outcome against the SLA, with coaching notes.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **The primary button is labelled "Case".** Why: Meaningless label; the act is Evaluate interaction. *(source: screens/P12-support-agent-console.yaml#SUP-025; Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers))*
+
 #### Inputs: what the user enters or picks
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
@@ -939,6 +1120,14 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+evaluation: Aisha Rahman - WhatsApp CA-1120 - 92/100 - coaching none
+```
+
 #### Permissions
 
 - `listQualityAgentEvaluation` → `CASE_VIEW` (read) · staff
@@ -977,6 +1166,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `SUP-019`.
 - [ ] Every gated control is gated: `CASE_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -998,6 +1188,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Route | `/support/customer-satisfaction-feedback-voice-of-customer-sup-026` |
 
 **Known gaps.** **The pack names 3 actions on this screen and the screen declares 1 operation.** Unserved: Service Rating, NPS where used, Direct Customer Comment. Each needs an operation, or needs removing from the …
+
+**From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** Perception of the support experience: CSAT, response rate, positive, neutral and negative share, complaints, repeat contact, effort; recurring problems with AI themes linked to comments.
 
 #### Inputs: what the user enters or picks
 
@@ -1062,6 +1254,18 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+kpis:
+  csat: 4.4
+  responseRate: 22%
+  negative: 9%
+  repeatContact: 6%
+```
+
 #### Permissions
 
 - `listCustomerSatisfactionFeedback` → `CASE_VIEW` (read) · staff
@@ -1125,6 +1329,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/support/service-analytics-root-cause-intelligence-sup-027` |
+
+**From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** Why guests contact the venue and what drives demand: volume, response and resolution times, first-contact resolution, reopen and escalation rates, SLA compliance, refund requests and complaint rate, compared over periods, with contributing drivers.
 
 #### Inputs: what the user enters or picks
 
@@ -1197,6 +1403,14 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+driver: Reschedule requests up 40% week on week after rain forecast
+```
+
 #### Permissions
 
 - `listServiceRootCause` → `CASE_VIEW` (read) · staff
@@ -1255,6 +1469,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Known gaps.** **AI Contact Center Intelligence & Automation Studio declares no operation that writes anything** — its only declared call is `listContactAutomation`, a read. The name promises authoring and the …
 
+**From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** The management AI layer for customer service: demand forecast, recommendations and governed automations for the whole operation (distinct from the copilot that helps one agent with one case). Automations are approved by a person.
+
 #### Inputs: what the user enters or picks
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
@@ -1303,6 +1519,14 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the contact intelligence automation are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+recommendation: Add 2 Arabic agents Saturday 14:00-18:00 - forecast 120 contacts (AI, model cs-demand-v1)
+```
 
 #### Permissions
 
@@ -1422,12 +1646,13 @@ Method, path, parameters, request and response for every operation these screens
 "listCustomerSatisfactionFeedback": {"method":"GET","path":"/customer-satisfaction-feedback","contract":"marketing-crm","summary":"Customer Satisfaction, Feedback & Voice of Customer","permission":"CASE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":"source","in":"query","required":false},{"name":"groupBy","in":"query","required":false},{"name":"venueId","in":"query","required":false},{"name":"eventId","in":"query","required":false},{"name":"productId","in":"query","required":false},{"name":"agentPrincipalId","in":"query","required":false},{"name":"sentiment","in":"query","required":false},{"name":"from","in":"query","required":false},{"name":"to","in":"query","required":false}],"requestBody":null,"responds":"CustomerSatisfactionFeedbackVoiceOfCustomerView"},
 "listEscalationCriticalCase": {"method":"GET","path":"/escalation-critical-case","contract":"marketing-crm","summary":"Escalation & Critical Case Monitor","permission":"CASE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"venueId","in":"query","required":false},{"name":"escalationType","in":"query","required":false},{"name":"priority","in":"query","required":false},{"name":"eventId","in":"query","required":false},{"name":"breachedOnly","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listQualityAgentEvaluation": {"method":"GET","path":"/quality-agent-evaluation","contract":"marketing-crm","summary":"Quality Management & Agent Evaluation","permission":"CASE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"agentPrincipalId","in":"query","required":false},{"name":"evaluatorPrincipalId","in":"query","required":false},{"name":"sourceType","in":"query","required":false},{"name":"status","in":"query","required":false},{"name":"criticalFailureOnly","in":"query","required":false},{"name":"from","in":"query","required":false},{"name":"to","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
-"listQueues": {"method":"GET","path":"/queues","contract":"queue","summary":"List queues","permission":"QUEUE_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"venueId","in":"query","required":null},{"name":"openOnly","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listServiceQueues": {"method":"GET","path":"/service-queues","contract":"marketing-crm","summary":"List customer-service queues","permission":"CASE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"isActive","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listServiceRootCause": {"method":"GET","path":"/service-root-cause","contract":"marketing-crm","summary":"Service Analytics & Root-Cause Intelligence","permission":"CASE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":"venueId","in":"query","required":false},{"name":"eventId","in":"query","required":false},{"name":"productId","in":"query","required":false},{"name":"channel","in":"query","required":false},{"name":"from","in":"query","required":false},{"name":"to","in":"query","required":false},{"name":"compare","in":"query","required":false},{"name":"compareId","in":"query","required":false}],"requestBody":null,"responds":"ServiceAnalyticsRootCauseIntelligenceView"},
 "listSlaPolicyService": {"method":"GET","path":"/sla-policy-service","contract":"marketing-crm","summary":"SLA Policy & Service-Level Management","permission":"CASE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":"venueId","in":"query","required":false},{"name":"slaPolicyId","in":"query","required":false},{"name":"priority","in":"query","required":false},{"name":"kind","in":"query","required":false},{"name":"channel","in":"query","required":false},{"name":"queueId","in":"query","required":false},{"name":"from","in":"query","required":false},{"name":"to","in":"query","required":false}],"requestBody":null,"responds":"SlaPolicyServiceLevelManagementView"},
 "setIntelligentRoutingSkill": {"method":"PUT","path":"/intelligent-routing-skill","contract":"marketing-crm","summary":"Create or change a case routing rule","permission":"CASE_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"IntelligentRoutingSkillsAssignmentEngineInput","responds":"IntelligentRoutingSkillsAssignmentEngineView"},
-"setServiceQueueDefinition": {"method":"PUT","path":"/service-queues","contract":"marketing-crm","summary":"Create or change a customer-service queue","permission":"CASE_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"ServiceQueue","responds":"ServiceQueue"}
+"setServiceQueueDefinition": {"method":"PUT","path":"/service-queues","contract":"marketing-crm","summary":"Create or change a customer-service queue","permission":"CASE_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"ServiceQueue","responds":"ServiceQueue"},
+"setSlaPolicy": {"method":"PUT","path":"/sla-policies","contract":"marketing-crm","summary":"Define an SLA policy","permission":"CASE_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"MarketingSlaPolicy","responds":"MarketingSlaPolicy"},
+"updateCase": {"method":"PATCH","path":"/cases/{caseId}","contract":"marketing-crm","summary":"Assign, reprioritise or resolve a case","permission":"CASE_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Case"}
 }
 ```
 
@@ -1439,25 +1664,23 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 {
 "AgentWorkloadAvailabilityWorkforceControlView": {"type":"object","x-ticvai-persistence":"none — projection over marketing.agent_service_profile (new), marketing.agent_availability, marketing.case, marketing.conversation, marketing.service_queue (new) and workforce.shift","description":"One agent's live status and workload. Rates are over the period since the agent's current shift started, or the venue's current day when no shift is rostered.","required":["principalId","agentName","status","activeCases"],"properties":{"principalId":{"type":"string","format":"uuid"},"agentName":{"type":"string","description":"The agent's display name."},"team":{"type":"string","nullable":true},"skills":{"type":"array","items":{"type":"string"}},"languages":{"type":"array","items":{"type":"string"}},"status":{"type":"string","enum":["available","busy","onCall","chatting","afterCallWork","break","training","offline"]},"activeCases":{"type":"integer","minimum":0},"chats":{"type":"integer","minimum":0,"description":"Conversations the agent holds now."},"calls":{"type":"integer","minimum":0,"description":"Voice conversations in progress (0 or 1)."},"queues":{"type":"array","items":{"type":"object","required":["queueId","queueName"],"properties":{"queueId":{"type":"string","format":"uuid"},"queueName":{"type":"string"}}}},"slaRiskCases":{"type":"integer","minimum":0,"description":"The agent's open cases at risk or breached."},"averageHandleSeconds":{"type":"integer","minimum":0,"nullable":true},"resolutionRate":{"type":"number","minimum":0,"maximum":1,"nullable":true,"description":"Cases resolved over cases handled."},"utilization":{"type":"number","minimum":0,"description":"Active cases and conversations over `maxConcurrentCases`; above 1 means overloaded."},"workloadBand":{"type":"string","enum":["available","normal","overloaded"],"description":"`overloaded` at utilization 0.9 or above, `available` below 0.5."},"availabilityExpiresAt":{"type":"string","format":"date-time","nullable":true}}},
 "AiContactCenterIntelligenceAutomationStudioView": {"type":"object","x-ticvai-persistence":"none — projection over marketing.contact_automation (new), with the forecast and recommendations computed over marketing.case, marketing.conversation and marketing.agent_availability","description":"The studio's forecast, recommendations and automations for the filters given.","required":["forecast","recommendations","automations"],"properties":{"forecast":{"type":"object","nullable":true,"description":"Expected over the next `horizonHours`.","properties":{"contactVolume":{"type":"integer","minimum":0},"queueDemand":{"type":"array","items":{"type":"object","required":["queueId","expectedCases"],"properties":{"queueId":{"type":"string","format":"uuid"},"queueName":{"type":"string"},"expectedCases":{"type":"integer","minimum":0},"requiredAgents":{"type":"integer","minimum":0}}}},"requiredAgents":{"type":"integer","minimum":0},"slaRiskCases":{"type":"integer","minimum":0,"description":"Cases expected to breach."},"expectedComplaints":{"type":"integer","minimum":0},"eventDaySupportDemand":{"type":"integer","minimum":0,"description":"Expected cases tied to events on the day."},"generatedAt":{"type":"string","format":"date-time"}}},"recommendations":{"type":"array","maxItems":20,"items":{"type":"object","required":["category","text"],"properties":{"category":{"type":"string","enum":["workforce","selfService","productImprovement","operationalImprovement","incidentDetection"]},"text":{"type":"string","maxLength":500},"evidence":{"type":"string","maxLength":500,"nullable":true},"confidence":{"type":"number","minimum":0,"maximum":1}}}},"automations":{"type":"array","maxItems":200,"items":{"$ref":"#/components/schemas/ContactAutomation"}}}},
+"Case": {"x-ticvai-persistence":"marketing.case","x-ticvai-retired-columns":["guest_name","subject","is_sla_breached"],"type":"object","required":["id","caseNumber","subject","status","priority","createdAt"],"properties":{"id":{"type":"string","format":"uuid","description":"Created on the device (`CreateCaseRequest.id`, `raiseMyCase`), so a UUIDv7."},"caseNumber":{"type":"string","readOnly":true,"description":"**Server-assigned: the venue prefix plus a sequence per venue** (decided 28 September, audit R152). Not gapless; only tax invoices are gapless, per legal entity. Assigned when the case reaches the server, so a retry with the same `id` keeps its number.\n"},"subjectId":{"type":"string","format":"uuid","nullable":true},"guestName":{"type":"string","nullable":true,"readOnly":true,"x-ticvai-persisted":false,"description":"**Resolved from `pii.subject` when the case is read, never stored on the case.** A name copied onto a case row is personal data outside the erasable store (ADR-0023), and it had no source anyway — no request carries it. Returned only to callers holding `GUEST_VIEW_PII`, as `searchGuests` does.\n"},"subject":{"type":"string","x-ticvai-column":"title","description":"**The case's one-line title**, not a person. Stored as `title` so the table does not hold `subject` beside `subject_id`; the wire keeps `subject` because screens bind it.\n"},"kind":{"allOf":[{"$ref":"#/components/schemas/CaseKind"}],"nullable":true,"description":"What the guest said it was about, where the guest raised it."},"channel":{"allOf":[{"$ref":"#/components/schemas/MessageChannel"}],"description":"How the guest reached the venue — `CreateCaseRequest.channel`, or `inApp` for a case raised through `raiseMyCase`."},"recordedAt":{"type":"string","format":"date-time","description":"Device time the case was raised — the start of the SLA clock."},"syncedAt":{"type":"string","format":"date-time","readOnly":true,"description":"Server time the case arrived. Equal to `recordedAt` for a case raised online."},"categoryId":{"type":"string","format":"uuid","nullable":true},"queueId":{"type":"string","format":"uuid","nullable":true,"description":"The `ServiceQueue` the case waits in, set by routing (`CaseRoutingRule.queueId`). Null once routed straight to an agent. (decided 29 September, data model for the agreed operations)"},"membershipId":{"type":"string","format":"uuid","nullable":true,"description":"The identity membership this case concerns (`identity.customer_membership`); member case notes are cases with this set. (decided 29 September, coordinator decision DM4, writers pass)"},"status":{"$ref":"#/components/schemas/CaseStatus"},"priority":{"$ref":"#/components/schemas/CasePriority"},"assignedToPrincipalId":{"type":"string","format":"uuid","nullable":true},"venueId":{"type":"string","format":"uuid","nullable":true},"relatedOrderId":{"type":"string","nullable":true},"slaDueAt":{"type":"string","format":"date-time","nullable":true},"isSlaBreached":{"type":"boolean","readOnly":true,"x-ticvai-persisted":false,"description":"**Computed when read, never stored.** True once the case has been open longer than its SLA allows — the time from `recordedAt` to `resolvedAt` (or to now, while unresolved), less `slaPausedSeconds`, is past the target that set `slaDueAt`. A stored flag would need a job to flip it at the moment of breach, and no such job is designed; `listCases?breachedSla` filters on the same computation.\n"},"slaPausedSeconds":{"type":"integer","description":"Accrued only while awaiting the guest. Waiting on an internal team does not pause the clock.\n"},"escalationCount":{"type":"integer"},"createdAt":{"type":"string","format":"date-time"},"resolvedAt":{"type":"string","format":"date-time","nullable":true}}},
 "CaseCategory": {"type":"object","x-ticvai-persistence":"marketing.case_category","description":"**The venue's case taxonomy**: categories and, under them, subcategories (`parentCategoryId`). `Case.categoryId` and the routing rules' `match.categoryIds` point here; `createCaseClassificationIntelligent` recommends one. Maintained by `setCaseCategoryDefinition`, read by `listCaseCategories` (decided 29 September, writers pass). (decided 29 September, data model for the agreed operations)\n","required":["id","code","name","isActive"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"code":{"type":"string","maxLength":60},"name":{"type":"string","maxLength":150},"parentCategoryId":{"type":"string","format":"uuid","nullable":true,"description":"Set on a subcategory; null on a top-level category."},"defaultPriority":{"allOf":[{"$ref":"#/components/schemas/CasePriority"}],"nullable":true,"description":"The priority a case in this category starts at before routing factors apply."},"isActive":{"type":"boolean","default":true},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005)."},"createdAt":{"type":"string","format":"date-time","readOnly":true},"updatedAt":{"type":"string","format":"date-time","readOnly":true}}},
 "CaseKind": {"type":"string","description":"**What the guest says the case is about**, in their words rather than the venue's taxonomy — `raiseMyCase` asks for it and `categoryId` is what staff file it under. Stored on the case, because a lost-property report that forgets it was one cannot be routed to the lost and found desk.\n**`other` only with a note (decided 28 September, audit R222).** A case raised as `other` must carry a non-empty `detail` (`raiseMyCase`), or it is refused with 400; the notes are reviewed quarterly to add the real kinds they reveal.\n","enum":["lostProperty","complaint","question","accessibility","refundRequest","other"]},
 "CasePriority": {"type":"string","enum":["low","normal","high","urgent"]},
 "CaseStatus": {"type":"string","enum":["open","inProgress","awaitingGuest","escalated","resolved","closed"]},
 "ContactAutomation": {"type":"object","x-ticvai-persistence":"marketing.contact_automation","description":"One governed contact-centre automation (pack 10.2.10 AI Governance).","required":["code","name","level","trigger","allowedActions","confidenceThreshold","onException","status"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"code":{"type":"string","maxLength":60,"description":"The natural key, e.g. `autoResendValidTicket`."},"name":{"type":"string","maxLength":150},"ownerPrincipalId":{"type":"string","format":"uuid","nullable":true},"level":{"type":"string","enum":["recommendOnly","agentConfirmation","supervisorGoverned","fullyAutomated"]},"trigger":{"type":"object","required":["event"],"properties":{"event":{"type":"string","enum":["caseCreated","caseUpdated","conversationMessageReceived","caseClusterDetected"]},"conditions":{"type":"array","maxItems":20,"description":"All must hold.","items":{"type":"object","required":["field","operator"],"properties":{"field":{"type":"string","maxLength":100,"description":"e.g. `case.kind`, `ticket.isValid`, `guest.identityVerified`, `cluster.caseCount`."},"operator":{"type":"string","enum":["eq","neq","in","gt","gte","lt","lte","exists"]},"value":{"description":"Any JSON value; omitted for `exists`."}}}},"windowMinutes":{"type":"integer","minimum":1,"nullable":true,"description":"For cluster triggers, e.g. 5 cases in 10 minutes."}}},"scope":{"type":"object","description":"Where it applies; empty lists mean everywhere in the scope path.","properties":{"venueIds":{"type":"array","items":{"type":"string","format":"uuid"}},"queueIds":{"type":"array","items":{"type":"string","format":"uuid"}},"channels":{"type":"array","items":{"$ref":"#/components/schemas/MessageChannel"}}}},"allowedActions":{"type":"array","minItems":1,"items":{"type":"string","enum":["resendTicket","resolveCase","createCase","assignQueue","setPriority","sendMessage","notifySupervisor","flagPotentialIncident"]}},"confidenceThreshold":{"type":"number","minimum":0,"maximum":1},"onException":{"type":"string","enum":["leaveForAgent","routeToQueue","notifySupervisor"]},"exceptionQueueId":{"type":"string","format":"uuid","nullable":true},"effectiveFrom":{"type":"string","format":"date-time","nullable":true},"effectiveTo":{"type":"string","format":"date-time","nullable":true},"killSwitch":{"type":"boolean","default":false},"status":{"type":"string","enum":["draft","approved","active","paused","retired"]},"version":{"type":"integer","minimum":1,"readOnly":true},"approvedByPrincipalId":{"type":"string","format":"uuid","nullable":true,"readOnly":true},"approvedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true},"lastSimulation":{"type":"object","nullable":true,"readOnly":true,"properties":{"simulatedVersion":{"type":"integer","minimum":1},"periodStart":{"type":"string","format":"date-time"},"periodEnd":{"type":"string","format":"date-time"},"casesMatched":{"type":"integer","minimum":0},"casesResolvable":{"type":"integer","minimum":0},"agentHoursSaved":{"type":"number","minimum":0},"estimatedConfidence":{"type":"number","minimum":0,"maximum":1}}},"executionsLast30Days":{"type":"integer","minimum":0,"readOnly":true},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005)."},"updatedAt":{"type":"string","format":"date-time","readOnly":true}}},
 "ContactCenterOperationsCommandCenterView": {"type":"object","x-ticvai-persistence":"none — projection over marketing.case, marketing.conversation, marketing.agent_availability, marketing.sla_policy, marketing.form_submission (post-case CSAT surveys) and marketing.service_queue (new)","description":"The contact centre's live figures for the filters given. Counts are of cases unless the name says otherwise; durations are averages over cases first responded to or resolved today.","required":["casesToday","openCases","unassignedCases","customersWaiting","criticalCases","slaAtRisk","slaBreached","channels","queues"],"properties":{"casesToday":{"type":"integer","minimum":0,"description":"Cases created today."},"openCases":{"type":"integer","minimum":0,"description":"Cases not `resolved` or `closed`."},"unassignedCases":{"type":"integer","minimum":0},"customersWaiting":{"type":"integer","minimum":0,"description":"Unclaimed conversations waiting in a queue now."},"criticalCases":{"type":"integer","minimum":0,"description":"Open cases at priority `urgent`."},"slaAtRisk":{"type":"integer","minimum":0,"description":"Open cases that have used 75% or more of their SLA and have not breached."},"slaBreached":{"type":"integer","minimum":0,"description":"Open cases past their SLA (`Case.isSlaBreached`)."},"casesResolvedToday":{"type":"integer","minimum":0},"averageFirstResponseSeconds":{"type":"integer","minimum":0,"nullable":true},"averageResolutionSeconds":{"type":"integer","minimum":0,"nullable":true},"firstContactResolutionRate":{"type":"number","minimum":0,"maximum":1,"nullable":true,"description":"Share of cases resolved today with no reopen and no transfer."},"csat":{"type":"number","minimum":0,"maximum":1,"nullable":true,"description":"Share of today's post-case CSAT responses that are satisfied (top two points of the scale). Null when there are none."},"activeAgents":{"type":"integer","minimum":0,"description":"Agents whose availability is not `offline`."},"agentUtilization":{"type":"number","minimum":0,"maximum":1,"nullable":true,"description":"Active cases and conversations held, over the active agents' combined capacity."},"channels":{"type":"array","description":"Workload per contact channel, from `Case.channel` and `Conversation.channel`.","items":{"type":"object","required":["channel","openCases","waiting"],"properties":{"channel":{"type":"string","enum":["email","phone","liveChat","whatsapp","webForm","mobileApp","b2cPortal","social","frontDesk"]},"openCases":{"type":"integer","minimum":0},"waiting":{"type":"integer","minimum":0},"slaAtRisk":{"type":"integer","minimum":0},"averageFirstResponseSeconds":{"type":"integer","minimum":0,"nullable":true}}}},"queues":{"type":"array","description":"Queue health, worst first.","items":{"type":"object","required":["queueId","queueName","openCases","waiting","health"],"properties":{"queueId":{"type":"string","format":"uuid"},"queueName":{"type":"string"},"openCases":{"type":"integer","minimum":0},"waiting":{"type":"integer","minimum":0},"slaAtRisk":{"type":"integer","minimum":0},"agentsOnline":{"type":"integer","minimum":0},"health":{"type":"string","enum":["healthy","warning","critical"],"description":"`critical` when any case in the queue has breached or waiting exceeds the queue's overflow threshold; `warning` when any is at risk."}}}},"operationalFeed":{"type":"array","maxItems":50,"description":"Notable changes in the last hour, newest first (queue surges, cases nearing breach, a channel over its response target).","items":{"type":"object","required":["occurredAt","severity","message"],"properties":{"occurredAt":{"type":"string","format":"date-time"},"severity":{"type":"string","enum":["info","warning","critical"]},"message":{"type":"string","maxLength":300},"queueId":{"type":"string","format":"uuid","nullable":true},"channel":{"type":"string","nullable":true}}}},"serviceRiskSummary":{"type":"object","nullable":true,"description":"The AI operational summary; null when AI is disabled for the tenant. Advisory only, it changes nothing.","required":["riskLevel","summary","generatedAt"],"properties":{"riskLevel":{"type":"string","enum":["low","medium","high","critical"]},"summary":{"type":"string","maxLength":1000},"recommendations":{"type":"array","maxItems":5,"items":{"type":"string","maxLength":300}},"generatedAt":{"type":"string","format":"date-time"}}}}},
-"CreateQueueRequest": {"x-ticvai-persistence":"none — request only","type":"object","required":["code","name","venueId","capacityPerCycle","cycleMinutes"],"properties":{"code":{"type":"string","maxLength":64},"name":{"$ref":"#/components/schemas/LocalisedText"},"venueId":{"type":"string","format":"uuid"},"attractionProductId":{"type":"string","format":"uuid"},"assetId":{"type":"string","format":"uuid","nullable":true,"description":"The ride. Taking it out of service closes this queue rather than leaving guests holding positions for something that is not running.\n"},"accessPointId":{"type":"string","format":"uuid","nullable":true},"kind":{"type":"string","enum":["standby","singleRider","fastPass","virtual","accessible","groupOnly","staffOnly"],"default":"standby","description":"5.6.x. **A ride has several queues and the model had one.** A single-rider line and a standby line at the same attraction draw from one capacity and fill at different rates, and modelling them as one queue makes both wait estimates wrong.\n**`accessible` is not a courtesy lane.** It has its own capacity because a guest who cannot stand in a switchback needs a place to wait, not priority.\n"},"operatingWindows":{"type":"array","description":"**When the queue runs, which is not when the venue is open.** A ride closing an hour early for maintenance leaves a queue accepting guests for a cycle that will not happen.\nStored one row per window in `queue.queue_operating_window` (see `Queue`), not as a column on the queue.\n","items":{"type":"object","required":["day","from","to"],"properties":{"day":{"type":"string","enum":["mon","tue","wed","thu","fri","sat","sun"]},"from":{"type":"string","pattern":"^([01][0-9]|2[0-3]):[0-5][0-9]$","description":"Venue local time, 24-hour `HH:MM`, when the queue starts running."},"to":{"type":"string","pattern":"^([01][0-9]|2[0-3]):[0-5][0-9]$","description":"Venue local time, 24-hour `HH:MM`, when the queue stops running."},"lastEntryMinutesBefore":{"type":"integer","default":0,"description":"**When the queue stops accepting, which is before it stops running.** A guest joining two minutes before close waits twenty and is turned away at the front.\n"}}}},"parentQueueId":{"type":"string","format":"uuid","nullable":true,"description":"Where several queues share one capacity. **The standby and single-rider lines at one ride draw from the same cycles**, and a parent is how that is expressed without either queue owning the other.\n"},"loadBalanceWithQueueIds":{"type":"array","description":"BL-137. **Two rides with the same theme and different waits**, and nothing directed a guest to the shorter one. Load balancing is an offer, not an assignment — **a guest sent to a ride they did not choose is a guest who feels managed.**\n","items":{"type":"string","format":"uuid"}},"inQueueOfferEnabled":{"type":"boolean","default":false,"description":"**A guest with twenty minutes to wait is a guest with twenty minutes to buy something.** Offers surface in the wait screen and are the only reason a virtual queue earns its infrastructure.\n"},"notifyBeforeCallMinutes":{"type":"integer","default":5,"description":"BL-017, 19.2.61. **A guest was not told their turn was approaching**, which makes a virtual queue worse than a physical one — at least a line is visible.\n"},"capacityPerCycle":{"type":"integer","minimum":1},"cycleMinutes":{"type":"number","minimum":0},"maxPartySize":{"type":"integer","default":6},"returnWindowMinutes":{"type":"integer","default":15,"description":"How long a called party has to arrive before the entry expires."},"heightRequirementCm":{"type":"integer","nullable":true},"fastPassAllocationPercent":{"type":"number","minimum":0,"maximum":100,"default":0,"description":"Share of each cycle reserved for Fast Pass holders."},"zone":{"type":"string","nullable":true},"fastPass":{"allOf":[{"$ref":"#/components/schemas/QueueFastPass"}],"nullable":true,"description":"The lane's Fast Pass block (decided 29 September, VM close-out). Null on a queue that takes no Fast Pass.\n"}}},
 "CustomerSatisfactionFeedbackVoiceOfCustomerView": {"type":"object","x-ticvai-persistence":"none — projection over marketing.form_submission and marketing.form_definition (survey forms), marketing.review, marketing.case and marketing.feedback_classification (new, the AI sentiment and topic per feedback item)","description":"Voice-of-customer figures for the filters given. Rates are shares of feedback items in the period.","required":["responses","breakdown","comments"],"properties":{"responses":{"type":"integer","minimum":0,"description":"Feedback items in the period."},"csat":{"type":"number","minimum":0,"maximum":1,"nullable":true,"description":"Share of CSAT answers in the top two points of the scale."},"nps":{"type":"integer","minimum":-100,"maximum":100,"nullable":true,"description":"Null where the tenant runs no NPS survey."},"surveyResponseRate":{"type":"number","minimum":0,"maximum":1,"nullable":true,"description":"Surveys answered over surveys sent."},"positiveRate":{"type":"number","minimum":0,"maximum":1},"neutralRate":{"type":"number","minimum":0,"maximum":1},"negativeRate":{"type":"number","minimum":0,"maximum":1},"complaints":{"type":"integer","minimum":0},"repeatContactRate":{"type":"number","minimum":0,"maximum":1,"nullable":true,"description":"Customers with a second case within 7 days of the first, over customers with a case."},"customerEffortScore":{"type":"number","minimum":1,"maximum":7,"nullable":true,"description":"Mean CES answer; null where effort is not measured."},"csatChangeRate":{"type":"number","nullable":true,"description":"Relative change in `csat` against the previous period of equal length."},"aiSummary":{"type":"object","nullable":true,"description":"AI-derived narrative of the feedback matching the filters (22.5.12; 29 September, build pass, group G2), labelled as AI on screen. Null when AI is off or fewer than 5 items match.","required":["text","basedOnCount","modelVersion"],"properties":{"text":{"type":"string","maxLength":2000},"basedOnCount":{"type":"integer","minimum":0,"description":"The feedback items the summary was written from."},"modelVersion":{"type":"string","maxLength":60},"generatedAt":{"type":"string","format":"date-time"}}},"breakdown":{"type":"array","description":"One row per value of the `groupBy` dimension, most responses first.","items":{"type":"object","required":["key","label","responses"],"properties":{"key":{"type":"string","description":"The id or enum value of the group."},"label":{"type":"string"},"responses":{"type":"integer","minimum":0},"csat":{"type":"number","minimum":0,"maximum":1,"nullable":true},"negativeRate":{"type":"number","minimum":0,"maximum":1}}}},"themes":{"type":"array","maxItems":20,"description":"AI topic themes, largest share first. Empty when AI is disabled for the tenant.","items":{"type":"object","required":["topic","shareRate"],"properties":{"topic":{"type":"string","maxLength":100},"shareRate":{"type":"number","minimum":0,"maximum":1},"negativeRate":{"type":"number","minimum":0,"maximum":1},"changeRate":{"type":"number","nullable":true,"description":"Relative change in the theme's volume against the previous period."}}}},"trendAlerts":{"type":"array","maxItems":10,"items":{"type":"string","maxLength":300},"description":"AI-detected shifts, e.g. negative feedback on ticket delivery rising after a release."},"comments":{"type":"array","maxItems":50,"description":"The 50 latest comments with text, newest first.","items":{"type":"object","required":["feedbackId","source","receivedAt"],"properties":{"feedbackId":{"type":"string","format":"uuid"},"source":{"type":"string","enum":["csatSurvey","serviceRating","nps","postCaseSurvey","complaint","appFeedback","webFeedback","directComment"]},"receivedAt":{"type":"string","format":"date-time"},"comment":{"type":"string","maxLength":4000,"nullable":true},"rating":{"type":"number","nullable":true,"description":"The answer on its survey's own scale."},"ratingScale":{"type":"string","nullable":true,"enum":["nps","csat","ces","likert5","likert7","stars"]},"sentiment":{"type":"string","nullable":true,"enum":["positive","neutral","negative"]},"topic":{"type":"string","nullable":true},"caseId":{"type":"string","format":"uuid","nullable":true},"agentPrincipalId":{"type":"string","format":"uuid","nullable":true},"productId":{"type":"string","format":"uuid","nullable":true},"eventId":{"type":"string","format":"uuid","nullable":true},"followUpCaseId":{"type":"string","format":"uuid","nullable":true}}}}}},
 "EscalationCriticalCaseMonitorView": {"type":"object","x-ticvai-persistence":"none — projection over marketing.case, marketing.case_escalation (new, one row per escalateCase call) and the related order in orders","description":"One open escalated case, as of its latest escalation.","required":["caseId","caseNumber","reason","escalationType","priority","escalatedAt","status"],"properties":{"caseId":{"type":"string","format":"uuid"},"caseNumber":{"type":"string"},"subjectId":{"type":"string","format":"uuid","nullable":true},"customerName":{"type":"string","nullable":true,"description":"Resolved from `pii.subject`; null unless the caller holds `GUEST_VIEW_PII`."},"reason":{"type":"string","description":"The reason given to `escalateCase`, or `SLA breached` for an automatic escalation."},"reasonCategory":{"type":"string","nullable":true,"enum":["slaRisk","customerComplaint","repeatedContact","highValue","refundException","operationalFailure","systemFailure","legalCompliance","vipCustomer","supervisorRequested","other"]},"escalationType":{"type":"string","enum":["vip","financial","eventDay","management","technical","other"],"description":"`vip` for a VIP-tier customer, `financial` for a refund or high-value order, `eventDay` when the case's event is today, `management` when escalated to a manager, `technical` for a technical category; the first that applies, in that order."},"priority":{"$ref":"#/components/schemas/CasePriority"},"transactionValue":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"nullable":true,"description":"The related order's total, when the case has one."},"eventId":{"type":"string","format":"uuid","nullable":true},"eventName":{"type":"string","nullable":true},"assignedToPrincipalId":{"type":"string","format":"uuid","nullable":true},"escalatedToPrincipalId":{"type":"string","format":"uuid","nullable":true},"escalatedAt":{"type":"string","format":"date-time"},"escalationCount":{"type":"integer","minimum":1},"slaDueAt":{"type":"string","format":"date-time","nullable":true},"isSlaBreached":{"type":"boolean"},"status":{"$ref":"#/components/schemas/CaseStatus"}}},
 "IntelligentRoutingSkillsAssignmentEngineInput": {"type":"object","x-ticvai-persistence":"marketing.case_routing_rule","description":"One case routing rule (pack 10.2.3). Empty match lists match everything; all non-empty lists must match.","required":["code","name","strategy","rank","isActive"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"code":{"type":"string","maxLength":60,"description":"The natural key, e.g. `eventDayArabic`."},"name":{"type":"string","maxLength":150},"rank":{"type":"integer","minimum":1,"description":"Lower is tried first."},"queueId":{"type":"string","format":"uuid","nullable":true,"description":"The queue this rule routes into; null routes straight to an agent."},"match":{"type":"object","properties":{"categoryIds":{"type":"array","items":{"type":"string","format":"uuid"},"description":"Case categories and subcategories (`Case.categoryId`)."},"kinds":{"type":"array","items":{"$ref":"#/components/schemas/CaseKind"}},"channels":{"type":"array","items":{"$ref":"#/components/schemas/MessageChannel"}},"customerLanguages":{"type":"array","items":{"type":"string","maxLength":10},"description":"BCP-47 tags, e.g. `ar`, `en`."},"customerTypes":{"type":"array","items":{"type":"string","enum":["individual","member","vip","corporate","group","partner"]}},"membershipTierIds":{"type":"array","items":{"type":"string","format":"uuid"}},"venueIds":{"type":"array","items":{"type":"string","format":"uuid"}},"eventIds":{"type":"array","items":{"type":"string","format":"uuid"}},"productIds":{"type":"array","items":{"type":"string","format":"uuid"}},"priorities":{"type":"array","items":{"$ref":"#/components/schemas/CasePriority"}},"eventWithinHours":{"type":"integer","minimum":0,"nullable":true,"description":"Event proximity - matches only when the case's event starts within this many hours."}}},"strategy":{"type":"string","enum":["roundRobin","leastBusy","skillBased","priorityBased","languageBased","customerTierBased","aiRecommended"]},"requiredSkills":{"type":"array","items":{"type":"string","maxLength":60},"description":"Skills an agent must hold (`AgentServiceProfile.skills`), e.g. `ticketing`, `refunds`."},"requireLanguageMatch":{"type":"boolean","default":true,"description":"Only agents who speak the customer's language are candidates."},"maxUtilizationRate":{"type":"number","minimum":0,"maximum":1,"nullable":true,"description":"Agents above this workload are skipped."},"respectSlaCapability":{"type":"boolean","default":true,"description":"Skip agents whose current queue would push the case past its SLA."},"stickyOwnership":{"type":"boolean","default":false,"description":"Prefer the agent who last handled the customer or the reopened case, if available."},"stickyWindowHours":{"type":"integer","minimum":1,"nullable":true},"fallbackQueueId":{"type":"string","format":"uuid","nullable":true,"description":"Where the case goes when no candidate agent is available."},"isActive":{"type":"boolean"},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005)."},"updatedAt":{"type":"string","format":"date-time","readOnly":true}}},
 "IntelligentRoutingSkillsAssignmentEngineView": {"description":"A routing rule as stored, with how often it has matched.","x-ticvai-persistence":"none — the marketing.case_routing_rule (new) row plus a count over marketing.case","allOf":[{"$ref":"#/components/schemas/IntelligentRoutingSkillsAssignmentEngineInput"},{"type":"object","properties":{"matchedLast7Days":{"type":"integer","minimum":0,"readOnly":true},"lastMatchedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true}}}]},
+"MarketingSlaPolicy": {"type":"object","x-ticvai-persistence":"marketing.sla_policy","description":"**Taken from the backend workbook, 20 September.** Defines service-level response and resolution targets used by support cases.","required":["code","name","businessHoursOnly","isActive","createdAt"],"properties":{"id":{"type":"string","format":"uuid"},"scopePath":{"type":"string","nullable":true},"code":{"type":"string","maxLength":100},"name":{"type":"string","maxLength":150},"priority":{"type":"string","maxLength":20,"nullable":true},"firstResponseMinutes":{"type":"integer","nullable":true},"resolutionMinutes":{"type":"integer","nullable":true},"escalationMinutes":{"type":"integer","nullable":true},"businessHoursOnly":{"type":"boolean"},"isActive":{"type":"boolean"},"createdAt":{"type":"string","format":"date-time"},"updatedAt":{"type":"string","format":"date-time","nullable":true}}},
 "MessageChannel": {"type":"string","enum":["email","sms","whatsapp","push","inApp","post"]},
 "Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}},
 "QualityManagementAgentEvaluationView": {"type":"object","x-ticvai-persistence":"marketing.quality_evaluation","description":"One quality evaluation of one interaction (pack 10.2.7). Resolution time and SLA outcome are read from the case, not entered.","required":["id","agentPrincipalId","sourceType","evaluatedBy","status","criteria"],"properties":{"id":{"type":"string","format":"uuid"},"agentPrincipalId":{"type":"string","format":"uuid"},"evaluatorPrincipalId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"The caller who scored it; null while only the AI has."},"sourceType":{"type":"string","enum":["call","chat","email","whatsapp","case","complaint"]},"caseId":{"type":"string","format":"uuid","nullable":true},"conversationId":{"type":"string","format":"uuid","nullable":true},"evaluatedBy":{"type":"string","enum":["human","ai"]},"status":{"type":"string","enum":["draft","scored","acknowledged"]},"criteria":{"type":"array","maxItems":30,"items":{"type":"object","required":["criterion","score","maxScore"],"properties":{"criterion":{"type":"string","maxLength":60,"description":"The tenant's criterion code; the pack's defaults are `greeting`, `customerVerification`, `understanding`, `accuracy`, `policyCompliance`, `communicationQuality`, `empathy`, `resolution`, `documentation`, `closing`."},"score":{"type":"integer","minimum":0},"maxScore":{"type":"integer","minimum":1},"comment":{"type":"string","maxLength":1000,"nullable":true}}}},"criticalFailures":{"type":"array","items":{"type":"string","enum":["incorrectRefund","privacyViolation","unauthorisedCompensation","incorrectTicketInformation","securityVerificationFailure","other"]}},"overallScore":{"type":"integer","minimum":0,"maximum":100,"nullable":true,"readOnly":true,"description":"Criteria score as a percentage; 0 when any critical failure is recorded."},"aiFindings":{"type":"array","readOnly":true,"items":{"type":"object","required":["area","finding"],"properties":{"area":{"type":"string","enum":["policyAdherence","requiredStatements","tone","accuracy","resolutionQuality","missingCaseDocumentation"]},"finding":{"type":"string","maxLength":500},"confidence":{"type":"number","minimum":0,"maximum":1}}}},"feedback":{"type":"string","maxLength":2000,"nullable":true},"coachingActions":{"type":"array","items":{"type":"object","required":["type"],"properties":{"type":{"type":"string","enum":["productTraining","policyTraining","communicationCoaching","systemTraining"]},"note":{"type":"string","maxLength":500,"nullable":true},"dueAt":{"type":"string","format":"date-time","nullable":true},"completedAt":{"type":"string","format":"date-time","nullable":true}}}},"resolutionSeconds":{"type":"integer","minimum":0,"nullable":true,"readOnly":true},"slaMet":{"type":"boolean","nullable":true,"readOnly":true},"agentComment":{"type":"string","maxLength":1000,"nullable":true},"acknowledgedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true},"evaluatedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005)."},"updatedAt":{"type":"string","format":"date-time","readOnly":true}}},
-"Queue": {"x-ticvai-persistence":"queue.queue + queue.queue_operating_window","allOf":[{"$ref":"#/components/schemas/CreateQueueRequest"},{"type":"object","required":["id","status","waitingPartyCount"],"properties":{"id":{"type":"string","format":"uuid"},"status":{"$ref":"#/components/schemas/QueueStatus"},"statusReason":{"type":"string","nullable":true},"waitingPartyCount":{"type":"integer"},"waitingGuestCount":{"type":"integer"},"currentWaitMinutes":{"type":"integer","nullable":true},"waitTimeSource":{"$ref":"#/components/schemas/WaitTimeSource"},"waitTimeAsOf":{"type":"string","format":"date-time","nullable":true,"readOnly":true,"description":"When `currentWaitMinutes` was last set, by whichever source set it. `WaitTime.asOf` reads this.\n"},"manualWaitExpiresAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true,"description":"Set by `setWaitTime` as now plus `expiresInMinutes`. Past it, the manual figure is dropped and the queue reverts to its sensor or throughput estimate. Null when the current figure is not manual.\n"},"manualWaitNote":{"type":"string","maxLength":200,"nullable":true,"readOnly":true,"description":"The `note` given with the current manual figure. Cleared when it expires."},"expectedReopenAt":{"type":"string","format":"date-time","nullable":true}}}]},
-"QueueStatus": {"type":"string","enum":["open","paused","closed","atCapacity"]},
 "ServiceAnalyticsRootCauseIntelligenceView": {"type":"object","x-ticvai-persistence":"none — projection over marketing.case, marketing.conversation, marketing.form_submission (CSAT) and the related orders and payments","description":"Service analytics for the filters given, with the comparison asked for.","required":["contactVolume","cases","drivers","comparison"],"properties":{"contactVolume":{"type":"integer","minimum":0,"description":"Conversations and cases opened, a conversation that became a case counted once."},"cases":{"type":"integer","minimum":0},"averageFirstResponseSeconds":{"type":"integer","minimum":0,"nullable":true},"averageResolutionSeconds":{"type":"integer","minimum":0,"nullable":true},"firstContactResolutionRate":{"type":"number","minimum":0,"maximum":1,"nullable":true},"reopenRate":{"type":"number","minimum":0,"maximum":1,"nullable":true},"escalationRate":{"type":"number","minimum":0,"maximum":1,"nullable":true},"slaComplianceRate":{"type":"number","minimum":0,"maximum":1,"nullable":true},"costPerCase":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"nullable":true},"csat":{"type":"number","minimum":0,"maximum":1,"nullable":true},"refundRequests":{"type":"integer","minimum":0},"complaintRate":{"type":"number","minimum":0,"maximum":1,"nullable":true},"comparison":{"type":"object","required":["basis","kpis"],"properties":{"basis":{"type":"string","enum":["previousDay","previousWeek","previousMonth","event","venue","product"]},"compareId":{"type":"string","format":"uuid","nullable":true},"kpis":{"type":"array","items":{"type":"object","required":["kpi"],"properties":{"kpi":{"type":"string","description":"The KPI's property name above, e.g. `contactVolume`."},"current":{"type":"number","nullable":true},"previous":{"type":"number","nullable":true},"changeRate":{"type":"number","nullable":true}}}}}},"drivers":{"type":"array","description":"Contact drivers, most cases first.","items":{"type":"object","required":["driver","cases","shareRate"],"properties":{"driver":{"type":"string","enum":["ticketDelivery","refund","reschedule","paymentFailure","membership","accessIssue","groupBooking","generalInformation","other"]},"cases":{"type":"integer","minimum":0},"shareRate":{"type":"number","minimum":0,"maximum":1},"changeRate":{"type":"number","nullable":true}}}},"rootCauses":{"type":"array","maxItems":20,"description":"Case surges traced to one cause, largest first. Empty when AI is disabled for the tenant.","items":{"type":"object","required":["summary","cases"],"properties":{"summary":{"type":"string","maxLength":500},"driver":{"type":"string","nullable":true},"cases":{"type":"integer","minimum":0},"causeType":{"type":"string","enum":["paymentProvider","event","product","release","incident","venueArea","other"]},"causeRef":{"type":"string","nullable":true,"description":"The id of the provider, event, product or incident, where there is one."},"windowStart":{"type":"string","format":"date-time","nullable":true},"windowEnd":{"type":"string","format":"date-time","nullable":true}}}},"avoidableContacts":{"type":"array","description":"AI estimate of cases that could have been prevented, by remedy.","items":{"type":"object","required":["preventableBy","cases"],"properties":{"preventableBy":{"type":"string","enum":["betterB2cInformation","selfService","productConfiguration","improvedNotifications","technicalFixes","betterTicketDelivery"]},"cases":{"type":"integer","minimum":0},"recommendation":{"type":"string","maxLength":500,"nullable":true}}}}}},
 "ServiceQueue": {"type":"object","x-ticvai-persistence":"marketing.service_queue","description":"**A customer-service queue** (e.g. `eventDaySupport`). Cases (`Case.queueId`), routing rules (`queueId`, `fallbackQueueId`) and agents (`AgentAvailability.queueIds`) name it; `listContact` and `listAgentWorkloadAvailability` report per queue. Maintained by `setServiceQueueDefinition`, read by `listServiceQueues` (decided 29 September, writers pass). (decided 29 September, data model for the agreed operations)\n","required":["id","code","name","isActive"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"code":{"type":"string","maxLength":60},"name":{"type":"string","maxLength":150},"overflowWaitSeconds":{"type":"integer","minimum":0,"nullable":true,"description":"The queue's overflow threshold; a case waiting longer marks the queue `critical`."},"isActive":{"type":"boolean","default":true},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005)."},"createdAt":{"type":"string","format":"date-time","readOnly":true},"updatedAt":{"type":"string","format":"date-time","readOnly":true}}},
-"SlaPolicyServiceLevelManagementView": {"type":"object","x-ticvai-persistence":"none — projection over marketing.case and marketing.sla_policy","description":"SLA performance for the filters given. Counts are of open cases for the state counts and of cases in the period for the averages and the compliance rate.","required":["withinSla","atRisk","breached","byPolicy"],"properties":{"withinSla":{"type":"integer","minimum":0},"atRisk":{"type":"integer","minimum":0},"breached":{"type":"integer","minimum":0},"averageResponseSeconds":{"type":"integer","minimum":0,"nullable":true,"description":"Mean time to first response, less paused time."},"averageResolutionSeconds":{"type":"integer","minimum":0,"nullable":true},"slaComplianceRate":{"type":"number","minimum":0,"maximum":1,"nullable":true,"description":"Cases resolved in the period within target, over cases resolved in the period."},"byPolicy":{"type":"array","description":"One row per SLA policy that timed a case in the period, worst compliance first.","items":{"type":"object","required":["slaPolicyId","code","name","withinSla","atRisk","breached"],"properties":{"slaPolicyId":{"type":"string","format":"uuid"},"code":{"type":"string"},"name":{"type":"string"},"firstResponseMinutes":{"type":"integer","nullable":true},"resolutionMinutes":{"type":"integer","nullable":true},"withinSla":{"type":"integer","minimum":0},"atRisk":{"type":"integer","minimum":0},"breached":{"type":"integer","minimum":0},"slaComplianceRate":{"type":"number","minimum":0,"maximum":1,"nullable":true}}}},"forecastBreaches":{"type":"array","maxItems":50,"description":"AI forecast of open cases likely to breach before the static thresholds fire, soonest first. Advisory; empty when AI is disabled for the tenant.","items":{"type":"object","required":["caseCount","horizonMinutes"],"properties":{"queueId":{"type":"string","format":"uuid","nullable":true},"queueName":{"type":"string","nullable":true},"slaPolicyId":{"type":"string","format":"uuid","nullable":true},"caseCount":{"type":"integer","minimum":0},"horizonMinutes":{"type":"integer","minimum":1},"confidence":{"type":"number","minimum":0,"maximum":1}}}}}},
-"WaitTimeSource": {"type":"string","description":"Where the estimate came from. Surfaced so an operator knows whether a figure is measured or guessed.\n","enum":["sensor","throughput","manual","unavailable"]}
+"SlaPolicyServiceLevelManagementView": {"type":"object","x-ticvai-persistence":"none — projection over marketing.case and marketing.sla_policy","description":"SLA performance for the filters given. Counts are of open cases for the state counts and of cases in the period for the averages and the compliance rate.","required":["withinSla","atRisk","breached","byPolicy"],"properties":{"withinSla":{"type":"integer","minimum":0},"atRisk":{"type":"integer","minimum":0},"breached":{"type":"integer","minimum":0},"averageResponseSeconds":{"type":"integer","minimum":0,"nullable":true,"description":"Mean time to first response, less paused time."},"averageResolutionSeconds":{"type":"integer","minimum":0,"nullable":true},"slaComplianceRate":{"type":"number","minimum":0,"maximum":1,"nullable":true,"description":"Cases resolved in the period within target, over cases resolved in the period."},"byPolicy":{"type":"array","description":"One row per SLA policy that timed a case in the period, worst compliance first.","items":{"type":"object","required":["slaPolicyId","code","name","withinSla","atRisk","breached"],"properties":{"slaPolicyId":{"type":"string","format":"uuid"},"code":{"type":"string"},"name":{"type":"string"},"firstResponseMinutes":{"type":"integer","nullable":true},"resolutionMinutes":{"type":"integer","nullable":true},"withinSla":{"type":"integer","minimum":0},"atRisk":{"type":"integer","minimum":0},"breached":{"type":"integer","minimum":0},"slaComplianceRate":{"type":"number","minimum":0,"maximum":1,"nullable":true}}}},"forecastBreaches":{"type":"array","maxItems":50,"description":"AI forecast of open cases likely to breach before the static thresholds fire, soonest first. Advisory; empty when AI is disabled for the tenant.","items":{"type":"object","required":["caseCount","horizonMinutes"],"properties":{"queueId":{"type":"string","format":"uuid","nullable":true},"queueName":{"type":"string","nullable":true},"slaPolicyId":{"type":"string","format":"uuid","nullable":true},"caseCount":{"type":"integer","minimum":0},"horizonMinutes":{"type":"integer","minimum":1},"confidence":{"type":"number","minimum":0,"maximum":1}}}}}}
 }
 ```

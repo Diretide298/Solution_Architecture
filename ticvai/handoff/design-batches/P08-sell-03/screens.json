@@ -1,5 +1,107 @@
 [
  {
+  "id": "BO-113",
+  "name": "Central Kitchen & Commissary Management",
+  "module": "Sell",
+  "requiresModule": "fnb",
+  "wave": 2,
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/sell/central-kitchen-commissary-management",
+   "component": "apps/venue-management-web/src/routes/sell/CentralKitchenCommissaryManagementList.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-102"
+   ],
+   "exitTo": [
+    "BO-102"
+   ],
+   "inferred": false,
+   "notes": "**Returns to BO-102.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
+   "transitions": [
+    {
+     "to": "BO-102",
+     "trigger": "Sell",
+     "provenance": "derived — BO-102 declares entryState.params  and BO-113 holds none of them. The edge carries nothing: BO-113 is opened from BO-102, so this edge is the way back and BO-102 keeps its own state"
+    }
+   ]
+  },
+  "notes": "**Merged into BO-112** (decided 2 October 2026, Chinmay: duplicate screens merged as proposed; CHG-SBO-021). Commissary production is a tab of the one Production screen (design-note correction fnb-retail BO-112). **One implementation, both ids kept**, as the M24-03 merges do: this id stays for traceability and routes to BO-112, and nothing on it is built separately.\n\n**Added 20 August from the client design board.** The operations existed and no screen called them.",
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the screen declares only writes (`planProductionRun`, `completeProductionRun`) and no read of a population — it is settings, not a list",
+  "purpose": "Central Kitchen & Commissary Management — from the client design board, 20 August (merged into BO-112 Production Planning & Production Sheets).",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": []
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": []
+    }
+   ]
+  },
+  "states": {
+   "loading": "Routes to BO-112 while it opens.",
+   "error": "Could not open BO-112; says so and offers to retry.",
+   "emptyFirstRun": "Never shown: this id routes to BO-112, whose empty states apply.",
+   "emptyNoResults": "Never shown: this id routes to BO-112.",
+   "emptyNoAccess": "As BO-112: shown when the caller lacks the access BO-112 requires, named in words."
+  },
+  "apis": [],
+  "entryState": {
+   "params": [
+    {
+     "name": "venueId",
+     "from": "session"
+    },
+    {
+     "name": "runId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "Resolves from the session. A principal with more than one venue is asked which before the page renders."
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-113",
+   "derivedFrom": "wireframes/reference/Retail Board 2.dc.html",
+   "source": "Claude Design Retail pack, 24 August",
+   "note": "**Drawn by Claude Design on `Retail Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
+  },
+  "apisNote": "No operations of its own since 2 October 2026 (CHG-SBO-021): merged into BO-112, whose operations it routes to.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
   "id": "BO-114",
   "name": "Variants, Attributes, Barcode & RFID Management",
   "module": "Sell",
@@ -220,10 +322,7 @@
     {
      "to": "BO-116",
      "trigger": "Merchandising & Product Presentation",
-     "provenance": "flow F86 step 1→2",
-     "carries": [
-      "saleBoardId"
-     ]
+     "provenance": "flow F86 step 1→2"
     }
    ]
   },
@@ -260,22 +359,6 @@
        ],
        "operation": "listProductCategories",
        "provenance": "contract catalogue.yaml GET /product-categories"
-      },
-      {
-       "kind": "dataTable",
-       "label": "Every sale board",
-       "bindsTo": "SaleBoard",
-       "columns": [
-        "SaleBoard.id",
-        "SaleBoard.code",
-        "SaleBoard.name",
-        "SaleBoard.venueId",
-        "SaleBoard.kind",
-        "SaleBoard.pages",
-        "SaleBoard.isActive"
-       ],
-       "operation": "listSaleBoards",
-       "provenance": "contract tenancy.yaml GET /sale-boards"
       },
       {
        "kind": "searchField",
@@ -318,18 +401,6 @@
        "label": "Save product categories",
        "operation": "setProductCategories",
        "provenance": "contract catalogue.yaml PUT /product-categories"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Request suggestion",
-       "operation": "requestSuggestion",
-       "provenance": "contract ai.yaml POST /ai/suggestions"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Run report",
-       "operation": "runReport",
-       "provenance": "contract reporting.yaml POST /reports/{reportId}/run"
       }
      ]
     },
@@ -352,7 +423,7 @@
   "states": {
    "loading": "The category brand merchandise list.",
    "error": "Could not load. Names which read failed and leaves the category brand merchandise untouched.",
-   "emptyFirstRun": "No category brand merchandise yet. Offers Request suggestion (`requestSuggestion`).",
+   "emptyFirstRun": "No category brand merchandise yet. Offers no create action — this screen declares no operation that makes one.",
    "emptyNoResults": "Never shown: `listProductCategories` takes no filter, so an empty list is always the first-run state above.",
    "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listProductCategories` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -378,30 +449,6 @@
     "invalidates": [
      "listProductCategories"
     ]
-   },
-   {
-    "operationId": "listSaleBoards",
-    "contract": "tenancy",
-    "purpose": "List sale boards",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "requestSuggestion",
-    "contract": "ai",
-    "purpose": "requestSuggestion",
-    "trigger": "onAction",
-    "invalidates": [
-     "listProductCategories"
-    ]
-   },
-   {
-    "operationId": "runReport",
-    "contract": "reporting",
-    "purpose": "Run a report",
-    "trigger": "onAction",
-    "invalidates": [
-     "listProductCategories"
-    ]
    }
   ],
   "entryState": {
@@ -409,10 +456,6 @@
     {
      "name": "venueId",
      "from": "session"
-    },
-    {
-     "name": "reportId",
-     "from": "deepLink"
     }
    ],
    "coldEntry": "Resolves from the session. A principal with more than one venue is asked which before the page renders.",
@@ -450,48 +493,26 @@
      ]
     },
     "provenance": "contract catalogue.yaml PUT /product-categories"
+   }
+  ],
+  "gaps": [
+   {
+    "operation": "listSaleBoards",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-025): Sale boards (POS layout, POS-4A), a report runner and a generic suggestion form sat on the category tree; the category tree (listProductCategories, setProductCategories, F86 step 1) is the screen's job (design-notes correction ticketing-backoffice BO-115)",
+    "source": "screens/P08-venue-back-office.yaml#BO-115 | F86 step 1"
    },
    {
-    "id": "formRequestSuggestion",
-    "component": "modal",
-    "trigger": "Request suggestion",
-    "body": "**Collects what `requestSuggestion` sends before it is called.** Required: `kind`. Optional: `subjectRef`, `horizon`, `context`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Request suggestion",
-     "operation": "requestSuggestion"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "kind",
-      "subjectRef",
-      "horizon",
-      "context"
-     ]
-    },
-    "provenance": "contract ai.yaml POST /ai/suggestions"
+    "operation": "requestSuggestion",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-025): Sale boards (POS layout, POS-4A), a report runner and a generic suggestion form sat on the category tree; the category tree (listProductCategories, setProductCategories, F86 step 1) is the screen's job (design-notes correction ticketing-backoffice BO-115)",
+    "source": "screens/P08-venue-back-office.yaml#BO-115 | F86 step 1"
    },
    {
-    "id": "formRunReport",
-    "component": "modal",
-    "trigger": "Run report",
-    "body": "**Collects what `runReport` sends before it is called.** Nothing in the body is required. Optional: `parameters`, `venueId`, `dateFrom`, `dateTo`, `forceAsync`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "RunReportRequest",
-    "confirm": {
-     "label": "Run report",
-     "operation": "runReport"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "parameters",
-      "venueId",
-      "dateFrom",
-      "dateTo",
-      "forceAsync"
-     ]
-    },
-    "provenance": "contract reporting.yaml POST /reports/{reportId}/run"
+    "operation": "runReport",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-025): Sale boards (POS layout, POS-4A), a report runner and a generic suggestion form sat on the category tree; the category tree (listProductCategories, setProductCategories, F86 step 1) is the screen's job (design-notes correction ticketing-backoffice BO-115)",
+    "source": "screens/P08-venue-back-office.yaml#BO-115 | F86 step 1"
    }
   ],
   "_platform": {
@@ -550,9 +571,7 @@
      "to": "BO-117",
      "trigger": "Product Import, Governance & AI Configuration Assistant",
      "provenance": "flow F86 step 2→3",
-     "carries": [
-      "saleBoardId"
-     ]
+     "operation": "updateMerchandise"
     }
    ]
   },
@@ -563,7 +582,7 @@
   ],
   "pattern": "commandCentre",
   "patternReason": "3 independent reads and no read of one record — the screen watches a population rather than working one",
-  "purpose": "Merchandising & Product Presentation — from the client design board, 20 August.",
+  "purpose": "Arrange how merchandise is presented on the sale boards.",
   "layout": {
    "template": "dashboard",
    "regions": [
@@ -625,14 +644,9 @@
        "label": "Every merchandise",
        "bindsTo": "MerchandiseItem",
        "columns": [
-        "MerchandiseItem.id",
         "MerchandiseItem.sku",
         "MerchandiseItem.barcode",
         "MerchandiseItem.name",
-        "MerchandiseItem.outletId",
-        "MerchandiseItem.categoryId",
-        "MerchandiseItem.variantId",
-        "MerchandiseItem.inventoryItemId",
         "MerchandiseItem.price",
         "MerchandiseItem.onHand",
         "MerchandiseItem.isReturnable",
@@ -657,18 +671,6 @@
        "label": "Save merchandise",
        "operation": "updateMerchandise",
        "provenance": "contract retail.yaml PATCH /merchandise/{merchandiseId}"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Save role permissions",
-       "operation": "setRolePermissions",
-       "provenance": "contract tenancy.yaml PUT /roles/{roleId}/permissions"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Save venue settings",
-       "operation": "setVenueSettings",
-       "provenance": "contract tenancy.yaml PUT /venues/{venueId}/settings"
       },
       {
        "kind": "secondaryButton",
@@ -716,24 +718,6 @@
     "trigger": "onLoad"
    },
    {
-    "operationId": "setRolePermissions",
-    "contract": "tenancy",
-    "purpose": "What this role may do",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMerchandise"
-    ]
-   },
-   {
-    "operationId": "setVenueSettings",
-    "contract": "tenancy",
-    "purpose": "Set support hours, quiet hours, segregated access and alerti",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMerchandise"
-    ]
-   },
-   {
     "operationId": "updateSaleBoard",
     "contract": "tenancy",
     "purpose": "Update a sale board",
@@ -751,10 +735,6 @@
     },
     {
      "name": "merchandiseId",
-     "from": "deepLink"
-    },
-    {
-     "name": "roleId",
      "from": "deepLink"
     },
     {
@@ -801,54 +781,10 @@
     "provenance": "contract retail.yaml PATCH /merchandise/{merchandiseId}"
    },
    {
-    "id": "formSetRolePermissions",
-    "component": "modal",
-    "trigger": "Save role permissions",
-    "body": "**Collects what `setRolePermissions` sends before it is called.** Required: `permissions`. Optional: `inheritsFromRoleId`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Save role permissions",
-     "operation": "setRolePermissions"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "permissions",
-      "inheritsFromRoleId"
-     ]
-    },
-    "provenance": "contract tenancy.yaml PUT /roles/{roleId}/permissions"
-   },
-   {
-    "id": "formSetVenueSettings",
-    "component": "modal",
-    "trigger": "Save venue settings",
-    "body": "**Collects what `setVenueSettings` sends before it is called.** Nothing in the body is required. Optional: `id`, `venueId`, `currencyCode`, `currencyScale`, `supportHours`, `quietHours`, `biometrics`, `segregatedAccess`, `alerting`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "VenueSettings",
-    "confirm": {
-     "label": "Save venue settings",
-     "operation": "setVenueSettings"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "id",
-      "venueId",
-      "currencyCode",
-      "currencyScale",
-      "supportHours",
-      "quietHours",
-      "biometrics",
-      "segregatedAccess",
-      "alerting"
-     ]
-    },
-    "provenance": "contract tenancy.yaml PUT /venues/{venueId}/settings"
-   },
-   {
     "id": "formUpdateSaleBoard",
     "component": "modal",
     "trigger": "Save sale board",
-    "body": "**Collects what `updateSaleBoard` sends before it is called.** Required: `id`, `code`, `name`, `venueId`, `kind`, `pages`. Optional: `isActive`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `updateSaleBoard` sends before it is called.** Required: `code`, `name`, `venueId`, `kind`, `pages`. Optional: `isActive`. **Not asked:** `id` is a client UUIDv7 generated silently (design-note correction, 2 October 2026). Dismissing sends nothing; the screen behind is unchanged.",
     "bindsTo": "SaleBoard",
     "confirm": {
      "label": "Save sale board",
@@ -857,7 +793,6 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "id",
       "code",
       "name",
       "venueId",
@@ -869,6 +804,21 @@
     "provenance": "contract tenancy.yaml PUT /sale-boards/{saleBoardId}"
    }
   ],
+  "gaps": [
+   {
+    "operation": "setRolePermissions",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-021): Save role permissions (setRolePermissions) and Save venue settings (setVenueSettings) were attached to a merchandising screen by board position; role permissions move to Role Assignment BO-054 (design-notes correction platform-foundation BO-116).",
+    "source": "screens/P08-venue-back-office.yaml#BO-116"
+   },
+   {
+    "operation": "setVenueSettings",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-021): Save role permissions (setRolePermissions) and Save venue settings (setVenueSettings) were attached to a merchandising screen by board position; role permissions move to Role Assignment BO-054 (design-notes correction platform-foundation BO-116).",
+    "source": "screens/P08-venue-back-office.yaml#BO-116"
+   }
+  ],
+  "purposeNote": "Purpose rewritten 2 October 2026 (CHG-WIR-023): The purpose was the pasted board placeholder \"Merchandising & Product Presentation — from the client design board, 20 August\"; the job is arranging products on a board (design-notes correction platform-foundation BO-116).",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -924,10 +874,7 @@
     {
      "to": "BO-118",
      "trigger": "Campaign & Audience Management",
-     "provenance": "flow F86 step 3→4",
-     "carries": [
-      "saleBoardId"
-     ]
+     "provenance": "flow F86 step 3→4"
     }
    ]
   },
@@ -947,36 +894,6 @@
      "slot": "collection",
      "components": [
       {
-       "kind": "textField",
-       "label": "Venue id",
-       "operation": "listSaleBoards",
-       "notes": "Sends `?venueId=` to `listSaleBoards`.",
-       "provenance": "contract tenancy.yaml GET /sale-boards"
-      },
-      {
-       "kind": "textField",
-       "label": "Kind",
-       "operation": "listSaleBoards",
-       "notes": "Sends `?kind=` to `listSaleBoards`.",
-       "provenance": "contract tenancy.yaml GET /sale-boards"
-      },
-      {
-       "kind": "dataTable",
-       "label": "Every sale board",
-       "bindsTo": "SaleBoard",
-       "columns": [
-        "SaleBoard.id",
-        "SaleBoard.code",
-        "SaleBoard.name",
-        "SaleBoard.venueId",
-        "SaleBoard.kind",
-        "SaleBoard.pages",
-        "SaleBoard.isActive"
-       ],
-       "operation": "listSaleBoards",
-       "provenance": "contract tenancy.yaml GET /sale-boards"
-      },
-      {
        "kind": "searchField",
        "label": "Search product import, governance",
        "provenance": "carried from the previous definition"
@@ -986,24 +903,7 @@
     {
      "name": "contextPanel",
      "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected sale board",
-       "bindsTo": "SaleBoard",
-       "columns": [
-        "SaleBoard.id",
-        "SaleBoard.code",
-        "SaleBoard.name",
-        "SaleBoard.venueId",
-        "SaleBoard.kind",
-        "SaleBoard.pages",
-        "SaleBoard.isActive"
-       ],
-       "operation": "listSaleBoards",
-       "provenance": "contract tenancy.yaml GET /sale-boards"
-      }
-     ]
+     "components": []
     },
     {
      "name": "actionBar",
@@ -1020,18 +920,6 @@
        "label": "Generate configuration",
        "operation": "generateConfiguration",
        "provenance": "contract ai.yaml POST /generate/configuration"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Request suggestion",
-       "operation": "requestSuggestion",
-       "provenance": "contract ai.yaml POST /ai/suggestions"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Save sale board",
-       "operation": "updateSaleBoard",
-       "provenance": "contract tenancy.yaml PUT /sale-boards/{saleBoardId}"
       }
      ]
     }
@@ -1042,50 +930,20 @@
    "error": "Could not load. Names which read failed and leaves the product import governance untouched.",
    "emptyFirstRun": "No product import governance yet. Offers Import product catalogue (`importProductCatalogue`); distinct from a filter that matched nothing.",
    "emptyNoResults": "Nothing matches the filter on venueId, kind and the product import governance are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `SCOPE_VIEW`, which `listSaleBoards` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_CONFIGURE`, which `importProductCatalogue` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
     "operationId": "importProductCatalogue",
     "contract": "catalogue",
     "purpose": "Parse a catalogue file into a preview",
-    "trigger": "onAction",
-    "invalidates": [
-     "listSaleBoards"
-    ]
+    "trigger": "onAction"
    },
    {
     "operationId": "generateConfiguration",
     "contract": "ai",
     "purpose": "Draft a configuration from a description",
-    "trigger": "onAction",
-    "invalidates": [
-     "listSaleBoards"
-    ]
-   },
-   {
-    "operationId": "listSaleBoards",
-    "contract": "tenancy",
-    "purpose": "List sale boards",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "requestSuggestion",
-    "contract": "ai",
-    "purpose": "requestSuggestion",
-    "trigger": "onAction",
-    "invalidates": [
-     "listSaleBoards"
-    ]
-   },
-   {
-    "operationId": "updateSaleBoard",
-    "contract": "tenancy",
-    "purpose": "Update a sale board",
-    "trigger": "onAction",
-    "invalidates": [
-     "listSaleBoards"
-    ]
+    "trigger": "onAction"
    },
    {
     "operationId": "commitCatalogueImport",
@@ -1100,10 +958,6 @@
     {
      "name": "venueId",
      "from": "session"
-    },
-    {
-     "name": "saleBoardId",
-     "from": "deepLink"
     },
     {
      "name": "jobId",
@@ -1166,50 +1020,26 @@
      ]
     },
     "provenance": "contract ai.yaml POST /generate/configuration"
+   }
+  ],
+  "gaps": [
+   {
+    "operation": "listSaleBoards",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-025): Sale boards are a POS layout concern (POS board 4C) unrelated to product import, and the assistant here is generateConfiguration, not a generic thirteen-kind suggestion form; F86 step 3 keeps importProductCatalogue and generateConfiguration (design-notes correction ticketing-backoffice BO-117)",
+    "source": "contracts/spine/tenancy.yaml#updateSaleBoard | F86 step 3 | contracts/satellite/ai.yaml#requestSuggestion"
    },
    {
-    "id": "formRequestSuggestion",
-    "component": "modal",
-    "trigger": "Request suggestion",
-    "body": "**Collects what `requestSuggestion` sends before it is called.** Required: `kind`. Optional: `subjectRef`, `horizon`, `context`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Request suggestion",
-     "operation": "requestSuggestion"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "kind",
-      "subjectRef",
-      "horizon",
-      "context"
-     ]
-    },
-    "provenance": "contract ai.yaml POST /ai/suggestions"
+    "operation": "requestSuggestion",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-025): Sale boards are a POS layout concern (POS board 4C) unrelated to product import, and the assistant here is generateConfiguration, not a generic thirteen-kind suggestion form; F86 step 3 keeps importProductCatalogue and generateConfiguration (design-notes correction ticketing-backoffice BO-117)",
+    "source": "contracts/spine/tenancy.yaml#updateSaleBoard | F86 step 3 | contracts/satellite/ai.yaml#requestSuggestion"
    },
    {
-    "id": "formUpdateSaleBoard",
-    "component": "modal",
-    "trigger": "Save sale board",
-    "body": "**Collects what `updateSaleBoard` sends before it is called.** Required: `id`, `code`, `name`, `venueId`, `kind`, `pages`. Optional: `isActive`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "SaleBoard",
-    "confirm": {
-     "label": "Save sale board",
-     "operation": "updateSaleBoard"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "id",
-      "code",
-      "name",
-      "venueId",
-      "kind",
-      "pages",
-      "isActive"
-     ]
-    },
-    "provenance": "contract tenancy.yaml PUT /sale-boards/{saleBoardId}"
+    "operation": "updateSaleBoard",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-025): Sale boards are a POS layout concern (POS board 4C) unrelated to product import, and the assistant here is generateConfiguration, not a generic thirteen-kind suggestion form; F86 step 3 keeps importProductCatalogue and generateConfiguration (design-notes correction ticketing-backoffice BO-117)",
+    "source": "contracts/spine/tenancy.yaml#updateSaleBoard | F86 step 3 | contracts/satellite/ai.yaml#requestSuggestion"
    }
   ],
   "_platform": {
@@ -1268,11 +1098,7 @@
      "to": "BO-126",
      "trigger": "Deployment, Preview & Audit",
      "provenance": "flow F86 step 4→5",
-     "operation": "createCampaign",
-     "carries": [
-      "reportId",
-      "saleBoardId"
-     ]
+     "operation": "createCampaign"
     }
    ]
   },
@@ -1304,13 +1130,6 @@
        "bindsTo": "Segment",
        "operation": "listSegments",
        "provenance": "contract marketing-crm.yaml GET /segments"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Sale boards",
-       "bindsTo": "SaleBoard",
-       "operation": "listSaleBoards",
-       "provenance": "contract tenancy.yaml GET /sale-boards"
       },
       {
        "kind": "textField",
@@ -1362,12 +1181,6 @@
        "label": "Run report",
        "operation": "runReport",
        "provenance": "contract reporting.yaml POST /reports/{reportId}/run"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Save sale board",
-       "operation": "updateSaleBoard",
-       "provenance": "contract tenancy.yaml PUT /sale-boards/{saleBoardId}"
       }
      ]
     }
@@ -1403,24 +1216,9 @@
     "trigger": "onLoad"
    },
    {
-    "operationId": "listSaleBoards",
-    "contract": "tenancy",
-    "purpose": "List sale boards",
-    "trigger": "onLoad"
-   },
-   {
     "operationId": "runReport",
     "contract": "reporting",
     "purpose": "Run a report",
-    "trigger": "onAction",
-    "invalidates": [
-     "listCampaigns"
-    ]
-   },
-   {
-    "operationId": "updateSaleBoard",
-    "contract": "tenancy",
-    "purpose": "Update a sale board",
     "trigger": "onAction",
     "invalidates": [
      "listCampaigns"
@@ -1435,10 +1233,6 @@
     },
     {
      "name": "reportId",
-     "from": "deepLink"
-    },
-    {
-     "name": "saleBoardId",
      "from": "deepLink"
     }
    ],
@@ -1502,30 +1296,20 @@
      ]
     },
     "provenance": "contract reporting.yaml POST /reports/{reportId}/run"
+   }
+  ],
+  "gaps": [
+   {
+    "operation": "listSaleBoards",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-005): A sale board is a workstation layout (WORKSTATION_CONFIGURE) with nothing to do with campaign and audience management (design-notes correction customer-marketing BO-118).",
+    "source": "contracts/spine/tenancy.yaml#updateSaleBoard | R254"
    },
    {
-    "id": "formUpdateSaleBoard",
-    "component": "modal",
-    "trigger": "Save sale board",
-    "body": "**Collects what `updateSaleBoard` sends before it is called.** Required: `id`, `code`, `name`, `venueId`, `kind`, `pages`. Optional: `isActive`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "SaleBoard",
-    "confirm": {
-     "label": "Save sale board",
-     "operation": "updateSaleBoard"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "id",
-      "code",
-      "name",
-      "venueId",
-      "kind",
-      "pages",
-      "isActive"
-     ]
-    },
-    "provenance": "contract tenancy.yaml PUT /sale-boards/{saleBoardId}"
+    "operation": "updateSaleBoard",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-005): A sale board is a workstation layout (WORKSTATION_CONFIGURE) with nothing to do with campaign and audience management (design-notes correction customer-marketing BO-118).",
+    "source": "contracts/spine/tenancy.yaml#updateSaleBoard | R254"
    }
   ],
   "_platform": {
@@ -1644,6 +1428,12 @@
        ],
        "operation": "getUpsellSuggestions",
        "provenance": "contract promotions.yaml POST /upsell-suggestions"
+      },
+      {
+       "kind": "dataTable",
+       "label": "List upsell and cross-sell rules",
+       "operation": "listUpsellRules",
+       "provenance": "contract promotions.yaml GET /upsell-rules; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -1676,6 +1466,13 @@
     "purpose": "Fill a recommendation slot",
     "trigger": "onAction",
     "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "listUpsellRules",
+    "contract": "promotions",
+    "purpose": "List upsell and cross-sell rules",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "entryState": {
@@ -2124,174 +1921,6 @@
     "provenance": "contract marketing-crm.yaml POST /campaigns"
    }
   ],
-  "_platform": {
-   "code": "P08",
-   "audience": "staff",
-   "formFactor": "web",
-   "shortName": "Venue Management",
-   "name": "Venue Management — Back Office",
-   "offlineCapable": false,
-   "app": "venue-management-web",
-   "operator": "venue",
-   "targetApp": {
-    "app": "venue-management",
-    "name": "TICVAI Venue Management",
-    "shell": "web",
-    "siblings": [
-     "P12",
-     "P13",
-     "P16"
-    ],
-    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "BO-122",
-  "name": "POS Experience Dashboard",
-  "module": "Sell",
-  "requiresModule": "core",
-  "wave": 2,
-  "implementation": {
-   "app": "venue-management-web",
-   "route": "/sell/pos-experience-dashboard",
-   "component": "apps/venue-management-web/src/routes/sell/PosExperienceDashboardList.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "BO-102"
-   ],
-   "exitTo": [
-    "BO-102"
-   ],
-   "inferred": false,
-   "notes": "**Returns to BO-102.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
-   "transitions": [
-    {
-     "to": "BO-102",
-     "trigger": "Sell",
-     "provenance": "derived — BO-102 declares entryState.params  and BO-122 holds none of them. The edge carries nothing: BO-122 is opened from BO-102, so this edge is the way back and BO-102 keeps its own state"
-    }
-   ]
-  },
-  "notes": "**Added 20 August from the client design board.** The operations existed and no screen called them. **Named in the board contents and not written up in it** — the operations are real, the layout is not.",
-  "density": "compact",
-  "boardFrames": [
-   "Retail Board 5.dc.html#ret-5j"
-  ],
-  "pattern": "listDetail",
-  "patternReason": "`listSaleBoards` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
-  "purpose": "POS Experience Dashboard — from the client design board, 20 August.",
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "collection",
-     "components": [
-      {
-       "kind": "textField",
-       "label": "Venue id",
-       "operation": "listSaleBoards",
-       "notes": "Sends `?venueId=` to `listSaleBoards`.",
-       "provenance": "contract tenancy.yaml GET /sale-boards"
-      },
-      {
-       "kind": "textField",
-       "label": "Kind",
-       "operation": "listSaleBoards",
-       "notes": "Sends `?kind=` to `listSaleBoards`.",
-       "provenance": "contract tenancy.yaml GET /sale-boards"
-      },
-      {
-       "kind": "dataTable",
-       "label": "Every sale board",
-       "bindsTo": "SaleBoard",
-       "columns": [
-        "SaleBoard.id",
-        "SaleBoard.code",
-        "SaleBoard.name",
-        "SaleBoard.venueId",
-        "SaleBoard.kind",
-        "SaleBoard.pages",
-        "SaleBoard.isActive"
-       ],
-       "operation": "listSaleBoards",
-       "provenance": "contract tenancy.yaml GET /sale-boards"
-      },
-      {
-       "kind": "searchField",
-       "label": "Search pos experience dashboard",
-       "provenance": "carried from the previous definition"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected sale board",
-       "bindsTo": "SaleBoard",
-       "columns": [
-        "SaleBoard.id",
-        "SaleBoard.code",
-        "SaleBoard.name",
-        "SaleBoard.venueId",
-        "SaleBoard.kind",
-        "SaleBoard.pages",
-        "SaleBoard.isActive"
-       ],
-       "operation": "listSaleBoards",
-       "provenance": "contract tenancy.yaml GET /sale-boards"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The pos experience list.",
-   "error": "Could not load. Names which read failed and leaves the pos experience untouched.",
-   "emptyFirstRun": "No pos experience yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
-   "emptyNoResults": "Nothing matches the filter on venueId, kind and the pos experience are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `SCOPE_VIEW`, which `listSaleBoards` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "listSaleBoards",
-    "contract": "tenancy",
-    "purpose": "List sale boards",
-    "trigger": "onLoad"
-   }
-  ],
-  "entryState": {
-   "params": [
-    {
-     "name": "venueId",
-     "from": "session"
-    }
-   ],
-   "coldEntry": "Resolves from the session. A principal with more than one venue is asked which before the page renders.",
-   "preloaded": [
-    "SaleBoard.id",
-    "SaleBoard.code",
-    "SaleBoard.name",
-    "SaleBoard.venueId",
-    "SaleBoard.kind"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-122",
-   "derivedFrom": "wireframes/reference/Retail Board 5.dc.html",
-   "source": "Claude Design Retail pack, 24 August",
-   "note": "**Drawn by Claude Design on `Retail Board 5.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
-  },
-  "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "_platform": {
    "code": "P08",
    "audience": "staff",

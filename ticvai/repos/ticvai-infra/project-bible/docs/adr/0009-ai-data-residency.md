@@ -1,9 +1,55 @@
 # ADR-0009: AI Data Residency
 
-**Status:** Accepted · section 2 amended by [ADR-0049](0049-vectors-live-in-qdrant-one-collection-per-tenant.md), 30 September 2026: Qdrant on every tier, one collection per tenant with a collection-scoped token; the shared tier no longer uses pgvector
+**Status:** Accepted · section 2 amended by [ADR-0049](0049-vectors-live-in-qdrant-one-collection-per-tenant.md), 30 September 2026: Qdrant on every tier, one collection per tenant with a collection-scoped token; the shared tier no longer uses pgvector · sections 1 and 3 amended 2 October 2026 (Chinmay): **a residency class per tenant**, UAE-only by default through Core42 Compass (see the amendment below); the vendor terms are still to be had in writing
 **Date:** 13 August 2026
 **Closes:** CF-20
 **Supersedes:** the working assumption that UAE law mandates domestic AI data storage
+
+---
+
+## Amended 2 October 2026: a residency class per tenant
+
+**Decided by Chinmay, 2 October 2026** (DEC-539 and DEC-540 in `docs/registers/decisions-2-october.md`;
+change entry CHG-DOC-003). Source: `docs/active/research/ai-ml-model-selection-2-october.md`, sections 2.1
+and 2A. It amends AI-D02 and AI-D03 (`handoff/ai-decisions.json`).
+
+**Why section 1 could not stand as written.** Section 1 keeps inference on an in-region endpoint, and the
+design's default was Azure OpenAI in UAE North (AI-D02, AI-D03). The research found that **Azure UAE North
+serves no chat or reasoning model in-region on pay-per-token**: it offers Global Standard (data at rest in
+the UAE, processing anywhere) or Regional Provisioned throughput, whose minimum is about $8,450 a month for
+the Small tier before the first tenant asks a question. UAE government and bank apps run on a sovereign
+wrapper (G42/Core42 Compass); consumer and leisure apps, including our closest peer, make no residency
+claim at all.
+
+**The decision: every tenant has an AI residency class.**
+
+| Residency class | Small tier | Strong tier | Fallback when the breaker opens |
+|---|---|---|---|
+| **UAE-only**: the default, and mandatory for government and semi-government, bank or payment, and health tenants | Core42 Compass GPT-4.1 mini (or GPT-4.1 Arabic, "Seraj", if it wins the Arabic golden set) | Compass GPT-5 (UAE region) | OpenAI's UAE region, then the in-cell open model (gpt-oss-120b, the same model Compass serves) |
+| **Global allowed**: a private venue opts in under PDPL Art. 23 (vendor contract, DPIA, privacy notice) | Azure gpt-5-mini, Global Standard, or the tenant's BYOK provider | Azure gpt-6-sol, Global Standard | The UAE-only chain |
+| **On-premise** (ADR-0046) | Qwen3.5 or gpt-oss | Qwen3.5-122B; Falcon-H1 Arabic or Jais 2 for Arabic-heavy tenants | None outside the site |
+
+1. **Compass is reached through the existing `openaiCompatible` provider kind**, so no new adapter. It runs
+   on Azure and is billed through Azure Marketplace; per-token billing per selected module (AI-D02) stands.
+2. **The class is a per-tenant setting** that extends the region's `allowedAiResidencies`
+   (`contracts/spine/tenancy.yaml`). The gateway resolves a provider from the class: **a UAE-only tenant can
+   only resolve to an endpoint inside the UAE**, and a residency refusal is never failed over to a
+   cross-border endpoint (ADR-0034).
+3. **Section 3's transfer register lists every Global-allowed tenant**, with its Article 23 mechanism, the
+   transfer risk assessment, the DPIA and the notice. **BYOK other than OpenAI's UAE region is a
+   cross-border transfer**, so BYOK is available only to Global-allowed tenants (AI-D20, closed the same day).
+4. **Embeddings, reranking, the guard model and PII detection stay self-hosted in the cell** for every
+   class, and every prompt is scrubbed offline before it leaves, whatever the class (ADR-0020, amended the
+   same day).
+5. **Scale step.** When steady Small-tier traffic in a region nears about 100,000 calls a day, the UAE-only
+   Small tier moves to Azure UAE North Regional Provisioned throughput (gpt-5-mini, 25 to 50 PTU) with
+   spillover **off** (spillover can only target Global Standard).
+
+**Before signing, in writing** (DEC-541, open: it needs the vendors and counsel; CHG-DOC-004): Core42
+Compass's retention, logging and sub-processor terms, its minimum, and the in-UAE region of each model;
+OpenAI's approval of the UAE region and of Modified Abuse Monitoring; Microsoft's PTU calculator figures at
+our traffic mix; and legal advice on whether Miral and Dubai Holding count as government entities (which
+would make their tenants UAE-only by law, not by default).
 
 ---
 

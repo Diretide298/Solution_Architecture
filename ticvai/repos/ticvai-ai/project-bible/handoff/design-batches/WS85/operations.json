@@ -136,6 +136,25 @@
   "requestBody": null,
   "responds": "Page"
  },
+ "setGateOfflinePolicy": {
+  "method": "PUT",
+  "path": "/offline-policies",
+  "contract": "access",
+  "summary": "Set the offline policy of a venue",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AccessOfflinePolicy",
+  "responds": "AccessOfflinePolicy"
+ },
  "simulateGameplayAuthorisation": {
   "method": "POST",
   "path": "/gameplay-authorisations/simulate",

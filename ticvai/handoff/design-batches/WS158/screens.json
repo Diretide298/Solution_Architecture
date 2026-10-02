@@ -216,6 +216,11 @@
     "operation": null,
     "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
     "source": "pack Resource_Management_Configuration_Reference.pdf, page 50 §Each candidate shall show"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-004): No read returns candidates for a rota position (skill, availability, suitability).",
+    "source": "contracts/satellite/workforce.yaml#createRotaAssignment"
    }
   ],
   "layout": {
@@ -243,6 +248,26 @@
        "bindsTo": null,
        "operation": null,
        "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 50 §Each candidate shall show"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Roster",
+       "operation": "listRotaAssignments",
+       "provenance": "contract workforce.yaml GET /rota-assignments; wiring fix, 2 October 2026"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Coverage",
+       "bindsTo": "StaffingCoverage",
+       "operation": "getStaffingCoverage",
+       "provenance": "contract workforce.yaml GET /staffing-coverage; wiring fix, 2 October 2026"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Checked in",
+       "bindsTo": "AttendanceRecord",
+       "operation": "listAttendance",
+       "provenance": "contract workforce.yaml GET /attendance; wiring fix, 2 October 2026"
       }
      ]
     },
@@ -291,6 +316,27 @@
      "listRotaAssignments",
      "getStaffingCoverage"
     ]
+   },
+   {
+    "operationId": "listRotaAssignments",
+    "contract": "workforce",
+    "purpose": "Who is rostered on each position",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-001)"
+   },
+   {
+    "operationId": "getStaffingCoverage",
+    "contract": "workforce",
+    "purpose": "Where the roster is short",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-001)"
+   },
+   {
+    "operationId": "listAttendance",
+    "contract": "workforce",
+    "purpose": "Who has checked in",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-001)"
    }
   ],
   "entryState": {
@@ -741,6 +787,17 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Resource_Management_Configuration_Reference.pdf, page 54"
+   },
+   {
+    "operation": "claimOpenShift",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): Claiming an open shift is an employee act on the Staff App; the manager publishes and approves here. The manager's queue needs the swap requests (design-notes correction venue-operations BO-887).",
+    "source": "screens/P08-venue-back-office.yaml#BO-887 | contracts/satellite/workforce.yaml#listShiftSwapRequests"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-004): No operation publishes, releases or withdraws an open shift, and none approves or rejects a swap request.",
+    "source": "contracts/satellite/workforce.yaml#listShiftSwapRequests | contracts/satellite/workforce.yaml#listOpenShifts"
    }
   ],
   "layout": {
@@ -756,18 +813,11 @@
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
       },
       {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "claimOpenShift",
-       "label": "Claim open shift",
-       "notes": "The act the screen exists for."
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "claimOpenShift"
+       "kind": "dataTable",
+       "label": "Swap requests",
+       "bindsTo": "ShiftSwap",
+       "operation": "listShiftSwapRequests",
+       "provenance": "contract workforce.yaml GET /shift-swaps; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -776,7 +826,7 @@
   "states": {
    "loading": "The shift marketplace workforce list.",
    "error": "Could not load. Names which read failed and leaves the shift marketplace workforce untouched.",
-   "emptyFirstRun": "No shift marketplace workforce yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No shift marketplace workforce yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the shift marketplace workforce are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -789,15 +839,11 @@
     "provenance": "board reading, 19 September 2026"
    },
    {
-    "operationId": "claimOpenShift",
+    "operationId": "listShiftSwapRequests",
     "contract": "workforce",
-    "purpose": "Pick one up",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026",
-    "invalidates": [
-     "listOpenShifts",
-     "getStaffingCoverage"
-    ]
+    "purpose": "Swap requests waiting on the manager",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-001)"
    }
   ],
   "wireframe": {
@@ -806,6 +852,7 @@
    "workshopBoard": "wireframes/WS129 Resource Management Configuration Board 4.dc.html#bo-887"
   },
   "apisNote": "Regenerated 9 September 2026 from Resource_Management_Configuration_Reference.pdf page 54. 0 of 0 labels bound to a contract property; 0 of 32 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {},
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1645,13 +1692,18 @@
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
-  "purpose": "Provide TICVAI's intelligent workforce-planning experience by automatically generating or optimizing operational rosters. Administrators may configure optimization priorities such as: Best operational coverage Minimize overtime Minimize labor cost Balance employee hours Minimize cross-venue movement Maximize skill match Prioritize employee continuity Safety, compliance, and mandatory qualification rules shall remain hard constraints. AI Explanation Provide TICVAI with a centralized Resource Requirement & Assignment Engine that connects ticket products, attraction experiences, sessions, and time slots with the operational resources required to deliver them. Board 5 shall allow administrators to configure: Which resources an experience requires How many resources are required Which resource combinations are valid Which skills and qualifications are mandatory How resource requirements change with ticket quantity or capacity Whether customers may select a specific resource Whether customers may select a resource skill/type rather than a specific person Whether TICVAI should automatically allocate resources How resource priority is calculated What happens when the assigned resource becomes unavailable How assignments are exposed through POS, B2C, B2B, mobile, and APIs",
-  "purposeNote": "compliance rules, availability, and cost while retaining human governance over final publication.",
+  "purpose": "Generate or optimise operational rosters against configured priorities, with safety, compliance and mandatory qualifications kept as hard constraints.",
+  "purposeNote": "compliance rules, availability, and cost while retaining human governance over final publication. Purpose rewritten 2 October 2026 (CHG-WIR-003): The purpose carried the board 5 introduction (\"Provide TICVAI with a centralized Resource Requirement and Assignment Engine ... Board 5 shall allow administrators to configure ...\") after the screen's own text.",
   "gaps": [
    {
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Resource_Management_Configuration_Reference.pdf, page 60"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-004): No roster generation or optimisation operation.",
+    "source": "contracts/satellite/workforce.yaml#getStaffingCoverage"
    }
   ],
   "layout": {

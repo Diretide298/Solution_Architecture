@@ -234,6 +234,144 @@
    }
   }
  },
+ "Case": {
+  "x-ticvai-persistence": "marketing.case",
+  "x-ticvai-retired-columns": [
+   "guest_name",
+   "subject",
+   "is_sla_breached"
+  ],
+  "type": "object",
+  "required": [
+   "id",
+   "caseNumber",
+   "subject",
+   "status",
+   "priority",
+   "createdAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "description": "Created on the device (`CreateCaseRequest.id`, `raiseMyCase`), so a UUIDv7."
+   },
+   "caseNumber": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**Server-assigned: the venue prefix plus a sequence per venue** (decided 28 September, audit R152). Not gapless; only tax invoices are gapless, per legal entity. Assigned when the case reaches the server, so a retry with the same `id` keeps its number.\n"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "guestName": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "**Resolved from `pii.subject` when the case is read, never stored on the case.** A name copied onto a case row is personal data outside the erasable store (ADR-0023), and it had no source anyway — no request carries it. Returned only to callers holding `GUEST_VIEW_PII`, as `searchGuests` does.\n"
+   },
+   "subject": {
+    "type": "string",
+    "x-ticvai-column": "title",
+    "description": "**The case's one-line title**, not a person. Stored as `title` so the table does not hold `subject` beside `subject_id`; the wire keeps `subject` because screens bind it.\n"
+   },
+   "kind": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/CaseKind"
+     }
+    ],
+    "nullable": true,
+    "description": "What the guest said it was about, where the guest raised it."
+   },
+   "channel": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/MessageChannel"
+     }
+    ],
+    "description": "How the guest reached the venue — `CreateCaseRequest.channel`, or `inApp` for a case raised through `raiseMyCase`."
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Device time the case was raised — the start of the SLA clock."
+   },
+   "syncedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true,
+    "description": "Server time the case arrived. Equal to `recordedAt` for a case raised online."
+   },
+   "categoryId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "queueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The `ServiceQueue` the case waits in, set by routing (`CaseRoutingRule.queueId`). Null once routed straight to an agent. (decided 29 September, data model for the agreed operations)"
+   },
+   "membershipId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The identity membership this case concerns (`identity.customer_membership`); member case notes are cases with this set. (decided 29 September, coordinator decision DM4, writers pass)"
+   },
+   "status": {
+    "$ref": "#/components/schemas/CaseStatus"
+   },
+   "priority": {
+    "$ref": "#/components/schemas/CasePriority"
+   },
+   "assignedToPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "relatedOrderId": {
+    "type": "string",
+    "nullable": true
+   },
+   "slaDueAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "isSlaBreached": {
+    "type": "boolean",
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "**Computed when read, never stored.** True once the case has been open longer than its SLA allows — the time from `recordedAt` to `resolvedAt` (or to now, while unresolved), less `slaPausedSeconds`, is past the target that set `slaDueAt`. A stored flag would need a job to flip it at the moment of breach, and no such job is designed; `listCases?breachedSla` filters on the same computation.\n"
+   },
+   "slaPausedSeconds": {
+    "type": "integer",
+    "description": "Accrued only while awaiting the guest. Waiting on an internal team does not pause the clock.\n"
+   },
+   "escalationCount": {
+    "type": "integer"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "resolvedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
  "CaseCategory": {
   "type": "object",
   "x-ticvai-persistence": "marketing.case_category",
@@ -841,165 +979,6 @@
       "format": "date-time"
      }
     }
-   }
-  }
- },
- "CreateQueueRequest": {
-  "x-ticvai-persistence": "none — request only",
-  "type": "object",
-  "required": [
-   "code",
-   "name",
-   "venueId",
-   "capacityPerCycle",
-   "cycleMinutes"
-  ],
-  "properties": {
-   "code": {
-    "type": "string",
-    "maxLength": 64
-   },
-   "name": {
-    "$ref": "#/components/schemas/LocalisedText"
-   },
-   "venueId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "attractionProductId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "assetId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "The ride. Taking it out of service closes this queue rather than leaving guests holding positions for something that is not running.\n"
-   },
-   "accessPointId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "kind": {
-    "type": "string",
-    "enum": [
-     "standby",
-     "singleRider",
-     "fastPass",
-     "virtual",
-     "accessible",
-     "groupOnly",
-     "staffOnly"
-    ],
-    "default": "standby",
-    "description": "5.6.x. **A ride has several queues and the model had one.** A single-rider line and a standby line at the same attraction draw from one capacity and fill at different rates, and modelling them as one queue makes both wait estimates wrong.\n**`accessible` is not a courtesy lane.** It has its own capacity because a guest who cannot stand in a switchback needs a place to wait, not priority.\n"
-   },
-   "operatingWindows": {
-    "type": "array",
-    "description": "**When the queue runs, which is not when the venue is open.** A ride closing an hour early for maintenance leaves a queue accepting guests for a cycle that will not happen.\nStored one row per window in `queue.queue_operating_window` (see `Queue`), not as a column on the queue.\n",
-    "items": {
-     "type": "object",
-     "required": [
-      "day",
-      "from",
-      "to"
-     ],
-     "properties": {
-      "day": {
-       "type": "string",
-       "enum": [
-        "mon",
-        "tue",
-        "wed",
-        "thu",
-        "fri",
-        "sat",
-        "sun"
-       ]
-      },
-      "from": {
-       "type": "string",
-       "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$",
-       "description": "Venue local time, 24-hour `HH:MM`, when the queue starts running."
-      },
-      "to": {
-       "type": "string",
-       "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$",
-       "description": "Venue local time, 24-hour `HH:MM`, when the queue stops running."
-      },
-      "lastEntryMinutesBefore": {
-       "type": "integer",
-       "default": 0,
-       "description": "**When the queue stops accepting, which is before it stops running.** A guest joining two minutes before close waits twenty and is turned away at the front.\n"
-      }
-     }
-    }
-   },
-   "parentQueueId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "Where several queues share one capacity. **The standby and single-rider lines at one ride draw from the same cycles**, and a parent is how that is expressed without either queue owning the other.\n"
-   },
-   "loadBalanceWithQueueIds": {
-    "type": "array",
-    "description": "BL-137. **Two rides with the same theme and different waits**, and nothing directed a guest to the shorter one. Load balancing is an offer, not an assignment — **a guest sent to a ride they did not choose is a guest who feels managed.**\n",
-    "items": {
-     "type": "string",
-     "format": "uuid"
-    }
-   },
-   "inQueueOfferEnabled": {
-    "type": "boolean",
-    "default": false,
-    "description": "**A guest with twenty minutes to wait is a guest with twenty minutes to buy something.** Offers surface in the wait screen and are the only reason a virtual queue earns its infrastructure.\n"
-   },
-   "notifyBeforeCallMinutes": {
-    "type": "integer",
-    "default": 5,
-    "description": "BL-017, 19.2.61. **A guest was not told their turn was approaching**, which makes a virtual queue worse than a physical one — at least a line is visible.\n"
-   },
-   "capacityPerCycle": {
-    "type": "integer",
-    "minimum": 1
-   },
-   "cycleMinutes": {
-    "type": "number",
-    "minimum": 0
-   },
-   "maxPartySize": {
-    "type": "integer",
-    "default": 6
-   },
-   "returnWindowMinutes": {
-    "type": "integer",
-    "default": 15,
-    "description": "How long a called party has to arrive before the entry expires."
-   },
-   "heightRequirementCm": {
-    "type": "integer",
-    "nullable": true
-   },
-   "fastPassAllocationPercent": {
-    "type": "number",
-    "minimum": 0,
-    "maximum": 100,
-    "default": 0,
-    "description": "Share of each cycle reserved for Fast Pass holders."
-   },
-   "zone": {
-    "type": "string",
-    "nullable": true
-   },
-   "fastPass": {
-    "allOf": [
-     {
-      "$ref": "#/components/schemas/QueueFastPass"
-     }
-    ],
-    "nullable": true,
-    "description": "The lane's Fast Pass block (decided 29 September, VM close-out). Null on a queue that takes no Fast Pass.\n"
    }
   }
  },
@@ -1615,6 +1594,68 @@
    }
   ]
  },
+ "MarketingSlaPolicy": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.sla_policy",
+  "description": "**Taken from the backend workbook, 20 September.** Defines service-level response and resolution targets used by support cases.",
+  "required": [
+   "code",
+   "name",
+   "businessHoursOnly",
+   "isActive",
+   "createdAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "scopePath": {
+    "type": "string",
+    "nullable": true
+   },
+   "code": {
+    "type": "string",
+    "maxLength": 100
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 150
+   },
+   "priority": {
+    "type": "string",
+    "maxLength": 20,
+    "nullable": true
+   },
+   "firstResponseMinutes": {
+    "type": "integer",
+    "nullable": true
+   },
+   "resolutionMinutes": {
+    "type": "integer",
+    "nullable": true
+   },
+   "escalationMinutes": {
+    "type": "integer",
+    "nullable": true
+   },
+   "businessHoursOnly": {
+    "type": "boolean"
+   },
+   "isActive": {
+    "type": "boolean"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
  "MessageChannel": {
   "type": "string",
   "enum": [
@@ -1875,83 +1916,6 @@
     "readOnly": true
    }
   }
- },
- "Queue": {
-  "x-ticvai-persistence": "queue.queue + queue.queue_operating_window",
-  "allOf": [
-   {
-    "$ref": "#/components/schemas/CreateQueueRequest"
-   },
-   {
-    "type": "object",
-    "required": [
-     "id",
-     "status",
-     "waitingPartyCount"
-    ],
-    "properties": {
-     "id": {
-      "type": "string",
-      "format": "uuid"
-     },
-     "status": {
-      "$ref": "#/components/schemas/QueueStatus"
-     },
-     "statusReason": {
-      "type": "string",
-      "nullable": true
-     },
-     "waitingPartyCount": {
-      "type": "integer"
-     },
-     "waitingGuestCount": {
-      "type": "integer"
-     },
-     "currentWaitMinutes": {
-      "type": "integer",
-      "nullable": true
-     },
-     "waitTimeSource": {
-      "$ref": "#/components/schemas/WaitTimeSource"
-     },
-     "waitTimeAsOf": {
-      "type": "string",
-      "format": "date-time",
-      "nullable": true,
-      "readOnly": true,
-      "description": "When `currentWaitMinutes` was last set, by whichever source set it. `WaitTime.asOf` reads this.\n"
-     },
-     "manualWaitExpiresAt": {
-      "type": "string",
-      "format": "date-time",
-      "nullable": true,
-      "readOnly": true,
-      "description": "Set by `setWaitTime` as now plus `expiresInMinutes`. Past it, the manual figure is dropped and the queue reverts to its sensor or throughput estimate. Null when the current figure is not manual.\n"
-     },
-     "manualWaitNote": {
-      "type": "string",
-      "maxLength": 200,
-      "nullable": true,
-      "readOnly": true,
-      "description": "The `note` given with the current manual figure. Cleared when it expires."
-     },
-     "expectedReopenAt": {
-      "type": "string",
-      "format": "date-time",
-      "nullable": true
-     }
-    }
-   }
-  ]
- },
- "QueueStatus": {
-  "type": "string",
-  "enum": [
-   "open",
-   "paused",
-   "closed",
-   "atCapacity"
-  ]
  },
  "ServiceAnalyticsRootCauseIntelligenceView": {
   "type": "object",
@@ -2399,15 +2363,5 @@
     }
    }
   }
- },
- "WaitTimeSource": {
-  "type": "string",
-  "description": "Where the estimate came from. Surfaced so an operator knows whether a figure is measured or guessed.\n",
-  "enum": [
-   "sensor",
-   "throughput",
-   "manual",
-   "unavailable"
-  ]
  }
 }

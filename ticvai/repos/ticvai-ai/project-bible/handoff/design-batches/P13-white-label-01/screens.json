@@ -80,12 +80,12 @@
     {
      "to": "CMS-009",
      "trigger": "Navigation & Menus",
-     "provenance": "derived — CMS-009 declares entryState.params menuId and CMS-001 holds none of them. The edge carries nothing: menuId only pre-selects (deep link or optional), and CMS-009 opens on its own"
+     "provenance": "derived — CMS-009 declares entryState.params  and CMS-001 holds none of them. The edge carries nothing: CMS-009 needs nothing to open"
     },
     {
      "to": "CMS-010",
      "trigger": "Media Library",
-     "provenance": "derived — CMS-010 declares entryState.params mediaCode, mediaId, uploadId and CMS-001 holds none of them. The edge carries nothing: mediaCode, mediaId, uploadId only pre-select (deep link or optional), and CMS-010 opens on its own"
+     "provenance": "derived — CMS-010 declares entryState.params mediaId, uploadId and CMS-001 holds none of them. The edge carries nothing: mediaId, uploadId only pre-select (deep link or optional), and CMS-010 opens on its own"
     },
     {
      "to": "CMS-011",
@@ -133,10 +133,7 @@
     {
      "to": "CMS-003",
      "trigger": "Typography",
-     "provenance": "flow F102 step 1→2",
-     "carries": [
-      "version"
-     ]
+     "provenance": "flow F102 step 1→2"
     }
    ]
   },
@@ -152,7 +149,7 @@
   "states": {
    "loading": "The tenant, read by `getTenantAppStatus`.",
    "error": "Could not load. Names which read failed and leaves the tenant untouched.",
-   "emptyFirstRun": "No tenant yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyFirstRun": "Nothing published yet: the status shows \"Never published\" and the Site Builder card offers to start (CMS-102). A tenant always exists here.",
    "emptyNoAccess": "Shown when the caller lacks `TENANT_CONFIGURE`, which `getTenantConfig` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
@@ -160,12 +157,6 @@
     "operationId": "getTenantAppStatus",
     "contract": "white-label",
     "purpose": "Whether the guest web and app are live",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "getTenantConfig",
-    "contract": "white-label",
-    "purpose": "The published configuration",
     "trigger": "onLoad"
    },
    {
@@ -197,6 +188,12 @@
     "contract": "white-label",
     "purpose": "Put the guest web and app into maintenance, and set the rest of the live app status — minimum app version, contact details, availability (decided 28 September, audit R073)",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "getSiteSetupProgress",
+    "contract": "white-label",
+    "purpose": "Where the tenant is in the Site Builder",
+    "trigger": "onLoad"
    }
   ],
   "wireframe": {
@@ -215,54 +212,32 @@
      "slot": "record",
      "components": [
       {
-       "kind": "detailPanel",
-       "label": "The tenant app status",
+       "kind": "banner",
+       "label": "Status",
        "bindsTo": "TenantAppStatus",
-       "columns": [
-        "TenantAppStatus.isPublished",
-        "TenantAppStatus.publishedVersion",
-        "TenantAppStatus.publishedAt",
-        "TenantAppStatus.draftVersion",
-        "TenantAppStatus.hasUnpublishedChanges",
-        "TenantAppStatus.activeModuleCount",
-        "TenantAppStatus.licensedModuleCount",
-        "TenantAppStatus.activePageCount",
-        "TenantAppStatus.isInMaintenance",
-        "TenantAppStatus.maintenanceMessage",
-        "TenantAppStatus.expectedBackAt",
-        "TenantAppStatus.minimumAppVersion",
-        "TenantAppStatus.contact",
-        "TenantAppStatus.availability",
-        "TenantAppStatus.availabilityMessage",
-        "TenantAppStatus.recentChanges"
-       ],
        "operation": "getTenantAppStatus",
-       "provenance": "contract white-label.yaml GET /tenant-config/status"
+       "notes": "Three badges in this order: Published (version and time, or \"Never published\"), Draft (\"Unpublished changes\"), Live now (maintenance, sold out today, closed, forced update). Counts: active of licensed modules, active pages.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-022, design-notes correction)"
       },
       {
-       "kind": "detailPanel",
-       "label": "The tenant config",
-       "bindsTo": "TenantConfig",
-       "columns": [
-        "TenantConfig.isDraft",
-        "TenantConfig.brand",
-        "TenantConfig.appIcons",
-        "TenantConfig.bookingFlow",
-        "TenantConfig.theme",
-        "TenantConfig.fonts",
-        "TenantConfig.footer",
-        "TenantConfig.notificationBranding",
-        "TenantConfig.enabledPaymentMethods",
-        "TenantConfig.accessibility",
-        "TenantConfig.header",
-        "TenantConfig.navigation",
-        "TenantConfig.homepage",
-        "TenantConfig.modules",
-        "TenantConfig.features",
-        "TenantConfig.languages"
-       ],
-       "operation": "getTenantConfig",
-       "provenance": "contract white-label.yaml GET /tenant-config"
+       "kind": "cardList",
+       "label": "Site Builder",
+       "bindsTo": "SiteSetupProgress",
+       "operation": "getSiteSetupProgress",
+       "notes": "Shown while the minimum path is not done, with the next unfinished step; opens CMS-102.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-022, design-notes correction)"
+      },
+      {
+       "kind": "cardList",
+       "label": "White label",
+       "notes": "Tiles: Brand kit, Theme, Typography, Logo and assets, Homepage and pages, Navigation, Banners, Booking settings, Booking flows, Help me choose, Languages, Domain, Versions, Publish, App build.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-022, design-notes correction)"
+      },
+      {
+       "kind": "cardList",
+       "label": "Other areas",
+       "notes": "The DAM, privacy and waiver command centres (CMS-021 to CMS-100) are other modules' areas, grouped apart so the white-label path stays short (the 30-minute site, DI-988).",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-022, design-notes correction)"
       },
       {
        "kind": "detailPanel",
@@ -312,7 +287,7 @@
       },
       {
        "kind": "secondaryButton",
-       "label": "Save maintenance mode",
+       "label": "Live now",
        "operation": "setMaintenanceMode",
        "provenance": "contract white-label.yaml PUT /tenant-config/status"
       }
@@ -358,8 +333,8 @@
    {
     "id": "formSetMaintenanceMode",
     "component": "modal",
-    "trigger": "Save maintenance mode",
-    "body": "**Collects what `setMaintenanceMode` sends before it is called.** Required: `isInMaintenance`. Optional: `message`, `expectedBackAt`, `minimumAppVersion` (`ios`, `android`), `contact` (`phone`, `email`, `whatsapp`, `address`, `openingHours`), `availability` (`open`, `soldOut`, `closed`) and `availabilityMessage`. **The live app status is set here, not published** (decided 28 September, audit R073 (b)(f)): a guest app below `minimumAppVersion` for its platform is sent to the forced upgrade (GST-047), the contact details feed WEB-028 and the availability feeds WEB-029's sold-out and closed states. A field not sent is left as it is, so clearing maintenance does not clear the contact details. Dismissing sends nothing; the screen behind is unchanged.",
+    "trigger": "Live now",
+    "body": "**Live now: four controls, each labelled by what it does**, applied at once and never published or restored: Maintenance (on, message, back at), Minimum app version (iOS, Android), Contact (phone, email, WhatsApp, address, hours) and today’s availability (open, sold out, closed, message). The confirmation names the consequence (\"Guests on web and app see the maintenance page from now until you clear it\") (CHG-SGU-022). **Collects what `setMaintenanceMode` sends before it is called.** Required: `isInMaintenance`. Optional: `message`, `expectedBackAt`, `minimumAppVersion` (`ios`, `android`), `contact` (`phone`, `email`, `whatsapp`, `address`, `openingHours`), `availability` (`open`, `soldOut`, `closed`) and `availabilityMessage`. **The live app status is set here, not published** (decided 28 September, audit R073 (b)(f)): a guest app below `minimumAppVersion` for its platform is sent to the forced upgrade (GST-047), the contact details feed WEB-028 and the availability feeds WEB-029's sold-out and closed states. A field not sent is left as it is, so clearing maintenance does not clear the contact details. Dismissing sends nothing; the screen behind is unchanged.",
     "confirm": {
      "label": "Save maintenance mode",
      "operation": "setMaintenanceMode"
@@ -376,7 +351,7 @@
       "availabilityMessage"
      ]
     },
-    "provenance": "contract white-label.yaml PUT /tenant-config/status"
+    "provenance": "corrected 2 October 2026 (CHG-SGU-022, design-notes correction)"
    }
   ],
   "_platform": {
@@ -438,7 +413,7 @@
     {
      "to": "CMS-003",
      "trigger": "Typography",
-     "provenance": "derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version and CMS-002 holds none of them. The edge carries nothing: bannerId, pageId, policyKind, version only pre-select (deep link or optional), and CMS-003 opens on its own"
+     "provenance": "derived — CMS-003 declares entryState.params  and CMS-002 holds none of them. The edge carries nothing: CMS-003 needs nothing to open"
     },
     {
      "to": "CMS-004",
@@ -447,7 +422,7 @@
     }
    ]
   },
-  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.",
+  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.\n \n**This screen owns the marks and the logo variant** (logo, dark logo, variant, favicon); CMS-004 owns the app icons, the splash and the intro video, so the two never edit the same fields (CHG-SGU-022). `splashChangeScope` is read-only and shown, never sent.",
   "density": "compact",
   "pattern": "statusTracker",
   "patternReason": "`getBrandIdentity` reads one record and nothing reads a population — the screen is about that one thing",
@@ -476,6 +451,14 @@
        ],
        "operation": "getBrandIdentity",
        "provenance": "contract white-label.yaml GET /tenant-config/brand"
+      },
+      {
+       "kind": "fileUpload",
+       "label": "Upload a logo",
+       "operation": "createUpload",
+       "notes": "One upload control: it asks the platform for an upload (`createUpload`), sends the file and completes it (`completeUpload`) behind the one action; nobody types a file name, content type or size.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-022, design-notes correction)",
+       "bindsTo": "BrandIdentity.logoAssetRef"
       }
      ]
     },
@@ -488,18 +471,6 @@
        "label": "Save brand identity",
        "operation": "setBrandIdentity",
        "provenance": "contract white-label.yaml PUT /tenant-config/brand"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Create upload",
-       "operation": "createUpload",
-       "provenance": "contract assets.yaml POST /media/uploads"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Complete upload",
-       "operation": "completeUpload",
-       "provenance": "contract assets.yaml POST /media/uploads/{uploadId}/complete"
       }
      ]
     }
@@ -533,8 +504,8 @@
    {
     "operationId": "completeUpload",
     "contract": "assets",
-    "purpose": "Confirm an upload and create the asset",
-    "trigger": "onAction"
+    "purpose": "Completes the upload behind the one upload control",
+    "trigger": "background"
    }
   ],
   "entryState": {
@@ -557,7 +528,7 @@
     "id": "formSetBrandIdentity",
     "component": "modal",
     "trigger": "Save brand identity",
-    "body": "**Collects what `setBrandIdentity` sends before it is called.** Required: `logoAssetRef`. Optional: `logoVariant` (light, dark or duotone: which lockup sits in the nav bar and which colour reading of it drives the theme, decided 29 September, rev 3 CFG-4), `logoDarkAssetRef`, `faviconAssetRef`, `splashImageAssetRefs`, `splashDurationSeconds`, `splashBackgroundColour`, `showLoadingIndicator`, `splashChangeScope`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setBrandIdentity` sends before it is called.** Required: `logoAssetRef`. Optional: `logoVariant` (light, dark or duotone: which lockup sits in the nav bar and which colour reading of it drives the theme, decided 29 September, rev 3 CFG-4), `logoDarkAssetRef`, `faviconAssetRef`, `splashImageAssetRefs`, `splashDurationSeconds`, `splashBackgroundColour`, `showLoadingIndicator`. Dismissing sends nothing; the screen behind is unchanged.",
     "bindsTo": "BrandIdentity",
     "confirm": {
      "label": "Save brand identity",
@@ -573,52 +544,10 @@
       "splashImageAssetRefs",
       "splashDurationSeconds",
       "splashBackgroundColour",
-      "showLoadingIndicator",
-      "splashChangeScope"
+      "showLoadingIndicator"
      ]
     },
     "provenance": "contract white-label.yaml PUT /tenant-config/brand"
-   },
-   {
-    "id": "formCreateUpload",
-    "component": "modal",
-    "trigger": "Create upload",
-    "body": "**Collects what `createUpload` sends before it is called.** Required: `filename`, `contentType`, `sizeBytes`. Optional: `venueId`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Create upload",
-     "operation": "createUpload"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "filename",
-      "contentType",
-      "sizeBytes",
-      "venueId"
-     ]
-    },
-    "provenance": "contract assets.yaml POST /media/uploads"
-   },
-   {
-    "id": "formCompleteUpload",
-    "component": "modal",
-    "trigger": "Complete upload",
-    "body": "**Collects what `completeUpload` sends before it is called.** Nothing in the body is required. Optional: `title`, `altText`, `tags`, `collectionIds`, `rights`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Complete upload",
-     "operation": "completeUpload"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "title",
-      "altText",
-      "tags",
-      "collectionIds",
-      "rights"
-     ]
-    },
-    "provenance": "contract assets.yaml POST /media/uploads/{uploadId}/complete"
    }
   ],
   "_platform": {
@@ -684,13 +613,7 @@
     {
      "to": "CMS-006",
      "trigger": "Component Preview",
-     "provenance": "flow F102 step 2→3",
-     "carries": [
-      "bannerId",
-      "pageId",
-      "policyKind",
-      "version"
-     ]
+     "provenance": "flow F102 step 2→3"
     }
    ]
   },
@@ -698,7 +621,7 @@
   "density": "compact",
   "pattern": "statusTracker",
   "patternReason": "`getFonts` reads one record and nothing reads a population — the screen is about that one thing",
-  "purpose": "Choose the two typefaces and the scale under them.",
+  "purpose": "Choose the two typefaces, Latin and Arabic; the type scale is TICVAI's fixed token set.",
   "layout": {
    "template": "detail",
    "regions": [
@@ -720,24 +643,6 @@
        ],
        "operation": "getFonts",
        "provenance": "contract white-label.yaml GET /tenant-config/fonts"
-      },
-      {
-       "kind": "detailPanel",
-       "label": "The theme",
-       "bindsTo": "Theme",
-       "columns": [
-        "Theme.primaryColour",
-        "Theme.secondaryColour",
-        "Theme.accentColour",
-        "Theme.backgroundColour",
-        "Theme.textColour",
-        "Theme.darkMode",
-        "Theme.cornerRadius",
-        "Theme.surfaceStyle",
-        "Theme.buttonStyle"
-       ],
-       "operation": "getTheme",
-       "provenance": "contract white-label.yaml GET /tenant-config/theme"
       }
      ]
     },
@@ -750,12 +655,6 @@
        "label": "Save fonts",
        "operation": "setFonts",
        "provenance": "contract white-label.yaml PUT /tenant-config/fonts"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Save theme",
-       "operation": "setTheme",
-       "provenance": "contract white-label.yaml PUT /tenant-config/theme"
       }
      ]
     }
@@ -775,44 +674,14 @@
     "trigger": "onLoad"
    },
    {
-    "operationId": "getTheme",
-    "contract": "white-label",
-    "purpose": "Read colour theme",
-    "trigger": "onLoad"
-   },
-   {
     "operationId": "setFonts",
     "contract": "white-label",
     "purpose": "Set fonts",
     "trigger": "onAction"
-   },
-   {
-    "operationId": "setTheme",
-    "contract": "white-label",
-    "purpose": "Set colour theme",
-    "trigger": "onAction"
    }
   ],
   "entryState": {
-   "params": [
-    {
-     "name": "bannerId",
-     "from": "deepLink"
-    },
-    {
-     "name": "pageId",
-     "from": "deepLink"
-    },
-    {
-     "name": "policyKind",
-     "from": "deepLink"
-    },
-    {
-     "name": "version",
-     "from": "deepLink"
-    }
-   ],
-   "coldEntry": "**A version link is expected to point at something superseded — that is what versions are for.** The screen opens the requested version read-only, says it is not current, and links to the one that is. **An old version is history, not an error.** Arrives with `bannerId`, `pageId`, `policyKind`."
+   "coldEntry": "Opens on the fonts in the draft; nothing to resolve."
   },
   "wireframe": {
    "status": "notStarted",
@@ -825,7 +694,7 @@
     "id": "formSetFonts",
     "component": "modal",
     "trigger": "Save fonts",
-    "body": "**Collects what `setFonts` sends before it is called.** Required: `primaryLatin`. Optional: `primaryArabic`, `secondaryLatin`, `secondaryArabic`, `customFontAssetRefs`, `changeScope`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setFonts` sends before it is called.** Required: `primaryLatin`. Optional: `primaryArabic`, `secondaryLatin`, `secondaryArabic`, `customFontAssetRefs`. Dismissing sends nothing; the screen behind is unchanged.",
     "bindsTo": "FontConfig",
     "confirm": {
      "label": "Save fonts",
@@ -838,37 +707,24 @@
       "primaryArabic",
       "secondaryLatin",
       "secondaryArabic",
-      "customFontAssetRefs",
-      "changeScope"
+      "customFontAssetRefs"
      ]
     },
     "provenance": "contract white-label.yaml PUT /tenant-config/fonts"
+   }
+  ],
+  "gaps": [
+   {
+    "operation": "getTheme",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-015): Typography also read and saved the Theme (getTheme, setTheme); the theme belongs to CMS-005, and two save points for one record drift. The entry parameters bannerId, pageId, policyKind and version were left from the 41-operation bulk attach (design-notes corrections white-label CMS-003).",
+    "source": "screens/P13-white-label-cms.yaml#CMS-005"
    },
    {
-    "id": "formSetTheme",
-    "component": "modal",
-    "trigger": "Save theme",
-    "body": "**Collects what `setTheme` sends before it is called.** Required: `primaryColour`, `secondaryColour`, `backgroundColour`, `textColour`. Optional: `accentColour`, `darkMode`, `cornerRadius`, `surfaceStyle` (glass or solid, default glass) and `buttonStyle` (solid, outline or pill, default solid; decided 29 September, rev 3 CFG-3). Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "Theme",
-    "confirm": {
-     "label": "Save theme",
-     "operation": "setTheme"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "primaryColour",
-      "secondaryColour",
-      "backgroundColour",
-      "textColour",
-      "accentColour",
-      "darkMode",
-      "cornerRadius",
-      "surfaceStyle",
-      "buttonStyle"
-     ]
-    },
-    "provenance": "contract white-label.yaml PUT /tenant-config/theme"
+    "operation": "setTheme",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-015): Typography also read and saved the Theme (getTheme, setTheme); the theme belongs to CMS-005, and two save points for one record drift. The entry parameters bannerId, pageId, policyKind and version were left from the 41-operation bulk attach (design-notes corrections white-label CMS-003).",
+    "source": "screens/P13-white-label-cms.yaml#CMS-005"
    }
   ],
   "_platform": {
@@ -928,11 +784,11 @@
     {
      "to": "CMS-003",
      "trigger": "Typography",
-     "provenance": "derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version and CMS-004 holds none of them. The edge carries nothing: bannerId, pageId, policyKind, version only pre-select (deep link or optional), and CMS-003 opens on its own"
+     "provenance": "derived — CMS-003 declares entryState.params  and CMS-004 holds none of them. The edge carries nothing: CMS-003 needs nothing to open"
     }
    ]
   },
-  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.\n\n**Rewired 23 September (L7).** The screen called the maintenance equipment register, guest CRM or subscription billing where its purpose names White Labelling. Its operations now match its purpose.",
+  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.\n\n**Rewired 23 September (L7).** The screen called the maintenance equipment register, guest CRM or subscription billing where its purpose names White Labelling. Its operations now match its purpose.\n\n**This screen owns the app icons, the splash and the intro video**; the marks and the logo variant are CMS-002's (CHG-SGU-022).",
   "density": "compact",
   "pattern": "statusTracker",
   "patternReason": "`getBrandIdentity` reads one record and nothing reads a population — the screen is about that one thing",
@@ -1061,7 +917,7 @@
     "id": "formSetBrandIdentity",
     "component": "modal",
     "trigger": "Save brand identity",
-    "body": "**Collects what `setBrandIdentity` sends before it is called.** Required: `logoAssetRef`. Optional: `logoVariant` (light, dark or duotone: which lockup sits in the nav bar and which colour reading of it drives the theme, decided 29 September, rev 3 CFG-4), `logoDarkAssetRef`, `faviconAssetRef`, `splashImageAssetRefs`, `splashDurationSeconds`, `splashBackgroundColour`, `showLoadingIndicator`, `splashChangeScope`, `introVideoAssetRef` and `introVideoMode` (off, first launch or every launch; MOB-5). Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setBrandIdentity` sends before it is called.** Required: `logoAssetRef`. Optional: `logoVariant` (light, dark or duotone: which lockup sits in the nav bar and which colour reading of it drives the theme, decided 29 September, rev 3 CFG-4), `logoDarkAssetRef`, `faviconAssetRef`, `splashImageAssetRefs`, `splashDurationSeconds`, `splashBackgroundColour`, `showLoadingIndicator`, `introVideoAssetRef` and `introVideoMode` (off, first launch or every launch; MOB-5). Dismissing sends nothing; the screen behind is unchanged.",
     "bindsTo": "BrandIdentity",
     "confirm": {
      "label": "Save brand identity",
@@ -1078,7 +934,6 @@
       "splashDurationSeconds",
       "splashBackgroundColour",
       "showLoadingIndicator",
-      "splashChangeScope",
       "introVideoAssetRef",
       "introVideoMode"
      ]
@@ -1151,16 +1006,16 @@
     {
      "to": "CMS-003",
      "trigger": "Typography",
-     "provenance": "derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version and CMS-005 holds none of them. The edge carries nothing: bannerId, pageId, policyKind, version only pre-select (deep link or optional), and CMS-003 opens on its own"
+     "provenance": "derived — CMS-003 declares entryState.params  and CMS-005 holds none of them. The edge carries nothing: CMS-003 needs nothing to open"
     },
     {
      "to": "CMS-006",
      "trigger": "Component Preview",
-     "provenance": "derived — CMS-006 declares entryState.params bannerId, pageId, policyKind, version and CMS-005 holds none of them. The edge carries nothing: bannerId, pageId, policyKind, version only pre-select (deep link or optional), and CMS-006 opens on its own"
+     "provenance": "derived — CMS-006 declares entryState.params productId and CMS-005 holds none of them. The edge carries nothing: productId only pre-selects (deep link or optional), and CMS-006 opens on its own"
     }
    ]
   },
-  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.\n\n**A failing colour contrast is refused, not warned (decided 28 September, audit R139 (a)).** `setTheme` answers `400` with a `ContrastProblem` naming each failing pair (foreground, background, ratio, the ratio required, where it is used); the theme is not saved, and the editor keeps the entered colours and marks the failing pairs so they can be corrected. There is no save-anyway.",
+  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.\n\n**A failing colour contrast is refused, not warned (decided 28 September, audit R139 (a)).** `setTheme` answers `400` with a `ContrastProblem` naming each failing pair (foreground, background, ratio, the ratio required, where it is used); the theme is not saved, and the editor keeps the entered colours and marks the failing pairs so they can be corrected. There is no save-anyway.\n\n**No dark or light mode (decided by Chinmay, 2 October 2026; DEC-150).** White label applies the venue's chosen theme; `Theme.darkMode` is deprecated and ignored (CHG-CSA-035), so the editor never draws it (CHG-SGU-007).",
   "density": "compact",
   "pattern": "statusTracker",
   "patternReason": "`getTheme` reads one record and nothing reads a population — the screen is about that one thing",
@@ -1182,7 +1037,6 @@
         "Theme.accentColour",
         "Theme.backgroundColour",
         "Theme.textColour",
-        "Theme.darkMode",
         "Theme.cornerRadius",
         "Theme.surfaceStyle",
         "Theme.buttonStyle",
@@ -1222,7 +1076,7 @@
   "states": {
    "loading": "The theme editor, read by `getTheme`.",
    "error": "Could not load. Names which read failed and leaves the theme editor untouched.",
-   "emptyFirstRun": "No theme editor yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyFirstRun": "Before the first save `getTheme` answers 404 not-configured: the editor opens pre-filled from the preset with Save, and the first `setTheme` creates the part.",
    "emptyNoAccess": "Shown when the caller lacks `TENANT_CONFIGURE`, which `getTheme` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
@@ -1250,7 +1104,7 @@
     "id": "formSetTheme",
     "component": "modal",
     "trigger": "Save theme",
-    "body": "**Collects what `setTheme` sends before it is called.** Required: `primaryColour`, `secondaryColour`, `backgroundColour`, `textColour`. Optional: `accentColour`, `darkMode`, `cornerRadius`, `surfaceStyle` (glass or solid, default glass) and `buttonStyle` (solid, outline or pill, default solid; decided 29 September, rev 3 CFG-3) and `componentColours` (M17-11). **A colour pair that fails contrast is refused** (`400 ContrastProblem`, decided 28 September, audit R139 (a)): the modal stays open with the failing pairs marked. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setTheme` sends before it is called.** Required: `primaryColour`, `secondaryColour`, `backgroundColour`, `textColour`. Optional: `accentColour`, `cornerRadius`, `surfaceStyle` (glass or solid, default glass) and `buttonStyle` (solid, outline or pill, default solid; decided 29 September, rev 3 CFG-3) and `componentColours` (M17-11). **A colour pair that fails contrast is refused** (`400 ContrastProblem`, decided 28 September, audit R139 (a)): the modal stays open with the failing pairs marked. Dismissing sends nothing; the screen behind is unchanged.",
     "bindsTo": "Theme",
     "confirm": {
      "label": "Save theme",
@@ -1264,7 +1118,6 @@
       "backgroundColour",
       "textColour",
       "accentColour",
-      "darkMode",
       "cornerRadius",
       "surfaceStyle",
       "buttonStyle",
@@ -1314,7 +1167,8 @@
    "exitTo": [
     "CMS-001",
     "CMS-002",
-    "CMS-003"
+    "CMS-003",
+    "CMS-014"
    ],
    "inferred": false,
    "entryFrom": [
@@ -1336,26 +1190,13 @@
     {
      "to": "CMS-003",
      "trigger": "Typography",
-     "carries": [
-      "bannerId",
-      "pageId",
-      "policyKind",
-      "version"
-     ],
-     "provenance": "derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version and CMS-006 holds bannerId, pageId, policyKind, version, so an edge into it carries them"
+     "provenance": "derived — CMS-003 declares entryState.params  and CMS-006 holds none of them. The edge carries nothing: CMS-006 is opened from CMS-003, so this edge is the way back and CMS-003 keeps its own state"
     },
     {
-     "to": "ADM-016",
+     "to": "CMS-014",
      "trigger": "White-Label Branding Management",
      "provenance": "flow F102 step 3→4",
-     "crossesDevice": true,
-     "back": false,
-     "carries": [
-      "bannerId",
-      "pageId",
-      "policyKind",
-      "version"
-     ]
+     "operation": "createPreview"
     }
    ]
   },
@@ -1372,54 +1213,55 @@
      "slot": "collection",
      "components": [
       {
-       "kind": "dataTable",
-       "label": "Every config version",
-       "bindsTo": "ConfigVersion",
-       "columns": [
-        "ConfigVersion.publishedAt",
-        "ConfigVersion.publishedByPrincipalId",
-        "ConfigVersion.publishedByName",
-        "ConfigVersion.note",
-        "ConfigVersion.isCurrent",
-        "ConfigVersion.scheduledFor",
-        "ConfigVersion.contentHash",
-        "ConfigVersion.pendingBuildTimeChanges",
-        "ConfigVersion.scopePath"
-       ],
-       "operation": "listConfigVersions",
-       "provenance": "contract white-label.yaml GET /tenant-config/versions"
+       "kind": "detailPanel",
+       "label": "Theme",
+       "bindsTo": "Theme",
+       "operation": "getTheme",
+       "provenance": "contract white-label.yaml GET /tenant-config/theme; wiring fix, 2 October 2026"
       },
       {
-       "kind": "publishGate",
-       "impliedBy": "publishTenantConfig",
-       "notes": "Declares `publishTenantConfig`. **The gate names what the publish will affect before it happens** — a disabled Publish with no reason is the state operators escalate.\n",
-       "provenance": "carried from the previous definition"
+       "kind": "detailPanel",
+       "label": "Fonts",
+       "bindsTo": "FontConfig",
+       "operation": "getFonts",
+       "provenance": "contract white-label.yaml GET /tenant-config/fonts; wiring fix, 2 October 2026"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Brand",
+       "bindsTo": "BrandIdentity",
+       "operation": "getBrandIdentity",
+       "provenance": "contract white-label.yaml GET /tenant-config/brand; wiring fix, 2 October 2026"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Booking flow",
+       "bindsTo": "BookingFlowConfig",
+       "operation": "getBookingFlowConfig",
+       "provenance": "contract white-label.yaml GET /tenant-config/booking-flow; wiring fix, 2 October 2026"
+      },
+      {
+       "kind": "selectField",
+       "label": "Product for the ticket preview",
+       "operation": "previewProductTickets",
+       "notes": "The product whose ticket and passes are previewed.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-008, decided by Chinmay 2 October 2026, DEC-151)",
+       "bindsTo": "Product.id"
+      },
+      {
+       "kind": "livePreview",
+       "label": "PDF ticket and wallet passes",
+       "bindsTo": "TicketProof",
+       "operation": "previewProductTickets",
+       "notes": "**In Block A (decided by Chinmay, 2 October 2026; DEC-151).** The PDF ticket and the Apple and Google Wallet passes rendered with the draft theme; `createPreview` with `outputs` pdfTicket, appleWalletPass, googleWalletPass and a `productId` returns a link per output (CHG-CSA-041) (CHG-SGU-008).",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-008, decided by Chinmay 2 October 2026, DEC-151)"
       }
      ]
     },
     {
      "name": "contextPanel",
      "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected config version",
-       "bindsTo": "ConfigVersion",
-       "columns": [
-        "ConfigVersion.publishedAt",
-        "ConfigVersion.publishedByPrincipalId",
-        "ConfigVersion.publishedByName",
-        "ConfigVersion.note",
-        "ConfigVersion.isCurrent",
-        "ConfigVersion.scheduledFor",
-        "ConfigVersion.contentHash",
-        "ConfigVersion.pendingBuildTimeChanges",
-        "ConfigVersion.scopePath"
-       ],
-       "operation": "listConfigVersions",
-       "provenance": "contract white-label.yaml GET /tenant-config/versions"
-      }
-     ]
+     "components": []
     },
     {
      "name": "actionBar",
@@ -1430,24 +1272,6 @@
        "label": "Create preview",
        "operation": "createPreview",
        "provenance": "contract white-label.yaml POST /tenant-config/preview"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Diff config version",
-       "operation": "diffConfigVersion",
-       "provenance": "contract white-label.yaml GET /tenant-config/versions/{version}/diff"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Publish tenant config",
-       "operation": "publishTenantConfig",
-       "provenance": "contract white-label.yaml POST /tenant-config/publish"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Restore config version",
-       "operation": "restoreConfigVersion",
-       "provenance": "contract white-label.yaml POST /tenant-config/versions/{version}/restore"
       },
       {
        "kind": "publishGate",
@@ -1463,67 +1287,58 @@
    "loading": "The component preview list.",
    "error": "Could not load. Names which read failed and leaves the component preview untouched.",
    "emptyFirstRun": "No component preview yet. Offers Create preview (`createPreview`).",
-   "emptyNoResults": "Never shown: `listConfigVersions` takes no filter, so an empty list is always the first-run state above.",
-   "emptyNoAccess": "Shown when the caller lacks `TENANT_CONFIGURE`, which `listConfigVersions` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoResults": "Never shown: nothing on this screen filters its list, so an empty list is always the first-run state above.",
+   "emptyNoAccess": "Shown when the caller lacks `TENANT_CONFIGURE`, which `getTheme` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
     "operationId": "createPreview",
     "contract": "white-label",
     "purpose": "Generate a preview link",
-    "trigger": "onAction",
-    "invalidates": [
-     "listConfigVersions"
-    ]
-   },
-   {
-    "operationId": "diffConfigVersion",
-    "contract": "white-label",
-    "purpose": "Compare a version against the working draft",
     "trigger": "onAction"
    },
    {
-    "operationId": "listConfigVersions",
+    "operationId": "getTheme",
     "contract": "white-label",
-    "purpose": "Version history",
-    "trigger": "onLoad"
+    "purpose": "The theme being previewed",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-015)"
    },
    {
-    "operationId": "publishTenantConfig",
+    "operationId": "getFonts",
     "contract": "white-label",
-    "purpose": "Publish the working draft",
-    "trigger": "onAction",
-    "invalidates": [
-     "listConfigVersions"
-    ]
+    "purpose": "The fonts being previewed",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-015)"
    },
    {
-    "operationId": "restoreConfigVersion",
+    "operationId": "getBrandIdentity",
     "contract": "white-label",
-    "purpose": "Restore a previous version",
-    "trigger": "onAction",
-    "invalidates": [
-     "listConfigVersions"
-    ]
+    "purpose": "The marks being previewed",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-015)"
+   },
+   {
+    "operationId": "getBookingFlowConfig",
+    "contract": "white-label",
+    "purpose": "The booking presentation being previewed",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-015)"
+   },
+   {
+    "operationId": "previewProductTickets",
+    "contract": "orders",
+    "purpose": "A product's PDF ticket and Apple and Google Wallet pass proofs with the draft theme (CHG-CSP-038)",
+    "trigger": "onAction"
    }
   ],
   "entryState": {
    "params": [
     {
-     "name": "bannerId",
-     "from": "deepLink"
-    },
-    {
-     "name": "pageId",
-     "from": "deepLink"
-    },
-    {
-     "name": "policyKind",
-     "from": "deepLink"
-    },
-    {
-     "name": "version",
-     "from": "deepLink"
+     "name": "productId",
+     "from": "CMS-006",
+     "optional": true,
+     "notes": "The product picked on this screen to preview its tickets (previewProductTickets; CHG-CLN-016)."
     }
    ],
    "coldEntry": "**A version link is expected to point at something superseded — that is what versions are for.** The screen opens the requested version read-only, says it is not current, and links to the one that is. **An old version is history, not an error.** Arrives with `bannerId`, `pageId`, `policyKind`.",
@@ -1546,7 +1361,7 @@
     "id": "formCreatePreview",
     "component": "modal",
     "trigger": "Create preview",
-    "body": "**Collects what `createPreview` sends before it is called.** Nothing in the body is required. Optional: `platform`, `theme`, `language`, `expiresInHours`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `createPreview` sends before it is called.** Nothing in the body is required. Optional: `platform`, `language`, `expiresInHours`. Dismissing sends nothing; the screen behind is unchanged. Optional `outputs` (app, pdfTicket, appleWalletPass, googleWalletPass) and `productId` add the ticket and pass previews (CHG-SGU-008).",
     "confirm": {
      "label": "Create preview",
      "operation": "createPreview"
@@ -1555,30 +1370,37 @@
      "label": "Cancel",
      "discards": [
       "platform",
-      "theme",
       "language",
       "expiresInHours"
      ]
     },
     "provenance": "contract white-label.yaml POST /tenant-config/preview"
+   }
+  ],
+  "gaps": [
+   {
+    "operation": "diffConfigVersion",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-015): The screen was wired to the version table and publish gate (listConfigVersions, diffConfigVersion, publishTenantConfig, restoreConfigVersion), which are CMS-015 and CMS-014; Component Preview needs the theme, fonts, brand and booking-flow reads and createPreview (design-notes correction white-label CMS-006).",
+    "source": "screens/P13-white-label-cms.yaml#CMS-015 | screens/P13-white-label-cms.yaml#CMS-014"
    },
    {
-    "id": "formPublishTenantConfig",
-    "component": "modal",
-    "trigger": "Publish tenant config",
-    "body": "**Collects what `publishTenantConfig` sends before it is called.** Required: `note`. Optional: `scheduledFor`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Publish tenant config",
-     "operation": "publishTenantConfig"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "note",
-      "scheduledFor"
-     ]
-    },
-    "provenance": "contract white-label.yaml POST /tenant-config/publish"
+    "operation": "listConfigVersions",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-015): The screen was wired to the version table and publish gate (listConfigVersions, diffConfigVersion, publishTenantConfig, restoreConfigVersion), which are CMS-015 and CMS-014; Component Preview needs the theme, fonts, brand and booking-flow reads and createPreview (design-notes correction white-label CMS-006).",
+    "source": "screens/P13-white-label-cms.yaml#CMS-015 | screens/P13-white-label-cms.yaml#CMS-014"
+   },
+   {
+    "operation": "publishTenantConfig",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-015): The screen was wired to the version table and publish gate (listConfigVersions, diffConfigVersion, publishTenantConfig, restoreConfigVersion), which are CMS-015 and CMS-014; Component Preview needs the theme, fonts, brand and booking-flow reads and createPreview (design-notes correction white-label CMS-006).",
+    "source": "screens/P13-white-label-cms.yaml#CMS-015 | screens/P13-white-label-cms.yaml#CMS-014"
+   },
+   {
+    "operation": "restoreConfigVersion",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-015): The screen was wired to the version table and publish gate (listConfigVersions, diffConfigVersion, publishTenantConfig, restoreConfigVersion), which are CMS-015 and CMS-014; Component Preview needs the theme, fonts, brand and booking-flow reads and createPreview (design-notes correction white-label CMS-006).",
+    "source": "screens/P13-white-label-cms.yaml#CMS-015 | screens/P13-white-label-cms.yaml#CMS-014"
    }
   ],
   "_platform": {
@@ -1645,10 +1467,7 @@
     {
      "to": "CMS-003",
      "trigger": "Typography",
-     "carries": [
-      "pageId"
-     ],
-     "provenance": "derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version and CMS-007 holds pageId, so an edge into it carries them"
+     "provenance": "derived — CMS-003 declares entryState.params  and CMS-007 holds none of them. The edge carries nothing: CMS-003 needs nothing to open"
     }
    ]
   },
@@ -1665,6 +1484,13 @@
      "slot": "record",
      "components": [
       {
+       "kind": "cardList",
+       "label": "Start from a template",
+       "operation": "listLandingPageTemplates",
+       "notes": "**For a tenant without its own landing page** (decided by Chinmay, 2 October 2026; DEC-548): the storefront home starts from a TICVAI template (`HomepageLayout.templateKey`, `landingSource` storefront). A tenant with its own site keeps it and links in with deep links (CMS-009) (CHG-SGU-005).",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-005, decided by Chinmay 2 October 2026, DEC-163, DEC-548)"
+      },
+      {
        "kind": "detailPanel",
        "label": "The homepage layout",
        "bindsTo": "HomepageLayout",
@@ -1673,7 +1499,7 @@
         "HomepageLayout.sections"
        ],
        "operation": "getHomepageLayout",
-       "notes": "**Also the mobile Home editor (decided 29 September, MOB-3; Site Builder steps 5 and 6).** The `venueOverview` section (description, opening hours, type tiles), the hero's style (carousel, video, poster or split) and 1 or 2 highlights for attractions, dining, what's on and shop (`maxItems`). The header and footer are set here too (`setHeader`, `setFooter`).",
+       "notes": "**Also the mobile Home editor (decided 29 September, MOB-3; Site Builder steps 5 and 6).** The `venueOverview` section (description, opening hours, type tiles), the hero's style (carousel, video, poster or split) and the highlights for attractions, dining, what's on and shop (`maxItems`, the venue\\'s choice per section, DEC-152). The header and footer are set here too (`setHeader`, `setFooter`). **Every customisation option of the approved wireframe** (decided by Chinmay, 2 October 2026; DEC-152), including the card count per section, which is the venue's choice (replacing MOB-3's 1 or 2), and a **scroll animation per section**: Rise, Scale, Slide, Blur or None (`scrollAnimation`, DEC-153; CHG-CSA-040) (CHG-SGU-009). **The client-approved web and app wireframes are the layout**; they change only where the spec breaks (DEC-163) (CHG-SGU-005).",
        "provenance": "contract white-label.yaml GET /tenant-config/homepage"
       },
       {
@@ -1735,9 +1561,23 @@
       },
       {
        "kind": "secondaryButton",
-       "label": "Save footer",
-       "operation": "setFooter",
-       "provenance": "contract white-label.yaml PUT /footer"
+       "label": "New content block",
+       "operation": "createContentBlock",
+       "notes": "A block for a page section, scheduled or personalised (MATRIX 22.10.4).",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-022, design-notes correction)"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Publish block",
+       "operation": "publishContentBlock",
+       "notes": "Now or scheduled; where the venue switched the review step on, the block waits for a reviewer (MATRIX 22.10.8).",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-022, design-notes correction)"
+      },
+      {
+       "kind": "publishGate",
+       "label": "What publishing a block changes",
+       "notes": "Names the page and section the block shows in, from when, and for whom; says whether the venue's review step applies. Blocks go live on their own schedule, not with the site Publish.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-022, design-notes correction)"
       }
      ]
     }
@@ -1775,12 +1615,6 @@
     ]
    },
    {
-    "operationId": "setFooter",
-    "contract": "white-label",
-    "purpose": "Set the guest web and app footer",
-    "trigger": "onAction"
-   },
-   {
     "operationId": "getHomepageLayout",
     "contract": "white-label",
     "purpose": "Read homepage layout",
@@ -1797,18 +1631,6 @@
     "contract": "white-label",
     "purpose": "Which modules are on, so a section whose module is off is disabled in the builder (decided 28 September, audit R163 (4))",
     "trigger": "onLoad"
-   },
-   {
-    "operationId": "setHeader",
-    "contract": "white-label",
-    "purpose": "Configure the header",
-    "trigger": "onAction",
-    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
-    "invalidates": [
-     "listContentPages",
-     "getHomepageLayout",
-     "getModuleEnablement"
-    ]
    },
    {
     "operationId": "deleteContentPage",
@@ -1835,6 +1657,24 @@
     "purpose": "Record which AI draft or proposal was used, or why it was refused",
     "trigger": "onAction",
     "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "createContentBlock",
+    "contract": "white-label",
+    "purpose": "Author a scheduled or personalised content block (BL-172)",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "publishContentBlock",
+    "contract": "white-label",
+    "purpose": "Publish a block now or on its schedule; follows the publish review policy (CHG-CSA-042)",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "listLandingPageTemplates",
+    "contract": "white-label",
+    "purpose": "The landing-page templates TICVAI provides (DEC-548)",
+    "trigger": "onLoad"
    }
   ],
   "wireframe": {
@@ -1852,6 +1692,10 @@
     {
      "name": "actionId",
      "from": "navigation"
+    },
+    {
+     "name": "blockId",
+     "from": "navigation"
     }
    ]
   },
@@ -1860,7 +1704,7 @@
     "id": "formCreateContentPage",
     "component": "modal",
     "trigger": "Create content page",
-    "body": "**Collects what `createContentPage` sends before it is called.** Required: `id`, `slug`, `title`, `body`, `status`. Optional: `isEnabled`, `iconAssetRef`, `categoryCode`, `sortOrder`, `isReferenced`, `scopePath`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `createContentPage` sends.** Required: `slug`, `title`, `body`. Optional: `isEnabled`, `iconAssetRef`, `categoryCode`, `sortOrder`. `id`, `status`, `isReferenced` and `scopePath` are the server's and never asked. Dismissing sends nothing.",
     "bindsTo": "ContentPage",
     "confirm": {
      "label": "Create content page",
@@ -1869,20 +1713,16 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "id",
       "slug",
       "title",
       "body",
-      "status",
       "isEnabled",
       "iconAssetRef",
       "categoryCode",
-      "sortOrder",
-      "isReferenced",
-      "scopePath"
+      "sortOrder"
      ]
     },
-    "provenance": "contract white-label.yaml POST /tenant-config/pages"
+    "provenance": "corrected 2 October 2026 (CHG-SGU-022, design-notes correction)"
    },
    {
     "id": "formUpdateContentPage",
@@ -1910,33 +1750,10 @@
     "provenance": "contract white-label.yaml PUT /tenant-config/pages/{pageId}"
    },
    {
-    "id": "formSetFooter",
-    "component": "modal",
-    "trigger": "Save footer",
-    "body": "**Collects what `setFooter` sends before it is called.** Required: `id`, `scopePath`. Optional: `columns`, `legalLinks`, `copyrightText`, `socialLinks`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "FooterConfig",
-    "confirm": {
-     "label": "Save footer",
-     "operation": "setFooter"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "id",
-      "scopePath",
-      "columns",
-      "legalLinks",
-      "copyrightText",
-      "socialLinks"
-     ]
-    },
-    "provenance": "contract white-label.yaml PUT /footer"
-   },
-   {
     "id": "formSetHomepageLayout",
     "component": "modal",
     "trigger": "Save homepage layout",
-    "body": "**Collects what `setHomepageLayout` sends before it is called.** Required: `sections`. Optional: `id`. A section whose module is off is disabled here and cannot be made visible (audit R163 (4)). Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setHomepageLayout` sends before it is called.** Required: `sections`. Optional: `id`. A section whose module is off is disabled here and cannot be made visible (audit R163 (4)). Dismissing sends nothing; the screen behind is unchanged. Per section: `maxItems` (the venue's choice) and `scrollAnimation` (rise, scale, slide, blur, none); `templateKey` and `landingSource` (CHG-SGU-009).",
     "bindsTo": "HomepageLayout",
     "confirm": {
      "label": "Save homepage layout",
@@ -1950,6 +1767,34 @@
      ]
     },
     "provenance": "contract white-label.yaml PUT /tenant-config/homepage"
+   },
+   {
+    "id": "formCreateContentBlock",
+    "component": "modal",
+    "trigger": "New content block",
+    "body": "The block's content per language, where it shows, when (schedule) and for whom (audience), as the block editor fields; ids and scope are the server's.",
+    "confirm": {
+     "label": "New content block",
+     "operation": "createContentBlock"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "corrected 2 October 2026 (CHG-SGU-022, design-notes correction)"
+   },
+   {
+    "id": "formPublishContentBlock",
+    "component": "modal",
+    "trigger": "Publish block",
+    "body": "Publish now or at a set time; says whether the venue's review step applies.",
+    "confirm": {
+     "label": "Publish block",
+     "operation": "publishContentBlock"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "corrected 2 October 2026 (CHG-SGU-022, design-notes correction)"
    }
   ],
   "_platform": {
@@ -2013,14 +1858,11 @@
     {
      "to": "CMS-003",
      "trigger": "Typography",
-     "carries": [
-      "bannerId"
-     ],
-     "provenance": "derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version and CMS-008 holds bannerId, so an edge into it carries them"
+     "provenance": "derived — CMS-003 declares entryState.params  and CMS-008 holds none of them. The edge carries nothing: CMS-003 needs nothing to open"
     }
    ]
   },
-  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.",
+  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.\n \n**Banners and promo blocks go live on their own schedule, not with Publish** (the contract header lists them outside the draft); the screen says so beside each (CHG-SGU-022).",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listPromoBlocks` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
@@ -2097,6 +1939,14 @@
        ],
        "operation": "listPromoBlocks",
        "provenance": "contract white-label.yaml GET /tenant-config/promo-blocks"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The selected banner",
+       "bindsTo": "Banner",
+       "operation": "listBanners",
+       "notes": "Select, edit and delete a banner as for promo blocks.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-022, design-notes correction)"
       }
      ]
     },
@@ -2133,6 +1983,12 @@
        "label": "Delete promo block",
        "operation": "deletePromoBlock",
        "provenance": "contract white-label.yaml DELETE /tenant-config/promo-blocks/{promoBlockId}"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Delete banner",
+       "operation": "deleteBanner",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-022, design-notes correction)"
       }
      ]
     }
@@ -2263,7 +2119,7 @@
     "id": "formCreateBanner",
     "component": "modal",
     "trigger": "Create banner",
-    "body": "**Collects what `createBanner` sends before it is called.** Required: `id`, `title`, `imageAssetRef`, `startsAt`. Optional: `subtitle`, `placement`, `linkTarget`, `endsAt`, `state`, `sortOrder`, `isActive`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `createBanner` sends before it is called.** Required:, `title`, `imageAssetRef`, `startsAt`. Optional: `subtitle`, `placement`, `linkTarget`, `endsAt`, `sortOrder`, `isActive`. Dismissing sends nothing; the screen behind is unchanged.",
     "bindsTo": "Banner",
     "confirm": {
      "label": "Create banner",
@@ -2272,7 +2128,6 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "id",
       "title",
       "imageAssetRef",
       "startsAt",
@@ -2280,12 +2135,11 @@
       "placement",
       "linkTarget",
       "endsAt",
-      "state",
       "sortOrder",
       "isActive"
      ]
     },
-    "provenance": "contract white-label.yaml POST /tenant-config/banners"
+    "provenance": "corrected 2 October 2026 (CHG-SGU-022, design-notes correction)"
    },
    {
     "id": "formUpdateBanner",
@@ -2316,7 +2170,7 @@
     "id": "formCreatePromoBlock",
     "component": "modal",
     "trigger": "Create promo block",
-    "body": "**Collects what `createPromoBlock` sends before it is called.** Required: `id`, `title`. Optional: `description`, `iconAssetRef`, `promotionId`, `linkTarget`, `startsAt`, `endsAt`, `state`, `sortOrder`, `scopePath`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `createPromoBlock` sends before it is called.** Required:, `title`. Optional: `description`, `iconAssetRef`, `promotionId`, `linkTarget`, `startsAt`, `endsAt`, `sortOrder`. Dismissing sends nothing; the screen behind is unchanged.",
     "bindsTo": "PromoBlock",
     "confirm": {
      "label": "Create promo block",
@@ -2325,7 +2179,6 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "id",
       "title",
       "description",
       "iconAssetRef",
@@ -2333,12 +2186,10 @@
       "linkTarget",
       "startsAt",
       "endsAt",
-      "state",
-      "sortOrder",
-      "scopePath"
+      "sortOrder"
      ]
     },
-    "provenance": "contract white-label.yaml POST /tenant-config/promo-blocks"
+    "provenance": "corrected 2 October 2026 (CHG-SGU-022, design-notes correction)"
    },
    {
     "id": "formUpdatePromoBlock",
@@ -2370,6 +2221,20 @@
     "trigger": "Delete promo block",
     "body": "**Names what `deletePromoBlock` changes and what it leaves alone**, in the consequence rather than the verb. A content blocks this affects should be identified in the dialog, not just counted.",
     "provenance": "contract white-label.yaml DELETE /tenant-config/promo-blocks/{promoBlockId}"
+   },
+   {
+    "id": "confirmDeleteBanner",
+    "component": "confirmDialog",
+    "trigger": "Delete banner",
+    "body": "Names the banner and where it shows; it disappears from the storefront at once.",
+    "confirm": {
+     "label": "Delete banner",
+     "operation": "deleteBanner"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "corrected 2 October 2026 (CHG-SGU-022, design-notes correction)"
    }
   ],
   "_platform": {
@@ -2399,7 +2264,7 @@
   "id": "CMS-009",
   "name": "Navigation & Menus",
   "module": "White Label",
-  "requiresModule": "fnb",
+  "requiresModule": "core",
   "wave": 2,
   "capability": "C00",
   "implementation": {
@@ -2433,7 +2298,7 @@
     {
      "to": "CMS-003",
      "trigger": "Typography",
-     "provenance": "derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version and CMS-009 holds none of them. The edge carries nothing: bannerId, pageId, policyKind, version only pre-select (deep link or optional), and CMS-003 opens on its own"
+     "provenance": "derived — CMS-003 declares entryState.params  and CMS-009 holds none of them. The edge carries nothing: CMS-003 needs nothing to open"
     }
    ]
   },
@@ -2441,67 +2306,19 @@
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listMenus` reads the population and `getMenu` reads one of them — list, select, act",
-  "purpose": "Decide what appears in the header, the footer and the mobile tab bar, with the Buy tickets button (Site Builder steps 5 and 6).",
+  "purpose": "Three editors, each saved on its own: the header, the footer and the mobile tab bar with the Buy tickets button (Site Builder steps 5 and 6); and the links a tenant's own site uses to deep-link in.",
   "layout": {
    "template": "split",
    "regions": [
     {
      "name": "contentBody",
      "slot": "collection",
-     "components": [
-      {
-       "kind": "textField",
-       "label": "Outlet id",
-       "operation": "listMenus",
-       "notes": "Sends `?outletId=` to `listMenus`.",
-       "provenance": "contract fnb.yaml GET /menus"
-      },
-      {
-       "kind": "datePicker",
-       "label": "Active at",
-       "operation": "listMenus",
-       "notes": "Sends `?activeAt=` to `listMenus`.",
-       "provenance": "contract fnb.yaml GET /menus"
-      },
-      {
-       "kind": "dataTable",
-       "label": "Every menu",
-       "bindsTo": "Menu",
-       "columns": [
-        "Menu.id",
-        "Menu.code",
-        "Menu.name",
-        "Menu.outletId",
-        "Menu.availability",
-        "Menu.sections",
-        "Menu.isActive"
-       ],
-       "operation": "listMenus",
-       "provenance": "contract fnb.yaml GET /menus"
-      }
-     ]
+     "components": []
     },
     {
      "name": "contextPanel",
      "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected menu",
-       "bindsTo": "Menu",
-       "columns": [
-        "Menu.id",
-        "Menu.code",
-        "Menu.name",
-        "Menu.outletId",
-        "Menu.availability",
-        "Menu.sections",
-        "Menu.isActive"
-       ],
-       "operation": "getMenu",
-       "provenance": "contract fnb.yaml GET /menus/{menuId}"
-      }
-     ]
+     "components": []
     },
     {
      "name": "navigationEditor",
@@ -2509,7 +2326,7 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "Navigation and mobile tabs",
+       "label": "Tab bar",
        "bindsTo": "NavigationConfig",
        "columns": [
         "NavigationConfig.kind",
@@ -2519,6 +2336,30 @@
        "operation": "getNavigation",
        "notes": "**The mobile tab editor (decided 29 September, MOB-1 and MOB-2).** Which tabs, their order, labels and icons; each tab is an `appSection` link. The default is Home, Explore, Plan and Tickets; Map is optional; Plan needs the `visitPlanner` module. The Buy tickets button: raised in the centre (default), floating, flat or hidden, and its label. At most five tabs are visible.",
        "provenance": "contract white-label.yaml GET /tenant-config/navigation"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Header",
+       "bindsTo": "HeaderConfig",
+       "operation": "setHeader",
+       "notes": "**Three navigation editors, each saved on its own** (decided by Chinmay, 2 October 2026; DEC-049): the header here, the footer below, the mobile tab bar above (CHG-SGU-006).",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-006, decided by Chinmay 2 October 2026, DEC-049)"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Footer",
+       "bindsTo": "FooterConfig",
+       "operation": "setFooter",
+       "notes": "Footer columns, legal links, copyright and social; the legal links a regulator checks and the Powered by credit (DI-111).",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-006, decided by Chinmay 2 October 2026, DEC-049)"
+      },
+      {
+       "kind": "cardList",
+       "label": "Links into the storefront",
+       "bindsTo": "DeepLinkScheme",
+       "operation": "getDeepLinkScheme",
+       "notes": "**For a tenant with its own landing page** (DEC-548): the published deep-link scheme and a link builder, so the tenant's site links straight to a product, an event or a booking step (CHG-SGU-005).",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-005, decided by Chinmay 2 October 2026, DEC-163, DEC-548)"
       }
      ]
     },
@@ -2528,27 +2369,27 @@
      "components": [
       {
        "kind": "secondaryButton",
-       "label": "Save navigation and tabs",
+       "label": "Save tab bar",
        "operation": "setNavigation",
        "provenance": "contract white-label.yaml PUT /tenant-config/navigation"
       },
       {
-       "kind": "primaryButton",
-       "label": "Create menu",
-       "operation": "createMenu",
-       "provenance": "contract fnb.yaml POST /menus"
+       "kind": "secondaryButton",
+       "label": "Save header",
+       "operation": "setHeader",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-006, decided by Chinmay 2 October 2026, DEC-049)"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save menu sections",
-       "operation": "setMenuSections",
-       "provenance": "contract fnb.yaml PUT /menus/{menuId}/sections"
+       "label": "Save footer",
+       "operation": "setFooter",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-006, decided by Chinmay 2 October 2026, DEC-049)"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save menu",
-       "operation": "updateMenu",
-       "provenance": "contract fnb.yaml PATCH /menus/{menuId}"
+       "label": "Build a link",
+       "operation": "buildDeepLink",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-005, decided by Chinmay 2 October 2026, DEC-163, DEC-548)"
       }
      ]
     }
@@ -2557,9 +2398,8 @@
   "states": {
    "loading": "The navigation menus list.",
    "error": "Could not load. Names which read failed and leaves the navigation menus untouched.",
-   "emptyFirstRun": "No navigation menus yet. Offers Create menu (`createMenu`); distinct from a filter that matched nothing.",
-   "emptyNoResults": "Nothing matches the filter on outletId, activeAt and the navigation menus are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listMenus` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "Nothing configured yet: the header, footer and tab bar open with the preset's defaults, each with its own Save.",
+   "emptyNoAccess": "Shown when the caller lacks `TENANT_CONFIGURE`, which `getNavigation` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -2567,45 +2407,6 @@
     "contract": "white-label",
     "purpose": "The navigation and the mobile tab set (MOB-1)",
     "trigger": "onLoad"
-   },
-   {
-    "operationId": "listMenus",
-    "contract": "fnb",
-    "purpose": "List menus",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "getMenu",
-    "contract": "fnb",
-    "purpose": "Read a menu with sections and items",
-    "trigger": "onAction"
-   },
-   {
-    "operationId": "createMenu",
-    "contract": "fnb",
-    "purpose": "Create a menu",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMenus"
-    ]
-   },
-   {
-    "operationId": "setMenuSections",
-    "contract": "fnb",
-    "purpose": "Set menu sections and their item ordering",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMenus"
-    ]
-   },
-   {
-    "operationId": "updateMenu",
-    "contract": "fnb",
-    "purpose": "Amend a menu",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMenus"
-    ]
    },
    {
     "operationId": "setNavigation",
@@ -2616,15 +2417,33 @@
      "getNavigation"
     ],
     "provenance": "decided 29 September, VM close-out (venue management and configuration)"
+   },
+   {
+    "operationId": "setHeader",
+    "contract": "white-label",
+    "purpose": "The header editor, saved on its own (DEC-049)",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "setFooter",
+    "contract": "white-label",
+    "purpose": "The footer editor, saved on its own (DEC-049)",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "getDeepLinkScheme",
+    "contract": "white-label",
+    "purpose": "The published deep-link scheme (DEC-548)",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "buildDeepLink",
+    "contract": "white-label",
+    "purpose": "Build a deep link to a target for a tenant's own site (DEC-548)",
+    "trigger": "onAction"
    }
   ],
   "entryState": {
-   "params": [
-    {
-     "name": "menuId",
-     "from": "deepLink"
-    }
-   ],
    "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `menuId`.",
    "preloaded": [
     "Menu.id",
@@ -2644,11 +2463,11 @@
    {
     "id": "formSetNavigation",
     "component": "modal",
-    "trigger": "Save navigation and tabs",
+    "trigger": "Save tab bar",
     "body": "**Collects what `setNavigation` sends.** Required: `kind`, `items` (label, icon, target, visible, order; a mobile tab targets an `appSection`). Optional: `buyButton` (`style`, `label`). Refused `400` when a tab targets a disabled module or more than five are visible. Dismissing sends nothing.",
     "bindsTo": "NavigationConfig",
     "confirm": {
-     "label": "Save navigation",
+     "label": "Save tab bar",
      "operation": "setNavigation"
     },
     "dismiss": {
@@ -2662,61 +2481,78 @@
     "provenance": "contract white-label.yaml PUT /tenant-config/navigation"
    },
    {
-    "id": "formCreateMenu",
+    "id": "formSetHeader",
     "component": "modal",
-    "trigger": "Create menu",
-    "body": "**Collects what `createMenu` sends before it is called.** Required: `code`, `name`, `outletId`. Optional: `availability`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "CreateMenuRequest",
+    "trigger": "Save header",
+    "body": "The header: logo placement, menu items and the Buy tickets button; saved on its own.",
     "confirm": {
-     "label": "Create menu",
-     "operation": "createMenu"
+     "label": "Save header",
+     "operation": "setHeader"
     },
     "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "code",
-      "name",
-      "outletId",
-      "availability"
-     ]
+     "label": "Cancel"
     },
-    "provenance": "contract fnb.yaml POST /menus"
+    "provenance": "corrected 2 October 2026 (CHG-SGU-006, decided by Chinmay 2 October 2026, DEC-049)"
    },
    {
-    "id": "formSetMenuSections",
+    "id": "formSetFooter",
     "component": "modal",
-    "trigger": "Save menu sections",
-    "body": "**Collects what `setMenuSections` sends before it is called.** Required: `sections`. Dismissing sends nothing; the screen behind is unchanged.",
+    "trigger": "Save footer",
+    "body": "Footer columns, legal links, copyright text and social links; `id` and `scopePath` are the server's and never asked (the contract still lists them as required: CHG-SGU-024).",
     "confirm": {
-     "label": "Save menu sections",
-     "operation": "setMenuSections"
+     "label": "Save footer",
+     "operation": "setFooter"
     },
     "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "sections"
-     ]
+     "label": "Cancel"
     },
-    "provenance": "contract fnb.yaml PUT /menus/{menuId}/sections"
+    "provenance": "corrected 2 October 2026 (CHG-SGU-006, decided by Chinmay 2 October 2026, DEC-049)"
    },
    {
-    "id": "formUpdateMenu",
+    "id": "formBuildDeepLink",
     "component": "modal",
-    "trigger": "Save menu",
-    "body": "**Collects what `updateMenu` sends before it is called.** Nothing in the body is required. Optional: `name`, `availability`, `isActive`. Dismissing sends nothing; the screen behind is unchanged.",
+    "trigger": "Build a link",
+    "body": "Pick the target (a product, an event, a booking step or a page); the link comes back to copy.",
     "confirm": {
-     "label": "Save menu",
-     "operation": "updateMenu"
+     "label": "Build a link",
+     "operation": "buildDeepLink"
     },
     "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "name",
-      "availability",
-      "isActive"
-     ]
+     "label": "Cancel"
     },
-    "provenance": "contract fnb.yaml PATCH /menus/{menuId}"
+    "provenance": "corrected 2 October 2026 (CHG-SGU-005, decided by Chinmay 2 October 2026, DEC-163, DEC-548)"
+   }
+  ],
+  "gaps": [
+   {
+    "operation": "createMenu",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-008): \"Navigation & Menus\" means site navigation menus; the F&B menu operations (listMenus, getMenu, createMenu, setMenuSections, updateMenu) were attached by name resemblance and belong to BO-045 and BO-109. Every tenant needs navigation, so the screen requires core (R254; design-notes corrections fnb-retail CMS-009, white-label CMS-102).",
+    "source": "screens/P13-white-label-cms.yaml#CMS-009 | R254"
+   },
+   {
+    "operation": "getMenu",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-008): \"Navigation & Menus\" means site navigation menus; the F&B menu operations (listMenus, getMenu, createMenu, setMenuSections, updateMenu) were attached by name resemblance and belong to BO-045 and BO-109. Every tenant needs navigation, so the screen requires core (R254; design-notes corrections fnb-retail CMS-009, white-label CMS-102).",
+    "source": "screens/P13-white-label-cms.yaml#CMS-009 | R254"
+   },
+   {
+    "operation": "listMenus",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-008): \"Navigation & Menus\" means site navigation menus; the F&B menu operations (listMenus, getMenu, createMenu, setMenuSections, updateMenu) were attached by name resemblance and belong to BO-045 and BO-109. Every tenant needs navigation, so the screen requires core (R254; design-notes corrections fnb-retail CMS-009, white-label CMS-102).",
+    "source": "screens/P13-white-label-cms.yaml#CMS-009 | R254"
+   },
+   {
+    "operation": "setMenuSections",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-008): \"Navigation & Menus\" means site navigation menus; the F&B menu operations (listMenus, getMenu, createMenu, setMenuSections, updateMenu) were attached by name resemblance and belong to BO-045 and BO-109. Every tenant needs navigation, so the screen requires core (R254; design-notes corrections fnb-retail CMS-009, white-label CMS-102).",
+    "source": "screens/P13-white-label-cms.yaml#CMS-009 | R254"
+   },
+   {
+    "operation": "updateMenu",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-008): \"Navigation & Menus\" means site navigation menus; the F&B menu operations (listMenus, getMenu, createMenu, setMenuSections, updateMenu) were attached by name resemblance and belong to BO-045 and BO-109. Every tenant needs navigation, so the screen requires core (R254; design-notes corrections fnb-retail CMS-009, white-label CMS-102).",
+    "source": "screens/P13-white-label-cms.yaml#CMS-009 | R254"
    }
   ],
   "_platform": {
@@ -2746,7 +2582,7 @@
   "id": "CMS-010",
   "name": "Media Library",
   "module": "White Label",
-  "requiresModule": "ticketing",
+  "requiresModule": "core",
   "wave": 2,
   "capability": "C00",
   "implementation": {
@@ -2783,7 +2619,7 @@
     {
      "to": "CMS-003",
      "trigger": "Typography",
-     "provenance": "derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version and CMS-010 holds none of them. The edge carries nothing: bannerId, pageId, policyKind, version only pre-select (deep link or optional), and CMS-003 opens on its own"
+     "provenance": "derived — CMS-003 declares entryState.params  and CMS-010 holds none of them. The edge carries nothing: CMS-003 needs nothing to open"
     }
    ]
   },
@@ -2800,32 +2636,36 @@
      "slot": "collection",
      "components": [
       {
-       "kind": "textField",
+       "kind": "selectField",
        "label": "Kind",
        "operation": "searchMedia",
-       "notes": "Sends `?kind=` to `searchMedia`.",
-       "provenance": "contract assets.yaml GET /media"
+       "notes": "The media kinds (image, video, document, audio) as a choice; sends `kind`.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-019, design-notes correction)",
+       "bindsTo": "MediaAsset.kind"
       },
       {
-       "kind": "textField",
+       "kind": "multiSelect",
        "label": "Tag",
        "operation": "searchMedia",
-       "notes": "Sends `?tag=` to `searchMedia`.",
-       "provenance": "contract assets.yaml GET /media"
+       "notes": "Tags picked from the taxonomy; sends `tag`.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-019, design-notes correction)",
+       "bindsTo": "MediaAsset.tags"
       },
       {
-       "kind": "textField",
-       "label": "Collection id",
+       "kind": "selectField",
+       "label": "Collection",
        "operation": "searchMedia",
-       "notes": "Sends `?collectionId=` to `searchMedia`.",
-       "provenance": "contract assets.yaml GET /media"
+       "notes": "Collections by name; sends `collectionId`.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-019, design-notes correction)",
+       "bindsTo": "Collection.name"
       },
       {
-       "kind": "textField",
-       "label": "Venue id",
+       "kind": "selectField",
+       "label": "Venue",
        "operation": "searchMedia",
-       "notes": "Sends `?venueId=` to `searchMedia`.",
-       "provenance": "contract assets.yaml GET /media"
+       "notes": "Venues by name; sends `venueId`.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-019, design-notes correction)",
+       "bindsTo": "MediaAsset.venueId"
       },
       {
        "kind": "searchField",
@@ -2853,7 +2693,6 @@
        "label": "Every media asset",
        "bindsTo": "MediaAsset",
        "columns": [
-        "MediaAsset.id",
         "MediaAsset.kind",
         "MediaAsset.status",
         "MediaAsset.filename",
@@ -2863,27 +2702,22 @@
         "MediaAsset.altText",
         "MediaAsset.width",
         "MediaAsset.height",
-        "MediaAsset.durationSeconds",
-        "MediaAsset.customMetadata"
+        "MediaAsset.durationSeconds"
        ],
        "operation": "searchMedia",
-       "provenance": "contract assets.yaml GET /media"
+       "provenance": "corrected 2 October 2026 (CHG-SGU-019, design-notes correction)"
       },
       {
        "kind": "dataTable",
        "label": "Every collection",
        "bindsTo": "Collection",
        "columns": [
-        "Collection.id",
         "Collection.name",
         "Collection.description",
-        "Collection.venueId",
-        "Collection.parentCollectionId",
-        "Collection.assetCount",
-        "Collection.coverAssetId"
+        "Collection.assetCount"
        ],
        "operation": "listCollections",
-       "provenance": "contract assets.yaml GET /media/collections"
+       "provenance": "corrected 2 October 2026 (CHG-SGU-019, design-notes correction)"
       },
       {
        "kind": "confirmDialog",
@@ -2965,22 +2799,6 @@
        ],
        "operation": "getMediaAsset",
        "provenance": "contract assets.yaml GET /media/{mediaId}"
-      },
-      {
-       "kind": "detailPanel",
-       "label": "The media entitlements",
-       "bindsTo": "MediaEntitlements",
-       "columns": [
-        "MediaEntitlements.mediaCode",
-        "MediaEntitlements.mediaKind",
-        "MediaEntitlements.subjectId",
-        "MediaEntitlements.isValid",
-        "MediaEntitlements.invalidReason",
-        "MediaEntitlements.canAcceptMore",
-        "MediaEntitlements.entitlements"
-       ],
-       "operation": "getMediaEntitlements",
-       "provenance": "contract orders.yaml GET /media/{mediaCode}/entitlements"
       }
      ]
     },
@@ -2988,12 +2806,6 @@
      "name": "actionBar",
      "slot": "rowActions",
      "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Append entitlement to media",
-       "operation": "appendEntitlementToMedia",
-       "provenance": "contract orders.yaml POST /media/{mediaCode}/entitlements"
-      },
       {
        "kind": "secondaryButton",
        "label": "Complete upload",
@@ -3077,28 +2889,6 @@
      "operation": "updateMediaAsset"
     },
     "provenance": "contract assets.yaml PATCH /media/{mediaId}"
-   },
-   {
-    "id": "formAppendEntitlementToMedia",
-    "component": "modal",
-    "trigger": "Append entitlement to media",
-    "body": "**Collects what `appendEntitlementToMedia` sends before it is called.** Required: `id`, `lines`, `recordedAt`. Optional: `paymentMethod`, `note`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "AppendEntitlementRequest",
-    "confirm": {
-     "label": "Append entitlement to media",
-     "operation": "appendEntitlementToMedia"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "id",
-      "lines",
-      "recordedAt",
-      "paymentMethod",
-      "note"
-     ]
-    },
-    "provenance": "contract orders.yaml POST /media/{mediaCode}/entitlements"
    },
    {
     "id": "formCompleteUpload",
@@ -3208,29 +2998,14 @@
    "error": "Could not load. Names which read failed and leaves the media untouched.",
    "emptyFirstRun": "No media yet. Offers Create collection (`createCollection`); distinct from a filter that matched nothing.",
    "emptyNoResults": "Nothing matches the filter on kind, tag, collectionId, venueId, search, unusedOnly and the media are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `getMediaEntitlements` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `ASSET_LIBRARY_VIEW`, which `searchMedia` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
-   {
-    "operationId": "getMediaEntitlements",
-    "contract": "orders",
-    "purpose": "What is already on this media",
-    "trigger": "onAction"
-   },
    {
     "operationId": "searchMedia",
     "contract": "assets",
     "purpose": "Search the asset library",
     "trigger": "onLoad"
-   },
-   {
-    "operationId": "appendEntitlementToMedia",
-    "contract": "orders",
-    "purpose": "Add something to a ticket the guest already holds",
-    "trigger": "onAction",
-    "invalidates": [
-     "searchMedia"
-    ]
    },
    {
     "operationId": "completeUpload",
@@ -3315,10 +3090,6 @@
   "entryState": {
    "params": [
     {
-     "name": "mediaCode",
-     "from": "deepLink"
-    },
-    {
      "name": "mediaId",
      "from": "deepLink"
     },
@@ -3342,6 +3113,20 @@
    "board": "wireframes/P13 Venue CMS.dc.html#cms-010"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 12 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "gaps": [
+   {
+    "operation": "appendEntitlementToMedia",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-021): getMediaEntitlements and appendEntitlementToMedia (orders) operate on ticket media, a wristband or card carrying entitlements, not on digital assets; the word \"media\" collided (design-notes correction platform-foundation CMS-010).",
+    "source": "contracts/spine/orders.yaml#appendEntitlementToMedia"
+   },
+   {
+    "operation": "getMediaEntitlements",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-021): getMediaEntitlements and appendEntitlementToMedia (orders) operate on ticket media, a wristband or card carrying entitlements, not on digital assets; the word \"media\" collided (design-notes correction platform-foundation CMS-010).",
+    "source": "contracts/spine/orders.yaml#appendEntitlementToMedia"
+   }
+  ],
   "_platform": {
    "code": "P13",
    "audience": "staff",

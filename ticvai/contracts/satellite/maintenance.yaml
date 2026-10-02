@@ -487,12 +487,12 @@ paths:
       operationId: createWorkOrder
       x-ticvai-consumed-by:
         - "P06 EMP-006 Raise a task"
+        - "P08 ADM-587 Terminal Health, Maintenance & Incident Center"
         - "P08 BO-070 Work Orders"
         - "P08 BO-576 Maintenance Calendar & Scheduling"
         - "P08 BO-577 Maintenance Work Order"
         - "P08 BO-910 Maintenance & Resource Blocking"
         - "P08 BO-990 Maintenance & Out of Service"
-        - "P08 ADM-587 Terminal Health, Maintenance & Incident Center"
       x-ticvai-audience: [staff]
       summary: Raise a work order
       description: >

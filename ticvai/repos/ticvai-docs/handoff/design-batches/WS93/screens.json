@@ -512,28 +512,35 @@
    }
   ],
   "layout": {
-   "template": "split",
    "regions": [
     {
-     "name": "contentBody",
      "components": [
       {
-       "kind": "primaryButton",
        "derived": true,
        "impliedBy": "assignRentalEquipment",
+       "kind": "primaryButton",
        "label": "Assign rental equipment",
        "notes": "The act the screen exists for."
       },
       {
+       "derived": true,
+       "impliedBy": "assignRentalEquipment",
        "kind": "secondaryButton",
        "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "assignRentalEquipment"
+       "notes": "**A screen that can submit must be leaveable without submitting.**"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Available units",
+       "bindsTo": "RentalAvailability",
+       "operation": "getRentalAvailability",
+       "provenance": "contract rental.yaml GET /rental-availability; wiring fix, 2 October 2026"
       }
-     ]
+     ],
+     "name": "contentBody"
     }
-   ]
+   ],
+   "template": "split"
   },
   "states": {
    "loading": "The equipment list.",
@@ -544,14 +551,21 @@
   },
   "apis": [
    {
-    "operationId": "assignRentalEquipment",
     "contract": "rental",
-    "purpose": "Bind the assets",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026",
     "invalidates": [
      "getRentalBooking"
-    ]
+    ],
+    "operationId": "assignRentalEquipment",
+    "provenance": "board reading, 19 September 2026",
+    "purpose": "Bind the assets",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "getRentalAvailability",
+    "contract": "rental",
+    "purpose": "Units available to assign",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-008)"
    }
   ],
   "wireframe": {

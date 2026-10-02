@@ -185,73 +185,6 @@
    }
   }
  },
- "BookingFlow": {
-  "x-ticvai-persistence": "whitelabel.booking_flow",
-  "type": "object",
-  "description": "**A venue's booking flow (decided 29 September, W12: operators pick their flows, see which steps are required, set their own order).** Made from a `BookingFlowType`; lives in the working draft and reaches guests with `publishTenantConfig`, which copies the venue's flows into the version's snapshot. A product or category names its flow (catalogue `bookingFlowId`); otherwise the venue's default for the type serving its kind applies.\n",
-  "required": [
-   "flowTypeKey",
-   "name"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid",
-    "readOnly": true
-   },
-   "venueId": {
-    "type": "string",
-    "format": "uuid",
-    "readOnly": true,
-    "description": "From the path of `createBookingFlowDefinition`."
-   },
-   "flowTypeKey": {
-    "$ref": "#/components/schemas/BookingFlowTypeKey"
-   },
-   "name": {
-    "type": "string",
-    "maxLength": 80,
-    "description": "Staff-facing, e.g. \"Day pass, date first\". Not shown to guests."
-   },
-   "isDefaultForType": {
-    "type": "boolean",
-    "default": false,
-    "description": "At most one per venue and type; setting it takes it from the previous default."
-   },
-   "isEnabled": {
-    "type": "boolean",
-    "default": true,
-    "description": "A disabled flow is kept and not published; products naming it fall back to the default."
-   },
-   "steps": {
-    "type": "array",
-    "maxItems": 30,
-    "description": "Every step of the type, in the venue's order. Filled from the type when left out on create.",
-    "items": {
-     "$ref": "#/components/schemas/BookingFlowStep"
-    }
-   },
-   "settings": {
-    "$ref": "#/components/schemas/BookingFlowLevelSettings"
-   },
-   "isValid": {
-    "type": "boolean",
-    "readOnly": true,
-    "x-ticvai-derived": "onWrite",
-    "description": "Whether the flow passes `validateBookingFlow`; worked out in the same transaction as each write. `publishTenantConfig` refuses a draft holding an invalid enabled flow."
-   },
-   "scopePath": {
-    "type": "string",
-    "readOnly": true,
-    "description": "The partition key (ADR-0005). Written at `venue` scope."
-   },
-   "updatedAt": {
-    "type": "string",
-    "format": "date-time",
-    "readOnly": true
-   }
-  }
- },
  "BookingFlowConfig": {
   "x-ticvai-persistence": "none — embedded in tenant_config",
   "description": "**Set per tenant, with a per-venue override (decided 29 September, rev 3 CFG-11).** One tenant with several venues (the Kids Club branches, Coastal Aqua beside Union Arena) needs them to differ. The settings in force at a venue are the tenant's, with that venue's entry in `venueOverrides` laid over them field by field. The guest app resolves them for the venue the guest picked (audit R267); `effectiveForVenueId` on `getBookingFlowConfig` returns them resolved.\n",
@@ -356,6 +289,11 @@
     ],
     "default": "off",
     "description": "When GST-001 plays it full screen. \"Skip introduction\" is always shown. Anything but `off` needs `introVideoAssetRef`, or 400."
+   },
+   "showPoweredBy": {
+    "type": "boolean",
+    "default": true,
+    "description": "**\"Powered by TICVAI\", a configuration toggle, on by default** (Chinmay, 2 October, workbook Q160 and the pre-apply round; consistent with DI-297; CHG-CSA-036). Shown on the launch screen and at the foot of Account and the web footer while true. **Switching it off needs the tenant's licence to allow it**: `setBrandIdentity` refuses `false` with `403 powered-by-locked` unless the tenant's plan carries the `poweredByRemoval` add-on (subscription `LicencePosition.poweredByRemovable`)."
    }
   }
  },
@@ -696,7 +634,7 @@
     "type": "string",
     "pattern": "^[A-Z]{3}$",
     "nullable": true,
-    "description": "The currency the guest handed over, where it is not the venue's — becomes `Payment.tenderCurrency`. Omit for a payment in the venue's own currency."
+    "description": "The currency the guest handed over, where it is not the venue's — becomes `Payment.tenderCurrency`. Omit for a payment in the venue's own currency. For a guest-channel card or wallet payment on an order with a `chargeCurrency`, the server sets it from the order (CHG-FIN-001)."
    },
    "tenderAmount": {
     "allOf": [
@@ -827,44 +765,6 @@
   "x-ticvai-persistence-column": "numeric(18,6)",
   "description": "**An exchange rate: a decimal string, never a float**, for the reason `Money.amount` is one — a JavaScript client must not round a rate in transit. **Six decimal places**, the precision `finance.FxRate.rate` asks for, and stored at that precision.\n",
   "pattern": "^\\d+(\\.\\d{1,6})?$"
- },
- "FeatureToggle": {
-  "x-ticvai-persistence": "whitelabel.feature_toggle",
-  "type": "object",
-  "required": [
-   "featureKey",
-   "isEnabled",
-   "changeScope"
-  ],
-  "properties": {
-   "featureKey": {
-    "allOf": [
-     {
-      "$ref": "#/components/schemas/FeatureKey"
-     }
-    ],
-    "description": "`guestCheckout` is **off by default** (decided 17 September 2026, matrix 2.6.28, placement settled by [ADR-0045](../../docs/adr/0045-every-order-carries-a-proven-contact.md) 18 September): **the venue sets this from the configuration menu**, and it decides which routes the checkout page offers — off, the guest signs in verified at checkout; on, a guest may also check out without an account after proving their contact with a one-time code. **It gates checkout, never the cart.** The kiosk is not governed by it. Rule on `identity` `verifyGuestEmail`.\n"
-   },
-   "displayName": {
-    "type": "string"
-   },
-   "isEnabled": {
-    "type": "boolean"
-   },
-   "changeScope": {
-    "allOf": [
-     {
-      "$ref": "#/components/schemas/ChangeScope"
-     }
-    ],
-    "readOnly": true,
-    "description": "Wallet and payment integrations are `buildTime` on native apps — enabling one needs a release, not a publish.\n"
-   },
-   "requiresConfiguration": {
-    "type": "boolean",
-    "description": "True where the feature needs credentials or setup elsewhere first."
-   }
-  }
  },
  "FontConfig": {
   "x-ticvai-persistence": "none — embedded in tenant_config",
@@ -1043,10 +943,25 @@
  "HomepageLayout": {
   "x-ticvai-persistence": "whitelabel.homepage_section",
   "type": "object",
+  "description": "**The client-approved web and app wireframes are the layout** (Chinmay, 2 October, workbook Q163; CHG-CSA-040): sections, their order and their options follow the approved wireframes and change only where the spec breaks. **Landing-page templates** (workbook Q41 batch 2; CHG-CSA-037): a tenant with no landing page of its own starts from a TICVAI template (`templateKey`, `listLandingPageTemplates`); a tenant with its own site links into the storefront with deep links (`getDeepLinkScheme`, `buildDeepLink`).",
   "required": [
    "sections"
   ],
   "properties": {
+   "templateKey": {
+    "type": "string",
+    "nullable": true,
+    "description": "The landing-page template this layout started from (`listLandingPageTemplates`), or null for a layout composed from scratch (CHG-CSA-037)."
+   },
+   "landingSource": {
+    "type": "string",
+    "enum": [
+     "storefront",
+     "ownSite"
+    ],
+    "default": "storefront",
+    "description": "`storefront`: this home is the tenant's landing page. `ownSite`: the tenant's own website is the landing page and links in with deep links; this home is still served at the storefront address."
+   },
    "id": {
     "type": "string",
     "format": "uuid",
@@ -1089,7 +1004,19 @@
       "maxItems": {
        "type": "integer",
        "nullable": true,
-       "description": "How many items the section shows. On the mobile Home, `attractions`, `dining`, `whatsOn` and `shop` show 1 or 2 highlights (decided 29 September, MOB-3)."
+       "description": "**How many cards the section shows, the venue's choice** (Chinmay, 2 October, workbook Q152: every customisation option of the approved wireframe, including the card count per section; CHG-CSA-040). Replaces the fixed 1 or 2 highlights of MOB-3: the CMS offers the counts the approved wireframe offers."
+      },
+      "scrollAnimation": {
+       "type": "string",
+       "enum": [
+        "rise",
+        "scale",
+        "slide",
+        "blur",
+        "none"
+       ],
+       "default": "rise",
+       "description": "**How the section enters as the guest scrolls** (Chinmay, 2 October, workbook Q153: \"must be there\"; DI-1088; CHG-CSA-040). Rise, Scale, Slide, Blur or None, as the v4 prototype offers; `none` for guests who asked the device for reduced motion is applied whatever is set."
       },
       "heroStyle": {
        "type": "string",
@@ -1118,6 +1045,7 @@
   "properties": {
    "languages": {
     "type": "array",
+    "description": "**A tenant may add or select interface languages beyond English and Arabic** (Chinmay, 2 October, workbook Q145; CHG-CSA-039). Any ISO 639-1 language. English and Arabic ship with complete interface strings; for any other, the interface strings come as a TICVAI string pack drafted by AI translation and reviewed (T03), and a string with no translation falls back to English. Content (pages, products, banners) is the tenant's to translate (`translationGaps`).",
     "items": {
      "type": "string",
      "pattern": "^[a-z]{2}$"
@@ -1126,6 +1054,32 @@
    "defaultLanguage": {
     "type": "string",
     "pattern": "^[a-z]{2}$"
+   },
+   "uiStringCoverage": {
+    "type": "array",
+    "readOnly": true,
+    "description": "How complete the interface strings are in each enabled language (CHG-CSA-039). English and Arabic are always complete.",
+    "items": {
+     "type": "object",
+     "properties": {
+      "language": {
+       "type": "string"
+      },
+      "coveragePercent": {
+       "type": "number",
+       "minimum": 0,
+       "maximum": 100
+      },
+      "status": {
+       "type": "string",
+       "enum": [
+        "complete",
+        "draft",
+        "missing"
+       ]
+      }
+     }
+    }
    },
    "rtlLanguages": {
     "type": "array",
@@ -1186,38 +1140,8 @@
    }
   }
  },
- "ModuleEnablement": {
-  "x-ticvai-persistence": "whitelabel.module_enablement",
-  "type": "object",
-  "required": [
-   "moduleKey",
-   "isLicensed",
-   "isEnabled"
-  ],
-  "properties": {
-   "moduleKey": {
-    "$ref": "#/components/schemas/ModuleKey"
-   },
-   "displayName": {
-    "type": "string"
-   },
-   "isLicensed": {
-    "type": "boolean",
-    "description": "From the tenant's subscription. False makes enablement impossible."
-   },
-   "isEnabled": {
-    "type": "boolean"
-   },
-   "referencedBy": {
-    "type": "array",
-    "readOnly": true,
-    "x-ticvai-derived": "onWrite",
-    "description": "Navigation items and homepage sections pointing at this module. Maintained by `setNavigation` and `setHomepageLayout` in the same transaction as the links they write.",
-    "items": {
-     "type": "string"
-    }
-   }
-  }
+ "ModuleKey": {
+  "$ref": "../shared/common.yaml#/components/schemas/ModuleKey"
  },
  "NavigationConfig": {
   "x-ticvai-persistence": "whitelabel.navigation_item",
@@ -1373,6 +1297,46 @@
    },
    "refundedAmount": {
     "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "chargeCurrency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**The currency the guest selected and is charged in** (CHG-FIN-001, 2 October 2026). Null or equal to `currency` for a sale in the base currency. Everything else on the order, and every ledger posting, stays in the base currency `currency`."
+   },
+   "chargeFxRate": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/ExchangeRateDecimal"
+     }
+    ],
+    "nullable": true,
+    "readOnly": true,
+    "description": "Units of `chargeCurrency` per one unit of the base currency, from the region's `tender` rate in force at checkout (`finance.FxRate`), stored on the order so the payment, the receipt, the tax invoice and any refund use the same rate (CHG-FIN-001)."
+   },
+   "chargeFxRateId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The `finance.FxRate` row the rate was taken from, for audit."
+   },
+   "chargeTotal": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "readOnly": true,
+    "description": "`grossAmount` converted at `chargeFxRate` and rounded to the charge currency's scale: what the guest pays and what the payment request to the provider asks for (CHG-FIN-001)."
+   },
+   "chargeRateLockedUntil": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The quote holds until then (the cart lease). After it, the next payment attempt re-quotes at the rate then in force and the guest confirms the new amount (CHG-FIN-001)."
    },
    "droppedPromotions": {
     "type": "array",
@@ -1672,7 +1636,7 @@
     "type": "string",
     "pattern": "^[A-Z]{3}$",
     "nullable": true,
-    "description": "4.6.11 is deliberately asymmetric: **accept foreign currency, refund in local.** A till giving change in five currencies needs five floats and five counts, and the variance becomes unattributable.\n"
+    "description": "4.6.11 is deliberately asymmetric: **accept foreign currency, refund in local.** A till giving change in five currencies needs five floats and five counts, and the variance becomes unattributable.\n**Cash at a till only** (CHG-FIN-001, 2 October 2026). A card or wallet payment the guest made in a currency they selected is refunded in that currency (`Refund.tenderCurrency`).\n"
    },
    "amount": {
     "$ref": "../shared/common.yaml#/components/schemas/Money"
@@ -2395,6 +2359,118 @@
    }
   }
  },
+ "PublishedTenantConfig": {
+  "x-ticvai-persistence": "none — computed from the current ConfigVersion snapshot and the live status on whitelabel.tenant_config",
+  "type": "object",
+  "x-ticvai-agreed": "2 October: decided by Chinmay, fix before Block A starts (GFIX-1)",
+  "description": "**The public view of the tenant's configuration** (`getPublishedTenantConfig`, decided 2 October, GFIX-1). The published parts a guest surface renders with, from the current `ConfigVersion`, and the live status `setMaintenanceMode` writes. Nothing a guest cannot see on the page: no draft marker, no CMS counts, no sender addresses, no licensing, no person.\n",
+  "required": [
+   "tenantId",
+   "publishedVersion",
+   "publishedAt",
+   "isInMaintenance"
+  ],
+  "properties": {
+   "tenantId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "publishedVersion": {
+    "type": "string",
+    "description": "The `ConfigVersion.version` this answer was read from; a client holding the same version keeps its copy."
+   },
+   "publishedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "brand": {
+    "$ref": "#/components/schemas/BrandIdentity"
+   },
+   "appIcons": {
+    "$ref": "#/components/schemas/AppIcons"
+   },
+   "theme": {
+    "$ref": "#/components/schemas/Theme"
+   },
+   "fonts": {
+    "$ref": "#/components/schemas/FontConfig"
+   },
+   "header": {
+    "$ref": "#/components/schemas/HeaderConfig"
+   },
+   "footer": {
+    "$ref": "#/components/schemas/FooterConfig"
+   },
+   "navigation": {
+    "$ref": "#/components/schemas/NavigationConfig"
+   },
+   "homepage": {
+    "$ref": "#/components/schemas/HomepageLayout"
+   },
+   "bookingFlow": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/BookingFlowConfig"
+     }
+    ],
+    "description": "The booking-flow display settings, resolved for `venueId` when one was sent (the tenant's values with that venue's `venueOverrides` entry laid over, rev 3 CFG-11)."
+   },
+   "languages": {
+    "$ref": "#/components/schemas/LanguageConfig"
+   },
+   "accessibility": {
+    "$ref": "#/components/schemas/AccessibilitySettings"
+   },
+   "enabledModules": {
+    "type": "array",
+    "description": "The modules the tenant has enabled and published, so a guest surface hides a tab or a homepage section for a module that is off. Licensing is not shown.",
+    "items": {
+     "$ref": "#/components/schemas/ModuleKey"
+    }
+   },
+   "enabledFeatures": {
+    "type": "array",
+    "description": "The `featureKey` of every feature toggle that is on in the published version.",
+    "items": {
+     "type": "string"
+    }
+   },
+   "isInMaintenance": {
+    "type": "boolean",
+    "description": "Live state (`setMaintenanceMode`), as on `getTenantAppStatus`."
+   },
+   "maintenanceMessage": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/LocalisedText"
+     }
+    ],
+    "nullable": true
+   },
+   "expectedBackAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "minimumAppVersion": {
+    "$ref": "#/components/schemas/MinimumAppVersion"
+   },
+   "availability": {
+    "$ref": "#/components/schemas/AppAvailability"
+   },
+   "availabilityMessage": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/LocalisedText"
+     }
+    ],
+    "nullable": true
+   },
+   "contact": {
+    "$ref": "#/components/schemas/VenueContact"
+   }
+  }
+ },
  "TenantAppStatus": {
   "x-ticvai-persistence": "none — computed",
   "type": "object",
@@ -2575,209 +2651,6 @@
    }
   }
  },
- "TenantConfig": {
-  "x-ticvai-persistence": "whitelabel.tenant_config",
-  "type": "object",
-  "description": "**The tenant's working draft**, one row per tenant (see the header). Published versions are `ConfigVersion.snapshot`, not further rows here.\n**Only `tenantId` and `version` are required**, because the draft is built one part at a time: the first `set*` call creates the row with that part alone. A part that is still unset is what `validateTenantConfig` reports (`missingRequiredAsset` and the like) and what blocks `publishTenantConfig` — a storage rule that every part exist would stop the first save.\n",
-  "required": [
-   "tenantId",
-   "version"
-  ],
-  "properties": {
-   "tenantId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "version": {
-    "type": "string",
-    "description": "The draft's working version label; the published one is `ConfigVersion.version`."
-   },
-   "isDraft": {
-    "type": "boolean",
-    "readOnly": true,
-    "description": "True for the working draft, which is the only row."
-   },
-   "brand": {
-    "$ref": "#/components/schemas/BrandIdentity"
-   },
-   "appIcons": {
-    "$ref": "#/components/schemas/AppIcons"
-   },
-   "bookingFlow": {
-    "$ref": "#/components/schemas/BookingFlowConfig"
-   },
-   "bookingFlows": {
-    "type": "array",
-    "readOnly": true,
-    "x-ticvai-derived": "onRead",
-    "description": "Every venue's booking flows in the draft (`whitelabel.booking_flow`), so a publish snapshots them with the rest (decided 29 September, W12).",
-    "items": {
-     "$ref": "#/components/schemas/BookingFlow"
-    }
-   },
-   "theme": {
-    "$ref": "#/components/schemas/Theme"
-   },
-   "fonts": {
-    "$ref": "#/components/schemas/FontConfig"
-   },
-   "footer": {
-    "$ref": "#/components/schemas/FooterConfig"
-   },
-   "notificationBranding": {
-    "type": "object",
-    "nullable": true,
-    "description": "BL-003. **`marketing-crm` holds the templates and nothing said whose identity they wear.** A message sent on behalf of a venue carries that venue's sender name, reply-to and logo — **an operational alert arriving from `noreply@ticvai.com` is one a guest marks as spam.**\nResolved on the template at send time rather than duplicated per template.\n",
-    "properties": {
-     "senderName": {
-      "type": "string"
-     },
-     "replyToEmail": {
-      "type": "string",
-      "format": "email"
-     },
-     "smsSenderId": {
-      "type": "string",
-      "nullable": true
-     },
-     "whatsappBusinessId": {
-      "type": "string",
-      "nullable": true
-     },
-     "logoAssetId": {
-      "type": "string",
-      "format": "uuid",
-      "nullable": true
-     }
-    }
-   },
-   "enabledPaymentMethods": {
-    "type": "array",
-    "nullable": true,
-    "description": "BL-004. **`FeatureToggle` could turn Apple Pay on and could not say which cards a tenant accepts.** Resolved against `orders.PaymentProvider.supportedMethods` — the tenant's choice within what the gateway offers, and **a tenant enabling a method their provider does not support should fail here rather than at checkout.**\n",
-    "items": {
-     "type": "string"
-    }
-   },
-   "accessibility": {
-    "$ref": "#/components/schemas/AccessibilitySettings"
-   },
-   "header": {
-    "$ref": "#/components/schemas/HeaderConfig"
-   },
-   "navigation": {
-    "$ref": "#/components/schemas/NavigationConfig"
-   },
-   "homepage": {
-    "$ref": "#/components/schemas/HomepageLayout"
-   },
-   "modules": {
-    "type": "array",
-    "items": {
-     "$ref": "#/components/schemas/ModuleEnablement"
-    }
-   },
-   "features": {
-    "type": "array",
-    "items": {
-     "$ref": "#/components/schemas/FeatureToggle"
-    }
-   },
-   "languages": {
-    "$ref": "#/components/schemas/LanguageConfig"
-   },
-   "updatedAt": {
-    "type": "string",
-    "format": "date-time"
-   },
-   "isInMaintenance": {
-    "type": "boolean",
-    "default": false,
-    "description": "Written by `setMaintenanceMode`; read by `getTenantAppStatus`."
-   },
-   "maintenanceMessage": {
-    "allOf": [
-     {
-      "$ref": "#/components/schemas/LocalisedText"
-     }
-    ],
-    "nullable": true,
-    "description": "The message on the branded maintenance screen."
-   },
-   "expectedBackAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "minimumAppVersion": {
-    "allOf": [
-     {
-      "$ref": "#/components/schemas/MinimumAppVersion"
-     }
-    ],
-    "description": "Live state, written by `setMaintenanceMode` (audit R073)."
-   },
-   "contact": {
-    "allOf": [
-     {
-      "$ref": "#/components/schemas/VenueContact"
-     }
-    ],
-    "description": "Live state, written by `setMaintenanceMode` (audit R073)."
-   },
-   "availability": {
-    "allOf": [
-     {
-      "$ref": "#/components/schemas/AppAvailability"
-     }
-    ],
-    "description": "Live state, written by `setMaintenanceMode` (audit R073)."
-   },
-   "availabilityMessage": {
-    "allOf": [
-     {
-      "$ref": "#/components/schemas/LocalisedText"
-     }
-    ],
-    "nullable": true,
-    "description": "Live state, written by `setMaintenanceMode` (audit R073)."
-   },
-   "venues": {
-    "type": "array",
-    "x-ticvai-derived": "onRead",
-    "description": "The tenant's active venues, for the guest venue picker on WEB-001 and GST-001 (decided 28 September, audit R267). Public: returned without a session and cached with the rest of the response. Read from `tenancy` venues; a closed or archived venue is left out.\n",
-    "items": {
-     "type": "object",
-     "required": [
-      "venueId",
-      "name"
-     ],
-     "properties": {
-      "venueId": {
-       "type": "string",
-       "format": "uuid"
-      },
-      "name": {
-       "$ref": "#/components/schemas/LocalisedText"
-      },
-      "city": {
-       "type": "string",
-       "nullable": true
-      },
-      "openingHours": {
-       "allOf": [
-        {
-         "$ref": "#/components/schemas/LocalisedText"
-        }
-       ],
-       "nullable": true,
-       "description": "Today's hours as shown to a guest, e.g. \"10:00 to 22:00\"."
-      }
-     }
-    }
-   }
-  }
- },
  "TenderKind": {
   "type": "string",
   "description": "`wallet` is a **digital wallet** (Apple Pay, Google Pay and the like, taken through the gateway), the value the guest channels accept beside `card` (decided 28 September, audit R080 (a)). **The stored-value TICVAI wallet is a separate tender**: it is spent through `authoriseStoredValue` and `captureStoredValue` (`StoredValueKind` `wallet`), never as this value, so the client can see which of the two the decision meant.\n",
@@ -2825,7 +2698,8 @@
    },
    "darkMode": {
     "type": "object",
-    "description": "Optional dark variant. Derived from the light theme when absent.",
+    "deprecated": true,
+    "description": "**Deprecated and ignored** (Chinmay, 2 October, workbook Q150 and the pre-apply round; CHG-CSA-035). White label has no dark or light mode: the venue's chosen theme is applied, on every device setting. The field is kept so a client built at r1 still parses, is accepted on `setTheme` and returned as stored, and **is never used to render anything or drawn on any screen**; the guest app has no Light/Dark switch.",
     "properties": {
      "primaryColour": {
       "type": "string",

@@ -20,7 +20,8 @@
    "exitTo": [
     "PTR-001",
     "PTR-003",
-    "PTR-007"
+    "PTR-007",
+    "PTR-008"
    ],
    "flowDerived": true,
    "transitions": [
@@ -33,15 +34,20 @@
     {
      "to": "PTR-001",
      "trigger": "Partner Login / MFA",
-     "carries": [
-      "accountId"
-     ],
-     "provenance": "derived — PTR-001 declares entryState.params accountId, challengeId and PTR-002 holds accountId, so an edge into it carries them"
+     "provenance": "derived — PTR-001 declares entryState.params challengeId, methodId, providerId and PTR-002 holds none of them. The edge carries nothing: PTR-002 is opened from PTR-001, so this edge is the way back and PTR-001 keeps its own state"
     },
     {
      "to": "PTR-003",
      "trigger": "Profile & Company Details",
      "provenance": "derived — PTR-003 declares entryState.params  and PTR-002 holds none of them. The edge carries nothing: PTR-003 needs nothing to open"
+    },
+    {
+     "to": "PTR-008",
+     "trigger": "Book against the allocation",
+     "provenance": "wiring fix, 2 October 2026 (CHG-WIR-022): flow F10 step 1→2",
+     "carries": [
+      "orderId"
+     ]
     }
    ]
   },
@@ -52,7 +58,7 @@
   ],
   "pattern": "listDetail",
   "patternReason": "`listOrders` reads the population and `getB2bCredit` reads one of them — list, select, act",
-  "purpose": "The screen this app sits on. Everything else is entered from here and returns to it.",
+  "purpose": "See the partner's credit position and bookings at a glance, and start from here.",
   "layout": {
    "template": "split",
    "regions": [
@@ -235,12 +241,6 @@
      "slot": "rowActions",
      "components": [
       {
-       "kind": "primaryButton",
-       "label": "Apply manual discount",
-       "operation": "applyManualDiscount",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/discounts"
-      },
-      {
        "kind": "secondaryButton",
        "label": "Create order",
        "operation": "createOrder",
@@ -265,12 +265,6 @@
        "provenance": "contract orders.yaml POST /orders/{orderId}/modify"
       },
       {
-       "kind": "destructiveButton",
-       "label": "Override credit limit",
-       "operation": "overrideCreditLimit",
-       "provenance": "contract orders.yaml POST /b2b-accounts/{accountId}/credit/override"
-      },
-      {
        "kind": "secondaryButton",
        "label": "Reprint order",
        "operation": "reprintOrder",
@@ -287,63 +281,12 @@
        "label": "Resume order",
        "operation": "resumeOrder",
        "provenance": "contract orders.yaml POST /orders/{orderId}/resume"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Save b2b credit limit",
-       "operation": "setB2bCreditLimit",
-       "provenance": "contract orders.yaml PUT /b2b-accounts/{accountId}/credit"
-      },
-      {
-       "kind": "destructiveButton",
-       "label": "Void order",
-       "operation": "voidOrder",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/voids"
       }
      ]
     }
    ]
   },
   "overlays": [
-   {
-    "id": "confirmOverrideCreditLimit",
-    "component": "confirmDialog",
-    "trigger": "Override credit limit",
-    "body": "**Names what `overrideCreditLimit` changes and what it leaves alone**, in the consequence rather than the verb. A partner this affects should be identified in the dialog, not just counted. **Collects what `overrideCreditLimit` sends before it is called.** Required: `orderId`, `amount`, `reason`. Optional: `expiresAt`.",
-    "provenance": "contract orders.yaml POST /b2b-accounts/{accountId}/credit/override"
-   },
-   {
-    "id": "confirmVoidOrder",
-    "component": "confirmDialog",
-    "trigger": "Void order",
-    "body": "**Names what `voidOrder` changes and what it leaves alone**, in the consequence rather than the verb. A partner this affects should be identified in the dialog, not just counted. **Collects what `voidOrder` sends before it is called.** Required: `id`, `reason`, `recordedAt`.",
-    "provenance": "contract orders.yaml POST /orders/{orderId}/voids"
-   },
-   {
-    "id": "formApplyManualDiscount",
-    "component": "modal",
-    "trigger": "Apply manual discount",
-    "body": "**Collects what `applyManualDiscount` sends before it is called.** Required: `id`, `reason`, `recordedAt`. Optional: `lineId`, `amount`, `percentage`, `reasonCode`, `approverPrincipalId`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "ManualDiscountRequest",
-    "confirm": {
-     "label": "Apply manual discount",
-     "operation": "applyManualDiscount"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "id",
-      "reason",
-      "recordedAt",
-      "lineId",
-      "amount",
-      "percentage",
-      "reasonCode",
-      "approverPrincipalId"
-     ]
-    },
-    "provenance": "contract orders.yaml POST /orders/{orderId}/discounts"
-   },
    {
     "id": "formCreateOrder",
     "component": "modal",
@@ -475,26 +418,6 @@
      ]
     },
     "provenance": "contract orders.yaml POST /orders/{orderId}/reschedule"
-   },
-   {
-    "id": "formSetB2bCreditLimit",
-    "component": "modal",
-    "trigger": "Save b2b credit limit",
-    "body": "**Collects what `setB2bCreditLimit` sends before it is called.** Required: `creditLimit`, `reason`. Optional: `paymentTermsDays`, `isSuspended`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Save b2b credit limit",
-     "operation": "setB2bCreditLimit"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "creditLimit",
-      "reason",
-      "paymentTermsDays",
-      "isSuspended"
-     ]
-    },
-    "provenance": "contract orders.yaml PUT /b2b-accounts/{accountId}/credit"
    }
   ],
   "states": {
@@ -516,15 +439,6 @@
     "contract": "orders",
     "purpose": "from page inventory",
     "trigger": "onLoad"
-   },
-   {
-    "operationId": "applyManualDiscount",
-    "contract": "orders",
-    "purpose": "Apply a discount a cashier chose",
-    "trigger": "onAction",
-    "invalidates": [
-     "listOrders"
-    ]
    },
    {
     "operationId": "createOrder",
@@ -581,15 +495,6 @@
     ]
    },
    {
-    "operationId": "overrideCreditLimit",
-    "contract": "orders",
-    "purpose": "Authorise an order beyond the credit limit",
-    "trigger": "onAction",
-    "invalidates": [
-     "listOrders"
-    ]
-   },
-   {
     "operationId": "reprintOrder",
     "contract": "orders",
     "purpose": "Reprint or resend tickets",
@@ -611,24 +516,6 @@
     "operationId": "resumeOrder",
     "contract": "orders",
     "purpose": "Bring a parked sale back to a till",
-    "trigger": "onAction",
-    "invalidates": [
-     "listOrders"
-    ]
-   },
-   {
-    "operationId": "setB2bCreditLimit",
-    "contract": "orders",
-    "purpose": "Set a partner credit limit",
-    "trigger": "onAction",
-    "invalidates": [
-     "listOrders"
-    ]
-   },
-   {
-    "operationId": "voidOrder",
-    "contract": "orders",
-    "purpose": "Void an order",
     "trigger": "onAction",
     "invalidates": [
      "listOrders"
@@ -663,6 +550,33 @@
    "note": "**Drawn by Claude Design on `Dashboards Board.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 16 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "gaps": [
+   {
+    "operation": "applyManualDiscount",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-018): A partner cannot set or override its own credit limit, apply a manual discount or void an order; those are venue actions (design-notes correction ticketing-guest PTR-002).",
+    "source": "screens/P10-partner-reseller-portal.yaml#PTR-002"
+   },
+   {
+    "operation": "overrideCreditLimit",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-018): A partner cannot set or override its own credit limit, apply a manual discount or void an order; those are venue actions (design-notes correction ticketing-guest PTR-002).",
+    "source": "screens/P10-partner-reseller-portal.yaml#PTR-002"
+   },
+   {
+    "operation": "setB2bCreditLimit",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-018): A partner cannot set or override its own credit limit, apply a manual discount or void an order; those are venue actions (design-notes correction ticketing-guest PTR-002).",
+    "source": "screens/P10-partner-reseller-portal.yaml#PTR-002"
+   },
+   {
+    "operation": "voidOrder",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-018): A partner cannot set or override its own credit limit, apply a manual discount or void an order; those are venue actions (design-notes correction ticketing-guest PTR-002).",
+    "source": "screens/P10-partner-reseller-portal.yaml#PTR-002"
+   }
+  ],
+  "purposeNote": "Purpose rewritten 2 October 2026 (CHG-WIR-020): The purpose (\"The screen this app sits on...\") was the generic home template; the dashboard is the partner's credit and bookings overview (design-notes correction ticketing-guest PTR-002).",
   "_platform": {
    "code": "P10",
    "audience": "partner",

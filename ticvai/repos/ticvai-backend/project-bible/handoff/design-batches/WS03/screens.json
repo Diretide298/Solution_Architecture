@@ -199,23 +199,14 @@
     {
      "name": "actionBar",
      "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Save device binding policy",
-       "operation": "setDeviceBindingPolicy",
-       "permission": "ACCESS_POINT_CONFIGURE",
-       "notes": "**The write behind Device Binding & Session Security** (BO-167): how many devices a mobile credential may be active on, how many concurrent sessions, and what a device change needs.",
-       "provenance": "contract access.yaml PUT /device-binding-policy"
-      }
-     ]
+     "components": []
     }
    ]
   },
   "states": {
    "loading": "The digital credential security list; the counts above it resolve separately.",
    "error": "Could not load. Names which read failed and leaves the digital credential security untouched.",
-   "emptyFirstRun": "No digital credential security yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No digital credential security yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the digital credential security are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -231,27 +222,6 @@
     "contract": "access",
     "purpose": "Credential Security Simulation, Audit & Publication",
     "trigger": "onLoad"
-   },
-   {
-    "operationId": "setDynamicSecurityProfile",
-    "contract": "access",
-    "purpose": "Create or change a dynamic QR security profile from the command centre",
-    "trigger": "onAction",
-    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
-    "invalidates": [
-     "listDigitalCredentialSecurity",
-     "listCredentialSecurity"
-    ]
-   },
-   {
-    "operationId": "setDeviceBindingPolicy",
-    "contract": "access",
-    "purpose": "Set the device binding policy of a venue",
-    "trigger": "onAction",
-    "invalidates": [
-     "listDigitalCredentialSecurity",
-     "listCredentialSecurity"
-    ]
    }
   ],
   "entryState": {
@@ -266,27 +236,18 @@
    "workshopBoard": "wireframes/WS20 Access Control Board 3.dc.html#bo-164"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 29. 15 of 15 labels bound to a contract property; 16 of 30 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "overlays": [
+  "gaps": [
    {
-    "id": "formSetDeviceBindingPolicy",
-    "component": "modal",
-    "trigger": "Save device binding policy",
-    "body": "**Collects what `setDeviceBindingPolicy` sends before it is called.** Required: `venueId`. Optional: `maximumActiveDevices`, `concurrentSessions`, `deviceChangePolicy`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "DeviceBindingPolicyInput",
-    "confirm": {
-     "label": "Save device binding policy",
-     "operation": "setDeviceBindingPolicy"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "venueId",
-      "maximumActiveDevices",
-      "concurrentSessions",
-      "deviceChangePolicy"
-     ]
-    },
-    "provenance": "contract access.yaml PUT /device-binding-policy"
+    "operation": "setDeviceBindingPolicy",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): The command centre monitors; the device-binding and dynamic-profile writes belong to BO-167 and BO-165, which declare them (ADR-0041, DI-653; design-notes correction venue-operations BO-164).",
+    "source": "ADR-0041 | DI-653"
+   },
+   {
+    "operation": "setDynamicSecurityProfile",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): The command centre monitors; the device-binding and dynamic-profile writes belong to BO-167 and BO-165, which declare them (ADR-0041, DI-653; design-notes correction venue-operations BO-164).",
+    "source": "ADR-0041 | DI-653"
    }
   ],
   "_platform": {
@@ -461,6 +422,14 @@
    "workshopBoard": "wireframes/WS20 Access Control Board 3.dc.html#bo-165"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 30. 0 of 0 labels bound to a contract property; 13 of 28 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-004): No read of dynamic QR security profiles (setDynamicSecurityProfile has no list or get).",
+    "source": "contracts/spine/access.yaml#setDynamicSecurityProfile | contracts/spine/access.yaml#listDigitalCredentialSecurity"
+   }
+  ],
+  "notes": "**QR refresh: 30 seconds by default; the venue may choose 15, 30, 45, 60 or a custom value of at least 5 seconds (decided 2 October 2026 by Chinmay, DEC-233, DEC-136; CHG-CSP-024, `refreshIntervalSeconds`).**",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -545,9 +514,16 @@
      "components": [
       {
        "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listCredentialActivationDisplay",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "label": "Activation and display rules",
+       "bindsTo": "CredentialActivationDisplayRulesView",
+       "columns": [
+        "CredentialActivationDisplayRulesView.name",
+        "CredentialActivationDisplayRulesView.beforeActivationDisplay",
+        "CredentialActivationDisplayRulesView.activeDisplay",
+        "CredentialActivationDisplayRulesView.activationTriggers"
+       ],
+       "operation": "listCredentialActivationDisplay",
+       "provenance": "contract access.yaml GET /credential-activation-display"
       }
      ]
     },
@@ -559,7 +535,8 @@
        "kind": "primaryButton",
        "label": "Save activation and display rule",
        "operation": "setCredentialActivationDisplay",
-       "provenance": "contract access.yaml PUT /credential-activation-display (decided 29 September, VM close-out)"
+       "provenance": "contract access.yaml PUT /credential-activation-display (decided 29 September, VM close-out)",
+       "permission": "ACCESS_POINT_CONFIGURE"
       }
      ]
     }
@@ -598,6 +575,30 @@
    "workshopBoard": "wireframes/WS20 Access Control Board 3.dc.html#bo-166"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 32. 0 of 0 labels bound to a contract property; 0 of 18 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetCredentialActivationDisplay",
+    "component": "modal",
+    "trigger": "Save activation and display rule",
+    "body": "**Collects what `setCredentialActivationDisplay` sends before it is called.** Required: `venueId`, `name`, `beforeActivationDisplay`, `activeDisplay`, `activationTriggers`. Optional: `ruleId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save activation and display rule",
+     "operation": "setCredentialActivationDisplay"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "venueId",
+      "name",
+      "beforeActivationDisplay",
+      "activeDisplay",
+      "activationTriggers",
+      "ruleId"
+     ]
+    },
+    "provenance": "contract access.yaml PUT /credential-activation-display"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -671,16 +672,17 @@
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every device binding session",
+       "label": "Device bindings",
        "columns": [
         "DeviceBindingSessionSecurityView.user",
         "DeviceBindingSessionSecurityView.credential",
-        "Device ID/reference",
         "DeviceBindingSessionSecurityView.appInstallation",
         "DeviceBindingSessionSecurityView.os",
         "DeviceBindingSessionSecurityView.registrationDate",
         "DeviceBindingSessionSecurityView.lastActivation",
-        "DeviceBindingSessionSecurityView.lastKnownVenue"
+        "DeviceBindingSessionSecurityView.lastKnownVenue",
+        "DeviceBindingSessionSecurityView.deviceId",
+        "DeviceBindingSessionSecurityView.deviceReference"
        ],
        "bindsTo": "DeviceBindingSessionSecurityView",
        "operation": "listDeviceBindingSession",
@@ -694,20 +696,22 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected device binding session",
+       "label": "The selected binding",
        "bindsTo": "DeviceBindingSessionSecurityView",
        "columns": [
         "DeviceBindingSessionSecurityView.user",
         "DeviceBindingSessionSecurityView.credential",
-        "Device ID/reference",
         "DeviceBindingSessionSecurityView.appInstallation",
         "DeviceBindingSessionSecurityView.os",
         "DeviceBindingSessionSecurityView.registrationDate",
         "DeviceBindingSessionSecurityView.lastActivation",
-        "DeviceBindingSessionSecurityView.lastKnownVenue"
+        "DeviceBindingSessionSecurityView.lastKnownVenue",
+        "DeviceBindingSessionSecurityView.deviceId",
+        "DeviceBindingSessionSecurityView.deviceReference"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Maximum Active Devices”, “Concurrent Sessions”, “Device Change”, “Credential active on Device A”, “Response”.",
-       "provenance": "pack Access Control Module_Reference.pdf, page 33 §Show"
+       "provenance": "pack Access Control Module_Reference.pdf, page 33 §Show",
+       "operation": "listDeviceBindingSession"
       }
      ]
     },
@@ -904,44 +908,68 @@
      "slot": "fields",
      "components": [
       {
-       "kind": "selectField",
-       "label": "Beacon Name",
-       "provenance": "pack Access Control Module_Reference.pdf, page 34 §Configure"
+       "kind": "textField",
+       "label": "Beacon name",
+       "provenance": "pack Access Control Module_Reference.pdf, page 34 §Configure",
+       "operation": "setBleBeaconGeofence",
+       "bindsTo": "BleBeaconGeofenceConfigurationInput.beaconName"
       },
       {
-       "kind": "selectField",
+       "kind": "textField",
        "label": "Beacon ID",
-       "provenance": "pack Access Control Module_Reference.pdf, page 34 §Configure"
+       "provenance": "pack Access Control Module_Reference.pdf, page 34 §Configure",
+       "operation": "setBleBeaconGeofence",
+       "bindsTo": "BleBeaconGeofenceConfigurationInput.beaconId"
       },
       {
        "kind": "selectField",
        "label": "Venue",
-       "provenance": "pack Access Control Module_Reference.pdf, page 34 §Configure"
+       "provenance": "pack Access Control Module_Reference.pdf, page 34 §Configure",
+       "operation": "setBleBeaconGeofence",
+       "bindsTo": "BleBeaconGeofenceConfigurationInput.venue"
       },
       {
        "kind": "selectField",
        "label": "Zone",
-       "provenance": "pack Access Control Module_Reference.pdf, page 34 §Configure"
+       "provenance": "pack Access Control Module_Reference.pdf, page 34 §Configure",
+       "operation": "setBleBeaconGeofence",
+       "bindsTo": "BleBeaconGeofenceConfigurationInput.zone"
       },
       {
        "kind": "selectField",
        "label": "Gate",
-       "provenance": "pack Access Control Module_Reference.pdf, page 34 §Configure"
+       "provenance": "pack Access Control Module_Reference.pdf, page 34 §Configure",
+       "operation": "setBleBeaconGeofence",
+       "bindsTo": "BleBeaconGeofenceConfigurationInput.gate"
       },
       {
-       "kind": "selectField",
-       "label": "Proximity threshold",
-       "provenance": "pack Access Control Module_Reference.pdf, page 34 §Configure"
+       "kind": "numberField",
+       "label": "Proximity threshold (metres)",
+       "provenance": "pack Access Control Module_Reference.pdf, page 34 §Configure",
+       "operation": "setBleBeaconGeofence",
+       "bindsTo": "BleBeaconGeofenceConfigurationInput.proximityThreshold"
       },
       {
-       "kind": "selectField",
-       "label": "Active/Inactive",
-       "provenance": "pack Access Control Module_Reference.pdf, page 34 §Configure"
+       "kind": "toggle",
+       "label": "Active",
+       "provenance": "pack Access Control Module_Reference.pdf, page 34 §Configure",
+       "operation": "setBleBeaconGeofence",
+       "bindsTo": "BleBeaconGeofenceConfigurationInput.activeInactive"
       },
       {
-       "kind": "selectField",
+       "kind": "detailPanel",
        "label": "Health",
-       "provenance": "pack Access Control Module_Reference.pdf, page 34 §Configure"
+       "provenance": "pack Access Control Module_Reference.pdf, page 34 §Configure",
+       "operation": "setBleBeaconGeofence",
+       "bindsTo": "BleBeaconGeofenceConfigurationView.health",
+       "notes": "Read-only: reported by the beacon, never typed (with last detected)."
+      },
+      {
+       "kind": "selectField",
+       "label": "Geofence level",
+       "operation": "setBleBeaconGeofence",
+       "notes": "Venue, attraction, zone or gate: the level the geofence activates the credential at (the board drew these as buttons).",
+       "provenance": "contract access.yaml PUT /ble-beacon-geofence"
       }
      ]
     },
@@ -951,18 +979,9 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Venue",
-       "provenance": "pack Access Control Module_Reference.pdf, page 34 §Support"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Attraction",
-       "provenance": "pack Access Control Module_Reference.pdf, page 34 §Support"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Zone",
-       "provenance": "pack Access Control Module_Reference.pdf, page 34 §Support"
+       "label": "Save beacon",
+       "operation": "setBleBeaconGeofence",
+       "provenance": "contract access.yaml PUT /ble-beacon-geofence"
       }
      ]
     }
@@ -989,6 +1008,44 @@
    "workshopBoard": "wireframes/WS20 Access Control Board 3.dc.html#bo-168"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 34. 0 of 0 labels bound to a contract property; 11 of 24 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Venue, Attraction, Zone are choices sent by `setBleBeaconGeofence`.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-004): No read lists the registered BLE beacons and geofences (setBleBeaconGeofence has no list or get).",
+    "source": "contracts/spine/access.yaml#setBleBeaconGeofence"
+   }
+  ],
+  "overlays": [
+   {
+    "id": "formSetBleBeaconGeofence",
+    "component": "modal",
+    "trigger": "Save beacon",
+    "body": "**Collects what `setBleBeaconGeofence` sends before it is called.** Required: `beaconId`, `venue`. Optional: `beaconName`, `zone`, `gate`, `proximityThreshold`, `activeInactive`, `health`, `lastDetected`, `park`, `attraction`, `geofenceRadiusMeters`, `geofenceBoundary`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save beacon",
+     "operation": "setBleBeaconGeofence"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "beaconId",
+      "venue",
+      "beaconName",
+      "zone",
+      "gate",
+      "proximityThreshold",
+      "activeInactive",
+      "health",
+      "lastDetected",
+      "park",
+      "attraction",
+      "geofenceRadiusMeters",
+      "geofenceBoundary"
+     ]
+    },
+    "provenance": "contract access.yaml PUT /ble-beacon-geofence"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1110,23 +1167,14 @@
     {
      "name": "actionBar",
      "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Release credential device",
-       "operation": "releaseCredentialDevice",
-       "permission": "GUEST_MANAGE",
-       "notes": "**A service agent frees a credential from a device** (a lost phone, a device change that needs an operator or supervisor under the policy): sets `deactivatedAt` on the binding, so the guest can bind the credential on another device.",
-       "provenance": "contract access.yaml POST /device-bindings/{bindingId}/release"
-      }
-     ]
+     "components": []
     }
    ]
   },
   "states": {
    "loading": "The credential transfer rebinding configuration as saved.",
    "error": "Could not load. Names which read failed and leaves the credential transfer rebinding untouched.",
-   "emptyFirstRun": "No credential transfer rebinding configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyFirstRun": "No credential transfer rebinding configured yet. Offers no create action — this screen declares no operation that makes one and says what the platform does in the meantime.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
@@ -1135,15 +1183,6 @@
     "contract": "access",
     "purpose": "Credential Transfer & Rebinding",
     "trigger": "onLoad"
-   },
-   {
-    "operationId": "releaseCredentialDevice",
-    "contract": "access",
-    "purpose": "Release a credential from a device",
-    "trigger": "onAction",
-    "invalidates": [
-     "listCredentialTransferRebinding"
-    ]
    }
   ],
   "wireframe": {
@@ -1153,34 +1192,20 @@
    "workshopBoard": "wireframes/WS20 Access Control Board 3.dc.html#bo-169"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 35. 0 of 0 labels bound to a contract property; 9 of 24 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "overlays": [
+  "entryState": {},
+  "gaps": [
    {
-    "id": "formReleaseCredentialDevice",
-    "component": "modal",
-    "trigger": "Release credential device",
-    "body": "**Collects what `releaseCredentialDevice` sends before it is called.** Required: `reason`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Release credential device",
-     "operation": "releaseCredentialDevice"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "reason"
-     ]
-    },
-    "provenance": "contract access.yaml POST /device-bindings/{bindingId}/release"
+    "operation": "releaseCredentialDevice",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): Releasing a device binding belongs to BO-167 Device Binding; this screen edits transfer policies, not a binding (design-notes correction venue-operations BO-169).",
+    "source": "contracts/spine/access.yaml#releaseCredentialDevice | screens/P08-venue-back-office.yaml#BO-167"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-004): No operation saves the credential transfer and rebinding policy.",
+    "source": "contracts/spine/access.yaml#listCredentialTransferRebinding"
    }
   ],
-  "entryState": {
-   "params": [
-    {
-     "name": "bindingId",
-     "from": "navigation",
-     "optional": true
-    }
-   ]
-  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1431,6 +1456,12 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Access Control Module_Reference.pdf, page 37"
+   },
+   {
+    "operation": "setOfflinePolicy",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): Save was bound to setOfflinePolicy (tenancy, TENANT_CONFIGURE), the POS workstation offline policy; the gate policy is setGateOfflinePolicy (ACCESS_POINT_CONFIGURE), already declared here (design-notes correction venue-operations BO-171).",
+    "source": "contracts/spine/access.yaml#setGateOfflinePolicy | contracts/spine/tenancy.yaml#setOfflinePolicy"
    }
   ],
   "layout": {
@@ -1444,29 +1475,34 @@
        "derived": true,
        "impliedBy": "listOfflineCryptographicValidation",
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setGateOfflinePolicy",
+       "label": "Save gate offline policy",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setGateOfflinePolicy"
       }
      ]
     },
     {
      "name": "actionBar",
      "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Save offline policy",
-       "operation": "setOfflinePolicy",
-       "permission": "TENANT_CONFIGURE",
-       "notes": "Board 5 of the client's POS set, and **one of only two things in 36 board screens the package could not do.** ADR-0013 makes the POS local-first and nothing configured the policy.",
-       "provenance": "contract tenancy.yaml PUT /offline-policy"
-      }
-     ]
+     "components": []
     }
    ]
   },
   "states": {
    "loading": "The offline cryptographic validation list.",
    "error": "Could not load. Names which read failed and leaves the offline cryptographic validation untouched.",
-   "emptyFirstRun": "No offline cryptographic validation yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No offline cryptographic validation yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the offline cryptographic validation are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -1481,15 +1517,6 @@
     "contract": "access",
     "purpose": "Offline Cryptographic Validation Profile",
     "trigger": "onLoad"
-   },
-   {
-    "operationId": "setOfflinePolicy",
-    "contract": "tenancy",
-    "purpose": "What a workstation may do with no network, and for how long",
-    "trigger": "onAction",
-    "invalidates": [
-     "listOfflineCryptographicValidation"
-    ]
    }
   ],
   "entryState": {
@@ -1504,33 +1531,6 @@
    "workshopBoard": "wireframes/WS20 Access Control Board 3.dc.html#bo-171"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 37. 0 of 0 labels bound to a contract property; 0 of 30 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "overlays": [
-   {
-    "id": "formSetOfflinePolicy",
-    "component": "modal",
-    "trigger": "Save offline policy",
-    "body": "**Collects what `setOfflinePolicy` sends before it is called.** Required: `scopePath`. Optional: `id`, `maxOfflineHours`, `allowedOffline`, `offlineValueCeiling`, `offlineTransactionCeiling`, `onCeilingBreach`, `requiresManagerToExtend`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "OfflinePolicy",
-    "confirm": {
-     "label": "Save offline policy",
-     "operation": "setOfflinePolicy"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "scopePath",
-      "id",
-      "maxOfflineHours",
-      "allowedOffline",
-      "offlineValueCeiling",
-      "offlineTransactionCeiling",
-      "onCeilingBreach",
-      "requiresManagerToExtend"
-     ]
-    },
-    "provenance": "contract tenancy.yaml PUT /offline-policy"
-   }
-  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1605,6 +1605,11 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Access Control Module_Reference.pdf, page 38"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-004): No read of the embedded entitlement payload and no payload size or optimisation estimate operation.",
+    "source": "contracts/spine/access.yaml#setEmbeddedEntitlementPayload"
    }
   ],
   "layout": {
@@ -1775,6 +1780,13 @@
    "workshopBoard": "wireframes/WS20 Access Control Board 3.dc.html#bo-173"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 39. 5 of 5 labels bound to a contract property; 6 of 72 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-004): No operation runs a credential security simulation or publishes, versions or rolls back a credential security configuration.",
+    "source": "contracts/spine/access.yaml#listCredentialSecurity"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",

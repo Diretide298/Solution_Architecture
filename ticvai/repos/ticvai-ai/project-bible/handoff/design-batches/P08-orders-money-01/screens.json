@@ -1,452 +1,5 @@
 [
  {
-  "id": "BO-008",
-  "name": "Product Detail & Variants",
-  "module": "Orders & Money",
-  "requiresModule": "ticketing",
-  "wave": 1,
-  "capability": "C00",
-  "implementation": {
-   "app": "venue-management-web",
-   "route": "/venue-operations/product-detail-variants",
-   "component": "apps/venue-management-web/src/routes/venue-operations/ProductDetailVariantsDetail.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "exitTo": [
-    "BO-007"
-   ],
-   "inferred": true,
-   "transitions": [
-    {
-     "to": "BO-007",
-     "trigger": "Product Directory",
-     "provenance": "flow F85 step 3→4, F93 step 3→4",
-     "carries": [
-      "productId"
-     ]
-    }
-   ],
-   "entryFrom": [
-    "BO-045",
-    "BO-137"
-   ]
-  },
-  "notes": "Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. **Carried `runFxRevaluation`, `getForeignTenderReport` and `listInterEntityObligations` until 20 August** — a product screen doing foreign-exchange revaluation. Operations were attached from the 14 August wireframe board by a heuristic that matched nothing. **Rewired 20 August.**",
-  "density": "compact",
-  "boardFrames": [
-   "FnB Board 2.dc.html#fnb-2d",
-   "Retail Board 2.dc.html#ret-2c"
-  ],
-  "pattern": "listDetail",
-  "patternReason": "`listProductVariants` reads the population and `getProduct` reads one of them — list, select, act",
-  "purpose": "Define what is sold and the ticket types under it.",
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "collection",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every product variant",
-       "bindsTo": "ProductVariant",
-       "columns": [
-        "ProductVariant.id",
-        "ProductVariant.productId",
-        "ProductVariant.sku",
-        "ProductVariant.axisValues",
-        "ProductVariant.isActive"
-       ],
-       "operation": "listProductVariants",
-       "provenance": "contract catalogue.yaml GET /products/{productId}/variants"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected product variant",
-       "bindsTo": "ProductVariant",
-       "columns": [
-        "ProductVariant.id",
-        "ProductVariant.productId",
-        "ProductVariant.sku",
-        "ProductVariant.axisValues",
-        "ProductVariant.name",
-        "ProductVariant.barcode",
-        "ProductVariant.description",
-        "ProductVariant.isDefault",
-        "ProductVariant.isActive"
-       ],
-       "operation": "listProductVariants",
-       "provenance": "contract catalogue.yaml GET /products/{productId}/variants"
-      },
-      {
-       "kind": "detailPanel",
-       "label": "The product",
-       "bindsTo": "Product",
-       "columns": [
-        "Product.id",
-        "Product.code",
-        "Product.name",
-        "Product.description",
-        "Product.kind",
-        "Product.venueId",
-        "Product.scopePath",
-        "Product.createdByPrincipalId",
-        "Product.approvedByPrincipalId",
-        "Product.responsibleDepartmentId",
-        "Product.onSaleFrom",
-        "Product.onSaleTo",
-        "Product.categoryId",
-        "Product.lifecycleState",
-        "Product.isSellable",
-        "Product.isStockTracked"
-       ],
-       "operation": "getProduct",
-       "provenance": "contract catalogue.yaml GET /products/{productId}"
-      },
-      {
-       "kind": "detailPanel",
-       "label": "What the guest sees",
-       "bindsTo": "Product",
-       "columns": [
-        "Product.guestListing",
-        "Product.notBookableLabel",
-        "Product.displayTags",
-        "Product.media",
-        "Product.consentQuestionIds",
-        "Product.requiresTimeWindow",
-        "Product.segmentTags",
-        "Product.salesContact",
-        "Product.bookingFlowId"
-       ],
-       "operation": "getProduct",
-       "notes": "**What the guest sees of the product** (decided 29 September, rev 3). `guestListing`: bookable (the default), info only, or hidden; an info-only product keeps its details and photo, shows `notBookableLabel` (default \"Info only / Not bookable online\") and opens details instead of Add to basket, and `addCartLine` refuses it `409` (REV3-14). `displayTags`: up to six, each a kind (clock, height, free, calendar, id) and a label; with none, the guest app derives them from duration, validity and the height rule (23SEP-3). `media`: images and videos from the asset library, one of them primary, which is the photo on the ticket card and what Read more opens on (23SEP-4). `consentQuestionIds`: the consent questions this product asks, in order, from CMS-018 (REV3-26). `requiresTimeWindow`: a space sold by the hour, such as a meeting-room type; its lengths are a `length` attribute whose values carry `durationMinutes` (REV3-13).",
-       "provenance": "contract catalogue.yaml GET /products/{productId}"
-      },
-      {
-       "kind": "multiSelect",
-       "label": "Photos and videos",
-       "bindsTo": "Product.media",
-       "operation": "searchMedia",
-       "notes": "Picks from the asset library (`searchMedia`); one item is marked primary. Saved with `updateProduct`, which registers the use of each asset (decided 29 September, rev 3 23SEP-4).",
-       "provenance": "contract assets.yaml GET /media"
-      },
-      {
-       "kind": "multiSelect",
-       "label": "Consent questions this product asks",
-       "bindsTo": "Product.consentQuestionIds",
-       "operation": "listConsentQuestions",
-       "notes": "Active questions from `listConsentQuestions`, written on CMS-018; ordered as the guest meets them. The guest is asked these together with the booking flow's own, each once (decided 29 September, rev 3 REV3-26).",
-       "provenance": "contract marketing-crm.yaml GET /consent-questions"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Save product attributes",
-       "operation": "setProductAttributes",
-       "provenance": "contract catalogue.yaml PUT /products/{productId}/attributes"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Save product",
-       "operation": "updateProduct",
-       "provenance": "contract catalogue.yaml PATCH /products/{productId}"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Save ticket type",
-       "operation": "updateProductVariant",
-       "notes": "**The words and codes on one variant**: its name, the description a guest reads behind the (i) on a ticket-type row (at most 300 characters per language, decided 29 September, rev 3 23SEP-6), its barcode, and whether it is the default. The combination of values and the SKU come from the attributes and are not edited here. A retired variant is refused `409`.",
-       "provenance": "contract catalogue.yaml PATCH /products/{productId}/variants/{variantId}"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "selectField",
-       "label": "Booking flow",
-       "bindsTo": "Product.bookingFlowId",
-       "operation": "listBookingFlows",
-       "notes": "**Which booking flow sells this product** (decided 29 September, W8 and W12): a flow from CMS-103, e.g. *workshop: product first, then date and time*. Empty means the category's flow, then the venue's flow for the product kind; the screen shows which one applies. Saved with `updateProduct`.",
-       "provenance": "decided 29 September, W12; agreed name white-label listBookingFlows (the 29 September pass brief)"
-      },
-      {
-       "kind": "textField",
-       "label": "Sales phone",
-       "bindsTo": "Product.salesContact.phone",
-       "operation": "updateProduct",
-       "notes": "**Contact sales to book** (decided 29 September, W3). Shown beside `guestListing`; used only when the product is info only, as *Call sales* on WEB-004 and GST-004. Empty phone and email means the venue's contact.",
-       "provenance": "contract catalogue.yaml Product.salesContact"
-      },
-      {
-       "kind": "textField",
-       "label": "Sales email",
-       "bindsTo": "Product.salesContact.email",
-       "operation": "updateProduct",
-       "provenance": "contract catalogue.yaml Product.salesContact"
-      },
-      {
-       "kind": "textField",
-       "label": "Note under the contact",
-       "bindsTo": "Product.salesContact.note",
-       "operation": "updateProduct",
-       "notes": "At most 200 characters per language, e.g. *Group courses are booked by phone*.",
-       "provenance": "contract catalogue.yaml Product.salesContact"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The product variants list.",
-   "error": "Could not load. Names which read failed and leaves the product variants untouched.",
-   "emptyFirstRun": "No product variants yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
-   "emptyNoResults": "Never shown: `listProductVariants` takes no filter, so an empty list is always the first-run state above.",
-   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `getProduct` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "listBookingFlows",
-    "contract": "white-label",
-    "purpose": "The booking flows a product can be sold through (W12)",
-    "trigger": "onAction",
-    "provenance": "decided 29 September, W12 (the 29 September pass)"
-   },
-   {
-    "operationId": "getProduct",
-    "contract": "catalogue",
-    "purpose": "Read a product",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "listProductVariants",
-    "contract": "catalogue",
-    "purpose": "List generated variants",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "setProductAttributes",
-    "contract": "catalogue",
-    "purpose": "Set the attribute axes for a product",
-    "trigger": "onAction",
-    "invalidates": [
-     "listProductVariants"
-    ]
-   },
-   {
-    "operationId": "updateProduct",
-    "contract": "catalogue",
-    "purpose": "Update a product",
-    "trigger": "onAction",
-    "invalidates": [
-     "listProductVariants"
-    ]
-   },
-   {
-    "operationId": "updateProductVariant",
-    "contract": "catalogue",
-    "purpose": "Name, describe, barcode or make default one ticket type (rev 3 23SEP-6)",
-    "trigger": "onAction",
-    "invalidates": [
-     "listProductVariants"
-    ]
-   },
-   {
-    "operationId": "searchMedia",
-    "contract": "assets",
-    "purpose": "Pick the product's photos and videos from the asset library (rev 3 23SEP-4)",
-    "trigger": "onAction"
-   },
-   {
-    "operationId": "listConsentQuestions",
-    "contract": "marketing-crm",
-    "purpose": "The consent questions a product can ask (rev 3 REV3-26)",
-    "trigger": "onAction"
-   },
-   {
-    "operationId": "restoreProductVersion",
-    "contract": "catalogue",
-    "purpose": "Put a previous version of the product back",
-    "trigger": "onAction",
-    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
-    "invalidates": [
-     "getProduct",
-     "listProductVariants"
-    ]
-   },
-   {
-    "operationId": "assessProductChange",
-    "contract": "catalogue",
-    "purpose": "See what a change would touch before making it",
-    "trigger": "onAction",
-    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
-    "invalidates": [
-     "getProduct",
-     "listProductVariants"
-    ]
-   },
-   {
-    "operationId": "cloneProduct",
-    "contract": "catalogue",
-    "purpose": "Copy the product as a new draft",
-    "trigger": "onAction",
-    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
-    "invalidates": [
-     "getProduct",
-     "listProductVariants"
-    ]
-   },
-   {
-    "operationId": "listProductVersions",
-    "contract": "catalogue",
-    "purpose": "The product versions a restore picks from",
-    "trigger": "onAction"
-   }
-  ],
-  "entryState": {
-   "params": [
-    {
-     "name": "venueId",
-     "from": "session"
-    },
-    {
-     "name": "productId",
-     "from": "deepLink"
-    },
-    {
-     "name": "variantId",
-     "from": "navigation"
-    },
-    {
-     "name": "version",
-     "from": "navigation"
-    }
-   ],
-   "coldEntry": "A product opened from the directory or a shared link. Shows what replaced it where it retired.",
-   "preloaded": [
-    "ProductVariant.id",
-    "ProductVariant.productId",
-    "ProductVariant.sku",
-    "ProductVariant.axisValues",
-    "ProductVariant.name"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-008",
-   "derivedFrom": "wireframes/reference/Retail Board 2.dc.html",
-   "source": "Claude Design Retail pack, 24 August",
-   "note": "**Drawn by Claude Design on `Retail Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
-  },
-  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
-  "overlays": [
-   {
-    "id": "formSetProductAttributes",
-    "component": "modal",
-    "trigger": "Save product attributes",
-    "body": "**Collects what `setProductAttributes` sends before it is called.** Required: `axes`. **A meeting-room type sells by length**: a `length` axis whose values each carry `durationMinutes` (e.g. 60, 120, 240, 480; minimum 15), one such axis per product, on a product with `requiresTimeWindow` on; each length is a variant priced on its own (decided 29 September, rev 3 REV3-13). Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Save product attributes",
-     "operation": "setProductAttributes"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "axes"
-     ]
-    },
-    "provenance": "contract catalogue.yaml PUT /products/{productId}/attributes"
-   },
-   {
-    "id": "formUpdateProduct",
-    "component": "modal",
-    "trigger": "Save product",
-    "body": "**Collects what `updateProduct` sends before it is called.** Nothing in the body is required. Optional: `name`, `description`, `channels`, `dataMaskValues`, and what the guest sees (decided 29 September, rev 3): `guestListing` and `notBookableLabel` (REV3-14), `displayTags` (at most six, 23SEP-3), `media` (23SEP-4), `consentQuestionIds` (REV3-26) and `requiresTimeWindow` (REV3-13); `salesContact` (W3) and `bookingFlowId` (W8, W12), decided 29 September. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "UpdateProductRequest",
-    "confirm": {
-     "label": "Save product",
-     "operation": "updateProduct"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "name",
-      "description",
-      "channels",
-      "dataMaskValues",
-      "guestListing",
-      "notBookableLabel",
-      "displayTags",
-      "media",
-      "consentQuestionIds",
-      "requiresTimeWindow",
-      "salesContact",
-      "bookingFlowId"
-     ]
-    },
-    "provenance": "contract catalogue.yaml PATCH /products/{productId}"
-   },
-   {
-    "id": "formUpdateProductVariant",
-    "component": "modal",
-    "trigger": "Save ticket type",
-    "body": "**Collects what `updateProductVariant` sends before it is called.** Nothing in the body is required. Optional: `name`, `description` (who the ticket type is for and what it includes, at most 300 characters per language, shown behind the (i) when the booking flow has `cardInfo` on; decided 29 September, rev 3 23SEP-6), `barcode`, `isDefault` (setting it clears the default on the product's other variants). Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Save ticket type",
-     "operation": "updateProductVariant"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "name",
-      "description",
-      "barcode",
-      "isDefault"
-     ]
-    },
-    "provenance": "contract catalogue.yaml PATCH /products/{productId}/variants/{variantId}"
-   }
-  ],
-  "_platform": {
-   "code": "P08",
-   "audience": "staff",
-   "formFactor": "web",
-   "shortName": "Venue Management",
-   "name": "Venue Management — Back Office",
-   "offlineCapable": false,
-   "app": "venue-management-web",
-   "operator": "venue",
-   "targetApp": {
-    "app": "venue-management",
-    "name": "TICVAI Venue Management",
-    "shell": "web",
-    "siblings": [
-     "P12",
-     "P13",
-     "P16"
-    ],
-    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
   "id": "BO-022",
   "name": "Order Detail",
   "module": "Orders & Money",
@@ -468,11 +21,14 @@
     {
      "to": "BO-008",
      "trigger": "Product Detail & Variants",
-     "provenance": "derived — BO-008 declares entryState.params productId, variantId, version and BO-022 holds none of them. The edge carries nothing: productId only pre-selects (deep link or optional); BO-008 finds variantId (listProductVariants), version (searchMedia) itself, and BO-008 opens on its own"
+     "carries": [
+      "variantId"
+     ],
+     "provenance": "derived — BO-008 declares entryState.params productId, variantId, version and BO-022 holds variantId, so an edge into it carries them"
     }
    ]
   },
-  "notes": "Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.",
+  "notes": "Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.\n\n**Tax documents, as the UAE requires them** (research 2 October 2026, CHG-FIN-011; Executive Regulation Art. 59-60): the document a paid order gets is titled \"Tax Invoice\" (a simplified tax invoice for a guest, a full one with the buyer's name, address and TRN on request), never \"Receipt\" or \"VAT receipt\" as the title, and a correction is a \"Tax Credit Note\" (the contract calls it a credit memo). A simplified tax invoice is issued automatically when the order is paid; a full one is offered for a VAT-registered buyer and is the only kind above AED 10,000 for them. Amounts and VAT are in AED; a guest who paid in another currency sees the amount paid, the currency and the rate as payment information (CHG-FIN-001). **Refunds** (CHG-FIN-001): a card or wallet payment taken in a guest-selected currency is refunded in that currency at the sale rate (`Refund.tenderCurrency`, `tenderAmount`), shown beside the base amount (\"USD 81.72 = AED 300.00 at 3.6710\"); foreign cash at a till is refunded in base currency (DI-282).",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listOrders` reads the population and `getOrder` reads one of them — list, select, act",
@@ -1124,30 +680,24 @@
   },
   "navigation": {
    "exitTo": [
-    "BO-004",
     "BO-008"
    ],
    "inferred": true,
-   "entryFrom": [
-    "BO-002"
-   ],
    "transitions": [
     {
      "to": "BO-008",
      "trigger": "Product Detail & Variants",
-     "provenance": "derived — BO-008 declares entryState.params productId, variantId, version and BO-023 holds none of them. The edge carries nothing: productId only pre-selects (deep link or optional); BO-008 finds variantId (listProductVariants), version (searchMedia) itself, and BO-008 opens on its own"
-    },
-    {
-     "to": "BO-004",
-     "trigger": "Authorises the bulk refund",
-     "provenance": "flow F09 step 3→4",
      "carries": [
-      "refundId"
-     ]
+      "variantId"
+     ],
+     "provenance": "derived — BO-008 declares entryState.params productId, variantId, version and BO-023 holds variantId, so an edge into it carries them"
     }
+   ],
+   "entryFrom": [
+    "BO-015"
    ]
   },
-  "notes": "Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. **`getRefundPolicy` wired 24 August.** **A refunds screen that cannot read the refund policy** judges every request by memory — and F09 was reaching it through `BO-003 Queue Integration Setup`, which held the operation only because of the 18 August bulk attach.",
+  "notes": "Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. **`getRefundPolicy` wired 24 August.** **A refunds screen that cannot read the refund policy** judges every request by memory — and F09 was reaching it through `BO-003 Queue Integration Setup`, which held the operation only because of the 18 August bulk attach.\n\n**Tax documents, as the UAE requires them** (research 2 October 2026, CHG-FIN-011; Executive Regulation Art. 59-60): the document a paid order gets is titled \"Tax Invoice\" (a simplified tax invoice for a guest, a full one with the buyer's name, address and TRN on request), never \"Receipt\" or \"VAT receipt\" as the title, and a correction is a \"Tax Credit Note\" (the contract calls it a credit memo). A simplified tax invoice is issued automatically when the order is paid; a full one is offered for a VAT-registered buyer and is the only kind above AED 10,000 for them. Amounts and VAT are in AED; a guest who paid in another currency sees the amount paid, the currency and the rate as payment information (CHG-FIN-001). **Refunds** (CHG-FIN-001): a card or wallet payment taken in a guest-selected currency is refunded in that currency at the sale rate (`Refund.tenderCurrency`, `tenderAmount`), shown beside the base amount (\"USD 81.72 = AED 300.00 at 3.6710\"); foreign cash at a till is refunded in base currency (DI-282).",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listOrderRefunds` reads the population and `getOrder` reads one of them — list, select, act",
@@ -1317,21 +867,9 @@
       },
       {
        "kind": "secondaryButton",
-       "label": "Create order",
-       "operation": "createOrder",
-       "provenance": "contract orders.yaml POST /orders"
-      },
-      {
-       "kind": "secondaryButton",
        "label": "Exchange order lines",
        "operation": "exchangeOrderLines",
        "provenance": "contract orders.yaml POST /orders/{orderId}/exchanges"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Hold order",
-       "operation": "holdOrder",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/hold"
       },
       {
        "kind": "secondaryButton",
@@ -1352,16 +890,16 @@
        "provenance": "contract orders.yaml POST /orders/{orderId}/reschedule"
       },
       {
-       "kind": "secondaryButton",
-       "label": "Resume order",
-       "operation": "resumeOrder",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/resume"
-      },
-      {
        "kind": "destructiveButton",
        "label": "Void order",
        "operation": "voidOrder",
        "provenance": "contract orders.yaml POST /orders/{orderId}/voids"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Refund every order",
+       "operation": "createBulkRefund",
+       "provenance": "contract orders.yaml POST /refunds/bulk; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -1426,32 +964,6 @@
     "provenance": "contract orders.yaml POST /orders/{orderId}/discounts"
    },
    {
-    "id": "formCreateOrder",
-    "component": "modal",
-    "trigger": "Create order",
-    "body": "**Collects what `createOrder` sends before it is called.** Required: `id`, `venueId`, `channel`, `lines`, `recordedAt`. Optional: `shiftId`, `subjectId`, `guestLinkId`, `catalogueBundleVersion`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "CreateOrderRequest",
-    "confirm": {
-     "label": "Create order",
-     "operation": "createOrder"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "id",
-      "venueId",
-      "channel",
-      "lines",
-      "recordedAt",
-      "shiftId",
-      "subjectId",
-      "guestLinkId",
-      "catalogueBundleVersion"
-     ]
-    },
-    "provenance": "contract orders.yaml POST /orders"
-   },
-   {
     "id": "formExchangeOrderLines",
     "component": "modal",
     "trigger": "Exchange order lines",
@@ -1473,25 +985,6 @@
      ]
     },
     "provenance": "contract orders.yaml POST /orders/{orderId}/exchanges"
-   },
-   {
-    "id": "formHoldOrder",
-    "component": "modal",
-    "trigger": "Hold order",
-    "body": "**Collects what `holdOrder` sends before it is called.** Required: `recordedAt`. Optional: `label`, `holdUntil`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Hold order",
-     "operation": "holdOrder"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "recordedAt",
-      "label",
-      "holdUntil"
-     ]
-    },
-    "provenance": "contract orders.yaml POST /orders/{orderId}/hold"
    },
    {
     "id": "formModifyOrder",
@@ -1556,6 +1049,20 @@
      ]
     },
     "provenance": "contract orders.yaml POST /orders/{orderId}/reschedule"
+   },
+   {
+    "id": "formCreateBulkRefund",
+    "component": "modal",
+    "trigger": "Refund every order",
+    "body": "**Collects what `createBulkRefund` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Refund every order",
+     "operation": "createBulkRefund"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "contract orders.yaml POST /refunds/bulk; wiring fix, 2 October 2026"
    }
   ],
   "states": {
@@ -1591,15 +1098,6 @@
     ]
    },
    {
-    "operationId": "createOrder",
-    "contract": "orders",
-    "purpose": "Create an order",
-    "trigger": "onAction",
-    "invalidates": [
-     "listOrderRefunds"
-    ]
-   },
-   {
     "operationId": "exchangeOrderLines",
     "contract": "orders",
     "purpose": "Exchange lines for different products or dates",
@@ -1619,15 +1117,6 @@
     "contract": "orders",
     "purpose": "Full financial history of an order",
     "trigger": "onAction"
-   },
-   {
-    "operationId": "holdOrder",
-    "contract": "orders",
-    "purpose": "Park a sale and free the till",
-    "trigger": "onAction",
-    "invalidates": [
-     "listOrderRefunds"
-    ]
    },
    {
     "operationId": "listOrders",
@@ -1657,15 +1146,6 @@
     "operationId": "rescheduleOrder",
     "contract": "orders",
     "purpose": "Move an order to another performance",
-    "trigger": "onAction",
-    "invalidates": [
-     "listOrderRefunds"
-    ]
-   },
-   {
-    "operationId": "resumeOrder",
-    "contract": "orders",
-    "purpose": "Bring a parked sale back to a till",
     "trigger": "onAction",
     "invalidates": [
      "listOrderRefunds"
@@ -1706,6 +1186,13 @@
     "purpose": "Download the invoice / credit memo PDF",
     "trigger": "onLoad",
     "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "createBulkRefund",
+    "contract": "orders",
+    "purpose": "Refund every order against a cancelled performance",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-001)"
    }
   ],
   "entryState": {
@@ -1742,6 +1229,31 @@
    "board": "wireframes/P08 Venue Management.dc.html#bo-023"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 15 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-004): No operation lists message dispatches (for F09 step 5, confirming guests of a cancelled performance were notified).",
+    "source": "F09 step 5 | contracts/satellite/marketing-crm.yaml#retryMessageDispatch"
+   },
+   {
+    "operation": "createOrder",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-025): createOrder, holdOrder and resumeOrder are till operations at workstation scope; a refunds desk does not park sales or create orders, they belong to the POS (design-notes correction ticketing-backoffice BO-023)",
+    "source": "contracts/spine/orders.yaml#holdOrder | contracts/spine/orders.yaml#createOrder"
+   },
+   {
+    "operation": "holdOrder",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-025): createOrder, holdOrder and resumeOrder are till operations at workstation scope; a refunds desk does not park sales or create orders, they belong to the POS (design-notes correction ticketing-backoffice BO-023)",
+    "source": "contracts/spine/orders.yaml#holdOrder | contracts/spine/orders.yaml#createOrder"
+   },
+   {
+    "operation": "resumeOrder",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-025): createOrder, holdOrder and resumeOrder are till operations at workstation scope; a refunds desk does not park sales or create orders, they belong to the POS (design-notes correction ticketing-backoffice BO-023)",
+    "source": "contracts/spine/orders.yaml#holdOrder | contracts/spine/orders.yaml#createOrder"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1863,6 +1375,19 @@
        "label": "recordedAt",
        "bindsTo": "CreatePaymentRequest.recordedAt",
        "provenance": "contract orders.yaml POST /payments"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Unresolved payments",
+       "bindsTo": "PaymentReconciliationExceptionManagementView",
+       "operation": "listPaymentReconciliationException",
+       "provenance": "contract orders.yaml GET /payment-reconciliation-exception; wiring fix, 2 October 2026"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Deposits",
+       "operation": "listDeposits",
+       "provenance": "contract orders.yaml GET /deposits; wiring fix, 2 October 2026"
       }
      ]
     },
@@ -1870,18 +1395,6 @@
      "name": "actionBar",
      "slot": "publish",
      "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Create payment",
-       "operation": "createPayment",
-       "provenance": "contract orders.yaml POST /payments"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Add tip",
-       "operation": "addTip",
-       "provenance": "contract orders.yaml POST /payments/{paymentId}/tip"
-      },
       {
        "kind": "secondaryButton",
        "label": "Capture payment",
@@ -1917,26 +1430,6 @@
     "trigger": "Close deposit boxes",
     "body": "**Names what `closeDepositBoxes` changes and what it leaves alone**, in the consequence rather than the verb. A payment exceptions this affects should be identified in the dialog, not just counted. **Collects what `closeDepositBoxes` sends before it is called.** Nothing in the body is required. Optional: `boxIds`, `allOpenAtVenue`.",
     "provenance": "contract shift.yaml POST /deposit-boxes/close"
-   },
-   {
-    "id": "formAddTip",
-    "component": "modal",
-    "trigger": "Add tip",
-    "body": "**Collects what `addTip` sends before it is called.** Required: `amount`, `source`, `recordedAt`. Optional: `allocateToPrincipalId`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Add tip",
-     "operation": "addTip"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "amount",
-      "source",
-      "recordedAt",
-      "allocateToPrincipalId"
-     ]
-    },
-    "provenance": "contract orders.yaml POST /payments/{paymentId}/tip"
    },
    {
     "id": "formCapturePayment",
@@ -1978,22 +1471,10 @@
   "states": {
    "loading": "The saved payment exceptions.",
    "error": "Could not load. Names which read failed and leaves the payment exceptions untouched.",
-   "emptyFirstRun": "No payment exceptions configured. The form opens empty and `createPayment` saves the first one; it says what the platform does in the meantime.",
-   "emptyNoAccess": "Shown when the caller lacks `ORDER_CREATE`, which `createPayment` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No payment exceptions configured. The form opens empty; it says what the platform does in the meantime.",
+   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `listPaymentReconciliationException` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
-   {
-    "operationId": "createPayment",
-    "contract": "orders",
-    "purpose": "Take a payment against an order",
-    "trigger": "onAction"
-   },
-   {
-    "operationId": "addTip",
-    "contract": "orders",
-    "purpose": "Record a tip against a payment",
-    "trigger": "onAction"
-   },
    {
     "operationId": "capturePayment",
     "contract": "orders",
@@ -2017,6 +1498,20 @@
     "contract": "finance",
     "purpose": "Convert to revenue, return it, or forfeit it",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "listPaymentReconciliationException",
+    "contract": "orders",
+    "purpose": "The payments that did not resolve themselves",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
+   },
+   {
+    "operationId": "listDeposits",
+    "contract": "orders",
+    "purpose": "Deposits and their authorisation state, to settle or close",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "entryState": {
@@ -2041,6 +1536,20 @@
    "note": "**Drawn by Claude Design on `Retail Board 3.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "gaps": [
+   {
+    "operation": "addTip",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-025): Taking a new payment (createPayment) or adding a tip (addTip) is a till act at workstation scope, and the exceptions screen resolves existing payments; it also had no read, so it opened empty (PR-9): listPaymentReconciliationException and listDeposits return the payments and deposits it resolves. F99 step 2 drops the two till acts (design-notes correction ticketing-backoffice BO-024)",
+    "source": "contracts/spine/orders.yaml#createPayment | contracts/spine/orders.yaml#addTip | contracts/spine/orders.yaml#capturePayment | contracts/spine/orders.yaml#inquirePaymentStatus | contracts/spine/shift.yaml#closeDepositBoxes | contracts/spine/finance.yaml#settleDeposit | screens/P08-venue-back-office.yaml#BO-024 | F99 step 2"
+   },
+   {
+    "operation": "createPayment",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-025): Taking a new payment (createPayment) or adding a tip (addTip) is a till act at workstation scope, and the exceptions screen resolves existing payments; it also had no read, so it opened empty (PR-9): listPaymentReconciliationException and listDeposits return the payments and deposits it resolves. F99 step 2 drops the two till acts (design-notes correction ticketing-backoffice BO-024)",
+    "source": "contracts/spine/orders.yaml#createPayment | contracts/spine/orders.yaml#addTip | contracts/spine/orders.yaml#capturePayment | contracts/spine/orders.yaml#inquirePaymentStatus | contracts/spine/shift.yaml#closeDepositBoxes | contracts/spine/finance.yaml#settleDeposit | screens/P08-venue-back-office.yaml#BO-024 | F99 step 2"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -2418,7 +1927,10 @@
     {
      "to": "BO-008",
      "trigger": "Product Detail & Variants",
-     "provenance": "derived — BO-008 declares entryState.params productId, variantId, version and BO-026 holds none of them. The edge carries nothing: productId only pre-selects (deep link or optional); BO-008 finds variantId (listProductVariants), version (searchMedia) itself, and BO-008 opens on its own"
+     "carries": [
+      "variantId"
+     ],
+     "provenance": "derived — BO-008 declares entryState.params productId, variantId, version and BO-026 holds variantId, so an edge into it carries them"
     }
    ]
   },
@@ -3188,9 +2700,9 @@
      "to": "BO-008",
      "trigger": "Product Detail & Variants",
      "carries": [
-      "version"
+      "variantId"
      ],
-     "provenance": "derived — BO-008 declares entryState.params productId, variantId, version and BO-027 holds version, so an edge into it carries them"
+     "provenance": "derived — BO-008 declares entryState.params productId, variantId, version and BO-027 holds variantId, so an edge into it carries them"
     }
    ]
   },
@@ -3221,31 +2733,6 @@
        ],
        "operation": "getMediaEntitlements",
        "provenance": "contract orders.yaml GET /media/{mediaCode}/entitlements"
-      },
-      {
-       "kind": "detailPanel",
-       "label": "The media asset",
-       "bindsTo": "MediaAssetDetail",
-       "columns": [
-        "MediaAssetDetail.id",
-        "MediaAssetDetail.kind",
-        "MediaAssetDetail.status",
-        "MediaAssetDetail.filename",
-        "MediaAssetDetail.contentType",
-        "MediaAssetDetail.sizeBytes",
-        "MediaAssetDetail.title",
-        "MediaAssetDetail.description",
-        "MediaAssetDetail.altText",
-        "MediaAssetDetail.width",
-        "MediaAssetDetail.height",
-        "MediaAssetDetail.durationSeconds",
-        "MediaAssetDetail.customMetadata",
-        "MediaAssetDetail.sharedWithTenantIds",
-        "MediaAssetDetail.tags",
-        "MediaAssetDetail.venueId"
-       ],
-       "operation": "getMediaAsset",
-       "provenance": "contract assets.yaml GET /media/{mediaId}"
       }
      ]
     },
@@ -3261,9 +2748,9 @@
       },
       {
        "kind": "secondaryButton",
-       "label": "Replace media asset",
-       "operation": "replaceMediaAsset",
-       "provenance": "contract assets.yaml POST /media/{mediaId}/replace"
+       "label": "Replace media",
+       "operation": "replaceCredential",
+       "provenance": "contract access.yaml POST /credentials/{credentialId}/replace; wiring fix, 2 October 2026"
       }
      ]
     },
@@ -3310,18 +2797,6 @@
     "trigger": "onAction"
    },
    {
-    "operationId": "getMediaAsset",
-    "contract": "assets",
-    "purpose": "Read an asset with derivatives and usage",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "replaceMediaAsset",
-    "contract": "assets",
-    "purpose": "Replace the file behind an asset",
-    "trigger": "onAction"
-   },
-   {
     "operationId": "listTicketReissueFulfillment",
     "contract": "orders",
     "purpose": "Ticket reissue and fulfilment regeneration history (absorbed from BO-320, audit R276)",
@@ -3332,6 +2807,13 @@
     "contract": "access",
     "purpose": "Credential replacement, reissue, revocation and recovery (absorbed from BO-652, audit R276)",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "replaceCredential",
+    "contract": "access",
+    "purpose": "Replace the media of a credential the guest lost or damaged",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "entryState": {
@@ -3343,6 +2825,10 @@
     {
      "name": "mediaId",
      "from": "deepLink"
+    },
+    {
+     "name": "credentialId",
+     "from": "navigation"
     }
    ],
    "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `mediaCode`, `mediaId`."
@@ -3377,22 +2863,32 @@
     "provenance": "contract orders.yaml POST /media/{mediaCode}/entitlements"
    },
    {
-    "id": "formReplaceMediaAsset",
+    "id": "formReplaceCredential",
     "component": "modal",
-    "trigger": "Replace media asset",
-    "body": "**Collects what `replaceMediaAsset` sends before it is called.** Required: `uploadId`. Optional: `note`. Dismissing sends nothing; the screen behind is unchanged.",
+    "trigger": "Replace media",
+    "body": "**Collects what `replaceCredential` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.",
     "confirm": {
-     "label": "Replace media asset",
-     "operation": "replaceMediaAsset"
+     "label": "Replace media",
+     "operation": "replaceCredential"
     },
     "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "uploadId",
-      "note"
-     ]
+     "label": "Cancel"
     },
-    "provenance": "contract assets.yaml POST /media/{mediaId}/replace"
+    "provenance": "contract access.yaml POST /credentials/{credentialId}/replace; wiring fix, 2 October 2026"
+   }
+  ],
+  "gaps": [
+   {
+    "operation": "getMediaAsset",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-025): getMediaAsset and replaceMediaAsset are the image library; media here is a ticket credential, and the replacement act was missing: replaceCredential (access) replaces a credential's media (design-notes correction ticketing-backoffice BO-027)",
+    "source": "contracts/satellite/assets.yaml#replaceMediaAsset | contracts/spine/access.yaml#replaceCredential"
+   },
+   {
+    "operation": "replaceMediaAsset",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-025): getMediaAsset and replaceMediaAsset are the image library; media here is a ticket credential, and the replacement act was missing: replaceCredential (access) replaces a credential's media (design-notes correction ticketing-backoffice BO-027)",
+    "source": "contracts/satellite/assets.yaml#replaceMediaAsset | contracts/spine/access.yaml#replaceCredential"
    }
   ],
   "_platform": {
@@ -3457,10 +2953,10 @@
      "slot": "publish",
      "components": [
       {
-       "kind": "primaryButton",
-       "label": "Create refund request",
-       "operation": "createRefundRequest",
-       "provenance": "contract orders.yaml POST /refund-requests"
+       "kind": "secondaryButton",
+       "label": "Approve refund",
+       "operation": "approveRefund",
+       "provenance": "contract orders.yaml POST /refunds/{refundId}/approve; wiring fix, 2 October 2026"
       }
      ]
     },
@@ -3469,24 +2965,11 @@
      "slot": "carried",
      "components": [
       {
-       "kind": "textField",
-       "label": "Order id",
-       "operation": "createRefundRequest",
-       "notes": "Required.",
-       "provenance": "contract orders.yaml POST /refund-requests"
-      },
-      {
-       "kind": "textField",
-       "label": "Reason",
-       "operation": "createRefundRequest",
-       "notes": "Required.",
-       "provenance": "contract orders.yaml POST /refund-requests"
-      },
-      {
-       "kind": "multiSelect",
-       "label": "Line ids",
-       "operation": "createRefundRequest",
-       "provenance": "contract orders.yaml POST /refund-requests"
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "approveRefund",
+       "label": "Approve refund",
+       "notes": "The act the screen exists for."
       }
      ]
     }
@@ -3499,10 +2982,11 @@
   },
   "apis": [
    {
-    "operationId": "createRefundRequest",
+    "operationId": "approveRefund",
     "contract": "orders",
-    "purpose": "Guest-initiated refund request",
-    "trigger": "onAction"
+    "purpose": "Approve a refund held for approval",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {
@@ -3511,6 +2995,43 @@
    "board": "wireframes/P08 Venue Management.dc.html#bo-028"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formApproveRefund",
+    "component": "modal",
+    "trigger": "Approve refund",
+    "body": "**Collects what `approveRefund` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Approve refund",
+     "operation": "approveRefund"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "contract orders.yaml POST /refunds/{refundId}/approve; wiring fix, 2 October 2026"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "refundId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "gaps": [
+   {
+    "operation": "createRefundRequest",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-025): The Refund Approval Queue's only operation was createRefundRequest, the guest's own refund request (guest audience, no permission); a staff approval queue approves refunds held for approval (approveRefund, which came off BO-004 in CHG-WIR-001). Guest-only operations on staff screens are wrong wiring (Chinmay, 2 October; R254).",
+    "source": "contracts/spine/orders.yaml#createRefundRequest | contracts/spine/orders.yaml#approveRefund | R254"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-027): No read lists refunds held for approval across orders.",
+    "source": "contracts/spine/orders.yaml#approveRefund"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -3560,7 +3081,7 @@
     }
    ]
   },
-  "notes": "Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.",
+  "notes": "Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.\n\n**One reporting area, one set of numbers** (decided 2 October 2026, Chinmay; CHG-FIN-006; DI-721, DI-702). This screen is a scoped window onto the reporting area (Analytics, P16): it runs the same seeded report definitions and reads the same seeded KPIs, so its figures equal what Analytics shows for the same scope, period and as-of time. It computes no total of its own and shows the as-of time on every figure.\n\n**One reporting area (DI-721, DI-702; decided 8 September and again 2 October 2026 for the finance dashboard, DEC-219):** this builder is the same reporting surface as Venue Analytics (P16), opened from Orders & Money with the venue's reports; it does not keep its own copy of definitions.",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listReports` reads the population and `getFinancialReport` reads one of them — list, select, act",
@@ -3644,22 +3165,6 @@
        ],
        "operation": "getReport",
        "provenance": "contract reporting.yaml GET /reports/{reportId}"
-      },
-      {
-       "kind": "detailPanel",
-       "label": "The financial report",
-       "bindsTo": "FinancialReport",
-       "columns": [
-        "FinancialReport.report",
-        "FinancialReport.fiscalPeriodId",
-        "FinancialReport.legalEntityId",
-        "FinancialReport.currency",
-        "FinancialReport.currencyScale",
-        "FinancialReport.generatedAt",
-        "FinancialReport.sections"
-       ],
-       "operation": "getFinancialReport",
-       "provenance": "contract finance.yaml GET /reports/financial"
       }
      ]
     },
@@ -3834,15 +3339,9 @@
    "error": "Could not load. Names which read failed and leaves the report untouched.",
    "emptyFirstRun": "No report yet. Offers Create report (`createReport`); distinct from a filter that matched nothing.",
    "emptyNoResults": "Nothing matches the filter on category, search and the report are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `REPORT_VIEW_VENUE`, which `getFinancialReport` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "You don't have access to building reports — ask your venue manager for the report management access. Building and saving need it; viewing alone does not. **Never an empty table.**"
   },
   "apis": [
-   {
-    "operationId": "getFinancialReport",
-    "contract": "finance",
-    "purpose": "P&L, balance sheet or cash flow",
-    "trigger": "onLoad"
-   },
    {
     "operationId": "listReports",
     "contract": "reporting",
@@ -3936,6 +3435,14 @@
    "board": "wireframes/P08 Venue Management.dc.html#bo-029"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "gaps": [
+   {
+    "operation": "getFinancialReport",
+    "removed": true,
+    "why": "Statutory statements (P&L, balance sheet, cash flow) are not part of a report builder; they are the finance close's (design-note correction finance-insights BO-029, CHG-SBO-012).",
+    "source": "DI-721"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -3973,19 +3480,9 @@
    "status": "notStarted"
   },
   "navigation": {
-   "exitTo": [
-    "BO-008"
-   ],
-   "inferred": true,
-   "transitions": [
-    {
-     "to": "BO-008",
-     "trigger": "Product Detail & Variants",
-     "provenance": "derived — BO-008 declares entryState.params productId, variantId, version and BO-039 holds none of them. The edge carries nothing: productId only pre-selects (deep link or optional); BO-008 finds variantId (listProductVariants), version (searchMedia) itself, and BO-008 opens on its own"
-    }
-   ]
+   "inferred": true
   },
-  "notes": "Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.",
+  "notes": "Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.\n\n**A pending shift never blocks the next one (decided 2 October 2026 by Chinmay, DEC-059; CHG-CSP-012).** A cashier may sign out with the variance pending; the shift shows \"Under review\" on the cashier's view and the next cashier opens a shift on the same till. A supervisor closes or resolves shifts with their PIN at any till, on POS-007, or from the daily cash reconciliation (BO-043). Kept separate from BO-040 (DEC-172: keep both).",
   "density": "compact",
   "pattern": "approvalInbox",
   "patternReason": "`approveShiftOpen` decides items that `listShifts` queues — every row is waiting for a person, so the empty state is success",
@@ -3998,18 +3495,23 @@
      "slot": "queue",
      "components": [
       {
-       "kind": "textField",
-       "label": "Workstation id",
-       "operation": "listShifts",
-       "notes": "Sends `?workstationId=` to `listShifts`.",
-       "provenance": "contract shift.yaml GET /shifts"
+       "kind": "selectField",
+       "label": "Till",
+       "operation": "listWorkstations",
+       "notes": "A pick list in words, never a typed id (design-note correction, 2 October 2026).",
+       "provenance": "contract shift.yaml GET /shifts",
+       "bindsTo": "Workstation.id",
+       "columns": [
+        "Workstation.name"
+       ]
       },
       {
-       "kind": "textField",
+       "kind": "multiSelect",
        "label": "Status",
        "operation": "listShifts",
-       "notes": "Sends `?status=` to `listShifts`.",
-       "provenance": "contract shift.yaml GET /shifts"
+       "notes": "Shift statuses in words; \"Under review\" is a counted shift waiting for a supervisor.",
+       "provenance": "contract shift.yaml GET /shifts",
+       "bindsTo": "Shift.status"
       },
       {
        "kind": "datePicker",
@@ -4027,14 +3529,9 @@
       },
       {
        "kind": "dataTable",
-       "label": "Waiting for a decision",
+       "label": "Shifts",
        "bindsTo": "Shift",
        "columns": [
-        "Shift.id",
-        "Shift.workstationId",
-        "Shift.venueId",
-        "Shift.scopePath",
-        "Shift.principalId",
         "Shift.principalDisplayName",
         "Shift.incidents",
         "Shift.status",
@@ -4075,31 +3572,6 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected shift",
-       "bindsTo": "Shift",
-       "columns": [
-        "Shift.id",
-        "Shift.workstationId",
-        "Shift.venueId",
-        "Shift.scopePath",
-        "Shift.principalId",
-        "Shift.principalDisplayName",
-        "Shift.incidents",
-        "Shift.status",
-        "Shift.currency",
-        "Shift.currencyScale",
-        "Shift.depositBoxCode",
-        "Shift.bagNumber",
-        "Shift.openingFloat",
-        "Shift.salesTotal",
-        "Shift.refundsTotal",
-        "Shift.liftsTotal"
-       ],
-       "operation": "getCurrentShift",
-       "provenance": "contract shift.yaml GET /shifts/current"
-      },
-      {
-       "kind": "detailPanel",
        "label": "The shift",
        "bindsTo": "Shift",
        "columns": [
@@ -4128,217 +3600,10 @@
     {
      "name": "actionBar",
      "slot": "decision",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Open shift",
-       "operation": "openShift",
-       "provenance": "contract shift.yaml POST /shifts"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Accept shift variance",
-       "operation": "acceptShiftVariance",
-       "provenance": "contract shift.yaml POST /shifts/{shiftId}/accept-variance"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Approve shift open",
-       "operation": "approveShiftOpen",
-       "provenance": "contract shift.yaml POST /shifts/{shiftId}/approve-open"
-      },
-      {
-       "kind": "destructiveButton",
-       "label": "Close shift",
-       "operation": "closeShift",
-       "provenance": "contract shift.yaml POST /shifts/{shiftId}/close"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Create cash movement",
-       "operation": "createCashMovement",
-       "provenance": "contract shift.yaml POST /shifts/{shiftId}/cash-movements"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Record no sale",
-       "operation": "recordNoSale",
-       "provenance": "contract shift.yaml POST /shifts/{shiftId}/no-sale"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Reopen shift",
-       "operation": "reopenShift",
-       "provenance": "contract shift.yaml POST /shifts/{shiftId}/reopen"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Resume shift",
-       "operation": "resumeShift",
-       "provenance": "contract shift.yaml POST /shifts/{shiftId}/resume"
-      },
-      {
-       "kind": "destructiveButton",
-       "label": "Suspend shift",
-       "operation": "suspendShift",
-       "provenance": "contract shift.yaml POST /shifts/{shiftId}/suspend"
-      }
-     ]
+     "components": []
     }
    ]
   },
-  "overlays": [
-   {
-    "id": "confirmCloseShift",
-    "component": "confirmDialog",
-    "trigger": "Close shift",
-    "body": "**Names what `closeShift` changes and what it leaves alone**, in the consequence rather than the verb. A shift this affects should be identified in the dialog, not just counted. **Collects what `closeShift` sends before it is called.** Required: `countedCash`, `recordedAt`. Optional: `nonCashDeclared`, `notes`, `releaseHeldLeases`.",
-    "provenance": "contract shift.yaml POST /shifts/{shiftId}/close",
-    "bindsTo": "CloseShiftRequest"
-   },
-   {
-    "id": "confirmSuspendShift",
-    "component": "confirmDialog",
-    "trigger": "Suspend shift",
-    "body": "**Names what `suspendShift` changes and what it leaves alone**, in the consequence rather than the verb. A shift this affects should be identified in the dialog, not just counted. **Collects what `suspendShift` sends before it is called.** Required: `recordedAt`. Optional: `reason`.",
-    "provenance": "contract shift.yaml POST /shifts/{shiftId}/suspend"
-   },
-   {
-    "id": "formOpenShift",
-    "component": "modal",
-    "trigger": "Open shift",
-    "body": "**Collects what `openShift` sends before it is called.** Required: `workstationId`, `openingFloat`. Optional: `depositBoxCode`, `bagNumber`, `recordedAt`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "OpenShiftRequest",
-    "confirm": {
-     "label": "Open shift",
-     "operation": "openShift"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "workstationId",
-      "openingFloat",
-      "depositBoxCode",
-      "bagNumber",
-      "recordedAt"
-     ]
-    },
-    "provenance": "contract shift.yaml POST /shifts"
-   },
-   {
-    "id": "formAcceptShiftVariance",
-    "component": "modal",
-    "trigger": "Accept shift variance",
-    "body": "**Collects what `acceptShiftVariance` sends before it is called.** Required: `reason`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Accept shift variance",
-     "operation": "acceptShiftVariance"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "reason"
-     ]
-    },
-    "provenance": "contract shift.yaml POST /shifts/{shiftId}/accept-variance"
-   },
-   {
-    "id": "formApproveShiftOpen",
-    "component": "modal",
-    "trigger": "Approve shift open",
-    "body": "**Collects what `approveShiftOpen` sends before it is called.** Required: `reason`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Approve shift open",
-     "operation": "approveShiftOpen"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "reason"
-     ]
-    },
-    "provenance": "contract shift.yaml POST /shifts/{shiftId}/approve-open"
-   },
-   {
-    "id": "formCreateCashMovement",
-    "component": "modal",
-    "trigger": "Create cash movement",
-    "body": "**Collects what `createCashMovement` sends before it is called.** Required: `id`, `kind`, `amount`, `recordedAt`. Optional: `denominations`, `reference`, `reason`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "CreateCashMovementRequest",
-    "confirm": {
-     "label": "Create cash movement",
-     "operation": "createCashMovement"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "id",
-      "kind",
-      "amount",
-      "recordedAt",
-      "denominations",
-      "reference",
-      "reason"
-     ]
-    },
-    "provenance": "contract shift.yaml POST /shifts/{shiftId}/cash-movements"
-   },
-   {
-    "id": "formRecordNoSale",
-    "component": "modal",
-    "trigger": "Record no sale",
-    "body": "**Collects what `recordNoSale` sends before it is called.** Required: `id`, `reason`, `recordedAt`. Optional: `note`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Record no sale",
-     "operation": "recordNoSale"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "id",
-      "reason",
-      "recordedAt",
-      "note"
-     ]
-    },
-    "provenance": "contract shift.yaml POST /shifts/{shiftId}/no-sale"
-   },
-   {
-    "id": "formReopenShift",
-    "component": "modal",
-    "trigger": "Reopen shift",
-    "body": "**Collects what `reopenShift` sends before it is called.** Required: `reason` and `supervisorStepUp` — a supervisor who did not close the shift enters their staff PIN on this device (`principalId`, `credential`) (decided 28 September, audit R144). A refusal names which: the supervisor is the closer (403 approver-is-closer) or the PIN was refused (403 supervisor-step-up-refused). Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Reopen shift",
-     "operation": "reopenShift"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "reason",
-      "supervisorStepUp"
-     ]
-    },
-    "provenance": "contract shift.yaml POST /shifts/{shiftId}/reopen"
-   },
-   {
-    "id": "formResumeShift",
-    "component": "modal",
-    "trigger": "Resume shift",
-    "body": "**Collects what `resumeShift` sends before it is called.** Required: `recordedAt`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Resume shift",
-     "operation": "resumeShift"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "recordedAt"
-     ]
-    },
-    "provenance": "contract shift.yaml POST /shifts/{shiftId}/resume"
-   }
-  ],
   "states": {
    "loading": "The shift list.",
    "error": "Could not load. Names which read failed and leaves the shift untouched.",
@@ -4354,57 +3619,6 @@
     "trigger": "onLoad"
    },
    {
-    "operationId": "getCurrentShift",
-    "contract": "shift",
-    "purpose": "The open or suspended shift on the session's workstation",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "openShift",
-    "contract": "shift",
-    "purpose": "Open a shift",
-    "trigger": "onAction",
-    "invalidates": [
-     "listShifts"
-    ]
-   },
-   {
-    "operationId": "acceptShiftVariance",
-    "contract": "shift",
-    "purpose": "Accept an over/short beyond the threshold",
-    "trigger": "onAction",
-    "invalidates": [
-     "listShifts"
-    ]
-   },
-   {
-    "operationId": "approveShiftOpen",
-    "contract": "shift",
-    "purpose": "Approve a shift opening outside tolerance",
-    "trigger": "onAction",
-    "invalidates": [
-     "listShifts"
-    ]
-   },
-   {
-    "operationId": "closeShift",
-    "contract": "shift",
-    "purpose": "Blind close-out",
-    "trigger": "onAction",
-    "invalidates": [
-     "listShifts"
-    ]
-   },
-   {
-    "operationId": "createCashMovement",
-    "contract": "shift",
-    "purpose": "Record a cash lift or add",
-    "trigger": "onAction",
-    "invalidates": [
-     "listShifts"
-    ]
-   },
-   {
     "operationId": "getShift",
     "contract": "shift",
     "purpose": "Read a shift",
@@ -4417,40 +3631,11 @@
     "trigger": "onLoad"
    },
    {
-    "operationId": "recordNoSale",
-    "contract": "shift",
-    "purpose": "Open the drawer without a sale",
-    "trigger": "onAction",
-    "invalidates": [
-     "listShifts"
-    ]
-   },
-   {
-    "operationId": "reopenShift",
-    "contract": "shift",
-    "purpose": "Reopen a shift closed in error",
-    "trigger": "onAction",
-    "invalidates": [
-     "listShifts"
-    ]
-   },
-   {
-    "operationId": "resumeShift",
-    "contract": "shift",
-    "purpose": "Resume a suspended shift",
-    "trigger": "onAction",
-    "invalidates": [
-     "listShifts"
-    ]
-   },
-   {
-    "operationId": "suspendShift",
-    "contract": "shift",
-    "purpose": "Suspend a shift so another user can log in",
-    "trigger": "onAction",
-    "invalidates": [
-     "listShifts"
-    ]
+    "operationId": "listWorkstations",
+    "contract": "tenancy",
+    "purpose": "List workstations (the pick list)",
+    "trigger": "onLoad",
+    "provenance": "design-note correction, 2 October 2026 (BO-039)"
    }
   ],
   "entryState": {
@@ -4475,6 +3660,474 @@
    "board": "wireframes/P08 Venue Management.dc.html#bo-039"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 13 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "gaps": [
+   {
+    "operation": "acceptShiftVariance",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-008): Till acts were bound to the back-office directory, including getCurrentShift (\"the shift on the session's workstation\", which a browser has not) and acceptShiftVariance, whose one path is a supervisor on the till with a PIN step-up (R080, POSV2-3); the directory's purpose \"See every till, open or closed\" needs none of them (R254, F32; design-notes corrections fnb-retail BO-039).",
+    "source": "R254 | R080 | POSV2-3 | contracts/spine/shift.yaml#getCurrentShift"
+   },
+   {
+    "operation": "approveShiftOpen",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-008): Till acts were bound to the back-office directory, including getCurrentShift (\"the shift on the session's workstation\", which a browser has not) and acceptShiftVariance, whose one path is a supervisor on the till with a PIN step-up (R080, POSV2-3); the directory's purpose \"See every till, open or closed\" needs none of them (R254, F32; design-notes corrections fnb-retail BO-039).",
+    "source": "R254 | R080 | POSV2-3 | contracts/spine/shift.yaml#getCurrentShift"
+   },
+   {
+    "operation": "closeShift",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-008): Till acts were bound to the back-office directory, including getCurrentShift (\"the shift on the session's workstation\", which a browser has not) and acceptShiftVariance, whose one path is a supervisor on the till with a PIN step-up (R080, POSV2-3); the directory's purpose \"See every till, open or closed\" needs none of them (R254, F32; design-notes corrections fnb-retail BO-039).",
+    "source": "R254 | R080 | POSV2-3 | contracts/spine/shift.yaml#getCurrentShift"
+   },
+   {
+    "operation": "createCashMovement",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-008): Till acts were bound to the back-office directory, including getCurrentShift (\"the shift on the session's workstation\", which a browser has not) and acceptShiftVariance, whose one path is a supervisor on the till with a PIN step-up (R080, POSV2-3); the directory's purpose \"See every till, open or closed\" needs none of them (R254, F32; design-notes corrections fnb-retail BO-039).",
+    "source": "R254 | R080 | POSV2-3 | contracts/spine/shift.yaml#getCurrentShift"
+   },
+   {
+    "operation": "getCurrentShift",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-008): Till acts were bound to the back-office directory, including getCurrentShift (\"the shift on the session's workstation\", which a browser has not) and acceptShiftVariance, whose one path is a supervisor on the till with a PIN step-up (R080, POSV2-3); the directory's purpose \"See every till, open or closed\" needs none of them (R254, F32; design-notes corrections fnb-retail BO-039).",
+    "source": "R254 | R080 | POSV2-3 | contracts/spine/shift.yaml#getCurrentShift"
+   },
+   {
+    "operation": "openShift",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-008): Till acts were bound to the back-office directory, including getCurrentShift (\"the shift on the session's workstation\", which a browser has not) and acceptShiftVariance, whose one path is a supervisor on the till with a PIN step-up (R080, POSV2-3); the directory's purpose \"See every till, open or closed\" needs none of them (R254, F32; design-notes corrections fnb-retail BO-039).",
+    "source": "R254 | R080 | POSV2-3 | contracts/spine/shift.yaml#getCurrentShift"
+   },
+   {
+    "operation": "recordNoSale",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-008): Till acts were bound to the back-office directory, including getCurrentShift (\"the shift on the session's workstation\", which a browser has not) and acceptShiftVariance, whose one path is a supervisor on the till with a PIN step-up (R080, POSV2-3); the directory's purpose \"See every till, open or closed\" needs none of them (R254, F32; design-notes corrections fnb-retail BO-039).",
+    "source": "R254 | R080 | POSV2-3 | contracts/spine/shift.yaml#getCurrentShift"
+   },
+   {
+    "operation": "reopenShift",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-008): Till acts were bound to the back-office directory, including getCurrentShift (\"the shift on the session's workstation\", which a browser has not) and acceptShiftVariance, whose one path is a supervisor on the till with a PIN step-up (R080, POSV2-3); the directory's purpose \"See every till, open or closed\" needs none of them (R254, F32; design-notes corrections fnb-retail BO-039).",
+    "source": "R254 | R080 | POSV2-3 | contracts/spine/shift.yaml#getCurrentShift"
+   },
+   {
+    "operation": "resumeShift",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-008): Till acts were bound to the back-office directory, including getCurrentShift (\"the shift on the session's workstation\", which a browser has not) and acceptShiftVariance, whose one path is a supervisor on the till with a PIN step-up (R080, POSV2-3); the directory's purpose \"See every till, open or closed\" needs none of them (R254, F32; design-notes corrections fnb-retail BO-039).",
+    "source": "R254 | R080 | POSV2-3 | contracts/spine/shift.yaml#getCurrentShift"
+   },
+   {
+    "operation": "suspendShift",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-008): Till acts were bound to the back-office directory, including getCurrentShift (\"the shift on the session's workstation\", which a browser has not) and acceptShiftVariance, whose one path is a supervisor on the till with a PIN step-up (R080, POSV2-3); the directory's purpose \"See every till, open or closed\" needs none of them (R254, F32; design-notes corrections fnb-retail BO-039).",
+    "source": "R254 | R080 | POSV2-3 | contracts/spine/shift.yaml#getCurrentShift"
+   }
+  ],
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-040",
+  "name": "Variance Approval",
+  "module": "Orders & Money",
+  "requiresModule": "core",
+  "wave": 1,
+  "capability": "C00",
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/venue-operations/variance-approval",
+   "component": "apps/venue-management-web/src/routes/venue-operations/VarianceApprovalDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "exitTo": [
+    "BO-089"
+   ],
+   "inferred": true,
+   "fromFlows": true,
+   "transitions": [
+    {
+     "to": "BO-089",
+     "trigger": "Posts the remaining journals",
+     "provenance": "flow F13 step 2→3",
+     "operation": "listShifts"
+    }
+   ]
+  },
+  "notes": "Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.\n\n**Where the variance goes** (decided 2 October 2026, Chinmay; CHG-FIN-003). The cashier counts blind (`submitShiftCount`) and never sees expected cash or the variance; a count beyond the venue threshold (`shiftVarianceThreshold`, proposed AED 20.00) alerts the supervisors holding OVERSHORT_ACCEPT on the venue's alerting channel and lands here. The supervisor sees counted, expected, the variance (over or short), the cashier's reason and note, and accepts it (`acceptShiftVariance`, never their own shift) or asks for a blind recount at the till. Over and short are both exceptions: an overage is as much a control failure as a shortage.\n\n**As POS-007 (decided 2 October 2026 by Chinmay, DEC-173):** the cashier signs out, the shift is \"Under review\", and the next cashier can start; the supervisor accepts, rejects for a recount, or closes.",
+  "density": "compact",
+  "pattern": "approvalInbox",
+  "patternReason": "`approveShiftOpen` decides items that `listShifts` queues — every row is waiting for a person, so the empty state is success",
+  "purpose": "See which tills are waiting for a variance to be accepted at the till, and which were.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "queue",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Till",
+       "operation": "listWorkstations",
+       "notes": "A pick list in words, never a typed id (design-note correction, 2 October 2026).",
+       "provenance": "contract shift.yaml GET /shifts",
+       "bindsTo": "Workstation.id",
+       "columns": [
+        "Workstation.name"
+       ]
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Status",
+       "operation": "listShifts",
+       "notes": "A pick list in words, never a typed id (design-note correction, 2 October 2026).",
+       "provenance": "contract shift.yaml GET /shifts",
+       "bindsTo": "Shift.status"
+      },
+      {
+       "kind": "datePicker",
+       "label": "Opened from",
+       "operation": "listShifts",
+       "notes": "Sends `?openedFrom=` to `listShifts`.",
+       "provenance": "contract shift.yaml GET /shifts"
+      },
+      {
+       "kind": "datePicker",
+       "label": "Opened to",
+       "operation": "listShifts",
+       "notes": "Sends `?openedTo=` to `listShifts`.",
+       "provenance": "contract shift.yaml GET /shifts"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Waiting for a decision",
+       "bindsTo": "Shift",
+       "columns": [
+        "Shift.principalDisplayName",
+        "Shift.incidents",
+        "Shift.status",
+        "Shift.currency",
+        "Shift.currencyScale",
+        "Shift.depositBoxCode",
+        "Shift.bagNumber",
+        "Shift.countedCash",
+        "Shift.expectedCash",
+        "Shift.variance",
+        "Shift.cashierReason",
+        "Shift.cashierNote"
+       ],
+       "operation": "listShifts",
+       "provenance": "contract shift.yaml GET /shifts"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every cash movement",
+       "bindsTo": "CashMovement",
+       "columns": [
+        "CashMovement.id",
+        "CashMovement.kind",
+        "CashMovement.amount",
+        "CashMovement.denominations",
+        "CashMovement.reference",
+        "CashMovement.reason",
+        "CashMovement.recordedAt",
+        "CashMovement.shiftId",
+        "CashMovement.depositBoxId",
+        "CashMovement.witnessPrincipalId",
+        "CashMovement.withdrawalReason",
+        "CashMovement.authorisedByPrincipalId"
+       ],
+       "operation": "listCashMovements",
+       "provenance": "contract shift.yaml GET /shifts/{shiftId}/cash-movements"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "item",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The shift",
+       "bindsTo": "Shift",
+       "columns": [
+        "Shift.id",
+        "Shift.workstationId",
+        "Shift.venueId",
+        "Shift.scopePath",
+        "Shift.principalId",
+        "Shift.principalDisplayName",
+        "Shift.incidents",
+        "Shift.status",
+        "Shift.currency",
+        "Shift.currencyScale",
+        "Shift.depositBoxCode",
+        "Shift.bagNumber",
+        "Shift.openingFloat",
+        "Shift.salesTotal",
+        "Shift.refundsTotal",
+        "Shift.liftsTotal",
+        "Shift.countedCash",
+        "Shift.expectedCash",
+        "Shift.variance",
+        "Shift.cashierReason",
+        "Shift.cashierNote"
+       ],
+       "operation": "getShift",
+       "provenance": "contract shift.yaml GET /shifts/{shiftId}"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Count by denomination",
+       "bindsTo": "CashCountLine",
+       "operation": "getShiftCountLines",
+       "notes": "**The denomination breakdown of the closing count (decided 2 October 2026 by Chinmay, DEC-176).** Counted figures only, never the expected amount (blind close).",
+       "provenance": "contract shift.yaml GET /shifts/{shiftId}/count-lines"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "decision",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Accept variance",
+       "operation": "acceptShiftVariance",
+       "notes": "At any till of the venue, with the supervisor's PIN (DEC-174).",
+       "provenance": "contract shift.yaml POST /shifts/{shiftId}/accept-variance"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Reject and recount",
+       "operation": "rejectShiftVariance",
+       "notes": "**A supervisor can reject a variance so the cashier recounts and resubmits (decided 2 October 2026 by Chinmay, DEC-175, DI-804; CHG-CSP-013).**",
+       "provenance": "contract shift.yaml POST /shifts/{shiftId}/reject-variance"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Close shift",
+       "operation": "closeShift",
+       "notes": "Supervisor close of a pending shift (pre-apply round: closeShift on POS-007 and the daily reconciliation).",
+       "provenance": "contract shift.yaml POST /shifts/{shiftId}/close"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The variance approval list.",
+   "error": "Could not load. Names which read failed and leaves the variance approval untouched.",
+   "emptyFirstRun": "**Nothing is waiting, which is the good outcome.** An empty queue means every item has been decided; it offers no create action, because creating work is not what it needs.",
+   "emptyNoResults": "Nothing matches the filter on workstationId, status, openedFrom, openedTo and the variance approval are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `REPORT_VIEW_WORKSTATION`, which `listShifts` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listShifts",
+    "contract": "shift",
+    "purpose": "List shifts",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getShift",
+    "contract": "shift",
+    "purpose": "Read a shift",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listCashMovements",
+    "contract": "shift",
+    "purpose": "Lifts, adds and the opening float",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listWorkstations",
+    "contract": "tenancy",
+    "purpose": "List workstations (the pick list)",
+    "trigger": "onLoad",
+    "provenance": "design-note correction, 2 October 2026 (BO-040)"
+   },
+   {
+    "operationId": "getShiftCountLines",
+    "contract": "shift",
+    "purpose": "The closing count by denomination, for review (DEC-176, CHG-CSP-014)",
+    "trigger": "onLoad",
+    "provenance": "design-note correction, 2 October 2026 (BO-040)"
+   },
+   {
+    "operationId": "acceptShiftVariance",
+    "contract": "shift",
+    "purpose": "Accept an over/short beyond the threshold",
+    "trigger": "onAction",
+    "provenance": "design-note correction, 2 October 2026 (BO-040)"
+   },
+   {
+    "operationId": "rejectShiftVariance",
+    "contract": "shift",
+    "purpose": "Send a counted shift back for a recount",
+    "trigger": "onAction",
+    "provenance": "design-note correction, 2 October 2026 (BO-040)"
+   },
+   {
+    "operationId": "closeShift",
+    "contract": "shift",
+    "purpose": "Blind close-out",
+    "trigger": "onAction",
+    "provenance": "design-note correction, 2 October 2026 (BO-040)"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "shiftId",
+     "from": "session"
+    }
+   ],
+   "coldEntry": "Resolves from the session; a cold arrival is the ordinary case.",
+   "preloaded": [
+    "Shift.id",
+    "Shift.workstationId",
+    "Shift.venueId",
+    "Shift.scopePath",
+    "Shift.principalId"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-040"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 13 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "gaps": [
+   {
+    "operation": "approveShiftOpen",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-008): acceptShiftVariance on BO-040 contradicts R080 (e) and the contract itself (\"BO-040 lists the shifts waiting here; it does not approve them by another route\"); the till and lifecycle operations were bulk-attached (R254, POSV2-3; design-notes corrections fnb-retail BO-040).",
+    "source": "R080 | R254 | POSV2-3 | contracts/spine/shift.yaml#acceptShiftVariance"
+   },
+   {
+    "operation": "createCashMovement",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-008): acceptShiftVariance on BO-040 contradicts R080 (e) and the contract itself (\"BO-040 lists the shifts waiting here; it does not approve them by another route\"); the till and lifecycle operations were bulk-attached (R254, POSV2-3; design-notes corrections fnb-retail BO-040).",
+    "source": "R080 | R254 | POSV2-3 | contracts/spine/shift.yaml#acceptShiftVariance"
+   },
+   {
+    "operation": "getCurrentShift",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-008): acceptShiftVariance on BO-040 contradicts R080 (e) and the contract itself (\"BO-040 lists the shifts waiting here; it does not approve them by another route\"); the till and lifecycle operations were bulk-attached (R254, POSV2-3; design-notes corrections fnb-retail BO-040).",
+    "source": "R080 | R254 | POSV2-3 | contracts/spine/shift.yaml#acceptShiftVariance"
+   },
+   {
+    "operation": "openShift",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-008): acceptShiftVariance on BO-040 contradicts R080 (e) and the contract itself (\"BO-040 lists the shifts waiting here; it does not approve them by another route\"); the till and lifecycle operations were bulk-attached (R254, POSV2-3; design-notes corrections fnb-retail BO-040).",
+    "source": "R080 | R254 | POSV2-3 | contracts/spine/shift.yaml#acceptShiftVariance"
+   },
+   {
+    "operation": "recordNoSale",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-008): acceptShiftVariance on BO-040 contradicts R080 (e) and the contract itself (\"BO-040 lists the shifts waiting here; it does not approve them by another route\"); the till and lifecycle operations were bulk-attached (R254, POSV2-3; design-notes corrections fnb-retail BO-040).",
+    "source": "R080 | R254 | POSV2-3 | contracts/spine/shift.yaml#acceptShiftVariance"
+   },
+   {
+    "operation": "reopenShift",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-008): acceptShiftVariance on BO-040 contradicts R080 (e) and the contract itself (\"BO-040 lists the shifts waiting here; it does not approve them by another route\"); the till and lifecycle operations were bulk-attached (R254, POSV2-3; design-notes corrections fnb-retail BO-040).",
+    "source": "R080 | R254 | POSV2-3 | contracts/spine/shift.yaml#acceptShiftVariance"
+   },
+   {
+    "operation": "resumeShift",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-008): acceptShiftVariance on BO-040 contradicts R080 (e) and the contract itself (\"BO-040 lists the shifts waiting here; it does not approve them by another route\"); the till and lifecycle operations were bulk-attached (R254, POSV2-3; design-notes corrections fnb-retail BO-040).",
+    "source": "R080 | R254 | POSV2-3 | contracts/spine/shift.yaml#acceptShiftVariance"
+   },
+   {
+    "operation": "suspendShift",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-008): acceptShiftVariance on BO-040 contradicts R080 (e) and the contract itself (\"BO-040 lists the shifts waiting here; it does not approve them by another route\"); the till and lifecycle operations were bulk-attached (R254, POSV2-3; design-notes corrections fnb-retail BO-040).",
+    "source": "R080 | R254 | POSV2-3 | contracts/spine/shift.yaml#acceptShiftVariance"
+   }
+  ],
+  "purposeNote": "Purpose rewritten 2 October 2026 (CHG-WIR-010): The purpose \"Accept or refuse a till that did not balance\" promises an act the screen does not have; nothing is approved here and the contract has no refuse (R080; design-notes correction fnb-retail BO-040).",
+  "overlays": [
+   {
+    "id": "formAcceptShiftVariance",
+    "component": "modal",
+    "trigger": "Accept variance",
+    "body": "**Collects what `acceptShiftVariance` sends before it is called.** Required: `reason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Accept variance",
+     "operation": "acceptShiftVariance"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "reason"
+     ]
+    },
+    "provenance": "contract shift.yaml POST /shifts/{shiftId}/accept-variance"
+   },
+   {
+    "id": "formRejectShiftVariance",
+    "component": "modal",
+    "trigger": "Reject and recount",
+    "body": "**Collects what `rejectShiftVariance` sends before it is called.** Required: `reason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Reject and recount",
+     "operation": "rejectShiftVariance"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "reason"
+     ]
+    },
+    "provenance": "contract shift.yaml POST /shifts/{shiftId}/reject-variance"
+   },
+   {
+    "id": "formCloseShift",
+    "component": "modal",
+    "trigger": "Close shift",
+    "body": "**Collects what `closeShift` sends before it is called.** Required: `countedCash`, `recordedAt`. Optional: `nonCashDeclared`, `notes`, `cashierReason`, `releaseHeldLeases`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Close shift",
+     "operation": "closeShift"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "countedCash",
+      "recordedAt",
+      "nonCashDeclared",
+      "notes",
+      "cashierReason",
+      "releaseHeldLeases"
+     ]
+    },
+    "provenance": "contract shift.yaml POST /shifts/{shiftId}/close"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",

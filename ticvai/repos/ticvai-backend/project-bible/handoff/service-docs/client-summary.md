@@ -6,7 +6,7 @@ This summary describes the four parts of the first release and the back-end serv
 
 ### Point of Sale
 
-40 screens: 27 in wave 1, 13 in wave 2.
+42 screens: 29 in wave 1, 13 in wave 2.
 
 Areas covered: Kitchen, Payment, Reports, Sell, Shift.
 
@@ -18,15 +18,15 @@ Areas covered: Account & Self-Service, Booking & Selection, Cart & Checkout, Dis
 
 ### Guest App - Mobile
 
-77 screens: 25 in wave 1, 35 in wave 2, 17 in wave 3.
+77 screens: 25 in wave 1, 36 in wave 2, 16 in wave 3.
 
 Areas covered: Account & Self-Service, Booking & Selection, Cart & Checkout, Discovery, Discovery & Browse, Engagement & Support, High-Demand Access, In-Venue Experience, In-venue Services, Marketing, Membership, Loyalty & Value, Promotions, Retail, Support, System States, Ticketing, Transport.
 
 ### White Labelling
 
-26 screens: 3 in wave 1, 23 in wave 2.
+27 screens: 3 in wave 1, 23 in wave 2, 1 in wave 3.
 
-Areas covered: Branding & Localisation, White Label.
+Areas covered: Branding & Localisation, Tenants & Licensing, White Label.
 
 ## The services behind them
 

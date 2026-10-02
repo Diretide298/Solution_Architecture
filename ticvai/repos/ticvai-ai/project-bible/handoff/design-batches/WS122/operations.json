@@ -145,6 +145,45 @@
   "requestBody": null,
   "responds": "AiDecisionTrace"
  },
+ "listAiCapabilities": {
+  "method": "GET",
+  "path": "/governance/capabilities",
+  "contract": "ai",
+  "summary": "The capability registry",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "family",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "riskClass",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "listAiGovernancePolicyVersions": {
   "method": "GET",
   "path": "/governance/policy-versions",
@@ -255,6 +294,35 @@
   "requestBody": null,
   "responds": "ApprovalMatrix"
  },
+ "listOwnPlatformStaffGrants": {
+  "method": "GET",
+  "path": "/platform-staff-grants/mine",
+  "contract": "identity",
+  "summary": "The calling platform operator's own grants into this tenant",
+  "permission": "PLATFORM_TENANT_ACCESS",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "activeOnly",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "listProposedActions": {
   "method": "GET",
   "path": "/proposed-actions",
@@ -267,6 +335,59 @@
   "parameters": [],
   "requestBody": null,
   "responds": "ProposedAction"
+ },
+ "listTenants": {
+  "method": "GET",
+  "path": "/tenants",
+  "contract": "subscription",
+  "summary": "List tenants",
+  "permission": "PLATFORM_TENANT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "planId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "openPlatformStaffGrant": {
+  "method": "POST",
+  "path": "/platform-staff-grants",
+  "contract": "identity",
+  "summary": "A platform operator opens a time-boxed grant into this tenant",
+  "permission": "PLATFORM_TENANT_ACCESS",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "PlatformStaffGrant"
  },
  "overrideAiDecision": {
   "method": "POST",

@@ -217,24 +217,5 @@
   ],
   "requestBody": "MessageTrigger",
   "responds": "MessageTrigger"
- },
- "setRefundCompensationService": {
-  "method": "PUT",
-  "path": "/refund-compensation-service",
-  "contract": "marketing-crm",
-  "summary": "Raise or change a refund, compensation or policy-exception request on a case",
-  "permission": "ORDER_REFUND",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "RefundCompensationServiceExceptionWorkspaceInput",
-  "responds": "RefundCompensationServiceExceptionWorkspaceView"
  }
 }

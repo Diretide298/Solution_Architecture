@@ -1,11 +1,11 @@
 id: F154
 name: 'Promotions   Bundles Management board 1: Promotion Command Center Dashboard'
-actor: platformAdmin
+actor: venueManager
 wave: 3
 frequency: routine
 criticality: operational
 platforms:
-- P09 TICVAI Web
+- P08 Venue Management
 provenance: derived-from-board
 offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
   not guess.
@@ -40,9 +40,11 @@ steps:
   screen: ADM-140
   action: Works in Promotion Overview
   operations:
-  - listPromotions
+  - getPromotion
+  - getPromotionUsage
   outcome: Provide the complete business summary of one selected promotion without opening its detailed
     configuration.
+  note: '**Repointed 2 October (CHG-WIR-025).** The overview of one promotion reads that promotion and its usage, not the whole list.'
 - step: 5
   screen: ADM-138
   action: Returns to the board's landing screen

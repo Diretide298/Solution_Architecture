@@ -1,6 +1,6 @@
 # P08-orders-money-03 — P08 · Orders & Money (3 of 3)
 
-**7 screens · 42 operations · 39 schemas · 8 permissions**
+**6 screens · 33 operations · 34 schemas · 7 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -48,8 +48,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 8 permissions apply here:
-  `ACCOUNT_CONFIGURE, LEDGER_APPROVE, LEDGER_POST, LEDGER_VIEW, ORDER_VIEW, SETTLEMENT_VIEW, TAX_CONFIGURE, TENANT_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 7 permissions apply here:
+  `ACCOUNT_CONFIGURE, LEDGER_APPROVE, LEDGER_POST, LEDGER_VIEW, ORDER_VIEW, SETTLEMENT_VIEW, TAX_CONFIGURE`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -61,19 +61,77 @@ convincingly. It is never a caption.
   and its error; and, element by element, what is shown and in what format, what each action
   produces and where the user goes next. Draw exactly that.
 
+## The processes these screens belong to
+
+Written by the owner of each process (`handoff/design-notes/`). Read before any screen: it says how the process runs end to end and which words the screens must use.
+
+### Finance, Ledger & Tax · Reporting & Analytics
+
+Finance and insights run underneath every sale. A sale at a till (P04), kiosk, web storefront (P01) or guest app (P02) is priced and taxed per line at the moment of sale, recorded in the venue's base currency (AED in the UAE; 2 decimals, or 3 for BHD, KWD and OMR, never rounded away), and posted to an append-only dual ledger through account mappings per money event; anything unmapped lands in suspense. Tax follows the jurisdiction's tax profile: inclusive or exclusive, compound where a tax applies on another, zero-rated or exempt with verified evidence, and computed on the discounted price by default or on the price before discount where the region requires it (Egypt). A guest may select a currency the venue charges and pay in it: the rate is locked on the order, the payment partner is asked in that currency, the ledger keeps the base amount with the rate, and a refund goes back in the currency paid (decided 2 October 2026, Chinmay); a currency shown but not charged is an approximate price. Foreign cash at a till is recorded at its base equivalent and change is given in base currency. A paid order can carry a VAT receipt (simplified tax invoice), a full tax invoice with the buyer's TRN, or a consolidated invoice for a company, each numbered without gaps and never edited; corrections are credit memos. Revenue is recognised by rule: POS-style immediate, tickets on the visit, gift cards and wallet on use, annual passes straight-line or per visit, breakage on expiry; deferred revenue is a balance that ages. Each venue's day is reconciled (POS cash, gateways, bank, wallet against the ledger, provider files matched automatically, only genuine mismatches to a person); chargebacks are defended against the bank's deadline; month end runs seven close checks and goes to a finance approver. Nothing posted is deleted: a correction is a reversal, an approver is never the preparer, and ledger approval needs a second factor. Back-office finance lives in Venue Management (P08: chart of accounts, mapping, FX, journals, recognition, reconciliation, period close, chargebacks); tax profiles, calculation validation and platform reconciliation in the TICVAI Console (P09); partner settlement in P10. Reporting is one consolidated, permission-based area (Analytics, P16): seeded standard dashboards and reports plus no-code builders over a governed business catalogue; the P08 report screens, the POS terminal day view and the kitchen performance view are scoped windows onto the same definitions and must show the same numbers. Every figure is read from a lag-tolerant reporting copy and shows its "as of" time; scope comes from the person's rights, never from a filter; AI explains and recommends but never acts, answers only within the person's role, labels forecasts, and is phase two for finance ledgers.
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Base currency | The venue's region currency; the currency every record and ledger posting is in. A guest may pay in a currency they select (where the venue charges it); the books still hold the base amount and the rate. | Home currency, Local price, Default currency | DI-211 / DI-282 / contracts/spine/orders.yaml#/components/schemas/Order |
+| Pay in USD (a currency the venue charges) | The guest's selected payment currency; the card is charged in it at the rate locked on the order, and refunds go back in it. | Converted price, Approx. (for a charged currency) | contracts/spine/orders.yaml#checkoutCart / … |
+| ≈ (approx.) price in USD / SAR / … | A conversion of a base-currency price for a currency the venue shows but does not charge, always next to the base price. | Converted price, USD price | DI-211 / screens/P02-guest-mobile-app.yaml#GST-044 |
+| Takings | Money received in the period less refunds (cash-basis); the seeded KPI on hubs. | Revenue, Sales, Income | contracts/satellite/reporting.yaml#/components/schemas/ReportingSystemKpi / R283 |
+| Gross sales | Issued sales before discounts and refunds; whether tax is included must be stated on the tile. | Revenue, Turnover | MATRIX 6.1.78 |
+| Net revenue | Gross sales less discounts less refunds, adjusted per finance policy. | Net sales, Revenue, Income | MATRIX 6.1.78 |
+| Recognised revenue / Deferred revenue | Earned under the recognition rules / paid for but not yet earned. Kept distinct from sales. | Realised revenue, Unearned income, Wallet revenue | MATRIX 5.12.6 / DI-260 / contracts/spine/finance.yaml#getDeferredRevenue |
+| VAT receipt | The simplified tax invoice issued on a paid order. | Receipt (when it is a tax document), Bill | contracts/spine/finance.yaml#issueTaxInvoice |
+| Tax invoice / Combined tax invoice | A full invoice with the buyer's details / one invoice for several paid orders of one buyer. | Bill, Statement | contracts/spine/finance.yaml#/components/schemas/FinTaxInvoiceType |
+| Credit memo | The document that corrects an issued invoice after a refund; the invoice itself is never edited. | Credit note (until the client's tax adviser chooses "Tax credit note"), Edit invoice | contracts/spine/finance.yaml#/components/schemas/FinTaxInvoice |
+| VAT (or the jurisdiction's tax name) | Use the tax profile's own name on every surface; "Tax" only where several kinds are summed. | GST in UAE, Service charge for a tax | contracts/spine/catalogue.yaml#setTaxProfileJurisdiction |
+| Price before discount | The taxable base where the jurisdiction taxes the undiscounted price. | Gross price, List tax | DI-598 |
+| Post / Reverse | A journal reaches the ledger when approved and posted; a correction is a reversal, never an edit or delete. | Edit entry, Delete entry, Undo | contracts/spine/finance.yaml#reverseJournalEntry |
+| Period (Open / Closing / Closed) | A fiscal period's state; closing stops postings, closed locks them. | Month locked, Frozen | contracts/spine/finance.yaml#/components/schemas/PeriodStatus |
+| Variance (Over / Short) | The difference between expected and counted or recorded, always saying between which two figures. | Discrepancy, Error, Loss | DI-275 / contracts/spine/finance.yaml#/components/schemas/UnifiedReconciliation |
+| Settlement / Exception / Resolve | A provider's file for a day / a line that did not match / the recorded explanation. | Payout file, Error, Close | contracts/spine/finance.yaml#/components/schemas/SettlementException |
+| Chargeback | A bank-initiated reversal with an evidence deadline; not a refund. | Dispute refund, Reversal | contracts/spine/orders.yaml#/components/schemas/Chargeback |
+| Report / Dashboard / Tile / KPI | A runnable, exportable, schedulable definition / a page of tiles / one visual bound to a report / a company-wide measure defined once. | Widget (outside the builder's library), Board (for a user-facing dashboard) | contracts/satellite/reporting.yaml#/components/schemas/DashboardTile / … |
+| Warning / Critical | KPI status bands set by a target's amber and red thresholds; always words plus colour. | Amber, Red (alone), Bad | contracts/satellite/reporting.yaml#/components/schemas/KpiTarget |
+| As of HH:MM / Updated N sec ago | The freshness of every figure read from the reporting copy; stale shows a warning. | Live (unless refreshed), Real-time | MATRIX 8.7.22 |
+| Forecast | Any projected figure, with its range; never shown as a fact. | Expected, Will be | DI-973 |
+| Outlet / Workstation (till) | A sales point / the device; staff copy may say "till" for the workstation. | Store, POS (in copy), Drawer (for the device) | R156 |
+| Channel | POS, Web, App, Kiosk, B2B, OTA, from one closed list. | Source, Platform | MoM 2026-08-18 4.2 Recipes, Operating Hours & Service Channels / MATRIX 1.4.7 |
+
+### Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management)
+
+Platform Foundation is everything the apps stand on. Five apps each have one door: the guest app and website (WEB-016, GST-042: a six-digit code to email or mobile, a password, Apple or Google, UAE Pass; never enterprise SSO), the till (POS-000: employee number and PIN, recent operators as tiles; the kitchen display is the same app), the staff handheld and scanner (EMP-001, SCN-001), Venue Management (SUP-001, the single door for the back office P08, the CMS P13, analytics P16 and the support desk P12) and TICVAI Control (ADM-001 for TICVAI's own platform operators, PTR-001 for partner users; the developer portal P14 and the sign-up P17 belong to this app too). A second factor is required by permission, not by role or device: ROLE_MANAGE, LEDGER_APPROVE and every PLATFORM_* permission, plus any the tenant adds; so a cashier never sees it and a platform operator always does. The factor is an authenticator app with an emailed code as fallback; five wrong codes lock step-up for the lockout minutes, never permanently. Guests get two-step verification only at a venue that switched it on. One person holds one session per workstation: a second sign-in is refused and only a supervisor ends the other session. Several roles mean a role prompt; one role goes straight in. The workstation decides the Sale Board, hardware and till identity, never what a person may do. Sensitive actions (refund approval, journal approval, credential reset, partner credit, commission rules, opening a platform-staff grant and 17 more) demand a fresh step-up on the operation itself, asked in place in the action's confirmation; the tenant may raise the strength, never remove it. Permission outcomes are three, never one word: self-authorised (proceeds, audited), escalated (a supervisor PIN in place), refused (the denied state, naming the permission); a missing permission is never an empty table, and a record outside the person's venues is "not found", indistinguishable from absent. The hierarchy is binding (tenant, brand, region, venue, department, sub-department, workstation; outlet beside department for F&B and retail); region owns currency, decimals, time zone, date format and fiscal year; configuration resolves nearest-ancestor across tenant, region and venue (outlet for F&B and retail), venue is the floor and a workstation is assigned a profile, never configured; every configuration screen says which level it writes and what it inherits. Venue Management is one tenant-level surface filtering across the venues in the session's scope. TICVAI's Console runs outside every cell: a platform operator picks a tenant and opens a time-boxed, audited platform-staff grant (with step-up) before any tenant action, and the tenant sees every action in its audit log (ADM-412 is the reference implementation). Approval workflows record authorisations and never perform the action; the requester cannot approve their own request; a venue may tighten and never loosen a rule from above; in-flight …
+*(source: screens/P12-support-agent-console.yaml#SUP-001; R135; R126; R167; DI-1072; ADR-0002; ADR-0003; ADR-0004; R184; contracts/spine/identity.yaml#createMfaChallenge; contracts/spine/approvals.yaml#setStepUpPolicy; ADR-0011; ADR-0018; ADR-0029; R098; contracts/spine/approvals.yaml#decideApprovalRequest …)*
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Sign in / Sign out | Entering and leaving any app, staff or guest. | Login, Log in, Logon, Logout | screens/P04-point-of-sale.yaml#POS-000 … |
+| Authentication code | The staff second factor from the authenticator app (or the emailed fallback). | OTP, 2FA code, token | screens/P09-platform-admin-console.yaml#ADM-001 |
+| One-time code | The six-digit code a guest receives to sign in or prove a contact. | OTP, PIN, password | DI-1034; R167 |
+| Two-step verification | The guest's optional second factor, asked only at venues that switched it on. | MFA, 2FA | DI-1072 |
+| Tenant / Brand / Region / Venue / Department / Outlet | The binding hierarchy levels; region owns currency and dates; outlet is F&B or retail inside a venue. | Client, Customer, Org (for tenant), Site, Park, Property (for venue), Area, Territory (for region) | ADR-0011; ADR-0018 |
+| Workstation (back office) / till (operator copy) | A configured device; decides Sale Board, hardware and till identity, never authorisation. | Terminal, Station, POS (for the device), till (for the Deposit Box) | ADR-0002; R156 |
+| Sale Board | The configured front end a workstation loads (ticketing, F&B or retail). | Screen, Layout, Menu | ADR-0003 |
+| Role | A named, fully configurable grouping of permissions; the seeded five are editable starting points. | Group, Profile | R229 |
+| Staff member / Partner user / Platform operator | A tenant's staff principal; a partner's user; a TICVAI employee in the Console. | User (alone), Account, Agent (for venue staff) | F104 step 1; F104 step 4; F104 step 5 |
+| Platform-staff grant | The time-boxed, audited access a platform operator opens into one tenant before acting in it. | Impersonation, Support login | R098 |
+| Escalate / Refused | Escalate is supervisor approval captured in place; Refused is the denied state that names the permission. | Denied (for an action that can be escalated) | R197 |
+| Approve / Reject / Return / Request information | The four decisions on an approval request; Withdraw is the requester's own act and never a rejection. | Accept, Decline, Cancel (for withdraw) | contracts/spine/approvals.yaml#decideApprovalRequest … |
+| Subscription / Plan / Module / Licence | TICVAI's commercial relationship with a tenant, its plan, the modules it licenses and the limits. | Membership (that is the guest's pass) | R214 |
+| Membership / Annual pass | A guest's pass product and its holder (BO-284 to BO-303). | Subscription (that is the tenant's TICVAI plan) | screens/P08-venue-back-office.yaml#BO-284 |
+| Sandbox client / Production client | A developer's own test credential; a TICVAI-issued live credential after certification. | Test key, Live key, API key (without environment) | DI-927 |
+| Asset (DAM) / Media (ticket) | A digital file in the library; ticket media is a wristband or card carrying entitlements. Never mix them. | Media (for a library asset) | contracts/satellite/assets.yaml#searchMedia … |
+
+
 ## The screens
 
 Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs count fields; requirements are matrix rows; meeting inputs are the ones naming the screen (the module and platform ones are below); white label says whether the tenant's brand reaches it (guest) or it sets the brand (configures).
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-074` | Chart of Accounts | A | 35 | 44 | 6 | 39 | 2 | 0 | — | notStarted (generated) |
 | `BO-075` | Account Mapping | A | 31 | 43 | 6 | 16 | 2 | 0 | — | notStarted (generated) |
 | `BO-076` | Revenue Recognition | B–D | 16 | 31 | 6 | 74 | 2 | 0 | — | notStarted (generated) |
-| `BO-077` | FX Rates & Variances | A | 15 | 34 | 6 | 1 | 2 | 4 | — | notStarted (generated) |
+| `BO-077` | FX Rates & Variances | A | 15 | 29 | 6 | 1 | 2 | 4 | — | notStarted (generated) |
 | `BO-089` | Journal Entries | B–D | 19 | 28 | 6 | 22 | 1 | 0 | — | notStarted (generated) |
 | `BO-090` | Period Close | B–D | 5 | 22 | 6 | 11 | 1 | 0 | — | notStarted (generated) |
-| `BO-101` | Orders & Money | B–D | 7 | 38 | 6 | 22 | 0 | 0 | — | notStarted (generated) |
+| `BO-101` | Orders & Money | B–D | 7 | 27 | 6 | 5 | 0 | 0 | — | notStarted (generated) |
 
 ---
 
@@ -81,263 +139,9 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 **One block per screen, in the order to build them.** Each says what the user enters (every control, with its rules), what the screen shows and produces (every field, with its format; every action, with what it returns and the errors to draw), every state, who may do what, the requirements it meets, what the client said about it, the tracker items, what the tenant configures, the references, and an acceptance checklist. **Everything in a block is for you, never for the screen**: no id, field name, operation or permission key may appear as text.
 
-### `BO-074` Chart of Accounts
-
-**Accounts, cost centres and legal entities.**
-
-| | |
-|---|---|
-| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
-| Module | Orders & Money · wave 1 · needs the `core` module |
-| Block | Block A · ticket #18126 (APP-SETUP-BO-074) |
-| Who uses it | venue staff holding `ACCOUNT_CONFIGURE`, `LEDGER_VIEW` (1 configure, 1 read); in the flows as finance controller, platform admin |
-| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
-| Pattern | listDetail (compact density): `listAccounts` reads the population and `getAccount` reads one of them — list, select, act |
-| Offline | online only |
-| Opens with | `accountId` (deepLink) · cold entry: **A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know … |
-| Route | `/finance/chart-of-accounts` |
-
-**What the spec says about it.** Added 17 August because the contract had operations no screen declared. **Not on the wireframe board** — needs drawing. Pulled to Wave 1 (CF-101). **F16 says it itself** — no chart of accounts blocks the first sale, so it cannot be Wave 2 while venue provisioning is Wave 1.
-
-#### Inputs: what the user enters or picks
-
-**On the screen**
-
-| Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
-|---|---|---|---|---|---|---|---|
-| Legal entity id | picker: choose a legal entity (drawn as a picker, not a text box) | optional | — | — | shows names, sends the id | Sends `?legalEntityId=` to `listAccounts`. | `listAccounts` ?legalEntityId |
-| Type | radio group | optional | — | Asset · Liability · Equity · Revenue · Expense | — | Sends `?type=` to `listAccounts`. | `listAccounts` ?type |
-| Is postable | toggle | optional | — | Parent accounts aggregate and cannot be posted to. | — | Sends `?isPostable=` to `listAccounts`. | `listAccounts` ?isPostable |
-
-**Form: Create account** (modal, opened by *Create account*; *Create account* calls `createAccount`, *Cancel* sends nothing)
-
-**Collects what `createAccount` sends before it is called.** Required: `code`, `name`, `type`, `legalEntityId`. Optional: `externalCode`, `parentId`, `isPostable`, `isSuspense`, `subType`, `tags`, `notes`. Dismissing sends nothing; the screen behind is unchanged.
-
-| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
-|---|---|---|---|---|---|---|---|
-| Code `code` | text field | required | — | max length 64; pattern `^[A-Za-z0-9._-]+$` | — | — | `createAccount` body |
-| External code `externalCode` | text field | optional | — | max length 64 | — | — | `createAccount` body |
-| Name `name` | text field | required | — | max length 200 | — | — | `createAccount` body |
-| Type `type` | radio group | required | — | Asset · Liability · Equity · Revenue · Expense | — | — | `createAccount` body |
-| Parent `parentId` | picker: choose a parent | optional | — | — | shows names, sends the id | — | `createAccount` body |
-| Legal entity `legalEntityId` | picker: choose a legal entity | required | — | — | shows names, sends the id | — | `createAccount` body |
-| Is postable `isPostable` | toggle | optional | on | — | — | — | `createAccount` body |
-| Is suspense `isSuspense` | toggle | optional | off | — | — | See `Account.isSuspense`. | `createAccount` body |
-| Sub type `subType` | text field | optional | — | — | — | See `Account.subType`. | `createAccount` body |
-| Tags `tags` | list of values (chips) | optional | — | — | — | See `Account.tags`. | `createAccount` body |
-| Notes `notes` | text area | optional | — | — | — | See `Account.notes`. | `createAccount` body |
-
-Errors to draw in the form: 400 Validation failed; 409 Code already in use within this legal entity
-
-**Form: Save account** (modal, opened by *Save account*; *Save account* calls `updateAccount`, *Cancel* sends nothing)
-
-**Collects what `updateAccount` sends before it is called.** Nothing in the body is required. Optional: `code`, `name`, `externalCode`, `isActive`, `isSuspense`, `subType`, `tags`, `notes`. Dismissing sends nothing; the screen behind is unchanged.
-
-| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
-|---|---|---|---|---|---|---|---|
-| Code `code` | text field | optional | — | max length 64; pattern `^[A-Za-z0-9._-]+$` | — | Accepted only while the account has no entries. | `updateAccount` body |
-| Name `name` | text field | optional | — | max length 200 | — | — | `updateAccount` body |
-| External code `externalCode` | text field | optional | — | max length 64 | — | — | `updateAccount` body |
-| Is active `isActive` | toggle | optional | — | — | — | — | `updateAccount` body |
-| Is suspense `isSuspense` | toggle | optional | — | — | — | — | `updateAccount` body |
-| Sub type `subType` | text field | optional | — | — | — | — | `updateAccount` body |
-| Tags `tags` | list of values (chips) | optional | — | — | — | — | `updateAccount` body |
-| Notes `notes` | text area | optional | — | — | — | — | `updateAccount` body |
-
-Errors to draw in the form: 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 `code` sent for an account that already has entries, or a new code already in use within the legal entity.
-
-**Form: Create cost center** (modal, opened by *Create cost center*; *Create cost center* calls `createCostCenter`, *Cancel* sends nothing)
-
-**Collects what `createCostCenter` sends before it is called.** Required: `code`, `name`. Optional: `parentId`, `venueId`. Dismissing sends nothing; the screen behind is unchanged.
-
-| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
-|---|---|---|---|---|---|---|---|
-| Code `code` | text field | required | — | max length 64 | — | — | `createCostCenter` body |
-| Name `name` | text field | required | — | max length 200 | — | — | `createCostCenter` body |
-| Parent `parentId` | picker: choose a parent | optional | — | — | shows names, sends the id | — | `createCostCenter` body |
-| Venue `venueId` | picker: choose a venue | optional | — | — | shows names, sends the id | — | `createCostCenter` body |
-
-**Form: Create legal entity** (modal, opened by *Create legal entity*; *Create legal entity* calls `createLegalEntity`, *Cancel* sends nothing)
-
-**Collects what `createLegalEntity` sends before it is called.** Required: `id`, `code`, `name`, `countryCode`, `currency`, `currencyScale`, `fiscalYearStartMonth`. Optional: `taxRegistrationNumber`, `regionIds`, `isActive`, `scopePath`. Dismissing sends nothing; the screen behind is unchanged.
-
-| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
-|---|---|---|---|---|---|---|---|
-| Code `code` | text field | required | — | max length 64 | — | — | `createLegalEntity` body |
-| Name `name` | text field | required | — | max length 200 | — | — | `createLegalEntity` body |
-| Country code `countryCode` | text field | required | — | pattern `^[A-Z]{2}$` | — | — | `createLegalEntity` body |
-| Currency `currency` | text field | required | — | pattern `^[A-Z]{3}$` | — | — | `createLegalEntity` body |
-| Currency scale `currencyScale` | stepper or slider | required | — | min 0; max 4 | — | — | `createLegalEntity` body |
-| Tax registration number `taxRegistrationNumber` | text field | optional | — | — | — | — | `createLegalEntity` body |
-| Fiscal year start month `fiscalYearStartMonth` | stepper or slider | required | — | min 1; max 12 | — | — | `createLegalEntity` body |
-| Regions `regionIds` | multi-picker: choose regions | optional | — | — | — | — | `createLegalEntity` body |
-| Is active `isActive` | toggle | optional | — | — | — | — | `createLegalEntity` body |
-
-#### Outputs: what the screen shows and produces
-
-**Shown**
-
-**Every account** (data table, from `listAccounts`)
-
-| Shows | Format | Notes |
-|---|---|---|
-| ID | the name it points at, never the id | — |
-| Code | text | — |
-| External code | text | Code in the client's own chart. Used on export so their team sees their codes. |
-| Is suspense | yes / no (icon or chip) | 5.7.x. Where a posting with no account mapping goes. |
-| Sub type | text | 5.7.27. `AccountType` stays a closed enum of asset, liability, equity, revenue and expense because that is correct accounting, and a venue … |
-| Tags | list or chips (count when long) | How a venue groups accounts for its own reporting. Free-form, and outside the type. |
-| Notes | text | 5.7.27. Annotations on the account, which an auditor reads before the balance. |
-| Name | text | — |
-| Type | chip: Asset, Liability, Equity, Revenue, Expense | — |
-| Parent | the name it points at, never the id | — |
-| Legal entity | the name it points at, never the id | — |
-| Currency | text | — |
-
-**Every cost center** (data table, from `listCostCenters`)
-
-| Shows | Format | Notes |
-|---|---|---|
-| ID | the name it points at, never the id | — |
-| Code | text | — |
-| Name | text | — |
-| Parent | the name it points at, never the id | — |
-| Venue | the name it points at, never the id | — |
-| Is active | yes / no (icon or chip) | — |
-
-**Every legal entity** (data table, from `listLegalEntities`)
-
-| Shows | Format | Notes |
-|---|---|---|
-| ID | the name it points at, never the id | — |
-| Code | text | — |
-| Name | text | — |
-| Country code | text | — |
-| Currency | text | — |
-| Currency scale | 1,234 | — |
-| Tax registration number | text | — |
-| Fiscal year start month | 1,234 | — |
-| Regions | list or chips (count when long) | — |
-| Is active | yes / no (icon or chip) | — |
-| Scope path | text | The partition key (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it … |
-
-**The selected account** (detail panel, from `getAccount`)
-
-| Shows | Format | Notes |
-|---|---|---|
-| ID | the name it points at, never the id | — |
-| Code | text | — |
-| External code | text | Code in the client's own chart. Used on export so their team sees their codes. |
-| Is suspense | yes / no (icon or chip) | 5.7.x. Where a posting with no account mapping goes. |
-| Sub type | text | 5.7.27. `AccountType` stays a closed enum of asset, liability, equity, revenue and expense because that is correct accounting, and a venue … |
-| Tags | list or chips (count when long) | How a venue groups accounts for its own reporting. Free-form, and outside the type. |
-| Notes | text | 5.7.27. Annotations on the account, which an auditor reads before the balance. |
-| Name | text | — |
-| Type | chip: Asset, Liability, Equity, Revenue, Expense | — |
-| Parent | the name it points at, never the id | — |
-| Legal entity | the name it points at, never the id | — |
-| Currency | text | — |
-| Is postable | yes / no (icon or chip) | False for parent accounts, which aggregate only. |
-| Is active | yes / no (icon or chip) | — |
-| Balance | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-
-**Actions and what each produces**
-
-| Action | Calls | Sends | On success returns | Errors to show | Notes |
-|---|---|---|---|---|---|
-| Create account (primary button) | `createAccount` POST `/accounts` | CreateAccountRequest | Account | 400 Validation failed; 409 Code already in use within this legal entity | opens modal first |
-| Save account (secondary button) | `updateAccount` PATCH `/accounts/{accountId}` | inline | Account | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 `code` sent for an account that already has entries, or a new code already in use within the legal entity. | opens modal first |
-| Create cost center (secondary button) | `createCostCenter` POST `/cost-centers` | inline | CostCenter | — | opens modal first |
-| Create legal entity (secondary button) | `createLegalEntity` POST `/legal-entities` | LegalEntity | LegalEntity | — | opens modal first |
-
-**Data it reads**: `listAccounts` (onLoad, List the chart of accounts); `listCostCenters` (onLoad, List cost centres); `listLegalEntities` (onLoad, List legal entities)
-
-**Where the user goes next**
-
-- → `BO-075` Account Mapping: *Maps products to accounts*
-- → `BO-077` FX Rates & Variances: *FX Rates & Variances*
-
-#### States
-
-| State | What it shows |
-|---|---|
-| Loading (`?state=loading`) | The chart accounts list. |
-| Error (`?state=error`) | Could not load. Names which read failed and leaves the chart accounts untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No chart accounts yet. Offers Create account (`createAccount`); distinct from a filter that matched nothing. |
-| Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on legalEntityId, type, isPostable and the chart accounts are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `LEDGER_VIEW`, which `listAccounts` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 Code already in use within this legal entity; 409 `code` sent for an account that already has entries, or a new code already in use within the legal entity. |
-
-#### Permissions
-
-- `listAccounts` → `LEDGER_VIEW` (read) · staff
-- `getAccount` → `LEDGER_VIEW` (read) · staff
-- `createAccount` → `ACCOUNT_CONFIGURE` (configure) · staff
-- `updateAccount` → `ACCOUNT_CONFIGURE` (configure) · staff
-- `listCostCenters` → `LEDGER_VIEW` (read) · staff
-- `createCostCenter` → `ACCOUNT_CONFIGURE` (configure) · staff
-- `listLegalEntities` → `LEDGER_VIEW` (read) · staff
-- `createLegalEntity` → `ACCOUNT_CONFIGURE` (configure) · staff
-
-**A refused user sees:** Shown when the caller lacks `LEDGER_VIEW`, which `listAccounts` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
-
-#### Requirements it meets
-
-39 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
-
-| Ref | Requirement (shortened) | Domain | Verdict | Via |
-|---|---|---|---|---|
-| 5.12.97 | System shall support account type filtering during journal entry creation. | F&B & Guest Management | CONTRACTED | `listAccounts` |
-| 5.12.102 | System shall support account lookup and search capabilities. | F&B & Guest Management | CONTRACTED | `listAccounts` |
-| 5.7.1 | The system should support entry and maintenance of data in accounts related information tables. The primary usage of this data will be to derive accounts for billing records and interface with the … | F&B & Guest Management | CONTRACTED | `createAccount` |
-| 5.7.25 | System shall provide a configurable Chart of Accounts structure. | F&B & Guest Management | CONTRACTED | `createAccount` |
-| 5.7.26 | System shall support Asset, Liability, Equity, Revenue, and Expense account types. | F&B & Guest Management | CONTRACTED | `createAccount` |
-| 5.7.28 | System shall support account codes, names, and descriptions. | F&B & Guest Management | CONTRACTED | `createAccount` |
-| 5.7.32 | System shall provide account search and filtering capabilities. | F&B & Guest Management | CONTRACTED | `createAccount` |
-| 5.7.33 | Create and manage General Ledger accounts. | F&B & Guest Management | CONTRACTED | `createAccount` |
-| 5.7.34 | Support configurable account numbering structures. | F&B & Guest Management | CONTRACTED | `createAccount` |
-| 5.7.36 | Allow account classification by account type. | F&B & Guest Management | CONTRACTED | `createAccount` |
-| 5.7.37 | Support account status management (active/inactive). | F&B & Guest Management | CONTRACTED | `createAccount` |
-| 5.7.39 | Support account-level descriptions and metadata. | F&B & Guest Management | CONTRACTED | `createAccount` |
-| … 27 more | | | | `traceability.json` |
-
-#### Client meeting inputs
-
-For this screen, newest first. An **Open question** is built to the default it states. Where an item disagrees with the fields above, the item wins.
-
-- Chart of accounts screen: external-system codes for ERP mapping, classification (asset, liability, income, expense), parent-account hierarchy and edit view with financial dimensions (profit centre, cost centres); plus transaction-to-account and payment/offset account mapping. *(client request · MoM 12 Aug 2026, 14. Finance Module Walkthrough — Dashboards, Chart of Accounts & Entities · DI-262)*
-- Chart of accounts can be created natively in TICVAI or mapped to a client's external/ERP chart of accounts. *(agreed · MoM 12 Aug 2026, 13. Chart of Accounts and Account Mapping · DI-259)*
-
-Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
-
-#### Workshop task tracker
-
-No tracker row concerns this screen; the rows for its platform are listed once, below.
-
-#### References
-
-- Wireframe frame: `wireframes/P08 Venue Management.dc.html#bo-074` · status **notStarted** · provenance generated
-- Flow F16 *A venue opens for the first time*, step 5: Finance sets the chart of accounts → **Before the first sale.** Every sale posts somewhere
-- Flow F98 *A day is reconciled from takings to the ledger*, step 2: Chart of Accounts. → 6 operations, 6 of them previously unwalked.
-- Flow F16 branch at step 5 (abandonsFlow): when No chart of accounts, **Blocks the first sale**, and it is the failure a venue discovers on opening morning rather than in setup.
-
-#### Acceptance for the design
-
-- [ ] Every input above is drawn (35), with its required mark, default, format and its error state (400, 403, 404, 409).
-- [ ] Every output is drawn (44 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
-- [ ] Every state opens from `#BO-074?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: Create account, Save account, Create cost center, Create legal entity.
-- [ ] Every transition is wired: `BO-075`, `BO-077`.
-- [ ] Every gated control is gated: `ACCOUNT_CONFIGURE`, `LEDGER_VIEW`.
-- [ ] The 2 client meeting input(s) for this screen are applied; open questions are built to their default.
-- [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
-
----
-
 ### `BO-075` Account Mapping
 
-**Which product or movement posts to which account.**
+**Which account each money event posts to, per venue, and the tax codes and exemptions that apply.**
 
 | | |
 |---|---|
@@ -351,7 +155,17 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | `taxCodeId` (deepLink), `exemptionId` (navigation) · cold entry: **A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know … |
 | Route | `/finance/account-mapping` |
 
-**What the spec says about it.** Added 17 August because the contract had operations no screen declared. **Not on the wireframe board** — needs drawing. Pulled to Wave 1 (CF-101). Without a mapping every sale posts to suspense. **Cross-platform navigation removed 24 August**: ADM-020. **A till does not navigate to a back office and a guest app does not navigate to either** — those are device handovers, and a flow declares them with `crossesDevice` rather than a screen pretending there is a link.
+**What the spec says about it.** Added 17 August because the contract had operations no screen declared. **Not on the wireframe board** — needs drawing. Pulled to Wave 1 (CF-101). Without a mapping every sale posts to suspense. **Cross-platform navigation removed 24 August**: ADM-020. **A till does not navigate to a back office and a guest app does not navigate to either** — those are device handovers, and a flow declares them with `crossesDevice` rather than a screen pretending there is a link. **One switch, not two** (decided 2 October 2026, Chinmay; CHG-FIN-004). "Price includes tax" on a tax code (`isInclusive`) says whether the price already contains the tax. Whether tax is computed before or after a discount is not set here: it is the jurisdiction's taxable base on its tax profile (ADM-069, `TaxProfile.taxBase`), shown here read-only with the Egypt example. The calculation's own `discountsAreTaxInclusive` is deprecated and ignored. Mappings are per money event and venue (`AccountMapping.eventType`), not per product (design-note correction, 2 October 2026); a product-level GL code is not in the catalogue (DI-466 is answered by the event mapping).
+
+**From the Finance, Ledger & Tax · Reporting & Analytics process.** Which account each money event posts to, and the tax codes and exemptions those postings use. Without a mapping a sale posts to suspense. The one thing to get right: saving replaces the whole mapping set for the region, and four events must be mapped before any venue can trade, so the screen edits a complete set and shows what changes before saving.
+
+**Fixed on main** (the package already carries these; draw what it says): The purpose says "which product or movement posts to which account". (CHG-SBO-012); The mapping set is drawn as tiles and a table with a single "Save" that takes only the mappings. (CHG-SBO-012); The create-exemption form asks for an id. (CHG-SBO-012); Two switches decide whether tax is computed before or after discount. (CHG-FIN-004).
+
+#### Decided on this screen
+
+Answered questions: draw the decision, not the old default. Where a decision and the tables below differ, the decision wins.
+
+- **Is a product-level GL code (DI-466) needed, or is event-type mapping enough?** → Drawn default accepted: Event-type mapping as contracted; draw no product account picker. *(decided by Chinmay, 2026-10-02; DEC-083 / CHG-NOTE-003)*
 
 #### Inputs: what the user enters or picks
 
@@ -360,20 +174,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Filter | Drawn as | Default | Allowed values, rules | Source |
 |---|---|---|---|---|
 | Country code | text field | — | pattern `^[A-Z]{2}$` | `listTaxCodes` ?countryCode |
-
-**Form: Save account mappings** (modal, opened by *Save account mappings*; *Save account mappings* calls `setAccountMappings`, *Cancel* sends nothing)
-
-**Collects what `setAccountMappings` sends before it is called.** Required: `mappings`. Dismissing sends nothing; the screen behind is unchanged.
-
-| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
-|---|---|---|---|---|---|---|---|
-| Mappings `mappings` | repeatable rows | required | — | — | — | — | `setAccountMappings` body |
-| Event type `mappings[].eventType` | select | required | — | Ticket revenue · Fnb revenue · Retail revenue · Rental revenue · Tax payable · Cash received · Card received · Wallet received · Refund issued · Void reversal · Deferred revenue · Recognised revenue … | — | Every event that generates a ledger posting. How each money event posts (decided 28 September, audit R191). | `setAccountMappings` body |
-| Debit account `mappings[].debitAccountId` | picker: choose a debit account | required | — | — | shows names, sends the id | — | `setAccountMappings` body |
-| Credit account `mappings[].creditAccountId` | picker: choose a credit account | required | — | — | shows names, sends the id | — | `setAccountMappings` body |
-| Venue `mappings[].venueId` | picker: choose a venue | optional | — | — | shows names, sends the id | Null applies the mapping to every venue in the region. | `setAccountMappings` body |
-
-Errors to draw in the form: 400 A required event type (`cardReceived`, `cashReceived`, `refundIssued`, `priceVariance`; audit R127 (1)) has no mapping, or maps to a non-postable account
 
 **Form: Create tax code** (modal, opened by *Create tax code*; *Create tax code* calls `createTaxCode`, *Cancel* sends nothing)
 
@@ -405,9 +205,23 @@ Errors to draw in the form: 400 Compound reference is circular or crosses countr
 
 Errors to draw in the form: 400 `rate` without `effectiveFrom`, or `effectiveFrom` without `rate`. `errors[]` names the field.; 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 A rate change whose `effectiveFrom` is today or earlier, which would reprice postings already made; or a rate change addressed to a row that is no longer in …
 
+**Form: Save account mappings** (modal, opened by *Save account mappings*; *Save account mappings* calls `setAccountMappings`, *Cancel* sends nothing)
+
+**Collects what `setAccountMappings` sends before it is called.** Required: `mappings`. Sends the full set; the preview of the changes is shown in the dialog before it is sent. Dismissing sends nothing; the screen behind is unchanged.
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Mappings `mappings` | repeatable rows | required | — | — | — | — | `setAccountMappings` body |
+| Event type `mappings[].eventType` | select | required | — | Ticket revenue · Fnb revenue · Retail revenue · Rental revenue · Tax payable · Cash received · Card received · Wallet received · Refund issued · Void reversal · Deferred revenue · Recognised revenue … | — | Every event that generates a ledger posting. How each money event posts (decided 28 September, audit R191). | `setAccountMappings` body |
+| Debit account `mappings[].debitAccountId` | picker: choose a debit account | required | — | — | shows names, sends the id | — | `setAccountMappings` body |
+| Credit account `mappings[].creditAccountId` | picker: choose a credit account | required | — | — | shows names, sends the id | — | `setAccountMappings` body |
+| Venue `mappings[].venueId` | picker: choose a venue | optional | — | — | shows names, sends the id | Null applies the mapping to every venue in the region. | `setAccountMappings` body |
+
+Errors to draw in the form: 400 A required event type (`cardReceived`, `cashReceived`, `refundIssued`, `priceVariance`; audit R127 (1)) has no mapping, or maps to a non-postable account
+
 **Form: Create tax exemption** (modal, opened by *Create tax exemption*; *Create tax exemption* calls `createTaxExemption`, *Cancel* sends nothing)
 
-**Collects what `createTaxExemption` sends before it is called.** Required: `id`, `scope`, `taxCodeId`, `reason`. Optional: `scopeRef`, `certificateReference`, `validFrom`, `validTo`. Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `createTaxExemption` sends before it is called.** Required: `scope`, `taxCodeId`, `reason`. Optional: `scopeRef`, `exemptionType`, `certificateReference`, `evidenceDocumentId`, `verificationStatus`, `validFrom`, `validTo`. The exemption id is the server's. Dismissing sends nothing; the screen behind is unchanged.
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
@@ -430,6 +244,12 @@ Errors to draw in the form: 400 `rate` without `effectiveFrom`, or `effectiveFro
 | Evidence document `evidenceDocumentId` | picker: choose an evidence document | optional | — | — | shows names, sends the id | Replaces the evidence document on the record when given. | `verifyTaxExemption` body |
 | Certificate reference `certificateReference` | text field | optional | — | max length 100 | — | — | `verifyTaxExemption` body |
 | Note `note` | text area | optional | — | max length 500 | — | Required with `rejected`. | `verifyTaxExemption` body |
+
+**Rules for these inputs** (from the Finance, Ledger & Tax · Reporting & Analytics process; these refine the tables above and win where they differ)
+
+- **Mapping row (event → debit account, credit account, venue)**: One row per money event (card received, cash received, refund issued, price variance, ticket, food, retail and rental revenue, VAT payable, deferred, recognised and breakage revenue, cash over/short, settlement fees, chargebacks…). Venue empty means every venue in the region; a venue row overrides it. Card received, cash received, refund issued and price variance are required and marked so. *(source: contracts/spine/finance.yaml#/components/schemas/PostingEventType / contracts/spine/finance.yaml#/components/schemas/AccountMapping / R127)*
+- **Tax code**: Code, name, country, rate 0–100 (0% is a valid rate, e.g. donations where untaxed), the account the tax posts to, effective from (future-dated: a rate change is a new row, history keeps the old rate), inclusive or exclusive, and optionally "applies on top of" another code for tax on tax. Show the application order explicitly. *(source: contracts/spine/finance.yaml#/components/schemas/TaxCode / DI-596 / DI-472)*
+- **Tax exemption**: Scope (customer account, product kind, channel, legal entity), the tax code, reason, exemption type (diplomatic, export, business-to-business, charity, government, free zone, zero-rated, other), certificate reference, evidence document, validity. Only verified or not-required exemptions take effect; pending, rejected or expired ones do not. *(source: contracts/spine/finance.yaml#/components/schemas/TaxExemption)*
 
 #### Outputs: what the screen shows and produces
 
@@ -489,7 +309,7 @@ Errors to draw in the form: 400 `rate` without `effectiveFrom`, or `effectiveFro
 | Next cursor | text | — |
 | Has more | yes / no (icon or chip) | — |
 
-**Every account mapping** (data table, from `listAccountMappings`)
+**Every account mapping** (data table, from `listAccountMappings`): The whole mapping set, editable in place: `setAccountMappings` replaces the region's whole set, so the screen shows every row and a change preview (rows added, changed, removed) before Save.
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -507,6 +327,17 @@ Errors to draw in the form: 400 `rate` without `effectiveFrom`, or `effectiveFro
 | Save tax code (secondary button) | `updateTaxCode` PATCH `/tax-codes/{taxCodeId}` | inline | TaxCode | 400 `rate` without `effectiveFrom`, or `effectiveFrom` without `rate`. `errors[]` names the field.; 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 A rate … | opens modal first |
 | Create tax exemption (secondary button) | `createTaxExemption` POST `/tax-exemptions` | TaxExemption | TaxExemption | — | opens modal first |
 | Verify tax exemption (primary button) | `verifyTaxExemption` POST `/tax-exemptions/{exemptionId}/verify` | inline | TaxExemption | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 The exemption is `expired`, or `notRequired`.; 422 `verified` with no evidence document on the record or in the … | — |
+
+**Rules for what is shown** (from the Finance, Ledger & Tax · Reporting & Analytics process; these refine the tables above and win where they differ)
+
+- **Mapping set**: Grouped: receipts, revenue, tax, deferral and recognition, variances, settlement, chargebacks. Unmapped events show "Posts to suspense" in amber; the four required ones in red until mapped. *(source: contracts/spine/finance.yaml#/components/schemas/PostingEventType)*
+- **Tax codes**: Active codes with rate, inclusive or exclusive, compounding and effective dates; future rates listed under the current one. *(source: contracts/spine/finance.yaml#/components/schemas/TaxCode)*
+- **Exemptions waiting for verification**: Pending evidence first, with its expiry; a verify action with a note (required when rejecting). *(source: contracts/spine/finance.yaml#/components/schemas/TaxExemption / contracts/spine/finance.yaml#verifyTaxExemption)*
+
+**What each action does** (from the Finance, Ledger & Tax · Reporting & Analytics process; these refine the tables above and win where they differ)
+
+- **Save mappings**: Shows the change list (added, changed, removed) and saves the full set; postings already made keep their accounts. Refused, with the missing event named, if a required event is unmapped. *(source: contracts/spine/finance.yaml#setAccountMappings)*
+- **Verify exemption**: Records verified or rejected with who and when; a rejection needs a note. *(source: contracts/spine/finance.yaml#/components/schemas/TaxExemption)*
 
 **Data it reads**: `listAccountMappings` (onLoad, Which account each transaction type posts to); `listTaxCodes` (onLoad, List tax codes); `listTaxExemptions` (onLoad, List tax exemptions)
 
@@ -528,6 +359,34 @@ Errors to draw in the form: 400 `rate` without `effectiveFrom`, or `effectiveFro
 | Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `LEDGER_VIEW`, which `listAccountMappings` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 A required event type (`cardReceived`, `cashReceived`, `refundIssued`, `priceVariance`; audit R127 (1)) has no mapping, or maps to a non-postable account; 400 Compound reference is circular or crosses countries; 400 `rate` without `effectiveFrom`, or `effectiveFrom` without `rate`. `errors[]` names the field.; 409 A rate change whose `effectiveFrom` is today or earlier, which would reprice … |
+
+#### Edge cases to draw
+
+- **A row is left out of the set when saving**: The change list shows it as removed ("Refunds will post to suspense") before confirming. *(source: contracts/spine/finance.yaml#setAccountMappings)*
+- **Suspense balance is not zero**: A banner with the balance and the events that fed it, linking to the chart. *(source: contracts/spine/finance.yaml#/components/schemas/Account)*
+
+#### Consistency with other screens
+
+- Match `ADM-069`: The tax profile (type, jurisdiction, taxable base) lives on ADM-069 in the catalogue; the tax code (rate, account, compounding) lives here in finance. Use the same tax names on both.
+- Match `BO-074`: Account pickers show the chart's codes and names.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+mappings:
+- Card received · Dr 1120 Card clearing · Cr 1190 Sales control · all venues
+- Ticket revenue · Dr 1190 Sales control · Cr 2300 Deferred revenue · all venues
+- Cash over/short · Dr 6900 Cash over/short · Cr 1100 Cash on hand
+- Price variance · not mapped (required)
+taxCodes:
+- VAT-AE-5 · UAE VAT standard · 5% · inclusive · posts to 2400 · from 1 Jan 2018
+- VAT-AE-0 · Zero-rated export · 0%
+- EG-VAT-14 · Egypt VAT · 14% · exclusive
+exemption: Free zone · VAT-AE-5 · Dubai Silicon Oasis Authority · certificate DSOA-2026-1142 · pending · valid to
+  31 Dec 2026
+```
 
 #### Permissions
 
@@ -590,6 +449,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-076`, `BO-074`, `BO-077`, `ADM-020`.
 - [ ] Every gated control is gated: `ACCOUNT_CONFIGURE`, `LEDGER_VIEW`, `TAX_CONFIGURE`.
 - [ ] The 2 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 2 edge case(s) from the process notes are drawn.
+- [ ] The 1 decision(s) taken on this screen are drawn as decided, not as the old default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -611,6 +472,20 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Route | `/finance/revenue-recognition` |
 
 **What the spec says about it.** Added 17 August because the contract had operations no screen declared. **Not on the wireframe board** — needs drawing.
+
+**From the Finance, Ledger & Tax · Reporting & Analytics process.** Deferred revenue (paid for, not yet earned), when it will unwind, and the rules that release it: ticket revenue on the visit, gift cards and wallet on use, annual passes straight-line or per visit, unredeemed value as breakage on expiry, no-shows when the performance ends. The one thing to get right: a product kind may be claimed by only one rule, because two rules claiming it recognise the same revenue twice and the numbers still look plausible.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **Rules can be created and validated but not edited or deactivated.** Why: No update operation exists, although the rule carries an active flag. *(source: contracts/spine/finance.yaml#/components/schemas/RecognitionSchedule / screens/P08-venue-back-office.yaml#BO-076; Finance, Ledger & Tax · Reporting & Analytics)*
+- **The create form lists the rule id as required.** Why: The id is server-owned. *(source: contracts/spine/finance.yaml#/components/schemas/RecognitionSchedule; Finance, Ledger & Tax · Reporting & Analytics)*
+- **The revenue allocation split builder from 12 August is not on this screen or any contract.** Why: Splitting a combo or two-venue pass across products or legal entities was agreed; fixed against percentage is still open. *(source: DI-267 / MoM 2026-08-12 16. Revenue Recognition Rules and Allocation Splits; Finance, Ledger & Tax · Reporting & Analytics)*
+
+#### Decided on this screen
+
+Answered questions: draw the decision, not the old default. Where a decision and the tables below differ, the decision wins.
+
+- **POS sales recognise immediately (12 August) but rules are per product kind, not per channel. How is a POS-sold dated ticket treated?** → Drawn default stands (answer: "By the product kind's rule (a dated ticket is recognised at admission)"): By its product kind's rule; recognised at admission the same day. *(decided by Chinmay, 2026-10-02; DEC-216 / CHG-NOTE-003)*
 
 #### Inputs: what the user enters or picks
 
@@ -653,6 +528,11 @@ Errors to draw in the form: 409 Period already closed, or a run is in progress
 | Is active `isActive` | toggle | optional | — | — | — | — | `createRecognitionSchedule` body |
 
 Errors to draw in the form: 400 Validation failed; 409 An active schedule at the same `priority` already claims one of these product kinds.
+
+**Rules for these inputs** (from the Finance, Ledger & Tax · Reporting & Analytics process; these refine the tables above and win where they differ)
+
+- **Recognition rule**: Name, method (Immediately, On redemption, Straight line, Per visit, On expiry), product kinds claimed, priority (lower wins; equal priority on the same kind is refused), where revenue is earned (Sale, Admission, Consumption: a ticket sold at one venue and admitted at another earns at the gate; a wallet top-up earns when spent), how often it runs (default at period close), deferred, recognised, breakage and no-show accounts, breakage after N days, no-show trigger. *(source: contracts/spine/finance.yaml#/components/schemas/RecognitionSchedule / contracts/spine/finance.yaml#/components/schemas/RecognitionMethod)*
+- **Run recognition**: A fiscal period and a dry run first; the dry run shows recognised and breakage totals by method before posting. *(source: contracts/spine/finance.yaml#runRecognition / contracts/spine/finance.yaml#/components/schemas/RecognitionRunResult)*
 
 #### Outputs: what the screen shows and produces
 
@@ -712,6 +592,16 @@ Errors to draw in the form: 400 Validation failed; 409 An active schedule at the
 | Create recognition schedule (secondary button) | `createRecognitionSchedule` POST `/recognition-schedules` | RecognitionSchedule | RecognitionSchedule | 400 Validation failed; 409 An active schedule at the same `priority` already claims one of these product kinds. | opens modal first |
 | Validate recognition schedules (secondary button) | `validateRecognitionSchedules` POST `/recognition-schedules/validate` | — | inline | — | — |
 
+**Rules for what is shown** (from the Finance, Ledger & Tax · Reporting & Analytics process; these refine the tables above and win where they differ)
+
+- **Deferred balance**: One total per currency, never summed across currencies, then ageing bands by expected recognition date, each with items and method. A chart of recognised against still-deferred (wallet and passes) by month. *(source: contracts/spine/finance.yaml#getDeferredRevenue / DI-266)*
+- **Rules list**: Method, kinds, priority, site, frequency, accounts; conflicts found by validation flagged in red. *(source: contracts/spine/finance.yaml#validateRecognitionSchedules)*
+
+**What each action does** (from the Finance, Ledger & Tax · Reporting & Analytics process; these refine the tables above and win where they differ)
+
+- **Validate rules**: Lists product kinds claimed by more than one rule. *(source: contracts/spine/finance.yaml#validateRecognitionSchedules)*
+- **Run recognition**: Posts the moves; running the same period again finds nothing left and says "Nothing to recognise", not an error. *(source: contracts/spine/finance.yaml#runRecognition)*
+
 **Data it reads**: `getDeferredRevenue` (onLoad, Deferred revenue balance and ageing); `listRecognitionSchedules` (onLoad, List revenue recognition schedules)
 
 **Where the user goes next**
@@ -731,6 +621,29 @@ Errors to draw in the form: 400 Validation failed; 409 An active schedule at the
 | Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `LEDGER_VIEW`, which `getDeferredRevenue` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 An active schedule at the same `priority` already claims one of these product kinds.; 409 Period already closed, or a run is in progress |
+
+#### Edge cases to draw
+
+- **A pass's validity is extended by three months**: Its deferred balance re-times; the ageing moves out. *(source: contracts/spine/finance.yaml#/components/schemas/RecognitionSchedule)*
+- **The period is closing**: Run is still allowed for the closing period until it is closed; the close check "Recognition run complete" turns green. *(source: contracts/spine/finance.yaml#/components/schemas/PeriodCloseResult)*
+
+#### Consistency with other screens
+
+- Match `BO-090`: Recognition run complete is a close check.
+- Match `BO-1081`: Recognised and deferred figures must be the same numbers on the finance dashboard.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+deferred: AED 1,842,350.00 deferred · 0–30 days AED 612,400.00 (8,214 items, on redemption) · 31–90 AED 498,950.00
+  · 91–365 AED 731,000.00 (annual passes, straight line)
+rules:
+- Admission tickets · On redemption · site Admission · priority 100
+- Annual pass · Straight line · AED 1,800.00 → AED 150.00 a month · priority 50
+- Gift cards and wallet · On redemption · site Consumption · breakage 365 days after expiry
+```
 
 #### Permissions
 
@@ -789,6 +702,9 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-074`, `BO-075`, `BO-077`.
 - [ ] Every gated control is gated: `ACCOUNT_CONFIGURE`, `LEDGER_POST`, `LEDGER_VIEW`.
 - [ ] The 2 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 2 edge case(s) from the process notes are drawn.
+- [ ] The 3 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
+- [ ] The 1 decision(s) taken on this screen are drawn as decided, not as the old default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -800,7 +716,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | | |
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
-| Module | Orders & Money · wave 2 · needs the `core` module |
+| Module | Orders & Money · wave 1 · needs the `core` module |
 | Block | Block A · ticket #17838 (APP-SETUP-BO-077) |
 | Who uses it | venue staff holding `LEDGER_APPROVE`, `LEDGER_VIEW` (1 operate, 1 read) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
@@ -809,7 +725,17 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | `varianceId` (deepLink) · cold entry: **A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know … |
 | Route | `/finance/fx-rates-variances` |
 
-**What the spec says about it.** Added 17 August because the contract had operations no screen declared. **Not on the wireframe board** — needs drawing.
+**What the spec says about it.** Added 17 August because the contract had operations no screen declared. **Not on the wireframe board** — needs drawing. **The tender rate now charges guests** (decided 2 October 2026, Chinmay; CHG-FIN-001). A `tender` rate is what a guest who selects a currency is charged at (locked on the order at checkout) and refunded at; a rate change never moves an order already quoted. Per region, as before (audit R120 (a)); the venue chooses which currencies it shows and which it charges (`VenueSettings.displayCurrencies`, `chargeCurrencies`).
+
+**From the Finance, Ledger & Tax · Reporting & Analytics process.** Two finance queues in one place: the exchange rates in force for the region (set by hand with a margin, or pulled from a provider), and the price variances waiting for review, where a till priced a sale differently from the server. The one thing to get right: a rate change never edits a rate; it adds a new one from a date, so the screen shows rates as a timeline and every manual rate carries a reason.
+
+**Fixed on main** (the package already carries these; draw what it says): The queue "Waiting for a decision" binds exchange rates. (CHG-SBO-012); The set-rate form offers server-owned fields (id, source, set-by, provider reference, fetched at) and omits the note. (CHG-SBO-012); The screen is wave 2 while it is in the Block A set-up tickets. (CHG-SBO-012).
+
+#### Decided on this screen
+
+Answered questions: draw the decision, not the old default. Where a decision and the tables below differ, the decision wins.
+
+- **Should the margin over market be stored, or only the resulting rate?** → Drawn default accepted: Only the rate, with the margin stated in the note. *(decided by Chinmay, 2026-10-02; DEC-084 / CHG-NOTE-003)*
 
 #### Inputs: what the user enters or picks
 
@@ -824,6 +750,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | Filter | Drawn as | Default | Allowed values, rules | Source |
 |---|---|---|---|---|
+| Chargeable | toggle | — | — | `listFxRates` ?chargeable |
 | Exceptions only | toggle | off | — | `listPriceVariances` ?exceptionsOnly |
 | Review status | segmented control | — | Not required · Pending review · Reviewed | `listPriceVariances` ?reviewStatus |
 | Occurred from | date picker | — | — | `listPriceVariances` ?occurredFrom |
@@ -842,9 +769,20 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 Errors to draw in the form: 409 No provider is assigned to this purpose in this region (`setFxProvider`).
 
+**Form: Review price variance** (modal, opened by *Review price variance*; *Review price variance* calls `reviewPriceVariance`, *Cancel* sends nothing)
+
+**Collects what `reviewPriceVariance` sends before it is called.** Required: `outcome`, `note`. Dismissing sends nothing; the screen behind is unchanged.
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Outcome `outcome` | segmented control | required | — | Accepted · Investigated · Catalogue corrected | — | — | `reviewPriceVariance` body |
+| Note `note` | text area | required | — | min length 3; max length 1000 | — | — | `reviewPriceVariance` body |
+
+Errors to draw in the form: 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 The variance is not awaiting review: its `reviewStatus` is `notRequired` (below the venue's threshold) or already `reviewed`.
+
 **Form: Save FX rate** (modal, opened by *Save FX rate*; *Save FX rate* calls `setFxRate`, *Cancel* sends nothing)
 
-**Collects what `setFxRate` sends before it is called.** Required: `fromCurrency`, `toCurrency`, `rate`, `purpose`, `effectiveFrom`. Optional: `id`, `source`, `effectiveTo`, `setByPrincipalId`, `providerReference`, `fetchedAt`. Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `setFxRate` sends before it is called.** Required: `fromCurrency`, `toCurrency`, `rate`, `purpose`, `effectiveFrom`. Optional: `effectiveTo`, `note`. **The note is required for a manual rate** and the call is refused without it (R127); `source`, set-by, provider reference and fetched-at are the server's. Dismissing sends nothing; the screen behind is unchanged.
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
@@ -858,22 +796,18 @@ Errors to draw in the form: 409 No provider is assigned to this purpose in this 
 
 Errors to draw in the form: 400 No `note` was given. A manual rate says where the figure came from (audit R127 (4)).; 409 Effective window overlaps an existing bounded rate for the same pair and purpose, or does not start after the rate in force
 
-**Form: Review price variance** (modal, opened by *Review price variance*; *Review price variance* calls `reviewPriceVariance`, *Cancel* sends nothing)
+**Rules for these inputs** (from the Finance, Ledger & Tax · Reporting & Analytics process; these refine the tables above and win where they differ)
 
-**Collects what `reviewPriceVariance` sends before it is called.** Required: `outcome`, `note`. Dismissing sends nothing; the screen behind is unchanged.
-
-| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
-|---|---|---|---|---|---|---|---|
-| Outcome `outcome` | segmented control | required | — | Accepted · Investigated · Catalogue corrected | — | — | `reviewPriceVariance` body |
-| Note `note` | text area | required | — | min length 3; max length 1000 | — | — | `reviewPriceVariance` body |
-
-Errors to draw in the form: 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 The variance is not awaiting review: its `reviewStatus` is `notRequired` (below the venue's threshold) or already `reviewed`.
+- **Set a rate**: From currency, to currency, rate (up to six decimals), purpose (Tender = what guests pay at, Reporting, Revaluation, Inter-entity), effective from, optional end, and a required note saying why and from where. The new rate closes the open-ended one in force at its start; a window that overlaps a bounded one is refused. *(source: contracts/spine/finance.yaml#setFxRate / contracts/spine/finance.yaml#/components/schemas/FxRate / R127)*
+- **Margin helper**: Optional: show the latest provider rate as a reference beside the typed rate and the resulting spread ("market 3.68 · venue 3.80 · +3.3%"); the stored value is the rate itself. *(source: DI-212)*
+- **Pull rates now**: Purpose (required), currency pairs (default all the region trades), effective date (default next business day), and a dry run option that shows the rates without saving. *(source: contracts/spine/finance.yaml#ingestFxRates)*
+- **Variance review outcome**: Accepted, Investigated, or Catalogue corrected, with a required note. *(source: contracts/spine/finance.yaml#/components/schemas/PriceVariance / contracts/spine/finance.yaml#reviewPriceVariance)*
 
 #### Outputs: what the screen shows and produces
 
 **Shown**
 
-**Waiting for a decision** (data table, from `listFxRates`)
+**Rates in force** (data table, from `listFxRates`): Not a queue: rates wait for nobody.
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -889,15 +823,10 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 | Provider reference | text | The provider's own identifier for this quote. What makes a rate reproducible — an auditor asking why a payment converted at 3.6725 gets an … |
 | Fetched at | 1 Oct 2026, 14:30 | When the rate was pulled. Distinct from `effectiveFrom`, which is when it applies — a rate fetched at 06:00 for a business day starting at … |
 
-**Every price variance** (data table, from `listPriceVariances`)
+**Waiting for a decision** (data table, from `listPriceVariances`): The queue: price variances pending review.
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Order | the name it points at, never the id | — |
-| Order line | text | — |
-| Venue | the name it points at, never the id | — |
-| Variant | the name it points at, never the id | — |
 | Quoted price | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Server price | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Variance | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
@@ -930,6 +859,17 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 | Review price variance (secondary button) | `reviewPriceVariance` POST `/price-variances/{varianceId}/review` | inline | PriceVariance | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 The variance is not awaiting review: its `reviewStatus` is `notRequired` (below the venue's threshold) or … | opens modal first |
 | Ingest FX rates (secondary button) | `ingestFxRates` POST `/fx-rates/ingest` | inline | inline | 409 No provider is assigned to this purpose in this region (`setFxProvider`). | opens modal first |
 
+**Rules for what is shown** (from the Finance, Ledger & Tax · Reporting & Analytics process; these refine the tables above and win where they differ)
+
+- **Rates**: Per pair and purpose: rate in force, source in words (Manual, UAE Central Bank, ECB, Open Exchange Rates, Card scheme), effective from, fetched at, who set it and the note. Earlier rates listed beneath, never edited. *(source: contracts/spine/finance.yaml#/components/schemas/FxRateSource / contracts/spine/finance.yaml#/components/schemas/FxRate)*
+- **Variances waiting**: Only exceptions above the venue threshold that are pending review: order, quoted against server price, difference, and the catalogue bundle the till priced from ("till was two bundles behind"). Oldest first. *(source: contracts/spine/finance.yaml#/components/schemas/PriceVariance)*
+
+**What each action does** (from the Finance, Ledger & Tax · Reporting & Analytics process; these refine the tables above and win where they differ)
+
+- **Save rate**: Adds the rate from its effective time; the timeline shows the previous one closed at that moment. *(source: contracts/spine/finance.yaml#setFxRate)*
+- **Pull rates now**: Writes new rows; refused with "Provider unreachable, no rates changed" rather than reusing old ones. *(source: contracts/spine/finance.yaml#ingestFxRates)*
+- **Review variance**: Records the outcome; the row leaves the queue. *(source: contracts/spine/finance.yaml#reviewPriceVariance)*
+
 **Data it reads**: `listFxRates` (onLoad, The rates in force); `listPriceVariances` (onLoad, List price variances)
 
 **Where the user goes next**
@@ -948,6 +888,30 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 | Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `LEDGER_VIEW`, which `listFxRates` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 No `note` was given. A manual rate says where the figure came from (audit R127 (4)).; 409 Effective window overlaps an existing bounded rate for the same pair and purpose, or does not start after the rate in force; 409 No provider is assigned to this purpose in this region (`setFxProvider`).; 409 The variance is not awaiting review: its `reviewStatus` is `notRequired` (below the venue's … |
+
+#### Edge cases to draw
+
+- **The person holds the venue role but rates are set per region**: Rates are read-only for them, with "Rates are set for the region by finance". *(source: contracts/spine/finance.yaml#setFxRate / R120)*
+- **A three-decimal currency pair**: Rates always show their six decimals; amounts use the currency's three. *(source: contracts/spine/finance.yaml#/components/schemas/FxRateValue)*
+
+#### Consistency with other screens
+
+- Match `WEB-035`: The tender rate set here is what guests see as the approximate conversion.
+- Match `POS-008`: Foreign tender is converted at the tender rate in force at the time of sale.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+rates:
+- 'USD → AED · Tender · 3.800000 · Manual · from 1 Oct 2026 00:00 · note: market 3.68, counter spread per finance
+  policy'
+- USD → AED · Reporting · 3.672500 · UAE Central Bank · fetched 06:00
+- SAR → AED · Tender · 0.979300 · Open Exchange Rates · fetched 06:00
+variance: ORD-8K21P · Day Pass Adult · quoted AED 279.00 · server AED 299.00 · −AED 20.00 · bundle 2026.09.30-2
+  (current .10.01-1)
+```
 
 #### Permissions
 
@@ -991,12 +955,14 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (15), with its required mark, default, format and its error state (400, 404, 409).
-- [ ] Every output is drawn (34 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (29 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-077?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save FX rate, Review price variance, Ingest FX rates.
 - [ ] Every transition is wired: `BO-074`, `BO-075`.
 - [ ] Every gated control is gated: `LEDGER_APPROVE`, `LEDGER_VIEW`.
 - [ ] The 2 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 2 edge case(s) from the process notes are drawn.
+- [ ] The 1 decision(s) taken on this screen are drawn as decided, not as the old default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -1017,7 +983,17 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 | Opens with | `entryId` (deepLink) · cold entry: **A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know … |
 | Route | `/finance/journal-entries` |
 
-**What the spec says about it.** Added 17 August because the contract had operations no screen declared. **Not on the wireframe board** — needs drawing.
+**What the spec says about it.** Added 17 August because the contract had operations no screen declared. **Not on the wireframe board** — needs drawing. **Every manual journal needs approval** (decided 2 October 2026, Chinmay; CHG-FIN-008; DI-265): a finance user prepares it, a finance manager or director approves it, and only then does it reach the ledger. There is no threshold below which it posts itself (the state model's "above the venue threshold" is wrong). **Posted entries are never edited, only reversed** (CHG-FIN-005): a posted entry offers Reverse, never Edit or Delete; a reversal a person asks for waits for approval like any manual journal. **The approver is never the preparer**: Approve is hidden on an entry the viewer prepared and refused by the server (`approver-is-preparer`).
+
+**From the Finance, Ledger & Tax · Reporting & Analytics process.** The journal: every posting, and the manual entries waiting for a finance manager. A finance user prepares a voucher, a different person approves it, and only then it reaches the ledger. Nothing posted is ever edited or deleted: a correction is a reversal. The one thing to get right: the approver can never be the preparer, and the screen must make that visible before anyone tries.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **There is no way to edit a draft or send a rejected draft back for approval.** Why: The journal state model moves draft to pending only when the entry is created; after a rejection the draft can only be approved directly or abandoned. *(source: contracts/spine/finance.yaml#/components/schemas/JournalStatus / contracts/spine/finance.yaml#rejectJournal; Finance, Ledger & Tax · Reporting & Analytics)*
+- **The state model says approval is needed only "above the venue threshold".** Why: The 12 August minutes and the operation say every manual voucher is approved by a manager before it posts. *(source: contracts/spine/finance.yaml#/components/schemas/JournalStatus / DI-265 / contracts/spine/finance.yaml#createJournalEntry; Finance, Ledger & Tax · Reporting & Analytics)*
+- **Period, status and source filters are free text.** Why: Pick lists of periods and the two closed enumerations. *(source: screens/P08-venue-back-office.yaml#BO-089; Finance, Ledger & Tax · Reporting & Analytics)*
+
+**Fixed on main** (the package already carries these; draw what it says): The whole journal list is titled "Waiting for a decision" and the empty state says "nothing is waiting… offers no create action", yet the … (CHG-FIN-005).
 
 #### Inputs: what the user enters or picks
 
@@ -1073,11 +1049,17 @@ Errors to draw in the form: 403 Approver is the poster, or lacks LEDGER_APPROVE;
 | Reason `reason` | text area | required | — | min length 3; max length 500 | — | — | `reverseJournalEntry` body |
 | Fiscal period `fiscalPeriodId` | picker: choose a fiscal period | optional | — | — | shows names, sends the id | Period to post the reversal into. Defaults to the current open period. | `reverseJournalEntry` body |
 
+**Rules for these inputs** (from the Finance, Ledger & Tax · Reporting & Analytics process; these refine the tables above and win where they differ)
+
+- **Journal entry**: Fiscal period (open periods only), posting date, description (3–500 characters), reference, and at least two lines, each with account (postable, active), debit or credit, venue, cost centre and line description. A running "Debits AED x · Credits AED y · Difference" bar; saving is refused while unbalanced. *(source: contracts/spine/finance.yaml#/components/schemas/CreateJournalEntryRequest / contracts/spine/finance.yaml#createJournalEntry)*
+- **Reject**: A required comment the preparer will read; the entry returns to draft. *(source: contracts/spine/finance.yaml#rejectJournal)*
+- **Reverse**: A required reason and the period to post the reversal into (default the current open period). *(source: contracts/spine/finance.yaml#reverseJournalEntry)*
+
 #### Outputs: what the screen shows and produces
 
 **Shown**
 
-**Waiting for a decision** (data table, from `listJournalEntries`)
+**Journal entries** (data table, from `listJournalEntries`): Opens on `pendingApproval`; drafts, posted and reversed entries are a filter away.
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -1124,6 +1106,17 @@ Errors to draw in the form: 403 Approver is the poster, or lacks LEDGER_APPROVE;
 | Reject journal (destructive button) | `rejectJournal` POST `/journal-entries/{entryId}/reject` | inline | JournalEntry | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 The entry is not `pendingApproval`. | — |
 | Reverse journal entry (destructive button) | `reverseJournalEntry` POST `/journal-entries/{entryId}/reverse` | inline | JournalEntry | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 Already reversed, not yet posted, or the target period is not `open`. Three causes, three types. | — |
 
+**Rules for what is shown** (from the Finance, Ledger & Tax · Reporting & Analytics process; these refine the tables above and win where they differ)
+
+- **Two views**: "Waiting for approval" (pending entries, oldest first; empty means all done) and "All entries" (filter by period, status and source: manual, order, refund, void, shift, recognition, settlement, variance, reversal, write-off, chargeback). *(source: contracts/spine/finance.yaml#/components/schemas/JournalSource / contracts/spine/finance.yaml#/components/schemas/JournalStatus)*
+- **Entry detail**: Number, status, source, preparer, approver, lines with account code and name, totals; for a reversal, a link to the original and back; a rejected draft shows the rejection comment. *(source: contracts/spine/finance.yaml#/components/schemas/JournalEntry / contracts/spine/finance.yaml#/components/schemas/JournalStatus)*
+
+**What each action does** (from the Finance, Ledger & Tax · Reporting & Analytics process; these refine the tables above and win where they differ)
+
+- **Approve and post**: Posts to the ledger; needs the approver's second factor. *(source: contracts/spine/finance.yaml#approveJournalEntry / R135)*
+- **Reject**: Back to draft with the comment. *(source: contracts/spine/finance.yaml#rejectJournal)*
+- **Reverse**: Creates the mirror entry referencing the original; the original stays as posted and is marked Reversed. The confirmation states the accounts and amounts that will move. *(source: contracts/spine/finance.yaml#reverseJournalEntry)*
+
 **Data it reads**: `listJournalEntries` (onLoad, List journal entries)
 
 **Where the user goes next**
@@ -1148,6 +1141,30 @@ Errors to draw in the form: 403 Approver is the poster, or lacks LEDGER_APPROVE;
 | Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `LEDGER_VIEW`, which `listJournalEntries` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Lines do not balance, or an account is not postable; 409 Already reversed, not yet posted, or the target period is not `open`. Three causes, three types.; 409 The entry is not `pendingApproval`.; 409 The entry is not awaiting approval (it is `posted` or `reversed` already; only a `draft` or `pendingApproval` entry is approved), or its fiscal period has … |
+
+#### Edge cases to draw
+
+- **The preparer opens their own pending entry**: Approve is not offered; "Waiting for another approver" with the routing. *(source: contracts/spine/finance.yaml#approveJournalEntry)*
+- **The period stopped taking postings after the entry was prepared**: Approve is refused with "Period is closing; choose an open period". *(source: contracts/spine/finance.yaml#approveJournalEntry)*
+- **The approver is on leave at month end**: Delegation routes it to a delegate for a limited time. *(source: F13 step 3)*
+
+#### Consistency with other screens
+
+- Match `BO-090`: "No unapproved journals" is a close check linking here.
+- Match `BO-074`: Account pickers show code, name and type.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+pending:
+- 'JV-2026-000418 · Accrual: September cleaning contract · Dr 6200 Facilities AED 42,000.00 · Cr 2100 Accruals AED
+  42,000.00 · prepared by Rahul Menon'
+posted:
+- 'JE-2026-091233 · Source: shift · Till 3 close · Dr 6900 Cash over/short AED 20.00 · Cr 1100 Cash on hand AED
+  20.00'
+```
 
 #### Permissions
 
@@ -1207,6 +1224,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-090`, `BO-074`, `BO-075`.
 - [ ] Every gated control is gated: `LEDGER_APPROVE`, `LEDGER_POST`, `LEDGER_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 3 edge case(s) from the process notes are drawn.
+- [ ] The 3 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -1228,6 +1247,13 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Route | `/finance/period-close` |
 
 **What the spec says about it.** Added 17 August because the contract had operations no screen declared. **Not on the wireframe board** — needs drawing.
+
+**From the Finance, Ledger & Tax · Reporting & Analytics process.** Close a fiscal period and see exactly what is stopping it. Beginning the close stops postings to the period (sales continue, posting to the next period); the close runs seven checks and, when they pass, goes to a finance approver; reopening is rare and approved. The one thing to get right: the checklist is the screen; every failing check names how many items block it and links to where they are fixed.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **Legal entity and status filters are free text.** Why: An entity switcher and the three statuses. *(source: screens/P08-venue-back-office.yaml#BO-090; Finance, Ledger & Tax · Reporting & Analytics)*
+- **The close checks are not drawn; the screen shows a period list and a trial balance.** Why: The close returns seven named checks with blocking counts; that checklist is what "see what is stopping it" means. *(source: contracts/spine/finance.yaml#/components/schemas/PeriodCloseResult / screens/P08-venue-back-office.yaml#BO-090; Finance, Ledger & Tax · Reporting & Analytics)*
 
 #### Inputs: what the user enters or picks
 
@@ -1270,6 +1296,12 @@ Errors to draw in the form: 403 The caller lacks `LEDGER_APPROVE` there.; 404 Th
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
 | Reason `reason` | text area | required | — | — | — | — | `abandonPeriodClose` body |
+
+**Rules for these inputs** (from the Finance, Ledger & Tax · Reporting & Analytics process; these refine the tables above and win where they differ)
+
+- **Legal entity and period**: Entity switcher, then the periods by year with status Open, Closing, Closed. Periods follow the entity's fiscal year (January or April start). *(source: contracts/spine/finance.yaml#/components/schemas/FiscalPeriod / DI-263)*
+- **Abandon or reopen reason**: Required text; kept in the period's history. *(source: contracts/spine/finance.yaml#/components/schemas/FiscalPeriodEvent)*
+- **VAT return range**: Its own date range (the tax period), which need not be the fiscal period. *(source: contracts/spine/finance.yaml#getVatReturn)*
 
 #### Outputs: what the screen shows and produces
 
@@ -1321,6 +1353,20 @@ Errors to draw in the form: 403 The caller lacks `LEDGER_APPROVE` there.; 404 Th
 | Abandon period close (destructive button) | `abandonPeriodClose` POST `/fiscal-periods/{periodId}/abandon-close` | inline | FiscalPeriod | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 The period is not `closing`. | — |
 | Reopen period (secondary button) | `reopenPeriod` POST `/fiscal-periods/{periodId}/reopen` | inline | FiscalPeriod | 403 The caller lacks `LEDGER_APPROVE` there.; 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 The period is not `closed`. | opens modal first |
 
+**Rules for what is shown** (from the Finance, Ledger & Tax · Reporting & Analytics process; these refine the tables above and win where they differ)
+
+- **Close checklist**: Trial balance balances; no unapproved journals; no open shifts; settlements reconciled; recognition run complete; prior period closed; variance exceptions reviewed. Each with pass or fail, the blocking count and a link (BO-089, shifts, BO-043, BO-076, BO-077). Run as a dry run any time. *(source: contracts/spine/finance.yaml#/components/schemas/PeriodCloseResult / F13 step 1)*
+- **Trial balance**: Accounts with debit, credit and balance; total debits and credits; "Balanced" or "Not balanced: this is a defect" in words. *(source: contracts/spine/finance.yaml#/components/schemas/TrialBalance)*
+- **VAT return**: The return boxes as filed (standard-rated supplies by emirate, zero-rated, exempt, reverse charge, imports, tourist refunds, recoverable input tax, net payable), each traceable to its tax codes and postings; download CSV or Excel for the adviser. *(source: contracts/spine/finance.yaml#getVatReturn)*
+- **History**: Every begin, abandon, close and reopen with who, when, why and the approver. *(source: contracts/spine/finance.yaml#/components/schemas/FiscalPeriodEvent)*
+
+**What each action does** (from the Finance, Ledger & Tax · Reporting & Analytics process; these refine the tables above and win where they differ)
+
+- **Begin close**: Status Closing; postings to the period stop; new sales post to the next period with a reference. *(source: contracts/spine/finance.yaml#beginPeriodClose / F13 step 4)*
+- **Close**: Runs the checks; if they pass, raises an approval to another finance approver and shows "Close pending finance approval"; locks when approved. Failing checks are listed instead. *(source: contracts/spine/finance.yaml#closeFiscalPeriod / R144)*
+- **Abandon close**: Back to Open with the reason. *(source: contracts/spine/finance.yaml#abandonPeriodClose)*
+- **Request reopen**: "Reopen pending finance approval"; when approved the period goes back to Closing. *(source: contracts/spine/finance.yaml#reopenPeriod / R144)*
+
 **Data it reads**: `listFiscalPeriods` (onLoad, List fiscal periods); `getTrialBalance` (onLoad, Trial balance for a period); `getVatReturn` (onLoad, VAT return (FTA boxes) for a period)
 
 **Where the user goes next**
@@ -1345,6 +1391,33 @@ Errors to draw in the form: 403 The caller lacks `LEDGER_APPROVE` there.; 404 Th
 | Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `LEDGER_VIEW`, which `listFiscalPeriods` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 The period is already `closed`, or one or more of the close checks failed. The checks are exactly the values of `PeriodCloseResult.checks[].check` … (PeriodCloseProblem); 409 The period is not `closed`.; 409 The period is not `closing`.; 409 The period is not `open`. |
+
+#### Edge cases to draw
+
+- **The trial balance does not balance**: The close stops; recommend abandoning and investigating rather than closing over it. *(source: F13 step 5)*
+- **A correction is needed after closing**: Recommend a reversal in the current period; reopening invalidates reports already issued. *(source: F13 step 6)*
+- **FX revaluation of cross-currency balances**: Not available yet; show it as a pending step, not a passed check. *(source: contracts/spine/finance.yaml#closeFiscalPeriod)*
+
+#### Consistency with other screens
+
+- Match `BO-089`: Same wording for unapproved journals.
+- Match `BO-043`: Same settlement exception counts.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+period: September 2026 · Aquaventure Leisure LLC · Closing since 1 Oct 09:12 by Layla Haddad
+checks:
+- Trial balance balances · passed · Dr AED 18,442,910.25 = Cr AED 18,442,910.25
+- No unapproved journals · failed · 2 waiting
+- No open shifts · failed · Till 7 Surf Café
+- Settlements reconciled · passed
+- Recognition run complete · passed
+vatReturn: Jul–Sep 2026 · Standard-rated supplies Dubai AED 9,812,400.00 · VAT AED 490,620.00 · net payable AED
+  431,905.40
+```
 
 #### Permissions
 
@@ -1410,6 +1483,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-040`, `BO-074`, `BO-075`.
 - [ ] Every gated control is gated: `LEDGER_APPROVE`, `LEDGER_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 3 edge case(s) from the process notes are drawn.
+- [ ] The 2 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -1423,7 +1498,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Orders & Money · wave 1 · needs the `core` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `ORDER_VIEW`, `SETTLEMENT_VIEW`, `TENANT_VIEW` (3 read) |
+| Who uses it | venue staff holding `ORDER_VIEW`, `SETTLEMENT_VIEW` (2 read) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listOrders` reads the population and `getVenueSettings` reads one of them — list, select, act |
 | Offline | online only |
@@ -1431,6 +1506,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Route | `/orders-money` |
 
 **What the spec says about it.** Section landing. **28 screens reach the entry point through here** — before 20 August they reached it through nothing. **Given its section's own operations on 4 September.** It sat on `getVenueSettings` alone, which made it identical to every other section landing page — a hub that shows nothing of its section is a menu item, not a screen.
+
+**Known gaps.** Venue settings are not part of orders and money (design-note correction platform-foundation BO-101, CHG-SBO-015).
+
+**From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** A venue manager's overview of orders and settlements and what needs attention (refunds pending, unmatched settlement lines). It is a section hub, not an editor.
+
+**Fixed on main** (the package already carries these; draw what it says): getVenueSettings is declared on an orders overview. (CHG-SBO-015); Tables show every schema field, plumbing included: 'Every order' drop id; 'Every settlement' drop id. (CHG-SBO-004).
 
 #### Inputs: what the user enters or picks
 
@@ -1464,7 +1545,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Order number | text | — |
 | Status | chip: Pending, Held, Paid, Partially paid, Completed, Voided… | `held` is a parked sale — the cashier freed the till and the guest will return. It holds no inventory and expires, because a till that … |
 | Gross amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
@@ -1476,7 +1556,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Currency code | text | A settlement has no account, so nothing else denominates it. A posting takes its currency from `ledger.account.currency` and a payment from … |
 | Provider name | text | — |
 | Period start | 1 Oct 2026 | A day in the region's time zone, local midnight to local midnight. |
@@ -1506,21 +1585,11 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Hold label | text | As `Order.holdLabel`. |
 | Held until | 1 Oct 2026, 14:30 | As `Order.heldUntil`, so a held-orders list can warn about the ones about to lapse. |
 
-**The venue settings** (detail panel, from `getVenueSettings`)
+**Rules for what is shown** (from the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process; these refine the tables above and win where they differ)
 
-| Shows | Format | Notes |
-|---|---|---|
-| ID | the name it points at, never the id | Added 20 August. The schema reference derives table columns from API response schemas, and a response is not a table — this one returned … |
-| Venue | the name it points at, never the id | From the path of `setVenueSettings`. |
-| Currency code | text | `readOnly` is the freeze. `setVenueSettings` takes this whole schema as its request body, so without it any settings save could rewrite the … |
-| Currency scale | 1,234 | Scale travels with currency (ADR-0008), and so does the freeze. OMR is three decimal places because Oman says so; overriding the currency … |
-| Support hours | grouped details | CF-100. A venue decides whether its support desk is 24/7 or bounded, and the platform does not. |
-| Quiet hours | grouped details | When the platform does not send. A wallet low-balance alert at 3am is a complaint, and journeys and message triggers both respect this. |
-| Biometrics | grouped details | CF-35, BL-096, BL-105, BL-106. The venue-level master switch, and the one place a person is asked whether the paperwork exists. |
-| Segregated access | grouped details | CF-130. Configured at venue level because it changes by region and the venue is where it is known — a Ladies Night, a family session, a … |
-| Alerting | grouped details | CF-134. On-platform notification, marked as read. |
+- **Money columns (grossAmount, refundedAmount)**: Money in the region's currency and scale, never a bare number: AED to 2 decimals, OMR/BHD/KWD to 3, the third decimal never rounded away (2.013 stays 2.013); the currency code is shown with the figure. *(source: ADR-0008; ADR-0011; DI-306)*
 
-**Data it reads**: `getVenueSettings` (onLoad, What is enabled here); `listOrders` (onLoad, Orders taken in this venue); `listSettlements` (onLoad, Money settled and what is outstanding)
+**Data it reads**: `listOrders` (onLoad, Orders taken in this venue); `listSettlements` (onLoad, Money settled and what is outstanding)
 
 **Where the user goes next**
 
@@ -1548,6 +1617,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - → `BO-077` FX Rates & Variances: *FX Rates & Variances*
 - → `BO-089` Journal Entries: *Journal Entries*
 - → `BO-090` Period Close: *Period Close*
+- → `BO-028` Refund Approval Queue: *Refund Approval Queue*
 
 #### States
 
@@ -1560,9 +1630,32 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Permission denied (`?state=emptyNoAccess`) | You do not have permission for orders & money. **Said plainly** — an empty section reads as broken. |
 | Offline (`?state=offline`) | online only |
 
+#### Edge cases to draw
+
+- **A person whose grants cover only some venues, or a link to a record in another venue**: The venue filter lists only venues in the session's scope (Session.scope, resolved at sign-in); a record outside it renders Not found, deliberately indistinguishable from absent, never a 'you may not see venue X' message. *(source: ADR-0011; contracts/shared/common.yaml#/components/schemas/Problem; contracts/spine/identity.yaml#getCurrentSession)*
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+Every order:
+- status: active
+  grossAmount: AED 1,250.00
+  refundedAmount: AED 1,250.00
+  lineCount: 12
+- status: pending
+  grossAmount: AED 48,000.00
+  refundedAmount: AED 48,000.00
+  lineCount: 3
+- status: suspended
+  grossAmount: OMR 48.500
+  refundedAmount: OMR 48.500
+  lineCount: 0
+```
+
 #### Permissions
 
-- `getVenueSettings` → `TENANT_VIEW` (read) · staff
 - `listOrders` → `ORDER_VIEW` (read) · staff, guest, partner
 - `listSettlements` → `SETTLEMENT_VIEW` (read) · staff, partner
 
@@ -1570,7 +1663,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Requirements it meets
 
-22 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+5 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
 
 | Ref | Requirement (shortened) | Domain | Verdict | Via |
 |---|---|---|---|---|
@@ -1579,14 +1672,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | 22.2.11 | Ticketing History | Marketing & CRM | CONTRACTED | `listOrders` |
 | 22.2.12 | Membership History | Marketing & CRM | CONTRACTED | `listOrders` |
 | 22.2.15 | Reservation History | Marketing & CRM | CONTRACTED | `listOrders` |
-| 3.2.45 | Face Pass and Face Tag should support automatic gender recognition and reject customers who do not match the designated gender segment. | Admission and Access | CONTRACTED_PARTIAL | data `VenueSettings` |
-| 3.2.46 | Face Pass shouldt restrict male guests attempting to enter during Friday Ladies Night, which needs to be validated with rule-based facial recognition validation. | Admission and Access | CONTRACTED | data `VenueSettings` |
-| 8.9.3 | System shall display queue lengths, estimated wait times, queue utilization, queue alerts, and queue prediction metrics. | Unified Operations Dashboard | CONTRACTED | data `VenueSettings` |
-| 11.1.15 | Approval Breach Alerts - System shall notify users when approval SLA thresholds are exceeded. | Approval Workflows & Governance | CONTRACTED | data `VenueSettings` |
-| 11.1.17 | Approval Notifications - System shall notify approvers when new approval requests are assigned. | Approval Workflows & Governance | CONTRACTED | data `VenueSettings` |
-| 11.1.18 | Approval Reminder Notifications - System shall send reminder notifications for pending approvals. | Approval Workflows & Governance | CONTRACTED | data `VenueSettings` |
-| 11.1.19 | Approval Outcome Notifications - System shall notify requestors when approvals are approved, rejected or escalated. | Approval Workflows & Governance | CONTRACTED | data `VenueSettings` |
-| … 10 more | | | | `traceability.json` |
 
 #### Client meeting inputs
 
@@ -1604,13 +1689,14 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (7), with its required mark, default, format and its error state (403, 404).
-- [ ] Every output is drawn (38 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (7), with its required mark, default, format and its error state (403).
+- [ ] Every output is drawn (27 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-101?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
-- [ ] Every transition is wired: `BO-008`, `BO-022`, `BO-023`, `BO-024`, `BO-025`, `BO-026`, `BO-027`, `BO-029`, `BO-039`, `BO-040`, `BO-041`, `BO-042`, `BO-043`, `BO-047`, `BO-048`, `BO-059`, `BO-061`, `BO-062`, `BO-065`, `BO-074`, `BO-075`, `BO-077`, `BO-089`, `BO-090`.
-- [ ] Every gated control is gated: `ORDER_VIEW`, `SETTLEMENT_VIEW`, `TENANT_VIEW`.
+- [ ] Every transition is wired: `BO-008`, `BO-022`, `BO-023`, `BO-024`, `BO-025`, `BO-026`, `BO-027`, `BO-029`, `BO-039`, `BO-040`, `BO-041`, `BO-042`, `BO-043`, `BO-047`, `BO-048`, `BO-059`, `BO-061`, `BO-062`, `BO-065`, `BO-074`, `BO-075`, `BO-077`, `BO-089`, `BO-090`, `BO-028`.
+- [ ] Every gated control is gated: `ORDER_VIEW`, `SETTLEMENT_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 1 edge case(s) from the process notes are drawn.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -1701,7 +1787,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Allam: Bulk QR option — for partners with no technical capability, the platform generates a bulk batch of tickets (e.g. 5,000) with a validity window, delivered as QR codes (e.g. CSV) for the partner to import and resell. *(client request · MoM 5 Aug 2026, 2. B2B Ticket Distribution Models · DI-135)*
 - Full card numbers are never stored or shown; only a masked representation (e.g. last four digits) so the user can identify which card was used. *(agreed · MoM 31 Jul 2026, 10. Compliance & Data Protection · DI-069)*
 
-**10 more name particular screens** and are in each screen's block above (*Client meeting inputs*).
+**8 more name particular screens** and are in each screen's block above (*Client meeting inputs*).
 
 ---
 
@@ -1719,27 +1805,19 @@ Method, path, parameters, request and response for every operation these screens
 "approveJournalEntry": {"method":"POST","path":"/journal-entries/{entryId}/approve","contract":"finance","summary":"Approve a journal entry and post it","permission":"LEDGER_APPROVE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"region","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"JournalEntry"},
 "beginPeriodClose": {"method":"POST","path":"/fiscal-periods/{periodId}/begin-close","contract":"finance","summary":"Begin closing a period","permission":"LEDGER_APPROVE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"region","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"FiscalPeriod"},
 "closeFiscalPeriod": {"method":"POST","path":"/fiscal-periods/{periodId}/close","contract":"finance","summary":"Close a period and lock postings","permission":"LEDGER_APPROVE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"region","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"PeriodCloseResult"},
-"createAccount": {"method":"POST","path":"/accounts","contract":"finance","summary":"Create an account","permission":"ACCOUNT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"region","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"CreateAccountRequest","responds":"Account"},
-"createCostCenter": {"method":"POST","path":"/cost-centers","contract":"finance","summary":"Create a cost centre","permission":"ACCOUNT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"region","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"CostCenter"},
 "createJournalEntry": {"method":"POST","path":"/journal-entries","contract":"finance","summary":"Post a manual journal voucher","permission":"LEDGER_POST","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"region","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"CreateJournalEntryRequest","responds":"JournalEntry"},
-"createLegalEntity": {"method":"POST","path":"/legal-entities","contract":"finance","summary":"Create a legal entity","permission":"ACCOUNT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"LegalEntity","responds":"LegalEntity"},
 "createRecognitionSchedule": {"method":"POST","path":"/recognition-schedules","contract":"finance","summary":"Define how a product class recognises revenue","permission":"ACCOUNT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"region","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"RecognitionSchedule","responds":"RecognitionSchedule"},
 "createTaxCode": {"method":"POST","path":"/tax-codes","contract":"finance","summary":"Create a tax code","permission":"TAX_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"region","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"CreateTaxCodeRequest","responds":"TaxCode"},
 "createTaxExemption": {"method":"POST","path":"/tax-exemptions","contract":"finance","summary":"Grant a tax exemption","permission":"TAX_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"region","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"TaxExemption","responds":"TaxExemption"},
-"getAccount": {"method":"GET","path":"/accounts/{accountId}","contract":"finance","summary":"Read an account","permission":"LEDGER_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"region","parameters":[],"requestBody":null,"responds":"Account"},
 "getDeferredRevenue": {"method":"GET","path":"/deferred-revenue","contract":"finance","summary":"Deferred revenue balance and ageing","permission":"LEDGER_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"asAt","in":"query","required":null},{"name":"venueId","in":"query","required":null}],"requestBody":null,"responds":"DeferredRevenueReport"},
 "getJournalEntry": {"method":"GET","path":"/journal-entries/{entryId}","contract":"finance","summary":"Read a journal entry","permission":"LEDGER_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"region","parameters":[],"requestBody":null,"responds":"JournalEntry"},
 "getTrialBalance": {"method":"GET","path":"/ledger/trial-balance","contract":"finance","summary":"Trial balance for a period","permission":"LEDGER_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"region","parameters":[{"name":"fiscalPeriodId","in":"query","required":true},{"name":"legalEntityId","in":"query","required":null}],"requestBody":null,"responds":"TrialBalance"},
 "getVatReturn": {"method":"GET","path":"/tax/vat-returns","contract":"finance","summary":"A legal entity's VAT return for a tax period, in the FTA's boxes","permission":"LEDGER_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"region","parameters":[{"name":"legalEntityId","in":"query","required":true},{"name":"periodFrom","in":"query","required":true},{"name":"periodTo","in":"query","required":true},{"name":"format","in":"query","required":null}],"requestBody":null,"responds":"FinVatReturn"},
-"getVenueSettings": {"method":"GET","path":"/venues/{venueId}/settings","contract":"tenancy","summary":"Operational settings for this venue","permission":"TENANT_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"VenueSettings"},
 "ingestFxRates": {"method":"POST","path":"/fx-rates/ingest","contract":"finance","summary":"Pull rates from the configured provider","permission":"LEDGER_APPROVE","offlineCapable":false,"conflictPolicy":"append","scopeLevel":"region","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":null},
 "listAccountMappings": {"method":"GET","path":"/account-mappings","contract":"finance","summary":"Which account each transaction type posts to","permission":"LEDGER_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"region","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
-"listAccounts": {"method":"GET","path":"/accounts","contract":"finance","summary":"List the chart of accounts","permission":"LEDGER_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"region","parameters":[{"name":"legalEntityId","in":"query","required":null},{"name":"type","in":"query","required":null},{"name":"isPostable","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
-"listCostCenters": {"method":"GET","path":"/cost-centers","contract":"finance","summary":"List cost centres","permission":"LEDGER_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"region","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listFiscalPeriods": {"method":"GET","path":"/fiscal-periods","contract":"finance","summary":"List fiscal periods","permission":"LEDGER_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"region","parameters":[{"name":"legalEntityId","in":"query","required":null},{"name":"status","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
-"listFxRates": {"method":"GET","path":"/fx-rates","contract":"finance","summary":"The rates in force","permission":"LEDGER_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"region","parameters":[{"name":"asAt","in":"query","required":null},{"name":"purpose","in":"query","required":null},{"name":"venueId","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
+"listFxRates": {"method":"GET","path":"/fx-rates","contract":"finance","summary":"The rates in force","permission":"LEDGER_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"region","parameters":[{"name":"asAt","in":"query","required":null},{"name":"purpose","in":"query","required":null},{"name":"venueId","in":"query","required":null},{"name":"chargeable","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listJournalEntries": {"method":"GET","path":"/journal-entries","contract":"finance","summary":"List journal entries","permission":"LEDGER_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"region","parameters":[{"name":"fiscalPeriodId","in":"query","required":null},{"name":"status","in":"query","required":null},{"name":"source","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
-"listLegalEntities": {"method":"GET","path":"/legal-entities","contract":"finance","summary":"List legal entities","permission":"LEDGER_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listOrders": {"method":"GET","path":"/orders","contract":"orders","summary":"List orders","permission":"ORDER_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"venueId","in":"query","required":null},{"name":"principalId","in":"query","required":null},{"name":"shiftId","in":"query","required":null},{"name":"status","in":"query","required":null},{"name":"createdFrom","in":"query","required":null},{"name":"createdTo","in":"query","required":null},{"name":"workstationId","in":"query","required":null},{"name":"subjectId","in":"query","required":null},{"name":"tender","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listPriceVariances": {"method":"GET","path":"/price-variances","contract":"finance","summary":"List price variances","permission":"LEDGER_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"venueId","in":"query","required":null},{"name":"exceptionsOnly","in":"query","required":null},{"name":"reviewStatus","in":"query","required":null},{"name":"occurredFrom","in":"query","required":null},{"name":"occurredTo","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listRecognitionSchedules": {"method":"GET","path":"/recognition-schedules","contract":"finance","summary":"List revenue recognition schedules","permission":"LEDGER_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"region","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
@@ -1753,7 +1831,6 @@ Method, path, parameters, request and response for every operation these screens
 "runRecognition": {"method":"POST","path":"/recognition/run","contract":"finance","summary":"Recognise earned revenue for a period","permission":"LEDGER_POST","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"region","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"RecognitionRunResult"},
 "setAccountMappings": {"method":"PUT","path":"/account-mappings","contract":"finance","summary":"Set posting mappings","permission":"ACCOUNT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"region","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"AccountMapping"},
 "setFxRate": {"method":"PUT","path":"/fx-rates","contract":"finance","summary":"Set a rate","permission":"LEDGER_APPROVE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"region","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"FxRate","responds":"FxRate"},
-"updateAccount": {"method":"PATCH","path":"/accounts/{accountId}","contract":"finance","summary":"Rename, remap or deactivate an account","permission":"ACCOUNT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"region","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Account"},
 "updateTaxCode": {"method":"PATCH","path":"/tax-codes/{taxCodeId}","contract":"finance","summary":"Amend a tax code","permission":"TAX_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"region","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"TaxCode"},
 "validateRecognitionSchedules": {"method":"POST","path":"/recognition-schedules/validate","contract":"finance","summary":"Find product kinds claimed by more than one schedule","permission":"LEDGER_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":null},
 "verifyTaxExemption": {"method":"POST","path":"/tax-exemptions/{exemptionId}/verify","contract":"finance","summary":"Record that a tax exemption's evidence was checked","permission":"TAX_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"region","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"TaxExemption"}
@@ -1766,18 +1843,15 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
-"Account": {"x-ticvai-persistence":"ledger.account","type":"object","required":["id","code","name","type","legalEntityId","isPostable","isActive"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string","maxLength":64},"externalCode":{"type":"string","nullable":true,"description":"Code in the client's own chart. Used on export so their team sees their codes."},"isSuspense":{"type":"boolean","default":false,"description":"5.7.x. **Where a posting with no account mapping goes.** Today it has no destination, and a posting event that cannot be booked is a posting event that is silently dropped.\n**A suspense balance is a work queue, not a resting place.** It should trend to zero, and a balance that grows is the signal that a mapping is missing — which is the whole reason for having one rather than refusing the posting.\n"},"subType":{"type":"string","nullable":true,"description":"5.7.27. **`AccountType` stays a closed enum of asset, liability, equity, revenue and expense because that is correct accounting**, and a venue wanting *Deferred Revenue — Annual Pass* is asking for a sub-type rather than a sixth type.\n"},"tags":{"type":"array","items":{"type":"string"},"description":"How a venue groups accounts for its own reporting. Free-form, and outside the type."},"notes":{"type":"string","nullable":true,"description":"5.7.27. Annotations on the account, which an auditor reads before the balance."},"name":{"type":"string","maxLength":200},"type":{"$ref":"#/components/schemas/AccountType"},"parentId":{"type":"string","format":"uuid","nullable":true},"legalEntityId":{"type":"string","format":"uuid"},"currency":{"type":"string","pattern":"^[A-Z]{3}$"},"isPostable":{"type":"boolean","description":"False for parent accounts, which aggregate only."},"isActive":{"type":"boolean"},"balance":{"$ref":"../shared/common.yaml#/components/schemas/Money"}}},
 "AccountMapping": {"x-ticvai-persistence":"ledger.account_mapping","type":"object","required":["eventType","debitAccountId","creditAccountId"],"properties":{"eventType":{"$ref":"#/components/schemas/PostingEventType"},"debitAccountId":{"type":"string","format":"uuid"},"creditAccountId":{"type":"string","format":"uuid"},"venueId":{"type":"string","format":"uuid","nullable":true,"description":"Null applies the mapping to every venue in the region."}}},
 "AccountType": {"type":"string","enum":["asset","liability","equity","revenue","expense"]},
-"CostCenter": {"x-ticvai-persistence":"ledger.cost_center","type":"object","required":["id","code","name"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string"},"name":{"type":"string"},"parentId":{"type":"string","format":"uuid","nullable":true},"venueId":{"type":"string","format":"uuid","nullable":true},"isActive":{"type":"boolean"}}},
-"CreateAccountRequest": {"type":"object","required":["code","name","type","legalEntityId"],"properties":{"code":{"type":"string","maxLength":64,"pattern":"^[A-Za-z0-9._-]+$"},"externalCode":{"type":"string","maxLength":64},"name":{"type":"string","maxLength":200},"type":{"$ref":"#/components/schemas/AccountType"},"parentId":{"type":"string","format":"uuid"},"legalEntityId":{"type":"string","format":"uuid"},"isPostable":{"type":"boolean","default":true},"isSuspense":{"type":"boolean","default":false,"description":"See `Account.isSuspense`."},"subType":{"type":"string","nullable":true,"description":"See `Account.subType`."},"tags":{"type":"array","items":{"type":"string"},"description":"See `Account.tags`."},"notes":{"type":"string","nullable":true,"description":"See `Account.notes`."}}},
 "CreateJournalEntryRequest": {"type":"object","required":["id","fiscalPeriodId","description","lines"],"properties":{"id":{"type":"string","format":"uuid"},"fiscalPeriodId":{"type":"string","format":"uuid"},"postingDate":{"type":"string","format":"date","description":"A day in the region's time zone, local midnight to local midnight."},"description":{"type":"string","minLength":3,"maxLength":500},"reference":{"type":"string","maxLength":128},"lines":{"type":"array","minItems":2,"items":{"$ref":"#/components/schemas/JournalLine"}}}},
 "CreateTaxCodeRequest": {"type":"object","required":["code","name","countryCode","rate","effectiveFrom","accountId"],"properties":{"code":{"type":"string","maxLength":64},"name":{"type":"string","maxLength":200},"countryCode":{"type":"string","pattern":"^[A-Z]{2}$"},"rate":{"type":"number","minimum":0,"maximum":100},"compoundOnTaxCodeId":{"type":"string","format":"uuid"},"isInclusive":{"type":"boolean","default":false},"accountId":{"type":"string","format":"uuid"},"effectiveFrom":{"type":"string","format":"date","description":"A day in the region's time zone, local midnight to local midnight."}}},
 "DeferredRevenueReport": {"x-ticvai-persistence":"none — computed","type":"object","required":["asAt","totals","buckets"],"properties":{"asAt":{"type":"string","format":"date","description":"A day in the region's time zone, local midnight to local midnight."},"totals":{"type":"array","description":"**One `Money` per currency in scope**, never a sum across currencies. One entry when every venue in scope trades in the same currency.\n","items":{"$ref":"../shared/common.yaml#/components/schemas/Money"}},"total":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"nullable":true,"description":"The single total when everything in scope is in one currency; null otherwise. Read `totals`."},"buckets":{"type":"array","description":"One ageing band in one currency per entry. A band spanning two currencies is two entries.","items":{"type":"object","required":["label","amount","itemCount"],"properties":{"label":{"type":"string","description":"Ageing band by expected recognition date."},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"itemCount":{"type":"integer"},"method":{"$ref":"#/components/schemas/RecognitionMethod"}}}}}},
 "FinVatReturn": {"x-ticvai-persistence":"none — computed from ledger postings on the reporting replica","type":"object","description":"6.1.23. The FTA VAT 201 boxes for one legal entity and tax period.","required":["legalEntityId","periodFrom","periodTo","boxes","netTaxPayable"],"properties":{"legalEntityId":{"type":"string","format":"uuid"},"taxRegistrationNumber":{"type":"string"},"periodFrom":{"type":"string","format":"date"},"periodTo":{"type":"string","format":"date"},"boxes":{"type":"array","items":{"type":"object","required":["box","amount","taxAmount"],"properties":{"box":{"type":"string","description":"The form's box, e.g. `1a` (standard-rated supplies, Abu Dhabi) ... `1g`, `2` (tourist refunds), `3` (reverse charge), `4` (zero-rated), `5` (exempt), `6` and `7` (imports), `9` (standard-rated expenses), `10` (reverse charge inputs)."},"label":{"type":"string"},"emirate":{"type":"string","nullable":true},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"taxAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"adjustmentAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"taxCodeIds":{"type":"array","items":{"type":"string","format":"uuid"}},"postingCount":{"type":"integer"}}}},"totalOutputTax":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"totalRecoverableTax":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"netTaxPayable":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"fileUrl":{"type":"string","format":"uri","nullable":true,"description":"Set for `format` `csv` or `xlsx`; a short-lived link."},"generatedAt":{"type":"string","format":"date-time"}}},
 "FiscalPeriod": {"x-ticvai-persistence":"ledger.fiscal_period + ledger.fiscal_period_event","type":"object","description":"`startDate` and `endDate` are days in the region's time zone: a posting belongs to the period when its `postedAt`, in that zone, falls on or between them.\n","required":["id","legalEntityId","name","startDate","endDate","status"],"properties":{"id":{"type":"string","format":"uuid"},"legalEntityId":{"type":"string","format":"uuid"},"name":{"type":"string"},"startDate":{"type":"string","format":"date","description":"A day in the region's time zone, local midnight to local midnight."},"endDate":{"type":"string","format":"date","description":"A day in the region's time zone, local midnight to local midnight."},"status":{"$ref":"#/components/schemas/PeriodStatus"},"closedByPrincipalId":{"type":"string","format":"uuid","nullable":true},"closedAt":{"type":"string","format":"date-time","nullable":true},"approvalRequestId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"The approval request a close or reopen is waiting on (`approvals`), routed to a finance approver (decided 28 September, audit R144). Null when nothing is waiting."},"events":{"type":"array","description":"**Every step of the period's close, oldest first**: begin, abandon, close and reopen, each with who, when and (for abandon and reopen) why. A reopened period restates figures somebody has already reported, so the reason is kept, not just the latest status.\n","items":{"$ref":"#/components/schemas/FiscalPeriodEvent"}}}},
 "FiscalPeriodEvent": {"type":"object","description":"One step in a fiscal period's close. Written by the operation that took the step; never edited.","required":["action","principalId","occurredAt"],"properties":{"action":{"type":"string","enum":["beginClose","abandonClose","close","reopen"]},"reason":{"type":"string","nullable":true,"description":"Required by `abandonPeriodClose` and `reopenPeriod`; null for the other steps."},"principalId":{"type":"string","format":"uuid","description":"Who took the step."},"approverPrincipalId":{"type":"string","format":"uuid","nullable":true,"description":"The approver of a `reopen`. Null for the other steps."},"occurredAt":{"type":"string","format":"date-time"}}},
-"FxRate": {"type":"object","x-ticvai-persistence":"ledger.fx_rate","description":"Also the `setFxRate` body. **Server-owned fields are `readOnly`** and ignored if sent: `id`, `setByPrincipalId`, and the provenance `ingestFxRates` writes (`source`, `providerReference`, `fetchedAt`). A rate set through `setFxRate` has `source` `manual`.\n","required":["fromCurrency","toCurrency","rate","purpose","effectiveFrom"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"fromCurrency":{"type":"string","pattern":"^[A-Z]{3}$"},"toCurrency":{"type":"string","pattern":"^[A-Z]{3}$"},"rate":{"allOf":[{"$ref":"#/components/schemas/FxRateValue"}],"description":"Units of `toCurrency` per one `fromCurrency`. Six decimal places — a two-place rate on a three-place currency loses money on every transaction, quietly.\n"},"purpose":{"$ref":"#/components/schemas/FxRatePurpose"},"source":{"allOf":[{"$ref":"#/components/schemas/FxRateSource"}],"readOnly":true},"effectiveFrom":{"type":"string","format":"date-time"},"effectiveTo":{"type":"string","format":"date-time","nullable":true,"description":"A rate change is a new row. The old one is never edited — a transaction posted last Tuesday must still reconcile at last Tuesday's rate.\n"},"setByPrincipalId":{"type":"string","format":"uuid","readOnly":true},"note":{"type":"string","maxLength":500,"nullable":true,"description":"Why this rate, and from where. **Required when `source` is `manual`** (decided 28 September, audit R127 (4)); null on a rate `ingestFxRates` fetched."},"providerReference":{"type":"string","nullable":true,"readOnly":true,"description":"The provider's own identifier for this quote. **What makes a rate reproducible** — an auditor asking why a payment converted at 3.6725 gets an answer that is checkable against the source rather than a number somebody typed."},"fetchedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true,"description":"When the rate was pulled. **Distinct from `effectiveFrom`**, which is when it applies — a rate fetched at 06:00 for a business day starting at 00:00 has two different times and conflating them makes a late feed look like a backdated rate."}}},
+"FxRate": {"type":"object","x-ticvai-persistence":"ledger.fx_rate","description":"Also the `setFxRate` body. **Server-owned fields are `readOnly`** and ignored if sent: `id`, `setByPrincipalId`, and the provenance `ingestFxRates` writes (`source`, `providerReference`, `fetchedAt`). A rate set through `setFxRate` has `source` `manual`.\n","required":["fromCurrency","toCurrency","rate","purpose","effectiveFrom"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"fromCurrency":{"type":"string","pattern":"^[A-Z]{3}$"},"toCurrency":{"type":"string","pattern":"^[A-Z]{3}$"},"rate":{"allOf":[{"$ref":"#/components/schemas/FxRateValue"}],"description":"Units of `toCurrency` per one `fromCurrency`. Six decimal places — a two-place rate on a three-place currency loses money on every transaction, quietly.\n"},"purpose":{"$ref":"#/components/schemas/FxRatePurpose"},"source":{"allOf":[{"$ref":"#/components/schemas/FxRateSource"}],"readOnly":true},"effectiveFrom":{"type":"string","format":"date-time"},"effectiveTo":{"type":"string","format":"date-time","nullable":true,"description":"A rate change is a new row. The old one is never edited — a transaction posted last Tuesday must still reconcile at last Tuesday's rate.\n"},"setByPrincipalId":{"type":"string","format":"uuid","readOnly":true},"note":{"type":"string","maxLength":500,"nullable":true,"description":"Why this rate, and from where. **Required when `source` is `manual`** (decided 28 September, audit R127 (4)); null on a rate `ingestFxRates` fetched."},"providerReference":{"type":"string","nullable":true,"readOnly":true,"description":"The provider's own identifier for this quote. **What makes a rate reproducible** — an auditor asking why a payment converted at 3.6725 gets an answer that is checkable against the source rather than a number somebody typed."},"fetchedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true,"description":"When the rate was pulled. **Distinct from `effectiveFrom`**, which is when it applies — a rate fetched at 06:00 for a business day starting at 00:00 has two different times and conflating them makes a late feed look like a backdated rate."},"chargeable":{"type":"boolean","readOnly":true,"x-ticvai-persisted":false,"description":"With `venueId`, true where a guest may select this currency and pay in it at that venue (`tenancy.VenueSettings.chargeCurrencies`), false where it is shown as an approximate price only (CHG-FIN-001)."}}},
 "FxRatePurpose": {"type":"string","description":"A venue does not accept dollars at the rate it books an intercompany balance at. Separating them is what stops a spread on the counter appearing as a loss in the accounts.\n","enum":["tender","interEntity","reporting","revaluation"]},
 "FxRateSource": {"type":"string","description":"**Where the rate came from, and which provider specifically.** `source: provider` said a feed set it and not which one — two tenants on different feeds were indistinguishable in the ledger, and a rate cannot be defended in an audit without naming its origin.\n\n**`uaeCentralBank` is the default for AED pairs.** The UAE Central Bank publishes an official daily rate and it is what a UAE auditor expects to see — a commercial feed is defensible for tender and awkward for statutory reporting.\n\n**`openExchangeRates` and `ecb` are the commercial and reference options.** ECB publishes daily reference rates free and is the usual fallback for non-AED pairs; Open Exchange Rates is the common commercial feed with intraday granularity. **The choice is per purpose, not per platform** — a tender rate wants intraday, a reporting rate wants the official daily close.","enum":["manual","uaeCentralBank","ecb","openExchangeRates","cardScheme","provider"]},
 "FxRateValue": {"x-ticvai-persistence-column":"numeric(18,6)","type":"string","pattern":"^\\d+(\\.\\d{1,6})?$","description":"**An exchange rate: a decimal string, never a float**, for the reason `Money.amount` is one (naming-and-style 5.1). Up to six decimal places — a two-place rate on a three-place currency loses money on every transaction, quietly — and stored as `numeric(18,6)` so the six places the wire carries survive the database.\n"},
@@ -1785,12 +1859,11 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "JournalLine": {"x-ticvai-append-only":"postedAt","type":"object","required":["accountId","debit","credit"],"properties":{"accountId":{"type":"string","format":"uuid"},"debit":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"credit":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"venueId":{"type":"string","format":"uuid","nullable":true},"costCenterId":{"type":"string","format":"uuid","nullable":true},"description":{"type":"string","maxLength":500},"postedAt":{"type":"string","format":"date-time","readOnly":true,"description":"**Copied from the journal entry when it posts** (ADR-0056), so the line table can be partitioned by month on its own column. Never differs from its entry's."}}},
 "JournalSource": {"type":"string","enum":["manual","order","refund","void","shift","recognition","settlement","variance","reversal","writeOff","chargeback"]},
 "JournalStatus": {"type":"string","enum":["draft","pendingApproval","posted","reversed"]},
-"LegalEntity": {"x-ticvai-persistence":"ledger.legal_entity","type":"object","description":"Also the `createLegalEntity` body. **`id` and `scopePath` are server-owned** (`readOnly`) and ignored if sent.\n","required":["id","code","name","countryCode","currency","currencyScale","fiscalYearStartMonth"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"code":{"type":"string","maxLength":64},"name":{"type":"string","maxLength":200},"countryCode":{"type":"string","pattern":"^[A-Z]{2}$"},"currency":{"type":"string","pattern":"^[A-Z]{3}$"},"currencyScale":{"type":"integer","minimum":0,"maximum":4},"taxRegistrationNumber":{"type":"string","nullable":true},"fiscalYearStartMonth":{"type":"integer","minimum":1,"maximum":12},"regionIds":{"type":"array","items":{"type":"string","format":"uuid"}},"isActive":{"type":"boolean"},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `tenant` scope.**"}}},
 "OrderChannel": {"type":"string","description":"Where the order originated. Added when guest self-ordering was contracted — an order a guest placed on their own phone is commercially and operationally different from one a cashier typed, and reporting that cannot separate them cannot answer whether self-ordering is working.\n","enum":["pos","kiosk","guestApp","guestWeb","callCentre","partner","api","backOffice"]},
 "OrderStatus": {"type":"string","enum":["pending","held","paid","partiallyPaid","completed","voided","refunded","partiallyRefunded","failed"],"description":"`held` is a parked sale — the cashier freed the till and the guest will return. It holds no inventory and expires, because a till that accumulates parked sales across a shift cannot be closed.\n"},
 "OrderSummary": {"x-ticvai-persistence":"none — projection","type":"object","required":["id","orderNumber","status","grossAmount","createdAt"],"properties":{"id":{"type":"string","format":"uuid"},"orderNumber":{"type":"string"},"status":{"$ref":"#/components/schemas/OrderStatus"},"grossAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"refundedAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"channel":{"allOf":[{"$ref":"#/components/schemas/OrderChannel"}],"description":"The same vocabulary as `Order.channel`, which this projects."},"lineCount":{"type":"integer"},"principalId":{"type":"string","format":"uuid","description":"The cashier who raised it — what the held-orders list shows."},"holdLabel":{"type":"string","nullable":true,"description":"As `Order.holdLabel`."},"heldUntil":{"type":"string","format":"date-time","nullable":true,"description":"As `Order.heldUntil`, so a held-orders list can warn about the ones about to lapse."},"createdAt":{"type":"string","format":"date-time"}}},
 "Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}},
-"PeriodCloseResult": {"x-ticvai-persistence":"none — computed","type":"object","required":["fiscalPeriodId","dryRun","passed","checks"],"properties":{"fiscalPeriodId":{"type":"string","format":"uuid"},"dryRun":{"type":"boolean"},"passed":{"type":"boolean"},"checks":{"type":"array","items":{"type":"object","required":["check","passed"],"properties":{"check":{"type":"string","enum":["trialBalanceBalances","noUnapprovedJournals","noOpenShifts","settlementsReconciled","recognitionRunComplete","priorPeriodClosed","varianceExceptionsReviewed"]},"passed":{"type":"boolean"},"detail":{"type":"string"},"blockingCount":{"type":"integer"}}}}}},
+"PeriodCloseResult": {"x-ticvai-persistence":"none — computed","type":"object","required":["fiscalPeriodId","dryRun","passed","checks"],"properties":{"fiscalPeriodId":{"type":"string","format":"uuid"},"dryRun":{"type":"boolean"},"passed":{"type":"boolean"},"checks":{"type":"array","items":{"type":"object","required":["check","passed"],"properties":{"check":{"type":"string","enum":["trialBalanceBalances","noUnapprovedJournals","noOpenShifts","settlementsReconciled","recognitionRunComplete","priorPeriodClosed","varianceExceptionsReviewed"]},"passed":{"type":"boolean"},"detail":{"type":"string"},"blockingCount":{"type":"integer"}}}},"walletChecks":{"type":"array","description":"**The wallet pre-close checks** (decided 2 October 2026, Chinmay, batch 6 #220, BO-1170; DEC-220; CHG-CSP-040). Beside `checks`, whose values clients built at r1 already switch on, so no value is added there. `passed` is false while any of these fails. Empty where the tenant has no wallet module.","items":{"type":"object","required":["check","passed"],"properties":{"check":{"type":"string","enum":["walletRollForwardTies","walletLiabilityMatchesLedger","noPendingWalletAuthorisations","expiredBalancesReleased","walletDisputesReviewed"],"description":"`walletRollForwardTies`: opening liability plus top-ups, minus spend, refunds and expiry, equals closing liability. `walletLiabilityMatchesLedger`: that closing liability equals the wallet liability account. `noPendingWalletAuthorisations`: no authorisation is still held open in the period. `expiredBalancesReleased`: balances past expiry were released to breakage. `walletDisputesReviewed`: no wallet dispute raised in the period is unreviewed."},"passed":{"type":"boolean"},"detail":{"type":"string"},"blockingCount":{"type":"integer"}}}},"walletRollForward":{"type":"object","nullable":true,"description":"**The period's wallet movement summary, as the close checked it** (DEC-220; CHG-CSP-040): read from wallet `getWalletMovementSummary` so BO-1170 shows the roll-forward beside the ledger checks. Null where the tenant has no wallet module.","properties":{"openingLiability":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"toppedUp":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"spent":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"refunded":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"expired":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"closingLiability":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"ledgerLiability":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"description":"The wallet liability account's balance, to compare with `closingLiability`."}}}}},
 "PeriodStatus": {"type":"string","enum":["open","closing","closed"]},
 "PostingEventType": {"type":"string","description":"Every event that generates a ledger posting.\n**How each money event posts** (decided 28 September, audit R191). Card payment `cardReceived`, cash payment `cashReceived`, refund `refundIssued`, a POS offline sync the same events as the payments it replays, dated by when the till recorded them. **Two added on that date**: `gameCreditLoaded`, the liability `wallet.loadGameCredits` creates, and `pointsAccrued`, the liability for loyalty points earned. Every posting goes to the fiscal period open for the event date, through the mapping for its event type, or to suspense where none is mapped.\n**Required before a venue trades**: `cardReceived`, `cashReceived`, `refundIssued` and `priceVariance` (audit R127 (1)).\n","enum":["ticketRevenue","fnbRevenue","retailRevenue","rentalRevenue","taxPayable","cashReceived","cardReceived","walletReceived","refundIssued","voidReversal","deferredRevenue","recognisedRevenue","breakageRevenue","priceVariance","cashOverShort","settlementFee","settlementClearing","gameCreditLoaded","pointsAccrued","chargebackDebit","chargebackReversal","chargebackFee"]},
 "PriceVariance": {"x-ticvai-persistence":"ledger.price_variance","type":"object","required":["id","orderId","orderLineId","venueId","quotedPrice","serverPrice","variance","isException","occurredAt"],"properties":{"id":{"type":"string","format":"uuid"},"orderId":{"type":"string","format":"uuid"},"orderLineId":{"type":"string"},"venueId":{"type":"string","format":"uuid"},"variantId":{"type":"string","format":"uuid"},"quotedPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"serverPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"variance":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"catalogueBundleVersion":{"type":"string","nullable":true,"description":"The bundle the terminal priced from. Turns \"the price was wrong\" into \"the terminal was two bundles behind\", which is actionable.\n"},"isException":{"type":"boolean","description":"Above the venue's configured variance threshold."},"reviewStatus":{"$ref":"#/components/schemas/VarianceReviewStatus"},"reviewOutcome":{"type":"string","nullable":true,"description":"The `outcome` given to `reviewPriceVariance`. Null until reviewed.","enum":["accepted","investigated","catalogueCorrected"]},"reviewedByPrincipalId":{"type":"string","format":"uuid","nullable":true},"journalEntryId":{"type":"string","format":"uuid","nullable":true},"occurredAt":{"type":"string","format":"date-time"}}},
@@ -1803,7 +1876,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "TaxCode": {"x-ticvai-persistence":"ledger.tax_code","type":"object","required":["id","code","name","countryCode","rate","effectiveFrom","isActive"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string","maxLength":64},"name":{"type":"string","maxLength":200},"countryCode":{"type":"string","pattern":"^[A-Z]{2}$"},"appliesTo":{"type":"array","description":"**What this code covers, and `donation` is why the field exists** (CF-84). Donation tax treatment varies by jurisdiction — **0% is a valid rate, not an absence of one** — and it is set here rather than assumed in the posting.\nThe liability-account posting stays the default and is no longer the only option.\n","items":{"type":"string","enum":["goods","services","admission","food","accommodation","donation","gratuity","fee"]}},"rate":{"type":"number","minimum":0,"maximum":100},"compoundOnTaxCodeId":{"type":"string","format":"uuid","nullable":true,"description":"When set, this tax applies to the base **plus** the referenced tax, not to the base alone. Ordering is explicit rather than implied.\n"},"isInclusive":{"type":"boolean","description":"True when the displayed price already contains this tax."},"accountId":{"type":"string","format":"uuid"},"effectiveFrom":{"type":"string","format":"date","description":"A day in the region's time zone, local midnight to local midnight."},"effectiveTo":{"type":"string","format":"date","description":"A day in the region's time zone, local midnight to local midnight.","nullable":true},"isActive":{"type":"boolean"}}},
 "TaxExemption": {"x-ticvai-persistence":"ledger.tax_exemption","type":"object","description":"Also the `createTaxExemption` body. **`id` is server-owned** (`readOnly`): a client does not send it, and one sent is ignored. OpenAPI 3.1: a `readOnly` property in `required` is required in responses only.\n","required":["id","scope","taxCodeId","reason"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"scope":{"type":"string","enum":["account","productKind","channel","legalEntity"]},"scopeRef":{"type":"string","description":"Identifier of the exempt subject, matching `scope`."},"taxCodeId":{"type":"string","format":"uuid"},"reason":{"type":"string","maxLength":500},"exemptionType":{"type":"string","enum":["diplomatic","export","businessToBusiness","charity","governmentEntity","freeZone","zeroRated","other"],"description":"Tax Exemption Evidence: exemption type (pack 'Pricing___Revenue_Management_Reference.pdf' p.47). Moved here from catalogue `listFeeWaiverTax`, whose rule now only says `evidenceRequired` (decided 29 September, readiness close-out). Which types a jurisdiction recognises is the client's tax configuration; the list names the kinds, it does not grant any. **Proposed values: tax configuration per jurisdiction, client to correct.**"},"certificateReference":{"type":"string","maxLength":100,"nullable":true,"description":"Tax Exemption Evidence: reference, e.g. the exemption certificate, diplomatic card or export declaration number."},"evidenceDocumentId":{"type":"string","format":"uuid","nullable":true,"description":"Tax Exemption Evidence: the uploaded document (certificate scan, declaration). Kept for the retention period of the postings it exempted, not of the exemption."},"verificationStatus":{"type":"string","enum":["notRequired","pending","verified","rejected","expired"],"default":"pending","description":"Tax Exemption Evidence: verification status. **Only `verified` and `notRequired` exempt a line**; `calculateTax` treats `pending`, `rejected` and `expired` as no exemption and records the exemption id on the line so the refusal is explainable. `expired` is set by the server once `validTo` has passed; evidence checked after the grant is recorded with `verifyTaxExemption`. The granter sends `verified` on `createTaxExemption` when the evidence was checked at the grant; `verifiedBy` and `verifiedAt` are then set from the caller."},"verifiedBy":{"type":"string","format":"uuid","nullable":true,"readOnly":true},"verifiedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true},"verificationNote":{"type":"string","maxLength":500,"nullable":true,"readOnly":true,"description":"The `note` given to `verifyTaxExemption`; required when evidence was rejected."},"validFrom":{"type":"string","format":"date","description":"Tax Exemption Evidence: validity, first day. A day in the region's time zone, local midnight to local midnight."},"validTo":{"type":"string","format":"date","description":"Tax Exemption Evidence: validity, last day. A day in the region's time zone, local midnight to local midnight.","nullable":true}}},
 "TrialBalance": {"x-ticvai-persistence":"none — computed","type":"object","required":["fiscalPeriodId","isBalanced","totalDebit","totalCredit","accounts"],"properties":{"fiscalPeriodId":{"type":"string","format":"uuid"},"isBalanced":{"type":"boolean","description":"False indicates a defect, not a business condition. Double-entry cannot be unbalanced by legitimate activity.\n"},"totalDebit":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"totalCredit":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"accounts":{"type":"array","items":{"type":"object","required":["accountId","accountCode","accountName","debit","credit","balance"],"properties":{"accountId":{"type":"string","format":"uuid"},"accountCode":{"type":"string"},"accountName":{"type":"string"},"type":{"$ref":"#/components/schemas/AccountType"},"debit":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"credit":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"balance":{"$ref":"../shared/common.yaml#/components/schemas/Money"}}}}}},
-"VarianceReviewStatus": {"type":"string","enum":["notRequired","pendingReview","reviewed"]},
-"VenueSettings": {"type":"object","x-ticvai-persistence":"platform.venue_settings","description":"**Venue-level operational configuration that no other level can answer.**\nRegion owns currency, tax regime and fiscal year (ADR-0011). Venue owns the things that vary between two venues in one region — **opening hours, support hours, and what the local law requires of the gate.**\n**And the configured limits** (decided 28 September, audit R094): every limit the contracts call *configured* is a field here, from `displayCurrencies` and `cartLeaseSeconds` down to the grouped `catalogue`, `inventory`, `seating`, `promotions`, `fnb`, `queue`, `reporting`, `marketing` and `identity` settings. **Each has a tenant-level default**: the tenant sets it once with `setVenueSettingsDefaults`, a venue overrides it within the field's bounds, and a null field here inherits it. Each field's `default` is the proposed tenant default, marked proposed, client to correct (audit R094); `docs/active/configured-limits-proposal.md` is the sheet the client corrects, and where the two differ this contract is what runs.\n","properties":{"id":{"type":"string","format":"uuid","readOnly":true,"description":"**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"},"venueId":{"type":"string","format":"uuid","readOnly":true,"description":"From the path of `setVenueSettings`."},"calendarDayStartHour":{"type":"integer","minimum":0,"maximum":23,"nullable":true,"default":6,"description":"**Where the venue's calendar day starts** (17 September minutes M17-03, added 30 September): the first hour row of every day and week calendar view (`calendarView` in `screens/_components.yaml`), so a venue open 06:00 to 02:00 sees its night on the day it belongs to. Display only: it moves no booking, slot or business date. Null inherits the tenant default (proposed 6, client to correct).\n"},"currencyCode":{"type":"string","pattern":"^[A-Z]{3}$","nullable":true,"readOnly":true,"description":"**`readOnly` is the freeze.** `setVenueSettings` takes this whole schema as its request body, so without it any settings save could rewrite the currency of a venue that had already traded — which is the one thing ADR-0018's amendment forbids. It is set when the venue is provisioned, defaulted from the region, and changed only by an operation whose precondition is that the venue has not yet traded.\n**The venue's trading currency, defaulted from its region and frozen once the venue has traded** (ADR-0018, amended 20 September). Currency was a region-only fact, grouped with tax rates on the reasoning that *\"a venue cannot choose its VAT\"* -- true of tax and over-applied to currency, because a free-zone unit, a duty-free shop and a cruise terminal genuinely trade in a currency their region does not.\n**This column exists because the freeze needs somewhere to live.** A venue that resolved purely from its region would silently follow a region currency change after it had already traded, and every dated artefact beneath it -- a price list is a `validFrom`/`validTo` range -- would render retrospectively wrong. Null means \"resolve from the region\", which is the answer for every venue that has not overridden.\n"},"currencyScale":{"type":"integer","minimum":0,"maximum":4,"nullable":true,"readOnly":true,"description":"**Scale travels with currency** (ADR-0008), and so does the freeze. OMR is three decimal places because Oman says so; overriding the currency without the scale gets rounding wrong. Set together or not at all.\n"},"supportHours":{"type":"object","description":"CF-100. **A venue decides whether its support desk is 24/7 or bounded, and the platform does not.** This was recorded as an open question for eleven days and was never one — the code is identical either way, and what was missing was somewhere to put the answer.\n","properties":{"mode":{"type":"string","enum":["alwaysOn","businessHours","custom","none"]},"timezone":{"type":"string","description":"IANA zone the `windows` are read in. Absent, they are read in the region's `timeZone`, like every other wall-clock time in this contract.\n"},"windows":{"type":"array","items":{"type":"object","properties":{"day":{"type":"string","enum":["mon","tue","wed","thu","fri","sat","sun"]},"from":{"type":"string","description":"Wall-clock time the desk opens."},"to":{"type":"string","description":"Wall-clock time the desk closes."}}}},"outOfHoursMessage":{"type":"string","nullable":true}}},"quietHours":{"type":"object","nullable":true,"description":"**When the platform does not send.** A wallet low-balance alert at 3am is a complaint, and journeys and message triggers both respect this.\n**Operational messages ignore it** — a queue-turn alert is why a guest is holding the phone.\n","properties":{"from":{"type":"string","description":"Wall-clock time sending stops","in the region's time zone.":null},"to":{"type":"string","description":"Wall-clock time sending resumes","in the region's time zone.":null}}},"biometrics":{"type":"object","nullable":true,"description":"CF-35, BL-096, BL-105, BL-106. **The venue-level master switch, and the one place a person is asked whether the paperwork exists.** Biometric data is sensitive under PDPL (Federal Decree-Law 45/2021) — heightened protection, explicit consent, and an Article 21 assessment before the processing rather than after it.\n**Nothing below this switch operates while it is off.** `AdmissionRules` may carry a `biometricPolicy` per ticket type and those rules are inert until a venue enables biometrics here, which means a profile copied between venues cannot start capturing faces at the destination.\n**Venue level because that is where the assessment is filed.** Region owns tax and currency; the DPIA, the consent notice and the hardware are a venue's.\n","properties":{"isEnabled":{"type":"boolean","default":false,"description":"**Off by default, and turning it on is refused without the two fields below.** `setVenueSettings` answers 422 rather than accepting an enable it cannot evidence — **a DPIA nobody can name is a DPIA nobody did**, and the point of the refusal is that the person switching this on is asked at the moment they switch it on rather than by an auditor a year later.\n"},"dpiaReference":{"type":"string","nullable":true,"maxLength":200,"description":"**The venue's own reference for its Article 21 assessment.** The platform does not hold the document and does not judge it; it records that one was named, by whom, and when — which is what an audit asks for and what the venue can produce.\n"},"consentNoticeAcknowledgedAt":{"type":"string","format":"date-time","nullable":true,"description":"**When somebody confirmed the consent forms are in place at the point of capture.** A guest consenting in an app is a record; a guest consenting at a ticket counter is a notice somebody has to have printed and a question somebody has to have asked.\n"},"acknowledgedByPrincipalId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"**Who confirmed it.** An acknowledgement with no name behind it cannot be followed up, and this is the field that makes the switch an act rather than a setting. Recorded by the server as the caller whose save carried the acknowledgement, so it cannot name somebody else.\n"},"faceTagPurgeMinutesAfterClose":{"type":"integer","nullable":true,"default":0,"description":"BL-106. **How long a same-visit Face Tag survives past the close of the operating day**, and zero is the default because that is what 3.2.44 describes. A non-zero value is an operational allowance for a late reconciliation, not a retention period — **`facePass` ignores this entirely** and is bounded by its entitlement.\n"}}},"segregatedAccess":{"type":"object","nullable":true,"description":"CF-130. **Configured at venue level because it changes by region and the venue is where it is known** — a Ladies Night, a family session, a prayer-time closure.\n**The platform does not infer gender.** 3.2.45 asks for automatic gender recognition and 3.2.46 for rule-based facial recognition validation, and neither is built. Two reasons, and the second is the one that decided it:\n**A Ladies Night ticket is already gendered at the point of sale**, so the gate checks the entitlement the platform issued rather than the face in front of it — deterministic, auditable, and already contracted through `admissionRules`.\n**And these events are staffed.** A steward at the entrance is making the judgment anyway, and a classifier that overrules a person who can see more than it can is a machine and a human disagreeing while a guest waits.\n**`genderVerification` is a switch, not an implementation.** Where a venue's access hardware offers the capability and the venue chooses to use it, this turns it on — following ADR-0015's standards-first driver model, where the device does what the device does. **Not everything needs to be built.**\n","properties":{"isEnabled":{"type":"boolean","default":false},"appliesToAccessPointIds":{"type":"array","items":{"type":"string","format":"uuid"}},"schedule":{"type":"array","items":{"type":"object","properties":{"day":{"type":"string","enum":["mon","tue","wed","thu","fri","sat","sun"]},"from":{"type":"string","description":"Wall-clock time","in the region's time zone.":null},"to":{"type":"string","description":"Wall-clock time","in the region's time zone.":null},"admits":{"type":"string","enum":["all","women","womenAndChildren","families","members"]}}}},"entitlementGated":{"type":"boolean","default":true,"readOnly":true,"description":"**Always true, and stated rather than assumed.** The gate admits on the entitlement. Everything below is advisory on top of that, and nothing replaces it.\n"},"genderVerification":{"type":"string","enum":["off","staffAssisted","deviceAssisted"],"default":"off","description":"`off` — the entitlement decides and a steward handles exceptions. **The default, and what is contracted.**\n`staffAssisted` — the steward's screen shows the ticket type so they can ask. No inference anywhere.\n`deviceAssisted` — **the venue's access hardware performs the check, not the platform.** Available only where the driver reports the capability, and the result is **advisory to the steward rather than decisive at the turnstile** (3.2.45 asks for rejection; this deviates deliberately).\n"},"overrideRateAlertThreshold":{"type":"number","nullable":true,"description":"Where `deviceAssisted` is on. **An override rate near zero means the steward has stopped deciding**, and that is the number that says whether the human safeguard is working or decorative.\n"}}},"alerting":{"type":"object","description":"CF-134. **On-platform notification, marked as read.** Six contracts detect their own trouble and none told a person.\n**The panel is the default and email or WhatsApp only where the matrix names them** — an operational alert that arrives by email is an alert nobody sees in time.\n","properties":{"channel":{"type":"string","enum":["dashboardPanel","dashboardAndEmail","dashboardAndWhatsapp"],"default":"dashboardPanel"},"acknowledgementRequired":{"type":"boolean","default":true},"escalateAfterMinutes":{"type":"integer","nullable":true}}},"displayCurrencies":{"type":"array","nullable":true,"description":"**Which currencies this venue shows guests** (decided 28 September, audit R120 (a)). ISO 4217 codes, each one its region holds an `FxRate` for; the rate itself stays per region and is never set here. `finance.listFxRates` with `venueId` narrows the region's rates to these. Null or empty shows the trading currency only. A code the region has no rate for is refused `400`.\n","items":{"type":"string","pattern":"^[A-Z]{3}$"}},"cartLeaseSeconds":{"type":"integer","nullable":true,"minimum":30,"maximum":3600,"default":900,"description":"**How long a cart holds capacity** (decided 28 September, audit R169): 15 minutes, the default `catalogue.acquireInventoryHold` takes for `ttlSeconds`. Proposed, client to correct (audit R094).\n"},"cartHoldExtensionMinutes":{"type":"integer","nullable":true,"minimum":1,"maximum":30,"default":5,"description":"How long one `orders.extendCart` extension adds. Proposed, client to correct (audit R094)."},"cartMaxExtensions":{"type":"integer","nullable":true,"minimum":0,"maximum":5,"default":1,"description":"How many extensions a cart may take before `extensionCapReached` (`Cart.maxExtensions`). Proposed, client to correct (audit R094)."},"resaleCutoffHours":{"type":"integer","nullable":true,"minimum":0,"maximum":168,"default":24,"description":"Hours before the performance after which a ticket can no longer be listed for resale (`orders.createResaleListing`). Proposed, client to correct (audit R094)."},"exchangeCutoffHours":{"type":"integer","nullable":true,"minimum":0,"maximum":720,"default":24,"description":"Hours before the original performance after which lines can no longer be exchanged (`orders.exchangeOrderLines`, `outsideExchangeWindow`). Proposed, client to correct (audit R094)."},"rescheduleCutoffHours":{"type":"integer","nullable":true,"minimum":0,"maximum":720,"default":24,"description":"Hours before the original performance after which an order can no longer be rescheduled (`orders.rescheduleOrder`, `outsideRescheduleWindow`). Proposed, client to correct (audit R094)."},"reservationMaxExtensions":{"type":"integer","nullable":true,"minimum":0,"maximum":5,"default":1,"description":"How many times `orders.extendReservation` may extend one reservation. Proposed, client to correct (audit R094)."},"shiftVarianceThreshold":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"nullable":true,"description":"Over or short at shift close beyond which the shift waits in `pendingVariance` for `shift.acceptShiftVariance`. **Proposed tenant default AED 20.00, bounds 0 to 1,000 in the venue currency; client finance to correct (audit R094).**\n"},"catalogue":{"type":"object","nullable":true,"properties":{"maxVariantsPerProduct":{"type":"integer","nullable":true,"minimum":1,"maximum":2000,"default":200,"description":"Variants one product may generate from its attributes (`setProductAttributes` refuses above it). Proposed, client to correct (audit R094)."},"waitlistOfferHoldMinutes":{"type":"integer","nullable":true,"minimum":1,"maximum":1440,"default":30,"description":"How long a waitlist offer holds the released capacity for the guest it was offered to. Proposed, client to correct (audit R094)."},"bulkPriceChangeEscalationPercent":{"type":"number","nullable":true,"minimum":0,"maximum":100,"default":10,"description":"A `bulkChangePrices` run changing any price by more than this percentage needs `PRICE_CONFIGURE` (audit R197). Proposed, client to correct (audit R094)."},"bulkPriceChangeEscalationCount":{"type":"integer","nullable":true,"minimum":1,"default":50,"description":"A `bulkChangePrices` run touching more prices than this needs `PRICE_CONFIGURE` (audit R197). Proposed, client to correct (audit R094)."}}},"inventory":{"type":"object","nullable":true,"properties":{"overReceiptTolerancePercent":{"type":"number","nullable":true,"minimum":0,"maximum":25,"default":5,"description":"Percent above the outstanding ordered quantity a goods receipt line may record (`createGoodsReceipt`). Proposed, client to correct (audit R094)."},"countVarianceTolerancePercent":{"type":"number","nullable":true,"minimum":0,"maximum":25,"default":2,"description":"Percent difference between counted and expected quantity before a count line is an exception (`getCountVariance`). Proposed, client to correct (audit R094)."},"countVarianceApprovalAmount":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"nullable":true,"description":"Total variance value of a count above which posting it needs approval (`postStockCount`). **Proposed tenant default 1,000.00 in the venue currency, client finance to correct (audit R094).**\n"}}},"seating":{"type":"object","nullable":true,"properties":{"seatHoldExtensionSeconds":{"type":"integer","nullable":true,"minimum":60,"maximum":1800,"default":300,"description":"What one `extendSeatHold` adds. No hold outlives 30 minutes in all (audit R169). Proposed, client to correct (audit R094)."},"seatHoldMaxExtensions":{"type":"integer","nullable":true,"minimum":0,"maximum":5,"default":2,"description":"How many times a seat hold may be extended. Proposed, client to correct (audit R094). A resource hold on a venue map (`resources.extendResourceHold`) uses the same two bounds (decided 29 September, rev 3 REV3-15)."},"maxSeatsPerGuestOrder":{"type":"integer","nullable":true,"minimum":1,"maximum":50,"default":10,"description":"**Seats one guest may take in one booking on a guest channel** (Guest Web, Guest App), decided 29 September, rev 3 REV3-7. `seating.createSeatHold` counts the seats in the request plus the seats the same guest already holds on the same performance, and refuses above this with `422` `seat-limit-exceeded`, naming the limit. Default 10, bounds 1 to 50; a venue sets its own in Venue Management. Staff and POS sales keep 10 per sale (audit R080 (c)) and do not read this field.\n"}}},"promotions":{"type":"object","nullable":true,"properties":{"maxDiscountPercent":{"type":"number","nullable":true,"minimum":0,"maximum":100,"default":30,"description":"The largest discount one promotion may give (`createPromotion` refuses above it). Proposed, client to correct (audit R094)."},"nearZeroLinePrice":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"nullable":true,"description":"Net line price below which a stacked combination is flagged near-zero in `analysePromotionConflicts` (audit R096 (5)); a warning, not a refusal. **Proposed tenant default AED 1.00, client to correct (audit R094).**\n"}}},"fnb":{"type":"object","nullable":true,"properties":{"recallWindowMinutes":{"type":"integer","nullable":true,"minimum":0,"maximum":60,"default":10,"description":"Minutes after a bump during which `recallKitchenTicket` still recalls; after it the act is a refire. Proposed, client to correct (audit R094)."},"compEscalationAmount":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"nullable":true,"description":"Line value above which `compItem` needs `ORDER_DISCOUNT` (audit R197). **Proposed tenant default AED 100.00, client to correct (audit R094).**\n"},"foodSafetyLeadPrincipalId":{"type":"string","format":"uuid","nullable":true,"description":"**The venue's food-safety lead**, to whom `escalateCorrectiveAction` sends every escalation (decided 28 September, audit R096 (9)). A venue fact, so it has no tenant default; while it is null an escalation is refused `409 no-food-safety-lead`.\n"}}},"queue":{"type":"object","nullable":true,"properties":{"crossQueueLimit":{"type":"integer","nullable":true,"minimum":1,"maximum":10,"default":2,"description":"Virtual queues one guest party may wait in at once (`joinQueue`, `crossQueueLimitReached`). Proposed, client to correct (audit R094)."}}},"reporting":{"type":"object","nullable":true,"properties":{"inlineRunRowLimit":{"type":"integer","nullable":true,"minimum":1000,"maximum":100000,"default":5000,"description":"Estimated rows above which `runReport` answers `202` and runs in the background. Proposed, client to correct (audit R094)."},"dashboardRefreshBudgetPerMinute":{"type":"integer","nullable":true,"minimum":1,"default":24,"description":"Tile refreshes per minute, summed over a dashboard's tiles, that `createDashboard` allows. Proposed, client to correct (audit R094)."}}},"marketing":{"type":"object","nullable":true,"properties":{"attributionWindowDays":{"type":"integer","nullable":true,"minimum":1,"maximum":30,"default":7,"description":"Days after a campaign touch within which a booking is attributed to it (`getCampaignPerformance`). Proposed, client to correct (audit R094)."}}},"identity":{"type":"object","nullable":true,"properties":{"guestOtpMaxAttempts":{"type":"integer","nullable":true,"minimum":3,"maximum":10,"default":5,"description":"Wrong entries allowed per guest one-time code before `verifyGuestOtp` invalidates it. A guest code is tenant-scoped, so the tenant default is the value used. Proposed, client to correct (audit R094).\n"},"guestTwoStep":{"type":"object","nullable":true,"description":"**Guest two-step verification: a venue option, off unless the venue enables it in Venue Management** (decided 29 September, rev 3 GAP-B1, per venue, superseding the second part of audit R167, \"no guest MFA\"; an earlier draft of the same day put it on the tenant's `PasswordPolicy`, which no longer carries it). **The guest's enrolment stays tenant-wide**: one guest account across the tenant's venues, so a method enrolled once is used in every venue that has this on, and is never asked in a venue that has it off. Identity learns the venue from `venueId` on the guest sign-in (`verifyGuestOtp`, `guestPasswordLogin`, `guestSocialLogin`, `guestUaePassLogin`) and on `createMfaChallenge`: the venue the guest app or booking is in; with no venue given, an enrolled guest is asked when any venue of the tenant has it on. Guests may enrol `totp` with `emailOtp` as the fallback, as staff do (audit R126 (5)); it is never forced. Guests still never use enterprise SSO (R167, first part). A null inherits the tenant default set with `setVenueSettingsDefaults`.\n","properties":{"enabled":{"type":"boolean","default":false,"description":"Off unless the venue enables it. While no venue of the tenant has it on, guests cannot enrol (`enrolMfaMethod` answers 403 `guest-two-step-disabled`)."},"stepUpActions":{"type":"array","uniqueItems":true,"description":"The guest actions in this venue that ask an enrolled guest for the factor again, whatever the age of the session. The service performing the action passes this venue to `createMfaChallenge`. Proposed, client to correct (rev 3 GAP-B1).\n","items":{"type":"string","enum":["changeContactDetails","changePassword","managePaymentMethods","transferTickets","deleteAccount"]},"default":["changeContactDetails","changePassword","managePaymentMethods","deleteAccount"]}}}}}}}
+"VarianceReviewStatus": {"type":"string","enum":["notRequired","pendingReview","reviewed"]}
 }
 ```

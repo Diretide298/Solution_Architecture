@@ -107,6 +107,12 @@
     "operation": null,
     "why": "**The pack names 7 actions on this screen and the screen declares 1 operation.** Unserved: Create Consent Purpose, Create Policy, Configure Preferences, Configure Cookies, Configure Capture Point, Test Configuration, Submit for Approval. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 4 §Quick Actions"
+   },
+   {
+    "operation": "listCustomerPrivacyConsent",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-005): listCustomerPrivacyConsent is one guest's privacy 360, which is CMS-032's; a configuration command centre shows counts (design-notes correction customer-marketing CMS-021).",
+    "source": "screens/P13-white-label-cms.yaml#CMS-021 | contracts/satellite/marketing-crm.yaml#listCustomerPrivacyConsent"
    }
   ],
   "layout": {
@@ -248,7 +254,7 @@
   "states": {
    "loading": "The privacy consent configuration as saved.",
    "error": "Could not load. Names which read failed and leaves the privacy consent untouched.",
-   "emptyFirstRun": "No privacy consent configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyFirstRun": "No privacy consent configured yet. Offers no create action — this screen declares no operation that makes one and says what the platform does in the meantime.",
    "emptyNoResults": "The filter narrowed it and the privacy consent are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -257,12 +263,6 @@
     "operationId": "listPrivacyConsent",
     "contract": "marketing-crm",
     "purpose": "Privacy & Consent Configuration Command Center",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "listCustomerPrivacyConsent",
-    "contract": "marketing-crm",
-    "purpose": "Customer Privacy, Consent & Preference 360°",
     "trigger": "onLoad"
    }
   ],
@@ -362,6 +362,17 @@
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "components": [
+      {
+       "kind": "secondaryButton",
+       "label": "Save purpose",
+       "operation": "setDataProcessingPurpose",
+       "provenance": "contract marketing-crm.yaml PUT /data-processing-purpose; wiring fix, 2 October 2026"
+      }
+     ]
     }
    ]
   },
@@ -378,6 +389,13 @@
     "contract": "marketing-crm",
     "purpose": "Data Processing Purpose & Lawful Basis Registry",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setDataProcessingPurpose",
+    "contract": "marketing-crm",
+    "purpose": "Create or change a processing purpose",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-005)"
    }
   ],
   "entryState": {
@@ -396,6 +414,22 @@
    "workshopBoard": "wireframes/WS102 Privacy  Consent   Preference Management Board 1.dc.html#cms-022"
   },
   "apisNote": "Regenerated 9 September 2026 from Privacy__Consent___Preference_Management_Reference.pdf page 5. 0 of 0 labels bound to a contract property; 0 of 54 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetDataProcessingPurpose",
+    "component": "modal",
+    "trigger": "Save purpose",
+    "body": "**Collects what `setDataProcessingPurpose` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save purpose",
+     "operation": "setDataProcessingPurpose"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "contract marketing-crm.yaml PUT /data-processing-purpose; wiring fix, 2 October 2026"
+   }
+  ],
   "_platform": {
    "code": "P13",
    "audience": "staff",
@@ -588,6 +622,7 @@
    "workshopBoard": "wireframes/WS102 Privacy  Consent   Preference Management Board 1.dc.html#cms-023"
   },
   "apisNote": "Regenerated 9 September 2026 from Privacy__Consent___Preference_Management_Reference.pdf page 7. 0 of 0 labels bound to a contract property; 17 of 46 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "notes": "**Consent purposes are captured on the venue's consent forms** (DEC-549): each purpose here is the `consentPurposes` value a consent form built on CMS-043 (BO-747 in Venue Management) collects; there is one form builder, not a second one on this screen (CHG-SGU-014).",
   "_platform": {
    "code": "P13",
    "audience": "staff",
@@ -872,37 +907,121 @@
    "template": "split",
    "regions": [
     {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Technology type",
+       "operation": "listCookieTrackingDigital",
+       "notes": "A filter over the registry (first-party cookie, third-party cookie, mobile SDK, analytics tracker, advertising pixel, embedded service, local storage, other); not an action.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)",
+       "bindsTo": "CookieTrackingDigitalTechnologyRegistryView.technologyType"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Tracking technologies",
+       "bindsTo": "CookieTrackingDigitalTechnologyRegistryView",
+       "columns": [
+        "CookieTrackingDigitalTechnologyRegistryView.name",
+        "CookieTrackingDigitalTechnologyRegistryView.provider",
+        "CookieTrackingDigitalTechnologyRegistryView.technologyType",
+        "CookieTrackingDigitalTechnologyRegistryView.category",
+        "CookieTrackingDigitalTechnologyRegistryView.durationDays",
+        "CookieTrackingDigitalTechnologyRegistryView.status",
+        "CookieTrackingDigitalTechnologyRegistryView.source"
+       ],
+       "operation": "listCookieTrackingDigital",
+       "notes": "Detected (blocked, needs review) first, then approved, blocked and retired; retired rather than deleted, as evidence of what a site did on a date.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Scan runs",
+       "bindsTo": "CookieScanRun",
+       "columns": [
+        "CookieScanRun.scannedAt",
+        "CookieScanRun.channel",
+        "CookieScanRun.source",
+        "CookieScanRun.findingsCount",
+        "CookieScanRun.newlyDetectedCount",
+        "CookieScanRun.missingCount"
+       ],
+       "operation": "listCookieScans",
+       "notes": "**A bought scanner API (hybrid) runs the scheduled scans** (decided by Chinmay, 2 October 2026; DEC-019; CHG-CSA-023): it feeds `recordCookieScan` through TICVAI's adapter, and the manual \"Upload scan report\" path stays for a venue that scans elsewhere. The source column says Scanner or Upload per run. Our banner, runtime, registry and consent logs stay ours (CHG-SGU-013).",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-013, decided by Chinmay 2 October 2026, DEC-019)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Loaded before consent",
+       "operation": "listCookieScans",
+       "notes": "**The compliance output, shown first and prominently:** the scan run's `preConsentViolationCount`, the technologies seen loading before the visitor decided (CHG-FUP-009) (CHG-SGU-013).",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-013, decided by Chinmay 2 October 2026, DEC-019)"
+      },
+      {
+       "kind": "dataTable",
+       "label": "What the scan saw",
+       "operation": "listCookieScanFindings",
+       "notes": "Per finding of the selected run: the consent state it was seen in (no decision, rejected all, accepted all), the page, the script that set it, its attributes (domain, SameSite, Secure) and the suggested category (CHG-FUP-009) (CHG-SGU-013).",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-013, decided by Chinmay 2 October 2026, DEC-019)"
+      },
+      {
+       "kind": "cardList",
+       "label": "Known cookies catalogue",
+       "operation": "listTrackingTechnologyCatalogue",
+       "notes": "The platform-wide catalogue of known cookies and trackers, read-only for the venue; a finding that matches it comes with its category suggested (CHG-FUP-010) (CHG-SGU-013).",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-013, decided by Chinmay 2 October 2026, DEC-019)"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Scan schedule and source",
+       "bindsTo": "CookieScanPolicy",
+       "columns": [
+        "CookieScanPolicy.channel",
+        "CookieScanPolicy.frequency",
+        "CookieScanPolicy.scanSource",
+        "CookieScanPolicy.scannerVendorRef",
+        "CookieScanPolicy.nextRunAt"
+       ],
+       "operation": "listCookieScanPolicies",
+       "notes": "Per channel: daily, weekly, monthly or off, who is alerted on a new finding, and the source (bought scanner, the default, or manual upload) (CHG-SGU-013).",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-013, decided by Chinmay 2 October 2026, DEC-019)"
+      }
+     ]
+    },
+    {
      "name": "actionBar",
      "slot": "rowActions",
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Analytics Tracker",
-       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 10 §Support"
+       "label": "Add technology",
+       "operation": "setTrackingTechnology",
+       "notes": "Add, classify or retire a technology; consent required can be off only for strictly necessary.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)"
       },
       {
        "kind": "secondaryButton",
-       "label": "Embedded Service",
-       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 10 §Support"
+       "label": "Upload scan report",
+       "operation": "recordCookieScan",
+       "notes": "The manual path for a venue that scans elsewhere (hybrid).",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-013, decided by Chinmay 2 October 2026, DEC-019)"
       },
       {
        "kind": "secondaryButton",
-       "label": "Other tracking technology",
-       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 10 §Support"
+       "label": "Save scan schedule",
+       "operation": "setCookieScanPolicy",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-013, decided by Chinmay 2 October 2026, DEC-019)"
       }
      ]
-    },
-    {
-     "name": "contentBody",
-     "components": []
     }
    ]
   },
   "states": {
    "loading": "The cookie tracking digital list.",
    "error": "Could not load. Names which read failed and leaves the cookie tracking digital untouched.",
-   "emptyFirstRun": "No cookie tracking digital yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the cookie tracking digital are still there. Names the active filter and offers to clear it.",
+   "emptyFirstRun": "No technology registered and no scan yet: offers Add technology and Save scan schedule; the first scheduled scan fills the registry.",
+   "emptyNoResults": "Nothing matches the technology type chosen; names it and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
@@ -946,11 +1065,29 @@
     "purpose": "Set a scan schedule and alert recipients",
     "trigger": "onAction",
     "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "listCookieScanFindings",
+    "contract": "marketing-crm",
+    "purpose": "What one scan saw, in each consent state (CHG-FUP-009)",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "listTrackingTechnologyCatalogue",
+    "contract": "marketing-crm",
+    "purpose": "The platform's catalogue of known cookies and trackers (CHG-FUP-010)",
+    "trigger": "onLoad"
    }
   ],
   "entryState": {
    "preloaded": [
     "CookieTrackingDigitalTechnologyRegistryView.technologyType"
+   ],
+   "params": [
+    {
+     "name": "scanRunId",
+     "from": "navigation"
+    }
    ]
   },
   "wireframe": {
@@ -960,6 +1097,50 @@
    "workshopBoard": "wireframes/WS102 Privacy  Consent   Preference Management Board 1.dc.html#cms-025"
   },
   "apisNote": "Regenerated 9 September 2026 from Privacy__Consent___Preference_Management_Reference.pdf page 10. 0 of 0 labels bound to a contract property; 3 of 45 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetTrackingTechnology",
+    "component": "modal",
+    "trigger": "Add technology",
+    "body": "Name, provider, domain or app, type, category, purpose, expiry in days, first or third party, channels, and consent required (off only for strictly necessary).",
+    "confirm": {
+     "label": "Add technology",
+     "operation": "setTrackingTechnology"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)"
+   },
+   {
+    "id": "formRecordCookieScan",
+    "component": "modal",
+    "trigger": "Upload scan report",
+    "body": "The scan report file from another scanner, its channel and scan time; findings are matched to the registry and the catalogue.",
+    "confirm": {
+     "label": "Upload scan report",
+     "operation": "recordCookieScan"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "corrected 2 October 2026 (CHG-SGU-013, decided by Chinmay 2 October 2026, DEC-019)"
+   },
+   {
+    "id": "formSetCookieScanPolicy",
+    "component": "modal",
+    "trigger": "Save scan schedule",
+    "body": "Channel, frequency, who is alerted, and the source: the bought scanner (default) or manual upload, with the scanner vendor reference.",
+    "confirm": {
+     "label": "Save scan schedule",
+     "operation": "setCookieScanPolicy"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "corrected 2 October 2026 (CHG-SGU-013, decided by Chinmay 2 October 2026, DEC-019)"
+   }
+  ],
   "_platform": {
    "code": "P13",
    "audience": "staff",
@@ -1049,19 +1230,26 @@
        "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 11 §Configure"
       },
       {
-       "kind": "selectField",
+       "kind": "textField",
        "label": "Title",
-       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 11 §Configure"
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)",
+       "operation": "setCookieBannerDesign",
+       "bindsTo": "CookieBannerPreferenceCenterDesignerView.title",
+       "notes": "Text per language (English and Arabic required)."
       },
       {
-       "kind": "selectField",
+       "kind": "textField",
        "label": "Description",
-       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 11 §Configure"
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)",
+       "operation": "setCookieBannerDesign",
+       "bindsTo": "CookieBannerPreferenceCenterDesignerView.body",
+       "notes": "Text per language (English and Arabic required)."
       },
       {
-       "kind": "selectField",
+       "kind": "detailPanel",
        "label": "Buttons",
-       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 11 §Configure"
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)",
+       "notes": "Fixed by the posture, not chosen: Accept all, Reject non-essential (always one click) and Choose."
       },
       {
        "kind": "selectField",
@@ -1081,17 +1269,24 @@
       {
        "kind": "selectField",
        "label": "Language",
-       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 11 §Configure"
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)",
+       "notes": "Languages are tabs of the text fields; English and Arabic are required."
       },
       {
-       "kind": "selectField",
+       "kind": "textField",
        "label": "Links",
-       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 11 §Configure"
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)",
+       "operation": "setCookieBannerDesign",
+       "bindsTo": "CookieBannerPreferenceCenterDesignerView.links",
+       "notes": "A list of links (privacy notice, cookie notice) per language."
       },
       {
-       "kind": "selectField",
+       "kind": "textField",
        "label": "Category descriptions",
-       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 11 §Configure"
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)",
+       "operation": "setCookieBannerDesign",
+       "bindsTo": "CookieBannerPreferenceCenterDesignerView.categories",
+       "notes": "The description of each category per language."
       }
      ]
     },
@@ -1101,8 +1296,10 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Additional configured languages",
-       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 11 §Support"
+       "label": "Save version",
+       "operation": "setCookieBannerDesign",
+       "notes": "Saves the design as a new version; publishing goes through privacy testing and approval.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)"
       }
      ]
     }
@@ -1136,6 +1333,22 @@
    "workshopBoard": "wireframes/WS102 Privacy  Consent   Preference Management Board 1.dc.html#cms-026"
   },
   "apisNote": "Regenerated 9 September 2026 from Privacy__Consent___Preference_Management_Reference.pdf page 11. 0 of 0 labels bound to a contract property; 11 of 28 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "confirmSetCookieBannerDesign",
+    "component": "confirmDialog",
+    "trigger": "Save version",
+    "body": "Saves this design as version N+1 for its channel and brand; the published version stays until the new one is approved.",
+    "confirm": {
+     "label": "Save version",
+     "operation": "setCookieBannerDesign"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)"
+   }
+  ],
   "_platform": {
    "code": "P13",
    "audience": "staff",
@@ -1706,6 +1919,7 @@
    "workshopBoard": "wireframes/WS102 Privacy  Consent   Preference Management Board 1.dc.html#cms-029"
   },
   "apisNote": "Regenerated 9 September 2026 from Privacy__Consent___Preference_Management_Reference.pdf page 15. 0 of 0 labels bound to a contract property; 8 of 40 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "notes": "**Children's biometric data: as BO-187, guardian consent, configurable** (decided by Chinmay, 2 October 2026; DEC-283, DEC-237). Allowed with a guardian-signed consent on the venue's form; the minor age per country and whether minors may be enrolled at all are the venue's settings (`RegionSettings.minorAgeThreshold`, `VenueSettings.biometrics.allowMinors`); `setMinorGuardianAge` keeps the privacy rules per country (CHG-SGU-004).",
   "_platform": {
    "code": "P13",
    "audience": "staff",

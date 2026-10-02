@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""Shared plumbing for the audit-class guards (plan item 1F, C12; audit/ticvai/ROOT-CLASSES.md).
+"""Shared plumbing for the audit-class guards (plan item 1F, C12; docs/active/root-classes.md).
 
 The 26 September pull audit found 293 root issues. Each belongs to a class of mistake, and a class
 is closed only when something fails the next time it happens. The `check-*.py` guards written for
@@ -176,7 +176,7 @@ class Guard:
     def _write_baseline(self):
         data = load_json(BASELINE, {}) or {}
         data.setdefault("_about", (
-            "Known members of the audit classes (audit/ticvai/ROOT-CLASSES.md) still present when a "
+            "Known members of the audit classes (docs/active/root-classes.md) still present when a "
             "guard was baselined. A guard fails only on a finding not listed here. Written by "
             "`python3 tools/check-<name>.py --update-baseline`; never add an entry by hand to "
             "silence a new finding."))

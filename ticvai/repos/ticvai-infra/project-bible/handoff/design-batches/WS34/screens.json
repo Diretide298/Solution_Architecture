@@ -12,17 +12,17 @@
    "page": 6
   },
   "implementation": {
-   "app": "ticvai-web",
+   "app": "venue-management-web",
    "route": "/commercial/commercial-pricing-command-center-adm-048",
-   "component": "apps/ticvai-web/src/routes/commercial/CommercialPricingCommandCenter.tsx",
+   "component": "apps/venue-management-web/src/routes/commercial/CommercialPricingCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
    "entryFrom": [
-    "ADM-002"
+    "BO-100"
    ],
    "exitTo": [
-    "ADM-002",
+    "BO-100",
     "ADM-049",
     "ADM-050",
     "ADM-051",
@@ -37,26 +37,15 @@
    "notes": "**The board's hub.** The workshop specified this module as boards of ten and opened each with a command centre; the other nine screens are that board's detail, so they are reached from here and return here.",
    "transitions": [
     {
-     "to": "ADM-002",
-     "trigger": "Platform Dashboard",
-     "provenance": "derived — ADM-002 declares entryState.params  and ADM-048 holds none of them. The edge carries nothing: ADM-048 is opened from ADM-002, so this edge is the way back and ADM-002 keeps its own state"
-    },
-    {
-     "to": "ADM-049",
-     "trigger": "Works in Price List Master Configuration",
-     "provenance": "flow F143 step 1→2",
-     "operation": "listCommercialPricing"
+     "to": "BO-100",
+     "trigger": "Back to Venue Home",
+     "provenance": "moved to Venue Management 2 October 2026 (CHG-MOV-001); it returned to the console's Platform Dashboard (ADM-002)",
+     "back": true
     },
     {
      "to": "ADM-050",
      "trigger": "Works in Price Category & Rate Type Library",
      "provenance": "flow F143 step 3→4",
-     "operation": "listCommercialPricing"
-    },
-    {
-     "to": "ADM-051",
-     "trigger": "Works in Rate Structure Builder",
-     "provenance": "flow F143 step 5→6",
      "operation": "listCommercialPricing"
     },
     {
@@ -94,9 +83,25 @@
      "trigger": "Works in Commercial Pricing Structure Validation",
      "provenance": "flow F143 step 17→18",
      "operation": "listCommercialPricing"
+    },
+    {
+     "to": "ADM-049",
+     "trigger": "Works in Price List Master Configuration, a section of BO-009, which saves the record with createPriceList…",
+     "provenance": "flow F143 step 1→2",
+     "operation": "listCommercialPricing"
+    },
+    {
+     "to": "ADM-051",
+     "trigger": "Works in Rate Structure Builder, a section of BO-009, which saves the record with setPrices (setRateStructure…",
+     "provenance": "flow F143 step 5→6",
+     "operation": "listCommercialPricing",
+     "carries": [
+      "priceListId"
+     ]
     }
    ]
   },
+  "notes": "**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: \"they are venue screens\"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.",
   "density": "compact",
   "purposeNote": "Authorized administrators can view and manage TICVAI's complete commercial pricing portfolio from one centralized workspace.",
   "pattern": "commandCentre",
@@ -356,12 +361,6 @@
     "trigger": "onLoad"
    },
    {
-    "operationId": "listMembershipCommercialPricing",
-    "contract": "subscription",
-    "purpose": "Membership Commercial, Pricing & Channel Association",
-    "trigger": "onLoad"
-   },
-   {
     "operationId": "listCommercialPricingStructure",
     "contract": "catalogue",
     "purpose": "Commercial Pricing Structure Validation",
@@ -377,30 +376,29 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-048",
+   "board": "wireframes/P08 Venue Management.dc.html#adm-048",
    "workshopBoard": "wireframes/WS95 Pricing   Revenue Management Board 1.dc.html#adm-048"
   },
   "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 6. 32 of 35 labels bound to a contract property; 49 of 71 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
+   "code": "P08",
+   "audience": "staff",
    "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
    "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
+   "app": "venue-management-web",
+   "operator": "venue",
    "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
     "shell": "web",
     "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
+     "P12",
+     "P13",
+     "P16"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
     "decided": "10 September 2026"
    }
   }
@@ -418,9 +416,9 @@
    "page": 8
   },
   "implementation": {
-   "app": "ticvai-web",
-   "route": "/commercial/price-list-master-configuration-adm-049",
-   "component": "apps/ticvai-web/src/routes/commercial/PriceListMasterConfiguration.tsx",
+   "app": "venue-management-web",
+   "route": "/venue-operations/pricing-rules/price-list-master-configuration-adm-049",
+   "component": "apps/venue-management-web/src/routes/venue-operations/PricingRulesDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -428,7 +426,8 @@
     "ADM-048"
    ],
    "exitTo": [
-    "ADM-048"
+    "ADM-048",
+    "BO-009"
    ],
    "inferred": false,
    "notes": "**Reached from ADM-048, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
@@ -436,16 +435,24 @@
     {
      "to": "ADM-048",
      "trigger": "Returns to the board's landing screen",
-     "provenance": "flow F143 step 2→3",
-     "operation": "setPriceListMaster"
+     "provenance": "flow F143 step 2→3"
+    },
+    {
+     "to": "BO-009",
+     "trigger": "Open Pricing Rules",
+     "provenance": "a section of BO-009 since 2 October 2026 (CHG-MOV-002)",
+     "carries": [
+      "priceListId"
+     ]
     }
    ]
   },
+  "notes": "**Its own writer is retired in r2** (decided 2 October 2026, Chinmay: \"13 dupes would be gone in r2\"; CHG-CLN-001). `setPriceListMaster` duplicated BO-009 Pricing Rules's createPriceList and updatePriceList, so it is removed from the contract (BC-008) and BO-009 saves this record. This id stays the anchor of its section of BO-009: nothing on it writes separately.\n\n**Merged into BO-009 Pricing Rules as a section of it** (decided 2 October 2026, Chinmay: DEC-100, \"merge them with BO-008 to BO-011 so one surface edits each record\", and the pre-apply round; CHG-MOV-002). It edits the same record as BO-009: it renders inside BO-009's component, under its route, and keeps its own operations, because the first-release slice and its ticket name them. Whether those duplicate writers retire in favour of the venue screen's is a contract and plan question (CHG-MOV-008).\n\n**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: \"they are venue screens\"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.",
   "density": "compact",
   "purposeNote": "Administrators can create reusable commercial price-list masters with clearly defined ownership, scope, currency, market, and business applicability.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
-  "purpose": "Create the master container that holds commercial rates. A Price List should be reusable across products and channels.",
+  "purpose": "Create the master container that holds commercial rates. A Price List should be reusable across products and channels. (a section of BO-009 Pricing Rules since 2 October 2026).",
   "layout": {
    "template": "form",
    "regions": [
@@ -557,6 +564,12 @@
        "kind": "selectField",
        "label": "Allow Product-Specific Rates",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 8 §Configure"
+      },
+      {
+       "kind": "dataTable",
+       "label": "List price lists",
+       "operation": "listPriceLists",
+       "provenance": "contract catalogue.yaml GET /price-lists; wiring fix, 2 October 2026"
       }
      ]
     },
@@ -581,39 +594,40 @@
   },
   "apis": [
    {
-    "operationId": "setPriceListMaster",
+    "operationId": "listPriceLists",
     "contract": "catalogue",
-    "purpose": "Price List Master Configuration",
-    "trigger": "onAction"
+    "purpose": "List price lists",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-049",
+   "board": "wireframes/P08 Venue Management.dc.html#adm-049",
    "workshopBoard": "wireframes/WS95 Pricing   Revenue Management Board 1.dc.html#adm-049"
   },
-  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 8. 0 of 0 labels bound to a contract property; 21 of 37 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 8. 0 of 0 labels bound to a contract property; 21 of 37 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **2 October 2026 (CHG-CLN-001):** setPriceListMaster retired in r2 (BC-008); BO-009 Pricing Rules writes the record with createPriceList and updatePriceList.",
+  "entryState": {},
   "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
+   "code": "P08",
+   "audience": "staff",
    "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
    "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
+   "app": "venue-management-web",
+   "operator": "venue",
    "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
     "shell": "web",
     "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
+     "P12",
+     "P13",
+     "P16"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
     "decided": "10 September 2026"
    }
   }
@@ -631,9 +645,9 @@
    "page": 9
   },
   "implementation": {
-   "app": "ticvai-web",
+   "app": "venue-management-web",
    "route": "/commercial/price-category-rate-type-library-adm-050",
-   "component": "apps/ticvai-web/src/routes/commercial/PriceCategoryRateTypeLibrary.tsx",
+   "component": "apps/venue-management-web/src/routes/commercial/PriceCategoryRateTypeLibrary.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -654,6 +668,7 @@
     }
    ]
   },
+  "notes": "**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: \"they are venue screens\"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.",
   "density": "compact",
   "purposeNote": "types across all tenants, venues, and products.",
   "pattern": "listDetail",
@@ -731,7 +746,7 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-050",
+   "board": "wireframes/P08 Venue Management.dc.html#adm-050",
    "workshopBoard": "wireframes/WS95 Pricing   Revenue Management Board 1.dc.html#adm-050"
   },
   "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 9. 0 of 0 labels bound to a contract property; 0 of 49 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
@@ -769,25 +784,24 @@
    }
   ],
   "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
+   "code": "P08",
+   "audience": "staff",
    "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
    "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
+   "app": "venue-management-web",
+   "operator": "venue",
    "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
     "shell": "web",
     "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
+     "P12",
+     "P13",
+     "P16"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
     "decided": "10 September 2026"
    }
   }
@@ -805,9 +819,9 @@
    "page": 11
   },
   "implementation": {
-   "app": "ticvai-web",
-   "route": "/commercial/rate-structure-builder-adm-051",
-   "component": "apps/ticvai-web/src/routes/commercial/RateStructureBuilder.tsx",
+   "app": "venue-management-web",
+   "route": "/venue-operations/pricing-rules/rate-structure-builder-adm-051",
+   "component": "apps/venue-management-web/src/routes/venue-operations/PricingRulesDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -815,7 +829,8 @@
     "ADM-048"
    ],
    "exitTo": [
-    "ADM-048"
+    "ADM-048",
+    "BO-009"
    ],
    "inferred": false,
    "notes": "**Reached from ADM-048, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
@@ -823,16 +838,24 @@
     {
      "to": "ADM-048",
      "trigger": "Returns to the board's landing screen",
-     "provenance": "flow F143 step 6→7",
-     "operation": "setRateStructure"
+     "provenance": "flow F143 step 6→7"
+    },
+    {
+     "to": "BO-009",
+     "trigger": "Open Pricing Rules",
+     "provenance": "a section of BO-009 since 2 October 2026 (CHG-MOV-002)",
+     "carries": [
+      "priceListId"
+     ]
     }
    ]
   },
+  "notes": "**Its own writer is retired in r2** (decided 2 October 2026, Chinmay: \"13 dupes would be gone in r2\"; CHG-CLN-001). `setRateStructure` duplicated BO-009 Pricing Rules's setPrices, so it is removed from the contract (BC-009) and BO-009 saves this record. This id stays the anchor of its section of BO-009: nothing on it writes separately.\n\n**Merged into BO-009 Pricing Rules as a section of it** (decided 2 October 2026, Chinmay: DEC-100, \"merge them with BO-008 to BO-011 so one surface edits each record\", and the pre-apply round; CHG-MOV-002). It edits the same record as BO-009: it renders inside BO-009's component, under its route, and keeps its own operations, because the first-release slice and its ticket name them. Whether those duplicate writers retire in favour of the venue screen's is a contract and plan question (CHG-MOV-008).\n\n**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: \"they are venue screens\"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.",
   "density": "compact",
   "purposeNote": "Administrators can define monetary rate structures for all TICVAI commercial product types through configurable rate matrices.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Detect) and no metric row",
-  "purpose": "Define the actual monetary rates contained within a price list. This is the core commercial configuration screen.",
+  "purpose": "Define the actual monetary rates contained within a price list. This is the core commercial configuration screen. (a section of BO-009 Pricing Rules since 2 October 2026).",
   "gaps": [
    {
     "operation": null,
@@ -855,8 +878,13 @@
         "RateStructureBuilderView.validationIssues"
        ],
        "bindsTo": "RateStructureBuilderView",
-       "operation": "setRateStructure",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 11 §Detect"
+      },
+      {
+       "kind": "dataTable",
+       "label": "List prices in a list",
+       "operation": "listPrices",
+       "provenance": "contract catalogue.yaml GET /price-lists/{priceListId}/prices; wiring fix, 2 October 2026"
       }
      ]
     },
@@ -914,45 +942,51 @@
   },
   "apis": [
    {
-    "operationId": "setRateStructure",
+    "operationId": "listPrices",
     "contract": "catalogue",
-    "purpose": "Rate Structure Builder",
-    "trigger": "onAction"
+    "purpose": "List prices in a list",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "entryState": {
    "preloaded": [
     "Duplicate Rates",
     "RateStructureBuilderView.validationIssues"
+   ],
+   "params": [
+    {
+     "name": "priceListId",
+     "from": "navigation"
+    }
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-051",
+   "board": "wireframes/P08 Venue Management.dc.html#adm-051",
    "workshopBoard": "wireframes/WS95 Pricing   Revenue Management Board 1.dc.html#adm-051"
   },
-  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 11. 4 of 5 labels bound to a contract property; 9 of 47 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 11. 4 of 5 labels bound to a contract property; 9 of 47 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **2 October 2026 (CHG-CLN-001):** setRateStructure retired in r2 (BC-009); BO-009 Pricing Rules writes the record with setPrices.",
   "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
+   "code": "P08",
+   "audience": "staff",
    "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
    "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
+   "app": "venue-management-web",
+   "operator": "venue",
    "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
     "shell": "web",
     "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
+     "P12",
+     "P13",
+     "P16"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
     "decided": "10 September 2026"
    }
   }
@@ -970,9 +1004,9 @@
    "page": 13
   },
   "implementation": {
-   "app": "ticvai-web",
-   "route": "/commercial/product-service-price-assignment-adm-052",
-   "component": "apps/ticvai-web/src/routes/commercial/ProductServicePriceAssignment.tsx",
+   "app": "venue-management-web",
+   "route": "/venue-operations/pricing-rules/product-service-price-assignment-adm-052",
+   "component": "apps/venue-management-web/src/routes/venue-operations/PricingRulesDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -980,7 +1014,8 @@
     "ADM-048"
    ],
    "exitTo": [
-    "ADM-048"
+    "ADM-048",
+    "BO-009"
    ],
    "inferred": false,
    "notes": "**Reached from ADM-048, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
@@ -990,19 +1025,33 @@
      "trigger": "Returns to the board's landing screen",
      "provenance": "flow F143 step 8→9",
      "operation": "setProductServicePrice"
+    },
+    {
+     "to": "BO-009",
+     "trigger": "Open Pricing Rules",
+     "provenance": "a section of BO-009 since 2 October 2026 (CHG-MOV-002)",
+     "carries": [
+      "priceListId"
+     ]
     }
    ]
   },
+  "notes": "**Merged into BO-009 Pricing Rules as a section of it** (decided 2 October 2026, Chinmay: DEC-100, \"merge them with BO-008 to BO-011 so one surface edits each record\", and the pre-apply round; CHG-MOV-002). It edits the same record as BO-009: it renders inside BO-009's component, under its route, and keeps its own operations, because the first-release slice and its ticket name them. Whether those duplicate writers retire in favour of the venue screen's is a contract and plan question (CHG-MOV-008).\n\n**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: \"they are venue screens\"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.",
   "density": "compact",
   "purposeNote": "All sellable TICVAI objects can reference centrally managed price lists and rates without maintaining duplicate price definitions inside business modules.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Product configuration should display) and no metric row",
-  "purpose": "Connect commercial rates to the actual products and services being sold.",
+  "purpose": "Connect commercial rates to the actual products and services being sold. (a section of BO-009 Pricing Rules since 2 October 2026).",
   "gaps": [
    {
     "operation": null,
     "why": "**The pack names 5 actions on this screen and the screen declares 1 operation.** Unserved: Ticket Type, Event, Venue. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Pricing___Revenue_Management_Reference.pdf, page 13 §Allow"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-027): A read (get or list) of the product and service price assignments that setProductServicePrice writes.",
+    "source": "contracts/spine/catalogue.yaml#setProductServicePrice | screens/P08-venue-back-office.yaml#ADM-052"
    }
   ],
   "layout": {
@@ -1096,30 +1145,29 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-052",
+   "board": "wireframes/P08 Venue Management.dc.html#adm-052",
    "workshopBoard": "wireframes/WS95 Pricing   Revenue Management Board 1.dc.html#adm-052"
   },
   "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 13. 0 of 1 labels bound to a contract property; 7 of 37 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
+   "code": "P08",
+   "audience": "staff",
    "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
    "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
+   "app": "venue-management-web",
+   "operator": "venue",
    "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
     "shell": "web",
     "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
+     "P12",
+     "P13",
+     "P16"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
     "decided": "10 September 2026"
    }
   }
@@ -1137,9 +1185,9 @@
    "page": 14
   },
   "implementation": {
-   "app": "ticvai-web",
-   "route": "/commercial/package-bundle-add-on-pricing-adm-053",
-   "component": "apps/ticvai-web/src/routes/commercial/PackageBundleAddOnPricing.tsx",
+   "app": "venue-management-web",
+   "route": "/venue-operations/packages-bundles/package-bundle-add-on-pricing-adm-053",
+   "component": "apps/venue-management-web/src/routes/venue-operations/PackagesBundlesDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1147,7 +1195,8 @@
     "ADM-048"
    ],
    "exitTo": [
-    "ADM-048"
+    "ADM-048",
+    "BO-011"
    ],
    "inferred": false,
    "notes": "**Reached from ADM-048, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
@@ -1157,14 +1206,23 @@
      "trigger": "Returns to the board's landing screen",
      "provenance": "flow F143 step 10→11",
      "operation": "listPackageBundleAdd"
+    },
+    {
+     "to": "BO-011",
+     "trigger": "Open Packages & Bundles",
+     "provenance": "a section of BO-011 since 2 October 2026 (CHG-MOV-002)",
+     "carries": [
+      "productId"
+     ]
     }
    ]
   },
+  "notes": "**Merged into BO-011 Packages & Bundles as a section of it** (decided 2 October 2026, Chinmay: DEC-100, \"merge them with BO-008 to BO-011 so one surface edits each record\", and the pre-apply round; CHG-MOV-002). It edits the same record as BO-011: it renders inside BO-011's component, under its route, and keeps its own operations, because the first-release slice and its ticket name them. Whether those duplicate writers retire in favour of the venue screen's is a contract and plan question (CHG-MOV-008).\n\n**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: \"they are venue screens\"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.",
   "density": "compact",
   "purposeNote": "Packages, bundles, and add-ons can use centralized commercial pricing while their product composition remains owned by the Product Catalogue.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure pricing for; Configure whether the customer sees) and no display directory — it is settings, not a population",
-  "purpose": "Provide dedicated commercial structures for products containing multiple components. This is separate from the Product Relationship/Bundle module. Product Catalogue defines what the bundle contains. Pricing defines how that bundle is priced.",
+  "purpose": "Provide dedicated commercial structures for products containing multiple components. This is separate from the Product Relationship/Bundle module. Product Catalogue defines what the bundle contains. Pricing defines how that bundle is priced. (a section of BO-011 Packages & Bundles since 2 October 2026).",
   "layout": {
    "template": "form",
    "regions": [
@@ -1281,7 +1339,7 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-053",
+   "board": "wireframes/P08 Venue Management.dc.html#adm-053",
    "workshopBoard": "wireframes/WS95 Pricing   Revenue Management Board 1.dc.html#adm-053"
   },
   "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 14. 0 of 0 labels bound to a contract property; 13 of 28 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
@@ -1317,25 +1375,24 @@
    }
   ],
   "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
+   "code": "P08",
+   "audience": "staff",
    "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
    "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
+   "app": "venue-management-web",
+   "operator": "venue",
    "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
     "shell": "web",
     "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
+     "P12",
+     "P13",
+     "P16"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
     "decided": "10 September 2026"
    }
   }
@@ -1353,9 +1410,9 @@
    "page": 15
   },
   "implementation": {
-   "app": "ticvai-web",
+   "app": "venue-management-web",
    "route": "/commercial/market-venue-currency-pricing-structure-adm-054",
-   "component": "apps/ticvai-web/src/routes/commercial/MarketVenueCurrencyPricingStructure.tsx",
+   "component": "apps/venue-management-web/src/routes/commercial/MarketVenueCurrencyPricingStructure.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1376,6 +1433,7 @@
     }
    ]
   },
+  "notes": "**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: \"they are venue screens\"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.",
   "density": "compact",
   "purposeNote": "entities, and currencies.",
   "pattern": "configEditor",
@@ -1472,7 +1530,7 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-054",
+   "board": "wireframes/P08 Venue Management.dc.html#adm-054",
    "workshopBoard": "wireframes/WS95 Pricing   Revenue Management Board 1.dc.html#adm-054"
   },
   "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 15. 0 of 0 labels bound to a contract property; 8 of 32 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
@@ -1513,25 +1571,24 @@
    }
   ],
   "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
+   "code": "P08",
+   "audience": "staff",
    "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
    "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
+   "app": "venue-management-web",
+   "operator": "venue",
    "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
     "shell": "web",
     "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
+     "P12",
+     "P13",
+     "P16"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
     "decided": "10 September 2026"
    }
   }
@@ -1549,9 +1606,9 @@
    "page": 17
   },
   "implementation": {
-   "app": "ticvai-web",
+   "app": "venue-management-web",
    "route": "/commercial/price-hierarchy-inheritance-configuration-adm-055",
-   "component": "apps/ticvai-web/src/routes/commercial/PriceHierarchyInheritanceConfiguration.tsx",
+   "component": "apps/venue-management-web/src/routes/commercial/PriceHierarchyInheritanceConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1572,6 +1629,7 @@
     }
    ]
   },
+  "notes": "**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: \"they are venue screens\"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.",
   "density": "compact",
   "purposeNote": "The platform deterministically resolves the correct commercial price source across global, market, venue, and product hierarchies.",
   "pattern": "configEditor",
@@ -1666,30 +1724,36 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-055",
+   "board": "wireframes/P08 Venue Management.dc.html#adm-055",
    "workshopBoard": "wireframes/WS95 Pricing   Revenue Management Board 1.dc.html#adm-055"
   },
   "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 17. 0 of 0 labels bound to a contract property; 10 of 29 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-027): A read (get or list) of the price hierarchy and inheritance configuration that setPriceHierarchyInheritance writes.",
+    "source": "contracts/spine/catalogue.yaml#setPriceHierarchyInheritance | screens/P08-venue-back-office.yaml#ADM-055"
+   }
+  ],
   "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
+   "code": "P08",
+   "audience": "staff",
    "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
    "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
+   "app": "venue-management-web",
+   "operator": "venue",
    "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
     "shell": "web",
     "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
+     "P12",
+     "P13",
+     "P16"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
     "decided": "10 September 2026"
    }
   }
@@ -1707,9 +1771,9 @@
    "page": 18
   },
   "implementation": {
-   "app": "ticvai-web",
+   "app": "venue-management-web",
    "route": "/commercial/price-list-templates-clone-reuse-adm-056",
-   "component": "apps/ticvai-web/src/routes/commercial/PriceListTemplatesCloneReuse.tsx",
+   "component": "apps/venue-management-web/src/routes/commercial/PriceListTemplatesCloneReuse.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1730,6 +1794,7 @@
     }
    ]
   },
+  "notes": "**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: \"they are venue screens\"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.",
   "density": "compact",
   "purposeNote": "Administrators can rapidly create consistent commercial pricing structures by cloning and reusing approved templates instead of rebuilding pricing manually.",
   "pattern": "configEditor",
@@ -1843,7 +1908,7 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-056",
+   "board": "wireframes/P08 Venue Management.dc.html#adm-056",
    "workshopBoard": "wireframes/WS95 Pricing   Revenue Management Board 1.dc.html#adm-056"
   },
   "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 18. 0 of 0 labels bound to a contract property; 10 of 39 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
@@ -1882,25 +1947,24 @@
    }
   ],
   "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
+   "code": "P08",
+   "audience": "staff",
    "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
    "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
+   "app": "venue-management-web",
+   "operator": "venue",
    "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
     "shell": "web",
     "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
+     "P12",
+     "P13",
+     "P16"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
     "decided": "10 September 2026"
    }
   }
@@ -1918,9 +1982,9 @@
    "page": 19
   },
   "implementation": {
-   "app": "ticvai-web",
+   "app": "venue-management-web",
    "route": "/commercial/commercial-pricing-structure-validation-adm-057",
-   "component": "apps/ticvai-web/src/routes/commercial/CommercialPricingStructureValidation.tsx",
+   "component": "apps/venue-management-web/src/routes/commercial/CommercialPricingStructureValidation.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1933,6 +1997,7 @@
    "inferred": false,
    "notes": "**Reached from ADM-048, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
   },
+  "notes": "**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: \"they are venue screens\"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.",
   "density": "compact",
   "purposeNote": "from progressing downstream without clearly identifying the issue. Board 1 — Final Screen Register # Screen Responsibility 10.1. Commercial Pricing Command",
   "pattern": "listDetail",
@@ -1989,30 +2054,29 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-057",
+   "board": "wireframes/P08 Venue Management.dc.html#adm-057",
    "workshopBoard": "wireframes/WS95 Pricing   Revenue Management Board 1.dc.html#adm-057"
   },
   "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 19. 0 of 0 labels bound to a contract property; 0 of 83 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
+   "code": "P08",
+   "audience": "staff",
    "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
    "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
+   "app": "venue-management-web",
+   "operator": "venue",
    "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
     "shell": "web",
     "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
+     "P12",
+     "P13",
+     "P16"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
     "decided": "10 September 2026"
    }
   }

@@ -1,5 +1,5 @@
 id: LLD-TenancyService
-title: TenancyService — 204 operations, 109 tables
+title: TenancyService — 209 operations, 109 tables
 generatedBy: tools/derive-diagrams.py
 tier: foundation
 deployable: commerce
@@ -21,9 +21,9 @@ why: '**`platform.org_unit` is reached by 304 of 379 tables** — the tenancy sp
 scale: Read-heavy and highly cacheable. Config changes are rare.
 ifDown: Same as identity — nothing runs without a scope.
 coverage:
-  operations: 204
-  inAFlow: 55
-  percent: 27%
+  operations: 209
+  inAFlow: 50
+  percent: 24%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
@@ -53,9 +53,476 @@ schemas:
   - postgres
   largestTable: tenancy.device_firmware
 operationsByContract:
-- contract: tenancy
-  count: 55
+- contract: approvals
+  count: 57
   operations:
+  - operation: actOnWorkflowInstance
+    verb: POST
+    path: /workflow-instances/{instanceId}/actions
+    scope: venue
+    permission: APPROVAL_ACT
+    offline: false
+    reads: 6
+    writes: 6
+  - operation: approveMatrixMultiLevel
+    verb: PUT
+    path: /matrix-multi-level
+    scope: venue
+    permission: APPROVAL_REQUEST
+    offline: false
+    reads: 3
+    writes: 3
+  - operation: approveRoleAuthorityDelegation
+    verb: PUT
+    path: /role-authority-delegation
+    scope: venue
+    permission: APPROVAL_REQUEST
+    offline: false
+    reads: 6
+    writes: 2
+  - operation: approveUnifiedDecision
+    verb: PUT
+    path: /unified-decision
+    scope: venue
+    permission: APPROVAL_REQUEST
+    offline: false
+    reads: 6
+    writes: 4
+  - operation: approveVersioningGovernance
+    verb: PUT
+    path: /versioning-governance
+    scope: venue
+    permission: APPROVAL_REQUEST
+    offline: false
+    reads: 4
+    writes: 3
+  - operation: assignApprovalRequest
+    verb: PUT
+    path: /approval-requests/{requestId}/assignment
+    scope: venue
+    permission: APPROVAL_DECIDE
+    offline: false
+    reads: 2
+    writes: 0
+  - operation: cancelApprovalRequest
+    verb: POST
+    path: /approval-requests/{requestId}/cancel
+    scope: venue
+    permission: APPROVAL_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 0
+  - operation: createApprovalDelegation
+    verb: POST
+    path: /delegations
+    scope: venue
+    permission: APPROVAL_DECIDE
+    offline: false
+    reads: 4
+    writes: 2
+  - operation: createApprovalEvidencePackage
+    verb: POST
+    path: /approval-evidence-packages
+    scope: tenant
+    permission: APPROVAL_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: createApprovalRequest
+    verb: POST
+    path: /approval-requests
+    scope: venue
+    permission: APPROVAL_REQUEST
+    offline: false
+    reads: 7
+    writes: 2
+  - operation: createAutomationAutonomouAction
+    verb: POST
+    path: /automation-autonomou-action
+    scope: venue
+    permission: APPROVAL_REQUEST
+    offline: false
+    reads: 4
+    writes: 2
+  - operation: decideApprovalRequest
+    verb: POST
+    path: /approval-requests/{requestId}/decide
+    scope: venue
+    permission: APPROVAL_DECIDE
+    offline: false
+    reads: 5
+    writes: 8
+  - operation: escalateApprovalRequest
+    verb: POST
+    path: /approval-requests/{requestId}/escalate
+    scope: venue
+    permission: APPROVAL_REQUEST
+    offline: false
+    reads: 4
+    writes: 4
+  - operation: evaluateApprovalRequirement
+    verb: POST
+    path: /approval-requests/evaluate
+    scope: venue
+    permission: APPROVAL_VIEW
+    offline: false
+    reads: 6
+    writes: 1
+  - operation: getApprovalAnalytics
+    verb: GET
+    path: /approval-analytics
+    scope: venue
+    permission: APPROVAL_VIEW
+    offline: false
+    reads: 3
+    writes: 0
+  - operation: getApprovalRecord
+    verb: GET
+    path: /approval-requests/{requestId}/record
+    scope: venue
+    permission: APPROVAL_VIEW
+    offline: false
+    reads: 2
+    writes: 0
+  - operation: issueAccreditationBadge
+    verb: POST
+    path: /accreditation-badges
+    scope: venue
+    permission: APPROVAL_ACT
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: listAccreditationBadges
+    verb: GET
+    path: /accreditation-badges
+    scope: venue
+    permission: APPROVAL_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listApprovalControlPolicies
+    verb: GET
+    path: /approval-control-policies
+    scope: tenant
+    permission: APPROVAL_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listApprovalDelegations
+    verb: GET
+    path: /delegations
+    scope: venue
+    permission: APPROVAL_VIEW
+    offline: false
+    reads: 2
+    writes: 0
+  - operation: listApprovalExternalDispatches
+    verb: GET
+    path: /approval-external-dispatches
+    scope: venue
+    permission: APPROVAL_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listApprovalExternalProviders
+    verb: GET
+    path: /approval-external-providers
+    scope: tenant
+    permission: APPROVAL_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listApprovalMatrices
+    verb: GET
+    path: /approval-matrices
+    scope: venue
+    permission: APPROVAL_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 0
+  - operation: listApprovalRequests
+    verb: GET
+    path: /approval-requests
+    scope: venue
+    permission: APPROVAL_VIEW
+    offline: false
+    reads: 2
+    writes: 0
+  - operation: listApprovedActionExecutions
+    verb: GET
+    path: /approved-action-executions
+    scope: venue
+    permission: APPROVAL_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listAutomationExecutions
+    verb: GET
+    path: /automation-executions
+    scope: venue
+    permission: APPROVAL_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listConditionDecisionLogic
+    verb: GET
+    path: /condition-decision-logic
+    scope: venue
+    permission: APPROVAL_VIEW
+    offline: false
+    reads: 2
+    writes: 0
+  - operation: listCrossModuleOrchestration
+    verb: GET
+    path: /cross-module-orchestration
+    scope: venue
+    permission: APPROVAL_VIEW
+    offline: false
+    reads: 4
+    writes: 0
+  - operation: listProcessAutomationOpportunity
+    verb: GET
+    path: /process-automation-opportunity
+    scope: venue
+    permission: APPROVAL_VIEW
+    offline: false
+    reads: 7
+    writes: 0
+  - operation: listRuleWorkflow
+    verb: GET
+    path: /rule-workflow
+    scope: venue
+    permission: APPROVAL_VIEW
+    offline: false
+    reads: 10
+    writes: 0
+  - operation: listSlaEscalationBottleneck
+    verb: GET
+    path: /sla-escalation-bottleneck
+    scope: venue
+    permission: APPROVAL_VIEW
+    offline: false
+    reads: 9
+    writes: 0
+  - operation: listSlaEscalationReminder
+    verb: GET
+    path: /sla-escalation-reminder
+    scope: venue
+    permission: APPROVAL_VIEW
+    offline: false
+    reads: 2
+    writes: 0
+  - operation: listStepUpPolicies
+    verb: GET
+    path: /step-up-policies
+    scope: tenant
+    permission: APPROVAL_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listWorkflow
+    verb: GET
+    path: /workflow
+    scope: venue
+    permission: APPROVAL_VIEW
+    offline: false
+    reads: 8
+    writes: 0
+  - operation: listWorkflowAutonomouGovernance
+    verb: GET
+    path: /workflow-autonomou-governance
+    scope: venue
+    permission: APPROVAL_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listWorkflowExceptionFailure
+    verb: GET
+    path: /workflow-exception-failure
+    scope: venue
+    permission: APPROVAL_VIEW
+    offline: false
+    reads: 5
+    writes: 0
+  - operation: listWorkflowInstanceProcess
+    verb: GET
+    path: /workflow-instance-process
+    scope: venue
+    permission: APPROVAL_VIEW
+    offline: false
+    reads: 11
+    writes: 0
+  - operation: listWorkflowProcessPerformance
+    verb: GET
+    path: /workflow-process-performance
+    scope: venue
+    permission: APPROVAL_VIEW
+    offline: false
+    reads: 10
+    writes: 0
+  - operation: recordExternalApprovalDecision
+    verb: POST
+    path: /approval-requests/{requestId}/external-decision
+    scope: venue
+    permission: APPROVAL_DECIDE
+    offline: false
+    reads: 6
+    writes: 5
+  - operation: reopenApprovalRequest
+    verb: POST
+    path: /approval-requests/{requestId}/reopen
+    scope: venue
+    permission: APPROVAL_REQUEST
+    offline: false
+    reads: 2
+    writes: 0
+  - operation: resolveApprovedActionExecution
+    verb: POST
+    path: /approved-action-executions/{executionId}/resolve
+    scope: venue
+    permission: APPROVAL_ACT
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: resubmitApprovalRequest
+    verb: POST
+    path: /approval-requests/{requestId}/resubmit
+    scope: venue
+    permission: APPROVAL_REQUEST
+    offline: false
+    reads: 3
+    writes: 2
+  - operation: revokeApprovalDelegation
+    verb: DELETE
+    path: /delegations/{delegationId}
+    scope: venue
+    permission: APPROVAL_DECIDE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: setApprovalControlPolicy
+    verb: PUT
+    path: /approval-control-policies
+    scope: tenant
+    permission: APPROVAL_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: setApprovalExternalProvider
+    verb: PUT
+    path: /approval-external-providers
+    scope: tenant
+    permission: APPROVAL_CONFIGURE
+    offline: false
+    reads: 3
+    writes: 2
+  - operation: setApprovalMatrix
+    verb: PUT
+    path: /approval-matrices
+    scope: venue
+    permission: APPROVAL_CONFIGURE
+    offline: false
+    reads: 4
+    writes: 3
+  - operation: setApprovalRetentionPolicy
+    verb: PUT
+    path: /approval-retention
+    scope: tenant
+    permission: APPROVAL_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: setApprovalSlaPolicy
+    verb: PUT
+    path: /approval-sla-policies
+    scope: tenant
+    permission: APPROVAL_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: setApproverAvailability
+    verb: PUT
+    path: /approval-delegations/availability
+    scope: venue
+    permission: APPROVAL_DECIDE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: setStepUpPolicy
+    verb: PUT
+    path: /step-up-policies
+    scope: tenant
+    permission: APPROVAL_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: setTriggerActionCross
+    verb: PUT
+    path: /trigger-action-cross
+    scope: venue
+    permission: APPROVAL_REQUEST
+    offline: false
+    reads: 3
+    writes: 2
+  - operation: setVisualBusinessRule
+    verb: PUT
+    path: /visual-business-rule
+    scope: venue
+    permission: APPROVAL_REQUEST
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: setVisualWorkflow
+    verb: PUT
+    path: /visual-workflow
+    scope: venue
+    permission: APPROVAL_REQUEST
+    offline: false
+    reads: 3
+    writes: 3
+  - operation: signApprovalDecision
+    verb: POST
+    path: /approval-requests/{requestId}/signature
+    scope: venue
+    permission: APPROVAL_DECIDE
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: simulateWorkflowTestingImpact
+    verb: PUT
+    path: /workflow-testing-impact
+    scope: venue
+    permission: APPROVAL_REQUEST
+    offline: false
+    reads: 14
+    writes: 2
+  - operation: submitApprovalRequest
+    verb: POST
+    path: /approval-requests/{requestId}/submit
+    scope: venue
+    permission: APPROVAL_REQUEST
+    offline: false
+    reads: 4
+    writes: 3
+  - operation: withdrawApprovalRequest
+    verb: POST
+    path: /approval-requests/{requestId}/withdraw
+    scope: venue
+    permission: APPROVAL_REQUEST
+    offline: false
+    reads: 3
+    writes: 2
+- contract: tenancy
+  count: 56
+  operations:
+  - operation: approveDevice
+    verb: POST
+    path: /devices/{deviceId}/approval
+    scope: venue
+    permission: DEVICE_MANAGE
+    offline: false
+    reads: 1
+    writes: 0
   - operation: configureWorkstation
     verb: PUT
     path: /workstations/{workstationId}
@@ -496,433 +963,6 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 4
-- contract: approvals
-  count: 53
-  operations:
-  - operation: actOnWorkflowInstance
-    verb: POST
-    path: /workflow-instances/{instanceId}/actions
-    scope: venue
-    permission: APPROVAL_ACT
-    offline: false
-    reads: 6
-    writes: 6
-  - operation: approveMatrixMultiLevel
-    verb: PUT
-    path: /matrix-multi-level
-    scope: venue
-    permission: APPROVAL_REQUEST
-    offline: false
-    reads: 3
-    writes: 3
-  - operation: approveRoleAuthorityDelegation
-    verb: PUT
-    path: /role-authority-delegation
-    scope: venue
-    permission: APPROVAL_REQUEST
-    offline: false
-    reads: 6
-    writes: 2
-  - operation: approveUnifiedDecision
-    verb: PUT
-    path: /unified-decision
-    scope: venue
-    permission: APPROVAL_REQUEST
-    offline: false
-    reads: 6
-    writes: 4
-  - operation: approveVersioningGovernance
-    verb: PUT
-    path: /versioning-governance
-    scope: venue
-    permission: APPROVAL_REQUEST
-    offline: false
-    reads: 4
-    writes: 3
-  - operation: createApprovalDelegation
-    verb: POST
-    path: /delegations
-    scope: venue
-    permission: APPROVAL_DECIDE
-    offline: false
-    reads: 4
-    writes: 2
-  - operation: createApprovalEvidencePackage
-    verb: POST
-    path: /approval-evidence-packages
-    scope: tenant
-    permission: APPROVAL_VIEW
-    offline: false
-    reads: 1
-    writes: 0
-  - operation: createApprovalRequest
-    verb: POST
-    path: /approval-requests
-    scope: venue
-    permission: APPROVAL_REQUEST
-    offline: false
-    reads: 7
-    writes: 2
-  - operation: createAutomationAutonomouAction
-    verb: POST
-    path: /automation-autonomou-action
-    scope: venue
-    permission: APPROVAL_REQUEST
-    offline: false
-    reads: 4
-    writes: 2
-  - operation: decideApprovalRequest
-    verb: POST
-    path: /approval-requests/{requestId}/decide
-    scope: venue
-    permission: APPROVAL_DECIDE
-    offline: false
-    reads: 5
-    writes: 8
-  - operation: escalateApprovalRequest
-    verb: POST
-    path: /approval-requests/{requestId}/escalate
-    scope: venue
-    permission: APPROVAL_REQUEST
-    offline: false
-    reads: 4
-    writes: 4
-  - operation: evaluateApprovalRequirement
-    verb: POST
-    path: /approval-requests/evaluate
-    scope: venue
-    permission: APPROVAL_VIEW
-    offline: false
-    reads: 6
-    writes: 1
-  - operation: getApprovalAnalytics
-    verb: GET
-    path: /approval-analytics
-    scope: venue
-    permission: APPROVAL_VIEW
-    offline: false
-    reads: 3
-    writes: 0
-  - operation: getApprovalRecord
-    verb: GET
-    path: /approval-requests/{requestId}/record
-    scope: venue
-    permission: APPROVAL_VIEW
-    offline: false
-    reads: 2
-    writes: 0
-  - operation: issueAccreditationBadge
-    verb: POST
-    path: /accreditation-badges
-    scope: venue
-    permission: APPROVAL_ACT
-    offline: false
-    reads: 1
-    writes: 1
-  - operation: listAccreditationBadges
-    verb: GET
-    path: /accreditation-badges
-    scope: venue
-    permission: APPROVAL_VIEW
-    offline: false
-    reads: 1
-    writes: 0
-  - operation: listApprovalControlPolicies
-    verb: GET
-    path: /approval-control-policies
-    scope: tenant
-    permission: APPROVAL_VIEW
-    offline: false
-    reads: 1
-    writes: 0
-  - operation: listApprovalDelegations
-    verb: GET
-    path: /delegations
-    scope: venue
-    permission: APPROVAL_VIEW
-    offline: false
-    reads: 2
-    writes: 0
-  - operation: listApprovalExternalDispatches
-    verb: GET
-    path: /approval-external-dispatches
-    scope: venue
-    permission: APPROVAL_VIEW
-    offline: false
-    reads: 1
-    writes: 0
-  - operation: listApprovalExternalProviders
-    verb: GET
-    path: /approval-external-providers
-    scope: tenant
-    permission: APPROVAL_VIEW
-    offline: false
-    reads: 1
-    writes: 0
-  - operation: listApprovalMatrices
-    verb: GET
-    path: /approval-matrices
-    scope: venue
-    permission: APPROVAL_CONFIGURE
-    offline: false
-    reads: 2
-    writes: 0
-  - operation: listApprovalRequests
-    verb: GET
-    path: /approval-requests
-    scope: venue
-    permission: APPROVAL_VIEW
-    offline: false
-    reads: 2
-    writes: 0
-  - operation: listApprovedActionExecutions
-    verb: GET
-    path: /approved-action-executions
-    scope: venue
-    permission: APPROVAL_VIEW
-    offline: false
-    reads: 1
-    writes: 0
-  - operation: listConditionDecisionLogic
-    verb: GET
-    path: /condition-decision-logic
-    scope: venue
-    permission: APPROVAL_VIEW
-    offline: false
-    reads: 2
-    writes: 0
-  - operation: listCrossModuleOrchestration
-    verb: GET
-    path: /cross-module-orchestration
-    scope: venue
-    permission: APPROVAL_VIEW
-    offline: false
-    reads: 4
-    writes: 0
-  - operation: listProcessAutomationOpportunity
-    verb: GET
-    path: /process-automation-opportunity
-    scope: venue
-    permission: APPROVAL_VIEW
-    offline: false
-    reads: 7
-    writes: 0
-  - operation: listRuleWorkflow
-    verb: GET
-    path: /rule-workflow
-    scope: venue
-    permission: APPROVAL_VIEW
-    offline: false
-    reads: 10
-    writes: 0
-  - operation: listSlaEscalationBottleneck
-    verb: GET
-    path: /sla-escalation-bottleneck
-    scope: venue
-    permission: APPROVAL_VIEW
-    offline: false
-    reads: 9
-    writes: 0
-  - operation: listSlaEscalationReminder
-    verb: GET
-    path: /sla-escalation-reminder
-    scope: venue
-    permission: APPROVAL_VIEW
-    offline: false
-    reads: 2
-    writes: 0
-  - operation: listStepUpPolicies
-    verb: GET
-    path: /step-up-policies
-    scope: tenant
-    permission: APPROVAL_CONFIGURE
-    offline: false
-    reads: 1
-    writes: 0
-  - operation: listWorkflow
-    verb: GET
-    path: /workflow
-    scope: venue
-    permission: APPROVAL_VIEW
-    offline: false
-    reads: 8
-    writes: 0
-  - operation: listWorkflowAutonomouGovernance
-    verb: GET
-    path: /workflow-autonomou-governance
-    scope: venue
-    permission: APPROVAL_VIEW
-    offline: false
-    reads: 0
-    writes: 0
-  - operation: listWorkflowExceptionFailure
-    verb: GET
-    path: /workflow-exception-failure
-    scope: venue
-    permission: APPROVAL_VIEW
-    offline: false
-    reads: 5
-    writes: 0
-  - operation: listWorkflowInstanceProcess
-    verb: GET
-    path: /workflow-instance-process
-    scope: venue
-    permission: APPROVAL_VIEW
-    offline: false
-    reads: 11
-    writes: 0
-  - operation: listWorkflowProcessPerformance
-    verb: GET
-    path: /workflow-process-performance
-    scope: venue
-    permission: APPROVAL_VIEW
-    offline: false
-    reads: 10
-    writes: 0
-  - operation: recordExternalApprovalDecision
-    verb: POST
-    path: /approval-requests/{requestId}/external-decision
-    scope: venue
-    permission: APPROVAL_DECIDE
-    offline: false
-    reads: 6
-    writes: 5
-  - operation: resolveApprovedActionExecution
-    verb: POST
-    path: /approved-action-executions/{executionId}/resolve
-    scope: venue
-    permission: APPROVAL_ACT
-    offline: false
-    reads: 1
-    writes: 0
-  - operation: resubmitApprovalRequest
-    verb: POST
-    path: /approval-requests/{requestId}/resubmit
-    scope: venue
-    permission: APPROVAL_REQUEST
-    offline: false
-    reads: 3
-    writes: 2
-  - operation: revokeApprovalDelegation
-    verb: DELETE
-    path: /delegations/{delegationId}
-    scope: venue
-    permission: APPROVAL_DECIDE
-    offline: false
-    reads: 2
-    writes: 2
-  - operation: setApprovalControlPolicy
-    verb: PUT
-    path: /approval-control-policies
-    scope: tenant
-    permission: APPROVAL_CONFIGURE
-    offline: false
-    reads: 1
-    writes: 1
-  - operation: setApprovalExternalProvider
-    verb: PUT
-    path: /approval-external-providers
-    scope: tenant
-    permission: APPROVAL_CONFIGURE
-    offline: false
-    reads: 3
-    writes: 2
-  - operation: setApprovalMatrix
-    verb: PUT
-    path: /approval-matrices
-    scope: venue
-    permission: APPROVAL_CONFIGURE
-    offline: false
-    reads: 4
-    writes: 3
-  - operation: setApprovalRetentionPolicy
-    verb: PUT
-    path: /approval-retention
-    scope: tenant
-    permission: APPROVAL_CONFIGURE
-    offline: false
-    reads: 2
-    writes: 2
-  - operation: setApprovalSlaPolicy
-    verb: PUT
-    path: /approval-sla-policies
-    scope: tenant
-    permission: APPROVAL_CONFIGURE
-    offline: false
-    reads: 1
-    writes: 1
-  - operation: setApproverAvailability
-    verb: PUT
-    path: /approval-delegations/availability
-    scope: venue
-    permission: APPROVAL_DECIDE
-    offline: false
-    reads: 1
-    writes: 1
-  - operation: setStepUpPolicy
-    verb: PUT
-    path: /step-up-policies
-    scope: tenant
-    permission: APPROVAL_CONFIGURE
-    offline: false
-    reads: 1
-    writes: 1
-  - operation: setTriggerActionCross
-    verb: PUT
-    path: /trigger-action-cross
-    scope: venue
-    permission: APPROVAL_REQUEST
-    offline: false
-    reads: 3
-    writes: 2
-  - operation: setVisualBusinessRule
-    verb: PUT
-    path: /visual-business-rule
-    scope: venue
-    permission: APPROVAL_REQUEST
-    offline: false
-    reads: 2
-    writes: 2
-  - operation: setVisualWorkflow
-    verb: PUT
-    path: /visual-workflow
-    scope: venue
-    permission: APPROVAL_REQUEST
-    offline: false
-    reads: 3
-    writes: 3
-  - operation: signApprovalDecision
-    verb: POST
-    path: /approval-requests/{requestId}/signature
-    scope: venue
-    permission: APPROVAL_DECIDE
-    offline: false
-    reads: 1
-    writes: 0
-  - operation: simulateWorkflowTestingImpact
-    verb: PUT
-    path: /workflow-testing-impact
-    scope: venue
-    permission: APPROVAL_REQUEST
-    offline: false
-    reads: 14
-    writes: 2
-  - operation: submitApprovalRequest
-    verb: POST
-    path: /approval-requests/{requestId}/submit
-    scope: venue
-    permission: APPROVAL_REQUEST
-    offline: false
-    reads: 4
-    writes: 3
-  - operation: withdrawApprovalRequest
-    verb: POST
-    path: /approval-requests/{requestId}/withdraw
-    scope: venue
-    permission: APPROVAL_REQUEST
-    offline: false
-    reads: 3
-    writes: 2
 - contract: workforce
   count: 49
   operations:
@@ -1982,7 +2022,7 @@ tables:
   - accreditation
   foreignWriters: null
 - table: accreditation.programme
-  columns: 14
+  columns: 16
   store: postgres
   parent: null
   writtenBy:
@@ -2116,7 +2156,7 @@ tables:
   - approvals
   foreignWriters: null
 - table: approvals.request
-  columns: 27
+  columns: 30
   store: postgres
   parent: null
   writtenBy:
@@ -2133,7 +2173,7 @@ tables:
   - approvals
   foreignWriters: null
 - table: approvals.rule
-  columns: 18
+  columns: 20
   store: postgres
   parent: null
   writtenBy:
@@ -2277,7 +2317,7 @@ tables:
   foreignWriters:
   - shift
 - table: platform.device
-  columns: 34
+  columns: 41
   store: postgres
   parent: null
   writtenBy:
@@ -2378,7 +2418,7 @@ tables:
   - wallet
   - white-label
 - table: platform.outlet
-  columns: 9
+  columns: 16
   store: postgres
   parent: null
   writtenBy:
@@ -2392,7 +2432,7 @@ tables:
   - tenancy
   foreignWriters: null
 - table: platform.region_settings
-  columns: 12
+  columns: 18
   store: postgres
   parent: null
   writtenBy:
@@ -2441,7 +2481,7 @@ tables:
   writtenBy: []
   foreignWriters: null
 - table: platform.venue_settings
-  columns: 29
+  columns: 31
   store: postgres
   parent: null
   writtenBy:
@@ -2456,7 +2496,7 @@ tables:
   foreignWriters:
   - cross-region
 - table: platform.workstation
-  columns: 17
+  columns: 20
   store: postgres
   parent: null
   writtenBy:
@@ -2760,16 +2800,10 @@ writesOutside:
 screens:
 - P04:POS-001 Begin Shift
 - P04:POS-002 Sell — Ticket Catalogue
-- P04:POS-004 Sell — Seat Map
 - P04:POS-009 Staff Roster
-- P04:POS-011 Returns, Refunds & Exchanges
 - P04:POS-016 Till Configuration
-- P04:POS-018 Safe Drop & Cash Transfer Management
-- P04:POS-019 Shift Templates & Policies
 - P04:POS-020 Shift Exceptions & Alerts
-- P04:POS-024 Outlet Setup
 - P04:POS-025 Till Home
-- P06:EMP-007 Handover notes
 - P06:EMP-010 Scan — ready
 - P06:EMP-021 Roster
 - P06:EMP-022 My rota
@@ -2783,32 +2817,107 @@ screens:
 - P06:EMP-043 Device settings
 - P06:EMP-047 Emergency mode
 - P07:SCN-003 Ready to scan
+- P08:ADM-083 Pricing Approval Workflow & Authority Matrix
+- P08:ADM-129 Approval Workflow Designer
+- P08:ADM-130 Approval Review & Decision Workspace
+- P08:ADM-145 Promotion Approval Inbox
+- P08:ADM-223 Campaign Approval Workflow Designer
+- P08:ADM-224 Approval Inbox & Decision Workspace
+- P08:ADM-238 Rules & Workflow Command Center
+- P08:ADM-239 Visual Business Rule Builder
+- P08:ADM-240 Conditions, Decision Logic & Decision Tables
+- P08:ADM-241 Visual Workflow Designer
+- P08:ADM-243 Roles, Authority, Delegation & Approval Limits
+- P08:ADM-244 SLA, Escalation, Reminder & Timeout Rules
+- P08:ADM-245 Trigger, Action & Cross-Module Orchestration Configuration
+- P08:ADM-246 Workflow Testing, Simulation & Impact Analysis
+- P08:ADM-247 Versioning, Governance, Approval & Publication
+- P08:ADM-248 Workflow Operations Command Center
+- P08:ADM-250 Workflow Instance Monitor & Process Timeline
+- P08:ADM-251 Workflow Exception, Failure & Recovery Center
+- P08:ADM-253 Automation Execution & Autonomous Action Monitor
+- P08:ADM-254 Cross-Module Orchestration Monitor
+- P08:ADM-255 Workflow Analytics & Process Performance
+- P08:ADM-256 Process Optimization & Automation Opportunity Center
+- P08:ADM-257 AI Workflow Intelligence & Autonomous Governance Center
+- P08:ADM-319 Approval Workflow Library
+- P08:ADM-320 Create Approval Workflow
+- P08:ADM-322 Approval Stage Configuration
+- P08:ADM-323 Condition & Decision Rule Builder
+- P08:ADM-324 Approval Sequence & Parallel Routing
+- P08:ADM-325 Workflow Outcome & Action Configuration
+- P08:ADM-326 Workflow Validation & Simulation
+- P08:ADM-327 Workflow Publication & Lifecycle
+- P08:ADM-328 Workflow Versioning & Change History
+- P08:ADM-329 Approval Matrix Command Center
+- P08:ADM-330 Approval Authority Matrix
+- P08:ADM-331 Organizational Hierarchy Routing
+- P08:ADM-332 Department-Based Approval Matrix
+- P08:ADM-333 Venue & Tenant Approval Matrix
+- P08:ADM-334 Value & Threshold Routing
+- P08:ADM-335 Risk-Based & Conditional Routing
+- P08:ADM-336 Approver Group & Decision Policy
+- P08:ADM-337 Routing Simulator & Conflict Detection
+- P08:ADM-338 AI Routing Advisor & Matrix Optimization
+- P08:ADM-339 Governance & Compliance Command Center
+- P08:ADM-341 Four-Eyes & Dual-Control Policy
+- P08:ADM-342 Authentication & MFA Policy Manager
+- P08:ADM-343 Sensitive Action Confirmation
+- P08:ADM-345 Immutable Approval Record & Tamper Detection
+- P08:ADM-346 Approval Record Retention Policy
+- P08:ADM-347 Regulatory Audit & Evidence Center
+- P08:ADM-348 Governance Risk & AI Compliance Advisor
+- P08:ADM-349 Approval Integration Command Center
+- P08:ADM-350 Module Integration Registry
+- P08:ADM-352 Workflow Event Framework
+- P08:ADM-354 External Workflow System Integration
+- P08:ADM-355 Data & Workflow Mapping Studio
+- P08:ADM-357 Integration Monitoring, Error & Retry Center
+- P08:ADM-358 Integration Analytics & AI Health Advisor
+- P08:ADM-359 Approval Executive KPI Dashboard
+- P08:ADM-360 Approval Volume & Outcome Analytics
+- P08:ADM-361 Approval Processing Time Analytics
+- P08:ADM-362 Bottleneck Analysis & Heatmap
+- P08:ADM-363 Approval Trend & Comparative Analytics
+- P08:ADM-364 Approver & Team Performance Analytics
+- P08:ADM-366 AI Approval Intelligence Center
+- P08:ADM-367 AI Optimization & What-If Simulator
+- P08:ADM-368 AI Governance Executive Advisor
+- P08:ADM-567 Payment Policy, Governance & Approval Manager
+- P08:ADM-580 Payment Terminal & Device Inventory
+- P08:ADM-581 Terminal Provisioning & Device Configuration
+- P08:ADM-582 POS, Kiosk & Terminal Assignment Manager
+- P08:ADM-584 Payment Server & Terminal Connectivity Manager
+- P08:ADM-587 Terminal Health, Maintenance & Incident Center
+- P08:BO-020 F&B Order Management
 - P08:BO-035 Override Audit
 - P08:BO-036 Device Registry
 - P08:BO-037 Offline Package Status
+- P08:BO-039 Shift Directory
+- P08:BO-040 Variance Approval
+- P08:BO-042 Banking & Safe
 - P08:BO-044 F&B Outlets
+- P08:BO-045 Menu Management
+- P08:BO-048 Retail Products
 - P08:BO-053 Staff Directory
+- P08:BO-054 Role Assignment
 - P08:BO-055 Rota & Scheduling
 - P08:BO-056 Time & Attendance
+- P08:BO-057 Training & Certification
 - P08:BO-063 Opening Hours & Calendar
 - P08:BO-064 Zones & Areas
 - P08:BO-065 Venue Configuration
 - P08:BO-066 Notification Settings
 - P08:BO-068 Audit Log
-- P08:BO-071 Planned Maintenance
 - P08:BO-084 Approval Inbox
 - P08:BO-085 Approval Request
 - P08:BO-086 Approval Matrix
 - P08:BO-087 Approval Delegations
 - P08:BO-088 Approval Analytics
 - P08:BO-100 Venue Home
-- P08:BO-101 Orders & Money
 - P08:BO-1010 Hold Approval Workflow
 - P08:BO-102 Sell
-- P08:BO-103 Access & Venue
 - P08:BO-1031 Contracts & Approval Workflow
-- P08:BO-104 Food & Beverage
-- P08:BO-105 Stock & Supply
 - P08:BO-106 People & Access Rights
 - P08:BO-1062 Tenant & Brand Context
 - P08:BO-1063 Venue-Specific Configuration
@@ -2816,19 +2925,15 @@ screens:
 - P08:BO-1065 Currency, Timezone & Channels
 - P08:BO-1067 Seat Approval Workflows
 - P08:BO-1068 Lifecycle & Environment Promotion
-- P08:BO-1069 Platform Health & Observability
 - P08:BO-107 Guests & Marketing
 - P08:BO-1070 Setup, Clone & Inheritance
-- P08:BO-108 Venue Operations
+- P08:BO-1079 Immutable Seat Audit Logs
 - P08:BO-1080 Integration Approval & Compliance
 - P08:BO-109 Menu Builder & POS Layout Designer
 - P08:BO-1120 Corporate Budget, Policy & Approval Rules
 - P08:BO-1149 Administrative Balance Adjustment Studio
-- P08:BO-115 Category, Brand & Merchandise Hierarchy
 - P08:BO-116 Merchandising & Product Presentation
 - P08:BO-1162 Security Governance, Audit & Rule Publication
-- P08:BO-117 Product Import, Governance & AI Configuration Assistant
-- P08:BO-118 Campaign & Audience Management
 - P08:BO-1181 Approval, Publication & Change Management
 - P08:BO-122 POS Experience Dashboard
 - P08:BO-123 POS Profile Management
@@ -2841,24 +2946,17 @@ screens:
 - P08:BO-131 Connectivity & Auto-Switch Settings
 - P08:BO-133 Offline Alerts, Limits & Audit
 - P08:BO-134 Kitchen & Preparation Stations
-- P08:BO-135 Order Routing & KDS/Printer Rules
 - P08:BO-136 F&B Global Settings & Controls
-- P08:BO-142 Store Rules, Controls & Permissions
-- P08:BO-143 Retail Global Settings & Controls
 - P08:BO-145 Venue & Park Access Structure
-- P08:BO-171 Offline Cryptographic Validation Profile
+- P08:BO-163 Rule Simulation, Conflict Check & Publication
+- P08:BO-187 Biometric Consent & Guardian Management
 - P08:BO-192 Biometric Lifecycle, Retention & Deletion
-- P08:BO-194 Device & Gate Command Center
 - P08:BO-196 Physical Device Registration & Provisioning
-- P08:BO-206 Offline Validation Policy Builder
-- P08:BO-208 Offline Credential & Revocation Cache
-- P08:BO-210 Connectivity Failure & Degraded Mode Policy
+- P08:BO-203 Hardware Compatibility, Health, Testing & Deployment
 - P08:BO-238 Identity, Membership & Accreditation Policies
-- P08:BO-241 Policy Evaluation Architecture & Offline Distribution
 - P08:BO-243 Policy Approval, Audit, Analytics & AI Optimization
 - P08:BO-301 Member Exceptions, Overrides & Service Recovery
 - P08:BO-364 Approval Command Center Dashboard
-- P08:BO-365 My Approval Inbox
 - P08:BO-366 Team / Shared Approval Queue
 - P08:BO-367 Approval Request Detail
 - P08:BO-368 AI Decision Support
@@ -2867,6 +2965,7 @@ screens:
 - P08:BO-371 Completed Approval History
 - P08:BO-372 Approval SLA & Workload Monitor
 - P08:BO-373 Approval Activity & Notification Center
+- P08:BO-374 Approval Decision Workspace
 - P08:BO-375 Business Context & Evidence Viewer
 - P08:BO-376 Approval Timeline & Decision Chain
 - P08:BO-377 Approve & Sensitive Action Confirmation
@@ -2881,13 +2980,11 @@ screens:
 - P08:BO-386 Temporary Delegation & Availability Calendar
 - P08:BO-387 Out-of-Office & Substitute Routing
 - P08:BO-388 Approval SLA Policy Configuration
-- P08:BO-389 Reminder & Breach Notification Rules
-- P08:BO-390 Escalation Policy Builder
 - P08:BO-391 Live Escalation Operations Center
 - P08:BO-392 SLA & Escalation Performance Analytics
 - P08:BO-393 AI SLA & Escalation Advisor
 - P08:BO-405 Reader Directory
-- P08:BO-407 Reader Credit & Payment Configuration
+- P08:BO-406 Reader Profile & Device Setup
 - P08:BO-466 Reader & Device Health Monitor
 - P08:BO-503 Product Validation, Approval & Publication
 - P08:BO-600 Venue, Calendar & Operational Setup
@@ -2918,14 +3015,16 @@ screens:
 - P08:BO-639 Reviewer Assignment & Delegation
 - P08:BO-640 Rejection & Resubmission Management
 - P08:BO-641 Escalation & Exception Management
+- P08:BO-642 Approval Decision History
 - P08:BO-643 Approval Policy Validation & Publication
+- P08:BO-644 Credential Issuance Command Center
 - P08:BO-645 Credential Generation Workspace
-- P08:BO-646 Credential Media Configuration
 - P08:BO-647 Badge Template Designer
 - P08:BO-648 Badge Printing & Print Queue
 - P08:BO-649 Digital & Mobile Credential Management
 - P08:BO-650 NFC & RFID Credential Encoding
 - P08:BO-651 Credential Activation & Delivery
+- P08:BO-653 Credential Registry & Credential History
 - P08:BO-654 Accreditation Access Command Center
 - P08:BO-655 Access Profile Management
 - P08:BO-656 Venue & Zone Access Matrix
@@ -2941,16 +3040,13 @@ screens:
 - P08:BO-666 Validity Period Configuration
 - P08:BO-667 Event & Venue Accreditation Assignment
 - P08:BO-668 Multi-Venue Accreditation Management
-- P08:BO-669 Temporary & Seasonal Accreditation
 - P08:BO-670 Suspension & Reactivation Management
 - P08:BO-671 Accreditation Revocation Management
 - P08:BO-672 Expiry Monitor & Expiration Rules
 - P08:BO-673 Accreditation Renewal Workspace
-- P08:BO-674 Accreditation Communications Command Center
 - P08:BO-675 Notification Rule Management
 - P08:BO-676 Expiry & Renewal Notification Scheduler
 - P08:BO-680 Accreditation Bulk Import
-- P08:BO-681 Import Validation & Processing Monitor
 - P08:BO-682 Accreditation Export & Data Extract Center
 - P08:BO-683 Delivery, Batch & Operational History
 - P08:BO-684 Accreditation Executive Dashboard
@@ -2965,12 +3061,12 @@ screens:
 - P08:BO-714 Event Shift & Roster Configuration
 - P08:BO-718 Event Change Request Configuration
 - P08:BO-727 F&B Command Center
-- P08:BO-728 Outlet Management
+- P08:BO-731 Operating Hours & Service Periods
 - P08:BO-732 POS & Device Assignment
 - P08:BO-751 Retention & Anonymization
 - P08:BO-771 Budget, Goals & Forecast
-- P08:BO-809 SLA Policy Configuration
 - P08:BO-863 Resource Lifecycle, Governance & Audit
+- P08:BO-873 Staff Resource Directory
 - P08:BO-874 Staff Resource Profile
 - P08:BO-876 Certification & Expiry Management
 - P08:BO-878 Staff Availability & Working Pattern
@@ -2996,89 +3092,19 @@ screens:
 - P08:BO-939 Shift Change, Swap, Pickup & Release
 - P08:BO-940 Manager Mobile Approval Center
 - P08:BO-941 Operational Notifications & Live Alerts
+- P09:ADM-004 Platform Audit Log
 - P09:ADM-006 Tenant Hierarchy Explorer
 - P09:ADM-019 Global Configuration & Defaults
-- P09:ADM-036 Platform Notification Broadcast
 - P09:ADM-037 AI Provider & Credentials
-- P09:ADM-145 Promotion Approval Inbox
-- P09:ADM-238 Rules & Workflow Command Center
-- P09:ADM-239 Visual Business Rule Builder
-- P09:ADM-240 Conditions, Decision Logic & Decision Tables
-- P09:ADM-241 Visual Workflow Designer
-- P09:ADM-242 Approval Matrix & Multi-Level Approval Configuration
-- P09:ADM-243 Roles, Authority, Delegation & Approval Limits
-- P09:ADM-244 SLA, Escalation, Reminder & Timeout Rules
-- P09:ADM-245 Trigger, Action & Cross-Module Orchestration Configuration
-- P09:ADM-246 Workflow Testing, Simulation & Impact Analysis
-- P09:ADM-247 Versioning, Governance, Approval & Publication
-- P09:ADM-248 Workflow Operations Command Center
-- P09:ADM-249 Unified Approval Inbox & Decision Workspace
-- P09:ADM-250 Workflow Instance Monitor & Process Timeline
-- P09:ADM-251 Workflow Exception, Failure & Recovery Center
-- P09:ADM-252 SLA, Escalation & Bottleneck Monitor
-- P09:ADM-253 Automation Execution & Autonomous Action Monitor
-- P09:ADM-254 Cross-Module Orchestration Monitor
-- P09:ADM-255 Workflow Analytics & Process Performance
-- P09:ADM-256 Process Optimization & Automation Opportunity Center
-- P09:ADM-257 AI Workflow Intelligence & Autonomous Governance Center
-- P09:ADM-319 Approval Workflow Library
-- P09:ADM-320 Create Approval Workflow
-- P09:ADM-322 Approval Stage Configuration
-- P09:ADM-323 Condition & Decision Rule Builder
-- P09:ADM-324 Approval Sequence & Parallel Routing
-- P09:ADM-325 Workflow Outcome & Action Configuration
-- P09:ADM-326 Workflow Validation & Simulation
-- P09:ADM-327 Workflow Publication & Lifecycle
-- P09:ADM-328 Workflow Versioning & Change History
-- P09:ADM-329 Approval Matrix Command Center
-- P09:ADM-330 Approval Authority Matrix
-- P09:ADM-331 Organizational Hierarchy Routing
-- P09:ADM-332 Department-Based Approval Matrix
-- P09:ADM-333 Venue & Tenant Approval Matrix
-- P09:ADM-334 Value & Threshold Routing
-- P09:ADM-335 Risk-Based & Conditional Routing
-- P09:ADM-336 Approver Group & Decision Policy
-- P09:ADM-337 Routing Simulator & Conflict Detection
-- P09:ADM-338 AI Routing Advisor & Matrix Optimization
-- P09:ADM-339 Governance & Compliance Command Center
-- P09:ADM-341 Four-Eyes & Dual-Control Policy
-- P09:ADM-342 Authentication & MFA Policy Manager
-- P09:ADM-343 Sensitive Action Confirmation
-- P09:ADM-344 Digital Signature Management
-- P09:ADM-345 Immutable Approval Record & Tamper Detection
-- P09:ADM-346 Approval Record Retention Policy
-- P09:ADM-347 Regulatory Audit & Evidence Center
-- P09:ADM-348 Governance Risk & AI Compliance Advisor
-- P09:ADM-349 Approval Integration Command Center
-- P09:ADM-350 Module Integration Registry
-- P09:ADM-351 Approval API Management
-- P09:ADM-352 Workflow Event Framework
-- P09:ADM-354 External Workflow System Integration
-- P09:ADM-355 Data & Workflow Mapping Studio
-- P09:ADM-357 Integration Monitoring, Error & Retry Center
-- P09:ADM-358 Integration Analytics & AI Health Advisor
-- P09:ADM-359 Approval Executive KPI Dashboard
-- P09:ADM-360 Approval Volume & Outcome Analytics
-- P09:ADM-361 Approval Processing Time Analytics
-- P09:ADM-362 Bottleneck Analysis & Heatmap
-- P09:ADM-363 Approval Trend & Comparative Analytics
-- P09:ADM-364 Approver & Team Performance Analytics
-- P09:ADM-366 AI Approval Intelligence Center
-- P09:ADM-367 AI Optimization & What-If Simulator
-- P09:ADM-368 AI Governance Executive Advisor
+- P09:ADM-412 Payment Method & Settlement Setup
 - P09:ADM-420 Tenant & Organization Provisioning
-- P09:ADM-425 Venue Template Application
+- P09:ADM-421 Venue & Operational Structure Creation
+- P09:ADM-426 Initial Configuration & Regional Defaults
 - P09:ADM-513 Workforce Demand & Staffing Forecast
 - P09:ADM-524 AI Data Access & Usage Policy
 - P09:ADM-530 AI Approval Requirement & Routing Configuration
 - P09:ADM-532 Conditional Approval & Approval Conditions
 - P09:ADM-534 Escalation, Delegation & Approval SLA Management
-- P09:ADM-567 Payment Policy, Governance & Approval Manager\t15
-- P09:ADM-580 Payment Terminal & Device Inventory\t49
-- P09:ADM-581 Terminal Provisioning & Device Configuration\t51
-- P09:ADM-582 POS, Kiosk & Terminal Assignment Manager\t52
-- P09:ADM-584 Payment Server & Terminal Connectivity Manager\t54
-- P09:ADM-587 Terminal Health, Maintenance & Incident Center\t57
 - P11:ACC-002 Registration Form
 - P11:ACC-003 Application Review & Submit
 - P11:ACC-004 Application Status Tracking
@@ -3087,13 +3113,11 @@ screens:
 - P11:ACC-007 Reviewer Application Detail
 - P11:ACC-008 Credential Register
 - P13:CMS-016 Site Settings
-- P15:KIT-009 SLA, Priority & Service Rules
 - P16:ANL-003 Operational Performance
 - P16:ANL-050 Retention, Archive & Governance Policy
+- P16:ANL-070 Analytics Governance, Security & Audit Center
 flows:
-- F08 Steward works a shift on the employee app
 - F106 A security dashboard surfaces something and it is investigated
-- 'F117 Access Control board 7: Offline & Edge Operations Command Center'
 - F14 A discount needs a manager
 - F15 A part is needed and ordered
 - 'F154 Promotions   Bundles Management board 1: Promotion Command Center Dashboard'
@@ -3110,6 +3134,7 @@ flows:
 - F73 A till is configured and its cash rules set
 - F74 A shift closes and the day is reported
 - F79 A workstation is registered, configured and rolled out
+- F81 A retail sale runs from overview to tender
 - F86 A POS layout is designed, previewed and deployed
 - F89 Offline policy is set, cached, monitored and reconciled
 - F95 A fleet is watched, a fault is found, and a station is fixed

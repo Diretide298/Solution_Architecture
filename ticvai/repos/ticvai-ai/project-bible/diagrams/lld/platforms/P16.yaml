@@ -1,5 +1,5 @@
 id: LLD-P16
-title: P16 Venue Analytics — Cross-Domain Reporting — 70 screens
+title: P16 Venue Analytics — Cross-Domain Reporting — 71 screens
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/00-platform.yaml
 audience: staff
@@ -38,29 +38,31 @@ modulesUsed:
   screens: 68
 - module: ai
   screens: 2
+- module: core
+  screens: 1
 servicesCalled:
 - service: ReportingService
-  operationCalls: 118
+  operationCalls: 122
 - service: AiService
-  operationCalls: 37
+  operationCalls: 40
 - service: TenancyService
+  operationCalls: 4
+- service: IdentityService
+  operationCalls: 4
+- service: LedgerService
   operationCalls: 4
 - service: InventoryService
   operationCalls: 3
 - service: MarketingService
   operationCalls: 3
-- service: IdentityService
-  operationCalls: 2
 - service: CatalogueService
   operationCalls: 2
 - service: OrderService
   operationCalls: 1
-- service: AccessService
-  operationCalls: 1
 coverage:
-  screens: 70
+  screens: 71
   inAFlow: 64
-  drawn: 70
+  drawn: 71
   note: '**A screen in no flow has been specified and never walked.** Every flow written in this package
     has found a defect.'
 screens:
@@ -591,7 +593,6 @@ screens:
   - decideAiInsight
   - explainMetricChange
   - listAiInsights
-  - listAnalyticsAnomalies
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -670,6 +671,7 @@ screens:
   - ANL-028
   - ANL-029
   - ANL-030
+  - ANL-072
   boardFrames: null
   wireframe: wireframes/P16 Venue Analytics.dc.html#anl-021
   inFlows:
@@ -704,6 +706,8 @@ screens:
   operations:
   - deleteDashboard
   - getDashboard
+  - getReport
+  - listReports
   - recordDashboardView
   - updateDashboard
   states:
@@ -1274,7 +1278,10 @@ screens:
   wave: 3
   density: compact
   operations:
+  - createAuthorisationPolicy
+  - getAnalyticsGovernancePolicy
   - listAuthorisationPolicies
+  - updateAuthorisationPolicy
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -1341,7 +1348,6 @@ screens:
   density: compact
   operations:
   - listDataRetentionSettings
-  - setApprovalRetentionPolicy
   - setDataRetentionSetting
   states:
   - emptyFirstRun
@@ -1465,7 +1471,6 @@ screens:
   operations:
   - configureAnomalyDetector
   - listAiInsights
-  - listAnalyticsAnomalies
   - listAnomalyDetectors
   states:
   - emptyFirstRun
@@ -1564,7 +1569,9 @@ screens:
   operations:
   - decideAiInsight
   - listAiInsights
+  - listAiInteractions
   - listAnalyticsAnomalies
+  - searchAiDecisions
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -1592,7 +1599,6 @@ screens:
   - listAiEvaluations
   - listAiModels
   - listPromptTemplates
-  - publishPromptTemplate
   - runAiEvaluation
   states:
   - emptyFirstRun
@@ -1838,7 +1844,11 @@ screens:
   wave: 3
   density: compact
   operations:
-  - listSecurityDetectionGovernance
+  - getAiUsage
+  - getAnalyticsGovernancePolicy
+  - listAiInteractions
+  - listAuditRecords
+  - setAnalyticsGovernancePolicy
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -1881,4 +1891,30 @@ screens:
   - ANL-010
   boardFrames: null
   wireframe: wireframes/P16 Venue Analytics.dc.html#anl-071
+  inFlows: null
+- screen: ANL-072
+  name: Finance Dashboard
+  module: Analytics
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations:
+  - getKpiValues
+  - getUnifiedReconciliation
+  - listCreditMemos
+  - listEInvoiceTransmissions
+  - listTaxInvoices
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - legalEntityId<-navigation
+  goesTo:
+  - ANL-021
+  boardFrames: null
+  wireframe: wireframes/P16 Venue Analytics.dc.html#anl-072
   inFlows: null

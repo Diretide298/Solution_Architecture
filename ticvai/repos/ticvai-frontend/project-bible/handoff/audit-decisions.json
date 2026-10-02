@@ -155,7 +155,8 @@
   "who": "Client security / client product",
   "default": "The operator picks a tenant, then acts under a time-boxed platform-staff grant. Every action is audited and visible to the tenant.",
   "decision": "adopted: our recommendation, 28 September 2026",
-  "applied": "applied 28 September"
+  "applied": "applied 28 September",
+  "superseded": "Refined 2 October (Chinmay; CHG-DOC-014): the 410 workshop-pack screens on the console (370 Commercial, 20 Catalogue lifecycle, 20 Rules and workflow) are venue screens and move to Venue Management, merged with BO-008 to BO-011, reached by TICVAI staff only under the platform-staff grant (DEC-100); console screens that act on a tenant get the ADM-412 pattern, a tenant picker and a time-boxed grant with step-up (PRE-5); for a site hosted with TICVAI, platform staff may publish under a grant, and a self-hosted venue generates a site package (DEC-144)."
  },
  {
   "id": "R101",
@@ -363,7 +364,8 @@
   "who": "Client operations / client finance",
   "default": "Finance and procurement actions (close and reopen period, cancel or short-close a purchase order) go through the approvals engine to a finance approver. Shift reopen, stock recount and retail returns above the threshold need a supervisor's step-up on the same device. Rollouts need the platform release manager.",
   "decision": "adopted: our recommendation, 28 September 2026",
-  "applied": "applied 28 September"
+  "applied": "applied 28 September",
+  "superseded": "Extended 2 October (Chinmay, DEC-192; CHG-DOC-015): waste joins the list as a policy the venue switches on or off (off by default); when on, approval by value band and a photo above a value."
  },
  {
   "id": "R145",
@@ -638,7 +640,8 @@
   "who": "Client counsel",
   "default": "The signed-in adult enrols a linked child and is recorded as guardian. Counsel sets the age.",
   "decision": "adopted: our recommendation, 28 September 2026",
-  "applied": "applied 28 September, one value open: Counsel sets the age below which a subject is a minor; missing DOB counts as a minor meanwhile."
+  "applied": "applied 28 September, one value open: Counsel sets the age below which a subject is a minor; missing DOB counts as a minor meanwhile.",
+  "superseded": "Amended 2 October (Chinmay, DEC-237, with DEC-138 and DEC-283; CHG-DOC-016): minors may be enrolled with guardian consent on the venue's own consent form; the age below which a guest is a minor is set per country; the venue can switch minors' enrolment off. Supersedes the GST-069 default that no under-18 is enrolled."
  },
  {
   "id": "R209",
@@ -731,7 +734,8 @@
   "who": "Client operations (gates)",
   "default": "The podium sets the operating mode. Direction is fixed per access point. Turnstile mode is reduced to free rotation or closed within the operating mode.",
   "decision": "adopted: our recommendation, 28 September 2026",
-  "applied": "applied 28 September"
+  "applied": "applied 28 September",
+  "superseded": "Amended 2 October (Chinmay, DEC-255; CHG-DOC-012): direction is no longer fixed per access point. A gate's direction can be switched live (Entry to Exit) by a user with a specific permission, and every switch is logged as an audit event. The operating mode stays the podium's setting."
  },
  {
   "id": "R222",
@@ -888,7 +892,8 @@
   "who": "Client product",
   "default": "Each journey follows the purpose of the screens it visits. POS F&B: send to kitchen, then charge.",
   "decision": "adopted: our recommendation, 28 September 2026",
-  "applied": "applied 28 September"
+  "applied": "applied 28 September",
+  "superseded": "Amended 2 October (Chinmay, DEC-064; CHG-DOC-013): payment timing is an outlet setting, 'Pay first' or 'Send to kitchen first, then pay' (outlet-scoped, ADR-0029). Send first, then charge stays the behaviour of an outlet set that way; POSV2-4 is amended with it."
  },
  {
   "id": "R267",

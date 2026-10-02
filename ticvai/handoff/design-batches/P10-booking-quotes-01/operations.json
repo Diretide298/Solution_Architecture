@@ -42,38 +42,6 @@
   "requestBody": null,
   "responds": "SeatHold"
  },
- "analysePromotionConflicts": {
-  "method": "GET",
-  "path": "/promotions/{promotionId}/conflicts",
-  "contract": "promotions",
-  "summary": "Analyse stacking against live promotions",
-  "permission": "PRICE_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "ConflictAnalysis"
- },
- "applyManualDiscount": {
-  "method": "POST",
-  "path": "/orders/{orderId}/discounts",
-  "contract": "orders",
-  "summary": "Apply a discount a cashier chose",
-  "permission": "ORDER_DISCOUNT",
-  "offlineCapable": true,
-  "conflictPolicy": "append",
-  "scopeLevel": "workstation",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "ManualDiscountRequest",
-  "responds": "Order"
- },
  "checkoutCart": {
   "method": "POST",
   "path": "/carts/{cartId}/checkout",
@@ -112,15 +80,15 @@
   "requestBody": "CreateOrderRequest",
   "responds": "Order"
  },
- "createRefund": {
+ "createPartnerQuote": {
   "method": "POST",
-  "path": "/orders/{orderId}/refunds",
-  "contract": "orders",
-  "summary": "Refund an order, wholly or in part",
-  "permission": "ORDER_REFUND",
+  "path": "/partner-quotes",
+  "contract": "subscription",
+  "summary": "Raise a quote",
+  "permission": "PARTNER_MANAGE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
+  "scopeLevel": "tenant",
   "parameters": [
    {
     "name": null,
@@ -128,8 +96,8 @@
     "required": null
    }
   ],
-  "requestBody": "CreateRefundRequest",
-  "responds": null
+  "requestBody": "PartnerQuote",
+  "responds": "PartnerQuote"
  },
  "createSeatBlock": {
   "method": "POST",
@@ -206,6 +174,30 @@
   ],
   "requestBody": null,
   "responds": "Cart"
+ },
+ "getCommissionStatement": {
+  "method": "GET",
+  "path": "/partner-agreements/{agreementId}/commission-statement",
+  "contract": "subscription",
+  "summary": "What the partner earned and what is owed",
+  "permission": "PARTNER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "CommissionStatement"
  },
  "getOrder": {
   "method": "GET",
@@ -376,6 +368,43 @@
   ],
   "requestBody": null,
   "responds": "Page"
+ },
+ "listPartnerAgreements": {
+  "method": "GET",
+  "path": "/partner-agreements",
+  "contract": "subscription",
+  "summary": "Commercial agreements with B2B partners",
+  "permission": "PARTNER_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "expiringWithinDays",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "PartnerAgreement"
+ },
+ "listPartnerQuotes": {
+  "method": "GET",
+  "path": "/partner-quotes",
+  "contract": "subscription",
+  "summary": "Quotes offered to this partner",
+  "permission": "PARTNER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "PartnerQuote"
  },
  "listPromotions": {
   "method": "GET",
@@ -587,24 +616,5 @@
   ],
   "requestBody": null,
   "responds": "Cart"
- },
- "voidOrder": {
-  "method": "POST",
-  "path": "/orders/{orderId}/voids",
-  "contract": "orders",
-  "summary": "Void an order",
-  "permission": "ORDER_VOID",
-  "offlineCapable": true,
-  "conflictPolicy": "append",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Order"
  }
 }

@@ -219,7 +219,7 @@
   "states": {
    "loading": "The biometric access list.",
    "error": "Could not load. Names which read failed and leaves the biometric access untouched.",
-   "emptyFirstRun": "No biometric access yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No biometric access yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the biometric access are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -229,26 +229,6 @@
     "contract": "access",
     "purpose": "Biometric Access Command Center",
     "trigger": "onLoad"
-   },
-   {
-    "operationId": "setBiometricVerificationProfile",
-    "contract": "access",
-    "purpose": "Create or change a biometric verification profile",
-    "trigger": "onAction",
-    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
-    "invalidates": [
-     "listBiometricAccess"
-    ]
-   },
-   {
-    "operationId": "setFacePassEnrollment",
-    "contract": "access",
-    "purpose": "Change Face Pass enrolment settings",
-    "trigger": "onAction",
-    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
-    "invalidates": [
-     "listBiometricAccess"
-    ]
    }
   ],
   "entryState": {
@@ -268,6 +248,20 @@
    "workshopBoard": "wireframes/WS22 Access Control Board 5.dc.html#bo-184"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 56. 11 of 11 labels bound to a contract property; 11 of 23 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "gaps": [
+   {
+    "operation": "setBiometricVerificationProfile",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): The command centre is a dashboard (VO-R02); the verification-profile and enrolment writes belong to BO-185 and BO-186, which declare them (ADR-0041; design-notes correction venue-operations BO-184).",
+    "source": "ADR-0041 | screens/P08-venue-back-office.yaml#BO-184"
+   },
+   {
+    "operation": "setFacePassEnrollment",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): The command centre is a dashboard (VO-R02); the verification-profile and enrolment writes belong to BO-185 and BO-186, which declare them (ADR-0041; design-notes correction venue-operations BO-184).",
+    "source": "ADR-0041 | screens/P08-venue-back-office.yaml#BO-184"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -415,6 +409,13 @@
    "workshopBoard": "wireframes/WS22 Access Control Board 5.dc.html#bo-185"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 58. 0 of 0 labels bound to a contract property; 8 of 25 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-004): No read of biometric verification profiles (setBiometricVerificationProfile has no list or get).",
+    "source": "contracts/spine/access.yaml#setBiometricVerificationProfile"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -487,44 +488,61 @@
      "slot": "fields",
      "components": [
       {
-       "kind": "selectField",
-       "label": "→",
-       "provenance": "pack Access Control Module_Reference.pdf, page 59 §Capture Required Consent"
+       "kind": "multiSelect",
+       "label": "Enrolment channels",
+       "provenance": "pack Access Control Module_Reference.pdf, page 59 §Capture Required Consent",
+       "operation": "setFacePassEnrollment",
+       "bindsTo": "FacePassEnrollmentConfigurationInput.enrollmentChannels",
+       "notes": "**The app, the staffed ticket and annual-pass counters, and a self-service kiosk with the consent shown; never the turnstile (decided 2 October 2026 by Chinmay, DEC-236; CHG-CSP-021).** The journey (account, valid ticket, identity check, capture, verify) is drawn as a strip above."
       },
       {
-       "kind": "selectField",
+       "kind": "toggle",
        "label": "Account login required",
-       "provenance": "pack Access Control Module_Reference.pdf, page 59 §Configure"
+       "provenance": "pack Access Control Module_Reference.pdf, page 59 §Configure",
+       "operation": "setFacePassEnrollment",
+       "bindsTo": "FacePassEnrollmentConfigurationInput.accountLoginRequired"
       },
       {
-       "kind": "selectField",
+       "kind": "toggle",
        "label": "Valid ticket/pass required",
-       "provenance": "pack Access Control Module_Reference.pdf, page 59 §Configure"
+       "provenance": "pack Access Control Module_Reference.pdf, page 59 §Configure",
+       "operation": "setFacePassEnrollment",
+       "bindsTo": "FacePassEnrollmentConfigurationInput.validTicketPassRequired"
       },
       {
-       "kind": "selectField",
+       "kind": "toggle",
        "label": "Identity check required",
-       "provenance": "pack Access Control Module_Reference.pdf, page 59 §Configure"
+       "provenance": "pack Access Control Module_Reference.pdf, page 59 §Configure",
+       "operation": "setFacePassEnrollment",
+       "bindsTo": "FacePassEnrollmentConfigurationInput.identityCheckRequired"
       },
       {
-       "kind": "textField",
+       "kind": "numberField",
        "label": "Number of capture attempts",
-       "provenance": "pack Access Control Module_Reference.pdf, page 59 §Configure"
+       "provenance": "pack Access Control Module_Reference.pdf, page 59 §Configure",
+       "operation": "setFacePassEnrollment",
+       "bindsTo": "FacePassEnrollmentConfigurationInput.numberOfCaptureAttempts"
       },
       {
        "kind": "selectField",
-       "label": "minimum image quality",
-       "provenance": "pack Access Control Module_Reference.pdf, page 59 §Configure"
+       "label": "Minimum image quality",
+       "provenance": "pack Access Control Module_Reference.pdf, page 59 §Configure",
+       "operation": "setFacePassEnrollment",
+       "bindsTo": "FacePassEnrollmentConfigurationInput.minimumImageQuality"
       },
       {
-       "kind": "selectField",
-       "label": "duplicate face detection",
-       "provenance": "pack Access Control Module_Reference.pdf, page 59 §Configure"
+       "kind": "toggle",
+       "label": "Duplicate face detection",
+       "provenance": "pack Access Control Module_Reference.pdf, page 59 §Configure",
+       "operation": "setFacePassEnrollment",
+       "bindsTo": "FacePassEnrollmentConfigurationInput.duplicateFaceDetection"
       },
       {
-       "kind": "selectField",
-       "label": "operator verification",
-       "provenance": "pack Access Control Module_Reference.pdf, page 59 §Configure"
+       "kind": "toggle",
+       "label": "Operator verification",
+       "provenance": "pack Access Control Module_Reference.pdf, page 59 §Configure",
+       "operation": "setFacePassEnrollment",
+       "bindsTo": "FacePassEnrollmentConfigurationInput.operatorVerification"
       }
      ]
     },
@@ -534,8 +552,9 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Save changes",
-       "provenance": "contract operation setFacePassEnrollment"
+       "label": "Save Face Pass enrolment",
+       "provenance": "contract operation setFacePassEnrollment",
+       "operation": "setFacePassEnrollment"
       }
      ]
     }
@@ -562,6 +581,41 @@
    "workshopBoard": "wireframes/WS22 Access Control Board 5.dc.html#bo-186"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 59. 0 of 0 labels bound to a contract property; 8 of 27 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-004): No read of the Face Pass enrolment configuration (setFacePassEnrollment has no get).",
+    "source": "contracts/spine/access.yaml#setFacePassEnrollment"
+   }
+  ],
+  "overlays": [
+   {
+    "id": "formSetFacePassEnrollment",
+    "component": "modal",
+    "trigger": "Save Face Pass enrolment",
+    "body": "**Collects what `setFacePassEnrollment` sends before it is called.** Required: `venueId`. Optional: `enrollmentChannels`, `accountLoginRequired`, `validTicketPassRequired`, `identityCheckRequired`, `numberOfCaptureAttempts`, `minimumImageQuality`, `operatorVerification`, `enrollmentExpiry`, `duplicateFaceDetection`. `venueId` from the session. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save Face Pass enrolment",
+     "operation": "setFacePassEnrollment"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "venueId",
+      "enrollmentChannels",
+      "accountLoginRequired",
+      "validTicketPassRequired",
+      "identityCheckRequired",
+      "numberOfCaptureAttempts",
+      "minimumImageQuality",
+      "operatorVerification",
+      "enrollmentExpiry",
+      "duplicateFaceDetection"
+     ]
+    },
+    "provenance": "contract access.yaml PUT /face-pass-enrollment"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -657,6 +711,26 @@
        "kind": "selectField",
        "label": "Enrollment Channel",
        "provenance": "pack Access Control Module_Reference.pdf, page 60 §Configure by"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Minors and consent",
+       "bindsTo": "VenueSettings.biometrics",
+       "operation": "getVenueSettings",
+       "notes": "**Minors enrol only with a guardian's consent on the venue's own form; the minor age is set per country (`RegionSettings.minorAgeThreshold`); the venue can switch minors off (`biometrics.allowMinors`) (decided 2 October 2026 by Chinmay, DEC-237; supersedes the GST-069 default; CHG-CSP-019).**",
+       "provenance": "contract tenancy.yaml GET /venues/{venueId}/settings"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "secondaryButton",
+       "label": "Save minors and consent",
+       "operation": "setVenueSettings",
+       "provenance": "contract tenancy.yaml PUT /venues/{venueId}/settings"
       }
      ]
     }
@@ -674,6 +748,20 @@
     "contract": "access",
     "purpose": "Biometric Consent & Guardian Management",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "getVenueSettings",
+    "contract": "tenancy",
+    "purpose": "The venue's minors switch and consent form (DEC-237)",
+    "trigger": "onLoad",
+    "provenance": "design-note correction, 2 October 2026 (BO-187)"
+   },
+   {
+    "operationId": "setVenueSettings",
+    "contract": "tenancy",
+    "purpose": "Set support hours, quiet hours, segregated access and alerting",
+    "trigger": "onAction",
+    "provenance": "design-note correction, 2 October 2026 (BO-187)"
    }
   ],
   "wireframe": {
@@ -683,6 +771,33 @@
    "workshopBoard": "wireframes/WS22 Access Control Board 5.dc.html#bo-187"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 60. 0 of 0 labels bound to a contract property; 5 of 31 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetVenueSettings",
+    "component": "modal",
+    "trigger": "Save minors and consent",
+    "body": "**Collects what `setVenueSettings` sends before it is called.** Nothing in the body is required. Optional: `biometrics`. Only the biometrics section: the consent form, the minors switch. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save minors and consent",
+     "operation": "setVenueSettings"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "biometrics"
+     ]
+    },
+    "provenance": "contract tenancy.yaml PUT /venues/{venueId}/settings"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "venueId",
+     "from": "session"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -755,15 +870,29 @@
      "slot": "fields",
      "components": [
       {
-       "kind": "selectField",
-       "label": "→",
-       "provenance": "pack Access Control Module_Reference.pdf, page 61 §Face Captured"
+       "kind": "banner",
+       "label": "Consent is required",
+       "bindsTo": "FaceTagTemporaryEnrollmentView.templatesHeldByTicvai",
+       "operation": "listFaceTagTemporary",
+       "notes": "**Biometric capture and retention need the guest's consent first, on the venue's own consent form (decided 2 October 2026 by Chinmay, DEC-128; CHG-CSP-018).** Where TICVAI holds the templates (`templatesHeldByTicvai`), this banner warns the venue that each guest must accept the consent form. **Minors** enrol only with a guardian's consent on that form; the minor age is set per country and the venue can switch minors off (DEC-237).",
+       "provenance": "contract access.yaml GET /face-tag-temporary"
       },
       {
        "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listFaceTagTemporary",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "label": "Face Tag profiles",
+       "bindsTo": "FaceTagTemporaryEnrollmentView",
+       "columns": [
+        "FaceTagTemporaryEnrollmentView.name",
+        "FaceTagTemporaryEnrollmentView.enrollmentChannels",
+        "FaceTagTemporaryEnrollmentView.bindTo",
+        "FaceTagTemporaryEnrollmentView.deletionTrigger",
+        "FaceTagTemporaryEnrollmentView.retentionThresholdHours",
+        "FaceTagTemporaryEnrollmentView.consentFormId",
+        "FaceTagTemporaryEnrollmentView.templatesHeldByTicvai"
+       ],
+       "operation": "listFaceTagTemporary",
+       "notes": "The journey (consent, capture at the counter or the entry gate, bind to the ticket, delete on exit or close) is a strip above the list, not a field.",
+       "provenance": "contract access.yaml GET /face-tag-temporary"
       }
      ]
     },
@@ -808,6 +937,34 @@
    "workshopBoard": "wireframes/WS22 Access Control Board 5.dc.html#bo-188"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 61. 0 of 0 labels bound to a contract property; 1 of 22 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetFaceTagTemporaryEnrollment",
+    "component": "modal",
+    "trigger": "Save Face Tag profile",
+    "body": "**Collects what `setFaceTagTemporaryEnrollment` sends before it is called.** Required: `venueId`, `name`, `enrollmentChannels`, `bindTo`, `deletionTrigger`. Optional: `profileId`, `retentionThresholdHours`, `consentFormId`, `consentCapture`. `consentFormId` picks one of the venue's consent forms (built in BO-747); `consentCapture` says where the consent is shown. `venueId` from the session. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save Face Tag profile",
+     "operation": "setFaceTagTemporaryEnrollment"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "venueId",
+      "name",
+      "enrollmentChannels",
+      "bindTo",
+      "deletionTrigger",
+      "profileId",
+      "retentionThresholdHours",
+      "consentFormId",
+      "consentCapture"
+     ]
+    },
+    "provenance": "contract access.yaml PUT /face-tag-temporary"
+   }
+  ],
+  "notes": "**Face Tag has its own enrolment operation (`enrolFaceTag`), separate from Face Pass, and it may capture at the entry gate** as the pack and the minutes say; the \"never at a gate\" rule is Face Pass's (CHG-CSP-018, DEC-236).",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -880,34 +1037,62 @@
      "slot": "fields",
      "components": [
       {
-       "kind": "selectField",
+       "kind": "numberField",
+       "label": "High-confidence match from",
+       "bindsTo": "FaceMatchingVerificationThresholdsInput.highConfidenceMin",
+       "operation": "setFaceMatchingVerification",
+       "notes": "The decision bands: at or above this, admit.",
+       "provenance": "contract access.yaml PUT /face-matching-verification"
+      },
+      {
+       "kind": "numberField",
+       "label": "Review range from",
+       "bindsTo": "FaceMatchingVerificationThresholdsInput.reviewRangeMin",
+       "operation": "setFaceMatchingVerification",
+       "notes": "Between this and the high-confidence band, an operator reviews; below it, refuse.",
+       "provenance": "contract access.yaml PUT /face-matching-verification"
+      },
+      {
+       "kind": "toggle",
        "label": "Liveness check",
-       "provenance": "pack Access Control Module_Reference.pdf, page 62 §Configure"
+       "provenance": "pack Access Control Module_Reference.pdf, page 62 §Configure",
+       "operation": "setFaceMatchingVerification",
+       "bindsTo": "FaceMatchingVerificationThresholdsInput.livenessCheck"
       },
       {
-       "kind": "selectField",
+       "kind": "toggle",
        "label": "Duplicate-face check",
-       "provenance": "pack Access Control Module_Reference.pdf, page 62 §Configure"
+       "provenance": "pack Access Control Module_Reference.pdf, page 62 §Configure",
+       "operation": "setFaceMatchingVerification",
+       "bindsTo": "FaceMatchingVerificationThresholdsInput.duplicateFaceCheck"
       },
       {
        "kind": "selectField",
-       "label": "image quality",
-       "provenance": "pack Access Control Module_Reference.pdf, page 62 §Configure"
+       "label": "Image quality",
+       "provenance": "pack Access Control Module_Reference.pdf, page 62 §Configure",
+       "operation": "setFaceMatchingVerification",
+       "bindsTo": "FaceMatchingVerificationThresholdsInput.imageQuality"
+      },
+      {
+       "kind": "numberField",
+       "label": "Capture timeout (seconds)",
+       "provenance": "pack Access Control Module_Reference.pdf, page 62 §Configure",
+       "operation": "setFaceMatchingVerification",
+       "bindsTo": "FaceMatchingVerificationThresholdsInput.captureTimeout"
+      },
+      {
+       "kind": "numberField",
+       "label": "Retries",
+       "provenance": "pack Access Control Module_Reference.pdf, page 62 §Configure",
+       "operation": "setFaceMatchingVerification",
+       "bindsTo": "FaceMatchingVerificationThresholdsInput.retryQuantity"
       },
       {
        "kind": "selectField",
-       "label": "capture timeout",
-       "provenance": "pack Access Control Module_Reference.pdf, page 62 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "retry quantity",
-       "provenance": "pack Access Control Module_Reference.pdf, page 62 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "mask/obstruction handling",
-       "provenance": "pack Access Control Module_Reference.pdf, page 62 §Configure"
+       "label": "Mask or obstruction handling",
+       "provenance": "pack Access Control Module_Reference.pdf, page 62 §Configure",
+       "operation": "setFaceMatchingVerification",
+       "bindsTo": "FaceMatchingVerificationThresholdsInput.maskObstructionHandling"
       }
      ]
     },
@@ -952,6 +1137,36 @@
    "workshopBoard": "wireframes/WS22 Access Control Board 5.dc.html#bo-189"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 62. 0 of 0 labels bound to a contract property; 6 of 16 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetFaceMatchingVerification",
+    "component": "modal",
+    "trigger": "Save thresholds",
+    "body": "**Collects what `setFaceMatchingVerification` sends before it is called.** Required: `venueId`, `accessContext`, `highConfidenceMin`, `reviewRangeMin`. Optional: `profileId`, `retryQuantity`, `livenessCheck`, `duplicateFaceCheck`, `imageQuality`, `captureTimeout`, `maskObstructionHandling`, `operatorFallback`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save thresholds",
+     "operation": "setFaceMatchingVerification"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "venueId",
+      "accessContext",
+      "highConfidenceMin",
+      "reviewRangeMin",
+      "profileId",
+      "retryQuantity",
+      "livenessCheck",
+      "duplicateFaceCheck",
+      "imageQuality",
+      "captureTimeout",
+      "maskObstructionHandling",
+      "operatorFallback"
+     ]
+    },
+    "provenance": "contract access.yaml PUT /face-matching-verification"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1062,6 +1277,13 @@
        ],
        "notes": "The pack groups this record's detail under its own headings: “Current Face”, “SIGNIFICANT IDENTITY DIFFERENCE”, “CHANGE BLOCKED”, “Change Reasons”.",
        "provenance": "pack Access Control Module_Reference.pdf, page 63 §Show"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "View images (logged)",
+       "operation": "getFaceReenrolmentImages",
+       "notes": "**Images only behind \"View images (logged)\", needing `BIOMETRIC_IMAGE_VIEW` and a fresh second factor (decided 2 October 2026 by Chinmay, DEC-239; CHG-CSP-023, CHG-FUP-004); the match score and references are always visible.** The reason is asked and the view is audited.",
+       "provenance": "contract access.yaml GET /face-reenrolment-attempts/{attemptId}/images"
       }
      ]
     },
@@ -1102,6 +1324,13 @@
     "invalidates": [
      "listFaceChangeEnrollment"
     ]
+   },
+   {
+    "operationId": "getFaceReenrolmentImages",
+    "contract": "access",
+    "purpose": "The enrolled and new images, behind a logged view (DEC-239)",
+    "trigger": "onLoad",
+    "provenance": "design-note correction, 2 October 2026 (BO-190)"
    }
   ],
   "entryState": {
@@ -1222,6 +1451,17 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Access Control Module_Reference.pdf, page 65"
+   },
+   {
+    "operation": "setBiometricVerificationProfile",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): setBiometricVerificationProfile is the profile write of BO-185 and has no outcome mapping or exit capture; the gate mapping read by listBiometricValidationGate has no write yet (contract gap CHG-WIR-004) (design-notes correction venue-operations BO-191).",
+    "source": "contracts/spine/access.yaml#setBiometricVerificationProfile | contracts/spine/access.yaml#listBiometricValidationGate"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-004): No operation saves biometric validation at the gate (outcome mapping, exit capture).",
+    "source": "contracts/spine/access.yaml#listBiometricValidationGate"
    }
   ],
   "layout": {
@@ -1235,20 +1475,6 @@
        "derived": true,
        "impliedBy": "listBiometricValidationGate",
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
-      },
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "setBiometricVerificationProfile",
-       "label": "Save",
-       "notes": "The act the screen exists for."
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "setBiometricVerificationProfile"
       }
      ]
     }
@@ -1257,7 +1483,7 @@
   "states": {
    "loading": "The biometric validation gate list.",
    "error": "Could not load. Names which read failed and leaves the biometric validation gate untouched.",
-   "emptyFirstRun": "No biometric validation gate yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No biometric validation gate yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the biometric validation gate are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -1267,16 +1493,6 @@
     "contract": "access",
     "purpose": "Biometric Validation at Gate",
     "trigger": "onLoad"
-   },
-   {
-    "operationId": "setBiometricVerificationProfile",
-    "contract": "access",
-    "purpose": "Choose which gates, zones and attractions require a face match",
-    "trigger": "onAction",
-    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
-    "invalidates": [
-     "listBiometricValidationGate"
-    ]
    }
   ],
   "entryState": {
@@ -1492,6 +1708,11 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Access Control Module_Reference.pdf, page 67"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-004): No operation disables biometrics in an emergency with a fallback method.",
+    "source": "contracts/spine/access.yaml#listBiometric"
    }
   ],
   "layout": {

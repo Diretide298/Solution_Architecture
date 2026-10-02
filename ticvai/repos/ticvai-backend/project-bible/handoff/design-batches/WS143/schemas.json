@@ -309,6 +309,20 @@
      "registration"
     ]
    },
+   "consentPurposes": {
+    "type": "array",
+    "description": "**What a `consentForm` consents to** (Chinmay, 2 October, batch 4; follows BO-188: biometric capture needs consent on the venue's own form; CHG-CSA-026). A guardian-signed form for a minor carries the guardian fields of the waiver builder (workbook Q237: guardian consent, configurable per country). Empty for any other kind.",
+    "items": {
+     "type": "string",
+     "enum": [
+      "facePass",
+      "faceTag",
+      "marketing",
+      "photography",
+      "waiver"
+     ]
+    }
+   },
    "version": {
     "readOnly": true,
     "type": "integer",
@@ -551,210 +565,6 @@
    },
    "hasMore": {
     "type": "boolean"
-   }
-  }
- },
- "RefundCompensationServiceExceptionWorkspaceInput": {
-  "type": "object",
-  "x-ticvai-persistence": "marketing.case_compensation_request",
-  "x-ticvai-record-definition": "Request Types",
-  "description": "One refund, compensation or policy-exception request raised from a case. The order, refund and approval are references, never copies.",
-  "required": [
-   "id",
-   "caseId",
-   "requestType",
-   "value",
-   "reason"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid",
-    "description": "Client-generated UUIDv7; equals the `Idempotency-Key` header."
-   },
-   "scopePath": {
-    "type": "string",
-    "readOnly": true,
-    "description": "**The partition key** (ADR-0005)."
-   },
-   "caseId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "orderId": {
-    "type": "string",
-    "format": "uuid",
-    "description": "Required for `fullRefund`, `partialRefund`, `feeWaiver`, `upgrade` and `discount`."
-   },
-   "lineIds": {
-    "type": "array",
-    "items": {
-     "type": "string",
-     "format": "uuid"
-    }
-   },
-   "requestType": {
-    "type": "string",
-    "enum": [
-     "fullRefund",
-     "partialRefund",
-     "serviceCredit",
-     "walletCredit",
-     "voucher",
-     "complimentaryTicket",
-     "feeWaiver",
-     "upgrade",
-     "discount",
-     "policyException"
-    ]
-   },
-   "value": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "The money value requested; for a complimentary ticket or upgrade, its face value. This is what the approval thresholds are compared with."
-   },
-   "reason": {
-    "type": "string",
-    "minLength": 3,
-    "maxLength": 1000
-   },
-   "isPolicyException": {
-    "type": "boolean",
-    "default": false,
-    "description": "True when the standard policy would not allow it; always needs approval."
-   },
-   "exceptionReason": {
-    "type": "string",
-    "maxLength": 1000,
-    "nullable": true,
-    "description": "Required when `isPolicyException` is true."
-   },
-   "submit": {
-    "type": "boolean",
-    "default": false,
-    "description": "False saves a draft; true routes it.",
-    "writeOnly": true
-   },
-   "status": {
-    "type": "string",
-    "readOnly": true,
-    "enum": [
-     "draft",
-     "pendingApproval",
-     "approved",
-     "declined",
-     "fulfilled",
-     "failed",
-     "withdrawn"
-    ]
-   },
-   "approvalRequestId": {
-    "type": "string",
-    "readOnly": true,
-    "nullable": true
-   },
-   "fulfilmentOperation": {
-    "type": "string",
-    "readOnly": true,
-    "nullable": true,
-    "description": "e.g. `createRefund`, `topUpWallet`."
-   },
-   "fulfilmentReference": {
-    "type": "string",
-    "readOnly": true,
-    "nullable": true,
-    "description": "The refund, wallet transaction or voucher it produced."
-   },
-   "requestedByPrincipalId": {
-    "type": "string",
-    "format": "uuid",
-    "readOnly": true
-   },
-   "updatedAt": {
-    "type": "string",
-    "format": "date-time",
-    "readOnly": true
-   }
-  }
- },
- "RefundCompensationServiceExceptionWorkspaceView": {
-  "type": "object",
-  "x-ticvai-persistence": "none — projection over marketing.case_compensation_request (new), orders.sales_order, orders.refund, orders.order_fee, orders.refund_policy and approvals.request",
-  "description": "The request, the order's financial context, the policy evaluation and who must approve.",
-  "required": [
-   "request",
-   "approvalLevel"
-  ],
-  "properties": {
-   "request": {
-    "$ref": "#/components/schemas/RefundCompensationServiceExceptionWorkspaceInput"
-   },
-   "originalTransaction": {
-    "type": "string",
-    "nullable": true,
-    "description": "The order number."
-   },
-   "amountPaid": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "amountUsed": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Value of tickets already scanned or consumed."
-   },
-   "refundableAmount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "What the refund policy's time bands allow now, less previous refunds."
-   },
-   "previousRefund": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "fees": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "proposedRefund": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "proposedCompensation": {
-    "type": "object",
-    "nullable": true,
-    "properties": {
-     "requestType": {
-      "type": "string"
-     },
-     "value": {
-      "$ref": "../shared/common.yaml#/components/schemas/Money"
-     }
-    }
-   },
-   "policyEvaluation": {
-    "type": "object",
-    "properties": {
-     "standardPolicy": {
-      "type": "string",
-      "description": "The rule that applies, as the venue's refund policy states it."
-     },
-     "isWithinPolicy": {
-      "type": "boolean"
-     },
-     "policyReference": {
-      "type": "string",
-      "nullable": true
-     }
-    }
-   },
-   "approvalLevel": {
-    "type": "string",
-    "enum": [
-     "agent",
-     "secondUser",
-     "approver"
-    ],
-    "description": "From the venue's `selfAuthoriseLimit`, `requiresSecondUserAbove` and `requiresApprovalAbove`; a policy exception is always `approver`."
-   },
-   "aiExplanation": {
-    "type": "string",
-    "nullable": true,
-    "maxLength": 1000,
-    "description": "AI-derived and labelled as such; cites a recorded policy or says none applies."
    }
   }
  },

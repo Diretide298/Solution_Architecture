@@ -1,14 +1,14 @@
 # WS56 — Rules  Workflow  Approval   Automation Engine board 2
 
-**10 screens · 13 operations · 25 schemas · 5 permissions**
+**10 screens · 9 operations · 16 schemas · 4 permissions**
 
-Platform P09 TICVAI Web · ships as **ticvai-control** ·
-platformAdmin audience · web ·
+Platform P08 Venue Management · ships as **venue-management** ·
+staff audience · web ·
 online only
 
 ## Who this is for
 
-**platformAdmin on web.** Everything below is how you know what is
+**staff on web.** Everything below is how you know what is
 true. **None of it is the subject.** The subject is the person in front of the screen and the one
 thing they came to do.
 
@@ -48,8 +48,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 5 permissions apply here:
-  `APPROVAL_ACT, APPROVAL_CONFIGURE, APPROVAL_DECIDE, APPROVAL_VIEW, REPORT_VIEW_VENUE`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 4 permissions apply here:
+  `APPROVAL_ACT, APPROVAL_CONFIGURE, APPROVAL_VIEW, REPORT_VIEW_VENUE`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -61,6 +61,35 @@ convincingly. It is never a caption.
   and its error; and, element by element, what is shown and in what format, what each action
   produces and where the user goes next. Draw exactly that.
 
+## The processes these screens belong to
+
+Written by the owner of each process (`handoff/design-notes/`). Read before any screen: it says how the process runs end to end and which words the screens must use.
+
+### Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management)
+
+Platform Foundation is everything the apps stand on. Five apps each have one door: the guest app and website (WEB-016, GST-042: a six-digit code to email or mobile, a password, Apple or Google, UAE Pass; never enterprise SSO), the till (POS-000: employee number and PIN, recent operators as tiles; the kitchen display is the same app), the staff handheld and scanner (EMP-001, SCN-001), Venue Management (SUP-001, the single door for the back office P08, the CMS P13, analytics P16 and the support desk P12) and TICVAI Control (ADM-001 for TICVAI's own platform operators, PTR-001 for partner users; the developer portal P14 and the sign-up P17 belong to this app too). A second factor is required by permission, not by role or device: ROLE_MANAGE, LEDGER_APPROVE and every PLATFORM_* permission, plus any the tenant adds; so a cashier never sees it and a platform operator always does. The factor is an authenticator app with an emailed code as fallback; five wrong codes lock step-up for the lockout minutes, never permanently. Guests get two-step verification only at a venue that switched it on. One person holds one session per workstation: a second sign-in is refused and only a supervisor ends the other session. Several roles mean a role prompt; one role goes straight in. The workstation decides the Sale Board, hardware and till identity, never what a person may do. Sensitive actions (refund approval, journal approval, credential reset, partner credit, commission rules, opening a platform-staff grant and 17 more) demand a fresh step-up on the operation itself, asked in place in the action's confirmation; the tenant may raise the strength, never remove it. Permission outcomes are three, never one word: self-authorised (proceeds, audited), escalated (a supervisor PIN in place), refused (the denied state, naming the permission); a missing permission is never an empty table, and a record outside the person's venues is "not found", indistinguishable from absent. The hierarchy is binding (tenant, brand, region, venue, department, sub-department, workstation; outlet beside department for F&B and retail); region owns currency, decimals, time zone, date format and fiscal year; configuration resolves nearest-ancestor across tenant, region and venue (outlet for F&B and retail), venue is the floor and a workstation is assigned a profile, never configured; every configuration screen says which level it writes and what it inherits. Venue Management is one tenant-level surface filtering across the venues in the session's scope. TICVAI's Console runs outside every cell: a platform operator picks a tenant and opens a time-boxed, audited platform-staff grant (with step-up) before any tenant action, and the tenant sees every action in its audit log (ADM-412 is the reference implementation). Approval workflows record authorisations and never perform the action; the requester cannot approve their own request; a venue may tighten and never loosen a rule from above; in-flight …
+*(source: screens/P12-support-agent-console.yaml#SUP-001; R135; R126; R167; DI-1072; ADR-0002; ADR-0003; ADR-0004; R184; contracts/spine/identity.yaml#createMfaChallenge; contracts/spine/approvals.yaml#setStepUpPolicy; ADR-0011; ADR-0018; ADR-0029; R098; contracts/spine/approvals.yaml#decideApprovalRequest …)*
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Sign in / Sign out | Entering and leaving any app, staff or guest. | Login, Log in, Logon, Logout | screens/P04-point-of-sale.yaml#POS-000 … |
+| Authentication code | The staff second factor from the authenticator app (or the emailed fallback). | OTP, 2FA code, token | screens/P09-platform-admin-console.yaml#ADM-001 |
+| One-time code | The six-digit code a guest receives to sign in or prove a contact. | OTP, PIN, password | DI-1034; R167 |
+| Two-step verification | The guest's optional second factor, asked only at venues that switched it on. | MFA, 2FA | DI-1072 |
+| Tenant / Brand / Region / Venue / Department / Outlet | The binding hierarchy levels; region owns currency and dates; outlet is F&B or retail inside a venue. | Client, Customer, Org (for tenant), Site, Park, Property (for venue), Area, Territory (for region) | ADR-0011; ADR-0018 |
+| Workstation (back office) / till (operator copy) | A configured device; decides Sale Board, hardware and till identity, never authorisation. | Terminal, Station, POS (for the device), till (for the Deposit Box) | ADR-0002; R156 |
+| Sale Board | The configured front end a workstation loads (ticketing, F&B or retail). | Screen, Layout, Menu | ADR-0003 |
+| Role | A named, fully configurable grouping of permissions; the seeded five are editable starting points. | Group, Profile | R229 |
+| Staff member / Partner user / Platform operator | A tenant's staff principal; a partner's user; a TICVAI employee in the Console. | User (alone), Account, Agent (for venue staff) | F104 step 1; F104 step 4; F104 step 5 |
+| Platform-staff grant | The time-boxed, audited access a platform operator opens into one tenant before acting in it. | Impersonation, Support login | R098 |
+| Escalate / Refused | Escalate is supervisor approval captured in place; Refused is the denied state that names the permission. | Denied (for an action that can be escalated) | R197 |
+| Approve / Reject / Return / Request information | The four decisions on an approval request; Withdraw is the requester's own act and never a rejection. | Accept, Decline, Cancel (for withdraw) | contracts/spine/approvals.yaml#decideApprovalRequest … |
+| Subscription / Plan / Module / Licence | TICVAI's commercial relationship with a tenant, its plan, the modules it licenses and the limits. | Membership (that is the guest's pass) | R214 |
+| Membership / Annual pass | A guest's pass product and its holder (BO-284 to BO-303). | Subscription (that is the tenant's TICVAI plan) | screens/P08-venue-back-office.yaml#BO-284 |
+| Sandbox client / Production client | A developer's own test credential; a TICVAI-issued live credential after certification. | Test key, Live key, API key (without environment) | DI-927 |
+| Asset (DAM) / Media (ticket) | A digital file in the library; ticket media is a wristband or card carrying entitlements. Never mix them. | Media (for a library asset) | contracts/satellite/assets.yaml#searchMedia … |
+
+
 ## The screens
 
 Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs count fields; requirements are matrix rows; meeting inputs are the ones naming the screen (the module and platform ones are below); white label says whether the tenant's brand reaches it (guest) or it sets the brand (configures).
@@ -68,15 +97,15 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `ADM-248` | Workflow Operations Command Center | B–D | 0 | 262 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `ADM-249` | Unified Approval Inbox & Decision Workspace | B–D | 5 | 18 | 6 | 20 | 1 | 3 | — | notStarted (generated) |
+| `ADM-249` | Unified Approval Inbox & Decision Workspace | B–D | 0 | 18 | 6 | 7 | 1 | 3 | — | notStarted (generated) |
 | `ADM-250` | Workflow Instance Monitor & Process Timeline | B–D | 9 | 20 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-251` | Workflow Exception, Failure & Recovery Center | B–D | 9 | 22 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-252` | SLA, Escalation & Bottleneck Monitor | B–D | 9 | 168 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-251` | Workflow Exception, Failure & Recovery Center | B–D | 10 | 22 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-252` | SLA, Escalation & Bottleneck Monitor | B–D | 0 | 28 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-253` | Automation Execution & Autonomous Action Monitor | B–D | 0 | 34 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-254` | Cross-Module Orchestration Monitor | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-255` | Workflow Analytics & Process Performance | B–D | 2 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-256` | Process Optimization & Automation Opportunity Center | B–D | 0 | 22 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-257` | AI Workflow Intelligence & Autonomous Governance Center | B–D | 0 | 13 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `ADM-257` | AI Workflow Intelligence & Autonomous Governance Center | B–D | 0 | 22 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 
@@ -94,15 +123,21 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Platform · wave 3 · needs the `core` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `APPROVAL_VIEW` (1 read); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `APPROVAL_VIEW` (1 read); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Display) and no metric row |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/platform/workflow-operations-command-center-adm-248` |
+
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
+
+**From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** Every running workflow instance with its current step, owner, priority and SLA; counts of started, completed, failed and escalated.
+
+**Fixed on main** (the package already carries these; draw what it says): Calls tenant-permission operations with no tenant picker and no platform-staff grant: listWorkflow (APPROVAL_VIEW). (CHG-MOV-001); emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything. (CHG-MOV-003).
 
 #### Inputs: what the user enters or picks
 
@@ -456,7 +491,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Where the user goes next**
 
-- → `ADM-002` Platform Dashboard: *Platform Dashboard*
+- → `BO-100` Venue Home: *Back to Venue Home*
 - → `ADM-249` Unified Approval Inbox & Decision Workspace: *Works in Unified Approval Inbox & Decision Workspace*; calls `listWorkflow`
 - → `ADM-250` Workflow Instance Monitor & Process Timeline: *Works in Workflow Instance Monitor & Process Timeline*; calls `listWorkflow`
 - → `ADM-251` Workflow Exception, Failure & Recovery Center: *Works in Workflow Exception, Failure & Recovery Center*; calls `listWorkflow`
@@ -466,6 +501,8 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 - → `ADM-255` Workflow Analytics & Process Performance: *Works in Workflow Analytics & Process Performance*; calls `listWorkflow`
 - → `ADM-256` Process Optimization & Automation Opportunity Center: *Works in Process Optimization & Automation Opportunity Center*; calls `listWorkflow`
 - → `ADM-257` AI Workflow Intelligence & Autonomous Governance Center: *Works in AI Workflow Intelligence & Autonomous Governance Center*; calls `listWorkflow`
+- → `BO-391` Live Escalation Operations Center: *Works in SLA, Escalation & Bottleneck Monitor*; calls `listWorkflow`
+- → `BO-084` Approval Inbox: *Works in Unified Approval Inbox & Decision Workspace*; calls `listWorkflow`
 
 #### States
 
@@ -473,10 +510,28 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |---|---|
 | Loading (`?state=loading`) | The workflow operations list. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the workflow operations untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No workflow operations yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, first run (`?state=emptyFirstRun`) | No workflow operations yet. Offers no create action: nothing on this screen creates one, so for a monitor or a queue an empty list is the good outcome. Distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the workflow operations are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+metric tiles:
+  Workflows Running: 128
+  Started Today: 46
+  Completed Today: 312
+  Pending Approvals: 74
+  Waiting Tasks: 42 min
+  SLA At Risk: 1.8 s
+  SLA Breached: 3 h 20 min
+  Failed Workflows: 5
+  Escalated: 128
+  Automated Executions: 46
+```
 
 #### Permissions
 
@@ -494,7 +549,7 @@ For this screen, newest first. An **Open question** is built to the default it s
 
 - Workshop packs group screens ten to a board, each opened by a command centre; that grouping is the navigation: the nine detail screens are reached from the board's hub and return to it. *(agreed · screen note 4 Sep 2026, BO-144 and the other board hubs · DI-653)*
 
-Also apply: 1 for P09 · Platform, 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -502,7 +557,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-248` · status **notStarted** · provenance generated
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-248` · status **notStarted** · provenance generated
 - Client workshop board: `wireframes/WS137 Rules  Workflow  Approval   Automation Engine Board 2.dc.html#adm-248`
 - Workshop pack: Rules__Workflow__Approval___Automation_Engine_Reference.pdf board 2
 - Flow F165 *Rules Workflow Approval Automation Engine board 2: Workflow Operations Command …*, step 1: Opens Workflow Operations Command Center → Provide administrators and operational managers with a real-time view of all workflow activity across TICVAI.
@@ -523,7 +578,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every output is drawn (262 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-248?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
-- [ ] Every transition is wired: `ADM-002`, `ADM-249`, `ADM-250`, `ADM-251`, `ADM-252`, `ADM-253`, `ADM-254`, `ADM-255`, `ADM-256`, `ADM-257`.
+- [ ] Every transition is wired: `BO-100`, `ADM-249`, `ADM-250`, `ADM-251`, `ADM-252`, `ADM-253`, `ADM-254`, `ADM-255`, `ADM-256`, `ADM-257`, `BO-391`, `BO-084`.
 - [ ] Every gated control is gated: `APPROVAL_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
@@ -532,48 +587,33 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 ### `ADM-249` Unified Approval Inbox & Decision Workspace
 
-**Provide users with one approval inbox across all TICVAI modules. This is extremely important. A manager should not need to open Finance for one approval, Pricing for another, Procurement for another, and Customer Service for another.**
+**Provide users with one approval inbox across all TICVAI modules. This is extremely important. A manager should not need to open Finance for one approval, Pricing for another, Procurement for another, and Customer Service for another. (merged into BO-084 Approval Inbox).**
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Platform · wave 3 · needs the `core` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `APPROVAL_DECIDE`, `APPROVAL_VIEW` (1 operate, 1 read); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Display) and no metric row |
 | Offline | online only |
 | Opens with | `requestId` (navigation), `approvalRequestId` (navigation) |
 | Route | `/platform/unified-approval-inbox-decision-workspace-adm-249` |
 
+**What the spec says about it.** **Merged into BO-084 Approval Inbox** (decided 2 October 2026, Chinmay: DEC-100 and the pre-apply round, "duplicate screens: merge as proposed"; CHG-MOV-002). On one platform it declared the same operations as BO-084 (check-screen-wiring S-DUP-SCREEN). **One implementation, both ids kept**, as the M24-03 merges do: this id stays for traceability and routes to BO-084, and nothing on it is built separately. **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
+
+**From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** One approval inbox across every module for a manager, decided in place. The same queue as BO-084, offered on the Console only for a platform operator acting in a tenant.
+
 #### Inputs: what the user enters or picks
 
-**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
-
-| Filter | Drawn as | Default | Allowed values, rules | Source |
-|---|---|---|---|---|
-| Assigned to me | toggle | — | — | `listApprovalRequests` ?assignedToMe |
-| Raised by me | toggle | — | — | `listApprovalRequests` ?raisedByMe |
-| Status | select | — | Draft · Pending · Escalated · Returned · Information requested · Approved · Rejected · Withdrawn · Expired · Cancelled | `listApprovalRequests` ?status |
-| Kind | select | — | Refund · Price override · Discount override · Complimentary ticket · Membership cancellation · Access permission change · Configuration change · AI recommendation · Release promotion · Requisition · Stock write off · Journal entry … | `listApprovalRequests` ?kind |
-| Breaching within minutes | number field (minutes) | — | — | `listApprovalRequests` ?breachingWithinMinutes |
-| Sort | segmented control | Sla proximity | Sla proximity · AI priority | `listApprovalRequests` ?sort |
-
-**Sent by *Approve*** (`decideApprovalRequest`; no form is declared, so these are filled from the screen or collected inline)
-
-| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
-|---|---|---|---|---|---|---|---|
-| Decision `decision` | radio group | required | — | Approve · Reject · Return · Request information | — | — | `decideApprovalRequest` body |
-| Comment `comment` | text area | optional | — | max length 1000 | — | — | `decideApprovalRequest` body |
-| Reason `reason` | text area | optional | — | max length 500 | — | Required on rejection. | `decideApprovalRequest` body |
-| Step up token `stepUpToken` | text field | optional | — | — | — | Where the rule demands MFA (11.1.60). | `decideApprovalRequest` body |
-| Signature `signature` | text field | optional | — | — | — | 11.1.57. Where the rule demands a digital signature. | `decideApprovalRequest` body |
+Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
 
 #### Outputs: what the screen shows and produces
 
 **Shown**
 
-**Every unified approval decision** (data table, from `listApprovalRequests`)
+**Every unified approval decision** (data table)
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -605,13 +645,20 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Approve (primary button) | `decideApprovalRequest` POST `/approval-requests/{requestId}/decide` | inline | ApprovalRequest | 403 The approver may not decide this request. Always carries `refusedReason`, one value per cause — the approver is the requester (`approverIsRequester`), is not … (ApprovalRefusedProblem); 409 The request is no longer … | — |
+| Approve (primary button) | navigation or local | — | — | — | — |
 
-**Data it reads**: `listApprovalRequests` (onLoad, The approval inbox); `getApprovalRequestScore` (onLoad, Risk band, priority and suggested escalation for the …)
+**Rules for what is shown** (from the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process; these refine the tables above and win where they differ)
+
+- **Money columns (amount)**: Money in the region's currency and scale, never a bare number: AED to 2 decimals, OMR/BHD/KWD to 3, the third decimal never rounded away (2.013 stays 2.013); the currency code is shown with the figure. Across tenants or regions figures in different currencies are never summed into one total; group by currency, or label the converted figure with its rate and time. *(source: ADR-0008; ADR-0011; DI-306)*
+
+**What each action does** (from the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process; these refine the tables above and win where they differ)
+
+- **Decide (Approve / Reject / Return / Request information)**: Four outcomes, not two: reject needs a reason the requester reads; return sends it back to amend; request information pauses the SLA clock. Approving records an authorisation and does not perform the action; on a multi-level chain the request moves to the next level. Where the rule demands MFA the decision carries a stepUpToken from the in-place challenge; where it demands a signature, the signature step comes first. *(source: contracts/spine/approvals.yaml#decideApprovalRequest; F14 step 4)*
 
 **Where the user goes next**
 
 - → `ADM-248` Workflow Operations Command Center: *Returns to the board's landing screen*
+- → `BO-084` Approval Inbox: *Open Approval Inbox*; carries `approvalRequestId`, `requestId`
 
 #### States
 
@@ -619,39 +666,62 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | Loading (`?state=loading`) | The unified approval decision list. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the unified approval decision untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No unified approval decision yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, first run (`?state=emptyFirstRun`) | No unified approval decision yet. Offers no create action: nothing on this screen creates one, so for a monitor or a queue an empty list is the good outcome. Distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the unified approval decision are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks the permission BO-084 Approval Inbox requires; this id has no operation of its own since the merge, so it names that screen's. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 409 The request is no longer open for a decision. `refusedReason` says which: `alreadyDecided` (approved or rejected), `withdrawn`, `expired` or `cancelled`, and … (ApprovalStateProblem) |
+
+#### Edge cases to draw
+
+- **Can read but not change (holds APPROVAL_VIEW only)**: Everything reads; the actions needing another permission are not offered as live buttons: APPROVAL_DECIDE for Approve. Where the person would reasonably expect the action, it shows disabled with the permission named. The server refuses with 403 forbidden regardless. *(source: contracts/spine/approvals.yaml#decideApprovalRequest)*
+- **decideApprovalRequest answers 403**: Show it as something the person can act on, not a failure: The approver may not decide this request. **Always carries `refusedReason`**, one value per cause — the approver is the requester (`approverIsRequester`), is not in the resolved chain (`notInApproverChain`), lacks the permission the rule demands (`insufficientPermission`), gave no step-up token where the rule requires MFA (`mfaR... *(source: contracts/spine/approvals.yaml#decideApprovalRequest)*
+- **decideApprovalRequest answers 409**: Show it as something the person can act on, not a failure: The request is no longer open for a decision. `refusedReason` says which: `alreadyDecided` (approved or rejected), `withdrawn`, `expired` or `cancelled`, and `currentStatus` carries the status it is in. *(source: contracts/spine/approvals.yaml#decideApprovalRequest)*
+- **The approver raised the request, or sits outside the resolved chain**: Decide is refused 403 with refusedReason (approverIsRequester, notInApproverChain, missing permission or step-up); show the reason in words and who can decide instead. Segregation of duties survives delegation. *(source: contracts/spine/approvals.yaml#decideApprovalRequest; contracts/spine/approvals.yaml#createApprovalDelegation)*
+
+#### Consistency with other screens
+
+- Match `BO-084`: One queue.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+Every unified approval decision:
+- kind: standard
+  amount: AED 1,250.00
+  requestedAt: 01/10/2026 09:14
+  slaDueAt: 01/10/2026 09:14
+  status: active
+- kind: standard
+  amount: AED 48,000.00
+  requestedAt: 30/09/2026 18:02
+  slaDueAt: 30/09/2026 18:02
+  status: pending
+- kind: override
+  amount: OMR 48.500
+  requestedAt: 28/09/2026 11:45
+  slaDueAt: 28/09/2026 11:45
+  status: suspended
+```
 
 #### Permissions
 
-- `listApprovalRequests` → `APPROVAL_VIEW` (read) · staff, public
-- `decideApprovalRequest` → `APPROVAL_DECIDE` (operate) · staff, public
-- `getApprovalRequestScore` → `APPROVAL_VIEW` (read) · staff
-
-**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks the permission BO-084 Approval Inbox requires; this id has no operation of its own since the merge, so it names that screen's.
 
 #### Requirements it meets
 
-20 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+7 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
 
 | Ref | Requirement (shortened) | Domain | Verdict | Via |
 |---|---|---|---|---|
-| 11.1.55 | Regulatory Audit Support - System shall provide approval records suitable for regulatory audits. | Approval Workflows & Governance | CONTRACTED | `listApprovalRequests` |
-| 11.1.56 | Immutable Approval Records - System shall prevent modification of completed approval records. | Approval Workflows & Governance | CONTRACTED | `listApprovalRequests` |
-| 11.1.62 | Approval Tamper Detection - System shall detect unauthorized modification attempts on approval records. | Approval Workflows & Governance | CONTRACTED | `listApprovalRequests` |
-| 11.1.74 | AI Priority Scoring - System shall prioritize approval requests using AI scoring. | Approval Workflows & Governance | CONTRACTED | `listApprovalRequests` |
-| 18.6.1 | Approval Inbox - Users shall view pending approvals. | Employee Mobile App & AI Assistant | CONTRACTED | `listApprovalRequests` |
-| 18.6.2 | Approval Actions - Authorized users shall approve or reject requests. | Employee Mobile App & AI Assistant | CONTRACTED | `listApprovalRequests` |
-| 18.6.3 | Approval Comments - Users shall submit approval comments. | Employee Mobile App & AI Assistant | CONTRACTED | `listApprovalRequests` |
-| 11.1.20 | Approval Comments - System shall allow approvers to add comments to approval decisions. | Approval Workflows & Governance | CONTRACTED | `decideApprovalRequest` |
-| 11.1.21 | Approval Rejection Reasons - System shall require rejection reasons when approvals are denied. | Approval Workflows & Governance | CONTRACTED | `decideApprovalRequest` |
-| 11.1.57 | Digital Signature Support - System shall support digital signatures for sensitive approvals. | Approval Workflows & Governance | CONTRACTED | `decideApprovalRequest` |
-| 11.1.59 | Approval Authentication - System shall require authentication before approval actions are executed. | Approval Workflows & Governance | CONTRACTED | `decideApprovalRequest` |
-| 11.1.60 | MFA-Protected Approvals - System shall support MFA requirements for sensitive approval actions. | Approval Workflows & Governance | CONTRACTED | `decideApprovalRequest` |
-| … 8 more | | | | `traceability.json` |
+| 11.1.10 | Out-of-Office Routing - System shall automatically reroute approvals when approvers are unavailable. | Approval Workflows & Governance | CONTRACTED | data `ApprovalRequest` |
+| 11.1.28 | Mobile Approvals - System shall support approval actions through mobile applications. | Approval Workflows & Governance | CONTRACTED | data `ApprovalRequest` |
+| 11.1.29 | Email-Based Approvals - System shall support approval actions through email links. | Approval Workflows & Governance | CONTRACTED | data `ApprovalRequest` |
+| 11.1.54 | Approval Reopening - System shall support reopening previously completed approval requests. | Approval Workflows & Governance | CONTRACTED | data `ApprovalRequest` |
+| 11.1.73 | AI Risk Assessment - System shall provide AI-generated risk assessments for approval requests. | Approval Workflows & Governance | CONTRACTED | data `ApprovalRequest` |
+| 11.1.75 | AI Escalation Recommendations - System shall recommend escalation actions based on approval patterns. | Approval Workflows & Governance | CONTRACTED | data `ApprovalRequest` |
+| 11.1.78 | Shared Service Approval Centers - System shall support centralized approval processing teams. | Approval Workflows & Governance | CONTRACTED | data `ApprovalRequest` |
 
 #### Client meeting inputs
 
@@ -659,7 +729,7 @@ For this screen, newest first. An **Open question** is built to the default it s
 
 - Approval command centre/inbox shows all pending, validated and renewal requests and lets requests be assigned or reassigned to the relevant department or person. Approvals apply to any request type (new product, price change, website change). *(client request · MoM 8 Sep 2026, 4.12 Approval Workflow Recap - Inbox, SLA & Escalation · DI-723)*
 
-Also apply: 1 for P09 · Platform, 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -669,20 +739,20 @@ Also apply: 1 for P09 · Platform, 9 for all of P09, 29 for every app (section *
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-249` · status **notStarted** · provenance generated
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-249` · status **notStarted** · provenance generated
 - Client workshop board: `wireframes/WS137 Rules  Workflow  Approval   Automation Engine Board 2.dc.html#adm-249`
 - Workshop pack: Rules__Workflow__Approval___Automation_Engine_Reference.pdf board 2
-- Flow F165 *Rules Workflow Approval Automation Engine board 2: Workflow Operations Command …*, step 2: Works in Unified Approval Inbox & Decision Workspace → Provide users with one approval inbox across all TICVAI modules. This is extremely important. A manager should not need to open Finance for one approval, Pricing for another, Procurement for another …
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (5), with its required mark, default, format and its error state (403, 404, 409).
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
 - [ ] Every output is drawn (18 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-249?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Approve.
-- [ ] Every transition is wired: `ADM-248`.
-- [ ] Every gated control is gated: `APPROVAL_DECIDE`, `APPROVAL_VIEW`.
+- [ ] Every transition is wired: `ADM-248`, `BO-084`.
+- [ ] Sign-in is asked only where the spec asks for it.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 4 edge case(s) from the process notes are drawn.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -693,15 +763,21 @@ Also apply: 1 for P09 · Platform, 9 for all of P09, 29 for every app (section *
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Platform · wave 3 · needs the `core` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `APPROVAL_ACT`, `APPROVAL_VIEW` (1 operate, 1 read); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `APPROVAL_ACT`, `APPROVAL_VIEW` (1 operate, 1 read); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | commandCentre (compact density): the pack gives this screen both a metric directory (§Display) and a per-row directory (§For each step show) — counts over a population, then the population |
 | Offline | online only |
 | Opens with | `instanceId` (navigation) |
 | Route | `/platform/workflow-instance-monitor-process-timeline-adm-250` |
+
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
+
+**From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** One running workflow instance step by step: who, when, input, output, decision and duration; act on it (retry, skip, cancel).
+
+**Fixed on main** (the package already carries these; draw what it says): Calls tenant-permission operations with no tenant picker and no platform-staff grant: listWorkflowInstanceProcess (APPROVAL_VIEW) … (CHG-MOV-001); emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything. (CHG-MOV-003).
 
 #### Inputs: what the user enters or picks
 
@@ -805,11 +881,42 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 |---|---|
 | Loading (`?state=loading`) | The workflow instance process list; the counts above it resolve separately. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the workflow instance process untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No workflow instance process yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, first run (`?state=emptyFirstRun`) | No workflow instance process yet. Offers no create action: nothing on this screen creates one, so for a monitor or a queue an empty list is the good outcome. Distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the workflow instance process are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 The instance is completed or cancelled, the action does not apply in its current status (for example `resume` on an instance that has not failed), or the step …; 422 A field the action needs is missing (assigneePrincipalId, extendByMinutes, priority, workflowExceptionId), the node is not skippable or the alternative is not … |
+
+#### Edge cases to draw
+
+- **Can read but not change (holds APPROVAL_VIEW only)**: Everything reads; the actions needing another permission are not offered as live buttons: APPROVAL_ACT for Act on workflow instance. Where the person would reasonably expect the action, it shows disabled with the permission named. The server refuses with 403 forbidden regardless. *(source: contracts/spine/approvals.yaml#actOnWorkflowInstance)*
+- **actOnWorkflowInstance answers 409**: Show it as something the person can act on, not a failure: The instance is completed or cancelled, the action does not apply in its current status (for example `resume` on an instance that has not failed), or the step to skip is an approval node *(source: contracts/spine/approvals.yaml#actOnWorkflowInstance)*
+- **actOnWorkflowInstance answers 422**: Show it as something the person can act on, not a failure: A field the action needs is missing (assigneePrincipalId, extendByMinutes, priority, workflowExceptionId), the node is not skippable or the alternative is not an allowed edge, or the assignee is the requester of the approval *(source: contracts/spine/approvals.yaml#actOnWorkflowInstance)*
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+metric tiles:
+  Workflow Instance: 128
+  Workflow Name: 46
+  Version: 312
+  Source Module: 74
+  Business Object: 19
+  Initiated By: 233
+  Start Time: 3 h 20 min
+  Current Status: 11
+  Current Step: 128
+  SLA: 3 h 20 min
+Every workflow instance process:
+- type: standard
+  assignedTo: 31/12/2026 23:59
+- type: standard
+  assignedTo: 15/10/2026 00:00
+- type: override
+  assignedTo: 01/11/2026 06:00
+```
 
 #### Permissions
 
@@ -826,7 +933,7 @@ No matrix row traces to this screen's operations or data.
 
 None names this screen.
 
-Also apply: 1 for P09 · Platform, 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -834,7 +941,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-250` · status **notStarted** · provenance generated
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-250` · status **notStarted** · provenance generated
 - Client workshop board: `wireframes/WS137 Rules  Workflow  Approval   Automation Engine Board 2.dc.html#adm-250`
 - Workshop pack: Rules__Workflow__Approval___Automation_Engine_Reference.pdf board 2
 - Flow F165 *Rules Workflow Approval Automation Engine board 2: Workflow Operations Command …*, step 4: Works in Workflow Instance Monitor & Process Timeline → Allow administrators to inspect exactly what is happening inside an individual running workflow.
@@ -848,6 +955,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `ADM-248`.
 - [ ] Every gated control is gated: `APPROVAL_ACT`, `APPROVAL_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 3 edge case(s) from the process notes are drawn.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -858,19 +966,31 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Platform · wave 3 · needs the `core` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `APPROVAL_ACT`, `APPROVAL_VIEW` (1 operate, 1 read); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `APPROVAL_ACT`, `APPROVAL_VIEW` (1 operate, 1 read); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Display) and no metric row |
 | Offline | online only |
 | Opens with | `instanceId` (navigation) |
 | Route | `/platform/workflow-exception-failure-recovery-center-adm-251` |
 
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
+
 **Known gaps.** **The pack names 15 actions on this screen and the screen declares 1 operation.** Unserved: Business Rule Failure, Missing Data, Permission Failure, Integration Failure, Action Failure, Duplicate …
 
+**From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** Failed workflow executions by error type with business impact; retry, resolve or escalate each.
+
+**Fixed on main** (the package already carries these; draw what it says): Error types are drawn as buttons. (CHG-MOV-005); Calls tenant-permission operations with no tenant picker and no platform-staff grant: listWorkflowExceptionFailure (APPROVAL_VIEW) … (CHG-MOV-001); emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything. (CHG-MOV-003).
+
 #### Inputs: what the user enters or picks
+
+**On the screen**
+
+| Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
+|---|---|---|---|---|---|---|---|
+| Error type | select | optional | — | Business rule failure · Missing data · Missing approver · Permission failure · Integration failure · Timeout · Action failure · Invalid state · Duplicate event · Service unavailable · Configuration error | — | The pack's error types (Business Rule Failure, Missing Data, Permission Failure, Integration Failure, Action Failure, Duplicate Event, Service Unavailable, Configuration Error) filter the list by … | `WorkflowExceptionFailureRecoveryCenterView.errorType` |
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
 
@@ -938,14 +1058,6 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Business Rule Failure (primary button) | navigation or local | — | — | — | — |
-| Missing Data (secondary button) | navigation or local | — | — | — | — |
-| Permission Failure (secondary button) | navigation or local | — | — | — | — |
-| Integration Failure (secondary button) | navigation or local | — | — | — | — |
-| Action Failure (secondary button) | navigation or local | — | — | — | — |
-| Duplicate Event (secondary button) | navigation or local | — | — | — | — |
-| Service Unavailable (secondary button) | navigation or local | — | — | — | — |
-| Configuration Error (secondary button) | navigation or local | — | — | — | — |
 | Act on workflow instance (secondary button) | `actOnWorkflowInstance` POST `/workflow-instances/{instanceId}/actions` | WorkflowInstanceActionInput | WorkflowInstance | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 The instance is completed or cancelled, the action does not apply in its current status (for example `resume` … | gated `APPROVAL_ACT`; opens modal first |
 
 **Data it reads**: `listWorkflowExceptionFailure` (onLoad, Workflow Exception, Failure & Recovery Center)
@@ -960,11 +1072,30 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 |---|---|
 | Loading (`?state=loading`) | The workflow exception failure list. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the workflow exception failure untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No workflow exception failure yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, first run (`?state=emptyFirstRun`) | No workflow exception failure yet. Offers no create action: nothing on this screen creates one, so for a monitor or a queue an empty list is the good outcome. Distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the workflow exception failure are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 The instance is completed or cancelled, the action does not apply in its current status (for example `resume` on an instance that has not failed), or the step …; 422 A field the action needs is missing (assigneePrincipalId, extendByMinutes, priority, workflowExceptionId), the node is not skippable or the alternative is not … |
+
+#### Edge cases to draw
+
+- **Can read but not change (holds APPROVAL_VIEW only)**: Everything reads; the actions needing another permission are not offered as live buttons: APPROVAL_ACT for Act on workflow instance. Where the person would reasonably expect the action, it shows disabled with the permission named. The server refuses with 403 forbidden regardless. *(source: contracts/spine/approvals.yaml#actOnWorkflowInstance)*
+- **actOnWorkflowInstance answers 409**: Show it as something the person can act on, not a failure: The instance is completed or cancelled, the action does not apply in its current status (for example `resume` on an instance that has not failed), or the step to skip is an approval node *(source: contracts/spine/approvals.yaml#actOnWorkflowInstance)*
+- **actOnWorkflowInstance answers 422**: Show it as something the person can act on, not a failure: A field the action needs is missing (assigneePrincipalId, extendByMinutes, priority, workflowExceptionId), the node is not skippable or the alternative is not an allowed edge, or the assignee is the requester of the approval *(source: contracts/spine/approvals.yaml#actOnWorkflowInstance)*
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+exceptions:
+- workflow: Group booking confirmation
+  step: Issue tickets
+  errorType: Integration failure
+  retries: 3
+  impact: 42 tickets not issued
+```
 
 #### Permissions
 
@@ -981,7 +1112,7 @@ No matrix row traces to this screen's operations or data.
 
 None names this screen.
 
-Also apply: 1 for P09 · Platform, 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -989,248 +1120,68 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-251` · status **notStarted** · provenance generated
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-251` · status **notStarted** · provenance generated
 - Client workshop board: `wireframes/WS137 Rules  Workflow  Approval   Automation Engine Board 2.dc.html#adm-251`
 - Workshop pack: Rules__Workflow__Approval___Automation_Engine_Reference.pdf board 2
 - Flow F165 *Rules Workflow Approval Automation Engine board 2: Workflow Operations Command …*, step 6: Works in Workflow Exception, Failure & Recovery Center → Provide one controlled workspace for failed workflow executions.
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (9), with its required mark, default, format and its error state (404, 409, 422).
+- [ ] Every input above is drawn (10), with its required mark, default, format and its error state (404, 409, 422).
 - [ ] Every output is drawn (22 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-251?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: Business Rule Failure, Missing Data, Permission Failure, Integration Failure, Action Failure, Duplicate Event, Service Unavailable, Configuration Error, Act on workflow instance.
+- [ ] Every action is wired with its success and its failure: Act on workflow instance.
 - [ ] Every transition is wired: `ADM-248`.
 - [ ] Every gated control is gated: `APPROVAL_ACT`, `APPROVAL_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 3 edge case(s) from the process notes are drawn.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
 
 ### `ADM-252` SLA, Escalation & Bottleneck Monitor
 
-**Monitor workflows approaching or exceeding configured time limits.**
+**Monitor workflows approaching or exceeding configured time limits. (merged into BO-391 Live Escalation Operations Center).**
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Platform · wave 3 · needs the `core` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `APPROVAL_ACT`, `APPROVAL_VIEW` (1 operate, 1 read); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Display; Show) and no metric row |
 | Offline | online only |
 | Opens with | `instanceId` (navigation) |
 | Route | `/platform/sla-escalation-bottleneck-monitor-adm-252` |
 
+**What the spec says about it.** **Merged into BO-391 Live Escalation Operations Center** (decided 2 October 2026, Chinmay: DEC-100 and the pre-apply round, "duplicate screens: merge as proposed"; CHG-MOV-002). On one platform it declared the same operations as BO-391 (check-screen-wiring S-DUP-SCREEN). **One implementation, both ids kept**, as the M24-03 merges do: this id stays for traceability and routes to BO-391, and nothing on it is built separately. **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
+
+**From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** Workflows approaching or past their time limits, the longest-waiting steps and escalation levels.
+
 #### Inputs: what the user enters or picks
 
-**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
-
-| Filter | Drawn as | Default | Allowed values, rules | Source |
-|---|---|---|---|---|
-| Workflow | text field | — | — | `listSlaEscalationBottleneck` ?workflow |
-| Risk | text field | — | — | `listSlaEscalationBottleneck` ?risk |
-| Escalation level | text field | — | — | `listSlaEscalationBottleneck` ?escalationLevel |
-
-**Form: Act on workflow instance** (modal, opened by *Act on workflow instance*; *Act on workflow instance* calls `actOnWorkflowInstance`, *Cancel* sends nothing)
-
-**Collects what `actOnWorkflowInstance` sends before it is called.** Required: `action`, `reason`. Optional: `workflowStepExecutionId`, `workflowExceptionId`, `assigneePrincipalId`, `alternativeNodeId`, `correctedInput`, `extendByMinutes`, `priority`. Dismissing sends nothing; the screen behind is unchanged.
-
-| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
-|---|---|---|---|---|---|---|---|
-| Action `action` | select | required | — | Reassign · Retry step · Skip step · Resume · Cancel · Extend sla · Add backup approver · Change priority · Escalate exception | — | What an operator did to a running workflow instance (pack 13.2.3, 13.2.4 and 13.2.5; decided 29 September, writers pass). | `actOnWorkflowInstance` body |
-| Reason `reason` | text area | required | — | min length 1; max length 500 | — | Mandatory for every action (pack 13.2.5, "actions capture a mandatory reason") | `actOnWorkflowInstance` body |
-| Workflow step execution `workflowStepExecutionId` | picker: choose a workflow step execution | optional | — | — | shows names, sends the id | The step acted on; for `retryStep` the step to retry from. | `actOnWorkflowInstance` body |
-| Workflow exception `workflowExceptionId` | picker: choose a workflow exception | optional | — | — | shows names, sends the id | The exception the action is taken from; required for `escalateException` | `actOnWorkflowInstance` body |
-| Assignee principal `assigneePrincipalId` | picker: choose an assignee principal | optional | — | — | shows names, sends the id | Required for `reassign`, `addBackupApprover` and `escalateException` | `actOnWorkflowInstance` body |
-| Alternative node `alternativeNodeId` | text field | optional | — | — | — | For `skipStep`, the node to continue at instead of the next one (Use Approved Alternative) | `actOnWorkflowInstance` body |
-| Corrected input `correctedInput` | key and value settings | optional | — | — | — | For `resume`, the corrected input of the failed step (Correct Data) | `actOnWorkflowInstance` body |
-| Extend by minutes `extendByMinutes` | number field (minutes) | optional | — | min 1; max 43200 | — | Required for `extendSla` | `actOnWorkflowInstance` body |
-| Priority `priority` | text field | optional | — | max length 30 | — | Required for `changePriority` | `actOnWorkflowInstance` body |
-
-Errors to draw in the form: 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 The instance is completed or cancelled, the action does not apply in its current status (for example `resume` on an instance that has not failed), or the step …; 422 A field the action needs is missing (assigneePrincipalId, extendByMinutes, priority, workflowExceptionId), the node is not skippable or the alternative is not …
+Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
 
 #### Outputs: what the screen shows and produces
 
 **Shown**
 
-**Within SLA** (metric tile, from `listSlaEscalationBottleneck`)
+**Within SLA** (metric tile)
 
-| Shows | Format | Notes |
-|---|---|---|
-| Items | list or chips (count when long) | — |
-| Workflow | text | Workflow |
-| Instance | text | Instance |
-| Current step | text | Current Step |
-| Owner | text | Owner |
-| Started | 1 Oct 2026, 14:30 | Started |
-| Target | 1 Oct 2026, 14:30 | SLA deadline |
-| Time remaining | 1,234 | Minutes until breach; negative once breached |
-| Risk | text | Risk |
-| Escalation level | text | Escalation Level |
-| First reminder | 1 Oct 2026, 14:30 | First Reminder |
-| Second reminder | 1 Oct 2026, 14:30 | Second Reminder |
-| Manager escalation | 1 Oct 2026, 14:30 | Manager Escalation |
-| Executive escalation | 1 Oct 2026, 14:30 | Executive Escalation |
-| Final outcome | text | Final Outcome |
-| Next cursor | text | — |
-| Has more | yes / no (icon or chip) | — |
-| Summary | grouped details | The KPI tiles shown above the list on this screen. Computed over the whole filtered set, not the current page (decided 29 September … |
-| Within sla | 1,234 | Within SLA |
-| At risk | 1,234 | At Risk |
+**At Risk** (metric tile)
 
-**At Risk** (metric tile, from `listSlaEscalationBottleneck`)
+**Breached** (metric tile)
 
-| Shows | Format | Notes |
-|---|---|---|
-| Items | list or chips (count when long) | — |
-| Workflow | text | Workflow |
-| Instance | text | Instance |
-| Current step | text | Current Step |
-| Owner | text | Owner |
-| Started | 1 Oct 2026, 14:30 | Started |
-| Target | 1 Oct 2026, 14:30 | SLA deadline |
-| Time remaining | 1,234 | Minutes until breach; negative once breached |
-| Risk | text | Risk |
-| Escalation level | text | Escalation Level |
-| First reminder | 1 Oct 2026, 14:30 | First Reminder |
-| Second reminder | 1 Oct 2026, 14:30 | Second Reminder |
-| Manager escalation | 1 Oct 2026, 14:30 | Manager Escalation |
-| Executive escalation | 1 Oct 2026, 14:30 | Executive Escalation |
-| Final outcome | text | Final Outcome |
-| Next cursor | text | — |
-| Has more | yes / no (icon or chip) | — |
-| Summary | grouped details | The KPI tiles shown above the list on this screen. Computed over the whole filtered set, not the current page (decided 29 September … |
-| Within sla | 1,234 | Within SLA |
-| At risk | 1,234 | At Risk |
+**Escalated** (metric tile)
 
-**Breached** (metric tile, from `listSlaEscalationBottleneck`)
+**Minutes** (metric tile)
 
-| Shows | Format | Notes |
-|---|---|---|
-| Items | list or chips (count when long) | — |
-| Workflow | text | Workflow |
-| Instance | text | Instance |
-| Current step | text | Current Step |
-| Owner | text | Owner |
-| Started | 1 Oct 2026, 14:30 | Started |
-| Target | 1 Oct 2026, 14:30 | SLA deadline |
-| Time remaining | 1,234 | Minutes until breach; negative once breached |
-| Risk | text | Risk |
-| Escalation level | text | Escalation Level |
-| First reminder | 1 Oct 2026, 14:30 | First Reminder |
-| Second reminder | 1 Oct 2026, 14:30 | Second Reminder |
-| Manager escalation | 1 Oct 2026, 14:30 | Manager Escalation |
-| Executive escalation | 1 Oct 2026, 14:30 | Executive Escalation |
-| Final outcome | text | Final Outcome |
-| Next cursor | text | — |
-| Has more | yes / no (icon or chip) | — |
-| Summary | grouped details | The KPI tiles shown above the list on this screen. Computed over the whole filtered set, not the current page (decided 29 September … |
-| Within sla | 1,234 | Within SLA |
-| At risk | 1,234 | At Risk |
+**Minutes** (metric tile)
 
-**Escalated** (metric tile, from `listSlaEscalationBottleneck`)
+**Longest Waiting Step** (metric tile)
 
-| Shows | Format | Notes |
-|---|---|---|
-| Items | list or chips (count when long) | — |
-| Workflow | text | Workflow |
-| Instance | text | Instance |
-| Current step | text | Current Step |
-| Owner | text | Owner |
-| Started | 1 Oct 2026, 14:30 | Started |
-| Target | 1 Oct 2026, 14:30 | SLA deadline |
-| Time remaining | 1,234 | Minutes until breach; negative once breached |
-| Risk | text | Risk |
-| Escalation level | text | Escalation Level |
-| First reminder | 1 Oct 2026, 14:30 | First Reminder |
-| Second reminder | 1 Oct 2026, 14:30 | Second Reminder |
-| Manager escalation | 1 Oct 2026, 14:30 | Manager Escalation |
-| Executive escalation | 1 Oct 2026, 14:30 | Executive Escalation |
-| Final outcome | text | Final Outcome |
-| Next cursor | text | — |
-| Has more | yes / no (icon or chip) | — |
-| Summary | grouped details | The KPI tiles shown above the list on this screen. Computed over the whole filtered set, not the current page (decided 29 September … |
-| Within sla | 1,234 | Within SLA |
-| At risk | 1,234 | At Risk |
-
-**Minutes** (metric tile, from `listSlaEscalationBottleneck`)
-
-| Shows | Format | Notes |
-|---|---|---|
-| Items | list or chips (count when long) | — |
-| Workflow | text | Workflow |
-| Instance | text | Instance |
-| Current step | text | Current Step |
-| Owner | text | Owner |
-| Started | 1 Oct 2026, 14:30 | Started |
-| Target | 1 Oct 2026, 14:30 | SLA deadline |
-| Time remaining | 1,234 | Minutes until breach; negative once breached |
-| Risk | text | Risk |
-| Escalation level | text | Escalation Level |
-| First reminder | 1 Oct 2026, 14:30 | First Reminder |
-| Second reminder | 1 Oct 2026, 14:30 | Second Reminder |
-| Manager escalation | 1 Oct 2026, 14:30 | Manager Escalation |
-| Executive escalation | 1 Oct 2026, 14:30 | Executive Escalation |
-| Final outcome | text | Final Outcome |
-| Next cursor | text | — |
-| Has more | yes / no (icon or chip) | — |
-| Summary | grouped details | The KPI tiles shown above the list on this screen. Computed over the whole filtered set, not the current page (decided 29 September … |
-| Within sla | 1,234 | Within SLA |
-| At risk | 1,234 | At Risk |
-
-**Minutes** (metric tile, from `listSlaEscalationBottleneck`)
-
-| Shows | Format | Notes |
-|---|---|---|
-| Items | list or chips (count when long) | — |
-| Workflow | text | Workflow |
-| Instance | text | Instance |
-| Current step | text | Current Step |
-| Owner | text | Owner |
-| Started | 1 Oct 2026, 14:30 | Started |
-| Target | 1 Oct 2026, 14:30 | SLA deadline |
-| Time remaining | 1,234 | Minutes until breach; negative once breached |
-| Risk | text | Risk |
-| Escalation level | text | Escalation Level |
-| First reminder | 1 Oct 2026, 14:30 | First Reminder |
-| Second reminder | 1 Oct 2026, 14:30 | Second Reminder |
-| Manager escalation | 1 Oct 2026, 14:30 | Manager Escalation |
-| Executive escalation | 1 Oct 2026, 14:30 | Executive Escalation |
-| Final outcome | text | Final Outcome |
-| Next cursor | text | — |
-| Has more | yes / no (icon or chip) | — |
-| Summary | grouped details | The KPI tiles shown above the list on this screen. Computed over the whole filtered set, not the current page (decided 29 September … |
-| Within sla | 1,234 | Within SLA |
-| At risk | 1,234 | At Risk |
-
-**Longest Waiting Step** (metric tile, from `listSlaEscalationBottleneck`)
-
-| Shows | Format | Notes |
-|---|---|---|
-| Items | list or chips (count when long) | — |
-| Workflow | text | Workflow |
-| Instance | text | Instance |
-| Current step | text | Current Step |
-| Owner | text | Owner |
-| Started | 1 Oct 2026, 14:30 | Started |
-| Target | 1 Oct 2026, 14:30 | SLA deadline |
-| Time remaining | 1,234 | Minutes until breach; negative once breached |
-| Risk | text | Risk |
-| Escalation level | text | Escalation Level |
-| First reminder | 1 Oct 2026, 14:30 | First Reminder |
-| Second reminder | 1 Oct 2026, 14:30 | Second Reminder |
-| Manager escalation | 1 Oct 2026, 14:30 | Manager Escalation |
-| Executive escalation | 1 Oct 2026, 14:30 | Executive Escalation |
-| Final outcome | text | Final Outcome |
-| Next cursor | text | — |
-| Has more | yes / no (icon or chip) | — |
-| Summary | grouped details | The KPI tiles shown above the list on this screen. Computed over the whole filtered set, not the current page (decided 29 September … |
-| Within sla | 1,234 | Within SLA |
-| At risk | 1,234 | At Risk |
-
-**Every sla escalation bottleneck** (data table, from `listSlaEscalationBottleneck`)
+**Every sla escalation bottleneck** (data table)
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -1274,13 +1225,16 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Act on workflow instance (primary button) | `actOnWorkflowInstance` POST `/workflow-instances/{instanceId}/actions` | WorkflowInstanceActionInput | WorkflowInstance | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 The instance is completed or cancelled, the action does not apply in its current status (for example `resume` … | gated `APPROVAL_ACT`; opens modal first |
-
-**Data it reads**: `listSlaEscalationBottleneck` (onLoad, SLA, Escalation & Bottleneck Monitor)
+| Act on workflow instance (primary button) | navigation or local | — | — | — | — |
 
 **Where the user goes next**
 
-- → `ADM-248` Workflow Operations Command Center: *Returns to the board's landing screen*; calls `listSlaEscalationBottleneck`
+- → `ADM-248` Workflow Operations Command Center: *Returns to the board's landing screen*
+- → `BO-391` Live Escalation Operations Center: *Open Live Escalation Operations Center*; carries `instanceId`
+
+**What opens over it**
+
+- modal *Act on workflow instance*: **Collects what `actOnWorkflowInstance` sends before it is called.** Required: `action`, `reason`. Optional: `workflowStepExecutionId`, `workflowExceptionId`, `assigneePrincipalId`, `alternativeNodeId`, `correctedInput`, `extendByMinutes`, `priority`. Dismissing sends nothing; the screen behind is …
 
 #### States
 
@@ -1288,18 +1242,34 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 |---|---|
 | Loading (`?state=loading`) | The sla escalation bottleneck list. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the sla escalation bottleneck untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No sla escalation bottleneck yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, first run (`?state=emptyFirstRun`) | No sla escalation bottleneck yet. Offers no create action: nothing on this screen creates one, so for a monitor or a queue an empty list is the good outcome. Distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the sla escalation bottleneck are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks the permission BO-391 Live Escalation Operations Center requires; this id has no operation of its own since the merge, so it names that screen's. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 409 The instance is completed or cancelled, the action does not apply in its current status (for example `resume` on an instance that has not failed), or the step …; 422 A field the action needs is missing (assigneePrincipalId, extendByMinutes, priority, workflowExceptionId), the node is not skippable or the alternative is not … |
+
+#### Edge cases to draw
+
+- **Can read but not change (holds APPROVAL_VIEW only)**: Everything reads; the actions needing another permission are not offered as live buttons: APPROVAL_ACT for Act on workflow instance. Where the person would reasonably expect the action, it shows disabled with the permission named. The server refuses with 403 forbidden regardless. *(source: contracts/spine/approvals.yaml#actOnWorkflowInstance)*
+- **actOnWorkflowInstance answers 409**: Show it as something the person can act on, not a failure: The instance is completed or cancelled, the action does not apply in its current status (for example `resume` on an instance that has not failed), or the step to skip is an approval node *(source: contracts/spine/approvals.yaml#actOnWorkflowInstance)*
+- **actOnWorkflowInstance answers 422**: Show it as something the person can act on, not a failure: A field the action needs is missing (assigneePrincipalId, extendByMinutes, priority, workflowExceptionId), the node is not skippable or the alternative is not an allowed edge, or the assignee is the requester of the approval *(source: contracts/spine/approvals.yaml#actOnWorkflowInstance)*
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+metric tiles:
+  Within SLA: 3 h 20 min
+  At Risk: 0
+  Breached: 5
+  Escalated: 74
+  Minutes: 233
+  Longest Waiting Step: 3 h 20 min
+```
 
 #### Permissions
 
-- `listSlaEscalationBottleneck` → `APPROVAL_VIEW` (read) · staff
-- `actOnWorkflowInstance` → `APPROVAL_ACT` (operate) · staff
-
-**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks the permission BO-391 Live Escalation Operations Center requires; this id has no operation of its own since the merge, so it names that screen's.
 
 #### Requirements it meets
 
@@ -1309,7 +1279,7 @@ No matrix row traces to this screen's operations or data.
 
 None names this screen.
 
-Also apply: 1 for P09 · Platform, 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -1317,20 +1287,20 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-252` · status **notStarted** · provenance generated
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-252` · status **notStarted** · provenance generated
 - Client workshop board: `wireframes/WS137 Rules  Workflow  Approval   Automation Engine Board 2.dc.html#adm-252`
 - Workshop pack: Rules__Workflow__Approval___Automation_Engine_Reference.pdf board 2
-- Flow F165 *Rules Workflow Approval Automation Engine board 2: Workflow Operations Command …*, step 8: Works in SLA, Escalation & Bottleneck Monitor → Monitor workflows approaching or exceeding configured time limits.
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (9), with its required mark, default, format and its error state (404, 409, 422).
-- [ ] Every output is drawn (168 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
+- [ ] Every output is drawn (28 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-252?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Act on workflow instance.
-- [ ] Every transition is wired: `ADM-248`.
-- [ ] Every gated control is gated: `APPROVAL_ACT`, `APPROVAL_VIEW`.
+- [ ] Every transition is wired: `ADM-248`, `BO-391`.
+- [ ] Sign-in is asked only where the spec asks for it.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 3 edge case(s) from the process notes are drawn.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -1341,15 +1311,27 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Platform · wave 3 · needs the `core` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `APPROVAL_CONFIGURE` (1 configure); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `APPROVAL_CONFIGURE` (1 configure); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Display) and no metric row |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/platform/automation-execution-autonomous-action-monitor-adm-253` |
+
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
+
+**Known gaps.** Contract gap recorded 2 October 2026 (CHG-WIR-024): A read listing automated and autonomous action executions (what ran, when, on whose rule, outcome), paged; createAutomationAutonomouAction should …
+
+**From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** Actions TICVAI executed automatically: successful, failed, needing human confirmation, reversed; with the governance to suspend an automation.
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- The only operation creates an autonomous action; nothing lists executions. (CHG-WIR-024)
+
+**Fixed on main** (the package already carries these; draw what it says): Calls tenant-permission operations with no tenant picker and no platform-staff grant: createAutomationAutonomouAction (APPROVAL_CONFIGURE). (CHG-MOV-001).
 
 #### Inputs: what the user enters or picks
 
@@ -1424,6 +1406,18 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+today:
+  automatedActions: 1840
+  failed: 6
+  needingConfirmation: 12
+  reversed: 1
+```
+
 #### Permissions
 
 - `createAutomationAutonomouAction` → `APPROVAL_CONFIGURE` (configure) · staff
@@ -1438,7 +1432,7 @@ No matrix row traces to this screen's operations or data.
 
 None names this screen.
 
-Also apply: 1 for P09 · Platform, 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -1446,7 +1440,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-253` · status **notStarted** · provenance generated
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-253` · status **notStarted** · provenance generated
 - Client workshop board: `wireframes/WS137 Rules  Workflow  Approval   Automation Engine Board 2.dc.html#adm-253`
 - Workshop pack: Rules__Workflow__Approval___Automation_Engine_Reference.pdf board 2
 - Flow F165 *Rules Workflow Approval Automation Engine board 2: Workflow Operations Command …*, step 10: Works in Automation Execution & Autonomous Action Monitor → Provide visibility and governance over actions executed automatically by TICVAI. This becomes especially important as TICVAI becomes more AI-driven.
@@ -1470,17 +1464,23 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Platform · wave 3 · needs the `core` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `APPROVAL_VIEW` (1 read); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `APPROVAL_VIEW` (1 read); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/platform/cross-module-orchestration-monitor-adm-254` |
 
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
+
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+**From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** A workflow spanning several services (e.g. group booking confirmation) step by step across modules.
+
+**Fixed on main** (the package already carries these; draw what it says): Calls tenant-permission operations with no tenant picker and no platform-staff grant: listCrossModuleOrchestration (APPROVAL_VIEW). (CHG-MOV-001); emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything. (CHG-MOV-003).
 
 #### Inputs: what the user enters or picks
 
@@ -1511,10 +1511,28 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |---|---|
 | Loading (`?state=loading`) | The cross-module orchestration list. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the cross-module orchestration untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No cross-module orchestration yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, first run (`?state=emptyFirstRun`) | No cross-module orchestration yet. Offers no create action: nothing on this screen creates one, so for a monitor or a queue an empty list is the good outcome. Distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the cross-module orchestration are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+listCrossModuleOrchestration (CrossModuleOrchestrationMonitorView):
+- status: active
+  started: 01/10/2026 09:14
+  completed: 01/10/2026 09:14
+  duration: 12
+  failureHandling: waits
+- status: pending
+  started: 30/09/2026 18:02
+  completed: 30/09/2026 18:02
+  duration: 3
+  failureHandling: retries
+```
 
 #### Permissions
 
@@ -1530,7 +1548,7 @@ No matrix row traces to this screen's operations or data.
 
 None names this screen.
 
-Also apply: 1 for P09 · Platform, 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -1538,7 +1556,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-254` · status **notStarted** · provenance generated
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-254` · status **notStarted** · provenance generated
 - Client workshop board: `wireframes/WS137 Rules  Workflow  Approval   Automation Engine Board 2.dc.html#adm-254`
 - Workshop pack: Rules__Workflow__Approval___Automation_Engine_Reference.pdf board 2
 - Flow F165 *Rules Workflow Approval Automation Engine board 2: Workflow Operations Command …*, step 12: Works in Cross-Module Orchestration Monitor → Monitor complex workflows involving multiple TICVAI services. Example — Group Booking Confirmation
@@ -1562,15 +1580,21 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Platform · wave 3 · needs the `core` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `REPORT_VIEW_VENUE` (1 operate); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `REPORT_VIEW_VENUE` (1 operate); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | commandCentre (compact density): the pack gives this screen a metric directory (§Analyze; Measure; Compare) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a … |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/platform/workflow-analytics-process-performance-adm-255` |
+
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
+
+**From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** Workflow performance: volume, completion, failure, automation, escalation, rework, SLA compliance.
+
+**Fixed on main** (the package already carries these; draw what it says): Calls tenant-permission operations with no tenant picker and no platform-staff grant: listWorkflowProcessPerformance (REPORT_VIEW_VENUE). (CHG-MOV-001); emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything. (CHG-MOV-003).
 
 #### Inputs: what the user enters or picks
 
@@ -1630,6 +1654,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Delegation Rate** (metric tile)
 
+**Rules for what is shown** (from the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process; these refine the tables above and win where they differ)
+
+- **Money columns (Transaction Value)**: Money in the region's currency and scale, never a bare number: AED to 2 decimals, OMR/BHD/KWD to 3, the third decimal never rounded away (2.013 stays 2.013); the currency code is shown with the figure. Across tenants or regions figures in different currencies are never summed into one total; group by currency, or label the converted figure with its rate and time. *(source: ADR-0008; ADR-0011; DI-306)*
+
 **Data it reads**: `listWorkflowProcessPerformance` (onLoad, Workflow Analytics & Process Performance)
 
 **Where the user goes next**
@@ -1642,10 +1670,28 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | Loading (`?state=loading`) | The workflow analytics process list; the counts above it resolve separately. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the workflow analytics process untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No workflow analytics process yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, first run (`?state=emptyFirstRun`) | No workflow analytics process yet. Offers no create action: nothing on this screen creates one, so for a monitor or a queue an empty list is the good outcome. Distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the workflow analytics process are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+metric tiles:
+  Workflow Volume: 128
+  Completion Rate: 87%
+  Failure Rate: 71%
+  Average Completion Time: 3 h 20 min
+  Approval Time: 42 min
+  Automation Rate: 71%
+  Escalation Rate: 94%
+  Rejection Rate: 87%
+  Rework Rate: 71%
+  SLA Compliance: 94%
+```
 
 #### Permissions
 
@@ -1661,7 +1707,7 @@ No matrix row traces to this screen's operations or data.
 
 None names this screen.
 
-Also apply: 1 for P09 · Platform, 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -1669,7 +1715,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-255` · status **notStarted** · provenance generated
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-255` · status **notStarted** · provenance generated
 - Client workshop board: `wireframes/WS137 Rules  Workflow  Approval   Automation Engine Board 2.dc.html#adm-255`
 - Workshop pack: Rules__Workflow__Approval___Automation_Engine_Reference.pdf board 2
 - Flow F165 *Rules Workflow Approval Automation Engine board 2: Workflow Operations Command …*, step 14: Works in Workflow Analytics & Process Performance → Measure how effectively TICVAI's business workflows are performing.
@@ -1693,15 +1739,21 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Platform · wave 3 · needs the `core` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `REPORT_VIEW_VENUE` (1 operate); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `REPORT_VIEW_VENUE` (1 operate); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Identify; Display) and no metric row |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/platform/process-optimization-automation-opportunity-center-adm-256` |
+
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
+
+**From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** Processes worth simplifying or automating, by volume, steps, duration and exception rate.
+
+**Fixed on main** (the package already carries these; draw what it says): Calls tenant-permission operations with no tenant picker and no platform-staff grant: listProcessAutomationOpportunity (REPORT_VIEW_VENUE). (CHG-MOV-001); emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything. (CHG-MOV-003).
 
 #### Inputs: what the user enters or picks
 
@@ -1762,10 +1814,30 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |---|---|
 | Loading (`?state=loading`) | The process optimization automation list. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the process optimization automation untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No process optimization automation yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, first run (`?state=emptyFirstRun`) | No process optimization automation yet. Offers no create action: nothing on this screen creates one, so for a monitor or a queue an empty list is the good outcome. Distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the process optimization automation are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+listProcessAutomationOpportunity (ProcessOptimizationAutomationOpportunityCenterView):
+- opportunityType: repetitiveApproval
+  monthlyVolume: 12
+  currentSteps: 12
+  averageDuration: 12
+  manualSteps: 12
+  approvalRate: 12
+- opportunityType: unnecessaryApproval
+  monthlyVolume: 3
+  currentSteps: 3
+  averageDuration: 3
+  manualSteps: 3
+  approvalRate: 3
+```
 
 #### Permissions
 
@@ -1781,7 +1853,7 @@ No matrix row traces to this screen's operations or data.
 
 None names this screen.
 
-Also apply: 1 for P09 · Platform, 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -1789,7 +1861,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-256` · status **notStarted** · provenance generated
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-256` · status **notStarted** · provenance generated
 - Client workshop board: `wireframes/WS137 Rules  Workflow  Approval   Automation Engine Board 2.dc.html#adm-256`
 - Workshop pack: Rules__Workflow__Approval___Automation_Engine_Reference.pdf board 2
 - Flow F165 *Rules Workflow Approval Automation Engine board 2: Workflow Operations Command …*, step 16: Works in Process Optimization & Automation Opportunity Center → Identify business processes that should be simplified, redesigned or automated. This is where TICVAI moves beyond simply running workflows.
@@ -1813,15 +1885,21 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Platform · wave 3 · needs the `core` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `APPROVAL_VIEW` (1 read); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `APPROVAL_VIEW` (1 read); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Analyze) and no metric row |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/platform/ai-workflow-intelligence-autonomous-governance-center-adm-257` |
+
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
+
+**From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** AI observations across rules and workflows with recommendations that become draft changes, never applied directly.
+
+**Fixed on main** (the package already carries these; draw what it says): The table has no columns. (CHG-MOV-005); Calls tenant-permission operations with no tenant picker and no platform-staff grant: listWorkflowAutonomouGovernance (APPROVAL_VIEW). (CHG-MOV-001); emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything. (CHG-MOV-003).
 
 #### Inputs: what the user enters or picks
 
@@ -1841,21 +1919,33 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 | Shows | Format | Notes |
 |---|---|---|
-| Use case | text | AI use case identifier |
-| AI model | text | AI Model |
-| AI service | text | AI Service |
 | Use case | text | Use Case |
+| AI service | text | AI Service |
 | Autonomy level | chip: Observe, Recommend, Prepare, Governed automation, Autonomous low risk | Level 0 to 4; approval decisions are held at observe |
 | Decision scope | text | Decision Scope |
 | Confidence threshold | 1,234.5 | Confidence Threshold |
 | Human approval requirement | text | Human Approval Requirement |
 | Execution volume | 1,234 | Execution Volume |
 | Exception rate | 12.5% | Exception Rate |
+| Override rate | 12.5% | Override rate |
 | Last review | 1 Oct 2026, 14:30 | Last Review |
 | Owner | text | Owner |
-| Override rate | 12.5% | Override rate |
 
 **The selected workflow intelligence autonomous** (detail panel): The pack groups this record's detail under its own headings: “Natural-Language Questions”, “Actual common process”, “Automation”, “Approval Simplification”, “SLA”, “Workflow Redesign”.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Use case | text | Use Case |
+| AI service | text | AI Service |
+| Autonomy level | chip: Observe, Recommend, Prepare, Governed automation, Autonomous low risk | Level 0 to 4; approval decisions are held at observe |
+| Decision scope | text | Decision Scope |
+| Confidence threshold | 1,234.5 | Confidence Threshold |
+| Human approval requirement | text | Human Approval Requirement |
+| Execution volume | 1,234 | Execution Volume |
+| Exception rate | 12.5% | Exception Rate |
+| Override rate | 12.5% | Override rate |
+| Last review | 1 Oct 2026, 14:30 | Last Review |
+| Owner | text | Owner |
 
 **Data it reads**: `listWorkflowAutonomouGovernance` (onLoad, AI Workflow Intelligence & Autonomous Governance Center)
 
@@ -1865,10 +1955,24 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |---|---|
 | Loading (`?state=loading`) | The workflow intelligence autonomous list. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the workflow intelligence autonomous untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No workflow intelligence autonomous yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, first run (`?state=emptyFirstRun`) | No workflow intelligence autonomous yet. Offers no create action: nothing on this screen creates one, so for a monitor or a queue an empty list is the good outcome. Distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the workflow intelligence autonomous are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+listWorkflowAutonomouGovernance (AiWorkflowIntelligenceAutonomousGovernanceCenterView):
+- autonomyLevel: observe
+  confidenceThreshold: 12
+  executionVolume: 12
+- autonomyLevel: recommend
+  confidenceThreshold: 3
+  executionVolume: 3
+```
 
 #### Permissions
 
@@ -1886,7 +1990,7 @@ For this screen, newest first. An **Open question** is built to the default it s
 
 - AI actions in progress are shown step by step in an AI action command center; if a process only partly completes (e.g. missing information) it rolls back rather than leaving a product half-configured, and a full change history records everything AI modified. *(client request · MoM 21 Sep 2026, 4.9 Core AI Platform — AI Tools, Agents & Action Orchestration · DI-965)*
 
-Also apply: 1 for P09 · Platform, 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -1894,7 +1998,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-257` · status **notStarted** · provenance generated
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-257` · status **notStarted** · provenance generated
 - Client workshop board: `wireframes/WS137 Rules  Workflow  Approval   Automation Engine Board 2.dc.html#adm-257`
 - Workshop pack: Rules__Workflow__Approval___Automation_Engine_Reference.pdf board 2
 - Flow F165 *Rules Workflow Approval Automation Engine board 2: Workflow Operations Command …*, step 18: Works in AI Workflow Intelligence & Autonomous Governance Center → Create the AI intelligence layer across TICVAI's entire rules, workflow and automation ecosystem. This is the management-level AI brain for Area 13.
@@ -1902,7 +2006,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (13 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (22 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-257?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] No transition is declared; back returns where the user came from.
@@ -1916,12 +2020,16 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 ## Reference designs and the trackers for this platform
 
-**P09 reference designs** (from `handoff/design-batches/apps/6-ticvai-controller/README.md`)
+**P08 reference designs** (from `handoff/design-batches/apps/5-venue-management/README.md`)
 
 - `sources/designs/TICVAI_POS_Terminal_client_approved.html`: the client-approved POS, for operator density and components.
 - `sources/designs/TICVAI_Mobile.dc.html`: for finish and motion.
 
-**Design Vision Book rules that apply** (`sources/designs/Ticvai_Design_Vision_Book_v1_1.pdf`): DI-021, DI-022, DI-023, DI-024, DI-025, DI-027, DI-028, DI-029, DI-032, DI-033, DI-034, DI-036, DI-037, DI-038, DI-039, DI-040, DI-041, DI-042, DI-044, DI-045, DI-046, DI-047, DI-048, DI-049, DI-050, DI-051 (each is in the design inputs below).
+**Design Vision Book rules that apply** (`sources/designs/Ticvai_Design_Vision_Book_v1_1.pdf`): DI-021, DI-022, DI-023, DI-024, DI-025, DI-027, DI-028, DI-029, DI-030, DI-032, DI-033, DI-034, DI-036, DI-037, DI-038, DI-039, DI-040, DI-041, DI-042, DI-043, DI-044, DI-045, DI-046, DI-047, DI-048, DI-049, DI-050, DI-051, DI-052 (each is in the design inputs below).
+
+**Workshop tracker rows about P08 as a whole** (1: 1 open, 0 closed). Open first; a closed row says where it went on 30 September.
+
+- **S8** Venue Management back-end configuration wireframes *(Chinmay Parab · In progress · due Fri 2 Oct · 30 Sep 2026 · 30 Sep tracker)*
 
 ## Design inputs from the client meetings
 
@@ -1959,21 +2067,32 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Brand personality: Modern, AI-First, Enterprise, Premium, Reliable, Minimal, Scalable, Human-Centred. Visual essence: intelligent and forward-thinking, clean and minimal, trustworthy and secure, modern and timeless, scalable and flexible. *(agreed · Design Vision Book 29 Jul 2026, 02 Brand Identity (p2) - Brand personality / Visual essence · DI-021)*
 - Arabic is a core requirement, not later localisation: full Arabic RTL across web, mobile, POS, reports, emails, WhatsApp, SMS, notifications, tickets and receipts, and administrative interfaces. *(agreed · MoM 28 Jul 2026, 27. Internationalisation and Arabic Support · DI-019)*
 
-### Across P09 TICVAI Web
+### Across P08 Venue Management
 
-- Portal access exposes TICVAI pricing, so prospects submit contact details and a trade license as proof of a real venue, reviewed and approved by TICVAI before access is granted. *(agreed · MoM 10 Sep 2026, 4.8 Customer Portal Access, Authentication & Verification · DI-827)*
+- Qossai: configuration screens should consolidate related functionality, potentially merging 3-4 previously separate screens into one, rather than the repetitive one-screen-per-concept pattern of the AI-built reference system. *(agreed · MoM 24 Sep 2026, 4.5 Screen Consolidation Philosophy · DI-987)*
+- **Open question.** Open: should AI monitoring live in one centralised AI command dashboard or be distributed as widgets in each functional module's own dashboard? Allam: Softlabs' call; the current proposal is illustrative and Softlabs may propose a better structure. *(open · MoM 18 Sep 2026, 4.4 AI Governance — Risk, Compliance & Continuous Monitoring · DI-936)*
 - Simulation functionality stays embedded within each relevant configuration section rather than being consolidated, since it tests that section's own configuration. *(agreed · MoM 8 Sep 2026, 4.11 Dashboard & Reporting Module Consolidation Strategy · DI-722)*
+- Client boards (POS Frontline, F&B, Retail, Inventory & Procurement) share one architecture: six boards of ten screens per domain, a command centre first and an AI/analytics board last, under the hierarchy Company > Venue > Department > Workstation > Operator/Shift > Transaction > Exception > Reconciliation > Analytics. *(agreed · client-design-boards-audit 20 Aug 2026, Opening / What the boards give us · DI-400)*
+- Decision: RBAC per role, per module, three levels — edit/view, view-only, hidden (e.g. a marketing officer does not see Finance at all) — plus sub-permissions within a module (a CRM role may get Campaigns and Communications but not Journeys). Default role templates, admin-customisable. *(agreed · MoM 20 Aug 2026, 4.7 Role-Based Access Control (RBAC); 5. Key Decisions · DI-387)*
+- **Open question.** Allam: a user's visibility must be restrictable to specific outlets (an F&B manager of one outlet should not see other outlets' items); also relevant for ticketing/event-specific access. Implementation approach still open. *(open · MoM 18 Aug 2026, 4.6 Role-Based & Outlet-Level Access Control — Open Item · DI-331)*
+- Access loads automatically at login on POS and web/admin. A user with one role logs straight in; a user with several roles (e.g. admin, cashier, supervisor, manager) is prompted to choose which role to use. *(agreed · MoM 12 Aug 2026, 4. Multiple Roles per User and Role Switching · DI-249)*
+- Back office is role-driven from any device: a finance user signing in from a workstation, laptop or home sees only finance reports and related information. *(agreed · MoM 12 Aug 2026, 3. Role-Based Access and Workstation-Linked Front-End · DI-248)*
+- Built-in help menu with step-by-step tutorials with screenshots for common tasks (e.g. how to sell a ticket at the POS). *(client request · MoM 7 Aug 2026, 8. Legacy POS Layout Designer & System Logging · DI-160)*
+- Custom data-capture fields ("data mask") at account, event, extended-ticket and product level: field types text, dropdown, radio, true/false; multi-language labels; validation (min/max length, required/optional); reusable value lists (e.g. country list). Standard fields come out of the box. *(agreed · MoM 7 Aug 2026, 6. Data Mask: Flexible Custom Data Capture · DI-155)*
+- Load/traffic dashboards respect the tenancy model: a venue manager sees traffic for their own venue only. *(agreed · MoM 31 Jul 2026, 4. Non-Functional Requirements: Scalability & Availability · DI-061)*
+- Allam: queue management is built into the system (not third-party) so traffic entering the site can be throttled from the back office itself. *(agreed · MoM 31 Jul 2026, 4. Non-Functional Requirements: Scalability & Availability · DI-060)*
 - **Open question.** Proposed tenant hierarchy Tenant > Organization/Brand > Region > Branch > Venue > Department, under review against TICVAI's own organisational hierarchy before finalising. *(open · MoM 30 Jul 2026, 2. Proposed Multi-Tenant Hierarchy · DI-055)*
+- Documentation deliverable includes user guides and help content; the preview shows a TICVAI Help Center with categories (Getting Started, Events, Tickets, Orders, Payments, Memberships, Access Control, Reports, Integrations), a "Welcome to TICVAI" getting-started article and Quick Links (Create an Event, Set Pricing, Manage Access, View Reports). *(agreed · Design Vision Book 29 Jul 2026, 09 Deliverables (p9) - What We Deliver / Key Deliverables Preview · DI-052)*
 - Typeface Inter (Light, Regular, Medium, Semibold, Bold). Scale: H1 32/40 Bold, H2 24/32 Semibold, H3 20/28 Semibold, Body 1 16/24 Regular, Body 2 14/20 Regular, Caption 12/16 Regular. *(agreed · Design Vision Book 29 Jul 2026, 08 Design System (p8) - 2. Typography · DI-047)*
 - Palette ("modern, trustworthy and accessible"): Primary #0D6EFD, #00B8FF, #00D4C4, #0B1324; Neutral #F7F9FC, #E5E7EB, #9CA3AF, #4B5563, #1F2937. *(agreed · Design Vision Book 29 Jul 2026, 08 Design System (p8) - 1. Color Palette · DI-046)*
+- AI Assistant panel: a short framing ("Based on last 30 days, here are 3 actions that can improve your revenue") then actionable recommendations, each with its potential impact (e.g. "Increase pricing for VIP seats, +12%") and a chevron, plus "View all recommendations". *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - AI Panels · DI-043)*
 - Chart cards: title with period dropdown ("This Week"), headline metrics with deltas (Tickets Sold 12,840 +8.7%, Visitors, Conversion). Data visualisations must be easy to read. *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - Charts · DI-041)*
 - Tables: titled card with "View all", columns (e.g. Order ID, Customer, Amount, Status), coloured status badges (Paid, Pending, Refunded) and pagination with "Showing 1 to 5 of 245" and page numbers. *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - Tables · DI-039)*
 - Primary button spec: height 40px, padding 12px 24px, radius 8px, Inter 14 Semibold, colour #0D6EFD, width auto. *(agreed · Design Vision Book 29 Jul 2026, 09 Deliverables (p9) - Developer Handoff preview · DI-037)*
+- Back-office shell: collapsible left sidebar with Overview, Events, Tickets, Orders, Customers, Memberships, Access Control, POS, Reports, Analytics, AI Assistant, Settings, and the signed-in user (name, role) at the bottom; top bar with global search (Cmd+K), current time and date, Notifications with unread dot, and user menu. *(agreed · Design Vision Book 29 Jul 2026, 04 Dashboard Vision (p4) - navigation shell · DI-030)*
 - Dynamic KPIs, forecasts and real-time insights; role-based dashboards, preferences and smart shortcuts for every user (e.g. greeting "Good morning, Ahmed" on the home screen, p2). *(agreed · Design Vision Book 29 Jul 2026, 03 Visual Direction (p3) - Smarter Data / Personalized Experience · DI-028)*
-
-### In P09 · Platform
-
-- **Open question.** Open: should AI monitoring live in one centralised AI command dashboard or be distributed as widgets in each functional module's own dashboard? Allam: Softlabs' call; the current proposal is illustrative and Softlabs may propose a better structure. *(open · MoM 18 Sep 2026, 4.4 AI Governance — Risk, Compliance & Continuous Monitoring · DI-936)*
+- Reports and historical searches must still retrieve archived transactions when required; the retention period (e.g. keep 3 of 5+ years live) is configurable per customer, archival manual or automated. *(agreed · MoM 28 Jul 2026, 23. Database Optimisation and Archiving · DI-018)*
+- Back-office controls for the waiting room: configurable maximum active users and admission intervals, set per customer and venue. *(agreed · MoM 28 Jul 2026, 19. Auto-scaling and Virtual Waiting Room · DI-017)*
 
 **3 more name particular screens** and are in each screen's block above (*Client meeting inputs*).
 
@@ -1991,12 +2110,8 @@ Method, path, parameters, request and response for every operation these screens
 {
 "actOnWorkflowInstance": {"method":"POST","path":"/workflow-instances/{instanceId}/actions","contract":"approvals","summary":"An operator's intervention in a running workflow","permission":"APPROVAL_ACT","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"WorkflowInstanceActionInput","responds":"WorkflowInstance"},
 "createAutomationAutonomouAction": {"method":"POST","path":"/automation-autonomou-action","contract":"approvals","summary":"Automation Execution & Autonomous Action Monitor","permission":"APPROVAL_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"AutomationExecutionAutonomousActionMonitorInput","responds":"AutomationExecutionAutonomousActionMonitorView"},
-"decideApprovalRequest": {"method":"POST","path":"/approval-requests/{requestId}/decide","contract":"approvals","summary":"Approve, reject, return or ask for information","permission":"APPROVAL_DECIDE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"ApprovalRequest"},
-"getApprovalRequestScore": {"method":"GET","path":"/approval-requests/{approvalRequestId}/score","contract":"ai","summary":"The latest context score of an approval request","permission":"APPROVAL_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"AiApprovalRequestScore"},
-"listApprovalRequests": {"method":"GET","path":"/approval-requests","contract":"approvals","summary":"Requests awaiting a decision, or already decided","permission":"APPROVAL_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"assignedToMe","in":"query","required":null},{"name":"raisedByMe","in":"query","required":null},{"name":"status","in":"query","required":null},{"name":"kind","in":"query","required":null},{"name":"breachingWithinMinutes","in":"query","required":null},{"name":"sort","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listCrossModuleOrchestration": {"method":"GET","path":"/cross-module-orchestration","contract":"approvals","summary":"Cross-Module Orchestration Monitor","permission":"APPROVAL_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"correlationId","in":"query","required":false},{"name":"status","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listProcessAutomationOpportunity": {"method":"GET","path":"/process-automation-opportunity","contract":"approvals","summary":"Process Optimization & Automation Opportunity Center","permission":"REPORT_VIEW_VENUE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"opportunityType","in":"query","required":false},{"name":"module","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
-"listSlaEscalationBottleneck": {"method":"GET","path":"/sla-escalation-bottleneck","contract":"approvals","summary":"SLA, Escalation & Bottleneck Monitor","permission":"APPROVAL_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"workflow","in":"query","required":false},{"name":"risk","in":"query","required":false},{"name":"escalationLevel","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listWorkflow": {"method":"GET","path":"/workflow","contract":"approvals","summary":"Workflow Operations Command Center","permission":"APPROVAL_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"module","in":"query","required":false},{"name":"status","in":"query","required":false},{"name":"priority","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listWorkflowAutonomouGovernance": {"method":"GET","path":"/workflow-autonomou-governance","contract":"approvals","summary":"AI Workflow Intelligence & Autonomous Governance Center","permission":"APPROVAL_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"autonomyLevel","in":"query","required":false}],"requestBody":null,"responds":"AiWorkflowIntelligenceAutonomousGovernanceCenterView"},
 "listWorkflowExceptionFailure": {"method":"GET","path":"/workflow-exception-failure","contract":"approvals","summary":"Workflow Exception, Failure & Recovery Center","permission":"APPROVAL_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"errorType","in":"query","required":false},{"name":"module","in":"query","required":false},{"name":"priority","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
@@ -2011,21 +2126,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
-"AiApprovalRequestScore": {"type":"object","x-ticvai-persistence":"ai.approval_request_score","description":"**Context for an approval reviewer** (11.1.73..75): risk, priority and a suggested escalation for one pending request, the latest per request. **There is no approve or reject field, by design** (minutes of 8 September: AI in approvals never recommends or influences approve or reject).","required":["approvalRequestId","riskScore","riskBand","priorityScore","escalationSuggestion"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"approvalRequestId":{"type":"string","format":"uuid","x-ticvai-references":"approvals.request"},"trigger":{"type":"string","enum":["submitted","resubmitted","slaTick","escalated"]},"riskScore":{"type":"integer","minimum":0,"maximum":100},"riskBand":{"type":"string","enum":["low","medium","high","critical"],"description":"Design 5.6: a risk score and band, never a probability."},"priorityScore":{"type":"integer","minimum":0,"maximum":100,"description":"For ordering work in an inbox; higher first."},"escalationSuggestion":{"type":"object","required":["action"],"properties":{"action":{"type":"string","enum":["escalate","addBackupApprover","none"]},"reason":{"type":"string","nullable":true}},"description":"A suggestion for an SLA problem, carried out if at all by a person or the tenant's SLA policy."},"signals":{"type":"array","items":{"type":"object","properties":{"code":{"type":"string","description":"e.g. `amountAboveRequesterNorm`, `requesterEntityRisk`, `outOfHours`, `irreversibleAction`, `slaDueSoon`, `stepBreachRate`, `approverUnavailable`."},"contribution":{"type":"number"},"detail":{"type":"string","nullable":true}}}},"basis":{"$ref":"#/components/schemas/SuggestionBasis"},"decisionRecordId":{"type":"string","format":"uuid","nullable":true},"scoredAt":{"type":"string","format":"date-time","readOnly":true},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."}}},
 "AiWorkflowIntelligenceAutonomousGovernanceCenterView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over the AI use-case register, which belongs to the AI service (the AI design is under review, 29 September); not an approvals table and not read directly from here","description":"**What AI Workflow Intelligence & Autonomous Governance Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"useCaseId":{"type":"string","description":"AI use case identifier"},"aiModel":{"type":"string","description":"AI Model"},"aiService":{"type":"string","description":"AI Service"},"useCase":{"type":"string","description":"Use Case"},"autonomyLevel":{"type":"string","enum":["observe","recommend","prepare","governedAutomation","autonomousLowRisk"],"description":"Level 0 to 4; approval decisions are held at observe"},"decisionScope":{"type":"string","description":"Decision Scope"},"confidenceThreshold":{"type":"number","description":"Confidence Threshold"},"humanApprovalRequirement":{"type":"string","description":"Human Approval Requirement"},"executionVolume":{"type":"integer","description":"Execution Volume"},"exceptionRate":{"type":"number","description":"Exception Rate"},"lastReview":{"type":"string","format":"date-time","description":"Last Review"},"owner":{"type":"string","description":"Owner"},"overrideRate":{"type":"number","description":"Override rate"}},"required":["useCaseId"]},
-"ApprovalDecision": {"type":"object","x-ticvai-persistence":"approvals.decision","required":["level","principalId","decision","decidedAt"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true,"description":"**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"},"level":{"type":"integer"},"principalId":{"type":"string","format":"uuid"},"displayName":{"type":"string"},"isDelegate":{"type":"boolean"},"delegatedFrom":{"type":"string","format":"uuid","nullable":true},"decision":{"type":"string","enum":["approve","reject"]},"comment":{"type":"string","nullable":true},"reason":{"type":"string","nullable":true},"usedMfa":{"type":"boolean"},"signatureRef":{"type":"string","nullable":true},"decidedAt":{"type":"string","format":"date-time"}}},
-"ApprovalKind": {"type":"string","description":"11.1.7 and 11.1.30–11.1.37. **The first four already exist as bespoke implementations** and this contract is what they collapse into.\n**Which actions route here — decided 28 September, audit R144.** Finance and procurement acts go through this engine to a **finance approver**: closing a fiscal period (`periodClose`), reopening one (`periodReopen`), cancelling a purchase order (`purchaseOrderCancel`) and closing one short (`purchaseOrderShortClose`). The tenant default matrix for each of these names the finance approver role; a venue may tighten it and never loosen it. Starting a release rollout routes through `releasePromotion` to the platform release manager (a holder of `PLATFORM_RELEASE_PROMOTE`). **Not every `requiresApproval` goes here:** reopening a shift, recounting a stock count and a retail return above the venue threshold take a supervisor's step-up on the same device instead, and never raise a request.\n**Catalogue change requests route through `productChange` and `pricingChange`** (decided 29 September, writers pass): a product change and a price or pricing change raised in `catalogue` ask for approval under these two kinds, so a venue can route product edits and price edits to different approvers.\n","enum":["refund","priceOverride","discountOverride","complimentaryTicket","membershipCancellation","accessPermissionChange","configurationChange","aiRecommendation","releasePromotion","requisition","stockWriteOff","journalEntry","periodClose","periodReopen","purchaseOrderCancel","purchaseOrderShortClose","tenantMigration","productChange","pricingChange"]},
-"ApprovalMode": {"type":"string","description":"11.1.43–11.1.46. **Sequential** asks one at a time, **parallel** asks everyone at once, **consensus** needs all of them, **majority** needs more than half.\nParallel and consensus differ in when it completes: parallel completes on the first approval, consensus waits for all. Conflating them is how a four-eyes rule turns into a one-eye rule.\n","enum":["sequential","parallel","consensus","majority"]},
-"ApprovalRequest": {"type":"object","x-ticvai-persistence":"approvals.request","required":["id","kind","status","requestedByPrincipalId","requestedAt"],"properties":{"id":{"type":"string"},"kind":{"$ref":"#/components/schemas/ApprovalKind"},"rerouteOnNoApprover":{"type":"boolean","default":true,"description":"BL-154. **An approver on leave is an approval that waits for them to come back.** Reroutes to the next in the chain rather than stalling — `workforce` already knows who is on leave, and an approval queue nobody is watching is the thing that stops a venue.\n"},"outOfOfficeDelegateId":{"type":"string","format":"uuid","nullable":true},"allowEmailApproval":{"type":"boolean","default":false,"description":"**Approving from an email link with no second factor is the weakest path in the system**, so it is off by default and available only below a configured value.\n"},"reopenedFrom":{"type":"string","format":"uuid","nullable":true,"description":"**Reopening a decided approval creates a new one that points back.** Editing a decision in place destroys the record of what was originally approved, which is the only thing an audit wants.\n"},"status":{"$ref":"#/components/schemas/ApprovalStatus"},"subjectContract":{"type":"string"},"subjectType":{"type":"string"},"subjectId":{"type":"string"},"scopePath":{"type":"string"},"summary":{"type":"string"},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"justification":{"type":"string","nullable":true},"requestedByPrincipalId":{"type":"string","format":"uuid"},"matrixVersion":{"type":"integer"},"mode":{"$ref":"#/components/schemas/ApprovalMode"},"currentLevel":{"type":"integer"},"totalLevels":{"type":"integer"},"pendingApprovers":{"type":"array","items":{"type":"object","properties":{"principalId":{"type":"string","format":"uuid"},"displayName":{"type":"string"},"isDelegate":{"type":"boolean"}}}},"decisions":{"type":"array","description":"Every decision at every level, in order. **Immutable once the request completes** (11.1.56) — an approval is evidence, and amending one is a different fact.\n","items":{"$ref":"#/components/schemas/ApprovalDecision"}},"escalations":{"type":"array","description":"11.1.48. Who was asked, when, and why it moved up. **Escalation adds an approver rather than replacing one**, so the original stays in the record.\n","items":{"type":"object","properties":{"at":{"type":"string","format":"date-time"},"reason":{"type":"string"},"fromLevel":{"type":"integer"},"toLevel":{"type":"integer"},"wasAutomatic":{"type":"boolean"}}}},"resubmittedFromId":{"type":"string","nullable":true},"reopenedFromId":{"type":"string","nullable":true},"slaDueAt":{"type":"string","format":"date-time","nullable":true},"slaBreached":{"type":"boolean"},"expiresAt":{"type":"string","format":"date-time","nullable":true},"requestedAt":{"type":"string","format":"date-time"},"completedAt":{"type":"string","format":"date-time","nullable":true},"aiAssessment":{"type":"object","nullable":true,"readOnly":true,"description":"**AI context for the reviewer, never an input to the decision** (11.1.73 to 11.1.75; MoM 8 September; 29 September, build pass, group G2). Written by approvals from `ai.scoreApprovalRequest` on submit and on each SLA tick; null where AI is off or has not answered. Shown on the request labelled as AI; orders the inbox only when `sort=aiPriority` is asked for.","properties":{"riskScore":{"type":"integer","minimum":0,"maximum":100},"riskBand":{"type":"string","enum":["low","medium","high","critical"]},"priorityScore":{"type":"integer","minimum":0,"maximum":100},"escalationSuggestion":{"type":"object","description":"A suggestion a person may act on through `escalateApprovalRequest`, or the tenant's own SLA policy may; nothing escalates because of it.","properties":{"action":{"type":"string","enum":["escalate","addBackupApprover","none"]},"reason":{"type":"string","nullable":true}}},"signals":{"type":"array","maxItems":10,"description":"The signals behind the scores, largest first, as `ai.AiApprovalRequestScore.signals`.","items":{"type":"object","properties":{"code":{"type":"string"},"contribution":{"type":"number"},"detail":{"type":"string","nullable":true}}}},"scoreId":{"type":"string","format":"uuid","description":"The `ai.approval_request_score` row it was copied from; `ai.getApprovalRequestScore` gives the full context. Not a foreign key (the score lives in the AI service)."},"decisionRecordId":{"type":"string","description":"The ai decision record, for the audit of what the AI said and why."},"assessedAt":{"type":"string","format":"date-time"}}}}},
-"ApprovalStatus": {"type":"string","enum":["draft","pending","escalated","returned","informationRequested","approved","rejected","withdrawn","expired","cancelled"]},
 "AutomationExecutionAutonomousActionMonitorInput": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — request only; updates approvals.automation status (schema Automation) (data model for the agreed operations, 29 September)","description":"**What Automation Execution & Autonomous Action Monitor submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.","properties":{"command":{"type":"string","enum":["pause","resume","disable","killSwitch"],"description":"Control command"},"automationId":{"type":"string","description":"Automation to control"},"reason":{"type":"string","description":"Why the automation is being controlled"}},"required":["automationId","command"]},
 "AutomationExecutionAutonomousActionMonitorView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over approvals.automation and approvals.automation_execution (data model for the agreed operations, 29 September)","description":"**What Automation Execution & Autonomous Action Monitor displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"command":{"type":"string","enum":["pause","resume","disable","killSwitch"],"description":"Control command"},"automationId":{"type":"string","description":"Automation to control"},"automatedActionsToday":{"type":"integer","description":"Automated Actions Today"},"successful":{"type":"integer","description":"Successful"},"failed":{"type":"integer","description":"Failed"},"humanConfirmationRequired":{"type":"integer","description":"Actions waiting for human confirmation"},"reversed":{"type":"integer","description":"Reversed"},"suspended":{"type":"integer","description":"Suspended"},"estimatedManualActionsAvoided":{"type":"integer","description":"Estimated Manual Actions Avoided"},"estimatedTimeSaved":{"type":"integer","description":"Minutes"},"automation":{"type":"string","description":"Automation"},"businessObject":{"type":"string","description":"Business Object"},"rule":{"type":"string","description":"Rule"},"action":{"type":"string","description":"Action"},"result":{"type":"string","description":"Result"},"confidenceWhereAiAssisted":{"type":"number","description":"Confidence of an AI-assisted non-approval action; never set for approve or reject"},"executionTime":{"type":"string","format":"date-time","description":"Execution Time"},"status":{"type":"string","enum":["active","paused","disabled","killSwitched"],"description":"Status"},"reason":{"type":"string","description":"Why the automation is being controlled"}},"required":["automationId","command"]},
 "CrossModuleOrchestrationMonitorView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over approvals.workflow_step_execution joined to approvals.workflow_instance by correlation id (data model for the agreed operations, 29 September)","description":"**What Cross-Module Orchestration Monitor displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"service":{"type":"string","description":"Service"},"action":{"type":"string","description":"Action"},"status":{"type":"string","enum":["notStarted","running","waiting","successful","failed","compensated"],"description":"Status"},"started":{"type":"string","format":"date-time","description":"Started"},"completed":{"type":"string","format":"date-time","description":"Completed"},"duration":{"type":"integer","description":"Seconds"},"inputOutput":{"type":"string","description":"Input/Output"},"failureHandling":{"type":"string","enum":["waits","retries","rollsBack","continuesPartially","requiresHumanIntervention"],"description":"What the workflow does after this node fails"},"retries":{"type":"integer","description":"Retries"},"correlationId":{"type":"string","description":"a common correlation/workflow ID"}},"required":["correlationId","service"]},
 "Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}},
 "ProcessOptimizationAutomationOpportunityCenterView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — aggregated from approvals.workflow_instance and workflow_step_execution per process (data model for the agreed operations, 29 September)","description":"**What Process Optimization & Automation Opportunity Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"opportunityType":{"type":"string","enum":["repetitiveApproval","unnecessaryApproval","highManualWork","excessiveRework","longWaitingTime","duplicateSteps","highFailureRate","lowRiskManualAction","processBottleneck"],"description":"Kind of improvement opportunity"},"process":{"type":"string","description":"Process"},"module":{"type":"string","description":"Module"},"monthlyVolume":{"type":"integer","description":"Monthly Volume"},"currentSteps":{"type":"integer","description":"Current Steps"},"averageDuration":{"type":"integer","description":"Minutes"},"manualSteps":{"type":"integer","description":"Manual Steps"},"approvalRate":{"type":"number","description":"Approval Rate"},"exceptionRate":{"type":"number","description":"Exception Rate"},"estimatedOpportunity":{"type":"string","description":"Estimated Opportunity"}},"required":["process"]},
-"SlaEscalationBottleneckMonitorView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over approvals.workflow_instance, whose SLA and reminder timestamps it lists (data model for the agreed operations, 29 September)","description":"**What SLA, Escalation & Bottleneck Monitor displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"workflow":{"type":"string","description":"Workflow"},"instance":{"type":"string","description":"Instance"},"currentStep":{"type":"string","description":"Current Step"},"owner":{"type":"string","description":"Owner"},"started":{"type":"string","format":"date-time","description":"Started"},"target":{"type":"string","format":"date-time","description":"SLA deadline"},"timeRemaining":{"type":"integer","description":"Minutes until breach; negative once breached"},"risk":{"type":"string","description":"Risk"},"escalationLevel":{"type":"string","description":"Escalation Level"},"firstReminder":{"type":"string","format":"date-time","description":"First Reminder"},"secondReminder":{"type":"string","format":"date-time","description":"Second Reminder"},"managerEscalation":{"type":"string","format":"date-time","description":"Manager Escalation"},"executiveEscalation":{"type":"string","format":"date-time","description":"Executive Escalation"},"finalOutcome":{"type":"string","description":"Final Outcome"}},"required":["instance"]},
-"SlaEscalationBottleneckMonitorViewSummary": {"type":"object","x-ticvai-persistence":"none - aggregate computed at read time over the rows the page lists","description":"The KPI tiles shown above the list on this screen. Computed over the whole filtered set, not the current page (decided 29 September, readiness close-out).","properties":{"withinSla":{"type":"integer","description":"Within SLA"},"atRisk":{"type":"integer","description":"At Risk"},"breached":{"type":"integer","description":"Breached"},"escalated":{"type":"integer","description":"Escalated"},"averageProcessingTime":{"type":"integer","description":"Minutes"},"averageApprovalTime":{"type":"integer","description":"Minutes"},"longestWaitingStep":{"type":"string","description":"Longest Waiting Step"}}},
-"SuggestionBasis": {"type":"string","description":"**How the answer was reached, and this is the field the whole design exists for.**\nA venue must be able to see that today's price suggestion is a margin rule and next quarter's is a trained model — **the same operation, the same screen, a different basis** — and a screen that cannot say which is a screen that asks a manager to trust arithmetic it will not show.\n**Swapping a heuristic for a model is a provider change, not a contract change.** That is the point of the abstraction: the frontend, the audit record and the outcome capture all stay exactly as they are.\n","enum":["heuristic","statistical","model","hybrid","manual"]},
 "WorkflowAnalyticsProcessPerformanceView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — aggregated from approvals.workflow_instance, workflow_step_execution, automation_execution, request, decision and escalation (data model for the agreed operations, 29 September)","description":"**What Workflow Analytics & Process Performance displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"workflowVolume":{"type":"integer","description":"Workflow Volume"},"completionRate":{"type":"number","description":"Completion Rate"},"failureRate":{"type":"number","description":"Failure Rate"},"averageCompletionTime":{"type":"integer","description":"Minutes"},"approvalTime":{"type":"integer","description":"Minutes"},"automationRate":{"type":"number","description":"Automation Rate"},"escalationRate":{"type":"number","description":"Escalation Rate"},"rejectionRate":{"type":"number","description":"Rejection Rate"},"reworkRate":{"type":"number","description":"Rework Rate"},"slaCompliance":{"type":"number","description":"Percent within SLA"},"averageApprovalTime":{"type":"integer","description":"Minutes"},"approvalRate":{"type":"number","description":"Approval Rate"},"requestChangesRate":{"type":"number","description":"Request Changes Rate"},"delegationRate":{"type":"number","description":"Delegation Rate"},"manualStepsRemoved":{"type":"integer","description":"Manual Steps Removed"},"processingTimeSaved":{"type":"integer","description":"Minutes"},"workloadReduced":{"type":"number","description":"Staff hours"},"costSavingWhereMeasurable":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Cost Saving where measurable"}}},
 "WorkflowExceptionFailureRecoveryCenterView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over approvals.workflow_exception (schema WorkflowException) (data model for the agreed operations, 29 September)","description":"**What Workflow Exception, Failure & Recovery Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"errorType":{"type":"string","enum":["businessRuleFailure","missingData","missingApprover","permissionFailure","integrationFailure","timeout","actionFailure","invalidState","duplicateEvent","serviceUnavailable","configurationError"],"description":"Kind of failure"},"exceptionId":{"type":"string","description":"Exception ID"},"workflow":{"type":"string","description":"Workflow"},"instance":{"type":"string","description":"Instance"},"module":{"type":"string","description":"Module"},"failedStep":{"type":"string","description":"Step that failed"},"time":{"type":"string","format":"date-time","description":"Time"},"businessImpact":{"type":"string","description":"Business Impact"},"priority":{"type":"string","description":"Priority"},"owner":{"type":"string","description":"Owner"},"retryCount":{"type":"integer","description":"Retry count"}},"required":["exceptionId"]},
 "WorkflowInstance": {"type":"object","x-ticvai-persistence":"approvals.workflow_instance","description":"**One running workflow** (pack 13.2.1, 13.2.3 and 13.2.5; data model for the agreed operations, 29 September). Started by a `WorkflowTrigger`, on the version in force at that moment and kept on it to the end (audit R129). Its steps are `WorkflowStepExecution` rows, keyed by the same `correlationId` the participating services trace with. **The SLA clock and its reminder and escalation timestamps are held here**, not in a table of their own: there is one clock per instance, and the SLA, Escalation & Bottleneck Monitor lists instances. Lifecycle in `states/workflow-instance.yaml`. The engine writes this row; an operator changes it only through `actOnWorkflowInstance`, which keeps each change as a `WorkflowIntervention` (decided 29 September, writers pass).","required":["id","workflowDefinitionId","workflowVersionId","sourceModule","status","correlationId","startedAt"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"workflowDefinitionId":{"type":"string","format":"uuid"},"workflowVersionId":{"type":"string","format":"uuid","description":"The version the instance started on; never changes"},"workflowTriggerId":{"type":"string","format":"uuid","nullable":true},"sourceModule":{"$ref":"#/components/schemas/WorkflowModule"},"businessObjectType":{"type":"string","maxLength":100,"nullable":true},"businessObjectId":{"type":"string","nullable":true,"description":"**A reference, never a copy**, as `ApprovalRequest.subjectId`"},"initiatedByPrincipalId":{"type":"string","format":"uuid","nullable":true,"description":"Null when a system event or schedule started it"},"ownerPrincipalId":{"type":"string","format":"uuid","nullable":true},"priority":{"type":"string","maxLength":30,"nullable":true},"currentNodeId":{"type":"string","nullable":true,"description":"The node of the version's graph the instance is at"},"status":{"$ref":"#/components/schemas/WorkflowInstanceStatus"},"correlationId":{"type":"string","maxLength":100,"description":"The shared correlation id every participating service logs, for distributed tracing"},"slaPolicyId":{"type":"string","format":"uuid","nullable":true,"description":"The `ApprovalSlaPolicy` whose clock runs on this instance"},"slaDueAt":{"type":"string","format":"date-time","nullable":true},"slaBreached":{"type":"boolean","default":false},"escalationLevel":{"type":"integer","minimum":0,"default":0},"firstReminderAt":{"type":"string","format":"date-time","nullable":true},"secondReminderAt":{"type":"string","format":"date-time","nullable":true},"managerEscalatedAt":{"type":"string","format":"date-time","nullable":true},"executiveEscalatedAt":{"type":"string","format":"date-time","nullable":true},"slaOutcome":{"type":"string","enum":["metWithinTarget","metAfterReminder","metAfterEscalation","breached"],"nullable":true,"description":"How the instance finished against its SLA; set on completion (the monitor's Final Outcome)"},"startedAt":{"type":"string","format":"date-time"},"completedAt":{"type":"string","format":"date-time","nullable":true},"scopePath":{"type":"string","description":"The partition key (ADR-0005). Written at venue scope"},"updatedAt":{"type":"string","format":"date-time","readOnly":true}}},

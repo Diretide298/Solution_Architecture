@@ -1,22 +1,22 @@
 {
  "scope": "platform",
- "generated": "2026-10-01",
+ "generated": "2026-10-02",
  "note": "Derived on every run by tools/build-status.py. A hand-maintained status page is worse than none, because somebody plans against it.",
  "counts": {
-  "operations": 2668,
+  "operations": 2731,
   "contracts": 33,
-  "tables": 1095,
+  "tables": 1112,
   "stores": 10,
   "foreignKeys": 796,
   "indexes": 2825,
   "tablesWritten": 1093,
-  "relationships": 3048,
-  "states": 206,
+  "relationships": 3062,
+  "states": 207,
   "events": 77,
   "flows": 97,
-  "flowsDerived": 192,
-  "adrs": 69,
-  "screens": 2445,
+  "flowsDerived": 193,
+  "adrs": 70,
+  "screens": 2450,
   "platforms": 16,
   "frontends": 13,
   "apps": 5,
@@ -26,22 +26,22 @@
   "design": [
    {
     "name": "API data lineage resolved",
-    "done": 2655,
-    "total": 2668,
-    "percent": 100,
+    "done": 2696,
+    "total": 2731,
+    "percent": 99,
     "note": "Every operation maps to the tables it reads and writes."
    },
    {
     "name": "Operations declaring an auth model",
-    "done": 2668,
-    "total": 2668,
+    "done": 2731,
+    "total": 2731,
     "percent": 100,
     "note": "A permission, an auth mode, or a declared audience. None may be silent."
    },
    {
     "name": "Screens defined, specified and given a purpose",
-    "done": 2445,
-    "total": 2445,
+    "done": 2450,
+    "total": 2450,
     "percent": 100,
     "note": "Loading, empty and error states written for each."
    },
@@ -68,23 +68,23 @@
    },
    {
     "name": "State models",
-    "done": 206,
-    "total": 383,
-    "percent": 54,
+    "done": 207,
+    "total": 388,
+    "percent": 53,
     "note": "The denominator is status enums in contracts. Some models describe behaviour with no enum, so this can exceed 100%."
    },
    {
     "name": "Tables with a relationship",
-    "done": 1013,
-    "total": 1109,
+    "done": 1023,
+    "total": 1126,
     "percent": 91,
     "note": "The remainder are partitions, platform-written tables and caches, each stating why."
    },
    {
     "name": "Screens with operations",
-    "done": 2438,
-    "total": 2445,
-    "percent": 100,
+    "done": 2383,
+    "total": 2450,
+    "percent": 97,
     "note": "The remainder are static, workshop-blocked, or navigation shells."
    },
    {
@@ -103,8 +103,8 @@
    },
    {
     "name": "Operations reaching a screen",
-    "done": 2436,
-    "total": 2668,
+    "done": 2486,
+    "total": 2731,
     "percent": 91,
     "note": "Not a defect on its own \u2014 sync, webhook and job operations have no screen."
    },
@@ -127,8 +127,8 @@
    {
     "name": "Tables written",
     "done": 1093,
-    "total": 1095,
-    "percent": 100,
+    "total": 1112,
+    "percent": 98,
     "note": "Counted from backend/. ADR-0024 said DDL waits for the design to settle; ADR-0038 and ADR-0039 settled it."
    },
    {
@@ -176,8 +176,8 @@
   "build": 33
  },
  "waves": {
-  "wave1": 185,
-  "wave2": 268,
+  "wave1": 189,
+  "wave2": 269,
   "wave3": 1992
  },
  "platformBreakdown": [
@@ -203,7 +203,7 @@
    "app": "venue-pos",
    "targetApp": "venue-pos",
    "operator": "venue",
-   "screens": 30
+   "screens": 32
   },
   {
    "code": "P05",
@@ -235,7 +235,7 @@
    "app": "venue-management-web",
    "targetApp": "venue-management",
    "operator": "venue",
-   "screens": 1186
+   "screens": 1661
   },
   {
    "code": "P09",
@@ -243,7 +243,7 @@
    "app": "ticvai-web",
    "targetApp": "ticvai-control",
    "operator": "ticvai",
-   "screens": 676
+   "screens": 211
   },
   {
    "code": "P10",
@@ -251,7 +251,7 @@
    "app": "partner-web",
    "targetApp": "ticvai-control",
    "operator": "partner",
-   "screens": 51
+   "screens": 43
   },
   {
    "code": "P11",
@@ -299,7 +299,7 @@
    "app": "venue-management-web",
    "targetApp": "venue-management",
    "operator": "venue",
-   "screens": 70
+   "screens": 71
   },
   {
    "code": "P17",
@@ -311,8 +311,8 @@
   }
  ],
  "conflicts": {
-  "open": 9,
-  "closed": 157,
+  "open": 8,
+  "closed": 158,
   "withdrawn": 6,
   "blocking": 0,
   "byOwner": {
@@ -322,12 +322,10 @@
    "Allam": 1,
    "Chinmay + Qossai": 1,
    "Qossai + finance": 1,
-   "Qossai": 1,
    "Allam + counsel": 1
   },
   "openIds": [
    "CF-35",
-   "CF-127",
    "CF-133",
    "CF-140",
    "CF-162",

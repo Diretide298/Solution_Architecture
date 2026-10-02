@@ -14,30 +14,23 @@ contracts:
 - subscription
 platforms:
 - P04
-- P08
 trigger:
   description: A guest buys merchandise at a counter.
 offlineBehaviour: '**Works offline** — the retail till is local-first like the ticket till.'
 steps:
 - step: 1
-  screen: BO-021
-  action: Order Search.
+  screen: POS-025
+  action: 'Till Home: the store''s overview before the sale.'
   operations:
-  - getGuestOrderStatus
-  - recordOrderHandover
-  outcome: '**Drawn by the client as RET-3A.** 2 operations on this step.'
+  - getWorkstationShift
+  - listSaleBoards
+  outcome: '**The operator arrives at the sale from the till''s own overview** (repointed 2 October 2026, CHG-CLN-005): RET-3A is the client''s cross-store command centre, not the back office''s order search (BO-021), and a back-office search does not open a till on another device.'
 - step: 2
   screen: POS-002
   action: Sell — Ticket Catalogue.
   operations:
-  - exchangeOrderLines
-  - getOrderStatement
   - holdOrder
-  - listOrderRefunds
-  - modifyOrder
-  - rescheduleOrder
   outcome: '**Drawn by the client as RET-3B.** 8 operations on this step.'
-  crossesDevice: true
 - step: 3
   screen: POS-005
   action: Payment.

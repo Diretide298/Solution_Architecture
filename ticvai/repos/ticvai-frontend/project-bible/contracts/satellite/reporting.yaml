@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Reporting & Analytics
   version: 0.1.0
-  x-ticvai-screen-count: 46
+  x-ticvai-screen-count: 49
   x-ticvai-tier: satellite
   x-ticvai-module: 8 — Unified Operations Dashboard  ·  cross-cutting
   x-ticvai-requirements: 332
@@ -80,6 +80,9 @@ paths:
         audit R282).** Code, what it shows, its data source, and the screen that runs it:
 
         - `terminalDayView`: sales, tenders, voids and refunds for one terminal today (`orders`); POS-008.
+        **Its cash-tender figures are withheld from the cashier of an open shift** (CHG-FIN-003, 2 October
+        2026): float plus cash takings is the expected drawer, so showing them would undo the blind count.
+        What else a cashier sees of it is the per-role switch of DI-802.
 
         - `salesByChannel`: net sales per sales channel for the period (`orders`); BO-059.
 
@@ -87,7 +90,8 @@ paths:
         (`scanEvents`); BO-060.
 
         - `shiftSummary`: each till shift''s takings, expected against counted cash, and variance
-        (`shifts`); POS-020.
+        (`shifts`); POS-020. **Supervisors only**: the expected and variance columns need OVERSHORT_ACCEPT
+        at the venue and are never shown to the cashier whose shift it is (CHG-FIN-003).
 
         - `refunds`: refunds by reason, operator and tender (`refunds`).
 
@@ -99,6 +103,15 @@ paths:
         - `fnbSales`: F&B sales by outlet, item and hour (`orderLines`, F&B outlets only).
 
         Each is run with `runReport` naming its `reportId`; a screen that runs a report names which.
+
+        **One reporting area, one set of numbers** (decided 2 October 2026, Chinmay; CHG-FIN-006; DI-721,
+        DI-702). Analytics (P16) is the reporting area. The till reports (POS-008, POS-020) and the
+        back-office report screens (BO-058, BO-059, BO-060, BO-1081 and the module report screens) are
+        scoped windows onto the same seeded definitions and the same seeded KPIs (`ReportingSystemKpi`),
+        run by `runReport` and `getKpiValues` against the same replica: a figure on a till or a back-office
+        screen is the figure Analytics shows for the same scope, period and as-of time. A screen never
+        computes a total of its own from another read, and a module never keeps a second definition of
+        a measure.
 
         '
       tags:
@@ -300,13 +313,11 @@ paths:
     get:
       operationId: listAlerts
       x-ticvai-consumed-by:
-        - "P04 POS-009 Staff Roster"
         - "P04 POS-020 Shift Exceptions & Alerts"
         - "P04 POS-025 Till Home"
         - "P06 EMP-061 Retail Inventory Command Center"
         - "P06 EMP-070 Inventory Exceptions, AI Replenishment & Action Center"
         - "P08 BO-036 Device Registry"
-        - "P08 BO-125 Product & Category Button Configuration"
         - "P08 BO-133 Offline Alerts, Limits & Audit"
         - "P08 BO-141 Operational Alerts, AI Replenishment & Action Center"
         - "P08 BO-886 Staffing Gap & Coverage Control Center"
@@ -445,6 +456,7 @@ paths:
         - "P08 BO-262 Access Reports, Scheduled Reporting & Data Export"
         - "P10 PTR-018 Reports & Sales Performance"
         - "P12 SUP-008 Agent Performance & SLA View"
+        - "P16 ANL-023 Drag-and-Drop Dashboard Canvas"
         - "P16 ANL-031 Report Catalogue & Library"
       x-ticvai-api-scope: analytics.read
       x-ticvai-audience:
@@ -571,6 +583,7 @@ paths:
         - "P08 BO-060 Attendance & Footfall"
         - "P10 PTR-018 Reports & Sales Performance"
         - "P12 SUP-008 Agent Performance & SLA View"
+        - "P16 ANL-023 Drag-and-Drop Dashboard Canvas"
       x-ticvai-api-scope: analytics.read
       x-ticvai-audience:
       - staff
@@ -667,7 +680,6 @@ paths:
     delete:
       operationId: deleteReport
       x-ticvai-consumed-by:
-        - "P04 POS-008 Reports"
         - "P08 BO-029 Report Builder"
         - "P08 BO-058 Reporting Home"
         - "P08 BO-059 Sales Reports"
@@ -771,12 +783,9 @@ paths:
         - "P08 BO-060 Attendance & Footfall"
         - "P08 BO-1059 Heat Maps & Drill-Down"
         - "P08 BO-1082 Admissions Revenue"
-        - "P08 BO-115 Category, Brand & Merchandise Hierarchy"
         - "P08 BO-118 Campaign & Audience Management"
-        - "P08 BO-126 Deployment, Preview & Audit"
         - "P08 BO-133 Offline Alerts, Limits & Audit"
         - "P08 BO-262 Access Reports, Scheduled Reporting & Data Export"
-        - "P08 BO-682 Accreditation Export & Data Extract Center"
         - "P10 PTR-018 Reports & Sales Performance"
         - "P12 SUP-008 Agent Performance & SLA View"
         - "P16 ANL-001 Executive Command Center"
@@ -1204,7 +1213,6 @@ paths:
       operationId: exportReportResult
       x-ticvai-consumed-by:
         - "P08 BO-1060 Report Builder, Export & Audit"
-        - "P08 BO-682 Accreditation Export & Data Extract Center"
         - "P16 ANL-045 Export & Download Center"
       x-ticvai-audience:
       - staff
@@ -1346,6 +1354,7 @@ paths:
     get:
       operationId: listDashboards
       x-ticvai-consumed-by:
+        - "P08 BO-1081 Finance Dashboard"
         - "P09 ADM-031 Security & Compliance Dashboard"
         - "P16 ANL-021 Dashboard Library"
         - "P16 ANL-068 Embedded BI, Workspace & Tenant Administration"
@@ -1444,6 +1453,15 @@ paths:
             the client, because hiding an option enforces nothing.
 
             '
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '422':
+          description: A tile's report lacks the column encodings its visualisation needs (problem type
+            `tile-encoding-missing`, CHG-FIN-007; the rule is on `DashboardTile.visualisation`).
+          x-ticvai-problem-types:
+          - tile-encoding-missing
           content:
             application/problem+json:
               schema:
@@ -1559,6 +1577,15 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '422':
+          description: A tile's report lacks the column encodings its visualisation needs (problem type
+            `tile-encoding-missing`, CHG-FIN-007), as `createDashboard`.
+          x-ticvai-problem-types:
+          - tile-encoding-missing
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     delete:
@@ -1605,6 +1632,7 @@ paths:
       operationId: askReportingQuestion
       x-ticvai-consumed-by:
         - "P04 POS-008 Reports"
+        - "P06 EMP-020 AI assistant — answer"
         - "P08 BO-029 Report Builder"
         - "P08 BO-058 Reporting Home"
         - "P08 BO-059 Sales Reports"
@@ -1736,7 +1764,6 @@ paths:
     post:
       operationId: saveNaturalLanguageQuery
       x-ticvai-consumed-by:
-        - "P04 POS-008 Reports"
         - "P08 BO-029 Report Builder"
         - "P08 BO-058 Reporting Home"
         - "P08 BO-059 Sales Reports"
@@ -2031,6 +2058,7 @@ paths:
     get:
       operationId: getKpiValues
       x-ticvai-consumed-by:
+        - "P06 EMP-060 Reservation & Table Performance"
         - "P06 EMP-061 Retail Inventory Command Center"
         - "P08 BO-005 Queue Monitor"
         - "P08 BO-100 Venue Home"
@@ -2050,7 +2078,6 @@ paths:
         - "P08 BO-684 Accreditation Executive Dashboard"
         - "P08 BO-685 Accreditation Status & Portfolio Reporting"
         - "P08 BO-688 Accreditation Trend & Comparative Analysis"
-        - "P08 BO-733 Service Channel Configuration"
         - "P08 BO-833 Gamification Analytics & Audit"
         - "P16 ANL-012 Live Operations Dashboard"
         - "P16 ANL-013 Revenue Pulse"
@@ -2060,6 +2087,7 @@ paths:
         - "P16 ANL-017 Customer, Membership & Loyalty Pulse"
         - "P16 ANL-057 Forecasting & Predictive Analytics Studio"
         - "P16 ANL-063 KPI Targets, Thresholds & Scorecards"
+        - "P16 ANL-072 Finance Dashboard"
       summary: Current values, against target, with movement
       description: 'BI boards 1 and 10.3. **The scorecard read.** Value, target, variance, direction and
         freshness in one call — a dashboard assembling those from four places will render three of them
@@ -2067,10 +2095,20 @@ paths:
 
         **Takings and admissions are always offered (decided 28 September, audit R283).** Two system KPIs
         are seeded at provisioning for every tenant, so a hub can ask for them by code without knowing
-        an id: `takings`, the gross value of payments taken in the period (currency, from `orders`
-        payments less refunds), and `admissions`, admitted in-direction scans in the period (count, from
-        `access.scan_event`). With no `period`, the period is today in the venue''s time zone. The
-        back-office hubs and the Queue Monitor read their takings and admissions tiles here.
+        an id: `takings`, the money taken in the period less the money paid back (currency; defined in
+        `ReportingSystemKpi`, CHG-FIN-010), and `admissions`, admitted in-direction scans in the period
+        (count, from `access.scan_event`). With no `period`, the period is today in the venue''s time zone.
+        The back-office hubs and the Queue Monitor read their takings and admissions tiles here.
+        **Takings is not revenue** and never feeds a Gross sales, Net revenue, Recognised revenue or
+        Deferred revenue tile (CHG-FIN-002).
+
+        **The finance measures are seeded too** (decided 2 October 2026, Chinmay; CHG-FIN-007):
+        `grossSales`, `discounts`, `refunds`, `netRevenue`, `recognisedRevenue`, `deferredRevenue` and
+        `taxCollected`, each with its formula in `ReportingSystemKpi`. The formulas follow the D-185
+        default (gross sales excluding VAT; net revenue is gross sales less discounts less refunds);
+        **client finance sign-off is pending**. `groupBy` splits them by `venue`, `channel`, `product`,
+        `attraction` or `businessUnit` (the dimensions their order lines carry), and `takings` also by
+        `tender`, `workstationId` or `shiftId`.
 
 
         **Accreditation KPIs are seeded too, where the accreditation module is on** (12.1.50, 29 September,
@@ -2084,6 +2122,23 @@ paths:
         draws; `groupBy` splits each value by one dimension the KPI''s source carries — `status` and
         `categoryCode` for the accreditation KPIs, `tierCode` for the loyalty ones — with `groupKey` set.
         Without either, one value per KPI, as before.
+
+
+        **One module''s takings** (Chinmay, 2 October, workbook Q181; CHG-CSA-020). `module` restricts a KPI to the
+        sales of one module''s outlets and products: the F&B hub (BO-104) shows `takings` with `module=fnb`, and
+        admissions are not on it. `takings` also splits by `saleBoardId`, the sales per till layout the POS
+        experience dashboard shows (contract gap CHG-WIR-024, BO-122; errors per board stay a gap, CHG-CSA-047).
+
+
+        **The restaurant measures are seeded where F&B is on** (Chinmay, 2 October, workbook Q205: "all four, from
+        reporting"; DI-400; CHG-CSA-020): `tableTurnTime`, `noShowRate`, `covers` and `waitQuoteAccuracy`, each
+        with its source in `ReportingSystemKpi`, so the staff app and the back office show the same numbers
+        (CHG-FIN-006).
+
+
+        **The finance dashboard is one P16 dashboard** (Chinmay, 2 October, workbook Q219; DI-721; CHG-CSA-022): the
+        Finance standard dashboard is seeded per tenant from the finance measures above and lives in Analytics;
+        Orders & Money (BO-1081) shows a link card to it rather than a second copy.
 
         '
       tags:
@@ -2137,6 +2192,12 @@ paths:
           `tierCode`. A dimension the source does not carry is `400`.
         schema:
           type: string
+      - name: module
+        in: query
+        description: Only the sales of this module's outlets and products, e.g. `fnb` for the F&B hub's takings
+          (workbook Q181; CHG-CSA-020). A KPI whose source has no module is `400`.
+        schema:
+          $ref: ../shared/common.yaml#/components/schemas/ModuleKey
       responses:
         '400':
           $ref: ../shared/common.yaml#/components/responses/BadRequest
@@ -2148,6 +2209,131 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/KpiValue'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /service-summary:
+    get:
+      operationId: getServiceSummary
+      x-ticvai-consumed-by:
+        - "P06 EMP-008 Shift summary"
+        - "P08 BO-104 Food & Beverage"
+      x-ticvai-audience:
+      - staff
+      x-ticvai-read-routing: replica
+      x-ticvai-self-scoped: principal
+      x-ticvai-agreed: '2 October: Chinmay, workbook Q199 (EMP-008: a server without a till gets a service summary:
+        covers, tables, sales, tips); shape follows getKpiValues'
+      summary: My service summary (a server without a till)
+      description: '**Covers, tables, sales and tips for one server''s service** (Chinmay, 2 October, workbook Q199;
+        MATRIX 4.9.7, DI-492; CHG-CSA-020). For a server who works the floor on a handheld and holds no drawer, the
+        counterpart of the till''s shift summary. A reporting window over the same sources as the KPIs, so the
+        numbers match the back office (CHG-FIN-006): covers and tables from `fnb.table_visit` served by the caller,
+        sales from the orders on those visits (excluding VAT), tips from the tips recorded on their payments. The
+        caller''s own figures only; `REPORT_VIEW_OWN` is self-scoped.
+
+        '
+      tags:
+      - reporting
+      x-ticvai-permission: REPORT_VIEW_OWN
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - name: date
+        in: query
+        description: The service day, in the venue's time zone; today where absent.
+        schema:
+          type: string
+          format: date
+      responses:
+        '200':
+          description: The summary
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceSummary'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /analytics-governance-policy:
+    get:
+      operationId: getAnalyticsGovernancePolicy
+      x-ticvai-consumed-by:
+        - "P16 ANL-047 Report Access & Sharing Control"
+        - "P16 ANL-070 Analytics Governance, Security & Audit Center"
+      x-ticvai-audience:
+      - staff
+      x-ticvai-read-routing: replica
+      x-ticvai-agreed: '2 October: Chinmay, workbook Q225 (ANL-070); shape follows getSemanticModel'
+      summary: The tenant's analytics governance policy
+      description: 'Masking, export restriction, retention, sharing and AI/API access for analytics (CHG-CSA-021).
+        A tenant that never set one reads the defaults: personal fields masked, exports of personal data refused
+        without `REPORT_EXPORT_PII`, no external sharing, AI and API access through the semantic layer only.
+
+        '
+      tags:
+      - reporting
+      x-ticvai-permission: REPORT_VIEW_TENANT
+      x-ticvai-scope-level: tenant
+      x-ticvai-config-scope: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: The policy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalyticsGovernancePolicy'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+    put:
+      operationId: setAnalyticsGovernancePolicy
+      x-ticvai-consumed-by:
+        - "P16 ANL-070 Analytics Governance, Security & Audit Center"
+      x-ticvai-audience:
+      - staff
+      x-ticvai-agreed: '2 October: Chinmay, workbook Q225 ("add a governance policy operation: masking, export,
+        retention, sharing, AI/API access"); shape follows setSemanticModel'
+      summary: Set the analytics governance policy
+      description: '**One policy for what analytics may show and where it may go** (Chinmay, 2 October, workbook Q225;
+        CHG-CSA-021). The semantic layer enforces it on every report, dashboard, export and natural-language answer
+        (ADR-0054): masked fields are masked before a value leaves the query, exports follow `export`, results are
+        kept as `retention` says, sharing outside the tenant follows `sharing`, and the AI assistant and the public
+        API reach analytics only as `aiAndApiAccess` allows. The whole policy is replaced. Gated by
+        `REPORT_GOVERNANCE_MANAGE` (joined the vocabulary 2 October, CHG-FUP-007): deciding what any report may
+        expose is a narrower right than `PERMISSION_MANAGE` and a different one from `REPORT_MANAGE`, which writes
+        reports.
+
+        '
+      tags:
+      - reporting
+      x-ticvai-permission: REPORT_GOVERNANCE_MANAGE
+      x-ticvai-scope-level: tenant
+      x-ticvai-config-scope: tenant
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: One policy per tenant, the caller's tenant; there is no key in the path.
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AnalyticsGovernancePolicy'
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Saved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalyticsGovernancePolicy'
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /analytics-benchmarks:
@@ -2313,9 +2499,7 @@ paths:
     get:
       operationId: listAnalyticsAnomalies
       x-ticvai-consumed-by:
-        - "P16 ANL-019 AI Management Insights"
         - "P16 ANL-051 AI Analytics Command Center"
-        - "P16 ANL-055 Anomaly Detection Center"
         - "P16 ANL-056 Root-Cause Analysis Explorer"
         - "P16 ANL-058 AI Recommendation & Next-Best-Action Center"
         - "P16 ANL-059 AI Insight History, Evidence & Explainability"
@@ -2717,6 +2901,100 @@ paths:
 components:
   schemas:
 
+    ServiceSummary:
+      x-ticvai-persistence: none — computed from fnb.table_visit, the orders and payments on it
+      type: object
+      description: One server's service day (`getServiceSummary`, CHG-CSA-020).
+      required:
+      - date
+      - covers
+      - tables
+      properties:
+        date:
+          type: string
+          format: date
+        covers:
+          type: integer
+        tables:
+          type: integer
+          description: Table visits served.
+        sales:
+          allOf:
+          - $ref: ../shared/common.yaml#/components/schemas/Money
+          description: Excluding VAT, as `grossSales` (CHG-FIN-007).
+        tips:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        openTables:
+          type: integer
+          description: Visits still open, with their bills not yet settled.
+    AnalyticsGovernancePolicy:
+      type: object
+      x-ticvai-persistence: reporting.analytics_governance_policy
+      description: '**What analytics may show and where it may go** (Chinmay, 2 October, workbook Q225; CHG-CSA-021).
+        One row per tenant.'
+      properties:
+        masking:
+          type: object
+          description: Masked fields, as `schema.table.column`, and who may see them unmasked.
+          properties:
+            maskedFields:
+              type: array
+              items:
+                type: string
+            unmaskedForPermissions:
+              type: array
+              items:
+                type: string
+        export:
+          type: object
+          properties:
+            allowedFormats:
+              type: array
+              items:
+                type: string
+            personalDataNeedsPermission:
+              type: boolean
+              default: true
+              description: An export carrying personal data needs `REPORT_EXPORT_PII`.
+            maxRows:
+              type: integer
+              nullable: true
+        retention:
+          type: object
+          properties:
+            resultDays:
+              type: integer
+              minimum: 1
+              nullable: true
+              description: How long report results and exports are kept.
+        sharing:
+          type: object
+          properties:
+            externalLinks:
+              type: boolean
+              default: false
+            allowedDomains:
+              type: array
+              items:
+                type: string
+        aiAndApiAccess:
+          type: object
+          properties:
+            aiAssistant:
+              type: boolean
+              default: true
+              description: The AI assistant may answer analytics questions through the semantic layer (ADR-0054).
+            publicApi:
+              type: boolean
+              default: false
+        scopePath:
+          type: string
+          readOnly: true
+          description: The partition key (ADR-0005). Written at `tenant` scope.
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
     KpiDefinition:
       type: object
       x-ticvai-persistence: reporting.kpi_definition
@@ -2789,8 +3067,19 @@ components:
 
         | Code | Unit | Source | Seeded for |
         |---|---|---|---|
-        | `takings` | currency | `orders` payments less refunds in the period | every tenant (R283) |
+        | `takings` | currency | **Money taken through the tills and channels, less money paid back** (CHG-FIN-010, 2 October 2026): captured `orders.payment.amount` (base currency) in the period less completed `orders.refund.amount` in the period, by tender; `groupBy=tender`, `workstationId` or `shiftId`. **A cash-control measure, not revenue**: it includes VAT, deposits and gift-card sales, and it is what a drawer and a settlement are reconciled against. For one shift, cash takings + opening float + float entries − lifts is the expected drawer, which the cashier never sees (CHG-FIN-003) | every tenant (R283) |
+        | `grossSales` | currency | Sales at the price before discounts, **excluding VAT**: the sum of `orders.order_line.net_amount` plus its `orders.order_line_discount.amount`, on orders paid in the period (D-185 default; CHG-FIN-007) | every tenant |
+        | `discounts` | currency | The sum of `orders.order_line_discount.amount` on orders paid in the period, excluding VAT (CHG-FIN-007) | every tenant |
+        | `refunds` | currency | Completed `orders.refund.amount` in the period less the tax it reversed (`taxReversalEntryId`), excluding VAT (CHG-FIN-007) | every tenant |
+        | `netRevenue` | currency | `grossSales` − `discounts` − `refunds` (D-185 default, BOARDREQ MOM-2760; client finance sign-off pending; CHG-FIN-007) | every tenant |
+        | `recognisedRevenue` | currency | Credits less debits of `ledger.journal_line` on `revenue` accounts posted in the period: what the recognition rules (`RecognitionMethod`) released, POS sales on the day, tickets on the visit (CHG-FIN-007) | every tenant |
+        | `deferredRevenue` | currency | The balance of the deferred-revenue liability accounts at period end (`finance.getDeferredRevenue`): paid and not yet recognised (CHG-FIN-007) | every tenant |
+        | `taxCollected` | currency | Output tax: `orders.order_line.tax_amount` on orders paid in the period less the tax reversed by refunds completed in it; labelled with the jurisdiction''s tax name (VAT in the UAE) (CHG-FIN-007) | every tenant |
         | `admissions` | count | admitted in-direction `access.scan_event` in the period | every tenant (R283) |
+        | `tableTurnTime` | duration | mean `closed_at` minus `opened_at` of `fnb.table_visit` closed in the period (`higherIsBetter` false; workbook Q205, CHG-CSA-020) | F&B module |
+        | `noShowRate` | percentage | `fnb.table_reservation` marked no-show over those due in the period (`higherIsBetter` false) | F&B module |
+        | `covers` | count | the sum of covers of `fnb.table_visit` opened in the period; `groupBy=serverPrincipalId` gives covers per server | F&B module |
+        | `waitQuoteAccuracy` | percentage | waitlist parties seated within their quoted wait over those seated in the period (`fnb.restaurant_waitlist`) | F&B module |
         | `accreditationApplications` | count | `accreditation.application` submitted in the period; `groupBy=status` gives applications by status | accreditation module (12.1.50) |
         | `accreditationTimeToDecision` | duration | mean `decided_at` minus `submitted_at` of `accreditation.application` decided in the period (`higherIsBetter` false) | accreditation module |
         | `accreditationCredentialsIssued` | count | `accreditation.credential` with `issued_at` in the period; `groupBy=kind` | accreditation module |
@@ -2802,15 +3091,31 @@ components:
         dashboard; the formula and source are the platform''s, so *time to decision* means the same thing on
         every screen that shows it.
 
+        **Labels are fixed with the measures** (decided 2 October 2026, Chinmay; CHG-FIN-002): Takings,
+        Gross sales, Discounts, Refunds, Net revenue, Recognised revenue, Deferred revenue, VAT (or the
+        jurisdiction''s tax name). **Never a bare "Revenue"** on a tile, a column or a chart axis; a
+        tile bound to one of these KPIs takes its label from the KPI.
+
         '
       enum:
       - takings
       - admissions
+      - grossSales
+      - discounts
+      - refunds
+      - netRevenue
+      - recognisedRevenue
+      - deferredRevenue
+      - taxCollected
       - accreditationApplications
       - accreditationTimeToDecision
       - accreditationCredentialsIssued
       - accreditationActiveHolders
       - accreditationRenewalsDue
+      - tableTurnTime
+      - noShowRate
+      - covers
+      - waitQuoteAccuracy
     KpiTarget:
       type: object
       x-ticvai-persistence: reporting.kpi_target
@@ -3655,7 +3960,23 @@ components:
       - accreditationActiveHolders
       - accreditationRenewalsDue
       - staffingShortfall
+      - grossSales
+      - discounts
+      - refunds
+      - netRevenue
+      - recognisedRevenue
+      - deferredRevenue
+      - taxCollected
+      - takings
       x-ticvai-money-valued:
+      - grossSales
+      - discounts
+      - refunds
+      - netRevenue
+      - recognisedRevenue
+      - deferredRevenue
+      - taxCollected
+      - takings
       - inventoryValuation
       - resaleCommission
       - revenuePerEntitlement
@@ -3698,6 +4019,11 @@ components:
         `challengeCompletionRate` and `attributedRevenue`.
 
         '
+      x-ticvai-extended-2-october: '**Eight finance measures added 2 October 2026** (Chinmay; CHG-FIN-007,
+        CHG-FIN-010), each with the source and formula of the seeded KPI of the same code in
+        `ReportingSystemKpi`: `grossSales`, `discounts`, `refunds`, `netRevenue`, `recognisedRevenue`,
+        `deferredRevenue`, `taxCollected` and `takings`, so an alert rule can watch them (a refund spike,
+        takings below a target). Formulas are the D-185 default; client finance sign-off is pending.'
       x-ticvai-money-valued-note: '**`salesByOperator`, `salesByWorkstation` and `resaleVolume` are not
         listed because the package does not say whether they count sales or sum their value.** Until
         that is decided, a rule on them carries a plain number.
@@ -3888,6 +4214,66 @@ components:
         format:
           type: string
           nullable: true
+        role:
+          type: string
+          nullable: true
+          enum:
+          - dimension
+          - measure
+          description: '**What the column is to a chart** (decided 2 October 2026, Chinmay; CHG-FIN-007).
+            A `dimension` groups (date, venue, channel, product); a `measure` is aggregated (sum of net
+            revenue, count of admissions). Null on a column only a table shows.'
+        encoding:
+          type: string
+          nullable: true
+          enum:
+          - category
+          - x
+          - y
+          - series
+          - value
+          - size
+          - colour
+          - location
+          - stage
+          - source
+          - target
+          - row
+          - column
+          - hierarchyLevel
+          - label
+          - tooltip
+          description: '**Which field well the column fills** (CHG-FIN-007), the binding the twenty marks
+            of `DashboardTile.visualisation` need. The per-mark rule is on that field.'
+        axis:
+          type: string
+          nullable: true
+          enum:
+          - primary
+          - secondary
+          description: For a measure on a `combo`, the axis it is drawn against. A secondary axis needs
+            its own `unitLabel` (CHG-FIN-007).
+        seriesType:
+          type: string
+          nullable: true
+          enum:
+          - bar
+          - line
+          - area
+          description: For a measure on a `combo`, how that series is drawn (CHG-FIN-007).
+        hierarchyLevel:
+          type: integer
+          nullable: true
+          minimum: 1
+          description: For `matrix` rows and columns, `treemap` nesting and `decompositionTree` levels, the
+            depth of this dimension, 1 outermost. Levels must follow a real hierarchy (DI-709), for example
+            year, month, day, or region, venue, outlet (CHG-FIN-007).
+        unitLabel:
+          type: string
+          nullable: true
+          maxLength: 40
+          description: The unit an axis states, for example "AED" or "Admissions". Required on a secondary
+            axis (CHG-FIN-007).
     ReportFilter:
       x-ticvai-persistence: reporting.report_filter
       type: object
@@ -4531,13 +4917,32 @@ components:
             cohort: '**Not one of the eighteen.** It appears once in the source as a *usage* — *"the
               Customer & Membership dashboard shall use cards, cohort and trend charts"* — never as a
               specified component. A cohort view is a `matrix` or `heatmap` over a cohort dimension.'
-          x-ticvai-note: '**These marks cannot yet bind data.** `ReportColumn` carries `field`,
-            `label`, `aggregation` and `format` and **no encoding role** — no axis, series, size or
-            colour. A `number` needs none and an eight-mark enum survived without one; a `scatter`
-            needs x, y, size and colour, and a `combo` needs a secondary axis with stated units.
-            **Adding `ReportColumn.role` is the harder half of this decision and is deliberately not
-            made here** — it is the field-wells model the source''s builder specifies, and it belongs
-            with the engine and semantic-layer split that needs an ADR first.
+          x-ticvai-note: '**The marks bind through the report''s column encodings** (decided 2 October 2026,
+            Chinmay; CHG-FIN-007: build the nine). Superseding the note of 22 September, which left
+            `ReportColumn.role` undecided. Each column of the tile''s report carries `role` and
+            `encoding` (and `axis`, `seriesType`, `hierarchyLevel`, `unitLabel` where the mark needs them),
+            and `createDashboard` / `updateDashboard` refuse 422 `tile-encoding-missing` a tile whose report
+            lacks what its mark requires:
+
+
+            | Mark | Requires |
+            |---|---|
+            | `combo` | one `x` dimension; two or more measures, each with `axis` and `seriesType`; `unitLabel` on a secondary axis |
+            | `matrix` | `row` dimensions (with `hierarchyLevel`), optional `column` dimensions, one or more `value` measures |
+            | `funnel` | one `stage` dimension in order (`sortOrder`), one `value` measure |
+            | `waterfall` | one `category` dimension of ordered steps, one `value` measure; the steps are a named measure set (for example Gross sales, Discounts, Refunds, Net revenue) and the last is the total |
+            | `treemap` | one or more `category` dimensions with `hierarchyLevel`, one `size` measure, optional `colour` measure |
+            | `scatter` | an `x` and a `y` measure, a `label` dimension, optional `size` and `colour` |
+            | `map` | one `location` dimension (venue, zone or venue-map point), one `value` measure |
+            | `ribbon` | an `x` dimension (period), a `series` dimension, one `value` measure (rank flow) |
+            | `decompositionTree` | one `value` measure and two or more dimensions with `hierarchyLevel` |
+
+
+            The other eleven marks bind as before (`number` one measure; `line`, `area`, `bar` and the
+            stacked bars an `x` dimension, optional `series`, one or more `y` measures; `pie`, `donut`,
+            `gauge`, `heatmap`, `table` as their names). **Unchanged**: at most 24 tiles a dashboard, and every
+            tile shows its as-of time and goes stale past its refresh (`KpiValue.asOf`, `stale`;
+            BOARDREQ MOM-2713/2714).
 
             '
         parameters:

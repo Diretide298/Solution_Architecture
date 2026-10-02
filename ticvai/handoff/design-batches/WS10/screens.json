@@ -214,7 +214,7 @@
   "states": {
    "loading": "The dynamic access policy list.",
    "error": "Could not load. Names which read failed and leaves the dynamic access policy untouched.",
-   "emptyFirstRun": "No dynamic access policy yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No dynamic access policy yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the dynamic access policy are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -224,16 +224,6 @@
     "contract": "access",
     "purpose": "Dynamic Access Policy Command Center",
     "trigger": "onLoad"
-   },
-   {
-    "operationId": "setVisualDynamicPolicy",
-    "contract": "access",
-    "purpose": "Create or change a dynamic access policy from the command centre",
-    "trigger": "onAction",
-    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
-    "invalidates": [
-     "listDynamicAccessPolicy"
-    ]
    },
    {
     "operationId": "listDynamicPolicyEffectiveness",
@@ -260,6 +250,14 @@
    "workshopBoard": "wireframes/WS27 Access Control Board 10.dc.html#bo-234"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 133. 9 of 10 labels bound to a contract property; 10 of 20 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "gaps": [
+   {
+    "operation": "setVisualDynamicPolicy",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): A policy write on the command centre; writes belong to BO-236 and BO-237 (VO-R02, ADR-0041; design-notes correction venue-operations BO-234).",
+    "source": "ADR-0041"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -494,6 +492,12 @@
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
        "impliedBy": "setVisualDynamicPolicy"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Policies",
+       "operation": "listDynamicAccessPolicy",
+       "provenance": "contract access.yaml GET /dynamic-access-policy; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -512,6 +516,13 @@
     "contract": "access",
     "purpose": "Visual Dynamic Policy Builder",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "listDynamicAccessPolicy",
+    "contract": "access",
+    "purpose": "The policies to open and edit",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-001)"
    }
   ],
   "wireframe": {
@@ -521,6 +532,7 @@
    "workshopBoard": "wireframes/WS27 Access Control Board 10.dc.html#bo-236"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 136. 0 of 0 labels bound to a contract property; 0 of 23 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {},
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -639,6 +651,13 @@
    "workshopBoard": "wireframes/WS27 Access Control Board 10.dc.html#bo-237"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 137. 0 of 0 labels bound to a contract property; 3 of 26 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Special Event are choices sent by `setContextTimeEvent`.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-004): No read of context, time, event and capacity policies (setContextTimeEvent has no list or get).",
+    "source": "contracts/spine/access.yaml#setContextTimeEvent"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -992,6 +1011,11 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Access Control Module_Reference.pdf, page 142"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-004): No operation creates, approves or revokes a temporary or emergency access grant.",
+    "source": "contracts/spine/access.yaml#listAuthorizationGovernanceTemporary"
    }
   ],
   "layout": {
@@ -1118,6 +1142,18 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Access Control Module_Reference.pdf, page 143"
+   },
+   {
+    "operation": "setEdgeNodeLocal",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): Edge nodes are configured on BO-205 and the tenancy till policy governs POS; this screen writes setPolicyEvaluationSetting only (design-notes correction venue-operations BO-241).",
+    "source": "contracts/spine/access.yaml#setEdgeNodeLocal | contracts/spine/tenancy.yaml#setOfflinePolicy | contracts/spine/access.yaml#setPolicyEvaluationSetting"
+   },
+   {
+    "operation": "setOfflinePolicy",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): Edge nodes are configured on BO-205 and the tenancy till policy governs POS; this screen writes setPolicyEvaluationSetting only (design-notes correction venue-operations BO-241).",
+    "source": "contracts/spine/access.yaml#setEdgeNodeLocal | contracts/spine/tenancy.yaml#setOfflinePolicy | contracts/spine/access.yaml#setPolicyEvaluationSetting"
    }
   ],
   "layout": {
@@ -1131,20 +1167,6 @@
        "derived": true,
        "impliedBy": "listPolicyEvaluationArchitecture",
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
-      },
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "setEdgeNodeLocal",
-       "label": "Save edge node local",
-       "notes": "The act the screen exists for."
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "setEdgeNodeLocal"
       }
      ]
     },
@@ -1167,7 +1189,7 @@
   "states": {
    "loading": "The policy evaluation architecture list.",
    "error": "Could not load. Names which read failed and leaves the policy evaluation architecture untouched.",
-   "emptyFirstRun": "No policy evaluation architecture yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No policy evaluation architecture yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the policy evaluation architecture are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -1177,23 +1199,6 @@
     "contract": "access",
     "purpose": "Policy Evaluation Architecture & Offline Distribution",
     "trigger": "onLoad"
-   },
-   {
-    "operationId": "setEdgeNodeLocal",
-    "contract": "access",
-    "purpose": "Save where a policy is evaluated at the edge",
-    "trigger": "onAction",
-    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
-    "invalidates": [
-     "listPolicyEvaluationArchitecture"
-    ]
-   },
-   {
-    "operationId": "setOfflinePolicy",
-    "contract": "tenancy",
-    "purpose": "Save what the edge may decide while central services are unreachable",
-    "trigger": "onAction",
-    "provenance": "decided 29 September, VM close-out (venue management and configuration)"
    },
    {
     "operationId": "setPolicyEvaluationSetting",
@@ -1457,24 +1462,7 @@
     {
      "name": "contentBody",
      "slot": "collection",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every policy approval audit",
-       "columns": [
-        "→",
-        "Denial Rate",
-        "Override Rate",
-        "False-Positive Indicators",
-        "Operator Review Rate",
-        "Guest Impact",
-        "Security Incidents"
-       ],
-       "bindsTo": "Policy",
-       "operation": "listPolicies",
-       "provenance": "pack Access Control Module_Reference.pdf, page 146 §Monitor"
-      }
-     ]
+     "components": []
     },
     {
      "name": "contextPanel",
@@ -1550,12 +1538,6 @@
   },
   "apis": [
    {
-    "operationId": "listPolicies",
-    "contract": "white-label",
-    "purpose": "List legal policies",
-    "trigger": "onLoad"
-   },
-   {
     "operationId": "listDynamicAccessPolicy",
     "contract": "access",
     "purpose": "The access policies awaiting approval, with their versions",
@@ -1617,6 +1599,14 @@
    "workshopBoard": "wireframes/WS27 Access Control Board 10.dc.html#bo-243"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 146. 0 of 7 labels bound to a contract property; 12 of 89 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Policy Owner, Business Approval, Security Approval, Technical Approval: `decideApprovalRequest`; still owed by a contract change: `rollbackAccessPolicy`.",
+  "gaps": [
+   {
+    "operation": "listPolicies",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): listPolicies reads the white-label legal policies (privacy, terms, refund, cookie), the wrong domain; access policies come from listDynamicAccessPolicy and listDynamicPolicyEffectiveness, both declared (design-notes correction venue-operations BO-243).",
+    "source": "contracts/satellite/white-label.yaml#listPolicies | contracts/spine/access.yaml#listDynamicAccessPolicy"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",

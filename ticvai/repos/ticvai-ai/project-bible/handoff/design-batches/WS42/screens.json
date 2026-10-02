@@ -909,6 +909,11 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 29"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-007): No operation performs or approves deletion, pseudonymisation, restriction or biometric removal.",
+    "source": "contracts/satellite/marketing-crm.yaml#listDeletionAnonymizationRestriction"
    }
   ],
   "layout": {
@@ -1138,6 +1143,18 @@
        "kind": "secondaryButton",
        "label": "Release Hold",
        "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 30 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Run retention",
+       "operation": "runDataRetention",
+       "provenance": "contract marketing-crm.yaml POST /retention-runs; wiring fix, 2 October 2026"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Place or release hold",
+       "operation": "setLegalHold",
+       "provenance": "contract marketing-crm.yaml PUT /data-retention-expiry; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -1157,6 +1174,34 @@
     "trigger": "Archive",
     "body": "**Archive on a data retention expiry is not reversible from this screen.** Names what it affects and what it leaves alone. The pack requires the decision to reach the audit trail, so the dialog states that it is recorded.",
     "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 30 §Support"
+   },
+   {
+    "id": "formRunDataRetention",
+    "component": "modal",
+    "trigger": "Run retention",
+    "body": "**Collects what `runDataRetention` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Run retention",
+     "operation": "runDataRetention"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "contract marketing-crm.yaml POST /retention-runs; wiring fix, 2 October 2026"
+   },
+   {
+    "id": "formSetLegalHold",
+    "component": "modal",
+    "trigger": "Place or release hold",
+    "body": "**Collects what `setLegalHold` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Place or release hold",
+     "operation": "setLegalHold"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "contract marketing-crm.yaml PUT /data-retention-expiry; wiring fix, 2 October 2026"
    }
   ],
   "states": {
@@ -1172,6 +1217,20 @@
     "contract": "marketing-crm",
     "purpose": "Data Retention, Expiry & Legal Hold Operations",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "runDataRetention",
+    "contract": "marketing-crm",
+    "purpose": "Preview or execute a retention pass",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-005)"
+   },
+   {
+    "operationId": "setLegalHold",
+    "contract": "marketing-crm",
+    "purpose": "Place",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-005)"
    }
   ],
   "entryState": {
@@ -1287,6 +1346,12 @@
        "bindsTo": "PrivacyComplianceExceptionInvestigationWorkspaceView",
        "operation": "setPrivacyComplianceException",
        "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 32 §Display"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Privacy exceptions",
+       "operation": "listPrivacyComplianceExceptions",
+       "provenance": "contract marketing-crm.yaml GET /privacy-compliance-exception; wiring fix, 2 October 2026"
       }
      ]
     },
@@ -1351,6 +1416,13 @@
     "contract": "marketing-crm",
     "purpose": "Privacy Compliance, Exception & Investigation Workspace",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "listPrivacyComplianceExceptions",
+    "contract": "marketing-crm",
+    "purpose": "The privacy exception queue",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-005)"
    }
   ],
   "entryState": {

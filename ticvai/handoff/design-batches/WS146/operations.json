@@ -1,4 +1,28 @@
 {
+ "getSignatorySignatureGuardian": {
+  "method": "GET",
+  "path": "/signatory-signature-guardian",
+  "contract": "marketing-crm",
+  "summary": "Load the signatory rules of a waiver version",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "formId",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "version",
+    "in": "query",
+    "required": false
+   }
+  ],
+  "requestBody": null,
+  "responds": "SignatorySignatureGuardianRuleConfigurationView"
+ },
  "getWaiverStatus": {
   "method": "GET",
   "path": "/guests/{subjectId}/waiver-status",

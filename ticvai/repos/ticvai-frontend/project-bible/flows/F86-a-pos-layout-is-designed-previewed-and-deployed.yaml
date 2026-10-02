@@ -29,10 +29,10 @@ steps:
   screen: BO-116
   action: Merchandising & Product Presentation.
   operations:
-  - setRolePermissions
   - updateMerchandise
   outcome: '**Drawn by the client as POS-4B.** 2 operations on this step.'
   crossesDevice: true
+  note: '**Repointed 2 October (CHG-WIR-021).** setRolePermissions was attached to the merchandising screen by board position; role permissions are set on BO-054 Role Assignment.'
 - step: 3
   screen: BO-117
   action: Product Import, Governance & AI Configuration Assistant.

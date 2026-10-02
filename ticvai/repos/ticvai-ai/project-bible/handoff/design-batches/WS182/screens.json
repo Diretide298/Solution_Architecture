@@ -12,17 +12,17 @@
    "page": 64
   },
   "implementation": {
-   "app": "ticvai-web",
+   "app": "venue-management-web",
    "route": "/commercial/cross-sell-command-center-adm-659",
-   "component": "apps/ticvai-web/src/routes/commercial/CrossSellCommandCenter.tsx",
+   "component": "apps/venue-management-web/src/routes/commercial/CrossSellCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
    "entryFrom": [
-    "ADM-002"
+    "BO-100"
    ],
    "exitTo": [
-    "ADM-002",
+    "BO-100",
     "ADM-660",
     "ADM-661",
     "ADM-662",
@@ -35,9 +35,9 @@
    ],
    "transitions": [
     {
-     "to": "ADM-002",
-     "trigger": "Back to Platform Dashboard",
-     "provenance": "structural — pack board 3 wiring, 19 September 2026",
+     "to": "BO-100",
+     "trigger": "Back to Venue Home",
+     "provenance": "moved to Venue Management 2 October 2026 (CHG-MOV-001); it returned to the console's Platform Dashboard (ADM-002)",
      "back": true
     },
     {
@@ -87,6 +87,7 @@
     }
    ]
   },
+  "notes": "**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: \"they are venue screens\"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.",
   "density": "compact",
   "pattern": "commandCentre",
   "patternReason": "the pack gives this screen both a metric directory (§KPI Cards) and a per-row directory (§Show) — counts over a population, then the population",
@@ -225,30 +226,29 @@
   ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-659",
+   "board": "wireframes/P08 Venue Management.dc.html#adm-659",
    "workshopBoard": "wireframes/WS180 Upsell,CrossSellEngine Board 3.dc.html#adm-659"
   },
   "apisNote": "Regenerated 9 September 2026 from Upsell,CrossSellEngine.pdf page 64. 0 of 1 labels bound to a contract property; 13 of 37 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
+   "code": "P08",
+   "audience": "staff",
    "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
    "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
+   "app": "venue-management-web",
+   "operator": "venue",
    "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
     "shell": "web",
     "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
+     "P12",
+     "P13",
+     "P16"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
     "decided": "10 September 2026"
    }
   }
@@ -266,9 +266,9 @@
    "page": 66
   },
   "implementation": {
-   "app": "ticvai-web",
+   "app": "venue-management-web",
    "route": "/commercial/cross-sell-relationship-builder-adm-660",
-   "component": "apps/ticvai-web/src/routes/commercial/CrossSellRelationshipBuilder.tsx",
+   "component": "apps/venue-management-web/src/routes/commercial/CrossSellRelationshipBuilder.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -287,6 +287,7 @@
     }
    ]
   },
+  "notes": "**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: \"they are venue screens\"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Identify) and no metric row",
@@ -329,6 +330,13 @@
        "bindsTo": null,
        "operation": null,
        "provenance": "pack Upsell,CrossSellEngine.pdf, page 66 §Identify"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Relationships",
+       "bindsTo": "ProductRelationship",
+       "operation": "listProductRelationships",
+       "provenance": "contract promotions.yaml GET /product-relationships; wiring fix, 2 October 2026"
       }
      ]
     },
@@ -398,6 +406,13 @@
     "invalidates": [
      "listProductRelationships"
     ]
+   },
+   {
+    "operationId": "listProductRelationships",
+    "contract": "promotions",
+    "purpose": "The product relationships already declared",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "entryState": {
@@ -412,30 +427,29 @@
   },
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-660",
+   "board": "wireframes/P08 Venue Management.dc.html#adm-660",
    "workshopBoard": "wireframes/WS180 Upsell,CrossSellEngine Board 3.dc.html#adm-660"
   },
   "apisNote": "Regenerated 9 September 2026 from Upsell,CrossSellEngine.pdf page 66. 0 of 6 labels bound to a contract property; 10 of 34 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
+   "code": "P08",
+   "audience": "staff",
    "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
    "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
+   "app": "venue-management-web",
+   "operator": "venue",
    "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
     "shell": "web",
     "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
+     "P12",
+     "P13",
+     "P16"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
     "decided": "10 September 2026"
    }
   }
@@ -453,9 +467,9 @@
    "page": 68
   },
   "implementation": {
-   "app": "ticvai-web",
+   "app": "venue-management-web",
    "route": "/commercial/product-affinity-matrix-relationship-map-adm-661",
-   "component": "apps/ticvai-web/src/routes/commercial/ProductAffinityMatrixRelationshipMap.tsx",
+   "component": "apps/venue-management-web/src/routes/commercial/ProductAffinityMatrixRelationshipMap.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -474,6 +488,7 @@
     }
    ]
   },
+  "notes": "**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: \"they are venue screens\"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
@@ -534,30 +549,29 @@
   ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-661",
+   "board": "wireframes/P08 Venue Management.dc.html#adm-661",
    "workshopBoard": "wireframes/WS180 Upsell,CrossSellEngine Board 3.dc.html#adm-661"
   },
   "apisNote": "Regenerated 9 September 2026 from Upsell,CrossSellEngine.pdf page 68. 0 of 7 labels bound to a contract property; 7 of 27 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
+   "code": "P08",
+   "audience": "staff",
    "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
    "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
+   "app": "venue-management-web",
+   "operator": "venue",
    "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
     "shell": "web",
     "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
+     "P12",
+     "P13",
+     "P16"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
     "decided": "10 September 2026"
    }
   }
@@ -575,9 +589,9 @@
    "page": 70
   },
   "implementation": {
-   "app": "ticvai-web",
+   "app": "venue-management-web",
    "route": "/commercial/frequently-bought-together-basket-pattern-engine-adm-662",
-   "component": "apps/ticvai-web/src/routes/commercial/FrequentlyBoughtTogetherBasketPatternEngine.tsx",
+   "component": "apps/venue-management-web/src/routes/commercial/FrequentlyBoughtTogetherBasketPatternEngine.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -596,6 +610,7 @@
     }
    ]
   },
+  "notes": "**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: \"they are venue screens\"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Analyze) and no metric row",
@@ -684,30 +699,29 @@
   },
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-662",
+   "board": "wireframes/P08 Venue Management.dc.html#adm-662",
    "workshopBoard": "wireframes/WS180 Upsell,CrossSellEngine Board 3.dc.html#adm-662"
   },
   "apisNote": "Regenerated 9 September 2026 from Upsell,CrossSellEngine.pdf page 70. 0 of 7 labels bound to a contract property; 11 of 23 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
+   "code": "P08",
+   "audience": "staff",
    "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
    "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
+   "app": "venue-management-web",
+   "operator": "venue",
    "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
     "shell": "web",
     "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
+     "P12",
+     "P13",
+     "P16"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
     "decided": "10 September 2026"
    }
   }
@@ -725,9 +739,9 @@
    "page": 71
   },
   "implementation": {
-   "app": "ticvai-web",
+   "app": "venue-management-web",
    "route": "/commercial/cross-category-recommendation-manager-adm-663",
-   "component": "apps/ticvai-web/src/routes/commercial/CrossCategoryRecommendationManager.tsx",
+   "component": "apps/venue-management-web/src/routes/commercial/CrossCategoryRecommendationManager.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -746,6 +760,7 @@
     }
    ]
   },
+  "notes": "**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: \"they are venue screens\"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
@@ -786,6 +801,13 @@
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
        "impliedBy": "setProductRelationships"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Relationships",
+       "bindsTo": "ProductRelationship",
+       "operation": "listProductRelationships",
+       "provenance": "contract promotions.yaml GET /product-relationships; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -808,34 +830,41 @@
     "invalidates": [
      "listProductRelationships"
     ]
+   },
+   {
+    "operationId": "listProductRelationships",
+    "contract": "promotions",
+    "purpose": "The product relationships already declared",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-663",
+   "board": "wireframes/P08 Venue Management.dc.html#adm-663",
    "workshopBoard": "wireframes/WS180 Upsell,CrossSellEngine Board 3.dc.html#adm-663"
   },
   "apisNote": "Regenerated 9 September 2026 from Upsell,CrossSellEngine.pdf page 71. 0 of 0 labels bound to a contract property; 0 of 30 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {},
   "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
+   "code": "P08",
+   "audience": "staff",
    "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
    "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
+   "app": "venue-management-web",
+   "operator": "venue",
    "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
     "shell": "web",
     "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
+     "P12",
+     "P13",
+     "P16"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
     "decided": "10 September 2026"
    }
   }
@@ -853,9 +882,9 @@
    "page": 73
   },
   "implementation": {
-   "app": "ticvai-web",
+   "app": "venue-management-web",
    "route": "/commercial/multi-attraction-destination-partner-cross-sell-adm-664",
-   "component": "apps/ticvai-web/src/routes/commercial/MultiAttractionDestinationPartnerCrossSell.tsx",
+   "component": "apps/venue-management-web/src/routes/commercial/MultiAttractionDestinationPartnerCrossSell.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -874,6 +903,7 @@
     }
    ]
   },
+  "notes": "**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: \"they are venue screens\"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
@@ -909,6 +939,13 @@
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
        "impliedBy": "setProductRelationships"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Relationships",
+       "bindsTo": "ProductRelationship",
+       "operation": "listProductRelationships",
+       "provenance": "contract promotions.yaml GET /product-relationships; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -931,34 +968,41 @@
     "invalidates": [
      "listProductRelationships"
     ]
+   },
+   {
+    "operationId": "listProductRelationships",
+    "contract": "promotions",
+    "purpose": "The product relationships already declared",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-664",
+   "board": "wireframes/P08 Venue Management.dc.html#adm-664",
    "workshopBoard": "wireframes/WS180 Upsell,CrossSellEngine Board 3.dc.html#adm-664"
   },
   "apisNote": "Regenerated 9 September 2026 from Upsell,CrossSellEngine.pdf page 73. 0 of 0 labels bound to a contract property; 0 of 23 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {},
   "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
+   "code": "P08",
+   "audience": "staff",
    "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
    "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
+   "app": "venue-management-web",
+   "operator": "venue",
    "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
     "shell": "web",
     "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
+     "P12",
+     "P13",
+     "P16"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
     "decided": "10 September 2026"
    }
   }
@@ -976,9 +1020,9 @@
    "page": 74
   },
   "implementation": {
-   "app": "ticvai-web",
+   "app": "venue-management-web",
    "route": "/commercial/basket-aware-cross-sell-duplicate-prevention-adm-665",
-   "component": "apps/ticvai-web/src/routes/commercial/BasketAwareCrossSellDuplicatePrevention.tsx",
+   "component": "apps/venue-management-web/src/routes/commercial/BasketAwareCrossSellDuplicatePrevention.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -997,6 +1041,7 @@
     }
    ]
   },
+  "notes": "**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: \"they are venue screens\"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
@@ -1032,6 +1077,13 @@
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
        "impliedBy": "updateRecommendationStrategy"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Strategies",
+       "bindsTo": "RecommendationStrategy",
+       "operation": "listRecommendationStrategies",
+       "provenance": "contract promotions.yaml GET /recommendation-strategies; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -1054,11 +1106,18 @@
     "invalidates": [
      "listRecommendationStrategies"
     ]
+   },
+   {
+    "operationId": "listRecommendationStrategies",
+    "contract": "promotions",
+    "purpose": "The strategies this screen edits",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-665",
+   "board": "wireframes/P08 Venue Management.dc.html#adm-665",
    "workshopBoard": "wireframes/WS180 Upsell,CrossSellEngine Board 3.dc.html#adm-665"
   },
   "apisNote": "Regenerated 9 September 2026 from Upsell,CrossSellEngine.pdf page 74. 0 of 0 labels bound to a contract property; 0 of 25 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
@@ -1071,25 +1130,24 @@
    ]
   },
   "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
+   "code": "P08",
+   "audience": "staff",
    "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
    "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
+   "app": "venue-management-web",
+   "operator": "venue",
    "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
     "shell": "web",
     "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
+     "P12",
+     "P13",
+     "P16"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
     "decided": "10 September 2026"
    }
   }
@@ -1107,9 +1165,9 @@
    "page": 76
   },
   "implementation": {
-   "app": "ticvai-web",
+   "app": "venue-management-web",
    "route": "/commercial/availability-inventory-capacity-aware-cross-sell-adm-666",
-   "component": "apps/ticvai-web/src/routes/commercial/AvailabilityInventoryCapacityAwareCrossSell.tsx",
+   "component": "apps/venue-management-web/src/routes/commercial/AvailabilityInventoryCapacityAwareCrossSell.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1128,6 +1186,7 @@
     }
    ]
   },
+  "notes": "**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: \"they are venue screens\"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.",
   "density": "compact",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
@@ -1158,6 +1217,13 @@
        "kind": "selectField",
        "label": "Recommend substitute",
        "provenance": "pack Upsell,CrossSellEngine.pdf, page 76 §Configure"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Strategies",
+       "bindsTo": "RecommendationStrategy",
+       "operation": "listRecommendationStrategies",
+       "provenance": "contract promotions.yaml GET /recommendation-strategies; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -1180,11 +1246,18 @@
     "invalidates": [
      "listRecommendationStrategies"
     ]
+   },
+   {
+    "operationId": "listRecommendationStrategies",
+    "contract": "promotions",
+    "purpose": "The strategies this screen edits",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-666",
+   "board": "wireframes/P08 Venue Management.dc.html#adm-666",
    "workshopBoard": "wireframes/WS180 Upsell,CrossSellEngine Board 3.dc.html#adm-666"
   },
   "apisNote": "Regenerated 9 September 2026 from Upsell,CrossSellEngine.pdf page 76. 0 of 0 labels bound to a contract property; 4 of 25 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
@@ -1197,25 +1270,24 @@
    ]
   },
   "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
+   "code": "P08",
+   "audience": "staff",
    "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
    "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
+   "app": "venue-management-web",
+   "operator": "venue",
    "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
     "shell": "web",
     "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
+     "P12",
+     "P13",
+     "P16"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
     "decided": "10 September 2026"
    }
   }
@@ -1233,9 +1305,9 @@
    "page": 77
   },
   "implementation": {
-   "app": "ticvai-web",
+   "app": "venue-management-web",
    "route": "/commercial/ai-cross-sell-discovery-scoring-ranking-engine-adm-667",
-   "component": "apps/ticvai-web/src/routes/commercial/AiCrossSellDiscoveryScoringRankingEngine.tsx",
+   "component": "apps/venue-management-web/src/routes/commercial/AiCrossSellDiscoveryScoringRankingEngine.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1254,6 +1326,7 @@
     }
    ]
   },
+  "notes": "**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: \"they are venue screens\"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
@@ -1297,30 +1370,29 @@
   ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-667",
+   "board": "wireframes/P08 Venue Management.dc.html#adm-667",
    "workshopBoard": "wireframes/WS180 Upsell,CrossSellEngine Board 3.dc.html#adm-667"
   },
   "apisNote": "Regenerated 9 September 2026 from Upsell,CrossSellEngine.pdf page 77. 0 of 0 labels bound to a contract property; 0 of 32 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
+   "code": "P08",
+   "audience": "staff",
    "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
    "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
+   "app": "venue-management-web",
+   "operator": "venue",
    "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
     "shell": "web",
     "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
+     "P12",
+     "P13",
+     "P16"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
     "decided": "10 September 2026"
    }
   }
@@ -1338,9 +1410,9 @@
    "page": 79
   },
   "implementation": {
-   "app": "ticvai-web",
+   "app": "venue-management-web",
    "route": "/commercial/cross-sell-simulator-ai-opportunity-advisor-adm-668",
-   "component": "apps/ticvai-web/src/routes/commercial/CrossSellSimulatorAiOpportunityAdvisor.tsx",
+   "component": "apps/venue-management-web/src/routes/commercial/CrossSellSimulatorAiOpportunityAdvisor.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1359,6 +1431,7 @@
     }
    ]
   },
+  "notes": "**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: \"they are venue screens\"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Track) and no metric row",
@@ -1398,6 +1471,13 @@
        "bindsTo": null,
        "operation": null,
        "provenance": "pack Upsell,CrossSellEngine.pdf, page 79 §Track"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Strategies",
+       "bindsTo": "RecommendationStrategy",
+       "operation": "listRecommendationStrategies",
+       "provenance": "contract promotions.yaml GET /recommendation-strategies; wiring fix, 2 October 2026"
       }
      ]
     },
@@ -1457,6 +1537,13 @@
     "purpose": "Simulate cross-sell",
     "trigger": "onAction",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "listRecommendationStrategies",
+    "contract": "promotions",
+    "purpose": "The strategies a simulation can replay",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "entryState": {
@@ -1471,30 +1558,29 @@
   },
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-668",
+   "board": "wireframes/P08 Venue Management.dc.html#adm-668",
    "workshopBoard": "wireframes/WS180 Upsell,CrossSellEngine Board 3.dc.html#adm-668"
   },
   "apisNote": "Regenerated 9 September 2026 from Upsell,CrossSellEngine.pdf page 79. 0 of 13 labels bound to a contract property; 33 of 158 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
+   "code": "P08",
+   "audience": "staff",
    "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
    "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
+   "app": "venue-management-web",
+   "operator": "venue",
    "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
     "shell": "web",
     "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
+     "P12",
+     "P13",
+     "P16"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
     "decided": "10 September 2026"
    }
   }

@@ -81,24 +81,18 @@
      "slot": "collection",
      "components": [
       {
-       "kind": "textField",
-       "label": "Venue id",
-       "operation": "listProducts",
-       "notes": "Sends `?venueId=` to `listProducts`.",
-       "provenance": "contract catalogue.yaml GET /products"
-      },
-      {
-       "kind": "textField",
+       "kind": "multiSelect",
        "label": "Kind",
        "operation": "listProducts",
-       "notes": "Sends `?kind=` to `listProducts`.",
-       "provenance": "contract catalogue.yaml GET /products"
+       "notes": "Product kinds in words, a closed list; the venue is the session scope (PR-1).",
+       "provenance": "contract catalogue.yaml GET /products",
+       "bindsTo": "Product.kind"
       },
       {
-       "kind": "toggle",
-       "label": "Is sellable",
+       "kind": "selectField",
+       "label": "Sellable",
        "operation": "listProducts",
-       "notes": "Sends `?isSellable=` to `listProducts`.",
+       "notes": "Any, sellable or not sellable: a toggle cannot say \"either\".",
        "provenance": "contract catalogue.yaml GET /products"
       },
       {
@@ -275,8 +269,9 @@
       {
        "kind": "secondaryButton",
        "label": "Bulk update products",
-       "operation": "bulkUpdateProducts",
-       "provenance": "contract inventory.yaml POST /products/bulk"
+       "operation": "bulkUpdateCatalogueProducts",
+       "notes": "Change many products at once with a preview first (`previewOnly`); catalogue owns the write (CHG-FUP-011, CHG-CSP-054).",
+       "provenance": "contract catalogue.yaml POST /products/bulk-update"
       }
      ]
     },
@@ -408,13 +403,11 @@
     "trigger": "onLoad"
    },
    {
-    "operationId": "bulkUpdateProducts",
-    "contract": "inventory",
+    "operationId": "bulkUpdateCatalogueProducts",
+    "contract": "catalogue",
     "purpose": "Change many products at once, with a preview",
     "trigger": "onAction",
-    "invalidates": [
-     "listProducts"
-    ]
+    "provenance": "design-note correction, 2 October 2026 (BO-007)"
    }
   ],
   "entryState": {
@@ -592,23 +585,499 @@
     "provenance": "contract retail.yaml POST /merchandise"
    },
    {
-    "id": "formBulkUpdateProducts",
+    "id": "formBulkUpdateCatalogueProducts",
     "component": "modal",
     "trigger": "Bulk update products",
-    "body": "**Collects what `bulkUpdateProducts` sends before it is called.** Required: `selector`, `changes`. Optional: `previewOnly`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `bulkUpdateCatalogueProducts` sends before it is called.** Required: `selection`, `changes`. Optional: `previewOnly`. Dismissing sends nothing; the screen behind is unchanged.",
     "confirm": {
      "label": "Bulk update products",
-     "operation": "bulkUpdateProducts"
+     "operation": "bulkUpdateCatalogueProducts"
     },
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "selector",
+      "selection",
       "changes",
       "previewOnly"
      ]
     },
-    "provenance": "contract inventory.yaml POST /products/bulk"
+    "provenance": "contract catalogue.yaml POST /products/bulk-update"
+   }
+  ],
+  "gaps": [
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-027): A catalogue-contract bulk product write: bulkUpdateProducts lives in the inventory contract while every other product write is catalogue's.",
+    "source": "contracts/satellite/inventory.yaml#bulkUpdateProducts"
+   }
+  ],
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-008",
+  "name": "Product Detail & Variants",
+  "module": "Sell",
+  "requiresModule": "ticketing",
+  "wave": 1,
+  "capability": "C00",
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/venue-operations/product-detail-variants",
+   "component": "apps/venue-management-web/src/routes/venue-operations/ProductDetailVariantsDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "exitTo": [
+    "BO-007"
+   ],
+   "inferred": true,
+   "transitions": [
+    {
+     "to": "BO-007",
+     "trigger": "Product Directory",
+     "provenance": "flow F85 step 3→4, F93 step 3→4",
+     "carries": [
+      "productId"
+     ]
+    }
+   ],
+   "entryFrom": [
+    "BO-045",
+    "BO-137"
+   ]
+  },
+  "notes": "Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. **Carried `runFxRevaluation`, `getForeignTenderReport` and `listInterEntityObligations` until 20 August** — a product screen doing foreign-exchange revaluation. Operations were attached from the 14 August wireframe board by a heuristic that matched nothing. **Rewired 20 August.**",
+  "density": "compact",
+  "boardFrames": [
+   "FnB Board 2.dc.html#fnb-2d",
+   "Retail Board 2.dc.html#ret-2c"
+  ],
+  "pattern": "listDetail",
+  "patternReason": "`listProductVariants` reads the population and `getProduct` reads one of them — list, select, act",
+  "purpose": "Define what is sold and the ticket types under it.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every product variant",
+       "bindsTo": "ProductVariant",
+       "columns": [
+        "ProductVariant.id",
+        "ProductVariant.productId",
+        "ProductVariant.sku",
+        "ProductVariant.axisValues",
+        "ProductVariant.isActive"
+       ],
+       "operation": "listProductVariants",
+       "provenance": "contract catalogue.yaml GET /products/{productId}/variants"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected product variant",
+       "bindsTo": "ProductVariant",
+       "columns": [
+        "ProductVariant.id",
+        "ProductVariant.productId",
+        "ProductVariant.sku",
+        "ProductVariant.axisValues",
+        "ProductVariant.name",
+        "ProductVariant.barcode",
+        "ProductVariant.description",
+        "ProductVariant.isDefault",
+        "ProductVariant.isActive"
+       ],
+       "operation": "listProductVariants",
+       "provenance": "contract catalogue.yaml GET /products/{productId}/variants"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The product",
+       "bindsTo": "Product",
+       "columns": [
+        "Product.id",
+        "Product.code",
+        "Product.name",
+        "Product.description",
+        "Product.kind",
+        "Product.venueId",
+        "Product.scopePath",
+        "Product.createdByPrincipalId",
+        "Product.approvedByPrincipalId",
+        "Product.responsibleDepartmentId",
+        "Product.onSaleFrom",
+        "Product.onSaleTo",
+        "Product.categoryId",
+        "Product.lifecycleState",
+        "Product.isSellable",
+        "Product.isStockTracked"
+       ],
+       "operation": "getProduct",
+       "provenance": "contract catalogue.yaml GET /products/{productId}"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "What the guest sees",
+       "bindsTo": "Product",
+       "columns": [
+        "Product.guestListing",
+        "Product.notBookableLabel",
+        "Product.displayTags",
+        "Product.media",
+        "Product.consentQuestionIds",
+        "Product.requiresTimeWindow",
+        "Product.segmentTags",
+        "Product.salesContact",
+        "Product.bookingFlowId"
+       ],
+       "operation": "getProduct",
+       "notes": "**What the guest sees of the product** (decided 29 September, rev 3). `guestListing`: bookable (the default), info only, or hidden; an info-only product keeps its details and photo, shows `notBookableLabel` (default \"Info only / Not bookable online\") and opens details instead of Add to basket, and `addCartLine` refuses it `409` (REV3-14). `displayTags`: up to six, each a kind (clock, height, free, calendar, id) and a label; with none, the guest app derives them from duration, validity and the height rule (23SEP-3). `media`: images and videos from the asset library, one of them primary, which is the photo on the ticket card and what Read more opens on (23SEP-4). `consentQuestionIds`: the consent questions this product asks, in order, from CMS-018 (REV3-26). `requiresTimeWindow`: a space sold by the hour, such as a meeting-room type; its lengths are a `length` attribute whose values carry `durationMinutes` (REV3-13).",
+       "provenance": "contract catalogue.yaml GET /products/{productId}"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Photos and videos",
+       "bindsTo": "Product.media",
+       "operation": "searchMedia",
+       "notes": "Picks from the asset library (`searchMedia`); one item is marked primary. Saved with `updateProduct`, which registers the use of each asset (decided 29 September, rev 3 23SEP-4).",
+       "provenance": "contract assets.yaml GET /media"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Consent questions this product asks",
+       "bindsTo": "Product.consentQuestionIds",
+       "operation": "listConsentQuestions",
+       "notes": "Active questions from `listConsentQuestions`, written on CMS-018; ordered as the guest meets them. The guest is asked these together with the booking flow's own, each once (decided 29 September, rev 3 REV3-26).",
+       "provenance": "contract marketing-crm.yaml GET /consent-questions"
+      },
+      {
+       "kind": "livePreview",
+       "label": "Ticket and wallet pass preview",
+       "bindsTo": "TicketProof",
+       "operation": "previewProductTickets",
+       "notes": "**The PDF ticket and the Apple and Google Wallet pass previews are in Block A (decided 2 October 2026 by Chinmay, DEC-151; CHG-CSP-038, CHG-CSA-041)**, rendered for this product where a ticket template and a pass are named.",
+       "provenance": "contract orders.yaml GET /products/{productId}/ticket-previews"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save product attributes",
+       "operation": "setProductAttributes",
+       "provenance": "contract catalogue.yaml PUT /products/{productId}/attributes"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save product",
+       "operation": "updateProduct",
+       "provenance": "contract catalogue.yaml PATCH /products/{productId}"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save ticket type",
+       "operation": "updateProductVariant",
+       "notes": "**The words and codes on one variant**: its name, the description a guest reads behind the (i) on a ticket-type row (at most 300 characters per language, decided 29 September, rev 3 23SEP-6), its barcode, and whether it is the default. The combination of values and the SKU come from the attributes and are not edited here. A retired variant is refused `409`.",
+       "provenance": "contract catalogue.yaml PATCH /products/{productId}/variants/{variantId}"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Booking flow",
+       "bindsTo": "Product.bookingFlowId",
+       "operation": "listBookingFlows",
+       "notes": "**Which booking flow sells this product** (decided 29 September, W8 and W12): a flow from CMS-103, e.g. *workshop: product first, then date and time*. Empty means the category's flow, then the venue's flow for the product kind; the screen shows which one applies. Saved with `updateProduct`.",
+       "provenance": "decided 29 September, W12; agreed name white-label listBookingFlows (the 29 September pass brief)"
+      },
+      {
+       "kind": "textField",
+       "label": "Sales phone",
+       "bindsTo": "Product.salesContact.phone",
+       "operation": "updateProduct",
+       "notes": "**Contact sales to book** (decided 29 September, W3). Shown beside `guestListing`; used only when the product is info only, as *Call sales* on WEB-004 and GST-004. Empty phone and email means the venue's contact.",
+       "provenance": "contract catalogue.yaml Product.salesContact"
+      },
+      {
+       "kind": "textField",
+       "label": "Sales email",
+       "bindsTo": "Product.salesContact.email",
+       "operation": "updateProduct",
+       "provenance": "contract catalogue.yaml Product.salesContact"
+      },
+      {
+       "kind": "textField",
+       "label": "Note under the contact",
+       "bindsTo": "Product.salesContact.note",
+       "operation": "updateProduct",
+       "notes": "At most 200 characters per language, e.g. *Group courses are booked by phone*.",
+       "provenance": "contract catalogue.yaml Product.salesContact"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The product variants list.",
+   "error": "Could not load. Names which read failed and leaves the product variants untouched.",
+   "emptyFirstRun": "No product variants yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Never shown: `listProductVariants` takes no filter, so an empty list is always the first-run state above.",
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `getProduct` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listBookingFlows",
+    "contract": "white-label",
+    "purpose": "The booking flows a product can be sold through (W12)",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, W12 (the 29 September pass)"
+   },
+   {
+    "operationId": "getProduct",
+    "contract": "catalogue",
+    "purpose": "Read a product",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listProductVariants",
+    "contract": "catalogue",
+    "purpose": "List generated variants",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "setProductAttributes",
+    "contract": "catalogue",
+    "purpose": "Set the attribute axes for a product",
+    "trigger": "onAction",
+    "invalidates": [
+     "listProductVariants"
+    ]
+   },
+   {
+    "operationId": "updateProduct",
+    "contract": "catalogue",
+    "purpose": "Update a product",
+    "trigger": "onAction",
+    "invalidates": [
+     "listProductVariants"
+    ]
+   },
+   {
+    "operationId": "updateProductVariant",
+    "contract": "catalogue",
+    "purpose": "Name, describe, barcode or make default one ticket type (rev 3 23SEP-6)",
+    "trigger": "onAction",
+    "invalidates": [
+     "listProductVariants"
+    ]
+   },
+   {
+    "operationId": "searchMedia",
+    "contract": "assets",
+    "purpose": "Pick the product's photos and videos from the asset library (rev 3 23SEP-4)",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "listConsentQuestions",
+    "contract": "marketing-crm",
+    "purpose": "The consent questions a product can ask (rev 3 REV3-26)",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "restoreProductVersion",
+    "contract": "catalogue",
+    "purpose": "Put a previous version of the product back",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
+    "invalidates": [
+     "getProduct",
+     "listProductVariants"
+    ]
+   },
+   {
+    "operationId": "assessProductChange",
+    "contract": "catalogue",
+    "purpose": "See what a change would touch before making it",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
+    "invalidates": [
+     "getProduct",
+     "listProductVariants"
+    ]
+   },
+   {
+    "operationId": "cloneProduct",
+    "contract": "catalogue",
+    "purpose": "Copy the product as a new draft",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
+    "invalidates": [
+     "getProduct",
+     "listProductVariants"
+    ]
+   },
+   {
+    "operationId": "listProductVersions",
+    "contract": "catalogue",
+    "purpose": "The product versions a restore picks from",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "previewProductTickets",
+    "contract": "orders",
+    "purpose": "The PDF ticket and the Apple and Google Wallet pass proofs of this product (DEC-151, CHG-CSP-038)",
+    "trigger": "onLoad",
+    "provenance": "design-note correction, 2 October 2026 (BO-008)"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "venueId",
+     "from": "session"
+    },
+    {
+     "name": "productId",
+     "from": "deepLink"
+    },
+    {
+     "name": "variantId",
+     "from": "navigation"
+    },
+    {
+     "name": "version",
+     "from": "navigation"
+    }
+   ],
+   "coldEntry": "A product opened from the directory or a shared link. Shows what replaced it where it retired.",
+   "preloaded": [
+    "ProductVariant.id",
+    "ProductVariant.productId",
+    "ProductVariant.sku",
+    "ProductVariant.axisValues",
+    "ProductVariant.name"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-008",
+   "derivedFrom": "wireframes/reference/Retail Board 2.dc.html",
+   "source": "Claude Design Retail pack, 24 August",
+   "note": "**Drawn by Claude Design on `Retail Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formSetProductAttributes",
+    "component": "modal",
+    "trigger": "Save product attributes",
+    "body": "**Collects what `setProductAttributes` sends before it is called.** Required: `axes`. **A meeting-room type sells by length**: a `length` axis whose values each carry `durationMinutes` (e.g. 60, 120, 240, 480; minimum 15), one such axis per product, on a product with `requiresTimeWindow` on; each length is a variant priced on its own (decided 29 September, rev 3 REV3-13). Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save product attributes",
+     "operation": "setProductAttributes"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "axes"
+     ]
+    },
+    "provenance": "contract catalogue.yaml PUT /products/{productId}/attributes"
+   },
+   {
+    "id": "formUpdateProduct",
+    "component": "modal",
+    "trigger": "Save product",
+    "body": "**Collects what `updateProduct` sends before it is called.** Nothing in the body is required. Optional: `name`, `description`, `channels`, `dataMaskValues`, and what the guest sees (decided 29 September, rev 3): `guestListing` and `notBookableLabel` (REV3-14), `displayTags` (at most six, 23SEP-3), `media` (23SEP-4), `consentQuestionIds` (REV3-26) and `requiresTimeWindow` (REV3-13); `salesContact` (W3) and `bookingFlowId` (W8, W12), decided 29 September. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "UpdateProductRequest",
+    "confirm": {
+     "label": "Save product",
+     "operation": "updateProduct"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "name",
+      "description",
+      "channels",
+      "dataMaskValues",
+      "guestListing",
+      "notBookableLabel",
+      "displayTags",
+      "media",
+      "consentQuestionIds",
+      "requiresTimeWindow",
+      "salesContact",
+      "bookingFlowId"
+     ]
+    },
+    "provenance": "contract catalogue.yaml PATCH /products/{productId}"
+   },
+   {
+    "id": "formUpdateProductVariant",
+    "component": "modal",
+    "trigger": "Save ticket type",
+    "body": "**Collects what `updateProductVariant` sends before it is called.** Nothing in the body is required. Optional: `name`, `description` (who the ticket type is for and what it includes, at most 300 characters per language, shown behind the (i) when the booking flow has `cardInfo` on; decided 29 September, rev 3 23SEP-6), `barcode`, `isDefault` (setting it clears the default on the product's other variants). Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save ticket type",
+     "operation": "updateProductVariant"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "name",
+      "description",
+      "barcode",
+      "isDefault"
+     ]
+    },
+    "provenance": "contract catalogue.yaml PATCH /products/{productId}/variants/{variantId}"
+   }
+  ],
+  "gaps": [
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-027): An operation that renders the PDF ticket and Wallet pass preview of a product (printTicketProof works on a template, not a product).",
+    "source": "screens/P08-venue-back-office.yaml#BO-008"
    }
   ],
   "_platform": {
@@ -655,8 +1124,7 @@
    ],
    "inferred": true,
    "entryFrom": [
-    "BO-102",
-    "BO-112"
+    "BO-102"
    ],
    "transitions": [
     {
@@ -686,7 +1154,7 @@
     }
    ]
   },
-  "notes": "Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. **Improved 20 August against the client design board.** Answers 1 board screen(s): Price Book & Retail Pricing Management. **The board specifies this screen further rather than replacing it** — the id, its flows and its navigation are unchanged, which is what keeps 3,184 traceability rows and every board anchor pointing at something real.",
+  "notes": "Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. **Improved 20 August against the client design board.** Answers 1 board screen(s): Price Book & Retail Pricing Management. **The board specifies this screen further rather than replacing it** — the id, its flows and its navigation are unchanged, which is what keeps 3,184 traceability rows and every board anchor pointing at something real.\n\n**Priority direction: the higher number wins** (decided 2 October 2026 by Chinmay, ADM-049 answer \"default\"; CHG-SBO-010). Price lists, promotions and the rule builders all read priority the same way, and every priority field on this screen says \"higher wins\".",
   "density": "compact",
   "boardFrames": [
    "Retail Board 2.dc.html#ret-2f"
@@ -725,7 +1193,8 @@
         "PriceList.priority"
        ],
        "operation": "listPriceLists",
-       "provenance": "contract catalogue.yaml GET /price-lists"
+       "provenance": "contract catalogue.yaml GET /price-lists",
+       "notes": "**Priority: higher number wins** (decided 2 October 2026 by Chinmay, DEC-101); the column header reads \"Priority (higher wins)\"."
       },
       {
        "kind": "dataTable",
@@ -764,7 +1233,8 @@
         "PriceList.priority"
        ],
        "operation": "getPriceList",
-       "provenance": "contract catalogue.yaml GET /price-lists/{priceListId}"
+       "provenance": "contract catalogue.yaml GET /price-lists/{priceListId}",
+       "notes": "**Priority: higher number wins** (decided 2 October 2026 by Chinmay, DEC-101); the column header reads \"Priority (higher wins)\"."
       }
      ]
     },
@@ -936,7 +1406,7 @@
     "id": "formCreatePriceList",
     "component": "modal",
     "trigger": "Create price list",
-    "body": "**Collects what `createPriceList` sends before it is called.** Required: `code`, `name`, `venueId`, `channels`. Optional: `validFrom`, `validTo`, `priority`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `createPriceList` sends before it is called.** Required: `code`, `name`, `venueId`, `channels`. Optional: `validFrom`, `validTo`, `priority`. `priority` is labelled **\"Priority (higher number wins)\"** (DEC-101). Dismissing sends nothing; the screen behind is unchanged.",
     "bindsTo": "CreatePriceListRequest",
     "confirm": {
      "label": "Create price list",
@@ -999,7 +1469,7 @@
     "id": "formUpdatePriceList",
     "component": "modal",
     "trigger": "Save price list",
-    "body": "**Collects what `updatePriceList` sends before it is called.** Nothing in the body is required. Optional: `name`, `validFrom`, `validTo`, `priority`, `isActive`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `updatePriceList` sends before it is called.** Nothing in the body is required. Optional: `name`, `validFrom`, `validTo`, `priority`, `isActive`. `priority` is labelled **\"Priority (higher number wins)\"** (DEC-101). Dismissing sends nothing; the screen behind is unchanged.",
     "confirm": {
      "label": "Save price list",
      "operation": "updatePriceList"
@@ -1086,7 +1556,7 @@
     }
    ]
   },
-  "notes": "Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. **Improved 20 August against the client design board.** Answers 6 board screen(s): Retail Commercial Command Center; Promotion & Offer Builder; Promotion Eligibility, Priority & Conflict Rules and 3 more. **The board specifies this screen further rather than replacing it** — the id, its flows and its navigation are unchanged, which is what keeps 3,184 traceability rows and every board anchor pointing at something real. **Owns POS board frame(s) POS-4E** (client pack, 24 August). **Assigned by board purpose rather than by operation overlap** — three attempts at deriving that mapping produced plausible nonsense, and a reader who trusts a bad table is worse off than one who has none. **Retail board operations wired 24 August.**",
+  "notes": "Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. **Improved 20 August against the client design board.** Answers 6 board screen(s): Retail Commercial Command Center; Promotion & Offer Builder; Promotion Eligibility, Priority & Conflict Rules and 3 more. **The board specifies this screen further rather than replacing it** — the id, its flows and its navigation are unchanged, which is what keeps 3,184 traceability rows and every board anchor pointing at something real. **Owns POS board frame(s) POS-4E** (client pack, 24 August). **Assigned by board purpose rather than by operation overlap** — three attempts at deriving that mapping produced plausible nonsense, and a reader who trusts a bad table is worse off than one who has none. **Retail board operations wired 24 August.**\n\n**One desk, four tabs (design-note correction, 2 October 2026; CHG-SBO-010; DI-987):** Promotions (price rules), Coupons (campaigns and codes), Vouchers (batches, a liability, kept apart from price rules) and Campaigns, with Results beside them. Each tab has its own list; nothing is one form. Components carry `tab`.",
   "density": "compact",
   "boardFrames": [
    "POS Board 4.dc.html#pos-4e",
@@ -1110,21 +1580,24 @@
        "label": "Venue id",
        "operation": "listPromotions",
        "notes": "Sends `?venueId=` to `listPromotions`.",
-       "provenance": "contract promotions.yaml GET /promotions"
+       "provenance": "contract promotions.yaml GET /promotions",
+       "tab": "Promotions"
       },
       {
        "kind": "textField",
        "label": "Status",
        "operation": "listPromotions",
        "notes": "Sends `?status=` to `listPromotions`.",
-       "provenance": "contract promotions.yaml GET /promotions"
+       "provenance": "contract promotions.yaml GET /promotions",
+       "tab": "Promotions"
       },
       {
        "kind": "datePicker",
        "label": "Active at",
        "operation": "listPromotions",
        "notes": "Sends `?activeAt=` to `listPromotions`.",
-       "provenance": "contract promotions.yaml GET /promotions"
+       "provenance": "contract promotions.yaml GET /promotions",
+       "tab": "Promotions"
       },
       {
        "kind": "dataTable",
@@ -1145,7 +1618,8 @@
         "Promotion.maxRedemptions"
        ],
        "operation": "listPromotions",
-       "provenance": "contract promotions.yaml GET /promotions"
+       "provenance": "contract promotions.yaml GET /promotions",
+       "tab": "Promotions"
       },
       {
        "kind": "dataTable",
@@ -1166,7 +1640,8 @@
         "CouponCampaign.redeemedCount"
        ],
        "operation": "listCouponCampaigns",
-       "provenance": "contract promotions.yaml GET /coupon-campaigns"
+       "provenance": "contract promotions.yaml GET /coupon-campaigns",
+       "tab": "Coupons"
       },
       {
        "kind": "dataTable",
@@ -1187,7 +1662,8 @@
         "CouponCode.redeemedAt"
        ],
        "operation": "listCouponCodes",
-       "provenance": "contract promotions.yaml GET /coupon-campaigns/{campaignId}/codes"
+       "provenance": "contract promotions.yaml GET /coupon-campaigns/{campaignId}/codes",
+       "tab": "Coupons"
       },
       {
        "kind": "confirmDialog",
@@ -1207,28 +1683,32 @@
        "label": "Venue id",
        "operation": "listCommercialCampaigns",
        "notes": "Sends `?venueId=` to `listCommercialCampaigns`.",
-       "provenance": "contract promotions.yaml GET /commercial-campaigns"
+       "provenance": "contract promotions.yaml GET /commercial-campaigns",
+       "tab": "Campaigns"
       },
       {
        "kind": "datePicker",
        "label": "Active at",
        "operation": "listCommercialCampaigns",
        "notes": "Sends `?activeAt=` to `listCommercialCampaigns`.",
-       "provenance": "contract promotions.yaml GET /commercial-campaigns"
+       "provenance": "contract promotions.yaml GET /commercial-campaigns",
+       "tab": "Campaigns"
       },
       {
        "kind": "textField",
        "label": "Owner principal id",
        "operation": "listCommercialCampaigns",
        "notes": "Sends `?ownerPrincipalId=` to `listCommercialCampaigns`.",
-       "provenance": "contract promotions.yaml GET /commercial-campaigns"
+       "provenance": "contract promotions.yaml GET /commercial-campaigns",
+       "tab": "Campaigns"
       },
       {
        "kind": "searchField",
        "label": "Q",
        "operation": "listCommercialCampaigns",
        "notes": "Sends `?q=` to `listCommercialCampaigns`.",
-       "provenance": "contract promotions.yaml GET /commercial-campaigns"
+       "provenance": "contract promotions.yaml GET /commercial-campaigns",
+       "tab": "Campaigns"
       },
       {
        "kind": "dataTable",
@@ -1247,7 +1727,8 @@
         "CommercialCampaign.budgets"
        ],
        "operation": "listCommercialCampaigns",
-       "provenance": "contract promotions.yaml GET /commercial-campaigns"
+       "provenance": "contract promotions.yaml GET /commercial-campaigns",
+       "tab": "Campaigns"
       }
      ]
     },
@@ -1278,7 +1759,8 @@
         "Promotion.status"
        ],
        "operation": "getPromotion",
-       "provenance": "contract promotions.yaml GET /promotions/{promotionId}"
+       "provenance": "contract promotions.yaml GET /promotions/{promotionId}",
+       "tab": "Promotions"
       },
       {
        "kind": "detailPanel",
@@ -1294,7 +1776,8 @@
         "PromotionUsage.byChannel"
        ],
        "operation": "getPromotionUsage",
-       "provenance": "contract promotions.yaml GET /promotions/{promotionId}/usage"
+       "provenance": "contract promotions.yaml GET /promotions/{promotionId}/usage",
+       "tab": "Promotions"
       },
       {
        "kind": "detailPanel",
@@ -1304,7 +1787,8 @@
         "DashboardData.tileData"
        ],
        "operation": "getDashboard",
-       "provenance": "contract reporting.yaml GET /dashboards/{dashboardId}"
+       "provenance": "contract reporting.yaml GET /dashboards/{dashboardId}",
+       "tab": "Results"
       }
      ]
     },
@@ -1316,79 +1800,92 @@
        "kind": "primaryButton",
        "label": "Analyse promotion conflicts",
        "operation": "analysePromotionConflicts",
-       "provenance": "contract promotions.yaml GET /promotions/{promotionId}/conflicts"
+       "provenance": "contract promotions.yaml GET /promotions/{promotionId}/conflicts",
+       "tab": "Promotions"
       },
       {
        "kind": "secondaryButton",
        "label": "Create coupon campaign",
        "operation": "createCouponCampaign",
-       "provenance": "contract promotions.yaml POST /coupon-campaigns"
+       "provenance": "contract promotions.yaml POST /coupon-campaigns",
+       "tab": "Coupons"
       },
       {
        "kind": "secondaryButton",
        "label": "Create promotion",
        "operation": "createPromotion",
-       "provenance": "contract promotions.yaml POST /promotions"
+       "provenance": "contract promotions.yaml POST /promotions",
+       "tab": "Promotions"
       },
       {
        "kind": "secondaryButton",
        "label": "End promotion",
        "operation": "endPromotion",
-       "provenance": "contract promotions.yaml POST /promotions/{promotionId}/end"
+       "provenance": "contract promotions.yaml POST /promotions/{promotionId}/end",
+       "tab": "Promotions"
       },
       {
        "kind": "secondaryButton",
        "label": "Evaluate promotions",
        "operation": "evaluatePromotions",
-       "provenance": "contract promotions.yaml POST /promotions/evaluate"
+       "provenance": "contract promotions.yaml POST /promotions/evaluate",
+       "tab": "Promotions"
       },
       {
        "kind": "secondaryButton",
        "label": "Generate coupon codes",
        "operation": "generateCouponCodes",
-       "provenance": "contract promotions.yaml POST /coupon-campaigns/{campaignId}/codes"
+       "provenance": "contract promotions.yaml POST /coupon-campaigns/{campaignId}/codes",
+       "tab": "Coupons"
       },
       {
        "kind": "secondaryButton",
        "label": "Pause promotion",
        "operation": "pausePromotion",
-       "provenance": "contract promotions.yaml POST /promotions/{promotionId}/pause"
+       "provenance": "contract promotions.yaml POST /promotions/{promotionId}/pause",
+       "tab": "Promotions"
       },
       {
        "kind": "secondaryButton",
        "label": "Publish promotion",
        "operation": "publishPromotion",
-       "provenance": "contract promotions.yaml POST /promotions/{promotionId}/publish"
+       "provenance": "contract promotions.yaml POST /promotions/{promotionId}/publish",
+       "tab": "Promotions"
       },
       {
        "kind": "secondaryButton",
        "label": "Unschedule promotion",
        "operation": "unschedulePromotion",
-       "provenance": "contract promotions.yaml POST /promotions/{promotionId}/unschedule"
+       "provenance": "contract promotions.yaml POST /promotions/{promotionId}/unschedule",
+       "tab": "Promotions"
       },
       {
        "kind": "secondaryButton",
        "label": "Save promotion",
        "operation": "updatePromotion",
-       "provenance": "contract promotions.yaml PATCH /promotions/{promotionId}"
+       "provenance": "contract promotions.yaml PATCH /promotions/{promotionId}",
+       "tab": "Promotions"
       },
       {
        "kind": "secondaryButton",
        "label": "Simulate promotion",
        "operation": "simulatePromotion",
-       "provenance": "contract promotions.yaml POST /promotions/{promotionId}/simulate"
+       "provenance": "contract promotions.yaml POST /promotions/{promotionId}/simulate",
+       "tab": "Promotions"
       },
       {
        "kind": "secondaryButton",
        "label": "Run report",
        "operation": "runReport",
-       "provenance": "contract reporting.yaml POST /reports/{reportId}/run"
+       "provenance": "contract reporting.yaml POST /reports/{reportId}/run",
+       "tab": "Results"
       },
       {
        "kind": "destructiveButton",
        "label": "Void coupon code",
        "operation": "voidCouponCode",
-       "provenance": "contract promotions.yaml POST /coupon-codes/{code}/void"
+       "provenance": "contract promotions.yaml POST /coupon-codes/{code}/void",
+       "tab": "Coupons"
       },
       {
        "kind": "publishGate",
@@ -1961,6 +2458,7 @@
      "to": "ANL-009",
      "trigger": "AI Assistant & Action Center",
      "provenance": "flow F77 step 2→3",
+     "operation": "createBundle",
      "crossesDevice": true,
      "back": false
     }
@@ -1999,12 +2497,6 @@
        ],
        "operation": "listCatalogueBundles",
        "provenance": "contract catalogue.yaml GET /catalogue/bundles"
-      },
-      {
-       "kind": "publishGate",
-       "impliedBy": "publishBundle",
-       "notes": "Declares `publishBundle`. **The gate names what the publish will affect before it happens** — a disabled Publish with no reason is the state operators escalate.\n",
-       "provenance": "carried from the previous definition"
       },
       {
        "kind": "textField",
@@ -2121,18 +2613,6 @@
      "slot": "rowActions",
      "components": [
       {
-       "kind": "primaryButton",
-       "label": "Publish bundle",
-       "operation": "publishBundle",
-       "provenance": "contract catalogue.yaml POST /catalogue/bundles"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Report bundle applied",
-       "operation": "reportBundleApplied",
-       "provenance": "contract catalogue.yaml POST /catalogue/bundles/{version}/applied"
-      },
-      {
        "kind": "secondaryButton",
        "label": "Create bundle",
        "operation": "createBundle",
@@ -2222,24 +2702,6 @@
     "contract": "catalogue",
     "purpose": "Pull the current bundle for this workstation's venue",
     "trigger": "onLoad"
-   },
-   {
-    "operationId": "publishBundle",
-    "contract": "catalogue",
-    "purpose": "Compute, sign and publish a catalogue bundle",
-    "trigger": "onAction",
-    "invalidates": [
-     "listCatalogueBundles"
-    ]
-   },
-   {
-    "operationId": "reportBundleApplied",
-    "contract": "catalogue",
-    "purpose": "Report that a workstation applied a bundle",
-    "trigger": "onAction",
-    "invalidates": [
-     "listCatalogueBundles"
-    ]
    },
    {
     "operationId": "createBundle",
@@ -2356,44 +2818,6 @@
     "provenance": "contract catalogue.yaml PUT /products/{productId}/group-package"
    },
    {
-    "id": "formPublishBundle",
-    "component": "modal",
-    "trigger": "Publish bundle",
-    "body": "**Collects what `publishBundle` sends before it is called.** Required: `venueId`. Optional: `note`, `staleAfterHours`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Publish bundle",
-     "operation": "publishBundle"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "venueId",
-      "note",
-      "staleAfterHours"
-     ]
-    },
-    "provenance": "contract catalogue.yaml POST /catalogue/bundles"
-   },
-   {
-    "id": "formReportBundleApplied",
-    "component": "modal",
-    "trigger": "Report bundle applied",
-    "body": "**Collects what `reportBundleApplied` sends before it is called.** Required: `appliedAt`, `outcome`. Optional: `error`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Report bundle applied",
-     "operation": "reportBundleApplied"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "appliedAt",
-      "outcome",
-      "error"
-     ]
-    },
-    "provenance": "contract catalogue.yaml POST /catalogue/bundles/{version}/applied"
-   },
-   {
     "id": "formCreateBundle",
     "component": "modal",
     "trigger": "Create bundle",
@@ -2449,6 +2873,20 @@
      ]
     },
     "provenance": "contract catalogue.yaml PUT /package-pricing"
+   }
+  ],
+  "gaps": [
+   {
+    "operation": "publishBundle",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-025): reportBundleApplied is a workstation reporting that it applied a catalogue release, which no person on a back-office screen does, and publishBundle publishes the whole catalogue release (BO-014), not the sellable bundle; the name collision (catalogue bundle vs bundle) put both here. F77 step 2 keeps createBundle (design-notes correction ticketing-backoffice BO-011)",
+    "source": "contracts/spine/catalogue.yaml#reportBundleApplied | contracts/spine/catalogue.yaml#publishBundle | F77 step 2"
+   },
+   {
+    "operation": "reportBundleApplied",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-025): reportBundleApplied is a workstation reporting that it applied a catalogue release, which no person on a back-office screen does, and publishBundle publishes the whole catalogue release (BO-014), not the sellable bundle; the name collision (catalogue bundle vs bundle) put both here. F77 step 2 keeps createBundle (design-notes correction ticketing-backoffice BO-011)",
+    "source": "contracts/spine/catalogue.yaml#reportBundleApplied | contracts/spine/catalogue.yaml#publishBundle | F77 step 2"
    }
   ],
   "_platform": {
@@ -3565,13 +4003,6 @@
      "components": [
       {
        "kind": "textField",
-       "label": "Venue id",
-       "operation": "listProducts",
-       "notes": "Sends `?venueId=` to `listProducts`.",
-       "provenance": "contract catalogue.yaml GET /products"
-      },
-      {
-       "kind": "textField",
        "label": "Kind",
        "operation": "listProducts",
        "notes": "Sends `?kind=` to `listProducts`.",
@@ -3586,7 +4017,7 @@
       },
       {
        "kind": "dataTable",
-       "label": "Every product",
+       "label": "Waiting to publish",
        "bindsTo": "Product",
        "columns": [
         "Product.id",
@@ -3603,38 +4034,8 @@
         "Product.onSaleTo"
        ],
        "operation": "listProducts",
-       "provenance": "contract catalogue.yaml GET /products"
-      },
-      {
-       "kind": "dataTable",
-       "label": "Every alternative code",
-       "bindsTo": "AlternativeCode",
-       "columns": [
-        "AlternativeCode.code",
-        "AlternativeCode.partnerId",
-        "AlternativeCode.partnerName",
-        "AlternativeCode.variantId",
-        "AlternativeCode.note"
-       ],
-       "operation": "listAlternativeCodes",
-       "provenance": "contract catalogue.yaml GET /products/{productId}/alternative-codes"
-      },
-      {
-       "kind": "dataTable",
-       "label": "Every product variant",
-       "bindsTo": "ProductVariant",
-       "columns": [
-        "ProductVariant.id",
-        "ProductVariant.productId",
-        "ProductVariant.sku",
-        "ProductVariant.axisValues",
-        "ProductVariant.name",
-        "ProductVariant.barcode",
-        "ProductVariant.isDefault",
-        "ProductVariant.isActive"
-       ],
-       "operation": "listProductVariants",
-       "provenance": "contract catalogue.yaml GET /products/{productId}/variants"
+       "provenance": "contract catalogue.yaml GET /products",
+       "notes": "Products with unpublished changes; the release is Publish bundle, and Transition product lifecycle moves a product to published (F78). Editing the product is BO-007 and BO-008."
       },
       {
        "kind": "dataTable",
@@ -3694,30 +4095,6 @@
      "slot": "rowActions",
      "components": [
       {
-       "kind": "primaryButton",
-       "label": "Create product",
-       "operation": "createProduct",
-       "provenance": "contract catalogue.yaml POST /products"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Resolve product by code",
-       "operation": "resolveProductByCode",
-       "provenance": "contract catalogue.yaml GET /products/resolve"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Save alternative codes",
-       "operation": "setAlternativeCodes",
-       "provenance": "contract catalogue.yaml PUT /products/{productId}/alternative-codes"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Save product attributes",
-       "operation": "setProductAttributes",
-       "provenance": "contract catalogue.yaml PUT /products/{productId}/attributes"
-      },
-      {
        "kind": "secondaryButton",
        "label": "Transition product lifecycle",
        "operation": "transitionProductLifecycle",
@@ -3726,21 +4103,9 @@
       },
       {
        "kind": "secondaryButton",
-       "label": "Save product",
-       "operation": "updateProduct",
-       "provenance": "contract catalogue.yaml PATCH /products/{productId}"
-      },
-      {
-       "kind": "secondaryButton",
        "label": "Publish bundle",
        "operation": "publishBundle",
        "provenance": "contract catalogue.yaml POST /catalogue/bundles"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Save item availability",
-       "operation": "setItemAvailability",
-       "provenance": "contract fnb.yaml PUT /menu-items/{itemId}/availability"
       },
       {
        "kind": "publishGate",
@@ -3755,7 +4120,7 @@
   "states": {
    "loading": "The catalogue publishing list.",
    "error": "Could not load. Names which read failed and leaves the catalogue publishing untouched.",
-   "emptyFirstRun": "No catalogue publishing yet. Offers Create product (`createProduct`); distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No catalogue publishing yet. Offers Publish bundle (`publishBundle`); distinct from a filter that matched nothing.",
    "emptyNoResults": "Nothing matches the filter on venueId, kind, isSellable and the catalogue publishing are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -3773,63 +4138,9 @@
     "trigger": "onAction"
    },
    {
-    "operationId": "createProduct",
-    "contract": "catalogue",
-    "purpose": "Create a product",
-    "trigger": "onAction",
-    "invalidates": [
-     "listProducts"
-    ]
-   },
-   {
-    "operationId": "listAlternativeCodes",
-    "contract": "catalogue",
-    "purpose": "External identifiers for a product",
-    "trigger": "onAction"
-   },
-   {
-    "operationId": "listProductVariants",
-    "contract": "catalogue",
-    "purpose": "List generated variants",
-    "trigger": "onAction"
-   },
-   {
-    "operationId": "resolveProductByCode",
-    "contract": "catalogue",
-    "purpose": "Resolve a partner code to a product",
-    "trigger": "onAction"
-   },
-   {
-    "operationId": "setAlternativeCodes",
-    "contract": "catalogue",
-    "purpose": "Set external identifiers",
-    "trigger": "onAction",
-    "invalidates": [
-     "listProducts"
-    ]
-   },
-   {
-    "operationId": "setProductAttributes",
-    "contract": "catalogue",
-    "purpose": "Set the attribute axes for a product",
-    "trigger": "onAction",
-    "invalidates": [
-     "listProducts"
-    ]
-   },
-   {
     "operationId": "transitionProductLifecycle",
     "contract": "catalogue",
     "purpose": "Move a product through its lifecycle",
-    "trigger": "onAction",
-    "invalidates": [
-     "listProducts"
-    ]
-   },
-   {
-    "operationId": "updateProduct",
-    "contract": "catalogue",
-    "purpose": "Update a product",
     "trigger": "onAction",
     "invalidates": [
      "listProducts"
@@ -3845,15 +4156,6 @@
     "operationId": "publishBundle",
     "contract": "catalogue",
     "purpose": "Compute, sign and publish a catalogue bundle",
-    "trigger": "onAction",
-    "invalidates": [
-     "listProducts"
-    ]
-   },
-   {
-    "operationId": "setItemAvailability",
-    "contract": "fnb",
-    "purpose": "Mark an item available or eighty-sixed",
     "trigger": "onAction",
     "invalidates": [
      "listProducts"
@@ -3899,65 +4201,6 @@
   "apisNote": "Rebuilt 9 September 2026 from the 13 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "overlays": [
    {
-    "id": "formCreateProduct",
-    "component": "modal",
-    "trigger": "Create product",
-    "body": "**Collects what `createProduct` sends before it is called.** Required: `code`, `name`, `kind`, `venueId`. Optional: `description`, `channels`, `entitlementTemplateId`, `dataMaskValues`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "CreateProductRequest",
-    "confirm": {
-     "label": "Create product",
-     "operation": "createProduct"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "code",
-      "name",
-      "kind",
-      "venueId",
-      "description",
-      "channels",
-      "entitlementTemplateId",
-      "dataMaskValues"
-     ]
-    },
-    "provenance": "contract catalogue.yaml POST /products"
-   },
-   {
-    "id": "formSetAlternativeCodes",
-    "component": "modal",
-    "trigger": "Save alternative codes",
-    "body": "**Collects what `setAlternativeCodes` sends before it is called.** Required: `codes`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Save alternative codes",
-     "operation": "setAlternativeCodes"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "codes"
-     ]
-    },
-    "provenance": "contract catalogue.yaml PUT /products/{productId}/alternative-codes"
-   },
-   {
-    "id": "formSetProductAttributes",
-    "component": "modal",
-    "trigger": "Save product attributes",
-    "body": "**Collects what `setProductAttributes` sends before it is called.** Required: `axes`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Save product attributes",
-     "operation": "setProductAttributes"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "axes"
-     ]
-    },
-    "provenance": "contract catalogue.yaml PUT /products/{productId}/attributes"
-   },
-   {
     "id": "formTransitionProductLifecycle",
     "component": "modal",
     "trigger": "Transition product lifecycle",
@@ -3977,27 +4220,6 @@
     "provenance": "contract catalogue.yaml POST /products/{productId}/lifecycle"
    },
    {
-    "id": "formUpdateProduct",
-    "component": "modal",
-    "trigger": "Save product",
-    "body": "**Collects what `updateProduct` sends before it is called.** Nothing in the body is required. Optional: `name`, `description`, `channels`, `dataMaskValues`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "UpdateProductRequest",
-    "confirm": {
-     "label": "Save product",
-     "operation": "updateProduct"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "name",
-      "description",
-      "channels",
-      "dataMaskValues"
-     ]
-    },
-    "provenance": "contract catalogue.yaml PATCH /products/{productId}"
-   },
-   {
     "id": "formPublishBundle",
     "component": "modal",
     "trigger": "Publish bundle",
@@ -4015,26 +4237,56 @@
      ]
     },
     "provenance": "contract catalogue.yaml POST /catalogue/bundles"
+   }
+  ],
+  "gaps": [
+   {
+    "operation": "createProduct",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-025): The publishing screen repeated the whole product editor of BO-007 and BO-008 (create, attributes, alternative codes, variants, code lookup, update); it keeps the pending list (listProducts, listPrices) and the release acts (transitionProductLifecycle, publishBundle) that F78 step 4 calls, and editing stays on the product configuration (DI-987) (design-notes correction ticketing-backoffice BO-014)",
+    "source": "screens/P08-venue-back-office.yaml#BO-014 | DI-987 | F78 step 4"
    },
    {
-    "id": "formSetItemAvailability",
-    "component": "modal",
-    "trigger": "Save item availability",
-    "body": "**Collects what `setItemAvailability` sends before it is called.** Required: `isAvailable`, `recordedAt`. Optional: `reason`, `restoreAt`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Save item availability",
-     "operation": "setItemAvailability"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "isAvailable",
-      "recordedAt",
-      "reason",
-      "restoreAt"
-     ]
-    },
-    "provenance": "contract fnb.yaml PUT /menu-items/{itemId}/availability"
+    "operation": "listAlternativeCodes",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-025): The publishing screen repeated the whole product editor of BO-007 and BO-008 (create, attributes, alternative codes, variants, code lookup, update); it keeps the pending list (listProducts, listPrices) and the release acts (transitionProductLifecycle, publishBundle) that F78 step 4 calls, and editing stays on the product configuration (DI-987) (design-notes correction ticketing-backoffice BO-014)",
+    "source": "screens/P08-venue-back-office.yaml#BO-014 | DI-987 | F78 step 4"
+   },
+   {
+    "operation": "listProductVariants",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-025): The publishing screen repeated the whole product editor of BO-007 and BO-008 (create, attributes, alternative codes, variants, code lookup, update); it keeps the pending list (listProducts, listPrices) and the release acts (transitionProductLifecycle, publishBundle) that F78 step 4 calls, and editing stays on the product configuration (DI-987) (design-notes correction ticketing-backoffice BO-014)",
+    "source": "screens/P08-venue-back-office.yaml#BO-014 | DI-987 | F78 step 4"
+   },
+   {
+    "operation": "resolveProductByCode",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-025): The publishing screen repeated the whole product editor of BO-007 and BO-008 (create, attributes, alternative codes, variants, code lookup, update); it keeps the pending list (listProducts, listPrices) and the release acts (transitionProductLifecycle, publishBundle) that F78 step 4 calls, and editing stays on the product configuration (DI-987) (design-notes correction ticketing-backoffice BO-014)",
+    "source": "screens/P08-venue-back-office.yaml#BO-014 | DI-987 | F78 step 4"
+   },
+   {
+    "operation": "setAlternativeCodes",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-025): The publishing screen repeated the whole product editor of BO-007 and BO-008 (create, attributes, alternative codes, variants, code lookup, update); it keeps the pending list (listProducts, listPrices) and the release acts (transitionProductLifecycle, publishBundle) that F78 step 4 calls, and editing stays on the product configuration (DI-987) (design-notes correction ticketing-backoffice BO-014)",
+    "source": "screens/P08-venue-back-office.yaml#BO-014 | DI-987 | F78 step 4"
+   },
+   {
+    "operation": "setProductAttributes",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-025): The publishing screen repeated the whole product editor of BO-007 and BO-008 (create, attributes, alternative codes, variants, code lookup, update); it keeps the pending list (listProducts, listPrices) and the release acts (transitionProductLifecycle, publishBundle) that F78 step 4 calls, and editing stays on the product configuration (DI-987) (design-notes correction ticketing-backoffice BO-014)",
+    "source": "screens/P08-venue-back-office.yaml#BO-014 | DI-987 | F78 step 4"
+   },
+   {
+    "operation": "updateProduct",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-025): The publishing screen repeated the whole product editor of BO-007 and BO-008 (create, attributes, alternative codes, variants, code lookup, update); it keeps the pending list (listProducts, listPrices) and the release acts (transitionProductLifecycle, publishBundle) that F78 step 4 calls, and editing stays on the product configuration (DI-987) (design-notes correction ticketing-backoffice BO-014)",
+    "source": "screens/P08-venue-back-office.yaml#BO-014 | DI-987 | F78 step 4"
+   },
+   {
+    "operation": "setItemAvailability",
+    "removed": true,
+    "why": "Editing a product belongs to the product configuration (BO-007, BO-008); publishing needs the pending list and the release (design-note correction ticketing-backoffice BO-014, DI-987).",
+    "source": "screens/P08-venue-back-office.yaml#BO-008"
    }
   ],
   "_platform": {
@@ -4075,24 +4327,16 @@
   },
   "navigation": {
    "exitTo": [
-    "BO-001",
     "BO-007",
     "BO-009",
-    "BO-099"
+    "BO-099",
+    "BO-023"
    ],
    "inferred": true,
    "entryFrom": [
     "BO-102"
    ],
    "transitions": [
-    {
-     "to": "BO-001",
-     "trigger": "Queue Directory",
-     "carries": [
-      "eventId"
-     ],
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId and BO-015 holds eventId, so an edge into it carries them"
-    },
     {
      "to": "BO-007",
      "trigger": "Product Directory",
@@ -4110,6 +4354,12 @@
       "performanceId"
      ],
      "provenance": "stated 28 September — BO-099 Performance Manifest is opened from a Performance (audit R165); the selected performance's id is its path parameter"
+    },
+    {
+     "to": "BO-023",
+     "trigger": "Cancels it and reviews the refund exposure",
+     "provenance": "wiring fix, 2 October 2026 (CHG-WIR-002): flow F09 step 2→3",
+     "operation": "cancelPerformance"
     }
    ]
   },
@@ -4723,358 +4973,6 @@
      ]
     },
     "provenance": "contract catalogue.yaml PUT /performance-templates"
-   }
-  ],
-  "_platform": {
-   "code": "P08",
-   "audience": "staff",
-   "formFactor": "web",
-   "shortName": "Venue Management",
-   "name": "Venue Management — Back Office",
-   "offlineCapable": false,
-   "app": "venue-management-web",
-   "operator": "venue",
-   "targetApp": {
-    "app": "venue-management",
-    "name": "TICVAI Venue Management",
-    "shell": "web",
-    "siblings": [
-     "P12",
-     "P13",
-     "P16"
-    ],
-    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "BO-017",
-  "name": "Capacity Management",
-  "module": "Sell",
-  "requiresModule": "ticketing",
-  "wave": 1,
-  "capability": "C00",
-  "implementation": {
-   "app": "venue-management-web",
-   "route": "/venue-operations/capacity-management",
-   "component": "apps/venue-management-web/src/routes/venue-operations/CapacityManagementDetail.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "exitTo": [
-    "BO-007",
-    "BO-009"
-   ],
-   "inferred": true,
-   "entryFrom": [
-    "BO-102"
-   ],
-   "transitions": [
-    {
-     "to": "BO-007",
-     "trigger": "Product Directory",
-     "provenance": "derived — BO-007 declares entryState.params productId and BO-017 holds none of them. The edge carries nothing: productId only pre-selects (deep link or optional), and BO-007 opens on its own"
-    },
-    {
-     "to": "BO-009",
-     "trigger": "Pricing Rules",
-     "provenance": "derived — BO-009 declares entryState.params priceListId, ruleId and BO-017 holds none of them. The edge carries nothing: priceListId only pre-selects (deep link or optional); BO-009 finds ruleId (listDynamicPriceRules) itself, and BO-009 opens on its own"
-    }
-   ]
-  },
-  "notes": "Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.",
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "`listChannelCapacities` reads the population and `getChannelAllocations` reads one of them — list, select, act",
-  "purpose": "Change how many people a performance can take (renamed from session, decided 28 September, audit R165).",
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "collection",
-     "components": [
-      {
-       "kind": "textField",
-       "label": "Performance id",
-       "operation": "listChannelCapacities",
-       "notes": "Sends `?performanceId=` to `listChannelCapacities`.",
-       "provenance": "contract catalogue.yaml GET /channel-capacities"
-      },
-      {
-       "kind": "dataTable",
-       "label": "Every channel capacity",
-       "bindsTo": "ChannelCapacity",
-       "columns": [
-        "ChannelCapacity.id",
-        "ChannelCapacity.performanceId",
-        "ChannelCapacity.name",
-        "ChannelCapacity.seatCategoryId",
-        "ChannelCapacity.oversellAllowance",
-        "ChannelCapacity.oversellBasis",
-        "ChannelCapacity.capacity",
-        "ChannelCapacity.sold",
-        "ChannelCapacity.leased",
-        "ChannelCapacity.remaining",
-        "ChannelCapacity.hasChannelAllocations",
-        "ChannelCapacity.isSeated"
-       ],
-       "operation": "listChannelCapacities",
-       "provenance": "contract catalogue.yaml GET /channel-capacities"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected channel capacity",
-       "bindsTo": "ChannelCapacity",
-       "columns": [
-        "ChannelCapacity.id",
-        "ChannelCapacity.performanceId",
-        "ChannelCapacity.name",
-        "ChannelCapacity.seatCategoryId",
-        "ChannelCapacity.oversellAllowance",
-        "ChannelCapacity.oversellBasis",
-        "ChannelCapacity.capacity",
-        "ChannelCapacity.sold",
-        "ChannelCapacity.leased",
-        "ChannelCapacity.remaining",
-        "ChannelCapacity.hasChannelAllocations",
-        "ChannelCapacity.isSeated"
-       ],
-       "operation": "listChannelCapacities",
-       "provenance": "contract catalogue.yaml GET /channel-capacities"
-      },
-      {
-       "kind": "detailPanel",
-       "label": "The channel allocation set",
-       "bindsTo": "ChannelAllocationSet",
-       "columns": [
-        "ChannelAllocationSet.channelCapacityId",
-        "ChannelAllocationSet.capacity",
-        "ChannelAllocationSet.allocations",
-        "ChannelAllocationSet.generalPoolUnits",
-        "ChannelAllocationSet.totalSold",
-        "ChannelAllocationSet.totalRemaining"
-       ],
-       "operation": "getChannelAllocations",
-       "provenance": "contract catalogue.yaml GET /channel-capacities/{channelCapacityId}/channel-allocations"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Create channel capacity",
-       "operation": "createChannelCapacity",
-       "provenance": "contract catalogue.yaml POST /channel-capacities"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Release channel allocation",
-       "operation": "relinquishChannelAllocation",
-       "provenance": "contract catalogue.yaml POST /channel-capacities/{channelCapacityId}/channel-allocations/release"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Save channel allocations",
-       "operation": "setChannelAllocations",
-       "provenance": "contract catalogue.yaml PUT /channel-capacities/{channelCapacityId}/channel-allocations"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Save channel capacity",
-       "operation": "updateChannelCapacity",
-       "provenance": "contract catalogue.yaml PATCH /channel-capacities/{channelCapacityId}"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The capacity list.",
-   "error": "Could not load. Names which read failed and leaves the capacity untouched.",
-   "emptyFirstRun": "No capacity yet. Offers Create channel capacity (`createChannelCapacity`); distinct from a filter that matched nothing.",
-   "emptyNoResults": "Nothing matches the filter on performanceId and the capacity are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listChannelCapacities` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "listChannelCapacities",
-    "contract": "catalogue",
-    "purpose": "List capacity envelopes",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "getChannelAllocations",
-    "contract": "catalogue",
-    "purpose": "Capacity allocated to each channel",
-    "trigger": "onAction"
-   },
-   {
-    "operationId": "createChannelCapacity",
-    "contract": "catalogue",
-    "purpose": "Create a capacity envelope",
-    "trigger": "onAction",
-    "invalidates": [
-     "listChannelCapacities"
-    ]
-   },
-   {
-    "operationId": "relinquishChannelAllocation",
-    "contract": "catalogue",
-    "purpose": "Return unsold channel allocation to the general pool",
-    "trigger": "onAction",
-    "invalidates": [
-     "listChannelCapacities"
-    ]
-   },
-   {
-    "operationId": "setChannelAllocations",
-    "contract": "catalogue",
-    "purpose": "Allocate envelope capacity across channels",
-    "trigger": "onAction",
-    "invalidates": [
-     "listChannelCapacities"
-    ]
-   },
-   {
-    "operationId": "updateChannelCapacity",
-    "contract": "catalogue",
-    "purpose": "Amend an envelope",
-    "trigger": "onAction",
-    "invalidates": [
-     "listChannelCapacities"
-    ]
-   },
-   {
-    "operationId": "listWaitlistEntries",
-    "contract": "catalogue",
-    "purpose": "Guests waiting for capacity",
-    "trigger": "onLoad",
-    "provenance": "decided 29 September, VM close-out (venue management and configuration)"
-   },
-   {
-    "operationId": "offerWaitlistCapacity",
-    "contract": "catalogue",
-    "purpose": "Tell a waiting guest that capacity appeared",
-    "trigger": "onAction",
-    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
-    "invalidates": [
-     "listChannelCapacities",
-     "getChannelAllocations",
-     "listWaitlistEntries"
-    ]
-   }
-  ],
-  "entryState": {
-   "params": [
-    {
-     "name": "channelCapacityId",
-     "from": "deepLink"
-    },
-    {
-     "name": "entryId",
-     "from": "navigation"
-    }
-   ],
-   "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `channelCapacityId`.",
-   "preloaded": [
-    "ChannelCapacity.id",
-    "ChannelCapacity.performanceId",
-    "ChannelCapacity.name",
-    "ChannelCapacity.seatCategoryId",
-    "ChannelCapacity.oversellAllowance"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P08 Venue Management.dc.html#bo-017"
-  },
-  "apisNote": "Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
-  "overlays": [
-   {
-    "id": "formCreateChannelCapacity",
-    "component": "modal",
-    "trigger": "Create channel capacity",
-    "body": "**Collects what `createChannelCapacity` sends before it is called.** Required: `performanceId`, `name`, `capacity`. Optional: `seatCategoryId`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "CreateEnvelopeRequest",
-    "confirm": {
-     "label": "Create channel capacity",
-     "operation": "createChannelCapacity"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "performanceId",
-      "name",
-      "capacity",
-      "seatCategoryId"
-     ]
-    },
-    "provenance": "contract catalogue.yaml POST /channel-capacities"
-   },
-   {
-    "id": "formRelinquishChannelAllocation",
-    "component": "modal",
-    "trigger": "Release channel allocation",
-    "body": "**Collects what `relinquishChannelAllocation` sends before it is called.** Required: `channels`. Optional: `reason`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Release channel allocation",
-     "operation": "relinquishChannelAllocation"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "channels",
-      "reason"
-     ]
-    },
-    "provenance": "contract catalogue.yaml POST /channel-capacities/{channelCapacityId}/channel-allocations/release"
-   },
-   {
-    "id": "formSetChannelAllocations",
-    "component": "modal",
-    "trigger": "Save channel allocations",
-    "body": "**Collects what `setChannelAllocations` sends before it is called.** Required: `allocations`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Save channel allocations",
-     "operation": "setChannelAllocations"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "allocations"
-     ]
-    },
-    "provenance": "contract catalogue.yaml PUT /channel-capacities/{channelCapacityId}/channel-allocations"
-   },
-   {
-    "id": "formUpdateChannelCapacity",
-    "component": "modal",
-    "trigger": "Save channel capacity",
-    "body": "**Collects what `updateChannelCapacity` sends before it is called.** Nothing in the body is required. Optional: `name`, `capacity`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Save channel capacity",
-     "operation": "updateChannelCapacity"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "name",
-      "capacity"
-     ]
-    },
-    "provenance": "contract catalogue.yaml PATCH /channel-capacities/{channelCapacityId}"
    }
   ],
   "_platform": {

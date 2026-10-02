@@ -150,6 +150,13 @@
        "kind": "metricTile",
        "label": "Redemption Credits Earned",
        "provenance": "pack Game_and_Ride_Module.pdf, page 3 §Header KPIs"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Readers",
+       "bindsTo": "Reader",
+       "operation": "listReaders",
+       "provenance": "contract games.yaml GET /readers; wiring fix, 2 October 2026"
       }
      ]
     },
@@ -248,6 +255,13 @@
      "listGames",
      "listGameplayTransactions"
     ]
+   },
+   {
+    "operationId": "listReaders",
+    "contract": "games",
+    "purpose": "Readers and their health, for the reader tiles",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-001)"
    }
   ],
   "wireframe": {
@@ -355,6 +369,21 @@
        ],
        "notes": "The pack filters this screen by venue, zone, attraction type, reader type, wallet enabled, redemption enabled and 1 more — which are present is a decision the pack already made.",
        "provenance": "pack Game_and_Ride_Module.pdf, page 4 §Filters"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Games and rides",
+       "bindsTo": "Game",
+       "columns": [
+        "Game.code",
+        "Game.name",
+        "Game.zone",
+        "Game.creditCost",
+        "Game.status",
+        "Game.playsToday"
+       ],
+       "operation": "listGames",
+       "provenance": "contract games.yaml GET /games"
       }
      ]
     },
@@ -363,9 +392,10 @@
      "slot": "fields",
      "components": [
       {
-       "kind": "textField",
-       "label": "Redemption Earn / Spend / N/A",
-       "provenance": "pack Game_and_Ride_Module.pdf, page 4 §Field Description"
+       "kind": "selectField",
+       "label": "Redemption",
+       "provenance": "pack Game_and_Ride_Module.pdf, page 4 §Field Description",
+       "notes": "Earn, Spend or N/A: a chip column in the directory and a select in the editor; the pack's \"Earn / Spend / N/A\" was a sample value in the label."
       }
      ]
     },
@@ -376,12 +406,14 @@
       {
        "kind": "primaryButton",
        "label": "Create",
-       "provenance": "pack Game_and_Ride_Module.pdf, page 4 §Actions"
+       "provenance": "pack Game_and_Ride_Module.pdf, page 4 §Actions",
+       "operation": "createGame"
       },
       {
        "kind": "secondaryButton",
        "label": "Edit",
-       "provenance": "pack Game_and_Ride_Module.pdf, page 4 §Actions"
+       "provenance": "pack Game_and_Ride_Module.pdf, page 4 §Actions",
+       "operation": "updateGame"
       },
       {
        "kind": "secondaryButton",
@@ -391,13 +423,10 @@
       },
       {
        "kind": "secondaryButton",
-       "label": "View",
-       "provenance": "pack Game_and_Ride_Module.pdf, page 4 §Actions"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Export",
-       "provenance": "pack Game_and_Ride_Module.pdf, page 4 §Actions"
+       "label": "Activate or deactivate",
+       "operation": "updateGame",
+       "notes": "`updateGame` on `status` (the pack's directory action).",
+       "provenance": "contract games.yaml PATCH /games/{gameId}"
       }
      ]
     }
@@ -450,7 +479,7 @@
    "board": "wireframes/P08 Venue Management.dc.html#bo-395",
    "workshopBoard": "wireframes/WS58 Game and Ride Board 1.dc.html#bo-395"
   },
-  "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 4. 0 of 7 labels bound to a contract property; 13 of 17 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Create: `createGame`; Edit: `updateGame`; View dropped (navigation); Export dropped (export is served by reporting exportReportResult); still owed by a contract change: `cloneGame`.",
+  "apisNote": "cloneGame was added on 29 September and is bound to Clone; the directory reads listGames and edits through createGame and updateGame (design-note correction, 2 October 2026).",
   "entryState": {
    "params": [
     {
@@ -459,6 +488,79 @@
     }
    ]
   },
+  "overlays": [
+   {
+    "id": "formCreateGame",
+    "component": "modal",
+    "trigger": "Create",
+    "body": "**Collects what `createGame` sends before it is called.** Required: `code`, `name`, `venueId`, `creditCost`, `status`. Optional: `zone`, `assetId`, `readerId`, `minPointsAwarded`, `maxPointsAwarded`, `heightRequirementCm`, `playsToday`, `creditsTakenToday`, `pointsAwardedToday`. `id` is a client UUIDv7 generated silently, never asked. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Create",
+     "operation": "createGame"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "code",
+      "name",
+      "venueId",
+      "creditCost",
+      "status",
+      "zone",
+      "assetId",
+      "readerId",
+      "minPointsAwarded",
+      "maxPointsAwarded",
+      "heightRequirementCm",
+      "playsToday",
+      "creditsTakenToday",
+      "pointsAwardedToday"
+     ]
+    },
+    "provenance": "contract games.yaml POST /games"
+   },
+   {
+    "id": "formUpdateGame",
+    "component": "modal",
+    "trigger": "Edit",
+    "body": "**Collects what `updateGame` sends before it is called.** Nothing in the body is required. Optional: `name`, `creditCost`, `minPointsAwarded`, `maxPointsAwarded`, `heightRequirementCm`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Edit",
+     "operation": "updateGame"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "name",
+      "creditCost",
+      "minPointsAwarded",
+      "maxPointsAwarded",
+      "heightRequirementCm"
+     ]
+    },
+    "provenance": "contract games.yaml PATCH /games/{gameId}"
+   },
+   {
+    "id": "formCloneGame",
+    "component": "modal",
+    "trigger": "Clone",
+    "body": "**Collects what `cloneGame` sends before it is called.** Required: `code`, `name`. Optional: `includeReaders`, `includePricing`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Clone",
+     "operation": "cloneGame"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "code",
+      "name",
+      "includeReaders",
+      "includePricing"
+     ]
+    },
+    "provenance": "contract games.yaml POST /games/{gameId}/clone"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -537,12 +639,6 @@
        "provenance": "pack Game_and_Ride_Module.pdf, page 5 §Transaction Configuration"
       },
       {
-       "kind": "detailPanel",
-       "derived": true,
-       "impliedBy": "getGameCard",
-       "notes": "One record, read-only."
-      },
-      {
        "kind": "primaryButton",
        "derived": true,
        "impliedBy": "updateGame",
@@ -555,6 +651,13 @@
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
        "impliedBy": "updateGame"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Attraction",
+       "bindsTo": "Game",
+       "operation": "listGames",
+       "provenance": "contract games.yaml GET /games; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -568,13 +671,6 @@
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },
   "apis": [
-   {
-    "operationId": "getGameCard",
-    "contract": "games",
-    "purpose": "The attraction profile",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026"
-   },
    {
     "operationId": "updateGame",
     "contract": "games",
@@ -591,6 +687,13 @@
     "invalidates": [
      "listGames"
     ]
+   },
+   {
+    "operationId": "listGames",
+    "contract": "games",
+    "purpose": "The attraction being edited (filtered to gameId)",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-001)"
    }
   ],
   "wireframe": {
@@ -602,15 +705,19 @@
   "entryState": {
    "params": [
     {
-     "name": "cardCode",
-     "from": "navigation"
-    },
-    {
      "name": "gameId",
      "from": "navigation"
     }
    ]
   },
+  "gaps": [
+   {
+    "operation": "getGameCard",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): getGameCard reads a guest card's balances (guest audience, by cardCode) and has nothing to do with an attraction; the editor reads the Game from listGames (design-notes correction venue-operations BO-396).",
+    "source": "contracts/satellite/games.yaml#getGameCard | screens/P08-venue-back-office.yaml#BO-396"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -816,6 +923,11 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Game_and_Ride_Module.pdf, page 7"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-004): No read of a game's operational configuration (no GET /games/{gameId}/operations).",
+    "source": "contracts/satellite/games.yaml#setGameOperationalConfiguration"
    }
   ],
   "layout": {
@@ -839,6 +951,17 @@
        "impliedBy": "setGameOperationalConfiguration"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "components": [
+      {
+       "kind": "secondaryButton",
+       "label": "Change availability",
+       "operation": "updateGame",
+       "provenance": "contract games.yaml PATCH /games/{gameId}; wiring fix, 2 October 2026"
+      }
+     ]
     }
    ]
   },
@@ -859,6 +982,13 @@
     "invalidates": [
      "listGames"
     ]
+   },
+   {
+    "operationId": "updateGame",
+    "contract": "games",
+    "purpose": "Open, close or take the attraction out of service (status)",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-001)"
    }
   ],
   "wireframe": {
@@ -875,6 +1005,22 @@
     }
    ]
   },
+  "overlays": [
+   {
+    "id": "formUpdateGame",
+    "component": "modal",
+    "trigger": "Change availability",
+    "body": "**Collects what `updateGame` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Change availability",
+     "operation": "updateGame"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "contract games.yaml PATCH /games/{gameId}; wiring fix, 2 October 2026"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -948,6 +1094,11 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Game_and_Ride_Module.pdf, page 8"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-027): A read (get or list) of the credit eligibility (where a credit may be spent; CreditType does not carry it) that setCreditEligibilityRules writes.",
+    "source": "contracts/satellite/wallet.yaml#setCreditEligibilityRules | screens/P08-venue-back-office.yaml#BO-399"
    }
   ],
   "layout": {
@@ -1267,6 +1418,12 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Game_and_Ride_Module.pdf, page 9"
+   },
+   {
+    "operation": "createGameEntitlement",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): The pack keeps entitlement creation on Board 4 (BO-427 to BO-430); this screen reads and navigates, and a create here duplicates them (design-notes correction venue-operations BO-401).",
+    "source": "screens/P08-venue-back-office.yaml#BO-402 | screens/P08-venue-back-office.yaml#BO-401"
    }
   ],
   "layout": {
@@ -1291,13 +1448,6 @@
        "derived": true,
        "impliedBy": "listGameEntitlements",
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "createGameEntitlement"
       }
      ]
     }
@@ -1306,7 +1456,7 @@
   "states": {
    "loading": "The game package entitlement list.",
    "error": "Could not load. Names which read failed and leaves the game package entitlement untouched.",
-   "emptyFirstRun": "No game package entitlement yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No game package entitlement yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the game package entitlement are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -1317,16 +1467,6 @@
     "purpose": "Packages and entitlements",
     "trigger": "onLoad",
     "provenance": "board reading, 19 September 2026"
-   },
-   {
-    "operationId": "createGameEntitlement",
-    "contract": "games",
-    "purpose": "Associate one",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026",
-    "invalidates": [
-     "listGameEntitlements"
-    ]
    }
   ],
   "wireframe": {
@@ -1529,10 +1669,7 @@
      "to": "BO-394",
      "trigger": "Back to Game & Ride Operations Dashboard",
      "provenance": "structural — pack board 1 wiring, 11 September 2026",
-     "back": true,
-     "carries": [
-      "gameId"
-     ]
+     "back": true
     }
    ]
   },
@@ -1549,59 +1686,23 @@
      "slot": "fields",
      "components": [
       {
-       "kind": "selectField",
-       "label": "Attraction created",
-       "provenance": "pack Game_and_Ride_Module.pdf, page 11 §Capture"
-      },
-      {
-       "kind": "selectField",
-       "label": "Type changed",
-       "provenance": "pack Game_and_Ride_Module.pdf, page 11 §Capture"
-      },
-      {
-       "kind": "selectField",
-       "label": "Reader assigned/replaced",
-       "provenance": "pack Game_and_Ride_Module.pdf, page 11 §Capture"
-      },
-      {
-       "kind": "selectField",
-       "label": "Wallet acceptance changed",
-       "provenance": "pack Game_and_Ride_Module.pdf, page 11 §Capture"
-      },
-      {
-       "kind": "selectField",
-       "label": "Package association changed",
-       "provenance": "pack Game_and_Ride_Module.pdf, page 11 §Capture"
-      },
-      {
-       "kind": "selectField",
-       "label": "Operational status changed",
-       "provenance": "pack Game_and_Ride_Module.pdf, page 11 §Capture"
-      },
-      {
-       "kind": "selectField",
-       "label": "Activation/deactivation",
-       "provenance": "pack Game_and_Ride_Module.pdf, page 11 §Capture"
-      },
-      {
-       "kind": "selectField",
-       "label": "User",
-       "provenance": "pack Game_and_Ride_Module.pdf, page 11 §Capture"
-      },
-      {
-       "kind": "selectField",
-       "label": "Date/time",
-       "provenance": "pack Game_and_Ride_Module.pdf, page 11 §Capture"
-      },
-      {
-       "kind": "selectField",
-       "label": "Previous value",
-       "provenance": "pack Game_and_Ride_Module.pdf, page 11 §Capture"
-      },
-      {
-       "kind": "selectField",
-       "label": "New value",
-       "provenance": "pack Game_and_Ride_Module.pdf, page 11 §Capture"
+       "kind": "timeline",
+       "label": "Change history",
+       "columns": [
+        "Attraction created",
+        "Type changed",
+        "Reader assigned/replaced",
+        "Wallet acceptance changed",
+        "Package association changed",
+        "Operational status changed",
+        "Activation/deactivation",
+        "User",
+        "Date/time",
+        "Previous value",
+        "New value"
+       ],
+       "notes": "Event types and columns of a read-only timeline; no read exists yet (logged).",
+       "provenance": "design-note correction, 2 October 2026"
       }
      ]
     }
@@ -1610,25 +1711,30 @@
   "states": {
    "loading": "The attraction audit dependencies configuration as saved.",
    "error": "Could not load. Names which read failed and leaves the attraction audit dependencies untouched.",
-   "emptyFirstRun": "No attraction audit dependencies configured yet. Carries the create action and says what the platform does in the meantime.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "No attraction audit dependencies configured yet. Offers no create action — this screen declares no operation that makes one and says what the platform does in the meantime.",
+   "emptyNoAccess": "Not shown: nothing on this screen needs a permission of its own; the app's sign-in decides access.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },
-  "apis": [
-   {
-    "operationId": "listGameplayTransactions",
-    "contract": "games",
-    "purpose": "Audit and governed actions",
-    "trigger": "onLoad",
-    "provenance": "board reading, 19 September 2026"
-   }
-  ],
+  "apis": [],
   "wireframe": {
    "status": "notStarted",
    "board": "wireframes/P08 Venue Management.dc.html#bo-403",
    "workshopBoard": "wireframes/WS58 Game and Ride Board 1.dc.html#bo-403"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 11. 0 of 0 labels bound to a contract property; 11 of 56 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "gaps": [
+   {
+    "operation": "listGameplayTransactions",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): Gameplay transactions are guest taps, not configuration changes; the audit timeline has no read in the games contract yet (contract gap CHG-WIR-004) (DI-866; design-notes correction venue-operations BO-403).",
+    "source": "contracts/satellite/games.yaml#listGameplayTransactions | DI-866"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-004): No read of attraction configuration changes and their dependencies.",
+    "source": "contracts/satellite/games.yaml#listGameplayTransactions | DI-866"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",

@@ -18,6 +18,19 @@
   "requestBody": "LegalEntity",
   "responds": "LegalEntity"
  },
+ "getBillingEntity": {
+  "method": "GET",
+  "path": "/tenants/{tenantId}/billing-entity",
+  "contract": "subscription",
+  "summary": "The company TICVAI invoices for a tenant",
+  "permission": "PLATFORM_BILLING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "BillingEntity"
+ },
  "getSubscription": {
   "method": "GET",
   "path": "/tenants/{tenantId}/subscription",
@@ -30,6 +43,74 @@
   "parameters": [],
   "requestBody": null,
   "responds": "Subscription"
+ },
+ "listOrgUnits": {
+  "method": "GET",
+  "path": "/org-units",
+  "contract": "tenancy",
+  "summary": "List scope nodes visible to the session",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "under",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "level",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "includeInactive",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listOwnPlatformStaffGrants": {
+  "method": "GET",
+  "path": "/platform-staff-grants/mine",
+  "contract": "identity",
+  "summary": "The calling platform operator's own grants into this tenant",
+  "permission": "PLATFORM_TENANT_ACCESS",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "activeOnly",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
  },
  "listTenants": {
   "method": "GET",
@@ -121,6 +202,25 @@
   ],
   "requestBody": "AgreementContractTermsBuilderInput",
   "responds": "AgreementContractTermsBuilderView"
+ },
+ "setBillingEntity": {
+  "method": "PUT",
+  "path": "/tenants/{tenantId}/billing-entity",
+  "contract": "subscription",
+  "summary": "Set the company TICVAI invoices for a tenant",
+  "permission": "PLATFORM_BILLING_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "BillingEntity",
+  "responds": "BillingEntity"
  },
  "setPaymentProvider": {
   "method": "PUT",

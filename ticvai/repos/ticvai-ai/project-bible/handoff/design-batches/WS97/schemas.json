@@ -203,47 +203,6 @@
    }
   }
  },
- "AssetHistoryEntry": {
-  "x-ticvai-persistence": "none — union view over work orders, inspections, incidents and asset status changes",
-  "type": "object",
-  "description": "**Every kind has a source.** `workOrder` is a work-order row, `inspection` an inspection, `incident` an incident, `statusChange` a `maintenance.asset_status_change` row. `partReplaced` is a completed work order whose `resolutionCode` is `partReplaced`, and `planCompleted` a completed work order with a `sourcePlanId` — both read from `maintenance.work_order`, not stored twice.\n",
-  "required": [
-   "kind",
-   "occurredAt",
-   "summary"
-  ],
-  "properties": {
-   "kind": {
-    "type": "string",
-    "enum": [
-     "workOrder",
-     "inspection",
-     "incident",
-     "statusChange",
-     "partReplaced",
-     "planCompleted"
-    ]
-   },
-   "referenceId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "The source row's id: a work order, inspection or incident, or an `asset_status_change` id. A uuid, as every id is (ADR-0056).\n"
-   },
-   "summary": {
-    "type": "string"
-   },
-   "principalId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "occurredAt": {
-    "type": "string",
-    "format": "date-time"
-   }
-  }
- },
  "BenchmarkNormalisation": {
   "type": "string",
   "description": "The basis a benchmark is compared on. Shared by `getAnalyticsBenchmark` and `BenchmarkRow`.",
@@ -619,7 +578,8 @@
    "depositAuthorisationId": {
     "type": "string",
     "format": "uuid",
-    "nullable": true
+    "nullable": true,
+    "description": "The card deposit's terminal pre-authorisation, written by `checkOutRental` (workbook Q304; CHG-CSA-029). The hold is kept whole until every unit is back (workbook Q306)."
    },
    "accruedLateFee": {
     "$ref": "../shared/common.yaml#/components/schemas/Money"

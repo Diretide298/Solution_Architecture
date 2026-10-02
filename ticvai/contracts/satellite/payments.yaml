@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI — Payment Orchestration
   version: 1.0.0
-  x-ticvai-screen-count: 47
+  x-ticvai-screen-count: 48
   x-ticvai-tier: satellite
   x-ticvai-module: 4 — Bundles and Promotions
   x-ticvai-platforms:
@@ -935,11 +935,11 @@ paths:
     get:
       operationId: listPaymentTerminals
       x-ticvai-consumed-by:
-        - "P08 BO-1141 Device, Terminal & Acceptance Point Mapping"
         - "P08 ADM-579 Terminal & Card-Present Command Center"
         - "P08 ADM-580 Payment Terminal & Device Inventory"
         - "P08 ADM-583 EMV & Card-Present Processing Configuration"
         - "P08 ADM-585 Card-Present Transaction Monitor & Operations"
+        - "P08 BO-1141 Device, Terminal & Acceptance Point Mapping"
       summary: Terminals, and the payment configuration on each
       description: 'Board 3.2. **The device register is `tenancy`''s; this is the payment layer on top
         of it.** Merchant id, terminal id, the acquirer it talks to, EMV configuration and its
@@ -1309,6 +1309,8 @@ paths:
         format: uuid
     get:
       operationId: getB2bPaymentTerms
+      x-ticvai-consumed-by:
+        - "P08 ADM-603 B2B Invoice, On-Account & Payment Terms Configuration"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -1380,8 +1382,8 @@ paths:
     get:
       operationId: listReconciliationSources
       x-ticvai-consumed-by:
-        - "P09 ADM-619 Reconciliation & Settlement Command Center"
         - "P08 ADM-620 Reconciliation Source & Import Manager"
+        - "P09 ADM-619 Reconciliation & Settlement Command Center"
       summary: The files and feeds reconciliation is run against
       description: 'Board 7.2. **`finance.ingestSettlementFile` could read one and nothing said where
         they come from.** Format, schedule, credentials, the field mapping and what a missing file

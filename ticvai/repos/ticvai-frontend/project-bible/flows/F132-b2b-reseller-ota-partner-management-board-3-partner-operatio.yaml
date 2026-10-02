@@ -73,11 +73,11 @@ steps:
   - listPartner2
   outcome: Ready for the next screen on this board
 - step: 10
-  screen: PTR-047
-  action: Works in Partner Reconciliation & Exception Management
+  screen: PTR-049
+  action: Works in Partner Disputes, Cases & Service Management
   operations:
-  - listPartnerReconciliationException
-  outcome: Reconcile operational bookings against financial and channel records and identify discrepancies.
+  - listPartnerDisputeCase
+  outcome: Provide a structured case-management environment for partner operational and commercial disputes.
 - step: 11
   screen: PTR-042
   action: Returns to the board's landing screen
@@ -85,12 +85,12 @@ steps:
   - listPartner2
   outcome: Ready for the next screen on this board
 - step: 12
-  screen: PTR-048
-  action: Works in Commission Calculation & Settlement Management
+  screen: PTR-050
+  action: Works in Partner Performance Scorecard & Risk Monitoring
   operations:
-  - listCommissionCalculationSettlement
-  outcome: Calculate, approve and settle commission or incentive amounts owed under partner commercial
-    agreements.
+  - listPartnerPerformanceScorecard
+  outcome: Create a consistent scorecard for evaluating the quality and commercial value of every partner
+    relationship.
 - step: 13
   screen: PTR-042
   action: Returns to the board's landing screen
@@ -98,31 +98,6 @@ steps:
   - listPartner2
   outcome: Ready for the next screen on this board
 - step: 14
-  screen: PTR-049
-  action: Works in Partner Disputes, Cases & Service Management
-  operations:
-  - listPartnerDisputeCase
-  outcome: Provide a structured case-management environment for partner operational and commercial disputes.
-- step: 15
-  screen: PTR-042
-  action: Returns to the board's landing screen
-  operations:
-  - listPartner2
-  outcome: Ready for the next screen on this board
-- step: 16
-  screen: PTR-050
-  action: Works in Partner Performance Scorecard & Risk Monitoring
-  operations:
-  - listPartnerPerformanceScorecard
-  outcome: Create a consistent scorecard for evaluating the quality and commercial value of every partner
-    relationship.
-- step: 17
-  screen: PTR-042
-  action: Returns to the board's landing screen
-  operations:
-  - listPartner2
-  outcome: Ready for the next screen on this board
-- step: 18
   screen: PTR-051
   action: Works in Partner AI Intelligence & Relationship Optimization
   operations:

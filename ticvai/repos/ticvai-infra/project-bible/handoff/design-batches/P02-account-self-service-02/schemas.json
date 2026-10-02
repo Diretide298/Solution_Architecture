@@ -200,7 +200,31 @@
      "annualPassCounter",
      "entryGate"
     ],
-    "description": "**`entryGate` is valid for `faceTag` only**, and 3.2.43's omission of it from Face Pass is deliberate: an enduring enrolment is a considered act with consent attached, not something done in a queue. 3.2.44 puts a Face Tag at a gate precisely because it dies the same day.\n"
+    "description": "**`entryGate` is valid for `faceTag` only**, and 3.2.43's omission of it from Face Pass is deliberate: an enduring enrolment is a considered act with consent attached, not something done in a queue. 3.2.44 puts a Face Tag at a gate precisely because it dies the same day.\n**A self-service kiosk enrolment reads `ticketCounter` here** (an on-site enrolment) so the r1 values stand; the precise channel is `enrolmentChannel` (DEC-236; CHG-CSP-021).\n"
+   },
+   "enrolmentChannel": {
+    "type": "string",
+    "readOnly": true,
+    "enum": [
+     "guestApp",
+     "ticketCounter",
+     "annualPassCounter",
+     "selfServiceKiosk",
+     "entryGate"
+    ],
+    "description": "**Where the face was actually captured** (decided 2 October 2026, Chinmay, BO-186; DEC-236; CHG-CSP-021): `source` with `selfServiceKiosk` told apart. `entryGate` for a Face Tag only.\n"
+   },
+   "consentFormId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The venue's consent form the capture was consented on, and its version below (DEC-128; CHG-CSP-018)."
+   },
+   "consentFormVersion": {
+    "type": "integer",
+    "nullable": true,
+    "readOnly": true
    },
    "capturedAt": {
     "type": "string",
@@ -434,171 +458,6 @@
     "type": "string",
     "format": "date-time",
     "description": "**30 days, sliding** (decided 28 September, audit R126 (2)): each use of the session moves this to 30 days from now, and 30 days unused ends it. **One session per device**: a guest may be signed in on a phone and a laptop at once, and a new sign-in on the same `deviceId` ends that device's previous session.\n"
-   }
-  }
- },
- "IdentityGuestDocumentSubmission": {
-  "type": "object",
-  "x-ticvai-persistence": "none — request only; the document goes to pii.subject_document and the verification to identity.guest_identity_verification",
-  "required": [
-   "documentKind",
-   "documentNumber",
-   "documentAssetId"
-  ],
-  "properties": {
-   "documentKind": {
-    "type": "string",
-    "enum": [
-     "passport",
-     "emiratesId",
-     "nationalId",
-     "drivingLicence",
-     "residencePermit",
-     "other"
-    ],
-    "description": "The vocabulary of `pii.subject_document.kind`."
-   },
-   "documentNumber": {
-    "type": "string",
-    "format": "password",
-    "writeOnly": true,
-    "maxLength": 64,
-    "description": "**Write-only, never returned.** Hashed on arrival; only the last four are kept in clear."
-   },
-   "issuingCountry": {
-    "type": "string",
-    "pattern": "^[A-Z]{2}$",
-    "nullable": true
-   },
-   "expiresOn": {
-    "type": "string",
-    "format": "date",
-    "nullable": true
-   },
-   "documentAssetId": {
-    "type": "string",
-    "format": "uuid",
-    "description": "The uploaded scan or photo of the document."
-   },
-   "selfieAssetId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "A live photo for the reviewer to compare, where the policy asks for one. Deleted with the scan."
-   },
-   "reason": {
-    "type": "string",
-    "enum": [
-     "policyRequired",
-     "ageRestrictedPurchase",
-     "residentPricing",
-     "accountRecovery"
-    ],
-    "default": "policyRequired",
-    "description": "What the guest is verifying for; the review queue shows it."
-   }
-  }
- },
- "IdentityGuestVerification": {
-  "type": "object",
-  "x-ticvai-persistence": "identity.guest_identity_verification",
-  "description": "**One guest identity-document verification** (5.3.21; decided 29 September, build pass): the document it checks, its status, the method and who decided. The document itself is `pii.subject_document`; this row holds no document number.",
-  "required": [
-   "id",
-   "subjectId",
-   "status",
-   "submittedAt"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid",
-    "readOnly": true
-   },
-   "subjectId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "subjectDocumentId": {
-    "type": "string",
-    "format": "uuid",
-    "description": "The `pii.subject_document` row submitted."
-   },
-   "documentKind": {
-    "type": "string",
-    "enum": [
-     "passport",
-     "emiratesId",
-     "nationalId",
-     "drivingLicence",
-     "residencePermit",
-     "other"
-    ]
-   },
-   "documentNumberLast4": {
-    "type": "string",
-    "maxLength": 4,
-    "nullable": true,
-    "readOnly": true
-   },
-   "reason": {
-    "type": "string",
-    "enum": [
-     "policyRequired",
-     "ageRestrictedPurchase",
-     "residentPricing",
-     "accountRecovery"
-    ]
-   },
-   "status": {
-    "type": "string",
-    "enum": [
-     "pending",
-     "verified",
-     "rejected",
-     "resubmissionRequested"
-    ],
-    "readOnly": true
-   },
-   "method": {
-    "type": "string",
-    "enum": [
-     "manualReview",
-     "documentScanner",
-     "provider"
-    ],
-    "nullable": true,
-    "readOnly": true
-   },
-   "decisionReason": {
-    "type": "string",
-    "maxLength": 300,
-    "nullable": true,
-    "readOnly": true
-   },
-   "decidedByPrincipalId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "readOnly": true
-   },
-   "submittedAt": {
-    "type": "string",
-    "format": "date-time",
-    "readOnly": true
-   },
-   "decidedAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true,
-    "readOnly": true
-   },
-   "documentImageDeletedAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true,
-    "readOnly": true,
-    "description": "When the scan (and any selfie) was deleted under the policy's retention."
    }
   }
  },
@@ -989,8 +848,7 @@
    "principalId",
    "roleId",
    "scope",
-   "effectivePermissions",
-   "saleBoardId"
+   "effectivePermissions"
   ],
   "properties": {
    "sessionId": {
@@ -1033,7 +891,7 @@
    "saleBoardId": {
     "type": "string",
     "format": "uuid",
-    "description": "Landing surface, derived from the WORKSTATION, not the role (12 Aug 2026 §3). Ticketing, F&B or Retail board.\n"
+    "description": "Landing surface, derived from the WORKSTATION, not the role (12 Aug 2026 §3). Ticketing, F&B or Retail board.\n\n**Optional since 2 October 2026: only a till session carries it** (Chinmay, door follow-ups; CHG-CSP-002; breaking change against r1 approved as BC-001 to BC-005 in `docs/active/breaking-changes.yaml`). A browser door (ADM-001, SUP-001, PTR-001) and a staff handheld (EMP-001) sign in with no workstation since CHG-DOOR-001, so they have no board to land on and the field is absent. On a till it is the workstation's effective board: the outlet's board unless the till overrides it (`tenancy.Workstation.saleBoardSource`; CHG-CSP-006). A client reads its landing from this field when present and from its own platform otherwise.\n"
    },
    "workstation": {
     "$ref": "#/components/schemas/WorkstationContext"

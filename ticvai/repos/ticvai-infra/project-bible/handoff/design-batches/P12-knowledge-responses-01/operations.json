@@ -31,19 +31,6 @@
   "requestBody": null,
   "responds": "FaqCategory"
  },
- "listKnowledgeCollections": {
-  "method": "GET",
-  "path": "/collections",
-  "contract": "ai",
-  "summary": "Collections available to this tenant",
-  "permission": "AI_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "KnowledgeCollection"
- },
  "listKnowledgeGaps": {
   "method": "GET",
   "path": "/knowledge-gaps",
@@ -111,5 +98,24 @@
   ],
   "requestBody": null,
   "responds": "Page"
+ },
+ "semanticSearch": {
+  "method": "POST",
+  "path": "/search",
+  "contract": "ai",
+  "summary": "Search meaning, not words",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "SearchResult"
  }
 }

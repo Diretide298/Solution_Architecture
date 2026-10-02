@@ -1,6 +1,6 @@
 # WS193 — Wallet Configuration Backend Structure v1.0 board 8
 
-**10 screens · 16 operations · 15 schemas · 6 permissions**
+**10 screens · 15 operations · 13 schemas · 6 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -61,6 +61,68 @@ convincingly. It is never a caption.
   and its error; and, element by element, what is shown and in what format, what each action
   produces and where the user goes next. Draw exactly that.
 
+## The processes these screens belong to
+
+Written by the owner of each process (`handoff/design-notes/`). Read before any screen: it says how the process runs end to end and which words the screens must use.
+
+### Ticketing & Guest Commerce, as the venue and TICVAI configure and run it
+
+WHAT THE PROCESS IS. Everything a guest can buy is set up, priced, promoted and serviced here, on Venue Management (P08, the venue's own back office, served inside the venue's cell) and on the TICVAI Console (P09, TICVAI's control plane, outside every cell). End to end: (1) CATALOGUE. A product has one of twelve kinds (admission, timedAdmission, datedAdmission, openDated, seated, membership, bundle, fnb, retail, rental, addOn, giftCard). Its ticket types (adult, child, senior, resident...) are not typed one by one: they are generated from the product's attributes (components) and each value combination becomes a sellable ticket type with no extra setup (DI-164). What a ticket grants (validity, entries, re-entry, days of week, blackout dates, expiry anchor, fast track, transfer) lives on a reusable entitlement template, not on the product. Who may take part (age, height, supervision, certification) is the eligibility rule; what the guest must answer is the data mask and the consent questions; how the guest sees it is guestListing (bookable, infoOnly, hidden), display tags (at most six), media and the booking flow. Group, family and corporate products and every after-sales policy (reschedule, exchange, refund, cancellation, upgrade, transfer) are configured inside the one product configuration, never on separate screens (DI-465, DI-466). (2) LIFECYCLE AND PUBLICATION. A product moves draft, inReview, approved, live, withdrawn, archived. Approval and publication are two acts with two permissions (PRODUCT_APPROVE, PRODUCT_PUBLISH, R091); every product is authorised before it sells online or on site (DI-438). Approved is still not on a till: a till sells only what is in the signed catalogue release it pulled (publishBundle, ADR-0013), so a saved price is a back-office fact until the venue publishes to tills. Changing something that has sold is preceded by an impact check (assessProductChange: orders affected, entitlements issued, future performances, open carts); restoring a version creates a new version, and sold tickets keep the price and terms they were sold under (restoreProductVersion, DI-938, TRACKER Actions row 145). (3) PRICE. Prices live in price lists: per venue, per channel set, with validity dates and a priority, copied for the next season with an uplift (copyPriceList) and repriced in bulk only after a dry run (bulkChangePrices). Currency and decimal scale are never chosen on a form: they resolve from the venue's region (ADR-0008, ADR-0018; AED 2 places, OMR and BHD 3). When several rules apply, the configured hierarchy decides; there is no "lowest price wins" default (DI-595). Tax on the pre-discount price and three-decimal rounding are regional settings (DI-598). Dynamic rules always show their minimum and maximum price guardrails beside the trigger (getDynamicPriceRule). (4) PROMOTE AND BUNDLE. A promotion is a rule (automatic, or gated by a code) created in draft, made live only by Publish, which first analyses stacking; a …
+*(source: DI-164; DI-171; DI-438; DI-465; DI-466; DI-595; DI-598; DI-387; DI-039; DI-044; DI-474; DI-671; DI-987; DI-019; DI-080; ADR-0008; ADR-0013; ADR-0018; ADR-0019; ADR-0030; R091; R098; R101; R222; REV3-21; contracts/spine/catalogue.yaml#transitionProductLifecycle …)*
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Product | Anything sellable, of one of the twelve kinds. The record that carries names, channels, listing, media and policies. | Item (except on F&B and retail screens), SKU (for tickets), Offering | contracts/spine/catalogue.yaml#/components/schemas/ProductKind |
+| Ticket type | One sellable variant of an admission or event product (Adult, Child, Resident Adult), generated from the product's attributes. For retail and F&B the same record is labelled Variant. | Variant (on ticket screens), Sub-product, Rate (that is a price), Axis value | contracts/spine/catalogue.yaml#updateProductVariant / DI-164 / DI-437 |
+| Attribute | A dimension that generates ticket types (Guest category, Residency, Tier, Length). Each has values; adding a value adds ticket types. | Axis, Component (the client's word; use it only in help text), Option | contracts/spine/catalogue.yaml#setProductAttributes / DI-164 / DI-450 |
+| Entitlement | What a ticket lets the holder do (validity, entries, re-entry, days, blackout dates, expiry, fast track, transfer), defined once on an entitlement template and shared by several products. | Access rights, Ticket rules, Validity profile | contracts/spine/catalogue.yaml#createEntitlementTemplate / DI-171 / DI-451 |
+| Eligibility rule | Who may take part in or buy a product (age, height, supervision, waiver, certification). Distinct from a promotion's eligibility, which decides who gets a discount. | Restriction, Access rule (that is access control) | contracts/spine/catalogue.yaml#setProductEligibilityRule / DI-463 |
+| Price list | A set of prices for one venue and a set of channels, valid between two dates, with a priority. Several coexist (B2C, B2B, season). | Price book, Rate card, Tariff | contracts/spine/catalogue.yaml#createPriceList / DI-140 / DI-163 |
+| Price category | A standard rate type (Adult, Child, Member) reused across lists so venues do not invent "Adult Standard" and "Normal Adult". | Price band (that is a seat-category band), Fare type (transport) | contracts/spine/catalogue.yaml#setPriceCategoryRateType / … |
+| Price band | A priced band on a seat category (code, label, colour, amount, channel, from-date). | Price category, Zone price | contracts/satellite/seating.yaml#/components/schemas/SeatPriceBand |
+| Promotion | A rule that changes a price automatically or when a code is entered; draft until published; declares how it stacks. | Offer (except in guest copy), Deal, Discount rule | contracts/satellite/promotions.yaml#createPromotion / DI-173 / DI-174 |
+| Coupon code | A code issued from a coupon campaign that applies a promotion-style discount; one shared code or many single-use codes. | Voucher, Promo voucher | contracts/satellite/promotions.yaml#createCouponCampaign / DI-173 |
+| Voucher | A code that carries money (face value, balance), sold or issued; a liability until redeemed or expired. | Coupon, Credit note | contracts/satellite/promotions.yaml#listVoucherBatches / … |
+| Bundle | A product sold as one line whose price differs from the sum of its components, with a mandatory revenue allocation. "Package" is acceptable in guest copy. | Combo (that is an F&B meal deal), Catalogue bundle | contracts/satellite/promotions.yaml#createBundle / DI-220 / ADR-0019 |
+| Catalogue release | The signed snapshot of a venue's catalogue, prices, promotions and sale boards that tills, kiosks and devices pull. Its action label is "Publish to tills". | Bundle, Catalogue bundle, Sync, Deploy | contracts/spine/catalogue.yaml#publishBundle / … |
+| Approve / Publish / Save | Save keeps a draft; Approve records that it is authorised (PRODUCT_APPROVE); Publish makes it live for guests and channels (PRODUCT_PUBLISH). Three different buttons, never merged. | Submit, Go live, Activate (except CatalogueConfigStatus active), Deploy | R091 / contracts/spine/catalogue.yaml#transitionProductLifecycle / DI-438 |
+| Product states | Draft, In review, Approved, Live, Withdrawn, Archived (ProductLifecycleState), always as coloured badges with these exact labels. | Published (for a product), Pending, Inactive (for a product) | contracts/spine/catalogue.yaml#/components/schemas/ProductLifecycleState |
+| Channel | Where something is sold. Labels: pos Point of sale; kiosk Kiosk; web and guestWeb Website; mobile and guestApp App; b2b B2B partners; partner Partner; ota Travel agents (OTA); callCentre Call centre; api API; backOffice Back office. | Touchpoint, Outlet (an outlet is a business inside a venue), raw enum values | contracts/spine/catalogue.yaml#/components/schemas/Channel / … |
+| Refund | Money returned after settlement, wholly or for some lines, under the venue's refund policy. | Return (that is retail goods), Reversal, Void | contracts/spine/orders.yaml#createRefund / DI-252 |
+| Void | Cancelling a whole order before settlement, within the same shift, with a reason from the void list. After settlement it is a refund. | Cancel order, Delete | contracts/spine/orders.yaml#voidOrder / R222 |
+| Exchange / Reschedule | Exchange swaps lines for other products or dates and settles only the difference; Reschedule is the same product moved to another date or time. | Rebook, Date change (acceptable only in guest copy), Refund and resell | contracts/spine/orders.yaml#exchangeOrderLines / … |
+| Hold / Capture / Release | A deposit or stored-value amount is held, then partly or fully captured, and the rest released. A held deposit is not a payment. | Charge, Pre-auth (in staff copy), Block funds | contracts/spine/orders.yaml#authoriseStoredValue / … |
+| Wallet (TICVAI wallet) | The guest's stored-value balance on TICVAI, spent by hold and capture. Distinct from the tender "Apple Pay / Google Pay", which the contract also calls wallet. | Digital wallet (for stored value), E-wallet, Credit (without a type) | contracts/spine/orders.yaml#/components/schemas/TenderKind / R080 |
+| Credit lot | One amount of wallet credit of one credit type (cash, bonus, gift) with its own expiry; lots are spent nearest expiry first and the guest sees the breakdown but cannot choose. | Bucket, Batch, Top-up | TRACKER Actions row 171 / contracts/satellite/wallet.yaml#expireCreditLots |
+| Venue map / Seat map | A venue map is the wayfinding map of a park or a floor (points, paths, bookable places); a seat map is the seating layout of an auditorium or stand. Never just "map" where both could be meant. | Layout (alone), Floor plan (unless it is a floor map), Map (alone) | contracts/satellite/venue-map.yaml#createVenueMap / … |
+| Point / Bookable place | A point is a place on a venue map (toilet, ride, restaurant, exit). A bookable place is a cabana, lounger, table or pitch placed on the map and sold through its price band. | Pin, POI, Marker, Resource (in staff copy) | contracts/satellite/venue-map.yaml#setVenuePoint / … |
+| Station / Route / Timetable / Departure / Fare table / Pass … | A route is an ordered list of stations with offsets; a timetable generates departures up to its release horizon; a fare table prices a route per passenger type; a pass type is a multi-trip or unlimited pass sold as a product. | Stop (except in the stop list), Line (except lineCode), Schedule, Trip (except a guest's journey) | contracts/satellite/transport.yaml / REV3-21 |
+| Applies from | The effective date of a change. Every dated change shows it, and sold items keep their old terms. | Effective date (in labels), Start date (for a change) | contracts/satellite/seating.yaml#updateSeatCategory / TRACKER Actions row 194 |
+
+### AI & Intelligence
+
+AI in TICVAI is one governed engine behind many screens. The guest meets it as Sahli, the concierge (WEB-044, GST-031, GST-033), as the planner agent that refines a rules-built day plan by chat (GST-054), and as upsell and cross-sell offers on a separate Extras step (WEB-008, GST-048). Staff meet it as the Staff App's AI tab (EMP-019/020, knowledge EMP-040/041), the kiosk assistant (KSK-015) and the support copilot (SUP-006, SUP-018). Venue managers meet it in Venue Management (BO-091 policy and spend, BO-919/BO-925..932 resource and staffing forecasts, BO-597/598 configuration drafts, BO-772/782 marketing optimisation, BO-793 translations, BO-970/975 seat-map generation, BO-1048 seat upsell, BO-1160 fraud cases) and in Analytics (ANL-010 suggestions, ANL-019 management insights, ANL-055 anomalies, ANL-057 forecasting studio, ANL-059 insight history, ANL-060 governance, ANL-071 AI maturity). The governance, configuration-assistant, forecasting, oversight, audit and monitoring boards sit on the TICVAI Console (P09: ADM-037 providers, ADM-469..498 configuration assistant, ADM-499..518 forecasting, ADM-519..558 governance, ADM-633/637 fraud, ADM-680..697 recommendation governance). Five rules hold on every one of these screens. (1) Baseline first, then it learns per tenant: every data-driven answer (forecast, suggestion, risk score, recommendation) exists from day one, from the venue AI profile, a starting pattern for the venue type, the UAE calendar and the weather, and shifts to the venue's own data as it trades; nothing says "comes later" or refuses for lack of history - a refusal only names a missing setting. (2) Every answer shows its basis and maturity: a "Based on" line, a stage badge (Starting, Learning, Established, Trained on your data), "Limited historical data" while the starting pattern carries more than half the weight, ranges or bands rather than a bare percentage, a confidence only where the producer really has one, a plain-words explanation always. (3) A trained model replaces the baseline only when it beats it in a shadow run of at least six weeks and an admin promotes it; the platform raises "Ready to promote" and never switches by itself. (4) The LLM never reads raw data: numbers come only from query results the platform runs (the answer shows the query), only the masked prompt and retrieved context leave the platform, and AI only drafts - the owning screen applies. (5) One autonomy scale, L0 Disabled to L4 Controlled auto, with first-release ceilings, separate from user permission and from the approval tier; impactful actions route to a person, who sees current against proposed, impact, risk and what is affected, and can approve within a limit, challenge, override or roll back; every decision is traceable (data, model, approver, time) and searchable by customer, venue and capability. In Block A (5 October to 20 November 2026) the guest concierge with retrieval, Help me choose, translations, the planner agent, the gateway and …
+*(source: ADR-0051; ADR-0050; ADR-0020; ADR-0052; ADR-0053; ADR-0054; ADR-0059; ADR-0051 (AI-D01..AI-D20); ADR-0051 (AI functions review 30 Sep §2 §4 §9); MoM 18 Sep 4.1-4.10; MoM 21 Sep 4.1-4.14; MoM 30 Sep 4.1 4.7; ADR-0059 (Block A slice: tasks.csv))*
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Sahli | The guest concierge's name; the entry reads "Ask Sahli" and shows as mascot art when the venue's Concierge mascot setting is on (default), otherwise a plain button. | Chatbot, Bot, AI Concierge (as a visible label), Virtual agent | DI-1069 / screens/P01-guest-web-storefront.yaml#WEB-044 |
+| Based on | The line on every AI answer that says what it was computed from, e.g. "Based on: your venue profile, UAE calendar, weather, 23 days of your sales". Always present. | Data sources, Model inputs, Powered by AI | ADR-0051 Maturity / contracts/satellite/ai.yaml#/components/schemas/AiMaturity |
+| Starting / Learning / Established / Trained on your data | The four maturity stages (enum starting, learning, established, learned), shown as one badge. Moves by itself from Starting to Established as own data arrives; Trained on your data only after an admin promotion. | Beta, Experimental, Low confidence, Cold start (in UI), Not enough data | ADR-0051 / ADR-0051 (AI functions review 30 Sep §2) |
+| Limited historical data | Shown while own data carries less than half the weight (AiMaturity.limitedHistory, ownDataShare < 0.5). An honest qualifier, never a refusal. | Insufficient data, Not available until, Comes later | ADR-0051 / contracts/satellite/ai.yaml#/components/schemas/AiMaturity |
+| Range | The 10th-90th percentile band a forecast or estimate is shown with (e.g. "1,850-3,400 guests, most likely 2,600"). Never a bare accuracy percentage on an answer; measured accuracy (WAPE, bias, coverage) appears only on accuracy screens … | Accuracy 92%, Confidence 0.87 (on a heuristic), Exact | ADR-0051 / contracts/satellite/ai.yaml#getForecast / … |
+| Running in the background | A trained model in shadow next to the live answer (AiRelease.stage shadow); it changes nothing a person sees. | Live, Active model, Testing in production | ADR-0051 Promotion / ADR-0051 (AI functions review 30 Sep §2) |
+| Ready to promote / Promote | A shadow model passed its gate (governance alert promotionReady); an admin promotes it one stage at a time (canary, then production). The only way a model replaces the baseline. | Deploy, Go live, Auto-switch, Activate model, Upgrade AI | ADR-0051 (AI-D16) / contracts/satellite/ai.yaml#promoteAiRelease |
+| L0 Disabled / L1 Advisory / L2 Prepare / L3 Execute with … | The one autonomy scale for every AI capability, shown as "L2 Prepare" etc. with the capability's ceiling beside it. Lower scopes tighten, never raise. | Autopilot, Copilot mode, Level 0-3 (CFG book), Approval level (for autonomy), Manual/Semi/Auto | ADR-0050 / ADR-0050 (AI-D04) / … |
+| Approval tier | How many people must approve a proposed action (ProposedAction.approvalLevel, 1 or 2). Not an autonomy level. | Autonomy level, Approval level (ambiguous) | ADR-0050 |
+| Suggestion / Draft | What AI produces. A suggestion advises; a draft is a ready-to-review change that a person applies in the owning screen. Copy says "Nothing is applied until you approve it." | AI changed, Auto-applied, AI updated your prices | ADR-0020 / ADR-0051 (AI functions review 30 Sep §4 Configuration assistant) / … |
+| Why this? | The link or expander that opens an answer's explanation (Suggestion.explanation, recommendation template reason, decision trace). Plain words; for guests a template reason. | Explainability, SHAP, Feature importance (in operator copy) | ADR-0052 (AI-D09) / contracts/satellite/ai.yaml#/components/schemas/Suggestion |
+| No thanks | The explicit decline on an offer. Only this counts as a decline and it is remembered across channels; scrolling past or closing the step is not a decline. | Dismiss (as a decline), Skip (as a decline), X (as a decline) | ADR-0052 (AI-D07) / DI-962 / … |
+| Hold for review | What a high fraud or risk score does to a payment or order. The transaction goes through; it is held for a person. | Decline, Block, Reject (for a risk score), Fraud detected | ADR-0053 / ADR-0053 (AI-D06) |
+| Hand over to a person | The concierge passes the whole conversation and its own summary to a live agent; the guest does not repeat themselves. | Escalate, Transfer, Contact bot | contracts/satellite/marketing-crm.yaml#handoverToAgent |
+| Not available yet | The analytics assistant's answer to a question outside the semantic model; it records a knowledge gap and never improvises a number. | I cannot answer, Error, Unknown | ADR-0054 |
+
+
 ## The screens
 
 Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs count fields; requirements are matrix rows; meeting inputs are the ones naming the screen (the module and platform ones are below); white label says whether the tenant's brand reaches it (guest) or it sets the brand (configures).
@@ -104,7 +166,13 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Opens with | nothing: it opens on its own |
 | Route | `/orders-money/wallet-security-risk-command-center-bo-1153` |
 
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
+**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape … Contract gap recorded 2 October 2026 (CHG-WIR-027): A read (get or list) of the wallet risk rules that setWalletRiskRules writes.
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Wallet security at a glance: rules tripped, wallets frozen, risk scores.
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- No read operation: the screen declares only setWalletRiskRules and nothing that returns the current configuration. (CHG-WIR-027)
 
 #### Inputs: what the user enters or picks
 
@@ -159,6 +227,10 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Prevented value | text | not in the schema: `Prevented Value` |
 | Risk distribution | text | not in the schema: `Risk Distribution` |
 
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **risk overview**: Tripped rules today, actions taken. *(source: contracts/satellite/wallet.yaml#setWalletRiskRules)*
+
 **Where the user goes next**
 
 - → `BO-100` Venue Home: *Back to Venue Home*
@@ -182,6 +254,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the wallet security risk are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+today:
+  rulesTripped: 14
+  walletsFrozen: 2
+```
 
 #### Permissions
 
@@ -259,6 +341,14 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 | Opens with | nothing: it opens on its own |
 | Route | `/orders-money/wallet-risk-policy-configuration-bo-1154` |
 
+**Known gaps.** Contract gap recorded 2 October 2026 (CHG-WIR-027): A read (get or list) of the wallet risk rules that setWalletRiskRules writes.
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Reusable risk policies; each rule names its action (score only, challenge, hold, block).
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- No read operation: the screen declares only setWalletRiskRules and nothing that returns the current configuration. (CHG-WIR-027)
+
 #### Inputs: what the user enters or picks
 
 **On the screen**
@@ -277,6 +367,10 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 | API Transactions | select field | — | — | — | — | — | — |
 | Risk Conditions | select field | — | — | — | — | — | — |
 
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **rule action**: Required per rule; a rule without action is a report. *(source: contracts/satellite/wallet.yaml#setWalletRiskRules)*
+
 #### Outputs: what the screen shows and produces
 
 **Where the user goes next**
@@ -293,6 +387,17 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Empty, no results (`?state=emptyNoResults`) | **Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+rule:
+  name: Rapid top-ups
+  condition: 5 top-ups in 10 min
+  action: challenge
+```
 
 #### Permissions
 
@@ -360,7 +465,13 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 | Opens with | nothing: it opens on its own |
 | Route | `/orders-money/transaction-risk-scoring-engine-bo-1155` |
 
-**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built. Contract gap recorded 2 October 2026 (CHG-WIR-027): A read (get or list) of the wallet risk rules that setWalletRiskRules writes.
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** The real-time risk score of sensitive operations and its components.
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- No read operation: the screen declares only setWalletRiskRules and nothing that returns the current configuration. (CHG-WIR-027)
 
 #### Inputs: what the user enters or picks
 
@@ -374,6 +485,10 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |---|---|---|---|---|---|
 | Save wallet risk rules (primary button) | navigation or local | — | — | — | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
+
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **score breakdown**: Components adding up to the score with thresholds. *(source: contracts/satellite/wallet.yaml#setWalletRiskRules)*
 
 **Where the user goes next**
 
@@ -389,6 +504,19 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the transaction risk scoring are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+score:
+  total: 72
+  components:
+    velocity: 30
+    newDevice: 25
+    amount: 17
+```
 
 #### Permissions
 
@@ -453,6 +581,14 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | nothing: it opens on its own |
 | Route | `/orders-money/velocity-behavioral-rule-configuration-bo-1156` |
 
+**Known gaps.** Contract gap recorded 2 October 2026 (CHG-WIR-027): A read (get or list) of the wallet risk rules that setWalletRiskRules writes.
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Velocity and behavioural rules for suspicious activity.
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- No read operation: the screen declares only setWalletRiskRules and nothing that returns the current configuration. (CHG-WIR-027)
+
 #### Inputs: what the user enters or picks
 
 **On the screen**
@@ -473,6 +609,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Number of recipients | select field | — | — | — | — | — | — |
 | Number of venues | select field | — | — | — | — | — | — |
 | Example | select field | — | — | — | — | — | — |
+
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **velocity rule**: Count or value over a window. *(source: contracts/satellite/wallet.yaml#setWalletRiskRules)*
 
 #### Outputs: what the screen shows and produces
 
@@ -498,6 +638,14 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Empty, no results (`?state=emptyNoResults`) | **Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+rule: More than AED 1,000.00 transferred in 1 hour
+```
 
 #### Permissions
 
@@ -561,6 +709,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Route | `/orders-money/device-credential-account-security-bo-1157` |
 
 **Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Compromised accounts, shared credentials and suspicious devices.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **List operation(s) listWalletDisputes return a bare array, not the paged list envelope (items, nextCursor, hasMore).** Why: The table cannot page, and a row without an id cannot open, edit or link to the record it summarises. *(source: contracts/satellite/wallet.yaml#listWalletDisputes; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
 
 #### Inputs: what the user enters or picks
 
@@ -649,6 +803,10 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | API Credential (secondary button) | navigation or local | — | — | — | — |
 | Security Rules (secondary button) | navigation or local | — | — | — | — |
 
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **device signals**: Credential, devices seen, flags. *(source: contracts/satellite/wallet.yaml#listWalletDisputes)*
+
 **Data it reads**: `listWalletDisputes` (onLoad, Where it went wrong)
 
 **Where the user goes next**
@@ -666,6 +824,17 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 Already bound to another wallet |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+signal:
+  credential: WB-0098812
+  devices: 3
+  flag: used at two gates 2 min apart
+```
 
 #### Permissions
 
@@ -704,6 +873,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-1153`.
 - [ ] Every gated control is gated: `WALLET_OPERATE`, `WALLET_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -724,11 +894,21 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | nothing: it opens on its own |
 | Route | `/orders-money/ai-fraud-anomaly-detection-studio-bo-1158` |
 
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape … **AI Fraud & Anomaly Detection Studio declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the …
+**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape … **AI Fraud & Anomaly Detection Studio declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the … Contract gap recorded 2 October 2026 (CHG-WIR-027): A read (get or list) of the wallet risk rules that setWalletRiskRules writes.
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** AI detection of unusual top-ups, spending and sharing that fixed rules miss.
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- No read operation: the screen declares only setWalletRiskRules and nothing that returns the current configuration. (CHG-WIR-027)
 
 #### Inputs: what the user enters or picks
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **AI rule**: Sensitivity and action as for other rules. *(source: contracts/satellite/wallet.yaml#setWalletRiskRules)*
 
 #### Outputs: what the screen shows and produces
 
@@ -770,6 +950,16 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the fraud anomaly detection are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+model:
+  sensitivity: medium
+  action: score only
+```
 
 #### Permissions
 
@@ -832,6 +1022,14 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | nothing: it opens on its own |
 | Route | `/orders-money/automated-security-action-orchestration-bo-1159` |
 
+**Known gaps.** Contract gap recorded 2 October 2026 (CHG-WIR-027): A read (get or list) of the wallet risk rules and their automated actions that setWalletRiskRules and setWalletRestriction writes.
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** What happens automatically at each risk level: approve, monitor, step-up, hold, block.
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- No read operation: the screen declares only setWalletRiskRules, setWalletRestriction and nothing that returns the current configuration. (CHG-WIR-027)
+
 #### Inputs: what the user enters or picks
 
 **On the screen**
@@ -851,6 +1049,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Example | select field | — | — | — | — | — | — |
 | Suspected credential compromise | select field | — | — | — | — | — | — |
 
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **level to action**: A ladder of levels to actions. *(source: contracts/satellite/wallet.yaml#setWalletRiskRules / contracts/satellite/wallet.yaml#setWalletRestriction)*
+
 #### Outputs: what the screen shows and produces
 
 **Where the user goes next**
@@ -867,6 +1069,18 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Empty, no results (`?state=emptyNoResults`) | **Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+ladder:
+- 'low: approve'
+- 'medium: approve and monitor'
+- 'elevated: step-up'
+- 'high: freeze'
+```
 
 #### Permissions
 
@@ -931,6 +1145,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Route | `/orders-money/fraud-alert-investigation-case-management-bo-1160` |
 
 **Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
+
+**From the AI & Intelligence process.** The venue's fraud and risk investigation workspace: an alert queue (wallet, payments, credentials), triage, and cases with evidence and outcome. Flagged transactions are never auto-approved or auto-declined; they wait for a person. The one thing to get right: risk score and AI score are distinguished - the deterministic rules triggered and the AI's composite score - and both are explained.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **The table carries 45 board columns.** Why: Keep the queue to about 10 columns; the rest belong in the case detail. *(source: screens/P08-venue-back-office.yaml#BO-1160; AI & Intelligence)*
 
 #### Inputs: what the user enters or picks
 
@@ -1022,6 +1242,14 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Credentials | text | not in the schema: `Credentials` |
 | … 15 more | | `schemas.json` |
 
+**Rules for what is shown** (from the AI & Intelligence process; these refine the tables above and win where they differ)
+
+- **alert queue**: Alert, wallet/customer, transaction and amount in AED, rules triggered, AI score band, device, credential, venue, time, priority, status. *(source: contracts/satellite/ai.yaml#listRiskAlerts / DI-537 / ADR-0053)*
+
+**What each action does** (from the AI & Intelligence process; these refine the tables above and win where they differ)
+
+- **Triage / open case / close**: As ADM-633. *(source: contracts/satellite/ai.yaml#decideRiskAlert / contracts/satellite/ai.yaml#createRiskCase / contracts/satellite/ai.yaml#closeRiskCase)*
+
 **Data it reads**: `listWalletDisputes` (onLoad, Fraud cases); `listRiskAlerts` (onLoad, Risk alerts)
 
 **Where the user goes next**
@@ -1039,6 +1267,24 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 Already closed, or a proposed action is still awaiting approval (`case-actions-open`).; 409 The alert is already decided (`alert-not-open`). |
+
+#### Consistency with other screens
+
+- Match `ADM-633`: Same case component and decisions.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+alert:
+  wallet: W-20931
+  transaction: Top-up AED 2,000.00
+  rules:
+  - 3 top-ups in 10 min
+  aiScore: high
+  status: Held for review
+```
 
 #### Permissions
 
@@ -1099,6 +1345,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-1153`.
 - [ ] Every gated control is gated: `RISK_INVESTIGATE`, `RISK_REVIEW`, `WALLET_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -1112,14 +1359,18 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Orders & Money · wave 3 · needs the `core` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `WALLET_VIEW` (1 read); in the flows as venue manager |
+| Who uses it | venue; in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Display; Show) and no metric row |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/orders-money/security-rules-testing-simulation-ai-sandbox-bo-1161` |
 
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
+**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape … Removed 2 October 2026 (CHG-WIR-025): simulateCreditConsumption simulates credit spending, not risk rule testing; a security sandbox needs a rule backtest, recorded as a contract gap (design-notes … Contract gap recorded 2 October 2026 (CHG-WIR-027): A wallet risk-rule backtest or simulation (rules against sample or historical transactions) and a read of the rules under test.
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Test new fraud rules on past transactions before going live, to see false positives.
+
+**Fixed on main** (the package already carries these; draw what it says): The simulation operation is credit consumption, not risk rule testing. (CHG-WIR-025); No read operation: the screen declares only simulateCreditConsumption and nothing that returns the current configuration. (CHG-WIR-025).
 
 #### Inputs: what the user enters or picks
 
@@ -1163,6 +1414,10 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Channels affected | text | not in the schema: `Channels affected` |
 | Wallet types affected | text | not in the schema: `Wallet types affected` |
 
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **backtest**: Would-have-tripped count and examples. *(source: contracts/satellite/wallet.yaml#simulateCreditConsumption)*
+
 **Where the user goes next**
 
 - → `BO-1153` Wallet Security & Risk Command Center: *Back to Wallet Security & Risk Command Center*
@@ -1173,16 +1428,25 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |---|---|
 | Loading (`?state=loading`) | The security rules testing list. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the security rules testing untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No security rules testing yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, first run (`?state=emptyFirstRun`) | No security rules testing yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the security rules testing are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Not shown: nothing on this screen needs a permission of its own; the app's sign-in decides access. |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+backtest:
+  rule: Rapid top-ups
+  wouldTrip: 38
+  falsePositives: est. 30
+```
 
 #### Permissions
 
-- `simulateCreditConsumption` → `WALLET_VIEW` (read) · staff
-
-**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Not shown: nothing on this screen needs a permission of its own; the app's sign-in decides access.
 
 #### Requirements it meets
 
@@ -1212,7 +1476,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every state opens from `#BO-1161?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-1153`.
-- [ ] Every gated control is gated: `WALLET_VIEW`.
+- [ ] Sign-in is asked only where the spec asks for it.
 - [ ] The module and platform inputs below are applied.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -1220,7 +1484,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 ### `BO-1162` Security Governance, Audit & Rule Publication
 
-**Govern how wallet security policies, fraud models and automated actions are changed and released. Configuration Areas Configure the financial-control layer of TICVAI Wallet, providing complete visibility and governance over wallet liabilities, stored-value balances, gift-card exposure, reconciliation, breakage, revenue-recognition events, accounting mappings, financial exceptions and management analytics. This board directly addresses requirements 4.3.17, 4.3.33, 4.3.36 and 4.3.37, as well as the reconciliation requirement described under 4.3.4. The architectural boundary should remain clear: Wallet Module = sub-ledger and source of wallet financial events. Finance Module = accounting/GL, financial posting and corporate financial reporting. Board 9 therefore controls the wallet-side financial configuration and sends governed accounting events to the TICVAI Finance module.**
+**Govern how wallet security policies, fraud models and automated actions are changed and released.**
 
 | | |
 |---|---|
@@ -1234,7 +1498,13 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | `ruleCode` (navigation), `version` (navigation) |
 | Route | `/orders-money/security-governance-audit-rule-publication-bo-1162` |
 
+**What the spec says about it.** **Applies to the whole tenant (design-note correction, 2 October 2026):** the wallet configuration is tenant-scoped, so the header says "Tenant-wide wallet security" and the screen opens only to a tenant administrator holding the wallet configuration right.
+
 **Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** How wallet configuration and risk rules are changed and released: versions, a field-level diff, restore as a draft, publish with validation findings, and switching one risk rule off at once without republishing. A rollback is as deliberate as the change that caused it.
+
+**Fixed on main** (the package already carries these; draw what it says): The purpose text is the financial-control layer (liabilities, breakage, reconciliation), not security governance. (CHG-WIR-026); The operations are tenant-scoped while the screen sits in the venue back office. (CHG-SBO-010).
 
 #### Inputs: what the user enters or picks
 
@@ -1299,6 +1569,16 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Rule suspension (secondary button) | `setWalletRiskRuleStatus` POST `/wallet-risk-rules/{ruleCode}/status` | inline | WalletRiskRules | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 422 No `reason` for `suspended` or `emergencyDisabled`, or `until` given with a status other than `suspended`, or … | — |
 | Security Audit (secondary button) | navigation or local | — | — | — | — |
 
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **diff**: Changes grouped by area (credit types, consumption, channel rules, authentication, risk rules, accounting, reconciliation, integration) with before and after values. *(source: contracts/satellite/wallet.yaml#diffWalletConfigurationVersion)*
+- **audit**: Who changed what, where and when, filterable by area. *(source: contracts/spine/tenancy.yaml#listAuditRecords)*
+
+**What each action does** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **Restore version**: Copies it into the working draft with its findings; it does not publish. *(source: contracts/satellite/wallet.yaml#restoreWalletConfigurationVersion)*
+- **Suspend or emergency-disable a rule**: Immediate, no new version; suspended may carry an "until" and returns to active by itself; emergency-disabled stays off. *(source: contracts/satellite/wallet.yaml#setWalletRiskRuleStatus)*
+
 **Data it reads**: `listWalletConfigurationVersions` (onLoad, Wallet configuration versions, newest first)
 
 **Where the user goes next**
@@ -1320,6 +1600,25 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 422 No `reason` for `suspended` or `emergencyDisabled`, or `until` given with a status other than `suspended`, or `until` in the past. |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+versions:
+- v: 14
+  published: 2026-10-28 18:05
+  by: Fatima Rahman
+  note: Velocity limits for top-ups
+- v: 13
+  published: '2026-10-12'
+rule:
+  code: VEL-TOPUP-01
+  status: suspended
+  until: 2026-11-15 08:00
+  reason: False positives on corporate cards
+```
 
 #### Permissions
 
@@ -1480,8 +1779,7 @@ Method, path, parameters, request and response for every operation these screens
 "restoreWalletConfigurationVersion": {"method":"POST","path":"/wallet-configuration/versions/{version}/restore","contract":"wallet","summary":"Put a previous wallet configuration back as the working draft","permission":"WALLET_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"WalletConfigurationVersion"},
 "setWalletRestriction": {"method":"POST","path":"/wallet-restrictions","contract":"wallet","summary":"Block, freeze or restrict a wallet","permission":"WALLET_OPERATE","offlineCapable":null,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"WalletRestriction","responds":"WalletRestriction"},
 "setWalletRiskRuleStatus": {"method":"POST","path":"/wallet-risk-rules/{ruleCode}/status","contract":"wallet","summary":"Suspend, emergency-disable or reactivate one risk rule","permission":"WALLET_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"WalletRiskRules"},
-"setWalletRiskRules": {"method":"PUT","path":"/wallet-risk-rules","contract":"wallet","summary":"Velocity, behaviour and what happens when a rule trips","permission":"WALLET_CONFIGURE","offlineCapable":null,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":"WalletRiskRules","responds":"WalletRiskRules"},
-"simulateCreditConsumption": {"method":"POST","path":"/credit-consumption/simulate","contract":"wallet","summary":"Which credit this purchase would actually use","permission":"WALLET_VIEW","offlineCapable":null,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"CreditAllocation"}
+"setWalletRiskRules": {"method":"PUT","path":"/wallet-risk-rules","contract":"wallet","summary":"Velocity, behaviour and what happens when a rule trips","permission":"WALLET_CONFIGURE","offlineCapable":null,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":"WalletRiskRules","responds":"WalletRiskRules"}
 }
 ```
 
@@ -1497,8 +1795,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "AiRiskCaseDetail": {"type":"object","x-ticvai-persistence":"none — ai.risk_case with its evidence, actions and alerts","description":"A case with everything attached to it.","required":["case"],"properties":{"case":{"$ref":"#/components/schemas/AiRiskCase"},"evidence":{"type":"array","items":{"$ref":"#/components/schemas/AiRiskCaseEvidence"}},"actions":{"type":"array","items":{"$ref":"#/components/schemas/AiRiskCaseAction"}},"alerts":{"type":"array","items":{"$ref":"#/components/schemas/AiRiskAlert"}}}},
 "AiRiskCaseEvidence": {"type":"object","x-ticvai-persistence":"ai.case_evidence","description":"**Case evidence** (AIP-155): `jsonb` plus an immutable Blob copy. **Scoped through its case** (`platform.apply_parent_rls`). Never edited; a correction is new evidence.","required":["caseId","kind","label"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"caseId":{"type":"string","format":"uuid","x-ticvai-references":"ai.risk_case"},"kind":{"type":"string","enum":["assessment","alert","transaction","networkSnapshot","note","document"]},"ref":{"type":"string","nullable":true},"content":{"type":"object","additionalProperties":true,"nullable":true},"blobRef":{"type":"string","nullable":true,"readOnly":true,"description":"The immutable (WORM) copy."},"label":{"type":"string","enum":["source","derived","modelInferred"]},"contentHash":{"type":"string","readOnly":true},"addedByPrincipalId":{"type":"string","format":"uuid","readOnly":true,"x-ticvai-references":"identity.principal"},"addedAt":{"type":"string","format":"date-time","readOnly":true}}},
 "AuditRecord": {"x-ticvai-append-only":"occurredAt","type":"object","x-ticvai-persistence":"platform.audit_record","description":"26 September, pull audit R198. **One row of the platform audit trail, as `listAuditRecords` returns it.** It was a free-form object, so nothing said what an audit row carries. These are the fields the operation already filters on — who, where, on which workstation, what action, on what, and when — and nothing more. Written by the operations that audit themselves; never edited and never deleted.\n","required":["id","action","occurredAt"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"principalId":{"type":"string","format":"uuid","description":"Who acted."},"orgUnitId":{"type":"string","format":"uuid","nullable":true,"description":"The scope node the action happened in."},"workstationId":{"type":"string","format":"uuid","nullable":true,"description":"The workstation it was done from, where there was one."},"action":{"type":"string","description":"What was done, as the writing operation names it."},"subjectRef":{"type":"string","nullable":true,"description":"**The thing acted on** — a profile, a shift, an order. The same value the `subjectRef` filter matches.\n"},"occurredAt":{"type":"string","format":"date-time","description":"When. The list is ordered by this, most recent first."},"platformStaffGrantId":{"type":"string","format":"uuid","nullable":true,"description":"**Set when a TICVAI platform operator acted, naming the grant they acted under** (`identity.openPlatformStaffGrant`; decided 28 September, audit R098). Null for the tenant's own staff. Every platform action in a tenant carries one, so the tenant can see all of them.\n"}}},
-"CreditAllocation": {"type":"object","description":"Board 3.10. **Which lots this purchase would draw on**, in order.","properties":{"requested":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"covered":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"shortfall":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"lines":{"type":"array","items":{"type":"object","properties":{"lotId":{"type":"string","format":"uuid"},"creditTypeId":{"type":"string","format":"uuid"},"creditTypeName":{"type":"string"},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"expiresAt":{"type":"string","format":"date-time","nullable":true},"reason":{"type":"string"}}}},"rejected":{"type":"array","items":{"type":"object","properties":{"creditTypeId":{"type":"string","format":"uuid"},"reason":{"type":"string","enum":["notEligibleHere","notEligibleForProduct","expired","basketCapReached","restricted"]}}}}}},
-"Money": {"type":"object","x-ticvai-persistence-kind":"valueObject","x-ticvai-persistence-column":"numeric(18,4)","description":"**On the wire this is three fields; in the database it is one column.**\n24 August. Every column typed `Money` was landing as `jsonb` — 129 of them, including `orders.shift.opening_float`, `inventory.purchase_order.total` and `promotions.voucher.balance`. **`orders.cash_movement.amount` was `numeric(18,4)` because somebody hand-typed that one**, and the inconsistency is what made it visible.\n**A jsonb price cannot be summed in SQL.** Every total, variance and reconciliation moves into application code — and a shift variance computed in .NET against a ledger computed in Postgres is two answers to one question. That is F13 month-end and F98 takings-to-ledger, both walked, both assuming the arithmetic is in the database.\n**`currency` and `scale` are not stored per row.** ADR-0018 makes them region-scoped and not overridable below, so they resolve from the scope walk — storing AED against nine million rows in a UAE region is nine million copies of a fact that cannot differ. A row that needed its own currency would be a row in the wrong region.\n**They stay on the wire** because a client reading a figure should not have to walk a hierarchy to know what it means.\n","required":["amount","currency","scale"],"properties":{"amount":{"type":"string","description":"Decimal string, never a float. Up to 4 decimal places. **Persisted as `numeric(18,4)`** — the string is a transport choice, so a JavaScript client cannot round a fare in transit.\n","pattern":"^-?\\d+(\\.\\d{1,4})?$"},"currency":{"type":"string","description":"**Resolved from the region, not stored on the row** (ADR-0018). OMR uses 3 decimal places and AED uses 2 — a venue on a different scale from its region is a ledger that cannot consolidate.\n","pattern":"^[A-Z]{3}$"},"scale":{"type":"integer","description":"Resolved from the region alongside `currency`.","minimum":0,"maximum":4}}},
 "Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}},
 "WalletConfigurationDiff": {"x-ticvai-persistence":"none — computed from wallet.configuration_version_snapshot (a published version) against the area tables (the working draft)","type":"object","description":"Board 8, p.98. Field-level comparison of two wallet configuration versions, shaped as white-label `ConfigDiff`.","required":["fromVersion","toVersion","changes"],"properties":{"fromVersion":{"type":"integer"},"toVersion":{"type":"integer","nullable":true,"description":"Null when compared against the working draft."},"changes":{"type":"array","items":{"type":"object","required":["area","path","changeKind"],"properties":{"area":{"type":"string","enum":["walletTypes","creditTypes","consumptionPolicy","fundingRules","channelRules","authenticationPolicy","transferRules","refundPolicy","riskRules","accountingMapping","reconciliationSources","integrationMappings"]},"path":{"type":"string"},"changeKind":{"type":"string","enum":["added","removed","modified"]},"before":{"type":"string","nullable":true},"after":{"type":"string","nullable":true}}}}}},
 "WalletConfigurationVersion": {"type":"object","x-ticvai-persistence":"wallet.configuration_version","description":"Boards 1.10 and 10.8. **Ten boards of configuration that interact.**","properties":{"version":{"type":"integer"},"publishedAt":{"type":"string","format":"date-time","nullable":true},"publishedBy":{"type":"string","format":"uuid","nullable":true},"note":{"type":"string","nullable":true},"findings":{"type":"array","items":{"type":"object","properties":{"severity":{"type":"string","enum":["blocking","warning"]},"code":{"type":"string"},"message":{"type":"string"}}}},"scopePath":{"type":"string"}}},

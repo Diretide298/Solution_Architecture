@@ -831,33 +831,6 @@
    }
   }
  },
- "CreateEnvelopeRequest": {
-  "type": "object",
-  "description": "The body of `createChannelCapacity`. **Named before the 26 August rename** (envelope to `ChannelCapacity`); the name stays because generated code is keyed on it.",
-  "required": [
-   "performanceId",
-   "name",
-   "capacity"
-  ],
-  "properties": {
-   "performanceId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "name": {
-    "type": "string",
-    "maxLength": 200
-   },
-   "seatCategoryId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "capacity": {
-    "type": "integer",
-    "minimum": 0
-   }
-  }
- },
  "CreateOrderLine": {
   "x-ticvai-persistence": "none — request only",
   "type": "object",
@@ -1249,149 +1222,6 @@
    }
   }
  },
- "DeliveryLocation": {
-  "type": "object",
-  "x-ticvai-persistence": "fnb.delivery_location",
-  "required": [
-   "id",
-   "venueId",
-   "kind",
-   "label",
-   "isServiceable"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "venueId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "kind": {
-    "$ref": "#/components/schemas/DeliveryLocationKind"
-   },
-   "label": {
-    "type": "string",
-    "description": "What a runner is told. \"Cabana 12\", \"Row H Seat 4\", \"Lawn — north gate\"."
-   },
-   "zone": {
-    "type": "string",
-    "nullable": true
-   },
-   "tableId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "Set where the location is a restaurant table, so it shares table state."
-   },
-   "seatId": {
-    "type": "string",
-    "nullable": true,
-    "description": "Set where the seat is the address. References the seat map."
-   },
-   "servingOutletIds": {
-    "type": "array",
-    "description": "Which outlets deliver here. A cabana served by the pool bar and not the restaurant is normal, and a location nothing serves is not an address.\n",
-    "items": {
-     "type": "string",
-     "format": "uuid"
-    }
-   },
-   "isServiceable": {
-    "type": "boolean",
-    "description": "False where the location exists but is not currently taking delivery — closed section, weather, no runner on shift.\n"
-   },
-   "unserviceableReason": {
-    "type": "string",
-    "nullable": true
-   },
-   "walkTimeMinutes": {
-    "type": "integer",
-    "nullable": true,
-    "description": "From the serving outlet. Feeds the guest's estimate — a cabana eight minutes away is not the same promise as a table by the kitchen.\n"
-   }
-  }
- },
- "DeliveryLocationKind": {
-  "type": "string",
-  "description": "4.6.26. One concept, because a runner needs one instruction.",
-  "enum": [
-   "table",
-   "seat",
-   "cabana",
-   "sunbed",
-   "poolside",
-   "box",
-   "suite",
-   "lawn",
-   "collectionPoint",
-   "namedLocation"
-  ]
- },
- "DiningOutlet": {
-  "type": "object",
-  "x-ticvai-persistence": "none — projection over outlet, menu and table state",
-  "required": [
-   "outletId",
-   "name",
-   "kind",
-   "isOpenNow",
-   "orderingMethod"
-  ],
-  "properties": {
-   "outletId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "name": {
-    "type": "string"
-   },
-   "kind": {
-    "type": "string"
-   },
-   "zone": {
-    "type": "string",
-    "nullable": true
-   },
-   "cuisine": {
-    "type": "array",
-    "items": {
-     "type": "string"
-    }
-   },
-   "isOpenNow": {
-    "type": "boolean"
-   },
-   "opensAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "closesAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "orderingMethod": {
-    "$ref": "#/components/schemas/GuestOrderingMethod"
-   },
-   "estimatedWaitMinutes": {
-    "type": "integer",
-    "nullable": true,
-    "description": "From current kitchen ticket volume, not a fixed figure. Null where the outlet has no kitchen display reporting ticket status — an invented wait time is worse than none.\n"
-   },
-   "imageAssetRef": {
-    "type": "string",
-    "nullable": true
-   },
-   "menuId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   }
-  }
- },
  "ExchangeOrderRequest": {
   "type": "object",
   "required": [
@@ -1451,18 +1281,6 @@
   ],
   "default": "bookable",
   "description": "**How a product appears to a guest** (decided 29 September, rev 3 REV3-14). `bookable`: listed and searched while it is on sale, and added to the basket. `infoOnly`: listed and searched with its details, photo and `notBookableLabel` whether or not it is on sale, and **never added to a basket** (`addCartLine` refuses it with `409`); the screen opens its details instead. `hidden`: never listed or searched for a guest, and reachable only where a staff channel sells it. Independent of `isSellable`, which says whether a channel may sell it at all.\n"
- },
- "GuestOrderingMethod": {
-  "x-ticvai-persistence": "none — enum",
-  "type": "string",
-  "description": "How a guest may order at this outlet. Varies within one venue, so it is per outlet rather than a venue setting.\n",
-  "enum": [
-   "tableService",
-   "appToTable",
-   "appToCollect",
-   "counterOnly",
-   "notAvailable"
-  ]
  },
  "Incident": {
   "x-ticvai-persistence": "maintenance.incident",
@@ -1957,6 +1775,46 @@
    },
    "refundedAmount": {
     "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "chargeCurrency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**The currency the guest selected and is charged in** (CHG-FIN-001, 2 October 2026). Null or equal to `currency` for a sale in the base currency. Everything else on the order, and every ledger posting, stays in the base currency `currency`."
+   },
+   "chargeFxRate": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/ExchangeRateDecimal"
+     }
+    ],
+    "nullable": true,
+    "readOnly": true,
+    "description": "Units of `chargeCurrency` per one unit of the base currency, from the region's `tender` rate in force at checkout (`finance.FxRate`), stored on the order so the payment, the receipt, the tax invoice and any refund use the same rate (CHG-FIN-001)."
+   },
+   "chargeFxRateId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The `finance.FxRate` row the rate was taken from, for audit."
+   },
+   "chargeTotal": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "readOnly": true,
+    "description": "`grossAmount` converted at `chargeFxRate` and rounded to the charge currency's scale: what the guest pays and what the payment request to the provider asks for (CHG-FIN-001)."
+   },
+   "chargeRateLockedUntil": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The quote holds until then (the cart lease). After it, the next payment attempt re-quotes at the rate then in force and the guest confirms the new amount (CHG-FIN-001)."
    },
    "droppedPromotions": {
     "type": "array",
@@ -2549,7 +2407,7 @@
     "type": "string",
     "pattern": "^[A-Z]{3}$",
     "nullable": true,
-    "description": "4.6.11 is deliberately asymmetric: **accept foreign currency, refund in local.** A till giving change in five currencies needs five floats and five counts, and the variance becomes unattributable.\n"
+    "description": "4.6.11 is deliberately asymmetric: **accept foreign currency, refund in local.** A till giving change in five currencies needs five floats and five counts, and the variance becomes unattributable.\n**Cash at a till only** (CHG-FIN-001, 2 October 2026). A card or wallet payment the guest made in a currency they selected is refunded in that currency (`Refund.tenderCurrency`).\n"
    },
    "amount": {
     "$ref": "../shared/common.yaml#/components/schemas/Money"
@@ -3429,7 +3287,7 @@
      "storeCredit"
     ],
     "default": "originalTender",
-    "description": "BL-086. **A refund could only go back the way it came.** A guest whose card has expired, a partner settling by wire, a guest who would rather have the credit — three real cases with one answer.\n**`originalTender` stays the default** because refunding elsewhere is how money laundering works, and anything else needs a reason.\n"
+    "description": "BL-086. **A refund could only go back the way it came.** A guest whose card has expired, a partner settling by wire, a guest who would rather have the credit — three real cases with one answer.\n**`originalTender` stays the default** because refunding elsewhere is how money laundering works, and anything else needs a reason.\n\n**`storeCredit` is a gift card issued for the refund amount** (decided 2 October 2026, Chinmay, batch 1, POS-011; DEC-061; CHG-CSP-037; DI-796), never a voucher or a wallet top-up.\n"
    },
    "fxVariance": {
     "allOf": [
@@ -3438,6 +3296,22 @@
      }
     ],
     "description": "Where the sale rate and the current rate differ, **the difference is booked as an FX variance rather than hidden in the refund**. `runFxRevaluation` already handles this class of movement and this is the same act at a smaller scale.\n"
+   },
+   "tenderCurrency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**A refund goes back in the currency the guest paid** (decided 2 October 2026, Chinmay; CHG-FIN-001). For a card or wallet payment taken in a guest-selected currency, the refund request to the provider is in that currency, and `tenderAmount` is the refunded share of the original `Payment.tenderAmount` at the sale rate (`fxRate`), so a full refund returns exactly what was charged. `amount` stays in base currency for the ledger. Null for a refund in the base currency. Foreign cash refunded at a till is paid in base currency (DI-282)."
+   },
+   "tenderAmount": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "readOnly": true,
+    "description": "The refund in `tenderCurrency`, at that currency's own scale (CHG-FIN-001)."
    },
    "amount": {
     "$ref": "../shared/common.yaml#/components/schemas/Money"
@@ -3694,57 +3568,6 @@
    "giftCard",
    "complimentary"
   ]
- },
- "VariantDimension": {
-  "x-ticvai-persistence": "catalogue.variant_dimension",
-  "type": "object",
-  "description": "**A length is an axis like any other** (decided 29 September, rev 3 REV3-13). A meeting room type sold by the hour has an axis `length` with values `1h`, `2h`, `halfDay`, `fullDay`, each carrying `durationMinutes` (proposed 60, 120, 240 and 480, client to correct), and each generated variant is priced on its own, so a half day need not cost four single hours.\n",
-  "required": [
-   "code",
-   "name",
-   "values"
-  ],
-  "properties": {
-   "code": {
-    "type": "string",
-    "maxLength": 64
-   },
-   "name": {
-    "type": "string",
-    "maxLength": 200
-   },
-   "values": {
-    "type": "array",
-    "minItems": 1,
-    "items": {
-     "type": "object",
-     "required": [
-      "code",
-      "label"
-     ],
-     "properties": {
-      "code": {
-       "type": "string",
-       "maxLength": 64
-      },
-      "label": {
-       "type": "string",
-       "maxLength": 200
-      },
-      "priceDelta": {
-       "$ref": "../shared/common.yaml#/components/schemas/Money"
-      },
-      "durationMinutes": {
-       "type": "integer",
-       "minimum": 15,
-       "maximum": 1440,
-       "nullable": true,
-       "description": "How long a variant carrying this value books its space for, on a `length` axis of a product with `requiresTimeWindow` (decided 29 September, rev 3 REV3-13). Null on any other axis. One axis per product at most may carry it; a second is a `400`."
-      }
-     }
-    }
-   }
-  }
  },
  "VenueMap": {
   "type": "object",

@@ -31,9 +31,9 @@
   },
   "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement.",
   "density": "comfortable",
-  "pattern": "listDetail",
+  "pattern": "configEditor",
   "patternReason": "**the screen's operations choose no pattern** — no list, no get, no write that groups. It falls to the default, and the fallback is recorded rather than passed off as a decision",
-  "purpose": "Arabic / RTL Experience — the screen a person opens when they need to deal with arabic / rtl experience.",
+  "purpose": "Choose the app's language; Arabic turns the whole app right to left.",
   "gaps": [
    {
     "operation": null,
@@ -43,7 +43,22 @@
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "form",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Language",
+       "bindsTo": "PublishedTenantConfig.languages",
+       "operation": "getPublishedTenantConfig",
+       "notes": "The languages the venue published; the choice is stored on the device and, for a signed-in guest, as the profile's language (GST-039). Arabic mirrors every layout (CF-42).",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-022, design-notes correction)"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The arabic rtl experience list.",
@@ -51,7 +66,14 @@
    "emptyFirstRun": "No arabic rtl experience yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
    "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "getPublishedTenantConfig",
+    "contract": "white-label",
+    "purpose": "The published languages",
+    "trigger": "onLoad"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "client-verified",
@@ -140,6 +162,14 @@
      "slot": "record",
      "components": [
       {
+       "kind": "banner",
+       "label": "Closed for maintenance",
+       "bindsTo": "PublishedTenantConfig.maintenanceMessage",
+       "operation": "getPublishedTenantConfig",
+       "notes": "The main case: `isInMaintenance` with its message and the expected-back time (\"Back at 14:00\"), set live on CMS-001 (DI-215).",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-022, design-notes correction)"
+      },
+      {
        "kind": "detailPanel",
        "label": "The tenant app status",
        "bindsTo": "TenantAppStatus",
@@ -185,13 +215,20 @@
    "forcedUpgrade": "**Update required.** The app's version is below `getTenantAppStatus.minimumAppVersion` for its platform; the screen offers only the store link, because an app too old to talk to the server cannot be trusted to book or pay (decided 28 September, audit R073 (b)).",
    "soldOut": "**Sold out today.** `getTenantAppStatus.availability` is `soldOut`: the page says so with the tenant's `availabilityMessage` and offers another day, never a generic error (decided 28 September, audit R073 (f)).",
    "closed": "**Closed.** `getTenantAppStatus.availability` is `closed`: the page says the venue is not open, with the tenant's `availabilityMessage` and the opening hours from `contact` (decided 28 September, audit R073 (f)).",
-   "emptyNoAccess": "**Nothing here needs a sign-in** (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-2)): the screen reads only what the tenant has published, which is public, so there is no no-access case. A host that belongs to no tenant shows the platform's neutral holding page."
+   "emptyNoAccess": "**Nothing here needs a sign-in** (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-2)): the screen reads only what the tenant has published, which is public, so there is no no-access case. A host that belongs to no tenant shows the platform's neutral holding page.",
+   "maintenance": "The venue's maintenance message and when it expects to be back; one way onward (try again at that time). Set live on CMS-001, never published."
   },
   "apis": [
    {
     "operationId": "getTenantAppStatus",
     "contract": "white-label",
     "purpose": "from page inventory",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getPublishedTenantConfig",
+    "contract": "white-label",
+    "purpose": "Maintenance, message and expected-back time, readable without signing in",
     "trigger": "onLoad"
    }
   ],

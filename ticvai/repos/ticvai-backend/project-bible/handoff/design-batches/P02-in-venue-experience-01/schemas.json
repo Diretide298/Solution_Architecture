@@ -203,25 +203,6 @@
    }
   }
  },
- "Page": {
-  "type": "object",
-  "required": [
-   "items",
-   "hasMore"
-  ],
-  "properties": {
-   "items": {
-    "type": "array",
-    "items": {}
-   },
-   "nextCursor": {
-    "type": "string"
-   },
-   "hasMore": {
-    "type": "boolean"
-   }
-  }
- },
  "ShopAndDrop": {
   "type": "object",
   "x-ticvai-persistence": "retail.shop_and_drop + retail.shop_and_drop_line",

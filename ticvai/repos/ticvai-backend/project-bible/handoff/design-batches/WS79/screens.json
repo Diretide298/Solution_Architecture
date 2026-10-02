@@ -48,7 +48,10 @@
     {
      "to": "BO-406",
      "trigger": "Reader Profile & Device Setup",
-     "provenance": "structural — pack board 2 wiring, 11 September 2026"
+     "provenance": "structural — pack board 2 wiring, 11 September 2026",
+     "carries": [
+      "deviceId"
+     ]
     },
     {
      "to": "BO-407",
@@ -285,6 +288,12 @@
        "bindsTo": null,
        "operation": null,
        "provenance": "pack Game_and_Ride_Module.pdf, page 14 §Directory Columns"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Devices",
+       "operation": "listDevices",
+       "provenance": "contract tenancy.yaml GET /devices; wiring fix, 2 October 2026"
       }
      ]
     },
@@ -409,6 +418,13 @@
     "contract": "games",
     "purpose": "Clone configuration",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "listDevices",
+    "contract": "tenancy",
+    "purpose": "The registered devices behind the readers: serial, firmware, last heartbeat",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-001)"
    }
   ],
   "entryState": {
@@ -500,6 +516,12 @@
     "operation": null,
     "why": "**Reader Profile & Device Setup declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
     "source": "contract — the screen's declared operations"
+   },
+   {
+    "operation": "setReaderProfile",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): setReaderProfile writes the shared display and retry profile, not one reader's identity and location; the per-reader write is setReaderConfiguration, with the reader read and the tenancy device read for its facts (design-notes correction venue-operations BO-406).",
+    "source": "contracts/satellite/games.yaml#setReaderProfile | contracts/satellite/games.yaml#setReaderConfiguration | screens/P08-venue-back-office.yaml#BO-406"
    }
   ],
   "layout": {
@@ -528,6 +550,31 @@
        "kind": "selectField",
        "label": "Logging Enabled",
        "provenance": "pack Game_and_Ride_Module.pdf, page 15 §Operational Settings"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Reader",
+       "bindsTo": "Reader",
+       "operation": "listReaders",
+       "provenance": "contract games.yaml GET /readers; wiring fix, 2 October 2026"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Device",
+       "bindsTo": "RegisteredDevice",
+       "operation": "getDevice",
+       "provenance": "contract tenancy.yaml GET /devices/{deviceId}; wiring fix, 2 October 2026"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "components": [
+      {
+       "kind": "secondaryButton",
+       "label": "Save reader",
+       "operation": "setReaderConfiguration",
+       "provenance": "contract games.yaml PUT /readers/{readerId}; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -536,16 +583,31 @@
   "states": {
    "loading": "The reader profile device configuration as saved.",
    "error": "Could not load. Names which read failed and leaves the reader profile device untouched.",
-   "emptyFirstRun": "No reader profile device configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyFirstRun": "No reader profile device configured yet. Offers no create action — this screen declares no operation that makes one and says what the platform does in the meantime.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },
   "apis": [
    {
-    "operationId": "setReaderProfile",
+    "operationId": "listReaders",
     "contract": "games",
-    "purpose": "How a reader behaves and what it shows",
-    "trigger": "onAction"
+    "purpose": "The reader being set up",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-001)"
+   },
+   {
+    "operationId": "setReaderConfiguration",
+    "contract": "games",
+    "purpose": "Save the reader's identity, location and status",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-001)"
+   },
+   {
+    "operationId": "getDevice",
+    "contract": "tenancy",
+    "purpose": "The registered device behind the reader: serial, firmware, heartbeat",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-001)"
    }
   ],
   "wireframe": {
@@ -554,6 +616,34 @@
    "workshopBoard": "wireframes/WS59 Game and Ride Board 2.dc.html#bo-406"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 15. 0 of 0 labels bound to a contract property; 4 of 26 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetReaderConfiguration",
+    "component": "modal",
+    "trigger": "Save reader",
+    "body": "**Collects what `setReaderConfiguration` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save reader",
+     "operation": "setReaderConfiguration"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "contract games.yaml PUT /readers/{readerId}; wiring fix, 2 October 2026"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "deviceId",
+     "from": "navigation"
+    },
+    {
+     "name": "readerId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -642,6 +732,27 @@
        "kind": "selectField",
        "label": "Pricing profile",
        "provenance": "pack Game_and_Ride_Module.pdf, page 16 §Configuration Source"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Reader",
+       "bindsTo": "Reader",
+       "operation": "listReaders",
+       "provenance": "contract games.yaml GET /readers; wiring fix, 2 October 2026"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Price in force",
+       "bindsTo": "GamePriceResolution",
+       "operation": "getGamePricing",
+       "provenance": "contract games.yaml GET /game-pricing; wiring fix, 2 October 2026"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Validation rules",
+       "bindsTo": "GameplayValidationRules",
+       "operation": "getGameplayValidationRules",
+       "provenance": "contract games.yaml GET /gameplay-validation-rules; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -650,7 +761,7 @@
   "states": {
    "loading": "The reader credit payment configuration as saved.",
    "error": "Could not load. Names which read failed and leaves the reader credit payment untouched.",
-   "emptyFirstRun": "No reader credit payment configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyFirstRun": "No reader credit payment configured yet. Offers no create action — this screen declares no operation that makes one and says what the platform does in the meantime.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },
@@ -666,11 +777,25 @@
     ]
    },
    {
-    "operationId": "enrolDevice",
-    "contract": "tenancy",
-    "purpose": "Enrol the device behind it",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026"
+    "operationId": "listReaders",
+    "contract": "games",
+    "purpose": "The reader whose acceptance is set",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-001)"
+   },
+   {
+    "operationId": "getGamePricing",
+    "contract": "games",
+    "purpose": "The effective price at this reader, and why",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-001)"
+   },
+   {
+    "operationId": "getGameplayValidationRules",
+    "contract": "games",
+    "purpose": "What a tap is checked against",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-001)"
    }
   ],
   "wireframe": {
@@ -682,15 +807,19 @@
   "entryState": {
    "params": [
     {
-     "name": "deviceId",
-     "from": "session"
-    },
-    {
      "name": "readerId",
      "from": "navigation"
     }
    ]
   },
+  "gaps": [
+   {
+    "operation": "enrolDevice",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): Enrolment belongs to the device register; this screen sets acceptance and price source and needs the reader, the effective price and the validation rules to show them (design-notes correction venue-operations BO-407).",
+    "source": "contracts/spine/tenancy.yaml#enrolDevice | screens/P08-venue-back-office.yaml#BO-407"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1311,6 +1440,12 @@
     "operation": null,
     "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
     "source": "pack Game_and_Ride_Module.pdf, page 20 §Identify Card / Wallet"
+   },
+   {
+    "operation": "setReaderConfiguration",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): Per-outcome responses (what the reader shows and does) live on ReaderProfile.displayBehaviour, written by setReaderProfile; the screen was bound to the per-reader setReaderConfiguration as \"Theme and experience\" (design-notes correction venue-operations BO-412).",
+    "source": "screens/P08-venue-back-office.yaml#BO-412 | contracts/satellite/games.yaml#setReaderProfile"
    }
   ],
   "layout": {
@@ -1347,37 +1482,39 @@
        "provenance": "pack Game_and_Ride_Module.pdf, page 20 §Identify Card / Wallet"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "components": [
+      {
+       "kind": "secondaryButton",
+       "label": "Save reader responses",
+       "operation": "setReaderProfile",
+       "provenance": "contract games.yaml PUT /reader-profiles; wiring fix, 2 October 2026"
+      }
+     ]
     }
    ]
   },
   "states": {
    "loading": "The real-time tap validation list.",
    "error": "Could not load. Names which read failed and leaves the real-time tap validation untouched.",
-   "emptyFirstRun": "No real-time tap validation yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No real-time tap validation yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the real-time tap validation are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
-    "operationId": "setReaderConfiguration",
+    "operationId": "setReaderProfile",
     "contract": "games",
-    "purpose": "Theme and experience",
+    "purpose": "What the reader shows and does for each tap outcome",
     "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026",
-    "invalidates": [
-     "listReaders"
-    ]
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-001)"
    }
   ],
   "entryState": {
    "preloaded": [
     "↓"
-   ],
-   "params": [
-    {
-     "name": "readerId",
-     "from": "navigation"
-    }
    ]
   },
   "wireframe": {
@@ -1386,6 +1523,22 @@
    "workshopBoard": "wireframes/WS59 Game and Ride Board 2.dc.html#bo-412"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 20. 0 of 1 labels bound to a contract property; 1 of 28 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetReaderProfile",
+    "component": "modal",
+    "trigger": "Save reader responses",
+    "body": "**Collects what `setReaderProfile` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save reader responses",
+     "operation": "setReaderProfile"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "contract games.yaml PUT /reader-profiles; wiring fix, 2 October 2026"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",

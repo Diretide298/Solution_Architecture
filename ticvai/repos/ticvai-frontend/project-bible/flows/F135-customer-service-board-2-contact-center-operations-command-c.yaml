@@ -26,7 +26,7 @@ steps:
   screen: SUP-020
   action: Works in Queue Configuration & Management
   operations:
-  - listQueues
+  - listServiceQueues
   outcome: Configure and operate the queues through which customer-service cases are organized.
 - step: 3
   screen: SUP-019

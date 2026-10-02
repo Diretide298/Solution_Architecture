@@ -442,6 +442,13 @@
    "workshopBoard": "wireframes/WS69 Group Sales   Corporate Booking Management Board 2.dc.html#bo-275"
   },
   "apisNote": "Regenerated 9 September 2026 from Group_Sales___Corporate_Booking_Management_Reference.pdf page 22. 0 of 0 labels bound to a contract property; 18 of 41 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-027): A read (get or list) of the group operational plan and its tasks that setGroupOperationalPlanning writes.",
+    "source": "contracts/spine/orders.yaml#setGroupOperationalPlanning | screens/P08-venue-back-office.yaml#BO-275"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",

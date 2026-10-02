@@ -1,6 +1,6 @@
 # WS143 — Marketing CRM Configuration Reference v1.0 board 9
 
-**10 screens · 7 operations · 10 schemas · 4 permissions**
+**10 screens · 6 operations · 8 schemas · 3 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -48,8 +48,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 4 permissions apply here:
-  `CASE_VIEW, MARKETING_MANAGE, MARKETING_VIEW, ORDER_REFUND`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 3 permissions apply here:
+  `CASE_VIEW, MARKETING_MANAGE, MARKETING_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -60,6 +60,42 @@ convincingly. It is never a caption.
   field, the control, whether it is required, its default, its limits and allowed values, its format
   and its error; and, element by element, what is shown and in what format, what each action
   produces and where the user goes next. Draw exactly that.
+
+## The processes these screens belong to
+
+Written by the owner of each process (`handoff/design-notes/`). Read before any screen: it says how the process runs end to end and which words the screens must use.
+
+### Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers)
+
+Customer & marketing is how a venue knows its guests and talks to them. There is ONE guest profile per person across ticketing, F&B and retail, so a guest who books online and later dines is the same profile (DI-339). A profile needs at least an email or a mobile, never neither (DI-372). Profiles are created by registration, by guest checkout, or by staff at a till or desk. Repeat guest checkouts with the same verified email or phone attach to the same profile automatically (DI-941, R120 default). Two records that might be the same person are NEVER merged automatically: the guest is asked to confirm, and an admin review queue runs alongside (DI-377). Each candidate shows why it matched; the record that loses is superseded, not deleted; consent takes the narrower of the two positions (DI-808). Around the profile sit three things that must never be confused. CONSENT is what the law allows: per purpose and per channel, append-only, with the notice version and the source (recordConsent). It is Given, Withdrawn or Not asked. A SUBSCRIPTION is what the guest asked to receive, e.g. a newsletter list (MarketingSubscription). A PREFERENCE is what they like: table, dietary, accessibility (updateGuestPreferences). An anonymous visitor's cookie decision is recorded against a device key (recordDeviceConsent) and attaches to the guest when they sign in (claimDeviceConsent). Marketing consent at GUEST CHECKOUT is an open client question, and the design follows its default: an unticked opt-in beside the terms, one per channel and purpose. It is recorded with source "checkout" against the order and the verified contact, and nothing is sent without it. Whether that is sufficient consent under PDPL is the client DPO's call (M18-15 (audit R-M18-15), DI-954, DI-940). Marketing reads profiles through SEGMENTS (rules, evaluated when used) and static LISTS (imported). It reaches guests by CAMPAIGNS (one send to an audience) and JOURNEYS (automations started by an event, with waits and branches). Journeys may offer only pre-configured offers, never a free-typed discount (MoM 2026-08-20 4.6). Everything goes through ONE communications module that every other module uses (MoM 2026-08-31 4.6). Consent and suppression are applied at send time, and the number excluded, with the reasons, is reported before anything goes out (launchCampaign). Transactional messages (tickets, receipts, queue calls, case replies) do not need marketing consent and must never carry marketing. LOYALTY pays for spend: points, tiers, rewards and expiry. GAMIFICATION pays for behaviour: challenges, badges, streaks, referrals and leaderboards (createChallenge). A guest reads their own loyalty position (getLoyaltyPosition). A till, the back office or support reads a named guest's (getGuestLoyalty, or identifyGuest at a till). SERVICE: one Case object covers lost property, complaints, questions, accessibility and refund requests (CaseKind). A guest raises one with raiseMyCase, which needs the connection …
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Guest | The person the venue serves, signed in or not. In body copy on every surface. | Customer, User, Subject, Contact, Patron | contracts/satellite/marketing-crm.yaml#/components/schemas/GuestProfile |
+| Guest profile | The CRM record of one person (details, consent, preferences, history). Distinct from the Account, which is how a guest signs in. | Customer record, Contact, Subject | contracts/satellite/marketing-crm.yaml#getGuestProfile |
+| Consent - Given / Withdrawn / Not asked | What the law allows, per purpose (marketing, personalisation, profiling, third-party sharing, AI processing, transactional) and per channel. "Not asked" is not "Withdrawn" and must look different. | Opted in/out as a status, Accepted, Declined, Revoked, Unsubscribed (that is a subscription) | contracts/satellite/marketing-crm.yaml#/components/schemas/ConsentDecision |
+| Subscription | A list the guest asked to receive (a newsletter, event news), per channel. Unsubscribing from a list is not withdrawing consent. | Consent, Opt-in | contracts/satellite/marketing-crm.yaml#/components/schemas/MarketingSubscription |
+| Preferences | What the guest likes or needs (seating, drinks, dietary, accessibility, contact channel). Never grants permission. | Consents, Settings | contracts/satellite/marketing-crm.yaml#updateGuestPreferences |
+| Send me offers and news | The marketing opt-in label beside the terms at checkout, unticked, one per channel and purpose. | I agree to marketing, Pre-ticked boxes, Keep me updated ticked by default | DI-954 |
+| Points / Tier / Points to next tier / Expiring points | The loyalty position. Points are a liability earned per programme; tiers are ranked (Bronze, Silver, Gold, Platinum in the meetings). | Credits, Coins, Balance alone (wallet money is "credit"), Level | DI-382 |
+| Pending points | Points earned on a purchase still inside its refund window; shown apart from spendable points. | Available points for pending ones | contracts/satellite/marketing-crm.yaml#getLoyaltyPosition |
+| Reward | What points can be turned into (rewards catalogue). | Prize (games redemption uses prize), Voucher unless it is one | contracts/satellite/marketing-crm.yaml#listRewards |
+| Challenge / Badge / Streak / Referral | Gamification - rewards for behaviour, not spend. Status badges such as Explorer, Adventurer, Legend. | Mission and Quest used interchangeably on one screen, Loyalty tier for a badge | DI-392 |
+| Case | One service record - lost property, complaint, question, accessibility, refund request or other - with a number (venue prefix plus sequence), a status and an SLA. | Ticket (a ticket is an admission product), Issue, Incident (that is maintenance and safety) | contracts/satellite/marketing-crm.yaml#/components/schemas/CaseKind |
+| Reply to guest / Internal note | The two kinds of case message. The agent always chooses one explicitly; there is no default. | Comment, Message (ambiguous) | F05 step 2 |
+| Conversation | A live chat session (web chat, in-app, WhatsApp, SMS, email, kiosk, voice). With the assistant, then queued, then with an agent. It is not a case. | Ticket, Case (until one is raised from it) | contracts/satellite/marketing-crm.yaml#/components/schemas/ConversationState |
+| Segment / List / Audience | A segment is rules evaluated when used. A list is static, imported or hand-picked. The audience is what a campaign or journey targets. | Group, Cohort, Target list for a segment | DI-381 |
+| Campaign / Journey | A campaign is one send (one-off, scheduled, triggered or recurring) to an audience. A journey is an automation started by an event, with steps, waits and branches. | Flow (booking flows use it), Automation for a one-off send, Blast | R146 |
+| Offer | A pre-configured, system-validated discount or benefit that a campaign or journey references. It is never typed into the builder. | Discount field, Coupon (unless the offer is a coupon code) | MoM 2026-08-20 4.6 |
+| Reachable | How many guests in an audience can actually be sent to on a channel after consent and suppression. Always shown beside the matching count. | Audience size alone | contracts/satellite/marketing-crm.yaml#previewSegment |
+| Possible duplicate / Merge | Two profiles that may be one person. Never called "Duplicate" as a verdict. Merging needs confirmation and stays reversible for 30 days. | Duplicate (as a status), Combine, Auto-merge | DI-808 |
+| Data request | A guest's privacy request - a copy of my data, a correction, erasure, a restriction - with a legal clock. Statuses submitted, in progress, completed. | DSAR on guest screens, Subject data, Ticket | DI-379 |
+| Waiver / Consent question | A waiver is a signed, versioned form. A consent question ("Are you able to swim?", "I accept the risk") is a single question asked per person or per booking and recorded as consent. | Contract, Disclaimer, Form for a waiver in guest copy | DI-1062 |
+| Lost item / Found item / Possible match | The two directions of lost property and the suggested pairing between them. | Lost case, Claim before it is claimed | contracts/satellite/marketing-crm.yaml#/components/schemas/LostItem |
+| Wishlist | Products and dates a guest saved to buy later, including F&B and retail to buy on site. | Favourites (used for transport routes), Saved for later on one surface and Wishlist on another | DI-202 |
+| Notification / Message | A notification is an item in the guest's in-app feed. A message is one send on a channel (email, SMS, WhatsApp, push, in-app). | Alert for marketing content, Inbox for the guest feed | contracts/satellite/marketing-crm.yaml#/components/schemas/GuestNotification |
+| Template | A reusable message body per channel and language with merge fields. Transactional and marketing templates are separate kinds. | Layout, Design | contracts/satellite/marketing-crm.yaml#createMessageTemplate |
+
 
 ## The screens
 
@@ -106,6 +142,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** Guest feedback and recovery at a glance: surveys sent, response rate, NPS, CSAT, CES, review count, average rating, negative feedback; trends by venue, product, event and channel; urgent detractors and moderation backlog; AI summaries linked to the responses behind them.
+
 #### Inputs: what the user enters or picks
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
@@ -128,6 +166,10 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 **Shown**
 
 **Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+
+**Rules for what is shown** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
+
+- **AI themes**: Labelled as AI with model version, each linking to example responses. *(source: contracts/satellite/marketing-crm.yaml#listCustomerSatisfactionFeedback; contracts/satellite/marketing-crm.yaml#/components/schemas/FeedbackClassification)*
 
 **Data it reads**: `listCustomerSatisfactionFeedback` (onLoad, Feedback at a glance)
 
@@ -155,6 +197,19 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+kpis:
+  nps: 41
+  csat: 4.3
+  responseRate: 18%
+  reviewsToModerate: 9
+theme: Queues at Tornado Slide (negative, 63 mentions)
+```
 
 #### Permissions
 
@@ -230,9 +285,15 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Known gaps.** **Survey Builder declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write operations are … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** Multilingual, accessible surveys without development: rating, NPS, choices, text, matrix, date, media; question library, branching, identified or anonymous responses, consent statement and incentive. A survey is a form version, immutable once answered.
+
 #### Inputs: what the user enters or picks
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+**Rules for these inputs** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
+
+- **Anonymous or identified**: Anonymous surveys never link to a guest profile, and say so to the respondent. *(source: screens/P08-venue-back-office.yaml#BO-815)*
 
 #### Outputs: what the screen shows and produces
 
@@ -257,6 +318,18 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the survey are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Consistency with other screens
+
+- Match `WEB-026`: Guests answer surveys on WEB-026 and GST-035 (see their corrections).
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+survey: Post-visit Coastal Aqua - NPS + 3 questions - EN/AR - version 2
+```
 
 #### Permissions
 
@@ -316,9 +389,15 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** When and to whom a survey goes: after purchase, visit (only when the ticket was scanned), event, reservation, membership interaction, case closure or inactivity; by email, SMS, WhatsApp, push, app, web, kiosk or QR; with delay, expiry, reminder, sampling, frequency cap and exclusions.
+
 #### Inputs: what the user enters or picks
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+**Rules for these inputs** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
+
+- **Trigger**: Post-visit means post-scan; a "how was your purchase" survey can trigger off the sale. *(source: DI-561; DI-391)*
 
 #### Outputs: what the screen shows and produces
 
@@ -344,6 +423,14 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 `sendTimeMode` `optimised` on a trigger whose `priority` is `operational` or `transactional` (29 September, build pass, group G2), or an `event` not in the … |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+trigger: Ticket scanned -> 3 hours later -> WhatsApp survey link -> reminder after 2 days -> expires after 7 days
+```
 
 #### Permissions
 
@@ -396,27 +483,24 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Engagement & Support · wave 3 · needs the `marketing` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `MARKETING_MANAGE` (1 configure); in the flows as venue manager |
+| Who uses it | venue; in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/engagement-support/nps-csat-ces-configuration-bo-817` |
 
-**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built. Removed 2 October 2026 (CHG-WIR-005): Metric definitions and follow-up thresholds are not forms; createForm does not configure NPS, CSAT or CES (design-notes correction customer-marketing BO-817).
+
+**From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** Standard experience metrics: NPS, CSAT and CES definitions, scales, score bands, targets, benchmarks, and the follow-up when a guest is a detractor, low CSAT or high effort. Rules are versioned so past results are never silently recalculated.
+
+**Fixed on main** (the package already carries these; draw what it says): The only operation is createForm. (CHG-WIR-005).
 
 #### Inputs: what the user enters or picks
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
 
 #### Outputs: what the screen shows and produces
-
-**Actions and what each produces**
-
-| Action | Calls | Sends | On success returns | Errors to show | Notes |
-|---|---|---|---|---|---|
-| Create form (primary button) | navigation or local | — | — | — | — |
-| Cancel (secondary button) | navigation or local | — | — | — | — |
 
 **Where the user goes next**
 
@@ -428,16 +512,22 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |---|---|
 | Loading (`?state=loading`) | The nps csat ces list. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the nps csat ces untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No nps csat ces yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, first run (`?state=emptyFirstRun`) | No nps csat ces yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the nps csat ces are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Not shown: nothing on this screen needs a permission of its own; the app's sign-in decides access. |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+nps: Detractor 0-6 -> case priority High; target +40
+```
 
 #### Permissions
 
-- `createForm` → `MARKETING_MANAGE` (configure) · staff
-
-**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Not shown: nothing on this screen needs a permission of its own; the app's sign-in decides access.
 
 #### Requirements it meets
 
@@ -465,9 +555,9 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
 - [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-817?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: Create form, Cancel.
+- [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-814`.
-- [ ] Every gated control is gated: `MARKETING_MANAGE`.
+- [ ] Sign-in is asked only where the spec asks for it.
 - [ ] The module and platform inputs below are applied.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -490,6 +580,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Route | `/engagement-support/survey-responses-insights-bo-818` |
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+**From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** Individual responses with their insight: respondent or anonymous, survey version, answers, channel, scores, sentiment and topics, linked guest and transaction where permitted; follow-up and recovery cases. The submitted response is never changed.
 
 #### Inputs: what the user enters or picks
 
@@ -531,6 +623,14 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+response: Anonymous - Post-visit v2 - NPS 3 - "Too crowded at the wave pool" - topic Crowding (AI)
+```
 
 #### Permissions
 
@@ -596,6 +696,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** Verified review capture: what can be reviewed (attraction, event, product, membership, venue, dining, service), scales, required comments, media, verified visit or purchase, submission window, duplicate and spam checks, and which reviews need moderation.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **Only listReviews is declared; nothing configures review rules.** Why: The purpose is configuration; add the rule operations. *(source: contracts/satellite/marketing-crm.yaml#listReviews; Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers))*
+
 #### Inputs: what the user enters or picks
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
@@ -629,6 +735,14 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the review collection rating are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+rule: Attractions - 1-5 stars - verified scan required - within 14 days - comments optional
+```
 
 #### Permissions
 
@@ -671,6 +785,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-814`.
 - [ ] Every gated control is gated: `MARKETING_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -693,6 +808,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** The moderation queue: approve, reject, redact or escalate guest reviews with reason codes, profanity and personal-data checks, and public response templates. Statuses pending moderation, published, hidden, rejected. The original text is retained.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **Only respondToReview is declared; approve, reject, redact and publish have no operation.** Why: Moderation itself cannot be performed. *(source: contracts/satellite/marketing-crm.yaml#/components/schemas/Review; Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers))*
+
 #### Inputs: what the user enters or picks
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
@@ -705,6 +826,10 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |---|---|---|---|---|---|
 |  (primary button) | navigation or local | — | — | — | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
+
+**What each action does** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
+
+- **Respond**: Public or private response shown under the guest's review. *(source: contracts/satellite/marketing-crm.yaml#respondToReview)*
 
 **Where the user goes next**
 
@@ -720,6 +845,14 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the moderation publishing are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+review: 2 stars - "Lazy river queue 40 minutes" - pending moderation
+```
 
 #### Permissions
 
@@ -768,6 +901,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - [ ] Every transition is wired: `BO-814`.
 - [ ] Every gated control is gated: `MARKETING_MANAGE`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -789,6 +923,8 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | Route | `/engagement-support/ai-sentiment-topic-analysis-bo-821` |
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+**From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** Explainable AI analysis of feedback text: sentiment, emotion, urgency, topics, clusters of recurring issues, with confidence, supporting excerpts, model and version, and reviewer corrections.
 
 #### Inputs: what the user enters or picks
 
@@ -830,6 +966,14 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+cluster: Food ran out late afternoon - 38 responses - negative 0.79 - model feedback-v3
+```
 
 #### Permissions
 
@@ -886,27 +1030,24 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Engagement & Support · wave 3 · needs the `marketing` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `ORDER_REFUND` (1 operate); in the flows as venue manager |
+| Who uses it | venue; in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/engagement-support/service-recovery-automation-bo-822` |
 
-**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built. Removed 2 October 2026 (CHG-WIR-005): setRefundCompensationService raises one request; nothing in it defines the automation rules this screen configures (design-notes correction customer-marketing …
+
+**From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** Turn negative feedback into governed action: rules for detractors, low CSAT, high effort, negative reviews, urgent topics; create and route a case, recommend an approved recovery offer, approval by amount, tier and risk; follow up and measure the change.
+
+**Fixed on main** (the package already carries these; draw what it says): Only setRefundCompensationService (one request) is declared; nothing defines the automation rules. (CHG-WIR-005).
 
 #### Inputs: what the user enters or picks
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
 
 #### Outputs: what the screen shows and produces
-
-**Actions and what each produces**
-
-| Action | Calls | Sends | On success returns | Errors to show | Notes |
-|---|---|---|---|---|---|
-| Save (primary button) | navigation or local | — | — | — | — |
-| Cancel (secondary button) | navigation or local | — | — | — | — |
 
 **Where the user goes next**
 
@@ -918,17 +1059,22 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |---|---|
 | Loading (`?state=loading`) | The service recovery automation list. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the service recovery automation untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No service recovery automation yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, first run (`?state=emptyFirstRun`) | No service recovery automation yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the service recovery automation are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Not shown: nothing on this screen needs a permission of its own; the app's sign-in decides access. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 The request is no longer a draft, or the amount exceeds what remains refundable (`exceedsRefundable`). |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+rule: NPS 0-6 with topic Staff -> case High to Guest Services -> recommend 500 points (auto-approved)
+```
 
 #### Permissions
 
-- `setRefundCompensationService` → `ORDER_REFUND` (operate) · staff
-
-**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Not shown: nothing on this screen needs a permission of its own; the app's sign-in decides access.
 
 #### Requirements it meets
 
@@ -953,12 +1099,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (400, 403, 404, 409).
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
 - [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-822?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: Save, Cancel.
+- [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-814`.
-- [ ] Every gated control is gated: `ORDER_REFUND`.
+- [ ] Sign-in is asked only where the spec asks for it.
 - [ ] The module and platform inputs below are applied.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -981,6 +1127,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Route | `/engagement-support/voc-analytics-audit-bo-823` |
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+**From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** Cross-source VOC reporting without double-counting guests: NPS, CSAT, CES, ratings, sentiment and topics benchmarked by venue, product and period, root-cause drivers, moderation SLA and recovery effectiveness.
 
 #### Inputs: what the user enters or picks
 
@@ -1021,6 +1169,14 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+driver: Queue length explains 34% of detractors in September
+```
 
 #### Permissions
 
@@ -1159,8 +1315,7 @@ Method, path, parameters, request and response for every operation these screens
 "listReviews": {"method":"GET","path":"/reviews","contract":"marketing-crm","summary":"List guest reviews and ratings","permission":"MARKETING_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"venueId","in":"query","required":null},{"name":"minRating","in":"query","required":null},{"name":"hasResponse","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listServiceRootCause": {"method":"GET","path":"/service-root-cause","contract":"marketing-crm","summary":"Service Analytics & Root-Cause Intelligence","permission":"CASE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":"venueId","in":"query","required":false},{"name":"eventId","in":"query","required":false},{"name":"productId","in":"query","required":false},{"name":"channel","in":"query","required":false},{"name":"from","in":"query","required":false},{"name":"to","in":"query","required":false},{"name":"compare","in":"query","required":false},{"name":"compareId","in":"query","required":false}],"requestBody":null,"responds":"ServiceAnalyticsRootCauseIntelligenceView"},
 "respondToReview": {"method":"POST","path":"/reviews/{reviewId}/respond","contract":"marketing-crm","summary":"Respond to a review","permission":"MARKETING_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Review"},
-"setMessageTrigger": {"method":"POST","path":"/message-triggers","contract":"marketing-crm","summary":"Fire a message from a platform event","permission":"MARKETING_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"MessageTrigger","responds":"MessageTrigger"},
-"setRefundCompensationService": {"method":"PUT","path":"/refund-compensation-service","contract":"marketing-crm","summary":"Raise or change a refund, compensation or policy-exception request on a case","permission":"ORDER_REFUND","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"RefundCompensationServiceExceptionWorkspaceInput","responds":"RefundCompensationServiceExceptionWorkspaceView"}
+"setMessageTrigger": {"method":"POST","path":"/message-triggers","contract":"marketing-crm","summary":"Fire a message from a platform event","permission":"MARKETING_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"MessageTrigger","responds":"MessageTrigger"}
 }
 ```
 
@@ -1171,12 +1326,10 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 ```json
 {
 "CustomerSatisfactionFeedbackVoiceOfCustomerView": {"type":"object","x-ticvai-persistence":"none — projection over marketing.form_submission and marketing.form_definition (survey forms), marketing.review, marketing.case and marketing.feedback_classification (new, the AI sentiment and topic per feedback item)","description":"Voice-of-customer figures for the filters given. Rates are shares of feedback items in the period.","required":["responses","breakdown","comments"],"properties":{"responses":{"type":"integer","minimum":0,"description":"Feedback items in the period."},"csat":{"type":"number","minimum":0,"maximum":1,"nullable":true,"description":"Share of CSAT answers in the top two points of the scale."},"nps":{"type":"integer","minimum":-100,"maximum":100,"nullable":true,"description":"Null where the tenant runs no NPS survey."},"surveyResponseRate":{"type":"number","minimum":0,"maximum":1,"nullable":true,"description":"Surveys answered over surveys sent."},"positiveRate":{"type":"number","minimum":0,"maximum":1},"neutralRate":{"type":"number","minimum":0,"maximum":1},"negativeRate":{"type":"number","minimum":0,"maximum":1},"complaints":{"type":"integer","minimum":0},"repeatContactRate":{"type":"number","minimum":0,"maximum":1,"nullable":true,"description":"Customers with a second case within 7 days of the first, over customers with a case."},"customerEffortScore":{"type":"number","minimum":1,"maximum":7,"nullable":true,"description":"Mean CES answer; null where effort is not measured."},"csatChangeRate":{"type":"number","nullable":true,"description":"Relative change in `csat` against the previous period of equal length."},"aiSummary":{"type":"object","nullable":true,"description":"AI-derived narrative of the feedback matching the filters (22.5.12; 29 September, build pass, group G2), labelled as AI on screen. Null when AI is off or fewer than 5 items match.","required":["text","basedOnCount","modelVersion"],"properties":{"text":{"type":"string","maxLength":2000},"basedOnCount":{"type":"integer","minimum":0,"description":"The feedback items the summary was written from."},"modelVersion":{"type":"string","maxLength":60},"generatedAt":{"type":"string","format":"date-time"}}},"breakdown":{"type":"array","description":"One row per value of the `groupBy` dimension, most responses first.","items":{"type":"object","required":["key","label","responses"],"properties":{"key":{"type":"string","description":"The id or enum value of the group."},"label":{"type":"string"},"responses":{"type":"integer","minimum":0},"csat":{"type":"number","minimum":0,"maximum":1,"nullable":true},"negativeRate":{"type":"number","minimum":0,"maximum":1}}}},"themes":{"type":"array","maxItems":20,"description":"AI topic themes, largest share first. Empty when AI is disabled for the tenant.","items":{"type":"object","required":["topic","shareRate"],"properties":{"topic":{"type":"string","maxLength":100},"shareRate":{"type":"number","minimum":0,"maximum":1},"negativeRate":{"type":"number","minimum":0,"maximum":1},"changeRate":{"type":"number","nullable":true,"description":"Relative change in the theme's volume against the previous period."}}}},"trendAlerts":{"type":"array","maxItems":10,"items":{"type":"string","maxLength":300},"description":"AI-detected shifts, e.g. negative feedback on ticket delivery rising after a release."},"comments":{"type":"array","maxItems":50,"description":"The 50 latest comments with text, newest first.","items":{"type":"object","required":["feedbackId","source","receivedAt"],"properties":{"feedbackId":{"type":"string","format":"uuid"},"source":{"type":"string","enum":["csatSurvey","serviceRating","nps","postCaseSurvey","complaint","appFeedback","webFeedback","directComment"]},"receivedAt":{"type":"string","format":"date-time"},"comment":{"type":"string","maxLength":4000,"nullable":true},"rating":{"type":"number","nullable":true,"description":"The answer on its survey's own scale."},"ratingScale":{"type":"string","nullable":true,"enum":["nps","csat","ces","likert5","likert7","stars"]},"sentiment":{"type":"string","nullable":true,"enum":["positive","neutral","negative"]},"topic":{"type":"string","nullable":true},"caseId":{"type":"string","format":"uuid","nullable":true},"agentPrincipalId":{"type":"string","format":"uuid","nullable":true},"productId":{"type":"string","format":"uuid","nullable":true},"eventId":{"type":"string","format":"uuid","nullable":true},"followUpCaseId":{"type":"string","format":"uuid","nullable":true}}}}}},
-"FormDefinition": {"type":"object","x-ticvai-persistence":"marketing.form_definition + marketing.form_definition_field","description":"CF-129, CL-04. **A waiver, a survey and a data-capture form are one mechanism.**\nA waiver is this form with a signature. A survey is this form with a scale. A demographic capture is this form at the point of sale. They were raised as three separate gaps and share every part: field configuration, conditional display, versioning, an acceptance record and a stored artefact.\n**Three implementations would drift on the version rule first.** A waiver signed against version 3 must stay bound to version 3, and that is the same requirement a survey has when question wording changes mid-campaign — **an NPS score means nothing if you cannot say which question produced it.**\n","required":["id","name","kind","version","status"],"properties":{"id":{"readOnly":true,"type":"string","format":"uuid"},"name":{"type":"string"},"kind":{"type":"string","enum":["waiver","survey","dataCapture","consentForm","incidentReport","registration"]},"version":{"readOnly":true,"type":"integer","description":"**Set by the server** — 1 on `createForm`, the next number on every change. **Immutable once anything is submitted against it.** A change creates a new version, and the old one stays readable forever — 2.15.13 requires the exact accepted version retained, which is legal evidence rather than a nicety.\n"},"fields":{"type":"array","items":{"$ref":"#/components/schemas/FormField"}},"requiresSignature":{"type":"boolean","default":false,"description":"**What makes it a waiver.** And 2.15.9 makes ticket issuance conditional on one, which puts this in the purchase path rather than beside it.\n"},"signatureKind":{"type":"string","enum":["drawn","typed","checkbox","none"],"default":"none"},"scoreScale":{"type":"string","nullable":true,"enum":["nps","csat","ces","likert5","likert7","stars"],"description":"**What makes it a survey.** Named rather than free-form because a score whose scale is unknown cannot be compared to last quarter's.\n"},"appliesToProductIds":{"type":"array","items":{"type":"string","format":"uuid"}},"validForMonths":{"type":"integer","nullable":true,"description":"**How long an acceptance lasts.** A waiver signed last summer may or may not still hold, and 2.15.x asks for a returning participant not to sign again — which only works if the expiry is stated.\n"},"minimumAge":{"type":"integer","nullable":true},"requiresGuardianForMinors":{"type":"boolean","default":true,"description":"**A minor cannot waive their own rights.** A guardian signs, and the record has to name them — an unsigned or self-signed minor waiver is worth nothing at the moment it matters.\n"},"status":{"readOnly":true,"type":"string","enum":["draft","published","superseded","retired"]},"legalReviewedBy":{"type":"string","nullable":true},"legalReviewedAt":{"type":"string","format":"date-time","nullable":true},"scopePath":{"readOnly":true,"type":"string","description":"**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"}}},
+"FormDefinition": {"type":"object","x-ticvai-persistence":"marketing.form_definition + marketing.form_definition_field","description":"CF-129, CL-04. **A waiver, a survey and a data-capture form are one mechanism.**\nA waiver is this form with a signature. A survey is this form with a scale. A demographic capture is this form at the point of sale. They were raised as three separate gaps and share every part: field configuration, conditional display, versioning, an acceptance record and a stored artefact.\n**Three implementations would drift on the version rule first.** A waiver signed against version 3 must stay bound to version 3, and that is the same requirement a survey has when question wording changes mid-campaign — **an NPS score means nothing if you cannot say which question produced it.**\n","required":["id","name","kind","version","status"],"properties":{"id":{"readOnly":true,"type":"string","format":"uuid"},"name":{"type":"string"},"kind":{"type":"string","enum":["waiver","survey","dataCapture","consentForm","incidentReport","registration"]},"consentPurposes":{"type":"array","description":"**What a `consentForm` consents to** (Chinmay, 2 October, batch 4; follows BO-188: biometric capture needs consent on the venue's own form; CHG-CSA-026). A guardian-signed form for a minor carries the guardian fields of the waiver builder (workbook Q237: guardian consent, configurable per country). Empty for any other kind.","items":{"type":"string","enum":["facePass","faceTag","marketing","photography","waiver"]}},"version":{"readOnly":true,"type":"integer","description":"**Set by the server** — 1 on `createForm`, the next number on every change. **Immutable once anything is submitted against it.** A change creates a new version, and the old one stays readable forever — 2.15.13 requires the exact accepted version retained, which is legal evidence rather than a nicety.\n"},"fields":{"type":"array","items":{"$ref":"#/components/schemas/FormField"}},"requiresSignature":{"type":"boolean","default":false,"description":"**What makes it a waiver.** And 2.15.9 makes ticket issuance conditional on one, which puts this in the purchase path rather than beside it.\n"},"signatureKind":{"type":"string","enum":["drawn","typed","checkbox","none"],"default":"none"},"scoreScale":{"type":"string","nullable":true,"enum":["nps","csat","ces","likert5","likert7","stars"],"description":"**What makes it a survey.** Named rather than free-form because a score whose scale is unknown cannot be compared to last quarter's.\n"},"appliesToProductIds":{"type":"array","items":{"type":"string","format":"uuid"}},"validForMonths":{"type":"integer","nullable":true,"description":"**How long an acceptance lasts.** A waiver signed last summer may or may not still hold, and 2.15.x asks for a returning participant not to sign again — which only works if the expiry is stated.\n"},"minimumAge":{"type":"integer","nullable":true},"requiresGuardianForMinors":{"type":"boolean","default":true,"description":"**A minor cannot waive their own rights.** A guardian signs, and the record has to name them — an unsigned or self-signed minor waiver is worth nothing at the moment it matters.\n"},"status":{"readOnly":true,"type":"string","enum":["draft","published","superseded","retired"]},"legalReviewedBy":{"type":"string","nullable":true},"legalReviewedAt":{"type":"string","format":"date-time","nullable":true},"scopePath":{"readOnly":true,"type":"string","description":"**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"}}},
 "FormField": {"type":"object","description":"One field. **Conditional display is the shared requirement** — a survey branching on an answer and a waiver revealing a medical question on a yes are the same mechanism.\n","required":["key","label","type"],"properties":{"key":{"type":"string"},"label":{"type":"string"},"labelLocalised":{"type":"object","additionalProperties":{"type":"string"}},"type":{"type":"string","enum":["text","longText","number","date","select","multiSelect","boolean","scale","signature","file","phone","email"]},"options":{"type":"array","items":{"type":"string"}},"isRequired":{"type":"boolean","default":false},"isPersonalData":{"type":"boolean","default":false,"description":"**Marked at the field, because retention is decided at the field.** A survey answer and a medical condition on the same form have different lifetimes, and a form-level flag makes the whole thing as sensitive as its most sensitive field.\n"},"consentPurposeId":{"type":"string","format":"uuid","nullable":true},"showWhen":{"type":"object","nullable":true,"properties":{"field":{"type":"string"},"equals":{"type":"string"}}}}},
 "MessageTrigger": {"type":"object","x-ticvai-persistence":"marketing.message_trigger","description":"**What fires a message.** Before, during and after a visit are one mechanism with a different sign on the offset.\n","required":["id","event","templateId","isActive"],"properties":{"id":{"readOnly":true,"type":"string","format":"uuid"},"event":{"type":"string","description":"The platform event that fires it — `order.completed`, `access.validated`, `queue.turnApproaching`. **Named from the event catalogue** (`BusinessEvent.eventType`), so a trigger cannot bind to something nothing publishes. Its conditions are `MessageTriggerCondition` rows.\n**`entitlement.expiringSoon` is in the catalogue since 29 September** (build pass, group G2; 5.5.30): the pre-expiry reminder for a ticket or pass. Its anchor is the event time; the notice period is the template's `expiryNoticeDays`, so `offsetMinutes` is normally 0.\n"},"templateId":{"type":"string","format":"uuid"},"offsetMinutes":{"type":"integer","default":0,"description":"Negative fires before the anchor, positive after. **A reminder the day before a visit is -1440 against the performance**, not a separate concept.\n"},"anchor":{"type":"string","enum":["eventTime","performanceStart","visitEnd"],"default":"eventTime"},"priority":{"type":"string","enum":["operational","transactional","marketing"],"default":"transactional","description":"**A queue-turn alert and a monthly newsletter are not the same urgency and were the same dispatch.** `operational` bypasses batching and quiet hours; `marketing` never does.\n"},"sendTimeMode":{"type":"string","enum":["fixed","optimised"],"default":"fixed","description":"**Only for `priority` `marketing`** (29 September, build pass, group G2; 22.9.16): `optimised` holds the notification to the recipient's suggested hour from `ai.requestSuggestion` (kind `sendTime`) within the next 24 hours, on the suggested consented channel. `operational` and `transactional` messages are never delayed for it, and a `setMessageTrigger` asking for it on them is refused (400)."},"isActive":{"type":"boolean","default":true},"scopePath":{"readOnly":true,"type":"string","description":"**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"}}},
 "Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}},
-"RefundCompensationServiceExceptionWorkspaceInput": {"type":"object","x-ticvai-persistence":"marketing.case_compensation_request","x-ticvai-record-definition":"Request Types","description":"One refund, compensation or policy-exception request raised from a case. The order, refund and approval are references, never copies.","required":["id","caseId","requestType","value","reason"],"properties":{"id":{"type":"string","format":"uuid","description":"Client-generated UUIDv7; equals the `Idempotency-Key` header."},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005)."},"caseId":{"type":"string","format":"uuid"},"orderId":{"type":"string","format":"uuid","description":"Required for `fullRefund`, `partialRefund`, `feeWaiver`, `upgrade` and `discount`."},"lineIds":{"type":"array","items":{"type":"string","format":"uuid"}},"requestType":{"type":"string","enum":["fullRefund","partialRefund","serviceCredit","walletCredit","voucher","complimentaryTicket","feeWaiver","upgrade","discount","policyException"]},"value":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"The money value requested; for a complimentary ticket or upgrade, its face value. This is what the approval thresholds are compared with."},"reason":{"type":"string","minLength":3,"maxLength":1000},"isPolicyException":{"type":"boolean","default":false,"description":"True when the standard policy would not allow it; always needs approval."},"exceptionReason":{"type":"string","maxLength":1000,"nullable":true,"description":"Required when `isPolicyException` is true."},"submit":{"type":"boolean","default":false,"description":"False saves a draft; true routes it.","writeOnly":true},"status":{"type":"string","readOnly":true,"enum":["draft","pendingApproval","approved","declined","fulfilled","failed","withdrawn"]},"approvalRequestId":{"type":"string","readOnly":true,"nullable":true},"fulfilmentOperation":{"type":"string","readOnly":true,"nullable":true,"description":"e.g. `createRefund`, `topUpWallet`."},"fulfilmentReference":{"type":"string","readOnly":true,"nullable":true,"description":"The refund, wallet transaction or voucher it produced."},"requestedByPrincipalId":{"type":"string","format":"uuid","readOnly":true},"updatedAt":{"type":"string","format":"date-time","readOnly":true}}},
-"RefundCompensationServiceExceptionWorkspaceView": {"type":"object","x-ticvai-persistence":"none — projection over marketing.case_compensation_request (new), orders.sales_order, orders.refund, orders.order_fee, orders.refund_policy and approvals.request","description":"The request, the order's financial context, the policy evaluation and who must approve.","required":["request","approvalLevel"],"properties":{"request":{"$ref":"#/components/schemas/RefundCompensationServiceExceptionWorkspaceInput"},"originalTransaction":{"type":"string","nullable":true,"description":"The order number."},"amountPaid":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"amountUsed":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Value of tickets already scanned or consumed."},"refundableAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"What the refund policy's time bands allow now, less previous refunds."},"previousRefund":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"fees":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"proposedRefund":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"proposedCompensation":{"type":"object","nullable":true,"properties":{"requestType":{"type":"string"},"value":{"$ref":"../shared/common.yaml#/components/schemas/Money"}}},"policyEvaluation":{"type":"object","properties":{"standardPolicy":{"type":"string","description":"The rule that applies, as the venue's refund policy states it."},"isWithinPolicy":{"type":"boolean"},"policyReference":{"type":"string","nullable":true}}},"approvalLevel":{"type":"string","enum":["agent","secondUser","approver"],"description":"From the venue's `selfAuthoriseLimit`, `requiresSecondUserAbove` and `requiresApprovalAbove`; a policy exception is always `approver`."},"aiExplanation":{"type":"string","nullable":true,"maxLength":1000,"description":"AI-derived and labelled as such; cites a recorded policy or says none applies."}}},
 "Review": {"x-ticvai-persistence":"marketing.review","allOf":[{"$ref":"#/components/schemas/SubmitReviewRequest"},{"type":"object","required":["status"],"properties":{"status":{"type":"string","enum":["pendingModeration","published","hidden","rejected"]},"response":{"type":"string","nullable":true},"responseIsPublic":{"type":"boolean"},"respondedByPrincipalId":{"type":"string","format":"uuid","nullable":true},"openedCaseId":{"type":"string","nullable":true,"description":"Case raised automatically where the rating fell below the venue's threshold. Feedback that goes nowhere is worse than no feedback mechanism.\n"}}}]},
 "ServiceAnalyticsRootCauseIntelligenceView": {"type":"object","x-ticvai-persistence":"none — projection over marketing.case, marketing.conversation, marketing.form_submission (CSAT) and the related orders and payments","description":"Service analytics for the filters given, with the comparison asked for.","required":["contactVolume","cases","drivers","comparison"],"properties":{"contactVolume":{"type":"integer","minimum":0,"description":"Conversations and cases opened, a conversation that became a case counted once."},"cases":{"type":"integer","minimum":0},"averageFirstResponseSeconds":{"type":"integer","minimum":0,"nullable":true},"averageResolutionSeconds":{"type":"integer","minimum":0,"nullable":true},"firstContactResolutionRate":{"type":"number","minimum":0,"maximum":1,"nullable":true},"reopenRate":{"type":"number","minimum":0,"maximum":1,"nullable":true},"escalationRate":{"type":"number","minimum":0,"maximum":1,"nullable":true},"slaComplianceRate":{"type":"number","minimum":0,"maximum":1,"nullable":true},"costPerCase":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"nullable":true},"csat":{"type":"number","minimum":0,"maximum":1,"nullable":true},"refundRequests":{"type":"integer","minimum":0},"complaintRate":{"type":"number","minimum":0,"maximum":1,"nullable":true},"comparison":{"type":"object","required":["basis","kpis"],"properties":{"basis":{"type":"string","enum":["previousDay","previousWeek","previousMonth","event","venue","product"]},"compareId":{"type":"string","format":"uuid","nullable":true},"kpis":{"type":"array","items":{"type":"object","required":["kpi"],"properties":{"kpi":{"type":"string","description":"The KPI's property name above, e.g. `contactVolume`."},"current":{"type":"number","nullable":true},"previous":{"type":"number","nullable":true},"changeRate":{"type":"number","nullable":true}}}}}},"drivers":{"type":"array","description":"Contact drivers, most cases first.","items":{"type":"object","required":["driver","cases","shareRate"],"properties":{"driver":{"type":"string","enum":["ticketDelivery","refund","reschedule","paymentFailure","membership","accessIssue","groupBooking","generalInformation","other"]},"cases":{"type":"integer","minimum":0},"shareRate":{"type":"number","minimum":0,"maximum":1},"changeRate":{"type":"number","nullable":true}}}},"rootCauses":{"type":"array","maxItems":20,"description":"Case surges traced to one cause, largest first. Empty when AI is disabled for the tenant.","items":{"type":"object","required":["summary","cases"],"properties":{"summary":{"type":"string","maxLength":500},"driver":{"type":"string","nullable":true},"cases":{"type":"integer","minimum":0},"causeType":{"type":"string","enum":["paymentProvider","event","product","release","incident","venueArea","other"]},"causeRef":{"type":"string","nullable":true,"description":"The id of the provider, event, product or incident, where there is one."},"windowStart":{"type":"string","format":"date-time","nullable":true},"windowEnd":{"type":"string","format":"date-time","nullable":true}}}},"avoidableContacts":{"type":"array","description":"AI estimate of cases that could have been prevented, by remedy.","items":{"type":"object","required":["preventableBy","cases"],"properties":{"preventableBy":{"type":"string","enum":["betterB2cInformation","selfService","productConfiguration","improvedNotifications","technicalFixes","betterTicketDelivery"]},"cases":{"type":"integer","minimum":0},"recommendation":{"type":"string","maxLength":500,"nullable":true}}}}}},
 "SubmitReviewRequest": {"x-ticvai-persistence":"none — request only","type":"object","required":["id","rating","venueId","recordedAt"],"properties":{"id":{"type":"string","format":"uuid"},"subjectId":{"type":"string","format":"uuid"},"venueId":{"type":"string","format":"uuid"},"relatedOrderId":{"type":"string"},"rating":{"type":"integer","minimum":1,"maximum":5},"body":{"type":"string","maxLength":5000},"aspects":{"type":"array","description":"Aspect chips — the closed set the description always named.","uniqueItems":true,"items":{"type":"string","enum":["exhibitions","staff","cleanliness","food","value"]}},"recordedAt":{"type":"string","format":"date-time"}}}

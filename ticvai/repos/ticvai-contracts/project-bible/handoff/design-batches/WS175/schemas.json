@@ -346,114 +346,6 @@
    "enum"
   ]
  },
- "InventoryHold": {
-  "x-ticvai-persistence": "catalogue.inventory_hold",
-  "type": "object",
-  "required": [
-   "id",
-   "channelCapacityId",
-   "holderKind",
-   "grantedUnits",
-   "consumedUnits",
-   "status",
-   "acquiredAt",
-   "expiresAt"
-  ],
-  "properties": {
-   "id": {
-    "type": "string"
-   },
-   "channelCapacityId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "holderKind": {
-    "$ref": "#/components/schemas/InventoryHoldHolderKind"
-   },
-   "holderWorkstationId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "The holding workstation when `holderKind` is `workstation`; null on a cart hold, because a browser has none (SD-023, 29 September)."
-   },
-   "holderCartId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "The holding cart (`orders.cart`) when `holderKind` is `cart` (SD-023, 29 September)."
-   },
-   "convertedOrderId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "readOnly": true,
-    "description": "The paid order the hold was converted for, set by `convertInventoryHold`."
-   },
-   "convertedAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true,
-    "readOnly": true
-   },
-   "parentLeaseId": {
-    "type": "string",
-    "nullable": true,
-    "description": "Present when sub-leased from a venue edge node."
-   },
-   "requestedUnits": {
-    "type": "integer"
-   },
-   "channel": {
-    "allOf": [
-     {
-      "$ref": "#/components/schemas/Channel"
-     }
-    ],
-    "description": "Allocation this lease draws from."
-   },
-   "grantedUnits": {
-    "type": "integer",
-    "description": "May be less than requested — a partial grant is not an error. Constrained by the channel's remaining allocation plus the general pool, never by raw capacity.\n"
-   },
-   "consumedUnits": {
-    "type": "integer"
-   },
-   "status": {
-    "$ref": "#/components/schemas/LeaseStatus"
-   },
-   "acquiredAt": {
-    "type": "string",
-    "format": "date-time"
-   },
-   "expiresAt": {
-    "type": "string",
-    "format": "date-time"
-   },
-   "releasedAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "forceReleasedByPrincipalId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "forceReleaseReason": {
-    "type": "string",
-    "nullable": true
-   }
-  }
- },
- "InventoryHoldHolderKind": {
-  "type": "string",
-  "enum": [
-   "workstation",
-   "cart"
-  ],
-  "default": "workstation",
-  "description": "**Who holds the units** (decided 29 September, SD-023). A till, kiosk or edge node holds as a `workstation`; a guest's web or app cart holds as a `cart`, acquired by the order service. A browser has no workstation, so a cart hold carries `cartId` and no `holderWorkstationId`.\n"
- },
  "KpiValue": {
   "type": "object",
   "description": "BI board 10.3. **Value, target, variance, direction and freshness in one read.**",
@@ -534,17 +426,6 @@
     "description": "**True when the pipeline behind it has not refreshed.** A number nobody flagged as stale is a number somebody will act on.\n"
    }
   }
- },
- "LeaseStatus": {
-  "type": "string",
-  "description": "`states/lease.yaml`. **`expired` is set by that model's timer transition when `expiresAt` passes without a renewal**, not by any operation in this contract. The job that runs the timer is the sweeper ADR-0037 deferred: it returns an expired hold's unconsumed units to `remaining` in the same guarded statement as a release (SD-023, 29 September), and **writes `inventoryHold.expired` to the outbox in the same transaction** (SD-023/SD-033, applied 30 September; `events/inventoryHold-expired.yaml`), so the cart that held the units hears of it before checkout. A `converted` hold is never swept.\n**`converted` is set by `convertInventoryHold`** when the order that holds the units is paid (decided 29 September, SD-023); its units are `sold` and the sweeper never touches it.\n",
-  "enum": [
-   "active",
-   "expired",
-   "released",
-   "forceReleased",
-   "converted"
-  ]
  },
  "MetricValue": {
   "x-ticvai-persistence-column": "numeric(18,4)",
@@ -647,6 +528,69 @@
    "format": {
     "type": "string",
     "nullable": true
+   },
+   "role": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "dimension",
+     "measure"
+    ],
+    "description": "**What the column is to a chart** (decided 2 October 2026, Chinmay; CHG-FIN-007). A `dimension` groups (date, venue, channel, product); a `measure` is aggregated (sum of net revenue, count of admissions). Null on a column only a table shows."
+   },
+   "encoding": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "category",
+     "x",
+     "y",
+     "series",
+     "value",
+     "size",
+     "colour",
+     "location",
+     "stage",
+     "source",
+     "target",
+     "row",
+     "column",
+     "hierarchyLevel",
+     "label",
+     "tooltip"
+    ],
+    "description": "**Which field well the column fills** (CHG-FIN-007), the binding the twenty marks of `DashboardTile.visualisation` need. The per-mark rule is on that field."
+   },
+   "axis": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "primary",
+     "secondary"
+    ],
+    "description": "For a measure on a `combo`, the axis it is drawn against. A secondary axis needs its own `unitLabel` (CHG-FIN-007)."
+   },
+   "seriesType": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "bar",
+     "line",
+     "area"
+    ],
+    "description": "For a measure on a `combo`, how that series is drawn (CHG-FIN-007)."
+   },
+   "hierarchyLevel": {
+    "type": "integer",
+    "nullable": true,
+    "minimum": 1,
+    "description": "For `matrix` rows and columns, `treemap` nesting and `decompositionTree` levels, the depth of this dimension, 1 outermost. Levels must follow a real hierarchy (DI-709), for example year, month, day, or region, venue, outlet (CHG-FIN-007)."
+   },
+   "unitLabel": {
+    "type": "string",
+    "nullable": true,
+    "maxLength": 40,
+    "description": "The unit an axis states, for example \"AED\" or \"Admissions\". Required on a secondary axis (CHG-FIN-007)."
    }
   }
  },
@@ -1003,6 +947,77 @@
     "items": {
      "$ref": "#/components/schemas/SeatPriceBand"
     }
+   }
+  }
+ },
+ "SeatHoldPool": {
+  "type": "object",
+  "x-ticvai-persistence": "seating.hold_pool",
+  "description": "Board 6.3. **Utilisation decides next season's allocation.**",
+  "required": [
+   "holdTypeId",
+   "performanceId"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "holdTypeId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "performanceId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "seatIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "seatCount": {
+    "type": "integer",
+    "readOnly": true
+   },
+   "usedCount": {
+    "type": "integer",
+    "readOnly": true
+   },
+   "releasedCount": {
+    "type": "integer",
+    "readOnly": true
+   },
+   "holderName": {
+    "type": "string",
+    "nullable": true
+   },
+   "reason": {
+    "type": "string",
+    "nullable": true
+   },
+   "releaseAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "active",
+     "partiallyReleased",
+     "released",
+     "expired"
+    ]
+   },
+   "createdBy": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "scopePath": {
+    "type": "string"
    }
   }
  },

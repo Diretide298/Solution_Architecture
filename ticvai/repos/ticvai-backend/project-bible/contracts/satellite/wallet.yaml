@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI — Wallet Configuration
   version: 1.0.0
-  x-ticvai-screen-count: 57
+  x-ticvai-screen-count: 60
   x-ticvai-tier: satellite
   x-ticvai-module: 4 — Bundles and Promotions
   x-ticvai-platforms:
@@ -74,7 +74,11 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-1083 Wallet Command Center"
         - "P08 BO-1084 Wallet Type Library"
-        - "P08 BO-1174 Wallet API Catalogue & Endpoint Configuration"
+        - "P08 BO-1085 Wallet Creation & Provisioning Rules"
+        - "P08 BO-1087 Wallet Currency & Monetary Configuration"
+        - "P08 BO-1089 Wallet Feature Profile"
+        - "P08 BO-1090 Wallet Lifecycle Configuration"
+        - "P08 BO-1091 Wallet Numbering, Identity & Digital Credentials"
       summary: The kinds of wallet that may exist — who owns one
       description: 'Board 1.2. Guest, registered customer, family, parent, child, corporate, school,
         employee.
@@ -197,7 +201,11 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-1088 Credit & Balance Type Configuration"
         - "P08 BO-1103 Stored Value & Credit Command Center"
+        - "P08 BO-1104 Credit Type Definition Studio"
+        - "P08 BO-1105 Credit Issuance Rule Configuration"
+        - "P08 BO-1108 Expiry & Validity Policy Configuration"
         - "P08 BO-415 Wallet & Credit Type Configuration"
+        - "P08 BO-420 Bonus Validity & Expiry Configuration"
         - "P08 BO-722 Prepaid Minute Package & Customer Balance Configuration"
       summary: The kinds of value that may sit in a wallet
       description: 'Board 1.6, and **the acceptance condition of the whole pack depends on this being a
@@ -373,8 +381,10 @@ paths:
     get:
       operationId: getCreditConsumptionPolicy
       x-ticvai-consumed-by:
+        - "P08 ADM-604 Stored Value, Gift Card & Voucher Tender Controls"
         - "P08 BO-1107 Consumption Priority Engine"
-        - "P09 ADM-604 Stored Value, Gift Card & Voucher Tender Controls\t97"
+        - "P08 BO-1110 Split Tender & Multi-Credit Consumption"
+        - "P08 BO-1112 Consumption Simulator, Validation & Rule Publication"
       summary: Which credit is spent first
       tags:
       - wallet
@@ -448,6 +458,8 @@ paths:
       operationId: listCreditLots
       x-ticvai-consumed-by:
         - "P08 BO-1109 FEFO & Credit Lot Management"
+        - "P08 BO-1111 Credit Expiry, Extension & Forfeiture Operations"
+        - "P08 BO-1130 Gift Card & Voucher Expiry Management"
         - "P08 BO-416 Wallet Account & Balance View"
       summary: The tranches behind a balance, with their expiry
       description: 'Board 3.7. **Expiry is a property of a tranche, not of a wallet.** Fifty dirhams of
@@ -570,7 +582,6 @@ paths:
         - "P08 BO-1112 Consumption Simulator, Validation & Rule Publication"
         - "P08 BO-1122 Shared Wallet Simulator, Monitoring & Audit"
         - "P08 BO-1142 Wallet Transaction Simulator, Monitoring & Channel Audit"
-        - "P08 BO-1161 Security Rules Testing, Simulation & AI Sandbox"
       x-ticvai-conflict-policy: serverWins
       summary: Which credit this purchase would actually use
       description: 'Board 3.10. **Split tender across several credit types and lots is hard to reason
@@ -624,6 +635,15 @@ paths:
       operationId: getWalletFundingRules
       x-ticvai-consumed-by:
         - "P08 BO-1093 Funding Command Center"
+        - "P08 BO-1094 Funding Method Configuration"
+        - "P08 BO-1095 Top-Up Rule Configuration"
+        - "P08 BO-1096 Channel & Funding Source Mapping"
+        - "P08 BO-1097 Auto-Reload Configuration"
+        - "P08 BO-1098 Recurring Funding Schedule"
+        - "P08 BO-1099 Funding Authorization & Approval Rules"
+        - "P08 BO-1101 Funding Limits & Velocity Controls"
+        - "P08 BO-417 Top-Up Configuration"
+        - "P08 BO-418 Top-Up Bonus Rule Configuration"
       summary: How a wallet may be topped up
       tags:
       - wallet
@@ -775,7 +795,13 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-1086 Wallet Ownership & Account Association"
         - "P08 BO-1113 Shared Wallet Command Center"
+        - "P08 BO-1114 Shared Wallet Model Configuration"
+        - "P08 BO-1115 Family & Household Structure Configuration"
+        - "P08 BO-1116 Parent–Child Stored Value Distribution"
+        - "P08 BO-1117 Allowance & Budget Allocation Engine"
+        - "P08 BO-1118 Member Spending Controls & Permissions"
         - "P08 BO-1119 Corporate Wallet & Organizational Hierarchy"
+        - "P08 BO-1120 Corporate Budget, Policy & Approval Rules"
         - "P08 BO-1122 Shared Wallet Simulator, Monitoring & Audit"
       summary: Family, household and corporate structures
       description: 'Board 4. **The money is in one place and the authority to spend it is distributed.**
@@ -917,6 +943,7 @@ paths:
       operationId: listVoucherTypes
       x-ticvai-consumed-by:
         - "P08 BO-1126 Voucher & Coupon Type Configuration"
+        - "P08 BO-1127 Voucher Eligibility & Redemption Rule Studio"
         - "P08 BO-1128 Membership Benefits & Entitlement Mapping"
         - "P08 BO-1129 Benefit Packaging & Digital Wallet Presentation"
       summary: Voucher, coupon and benefit definitions
@@ -1028,7 +1055,6 @@ paths:
     put:
       operationId: setWalletChannelRules
       x-ticvai-consumed-by:
-        - "P08 BO-1133 Wallet Usage & Channel Command Center"
         - "P08 BO-1134 Wallet Channel Configuration"
         - "P08 BO-1135 Wallet Payment & Redemption Policy"
         - "P08 BO-1136 Wearable & Credential Type Configuration"
@@ -1178,9 +1204,9 @@ paths:
     put:
       operationId: setWalletRefundPolicy
       x-ticvai-consumed-by:
+        - "P08 ADM-612 Refund Allocation & Original Tender Manager"
         - "P08 BO-1146 Refund-to-Wallet Policy Configuration"
         - "P08 BO-1147 Refund Routing & Credit Restoration Engine"
-        - "P09 ADM-612 Refund Allocation & Original Tender Manager\t119"
       x-ticvai-conflict-policy: serverWins
       summary: What a refund puts back, and where
       description: 'Boards 7.4 and 7.5. **A refund to a wallet and a refund to a card are different
@@ -1489,6 +1515,112 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/WalletLiabilityRow'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /wallet-movement-summary:
+    get:
+      operationId: getWalletMovementSummary
+      x-ticvai-consumed-by:
+        - "P08 BO-1170 Wallet Financial Period & Closing Controls"
+      x-ticvai-audience:
+      - staff
+      x-ticvai-read-routing: replica
+      x-ticvai-agreed: '2 October: Chinmay, workbook Q220 (BO-1170: add a wallet movement summary operation and wallet
+        pre-close checks); shape follows getWalletLiability'
+      summary: How the stored-value balance moved over a period
+      description: '**The wallet roll-forward** (Chinmay, 2 October, workbook Q220; CHG-CSA-027). Opening balance,
+        what came in (top-ups, refunds to wallet, transfers in, positive adjustments), what went out (spend,
+        transfers out, negative adjustments, refunds out), expiries and breakage, and the closing balance, per
+        credit type where asked. `tiesOut` is false where opening plus movements does not equal closing, which is
+        the first of the pre-close checks (`getWalletPreCloseChecks`).
+
+        '
+      tags:
+      - wallet
+      x-ticvai-permission: WALLET_VIEW
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - name: from
+        in: query
+        required: true
+        schema:
+          type: string
+          format: date
+      - name: to
+        in: query
+        required: true
+        schema:
+          type: string
+          format: date
+      - name: groupBy
+        in: query
+        schema:
+          type: string
+          enum:
+          - creditType
+          - walletType
+          - venue
+      responses:
+        '200':
+          description: The movement summary
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WalletMovementSummary'
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /wallet-pre-close-checks:
+    get:
+      operationId: getWalletPreCloseChecks
+      x-ticvai-consumed-by:
+        - "P08 BO-1170 Wallet Financial Period & Closing Controls"
+      x-ticvai-audience:
+      - staff
+      - service
+      x-ticvai-read-routing: primary
+      x-ticvai-agreed: '2 October: Chinmay, workbook Q220 (BO-1170: the wallet-specific checks join the period-close
+        checks); shape follows getWalletReconciliation'
+      summary: The wallet's checks before a period closes
+      description: '**The wallet-specific checks that join the period-close checks** (Chinmay, 2 October, workbook
+        Q220; CHG-CSA-027). Each check passes, warns or fails with its figures: the roll-forward ties out
+        (`getWalletMovementSummary`); the wallet sub-ledger equals the stored-value liability in the ledger; no
+        hold is open past its expiry; no expiry run is pending for the period; no dispute is unresolved past its
+        deadline; the reconciliation sources are matched for every day of the period. Finance''s period close reads
+        it (`finance.beginPeriodClose` lists these with its own checks), and a failing check blocks the close as its
+        own checks do.
+
+        '
+      tags:
+      - wallet
+      x-ticvai-permission: WALLET_VIEW
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      security:
+      - bearerAuth: []
+      - serviceAuth: []
+      parameters:
+      - name: periodEnd
+        in: query
+        required: true
+        schema:
+          type: string
+          format: date
+      responses:
+        '200':
+          description: The checks
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WalletPreCloseCheck'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /wallet-reconciliation:
@@ -1826,13 +1958,19 @@ paths:
     get:
       operationId: getWallet
       x-ticvai-consumed-by:
+        - "P01 WEB-017 My Account Dashboard"
         - "P01 WEB-021 Wallet & Gift Cards"
         - "P02 GST-011 Wallet Overview"
         - "P08 BO-1086 Wallet Ownership & Account Association"
+        - "P08 BO-1100 Funding Reversal & Correction Management"
+        - "P08 BO-1149 Administrative Balance Adjustment Studio"
+        - "P08 BO-1150 Wallet Block, Freeze & Restriction Management"
         - "P08 BO-414 Wallet & Credit Management Dashboard"
         - "P08 BO-416 Wallet Account & Balance View"
+        - "P08 BO-422 Refund, Adjustment & Manual Bonus Control"
         - "P08 BO-448 Redemption Wallet & Balance View"
         - "P08 BO-487 Customer Wallet & Balance Summary"
+        - "P08 BO-488 Self-Service Wallet Top-Up"
       parameters:
       - $ref: '../shared/common.yaml#/components/parameters/ConsistencyToken'
       security:
@@ -1867,6 +2005,7 @@ paths:
     post:
       operationId: topUpWallet
       x-ticvai-consumed-by:
+        - "P04 POS-027 Guest Lookup"
         - "P08 BO-488 Self-Service Wallet Top-Up"
       x-ticvai-note: >-
         **Through the one balance writer** (system-design review SD-027, 29 September): the `wallet.balance` row is
@@ -1940,8 +2079,10 @@ paths:
         - "P08 BO-1102 Funding Transaction Audit & Reconciliation"
         - "P08 BO-1142 Wallet Transaction Simulator, Monitoring & Channel Audit"
         - "P08 BO-1143 Wallet Operations Command Center"
+        - "P08 BO-1148 Reversal & Transaction Correction Management"
         - "P08 BO-414 Wallet & Credit Management Dashboard"
         - "P08 BO-423 Wallet Credit Transaction Ledger & Audit"
+        - "P08 BO-453 Redemption Transaction Ledger, Reconciliation & Audit"
         - "P08 BO-469 Wallet & Deduction Transaction Monitor"
       security:
       - guestAuth: []
@@ -2055,6 +2196,10 @@ paths:
 
         Physical cards are pre-printed and activated at sale; digital cards are issued with a
         generated code.
+
+        **Store credit is a gift card** (Chinmay, 2 October, workbook Q61, the default; DI-796; CHG-CSA-027): a
+        refund taken as store credit at the till issues a digital gift card here for the refund amount, never a
+        voucher and never a top-up of the guest's wallet.
       tags: [giftCard]
       x-ticvai-permission: WALLET_OPERATE
       x-ticvai-scope-level: workstation
@@ -2095,6 +2240,7 @@ paths:
         - "P01 WEB-021 Wallet & Gift Cards"
         - "P02 GST-071 Payment Methods"
         - "P08 BO-1123 Gift Card & Digital Benefit Command Center"
+        - "P08 BO-1125 Gift Card Issuance, Activation & Distribution"
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -2415,6 +2561,9 @@ paths:
   /wallets/{walletId}/balance:
     get:
       operationId: getWalletBalance
+      x-ticvai-consumed-by:
+        - "P08 BO-1116 Parent–Child Stored Value Distribution"
+        - "P08 BO-1121 Shared Wallet Transfers & Balance Reallocation"
       summary: A wallet's balance
       description: >
         **Keyed by wallet, not by guest, and that is the cross-cell decision.** A shared wallet
@@ -2740,7 +2889,11 @@ paths:
     get:
       operationId: listWalletConfigurationVersions
       x-ticvai-consumed-by:
+        - "P08 BO-1092 Wallet Configuration Preview, Validation & Publication"
+        - "P08 BO-1132 Gift Card & Voucher Simulator, Validation & Publication"
         - "P08 BO-1162 Security Governance, Audit & Rule Publication"
+        - "P08 BO-1180 Wallet Configuration Governance & Version Control"
+        - "P08 BO-1181 Approval, Publication & Change Management"
       x-ticvai-agreed: '29 September: VM close-out; pack ''Wallet_Configuration_Backend_Structure_v1.0.pdf''
         board 8 p.98 (Version comparison, Rollback); shape follows white-label listConfigVersions'
       summary: Wallet configuration versions, newest first
@@ -3096,6 +3249,7 @@ paths:
     post:
       operationId: resolveWalletDispute
       x-ticvai-consumed-by:
+        - "P08 BO-1151 Wallet Disputes & Operational Exception Queue"
         - "P08 BO-1179 Integration Monitoring & Exception Workbench"
       x-ticvai-agreed: '29 September: VM close-out; pack ''Wallet_Configuration_Backend_Structure_v1.0.pdf''
         board 10 p.122 (Reprocess, Escalate, Mark resolved); shape follows raiseWalletDispute'
@@ -3305,7 +3459,8 @@ paths:
         when the balance falls below `thresholdAmount`, `reloadAmount` is charged to the stored card
         (`paymentTokenId`, one of the caller's own) and loaded as cash credit. The venue's rules bound it
         (minimum and maximum top-up, velocity limits, `maximumPerDay`); this is refused where the venue has
-        auto-reload disabled. A declined charge suspends the setting until the holder updates it, rather
+        auto-reload disabled, or where the wallet's type does not allow it (`WalletType.autoReloadAllowed`,
+        CHG-CSA-027). A declined charge suspends the setting until the holder updates it, rather
         than retrying a card that has said no. The holder sets it for their own wallet; staff set it for
         a guest at a counter with the guest present.
       tags: [retail]
@@ -3940,6 +4095,12 @@ components:
       - code
       - name
       properties:
+        autoReloadAllowed:
+          type: boolean
+          default: true
+          description: '**Auto-reload is optional per wallet type** (Chinmay, 2 October, workbook Q105, default
+            accepted; CHG-CSA-027). Where false, a holder of this type cannot set an auto top-up
+            (`setWalletAutoReloadSetting` refuses it) whatever the venue''s `WalletFundingRules.autoReload` says.'
         id:
           type: string
           format: uuid
@@ -4834,6 +4995,33 @@ components:
           type: number
           nullable: true
           description: 'An incentive to take the refund as credit rather than to a card.'
+        destinationsBySource:
+          x-ticvai-persistence-kind: valueObject
+          x-ticvai-persistence-column: jsonb
+          type: array
+          description: '**A destination per refund source** (contract gap CHG-WIR-027, BO-1146; CHG-CSA-045). A refund
+            of a ticket, an event, F&B, retail, a rental, parking, a membership or a compensation goes to the
+            destination listed for its source; a source not listed takes `defaultDestination`.'
+          items:
+            type: object
+            properties:
+              source:
+                type: string
+                enum:
+                - ticket
+                - event
+                - fnb
+                - retail
+                - rental
+                - parking
+                - membership
+                - compensation
+              destination:
+                type: string
+                enum:
+                - originalTender
+                - wallet
+                - guestChoice
         scopePath:
           type: string
     WalletRestriction:
@@ -5095,6 +5283,68 @@ components:
         oldestLotAt:
           type: string
           format: date
+          nullable: true
+    WalletMovementSummary:
+      type: object
+      x-ticvai-persistence: none — aggregated from wallet.transaction and wallet.credit_lot
+      description: One row of the wallet roll-forward (`getWalletMovementSummary`, CHG-CSA-027). Every amount is in the
+        base currency.
+      properties:
+        groupKey:
+          type: string
+          nullable: true
+        opening:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        topUps:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        refundsIn:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        transfersIn:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        adjustmentsIn:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        spend:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        transfersOut:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        adjustmentsOut:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        refundsOut:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        expired:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        breakageRecognised:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        closing:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        tiesOut:
+          type: boolean
+          description: Opening plus every movement equals closing.
+    WalletPreCloseCheck:
+      type: object
+      x-ticvai-persistence: none — computed at the call
+      description: One wallet check before a period closes (`getWalletPreCloseChecks`, CHG-CSA-027).
+      properties:
+        code:
+          type: string
+          enum:
+          - rollForwardTies
+          - subLedgerTiesToLedger
+          - noExpiredHoldsOpen
+          - noPendingExpiryRun
+          - noOverdueDisputes
+          - reconciliationSourcesMatched
+        outcome:
+          type: string
+          enum:
+          - pass
+          - warn
+          - fail
+        detail:
+          type: string
+        difference:
+          allOf:
+          - $ref: ../shared/common.yaml#/components/schemas/Money
           nullable: true
     WalletReconciliation:
       type: object

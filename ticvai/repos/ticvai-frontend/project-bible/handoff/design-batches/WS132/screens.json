@@ -54,8 +54,8 @@
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
-  "purpose": "Configure the financial plan and budget against which event performance will be measured.",
-  "purposeNote": "Administrators can create an event-level financial plan and compare budget, commitments, actuals and forecasts using data referenced from the shared Finance services.",
+  "purpose": "Define slot templates for activities: slot length, capacity and the time bands they run in.",
+  "purposeNote": "Administrators can create an event-level financial plan and compare budget, commitments, actuals and forecasts using data referenced from the shared Finance services. Purpose rewritten 2 October 2026 (CHG-WIR-026): The purpose was pack text attached by page rather than by screen and does not describe this screen; it is rewritten from the screen's name and operations (design-notes correction ticketing-backoffice BO-721)",
   "gaps": [
    {
     "operation": null,
@@ -190,8 +190,8 @@
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
-  "purpose": "Configure dashboards used to measure event sales, attendance and check-in performance.",
-  "purposeNote": "Authorized users can monitor configured sales and attendance KPIs with current check-in information supplied by shared Ticketing and Access Control services.",
+  "purpose": "Define prepaid minute packages and the credit type that holds a guest's remaining minutes.",
+  "purposeNote": "Authorized users can monitor configured sales and attendance KPIs with current check-in information supplied by shared Ticketing and Access Control services. Purpose rewritten 2 October 2026 (CHG-WIR-026): The purpose was pack text attached by page rather than by screen and does not describe this screen; it is rewritten from the screen's name and operations (design-notes correction ticketing-backoffice BO-722)",
   "gaps": [
    {
     "operation": null,
@@ -323,8 +323,8 @@
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Configure KPI by; Display) and no metric row",
-  "purpose": "Configure measurable operational KPIs for staff, instructors and activity operators.",
-  "purposeNote": "Administrators can define measurable operator/instructor KPIs and calculate performance using traceable operational records from completed sessions.",
+  "purpose": "Set the peak, off-peak and super-prime time bands of a slot template.",
+  "purposeNote": "Administrators can define measurable operator/instructor KPIs and calculate performance using traceable operational records from completed sessions. Purpose rewritten 2 October 2026 (CHG-WIR-026): The purpose was pack text attached by page rather than by screen and does not describe this screen; it is rewritten from the screen's name and operations (design-notes correction ticketing-backoffice BO-723)",
   "gaps": [
    {
     "operation": null,
@@ -348,6 +348,13 @@
        "bindsTo": null,
        "operation": null,
        "provenance": "pack Event_Management_Configuration_Backend_Structure_v1.0.pdf, page 86 §Display"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Slot templates, peak bands and walk-in rules",
+       "bindsTo": "PerformanceTemplate",
+       "operation": "listPerformanceTemplates",
+       "provenance": "contract catalogue.yaml GET /performance-templates; wiring fix, 2 October 2026"
       }
      ]
     },
@@ -386,6 +393,13 @@
     "invalidates": [
      "listPerformanceTemplates"
     ]
+   },
+   {
+    "operationId": "listPerformanceTemplates",
+    "contract": "catalogue",
+    "purpose": "Slot templates, peak bands and walk-in rules",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "entryState": {
@@ -459,8 +473,8 @@
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
-  "purpose": "Configure automatic invoice generation for eligible event-related customers and commercial accounts.",
-  "purposeNote": "Eligible event transactions can trigger automated invoice requests with complete event and customer references while financial posting remains controlled by Finance.",
+  "purpose": "Set whether a slot template takes walk-in bookings, and on what terms.",
+  "purposeNote": "Eligible event transactions can trigger automated invoice requests with complete event and customer references while financial posting remains controlled by Finance. Purpose rewritten 2 October 2026 (CHG-WIR-026): The purpose was pack text attached by page rather than by screen and does not describe this screen; it is rewritten from the screen's name and operations (design-notes correction ticketing-backoffice BO-724)",
   "gaps": [
    {
     "operation": null,
@@ -492,6 +506,13 @@
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
        "impliedBy": "setPerformanceTemplate"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Slot templates, peak bands and walk-in rules",
+       "bindsTo": "PerformanceTemplate",
+       "operation": "listPerformanceTemplates",
+       "provenance": "contract catalogue.yaml GET /performance-templates; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -514,6 +535,13 @@
     "invalidates": [
      "listPerformanceTemplates"
     ]
+   },
+   {
+    "operationId": "listPerformanceTemplates",
+    "contract": "catalogue",
+    "purpose": "Slot templates, peak bands and walk-in rules",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {
@@ -522,6 +550,7 @@
    "workshopBoard": "wireframes/WS55 Event Management Configuration Backend Structure v1.0 Board 8.dc.html#bo-724"
   },
   "apisNote": "Regenerated 9 September 2026 from Event_Management_Configuration_Backend_Structure_v1.0.pdf page 87. 0 of 0 labels bound to a contract property; 0 of 36 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {},
   "_platform": {
    "code": "P08",
    "audience": "staff",

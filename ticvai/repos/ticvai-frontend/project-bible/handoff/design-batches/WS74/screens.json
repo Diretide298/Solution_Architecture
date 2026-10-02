@@ -108,47 +108,55 @@
    "regions": [
     {
      "name": "contentBody",
-     "slot": "collection",
+     "slot": "metrics",
      "components": [
       {
-       "kind": "dataTable",
-       "label": "Every digital asset",
-       "columns": [
-        "Total Digital Assets",
-        "Images",
-        "Videos",
-        "Uploads",
-        "Updates",
-        "Downloads",
-        "Shares",
-        "Recently Used"
-       ],
-       "bindsTo": null,
-       "operation": null,
-       "provenance": "pack Digital Asset Management DAM.pdf, page 3 §Display"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
+       "kind": "metricTile",
+       "label": "Total Digital Assets",
+       "operation": "getMediaUsageAnalytics",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-023, design-notes correction)"
+      },
       {
-       "kind": "detailPanel",
-       "label": "The selected digital asset",
-       "bindsTo": null,
-       "columns": [
-        "Total Digital Assets",
-        "Images",
-        "Videos",
-        "Uploads",
-        "Updates",
-        "Downloads",
-        "Shares",
-        "Recently Used"
-       ],
-       "notes": "The pack groups this record's detail under its own headings: “Digital Asset Management”, “Unclassified 128”, “Charts by”.",
-       "provenance": "pack Digital Asset Management DAM.pdf, page 3 §Display"
+       "kind": "metricTile",
+       "label": "Images",
+       "operation": "getMediaUsageAnalytics",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-023, design-notes correction)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Videos",
+       "operation": "getMediaUsageAnalytics",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-023, design-notes correction)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Uploads",
+       "operation": "getMediaUsageAnalytics",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-023, design-notes correction)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Updates",
+       "operation": "getMediaUsageAnalytics",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-023, design-notes correction)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Downloads",
+       "operation": "getMediaUsageAnalytics",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-023, design-notes correction)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Shares",
+       "operation": "getMediaUsageAnalytics",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-023, design-notes correction)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Recently Used",
+       "operation": "getMediaUsageAnalytics",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-023, design-notes correction)"
       }
      ]
     },
@@ -178,7 +186,7 @@
   "states": {
    "loading": "The digital asset list.",
    "error": "Could not load. Names which read failed and leaves the digital asset untouched.",
-   "emptyFirstRun": "No digital asset yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "Nothing here yet for Digital Asset Management Command Center. This screen only reads, so it offers no create action and says where the records come from.",
    "emptyNoResults": "The filter narrowed it and the digital asset are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -317,6 +325,13 @@
        ],
        "notes": "The pack filters this screen by tenant, venue, asset type, category, collection, tags and 5 more — which are present is a decision the pack already made.",
        "provenance": "pack Digital Asset Management DAM.pdf, page 5 §Allow filtering by"
+      },
+      {
+       "kind": "selectField",
+       "label": "Sort by",
+       "notes": "Name, updated date or file size. \"Ticket Media\" is not a filter here: wristband and ticket media are not library assets.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-023, design-notes correction)",
+       "bindsTo": "MediaAsset.sizeBytes"
       }
      ]
     },
@@ -373,16 +388,6 @@
      "slot": "rowActions",
      "components": [
       {
-       "kind": "primaryButton",
-       "label": "File Size",
-       "provenance": "pack Digital Asset Management DAM.pdf, page 5 §Support"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Ticket Media",
-       "provenance": "pack Digital Asset Management DAM.pdf, page 5 §Support at minimum"
-      },
-      {
        "kind": "secondaryButton",
        "label": "Preview",
        "provenance": "pack Digital Asset Management DAM.pdf, page 5 §Actions"
@@ -414,7 +419,7 @@
   "states": {
    "loading": "The central digital asset list.",
    "error": "Could not load. Names which read failed and leaves the central digital asset untouched.",
-   "emptyFirstRun": "No central digital asset yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "Nothing here yet for Central Digital Asset Library. This screen only reads, so it offers no create action and says where the records come from.",
    "emptyNoResults": "The filter narrowed it and the central digital asset are still there. The pack's own statuses are 🟢 Active — the state names which is selected.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -870,54 +875,23 @@
    "template": "split",
    "regions": [
     {
-     "name": "actionBar",
-     "slot": "rowActions",
+     "name": "contentBody",
+     "slot": "collection",
      "components": [
       {
+       "kind": "dataTable",
+       "label": "Metadata fields",
+       "operation": "getMediaTaxonomy",
+       "notes": "One row per field of the taxonomy (Asset Name, Asset Type, Venue, Campaign, Event, Attraction, Owner, Source), with its type and whether it is required; edited with `setMediaTaxonomy`.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-023, design-notes correction)"
+      },
+      {
        "kind": "primaryButton",
-       "label": "Asset Name",
-       "provenance": "pack Digital Asset Management DAM.pdf, page 9 §Support"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Asset Type",
-       "provenance": "pack Digital Asset Management DAM.pdf, page 9 §Support"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Venue",
-       "provenance": "pack Digital Asset Management DAM.pdf, page 9 §Support"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Campaign",
-       "provenance": "pack Digital Asset Management DAM.pdf, page 9 §Support"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Event",
-       "provenance": "pack Digital Asset Management DAM.pdf, page 9 §Support"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Attraction",
-       "provenance": "pack Digital Asset Management DAM.pdf, page 9 §Support"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Owner",
-       "provenance": "pack Digital Asset Management DAM.pdf, page 9 §Support"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Source",
-       "provenance": "pack Digital Asset Management DAM.pdf, page 9 §Support"
+       "label": "Save taxonomy",
+       "operation": "setMediaTaxonomy",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-023, design-notes correction)"
       }
      ]
-    },
-    {
-     "name": "contentBody",
-     "components": []
     }
    ]
   },
@@ -953,6 +927,22 @@
    "workshopBoard": "wireframes/WS44 Digital Asset Management DAM Board 1.dc.html#cms-065"
   },
   "apisNote": "Regenerated 9 September 2026 from Digital Asset Management DAM.pdf page 9. 0 of 0 labels bound to a contract property; 9 of 51 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetMediaTaxonomy",
+    "component": "modal",
+    "trigger": "Save taxonomy",
+    "body": "The fields of the taxonomy as edited in the table: name, type, whether required, and the allowed values for a choice field. Dismissing sends nothing.",
+    "confirm": {
+     "label": "Save taxonomy",
+     "operation": "setMediaTaxonomy"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "corrected 2 October 2026 (CHG-SGU-023, design-notes correction)"
+   }
+  ],
   "_platform": {
    "code": "P13",
    "audience": "staff",
@@ -1023,23 +1013,31 @@
      "components": [
       {
        "kind": "selectField",
-       "label": "Venue: Dubai Park",
-       "provenance": "pack Digital Asset Management DAM.pdf, page 11 §Select 100 assets and apply"
+       "label": "Venue",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-023, design-notes correction)",
+       "notes": "e.g. Dubai Park",
+       "bindsTo": "MediaAsset.venueId"
       },
       {
        "kind": "selectField",
-       "label": "Category: Marketing",
-       "provenance": "pack Digital Asset Management DAM.pdf, page 11 §Select 100 assets and apply"
+       "label": "Category",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-023, design-notes correction)",
+       "notes": "e.g. Marketing",
+       "bindsTo": "MediaAsset.categoryId"
       },
       {
        "kind": "selectField",
-       "label": "Campaign: Summer 2026",
-       "provenance": "pack Digital Asset Management DAM.pdf, page 11 §Select 100 assets and apply"
+       "label": "Campaign",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-023, design-notes correction)",
+       "notes": "e.g. Summer 2026",
+       "bindsTo": "MediaAsset.tags"
       },
       {
        "kind": "selectField",
-       "label": "Tags: Family, Outdoor",
-       "provenance": "pack Digital Asset Management DAM.pdf, page 11 §Select 100 assets and apply"
+       "label": "Tags",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-023, design-notes correction)",
+       "notes": "e.g. Family, Outdoor",
+       "bindsTo": "MediaAsset.tags"
       }
      ]
     }
@@ -1207,7 +1205,7 @@
   "states": {
    "loading": "The advanced search discovery list.",
    "error": "Could not load. Names which read failed and leaves the advanced search discovery untouched.",
-   "emptyFirstRun": "No advanced search discovery yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "Nothing here yet for Advanced Search & Discovery. This screen only reads, so it offers no create action and says where the records come from.",
    "emptyNoResults": "The filter narrowed it and the advanced search discovery are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -1368,7 +1366,7 @@
   "states": {
    "loading": "The digital asset 360° list.",
    "error": "Could not load. Names which read failed and leaves the digital asset 360° untouched.",
-   "emptyFirstRun": "No digital asset 360° yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "Nothing here yet for Digital Asset 360° Profile. This screen only reads, so it offers no create action and says where the records come from.",
    "emptyNoResults": "The filter narrowed it and the digital asset 360° are still there. The pack's own statuses are 🟢 Active — the state names which is selected.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -1532,7 +1530,7 @@
   "states": {
    "loading": "The bulk asset list.",
    "error": "Could not load. Names which read failed and leaves the bulk asset untouched.",
-   "emptyFirstRun": "No bulk asset yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "Nothing here yet for Bulk Asset Management Workspace. This screen only reads, so it offers no create action and says where the records come from.",
    "emptyNoResults": "The filter narrowed it and the bulk asset are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -1726,7 +1724,7 @@
   "states": {
    "loading": "The asset activity recent list.",
    "error": "Could not load. Names which read failed and leaves the asset activity recent untouched.",
-   "emptyFirstRun": "No asset activity recent yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "Nothing here yet for Asset Activity, Recent Assets & Library Health. This screen only reads, so it offers no create action and says where the records come from.",
    "emptyNoResults": "The filter narrowed it and the asset activity recent are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },

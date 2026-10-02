@@ -62,6 +62,31 @@ produce a second product, not more of this one.
 wireframes/design-base/pos-terminal/ is the fidelity bar for operator screens.
 sources/designs/ticvai-booking-archetypes.md governs anything on the booking spine.
 
+THE CLIENT'S DESIGN INPUTS OUTRANK THE REFERENCES
+
+Every BUNDLE.md has a section "Design inputs from the client meetings": what the client
+said in the minutes, workshops and design reviews about that batch's platform, modules
+and screens. Apply every item. Where a reference design or house style disagrees, the
+input wins; an open question gets the default it states.
+
+EACH SCREEN HAS A BLOCK: DRAW TO IT
+
+Every BUNDLE.md has a section "Screen by screen": one block per screen with every input
+(control, required, default, allowed values, format, error), every output (what is shown,
+in what format; what each action produces; where the user goes next), every state, the
+permissions, the requirements it meets, the client's inputs for it, the tracker items, what
+the tenant configures and the references. Draw the screen to its block and tick its
+acceptance checklist. On a guest screen apply apps/1-guest-app/WHITE-LABEL.md: the default
+theme, and the alternate tenant theme on the key screens.
+
+A block also says what was decided and what is still wrong. "Decided on this screen" lists
+each answered question (question, decision, who, when): draw the decision, not the old
+default; a "Reviewable" one is drawn as decided and only flagged in the review. "Known
+correction pending" is what the package still gets wrong: draw the corrected version.
+"Fixed on main" needs nothing from you; "Contract gap logged" means draw the corrected
+version and mark what waits on the contract. The guest surfaces have no dark or light mode,
+and "Powered by TICVAI" is a tenant toggle that is on by default.
+
 WHERE YOU MUST BE CREATIVE, AND WHERE YOU MUST NOT
 
 1,292 of the 7,679 component labels in this package are scaffolding a generator wrote
@@ -116,6 +141,19 @@ NEVER
   - read anything under _dump/ — it is retired work
   - go looking for wireframe boards; frames are the deliverable
 ```
+
+---
+
+## The client's design inputs (1 October)
+
+**The bundles carried the screens and the contracts and nothing the client said in the room.**
+`handoff/design-inputs/mom-design-inputs.yaml` is the authored index of every design statement in
+the minutes, workshop outputs and design reviews (source, date, section, scope, status, what it
+supersedes); `handoff/design-inputs/README.md` is its readable copy and says how to add one.
+`tools/build-design-inputs.py` validates it against the screens and `export-design-batch.py` puts
+the inputs that apply into each batch's BRIEF.md and BUNDLE.md, latest only. The app guides in
+`handoff/design-batches/apps/` list the app-wide ones between `<!-- design-inputs:... -->` markers.
+**A new MoM is not in a bundle until it is in the index.**
 
 ---
 

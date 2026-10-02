@@ -37,7 +37,6 @@ contracts:
 - marketing-crm
 - orders
 - payments
-- platform-ops
 - promotions
 - public-api
 - queue

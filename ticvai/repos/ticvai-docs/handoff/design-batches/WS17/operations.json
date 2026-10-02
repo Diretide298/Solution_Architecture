@@ -147,30 +147,6 @@
   "requestBody": null,
   "responds": "Page"
  },
- "listDelegations": {
-  "method": "GET",
-  "path": "/guests/{subjectId}/delegations",
-  "contract": "identity",
-  "summary": "Who may act for this guest, and for whom they may act",
-  "permission": "GUEST_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- },
  "listSlaEscalationBottleneck": {
   "method": "GET",
   "path": "/sla-escalation-bottleneck",

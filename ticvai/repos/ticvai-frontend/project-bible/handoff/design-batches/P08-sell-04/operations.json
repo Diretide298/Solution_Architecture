@@ -56,70 +56,18 @@
   "requestBody": null,
   "responds": null
  },
- "getVenueSettings": {
+ "getReturnPolicy": {
   "method": "GET",
-  "path": "/venues/{venueId}/settings",
-  "contract": "tenancy",
-  "summary": "Operational settings for this venue",
-  "permission": "TENANT_VIEW",
+  "path": "/outlets/{outletId}/return-policy",
+  "contract": "retail",
+  "summary": "Read the retail return policy",
+  "permission": "ORDER_VIEW",
   "offlineCapable": true,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [],
   "requestBody": null,
-  "responds": "VenueSettings"
- },
- "getWorkstationHealth": {
-  "method": "GET",
-  "path": "/workstations/{workstationId}/health",
-  "contract": "tenancy",
-  "summary": "A score a manager can sort by, and what is dragging it down",
-  "permission": "DEVICE_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [],
-  "requestBody": null,
-  "responds": null
- },
- "listAlerts": {
-  "method": "GET",
-  "path": "/alerts",
-  "contract": "reporting",
-  "summary": "What is currently wrong",
-  "permission": "REPORT_VIEW_VENUE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "status",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "severity",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "workstationId",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "shiftId",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "itemId",
-    "in": "query",
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Alert"
+  "responds": "ReturnPolicy"
  },
  "listAuditRecords": {
   "method": "GET",
@@ -273,30 +221,6 @@
   "requestBody": null,
   "responds": "Page"
  },
- "listRoles": {
-  "method": "GET",
-  "path": "/roles",
-  "contract": "identity",
-  "summary": "List roles",
-  "permission": "ROLE_MANAGE",
-  "offlineCapable": true,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- },
  "listSaleBoards": {
   "method": "GET",
   "path": "/sale-boards",
@@ -408,63 +332,6 @@
   "requestBody": null,
   "responds": "ShopAndDrop"
  },
- "recordDeviceHeartbeat": {
-  "method": "POST",
-  "path": "/devices/{deviceId}/heartbeat",
-  "contract": "tenancy",
-  "summary": "Device heartbeat and status",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "append",
-  "scopeLevel": "workstation",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": null
- },
- "reportIncident": {
-  "method": "POST",
-  "path": "/incidents",
-  "contract": "maintenance",
-  "summary": "Report an incident",
-  "permission": "INCIDENT_REPORT",
-  "offlineCapable": true,
-  "conflictPolicy": "append",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "ReportIncidentRequest",
-  "responds": "Incident"
- },
- "runReport": {
-  "method": "POST",
-  "path": "/reports/{reportId}/run",
-  "contract": "reporting",
-  "summary": "Run a report",
-  "permission": "REPORT_VIEW_VENUE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "RunReportRequest",
-  "responds": "ReportResult"
- },
  "setConfigurationProfile": {
   "method": "PUT",
   "path": "/configuration-profiles",
@@ -484,6 +351,25 @@
   "requestBody": "ConfigurationProfile",
   "responds": "ConfigurationProfile"
  },
+ "setReturnPolicy": {
+  "method": "PUT",
+  "path": "/outlets/{outletId}/return-policy",
+  "contract": "retail",
+  "summary": "Set the retail return policy",
+  "permission": "REGION_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ReturnPolicy",
+  "responds": "ReturnPolicy"
+ },
  "setStoreRules": {
   "method": "PUT",
   "path": "/store-rules",
@@ -502,44 +388,6 @@
   ],
   "requestBody": "StoreRule",
   "responds": "StoreRule"
- },
- "setVenueSettings": {
-  "method": "PUT",
-  "path": "/venues/{venueId}/settings",
-  "contract": "tenancy",
-  "summary": "Set support hours, quiet hours, segregated access and alerting",
-  "permission": "TENANT_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "VenueSettings",
-  "responds": "VenueSettings"
- },
- "startRollout": {
-  "method": "POST",
-  "path": "/rollouts/{rolloutId}/start",
-  "contract": "platform-ops",
-  "summary": "Start or continue a rollout",
-  "permission": "PLATFORM_RELEASE_PROMOTE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": null
  },
  "updateSaleBoard": {
   "method": "PUT",

@@ -9,17 +9,22 @@
 # APPLY=1 applies the phases in this order, each in one transaction, with no mail (notifications off):
 #
 #   guard         refuses to run if two keys map to one OpenProject id, or a pushed plan ticket is missing
-#   create        tickets with no id yet, parents before children; an existing ticket with the same subject under
-#                 the same parent (and no key of its own) is taken, not made again. A New plan ticket under the
-#                 wrong parent is moved under the plan's. Writes /tmp/op-created.json {key: id} (CREATED_OUT).
+#   create        the "Sprint n" versions the bundle names (sprint_versions) that the project lacks, then tickets
+#                 with no id yet, parents before children; an existing ticket with the same subject under the same
+#                 parent (and no key of its own) is taken, not made again. A New plan ticket under the wrong parent
+#                 is moved under the plan's (1 October: every task moves under its app-module feature and Block
+#                 epic). Writes /tmp/op-created.json {key: id}, the versions as VERSION-S<n> (CREATED_OUT).
 #   guard again   with the new ids
 #   priority      Priority_No. (the build order) on every plan ticket, started and closed ones too
-#   assign        assignee, accountable, Block A week on New tickets (names through the bundle's aliases); a
-#                 started ticket gets one comment per release naming the plan's person (ASSIGN_COMMENT=0: none)
+#   assign        a plan ticket On hold (deferred earlier, planned again) goes back to New with one comment; then
+#                 assignee, accountable and sprint version on New tickets (names through the bundle's aliases); a
+#                 started ticket gets one comment per release naming the plan's person (ASSIGN_COMMENT=0: none) and
+#                 keeps its owner and sprint (stable owners, plan item L2)
 #   links         removes a direct follows link between two plan tasks the plan no longer orders (even through a
 #                 chain), then adds the missing ones; duplicates are skipped
-#   retire        tickets that left the plan: on hold (defer) or rejected (merge), with the reason as a comment,
-#                 New tickets only; the unexplained ones are listed and never touched
+#   retire        tickets that left the plan: on hold (defer) or rejected (merge, regroup), with the reason as a
+#                 comment, New tickets only; a regrouped epic or feature only once nothing is under it; the
+#                 unexplained ones are listed and never touched
 #   descriptions  pointer bodies (C7): a New ticket's description becomes its pointer; a started ticket keeps its
 #                 text and gets ONE comment that its spec lives in ADAM (found again by its wording, so never
 #                 twice); New tickets are retitled to the plan (RETITLE=all: started ones too).
@@ -168,9 +173,36 @@ created = {}      # key -> id made or taken in this run; :pending in a dry run f
 resolve = lambda { |k| ids[k] || created[k] }
 results = []
 
+# The sprint versions (1 October): "Sprint 1" ... "Sprint 13", found by id or by name in the project, made in the
+# create phase when missing. A ticket names its version by key (VERSION-S<n>); the old week versions are left alone.
+sprint_defs = B["sprint_versions"] || []
+sprint_ids = {}
+sprint_defs.each do |v|
+  ver = v["id"] ? Version.find_by(id: v["id"].to_i) : nil
+  ver ||= Version.where(project_id: PROJECT_ID, name: v["name"]).first
+  sprint_ids[v["key"]] = ver ? ver.id : nil
+end
+version_of = lambda do |t|
+  next nil unless t["set_version"]
+  t["version_key"] ? sprint_ids[t["version_key"]] : t["version"]
+end
+
 # --------------------------------------------------------------------------------------------------------- create
 if rel_run?("create")
   rel_phase("create")
+  missing_versions = sprint_defs.select { |v| sprint_ids[v["key"]].nil? }
+  rel_say "sprint versions: #{sprint_defs.size - missing_versions.size} there, #{missing_versions.size} to make" +
+          (missing_versions.any? ? " (#{missing_versions.map { |v| v['name'] }.join(', ')})" : "")
+  if APPLY && missing_versions.any?
+    missing_versions.each do |v|
+      ver = Version.new(project: project, name: v["name"], status: "open", sharing: "none")
+      ver.start_date = v["start"] if v["start"] && ver.respond_to?(:start_date=)
+      ver.effective_date = v["end"] if v["end"] && ver.respond_to?(:effective_date=)
+      ver.save!
+      sprint_ids[v["key"]] = ver.id
+      rel_say "  made version ##{ver.id} #{v['name']}"
+    end
+  end
   owned = ids.values.to_set
   claimed = Set.new
   steps = []
@@ -246,7 +278,8 @@ if rel_run?("create")
           r = find_user.call(t["responsible"])
           wp.assigned_to = a if a
           wp.responsible = r if r
-          wp.send("#{version_col}=", t["version"]) if t["version"] && t["set_version"]
+          vid = version_of.call(t)
+          wp.send("#{version_col}=", vid) if vid
           if t["sequence"] && B["field"]
             wp.custom_field_values = { B["field"].sub("customField", "").to_i => t["sequence"] }
           end
@@ -266,6 +299,7 @@ if rel_run?("create")
     end
     out = {}
     B["create"].each { |k| out[k] = created[k] if created[k].is_a?(Integer) }
+    sprint_defs.each { |v| out[v["key"]] = sprint_ids[v["key"]] if sprint_ids[v["key"]] && !v["id"] }
     File.write(CREATED_OUT, JSON.pretty_generate(out))
     rel_say "done: #{made} made, #{out.size - made} taken, #{moves.size} moved in #{(Time.now - started).round(1)}s; " \
         "#{out.size} new ids -> #{CREATED_OUT} (merge into pms-map.json with tools/op-created-merge.py)"
@@ -332,12 +366,32 @@ end
 if rel_run?("assign")
   rel_phase("assign")
   wps = load_wps.call
+  # **Back in the plan** (1 October): a ticket op-retire deferred (On hold) whose work the plan has again goes back
+  # to New, with one comment, so it is assigned and versioned like any New ticket below.
+  reopen_marker = B["reopen_marker"] || "Back in the plan"
+  reopen = tickets.map { |t| [t, all_ids[t["key"]]] }.select { |t, id| id && wps[id] && wps[id].status_id == status_hold.id }
+  rel_say "On hold tickets the plan has again (back to New): #{reopen.size}"
+  rel_list(reopen.map { |t, id| "reopen ##{id} #{t['key']}" })
+  if APPLY && reopen.any?
+    rel_quietly do
+      WorkPackage.transaction do
+        reopen.each do |t, id|
+          w = WorkPackage.find(id)
+          w.status_id = NEW_ID
+          where = t["sprint"] ? "Sprint #{t['sprint']}" : "the plan"
+          w.add_journal(author, "**#{reopen_marker}** (release #{RELEASE}): this work is planned again, in #{where}; it was on hold.")
+          w.save!(validate: false)
+        end
+      end
+    end
+    wps = load_wps.call
+  end
   names = tickets.flat_map { |t| [t["assignee"], t["responsible"]] }.compact.uniq
   nobody = names.reject { |n| find_user.call(n) }
-  versions = Version.where(id: B["versions"].values.compact).pluck(:id, :name).to_h
-  lost = B["versions"].values.compact - versions.keys
+  versions = Version.where(id: sprint_ids.values.compact).pluck(:id, :name).to_h
+  lost = sprint_defs.map { |v| v["name"] }.reject { |n| versions.values.include?(n) }
   rel_say "no active OpenProject user (that field left as it is): #{nobody.join(', ')}" if nobody.any?
-  rel_say "week versions not found (left as is): #{lost.join(', ')}" if lost.any?
+  rel_say "sprint versions not there yet (set once the create phase makes them): #{lost.join(', ')}" if lost.any?
   noted = Journal.where(journable_type: "WorkPackage", journable_id: wps.keys)
                  .where("notes LIKE ?", "%#{ASSIGN_MARKER}%").pluck(:journable_id).to_set
   change, notes, moves = {}, [], Hash.new(0)
@@ -347,7 +401,8 @@ if rel_run?("assign")
     next unless w
     a = find_user.call(t["assignee"])
     r = find_user.call(t["responsible"])
-    v = t["set_version"] && t["version"] && versions.key?(t["version"]) ? t["version"] : nil
+    vid = version_of.call(t)
+    v = vid && versions.key?(vid) ? vid : nil
     want = {}
     want[:assigned_to_id] = a.id if a && w.assigned_to_id != a.id
     want[:responsible_id] = r.id if r && w.responsible_id != r.id
@@ -366,7 +421,7 @@ if rel_run?("assign")
   end
   n_of = lambda { |k| change.values.count { |x| x.key?(k) } }
   rel_say "New tickets to change: #{change.size} (assignee #{n_of.call(:assigned_to_id)}, accountable " \
-      "#{n_of.call(:responsible_id)}, week #{n_of.call(version_col)}); started tickets that get a comment: #{notes.size}" +
+      "#{n_of.call(:responsible_id)}, sprint #{n_of.call(version_col)}); started tickets that get a comment: #{notes.size}" +
       (ENV["ASSIGN_COMMENT"] == "0" ? " (ASSIGN_COMMENT=0: none)" : "") + "; #{noted.size} already have this release's"
   rel_list(moves.sort_by { |_, n| -n }.map { |m, n| "#{n.to_s.rjust(4)}  #{m}" } +
             notes.map { |id, k, s, _| "comment ##{id} #{k} (#{s})" })
@@ -457,11 +512,19 @@ if rel_run?("retire")
   found = {}
   WorkPackage.where(id: list.map { |e| e["id"] }).includes(:status).to_a.each { |w| found[w.id] = w }
   act, done_already, started_left, gone = [], [], [], []
+  # a regrouped epic or feature is closed only once nothing is under it; in a dry run the tickets the create phase
+  # would move out from under it are counted as moved
+  planned_ids = Set.new
+  tickets.each { |t| planned_ids << all_ids[t["key"]] if all_ids[t["key"]] && t["parent"] }
   list.each do |e|
     w = found[e["id"]]
     target = e["action"] == "defer" ? status_hold : status_rejected
+    under = w && e["action"] == "regroup" ? WorkPackage.where(parent_id: w.id).pluck(:id) : []
+    under = under.reject { |i| planned_ids.include?(i) } unless APPLY
     if w.nil?
       gone << "##{e['id']} #{e['key']}: not in OpenProject any more"
+    elsif under.any?
+      started_left << "##{e['id']} #{e['key']}: #{under.size} tickets still under it - left"
     elsif w.project_id != PROJECT_ID
       gone << "##{e['id']} #{e['key']}: in another project, left"
     elsif w.status_id == target.id

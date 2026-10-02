@@ -43,7 +43,10 @@
     {
      "to": "BO-383",
      "trigger": "Decision Record & Immutable Audit View",
-     "provenance": "structural — pack board 4 wiring, 9 September 2026"
+     "provenance": "structural — pack board 4 wiring, 9 September 2026",
+     "carries": [
+      "requestId"
+     ]
     },
     {
      "to": "BO-375",
@@ -53,27 +56,42 @@
     {
      "to": "BO-376",
      "trigger": "Approval Timeline & Decision Chain",
-     "provenance": "structural — pack board 4 wiring, 9 September 2026"
+     "provenance": "structural — pack board 4 wiring, 9 September 2026",
+     "carries": [
+      "requestId"
+     ]
     },
     {
      "to": "BO-377",
      "trigger": "Approve & Sensitive Action Confirmation",
-     "provenance": "structural — pack board 4 wiring, 9 September 2026"
+     "provenance": "structural — pack board 4 wiring, 9 September 2026",
+     "carries": [
+      "requestId"
+     ]
     },
     {
      "to": "BO-378",
      "trigger": "Reject / Return / Request Information",
-     "provenance": "structural — pack board 4 wiring, 9 September 2026"
+     "provenance": "structural — pack board 4 wiring, 9 September 2026",
+     "carries": [
+      "requestId"
+     ]
     },
     {
      "to": "BO-379",
      "trigger": "Requester Modification & Resubmission",
-     "provenance": "structural — pack board 4 wiring, 9 September 2026"
+     "provenance": "structural — pack board 4 wiring, 9 September 2026",
+     "carries": [
+      "requestId"
+     ]
     },
     {
      "to": "BO-380",
      "trigger": "Withdrawal, Cancellation, Expiration & Reopening",
-     "provenance": "structural — pack board 4 wiring, 9 September 2026"
+     "provenance": "structural — pack board 4 wiring, 9 September 2026",
+     "carries": [
+      "requestId"
+     ]
     },
     {
      "to": "BO-381",
@@ -101,6 +119,12 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Approval_Workflows_and_Governance_Reference.pdf, page 31"
+   },
+   {
+    "operation": "approveDecision",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-025): The approval workspace (board 4, children BO-375 to BO-383) declared approveDecision from the promotions contract (PRICE_CONFIGURE), which names no request; the approvals contract reads the requests awaiting a decision (listApprovalRequests) and records the decision on one (decideApprovalRequest) (design-notes correction ticketing-backoffice BO-374)",
+    "source": "contracts/satellite/promotions.yaml#approveDecision | screens/P08-venue-back-office.yaml#BO-374 | contracts/spine/approvals.yaml#decideApprovalRequest"
    }
   ],
   "layout": {
@@ -110,18 +134,21 @@
      "name": "contentBody",
      "components": [
       {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "approveDecision",
-       "label": "Approve decision",
-       "notes": "The act the screen exists for."
-      },
+       "kind": "dataTable",
+       "label": "Requests",
+       "operation": "listApprovalRequests",
+       "provenance": "contract approvals.yaml GET /approval-requests; wiring fix, 2 October 2026"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "components": [
       {
        "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "approveDecision"
+       "label": "Decide",
+       "operation": "decideApprovalRequest",
+       "provenance": "contract approvals.yaml POST /approval-requests/{requestId}/decide; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -130,16 +157,24 @@
   "states": {
    "loading": "The approval decision list.",
    "error": "Could not load. Names which read failed and leaves the approval decision untouched.",
-   "emptyFirstRun": "No approval decision yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No approval decision yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the approval decision are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
-    "operationId": "approveDecision",
-    "contract": "promotions",
-    "purpose": "Approval Inbox & Decision Workspace",
-    "trigger": "onAction"
+    "operationId": "listApprovalRequests",
+    "contract": "approvals",
+    "purpose": "Requests awaiting a decision, or already decided",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
+   },
+   {
+    "operationId": "decideApprovalRequest",
+    "contract": "approvals",
+    "purpose": "Approve, reject, return or ask for information on the selected request",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {
@@ -148,6 +183,30 @@
    "workshopBoard": "wireframes/WS33 Approval Workflows and Governance Board 4.dc.html#bo-374"
   },
   "apisNote": "Regenerated 9 September 2026 from Approval_Workflows_and_Governance_Reference.pdf page 31. 0 of 0 labels bound to a contract property; 0 of 24 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formDecideApprovalRequest",
+    "component": "modal",
+    "trigger": "Decide",
+    "body": "**Collects what `decideApprovalRequest` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Decide",
+     "operation": "decideApprovalRequest"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "contract approvals.yaml POST /approval-requests/{requestId}/decide; wiring fix, 2 October 2026"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "requestId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -228,10 +287,25 @@
      "name": "contentBody",
      "components": [
       {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listApprovalRequests",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "kind": "detailPanel",
+       "label": "The request",
+       "bindsTo": "ApprovalRequest",
+       "operation": "listApprovalRequests",
+       "notes": "The request opened by its id, with its subject (read from the subject's own contract: the order, the payment).",
+       "provenance": "contract approvals.yaml GET /approval-requests"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "secondaryButton",
+       "label": "Build evidence package",
+       "operation": "createApprovalEvidencePackage",
+       "notes": "The evidence package (`createApprovalEvidencePackage`) for the request's period and kind.",
+       "provenance": "contract approvals.yaml POST /approval-evidence-packages"
       }
      ]
     }
@@ -240,7 +314,7 @@
   "states": {
    "loading": "The business context evidence list.",
    "error": "Could not load. Names which read failed and leaves the business context evidence untouched.",
-   "emptyFirstRun": "No business context evidence yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No business context evidence yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the business context evidence are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -251,6 +325,13 @@
     "purpose": "The request and its evidence",
     "trigger": "onLoad",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "createApprovalEvidencePackage",
+    "contract": "approvals",
+    "purpose": "Assemble what an auditor asked for",
+    "trigger": "onAction",
+    "provenance": "design-note correction, 2 October 2026 (BO-375)"
    }
   ],
   "wireframe": {
@@ -259,6 +340,29 @@
    "workshopBoard": "wireframes/WS33 Approval Workflows and Governance Board 4.dc.html#bo-375"
   },
   "apisNote": "Regenerated 9 September 2026 from Approval_Workflows_and_Governance_Reference.pdf page 32. 0 of 0 labels bound to a contract property; 0 of 21 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formCreateApprovalEvidencePackage",
+    "component": "modal",
+    "trigger": "Build evidence package",
+    "body": "**Collects what `createApprovalEvidencePackage` sends before it is called.** Required: `from`, `to`. Optional: `requestKinds`, `includePolicyVersions`, `includeSignatures`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Build evidence package",
+     "operation": "createApprovalEvidencePackage"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "from",
+      "to",
+      "requestKinds",
+      "includePolicyVersions",
+      "includeSignatures"
+     ]
+    },
+    "provenance": "contract approvals.yaml POST /approval-evidence-packages"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -320,13 +424,6 @@
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Provide a visual representation of the complete approval journey.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Approval_Workflows_and_Governance_Reference.pdf, page 33 §Display"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -335,61 +432,40 @@
      "slot": "collection",
      "components": [
       {
-       "kind": "dataTable",
-       "label": "Every approval timeline decision",
+       "kind": "timeline",
+       "label": "Decision chain",
+       "bindsTo": "ApprovalRecord",
        "columns": [
-        "Request created",
-        "Workflow triggered",
-        "Routing decision",
-        "Assignment",
-        "Reassignment",
-        "Delegation",
-        "Comments",
-        "Approval",
-        "Rejection",
-        "Escalation",
-        "Notification",
-        "Execution"
+        "ApprovalRecord.sequence",
+        "ApprovalRecord.recordedAt",
+        "ApprovalRecord.decision",
+        "ApprovalRecord.decidedBy",
+        "ApprovalRecord.comment",
+        "ApprovalRecord.integrity"
        ],
-       "bindsTo": null,
-       "operation": null,
-       "provenance": "pack Approval_Workflows_and_Governance_Reference.pdf, page 33 §Display"
+       "operation": "getApprovalRecord",
+       "notes": "Events (created, routed, assigned, reassigned, decided ...) are rows of the timeline, verified on read, not table columns.",
+       "provenance": "contract approvals.yaml GET /approval-requests/{requestId}/record"
+      },
+      {
+       "kind": "detailPanel",
+       "derived": true,
+       "impliedBy": "getApprovalRecord",
+       "notes": "One record, read-only."
       }
      ]
     },
     {
      "name": "contextPanel",
      "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected approval timeline decision",
-       "bindsTo": null,
-       "columns": [
-        "Request created",
-        "Workflow triggered",
-        "Routing decision",
-        "Assignment",
-        "Reassignment",
-        "Delegation",
-        "Comments",
-        "Approval",
-        "Rejection",
-        "Escalation",
-        "Notification",
-        "Execution"
-       ],
-       "notes": "The pack groups this record's detail under its own headings: “Current”.",
-       "provenance": "pack Approval_Workflows_and_Governance_Reference.pdf, page 33 §Display"
-      }
-     ]
+     "components": []
     }
    ]
   },
   "states": {
    "loading": "The approval timeline decision list.",
    "error": "Could not load. Names which read failed and leaves the approval timeline decision untouched.",
-   "emptyFirstRun": "No approval timeline decision yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No approval timeline decision yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the approval timeline decision are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -403,14 +479,6 @@
    }
   ],
   "entryState": {
-   "preloaded": [
-    "Request created",
-    "Workflow triggered",
-    "Routing decision",
-    "Assignment",
-    "Reassignment",
-    "Delegation"
-   ],
    "params": [
     {
      "name": "requestId",
@@ -529,7 +597,7 @@
   "states": {
    "loading": "The approve sensitive action list.",
    "error": "Could not load. Names which read failed and leaves the approve sensitive action untouched.",
-   "emptyFirstRun": "No approve sensitive action yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No approve sensitive action yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the approve sensitive action are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -692,7 +760,7 @@
   "states": {
    "loading": "The reject return request list.",
    "error": "Could not load. Names which read failed and leaves the reject return request untouched.",
-   "emptyFirstRun": "No reject return request yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No reject return request yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the reject return request are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -823,7 +891,7 @@
   "states": {
    "loading": "The requester modification resubmission list.",
    "error": "Could not load. Names which read failed and leaves the requester modification resubmission untouched.",
-   "emptyFirstRun": "No requester modification resubmission yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No requester modification resubmission yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the requester modification resubmission are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -924,6 +992,11 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Approval_Workflows_and_Governance_Reference.pdf, page 36"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-024): No operation cancels, expires or reopens an approval request.",
+    "source": "contracts/spine/approvals.yaml#withdrawApprovalRequest"
    }
   ],
   "layout": {
@@ -952,7 +1025,7 @@
   "states": {
    "loading": "The withdrawal cancellation expiration list.",
    "error": "Could not load. Names which read failed and leaves the withdrawal cancellation expiration untouched.",
-   "emptyFirstRun": "No withdrawal cancellation expiration yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No withdrawal cancellation expiration yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the withdrawal cancellation expiration are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -1074,7 +1147,7 @@
   "states": {
    "loading": "The segregation duties four-eyes list.",
    "error": "Could not load. Names which read failed and leaves the segregation duties four-eyes untouched.",
-   "emptyFirstRun": "No segregation duties four-eyes yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No segregation duties four-eyes yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the segregation duties four-eyes are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -1175,9 +1248,24 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Retry | Investigate | Escalate",
+       "label": "Retry",
        "operation": "resolveApprovedActionExecution",
-       "provenance": "pack Approval_Workflows_and_Governance_Reference.pdf, page 37 §Actions"
+       "notes": "`resolveApprovedActionExecution` with action retry.",
+       "provenance": "contract approvals.yaml POST /approved-action-executions/{executionId}/resolve"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Investigate",
+       "operation": "resolveApprovedActionExecution",
+       "notes": "`resolveApprovedActionExecution` with action investigate.",
+       "provenance": "contract approvals.yaml POST /approved-action-executions/{executionId}/resolve"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Escalate",
+       "operation": "resolveApprovedActionExecution",
+       "notes": "`resolveApprovedActionExecution` with action escalate.",
+       "provenance": "contract approvals.yaml POST /approved-action-executions/{executionId}/resolve"
       }
      ]
     },
@@ -1197,7 +1285,7 @@
   "states": {
    "loading": "The approved action execution list.",
    "error": "Could not load. Names which read failed and leaves the approved action execution untouched.",
-   "emptyFirstRun": "No approved action execution yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No approved action execution yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the approved action execution are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -1236,6 +1324,27 @@
     }
    ]
   },
+  "overlays": [
+   {
+    "id": "formResolveApprovedActionExecution",
+    "component": "modal",
+    "trigger": "Retry",
+    "body": "**Collects what `resolveApprovedActionExecution` sends before it is called.** Required: `action`. Optional: `assigneeId`, `note`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Retry",
+     "operation": "resolveApprovedActionExecution"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "action",
+      "assigneeId",
+      "note"
+     ]
+    },
+    "provenance": "contract approvals.yaml POST /approved-action-executions/{executionId}/resolve"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1328,7 +1437,7 @@
   "states": {
    "loading": "The decision record immutable list.",
    "error": "Could not load. Names which read failed and leaves the decision record immutable untouched.",
-   "emptyFirstRun": "No decision record immutable yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No decision record immutable yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the decision record immutable are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },

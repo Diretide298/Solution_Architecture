@@ -399,6 +399,105 @@
    }
   }
  },
+ "BillingEntity": {
+  "type": "object",
+  "x-ticvai-persistence": "control.billing_entity",
+  "description": "**The company TICVAI invoices for a tenant, with its trade licence and VAT certificate** (Chinmay, 2 October, workbook Q209: \"a new billing-entity record in the subscription contract\"; DI-830; CHG-CSA-030). One per tenant, mastered in the control plane. `legalName` and `countryCode` are required on save (400 otherwise); they are not marked required here so the record can ride, optional, on an onboarding application. **Documents** (workbook Q210, the default): a trade licence always; a VAT certificate when a `trn` is entered. Which documents a country requires is configurable per country (tenancy `RegionSettings`); the default is that rule.",
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "tenantId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "Null while it rides on an onboarding application."
+   },
+   "legalName": {
+    "type": "string",
+    "maxLength": 300
+   },
+   "tradeLicenceNumber": {
+    "type": "string",
+    "maxLength": 100,
+    "nullable": true
+   },
+   "trn": {
+    "type": "string",
+    "maxLength": 30,
+    "nullable": true,
+    "description": "The tax registration number; entering one makes the VAT certificate required."
+   },
+   "countryCode": {
+    "type": "string",
+    "minLength": 2,
+    "maxLength": 2
+   },
+   "address": {
+    "type": "string",
+    "maxLength": 1000,
+    "nullable": true
+   },
+   "invoiceEmail": {
+    "type": "string",
+    "format": "email",
+    "nullable": true
+   },
+   "documents": {
+    "x-ticvai-persistence-kind": "valueObject",
+    "x-ticvai-persistence-column": "jsonb",
+    "type": "array",
+    "description": "The trade licence and, where a TRN is entered, the VAT certificate, each a stored file with its verification.",
+    "items": {
+     "type": "object",
+     "properties": {
+      "documentType": {
+       "type": "string",
+       "enum": [
+        "tradeLicence",
+        "vatCertificate"
+       ]
+      },
+      "fileRef": {
+       "type": "string",
+       "nullable": true
+      },
+      "expiryDate": {
+       "type": "string",
+       "format": "date",
+       "nullable": true
+      },
+      "verificationStatus": {
+       "type": "string",
+       "enum": [
+        "missing",
+        "uploaded",
+        "verified",
+        "rejected",
+        "expired"
+       ]
+      }
+     }
+    }
+   },
+   "missingDocuments": {
+    "type": "array",
+    "readOnly": true,
+    "description": "The documents the country's rule requires that are not yet uploaded and verified.",
+    "items": {
+     "type": "string"
+    }
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
  "CellTier": {
   "type": "string",
   "enum": [
@@ -527,6 +626,53 @@
   "type": "object",
   "additionalProperties": {
    "type": "string"
+  }
+ },
+ "OrgUnit": {
+  "x-ticvai-persistence": "platform.scope",
+  "type": "object",
+  "required": [
+   "id",
+   "level",
+   "path",
+   "code",
+   "name",
+   "isActive"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "level": {
+    "$ref": "#/components/schemas/ScopeLevel"
+   },
+   "parentId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "path": {
+    "type": "string",
+    "description": "Materialised ltree path, e.g. `t_ref.b_alpha.r_north.v_alpha1`.",
+    "pattern": "^[a-z0-9_]+(\\.[a-z0-9_]+)*$"
+   },
+   "code": {
+    "type": "string",
+    "maxLength": 64
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "isActive": {
+    "type": "boolean",
+    "description": "False causes every permission query at or beneath this node to resolve to DENY.\n"
+   },
+   "childCount": {
+    "type": "integer",
+    "minimum": 0
+   }
   }
  },
  "PackageSimulation": {
@@ -1065,7 +1211,27 @@
    "PROCUREMENT_VIEW",
    "PROCUREMENT_REQUEST",
    "PROCUREMENT_MANAGE",
-   "PROCUREMENT_RECEIVE"
+   "PROCUREMENT_RECEIVE",
+   "CORE_AI_PUBLISH",
+   "TICKETING_AI_PUBLISH",
+   "ACCESS_AI_PUBLISH",
+   "FNB_AI_PUBLISH",
+   "RETAIL_AI_PUBLISH",
+   "INVENTORY_AI_PUBLISH",
+   "SEATING_AI_PUBLISH",
+   "MEMBERSHIP_AI_PUBLISH",
+   "MARKETING_AI_PUBLISH",
+   "RESOURCES_AI_PUBLISH",
+   "QUEUE_AI_PUBLISH",
+   "TRANSPORT_AI_PUBLISH",
+   "GAMES_AI_PUBLISH",
+   "MAINTENANCE_AI_PUBLISH",
+   "ACCREDITATION_AI_PUBLISH",
+   "PARTNER_AI_PUBLISH",
+   "ANALYTICS_AI_PUBLISH",
+   "BIOMETRIC_IMAGE_VIEW",
+   "ACCESS_DIRECTION_SET",
+   "REPORT_GOVERNANCE_MANAGE"
   ]
  },
  "PlatformStaffGrant": {
@@ -1123,6 +1289,21 @@
     "description": "The tenant root. **Operations write it at `tenant` scope**; the server sets it."
    }
   }
+ },
+ "ScopeLevel": {
+  "type": "string",
+  "description": "**The eight organisational levels, plus `subject`.** Restored 24 August.\n`tenancy.yaml` holds the authoritative definition of the eight levels and this mirrors them so a contract can reference a level without depending on the whole tenancy surface. **Seven organisational levels plus `outlet`** — a commercial branch beside the organisational one (CF-138, ADR-0018). **A department has requisitions and rotas; an outlet has a menu and stock**, and modelling a restaurant as a department would put it in the staffing tree.\n\n**`subject` is the one value tenancy does not have, and it is not a level.** It is here because `check-package` reads this enum as the closed vocabulary for `x-ticvai-scope-level`, and some operations act on one guest's own resources, which sit in no node of the venue hierarchy. So `subject` is valid as an operation's scope level and never as a `ScopeRef.level`: every `ScopeRef` is a row of `platform.scope`, and those carry one of the eight.\n",
+  "enum": [
+   "tenant",
+   "brand",
+   "region",
+   "venue",
+   "department",
+   "subDepartment",
+   "workstation",
+   "outlet",
+   "subject"
+  ]
  },
  "SetPaymentProviderRequest": {
   "x-ticvai-persistence": "none — request only; the provider lands in payments.provider and its rules in payments.routing_rule",

@@ -444,6 +444,13 @@
        "kind": "selectField",
        "label": "Active/inactive status",
        "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 14 §For each method configure"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "How a wallet may be topped up",
+       "bindsTo": "WalletFundingRules",
+       "operation": "getWalletFundingRules",
+       "provenance": "contract wallet.yaml GET /wallet-funding-rules; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -466,6 +473,13 @@
     "invalidates": [
      "getWalletFundingRules"
     ]
+   },
+   {
+    "operationId": "getWalletFundingRules",
+    "contract": "wallet",
+    "purpose": "How a wallet may be topped up",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {
@@ -474,6 +488,7 @@
    "workshopBoard": "wireframes/WS187 Wallet Configuration Backend Structure v1.0 Board 2.dc.html#bo-1094"
   },
   "apisNote": "Regenerated 9 September 2026 from Wallet_Configuration_Backend_Structure_v1.0.pdf page 14. 0 of 0 labels bound to a contract property; 18 of 35 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {},
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -657,6 +672,13 @@
        "kind": "textField",
        "label": "Route for risk review",
        "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 15 §Configure"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "How a wallet may be topped up",
+       "bindsTo": "WalletFundingRules",
+       "operation": "getWalletFundingRules",
+       "provenance": "contract wallet.yaml GET /wallet-funding-rules; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -679,6 +701,13 @@
     "invalidates": [
      "getWalletFundingRules"
     ]
+   },
+   {
+    "operationId": "getWalletFundingRules",
+    "contract": "wallet",
+    "purpose": "How a wallet may be topped up",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {
@@ -687,6 +716,7 @@
    "workshopBoard": "wireframes/WS187 Wallet Configuration Backend Structure v1.0 Board 2.dc.html#bo-1095"
   },
   "apisNote": "Regenerated 9 September 2026 from Wallet_Configuration_Backend_Structure_v1.0.pdf page 15. 0 of 0 labels bound to a contract property; 23 of 27 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {},
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -854,6 +884,13 @@
        "kind": "selectField",
        "label": "Effective dates",
        "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 16 §Configure"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "How a wallet may be topped up",
+       "bindsTo": "WalletFundingRules",
+       "operation": "getWalletFundingRules",
+       "provenance": "contract wallet.yaml GET /wallet-funding-rules; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -876,6 +913,13 @@
     "invalidates": [
      "getWalletFundingRules"
     ]
+   },
+   {
+    "operationId": "getWalletFundingRules",
+    "contract": "wallet",
+    "purpose": "How a wallet may be topped up",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {
@@ -884,6 +928,7 @@
    "workshopBoard": "wireframes/WS187 Wallet Configuration Backend Structure v1.0 Board 2.dc.html#bo-1096"
   },
   "apisNote": "Regenerated 9 September 2026 from Wallet_Configuration_Backend_Structure_v1.0.pdf page 16. 0 of 0 labels bound to a contract property; 20 of 26 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {},
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1042,6 +1087,13 @@
        "kind": "selectField",
        "label": "Effective dates",
        "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 17 §Configure"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "How a wallet may be topped up",
+       "bindsTo": "WalletFundingRules",
+       "operation": "getWalletFundingRules",
+       "provenance": "contract wallet.yaml GET /wallet-funding-rules; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -1064,6 +1116,13 @@
     "invalidates": [
      "getWalletFundingRules"
     ]
+   },
+   {
+    "operationId": "getWalletFundingRules",
+    "contract": "wallet",
+    "purpose": "How a wallet may be topped up",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {
@@ -1072,6 +1131,7 @@
    "workshopBoard": "wireframes/WS187 Wallet Configuration Backend Structure v1.0 Board 2.dc.html#bo-1097"
   },
   "apisNote": "Regenerated 9 September 2026 from Wallet_Configuration_Backend_Structure_v1.0.pdf page 17. 0 of 0 labels bound to a contract property; 18 of 27 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {},
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1225,6 +1285,13 @@
        "kind": "selectField",
        "label": "Cancellation",
        "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 17 §Configure"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "How a wallet may be topped up",
+       "bindsTo": "WalletFundingRules",
+       "operation": "getWalletFundingRules",
+       "provenance": "contract wallet.yaml GET /wallet-funding-rules; wiring fix, 2 October 2026"
       }
      ]
     },
@@ -1258,6 +1325,13 @@
     "invalidates": [
      "getWalletFundingRules"
     ]
+   },
+   {
+    "operationId": "getWalletFundingRules",
+    "contract": "wallet",
+    "purpose": "How a wallet may be topped up",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {
@@ -1266,6 +1340,7 @@
    "workshopBoard": "wireframes/WS187 Wallet Configuration Backend Structure v1.0 Board 2.dc.html#bo-1098"
   },
   "apisNote": "Regenerated 9 September 2026 from Wallet_Configuration_Backend_Structure_v1.0.pdf page 17. 0 of 0 labels bound to a contract property; 18 of 29 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Specific day of month are choices sent by `setWalletFundingRules` (recurringFunding.dayOfMonth).",
+  "entryState": {},
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1439,6 +1514,13 @@
        "kind": "selectField",
        "label": "Approval notifications",
        "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 18 §Configure"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "How a wallet may be topped up",
+       "bindsTo": "WalletFundingRules",
+       "operation": "getWalletFundingRules",
+       "provenance": "contract wallet.yaml GET /wallet-funding-rules; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -1461,6 +1543,13 @@
     "invalidates": [
      "getWalletFundingRules"
     ]
+   },
+   {
+    "operationId": "getWalletFundingRules",
+    "contract": "wallet",
+    "purpose": "How a wallet may be topped up",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {
@@ -1469,6 +1558,7 @@
    "workshopBoard": "wireframes/WS187 Wallet Configuration Backend Structure v1.0 Board 2.dc.html#bo-1099"
   },
   "apisNote": "Regenerated 9 September 2026 from Wallet_Configuration_Backend_Structure_v1.0.pdf page 18. 0 of 0 labels bound to a contract property; 21 of 31 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {},
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1600,6 +1690,13 @@
        "kind": "selectField",
        "label": "Credit expiry impact",
        "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 19 §Configure"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Read a guest wallet",
+       "bindsTo": "Wallet",
+       "operation": "getWallet",
+       "provenance": "contract wallet.yaml GET /wallets/{subjectId}; wiring fix, 2 October 2026"
       }
      ]
     },
@@ -1661,6 +1758,13 @@
     "purpose": "Credit a top-up that was paid but never reached the wallet",
     "trigger": "onAction",
     "provenance": "decided 29 September, VM close-out (venue management and configuration): serves the pack action(s) Failed funding correction"
+   },
+   {
+    "operationId": "getWallet",
+    "contract": "wallet",
+    "purpose": "Read a guest wallet",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "entryState": {
@@ -1896,6 +2000,13 @@
        "kind": "selectField",
        "label": "Require approval",
        "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 20 §Configure"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "How a wallet may be topped up",
+       "bindsTo": "WalletFundingRules",
+       "operation": "getWalletFundingRules",
+       "provenance": "contract wallet.yaml GET /wallet-funding-rules; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -1918,6 +2029,13 @@
     "invalidates": [
      "getWalletFundingRules"
     ]
+   },
+   {
+    "operationId": "getWalletFundingRules",
+    "contract": "wallet",
+    "purpose": "How a wallet may be topped up",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {
@@ -1926,6 +2044,7 @@
    "workshopBoard": "wireframes/WS187 Wallet Configuration Backend Structure v1.0 Board 2.dc.html#bo-1101"
   },
   "apisNote": "Regenerated 9 September 2026 from Wallet_Configuration_Backend_Structure_v1.0.pdf page 20. 0 of 0 labels bound to a contract property; 32 of 39 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {},
   "_platform": {
    "code": "P08",
    "audience": "staff",

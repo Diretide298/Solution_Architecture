@@ -29,39 +29,41 @@
     {
      "name": "actionBar",
      "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Resolve permissions",
-       "operation": "resolvePermissions",
-       "provenance": "contract identity.yaml POST /permissions/resolve"
-      }
-     ]
+     "components": []
     },
     {
      "name": "contentBody",
      "slot": "carried",
      "components": [
       {
-       "kind": "textField",
-       "label": "Org unit id",
-       "operation": "listAuditRecords",
-       "notes": "Sends `?orgUnitId=` to `listAuditRecords`.",
-       "provenance": "contract tenancy.yaml GET /audit-records"
+       "kind": "selectField",
+       "label": "Where",
+       "operation": "listOrgUnits",
+       "notes": "A pick list in words, never a typed id (design-note correction, 2 October 2026).",
+       "provenance": "contract tenancy.yaml GET /audit-records",
+       "bindsTo": "OrgUnit.id",
+       "columns": [
+        "OrgUnit.name"
+       ]
       },
       {
-       "kind": "textField",
-       "label": "Principal id",
+       "kind": "selectField",
+       "label": "Who",
        "operation": "listAuditRecords",
-       "notes": "Sends `?principalId=` to `listAuditRecords`.",
-       "provenance": "contract tenancy.yaml GET /audit-records"
+       "notes": "A pick list of people by name.",
+       "provenance": "contract tenancy.yaml GET /audit-records",
+       "bindsTo": "AuditRecord.principalId"
       },
       {
-       "kind": "textField",
-       "label": "Workstation id",
-       "operation": "listAuditRecords",
-       "notes": "Sends `?workstationId=` to `listAuditRecords`.",
-       "provenance": "contract tenancy.yaml GET /audit-records"
+       "kind": "selectField",
+       "label": "Till or device",
+       "operation": "listWorkstations",
+       "notes": "A pick list in words, never a typed id (design-note correction, 2 October 2026).",
+       "provenance": "contract tenancy.yaml GET /audit-records",
+       "bindsTo": "Workstation.id",
+       "columns": [
+        "Workstation.name"
+       ]
       },
       {
        "kind": "textField",
@@ -71,10 +73,10 @@
        "provenance": "contract tenancy.yaml GET /audit-records"
       },
       {
-       "kind": "textField",
-       "label": "Subject ref",
+       "kind": "searchField",
+       "label": "About",
        "operation": "listAuditRecords",
-       "notes": "Sends `?subjectRef=` to `listAuditRecords`.",
+       "notes": "Search by what the record is about (an order number, a product name), never a raw reference.",
        "provenance": "contract tenancy.yaml GET /audit-records"
       },
       {
@@ -96,23 +98,18 @@
        "label": "Every audit",
        "bindsTo": "AuditRecord",
        "columns": [
-        "AuditRecord.id",
-        "AuditRecord.principalId",
-        "AuditRecord.orgUnitId",
-        "AuditRecord.workstationId",
         "AuditRecord.action",
         "AuditRecord.subjectRef",
-        "AuditRecord.occurredAt",
-        "AuditRecord.platformStaffGrantId"
+        "AuditRecord.occurredAt"
        ],
        "operation": "listAuditRecords",
        "provenance": "contract tenancy.yaml GET /audit-records"
       },
       {
-       "kind": "textField",
-       "label": "Platform-staff grant id",
+       "kind": "selectField",
+       "label": "Under a TICVAI grant",
        "operation": "listAuditRecords",
-       "notes": "Sends `?platformStaffGrantId=` to `listAuditRecords`, so the log shows only what a platform operator did under that grant. Choosing a row in **Platform-staff grants** fills it (decided 28 September, audit R098).",
+       "notes": "Pick one of the grants listed below, by operator and reason.",
        "provenance": "contract tenancy.yaml GET /audit-records"
       },
       {
@@ -128,7 +125,6 @@
        "bindsTo": "PlatformStaffGrant",
        "columns": [
         "PlatformStaffGrant.operatorDisplayName",
-        "PlatformStaffGrant.operatorPrincipalId",
         "PlatformStaffGrant.reason",
         "PlatformStaffGrant.ticketRef",
         "PlatformStaffGrant.permissions",
@@ -146,7 +142,7 @@
   "states": {
    "loading": "The audit log list.",
    "error": "Could not load. Names which read failed and leaves the audit log untouched.",
-   "emptyFirstRun": "No audit log yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyFirstRun": "No audit log yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "Nothing matches the filter on orgUnitId, principalId, workstationId, action, subjectRef, from and platformStaffGrantId; the audit log is still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Shown when the caller lacks `AUDIT_VIEW`, which `listAuditRecords` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -164,13 +160,18 @@
     "trigger": "onLoad"
    },
    {
-    "operationId": "resolvePermissions",
-    "contract": "identity",
-    "purpose": "Simulate a principal's effective permissions",
-    "trigger": "onAction",
-    "invalidates": [
-     "listAuditRecords"
-    ]
+    "operationId": "listOrgUnits",
+    "contract": "tenancy",
+    "purpose": "List scope nodes visible to the session (the pick list)",
+    "trigger": "onLoad",
+    "provenance": "design-note correction, 2 October 2026 (BO-068)"
+   },
+   {
+    "operationId": "listWorkstations",
+    "contract": "tenancy",
+    "purpose": "List workstations (the pick list)",
+    "trigger": "onLoad",
+    "provenance": "design-note correction, 2 October 2026 (BO-068)"
    }
   ],
   "wireframe": {
@@ -182,25 +183,12 @@
    "note": "**Drawn by Claude Design on `Retail Board 6.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
-  "overlays": [
+  "gaps": [
    {
-    "id": "formResolvePermissions",
-    "component": "modal",
-    "trigger": "Resolve permissions",
-    "body": "**Collects what `resolvePermissions` sends before it is called.** Required: `principalId`, `roleId`. Optional: `atScopePath`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Resolve permissions",
-     "operation": "resolvePermissions"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "principalId",
-      "roleId",
-      "atScopePath"
-     ]
-    },
-    "provenance": "contract identity.yaml POST /permissions/resolve"
+    "operation": "resolvePermissions",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-021): Resolve permissions (a permission simulator) was a button on the audit log; it belongs to role management and is declared on BO-054 (design-notes correction platform-foundation BO-068).",
+    "source": "contracts/spine/identity.yaml#resolvePermissions"
    }
   ],
   "_platform": {
@@ -274,6 +262,13 @@
        ],
        "operation": "listLostItems",
        "provenance": "contract marketing-crm.yaml GET /lost-items"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Suggested matches",
+       "bindsTo": "LostItemMatch",
+       "operation": "getLostItemMatches",
+       "provenance": "contract marketing-crm.yaml GET /lost-items/{itemId}/matches; wiring fix, 2 October 2026"
       }
      ]
     },
@@ -312,7 +307,7 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Find matches for lost item",
+       "label": "Decide: tie, return or dispose",
        "operation": "matchLostItem",
        "provenance": "contract marketing-crm.yaml POST /lost-items/{itemId}/match"
       }
@@ -352,6 +347,13 @@
     "invalidates": [
      "listLostItems"
     ]
+   },
+   {
+    "operationId": "getLostItemMatches",
+    "contract": "marketing-crm",
+    "purpose": "Candidate matches for the selected item",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-005)"
    }
   ],
   "entryState": {
@@ -384,10 +386,10 @@
    {
     "id": "formMatchLostItem",
     "component": "modal",
-    "trigger": "Find matches for lost item",
+    "trigger": "Decide: tie, return or dispose",
     "body": "**Collects what `matchLostItem` sends before it is called.** Required: `action`. Optional: `otherItemId`, `claimantSubjectId`, `note`. Dismissing sends nothing; the screen behind is unchanged.",
     "confirm": {
-     "label": "Find matches for lost item",
+     "label": "Decide: tie, return or dispose",
      "operation": "matchLostItem"
     },
     "dismiss": {
@@ -446,7 +448,10 @@
      "trigger": "Platform Audit Log",
      "provenance": "flow F100 step 2→3",
      "crossesDevice": true,
-     "back": false
+     "back": false,
+     "carries": [
+      "tenantId"
+     ]
     }
    ]
   },
@@ -463,34 +468,24 @@
      "slot": "collection",
      "components": [
       {
-       "kind": "textField",
-       "label": "Job id",
-       "operation": "listIndexFailures",
-       "notes": "Sends `?jobId=` to `listIndexFailures`.",
-       "provenance": "contract ai.yaml GET /index-failures"
-      },
-      {
-       "kind": "selectField",
-       "label": "Stage",
-       "operation": "listIndexFailures",
-       "notes": "Sends `?stage=` to `listIndexFailures`.",
-       "provenance": "contract ai.yaml GET /index-failures"
-      },
-      {
-       "kind": "dataTable",
-       "label": "Every index failure",
-       "bindsTo": "IndexFailure",
+       "kind": "detailPanel",
+       "label": "Spend ceiling",
+       "bindsTo": "AiSpendCeiling",
        "columns": [
-        "IndexFailure.id",
-        "IndexFailure.jobId",
-        "IndexFailure.sourceId",
-        "IndexFailure.documentRef",
-        "IndexFailure.stage",
-        "IndexFailure.error",
-        "IndexFailure.attempts"
+        "AiSpendCeiling.spend",
+        "AiSpendCeiling.tokenEquivalent",
+        "AiSpendCeiling.updatedAt"
        ],
-       "operation": "listIndexFailures",
-       "provenance": "contract ai.yaml GET /index-failures"
+       "operation": "getAiSpendCeiling",
+       "notes": "**In the tenant's selected currency, USD by default, with tokens shown alongside (decided 2 October 2026 by Chinmay, DEC-008; CHG-CSA-004).** At the ceiling the manager decides whether to continue (CF-14).",
+       "provenance": "contract ai.yaml GET /policy/spend-ceiling"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Bring your own key",
+       "bindsTo": "AiByokEnablement",
+       "operation": "getAiByokEnablement",
+       "provenance": "contract ai.yaml GET /tenants/{tenantId}/byok; wiring fix, 2 October 2026"
       }
      ]
     },
@@ -500,29 +495,16 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected index failure",
-       "bindsTo": "IndexFailure",
-       "columns": [
-        "IndexFailure.id",
-        "IndexFailure.jobId",
-        "IndexFailure.sourceId",
-        "IndexFailure.documentRef",
-        "IndexFailure.stage",
-        "IndexFailure.error",
-        "IndexFailure.attempts"
-       ],
-       "operation": "listIndexFailures",
-       "provenance": "contract ai.yaml GET /index-failures"
-      },
-      {
-       "kind": "detailPanel",
        "label": "The AI usage report",
        "bindsTo": "AiUsageReport",
        "columns": [
+        "AiUsageReport.currency",
+        "AiUsageReport.ceiling",
         "AiUsageReport.from",
         "AiUsageReport.to",
         "AiUsageReport.groupBy",
-        "AiUsageReport.rows"
+        "AiUsageReport.rows",
+        "AiUsageReport.forecast"
        ],
        "operation": "getAiUsage",
        "provenance": "contract ai.yaml GET /usage"
@@ -532,9 +514,7 @@
        "label": "The AI policy",
        "bindsTo": "AiPolicy",
        "columns": [
-        "AiPolicy.id",
         "AiPolicy.scopeLevel",
-        "AiPolicy.scopePath",
         "AiPolicy.enabledCapabilities",
         "AiPolicy.allowedRoleIds",
         "AiPolicy.maskedFields",
@@ -543,14 +523,25 @@
         "AiPolicy.ceilingBehaviour",
         "AiPolicy.ceilingWarningPercent",
         "AiPolicy.guestCapabilityScope",
-        "AiPolicy.retrieveTopK",
-        "AiPolicy.rerankTopK",
         "AiPolicy.cacheAnswers",
-        "AiPolicy.cacheTtlMinutes",
-        "AiPolicy.retainInteractionsDays"
+        "AiPolicy.cacheTtlMinutes"
        ],
        "operation": "getAiPolicy",
        "provenance": "contract ai.yaml GET /policy"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Index health",
+       "bindsTo": "IndexFailure",
+       "columns": [
+        "IndexFailure.stage",
+        "IndexFailure.error",
+        "IndexFailure.attempts",
+        "IndexFailure.documentRef"
+       ],
+       "operation": "listIndexFailures",
+       "notes": "Secondary: records the assistant could not embed, beside spend, because both answer \"is the assistant working and what is it costing\".",
+       "provenance": "contract ai.yaml GET /index-failures"
       }
      ]
     },
@@ -563,6 +554,12 @@
        "label": "Save AI policy",
        "operation": "setAiPolicy",
        "provenance": "contract ai.yaml PUT /policy"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save spend ceiling",
+       "operation": "setAiSpendCeiling",
+       "provenance": "contract ai.yaml PUT /policy/spend-ceiling"
       }
      ]
     }
@@ -572,7 +569,7 @@
    "loading": "The policy spend list.",
    "error": "Could not load. Names which read failed and leaves the policy spend untouched.",
    "emptyFirstRun": "No policy spend yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
-   "emptyNoResults": "Nothing matches the filter on jobId, stage and the policy spend are still there. Names the active filter and offers to clear it.",
+   "emptyNoResults": "Never shown: nothing on this screen filters.",
    "emptyNoAccess": "Shown when the caller lacks `AI_CONFIGURE`, which `getAiPolicy` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
@@ -630,6 +627,27 @@
     "purpose": "Assistant profiles",
     "trigger": "onLoad",
     "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "getAiByokEnablement",
+    "contract": "ai",
+    "purpose": "Whether the venue may bring its own key",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-012)"
+   },
+   {
+    "operationId": "getAiSpendCeiling",
+    "contract": "ai",
+    "purpose": "The spend ceiling in the tenant's selected currency, with tokens alongside (DEC-008)",
+    "trigger": "onLoad",
+    "provenance": "design-note correction, 2 October 2026 (BO-091)"
+   },
+   {
+    "operationId": "setAiSpendCeiling",
+    "contract": "ai",
+    "purpose": "Set the AI spend ceiling, in money",
+    "trigger": "onAction",
+    "provenance": "design-note correction, 2 October 2026 (BO-091)"
    }
   ],
   "entryState": {
@@ -643,6 +661,10 @@
    "params": [
     {
      "name": "profileKey",
+     "from": "navigation"
+    },
+    {
+     "name": "tenantId",
      "from": "navigation"
     }
    ]
@@ -658,7 +680,7 @@
     "id": "formSetAiPolicy",
     "component": "modal",
     "trigger": "Save AI policy",
-    "body": "**Collects what `setAiPolicy` sends before it is called.** Required: `scopeLevel`, `scopePath`, `enabledCapabilities`. Optional: `id`, `allowedRoleIds`, `maskedFields`, `requiresApprovalFor`, `monthlyTokenCeiling`, `ceilingBehaviour`, `ceilingWarningPercent`, `guestCapabilityScope`, `retrieveTopK`, `rerankTopK`, `cacheAnswers`, `cacheTtlMinutes` and 12 more. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setAiPolicy` sends before it is called.** Required: `scopeLevel`, `scopePath` (from the session, not typed), `enabledCapabilities`. Optional: `allowedRoleIds`, `maskedFields`, `requiresApprovalFor`, `ceilingBehaviour`, `ceilingWarningPercent`, `guestCapabilityScope`, `cacheAnswers`, `cacheTtlMinutes`. **Not drawn:** `retainInteractionsDays` (deprecated 29 September, AI-D05; retention is a tenant setting per data class) and the engine tuning (`retrieveTopK`, `rerankTopK`, `semanticCacheThreshold`, `negativeCacheTtlSeconds`, chunking, quantisation, hnsw, cascade), which is platform tuning left to the console, not a venue manager's decision. The money ceiling is set with Save spend ceiling. Dismissing sends nothing; the screen behind is unchanged.",
     "bindsTo": "AiPolicy",
     "confirm": {
      "label": "Save AI policy",
@@ -688,6 +710,23 @@
      ]
     },
     "provenance": "contract ai.yaml PUT /policy"
+   },
+   {
+    "id": "formSetAiSpendCeiling",
+    "component": "modal",
+    "trigger": "Save spend ceiling",
+    "body": "**Collects what `setAiSpendCeiling` sends before it is called.** Required: `spend`. `spend` is Money in the tenant's selected currency (USD by default); the token equivalent is shown, not typed. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save spend ceiling",
+     "operation": "setAiSpendCeiling"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "spend"
+     ]
+    },
+    "provenance": "contract ai.yaml PUT /policy/spend-ceiling"
    }
   ],
   "_platform": {
@@ -743,7 +782,7 @@
     {
      "to": "BO-091",
      "trigger": "AI Policy & Spend",
-     "provenance": "derived — BO-091 declares entryState.params profileKey and BO-107 holds none of them. The edge carries nothing: BO-091 finds profileKey (listAssistantProfiles) itself, and BO-091 opens on its own"
+     "provenance": "derived — BO-091 declares entryState.params profileKey, tenantId and BO-107 holds none of them. The edge carries nothing: BO-091 finds profileKey (listAssistantProfiles) itself; BO-091 opens on listIndexFailures, and tenantId has no source on BO-091 yet (a gap in BO-091, not in this edge)"
     }
    ]
   },

@@ -41,7 +41,6 @@
      "to": "BO-037",
      "trigger": "Each device's cached package is checked",
      "provenance": "flow F89 step 2→3",
-     "operation": "setConnectivityThresholds",
      "carries": [
       "version"
      ]
@@ -50,6 +49,7 @@
      "to": "BO-124",
      "trigger": "Its sale board layout is built",
      "provenance": "flow F79 step 2→3",
+     "operation": "setConfigurationProfile",
      "carries": [
       "profileId"
      ]
@@ -63,12 +63,24 @@
   ],
   "pattern": "listDetail",
   "patternReason": "`listWorkstations` reads the population and `getWorkstationHealth` reads one of them — list, select, act",
-  "purpose": "Software, Configuration & Version Management — from the client design board, 20 August.",
+  "purpose": "Manage configuration profiles and device firmware versions across the fleet.",
   "gaps": [
    {
     "operation": "getWorkstationHealth",
     "why": "**`getWorkstationHealth` declares its response inline**, so the component that shows it names fields but binds to no schema. The contract should name the shape.",
     "source": "contract tenancy.yaml GET /workstations/{workstationId}/health"
+   },
+   {
+    "operation": "configureWorkstation",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-021): configureWorkstation and setConnectivityThresholds shared the firmware and profile screen; connectivity thresholds have their own screen (BO-131) and workstation configuration is done where the device is registered (BO-036, F79 step 1) or at the till (POS-016). F89 step 2 moves to BO-131 (design-notes corrections platform-foundation BO-129, BO-036).",
+    "source": "screens/P08-venue-back-office.yaml#BO-131 | F89 step 2 | F79 step 2"
+   },
+   {
+    "operation": "setConnectivityThresholds",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-021): configureWorkstation and setConnectivityThresholds shared the firmware and profile screen; connectivity thresholds have their own screen (BO-131) and workstation configuration is done where the device is registered (BO-036, F79 step 1) or at the till (POS-016). F89 step 2 moves to BO-131 (design-notes corrections platform-foundation BO-129, BO-036).",
+    "source": "screens/P08-venue-back-office.yaml#BO-131 | F89 step 2 | F79 step 2"
    }
   ],
   "layout": {
@@ -97,15 +109,9 @@
        "label": "Every workstation",
        "bindsTo": "Workstation",
        "columns": [
-        "Workstation.id",
         "Workstation.code",
         "Workstation.name",
-        "Workstation.venueId",
-        "Workstation.regionId",
-        "Workstation.departmentId",
-        "Workstation.scopePath",
         "Workstation.saleBoard",
-        "Workstation.accessPointId",
         "Workstation.devices",
         "Workstation.currency",
         "Workstation.currencyScale"
@@ -141,18 +147,6 @@
        "label": "Deploy configuration profile",
        "operation": "deployConfigurationProfile",
        "provenance": "contract tenancy.yaml POST /configuration-profiles/{profileId}/deploy"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Configure workstation",
-       "operation": "configureWorkstation",
-       "provenance": "contract tenancy.yaml PUT /workstations/{workstationId}"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Save connectivity thresholds",
-       "operation": "setConnectivityThresholds",
-       "provenance": "contract tenancy.yaml PUT /connectivity-policy"
       },
       {
        "kind": "publishGate",
@@ -204,15 +198,6 @@
     ]
    },
    {
-    "operationId": "configureWorkstation",
-    "contract": "tenancy",
-    "purpose": "Configure a workstation",
-    "trigger": "onAction",
-    "invalidates": [
-     "listWorkstations"
-    ]
-   },
-   {
     "operationId": "getWorkstationHealth",
     "contract": "tenancy",
     "purpose": "getWorkstationHealth",
@@ -223,15 +208,6 @@
     "contract": "tenancy",
     "purpose": "List workstations",
     "trigger": "onLoad"
-   },
-   {
-    "operationId": "setConnectivityThresholds",
-    "contract": "tenancy",
-    "purpose": "setConnectivityThresholds",
-    "trigger": "onAction",
-    "invalidates": [
-     "listWorkstations"
-    ]
    },
    {
     "operationId": "listDeviceFirmware",
@@ -325,7 +301,7 @@
     "id": "formSetConfigurationProfile",
     "component": "modal",
     "trigger": "Save configuration profile",
-    "body": "**Collects what `setConfigurationProfile` sends before it is called.** Required: `id`, `name`, `venueKindScope`, `status`. Optional: `scopePath`, `settings`, `deployedCount`, `publishedAt`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setConfigurationProfile` sends before it is called.** Required: `name`, `venueKindScope`. Optional: `scopePath`, `settings`, `deployedCount`, `publishedAt`. **Not asked:** `id` is a client UUIDv7 generated silently; `status` is set by the server (design-note correction, 2 October 2026). Dismissing sends nothing; the screen behind is unchanged.",
     "bindsTo": "ConfigurationProfile",
     "confirm": {
      "label": "Save configuration profile",
@@ -334,10 +310,8 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "id",
       "name",
       "venueKindScope",
-      "status",
       "scopePath",
       "settings",
       "deployedCount",
@@ -350,7 +324,7 @@
     "id": "formDeployConfigurationProfile",
     "component": "modal",
     "trigger": "Deploy configuration profile",
-    "body": "**Collects what `deployConfigurationProfile` sends before it is called.** Required: `id`, `profileId`, `status`. Optional: `targetWorkstationIds`, `targetFilter`, `strategy`, `succeededCount`, `failedCount`, `failureReasons`, `startedAt`, `completedAt`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `deployConfigurationProfile` sends before it is called.** Required: `profileId`. Optional: `targetWorkstationIds`, `targetFilter`, `strategy`, `succeededCount`, `failedCount`, `failureReasons`, `startedAt`, `completedAt`. **Not asked:** `id` is a client UUIDv7 generated silently; `status` is set by the server (design-note correction, 2 October 2026). Dismissing sends nothing; the screen behind is unchanged.",
     "bindsTo": "ProfileDeployment",
     "confirm": {
      "label": "Deploy configuration profile",
@@ -359,9 +333,7 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "id",
       "profileId",
-      "status",
       "targetWorkstationIds",
       "targetFilter",
       "strategy",
@@ -373,62 +345,9 @@
      ]
     },
     "provenance": "contract tenancy.yaml POST /configuration-profiles/{profileId}/deploy"
-   },
-   {
-    "id": "formConfigureWorkstation",
-    "component": "modal",
-    "trigger": "Configure workstation",
-    "body": "**Collects what `configureWorkstation` sends before it is called.** Required: `name`, `saleBoardId`. Optional: `cashierInputMode`, `guestDisplayContent`, `loadedMediaStockId`, `mediaStockRemaining`, `departmentId`, `accessPointId`, `devices`, `deploymentProfile`, `edgeNodeId`, `isActive`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "ConfigureWorkstationRequest",
-    "confirm": {
-     "label": "Configure workstation",
-     "operation": "configureWorkstation"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "name",
-      "saleBoardId",
-      "cashierInputMode",
-      "guestDisplayContent",
-      "loadedMediaStockId",
-      "mediaStockRemaining",
-      "departmentId",
-      "accessPointId",
-      "devices",
-      "deploymentProfile",
-      "edgeNodeId",
-      "isActive"
-     ]
-    },
-    "provenance": "contract tenancy.yaml PUT /workstations/{workstationId}"
-   },
-   {
-    "id": "formSetConnectivityThresholds",
-    "component": "modal",
-    "trigger": "Save connectivity thresholds",
-    "body": "**Collects what `setConnectivityThresholds` sends before it is called.** Required: `scopePath`. Optional: `id`, `failuresBeforeOffline`, `probeIntervalSeconds`, `probeTimeoutMs`, `successesBeforeOnline`, `minimumStableSeconds`, `autoSwitch`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "ConnectivityPolicy",
-    "confirm": {
-     "label": "Save connectivity thresholds",
-     "operation": "setConnectivityThresholds"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "scopePath",
-      "id",
-      "failuresBeforeOffline",
-      "probeIntervalSeconds",
-      "probeTimeoutMs",
-      "successesBeforeOnline",
-      "minimumStableSeconds",
-      "autoSwitch"
-     ]
-    },
-    "provenance": "contract tenancy.yaml PUT /connectivity-policy"
    }
   ],
+  "purposeNote": "Purpose rewritten 2 October 2026 (CHG-WIR-023): The purpose was the pasted board placeholder \"Software, Configuration & Version Management — from the client design board, 20 August\".",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -471,7 +390,8 @@
    ],
    "exitTo": [
     "BO-108",
-    "BO-129"
+    "BO-129",
+    "BO-131"
    ],
    "inferred": false,
    "notes": "**Returns to BO-108.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
@@ -489,6 +409,12 @@
      "carries": [
       "workstationId"
      ]
+    },
+    {
+     "to": "BO-131",
+     "trigger": "The connectivity thresholds are set",
+     "provenance": "flow F89 step 1→2",
+     "operation": "setOfflinePolicy"
     }
    ]
   },
@@ -589,15 +515,9 @@
       },
       {
        "kind": "secondaryButton",
-       "label": "Sync orders",
-       "operation": "syncOrders",
-       "provenance": "contract orders.yaml POST /sync/orders"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Create order",
-       "operation": "createOrder",
-       "provenance": "contract orders.yaml POST /orders"
+       "label": "Resolve rejection",
+       "operation": "resolveSyncRejection",
+       "provenance": "contract orders.yaml POST /sync/rejections/{rejectionId}/resolve; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -606,7 +526,7 @@
   "states": {
    "loading": "The offline policy rules list.",
    "error": "Could not load. Names which read failed and leaves the offline policy rules untouched.",
-   "emptyFirstRun": "No offline policy rules yet. Offers Create order (`createOrder`); distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No offline policy rules yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "Nothing matches the filter on workstationId, kind, resolved and the offline policy rules are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `listSyncRejections` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -627,22 +547,11 @@
     "trigger": "onLoad"
    },
    {
-    "operationId": "syncOrders",
+    "operationId": "resolveSyncRejection",
     "contract": "orders",
-    "purpose": "Replay orders recorded offline",
+    "purpose": "Record what was done about each refused entry",
     "trigger": "onAction",
-    "invalidates": [
-     "listSyncRejections"
-    ]
-   },
-   {
-    "operationId": "createOrder",
-    "contract": "orders",
-    "purpose": "Post a rejected transaction at the price the guest paid",
-    "trigger": "onAction",
-    "invalidates": [
-     "listSyncRejections"
-    ]
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "entryState": {
@@ -650,6 +559,10 @@
     {
      "name": "venueId",
      "from": "session"
+    },
+    {
+     "name": "rejectionId",
+     "from": "navigation"
     }
    ],
    "coldEntry": "Resolves from the session. A principal with more than one venue is asked which first.",
@@ -697,48 +610,32 @@
     "provenance": "contract tenancy.yaml PUT /offline-policy"
    },
    {
-    "id": "formSyncOrders",
+    "id": "formResolveSyncRejection",
     "component": "modal",
-    "trigger": "Sync orders",
-    "body": "**Collects what `syncOrders` sends before it is called.** Required: `deviceId`, `orders`. Dismissing sends nothing; the screen behind is unchanged.",
+    "trigger": "Resolve rejection",
+    "body": "**Collects what `resolveSyncRejection` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.",
     "confirm": {
-     "label": "Sync orders",
-     "operation": "syncOrders"
+     "label": "Resolve rejection",
+     "operation": "resolveSyncRejection"
     },
     "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "deviceId",
-      "orders"
-     ]
+     "label": "Cancel"
     },
-    "provenance": "contract orders.yaml POST /sync/orders"
+    "provenance": "contract orders.yaml POST /sync/rejections/{rejectionId}/resolve; wiring fix, 2 October 2026"
+   }
+  ],
+  "gaps": [
+   {
+    "operation": "createOrder",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-025): Devices replay their own journals (syncOrders is POS-013's) and a supervisor resolves a rejection rather than typing a sync batch or a new order; resolveSyncRejection is the act the screen needs. F33 step 8 is repointed to it (design-notes correction ticketing-backoffice BO-130)",
+    "source": "contracts/spine/orders.yaml#syncOrders | contracts/spine/orders.yaml#createOrder | F33 step 8"
    },
    {
-    "id": "formCreateOrder",
-    "component": "modal",
-    "trigger": "Create order",
-    "body": "**Collects what `createOrder` sends before it is called.** Required: `id`, `venueId`, `channel`, `lines`, `recordedAt`. Optional: `shiftId`, `subjectId`, `guestLinkId`, `catalogueBundleVersion`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "CreateOrderRequest",
-    "confirm": {
-     "label": "Create order",
-     "operation": "createOrder"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "id",
-      "venueId",
-      "channel",
-      "lines",
-      "recordedAt",
-      "shiftId",
-      "subjectId",
-      "guestLinkId",
-      "catalogueBundleVersion"
-     ]
-    },
-    "provenance": "contract orders.yaml POST /orders"
+    "operation": "syncOrders",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-025): Devices replay their own journals (syncOrders is POS-013's) and a supervisor resolves a rejection rather than typing a sync batch or a new order; resolveSyncRejection is the act the screen needs. F33 step 8 is repointed to it (design-notes correction ticketing-backoffice BO-130)",
+    "source": "contracts/spine/orders.yaml#syncOrders | contracts/spine/orders.yaml#createOrder | F33 step 8"
    }
   ],
   "_platform": {
@@ -778,9 +675,11 @@
   },
   "navigation": {
    "entryFrom": [
-    "BO-108"
+    "BO-108",
+    "BO-130"
    ],
    "exitTo": [
+    "BO-037",
     "BO-108"
    ],
    "inferred": false,
@@ -790,6 +689,12 @@
      "to": "BO-108",
      "trigger": "Venue Operations",
      "provenance": "derived — BO-108 declares entryState.params  and BO-131 holds none of them. The edge carries nothing: BO-131 is opened from BO-108, so this edge is the way back and BO-108 keeps its own state"
+    },
+    {
+     "to": "BO-037",
+     "trigger": "Each device's cached package is checked",
+     "provenance": "flow F89 step 2→3",
+     "operation": "setConnectivityThresholds"
     }
    ]
   },
@@ -797,7 +702,7 @@
   "density": "compact",
   "pattern": "configEditor",
   "patternReason": "the screen declares only writes (`setConnectivityThresholds`) and no read of a population — it is settings, not a list",
-  "purpose": "Connectivity & Auto-Switch Settings — from the client design board, 20 August.",
+  "purpose": "Set when a device is treated as offline and when it switches back online.",
   "layout": {
    "template": "form",
    "regions": [
@@ -806,57 +711,46 @@
      "slot": "fields",
      "components": [
       {
-       "kind": "textField",
-       "label": "id",
-       "bindsTo": "ConnectivityPolicy.id",
-       "provenance": "contract tenancy.yaml PUT /connectivity-policy"
-      },
-      {
-       "kind": "textField",
-       "label": "scopePath",
-       "bindsTo": "ConnectivityPolicy.scopePath",
-       "provenance": "contract tenancy.yaml PUT /connectivity-policy"
-      },
-      {
-       "kind": "textField",
-       "label": "failuresBeforeOffline",
+       "kind": "numberField",
+       "label": "Failures before offline",
        "bindsTo": "ConnectivityPolicy.failuresBeforeOffline",
-       "provenance": "contract tenancy.yaml PUT /connectivity-policy"
+       "provenance": "contract tenancy.yaml PUT /connectivity-policy",
+       "operation": "setConnectivityThresholds"
       },
       {
-       "kind": "textField",
-       "label": "probeIntervalSeconds",
+       "kind": "numberField",
+       "label": "Probe every (seconds)",
        "bindsTo": "ConnectivityPolicy.probeIntervalSeconds",
-       "provenance": "contract tenancy.yaml PUT /connectivity-policy"
+       "provenance": "contract tenancy.yaml PUT /connectivity-policy",
+       "operation": "setConnectivityThresholds"
       },
       {
-       "kind": "textField",
-       "label": "probeTimeoutMs",
+       "kind": "numberField",
+       "label": "Probe timeout (ms)",
        "bindsTo": "ConnectivityPolicy.probeTimeoutMs",
-       "provenance": "contract tenancy.yaml PUT /connectivity-policy"
+       "provenance": "contract tenancy.yaml PUT /connectivity-policy",
+       "operation": "setConnectivityThresholds"
       },
       {
-       "kind": "textField",
-       "label": "successesBeforeOnline",
+       "kind": "numberField",
+       "label": "Successes before online",
        "bindsTo": "ConnectivityPolicy.successesBeforeOnline",
-       "provenance": "contract tenancy.yaml PUT /connectivity-policy"
+       "provenance": "contract tenancy.yaml PUT /connectivity-policy",
+       "operation": "setConnectivityThresholds"
       },
       {
-       "kind": "textField",
-       "label": "minimumStableSeconds",
+       "kind": "numberField",
+       "label": "Stable for (seconds)",
        "bindsTo": "ConnectivityPolicy.minimumStableSeconds",
-       "provenance": "contract tenancy.yaml PUT /connectivity-policy"
+       "provenance": "contract tenancy.yaml PUT /connectivity-policy",
+       "operation": "setConnectivityThresholds"
       },
       {
-       "kind": "textField",
-       "label": "autoSwitch",
+       "kind": "toggle",
+       "label": "Switch automatically",
        "bindsTo": "ConnectivityPolicy.autoSwitch",
-       "provenance": "contract tenancy.yaml PUT /connectivity-policy"
-      },
-      {
-       "kind": "searchField",
-       "label": "Search connectivity",
-       "provenance": "carried from the previous definition"
+       "provenance": "contract tenancy.yaml PUT /connectivity-policy",
+       "operation": "setConnectivityThresholds"
       }
      ]
     },
@@ -903,6 +797,7 @@
    "board": "wireframes/P08 Venue Management.dc.html#bo-131"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "purposeNote": "Purpose rewritten 2 October 2026 (CHG-WIR-023): The purpose was the pasted board placeholder \"Connectivity & Auto-Switch Settings — from the client design board, 20 August\".",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1192,11 +1087,15 @@
      "slot": "queue",
      "components": [
       {
-       "kind": "textField",
-       "label": "Workstation id",
-       "operation": "listSyncRejections",
-       "notes": "Sends `?workstationId=` to `listSyncRejections`.",
-       "provenance": "contract orders.yaml GET /sync/rejections"
+       "kind": "selectField",
+       "label": "Till",
+       "operation": "listWorkstations",
+       "notes": "A pick list in words, never a typed id (design-note correction, 2 October 2026).",
+       "provenance": "contract orders.yaml GET /sync/rejections",
+       "bindsTo": "Workstation.id",
+       "columns": [
+        "Workstation.name"
+       ]
       },
       {
        "kind": "selectField",
@@ -1303,12 +1202,6 @@
      "slot": "decision",
      "components": [
       {
-       "kind": "primaryButton",
-       "label": "Decide approval request",
-       "operation": "decideApprovalRequest",
-       "provenance": "contract approvals.yaml POST /approval-requests/{requestId}/decide"
-      },
-      {
        "kind": "secondaryButton",
        "label": "Run report",
        "operation": "runReport",
@@ -1320,6 +1213,12 @@
        "label": "Save alert rule",
        "operation": "setAlertRule",
        "provenance": "contract reporting.yaml PUT /alert-rules"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Resolve refused entry",
+       "operation": "resolveSyncRejection",
+       "provenance": "contract orders.yaml POST /sync/rejections/{rejectionId}/resolve"
       }
      ]
     }
@@ -1352,15 +1251,6 @@
     "trigger": "onLoad"
    },
    {
-    "operationId": "decideApprovalRequest",
-    "contract": "approvals",
-    "purpose": "Approve or reject",
-    "trigger": "onAction",
-    "invalidates": [
-     "listSyncRejections"
-    ]
-   },
-   {
     "operationId": "runReport",
     "contract": "reporting",
     "purpose": "Run the seeded report `voidsAndDiscounts` (proposed, audit R282)",
@@ -1377,6 +1267,20 @@
     "invalidates": [
      "listSyncRejections"
     ]
+   },
+   {
+    "operationId": "resolveSyncRejection",
+    "contract": "orders",
+    "purpose": "Record what was done about a refused entry",
+    "trigger": "onAction",
+    "provenance": "design-note correction, 2 October 2026 (BO-133)"
+   },
+   {
+    "operationId": "listWorkstations",
+    "contract": "tenancy",
+    "purpose": "List workstations (the pick list)",
+    "trigger": "onLoad",
+    "provenance": "design-note correction, 2 October 2026 (BO-133)"
    }
   ],
   "entryState": {
@@ -1392,6 +1296,10 @@
     {
      "name": "requestId",
      "from": "deepLink"
+    },
+    {
+     "name": "rejectionId",
+     "from": "navigation"
     }
    ],
    "coldEntry": "Resolves from the session. A principal with more than one venue is asked which first. An approval request opened from the queue.",
@@ -1413,27 +1321,6 @@
   },
   "apisNote": "Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "overlays": [
-   {
-    "id": "formDecideApprovalRequest",
-    "component": "modal",
-    "trigger": "Decide approval request",
-    "body": "**Collects what `decideApprovalRequest` sends before it is called.** Required: `decision`. Optional: `comment`, `reason`, `stepUpToken`, `signature`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Decide approval request",
-     "operation": "decideApprovalRequest"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "decision",
-      "comment",
-      "reason",
-      "stepUpToken",
-      "signature"
-     ]
-    },
-    "provenance": "contract approvals.yaml POST /approval-requests/{requestId}/decide"
-   },
    {
     "id": "formRunReport",
     "component": "modal",
@@ -1485,6 +1372,33 @@
      ]
     },
     "provenance": "contract reporting.yaml PUT /alert-rules"
+   },
+   {
+    "id": "formResolveSyncRejection",
+    "component": "modal",
+    "trigger": "Resolve refused entry",
+    "body": "**Collects what `resolveSyncRejection` sends before it is called.** Required: `resolution`, `resolvedRecordId`. Optional: `note`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Resolve refused entry",
+     "operation": "resolveSyncRejection"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "resolution",
+      "resolvedRecordId",
+      "note"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /sync/rejections/{rejectionId}/resolve"
+   }
+  ],
+  "gaps": [
+   {
+    "operation": "decideApprovalRequest",
+    "removed": true,
+    "why": "A refused offline entry is resolved with resolveSyncRejection, not with an approval decision (design-note correction finance-insights BO-133, CHG-SBO-012).",
+    "source": "contracts/spine/orders.yaml#resolveSyncRejection"
    }
   ],
   "_platform": {

@@ -68,6 +68,10 @@ decision below keeps both as separate deployables.
 **Split rule.** A module moves to its own deployable when its load profile or release cadence
 diverges from its host. Marketing is the first candidate, as ADR-0028 already says.
 
+**F&B prices stay out of `commerce` (2 October 2026).** F&B owns its own catalogue table, so an F&B sale in
+`operations` reads no row of the central catalogue in `commerce`, and the ticketing sale path scales on
+ticket traffic alone (Chinmay, DEC-034; recorded in ADR-0028's amendment of 2 October; CHG-DOC-009).
+
 ---
 
 ## Options Considered

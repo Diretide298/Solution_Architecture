@@ -1,4 +1,36 @@
 {
+ "getFaceReenrolmentImages": {
+  "method": "GET",
+  "path": "/face-reenrolment-attempts/{attemptId}/images",
+  "contract": "access",
+  "summary": "View the images behind a face re-enrolment review (logged)",
+  "permission": "BIOMETRIC_IMAGE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "reason",
+    "in": "query",
+    "required": true
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "getVenueSettings": {
+  "method": "GET",
+  "path": "/venues/{venueId}/settings",
+  "contract": "tenancy",
+  "summary": "Operational settings for this venue",
+  "permission": "TENANT_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "VenueSettings"
+ },
  "listBiometric": {
   "method": "GET",
   "path": "/biometric",
@@ -382,6 +414,25 @@
   ],
   "requestBody": "FaceTagTemporaryEnrollmentInput",
   "responds": "FaceTagTemporaryEnrollmentView"
+ },
+ "setVenueSettings": {
+  "method": "PUT",
+  "path": "/venues/{venueId}/settings",
+  "contract": "tenancy",
+  "summary": "Set support hours, quiet hours, segregated access and alerting",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "VenueSettings",
+  "responds": "VenueSettings"
  },
  "simulateBiometricConfiguration": {
   "method": "POST",

@@ -1,6 +1,6 @@
 # WS141 — Marketing CRM Configuration Reference v1.0 board 7
 
-**10 screens · 19 operations · 25 schemas · 5 permissions**
+**10 screens · 20 operations · 27 schemas · 5 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -61,6 +61,42 @@ convincingly. It is never a caption.
   and its error; and, element by element, what is shown and in what format, what each action
   produces and where the user goes next. Draw exactly that.
 
+## The processes these screens belong to
+
+Written by the owner of each process (`handoff/design-notes/`). Read before any screen: it says how the process runs end to end and which words the screens must use.
+
+### Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers)
+
+Customer & marketing is how a venue knows its guests and talks to them. There is ONE guest profile per person across ticketing, F&B and retail, so a guest who books online and later dines is the same profile (DI-339). A profile needs at least an email or a mobile, never neither (DI-372). Profiles are created by registration, by guest checkout, or by staff at a till or desk. Repeat guest checkouts with the same verified email or phone attach to the same profile automatically (DI-941, R120 default). Two records that might be the same person are NEVER merged automatically: the guest is asked to confirm, and an admin review queue runs alongside (DI-377). Each candidate shows why it matched; the record that loses is superseded, not deleted; consent takes the narrower of the two positions (DI-808). Around the profile sit three things that must never be confused. CONSENT is what the law allows: per purpose and per channel, append-only, with the notice version and the source (recordConsent). It is Given, Withdrawn or Not asked. A SUBSCRIPTION is what the guest asked to receive, e.g. a newsletter list (MarketingSubscription). A PREFERENCE is what they like: table, dietary, accessibility (updateGuestPreferences). An anonymous visitor's cookie decision is recorded against a device key (recordDeviceConsent) and attaches to the guest when they sign in (claimDeviceConsent). Marketing consent at GUEST CHECKOUT is an open client question, and the design follows its default: an unticked opt-in beside the terms, one per channel and purpose. It is recorded with source "checkout" against the order and the verified contact, and nothing is sent without it. Whether that is sufficient consent under PDPL is the client DPO's call (M18-15 (audit R-M18-15), DI-954, DI-940). Marketing reads profiles through SEGMENTS (rules, evaluated when used) and static LISTS (imported). It reaches guests by CAMPAIGNS (one send to an audience) and JOURNEYS (automations started by an event, with waits and branches). Journeys may offer only pre-configured offers, never a free-typed discount (MoM 2026-08-20 4.6). Everything goes through ONE communications module that every other module uses (MoM 2026-08-31 4.6). Consent and suppression are applied at send time, and the number excluded, with the reasons, is reported before anything goes out (launchCampaign). Transactional messages (tickets, receipts, queue calls, case replies) do not need marketing consent and must never carry marketing. LOYALTY pays for spend: points, tiers, rewards and expiry. GAMIFICATION pays for behaviour: challenges, badges, streaks, referrals and leaderboards (createChallenge). A guest reads their own loyalty position (getLoyaltyPosition). A till, the back office or support reads a named guest's (getGuestLoyalty, or identifyGuest at a till). SERVICE: one Case object covers lost property, complaints, questions, accessibility and refund requests (CaseKind). A guest raises one with raiseMyCase, which needs the connection …
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Guest | The person the venue serves, signed in or not. In body copy on every surface. | Customer, User, Subject, Contact, Patron | contracts/satellite/marketing-crm.yaml#/components/schemas/GuestProfile |
+| Guest profile | The CRM record of one person (details, consent, preferences, history). Distinct from the Account, which is how a guest signs in. | Customer record, Contact, Subject | contracts/satellite/marketing-crm.yaml#getGuestProfile |
+| Consent - Given / Withdrawn / Not asked | What the law allows, per purpose (marketing, personalisation, profiling, third-party sharing, AI processing, transactional) and per channel. "Not asked" is not "Withdrawn" and must look different. | Opted in/out as a status, Accepted, Declined, Revoked, Unsubscribed (that is a subscription) | contracts/satellite/marketing-crm.yaml#/components/schemas/ConsentDecision |
+| Subscription | A list the guest asked to receive (a newsletter, event news), per channel. Unsubscribing from a list is not withdrawing consent. | Consent, Opt-in | contracts/satellite/marketing-crm.yaml#/components/schemas/MarketingSubscription |
+| Preferences | What the guest likes or needs (seating, drinks, dietary, accessibility, contact channel). Never grants permission. | Consents, Settings | contracts/satellite/marketing-crm.yaml#updateGuestPreferences |
+| Send me offers and news | The marketing opt-in label beside the terms at checkout, unticked, one per channel and purpose. | I agree to marketing, Pre-ticked boxes, Keep me updated ticked by default | DI-954 |
+| Points / Tier / Points to next tier / Expiring points | The loyalty position. Points are a liability earned per programme; tiers are ranked (Bronze, Silver, Gold, Platinum in the meetings). | Credits, Coins, Balance alone (wallet money is "credit"), Level | DI-382 |
+| Pending points | Points earned on a purchase still inside its refund window; shown apart from spendable points. | Available points for pending ones | contracts/satellite/marketing-crm.yaml#getLoyaltyPosition |
+| Reward | What points can be turned into (rewards catalogue). | Prize (games redemption uses prize), Voucher unless it is one | contracts/satellite/marketing-crm.yaml#listRewards |
+| Challenge / Badge / Streak / Referral | Gamification - rewards for behaviour, not spend. Status badges such as Explorer, Adventurer, Legend. | Mission and Quest used interchangeably on one screen, Loyalty tier for a badge | DI-392 |
+| Case | One service record - lost property, complaint, question, accessibility, refund request or other - with a number (venue prefix plus sequence), a status and an SLA. | Ticket (a ticket is an admission product), Issue, Incident (that is maintenance and safety) | contracts/satellite/marketing-crm.yaml#/components/schemas/CaseKind |
+| Reply to guest / Internal note | The two kinds of case message. The agent always chooses one explicitly; there is no default. | Comment, Message (ambiguous) | F05 step 2 |
+| Conversation | A live chat session (web chat, in-app, WhatsApp, SMS, email, kiosk, voice). With the assistant, then queued, then with an agent. It is not a case. | Ticket, Case (until one is raised from it) | contracts/satellite/marketing-crm.yaml#/components/schemas/ConversationState |
+| Segment / List / Audience | A segment is rules evaluated when used. A list is static, imported or hand-picked. The audience is what a campaign or journey targets. | Group, Cohort, Target list for a segment | DI-381 |
+| Campaign / Journey | A campaign is one send (one-off, scheduled, triggered or recurring) to an audience. A journey is an automation started by an event, with steps, waits and branches. | Flow (booking flows use it), Automation for a one-off send, Blast | R146 |
+| Offer | A pre-configured, system-validated discount or benefit that a campaign or journey references. It is never typed into the builder. | Discount field, Coupon (unless the offer is a coupon code) | MoM 2026-08-20 4.6 |
+| Reachable | How many guests in an audience can actually be sent to on a channel after consent and suppression. Always shown beside the matching count. | Audience size alone | contracts/satellite/marketing-crm.yaml#previewSegment |
+| Possible duplicate / Merge | Two profiles that may be one person. Never called "Duplicate" as a verdict. Merging needs confirmation and stays reversible for 30 days. | Duplicate (as a status), Combine, Auto-merge | DI-808 |
+| Data request | A guest's privacy request - a copy of my data, a correction, erasure, a restriction - with a legal clock. Statuses submitted, in progress, completed. | DSAR on guest screens, Subject data, Ticket | DI-379 |
+| Waiver / Consent question | A waiver is a signed, versioned form. A consent question ("Are you able to swim?", "I accept the risk") is a single question asked per person or per booking and recorded as consent. | Contract, Disclaimer, Form for a waiver in guest copy | DI-1062 |
+| Lost item / Found item / Possible match | The two directions of lost property and the suggested pairing between them. | Lost case, Claim before it is claimed | contracts/satellite/marketing-crm.yaml#/components/schemas/LostItem |
+| Wishlist | Products and dates a guest saved to buy later, including F&B and retail to buy on site. | Favourites (used for transport routes), Saved for later on one surface and Wishlist on another | DI-202 |
+| Notification / Message | A notification is an item in the guest's in-app feed. A message is one send on a channel (email, SMS, WhatsApp, push, in-app). | Alert for marketing content, Inbox for the guest feed | contracts/satellite/marketing-crm.yaml#/components/schemas/GuestNotification |
+| Template | A reusable message body per channel and language with merge fields. Transactional and marketing templates are separate kinds. | Layout, Design | contracts/satellite/marketing-crm.yaml#createMessageTemplate |
+
+
 ## The screens
 
 Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs count fields; requirements are matrix rows; meeting inputs are the ones naming the screen (the module and platform ones are below); white label says whether the tenant's brand reaches it (guest) or it sets the brand (configures).
@@ -71,8 +107,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-795` | Unified Inbox | B–D | 0 | 0 | 6 | 4 | 0 | 0 | — | notStarted (—) |
 | `BO-796` | Guest Conversation 360 | B–D | 0 | 0 | 6 | 3 | 1 | 0 | — | notStarted (—) |
 | `BO-797` | AI Chatbot Configuration | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-798` | Intent & Knowledge Management | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-799` | Agent Workspace | B–D | 0 | 0 | 6 | 8 | 0 | 0 | — | notStarted (—) |
+| `BO-798` | Intent & Knowledge Management | B–D | 5 | 11 | 6 | 1 | 0 | 0 | — | notStarted (—) |
+| `BO-799` | Agent Workspace | B–D | 0 | 0 | 6 | 7 | 0 | 0 | — | notStarted (—) |
 | `BO-800` | Routing & Queue Management | B–D | 8 | 13 | 6 | 0 | 2 | 6 | — | notStarted (—) |
 | `BO-801` | Sales & Service Actions | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-802` | Sentiment, Quality & Escalation | B–D | 0 | 0 | 6 | 1 | 0 | 0 | — | notStarted (—) |
@@ -80,7 +116,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 ## Thin screens in this batch
 
-**BO-794, BO-795, BO-796, BO-797, BO-798, BO-799, BO-801, BO-802, BO-803 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**BO-794, BO-795, BO-796, BO-797, BO-799, BO-801, BO-802, BO-803 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ---
 
@@ -106,6 +142,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** Conversation demand and service level across channels: open, waiting, at SLA risk and escalated conversations; bot containment and handover; response and resolution time; CSAT, conversions and revenue; outages, knowledge gaps, negative sentiment spikes and overloaded queues. A conversation (seconds) is not a case (hours), and the screen measures them separately.
+
 #### Inputs: what the user enters or picks
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
@@ -123,6 +161,11 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 **Shown**
 
 **Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+
+**Rules for what is shown** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
+
+- **Waiting now**: Conversations queued for a person with the longest wait first; with-assistant conversations counted apart, because time with a bot is not time in a queue. *(source: contracts/satellite/marketing-crm.yaml#/components/schemas/ConversationState; contracts/satellite/marketing-crm.yaml#listConversations)*
+- **Containment**: Share answered by the assistant without handover, per channel (WhatsApp, web, Instagram, Facebook as the client listed). *(source: DI-388; DI-256)*
 
 **Data it reads**: `listConversations` (onLoad, Conversations across channels)
 
@@ -149,6 +192,19 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the omnichannel are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+now:
+  withAssistant: 42
+  queued: 7
+  withAgent: 18
+  longestWait: 3m 10s
+containment: 64% (WhatsApp 58%, web chat 71%)
+```
 
 #### Permissions
 
@@ -222,6 +278,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** One inbox for every guest conversation (email, SMS, WhatsApp, social, web chat, app chat, voice), with assignment, priority, unread state, SLA clock, search and saved views. Claiming a conversation is what stops two agents answering the same guest.
+
 #### Inputs: what the user enters or picks
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
@@ -247,6 +305,14 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Claim conversation (primary button) | navigation or local | — | — | — | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
 
+**Rules for what is shown** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
+
+- **Conversation row**: Channel icon, guest (identified or not), last message, state, wait time, owner. *(source: contracts/satellite/marketing-crm.yaml#listConversations)*
+
+**What each action does** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
+
+- **Claim**: The conversation is assigned to the agent; another agent claiming it sees who has it. *(source: contracts/satellite/marketing-crm.yaml#claimConversation)*
+
 **Data it reads**: `listConversations` (onLoad, The unified inbox)
 
 **Where the user goes next**
@@ -264,6 +330,19 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 Already claimed by another agent |
+
+#### Consistency with other screens
+
+- Match `SUP-004`: The Support Console's conversation queue is the same inbox; same rows and claim behaviour.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+rows:
+- '{channel: WhatsApp, guest: Priya Nair, last: Can I change my visit to Sunday?, state: queued, wait: 0m 48s}'
+```
 
 #### Permissions
 
@@ -331,6 +410,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** The conversation with the guest's CRM context beside it: profile, value, tickets, reservations, membership, loyalty, wallet, open cases, and every earlier conversation across channels in order, with intent, outcome and who handled it (bot or agent). Sensitive data is masked by permission.
+
 #### Inputs: what the user enters or picks
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
@@ -340,6 +421,11 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 **Shown**
 
 **Detail panel** (detail panel): One record, read-only.
+
+**Rules for what is shown** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
+
+- **History**: All prior conversations across channels and sessions as one thread for one person. *(source: contracts/satellite/marketing-crm.yaml#getConversation; DI-388)*
+- **Context**: Guest timeline and loyalty (staff read getGuestLoyalty), opened without losing the conversation. *(source: contracts/satellite/marketing-crm.yaml#getGuestTimeline; contracts/satellite/marketing-crm.yaml#getGuestLoyalty)*
 
 **Where the user goes next**
 
@@ -355,6 +441,14 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the guest conversation 360 are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+guest: Priya Nair - Bronze - last visit 2 Jun 2026 - open case CA-1110
+```
 
 #### Permissions
 
@@ -414,27 +508,28 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Engagement & Support · wave 3 · needs the `marketing` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `AI_CONFIGURE` (1 configure); in the flows as venue manager |
+| Who uses it | venue; in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/engagement-support/ai-chatbot-configuration-bo-797` |
 
-**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built. Removed 2 October 2026 (CHG-WIR-005): The chatbot screen wrote setCustomerServiceCopilot, the agent-side copilot (the same operation as BO-798); the guest-facing chatbot needs its own configuration …
+
+**From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** Configure the guest-facing AI assistant: name, tone, languages, channels, hours, confidence thresholds, fallback, authentication, guest-data access, permitted actions, prohibited topics, and when it hands over to a person. It answers first and escalates to a human representative.
+
+**Fixed on main** (the package already carries these; draw what it says): The screen writes setCustomerServiceCopilot (the agent-side copilot), the same operation as BO-798. (CHG-WIR-005).
 
 #### Inputs: what the user enters or picks
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
 
+**Rules for these inputs** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
+
+- **Handover conditions**: Low confidence, guest asks for a person, negative sentiment, payment or refund topics. *(source: DI-256; screens/P08-venue-back-office.yaml#BO-797)*
+
 #### Outputs: what the screen shows and produces
-
-**Actions and what each produces**
-
-| Action | Calls | Sends | On success returns | Errors to show | Notes |
-|---|---|---|---|---|---|
-| Save (primary button) | navigation or local | — | — | — | — |
-| Cancel (secondary button) | navigation or local | — | — | — | — |
 
 **Where the user goes next**
 
@@ -446,17 +541,22 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |---|---|
 | Loading (`?state=loading`) | The chatbot list. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the chatbot untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No chatbot yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, first run (`?state=emptyFirstRun`) | No chatbot yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the chatbot are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Not shown: nothing on this screen needs a permission of its own; the app's sign-in decides access. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 422 A venue row would widen the tenant's configuration or the AI policy. |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+assistant: Coral - friendly, EN/AR, WhatsApp and web chat, 24/7, hand over below 0.6 confidence
+```
 
 #### Permissions
 
-- `setCustomerServiceCopilot` → `AI_CONFIGURE` (configure) · staff
-
-**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Not shown: nothing on this screen needs a permission of its own; the app's sign-in decides access.
 
 #### Requirements it meets
 
@@ -480,16 +580,15 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS76 Marketing CRM Configuration Reference v1.0 Board 7.dc.html#bo-797`
 - Workshop pack: Marketing_CRM_Configuration_Reference v1.0.pdf board 7
 - Flow F250 *Marketing CRM Configuration Reference v1.0 board 7: Omnichannel Command Center*, step 6: Works in AI Chatbot Configuration → Configure the AI assistant's identity, scope and operating controls. Set bot name, personality, tone, supported languages, channels, operating hours and brand/venue context. Configure confidence …
-- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (400, 403, 422).
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
 - [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-797?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: Save, Cancel.
+- [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-794`.
-- [ ] Every gated control is gated: `AI_CONFIGURE`.
+- [ ] Sign-in is asked only where the spec asks for it.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -508,10 +607,14 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
 | Offline | online only |
-| Opens with | nothing: it opens on its own |
+| Opens with | `collectionId` (navigation) |
 | Route | `/engagement-support/intent-knowledge-management-bo-798` |
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+**From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** What the assistant understands and may use: intents, example phrases, entities, synonyms, approved FAQs, product data and policies with freshness and ownership, a test console with citations, and the queue of questions it could not answer.
+
+**Fixed on main** (the package already carries these; draw what it says): Intents and knowledge sources have no operation; setCustomerServiceCopilot is the only write. (CHG-WIR-005).
 
 #### Inputs: what the user enters or picks
 
@@ -523,9 +626,37 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Kind | segmented control | — | Knowledge · Analytics | `listKnowledgeGaps` ?kind |
 | Audience | segmented control | — | Staff · Guest | `listKnowledgeGaps` ?audience |
 
-Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+**Form: Add document** (modal, opened by *Add document*; *Add document* calls `ingestKnowledgeDocument`, *Cancel* sends nothing)
+
+**Collects what `ingestKnowledgeDocument` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Title `title` | text field | required | — | — | — | — | `ingestKnowledgeDocument` body |
+| Source image `sourceAssetId` | upload, or pick from the media library | required | — | — | PNG or SVG ≤ 2 MB for logos; images ≥ 1600 px; video MP4 | — | `ingestKnowledgeDocument` body |
+| Mime type `mimeType` | text field | optional | — | — | — | — | `ingestKnowledgeDocument` body |
+| Reingest document `reingestDocumentId` | picker: choose a reingest document | optional | — | — | shows names, sends the id | An `indexed` or `failed` document in this collection to process again from `sourceAssetId`. | `ingestKnowledgeDocument` body |
+| Supersedes document `supersedesDocumentId` | picker: choose a supersedes document | optional | — | — | shows names, sends the id | The `indexed` document in this collection that this one replaces. It moves to `superseded` when this one reaches `indexed`, and is kept — a technician who followed version 2 last … | `ingestKnowledgeDocument` body |
 
 #### Outputs: what the screen shows and produces
+
+**Shown**
+
+**Knowledge sources** (data table, from `listKnowledgeCollections`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| ID | the name it points at, never the id | — |
+| Name | text | — |
+| Description | text | — |
+| Scope level | chip: Tenant, Region, Venue | — |
+| Document count | 1,234 | — |
+| Shard key | text | The tenant boundary on shared placement (ADR-0021). A collection is shared by every tenant using the same embedding model, and the shard … |
+| Retrieval | chip: Dense, Hybrid | Set at creation and not changeable. A collection created dense-only cannot gain a sparse index without a full rebuild, which is why this is … |
+| Sparse model | text | The sparse signal, where `retrieval` is `hybrid`. BM25 unless a tenant needs otherwise. |
+| Idf scope | chip: Shard, Tenant, Venue | Which population the sparse score measures rarity against (ADR-0021). Qdrant computes IDF statistics shard-wide by default, so a term … |
+| Embedding model | text | This is what decides how many collections exist (ADR-0021). A collection carries its own vector configuration and a shard cannot, so … |
+| Is active | yes / no (icon or chip) | — |
 
 **Actions and what each produces**
 
@@ -533,8 +664,13 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |---|---|---|---|---|---|
 | Save (primary button) | navigation or local | — | — | — | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
+| Add document (secondary button) | `ingestKnowledgeDocument` POST `/collections/{collectionId}/documents` | KnowledgeDocument | KnowledgeDocument | — | opens modal first |
 
-**Data it reads**: `listKnowledgeGaps` (onLoad, Questions the assistant could not answer)
+**Rules for what is shown** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
+
+- **Knowledge gaps**: Unanswered questions grouped and counted, newest first, each becoming a task for the content owner. *(source: contracts/satellite/ai.yaml#listKnowledgeGaps)*
+
+**Data it reads**: `listKnowledgeGaps` (onLoad, Questions the assistant could not answer); `listKnowledgeCollections` (onLoad, The knowledge collections the assistant answers from)
 
 **Where the user goes next**
 
@@ -552,16 +688,32 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 422 A venue row would widen the tenant's configuration or the AI policy. |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+gaps:
+- Can I bring a drone? (14 times this week)
+- Is the lazy river heated? (9)
+```
+
 #### Permissions
 
 - `setCustomerServiceCopilot` → `AI_CONFIGURE` (configure) · staff
 - `listKnowledgeGaps` → `AI_USE` (operate) · staff
+- `listKnowledgeCollections` → `AI_CONFIGURE` (configure) · staff
+- `ingestKnowledgeDocument` → `AI_CONFIGURE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
 #### Requirements it meets
 
-No matrix row traces to this screen's operations or data.
+1 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+
+| Ref | Requirement (shortened) | Domain | Verdict | Via |
+|---|---|---|---|---|
+| 8.4.38 | System shall support Retrieval-Augmented Generation (RAG) using approved enterprise knowledge sources, documents, policies, product catalogs, support content, operational data, and reporting datasets … | Unified Operations Dashboard | CONTRACTED | `ingestKnowledgeDocument` |
 
 #### Client meeting inputs
 
@@ -583,10 +735,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (400, 403, 422).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (5), with its required mark, default, format and its error state (400, 403, 422).
+- [ ] Every output is drawn (11 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-798?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: Save, Cancel.
+- [ ] Every action is wired with its success and its failure: Save, Cancel, Add document.
 - [ ] Every transition is wired: `BO-794`.
 - [ ] Every gated control is gated: `AI_CONFIGURE`, `AI_USE`.
 - [ ] The module and platform inputs below are applied.
@@ -610,7 +762,11 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | `conversationId` (navigation) |
 | Route | `/engagement-support/agent-workspace-bo-799` |
 
-**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built. Removed 2 October 2026 (CHG-WIR-005): handoverToAgent is the guest's side of the handover (guest audience); the agent claims the conversation (claimConversation) (design-notes correction …
+
+**From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** The live agent's workspace: transcript, guest context, AI reply suggestion, canned responses, translation, rich messages (images, PDFs, QR codes, tickets), internal notes, transfer, and authorised booking and wallet actions without switching applications. Closing records why the conversation ended and any callback promised.
+
+**Fixed on main** (the package already carries these; draw what it says): handoverToAgent (guest audience) is declared on the agent workspace. (CHG-WIR-005).
 
 #### Inputs: what the user enters or picks
 
@@ -624,6 +780,13 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |---|---|---|---|---|---|
 | Send conversation message (primary button) | navigation or local | — | — | — | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
+| Claim conversation (secondary button) | `claimConversation` POST `/conversations/{conversationId}/claim` | — | Conversation | 409 Already claimed by another agent | — |
+
+**What each action does** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
+
+- **Send**: Sent as the agent (the sender is resolved from the session). Internal notes are visibly different and never reach the guest. *(source: contracts/satellite/marketing-crm.yaml#sendConversationMessage; F05 step 2)*
+- **End conversation**: Requires a disposition and records a callback if one was promised. *(source: contracts/satellite/marketing-crm.yaml#setCallDisposition)*
+- **Assist at kiosk**: Starts a remote assist session on a kiosk the guest is using. *(source: contracts/satellite/marketing-crm.yaml#startKioskAssist)*
 
 **Where the user goes next**
 
@@ -639,31 +802,38 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the agent are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 409 No agent available. Returns the reason and offers a case, rather than queuing a guest for somebody who is not there. (HandoverRefusedProblem) |
+| Validation and conflict | the form keeps what was entered and marks the problem: 409 Already claimed by another agent |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+suggestion: AI - "You can move your Day Pass to Sunday 4 Oct at no charge. Shall I do that?"
+```
 
 #### Permissions
 
 - `sendConversationMessage` → `CASE_MANAGE` (configure) · staff, guest
-- `handoverToAgent` → no permission · guest
 - `setCallDisposition` → `CASE_MANAGE` (configure) · staff
 - `startKioskAssist` → `CASE_MANAGE` (configure) · staff
+- `claimConversation` → `CASE_MANAGE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
 #### Requirements it meets
 
-8 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+7 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
 
 | Ref | Requirement (shortened) | Domain | Verdict | Via |
 |---|---|---|---|---|
 | 22.8.20 | Rich Messaging Support | Marketing & CRM | CONTRACTED | `sendConversationMessage` |
 | 22.8.22 | Payment Link Integration | Marketing & CRM | CONTRACTED | `sendConversationMessage` |
 | 22.8.24 | Mobile App Chat Center | Marketing & CRM | CONTRACTED | `sendConversationMessage` |
-| 19.2.67 | Live Chat - System shall support live chat. | Guest Mobile App & Branding | CONTRACTED | `handoverToAgent` |
-| 19.2.68 | AI Chat Assistant - System shall provide AI chat assistance. | Guest Mobile App & Branding | CONTRACTED | `handoverToAgent` |
-| 19.2.72 | AI Concierge - System shall provide AI concierge services. | Guest Mobile App & Branding | CONTRACTED | `handoverToAgent` |
-| 22.8.5 | Live Agent Handover | Marketing & CRM | CONTRACTED | `handoverToAgent` |
 | 2.1.25 | Authorized staff shall be able to remotely assist guests using self-service kiosks, troubleshoot issues, and support checkout completion. | Ticketing Sales | CONTRACTED | `startKioskAssist` |
+| 22.8.6 | Agent Workspace | Marketing & CRM | CONTRACTED | `claimConversation` |
+| 22.8.17 | Conversation Routing | Marketing & CRM | CONTRACTED | `claimConversation` |
+| 22.8.18 | Queue Management | Marketing & CRM | CONTRACTED | `claimConversation` |
 
 #### Client meeting inputs
 
@@ -687,7 +857,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state (409).
 - [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-799?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: Send conversation message, Cancel.
+- [ ] Every action is wired with its success and its failure: Send conversation message, Cancel, Claim conversation.
 - [ ] Every transition is wired: `BO-794`.
 - [ ] Every gated control is gated: `CASE_MANAGE`.
 - [ ] The module and platform inputs below are applied.
@@ -712,6 +882,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Route | `/engagement-support/routing-queue-management-bo-800` |
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+**From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** Route work to the right team: rules by intent, skill, department, venue, language, guest tier, priority and SLA risk; queues with capacity, hours, overflow and assignment method. The meetings name the queues: reservation, general, membership and billing, technical support.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **Case category list filters are exposed as fields (Parent category id, Top level only, Is active).** Why: Category management belongs to BO-807; ids are never typed. *(source: screens/P08-venue-back-office.yaml#BO-800; Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers))*
 
 #### Inputs: what the user enters or picks
 
@@ -746,6 +922,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Is active `isActive` | toggle | required | on | — | — | — | `setServiceQueueDefinition` body |
 
 Errors to draw in the form: 400 Validation failed; 403 Authenticated but not permitted at the requested scope; 409 Retiring a queue that an active routing rule names, or that an unresolved case still waits in.
+
+**Rules for these inputs** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
+
+- **Queue**: Code (never changes once created), name, hours, capacity, overflow wait in seconds and the overflow queue. *(source: contracts/satellite/marketing-crm.yaml#setServiceQueueDefinition; DI-389)*
+- **Routing rule**: Matches (category, channel, language, tier, venue, priority) and target queue or skill. *(source: contracts/satellite/marketing-crm.yaml#setIntelligentRoutingSkill)*
+- **Conversation retention**: Default one month, extendable, per tenant or venue. *(source: DI-380)*
 
 #### Outputs: what the screen shows and produces
 
@@ -802,6 +984,22 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 Idempotency conflict or optimistic concurrency failure. Two causes, so two types.; 409 Retiring a queue that an active routing rule names, or that an unresolved case still waits in. |
 
+#### Consistency with other screens
+
+- Match `SUP-020`: Same queues and rules in the Support Console.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+queues:
+- Reservations (EN/AR, 08:00-22:00)
+- General
+- Membership & billing
+- Technical support
+```
+
 #### Permissions
 
 - `setIntelligentRoutingSkill` → `CASE_MANAGE` (configure) · staff
@@ -850,6 +1048,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - [ ] Every transition is wired: `BO-794`.
 - [ ] Every gated control is gated: `CASE_MANAGE`, `CASE_VIEW`.
 - [ ] The 2 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -872,6 +1071,8 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** Agents (and AI with approval) perform governed actions from a case or conversation: change tickets and reservations with capacity, price and policy shown first; loyalty and wallet actions within authority; payment links, vouchers and QR tickets. It is a front door to the order operations, never a second copy of their rules.
+
 #### Inputs: what the user enters or picks
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
@@ -884,6 +1085,10 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |---|---|---|---|---|---|
 | Save order booking ticket (primary button) | navigation or local | — | — | — | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
+
+**What each action does** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
+
+- **Evaluate, then perform**: Evaluate shows what is allowed and the price difference; perform needs the agent's authority or an approval. *(source: contracts/satellite/marketing-crm.yaml#setOrderBookingTicket)*
 
 **Where the user goes next**
 
@@ -900,6 +1105,14 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 Idempotency conflict or optimistic concurrency failure. Two causes, so two types.; 422 The action is not permitted for this order under its policies; the problem names the policy. |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+action: Reschedule 2 Day Passes from Sat 3 Oct to Sun 4 Oct - no fee - allowed
+```
 
 #### Permissions
 
@@ -959,6 +1172,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** Conversation risk and quality: sentiment, urgency, intent confidence and quality score in near real time, with thresholds that alert a supervisor, change priority, transfer, create a case or take over from the bot. AI rationale is shown and can be overridden.
+
 #### Inputs: what the user enters or picks
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
@@ -988,6 +1203,10 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |  (primary button) | navigation or local | — | — | — | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
 
+**Rules for what is shown** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
+
+- **Quality evaluation**: Scores per interaction with the checklist and coaching notes; AI-derived scores labelled with model and version. *(source: contracts/satellite/marketing-crm.yaml#listQualityAgentEvaluation)*
+
 **Data it reads**: `listQualityAgentEvaluation` (onLoad, Sentiment, quality and escalation)
 
 **Where the user goes next**
@@ -1004,6 +1223,14 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the sentiment quality escalation are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+alert: Negative sentiment (0.82) on WhatsApp with Omar Haddad - escalated to supervisor
+```
 
 #### Permissions
 
@@ -1068,6 +1295,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** Channel, bot and agent performance with evidence: volume, response, resolution, abandonment, containment, handover, transfer, conversion, revenue and CSAT, with drill-down to the conversation and its action trace.
+
 #### Inputs: what the user enters or picks
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
@@ -1092,6 +1321,10 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
 
+**Rules for what is shown** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
+
+- **Interaction timeline**: Case messages, conversation messages, notes, calls and automated notifications in one order; who acted (AI or human). *(source: contracts/satellite/marketing-crm.yaml#listUnifiedInteractionCommunication)*
+
 **Data it reads**: `listUnifiedInteractionCommunication` (onLoad, Chat analytics and audit)
 
 **Where the user goes next**
@@ -1109,6 +1342,18 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+kpis:
+  firstResponse: 42s
+  resolution: 11m
+  abandonment: 6%
+  csat: 4.4
+```
 
 #### Permissions
 
@@ -1246,10 +1491,11 @@ Method, path, parameters, request and response for every operation these screens
 "escalateCase": {"method":"POST","path":"/cases/{caseId}/escalate","contract":"marketing-crm","summary":"Escalate a case","permission":"CASE_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Case"},
 "getConversation": {"method":"GET","path":"/conversations/{conversationId}","contract":"marketing-crm","summary":"One conversation and everything before it","permission":"CASE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[],"requestBody":null,"responds":"Conversation"},
 "getGuestTimeline": {"method":"GET","path":"/guests/{guestId}/timeline","contract":"marketing-crm","summary":"Everything this guest did, in order, across the platform","permission":"GUEST_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"from","in":"query","required":null},{"name":"kinds","in":"query","required":null},{"name":"venueId","in":"query","required":null}],"requestBody":null,"responds":"GuestTimelineEvent"},
-"handoverToAgent": {"method":"POST","path":"/conversations/{conversationId}/handover","contract":"marketing-crm","summary":"Pass an assistant conversation to a person","permission":null,"offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Conversation"},
+"ingestKnowledgeDocument": {"method":"POST","path":"/collections/{collectionId}/documents","contract":"ai","summary":"Add a document","permission":"AI_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"KnowledgeDocument","responds":null},
 "listAgentWorkloadAvailability": {"method":"GET","path":"/agent-workload-availability","contract":"marketing-crm","summary":"Agent Workload, Availability & Workforce Control","permission":"CASE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"venueId","in":"query","required":false},{"name":"queueId","in":"query","required":false},{"name":"team","in":"query","required":false},{"name":"status","in":"query","required":false},{"name":"skill","in":"query","required":false},{"name":"language","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listCaseCategories": {"method":"GET","path":"/case-categories","contract":"marketing-crm","summary":"List case categories and subcategories","permission":"CASE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"parentCategoryId","in":"query","required":false},{"name":"topLevelOnly","in":"query","required":false},{"name":"isActive","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listConversations": {"method":"GET","path":"/conversations","contract":"marketing-crm","summary":"The omnichannel inbox","permission":"CASE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":"state","in":"query","required":null},{"name":"assignedToMe","in":"query","required":null},{"name":"channel","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
+"listKnowledgeCollections": {"method":"GET","path":"/collections","contract":"ai","summary":"Collections available to this tenant","permission":"AI_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[],"requestBody":null,"responds":"KnowledgeCollection"},
 "listKnowledgeGaps": {"method":"GET","path":"/knowledge-gaps","contract":"ai","summary":"Questions the assistant could not answer","permission":"AI_USE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":"status","in":"query","required":null},{"name":"kind","in":"query","required":null},{"name":"audience","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listQualityAgentEvaluation": {"method":"GET","path":"/quality-agent-evaluation","contract":"marketing-crm","summary":"Quality Management & Agent Evaluation","permission":"CASE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"agentPrincipalId","in":"query","required":false},{"name":"evaluatorPrincipalId","in":"query","required":false},{"name":"sourceType","in":"query","required":false},{"name":"status","in":"query","required":false},{"name":"criticalFailureOnly","in":"query","required":false},{"name":"from","in":"query","required":false},{"name":"to","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listServiceQueues": {"method":"GET","path":"/service-queues","contract":"marketing-crm","summary":"List customer-service queues","permission":"CASE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"isActive","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
@@ -1288,6 +1534,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "IntelligentRoutingSkillsAssignmentEngineInput": {"type":"object","x-ticvai-persistence":"marketing.case_routing_rule","description":"One case routing rule (pack 10.2.3). Empty match lists match everything; all non-empty lists must match.","required":["code","name","strategy","rank","isActive"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"code":{"type":"string","maxLength":60,"description":"The natural key, e.g. `eventDayArabic`."},"name":{"type":"string","maxLength":150},"rank":{"type":"integer","minimum":1,"description":"Lower is tried first."},"queueId":{"type":"string","format":"uuid","nullable":true,"description":"The queue this rule routes into; null routes straight to an agent."},"match":{"type":"object","properties":{"categoryIds":{"type":"array","items":{"type":"string","format":"uuid"},"description":"Case categories and subcategories (`Case.categoryId`)."},"kinds":{"type":"array","items":{"$ref":"#/components/schemas/CaseKind"}},"channels":{"type":"array","items":{"$ref":"#/components/schemas/MessageChannel"}},"customerLanguages":{"type":"array","items":{"type":"string","maxLength":10},"description":"BCP-47 tags, e.g. `ar`, `en`."},"customerTypes":{"type":"array","items":{"type":"string","enum":["individual","member","vip","corporate","group","partner"]}},"membershipTierIds":{"type":"array","items":{"type":"string","format":"uuid"}},"venueIds":{"type":"array","items":{"type":"string","format":"uuid"}},"eventIds":{"type":"array","items":{"type":"string","format":"uuid"}},"productIds":{"type":"array","items":{"type":"string","format":"uuid"}},"priorities":{"type":"array","items":{"$ref":"#/components/schemas/CasePriority"}},"eventWithinHours":{"type":"integer","minimum":0,"nullable":true,"description":"Event proximity - matches only when the case's event starts within this many hours."}}},"strategy":{"type":"string","enum":["roundRobin","leastBusy","skillBased","priorityBased","languageBased","customerTierBased","aiRecommended"]},"requiredSkills":{"type":"array","items":{"type":"string","maxLength":60},"description":"Skills an agent must hold (`AgentServiceProfile.skills`), e.g. `ticketing`, `refunds`."},"requireLanguageMatch":{"type":"boolean","default":true,"description":"Only agents who speak the customer's language are candidates."},"maxUtilizationRate":{"type":"number","minimum":0,"maximum":1,"nullable":true,"description":"Agents above this workload are skipped."},"respectSlaCapability":{"type":"boolean","default":true,"description":"Skip agents whose current queue would push the case past its SLA."},"stickyOwnership":{"type":"boolean","default":false,"description":"Prefer the agent who last handled the customer or the reopened case, if available."},"stickyWindowHours":{"type":"integer","minimum":1,"nullable":true},"fallbackQueueId":{"type":"string","format":"uuid","nullable":true,"description":"Where the case goes when no candidate agent is available."},"isActive":{"type":"boolean"},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005)."},"updatedAt":{"type":"string","format":"date-time","readOnly":true}}},
 "IntelligentRoutingSkillsAssignmentEngineView": {"description":"A routing rule as stored, with how often it has matched.","x-ticvai-persistence":"none — the marketing.case_routing_rule (new) row plus a count over marketing.case","allOf":[{"$ref":"#/components/schemas/IntelligentRoutingSkillsAssignmentEngineInput"},{"type":"object","properties":{"matchedLast7Days":{"type":"integer","minimum":0,"readOnly":true},"lastMatchedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true}}}]},
 "KioskAssistSession": {"type":"object","x-ticvai-persistence":"marketing.kiosk_assist_session","description":"2.1.25. A staff member acting on a kiosk session remotely. **The guest can always see it and always end it** — remote assistance a guest cannot see or stop is surveillance.\n","required":["id","deviceId","staffPrincipalId","startedAt"],"properties":{"id":{"type":"string","format":"uuid"},"deviceId":{"type":"string","format":"uuid"},"venueId":{"type":"string","format":"uuid"},"staffPrincipalId":{"type":"string","format":"uuid"},"staffDisplayName":{"type":"string","description":"**Shown on the kiosk.** A guest being helped should know by whom.\n"},"cartId":{"type":"string","format":"uuid","nullable":true},"reason":{"type":"string","enum":["guestCalled","healthAlert","stuckSession","paymentIssue","proactive"]},"endedBy":{"type":"string","nullable":true,"enum":["staff","guest","timeout"]},"actionsTaken":{"type":"array","description":"**Every action recorded as the staff member's**, not the kiosk's. A cashier completing a guest's checkout remotely is a staff action on a guest cart.\n","items":{"type":"object","properties":{"operationId":{"type":"string"},"at":{"type":"string","format":"date-time"}}}},"startedAt":{"type":"string","format":"date-time"},"endedAt":{"type":"string","format":"date-time","nullable":true}}},
+"KnowledgeCollection": {"type":"object","x-ticvai-persistence":"ai.knowledge_collection","required":["name","scopeLevel"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"name":{"type":"string"},"description":{"type":"string"},"scopeLevel":{"type":"string","enum":["tenant","region","venue"]},"scopePath":{"type":"string","readOnly":true},"documentCount":{"type":"integer","readOnly":true},"shardKey":{"type":"string","readOnly":true,"description":"**The tenant boundary on shared placement** (ADR-0021). A collection is shared by every tenant using the same embedding model, and the shard separates them — set at provisioning from the tenant, never from a request.\nOn dedicated placement there is one shard and this is still populated, because a tenant moving from shared to dedicated moves a shard rather than being re-indexed.\n"},"retrieval":{"type":"string","enum":["dense","hybrid"],"default":"hybrid","description":"**Set at creation and not changeable.** A collection created dense-only cannot gain a sparse index without a full rebuild, which is why this is a creation decision rather than a query one.\nHybrid is the default because **a venue corpus is mostly proper nouns** — Yas Waterworld, Bronze Annual Pass, a menu item name. Dense retrieval is good at meaning and poor at exact tokens, and half our queries are exact tokens.\n"},"sparseModel":{"type":"string","nullable":true,"description":"The sparse signal, where `retrieval` is `hybrid`. BM25 unless a tenant needs otherwise."},"idfScope":{"type":"string","enum":["shard","tenant","venue"],"default":"tenant","description":"**Which population the sparse score measures rarity against** (ADR-0021). Qdrant computes IDF statistics shard-wide by default, so a term common at one venue and rare at another gets one score for both. Shard-per-tenant fixes the cross-tenant case; **inside a dedicated cell the shard is the whole tenant and venues share it**, which is what this narrows.\n"},"embeddingModel":{"type":"string","readOnly":true,"description":"**This is what decides how many collections exist** (ADR-0021). A collection carries its own vector configuration and a shard cannot, so vectors from two models cannot share one. A tenant that residency forces onto a local model therefore has its own collection — forced by the model, not chosen for isolation.\nRead-only because **changing it invalidates every embedding in the collection**, and a collection silently searched with mismatched vectors returns plausible nonsense.\n"},"isActive":{"type":"boolean"}}},
+"KnowledgeDocument": {"type":"object","x-ticvai-persistence":"ai.knowledge_document","required":["title","sourceAssetId"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"collectionId":{"type":"string","format":"uuid","readOnly":true},"title":{"type":"string"},"sourceAssetId":{"type":"string","format":"uuid"},"mimeType":{"type":"string"},"reingestDocumentId":{"type":"string","format":"uuid","nullable":true,"writeOnly":true,"x-ticvai-persisted":false,"description":"An `indexed` or `failed` document in this collection to process again from `sourceAssetId`. **The same document** returns to `processing` and keeps its id (states/ai-knowledge-document.yaml). A request, not a fact about the row, so it is not stored.\n"},"supersedesDocumentId":{"type":"string","format":"uuid","nullable":true,"description":"The `indexed` document in this collection that this one replaces. It moves to `superseded` when this one reaches `indexed`, and is kept — **a technician who followed version 2 last week needs version 2 to still exist.**\n"},"status":{"type":"string","enum":["processing","indexed","failed","superseded"],"readOnly":true},"chunkCount":{"type":"integer","readOnly":true},"failureReason":{"type":"string","nullable":true,"readOnly":true},"indexedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true},"scopePath":{"type":"string","readOnly":true,"description":"**Added 29 September (AI design 3.1):** `ai.knowledge_document` had no policy, so neither did its chunks. Copied from the collection at ingestion, narrowed where the document is venue-specific (\"documents carry the scope they may be retrieved at\"). `ai.chunk_embedding` is scoped through this row.\n"}}},
 "MessageChannel": {"type":"string","enum":["email","sms","whatsapp","push","inApp","post"]},
 "OrderBookingTicketServiceWorkspaceInput": {"type":"object","x-ticvai-persistence":"marketing.case_service_action","x-ticvai-record-definition":"Permitted Service Actions (one per executed action)","description":"One service action on an order, taken from a case. Only an `execute` stores a row.","required":["id","mode","orderId"],"properties":{"id":{"type":"string","format":"uuid","description":"Client-generated UUIDv7; equals the `Idempotency-Key` header."},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005)."},"mode":{"type":"string","enum":["evaluate","execute"]},"caseId":{"type":"string","format":"uuid","description":"Required with `execute`; the action is recorded on this case."},"orderId":{"type":"string","format":"uuid"},"lineIds":{"type":"array","items":{"type":"string","format":"uuid"},"description":"Omit for the whole order."},"action":{"type":"string","description":"Required with `execute`.","enum":["resendTicket","downloadTicket","reissue","transfer","changeName","reschedule","exchange","upgrade","cancel"]},"targetPerformanceId":{"type":"string","format":"uuid","description":"For `reschedule` and `exchange`, the option chosen from the evaluation."},"targetProductId":{"type":"string","format":"uuid","description":"For `exchange` and `upgrade`."},"recipientSubjectId":{"type":"string","format":"uuid","description":"For `transfer` and `changeName`, the new ticket holder."},"deliveryChannel":{"allOf":[{"$ref":"#/components/schemas/MessageChannel"}],"description":"For `resendTicket`."},"reason":{"type":"string","maxLength":500},"status":{"type":"string","readOnly":true,"enum":["completed","pendingPayment","refused","failed"]},"downstreamOperation":{"type":"string","readOnly":true,"description":"The operation that performed it, e.g. `rescheduleOrder`."},"downstreamReference":{"type":"string","readOnly":true,"nullable":true},"performedByPrincipalId":{"type":"string","format":"uuid","readOnly":true},"updatedAt":{"type":"string","format":"date-time","readOnly":true}}},
 "OrderBookingTicketServiceWorkspaceView": {"type":"object","x-ticvai-persistence":"none — projection over orders.sales_order, orders.order_line, orders.payment, access.entitlement, marketing.case_service_action (new) and the policies each owning operation reads","description":"The order as a service agent sees it, what may be done to it, and what was done.","required":["orderId","order","availableActions"],"properties":{"orderId":{"type":"string","format":"uuid"},"order":{"type":"string","description":"The order number shown to the guest."},"subjectId":{"type":"string","format":"uuid","nullable":true},"purchaseDate":{"type":"string","format":"date-time"},"channel":{"type":"string","description":"The sales channel the order came through."},"products":{"type":"integer","minimum":0},"tickets":{"type":"integer","minimum":0},"eventId":{"type":"string","format":"uuid","nullable":true},"dateTime":{"type":"string","format":"date-time","nullable":true,"description":"The performance start."},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"payment":{"type":"string","enum":["paid","partiallyPaid","unpaid","partiallyRefunded","refunded"]},"fulfillment":{"type":"string","enum":["pending","issued","delivered","failed"]},"ticketStatus":{"type":"string","enum":["valid","partiallyUsed","used","expired","cancelled"]},"availableActions":{"type":"array","items":{"type":"object","required":["action","isPermitted"],"properties":{"action":{"type":"string","enum":["resendTicket","downloadTicket","reissue","transfer","changeName","reschedule","exchange","upgrade","cancel","requestRefund"]},"isPermitted":{"type":"boolean"},"refusedBy":{"type":"string","nullable":true,"enum":["ticketPolicy","servicePolicy","orderStatus","eventDate","customerEntitlement","permission"]},"policyReference":{"type":"string","nullable":true},"options":{"type":"array","description":"Alternatives for `reschedule`, `exchange` and `upgrade`, earliest first.","items":{"type":"object","properties":{"performanceId":{"type":"string","format":"uuid","nullable":true},"productId":{"type":"string","format":"uuid","nullable":true},"startsAt":{"type":"string","format":"date-time","nullable":true},"available":{"type":"boolean"},"priceDifferencePerTicket":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"priceDifferenceTotal":{"$ref":"../shared/common.yaml#/components/schemas/Money"}}}}}}},"lastAction":{"allOf":[{"$ref":"#/components/schemas/OrderBookingTicketServiceWorkspaceInput"}],"nullable":true,"description":"The action just executed; null on `evaluate`."}}},

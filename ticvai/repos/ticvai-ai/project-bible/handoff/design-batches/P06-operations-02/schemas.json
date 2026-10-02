@@ -457,7 +457,7 @@
    "localLlm",
    "openaiCompatible"
   ],
-  "description": "`openaiCompatible` (added 29 September, AI design 3.3): a customer endpoint that speaks the OpenAI API, taken with no custom development (AIC-009). Any other protocol needs an adapter.\n"
+  "description": "`openaiCompatible` (added 29 September, AI design 3.3): a customer endpoint that speaks the OpenAI API, taken with no custom development (AIC-009). Any other protocol needs an adapter.\n**Core42 Compass is reached through `openaiCompatible`** (Chinmay, 2 October: the AI residency decision, amending AI-D02; CHG-CSA-002). Compass is the provider of the `uaeOnly` residency class (common `AiResidencyClass`): Small tier Compass GPT-4.1 mini (or Seraj), Strong tier Compass GPT-5, with OpenAI UAE and then the in-cell open-weights model as the fallback chain. OpenAI UAE is `openai` with a UAE `endpoint`; the in-cell model is `localLlm`.\n**A kind is a protocol, not a vendor** (Chinmay, 2 October, contract follow-ups: BYOK accepts any provider; CHG-FUP-008). Any vendor is accepted, named in `AiProvider.vendor`: Mistral, Cohere or any other is reached through `openaiCompatible` where its API speaks it, which the compatibility test confirms before activation (`AiProviderCompatibility`). A new native adapter is a new value here, a breaking change for a client built earlier that goes out with an approval (`docs/active/breaking-changes.yaml`); until then a vendor without either protocol is refused `422 provider-protocol-unsupported`.\n"
  },
  "AiSourceList": {
   "type": "array",
@@ -730,323 +730,6 @@
    }
   }
  },
- "Channel": {
-  "type": "string",
-  "enum": [
-   "pos",
-   "kiosk",
-   "web",
-   "mobile",
-   "b2b",
-   "ota",
-   "callCentre"
-  ]
- },
- "CreateOrderLine": {
-  "x-ticvai-persistence": "none — request only",
-  "type": "object",
-  "required": [
-   "id",
-   "variantId",
-   "quantity",
-   "quotedUnitPrice"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid",
-    "description": "Client-generated UUIDv7 of the line. `lineIds` everywhere in this contract are these."
-   },
-   "variantId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "recommendationId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "The `trackingId` of the ai `decideRecommendations` item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather than guessed. Carried from the cart line at checkout; stored on `orders.order_line` and sent in `order.completed` lines.\n"
-   },
-   "performanceId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "bookedWindow": {
-    "$ref": "#/components/schemas/BookedWindow"
-   },
-   "inventoryHoldId": {
-    "type": "string",
-    "nullable": true,
-    "description": "Lease the units were drawn from — a `catalogue.InventoryHold.id`. Absent for uncontended products."
-   },
-   "seatIds": {
-    "type": "array",
-    "maxItems": 50,
-    "items": {
-     "type": "string",
-     "format": "uuid"
-    },
-    "description": "Seated products only, as `seating.Seat.id`. Not available offline. **At most `VenueSettings.seating.maxSeatsPerGuestOrder` seats per booking on a guest channel** (default 10, bounds 1 to 50, decided 29 September, rev 3 REV3-7); **at most 10 per sale on staff and POS** (audit R080 (c)), across all the lines of one order for one performance. `createOrder` refuses more with 422 `seatLimitExceeded` (problem type `seat-limit-exceeded`)."
-   },
-   "resourceHoldId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "A `resources.ResourceHold` on a resource the guest picked on a venue map (decided 29 September, rev 3 REV3-15); `variantId` is the placed resource's price-band variant. `createOrder` converts the hold into a `ResourceBooking` without releasing it. Not available offline."
-   },
-   "attributes": {
-    "$ref": "#/components/schemas/OrderLineAttributes"
-   },
-   "quantity": {
-    "type": "integer",
-    "minimum": 1
-   },
-   "eligibilityDeclaration": {
-    "type": "array",
-    "nullable": true,
-    "x-ticvai-note": "One row per declared guest in `orders.order_line_eligibility` (named on `OrderLine`), because an array of objects is a child table's rows, not a column.\n",
-    "items": {
-     "type": "object",
-     "properties": {
-      "ageBand": {
-       "type": "string",
-       "enum": [
-        "infant",
-        "child",
-        "junior",
-        "adult",
-        "senior"
-       ],
-       "description": "Infant under 3, child 3–12, junior 13–17, adult 18–59, senior 60+."
-      },
-      "ageYears": {
-       "type": "integer",
-       "nullable": true
-      },
-      "heightBandIndex": {
-       "type": "integer",
-       "nullable": true
-      },
-      "confidentSwimmer": {
-       "type": "boolean",
-       "nullable": true,
-       "description": "**Derived, kept for the gate check** (decided 29 September, rev 3 REV3-26). The swim question is a consent: the answer is a `marketing.BookingConsentRecord` of kind `swim`, and this is filled from it (true for a `yes` covering this person, whether answered for them or once for the booking). A value sent that contradicts the record is ignored and the record wins. No longer the place a swim answer is captured.\n"
-      },
-      "guardianSigned": {
-       "type": "boolean"
-      }
-     }
-    },
-    "description": "What was declared for each guest on this line, kept as the record staff check at the gate."
-   },
-   "quotedUnitPrice": {
-    "allOf": [
-     {
-      "$ref": "../shared/common.yaml#/components/schemas/Money"
-     }
-    ],
-    "description": "What the client charged, from its local bundle."
-   },
-   "holderName": {
-    "type": "string",
-    "nullable": true
-   },
-   "dataMaskValues": {
-    "type": "object",
-    "additionalProperties": true,
-    "description": "**Deliberately open.** Custom fields keyed by the venue's data mask: the field definitions travel in the catalogue bundle (`catalogue.CatalogueBundle.payload`), so the keys are the venue's to define, as on `catalogue`'s own `dataMaskValues`.\n"
-   }
-  }
- },
- "CreateOrderRequest": {
-  "type": "object",
-  "required": [
-   "id",
-   "venueId",
-   "channel",
-   "lines",
-   "recordedAt"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid",
-    "description": "Client-generated UUIDv7. Also the idempotency key: it must equal the `Idempotency-Key` header, and a replay or a mismatch follows `IdempotencyKey` in `shared/common.yaml`. Offline replay through `syncOrders` carries no header, and this id alone deduplicates there.\n"
-   },
-   "venueId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "channel": {
-    "$ref": "#/components/schemas/Channel"
-   },
-   "shiftId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "subjectId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "Null for an anonymous sale. Identity and entitlement are separate."
-   },
-   "guestLinkId": {
-    "type": "string",
-    "nullable": true,
-    "description": "Present where the guest is linked across cells."
-   },
-   "catalogueBundleVersion": {
-    "type": "string",
-    "description": "The bundle the client priced from. Lets the server explain a variance rather than merely report one.\n"
-   },
-   "lines": {
-    "type": "array",
-    "minItems": 1,
-    "items": {
-     "$ref": "#/components/schemas/CreateOrderLine"
-    }
-   },
-   "recordedAt": {
-    "type": "string",
-    "format": "date-time"
-   }
-  }
- },
- "CreatePaymentRequest": {
-  "type": "object",
-  "required": [
-   "id",
-   "orderId",
-   "tender",
-   "amount",
-   "recordedAt"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid",
-    "description": "Client-generated UUIDv7 of the payment, and its idempotency key — it must equal the `Idempotency-Key` header."
-   },
-   "orderId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "tender": {
-    "$ref": "#/components/schemas/TenderKind"
-   },
-   "amount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "tenderCurrency": {
-    "type": "string",
-    "pattern": "^[A-Z]{3}$",
-    "nullable": true,
-    "description": "The currency the guest handed over, where it is not the venue's — becomes `Payment.tenderCurrency`. Omit for a payment in the venue's own currency."
-   },
-   "tenderAmount": {
-    "allOf": [
-     {
-      "$ref": "../shared/common.yaml#/components/schemas/Money"
-     }
-    ],
-    "description": "**What the guest handed over**, in `tenderCurrency` — becomes `Payment.tenderAmount`, one name for one concept (renamed from `tenderedAmount` on 26 September). For cash, change is the difference.\n"
-   },
-   "walletAuthorisationId": {
-    "type": "string",
-    "nullable": true,
-    "description": "Cross-cell wallet hold, where the guest's home cell is elsewhere."
-   },
-   "walletHoldId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "For a `wallet` tender, the hold `wallet.holdWalletFunds` placed (SD-027). Capture debits it; the order service writes no wallet table."
-   },
-   "returnUrl": {
-    "type": "string",
-    "format": "uri",
-    "nullable": true,
-    "description": "Where the provider returns the guest after a 3-D Secure challenge or hosted page (SD-034). Required for a card payment from the guest web or app."
-   },
-   "terminalId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "The card terminal to instruct, for a card payment at a till (ECR flow, SD-034)."
-   },
-   "deviceId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "recordedAt": {
-    "type": "string",
-    "format": "date-time"
-   }
-  }
- },
- "CreateRefundRequest": {
-  "type": "object",
-  "required": [
-   "id",
-   "amount",
-   "reason",
-   "recordedAt"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid",
-    "description": "Client-generated UUIDv7 of the refund, and its idempotency key — it must equal the `Idempotency-Key` header."
-   },
-   "lineIds": {
-    "type": "array",
-    "items": {
-     "type": "string",
-     "format": "uuid"
-    },
-    "description": "Omit to refund the whole order."
-   },
-   "amount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "reason": {
-    "type": "string",
-    "minLength": 3,
-    "maxLength": 500
-   },
-   "secondaryAuthorisation": {
-    "type": "object",
-    "description": "Required above the venue's `requiresSecondUserAbove`. A second user — cashier or supervisor — names themselves. This is dual-authorisation, not escalation.\n",
-    "required": [
-     "principalId",
-     "credential"
-    ],
-    "properties": {
-     "principalId": {
-      "type": "string",
-      "format": "uuid"
-     },
-     "credential": {
-      "type": "string",
-      "maxLength": 512,
-      "description": "The second person's staff PIN, as they sign in at a till with it. **A PIN, never a password** (decided 28 September, audit R123 (7))."
-     }
-    }
-   },
-   "refundToOriginalTender": {
-    "type": "boolean",
-    "default": true
-   },
-   "alternateTender": {
-    "$ref": "#/components/schemas/TenderKind"
-   },
-   "recordedAt": {
-    "type": "string",
-    "format": "date-time"
-   }
-  }
- },
  "DenyReason": {
   "type": "string",
   "description": "Enumerated so the client can render an appropriate operator prompt. A gate operator facing a queue needs a reason and a next action, not a boolean.\n",
@@ -1081,49 +764,6 @@
    "crossover"
   ]
  },
- "ExchangeOrderRequest": {
-  "type": "object",
-  "required": [
-   "id",
-   "outgoingLineIds",
-   "incomingLines",
-   "recordedAt"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid",
-    "description": "Client-generated UUIDv7 of this exchange, and its idempotency key — it must equal the `Idempotency-Key` header."
-   },
-   "outgoingLineIds": {
-    "type": "array",
-    "minItems": 1,
-    "items": {
-     "type": "string",
-     "format": "uuid"
-    }
-   },
-   "incomingLines": {
-    "type": "array",
-    "minItems": 1,
-    "items": {
-     "$ref": "#/components/schemas/CreateOrderLine"
-    }
-   },
-   "waiveFee": {
-    "type": "boolean",
-    "default": false
-   },
-   "reason": {
-    "type": "string",
-    "maxLength": 500
-   },
-   "recordedAt": {
-    "type": "string",
-    "format": "date-time"
-   }
-  }
- },
  "ExchangeRateDecimal": {
   "type": "string",
   "x-ticvai-persistence-kind": "valueObject",
@@ -1131,54 +771,36 @@
   "description": "**An exchange rate: a decimal string, never a float**, for the reason `Money.amount` is one — a JavaScript client must not round a rate in transit. **Six decimal places**, the precision `finance.FxRate.rate` asks for, and stored at that precision.\n",
   "pattern": "^\\d+(\\.\\d{1,6})?$"
  },
- "ManualDiscountRequest": {
+ "GeneratedQuery": {
+  "x-ticvai-persistence": "none — embedded; stored whole in `reporting.natural_language_query`",
   "type": "object",
-  "x-ticvai-persistence": "none — request only",
-  "required": [
-   "id",
-   "reason",
-   "recordedAt"
-  ],
+  "description": "The structured query a natural-language question produced — data source, columns, filters, grouping. Named on 26 September so the answer and the kept copy are one shape.\n",
   "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid",
-    "description": "Client-generated UUIDv7 of this discount, and its idempotency key — it must equal the `Idempotency-Key` header."
+   "dataSource": {
+    "$ref": "#/components/schemas/DataSource"
    },
-   "lineId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "Omit to discount the order rather than a line."
+   "columns": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/ReportColumn"
+    }
    },
-   "amount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   "filters": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/ReportFilter"
+    }
    },
-   "percentage": {
-    "type": "number",
-    "minimum": 0,
-    "maximum": 100
+   "groupBy": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
    },
-   "reason": {
-    "type": "string",
-    "minLength": 3,
-    "maxLength": 300,
-    "description": "Required, and free text rather than a code list. A cashier forced to pick the nearest reason picks the first one, and the register stops meaning anything.\n"
-   },
-   "reasonCode": {
+   "compiledSql": {
     "type": "string",
     "nullable": true,
-    "description": "Optional alongside the free text, where the venue maintains a list."
-   },
-   "approverPrincipalId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "Required above the venue threshold. May not be the requester."
-   },
-   "recordedAt": {
-    "type": "string",
-    "format": "date-time"
+    "description": "The SQL the semantic spec compiled to, exactly as run on the analytical replica (29 September, design 5.7). The replica's row-level security applies beneath it, so it does not need to carry the caller's scope. Null on queries kept before the semantic compile.\n"
    }
   }
  },
@@ -1194,71 +816,95 @@
    "archive"
   ]
  },
- "ModifyOrderRequest": {
-  "type": "object",
-  "required": [
-   "id",
-   "recordedAt"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid",
-    "description": "Client-generated UUIDv7 **of this modification, not of the order** — the order is the path's `orderId`. It is the modification's idempotency key and must equal the `Idempotency-Key` header.\n"
-   },
-   "addLines": {
-    "type": "array",
-    "items": {
-     "$ref": "#/components/schemas/CreateOrderLine"
-    }
-   },
-   "removeLineIds": {
-    "type": "array",
-    "items": {
-     "type": "string",
-     "format": "uuid"
-    }
-   },
-   "reason": {
-    "type": "string",
-    "maxLength": 500
-   },
-   "recordedAt": {
-    "type": "string",
-    "format": "date-time"
-   }
-  }
- },
  "ModuleKey": {
   "$ref": "../shared/common.yaml#/components/schemas/ModuleKey"
  },
- "OfflineOrder": {
-  "x-ticvai-persistence": "none — client-side journal, not server storage",
-  "allOf": [
-   {
-    "$ref": "#/components/schemas/CreateOrderRequest"
+ "NaturalLanguageAnswer": {
+  "x-ticvai-persistence": "none — computed",
+  "type": "object",
+  "required": [
+   "conversationId",
+   "question",
+   "interpretation",
+   "result",
+   "reliability"
+  ],
+  "properties": {
+   "conversationId": {
+    "type": "string"
    },
-   {
-    "type": "object",
-    "required": [
-     "sequence",
-     "payments"
-    ],
-    "properties": {
-     "sequence": {
-      "type": "integer",
-      "minimum": 1,
-      "description": "Monotonic per device. Processed in this order."
-     },
-     "payments": {
-      "type": "array",
-      "items": {
-       "$ref": "#/components/schemas/CreatePaymentRequest"
-      }
+   "question": {
+    "type": "string"
+   },
+   "interpretation": {
+    "type": "string",
+    "description": "What the question was understood to mean, in plain language. When the question is outside the semantic model, the \"not available yet\" sentence."
+   },
+   "semanticSpec": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/ReportingSemanticQuerySpec"
      }
+    ],
+    "nullable": true,
+    "description": "What the model returned instead of SQL (design 2.2 E, 5.7): metric, dimensions, filters, period, comparison, as validated against the semantic model. Null when the question is outside it. **Also kept**, on `NaturalLanguageQuery`, so a follow-up edits it.\n"
+   },
+   "generatedQuery": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/GeneratedQuery"
+     }
+    ],
+    "nullable": true,
+    "description": "The query the spec compiled to: data source, columns, filters, grouping, and the compiled SQL in `compiledSql`. Returned so the answer can be checked. An answer nobody can verify is worse than no answer. **Also kept, as `NaturalLanguageQuery`**, for `saveNaturalLanguageQuery`. Null when the question is outside the semantic model.\n"
+   },
+   "result": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/ReportResult"
+     }
+    ],
+    "nullable": true,
+    "description": "Null when the question is outside the semantic model."
+   },
+   "dataAsOf": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "Replica position the answer was read at, the result's `dataAsOf`, stated beside the answer so a figure that moved is not argued about. Null when nothing was run."
+   },
+   "reliability": {
+    "$ref": "#/components/schemas/ReportingAnswerReliability"
+   },
+   "unavailableReason": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/ReportingUnavailableReason"
+     }
+    ],
+    "nullable": true,
+    "description": "Set only when `reliability` is `insufficientEvidence` because the question is outside the semantic model (\"not available yet\"); names which part is not modelled."
+   },
+   "confidence": {
+    "type": "number",
+    "minimum": 0,
+    "maximum": 1,
+    "deprecated": true,
+    "description": "Superseded by `reliability` on 29 September (design 5.6, never a bare percentage for analytics). Returned for one release, then removed."
+   },
+   "suggestedFollowUps": {
+    "type": "array",
+    "items": {
+     "type": "string"
     }
+   },
+   "modelVersion": {
+    "type": "string"
+   },
+   "tokensUsed": {
+    "type": "integer"
    }
-  ]
+  }
  },
  "OfflinePackage": {
   "x-ticvai-persistence": "none — generated artefact in object storage",
@@ -1580,6 +1226,46 @@
    "refundedAmount": {
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
+   "chargeCurrency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**The currency the guest selected and is charged in** (CHG-FIN-001, 2 October 2026). Null or equal to `currency` for a sale in the base currency. Everything else on the order, and every ledger posting, stays in the base currency `currency`."
+   },
+   "chargeFxRate": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/ExchangeRateDecimal"
+     }
+    ],
+    "nullable": true,
+    "readOnly": true,
+    "description": "Units of `chargeCurrency` per one unit of the base currency, from the region's `tender` rate in force at checkout (`finance.FxRate`), stored on the order so the payment, the receipt, the tax invoice and any refund use the same rate (CHG-FIN-001)."
+   },
+   "chargeFxRateId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The `finance.FxRate` row the rate was taken from, for audit."
+   },
+   "chargeTotal": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "readOnly": true,
+    "description": "`grossAmount` converted at `chargeFxRate` and rounded to the charge currency's scale: what the guest pays and what the payment request to the provider asks for (CHG-FIN-001)."
+   },
+   "chargeRateLockedUntil": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The quote holds until then (the cart lease). After it, the next payment attempt re-quotes at the rate then in force and the guest confirms the new amount (CHG-FIN-001)."
+   },
    "droppedPromotions": {
     "type": "array",
     "readOnly": true,
@@ -1688,60 +1374,6 @@
    "backOffice"
   ]
  },
- "OrderExchangeResult": {
-  "x-ticvai-persistence": "none — computed",
-  "type": "object",
-  "required": [
-   "orderId",
-   "outgoingValue",
-   "incomingValue",
-   "difference"
-  ],
-  "properties": {
-   "orderId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "outgoingValue": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "incomingValue": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "exchangeFee": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "difference": {
-    "allOf": [
-     {
-      "$ref": "../shared/common.yaml#/components/schemas/Money"
-     }
-    ],
-    "description": "Only the difference settles. The replacement is held before the original is released, never the other way round.\n"
-   },
-   "newLineIds": {
-    "type": "array",
-    "items": {
-     "type": "string",
-     "format": "uuid"
-    }
-   },
-   "revokedEntitlementIds": {
-    "type": "array",
-    "items": {
-     "type": "string",
-     "format": "uuid"
-    }
-   },
-   "issuedEntitlementIds": {
-    "type": "array",
-    "items": {
-     "type": "string",
-     "format": "uuid"
-    }
-   }
-  }
- },
  "OrderLine": {
   "x-ticvai-persistence": "orders.order_line + orders.order_line_eligibility + orders.order_line_discount",
   "x-ticvai-retired-columns": [
@@ -1826,101 +1458,6 @@
     }
    }
   ]
- },
- "OrderModificationResult": {
-  "x-ticvai-persistence": "none — computed",
-  "type": "object",
-  "required": [
-   "order",
-   "balanceDue"
-  ],
-  "properties": {
-   "order": {
-    "$ref": "#/components/schemas/Order"
-   },
-   "addedValue": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "removedValue": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "balanceDue": {
-    "allOf": [
-     {
-      "$ref": "../shared/common.yaml#/components/schemas/Money"
-     }
-    ],
-    "description": "Positive means the guest pays; negative means a refund is due."
-   },
-   "refundId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "revokedEntitlementIds": {
-    "type": "array",
-    "items": {
-     "type": "string",
-     "format": "uuid"
-    }
-   },
-   "issuedEntitlementIds": {
-    "type": "array",
-    "items": {
-     "type": "string",
-     "format": "uuid"
-    }
-   }
-  }
- },
- "OrderResumeResult": {
-  "type": "object",
-  "x-ticvai-persistence": "none — computed",
-  "required": [
-   "order",
-   "hasChanged"
-  ],
-  "properties": {
-   "order": {
-    "$ref": "#/components/schemas/Order"
-   },
-   "hasChanged": {
-    "type": "boolean",
-    "description": "True where anything moved while the sale was parked. The cashier decides — silently charging the old price loses money, silently charging the new one loses the guest.\n"
-   },
-   "changes": {
-    "type": "array",
-    "items": {
-     "type": "object",
-     "properties": {
-      "kind": {
-       "type": "string",
-       "enum": [
-        "priceChanged",
-        "promotionExpired",
-        "promotionNowApplies",
-        "soldOut",
-        "seatHoldExpired",
-        "productWithdrawn"
-       ]
-      },
-      "lineId": {
-       "type": "string",
-       "format": "uuid"
-      },
-      "detail": {
-       "type": "string"
-      },
-      "wasAmount": {
-       "$ref": "../shared/common.yaml#/components/schemas/Money"
-      },
-      "nowAmount": {
-       "$ref": "../shared/common.yaml#/components/schemas/Money"
-      }
-     }
-    }
-   }
-  }
  },
  "OrderStatement": {
   "x-ticvai-persistence": "none — computed from order, payment, refund and ledger",
@@ -2093,79 +1630,6 @@
    }
   }
  },
- "OrderSyncResult": {
-  "x-ticvai-persistence": "none — computed",
-  "type": "object",
-  "required": [
-   "accepted",
-   "results"
-  ],
-  "properties": {
-   "accepted": {
-    "type": "integer"
-   },
-   "stoppedAtSequence": {
-    "type": "integer",
-    "nullable": true,
-    "description": "First entry that hit a **transient** failure (SD-028, 29 September): a refusal on the merits no longer stops the batch. Null when every entry was accepted, duplicate or quarantined. The client retries from here and never past it.\n"
-   },
-   "results": {
-    "type": "array",
-    "items": {
-     "type": "object",
-     "required": [
-      "id",
-      "sequence",
-      "status"
-     ],
-     "properties": {
-      "id": {
-       "type": "string",
-       "format": "uuid",
-       "description": "The `OfflineOrder.id` this result is about."
-      },
-      "sequence": {
-       "type": "integer"
-      },
-      "status": {
-       "type": "string",
-       "enum": [
-        "accepted",
-        "duplicate",
-        "rejected",
-        "blockedByRejection"
-       ],
-       "description": "`rejected`: refused on its merits and quarantined in `sync.rejection`; the batch continues. `blockedByRejection`: depends on a rejected entry for the same order (a void, a refund, a later payment) and is quarantined with it (SD-028, 29 September)."
-      },
-      "orderNumber": {
-       "type": "string",
-       "nullable": true
-      },
-      "priceVariance": {
-       "allOf": [
-        {
-         "$ref": "../shared/common.yaml#/components/schemas/Money"
-        }
-       ],
-       "description": "Posted to the variance account. Not surfaced to the cashier."
-      },
-      "varianceExceedsThreshold": {
-       "type": "boolean",
-       "description": "True when review is required per the venue's variance threshold."
-      },
-      "rejectionId": {
-       "type": "string",
-       "nullable": true,
-       "description": "For a `rejected` or `blockedByRejection` entry, the `sync.rejection` row it was quarantined into (SD-028). The batch carried on past it."
-      },
-      "error": {
-       "$ref": "../shared/common.yaml#/components/schemas/Problem"
-      }
-     }
-    }
-   }
-  }
- },
  "Page": {
   "type": "object",
   "required": [
@@ -2244,7 +1708,7 @@
     "type": "string",
     "pattern": "^[A-Z]{3}$",
     "nullable": true,
-    "description": "4.6.11 is deliberately asymmetric: **accept foreign currency, refund in local.** A till giving change in five currencies needs five floats and five counts, and the variance becomes unattributable.\n"
+    "description": "4.6.11 is deliberately asymmetric: **accept foreign currency, refund in local.** A till giving change in five currencies needs five floats and five counts, and the variance becomes unattributable.\n**Cash at a till only** (CHG-FIN-001, 2 October 2026). A card or wallet payment the guest made in a currency they selected is refunded in that currency (`Refund.tenderCurrency`).\n"
    },
    "amount": {
     "$ref": "../shared/common.yaml#/components/schemas/Money"
@@ -2498,7 +1962,7 @@
      "storeCredit"
     ],
     "default": "originalTender",
-    "description": "BL-086. **A refund could only go back the way it came.** A guest whose card has expired, a partner settling by wire, a guest who would rather have the credit — three real cases with one answer.\n**`originalTender` stays the default** because refunding elsewhere is how money laundering works, and anything else needs a reason.\n"
+    "description": "BL-086. **A refund could only go back the way it came.** A guest whose card has expired, a partner settling by wire, a guest who would rather have the credit — three real cases with one answer.\n**`originalTender` stays the default** because refunding elsewhere is how money laundering works, and anything else needs a reason.\n\n**`storeCredit` is a gift card issued for the refund amount** (decided 2 October 2026, Chinmay, batch 1, POS-011; DEC-061; CHG-CSP-037; DI-796), never a voucher or a wallet top-up.\n"
    },
    "fxVariance": {
     "allOf": [
@@ -2507,6 +1971,22 @@
      }
     ],
     "description": "Where the sale rate and the current rate differ, **the difference is booked as an FX variance rather than hidden in the refund**. `runFxRevaluation` already handles this class of movement and this is the same act at a smaller scale.\n"
+   },
+   "tenderCurrency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**A refund goes back in the currency the guest paid** (decided 2 October 2026, Chinmay; CHG-FIN-001). For a card or wallet payment taken in a guest-selected currency, the refund request to the provider is in that currency, and `tenderAmount` is the refunded share of the original `Payment.tenderAmount` at the sale rate (`fxRate`), so a full refund returns exactly what was charged. `amount` stays in base currency for the ledger. Null for a refund in the base currency. Foreign cash refunded at a till is paid in base currency (DI-282)."
+   },
+   "tenderAmount": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "readOnly": true,
+    "description": "The refund in `tenderCurrency`, at that currency's own scale (CHG-FIN-001)."
    },
    "amount": {
     "$ref": "../shared/common.yaml#/components/schemas/Money"
@@ -2562,6 +2042,165 @@
     "nullable": true
    }
   }
+ },
+ "ReportResult": {
+  "x-ticvai-persistence": "none — result set, cached in object storage",
+  "type": "object",
+  "required": [
+   "executionId",
+   "columns",
+   "rows"
+  ],
+  "properties": {
+   "executionId": {
+    "type": "string"
+   },
+   "columns": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "key": {
+       "type": "string"
+      },
+      "label": {
+       "type": "string"
+      },
+      "type": {
+       "$ref": "#/components/schemas/FieldType"
+      }
+     }
+    }
+   },
+   "rows": {
+    "type": "array",
+    "description": "**Open on purpose; the shape is `columns`.** Each row is keyed by `columns[].key`, and each value is of that column's `type` — money as a `Money`, dates, date-times and uuids as strings. A report's columns are chosen at run time, so no fixed schema can name them.\n",
+    "items": {
+     "type": "object",
+     "additionalProperties": true
+    }
+   },
+   "totals": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "Aggregated columns only, keyed and typed as a row is."
+   },
+   "rowCount": {
+    "type": "integer"
+   },
+   "nextCursor": {
+    "type": "string",
+    "nullable": true
+   },
+   "generatedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "dataAsOf": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Replica position the result was read at. Reporting reads a lag-tolerant replica, so this may trail the primary by seconds — stating it prevents an argument about a figure that moved.\n"
+   }
+  }
+ },
+ "ReportingAnswerReliability": {
+  "type": "string",
+  "description": "**How far an analytics answer can be relied on** (decided 29 September, AI system design 5.6): a category, never a bare percentage. `grounded`: every figure comes from a result of the compiled spec. `partial`: part of the question was answered and the rest was not modelled. `conflictingSources`: the result and a cited source disagree. `insufficientEvidence`: the question could not be answered, including \"not available yet\" outside the semantic model. The same four values as `ai.yaml`'s assistant answers.\n",
+  "enum": [
+   "grounded",
+   "partial",
+   "conflictingSources",
+   "insufficientEvidence"
+  ]
+ },
+ "ReportingSemanticQuerySpec": {
+  "x-ticvai-persistence": "none — embedded; stored whole in `reporting.natural_language_query`",
+  "type": "object",
+  "description": "**A question in the semantic model's own vocabulary** (decided 29 September, AI system design 2.2 E and 5.7). What the model returns for a live-number question instead of SQL, and what `runSemanticQuery` takes. Every code is a `SemanticModel` field code or a KPI code; Reporting validates the spec against the published model and compiles it deterministically, so the same spec compiles to the same SQL for the same model version.\n",
+  "required": [
+   "metric",
+   "period"
+  ],
+  "properties": {
+   "metric": {
+    "type": "string",
+    "description": "A measure field code in the `SemanticModel`, or a `KpiDefinition.code`. The governed definition the dashboards use, so the number matches them."
+   },
+   "dimensions": {
+    "type": "array",
+    "maxItems": 5,
+    "description": "Field codes to group by. Each must be reachable from the metric's dataset through a relationship the semantic model declares.",
+    "items": {
+     "type": "string"
+    }
+   },
+   "filters": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "field",
+      "operator"
+     ],
+     "properties": {
+      "field": {
+       "type": "string",
+       "description": "A `SemanticModel` field code."
+      },
+      "operator": {
+       "type": "string",
+       "enum": [
+        "equals",
+        "notEquals",
+        "greaterThan",
+        "lessThan",
+        "between",
+        "in",
+        "notIn",
+        "isNull",
+        "isNotNull"
+       ]
+      },
+      "values": {
+       "type": "array",
+       "description": "**Open on purpose; typed by the field.** One value for the comparison operators, exactly two (from, to) for `between`, any number for `in` and `notIn`, none for `isNull` and `isNotNull`.\n",
+       "items": {}
+      }
+     }
+    }
+   },
+   "period": {
+    "type": "string",
+    "description": "ISO 8601 interval in the venue's time zone, e.g. `2026-09-21/2026-09-27`, the form `explainMetricChange` takes."
+   },
+   "comparison": {
+    "type": "string",
+    "nullable": true,
+    "description": "As `getKpiValues` `compareTo`. With one, each row carries the metric for the comparison beside the current value.",
+    "enum": [
+     "previousPeriod",
+     "samePeriodLastYear",
+     "target",
+     "benchmark"
+    ]
+   },
+   "semanticModelVersion": {
+    "type": "integer",
+    "readOnly": true,
+    "description": "The `SemanticModel.version` the spec was validated and compiled against. Set by Reporting."
+   }
+  }
+ },
+ "ReportingUnavailableReason": {
+  "type": "string",
+  "description": "Which part of a question is outside the semantic model, so the answer is \"not available yet\" (design 5.7). A metric or field the caller may not see is reported as not modelled, so the reason does not reveal that it exists.",
+  "enum": [
+   "metricNotModelled",
+   "dimensionNotModelled",
+   "filterNotModelled",
+   "comparisonNotAvailable",
+   "periodOutsideHistory"
+  ]
  },
  "RotaAssignment": {
   "type": "object",
@@ -2864,243 +2503,6 @@
    }
   }
  },
- "Shift": {
-  "x-ticvai-persistence": "orders.pos_shift + orders.pos_shift_approval + orders.pos_shift_incident",
-  "description": "**`approvals` and `incidents` are child rows** (26 September, pull audit R099): `orders.pos_shift_approval` and `orders.pos_shift_incident`, one row per item, keyed to the shift. Until then the contract carried both and `orders.pos_shift` had nowhere to put either.\n",
-  "type": "object",
-  "required": [
-   "id",
-   "workstationId",
-   "venueId",
-   "scopePath",
-   "principalId",
-   "status",
-   "currency",
-   "currencyScale",
-   "openedAt"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid",
-    "description": "Client-generated UUIDv7. Also the idempotency key."
-   },
-   "workstationId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "venueId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "scopePath": {
-    "type": "string"
-   },
-   "principalId": {
-    "type": "string",
-    "format": "uuid",
-    "description": "Who opened it. Cash reconciles to a person and a drawer."
-   },
-   "principalDisplayName": {
-    "type": "string"
-   },
-   "incidents": {
-    "type": "array",
-    "description": "BL-097. **A till has exceptions and there was nowhere to write them** — a no-sale, a drawer opened without a transaction, a manager override, a guest dispute.\n**This is the log a cash-up investigation starts from**, and a shift that balances with four unexplained no-sales is not a shift that balanced.\n",
-    "items": {
-     "type": "object",
-     "properties": {
-      "kind": {
-       "type": "string",
-       "enum": [
-        "noSale",
-        "drawerOpen",
-        "override",
-        "voidAfterPayment",
-        "guestDispute",
-        "tillJam",
-        "priceQuery",
-        "other"
-       ]
-      },
-      "at": {
-       "type": "string",
-       "format": "date-time"
-      },
-      "principalId": {
-       "type": "string",
-       "format": "uuid"
-      },
-      "note": {
-       "type": "string",
-       "nullable": true
-      }
-     }
-    }
-   },
-   "status": {
-    "$ref": "#/components/schemas/ShiftStatus"
-   },
-   "currency": {
-    "type": "string",
-    "pattern": "^[A-Z]{3}$",
-    "x-ticvai-persisted": false,
-    "description": "**Resolved from the region, not stored** (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and cannot be anything else. **Kept on the wire , removed from the table** — a client should not walk a hierarchy to read a figure, and the  database should not hold nine million copies of AED. Four tables genuinely differ from their\n region and keep a stored currency: `orders.payment.tender_currency`, `inventory.supplier`, \n`ledger.account`, `control.partner_agreement`.\n"
-   },
-   "currencyScale": {
-    "type": "integer",
-    "minimum": 0,
-    "maximum": 4,
-    "x-ticvai-persisted": false,
-    "description": "**Resolved from the region, not stored** (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and cannot be anything else — storing it per ro w is a copy of a fact that cannot differ. **Kept on the wire, removed from the table**: a cl ient reading a figure should not walk a hierarchy to know what it means, and the database sh ould not hold nine million copies of AED. Four tables genuinely differ from their region and\n keep a stored currency — `orders.payment.tender_currency`, `inventory.supplier`, `ledger.ac\ncount`, `control.partner_agreement`. **A guest paying USD at an AED venue is a real row; a w orkstation with its own currency is a misconfiguration.**\n"
-   },
-   "depositBoxCode": {
-    "type": "string",
-    "nullable": true
-   },
-   "bagNumber": {
-    "type": "string",
-    "nullable": true
-   },
-   "openingFloat": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "salesTotal": {
-    "x-ticvai-column": "gross_sales_amount",
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "What the till took in sales, as the guest paid it — tax included."
-   },
-   "refundsTotal": {
-    "x-ticvai-column": "gross_refunded_amount",
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "What the till paid back, as the guest was refunded it — tax included."
-   },
-   "liftsTotal": {
-    "x-ticvai-column": "lifted_amount",
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Cash taken out mid-shift by lifts and withdrawals. Cash, so neither gross nor net."
-   },
-   "expectedCash": {
-    "x-ticvai-column": "expected_cash_amount",
-    "allOf": [
-     {
-      "$ref": "../shared/common.yaml#/components/schemas/Money"
-     }
-    ],
-    "readOnly": true,
-    "nullable": true,
-    "description": "26 September, pull audit R207. **The figure the blind count was measured against**, revealed once the count is in — null until then. Until this date only `ShiftCloseResult` carried it, returned once by `closeShift`, so BO-040 could not show the over/short it exists to accept.\n"
-   },
-   "countedCash": {
-    "x-ticvai-column": "counted_cash_amount",
-    "allOf": [
-     {
-      "$ref": "../shared/common.yaml#/components/schemas/Money"
-     }
-    ],
-    "readOnly": true,
-    "nullable": true,
-    "description": "What the close count found. Null until the shift is counted."
-   },
-   "variance": {
-    "x-ticvai-column": "variance_amount",
-    "allOf": [
-     {
-      "$ref": "../shared/common.yaml#/components/schemas/Money"
-     }
-    ],
-    "readOnly": true,
-    "nullable": true,
-    "description": "Counted minus expected, as `ShiftCloseResult.variance`. Negative is short."
-   },
-   "heldLeaseCount": {
-    "type": "integer",
-    "description": "Inventory leases currently held by this workstation. Surfaced so an operator closing a shift can see what will be returned.\n"
-   },
-   "openedAt": {
-    "type": "string",
-    "format": "date-time"
-   },
-   "recordedAt": {
-    "type": "string",
-    "format": "date-time",
-    "description": "When the device recorded the open. `openedAt` is the server's time."
-   },
-   "suspendedAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "suspendReason": {
-    "type": "string",
-    "maxLength": 200,
-    "nullable": true,
-    "description": "The `reason` given to `suspendShift`. Cleared on resume."
-   },
-   "closedAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "closedByPrincipalId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "Who submitted the close count. `reopenShift` refuses an approver who is this principal, and until 26 September there was nothing to compare against (pull audit R099).\n"
-   },
-   "syncedAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true,
-    "description": "Null while the shift has unsynced operations."
-   },
-   "approvals": {
-    "type": "array",
-    "items": {
-     "type": "object",
-     "required": [
-      "kind",
-      "principalId",
-      "at"
-     ],
-     "properties": {
-      "kind": {
-       "type": "string",
-       "enum": [
-        "open",
-        "close",
-        "variance"
-       ],
-       "description": "`open` from `approveShiftOpen`, `close` from `approveShiftClose`, `variance` from `acceptShiftVariance`.\n"
-      },
-      "principalId": {
-       "type": "string",
-       "format": "uuid"
-      },
-      "at": {
-       "type": "string",
-       "format": "date-time"
-      },
-      "reason": {
-       "type": "string"
-      }
-     }
-    }
-   }
-  }
- },
- "ShiftStatus": {
-  "type": "string",
-  "enum": [
-   "pendingApproval",
-   "open",
-   "suspended",
-   "pendingVariance",
-   "pendingClosure",
-   "closed",
-   "autoClosed"
-  ]
- },
  "ShiftSwap": {
   "type": "object",
   "x-ticvai-persistence": "workforce.shift_swap",
@@ -3230,21 +2632,6 @@
     "description": "The order, void or refund the resolution produced — what stops the entry being posted twice."
    }
   }
- },
- "TenderKind": {
-  "type": "string",
-  "description": "`wallet` is a **digital wallet** (Apple Pay, Google Pay and the like, taken through the gateway), the value the guest channels accept beside `card` (decided 28 September, audit R080 (a)). **The stored-value TICVAI wallet is a separate tender**: it is spent through `authoriseStoredValue` and `captureStoredValue` (`StoredValueKind` `wallet`), never as this value, so the client can see which of the two the decision meant.\n",
-  "enum": [
-   "cash",
-   "card",
-   "wallet",
-   "voucher",
-   "bankTransfer",
-   "hotelCharge",
-   "installment",
-   "giftCard",
-   "complimentary"
-  ]
  },
  "TicketStatus": {
   "x-ticvai-persistence": "none — computed from entitlement and scans",
@@ -3390,6 +2777,41 @@
     "type": "string",
     "description": "Human-readable, localised. For operator display, never for logic."
    },
+   "denyCause": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "attractionTemporarilyClosed",
+     "timeBoundWindowElapsed",
+     "offlineLimitExceeded"
+    ],
+    "description": "**The finer cause of three denials decided on 2 October 2026**, beside the r1 `denyReason` a client already switches on (a new `DenyReason` value would be a breaking change against r1; CHG-CSP-026, CHG-CSP-030, CHG-CSP-035). `attractionTemporarilyClosed` (DEC-228): `denyReason` `outsideAdmissionWindow`, with `reopensAt` and `queueReturnOffer`. `timeBoundWindowElapsed` (DEC-232): a time-bound entitlement scanned after its window from first scan, `denyReason` `expired`. `offlineLimitExceeded` (DEC-426): a reader offline longer than the venue's `AccessOfflinePolicy.maxOfflineDurationHours` refusing a tap it cannot check, `denyReason` `outsideAdmissionWindow`. Null for every other denial."
+   },
+   "reopensAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "When a temporarily closed attraction expects to reopen, where known (DEC-228; CHG-CSP-026)."
+   },
+   "queueReturnOffer": {
+    "type": "object",
+    "nullable": true,
+    "description": "A virtual-queue return window offered at a denied scan of a temporarily closed attraction, where the venue enables it (DEC-228; CHG-CSP-026). Taking it is `queue.joinQueue`.",
+    "properties": {
+     "queueId": {
+      "type": "string",
+      "format": "uuid"
+     },
+     "returnWindowStart": {
+      "type": "string",
+      "format": "date-time"
+     },
+     "returnWindowEnd": {
+      "type": "string",
+      "format": "date-time"
+     }
+    }
+   },
    "accessPointId": {
     "type": "string",
     "format": "uuid"
@@ -3437,17 +2859,5 @@
     }
    }
   }
- },
- "VoidReason": {
-  "type": "string",
-  "description": "**The void reason list** (decided 28 September, audit R125 (4)): the one list `voidOrder` takes, and the list `fnb.amendFnbOrder` and `fnb.cancelFnbOrder` point to. `other` requires a note (audit R222), and the notes are reviewed quarterly to add real reasons. Proposed, client to correct.\n",
-  "enum": [
-   "guestChangedMind",
-   "enteredInError",
-   "itemUnavailable",
-   "qualityIssue",
-   "duplicate",
-   "other"
-  ]
  }
 }

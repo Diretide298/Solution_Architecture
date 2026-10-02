@@ -71,6 +71,107 @@
    }
   }
  },
+ "OrdersUpgrade": {
+  "type": "object",
+  "x-ticvai-persistence": "orders.upgrade",
+  "description": "**Taken from the backend workbook, 20 September.** Stores the real post-purchase upgrade transaction, including original line, upgraded line and additional amount. Existing orders.payment should be reused to collect the upgrade amount.",
+  "required": [
+   "number",
+   "orderId",
+   "originalOrderLineId",
+   "originalAmount",
+   "newAmount",
+   "amount",
+   "status",
+   "createdAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "number": {
+    "type": "string",
+    "maxLength": 50
+   },
+   "orderId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "originalOrderLineId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "newOrderLineId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "ruleId": {
+    "x-ticvai-references": "orders.upgrade_rule",
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The `UpgradeRule` (`orders.upgrade_rule`) this upgrade ran under; null for a supervisor override outside any rule (DM5, 29 September)."
+   },
+   "originalAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "newAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "amount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "status": {
+    "type": "string",
+    "maxLength": 30
+   },
+   "requestedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "reason": {
+    "type": "string",
+    "maxLength": 500,
+    "nullable": true
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "completedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "cancelledAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ },
  "PersonTypeProductEntitlementConversionRulesView": {
   "type": "object",
   "x-ticvai-drafted-shape": true,

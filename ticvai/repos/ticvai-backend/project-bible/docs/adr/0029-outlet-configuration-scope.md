@@ -7,6 +7,26 @@
 
 ---
 
+## Extended 2 October 2026: the outlet settings decided on the open questions
+
+**Decided by Chinmay, 2 October 2026** (change entry CHG-DOC-010; each decision is in
+`docs/registers/decisions-2-october.md`). Each of these is a property or setting **of the outlet**, so it
+resolves at `outlet` (ADR-0018: nearest ancestor wins, outlet a sibling of department), and an operation on
+`/outlets/{outletId}/…` that sets it carries the `outlet` scope, which `check-config-scope` enforces.
+
+| Outlet setting | What it decides | Decision |
+|---|---|---|
+| **Payment timing** | *Pay first*, or *Send to kitchen first, then pay*. Amends audit R261 (send first, then charge, everywhere) into a per-outlet choice | DEC-064 |
+| **Inside the venue or standalone** | An outlet inside the venue sells to guests who hold an admission ticket; a standalone restaurant sells takeaway and delivery without one. Amends DI-292 for standalone outlets; the admission check itself stays in Access (ADR-0068) | DEC-070, DEC-206 |
+| **Outlet type and department** | Two fields on the outlet (DI-319) | DEC-196 |
+| **Till layout** | Set per outlet; a till may override it. The override is an assignment (`Workstation.saleBoard`), not a configuration level: ADR-0018's "below venue you assign, you do not configure" | DEC-183 |
+| **Producing outlet** | A commissary is an outlet that produces for others, and one kitchen outlet can produce for several outlets | DEC-186, DEC-188 |
+| **Default kitchen station** | An item with no station goes to the outlet's named default station, after item and category routing (DI-323) | DEC-189, DEC-190 |
+
+The contract fields and operations are the contracts' owners' to add; this ADR fixes where they resolve.
+
+---
+
 ## Context
 
 **Two client decisions point in opposite directions and no ADR arbitrated between them.**

@@ -1,10 +1,10 @@
 id: LLD-OrderService
-title: OrderService — 288 operations, 114 tables
+title: OrderService — 297 operations, 115 tables
 generatedBy: tools/derive-diagrams.py
 tier: commerce
 deployable: commerce
 index: diagrams/hld/02-services.yaml
-why: '**The transactional core.** 288 operations, 114 tables, and the highest write rate in the platform.
+why: '**The transactional core.** 297 operations, 115 tables, and the highest write rate in the platform.
   Separate because its scaling profile is unlike anything else — a Saturday evening is ten times a Tuesday
   morning.
 
@@ -28,14 +28,14 @@ why: '**The transactional core.** 288 operations, 114 tables, and the highest wr
 scale: Write-heavy, spiky, latency-critical. **The one that autoscales.**
 ifDown: '**Down means no sales.** Highest availability target in the platform.'
 coverage:
-  operations: 288
-  inAFlow: 142
-  percent: 49%
+  operations: 297
+  inAFlow: 139
+  percent: 47%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
 - schema: orders
-  tables: 81
+  tables: 82
   stores:
   - postgres
   largestTable: orders.upgrade_rule
@@ -46,7 +46,7 @@ schemas:
   largestTable: payments.payment_attempt
 operationsByContract:
 - contract: orders
-  count: 219
+  count: 221
   operations:
   - operation: abandonCart
     verb: DELETE
@@ -1296,6 +1296,14 @@ operationsByContract:
     offline: false
     reads: 5
     writes: 6
+  - operation: previewProductTickets
+    verb: GET
+    path: /products/{productId}/ticket-previews
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 0
+    writes: 0
   - operation: printTicketProof
     verb: POST
     path: /ticket-templates/{templateId}/proof
@@ -1720,6 +1728,14 @@ operationsByContract:
     offline: false
     reads: 4
     writes: 3
+  - operation: simulateRefund
+    verb: POST
+    path: /orders/{orderId}/refund-simulation
+    scope: venue
+    permission: ORDER_REFUND
+    offline: false
+    reads: 0
+    writes: 0
   - operation: splitOrder
     verb: POST
     path: /orders/{orderId}/split
@@ -1801,7 +1817,7 @@ operationsByContract:
     reads: 2
     writes: 3
 - contract: payments
-  count: 48
+  count: 49
   operations:
   - operation: createB2bCreditAccount
     verb: POST
@@ -1835,6 +1851,14 @@ operationsByContract:
     offline: false
     reads: 1
     writes: 1
+  - operation: getB2bPaymentTerms
+    verb: GET
+    path: /b2b-credit-accounts/{accountId}/terms
+    scope: tenant
+    permission: PAYMENT_VIEW
+    offline: false
+    reads: 1
+    writes: 0
   - operation: getDunningPolicy
     verb: GET
     path: /dunning-policy
@@ -2188,7 +2212,7 @@ operationsByContract:
     reads: 1
     writes: 1
 - contract: shift
-  count: 21
+  count: 27
   operations:
   - operation: acceptShiftVariance
     verb: POST
@@ -2270,6 +2294,30 @@ operationsByContract:
     offline: true
     reads: 3
     writes: 0
+  - operation: getShiftCountLines
+    verb: GET
+    path: /shifts/{shiftId}/count-lines
+    scope: venue
+    permission: REPORT_VIEW_WORKSTATION
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: getTillShiftPolicy
+    verb: GET
+    path: /venues/{venueId}/till-shift-policy
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: true
+    reads: 1
+    writes: 0
+  - operation: getWorkstationShift
+    verb: GET
+    path: /shifts/current/overview
+    scope: workstation
+    permission: REPORT_VIEW_WORKSTATION
+    offline: true
+    reads: 3
+    writes: 0
   - operation: listCashMovements
     verb: GET
     path: /shifts/{shiftId}/cash-movements
@@ -2318,6 +2366,14 @@ operationsByContract:
     offline: true
     reads: 2
     writes: 2
+  - operation: rejectShiftVariance
+    verb: POST
+    path: /shifts/{shiftId}/reject-variance
+    scope: venue
+    permission: OVERSHORT_ACCEPT
+    offline: false
+    reads: 3
+    writes: 0
   - operation: reopenShift
     verb: POST
     path: /shifts/{shiftId}/reopen
@@ -2342,6 +2398,22 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 2
+  - operation: setTillShiftPolicy
+    verb: PUT
+    path: /venues/{venueId}/till-shift-policy
+    scope: venue
+    permission: WORKSTATION_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: submitShiftCount
+    verb: POST
+    path: /shifts/{shiftId}/count
+    scope: workstation
+    permission: SHIFT_CLOSE
+    offline: false
+    reads: 9
+    writes: 4
   - operation: suspendShift
     verb: POST
     path: /shifts/{shiftId}/suspend
@@ -2468,6 +2540,7 @@ tables:
   - simulatePaymentRouting
   - splitOrder
   - storePaymentToken
+  - submitShiftCount
   - suspendShift
   - testPaymentProviderConnection
   - transferOrderTickets
@@ -2571,6 +2644,7 @@ tables:
   - simulatePaymentRouting
   - splitOrder
   - storePaymentToken
+  - submitShiftCount
   - suspendShift
   - testPaymentProviderConnection
   - transferOrderTickets
@@ -2975,7 +3049,7 @@ tables:
   writtenBy: []
   foreignWriters: null
 - table: orders.pos_shift
-  columns: 24
+  columns: 30
   store: postgres
   parent: null
   writtenBy:
@@ -2994,7 +3068,7 @@ tables:
   writtenBy: []
   foreignWriters: null
 - table: orders.refund
-  columns: 18
+  columns: 20
   store: postgres
   parent: null
   writtenBy:
@@ -3092,7 +3166,7 @@ tables:
   - orders
   foreignWriters: null
 - table: orders.sales_order
-  columns: 20
+  columns: 25
   store: postgres
   parent: null
   writtenBy:
@@ -3145,6 +3219,13 @@ tables:
   parent: null
   writtenBy:
   - orders
+  foreignWriters: null
+- table: orders.till_shift_policy
+  columns: 11
+  store: postgres
+  parent: null
+  writtenBy:
+  - shift
   foreignWriters: null
 - table: orders.upgrade
   columns: 15
@@ -3414,11 +3495,11 @@ readsFrom:
 - service: IdentityService
   operations: 22
 - service: LedgerService
-  operations: 15
+  operations: 16
 - service: MarketingService
   operations: 11
 - service: TenancyService
-  operations: 8
+  operations: 9
 - service: CrossRegionService
   operations: 3
 - service: WalletService
@@ -3507,7 +3588,7 @@ writesOutside:
     tables:
     - platform.outbox
 - service: LedgerService
-  operations: 11
+  operations: 12
   rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
     published.'
   why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
@@ -3553,6 +3634,9 @@ writesOutside:
   - operation: respondToChargeback
     tables:
     - ledger.posting
+  - operation: submitShiftCount
+    tables:
+    - ledger.journal_entry
   - operation: syncOrders
     tables:
     - ledger.price_variance
@@ -3698,10 +3782,12 @@ screens:
 - P01:WEB-013 Booking Confirmation
 - P01:WEB-014 Pay for a Booking
 - P01:WEB-016 Login / Register
+- P01:WEB-017 My Account Dashboard
 - P01:WEB-018 My Tickets
 - P01:WEB-019 Order History
 - P01:WEB-021 Wallet & Gift Cards
 - P01:WEB-023 Membership Management
+- P01:WEB-026 Survey & Feedback
 - P01:WEB-030 Ticket Transfer
 - P01:WEB-031 My Reservations
 - P01:WEB-033 Shop
@@ -3727,12 +3813,12 @@ screens:
 - P02:GST-027 Parking – Reserve & Pay
 - P02:GST-028 Parking – Reservation Confirmed
 - P02:GST-032 AI Concierge – Chat
+- P02:GST-035 Feedback & Ratings
 - P02:GST-041 Checkout Entry
 - P02:GST-045 Ticket Delivery & Sharing
 - P02:GST-048 Upsell / Cross-Sell
 - P02:GST-050 Resource Booking – Cabana
 - P02:GST-053 Your Plan
-- P02:GST-055 Dynamic QR Ticket
 - P02:GST-056 Bundle Package
 - P02:GST-067 Refunds & Resale
 - P02:GST-070 Reserve a Table
@@ -3764,6 +3850,8 @@ screens:
 - P04:POS-023 Sell — Merchandise
 - P04:POS-025 Till Home
 - P04:POS-026 Receipt & Reprint
+- P04:POS-030 Sales Journal
+- P04:POS-031 Reservations & Group Arrivals
 - P05:KSK-005 Choose a performance
 - P05:KSK-006 Review
 - P05:KSK-007 Payment
@@ -3778,15 +3866,126 @@ screens:
 - P06:EMP-009 End shift
 - P06:EMP-014 Ticket lookup
 - P06:EMP-017 Sync & reconciliation
-- P06:EMP-022 My rota
 - P06:EMP-034 Walk-up sale
 - P06:EMP-035 Payment on device
 - P06:EMP-036 Issue media
 - P06:EMP-057 Guest Profile & Dining History
 - P06:EMP-059 Table Order, Bill & Payment Management
-- P07:SCN-001 Sign in
+- P06:EMP-099 Deposit Release, Capture & Customer Confirmation
 - P07:SCN-014 Sync & reconciliation
-- P08:BO-004 Manual Wait Time Entry
+- P08:ADM-278 Resale Marketplace Command Center
+- P08:ADM-279 Resale Eligibility Rule Configuration
+- P08:ADM-280 Resale Policy & Marketplace Settings
+- P08:ADM-281 Listing Creation & Seller Configuration
+- P08:ADM-282 Resale Pricing & Price Guardrails
+- P08:ADM-283 Resale Fees, Commission & Seller Proceeds
+- P08:ADM-284 Listing Approval & Moderation
+- P08:ADM-285 Resale Inventory & Availability Management
+- P08:ADM-286 Listing Lifecycle, Expiry & Cancellation
+- P08:ADM-287 AI Resale Configuration & Marketplace Recommendations
+- P08:ADM-288 Resale Operations Command Center
+- P08:ADM-289 Buyer Purchase & Resale Order Management
+- P08:ADM-290 Ticket Ownership Transfer Management
+- P08:ADM-291 Credential Revocation & Regeneration
+- P08:ADM-292 Resale Fraud & Duplicate Sale Protection
+- P08:ADM-293 Capacity & Inventory Reconciliation
+- P08:ADM-294 Seller Settlement & Payout Management
+- P08:ADM-295 Refunds, Disputes & Resale Exceptions
+- P08:ADM-296 Resale Audit & Ownership History
+- P08:ADM-297 Resale Analytics & AI Intelligence
+- P08:ADM-298 My Tickets & Resale Marketplace Entry
+- P08:ADM-299 Resale Eligibility & Ticket Selection
+- P08:ADM-300 Create Listing & Resale Price Selection
+- P08:ADM-301 Fees, Seller Proceeds & Listing Confirmation
+- P08:ADM-302 My Resale Listings & Seller Dashboard
+- P08:ADM-303 Official Resale Marketplace & Buyer Discovery
+- P08:ADM-304 Resale Ticket Detail, Seat Selection & Primary-vs-Resale Experience
+- P08:ADM-305 Buyer Checkout, Inventory Hold & Secure Payment
+- P08:ADM-306 Resale Confirmation, Ownership Transfer & Ticket Delivery
+- P08:ADM-307 White-Label Marketplace Deployment & Experience Architecture
+- P08:ADM-308 Upgrade & Conversion Command Center
+- P08:ADM-309 Upgrade & Conversion Path Builder
+- P08:ADM-310 Upgrade Eligibility & Qualification Rules
+- P08:ADM-311 Upgrade Timing, Usage & Ticket Status Rules
+- P08:ADM-312 Upgrade Financial Treatment & Price Difference Rules
+- P08:ADM-313 Pro-Rata, Residual Value & Entitlement Credit Configuration
+- P08:ADM-314 Person-Type, Product & Entitlement Conversion Rules
+- P08:ADM-315 Bulk, Group & Assisted Upgrade Operations
+- P08:ADM-316 Upgrade Execution, Credential Regeneration & Channel Controls
+- P08:ADM-317 Upgrade History, Exception Management & Audit Explorer
+- P08:ADM-559 Payment Command Center
+- P08:ADM-560 Payment Method Catalogue
+- P08:ADM-561 Payment Method Configuration
+- P08:ADM-562 Channel & Touchpoint Payment Configuration
+- P08:ADM-563 Venue, Location & Business Unit Payment Assignment
+- P08:ADM-564 Currency & Payment Currency Configuration
+- P08:ADM-565 Payment Eligibility & Availability Rule Builder
+- P08:ADM-566 Payment Fees, Surcharges & Commercial Rules
+- P08:ADM-567 Payment Policy, Governance & Approval Manager
+- P08:ADM-568 Payment Configuration Simulator & Validation Center
+- P08:ADM-569 Payment Orchestration Command Center
+- P08:ADM-570 Gateway, PSP & Acquirer Directory
+- P08:ADM-571 Provider Connection & Adapter Configuration
+- P08:ADM-572 Gateway Capability & Payment Method Mapping
+- P08:ADM-573 Payment Routing Rule Builder
+- P08:ADM-574 Routing Strategy, Priority & Load Distribution
+- P08:ADM-575 Failover, Retry & Resilience Manager
+- P08:ADM-576 Provider Health, SLA & Performance Monitor
+- P08:ADM-577 Provider Cost, Commercial & Routing Economics
+- P08:ADM-578 Payment Routing Simulator, Decision Trace & AI Advisor
+- P08:ADM-579 Terminal & Card-Present Command Center
+- P08:ADM-580 Payment Terminal & Device Inventory
+- P08:ADM-581 Terminal Provisioning & Device Configuration
+- P08:ADM-583 EMV & Card-Present Processing Configuration
+- P08:ADM-585 Card-Present Transaction Monitor & Operations
+- P08:ADM-586 Degraded, Offline & Store-and-Forward Manager
+- P08:ADM-588 Terminal Simulator, Certification & AI Operations Advisor
+- P08:ADM-589 Digital Payments Command Center
+- P08:ADM-590 Digital & Alternative Payment Method Manager
+- P08:ADM-591 Digital Wallet & Mobile Payment Configuration
+- P08:ADM-592 Payment Link Builder & Configuration
+- P08:ADM-593 Payment Link Distribution & Customer Journey Manager
+- P08:ADM-594 Hosted Checkout, Redirect & Return Flow Configuration
+- P08:ADM-595 Digital Payment Session & Transaction Monitor
+- P08:ADM-596 Authentication, Tokenization & Recurring Payment Controls
+- P08:ADM-597 Digital Payment Exception, Recovery & Expiry Center
+- P08:ADM-598 Digital Payment Simulator, Conversion & AI Advisor
+- P08:ADM-599 Mixed Tender & Credit Command Center
+- P08:ADM-600 Mixed Tender Rule & Combination Builder
+- P08:ADM-601 Split Payment & Tender Allocation Manager
+- P08:ADM-602 B2B Credit Account & Limit Manager
+- P08:ADM-603 B2B Invoice, On-Account & Payment Terms Configuration
+- P08:ADM-604 Stored Value, Gift Card & Voucher Tender Controls
+- P08:ADM-605 Advanced Payment Eligibility, Sequence & Restriction Rules
+- P08:ADM-606 Partial Payment, Failure & Recovery Manager
+- P08:ADM-607 Mixed Tender Transaction Trace & Allocation Audit
+- P08:ADM-608 Mixed Tender Simulator, Credit Exposure & AI Advisor
+- P08:ADM-609 Refund & Payment Adjustment Command Center
+- P08:ADM-610 Refund Request & Eligibility Workspace
+- P08:ADM-613 Void, Reversal & Cancellation Manager
+- P08:ADM-614 Refund Approval & Exception Workflow
+- P08:ADM-615 Refund Processing, Provider Status & Recovery Center
+- P08:ADM-616 Payment Adjustment & Financial Correction Manager
+- P08:ADM-617 Refund Transaction Trace & Audit Investigation
+- P08:ADM-620 Reconciliation Source & Import Manager
+- P08:ADM-621 Transaction Matching & Reconciliation Engine
+- P08:ADM-624 Fees, Commission, FX & Settlement Economics
+- P08:ADM-625 Merchant Account & Settlement Calendar Manager
+- P08:ADM-629 Payment Risk & Fraud Command Center
+- P08:ADM-630 Payment Risk Rule & Decision Engine
+- P08:ADM-631 Velocity, Behavioral & Transaction Risk Controls
+- P08:ADM-632 Risk Lists, Signals & Payment Control Center
+- P08:ADM-633 Fraud Alert, Investigation & Case Management
+- P08:ADM-634 Chargeback & Dispute Command Center
+- P08:ADM-635 Chargeback Evidence & Representment Workspace
+- P08:ADM-636 Payment Performance & Conversion Analytics
+- P08:ADM-637 AI Fraud, Anomaly & Payment Intelligence Center
+- P08:ADM-638 Payment Executive Intelligence, Risk Simulator & AI Advisor
+- P08:ADM-652 Upgrade Price Difference & Value Proposition Manager
+- P08:ADM-653 Ticket, Experience & Bundle Upgrade Manager
+- P08:ADM-654 Membership & Pass Upgrade Engine
+- P08:ADM-656 Post-Purchase & In-Journey Upgrade Manager
+- P08:BO-008 Product Detail & Variants
 - P08:BO-022 Order Detail
 - P08:BO-023 Refunds & Exchanges
 - P08:BO-024 Payment Exceptions
@@ -3795,14 +3994,15 @@ screens:
 - P08:BO-027 Reissue & Media Replacement
 - P08:BO-028 Refund Approval Queue
 - P08:BO-037 Offline Package Status
+- P08:BO-038 Reconciliation Queue
 - P08:BO-039 Shift Directory
 - P08:BO-040 Variance Approval
 - P08:BO-041 Cash Movements
 - P08:BO-042 Banking & Safe
+- P08:BO-043 Daily Reconciliation
 - P08:BO-047 Order Corrections & Exceptions
 - P08:BO-062 Venue Profile
 - P08:BO-065 Venue Configuration
-- P08:BO-082 Stock Movements
 - P08:BO-097 Check Out & Check In
 - P08:BO-100 Venue Home
 - P08:BO-101 Orders & Money
@@ -3868,124 +4068,10 @@ screens:
 - P08:BO-333 Order Financial Analytics & AI Reconciliation Intelligence
 - P08:BO-344 Media Design Studio Command Center
 - P08:BO-346 PDF, Printable & POS Ticket Designer
+- P08:BO-572 Deposit Release, Capture & Customer Confirmation
 - P08:BO-778 Abandoned Cart Recovery
-- P09:ADM-199 Eligibility Rule Builder
-- P09:ADM-278 Resale Marketplace Command Center
-- P09:ADM-279 Resale Eligibility Rule Configuration
-- P09:ADM-280 Resale Policy & Marketplace Settings
-- P09:ADM-281 Listing Creation & Seller Configuration
-- P09:ADM-282 Resale Pricing & Price Guardrails
-- P09:ADM-283 Resale Fees, Commission & Seller Proceeds
-- P09:ADM-284 Listing Approval & Moderation
-- P09:ADM-285 Resale Inventory & Availability Management
-- P09:ADM-286 Listing Lifecycle, Expiry & Cancellation
-- P09:ADM-287 AI Resale Configuration & Marketplace Recommendations
-- P09:ADM-288 Resale Operations Command Center
-- P09:ADM-289 Buyer Purchase & Resale Order Management
-- P09:ADM-290 Ticket Ownership Transfer Management
-- P09:ADM-291 Credential Revocation & Regeneration
-- P09:ADM-292 Resale Fraud & Duplicate Sale Protection
-- P09:ADM-293 Capacity & Inventory Reconciliation
-- P09:ADM-294 Seller Settlement & Payout Management
-- P09:ADM-295 Refunds, Disputes & Resale Exceptions
-- P09:ADM-296 Resale Audit & Ownership History
-- P09:ADM-297 Resale Analytics & AI Intelligence
-- P09:ADM-298 My Tickets & Resale Marketplace Entry
-- P09:ADM-299 Resale Eligibility & Ticket Selection
-- P09:ADM-300 Create Listing & Resale Price Selection
-- P09:ADM-301 Fees, Seller Proceeds & Listing Confirmation
-- P09:ADM-302 My Resale Listings & Seller Dashboard
-- P09:ADM-303 Official Resale Marketplace & Buyer Discovery
-- P09:ADM-304 Resale Ticket Detail, Seat Selection & Primary-vs-Resale Experience
-- P09:ADM-305 Buyer Checkout, Inventory Hold & Secure Payment
-- P09:ADM-306 Resale Confirmation, Ownership Transfer & Ticket Delivery
-- P09:ADM-307 White-Label Marketplace Deployment & Experience Architecture
-- P09:ADM-308 Upgrade & Conversion Command Center
-- P09:ADM-309 Upgrade & Conversion Path Builder
-- P09:ADM-310 Upgrade Eligibility & Qualification Rules
-- P09:ADM-311 Upgrade Timing, Usage & Ticket Status Rules
-- P09:ADM-312 Upgrade Financial Treatment & Price Difference Rules
-- P09:ADM-313 Pro-Rata, Residual Value & Entitlement Credit Configuration
-- P09:ADM-314 Person-Type, Product & Entitlement Conversion Rules
-- P09:ADM-315 Bulk, Group & Assisted Upgrade Operations
-- P09:ADM-316 Upgrade Execution, Credential Regeneration & Channel Controls
-- P09:ADM-317 Upgrade History, Exception Management & Audit Explorer
 - P09:ADM-412 Payment Method & Settlement Setup
-- P09:ADM-559 Payment Command Center\t7
-- P09:ADM-560 Payment Method Catalogue\t8
-- P09:ADM-561 Payment Method Configuration\t9
-- P09:ADM-562 Channel & Touchpoint Payment Configuration\t10
-- P09:ADM-563 Venue, Location & Business Unit Payment Assignment\t11
-- P09:ADM-564 Currency & Payment Currency Configuration\t12
-- P09:ADM-565 Payment Eligibility & Availability Rule Builder\t13
-- P09:ADM-566 Payment Fees, Surcharges & Commercial Rules\t14
-- P09:ADM-567 Payment Policy, Governance & Approval Manager\t15
-- P09:ADM-568 Payment Configuration Simulator & Validation Center\t16
-- P09:ADM-569 Payment Orchestration Command Center\t27
-- P09:ADM-570 Gateway, PSP & Acquirer Directory\t28
-- P09:ADM-571 Provider Connection & Adapter Configuration\t29
-- P09:ADM-572 Gateway Capability & Payment Method Mapping\t30
-- P09:ADM-573 Payment Routing Rule Builder\t31
-- P09:ADM-574 Routing Strategy, Priority & Load Distribution\t33
-- P09:ADM-575 Failover, Retry & Resilience Manager\t34
-- P09:ADM-576 Provider Health, SLA & Performance Monitor\t35
-- P09:ADM-577 Provider Cost, Commercial & Routing Economics\t36
-- P09:ADM-578 Payment Routing Simulator, Decision Trace & AI Advisor\t37
-- P09:ADM-579 Terminal & Card-Present Command Center\t48
-- P09:ADM-580 Payment Terminal & Device Inventory\t49
-- P09:ADM-581 Terminal Provisioning & Device Configuration\t51
-- P09:ADM-583 EMV & Card-Present Processing Configuration\t53
-- P09:ADM-585 Card-Present Transaction Monitor & Operations\t55
-- P09:ADM-586 Degraded, Offline & Store-and-Forward Manager\t56
-- P09:ADM-588 Terminal Simulator, Certification & AI Operations Advisor\t59
-- P09:ADM-589 Digital Payments Command Center\t71
-- P09:ADM-590 Digital & Alternative Payment Method Manager\t71
-- P09:ADM-591 Digital Wallet & Mobile Payment Configuration\t72
-- P09:ADM-592 Payment Link Builder & Configuration\t73
-- P09:ADM-593 Payment Link Distribution & Customer Journey Manager\t74
-- P09:ADM-594 Hosted Checkout, Redirect & Return Flow Configuration\t75
-- P09:ADM-595 Digital Payment Session & Transaction Monitor\t76
-- P09:ADM-596 Authentication, Tokenization & Recurring Payment Controls\t78
-- P09:ADM-597 Digital Payment Exception, Recovery & Expiry Center\t79
-- P09:ADM-598 Digital Payment Simulator, Conversion & AI Advisor\t80
-- P09:ADM-599 Mixed Tender & Credit Command Center\t93
-- P09:ADM-600 Mixed Tender Rule & Combination Builder\t93
-- P09:ADM-601 Split Payment & Tender Allocation Manager\t94
-- P09:ADM-602 B2B Credit Account & Limit Manager\t95
-- P09:ADM-603 B2B Invoice, On-Account & Payment Terms Configuration\t96
-- P09:ADM-604 Stored Value, Gift Card & Voucher Tender Controls\t97
-- P09:ADM-605 Advanced Payment Eligibility, Sequence & Restriction Rules\t98
-- P09:ADM-606 Partial Payment, Failure & Recovery Manager\t100
-- P09:ADM-607 Mixed Tender Transaction Trace & Allocation Audit\t100
-- P09:ADM-608 Mixed Tender Simulator, Credit Exposure & AI Advisor\t102
-- P09:ADM-609 Refund & Payment Adjustment Command Center\t116
-- P09:ADM-610 Refund Request & Eligibility Workspace\t117
-- P09:ADM-611 Refund Policy & Rule Configuration\t118
-- P09:ADM-613 Void, Reversal & Cancellation Manager\t120
-- P09:ADM-614 Refund Approval & Exception Workflow\t121
-- P09:ADM-615 Refund Processing, Provider Status & Recovery Center\t122
-- P09:ADM-616 Payment Adjustment & Financial Correction Manager\t123
-- P09:ADM-617 Refund Transaction Trace & Audit Investigation\t124
-- P09:ADM-619 Reconciliation & Settlement Command Center\t139
-- P09:ADM-620 Reconciliation Source & Import Manager\t141
-- P09:ADM-621 Transaction Matching & Reconciliation Engine\t142
-- P09:ADM-624 Fees, Commission, FX & Settlement Economics\t145
-- P09:ADM-625 Merchant Account & Settlement Calendar Manager\t146
-- P09:ADM-629 Payment Risk & Fraud Command Center\t166
-- P09:ADM-630 Payment Risk Rule & Decision Engine\t167
-- P09:ADM-631 Velocity, Behavioral & Transaction Risk Controls\t168
-- P09:ADM-632 Risk Lists, Signals & Payment Control Center\t169
-- P09:ADM-633 Fraud Alert, Investigation & Case Management\t170
-- P09:ADM-634 Chargeback & Dispute Command Center\t172
-- P09:ADM-635 Chargeback Evidence & Representment Workspace\t173
-- P09:ADM-636 Payment Performance & Conversion Analytics\t174
-- P09:ADM-637 AI Fraud, Anomaly & Payment Intelligence Center\t175
-- P09:ADM-638 Payment Executive Intelligence, Risk Simulator & AI Advisor\t176
-- P09:ADM-652 Upgrade Price Difference & Value Proposition Manager
-- P09:ADM-653 Ticket, Experience & Bundle Upgrade Manager
-- P09:ADM-654 Membership & Pass Upgrade Engine
-- P09:ADM-656 Post-Purchase & In-Journey Upgrade Manager
-- P10:PTR-001 Partner Login / MFA
+- P09:ADM-619 Reconciliation & Settlement Command Center
 - P10:PTR-002 Partner Dashboard
 - P10:PTR-005 Inventory & Allocation View
 - P10:PTR-008 Booking Creation
@@ -3994,7 +4080,8 @@ screens:
 - P10:PTR-013 Credit Limit & Balance
 - P10:PTR-015 Order History
 - P10:PTR-016 Voucher / Ticket Download
-- P13:CMS-010 Media Library
+- P12:SUP-014 Order, Booking & Ticket Service Workspace
+- P13:CMS-006 Component Preview
 - P16:ANL-009 AI Assistant & Action Center
 - P17:SGN-021 Payment Method & Settlement Setup
 flows:
@@ -4025,7 +4112,6 @@ flows:
 - F32 A till opens, trades and settles
 - F33 A till goes offline and comes back
 - F34 A retail sale, from scan to return
-- F35 Stock arrives short and an oversell is resolved
 - F49 A guest plans a day and follows it
 - F50 A guest arrives, parks, and gets in
 - F51 A guest shops in the venue and collects on the way out

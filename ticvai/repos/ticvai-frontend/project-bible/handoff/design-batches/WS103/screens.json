@@ -42,12 +42,18 @@
     {
      "to": "ADM-420",
      "trigger": "Tenant & Organization Provisioning",
-     "provenance": "structural — pack board 6 wiring, 11 September 2026"
+     "provenance": "structural — pack board 6 wiring, 11 September 2026",
+     "carries": [
+      "tenantId"
+     ]
     },
     {
      "to": "ADM-421",
      "trigger": "Venue & Operational Structure Creation",
-     "provenance": "structural — pack board 6 wiring, 11 September 2026"
+     "provenance": "structural — pack board 6 wiring, 11 September 2026",
+     "carries": [
+      "tenantId"
+     ]
     },
     {
      "to": "ADM-422",
@@ -62,17 +68,27 @@
     {
      "to": "ADM-424",
      "trigger": "Module Activation & Dependency Validation",
-     "provenance": "structural — pack board 6 wiring, 11 September 2026"
+     "provenance": "structural — pack board 6 wiring, 11 September 2026",
+     "carries": [
+      "tenantId"
+     ]
     },
     {
      "to": "ADM-425",
      "trigger": "Venue Template Application",
-     "provenance": "structural — pack board 6 wiring, 11 September 2026"
+     "provenance": "structural — pack board 6 wiring, 11 September 2026",
+     "carries": [
+      "tenantId"
+     ]
     },
     {
      "to": "ADM-426",
      "trigger": "Initial Configuration & Regional Defaults",
-     "provenance": "structural — pack board 6 wiring, 11 September 2026"
+     "provenance": "structural — pack board 6 wiring, 11 September 2026",
+     "carries": [
+      "regionId",
+      "tenantId"
+     ]
     },
     {
      "to": "ADM-427",
@@ -116,6 +132,12 @@
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
        "impliedBy": "createTenant"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Provisioning progress",
+       "operation": "listCellJobs",
+       "provenance": "contract subscription.yaml GET /cells/{cellId}/jobs; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -135,6 +157,13 @@
     "purpose": "Provision the tenant",
     "trigger": "onAction",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "listCellJobs",
+    "contract": "subscription",
+    "purpose": "Provisioning jobs and how far each has got",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-021)"
    }
   ],
   "wireframe": {
@@ -143,6 +172,14 @@
    "workshopBoard": "wireframes/WS158 Subscription Licensing AI Self Service Board 6.dc.html#adm-419"
   },
   "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 72. 0 of 0 labels bound to a contract property; 6 of 22 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "cellId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -224,6 +261,42 @@
      "name": "contentBody",
      "components": [
       {
+       "kind": "selectField",
+       "label": "Tenant",
+       "bindsTo": "Tenant.id",
+       "columns": [
+        "Tenant.code",
+        "Tenant.name",
+        "Tenant.status"
+       ],
+       "operation": "listTenants",
+       "notes": "**Pick a tenant first** (audit R098; decided 2 October 2026, Chinmay: console screens get the tenant picker and grant, CHG-SBO-001). This screen's operations run in that tenant's cell, and a platform token carries no tenant permission there until a platform-staff grant into it is open.",
+       "provenance": "contract subscription.yaml GET /tenants"
+      },
+      {
+       "kind": "banner",
+       "label": "Open grant into this tenant",
+       "bindsTo": "PlatformStaffGrant",
+       "columns": [
+        "PlatformStaffGrant.operatorDisplayName",
+        "PlatformStaffGrant.permissions",
+        "PlatformStaffGrant.reason",
+        "PlatformStaffGrant.ticketRef",
+        "PlatformStaffGrant.openedAt",
+        "PlatformStaffGrant.expiresAt"
+       ],
+       "operation": "listOwnPlatformStaffGrants",
+       "notes": "**Always visible while the screen acts on a tenant** (audit R098, the ADM-412 pattern): which tenant, which permissions, why, and the time left to `expiresAt`. At expiry every tenant action is disabled and the screen returns to its grantRequired state; a new need is a new grant. The tenant sees the grant in its own audit log. Found again after a reload with `listOwnPlatformStaffGrants`.",
+       "provenance": "contract identity.yaml GET /platform-staff-grants/mine"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Open access grant",
+       "operation": "openPlatformStaffGrant",
+       "notes": "Shown until a grant into the picked tenant is open; asks for the second factor first (step-up, audit R135).",
+       "provenance": "contract identity.yaml POST /platform-staff-grants"
+      },
+      {
        "kind": "primaryButton",
        "derived": true,
        "impliedBy": "createOrgUnit",
@@ -238,6 +311,17 @@
        "impliedBy": "createOrgUnit"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "components": [
+      {
+       "kind": "secondaryButton",
+       "label": "Create tenant",
+       "operation": "createTenant",
+       "provenance": "contract subscription.yaml POST /tenants; wiring fix, 2 October 2026"
+      }
+     ]
     }
    ]
   },
@@ -246,7 +330,8 @@
    "error": "Could not load. Names which read failed and leaves the tenant organization provisioning untouched.",
    "emptyFirstRun": "No tenant organization provisioning yet. Carries the create action; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the tenant organization provisioning are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "grantRequired": "**No access into this tenant yet.** A tenant is picked and no platform-staff grant into it is open, so every tenant action is disabled and the screen offers **Open access grant** (`openPlatformStaffGrant`: reason, permissions `SCOPE_MANAGE`, expiry). The same state returns when the grant reaches `expiresAt` (audit R098; CHG-SBO-001)."
   },
   "apis": [
    {
@@ -255,6 +340,34 @@
     "purpose": "Venue and operational structure",
     "trigger": "onAction",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "createTenant",
+    "contract": "subscription",
+    "purpose": "Create the customer's tenant record before its organisation structure",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-021)"
+   },
+   {
+    "operationId": "listTenants",
+    "contract": "subscription",
+    "purpose": "The tenant picker: the operator picks a tenant before acting in its cell (audit R098; decided 2 October 2026, CHG-SBO-001)",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listOwnPlatformStaffGrants",
+    "contract": "identity",
+    "purpose": "Find a grant into the picked tenant already open, after a reload (audit R098; CHG-SBO-001)",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "openPlatformStaffGrant",
+    "contract": "identity",
+    "purpose": "Open a time-boxed, audited platform-staff grant into the picked tenant before any tenant-scoped operation here; the tenant sees it (audit R098; decided 2 October 2026, CHG-SBO-001)",
+    "trigger": "onAction",
+    "invalidates": [
+     "listOwnPlatformStaffGrants"
+    ]
    }
   ],
   "wireframe": {
@@ -263,6 +376,52 @@
    "workshopBoard": "wireframes/WS158 Subscription Licensing AI Self Service Board 6.dc.html#adm-420"
   },
   "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 73. 0 of 0 labels bound to a contract property; 0 of 28 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formCreateTenant",
+    "component": "modal",
+    "trigger": "Create tenant",
+    "body": "**Collects what `createTenant` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Create tenant",
+     "operation": "createTenant"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "contract subscription.yaml POST /tenants; wiring fix, 2 October 2026"
+   },
+   {
+    "id": "formOpenPlatformStaffGrant",
+    "component": "modal",
+    "trigger": "Open access grant",
+    "body": "**Collects what `openPlatformStaffGrant` sends before it is called** (audit R098). Required: `id` (a client UUIDv7, generated silently), `permissions` (tenant permissions only; `SCOPE_MANAGE` preselected for this screen), `reason`, `expiresAt` (at most 8 hours ahead, proposed). Optional: `ticketRef`. Requires step-up: the operator presents a second factor first. The tenant sees the grant and everything done under it. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Open access grant",
+     "operation": "openPlatformStaffGrant"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "permissions",
+      "reason",
+      "ticketRef",
+      "expiresAt"
+     ]
+    },
+    "provenance": "contract identity.yaml POST /platform-staff-grants"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "tenantId",
+     "from": "navigation",
+     "optional": true
+    }
+   ]
+  },
+  "notes": "**Tenant picker and platform-staff grant added 2 October 2026** (CHG-SBO-001; Chinmay, pre-apply round: console screens get the R098 tenant picker and grant, the ADM-412 pattern). The Console runs outside every cell; `createOrgUnit` (SCOPE_MANAGE) are tenant operations, refused 403 to a platform token until a time-boxed, audited grant into the picked tenant is open. The tenant sees the grant and every action under it.",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -330,6 +489,18 @@
     "operation": null,
     "why": "**Venue & Operational Structure Creation declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
     "source": "contract — the screen's declared operations"
+   },
+   {
+    "operation": "createPrincipal",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-021): Venue structure creation declared createPrincipal and setPasswordPolicy (the administrator and security baseline, ADM-422's job) and nothing created a venue; createOrgUnit is the venue write (design-notes corrections platform-foundation ADM-421, ADM-422).",
+    "source": "contracts/spine/tenancy.yaml#createOrgUnit | screens/P09-platform-admin-console.yaml#ADM-422"
+   },
+   {
+    "operation": "setPasswordPolicy",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-021): Venue structure creation declared createPrincipal and setPasswordPolicy (the administrator and security baseline, ADM-422's job) and nothing created a venue; createOrgUnit is the venue write (design-notes corrections platform-foundation ADM-421, ADM-422).",
+    "source": "contracts/spine/tenancy.yaml#createOrgUnit | screens/P09-platform-admin-console.yaml#ADM-422"
    }
   ],
   "layout": {
@@ -342,7 +513,7 @@
       {
        "kind": "selectField",
        "label": "Tenant",
-       "bindsTo": "Tenant",
+       "bindsTo": "Tenant.id",
        "columns": [
         "Tenant.id",
         "Tenant.code",
@@ -366,7 +537,7 @@
         "PlatformStaffGrant.openedAt",
         "PlatformStaffGrant.expiresAt"
        ],
-       "operation": "openPlatformStaffGrant",
+       "operation": "listOwnPlatformStaffGrants",
        "notes": "**Always visible while the screen acts on a tenant** (decided 28 September, audit R098): which tenant, which permissions, why, and the time left to `expiresAt`. At expiry every tenant action is disabled and the screen returns to its grantRequired state; a new need is a new grant. The tenant sees the grant in its own audit log.",
        "provenance": "contract identity.yaml POST /platform-staff-grants"
       },
@@ -418,6 +589,17 @@
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 74 §Venue Settings"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "components": [
+      {
+       "kind": "secondaryButton",
+       "label": "Create venue structure",
+       "operation": "createOrgUnit",
+       "provenance": "contract tenancy.yaml POST /org-units; wiring fix, 2 October 2026"
+      }
+     ]
     }
    ]
   },
@@ -441,6 +623,20 @@
      ]
     },
     "provenance": "contract identity.yaml POST /platform-staff-grants"
+   },
+   {
+    "id": "formCreateOrgUnit",
+    "component": "modal",
+    "trigger": "Create venue structure",
+    "body": "**Collects what `createOrgUnit` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Create venue structure",
+     "operation": "createOrgUnit"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "contract tenancy.yaml POST /org-units; wiring fix, 2 October 2026"
    }
   ],
   "states": {
@@ -465,18 +661,17 @@
     "trigger": "onLoad"
    },
    {
-    "operationId": "createPrincipal",
-    "contract": "identity",
-    "purpose": "The first administrator",
+    "operationId": "createOrgUnit",
+    "contract": "tenancy",
+    "purpose": "Create the venues and operational structure collected at onboarding",
     "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026"
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-021)"
    },
    {
-    "operationId": "setPasswordPolicy",
+    "operationId": "listOwnPlatformStaffGrants",
     "contract": "identity",
-    "purpose": "Security initialisation",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026"
+    "purpose": "Find a grant into the picked tenant already open, after a reload (audit R098; CHG-SBO-001)",
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
@@ -485,6 +680,15 @@
    "workshopBoard": "wireframes/WS158 Subscription Licensing AI Self Service Board 6.dc.html#adm-421"
   },
   "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 74. 0 of 0 labels bound to a contract property; 8 of 20 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "tenantId",
+     "from": "navigation",
+     "optional": true
+    }
+   ]
+  },
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -555,34 +759,92 @@
      "slot": "fields",
      "components": [
       {
-       "kind": "textField",
-       "label": "✓ Administrator Account Created",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 75 §Security Setup"
-      },
-      {
        "kind": "selectField",
-       "label": "✓ Email Verified",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 75 §Security Setup"
+       "label": "Tenant",
+       "bindsTo": "Tenant.id",
+       "columns": [
+        "Tenant.code",
+        "Tenant.name",
+        "Tenant.status"
+       ],
+       "operation": "listTenants",
+       "notes": "**Pick a tenant first** (audit R098; decided 2 October 2026, Chinmay: console screens get the tenant picker and grant, CHG-SBO-001). This screen's operations run in that tenant's cell, and a platform token carries no tenant permission there until a platform-staff grant into it is open.",
+       "provenance": "contract subscription.yaml GET /tenants"
       },
       {
-       "kind": "textField",
-       "label": "✓ Tenant Access Assigned",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 75 §Security Setup"
+       "kind": "banner",
+       "label": "Open grant into this tenant",
+       "bindsTo": "PlatformStaffGrant",
+       "columns": [
+        "PlatformStaffGrant.operatorDisplayName",
+        "PlatformStaffGrant.permissions",
+        "PlatformStaffGrant.reason",
+        "PlatformStaffGrant.ticketRef",
+        "PlatformStaffGrant.openedAt",
+        "PlatformStaffGrant.expiresAt"
+       ],
+       "operation": "listOwnPlatformStaffGrants",
+       "notes": "**Always visible while the screen acts on a tenant** (audit R098, the ADM-412 pattern): which tenant, which permissions, why, and the time left to `expiresAt`. At expiry every tenant action is disabled and the screen returns to its grantRequired state; a new need is a new grant. The tenant sees the grant in its own audit log. Found again after a reload with `listOwnPlatformStaffGrants`.",
+       "provenance": "contract identity.yaml GET /platform-staff-grants/mine"
       },
       {
-       "kind": "textField",
-       "label": "✓ Default Role Applied",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 75 §Security Setup"
+       "kind": "progressIndicator",
+       "label": "Administrator Account Created",
+       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 75 §Security Setup",
+       "notes": "A progress output of initialisation, not an input."
       },
       {
-       "kind": "textField",
-       "label": "✓ Security Policy Applied",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 75 §Security Setup"
+       "kind": "progressIndicator",
+       "label": "Email Verified",
+       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 75 §Security Setup",
+       "notes": "A progress output of initialisation, not an input."
       },
       {
-       "kind": "textField",
-       "label": "✓ Audit Logging Enabled",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 75 §Security Setup"
+       "kind": "progressIndicator",
+       "label": "Tenant Access Assigned",
+       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 75 §Security Setup",
+       "notes": "A progress output of initialisation, not an input."
+      },
+      {
+       "kind": "progressIndicator",
+       "label": "Default Role Applied",
+       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 75 §Security Setup",
+       "notes": "A progress output of initialisation, not an input."
+      },
+      {
+       "kind": "progressIndicator",
+       "label": "Security Policy Applied",
+       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 75 §Security Setup",
+       "notes": "A progress output of initialisation, not an input."
+      },
+      {
+       "kind": "progressIndicator",
+       "label": "Audit Logging Enabled",
+       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 75 §Security Setup",
+       "notes": "A progress output of initialisation, not an input."
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "components": [
+      {
+       "kind": "secondaryButton",
+       "label": "Open access grant",
+       "operation": "openPlatformStaffGrant",
+       "provenance": "contract identity.yaml POST /platform-staff-grants; wiring fix, 2 October 2026"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Create administrator",
+       "operation": "createPrincipal",
+       "provenance": "contract identity.yaml POST /principals; wiring fix, 2 October 2026"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Set security baseline",
+       "operation": "setPasswordPolicy",
+       "provenance": "contract identity.yaml PUT /password-policy; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -593,7 +855,8 @@
    "error": "Could not load. Names which read failed and leaves the administrator security initialization untouched.",
    "emptyFirstRun": "No administrator security initialization configured yet. Carries the create action and says what the platform does in the meantime.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
+   "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist",
+   "grantRequired": "**No access into this tenant yet.** A tenant is picked and no platform-staff grant into it is open, so every tenant action is disabled and the screen offers **Open access grant** (`openPlatformStaffGrant`: reason, permissions `TENANT_CONFIGURE`, `USER_MANAGE`, expiry). The same state returns when the grant reaches `expiresAt` (audit R098; CHG-SBO-001)."
   },
   "apis": [
    {
@@ -609,6 +872,39 @@
     "purpose": "Activate an add-on",
     "trigger": "onAction",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "openPlatformStaffGrant",
+    "contract": "identity",
+    "purpose": "Open a time-boxed, audited grant into the new tenant before acting in its cell",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-021)"
+   },
+   {
+    "operationId": "createPrincipal",
+    "contract": "identity",
+    "purpose": "Create the tenant's first administrator",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-021)"
+   },
+   {
+    "operationId": "setPasswordPolicy",
+    "contract": "identity",
+    "purpose": "Set the tenant's security baseline: password rules and which permissions need MFA",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-021)"
+   },
+   {
+    "operationId": "listTenants",
+    "contract": "subscription",
+    "purpose": "The tenant picker: the operator picks a tenant before acting in its cell (audit R098; decided 2 October 2026, CHG-SBO-001)",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listOwnPlatformStaffGrants",
+    "contract": "identity",
+    "purpose": "Find a grant into the picked tenant already open, after a reload (audit R098; CHG-SBO-001)",
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
@@ -625,6 +921,50 @@
     }
    ]
   },
+  "overlays": [
+   {
+    "id": "formOpenPlatformStaffGrant",
+    "component": "modal",
+    "trigger": "Open access grant",
+    "body": "**Collects what `openPlatformStaffGrant` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Open access grant",
+     "operation": "openPlatformStaffGrant"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "contract identity.yaml POST /platform-staff-grants; wiring fix, 2 October 2026"
+   },
+   {
+    "id": "formCreatePrincipal",
+    "component": "modal",
+    "trigger": "Create administrator",
+    "body": "**Collects what `createPrincipal` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Create administrator",
+     "operation": "createPrincipal"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "contract identity.yaml POST /principals; wiring fix, 2 October 2026"
+   },
+   {
+    "id": "formSetPasswordPolicy",
+    "component": "modal",
+    "trigger": "Set security baseline",
+    "body": "**Collects what `setPasswordPolicy` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Set security baseline",
+     "operation": "setPasswordPolicy"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "contract identity.yaml PUT /password-policy; wiring fix, 2 October 2026"
+   }
+  ],
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -718,7 +1058,7 @@
   "states": {
    "loading": "The license entitlement activation list.",
    "error": "Could not load. Names which read failed and leaves the license entitlement activation untouched.",
-   "emptyFirstRun": "No license entitlement activation yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No license entitlement activation yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the license entitlement activation are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -809,6 +1149,12 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Subscription_Licensing_AI_Self_Service.pdf, page 77"
+   },
+   {
+    "operation": "listVenueTypeTemplates",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-021): Module Activation was wired to listVenueTypeTemplates, which belongs to the next screen (ADM-425 Venue Template Application); activation reads licence data (getTenantLicences), checks dependencies (listModuleCatalogue) and switches modules on (getModuleEnablement, setModuleEnablement). setModuleEnablement is a tenant-scoped write, so the screen carries the R098 tenant picker and grant like its sibling ADM-421 (design-notes correction platform-foundation ADM-424).",
+    "source": "screens/P09-platform-admin-console.yaml#ADM-424; screens/P09-platform-admin-console.yaml#ADM-421; R098"
    }
   ],
   "layout": {
@@ -818,10 +1164,77 @@
      "name": "contentBody",
      "components": [
       {
+       "kind": "selectField",
+       "label": "Tenant",
+       "bindsTo": "Tenant.id",
+       "columns": [
+        "Tenant.code",
+        "Tenant.name",
+        "Tenant.status"
+       ],
+       "operation": "listTenants",
+       "notes": "**Pick a tenant first** (audit R098; decided 2 October 2026, Chinmay: console screens get the tenant picker and grant, CHG-SBO-001). This screen's operations run in that tenant's cell, and a platform token carries no tenant permission there until a platform-staff grant into it is open.",
+       "provenance": "contract subscription.yaml GET /tenants"
+      },
+      {
+       "kind": "banner",
+       "label": "Open grant into this tenant",
+       "bindsTo": "PlatformStaffGrant",
+       "columns": [
+        "PlatformStaffGrant.operatorDisplayName",
+        "PlatformStaffGrant.permissions",
+        "PlatformStaffGrant.reason",
+        "PlatformStaffGrant.ticketRef",
+        "PlatformStaffGrant.openedAt",
+        "PlatformStaffGrant.expiresAt"
+       ],
+       "operation": "listOwnPlatformStaffGrants",
+       "notes": "**Always visible while the screen acts on a tenant** (audit R098, the ADM-412 pattern): which tenant, which permissions, why, and the time left to `expiresAt`. At expiry every tenant action is disabled and the screen returns to its grantRequired state; a new need is a new grant. The tenant sees the grant in its own audit log. Found again after a reload with `listOwnPlatformStaffGrants`.",
+       "provenance": "contract identity.yaml GET /platform-staff-grants/mine"
+      },
+      {
        "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listVenueTypeTemplates",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "label": "Tenant",
+       "operation": "listTenants",
+       "provenance": "contract subscription.yaml GET /tenants; wiring fix, 2 October 2026"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Licensed modules",
+       "bindsTo": "LicencePosition",
+       "operation": "getTenantLicences",
+       "provenance": "contract subscription.yaml GET /tenants/{tenantId}/licences; wiring fix, 2 October 2026"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Dependencies",
+       "bindsTo": "ModuleListing",
+       "operation": "listModuleCatalogue",
+       "provenance": "contract subscription.yaml GET /module-catalogue; wiring fix, 2 October 2026"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Active modules",
+       "bindsTo": "ModuleEnablement",
+       "operation": "getModuleEnablement",
+       "provenance": "contract white-label.yaml GET /tenant-config/modules; wiring fix, 2 October 2026"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "components": [
+      {
+       "kind": "secondaryButton",
+       "label": "Open access grant",
+       "operation": "openPlatformStaffGrant",
+       "provenance": "contract identity.yaml POST /platform-staff-grants; wiring fix, 2 October 2026"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Activate modules",
+       "operation": "setModuleEnablement",
+       "provenance": "contract white-label.yaml PUT /tenant-config/modules; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -830,17 +1243,59 @@
   "states": {
    "loading": "The module activation dependency list.",
    "error": "Could not load. Names which read failed and leaves the module activation dependency untouched.",
-   "emptyFirstRun": "No module activation dependency yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No module activation dependency yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the module activation dependency are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "grantRequired": "**No access into this tenant yet.** A tenant is picked and no platform-staff grant into it is open, so every tenant action is disabled and the screen offers **Open access grant** (`openPlatformStaffGrant`: reason, permissions `TENANT_CONFIGURE`, expiry). The same state returns when the grant reaches `expiresAt` (audit R098; CHG-SBO-001)."
   },
   "apis": [
    {
-    "operationId": "listVenueTypeTemplates",
+    "operationId": "listTenants",
     "contract": "subscription",
-    "purpose": "Apply a venue template",
+    "purpose": "Pick the tenant whose modules are being activated (audit R098)",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-021)"
+   },
+   {
+    "operationId": "openPlatformStaffGrant",
+    "contract": "identity",
+    "purpose": "Open a time-boxed, audited grant into the picked tenant before activating anything (audit R098)",
     "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026"
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-021)"
+   },
+   {
+    "operationId": "getTenantLicences",
+    "contract": "subscription",
+    "purpose": "The modules the tenant has bought",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-021)"
+   },
+   {
+    "operationId": "listModuleCatalogue",
+    "contract": "subscription",
+    "purpose": "Each module's dependencies, to validate before activation",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-021)"
+   },
+   {
+    "operationId": "getModuleEnablement",
+    "contract": "white-label",
+    "purpose": "Which modules are switched on now",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-021)"
+   },
+   {
+    "operationId": "setModuleEnablement",
+    "contract": "white-label",
+    "purpose": "Switch the purchased modules on",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-021)"
+   },
+   {
+    "operationId": "listOwnPlatformStaffGrants",
+    "contract": "identity",
+    "purpose": "Find a grant into the picked tenant already open, after a reload (audit R098; CHG-SBO-001)",
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
@@ -849,6 +1304,45 @@
    "workshopBoard": "wireframes/WS158 Subscription Licensing AI Self Service Board 6.dc.html#adm-424"
   },
   "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 77. 0 of 0 labels bound to a contract property; 0 of 10 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formOpenPlatformStaffGrant",
+    "component": "modal",
+    "trigger": "Open access grant",
+    "body": "**Collects what `openPlatformStaffGrant` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Open access grant",
+     "operation": "openPlatformStaffGrant"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "contract identity.yaml POST /platform-staff-grants; wiring fix, 2 October 2026"
+   },
+   {
+    "id": "formSetModuleEnablement",
+    "component": "modal",
+    "trigger": "Activate modules",
+    "body": "**Collects what `setModuleEnablement` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Activate modules",
+     "operation": "setModuleEnablement"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "contract white-label.yaml PUT /tenant-config/modules; wiring fix, 2 October 2026"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "tenantId",
+     "from": "navigation",
+     "optional": true
+    }
+   ]
+  },
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -921,6 +1415,17 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Subscription_Licensing_AI_Self_Service.pdf, page 77"
+   },
+   {
+    "operation": "updateRegionSettings",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-021): Venue Template Application was wired to updateRegionSettings (region money and time settings), which is initial configuration (ADM-426); the template list (listVenueTypeTemplates) had landed on ADM-424. The regionId entry parameter existed only for the region write. Applying a template has no operation (contract gap, CHG-WIR-024) (design-notes correction platform-foundation ADM-425).",
+    "source": "screens/P09-platform-admin-console.yaml#ADM-425; contracts/satellite/subscription.yaml#listVenueTypeTemplates"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-024): An operation that applies a venue-type template to a tenant or venue (creating the editable starting configuration), with a preview of what it creates.",
+    "source": "contracts/satellite/subscription.yaml#listVenueTypeTemplates"
    }
   ],
   "layout": {
@@ -930,18 +1435,47 @@
      "name": "contentBody",
      "components": [
       {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "updateRegionSettings",
-       "label": "Save region settings",
-       "notes": "The act the screen exists for."
+       "kind": "selectField",
+       "label": "Tenant",
+       "bindsTo": "Tenant.id",
+       "columns": [
+        "Tenant.code",
+        "Tenant.name",
+        "Tenant.status"
+       ],
+       "operation": "listTenants",
+       "notes": "**Pick a tenant first** (audit R098; decided 2 October 2026, Chinmay: console screens get the tenant picker and grant, CHG-SBO-001). This screen's operations run in that tenant's cell, and a platform token carries no tenant permission there until a platform-staff grant into it is open.",
+       "provenance": "contract subscription.yaml GET /tenants"
       },
       {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "updateRegionSettings"
+       "kind": "banner",
+       "label": "Open grant into this tenant",
+       "bindsTo": "PlatformStaffGrant",
+       "columns": [
+        "PlatformStaffGrant.operatorDisplayName",
+        "PlatformStaffGrant.permissions",
+        "PlatformStaffGrant.reason",
+        "PlatformStaffGrant.ticketRef",
+        "PlatformStaffGrant.openedAt",
+        "PlatformStaffGrant.expiresAt"
+       ],
+       "operation": "listOwnPlatformStaffGrants",
+       "notes": "**Always visible while the screen acts on a tenant** (audit R098, the ADM-412 pattern): which tenant, which permissions, why, and the time left to `expiresAt`. At expiry every tenant action is disabled and the screen returns to its grantRequired state; a new need is a new grant. The tenant sees the grant in its own audit log. Found again after a reload with `listOwnPlatformStaffGrants`.",
+       "provenance": "contract identity.yaml GET /platform-staff-grants/mine"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Open access grant",
+       "operation": "openPlatformStaffGrant",
+       "notes": "Shown until a grant into the picked tenant is open; asks for the second factor first (step-up, audit R135).",
+       "provenance": "contract identity.yaml POST /platform-staff-grants"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Venue templates",
+       "bindsTo": "VenueTypeTemplate",
+       "operation": "listVenueTypeTemplates",
+       "provenance": "contract subscription.yaml GET /venue-type-templates; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -950,17 +1484,39 @@
   "states": {
    "loading": "The venue template application list.",
    "error": "Could not load. Names which read failed and leaves the venue template application untouched.",
-   "emptyFirstRun": "No venue template application yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No venue template application yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the venue template application are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "grantRequired": "**No access into this tenant yet.** A tenant is picked and no platform-staff grant into it is open, so every tenant action is disabled and the screen offers **Open access grant** (`openPlatformStaffGrant`: reason, permissions `TENANT_CONFIGURE`, expiry). The same state returns when the grant reaches `expiresAt` (audit R098; CHG-SBO-001)."
   },
   "apis": [
    {
-    "operationId": "updateRegionSettings",
-    "contract": "tenancy",
-    "purpose": "Regional defaults",
+    "operationId": "listVenueTypeTemplates",
+    "contract": "subscription",
+    "purpose": "Starting configurations by venue kind, to pick from",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-021)"
+   },
+   {
+    "operationId": "listTenants",
+    "contract": "subscription",
+    "purpose": "The tenant picker: the operator picks a tenant before acting in its cell (audit R098; decided 2 October 2026, CHG-SBO-001)",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listOwnPlatformStaffGrants",
+    "contract": "identity",
+    "purpose": "Find a grant into the picked tenant already open, after a reload (audit R098; CHG-SBO-001)",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "openPlatformStaffGrant",
+    "contract": "identity",
+    "purpose": "Open a time-boxed, audited platform-staff grant into the picked tenant before any tenant-scoped operation here; the tenant sees it (audit R098; decided 2 October 2026, CHG-SBO-001)",
     "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026"
+    "invalidates": [
+     "listOwnPlatformStaffGrants"
+    ]
    }
   ],
   "wireframe": {
@@ -972,11 +1528,35 @@
   "entryState": {
    "params": [
     {
-     "name": "regionId",
-     "from": "navigation"
+     "name": "tenantId",
+     "from": "navigation",
+     "optional": true
     }
    ]
   },
+  "overlays": [
+   {
+    "id": "formOpenPlatformStaffGrant",
+    "component": "modal",
+    "trigger": "Open access grant",
+    "body": "**Collects what `openPlatformStaffGrant` sends before it is called** (audit R098). Required: `id` (a client UUIDv7, generated silently), `permissions` (tenant permissions only; `TENANT_CONFIGURE` preselected for this screen), `reason`, `expiresAt` (at most 8 hours ahead, proposed). Optional: `ticketRef`. Requires step-up: the operator presents a second factor first. The tenant sees the grant and everything done under it. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Open access grant",
+     "operation": "openPlatformStaffGrant"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "permissions",
+      "reason",
+      "ticketRef",
+      "expiresAt"
+     ]
+    },
+    "provenance": "contract identity.yaml POST /platform-staff-grants"
+   }
+  ],
+  "notes": "**Tenant picker and platform-staff grant added 2 October 2026** (CHG-SBO-001; Chinmay, pre-apply round: console screens get the R098 tenant picker and grant, the ADM-412 pattern). The Console runs outside every cell; `listVenueTypeTemplates` (TENANT_CONFIGURE) are tenant operations, refused 403 to a platform token until a time-boxed, audited grant into the picked tenant is open. The tenant sees the grant and every action under it.",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -1048,6 +1628,35 @@
      "components": [
       {
        "kind": "selectField",
+       "label": "Tenant",
+       "bindsTo": "Tenant.id",
+       "columns": [
+        "Tenant.code",
+        "Tenant.name",
+        "Tenant.status"
+       ],
+       "operation": "listTenants",
+       "notes": "**Pick a tenant first** (audit R098; decided 2 October 2026, Chinmay: console screens get the tenant picker and grant, CHG-SBO-001). This screen's operations run in that tenant's cell, and a platform token carries no tenant permission there until a platform-staff grant into it is open.",
+       "provenance": "contract subscription.yaml GET /tenants"
+      },
+      {
+       "kind": "banner",
+       "label": "Open grant into this tenant",
+       "bindsTo": "PlatformStaffGrant",
+       "columns": [
+        "PlatformStaffGrant.operatorDisplayName",
+        "PlatformStaffGrant.permissions",
+        "PlatformStaffGrant.reason",
+        "PlatformStaffGrant.ticketRef",
+        "PlatformStaffGrant.openedAt",
+        "PlatformStaffGrant.expiresAt"
+       ],
+       "operation": "listOwnPlatformStaffGrants",
+       "notes": "**Always visible while the screen acts on a tenant** (audit R098, the ADM-412 pattern): which tenant, which permissions, why, and the time left to `expiresAt`. At expiry every tenant action is disabled and the screen returns to its grantRequired state; a new need is a new grant. The tenant sees the grant in its own audit log. Found again after a reload with `listOwnPlatformStaffGrants`.",
+       "provenance": "contract identity.yaml GET /platform-staff-grants/mine"
+      },
+      {
+       "kind": "selectField",
        "label": "Currency",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 78 §Low-risk settings such as"
       },
@@ -1100,6 +1709,49 @@
        "kind": "selectField",
        "label": "Capacity",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 78 §Business-critical settings such as"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Tenant",
+       "operation": "listTenants",
+       "provenance": "contract subscription.yaml GET /tenants; wiring fix, 2 October 2026"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Venue defaults",
+       "bindsTo": "VenueSettings",
+       "operation": "getVenueSettingsDefaults",
+       "provenance": "contract tenancy.yaml GET /venue-settings-defaults; wiring fix, 2 October 2026"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Region settings",
+       "bindsTo": "RegionSettings",
+       "operation": "getRegionSettings",
+       "provenance": "contract tenancy.yaml GET /regions/{regionId}/settings; wiring fix, 2 October 2026"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "components": [
+      {
+       "kind": "secondaryButton",
+       "label": "Open access grant",
+       "operation": "openPlatformStaffGrant",
+       "provenance": "contract identity.yaml POST /platform-staff-grants; wiring fix, 2 October 2026"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Apply defaults",
+       "operation": "setVenueSettingsDefaults",
+       "provenance": "contract tenancy.yaml PUT /venue-settings-defaults; wiring fix, 2 October 2026"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save region settings",
+       "operation": "updateRegionSettings",
+       "provenance": "contract tenancy.yaml PUT /regions/{regionId}/settings; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -1108,9 +1760,10 @@
   "states": {
    "loading": "The initial regional defaults configuration as saved.",
    "error": "Could not load. Names which read failed and leaves the initial regional defaults untouched.",
-   "emptyFirstRun": "No initial regional defaults configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyFirstRun": "**Nothing saved yet.** The form opens on the values it inherits and Apply defaults (`setVenueSettingsDefaults`) saves the first version; offers no other create action.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
+   "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist",
+   "grantRequired": "**No access into this tenant yet.** A tenant is picked and no platform-staff grant into it is open, so every tenant action is disabled and the screen offers **Open access grant** (`openPlatformStaffGrant`: reason, permissions `REGION_CONFIGURE`, `SCOPE_VIEW`, `TENANT_CONFIGURE`, `TENANT_VIEW`, expiry). The same state returns when the grant reaches `expiresAt` (audit R098; CHG-SBO-001)."
   },
   "apis": [
    {
@@ -1122,6 +1775,54 @@
     "invalidates": [
      "getGoLiveReadiness"
     ]
+   },
+   {
+    "operationId": "listTenants",
+    "contract": "subscription",
+    "purpose": "Pick the tenant being configured (audit R098)",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-021)"
+   },
+   {
+    "operationId": "openPlatformStaffGrant",
+    "contract": "identity",
+    "purpose": "Open a time-boxed, audited grant into the picked tenant before changing its defaults (audit R098)",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-021)"
+   },
+   {
+    "operationId": "getVenueSettingsDefaults",
+    "contract": "tenancy",
+    "purpose": "The tenant's default for every venue setting",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-021)"
+   },
+   {
+    "operationId": "setVenueSettingsDefaults",
+    "contract": "tenancy",
+    "purpose": "Apply the initial venue defaults from onboarding",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-021)"
+   },
+   {
+    "operationId": "getRegionSettings",
+    "contract": "tenancy",
+    "purpose": "The region's currency, time zone and money settings",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-021)"
+   },
+   {
+    "operationId": "updateRegionSettings",
+    "contract": "tenancy",
+    "purpose": "Set the regional defaults",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-021)"
+   },
+   {
+    "operationId": "listOwnPlatformStaffGrants",
+    "contract": "identity",
+    "purpose": "Find a grant into the picked tenant already open, after a reload (audit R098; CHG-SBO-001)",
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
@@ -1130,6 +1831,63 @@
    "workshopBoard": "wireframes/WS158 Subscription Licensing AI Self Service Board 6.dc.html#adm-426"
   },
   "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 78. 0 of 0 labels bound to a contract property; 11 of 24 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formOpenPlatformStaffGrant",
+    "component": "modal",
+    "trigger": "Open access grant",
+    "body": "**Collects what `openPlatformStaffGrant` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Open access grant",
+     "operation": "openPlatformStaffGrant"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "contract identity.yaml POST /platform-staff-grants; wiring fix, 2 October 2026"
+   },
+   {
+    "id": "formSetVenueSettingsDefaults",
+    "component": "modal",
+    "trigger": "Apply defaults",
+    "body": "**Collects what `setVenueSettingsDefaults` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Apply defaults",
+     "operation": "setVenueSettingsDefaults"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "contract tenancy.yaml PUT /venue-settings-defaults; wiring fix, 2 October 2026"
+   },
+   {
+    "id": "formUpdateRegionSettings",
+    "component": "modal",
+    "trigger": "Save region settings",
+    "body": "**Collects what `updateRegionSettings` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save region settings",
+     "operation": "updateRegionSettings"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "contract tenancy.yaml PUT /regions/{regionId}/settings; wiring fix, 2 October 2026"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "regionId",
+     "from": "navigation"
+    },
+    {
+     "name": "tenantId",
+     "from": "navigation",
+     "optional": true
+    }
+   ]
+  },
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -1216,7 +1974,7 @@
   "states": {
    "loading": "The provisioning validation exception list.",
    "error": "Could not load. Names which read failed and leaves the provisioning validation exception untouched.",
-   "emptyFirstRun": "No provisioning validation exception yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No provisioning validation exception yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the provisioning validation exception are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },

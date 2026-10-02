@@ -1,95 +1,194 @@
 {
- "IntegrationListing": {
+ "AccessHardwareModel": {
   "type": "object",
-  "x-ticvai-persistence": "control.integration_listing",
-  "description": "13.1.50, decision D1. **A listing, not an installation.** The integration runs on the developer's own infrastructure.\n**Third-party code does not execute inside TICVAI** — stated rather than assumed, because that is a different product with a different threat model.\n",
+  "x-ticvai-persistence": "access.hardware_model",
+  "description": "One hardware model in the reusable library, independent of deployed devices: manufacturer, model, category and type, supported technologies, connectivity, capability flags and firmware information (declared 29 September, data-model close-out DM1)",
   "required": [
    "id",
-   "developerId",
-   "name",
-   "category",
-   "status"
+   "manufacturer",
+   "model",
+   "deviceCategory",
+   "hardwareType",
+   "scopePath"
   ],
   "properties": {
    "id": {
     "type": "string",
-    "format": "uuid",
-    "readOnly": true
-   },
-   "developerId": {
-    "type": "string",
     "format": "uuid"
    },
-   "name": {
+   "manufacturer": {
     "type": "string"
    },
-   "category": {
+   "model": {
+    "type": "string"
+   },
+   "deviceCategory": {
     "type": "string",
     "enum": [
-     "crm",
-     "marketing",
-     "accounting",
-     "hotel",
-     "transport",
-     "analytics",
-     "accessibility",
+     "turnstile",
+     "specialGate",
+     "mobile",
+     "reader",
      "other"
     ]
    },
-   "description": {
-    "type": "string"
+   "hardwareType": {
+    "$ref": "../shared/common.yaml#/components/schemas/DeviceHardwareType"
    },
-   "integrationUrl": {
-    "type": "string"
-   },
-   "requiredScopes": {
+   "supportedTechnologies": {
     "type": "array",
     "items": {
      "type": "string"
     }
    },
-   "status": {
-    "type": "string",
-    "enum": [
-     "draft",
-     "submitted",
-     "inReview",
-     "certified",
-     "rejected",
-     "revoked",
-     "delisted"
-    ],
-    "readOnly": true
+   "connectivity": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
    },
-   "certifiedUntil": {
-    "type": "string",
-    "format": "date",
-    "nullable": true,
-    "readOnly": true,
-    "description": "**Certification expires.** An integration certified against v1 and still listed after v3 is TICVAI vouching for something it has not looked at in two years.\n"
+   "offlineCapability": {
+    "type": "boolean",
+    "default": false
    },
-   "certifiedAgainstVersion": {
-    "type": "string",
-    "nullable": true,
-    "readOnly": true
+   "screenCapability": {
+    "type": "boolean",
+    "default": false
    },
-   "listingFeeModel": {
+   "soundCapability": {
+    "type": "boolean",
+    "default": false
+   },
+   "lightCapability": {
+    "type": "boolean",
+    "default": false
+   },
+   "relayControllerSupport": {
+    "type": "boolean",
+    "default": false
+   },
+   "paymentCapability": {
+    "type": "boolean",
+    "default": false,
+    "description": "Payment capability where available"
+   },
+   "firmwareSoftwareInformation": {
     "type": "string",
-    "enum": [
-     "none",
-     "flat",
-     "revenueShare"
-    ],
     "nullable": true
    },
-   "visibility": {
+   "scopePath": {
+    "type": "string",
+    "description": "ltree of the owning scope node (ADR-0005)"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
+ "DeviceTypeHardwareLibraryView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Device Type & Hardware Library displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "hardwareType": {
     "type": "string",
     "enum": [
-     "public",
-     "private"
+     "standardTurnstile",
+     "fullHeightTurnstile",
+     "tripodTurnstile",
+     "speedGate",
+     "wideLane",
+     "accessiblePodGate",
+     "buggyGate",
+     "vipGate",
+     "staffGate",
+     "androidHandheld",
+     "iosDevice",
+     "tablet",
+     "qrBarcodeReader",
+     "rfidReader",
+     "nfcReader",
+     "multiTechnologyReader",
+     "biometricReader",
+     "podium",
+     "counter",
+     "beacon",
+     "cameraController",
+     "externalAccessDevice"
     ],
-    "default": "public",
-    "description": "`private`: certified for production access and never shown in the marketplace (17 September minutes, M17-06). `public`: also listed once certified.\n"
+    "description": "Specific hardware type within the device category"
+   },
+   "manufacturer": {
+    "type": "string",
+    "description": "Manufacturer"
+   },
+   "model": {
+    "type": "string",
+    "description": "Model"
+   },
+   "deviceCategory": {
+    "type": "string",
+    "enum": [
+     "turnstile",
+     "specialGate",
+     "mobile",
+     "reader",
+     "other"
+    ],
+    "description": "Device Category"
+   },
+   "supportedTechnologies": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Supported technologies"
+   },
+   "connectivity": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Connectivity"
+   },
+   "offlineCapability": {
+    "type": "boolean",
+    "description": "Offline capability"
+   },
+   "screenCapability": {
+    "type": "boolean",
+    "description": "Screen capability"
+   },
+   "soundCapability": {
+    "type": "boolean",
+    "description": "Sound capability"
+   },
+   "lightCapability": {
+    "type": "boolean",
+    "description": "Light capability"
+   },
+   "relayControllerSupport": {
+    "type": "boolean",
+    "description": "Relay/controller support"
+   },
+   "paymentCapabilityWhereAvailable": {
+    "type": "boolean",
+    "description": "payment capability where available"
+   },
+   "firmwareSoftwareInformation": {
+    "type": "string",
+    "description": "firmware/software information"
+   },
+   "hardwareModelId": {
+    "type": "string"
    }
   }
  },

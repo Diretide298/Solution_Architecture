@@ -299,6 +299,88 @@
   "requestBody": null,
   "responds": "Page"
  },
+ "listOwnPlatformStaffGrants": {
+  "method": "GET",
+  "path": "/platform-staff-grants/mine",
+  "contract": "identity",
+  "summary": "The calling platform operator's own grants into this tenant",
+  "permission": "PLATFORM_TENANT_ACCESS",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "activeOnly",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listTenants": {
+  "method": "GET",
+  "path": "/tenants",
+  "contract": "subscription",
+  "summary": "List tenants",
+  "permission": "PLATFORM_TENANT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "planId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "openPlatformStaffGrant": {
+  "method": "POST",
+  "path": "/platform-staff-grants",
+  "contract": "identity",
+  "summary": "A platform operator opens a time-boxed grant into this tenant",
+  "permission": "PLATFORM_TENANT_ACCESS",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "PlatformStaffGrant"
+ },
  "pauseAiCapability": {
   "method": "POST",
   "path": "/governance/capabilities/{capabilityKey}/pause",
@@ -323,7 +405,7 @@
   "path": "/releases/{releaseId}/promote",
   "contract": "ai",
   "summary": "Promote a release to its next stage (a person)",
-  "permission": "AI_APPROVE",
+  "permission": "AI_USE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
@@ -374,25 +456,6 @@
   ],
   "requestBody": null,
   "responds": "AiPolicyException"
- },
- "setAiTool": {
-  "method": "PUT",
-  "path": "/tools/{toolKey}",
-  "contract": "ai",
-  "summary": "Register or change a tool (platform)",
-  "permission": "PLATFORM_AI_MANAGE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "platform",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "AiTool",
-  "responds": "AiTool"
  },
  "setDataRetentionSetting": {
   "method": "PUT",

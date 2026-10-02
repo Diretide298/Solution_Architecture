@@ -358,6 +358,12 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 21"
+   },
+   {
+    "operation": "createInvitationCampaign",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-005): The Campaign Builder's create action was createInvitationCampaign, the quota-bounded addressed invitation (press night); the builder's purpose is the general campaign, createCampaign with launchCampaign and testSendCampaign (design-notes correction customer-marketing BO-766).",
+    "source": "contracts/satellite/marketing-crm.yaml#createInvitationCampaign | contracts/satellite/marketing-crm.yaml#createCampaign"
    }
   ],
   "layout": {
@@ -371,20 +377,29 @@
        "derived": true,
        "impliedBy": "listCampaigns",
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
-      },
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "components": [
       {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "createInvitationCampaign",
-       "label": "Create invitation campaign",
-       "notes": "The act the screen exists for."
+       "kind": "secondaryButton",
+       "label": "Create campaign",
+       "operation": "createCampaign",
+       "provenance": "contract marketing-crm.yaml POST /campaigns; wiring fix, 2 October 2026"
       },
       {
        "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "createInvitationCampaign"
+       "label": "Send test",
+       "operation": "testSendCampaign",
+       "provenance": "contract marketing-crm.yaml POST /campaigns/{campaignId}/test-send; wiring fix, 2 October 2026"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Launch campaign",
+       "operation": "launchCampaign",
+       "provenance": "contract marketing-crm.yaml POST /campaigns/{campaignId}/launch; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -406,21 +421,32 @@
     "provenance": "board reading, 19 September 2026"
    },
    {
-    "operationId": "createInvitationCampaign",
-    "contract": "marketing-crm",
-    "purpose": "Create a quota-bounded, addressed invitation campaign",
-    "trigger": "onAction",
-    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
-    "invalidates": [
-     "listCampaigns"
-    ]
-   },
-   {
     "operationId": "proposeMarketingContent",
     "contract": "ai",
     "purpose": "Draft subject lines, message bodies or content variants from a brief, for the author to edit and apply",
     "trigger": "onAction",
     "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "createCampaign",
+    "contract": "marketing-crm",
+    "purpose": "Create a campaign",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-005)"
+   },
+   {
+    "operationId": "testSendCampaign",
+    "contract": "marketing-crm",
+    "purpose": "Send a test to named recipients",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-005)"
+   },
+   {
+    "operationId": "launchCampaign",
+    "contract": "marketing-crm",
+    "purpose": "Launch or schedule the campaign",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-005)"
    }
   ],
   "wireframe": {
@@ -429,6 +455,44 @@
    "workshopBoard": "wireframes/WS73 Marketing CRM Configuration Reference v1.0 Board 4.dc.html#bo-766"
   },
   "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 21. 0 of 0 labels bound to a contract property; 0 of 11 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formCreateCampaign",
+    "component": "modal",
+    "trigger": "Create campaign",
+    "body": "**Collects what `createCampaign` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Create campaign",
+     "operation": "createCampaign"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "contract marketing-crm.yaml POST /campaigns; wiring fix, 2 October 2026"
+   },
+   {
+    "id": "formTestSendCampaign",
+    "component": "modal",
+    "trigger": "Send test",
+    "body": "**Collects what `testSendCampaign` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Send test",
+     "operation": "testSendCampaign"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "contract marketing-crm.yaml POST /campaigns/{campaignId}/test-send; wiring fix, 2 October 2026"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "campaignId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -639,6 +703,12 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 22"
+   },
+   {
+    "operation": "listSegments",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-005): The composer starts from a template and does not choose audiences; listSegments was declared and listMessageTemplates was not (design-notes correction customer-marketing BO-768).",
+    "source": "contracts/satellite/marketing-crm.yaml#listMessageTemplates"
    }
   ],
   "layout": {
@@ -647,12 +717,6 @@
     {
      "name": "contentBody",
      "components": [
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listSegments",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
-      },
       {
        "kind": "primaryButton",
        "derived": true,
@@ -666,6 +730,12 @@
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
        "impliedBy": "updateCampaign"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Templates",
+       "operation": "listMessageTemplates",
+       "provenance": "contract marketing-crm.yaml GET /message-templates; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -674,24 +744,24 @@
   "states": {
    "loading": "The multichannel composer list.",
    "error": "Could not load. Names which read failed and leaves the multichannel composer untouched.",
-   "emptyFirstRun": "No multichannel composer yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No multichannel composer yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the multichannel composer are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
-   {
-    "operationId": "listSegments",
-    "contract": "marketing-crm",
-    "purpose": "Choose an audience",
-    "trigger": "onLoad",
-    "provenance": "board reading, 19 September 2026"
-   },
    {
     "operationId": "updateCampaign",
     "contract": "marketing-crm",
     "purpose": "Attach it",
     "trigger": "onAction",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "listMessageTemplates",
+    "contract": "marketing-crm",
+    "purpose": "Start from a template",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-005)"
    }
   ],
   "wireframe": {
@@ -919,6 +989,11 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 23"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-027): A read (get or list) of the campaign approval workflow that approveCampaignWorkflow writes.",
+    "source": "contracts/satellite/promotions.yaml#approveCampaignWorkflow | screens/P08-venue-back-office.yaml#BO-770"
    }
   ],
   "layout": {
@@ -1283,6 +1358,7 @@
     }
    ]
   },
+  "notes": "**Guests who checked out without an account receive marketing only if they ticked the checkout opt-in (unticked by default, source checkout); nothing is sent without it (decided 2 October 2026 by Chinmay, DEC-275; CHG-CSA-025).** Replaces \"not targeted until the consent question is answered\".",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1354,6 +1430,17 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 23"
+   },
+   {
+    "operation": "recordTouchPoint",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-005): recordTouchPoint is a service-audience operation (touches are recorded by services), not a staff action (design-notes correction customer-marketing BO-773).",
+    "source": "contracts/satellite/marketing-crm.yaml#recordTouchPoint"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-007): No read lists recorded marketing touches.",
+    "source": "contracts/satellite/marketing-crm.yaml#recordTouchPoint"
    }
   ],
   "layout": {
@@ -1367,19 +1454,6 @@
        "derived": true,
        "impliedBy": "getCampaignPerformance",
        "notes": "One record, read-only."
-      },
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "recordTouchPoint",
-       "notes": "The act the screen exists for."
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "recordTouchPoint"
       }
      ]
     }
@@ -1388,7 +1462,7 @@
   "states": {
    "loading": "The attribution audit list.",
    "error": "Could not load. Names which read failed and leaves the attribution audit untouched.",
-   "emptyFirstRun": "No attribution audit yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No attribution audit yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the attribution audit are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -1399,16 +1473,6 @@
     "purpose": "Attribution",
     "trigger": "onAction",
     "provenance": "board reading, 19 September 2026"
-   },
-   {
-    "operationId": "recordTouchPoint",
-    "contract": "marketing-crm",
-    "purpose": "Record an offline marketing touch for attribution",
-    "trigger": "onAction",
-    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
-    "invalidates": [
-     "getCampaignPerformance"
-    ]
    }
   ],
   "wireframe": {

@@ -429,6 +429,20 @@ components:
       which is where integrations actually fail — so the sample carries a real sandbox credential
       or it says plainly where to get one.
 
+  - kind: canvas
+    description: >
+      **A node-and-edge editor**: steps, decisions and connections laid out on a pannable, zoomable
+      surface, with a palette of node types and a properties panel for the selected node or edge.
+    states: [loading, empty, editing, invalid, saving, error]
+    notes: >
+      **Added 2 October 2026 for ADM-241 Visual Workflow Designer** (CHG-MOV-009, CHG-SOT-020): a
+      visual designer edits `VisualWorkflowDesignerInput.definition` against its `nodeTypes`, and form
+      fields cannot draw a graph. `invalid` names the node or edge that breaks the definition (an
+      unconnected step, a loop with no exit) before anything is saved. Keyboard users move between nodes
+      and edges in order and edit them in the properties panel; the canvas is never the only way to
+      change a value. Distinct from `seatMap` (a fixed geometry to select from) and `treeNav` (a
+      hierarchy, not a graph).
+
 patterns:
   - id: listDetailSplit
     description: List left, detail right; stacks to two screens on narrow.
@@ -463,3 +477,23 @@ patterns:
     notes: >
       Lives in `statusStrip` on every offline-capable surface. A cashier needs to know at a
       glance whether their last twenty sales have reached the server.
+  - id: accreditationReview
+    description: >
+      **One reviewer queue and one reviewer workspace for accreditation, used in both apps** (decided 2
+      October 2026, Chinmay, workbook Q368: "One queue and workspace component used in both P11 and P08";
+      DEC-368, CHG-SOT-018). The queue lists the applications waiting on a decision for the reviewer's
+      programmes, due first, with the requirement and document states as row signals; the workspace shows
+      one application with the photo against the ID document, each document and its verification, the
+      venue's history with the person and the decision due date, and decides it (approve, refuse, return for
+      information, escalate).
+    components: [dataTable, detailPanel, banner, primaryButton, destructiveButton, textField]
+    usedBy:
+      queue: [ACC-006, BO-635]
+      workspace: [ACC-007, BO-636]
+    notes: >
+      **Built once.** The P11 reviewer screens and the P08 accreditation board render the same component
+      against the same operations (`listAccreditationApplications`, `getAccreditationApplication`,
+      `listAccreditationDocuments`, `verifyAccreditationDocument`, `decideAccreditationApplication`), so a
+      fix to one is a fix to both. Approval is offered only when nothing that blocks it is unresolved, and
+      every refusal carries a reason the applicant will read. Two copies drift, and a reviewer who works
+      in both apps notices first.

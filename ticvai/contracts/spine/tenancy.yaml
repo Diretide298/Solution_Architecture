@@ -984,10 +984,10 @@ paths:
         - "P08 BO-100 Venue Home"
         - "P08 BO-102 Sell"
         - "P08 BO-106 People & Access Rights"
-        - "P08 BO-187 Biometric Consent & Guardian Management"
         - "P08 BO-1063 Venue-Specific Configuration"
         - "P08 BO-107 Guests & Marketing"
         - "P08 BO-136 F&B Global Settings & Controls"
+        - "P08 BO-187 Biometric Consent & Guardian Management"
       summary: Operational settings for this venue
       description: >
         **What this returns, and what it does not.** `VenueSettings` holds the venue's trading
@@ -1028,9 +1028,9 @@ paths:
       operationId: setVenueSettings
       x-ticvai-consumed-by:
         - "P08 BO-065 Venue Configuration"
-        - "P08 BO-187 Biometric Consent & Guardian Management"
         - "P08 BO-1063 Venue-Specific Configuration"
         - "P08 BO-136 F&B Global Settings & Controls"
+        - "P08 BO-187 Biometric Consent & Guardian Management"
         - "P08 BO-600 Venue, Calendar & Operational Setup"
       summary: Set support hours, quiet hours, segregated access and alerting
       description: >
@@ -1829,11 +1829,11 @@ paths:
         - "P04 POS-016 Till Configuration"
         - "P04 POS-025 Till Home"
         - "P06 EMP-043 Device settings"
+        - "P08 ADM-580 Payment Terminal & Device Inventory"
         - "P08 BO-036 Device Registry"
         - "P08 BO-124 Layout & Journey Builder"
         - "P08 BO-405 Reader Directory"
         - "P08 BO-732 POS & Device Assignment"
-        - "P08 ADM-580 Payment Terminal & Device Inventory"
         - "P16 ANL-003 Operational Performance"
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
@@ -2138,6 +2138,8 @@ paths:
         format: uuid
     post:
       operationId: approveDevice
+      x-ticvai-consumed-by:
+        - "P08 BO-203 Hardware Compatibility, Health, Testing & Deployment"
       x-ticvai-audience:
       - staff
       x-ticvai-conflict-policy: serverWins
@@ -2222,8 +2224,8 @@ paths:
       operationId: setDeviceAssignment
       x-ticvai-consumed-by:
         - "P04 POS-016 Till Configuration"
-        - "P08 BO-732 POS & Device Assignment"
         - "P08 ADM-582 POS, Kiosk & Terminal Assignment Manager"
+        - "P08 BO-732 POS & Device Assignment"
       x-ticvai-conflict-policy: serverWins
       summary: Who owns it, who holds it, and where it is
       description: '16.2.9, 16.2.10 and 16.2.11. **Ownership, custody and location are three facts and
@@ -2281,9 +2283,9 @@ paths:
     get:
       operationId: getDeviceTelemetry
       x-ticvai-consumed-by:
-        - "P08 BO-466 Reader & Device Health Monitor"
         - "P08 ADM-584 Payment Server & Terminal Connectivity Manager"
         - "P08 ADM-587 Terminal Health, Maintenance & Incident Center"
+        - "P08 BO-466 Reader & Device Health Monitor"
       summary: Battery, performance and consumables over time
       description: '16.4.21 and 16.4.22. **The heartbeat already carries consumables and nothing kept
         them.** A point-in-time reading answers *is it alive*; the matrix asks *is it degrading*, and
@@ -2333,8 +2335,8 @@ paths:
     get:
       operationId: listDeviceFirmware
       x-ticvai-consumed-by:
-        - "P08 BO-129 Software, Configuration & Version Management"
         - "P08 ADM-587 Terminal Health, Maintenance & Incident Center"
+        - "P08 BO-129 Software, Configuration & Version Management"
       summary: Firmware and software versions, and what is running where
       description: '16.6.30 and 16.6.32. **The fleet view, which is the only useful one.** *Which version
         is this scanner on* is rarely asked; *how many scanners are still on the version with the scan
@@ -2371,8 +2373,8 @@ paths:
     post:
       operationId: createDeviceFirmware
       x-ticvai-consumed-by:
-        - "P08 BO-129 Software, Configuration & Version Management"
         - "P08 ADM-587 Terminal Health, Maintenance & Incident Center"
+        - "P08 BO-129 Software, Configuration & Version Management"
       x-ticvai-agreed: '29 September: re-trace 16.6.30 and 16.6.33 (nothing wrote the table the rollout
         references); our build plan; shape follows startDeviceFirmwareRollout'
       summary: Register a firmware or software release before it is deployed
@@ -2439,8 +2441,8 @@ paths:
     get:
       operationId: getDeviceFirmware
       x-ticvai-consumed-by:
-        - "P08 BO-129 Software, Configuration & Version Management"
         - "P08 ADM-587 Terminal Health, Maintenance & Incident Center"
+        - "P08 BO-129 Software, Configuration & Version Management"
       x-ticvai-agreed: '29 September: re-trace 16.6.30 (release read beside the new write); our build
         plan; shape follows getDevice'
       summary: Read one firmware release, and how much of the fleet is on it
@@ -2888,9 +2890,9 @@ paths:
     get:
       operationId: listDataRetentionSettings
       x-ticvai-consumed-by:
+        - "P08 ADM-346 Approval Record Retention Policy"
         - "P08 BO-192 Biometric Lifecycle, Retention & Deletion"
         - "P08 BO-751 Retention & Anonymization"
-        - "P08 ADM-346 Approval Record Retention Policy"
         - "P09 ADM-524 AI Data Access & Usage Policy"
         - "P16 ANL-050 Retention, Archive & Governance Policy"
       x-ticvai-agreed: '29 September: decided by Chinmay (all data retention is tenant configuration, one
@@ -2950,8 +2952,8 @@ paths:
     put:
       operationId: setDataRetentionSetting
       x-ticvai-consumed-by:
-        - "P08 BO-751 Retention & Anonymization"
         - "P08 ADM-346 Approval Record Retention Policy"
+        - "P08 BO-751 Retention & Anonymization"
         - "P09 ADM-524 AI Data Access & Usage Policy"
         - "P16 ANL-050 Retention, Archive & Governance Policy"
       x-ticvai-agreed: '29 September: decided by Chinmay (all data retention moves to tenant

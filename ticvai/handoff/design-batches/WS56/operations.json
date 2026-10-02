@@ -37,92 +37,6 @@
   "requestBody": "AutomationExecutionAutonomousActionMonitorInput",
   "responds": "AutomationExecutionAutonomousActionMonitorView"
  },
- "decideApprovalRequest": {
-  "method": "POST",
-  "path": "/approval-requests/{requestId}/decide",
-  "contract": "approvals",
-  "summary": "Approve, reject, return or ask for information",
-  "permission": "APPROVAL_DECIDE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "ApprovalRequest"
- },
- "getApprovalRequestScore": {
-  "method": "GET",
-  "path": "/approval-requests/{approvalRequestId}/score",
-  "contract": "ai",
-  "summary": "The latest context score of an approval request",
-  "permission": "APPROVAL_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "AiApprovalRequestScore"
- },
- "listApprovalRequests": {
-  "method": "GET",
-  "path": "/approval-requests",
-  "contract": "approvals",
-  "summary": "Requests awaiting a decision, or already decided",
-  "permission": "APPROVAL_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "assignedToMe",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "raisedByMe",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "status",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "kind",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "breachingWithinMinutes",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "sort",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- },
  "listCrossModuleOrchestration": {
   "method": "GET",
   "path": "/cross-module-orchestration",
@@ -174,45 +88,6 @@
    },
    {
     "name": "module",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- },
- "listSlaEscalationBottleneck": {
-  "method": "GET",
-  "path": "/sla-escalation-bottleneck",
-  "contract": "approvals",
-  "summary": "SLA, Escalation & Bottleneck Monitor",
-  "permission": "APPROVAL_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "workflow",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "risk",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "escalationLevel",
     "in": "query",
     "required": false
    },

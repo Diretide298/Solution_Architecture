@@ -35,7 +35,7 @@ steps:
   screen: KSK-002
   action: Chooses a language
   operations:
-  - getTenantConfig
+  - getPublishedTenantConfig
   outcome: Everything after this is in their language, including receipts
 - step: 3
   screen: KSK-003
@@ -49,7 +49,12 @@ steps:
   operations:
   - listProductVariants
   - getAvailability
-  outcome: Sees availability from a one-second cache (ADR-0065); the hold decides
+  outcome: Sees availability from a one-second cache (ADR-0065); the hold decides. **Tickets first, then
+    the date and time** (step 5), on the kiosk only
+  note: '**Kept deliberately, 2 October 2026 (CHG-SOT-005).** Chinmay chose tickets first for the kiosk (batch 5,
+    KSK-004: "Tickets first"; DEC-170, CHG-DOC-017). REV3-2 put the date and time before tickets on every
+    guest channel; it still holds for the web and the app, and this order supersedes it for the kiosk only.
+    Do not "align" this flow with F01.'
 - step: 5
   screen: KSK-005
   action: Chooses a session

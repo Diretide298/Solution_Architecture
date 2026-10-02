@@ -21,6 +21,7 @@
    ],
    "inferred": true,
    "entryFrom": [
+    "BO-080",
     "BO-105"
    ],
    "transitions": [
@@ -38,7 +39,7 @@
     {
      "to": "BO-080",
      "trigger": "Stock Transfers",
-     "provenance": "derived — BO-080 declares entryState.params transferId and BO-049 holds none of them. The edge carries nothing: transferId only pre-selects (deep link or optional), and BO-080 opens on its own"
+     "provenance": "derived — BO-080 declares entryState.params transferId and BO-049 holds none of them. The edge carries nothing: BO-049 is opened from BO-080, so this edge is the way back and BO-080 keeps its own state"
     },
     {
      "to": "EMP-065",
@@ -156,12 +157,6 @@
      "slot": "rowActions",
      "components": [
       {
-       "kind": "primaryButton",
-       "label": "Save item availability",
-       "operation": "setItemAvailability",
-       "provenance": "contract fnb.yaml PUT /menu-items/{itemId}/availability"
-      },
-      {
        "kind": "secondaryButton",
        "label": "Create stock transfer",
        "operation": "createStockTransfer",
@@ -196,15 +191,6 @@
     "contract": "inventory",
     "purpose": "Stock value by location and category",
     "trigger": "onLoad"
-   },
-   {
-    "operationId": "setItemAvailability",
-    "contract": "fnb",
-    "purpose": "Mark an item available or eighty-sixed",
-    "trigger": "onAction",
-    "invalidates": [
-     "listStockLocations"
-    ]
    },
    {
     "operationId": "createStockTransfer",
@@ -262,26 +248,6 @@
   "apisNote": "Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "overlays": [
    {
-    "id": "formSetItemAvailability",
-    "component": "modal",
-    "trigger": "Save item availability",
-    "body": "**Collects what `setItemAvailability` sends before it is called.** Required: `isAvailable`, `recordedAt`. Optional: `reason`, `restoreAt`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Save item availability",
-     "operation": "setItemAvailability"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "isAvailable",
-      "recordedAt",
-      "reason",
-      "restoreAt"
-     ]
-    },
-    "provenance": "contract fnb.yaml PUT /menu-items/{itemId}/availability"
-   },
-   {
     "id": "formCreateStockTransfer",
     "component": "modal",
     "trigger": "Create stock transfer",
@@ -329,6 +295,14 @@
      ]
     },
     "provenance": "contract inventory.yaml POST /stock-movements"
+   }
+  ],
+  "gaps": [
+   {
+    "operation": "setItemAvailability",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-008): \"Save item availability\" (the F&B 86 operation) acts on a menu item, not a stock item, and has its own screen (BO-140) (R254, R110; design-notes correction fnb-retail BO-049).",
+    "source": "R254 | R110 | contracts/satellite/fnb.yaml#setItemAvailability"
    }
   ],
   "_platform": {
@@ -504,6 +478,7 @@
     }
    ],
    "entryFrom": [
+    "BO-080",
     "BO-105"
    ],
    "inferred": false,
@@ -959,27 +934,6 @@
        ],
        "operation": "getPurchaseOrder",
        "provenance": "contract inventory.yaml GET /purchase-orders/{purchaseOrderId}"
-      },
-      {
-       "kind": "detailPanel",
-       "label": "The stock transfer",
-       "bindsTo": "StockTransfer",
-       "columns": [
-        "StockTransfer.id",
-        "StockTransfer.transferNumber",
-        "StockTransfer.fromLocationId",
-        "StockTransfer.toLocationId",
-        "StockTransfer.status",
-        "StockTransfer.lines",
-        "StockTransfer.dispatchedByPrincipalId",
-        "StockTransfer.receivedByPrincipalId",
-        "StockTransfer.dispatchedAt",
-        "StockTransfer.receivedAt",
-        "StockTransfer.closeShortReason",
-        "StockTransfer.scopePath"
-       ],
-       "operation": "getStockTransfer",
-       "provenance": "contract inventory.yaml GET /stock-transfers/{transferId}"
       }
      ]
     },
@@ -995,54 +949,12 @@
        "provenance": "contract inventory.yaml POST /goods-receipts"
       },
       {
-       "kind": "secondaryButton",
-       "label": "Acknowledge purchase order",
-       "operation": "acknowledgePurchaseOrder",
-       "permission": "PROCUREMENT_MANAGE",
-       "provenance": "contract inventory.yaml POST /purchase-orders/{purchaseOrderId}/acknowledge"
-      },
-      {
-       "kind": "destructiveButton",
-       "label": "Cancel purchase order",
-       "operation": "cancelPurchaseOrder",
-       "permission": "PROCUREMENT_MANAGE",
-       "provenance": "contract inventory.yaml POST /purchase-orders/{purchaseOrderId}/cancel"
-      },
-      {
-       "kind": "destructiveButton",
-       "label": "Close purchase order short",
-       "operation": "closePurchaseOrderShort",
-       "permission": "PROCUREMENT_MANAGE",
-       "provenance": "contract inventory.yaml POST /purchase-orders/{purchaseOrderId}/close-short"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Create purchase order",
-       "operation": "createPurchaseOrder",
-       "permission": "PROCUREMENT_MANAGE",
-       "notes": "PO lines prefill the unit price from the selected quotation; changing it asks for an override reason (decided 28 September, audit R171).",
-       "provenance": "contract inventory.yaml POST /purchase-orders"
-      },
-      {
        "kind": "destructiveButton",
        "label": "Reject received goods",
        "operation": "rejectReceivedGoods",
        "permission": "PROCUREMENT_RECEIVE",
        "notes": "**Rejects receipt lines, not items** — the picker lists the receipt's batch/expiry lines by `lineId` (decided 28 September, audit R171). Choosing reason Other makes the note required (audit R222).",
        "provenance": "contract inventory.yaml POST /goods-receipts/{receiptId}/reject"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Send purchase order",
-       "operation": "sendPurchaseOrder",
-       "permission": "PROCUREMENT_MANAGE",
-       "provenance": "contract inventory.yaml POST /purchase-orders/{purchaseOrderId}/send"
-      },
-      {
-       "kind": "destructiveButton",
-       "label": "Close transfer short",
-       "operation": "closeTransferShort",
-       "provenance": "contract inventory.yaml POST /stock-transfers/{transferId}/close-short"
       }
      ]
     }
@@ -1050,32 +962,11 @@
   },
   "overlays": [
    {
-    "id": "confirmCancelPurchaseOrder",
-    "component": "confirmDialog",
-    "trigger": "Cancel purchase order",
-    "body": "**Names what `cancelPurchaseOrder` changes and what it leaves alone**, in the consequence rather than the verb. A goods receipt this affects should be identified in the dialog, not just counted. **Collects what `cancelPurchaseOrder` sends before it is called.** Required: `reason`. **It may answer 202 pending a finance approver** (decided 28 September, audit R144): the order is unchanged, shows *cancellation pending approval* and carries `approvalRequestId` until the approver acts.",
-    "provenance": "contract inventory.yaml POST /purchase-orders/{purchaseOrderId}/cancel"
-   },
-   {
-    "id": "confirmClosePurchaseOrderShort",
-    "component": "confirmDialog",
-    "trigger": "Close purchase order short",
-    "body": "**Names what `closePurchaseOrderShort` changes and what it leaves alone**, in the consequence rather than the verb. A goods receipt this affects should be identified in the dialog, not just counted. **Collects what `closePurchaseOrderShort` sends before it is called.** Required: `reason`. **It may answer 202 pending a finance approver** (decided 28 September, audit R144): the order is unchanged, shows *close-short pending approval* and carries `approvalRequestId` until the approver acts.",
-    "provenance": "contract inventory.yaml POST /purchase-orders/{purchaseOrderId}/close-short"
-   },
-   {
     "id": "confirmRejectReceivedGoods",
     "component": "confirmDialog",
     "trigger": "Reject received goods",
     "body": "**Names what `rejectReceivedGoods` changes and what it leaves alone**, in the consequence rather than the verb. A goods receipt this affects should be identified in the dialog, not just counted. **Collects what `rejectReceivedGoods` sends before it is called.** Required: `lines` — each a receipt line picked by `lineId` (the batch or expiry line, so one item received on two batches can be rejected on one of them) with the `quantity` rejected (decided 28 September, audit R171) — and `reason` (damaged, wrongItem, qualityFailure, shortDated, overDelivery, other). `note` is optional, **and required (at least 3 characters) when the reason is Other**; the dialog will not confirm without it and the server refuses 400 (decided 28 September, audit R222).",
     "provenance": "contract inventory.yaml POST /goods-receipts/{receiptId}/reject"
-   },
-   {
-    "id": "confirmCloseTransferShort",
-    "component": "confirmDialog",
-    "trigger": "Close transfer short",
-    "body": "**Names what `closeTransferShort` changes and what it leaves alone**, in the consequence rather than the verb. A goods receipt this affects should be identified in the dialog, not just counted. **Collects what `closeTransferShort` sends before it is called.** Required: `reason` and `supervisorStepUp` — a supervisor enters their staff PIN on this device (`principalId`, `credential`); a refused PIN is 403 supervisor-step-up-refused (decided 28 September, audit R144).",
-    "provenance": "contract inventory.yaml POST /stock-transfers/{transferId}/close-short"
    },
    {
     "id": "formCreateGoodsReceipt",
@@ -1099,48 +990,6 @@
      ]
     },
     "provenance": "contract inventory.yaml POST /goods-receipts"
-   },
-   {
-    "id": "formAcknowledgePurchaseOrder",
-    "component": "modal",
-    "trigger": "Acknowledge purchase order",
-    "body": "**Collects what `acknowledgePurchaseOrder` sends before it is called.** Required: `supplierReference`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Acknowledge purchase order",
-     "operation": "acknowledgePurchaseOrder"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "supplierReference"
-     ]
-    },
-    "provenance": "contract inventory.yaml POST /purchase-orders/{purchaseOrderId}/acknowledge"
-   },
-   {
-    "id": "formCreatePurchaseOrder",
-    "component": "modal",
-    "trigger": "Create purchase order",
-    "body": "**Collects what `createPurchaseOrder` sends before it is called.** Required: `id`, `requisitionId`, `supplierId`, `quotationId`, `lines`, `expectedDelivery`. Optional: `deliverToLocationId`, `note`. **Each line's `unitPrice` is prefilled from the selected quotation**; if the user changes it, the line asks for `priceOverrideReason`, which the server requires (400) whenever the price differs from the quotation (decided 28 September, audit R171). Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "CreatePurchaseOrderRequest",
-    "confirm": {
-     "label": "Create purchase order",
-     "operation": "createPurchaseOrder"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "id",
-      "requisitionId",
-      "supplierId",
-      "quotationId",
-      "lines",
-      "expectedDelivery",
-      "deliverToLocationId",
-      "note"
-     ]
-    },
-    "provenance": "contract inventory.yaml POST /purchase-orders"
    }
   ],
   "states": {
@@ -1167,42 +1016,6 @@
     "trigger": "onLoad"
    },
    {
-    "operationId": "acknowledgePurchaseOrder",
-    "contract": "inventory",
-    "purpose": "Record the supplier acknowledgement",
-    "trigger": "onAction",
-    "invalidates": [
-     "listPurchaseOrders"
-    ]
-   },
-   {
-    "operationId": "cancelPurchaseOrder",
-    "contract": "inventory",
-    "purpose": "Cancel a purchase order",
-    "trigger": "onAction",
-    "invalidates": [
-     "listPurchaseOrders"
-    ]
-   },
-   {
-    "operationId": "closePurchaseOrderShort",
-    "contract": "inventory",
-    "purpose": "Close an order accepting the balance will not arrive",
-    "trigger": "onAction",
-    "invalidates": [
-     "listPurchaseOrders"
-    ]
-   },
-   {
-    "operationId": "createPurchaseOrder",
-    "contract": "inventory",
-    "purpose": "Raise a purchase order",
-    "trigger": "onAction",
-    "invalidates": [
-     "listPurchaseOrders"
-    ]
-   },
-   {
     "operationId": "getPurchaseOrder",
     "contract": "inventory",
     "purpose": "Read a purchase order with receipt progress",
@@ -1222,30 +1035,6 @@
     "invalidates": [
      "listPurchaseOrders"
     ]
-   },
-   {
-    "operationId": "sendPurchaseOrder",
-    "contract": "inventory",
-    "purpose": "Issue the order to the supplier",
-    "trigger": "onAction",
-    "invalidates": [
-     "listPurchaseOrders"
-    ]
-   },
-   {
-    "operationId": "closeTransferShort",
-    "contract": "inventory",
-    "purpose": "Close a transfer accepting the balance will not arrive",
-    "trigger": "onAction",
-    "invalidates": [
-     "listPurchaseOrders"
-    ]
-   },
-   {
-    "operationId": "getStockTransfer",
-    "contract": "inventory",
-    "purpose": "One transfer, its manifest and where it is",
-    "trigger": "onLoad"
    }
   ],
   "entryState": {
@@ -1257,11 +1046,6 @@
     {
      "name": "receiptId",
      "from": "deepLink"
-    },
-    {
-     "name": "transferId",
-     "from": "deepLink",
-     "optional": true
     }
    ],
    "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `purchaseOrderId`, `receiptId`, `transferId`.",
@@ -1282,6 +1066,50 @@
    "note": "**Drawn by Claude Design on `Retail Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 12 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "gaps": [
+   {
+    "operation": "acknowledgePurchaseOrder",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-008): The purchase-order lifecycle belongs to BO-051 and the transfer actions to BO-080; F76 step 5 and F92 step 5 attached them here before BO-051 existed in the chain. Kept receipt, rejection, the order list for picking and receipt history (R254; design-notes correction fnb-retail BO-052).",
+    "source": "R254 | F76 step 5 | F92 step 5 | screens/P08-venue-back-office.yaml#BO-051"
+   },
+   {
+    "operation": "cancelPurchaseOrder",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-008): The purchase-order lifecycle belongs to BO-051 and the transfer actions to BO-080; F76 step 5 and F92 step 5 attached them here before BO-051 existed in the chain. Kept receipt, rejection, the order list for picking and receipt history (R254; design-notes correction fnb-retail BO-052).",
+    "source": "R254 | F76 step 5 | F92 step 5 | screens/P08-venue-back-office.yaml#BO-051"
+   },
+   {
+    "operation": "closePurchaseOrderShort",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-008): The purchase-order lifecycle belongs to BO-051 and the transfer actions to BO-080; F76 step 5 and F92 step 5 attached them here before BO-051 existed in the chain. Kept receipt, rejection, the order list for picking and receipt history (R254; design-notes correction fnb-retail BO-052).",
+    "source": "R254 | F76 step 5 | F92 step 5 | screens/P08-venue-back-office.yaml#BO-051"
+   },
+   {
+    "operation": "closeTransferShort",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-008): The purchase-order lifecycle belongs to BO-051 and the transfer actions to BO-080; F76 step 5 and F92 step 5 attached them here before BO-051 existed in the chain. Kept receipt, rejection, the order list for picking and receipt history (R254; design-notes correction fnb-retail BO-052).",
+    "source": "R254 | F76 step 5 | F92 step 5 | screens/P08-venue-back-office.yaml#BO-051"
+   },
+   {
+    "operation": "createPurchaseOrder",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-008): The purchase-order lifecycle belongs to BO-051 and the transfer actions to BO-080; F76 step 5 and F92 step 5 attached them here before BO-051 existed in the chain. Kept receipt, rejection, the order list for picking and receipt history (R254; design-notes correction fnb-retail BO-052).",
+    "source": "R254 | F76 step 5 | F92 step 5 | screens/P08-venue-back-office.yaml#BO-051"
+   },
+   {
+    "operation": "getStockTransfer",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-008): The purchase-order lifecycle belongs to BO-051 and the transfer actions to BO-080; F76 step 5 and F92 step 5 attached them here before BO-051 existed in the chain. Kept receipt, rejection, the order list for picking and receipt history (R254; design-notes correction fnb-retail BO-052).",
+    "source": "R254 | F76 step 5 | F92 step 5 | screens/P08-venue-back-office.yaml#BO-051"
+   },
+   {
+    "operation": "sendPurchaseOrder",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-008): The purchase-order lifecycle belongs to BO-051 and the transfer actions to BO-080; F76 step 5 and F92 step 5 attached them here before BO-051 existed in the chain. Kept receipt, rejection, the order list for picking and receipt history (R254; design-notes correction fnb-retail BO-052).",
+    "source": "R254 | F76 step 5 | F92 step 5 | screens/P08-venue-back-office.yaml#BO-051"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -2274,6 +2102,8 @@
   },
   "navigation": {
    "exitTo": [
+    "BO-049",
+    "BO-051",
     "BO-052",
     "BO-078",
     "BO-079",
@@ -2305,11 +2135,20 @@
     {
      "to": "BO-052",
      "trigger": "Goods Receipt",
-     "provenance": "flow F76 step 4→5, F92 step 4→5",
+     "provenance": "flow F76 step 4→5, F92 step 4→5"
+    },
+    {
+     "to": "BO-049",
+     "trigger": "The website has already sold four of the damaged units",
+     "provenance": "flow F35 step 4→5",
      "carries": [
-      "purchaseOrderId",
-      "transferId"
+      "itemId"
      ]
+    },
+    {
+     "to": "BO-051",
+     "trigger": "Goods Receipt",
+     "provenance": "flow F76 step 4→5, F92 step 4→5"
     }
    ]
   },
@@ -2384,12 +2223,6 @@
        "label": "Close transfer short",
        "operation": "closeTransferShort",
        "provenance": "contract inventory.yaml POST /stock-transfers/{transferId}/close-short"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Create goods receipt",
-       "operation": "createGoodsReceipt",
-       "provenance": "contract inventory.yaml POST /goods-receipts"
       }
      ]
     },
@@ -2471,29 +2304,6 @@
      ]
     },
     "provenance": "contract inventory.yaml POST /stock-transfers/{transferId}/receive"
-   },
-   {
-    "id": "formCreateGoodsReceipt",
-    "component": "modal",
-    "trigger": "Create goods receipt",
-    "body": "**Collects what `createGoodsReceipt` sends before it is called.** Required: `id`, `purchaseOrderId`, `locationId`, `lines`, `recordedAt`. Optional: `deliveryNoteReference`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "CreateGoodsReceiptRequest",
-    "confirm": {
-     "label": "Create goods receipt",
-     "operation": "createGoodsReceipt"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "id",
-      "purchaseOrderId",
-      "locationId",
-      "lines",
-      "recordedAt",
-      "deliveryNoteReference"
-     ]
-    },
-    "provenance": "contract inventory.yaml POST /goods-receipts"
    }
   ],
   "states": {
@@ -2538,15 +2348,6 @@
     ]
    },
    {
-    "operationId": "createGoodsReceipt",
-    "contract": "inventory",
-    "purpose": "Receive goods against a purchase order",
-    "trigger": "onAction",
-    "invalidates": [
-     "listStockTransfers"
-    ]
-   },
-   {
     "operationId": "getStockTransfer",
     "contract": "inventory",
     "purpose": "One transfer, its manifest and where it is",
@@ -2571,6 +2372,14 @@
    "note": "**Drawn by Claude Design on `Retail Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "gaps": [
+   {
+    "operation": "createGoodsReceipt",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-008): Transfers are received with Receive; a goods receipt needs a supplier purchase order and was attached by resemblance (R254; design-notes correction fnb-retail BO-080).",
+    "source": "R254 | contracts/satellite/inventory.yaml#createGoodsReceipt"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -2658,18 +2467,12 @@
      "slot": "collection",
      "components": [
       {
-       "kind": "textField",
-       "label": "Venue id",
+       "kind": "selectField",
+       "label": "Category",
        "operation": "listInventoryItems",
-       "notes": "Sends `?venueId=` to `listInventoryItems`.",
-       "provenance": "contract inventory.yaml GET /inventory-items"
-      },
-      {
-       "kind": "textField",
-       "label": "Category id",
-       "operation": "listInventoryItems",
-       "notes": "Sends `?categoryId=` to `listInventoryItems`.",
-       "provenance": "contract inventory.yaml GET /inventory-items"
+       "notes": "A pick list of categories by name; the venue comes from the session.",
+       "provenance": "contract inventory.yaml GET /inventory-items",
+       "bindsTo": "InventoryItem.categoryId"
       },
       {
        "kind": "toggle",
@@ -2687,14 +2490,12 @@
       },
       {
        "kind": "dataTable",
-       "label": "Every inventory",
+       "label": "Items",
        "bindsTo": "InventoryItem",
        "columns": [
         "InventoryItem.sku",
         "InventoryItem.barcode",
         "InventoryItem.name",
-        "InventoryItem.venueId",
-        "InventoryItem.categoryId",
         "InventoryItem.baseUnit",
         "InventoryItem.purchaseUnit",
         "InventoryItem.purchaseUnitFactor",
@@ -2707,20 +2508,18 @@
        "provenance": "contract inventory.yaml GET /inventory-items"
       },
       {
-       "kind": "dataTable",
-       "label": "Every stock location",
+       "kind": "treeNav",
+       "label": "Stock locations",
        "bindsTo": "StockLocation",
        "columns": [
-        "StockLocation.id",
         "StockLocation.code",
         "StockLocation.name",
-        "StockLocation.venueId",
         "StockLocation.kind",
-        "StockLocation.parentLocationId",
         "StockLocation.isActive"
        ],
        "operation": "listStockLocations",
-       "provenance": "contract inventory.yaml GET /stock-locations"
+       "provenance": "contract inventory.yaml GET /stock-locations",
+       "notes": "On its own tab, as a tree (parent and children), not a raw table beside the items."
       }
      ]
     },
@@ -3049,25 +2848,34 @@
      "slot": "collection",
      "components": [
       {
-       "kind": "textField",
-       "label": "Item id",
-       "operation": "listStockMovements",
-       "notes": "Sends `?itemId=` to `listStockMovements`.",
-       "provenance": "contract inventory.yaml GET /stock-movements"
+       "kind": "selectField",
+       "label": "Item",
+       "operation": "listInventoryItems",
+       "notes": "A pick list in words, never a typed id (design-note correction, 2 October 2026).",
+       "provenance": "contract inventory.yaml GET /stock-movements",
+       "bindsTo": "InventoryItem.id",
+       "columns": [
+        "InventoryItem.name"
+       ]
       },
       {
-       "kind": "textField",
-       "label": "Location id",
-       "operation": "listStockMovements",
-       "notes": "Sends `?locationId=` to `listStockMovements`.",
-       "provenance": "contract inventory.yaml GET /stock-movements"
+       "kind": "selectField",
+       "label": "Location",
+       "operation": "listStockLocations",
+       "notes": "A pick list in words, never a typed id (design-note correction, 2 October 2026).",
+       "provenance": "contract inventory.yaml GET /stock-movements",
+       "bindsTo": "StockLocation.id",
+       "columns": [
+        "StockLocation.name"
+       ]
       },
       {
-       "kind": "textField",
+       "kind": "multiSelect",
        "label": "Kind",
        "operation": "listStockMovements",
-       "notes": "Sends `?kind=` to `listStockMovements`. Offers every `MovementKind`, including `adjustmentIn`/`adjustmentOut` and `countGain`/`countLoss`, which replaced `adjustment` and `countAdjustment` (audit R171).",
-       "provenance": "contract inventory.yaml GET /stock-movements"
+       "notes": "Movement kinds in words, as chips.",
+       "provenance": "contract inventory.yaml GET /stock-movements",
+       "bindsTo": "StockMovement.kind"
       },
       {
        "kind": "datePicker",
@@ -3085,17 +2893,13 @@
       },
       {
        "kind": "dataTable",
-       "label": "Every stock movement",
+       "label": "Movements",
        "bindsTo": "StockMovement",
        "columns": [
-        "StockMovement.id",
-        "StockMovement.itemId",
-        "StockMovement.locationId",
         "StockMovement.kind",
         "StockMovement.quantity",
         "StockMovement.unit",
         "StockMovement.reason",
-        "StockMovement.costCenterId",
         "StockMovement.recordedAt",
         "StockMovement.balanceAfter",
         "StockMovement.unitCost",
@@ -3104,25 +2908,6 @@
        "operation": "listStockMovements",
        "notes": "`countGain` and `countLoss` rows are shown (posted by a stock count), never entered here; quantity is always positive and the kind shows the direction (decided 28 September, audit R171).",
        "provenance": "contract inventory.yaml GET /stock-movements"
-      },
-      {
-       "kind": "dataTable",
-       "label": "Every order",
-       "bindsTo": "OrderSummary",
-       "columns": [
-        "OrderSummary.id",
-        "OrderSummary.orderNumber",
-        "OrderSummary.status",
-        "OrderSummary.grossAmount",
-        "OrderSummary.refundedAmount",
-        "OrderSummary.channel",
-        "OrderSummary.lineCount",
-        "OrderSummary.principalId",
-        "OrderSummary.holdLabel",
-        "OrderSummary.heldUntil"
-       ],
-       "operation": "listOrders",
-       "provenance": "contract orders.yaml GET /orders"
       }
      ]
     },
@@ -3166,12 +2951,6 @@
        "label": "Create stock movement",
        "operation": "createStockMovement",
        "provenance": "contract inventory.yaml POST /stock-movements"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Create stock transfer",
-       "operation": "createStockTransfer",
-       "provenance": "contract inventory.yaml POST /stock-transfers"
       }
      ]
     }
@@ -3201,19 +2980,18 @@
     ]
    },
    {
-    "operationId": "createStockTransfer",
+    "operationId": "listInventoryItems",
     "contract": "inventory",
-    "purpose": "Send stock to another location",
-    "trigger": "onAction",
-    "invalidates": [
-     "listStockMovements"
-    ]
+    "purpose": "List inventory items (the pick list)",
+    "trigger": "onLoad",
+    "provenance": "design-note correction, 2 October 2026 (BO-082)"
    },
    {
-    "operationId": "listOrders",
-    "contract": "orders",
-    "purpose": "List orders",
-    "trigger": "onLoad"
+    "operationId": "listStockLocations",
+    "contract": "inventory",
+    "purpose": "List stock locations (the pick list)",
+    "trigger": "onLoad",
+    "provenance": "design-note correction, 2 October 2026 (BO-082)"
    }
   ],
   "entryState": {
@@ -3260,29 +3038,20 @@
      ]
     },
     "provenance": "contract inventory.yaml POST /stock-movements"
+   }
+  ],
+  "gaps": [
+   {
+    "operation": "createStockTransfer",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-008): An \"Every order\" table (sales orders) and \"Create stock transfer\" sit on the movement ledger, attached through F35 step 7; sourcing belongs with transfers (BO-080) and the order screens (R254; design-notes correction fnb-retail BO-082).",
+    "source": "R254 | F35 step 7"
    },
    {
-    "id": "formCreateStockTransfer",
-    "component": "modal",
-    "trigger": "Create stock transfer",
-    "body": "**Collects what `createStockTransfer` sends before it is called.** Required: `id`, `fromLocationId`, `toLocationId`, `lines`, `recordedAt`. Optional: `note`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "CreateStockTransferRequest",
-    "confirm": {
-     "label": "Create stock transfer",
-     "operation": "createStockTransfer"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "id",
-      "fromLocationId",
-      "toLocationId",
-      "lines",
-      "recordedAt",
-      "note"
-     ]
-    },
-    "provenance": "contract inventory.yaml POST /stock-transfers"
+    "operation": "listOrders",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-008): An \"Every order\" table (sales orders) and \"Create stock transfer\" sit on the movement ledger, attached through F35 step 7; sourcing belongs with transfers (BO-080) and the order screens (R254; design-notes correction fnb-retail BO-082).",
+    "source": "R254 | F35 step 7"
    }
   ],
   "_platform": {
@@ -3324,9 +3093,7 @@
   "navigation": {
    "exitTo": [
     "BO-007",
-    "BO-078",
-    "BO-079",
-    "BO-080"
+    "BO-078"
    ],
    "inferred": true,
    "entryFrom": [
@@ -3340,16 +3107,6 @@
       "requisitionId"
      ],
      "provenance": "derived — BO-078 declares entryState.params requisitionId and BO-083 holds requisitionId, so an edge into it carries them"
-    },
-    {
-     "to": "BO-079",
-     "trigger": "Stock Count",
-     "provenance": "derived — BO-079 declares entryState.params countId and BO-083 holds none of them. The edge carries nothing: countId only pre-selects (deep link or optional), and BO-079 opens on its own"
-    },
-    {
-     "to": "BO-080",
-     "trigger": "Stock Transfers",
-     "provenance": "derived — BO-080 declares entryState.params transferId and BO-083 holds none of them. The edge carries nothing: transferId only pre-selects (deep link or optional), and BO-080 opens on its own"
     },
     {
      "to": "BO-007",

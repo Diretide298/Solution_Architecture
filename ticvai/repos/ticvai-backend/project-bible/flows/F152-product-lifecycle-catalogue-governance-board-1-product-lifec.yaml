@@ -1,11 +1,11 @@
 id: F152
 name: 'Product Lifecycle   Catalogue Governance board 1: Product Lifecycle Command Center'
-actor: platformAdmin
+actor: venueManager
 wave: 3
 frequency: routine
 criticality: operational
 platforms:
-- P09 TICVAI Web
+- P08 Venue Management
 provenance: derived-from-board
 offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
   not guess.
@@ -49,9 +49,8 @@ steps:
   outcome: Ready for the next screen on this board
 - step: 6
   screen: ADM-121
-  action: Works in Bulk Product Creation & Catalogue Import
-  operations:
-  - createBulkProductCatalogue
+  action: Works in Bulk Product Creation & Catalogue Import, a section of BO-117, which saves the record with importProductCatalogue and commitCatalogueImport (createBulkProductCatalogue retired in r2, CHG-CLN-001)
+  operations: []
   outcome: Allow large catalogues to be created efficiently rather than configuring every product manually.
     This directly addresses the matrix requirement for catalogue creation through bulk-file upload.
 - step: 7

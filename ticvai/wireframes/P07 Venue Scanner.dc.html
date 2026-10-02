@@ -188,12 +188,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listAccessPoints · getAccessPoint · setTurnstileMode · startPodiumShift +1</div>
+          <div><b>OPERATIONS</b> &middot; listAccessPoints · getAccessPoint · startPodiumShift · endPodiumShift</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; accessPointId&larr;deepLink, podiumId&larr;session, shiftId&larr;session</div>
           <div><b>GOES TO</b> &middot; <a href="#scn-001">SCN-001</a>  &mdash; <i>Sign in</i><br><a href="#scn-003">SCN-003</a>  &mdash; <i>Ready to scan</i><br><a href="#scn-013">SCN-013</a> <br><a href="#scn-015">SCN-015</a>  &mdash; <i>Loads the offline package</i><br><a href="#scn-016">SCN-016</a>  &mdash; <i>Gate mode</i> <span class="car">accessPointId</span></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetTurnstileMode &middot; <i>Save gate mode</i> &middot; <b>Save gate mode</b> &middot; Cancel <span class="dis">discards operatingMode · mode · reason</span></div><div class="ov"><b>modal</b> formStartPodiumShift &middot; <i>Start podium shift</i> &middot; <b>Start podium shift</b> &middot; Cancel <span class="dis">discards role · accessDeviceId</span></div><div class="ov"><b>modal</b> formEndPodiumShift &middot; <i>End podium shift</i> &middot; <b>End podium shift</b> &middot; Cancel <span class="dis">discards handoverNote</span></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formStartPodiumShift &middot; <i>Start podium shift</i> &middot; <b>Start podium shift</b> &middot; Cancel <span class="dis">discards role · accessDeviceId</span></div><div class="ov"><b>modal</b> formEndPodiumShift &middot; <i>End podium shift</i> &middot; <b>End podium shift</b> &middot; Cancel <span class="dis">discards handoverNote</span></div></div>
         </div>
       </div>
       <div id="scn-003" class="scr">
@@ -213,17 +213,17 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             <div class="strip">offline capable · works from the local journal</div>
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><b>Access point id</b><div class="chip">Access point id</div><span class="why">Sends `?accessPointId=` to `listScans`.</span></div><div class="panel"><b>Ticket id</b><div class="chip">Ticket id</div><span class="why">Sends `?ticketId=` to `listScans`.</span></div><div class="panel"><b>Outcome</b><div class="chip">Outcome</div><span class="why">Sends `?outcome=` to `listScans`.</span></div></div><div class="side"><div class="panel"><b>Recorded from</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Sends `?recordedFrom=` to `listScans`.</span></div><div class="panel"><b>Recorded to</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Sends `?recordedTo=` to `listScans`.</span></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Search</b><div class="chip">Search</div><span class="why">A search that returns nothing must say so differently from a search not yet run.</span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the split template — not declared on the screen.</span></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listScans · syncScans · getOfflinePackage · lookupTicket +6</div>
+          <div><b>OPERATIONS</b> &middot; lookupTicket · overrideAccess · validateAccess · validateGroupAccess +2</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline · admitted</span></div>
           <div><b>ARRIVES WITH</b> &middot; mediaCode&larr;deepLink, rightId&larr;deepLink</div>
           <div><b>GOES TO</b> &middot; <a href="#scn-001">SCN-001</a>  &mdash; <i>Sign in</i><br><a href="#scn-002">SCN-002</a>  &mdash; <i>Access point &amp; direction</i> <span class="car">accessPointId</span><br><a href="#scn-003">SCN-003</a>  &mdash; <i>Ready to scan</i> <span class="car">mediaCode · rightId</span><br><a href="#scn-007">SCN-007</a>  &mdash; <i>A school party of forty arrives on one booki</i><br><a href="#scn-008">SCN-008</a> <br><a href="#scn-009">SCN-009</a> <br><a href="#scn-011">SCN-011</a>  &mdash; <i>Delegated right</i> <span class="car">rightId</span><br><a href="#scn-014">SCN-014</a>  &mdash; <i>Syncs the journal when signal returns</i></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>confirmDialog</b> confirmOverrideAccess &middot; <i>Override access</i></div><div class="ov"><b>modal</b> formSyncScans &middot; <i>Sync scans</i> &middot; <b>Sync scans</b> &middot; Cancel <span class="dis">discards deviceId · scans</span></div><div class="ov"><b>modal</b> formValidateAccess &middot; <i>Validate access</i> &middot; <b>Validate access</b> &middot; Cancel <span class="dis">discards id · mediaCode · mediaKind · direction · recordedAt · groupSize · proximityToken</span></div><div class="ov"><b>modal</b> formValidateGroupAccess &middot; <i>Validate group access</i> &middot; <b>Validate group access</b> &middot; Cancel <span class="dis">discards id · mediaCode · admitCount · recordedAt · direction</span></div><div class="ov"><b>modal</b> formConsumeCrossRegionEntitlement &middot; <i>Consume cross region entitlement</i> &middot; <b>Consume cross region entitlement</b> &middot; Cancel <span class="dis">discards id · entries · scanId · recordedAt</span></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>confirmDialog</b> confirmOverrideAccess &middot; <i>Override access</i></div><div class="ov"><b>modal</b> formValidateAccess &middot; <i>Validate access</i> &middot; <b>Validate access</b> &middot; Cancel <span class="dis">discards id · mediaCode · mediaKind · direction · recordedAt · groupSize · proximityToken</span></div><div class="ov"><b>modal</b> formValidateGroupAccess &middot; <i>Validate group access</i> &middot; <b>Validate group access</b> &middot; Cancel <span class="dis">discards id · mediaCode · admitCount · recordedAt · direction</span></div><div class="ov"><b>modal</b> formConsumeCrossRegionEntitlement &middot; <i>Consume cross region entitlement</i> &middot; <b>Consume cross region entitlement</b> &middot; Cancel <span class="dis">discards id · entries · scanId · recordedAt</span></div></div>
         </div>
       </div>
       <div id="scn-007" class="scr">
@@ -243,17 +243,17 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             <div class="strip">offline capable · works from the local journal</div>
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><b>Access point id</b><div class="chip">Access point id</div><span class="why">Sends `?accessPointId=` to `listScans`.</span></div><div class="panel"><b>Ticket id</b><div class="chip">Ticket id</div><span class="why">Sends `?ticketId=` to `listScans`.</span></div><div class="panel"><b>Outcome</b><div class="chip">Outcome</div><span class="why">Sends `?outcome=` to `listScans`.</span></div></div><div class="side"><div class="panel"><b>Recorded from</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Sends `?recordedFrom=` to `listScans`.</span></div><div class="panel"><b>Recorded to</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Sends `?recordedTo=` to `listScans`.</span></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Search</b><div class="chip">Search</div><span class="why">A search that returns nothing must say so differently from a search not yet run.</span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the split template — not declared on the screen.</span></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; validateGroupAccess · getOfflinePackage · listScans · lookupTicket +3</div>
+          <div><b>OPERATIONS</b> &middot; validateGroupAccess · getOfflinePackage · lookupTicket</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
           
-          <div><b>GOES TO</b> &middot; <a href="#scn-001">SCN-001</a>  &mdash; <i>Sign in</i><br><a href="#scn-002">SCN-002</a>  &mdash; <i>Access point &amp; direction</i> <span class="car">accessPointId</span><br><a href="#scn-003">SCN-003</a>  &mdash; <i>The session ends and the device syncs</i> <span class="car">mediaCode · rightId</span></div>
+          <div><b>GOES TO</b> &middot; <a href="#scn-001">SCN-001</a>  &mdash; <i>Sign in</i><br><a href="#scn-002">SCN-002</a>  &mdash; <i>Access point &amp; direction</i> <span class="car">accessPointId</span><br><a href="#scn-003">SCN-003</a>  &mdash; <i>Ready to scan</i> <span class="car">mediaCode · rightId</span><br><a href="#scn-014">SCN-014</a>  &mdash; <i>The session ends and the device syncs</i></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>confirmDialog</b> confirmOverrideAccess &middot; <i>Override access</i></div><div class="ov"><b>modal</b> formValidateGroupAccess &middot; <i>Validate group access</i> &middot; <b>Validate group access</b> &middot; Cancel <span class="dis">discards id · mediaCode · admitCount · recordedAt · direction</span></div><div class="ov"><b>modal</b> formSyncScans &middot; <i>Sync scans</i> &middot; <b>Sync scans</b> &middot; Cancel <span class="dis">discards deviceId · scans</span></div><div class="ov"><b>modal</b> formValidateAccess &middot; <i>Validate access</i> &middot; <b>Validate access</b> &middot; Cancel <span class="dis">discards id · mediaCode · mediaKind · direction · recordedAt · groupSize · proximityToken</span></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formValidateGroupAccess &middot; <i>Validate group access</i> &middot; <b>Validate group access</b> &middot; Cancel <span class="dis">discards id · mediaCode · admitCount · recordedAt · direction</span></div></div>
         </div>
       </div>
       <div id="scn-008" class="scr">
@@ -273,17 +273,17 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             <div class="strip">offline capable · works from the local journal</div>
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><b>Access point id</b><div class="chip">Access point id</div><span class="why">Sends `?accessPointId=` to `listScans`.</span></div><div class="panel"><b>Ticket id</b><div class="chip">Ticket id</div><span class="why">Sends `?ticketId=` to `listScans`.</span></div><div class="panel"><b>Outcome</b><div class="chip">Outcome</div><span class="why">Sends `?outcome=` to `listScans`.</span></div></div><div class="side"><div class="panel"><b>Recorded from</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Sends `?recordedFrom=` to `listScans`.</span></div><div class="panel"><b>Recorded to</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Sends `?recordedTo=` to `listScans`.</span></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Search</b><div class="chip">Search</div><span class="why">A search that returns nothing must say so differently from a search not yet run.</span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the split template — not declared on the screen.</span></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; lookupTicket · getOfflinePackage · listScans · overrideAccess +3</div>
+          <div><b>OPERATIONS</b> &middot; lookupTicket · getOfflinePackage · validateAccess</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#scn-001">SCN-001</a>  &mdash; <i>Sign in</i><br><a href="#scn-002">SCN-002</a>  &mdash; <i>Access point &amp; direction</i> <span class="car">accessPointId</span><br><a href="#scn-003">SCN-003</a>  &mdash; <i>Ready to scan</i> <span class="car">mediaCode · rightId</span><br><a href="#scn-009">SCN-009</a>  &mdash; <i>The ticket is found and its history read</i></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>confirmDialog</b> confirmOverrideAccess &middot; <i>Override access</i></div><div class="ov"><b>modal</b> formSyncScans &middot; <i>Sync scans</i> &middot; <b>Sync scans</b> &middot; Cancel <span class="dis">discards deviceId · scans</span></div><div class="ov"><b>modal</b> formValidateAccess &middot; <i>Validate access</i> &middot; <b>Validate access</b> &middot; Cancel <span class="dis">discards id · mediaCode · mediaKind · direction · recordedAt · groupSize · proximityToken</span></div><div class="ov"><b>modal</b> formValidateGroupAccess &middot; <i>Validate group access</i> &middot; <b>Validate group access</b> &middot; Cancel <span class="dis">discards id · mediaCode · admitCount · recordedAt · direction</span></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formValidateAccess &middot; <i>Validate access</i> &middot; <b>Validate access</b> &middot; Cancel <span class="dis">discards id · mediaCode · mediaKind · direction · recordedAt · groupSize · proximityToken</span></div></div>
         </div>
       </div>
       <div id="scn-009" class="scr">
@@ -308,12 +308,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; lookupTicket · getOfflinePackage · listScans · overrideAccess +3</div>
+          <div><b>OPERATIONS</b> &middot; lookupTicket · getOfflinePackage · listScans</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#scn-001">SCN-001</a>  &mdash; <i>Sign in</i><br><a href="#scn-002">SCN-002</a>  &mdash; <i>Access point &amp; direction</i> <span class="car">accessPointId</span><br><a href="#scn-003">SCN-003</a>  &mdash; <i>It is valid</i> <span class="car">mediaCode · rightId</span></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>confirmDialog</b> confirmOverrideAccess &middot; <i>Override access</i></div><div class="ov"><b>modal</b> formSyncScans &middot; <i>Sync scans</i> &middot; <b>Sync scans</b> &middot; Cancel <span class="dis">discards deviceId · scans</span></div><div class="ov"><b>modal</b> formValidateAccess &middot; <i>Validate access</i> &middot; <b>Validate access</b> &middot; Cancel <span class="dis">discards id · mediaCode · mediaKind · direction · recordedAt · groupSize · proximityToken</span></div><div class="ov"><b>modal</b> formValidateGroupAccess &middot; <i>Validate group access</i> &middot; <b>Validate group access</b> &middot; Cancel <span class="dis">discards id · mediaCode · admitCount · recordedAt · direction</span></div></div>
+          
         </div>
       </div>
       <div id="scn-011" class="scr">
@@ -343,7 +343,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>ARRIVES WITH</b> &middot; rightId&larr;deepLink</div>
           <div><b>GOES TO</b> &middot; <a href="#scn-001">SCN-001</a>  &mdash; <i>Sign in</i><br><a href="#scn-002">SCN-002</a>  &mdash; <i>Access point &amp; direction</i><br><a href="#scn-003">SCN-003</a>  &mdash; <i>Ready to scan</i> <span class="car">rightId</span></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formConsumeCrossRegionEntitlement &middot; <i>Consume cross region entitlement</i> &middot; <b>Consume cross region entitlement</b> &middot; Cancel <span class="dis">discards id · entries · scanId · recordedAt</span></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formConsumeCrossRegionEntitlement &middot; <i>Consume cross region entitlement</i> &middot; <b>Consume cross region entitlement</b> &middot; Cancel <span class="dis">discards entries · scanId · recordedAt</span></div></div>
         </div>
       </div>
       <div id="scn-013" class="scr">
@@ -363,12 +363,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             <div class="strip">offline capable · works from the local journal</div>
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><b>Access point id</b><div class="chip">Access point id</div><span class="why">Sends `?accessPointId=` to `listScans`.</span></div><div class="panel"><b>Ticket id</b><div class="chip">Ticket id</div><span class="why">Sends `?ticketId=` to `listScans`.</span></div><div class="panel"><b>Outcome</b><div class="chip">Outcome</div><span class="why">Sends `?outcome=` to `listScans`.</span></div></div><div class="side"><div class="panel"><b>Recorded from</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Sends `?recordedFrom=` to `listScans`.</span></div><div class="panel"><b>Recorded to</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Sends `?recordedTo=` to `listScans`.</span></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Search</b><div class="chip">Search</div><span class="why">A search that returns nothing must say so differently from a search not yet run.</span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the split template — not declared on the screen.</span></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listScans · getOfflinePackage · lookupTicket · overrideAccess +3</div>
+          <div><b>OPERATIONS</b> &middot; getOfflinePackage · lookupTicket · overrideAccess · syncScans +2</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#scn-001">SCN-001</a>  &mdash; <i>Sign in</i><br><a href="#scn-002">SCN-002</a>  &mdash; <i>Access point &amp; direction</i> <span class="car">accessPointId</span><br><a href="#scn-003">SCN-003</a>  &mdash; <i>Ready to scan</i> <span class="car">mediaCode · rightId</span><br><a href="#scn-014">SCN-014</a>  &mdash; <i>The network returns and the journal posts</i></div>
@@ -398,12 +398,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; syncScans · listSyncRejections · getOfflinePackage · listScans +5</div>
+          <div><b>OPERATIONS</b> &middot; syncScans · listSyncRejections · getOfflinePackage · listScans +4</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#scn-001">SCN-001</a>  &mdash; <i>Sign in</i><br><a href="#scn-002">SCN-002</a>  &mdash; <i>Access point &amp; direction</i> <span class="car">accessPointId</span><br><a href="#scn-003">SCN-003</a>  &mdash; <i>Ready to scan</i> <span class="car">mediaCode · rightId</span></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>confirmDialog</b> confirmOverrideAccess &middot; <i>Override access</i></div><div class="ov"><b>modal</b> formSyncScans &middot; <i>Sync scans</i> &middot; <b>Sync scans</b> &middot; Cancel <span class="dis">discards deviceId · scans</span></div><div class="ov"><b>modal</b> formSyncOrders &middot; <i>Sync orders</i> &middot; <b>Sync orders</b> &middot; Cancel <span class="dis">discards deviceId · orders</span></div><div class="ov"><b>modal</b> formValidateAccess &middot; <i>Validate access</i> &middot; <b>Validate access</b> &middot; Cancel <span class="dis">discards id · mediaCode · mediaKind · direction · recordedAt · groupSize · proximityToken</span></div><div class="ov"><b>modal</b> formValidateGroupAccess &middot; <i>Validate group access</i> &middot; <b>Validate group access</b> &middot; Cancel <span class="dis">discards id · mediaCode · admitCount · recordedAt · direction</span></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>confirmDialog</b> confirmOverrideAccess &middot; <i>Override access</i></div><div class="ov"><b>modal</b> formSyncScans &middot; <i>Sync scans</i> &middot; <b>Sync scans</b> &middot; Cancel <span class="dis">discards deviceId · scans</span></div><div class="ov"><b>modal</b> formValidateAccess &middot; <i>Validate access</i> &middot; <b>Validate access</b> &middot; Cancel <span class="dis">discards id · mediaCode · mediaKind · direction · recordedAt · groupSize · proximityToken</span></div><div class="ov"><b>modal</b> formValidateGroupAccess &middot; <i>Validate group access</i> &middot; <b>Validate group access</b> &middot; Cancel <span class="dis">discards id · mediaCode · admitCount · recordedAt · direction</span></div></div>
         </div>
       </div>
       <div id="scn-015" class="scr">
@@ -423,17 +423,17 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             <div class="strip">offline capable · works from the local journal</div>
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><b>Access point id</b><div class="chip">Access point id</div><span class="why">Sends `?accessPointId=` to `listScans`.</span></div><div class="panel"><b>Ticket id</b><div class="chip">Ticket id</div><span class="why">Sends `?ticketId=` to `listScans`.</span></div><div class="panel"><b>Outcome</b><div class="chip">Outcome</div><span class="why">Sends `?outcome=` to `listScans`.</span></div></div><div class="side"><div class="panel"><b>Recorded from</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Sends `?recordedFrom=` to `listScans`.</span></div><div class="panel"><b>Recorded to</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Sends `?recordedTo=` to `listScans`.</span></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Search</b><div class="chip">Search</div><span class="why">A search that returns nothing must say so differently from a search not yet run.</span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the split template — not declared on the screen.</span></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getOfflinePackage · listScans · lookupTicket · overrideAccess +3</div>
+          <div><b>OPERATIONS</b> &middot; getOfflinePackage · lookupTicket</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#scn-001">SCN-001</a>  &mdash; <i>Sign in</i><br><a href="#scn-002">SCN-002</a>  &mdash; <i>Access point &amp; direction</i> <span class="car">accessPointId</span><br><a href="#scn-003">SCN-003</a>  &mdash; <i>Waits at the ready screen</i> <span class="car">mediaCode · rightId</span><br><a href="#scn-013">SCN-013</a>  &mdash; <i>Scans journal locally while the network is g</i></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>confirmDialog</b> confirmOverrideAccess &middot; <i>Override access</i></div><div class="ov"><b>modal</b> formSyncScans &middot; <i>Sync scans</i> &middot; <b>Sync scans</b> &middot; Cancel <span class="dis">discards deviceId · scans</span></div><div class="ov"><b>modal</b> formValidateAccess &middot; <i>Validate access</i> &middot; <b>Validate access</b> &middot; Cancel <span class="dis">discards id · mediaCode · mediaKind · direction · recordedAt · groupSize · proximityToken</span></div><div class="ov"><b>modal</b> formValidateGroupAccess &middot; <i>Validate group access</i> &middot; <b>Validate group access</b> &middot; Cancel <span class="dis">discards id · mediaCode · admitCount · recordedAt · direction</span></div></div>
+          
         </div>
       </div>
       <div id="scn-016" class="scr">
@@ -458,12 +458,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; setTurnstileMode · getAccessPoint · listAccessPoints · cancelGateModeChange</div>
+          <div><b>OPERATIONS</b> &middot; setTurnstileMode · getAccessPoint · listAccessPoints · cancelGateModeChange +1</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; accessPointId&larr;deepLink, changeId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#scn-001">SCN-001</a>  &mdash; <i>Sign in</i><br><a href="#scn-002">SCN-002</a>  &mdash; <i>Access point &amp; direction</i> <span class="car">accessPointId</span><br><a href="#scn-003">SCN-003</a>  &mdash; <i>Ready to scan</i></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetTurnstileMode &middot; <i>Save gate mode</i> &middot; <b>Save gate mode</b> &middot; Cancel <span class="dis">discards operatingMode · mode · reason</span></div><div class="ov"><b>confirmDialog</b> confirmCancelGateModeChange &middot; <i>Cancel gate mode change</i></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetTurnstileMode &middot; <i>Save gate mode</i> &middot; <b>Save gate mode</b> &middot; Cancel <span class="dis">discards operatingMode · mode · reason</span></div><div class="ov"><b>confirmDialog</b> confirmCancelGateModeChange &middot; <i>Cancel gate mode change</i></div><div class="ov"><b>modal</b> formSetAccessPointDirection &middot; <i>Switch direction</i> &middot; <b>Switch direction</b> &middot; Cancel</div></div>
         </div>
       </div></div>
   <div class="bottom">

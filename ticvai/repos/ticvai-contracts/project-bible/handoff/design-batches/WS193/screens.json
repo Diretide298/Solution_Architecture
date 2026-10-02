@@ -97,6 +97,11 @@
     "operation": null,
     "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
     "source": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 89 §Display"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-027): A read (get or list) of the wallet risk rules that setWalletRiskRules writes.",
+    "source": "contracts/satellite/wallet.yaml#setWalletRiskRules | screens/P08-venue-back-office.yaml#BO-1153"
    }
   ],
   "layout": {
@@ -375,6 +380,13 @@
    "workshopBoard": "wireframes/WS193 Wallet Configuration Backend Structure v1.0 Board 8.dc.html#bo-1154"
   },
   "apisNote": "Regenerated 9 September 2026 from Wallet_Configuration_Backend_Structure_v1.0.pdf page 90. 0 of 0 labels bound to a contract property; 11 of 42 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-027): A read (get or list) of the wallet risk rules that setWalletRiskRules writes.",
+    "source": "contracts/satellite/wallet.yaml#setWalletRiskRules | screens/P08-venue-back-office.yaml#BO-1154"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -447,6 +459,11 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 91"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-027): A read (get or list) of the wallet risk rules that setWalletRiskRules writes.",
+    "source": "contracts/satellite/wallet.yaml#setWalletRiskRules | screens/P08-venue-back-office.yaml#BO-1155"
    }
   ],
   "layout": {
@@ -681,6 +698,13 @@
    "workshopBoard": "wireframes/WS193 Wallet Configuration Backend Structure v1.0 Board 8.dc.html#bo-1156"
   },
   "apisNote": "Regenerated 9 September 2026 from Wallet_Configuration_Backend_Structure_v1.0.pdf page 92. 0 of 0 labels bound to a contract property; 17 of 29 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Hold additional transfers + Risk Review, High-Risk Alert, Behavioral Baseline are choices sent by `setWalletRiskRules` (action holdTransaction/raiseCase, alertOnAction, signal baseline).",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-027): A read (get or list) of the wallet risk rules that setWalletRiskRules writes.",
+    "source": "contracts/satellite/wallet.yaml#setWalletRiskRules | screens/P08-venue-back-office.yaml#BO-1156"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -979,6 +1003,11 @@
     "operation": null,
     "why": "**AI Fraud & Anomaly Detection Studio declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
     "source": "contract — the screen's declared operations"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-027): A read (get or list) of the wallet risk rules that setWalletRiskRules writes.",
+    "source": "contracts/satellite/wallet.yaml#setWalletRiskRules | screens/P08-venue-back-office.yaml#BO-1158"
    }
   ],
   "layout": {
@@ -1241,6 +1270,13 @@
    "workshopBoard": "wireframes/WS193 Wallet Configuration Backend Structure v1.0 Board 8.dc.html#bo-1159"
   },
   "apisNote": "Regenerated 9 September 2026 from Wallet_Configuration_Backend_Structure_v1.0.pdf page 95. 0 of 0 labels bound to a contract property; 12 of 44 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-027): A read (get or list) of the wallet risk rules and their automated actions that setWalletRiskRules and setWalletRestriction writes.",
+    "source": "contracts/satellite/wallet.yaml#setWalletRiskRules | contracts/satellite/wallet.yaml#setWalletRestriction | screens/P08-venue-back-office.yaml#BO-1159"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1579,6 +1615,17 @@
     "operation": null,
     "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
     "source": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 97 §Display"
+   },
+   {
+    "operation": "simulateCreditConsumption",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-025): simulateCreditConsumption simulates credit spending, not risk rule testing; a security sandbox needs a rule backtest, recorded as a contract gap (design-notes correction ticketing-backoffice BO-1161)",
+    "source": "contracts/satellite/wallet.yaml#simulateCreditConsumption | screens/P08-venue-back-office.yaml#BO-1161"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-027): A wallet risk-rule backtest or simulation (rules against sample or historical transactions) and a read of the rules under test.",
+    "source": "contracts/satellite/wallet.yaml#simulateCreditConsumption | screens/P08-venue-back-office.yaml#BO-1161"
    }
   ],
   "layout": {
@@ -1643,19 +1690,11 @@
   "states": {
    "loading": "The security rules testing list.",
    "error": "Could not load. Names which read failed and leaves the security rules testing untouched.",
-   "emptyFirstRun": "No security rules testing yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No security rules testing yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the security rules testing are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Not shown: nothing on this screen needs a permission of its own; the app's sign-in decides access."
   },
-  "apis": [
-   {
-    "operationId": "simulateCreditConsumption",
-    "contract": "wallet",
-    "purpose": "Test against a scenario",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026"
-   }
-  ],
+  "apis": [],
   "entryState": {
    "preloaded": [
     "Transactions Evaluated → 1,245,000",
@@ -1732,8 +1771,8 @@
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
-  "purpose": "Govern how wallet security policies, fraud models and automated actions are changed and released. Configuration Areas Configure the financial-control layer of TICVAI Wallet, providing complete visibility and governance over wallet liabilities, stored-value balances, gift-card exposure, reconciliation, breakage, revenue-recognition events, accounting mappings, financial exceptions and management analytics. This board directly addresses requirements 4.3.17, 4.3.33, 4.3.36 and 4.3.37, as well as the reconciliation requirement described under 4.3.4. The architectural boundary should remain clear: Wallet Module = sub-ledger and source of wallet financial events. Finance Module = accounting/GL, financial posting and corporate financial reporting. Board 9 therefore controls the wallet-side financial configuration and sends governed accounting events to the TICVAI Finance module.",
-  "purposeNote": "No material wallet-security configuration can enter production without appropriate validation, permissions, versioning and approval, and all changes remain permanently auditable. Board 8 — Real-Time Risk Decision Flow We would specify the backend sequence clearly: Wallet Transaction Request → Identity / Credential Validation → Static Security Rules → Velocity Check → Device & Credential Risk → Customer Behavioural Profile → AI Anomaly Detection → Combined Risk Score → Decision Engine",
+  "purpose": "Govern how wallet security policies, fraud models and automated actions are changed and released.",
+  "purposeNote": "No material wallet-security configuration can enter production without appropriate validation, permissions, versioning and approval, and all changes remain permanently auditable. Board 8 — Real-Time Risk Decision Flow We would specify the backend sequence clearly: Wallet Transaction Request → Identity / Credential Validation → Static Security Rules → Velocity Check → Device & Credential Risk → Customer Behavioural Profile → AI Anomaly Detection → Combined Risk Score → Decision Engine Purpose rewritten 2 October 2026 (CHG-WIR-026): The purpose carried the financial-control layer text of another board (liabilities, breakage, reconciliation); the operations are versioning, audit and risk-rule status, so the screen's own sentence is kept (design-notes correction ticketing-backoffice BO-1162)",
   "gaps": [
    {
     "operation": null,
@@ -1925,6 +1964,7 @@
    "workshopBoard": "wireframes/WS193 Wallet Configuration Backend Structure v1.0 Board 8.dc.html#bo-1162"
   },
   "apisNote": "Regenerated 9 September 2026 from Wallet_Configuration_Backend_Structure_v1.0.pdf page 98. 0 of 11 labels bound to a contract property; 16 of 95 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Security Audit: `listAuditRecords`; still owed by a contract change: `diffWalletConfigurationVersion`, `listWalletConfigurationVersions`, `restoreWalletConfigurationVersion`, `setWalletRiskRuleStatus`.",
+  "notes": "**Applies to the whole tenant (design-note correction, 2 October 2026):** the wallet configuration is tenant-scoped, so the header says \"Tenant-wide wallet security\" and the screen opens only to a tenant administrator holding the wallet configuration right.",
   "_platform": {
    "code": "P08",
    "audience": "staff",

@@ -457,6 +457,37 @@
      "type": "string",
      "format": "uuid"
     }
+   },
+   "ruleGroups": {
+    "x-ticvai-persistence-kind": "valueObject",
+    "x-ticvai-persistence-column": "jsonb",
+    "type": "array",
+    "description": "**Nested AND / OR / NOT groups** (contract gap CHG-WIR-007, BO-755; CHG-CSA-045). Where present, the segment matches `criteria` (combined by `match`) AND every group here. Absent keeps the flat list.",
+    "items": {
+     "$ref": "#/components/schemas/SegmentRuleGroup"
+    }
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "The segment is evaluated for sends only from this time."
+   },
+   "effectiveTo": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "ownerPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Who answers for the segment; defaults to its creator."
+   },
+   "requiresApproval": {
+    "type": "boolean",
+    "default": false,
+    "description": "Where true, a campaign may use the segment only after an `approvals` request on it is approved."
    }
   }
  },
@@ -678,6 +709,23 @@
    }
   }
  },
+ "SegmentDraftPreview": {
+  "x-ticvai-persistence": "none — evaluated live",
+  "type": "object",
+  "description": "The preview of an unsaved segment (`previewSegmentDraft`, CHG-CSA-045); `SegmentPreview` without a segment id.",
+  "properties": {
+   "matchingCount": {
+    "type": "integer"
+   },
+   "reachable": {
+    "$ref": "#/components/schemas/SegmentPreview/properties/reachable"
+   },
+   "evaluatedAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
  "SegmentPreview": {
   "x-ticvai-persistence": "none — evaluated live",
   "type": "object",
@@ -721,6 +769,35 @@
    "evaluatedAt": {
     "type": "string",
     "format": "date-time"
+   }
+  }
+ },
+ "SegmentRuleGroup": {
+  "x-ticvai-persistence": "none — stored with the segment as jsonb",
+  "type": "object",
+  "description": "One group of a segment's nested rules (CHG-CSA-045). `operator` combines the group's `criteria` and its child `groups`; `not` negates the group (it takes one child, criteria or group).",
+  "properties": {
+   "operator": {
+    "type": "string",
+    "enum": [
+     "and",
+     "or",
+     "not"
+    ]
+   },
+   "criteria": {
+    "type": "array",
+    "description": "Each entry has the shape of `SegmentCriterion` (`attribute`, `operator`, `value`). Typed loosely here so the new optional field adds no required member to `createSegment`'s body for clients built at r1; the server validates each entry as a `SegmentCriterion` (400 otherwise).",
+    "items": {
+     "type": "object",
+     "additionalProperties": true
+    }
+   },
+   "groups": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/SegmentRuleGroup"
+    }
    }
   }
  },

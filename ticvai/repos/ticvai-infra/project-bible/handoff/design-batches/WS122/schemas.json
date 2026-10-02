@@ -1183,7 +1183,7 @@
    "localLlm",
    "openaiCompatible"
   ],
-  "description": "`openaiCompatible` (added 29 September, AI design 3.3): a customer endpoint that speaks the OpenAI API, taken with no custom development (AIC-009). Any other protocol needs an adapter.\n"
+  "description": "`openaiCompatible` (added 29 September, AI design 3.3): a customer endpoint that speaks the OpenAI API, taken with no custom development (AIC-009). Any other protocol needs an adapter.\n**Core42 Compass is reached through `openaiCompatible`** (Chinmay, 2 October: the AI residency decision, amending AI-D02; CHG-CSA-002). Compass is the provider of the `uaeOnly` residency class (common `AiResidencyClass`): Small tier Compass GPT-4.1 mini (or Seraj), Strong tier Compass GPT-5, with OpenAI UAE and then the in-cell open-weights model as the fallback chain. OpenAI UAE is `openai` with a UAE `endpoint`; the in-cell model is `localLlm`.\n**A kind is a protocol, not a vendor** (Chinmay, 2 October, contract follow-ups: BYOK accepts any provider; CHG-FUP-008). Any vendor is accepted, named in `AiProvider.vendor`: Mistral, Cohere or any other is reached through `openaiCompatible` where its API speaks it, which the compatibility test confirms before activation (`AiProviderCompatibility`). A new native adapter is a new value here, a breaking change for a client built earlier that goes out with an approval (`docs/active/breaking-changes.yaml`); until then a vendor without either protocol is refused `422 provider-protocol-unsupported`.\n"
  },
  "AiRiskClass": {
   "type": "string",
@@ -1605,7 +1605,7 @@
  },
  "ApprovalKind": {
   "type": "string",
-  "description": "11.1.7 and 11.1.30–11.1.37. **The first four already exist as bespoke implementations** and this contract is what they collapse into.\n**Which actions route here — decided 28 September, audit R144.** Finance and procurement acts go through this engine to a **finance approver**: closing a fiscal period (`periodClose`), reopening one (`periodReopen`), cancelling a purchase order (`purchaseOrderCancel`) and closing one short (`purchaseOrderShortClose`). The tenant default matrix for each of these names the finance approver role; a venue may tighten it and never loosen it. Starting a release rollout routes through `releasePromotion` to the platform release manager (a holder of `PLATFORM_RELEASE_PROMOTE`). **Not every `requiresApproval` goes here:** reopening a shift, recounting a stock count and a retail return above the venue threshold take a supervisor's step-up on the same device instead, and never raise a request.\n**Catalogue change requests route through `productChange` and `pricingChange`** (decided 29 September, writers pass): a product change and a price or pricing change raised in `catalogue` ask for approval under these two kinds, so a venue can route product edits and price edits to different approvers.\n",
+  "description": "11.1.7 and 11.1.30–11.1.37. **The first four already exist as bespoke implementations** and this contract is what they collapse into.\n**Which actions route here — decided 28 September, audit R144.** Finance and procurement acts go through this engine to a **finance approver**: closing a fiscal period (`periodClose`), reopening one (`periodReopen`), cancelling a purchase order (`purchaseOrderCancel`) and closing one short (`purchaseOrderShortClose`). The tenant default matrix for each of these names the finance approver role; a venue may tighten it and never loosen it. Starting a release rollout routes through `releasePromotion` to the platform release manager (a holder of `PLATFORM_RELEASE_PROMOTE`). **Not every `requiresApproval` goes here:** reopening a shift, recounting a stock count and a retail return above the venue threshold take a supervisor's step-up on the same device instead, and never raise a request.\n**Catalogue change requests route through `productChange` and `pricingChange`** (decided 29 September, writers pass): a product change and a price or pricing change raised in `catalogue` ask for approval under these two kinds, so a venue can route product edits and price edits to different approvers.\n\n**Optional review steps a venue switches on, decided 2 October 2026** (Chinmay; CHG-CSP-036, CHG-CSP-028, CHG-CSP-031). Each is an existing kind narrowed by the rule's `subjectTypes`, so no kind is added (a new value here would be a breaking change against r1) and each is off until the venue saves an active matrix for it:\n- **Publishing white-label content** (`configurationChange`, subject `whiteLabelPublication`): simulate, then a single publish by a holder of the permission; a review step only where the venue sets one up (batch 1, CMS-014; DEC-156). - **Recording F&B waste above a value** (`stockWriteOff`, subject `fnbWaste`): the venue's waste-approval policy, value bands as `minAmount` and `maxAmount`, photo evidence above a value held by fnb (batch 6 #192, BO-139; DEC-192; R144). - **Publishing an access topology** (`configurationChange`, subject `topologyPublication`): second-person approval when the venue switches it on (batch 6 #230, BO-153; DEC-230). - **A permanent identity lock, a whitelist entry, or releasing a full-identity or permanent lock** (`accessPermissionChange`, subjects `identityLock`, `whitelistEntry`, `identityLockRelease`): always a second approver, never for an until-end-of-day lock (critical set 1, BO-229 and BO-247; DEC-254, DEC-260); the tenant default matrix names the security approver role and a venue may tighten it, never remove it.\n",
   "enum": [
    "refund",
    "priceOverride",
@@ -1832,6 +1832,26 @@
     "type": "string",
     "format": "date-time",
     "nullable": true
+   },
+   "assignedToPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "Who claimed or was assigned the request in a shared queue (`assignApprovalRequest`; DI-723; CHG-CSP-042). Null while it sits in the queue."
+   },
+   "assignedToDepartmentId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The department queue it was assigned to, where it went to a department rather than a person (CHG-CSP-042)."
+   },
+   "assignedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
    },
    "requestedAt": {
     "type": "string",
@@ -2074,6 +2094,27 @@
     "nullable": true,
     "description": "11.1.53. An unanswered request eventually stops waiting."
    },
+   "subjectTypes": {
+    "type": "array",
+    "description": "**Which subjects of the kind this rule matches** (decided 2 October 2026, Chinmay; CHG-CSP-028, CHG-CSP-036, CHG-CSP-031): the `CreateApprovalRequest.subjectType` values, for example `topologyPublication` or `whiteLabelPublication` under `configurationChange`. Empty matches every subject of the kind. It is how a venue switches an optional review step on for one kind of act without routing every act of the kind.",
+    "items": {
+     "type": "string",
+     "maxLength": 64
+    }
+   },
+   "signatureMethods": {
+    "type": "array",
+    "description": "**The signature methods this level accepts, where `requiresSignature` is true** (design-notes correction on ADM-344, Block B: \"Configuring which stages need a signature is a policy write\"; CHG-CSP-045). Values of `ApprovalSignature.method`. Empty accepts any of them. With `requiresSignature` this makes the rule the signature policy: which levels of which kinds need a signature, and how it is given; `signApprovalDecision` refuses a method the level does not accept.",
+    "items": {
+     "type": "string",
+     "enum": [
+      "platformKey",
+      "uaePass",
+      "externalCertificate",
+      "drawnSignature"
+     ]
+    }
+   },
    "externalProviderId": {
     "type": "string",
     "format": "uuid",
@@ -2197,6 +2238,13 @@
    "cancelled"
   ]
  },
+ "LocalisedText": {
+  "x-ticvai-persistence": "none — jsonb column",
+  "type": "object",
+  "additionalProperties": {
+   "type": "string"
+  }
+ },
  "Money": {
   "type": "object",
   "x-ticvai-persistence-kind": "valueObject",
@@ -2242,6 +2290,271 @@
    },
    "hasMore": {
     "type": "boolean"
+   }
+  }
+ },
+ "Permission": {
+  "type": "string",
+  "enum": [
+   "SESSION_FORCE_LOGOUT",
+   "USER_MANAGE",
+   "ROLE_MANAGE",
+   "PERMISSION_GRANT",
+   "PERMISSION_VIEW",
+   "PERMISSION_MANAGE",
+   "PLATFORM_TENANT_VIEW",
+   "PLATFORM_TENANT_MANAGE",
+   "PLATFORM_TENANT_TERMINATE",
+   "PLATFORM_PLAN_MANAGE",
+   "PLATFORM_CELL_VIEW",
+   "PLATFORM_CELL_MANAGE",
+   "PLATFORM_BILLING_VIEW",
+   "PLATFORM_AI_MANAGE",
+   "PLATFORM_BILLING_MANAGE",
+   "PLATFORM_RELEASE_VIEW",
+   "PLATFORM_RELEASE_MANAGE",
+   "PLATFORM_RELEASE_PROMOTE",
+   "PLATFORM_MIGRATION_VIEW",
+   "PLATFORM_MIGRATION_APPLY",
+   "PLATFORM_TENANT_ACCESS",
+   "TENANT_CONFIGURE",
+   "TENANT_VIEW",
+   "TENANT_PUBLISH",
+   "SCOPE_VIEW",
+   "SCOPE_MANAGE",
+   "REGION_CONFIGURE",
+   "WORKSTATION_CONFIGURE",
+   "PRODUCT_VIEW",
+   "PRODUCT_CONFIGURE",
+   "PRODUCT_APPROVE",
+   "PRODUCT_PUBLISH",
+   "PRICE_VIEW",
+   "PRICE_CONFIGURE",
+   "EVENT_CONFIGURE",
+   "PERFORMANCE_CONFIGURE",
+   "CAPACITY_CONFIGURE",
+   "ORDER_VIEW",
+   "ORDER_VIEW_OTHER",
+   "ORDER_CREATE",
+   "ORDER_MODIFY",
+   "ORDER_DISCOUNT",
+   "ORDER_CANCEL",
+   "ORDER_VOID",
+   "ORDER_REFUND",
+   "ORDER_REFUND_APPROVE",
+   "ORDER_REFUND_BULK",
+   "ORDER_EXCHANGE",
+   "ORDER_RESCHEDULE",
+   "ORDER_REPRINT",
+   "PRICE_OVERRIDE",
+   "DISCOUNT_APPLY",
+   "CREDIT_MANAGE",
+   "CREDIT_OVERRIDE",
+   "WALLET_VIEW",
+   "WALLET_OPERATE",
+   "WALLET_CONFIGURE",
+   "PAYMENT_VIEW",
+   "PAYMENT_CONFIGURE",
+   "PAYMENT_PROVIDER_MANAGE",
+   "PAYMENT_DISPUTE",
+   "SHIFT_OPEN",
+   "SHIFT_CLOSE",
+   "SHIFT_SUSPEND",
+   "SHIFT_CLOSE_OTHER",
+   "SHIFT_APPROVE_OPEN",
+   "SHIFT_APPROVE_CLOSE",
+   "SHIFT_REOPEN",
+   "CASH_LIFT",
+   "CASH_ADD",
+   "CASH_NO_SALE",
+   "DEPOSIT_BOX_MODIFY_OWN",
+   "DEPOSIT_BOX_MODIFY_OTHER",
+   "OVERSHORT_ACCEPT",
+   "ACCESS_VALIDATE",
+   "ACCESS_OVERRIDE",
+   "ACCESS_POINT_CONFIGURE",
+   "TURNSTILE_MODE_SET",
+   "TICKET_LOOKUP",
+   "ACCREDITATION_VIEW",
+   "ACCREDITATION_APPLY",
+   "ACCREDITATION_APPROVE",
+   "ACCREDITATION_ISSUE",
+   "ACCREDITATION_MANAGE",
+   "ACCREDITATION_CONFIGURE",
+   "REPORT_VIEW_OWN",
+   "REPORT_VIEW_WORKSTATION",
+   "REPORT_VIEW_VENUE",
+   "REPORT_VIEW_REGION",
+   "REPORT_VIEW_TENANT",
+   "REPORT_EXPORT",
+   "REPORT_EXPORT_PII",
+   "REPORT_MANAGE",
+   "REPORT_SCHEDULE",
+   "LEDGER_VIEW",
+   "LEDGER_POST",
+   "LEDGER_APPROVE",
+   "TAX_CONFIGURE",
+   "ACCOUNT_CONFIGURE",
+   "SETTLEMENT_VIEW",
+   "SETTLEMENT_RECONCILE",
+   "GUEST_VIEW",
+   "GUEST_VIEW_PII",
+   "GUEST_MANAGE",
+   "VENUE_MAP_VIEW",
+   "VENUE_MAP_MANAGE",
+   "VENUE_MAP_PUBLISH",
+   "RESOURCE_VIEW",
+   "RESOURCE_BOOK",
+   "RESOURCE_MANAGE",
+   "RESOURCE_CONFIGURE",
+   "RENTAL_VIEW",
+   "RENTAL_BOOK",
+   "RENTAL_OPERATE",
+   "RENTAL_MANAGE",
+   "RENTAL_CONFIGURE",
+   "RENTAL_PRICE",
+   "RENTAL_APPROVE",
+   "RENTAL_OVERRIDE",
+   "DEVELOPER_VIEW",
+   "DEVELOPER_MANAGE",
+   "DEVELOPER_ADMIN",
+   "LOYALTY_ACCRUE",
+   "LOYALTY_REDEEM",
+   "LOYALTY_ADJUST",
+   "MARKETING_VIEW",
+   "MARKETING_MANAGE",
+   "MARKETING_SEND",
+   "CASE_VIEW",
+   "CASE_MANAGE",
+   "ASSET_LIBRARY_VIEW",
+   "ASSET_LIBRARY_MANAGE",
+   "ASSET_LIBRARY_APPROVE",
+   "ASSET_LIBRARY_SHARE",
+   "QUEUE_VIEW",
+   "QUEUE_MANAGE",
+   "QUEUE_REDEEM",
+   "QUEUE_OVERRIDE",
+   "TRANSPORT_VIEW",
+   "TRANSPORT_MANAGE",
+   "TRANSPORT_PRICE",
+   "ASSET_VIEW",
+   "ASSET_MANAGE",
+   "WORK_ORDER_VIEW",
+   "WORK_ORDER_MANAGE",
+   "WORK_ORDER_VERIFY",
+   "INSPECTION_VIEW",
+   "INSPECTION_SUBMIT",
+   "INSPECTION_MANAGE",
+   "INCIDENT_REPORT",
+   "INCIDENT_VIEW",
+   "INCIDENT_MANAGE",
+   "KIOSK_ATTEND",
+   "DEVICE_VIEW",
+   "DEVICE_CONFIGURE",
+   "DEVICE_MANAGE",
+   "APPROVAL_ACT",
+   "APPROVAL_DELEGATE",
+   "AI_USE",
+   "AI_CONFIGURE",
+   "AI_APPROVE",
+   "AI_AUDIT_VIEW",
+   "RISK_REVIEW",
+   "RISK_INVESTIGATE",
+   "AUDIT_VIEW",
+   "APPROVAL_VIEW",
+   "APPROVAL_REQUEST",
+   "APPROVAL_DECIDE",
+   "APPROVAL_CONFIGURE",
+   "MAINTENANCE_EXECUTE",
+   "MAINTENANCE_APPROVE",
+   "WORKFORCE_VIEW",
+   "WORKFORCE_MANAGE",
+   "ATTENDANCE_RECORD",
+   "ANNOUNCEMENT_PUBLISH",
+   "ANNOUNCEMENT_EMERGENCY",
+   "PARTNER_VIEW",
+   "PARTNER_MANAGE",
+   "PARKING_CONFIGURE",
+   "PAYMENT_VOID",
+   "PROCUREMENT_VIEW",
+   "PROCUREMENT_REQUEST",
+   "PROCUREMENT_MANAGE",
+   "PROCUREMENT_RECEIVE",
+   "CORE_AI_PUBLISH",
+   "TICKETING_AI_PUBLISH",
+   "ACCESS_AI_PUBLISH",
+   "FNB_AI_PUBLISH",
+   "RETAIL_AI_PUBLISH",
+   "INVENTORY_AI_PUBLISH",
+   "SEATING_AI_PUBLISH",
+   "MEMBERSHIP_AI_PUBLISH",
+   "MARKETING_AI_PUBLISH",
+   "RESOURCES_AI_PUBLISH",
+   "QUEUE_AI_PUBLISH",
+   "TRANSPORT_AI_PUBLISH",
+   "GAMES_AI_PUBLISH",
+   "MAINTENANCE_AI_PUBLISH",
+   "ACCREDITATION_AI_PUBLISH",
+   "PARTNER_AI_PUBLISH",
+   "ANALYTICS_AI_PUBLISH",
+   "BIOMETRIC_IMAGE_VIEW",
+   "ACCESS_DIRECTION_SET",
+   "REPORT_GOVERNANCE_MANAGE"
+  ]
+ },
+ "PlatformStaffGrant": {
+  "type": "object",
+  "x-ticvai-persistence": "identity.platform_staff_grant",
+  "description": "**One platform operator's time-boxed access into this tenant** (decided 28 September, audit R098). Written by `openPlatformStaffGrant`, read by the tenant through `listPlatformStaffGrants`, and never edited: a grant ends at `expiresAt`, and a new need is a new grant.\n",
+  "required": [
+   "id",
+   "operatorPrincipalId",
+   "permissions",
+   "reason",
+   "openedAt",
+   "expiresAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "operatorPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "The platform operator, from the Control Plane token. Set by the server."
+   },
+   "operatorDisplayName": {
+    "type": "string",
+    "readOnly": true
+   },
+   "permissions": {
+    "type": "array",
+    "items": {
+     "$ref": "../shared/permissions.yaml#/components/schemas/Permission"
+    }
+   },
+   "reason": {
+    "type": "string"
+   },
+   "ticketRef": {
+    "type": "string",
+    "nullable": true
+   },
+   "openedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "The tenant root. **Operations write it at `tenant` scope**; the server sets it."
    }
   }
  },
@@ -2364,5 +2677,134 @@
     "description": "Hash of the change set approved; execution refuses a plan whose hash differs (AIC-181)."
    }
   }
+ },
+ "SuspensionMode": {
+  "type": "string",
+  "description": "Access validation continues under every mode. A commercial dispute must not strand guests at a gate holding valid tickets.\n",
+  "enum": [
+   "readOnly",
+   "noNewSales",
+   "fullLockout"
+  ]
+ },
+ "Tenant": {
+  "x-ticvai-persistence": "control.tenant",
+  "type": "object",
+  "required": [
+   "id",
+   "code",
+   "name",
+   "status",
+   "createdAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "status": {
+    "$ref": "#/components/schemas/TenantStatus"
+   },
+   "suspensionMode": {
+    "$ref": "#/components/schemas/SuspensionMode"
+   },
+   "suspensionReason": {
+    "type": "string",
+    "nullable": true
+   },
+   "suspensionEffectiveAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "When the suspension takes, or took, effect — `suspendTenant.effectiveAt`. **A future value is a pending suspension**: the tenant stays `active` until then, and this row is the only place that says a suspension is coming."
+   },
+   "suspensionNoticeMessage": {
+    "$ref": "#/components/schemas/LocalisedText",
+    "description": "The notice shown to the tenant's users about the suspension — `suspendTenant.noticeMessage`."
+   },
+   "terminationScheduledAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "When `terminateTenant` started the retention window. Null when no termination is under way."
+   },
+   "terminationRetentionUntil": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "`terminationScheduledAt` plus the request's `retentionDays`. **Stored, not recomputed** — the day count is client-supplied and exists nowhere else, and this is the date the cells are destroyed after."
+   },
+   "terminationReason": {
+    "type": "string",
+    "maxLength": 1000,
+    "nullable": true
+   },
+   "terminationRequestedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "planId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "planName": {
+    "type": "string",
+    "nullable": true
+   },
+   "cellCount": {
+    "type": "integer"
+   },
+   "venueCount": {
+    "type": "integer"
+   },
+   "regionId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The tenant's home region: the `tenancy` region node whose `RegionSettings` govern tenant-wide gates, today `allowedAiResidencies` (decided 28 September, audit R203). Written by the server when the tenant's first region is created; null until then. ADM-037 reads it to show the region's residency restriction, and `ai.setAiProvider` checks against the same region.\n"
+   },
+   "billingEmail": {
+    "type": "string"
+   },
+   "billingAddress": {
+    "type": "string",
+    "maxLength": 500,
+    "nullable": true,
+    "description": "Accepted by `createTenant` and `updateTenant`; stored here so the response can return what was sent."
+   },
+   "accountManagerPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "activatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "TenantStatus": {
+  "type": "string",
+  "enum": [
+   "onboarding",
+   "active",
+   "suspended",
+   "terminating",
+   "terminated"
+  ]
  }
 }

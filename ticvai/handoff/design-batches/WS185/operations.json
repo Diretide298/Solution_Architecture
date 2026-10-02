@@ -122,6 +122,44 @@
   "requestBody": null,
   "responds": "RecommendationStrategy"
  },
+ "pauseAiCapability": {
+  "method": "POST",
+  "path": "/governance/capabilities/{capabilityKey}/pause",
+  "contract": "ai",
+  "summary": "Stop a capability now",
+  "permission": "AI_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AiCapabilityRegistration"
+ },
+ "rollbackAiRelease": {
+  "method": "POST",
+  "path": "/releases/{releaseId}/rollback",
+  "contract": "ai",
+  "summary": "Roll a release back",
+  "permission": "AI_APPROVE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AiRelease"
+ },
  "simulateRecommendationStrategy": {
   "method": "POST",
   "path": "/recommendation-simulations",

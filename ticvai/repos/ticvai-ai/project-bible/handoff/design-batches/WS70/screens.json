@@ -687,6 +687,12 @@
     "operation": null,
     "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
     "source": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 113 §Each Anomaly Displays"
+   },
+   {
+    "operation": "listAnalyticsAnomalies",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-012): The same duplication as ANL-019; listAiInsights (kind anomaly) is the one list (ADR-0053; design-notes correction ai ANL-055).",
+    "source": "ADR-0053 | contracts/satellite/ai.yaml#listAiInsights"
    }
   ],
   "layout": {
@@ -747,18 +753,11 @@
   "states": {
    "loading": "The anomaly detection list.",
    "error": "Could not load. Names which read failed and leaves the anomaly detection untouched.",
-   "emptyFirstRun": "No anomaly detection yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No anomaly detection yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the anomaly detection are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
-   {
-    "operationId": "listAnalyticsAnomalies",
-    "contract": "reporting",
-    "purpose": "Anomalies, with severity",
-    "trigger": "onLoad",
-    "provenance": "board reading, 19 September 2026"
-   },
    {
     "operationId": "listAiInsights",
     "contract": "ai",
@@ -1065,8 +1064,9 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Revenue",
-       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 116 §Support forecasts for"
+       "label": "Net revenue",
+       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 116 §Support forecasts for",
+       "notes": "(CHG-FIN-002: never a bare \"Revenue\")"
       },
       {
        "kind": "secondaryButton",
@@ -1164,6 +1164,7 @@
     }
    ]
   },
+  "notes": "**Measure names, not \"Revenue\"** (decided 2 October 2026, Chinmay; CHG-FIN-002; BOARDREQ MOM-2758..2761). Takings (money taken less money paid back, a cash-control figure), Gross sales (before discounts, excluding VAT), Net revenue (gross sales less discounts and refunds), Recognised revenue and Deferred revenue are different numbers and never share a label; a tile takes its label from the seeded KPI it is bound to (`ReportingSystemKpi`).",
   "_platform": {
    "code": "P16",
    "formFactor": "web",
@@ -1376,6 +1377,18 @@
        "kind": "textField",
        "label": "Whether recommendation was accepted",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 118 §Capture"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Decisions",
+       "operation": "searchAiDecisions",
+       "provenance": "contract ai.yaml GET /decision-records; wiring fix, 2 October 2026"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Interactions",
+       "operation": "listAiInteractions",
+       "provenance": "contract ai.yaml GET /interactions; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -1408,6 +1421,20 @@
     "purpose": "Review, accept, reject or mark an insight actioned",
     "trigger": "onAction",
     "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "searchAiDecisions",
+    "contract": "ai",
+    "purpose": "The decision records behind each insight",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-012)"
+   },
+   {
+    "operationId": "listAiInteractions",
+    "contract": "ai",
+    "purpose": "Who asked and what was accessed",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-012)"
    }
   ],
   "wireframe": {
@@ -1490,6 +1517,12 @@
     "operation": null,
     "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
     "source": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 119 §Display"
+   },
+   {
+    "operation": "publishPromptTemplate",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-012): publishPromptTemplate (AI_APPROVE) is model governance on the console (ADM-037); on a venue analytics screen prompts are read-only (design-notes correction ai ANL-060).",
+    "source": "contracts/satellite/ai.yaml#publishPromptTemplate"
    }
   ],
   "layout": {
@@ -1499,12 +1532,6 @@
      "name": "contentBody",
      "slot": "collection",
      "components": [
-      {
-       "kind": "publishGate",
-       "impliedBy": "publishPromptTemplate",
-       "notes": "Declares `publishPromptTemplate`. **The gate names what the publish will affect before it happens**: which tenants, venues or capabilities take the new version, and that the previous one stays available to roll back to.",
-       "provenance": "check-screens publish rule, 29 September 2026"
-      },
       {
        "kind": "dataTable",
        "label": "Every analytics governance model",
@@ -1574,7 +1601,7 @@
   "states": {
    "loading": "The analytics governance model list.",
    "error": "Could not load. Names which read failed and leaves the analytics governance model untouched.",
-   "emptyFirstRun": "No analytics governance model yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No analytics governance model yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the analytics governance model are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -1612,13 +1639,6 @@
     "contract": "ai",
     "purpose": "The prompt registry",
     "trigger": "onLoad",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "publishPromptTemplate",
-    "contract": "ai",
-    "purpose": "Publish a prompt template version",
-    "trigger": "onAction",
     "provenance": "build, 29 September 2026"
    },
    {

@@ -48,12 +48,12 @@ steps:
     not four orders.'
   crossesDevice: true
 - step: 4
-  screen: KSK-017
-  action: Or they collect from a kiosk.
+  screen: POS-012
+  action: 'They collect at the exit desk on the way out'
   operations:
-  - listMerchandise
-  - reserveMerchandise
-  outcome: '**Unattended collection.** F75 covers what happens when it goes wrong with nobody there.'
+  - lookupShopAndDrop
+  - collectShopAndDrop
+  outcome: '**Staff hand the goods over**, against the ticket, the drop reference or the receipt: a kiosk cannot hand goods over (collectShopAndDrop is staff-only), so the guest''s way out passes the desk (CHG-CLN-005; design-note correction KSK-017)'
   crossesDevice: true
 branches:
 - at: 2

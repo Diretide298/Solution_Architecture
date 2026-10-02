@@ -299,7 +299,7 @@
   "states": {
    "loading": "The member operations list.",
    "error": "Could not load. Names which read failed and leaves the member operations untouched.",
-   "emptyFirstRun": "No member operations yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No member operations yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the member operations are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -688,7 +688,7 @@
   "states": {
    "loading": "The membership activation credential list.",
    "error": "Could not load. Names which read failed and leaves the membership activation credential untouched.",
-   "emptyFirstRun": "No membership activation credential yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No membership activation credential yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the membership activation credential are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -902,7 +902,7 @@
   "states": {
    "loading": "The visit admission entitlement list.",
    "error": "Could not load. Names which read failed and leaves the visit admission entitlement untouched.",
-   "emptyFirstRun": "No visit admission entitlement yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No visit admission entitlement yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the visit admission entitlement are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -1257,7 +1257,7 @@
   "states": {
    "loading": "The membership upgrade downgrade list.",
    "error": "Could not load. Names which read failed and leaves the membership upgrade downgrade untouched.",
-   "emptyFirstRun": "No membership upgrade downgrade yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No membership upgrade downgrade yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the membership upgrade downgrade are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -1419,7 +1419,7 @@
   "states": {
    "loading": "The renewal operations auto-renewal list.",
    "error": "Could not load. Names which read failed and leaves the renewal operations auto-renewal untouched.",
-   "emptyFirstRun": "No renewal operations auto-renewal yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No renewal operations auto-renewal yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the renewal operations auto-renewal are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -1772,7 +1772,7 @@
   "states": {
    "loading": "The member lifecycle history list.",
    "error": "Could not load. Names which read failed and leaves the member lifecycle history untouched.",
-   "emptyFirstRun": "No member lifecycle history yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No member lifecycle history yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the member lifecycle history are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -1993,7 +1993,7 @@
   "states": {
    "loading": "The membership analytics renewal list; the counts above it resolve separately.",
    "error": "Could not load. Names which read failed and leaves the membership analytics renewal untouched.",
-   "emptyFirstRun": "No membership analytics renewal yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "**Nothing to show yet**: the figures fill as activity is recorded. Offers no create action — a monitor creates nothing — and says so rather than showing empty tiles.",
    "emptyNoResults": "The filter narrowed it and the membership analytics renewal are still there. The pack's own statuses are 5 Management — the state names which is selected.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },

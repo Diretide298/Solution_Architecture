@@ -61,25 +61,6 @@
   "requestBody": null,
   "responds": "Order"
  },
- "claimLocationSession": {
-  "method": "POST",
-  "path": "/location-sessions",
-  "contract": "fnb",
-  "summary": "Tell the platform where the guest is",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "LocationSession"
- },
  "createAiConversation": {
   "method": "POST",
   "path": "/conversations",
@@ -155,6 +136,25 @@
   ],
   "requestBody": null,
   "responds": "Cart"
+ },
+ "getForm": {
+  "method": "GET",
+  "path": "/forms/{formId}",
+  "contract": "marketing-crm",
+  "summary": "One form, to fill in or to edit",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "version",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "FormDefinition"
  },
  "getGuestMenu": {
   "method": "GET",
@@ -268,44 +268,16 @@
   "requestBody": null,
   "responds": "Conversation"
  },
- "listCatalogueBundles": {
+ "listAiConversations": {
   "method": "GET",
-  "path": "/catalogue/bundles",
-  "contract": "catalogue",
-  "summary": "List published catalogue bundles",
-  "permission": "PRODUCT_VIEW",
-  "offlineCapable": true,
+  "path": "/conversations",
+  "contract": "ai",
+  "summary": "A principal's conversation history",
+  "permission": "AI_USE",
+  "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "BundleSummary"
- },
- "listContentPages": {
-  "method": "GET",
-  "path": "/tenant-config/pages",
-  "contract": "white-label",
-  "summary": "List custom content pages",
-  "permission": "TENANT_CONFIGURE",
-  "offlineCapable": true,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
   "parameters": [
-   {
-    "name": "status",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "categoryCode",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "slug",
-    "in": "query",
-    "required": null
-   },
    {
     "name": null,
     "in": null,
@@ -320,18 +292,18 @@
   "requestBody": null,
   "responds": "Page"
  },
- "listFaqs": {
+ "listCatalogueBundles": {
   "method": "GET",
-  "path": "/tenant-config/faqs",
-  "contract": "white-label",
-  "summary": "List FAQs",
-  "permission": "TENANT_CONFIGURE",
+  "path": "/catalogue/bundles",
+  "contract": "catalogue",
+  "summary": "List published catalogue bundles",
+  "permission": "PRODUCT_VIEW",
   "offlineCapable": true,
   "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
+  "scopeLevel": "venue",
   "parameters": [],
   "requestBody": null,
-  "responds": "FaqCategory"
+  "responds": "BundleSummary"
  },
  "listMyCases": {
   "method": "GET",
@@ -391,6 +363,40 @@
   "requestBody": null,
   "responds": "Page"
  },
+ "listMyOrders": {
+  "method": "GET",
+  "path": "/my/orders",
+  "contract": "orders",
+  "summary": "The orders this guest placed",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": "since",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "listProducts": {
   "method": "GET",
   "path": "/products",
@@ -444,6 +450,72 @@
   ],
   "requestBody": null,
   "responds": "Page"
+ },
+ "listPublishedContentPages": {
+  "method": "GET",
+  "path": "/storefront/pages",
+  "contract": "white-label",
+  "summary": "The live content pages, readable before sign-in",
+  "permission": null,
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "categoryCode",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "slug",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listPublishedFaqs": {
+  "method": "GET",
+  "path": "/storefront/faqs",
+  "contract": "white-label",
+  "summary": "The published FAQs, readable before sign-in",
+  "permission": null,
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "PublishedFaqCategory"
+ },
+ "listPublishedPolicies": {
+  "method": "GET",
+  "path": "/storefront/policies",
+  "contract": "white-label",
+  "summary": "The tenant's current legal policies, readable before sign-in",
+  "permission": null,
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "kind",
+    "in": "query",
+    "required": false
+   }
+  ],
+  "requestBody": null,
+  "responds": "PublishedPolicy"
  },
  "listVisitPlanAlternatives": {
   "method": "GET",
@@ -606,6 +678,25 @@
   ],
   "requestBody": null,
   "responds": "ConversationMessage"
+ },
+ "submitForm": {
+  "method": "POST",
+  "path": "/form-submissions",
+  "contract": "marketing-crm",
+  "summary": "Sign a waiver, answer a survey, capture details",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "FormSubmission",
+  "responds": "FormSubmission"
  },
  "submitReview": {
   "method": "POST",

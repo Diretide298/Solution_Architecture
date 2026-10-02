@@ -1138,7 +1138,7 @@
   "states": {
    "loading": "The accreditation api list.",
    "error": "Could not load. Names which read failed and leaves the accreditation api untouched.",
-   "emptyFirstRun": "No accreditation api yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No accreditation api yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the accreditation api are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -1258,11 +1258,6 @@
       {
        "kind": "selectField",
        "label": "Delivery history",
-       "provenance": "pack ACCREDITATION.pdf, page 71 §Webhook configuration shall include"
-      },
-      {
-       "kind": "selectField",
-       "label": "Key requirement: 12.1.53",
        "provenance": "pack ACCREDITATION.pdf, page 71 §Webhook configuration shall include"
       }
      ]

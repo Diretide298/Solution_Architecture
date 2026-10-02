@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """Contract shapes a reviewer misses on the four-hundredth operation.
 
-**Audit classes A-CONTRACT-CONVENTION and A-CONTRACT-VOCAB (audit/ticvai/ROOT-CLASSES.md).**
+**Audit classes A-CONTRACT-CONVENTION and A-CONTRACT-VOCAB (docs/active/root-classes.md).**
 `check-package.py` rules 46-50 hold the Page envelope, one route per operation, Idempotency-Key,
 X-Consistency-Token and path naming (R076 R176 R142 R192 R118). The same audit found more of the
 same kind that nothing held:

@@ -2284,7 +2284,7 @@
     "22.13.10"
    ],
    "lane": "decision",
-   "status": "open",
+   "status": "done",
    "contracts": [
     "white-label"
    ],
@@ -2299,7 +2299,9 @@
     "CF-127"
    ],
    "blockedOnDomains": [],
-   "cf": "CF-127"
+   "cf": "CF-127",
+   "closed": "2026-10-02",
+   "closedBy": "CF-127 closed 2 October (Chinmay, DEC-019; CHG-DOC-021, CHG-CSA-023): **buy a scanner API, hybrid.** Our banner, runtime, registry and consent logs stay; a bought scanner API feeds `recordCookieScan` (marketing-crm) through a TICVAI adapter (`CookieScanPolicy.scanSource`, default boughtScanner), and the manual \"Upload scan report\" path stays. The vendor is still to be chosen (external dependencies, Class S). Closed in the backlog by CHG-GTB-005."
   },
   {
    "id": "BL-074",

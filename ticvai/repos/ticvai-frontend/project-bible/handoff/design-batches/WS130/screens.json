@@ -78,8 +78,8 @@
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
-  "purpose": "Provide management with a consolidated backend view of the financial, commercial, sponsorship, attendance and operational performance of events.",
-  "purposeNote": "Authorized users can obtain a consolidated view of event commercial and operational performance while data visibility remains controlled by tenant, entity and role permissions.",
+  "purpose": "See everything an event needs (staff, equipment, spaces) and whether each has been secured.",
+  "purposeNote": "Authorized users can obtain a consolidated view of event commercial and operational performance while data visibility remains controlled by tenant, entity and role permissions. Purpose rewritten 2 October 2026 (CHG-WIR-026): The purpose was pack text attached by page rather than by screen and does not describe this screen; it is rewritten from the screen's name and operations (design-notes correction ticketing-backoffice BO-710)",
   "gaps": [
    {
     "operation": null,
@@ -201,8 +201,8 @@
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
-  "purpose": "Configure the financial plan and budget against which event performance will be measured.",
-  "purposeNote": "Administrators can create an event-level financial plan and compare budget, commitments, actuals and forecasts using data referenced from the shared Finance services.",
+  "purpose": "List the resources an event needs (staff, equipment and spaces) with quantities and times.",
+  "purposeNote": "Administrators can create an event-level financial plan and compare budget, commitments, actuals and forecasts using data referenced from the shared Finance services. Purpose rewritten 2 October 2026 (CHG-WIR-026): The purpose was pack text attached by page rather than by screen and does not describe this screen; it is rewritten from the screen's name and operations (design-notes correction ticketing-backoffice BO-711)",
   "gaps": [
    {
     "operation": null,
@@ -234,6 +234,13 @@
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
        "impliedBy": "setEventResourcePlan"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Everything an event needs, and whether it has been secured",
+       "bindsTo": "EventResourcePlan",
+       "operation": "getEventResourcePlan",
+       "provenance": "contract catalogue.yaml GET /events/{eventId}/resource-plan; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -256,6 +263,13 @@
     "invalidates": [
      "getEventResourcePlan"
     ]
+   },
+   {
+    "operationId": "getEventResourcePlan",
+    "contract": "catalogue",
+    "purpose": "Everything an event needs, and whether it has been secured",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {
@@ -335,8 +349,8 @@
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
-  "purpose": "Define how financial performance should be measured and attributed to an event.",
-  "purposeNote": "The system provides traceable event profitability using configured financial attribution rules without duplicating the underlying accounting ledger.",
+  "purpose": "Set the staff roles an event needs and assign people to them on the rota.",
+  "purposeNote": "The system provides traceable event profitability using configured financial attribution rules without duplicating the underlying accounting ledger. Purpose rewritten 2 October 2026 (CHG-WIR-026): The purpose was pack text attached by page rather than by screen and does not describe this screen; it is rewritten from the screen's name and operations (design-notes correction ticketing-backoffice BO-712)",
   "gaps": [
    {
     "operation": null,
@@ -368,6 +382,19 @@
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
        "impliedBy": "setEventResourcePlan"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Everything an event needs, and whether it has been secured",
+       "bindsTo": "EventResourcePlan",
+       "operation": "getEventResourcePlan",
+       "provenance": "contract catalogue.yaml GET /events/{eventId}/resource-plan; wiring fix, 2 October 2026"
+      },
+      {
+       "kind": "dataTable",
+       "label": "The rota",
+       "operation": "listRotaAssignments",
+       "provenance": "contract workforce.yaml GET /rota-assignments; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -401,6 +428,20 @@
      "listRotaAssignments",
      "getStaffingCoverage"
     ]
+   },
+   {
+    "operationId": "getEventResourcePlan",
+    "contract": "catalogue",
+    "purpose": "Everything an event needs, and whether it has been secured",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
+   },
+   {
+    "operationId": "listRotaAssignments",
+    "contract": "workforce",
+    "purpose": "The rota",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {
@@ -480,8 +521,8 @@
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Track) and no metric row",
-  "purpose": "Manage sponsors and sponsorship agreements associated with events.",
-  "purposeNote": "Administrators can associate sponsorship agreements and deliverables with an event and track fulfillment against contractual commitments.",
+  "purpose": "Plan the contractors and external workers an event needs, as part of its resource plan.",
+  "purposeNote": "Administrators can associate sponsorship agreements and deliverables with an event and track fulfillment against contractual commitments. Purpose rewritten 2 October 2026 (CHG-WIR-026): The purpose was pack text attached by page rather than by screen and does not describe this screen; it is rewritten from the screen's name and operations (design-notes correction ticketing-backoffice BO-713)",
   "gaps": [
    {
     "operation": null,
@@ -505,6 +546,13 @@
        "bindsTo": null,
        "operation": null,
        "provenance": "pack Event_Management_Configuration_Backend_Structure_v1.0.pdf, page 84 §Track"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Everything an event needs, and whether it has been secured",
+       "bindsTo": "EventResourcePlan",
+       "operation": "getEventResourcePlan",
+       "provenance": "contract catalogue.yaml GET /events/{eventId}/resource-plan; wiring fix, 2 October 2026"
       }
      ]
     },
@@ -543,6 +591,13 @@
     "invalidates": [
      "getEventResourcePlan"
     ]
+   },
+   {
+    "operationId": "getEventResourcePlan",
+    "contract": "catalogue",
+    "purpose": "Everything an event needs, and whether it has been secured",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "entryState": {
@@ -622,8 +677,8 @@
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
-  "purpose": "Allow authorized administrators to use AI to accelerate creation of event configuration from natural-language instructions or existing templates.",
-  "purposeNote": "AI can accelerate event setup while every proposed configuration remains reviewable, editable, permission-controlled and subject to normal approval workflows.",
+  "purpose": "Plan the shifts an event needs and roster the people who will work them.",
+  "purposeNote": "AI can accelerate event setup while every proposed configuration remains reviewable, editable, permission-controlled and subject to normal approval workflows. Purpose rewritten 2 October 2026 (CHG-WIR-003): The purpose, columns and governance headings came from pack page 85 (Screen 06 AI-Assisted Event Creation); Event Shift and Roster Configuration is Screen 06 of board 6 on pages 46-47 of the same pack (design-notes correction venue-operations BO-714).",
   "gaps": [
    {
     "operation": null,
@@ -648,6 +703,12 @@
        "bindsTo": null,
        "operation": null,
        "provenance": "pack Event_Management_Configuration_Backend_Structure_v1.0.pdf, page 85 §Display"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Event roster",
+       "operation": "listRotaAssignments",
+       "provenance": "contract workforce.yaml GET /rota-assignments; wiring fix, 2 October 2026"
       }
      ]
     },
@@ -665,6 +726,17 @@
        ],
        "notes": "The pack groups this record's detail under its own headings: “Administrators can”, “Critical Governance Principle”.",
        "provenance": "pack Event_Management_Configuration_Backend_Structure_v1.0.pdf, page 85 §Display"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "components": [
+      {
+       "kind": "secondaryButton",
+       "label": "Add to roster",
+       "operation": "createRotaAssignment",
+       "provenance": "contract workforce.yaml POST /rota-assignments; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -694,6 +766,20 @@
     "purpose": "Where it is short",
     "trigger": "onLoad",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "listRotaAssignments",
+    "contract": "workforce",
+    "purpose": "Who is rostered for the event",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-001)"
+   },
+   {
+    "operationId": "createRotaAssignment",
+    "contract": "workforce",
+    "purpose": "Roster someone for an event shift",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-001)"
    }
   ],
   "entryState": {
@@ -708,6 +794,22 @@
    "workshopBoard": "wireframes/WS53 Event Management Configuration Backend Structure v1.0 Board 6.dc.html#bo-714"
   },
   "apisNote": "Regenerated 9 September 2026 from Event_Management_Configuration_Backend_Structure_v1.0.pdf page 85. 0 of 2 labels bound to a contract property; 2 of 33 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formCreateRotaAssignment",
+    "component": "modal",
+    "trigger": "Add to roster",
+    "body": "**Collects what `createRotaAssignment` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Add to roster",
+     "operation": "createRotaAssignment"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "contract workforce.yaml POST /rota-assignments; wiring fix, 2 October 2026"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -771,8 +873,8 @@
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Configure KPI by; Display) and no metric row",
-  "purpose": "Configure measurable operational KPIs for staff, instructors and activity operators.",
-  "purposeNote": "Administrators can define measurable operator/instructor KPIs and calculate performance using traceable operational records from completed sessions.",
+  "purpose": "Set where and when each of an event's resources is deployed.",
+  "purposeNote": "Administrators can define measurable operator/instructor KPIs and calculate performance using traceable operational records from completed sessions. Purpose rewritten 2 October 2026 (CHG-WIR-026): The purpose was pack text attached by page rather than by screen and does not describe this screen; it is rewritten from the screen's name and operations (design-notes correction ticketing-backoffice BO-715)",
   "gaps": [
    {
     "operation": null,
@@ -796,6 +898,13 @@
        "bindsTo": null,
        "operation": null,
        "provenance": "pack Event_Management_Configuration_Backend_Structure_v1.0.pdf, page 86 §Display"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Everything an event needs, and whether it has been secured",
+       "bindsTo": "EventResourcePlan",
+       "operation": "getEventResourcePlan",
+       "provenance": "contract catalogue.yaml GET /events/{eventId}/resource-plan; wiring fix, 2 October 2026"
       }
      ]
     },
@@ -834,6 +943,13 @@
     "invalidates": [
      "getEventResourcePlan"
     ]
+   },
+   {
+    "operationId": "getEventResourcePlan",
+    "contract": "catalogue",
+    "purpose": "Everything an event needs, and whether it has been secured",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "entryState": {

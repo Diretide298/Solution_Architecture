@@ -1,4 +1,49 @@
 {
+ "getCell": {
+  "method": "GET",
+  "path": "/cells/{cellId}",
+  "contract": "subscription",
+  "summary": "Read a cell",
+  "permission": "PLATFORM_CELL_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "CellDetail"
+ },
+ "getCellCapacity": {
+  "method": "GET",
+  "path": "/cells/{cellId}/capacity",
+  "contract": "subscription",
+  "summary": "Load against headroom",
+  "permission": "PLATFORM_CELL_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "window",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "CellCapacity"
+ },
+ "getCellHealth": {
+  "method": "GET",
+  "path": "/cells/{cellId}/health",
+  "contract": "subscription",
+  "summary": "Cell health and schema version",
+  "permission": "PLATFORM_CELL_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "CellHealth"
+ },
  "getScalingPolicy": {
   "method": "GET",
   "path": "/scaling-policies",
@@ -37,6 +82,30 @@
   "parameters": [],
   "requestBody": null,
   "responds": "BackupRun"
+ },
+ "listCellJobs": {
+  "method": "GET",
+  "path": "/cells/{cellId}/jobs",
+  "contract": "subscription",
+  "summary": "Provisioning, migration and maintenance jobs",
+  "permission": "PLATFORM_CELL_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
  },
  "setScalingPolicy": {
   "method": "PUT",

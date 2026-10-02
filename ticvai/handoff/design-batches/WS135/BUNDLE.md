@@ -1,6 +1,6 @@
 # WS135 — Marketing CRM Configuration Reference v1.0 board 1
 
-**10 screens · 21 operations · 28 schemas · 8 permissions**
+**10 screens · 20 operations · 26 schemas · 7 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -48,8 +48,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 8 permissions apply here:
-  `CASE_VIEW, GUEST_MANAGE, GUEST_VIEW, GUEST_VIEW_PII, LEDGER_POST, MARKETING_MANAGE, MARKETING_VIEW, PRODUCT_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 7 permissions apply here:
+  `CASE_VIEW, GUEST_MANAGE, GUEST_VIEW, GUEST_VIEW_PII, LEDGER_POST, MARKETING_MANAGE, MARKETING_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -61,6 +61,66 @@ convincingly. It is never a caption.
   and its error; and, element by element, what is shown and in what format, what each action
   produces and where the user goes next. Draw exactly that.
 
+## The processes these screens belong to
+
+Written by the owner of each process (`handoff/design-notes/`). Read before any screen: it says how the process runs end to end and which words the screens must use.
+
+### Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers)
+
+Customer & marketing is how a venue knows its guests and talks to them. There is ONE guest profile per person across ticketing, F&B and retail, so a guest who books online and later dines is the same profile (DI-339). A profile needs at least an email or a mobile, never neither (DI-372). Profiles are created by registration, by guest checkout, or by staff at a till or desk. Repeat guest checkouts with the same verified email or phone attach to the same profile automatically (DI-941, R120 default). Two records that might be the same person are NEVER merged automatically: the guest is asked to confirm, and an admin review queue runs alongside (DI-377). Each candidate shows why it matched; the record that loses is superseded, not deleted; consent takes the narrower of the two positions (DI-808). Around the profile sit three things that must never be confused. CONSENT is what the law allows: per purpose and per channel, append-only, with the notice version and the source (recordConsent). It is Given, Withdrawn or Not asked. A SUBSCRIPTION is what the guest asked to receive, e.g. a newsletter list (MarketingSubscription). A PREFERENCE is what they like: table, dietary, accessibility (updateGuestPreferences). An anonymous visitor's cookie decision is recorded against a device key (recordDeviceConsent) and attaches to the guest when they sign in (claimDeviceConsent). Marketing consent at GUEST CHECKOUT is an open client question, and the design follows its default: an unticked opt-in beside the terms, one per channel and purpose. It is recorded with source "checkout" against the order and the verified contact, and nothing is sent without it. Whether that is sufficient consent under PDPL is the client DPO's call (M18-15 (audit R-M18-15), DI-954, DI-940). Marketing reads profiles through SEGMENTS (rules, evaluated when used) and static LISTS (imported). It reaches guests by CAMPAIGNS (one send to an audience) and JOURNEYS (automations started by an event, with waits and branches). Journeys may offer only pre-configured offers, never a free-typed discount (MoM 2026-08-20 4.6). Everything goes through ONE communications module that every other module uses (MoM 2026-08-31 4.6). Consent and suppression are applied at send time, and the number excluded, with the reasons, is reported before anything goes out (launchCampaign). Transactional messages (tickets, receipts, queue calls, case replies) do not need marketing consent and must never carry marketing. LOYALTY pays for spend: points, tiers, rewards and expiry. GAMIFICATION pays for behaviour: challenges, badges, streaks, referrals and leaderboards (createChallenge). A guest reads their own loyalty position (getLoyaltyPosition). A till, the back office or support reads a named guest's (getGuestLoyalty, or identifyGuest at a till). SERVICE: one Case object covers lost property, complaints, questions, accessibility and refund requests (CaseKind). A guest raises one with raiseMyCase, which needs the connection …
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Guest | The person the venue serves, signed in or not. In body copy on every surface. | Customer, User, Subject, Contact, Patron | contracts/satellite/marketing-crm.yaml#/components/schemas/GuestProfile |
+| Guest profile | The CRM record of one person (details, consent, preferences, history). Distinct from the Account, which is how a guest signs in. | Customer record, Contact, Subject | contracts/satellite/marketing-crm.yaml#getGuestProfile |
+| Consent - Given / Withdrawn / Not asked | What the law allows, per purpose (marketing, personalisation, profiling, third-party sharing, AI processing, transactional) and per channel. "Not asked" is not "Withdrawn" and must look different. | Opted in/out as a status, Accepted, Declined, Revoked, Unsubscribed (that is a subscription) | contracts/satellite/marketing-crm.yaml#/components/schemas/ConsentDecision |
+| Subscription | A list the guest asked to receive (a newsletter, event news), per channel. Unsubscribing from a list is not withdrawing consent. | Consent, Opt-in | contracts/satellite/marketing-crm.yaml#/components/schemas/MarketingSubscription |
+| Preferences | What the guest likes or needs (seating, drinks, dietary, accessibility, contact channel). Never grants permission. | Consents, Settings | contracts/satellite/marketing-crm.yaml#updateGuestPreferences |
+| Send me offers and news | The marketing opt-in label beside the terms at checkout, unticked, one per channel and purpose. | I agree to marketing, Pre-ticked boxes, Keep me updated ticked by default | DI-954 |
+| Points / Tier / Points to next tier / Expiring points | The loyalty position. Points are a liability earned per programme; tiers are ranked (Bronze, Silver, Gold, Platinum in the meetings). | Credits, Coins, Balance alone (wallet money is "credit"), Level | DI-382 |
+| Pending points | Points earned on a purchase still inside its refund window; shown apart from spendable points. | Available points for pending ones | contracts/satellite/marketing-crm.yaml#getLoyaltyPosition |
+| Reward | What points can be turned into (rewards catalogue). | Prize (games redemption uses prize), Voucher unless it is one | contracts/satellite/marketing-crm.yaml#listRewards |
+| Challenge / Badge / Streak / Referral | Gamification - rewards for behaviour, not spend. Status badges such as Explorer, Adventurer, Legend. | Mission and Quest used interchangeably on one screen, Loyalty tier for a badge | DI-392 |
+| Case | One service record - lost property, complaint, question, accessibility, refund request or other - with a number (venue prefix plus sequence), a status and an SLA. | Ticket (a ticket is an admission product), Issue, Incident (that is maintenance and safety) | contracts/satellite/marketing-crm.yaml#/components/schemas/CaseKind |
+| Reply to guest / Internal note | The two kinds of case message. The agent always chooses one explicitly; there is no default. | Comment, Message (ambiguous) | F05 step 2 |
+| Conversation | A live chat session (web chat, in-app, WhatsApp, SMS, email, kiosk, voice). With the assistant, then queued, then with an agent. It is not a case. | Ticket, Case (until one is raised from it) | contracts/satellite/marketing-crm.yaml#/components/schemas/ConversationState |
+| Segment / List / Audience | A segment is rules evaluated when used. A list is static, imported or hand-picked. The audience is what a campaign or journey targets. | Group, Cohort, Target list for a segment | DI-381 |
+| Campaign / Journey | A campaign is one send (one-off, scheduled, triggered or recurring) to an audience. A journey is an automation started by an event, with steps, waits and branches. | Flow (booking flows use it), Automation for a one-off send, Blast | R146 |
+| Offer | A pre-configured, system-validated discount or benefit that a campaign or journey references. It is never typed into the builder. | Discount field, Coupon (unless the offer is a coupon code) | MoM 2026-08-20 4.6 |
+| Reachable | How many guests in an audience can actually be sent to on a channel after consent and suppression. Always shown beside the matching count. | Audience size alone | contracts/satellite/marketing-crm.yaml#previewSegment |
+| Possible duplicate / Merge | Two profiles that may be one person. Never called "Duplicate" as a verdict. Merging needs confirmation and stays reversible for 30 days. | Duplicate (as a status), Combine, Auto-merge | DI-808 |
+| Data request | A guest's privacy request - a copy of my data, a correction, erasure, a restriction - with a legal clock. Statuses submitted, in progress, completed. | DSAR on guest screens, Subject data, Ticket | DI-379 |
+| Waiver / Consent question | A waiver is a signed, versioned form. A consent question ("Are you able to swim?", "I accept the risk") is a single question asked per person or per booking and recorded as consent. | Contract, Disclaimer, Form for a waiver in guest copy | DI-1062 |
+| Lost item / Found item / Possible match | The two directions of lost property and the suggested pairing between them. | Lost case, Claim before it is claimed | contracts/satellite/marketing-crm.yaml#/components/schemas/LostItem |
+| Wishlist | Products and dates a guest saved to buy later, including F&B and retail to buy on site. | Favourites (used for transport routes), Saved for later on one surface and Wishlist on another | DI-202 |
+| Notification / Message | A notification is an item in the guest's in-app feed. A message is one send on a channel (email, SMS, WhatsApp, push, in-app). | Alert for marketing content, Inbox for the guest feed | contracts/satellite/marketing-crm.yaml#/components/schemas/GuestNotification |
+| Template | A reusable message body per channel and language with merge fields. Transactional and marketing templates are separate kinds. | Layout, Design | contracts/satellite/marketing-crm.yaml#createMessageTemplate |
+
+### Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management)
+
+Platform Foundation is everything the apps stand on. Five apps each have one door: the guest app and website (WEB-016, GST-042: a six-digit code to email or mobile, a password, Apple or Google, UAE Pass; never enterprise SSO), the till (POS-000: employee number and PIN, recent operators as tiles; the kitchen display is the same app), the staff handheld and scanner (EMP-001, SCN-001), Venue Management (SUP-001, the single door for the back office P08, the CMS P13, analytics P16 and the support desk P12) and TICVAI Control (ADM-001 for TICVAI's own platform operators, PTR-001 for partner users; the developer portal P14 and the sign-up P17 belong to this app too). A second factor is required by permission, not by role or device: ROLE_MANAGE, LEDGER_APPROVE and every PLATFORM_* permission, plus any the tenant adds; so a cashier never sees it and a platform operator always does. The factor is an authenticator app with an emailed code as fallback; five wrong codes lock step-up for the lockout minutes, never permanently. Guests get two-step verification only at a venue that switched it on. One person holds one session per workstation: a second sign-in is refused and only a supervisor ends the other session. Several roles mean a role prompt; one role goes straight in. The workstation decides the Sale Board, hardware and till identity, never what a person may do. Sensitive actions (refund approval, journal approval, credential reset, partner credit, commission rules, opening a platform-staff grant and 17 more) demand a fresh step-up on the operation itself, asked in place in the action's confirmation; the tenant may raise the strength, never remove it. Permission outcomes are three, never one word: self-authorised (proceeds, audited), escalated (a supervisor PIN in place), refused (the denied state, naming the permission); a missing permission is never an empty table, and a record outside the person's venues is "not found", indistinguishable from absent. The hierarchy is binding (tenant, brand, region, venue, department, sub-department, workstation; outlet beside department for F&B and retail); region owns currency, decimals, time zone, date format and fiscal year; configuration resolves nearest-ancestor across tenant, region and venue (outlet for F&B and retail), venue is the floor and a workstation is assigned a profile, never configured; every configuration screen says which level it writes and what it inherits. Venue Management is one tenant-level surface filtering across the venues in the session's scope. TICVAI's Console runs outside every cell: a platform operator picks a tenant and opens a time-boxed, audited platform-staff grant (with step-up) before any tenant action, and the tenant sees every action in its audit log (ADM-412 is the reference implementation). Approval workflows record authorisations and never perform the action; the requester cannot approve their own request; a venue may tighten and never loosen a rule from above; in-flight …
+*(source: screens/P12-support-agent-console.yaml#SUP-001; R135; R126; R167; DI-1072; ADR-0002; ADR-0003; ADR-0004; R184; contracts/spine/identity.yaml#createMfaChallenge; contracts/spine/approvals.yaml#setStepUpPolicy; ADR-0011; ADR-0018; ADR-0029; R098; contracts/spine/approvals.yaml#decideApprovalRequest …)*
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Sign in / Sign out | Entering and leaving any app, staff or guest. | Login, Log in, Logon, Logout | screens/P04-point-of-sale.yaml#POS-000 … |
+| Authentication code | The staff second factor from the authenticator app (or the emailed fallback). | OTP, 2FA code, token | screens/P09-platform-admin-console.yaml#ADM-001 |
+| One-time code | The six-digit code a guest receives to sign in or prove a contact. | OTP, PIN, password | DI-1034; R167 |
+| Two-step verification | The guest's optional second factor, asked only at venues that switched it on. | MFA, 2FA | DI-1072 |
+| Tenant / Brand / Region / Venue / Department / Outlet | The binding hierarchy levels; region owns currency and dates; outlet is F&B or retail inside a venue. | Client, Customer, Org (for tenant), Site, Park, Property (for venue), Area, Territory (for region) | ADR-0011; ADR-0018 |
+| Workstation (back office) / till (operator copy) | A configured device; decides Sale Board, hardware and till identity, never authorisation. | Terminal, Station, POS (for the device), till (for the Deposit Box) | ADR-0002; R156 |
+| Sale Board | The configured front end a workstation loads (ticketing, F&B or retail). | Screen, Layout, Menu | ADR-0003 |
+| Role | A named, fully configurable grouping of permissions; the seeded five are editable starting points. | Group, Profile | R229 |
+| Staff member / Partner user / Platform operator | A tenant's staff principal; a partner's user; a TICVAI employee in the Console. | User (alone), Account, Agent (for venue staff) | F104 step 1; F104 step 4; F104 step 5 |
+| Platform-staff grant | The time-boxed, audited access a platform operator opens into one tenant before acting in it. | Impersonation, Support login | R098 |
+| Escalate / Refused | Escalate is supervisor approval captured in place; Refused is the denied state that names the permission. | Denied (for an action that can be escalated) | R197 |
+| Approve / Reject / Return / Request information | The four decisions on an approval request; Withdraw is the requester's own act and never a rejection. | Accept, Decline, Cancel (for withdraw) | contracts/spine/approvals.yaml#decideApprovalRequest … |
+| Subscription / Plan / Module / Licence | TICVAI's commercial relationship with a tenant, its plan, the modules it licenses and the limits. | Membership (that is the guest's pass) | R214 |
+| Membership / Annual pass | A guest's pass product and its holder (BO-284 to BO-303). | Subscription (that is the tenant's TICVAI plan) | screens/P08-venue-back-office.yaml#BO-284 |
+| Sandbox client / Production client | A developer's own test credential; a TICVAI-issued live credential after certification. | Test key, Live key, API key (without environment) | DI-927 |
+| Asset (DAM) / Media (ticket) | A digital file in the library; ticket media is a wristband or card carrying entitlements. Never mix them. | Media (for a library asset) | contracts/satellite/assets.yaml#searchMedia … |
+
+
 ## The screens
 
 Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs count fields; requirements are matrix rows; meeting inputs are the ones naming the screen (the module and platform ones are below); white label says whether the tenant's brand reaches it (guest) or it sets the brand (configures).
@@ -70,17 +130,17 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-734` | CRM Command Center | B–D | 1 | 0 | 6 | 1 | 1 | 0 | — | notStarted (—) |
 | `BO-735` | Guest Directory | B–D | 13 | 21 | 6 | 16 | 1 | 0 | — | notStarted (—) |
 | `BO-736` | Guest Master Configuration | B–D | 0 | 0 | 6 | 0 | 2 | 0 | — | notStarted (—) |
-| `BO-737` | Customer 360 Profile | B–D | 0 | 0 | 6 | 0 | 3 | 0 | — | notStarted (—) |
-| `BO-738` | Activity Timeline | B–D | 0 | 0 | 6 | 12 | 0 | 0 | — | notStarted (—) |
+| `BO-737` | Customer 360 Profile | B–D | 0 | 70 | 6 | 12 | 3 | 0 | — | notStarted (—) |
+| `BO-738` | Activity Timeline | B–D | 0 | 11 | 6 | 3 | 0 | 0 | — | notStarted (—) |
 | `BO-739` | Contact & Preferences | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-740` | Family & Guardians | B–D | 0 | 0 | 6 | 3 | 1 | 0 | — | notStarted (—) |
+| `BO-740` | Family & Guardians | B–D | 11 | 9 | 6 | 3 | 1 | 0 | — | notStarted (—) |
 | `BO-741` | Corporate & Groups | B–D | 0 | 0 | 6 | 0 | 2 | 0 | — | notStarted (—) |
-| `BO-742` | Commerce & Documents | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-743` | AI Guest Intelligence | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-742` | Commerce & Documents | B–D | 0 | 11 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-743` | AI Guest Intelligence | B–D | 0 | 20 | 6 | 9 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 
-**BO-734, BO-736, BO-737, BO-738, BO-740, BO-741, BO-742, BO-743 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**BO-734, BO-736, BO-738, BO-741, BO-742, BO-743 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ---
 
@@ -104,7 +164,13 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Opens with | nothing: it opens on its own |
 | Route | `/engagement-support/crm-command-center-bo-734` |
 
-**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built. Contract gap recorded 2 October 2026 (CHG-WIR-007): No CRM summary operation for the command centre tiles.
+
+**From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** The CRM command centre: the health of the guest base at a glance, with every number drilling down to the guests behind it. Totals (all, new, active, inactive, registered vs guest-checkout), indicator counts (VIP, high value, family, corporate, churn risk, possible duplicates, incomplete profiles), lifetime value, and consent health. Segmentation by source (individual, corporate, group, travel agent, OTA) is the client's own example.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **The screen declares only searchGuests and listSegments; no operation returns the counts, trends or indicators the purpose lists.** Why: A command centre needs a summary read. Add a CRM summary operation, or the tiles cannot be built (R283 already bars counts without a summary operation). *(source: screens/P08-venue-back-office.yaml#BO-734; R283; Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers))*
 
 #### Inputs: what the user enters or picks
 
@@ -129,6 +195,13 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 **Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
 
+**Rules for what is shown** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
+
+- **Base totals**: Total, new this period, active, inactive, registered and guest-checkout profiles, with period comparison; each tile opens the directory filtered to it. *(source: DI-370; screens/P08-venue-back-office.yaml#BO-734)*
+- **Consent health**: Share of guests reachable for marketing per channel (consent given), and consents needing renewal after a notice change. Never a single "opted in" figure. *(source: contracts/satellite/marketing-crm.yaml#getGuestConsents; DI-378)*
+- **Possible duplicates**: Count awaiting review, linking to BO-746; labelled "possible duplicates", not "duplicates". *(source: DI-377; contracts/satellite/marketing-crm.yaml#listDuplicateCandidates)*
+- **By source**: Individual, corporate, group, travel agent, OTA. *(source: DI-370)*
+
 **Data it reads**: `searchGuests` (onLoad, Find a guest); `listSegments` (onLoad, Segment indicators)
 
 **Where the user goes next**
@@ -136,7 +209,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 - → `BO-100` Venue Home: *Back to Venue Home*
 - → `BO-735` Guest Directory: *Guest Directory*; carries `subjectId`
 - → `BO-736` Guest Master Configuration: *Guest Master Configuration*
-- → `BO-737` Customer 360 Profile: *Customer 360 Profile*
+- → `BO-737` Customer 360 Profile: *Customer 360 Profile*; carries `subjectId`
 - → `BO-738` Activity Timeline: *Activity Timeline*; carries `subjectId`
 - → `BO-739` Contact & Preferences: *Contact & Preferences*
 - → `BO-740` Family & Guardians: *Family & Guardians*; carries `subjectId`
@@ -154,6 +227,35 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the crm are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Consistency with other screens
+
+- Match `BO-735`: Every tile drills into the directory with the matching filter applied and named.
+- Match `BO-107`: The section landing's guest counts must equal these.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+totals:
+  all: 48210
+  new30d: 1932
+  active: 21480
+  inactive: 26730
+  guestCheckout: 9120
+indicators:
+  vip: 412
+  churnRisk: 3105
+  possibleDuplicates: 512
+  incomplete: 7880
+consent:
+  email: 61%
+  whatsapp: 54%
+  sms: 22%
+  needsRenewal: 1204
+ltv: AED 1,240.00 average lifetime value
+```
 
 #### Permissions
 
@@ -208,6 +310,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-100`, `BO-735`, `BO-736`, `BO-737`, `BO-738`, `BO-739`, `BO-740`, `BO-741`, `BO-742`, `BO-743`.
 - [ ] Every gated control is gated: `GUEST_VIEW`, `MARKETING_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -231,6 +334,13 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 **What the spec says about it.** **Guest record operations moved here from BO-036 Device Registry on 28 September (audit R254)** — `updateGuestProfile`, `mergeGuestProfiles`, `getGuestLoyalty`, `adjustLoyaltyPoints` and `getConsentHistory`, with their panels and forms. They had been attached to the device registry by module resemblance; managing a guest record is this screen's purpose.
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+**From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** The guest directory: find any guest by name, email, mobile, guest id, external id, ticket, booking, membership or loyalty number, filter the population, and act on one record (amend, adjust points, merge) or open the Customer 360. Personal fields are returned only to staff holding GUEST_VIEW_PII; everyone else sees an opaque reference and behaviour, and the table must render that honestly.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **Two merge operations exist - mergeGuestProfiles (BO-735) and mergeGuests (BO-746, EMP-057).** Why: One decision, two operations; their rules on consent and loyalty may drift. Keep one merge operation. *(source: contracts/satellite/marketing-crm.yaml#mergeGuestProfiles; contracts/satellite/marketing-crm.yaml#mergeGuests; Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers))*
+- **adjustLoyaltyPoints requires LEDGER_POST, a finance permission.** Why: A CRM officer granting goodwill points would need ledger posting rights. Confirm the permission (points are a liability, so finance may be intended). *(source: contracts/satellite/marketing-crm.yaml#adjustLoyaltyPoints; Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers))*
 
 #### Inputs: what the user enters or picks
 
@@ -281,6 +391,13 @@ Errors to draw in the form: 409 The entry being reversed is already reversed (`a
 | Duplicate subject `duplicateSubjectId` | picker: choose a duplicate subject | required | — | — | shows names, sends the id | — | `mergeGuestProfiles` body |
 | Reason `reason` | text area | required | — | min length 3; max length 500 | — | — | `mergeGuestProfiles` body |
 
+**Rules for these inputs** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
+
+- **Search**: One box for all identifiers; matching on personal data needs GUEST_VIEW_PII, so without it the box accepts only ids and membership or loyalty numbers and says so. *(source: contracts/satellite/marketing-crm.yaml#searchGuests)*
+- **Filters**: Status, segment, consent for a purpose (hasConsentFor), language, tier, LTV band, churn risk; saved views; filters always named and clearable. *(source: contracts/satellite/marketing-crm.yaml#searchGuests; screens/P08-venue-back-office.yaml#BO-735)*
+- **Adjust points**: Type goodwill, correction or expiry reversal; amount; reason required. It changes the balance only, never tier or lifetime points, and appears in the loyalty ledger report. *(source: contracts/satellite/marketing-crm.yaml#adjustLoyaltyPoints; R149)*
+- **Amend profile**: Staff field set (wider than the guest's); at least one of email or mobile remains; the change is audited. *(source: contracts/satellite/marketing-crm.yaml#updateGuestProfile; DI-372)*
+
 #### Outputs: what the screen shows and produces
 
 **Shown**
@@ -326,6 +443,17 @@ Errors to draw in the form: 409 The entry being reversed is already reversed (`a
 | Merge guest profiles (destructive button) | `mergeGuestProfiles` POST `/guests/{subjectId}/merge` | inline | MergeResult | 409 Either profile is already merged (`alreadyMerged`), or they are the same profile (`sameProfile`) (MergeRefusedProblem) | — |
 | Save guest profile (secondary button) | `updateGuestProfile` PATCH `/guests/{subjectId}` | inline | GuestProfileDetail | — | opens modal first |
 
+**Rules for what is shown** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
+
+- **Guest row**: Name (or masked reference without PII permission), masked contact, tier, last visit, LTV, flags (VIP, possible duplicate, incomplete). *(source: contracts/satellite/marketing-crm.yaml#searchGuests)*
+- **Loyalty panel**: Read with getGuestLoyalty (the staff read of a named guest), per programme. *(source: contracts/satellite/marketing-crm.yaml#getGuestLoyalty)*
+- **Consent history**: Every decision oldest first, with purpose, channel, decision, source, notice version and time; read-only evidence. *(source: contracts/satellite/marketing-crm.yaml#getConsentHistory)*
+
+**What each action does** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
+
+- **Merge into this profile**: Confirmation shows both records with what transfers (orders, cases, loyalty per programme added and higher tier kept, consent taking the more restrictive position) and that the other record is superseded, not deleted. It never runs from a bulk selection. *(source: contracts/satellite/marketing-crm.yaml#mergeGuestProfiles; R149; DI-808)*
+- **Export**: Controlled export; needs PII permission and is audited. *(source: screens/P08-venue-back-office.yaml#BO-735)*
+
 **Data it reads**: `searchGuests` (onLoad, The directory)
 
 **Where the user goes next**
@@ -347,6 +475,35 @@ Errors to draw in the form: 409 The entry being reversed is already reversed (`a
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 Either profile is already merged (`alreadyMerged`), or they are the same profile (`sameProfile`) (MergeRefusedProblem); 409 The entry being reversed is already reversed (`alreadyReversed`), or the balance would go negative (`balanceWouldGoNegative`) (LoyaltyRefusedProblem) |
+
+#### Consistency with other screens
+
+- Match `BO-746`: Merging is the same decision as on Duplicate Review and must use the same confirmation and the same operation.
+- Match `BO-737`: Opening a row goes to the Customer 360.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+rows:
+- name: Fatima Al Mansoori
+  contact: +971 50 *** 4567
+  tier: Gold
+  lastVisit: 26 Sep 2026
+  ltv: AED 4
+  860.0: null
+  flags:
+  - VIP
+- name: Priya Nair
+  contact: priya.n@ex***.ae
+  tier: Bronze
+  lastVisit: 2 Jun 2026
+  ltv: AED 310.00
+  flags:
+  - Churn risk
+adjustment: Goodwill +500 points - slide closed during visit, case CA-1019
+```
 
 #### Permissions
 
@@ -408,6 +565,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-734`.
 - [ ] Every gated control is gated: `GUEST_MANAGE`, `GUEST_VIEW`, `LEDGER_POST`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 2 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -430,9 +588,18 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** Configure the guest data model without development: standard and custom attributes, field groups, types, defaults, required and unique flags, either/or rules, identifiers, survivorship and completeness scoring, and visibility by role. Every change is a version, because a field whose meaning changed in March makes every earlier value ambiguous.
+
 #### Inputs: what the user enters or picks
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+**Rules for these inputs** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
+
+- **Required rules**: Per field required, optional or either/or. Email and mobile are an either/or pair by default and cannot both be made optional. *(source: DI-372; DI-371)*
+- **Custom field**: Label in English and Arabic, type, options, unique flag; nationality and country of residence are separate fields. *(source: DI-371; contracts/satellite/marketing-crm.yaml#setGuestExtraFields)*
+- **Remove an option**: Options are set as a whole list; removing one still held by guests shows how many hold it before saving. *(source: contracts/satellite/marketing-crm.yaml#setGuestExtraFields)*
+- **Group profile fields**: Group profiles (group name, description, contact person) are configured separately from individuals. *(source: DI-371)*
 
 #### Outputs: what the screen shows and produces
 
@@ -442,6 +609,10 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |---|---|---|---|---|---|
 | Save guest attribute model (primary button) | navigation or local | — | — | — | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
+
+**Rules for what is shown** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
+
+- **Version history**: Each saved model version with author, date and changed fields. *(source: contracts/satellite/marketing-crm.yaml#setGuestAttributeModel)*
 
 **Data it reads**: `getGuestAttributeModel` (onLoad, The shared data model)
 
@@ -459,6 +630,21 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the guest master are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+fields:
+- First name (required)
+- Last name (required)
+- Email or Mobile (either/or)
+- Nationality (optional, list)
+- Country of residence (optional)
+- Emirates ID (unique, optional)
+version: Model v6 - 30 Sep 2026 - added "Preferred park area"
+```
 
 #### Permissions
 
@@ -514,14 +700,18 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Engagement & Support · wave 3 · needs the `marketing` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `CASE_VIEW`, `PRODUCT_VIEW` (2 read); in the flows as venue manager |
+| Who uses it | venue staff holding `CASE_VIEW`, `GUEST_VIEW` (2 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
 | Offline | online only |
-| Opens with | nothing: it opens on its own |
+| Opens with | `subjectId` (navigation), `guestId` (navigation) |
 | Route | `/engagement-support/customer-360-profile-bo-737` |
 
-**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built. Removed 2 October 2026 (CHG-WIR-005): listCustomerSegmentProfile is catalogue segment pricing rules, not a guest view; the CRM 360 is getGuestProfile, getGuestLoyalty, getGuestTimeline …
+
+**From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** One guest on one page: identity, contacts, preferences, household, organisation, memberships, loyalty, wallet, tickets, bookings, visits, LTV, churn risk, whether they can be contacted (per channel and purpose), open cases, pending waivers and recent activity, with quick actions. Communication eligibility is shown before any "send" action is offered.
+
+**Fixed on main** (the package already carries these; draw what it says): The 360 is wired to listCustomerServiceProfile (the support service view) and listCustomerSegmentProfile (catalogue pricing eligibility … (CHG-WIR-005).
 
 #### Inputs: what the user enters or picks
 
@@ -530,11 +720,9 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Filter | Drawn as | Default | Allowed values, rules | Source |
 |---|---|---|---|---|
 | Subject | picker: choose a subject | — | — | `listCustomerServiceProfile` ?subjectId |
-| Dimension | select | — | Customer type · Customer segment · Account type · Crm segment · Vip status · Corporate customer · Employee staff · Partner customer · Guest registered user | `listCustomerSegmentProfile` ?dimension |
-| Segment source | radio group | — | Crm · Membership · B2B partner · Corporate account · Customer profile | `listCustomerSegmentProfile` ?segmentSource |
-| Customer | text field | — | — | `listCustomerSegmentProfile` ?customerId |
-| Status | radio group | — | Draft · Active · Disabled · Expired | `listCustomerSegmentProfile` ?status |
-| Search | text field | — | — | `listCustomerSegmentProfile` ?search |
+| Programme | picker: choose a programme | — | — | `getGuestLoyalty` ?programmeId |
+| From | date and time picker | — | — | `getGuestTimeline` ?from |
+| Kinds | text field | — | — | `getGuestTimeline` ?kinds |
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
 
@@ -544,7 +732,113 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
 
-**Data it reads**: `listCustomerServiceProfile` (onLoad, Customer 360° Service Profile); `listCustomerSegmentProfile` (onLoad, Customer Segment & Profile Pricing Rules)
+**Profile** (detail panel, from `getGuestProfile`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| ID | the name it points at, never the id | Added 20 August. The schema reference derives table columns from API response schemas, and a response is not a table — this one returned … |
+| Subject | the name it points at, never the id | Opaque reference. Personal data lives in the separately erasable store, which is what makes erasure possible against an append-only ledger. |
+| Display name | text | — |
+| Email | text | — |
+| Phone | +971 50 123 4567 | — |
+| Preferred language | text | — |
+| Preferred channel | chip: Email, SMS, Whatsapp, Push, In app, Post | — |
+| Guest link | text | Present where the guest is linked across cells. Marketing acts locally. |
+| Tags | list or chips (count when long) | — |
+| Engagement score | 1,234 | 22.2.20 and 22.2.21. `lifetimeValue` and `visitCount` existed, so value was a stored figure and engagement was not. |
+| Engagement tier | chip: New, Active, Occasional, Lapsing, Lapsed, Dormant | 5.3.19. Automatic classification, computed rather than assigned. |
+| Lifetime value | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Visit count | 1,234 | — |
+| Last visit at | 1 Oct 2026, 14:30 | — |
+| Is active | yes / no (icon or chip) | — |
+| Merged into subject | the name it points at, never the id | Set on the absorbed profile by `mergeGuestProfiles` and `mergeGuests`, which retain it as a redirect rather than deleting it. |
+| Merged at | 1 Oct 2026, 14:30 | — |
+| Consents | grouped details | — |
+| Subject | the name it points at, never the id | — |
+| Purposes | list or chips (count when long) | — |
+
+**Loyalty** (detail panel, from `getGuestLoyalty`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Leaderboard nickname | text | BL-173. The name shown on a leaderboard, chosen by the guest. |
+| Subject | the name it points at, never the id | — |
+| Programme | the name it points at, never the id | — |
+| Points balance | 1,234 | — |
+| Lifetime points | 1,234 | — |
+| Tier | the name it points at, never the id | The tier this row's `tierCode` and `tierName` are a copy of. Added 20 September with `marketing.programme_tier`: the two strings were a … |
+| Tier code | text | — |
+| Tier name | text | — |
+| Points to next tier | 1,234 | — |
+| Next expiry points | 1,234 | — |
+| Next expiry at | 1 Oct 2026, 14:30 | — |
+
+**Timeline** (data table, from `getGuestTimeline`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| ID | the name it points at, never the id | — |
+| At | 1 Oct 2026, 14:30 | — |
+| Kind | chip: Purchase, Ticket used, Reservation, Visit, Membership change, Loyalty… | — |
+| Nature | chip: Operational fact, User note, AI derived | A prediction and a gate scan are both useful and only one happened. |
+| Summary | text | — |
+| Channel | text | — |
+| Venue | the name it points at, never the id | — |
+| Source contract | text | — |
+| Source reference | the name it points at, never the id | — |
+| Value | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Outcome | text | — |
+
+**Consents** (detail panel, from `getGuestConsents`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Subject | the name it points at, never the id | — |
+| Purposes | list or chips (count when long) | — |
+| Purpose | chip: Marketing, Personalisation, Profiling, Third party sharing, AI processing … | — |
+| Decision | chip: Granted, Withdrawn, Not asked | — |
+| Channels | list or chips (count when long) | — |
+| Notice version | text | — |
+| Requires renewal | yes / no (icon or chip) | True where the notice has been superseded since consent was given. |
+| Decided at | 1 Oct 2026, 14:30 | — |
+
+**Intelligence** (detail panel, from `getGuestIntelligence`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Subject | the name it points at, never the id | — |
+| Scores | list or chips (count when long) | — |
+| Kind | chip: Historical ltv, Predicted ltv, Engagement, Churn risk, Inactivity risk … | — |
+| Value | 1,234.5 | — |
+| Band | text | — |
+| Confidence | 1,234.5 | — |
+| Model | text | — |
+| Model version | text | — |
+| Computed at | 1 Oct 2026, 14:30 | — |
+| Factors | list or chips (count when long) | — |
+| Factor | text | — |
+| Contribution | 1,234.5 | — |
+| Limitations | list or chips (count when long) | Policy and data limitations travel with the score, so the rule that prediction never overrides consent cannot be forgotten downstream. |
+| Affinities | list or chips (count when long) | — |
+| Product category | the name it points at, never the id | — |
+| Label | text | — |
+| Strength | 1,234.5 | — |
+| Next best actions | list or chips (count when long) | — |
+| Action | text | — |
+| Expected impact | text | — |
+
+**Rules for what is shown** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
+
+- **Header**: Name, tier badge, flags (VIP, minor, possible duplicate), preferred language and channel, and a contactability strip (Email Given, WhatsApp Not asked, SMS Withdrawn). *(source: contracts/satellite/marketing-crm.yaml#getGuestConsents; screens/P08-venue-back-office.yaml#BO-737)*
+- **Value and risk**: LTV, engagement tier (new, active, occasional, lapsing, lapsed, dormant) and churn risk, each with its reasons; AI-derived values labelled as such. *(source: contracts/satellite/marketing-crm.yaml#/components/schemas/GuestProfile; contracts/satellite/marketing-crm.yaml#getGuestIntelligence)*
+- **Portfolio**: Entitlements, wallet balance and restrictions in one list, the same view the guest app shows. *(source: DI-667)*
+
+**What each action does** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
+
+- **Send a message**: Offered only on channels where the purpose is permitted; transactional resends are always allowed. *(source: DI-378)*
+- **Create case**: Opens case creation with the guest attached. *(source: contracts/satellite/marketing-crm.yaml#createCase)*
+
+**Data it reads**: `listCustomerServiceProfile` (onLoad, Customer 360° Service Profile); `getGuestProfile` (onLoad, The consolidated profile); `getGuestLoyalty` (onLoad, Points and tier); `getGuestTimeline` (onLoad, Commercial and document history); `getGuestConsents` (onLoad, Consents in force); `getGuestIntelligence` (onLoad, Value, engagement and risk)
 
 **Where the user goes next**
 
@@ -556,21 +850,66 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |---|---|
 | Loading (`?state=loading`) | The customer 360 profile list. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the customer 360 profile untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No customer 360 profile yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, first run (`?state=emptyFirstRun`) | No customer 360 profile yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the customer 360 profile are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 
+#### Consistency with other screens
+
+- Match `SUP-010`: The service 360 in the Support Console is the same guest view; same header and contactability strip.
+- Match `POS-027`: Same tier badge and wallet split.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+guest:
+  name: Omar Haddad
+  tier: Silver
+  language: Arabic
+  channel: WhatsApp
+  ltv: AED 2
+  145.0: null
+  engagement: lapsing
+  churnRisk: High - no visit in 140 days
+  last visit spend down 40%: null
+openCases:
+- CA-0998 Complaint - escalated
+waivers:
+- Deep Dive waiver v3 - not signed
+```
+
 #### Permissions
 
 - `listCustomerServiceProfile` → `CASE_VIEW` (read) · staff
-- `listCustomerSegmentProfile` → `PRODUCT_VIEW` (read) · staff
+- `getGuestProfile` → `GUEST_VIEW` (read) · staff, guest
+- `getGuestLoyalty` → `GUEST_VIEW` (read) · staff, service
+- `getGuestTimeline` → `GUEST_VIEW` (read) · staff
+- `getGuestConsents` → `GUEST_VIEW` (read) · staff, guest
+- `getGuestIntelligence` → `GUEST_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
 #### Requirements it meets
 
-No matrix row traces to this screen's operations or data.
+12 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+
+| Ref | Requirement (shortened) | Domain | Verdict | Via |
+|---|---|---|---|---|
+| 13.3.8 | APIs shall support guest profile creation, updates, segmentation, communication preferences and activity history retrieval. | Developer & API Management | CONTRACTED | `getGuestProfile` |
+| 22.2.27 | CRM APIs | Marketing & CRM | CONTRACTED | `getGuestProfile` |
+| 22.2.28 | CRM Audit Trail | Marketing & CRM | CONTRACTED | `getGuestProfile` |
+| 5.3.25 | Generate AI insights such as predicted next visit, churn risk, preferred products, preferred attractions, lifetime value, and upsell recommendations. | F&B & Guest Management | CONTRACTED_PARTIAL | `getGuestIntelligence` |
+| 5.4.22 | Identify customers at risk of disengagement. | F&B & Guest Management | CONTRACTED | `getGuestIntelligence` |
+| 5.4.33 | AI provides personalized engagement and retention recommendations. | F&B & Guest Management | CONTRACTED | `getGuestIntelligence` |
+| 22.2.22 | AI Guest Insights | Marketing & CRM | CONTRACTED | `getGuestIntelligence` |
+| 22.2.23 | AI Churn Prediction | Marketing & CRM | CONTRACTED | `getGuestIntelligence` |
+| 22.2.24 | AI Next Best Action | Marketing & CRM | CONTRACTED | `getGuestIntelligence` |
+| 22.6.19 | AI Engagement Optimization | Marketing & CRM | CONTRACTED | `getGuestIntelligence` |
+| 22.14.13 | AI Churn Prediction Segments | Marketing & CRM | CONTRACTED | `getGuestIntelligence` |
+| 22.14.14 | AI Upgrade Opportunities | Marketing & CRM | CONTRACTED | `getGuestIntelligence` |
 
 #### Client meeting inputs
 
@@ -597,11 +936,11 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state (403, 404).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (70 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-737?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-734`.
-- [ ] Every gated control is gated: `CASE_VIEW`, `PRODUCT_VIEW`.
+- [ ] Every gated control is gated: `CASE_VIEW`, `GUEST_VIEW`.
 - [ ] The 3 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -623,17 +962,54 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | `guestId` (navigation), `subjectId` (navigation) |
 | Route | `/engagement-support/activity-timeline-bo-738` |
 
-**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built. Removed 2 October 2026 (CHG-WIR-005): The timeline screen declared getGuestIntelligence (scores) and not getGuestTimeline, while BO-743 AI Guest Intelligence declared the reverse; the two reads were …
+
+**From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** Everything one guest did, in order, across the platform: purchases, scans, reservations, visits, membership changes, loyalty, wallet, campaigns, messages, cases, surveys and waivers. Operational facts, staff notes and AI-derived events are visibly different kinds of entry.
+
+**Fixed on main** (the package already carries these; draw what it says): The timeline screen declares getGuestIntelligence (scores) and not getGuestTimeline, while BO-743 AI Guest Intelligence declares … (CHG-WIR-005).
 
 #### Inputs: what the user enters or picks
 
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| From | date and time picker | — | — | `getGuestTimeline` ?from |
+| Kinds | text field | — | — | `getGuestTimeline` ?kinds |
+
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+**Rules for these inputs** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
+
+- **Filters**: Date range, channel, venue, event type, source system, outcome. *(source: screens/P08-venue-back-office.yaml#BO-738)*
 
 #### Outputs: what the screen shows and produces
 
 **Shown**
 
 **Detail panel** (detail panel): One record, read-only.
+
+**Activity timeline** (data table, from `getGuestTimeline`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| ID | the name it points at, never the id | — |
+| At | 1 Oct 2026, 14:30 | — |
+| Kind | chip: Purchase, Ticket used, Reservation, Visit, Membership change, Loyalty… | — |
+| Nature | chip: Operational fact, User note, AI derived | A prediction and a gate scan are both useful and only one happened. |
+| Summary | text | — |
+| Channel | text | — |
+| Venue | the name it points at, never the id | — |
+| Source contract | text | — |
+| Source reference | the name it points at, never the id | — |
+| Value | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Outcome | text | — |
+
+**Rules for what is shown** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
+
+- **Timeline entry**: Time (venue time zone), icon by kind, one-line description, source and a link to the source record; AI-derived entries carry an "AI" tag and model version; notes show their author. *(source: contracts/satellite/marketing-crm.yaml#getGuestTimeline; screens/P08-venue-back-office.yaml#BO-738)*
+
+**Data it reads**: `getGuestTimeline` (onLoad, Commercial and document history)
 
 **Where the user goes next**
 
@@ -645,37 +1021,40 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |---|---|
 | Loading (`?state=loading`) | The activity timeline list. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the activity timeline untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No activity timeline yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, first run (`?state=emptyFirstRun`) | No activity timeline yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the activity timeline are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+entries:
+- 26 Sep 2026 15:02 - Scan - Coastal Aqua main gate - admitted
+- 26 Sep 2026 13:40 - Purchase - Beach Grill - AED 86.00 - 86 points
+- 20 Sep 2026 09:00 - Message - Autumn comeback (WhatsApp) - read
+- 21 Sep 2026 - AI - Churn risk raised to High (model churn-v2)
+```
+
 #### Permissions
 
 - `getGuestProfile` → `GUEST_VIEW` (read) · staff, guest
-- `getGuestIntelligence` → `GUEST_VIEW` (read) · staff
 - `getGuestRelationships` → `GUEST_VIEW` (read) · staff
+- `getGuestTimeline` → `GUEST_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
 #### Requirements it meets
 
-12 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+3 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
 
 | Ref | Requirement (shortened) | Domain | Verdict | Via |
 |---|---|---|---|---|
 | 13.3.8 | APIs shall support guest profile creation, updates, segmentation, communication preferences and activity history retrieval. | Developer & API Management | CONTRACTED | `getGuestProfile` |
 | 22.2.27 | CRM APIs | Marketing & CRM | CONTRACTED | `getGuestProfile` |
 | 22.2.28 | CRM Audit Trail | Marketing & CRM | CONTRACTED | `getGuestProfile` |
-| 5.3.25 | Generate AI insights such as predicted next visit, churn risk, preferred products, preferred attractions, lifetime value, and upsell recommendations. | F&B & Guest Management | CONTRACTED_PARTIAL | `getGuestIntelligence` |
-| 5.4.22 | Identify customers at risk of disengagement. | F&B & Guest Management | CONTRACTED | `getGuestIntelligence` |
-| 5.4.33 | AI provides personalized engagement and retention recommendations. | F&B & Guest Management | CONTRACTED | `getGuestIntelligence` |
-| 22.2.22 | AI Guest Insights | Marketing & CRM | CONTRACTED | `getGuestIntelligence` |
-| 22.2.23 | AI Churn Prediction | Marketing & CRM | CONTRACTED | `getGuestIntelligence` |
-| 22.2.24 | AI Next Best Action | Marketing & CRM | CONTRACTED | `getGuestIntelligence` |
-| 22.6.19 | AI Engagement Optimization | Marketing & CRM | CONTRACTED | `getGuestIntelligence` |
-| 22.14.13 | AI Churn Prediction Segments | Marketing & CRM | CONTRACTED | `getGuestIntelligence` |
-| 22.14.14 | AI Upgrade Opportunities | Marketing & CRM | CONTRACTED | `getGuestIntelligence` |
 
 #### Client meeting inputs
 
@@ -697,7 +1076,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state (404).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (11 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-738?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-734`.
@@ -724,6 +1103,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Route | `/engagement-support/contact-preferences-bo-739` |
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+**From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** A guest's contact details and preferences as staff see them, with identity verifications to decide. Personal data is shown only with the PII permission.
+
+**Fixed on main** (the package already carries these; draw what it says): emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything. (CHG-SBO-002).
 
 #### Inputs: what the user enters or picks
 
@@ -763,11 +1146,31 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |---|---|
 | Loading (`?state=loading`) | The contact preferences list. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the contact preferences untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No contact preferences yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, first run (`?state=emptyFirstRun`) | No contact preferences yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the contact preferences are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 Already decided; 422 A rejection or resubmission request without a reason |
+
+#### Edge cases to draw
+
+- **Viewer without GUEST_VIEW_PII**: Contact values masked (f•••@gmail.com); verification decisions not offered. *(source: contracts/spine/identity.yaml#listGuestIdentityVerifications; ADR-0023)*
+- **A person whose grants cover only some venues, or a link to a record in another venue**: The venue filter lists only venues in the session's scope (Session.scope, resolved at sign-in); a record outside it renders Not found, deliberately indistinguishable from absent, never a 'you may not see venue X' message. *(source: ADR-0011; contracts/shared/common.yaml#/components/schemas/Problem; contracts/spine/identity.yaml#getCurrentSession)*
+- **Can read but not change (holds GUEST_VIEW, GUEST_VIEW_PII only)**: Everything reads; the actions needing another permission are not offered as live buttons: GUEST_MANAGE for decideGuestIdentityVerification. Where the person would reasonably expect the action, it shows disabled with the permission named. The server refuses with 403 forbidden regardless. *(source: contracts/spine/identity.yaml#decideGuestIdentityVerification)*
+- **decideGuestIdentityVerification answers 422**: Show it as something the person can act on, not a failure: A rejection or resubmission request without a reason *(source: contracts/spine/identity.yaml#decideGuestIdentityVerification)*
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+guest:
+  name: Aisha Al Nuaimi
+  email: a•••@outlook.com
+  mobile: +971 50 ••• 4412
+  language: Arabic
+  channel: WhatsApp
+```
 
 #### Permissions
 
@@ -807,6 +1210,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-734`.
 - [ ] Every gated control is gated: `GUEST_MANAGE`, `GUEST_VIEW`, `GUEST_VIEW_PII`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 4 edge case(s) from the process notes are drawn.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -824,14 +1228,40 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
 | Offline | online only |
-| Opens with | `subjectId` (navigation) |
+| Opens with | `subjectId` (navigation), `guestId` (navigation) |
 | Route | `/engagement-support/family-guardians-bo-740` |
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** Households, dependants and guardians, linked without merging anyone. Each person keeps their own profile; the link carries authority (who may buy, book, manage the profile or sign waivers for a minor), effective dates, and whether benefits and communications are shared. Wallet balances can be shared across a linked family, so a parent's top-up is spent from a child's wristband.
+
+**Fixed on main** (the package already carries these; draw what it says): The screen's only write is updateGuestPreferences ("Save guest preferences"). (CHG-WIR-005).
+
 #### Inputs: what the user enters or picks
 
-Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+**Form: Save links** (modal, opened by *Save links*; *Save links* calls `setGuestRelationships`, *Cancel* sends nothing)
+
+**Collects what `setGuestRelationships` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Relationships `relationships` | repeatable rows | required | — | — | — | — | `setGuestRelationships` body |
+| ID `relationships[].id` | picker: choose an id | optional | — | — | shows names, sends the id | — | `setGuestRelationships` body |
+| Related subject `relationships[].relatedSubjectId` | picker: choose a related subject | required | — | — | shows names, sends the id | — | `setGuestRelationships` body |
+| Organisation `relationships[].organisationId` | picker: choose an organisation | optional | — | — | shows names, sends the id | — | `setGuestRelationships` body |
+| Kind `relationships[].kind` | select | required | — | Parent · Guardian · Spouse · Dependant · Household member · Employee · Student · Group leader · Travel agent · Reseller | — | — | `setGuestRelationships` body |
+| Authorities `relationships[].authorities` | multi-select chips | optional | — | Purchase for · Book for · Manage profile · Sign waiver · View history · Receive communications | — | Four different permissions, not one relationship. A guardianship granting all of them forever survives the child becoming an adult. | `setGuestRelationships` body |
+| Effective from `relationships[].effectiveFrom` | date picker | optional | — | — | 1 Oct 2026 (dd MMM yyyy) | — | `setGuestRelationships` body |
+| Effective to `relationships[].effectiveTo` | date picker | optional | — | — | 1 Oct 2026 (dd MMM yyyy) | — | `setGuestRelationships` body |
+| Shared benefits `relationships[].sharedBenefits` | toggle | optional | off | — | — | — | `setGuestRelationships` body |
+| Verified at `relationships[].verifiedAt` | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `setGuestRelationships` body |
+| Scope path `relationships[].scopePath` | text field | optional | — | — | — | — | `setGuestRelationships` body |
+
+**Rules for these inputs** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
+
+- **Relationship**: Parent, guardian, spouse, dependant, with effective from and to dates. *(source: contracts/satellite/marketing-crm.yaml#setGuestRelationships; DI-373)*
+- **Authority for a minor**: Purchasing, booking, profile management, waiver signing, each a separate permission; a guest with no date of birth counts as a minor. *(source: screens/P08-venue-back-office.yaml#BO-740; R205)*
+- **Shared wallet and spending limit**: Whether the family shares the wallet, and a daily limit per dependant (guests can also set this themselves). *(source: MoM 2026-08-20 4.1; DI-530)*
 
 #### Outputs: what the screen shows and produces
 
@@ -839,12 +1269,33 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Detail panel** (detail panel): One record, read-only.
 
+**Family and guardians** (data table, from `getGuestRelationships`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| ID | the name it points at, never the id | — |
+| Related subject | the name it points at, never the id | — |
+| Organisation | the name it points at, never the id | — |
+| Kind | chip: Parent, Guardian, Spouse, Dependant, Household member, Employee… | — |
+| Authorities | list or chips (count when long) | Four different permissions, not one relationship. A guardianship granting all of them forever survives the child becoming an adult. |
+| Effective from | 1 Oct 2026 | — |
+| Effective to | 1 Oct 2026 | — |
+| Shared benefits | yes / no (icon or chip) | — |
+| Verified at | 1 Oct 2026, 14:30 | — |
+
 **Actions and what each produces**
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
 | Save guest preferences (primary button) | navigation or local | — | — | — | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
+| Save links (secondary button) | `setGuestRelationships` PUT `/guests/{guestId}/relationships` | inline | GuestRelationship[] | — | opens modal first |
+
+**Rules for what is shown** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
+
+- **Household card**: Each member as their own profile chip, with relationship, authority icons, and "shared wallet" when on. Messages to one member are never addressed to the household. *(source: contracts/satellite/marketing-crm.yaml#/components/schemas/SegmentCriterion)*
+
+**Data it reads**: `getGuestRelationships` (onLoad, Household, guardians and dependants)
 
 **Where the user goes next**
 
@@ -861,10 +1312,24 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+household: Al Suwaidi family
+members:
+- Khalid (guardian - booking, waiver signing)
+- Mariam (daughter, 9 - AED 100 a day)
+- Saeed (son, 6 - AED 50 a day)
+```
+
 #### Permissions
 
 - `updateGuestPreferences` → `GUEST_MANAGE` (configure) · staff, guest
 - `getGuestProfile` → `GUEST_VIEW` (read) · staff, guest
+- `getGuestRelationships` → `GUEST_VIEW` (read) · staff
+- `setGuestRelationships` → `GUEST_MANAGE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -899,10 +1364,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (404).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (11), with its required mark, default, format and its error state (404).
+- [ ] Every output is drawn (9 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-740?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: Save guest preferences, Cancel.
+- [ ] Every action is wired with its success and its failure: Save guest preferences, Cancel, Save links.
 - [ ] Every transition is wired: `BO-734`.
 - [ ] Every gated control is gated: `GUEST_MANAGE`, `GUEST_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
@@ -928,9 +1393,16 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** Link guests to organisations: corporate accounts, schools, tour operators, travel agencies, resellers, clubs, teams, event groups. Each link has a role, billing relationship, booking authority and validity period. Linking never merges people.
+
 #### Inputs: what the user enters or picks
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+**Rules for these inputs** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
+
+- **Organisation link**: Organisation, participant role (contact, booker, member, teacher), billing relationship, booking authority, valid from and to. *(source: contracts/satellite/marketing-crm.yaml#setGuestRelationships)*
+- **Corporate onboarding status**: Company profile (name, address, trade licence, VAT certificate), then admin approval or rejection, then rates and credentials. *(source: DI-375)*
 
 #### Outputs: what the screen shows and produces
 
@@ -944,6 +1416,10 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |---|---|---|---|---|---|
 | Save guest relationships (primary button) | navigation or local | — | — | — | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
+
+**Rules for what is shown** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
+
+- **Organisation view**: Members, their bookings and memberships, agreements; respecting the organisation's access boundary. *(source: screens/P08-venue-back-office.yaml#BO-741)*
 
 **Where the user goes next**
 
@@ -959,6 +1435,23 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the corporate groups are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Consistency with other screens
+
+- Match `BO-740`: Same relationship component, different kinds.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+organisation: Al Noor International School (school)
+links:
+- Ms Hana Yousef - teacher
+- booking authority
+- Ahmed Saleh - finance contact
+- invoice
+```
 
 #### Permissions
 
@@ -1013,27 +1506,57 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Engagement & Support · wave 3 · needs the `marketing` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `GUEST_MANAGE` (1 configure); in the flows as venue manager |
+| Who uses it | venue staff holding `GUEST_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
 | Offline | online only |
 | Opens with | `guestId` (navigation) |
 | Route | `/engagement-support/commerce-documents-bo-742` |
 
-**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built. Removed 2 October 2026 (CHG-WIR-005): A history screen needs reads; its only operation was setGuestRelationships, and relationship editing belongs on BO-740 and BO-741 (design-notes correction …
+
+**From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** The guest's commercial, service and document history in tabs: tickets, reservations, memberships, loyalty, wallet, refunds, exchanges, transfers, upgrades, attendance, communications, cases, surveys, reviews, waivers, ID documents and signed agreements. Each row links to its source with status, value, channel and time.
+
+**Fixed on main** (the package already carries these; draw what it says): The screen's only operation is setGuestRelationships ("Save guest relationships"). (CHG-WIR-005).
 
 #### Inputs: what the user enters or picks
+
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| From | date and time picker | — | — | `getGuestTimeline` ?from |
+| Kinds | text field | — | — | `getGuestTimeline` ?kinds |
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
 
 #### Outputs: what the screen shows and produces
 
-**Actions and what each produces**
+**Shown**
 
-| Action | Calls | Sends | On success returns | Errors to show | Notes |
-|---|---|---|---|---|---|
-| Save guest relationships (primary button) | navigation or local | — | — | — | — |
-| Cancel (secondary button) | navigation or local | — | — | — | — |
+**Commerce and documents** (data table, from `getGuestTimeline`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| ID | the name it points at, never the id | — |
+| At | 1 Oct 2026, 14:30 | — |
+| Kind | chip: Purchase, Ticket used, Reservation, Visit, Membership change, Loyalty… | — |
+| Nature | chip: Operational fact, User note, AI derived | A prediction and a gate scan are both useful and only one happened. |
+| Summary | text | — |
+| Channel | text | — |
+| Venue | the name it points at, never the id | — |
+| Source contract | text | — |
+| Source reference | the name it points at, never the id | — |
+| Value | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Outcome | text | — |
+
+**Detail panel** (detail panel): One record, read-only.
+
+**Rules for what is shown** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
+
+- **Documents tab**: Kind, uploaded by, date, retain-until date (always present), and access is PII-permissioned; signed waivers open at the exact version signed. *(source: contracts/satellite/marketing-crm.yaml#uploadGuestDocument; contracts/satellite/marketing-crm.yaml#createForm)*
+
+**Data it reads**: `getGuestTimeline` (onLoad, Commercial and document history)
 
 **Where the user goes next**
 
@@ -1045,14 +1568,26 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |---|---|
 | Loading (`?state=loading`) | The commerce documents list. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the commerce documents untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No commerce documents yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, first run (`?state=emptyFirstRun`) | No commerce documents yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the commerce documents are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+tickets:
+- Coastal Aqua Day Pass x3 - 26 Sep 2026 - used
+documents:
+- Emirates ID - retain until 31 Dec 2027
+- Deep Dive waiver v3 - signed 26 Sep 2026
+```
+
 #### Permissions
 
-- `setGuestRelationships` → `GUEST_MANAGE` (configure) · staff
+- `getGuestTimeline` → `GUEST_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -1080,11 +1615,11 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (11 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-742?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: Save guest relationships, Cancel.
+- [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-734`.
-- [ ] Every gated control is gated: `GUEST_MANAGE`.
+- [ ] Every gated control is gated: `GUEST_VIEW`.
 - [ ] The module and platform inputs below are applied.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -1099,14 +1634,18 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Engagement & Support · wave 3 · needs the `marketing` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `GUEST_VIEW`, `GUEST_VIEW_PII` (1 read, 1 operate); in the flows as venue manager |
+| Who uses it | venue staff holding `GUEST_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
 | Offline | online only |
 | Opens with | `guestId` (navigation) |
 | Route | `/engagement-support/ai-guest-intelligence-bo-743` |
 
-**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built. Removed 2 October 2026 (CHG-WIR-005): The reads were swapped with BO-738, and uploading documents has nothing to do with AI insight (design-notes corrections customer-marketing BO-738, BO-743).
+
+**From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** Explainable insight for one guest and for audiences: historical and predicted LTV, engagement, churn, cancellation, affinity, upgrade propensity, and the recommended next action. Every score shows its contributing factors, confidence, model and version, and the recommendation respects consent and eligibility before it is offered.
+
+**Fixed on main** (the package already carries these; draw what it says): Declares getGuestTimeline and uploadGuestDocument but not getGuestIntelligence. (CHG-WIR-005).
 
 #### Inputs: what the user enters or picks
 
@@ -1116,14 +1655,37 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Detail panel** (detail panel): One record, read-only.
+**Guest intelligence** (detail panel, from `getGuestIntelligence`)
 
-**Actions and what each produces**
+| Shows | Format | Notes |
+|---|---|---|
+| Subject | the name it points at, never the id | — |
+| Scores | list or chips (count when long) | — |
+| Kind | chip: Historical ltv, Predicted ltv, Engagement, Churn risk, Inactivity risk … | — |
+| Value | 1,234.5 | — |
+| Band | text | — |
+| Confidence | 1,234.5 | — |
+| Model | text | — |
+| Model version | text | — |
+| Computed at | 1 Oct 2026, 14:30 | — |
+| Factors | list or chips (count when long) | — |
+| Factor | text | — |
+| Contribution | 1,234.5 | — |
+| Limitations | list or chips (count when long) | Policy and data limitations travel with the score, so the rule that prediction never overrides consent cannot be forgotten downstream. |
+| Affinities | list or chips (count when long) | — |
+| Product category | the name it points at, never the id | — |
+| Label | text | — |
+| Strength | 1,234.5 | — |
+| Next best actions | list or chips (count when long) | — |
+| Action | text | — |
+| Expected impact | text | — |
 
-| Action | Calls | Sends | On success returns | Errors to show | Notes |
-|---|---|---|---|---|---|
-|  (primary button) | navigation or local | — | — | — | — |
-| Cancel (secondary button) | navigation or local | — | — | — | — |
+**Rules for what is shown** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
+
+- **Score card**: Score, band, top contributing factors in plain words, confidence, model name and version, last computed. *(source: contracts/satellite/marketing-crm.yaml#getGuestIntelligence)*
+- **Next best action**: A proposal with expected impact and why; actions a human accepts. A recommendation on a channel without consent is not shown. *(source: screens/P08-venue-back-office.yaml#BO-743; DI-378)*
+
+**Data it reads**: `getGuestIntelligence` (onLoad, Value, engagement and risk)
 
 **Where the user goes next**
 
@@ -1135,21 +1697,49 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |---|---|
 | Loading (`?state=loading`) | The guest intelligence list. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the guest intelligence untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No guest intelligence yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, first run (`?state=emptyFirstRun`) | No guest intelligence yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the guest intelligence are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+guest: Omar Haddad
+churn:
+  score: 0.78
+  band: High
+  factors:
+  - No visit in 140 days
+  - Annual pass expires 30 Nov 2026
+  - Complaint unresolved
+  model: churn-v2
+nextAction: Offer pass renewal with 10% member discount on WhatsApp (consent given)
+```
+
 #### Permissions
 
-- `getGuestTimeline` → `GUEST_VIEW` (read) · staff
-- `uploadGuestDocument` → `GUEST_VIEW_PII` (operate) · staff, guest
+- `getGuestIntelligence` → `GUEST_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
 #### Requirements it meets
 
-No matrix row traces to this screen's operations or data.
+9 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+
+| Ref | Requirement (shortened) | Domain | Verdict | Via |
+|---|---|---|---|---|
+| 5.3.25 | Generate AI insights such as predicted next visit, churn risk, preferred products, preferred attractions, lifetime value, and upsell recommendations. | F&B & Guest Management | CONTRACTED_PARTIAL | `getGuestIntelligence` |
+| 5.4.22 | Identify customers at risk of disengagement. | F&B & Guest Management | CONTRACTED | `getGuestIntelligence` |
+| 5.4.33 | AI provides personalized engagement and retention recommendations. | F&B & Guest Management | CONTRACTED | `getGuestIntelligence` |
+| 22.2.22 | AI Guest Insights | Marketing & CRM | CONTRACTED | `getGuestIntelligence` |
+| 22.2.23 | AI Churn Prediction | Marketing & CRM | CONTRACTED | `getGuestIntelligence` |
+| 22.2.24 | AI Next Best Action | Marketing & CRM | CONTRACTED | `getGuestIntelligence` |
+| 22.6.19 | AI Engagement Optimization | Marketing & CRM | CONTRACTED | `getGuestIntelligence` |
+| 22.14.13 | AI Churn Prediction Segments | Marketing & CRM | CONTRACTED | `getGuestIntelligence` |
+| 22.14.14 | AI Upgrade Opportunities | Marketing & CRM | CONTRACTED | `getGuestIntelligence` |
 
 #### Client meeting inputs
 
@@ -1171,11 +1761,11 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-743?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: , Cancel.
+- [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-734`.
-- [ ] Every gated control is gated: `GUEST_VIEW`, `GUEST_VIEW_PII`.
+- [ ] Every gated control is gated: `GUEST_VIEW`.
 - [ ] The module and platform inputs below are applied.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -1277,12 +1867,12 @@ Method, path, parameters, request and response for every operation these screens
 "decideGuestIdentityVerification": {"method":"POST","path":"/guest-identity-verifications/{verificationId}/decision","contract":"identity","summary":"Verify or refuse a guest's identity document","permission":"GUEST_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"IdentityGuestVerification"},
 "getConsentHistory": {"method":"GET","path":"/guests/{subjectId}/consents/history","contract":"marketing-crm","summary":"Full consent history","permission":"GUEST_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "getGuestAttributeModel": {"method":"GET","path":"/guest-attribute-model","contract":"marketing-crm","summary":"The shared guest data model","permission":"GUEST_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[],"requestBody":null,"responds":"GuestAttributeModel"},
+"getGuestConsents": {"method":"GET","path":"/guests/{subjectId}/consents","contract":"marketing-crm","summary":"Read a guest's consent state","permission":"GUEST_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"ConsentState"},
 "getGuestIntelligence": {"method":"GET","path":"/guests/{guestId}/intelligence","contract":"marketing-crm","summary":"Value, engagement, churn and propensity, with their reasons","permission":"GUEST_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"GuestIntelligence"},
 "getGuestLoyalty": {"method":"GET","path":"/guests/{subjectId}/loyalty","contract":"marketing-crm","summary":"A guest's loyalty position","permission":"GUEST_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"programmeId","in":"query","required":true}],"requestBody":null,"responds":"LoyaltyPosition"},
 "getGuestProfile": {"method":"GET","path":"/guests/{subjectId}","contract":"marketing-crm","summary":"Read a guest profile","permission":"GUEST_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"GuestProfileDetail"},
 "getGuestRelationships": {"method":"GET","path":"/guests/{guestId}/relationships","contract":"marketing-crm","summary":"Household, guardians, corporate and group links","permission":"GUEST_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"GuestRelationship"},
 "getGuestTimeline": {"method":"GET","path":"/guests/{guestId}/timeline","contract":"marketing-crm","summary":"Everything this guest did, in order, across the platform","permission":"GUEST_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"from","in":"query","required":null},{"name":"kinds","in":"query","required":null},{"name":"venueId","in":"query","required":null}],"requestBody":null,"responds":"GuestTimelineEvent"},
-"listCustomerSegmentProfile": {"method":"GET","path":"/customer-segment-profile","contract":"catalogue","summary":"Customer Segment & Profile Pricing Rules","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"dimension","in":"query","required":false},{"name":"segmentSource","in":"query","required":false},{"name":"customerId","in":"query","required":false},{"name":"status","in":"query","required":false},{"name":"search","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listCustomerServiceProfile": {"method":"GET","path":"/customer-service-profile","contract":"marketing-crm","summary":"Customer 360° Service Profile","permission":"CASE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":"subjectId","in":"query","required":true}],"requestBody":null,"responds":"Customer360ServiceProfileView"},
 "listGuestIdentityVerifications": {"method":"GET","path":"/guest-identity-verifications","contract":"identity","summary":"Guest identity verifications, the review queue first","permission":"GUEST_VIEW_PII","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"tenant","parameters":[{"name":"status","in":"query","required":null},{"name":"subjectId","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listSegments": {"method":"GET","path":"/segments","contract":"marketing-crm","summary":"List segments","permission":"MARKETING_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"search","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
@@ -1292,8 +1882,7 @@ Method, path, parameters, request and response for every operation these screens
 "setGuestExtraFields": {"method":"PUT","path":"/guest-extra-fields","contract":"marketing-crm","summary":"Define the extra guest fields","permission":"MARKETING_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"GuestExtraFieldDefinition","responds":"GuestExtraFieldDefinition"},
 "setGuestRelationships": {"method":"PUT","path":"/guests/{guestId}/relationships","contract":"marketing-crm","summary":"Link people without merging them","permission":"GUEST_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"GuestRelationship"},
 "updateGuestPreferences": {"method":"PUT","path":"/guests/{subjectId}/preferences","contract":"marketing-crm","summary":"The things a regular should not have to say twice","permission":"GUEST_MANAGE","offlineCapable":false,"conflictPolicy":"lastWriterWins","scopeLevel":"subject","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"GuestPreferences","responds":"GuestPreferences"},
-"updateGuestProfile": {"method":"PATCH","path":"/guests/{subjectId}","contract":"marketing-crm","summary":"Amend a guest profile","permission":"GUEST_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"GuestProfileDetail"},
-"uploadGuestDocument": {"method":"POST","path":"/guest-documents","contract":"marketing-crm","summary":"Store a guest photo, ID or signed document","permission":"GUEST_VIEW_PII","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"GuestDocument","responds":"GuestDocument"}
+"updateGuestProfile": {"method":"PATCH","path":"/guests/{subjectId}","contract":"marketing-crm","summary":"Amend a guest profile","permission":"GUEST_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"GuestProfileDetail"}
 }
 ```
 
@@ -1308,11 +1897,9 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "ConsentPurpose": {"type":"string","enum":["marketing","personalisation","profiling","thirdPartySharing","aiProcessing","transactional"]},
 "ConsentRecord": {"x-ticvai-persistence":"marketing.consent_record + marketing.consent_record_channel","allOf":[{"$ref":"#/components/schemas/RecordConsentRequest"},{"type":"object","required":["id","subjectId"],"properties":{"id":{"type":"string"},"subjectId":{"type":"string","format":"uuid"},"recordedByPrincipalId":{"type":"string","format":"uuid","nullable":true},"orderId":{"type":"string","format":"uuid","nullable":true,"description":"The order whose checkout carried the opt-in (source `checkout`, M18-15): the UUIDv7 of orders.sales_order. Null for every other source.","x-ticvai-references":"orders.sales_order"},"verifiedContactRef":{"type":"string","nullable":true,"maxLength":128,"description":"The verified contact the checkout opt-in was given against (ADR-0045), as the keyed hash the guest match policy uses; never the raw address. It is how a checkout consent given without an account is attached to the profile when the contact later matches one."},"supersededAt":{"type":"string","format":"date-time","nullable":true}}}]},
 "ConsentState": {"x-ticvai-persistence":"none — projection over consent_record","type":"object","required":["subjectId","purposes"],"properties":{"subjectId":{"type":"string","format":"uuid"},"purposes":{"type":"array","items":{"type":"object","required":["purpose","decision","requiresRenewal"],"properties":{"purpose":{"$ref":"#/components/schemas/ConsentPurpose"},"decision":{"$ref":"#/components/schemas/ConsentDecision"},"channels":{"type":"array","items":{"$ref":"#/components/schemas/MessageChannel"}},"noticeVersion":{"type":"string","nullable":true},"requiresRenewal":{"type":"boolean","description":"True where the notice has been superseded since consent was given."},"decidedAt":{"type":"string","format":"date-time","nullable":true}}}}}},
-"CreateSegmentRequest": {"x-ticvai-persistence":"none — request only","type":"object","required":["name","criteria"],"properties":{"name":{"type":"string","maxLength":200},"description":{"type":"string","maxLength":1000},"venueId":{"type":"string","format":"uuid"},"match":{"type":"string","enum":["all","any"],"default":"all"},"criteria":{"type":"array","minItems":1,"items":{"$ref":"#/components/schemas/SegmentCriterion"}},"excludeSegmentIds":{"type":"array","items":{"type":"string","format":"uuid"}}}},
+"CreateSegmentRequest": {"x-ticvai-persistence":"none — request only","type":"object","required":["name","criteria"],"properties":{"name":{"type":"string","maxLength":200},"description":{"type":"string","maxLength":1000},"venueId":{"type":"string","format":"uuid"},"match":{"type":"string","enum":["all","any"],"default":"all"},"criteria":{"type":"array","minItems":1,"items":{"$ref":"#/components/schemas/SegmentCriterion"}},"excludeSegmentIds":{"type":"array","items":{"type":"string","format":"uuid"}},"ruleGroups":{"x-ticvai-persistence-kind":"valueObject","x-ticvai-persistence-column":"jsonb","type":"array","description":"**Nested AND / OR / NOT groups** (contract gap CHG-WIR-007, BO-755; CHG-CSA-045). Where present, the segment matches `criteria` (combined by `match`) AND every group here. Absent keeps the flat list.","items":{"$ref":"#/components/schemas/SegmentRuleGroup"}},"effectiveFrom":{"type":"string","format":"date-time","nullable":true,"description":"The segment is evaluated for sends only from this time."},"effectiveTo":{"type":"string","format":"date-time","nullable":true},"ownerPrincipalId":{"type":"string","format":"uuid","nullable":true,"description":"Who answers for the segment; defaults to its creator."},"requiresApproval":{"type":"boolean","default":false,"description":"Where true, a campaign may use the segment only after an `approvals` request on it is approved."}}},
 "Customer360ServiceProfileView": {"type":"object","x-ticvai-persistence":"none — projection over marketing.guest_profile, pii.subject, pii.subject_contact, marketing.loyalty_position, marketing.guest_preference, marketing.consent_record, marketing.suppression, marketing.case, orders.sales_order, orders.reservation, orders.group_booking, access.entitlement and wallet.balance","description":"The service view of one guest. Fields the caller may not see are null, never omitted.","required":["customerId","customerSince","openCases","serviceAlerts"],"properties":{"customerId":{"type":"string","format":"uuid","description":"The guest's `subjectId`."},"customerName":{"type":"string","nullable":true,"description":"Null unless the caller holds GUEST_VIEW_PII."},"customerType":{"type":"string","enum":["individual","member","groupOrganiser","corporate","partner"]},"membershipStatus":{"type":"string","enum":["none","active","expiring","lapsed"]},"loyaltyTier":{"type":"string","nullable":true},"preferredLanguage":{"type":"string","maxLength":10,"nullable":true},"country":{"type":"string","pattern":"^[A-Z]{2}$","nullable":true},"contactDetails":{"type":"object","description":"Masked (e.g. `j***@example.com`, `+971 ** *** 4821`) unless the caller holds GUEST_VIEW_PII.","properties":{"email":{"type":"string","nullable":true},"phone":{"type":"string","nullable":true}}},"customerSince":{"type":"string","format":"date-time"},"customerValue":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Lifetime net spend across the tenant."},"openCases":{"type":"integer","minimum":0},"riskAttentionIndicator":{"type":"string","enum":["none","attention","risk"],"description":"`attention` with an open complaint or an unresolved refund case; `risk` with a breached SLA or a repeat contact on the same issue."},"upcomingTickets":{"type":"integer","minimum":0},"activeMembership":{"type":"object","nullable":true,"properties":{"membershipId":{"type":"string"},"planName":{"type":"string"},"expiresAt":{"type":"string","format":"date-time","nullable":true}}},"walletBalance":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"activeReservations":{"type":"integer","minimum":0},"futureGroupBookings":{"type":"integer","minimum":0},"openOrders":{"type":"integer","minimum":0},"serviceAlerts":{"type":"array","maxItems":20,"items":{"type":"object","required":["kind","message"],"properties":{"kind":{"type":"string","enum":["eventSoon","unresolvedRefundCase","membershipExpiring","openComplaint","communicationRestricted"]},"message":{"type":"string"},"referenceId":{"type":"string","nullable":true}}}},"preferredCommunicationChannel":{"allOf":[{"$ref":"#/components/schemas/MessageChannel"}],"nullable":true},"marketingConsent":{"$ref":"#/components/schemas/ConsentDecision"},"accessibilityRequirements":{"type":"array","nullable":true,"description":"Null unless the caller holds GUEST_VIEW_PII.","items":{"type":"string"}},"communicationRestrictions":{"type":"array","description":"Channels the guest must not be contacted on (`getSuppressionList`).","items":{"$ref":"#/components/schemas/MessageChannel"}},"aiSummary":{"type":"object","nullable":true,"description":"Where the AI policy enables `summarise`. AI-derived and labelled as such.","properties":{"text":{"type":"string","maxLength":2000},"generatedAt":{"type":"string","format":"date-time"}}}}},
-"CustomerSegmentProfilePricingRulesView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over catalogue state, assembled at read time from tables that already exist","description":"**What Customer Segment & Profile Pricing Rules displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"ruleName":{"type":"string","description":"Rule Name"},"segment":{"type":"string","description":"Segment: the value the dimension must equal, e.g. VIP"},"applicableProducts":{"type":"array","items":{"type":"string"},"description":"Applicable Products: product ids or product category codes"},"priceList":{"type":"string","description":"Price List: the list whose rate the rule selects"},"rate":{"type":"string","description":"Rate: code of the rate used when the rule matches, e.g. VIP Adult"},"priority":{"type":"integer","description":"Priority within the configurable pricing hierarchy (MoM 1 Sep §4.4): the lower number wins"},"status":{"type":"string","description":"Status: draft, active, disabled or expired"},"ruleId":{"type":"string","description":"Rule ID"},"dimension":{"type":"string","enum":["customerType","customerSegment","accountType","crmSegment","vipStatus","corporateCustomer","employeeStaff","partnerCustomer","guestRegisteredUser"],"description":"Supported Dimension (p.25) the rule tests"},"segmentSource":{"type":"string","enum":["crm","membership","b2bPartner","corporateAccount","customerProfile"],"description":"Customer Segment Source (p.26) the segment is read from"},"fallbackRate":{"type":"string","description":"Fallback (p.26): rate used when the customer no longer qualifies; the standard rate by default (decided 29 September, readiness close-out)"},"effectiveFrom":{"type":"string","format":"date","description":"Effective From"},"effectiveTo":{"type":"string","format":"date","description":"Effective To; empty for open-ended","nullable":true}}},
 "GuestAttributeModel": {"type":"object","x-ticvai-persistence":"marketing.guest_attribute_model","description":"Board 1.3. **Visibility by jurisdiction is what makes this a model and not a form.**","properties":{"version":{"type":"integer"},"fieldGroups":{"type":"array","items":{"type":"object","properties":{"code":{"type":"string"},"label":{"type":"string"},"displayOrder":{"type":"integer"}}}},"attributes":{"type":"array","items":{"type":"object","properties":{"code":{"type":"string"},"label":{"type":"string"},"groupCode":{"type":"string"},"dataType":{"type":"string"},"standard":{"type":"boolean","default":false},"mandatory":{"type":"boolean","default":false},"defaultValue":{"nullable":true},"allowedValues":{"type":"array","items":{"type":"string"}},"validationExpression":{"type":"string","nullable":true},"sensitive":{"type":"boolean","default":false},"visibleToRoles":{"type":"array","items":{"type":"string"}},"editableByRoles":{"type":"array","items":{"type":"string"}},"lawfulInJurisdictions":{"type":"array","items":{"type":"string"},"description":"**Empty means everywhere.** A nationality field lawful in one jurisdiction and not another cannot be a column somebody ships.\n"},"countsTowardCompleteness":{"type":"boolean","default":false}}}},"identifiers":{"type":"array","items":{"type":"object","properties":{"code":{"type":"string"},"primary":{"type":"boolean","default":false},"sourceSystem":{"type":"string","nullable":true},"sourcePriority":{"type":"integer"}}}},"publishedAt":{"type":"string","format":"date-time","nullable":true},"scopePath":{"type":"string"}}},
-"GuestDocument": {"type":"object","x-ticvai-persistence":"marketing.guest_document","description":"BL-133. **No store for guest photos, avatars, IDs or signed documents anywhere.**\nDeliberately separate from `assets`, which holds a tenant's media library. **A guest's passport scan is not a marketing asset** — it has a different retention clock, a different access rule and a different reason to exist, and putting it in the same store means one careless query returns both.\n","required":["id","subjectId","kind","storageRef","retainUntil"],"properties":{"id":{"readOnly":true,"type":"string","format":"uuid"},"subjectId":{"type":"string","format":"uuid"},"kind":{"type":"string","enum":["avatar","idDocument","visa","signedWaiver","medicalNote","accessibilityEvidence","photo","other"]},"storageRef":{"type":"string","description":"**The stored object's key in the guest-document store**, which is deliberately not `assets` (BL-133). No operation in this contract issues one yet: `assets` `createUpload` is staff-only and writes the media library, so the upload step for this store is still to be designed.\n"},"contentType":{"type":"string"},"consentPurposeId":{"type":"string","format":"uuid"},"retainUntil":{"type":"string","format":"date","description":"**Required, not optional.** A guest document with no deletion date is a guest document kept forever, and the retention question is the one CF-64 is open on.\n**Kept until its purpose ends, then for the period client counsel sets (decided 28 September, audit R149).** The caller sets `retainUntil` to the end of the purpose (the visit, the waiver's validity, the visa's expiry) plus that period. **The period per `kind` is an open value**: until counsel names it, it is zero, so the document is deleted when the purpose ends.\n"},"uploadedAt":{"readOnly":true,"type":"string","format":"date-time"},"uploadedByPrincipalId":{"readOnly":true,"type":"string","format":"uuid","nullable":true}}},
 "GuestExtraFieldDefinition": {"type":"object","x-ticvai-persistence":"none — composed from a field and its options","description":"**A select with no options is not a field**, so the options come back with the definition rather than from a second call.\n","required":["field"],"properties":{"field":{"$ref":"#/components/schemas/MarketingGuestExtraField"},"options":{"type":"array","items":{"$ref":"#/components/schemas/MarketingGuestExtraOption"}}}},
 "GuestIntelligence": {"type":"object","description":"Board 1.10. **Explainable, or an agent will ignore it or over-trust it.**","properties":{"subjectId":{"type":"string","format":"uuid"},"scores":{"type":"array","items":{"type":"object","properties":{"kind":{"type":"string","enum":["historicalLtv","predictedLtv","engagement","churnRisk","inactivityRisk","cancellationRisk","upgradePropensity","nextPurchasePropensity"]},"value":{"type":"number"},"band":{"type":"string","nullable":true},"confidence":{"type":"number","nullable":true},"modelId":{"type":"string","nullable":true},"modelVersion":{"type":"string","nullable":true},"computedAt":{"type":"string","format":"date-time"},"factors":{"type":"array","items":{"type":"object","properties":{"factor":{"type":"string"},"contribution":{"type":"number"}}}},"limitations":{"type":"array","items":{"type":"string"},"description":"**Policy and data limitations travel with the score**, so the rule that prediction never overrides consent cannot be forgotten downstream.\n"}}}},"affinities":{"type":"array","items":{"type":"object","properties":{"productCategoryId":{"type":"string","format":"uuid"},"label":{"type":"string"},"strength":{"type":"number"}}}},"nextBestActions":{"type":"array","items":{"type":"object","properties":{"action":{"type":"string"},"expectedImpact":{"type":"string","nullable":true},"confidence":{"type":"number","nullable":true}}}}}},
 "GuestPreferences": {"type":"object","x-ticvai-persistence":"marketing.guest_preference","description":"**What the guest likes, kept apart from what they permit** (consent) and from who they are (the profile). One row per subject. `dietary` and `accessibility` are here rather than as tags because BL-134 gives them their own consent purpose and retention.\n","properties":{"id":{"type":"string","format":"uuid","readOnly":true},"subjectId":{"type":"string","format":"uuid","readOnly":true},"seatingPreference":{"type":"string","nullable":true,"maxLength":200},"drinkPreferences":{"type":"array","items":{"type":"string"}},"dietary":{"type":"array","description":"Also written by `updateMyProfile`.","items":{"type":"string"}},"accessibility":{"type":"array","description":"Also written by `updateMyProfile`.","items":{"type":"string"}},"preferredChannel":{"allOf":[{"$ref":"#/components/schemas/MessageChannel"}],"x-ticvai-persisted":false,"description":"**Stored on the profile** (`GuestProfile.preferredChannel`) — carried here because the preference screen edits it beside the rest.\n"},"updatedAt":{"type":"string","format":"date-time","readOnly":true}}},

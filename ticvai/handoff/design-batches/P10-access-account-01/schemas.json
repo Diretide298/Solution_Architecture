@@ -1,81 +1,4 @@
 {
- "ActiveSession": {
-  "x-ticvai-persistence": "none — Redis session registry",
-  "type": "object",
-  "required": [
-   "sessionId",
-   "principalId",
-   "status",
-   "startedAt",
-   "lastSeenAt"
-  ],
-  "properties": {
-   "status": {
-    "allOf": [
-     {
-      "$ref": "#/components/schemas/SessionStatus"
-     }
-    ],
-    "description": "**A registry that only holds live sessions cannot answer why one ended.** Kept on the record so a supervisor asking *what happened to till 4* gets `terminated` or `expired` rather than an absence.\n"
-   },
-   "sessionId": {
-    "type": "string"
-   },
-   "principalId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "principalName": {
-    "type": "string"
-   },
-   "roleId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "roleName": {
-    "type": "string",
-    "nullable": true
-   },
-   "workstationId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "workstationName": {
-    "type": "string",
-    "nullable": true
-   },
-   "venueId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "ipAddress": {
-    "type": "string",
-    "nullable": true
-   },
-   "deviceInfo": {
-    "type": "string",
-    "nullable": true
-   },
-   "hasOpenShift": {
-    "type": "boolean",
-    "description": "Revoking this session leaves cash unreconciled."
-   },
-   "mfaSatisfied": {
-    "type": "boolean"
-   },
-   "startedAt": {
-    "type": "string",
-    "format": "date-time"
-   },
-   "lastSeenAt": {
-    "type": "string",
-    "format": "date-time"
-   }
-  }
- },
  "ApiClient": {
   "type": "object",
   "x-ticvai-persistence": "control.api_client",
@@ -231,6 +154,35 @@
    }
   }
  },
+ "ChangeCredentialRequest": {
+  "type": "object",
+  "description": "Request only. The credential itself is stored hashed in `identity.principal_credential` and is never returned by any operation (`handoff/schema-storage-only.md`).\n",
+  "required": [
+   "method",
+   "currentCredential",
+   "newCredential"
+  ],
+  "properties": {
+   "method": {
+    "type": "string",
+    "enum": [
+     "password",
+     "pin"
+    ],
+    "description": "Which credential is being changed. Card, RFID and SSO are not secrets the principal holds, so they are not changed here."
+   },
+   "currentCredential": {
+    "type": "string",
+    "maxLength": 512,
+    "writeOnly": true
+   },
+   "newCredential": {
+    "type": "string",
+    "maxLength": 512,
+    "writeOnly": true
+   }
+  }
+ },
  "CreateGrantRequest": {
   "type": "object",
   "required": [
@@ -304,89 +256,6 @@
      "type": "string",
      "format": "uuid"
     }
-   }
-  }
- },
- "CreditPosition": {
-  "x-ticvai-persistence": "orders.b2b_credit + orders.credit_override",
-  "type": "object",
-  "required": [
-   "accountId",
-   "creditLimit",
-   "used",
-   "available",
-   "isSuspended"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid",
-    "readOnly": true,
-    "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
-   },
-   "accountId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "accountName": {
-    "type": "string"
-   },
-   "creditLimit": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "used": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "available": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "isOverLimit": {
-    "type": "boolean"
-   },
-   "isSuspended": {
-    "type": "boolean"
-   },
-   "paymentTermsDays": {
-    "type": "integer"
-   },
-   "oldestUnpaidInvoiceAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "daysOverdue": {
-    "type": "integer"
-   },
-   "activeOverrides": {
-    "type": "array",
-    "items": {
-     "type": "object",
-     "properties": {
-      "orderId": {
-       "type": "string",
-       "format": "uuid"
-      },
-      "amount": {
-       "$ref": "../shared/common.yaml#/components/schemas/Money"
-      },
-      "authorisedByPrincipalId": {
-       "type": "string",
-       "format": "uuid"
-      },
-      "reason": {
-       "type": "string"
-      },
-      "expiresAt": {
-       "type": "string",
-       "format": "date-time",
-       "nullable": true
-      }
-     }
-    }
-   },
-   "scopePath": {
-    "type": "string",
-    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"
    }
   }
  },
@@ -504,10 +373,10 @@
  },
  "LoginRequest": {
   "type": "object",
+  "description": "**`workstationId` is required for a device door and absent from a browser door** (CHG-DOOR-001, 2 October 2026). It was required on every login, so no browser could sign in: the TICVAI Console (ADM-001), Venue Management (SUP-001) and the partner portal (PTR-001) have no workstation. Optional in the schema is additive against r1; the rule moved to where it belongs, the device-bound methods: `pin`, `card` and `rfid` without a `workstationId` are refused 400 (`workstation-required`). A `password` sign-in from a till, handheld or scanner still sends it, because the workstation decides the Sale Board, the hardware and the till identity (never a permission, ADR-0002).\n",
   "required": [
    "username",
-   "credential",
-   "workstationId"
+   "credential"
   ],
   "properties": {
    "username": {
@@ -522,7 +391,7 @@
    },
    "method": {
     "type": "string",
-    "description": "**`pin` is how a till is actually used.** A cashier signs in at a shared terminal between guests, and a password on a touchscreen with somebody waiting is a password that gets shortened, shared or written on the drawer. The employee number goes in `username` and the PIN in `credential`, so the shape of the request does not change — only what the operator types.\n\n**A PIN is weaker than a password and the difference is bounded by the device, not by the secret.** `workstationId` is required on every login and is *NOT a permission source*: it says which till, and the till is on a venue network in a staff area. A PIN is a reasonable credential there and nowhere else, which is why this is an enum value and not a policy flag — a surface that wants it has to ask for it by name.\n\nAdded 10 September 2026 for `POS-000 Sign In`.\n",
+    "description": "**`pin` is how a till is actually used.** A cashier signs in at a shared terminal between guests, and a password on a touchscreen with somebody waiting is a password that gets shortened, shared or written on the drawer. The employee number goes in `username` and the PIN in `credential`, so the shape of the request does not change — only what the operator types.\n\n**A PIN is weaker than a password and the difference is bounded by the device, not by the secret.** A `pin` (like `card` and `rfid`) is accepted only with a `workstationId`, refused 400 `workstation-required` without one (CHG-DOOR-001), and the workstation is *NOT a permission source*: it says which till, and the till is on a venue network in a staff area. A PIN is a reasonable credential there and nowhere else, which is why this is an enum value and not a policy flag — a surface that wants it has to ask for it by name.\n\nAdded 10 September 2026 for `POS-000 Sign In`.\n",
     "enum": [
      "password",
      "pin",
@@ -535,7 +404,7 @@
    "workstationId": {
     "type": "string",
     "format": "uuid",
-    "description": "Identifies the device. Determines Sale Board, connected hardware, till identity and Access Point inheritance. NOT a permission source.\n"
+    "description": "Identifies the device. Determines Sale Board, connected hardware, till identity and Access Point inheritance. NOT a permission source.\n\n**Sent by a device door, never by a browser** (CHG-DOOR-001, 2 October 2026). Required in effect for the device-bound methods `pin`, `card` and `rfid` (400 `workstation-required` without it); absent on the TICVAI Console, Venue Management and partner portal sign-ins, which have no workstation.\n"
    },
    "deviceFingerprint": {
     "type": "string",
@@ -706,6 +575,49 @@
    }
   }
  },
+ "MfaEnrolment": {
+  "x-ticvai-persistence": "none — transient",
+  "type": "object",
+  "required": [
+   "methodId",
+   "kind"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "**Added 20 August.** The table had no key at all — no id, no parent and no natural key, so **no row could be addressed, updated or deleted.** The response schema returned everything a caller needs and not the row's own identity, which is the difference between an API response and a table.\n"
+   },
+   "methodId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "kind": {
+    "$ref": "#/components/schemas/MfaKind"
+   },
+   "secret": {
+    "type": "string",
+    "nullable": true,
+    "description": "TOTP shared secret. Returned once, at enrolment, and never again."
+   },
+   "qrCodeUri": {
+    "type": "string",
+    "nullable": true
+   },
+   "recoveryCodes": {
+    "type": "array",
+    "description": "Returned once, in this enrolment response (`enrolMfaMethod` writes them, hashed, to `identity.mfa_recovery_code`). Not retrievable afterwards — `verifyMfaEnrolment` does not return them.\n",
+    "items": {
+     "type": "string"
+    }
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
  "MfaKind": {
   "type": "string",
   "enum": [
@@ -756,35 +668,6 @@
     "type": "string",
     "format": "date-time",
     "nullable": true
-   }
-  }
- },
- "Money": {
-  "type": "object",
-  "x-ticvai-persistence-kind": "valueObject",
-  "x-ticvai-persistence-column": "numeric(18,4)",
-  "description": "**On the wire this is three fields; in the database it is one column.**\n24 August. Every column typed `Money` was landing as `jsonb` — 129 of them, including `orders.shift.opening_float`, `inventory.purchase_order.total` and `promotions.voucher.balance`. **`orders.cash_movement.amount` was `numeric(18,4)` because somebody hand-typed that one**, and the inconsistency is what made it visible.\n**A jsonb price cannot be summed in SQL.** Every total, variance and reconciliation moves into application code — and a shift variance computed in .NET against a ledger computed in Postgres is two answers to one question. That is F13 month-end and F98 takings-to-ledger, both walked, both assuming the arithmetic is in the database.\n**`currency` and `scale` are not stored per row.** ADR-0018 makes them region-scoped and not overridable below, so they resolve from the scope walk — storing AED against nine million rows in a UAE region is nine million copies of a fact that cannot differ. A row that needed its own currency would be a row in the wrong region.\n**They stay on the wire** because a client reading a figure should not have to walk a hierarchy to know what it means.\n",
-  "required": [
-   "amount",
-   "currency",
-   "scale"
-  ],
-  "properties": {
-   "amount": {
-    "type": "string",
-    "description": "Decimal string, never a float. Up to 4 decimal places. **Persisted as `numeric(18,4)`** — the string is a transport choice, so a JavaScript client cannot round a fare in transit.\n",
-    "pattern": "^-?\\d+(\\.\\d{1,4})?$"
-   },
-   "currency": {
-    "type": "string",
-    "description": "**Resolved from the region, not stored on the row** (ADR-0018). OMR uses 3 decimal places and AED uses 2 — a venue on a different scale from its region is a ledger that cannot consolidate.\n",
-    "pattern": "^[A-Z]{3}$"
-   },
-   "scale": {
-    "type": "integer",
-    "description": "Resolved from the region alongside `currency`.",
-    "minimum": 0,
-    "maximum": 4
    }
   }
  },
@@ -989,8 +872,7 @@
    "principalId",
    "roleId",
    "scope",
-   "effectivePermissions",
-   "saleBoardId"
+   "effectivePermissions"
   ],
   "properties": {
    "sessionId": {
@@ -1033,7 +915,7 @@
    "saleBoardId": {
     "type": "string",
     "format": "uuid",
-    "description": "Landing surface, derived from the WORKSTATION, not the role (12 Aug 2026 §3). Ticketing, F&B or Retail board.\n"
+    "description": "Landing surface, derived from the WORKSTATION, not the role (12 Aug 2026 §3). Ticketing, F&B or Retail board.\n\n**Optional since 2 October 2026: only a till session carries it** (Chinmay, door follow-ups; CHG-CSP-002; breaking change against r1 approved as BC-001 to BC-005 in `docs/active/breaking-changes.yaml`). A browser door (ADM-001, SUP-001, PTR-001) and a staff handheld (EMP-001) sign in with no workstation since CHG-DOOR-001, so they have no board to land on and the field is absent. On a till it is the workstation's effective board: the outlet's board unless the till overrides it (`tenancy.Workstation.saleBoardSource`; CHG-CSP-006). A client reads its landing from this field when present and from its own platform otherwise.\n"
    },
    "workstation": {
     "$ref": "#/components/schemas/WorkstationContext"
@@ -1047,16 +929,6 @@
     "format": "date-time"
    }
   }
- },
- "SessionStatus": {
-  "type": "string",
-  "description": "**The life of one signed-in session, which is not the life of a shift.** A shift holds the float and survives a break; a session holds the person and does not. `ShiftStatus.suspended` is where a break lives — *break cover; float intact, workstation released* — and the release of the workstation is exactly why the session ends rather than pausing: the next person opens their own.\n**One principal, one active session per workstation.** Enforced by the `ActiveSession` registry rather than by a state, because it is a fact about the set of sessions and not about any one of them.\n",
-  "enum": [
-   "active",
-   "signedOut",
-   "terminated",
-   "expired"
-  ]
  },
  "SsoProtocol": {
   "type": "string",

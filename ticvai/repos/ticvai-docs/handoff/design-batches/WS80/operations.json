@@ -101,6 +101,19 @@
   "requestBody": null,
   "responds": "WalletExitBalance"
  },
+ "getWalletFundingRules": {
+  "method": "GET",
+  "path": "/wallet-funding-rules",
+  "contract": "wallet",
+  "summary": "How a wallet may be topped up",
+  "permission": "WALLET_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "WalletFundingRules"
+ },
  "listCreditLots": {
   "method": "GET",
   "path": "/credit-lots",

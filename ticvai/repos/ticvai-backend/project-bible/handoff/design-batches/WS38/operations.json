@@ -82,6 +82,19 @@
   "requestBody": null,
   "responds": "Page"
  },
+ "listDynamicPriceRules": {
+  "method": "GET",
+  "path": "/pricing/dynamic-rules",
+  "contract": "catalogue",
+  "summary": "Dynamic pricing rules",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "PricingDynamicPriceRule"
+ },
  "listDynamicPricingAutomation": {
   "method": "GET",
   "path": "/dynamic-pricing-automation",
@@ -182,45 +195,6 @@
    },
    {
     "name": "search",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- },
- "listRulePriorityConflict": {
-  "method": "GET",
-  "path": "/rule-priority-conflict",
-  "contract": "catalogue",
-  "summary": "Rule Priority, Conflict Resolution & Dynamic Pricing Test Console",
-  "permission": "PRODUCT_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "caseType",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "conflictCode",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "strategyId",
     "in": "query",
     "required": false
    },
@@ -400,25 +374,6 @@
   ],
   "requestBody": "PriceLadder",
   "responds": "PriceLadder"
- },
- "setRulePriorityConflict": {
-  "method": "PUT",
-  "path": "/rule-priority-conflict",
-  "contract": "catalogue",
-  "summary": "Reorder, validate, test or save the pricing rule priority",
-  "permission": "PRODUCT_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "RulePriorityConflictInput",
-  "responds": "RulePriorityConflictView"
  },
  "transitionDynamicPricingStrategy": {
   "method": "POST",

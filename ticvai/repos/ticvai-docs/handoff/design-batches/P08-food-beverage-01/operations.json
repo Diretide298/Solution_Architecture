@@ -85,25 +85,6 @@
   "requestBody": null,
   "responds": "MenuItem"
  },
- "buildProductionPlan": {
-  "method": "POST",
-  "path": "/production-plans",
-  "contract": "fnb",
-  "summary": "Turn a forecast into a prep list",
-  "permission": "PRODUCT_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "ProductionPlan",
-  "responds": "ProductionPlan"
- },
  "cancelFnbOrder": {
   "method": "POST",
   "path": "/fnb-orders/{orderId}/cancel",
@@ -123,15 +104,15 @@
   "requestBody": null,
   "responds": "FnbOrder"
  },
- "createFnbOrder": {
+ "createApprovalRequest": {
   "method": "POST",
-  "path": "/fnb-orders",
-  "contract": "fnb",
-  "summary": "Place an F&B order",
-  "permission": "ORDER_CREATE",
-  "offlineCapable": true,
-  "conflictPolicy": "append",
-  "scopeLevel": "workstation",
+  "path": "/approval-requests",
+  "contract": "approvals",
+  "summary": "Raise a request",
+  "permission": "APPROVAL_REQUEST",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
   "parameters": [
    {
     "name": null,
@@ -139,8 +120,8 @@
     "required": null
    }
   ],
-  "requestBody": "CreateFnbOrderRequest",
-  "responds": "FnbOrder"
+  "requestBody": "CreateApprovalRequest",
+  "responds": "ApprovalRequest"
  },
  "createMenu": {
   "method": "POST",
@@ -180,6 +161,19 @@
   "requestBody": "ModifierGroup",
   "responds": "ModifierGroup"
  },
+ "getAllergenVerification": {
+  "method": "GET",
+  "path": "/menu-items/{menuItemId}/allergen-verification",
+  "contract": "fnb",
+  "summary": "The last allergen verdict recorded for a dish",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "AllergenVerdict"
+ },
  "getFnbOrder": {
   "method": "GET",
   "path": "/fnb-orders/{orderId}",
@@ -193,18 +187,18 @@
   "requestBody": null,
   "responds": "FnbOrder"
  },
- "getGuestOrderStatus": {
+ "getKitchenRoutingRules": {
   "method": "GET",
-  "path": "/guest-orders/{orderId}",
+  "path": "/outlets/{outletId}/kitchen-routing",
   "contract": "fnb",
-  "summary": "Track an order",
-  "permission": null,
-  "offlineCapable": false,
+  "summary": "An outlet's kitchen routing rules",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": true,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [],
   "requestBody": null,
-  "responds": "GuestOrderStatus"
+  "responds": "KitchenRoutingRules"
  },
  "getKpiValues": {
   "method": "GET",
@@ -250,6 +244,11 @@
     "name": "groupBy",
     "in": "query",
     "required": null
+   },
+   {
+    "name": "module",
+    "in": "query",
+    "required": null
    }
   ],
   "requestBody": null,
@@ -267,6 +266,25 @@
   "parameters": [],
   "requestBody": null,
   "responds": "Menu"
+ },
+ "getServiceSummary": {
+  "method": "GET",
+  "path": "/service-summary",
+  "contract": "reporting",
+  "summary": "My service summary (a server without a till)",
+  "permission": "REPORT_VIEW_OWN",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "date",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ServiceSummary"
  },
  "getVenueSettings": {
   "method": "GET",
@@ -388,6 +406,59 @@
   "requestBody": null,
   "responds": "Page"
  },
+ "listMenuSchedules": {
+  "method": "GET",
+  "path": "/menus/{menuId}/schedule",
+  "contract": "fnb",
+  "summary": "What is scheduled to go live, and when",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listMenuVersions": {
+  "method": "GET",
+  "path": "/menus/{menuId}/versions",
+  "contract": "fnb",
+  "summary": "Every published version of a menu",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "listMenus": {
   "method": "GET",
   "path": "/menus",
@@ -408,6 +479,30 @@
     "in": "query",
     "required": null
    },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listModifierGroups": {
+  "method": "GET",
+  "path": "/modifier-groups",
+  "contract": "fnb",
+  "summary": "List modifier groups",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
    {
     "name": null,
     "in": null,
@@ -446,28 +541,28 @@
   "requestBody": null,
   "responds": "Outlet"
  },
- "listProductionRuns": {
+ "lookupRetailSale": {
   "method": "GET",
-  "path": "/production-runs",
-  "contract": "fnb",
-  "summary": "What is being made, and what was",
-  "permission": "PRODUCT_VIEW",
-  "offlineCapable": true,
+  "path": "/retail-sales/lookup",
+  "contract": "retail",
+  "summary": "Find a sale from a receipt",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
-    "name": "status",
+    "name": "receiptNumber",
     "in": "query",
     "required": null
    },
    {
-    "name": "locationKind",
+    "name": "orderNumber",
     "in": "query",
     "required": null
    },
    {
-    "name": "from",
+    "name": "receiptBarcode",
     "in": "query",
     "required": null
    },
@@ -485,31 +580,16 @@
   "requestBody": null,
   "responds": "Page"
  },
- "listWorkstations": {
-  "method": "GET",
-  "path": "/workstations",
-  "contract": "tenancy",
-  "summary": "List workstations",
-  "permission": "SCOPE_VIEW",
+ "printPrepSheet": {
+  "method": "POST",
+  "path": "/production-plans/{planId}/prep-sheet",
+  "contract": "fnb",
+  "summary": "Print a production plan's prep sheet",
+  "permission": "PRODUCT_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
-   {
-    "name": "venueId",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "saleBoardKind",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
    {
     "name": null,
     "in": null,
@@ -517,7 +597,7 @@
    }
   ],
   "requestBody": null,
-  "responds": "Page"
+  "responds": "PrepSheet"
  },
  "prioritiseKitchenTicket": {
   "method": "POST",
@@ -576,25 +656,6 @@
   "requestBody": null,
   "responds": "GuestOrderStatus"
  },
- "releaseProductionPlan": {
-  "method": "POST",
-  "path": "/production-plans/{planId}/release",
-  "contract": "fnb",
-  "summary": "Make the plan real",
-  "permission": "PRODUCT_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "ProductionPlan"
- },
  "rollbackMenu": {
   "method": "POST",
   "path": "/menus/{menuId}/rollback",
@@ -632,6 +693,54 @@
   ],
   "requestBody": null,
   "responds": "MenuSchedule"
+ },
+ "setCourseRules": {
+  "method": "PUT",
+  "path": "/outlets/{outletId}/course-rules",
+  "contract": "fnb",
+  "summary": "How this outlet courses by default",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CourseRules",
+  "responds": "CourseRules"
+ },
+ "setKitchenRoutingRules": {
+  "method": "PUT",
+  "path": "/outlets/{outletId}/kitchen-routing",
+  "contract": "fnb",
+  "summary": "Set an outlet's category rules, default station and fallback station",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "KitchenRoutingRules",
+  "responds": "KitchenRoutingRules"
  },
  "setKitchenSla": {
   "method": "PUT",

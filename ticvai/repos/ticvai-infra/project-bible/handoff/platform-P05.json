@@ -7,15 +7,15 @@
  "audience": "guest",
  "formFactor": "kiosk",
  "offlineCapable": false,
- "generated": "2026-10-01",
+ "generated": "2026-10-02",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 17,
-  "operations": 23,
+  "operations": 24,
   "contracts": 8,
   "modules": 2,
   "undrawn": 0,
-  "operationsWithNoScreen": 16
+  "operationsWithNoScreen": 14
  },
  "waves": {
   "wave2": 17
@@ -50,19 +50,19 @@
    "operations": 3
   },
   {
+   "contract": "ai",
+   "operations": 3
+  },
+  {
+   "contract": "fnb",
+   "operations": 2
+  },
+  {
    "contract": "marketing-crm",
    "operations": 2
   },
   {
-   "contract": "ai",
-   "operations": 2
-  },
-  {
    "contract": "white-label",
-   "operations": 2
-  },
-  {
-   "contract": "fnb",
    "operations": 2
   },
   {
@@ -203,7 +203,7 @@
    "module": "AI",
    "wave": 2,
    "route": "/kiosk/assistant",
-   "operations": 5,
+   "operations": 6,
    "drawn": true
   },
   {
@@ -234,6 +234,24 @@
     "summary": "Which benefits a plan grants, and how much of each"
    },
    {
+    "operation": "joinWaitlist",
+    "contract": "catalogue",
+    "verb": "POST",
+    "summary": "Ask to be told if capacity frees up"
+   },
+   {
+    "operation": "leaveWaitlist",
+    "contract": "catalogue",
+    "verb": "DELETE",
+    "summary": "Stop waiting"
+   },
+   {
+    "operation": "listGuestMemberships",
+    "contract": "catalogue",
+    "verb": "GET",
+    "summary": "A guest's memberships, benefits and history"
+   },
+   {
     "operation": "listMembershipBenefits",
     "contract": "catalogue",
     "verb": "GET",
@@ -244,6 +262,12 @@
     "contract": "catalogue",
     "verb": "GET",
     "summary": "Membership schemes, the level above a plan"
+   },
+   {
+    "operation": "claimTableSession",
+    "contract": "fnb",
+    "verb": "POST",
+    "summary": "Identify which table a guest is sitting at"
    },
    {
     "operation": "checkGuestCheckoutMatch",
@@ -258,46 +282,10 @@
     "summary": "Use the existing profile or keep this booking separate"
    },
    {
-    "operation": "getForm",
+    "operation": "uploadGuestDocument",
     "contract": "marketing-crm",
-    "verb": "GET",
-    "summary": "One form, to fill in or to edit"
-   },
-   {
-    "operation": "getMyProfile",
-    "contract": "marketing-crm",
-    "verb": "GET",
-    "summary": "A guest reading their own details"
-   },
-   {
-    "operation": "listBadges",
-    "contract": "marketing-crm",
-    "verb": "GET",
-    "summary": "Badges a guest can be awarded"
-   },
-   {
-    "operation": "listCustomerBadges",
-    "contract": "marketing-crm",
-    "verb": "GET",
-    "summary": "Badges a guest holds"
-   },
-   {
-    "operation": "listLeaderboard",
-    "contract": "marketing-crm",
-    "verb": "GET",
-    "summary": "Standings, by nickname"
-   },
-   {
-    "operation": "listRewards",
-    "contract": "marketing-crm",
-    "verb": "GET",
-    "summary": "What points can be turned into"
-   },
-   {
-    "operation": "setLeaderboardNickname",
-    "contract": "marketing-crm",
-    "verb": "PUT",
-    "summary": "Choose the name shown on the board"
+    "verb": "POST",
+    "summary": "Store a guest photo, ID or signed document"
    },
    {
     "operation": "listTicketTransfers",

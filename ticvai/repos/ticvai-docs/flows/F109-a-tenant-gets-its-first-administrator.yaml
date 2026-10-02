@@ -27,7 +27,7 @@ steps:
   action: The platform operator signs in
   operations:
   - login
-  - listMfaMethods
+  - verifyMfaChallenge
   outcome: A session scoped to the platform, not to any tenant
   note: >
     **The identity used here is the one nothing created.** Every other principal in the system is

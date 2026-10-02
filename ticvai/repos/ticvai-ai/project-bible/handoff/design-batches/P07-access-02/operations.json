@@ -60,6 +60,25 @@
   "requestBody": null,
   "responds": "Page"
  },
+ "setAccessPointDirection": {
+  "method": "PUT",
+  "path": "/access-points/{accessPointId}/direction",
+  "contract": "access",
+  "summary": "Switch a gate's direction live",
+  "permission": "ACCESS_DIRECTION_SET",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AccessPoint"
+ },
  "setTurnstileMode": {
   "method": "PUT",
   "path": "/access-points/{accessPointId}/mode",

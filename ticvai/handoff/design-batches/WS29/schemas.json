@@ -623,6 +623,1978 @@
    }
   }
  },
+ "FamilyHouseholdDependentMembershipConfigurationInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; stored as subscription.membership_household_policy (MembershipHouseholdPolicy) (decided 29 September, data model DM4)",
+  "description": "**What Family, Household & Dependent Membership Configuration submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "minimumAge": {
+    "type": "integer",
+    "description": "Dependent Rules: minimum age of a dependent",
+    "nullable": true
+   },
+   "maximumAge": {
+    "type": "integer",
+    "description": "Dependent Rules: maximum age of a dependent (pack example: a child dependent turning 16 is flagged)",
+    "nullable": true
+   },
+   "relationshipRequirement": {
+    "type": "string",
+    "enum": [
+     "none",
+     "declared",
+     "verified"
+    ],
+    "description": "Relationship Requirement between dependent and primary member. Default declared (decided 29 September, readiness close-out)"
+   },
+   "verificationRequirement": {
+    "type": "string",
+    "enum": [
+     "none",
+     "customerDeclaration",
+     "documentVerification",
+     "identityVerification",
+     "staffVerification",
+     "externalVerification"
+    ],
+    "description": "Verification Requirement for dependents"
+   },
+   "sameHouseholdRequired": {
+    "type": "boolean",
+    "description": "Same Household Requirement where applicable. Default false (decided 29 September, readiness close-out)"
+   },
+   "memberChangesAllowed": {
+    "type": "boolean",
+    "description": "Add/Remove Member Rules: members may be added or removed during the term"
+   },
+   "memberChangeEffective": {
+    "type": "string",
+    "enum": [
+     "immediately",
+     "nextRenewal"
+    ],
+    "description": "Add/Remove effective date. Default immediately (decided 29 September, readiness close-out)"
+   },
+   "memberChangesPerTerm": {
+    "type": "integer",
+    "description": "Frequency: add/remove changes allowed per membership term; empty for unlimited",
+    "nullable": true
+   },
+   "memberChangeFee": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true,
+    "description": "Fee charged per add/remove change, as the venue configures it; empty for no fee"
+   },
+   "memberChangeApprovalRequired": {
+    "type": "boolean",
+    "description": "Approval: add/remove changes need staff approval. Default false (decided 29 September, readiness close-out)"
+   },
+   "eligibilityRevalidation": {
+    "type": "boolean",
+    "description": "Eligibility Revalidation of the added member against the dependent rules. Default true (decided 29 September, readiness close-out)"
+   },
+   "membershipCode": {
+    "type": "string",
+    "description": "Membership code"
+   },
+   "membershipStructure": {
+    "type": "string",
+    "enum": [
+     "individual",
+     "couple",
+     "family",
+     "household",
+     "parentChild",
+     "corporateGroup",
+     "custom"
+    ],
+    "description": "Membership Structure (pack p.12)"
+   },
+   "roleLimits": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "role": {
+       "type": "string",
+       "enum": [
+        "primaryMember",
+        "secondaryAdult",
+        "dependent",
+        "child",
+        "guardian",
+        "authorizedManager"
+       ]
+      },
+      "minCount": {
+       "type": "integer"
+      },
+      "maxCount": {
+       "type": "integer",
+       "nullable": true
+      }
+     }
+    },
+    "description": "Roles and Family Limits (pack p.13; example Family Gold: 2 adults, maximum 3 children)"
+   },
+   "entitlementModel": {
+    "type": "string",
+    "enum": [
+     "individual",
+     "shared",
+     "mixed"
+    ],
+    "description": "Entitlement Model (pack p.13): each member's own benefits, shared benefits (e.g. 6 guest tickets for the family) or both"
+   },
+   "ageTransitionAction": {
+    "type": "string",
+    "enum": [
+     "gracePeriod",
+     "upgradeRequired",
+     "renewalCorrection",
+     "manualReview"
+    ],
+    "description": "Age Transition (pp.13-14): action when a dependent no longer qualifies. Default manualReview (decided 29 September, readiness close-out)"
+   },
+   "ageTransitionGraceDays": {
+    "type": "integer",
+    "description": "Days a dependent keeps access after ageing out, for gracePeriod",
+    "nullable": true
+   }
+  }
+ },
+ "FamilyHouseholdDependentMembershipConfigurationView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
+  "description": "**What Family, Household & Dependent Membership Configuration displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "minimumAge": {
+    "type": "integer",
+    "description": "Dependent Rules: minimum age of a dependent",
+    "nullable": true
+   },
+   "maximumAge": {
+    "type": "integer",
+    "description": "Dependent Rules: maximum age of a dependent (pack example: a child dependent turning 16 is flagged)",
+    "nullable": true
+   },
+   "relationshipRequirement": {
+    "type": "string",
+    "enum": [
+     "none",
+     "declared",
+     "verified"
+    ],
+    "description": "Relationship Requirement between dependent and primary member. Default declared (decided 29 September, readiness close-out)"
+   },
+   "verificationRequirement": {
+    "type": "string",
+    "enum": [
+     "none",
+     "customerDeclaration",
+     "documentVerification",
+     "identityVerification",
+     "staffVerification",
+     "externalVerification"
+    ],
+    "description": "Verification Requirement for dependents"
+   },
+   "sameHouseholdRequired": {
+    "type": "boolean",
+    "description": "Same Household Requirement where applicable. Default false (decided 29 September, readiness close-out)"
+   },
+   "memberChangesAllowed": {
+    "type": "boolean",
+    "description": "Add/Remove Member Rules: members may be added or removed during the term"
+   },
+   "memberChangeEffective": {
+    "type": "string",
+    "enum": [
+     "immediately",
+     "nextRenewal"
+    ],
+    "description": "Add/Remove effective date. Default immediately (decided 29 September, readiness close-out)"
+   },
+   "memberChangesPerTerm": {
+    "type": "integer",
+    "description": "Frequency: add/remove changes allowed per membership term; empty for unlimited",
+    "nullable": true
+   },
+   "memberChangeFee": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true,
+    "description": "Fee charged per add/remove change, as the venue configures it; empty for no fee"
+   },
+   "memberChangeApprovalRequired": {
+    "type": "boolean",
+    "description": "Approval: add/remove changes need staff approval. Default false (decided 29 September, readiness close-out)"
+   },
+   "eligibilityRevalidation": {
+    "type": "boolean",
+    "description": "Eligibility Revalidation of the added member against the dependent rules. Default true (decided 29 September, readiness close-out)"
+   },
+   "membershipCode": {
+    "type": "string",
+    "description": "Membership code"
+   },
+   "membershipStructure": {
+    "type": "string",
+    "enum": [
+     "individual",
+     "couple",
+     "family",
+     "household",
+     "parentChild",
+     "corporateGroup",
+     "custom"
+    ],
+    "description": "Membership Structure (pack p.12)"
+   },
+   "roleLimits": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "role": {
+       "type": "string",
+       "enum": [
+        "primaryMember",
+        "secondaryAdult",
+        "dependent",
+        "child",
+        "guardian",
+        "authorizedManager"
+       ]
+      },
+      "minCount": {
+       "type": "integer"
+      },
+      "maxCount": {
+       "type": "integer",
+       "nullable": true
+      }
+     }
+    },
+    "description": "Roles and Family Limits (pack p.13; example Family Gold: 2 adults, maximum 3 children)"
+   },
+   "entitlementModel": {
+    "type": "string",
+    "enum": [
+     "individual",
+     "shared",
+     "mixed"
+    ],
+    "description": "Entitlement Model (pack p.13): each member's own benefits, shared benefits (e.g. 6 guest tickets for the family) or both"
+   },
+   "ageTransitionAction": {
+    "type": "string",
+    "enum": [
+     "gracePeriod",
+     "upgradeRequired",
+     "renewalCorrection",
+     "manualReview"
+    ],
+    "description": "Age Transition (pp.13-14): action when a dependent no longer qualifies. Default manualReview (decided 29 September, readiness close-out)"
+   },
+   "ageTransitionGraceDays": {
+    "type": "integer",
+    "description": "Days a dependent keeps access after ageing out, for gracePeriod",
+    "nullable": true
+   }
+  }
+ },
+ "MembershipAnnualPassCommandCenterSummary": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection; the headline tiles over the list, computed at read time for the filters in force",
+  "description": "**The headline figures on Membership & Annual Pass Command Center.** The pack's KPI cards, split out of the row (decided 29 September, readiness close-out): a count describes the list, not each item in it.",
+  "properties": {
+   "activeMembershipProducts": {
+    "type": "integer",
+    "description": "Active Membership Products"
+   },
+   "annualPassProducts": {
+    "type": "integer",
+    "description": "Annual Pass Products"
+   },
+   "draftProducts": {
+    "type": "integer",
+    "description": "Draft Products"
+   },
+   "activeMembers": {
+    "type": "integer",
+    "description": "Active Members"
+   },
+   "familyMemberships": {
+    "type": "integer",
+    "description": "Family Memberships"
+   },
+   "membershipsExpiringSoon": {
+    "type": "integer",
+    "description": "Memberships Expiring Soon: active memberships whose expiry falls within the next 30 days (decided 29 September, readiness close-out)"
+   },
+   "renewalEnabledProducts": {
+    "type": "integer",
+    "description": "Renewal-Enabled Products"
+   },
+   "suspendedProducts": {
+    "type": "integer",
+    "description": "Suspended Products"
+   },
+   "productsWithConfigurationIssues": {
+    "type": "integer",
+    "description": "Products with Configuration Issues: products with at least one validationIssues entry"
+   },
+   "averageMembershipDuration": {
+    "type": "number",
+    "description": "Average Membership Duration, in days, across active members (decided 29 September, readiness close-out)"
+   }
+  }
+ },
+ "MembershipAnnualPassCommandCenterView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
+  "description": "**What Membership & Annual Pass Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "productId": {
+    "type": "string",
+    "description": "Product ID"
+   },
+   "membershipName": {
+    "type": "string",
+    "description": "Membership Name"
+   },
+   "type": {
+    "type": "string",
+    "enum": [
+     "annualPass",
+     "seasonPass",
+     "monthlyMembership",
+     "fixedTermMembership",
+     "corporateMembership",
+     "familyMembership",
+     "individualMembership",
+     "studentMembership",
+     "vipMembership",
+     "customMembership"
+    ],
+    "description": "Type: the membership type (pack pp.4-5 Membership Types); customMembership for a venue-defined type"
+   },
+   "tier": {
+    "type": "string",
+    "description": "Tier name (Standard, Silver, Gold, Platinum, VIP or a custom tier the venue names)"
+   },
+   "venueAttraction": {
+    "type": "string",
+    "description": "Venue/Attraction the membership admits to"
+   },
+   "validityMethod": {
+    "type": "string",
+    "enum": [
+     "fixedCalendar",
+     "durationFromPurchase",
+     "durationFromActivation",
+     "seasonBased",
+     "customPeriod"
+    ],
+    "description": "Validity method (pack p.8 Validity Methods)"
+   },
+   "activationMethod": {
+    "type": "string",
+    "enum": [
+     "immediateOnPurchase",
+     "fixedStartDate",
+     "firstVisit",
+     "manualActivation",
+     "customerActivation",
+     "membershipCardCollection",
+     "identityVerification",
+     "configuredTrigger"
+    ],
+    "description": "Activation Method (pack pp.8-9)"
+   },
+   "renewalMode": {
+    "type": "string",
+    "enum": [
+     "manual",
+     "customerSelfService",
+     "agentAssisted",
+     "autoRenewal",
+     "invitationOnly",
+     "nonRenewable"
+    ],
+    "description": "Renewal: the product's primary renewal mode (pack p.15 Renewal Modes)"
+   },
+   "membershipStructure": {
+    "type": "string",
+    "enum": [
+     "individual",
+     "couple",
+     "family",
+     "household",
+     "parentChild",
+     "corporateGroup",
+     "custom"
+    ],
+    "description": "Family/Individual: the membership structure (pack p.12 Membership Structures)"
+   },
+   "currentMembers": {
+    "type": "integer",
+    "description": "Current Members"
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "format": "date",
+    "description": "Effective From: the date the current version becomes sellable"
+   },
+   "status": {
+    "type": "string",
+    "description": "Status of the membership product: draft, inReview, approved, scheduled, active, suspended, expired or retired (pack p.5 Statuses)"
+   },
+   "owner": {
+    "type": "string",
+    "description": "Owner"
+   },
+   "effectiveTo": {
+    "type": "string",
+    "format": "date",
+    "description": "Effective To; empty for open-ended",
+    "nullable": true
+   },
+   "validationIssues": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "code": {
+       "type": "string",
+       "enum": [
+        "missingEntitlements",
+        "missingPricingAssociation",
+        "missingValidity",
+        "invalidEligibility",
+        "conflictingRules",
+        "missingRenewalPolicy"
+       ]
+      },
+      "message": {
+       "type": "string"
+      }
+     }
+    },
+    "description": "Configuration Health (pack p.5): the checks this product currently fails"
+   },
+   "aiInsights": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "AI Assistance: advisory observations only; never applied automatically (pack AI sections)"
+   }
+  }
+ },
+ "MembershipCommercialConfigInput": {
+  "type": "object",
+  "x-ticvai-persistence": "none — request only; stored as the commercial columns of subscription.membership_product (MembershipProduct: basePricingProfile, taxProfile, feeProfile, upgradePricePolicy, promotionalPricingEligibility, paymentTerms, salesPeriod) (decided 29 September, writers pass; DM4)",
+  "description": "What setMembershipCommercialConfig submits. Prices, channels, the sales window and capacity are catalogue data and are set there (setPrices, publishChannelAvailability, createChannelCapacity/updateChannelCapacity), so none is repeated here (decided 29 September, writers pass; DM4)",
+  "required": [
+   "membershipCode",
+   "basePricingProfile",
+   "taxProfile",
+   "salesPeriod"
+  ],
+  "properties": {
+   "membershipCode": {
+    "type": "string",
+    "description": "The membership product (subscription.membership_product) being associated."
+   },
+   "basePricingProfile": {
+    "type": "string",
+    "description": "Base Pricing Profile id"
+   },
+   "taxProfile": {
+    "type": "string",
+    "description": "Tax Profile id"
+   },
+   "feeProfile": {
+    "type": "string",
+    "nullable": true,
+    "description": "Fee Profile id"
+   },
+   "upgradePricePolicy": {
+    "type": "string",
+    "nullable": true,
+    "description": "Upgrade Price Policy id (pack p.14); pro-rata credit on upgrade per MoM 1 Sep §4.9"
+   },
+   "promotionalPricingEligibility": {
+    "type": "boolean",
+    "default": false,
+    "description": "Promotional Pricing Eligibility: promotions may apply to this membership"
+   },
+   "paymentTerms": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "fullPayment",
+      "installments",
+      "corporateCredit",
+      "autoRenewPayment"
+     ]
+    },
+    "description": "Payment Eligibility (pp.14-15); installments only where the payments module supports them"
+   },
+   "salesPeriod": {
+    "type": "string",
+    "enum": [
+     "alwaysAvailable",
+     "fixedSalesWindow",
+     "seasonalSale",
+     "invitationOnly",
+     "capacityLimited"
+    ],
+    "description": "Sales Period (pack p.15); the window itself is the catalogue product's sales window"
+   },
+   "billingFrequency": {
+    "type": "string",
+    "enum": [
+     "upFront",
+     "monthly",
+     "quarterly",
+     "semiAnnual",
+     "annual",
+     "custom"
+    ],
+    "default": "upFront",
+    "description": "2.14.19 (29 September, build). **How often the member is charged, independent of the validity term**: an annual membership may be billed monthly or quarterly. `upFront` charges the whole term at sale. A recurring frequency needs `autoRenewPayment` or `installments` in `paymentTerms` and a card on file under a recurring mandate; each cycle is an instalment of the plan payments `createInstalmentPlan` schedules at sale, charged to the stored card on its due date."
+   },
+   "billingIntervalMonths": {
+    "type": "integer",
+    "minimum": 1,
+    "maximum": 24,
+    "nullable": true,
+    "description": "For `custom`, every how many months. Null otherwise."
+   },
+   "billingAnchor": {
+    "type": "string",
+    "enum": [
+     "purchaseDate",
+     "calendarMonthStart"
+    ],
+    "default": "purchaseDate",
+    "description": "`purchaseDate` bills on the purchase day each cycle; `calendarMonthStart` on the 1st of the month, the first cycle prorated. A cycle longer than the term is refused (422)."
+   }
+  }
+ },
+ "MembershipCommercialPricingChannelAssociationView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
+  "description": "**What Membership Commercial, Pricing & Channel Association displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "basePricingProfile": {
+    "type": "string",
+    "description": "Base Pricing Profile id"
+   },
+   "membershipTierPrice": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "Membership Tier Price, as calculated by the linked pricing profile (read-only)"
+   },
+   "renewalPrice": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true,
+    "description": "Renewal Price, as calculated by the linked renewal pricing (read-only)"
+   },
+   "promotionalPricingEligibility": {
+    "type": "boolean",
+    "description": "Promotional Pricing Eligibility: promotions may apply to this membership"
+   },
+   "taxProfile": {
+    "type": "string",
+    "description": "Tax Profile id"
+   },
+   "feeProfile": {
+    "type": "string",
+    "description": "Fee Profile id",
+    "nullable": true
+   },
+   "salesCapacity": {
+    "type": "integer",
+    "description": "Capacity limit for a capacityLimited sales period",
+    "nullable": true
+   },
+   "membershipCode": {
+    "type": "string",
+    "description": "Membership code"
+   },
+   "upgradePricePolicy": {
+    "type": "string",
+    "description": "Upgrade Price Policy id (pack p.14); pro-rata credit on upgrade per MoM 1 Sep §4.9",
+    "nullable": true
+   },
+   "availableChannels": {
+    "type": "array",
+    "items": {
+     "$ref": "../shared/common.yaml#/components/schemas/SalesChannel"
+    },
+    "description": "Channel Availability (pack p.14): B2C -> guestWeb, Mobile App -> guestApp, POS and Box Office -> pos, Call Center -> callCentre, Kiosk -> kiosk, B2B and Corporate -> b2b, Reseller -> partner, API -> api"
+   },
+   "paymentTerms": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "fullPayment",
+      "installments",
+      "corporateCredit",
+      "autoRenewPayment"
+     ]
+    },
+    "description": "Payment Eligibility (pp.14-15); installments only where the payments module supports them"
+   },
+   "salesPeriod": {
+    "type": "string",
+    "enum": [
+     "alwaysAvailable",
+     "fixedSalesWindow",
+     "seasonalSale",
+     "invitationOnly",
+     "capacityLimited"
+    ],
+    "description": "Sales Period (pack p.15)"
+   },
+   "billingFrequency": {
+    "type": "string",
+    "enum": [
+     "upFront",
+     "monthly",
+     "quarterly",
+     "semiAnnual",
+     "annual",
+     "custom"
+    ],
+    "default": "upFront",
+    "description": "2.14.19 (29 September, build). **How often the member is charged, independent of the validity term**: an annual membership may be billed monthly or quarterly. `upFront` charges the whole term at sale. A recurring frequency needs `autoRenewPayment` or `installments` in `paymentTerms` and a card on file under a recurring mandate; each cycle is an instalment of the plan payments `createInstalmentPlan` schedules at sale, charged to the stored card on its due date."
+   },
+   "billingIntervalMonths": {
+    "type": "integer",
+    "minimum": 1,
+    "maximum": 24,
+    "nullable": true,
+    "description": "For `custom`, every how many months. Null otherwise."
+   },
+   "billingAnchor": {
+    "type": "string",
+    "enum": [
+     "purchaseDate",
+     "calendarMonthStart"
+    ],
+    "default": "purchaseDate",
+    "description": "`purchaseDate` bills on the purchase day each cycle; `calendarMonthStart` on the 1st of the month, the first cycle prorated. A cycle longer than the term is refused (422)."
+   },
+   "salesWindowFrom": {
+    "type": "string",
+    "format": "date",
+    "description": "Sales window start, for fixedSalesWindow or seasonalSale",
+    "nullable": true
+   },
+   "salesWindowTo": {
+    "type": "string",
+    "format": "date",
+    "description": "Sales window end",
+    "nullable": true
+   }
+  }
+ },
+ "MembershipEligibilityQualificationRuleBuilderInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; stored as subscription.membership_eligibility_rule (MembershipEligibilityRule) for the rules and subscription.membership_product for the product-level switches (decided 29 September, data model DM4)",
+  "description": "**What Membership Eligibility & Qualification Rule Builder submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "multipleMembershipsAllowed": {
+    "type": "boolean",
+    "description": "Multiple Memberships Allowed: false means one membership of this product per customer. Default false (decided 29 September, readiness close-out)"
+   },
+   "mutuallyExclusiveMemberships": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Mutually Exclusive Memberships: membership codes a customer may not hold alongside this one"
+   },
+   "prerequisiteMembership": {
+    "type": "string",
+    "description": "Prerequisite Membership: code of a membership the customer must already hold",
+    "nullable": true
+   },
+   "existingTierRequirement": {
+    "type": "string",
+    "description": "Existing Tier Requirement: minimum tier the customer must already hold",
+    "nullable": true
+   },
+   "separatePurchaseAndActivationRules": {
+    "type": "boolean",
+    "description": "Purchase vs Activation: true when the rules apply at activation to the assigned member rather than to the buyer (pack p.8: a parent may buy a Junior Pass that must be assigned to an eligible child). Default true (decided 29 September, readiness close-out)"
+   },
+   "membershipCode": {
+    "type": "string",
+    "description": "Membership code the rules belong to"
+   },
+   "rules": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "dimension": {
+       "type": "string",
+       "enum": [
+        "age",
+        "personType",
+        "residency",
+        "country",
+        "customerSegment",
+        "corporateAffiliation",
+        "studentStatus",
+        "existingMembership",
+        "previousPurchase",
+        "membershipHistory",
+        "channel",
+        "venue",
+        "promotionalQualification"
+       ],
+       "description": "Eligibility Dimension (pack p.7)"
+      },
+      "operator": {
+       "type": "string",
+       "enum": [
+        "equals",
+        "notEquals",
+        "in",
+        "notIn",
+        "between",
+        "atLeast",
+        "atMost"
+       ]
+      },
+      "values": {
+       "type": "array",
+       "items": {
+        "type": "string"
+       },
+       "description": "Values compared, e.g. the age bounds of a junior pass"
+      },
+      "appliesAt": {
+       "type": "array",
+       "items": {
+        "type": "string",
+        "enum": [
+         "purchase",
+         "activation",
+         "holding",
+         "renewal"
+        ]
+       },
+       "description": "When the rule is evaluated (pack p.7 purpose: purchase, activate, hold or renew)"
+      }
+     }
+    },
+    "description": "Eligibility rules; all must pass"
+   },
+   "verificationMethod": {
+    "type": "string",
+    "enum": [
+     "none",
+     "customerDeclaration",
+     "documentVerification",
+     "identityVerification",
+     "staffVerification",
+     "externalVerification"
+    ],
+    "description": "Verification (pack pp.7-8): how qualification is proven. Default none (decided 29 September, readiness close-out)"
+   }
+  }
+ },
+ "MembershipEligibilityQualificationRuleBuilderView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
+  "description": "**What Membership Eligibility & Qualification Rule Builder displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "multipleMembershipsAllowed": {
+    "type": "boolean",
+    "description": "Multiple Memberships Allowed: false means one membership of this product per customer. Default false (decided 29 September, readiness close-out)"
+   },
+   "mutuallyExclusiveMemberships": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Mutually Exclusive Memberships: membership codes a customer may not hold alongside this one"
+   },
+   "prerequisiteMembership": {
+    "type": "string",
+    "description": "Prerequisite Membership: code of a membership the customer must already hold",
+    "nullable": true
+   },
+   "existingTierRequirement": {
+    "type": "string",
+    "description": "Existing Tier Requirement: minimum tier the customer must already hold",
+    "nullable": true
+   },
+   "separatePurchaseAndActivationRules": {
+    "type": "boolean",
+    "description": "Purchase vs Activation: true when the rules apply at activation to the assigned member rather than to the buyer (pack p.8: a parent may buy a Junior Pass that must be assigned to an eligible child). Default true (decided 29 September, readiness close-out)"
+   },
+   "membershipCode": {
+    "type": "string",
+    "description": "Membership code the rules belong to"
+   },
+   "rules": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "dimension": {
+       "type": "string",
+       "enum": [
+        "age",
+        "personType",
+        "residency",
+        "country",
+        "customerSegment",
+        "corporateAffiliation",
+        "studentStatus",
+        "existingMembership",
+        "previousPurchase",
+        "membershipHistory",
+        "channel",
+        "venue",
+        "promotionalQualification"
+       ],
+       "description": "Eligibility Dimension (pack p.7)"
+      },
+      "operator": {
+       "type": "string",
+       "enum": [
+        "equals",
+        "notEquals",
+        "in",
+        "notIn",
+        "between",
+        "atLeast",
+        "atMost"
+       ]
+      },
+      "values": {
+       "type": "array",
+       "items": {
+        "type": "string"
+       },
+       "description": "Values compared, e.g. the age bounds of a junior pass"
+      },
+      "appliesAt": {
+       "type": "array",
+       "items": {
+        "type": "string",
+        "enum": [
+         "purchase",
+         "activation",
+         "holding",
+         "renewal"
+        ]
+       },
+       "description": "When the rule is evaluated (pack p.7 purpose: purchase, activate, hold or renew)"
+      }
+     }
+    },
+    "description": "Eligibility rules; all must pass"
+   },
+   "verificationMethod": {
+    "type": "string",
+    "enum": [
+     "none",
+     "customerDeclaration",
+     "documentVerification",
+     "identityVerification",
+     "staffVerification",
+     "externalVerification"
+    ],
+    "description": "Verification (pack pp.7-8): how qualification is proven. Default none (decided 29 September, readiness close-out)"
+   }
+  }
+ },
+ "MembershipEntitlementAdmissionBenefitBuilderInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; stored as subscription.membership_entitlement (MembershipEntitlement), one row per entitlement (decided 29 September, data model DM4)",
+  "description": "**What Membership Entitlement & Admission Benefit Builder submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "membershipCode": {
+    "type": "string",
+    "description": "Membership code"
+   },
+   "tier": {
+    "type": "string",
+    "description": "Tier the package belongs to"
+   },
+   "entitlements": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "entitlementType": {
+       "type": "string",
+       "enum": [
+        "unlimitedAdmission",
+        "limitedAdmissions",
+        "attractionAccess",
+        "eventAccess",
+        "zoneAccess",
+        "fastTrack",
+        "priorityEntry",
+        "guestTickets",
+        "parking",
+        "fnbBenefit",
+        "retailBenefit",
+        "rentalBenefit",
+        "specialEventAccess",
+        "bookingPrivileges",
+        "other"
+       ],
+       "description": "Entitlement Type (pack pp.9-10)"
+      },
+      "venue": {
+       "type": "string",
+       "nullable": true
+      },
+      "attraction": {
+       "type": "string",
+       "nullable": true
+      },
+      "eventType": {
+       "type": "string",
+       "nullable": true
+      },
+      "admissionType": {
+       "type": "string",
+       "nullable": true
+      },
+      "quantity": {
+       "type": "integer",
+       "nullable": true,
+       "description": "Number of visits or uses per limitPeriod; empty for unlimited"
+      },
+      "limitPeriod": {
+       "type": "string",
+       "enum": [
+        "perDay",
+        "perWeek",
+        "perMonth",
+        "perMembershipYear",
+        "lifetimeOfMembership"
+       ],
+       "description": "Benefit Limits (pack p.10)"
+      },
+      "days": {
+       "type": "array",
+       "items": {
+        "type": "string",
+        "enum": [
+         "mon",
+         "tue",
+         "wed",
+         "thu",
+         "fri",
+         "sat",
+         "sun"
+        ]
+       },
+       "description": "Days the entitlement is valid; empty for every day"
+      },
+      "timeFrom": {
+       "type": "string",
+       "nullable": true,
+       "description": "Times: local start time HH:mm"
+      },
+      "timeTo": {
+       "type": "string",
+       "nullable": true,
+       "description": "Times: local end time HH:mm"
+      },
+      "timeslots": {
+       "type": "array",
+       "items": {
+        "type": "string"
+       },
+       "description": "Timeslot ids the entitlement is restricted to"
+      },
+      "blackoutDates": {
+       "type": "array",
+       "items": {
+        "type": "string",
+        "format": "date"
+       },
+       "description": "Blackouts (pack pp.10-11; MoM 25 Aug blockout dates)"
+      },
+      "requiresSameDayVisit": {
+       "type": "boolean",
+       "description": "Benefit Dependencies (pack p.11): valid only with a valid visit the same day, e.g. parking"
+      },
+      "pricingRuleId": {
+       "type": "string",
+       "nullable": true,
+       "description": "For a discount benefit (F&B, retail, rental): the central pricing rule that calculates it (pack p.15: Area 13 identifies the benefit, the commercial engine calculates)"
+      },
+      "ownership": {
+       "type": "string",
+       "enum": [
+        "memberSpecific",
+        "familyShared",
+        "dependentSpecific",
+        "accountShared"
+       ],
+       "description": "Entitlement Ownership (pack p.11)"
+      }
+     }
+    },
+    "description": "The admission and benefit package for the tier (pack p.10 example: Gold Annual Pass)"
+   }
+  }
+ },
+ "MembershipEntitlementAdmissionBenefitBuilderView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
+  "description": "**What Membership Entitlement & Admission Benefit Builder displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "membershipCode": {
+    "type": "string",
+    "description": "Membership code"
+   },
+   "tier": {
+    "type": "string",
+    "description": "Tier the package belongs to"
+   },
+   "entitlements": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "entitlementType": {
+       "type": "string",
+       "enum": [
+        "unlimitedAdmission",
+        "limitedAdmissions",
+        "attractionAccess",
+        "eventAccess",
+        "zoneAccess",
+        "fastTrack",
+        "priorityEntry",
+        "guestTickets",
+        "parking",
+        "fnbBenefit",
+        "retailBenefit",
+        "rentalBenefit",
+        "specialEventAccess",
+        "bookingPrivileges",
+        "other"
+       ],
+       "description": "Entitlement Type (pack pp.9-10)"
+      },
+      "venue": {
+       "type": "string",
+       "nullable": true
+      },
+      "attraction": {
+       "type": "string",
+       "nullable": true
+      },
+      "eventType": {
+       "type": "string",
+       "nullable": true
+      },
+      "admissionType": {
+       "type": "string",
+       "nullable": true
+      },
+      "quantity": {
+       "type": "integer",
+       "nullable": true,
+       "description": "Number of visits or uses per limitPeriod; empty for unlimited"
+      },
+      "limitPeriod": {
+       "type": "string",
+       "enum": [
+        "perDay",
+        "perWeek",
+        "perMonth",
+        "perMembershipYear",
+        "lifetimeOfMembership"
+       ],
+       "description": "Benefit Limits (pack p.10)"
+      },
+      "days": {
+       "type": "array",
+       "items": {
+        "type": "string",
+        "enum": [
+         "mon",
+         "tue",
+         "wed",
+         "thu",
+         "fri",
+         "sat",
+         "sun"
+        ]
+       },
+       "description": "Days the entitlement is valid; empty for every day"
+      },
+      "timeFrom": {
+       "type": "string",
+       "nullable": true,
+       "description": "Times: local start time HH:mm"
+      },
+      "timeTo": {
+       "type": "string",
+       "nullable": true,
+       "description": "Times: local end time HH:mm"
+      },
+      "timeslots": {
+       "type": "array",
+       "items": {
+        "type": "string"
+       },
+       "description": "Timeslot ids the entitlement is restricted to"
+      },
+      "blackoutDates": {
+       "type": "array",
+       "items": {
+        "type": "string",
+        "format": "date"
+       },
+       "description": "Blackouts (pack pp.10-11; MoM 25 Aug blockout dates)"
+      },
+      "requiresSameDayVisit": {
+       "type": "boolean",
+       "description": "Benefit Dependencies (pack p.11): valid only with a valid visit the same day, e.g. parking"
+      },
+      "pricingRuleId": {
+       "type": "string",
+       "nullable": true,
+       "description": "For a discount benefit (F&B, retail, rental): the central pricing rule that calculates it (pack p.15: Area 13 identifies the benefit, the commercial engine calculates)"
+      },
+      "ownership": {
+       "type": "string",
+       "enum": [
+        "memberSpecific",
+        "familyShared",
+        "dependentSpecific",
+        "accountShared"
+       ],
+       "description": "Entitlement Ownership (pack p.11)"
+      }
+     }
+    },
+    "description": "The admission and benefit package for the tier (pack p.10 example: Gold Annual Pass)"
+   }
+  }
+ },
+ "MembershipProductTierBuilderInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; stored as subscription.membership_product (MembershipProduct), a new version when the product is active (decided 29 September, data model DM4)",
+  "description": "**What Membership Product & Tier Builder submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "membershipName": {
+    "type": "string",
+    "description": "Membership Name"
+   },
+   "membershipCode": {
+    "type": "string",
+    "description": "Membership Code"
+   },
+   "description": {
+    "type": "string",
+    "description": "Description"
+   },
+   "membershipType": {
+    "type": "string",
+    "enum": [
+     "annualPass",
+     "seasonPass",
+     "monthlyMembership",
+     "fixedTermMembership",
+     "corporateMembership",
+     "familyMembership",
+     "individualMembership",
+     "studentMembership",
+     "vipMembership",
+     "customMembership"
+    ],
+    "description": "Membership Type (pack pp.4-5)"
+   },
+   "brand": {
+    "type": "string",
+    "description": "Brand"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "attraction": {
+    "type": "string",
+    "description": "Attraction"
+   },
+   "market": {
+    "type": "string",
+    "description": "Market"
+   },
+   "currencyContext": {
+    "type": "string",
+    "description": "Currency Context: ISO 4217 currency code the product is sold in"
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "format": "date",
+    "description": "Effective From"
+   },
+   "effectiveTo": {
+    "type": "string",
+    "format": "date",
+    "description": "Effective To; empty for open-ended",
+    "nullable": true
+   },
+   "tierLevel": {
+    "type": "integer",
+    "description": "Tier Level: rank within the membership family; higher is more premium"
+   },
+   "displayOrder": {
+    "type": "integer",
+    "description": "Display Order in listings and upgrade choices"
+   },
+   "parentMembership": {
+    "type": "string",
+    "description": "Parent Membership: code of the membership family this tier belongs to",
+    "nullable": true
+   },
+   "replacementMembership": {
+    "type": "string",
+    "description": "Replacement Membership: code of the product that replaces this one when it is retired",
+    "nullable": true
+   },
+   "holderModel": {
+    "type": "string",
+    "enum": [
+     "individual",
+     "family",
+     "corporate"
+    ],
+    "description": "Individual / Family / Corporate (pack p.6 Product Characteristics)"
+   },
+   "transferable": {
+    "type": "boolean",
+    "description": "Named / Transferable: true when the membership may be transferred; false (the default) keeps it named to one member (decided 29 September, readiness close-out)"
+   },
+   "credentialForm": {
+    "type": "string",
+    "enum": [
+     "physical",
+     "digital",
+     "both"
+    ],
+    "description": "Physical / Digital credential form"
+   },
+   "renewable": {
+    "type": "boolean",
+    "description": "Renewable / Non-Renewable: true when the membership can be renewed"
+   },
+   "autoRenewEligible": {
+    "type": "boolean",
+    "description": "Auto-Renew Eligible: the product may be auto-renewed; a member is only auto-renewed after their own explicit opt-in. Default false (decided 29 September, readiness close-out)"
+   },
+   "benefitModel": {
+    "type": "string",
+    "enum": [
+     "admissionBased",
+     "benefitBased",
+     "hybrid"
+    ],
+    "description": "Admission-Based / Benefit-Based / Hybrid"
+   },
+   "tier": {
+    "type": "string",
+    "description": "Tier: Standard, Silver, Gold, Platinum, VIP or a custom tier the venue names (pack p.6 Tier Configuration)"
+   },
+   "upgradePath": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Upgrade Path: membership codes this tier may upgrade to (pack p.6 Tier Relationships; the transaction runs in Area 11)"
+   },
+   "downgradePath": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Downgrade Path: membership codes this tier may downgrade to"
+   },
+   "catalogueProductId": {
+    "type": "string",
+    "description": "Catalogue Association: the sellable product in the Ticketing Catalogue this membership configures (a membership ProductKind)"
+   }
+  }
+ },
+ "MembershipProductTierBuilderView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
+  "description": "**What Membership Product & Tier Builder displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "membershipName": {
+    "type": "string",
+    "description": "Membership Name"
+   },
+   "membershipCode": {
+    "type": "string",
+    "description": "Membership Code"
+   },
+   "description": {
+    "type": "string",
+    "description": "Description"
+   },
+   "membershipType": {
+    "type": "string",
+    "enum": [
+     "annualPass",
+     "seasonPass",
+     "monthlyMembership",
+     "fixedTermMembership",
+     "corporateMembership",
+     "familyMembership",
+     "individualMembership",
+     "studentMembership",
+     "vipMembership",
+     "customMembership"
+    ],
+    "description": "Membership Type (pack pp.4-5)"
+   },
+   "brand": {
+    "type": "string",
+    "description": "Brand"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "attraction": {
+    "type": "string",
+    "description": "Attraction"
+   },
+   "market": {
+    "type": "string",
+    "description": "Market"
+   },
+   "currencyContext": {
+    "type": "string",
+    "description": "Currency Context: ISO 4217 currency code the product is sold in"
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "format": "date",
+    "description": "Effective From"
+   },
+   "effectiveTo": {
+    "type": "string",
+    "format": "date",
+    "description": "Effective To; empty for open-ended",
+    "nullable": true
+   },
+   "tierLevel": {
+    "type": "integer",
+    "description": "Tier Level: rank within the membership family; higher is more premium"
+   },
+   "displayOrder": {
+    "type": "integer",
+    "description": "Display Order in listings and upgrade choices"
+   },
+   "parentMembership": {
+    "type": "string",
+    "description": "Parent Membership: code of the membership family this tier belongs to",
+    "nullable": true
+   },
+   "replacementMembership": {
+    "type": "string",
+    "description": "Replacement Membership: code of the product that replaces this one when it is retired",
+    "nullable": true
+   },
+   "holderModel": {
+    "type": "string",
+    "enum": [
+     "individual",
+     "family",
+     "corporate"
+    ],
+    "description": "Individual / Family / Corporate (pack p.6 Product Characteristics)"
+   },
+   "transferable": {
+    "type": "boolean",
+    "description": "Named / Transferable: true when the membership may be transferred; false (the default) keeps it named to one member (decided 29 September, readiness close-out)"
+   },
+   "credentialForm": {
+    "type": "string",
+    "enum": [
+     "physical",
+     "digital",
+     "both"
+    ],
+    "description": "Physical / Digital credential form"
+   },
+   "renewable": {
+    "type": "boolean",
+    "description": "Renewable / Non-Renewable: true when the membership can be renewed"
+   },
+   "autoRenewEligible": {
+    "type": "boolean",
+    "description": "Auto-Renew Eligible: the product may be auto-renewed; a member is only auto-renewed after their own explicit opt-in. Default false (decided 29 September, readiness close-out)"
+   },
+   "benefitModel": {
+    "type": "string",
+    "enum": [
+     "admissionBased",
+     "benefitBased",
+     "hybrid"
+    ],
+    "description": "Admission-Based / Benefit-Based / Hybrid"
+   },
+   "tier": {
+    "type": "string",
+    "description": "Tier: Standard, Silver, Gold, Platinum, VIP or a custom tier the venue names (pack p.6 Tier Configuration)"
+   },
+   "upgradePath": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Upgrade Path: membership codes this tier may upgrade to (pack p.6 Tier Relationships; the transaction runs in Area 11)"
+   },
+   "downgradePath": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Downgrade Path: membership codes this tier may downgrade to"
+   },
+   "catalogueProductId": {
+    "type": "string",
+    "description": "Catalogue Association: the sellable product in the Ticketing Catalogue this membership configures (a membership ProductKind)"
+   },
+   "version": {
+    "type": "integer",
+    "description": "Version number of this configuration; each saved change to an active product creates a new version"
+   },
+   "status": {
+    "type": "string",
+    "description": "Status of the membership product: draft, inReview, approved, scheduled, active, suspended, expired or retired (pack p.5 Statuses)"
+   }
+  }
+ },
+ "MembershipProductValidationApprovalPublicationVersioInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; stored as subscription.membership_product (status, approvalStage) with an audit row in subscription.membership_product_history (decided 29 September, data model DM4)",
+  "description": "**What Membership Product Validation, Approval, Publication & Versioning submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "migrationPolicy": {
+    "type": "string",
+    "enum": [
+     "remainOnCurrentVersion",
+     "moveAtNextRenewal",
+     "moveOnEffectiveDate"
+    ],
+    "description": "Migration policy for existing member contracts (pack p.18). Default moveAtNextRenewal (decided 29 September, readiness close-out)"
+   },
+   "membershipCode": {
+    "type": "string",
+    "description": "Membership code"
+   },
+   "version": {
+    "type": "integer",
+    "description": "Configuration version the decision applies to"
+   },
+   "action": {
+    "type": "string",
+    "enum": [
+     "validate",
+     "submitForReview",
+     "approveCommercial",
+     "approveOperational",
+     "reject",
+     "schedule",
+     "publish",
+     "suspend",
+     "reinstate"
+    ],
+    "description": "Decision taken on BO-293; `suspend` (from `active`, reason required) and `reinstate` (from `suspended`) are the BO-284 quick actions (decided 29 September, writers pass; DM4)"
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "format": "date",
+    "description": "Effective date for schedule/publish",
+    "nullable": true
+   },
+   "reason": {
+    "type": "string",
+    "description": "Reason, recorded in the audit",
+    "nullable": true
+   }
+  }
+ },
+ "MembershipProductValidationApprovalPublicationVersioView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
+  "description": "**What Membership Product Validation, Approval, Publication & Versioning displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "migrationPolicy": {
+    "type": "string",
+    "enum": [
+     "remainOnCurrentVersion",
+     "moveAtNextRenewal",
+     "moveOnEffectiveDate"
+    ],
+    "description": "Migration policy for existing member contracts (pack p.18). Default moveAtNextRenewal (decided 29 September, readiness close-out)"
+   },
+   "activeMembersAffected": {
+    "type": "integer",
+    "description": "Active Members Affected"
+   },
+   "futureRenewals": {
+    "type": "integer",
+    "description": "Future Renewals affected by the change"
+   },
+   "entitlementsAffected": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Entitlements Affected"
+   },
+   "channels": {
+    "type": "array",
+    "items": {
+     "$ref": "../shared/common.yaml#/components/schemas/SalesChannel"
+    },
+    "description": "Channels affected"
+   },
+   "pricingDependencies": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Pricing Dependencies: pricing profiles and rules referenced"
+   },
+   "accessDependencies": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Access Dependencies: access-control rules and credentials referenced"
+   },
+   "membershipCode": {
+    "type": "string",
+    "description": "Membership code"
+   },
+   "version": {
+    "type": "integer",
+    "description": "Configuration version under approval"
+   },
+   "approvalStage": {
+    "type": "string",
+    "description": "Approval stage: draft, review, commercialApproval, operationalApproval, approved, scheduled or published (pack p.17)"
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "format": "date",
+    "description": "Effective Dating: date this version takes effect"
+   },
+   "validationChecks": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "check": {
+       "type": "string",
+       "enum": [
+        "productDefinitionComplete",
+        "catalogueAssociation",
+        "eligibilityRules",
+        "validity",
+        "activation",
+        "entitlements",
+        "usageRules",
+        "pricingAssociation",
+        "taxFeeAssociation",
+        "channelAvailability",
+        "renewalPolicy",
+        "requiredCredentialConfiguration"
+       ]
+      },
+      "passed": {
+       "type": "boolean"
+      },
+      "message": {
+       "type": "string",
+       "nullable": true
+      }
+     }
+    },
+    "description": "Configuration Validation (pack p.17)"
+   },
+   "validationIssues": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "code": {
+       "type": "string",
+       "enum": [
+        "inactivePricingProfile",
+        "missingDependentEligibility",
+        "autoRenewWithoutConsentConfiguration",
+        "missingCancellationPolicy",
+        "other"
+       ]
+      },
+      "message": {
+       "type": "string"
+      }
+     }
+    },
+    "description": "Dependency Health (pack p.17 examples); missingCancellationPolicy is a warning (decided 29 September, readiness close-out)"
+   },
+   "publicationTargets": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "target": {
+       "type": "string",
+       "enum": [
+        "b2c",
+        "pos",
+        "mobileApp",
+        "callCenter",
+        "b2b",
+        "accessControl",
+        "ticketing",
+        "otherDependentServices"
+       ]
+      },
+      "synchronisedAt": {
+       "type": "string",
+       "format": "date-time",
+       "nullable": true
+      }
+     }
+    },
+    "description": "Publication (pack p.18): services the configuration is synchronised to"
+   },
+   "aiInsights": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "AI Assistance: advisory observations only; never applied automatically (pack AI sections)"
+   }
+  }
+ },
+ "MembershipUsagePolicyInput": {
+  "type": "object",
+  "x-ticvai-persistence": "none — request only; stored as subscription.membership_usage_policy (MembershipUsagePolicy), one row per product version (decided 29 September, writers pass; DM4)",
+  "description": "What setMembershipUsagePolicy submits for one membership product version; the fields of MembershipUsagePolicy a venue sets. Counters and figures are not sent (decided 29 September, writers pass; DM4)",
+  "required": [
+   "membershipCode",
+   "reEntryPolicy",
+   "reservationRequirement"
+  ],
+  "properties": {
+   "membershipCode": {
+    "type": "string",
+    "description": "The membership product (subscription.membership_product) whose rules these are."
+   },
+   "tier": {
+    "type": "string",
+    "nullable": true,
+    "description": "Tier, where the product code covers several tiers."
+   },
+   "maximumVisitsPerDay": {
+    "type": "integer",
+    "minimum": 1,
+    "nullable": true,
+    "description": "Maximum Visits per Day; empty for unlimited"
+   },
+   "maximumAdmissionsPerPeriod": {
+    "type": "integer",
+    "minimum": 1,
+    "nullable": true,
+    "description": "Maximum Admissions per admissionPeriod; empty for unlimited"
+   },
+   "admissionPeriod": {
+    "type": "string",
+    "enum": [
+     "perDay",
+     "perWeek",
+     "perMonth",
+     "perMembershipYear"
+    ],
+    "nullable": true,
+    "description": "Period for maximumAdmissionsPerPeriod; required when that is set"
+   },
+   "reEntryPolicy": {
+    "type": "string",
+    "enum": [
+     "unlimitedSameDay",
+     "noReEntry",
+     "afterMinutes",
+     "venueSpecific"
+    ],
+    "description": "Re-entry (pack p.12)"
+   },
+   "reEntryCooldownMinutes": {
+    "type": "integer",
+    "minimum": 1,
+    "nullable": true,
+    "description": "Re-entry Cooldown in minutes; required for reEntryPolicy afterMinutes"
+   },
+   "reservationRequirement": {
+    "type": "string",
+    "enum": [
+     "required",
+     "optional"
+    ],
+    "description": "Advance Reservation (pack pp.11-12)"
+   },
+   "walkInAllowed": {
+    "type": "boolean",
+    "default": true,
+    "description": "Walk-In Allowed without a reservation"
+   },
+   "maximumAdvanceBookingDays": {
+    "type": "integer",
+    "minimum": 0,
+    "nullable": true,
+    "description": "Maximum Advance Booking Days"
+   },
+   "maximumActiveFutureReservations": {
+    "type": "integer",
+    "minimum": 1,
+    "nullable": true,
+    "description": "Maximum Active Future Reservations"
+   },
+   "concurrentReservations": {
+    "type": "integer",
+    "minimum": 1,
+    "default": 1,
+    "description": "Concurrent Reservations: maximum active reservations per timeslot. Default 1 (decided 29 September, readiness close-out)"
+   },
+   "noShowTreatment": {
+    "type": "string",
+    "enum": [
+     "none",
+     "restrictReservations"
+    ],
+    "default": "none",
+    "description": "No-Show Treatment (pack p.12)"
+   },
+   "noShowThreshold": {
+    "type": "integer",
+    "minimum": 1,
+    "nullable": true,
+    "description": "No-shows that trigger the restriction; required for restrictReservations"
+   },
+   "noShowWindowDays": {
+    "type": "integer",
+    "minimum": 1,
+    "nullable": true,
+    "description": "Window in which no-shows are counted; required for restrictReservations"
+   },
+   "noShowRestrictionDays": {
+    "type": "integer",
+    "minimum": 1,
+    "nullable": true,
+    "default": 14,
+    "description": "Days reservation privilege stays restricted. Default 14 (decided 29 September, readiness close-out)"
+   },
+   "cancellationLimit": {
+    "type": "integer",
+    "minimum": 0,
+    "nullable": true,
+    "description": "Reservation cancellations allowed per 30 days; empty for unlimited"
+   },
+   "guestUsage": {
+    "type": "string",
+    "enum": [
+     "withMemberOnly",
+     "independent"
+    ],
+    "default": "withMemberOnly",
+    "description": "Guest Usage: whether guest tickets need the member present"
+   },
+   "benefitConsumption": {
+    "type": "string",
+    "enum": [
+     "onRedemption",
+     "onValidatedVisit"
+    ],
+    "default": "onRedemption",
+    "description": "Benefit Consumption: when a benefit counter decrements"
+   }
+  }
+ },
+ "MembershipUsageVisitConsumptionRulesView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
+  "description": "**What Membership Usage, Visit & Consumption Rules displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "maximumVisitsPerDay": {
+    "type": "integer",
+    "description": "Maximum Visits per Day; empty for unlimited",
+    "nullable": true
+   },
+   "maximumAdmissionsPerPeriod": {
+    "type": "integer",
+    "description": "Maximum Admissions per admissionPeriod; empty for unlimited",
+    "nullable": true
+   },
+   "reEntryCooldownMinutes": {
+    "type": "integer",
+    "description": "Re-entry Cooldown in minutes, for reEntryPolicy afterMinutes",
+    "nullable": true
+   },
+   "concurrentReservations": {
+    "type": "integer",
+    "description": "Concurrent Reservations: maximum active reservations per timeslot (pack example: one). Default 1 (decided 29 September, readiness close-out)"
+   },
+   "noShowTreatment": {
+    "type": "string",
+    "enum": [
+     "none",
+     "restrictReservations"
+    ],
+    "description": "No-Show Treatment (pack p.12)"
+   },
+   "cancellationLimit": {
+    "type": "integer",
+    "description": "Cancellation Limit: reservation cancellations allowed per 30 days; empty for unlimited (decided 29 September, readiness close-out)",
+    "nullable": true
+   },
+   "guestUsage": {
+    "type": "string",
+    "enum": [
+     "withMemberOnly",
+     "independent"
+    ],
+    "description": "Guest Usage: whether guest tickets need the member present. Default withMemberOnly (decided 29 September, readiness close-out)"
+   },
+   "benefitConsumption": {
+    "type": "string",
+    "enum": [
+     "onRedemption",
+     "onValidatedVisit"
+    ],
+    "description": "Benefit Consumption: when a benefit counter decrements. Default onRedemption (decided 29 September, readiness close-out)"
+   },
+   "walkInAllowed": {
+    "type": "boolean",
+    "description": "Walk-In Allowed without a reservation"
+   },
+   "maximumAdvanceBookingDays": {
+    "type": "integer",
+    "description": "Maximum Advance Booking Days",
+    "nullable": true
+   },
+   "maximumActiveFutureReservations": {
+    "type": "integer",
+    "description": "Maximum Active Future Reservations",
+    "nullable": true
+   },
+   "membershipCode": {
+    "type": "string",
+    "description": "Membership code"
+   },
+   "tier": {
+    "type": "string",
+    "description": "Tier",
+    "nullable": true
+   },
+   "admissionPeriod": {
+    "type": "string",
+    "enum": [
+     "perDay",
+     "perWeek",
+     "perMonth",
+     "perMembershipYear"
+    ],
+    "description": "Period for maximumAdmissionsPerPeriod",
+    "nullable": true
+   },
+   "reEntryPolicy": {
+    "type": "string",
+    "enum": [
+     "unlimitedSameDay",
+     "noReEntry",
+     "afterMinutes",
+     "venueSpecific"
+    ],
+    "description": "Re-entry (pack p.12)"
+   },
+   "reservationRequirement": {
+    "type": "string",
+    "enum": [
+     "required",
+     "optional"
+    ],
+    "description": "Advance Reservation (pack pp.11-12)"
+   },
+   "noShowThreshold": {
+    "type": "integer",
+    "description": "No-shows that trigger the restriction (pack example: 3)",
+    "nullable": true
+   },
+   "noShowWindowDays": {
+    "type": "integer",
+    "description": "Window in which no-shows are counted (pack example: 30 days)",
+    "nullable": true
+   },
+   "noShowRestrictionDays": {
+    "type": "integer",
+    "description": "Days reservation privilege stays restricted. Default 14 (decided 29 September, readiness close-out)",
+    "nullable": true
+   }
+  }
+ },
  "Page": {
   "type": "object",
   "required": [
@@ -705,7 +2677,7 @@
    "description": {
     "type": "string",
     "nullable": true,
-    "description": "Price list master fields (29 September, data model DM3), set with `setPriceListMaster` (ADM-058)."
+    "description": "Price list master fields (29 September, data model DM3), set with `createPriceList` and `updatePriceList` since setPriceListMaster was retired in r2 (BC-008, CHG-CLN-001)."
    },
    "priceListType": {
     "type": "string",
@@ -827,6 +2799,329 @@
    }
   }
  },
+ "RenewalAutoRenewalMembershipContinuityConfigurationInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; stored as subscription.membership_renewal_policy (MembershipRenewalPolicy) (decided 29 September, data model DM4)",
+  "description": "**What Renewal, Auto-Renewal & Membership Continuity Configuration submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "autoRenewEligible": {
+    "type": "boolean",
+    "description": "Eligible Products: this product may be auto-renewed. Default false (decided 29 September, readiness close-out)"
+   },
+   "autoRenewTermsVersion": {
+    "type": "string",
+    "description": "Consent Requirement: version of the auto-renewal terms the member accepts when opting in. Auto-renew is only ever switched on by the member's own explicit opt-in (MoM 25 Aug: subject to consent on terms and conditions), never pre-selected (decided 29 September, readiness close-out)",
+    "nullable": true
+   },
+   "cardOnFileRequired": {
+    "type": "boolean",
+    "description": "Payment Method Requirement: a tokenised card on file held by the payments module is required before auto-renew can be scheduled (MoM 25 Aug); the membership engine never holds card data. Default true (decided 29 September, readiness close-out)"
+   },
+   "preRenewalNoticeDays": {
+    "type": "integer",
+    "description": "Pre-Renewal Notification: days before the charge that the member is reminded, with the amount and how to opt out. Default 14, minimum 7 (decided 29 September, readiness close-out)"
+   },
+   "failureHandling": {
+    "type": "string",
+    "enum": [
+     "gracePeriod",
+     "manualAction",
+     "expire"
+    ],
+    "description": "Failure Handling after the final retry (pack p.16: Payment Failed -> Retry -> Grace Period -> Manual Action -> Expired). Default gracePeriod (decided 29 September, readiness close-out)"
+   },
+   "membershipCode": {
+    "type": "string",
+    "description": "Membership code"
+   },
+   "renewalModes": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "manual",
+      "customerSelfService",
+      "agentAssisted",
+      "autoRenewal",
+      "invitationOnly",
+      "nonRenewable"
+     ]
+    },
+    "description": "Renewal Modes (pack p.15); nonRenewable excludes the others"
+   },
+   "renewalWindowOpensDaysBefore": {
+    "type": "integer",
+    "description": "Renewal Window opens this many days before expiry. Default 60, the pack's example"
+   },
+   "renewalWindowClosesDaysAfter": {
+    "type": "integer",
+    "description": "Renewal Window closes this many days after expiry. Default 30, the pack's example"
+   },
+   "earlyRenewalStart": {
+    "type": "string",
+    "enum": [
+     "immediately",
+     "afterCurrentExpiry"
+    ],
+    "description": "Early Renewal (pack p.16): when the new period starts. Default afterCurrentExpiry, preserving remaining validity as the pack advises"
+   },
+   "renewalPriceBasis": {
+    "type": "string",
+    "enum": [
+     "currentMembershipPrice",
+     "protectedRenewalPrice",
+     "renewalDiscount",
+     "loyaltyRate",
+     "fixedRenewalRate"
+    ],
+    "description": "Renewal Pricing (pack p.16); calculated by pricing (Area 10). Default currentMembershipPrice (decided 29 September, readiness close-out)"
+   },
+   "renewalPricingProfile": {
+    "type": "string",
+    "description": "Renewal pricing profile id in pricing (Area 10)",
+    "nullable": true
+   },
+   "retryIntervalsDays": {
+    "type": "array",
+    "items": {
+     "type": "integer"
+    },
+    "description": "Retry Policy: days between failed auto-renew payment attempts. Default [2, 3], the pack's example (p.31)"
+   },
+   "renewalGraceDays": {
+    "type": "integer",
+    "description": "Days a failed renewal stays in Renewal Grace before failureHandling applies. Default 7 (decided 29 September, readiness close-out)"
+   },
+   "revalidateOnRenewal": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "age",
+      "residency",
+      "membershipStatus",
+      "outstandingBalance",
+      "qualification",
+      "corporateAssociation"
+     ]
+    },
+    "description": "Renewal Eligibility (pack p.16): what is revalidated at renewal"
+   },
+   "tierMovementAtRenewal": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "sameTierOnly",
+      "upgradeAllowed",
+      "downgradeAllowed",
+      "suggestedTier"
+     ]
+    },
+    "description": "Tier Movement (pack p.16)"
+   },
+   "cancellationPolicyId": {
+    "type": "string",
+    "description": "Cancellation/refund policy from the central policy management (MoM 25 Aug: refund and cancellation rules are managed centrally). Empty means no refund on cancellation unless the commercial team configures one; cancelling always stops the next auto-renew charge (decided 29 September, readiness close-out)",
+    "nullable": true
+   }
+  }
+ },
+ "RenewalAutoRenewalMembershipContinuityConfigurationView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
+  "description": "**What Renewal, Auto-Renewal & Membership Continuity Configuration displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "autoRenewEligible": {
+    "type": "boolean",
+    "description": "Eligible Products: this product may be auto-renewed. Default false (decided 29 September, readiness close-out)"
+   },
+   "autoRenewTermsVersion": {
+    "type": "string",
+    "description": "Consent Requirement: version of the auto-renewal terms the member accepts when opting in. Auto-renew is only ever switched on by the member's own explicit opt-in (MoM 25 Aug: subject to consent on terms and conditions), never pre-selected (decided 29 September, readiness close-out)",
+    "nullable": true
+   },
+   "cardOnFileRequired": {
+    "type": "boolean",
+    "description": "Payment Method Requirement: a tokenised card on file held by the payments module is required before auto-renew can be scheduled (MoM 25 Aug); the membership engine never holds card data. Default true (decided 29 September, readiness close-out)"
+   },
+   "preRenewalNoticeDays": {
+    "type": "integer",
+    "description": "Pre-Renewal Notification: days before the charge that the member is reminded, with the amount and how to opt out. Default 14, minimum 7 (decided 29 September, readiness close-out)"
+   },
+   "failureHandling": {
+    "type": "string",
+    "enum": [
+     "gracePeriod",
+     "manualAction",
+     "expire"
+    ],
+    "description": "Failure Handling after the final retry (pack p.16: Payment Failed -> Retry -> Grace Period -> Manual Action -> Expired). Default gracePeriod (decided 29 September, readiness close-out)"
+   },
+   "membershipCode": {
+    "type": "string",
+    "description": "Membership code"
+   },
+   "renewalModes": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "manual",
+      "customerSelfService",
+      "agentAssisted",
+      "autoRenewal",
+      "invitationOnly",
+      "nonRenewable"
+     ]
+    },
+    "description": "Renewal Modes (pack p.15); nonRenewable excludes the others"
+   },
+   "renewalWindowOpensDaysBefore": {
+    "type": "integer",
+    "description": "Renewal Window opens this many days before expiry. Default 60, the pack's example"
+   },
+   "renewalWindowClosesDaysAfter": {
+    "type": "integer",
+    "description": "Renewal Window closes this many days after expiry. Default 30, the pack's example"
+   },
+   "earlyRenewalStart": {
+    "type": "string",
+    "enum": [
+     "immediately",
+     "afterCurrentExpiry"
+    ],
+    "description": "Early Renewal (pack p.16): when the new period starts. Default afterCurrentExpiry, preserving remaining validity as the pack advises"
+   },
+   "renewalPriceBasis": {
+    "type": "string",
+    "enum": [
+     "currentMembershipPrice",
+     "protectedRenewalPrice",
+     "renewalDiscount",
+     "loyaltyRate",
+     "fixedRenewalRate"
+    ],
+    "description": "Renewal Pricing (pack p.16); calculated by pricing (Area 10). Default currentMembershipPrice (decided 29 September, readiness close-out)"
+   },
+   "renewalPricingProfile": {
+    "type": "string",
+    "description": "Renewal pricing profile id in pricing (Area 10)",
+    "nullable": true
+   },
+   "retryIntervalsDays": {
+    "type": "array",
+    "items": {
+     "type": "integer"
+    },
+    "description": "Retry Policy: days between failed auto-renew payment attempts. Default [2, 3], the pack's example (p.31)"
+   },
+   "renewalGraceDays": {
+    "type": "integer",
+    "description": "Days a failed renewal stays in Renewal Grace before failureHandling applies. Default 7 (decided 29 September, readiness close-out)"
+   },
+   "revalidateOnRenewal": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "age",
+      "residency",
+      "membershipStatus",
+      "outstandingBalance",
+      "qualification",
+      "corporateAssociation"
+     ]
+    },
+    "description": "Renewal Eligibility (pack p.16): what is revalidated at renewal"
+   },
+   "tierMovementAtRenewal": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "sameTierOnly",
+      "upgradeAllowed",
+      "downgradeAllowed",
+      "suggestedTier"
+     ]
+    },
+    "description": "Tier Movement (pack p.16)"
+   },
+   "cancellationPolicyId": {
+    "type": "string",
+    "description": "Cancellation/refund policy from the central policy management (MoM 25 Aug: refund and cancellation rules are managed centrally). Empty means no refund on cancellation unless the commercial team configures one; cancelling always stops the next auto-renew charge (decided 29 September, readiness close-out)",
+    "nullable": true
+   }
+  }
+ },
+ "Session": {
+  "type": "object",
+  "required": [
+   "sessionId",
+   "principalId",
+   "roleId",
+   "scope",
+   "effectivePermissions"
+  ],
+  "properties": {
+   "sessionId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "principalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "roleId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "displayName": {
+    "type": "string"
+   },
+   "scope": {
+    "type": "array",
+    "description": "Scope nodes this session may act within, resolved once at login from the ltree hierarchy with deny-overrides-allow. Clients filter navigation against this — they never compute it.\n",
+    "items": {
+     "$ref": "../shared/common.yaml#/components/schemas/ScopeRef"
+    }
+   },
+   "effectivePermissions": {
+    "allOf": [
+     {
+      "$ref": "../shared/permissions.yaml#/components/schemas/PermissionSet"
+     }
+    ],
+    "description": "Flattened set across all granted scopes, after deny resolution. Convenience for coarse checks. Anything scope-sensitive must use `permissionsByScope`.\n"
+   },
+   "permissionsByScope": {
+    "type": "array",
+    "description": "Permissions effective at each granted scope path. Clients filter navigation on this and never compute permissions themselves.\n",
+    "items": {
+     "$ref": "../shared/permissions.yaml#/components/schemas/ScopedPermissions"
+    }
+   },
+   "saleBoardId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "Landing surface, derived from the WORKSTATION, not the role (12 Aug 2026 §3). Ticketing, F&B or Retail board.\n\n**Optional since 2 October 2026: only a till session carries it** (Chinmay, door follow-ups; CHG-CSP-002; breaking change against r1 approved as BC-001 to BC-005 in `docs/active/breaking-changes.yaml`). A browser door (ADM-001, SUP-001, PTR-001) and a staff handheld (EMP-001) sign in with no workstation since CHG-DOOR-001, so they have no board to land on and the field is absent. On a till it is the workstation's effective board: the outlet's board unless the till overrides it (`tenancy.Workstation.saleBoardSource`; CHG-CSP-006). A client reads its landing from this field when present and from its own platform otherwise.\n"
+   },
+   "workstation": {
+    "$ref": "#/components/schemas/WorkstationContext"
+   },
+   "openedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
  "SetPriceRequest": {
   "type": "object",
   "required": [
@@ -844,6 +3139,264 @@
    "taxCodeId": {
     "type": "string",
     "format": "uuid"
+   }
+  }
+ },
+ "ValidityActivationExpiryConfigurationInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; stored as subscription.membership_product (MembershipProduct) (decided 29 September, data model DM4)",
+  "description": "**What Validity, Activation & Expiry Configuration submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "configuredStart": {
+    "type": "string",
+    "format": "date",
+    "description": "Configured start: start date for fixedCalendar, seasonBased and customPeriod validity, and the start of a future-dated membership (fixedStartDate activation)",
+    "nullable": true
+   },
+   "configuredEnd": {
+    "type": "string",
+    "format": "date",
+    "description": "Configured end: end date for fixedCalendar, seasonBased and customPeriod validity",
+    "nullable": true
+   },
+   "membershipCode": {
+    "type": "string",
+    "description": "Membership code this configuration belongs to"
+   },
+   "validityMethod": {
+    "type": "string",
+    "enum": [
+     "fixedCalendar",
+     "durationFromPurchase",
+     "durationFromActivation",
+     "seasonBased",
+     "customPeriod"
+    ],
+    "description": "Validity Method (pack p.8)"
+   },
+   "durationDays": {
+    "type": "integer",
+    "description": "Duration in days for durationFromPurchase / durationFromActivation (the pack's example: 365)",
+    "nullable": true
+   },
+   "seasonName": {
+    "type": "string",
+    "description": "Season name for seasonBased validity, e.g. the 2026-2027 season",
+    "nullable": true
+   },
+   "activationMethod": {
+    "type": "string",
+    "enum": [
+     "immediateOnPurchase",
+     "fixedStartDate",
+     "firstVisit",
+     "manualActivation",
+     "customerActivation",
+     "membershipCardCollection",
+     "identityVerification",
+     "configuredTrigger"
+    ],
+    "description": "Activation Method (pack pp.8-9)"
+   },
+   "activationDeadlineDays": {
+    "type": "integer",
+    "description": "Activation Deadline: days after purchase by which a membership must be activated. Required when activation is deferred (firstVisit, manualActivation, customerActivation, membershipCardCollection, identityVerification, configuredTrigger); an unactivated membership expires at the deadline so it never stays open indefinitely (MoM 25 Aug fallback expiry for first-use activation). Default 90, the pack's example (decided 29 September, readiness close-out)",
+    "nullable": true
+   },
+   "expiryRule": {
+    "type": "string",
+    "enum": [
+     "exactExpiryDate",
+     "endOfDay",
+     "endOfSeason",
+     "duration"
+    ],
+    "description": "Expiry (pack p.9)"
+   },
+   "gracePeriodDays": {
+    "type": "integer",
+    "description": "Grace Period: days after expiry during which renewal continues the membership without a gap. Default 0 (decided 29 September, readiness close-out)"
+   },
+   "backdatingAllowed": {
+    "type": "boolean",
+    "description": "Backdating: whether authorised staff may backdate activation. Default false (decided 29 September, readiness close-out)"
+   },
+   "backdatingApprovalRequired": {
+    "type": "boolean",
+    "description": "Backdating needs a second user's approval. Default true (decided 29 September, readiness close-out)"
+   }
+  }
+ },
+ "ValidityActivationExpiryConfigurationView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
+  "description": "**What Validity, Activation & Expiry Configuration displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "configuredStart": {
+    "type": "string",
+    "format": "date",
+    "description": "Configured start: start date for fixedCalendar, seasonBased and customPeriod validity, and the start of a future-dated membership (fixedStartDate activation)",
+    "nullable": true
+   },
+   "configuredEnd": {
+    "type": "string",
+    "format": "date",
+    "description": "Configured end: end date for fixedCalendar, seasonBased and customPeriod validity",
+    "nullable": true
+   },
+   "membershipCode": {
+    "type": "string",
+    "description": "Membership code this configuration belongs to"
+   },
+   "validityMethod": {
+    "type": "string",
+    "enum": [
+     "fixedCalendar",
+     "durationFromPurchase",
+     "durationFromActivation",
+     "seasonBased",
+     "customPeriod"
+    ],
+    "description": "Validity Method (pack p.8)"
+   },
+   "durationDays": {
+    "type": "integer",
+    "description": "Duration in days for durationFromPurchase / durationFromActivation (the pack's example: 365)",
+    "nullable": true
+   },
+   "seasonName": {
+    "type": "string",
+    "description": "Season name for seasonBased validity, e.g. the 2026-2027 season",
+    "nullable": true
+   },
+   "activationMethod": {
+    "type": "string",
+    "enum": [
+     "immediateOnPurchase",
+     "fixedStartDate",
+     "firstVisit",
+     "manualActivation",
+     "customerActivation",
+     "membershipCardCollection",
+     "identityVerification",
+     "configuredTrigger"
+    ],
+    "description": "Activation Method (pack pp.8-9)"
+   },
+   "activationDeadlineDays": {
+    "type": "integer",
+    "description": "Activation Deadline: days after purchase by which a membership must be activated. Required when activation is deferred (firstVisit, manualActivation, customerActivation, membershipCardCollection, identityVerification, configuredTrigger); an unactivated membership expires at the deadline so it never stays open indefinitely (MoM 25 Aug fallback expiry for first-use activation). Default 90, the pack's example (decided 29 September, readiness close-out)",
+    "nullable": true
+   },
+   "expiryRule": {
+    "type": "string",
+    "enum": [
+     "exactExpiryDate",
+     "endOfDay",
+     "endOfSeason",
+     "duration"
+    ],
+    "description": "Expiry (pack p.9)"
+   },
+   "gracePeriodDays": {
+    "type": "integer",
+    "description": "Grace Period: days after expiry during which renewal continues the membership without a gap. Default 0 (decided 29 September, readiness close-out)"
+   },
+   "backdatingAllowed": {
+    "type": "boolean",
+    "description": "Backdating: whether authorised staff may backdate activation. Default false (decided 29 September, readiness close-out)"
+   },
+   "backdatingApprovalRequired": {
+    "type": "boolean",
+    "description": "Backdating needs a second user's approval. Default true (decided 29 September, readiness close-out)"
+   }
+  }
+ },
+ "WorkstationContext": {
+  "type": "object",
+  "required": [
+   "id",
+   "code",
+   "venueId",
+   "regionId"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "regionId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "accessPointId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "Inherited from the workstation, never selected by the operator."
+   },
+   "devices": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "kind",
+      "driver"
+     ],
+     "properties": {
+      "kind": {
+       "type": "string",
+       "enum": [
+        "receiptPrinter",
+        "ticketPrinter",
+        "cashDrawer",
+        "barcodeScanner",
+        "rfidReader",
+        "paymentTerminal",
+        "customerDisplay"
+       ]
+      },
+      "driver": {
+       "type": "string"
+      },
+      "identifier": {
+       "type": "string"
+      }
+     }
+    }
+   },
+   "currency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$"
+   },
+   "currencyScale": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 4
+   },
+   "timezone": {
+    "type": "string"
+   },
+   "cellName": {
+    "type": "string",
+    "description": "The cell serving this workstation's region. One cell per tenant per region (ADR-0014). A client uses this only for diagnostics and telemetry tagging — never for routing, which the Control Plane resolves.\n"
+   },
+   "deploymentProfile": {
+    "type": "string",
+    "enum": [
+     "terminalLocal",
+     "venueEdge",
+     "thin"
+    ],
+    "description": "Whether this surface reads catalogue locally (ADR-0013). Determines which flows the client enables offline.\n"
    }
   }
  }

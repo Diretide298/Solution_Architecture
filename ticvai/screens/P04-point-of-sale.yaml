@@ -388,13 +388,13 @@ screens:
       trigger: Returns, Refunds & Exchanges
       provenance: 'derived — POS-011 declares entryState.params invoiceId, orderId, outletId and POS-001
         holds none of them. The edge carries nothing: orderId, outletId only pre-select (deep link or
-        optional); POS-011 opens on listDenominations, and invoiceId has no source on POS-011 yet (a gap
+        optional); POS-011 opens on lookupRetailSale, and invoiceId has no source on POS-011 yet (a gap
         in POS-011, not in this edge)'
     - to: POS-012
       trigger: Omnichannel Order & Fulfilment Center
-      provenance: 'derived — POS-012 declares entryState.params orderId, outletId and POS-001 holds none
-        of them. The edge carries nothing: orderId, outletId only pre-select (deep link or optional),
-        and POS-012 opens on its own'
+      provenance: 'derived — POS-012 declares entryState.params dropId, orderId, outletId and POS-001
+        holds none of them. The edge carries nothing: orderId, outletId, dropId only pre-select (deep
+        link or optional), and POS-012 opens on its own'
     - to: POS-014
       trigger: Sales Exceptions, Controls & Operational Actions
       carries:
@@ -427,8 +427,8 @@ screens:
         shiftId, so an edge into it carries them
     - to: POS-019
       trigger: Shift Templates & Policies
-      provenance: derived — POS-019 declares entryState.params venueId and POS-001 holds venueId, so an
-        edge into it carries them
+      provenance: 'derived — POS-019 declares entryState.params  and POS-001 holds none of them. The edge
+        carries nothing: POS-019 needs nothing to open'
     - to: POS-020
       trigger: Shift Exceptions & Alerts
       carries:
@@ -903,8 +903,8 @@ screens:
       provenance: 'wiring fix, 2 October 2026 (CHG-WIR-009): flow F32 step 3→4'
     - to: POS-007
       trigger: Close Shift
-      provenance: derived — POS-007 declares entryState.params saleId and POS-002 holds saleId, so an
-        edge into it carries them
+      provenance: 'derived — POS-007 declares entryState.params  and POS-002 holds none of them. The edge
+        carries nothing: POS-007 needs nothing to open'
     - to: POS-010
       trigger: Add to Existing Ticket
       carries:
@@ -933,15 +933,42 @@ screens:
       - cartId
       provenance: 'decided 1 October 2026 (POSV2-2): the cart''s Reserve holds the sale without payment
         as a reservation (createReservation on POS-031); a reservation issues no ticket'
+    - to: POS-018
+      trigger: A guest wants cash back and the drawer is heavy
+      provenance: 'wiring fix, 2 October 2026 (CHG-WIR-009): flow F32 step 3→4'
     - to: POS-011
       trigger: Three days later the guest returns one item
       provenance: flow F34 step 5→6
       carries:
       - orderId
       - outletId
-    - to: POS-018
-      trigger: A guest wants cash back and the drawer is heavy
-      provenance: 'wiring fix, 2 October 2026 (CHG-WIR-009): flow F32 step 3→4'
+    - to: BO-045
+      trigger: The new price is wrong on eleven items
+      provenance: flow F31 step 6→7
+      operation: getLatestBundle
+      crossesDevice: true
+      back: false
+    - to: BO-084
+      trigger: The manager sees it in their inbox
+      provenance: flow F14 step 2→3
+      operation: evaluateApprovalRequirement
+      crossesDevice: true
+      back: false
+      carries:
+      - approvalRequestId
+    - to: BO-133
+      trigger: The venue's offline exposure crosses a ceiling
+      provenance: flow F33 step 3→4
+      crossesDevice: true
+      back: false
+    - to: GST-011
+      trigger: Checks the card's balance in the app's wallet
+      provenance: flow F18 step 1→2
+      crossesDevice: true
+      back: false
+      carries:
+      - cardCode
+      - walletId
     uses:
     - posPrimaryRail
     - posSaleToPayment
@@ -2457,6 +2484,8 @@ screens:
       precondition: cart.lineCount > 0
       guard: payment.take
       provenance: board TICVAI POS Terminal · drawerConfirm (4118) then goCheckout (5157)
+      carries:
+      - paymentId
     - to: POS-003
       trigger: Sell — Timed Entry
       provenance: 'derived — POS-003 declares entryState.params inventoryHoldId, productId and POS-004
@@ -2823,14 +2852,24 @@ screens:
       provenance: flow F108 step 4→5
       crossesDevice: true
       back: false
+    - to: POS-026
+      trigger: Receipt
+      provenance: 'wiring fix, 2 October 2026 (CHG-WIR-019): the payment''s success branch'
+      carries:
+      - entitlementId
+      - orderId
+      - saleId
     - to: POS-010
       trigger: The guest asks to add a locker to the ticket they just bought
       provenance: flow F58 step 6→7
       carries:
       - orderId
-    - to: POS-026
-      trigger: Receipt
-      provenance: 'wiring fix, 2 October 2026 (CHG-WIR-019): the payment''s success branch'
+    - to: GST-062
+      trigger: Guest tracks it in the app
+      provenance: flow F17 step 3→4
+      operation: createShopAndDrop
+      crossesDevice: true
+      back: false
     uses:
     - posPrimaryRail
   notes: 'Design: Park_POS_dc.html, "Cash Payment". Add Tip appears in the design and had no operation
@@ -4701,9 +4740,14 @@ screens:
         edge into it carries them
     - to: POS-007
       trigger: Close Shift
-      provenance: 'derived — POS-007 declares entryState.params saleId and POS-009 holds none of them.
-        The edge carries nothing: saleId only pre-selects (deep link or optional), and POS-007 opens on
-        its own'
+      provenance: 'derived — POS-007 declares entryState.params  and POS-009 holds none of them. The edge
+        carries nothing: POS-007 needs nothing to open'
+    - to: BO-043
+      trigger: The daily cash reconciliation lists every shift of the day and resolves the ones still
+        under review, one by…
+      provenance: flow F74 step 3→4
+      crossesDevice: true
+      back: false
   notes: 'Close (POS-007) counts each foreign currency separately (`foreignHoldings`). **A variance collapsed
     into a base-currency total cannot be attributed to the currency that caused it.** **createCashMovement
     removed 18 August** — attached by module resemblance, not by what this screen does. A screen that
@@ -5934,6 +5978,9 @@ screens:
       trigger: Back to sale
       provenance: board TICVAI POS Terminal · navigation rail; **selling continues offline** (ADR-0013)
         and the queue drains on reconnect — `toggleNet` (4750).
+      carries:
+      - orderId
+      - promotionId
     - to: POS-020
       trigger: Open a queued transaction that needs attention
       control: dataTable#syncQueue
@@ -5941,9 +5988,18 @@ screens:
       guard: inventory.conflict.resolve
       escalatable: true
       provenance: board TICVAI POS Terminal · openConflict (4770) + resolveConflict (4776)
+      carries:
+      - shiftId
     - to: POS-007
       trigger: Close Shift
       provenance: flow F87 step 3→4
+      operation: createOrder
+    - to: BO-130
+      trigger: Four transactions are rejected — a product retired while the till was offline
+      provenance: flow F33 step 6→7
+      operation: syncOrders
+      crossesDevice: true
+      back: false
     uses:
     - posPrimaryRail
   notes: '**Added 20 August from the client design board.** The operations existed and no screen called
@@ -6858,6 +6914,8 @@ screens:
     - to: POS-020
       trigger: A no-sale is recorded
       provenance: 'wiring fix, 2 October 2026 (CHG-WIR-009): flow F32 step 4→5'
+      carries:
+      - shiftId
   notes: '**Added 20 August from the client design board.** The operations existed and no screen called
     them. **Owns POS board frame(s) POS-3B** (client pack, 24 August). **Assigned by board purpose rather
     than by operation overlap** — three attempts at deriving that mapping produced plausible nonsense,
@@ -7051,7 +7109,7 @@ screens:
       provenance: derived — POS-001 declares entryState.params shiftId and POS-019 holds shiftId, so an
         edge into it carries them
     - to: POS-015
-      trigger: Cash limits and the drawer ceiling are set
+      trigger: Cash limits and the drawer limit are set, and the till watches the drawer against it
       provenance: flow F73 step 2→3
       carries:
       - shiftId
@@ -7579,6 +7637,7 @@ screens:
     - to: POS-022
       trigger: The order goes to the pass before the guest pays
       provenance: flow F108 step 2→3
+      operation: evaluatePromotions
     uses:
     - posPrimaryRail
     - posSaleToPayment

@@ -37,25 +37,6 @@
   "requestBody": null,
   "responds": "ApprovalRequest"
  },
- "evaluateApprovalRequirement": {
-  "method": "POST",
-  "path": "/approval-requests/evaluate",
-  "contract": "approvals",
-  "summary": "Does this need approval, and from whom",
-  "permission": "APPROVAL_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "ApprovalRequirement"
- },
  "getApprovalAnalytics": {
   "method": "GET",
   "path": "/approval-analytics",

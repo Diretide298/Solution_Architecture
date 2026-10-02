@@ -48,13 +48,6 @@
        "provenance": "contract marketing-crm.yaml GET /cases"
       },
       {
-       "kind": "textField",
-       "label": "Assigned to principal id",
-       "operation": "listCases",
-       "notes": "Sends `?assignedToPrincipalId=` to `listCases`.",
-       "provenance": "contract marketing-crm.yaml GET /cases"
-      },
-      {
        "kind": "toggle",
        "label": "Breached sla",
        "operation": "listCases",
@@ -165,21 +158,9 @@
       },
       {
        "kind": "secondaryButton",
-       "label": "Escalate case",
-       "operation": "escalateCase",
-       "provenance": "contract marketing-crm.yaml POST /cases/{caseId}/escalate"
-      },
-      {
-       "kind": "secondaryButton",
        "label": "Reopen case",
        "operation": "reopenCase",
        "provenance": "contract marketing-crm.yaml POST /cases/{caseId}/reopen"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Save case",
-       "operation": "updateCase",
-       "provenance": "contract marketing-crm.yaml PATCH /cases/{caseId}"
       }
      ]
     }
@@ -209,15 +190,6 @@
     ]
    },
    {
-    "operationId": "escalateCase",
-    "contract": "marketing-crm",
-    "purpose": "Escalate a case",
-    "trigger": "onAction",
-    "invalidates": [
-     "listCases"
-    ]
-   },
-   {
     "operationId": "getCase",
     "contract": "marketing-crm",
     "purpose": "Read a case with its thread",
@@ -233,15 +205,6 @@
     "operationId": "reopenCase",
     "contract": "marketing-crm",
     "purpose": "Reopen a resolved case",
-    "trigger": "onAction",
-    "invalidates": [
-     "listCases"
-    ]
-   },
-   {
-    "operationId": "updateCase",
-    "contract": "marketing-crm",
-    "purpose": "Assign, reprioritise or resolve a case",
     "trigger": "onAction",
     "invalidates": [
      "listCases"
@@ -323,25 +286,6 @@
     "provenance": "contract marketing-crm.yaml POST /cases/{caseId}/messages"
    },
    {
-    "id": "formEscalateCase",
-    "component": "modal",
-    "trigger": "Escalate case",
-    "body": "**Collects what `escalateCase` sends before it is called.** Required: `reason`. Optional: `assignToPrincipalId`, `newPriority`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Escalate case",
-     "operation": "escalateCase"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "reason",
-      "assignToPrincipalId",
-      "newPriority"
-     ]
-    },
-    "provenance": "contract marketing-crm.yaml POST /cases/{caseId}/escalate"
-   },
-   {
     "id": "formReopenCase",
     "component": "modal",
     "trigger": "Reopen case",
@@ -357,27 +301,20 @@
      ]
     },
     "provenance": "contract marketing-crm.yaml POST /cases/{caseId}/reopen"
+   }
+  ],
+  "gaps": [
+   {
+    "operation": "escalateCase",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-005): A partner raises, reads and replies; assignment, status and escalation are venue-side (design-notes correction customer-marketing PTR-021).",
+    "source": "screens/P10-partner-reseller-portal.yaml#PTR-021"
    },
    {
-    "id": "formUpdateCase",
-    "component": "modal",
-    "trigger": "Save case",
-    "body": "**Collects what `updateCase` sends before it is called.** Nothing in the body is required. Optional: `status`, `priority`, `assignedToPrincipalId`, `categoryId`, `resolutionNote`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Save case",
-     "operation": "updateCase"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "status",
-      "priority",
-      "assignedToPrincipalId",
-      "categoryId",
-      "resolutionNote"
-     ]
-    },
-    "provenance": "contract marketing-crm.yaml PATCH /cases/{caseId}"
+    "operation": "updateCase",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-005): A partner raises, reads and replies; assignment, status and escalation are venue-side (design-notes correction customer-marketing PTR-021).",
+    "source": "screens/P10-partner-reseller-portal.yaml#PTR-021"
    }
   ],
   "_platform": {

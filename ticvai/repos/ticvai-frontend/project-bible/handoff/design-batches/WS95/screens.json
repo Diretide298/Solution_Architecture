@@ -655,13 +655,18 @@
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
-    "source": "pack Rental_Management.pdf, page 96"
+    "source": "pack Rental_Management.pdf, page 96",
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built."
    },
    {
     "operation": null,
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
-    "source": "pack Rental_Management.pdf, page 96"
+    "source": "pack Rental_Management.pdf, page 96",
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built."
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-011): No read returns a rental booking's inspections.",
+    "source": "contracts/satellite/rental.yaml#recordRentalInspection"
    }
   ],
   "layout": {
@@ -1187,27 +1192,34 @@
    }
   ],
   "layout": {
-   "template": "split",
    "regions": [
     {
-     "name": "contentBody",
      "components": [
       {
-       "kind": "primaryButton",
        "derived": true,
        "impliedBy": "returnRental",
+       "kind": "primaryButton",
        "notes": "The act the screen exists for."
       },
       {
+       "derived": true,
+       "impliedBy": "returnRental",
        "kind": "secondaryButton",
        "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "returnRental"
+       "notes": "**A screen that can submit must be leaveable without submitting.**"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Deposit history",
+       "bindsTo": "PaymentsDepositActivity",
+       "operation": "listDepositActivity",
+       "provenance": "contract payments.yaml GET /deposits/{depositId}/activity; wiring fix, 2 October 2026"
       }
-     ]
+     ],
+     "name": "contentBody"
     }
-   ]
+   ],
+   "template": "split"
   },
   "states": {
    "loading": "The deposit release capture list.",
@@ -1218,17 +1230,24 @@
   },
   "apis": [
    {
-    "operationId": "returnRental",
     "contract": "rental",
-    "purpose": "Capture or release the deposit",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026",
     "invalidates": [
      "getRentalBooking",
      "listRentalBookings",
      "getRentalAvailability",
      "listOverdueRentals"
-    ]
+    ],
+    "operationId": "returnRental",
+    "provenance": "board reading, 19 September 2026",
+    "purpose": "Capture or release the deposit",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "listDepositActivity",
+    "contract": "payments",
+    "purpose": "The deposit's movement history",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-008)"
    }
   ],
   "wireframe": {
@@ -1240,7 +1259,11 @@
   "entryState": {
    "params": [
     {
-     "name": "bookingId",
+     "from": "navigation",
+     "name": "bookingId"
+    },
+    {
+     "name": "depositId",
      "from": "navigation"
     }
    ]
@@ -1309,13 +1332,24 @@
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
-    "source": "pack Rental_Management.pdf, page 101"
+    "source": "pack Rental_Management.pdf, page 101",
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built."
    },
    {
     "operation": null,
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
-    "source": "pack Rental_Management.pdf, page 101"
+    "source": "pack Rental_Management.pdf, page 101",
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built."
+   },
+   {
+    "operation": "setAssetStatus",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-008): setAssetStatus needs ASSET_MANAGE (a configure-tier grant on the staff app), offers six maintenance statuses and takes one asset per screen; the unit's next state belongs to the return (DI-500; design-notes correction fnb-retail EMP-100).",
+    "source": "contracts/satellite/maintenance.yaml#setAssetStatus | DI-500"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-011): returnRental carries no per-unit disposition.",
+    "source": "contracts/satellite/rental.yaml#returnRental | DI-500"
    }
   ],
   "layout": {
@@ -1342,36 +1376,25 @@
    ]
   },
   "states": {
-   "loading": "The return completion equipment list.",
-   "error": "Could not load. Names which read failed and leaves the return completion equipment untouched.",
-   "emptyFirstRun": "No return completion equipment yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No return completion equipment yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "emptyNoResults": "The filter narrowed it and the return completion equipment are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "error": "Could not load. Names which read failed and leaves the return completion equipment untouched.",
+   "loading": "The return completion equipment list."
   },
   "apis": [
    {
-    "operationId": "returnRental",
     "contract": "rental",
-    "purpose": "Complete, and dispose of the equipment",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026",
     "invalidates": [
      "getRentalBooking",
      "listRentalBookings",
      "getRentalAvailability",
      "listOverdueRentals"
-    ]
-   },
-   {
-    "operationId": "setAssetStatus",
-    "contract": "maintenance",
-    "purpose": "Back into the pool, or not",
-    "trigger": "onAction",
+    ],
+    "operationId": "returnRental",
     "provenance": "board reading, 19 September 2026",
-    "invalidates": [
-     "getAsset",
-     "listAssets"
-    ]
+    "purpose": "Complete, and dispose of the equipment",
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
@@ -1383,12 +1406,8 @@
   "entryState": {
    "params": [
     {
-     "name": "assetId",
-     "from": "navigation"
-    },
-    {
-     "name": "bookingId",
-     "from": "navigation"
+     "from": "navigation",
+     "name": "bookingId"
     }
    ]
   },

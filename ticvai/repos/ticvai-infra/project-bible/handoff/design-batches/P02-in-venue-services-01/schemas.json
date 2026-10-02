@@ -593,79 +593,6 @@
    }
   }
  },
- "CreatePaymentRequest": {
-  "type": "object",
-  "required": [
-   "id",
-   "orderId",
-   "tender",
-   "amount",
-   "recordedAt"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid",
-    "description": "Client-generated UUIDv7 of the payment, and its idempotency key — it must equal the `Idempotency-Key` header."
-   },
-   "orderId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "tender": {
-    "$ref": "#/components/schemas/TenderKind"
-   },
-   "amount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "tenderCurrency": {
-    "type": "string",
-    "pattern": "^[A-Z]{3}$",
-    "nullable": true,
-    "description": "The currency the guest handed over, where it is not the venue's — becomes `Payment.tenderCurrency`. Omit for a payment in the venue's own currency."
-   },
-   "tenderAmount": {
-    "allOf": [
-     {
-      "$ref": "../shared/common.yaml#/components/schemas/Money"
-     }
-    ],
-    "description": "**What the guest handed over**, in `tenderCurrency` — becomes `Payment.tenderAmount`, one name for one concept (renamed from `tenderedAmount` on 26 September). For cash, change is the difference.\n"
-   },
-   "walletAuthorisationId": {
-    "type": "string",
-    "nullable": true,
-    "description": "Cross-cell wallet hold, where the guest's home cell is elsewhere."
-   },
-   "walletHoldId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "For a `wallet` tender, the hold `wallet.holdWalletFunds` placed (SD-027). Capture debits it; the order service writes no wallet table."
-   },
-   "returnUrl": {
-    "type": "string",
-    "format": "uri",
-    "nullable": true,
-    "description": "Where the provider returns the guest after a 3-D Secure challenge or hosted page (SD-034). Required for a card payment from the guest web or app."
-   },
-   "terminalId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "The card terminal to instruct, for a card payment at a till (ECR flow, SD-034)."
-   },
-   "deviceId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "recordedAt": {
-    "type": "string",
-    "format": "date-time"
-   }
-  }
- },
  "CreateQueueRequest": {
   "x-ticvai-persistence": "none — request only",
   "type": "object",
@@ -965,6 +892,14 @@
     "type": "string",
     "format": "uuid",
     "nullable": true
+   },
+   "admissionContext": {
+    "allOf": [
+     {
+      "$ref": "../spine/tenancy.yaml#/components/schemas/OutletAdmissionContext"
+     }
+    ],
+    "description": "**Inside the venue or standalone** (decided 2 October 2026, Chinmay: DEC-070, workbook Q70; CHG-CLN-008): the outlet's `tenancy.Outlet.admissionContext`, so the guest sees before ordering whether an admission ticket for today is needed (`insideVenue`, refused `403 entry-ticket-required` without one) or not (`standalone`, takeaway and delivery). The canonical name; \"siting\" is its deprecated alias."
    }
   }
  },
@@ -1735,6 +1670,46 @@
    "refundedAmount": {
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
+   "chargeCurrency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**The currency the guest selected and is charged in** (CHG-FIN-001, 2 October 2026). Null or equal to `currency` for a sale in the base currency. Everything else on the order, and every ledger posting, stays in the base currency `currency`."
+   },
+   "chargeFxRate": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/ExchangeRateDecimal"
+     }
+    ],
+    "nullable": true,
+    "readOnly": true,
+    "description": "Units of `chargeCurrency` per one unit of the base currency, from the region's `tender` rate in force at checkout (`finance.FxRate`), stored on the order so the payment, the receipt, the tax invoice and any refund use the same rate (CHG-FIN-001)."
+   },
+   "chargeFxRateId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The `finance.FxRate` row the rate was taken from, for audit."
+   },
+   "chargeTotal": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "readOnly": true,
+    "description": "`grossAmount` converted at `chargeFxRate` and rounded to the charge currency's scale: what the guest pays and what the payment request to the provider asks for (CHG-FIN-001)."
+   },
+   "chargeRateLockedUntil": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The quote holds until then (the cart lease). After it, the next payment attempt re-quotes at the rate then in force and the guest confirms the new amount (CHG-FIN-001)."
+   },
    "droppedPromotions": {
     "type": "array",
     "readOnly": true,
@@ -2202,7 +2177,7 @@
     "type": "string",
     "pattern": "^[A-Z]{3}$",
     "nullable": true,
-    "description": "4.6.11 is deliberately asymmetric: **accept foreign currency, refund in local.** A till giving change in five currencies needs five floats and five counts, and the variance becomes unattributable.\n"
+    "description": "4.6.11 is deliberately asymmetric: **accept foreign currency, refund in local.** A till giving change in five currencies needs five floats and five counts, and the variance becomes unattributable.\n**Cash at a till only** (CHG-FIN-001, 2 October 2026). A card or wallet payment the guest made in a currency they selected is refunded in that currency (`Refund.tenderCurrency`).\n"
    },
    "amount": {
     "$ref": "../shared/common.yaml#/components/schemas/Money"
@@ -3010,9 +2985,32 @@
    },
    "notes": {
     "type": "string",
-    "description": "Allergies",
-    "occasion": null,
-    "accessibility.": null
+    "description": "Allergies, accessibility needs and other requests, as the guest wrote them."
+   },
+   "seatingPreference": {
+    "type": "string",
+    "maxLength": 64,
+    "nullable": true,
+    "description": "**The seating area the guest asked for**, e.g. indoor, terrace, majlis (Chinmay, 2 October, workbook Q204; DI-791; CHG-CSA-018). The outlet's own area names, as the waitlist's `RestaurantWaitlist.seatingPreference` takes them. A preference, not a table: the host seats the party on the night."
+   },
+   "occasion": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "birthday",
+     "anniversary",
+     "business",
+     "celebration",
+     "other"
+    ],
+    "description": "The occasion the guest named (workbook Q204, DI-337; CHG-CSA-018). Shown to the host and the server; never a price."
+   },
+   "takenByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The staff member who took the booking (`createTableReservationForGuest`); null for a guest's own booking (CHG-CSA-045)."
    },
    "actualPartySize": {
     "type": "integer",
@@ -3100,55 +3098,6 @@
    "cancelled",
    "noShow"
   ]
- },
- "TableSession": {
-  "type": "object",
-  "x-ticvai-persistence": "fnb.table_session",
-  "required": [
-   "id",
-   "outletId",
-   "tableId",
-   "tableLabel",
-   "visitId",
-   "expiresAt"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "outletId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "outletName": {
-    "type": "string"
-   },
-   "tableId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "tableLabel": {
-    "type": "string"
-   },
-   "visitId": {
-    "type": "string",
-    "format": "uuid",
-    "description": "The table visit this session orders onto. An existing open visit is joined rather than duplicated — a guest seated by a server and then ordering by app is one party, one bill.\n"
-   },
-   "joinedExistingVisit": {
-    "type": "boolean"
-   },
-   "subjectId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "expiresAt": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Sessions expire so a guest who leaves cannot order to a table now occupied by someone else.\n"
-   }
-  }
  },
  "TenantAppStatus": {
   "x-ticvai-persistence": "none — computed",
@@ -3329,21 +3278,6 @@
     }
    }
   }
- },
- "TenderKind": {
-  "type": "string",
-  "description": "`wallet` is a **digital wallet** (Apple Pay, Google Pay and the like, taken through the gateway), the value the guest channels accept beside `card` (decided 28 September, audit R080 (a)). **The stored-value TICVAI wallet is a separate tender**: it is spent through `authoriseStoredValue` and `captureStoredValue` (`StoredValueKind` `wallet`), never as this value, so the client can see which of the two the decision meant.\n",
-  "enum": [
-   "cash",
-   "card",
-   "wallet",
-   "voucher",
-   "bankTransfer",
-   "hotelCharge",
-   "installment",
-   "giftCard",
-   "complimentary"
-  ]
  },
  "UpdateParkingEntitlementRequest": {
   "type": "object",
@@ -4156,84 +4090,5 @@
     "nullable": true
    }
   }
- },
- "WaitlistEntry": {
-  "type": "object",
-  "x-ticvai-persistence": "catalogue.waitlist_entry",
-  "required": [
-   "performanceId",
-   "partySize"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid",
-    "readOnly": true
-   },
-   "performanceId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "variantId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "subjectId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "contactPoint": {
-    "type": "string",
-    "description": "**Where the offer goes.** An entry with no way to reach the guest is an entry that can never be honoured, so this is required even for an anonymous guest.\n"
-   },
-   "partySize": {
-    "type": "integer",
-    "minimum": 1
-   },
-   "status": {
-    "allOf": [
-     {
-      "$ref": "#/components/schemas/WaitlistStatus"
-     }
-    ],
-    "readOnly": true,
-    "description": "Set by the server. `joinWaitlist` does not take it; a new entry is `waiting`."
-   },
-   "position": {
-    "type": "integer",
-    "readOnly": true,
-    "description": "First in, first offered. Shown to the guest, because not knowing is worse than waiting."
-   },
-   "offeredAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true,
-    "readOnly": true
-   },
-   "offerExpiresAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true,
-    "readOnly": true,
-    "description": "**The offer moves on when this passes.** Notifying everyone at once produces a race the fastest guest wins; holding indefinitely for someone asleep leaves the seat unsold.\n"
-   },
-   "joinedAt": {
-    "type": "string",
-    "format": "date-time",
-    "readOnly": true
-   }
-  }
- },
- "WaitlistStatus": {
-  "type": "string",
-  "enum": [
-   "waiting",
-   "offered",
-   "converted",
-   "expired",
-   "left"
-  ]
  }
 }

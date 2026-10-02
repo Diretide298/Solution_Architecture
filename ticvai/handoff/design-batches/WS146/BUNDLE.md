@@ -1,6 +1,6 @@
 # WS146 — Marketing CRM Configuration Reference v1.0 board 12
 
-**10 screens · 11 operations · 16 schemas · 3 permissions**
+**10 screens · 12 operations · 16 schemas · 3 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -61,6 +61,42 @@ convincingly. It is never a caption.
   and its error; and, element by element, what is shown and in what format, what each action
   produces and where the user goes next. Draw exactly that.
 
+## The processes these screens belong to
+
+Written by the owner of each process (`handoff/design-notes/`). Read before any screen: it says how the process runs end to end and which words the screens must use.
+
+### Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers)
+
+Customer & marketing is how a venue knows its guests and talks to them. There is ONE guest profile per person across ticketing, F&B and retail, so a guest who books online and later dines is the same profile (DI-339). A profile needs at least an email or a mobile, never neither (DI-372). Profiles are created by registration, by guest checkout, or by staff at a till or desk. Repeat guest checkouts with the same verified email or phone attach to the same profile automatically (DI-941, R120 default). Two records that might be the same person are NEVER merged automatically: the guest is asked to confirm, and an admin review queue runs alongside (DI-377). Each candidate shows why it matched; the record that loses is superseded, not deleted; consent takes the narrower of the two positions (DI-808). Around the profile sit three things that must never be confused. CONSENT is what the law allows: per purpose and per channel, append-only, with the notice version and the source (recordConsent). It is Given, Withdrawn or Not asked. A SUBSCRIPTION is what the guest asked to receive, e.g. a newsletter list (MarketingSubscription). A PREFERENCE is what they like: table, dietary, accessibility (updateGuestPreferences). An anonymous visitor's cookie decision is recorded against a device key (recordDeviceConsent) and attaches to the guest when they sign in (claimDeviceConsent). Marketing consent at GUEST CHECKOUT is an open client question, and the design follows its default: an unticked opt-in beside the terms, one per channel and purpose. It is recorded with source "checkout" against the order and the verified contact, and nothing is sent without it. Whether that is sufficient consent under PDPL is the client DPO's call (M18-15 (audit R-M18-15), DI-954, DI-940). Marketing reads profiles through SEGMENTS (rules, evaluated when used) and static LISTS (imported). It reaches guests by CAMPAIGNS (one send to an audience) and JOURNEYS (automations started by an event, with waits and branches). Journeys may offer only pre-configured offers, never a free-typed discount (MoM 2026-08-20 4.6). Everything goes through ONE communications module that every other module uses (MoM 2026-08-31 4.6). Consent and suppression are applied at send time, and the number excluded, with the reasons, is reported before anything goes out (launchCampaign). Transactional messages (tickets, receipts, queue calls, case replies) do not need marketing consent and must never carry marketing. LOYALTY pays for spend: points, tiers, rewards and expiry. GAMIFICATION pays for behaviour: challenges, badges, streaks, referrals and leaderboards (createChallenge). A guest reads their own loyalty position (getLoyaltyPosition). A till, the back office or support reads a named guest's (getGuestLoyalty, or identifyGuest at a till). SERVICE: one Case object covers lost property, complaints, questions, accessibility and refund requests (CaseKind). A guest raises one with raiseMyCase, which needs the connection …
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Guest | The person the venue serves, signed in or not. In body copy on every surface. | Customer, User, Subject, Contact, Patron | contracts/satellite/marketing-crm.yaml#/components/schemas/GuestProfile |
+| Guest profile | The CRM record of one person (details, consent, preferences, history). Distinct from the Account, which is how a guest signs in. | Customer record, Contact, Subject | contracts/satellite/marketing-crm.yaml#getGuestProfile |
+| Consent - Given / Withdrawn / Not asked | What the law allows, per purpose (marketing, personalisation, profiling, third-party sharing, AI processing, transactional) and per channel. "Not asked" is not "Withdrawn" and must look different. | Opted in/out as a status, Accepted, Declined, Revoked, Unsubscribed (that is a subscription) | contracts/satellite/marketing-crm.yaml#/components/schemas/ConsentDecision |
+| Subscription | A list the guest asked to receive (a newsletter, event news), per channel. Unsubscribing from a list is not withdrawing consent. | Consent, Opt-in | contracts/satellite/marketing-crm.yaml#/components/schemas/MarketingSubscription |
+| Preferences | What the guest likes or needs (seating, drinks, dietary, accessibility, contact channel). Never grants permission. | Consents, Settings | contracts/satellite/marketing-crm.yaml#updateGuestPreferences |
+| Send me offers and news | The marketing opt-in label beside the terms at checkout, unticked, one per channel and purpose. | I agree to marketing, Pre-ticked boxes, Keep me updated ticked by default | DI-954 |
+| Points / Tier / Points to next tier / Expiring points | The loyalty position. Points are a liability earned per programme; tiers are ranked (Bronze, Silver, Gold, Platinum in the meetings). | Credits, Coins, Balance alone (wallet money is "credit"), Level | DI-382 |
+| Pending points | Points earned on a purchase still inside its refund window; shown apart from spendable points. | Available points for pending ones | contracts/satellite/marketing-crm.yaml#getLoyaltyPosition |
+| Reward | What points can be turned into (rewards catalogue). | Prize (games redemption uses prize), Voucher unless it is one | contracts/satellite/marketing-crm.yaml#listRewards |
+| Challenge / Badge / Streak / Referral | Gamification - rewards for behaviour, not spend. Status badges such as Explorer, Adventurer, Legend. | Mission and Quest used interchangeably on one screen, Loyalty tier for a badge | DI-392 |
+| Case | One service record - lost property, complaint, question, accessibility, refund request or other - with a number (venue prefix plus sequence), a status and an SLA. | Ticket (a ticket is an admission product), Issue, Incident (that is maintenance and safety) | contracts/satellite/marketing-crm.yaml#/components/schemas/CaseKind |
+| Reply to guest / Internal note | The two kinds of case message. The agent always chooses one explicitly; there is no default. | Comment, Message (ambiguous) | F05 step 2 |
+| Conversation | A live chat session (web chat, in-app, WhatsApp, SMS, email, kiosk, voice). With the assistant, then queued, then with an agent. It is not a case. | Ticket, Case (until one is raised from it) | contracts/satellite/marketing-crm.yaml#/components/schemas/ConversationState |
+| Segment / List / Audience | A segment is rules evaluated when used. A list is static, imported or hand-picked. The audience is what a campaign or journey targets. | Group, Cohort, Target list for a segment | DI-381 |
+| Campaign / Journey | A campaign is one send (one-off, scheduled, triggered or recurring) to an audience. A journey is an automation started by an event, with steps, waits and branches. | Flow (booking flows use it), Automation for a one-off send, Blast | R146 |
+| Offer | A pre-configured, system-validated discount or benefit that a campaign or journey references. It is never typed into the builder. | Discount field, Coupon (unless the offer is a coupon code) | MoM 2026-08-20 4.6 |
+| Reachable | How many guests in an audience can actually be sent to on a channel after consent and suppression. Always shown beside the matching count. | Audience size alone | contracts/satellite/marketing-crm.yaml#previewSegment |
+| Possible duplicate / Merge | Two profiles that may be one person. Never called "Duplicate" as a verdict. Merging needs confirmation and stays reversible for 30 days. | Duplicate (as a status), Combine, Auto-merge | DI-808 |
+| Data request | A guest's privacy request - a copy of my data, a correction, erasure, a restriction - with a legal clock. Statuses submitted, in progress, completed. | DSAR on guest screens, Subject data, Ticket | DI-379 |
+| Waiver / Consent question | A waiver is a signed, versioned form. A consent question ("Are you able to swim?", "I accept the risk") is a single question asked per person or per booking and recorded as consent. | Contract, Disclaimer, Form for a waiver in guest copy | DI-1062 |
+| Lost item / Found item / Possible match | The two directions of lost property and the suggested pairing between them. | Lost case, Claim before it is claimed | contracts/satellite/marketing-crm.yaml#/components/schemas/LostItem |
+| Wishlist | Products and dates a guest saved to buy later, including F&B and retail to buy on site. | Favourites (used for transport routes), Saved for later on one surface and Wishlist on another | DI-202 |
+| Notification / Message | A notification is an item in the guest's in-app feed. A message is one send on a channel (email, SMS, WhatsApp, push, in-app). | Alert for marketing content, Inbox for the guest feed | contracts/satellite/marketing-crm.yaml#/components/schemas/GuestNotification |
+| Template | A reusable message body per channel and language with merge fields. Transactional and marketing templates are separate kinds. | Layout, Design | contracts/satellite/marketing-crm.yaml#createMessageTemplate |
+
+
 ## The screens
 
 Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs count fields; requirements are matrix rows; meeting inputs are the ones naming the screen (the module and platform ones are below); white label says whether the tenant's brand reaches it (guest) or it sets the brand (configures).
@@ -68,19 +104,19 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-844` | Waiver Command Center | B–D | 0 | 0 | 6 | 0 | 1 | 4 | — | notStarted (—) |
-| `BO-845` | Waiver Template Builder | B–D | 0 | 0 | 6 | 0 | 1 | 4 | — | notStarted (—) |
-| `BO-846` | Assignment Rules | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-847` | Version, Expiry & Renewal | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-848` | Signature Experience Setup | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-845` | Waiver Template Builder | B–D | 20 | 20 | 6 | 0 | 1 | 4 | — | notStarted (—) |
+| `BO-846` | Assignment Rules | B–D | 0 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-847` | Version, Expiry & Renewal | B–D | 0 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-848` | Signature Experience Setup | B–D | 17 | 20 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-849` | Guardian & Group Signing | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-850` | Pre-Arrival Completion | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-850` | Pre-Arrival Completion | B–D | 0 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-851` | Verification & Access Control | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-852` | Documents, Search & Retention | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-852` | Documents, Search & Retention | B–D | 0 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-853` | Legal Evidence & Audit | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 
-**BO-844, BO-845, BO-846, BO-847, BO-848, BO-849, BO-850, BO-851, BO-852, BO-853 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**BO-844, BO-845, BO-846, BO-847, BO-848, BO-849, BO-850, BO-851, BO-853 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ---
 
@@ -106,6 +142,12 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** Waiver readiness: required, completed, pending, expired and expiring waivers, blocked entries and guardian signatures, by venue, activity, product, channel and arrival date; upcoming activities most at risk, without exposing document content.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **BO-844 to BO-853 duplicate the CMS waiver screens CMS-041 to CMS-060 (same operations, e.g. listWaiver, listParticipantWaiverStatus, setSignatorySignatureGuardian).** Why: As with the other Digital Experience screens (DI-996), build once. Proposal - the CMS owns waiver configuration (templates, fields, signatories, rules, versions, publication) and the back office keeps operations (status, verification at the gate, pre-arrival chasing). *(source: DI-996; contracts/satellite/marketing-crm.yaml#listWaiver; Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers))*
+
 #### Inputs: what the user enters or picks
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
@@ -130,6 +172,10 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 **Shown**
 
 **Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+
+**Rules for what is shown** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
+
+- **At-risk activities**: Activity, start time, participants, unsigned count; blocked entries today. *(source: contracts/satellite/marketing-crm.yaml#listWaiver; DI-576)*
 
 **Data it reads**: `listWaiver` (onLoad, Waiver Operations Command Center)
 
@@ -157,6 +203,18 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed |
+
+#### Consistency with other screens
+
+- Match `CMS-051`: The same waiver operations command centre (listWaiver) exists in the CMS.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+atRisk: Deep Dive 14:00 - 12 participants - 3 unsigned (2 minors awaiting guardian)
+```
 
 #### Permissions
 
@@ -209,6 +267,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - [ ] Every transition is wired: `BO-100`, `BO-845`, `BO-846`, `BO-847`, `BO-848`, `BO-849`, `BO-850`, `BO-851`, `BO-852`, `BO-853`.
 - [ ] Every gated control is gated: `GUEST_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -222,7 +281,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Engagement & Support · wave 3 · needs the `marketing` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `GUEST_VIEW` (1 read); in the flows as venue manager |
+| Who uses it | venue staff holding `GUEST_MANAGE`, `GUEST_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
 | Offline | online only |
@@ -231,32 +290,86 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 
 **Known gaps.** **Waiver Template Builder declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** Waiver and declaration templates without development: liability release, general consent, parental consent, medical declaration, risk acknowledgement, activity agreement; sections, clauses, variables, conditional content, initials, signature blocks; EN and AR; legal owner and approval. Every legal change is a version.
+
+**Fixed on main** (the package already carries these; draw what it says): Declares only listWaiver (the operations command centre read). (CHG-WIR-005).
+
 #### Inputs: what the user enters or picks
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
 
 | Filter | Drawn as | Default | Allowed values, rules | Source |
 |---|---|---|---|---|
-| Brand | picker: choose a brand | — | — | `listWaiver` ?brandId |
-| Event | picker: choose an event | — | — | `listWaiver` ?eventId |
-| Product | picker: choose a product | — | — | `listWaiver` ?productId |
-| Form | picker: choose a form | — | — | `listWaiver` ?formId |
-| From | date and time picker | — | — | `listWaiver` ?from |
-| To | date and time picker | — | — | `listWaiver` ?to |
-| Status | select | — | Not assigned · Assigned · Sent · Opened · In progress · Completed · Verified · Rejected · Expired · Superseded | `listWaiver` ?status |
-| Participant type | segmented control | — | Adult · Minor | `listWaiver` ?participantType |
-| Booking channel | select | — | POS · Kiosk · Guest app · Guest web · Call centre · Partner · API · Back office · B2B · Ota | `listWaiver` ?bookingChannel |
-| Breakdown by | select | Venue | Venue · Event · Product · Activity · Group · Booking · Waiver type | `listWaiver` ?breakdownBy |
+| Waiver type | select | — | Liability waiver · Parent guardian consent · Participation consent · Medical declaration · Safety acknowledgement · Media consent · Rental agreement · Terms acceptance · Membership declaration · Custom form | `listWaiverTemplateMaster` ?waiverType |
+| Brand | picker: choose a brand | — | — | `listWaiverTemplateMaster` ?brandId |
+| Is master template | toggle | — | — | `listWaiverTemplateMaster` ?isMasterTemplate |
+| Q | text field | — | max length 100 | `listWaiverTemplateMaster` ?q |
 
-Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+**Form: Save layout** (modal, opened by *Save layout*; *Save layout* calls `setDigitalWaiverForm`, *Cancel* sends nothing)
+
+**Collects what `setDigitalWaiverForm` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Form `formId` | picker: choose a form | required | — | — | shows names, sends the id | — | `setDigitalWaiverForm` body |
+| Form version `formVersion` | number field | required | — | min 1 | — | — | `setDigitalWaiverForm` body |
+| Sections `sections` | repeatable rows | required | — | at least 1 | — | — | `setDigitalWaiverForm` body |
+| Section key `sections[].sectionKey` | text field | required | — | max length 60 | — | — | `setDigitalWaiverForm` body |
+| Kind `sections[].kind` | select | required | — | Header · Participant information · Waiver terms · Safety acknowledgements · Questions · Consent · Signature · Custom | — | — | `setDigitalWaiverForm` body |
+| Title `sections[].title` | text, one per language | optional | — | — | English and Arabic (Arabic right to left) | — | `setDigitalWaiverForm` body |
+| Numbered `sections[].numbered` | toggle | optional | off | — | — | — | `setDigitalWaiverForm` body |
+| Mandatory reading `sections[].mandatoryReading` | toggle | optional | off | — | — | The signatory must tick "I have read and understood this section" before continuing. | `setDigitalWaiverForm` body |
+| Acknowledgement text `sections[].acknowledgementText` | text, one per language | optional | — | — | English and Arabic (Arabic right to left) | — | `setDigitalWaiverForm` body |
+| Show when `sections[].showWhen` | group | optional | — | Shown only when the condition holds, e. | — | Shown only when the condition holds, e.g. `isMinor` equals `true` shows the guardian section. | `setDigitalWaiverForm` body |
+| Subject `sections[].showWhen.subject` | text field | required | — | max length 60 | — | A field key of this version, or `isMinor` (resolved from the waiver's guardian threshold). | `setDigitalWaiverForm` body |
+| Operator `sections[].showWhen.operator` | select | required | — | Equals · Not equals · In · Less than · Greater than · Is answered | — | — | `setDigitalWaiverForm` body |
+| Value `sections[].showWhen.value` | text field | optional | — | max length 200 | — | — | `setDigitalWaiverForm` body |
+| Blocks `sections[].blocks` | repeatable rows | required | — | — | — | — | `setDigitalWaiverForm` body |
+| Block key `sections[].blocks[].blockKey` | text field | required | — | max length 60 | — | — | `setDigitalWaiverForm` body |
+| Kind `sections[].blocks[].kind` | select | required | — | Heading · Paragraph · Legal text · Instructions · Image logo · Divider · Information box · Checkbox · Acknowledgement · Question · Signature · Initials … | — | — | `setDigitalWaiverForm` body |
+| Content `sections[].blocks[].content` | text, one per language | optional | — | — | English and Arabic (Arabic right to left) | — | `setDigitalWaiverForm` body |
+| Asset `sections[].blocks[].assetId` | upload, or pick from the media library | optional | — | — | PNG or SVG ≤ 2 MB for logos; images ≥ 1600 px; video MP4 | The image for an `imageLogo` block. | `setDigitalWaiverForm` body |
+| Field key `sections[].blocks[].fieldKey` | text field | optional | — | max length 60 | — | The `FormField.key` an input block collects; required for input kinds. | `setDigitalWaiverForm` body |
+| Mandatory notice `sections[].blocks[].mandatoryNotice` | toggle | optional | off | Rendered as a notice that cannot be collapsed. | — | Rendered as a notice that cannot be collapsed. | `setDigitalWaiverForm` body |
+
+Errors to draw in the form: 400 Validation failed; 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 The version is no longer a draft.; 422 A block names a field the version does not have, or a block kind needs content it lacks.
 
 #### Outputs: what the screen shows and produces
 
 **Shown**
 
-**Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+**Templates** (data table, from `listWaiverTemplateMaster`)
 
-**Data it reads**: `listWaiver` (onLoad, Waivers and their state)
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| Waiver | the name it points at, never the id | The `FormDefinition.id`; the natural key. |
+| Waiver name | text | `FormDefinition.name`, shown here, written by `createForm`. |
+| Internal description | text | — |
+| Waiver type | chip: Liability waiver, Parent guardian consent, Participation consent, Medical … | — |
+| Custom type label | text | The tenant's own classification name; required when `waiverType` is `customForm`. |
+| Owner user | the name it points at, never the id | — |
+| Department | text | — |
+| Brand | the name it points at, never the id | Null for a corporate waiver every brand may use. |
+| Legal entity | the name it points at, never the id | The finance legal entity the waiver is given in favour of. |
+| Default language | text | — |
+| Applicable countries | list or chips (count when long) | ISO 3166-1 alpha-2. Empty means the waiver is not yet scoped, which blocks publication. |
+| Applicable jurisdiction | text | A sub-national jurisdiction where the law differs within a country. |
+| Status | chip: Draft, Review, Pending approval, Approved, Scheduled, Published… | The lifecycle status of the latest version (see `listWaiverConsent`). |
+| Template source | chip: Create new, Duplicate existing, Master template, Corporate template | — |
+| Source waiver | the name it points at, never the id | The waiver it was duplicated or created from; required unless `createNew`. |
+| Source version | 1,234 | — |
+| Is master template | yes / no (icon or chip) | Offered in the reusable library. A corporate template is a master template with no `brandId`. |
+| Business owner user | the name it points at, never the id | — |
+| Legal reviewer user | the name it points at, never the id | — |
+
+**Actions and what each produces**
+
+| Action | Calls | Sends | On success returns | Errors to show | Notes |
+|---|---|---|---|---|---|
+| Save layout (secondary button) | `setDigitalWaiverForm` PUT `/digital-waiver-form` | DigitalWaiverFormBuilderInput | DigitalWaiverFormBuilderView | 400 Validation failed; 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 The version is no longer a draft. | opens modal first |
+
+**Data it reads**: `listWaiverTemplateMaster` (onLoad, The waiver templates)
 
 **Where the user goes next**
 
@@ -268,15 +381,28 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |---|---|
 | Loading (`?state=loading`) | The waiver template list. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the waiver template untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No waiver template yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, first run (`?state=emptyFirstRun`) | No waiver template yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the waiver template are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 The version is no longer a draft.; 422 A block names a field the version does not have, or a block kind needs content it lacks. |
+
+#### Consistency with other screens
+
+- Match `CMS-043`: The CMS builder.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+template: Deep Dive liability release v3 - EN/AR - owner Legal - approved
+```
 
 #### Permissions
 
-- `listWaiver` → `GUEST_VIEW` (read) · staff
+- `listWaiverTemplateMaster` → `GUEST_VIEW` (read) · staff
+- `setDigitalWaiverForm` → `GUEST_MANAGE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -308,12 +434,12 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (400, 403).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (20), with its required mark, default, format and its error state (400, 403, 404, 409, 422).
+- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-845?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
+- [ ] Every action is wired with its success and its failure: Save layout.
 - [ ] Every transition is wired: `BO-844`.
-- [ ] Every gated control is gated: `GUEST_VIEW`.
+- [ ] Every gated control is gated: `GUEST_MANAGE`, `GUEST_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -328,14 +454,18 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Engagement & Support · wave 3 · needs the `marketing` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `GUEST_MANAGE`, `GUEST_VIEW` (1 configure, 1 read); in the flows as venue manager |
+| Who uses it | venue staff holding `GUEST_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/engagement-support/assignment-rules-bo-846` |
 
-**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built. Removed 2 October 2026 (CHG-WIR-005): setDigitalWaiverForm saves a waiver's layout; assignment is the trigger and eligibility rules (listWaiverTriggerEligibility, as on CMS-047) (design-notes …
+
+**From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** Which waiver each guest must complete: rules by product, attraction, event, activity, venue, age, membership, risk category; priority, effective dates and exceptions; conflict detection and simulation.
+
+**Fixed on main** (the package already carries these; draw what it says): setDigitalWaiverForm (saves a waiver's layout) is the write on the assignment rules screen. (CHG-WIR-005).
 
 #### Inputs: what the user enters or picks
 
@@ -347,6 +477,9 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | Brand | picker: choose a brand | — | — | `listWaiverTemplateMaster` ?brandId |
 | Is master template | toggle | — | — | `listWaiverTemplateMaster` ?isMasterTemplate |
 | Q | text field | — | max length 100 | `listWaiverTemplateMaster` ?q |
+| Form | picker: choose a form | — | — | `listWaiverTriggerEligibility` ?formId |
+| Trigger point | select | — | During checkout · After purchase · Before ticket issuance · Before ticket download · Before event · Before check in · Before access · Before equipment collection · Before membership activation · Before activity start | `listWaiverTriggerEligibility` ?triggerPoint |
+| Status | segmented control | — | Active · Inactive | `listWaiverTriggerEligibility` ?status |
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
 
@@ -356,14 +489,32 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
 
-**Actions and what each produces**
+**Assignment rules** (data table, from `listWaiverTriggerEligibility`)
 
-| Action | Calls | Sends | On success returns | Errors to show | Notes |
-|---|---|---|---|---|---|
-| Save digital waiver form (primary button) | navigation or local | — | — | — | — |
-| Cancel (secondary button) | navigation or local | — | — | — | — |
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| ID | the name it points at, never the id | Absent on create. |
+| Form | the name it points at, never the id | — |
+| Name | text | — |
+| Trigger point | chip: During checkout, After purchase, Before ticket issuance, Before ticket download … | — |
+| Eligibility | list or chips (count when long) | All must hold (AND). Empty means every participant the association reaches. |
+| Attribute | chip: Age, Is minor, Product, Event, Venue, Activity… | — |
+| Operator | chip: Equals, Not equals, In, Not in, Less than, Greater than | — |
+| Values | list or chips (count when long) | — |
+| Completion deadline | grouped details | — |
+| Kind | chip: Immediately, Before ticket release, Hours before event, Days before visit, Before … | — |
+| Offset | 1,234 | Hours for `hoursBeforeEvent`, days for `daysBeforeVisit`. |
+| Enforcement | list or chips (count when long) | What an incomplete waiver blocks. Empty means warn only. |
+| Allow staff override | yes / no (icon or chip) | An authorised operator may admit the participant anyway; the override is recorded. |
+| Reminders | list or chips (count when long) | — |
+| Offset hours | 1,234 | Hours before the deadline, e.g. 168, 72, 24. |
+| Channels | list or chips (count when long) | — |
+| Status | chip: Active, Inactive | — |
+| Next cursor | text | — |
+| Has more | yes / no (icon or chip) | — |
 
-**Data it reads**: `listWaiverTemplateMaster` (onLoad, Templates)
+**Data it reads**: `listWaiverTemplateMaster` (onLoad, Templates); `listWaiverTriggerEligibility` (onLoad, The assignment rules)
 
 **Where the user goes next**
 
@@ -375,16 +526,24 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |---|---|
 | Loading (`?state=loading`) | The rules list. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the rules untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No rules yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, first run (`?state=emptyFirstRun`) | No rules yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the rules are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 The version is no longer a draft.; 422 A block names a field the version does not have, or a block kind needs content it lacks. |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+rule: Deep Dive and Flow Rider products -> Water activity waiver v3 required before entry; under 16 -> guardian
+  signs
+```
 
 #### Permissions
 
 - `listWaiverTemplateMaster` → `GUEST_VIEW` (read) · staff
-- `setDigitalWaiverForm` → `GUEST_MANAGE` (configure) · staff
+- `listWaiverTriggerEligibility` → `GUEST_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -411,12 +570,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (400, 403, 404, 409, 422).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (403).
+- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-846?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: Save digital waiver form, Cancel.
+- [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-844`.
-- [ ] Every gated control is gated: `GUEST_MANAGE`, `GUEST_VIEW`.
+- [ ] Every gated control is gated: `GUEST_VIEW`.
 - [ ] The module and platform inputs below are applied.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -438,7 +597,11 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | nothing: it opens on its own |
 | Route | `/engagement-support/version-expiry-renewal-bo-847` |
 
-**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built. Removed 2 October 2026 (CHG-WIR-005): BO-847 Version, Expiry & Renewal declared listWaiverTriggerEligibility while BO-848 declared listVersioningEffectiveDate; the reads were swapped, and versions …
+
+**From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** Lifecycle of the legal document: version history, effective dates, changed clauses, approver, expiry; whether a change requires all, selected or future guests to sign again; renewal reminders and grace periods. Every signed version is preserved; a new template never alters past evidence.
+
+**Fixed on main** (the package already carries these; draw what it says): Declares listWaiverTriggerEligibility, while BO-848 Signature Experience declares listVersioningEffectiveDate. (CHG-WIR-005).
 
 #### Inputs: what the user enters or picks
 
@@ -446,9 +609,9 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | Filter | Drawn as | Default | Allowed values, rules | Source |
 |---|---|---|---|---|
-| Form | picker: choose a form | — | — | `listWaiverTriggerEligibility` ?formId |
-| Trigger point | select | — | During checkout · After purchase · Before ticket issuance · Before ticket download · Before event · Before check in · Before access · Before equipment collection · Before membership activation · Before activity start | `listWaiverTriggerEligibility` ?triggerPoint |
-| Status | segmented control | — | Active · Inactive | `listWaiverTriggerEligibility` ?status |
+| Form | picker: choose a form | — | — | `listVersioningEffectiveDate` ?formId |
+| Compare with | number field | — | min 1 | `listVersioningEffectiveDate` ?compareWith |
+| Status | radio group | — | Draft · Published · Superseded · Retired | `listVersioningEffectiveDate` ?status |
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
 
@@ -456,9 +619,32 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+**Versions** (data table, from `listVersioningEffectiveDate`)
 
-**Data it reads**: `listWaiverTriggerEligibility` (onLoad, Assignment rules)
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| Form | the name it points at, never the id | — |
+| Waiver name | text | — |
+| Version number | 1,234 | — |
+| Status | chip: Draft, Published, Superseded, Retired | `FormDefinition.status` (states/form-definition.yaml). |
+| Lifecycle status | chip: Draft, Review, Pending approval, Approved, Scheduled, Published… | — |
+| Created by user | the name it points at, never the id | — |
+| Change reason | text | — |
+| Legal reviewer | text | `FormDefinition.legalReviewedBy`. |
+| Legal reviewed at | 1 Oct 2026, 14:30 | — |
+| Approved by user | the name it points at, never the id | — |
+| Approved at | 1 Oct 2026, 14:30 | — |
+| Effective from | 1 Oct 2026, 14:30 | — |
+| Effective to | 1 Oct 2026, 14:30 | — |
+| Resign rule | chip: No resign, Resign at next booking, Resign before next visit | Whether people who signed an earlier version must sign this one. |
+| Suspended | yes / no (icon or chip) | — |
+| Suspension reason | text | — |
+| Signature count | 1,234 | Signatures taken against this exact version. |
+| Comparison | grouped details | Present when `compareWith` is given. |
+| Compared with version | 1,234 | — |
+
+**Data it reads**: `listVersioningEffectiveDate` (onLoad, Version history, effective dates and expiry)
 
 **Where the user goes next**
 
@@ -470,14 +656,23 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |---|---|
 | Loading (`?state=loading`) | The version expiry renewal list. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the version expiry renewal untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No version expiry renewal yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, first run (`?state=emptyFirstRun`) | No version expiry renewal yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the version expiry renewal are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+version: v4 effective 1 Nov 2026 - clause 6 medical changed - all future bookings must re-sign
+```
 
 #### Permissions
 
-- `listWaiverTriggerEligibility` → `GUEST_VIEW` (read) · staff
+- `listVersioningEffectiveDate` → `GUEST_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -504,8 +699,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (403).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (400, 403).
+- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-847?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-844`.
@@ -524,7 +719,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Engagement & Support · wave 3 · needs the `marketing` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `GUEST_VIEW` (1 read); in the flows as venue manager |
+| Who uses it | venue staff holding `GUEST_MANAGE`, `GUEST_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
 | Offline | online only |
@@ -533,25 +728,87 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Known gaps.** **Signature Experience Setup declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** Secure signing at every touchpoint (website, app, kiosk, tablet, POS, waiver station): identity check, signature, initials, witness, review before submit, receipt; accessible and multilingual; timeout, recovery and offline behaviour. Group waivers may need a signature pad.
+
+**Fixed on main** (the package already carries these; draw what it says): Declares listVersioningEffectiveDate (version history). (CHG-WIR-005).
+
+#### Decided on this screen
+
+Answered questions: draw the decision, not the old default. Where a decision and the tables below differ, the decision wins.
+
+- **Which signature-capture device (USB stylus pad) is supported for group waivers?** → Drawn default accepted: Finger signature on the tablet; pad support shown as "coming". *(decided by Chinmay, 2026-10-02; DEC-281 / CHG-NOTE-002)* **Reviewable:** a default the lead may still overrule before the block is tasked.
+
 #### Inputs: what the user enters or picks
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
 
 | Filter | Drawn as | Default | Allowed values, rules | Source |
 |---|---|---|---|---|
-| Form | picker: choose a form | — | — | `listVersioningEffectiveDate` ?formId |
-| Compare with | number field | — | min 1 | `listVersioningEffectiveDate` ?compareWith |
-| Status | radio group | — | Draft · Published · Superseded · Retired | `listVersioningEffectiveDate` ?status |
+| Form | picker: choose a form | — | — | `getSignatorySignatureGuardian` ?formId |
+| Version | number field | — | min 1 | `getSignatorySignatureGuardian` ?version |
 
-Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+**Form: Save signing setup** (modal, opened by *Save signing setup*; *Save signing setup* calls `setSignatorySignatureGuardian`, *Cancel* sends nothing)
+
+**Collects what `setSignatorySignatureGuardian` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Form `formId` | picker: choose a form | required | — | — | shows names, sends the id | — | `setSignatorySignatureGuardian` body |
+| Form version `formVersion` | number field | required | — | min 1 | — | — | `setSignatorySignatureGuardian` body |
+| Primary signatory `primarySignatory` | select | required | — | Ticket holder · Purchaser · Participant · Parent · Legal guardian · Group leader · Corporate representative · Member · Rental customer · Other authorized signatory | — | — | `setSignatorySignatureGuardian` body |
+| Allowed signatories `allowedSignatories` | multi-select chips | optional | — | Ticket holder · Purchaser · Participant · Parent · Legal guardian · Group leader · Corporate representative · Member · Rental customer · Other authorized signatory | — | Who else may sign in the primary signatory's place. | `setSignatorySignatureGuardian` body |
+| Co signature `coSignature` | segmented control | optional | — | Participant and guardian · Customer and authorized representative | — | Set when two people must both sign. | `setSignatorySignatureGuardian` body |
+| Signature required `signatureRequired` | toggle | optional | on | — | — | — | `setSignatorySignatureGuardian` body |
+| Initials required `initialsRequired` | toggle | optional | off | — | — | — | `setSignatorySignatureGuardian` body |
+| Acceptance method `acceptanceMethod` | segmented control | required | — | Drawn signature · Typed name · Checkbox | — | Kept equal to `FormDefinition.signatureKind` (drawn, typed, checkbox). | `setSignatorySignatureGuardian` body |
+| Capture relationship `captureRelationship` | toggle | optional | on | — | — | Whoever signs for someone else states their relationship. | `setSignatorySignatureGuardian` body |
+| Identity verification `identityVerification` | radio group | optional | None | None · Signed in account · One time code · ID document check | — | — | `setSignatorySignatureGuardian` body |
+| Requires guardian for minors `requiresGuardianForMinors` | toggle | required | — | — | — | Written to `FormDefinition.requiresGuardianForMinors`. | `setSignatorySignatureGuardian` body |
+| Guardian threshold age `guardianThresholdAge` | stepper or slider | optional | — | min 1; max 25 | — | A participant under this age needs a guardian. Written to `FormDefinition.minimumAge`. | `setSignatorySignatureGuardian` body |
+| Guardian threshold by country `guardianThresholdByCountry` | repeatable rows | optional | — | — | — | Per-country thresholds that override `guardianThresholdAge`. | `setSignatorySignatureGuardian` body |
+| Country `guardianThresholdByCountry[].country` | text field | required | — | pattern `^[A-Z]{2}$` | — | — | `setSignatorySignatureGuardian` body |
+| Age `guardianThresholdByCountry[].age` | stepper or slider | required | — | min 1; max 25 | — | — | `setSignatorySignatureGuardian` body |
+| Guardian signs for each minor `guardianSignsForEachMinor` | toggle | optional | on | — | — | One guardian signature per minor, never one for the family. | `setSignatorySignatureGuardian` body |
+| Group signing modes `groupSigningModes` | multi-select chips | optional | — | Each participant individually · Guardian for each minor · Group leader for group · Organisation representative declaration | — | The modes a group booking may use. Empty means each participant signs individually. | `setSignatorySignatureGuardian` body |
+
+Errors to draw in the form: 400 Validation failed; 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 The version is no longer a draft.; 422 A signatory or group mode the version's fields cannot collect (e.g. a guardian mode with no guardian signature field).
 
 #### Outputs: what the screen shows and produces
 
 **Shown**
 
-**Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+**Signatory rules** (detail panel, from `getSignatorySignatureGuardian`)
 
-**Data it reads**: `listVersioningEffectiveDate` (onLoad, Version, expiry and renewal)
+| Shows | Format | Notes |
+|---|---|---|
+| Form | the name it points at, never the id | — |
+| Form version | 1,234 | — |
+| Primary signatory | chip: Ticket holder, Purchaser, Participant, Parent, Legal guardian, Group leader… | — |
+| Allowed signatories | list or chips (count when long) | Who else may sign in the primary signatory's place. |
+| Co signature | chip: Participant and guardian, Customer and authorized representative | Set when two people must both sign. |
+| Signature required | yes / no (icon or chip) | — |
+| Initials required | yes / no (icon or chip) | — |
+| Acceptance method | chip: Drawn signature, Typed name, Checkbox | Kept equal to `FormDefinition.signatureKind` (drawn, typed, checkbox). |
+| Capture relationship | yes / no (icon or chip) | Whoever signs for someone else states their relationship. |
+| Identity verification | chip: None, Signed in account, One time code, ID document check | — |
+| Requires guardian for minors | yes / no (icon or chip) | Written to `FormDefinition.requiresGuardianForMinors`. |
+| Guardian threshold age | 1,234 | A participant under this age needs a guardian. Written to `FormDefinition.minimumAge`. |
+| Guardian threshold by country | list or chips (count when long) | Per-country thresholds that override `guardianThresholdAge`. |
+| Country | text | — |
+| Age | 1,234 | — |
+| Guardian signs for each minor | yes / no (icon or chip) | One guardian signature per minor, never one for the family. |
+| Group signing modes | list or chips (count when long) | The modes a group booking may use. Empty means each participant signs individually. |
+| Recorded evidence | list or chips (count when long) | Always all of them; listed so the reviewer sees what is kept. |
+| Legal approved by | text | `FormDefinition.legalReviewedBy`, set at the legal/compliance step of `approveWaiverTesting`. |
+| Legal approved at | 1 Oct 2026, 14:30 | — |
+
+**Actions and what each produces**
+
+| Action | Calls | Sends | On success returns | Errors to show | Notes |
+|---|---|---|---|---|---|
+| Save signing setup (secondary button) | `setSignatorySignatureGuardian` PUT `/signatory-signature-guardian` | SignatorySignatureGuardianRuleConfigurationInput | SignatorySignatureGuardianRuleConfigurationView | 400 Validation failed; 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 The version is no longer a draft. | opens modal first |
+
+**Data it reads**: `getSignatorySignatureGuardian` (onLoad, Who must sign a waiver version)
 
 **Where the user goes next**
 
@@ -563,15 +820,24 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |---|---|
 | Loading (`?state=loading`) | The signature experience list. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the signature experience untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No signature experience yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, first run (`?state=emptyFirstRun`) | No signature experience yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the signature experience are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 The version is no longer a draft.; 422 A signatory or group mode the version's fields cannot collect (e.g. a guardian mode with no guardian signature field). |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+setup: Waiver station at Deep Dive desk - tablet - signature + initials on clause 4 - receipt by email
+```
 
 #### Permissions
 
-- `listVersioningEffectiveDate` → `GUEST_VIEW` (read) · staff
+- `getSignatorySignatureGuardian` → `GUEST_VIEW` (read) · staff
+- `setSignatorySignatureGuardian` → `GUEST_MANAGE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -600,13 +866,14 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (400, 403).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (17), with its required mark, default, format and its error state (400, 403, 404, 409, 422).
+- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-848?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
+- [ ] Every action is wired with its success and its failure: Save signing setup.
 - [ ] Every transition is wired: `BO-844`.
-- [ ] Every gated control is gated: `GUEST_VIEW`.
+- [ ] Every gated control is gated: `GUEST_MANAGE`, `GUEST_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 1 decision(s) taken on this screen are drawn as decided, not as the old default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -629,9 +896,15 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** Authority and multi-participant signing for minors and groups: guardian relationships from the guest master, one signer for several family members or students where permitted, minimum self-sign age, one or both guardians, partial group signing. A missing date of birth counts as a minor.
+
 #### Inputs: what the user enters or picks
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+**Rules for these inputs** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
+
+- **Signatory**: Participant or parent/guardian; minimum self-sign age; individual signatures where the document requires them. *(source: contracts/satellite/marketing-crm.yaml#setSignatorySignatureGuardian; DI-572; R205)*
 
 #### Outputs: what the screen shows and produces
 
@@ -657,6 +930,15 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 The version is no longer a draft.; 422 A signatory or group mode the version's fields cannot collect (e.g. a guardian mode with no guardian signature field). |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+rule: Under 16 - one guardian signs for up to 5 linked children; school groups - teacher signs with parental consent
+  on file
+```
 
 #### Permissions
 
@@ -718,6 +1000,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** Get waivers signed before arrival: a secure link or QR by email, SMS or WhatsApp in the guest's language, a deadline, reminders, and status per participant. Reminders stop when everyone has signed. These are transactional messages, not marketing.
+
+**Fixed on main** (the package already carries these; draw what it says): Declares only listMinorGuardianGroup. (CHG-WIR-005).
+
 #### Inputs: what the user enters or picks
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
@@ -731,6 +1017,16 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Consent status | segmented control | — | Complete · Pending · Rejected | `listMinorGuardianGroup` ?consentStatus |
 | Visit from | date and time picker | — | — | `listMinorGuardianGroup` ?visitFrom |
 | Visit to | date and time picker | — | — | `listMinorGuardianGroup` ?visitTo |
+| Q | text field | — | max length 200 | `listParticipantWaiverStatus` ?q |
+| Participant subject | picker: choose a participant subject | — | — | `listParticipantWaiverStatus` ?participantSubjectId |
+| Order | picker: choose an order | — | — | `listParticipantWaiverStatus` ?orderId |
+| Ticket | picker: choose a ticket | — | — | `listParticipantWaiverStatus` ?ticketId |
+| Group booking | picker: choose a group booking | — | — | `listParticipantWaiverStatus` ?groupBookingId |
+| Form | picker: choose a form | — | — | `listParticipantWaiverStatus` ?formId |
+| Performance | picker: choose a performance | — | — | `listParticipantWaiverStatus` ?performanceId |
+| Visit from | date and time picker | — | — | `listParticipantWaiverStatus` ?visitFrom |
+| Visit to | date and time picker | — | — | `listParticipantWaiverStatus` ?visitTo |
+| … 1 more | | | | `operations.json` |
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
 
@@ -740,7 +1036,32 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
 
-**Data it reads**: `listMinorGuardianGroup` (onLoad, Guardian and group signing)
+**Participants to chase** (data table, from `listParticipantWaiverStatus`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| Participant | the name it points at, never the id | The participant's subject id. |
+| Participant | text | The participant's name. |
+| Customer purchaser | grouped details | Who bought the booking; may differ from the participant. |
+| Subject | the name it points at, never the id | — |
+| Name | text | — |
+| Booking | the name it points at, never the id | The order id. |
+| Ticket | the name it points at, never the id | The ticket (entitlement) id. |
+| Product | grouped details | — |
+| Product | the name it points at, never the id | — |
+| Name | text | — |
+| Event | grouped details | — |
+| Event | the name it points at, never the id | — |
+| Performance | the name it points at, never the id | — |
+| Name | text | — |
+| Visit date | 1 Oct 2026, 14:30 | — |
+| Age category | chip: Adult, Minor | From the participant's date of birth against the age of majority configured for the venue's jurisdiction (no shipped default). |
+| Group | grouped details | — |
+| Group booking | the name it points at, never the id | — |
+| Name | text | — |
+
+**Data it reads**: `listMinorGuardianGroup` (onLoad, Guardian and group signing); `listParticipantWaiverStatus` (onLoad, Which participants still have to sign before arrival)
 
 **Where the user goes next**
 
@@ -758,9 +1079,18 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+booking: ORD-55821 - Deep Dive Sat 3 Oct 14:00 - 3 participants - 1 signed, 2 pending - reminder sent 1 Oct
+```
+
 #### Permissions
 
 - `listMinorGuardianGroup` → `GUEST_VIEW_PII` (operate) · staff
+- `listParticipantWaiverStatus` → `GUEST_VIEW_PII` (operate) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -788,7 +1118,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state (400, 403).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-850?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-844`.
@@ -816,6 +1146,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** Waiver checks at check-in and scan: valid, missing, expired or wrong version, in real time, with minimal sensitive content at the gate; admit or block, supervisor override with reason; offline cache freshness. An incomplete waiver can block download, activation, check-in or access.
+
 #### Inputs: what the user enters or picks
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
@@ -841,6 +1173,10 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
 
+**Rules for what is shown** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
+
+- **Gate result**: Participant name, which waiver is missing, and Sign now (QR) or Override; never the waiver content. *(source: DI-574; contracts/satellite/marketing-crm.yaml#getWaiverStatus)*
+
 **Data it reads**: `listParticipantWaiverStatus` (onLoad, Pre-arrival completion)
 
 **Where the user goes next**
@@ -858,6 +1194,14 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+result: Layla Haddad - Water activity waiver v3 missing - guardian must sign - BLOCKED
+```
 
 #### Permissions
 
@@ -910,7 +1254,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Engagement & Support · wave 3 · needs the `marketing` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `GUEST_MANAGE`, `GUEST_VIEW` (1 configure, 1 read); in the flows as venue manager |
+| Who uses it | venue staff holding `GUEST_MANAGE`, `GUEST_VIEW`, `GUEST_VIEW_PII` (1 configure, 1 read, 1 operate); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
 | Offline | online only |
@@ -919,7 +1263,26 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** Signed waiver evidence stored and retrieved securely: search by guest, guardian, participant, booking, activity, date, version; signed PDF and metadata; retention, legal hold, deletion; every access logged.
+
+**Fixed on main** (the package already carries these; draw what it says): Declares setWaiverVerificationValidation (a reviewer's decision) and getWaiverStatus, but no evidence search. (CHG-WIR-005).
+
 #### Inputs: what the user enters or picks
+
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Participant subject | picker: choose a participant subject | — | — | `listComplianceEvidenceWaiver` ?participantSubjectId |
+| Customer subject | picker: choose a customer subject | — | — | `listComplianceEvidenceWaiver` ?customerSubjectId |
+| Signatory subject | picker: choose a signatory subject | — | — | `listComplianceEvidenceWaiver` ?signatorySubjectId |
+| Ticket | picker: choose a ticket | — | — | `listComplianceEvidenceWaiver` ?ticketId |
+| Order | picker: choose an order | — | — | `listComplianceEvidenceWaiver` ?orderId |
+| Event | picker: choose an event | — | — | `listComplianceEvidenceWaiver` ?eventId |
+| Form | picker: choose a form | — | — | `listComplianceEvidenceWaiver` ?formId |
+| Form version | number field | — | min 1 | `listComplianceEvidenceWaiver` ?formVersion |
+| From | date and time picker | — | — | `listComplianceEvidenceWaiver` ?from |
+| To | date and time picker | — | — | `listComplianceEvidenceWaiver` ?to |
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
 
@@ -929,12 +1292,43 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Detail panel** (detail panel): One record, read-only.
 
+**Signed waivers** (data table, from `listComplianceEvidenceWaiver`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| Submission | the name it points at, never the id | — |
+| Signature | the name it points at, never the id | The `MarketingWaiverSignature` row. |
+| Waiver | the name it points at, never the id | The waiver form (`FormDefinition.id`). |
+| Waiver name | text | — |
+| Exact version | 1,234 | The form version presented and signed; `getForm` with this `version` returns its wording and questions. |
+| Participant | grouped details | — |
+| Subject | the name it points at, never the id | — |
+| Name | text | — |
+| Date of birth | 1 Oct 2026 | — |
+| Signatory | grouped details | — |
+| Subject | the name it points at, never the id | — |
+| Name | text | — |
+| Signed name | text | The name as typed or drawn at signing. |
+| Signatory type | chip: Participant, Guardian, Organisation representative | — |
+| Guardian relationship | the name it points at, never the id | The `GuestRelationship` relied on when a guardian or representative signed. |
+| Submitted at | 1 Oct 2026, 14:30 | Device time of signing. |
+| Synced at | 1 Oct 2026, 14:30 | Server time the submission arrived. |
+| Channel | text | `FormSubmission.capturedAtChannel`. |
+| Collection method | chip: Email, SMS, Whatsapp, Guest web, Guest app, Group portal… | — |
+
 **Actions and what each produces**
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
 | Save (primary button) | navigation or local | — | — | — | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
+
+**Rules for what is shown** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
+
+- **Evidence record**: Opens the exact version signed; access requires PII permission and is logged. *(source: contracts/satellite/marketing-crm.yaml#createForm)*
+
+**Data it reads**: `listComplianceEvidenceWaiver` (onLoad, Signed waiver evidence)
 
 **Where the user goes next**
 
@@ -952,10 +1346,19 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 Idempotency conflict or optimistic concurrency failure. Two causes, so two types.; 422 `verified` while an automatic check fails or no signature is present (`checksFailing`), or a required `note` or `escalatedTo` is missing (`reasonRequired`). |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+record: Fatima Al Mansoori - Water activity waiver v3 - signed 26 Sep 2026 10:12 - retain until 26 Sep 2033
+```
+
 #### Permissions
 
 - `setWaiverVerificationValidation` → `GUEST_MANAGE` (configure) · staff
 - `getWaiverStatus` → `GUEST_VIEW` (read) · staff, guest, device
+- `listComplianceEvidenceWaiver` → `GUEST_VIEW_PII` (operate) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -979,15 +1382,17 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS81 Marketing CRM Configuration Reference v1.0 Board 12.dc.html#bo-852`
 - Workshop pack: Marketing_CRM_Configuration_Reference v1.0.pdf board 12
 - Flow F255 *Marketing CRM Configuration Reference v1.0 board 12: Waiver Command Center*, step 16: Works in Documents, Search & Retention → Securely store and retrieve signed waiver evidence. Search by guest, guardian, participant, booking, ticket, activity, event, date, version and status. Store signed PDF/evidence package, metadata …
+- ADR-0047 *How long data is kept, and where it goes next* (`docs/adr/0047-how-long-data-is-kept-and-where-it-goes-next.md`)
+- ADR-0023 *— Personal data lives apart from the append-only ledger* (`docs/adr/0023-pii-separation.md`)
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (400, 404, 409, 422).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (400, 403, 404, 409, 422).
+- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-852?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save, Cancel.
 - [ ] Every transition is wired: `BO-844`.
-- [ ] Every gated control is gated: `GUEST_MANAGE`, `GUEST_VIEW`.
+- [ ] Every gated control is gated: `GUEST_MANAGE`, `GUEST_VIEW`, `GUEST_VIEW_PII`.
 - [ ] The module and platform inputs below are applied.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -1010,6 +1415,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Route | `/engagement-support/legal-evidence-audit-bo-853` |
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+**From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** A defensible record of signing and later use: signer and participant identity, authority, time and time zone, IP or device, channel, verification method, template version and content hash, signature, witness, receipt; access decisions, overrides, renewals and revocations; controlled evidence export.
 
 #### Inputs: what the user enters or picks
 
@@ -1053,6 +1460,19 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed |
+
+#### Consistency with other screens
+
+- Match `CMS-058`: Same evidence repository.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+evidence: v3 hash 9f2c...e1 - signed by guardian Khalid Al Suwaidi for Mariam (9) - kiosk 4 - 26 Sep 2026 10:12
+  GST
+```
 
 #### Permissions
 
@@ -1188,6 +1608,7 @@ Method, path, parameters, request and response for every operation these screens
 
 ```json
 {
+"getSignatorySignatureGuardian": {"method":"GET","path":"/signatory-signature-guardian","contract":"marketing-crm","summary":"Load the signatory rules of a waiver version","permission":"GUEST_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"formId","in":"query","required":true},{"name":"version","in":"query","required":false}],"requestBody":null,"responds":"SignatorySignatureGuardianRuleConfigurationView"},
 "getWaiverStatus": {"method":"GET","path":"/guests/{subjectId}/waiver-status","contract":"marketing-crm","summary":"Whether this guest may be issued a ticket that requires a waiver","permission":"GUEST_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"productId","in":"query","required":null}],"requestBody":null,"responds":null},
 "listComplianceEvidenceWaiver": {"method":"GET","path":"/compliance-evidence-waiver","contract":"marketing-crm","summary":"Compliance Evidence, Audit & Waiver Repository","permission":"GUEST_VIEW_PII","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"participantSubjectId","in":"query","required":false},{"name":"customerSubjectId","in":"query","required":false},{"name":"signatorySubjectId","in":"query","required":false},{"name":"ticketId","in":"query","required":false},{"name":"orderId","in":"query","required":false},{"name":"eventId","in":"query","required":false},{"name":"formId","in":"query","required":false},{"name":"formVersion","in":"query","required":false},{"name":"venueId","in":"query","required":false},{"name":"from","in":"query","required":false},{"name":"to","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listMinorGuardianGroup": {"method":"GET","path":"/minor-guardian-group","contract":"marketing-crm","summary":"Minor, Guardian & Group Consent Management","permission":"GUEST_VIEW_PII","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"groupBookingId","in":"query","required":false},{"name":"guardianSubjectId","in":"query","required":false},{"name":"orderId","in":"query","required":false},{"name":"performanceId","in":"query","required":false},{"name":"consentStatus","in":"query","required":false},{"name":"visitFrom","in":"query","required":false},{"name":"visitTo","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},

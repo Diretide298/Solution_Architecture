@@ -1,6 +1,6 @@
 # WS117 — AI Configuration Assistant board 2
 
-**10 screens · 6 operations · 9 schemas · 2 permissions**
+**10 screens · 8 operations · 14 schemas · 3 permissions**
 
 Platform P09 TICVAI Web · ships as **ticvai-control** ·
 platformAdmin audience · web ·
@@ -48,8 +48,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 2 permissions apply here:
-  `AI_USE, PRODUCT_CONFIGURE`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 3 permissions apply here:
+  `AI_USE, PLATFORM_TENANT_ACCESS, PLATFORM_TENANT_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -61,26 +61,50 @@ convincingly. It is never a caption.
   and its error; and, element by element, what is shown and in what format, what each action
   produces and where the user goes next. Draw exactly that.
 
+## The processes these screens belong to
+
+Written by the owner of each process (`handoff/design-notes/`). Read before any screen: it says how the process runs end to end and which words the screens must use.
+
+### AI & Intelligence
+
+AI in TICVAI is one governed engine behind many screens. The guest meets it as Sahli, the concierge (WEB-044, GST-031, GST-033), as the planner agent that refines a rules-built day plan by chat (GST-054), and as upsell and cross-sell offers on a separate Extras step (WEB-008, GST-048). Staff meet it as the Staff App's AI tab (EMP-019/020, knowledge EMP-040/041), the kiosk assistant (KSK-015) and the support copilot (SUP-006, SUP-018). Venue managers meet it in Venue Management (BO-091 policy and spend, BO-919/BO-925..932 resource and staffing forecasts, BO-597/598 configuration drafts, BO-772/782 marketing optimisation, BO-793 translations, BO-970/975 seat-map generation, BO-1048 seat upsell, BO-1160 fraud cases) and in Analytics (ANL-010 suggestions, ANL-019 management insights, ANL-055 anomalies, ANL-057 forecasting studio, ANL-059 insight history, ANL-060 governance, ANL-071 AI maturity). The governance, configuration-assistant, forecasting, oversight, audit and monitoring boards sit on the TICVAI Console (P09: ADM-037 providers, ADM-469..498 configuration assistant, ADM-499..518 forecasting, ADM-519..558 governance, ADM-633/637 fraud, ADM-680..697 recommendation governance). Five rules hold on every one of these screens. (1) Baseline first, then it learns per tenant: every data-driven answer (forecast, suggestion, risk score, recommendation) exists from day one, from the venue AI profile, a starting pattern for the venue type, the UAE calendar and the weather, and shifts to the venue's own data as it trades; nothing says "comes later" or refuses for lack of history - a refusal only names a missing setting. (2) Every answer shows its basis and maturity: a "Based on" line, a stage badge (Starting, Learning, Established, Trained on your data), "Limited historical data" while the starting pattern carries more than half the weight, ranges or bands rather than a bare percentage, a confidence only where the producer really has one, a plain-words explanation always. (3) A trained model replaces the baseline only when it beats it in a shadow run of at least six weeks and an admin promotes it; the platform raises "Ready to promote" and never switches by itself. (4) The LLM never reads raw data: numbers come only from query results the platform runs (the answer shows the query), only the masked prompt and retrieved context leave the platform, and AI only drafts - the owning screen applies. (5) One autonomy scale, L0 Disabled to L4 Controlled auto, with first-release ceilings, separate from user permission and from the approval tier; impactful actions route to a person, who sees current against proposed, impact, risk and what is affected, and can approve within a limit, challenge, override or roll back; every decision is traceable (data, model, approver, time) and searchable by customer, venue and capability. In Block A (5 October to 20 November 2026) the guest concierge with retrieval, Help me choose, translations, the planner agent, the gateway and …
+*(source: ADR-0051; ADR-0050; ADR-0020; ADR-0052; ADR-0053; ADR-0054; ADR-0059; ADR-0051 (AI-D01..AI-D20); ADR-0051 (AI functions review 30 Sep §2 §4 §9); MoM 18 Sep 4.1-4.10; MoM 21 Sep 4.1-4.14; MoM 30 Sep 4.1 4.7; ADR-0059 (Block A slice: tasks.csv))*
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Sahli | The guest concierge's name; the entry reads "Ask Sahli" and shows as mascot art when the venue's Concierge mascot setting is on (default), otherwise a plain button. | Chatbot, Bot, AI Concierge (as a visible label), Virtual agent | DI-1069 / screens/P01-guest-web-storefront.yaml#WEB-044 |
+| Based on | The line on every AI answer that says what it was computed from, e.g. "Based on: your venue profile, UAE calendar, weather, 23 days of your sales". Always present. | Data sources, Model inputs, Powered by AI | ADR-0051 Maturity / contracts/satellite/ai.yaml#/components/schemas/AiMaturity |
+| Starting / Learning / Established / Trained on your data | The four maturity stages (enum starting, learning, established, learned), shown as one badge. Moves by itself from Starting to Established as own data arrives; Trained on your data only after an admin promotion. | Beta, Experimental, Low confidence, Cold start (in UI), Not enough data | ADR-0051 / ADR-0051 (AI functions review 30 Sep §2) |
+| Limited historical data | Shown while own data carries less than half the weight (AiMaturity.limitedHistory, ownDataShare < 0.5). An honest qualifier, never a refusal. | Insufficient data, Not available until, Comes later | ADR-0051 / contracts/satellite/ai.yaml#/components/schemas/AiMaturity |
+| Range | The 10th-90th percentile band a forecast or estimate is shown with (e.g. "1,850-3,400 guests, most likely 2,600"). Never a bare accuracy percentage on an answer; measured accuracy (WAPE, bias, coverage) appears only on accuracy screens … | Accuracy 92%, Confidence 0.87 (on a heuristic), Exact | ADR-0051 / contracts/satellite/ai.yaml#getForecast / … |
+| Running in the background | A trained model in shadow next to the live answer (AiRelease.stage shadow); it changes nothing a person sees. | Live, Active model, Testing in production | ADR-0051 Promotion / ADR-0051 (AI functions review 30 Sep §2) |
+| Ready to promote / Promote | A shadow model passed its gate (governance alert promotionReady); an admin promotes it one stage at a time (canary, then production). The only way a model replaces the baseline. | Deploy, Go live, Auto-switch, Activate model, Upgrade AI | ADR-0051 (AI-D16) / contracts/satellite/ai.yaml#promoteAiRelease |
+| L0 Disabled / L1 Advisory / L2 Prepare / L3 Execute with … | The one autonomy scale for every AI capability, shown as "L2 Prepare" etc. with the capability's ceiling beside it. Lower scopes tighten, never raise. | Autopilot, Copilot mode, Level 0-3 (CFG book), Approval level (for autonomy), Manual/Semi/Auto | ADR-0050 / ADR-0050 (AI-D04) / … |
+| Approval tier | How many people must approve a proposed action (ProposedAction.approvalLevel, 1 or 2). Not an autonomy level. | Autonomy level, Approval level (ambiguous) | ADR-0050 |
+| Suggestion / Draft | What AI produces. A suggestion advises; a draft is a ready-to-review change that a person applies in the owning screen. Copy says "Nothing is applied until you approve it." | AI changed, Auto-applied, AI updated your prices | ADR-0020 / ADR-0051 (AI functions review 30 Sep §4 Configuration assistant) / … |
+| Why this? | The link or expander that opens an answer's explanation (Suggestion.explanation, recommendation template reason, decision trace). Plain words; for guests a template reason. | Explainability, SHAP, Feature importance (in operator copy) | ADR-0052 (AI-D09) / contracts/satellite/ai.yaml#/components/schemas/Suggestion |
+| No thanks | The explicit decline on an offer. Only this counts as a decline and it is remembered across channels; scrolling past or closing the step is not a decline. | Dismiss (as a decline), Skip (as a decline), X (as a decline) | ADR-0052 (AI-D07) / DI-962 / … |
+| Hold for review | What a high fraud or risk score does to a payment or order. The transaction goes through; it is held for a person. | Decline, Block, Reject (for a risk score), Fraud detected | ADR-0053 / ADR-0053 (AI-D06) |
+| Hand over to a person | The concierge passes the whole conversation and its own summary to a live agent; the guest does not repeat themselves. | Escalate, Transfer, Contact bot | contracts/satellite/marketing-crm.yaml#handoverToAgent |
+| Not available yet | The analytics assistant's answer to a question outside the semantic model; it records a knowledge gap and never improvises a number. | I cannot answer, Error, Unknown | ADR-0054 |
+
+
 ## The screens
 
 Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs count fields; requirements are matrix rows; meeting inputs are the ones naming the screen (the module and platform ones are below); white label says whether the tenant's brand reaches it (guest) or it sets the brand (configures).
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-479` | AI Configuration Build Command Center | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-480` | Venue & Organization Configuration | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-481` | Product Configuration Assistant | B–D | 0 | 0 | 6 | 0 | 2 | 3 | — | notStarted (—) |
-| `ADM-482` | Schedule, Capacity & Availability Configuration | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-483` | Pricing & Commercial Configuration | B–D | 0 | 10 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-484` | Promotion, Bundle & Upsell Configuration | B–D | 0 | 0 | 6 | 0 | 0 | 2 | — | notStarted (—) |
-| `ADM-485` | Seating, Access & Operational Configuration | B–D | 0 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
-| `ADM-486` | Channel, Media & Fulfillment Configuration | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-487` | Cross-Module Conflict & Dependency Validation | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-488` | Configuration Preview & Impact Analysis | B–D | 18 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-
-## Thin screens in this batch
-
-**ADM-480, ADM-481, ADM-482, ADM-483, ADM-484, ADM-485, ADM-486 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+| `ADM-479` | AI Configuration Build Command Center | B–D | 6 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
+| `ADM-480` | Venue & Organization Configuration | B–D | 6 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
+| `ADM-481` | Product Configuration Assistant | B–D | 6 | 6 | 7 | 1 | 2 | 3 | — | notStarted (—) |
+| `ADM-482` | Schedule, Capacity & Availability Configuration | B–D | 6 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
+| `ADM-483` | Pricing & Commercial Configuration | B–D | 6 | 16 | 7 | 1 | 0 | 0 | — | notStarted (—) |
+| `ADM-484` | Promotion, Bundle & Upsell Configuration | B–D | 6 | 6 | 7 | 1 | 0 | 2 | — | notStarted (—) |
+| `ADM-485` | Seating, Access & Operational Configuration | B–D | 6 | 6 | 7 | 1 | 0 | 6 | — | notStarted (—) |
+| `ADM-486` | Channel, Media & Fulfillment Configuration | B–D | 6 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
+| `ADM-487` | Cross-Module Conflict & Dependency Validation | B–D | 6 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
+| `ADM-488` | Configuration Preview & Impact Analysis | B–D | 24 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
 
 ---
 
@@ -95,16 +119,26 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | | |
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
-| Module | Platform · wave 3 · needs the `ai` module |
+| Module | Platform · wave 3 · needs the `core` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `AI_USE` (1 operate); in the flows as platform admin |
+| Who uses it | ticvai staff holding `AI_USE`, `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW` (2 operate, 1 read); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | commandCentre (compact density): the pack gives this screen a metric directory (§Header KPIs) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's |
 | Offline | online only |
-| Opens with | `planId` (navigation), `sessionId` (session) |
+| Opens with | `planId` (navigation), `sessionId` (session), `tenantId` (navigation) |
 | Route | `/platform/ai-configuration-build-command-center-adm-479` |
 
+**What the spec says about it.** **Tenant picker and platform-staff grant added 2 October 2026** (CHG-SBO-001; Chinmay, pre-apply round: console screens get the R098 tenant picker and grant, the ADM-412 pattern). The Console runs outside every cell; `getActionPlan` (AI_USE), `getConfigurationBlueprint` (AI_USE), `buildConfigurationPlan` (AI_USE) are tenant operations, refused 403 to a platform token until a time-boxed, audited grant into the picked tenant is open. The tenant sees the grant and every action under it.
+
+**From the AI & Intelligence process.** Build command centre: how the blueprint is being turned into real configuration objects - areas, objects proposed, ready, warnings, conflicts, missing configuration, recommendations and what needs approval. The one thing to get right: it shows the plan's status on the action-plan lifecycle (draft → validated → simulated → awaiting approval → approved → executing), not a free-form progress bar.
+
 #### Inputs: what the user enters or picks
+
+**On the screen**
+
+| Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
+|---|---|---|---|---|---|---|---|
+| Tenant | picker: choose an id | optional | — | — | shows names, sends the id | **Pick a tenant first** (audit R098; decided 2 October 2026, Chinmay: console screens get the tenant picker and grant, CHG-SBO-001). This screen's operations run in that tenant's cell, and a platform … | `Tenant.id` |
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
 
@@ -112,12 +146,37 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|---|---|---|
 | Module | text field | — | — | `getConfigurationBlueprint` ?module |
 | Decision class | segmented control | — | Required · Recommended · Optional | `getConfigurationBlueprint` ?decisionClass |
+| Status | radio group | — | Onboarding · Active · Suspended · Terminating · Terminated | `listTenants` ?status |
+| Plan | picker: choose a plan | — | — | `listTenants` ?planId |
 
-Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+**Form: Open access grant** (modal, opened by *Open access grant*; *Open access grant* calls `openPlatformStaffGrant`, *Cancel* sends nothing)
+
+**Collects what `openPlatformStaffGrant` sends before it is called** (audit R098). Required: `id` (a client UUIDv7, generated silently), `permissions` (tenant permissions only; `AI_USE` preselected for this screen), `reason`, `expiresAt` (at most 8 hours ahead, proposed). Optional: `ticketRef`. Requires step-up: the operator presents a second factor first. The tenant sees the grant and everything done under it. Dismissing sends nothing; the screen behind is unchanged.
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| ID `id` | picker: choose an id | required | — | — | shows names, sends the id | Client-generated UUIDv7 for the grant. | `openPlatformStaffGrant` body |
+| Permissions `permissions` | multi-select chips | required | — | SESSION FORCE LOGOUT · USER MANAGE · ROLE MANAGE · PERMISSION GRANT · PERMISSION VIEW · PERMISSION MANAGE · PLATFORM TENANT VIEW · PLATFORM TENANT MANAGE · PLATFORM TENANT TERMINATE · PLATFORM PLAN MANAGE · PLATFORM CELL VIEW · PLATFORM CELL MANAGE …; at … | — | What the operator may do in this tenant while the grant is open. Tenant permissions only; a `PLATFORM_*` value is refused `400`. | `openPlatformStaffGrant` body |
+| Reason `reason` | text area | required | — | min length 3; max length 500 | — | — | `openPlatformStaffGrant` body |
+| Ticket ref `ticketRef` | text field | optional | — | max length 100 | — | The support case this access serves, where there is one. | `openPlatformStaffGrant` body |
+| Expires at `expiresAt` | date and time picker | required | — | At most 8 hours after opening (proposed, client to correct). | 1 Oct 2026, 14:30 (venue time zone) | At most 8 hours after opening (proposed, client to correct). | `openPlatformStaffGrant` body |
+
+Errors to draw in the form: 400 Validation failed; 403 Authenticated but not permitted at the requested scope
 
 #### Outputs: what the screen shows and produces
 
 **Shown**
+
+**Open grant into this tenant** (banner, from `listOwnPlatformStaffGrants`): **Always visible while the screen acts on a tenant** (audit R098, the ADM-412 pattern): which tenant, which permissions, why, and the time left to `expiresAt`. At expiry every tenant action is disabled and the screen returns to its grantRequired state; a new need is a new grant. The tenant sees the grant in its own audit log. Found again after a reload with `listOwnPlatformStaffGrants`.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Operator display name | text | — |
+| Permissions | list or chips (count when long) | — |
+| Reason | text | — |
+| Ticket ref | text | — |
+| Opened at | 1 Oct 2026, 14:30 | — |
+| Expires at | 1 Oct 2026, 14:30 | — |
 
 **Configuration Areas** (metric tile)
 
@@ -135,7 +194,17 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Approval Required** (metric tile)
 
-**Data it reads**: `getActionPlan` (onLoad, A plan with its steps); `getConfigurationBlueprint` (onLoad, The blueprint so far)
+**Actions and what each produces**
+
+| Action | Calls | Sends | On success returns | Errors to show | Notes |
+|---|---|---|---|---|---|
+| Open access grant (primary button) | `openPlatformStaffGrant` POST `/platform-staff-grants` | inline | PlatformStaffGrant | 400 Validation failed; 403 Authenticated but not permitted at the requested scope | step-up: mfa (Opens a platform operator's access into a tenant's data.); opens modal first |
+
+**Rules for what is shown** (from the AI & Intelligence process; these refine the tables above and win where they differ)
+
+- **plan status**: Stage track of AiActionPlan.status with counts per module; "Approval required" links to the approval workflow. *(source: contracts/satellite/ai.yaml#getActionPlan / contracts/satellite/ai.yaml#/components/schemas/AiActionPlan)*
+
+**Data it reads**: `getActionPlan` (onLoad, A plan with its steps); `getConfigurationBlueprint` (onLoad, The blueprint so far); `listTenants` (onLoad, The tenant picker: the operator picks a tenant before …)
 
 **Where the user goes next**
 
@@ -159,20 +228,42 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, first run (`?state=emptyFirstRun`) | No build yet. Carries the create action; distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the build are still there. The pack's own statuses are Building Configuration — the state names which is selected. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Grant required (`?state=grantRequired`) | **No access into this tenant yet.** A tenant is picked and no platform-staff grant into it is open, so every tenant action is disabled and the screen offers **Open access grant** (`openPlatformStaffGrant`: reason, permissions `AI_USE`, expiry). The same state returns when the grant reaches `expiresAt` (audit R098; CHG-SBO-001). |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 409 The blueprint is not ready: a required decision is open or deferred (AIC-115). |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 The blueprint is not ready: a required decision is open or deferred (AIC-115). |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+tiles:
+  areas: 6
+  objectsProposed: 46
+  ready: 41
+  warnings: 3
+  conflicts: 1
+  approvalRequired: 12
+```
 
 #### Permissions
 
 - `getActionPlan` → `AI_USE` (operate) · staff
 - `getConfigurationBlueprint` → `AI_USE` (operate) · staff
 - `buildConfigurationPlan` → `AI_USE` (operate) · staff
+- `listTenants` → `PLATFORM_TENANT_VIEW` (read) · staff
+- `listOwnPlatformStaffGrants` → `PLATFORM_TENANT_ACCESS` (operate) · staff
+- `openPlatformStaffGrant` → `PLATFORM_TENANT_ACCESS` (operate) · staff · step-up mfa
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
 #### Requirements it meets
 
-No matrix row traces to this screen's operations or data.
+1 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+
+| Ref | Requirement (shortened) | Domain | Verdict | Via |
+|---|---|---|---|---|
+| 2.6.6 | It is expected to have one webstore/application API for each venue. | Ticketing Sales | CONTRACTED | data `Tenant` |
 
 #### Client meeting inputs
 
@@ -203,12 +294,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (404, 409).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
-- [ ] Every state opens from `#ADM-479?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
+- [ ] Every input above is drawn (6), with its required mark, default, format and its error state (400, 403, 404, 409).
+- [ ] Every output is drawn (6 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every state opens from `#ADM-479?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, grantRequired, offline.
+- [ ] Every action is wired with its success and its failure: Open access grant.
 - [ ] Every transition is wired: `ADM-002`, `ADM-480`, `ADM-481`, `ADM-482`, `ADM-483`, `ADM-484`, `ADM-485`, `ADM-486`, `ADM-487`, `ADM-488`.
-- [ ] Every gated control is gated: `AI_USE`.
+- [ ] Every gated control is gated: `AI_USE`, `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW`.
 - [ ] The module and platform inputs below are applied.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -221,18 +312,28 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | | |
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
-| Module | Platform · wave 3 · needs the `ai` module |
+| Module | Platform · wave 3 · needs the `core` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `AI_USE` (1 operate); in the flows as platform admin |
+| Who uses it | ticvai staff holding `AI_USE`, `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW` (2 operate, 1 read); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
 | Offline | online only |
-| Opens with | `decisionKey` (navigation), `planId` (navigation), `sessionId` (session) |
+| Opens with | `decisionKey` (navigation), `planId` (navigation), `sessionId` (session), `tenantId` (navigation) |
 | Route | `/platform/venue-organization-configuration-adm-480` |
+
+**What the spec says about it.** **Tenant picker and platform-staff grant added 2 October 2026** (CHG-SBO-001; Chinmay, pre-apply round: console screens get the R098 tenant picker and grant, the ADM-412 pattern). The Console runs outside every cell; `getActionPlan` (AI_USE), `getConfigurationBlueprint` (AI_USE), `decideBlueprintRecommendation` (AI_USE) are tenant operations, refused 403 to a platform token until a time-boxed, audited grant into the picked tenant is open. The tenant sees the grant and every action under it.
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the AI & Intelligence process.** Venue and organisation configuration proposed from the blueprint: organisation, venues, zones, opening calendar - as draft objects to review per field, with what the assistant inferred marked. The one thing to get right: each proposed object shows the owning module's fields, and accepting here only accepts the proposal.
+
 #### Inputs: what the user enters or picks
+
+**On the screen**
+
+| Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
+|---|---|---|---|---|---|---|---|
+| Tenant | picker: choose an id | optional | — | — | shows names, sends the id | **Pick a tenant first** (audit R098; decided 2 October 2026, Chinmay: console screens get the tenant picker and grant, CHG-SBO-001). This screen's operations run in that tenant's cell, and a platform … | `Tenant.id` |
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
 
@@ -240,12 +341,37 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|---|---|---|
 | Module | text field | — | — | `getConfigurationBlueprint` ?module |
 | Decision class | segmented control | — | Required · Recommended · Optional | `getConfigurationBlueprint` ?decisionClass |
+| Status | radio group | — | Onboarding · Active · Suspended · Terminating · Terminated | `listTenants` ?status |
+| Plan | picker: choose a plan | — | — | `listTenants` ?planId |
 
-Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+**Form: Open access grant** (modal, opened by *Open access grant*; *Open access grant* calls `openPlatformStaffGrant`, *Cancel* sends nothing)
+
+**Collects what `openPlatformStaffGrant` sends before it is called** (audit R098). Required: `id` (a client UUIDv7, generated silently), `permissions` (tenant permissions only; `AI_USE` preselected for this screen), `reason`, `expiresAt` (at most 8 hours ahead, proposed). Optional: `ticketRef`. Requires step-up: the operator presents a second factor first. The tenant sees the grant and everything done under it. Dismissing sends nothing; the screen behind is unchanged.
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| ID `id` | picker: choose an id | required | — | — | shows names, sends the id | Client-generated UUIDv7 for the grant. | `openPlatformStaffGrant` body |
+| Permissions `permissions` | multi-select chips | required | — | SESSION FORCE LOGOUT · USER MANAGE · ROLE MANAGE · PERMISSION GRANT · PERMISSION VIEW · PERMISSION MANAGE · PLATFORM TENANT VIEW · PLATFORM TENANT MANAGE · PLATFORM TENANT TERMINATE · PLATFORM PLAN MANAGE · PLATFORM CELL VIEW · PLATFORM CELL MANAGE …; at … | — | What the operator may do in this tenant while the grant is open. Tenant permissions only; a `PLATFORM_*` value is refused `400`. | `openPlatformStaffGrant` body |
+| Reason `reason` | text area | required | — | min length 3; max length 500 | — | — | `openPlatformStaffGrant` body |
+| Ticket ref `ticketRef` | text field | optional | — | max length 100 | — | The support case this access serves, where there is one. | `openPlatformStaffGrant` body |
+| Expires at `expiresAt` | date and time picker | required | — | At most 8 hours after opening (proposed, client to correct). | 1 Oct 2026, 14:30 (venue time zone) | At most 8 hours after opening (proposed, client to correct). | `openPlatformStaffGrant` body |
+
+Errors to draw in the form: 400 Validation failed; 403 Authenticated but not permitted at the requested scope
 
 #### Outputs: what the screen shows and produces
 
 **Shown**
+
+**Open grant into this tenant** (banner, from `listOwnPlatformStaffGrants`): **Always visible while the screen acts on a tenant** (audit R098, the ADM-412 pattern): which tenant, which permissions, why, and the time left to `expiresAt`. At expiry every tenant action is disabled and the screen returns to its grantRequired state; a new need is a new grant. The tenant sees the grant in its own audit log. Found again after a reload with `listOwnPlatformStaffGrants`.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Operator display name | text | — |
+| Permissions | list or chips (count when long) | — |
+| Reason | text | — |
+| Ticket ref | text | — |
+| Opened at | 1 Oct 2026, 14:30 | — |
+| Expires at | 1 Oct 2026, 14:30 | — |
 
 **Detail panel** (detail panel): One record, read-only.
 
@@ -253,10 +379,15 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
+| Open access grant (primary button) | `openPlatformStaffGrant` POST `/platform-staff-grants` | inline | PlatformStaffGrant | 400 Validation failed; 403 Authenticated but not permitted at the requested scope | step-up: mfa (Opens a platform operator's access into a tenant's data.); opens modal first |
 |  (primary button) | navigation or local | — | — | — | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
 
-**Data it reads**: `getActionPlan` (onLoad, A plan with its steps); `getConfigurationBlueprint` (onLoad, The blueprint so far)
+**Rules for what is shown** (from the AI & Intelligence process; these refine the tables above and win where they differ)
+
+- **proposed objects**: Field, proposed value, provenance, status; accept / modify / reject per field or object. *(source: contracts/satellite/ai.yaml#decideBlueprintRecommendation / contracts/satellite/ai.yaml#getActionPlan)*
+
+**Data it reads**: `getActionPlan` (onLoad, A plan with its steps); `getConfigurationBlueprint` (onLoad, The blueprint so far); `listTenants` (onLoad, The tenant picker: the operator picks a tenant before …)
 
 **Where the user goes next**
 
@@ -271,20 +402,43 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, first run (`?state=emptyFirstRun`) | No venue organization yet. Carries the create action; distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the venue organization are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Grant required (`?state=grantRequired`) | **No access into this tenant yet.** A tenant is picked and no platform-staff grant into it is open, so every tenant action is disabled and the screen offers **Open access grant** (`openPlatformStaffGrant`: reason, permissions `AI_USE`, expiry). The same state returns when the grant reaches `expiresAt` (audit R098; CHG-SBO-001). |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 409 The session is no longer open for decisions (`session-not-open`). |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 The session is no longer open for decisions (`session-not-open`). |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+venue:
+  name: Coastal Aqua
+  zones:
+  - Wave pool
+  - Kids splash
+  - Lazy river
+  - Cabanas
+  calendar: Closed Mondays Jun-Aug
+```
 
 #### Permissions
 
 - `getActionPlan` → `AI_USE` (operate) · staff
 - `getConfigurationBlueprint` → `AI_USE` (operate) · staff
 - `decideBlueprintRecommendation` → `AI_USE` (operate) · staff
+- `listTenants` → `PLATFORM_TENANT_VIEW` (read) · staff
+- `listOwnPlatformStaffGrants` → `PLATFORM_TENANT_ACCESS` (operate) · staff
+- `openPlatformStaffGrant` → `PLATFORM_TENANT_ACCESS` (operate) · staff · step-up mfa
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
 #### Requirements it meets
 
-No matrix row traces to this screen's operations or data.
+1 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+
+| Ref | Requirement (shortened) | Domain | Verdict | Via |
+|---|---|---|---|---|
+| 2.6.6 | It is expected to have one webstore/application API for each venue. | Ticketing Sales | CONTRACTED | data `Tenant` |
 
 #### Client meeting inputs
 
@@ -305,12 +459,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (404, 409).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
-- [ ] Every state opens from `#ADM-480?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: , Cancel.
+- [ ] Every input above is drawn (6), with its required mark, default, format and its error state (400, 403, 404, 409).
+- [ ] Every output is drawn (6 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every state opens from `#ADM-480?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, grantRequired, offline.
+- [ ] Every action is wired with its success and its failure: Open access grant, , Cancel.
 - [ ] Every transition is wired: `ADM-479`.
-- [ ] Every gated control is gated: `AI_USE`.
+- [ ] Every gated control is gated: `AI_USE`, `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW`.
 - [ ] The module and platform inputs below are applied.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -323,18 +477,28 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | | |
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
-| Module | Platform · wave 3 · needs the `ai` module |
+| Module | Platform · wave 3 · needs the `core` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `AI_USE` (1 operate); in the flows as platform admin |
+| Who uses it | ticvai staff holding `AI_USE`, `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW` (2 operate, 1 read); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
 | Offline | online only |
-| Opens with | `decisionKey` (navigation), `planId` (navigation), `sessionId` (session) |
+| Opens with | `decisionKey` (navigation), `planId` (navigation), `sessionId` (session), `tenantId` (navigation) |
 | Route | `/platform/product-configuration-assistant-adm-481` |
+
+**What the spec says about it.** **Tenant picker and platform-staff grant added 2 October 2026** (CHG-SBO-001; Chinmay, pre-apply round: console screens get the R098 tenant picker and grant, the ADM-412 pattern). The Console runs outside every cell; `getActionPlan` (AI_USE), `getConfigurationBlueprint` (AI_USE), `decideBlueprintRecommendation` (AI_USE) are tenant operations, refused 403 to a platform token until a time-boxed, audited grant into the picked tenant is open. The tenant sees the grant and every action under it.
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the AI & Intelligence process.** Products proposed by the assistant, in the existing ticketing model: product, variants, guest categories, validity, entitlement, add-ons. The one thing to get right: the assistant asks for any missing required field (e.g. capacity) before drafting, and unstructured input (a brochure, a photo of a price board) can seed it.
+
 #### Inputs: what the user enters or picks
+
+**On the screen**
+
+| Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
+|---|---|---|---|---|---|---|---|
+| Tenant | picker: choose an id | optional | — | — | shows names, sends the id | **Pick a tenant first** (audit R098; decided 2 October 2026, Chinmay: console screens get the tenant picker and grant, CHG-SBO-001). This screen's operations run in that tenant's cell, and a platform … | `Tenant.id` |
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
 
@@ -342,12 +506,37 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|---|---|---|
 | Module | text field | — | — | `getConfigurationBlueprint` ?module |
 | Decision class | segmented control | — | Required · Recommended · Optional | `getConfigurationBlueprint` ?decisionClass |
+| Status | radio group | — | Onboarding · Active · Suspended · Terminating · Terminated | `listTenants` ?status |
+| Plan | picker: choose a plan | — | — | `listTenants` ?planId |
 
-Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+**Form: Open access grant** (modal, opened by *Open access grant*; *Open access grant* calls `openPlatformStaffGrant`, *Cancel* sends nothing)
+
+**Collects what `openPlatformStaffGrant` sends before it is called** (audit R098). Required: `id` (a client UUIDv7, generated silently), `permissions` (tenant permissions only; `AI_USE` preselected for this screen), `reason`, `expiresAt` (at most 8 hours ahead, proposed). Optional: `ticketRef`. Requires step-up: the operator presents a second factor first. The tenant sees the grant and everything done under it. Dismissing sends nothing; the screen behind is unchanged.
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| ID `id` | picker: choose an id | required | — | — | shows names, sends the id | Client-generated UUIDv7 for the grant. | `openPlatformStaffGrant` body |
+| Permissions `permissions` | multi-select chips | required | — | SESSION FORCE LOGOUT · USER MANAGE · ROLE MANAGE · PERMISSION GRANT · PERMISSION VIEW · PERMISSION MANAGE · PLATFORM TENANT VIEW · PLATFORM TENANT MANAGE · PLATFORM TENANT TERMINATE · PLATFORM PLAN MANAGE · PLATFORM CELL VIEW · PLATFORM CELL MANAGE …; at … | — | What the operator may do in this tenant while the grant is open. Tenant permissions only; a `PLATFORM_*` value is refused `400`. | `openPlatformStaffGrant` body |
+| Reason `reason` | text area | required | — | min length 3; max length 500 | — | — | `openPlatformStaffGrant` body |
+| Ticket ref `ticketRef` | text field | optional | — | max length 100 | — | The support case this access serves, where there is one. | `openPlatformStaffGrant` body |
+| Expires at `expiresAt` | date and time picker | required | — | At most 8 hours after opening (proposed, client to correct). | 1 Oct 2026, 14:30 (venue time zone) | At most 8 hours after opening (proposed, client to correct). | `openPlatformStaffGrant` body |
+
+Errors to draw in the form: 400 Validation failed; 403 Authenticated but not permitted at the requested scope
 
 #### Outputs: what the screen shows and produces
 
 **Shown**
+
+**Open grant into this tenant** (banner, from `listOwnPlatformStaffGrants`): **Always visible while the screen acts on a tenant** (audit R098, the ADM-412 pattern): which tenant, which permissions, why, and the time left to `expiresAt`. At expiry every tenant action is disabled and the screen returns to its grantRequired state; a new need is a new grant. The tenant sees the grant in its own audit log. Found again after a reload with `listOwnPlatformStaffGrants`.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Operator display name | text | — |
+| Permissions | list or chips (count when long) | — |
+| Reason | text | — |
+| Ticket ref | text | — |
+| Opened at | 1 Oct 2026, 14:30 | — |
+| Expires at | 1 Oct 2026, 14:30 | — |
 
 **Detail panel** (detail panel): One record, read-only.
 
@@ -355,10 +544,15 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
+| Open access grant (primary button) | `openPlatformStaffGrant` POST `/platform-staff-grants` | inline | PlatformStaffGrant | 400 Validation failed; 403 Authenticated but not permitted at the requested scope | step-up: mfa (Opens a platform operator's access into a tenant's data.); opens modal first |
 |  (primary button) | navigation or local | — | — | — | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
 
-**Data it reads**: `getActionPlan` (onLoad, A plan with its steps); `getConfigurationBlueprint` (onLoad, The blueprint so far)
+**Rules for what is shown** (from the AI & Intelligence process; these refine the tables above and win where they differ)
+
+- **product drafts**: One card per product with its fields, provenance and citation; required fields missing shown as questions, not blanks. *(source: DI-937 / TRACKER Actions row 125 / contracts/satellite/ai.yaml#getConfigurationBlueprint)*
+
+**Data it reads**: `getActionPlan` (onLoad, A plan with its steps); `getConfigurationBlueprint` (onLoad, The blueprint so far); `listTenants` (onLoad, The tenant picker: the operator picks a tenant before …)
 
 **Where the user goes next**
 
@@ -373,20 +567,40 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, first run (`?state=emptyFirstRun`) | No product assistant yet. Carries the create action; distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the product assistant are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Grant required (`?state=grantRequired`) | **No access into this tenant yet.** A tenant is picked and no platform-staff grant into it is open, so every tenant action is disabled and the screen offers **Open access grant** (`openPlatformStaffGrant`: reason, permissions `AI_USE`, expiry). The same state returns when the grant reaches `expiresAt` (audit R098; CHG-SBO-001). |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 409 The session is no longer open for decisions (`session-not-open`). |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 The session is no longer open for decisions (`session-not-open`). |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+product:
+  name: Family Day Pass (2+2) / تذكرة اليوم العائلي
+  price: AED 540.00 (from price list p.4)
+  validity: Selected date
+  capacityLink: Day capacity
+```
 
 #### Permissions
 
 - `getActionPlan` → `AI_USE` (operate) · staff
 - `getConfigurationBlueprint` → `AI_USE` (operate) · staff
 - `decideBlueprintRecommendation` → `AI_USE` (operate) · staff
+- `listTenants` → `PLATFORM_TENANT_VIEW` (read) · staff
+- `listOwnPlatformStaffGrants` → `PLATFORM_TENANT_ACCESS` (operate) · staff
+- `openPlatformStaffGrant` → `PLATFORM_TENANT_ACCESS` (operate) · staff · step-up mfa
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
 #### Requirements it meets
 
-No matrix row traces to this screen's operations or data.
+1 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+
+| Ref | Requirement (shortened) | Domain | Verdict | Via |
+|---|---|---|---|---|
+| 2.6.6 | It is expected to have one webstore/application API for each venue. | Ticketing Sales | CONTRACTED | data `Tenant` |
 
 #### Client meeting inputs
 
@@ -412,12 +626,12 @@ Also apply: 1 for P09 · Platform, 9 for all of P09, 29 for every app (section *
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (404, 409).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
-- [ ] Every state opens from `#ADM-481?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: , Cancel.
+- [ ] Every input above is drawn (6), with its required mark, default, format and its error state (400, 403, 404, 409).
+- [ ] Every output is drawn (6 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every state opens from `#ADM-481?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, grantRequired, offline.
+- [ ] Every action is wired with its success and its failure: Open access grant, , Cancel.
 - [ ] Every transition is wired: `ADM-479`.
-- [ ] Every gated control is gated: `AI_USE`.
+- [ ] Every gated control is gated: `AI_USE`, `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW`.
 - [ ] The 2 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -430,18 +644,28 @@ Also apply: 1 for P09 · Platform, 9 for all of P09, 29 for every app (section *
 | | |
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
-| Module | Platform · wave 3 · needs the `ai` module |
+| Module | Platform · wave 3 · needs the `core` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `AI_USE` (1 operate); in the flows as platform admin |
+| Who uses it | ticvai staff holding `AI_USE`, `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW` (2 operate, 1 read); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
 | Offline | online only |
-| Opens with | `decisionKey` (navigation), `planId` (navigation), `sessionId` (session) |
+| Opens with | `decisionKey` (navigation), `planId` (navigation), `sessionId` (session), `tenantId` (navigation) |
 | Route | `/platform/schedule-capacity-availability-configuration-adm-482` |
+
+**What the spec says about it.** **Tenant picker and platform-staff grant added 2 October 2026** (CHG-SBO-001; Chinmay, pre-apply round: console screens get the R098 tenant picker and grant, the ADM-412 pattern). The Console runs outside every cell; `getActionPlan` (AI_USE), `getConfigurationBlueprint` (AI_USE), `decideBlueprintRecommendation` (AI_USE) are tenant operations, refused 403 to a platform token until a time-boxed, audited grant into the picked tenant is open. The tenant sees the grant and every action under it.
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the AI & Intelligence process.** Schedules, timeslots, reservation windows and capacity structures proposed from the operating answers. The one thing to get right: capacity per slot and per area is explicit and consistent with the venue's total capacity; a mismatch is a conflict, not silently adjusted.
+
 #### Inputs: what the user enters or picks
+
+**On the screen**
+
+| Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
+|---|---|---|---|---|---|---|---|
+| Tenant | picker: choose an id | optional | — | — | shows names, sends the id | **Pick a tenant first** (audit R098; decided 2 October 2026, Chinmay: console screens get the tenant picker and grant, CHG-SBO-001). This screen's operations run in that tenant's cell, and a platform … | `Tenant.id` |
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
 
@@ -449,12 +673,37 @@ Also apply: 1 for P09 · Platform, 9 for all of P09, 29 for every app (section *
 |---|---|---|---|---|
 | Module | text field | — | — | `getConfigurationBlueprint` ?module |
 | Decision class | segmented control | — | Required · Recommended · Optional | `getConfigurationBlueprint` ?decisionClass |
+| Status | radio group | — | Onboarding · Active · Suspended · Terminating · Terminated | `listTenants` ?status |
+| Plan | picker: choose a plan | — | — | `listTenants` ?planId |
 
-Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+**Form: Open access grant** (modal, opened by *Open access grant*; *Open access grant* calls `openPlatformStaffGrant`, *Cancel* sends nothing)
+
+**Collects what `openPlatformStaffGrant` sends before it is called** (audit R098). Required: `id` (a client UUIDv7, generated silently), `permissions` (tenant permissions only; `AI_USE` preselected for this screen), `reason`, `expiresAt` (at most 8 hours ahead, proposed). Optional: `ticketRef`. Requires step-up: the operator presents a second factor first. The tenant sees the grant and everything done under it. Dismissing sends nothing; the screen behind is unchanged.
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| ID `id` | picker: choose an id | required | — | — | shows names, sends the id | Client-generated UUIDv7 for the grant. | `openPlatformStaffGrant` body |
+| Permissions `permissions` | multi-select chips | required | — | SESSION FORCE LOGOUT · USER MANAGE · ROLE MANAGE · PERMISSION GRANT · PERMISSION VIEW · PERMISSION MANAGE · PLATFORM TENANT VIEW · PLATFORM TENANT MANAGE · PLATFORM TENANT TERMINATE · PLATFORM PLAN MANAGE · PLATFORM CELL VIEW · PLATFORM CELL MANAGE …; at … | — | What the operator may do in this tenant while the grant is open. Tenant permissions only; a `PLATFORM_*` value is refused `400`. | `openPlatformStaffGrant` body |
+| Reason `reason` | text area | required | — | min length 3; max length 500 | — | — | `openPlatformStaffGrant` body |
+| Ticket ref `ticketRef` | text field | optional | — | max length 100 | — | The support case this access serves, where there is one. | `openPlatformStaffGrant` body |
+| Expires at `expiresAt` | date and time picker | required | — | At most 8 hours after opening (proposed, client to correct). | 1 Oct 2026, 14:30 (venue time zone) | At most 8 hours after opening (proposed, client to correct). | `openPlatformStaffGrant` body |
+
+Errors to draw in the form: 400 Validation failed; 403 Authenticated but not permitted at the requested scope
 
 #### Outputs: what the screen shows and produces
 
 **Shown**
+
+**Open grant into this tenant** (banner, from `listOwnPlatformStaffGrants`): **Always visible while the screen acts on a tenant** (audit R098, the ADM-412 pattern): which tenant, which permissions, why, and the time left to `expiresAt`. At expiry every tenant action is disabled and the screen returns to its grantRequired state; a new need is a new grant. The tenant sees the grant in its own audit log. Found again after a reload with `listOwnPlatformStaffGrants`.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Operator display name | text | — |
+| Permissions | list or chips (count when long) | — |
+| Reason | text | — |
+| Ticket ref | text | — |
+| Opened at | 1 Oct 2026, 14:30 | — |
+| Expires at | 1 Oct 2026, 14:30 | — |
 
 **Detail panel** (detail panel): One record, read-only.
 
@@ -462,10 +711,15 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
+| Open access grant (primary button) | `openPlatformStaffGrant` POST `/platform-staff-grants` | inline | PlatformStaffGrant | 400 Validation failed; 403 Authenticated but not permitted at the requested scope | step-up: mfa (Opens a platform operator's access into a tenant's data.); opens modal first |
 |  (primary button) | navigation or local | — | — | — | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
 
-**Data it reads**: `getActionPlan` (onLoad, A plan with its steps); `getConfigurationBlueprint` (onLoad, The blueprint so far)
+**Rules for what is shown** (from the AI & Intelligence process; these refine the tables above and win where they differ)
+
+- **schedule proposal**: Calendar view of opening days and slots with capacity; conflicts flagged against venue capacity. *(source: contracts/satellite/ai.yaml#getConfigurationBlueprint / MoM 18 Sep 4.6)*
+
+**Data it reads**: `getActionPlan` (onLoad, A plan with its steps); `getConfigurationBlueprint` (onLoad, The blueprint so far); `listTenants` (onLoad, The tenant picker: the operator picks a tenant before …)
 
 **Where the user goes next**
 
@@ -480,20 +734,36 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, first run (`?state=emptyFirstRun`) | No schedule capacity availability yet. Carries the create action; distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the schedule capacity availability are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Grant required (`?state=grantRequired`) | **No access into this tenant yet.** A tenant is picked and no platform-staff grant into it is open, so every tenant action is disabled and the screen offers **Open access grant** (`openPlatformStaffGrant`: reason, permissions `AI_USE`, expiry). The same state returns when the grant reaches `expiresAt` (audit R098; CHG-SBO-001). |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 409 The session is no longer open for decisions (`session-not-open`). |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 The session is no longer open for decisions (`session-not-open`). |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+slots: 'Cabanas: full day, 40 per day; Dolphin show: 12:00 and 16:00, 400 seats each'
+```
 
 #### Permissions
 
 - `getActionPlan` → `AI_USE` (operate) · staff
 - `getConfigurationBlueprint` → `AI_USE` (operate) · staff
 - `decideBlueprintRecommendation` → `AI_USE` (operate) · staff
+- `listTenants` → `PLATFORM_TENANT_VIEW` (read) · staff
+- `listOwnPlatformStaffGrants` → `PLATFORM_TENANT_ACCESS` (operate) · staff
+- `openPlatformStaffGrant` → `PLATFORM_TENANT_ACCESS` (operate) · staff · step-up mfa
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
 #### Requirements it meets
 
-No matrix row traces to this screen's operations or data.
+1 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+
+| Ref | Requirement (shortened) | Domain | Verdict | Via |
+|---|---|---|---|---|
+| 2.6.6 | It is expected to have one webstore/application API for each venue. | Ticketing Sales | CONTRACTED | data `Tenant` |
 
 #### Client meeting inputs
 
@@ -514,12 +784,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (404, 409).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
-- [ ] Every state opens from `#ADM-482?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: , Cancel.
+- [ ] Every input above is drawn (6), with its required mark, default, format and its error state (400, 403, 404, 409).
+- [ ] Every output is drawn (6 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every state opens from `#ADM-482?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, grantRequired, offline.
+- [ ] Every action is wired with its success and its failure: Open access grant, , Cancel.
 - [ ] Every transition is wired: `ADM-479`.
-- [ ] Every gated control is gated: `AI_USE`.
+- [ ] Every gated control is gated: `AI_USE`, `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW`.
 - [ ] The module and platform inputs below are applied.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -532,18 +802,34 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | | |
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
-| Module | Platform · wave 3 · needs the `ai` module |
+| Module | Platform · wave 3 · needs the `core` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `AI_USE`, `PRODUCT_CONFIGURE` (1 operate, 1 configure); in the flows as platform admin |
+| Who uses it | ticvai staff holding `AI_USE`, `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW` (2 operate, 1 read); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Show) and no metric row |
 | Offline | online only |
-| Opens with | `decisionKey` (navigation), `planId` (navigation), `sessionId` (session) |
+| Opens with | `decisionKey` (navigation), `planId` (navigation), `sessionId` (session), `tenantId` (navigation) |
 | Route | `/platform/pricing-commercial-configuration-adm-483` |
 
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
+**What the spec says about it.** **Tenant picker and platform-staff grant added 2 October 2026** (CHG-SBO-001; Chinmay, pre-apply round: console screens get the R098 tenant picker and grant, the ADM-412 pattern). The Console runs outside every cell; `getActionPlan` (AI_USE), `getConfigurationBlueprint` (AI_USE), `decideBlueprintRecommendation` (AI_USE) are tenant operations, refused 403 to a platform token until a time-boxed, audited grant into the picked tenant is open. The tenant sees the grant and every action under it.
+
+**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape … Removed 2 October 2026 (CHG-WIR-012): The assistant only drafts (ADR-0020); pricing is written by the plan's executor after approval, through the owning API, so the direct write …
+
+**From the AI & Intelligence process.** Prices, taxes, fees and commercial rules proposed from the commercial answers, using the existing pricing model, with a price simulation. The one thing to get right: pricing is high risk - every proposed price is a draft that routes for approval (L3 at most for the configuration assistant), and VAT treatment is shown explicitly.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **Table columns are board values ("AED 120", "AED 20", "Adult / Saturday / B2C").** Why: Sample values, not columns. *(source: screens/P09-platform-admin-console.yaml#ADM-483; AI & Intelligence)*
+
+**Fixed on main** (the package already carries these; draw what it says): The screen calls setChannelPricingCommercial (PRODUCT_CONFIGURE) directly. (CHG-WIR-012).
 
 #### Inputs: what the user enters or picks
+
+**On the screen**
+
+| Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
+|---|---|---|---|---|---|---|---|
+| Tenant | picker: choose an id | optional | — | — | shows names, sends the id | **Pick a tenant first** (audit R098; decided 2 October 2026, Chinmay: console screens get the tenant picker and grant, CHG-SBO-001). This screen's operations run in that tenant's cell, and a platform … | `Tenant.id` |
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
 
@@ -551,12 +837,37 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|---|---|---|
 | Module | text field | — | — | `getConfigurationBlueprint` ?module |
 | Decision class | segmented control | — | Required · Recommended · Optional | `getConfigurationBlueprint` ?decisionClass |
+| Status | radio group | — | Onboarding · Active · Suspended · Terminating · Terminated | `listTenants` ?status |
+| Plan | picker: choose a plan | — | — | `listTenants` ?planId |
 
-Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+**Form: Open access grant** (modal, opened by *Open access grant*; *Open access grant* calls `openPlatformStaffGrant`, *Cancel* sends nothing)
+
+**Collects what `openPlatformStaffGrant` sends before it is called** (audit R098). Required: `id` (a client UUIDv7, generated silently), `permissions` (tenant permissions only; `AI_USE` preselected for this screen), `reason`, `expiresAt` (at most 8 hours ahead, proposed). Optional: `ticketRef`. Requires step-up: the operator presents a second factor first. The tenant sees the grant and everything done under it. Dismissing sends nothing; the screen behind is unchanged.
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| ID `id` | picker: choose an id | required | — | — | shows names, sends the id | Client-generated UUIDv7 for the grant. | `openPlatformStaffGrant` body |
+| Permissions `permissions` | multi-select chips | required | — | SESSION FORCE LOGOUT · USER MANAGE · ROLE MANAGE · PERMISSION GRANT · PERMISSION VIEW · PERMISSION MANAGE · PLATFORM TENANT VIEW · PLATFORM TENANT MANAGE · PLATFORM TENANT TERMINATE · PLATFORM PLAN MANAGE · PLATFORM CELL VIEW · PLATFORM CELL MANAGE …; at … | — | What the operator may do in this tenant while the grant is open. Tenant permissions only; a `PLATFORM_*` value is refused `400`. | `openPlatformStaffGrant` body |
+| Reason `reason` | text area | required | — | min length 3; max length 500 | — | — | `openPlatformStaffGrant` body |
+| Ticket ref `ticketRef` | text field | optional | — | max length 100 | — | The support case this access serves, where there is one. | `openPlatformStaffGrant` body |
+| Expires at `expiresAt` | date and time picker | required | — | At most 8 hours after opening (proposed, client to correct). | 1 Oct 2026, 14:30 (venue time zone) | At most 8 hours after opening (proposed, client to correct). | `openPlatformStaffGrant` body |
+
+Errors to draw in the form: 400 Validation failed; 403 Authenticated but not permitted at the requested scope
 
 #### Outputs: what the screen shows and produces
 
 **Shown**
+
+**Open grant into this tenant** (banner, from `listOwnPlatformStaffGrants`): **Always visible while the screen acts on a tenant** (audit R098, the ADM-412 pattern): which tenant, which permissions, why, and the time left to `expiresAt`. At expiry every tenant action is disabled and the screen returns to its grantRequired state; a new need is a new grant. The tenant sees the grant in its own audit log. Found again after a reload with `listOwnPlatformStaffGrants`.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Operator display name | text | — |
+| Permissions | list or chips (count when long) | — |
+| Reason | text | — |
+| Ticket ref | text | — |
+| Opened at | 1 Oct 2026, 14:30 | — |
+| Expires at | 1 Oct 2026, 14:30 | — |
 
 **Every pricing commercial** (data table)
 
@@ -578,7 +889,18 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | AED 120 | text | not in the schema: `AED 120` |
 | AED 20 | text | not in the schema: `AED 20` |
 
-**Data it reads**: `getActionPlan` (onLoad, A plan with its steps); `getConfigurationBlueprint` (onLoad, The blueprint so far)
+**Actions and what each produces**
+
+| Action | Calls | Sends | On success returns | Errors to show | Notes |
+|---|---|---|---|---|---|
+| Open access grant (primary button) | `openPlatformStaffGrant` POST `/platform-staff-grants` | inline | PlatformStaffGrant | 400 Validation failed; 403 Authenticated but not permitted at the requested scope | step-up: mfa (Opens a platform operator's access into a tenant's data.); opens modal first |
+
+**Rules for what is shown** (from the AI & Intelligence process; these refine the tables above and win where they differ)
+
+- **price proposal**: Product × guest category × day type × channel grid with proposed price in AED, VAT shown (5% UAE) and the source of each price (price list, recommendation). *(source: contracts/spine/catalogue.yaml#setChannelPricingCommercial / ADR-0050 / MoM 18 Sep 4.1)*
+- **simulation**: "Adult / Saturday / B2C: AED 120 base + AED 20 weekend = AED 140" style worked examples. *(source: screens/P09-platform-admin-console.yaml#ADM-483)*
+
+**Data it reads**: `getActionPlan` (onLoad, A plan with its steps); `getConfigurationBlueprint` (onLoad, The blueprint so far); `listTenants` (onLoad, The tenant picker: the operator picks a tenant before …)
 
 **Where the user goes next**
 
@@ -590,24 +912,45 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |---|---|
 | Loading (`?state=loading`) | The pricing commercial list. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the pricing commercial untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No pricing commercial yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, first run (`?state=emptyFirstRun`) | No pricing commercial yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the pricing commercial are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Grant required (`?state=grantRequired`) | **No access into this tenant yet.** A tenant is picked and no platform-staff grant into it is open, so every tenant action is disabled and the screen offers **Open access grant** (`openPlatformStaffGrant`: reason, permissions `AI_USE`, expiry). The same state returns when the grant reaches `expiresAt` (audit R098; CHG-SBO-001). |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 409 The session is no longer open for decisions (`session-not-open`). |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 The session is no longer open for decisions (`session-not-open`). |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+grid:
+- product: Day Pass
+  category: Adult
+  day: Saturday
+  channel: B2C
+  price: AED 140.00
+  vat: incl. 5%
+```
 
 #### Permissions
 
-- `setChannelPricingCommercial` → `PRODUCT_CONFIGURE` (configure) · staff
 - `getActionPlan` → `AI_USE` (operate) · staff
 - `getConfigurationBlueprint` → `AI_USE` (operate) · staff
 - `decideBlueprintRecommendation` → `AI_USE` (operate) · staff
+- `listTenants` → `PLATFORM_TENANT_VIEW` (read) · staff
+- `listOwnPlatformStaffGrants` → `PLATFORM_TENANT_ACCESS` (operate) · staff
+- `openPlatformStaffGrant` → `PLATFORM_TENANT_ACCESS` (operate) · staff · step-up mfa
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
 #### Requirements it meets
 
-No matrix row traces to this screen's operations or data.
+1 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+
+| Ref | Requirement (shortened) | Domain | Verdict | Via |
+|---|---|---|---|---|
+| 2.6.6 | It is expected to have one webstore/application API for each venue. | Ticketing Sales | CONTRACTED | data `Tenant` |
 
 #### Client meeting inputs
 
@@ -625,16 +968,18 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS10 AI Configuration Assistant Board 2.dc.html#adm-483`
 - Workshop pack: AI_Configuration_Assistant_Reference.pdf board 2
 - Flow F226 *AI Configuration Assistant board 2: AI Configuration Build Command Center*, step 8: Works in Pricing & Commercial Configuration → Convert commercial requirements into proposed pricing, tax, fee, and commercial rules using TICVAI's existing Pricing architecture.
+- ADR-0020 *— Where AI runs, and what it is isolated from* (`docs/adr/0020-ai-isolation-boundary.md`)
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (404, 409).
-- [ ] Every output is drawn (10 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
-- [ ] Every state opens from `#ADM-483?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
+- [ ] Every input above is drawn (6), with its required mark, default, format and its error state (400, 403, 404, 409).
+- [ ] Every output is drawn (16 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every state opens from `#ADM-483?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, grantRequired, offline.
+- [ ] Every action is wired with its success and its failure: Open access grant.
 - [ ] Every transition is wired: `ADM-479`.
-- [ ] Every gated control is gated: `AI_USE`, `PRODUCT_CONFIGURE`.
+- [ ] Every gated control is gated: `AI_USE`, `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -646,18 +991,28 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | | |
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
-| Module | Platform · wave 3 · needs the `ai` module |
+| Module | Platform · wave 3 · needs the `core` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `AI_USE` (1 operate); in the flows as platform admin |
+| Who uses it | ticvai staff holding `AI_USE`, `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW` (2 operate, 1 read); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
 | Offline | online only |
-| Opens with | `decisionKey` (navigation), `planId` (navigation), `sessionId` (session) |
+| Opens with | `decisionKey` (navigation), `planId` (navigation), `sessionId` (session), `tenantId` (navigation) |
 | Route | `/platform/promotion-bundle-upsell-configuration-adm-484` |
+
+**What the spec says about it.** **Tenant picker and platform-staff grant added 2 October 2026** (CHG-SBO-001; Chinmay, pre-apply round: console screens get the R098 tenant picker and grant, the ADM-412 pattern). The Console runs outside every cell; `getActionPlan` (AI_USE), `getConfigurationBlueprint` (AI_USE), `decideBlueprintRecommendation` (AI_USE) are tenant operations, refused 403 to a platform token until a time-boxed, audited grant into the picked tenant is open. The tenant sees the grant and every action under it.
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the AI & Intelligence process.** Promotions, bundles, upsell and cross-sell proposed from the commercial answers - shown only when the answers made them relevant. The one thing to get right: proposals reuse the Promotions model (relationship map, bundles, business priority), which is also what Block A upsell answers from.
+
 #### Inputs: what the user enters or picks
+
+**On the screen**
+
+| Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
+|---|---|---|---|---|---|---|---|
+| Tenant | picker: choose an id | optional | — | — | shows names, sends the id | **Pick a tenant first** (audit R098; decided 2 October 2026, Chinmay: console screens get the tenant picker and grant, CHG-SBO-001). This screen's operations run in that tenant's cell, and a platform … | `Tenant.id` |
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
 
@@ -665,12 +1020,37 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|---|---|---|
 | Module | text field | — | — | `getConfigurationBlueprint` ?module |
 | Decision class | segmented control | — | Required · Recommended · Optional | `getConfigurationBlueprint` ?decisionClass |
+| Status | radio group | — | Onboarding · Active · Suspended · Terminating · Terminated | `listTenants` ?status |
+| Plan | picker: choose a plan | — | — | `listTenants` ?planId |
 
-Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+**Form: Open access grant** (modal, opened by *Open access grant*; *Open access grant* calls `openPlatformStaffGrant`, *Cancel* sends nothing)
+
+**Collects what `openPlatformStaffGrant` sends before it is called** (audit R098). Required: `id` (a client UUIDv7, generated silently), `permissions` (tenant permissions only; `AI_USE` preselected for this screen), `reason`, `expiresAt` (at most 8 hours ahead, proposed). Optional: `ticketRef`. Requires step-up: the operator presents a second factor first. The tenant sees the grant and everything done under it. Dismissing sends nothing; the screen behind is unchanged.
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| ID `id` | picker: choose an id | required | — | — | shows names, sends the id | Client-generated UUIDv7 for the grant. | `openPlatformStaffGrant` body |
+| Permissions `permissions` | multi-select chips | required | — | SESSION FORCE LOGOUT · USER MANAGE · ROLE MANAGE · PERMISSION GRANT · PERMISSION VIEW · PERMISSION MANAGE · PLATFORM TENANT VIEW · PLATFORM TENANT MANAGE · PLATFORM TENANT TERMINATE · PLATFORM PLAN MANAGE · PLATFORM CELL VIEW · PLATFORM CELL MANAGE …; at … | — | What the operator may do in this tenant while the grant is open. Tenant permissions only; a `PLATFORM_*` value is refused `400`. | `openPlatformStaffGrant` body |
+| Reason `reason` | text area | required | — | min length 3; max length 500 | — | — | `openPlatformStaffGrant` body |
+| Ticket ref `ticketRef` | text field | optional | — | max length 100 | — | The support case this access serves, where there is one. | `openPlatformStaffGrant` body |
+| Expires at `expiresAt` | date and time picker | required | — | At most 8 hours after opening (proposed, client to correct). | 1 Oct 2026, 14:30 (venue time zone) | At most 8 hours after opening (proposed, client to correct). | `openPlatformStaffGrant` body |
+
+Errors to draw in the form: 400 Validation failed; 403 Authenticated but not permitted at the requested scope
 
 #### Outputs: what the screen shows and produces
 
 **Shown**
+
+**Open grant into this tenant** (banner, from `listOwnPlatformStaffGrants`): **Always visible while the screen acts on a tenant** (audit R098, the ADM-412 pattern): which tenant, which permissions, why, and the time left to `expiresAt`. At expiry every tenant action is disabled and the screen returns to its grantRequired state; a new need is a new grant. The tenant sees the grant in its own audit log. Found again after a reload with `listOwnPlatformStaffGrants`.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Operator display name | text | — |
+| Permissions | list or chips (count when long) | — |
+| Reason | text | — |
+| Ticket ref | text | — |
+| Opened at | 1 Oct 2026, 14:30 | — |
+| Expires at | 1 Oct 2026, 14:30 | — |
 
 **Detail panel** (detail panel): One record, read-only.
 
@@ -678,10 +1058,15 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
+| Open access grant (primary button) | `openPlatformStaffGrant` POST `/platform-staff-grants` | inline | PlatformStaffGrant | 400 Validation failed; 403 Authenticated but not permitted at the requested scope | step-up: mfa (Opens a platform operator's access into a tenant's data.); opens modal first |
 |  (primary button) | navigation or local | — | — | — | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
 
-**Data it reads**: `getActionPlan` (onLoad, A plan with its steps); `getConfigurationBlueprint` (onLoad, The blueprint so far)
+**Rules for what is shown** (from the AI & Intelligence process; these refine the tables above and win where they differ)
+
+- **proposals**: Bundle, upsell path or cross-sell relationship with the products involved, price effect and why recommended; provenance per item. *(source: contracts/satellite/ai.yaml#getConfigurationBlueprint / ADR-0052)*
+
+**Data it reads**: `getActionPlan` (onLoad, A plan with its steps); `getConfigurationBlueprint` (onLoad, The blueprint so far); `listTenants` (onLoad, The tenant picker: the operator picks a tenant before …)
 
 **Where the user goes next**
 
@@ -696,20 +1081,43 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, first run (`?state=emptyFirstRun`) | No promotion bundle upsell yet. Carries the create action; distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the promotion bundle upsell are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Grant required (`?state=grantRequired`) | **No access into this tenant yet.** A tenant is picked and no platform-staff grant into it is open, so every tenant action is disabled and the screen offers **Open access grant** (`openPlatformStaffGrant`: reason, permissions `AI_USE`, expiry). The same state returns when the grant reaches `expiresAt` (audit R098; CHG-SBO-001). |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 409 The session is no longer open for decisions (`session-not-open`). |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 The session is no longer open for decisions (`session-not-open`). |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+proposals:
+- kind: bundle
+  name: Family Day Pass (2+2)
+  effect: AED 540 vs AED 600 separately
+  why: You said families are 60% of visitors
+- kind: upsell
+  from: Day Pass
+  to: Annual Pass
+```
 
 #### Permissions
 
 - `getActionPlan` → `AI_USE` (operate) · staff
 - `getConfigurationBlueprint` → `AI_USE` (operate) · staff
 - `decideBlueprintRecommendation` → `AI_USE` (operate) · staff
+- `listTenants` → `PLATFORM_TENANT_VIEW` (read) · staff
+- `listOwnPlatformStaffGrants` → `PLATFORM_TENANT_ACCESS` (operate) · staff
+- `openPlatformStaffGrant` → `PLATFORM_TENANT_ACCESS` (operate) · staff · step-up mfa
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
 #### Requirements it meets
 
-No matrix row traces to this screen's operations or data.
+1 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+
+| Ref | Requirement (shortened) | Domain | Verdict | Via |
+|---|---|---|---|---|
+| 2.6.6 | It is expected to have one webstore/application API for each venue. | Ticketing Sales | CONTRACTED | data `Tenant` |
 
 #### Client meeting inputs
 
@@ -731,12 +1139,12 @@ Also apply: 1 for P09 · Platform, 9 for all of P09, 29 for every app (section *
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (404, 409).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
-- [ ] Every state opens from `#ADM-484?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: , Cancel.
+- [ ] Every input above is drawn (6), with its required mark, default, format and its error state (400, 403, 404, 409).
+- [ ] Every output is drawn (6 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every state opens from `#ADM-484?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, grantRequired, offline.
+- [ ] Every action is wired with its success and its failure: Open access grant, , Cancel.
 - [ ] Every transition is wired: `ADM-479`.
-- [ ] Every gated control is gated: `AI_USE`.
+- [ ] Every gated control is gated: `AI_USE`, `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW`.
 - [ ] The module and platform inputs below are applied.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -749,18 +1157,28 @@ Also apply: 1 for P09 · Platform, 9 for all of P09, 29 for every app (section *
 | | |
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
-| Module | Platform · wave 3 · needs the `ai` module |
+| Module | Platform · wave 3 · needs the `core` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `AI_USE` (1 operate); in the flows as platform admin |
+| Who uses it | ticvai staff holding `AI_USE`, `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW` (2 operate, 1 read); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
 | Offline | online only |
-| Opens with | `decisionKey` (navigation), `planId` (navigation), `sessionId` (session) |
+| Opens with | `decisionKey` (navigation), `planId` (navigation), `sessionId` (session), `tenantId` (navigation) |
 | Route | `/platform/seating-access-operational-configuration-adm-485` |
+
+**What the spec says about it.** **Tenant picker and platform-staff grant added 2 October 2026** (CHG-SBO-001; Chinmay, pre-apply round: console screens get the R098 tenant picker and grant, the ADM-412 pattern). The Console runs outside every cell; `getActionPlan` (AI_USE), `getConfigurationBlueprint` (AI_USE), `decideBlueprintRecommendation` (AI_USE) are tenant operations, refused 403 to a platform token until a time-boxed, audited grant into the picked tenant is open. The tenant sees the grant and every action under it.
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the AI & Intelligence process.** Seating, access and operational rules for fulfilling and validating the products; the screen adapts to the venue type - for a museum, seating is irrelevant and takes no space. The one thing to get right: sections not relevant to the blueprint collapse to a single "Not needed for this venue" line.
+
 #### Inputs: what the user enters or picks
+
+**On the screen**
+
+| Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
+|---|---|---|---|---|---|---|---|
+| Tenant | picker: choose an id | optional | — | — | shows names, sends the id | **Pick a tenant first** (audit R098; decided 2 October 2026, Chinmay: console screens get the tenant picker and grant, CHG-SBO-001). This screen's operations run in that tenant's cell, and a platform … | `Tenant.id` |
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
 
@@ -768,12 +1186,37 @@ Also apply: 1 for P09 · Platform, 9 for all of P09, 29 for every app (section *
 |---|---|---|---|---|
 | Module | text field | — | — | `getConfigurationBlueprint` ?module |
 | Decision class | segmented control | — | Required · Recommended · Optional | `getConfigurationBlueprint` ?decisionClass |
+| Status | radio group | — | Onboarding · Active · Suspended · Terminating · Terminated | `listTenants` ?status |
+| Plan | picker: choose a plan | — | — | `listTenants` ?planId |
 
-Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+**Form: Open access grant** (modal, opened by *Open access grant*; *Open access grant* calls `openPlatformStaffGrant`, *Cancel* sends nothing)
+
+**Collects what `openPlatformStaffGrant` sends before it is called** (audit R098). Required: `id` (a client UUIDv7, generated silently), `permissions` (tenant permissions only; `AI_USE` preselected for this screen), `reason`, `expiresAt` (at most 8 hours ahead, proposed). Optional: `ticketRef`. Requires step-up: the operator presents a second factor first. The tenant sees the grant and everything done under it. Dismissing sends nothing; the screen behind is unchanged.
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| ID `id` | picker: choose an id | required | — | — | shows names, sends the id | Client-generated UUIDv7 for the grant. | `openPlatformStaffGrant` body |
+| Permissions `permissions` | multi-select chips | required | — | SESSION FORCE LOGOUT · USER MANAGE · ROLE MANAGE · PERMISSION GRANT · PERMISSION VIEW · PERMISSION MANAGE · PLATFORM TENANT VIEW · PLATFORM TENANT MANAGE · PLATFORM TENANT TERMINATE · PLATFORM PLAN MANAGE · PLATFORM CELL VIEW · PLATFORM CELL MANAGE …; at … | — | What the operator may do in this tenant while the grant is open. Tenant permissions only; a `PLATFORM_*` value is refused `400`. | `openPlatformStaffGrant` body |
+| Reason `reason` | text area | required | — | min length 3; max length 500 | — | — | `openPlatformStaffGrant` body |
+| Ticket ref `ticketRef` | text field | optional | — | max length 100 | — | The support case this access serves, where there is one. | `openPlatformStaffGrant` body |
+| Expires at `expiresAt` | date and time picker | required | — | At most 8 hours after opening (proposed, client to correct). | 1 Oct 2026, 14:30 (venue time zone) | At most 8 hours after opening (proposed, client to correct). | `openPlatformStaffGrant` body |
+
+Errors to draw in the form: 400 Validation failed; 403 Authenticated but not permitted at the requested scope
 
 #### Outputs: what the screen shows and produces
 
 **Shown**
+
+**Open grant into this tenant** (banner, from `listOwnPlatformStaffGrants`): **Always visible while the screen acts on a tenant** (audit R098, the ADM-412 pattern): which tenant, which permissions, why, and the time left to `expiresAt`. At expiry every tenant action is disabled and the screen returns to its grantRequired state; a new need is a new grant. The tenant sees the grant in its own audit log. Found again after a reload with `listOwnPlatformStaffGrants`.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Operator display name | text | — |
+| Permissions | list or chips (count when long) | — |
+| Reason | text | — |
+| Ticket ref | text | — |
+| Opened at | 1 Oct 2026, 14:30 | — |
+| Expires at | 1 Oct 2026, 14:30 | — |
 
 **Detail panel** (detail panel): One record, read-only.
 
@@ -781,10 +1224,15 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
+| Open access grant (primary button) | `openPlatformStaffGrant` POST `/platform-staff-grants` | inline | PlatformStaffGrant | 400 Validation failed; 403 Authenticated but not permitted at the requested scope | step-up: mfa (Opens a platform operator's access into a tenant's data.); opens modal first |
 |  (primary button) | navigation or local | — | — | — | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
 
-**Data it reads**: `getActionPlan` (onLoad, A plan with its steps); `getConfigurationBlueprint` (onLoad, The blueprint so far)
+**Rules for what is shown** (from the AI & Intelligence process; these refine the tables above and win where they differ)
+
+- **adaptive sections**: Only seating (seated venues), access gates and validation rules, re-entry, ID checks as the blueprint requires. *(source: screens/P09-platform-admin-console.yaml#ADM-485 (purpose) / contracts/satellite/ai.yaml#getConfigurationBlueprint)*
+
+**Data it reads**: `getActionPlan` (onLoad, A plan with its steps); `getConfigurationBlueprint` (onLoad, The blueprint so far); `listTenants` (onLoad, The tenant picker: the operator picks a tenant before …)
 
 **Where the user goes next**
 
@@ -799,20 +1247,41 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, first run (`?state=emptyFirstRun`) | No seating access operational yet. Carries the create action; distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the seating access operational are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Grant required (`?state=grantRequired`) | **No access into this tenant yet.** A tenant is picked and no platform-staff grant into it is open, so every tenant action is disabled and the screen offers **Open access grant** (`openPlatformStaffGrant`: reason, permissions `AI_USE`, expiry). The same state returns when the grant reaches `expiresAt` (audit R098; CHG-SBO-001). |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 409 The session is no longer open for decisions (`session-not-open`). |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 The session is no longer open for decisions (`session-not-open`). |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+access:
+  gates:
+  - Main gate
+  - Cabana entrance
+  reEntry: Allowed same day with wristband
+  validation: QR on ticket or wristband RFID
+```
 
 #### Permissions
 
 - `getActionPlan` → `AI_USE` (operate) · staff
 - `getConfigurationBlueprint` → `AI_USE` (operate) · staff
 - `decideBlueprintRecommendation` → `AI_USE` (operate) · staff
+- `listTenants` → `PLATFORM_TENANT_VIEW` (read) · staff
+- `listOwnPlatformStaffGrants` → `PLATFORM_TENANT_ACCESS` (operate) · staff
+- `openPlatformStaffGrant` → `PLATFORM_TENANT_ACCESS` (operate) · staff · step-up mfa
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
 #### Requirements it meets
 
-No matrix row traces to this screen's operations or data.
+1 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+
+| Ref | Requirement (shortened) | Domain | Verdict | Via |
+|---|---|---|---|---|
+| 2.6.6 | It is expected to have one webstore/application API for each venue. | Ticketing Sales | CONTRACTED | data `Tenant` |
 
 #### Client meeting inputs
 
@@ -838,12 +1307,12 @@ Also apply: 1 for P09 · Platform, 9 for all of P09, 29 for every app (section *
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (404, 409).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
-- [ ] Every state opens from `#ADM-485?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: , Cancel.
+- [ ] Every input above is drawn (6), with its required mark, default, format and its error state (400, 403, 404, 409).
+- [ ] Every output is drawn (6 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every state opens from `#ADM-485?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, grantRequired, offline.
+- [ ] Every action is wired with its success and its failure: Open access grant, , Cancel.
 - [ ] Every transition is wired: `ADM-479`.
-- [ ] Every gated control is gated: `AI_USE`.
+- [ ] Every gated control is gated: `AI_USE`, `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW`.
 - [ ] The module and platform inputs below are applied.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -856,18 +1325,28 @@ Also apply: 1 for P09 · Platform, 9 for all of P09, 29 for every app (section *
 | | |
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
-| Module | Platform · wave 3 · needs the `ai` module |
+| Module | Platform · wave 3 · needs the `core` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `AI_USE` (1 operate); in the flows as platform admin |
+| Who uses it | ticvai staff holding `AI_USE`, `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW` (2 operate, 1 read); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
 | Offline | online only |
-| Opens with | `decisionKey` (navigation), `planId` (navigation), `sessionId` (session) |
+| Opens with | `decisionKey` (navigation), `planId` (navigation), `sessionId` (session), `tenantId` (navigation) |
 | Route | `/platform/channel-media-fulfillment-configuration-adm-486` |
+
+**What the spec says about it.** **Tenant picker and platform-staff grant added 2 October 2026** (CHG-SBO-001; Chinmay, pre-apply round: console screens get the R098 tenant picker and grant, the ADM-412 pattern). The Console runs outside every cell; `getActionPlan` (AI_USE), `getConfigurationBlueprint` (AI_USE), `decideBlueprintRecommendation` (AI_USE) are tenant operations, refused 403 to a platform token until a time-boxed, audited grant into the picked tenant is open. The tenant sees the grant and every action under it.
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the AI & Intelligence process.** Channels, ticket media and fulfilment: which products sell on which channels, delivered how (e-ticket, wallet pass, wristband, printed), and the dependency that a channel needs a price before a product is published to it. The one thing to get right: a product proposed for a channel with no price shows as a blocking dependency.
+
 #### Inputs: what the user enters or picks
+
+**On the screen**
+
+| Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
+|---|---|---|---|---|---|---|---|
+| Tenant | picker: choose an id | optional | — | — | shows names, sends the id | **Pick a tenant first** (audit R098; decided 2 October 2026, Chinmay: console screens get the tenant picker and grant, CHG-SBO-001). This screen's operations run in that tenant's cell, and a platform … | `Tenant.id` |
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
 
@@ -875,12 +1354,37 @@ Also apply: 1 for P09 · Platform, 9 for all of P09, 29 for every app (section *
 |---|---|---|---|---|
 | Module | text field | — | — | `getConfigurationBlueprint` ?module |
 | Decision class | segmented control | — | Required · Recommended · Optional | `getConfigurationBlueprint` ?decisionClass |
+| Status | radio group | — | Onboarding · Active · Suspended · Terminating · Terminated | `listTenants` ?status |
+| Plan | picker: choose a plan | — | — | `listTenants` ?planId |
 
-Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+**Form: Open access grant** (modal, opened by *Open access grant*; *Open access grant* calls `openPlatformStaffGrant`, *Cancel* sends nothing)
+
+**Collects what `openPlatformStaffGrant` sends before it is called** (audit R098). Required: `id` (a client UUIDv7, generated silently), `permissions` (tenant permissions only; `AI_USE` preselected for this screen), `reason`, `expiresAt` (at most 8 hours ahead, proposed). Optional: `ticketRef`. Requires step-up: the operator presents a second factor first. The tenant sees the grant and everything done under it. Dismissing sends nothing; the screen behind is unchanged.
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| ID `id` | picker: choose an id | required | — | — | shows names, sends the id | Client-generated UUIDv7 for the grant. | `openPlatformStaffGrant` body |
+| Permissions `permissions` | multi-select chips | required | — | SESSION FORCE LOGOUT · USER MANAGE · ROLE MANAGE · PERMISSION GRANT · PERMISSION VIEW · PERMISSION MANAGE · PLATFORM TENANT VIEW · PLATFORM TENANT MANAGE · PLATFORM TENANT TERMINATE · PLATFORM PLAN MANAGE · PLATFORM CELL VIEW · PLATFORM CELL MANAGE …; at … | — | What the operator may do in this tenant while the grant is open. Tenant permissions only; a `PLATFORM_*` value is refused `400`. | `openPlatformStaffGrant` body |
+| Reason `reason` | text area | required | — | min length 3; max length 500 | — | — | `openPlatformStaffGrant` body |
+| Ticket ref `ticketRef` | text field | optional | — | max length 100 | — | The support case this access serves, where there is one. | `openPlatformStaffGrant` body |
+| Expires at `expiresAt` | date and time picker | required | — | At most 8 hours after opening (proposed, client to correct). | 1 Oct 2026, 14:30 (venue time zone) | At most 8 hours after opening (proposed, client to correct). | `openPlatformStaffGrant` body |
+
+Errors to draw in the form: 400 Validation failed; 403 Authenticated but not permitted at the requested scope
 
 #### Outputs: what the screen shows and produces
 
 **Shown**
+
+**Open grant into this tenant** (banner, from `listOwnPlatformStaffGrants`): **Always visible while the screen acts on a tenant** (audit R098, the ADM-412 pattern): which tenant, which permissions, why, and the time left to `expiresAt`. At expiry every tenant action is disabled and the screen returns to its grantRequired state; a new need is a new grant. The tenant sees the grant in its own audit log. Found again after a reload with `listOwnPlatformStaffGrants`.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Operator display name | text | — |
+| Permissions | list or chips (count when long) | — |
+| Reason | text | — |
+| Ticket ref | text | — |
+| Opened at | 1 Oct 2026, 14:30 | — |
+| Expires at | 1 Oct 2026, 14:30 | — |
 
 **Detail panel** (detail panel): One record, read-only.
 
@@ -888,10 +1392,15 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
+| Open access grant (primary button) | `openPlatformStaffGrant` POST `/platform-staff-grants` | inline | PlatformStaffGrant | 400 Validation failed; 403 Authenticated but not permitted at the requested scope | step-up: mfa (Opens a platform operator's access into a tenant's data.); opens modal first |
 |  (primary button) | navigation or local | — | — | — | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
 
-**Data it reads**: `getActionPlan` (onLoad, A plan with its steps); `getConfigurationBlueprint` (onLoad, The blueprint so far)
+**Rules for what is shown** (from the AI & Intelligence process; these refine the tables above and win where they differ)
+
+- **product × channel matrix**: Ticks per channel with media; a missing price on a ticked channel is a red dependency linking to pricing. *(source: MoM 18 Sep 4.6 / contracts/satellite/ai.yaml#getConfigurationBlueprint)*
+
+**Data it reads**: `getActionPlan` (onLoad, A plan with its steps); `getConfigurationBlueprint` (onLoad, The blueprint so far); `listTenants` (onLoad, The tenant picker: the operator picks a tenant before …)
 
 **Where the user goes next**
 
@@ -906,20 +1415,41 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, first run (`?state=emptyFirstRun`) | No channel media fulfillment yet. Carries the create action; distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the channel media fulfillment are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Grant required (`?state=grantRequired`) | **No access into this tenant yet.** A tenant is picked and no platform-staff grant into it is open, so every tenant action is disabled and the screen offers **Open access grant** (`openPlatformStaffGrant`: reason, permissions `AI_USE`, expiry). The same state returns when the grant reaches `expiresAt` (audit R098; CHG-SBO-001). |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 409 The session is no longer open for decisions (`session-not-open`). |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 The session is no longer open for decisions (`session-not-open`). |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+row:
+  product: Day Pass
+  channels:
+    Website: e-ticket + wallet pass
+    POS: printed / wristband
+    Reseller: no price yet - blocking
+```
 
 #### Permissions
 
 - `getActionPlan` → `AI_USE` (operate) · staff
 - `getConfigurationBlueprint` → `AI_USE` (operate) · staff
 - `decideBlueprintRecommendation` → `AI_USE` (operate) · staff
+- `listTenants` → `PLATFORM_TENANT_VIEW` (read) · staff
+- `listOwnPlatformStaffGrants` → `PLATFORM_TENANT_ACCESS` (operate) · staff
+- `openPlatformStaffGrant` → `PLATFORM_TENANT_ACCESS` (operate) · staff · step-up mfa
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
 #### Requirements it meets
 
-No matrix row traces to this screen's operations or data.
+1 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+
+| Ref | Requirement (shortened) | Domain | Verdict | Via |
+|---|---|---|---|---|
+| 2.6.6 | It is expected to have one webstore/application API for each venue. | Ticketing Sales | CONTRACTED | data `Tenant` |
 
 #### Client meeting inputs
 
@@ -940,12 +1470,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (404, 409).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
-- [ ] Every state opens from `#ADM-486?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: , Cancel.
+- [ ] Every input above is drawn (6), with its required mark, default, format and its error state (400, 403, 404, 409).
+- [ ] Every output is drawn (6 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every state opens from `#ADM-486?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, grantRequired, offline.
+- [ ] Every action is wired with its success and its failure: Open access grant, , Cancel.
 - [ ] Every transition is wired: `ADM-479`.
-- [ ] Every gated control is gated: `AI_USE`.
+- [ ] Every gated control is gated: `AI_USE`, `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW`.
 - [ ] The module and platform inputs below are applied.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -958,24 +1488,64 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | | |
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
-| Module | Platform · wave 3 · needs the `ai` module |
+| Module | Platform · wave 3 · needs the `core` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `AI_USE` (1 operate); in the flows as platform admin |
+| Who uses it | ticvai staff holding `AI_USE`, `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW` (2 operate, 1 read); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | commandCentre (compact density): the pack gives this screen a metric directory (§Header KPIs) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's |
 | Offline | online only |
-| Opens with | `planId` (navigation) |
+| Opens with | `planId` (navigation), `tenantId` (navigation) |
 | Route | `/platform/cross-module-conflict-dependency-validation-adm-487` |
+
+**What the spec says about it.** **Tenant picker and platform-staff grant added 2 October 2026** (CHG-SBO-001; Chinmay, pre-apply round: console screens get the R098 tenant picker and grant, the ADM-412 pattern). The Console runs outside every cell; `getActionPlan` (AI_USE), `simulateActionPlan` (AI_USE) are tenant operations, refused 403 to a platform token until a time-boxed, audited grant into the picked tenant is open. The tenant sees the grant and every action under it.
 
 **Known gaps.** **The pack names 3 actions on this screen and the screen declares 0 operations.** Unserved: Link Existing, Configure Later, Ask AI. Each needs an operation, or needs removing from the screen; this is …
 
+**From the AI & Intelligence process.** Cross-module validation before approval: every proposed object checked against every module's rules - passed, warnings, conflicts, missing dependencies, approval requirements - by simulating the plan without changing anything. The one thing to get right: each issue names the object, the rule it fails and the module that owns the rule, with a resolution (link an existing object, configure later, ask the assistant).
+
 #### Inputs: what the user enters or picks
 
-Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+**On the screen**
+
+| Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
+|---|---|---|---|---|---|---|---|
+| Tenant | picker: choose an id | optional | — | — | shows names, sends the id | **Pick a tenant first** (audit R098; decided 2 October 2026, Chinmay: console screens get the tenant picker and grant, CHG-SBO-001). This screen's operations run in that tenant's cell, and a platform … | `Tenant.id` |
+
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Status | radio group | — | Onboarding · Active · Suspended · Terminating · Terminated | `listTenants` ?status |
+| Plan | picker: choose a plan | — | — | `listTenants` ?planId |
+
+**Form: Open access grant** (modal, opened by *Open access grant*; *Open access grant* calls `openPlatformStaffGrant`, *Cancel* sends nothing)
+
+**Collects what `openPlatformStaffGrant` sends before it is called** (audit R098). Required: `id` (a client UUIDv7, generated silently), `permissions` (tenant permissions only; `AI_USE` preselected for this screen), `reason`, `expiresAt` (at most 8 hours ahead, proposed). Optional: `ticketRef`. Requires step-up: the operator presents a second factor first. The tenant sees the grant and everything done under it. Dismissing sends nothing; the screen behind is unchanged.
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| ID `id` | picker: choose an id | required | — | — | shows names, sends the id | Client-generated UUIDv7 for the grant. | `openPlatformStaffGrant` body |
+| Permissions `permissions` | multi-select chips | required | — | SESSION FORCE LOGOUT · USER MANAGE · ROLE MANAGE · PERMISSION GRANT · PERMISSION VIEW · PERMISSION MANAGE · PLATFORM TENANT VIEW · PLATFORM TENANT MANAGE · PLATFORM TENANT TERMINATE · PLATFORM PLAN MANAGE · PLATFORM CELL VIEW · PLATFORM CELL MANAGE …; at … | — | What the operator may do in this tenant while the grant is open. Tenant permissions only; a `PLATFORM_*` value is refused `400`. | `openPlatformStaffGrant` body |
+| Reason `reason` | text area | required | — | min length 3; max length 500 | — | — | `openPlatformStaffGrant` body |
+| Ticket ref `ticketRef` | text field | optional | — | max length 100 | — | The support case this access serves, where there is one. | `openPlatformStaffGrant` body |
+| Expires at `expiresAt` | date and time picker | required | — | At most 8 hours after opening (proposed, client to correct). | 1 Oct 2026, 14:30 (venue time zone) | At most 8 hours after opening (proposed, client to correct). | `openPlatformStaffGrant` body |
+
+Errors to draw in the form: 400 Validation failed; 403 Authenticated but not permitted at the requested scope
 
 #### Outputs: what the screen shows and produces
 
 **Shown**
+
+**Open grant into this tenant** (banner, from `listOwnPlatformStaffGrants`): **Always visible while the screen acts on a tenant** (audit R098, the ADM-412 pattern): which tenant, which permissions, why, and the time left to `expiresAt`. At expiry every tenant action is disabled and the screen returns to its grantRequired state; a new need is a new grant. The tenant sees the grant in its own audit log. Found again after a reload with `listOwnPlatformStaffGrants`.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Operator display name | text | — |
+| Permissions | list or chips (count when long) | — |
+| Reason | text | — |
+| Ticket ref | text | — |
+| Opened at | 1 Oct 2026, 14:30 | — |
+| Expires at | 1 Oct 2026, 14:30 | — |
 
 **Configuration Objects** (metric tile)
 
@@ -993,11 +1563,21 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
+| Open access grant (primary button) | `openPlatformStaffGrant` POST `/platform-staff-grants` | inline | PlatformStaffGrant | 400 Validation failed; 403 Authenticated but not permitted at the requested scope | step-up: mfa (Opens a platform operator's access into a tenant's data.); opens modal first |
 | Link Existing (primary button) | navigation or local | — | — | — | — |
 | Configure Later (secondary button) | navigation or local | — | — | — | — |
 | Ask AI (secondary button) | navigation or local | — | — | — | — |
 
-**Data it reads**: `getActionPlan` (onLoad, A plan with its steps)
+**Rules for what is shown** (from the AI & Intelligence process; these refine the tables above and win where they differ)
+
+- **validation results**: Per object and step - pass, warning, conflict, missing dependency, governance-blocked (a step failing a module limit is never applied). *(source: contracts/satellite/ai.yaml#simulateActionPlan / DI-955)*
+
+**What each action does** (from the AI & Intelligence process; these refine the tables above and win where they differ)
+
+- **Validate (simulate)**: Plan moves to validated/simulated; nothing changes in any module. *(source: contracts/satellite/ai.yaml#simulateActionPlan)*
+- **Link existing / Configure later / Ask AI**: Per-issue resolutions; Ask AI opens the interview with the issue as the question. *(source: screens/P09-platform-admin-console.yaml#ADM-487)*
+
+**Data it reads**: `getActionPlan` (onLoad, A plan with its steps); `listTenants` (onLoad, The tenant picker: the operator picks a tenant before …)
 
 **Where the user goes next**
 
@@ -1012,19 +1592,39 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, first run (`?state=emptyFirstRun`) | No cross-module conflict dependency yet. Carries the create action; distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the cross-module conflict dependency are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Grant required (`?state=grantRequired`) | **No access into this tenant yet.** A tenant is picked and no platform-staff grant into it is open, so every tenant action is disabled and the screen offers **Open access grant** (`openPlatformStaffGrant`: reason, permissions `AI_USE`, expiry). The same state returns when the grant reaches `expiresAt` (audit R098; CHG-SBO-001). |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 409 The plan is executing or finished; simulate a rollback plan instead. |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 The plan is executing or finished; simulate a rollback plan instead. |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+issue:
+  object: Product Day Pass on channel Reseller
+  rule: A product needs a channel price before publishing
+  owner: Catalogue
+  resolution: Configure later
+```
 
 #### Permissions
 
 - `getActionPlan` → `AI_USE` (operate) · staff
 - `simulateActionPlan` → `AI_USE` (operate) · staff
+- `listTenants` → `PLATFORM_TENANT_VIEW` (read) · staff
+- `listOwnPlatformStaffGrants` → `PLATFORM_TENANT_ACCESS` (operate) · staff
+- `openPlatformStaffGrant` → `PLATFORM_TENANT_ACCESS` (operate) · staff · step-up mfa
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
 #### Requirements it meets
 
-No matrix row traces to this screen's operations or data.
+1 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+
+| Ref | Requirement (shortened) | Domain | Verdict | Via |
+|---|---|---|---|---|
+| 2.6.6 | It is expected to have one webstore/application API for each venue. | Ticketing Sales | CONTRACTED | data `Tenant` |
 
 #### Client meeting inputs
 
@@ -1045,12 +1645,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (404, 409).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
-- [ ] Every state opens from `#ADM-487?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: Link Existing, Configure Later, Ask AI.
+- [ ] Every input above is drawn (6), with its required mark, default, format and its error state (400, 403, 404, 409).
+- [ ] Every output is drawn (6 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every state opens from `#ADM-487?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, grantRequired, offline.
+- [ ] Every action is wired with its success and its failure: Open access grant, Link Existing, Configure Later, Ask AI.
 - [ ] Every transition is wired: `ADM-479`.
-- [ ] Every gated control is gated: `AI_USE`.
+- [ ] Every gated control is gated: `AI_USE`, `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW`.
 - [ ] The module and platform inputs below are applied.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -1063,14 +1663,22 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | | |
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
-| Module | Platform · wave 3 · needs the `ai` module |
+| Module | Platform · wave 3 · needs the `core` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `AI_USE` (1 operate); in the flows as platform admin |
+| Who uses it | ticvai staff holding `AI_USE`, `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW` (2 operate, 1 read); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Critical AI Configuration Object Model; Three Sources of Configuration; AI Configuration Builder & Validation) and no display directory — it is … |
 | Offline | online only |
-| Opens with | `planId` (navigation) |
+| Opens with | `planId` (navigation), `tenantId` (navigation) |
 | Route | `/platform/configuration-preview-impact-analysis-adm-488` |
+
+**What the spec says about it.** **Tenant picker and platform-staff grant added 2 October 2026** (CHG-SBO-001; Chinmay, pre-apply round: console screens get the R098 tenant picker and grant, the ADM-412 pattern). The Console runs outside every cell; `getActionPlan` (AI_USE), `simulateActionPlan` (AI_USE) are tenant operations, refused 403 to a platform token until a time-boxed, audited grant into the picked tenant is open. The tenant sees the grant and every action under it.
+
+**From the AI & Intelligence process.** The full preview and impact before approval: the proposed configuration in business terms (what guests will be able to buy, when, at what price) and technical terms (objects per module), what it affects (existing bookings, channels) and where each value came from. The one thing to get right: impact on existing bookings is explicit - purchased tickets never change retroactively.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **The layout is the board's navigation outline as text fields ("1. AI Configuration Build Command Center" ... "Board: 3 of 3").** Why: Board text, not fields; draw the preview. *(source: screens/P09-platform-admin-console.yaml#ADM-488; AI & Intelligence)*
 
 #### Inputs: what the user enters or picks
 
@@ -1078,6 +1686,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
 |---|---|---|---|---|---|---|---|
+| Tenant | picker: choose an id | optional | — | — | shows names, sends the id | **Pick a tenant first** (audit R098; decided 2 October 2026, Chinmay: console screens get the tenant picker and grant, CHG-SBO-001). This screen's operations run in that tenant's cell, and a platform … | `Tenant.id` |
 | 👤 User Provided | select field | — | — | — | — | — | — |
 | 1. AI Configuration Build Command Center | text field | — | — | — | — | — | — |
 | 2. Venue & Organization Configuration | text field | — | — | — | — | — | — |
@@ -1097,9 +1706,54 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Board: 3 of 3 | text field | — | — | — | — | — | — |
 | Screens: 10 | select field | — | — | — | — | — | — |
 
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Status | radio group | — | Onboarding · Active · Suspended · Terminating · Terminated | `listTenants` ?status |
+| Plan | picker: choose a plan | — | — | `listTenants` ?planId |
+
+**Form: Open access grant** (modal, opened by *Open access grant*; *Open access grant* calls `openPlatformStaffGrant`, *Cancel* sends nothing)
+
+**Collects what `openPlatformStaffGrant` sends before it is called** (audit R098). Required: `id` (a client UUIDv7, generated silently), `permissions` (tenant permissions only; `AI_USE` preselected for this screen), `reason`, `expiresAt` (at most 8 hours ahead, proposed). Optional: `ticketRef`. Requires step-up: the operator presents a second factor first. The tenant sees the grant and everything done under it. Dismissing sends nothing; the screen behind is unchanged.
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| ID `id` | picker: choose an id | required | — | — | shows names, sends the id | Client-generated UUIDv7 for the grant. | `openPlatformStaffGrant` body |
+| Permissions `permissions` | multi-select chips | required | — | SESSION FORCE LOGOUT · USER MANAGE · ROLE MANAGE · PERMISSION GRANT · PERMISSION VIEW · PERMISSION MANAGE · PLATFORM TENANT VIEW · PLATFORM TENANT MANAGE · PLATFORM TENANT TERMINATE · PLATFORM PLAN MANAGE · PLATFORM CELL VIEW · PLATFORM CELL MANAGE …; at … | — | What the operator may do in this tenant while the grant is open. Tenant permissions only; a `PLATFORM_*` value is refused `400`. | `openPlatformStaffGrant` body |
+| Reason `reason` | text area | required | — | min length 3; max length 500 | — | — | `openPlatformStaffGrant` body |
+| Ticket ref `ticketRef` | text field | optional | — | max length 100 | — | The support case this access serves, where there is one. | `openPlatformStaffGrant` body |
+| Expires at `expiresAt` | date and time picker | required | — | At most 8 hours after opening (proposed, client to correct). | 1 Oct 2026, 14:30 (venue time zone) | At most 8 hours after opening (proposed, client to correct). | `openPlatformStaffGrant` body |
+
+Errors to draw in the form: 400 Validation failed; 403 Authenticated but not permitted at the requested scope
+
 #### Outputs: what the screen shows and produces
 
-**Data it reads**: `getActionPlan` (onLoad, A plan with its steps)
+**Shown**
+
+**Open grant into this tenant** (banner, from `listOwnPlatformStaffGrants`): **Always visible while the screen acts on a tenant** (audit R098, the ADM-412 pattern): which tenant, which permissions, why, and the time left to `expiresAt`. At expiry every tenant action is disabled and the screen returns to its grantRequired state; a new need is a new grant. The tenant sees the grant in its own audit log. Found again after a reload with `listOwnPlatformStaffGrants`.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Operator display name | text | — |
+| Permissions | list or chips (count when long) | — |
+| Reason | text | — |
+| Ticket ref | text | — |
+| Opened at | 1 Oct 2026, 14:30 | — |
+| Expires at | 1 Oct 2026, 14:30 | — |
+
+**Actions and what each produces**
+
+| Action | Calls | Sends | On success returns | Errors to show | Notes |
+|---|---|---|---|---|---|
+| Open access grant (primary button) | `openPlatformStaffGrant` POST `/platform-staff-grants` | inline | PlatformStaffGrant | 400 Validation failed; 403 Authenticated but not permitted at the requested scope | step-up: mfa (Opens a platform operator's access into a tenant's data.); opens modal first |
+
+**Rules for what is shown** (from the AI & Intelligence process; these refine the tables above and win where they differ)
+
+- **business view**: Plain-language summary per product line; values marked User provided / AI recommended / System derived / Existing configuration. *(source: contracts/satellite/ai.yaml#/components/schemas/AiProvenance / screens/P09-platform-admin-console.yaml#ADM-498)*
+- **impact**: Affected channels and future bookings counted; higher-risk changes can take effect from a chosen future date. *(source: TRACKER Actions row 194 / MoM 18 Sep 4.2)*
+
+**Data it reads**: `getActionPlan` (onLoad, A plan with its steps); `listTenants` (onLoad, The tenant picker: the operator picks a tenant before …)
 
 **Where the user goes next**
 
@@ -1114,19 +1768,36 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Empty, first run (`?state=emptyFirstRun`) | No preview impact analysis configured yet. Carries the create action and says what the platform does in the meantime. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Empty, no results (`?state=emptyNoResults`) | **Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist |
+| Grant required (`?state=grantRequired`) | **No access into this tenant yet.** A tenant is picked and no platform-staff grant into it is open, so every tenant action is disabled and the screen offers **Open access grant** (`openPlatformStaffGrant`: reason, permissions `AI_USE`, expiry). The same state returns when the grant reaches `expiresAt` (audit R098; CHG-SBO-001). |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 409 The plan is executing or finished; simulate a rollback plan instead. |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 The plan is executing or finished; simulate a rollback plan instead. |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+summary: Guests can buy Day Passes (AED 120 weekdays, AED 140 weekends) and the Family Day Pass online, at the gate
+  and through 3 resellers from 1 Nov.
+```
 
 #### Permissions
 
 - `getActionPlan` → `AI_USE` (operate) · staff
 - `simulateActionPlan` → `AI_USE` (operate) · staff
+- `listTenants` → `PLATFORM_TENANT_VIEW` (read) · staff
+- `listOwnPlatformStaffGrants` → `PLATFORM_TENANT_ACCESS` (operate) · staff
+- `openPlatformStaffGrant` → `PLATFORM_TENANT_ACCESS` (operate) · staff · step-up mfa
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
 #### Requirements it meets
 
-No matrix row traces to this screen's operations or data.
+1 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+
+| Ref | Requirement (shortened) | Domain | Verdict | Via |
+|---|---|---|---|---|
+| 2.6.6 | It is expected to have one webstore/application API for each venue. | Ticketing Sales | CONTRACTED | data `Tenant` |
 
 #### Client meeting inputs
 
@@ -1147,13 +1818,14 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (18), with its required mark, default, format and its error state (404, 409).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
-- [ ] Every state opens from `#ADM-488?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, emptyNoResults, offline.
-- [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
+- [ ] Every input above is drawn (24), with its required mark, default, format and its error state (400, 403, 404, 409).
+- [ ] Every output is drawn (6 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every state opens from `#ADM-488?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, emptyNoResults, grantRequired, offline.
+- [ ] Every action is wired with its success and its failure: Open access grant.
 - [ ] Every transition is wired: `ADM-479`.
-- [ ] Every gated control is gated: `AI_USE`.
+- [ ] Every gated control is gated: `AI_USE`, `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -1239,7 +1911,9 @@ Method, path, parameters, request and response for every operation these screens
 "decideBlueprintRecommendation": {"method":"POST","path":"/configuration-sessions/{sessionId}/decisions/{decisionKey}","contract":"ai","summary":"Accept, modify, reject or defer a blueprint decision","permission":"AI_USE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"AiBlueprintDecision"},
 "getActionPlan": {"method":"GET","path":"/action-plans/{planId}","contract":"ai","summary":"A plan with its steps","permission":"AI_USE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"AiActionPlanDetail"},
 "getConfigurationBlueprint": {"method":"GET","path":"/configuration-sessions/{sessionId}/blueprint","contract":"ai","summary":"The blueprint so far","permission":"AI_USE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"module","in":"query","required":null},{"name":"decisionClass","in":"query","required":null}],"requestBody":null,"responds":"AiBlueprintView"},
-"setChannelPricingCommercial": {"method":"PUT","path":"/channel-pricing-commercial","contract":"catalogue","summary":"Channel Pricing & Commercial Profile Assignment","permission":"PRODUCT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"ChannelPricingCommercialProfileAssignmentInput","responds":"ChannelPricingCommercialProfileAssignmentView"},
+"listOwnPlatformStaffGrants": {"method":"GET","path":"/platform-staff-grants/mine","contract":"identity","summary":"The calling platform operator's own grants into this tenant","permission":"PLATFORM_TENANT_ACCESS","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":"activeOnly","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
+"listTenants": {"method":"GET","path":"/tenants","contract":"subscription","summary":"List tenants","permission":"PLATFORM_TENANT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":"status","in":"query","required":null},{"name":"planId","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
+"openPlatformStaffGrant": {"method":"POST","path":"/platform-staff-grants","contract":"identity","summary":"A platform operator opens a time-boxed grant into this tenant","permission":"PLATFORM_TENANT_ACCESS","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"PlatformStaffGrant"},
 "simulateActionPlan": {"method":"POST","path":"/action-plans/{planId}/simulate","contract":"ai","summary":"Validate and simulate a plan without changing anything","permission":"AI_USE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"AiActionPlanDetail"}
 }
 ```
@@ -1257,7 +1931,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "AiBlueprintView": {"type":"object","x-ticvai-persistence":"none — ai.blueprint with its ai.blueprint_decision rows","description":"A blueprint with its decisions.","required":["blueprint","decisions"],"properties":{"blueprint":{"$ref":"#/components/schemas/AiConfigurationBlueprint"},"decisions":{"type":"array","items":{"$ref":"#/components/schemas/AiBlueprintDecision"}}}},
 "AiConfigurationBlueprint": {"type":"object","x-ticvai-persistence":"ai.blueprint","description":"**The blueprint** (design 2.2 D step 2, ADM-478): decisions, severity-graded issues and a dependency map. **Never `ready` while a required decision is deferred** (AIC-115).","required":["sessionId","version","readiness"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"sessionId":{"type":"string","format":"uuid","x-ticvai-references":"ai.config_session"},"version":{"type":"integer","minimum":1},"readiness":{"type":"string","enum":["notReady","readyWithWarnings","ready"],"readOnly":true},"requiredOpen":{"type":"integer","minimum":0,"readOnly":true,"description":"Required decisions not yet accepted or modified."},"issues":{"$ref":"#/components/schemas/AiBlueprintIssueList"},"dependencyMap":{"type":"object","additionalProperties":true,"readOnly":true,"description":"Configuration objects and the order they depend on each other, by module."},"summary":{"type":"string","nullable":true},"createdAt":{"type":"string","format":"date-time","readOnly":true},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."}}},
 "AiProvenance": {"type":"string","enum":["confirmed","aiRecommended","inferred","unknown"],"description":"**Where a configuration value came from** (design 2.2 D, AIC-111): said by the administrator, recommended by the assistant, inferred from other answers, or not known yet. Shown beside every value; no confidence number is shown for configuration (design 5.6)."},
-"ChannelPricingCommercialProfileAssignmentInput": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — request only; **no existing table covers these fields** — the closest is catalogue.price_list at 6%, so this is not an update to anything the package stores today and no new table has been decided","description":"**What Channel Pricing & Commercial Profile Assignment submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.\n\n**The pack defines this as a record**, under *For each assignment* - one of only 13 drafted writes that does. That is the client writing a row rather than a screen, and it is where the table conversation should start.","properties":{"priceProfile":{"type":"string","description":"Price Profile: the ID of the approved price list or profile consumed (the Pricing Engine calculates the price)"},"currency":{"type":"string","description":"Currency: ISO 4217 code","pattern":"^[A-Z]{3}$"},"effectiveFrom":{"type":"string","format":"date","description":"Effective From"},"effectiveTo":{"type":"string","format":"date","description":"Effective To; empty for open-ended","nullable":true},"venue":{"type":"string","description":"Venue ID","nullable":true},"event":{"type":"string","description":"Event ID","nullable":true},"product":{"type":"string","description":"Product ID","nullable":true},"customerSegment":{"type":"string","description":"Customer Segment ID","nullable":true},"priority":{"type":"integer","description":"Priority: when several assignments match, the lower number wins","minimum":1},"channelId":{"type":"string","description":"Channel ID"},"pricingSource":{"type":"string","enum":["standardPriceList","channelPriceList","b2bRate","resellerRate","otaRate","posPrice","promotionalPriceProfile","dynamicPricingProfile"],"description":"Pricing Association (pack p.8): which kind of approved pricing this assignment consumes"},"overridePermission":{"type":"string","description":"Override Permission: the permission a user needs to override price on this channel","nullable":true},"fixedPriceOnly":{"type":"boolean","description":"Price Override Governance: use fixed price only"},"promotionAllowed":{"type":"boolean","description":"Price Override Governance: apply promotion"},"discountAllowed":{"type":"boolean","description":"Price Override Governance: apply discount"},"priceOverrideAllowed":{"type":"boolean","description":"Price Override Governance: override price"},"overrideRequiresApproval":{"type":"boolean","description":"Price Override Governance: require approval for override"},"dynamicPricingAllowed":{"type":"boolean","description":"Price Override Governance: use dynamic pricing"}},"x-ticvai-record-definition":"For each assignment"},
-"ChannelPricingCommercialProfileAssignmentView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over catalogue state, assembled at read time from tables that already exist","description":"**What Channel Pricing & Commercial Profile Assignment displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"priceProfile":{"type":"string","description":"Price Profile: the ID of the approved price list or profile consumed (the Pricing Engine calculates the price)"},"currency":{"type":"string","description":"Currency: ISO 4217 code","pattern":"^[A-Z]{3}$"},"effectiveFrom":{"type":"string","format":"date","description":"Effective From"},"effectiveTo":{"type":"string","format":"date","description":"Effective To; empty for open-ended","nullable":true},"venue":{"type":"string","description":"Venue ID","nullable":true},"event":{"type":"string","description":"Event ID","nullable":true},"product":{"type":"string","description":"Product ID","nullable":true},"customerSegment":{"type":"string","description":"Customer Segment ID","nullable":true},"priority":{"type":"integer","description":"Priority: when several assignments match, the lower number wins","minimum":1},"channelId":{"type":"string","description":"Channel ID"},"pricingSource":{"type":"string","enum":["standardPriceList","channelPriceList","b2bRate","resellerRate","otaRate","posPrice","promotionalPriceProfile","dynamicPricingProfile"],"description":"Pricing Association (pack p.8): which kind of approved pricing this assignment consumes"},"overridePermission":{"type":"string","description":"Override Permission: the permission a user needs to override price on this channel","nullable":true},"fixedPriceOnly":{"type":"boolean","description":"Price Override Governance: use fixed price only"},"promotionAllowed":{"type":"boolean","description":"Price Override Governance: apply promotion"},"discountAllowed":{"type":"boolean","description":"Price Override Governance: apply discount"},"priceOverrideAllowed":{"type":"boolean","description":"Price Override Governance: override price"},"overrideRequiresApproval":{"type":"boolean","description":"Price Override Governance: require approval for override"},"dynamicPricingAllowed":{"type":"boolean","description":"Price Override Governance: use dynamic pricing"},"validationIssues":{"type":"array","items":{"type":"object","properties":{"code":{"type":"string","enum":["missingPrice","expiredPrice","currencyMismatch","conflictingProfiles","invalidOverride"]},"message":{"type":"string"}}},"description":"Price Validation (pack p.9)"}}}
+"LocalisedText": {"x-ticvai-persistence":"none — jsonb column","type":"object","additionalProperties":{"type":"string"}},
+"Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}},
+"Permission": {"type":"string","enum":["SESSION_FORCE_LOGOUT","USER_MANAGE","ROLE_MANAGE","PERMISSION_GRANT","PERMISSION_VIEW","PERMISSION_MANAGE","PLATFORM_TENANT_VIEW","PLATFORM_TENANT_MANAGE","PLATFORM_TENANT_TERMINATE","PLATFORM_PLAN_MANAGE","PLATFORM_CELL_VIEW","PLATFORM_CELL_MANAGE","PLATFORM_BILLING_VIEW","PLATFORM_AI_MANAGE","PLATFORM_BILLING_MANAGE","PLATFORM_RELEASE_VIEW","PLATFORM_RELEASE_MANAGE","PLATFORM_RELEASE_PROMOTE","PLATFORM_MIGRATION_VIEW","PLATFORM_MIGRATION_APPLY","PLATFORM_TENANT_ACCESS","TENANT_CONFIGURE","TENANT_VIEW","TENANT_PUBLISH","SCOPE_VIEW","SCOPE_MANAGE","REGION_CONFIGURE","WORKSTATION_CONFIGURE","PRODUCT_VIEW","PRODUCT_CONFIGURE","PRODUCT_APPROVE","PRODUCT_PUBLISH","PRICE_VIEW","PRICE_CONFIGURE","EVENT_CONFIGURE","PERFORMANCE_CONFIGURE","CAPACITY_CONFIGURE","ORDER_VIEW","ORDER_VIEW_OTHER","ORDER_CREATE","ORDER_MODIFY","ORDER_DISCOUNT","ORDER_CANCEL","ORDER_VOID","ORDER_REFUND","ORDER_REFUND_APPROVE","ORDER_REFUND_BULK","ORDER_EXCHANGE","ORDER_RESCHEDULE","ORDER_REPRINT","PRICE_OVERRIDE","DISCOUNT_APPLY","CREDIT_MANAGE","CREDIT_OVERRIDE","WALLET_VIEW","WALLET_OPERATE","WALLET_CONFIGURE","PAYMENT_VIEW","PAYMENT_CONFIGURE","PAYMENT_PROVIDER_MANAGE","PAYMENT_DISPUTE","SHIFT_OPEN","SHIFT_CLOSE","SHIFT_SUSPEND","SHIFT_CLOSE_OTHER","SHIFT_APPROVE_OPEN","SHIFT_APPROVE_CLOSE","SHIFT_REOPEN","CASH_LIFT","CASH_ADD","CASH_NO_SALE","DEPOSIT_BOX_MODIFY_OWN","DEPOSIT_BOX_MODIFY_OTHER","OVERSHORT_ACCEPT","ACCESS_VALIDATE","ACCESS_OVERRIDE","ACCESS_POINT_CONFIGURE","TURNSTILE_MODE_SET","TICKET_LOOKUP","ACCREDITATION_VIEW","ACCREDITATION_APPLY","ACCREDITATION_APPROVE","ACCREDITATION_ISSUE","ACCREDITATION_MANAGE","ACCREDITATION_CONFIGURE","REPORT_VIEW_OWN","REPORT_VIEW_WORKSTATION","REPORT_VIEW_VENUE","REPORT_VIEW_REGION","REPORT_VIEW_TENANT","REPORT_EXPORT","REPORT_EXPORT_PII","REPORT_MANAGE","REPORT_SCHEDULE","LEDGER_VIEW","LEDGER_POST","LEDGER_APPROVE","TAX_CONFIGURE","ACCOUNT_CONFIGURE","SETTLEMENT_VIEW","SETTLEMENT_RECONCILE","GUEST_VIEW","GUEST_VIEW_PII","GUEST_MANAGE","VENUE_MAP_VIEW","VENUE_MAP_MANAGE","VENUE_MAP_PUBLISH","RESOURCE_VIEW","RESOURCE_BOOK","RESOURCE_MANAGE","RESOURCE_CONFIGURE","RENTAL_VIEW","RENTAL_BOOK","RENTAL_OPERATE","RENTAL_MANAGE","RENTAL_CONFIGURE","RENTAL_PRICE","RENTAL_APPROVE","RENTAL_OVERRIDE","DEVELOPER_VIEW","DEVELOPER_MANAGE","DEVELOPER_ADMIN","LOYALTY_ACCRUE","LOYALTY_REDEEM","LOYALTY_ADJUST","MARKETING_VIEW","MARKETING_MANAGE","MARKETING_SEND","CASE_VIEW","CASE_MANAGE","ASSET_LIBRARY_VIEW","ASSET_LIBRARY_MANAGE","ASSET_LIBRARY_APPROVE","ASSET_LIBRARY_SHARE","QUEUE_VIEW","QUEUE_MANAGE","QUEUE_REDEEM","QUEUE_OVERRIDE","TRANSPORT_VIEW","TRANSPORT_MANAGE","TRANSPORT_PRICE","ASSET_VIEW","ASSET_MANAGE","WORK_ORDER_VIEW","WORK_ORDER_MANAGE","WORK_ORDER_VERIFY","INSPECTION_VIEW","INSPECTION_SUBMIT","INSPECTION_MANAGE","INCIDENT_REPORT","INCIDENT_VIEW","INCIDENT_MANAGE","KIOSK_ATTEND","DEVICE_VIEW","DEVICE_CONFIGURE","DEVICE_MANAGE","APPROVAL_ACT","APPROVAL_DELEGATE","AI_USE","AI_CONFIGURE","AI_APPROVE","AI_AUDIT_VIEW","RISK_REVIEW","RISK_INVESTIGATE","AUDIT_VIEW","APPROVAL_VIEW","APPROVAL_REQUEST","APPROVAL_DECIDE","APPROVAL_CONFIGURE","MAINTENANCE_EXECUTE","MAINTENANCE_APPROVE","WORKFORCE_VIEW","WORKFORCE_MANAGE","ATTENDANCE_RECORD","ANNOUNCEMENT_PUBLISH","ANNOUNCEMENT_EMERGENCY","PARTNER_VIEW","PARTNER_MANAGE","PARKING_CONFIGURE","PAYMENT_VOID","PROCUREMENT_VIEW","PROCUREMENT_REQUEST","PROCUREMENT_MANAGE","PROCUREMENT_RECEIVE","CORE_AI_PUBLISH","TICKETING_AI_PUBLISH","ACCESS_AI_PUBLISH","FNB_AI_PUBLISH","RETAIL_AI_PUBLISH","INVENTORY_AI_PUBLISH","SEATING_AI_PUBLISH","MEMBERSHIP_AI_PUBLISH","MARKETING_AI_PUBLISH","RESOURCES_AI_PUBLISH","QUEUE_AI_PUBLISH","TRANSPORT_AI_PUBLISH","GAMES_AI_PUBLISH","MAINTENANCE_AI_PUBLISH","ACCREDITATION_AI_PUBLISH","PARTNER_AI_PUBLISH","ANALYTICS_AI_PUBLISH","BIOMETRIC_IMAGE_VIEW","ACCESS_DIRECTION_SET","REPORT_GOVERNANCE_MANAGE"]},
+"PlatformStaffGrant": {"type":"object","x-ticvai-persistence":"identity.platform_staff_grant","description":"**One platform operator's time-boxed access into this tenant** (decided 28 September, audit R098). Written by `openPlatformStaffGrant`, read by the tenant through `listPlatformStaffGrants`, and never edited: a grant ends at `expiresAt`, and a new need is a new grant.\n","required":["id","operatorPrincipalId","permissions","reason","openedAt","expiresAt"],"properties":{"id":{"type":"string","format":"uuid"},"operatorPrincipalId":{"type":"string","format":"uuid","readOnly":true,"description":"The platform operator, from the Control Plane token. Set by the server."},"operatorDisplayName":{"type":"string","readOnly":true},"permissions":{"type":"array","items":{"$ref":"../shared/permissions.yaml#/components/schemas/Permission"}},"reason":{"type":"string"},"ticketRef":{"type":"string","nullable":true},"openedAt":{"type":"string","format":"date-time","readOnly":true},"expiresAt":{"type":"string","format":"date-time"},"scopePath":{"type":"string","readOnly":true,"description":"The tenant root. **Operations write it at `tenant` scope**; the server sets it."}}},
+"SuspensionMode": {"type":"string","description":"Access validation continues under every mode. A commercial dispute must not strand guests at a gate holding valid tickets.\n","enum":["readOnly","noNewSales","fullLockout"]},
+"Tenant": {"x-ticvai-persistence":"control.tenant","type":"object","required":["id","code","name","status","createdAt"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string"},"name":{"type":"string"},"status":{"$ref":"#/components/schemas/TenantStatus"},"suspensionMode":{"$ref":"#/components/schemas/SuspensionMode"},"suspensionReason":{"type":"string","nullable":true},"suspensionEffectiveAt":{"type":"string","format":"date-time","nullable":true,"description":"When the suspension takes, or took, effect — `suspendTenant.effectiveAt`. **A future value is a pending suspension**: the tenant stays `active` until then, and this row is the only place that says a suspension is coming."},"suspensionNoticeMessage":{"$ref":"#/components/schemas/LocalisedText","description":"The notice shown to the tenant's users about the suspension — `suspendTenant.noticeMessage`."},"terminationScheduledAt":{"type":"string","format":"date-time","nullable":true,"description":"When `terminateTenant` started the retention window. Null when no termination is under way."},"terminationRetentionUntil":{"type":"string","format":"date-time","nullable":true,"description":"`terminationScheduledAt` plus the request's `retentionDays`. **Stored, not recomputed** — the day count is client-supplied and exists nowhere else, and this is the date the cells are destroyed after."},"terminationReason":{"type":"string","maxLength":1000,"nullable":true},"terminationRequestedByPrincipalId":{"type":"string","format":"uuid","nullable":true},"planId":{"type":"string","format":"uuid","nullable":true},"planName":{"type":"string","nullable":true},"cellCount":{"type":"integer"},"venueCount":{"type":"integer"},"regionId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"The tenant's home region: the `tenancy` region node whose `RegionSettings` govern tenant-wide gates, today `allowedAiResidencies` (decided 28 September, audit R203). Written by the server when the tenant's first region is created; null until then. ADM-037 reads it to show the region's residency restriction, and `ai.setAiProvider` checks against the same region.\n"},"billingEmail":{"type":"string"},"billingAddress":{"type":"string","maxLength":500,"nullable":true,"description":"Accepted by `createTenant` and `updateTenant`; stored here so the response can return what was sent."},"accountManagerPrincipalId":{"type":"string","format":"uuid","nullable":true},"createdAt":{"type":"string","format":"date-time"},"activatedAt":{"type":"string","format":"date-time","nullable":true}}},
+"TenantStatus": {"type":"string","enum":["onboarding","active","suspended","terminating","terminated"]}
 }
 ```

@@ -1,4 +1,23 @@
 {
+ "createAiConversation": {
+  "method": "POST",
+  "path": "/conversations",
+  "contract": "ai",
+  "summary": "Open a conversation",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AiConversation"
+ },
  "getAvailability": {
   "method": "GET",
   "path": "/availability",

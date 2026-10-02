@@ -59,6 +59,17 @@ info:
     **Who holds the escalated permission is role configuration**, not a contract fact: the seeded
     role templates give it to the manager roles, and a tenant may move it.
 
+    ## What `x-ticvai-permission-by-module` means
+
+    **Decided 2 October (Chinmay, workbook Q3 and Q7; CHG-FUP-004).** Publishing a module's AI is that
+    module's act, so an operation that publishes a forecast or promotes a model declares, beside its
+    base permission, `x-ticvai-permission-by-module` with two keys: `moduleOf`, the field of the target
+    that holds its `ModuleKey`, and `permissions`, the map from module to permission
+    (`x-ticvai-module-ai-publish` below). The base `x-ticvai-permission` is checked first, as for any
+    operation; once the target is read, the caller must also hold the mapped permission at the same
+    scope, or the call is refused `403 module-ai-publish-required`. Like the base permission, a change to
+    it is a breaking change (`tools/check-contract-compat.py`).
+
     ## Who must use MFA
 
     **By permission, not by role — decided 28 September, audit R135.** A principal holding any
@@ -66,6 +77,451 @@ info:
     have an active MFA method. The platform floor is `ROLE_MANAGE`, `LEDGER_APPROVE` and every
     `PLATFORM_*` permission; a tenant may add to the list and never remove from the floor.
 
+x-ticvai-permission-modules:
+  description: >
+    **Every permission in exactly one module, the checklist a role is built from** (Chinmay, 2 October,
+    workbook Q3 and Q7 and the pre-apply round; CHG-CSA-006). There are no fixed default roles: creating a
+    role shows these modules, each with its permissions as checkboxes, and a preset below fills them. Keys are
+    common `ModuleKey` values, plus `platform` for the Control Plane permissions, which only platform staff
+    hold and no tenant role offers. A permission shared by several modules' screens (selling, catalogue,
+    shift and cash) sits under `core`. Each module with AI models has its own `<MODULE>_AI_PUBLISH` (Chinmay,
+    2 October, workbook Q3 and Q7), the permission that publishes that module's forecasts and promotes its AI
+    releases (`x-ticvai-module-ai-publish` below); with `BIOMETRIC_IMAGE_VIEW`, `ACCESS_DIRECTION_SET` and
+    `REPORT_GOVERNANCE_MANAGE` these twenty joined the enum on 2 October, once a new `Permission` value was
+    ruled additive (contract follow-ups; CHG-FUP-001, CHG-FUP-003).
+  modules:
+    core:
+      - SESSION_FORCE_LOGOUT
+      - USER_MANAGE
+      - ROLE_MANAGE
+      - PERMISSION_GRANT
+      - PERMISSION_VIEW
+      - PERMISSION_MANAGE
+      - TENANT_CONFIGURE
+      - TENANT_VIEW
+      - TENANT_PUBLISH
+      - SCOPE_VIEW
+      - SCOPE_MANAGE
+      - REGION_CONFIGURE
+      - WORKSTATION_CONFIGURE
+      - PRODUCT_VIEW
+      - PRODUCT_CONFIGURE
+      - PRODUCT_APPROVE
+      - PRODUCT_PUBLISH
+      - PRICE_VIEW
+      - PRICE_CONFIGURE
+      - EVENT_CONFIGURE
+      - PERFORMANCE_CONFIGURE
+      - CAPACITY_CONFIGURE
+      - ORDER_VIEW
+      - ORDER_VIEW_OTHER
+      - ORDER_CREATE
+      - ORDER_MODIFY
+      - ORDER_DISCOUNT
+      - ORDER_CANCEL
+      - ORDER_VOID
+      - ORDER_REFUND
+      - ORDER_REFUND_APPROVE
+      - ORDER_REFUND_BULK
+      - ORDER_EXCHANGE
+      - ORDER_RESCHEDULE
+      - ORDER_REPRINT
+      - PRICE_OVERRIDE
+      - DISCOUNT_APPLY
+      - CREDIT_MANAGE
+      - CREDIT_OVERRIDE
+      - WALLET_VIEW
+      - WALLET_OPERATE
+      - WALLET_CONFIGURE
+      - PAYMENT_VIEW
+      - PAYMENT_CONFIGURE
+      - PAYMENT_PROVIDER_MANAGE
+      - PAYMENT_DISPUTE
+      - SHIFT_OPEN
+      - SHIFT_CLOSE
+      - SHIFT_SUSPEND
+      - SHIFT_CLOSE_OTHER
+      - SHIFT_APPROVE_OPEN
+      - SHIFT_APPROVE_CLOSE
+      - SHIFT_REOPEN
+      - CASH_LIFT
+      - CASH_ADD
+      - CASH_NO_SALE
+      - DEPOSIT_BOX_MODIFY_OWN
+      - DEPOSIT_BOX_MODIFY_OTHER
+      - OVERSHORT_ACCEPT
+      - LEDGER_VIEW
+      - LEDGER_POST
+      - LEDGER_APPROVE
+      - TAX_CONFIGURE
+      - ACCOUNT_CONFIGURE
+      - SETTLEMENT_VIEW
+      - SETTLEMENT_RECONCILE
+      - VENUE_MAP_VIEW
+      - VENUE_MAP_MANAGE
+      - VENUE_MAP_PUBLISH
+      - ASSET_LIBRARY_VIEW
+      - ASSET_LIBRARY_MANAGE
+      - ASSET_LIBRARY_APPROVE
+      - ASSET_LIBRARY_SHARE
+      - KIOSK_ATTEND
+      - DEVICE_VIEW
+      - DEVICE_CONFIGURE
+      - DEVICE_MANAGE
+      - APPROVAL_ACT
+      - APPROVAL_DELEGATE
+      - AUDIT_VIEW
+      - APPROVAL_VIEW
+      - APPROVAL_REQUEST
+      - APPROVAL_DECIDE
+      - APPROVAL_CONFIGURE
+      - WORKFORCE_VIEW
+      - WORKFORCE_MANAGE
+      - ATTENDANCE_RECORD
+      - ANNOUNCEMENT_PUBLISH
+      - ANNOUNCEMENT_EMERGENCY
+      - PARKING_CONFIGURE
+      - PAYMENT_VOID
+      - CORE_AI_PUBLISH
+    ticketing:
+      - TICKETING_AI_PUBLISH
+    access:
+      - ACCESS_VALIDATE
+      - ACCESS_OVERRIDE
+      - ACCESS_POINT_CONFIGURE
+      - TURNSTILE_MODE_SET
+      - TICKET_LOOKUP
+      - ACCESS_AI_PUBLISH
+      - BIOMETRIC_IMAGE_VIEW
+      - ACCESS_DIRECTION_SET
+    fnb:
+      - FNB_AI_PUBLISH
+    retail:
+      - RETAIL_AI_PUBLISH
+    inventory:
+      - PROCUREMENT_VIEW
+      - PROCUREMENT_REQUEST
+      - PROCUREMENT_MANAGE
+      - PROCUREMENT_RECEIVE
+      - INVENTORY_AI_PUBLISH
+    seating:
+      - SEATING_AI_PUBLISH
+    membership:
+      - LOYALTY_ACCRUE
+      - LOYALTY_REDEEM
+      - LOYALTY_ADJUST
+      - MEMBERSHIP_AI_PUBLISH
+    marketing:
+      - GUEST_VIEW
+      - GUEST_VIEW_PII
+      - GUEST_MANAGE
+      - MARKETING_VIEW
+      - MARKETING_MANAGE
+      - MARKETING_SEND
+      - CASE_VIEW
+      - CASE_MANAGE
+      - MARKETING_AI_PUBLISH
+    resources:
+      - RESOURCE_VIEW
+      - RESOURCE_BOOK
+      - RESOURCE_MANAGE
+      - RESOURCE_CONFIGURE
+      - RENTAL_VIEW
+      - RENTAL_BOOK
+      - RENTAL_OPERATE
+      - RENTAL_MANAGE
+      - RENTAL_CONFIGURE
+      - RENTAL_PRICE
+      - RENTAL_APPROVE
+      - RENTAL_OVERRIDE
+      - RESOURCES_AI_PUBLISH
+    queue:
+      - QUEUE_VIEW
+      - QUEUE_MANAGE
+      - QUEUE_REDEEM
+      - QUEUE_OVERRIDE
+      - QUEUE_AI_PUBLISH
+    transport:
+      - TRANSPORT_VIEW
+      - TRANSPORT_MANAGE
+      - TRANSPORT_PRICE
+      - TRANSPORT_AI_PUBLISH
+    games:
+      - GAMES_AI_PUBLISH
+    maintenance:
+      - ASSET_VIEW
+      - ASSET_MANAGE
+      - WORK_ORDER_VIEW
+      - WORK_ORDER_MANAGE
+      - WORK_ORDER_VERIFY
+      - INSPECTION_VIEW
+      - INSPECTION_SUBMIT
+      - INSPECTION_MANAGE
+      - INCIDENT_REPORT
+      - INCIDENT_VIEW
+      - INCIDENT_MANAGE
+      - MAINTENANCE_EXECUTE
+      - MAINTENANCE_APPROVE
+      - MAINTENANCE_AI_PUBLISH
+    accreditation:
+      - ACCREDITATION_VIEW
+      - ACCREDITATION_APPLY
+      - ACCREDITATION_APPROVE
+      - ACCREDITATION_ISSUE
+      - ACCREDITATION_MANAGE
+      - ACCREDITATION_CONFIGURE
+      - ACCREDITATION_AI_PUBLISH
+    partner:
+      - PARTNER_VIEW
+      - PARTNER_MANAGE
+      - PARTNER_AI_PUBLISH
+    developerApi:
+      - DEVELOPER_VIEW
+      - DEVELOPER_MANAGE
+      - DEVELOPER_ADMIN
+    analytics:
+      - REPORT_VIEW_OWN
+      - REPORT_VIEW_WORKSTATION
+      - REPORT_VIEW_VENUE
+      - REPORT_VIEW_REGION
+      - REPORT_VIEW_TENANT
+      - REPORT_EXPORT
+      - REPORT_EXPORT_PII
+      - REPORT_MANAGE
+      - REPORT_SCHEDULE
+      - ANALYTICS_AI_PUBLISH
+      - REPORT_GOVERNANCE_MANAGE
+    ai:
+      - AI_USE
+      - AI_CONFIGURE
+      - AI_APPROVE
+      - AI_AUDIT_VIEW
+      - RISK_REVIEW
+      - RISK_INVESTIGATE
+    platform:
+      - PLATFORM_TENANT_VIEW
+      - PLATFORM_TENANT_MANAGE
+      - PLATFORM_TENANT_TERMINATE
+      - PLATFORM_PLAN_MANAGE
+      - PLATFORM_CELL_VIEW
+      - PLATFORM_CELL_MANAGE
+      - PLATFORM_BILLING_VIEW
+      - PLATFORM_AI_MANAGE
+      - PLATFORM_BILLING_MANAGE
+      - PLATFORM_RELEASE_VIEW
+      - PLATFORM_RELEASE_MANAGE
+      - PLATFORM_RELEASE_PROMOTE
+      - PLATFORM_MIGRATION_VIEW
+      - PLATFORM_MIGRATION_APPLY
+      - PLATFORM_TENANT_ACCESS
+x-ticvai-module-ai-publish:
+  description: >
+    **Which permission publishes each module's AI** (Chinmay, 2 October, workbook Q3 and Q7: "the permission holder
+    for that module's AI"; CHG-FUP-003, CHG-FUP-004). An operation that publishes a model's output or promotes a
+    model declares `x-ticvai-permission-by-module`: the server reads the module of the thing published (a forecast
+    definition's or an AI release's `module`) and requires the permission this map names for it, at the
+    operation's scope. There is no default role: whoever builds a role ticks a module's "Publish AI model" box.
+    `developerApi` and `ai` have no AI models of their own and no entry; a target with no module is refused
+    `409 module-required`. Replaces `AI_APPROVE` for model publishing; `AI_APPROVE` keeps the AI governance acts
+    (proposals, plans, policies, incidents).
+  modules:
+    core: CORE_AI_PUBLISH
+    ticketing: TICKETING_AI_PUBLISH
+    access: ACCESS_AI_PUBLISH
+    fnb: FNB_AI_PUBLISH
+    retail: RETAIL_AI_PUBLISH
+    inventory: INVENTORY_AI_PUBLISH
+    seating: SEATING_AI_PUBLISH
+    membership: MEMBERSHIP_AI_PUBLISH
+    marketing: MARKETING_AI_PUBLISH
+    resources: RESOURCES_AI_PUBLISH
+    queue: QUEUE_AI_PUBLISH
+    transport: TRANSPORT_AI_PUBLISH
+    games: GAMES_AI_PUBLISH
+    maintenance: MAINTENANCE_AI_PUBLISH
+    accreditation: ACCREDITATION_AI_PUBLISH
+    partner: PARTNER_AI_PUBLISH
+    analytics: ANALYTICS_AI_PUBLISH
+x-ticvai-permission-presets:
+  description: >
+    **Presets fill the checklist; they are not roles** (Chinmay, 2 October, pre-apply round: "default permission
+    configs, so to speak ... if they select Viewer they can still give that viewer more permissions and rename
+    it"; CHG-CSA-006). Picking a preset for a module ticks its permissions below; every box stays editable and
+    the role can be renamed. `all` ticks every permission of the module (`x-ticvai-permission-modules`);
+    `viewer` ticks the read permissions; `midLevel` ticks the read permissions and the day-to-day operating
+    ones, leaving configuration, approval, publishing, overrides and personal-data exports unticked. So no preset
+    but `all` ticks a module's `<MODULE>_AI_PUBLISH`, `BIOMETRIC_IMAGE_VIEW` (a logged view of biometric images,
+    ADR-0063), `ACCESS_DIRECTION_SET` or `REPORT_GOVERNANCE_MANAGE` (CHG-FUP-003). The five starting
+    configurations of the seed (`docs/active/seed-data-proposal.md` section 2: Cashier, Supervisor, Venue Manager,
+    Finance, Tenant Admin) are named presets built the same way: they fill the checklist, every box stays
+    editable, and the role is renamed freely (CHG-FUP-012).
+  presets:
+    all: every permission of the module
+    viewer:
+      core:
+        - PERMISSION_VIEW
+        - TENANT_VIEW
+        - SCOPE_VIEW
+        - PRODUCT_VIEW
+        - PRICE_VIEW
+        - ORDER_VIEW
+        - ORDER_VIEW_OTHER
+        - WALLET_VIEW
+        - PAYMENT_VIEW
+        - LEDGER_VIEW
+        - SETTLEMENT_VIEW
+        - VENUE_MAP_VIEW
+        - ASSET_LIBRARY_VIEW
+        - DEVICE_VIEW
+        - AUDIT_VIEW
+        - APPROVAL_VIEW
+        - WORKFORCE_VIEW
+      access:
+        - TICKET_LOOKUP
+      inventory:
+        - PROCUREMENT_VIEW
+      marketing:
+        - GUEST_VIEW
+        - GUEST_VIEW_PII
+        - MARKETING_VIEW
+        - CASE_VIEW
+      resources:
+        - RESOURCE_VIEW
+        - RENTAL_VIEW
+      queue:
+        - QUEUE_VIEW
+      transport:
+        - TRANSPORT_VIEW
+      maintenance:
+        - ASSET_VIEW
+        - WORK_ORDER_VIEW
+        - INSPECTION_VIEW
+        - INCIDENT_VIEW
+      accreditation:
+        - ACCREDITATION_VIEW
+      partner:
+        - PARTNER_VIEW
+      developerApi:
+        - DEVELOPER_VIEW
+      analytics:
+        - REPORT_VIEW_OWN
+        - REPORT_VIEW_WORKSTATION
+        - REPORT_VIEW_VENUE
+        - REPORT_VIEW_REGION
+        - REPORT_VIEW_TENANT
+      ai:
+        - AI_AUDIT_VIEW
+      platform:
+        - PLATFORM_TENANT_VIEW
+        - PLATFORM_CELL_VIEW
+        - PLATFORM_BILLING_VIEW
+        - PLATFORM_RELEASE_VIEW
+        - PLATFORM_MIGRATION_VIEW
+    midLevel:
+      core:
+        - PERMISSION_VIEW
+        - TENANT_VIEW
+        - SCOPE_VIEW
+        - PRODUCT_VIEW
+        - PRICE_VIEW
+        - ORDER_VIEW
+        - ORDER_VIEW_OTHER
+        - ORDER_CREATE
+        - ORDER_MODIFY
+        - ORDER_DISCOUNT
+        - ORDER_CANCEL
+        - ORDER_REFUND
+        - ORDER_EXCHANGE
+        - ORDER_RESCHEDULE
+        - ORDER_REPRINT
+        - DISCOUNT_APPLY
+        - WALLET_VIEW
+        - WALLET_OPERATE
+        - PAYMENT_VIEW
+        - PAYMENT_DISPUTE
+        - SHIFT_OPEN
+        - SHIFT_CLOSE
+        - SHIFT_SUSPEND
+        - CASH_LIFT
+        - CASH_ADD
+        - CASH_NO_SALE
+        - LEDGER_VIEW
+        - SETTLEMENT_VIEW
+        - VENUE_MAP_VIEW
+        - ASSET_LIBRARY_VIEW
+        - ASSET_LIBRARY_SHARE
+        - KIOSK_ATTEND
+        - DEVICE_VIEW
+        - APPROVAL_ACT
+        - AUDIT_VIEW
+        - APPROVAL_VIEW
+        - APPROVAL_REQUEST
+        - APPROVAL_DECIDE
+        - WORKFORCE_VIEW
+        - ATTENDANCE_RECORD
+      access:
+        - ACCESS_VALIDATE
+        - TURNSTILE_MODE_SET
+        - TICKET_LOOKUP
+      inventory:
+        - PROCUREMENT_VIEW
+        - PROCUREMENT_REQUEST
+        - PROCUREMENT_RECEIVE
+      membership:
+        - LOYALTY_REDEEM
+      marketing:
+        - GUEST_VIEW
+        - GUEST_VIEW_PII
+        - MARKETING_VIEW
+        - MARKETING_SEND
+        - CASE_VIEW
+      resources:
+        - RESOURCE_VIEW
+        - RESOURCE_BOOK
+        - RENTAL_VIEW
+        - RENTAL_BOOK
+        - RENTAL_OPERATE
+      queue:
+        - QUEUE_VIEW
+        - QUEUE_REDEEM
+      transport:
+        - TRANSPORT_VIEW
+      maintenance:
+        - ASSET_VIEW
+        - WORK_ORDER_VIEW
+        - WORK_ORDER_VERIFY
+        - INSPECTION_VIEW
+        - INSPECTION_SUBMIT
+        - INCIDENT_REPORT
+        - INCIDENT_VIEW
+        - MAINTENANCE_EXECUTE
+      accreditation:
+        - ACCREDITATION_VIEW
+        - ACCREDITATION_APPLY
+        - ACCREDITATION_ISSUE
+      partner:
+        - PARTNER_VIEW
+      developerApi:
+        - DEVELOPER_VIEW
+      analytics:
+        - REPORT_VIEW_OWN
+        - REPORT_VIEW_WORKSTATION
+        - REPORT_VIEW_VENUE
+        - REPORT_VIEW_REGION
+        - REPORT_VIEW_TENANT
+        - REPORT_EXPORT
+        - REPORT_SCHEDULE
+      ai:
+        - AI_USE
+        - AI_AUDIT_VIEW
+        - RISK_REVIEW
+        - RISK_INVESTIGATE
+      platform:
+        - PLATFORM_TENANT_VIEW
+        - PLATFORM_CELL_VIEW
+        - PLATFORM_BILLING_VIEW
+        - PLATFORM_RELEASE_VIEW
+        - PLATFORM_MIGRATION_VIEW
 components:
   schemas:
     Permission:
@@ -113,6 +569,9 @@ components:
         # `getConnectivityPolicy` were gated by `TENANT_CONFIGURE`, so anybody who needed to *see*
         # a venue's settings had to be allowed to change them.
         - TENANT_PUBLISH              # publish a configuration version, restore a prior one
+        # **Platform staff may publish a hosted tenant's site** (Chinmay, 2 October, workbook Q144;
+        # R098; CHG-CSA-038): only through a platform-staff grant that names `TENANT_PUBLISH`, with
+        # step-up. A self-hosted tenant exports a site package instead (white-label `exportSitePackage`).
 
         # --- Organisation -----------------------------------------------------
         - SCOPE_VIEW                  # read the hierarchy
@@ -364,6 +823,43 @@ components:
         - PROCUREMENT_REQUEST         # raise, amend and cancel a requisition
         - PROCUREMENT_MANAGE          # suppliers, quotations; raise, send, cancel and short-close a PO
         - PROCUREMENT_RECEIVE         # record and reject received goods
+
+        # --- Decided 2 October (CHG-FUP-003) -------------------------------------
+        # **A new value is additive** (Chinmay, 2 October, contract follow-ups; tools/check-contract-compat.py,
+        # CHG-FUP-001): a client that does not know a permission never checks it, so it is ignored, not mis-read.
+        # **Publishing a module's AI is that module's permission, not `AI_APPROVE`** (workbook Q3 and Q7;
+        # `x-ticvai-module-ai-publish` above names which module each serves). No default role holds them.
+        - CORE_AI_PUBLISH             # publish core forecasts, promote core AI releases
+        - TICKETING_AI_PUBLISH        # publish ticketing forecasts, promote ticketing AI releases
+        - ACCESS_AI_PUBLISH           # publish access forecasts, promote access AI releases
+        - FNB_AI_PUBLISH              # publish fnb forecasts, promote fnb AI releases
+        - RETAIL_AI_PUBLISH           # publish retail forecasts, promote retail AI releases
+        - INVENTORY_AI_PUBLISH        # publish inventory forecasts, promote inventory AI releases
+        - SEATING_AI_PUBLISH          # publish seating forecasts, promote seating AI releases
+        - MEMBERSHIP_AI_PUBLISH       # publish membership forecasts, promote membership AI releases
+        - MARKETING_AI_PUBLISH        # publish marketing forecasts, promote marketing AI releases
+        - RESOURCES_AI_PUBLISH        # publish resources forecasts, promote resources AI releases
+        - QUEUE_AI_PUBLISH            # publish queue forecasts, promote queue AI releases
+        - TRANSPORT_AI_PUBLISH        # publish transport forecasts, promote transport AI releases
+        - GAMES_AI_PUBLISH            # publish games forecasts, promote games AI releases
+        - MAINTENANCE_AI_PUBLISH      # publish maintenance forecasts, promote maintenance AI releases
+        - ACCREDITATION_AI_PUBLISH    # publish accreditation forecasts, promote accreditation AI releases
+        - PARTNER_AI_PUBLISH          # publish partner forecasts, promote partner AI releases
+        - ANALYTICS_AI_PUBLISH        # publish analytics forecasts, promote analytics AI releases
+        - BIOMETRIC_IMAGE_VIEW        # open the enrolled face and the new capture behind "View images (logged)"
+        # (workbook Q239, BO-190, BO-248; ADR-0063). Every use writes a biometric audit event; MFA required.
+        - ACCESS_DIRECTION_SET        # switch a running gate's direction live, logged (workbook Q255, BO-230; R221 amended)
+        - REPORT_GOVERNANCE_MANAGE    # analytics governance: masking, export restriction, retention, sharing,
+        # AI and API access (workbook Q225, ANL-070). Separate from `REPORT_MANAGE`: writing a report is not
+        # deciding what any report may expose.
+
+    PermissionPreset:
+      type: string
+      description: >
+        A preset that fills a module's permission checklist when a role is built (CHG-CSA-006). Not a role:
+        the boxes stay editable and the role is named by whoever builds it. The permissions each preset ticks
+        per module are in `x-ticvai-permission-presets`.
+      enum: [all, viewer, midLevel]
 
     PermissionSet:
       type: array

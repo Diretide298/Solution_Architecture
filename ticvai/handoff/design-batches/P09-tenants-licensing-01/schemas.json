@@ -325,6 +325,295 @@
    }
   }
  },
+ "Cell": {
+  "x-ticvai-persistence": "control.cell",
+  "x-ticvai-retired-columns": [
+   "tenant_id"
+  ],
+  "type": "object",
+  "required": [
+   "id",
+   "name",
+   "regionId",
+   "countryCode",
+   "tier",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "name": {
+    "type": "string"
+   },
+   "kind": {
+    "$ref": "#/components/schemas/CellKind"
+   },
+   "clusterId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "isReachable": {
+    "type": "boolean",
+    "default": true,
+    "description": "False for `onPremiseIsolated`, true for `onPremiseConnected` (ADR-0046). When false, the Control Plane holds the record for licensing and support and **cannot reach the installation** — it may sit behind a firewall with no inbound route. Every operation assuming reachability must handle absence rather than timing out, and a cell that has not called home for a month is not necessarily broken.\n"
+   },
+   "lastContactAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "When the site last called out. The only liveness signal for an unreachable cell, and the number a support engineer asks for first.\n"
+   },
+   "licenceExpiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "On-premise only. Licensing cannot be enforced by a Control Plane the site cannot reach, so a signed licence file is verified locally. **An expired licence degrades rather than stops** — a venue whose gates refuse entry because a licence lapsed over a weekend is worse than one running unlicensed until Monday.\n"
+   },
+   "participatesInCrossCell": {
+    "type": "boolean",
+    "default": true,
+    "description": "False by default for `onPremiseIsolated`, available for `onPremiseConnected` (ADR-0046). Redeeming a pass issued elsewhere requires reaching the issuing cell at that moment, and an on-premise site may not be able to. Exclusion is the honest default; local-then-reconcile carries a double-redemption risk that needs a decision rather than an assumption.\n"
+   },
+   "regionId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "regionName": {
+    "type": "string"
+   },
+   "countryCode": {
+    "type": "string"
+   },
+   "tier": {
+    "$ref": "#/components/schemas/CellTier"
+   },
+   "status": {
+    "$ref": "#/components/schemas/CellStatus"
+   },
+   "cloudProvider": {
+    "type": "string",
+    "nullable": true
+   },
+   "cloudRegion": {
+    "type": "string",
+    "nullable": true
+   },
+   "apiEndpoint": {
+    "type": "string",
+    "nullable": true
+   },
+   "venueCount": {
+    "type": "integer"
+   },
+   "provisionedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "deploymentRef": {
+    "type": "string",
+    "nullable": true,
+    "description": "**A pointer to where this cell runs, not a description of it.** A Kubernetes namespace, an ECS cluster ARN, a stack name — whatever the orchestrator calls the thing.\n\n**The platform does not model instances, nodes or shards** (31 August). Kubernetes already holds instance counts and they change by the second; a table copying them drifts within minutes and the copy would win.\n\n**The line is: routing decisions belong to the platform, provisioning facts belong to the orchestrator.** Qdrant is the proof — ADR-0021 makes the tenant *the* shard key, so nine operations route without a lookup and **a stored shard assignment would be a second copy of something derivable.**\n\n**CF-161 needed a table after all, and this said it did not.** The claim here was that one database per cell or one per service is a build-time decision and the DDL is identical either way. **ADR-0038 answered it per tenant**, which drops `Cell.tenantId`, adds `CellTenant`, `RolloutTenant` and a per-tenant migration row, and takes `control` out of the tenant template. `tools/derive-ddl.py` carried the same claim in its docstring.\n\n**A claim that a question cannot affect your artefact is the one most likely to be left standing after it does**, which is why the correction is recorded here rather than the sentence simply deleted."
+   }
+  }
+ },
+ "CellCapacity": {
+  "type": "object",
+  "x-ticvai-persistence": "none — measured, not stored",
+  "required": [
+   "cellId",
+   "isConstrained",
+   "dimensions",
+   "measuredAt"
+  ],
+  "properties": {
+   "cellId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "kind": {
+    "$ref": "#/components/schemas/CellKind"
+   },
+   "tenantCount": {
+    "type": "integer",
+    "description": "Reported, and **deliberately not the sizing signal.** Forty quiet tenants may load a cell less than three busy ones.\n"
+   },
+   "isConstrained": {
+    "type": "boolean"
+   },
+   "constrainedDimension": {
+    "type": "string",
+    "nullable": true
+   },
+   "dimensions": {
+    "type": "array",
+    "description": "Per dimension, because the response differs. Short of connections and long on storage is a different problem from short of both.\n",
+    "items": {
+     "type": "object",
+     "required": [
+      "dimension",
+      "used",
+      "headroom"
+     ],
+     "properties": {
+      "dimension": {
+       "type": "string",
+       "enum": [
+        "concurrentUsers",
+        "transactionsPerSecond",
+        "scansPerSecond",
+        "databaseConnections",
+        "storageGb",
+        "replicationLag",
+        "cpu"
+       ]
+      },
+      "used": {
+       "type": "number"
+      },
+      "limit": {
+       "type": "number"
+      },
+      "headroom": {
+       "type": "number",
+       "description": "Fraction remaining. Negative means already over."
+      },
+      "peakAt": {
+       "type": "string",
+       "format": "date-time",
+       "nullable": true
+      }
+     }
+    }
+   },
+   "forecastBreachAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "When the constrained dimension is projected to run out at the current trend. Null where there is no trend to project — an honest null beats an invented date.\n"
+   },
+   "measuredAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "CellKind": {
+  "type": "string",
+  "description": "Two deployment locations (ADR-0017, amended by ADR-0046). `shared` is the default; the others exist because a client asked or a law requires it.\n\n**On-premise is two configurations, not one (ADR-0046).** `onPremiseIsolated` keeps no channel to TICVAI — updates are pull-initiated or physically delivered, licensing is a signed file, support is blind. `onPremiseConnected` keeps an outbound control channel and is reachable, updatable and licensable in the ordinary way. The channel carries control traffic only and no natural person (ADR-0043); **AI inference is data, not control**, so connectivity alone does not grant the assistant.\n\nThere is no `hybrid`. The RFP's third model is answered by `onPremiseConnected`; a genuine split workload has never been asked for and would be a new decision.\n\n\n**`burst` added 31 August.** An environment stood up for one on-sale and torn down after (CF-162 scenario c). **It is not a jurisdiction and it is not permanent** — it holds a catalogue snapshot, three services of sixteen, and 17 tables of 380.\n\n**The other four are places data lives. This one is a place data passes through**, which is why it has its own lifecycle and a reconciliation obligation the others do not.",
+  "enum": [
+   "shared",
+   "dedicated",
+   "onPremiseIsolated",
+   "onPremiseConnected",
+   "controlPlane",
+   "burst"
+  ]
+ },
+ "CellStatus": {
+  "type": "string",
+  "enum": [
+   "provisioning",
+   "active",
+   "migrating",
+   "suspended",
+   "decommissioning",
+   "failed"
+  ]
+ },
+ "CellTier": {
+  "type": "string",
+  "enum": [
+   "shared",
+   "dedicated",
+   "isolated",
+   "clientHosted"
+  ]
+ },
+ "CreatePlanRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "code",
+   "name",
+   "cellTier",
+   "licensedModules",
+   "limits",
+   "basePrice"
+  ],
+  "properties": {
+   "code": {
+    "type": "string",
+    "maxLength": 64
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "description": {
+    "type": "string",
+    "maxLength": 1000
+   },
+   "cellTier": {
+    "$ref": "#/components/schemas/CellTier"
+   },
+   "licensedModules": {
+    "type": "array",
+    "minItems": 1,
+    "description": "**A closed set as of 24 August.** `moduleKey` was a free string, so nothing could join a licence to a screen — **a tenant without an F&B licence was still served every F&B screen**, because no screen said which module it belonged to in a form the licence could match.\n**The key is the join.** `screen.requiresModule` names one of these, and navigation is built from the intersection of what a tenant licensed and what their role permits.\n",
+    "items": {
+     "$ref": "#/components/schemas/ModuleKey"
+    }
+   },
+   "limits": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/EntitlementLimit"
+    }
+   },
+   "basePrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "billingPeriod": {
+    "type": "string",
+    "enum": [
+     "monthly",
+     "quarterly",
+     "annual"
+    ]
+   },
+   "includesBrandedApp": {
+    "type": "boolean",
+    "description": "Branded native publishing carries per-tenant operational cost and is priced, not absorbed.\n"
+   },
+   "includedAiTokens": {
+    "type": "integer",
+    "nullable": true,
+    "description": "AI tokens the package includes per billing period. Usage beyond it is a `metered` invoice line at the AI module's price (decided 29 September)."
+   },
+   "requestLimits": {
+    "$ref": "#/components/schemas/PlanRequestLimits"
+   },
+   "packageKind": {
+    "type": "string",
+    "enum": [
+     "standard",
+     "custom"
+    ],
+    "default": "standard",
+    "description": "**Three standard packages, and custom ones allowed** (decided 29 September, Chinmay)."
+   },
+   "offeredToTenantId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**Private to one tenant** (decided 29 September, Chinmay): a custom package offered only to this tenant; `listPlans` shows it to no other tenant and `setSubscription` refuses it for any other (422 `plan-not-offered`). Null for a package any tenant may buy. Custom packages only."
+   }
+  }
+ },
  "CreateScopeNodeRequest": {
   "type": "object",
   "required": [
@@ -353,6 +642,295 @@
     "maxLength": 200
    }
   }
+ },
+ "CreateTenantRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "code",
+   "name",
+   "billingEmail"
+  ],
+  "properties": {
+   "code": {
+    "type": "string",
+    "maxLength": 64,
+    "pattern": "^[a-z0-9-]+$"
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "billingEmail": {
+    "type": "string"
+   },
+   "billingAddress": {
+    "type": "string",
+    "maxLength": 500
+   },
+   "accountManagerPrincipalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "planId": {
+    "type": "string",
+    "format": "uuid"
+   }
+  }
+ },
+ "DowngradeConflictProblem": {
+  "x-ticvai-persistence": "none — error shape",
+  "allOf": [
+   {
+    "$ref": "../shared/common.yaml#/components/schemas/Problem"
+   },
+   {
+    "type": "object",
+    "properties": {
+     "modulesInUse": {
+      "type": "array",
+      "description": "Enabled by the tenant but not licensed by the target plan.",
+      "items": {
+       "type": "object",
+       "properties": {
+        "moduleKey": {
+         "type": "string"
+        },
+        "displayName": {
+         "type": "string"
+        },
+        "isEnabled": {
+         "type": "boolean"
+        }
+       }
+      }
+     },
+     "limitsExceeded": {
+      "type": "array",
+      "items": {
+       "type": "object",
+       "properties": {
+        "metric": {
+         "$ref": "#/components/schemas/UsageMetric"
+        },
+        "currentUsage": {
+         "type": "integer"
+        },
+        "targetLimit": {
+         "type": "integer"
+        }
+       }
+      }
+     }
+    }
+   }
+  ]
+ },
+ "EntitlementLimit": {
+  "type": "object",
+  "required": [
+   "metric",
+   "limit"
+  ],
+  "properties": {
+   "metric": {
+    "$ref": "#/components/schemas/UsageMetric"
+   },
+   "limit": {
+    "type": "integer",
+    "nullable": true,
+    "x-ticvai-column": "limit_value",
+    "description": "Null means unlimited. Stored as `limit_value` — `limit` is a reserved word, and `subscription.tier_allowance` already names the same figure `limit_value`."
+   },
+   "overageAllowed": {
+    "type": "boolean",
+    "default": false
+   },
+   "overageUnitPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   }
+  }
+ },
+ "EntitlementUsage": {
+  "x-ticvai-persistence": "none — aggregated from usage_record",
+  "type": "object",
+  "required": [
+   "tenantId",
+   "metrics"
+  ],
+  "properties": {
+   "tenantId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "metrics": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "metric",
+      "current",
+      "isNearLimit"
+     ],
+     "properties": {
+      "metric": {
+       "$ref": "#/components/schemas/UsageMetric"
+      },
+      "current": {
+       "type": "integer"
+      },
+      "limit": {
+       "type": "integer",
+       "nullable": true
+      },
+      "percentUsed": {
+       "type": "number",
+       "nullable": true
+      },
+      "isNearLimit": {
+       "type": "boolean",
+       "description": "Approaching a limit is an account conversation. Hitting one silently at a gate is an incident.\n"
+      },
+      "isExceeded": {
+       "type": "boolean"
+      }
+     }
+    }
+   },
+   "asAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "InvoiceStatus": {
+  "type": "string",
+  "enum": [
+   "draft",
+   "issued",
+   "paid",
+   "overdue",
+   "disputed",
+   "cancelled"
+  ]
+ },
+ "LicenceAddOn": {
+  "x-ticvai-persistence": "control.licence_add_on + control.licence_add_on_limit",
+  "x-ticvai-retired-columns": [
+   "plan_id"
+  ],
+  "description": "**Belongs to the tenant, not the plan.** Add-ons survive a plan change unless explicitly removed (`addLicenceAddOn`), so a row keyed on `plan_id` would be lost, or silently re-applied to every tenant on that plan, at the first plan change. The tenant comes from the path. `limitOverrides` are child rows in `control.licence_add_on_limit`.",
+  "type": "object",
+  "required": [
+   "moduleKey"
+  ],
+  "properties": {
+   "tenantId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "The tenant the add-on was sold to — the `tenantId` in the path, never the body."
+   },
+   "moduleKey": {
+    "type": "string"
+   },
+   "limitOverrides": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/EntitlementLimit"
+    }
+   },
+   "price": {
+    "x-ticvai-column": "list_price",
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "validFrom": {
+    "type": "string",
+    "format": "date"
+   },
+   "validTo": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "note": {
+    "type": "string",
+    "maxLength": 500
+   }
+  }
+ },
+ "LicencePosition": {
+  "x-ticvai-persistence": "none — union of the tenant's plan (control.tenant.plan_id -> subscription.plan_module, subscription.plan_limit) and its add-ons (control.licence_add_on, control.licence_add_on_limit by tenant_id)",
+  "type": "object",
+  "required": [
+   "tenantId",
+   "licensedModules",
+   "limits"
+  ],
+  "properties": {
+   "poweredByRemovable": {
+    "type": "boolean",
+    "readOnly": true,
+    "default": false,
+    "description": "**Whether the tenant's licence lets it switch \"Powered by TICVAI\" off** (Chinmay, 2 October, workbook Q160 and the pre-apply round; CHG-CSA-036). False by default; true where TICVAI sold the tenant the add-on keyed `poweredByRemoval` (`addLicenceAddOn`). White label's `setBrandIdentity` refuses `showPoweredBy` false while this is false."
+   },
+   "tenantId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "planId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "licensedModules": {
+    "type": "array",
+    "description": "Union of plan modules and add-ons. The White Label Builder reads this and cannot enable anything absent from it.\n",
+    "items": {
+     "type": "object",
+     "required": [
+      "moduleKey",
+      "source"
+     ],
+     "properties": {
+      "moduleKey": {
+       "type": "string"
+      },
+      "displayName": {
+       "type": "string"
+      },
+      "source": {
+       "type": "string",
+       "enum": [
+        "plan",
+        "addOn"
+       ]
+      },
+      "validTo": {
+       "type": "string",
+       "format": "date",
+       "nullable": true
+      }
+     }
+    }
+   },
+   "limits": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/EntitlementLimit"
+    }
+   }
+  }
+ },
+ "LocalisedText": {
+  "x-ticvai-persistence": "none — jsonb column",
+  "type": "object",
+  "additionalProperties": {
+   "type": "string"
+  }
+ },
+ "ModuleKey": {
+  "$ref": "../shared/common.yaml#/components/schemas/ModuleKey"
  },
  "OrgUnit": {
   "x-ticvai-persistence": "platform.scope",
@@ -606,8 +1184,100 @@
    "PROCUREMENT_VIEW",
    "PROCUREMENT_REQUEST",
    "PROCUREMENT_MANAGE",
-   "PROCUREMENT_RECEIVE"
+   "PROCUREMENT_RECEIVE",
+   "CORE_AI_PUBLISH",
+   "TICKETING_AI_PUBLISH",
+   "ACCESS_AI_PUBLISH",
+   "FNB_AI_PUBLISH",
+   "RETAIL_AI_PUBLISH",
+   "INVENTORY_AI_PUBLISH",
+   "SEATING_AI_PUBLISH",
+   "MEMBERSHIP_AI_PUBLISH",
+   "MARKETING_AI_PUBLISH",
+   "RESOURCES_AI_PUBLISH",
+   "QUEUE_AI_PUBLISH",
+   "TRANSPORT_AI_PUBLISH",
+   "GAMES_AI_PUBLISH",
+   "MAINTENANCE_AI_PUBLISH",
+   "ACCREDITATION_AI_PUBLISH",
+   "PARTNER_AI_PUBLISH",
+   "ANALYTICS_AI_PUBLISH",
+   "BIOMETRIC_IMAGE_VIEW",
+   "ACCESS_DIRECTION_SET",
+   "REPORT_GOVERNANCE_MANAGE"
   ]
+ },
+ "Plan": {
+  "x-ticvai-persistence": "subscription.plan + subscription.plan_module + subscription.plan_limit",
+  "description": "**A plan's modules and limits are rows, keyed on `plan_id`.** `licensedModules` and `limits` are required on every plan, and `subscription.plan` alone had no column for either — so the licence position, the downgrade check and every module gate had nothing to read. `plan_module` holds one row per licensed `ModuleKey`; `plan_limit` one row per `EntitlementLimit`. Both belong to the plan version the row is, so a subscriber on an earlier version keeps the modules and limits they were sold.",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/CreatePlanRequest"
+   },
+   {
+    "type": "object",
+    "required": [
+     "id",
+     "version",
+     "isActive",
+     "subscriberCount"
+    ],
+    "properties": {
+     "id": {
+      "type": "string",
+      "format": "uuid"
+     },
+     "version": {
+      "type": "string",
+      "description": "Existing subscribers stay on the version they were sold. A price change never applies retroactively.\n"
+     },
+     "isActive": {
+      "type": "boolean"
+     },
+     "subscriberCount": {
+      "type": "integer"
+     },
+     "publishedAt": {
+      "type": "string",
+      "format": "date-time"
+     }
+    }
+   }
+  ]
+ },
+ "PlanRequestLimits": {
+  "type": "object",
+  "nullable": true,
+  "x-ticvai-persistence": "none — embedded in subscription.plan as its request_limits jsonb column",
+  "description": "**The limits section of a plan: every tenant has a request budget** (ADR-0064, accepted 1 October; it decides the per-tenant limit ADR-0032 deferred). A token bucket per tenant and audience in the kernel middleware of `commerce`, `access` and `operations`, counted in Azure Managed Redis so every replica agrees; a guest browse never spends a till's budget. Over budget, the call is refused `429` with `Retry-After` and the `RateLimit-*` headers (every operation declares it).\n\n**Null takes the platform default**, which starts at twice the tenant's expected peak from its sizing tier (`handoff/sizing.json` venue tiers) and is recalibrated after the benchmark and after four weeks of production. **A tenant may use the whole platform when others are quiet**: the per-replica share (`replicaSharePercent`) is enforced only above `shareEnforcedAbovePercent` of the replica's limit. If Redis is unavailable each replica falls back to its own buckets (the limit divided by the replica count); the request path never fails because the limiter's store did.",
+  "properties": {
+   "guest": {
+    "$ref": "#/components/schemas/RequestBudget"
+   },
+   "staff": {
+    "$ref": "#/components/schemas/RequestBudget"
+   },
+   "service": {
+    "$ref": "#/components/schemas/RequestBudget"
+   },
+   "partner": {
+    "$ref": "#/components/schemas/RequestBudget"
+   },
+   "replicaSharePercent": {
+    "type": "integer",
+    "minimum": 1,
+    "maximum": 100,
+    "default": 25,
+    "description": "The most of one replica's request slots one tenant may hold while the share is enforced."
+   },
+   "shareEnforcedAbovePercent": {
+    "type": "integer",
+    "minimum": 1,
+    "maximum": 100,
+    "default": 70,
+    "description": "The replica load, as a percent of its limit, above which the share is enforced."
+   }
+  }
  },
  "PlatformStaffGrant": {
   "type": "object",
@@ -763,6 +1433,40 @@
    }
   }
  },
+ "ProvisionCellRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "regionId",
+   "countryCode",
+   "tier"
+  ],
+  "properties": {
+   "regionId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "countryCode": {
+    "type": "string",
+    "pattern": "^[A-Z]{2}$",
+    "description": "Determines the jurisdiction. Placement must be within it — this is enforced, not trusted.\n"
+   },
+   "tier": {
+    "$ref": "#/components/schemas/CellTier"
+   },
+   "cloudProvider": {
+    "type": "string"
+   },
+   "cloudRegion": {
+    "type": "string"
+   },
+   "clientHostedEndpoint": {
+    "type": "string",
+    "nullable": true,
+    "description": "Required for `clientHosted`, where no in-region cloud exists."
+   }
+  }
+ },
  "ScopeLevel": {
   "type": "string",
   "description": "**The eight organisational levels, plus `subject`.** Restored 24 August.\n`tenancy.yaml` holds the authoritative definition of the eight levels and this mirrors them so a contract can reference a level without depending on the whole tenancy surface. **Seven organisational levels plus `outlet`** — a commercial branch beside the organisational one (CF-138, ADR-0018). **A department has requisitions and rotas; an outlet has a menu and stock**, and modelling a restaurant as a department would put it in the staffing tree.\n\n**`subject` is the one value tenancy does not have, and it is not a level.** It is here because `check-package` reads this enum as the closed vocabulary for `x-ticvai-scope-level`, and some operations act on one guest's own resources, which sit in no node of the venue hierarchy. So `subject` is valid as an operation's scope level and never as a `ScopeRef.level`: every `ScopeRef` is a row of `platform.scope`, and those carry one of the eight.\n",
@@ -777,6 +1481,37 @@
    "outlet",
    "subject"
   ]
+ },
+ "SetSubscriptionRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "planId"
+  ],
+  "properties": {
+   "planId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "planVersion": {
+    "type": "string",
+    "description": "Defaults to the current version."
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "format": "date",
+    "description": "Optional, and set by the server if omitted. Today for an upgrade, `renewsAt` for a downgrade; any other date is refused (audit R214 (1))."
+   },
+   "prorate": {
+    "type": "boolean",
+    "default": true,
+    "description": "An upgrade is always prorated and a downgrade, which starts at renewal, never is (audit R214 (1)). Kept so a preview can show the unprorated figure; `setSubscription` applies the rule whatever is sent."
+   },
+   "note": {
+    "type": "string",
+    "maxLength": 500
+   }
+  }
  },
  "SsoGroupMapping": {
   "x-ticvai-persistence": "identity.sso_group_mapping",
@@ -868,6 +1603,617 @@
    },
    "isActive": {
     "type": "boolean"
+   }
+  }
+ },
+ "Subscription": {
+  "x-ticvai-persistence": "subscription.contract",
+  "type": "object",
+  "required": [
+   "tenantId",
+   "planId",
+   "planVersion",
+   "status",
+   "startsAt"
+  ],
+  "properties": {
+   "tenantId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "planId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "planName": {
+    "type": "string"
+   },
+   "planVersion": {
+    "type": "string"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "trial",
+     "active",
+     "pastDue",
+     "cancelled",
+     "expired"
+    ]
+   },
+   "startsAt": {
+    "type": "string",
+    "format": "date"
+   },
+   "renewsAt": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "cancelledAt": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "scheduledChange": {
+    "type": "object",
+    "nullable": true,
+    "readOnly": true,
+    "description": "A downgrade waiting for the next renewal (decided 28 September, audit R214 (1)). Null when none is scheduled.",
+    "properties": {
+     "planId": {
+      "type": "string",
+      "format": "uuid"
+     },
+     "planVersion": {
+      "type": "string"
+     },
+     "effectiveFrom": {
+      "type": "string",
+      "format": "date",
+      "description": "Always the `renewsAt` it was scheduled against."
+     }
+    }
+   },
+   "currentPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "billingPeriod": {
+    "type": "string"
+   }
+  }
+ },
+ "SubscriptionCreditNote": {
+  "type": "object",
+  "x-ticvai-persistence": "control.credit_note + control.credit_note_line",
+  "description": "**A credit note against one tenant invoice** (20.7.7, 29 September build): its own number, lines, tax and total. The invoice it credits is never edited.",
+  "required": [
+   "id",
+   "creditNoteNumber",
+   "invoiceId",
+   "tenantId",
+   "reasonCode",
+   "settlement",
+   "total",
+   "issuedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "creditNoteNumber": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**Gapless, per issuing legal entity, in its own sequence** (the R152 rule for invoices, decided 28 September, applied to credit notes): assigned at issue, never reused."
+   },
+   "invoiceId": {
+    "type": "string",
+    "description": "The invoice credited."
+   },
+   "tenantId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "reasonCode": {
+    "type": "string",
+    "enum": [
+     "billingError",
+     "serviceCredit",
+     "disputeResolution",
+     "goodwill",
+     "other"
+    ]
+   },
+   "reason": {
+    "type": "string",
+    "maxLength": 500,
+    "nullable": true
+   },
+   "settlement": {
+    "type": "string",
+    "enum": [
+     "offsetNextInvoice",
+     "refund"
+    ]
+   },
+   "settlementStatus": {
+    "type": "string",
+    "enum": [
+     "pending",
+     "offset",
+     "refunded"
+    ],
+    "readOnly": true,
+    "description": "`offset` once a later invoice has taken it; `refunded` once the refund is recorded."
+   },
+   "lines": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "invoiceLineIndex": {
+       "type": "integer"
+      },
+      "description": {
+       "type": "string"
+      },
+      "quantity": {
+       "type": "number",
+       "nullable": true
+      },
+      "unitPrice": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "amount": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      }
+     }
+    }
+   },
+   "subtotal": {
+    "x-ticvai-column": "net_amount",
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "taxAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "total": {
+    "x-ticvai-column": "gross_amount",
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "issuedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "issuedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   }
+  }
+ },
+ "SubscriptionInvoice": {
+  "x-ticvai-persistence": "control.invoice + control.invoice_line",
+  "type": "object",
+  "required": [
+   "id",
+   "invoiceNumber",
+   "tenantId",
+   "periodStart",
+   "periodEnd",
+   "status",
+   "total"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "invoiceNumber": {
+    "type": "string",
+    "readOnly": true,
+    "description": "A tax invoice number, so **gapless, per legal entity** (decided 28 September, audit R152): one unbroken sequence for the TICVAI legal entity that issues it, assigned when the invoice is issued, never reused. A cancelled invoice keeps its number.\n"
+   },
+   "tenantId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "periodStart": {
+    "type": "string",
+    "format": "date"
+   },
+   "periodEnd": {
+    "type": "string",
+    "format": "date"
+   },
+   "status": {
+    "$ref": "#/components/schemas/InvoiceStatus"
+   },
+   "lines": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "description": {
+       "type": "string"
+      },
+      "kind": {
+       "type": "string",
+       "enum": [
+        "basePlan",
+        "module",
+        "addOn",
+        "overage",
+        "metered",
+        "oneOff",
+        "credit"
+       ],
+       "description": "`module`, one per licensed module at its platform price, and `metered`, usage such as AI tokens (decided 29 September)."
+      },
+      "moduleCode": {
+       "type": "string",
+       "nullable": true,
+       "description": "The module a `module` or `metered` line charges for."
+      },
+      "audience": {
+       "type": "string",
+       "enum": [
+        "staff",
+        "guest"
+       ],
+       "nullable": true,
+       "description": "For an AI `metered` line, whose usage it is."
+      },
+      "metric": {
+       "$ref": "#/components/schemas/UsageMetric"
+      },
+      "quantity": {
+       "type": "number"
+      },
+      "unitPrice": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "amount": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      }
+     }
+    }
+   },
+   "subtotal": {
+    "x-ticvai-column": "net_amount",
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "taxAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "total": {
+    "x-ticvai-column": "gross_amount",
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "planVersionUsed": {
+    "type": "string",
+    "description": "Priced against the version the tenant is subscribed to, not the latest."
+   },
+   "creditedTotal": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "readOnly": true,
+    "nullable": true,
+    "description": "The sum of the credit notes issued against this invoice (`issueCreditNote`); the invoice itself is never edited. Null with none."
+   },
+   "issuedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "dueAt": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "paidAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "SubscriptionPreview": {
+  "x-ticvai-persistence": "none — computed",
+  "type": "object",
+  "required": [
+   "canApply",
+   "priceChange"
+  ],
+  "properties": {
+   "canApply": {
+    "type": "boolean"
+   },
+   "priceChange": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "proratedAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "modulesGained": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "modulesLost": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "conflicts": {
+    "$ref": "#/components/schemas/DowngradeConflictProblem"
+   },
+   "cellTierChange": {
+    "type": "object",
+    "nullable": true,
+    "properties": {
+     "from": {
+      "$ref": "#/components/schemas/CellTier"
+     },
+     "to": {
+      "$ref": "#/components/schemas/CellTier"
+     },
+     "requiresMigration": {
+      "type": "boolean"
+     }
+    }
+   }
+  }
+ },
+ "SuspensionMode": {
+  "type": "string",
+  "description": "Access validation continues under every mode. A commercial dispute must not strand guests at a gate holding valid tickets.\n",
+  "enum": [
+   "readOnly",
+   "noNewSales",
+   "fullLockout"
+  ]
+ },
+ "Tenant": {
+  "x-ticvai-persistence": "control.tenant",
+  "type": "object",
+  "required": [
+   "id",
+   "code",
+   "name",
+   "status",
+   "createdAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "status": {
+    "$ref": "#/components/schemas/TenantStatus"
+   },
+   "suspensionMode": {
+    "$ref": "#/components/schemas/SuspensionMode"
+   },
+   "suspensionReason": {
+    "type": "string",
+    "nullable": true
+   },
+   "suspensionEffectiveAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "When the suspension takes, or took, effect — `suspendTenant.effectiveAt`. **A future value is a pending suspension**: the tenant stays `active` until then, and this row is the only place that says a suspension is coming."
+   },
+   "suspensionNoticeMessage": {
+    "$ref": "#/components/schemas/LocalisedText",
+    "description": "The notice shown to the tenant's users about the suspension — `suspendTenant.noticeMessage`."
+   },
+   "terminationScheduledAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "When `terminateTenant` started the retention window. Null when no termination is under way."
+   },
+   "terminationRetentionUntil": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "`terminationScheduledAt` plus the request's `retentionDays`. **Stored, not recomputed** — the day count is client-supplied and exists nowhere else, and this is the date the cells are destroyed after."
+   },
+   "terminationReason": {
+    "type": "string",
+    "maxLength": 1000,
+    "nullable": true
+   },
+   "terminationRequestedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "planId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "planName": {
+    "type": "string",
+    "nullable": true
+   },
+   "cellCount": {
+    "type": "integer"
+   },
+   "venueCount": {
+    "type": "integer"
+   },
+   "regionId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The tenant's home region: the `tenancy` region node whose `RegionSettings` govern tenant-wide gates, today `allowedAiResidencies` (decided 28 September, audit R203). Written by the server when the tenant's first region is created; null until then. ADM-037 reads it to show the region's residency restriction, and `ai.setAiProvider` checks against the same region.\n"
+   },
+   "billingEmail": {
+    "type": "string"
+   },
+   "billingAddress": {
+    "type": "string",
+    "maxLength": 500,
+    "nullable": true,
+    "description": "Accepted by `createTenant` and `updateTenant`; stored here so the response can return what was sent."
+   },
+   "accountManagerPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "activatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "TenantDetail": {
+  "x-ticvai-persistence": "control.tenant",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/Tenant"
+   },
+   {
+    "type": "object",
+    "properties": {
+     "subscription": {
+      "$ref": "#/components/schemas/Subscription"
+     },
+     "cells": {
+      "type": "array",
+      "items": {
+       "$ref": "#/components/schemas/Cell"
+      }
+     },
+     "licences": {
+      "$ref": "#/components/schemas/LicencePosition"
+     }
+    }
+   }
+  ]
+ },
+ "TenantStatus": {
+  "type": "string",
+  "enum": [
+   "onboarding",
+   "active",
+   "suspended",
+   "terminating",
+   "terminated"
+  ]
+ },
+ "UsageMetric": {
+  "type": "string",
+  "enum": [
+   "venues",
+   "workstations",
+   "activeUsers",
+   "devices",
+   "brandedApps",
+   "aiTokens",
+   "apiCalls",
+   "storageGb",
+   "transactions",
+   "guestProfiles"
+  ]
+ },
+ "UsageReport": {
+  "x-ticvai-persistence": "none — aggregated",
+  "type": "object",
+  "required": [
+   "tenantId",
+   "periodStart",
+   "periodEnd",
+   "metrics"
+  ],
+  "properties": {
+   "tenantId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "periodStart": {
+    "type": "string",
+    "format": "date"
+   },
+   "periodEnd": {
+    "type": "string",
+    "format": "date"
+   },
+   "metrics": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "metric": {
+       "$ref": "#/components/schemas/UsageMetric"
+      },
+      "total": {
+       "type": "number"
+      },
+      "included": {
+       "type": "number",
+       "nullable": true
+      },
+      "overage": {
+       "type": "number"
+      },
+      "byVenue": {
+       "type": "array",
+       "items": {
+        "type": "object",
+        "properties": {
+         "venueId": {
+          "type": "string",
+          "format": "uuid"
+         },
+         "quantity": {
+          "type": "number"
+         }
+        }
+       }
+      },
+      "byCapability": {
+       "type": "array",
+       "description": "AI tokens only.",
+       "items": {
+        "type": "object",
+        "properties": {
+         "capability": {
+          "type": "string"
+         },
+         "quantity": {
+          "type": "number"
+         }
+        }
+       }
+      }
+     }
+    }
    }
   }
  }

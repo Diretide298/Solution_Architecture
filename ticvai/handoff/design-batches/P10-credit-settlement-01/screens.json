@@ -111,12 +111,6 @@
       },
       {
        "kind": "secondaryButton",
-       "label": "Add tip",
-       "operation": "addTip",
-       "provenance": "contract orders.yaml POST /payments/{paymentId}/tip"
-      },
-      {
-       "kind": "secondaryButton",
        "label": "Capture payment",
        "operation": "capturePayment",
        "provenance": "contract orders.yaml POST /payments/{paymentId}/capture"
@@ -142,12 +136,6 @@
     "operationId": "createPayment",
     "contract": "orders",
     "purpose": "from page inventory",
-    "trigger": "onAction"
-   },
-   {
-    "operationId": "addTip",
-    "contract": "orders",
-    "purpose": "Record a tip against a payment",
     "trigger": "onAction"
    },
    {
@@ -180,26 +168,6 @@
   "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "overlays": [
    {
-    "id": "formAddTip",
-    "component": "modal",
-    "trigger": "Add tip",
-    "body": "**Collects what `addTip` sends before it is called.** Required: `amount`, `source`, `recordedAt`. Optional: `allocateToPrincipalId`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Add tip",
-     "operation": "addTip"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "amount",
-      "source",
-      "recordedAt",
-      "allocateToPrincipalId"
-     ]
-    },
-    "provenance": "contract orders.yaml POST /payments/{paymentId}/tip"
-   },
-   {
     "id": "formCapturePayment",
     "component": "modal",
     "trigger": "Capture payment",
@@ -215,6 +183,14 @@
      ]
     },
     "provenance": "contract orders.yaml POST /payments/{paymentId}/capture"
+   }
+  ],
+  "gaps": [
+   {
+    "operation": "addTip",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-018): A partner checkout has no tip (design-notes correction ticketing-guest PTR-012).",
+    "source": "screens/P10-partner-reseller-portal.yaml#PTR-012"
    }
   ],
   "_platform": {
@@ -268,10 +244,7 @@
     {
      "to": "PTR-001",
      "trigger": "Partner Login / MFA",
-     "carries": [
-      "accountId"
-     ],
-     "provenance": "derived — PTR-001 declares entryState.params accountId, challengeId and PTR-013 holds accountId, so an edge into it carries them"
+     "provenance": "derived — PTR-001 declares entryState.params challengeId, methodId, providerId and PTR-013 holds none of them. The edge carries nothing: PTR-013 is opened from PTR-001, so this edge is the way back and PTR-001 keeps its own state"
     },
     {
      "to": "PTR-002",
@@ -328,52 +301,10 @@
     {
      "name": "actionBar",
      "slot": "rowActions",
-     "components": [
-      {
-       "kind": "destructiveButton",
-       "label": "Override credit limit",
-       "operation": "overrideCreditLimit",
-       "provenance": "contract orders.yaml POST /b2b-accounts/{accountId}/credit/override"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Save b2b credit limit",
-       "operation": "setB2bCreditLimit",
-       "provenance": "contract orders.yaml PUT /b2b-accounts/{accountId}/credit"
-      }
-     ]
+     "components": []
     }
    ]
   },
-  "overlays": [
-   {
-    "id": "confirmOverrideCreditLimit",
-    "component": "confirmDialog",
-    "trigger": "Override credit limit",
-    "body": "**Names what `overrideCreditLimit` changes and what it leaves alone**, in the consequence rather than the verb. A credit limit balance this affects should be identified in the dialog, not just counted. **Collects what `overrideCreditLimit` sends before it is called.** Required: `orderId`, `amount`, `reason`. Optional: `expiresAt`.",
-    "provenance": "contract orders.yaml POST /b2b-accounts/{accountId}/credit/override"
-   },
-   {
-    "id": "formSetB2bCreditLimit",
-    "component": "modal",
-    "trigger": "Save b2b credit limit",
-    "body": "**Collects what `setB2bCreditLimit` sends before it is called.** Required: `creditLimit`, `reason`. Optional: `paymentTermsDays`, `isSuspended`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Save b2b credit limit",
-     "operation": "setB2bCreditLimit"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "creditLimit",
-      "reason",
-      "paymentTermsDays",
-      "isSuspended"
-     ]
-    },
-    "provenance": "contract orders.yaml PUT /b2b-accounts/{accountId}/credit"
-   }
-  ],
   "states": {
    "loading": "The credit limit balance, read by `getB2bCredit`.",
    "error": "Could not load. Names which read failed and leaves the credit limit balance untouched.",
@@ -386,18 +317,6 @@
     "contract": "orders",
     "purpose": "from page inventory",
     "trigger": "onLoad"
-   },
-   {
-    "operationId": "overrideCreditLimit",
-    "contract": "orders",
-    "purpose": "Authorise an order beyond the credit limit",
-    "trigger": "onAction"
-   },
-   {
-    "operationId": "setB2bCreditLimit",
-    "contract": "orders",
-    "purpose": "Set a partner credit limit",
-    "trigger": "onAction"
    }
   ],
   "entryState": {
@@ -415,6 +334,20 @@
    "board": "wireframes/P10 Partner Web.dc.html#ptr-013"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "gaps": [
+   {
+    "operation": "overrideCreditLimit",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-018): Overriding and setting the credit limit are venue actions; the partner reads (design-notes correction ticketing-guest PTR-013).",
+    "source": "screens/P10-partner-reseller-portal.yaml#PTR-013"
+   },
+   {
+    "operation": "setB2bCreditLimit",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-018): Overriding and setting the credit limit are venue actions; the partner reads (design-notes correction ticketing-guest PTR-013).",
+    "source": "screens/P10-partner-reseller-portal.yaml#PTR-013"
+   }
+  ],
   "_platform": {
    "code": "P10",
    "audience": "partner",

@@ -26,7 +26,7 @@
     {
      "to": "ADM-001",
      "trigger": "Platform Login / MFA",
-     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId and ADM-016 holds none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and ADM-001 opens on its own"
+     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId, providerId and ADM-016 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and ADM-001 opens on its own"
     },
     {
      "to": "ADM-002",
@@ -35,11 +35,11 @@
     }
    ]
   },
-  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement. **30 operations removed 24 August.** Every white-label screen across P09, P12 and P13 declared the **identical 41 operations** — a Typography screen that could create banners and a Component Preview that could set FAQs. **The worst instance of the 18 August bulk attach found so far**, and only walking the white-label journey surfaced it.",
+  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement. **30 operations removed 24 August.** Every white-label screen across P09, P12 and P13 declared the **identical 41 operations** — a Typography screen that could create banners and a Component Preview that could set FAQs. **The worst instance of the 18 August bulk attach found so far**, and only walking the white-label journey surfaced it.\n\n**Hosted with TICVAI: platform staff may publish the tenant's site under the open grant (decided 2 October 2026 by Chinmay, DEC-144); self-hosted: Generate site package.** Publishing here is simulate (Create preview) then publish; an optional review step applies when the venue switched it on (DEC-156).",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listConfigVersions` reads the population and `getAppIcons` reads one of them — list, select, act",
-  "purpose": "See white-label branding management for this venue.",
+  "purpose": "Support a tenant's branding from the platform console, inside an open grant.",
   "layout": {
    "template": "split",
    "regions": [
@@ -50,7 +50,7 @@
       {
        "kind": "selectField",
        "label": "Tenant",
-       "bindsTo": "Tenant",
+       "bindsTo": "Tenant.id",
        "columns": [
         "Tenant.id",
         "Tenant.code",
@@ -74,7 +74,7 @@
         "PlatformStaffGrant.openedAt",
         "PlatformStaffGrant.expiresAt"
        ],
-       "operation": "openPlatformStaffGrant",
+       "operation": "listOwnPlatformStaffGrants",
        "notes": "**Always visible while the screen acts on a tenant** (decided 28 September, audit R098): which tenant, which permissions, why, and the time left to `expiresAt`. At expiry every tenant action is disabled and the screen returns to its grantRequired state; a new need is a new grant. The tenant sees the grant in its own audit log.",
        "provenance": "contract identity.yaml POST /platform-staff-grants"
       },
@@ -161,7 +161,6 @@
         "Theme.accentColour",
         "Theme.backgroundColour",
         "Theme.textColour",
-        "Theme.darkMode",
         "Theme.cornerRadius"
        ],
        "operation": "getTheme",
@@ -180,6 +179,12 @@
        ],
        "operation": "getAppIcons",
        "provenance": "contract white-label.yaml GET /tenant-config/app-icons"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Site package",
+       "operation": "getSitePackage",
+       "provenance": "contract white-label.yaml GET /site-package/{packageId}"
       }
      ]
     },
@@ -234,6 +239,13 @@
        "label": "What publishing changes",
        "notes": "**Names what goes live, where, and from when.** A publish with no stated consequence is one somebody presses meaning to save.",
        "provenance": "authored — required by check-screens"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Generate site package",
+       "operation": "exportSitePackage",
+       "notes": "**Self-hosted tenants: the venue generates a site package to host itself (decided 2 October 2026 by Chinmay, DEC-144; CHG-CSA-038).**",
+       "provenance": "contract white-label.yaml POST /site-package"
       }
      ]
     }
@@ -343,27 +355,29 @@
     "invalidates": [
      "listConfigVersions"
     ]
+   },
+   {
+    "operationId": "listOwnPlatformStaffGrants",
+    "contract": "identity",
+    "purpose": "Find a grant into the picked tenant already open, after a reload (audit R098; CHG-SBO-001)",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "exportSitePackage",
+    "contract": "white-label",
+    "purpose": "Generate a site package (self-hosted)",
+    "trigger": "onAction",
+    "provenance": "design-note correction, 2 October 2026 (ADM-016)"
+   },
+   {
+    "operationId": "getSitePackage",
+    "contract": "white-label",
+    "purpose": "Follow the generated package until it is ready",
+    "trigger": "onLoad",
+    "provenance": "design-note correction, 2 October 2026 (ADM-016)"
    }
   ],
   "entryState": {
-   "params": [
-    {
-     "name": "bannerId",
-     "from": "deepLink"
-    },
-    {
-     "name": "pageId",
-     "from": "deepLink"
-    },
-    {
-     "name": "policyKind",
-     "from": "deepLink"
-    },
-    {
-     "name": "version",
-     "from": "deepLink"
-    }
-   ],
    "coldEntry": "**A version link is expected to point at something superseded — that is what versions are for.** The screen opens the requested version read-only, says it is not current, and links to the one that is. **An old version is history, not an error.** Arrives with `bannerId`, `pageId`, `policyKind`.",
    "preloaded": [
     "ConfigVersion.publishedAt",
@@ -371,6 +385,21 @@
     "ConfigVersion.publishedByName",
     "ConfigVersion.note",
     "ConfigVersion.isCurrent"
+   ],
+   "params": [
+    {
+     "name": "tenantId",
+     "from": "navigation",
+     "optional": true
+    },
+    {
+     "name": "packageId",
+     "from": "navigation"
+    },
+    {
+     "name": "version",
+     "from": "navigation"
+    }
    ]
   },
   "wireframe": {
@@ -456,36 +485,10 @@
     "provenance": "contract white-label.yaml PUT /tenant-config/app-icons"
    },
    {
-    "id": "formSetBrandIdentity",
-    "component": "modal",
-    "trigger": "Save brand identity",
-    "body": "**Collects what `setBrandIdentity` sends before it is called.** Required: `logoAssetRef`. Optional: `logoDarkAssetRef`, `faviconAssetRef`, `splashImageAssetRefs`, `splashDurationSeconds`, `splashBackgroundColour`, `showLoadingIndicator`, `splashChangeScope`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "BrandIdentity",
-    "confirm": {
-     "label": "Save brand identity",
-     "operation": "setBrandIdentity"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "logoAssetRef",
-      "logoDarkAssetRef",
-      "faviconAssetRef",
-      "splashImageAssetRefs",
-      "splashDurationSeconds",
-      "splashBackgroundColour",
-      "showLoadingIndicator",
-      "splashChangeScope"
-     ]
-    },
-    "provenance": "contract white-label.yaml PUT /tenant-config/brand"
-   },
-   {
     "id": "formSetTheme",
     "component": "modal",
     "trigger": "Save theme",
-    "body": "**Collects what `setTheme` sends before it is called.** Required: `primaryColour`, `secondaryColour`, `backgroundColour`, `textColour`. Optional: `accentColour`, `darkMode`, `cornerRadius`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "Theme",
+    "body": "**Collects what `setTheme` sends before it is called.** Required: `primaryColour`, `secondaryColour`, `backgroundColour`, `textColour`. Optional: `accentColour`, `cornerRadius`, `surfaceStyle`, `buttonStyle`, `componentColours`. The same fields as the tenant's theme editor (CMS-005): surface style, button style and per-element colours. **No dark or light mode**: `darkMode` is deprecated and ignored (Chinmay, 2 October 2026; CHG-CSA-035). Dismissing sends nothing; the screen behind is unchanged.",
     "confirm": {
      "label": "Save theme",
      "operation": "setTheme"
@@ -498,13 +501,60 @@
       "backgroundColour",
       "textColour",
       "accentColour",
-      "darkMode",
-      "cornerRadius"
+      "cornerRadius",
+      "surfaceStyle",
+      "buttonStyle",
+      "componentColours"
      ]
     },
     "provenance": "contract white-label.yaml PUT /tenant-config/theme"
+   },
+   {
+    "id": "formSetBrandIdentity",
+    "component": "modal",
+    "trigger": "Save brand identity",
+    "body": "**Collects what `setBrandIdentity` sends before it is called.** Required: `logoAssetRef`. Optional: `logoDarkAssetRef`, `logoVariant`, `faviconAssetRef`, `splashImageAssetRefs`, `splashDurationSeconds`, `splashBackgroundColour`, `showLoadingIndicator`, `introVideoAssetRef`, `introVideoMode`, `showPoweredBy`. The same fields as the tenant's brand kit (CMS-004): logo variant and the intro video; \"Powered by TICVAI\" is a toggle, on by default (DEC-160). `splashChangeScope` is not sent. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save brand identity",
+     "operation": "setBrandIdentity"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "logoAssetRef",
+      "logoDarkAssetRef",
+      "logoVariant",
+      "faviconAssetRef",
+      "splashImageAssetRefs",
+      "splashDurationSeconds",
+      "splashBackgroundColour",
+      "showLoadingIndicator",
+      "introVideoAssetRef",
+      "introVideoMode",
+      "showPoweredBy"
+     ]
+    },
+    "provenance": "contract white-label.yaml PUT /tenant-config/brand"
+   },
+   {
+    "id": "formExportSitePackage",
+    "component": "modal",
+    "trigger": "Generate site package",
+    "body": "**Collects what `exportSitePackage` sends before it is called.** Nothing in the body is required. Optional: `version`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Generate site package",
+     "operation": "exportSitePackage"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "version"
+     ]
+    },
+    "provenance": "contract white-label.yaml POST /site-package"
    }
   ],
+  "purposeNote": "Purpose rewritten 2 October 2026 (CHG-WIR-016): The purpose (\"See white-label branding management for this venue\") was the generic template; branding is per tenant (design-notes correction white-label ADM-016).",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -556,7 +606,7 @@
     {
      "to": "ADM-001",
      "trigger": "Platform Login / MFA",
-     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId and ADM-017 holds none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and ADM-001 opens on its own"
+     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId, providerId and ADM-017 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and ADM-001 opens on its own"
     },
     {
      "to": "ADM-002",
@@ -568,22 +618,16 @@
      "trigger": "White-Label Branding Management",
      "provenance": "flow F103 step 1→2",
      "carries": [
-      "bannerId",
-      "pageId",
-      "policyKind",
-      "version"
+      "tenantId"
      ]
     }
    ]
   },
-  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement. **41 operations removed 24 August.** Every white-label screen across P09, P12 and P13 declared the **identical 41 operations** — a Typography screen that could create banners and a Component Preview that could set FAQs. **The worst instance of the 18 August bulk attach found so far**, and only walking the white-label journey surfaced it. **Rebuilt 24 August.** This screen declared 41 operations and **not one was about a domain** — it carried the bulk-attached white-label set, and no domain or certificate operation existed anywhere in the package. **A white-label platform whose tenants cannot use their own domain is white-label in name only.**",
-  "openQuestions": [
-   "No contract — not specified"
-  ],
+  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement. **41 operations removed 24 August.** Every white-label screen across P09, P12 and P13 declared the **identical 41 operations** — a Typography screen that could create banners and a Component Preview that could set FAQs. **The worst instance of the 18 August bulk attach found so far**, and only walking the white-label journey surfaced it. **Rebuilt 24 August.** This screen declared 41 operations and **not one was about a domain** — it carried the bulk-attached white-label set, and no domain or certificate operation existed anywhere in the package. **A white-label platform whose tenants cannot use their own domain is white-label in name only.**\n\n**Custom domains (decided 2 October 2026 by Chinmay, DEC-547; CHG-CSA-043):** a CNAME (for example tickets.venue.com) to the Front Door endpoint, validated by TXT _dnsauth, with a managed certificate; a delegated subdomain as an option; the apex only on request; no path proxy. The screen lists every DNS record with its observed value and status, the pending-revalidation and timeout states, the takeover warning on release, the primary domain with redirects, and per-domain readiness (UAE Pass redirect, Apple Pay domain, app links).",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listCustomDomains` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
-  "purpose": "See domain & certificate management for this venue.",
+  "purpose": "Support a tenant's custom domains and certificates from the platform console.",
   "layout": {
    "template": "split",
    "regions": [
@@ -594,7 +638,7 @@
       {
        "kind": "selectField",
        "label": "Tenant",
-       "bindsTo": "Tenant",
+       "bindsTo": "Tenant.id",
        "columns": [
         "Tenant.id",
         "Tenant.code",
@@ -618,7 +662,7 @@
         "PlatformStaffGrant.openedAt",
         "PlatformStaffGrant.expiresAt"
        ],
-       "operation": "openPlatformStaffGrant",
+       "operation": "listOwnPlatformStaffGrants",
        "notes": "**Always visible while the screen acts on a tenant** (decided 28 September, audit R098): which tenant, which permissions, why, and the time left to `expiresAt`. At expiry every tenant action is disabled and the screen returns to its grantRequired state; a new need is a new grant. The tenant sees the grant in its own audit log.",
        "provenance": "contract identity.yaml POST /platform-staff-grants"
       },
@@ -634,18 +678,25 @@
        "label": "Every custom domain",
        "bindsTo": "CustomDomain",
        "columns": [
-        "CustomDomain.id",
         "CustomDomain.hostname",
         "CustomDomain.kind",
         "CustomDomain.status",
-        "CustomDomain.verificationMethod",
-        "CustomDomain.verificationToken",
+        "CustomDomain.isPrimary",
+        "CustomDomain.dnsRecords",
+        "CustomDomain.revalidation",
         "CustomDomain.certificateExpiresAt",
-        "CustomDomain.lastCheckedAt",
-        "CustomDomain.failureReason"
+        "CustomDomain.readiness"
        ],
        "operation": "listCustomDomains",
        "provenance": "contract white-label.yaml GET /tenant-domains"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Platform subdomain",
+       "bindsTo": "PlatformSubdomain",
+       "operation": "getPlatformSubdomain",
+       "notes": "Every tenant has venue.<cell>.ticvai.app from provisioning (DEC-546).",
+       "provenance": "contract white-label.yaml GET /platform-subdomain"
       }
      ]
     },
@@ -658,12 +709,17 @@
        "label": "The selected custom domain",
        "bindsTo": "CustomDomain",
        "columns": [
-        "CustomDomain.id",
         "CustomDomain.hostname",
         "CustomDomain.kind",
         "CustomDomain.status",
         "CustomDomain.verificationMethod",
-        "CustomDomain.verificationToken",
+        "CustomDomain.verificationRecord",
+        "CustomDomain.dnsRecords",
+        "CustomDomain.routing",
+        "CustomDomain.revalidation",
+        "CustomDomain.cnameLost",
+        "CustomDomain.isPrimary",
+        "CustomDomain.readiness",
         "CustomDomain.certificateExpiresAt",
         "CustomDomain.lastCheckedAt",
         "CustomDomain.failureReason"
@@ -693,7 +749,21 @@
        "kind": "secondaryButton",
        "label": "Release custom domain",
        "operation": "relinquishCustomDomain",
-       "provenance": "contract white-label.yaml DELETE /tenant-domains/{domainId}"
+       "provenance": "contract white-label.yaml DELETE /tenant-domains/{domainId}",
+       "notes": "**Takeover warning:** releasing a domain whose CNAME still points at us lets someone else claim it; the dialog says to remove the CNAME first."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Make primary",
+       "operation": "setPrimaryDomain",
+       "notes": "The primary host; the others redirect to it.",
+       "provenance": "contract white-label.yaml POST /tenant-domains/{domainId}/primary"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Regenerate token",
+       "operation": "regenerateDomainToken",
+       "provenance": "contract white-label.yaml POST /tenant-domains/{domainId}/token"
       }
      ]
     }
@@ -752,29 +822,45 @@
     "invalidates": [
      "listCustomDomains"
     ]
+   },
+   {
+    "operationId": "listOwnPlatformStaffGrants",
+    "contract": "identity",
+    "purpose": "Find a grant into the picked tenant already open, after a reload (audit R098; CHG-SBO-001)",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "getPlatformSubdomain",
+    "contract": "white-label",
+    "purpose": "The tenant's platform subdomain in its cell (DEC-546)",
+    "trigger": "onLoad",
+    "provenance": "design-note correction, 2 October 2026 (ADM-017)"
+   },
+   {
+    "operationId": "setPrimaryDomain",
+    "contract": "white-label",
+    "purpose": "Make a domain the primary one",
+    "trigger": "onAction",
+    "provenance": "design-note correction, 2 October 2026 (ADM-017)"
+   },
+   {
+    "operationId": "regenerateDomainToken",
+    "contract": "white-label",
+    "purpose": "Issue a new validation token",
+    "trigger": "onAction",
+    "provenance": "design-note correction, 2 October 2026 (ADM-017)"
    }
   ],
   "entryState": {
    "params": [
     {
-     "name": "bannerId",
-     "from": "deepLink"
-    },
-    {
-     "name": "pageId",
-     "from": "deepLink"
-    },
-    {
-     "name": "policyKind",
-     "from": "deepLink"
-    },
-    {
-     "name": "version",
-     "from": "deepLink"
-    },
-    {
      "name": "domainId",
      "from": "deepLink",
+     "optional": true
+    },
+    {
+     "name": "tenantId",
+     "from": "navigation",
      "optional": true
     }
    ],
@@ -834,6 +920,7 @@
     "provenance": "contract white-label.yaml POST /tenant-domains"
    }
   ],
+  "purposeNote": "Purpose rewritten 2 October 2026 (CHG-WIR-016): The purpose (\"See domain & certificate management for this venue\") was the generic template; the tenant claims on CMS-017 and this is the support path (design-notes correction white-label ADM-017).",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -860,7 +947,7 @@
  },
  {
   "id": "ADM-018",
-  "name": "Localisation & Language Pack",
+  "name": "Interface Languages",
   "module": "Branding & Localisation",
   "requiresModule": "core",
   "wave": 2,
@@ -884,7 +971,7 @@
     {
      "to": "ADM-001",
      "trigger": "Platform Login / MFA",
-     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId and ADM-018 holds none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and ADM-001 opens on its own"
+     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId, providerId and ADM-018 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and ADM-001 opens on its own"
     },
     {
      "to": "ADM-002",
@@ -897,7 +984,7 @@
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listFaqs` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
-  "purpose": "Configure localisation & language pack for this venue.",
+  "purpose": "Add or select a tenant's interface languages beyond English and Arabic, inside an open grant, and see how far the interface strings reach in each.",
   "layout": {
    "template": "split",
    "regions": [
@@ -908,7 +995,7 @@
       {
        "kind": "selectField",
        "label": "Tenant",
-       "bindsTo": "Tenant",
+       "bindsTo": "Tenant.id",
        "columns": [
         "Tenant.id",
         "Tenant.code",
@@ -932,7 +1019,7 @@
         "PlatformStaffGrant.openedAt",
         "PlatformStaffGrant.expiresAt"
        ],
-       "operation": "openPlatformStaffGrant",
+       "operation": "listOwnPlatformStaffGrants",
        "notes": "**Always visible while the screen acts on a tenant** (decided 28 September, audit R098): which tenant, which permissions, why, and the time left to `expiresAt`. At expiry every tenant action is disabled and the screen returns to its grantRequired state; a new need is a new grant. The tenant sees the grant in its own audit log.",
        "provenance": "contract identity.yaml POST /platform-staff-grants"
       },
@@ -944,57 +1031,18 @@
        "provenance": "contract identity.yaml POST /platform-staff-grants"
       },
       {
-       "kind": "dataTable",
-       "label": "Every faq category",
-       "bindsTo": "FaqCategory",
-       "columns": [
-        "FaqCategory.code",
-        "FaqCategory.name",
-        "FaqCategory.sortOrder",
-        "FaqCategory.entries",
-        "FaqCategory.scopePath"
-       ],
-       "operation": "listFaqs",
-       "provenance": "contract white-label.yaml GET /tenant-config/faqs"
-      },
-      {
-       "kind": "dataTable",
-       "label": "Every policy",
-       "bindsTo": "Policy",
-       "columns": [
-        "Policy.kind",
-        "Policy.title",
-        "Policy.body",
-        "Policy.requiresReconsent",
-        "Policy.effectiveFrom",
-        "Policy.publishedByPrincipalId",
-        "Policy.publishedAt",
-        "Policy.scopePath"
-       ],
-       "operation": "listPolicies",
-       "provenance": "contract white-label.yaml GET /tenant-config/policies"
+       "kind": "detailPanel",
+       "label": "Languages in force",
+       "operation": "getTenantConfig",
+       "notes": "**A tenant can add or select interface languages beyond English and Arabic (decided 2 October 2026 by Chinmay, DEC-145; CHG-CSA-039).** The save reports how far the interface strings reach in each language.",
+       "provenance": "contract white-label.yaml GET /tenant-config"
       }
      ]
     },
     {
      "name": "contextPanel",
      "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected faq category",
-       "bindsTo": "FaqCategory",
-       "columns": [
-        "FaqCategory.code",
-        "FaqCategory.name",
-        "FaqCategory.sortOrder",
-        "FaqCategory.entries",
-        "FaqCategory.scopePath"
-       ],
-       "operation": "listFaqs",
-       "provenance": "contract white-label.yaml GET /tenant-config/faqs"
-      }
-     ]
+     "components": []
     },
     {
      "name": "actionBar",
@@ -1005,18 +1053,6 @@
        "label": "Save languages",
        "operation": "setLanguages",
        "provenance": "contract white-label.yaml PUT /tenant-config/languages"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Save faqs",
-       "operation": "setFaqs",
-       "provenance": "contract white-label.yaml PUT /tenant-config/faqs"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Save policy",
-       "operation": "setPolicy",
-       "provenance": "contract white-label.yaml PUT /tenant-config/policies/{policyKind}"
       }
      ]
     }
@@ -1050,34 +1086,17 @@
     "trigger": "onAction"
    },
    {
-    "operationId": "listFaqs",
-    "contract": "white-label",
-    "purpose": "List FAQs",
-    "trigger": "onLoad"
+    "operationId": "listOwnPlatformStaffGrants",
+    "contract": "identity",
+    "purpose": "Find a grant into the picked tenant already open, after a reload (audit R098; CHG-SBO-001)",
+    "trigger": "onAction"
    },
    {
-    "operationId": "listPolicies",
+    "operationId": "getTenantConfig",
     "contract": "white-label",
-    "purpose": "List legal policies",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "setFaqs",
-    "contract": "white-label",
-    "purpose": "Set FAQ categories and entries",
-    "trigger": "onAction",
-    "invalidates": [
-     "listFaqs"
-    ]
-   },
-   {
-    "operationId": "setPolicy",
-    "contract": "white-label",
-    "purpose": "Publish a policy version",
-    "trigger": "onAction",
-    "invalidates": [
-     "listFaqs"
-    ]
+    "purpose": "The tenant's languages in force",
+    "trigger": "onLoad",
+    "provenance": "design-note correction, 2 October 2026 (ADM-018)"
    }
   ],
   "entryState": {
@@ -1097,6 +1116,11 @@
     {
      "name": "version",
      "from": "deepLink"
+    },
+    {
+     "name": "tenantId",
+     "from": "navigation",
+     "optional": true
     }
    ],
    "coldEntry": "**A version link is expected to point at something superseded — that is what versions are for.** The screen opens the requested version read-only, says it is not current, and links to the one that is. **An old version is history, not an error.** Arrives with `bannerId`, `pageId`, `policyKind`.",
@@ -1152,42 +1176,32 @@
      ]
     },
     "provenance": "contract white-label.yaml PUT /tenant-config/languages"
+   }
+  ],
+  "gaps": [
+   {
+    "operation": "listFaqs",
+    "removed": true,
+    "why": "FAQs and policies are tenant content edited on CMS-018; this console screen is the interface languages (design-note correction white-label ADM-018, DEC-145; CHG-SBO-014).",
+    "source": "screens/P13-white-label-cms.yaml#CMS-018"
    },
    {
-    "id": "formSetFaqs",
-    "component": "modal",
-    "trigger": "Save faqs",
-    "body": "**Collects what `setFaqs` sends before it is called.** Required: `categories`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Save faqs",
-     "operation": "setFaqs"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "categories"
-     ]
-    },
-    "provenance": "contract white-label.yaml PUT /tenant-config/faqs"
+    "operation": "listPolicies",
+    "removed": true,
+    "why": "FAQs and policies are tenant content edited on CMS-018; this console screen is the interface languages (design-note correction white-label ADM-018, DEC-145; CHG-SBO-014).",
+    "source": "screens/P13-white-label-cms.yaml#CMS-018"
    },
    {
-    "id": "formSetPolicy",
-    "component": "modal",
-    "trigger": "Save policy",
-    "body": "**Collects what `setPolicy` sends before it is called.** Required: `body`, `requiresReconsent`. Optional: `effectiveFrom`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Save policy",
-     "operation": "setPolicy"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "body",
-      "requiresReconsent",
-      "effectiveFrom"
-     ]
-    },
-    "provenance": "contract white-label.yaml PUT /tenant-config/policies/{policyKind}"
+    "operation": "setFaqs",
+    "removed": true,
+    "why": "FAQs and policies are tenant content edited on CMS-018; this console screen is the interface languages (design-note correction white-label ADM-018, DEC-145; CHG-SBO-014).",
+    "source": "screens/P13-white-label-cms.yaml#CMS-018"
+   },
+   {
+    "operation": "setPolicy",
+    "removed": true,
+    "why": "FAQs and policies are tenant content edited on CMS-018; this console screen is the interface languages (design-note correction white-label ADM-018, DEC-145; CHG-SBO-014).",
+    "source": "screens/P13-white-label-cms.yaml#CMS-018"
    }
   ],
   "_platform": {
@@ -1218,7 +1232,7 @@
   "id": "ADM-019",
   "name": "Global Configuration & Defaults",
   "module": "Branding & Localisation",
-  "requiresModule": "membership",
+  "requiresModule": "core",
   "wave": 2,
   "capability": "C95",
   "implementation": {
@@ -1240,7 +1254,7 @@
     {
      "to": "ADM-001",
      "trigger": "Platform Login / MFA",
-     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId and ADM-019 holds none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and ADM-001 opens on its own"
+     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId, providerId and ADM-019 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and ADM-001 opens on its own"
     },
     {
      "to": "ADM-002",
@@ -1256,7 +1270,7 @@
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listPlans` reads the population and `getPlan` reads one of them — list, select, act",
-  "purpose": "Change how global behaves here, and see which level the current value came from.",
+  "purpose": "Set the tenant-level defaults every venue inherits.",
   "layout": {
    "template": "split",
    "regions": [
@@ -1267,7 +1281,7 @@
       {
        "kind": "selectField",
        "label": "Tenant",
-       "bindsTo": "Tenant",
+       "bindsTo": "Tenant.id",
        "columns": [
         "Tenant.id",
         "Tenant.code",
@@ -1291,7 +1305,7 @@
         "PlatformStaffGrant.openedAt",
         "PlatformStaffGrant.expiresAt"
        ],
-       "operation": "openPlatformStaffGrant",
+       "operation": "listOwnPlatformStaffGrants",
        "notes": "**Always visible while the screen acts on a tenant** (decided 28 September, audit R098): which tenant, which permissions, why, and the time left to `expiresAt`. At expiry every tenant action is disabled and the screen returns to its grantRequired state; a new need is a new grant. The tenant sees the grant in its own audit log.",
        "provenance": "contract identity.yaml POST /platform-staff-grants"
       },
@@ -1301,27 +1315,6 @@
        "operation": "openPlatformStaffGrant",
        "notes": "Shown until a grant into the picked tenant is open; asks for the second factor first (step-up, audit R135).",
        "provenance": "contract identity.yaml POST /platform-staff-grants"
-      },
-      {
-       "kind": "dataTable",
-       "label": "Every plan",
-       "bindsTo": "Plan",
-       "columns": [
-        "Plan.code",
-        "Plan.name",
-        "Plan.description",
-        "Plan.cellTier",
-        "Plan.licensedModules",
-        "Plan.limits",
-        "Plan.basePrice",
-        "Plan.billingPeriod",
-        "Plan.includesBrandedApp",
-        "Plan.includedAiTokens",
-        "Plan.id",
-        "Plan.isActive"
-       ],
-       "operation": "listPlans",
-       "provenance": "contract subscription.yaml GET /plans"
       }
      ]
     },
@@ -1348,29 +1341,6 @@
        "operation": "getVenueSettingsDefaults",
        "notes": "**The tenant-level default each venue inherits** (decided 28 September, audit R094). A venue whose own value is null uses the value here; where the tenant has saved nothing these are the proposed defaults, client to correct. The venue facts on the schema (support hours, biometrics, segregated access) are not defaulted here.",
        "provenance": "contract tenancy.yaml GET /venue-settings-defaults"
-      },
-      {
-       "kind": "detailPanel",
-       "label": "The selected plan",
-       "bindsTo": "Plan",
-       "columns": [
-        "Plan.code",
-        "Plan.name",
-        "Plan.description",
-        "Plan.cellTier",
-        "Plan.licensedModules",
-        "Plan.limits",
-        "Plan.basePrice",
-        "Plan.billingPeriod",
-        "Plan.includesBrandedApp",
-        "Plan.includedAiTokens",
-        "Plan.id",
-        "Plan.isActive",
-        "Plan.subscriberCount",
-        "Plan.publishedAt"
-       ],
-       "operation": "getPlan",
-       "provenance": "contract subscription.yaml GET /plans/{planId}"
       }
      ]
     },
@@ -1383,18 +1353,6 @@
        "label": "Save venue defaults",
        "operation": "setVenueSettingsDefaults",
        "provenance": "contract tenancy.yaml PUT /venue-settings-defaults"
-      },
-      {
-       "kind": "primaryButton",
-       "label": "Create plan",
-       "operation": "createPlan",
-       "provenance": "contract subscription.yaml POST /plans"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Create plan version",
-       "operation": "createPlanVersion",
-       "provenance": "contract subscription.yaml POST /plans/{planId}"
       }
      ]
     }
@@ -1403,9 +1361,9 @@
   "states": {
    "loading": "The global defaults list.",
    "error": "Could not load. Names which read failed and leaves the global defaults untouched.",
-   "emptyFirstRun": "No global defaults yet. Offers Create plan (`createPlan`).",
-   "emptyNoResults": "Never shown: `listPlans` takes no filter, so an empty list is always the first-run state above.",
-   "emptyNoAccess": "Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `listPlans` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "No global defaults yet. Offers Open access grant (`openPlatformStaffGrant`).",
+   "emptyNoResults": "Never shown: nothing on this screen filters its list, so an empty list is always the first-run state above.",
+   "emptyNoAccess": "Shown when the caller lacks `TENANT_VIEW`, which `getVenueSettingsDefaults` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "grantRequired": "**No access into this tenant yet.** A tenant is picked and no platform-staff grant into it is open, so every tenant action is disabled and the screen offers **Open access grant** (`openPlatformStaffGrant`: reason, permissions, expiry). The same state returns when the grant reaches `expiresAt` (decided 28 September, audit R098)."
   },
   "apis": [
@@ -1437,43 +1395,13 @@
     "trigger": "onLoad"
    },
    {
-    "operationId": "listPlans",
-    "contract": "subscription",
-    "purpose": "List subscription plans",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "createPlan",
-    "contract": "subscription",
-    "purpose": "Create a subscription plan",
-    "trigger": "onAction",
-    "invalidates": [
-     "listPlans"
-    ]
-   },
-   {
-    "operationId": "createPlanVersion",
-    "contract": "subscription",
-    "purpose": "Publish a new version of a plan",
-    "trigger": "onAction",
-    "invalidates": [
-     "listPlans"
-    ]
-   },
-   {
-    "operationId": "getPlan",
-    "contract": "subscription",
-    "purpose": "Read a plan",
+    "operationId": "listOwnPlatformStaffGrants",
+    "contract": "identity",
+    "purpose": "Find a grant into the picked tenant already open, after a reload (audit R098; CHG-SBO-001)",
     "trigger": "onAction"
    }
   ],
   "entryState": {
-   "params": [
-    {
-     "name": "planId",
-     "from": "deepLink"
-    }
-   ],
    "coldEntry": "**A platform-admin link resolves against the tenant in the link and refuses if the operator does not hold that tenant.** A link is not authorisation. If the target is gone the screen says so and returns to the directory — **an admin console that silently shows the wrong tenant is worse than one that shows nothing.** Arrives with `planId`.",
    "preloaded": [
     "Plan.code",
@@ -1481,6 +1409,13 @@
     "Plan.description",
     "Plan.cellTier",
     "Plan.licensedModules"
+   ],
+   "params": [
+    {
+     "name": "tenantId",
+     "from": "navigation",
+     "optional": true
+    }
    ]
   },
   "wireframe": {
@@ -1536,62 +1471,35 @@
      ]
     },
     "provenance": "contract tenancy.yaml PUT /venue-settings-defaults"
-   },
-   {
-    "id": "formCreatePlan",
-    "component": "modal",
-    "trigger": "Create plan",
-    "body": "**Collects what `createPlan` sends before it is called.** Required: `code`, `name`, `cellTier`, `licensedModules`, `limits`, `basePrice`. Optional: `description`, `billingPeriod`, `includesBrandedApp`, `includedAiTokens`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "CreatePlanRequest",
-    "confirm": {
-     "label": "Create plan",
-     "operation": "createPlan"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "code",
-      "name",
-      "cellTier",
-      "licensedModules",
-      "limits",
-      "basePrice",
-      "description",
-      "billingPeriod",
-      "includesBrandedApp",
-      "includedAiTokens"
-     ]
-    },
-    "provenance": "contract subscription.yaml POST /plans"
-   },
-   {
-    "id": "formCreatePlanVersion",
-    "component": "modal",
-    "trigger": "Create plan version",
-    "body": "**Collects what `createPlanVersion` sends before it is called.** Required: `code`, `name`, `cellTier`, `licensedModules`, `limits`, `basePrice`. Optional: `description`, `billingPeriod`, `includesBrandedApp`, `includedAiTokens`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "CreatePlanRequest",
-    "confirm": {
-     "label": "Create plan version",
-     "operation": "createPlanVersion"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "code",
-      "name",
-      "cellTier",
-      "licensedModules",
-      "limits",
-      "basePrice",
-      "description",
-      "billingPeriod",
-      "includesBrandedApp",
-      "includedAiTokens"
-     ]
-    },
-    "provenance": "contract subscription.yaml POST /plans/{planId}"
    }
   ],
+  "gaps": [
+   {
+    "operation": "createPlan",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-021): Plan creation (createPlan, createPlanVersion, with listPlans and getPlan) on global configuration and defaults; plans belong to ADM-008 and ADM-392 (design-notes correction platform-foundation ADM-019).",
+    "source": "screens/P09-platform-admin-console.yaml#ADM-008"
+   },
+   {
+    "operation": "createPlanVersion",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-021): Plan creation (createPlan, createPlanVersion, with listPlans and getPlan) on global configuration and defaults; plans belong to ADM-008 and ADM-392 (design-notes correction platform-foundation ADM-019).",
+    "source": "screens/P09-platform-admin-console.yaml#ADM-008"
+   },
+   {
+    "operation": "getPlan",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-021): Plan creation (createPlan, createPlanVersion, with listPlans and getPlan) on global configuration and defaults; plans belong to ADM-008 and ADM-392 (design-notes correction platform-foundation ADM-019).",
+    "source": "screens/P09-platform-admin-console.yaml#ADM-008"
+   },
+   {
+    "operation": "listPlans",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-021): Plan creation (createPlan, createPlanVersion, with listPlans and getPlan) on global configuration and defaults; plans belong to ADM-008 and ADM-392 (design-notes correction platform-foundation ADM-019).",
+    "source": "screens/P09-platform-admin-console.yaml#ADM-008"
+   }
+  ],
+  "purposeNote": "Purpose rewritten 2 October 2026 (CHG-WIR-023): The purpose was the configuration template (\"Change how global behaves here, and see which level the current value came from\"); the screen sets the tenant-level venue defaults (R094).",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",

@@ -360,7 +360,7 @@
    "localLlm",
    "openaiCompatible"
   ],
-  "description": "`openaiCompatible` (added 29 September, AI design 3.3): a customer endpoint that speaks the OpenAI API, taken with no custom development (AIC-009). Any other protocol needs an adapter.\n"
+  "description": "`openaiCompatible` (added 29 September, AI design 3.3): a customer endpoint that speaks the OpenAI API, taken with no custom development (AIC-009). Any other protocol needs an adapter.\n**Core42 Compass is reached through `openaiCompatible`** (Chinmay, 2 October: the AI residency decision, amending AI-D02; CHG-CSA-002). Compass is the provider of the `uaeOnly` residency class (common `AiResidencyClass`): Small tier Compass GPT-4.1 mini (or Seraj), Strong tier Compass GPT-5, with OpenAI UAE and then the in-cell open-weights model as the fallback chain. OpenAI UAE is `openai` with a UAE `endpoint`; the in-cell model is `localLlm`.\n**A kind is a protocol, not a vendor** (Chinmay, 2 October, contract follow-ups: BYOK accepts any provider; CHG-FUP-008). Any vendor is accepted, named in `AiProvider.vendor`: Mistral, Cohere or any other is reached through `openaiCompatible` where its API speaks it, which the compatibility test confirms before activation (`AiProviderCompatibility`). A new native adapter is a new value here, a breaking change for a client built earlier that goes out with an approval (`docs/active/breaking-changes.yaml`); until then a vendor without either protocol is refused `422 provider-protocol-unsupported`.\n"
  },
  "AiSourceList": {
   "type": "array",
@@ -1410,21 +1410,12 @@
    }
   }
  },
- "DeliveryLocationKind": {
+ "ExchangeRateDecimal": {
   "type": "string",
-  "description": "4.6.26. One concept, because a runner needs one instruction.",
-  "enum": [
-   "table",
-   "seat",
-   "cabana",
-   "sunbed",
-   "poolside",
-   "box",
-   "suite",
-   "lawn",
-   "collectionPoint",
-   "namedLocation"
-  ]
+  "x-ticvai-persistence-kind": "valueObject",
+  "x-ticvai-persistence-column": "numeric(18,6)",
+  "description": "**An exchange rate: a decimal string, never a float**, for the reason `Money.amount` is one — a JavaScript client must not round a rate in transit. **Six decimal places**, the precision `finance.FxRate.rate` asks for, and stored at that precision.\n",
+  "pattern": "^\\d+(\\.\\d{1,6})?$"
  },
  "FnbOrderStatus": {
   "type": "string",
@@ -1440,6 +1431,299 @@
    "cancelled",
    "refunded"
   ]
+ },
+ "FormDefinition": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.form_definition + marketing.form_definition_field",
+  "description": "CF-129, CL-04. **A waiver, a survey and a data-capture form are one mechanism.**\nA waiver is this form with a signature. A survey is this form with a scale. A demographic capture is this form at the point of sale. They were raised as three separate gaps and share every part: field configuration, conditional display, versioning, an acceptance record and a stored artefact.\n**Three implementations would drift on the version rule first.** A waiver signed against version 3 must stay bound to version 3, and that is the same requirement a survey has when question wording changes mid-campaign — **an NPS score means nothing if you cannot say which question produced it.**\n",
+  "required": [
+   "id",
+   "name",
+   "kind",
+   "version",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "readOnly": true,
+    "type": "string",
+    "format": "uuid"
+   },
+   "name": {
+    "type": "string"
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "waiver",
+     "survey",
+     "dataCapture",
+     "consentForm",
+     "incidentReport",
+     "registration"
+    ]
+   },
+   "consentPurposes": {
+    "type": "array",
+    "description": "**What a `consentForm` consents to** (Chinmay, 2 October, batch 4; follows BO-188: biometric capture needs consent on the venue's own form; CHG-CSA-026). A guardian-signed form for a minor carries the guardian fields of the waiver builder (workbook Q237: guardian consent, configurable per country). Empty for any other kind.",
+    "items": {
+     "type": "string",
+     "enum": [
+      "facePass",
+      "faceTag",
+      "marketing",
+      "photography",
+      "waiver"
+     ]
+    }
+   },
+   "version": {
+    "readOnly": true,
+    "type": "integer",
+    "description": "**Set by the server** — 1 on `createForm`, the next number on every change. **Immutable once anything is submitted against it.** A change creates a new version, and the old one stays readable forever — 2.15.13 requires the exact accepted version retained, which is legal evidence rather than a nicety.\n"
+   },
+   "fields": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/FormField"
+    }
+   },
+   "requiresSignature": {
+    "type": "boolean",
+    "default": false,
+    "description": "**What makes it a waiver.** And 2.15.9 makes ticket issuance conditional on one, which puts this in the purchase path rather than beside it.\n"
+   },
+   "signatureKind": {
+    "type": "string",
+    "enum": [
+     "drawn",
+     "typed",
+     "checkbox",
+     "none"
+    ],
+    "default": "none"
+   },
+   "scoreScale": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "nps",
+     "csat",
+     "ces",
+     "likert5",
+     "likert7",
+     "stars"
+    ],
+    "description": "**What makes it a survey.** Named rather than free-form because a score whose scale is unknown cannot be compared to last quarter's.\n"
+   },
+   "appliesToProductIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "validForMonths": {
+    "type": "integer",
+    "nullable": true,
+    "description": "**How long an acceptance lasts.** A waiver signed last summer may or may not still hold, and 2.15.x asks for a returning participant not to sign again — which only works if the expiry is stated.\n"
+   },
+   "minimumAge": {
+    "type": "integer",
+    "nullable": true
+   },
+   "requiresGuardianForMinors": {
+    "type": "boolean",
+    "default": true,
+    "description": "**A minor cannot waive their own rights.** A guardian signs, and the record has to name them — an unsigned or self-signed minor waiver is worth nothing at the moment it matters.\n"
+   },
+   "status": {
+    "readOnly": true,
+    "type": "string",
+    "enum": [
+     "draft",
+     "published",
+     "superseded",
+     "retired"
+    ]
+   },
+   "legalReviewedBy": {
+    "type": "string",
+    "nullable": true
+   },
+   "legalReviewedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "scopePath": {
+    "readOnly": true,
+    "type": "string",
+    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"
+   }
+  }
+ },
+ "FormField": {
+  "type": "object",
+  "description": "One field. **Conditional display is the shared requirement** — a survey branching on an answer and a waiver revealing a medical question on a yes are the same mechanism.\n",
+  "required": [
+   "key",
+   "label",
+   "type"
+  ],
+  "properties": {
+   "key": {
+    "type": "string"
+   },
+   "label": {
+    "type": "string"
+   },
+   "labelLocalised": {
+    "type": "object",
+    "additionalProperties": {
+     "type": "string"
+    }
+   },
+   "type": {
+    "type": "string",
+    "enum": [
+     "text",
+     "longText",
+     "number",
+     "date",
+     "select",
+     "multiSelect",
+     "boolean",
+     "scale",
+     "signature",
+     "file",
+     "phone",
+     "email"
+    ]
+   },
+   "options": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "isRequired": {
+    "type": "boolean",
+    "default": false
+   },
+   "isPersonalData": {
+    "type": "boolean",
+    "default": false,
+    "description": "**Marked at the field, because retention is decided at the field.** A survey answer and a medical condition on the same form have different lifetimes, and a form-level flag makes the whole thing as sensitive as its most sensitive field.\n"
+   },
+   "consentPurposeId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "showWhen": {
+    "type": "object",
+    "nullable": true,
+    "properties": {
+     "field": {
+      "type": "string"
+     },
+     "equals": {
+      "type": "string"
+     }
+    }
+   }
+  }
+ },
+ "FormSubmission": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.form_submission",
+  "description": "**The acceptance record, and it is evidence.** Bound to the exact version accepted, with who accepted it and when.\n",
+  "required": [
+   "id",
+   "formId",
+   "formVersion",
+   "subjectId",
+   "submittedAt"
+  ],
+  "properties": {
+   "id": {
+    "readOnly": true,
+    "type": "string",
+    "format": "uuid"
+   },
+   "formId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "formVersion": {
+    "type": "integer",
+    "description": "**The version, not the form.** 2.15.13 requires the exact accepted version retained, and a submission pointing at a form that has since changed is a submission proving nothing.\n"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "onBehalfOfSubjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "A guardian signing for a minor, or a group leader for an attendee."
+   },
+   "answers": {
+    "type": "object",
+    "description": "**One entry per answered `FormField`, keyed by its `key`.** The value's type follows the field's `type`: a string for text, long text, date, phone, email, select and `file` (the asset id); a number for number and scale; a boolean for boolean; an array of strings for multi-select. A `signature` field is `signatureAssetId`, not an answer.\n",
+    "additionalProperties": {
+     "oneOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "number"
+      },
+      {
+       "type": "boolean"
+      },
+      {
+       "type": "array",
+       "items": {
+        "type": "string"
+       }
+      }
+     ]
+    }
+   },
+   "signatureAssetId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "submittedAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "**Device time** of the acceptance — `submitForm` is offline-capable, and the time a waiver was signed is the evidence, not the time it synced. The `recorded_at` of naming-and-style 5.2 for this row.\n"
+   },
+   "syncedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true,
+    "description": "Server time the submission arrived."
+   },
+   "expiresAt": {
+    "readOnly": true,
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "From `validForMonths`. **A returning participant with a live acceptance does not sign again**, which is the whole point of holding it against the guest.\n"
+   },
+   "capturedAtChannel": {
+    "$ref": "../shared/common.yaml#/components/schemas/SalesChannel"
+   },
+   "ipAddress": {
+    "type": "string",
+    "nullable": true
+   }
+  }
  },
  "GuestListing": {
   "type": "string",
@@ -1822,57 +2106,6 @@
    "type": "string"
   }
  },
- "LocationSession": {
-  "type": "object",
-  "x-ticvai-persistence": "fnb.location_session",
-  "required": [
-   "id",
-   "locationId",
-   "kind",
-   "label",
-   "expiresAt"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "locationId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "kind": {
-    "$ref": "#/components/schemas/DeliveryLocationKind"
-   },
-   "label": {
-    "type": "string"
-   },
-   "outletId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "The outlet serving this location. Where several serve it, the guest chooses and this is set on the first order.\n"
-   },
-   "visitId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "The table visit this session orders onto, where the location is a table. Absent for a cabana or a seat, which have no visit concept — the order stands alone.\n"
-   },
-   "joinedExistingVisit": {
-    "type": "boolean"
-   },
-   "subjectId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "expiresAt": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Sessions expire so a guest who leaves cannot order to a lounger now occupied by someone else.\n"
-   }
-  }
- },
  "MessageChannel": {
   "type": "string",
   "enum": [
@@ -1978,25 +2211,7 @@
   }
  },
  "ModuleKey": {
-  "type": "string",
-  "enum": [
-   "ticketsAndBooking",
-   "membership",
-   "events",
-   "attractions",
-   "virtualQueue",
-   "diningAndFnb",
-   "shop",
-   "parking",
-   "gamification",
-   "photoGallery",
-   "wallet",
-   "loyalty",
-   "lostAndFound",
-   "map",
-   "visitPlanner"
-  ],
-  "description": "`visitPlanner` (decided 29 September, MOB-1 and the Plan tab in Block A) is the Plan tab and WEB-050; off, the tab and the page are not shown."
+  "$ref": "../shared/common.yaml#/components/schemas/ModuleKey"
  },
  "Order": {
   "x-ticvai-persistence": "orders.sales_order + orders.order_line",
@@ -2069,6 +2284,46 @@
    },
    "refundedAmount": {
     "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "chargeCurrency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**The currency the guest selected and is charged in** (CHG-FIN-001, 2 October 2026). Null or equal to `currency` for a sale in the base currency. Everything else on the order, and every ledger posting, stays in the base currency `currency`."
+   },
+   "chargeFxRate": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/ExchangeRateDecimal"
+     }
+    ],
+    "nullable": true,
+    "readOnly": true,
+    "description": "Units of `chargeCurrency` per one unit of the base currency, from the region's `tender` rate in force at checkout (`finance.FxRate`), stored on the order so the payment, the receipt, the tax invoice and any refund use the same rate (CHG-FIN-001)."
+   },
+   "chargeFxRateId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The `finance.FxRate` row the rate was taken from, for audit."
+   },
+   "chargeTotal": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "readOnly": true,
+    "description": "`grossAmount` converted at `chargeFxRate` and rounded to the charge currency's scale: what the guest pays and what the payment request to the provider asks for (CHG-FIN-001)."
+   },
+   "chargeRateLockedUntil": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The quote holds until then (the cart lease). After it, the next payment attempt re-quotes at the rate then in force and the guest confirms the new amount (CHG-FIN-001)."
    },
    "droppedPromotions": {
     "type": "array",
@@ -2368,7 +2623,7 @@
     "type": "string",
     "pattern": "^[A-Z]{3}$",
     "nullable": true,
-    "description": "4.6.11 is deliberately asymmetric: **accept foreign currency, refund in local.** A till giving change in five currencies needs five floats and five counts, and the variance becomes unattributable.\n"
+    "description": "4.6.11 is deliberately asymmetric: **accept foreign currency, refund in local.** A till giving change in five currencies needs five floats and five counts, and the variance becomes unattributable.\n**Cash at a till only** (CHG-FIN-001, 2 October 2026). A card or wallet payment the guest made in a currency they selected is refunded in that currency (`Refund.tenderCurrency`).\n"
    },
    "amount": {
     "$ref": "../shared/common.yaml#/components/schemas/Money"

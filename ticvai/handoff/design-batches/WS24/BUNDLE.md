@@ -2,13 +2,13 @@
 
 **10 screens · 11 operations · 19 schemas · 4 permissions**
 
-Platform P09 TICVAI Web · ships as **ticvai-control** ·
-platformAdmin audience · web ·
+Platform P08 Venue Management · ships as **venue-management** ·
+staff audience · web ·
 online only
 
 ## Who this is for
 
-**platformAdmin on web.** Everything below is how you know what is
+**staff on web.** Everything below is how you know what is
 true. **None of it is the subject.** The subject is the person in front of the screen and the one
 thing they came to do.
 
@@ -61,6 +61,42 @@ convincingly. It is never a caption.
   and its error; and, element by element, what is shown and in what format, what each action
   produces and where the user goes next. Draw exactly that.
 
+## The processes these screens belong to
+
+Written by the owner of each process (`handoff/design-notes/`). Read before any screen: it says how the process runs end to end and which words the screens must use.
+
+### Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers)
+
+Customer & marketing is how a venue knows its guests and talks to them. There is ONE guest profile per person across ticketing, F&B and retail, so a guest who books online and later dines is the same profile (DI-339). A profile needs at least an email or a mobile, never neither (DI-372). Profiles are created by registration, by guest checkout, or by staff at a till or desk. Repeat guest checkouts with the same verified email or phone attach to the same profile automatically (DI-941, R120 default). Two records that might be the same person are NEVER merged automatically: the guest is asked to confirm, and an admin review queue runs alongside (DI-377). Each candidate shows why it matched; the record that loses is superseded, not deleted; consent takes the narrower of the two positions (DI-808). Around the profile sit three things that must never be confused. CONSENT is what the law allows: per purpose and per channel, append-only, with the notice version and the source (recordConsent). It is Given, Withdrawn or Not asked. A SUBSCRIPTION is what the guest asked to receive, e.g. a newsletter list (MarketingSubscription). A PREFERENCE is what they like: table, dietary, accessibility (updateGuestPreferences). An anonymous visitor's cookie decision is recorded against a device key (recordDeviceConsent) and attaches to the guest when they sign in (claimDeviceConsent). Marketing consent at GUEST CHECKOUT is an open client question, and the design follows its default: an unticked opt-in beside the terms, one per channel and purpose. It is recorded with source "checkout" against the order and the verified contact, and nothing is sent without it. Whether that is sufficient consent under PDPL is the client DPO's call (M18-15 (audit R-M18-15), DI-954, DI-940). Marketing reads profiles through SEGMENTS (rules, evaluated when used) and static LISTS (imported). It reaches guests by CAMPAIGNS (one send to an audience) and JOURNEYS (automations started by an event, with waits and branches). Journeys may offer only pre-configured offers, never a free-typed discount (MoM 2026-08-20 4.6). Everything goes through ONE communications module that every other module uses (MoM 2026-08-31 4.6). Consent and suppression are applied at send time, and the number excluded, with the reasons, is reported before anything goes out (launchCampaign). Transactional messages (tickets, receipts, queue calls, case replies) do not need marketing consent and must never carry marketing. LOYALTY pays for spend: points, tiers, rewards and expiry. GAMIFICATION pays for behaviour: challenges, badges, streaks, referrals and leaderboards (createChallenge). A guest reads their own loyalty position (getLoyaltyPosition). A till, the back office or support reads a named guest's (getGuestLoyalty, or identifyGuest at a till). SERVICE: one Case object covers lost property, complaints, questions, accessibility and refund requests (CaseKind). A guest raises one with raiseMyCase, which needs the connection …
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Guest | The person the venue serves, signed in or not. In body copy on every surface. | Customer, User, Subject, Contact, Patron | contracts/satellite/marketing-crm.yaml#/components/schemas/GuestProfile |
+| Guest profile | The CRM record of one person (details, consent, preferences, history). Distinct from the Account, which is how a guest signs in. | Customer record, Contact, Subject | contracts/satellite/marketing-crm.yaml#getGuestProfile |
+| Consent - Given / Withdrawn / Not asked | What the law allows, per purpose (marketing, personalisation, profiling, third-party sharing, AI processing, transactional) and per channel. "Not asked" is not "Withdrawn" and must look different. | Opted in/out as a status, Accepted, Declined, Revoked, Unsubscribed (that is a subscription) | contracts/satellite/marketing-crm.yaml#/components/schemas/ConsentDecision |
+| Subscription | A list the guest asked to receive (a newsletter, event news), per channel. Unsubscribing from a list is not withdrawing consent. | Consent, Opt-in | contracts/satellite/marketing-crm.yaml#/components/schemas/MarketingSubscription |
+| Preferences | What the guest likes or needs (seating, drinks, dietary, accessibility, contact channel). Never grants permission. | Consents, Settings | contracts/satellite/marketing-crm.yaml#updateGuestPreferences |
+| Send me offers and news | The marketing opt-in label beside the terms at checkout, unticked, one per channel and purpose. | I agree to marketing, Pre-ticked boxes, Keep me updated ticked by default | DI-954 |
+| Points / Tier / Points to next tier / Expiring points | The loyalty position. Points are a liability earned per programme; tiers are ranked (Bronze, Silver, Gold, Platinum in the meetings). | Credits, Coins, Balance alone (wallet money is "credit"), Level | DI-382 |
+| Pending points | Points earned on a purchase still inside its refund window; shown apart from spendable points. | Available points for pending ones | contracts/satellite/marketing-crm.yaml#getLoyaltyPosition |
+| Reward | What points can be turned into (rewards catalogue). | Prize (games redemption uses prize), Voucher unless it is one | contracts/satellite/marketing-crm.yaml#listRewards |
+| Challenge / Badge / Streak / Referral | Gamification - rewards for behaviour, not spend. Status badges such as Explorer, Adventurer, Legend. | Mission and Quest used interchangeably on one screen, Loyalty tier for a badge | DI-392 |
+| Case | One service record - lost property, complaint, question, accessibility, refund request or other - with a number (venue prefix plus sequence), a status and an SLA. | Ticket (a ticket is an admission product), Issue, Incident (that is maintenance and safety) | contracts/satellite/marketing-crm.yaml#/components/schemas/CaseKind |
+| Reply to guest / Internal note | The two kinds of case message. The agent always chooses one explicitly; there is no default. | Comment, Message (ambiguous) | F05 step 2 |
+| Conversation | A live chat session (web chat, in-app, WhatsApp, SMS, email, kiosk, voice). With the assistant, then queued, then with an agent. It is not a case. | Ticket, Case (until one is raised from it) | contracts/satellite/marketing-crm.yaml#/components/schemas/ConversationState |
+| Segment / List / Audience | A segment is rules evaluated when used. A list is static, imported or hand-picked. The audience is what a campaign or journey targets. | Group, Cohort, Target list for a segment | DI-381 |
+| Campaign / Journey | A campaign is one send (one-off, scheduled, triggered or recurring) to an audience. A journey is an automation started by an event, with steps, waits and branches. | Flow (booking flows use it), Automation for a one-off send, Blast | R146 |
+| Offer | A pre-configured, system-validated discount or benefit that a campaign or journey references. It is never typed into the builder. | Discount field, Coupon (unless the offer is a coupon code) | MoM 2026-08-20 4.6 |
+| Reachable | How many guests in an audience can actually be sent to on a channel after consent and suppression. Always shown beside the matching count. | Audience size alone | contracts/satellite/marketing-crm.yaml#previewSegment |
+| Possible duplicate / Merge | Two profiles that may be one person. Never called "Duplicate" as a verdict. Merging needs confirmation and stays reversible for 30 days. | Duplicate (as a status), Combine, Auto-merge | DI-808 |
+| Data request | A guest's privacy request - a copy of my data, a correction, erasure, a restriction - with a legal clock. Statuses submitted, in progress, completed. | DSAR on guest screens, Subject data, Ticket | DI-379 |
+| Waiver / Consent question | A waiver is a signed, versioned form. A consent question ("Are you able to swim?", "I accept the risk") is a single question asked per person or per booking and recorded as consent. | Contract, Disclaimer, Form for a waiver in guest copy | DI-1062 |
+| Lost item / Found item / Possible match | The two directions of lost property and the suggested pairing between them. | Lost case, Claim before it is claimed | contracts/satellite/marketing-crm.yaml#/components/schemas/LostItem |
+| Wishlist | Products and dates a guest saved to buy later, including F&B and retail to buy on site. | Favourites (used for transport routes), Saved for later on one surface and Wishlist on another | DI-202 |
+| Notification / Message | A notification is an item in the guest's in-app feed. A message is one send on a channel (email, SMS, WhatsApp, push, in-app). | Alert for marketing content, Inbox for the guest feed | contracts/satellite/marketing-crm.yaml#/components/schemas/GuestNotification |
+| Template | A reusable message body per channel and language with merge fields. Transactional and marketing templates are separate kinds. | Layout, Design | contracts/satellite/marketing-crm.yaml#createMessageTemplate |
+
+
 ## The screens
 
 Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs count fields; requirements are matrix rows; meeting inputs are the ones naming the screen (the module and platform ones are below); white label says whether the tenant's brand reaches it (guest) or it sets the brand (configures).
@@ -94,15 +130,19 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
-| Module | Platform · wave 3 · needs the `marketing` module |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
+| Module | Platform · wave 3 · needs the `core` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `MARKETING_VIEW` (1 read); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `MARKETING_VIEW` (1 read); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Display) and no metric row |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/platform/communication-service-command-center-adm-038` |
+
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, 2 October: the approvals workflow and matrix screens and the communication service screens move to Venue Management; CHG-CLN-003). It configures a record the tenant owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The console's tenant picker and grant (CHG-SBO-001) came off with the move. The id is kept, so its tickets keep their keys.
+
+**From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** For TICVAI administrators and operations: the health and activity of the communication infrastructure across tenants. It is not a marketing dashboard - it shows throughput, queues, failures and provider state, not campaign performance.
 
 #### Inputs: what the user enters or picks
 
@@ -147,11 +187,15 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Provider availability rate | 12.5% | Share of the window the active providers were reachable, weighted by volume. |
 | Channel | chip: Email, SMS, Whatsapp, Push, In app, Post | — |
 
+**Rules for what is shown** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
+
+- **Platform KPIs**: Volume by channel and provider, queue depth, failure rate, providers degraded. *(source: contracts/satellite/marketing-crm.yaml#listCommunicationService)*
+
 **Data it reads**: `listCommunicationService` (onLoad, Communication Service Command Center)
 
 **Where the user goes next**
 
-- → `ADM-002` Platform Dashboard: *Platform Dashboard*
+- → `BO-100` Venue Home: *Back to Venue Home*
 - → `ADM-039` Channel & Provider Configuration: *Works in Channel & Provider Configuration*; calls `listCommunicationService`
 - → `ADM-040` Sender Identity, Domain & Brand Configuration: *Works in Sender Identity, Domain & Brand Configuration*; calls `listCommunicationService`
 - → `ADM-041` System Transactional Template Registry: *Works in System Transactional Template Registry*; calls `listCommunicationService`
@@ -174,6 +218,23 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed |
 
+#### Consistency with other screens
+
+- Match `BO-784`: Same object scoped to one venue there.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+kpis:
+  messagesToday: 1240000
+  queueDepth: 3420
+  failureRate: 0.6%
+  degradedProviders:
+  - SMS gateway KSA
+```
+
 #### Permissions
 
 - `listCommunicationService` → `MARKETING_VIEW` (read) · staff
@@ -191,7 +252,7 @@ For this screen, newest first. An **Open question** is built to the default it s
 - Workshop packs group screens ten to a board, each opened by a command centre; that grouping is the navigation: the nine detail screens are reached from the board's hub and return to it. *(agreed · screen note 4 Sep 2026, BO-144 and the other board hubs · DI-653)*
 - Communications dashboard shows activity across email, WhatsApp and SMS: delivered, pending, failed. Delivery queue tracks failed sends with automatic retry; routing/fallback rules send on an alternate channel if delivery fails. *(client request · MoM 31 Aug 2026, 4.6 Communications & Notifications · DI-559)*
 
-Also apply: 1 for P09 · Platform, 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -199,7 +260,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-038` · status **notStarted** · provenance generated
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-038` · status **notStarted** · provenance generated
 - Client workshop board: `wireframes/WS41 Communication & Notification Platform Services Board 1.dc.html#adm-038`
 - Workshop pack: Communication & Notification Platform Services_Reference.pdf board 1
 - Flow F133 *Communication & Notification Platform Services board 1: Communication Service …*, step 1: Opens Communication Service Command Center → Provide administrators and technical/operations teams with a centralized view of the health and activity of TICVAI's communication infrastructure. This is not a marketing dashboard.
@@ -220,7 +281,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every output is drawn (18 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-038?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
-- [ ] Every transition is wired: `ADM-002`, `ADM-039`, `ADM-040`, `ADM-041`, `ADM-042`, `ADM-043`, `ADM-044`, `ADM-045`, `ADM-046`, `ADM-047`.
+- [ ] Every transition is wired: `BO-100`, `ADM-039`, `ADM-040`, `ADM-041`, `ADM-042`, `ADM-043`, `ADM-044`, `ADM-045`, `ADM-046`, `ADM-047`.
 - [ ] Every gated control is gated: `MARKETING_VIEW`.
 - [ ] The 2 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
@@ -233,17 +294,25 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
-| Module | Platform · wave 3 · needs the `marketing` module |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
+| Module | Platform · wave 3 · needs the `core` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `MARKETING_MANAGE` (1 configure); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `MARKETING_MANAGE` (1 configure); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/platform/channel-provider-configuration-adm-039` |
 
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, 2 October: the approvals workflow and matrix screens and the communication service screens move to Venue Management; CHG-CLN-003). It configures a record the tenant owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The console's tenant picker and grant (CHG-SBO-001) came off with the move. The id is kept, so its tickets keep their keys.
+
 **Known gaps.** **The pack names 6 actions on this screen and the screen declares 1 operation.** Unserved: Legal Entity, Test Connection, Send Test Message, Validate Credentials, Test Webhook, Verify Delivery …
+
+**From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** Configure the providers TICVAI uses to deliver each channel: SMTP or email service, SMS gateway, WhatsApp provider, push service, in-app. Credentials are stored in the vault and never shown again; connections, webhooks and delivery receipts can be tested.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **"Legal Entity" is the primary button and the channel fields are selects.** Why: The act is Save provider; legal entity is a field. *(source: screens/P08-venue-back-office.yaml#ADM-039; Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers))*
 
 #### Inputs: what the user enters or picks
 
@@ -258,6 +327,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | In-App Notification | select field | — | — | — | — | — | — |
 | Future supported channels | select field | — | — | — | — | — | — |
 
+**Rules for these inputs** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
+
+- **Provider credentials**: Write-only; after saving, only a masked reference is shown. *(source: contracts/satellite/marketing-crm.yaml#setChannelProvider)*
+
 #### Outputs: what the screen shows and produces
 
 **Actions and what each produces**
@@ -270,6 +343,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Validate Credentials (secondary button) | navigation or local | — | — | — | — |
 | Test Webhook (secondary button) | navigation or local | — | — | — | — |
 | Verify Delivery Receipt (secondary button) | navigation or local | — | — | — | — |
+
+**What each action does** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
+
+- **Test connection / Send test message / Test webhook**: Each shows pass or fail with the provider's response. *(source: screens/P08-venue-back-office.yaml#ADM-039)*
 
 **Where the user goes next**
 
@@ -286,6 +363,17 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 Idempotency conflict or optimistic concurrency failure. Two causes, so two types.; 422 The provider cannot be activated: credentials, connection or webhook verification failed, or the secret reference does not resolve. |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+providers:
+- Email - SendGrid - primary
+- SMS - Etisalat gateway - primary
+- WhatsApp - Meta Cloud API - primary
+```
+
 #### Permissions
 
 - `setChannelProvider` → `MARKETING_MANAGE` (configure) · staff
@@ -300,7 +388,7 @@ No matrix row traces to this screen's operations or data.
 
 None names this screen.
 
-Also apply: 1 for P09 · Platform, 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -308,7 +396,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-039` · status **notStarted** · provenance generated
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-039` · status **notStarted** · provenance generated
 - Client workshop board: `wireframes/WS41 Communication & Notification Platform Services Board 1.dc.html#adm-039`
 - Workshop pack: Communication & Notification Platform Services_Reference.pdf board 1
 - Flow F133 *Communication & Notification Platform Services board 1: Communication Service …*, step 2: Works in Channel & Provider Configuration → Configure the external/internal services used by TICVAI to deliver communications.
@@ -322,6 +410,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `ADM-038`.
 - [ ] Every gated control is gated: `MARKETING_MANAGE`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -332,15 +421,23 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
-| Module | Platform · wave 3 · needs the `marketing` module |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
+| Module | Platform · wave 3 · needs the `core` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `MARKETING_MANAGE` (1 configure); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `MARKETING_MANAGE` (1 configure); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure; Configure/reference) and no display directory — it is settings, not a population |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/platform/sender-identity-domain-brand-configuration-adm-040` |
+
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, 2 October: the approvals workflow and matrix screens and the communication service screens move to Venue Management; CHG-CLN-003). It configures a record the tenant owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The console's tenant picker and grant (CHG-SBO-001) came off with the move. The id is kept, so its tickets keep their keys.
+
+**From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** The identities messages are sent from: email sending domains with from and reply-to per brand (no-reply@venue.com, customerservice@venue.com), SMS sender ids per country, WhatsApp business accounts and numbers with approved templates, and verification status.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **Every field (From name, From address, Reply-To, Phone number) is a select.** Why: Names and addresses are typed; only brand, provider and country are selects. *(source: screens/P08-venue-back-office.yaml#ADM-040; Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers))*
 
 #### Inputs: what the user enters or picks
 
@@ -368,6 +465,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Verification Status | select field | — | — | — | — | — | — |
 | Approved Templates | select field | — | — | — | — | — | — |
 
+**Rules for these inputs** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
+
+- **From name and address**: Text fields; the domain must be verified (SPF, DKIM) before use. *(source: contracts/satellite/marketing-crm.yaml#setSenderIdentityDomain; DI-560)*
+
 #### Outputs: what the screen shows and produces
 
 **Actions and what each produces**
@@ -391,6 +492,16 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 Idempotency conflict or optimistic concurrency failure. Two causes, so two types.; 422 The identity cannot take this status (not yet verified), the channel-specific fields are missing, or the provider does not serve this channel. |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+identities:
+- Coastal Aqua <no-reply@coastalaqua.ae> reply-to customerservice@coastalaqua.ae - verified
+- SMS sender CoastalAqua (UAE) - approved
+```
+
 #### Permissions
 
 - `setSenderIdentityDomain` → `MARKETING_MANAGE` (configure) · staff
@@ -407,7 +518,7 @@ For this screen, newest first. An **Open question** is built to the default it s
 
 - Sender identity per brand (from and reply-to, e.g. no-reply@venue.com, customerservice@venue.com). Templates fully configurable per channel (email, SMS, WhatsApp): header, logo, footer and content, for consistent branded communications. *(client request · MoM 31 Aug 2026, 4.6 Communications & Notifications · DI-560)*
 
-Also apply: 1 for P09 · Platform, 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -420,7 +531,7 @@ Also apply: 1 for P09 · Platform, 9 for all of P09, 29 for every app (section *
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-040` · status **notStarted** · provenance generated
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-040` · status **notStarted** · provenance generated
 - Client workshop board: `wireframes/WS41 Communication & Notification Platform Services Board 1.dc.html#adm-040`
 - Workshop pack: Communication & Notification Platform Services_Reference.pdf board 1
 - Flow F133 *Communication & Notification Platform Services board 1: Communication Service …*, step 4: Works in Sender Identity, Domain & Brand Configuration → Manage the identities from which TICVAI communications are sent.
@@ -434,6 +545,7 @@ Also apply: 1 for P09 · Platform, 9 for all of P09, 29 for every app (section *
 - [ ] Every transition is wired: `ADM-038`.
 - [ ] Every gated control is gated: `MARKETING_MANAGE`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -444,17 +556,25 @@ Also apply: 1 for P09 · Platform, 9 for all of P09, 29 for every app (section *
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
-| Module | Platform · wave 3 · needs the `marketing` module |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
+| Module | Platform · wave 3 · needs the `core` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `MARKETING_VIEW` (1 read); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `MARKETING_VIEW` (1 read); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/platform/system-transactional-template-registry-adm-041` |
 
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, 2 October: the approvals workflow and matrix screens and the communication service screens move to Venue Management; CHG-CLN-003). It configures a record the tenant owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The console's tenant picker and grant (CHG-SBO-001) came off with the move. The id is kept, so its tickets keep their keys.
+
 **Known gaps.** **The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Attachments where applicable. Each needs an operation, or needs removing from the screen; this is the Phase …
+
+**From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** The registry of system transactional templates the operational modules send (ticket confirmation, payment failed, waiver reminder, deposit due), per business event, channel, brand and language, with versions. It must not replace the CRM marketing template builder.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **Only a list read is declared, and the fields are selects (Template ID, Template Name, Version).** Why: A registry that maintains templates needs a write; ids and names are not chosen from a list. *(source: contracts/satellite/marketing-crm.yaml#listSystemTransactionalTemplate; Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers))*
 
 #### Inputs: what the user enters or picks
 
@@ -492,6 +612,10 @@ Also apply: 1 for P09 · Platform, 9 for all of P09, 29 for every app (section *
 |---|---|---|---|---|---|
 | Attachments where applicable (primary button) | navigation or local | — | — | — | — |
 
+**Rules for what is shown** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
+
+- **Template row**: Template, business event, source module, channel, languages (missing flagged), version, status. *(source: contracts/satellite/marketing-crm.yaml#listSystemTransactionalTemplate)*
+
 **Data it reads**: `listSystemTransactionalTemplate` (onLoad, System Transactional Template Registry)
 
 **Where the user goes next**
@@ -509,6 +633,17 @@ Also apply: 1 for P09 · Platform, 9 for all of P09, 29 for every app (section *
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+templates:
+- TICKET_ISSUED - ticketing - email/WhatsApp - EN AR - v5
+- PAYMENT_FAILED - orders - email - EN AR - v2
+- WAIVER_INCOMPLETE - waiver - email/SMS - EN - v1 (AR missing)
+```
+
 #### Permissions
 
 - `listSystemTransactionalTemplate` → `MARKETING_VIEW` (read) · staff
@@ -525,7 +660,7 @@ For this screen, newest first. An **Open question** is built to the default it s
 
 - Sender identity per brand (from and reply-to, e.g. no-reply@venue.com, customerservice@venue.com). Templates fully configurable per channel (email, SMS, WhatsApp): header, logo, footer and content, for consistent branded communications. *(client request · MoM 31 Aug 2026, 4.6 Communications & Notifications · DI-560)*
 
-Also apply: 1 for P09 · Platform, 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -533,7 +668,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-041` · status **notStarted** · provenance generated
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-041` · status **notStarted** · provenance generated
 - Client workshop board: `wireframes/WS41 Communication & Notification Platform Services Board 1.dc.html#adm-041`
 - Workshop pack: Communication & Notification Platform Services_Reference.pdf board 1
 - Flow F133 *Communication & Notification Platform Services board 1: Communication Service …*, step 6: Works in System Transactional Template Registry → Maintain centralized system/transactional communication templates used by TICVAI operational modules. This screen must not replace CRM's marketing template builder.
@@ -547,6 +682,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `ADM-038`.
 - [ ] Every gated control is gated: `MARKETING_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -557,17 +693,25 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
-| Module | Platform · wave 3 · needs the `marketing` module |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
+| Module | Platform · wave 3 · needs the `core` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `MARKETING_VIEW` (1 read); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `MARKETING_VIEW` (1 read); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/platform/business-event-notification-trigger-mapping-adm-042` |
 
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, 2 October: the approvals workflow and matrix screens and the communication service screens move to Venue Management; CHG-CLN-003). It configures a record the tenant owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The console's tenant picker and grant (CHG-SBO-001) came off with the move. The id is kept, so its tickets keep their keys.
+
 **Known gaps.** **The pack names 8 actions on this screen and the screen declares 1 operation.** Unserved: Product, Venue, Customer, Channel, Transaction Status, Membership, Booking Type. Each needs an operation, or … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+**From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** Map business events (OrderConfirmed, TicketIssued, TicketScanned, PaymentFailed, WaiverIncomplete) to the operational communications each generates. Triggers key off precise event states.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **The action bar is buttons named Product, Event, Venue, Customer, Channel, Transaction Status, Membership, Booking Type.** Why: These are condition dimensions (filters or condition fields), not actions; and no write operation is declared. *(source: screens/P08-venue-back-office.yaml#ADM-042; Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers))*
 
 #### Inputs: what the user enters or picks
 
@@ -596,6 +740,10 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Membership (secondary button) | navigation or local | — | — | — | — |
 | Booking Type (secondary button) | navigation or local | — | — | — | — |
 
+**Rules for what is shown** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
+
+- **Mapping row**: Event, state, conditions (product, venue, channel, booking type), template, timing. *(source: contracts/satellite/marketing-crm.yaml#listBusinessEventNotification; DI-561)*
+
 **Data it reads**: `listBusinessEventNotification` (onLoad, Business Event & Notification Trigger Mapping)
 
 **Where the user goes next**
@@ -614,6 +762,14 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+mapping: TicketScanned (first entry of the day) -> post-visit survey after 3 hours
+```
+
 #### Permissions
 
 - `listBusinessEventNotification` → `MARKETING_VIEW` (read) · staff
@@ -630,7 +786,7 @@ For this screen, newest first. An **Open question** is built to the default it s
 
 - Notification triggers must key off precise event states where needed: a post-visit survey only when the ticket was actually scanned/used, whereas a "how was your experience" follow-up can trigger off the sale. Trigger mapping must expose such event states. *(agreed · MoM 31 Aug 2026, 4.6 Communications & Notifications · DI-561)*
 
-Also apply: 1 for P09 · Platform, 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -638,7 +794,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-042` · status **notStarted** · provenance generated
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-042` · status **notStarted** · provenance generated
 - Client workshop board: `wireframes/WS41 Communication & Notification Platform Services Board 1.dc.html#adm-042`
 - Workshop pack: Communication & Notification Platform Services_Reference.pdf board 1
 - Flow F133 *Communication & Notification Platform Services board 1: Communication Service …*, step 8: Works in Business Event & Notification Trigger Mapping → Map TICVAI business events to the operational communications they should generate. This is the core of the event-driven communication architecture.
@@ -652,6 +808,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `ADM-038`.
 - [ ] Every gated control is gated: `MARKETING_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -662,15 +819,23 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
-| Module | Platform · wave 3 · needs the `marketing` module |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
+| Module | Platform · wave 3 · needs the `core` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `MARKETING_VIEW` (1 read); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `MARKETING_VIEW` (1 read); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure based on; Configure) and no display directory — it is settings, not a population |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/platform/routing-priority-throttling-fallback-rules-adm-043` |
+
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, 2 October: the approvals workflow and matrix screens and the communication service screens move to Venue Management; CHG-CLN-003). It configures a record the tenant owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The console's tenant picker and grant (CHG-SBO-001) came off with the move. The id is kept, so its tickets keep their keys.
+
+**From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** How a message is delivered once required: ordered providers per channel, country, brand, message class, priority and recipient type; throttles (per second, per minute, provider, brand, event); fallback channel.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **Only a list read; throttle values are selects.** Why: Rates are numbers and the screen needs a write. *(source: contracts/satellite/marketing-crm.yaml#listRoutingPriorityThrottling; Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers))*
 
 #### Inputs: what the user enters or picks
 
@@ -721,6 +886,14 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+rule: WhatsApp, UAE, transactional, Critical -> Meta primary, fallback SMS after 2 minutes, 200 msg/s
+```
+
 #### Permissions
 
 - `listRoutingPriorityThrottling` → `MARKETING_VIEW` (read) · staff
@@ -737,7 +910,7 @@ For this screen, newest first. An **Open question** is built to the default it s
 
 - Communications dashboard shows activity across email, WhatsApp and SMS: delivered, pending, failed. Delivery queue tracks failed sends with automatic retry; routing/fallback rules send on an alternate channel if delivery fails. *(client request · MoM 31 Aug 2026, 4.6 Communications & Notifications · DI-559)*
 
-Also apply: 1 for P09 · Platform, 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -745,7 +918,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-043` · status **notStarted** · provenance generated
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-043` · status **notStarted** · provenance generated
 - Client workshop board: `wireframes/WS41 Communication & Notification Platform Services Board 1.dc.html#adm-043`
 - Workshop pack: Communication & Notification Platform Services_Reference.pdf board 1
 - Flow F133 *Communication & Notification Platform Services board 1: Communication Service …*, step 10: Works in Routing, Priority, Throttling & Fallback Rules → Determine how TICVAI delivers a message after a communication requirement has been created.
@@ -759,6 +932,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `ADM-038`.
 - [ ] Every gated control is gated: `MARKETING_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -769,17 +943,27 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
-| Module | Platform · wave 3 · needs the `marketing` module |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
+| Module | Platform · wave 3 · needs the `core` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `GUEST_VIEW` (1 read); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `GUEST_VIEW` (1 read); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/platform/consent-preference-communication-policy-enforcement-adm-044` |
 
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, 2 October: the approvals workflow and matrix screens and the communication service screens move to Venue Management; CHG-CLN-003). It configures a record the tenant owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The console's tenant picker and grant (CHG-SBO-001) came off with the move. The id is kept, so its tickets keep their keys.
+
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+**From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** The central enforcement layer: for each communication, its class, channel, the consent and preference read from CRM at that moment, and whether it was allowed or blocked and why. Transactional messages pass without marketing consent; marketing is blocked without it; suppression always wins.
+
+#### Decided on this screen
+
+Answered questions: draw the decision, not the old default. Where a decision and the tables below differ, the decision wins.
+
+- **Is a guest-checkout opt-in sufficient marketing consent?** → Drawn default stands (answer: "From WEB-011: the checkout opt-in, unticked by default, recorded with source checkout"): Treated as consent with source checkout; shown as such in the decision row. *(decided by Chinmay, 2026-10-02; DEC-276 / CHG-NOTE-002)*
 
 #### Inputs: what the user enters or picks
 
@@ -802,6 +986,10 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
 
+**Rules for what is shown** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
+
+- **Decision row**: Time, message class, channel, consent read (Given, Withdrawn, Not asked), preference, decision and reason. *(source: contracts/satellite/marketing-crm.yaml#listConsentPreferenceCommunication; DI-562)*
+
 **Data it reads**: `listConsentPreferenceCommunication` (onLoad, Consent, Preference & Communication Policy Enforcement)
 
 **Where the user goes next**
@@ -820,6 +1008,16 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+decisions:
+- MKT-AUTUMN to Rahul Menon - WhatsApp - consent Withdrawn - blocked
+- TKT-CONFIRM to Rahul Menon - WhatsApp - transactional - allowed
+```
+
 #### Permissions
 
 - `listConsentPreferenceCommunication` → `GUEST_VIEW` (read) · staff
@@ -836,7 +1034,7 @@ For this screen, newest first. An **Open question** is built to the default it s
 
 - Consent and communication preference tracking records marketing/newsletter opt-in status per customer. *(client request · MoM 31 Aug 2026, 4.6 Communications & Notifications · DI-562)*
 
-Also apply: 1 for P09 · Platform, 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -847,7 +1045,7 @@ Also apply: 1 for P09 · Platform, 9 for all of P09, 29 for every app (section *
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-044` · status **notStarted** · provenance generated
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-044` · status **notStarted** · provenance generated
 - Client workshop board: `wireframes/WS41 Communication & Notification Platform Services Board 1.dc.html#adm-044`
 - Workshop pack: Communication & Notification Platform Services_Reference.pdf board 1
 - Flow F133 *Communication & Notification Platform Services board 1: Communication Service …*, step 12: Works in Consent, Preference & Communication Policy Enforcement → Create a central enforcement layer ensuring communications respect the appropriate communication rules.
@@ -861,6 +1059,7 @@ Also apply: 1 for P09 · Platform, 9 for all of P09, 29 for every app (section *
 - [ ] Every transition is wired: `ADM-038`.
 - [ ] Every gated control is gated: `GUEST_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 1 decision(s) taken on this screen are drawn as decided, not as the old default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -871,15 +1070,19 @@ Also apply: 1 for P09 · Platform, 9 for all of P09, 29 for every app (section *
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
-| Module | Platform · wave 3 · needs the `marketing` module |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
+| Module | Platform · wave 3 · needs the `core` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `MARKETING_VIEW` (1 read); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `MARKETING_VIEW` (1 read); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Display) and no metric row |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/platform/delivery-queue-failure-retry-management-adm-045` |
+
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, 2 October: the approvals workflow and matrix screens and the communication service screens move to Venue Management; CHG-CLN-003). It configures a record the tenant owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The console's tenant picker and grant (CHG-SBO-001) came off with the move. The id is kept, so its tickets keep their keys.
+
+**From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** Communications being processed or failing across the platform: queue state, attempts, last failure, counts per state, with retry and channel fallback.
 
 #### Inputs: what the user enters or picks
 
@@ -955,6 +1158,22 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed |
 
+#### Consistency with other screens
+
+- Match `BO-791`: Same queue scoped to one venue.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+queue:
+  queued: 3420
+  retrying: 210
+  failed: 96
+  deadLetter: 4
+```
+
 #### Permissions
 
 - `listDeliveryQueueFailure` → `MARKETING_VIEW` (read) · staff
@@ -971,7 +1190,7 @@ For this screen, newest first. An **Open question** is built to the default it s
 
 - Communications dashboard shows activity across email, WhatsApp and SMS: delivered, pending, failed. Delivery queue tracks failed sends with automatic retry; routing/fallback rules send on an alternate channel if delivery fails. *(client request · MoM 31 Aug 2026, 4.6 Communications & Notifications · DI-559)*
 
-Also apply: 1 for P09 · Platform, 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -984,7 +1203,7 @@ Also apply: 1 for P09 · Platform, 9 for all of P09, 29 for every app (section *
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-045` · status **notStarted** · provenance generated
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-045` · status **notStarted** · provenance generated
 - Client workshop board: `wireframes/WS41 Communication & Notification Platform Services Board 1.dc.html#adm-045`
 - Workshop pack: Communication & Notification Platform Services_Reference.pdf board 1
 - Flow F133 *Communication & Notification Platform Services board 1: Communication Service …*, step 14: Works in Delivery Queue, Failure & Retry Management → Provide technical/operations teams with visibility into communications currently being processed or failing.
@@ -1008,15 +1227,19 @@ Also apply: 1 for P09 · Platform, 9 for all of P09, 29 for every app (section *
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
-| Module | Platform · wave 3 · needs the `marketing` module |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
+| Module | Platform · wave 3 · needs the `core` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `MARKETING_VIEW` (1 read); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `MARKETING_VIEW` (1 read); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Display) and no metric row |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/platform/provider-health-usage-cost-monitoring-adm-046` |
+
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, 2 October: the approvals workflow and matrix screens and the communication service screens move to Venue Management; CHG-CLN-003). It configures a record the tenant owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The console's tenant picker and grant (CHG-SBO-001) came off with the move. The id is kept, so its tickets keep their keys.
+
+**From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** Provider performance and cost: KPIs per provider, usage and cost by channel, tenant or country, threshold breaches. Cost is shown in the currency billed.
 
 #### Inputs: what the user enters or picks
 
@@ -1093,6 +1316,16 @@ Also apply: 1 for P09 · Platform, 9 for all of P09, 29 for every app (section *
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+providers:
+- Meta WhatsApp - 412,000 messages - USD 3,296.00
+- Etisalat SMS - 98,000 - AED 2,940.00
+```
+
 #### Permissions
 
 - `listProviderHealthUsage` → `MARKETING_VIEW` (read) · staff
@@ -1107,7 +1340,7 @@ No matrix row traces to this screen's operations or data.
 
 None names this screen.
 
-Also apply: 1 for P09 · Platform, 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -1115,7 +1348,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-046` · status **notStarted** · provenance generated
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-046` · status **notStarted** · provenance generated
 - Client workshop board: `wireframes/WS41 Communication & Notification Platform Services Board 1.dc.html#adm-046`
 - Workshop pack: Communication & Notification Platform Services_Reference.pdf board 1
 - Flow F133 *Communication & Notification Platform Services board 1: Communication Service …*, step 16: Works in Provider Health, Usage & Cost Monitoring → Monitor the operational and commercial performance of communication providers.
@@ -1139,15 +1372,19 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
-| Module | Platform · wave 3 · needs the `marketing` module |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
+| Module | Platform · wave 3 · needs the `core` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `AI_USE`, `MARKETING_VIEW` (1 operate, 1 read); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `AI_USE`, `MARKETING_VIEW` (1 operate, 1 read); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Analyze) and no metric row |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/platform/ai-delivery-optimization-communication-platform-diagnost-adm-047` |
+
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, 2 October: the approvals workflow and matrix screens and the communication service screens move to Venue Management; CHG-CLN-003). It configures a record the tenant owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The console's tenant picker and grant (CHG-SBO-001) came off with the move. The id is kept, so its tickets keep their keys.
+
+**From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** AI diagnostics for the communication infrastructure (not marketing strategy): health summary, detected provider incidents with probable cause, recommendations a person accepts.
 
 #### Inputs: what the user enters or picks
 
@@ -1201,6 +1438,14 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 422 A setting the answer cannot do without is missing (29 September, AI functions review). (AiMissingSettingProblem) |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+finding: Bounce rate on coastalaqua.ae rose to 4% after DKIM key rotation - recommend re-verifying domain
+```
+
 #### Permissions
 
 - `listDeliveryCommunicationPlatform` → `MARKETING_VIEW` (read) · staff
@@ -1230,7 +1475,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 None names this screen.
 
-Also apply: 1 for P09 · Platform, 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -1238,7 +1483,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-047` · status **notStarted** · provenance generated
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-047` · status **notStarted** · provenance generated
 - Client workshop board: `wireframes/WS41 Communication & Notification Platform Services Board 1.dc.html#adm-047`
 - Workshop pack: Communication & Notification Platform Services_Reference.pdf board 1
 - Flow F133 *Communication & Notification Platform Services board 1: Communication Service …*, step 18: Works in AI Delivery Optimization & Communication Platform Diagnostics → Provide an AI intelligence layer focused specifically on communication infrastructure performance, not CRM marketing strategy.
@@ -1261,12 +1506,16 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 ## Reference designs and the trackers for this platform
 
-**P09 reference designs** (from `handoff/design-batches/apps/6-ticvai-controller/README.md`)
+**P08 reference designs** (from `handoff/design-batches/apps/5-venue-management/README.md`)
 
 - `sources/designs/TICVAI_POS_Terminal_client_approved.html`: the client-approved POS, for operator density and components.
 - `sources/designs/TICVAI_Mobile.dc.html`: for finish and motion.
 
-**Design Vision Book rules that apply** (`sources/designs/Ticvai_Design_Vision_Book_v1_1.pdf`): DI-021, DI-022, DI-023, DI-024, DI-025, DI-027, DI-028, DI-029, DI-032, DI-033, DI-034, DI-036, DI-037, DI-038, DI-039, DI-040, DI-041, DI-042, DI-044, DI-045, DI-046, DI-047, DI-048, DI-049, DI-050, DI-051 (each is in the design inputs below).
+**Design Vision Book rules that apply** (`sources/designs/Ticvai_Design_Vision_Book_v1_1.pdf`): DI-021, DI-022, DI-023, DI-024, DI-025, DI-027, DI-028, DI-029, DI-030, DI-032, DI-033, DI-034, DI-036, DI-037, DI-038, DI-039, DI-040, DI-041, DI-042, DI-043, DI-044, DI-045, DI-046, DI-047, DI-048, DI-049, DI-050, DI-051, DI-052 (each is in the design inputs below).
+
+**Workshop tracker rows about P08 as a whole** (1: 1 open, 0 closed). Open first; a closed row says where it went on 30 September.
+
+- **S8** Venue Management back-end configuration wireframes *(Chinmay Parab · In progress · due Fri 2 Oct · 30 Sep 2026 · 30 Sep tracker)*
 
 ## Design inputs from the client meetings
 
@@ -1304,21 +1553,32 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Brand personality: Modern, AI-First, Enterprise, Premium, Reliable, Minimal, Scalable, Human-Centred. Visual essence: intelligent and forward-thinking, clean and minimal, trustworthy and secure, modern and timeless, scalable and flexible. *(agreed · Design Vision Book 29 Jul 2026, 02 Brand Identity (p2) - Brand personality / Visual essence · DI-021)*
 - Arabic is a core requirement, not later localisation: full Arabic RTL across web, mobile, POS, reports, emails, WhatsApp, SMS, notifications, tickets and receipts, and administrative interfaces. *(agreed · MoM 28 Jul 2026, 27. Internationalisation and Arabic Support · DI-019)*
 
-### Across P09 TICVAI Web
+### Across P08 Venue Management
 
-- Portal access exposes TICVAI pricing, so prospects submit contact details and a trade license as proof of a real venue, reviewed and approved by TICVAI before access is granted. *(agreed · MoM 10 Sep 2026, 4.8 Customer Portal Access, Authentication & Verification · DI-827)*
+- Qossai: configuration screens should consolidate related functionality, potentially merging 3-4 previously separate screens into one, rather than the repetitive one-screen-per-concept pattern of the AI-built reference system. *(agreed · MoM 24 Sep 2026, 4.5 Screen Consolidation Philosophy · DI-987)*
+- **Open question.** Open: should AI monitoring live in one centralised AI command dashboard or be distributed as widgets in each functional module's own dashboard? Allam: Softlabs' call; the current proposal is illustrative and Softlabs may propose a better structure. *(open · MoM 18 Sep 2026, 4.4 AI Governance — Risk, Compliance & Continuous Monitoring · DI-936)*
 - Simulation functionality stays embedded within each relevant configuration section rather than being consolidated, since it tests that section's own configuration. *(agreed · MoM 8 Sep 2026, 4.11 Dashboard & Reporting Module Consolidation Strategy · DI-722)*
+- Client boards (POS Frontline, F&B, Retail, Inventory & Procurement) share one architecture: six boards of ten screens per domain, a command centre first and an AI/analytics board last, under the hierarchy Company > Venue > Department > Workstation > Operator/Shift > Transaction > Exception > Reconciliation > Analytics. *(agreed · client-design-boards-audit 20 Aug 2026, Opening / What the boards give us · DI-400)*
+- Decision: RBAC per role, per module, three levels — edit/view, view-only, hidden (e.g. a marketing officer does not see Finance at all) — plus sub-permissions within a module (a CRM role may get Campaigns and Communications but not Journeys). Default role templates, admin-customisable. *(agreed · MoM 20 Aug 2026, 4.7 Role-Based Access Control (RBAC); 5. Key Decisions · DI-387)*
+- **Open question.** Allam: a user's visibility must be restrictable to specific outlets (an F&B manager of one outlet should not see other outlets' items); also relevant for ticketing/event-specific access. Implementation approach still open. *(open · MoM 18 Aug 2026, 4.6 Role-Based & Outlet-Level Access Control — Open Item · DI-331)*
+- Access loads automatically at login on POS and web/admin. A user with one role logs straight in; a user with several roles (e.g. admin, cashier, supervisor, manager) is prompted to choose which role to use. *(agreed · MoM 12 Aug 2026, 4. Multiple Roles per User and Role Switching · DI-249)*
+- Back office is role-driven from any device: a finance user signing in from a workstation, laptop or home sees only finance reports and related information. *(agreed · MoM 12 Aug 2026, 3. Role-Based Access and Workstation-Linked Front-End · DI-248)*
+- Built-in help menu with step-by-step tutorials with screenshots for common tasks (e.g. how to sell a ticket at the POS). *(client request · MoM 7 Aug 2026, 8. Legacy POS Layout Designer & System Logging · DI-160)*
+- Custom data-capture fields ("data mask") at account, event, extended-ticket and product level: field types text, dropdown, radio, true/false; multi-language labels; validation (min/max length, required/optional); reusable value lists (e.g. country list). Standard fields come out of the box. *(agreed · MoM 7 Aug 2026, 6. Data Mask: Flexible Custom Data Capture · DI-155)*
+- Load/traffic dashboards respect the tenancy model: a venue manager sees traffic for their own venue only. *(agreed · MoM 31 Jul 2026, 4. Non-Functional Requirements: Scalability & Availability · DI-061)*
+- Allam: queue management is built into the system (not third-party) so traffic entering the site can be throttled from the back office itself. *(agreed · MoM 31 Jul 2026, 4. Non-Functional Requirements: Scalability & Availability · DI-060)*
 - **Open question.** Proposed tenant hierarchy Tenant > Organization/Brand > Region > Branch > Venue > Department, under review against TICVAI's own organisational hierarchy before finalising. *(open · MoM 30 Jul 2026, 2. Proposed Multi-Tenant Hierarchy · DI-055)*
+- Documentation deliverable includes user guides and help content; the preview shows a TICVAI Help Center with categories (Getting Started, Events, Tickets, Orders, Payments, Memberships, Access Control, Reports, Integrations), a "Welcome to TICVAI" getting-started article and Quick Links (Create an Event, Set Pricing, Manage Access, View Reports). *(agreed · Design Vision Book 29 Jul 2026, 09 Deliverables (p9) - What We Deliver / Key Deliverables Preview · DI-052)*
 - Typeface Inter (Light, Regular, Medium, Semibold, Bold). Scale: H1 32/40 Bold, H2 24/32 Semibold, H3 20/28 Semibold, Body 1 16/24 Regular, Body 2 14/20 Regular, Caption 12/16 Regular. *(agreed · Design Vision Book 29 Jul 2026, 08 Design System (p8) - 2. Typography · DI-047)*
 - Palette ("modern, trustworthy and accessible"): Primary #0D6EFD, #00B8FF, #00D4C4, #0B1324; Neutral #F7F9FC, #E5E7EB, #9CA3AF, #4B5563, #1F2937. *(agreed · Design Vision Book 29 Jul 2026, 08 Design System (p8) - 1. Color Palette · DI-046)*
+- AI Assistant panel: a short framing ("Based on last 30 days, here are 3 actions that can improve your revenue") then actionable recommendations, each with its potential impact (e.g. "Increase pricing for VIP seats, +12%") and a chevron, plus "View all recommendations". *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - AI Panels · DI-043)*
 - Chart cards: title with period dropdown ("This Week"), headline metrics with deltas (Tickets Sold 12,840 +8.7%, Visitors, Conversion). Data visualisations must be easy to read. *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - Charts · DI-041)*
 - Tables: titled card with "View all", columns (e.g. Order ID, Customer, Amount, Status), coloured status badges (Paid, Pending, Refunded) and pagination with "Showing 1 to 5 of 245" and page numbers. *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - Tables · DI-039)*
 - Primary button spec: height 40px, padding 12px 24px, radius 8px, Inter 14 Semibold, colour #0D6EFD, width auto. *(agreed · Design Vision Book 29 Jul 2026, 09 Deliverables (p9) - Developer Handoff preview · DI-037)*
+- Back-office shell: collapsible left sidebar with Overview, Events, Tickets, Orders, Customers, Memberships, Access Control, POS, Reports, Analytics, AI Assistant, Settings, and the signed-in user (name, role) at the bottom; top bar with global search (Cmd+K), current time and date, Notifications with unread dot, and user menu. *(agreed · Design Vision Book 29 Jul 2026, 04 Dashboard Vision (p4) - navigation shell · DI-030)*
 - Dynamic KPIs, forecasts and real-time insights; role-based dashboards, preferences and smart shortcuts for every user (e.g. greeting "Good morning, Ahmed" on the home screen, p2). *(agreed · Design Vision Book 29 Jul 2026, 03 Visual Direction (p3) - Smarter Data / Personalized Experience · DI-028)*
-
-### In P09 · Platform
-
-- **Open question.** Open: should AI monitoring live in one centralised AI command dashboard or be distributed as widgets in each functional module's own dashboard? Allam: Softlabs' call; the current proposal is illustrative and Softlabs may propose a better structure. *(open · MoM 18 Sep 2026, 4.4 AI Governance — Risk, Compliance & Continuous Monitoring · DI-936)*
+- Reports and historical searches must still retrieve archived transactions when required; the retention period (e.g. keep 3 of 5+ years live) is configurable per customer, archival manual or automated. *(agreed · MoM 28 Jul 2026, 23. Database Optimisation and Archiving · DI-018)*
+- Back-office controls for the waiting room: configurable maximum active users and admission intervals, set per customer and venue. *(agreed · MoM 28 Jul 2026, 19. Auto-scaling and Virtual Waiting Room · DI-017)*
 
 **8 more name particular screens** and are in each screen's block above (*Client meeting inputs*).
 

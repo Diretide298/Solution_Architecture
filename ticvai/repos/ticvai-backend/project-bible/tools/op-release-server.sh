@@ -73,20 +73,25 @@ checkout_tag() {
     git -C "$CHECKOUT" status --short --untracked-files=no | head -20
     die "the checkout has local changes; it only ever holds a release tag. Inspect, then: git -C $CHECKOUT checkout -- ."
   fi
-  git -C "$CHECKOUT" fetch --tags --prune --quiet origin
+  git -C "$CHECKOUT" fetch --quiet --depth 1 origin tag "$tag" 2>/dev/null || git -C "$CHECKOUT" fetch --tags --prune --quiet origin
   git -C "$CHECKOUT" rev-parse -q --verify "refs/tags/$tag" >/dev/null || die "tag $tag not found on origin"
-  git -C "$CHECKOUT" checkout --quiet --detach "refs/tags/$tag"
-  [ -f "$RB" ] || die "$RB missing at $tag"
-  [ -f "$BUNDLE" ] || die "$BUNDLE missing at $tag: build it with tools/op-release.py --release $tag and commit it before tagging"
+  # The two files are read straight from the tag, never by switching the working tree: git before 2.25 cannot
+  # move a sparse checkout to another commit ("Sparse checkout leaves no entry", 1 October on git 2.17).
+  local from="$OUT/$tag"
+  mkdir -p "$from"
+  git -C "$CHECKOUT" show "refs/tags/$tag:ticvai/tools/op-release.rb" > "$from/op-release.rb" || die "op-release.rb missing at $tag"
+  git -C "$CHECKOUT" show "refs/tags/$tag:ticvai/handoff/service-docs/op-release.json" > "$from/op-release.json"     || die "op-release.json missing at $tag: build it with tools/op-release.py --release $tag and commit it before tagging"
+  RB="$from/op-release.rb"
+  BUNDLE="$from/op-release.json"
   grep -q "\"release\": \"$tag\"" "$BUNDLE" || die "the bundle at $tag is not for $tag: rebuild it (tools/op-release.py --release $tag)"
   # the bundle records the git blob of each plan file it was built from; at the tag they must be the same files
   local f want have
   for f in tasks.csv pms-map.json block-a-schedule.json; do
     want=$(grep -o "\"$f\": \"[0-9a-f]*\"" "$BUNDLE" | head -1 | cut -d'"' -f4)
-    have=$(git -C "$CHECKOUT" rev-parse -q --verify "HEAD:ticvai/handoff/service-docs/$f" || true)
+    have=$(git -C "$CHECKOUT" rev-parse -q --verify "refs/tags/$tag:ticvai/handoff/service-docs/$f" || true)
     [ -n "$want" ] && [ "$want" = "$have" ] || die "the bundle at $tag was built from a different $f than the one at $tag: rebuild it (tools/op-release.py --release $tag), commit, re-tag"
   done
-  echo "== $tag = $(git -C "$CHECKOUT" rev-parse --short HEAD); bundle sha256 $(bundle_sum | cut -c1-12)"
+  echo "== $tag = $(git -C "$CHECKOUT" rev-parse --short "refs/tags/$tag^{commit}"); bundle sha256 $(bundle_sum | cut -c1-12)"
 }
 
 bundle_sum() { sha256sum "$BUNDLE" | cut -d' ' -f1; }

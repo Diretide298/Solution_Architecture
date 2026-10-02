@@ -203,7 +203,7 @@
   "states": {
    "loading": "The dam governance rights list.",
    "error": "Could not load. Names which read failed and leaves the dam governance rights untouched.",
-   "emptyFirstRun": "No dam governance rights yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "Nothing here yet for DAM Governance & Rights Command Center. This screen only reads, so it offers no create action and says where the records come from.",
    "emptyNoResults": "The filter narrowed it and the dam governance rights are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -354,7 +354,7 @@
   "states": {
    "loading": "The asset ownership responsibility list.",
    "error": "Could not load. Names which read failed and leaves the asset ownership responsibility untouched.",
-   "emptyFirstRun": "No asset ownership responsibility yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "Nothing here yet for Asset Ownership & Responsibility Management. This screen only reads, so it offers no create action and says where the records come from.",
    "emptyNoResults": "The filter narrowed it and the asset ownership responsibility are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -622,11 +622,6 @@
       },
       {
        "kind": "secondaryButton",
-       "label": "Delegate",
-       "provenance": "pack Digital Asset Management DAM.pdf, page 47 §Actions"
-      },
-      {
-       "kind": "secondaryButton",
        "label": "Add Comment",
        "provenance": "pack Digital Asset Management DAM.pdf, page 47 §Actions"
       },
@@ -636,10 +631,6 @@
        "provenance": "pack Digital Asset Management DAM.pdf, page 47 §Actions"
       }
      ]
-    },
-    {
-     "name": "contentBody",
-     "components": []
     }
    ]
   },
@@ -686,6 +677,7 @@
     }
    ]
   },
+  "notes": "**No Delegate button (CHG-SGU-023).** Delegation is configured ahead of time (`createApprovalDelegation` on the approvals screens), not chosen per decision.",
   "_platform": {
    "code": "P13",
    "audience": "staff",
@@ -907,26 +899,20 @@
    "regions": [
     {
      "name": "contentBody",
+     "slot": "collection",
      "components": [
       {
        "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listAuthorisationPolicies",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "label": "Roles and asset actions",
+       "operation": "listAuthorisationPolicies",
+       "notes": "One row per role, one column per asset action (discover, view, edit, download, share, approve, manage), each allowed or not, with the scope it applies at.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-023, design-notes correction)"
       },
       {
        "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "createAuthorisationPolicy",
-       "label": "Create access policy",
-       "notes": "The act the screen exists for."
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "createAuthorisationPolicy"
+       "label": "Grant an asset action to a role",
+       "operation": "createAuthorisationPolicy",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-023, design-notes correction)"
       }
      ]
     }
@@ -961,6 +947,22 @@
    "workshopBoard": "wireframes/WS46 Digital Asset Management DAM Board 3.dc.html#cms-086"
   },
   "apisNote": "Regenerated 9 September 2026 from Digital Asset Management DAM.pdf page 49. 0 of 0 labels bound to a contract property; 0 of 20 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formCreateAuthorisationPolicy",
+    "component": "modal",
+    "trigger": "Grant an asset action to a role",
+    "body": "The role, the asset actions it may take (discover, view, edit, download, share, approve, manage) and the scope it applies at. Dismissing sends nothing.",
+    "confirm": {
+     "label": "Grant an asset action to a role",
+     "operation": "createAuthorisationPolicy"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "corrected 2 October 2026 (CHG-SGU-023, design-notes correction)"
+   }
+  ],
   "_platform": {
    "code": "P13",
    "audience": "staff",
@@ -1206,9 +1208,7 @@
         "Expires in 7 Days",
         "Expires in 30 Days",
         "Expires in 60 Days",
-        "Expired",
-        "Example",
-        "DAM-IMG-008421"
+        "Expired"
        ],
        "bindsTo": null,
        "operation": null,
@@ -1228,9 +1228,7 @@
         "Expires in 7 Days",
         "Expires in 30 Days",
         "Expires in 60 Days",
-        "Expired",
-        "Example",
-        "DAM-IMG-008421"
+        "Expired"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Rights expire”, “Impact”, “Owner notification”, “Digital Asset Management”, “Escalation”, “Expired”.",
        "provenance": "pack Digital Asset Management DAM.pdf, page 52 §Show"
@@ -1422,7 +1420,7 @@
   "states": {
    "loading": "The governance audit trail configuration as saved.",
    "error": "Could not load. Names which read failed and leaves the governance audit trail untouched.",
-   "emptyFirstRun": "No governance audit trail configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyFirstRun": "Nothing here yet for Governance Audit Trail & Compliance Evidence. This screen only reads, so it offers no create action and says where the records come from.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },
@@ -1587,7 +1585,7 @@
   "states": {
    "loading": "The governance risk compliance list.",
    "error": "Could not load. Names which read failed and leaves the governance risk compliance untouched.",
-   "emptyFirstRun": "No governance risk compliance yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "Nothing here yet for Governance Risk, Compliance & AI Recommendations. This screen only reads, so it offers no create action and says where the records come from.",
    "emptyNoResults": "The filter narrowed it and the governance risk compliance are still there. The pack's own statuses are 🟢 Valid — the state names which is selected.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },

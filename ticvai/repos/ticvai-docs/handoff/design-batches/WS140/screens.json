@@ -287,6 +287,7 @@
    "workshopBoard": "wireframes/WS75 Marketing CRM Configuration Reference v1.0 Board 6.dc.html#bo-785"
   },
   "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 31. 0 of 0 labels bound to a contract property; 0 of 8 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "notes": "**One template library** (decided 2 October 2026, merge as proposed; CHG-SBO-021): accreditation communication templates are message templates filtered to the accreditation purpose; BO-677 is merged in.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -615,6 +616,23 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 32"
+   },
+   {
+    "operation": "getMarketingSubscription",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-005): getMarketingSubscription and setMarketingSubscription are guest-only operations; staff should not write a guest's subscription (design-notes correction customer-marketing BO-788).",
+    "source": "contracts/satellite/marketing-crm.yaml#getMarketingSubscription"
+   },
+   {
+    "operation": "setMarketingSubscription",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-005): getMarketingSubscription and setMarketingSubscription are guest-only operations; staff should not write a guest's subscription (design-notes correction customer-marketing BO-788).",
+    "source": "contracts/satellite/marketing-crm.yaml#getMarketingSubscription"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-007): No staff read of a guest's marketing subscriptions or of subscribers.",
+    "source": "contracts/satellite/marketing-crm.yaml#getMarketingSubscription"
    }
   ],
   "layout": {
@@ -626,8 +644,8 @@
       {
        "kind": "primaryButton",
        "derived": true,
-       "impliedBy": "setMarketingSubscription",
-       "label": "Save",
+       "impliedBy": "addSuppression",
+       "label": "Add suppression",
        "notes": "The act the screen exists for."
       },
       {
@@ -635,7 +653,7 @@
        "label": "Cancel",
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
-       "impliedBy": "setMarketingSubscription"
+       "impliedBy": "addSuppression"
       }
      ]
     }
@@ -650,28 +668,11 @@
   },
   "apis": [
    {
-    "operationId": "setMarketingSubscription",
-    "contract": "marketing-crm",
-    "purpose": "Subscriptions and preferences",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026"
-   },
-   {
-    "operationId": "getMarketingSubscription",
-    "contract": "marketing-crm",
-    "purpose": "What a guest is subscribed to",
-    "trigger": "onLoad",
-    "provenance": "board reading, 19 September 2026"
-   },
-   {
     "operationId": "addSuppression",
     "contract": "marketing-crm",
     "purpose": "Suppress an address from all marketing",
     "trigger": "onAction",
-    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
-    "invalidates": [
-     "getMarketingSubscription"
-    ]
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)"
    }
   ],
   "wireframe": {
@@ -1251,6 +1252,12 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 33"
+   },
+   {
+    "operation": "setLocalizationBrandingCustomer",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-012): setLocalizationBrandingCustomer (waiver form languages, GUEST_MANAGE) is unrelated waiver configuration (design-notes correction ai BO-793).",
+    "source": "contracts/satellite/marketing-crm.yaml#setLocalizationBrandingCustomer"
    }
   ],
   "layout": {
@@ -1262,8 +1269,7 @@
       {
        "kind": "primaryButton",
        "derived": true,
-       "impliedBy": "setLocalizationBrandingCustomer",
-       "label": "Save",
+       "impliedBy": "proposeMarketingContent",
        "notes": "The act the screen exists for."
       },
       {
@@ -1271,7 +1277,7 @@
        "label": "Cancel",
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
-       "impliedBy": "setLocalizationBrandingCustomer"
+       "impliedBy": "proposeMarketingContent"
       }
      ]
     }
@@ -1280,18 +1286,11 @@
   "states": {
    "loading": "The content translation audit list.",
    "error": "Could not load. Names which read failed and leaves the content translation audit untouched.",
-   "emptyFirstRun": "No content translation audit yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No content translation audit yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the content translation audit are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
-   {
-    "operationId": "setLocalizationBrandingCustomer",
-    "contract": "marketing-crm",
-    "purpose": "Content, translation and branding",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026"
-   },
    {
     "operationId": "proposeMarketingContent",
     "contract": "ai",

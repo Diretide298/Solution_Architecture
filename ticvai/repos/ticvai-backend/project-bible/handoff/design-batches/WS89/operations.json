@@ -1,23 +1,4 @@
 {
- "createStockLocation": {
-  "method": "POST",
-  "path": "/stock-locations",
-  "contract": "inventory",
-  "summary": "Create a stock location",
-  "permission": "PRODUCT_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "StockLocation"
- },
  "createStockMovement": {
   "method": "POST",
   "path": "/stock-movements",
@@ -108,25 +89,6 @@
   "requestBody": null,
   "responds": "Page"
  },
- "getSuggestedRequisitions": {
-  "method": "GET",
-  "path": "/requisitions/suggested",
-  "contract": "inventory",
-  "summary": "Draft requisitions from reorder points",
-  "permission": "PROCUREMENT_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "locationId",
-    "in": "query",
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": null
- },
  "listAssets": {
   "method": "GET",
   "path": "/assets",
@@ -171,83 +133,39 @@
   "requestBody": null,
   "responds": "Page"
  },
- "listInventoryItems": {
+ "listRentalBookings": {
   "method": "GET",
-  "path": "/inventory-items",
-  "contract": "inventory",
-  "summary": "List inventory items",
-  "permission": "PRODUCT_VIEW",
-  "offlineCapable": true,
-  "conflictPolicy": "serverWins",
+  "path": "/rental-bookings",
+  "contract": "rental",
+  "summary": "Reservations across venues and locations",
+  "permission": "RENTAL_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
   "scopeLevel": "venue",
   "parameters": [
-   {
-    "name": "venueId",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "categoryId",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "belowReorderPoint",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "search",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- },
- "listSerialisedItems": {
-  "method": "GET",
-  "path": "/serialised-items",
-  "contract": "inventory",
-  "summary": "Where each individual item is",
-  "permission": "PRODUCT_VIEW",
-  "offlineCapable": true,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "serial",
-    "in": "query",
-    "required": null
-   },
    {
     "name": "status",
     "in": "query",
     "required": null
    },
    {
-    "name": null,
-    "in": null,
+    "name": "locationId",
+    "in": "query",
     "required": null
    },
    {
-    "name": null,
-    "in": null,
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "to",
+    "in": "query",
     "required": null
    }
   ],
   "requestBody": null,
-  "responds": "Page"
+  "responds": "RentalBooking"
  },
  "listStockLocations": {
   "method": "GET",

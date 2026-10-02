@@ -1,5 +1,5 @@
 id: LLD-approvals
-title: approvals — 53 operations
+title: approvals — 57 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: spine
@@ -98,6 +98,30 @@ operations:
   - approvals.request
   - approvals.workflow_version
   - cache:idempotency
+- operation: assignApprovalRequest
+  verb: PUT
+  path: /approval-requests/{requestId}/assignment
+  scope: venue
+  permission: APPROVAL_DECIDE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - approvals.decision
+  - approvals.request
+  writes: []
+- operation: cancelApprovalRequest
+  verb: POST
+  path: /approval-requests/{requestId}/cancel
+  scope: venue
+  permission: APPROVAL_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - approvals.decision
+  - approvals.request
+  writes: []
 - operation: createApprovalDelegation
   verb: POST
   path: /delegations
@@ -346,6 +370,17 @@ operations:
   reads:
   - approvals.approved_action_execution
   writes: []
+- operation: listAutomationExecutions
+  verb: GET
+  path: /automation-executions
+  scope: venue
+  permission: APPROVAL_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - approvals.automation_execution
+  writes: []
 - operation: listConditionDecisionLogic
   verb: GET
   path: /condition-decision-logic
@@ -556,6 +591,18 @@ operations:
   - approvals.request
   - cache:idempotency
   - platform.outbox
+- operation: reopenApprovalRequest
+  verb: POST
+  path: /approval-requests/{requestId}/reopen
+  scope: venue
+  permission: APPROVAL_REQUEST
+  audience:
+  - staff
+  offline: false
+  reads:
+  - approvals.decision
+  - approvals.request
+  writes: []
 - operation: resolveApprovedActionExecution
   verb: POST
   path: /approved-action-executions/{executionId}/resolve

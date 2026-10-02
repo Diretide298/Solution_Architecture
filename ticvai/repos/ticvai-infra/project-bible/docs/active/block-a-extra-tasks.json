@@ -1,5 +1,5 @@
 {
- "note": "Block A tasks that come from no screen or operation, so the slice cannot derive them. Read by tools/build-service-docs.py. Edit this file, not the task sheet. Added 30 September 2026 from the system-design review (audit/ticvai/steps/SD, findings SD-016, 024, 026, 028, 030-032, 034, 046-049, 051, 057, 059, 063) and the AI functions review (docs/active/ai-functions-review-30-september.md). `pool: backend` goes to the least-loaded backend owner; `assignee` names a person. AI engine tasks carry no points: they are sized in engineer-days in their text and planned by the two AI engineers, whose capacity is separate from the developers' (decided 30 September). Since 1 October a task may carry `block` (for example `B1`): it is recorded here with the ADR that asks for it and is not ticketed in the Block A sheet; build-service-docs.py skips it until that block is planned. A task without `block` is Block A.",
+ "note": "Block A tasks that come from no screen or operation, so the slice cannot derive them. Read by tools/build-service-docs.py. Edit this file, not the task sheet. Added 30 September 2026 from the system-design review (audit/ticvai/steps/SD, findings SD-016, 024, 026, 028, 030-032, 034, 046-049, 051, 057, 059, 063) and the AI functions review (docs/active/ai-functions-review-30-september.md). `pool: backend` goes to the least-loaded backend owner; `assignee` names a person. AI engine tasks carry no points: they are sized in engineer-days in their text and planned by the two AI engineers, whose capacity is separate from the developers' (decided 30 September). Since 1 October a task may carry `block` (for example `B1`): it is recorded here with the ADR that asks for it and is not ticketed in the Block A sheet; build-service-docs.py skips it until that block is planned. A task without `block` is Block A. Since 1 October (the sprint plan) a later-block task names the app-module it lands in with `module` (a business module) and `platform` (P01-P17; none = that module's platform work), and build-service-docs.py plans it with the rest of the package. **The Block A AI chain split across both AI engineers** (Chinmay, 1 October): the baseline layer (estimators, venue profile, starting patterns) and Qdrant tenancy do not call the LLM gateway, so they start on day one beside it; day-one suggestions and the evaluation harness still wait for the gateway (an answer is recorded through its decision point), and the concierge for Qdrant. Kalpita Mejari: gateway, concierge, Help me choose, translations, planner (33 days); the second AI engineer: baseline, Qdrant, suggestions, evaluation (33 days). `appModule: baseline` puts a task in the second AI engine app-module of Block A, so each engineer's module test is of the other's half.",
  "epics": [
   {
    "key": "PLATFORM",
@@ -258,25 +258,38 @@
   {
    "key": "POS-KDS-ROUTING",
    "epic": "OFFLINE",
-   "points": 5,
+   "points": 8,
    "pool": "backend",
    "depends": [
     "PLATFORM-OUTBOX"
    ],
    "subject": "A POS sale reaches the kitchen: routing online, and the LAN path decision",
-   "detail": "createFnbOrder from the POS creates the kitchen ticket as the guest order does, routed to the right station (SD-046). The offline LAN path to the Kitchen Display is an ADR decision; this task implements the online path and the stub the decision fills. Done when: a POS sale of a burger and a drink shows on the grill and bar stations."
+   "detail": "createFnbOrder from the POS creates the kitchen ticket as the guest order does, routed to the right station (SD-046). The offline LAN path to the Kitchen Display is an ADR decision; this task implements the online path and the stub the decision fills. Done when: a POS sale of a burger and a drink shows on the grill and bar stations. 2 October (Chinmay, DEC-187/189): kitchen printers are in release 1 (print template, printer routing) and routing takes category rules with a default/fallback station per outlet. 8 points (was 5)."
   },
   {
    "key": "AI-ENGINE-GATEWAY",
    "epic": "AI-ENGINE",
    "assignee": "Kalpita Mejari",
-   "days": 10,
+   "days": 12,
    "subject": "AI gateway, governance decision point and usage metering",
-   "detail": "One gateway every AI call goes through: provider (managed Azure by default; BYOK where TICVAI enables it), policy check (evaluateAiGovernance), usage and spend (getAiUsage), and the decision record for every answer. About 10 engineer-days.",
+   "detail": "One gateway every AI call goes through: provider (managed Azure by default; BYOK where TICVAI enables it), policy check (evaluateAiGovernance), usage and spend (getAiUsage), and the decision record for every answer. About 10 engineer-days. 2 October (Chinmay, DEC-539): routes each call by the tenant's AI residency class (UAE-only via Core42 Compass by default, Global opt-in under PDPL Art. 23, on-prem open models) and enforces TICVAI's curated model range per task tier (BYOK maps to the provider's equivalent; clients cannot pick models). About 12 engineer-days (was 10).",
    "depends": [
     "SETUP-CI",
     "SETUP-ENV"
    ]
+  },
+  {
+   "key": "AI-ENGINE-SCRUB-GUARD",
+   "epic": "AI-ENGINE",
+   "assignee": "Second AI engineer",
+   "days": 6,
+   "subject": "Offline PII scrubber and guard model in front of every LLM call",
+   "detail": "2 October (Chinmay, DEC-542/543, ADR-0020 amended): Microsoft Presidio in-cell with UAE recognisers (Emirates ID, UAE phone, passport, IBAN, Luhn-checked cards, email) and Arabic NER for names and places; reversible placeholders whose map stays in-cell and replies re-filled before the user sees them; Qwen3Guard on input and output; fails closed. Mandatory whatever the tenant's residency class. Done when: a prompt with an Emirates ID, an Arabic name and a card number reaches the provider as placeholders and the reply comes back filled. About 6 engineer-days.",
+   "depends": [
+    "SETUP-CI",
+    "SETUP-ENV"
+   ],
+   "appModule": "baseline"
   },
   {
    "key": "AI-ENGINE-BASELINE",
@@ -286,8 +299,10 @@
    "subject": "The baseline-then-learn layer: estimator interface, maturity stages, venue profile, starting patterns",
    "detail": "One interface per AI question with three answers behind it (starting pattern, statistical on the tenant's data, trained model); the stage and 'based on' label on every answer; the venue profile entered at onboarding; starting patterns per venue type with the UAE calendar and weather; no other tenant's data. About 15 engineer-days; the rest of the layer continues in Block B.",
    "depends": [
-    "AI-ENGINE-GATEWAY"
-   ]
+    "SETUP-CI",
+    "SETUP-ENV"
+   ],
+   "appModule": "baseline"
   },
   {
    "key": "AI-ENGINE-SUGGESTIONS",
@@ -297,8 +312,10 @@
    "subject": "Day-one suggestions for the Block A screens: queue balancing, prep plan, upsell",
    "detail": "requestSuggestion answers from the baseline on day one for the kinds Block A screens call (BO-005, GST-031, WEB-044), with the upsell baseline from the Promotions relationship map. About 8 engineer-days.",
    "depends": [
-    "AI-ENGINE-BASELINE"
-   ]
+    "AI-ENGINE-BASELINE",
+    "AI-ENGINE-GATEWAY"
+   ],
+   "appModule": "baseline"
   },
   {
    "key": "AI-ENGINE-CONCIERGE",
@@ -320,9 +337,9 @@
    "subject": "Qdrant tenancy: a collection and a scoped token per tenant, the retrieval client, erasure and snapshots",
    "detail": "Collection-per-tenant provisioning at tenant onboarding, per embedding model behind the alias tenant_<tenantId> (a model change is a shadow collection and an alias swap); per-tenant JWT issuance and rotation, scoped to the tenant's collections; the single retrieval client with no scope parameter that always adds the venue filter; erasure by guest or document payload, checked against the point references in ai.chunk_embedding; offboarding that deletes the collections and revokes the token; per-collection snapshots (ADR-0049). Done when: a token for one tenant cannot read another tenant's collection, a venue-scoped question never returns another venue's chunk, and an erased guest's points are gone and provably so. About 5 engineer-days.",
    "depends": [
-    "SETUP-QDRANT",
-    "AI-ENGINE-GATEWAY"
-   ]
+    "SETUP-QDRANT"
+   ],
+   "appModule": "baseline"
   },
   {
    "key": "AI-ENGINE-GUIDED",
@@ -366,7 +383,8 @@
    "detail": "Offline evaluation of every AI answer type against a fixture, the backtest runner the learned producers will use, and the promotion-ready alert to the admin (AI-D16). About 5 engineer-days.",
    "depends": [
     "AI-ENGINE-GATEWAY"
-   ]
+   ],
+   "appModule": "baseline"
   },
   {
    "key": "KERNEL-TENANT-LIMITS",
@@ -402,7 +420,8 @@
     "KERNEL-TENANT-LIMITS"
    ],
    "subject": "The on-sale waiting room: Redis positions, the cached page, the release controller, admission tokens",
-   "detail": "ADR-0066 (accepted 1 October; B1, or Block A if an on-sale is booked in Block A): enterWaitingRoom gives a position from a Redis counter with no database write; the static branded waiting page is served from Front Door's cache and polls getWaitingRoomPosition; a release controller admits guests per second from the health of commerce (latency and the 429 rate, ADR-0064); an admitted guest gets a short-lived signed token (tenant, performance, expiry, unique id; key in Key Vault) that middleware checks by signature, with no database read, on addCartLine and acquireInventoryHold from guest channels only (till, kiosk and workstation holds are exempt, amendment of 1 October); activation follows the performance's onSaleFrom/onSaleTo or setWaitingRoomSetting. Done when: with the room on, a guest cart hold without a token is refused 403 admission-required, one with a valid token succeeds, a forged or expired token or one for another performance is refused, a till hold needs no token, and the release rate drops when commerce latency rises."
+   "detail": "ADR-0066 (accepted 1 October; B1, or Block A if an on-sale is booked in Block A): enterWaitingRoom gives a position from a Redis counter with no database write; the static branded waiting page is served from Front Door's cache and polls getWaitingRoomPosition; a release controller admits guests per second from the health of commerce (latency and the 429 rate, ADR-0064); an admitted guest gets a short-lived signed token (tenant, performance, expiry, unique id; key in Key Vault) that middleware checks by signature, with no database read, on addCartLine and acquireInventoryHold from guest channels only (till, kiosk and workstation holds are exempt, amendment of 1 October); activation follows the performance's onSaleFrom/onSaleTo or setWaitingRoomSetting. Done when: with the room on, a guest cart hold without a token is refused 403 admission-required, one with a valid token succeeds, a forged or expired token or one for another performance is refused, a till hold needs no token, and the release rate drops when commerce latency rises.",
+   "module": "Foundation & Setup"
   },
   {
    "key": "EDGE-WAITING-ROOM-LOAD",
@@ -414,7 +433,8 @@
     "EDGE-WAITING-ROOM"
    ],
    "subject": "Load test the waiting room at 30,000 arrivals in the burst environment",
-   "detail": "ADR-0066 item 4, before the first large sale: 30,000 arrivals in the opening seconds against a burst environment (ADR-0035) with the waiting room on, recording position latency, the Front Door cache hit rate, the release rate the controller holds, commerce p95 and 429s, and the relay lag while admitted guests buy (ADR-0058 amendment: 3,500 events a second). Done when: all 30,000 get a position without a database write, admitted guests buy with commerce p95 inside its target, no cart hold succeeds without a token, and the results are recorded against the sizing figures."
+   "detail": "ADR-0066 item 4, before the first large sale: 30,000 arrivals in the opening seconds against a burst environment (ADR-0035) with the waiting room on, recording position latency, the Front Door cache hit rate, the release rate the controller holds, commerce p95 and 429s, and the relay lag while admitted guests buy (ADR-0058 amendment: 3,500 events a second). Done when: all 30,000 get a position without a database write, admitted guests buy with commerce p95 inside its target, no cart hold succeeds without a token, and the results are recorded against the sizing figures.",
+   "module": "Foundation & Setup"
   },
   {
    "key": "ACC-RULE-EVAL",
@@ -426,7 +446,35 @@
     "OFFLINE-BUNDLE"
    ],
    "subject": "One admission rule format, two evaluators: .NET and TypeScript proven equal by shared test vectors",
-   "detail": "ADR-0068 (accepted 1 October; B1, with the scanner): the closed JSON rule format (AdmissionRule, AdmissionCondition; conditionRule on access.dynamic_policy versions) evaluated by validateAccess online in .NET and by the gate offline in TypeScript (packages/offline-core) against the same active policy version that getOfflinePackage carries; each scan_event records the policy version that decided it. Done when: one set of test vectors runs in CI against both evaluators and they agree on every vector, a rule the format cannot express is refused when the policy is saved, and an offline scan and an online scan of the same credential under the same policy version give the same decision."
+   "detail": "ADR-0068 (accepted 1 October; B1, with the scanner): the closed JSON rule format (AdmissionRule, AdmissionCondition; conditionRule on access.dynamic_policy versions) evaluated by validateAccess online in .NET and by the gate offline in TypeScript (packages/offline-core) against the same active policy version that getOfflinePackage carries; each scan_event records the policy version that decided it. Done when: one set of test vectors runs in CI against both evaluators and they agree on every vector, a rule the format cannot express is refused when the policy is saved, and an offline scan and an online scan of the same credential under the same policy version give the same decision.",
+   "module": "Admission & Access Control",
+   "platform": "P07"
+  },
+  {
+   "key": "ACC-UAEPASS-ICP",
+   "epic": "PLATFORM",
+   "points": 8,
+   "pool": "backend",
+   "block": "D",
+   "module": "Accreditation",
+   "platform": "API",
+   "depends": [
+    "PLATFORM-KERNEL"
+   ],
+   "subject": "Identity verification for accreditation: UAE Pass and ICP",
+   "detail": "2 October (Chinmay, DEC-457): UAE Pass sign-in/verification and ICP (Federal Authority for Identity, Citizenship, Customs and Port Security) document checks for accreditation applicants, alongside manual review. Needs client access to both (external dependencies register). Done when: an applicant verified through UAE Pass shows the verified identity on the reviewer workspace, and an ICP check result is recorded on the application."
+  },
+  {
+   "key": "TEST-SAME-NUMBERS",
+   "epic": "PLATFORM",
+   "points": 3,
+   "pool": "frontend",
+   "block": "B",
+   "module": "Reporting & Analytics",
+   "platform": "API",
+   "depends": [],
+   "subject": "Same numbers test: till, back-office and Analytics reports agree",
+   "detail": "2 October (Chinmay, DEC-559, prevention of CHG-FIN-006): an automated comparison of the same measure (takings, gross sales, net revenue, refunds) for the same period and scope on the till report (POS-008), the back-office report and the Analytics (P16) dashboard; fails when they differ. Done when: the test runs in CI against the seeded demo tenant."
   }
  ]
 }

@@ -300,6 +300,12 @@
    "limits"
   ],
   "properties": {
+   "poweredByRemovable": {
+    "type": "boolean",
+    "readOnly": true,
+    "default": false,
+    "description": "**Whether the tenant's licence lets it switch \"Powered by TICVAI\" off** (Chinmay, 2 October, workbook Q160 and the pre-apply round; CHG-CSA-036). False by default; true where TICVAI sold the tenant the add-on keyed `poweredByRemoval` (`addLicenceAddOn`). White label's `setBrandIdentity` refuses `showPoweredBy` false while this is false."
+   },
    "tenantId": {
     "type": "string",
     "format": "uuid"

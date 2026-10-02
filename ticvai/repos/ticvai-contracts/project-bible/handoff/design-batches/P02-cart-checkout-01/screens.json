@@ -14,12 +14,16 @@
   },
   "navigation": {
    "entryFrom": [
-    "GST-001"
+    "GST-001",
+    "GST-027",
+    "GST-041"
    ],
    "inferred": true,
    "exitTo": [
     "GST-001",
-    "GST-002"
+    "GST-002",
+    "GST-010",
+    "GST-028"
    ],
    "fromFlows": true,
    "transitions": [
@@ -27,6 +31,14 @@
      "to": "GST-001",
      "trigger": "Home – Default",
      "provenance": "derived — GST-001 declares entryState.params  and GST-009 holds none of them. The edge carries nothing: GST-009 is opened from GST-001, so this edge is the way back and GST-001 keeps its own state"
+    },
+    {
+     "to": "GST-010",
+     "trigger": "Paid: the booking confirmation",
+     "provenance": "corrected 2 October 2026 (CHG-SGU-020, design-notes correction)",
+     "carries": [
+      "orderId"
+     ]
     },
     {
      "to": "BO-020",
@@ -38,10 +50,18 @@
      "carries": [
       "orderId"
      ]
+    },
+    {
+     "to": "GST-028",
+     "trigger": "It is confirmed with a facility",
+     "provenance": "flow F50 step 2→3",
+     "carries": [
+      "orderId"
+     ]
     }
    ]
   },
-  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement. **`createPayment` added 18 August** — the guest app's payment screen did not declare the operation that takes a payment, and F11 routed food payment through the AI concierge instead. **Card or wallet** (TenderKind `card`, `wallet`, as `createPayment` and flow F11 step 4 say; decided 28 September, audit R080 (a)), **both in base currency, so tender currency equals base currency**; a foreign card is converted by the guest's own issuer at their rate, which is not ours and is not recorded as ours. **Navigation repointed to P15 on 20 August** — the F&B screens it linked to moved out of the back office when the client board was adopted. **Cross-platform navigation removed 24 August**: BO-020. **A till does not navigate to a back office and a guest app does not navigate to either** — those are device handovers, and a flow declares them with `crossesDevice` rather than a screen pretending there is a link. **No 'is this you?' at checkout** (decided 28 September, audit R120 (b)): a verified contact that matches an existing profile attaches the order automatically inside `checkoutCart` (ADR-0045), so `checkGuestCheckoutMatch` and `decideGuestCheckoutMatch` were removed from this screen; only unverified matches go to staff review.\n\n**The step order comes from the published booking flow** (W12, 29 September): `getPublishedBookingFlow` returns the flow the product (or its category, else the venue default for its kind) uses, with its enabled steps in `sortOrder`; this screen renders when that flow has its step and in the order the flow gives. Flow-level settings (`performanceReveal`, `signInAt`, `seatEventDateMode`, `extrasStep`, `quickTour`, `consentQuestionIds`) are read from the flow; venue-wide settings stay on `getTenantConfig` `bookingFlow`.\n\n**29 September.** **W1:** a guest who proved the contact with the code arrives here with it; only the T&Cs tick (and the unticked marketing opt-in, M18-15) remains.",
+  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement. **`createPayment` added 18 August** — the guest app's payment screen did not declare the operation that takes a payment, and F11 routed food payment through the AI concierge instead. **Card or wallet** (TenderKind `card`, `wallet`, as `createPayment` and flow F11 step 4 say; decided 28 September, audit R080 (a)), **both in base currency, so tender currency equals base currency**; a foreign card is converted by the guest's own issuer at their rate, which is not ours and is not recorded as ours. **Navigation repointed to P15 on 20 August** — the F&B screens it linked to moved out of the back office when the client board was adopted. **Cross-platform navigation removed 24 August**: BO-020. **A till does not navigate to a back office and a guest app does not navigate to either** — those are device handovers, and a flow declares them with `crossesDevice` rather than a screen pretending there is a link. **No 'is this you?' at checkout** (decided 28 September, audit R120 (b)): a verified contact that matches an existing profile attaches the order automatically inside `checkoutCart` (ADR-0045), so `checkGuestCheckoutMatch` and `decideGuestCheckoutMatch` were removed from this screen; only unverified matches go to staff review.\n\n**The step order comes from the published booking flow** (W12, 29 September): `getPublishedBookingFlow` returns the flow the product (or its category, else the venue default for its kind) uses, with its enabled steps in `sortOrder`; this screen renders when that flow has its step and in the order the flow gives. Flow-level settings (`performanceReveal`, `signInAt`, `seatEventDateMode`, `extrasStep`, `quickTour`, `consentQuestionIds`) are read from the flow; venue-wide settings stay on `getTenantConfig` `bookingFlow`.\n\n**29 September.** **W1:** a guest who proved the contact with the code arrives here with it; only the T&Cs tick (and the unticked marketing opt-in, M18-15) remains.\n\n**The guest selects the currency and pays in it** (decided 2 October 2026, Chinmay; CHG-FIN-001; reverses the display-only rule, CF-37 and \"payment will be processed in AED\", in favour of option (b) of MoM 10 Aug 2026 4.7, DI-211). The venue lists the currencies a guest may pay in (`VenueSettings.chargeCurrencies`, a subset of the currencies it shows); `listFxRates` with `chargeable=true` returns them, each marked `chargeable`. The selected currency is sent at checkout (`checkoutCart.chargeCurrency`), the rate is locked on the order (`Order.chargeFxRate`, `chargeTotal`, until `chargeRateLockedUntil`), and the payment request goes to the payment partner in that currency. The ledger stays in the venue's base currency, with the rate recorded on the order, the payment and any refund. **Refunds go back in the currency paid**, at the sale rate, so a full refund returns exactly what was charged. A currency the venue shows but does not charge is still an approximate price, marked \"approx.\", with \"You pay in <base currency>\" beside it.\n\n**F&B is paid on its own (decided by Chinmay, 2 October 2026; DEC-052, DEC-071).** When this step pays a guest F&B order (F11 step 4, after `createGuestFnbOrder`), it pays that order alone, with its own receipt; F&B lines never join the ticket cart's one receipt (DI-293 does not apply to F&B) (CHG-SGU-001).",
   "density": "comfortable",
   "pattern": "statusTracker",
   "patternReason": "`getCart` reads one record and nothing reads a population — the screen is about that one thing",
@@ -58,14 +78,9 @@
        "label": "The cart",
        "bindsTo": "Cart",
        "columns": [
-        "Cart.id",
-        "Cart.token",
-        "Cart.venueId",
         "Cart.channel",
-        "Cart.subjectId",
         "Cart.status",
         "Cart.lines",
-        "Cart.conflicts",
         "Cart.subtotal",
         "Cart.discountTotal",
         "Cart.taxTotal",
@@ -77,6 +92,14 @@
        ],
        "operation": "getCart",
        "provenance": "contract orders.yaml GET /carts/{cartId}"
+      },
+      {
+       "kind": "banner",
+       "label": "You pay in",
+       "bindsTo": "Order.chargeTotal",
+       "operation": "checkoutCart",
+       "notes": "After checkout: the amount in the selected currency, the base amount and the rate, and how long the rate holds (`Order.chargeCurrency`, `chargeTotal`, `chargeFxRate`, `chargeRateLockedUntil`; CHG-FIN-001).",
+       "provenance": "contract orders.yaml Order.chargeTotal (CHG-FIN-001, 2 October 2026)"
       },
       {
        "kind": "detailPanel",
@@ -98,7 +121,7 @@
         "BookingFlow.steps"
        ],
        "operation": "getPublishedBookingFlow",
-       "notes": "The steps of the published flow in their `sortOrder`, this one (review and payment) highlighted. A step the flow has turned off is not shown and is skipped by Continue and Back.",
+       "notes": "The steps of the published flow in their `sortOrder`, this one (review and payment) highlighted. A step the flow has turned off is not shown and is skipped by Continue and Back. Drawn in the venue's `BookingFlowSettings.stepIndicator` style; `embedMode` and `singleEventPage` come from the same published settings (CMS-016) (CHG-SGU-022).",
        "provenance": "decided 29 September 2026, W12; CMS-103 Booking Flows"
       },
       {
@@ -109,59 +132,57 @@
        "provenance": "decided 29 September 2026, W1"
       },
       {
+       "kind": "detailPanel",
+       "label": "Read the terms",
+       "bindsTo": "PublishedPolicy",
+       "columns": [
+        "PublishedPolicy.title",
+        "PublishedPolicy.version",
+        "PublishedPolicy.body"
+       ],
+       "operation": "listPublishedPolicies",
+       "notes": "`kind=termsAndConditions`, opened from the T&Cs tick; the version shown is the version the consent records.",
+       "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-2)"
+      },
+      {
        "kind": "toggle",
        "label": "Send me offers and news",
        "operation": "checkoutCart",
        "notes": "**Marketing opt-in beside the T&Cs, never pre-ticked** (M18-15), sent as `marketingConsents[]` on `checkoutCart`, bound to the order and the verified contact and attached to the profile on match.",
        "provenance": "decided 29 September 2026, M18-15"
+      },
+      {
+       "kind": "banner",
+       "label": "Order",
+       "operation": "createOrder",
+       "notes": "The order number once `createOrder` has answered, shown above the payment.",
+       "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
+      },
+      {
+       "kind": "banner",
+       "label": "Checking your payment",
+       "operation": "inquirePaymentStatus",
+       "notes": "Only in the unknown-outcome state: the app asks the provider by itself (`inquirePaymentStatus`) and never offers to pay again.",
+       "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
+      },
+      {
+       "kind": "banner",
+       "label": "Paying a link someone sent you",
+       "operation": "payByLink",
+       "notes": "Only when the app was opened from a payment link (`getPaymentLink`): Pay settles the link (`payByLink`) instead of a cart.",
+       "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
       }
      ]
     },
     {
      "name": "actionBar",
-     "slot": "rowActions",
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Transfer order tickets",
-       "operation": "transferOrderTickets",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Create payment",
+       "label": "Pay",
        "operation": "createPayment",
-       "provenance": "contract orders.yaml POST /payments"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Inquire payment status",
-       "operation": "inquirePaymentStatus",
-       "provenance": "contract orders.yaml POST /payments/{paymentId}/inquiry"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Checkout cart",
-       "operation": "checkoutCart",
-       "provenance": "contract orders.yaml POST /carts/{cartId}/checkout"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Acquire inventory hold",
-       "operation": "addCartLine",
-       "provenance": "contract catalogue.yaml POST /inventory-holds"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Create order",
-       "operation": "createOrder",
-       "provenance": "contract orders.yaml POST /orders"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Pay by link",
-       "operation": "payByLink",
-       "provenance": "contract orders.yaml POST /payment-links/{token}/pay"
+       "notes": "One Pay: checks the cart out (`checkoutCart`, with the T&Cs tick and the opt-in), creates the order (`createOrder`) and takes the payment (`createPayment`). The provider token comes from the gateway, never a form.",
+       "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
       }
      ]
     }
@@ -171,16 +192,10 @@
    "loading": "The review payment, read by `getCart`.",
    "error": "Could not load. Names which read failed and leaves the review payment untouched.",
    "emptyFirstRun": "No review payment yet. Offers Create payment (`createPayment`).",
-   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `getPaymentLink` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**Not available, and the offline banner says why.** A payment needs the gateway, and pretending otherwise takes money nobody can confirm. What was typed stays on screen so nothing is entered twice."
   },
   "apis": [
-   {
-    "operationId": "transferOrderTickets",
-    "contract": "orders",
-    "purpose": "Transfer tickets to another guest",
-    "trigger": "onAction"
-   },
    {
     "operationId": "createPayment",
     "contract": "orders",
@@ -202,14 +217,8 @@
    {
     "operationId": "getCart",
     "contract": "orders",
-    "purpose": "The cart, priced and checked, right now",
+    "purpose": "The cart, priced and checked, right now With the guest session the device already holds: signed in, or the anonymous cart session a visitor gets with the first line (ADR-0045) (decided 2 October 2026 by Chinmay, fix before Block A starts (GFIX-6)).",
     "trigger": "onLoad"
-   },
-   {
-    "operationId": "addCartLine",
-    "contract": "orders",
-    "purpose": "Hold the stock while payment is taken",
-    "trigger": "onAction"
    },
    {
     "operationId": "createOrder",
@@ -235,6 +244,13 @@
     "purpose": "The published booking flow for this product: which steps it has and in what order (W12)",
     "trigger": "onLoad",
     "provenance": "decided 29 September 2026, W12"
+   },
+   {
+    "operationId": "listPublishedPolicies",
+    "contract": "white-label",
+    "purpose": "The current terms and conditions the guest ticks, with their version, readable before sign-in (GFIX-2)",
+    "trigger": "onLoad",
+    "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-2)"
    }
   ],
   "entryState": {
@@ -276,138 +292,21 @@
    "note": "**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified, awaiting the client's design reviewer.** `provenance: designed` because the accepted vocabulary has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
-  "overlays": [
+  "x-ticvai-make-or-break": "M18-15: may a guest-checkout customer be sent marketing on an opt-in taken at checkout (law and the client's marketing policy)? Until the client confirms, the opt-in is shown unticked and nothing is sent without it.",
+  "gaps": [
    {
-    "id": "formAcquireInventoryHold",
-    "component": "modal",
-    "trigger": "Add to cart",
-    "body": "**Collects what `addCartLine` sends before it is called; the cart takes the hold server-side.** Required: `variantId`, `quantity`. Optional: `performanceId`, `seatIds`, `parentLineId`, `attributes`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "AddCartLineRequest",
-    "confirm": {
-     "label": "Add to cart",
-     "operation": "addCartLine"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "id",
-      "channelCapacityId",
-      "requestedUnits",
-      "ttlSeconds",
-      "channel"
-     ]
-    },
-    "provenance": "client-verified"
+    "operation": "transferOrderTickets",
+    "removed": true,
+    "why": "Transfer does not belong on a payment screen; it is GST-014's, after purchase.",
+    "source": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
    },
    {
-    "id": "formCreateOrder",
-    "component": "modal",
-    "trigger": "Create order",
-    "body": "**Collects what `createOrder` sends before it is called.** Required: `id`, `venueId`, `channel`, `lines`, `recordedAt`. Optional: `shiftId`, `subjectId`, `guestLinkId`, `catalogueBundleVersion`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "CreateOrderRequest",
-    "confirm": {
-     "label": "Create order",
-     "operation": "createOrder"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "id",
-      "venueId",
-      "channel",
-      "lines",
-      "recordedAt",
-      "shiftId",
-      "subjectId",
-      "guestLinkId",
-      "catalogueBundleVersion"
-     ]
-    },
-    "provenance": "client-verified"
-   },
-   {
-    "id": "formPayByLink",
-    "component": "modal",
-    "trigger": "Pay by link",
-    "body": "**Collects what `payByLink` sends before it is called.** Required: `providerToken`. Optional: `email`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Pay by link",
-     "operation": "payByLink"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "providerToken",
-      "email"
-     ]
-    },
-    "provenance": "client-verified"
-   },
-   {
-    "id": "formTransferOrderTickets",
-    "component": "modal",
-    "trigger": "Transfer order tickets",
-    "body": "**Collects what `transferOrderTickets` sends before it is called.** Required: `ticketIds`, `recipient`. Optional: `message`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Transfer order tickets",
-     "operation": "transferOrderTickets"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "ticketIds",
-      "recipient",
-      "message"
-     ]
-    },
-    "provenance": "client-verified"
-   },
-   {
-    "id": "formCreatePayment",
-    "component": "modal",
-    "trigger": "Create payment",
-    "body": "**Collects what `createPayment` sends before it is called.** Required: `id`, `orderId`, `tender`, `amount`, `recordedAt`. Optional: `tenderCurrency`, `tenderAmount`, `walletAuthorisationId`, `deviceId`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "CreatePaymentRequest",
-    "confirm": {
-     "label": "Create payment",
-     "operation": "createPayment"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "id",
-      "orderId",
-      "tender",
-      "amount",
-      "recordedAt",
-      "tenderCurrency",
-      "tenderAmount",
-      "walletAuthorisationId",
-      "deviceId"
-     ]
-    },
-    "provenance": "client-verified"
-   },
-   {
-    "id": "formCheckoutCart",
-    "component": "modal",
-    "trigger": "Checkout cart",
-    "body": "**Collects what `checkoutCart` sends before it is called.** Nothing in the body is required. Optional: `subjectId`, `attendees`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Checkout cart",
-     "operation": "checkoutCart"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "subjectId",
-      "attendees"
-     ]
-    },
-    "provenance": "client-verified"
+    "operation": "addCartLine",
+    "removed": true,
+    "why": "The hold was taken when the lines were added on the booking steps; nothing is added on the payment step.",
+    "source": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
    }
   ],
-  "x-ticvai-make-or-break": "M18-15: may a guest-checkout customer be sent marketing on an opt-in taken at checkout (law and the client's marketing policy)? Until the client confirms, the opt-in is shown unticked and nothing is sent without it.",
   "_platform": {
    "code": "P02",
    "audience": "guest",
@@ -454,7 +353,8 @@
   },
   "navigation": {
    "entryFrom": [
-    "GST-001"
+    "GST-001",
+    "GST-009"
    ],
    "inferred": true,
    "exitTo": [
@@ -486,22 +386,16 @@
        "label": "The order",
        "bindsTo": "Order",
        "columns": [
-        "Order.id",
         "Order.orderNumber",
         "Order.channel",
-        "Order.venueId",
-        "Order.scopePath",
         "Order.status",
         "Order.currency",
-        "Order.currencyScale",
         "Order.grossAmount",
         "Order.taxAmount",
         "Order.netAmount",
         "Order.refundedAmount",
-        "Order.totalPriceVariance",
         "Order.lines",
-        "Order.payments",
-        "Order.principalId"
+        "Order.payments"
        ],
        "operation": "getOrder",
        "provenance": "contract orders.yaml GET /orders/{orderId}"
@@ -513,16 +407,23 @@
      "slot": "rowActions",
      "components": [
       {
-       "kind": "primaryButton",
-       "label": "Transfer order tickets",
-       "operation": "transferOrderTickets",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
+       "kind": "secondaryButton",
+       "label": "Resend my tickets",
+       "operation": "reprintOrder",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/reprints"
       },
       {
        "kind": "secondaryButton",
-       "label": "Reprint order",
-       "operation": "reprintOrder",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/reprints"
+       "label": "Transfer tickets",
+       "notes": "Opens Ticket Transfer (WEB-030 on the web, GST-014 in the app), after the tickets.",
+       "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Set a password",
+       "operation": "linkGuestCheckout",
+       "notes": "Offered after a guest checkout: keeps these tickets in an account.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-020, design-notes correction)"
       }
      ]
     }
@@ -532,26 +433,26 @@
    "loading": "The booking confirmation, read by `getOrder`.",
    "error": "Could not load. Names which read failed and leaves the booking confirmation untouched.",
    "emptyFirstRun": "No booking confirmation yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
-   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `getOrder` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "apis": [
    {
-    "operationId": "transferOrderTickets",
-    "contract": "orders",
-    "purpose": "Transfer tickets to another guest",
-    "trigger": "onAction"
-   },
-   {
     "operationId": "getOrder",
     "contract": "orders",
-    "purpose": "Read an order",
+    "purpose": "Read an order With the guest session the device already holds: signed in, or the anonymous cart session a visitor gets with the first line (ADR-0045) (decided 2 October 2026 by Chinmay, fix before Block A starts (GFIX-6)).",
     "trigger": "onLoad"
    },
    {
     "operationId": "reprintOrder",
     "contract": "orders",
     "purpose": "Reprint or resend tickets",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "linkGuestCheckout",
+    "contract": "identity",
+    "purpose": "Set a password: turn the guest-checkout order into an account",
     "trigger": "onAction"
    }
   ],
@@ -580,31 +481,12 @@
   "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "overlays": [
    {
-    "id": "formTransferOrderTickets",
-    "component": "modal",
-    "trigger": "Transfer order tickets",
-    "body": "**Collects what `transferOrderTickets` sends before it is called.** Required: `ticketIds`, `recipient`. Optional: `message`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Transfer order tickets",
-     "operation": "transferOrderTickets"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "ticketIds",
-      "recipient",
-      "message"
-     ]
-    },
-    "provenance": "client-verified"
-   },
-   {
     "id": "formReprintOrder",
     "component": "modal",
-    "trigger": "Reprint order",
-    "body": "**Collects what `reprintOrder` sends before it is called.** Required: `delivery`, `recordedAt`. Optional: `destination`, `lineIds`, `reason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "trigger": "Resend my tickets",
+    "body": "**Where to send them**: email or SMS to the contact on the order, or another address the guest types. `reprintOrder` with `delivery` email or sms; nothing else is asked.",
     "confirm": {
-     "label": "Reprint order",
+     "label": "Send",
      "operation": "reprintOrder"
     },
     "dismiss": {
@@ -617,7 +499,29 @@
       "reason"
      ]
     },
-    "provenance": "client-verified"
+    "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
+   },
+   {
+    "id": "formLinkGuestCheckout",
+    "component": "modal",
+    "trigger": "Set a password",
+    "body": "A password for the account; the order and the verified contact come from the checkout just made.",
+    "confirm": {
+     "label": "Set a password",
+     "operation": "linkGuestCheckout"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "corrected 2 October 2026 (CHG-SGU-020, design-notes correction)"
+   }
+  ],
+  "gaps": [
+   {
+    "operation": "transferOrderTickets",
+    "removed": true,
+    "why": "The tickets are the primary action here (wallet, resend); transfer is WEB-030's, opened from My Tickets.",
+    "source": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
    }
   ],
   "_platform": {
@@ -682,7 +586,8 @@
     "GST-001",
     "GST-002",
     "GST-042",
-    "GST-059"
+    "GST-059",
+    "GST-009"
    ],
    "transitions": [
     {
@@ -704,6 +609,16 @@
      "to": "GST-059",
      "trigger": "They follow it through the day",
      "provenance": "flow F49 step 5→6"
+    },
+    {
+     "to": "GST-009",
+     "trigger": "Checkout",
+     "provenance": "corrected 2 October 2026 (CHG-SGU-020, design-notes correction)",
+     "carries": [
+      "orderId",
+      "paymentId",
+      "token"
+     ]
     }
    ]
   },
@@ -724,14 +639,9 @@
        "label": "The cart",
        "bindsTo": "Cart",
        "columns": [
-        "Cart.id",
-        "Cart.token",
-        "Cart.venueId",
         "Cart.channel",
-        "Cart.subjectId",
         "Cart.status",
         "Cart.lines",
-        "Cart.conflicts",
         "Cart.subtotal",
         "Cart.discountTotal",
         "Cart.taxTotal",
@@ -745,26 +655,9 @@
        "provenance": "contract orders.yaml GET /carts/{cartId}"
       },
       {
-       "kind": "dataTable",
-       "label": "Every product variant",
-       "bindsTo": "ProductVariant",
-       "columns": [
-        "ProductVariant.id",
-        "ProductVariant.productId",
-        "ProductVariant.sku",
-        "ProductVariant.axisValues",
-        "ProductVariant.name",
-        "ProductVariant.barcode",
-        "ProductVariant.isDefault",
-        "ProductVariant.isActive"
-       ],
-       "operation": "listProductVariants",
-       "provenance": "contract catalogue.yaml GET /products/{productId}/variants"
-      },
-      {
        "kind": "cardList",
        "label": "Visit date per line",
-       "notes": "`Performance.startsAt` on each line (the match date for a fixture).",
+       "notes": "Each line: the variant's name (`listProductVariants`), its visit date (`Performance.startsAt`, the match date for a fixture), quantity and price.",
        "operation": "getPerformance",
        "provenance": "decided 29 September, rev 3 23SEP-9"
       },
@@ -778,6 +671,20 @@
        "operation": "getPublishedBookingFlow",
        "notes": "The steps of the published flow in their `sortOrder`, this one (basket) highlighted. A step the flow has turned off is not shown and is skipped by Continue and Back.",
        "provenance": "decided 29 September 2026, W12; CMS-103 Booking Flows"
+      },
+      {
+       "kind": "numberField",
+       "label": "Quantity",
+       "operation": "updateCartLine",
+       "notes": "A stepper on each line; each change saves at once (`updateCartLine`).",
+       "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
+      },
+      {
+       "kind": "cardList",
+       "label": "Lines",
+       "operation": "listProductVariants",
+       "notes": "One row per line with the variant's guest name and a stepper; inactive variants are never shown.",
+       "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
       }
      ]
     },
@@ -806,14 +713,8 @@
      "slot": "rowActions",
      "components": [
       {
-       "kind": "primaryButton",
-       "label": "Checkout cart",
-       "operation": "checkoutCart",
-       "provenance": "contract orders.yaml POST /carts/{cartId}/checkout"
-      },
-      {
        "kind": "destructiveButton",
-       "label": "Abandon cart",
+       "label": "Empty cart",
        "operation": "abandonCart",
        "provenance": "contract orders.yaml DELETE /carts/{cartId}"
       },
@@ -825,21 +726,23 @@
       },
       {
        "kind": "secondaryButton",
-       "label": "Extend cart",
+       "label": "More time",
        "operation": "extendCart",
-       "provenance": "contract orders.yaml POST /carts/{cartId}/extend"
+       "provenance": "contract orders.yaml POST /carts/{cartId}/extend",
+       "notes": "Beside the countdown (`Cart.expiresAt`, the one clock the guest sees); `extendCart` up to `maxExtensions` times."
       },
       {
        "kind": "destructiveButton",
-       "label": "Remove cart line",
+       "label": "Remove",
        "operation": "removeCartLine",
        "provenance": "contract orders.yaml DELETE /carts/{cartId}/lines/{lineId}"
       },
       {
-       "kind": "secondaryButton",
-       "label": "Save cart line",
-       "operation": "updateCartLine",
-       "provenance": "contract orders.yaml PATCH /carts/{cartId}/lines/{lineId}"
+       "kind": "primaryButton",
+       "label": "Checkout",
+       "operation": "checkoutCart",
+       "notes": "Checks the cart out (`checkoutCart`) and moves on to Review & Payment.",
+       "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
       }
      ]
     }
@@ -849,7 +752,7 @@
    "loading": "Terminal or gateway state, shown plainly",
    "error": "**Declined reads differently from unresolved.** An unresolved payment inquires rather than retries, and nothing is issued until it resolves",
    "emptyFirstRun": "—",
-   "emptyNoResults": "Never shown: `listProductVariants` takes no filter, so an empty list is always the first-run state above.",
+   "emptyNoResults": "Never shown: the basket has no filter; an empty basket is the first-run state.",
    "emptyNoAccess": "**This is the checkout page, and it is where identity is settled** (ADR-0045, 18 September 2026). An unverified or anonymous guest is not turned away — they are offered sign-in or, where the site's `guestCheckout` is on, the one-time code. The cart stays intact either way; `checkoutCart` is what refuses.",
    "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
@@ -866,7 +769,7 @@
    {
     "operationId": "getCart",
     "contract": "orders",
-    "purpose": "The cart, priced and checked, right now",
+    "purpose": "The cart, priced and checked, right now With the guest session the device already holds: signed in, or the anonymous cart session a visitor gets with the first line (ADR-0045) (decided 2 October 2026 by Chinmay, fix before Block A starts (GFIX-6)).",
     "trigger": "onLoad"
    },
    {
@@ -920,7 +823,7 @@
    {
     "operationId": "getResourceHold",
     "contract": "resources",
-    "purpose": "The countdown of a spot held on the venue map",
+    "purpose": "The countdown of a spot held on the venue map With the guest session the device already holds: signed in, or the anonymous cart session a visitor gets with the first line (ADR-0045) (decided 2 October 2026 by Chinmay, fix before Block A starts (GFIX-6)).",
     "trigger": "onInterval"
    },
    {
@@ -979,50 +882,15 @@
    {
     "id": "confirmAbandonCart",
     "component": "confirmDialog",
-    "trigger": "Abandon cart",
+    "trigger": "Empty cart",
     "body": "**Names what `abandonCart` changes and what it leaves alone**, in the consequence rather than the verb. A checkout entry this affects should be identified in the dialog, not just counted.",
     "provenance": "client-verified"
    },
    {
     "id": "confirmRemoveCartLine",
     "component": "confirmDialog",
-    "trigger": "Remove cart line",
+    "trigger": "Remove",
     "body": "**Names what `removeCartLine` changes and what it leaves alone**, in the consequence rather than the verb. A checkout entry this affects should be identified in the dialog, not just counted.",
-    "provenance": "client-verified"
-   },
-   {
-    "id": "formUpdateCartLine",
-    "component": "modal",
-    "trigger": "Save cart line",
-    "body": "**Collects what `updateCartLine` sends before it is called.** Required: `quantity`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Save cart line",
-     "operation": "updateCartLine"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "quantity"
-     ]
-    },
-    "provenance": "client-verified"
-   },
-   {
-    "id": "formCheckoutCart",
-    "component": "modal",
-    "trigger": "Checkout cart",
-    "body": "**Collects what `checkoutCart` sends before it is called.** Nothing in the body is required. Optional: `subjectId`, `attendees`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Checkout cart",
-     "operation": "checkoutCart"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "subjectId",
-      "attendees"
-     ]
-    },
     "provenance": "client-verified"
    }
   ],

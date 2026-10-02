@@ -1,0 +1,105 @@
+{
+ "about": "P04 POS: the screens whose view changed in the POS v2 build (TICVAI POS Terminal (3).html, 1 October 2026, kept as sources/designs/TICVAI_POS_Terminal_v2.html and out of git: 9.7 MB). v2 is OUR improved version of the client-approved terminal (sources/designs/TICVAI_POS_Terminal_client_approved.html) and is NOT client-approved, so tools/applied/pos-v2-1-october.py imports these frames as provenance designed, status review, with a wireframe.candidate block; the approved prototype block stays. Screens whose view did not change beyond the shared chrome (the F1-F7 function bar, the Bookings rail item, the on-shift timer, the cart's Reserve and Proceed to payment) keep their client-verified approved frame: POS-007, 008, 011, 013, 014, 016, 020, 026, 027. The V2-* entries are views with no P04 screen (journal, cart history, group reservations, the shift management panel, the reserve, experience-builder and annual-pass dialogs): captured for review only; the import script skips them. The four dialogs (V2-NEWRES, V2-RESERVE, V2-BUILDER, V2-PASS) open outside the device frame in headless capture and stay in the manifest's missing list. Every screen signs in (any operator, PIN 1234) and opens the shift; the terminal is the 1620 x 1080 device frame, the screen designer panel beside it is outside the capture. P15 has no view in either build.",
+ "prototype": "sources/designs/TICVAI_POS_Terminal_v2.html",
+ "caption": "POS v2 build, ours, not client-approved (1 Oct 2026)",
+ "imgBase": "frames/img/",
+ "viewport": {"width": 2200, "height": 1400},
+ "frame": {"width": 1620, "height": 1080, "inset": 0},
+ "maxBytes": 250000,
+ "loadWait": 6000,
+ "stepWait": 700,
+ "setup": [{"click": "1"}, {"click": "2"}, {"click": "3"}, {"click": "4"}, {"click": "Continue to float count"}, {"wait": 800}, {"clickContains": "Open shift"}, {"wait": 1200}],
+ "screens": [
+  {"id": "POS-000", "name": "Sign In", "view": "Opens here: venue co-branding (Ferrari World), recent cashiers four at a time with their last shift, cashier-ID entry, PIN or password", "noSetup": true,
+   "steps": [],
+   "expect": ["Sign in to shift", "Ferrari World", "RECENT CASHIERS", "Enter cashier ID", "4-digit PIN", "Password", "Badge / RFID"]},
+
+  {"id": "POS-001", "name": "Begin Shift", "view": "Sign in -> 'Continue to float count' -> 'STEP 2 OF 2 · SHIFT OPENING' (eleven denominations, typed or tapped, with the hardware check running beside the count)", "noSetup": true,
+   "steps": [{"click": "1"}, {"click": "2"}, {"click": "3"}, {"click": "4"}, {"click": "Continue to float count"}, {"wait": 2500}],
+   "expect": ["Count the opening float", "AED 1,000", "50 fils", "25 fils", "Hardware status", "Re-run"]},
+
+  {"id": "POS-025", "name": "Till Home", "view": "After 'Open shift & start selling', or left rail 'Home': the F1-F7 function bar replaces the home hot keys; the KPI tiles drill into the Sales journal",
+   "steps": [],
+   "expect": ["Sales board", "Scan ticket", "Recall held", "Reservations", "Encode tickets", "Sales journal", "SHIFT SALES", "Recent transactions"]},
+
+  {"id": "POS-002", "name": "Sell — Ticket Catalogue", "view": "Left rail 'Tickets', with a timed ticket added (Aqua Park · Day Pass, 12:00, two adults and a child, add-ons dialog continued): REFINE chips, availability on each card, On now / Builder / Scan, the cart with the inventory hold, Reserve and Proceed to payment",
+   "steps": [{"click": "Tickets"}, {"click": "Aqua Park · Day Pass"}, {"wait": 800}, {"click": "12:00 PM"}, {"wait": 400}, {"click": "+"}, {"click": "+"}, {"click": "+", "nth": 1}, {"wait": 400}, {"click": "Add to sale"}, {"wait": 800}, {"click": "Continue to cart"}, {"wait": 600}],
+   "expect": ["Ticketing & attractions", "REFINE", "Builder", "Next slot", "Inventory held", "Aqua Park · Adult", "Reserve", "Proceed to payment"]},
+
+  {"id": "POS-003", "name": "Sell — Timed Entry", "view": "Tickets -> 'Aqua Park · Day Pass' -> drawer: business date, the entry-slot grid with what is left per slot (12:00 PM picked), guests by ticket type (two adults, one child)",
+   "steps": [{"click": "Tickets"}, {"click": "Aqua Park · Day Pass"}, {"wait": 800}, {"click": "12:00 PM"}, {"wait": 400}, {"click": "+"}, {"click": "+"}, {"click": "+", "nth": 1}, {"wait": 400}],
+   "expect": ["TICKET VARIANTS", "BUSINESS DATE", "ENTRY SLOT", "LEFT", "GUESTS BY TICKET TYPE", "Add to sale"]},
+
+  {"id": "POS-004", "name": "Sell — Seat Map", "view": "Tickets -> 'Pluma Circus · Reserved' -> drawer -> 'Choose date & time' -> 3:00 PM -> section map -> section 103 (seats, with held and sold seats)",
+   "steps": [{"click": "Tickets"}, {"click": "Pluma Circus · Reserved"}, {"wait": 800}, {"click": "Choose date & time"}, {"wait": 800}, {"click": "3:00 PM"}, {"wait": 800}, {"click": "103"}, {"wait": 800}],
+   "expect": ["Pluma Circus · Reserved", "Section 103", "STAGE THIS WAY", "On hold", "Sold / occupied", "Add to sale"]},
+
+  {"id": "POS-005", "name": "Payment", "view": "Cart 'Proceed to payment' (the POS-002 sale): tenders, cash keypad; a split is taken on the tender itself ('Add to split', 'Half'), there is no Split payment tender",
+   "steps": [{"click": "Tickets"}, {"click": "Aqua Park · Day Pass"}, {"wait": 800}, {"click": "12:00 PM"}, {"wait": 400}, {"click": "+"}, {"click": "+"}, {"click": "+", "nth": 1}, {"wait": 400}, {"click": "Add to sale"}, {"wait": 800}, {"click": "Continue to cart"}, {"wait": 600}, {"clickContains": "Proceed to payment"}, {"wait": 1200}],
+   "expect": ["Payment", "Select payment method", "Add to split", "Half", "Amount due", "AED 687.75"]},
+
+  {"id": "POS-006", "name": "Held Orders", "view": "Cart 'Hold sale', then F2 'Recall held' -> 'Held sales' screen (was a modal): parked value, every line in full, Recall into sale / Print hold slip / Discard hold",
+   "steps": [{"click": "Tickets"}, {"click": "Aqua Park · Day Pass"}, {"wait": 800}, {"click": "12:00 PM"}, {"wait": 400}, {"click": "+"}, {"click": "+"}, {"click": "+", "nth": 1}, {"wait": 400}, {"click": "Add to sale"}, {"wait": 800}, {"click": "Continue to cart"}, {"wait": 600}, {"click": "Hold sale"}, {"wait": 800}, {"click": "Recall held"}, {"wait": 1000}],
+   "expect": ["Held sales", "PARKED VALUE", "HLD-0044", "Recall into sale", "Print hold slip", "Discard hold"]},
+
+  {"id": "POS-012", "name": "Omnichannel Order & Fulfilment Center", "view": "Left rail 'F&B' -> 'Loaded Fries' -> cart order type 'Delivery' (four order types: Dine-in, Quick service, Takeaway, Delivery) + left rail 'Queue'",
+   "steps": [{"click": "F&B"}, {"wait": 600}, {"click": "Loaded Fries"}, {"wait": 800}, {"click": "Delivery"}, {"wait": 800}],
+   "expect": ["Food & beverage", "Dine-in", "Quick", "Takeaway", "Delivery", "Loaded Fries"]},
+
+  {"id": "POS-021", "name": "Sell — Food & Drink", "view": "Left rail 'F&B' (category tabs with counts, REFINE chips, Quick service order type)",
+   "steps": [{"click": "F&B"}, {"wait": 800}],
+   "expect": ["Food & beverage", "Popular", "Mains", "Desserts", "REFINE", "Marina Smash Burger"]},
+
+  {"id": "POS-022", "name": "Send to Kitchen", "view": "Left rail 'Queue' -> partner order DLV-8842 'Send to kitchen' (it moves to Preparing; the guest status board above shows takeaway and quick-service numbers only, never partner, delivery or dine-in orders)",
+   "steps": [{"click": "Queue"}, {"wait": 800}, {"click": "Send to kitchen"}, {"wait": 1000}],
+   "expect": ["Delivery & takeaway queue", "GUEST STATUS BOARD", "Send to kitchen", "DLV-8845", "Prepaid via Talabat"]},
+
+  {"id": "POS-023", "name": "Sell — Merchandise", "view": "Left rail 'Retail' (category tabs incl. Lockers, REFINE chips)",
+   "steps": [{"click": "Retail"}, {"wait": 800}],
+   "expect": ["Retail", "Apparel", "Souvenirs", "Lockers", "REFINE"]},
+
+  {"id": "POS-028", "name": "Table Service", "view": "Left rail 'Tables' -> 'Table service': halls (Main Hall, Terrace, Majlis rooms), the plan drawn to scale, status filters, the hall's table list with Seat & order / Recall check / Settle bill / Seat booking",
+   "steps": [{"click": "Tables"}, {"wait": 1000}],
+   "expect": ["Oasis Bistro floor plan", "Main Hall", "Terrace", "Majlis rooms", "drawn to scale", "Bill requested", "Seat booking"]},
+
+  {"id": "POS-029", "name": "Order Queue", "view": "Left rail 'Queue': stage counts, the guest status board (order numbers only, mirrors the kitchen display), takeaway, partner, dine-in, delivery and quick-service orders",
+   "steps": [{"click": "Queue"}, {"wait": 1000}],
+   "expect": ["Delivery & takeaway queue", "GUEST STATUS BOARD", "READY FOR PICKUP", "Quick service", "Served to table", "Hand over to guest"]},
+
+  {"id": "V2-JOURNAL", "name": "Sales journal (no P04 screen)", "view": "F7 'Sales journal' -> first row expanded (line items, transaction status, Reprint receipt / Email tax invoice / Refund or void)",
+   "steps": [{"click": "Sales journal"}, {"wait": 800}, {"click": "TCK-240820-0231"}, {"wait": 800}],
+   "expect": ["Sales journal", "GROSS VALUE", "SETTLEMENT", "Pay status", "TRANSACTION STATUS", "Email tax invoice", "Refund or void", "CSV", "Excel"]},
+
+  {"id": "V2-CARTHIST", "name": "Cart history (no P04 screen)", "view": "Cart 'History' -> 'Cart history': completed sales on this terminal by day; a row opens Reload this cart / Reprint receipt / Email tax invoice",
+   "steps": [{"click": "Tickets"}, {"wait": 600}, {"click": "History"}, {"wait": 800}, {"click": "TCK-240820-0230"}, {"wait": 800}],
+   "expect": ["Cart history", "Yesterday", "All days", "AVG BASKET", "Reload this cart", "Email tax invoice"]},
+
+  {"id": "V2-SHIFT", "name": "Shift management panel (no P04 screen of its own)", "view": "Top bar 'On shift' pill -> 'Shift Management': current shift (terminal, start, elapsed), Clock In & Open Lane / Clock Out, shift statistics, the cash drawer with expected in drawer and takings so far, shift history, End Shift & Declare Cash",
+   "steps": [{"clickContains": "On shift"}, {"wait": 1000}],
+   "expect": ["Shift Management", "CURRENT SHIFT", "Clock Out", "Expected in Drawer", "End Shift & Declare Cash"]},
+
+  {"id": "V2-GROUPS", "name": "Reservations / group bookings (no P04 screen)", "view": "Left rail 'Bookings' (F5 'Reservations') -> Emirates Scouts · Troop 7: tickets encoded inactive, deposit paid, balance due, Take payment with Activate all on payment",
+   "steps": [{"click": "Bookings"}, {"wait": 800}, {"click": "Emirates Scouts · Troop 7"}, {"wait": 1000}],
+   "expect": ["Reservations", "New reservation", "Partially Paid", "VALID AT GATES", "BALANCE DUE", "Set active", "Activate all on payment", "Take payment"]},
+
+  {"id": "V2-GROUPS-ENCODE", "name": "Reservations: encode a confirmed booking (no P04 screen)", "view": "Left rail 'Bookings' -> Al Noor International School (confirmed, unpaid, not encoded): encode tickets as Inactive (pay on arrival) or Active (prepaid)",
+   "steps": [{"click": "Bookings"}, {"wait": 1000}],
+   "expect": ["Al Noor International School", "Encode tickets as", "Inactive", "Pay on arrival", "Prepaid", "Encode & print 55 tickets"]},
+
+  {"id": "V2-NEWRES", "name": "New group reservation dialog (no P04 screen)", "view": "Bookings -> 'New reservation': customer or group, contact, visit date, entry slot, adults and children, Tentative (48 h hold, no encoding) or Confirmed",
+   "steps": [{"click": "Bookings"}, {"wait": 800}, {"clickContains": "New reservation"}, {"wait": 1000}],
+   "expect": ["GROUP RESERVATION", "New reservation", "ENTRY SLOT", "RESERVATION STATUS", "Tentative", "Confirmed", "Create tentative reservation"]},
+
+  {"id": "V2-RESERVE", "name": "Reserve this sale dialog (no P04 screen)", "view": "Cart 'Reserve' (the POS-002 sale): customer, mobile or email, visit date, note, Tentative (hold for 24/48/72 h) or Confirmed (pay on arrival)",
+   "steps": [{"click": "Tickets"}, {"click": "Aqua Park · Day Pass"}, {"wait": 800}, {"click": "12:00 PM"}, {"wait": 400}, {"click": "+"}, {"click": "+"}, {"click": "+", "nth": 1}, {"wait": 400}, {"click": "Add to sale"}, {"wait": 800}, {"click": "Continue to cart"}, {"wait": 600}, {"click": "Reserve"}, {"wait": 800}],
+   "expect": ["RESERVATION · NO PAYMENT", "Reserve this sale", "HOLD FOR", "48 h", "Payment status · Unpaid", "Reserve · no payment"]},
+
+  {"id": "V2-BUILDER", "name": "Experience builder dialog (no P04 screen)", "view": "Tickets -> 'Builder' -> 'Design the guest's experience' (visit type, guests, extras, packages)",
+   "steps": [{"click": "Tickets"}, {"wait": 600}, {"click": "Builder"}, {"wait": 1000}],
+   "expect": ["Design the guest's experience", "Visit type", "Guests", "Extras", "Packages", "Full Marina Bay Experience"]},
+
+  {"id": "V2-PASS", "name": "Annual pass enrolment dialog (no P04 screen)", "view": "Tickets -> Passes -> 'Annual Pass · Family of 4' -> 'Annual pass enrolment' (holders, photo & ID, validity & card, review)",
+   "steps": [{"click": "Tickets"}, {"click": "Passes"}, {"wait": 600}, {"click": "Annual Pass · Family of 4"}, {"wait": 1000}],
+   "expect": ["ANNUAL PASS ENROLMENT", "Pass holders", "Photo & ID", "Validity & card", "DATE OF BIRTH", "NATIONALITY"]}
+ ]
+}

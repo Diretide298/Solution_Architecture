@@ -56,6 +56,25 @@
   "requestBody": null,
   "responds": "ResourceBooking"
  },
+ "createInspectionTemplate": {
+  "method": "POST",
+  "path": "/inspection-templates",
+  "contract": "maintenance",
+  "summary": "Create an inspection template",
+  "permission": "INSPECTION_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "InspectionTemplate",
+  "responds": "InspectionTemplate"
+ },
  "createResourceBlock": {
   "method": "POST",
   "path": "/resource-blocks",
@@ -304,6 +323,19 @@
   "requestBody": null,
   "responds": "Page"
  },
+ "listInspectionTemplates": {
+  "method": "GET",
+  "path": "/inspection-templates",
+  "contract": "maintenance",
+  "summary": "List inspection templates",
+  "permission": "INSPECTION_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "InspectionTemplate"
+ },
  "listInspections": {
   "method": "GET",
   "path": "/inspections",
@@ -426,14 +458,14 @@
   "requestBody": null,
   "responds": "Resource"
  },
- "recordRentalInspection": {
-  "method": "POST",
-  "path": "/rental-bookings/{bookingId}/inspection",
-  "contract": "rental",
-  "summary": "Condition before or after, with evidence",
-  "permission": "RENTAL_OPERATE",
-  "offlineCapable": true,
-  "conflictPolicy": "append",
+ "releaseResourceBlock": {
+  "method": "DELETE",
+  "path": "/resource-blocks/{blockId}",
+  "contract": "resources",
+  "summary": "Put it back into service",
+  "permission": "RESOURCE_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -442,8 +474,8 @@
     "required": null
    }
   ],
-  "requestBody": "RentalInspection",
-  "responds": "RentalInspection"
+  "requestBody": null,
+  "responds": null
  },
  "returnRental": {
   "method": "POST",

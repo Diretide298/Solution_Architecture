@@ -20,7 +20,6 @@
    "inferred": true,
    "exitTo": [
     "GST-001",
-    "GST-002",
     "GST-013"
    ],
    "transitions": [
@@ -82,25 +81,21 @@
        "provenance": "contract access.yaml GET /guests/me/entitlements"
       },
       {
-       "kind": "dataTable",
-       "label": "Every entitlement",
+       "kind": "cardList",
+       "label": "My tickets",
        "bindsTo": "Entitlement",
        "columns": [
-        "Entitlement.id",
-        "Entitlement.templateId",
         "Entitlement.productId",
-        "Entitlement.orderId",
-        "Entitlement.orderLineId",
-        "Entitlement.subjectId",
-        "Entitlement.venueId",
-        "Entitlement.scopePath",
-        "Entitlement.mediaCode",
-        "Entitlement.status",
-        "Entitlement.statusNote",
-        "Entitlement.validFrom"
+        "Entitlement.validFrom",
+        "Entitlement.validTo",
+        "Entitlement.lifecycleLabel",
+        "Entitlement.entriesUsed",
+        "Entitlement.entriesAllowed",
+        "Entitlement.holderName"
        ],
        "operation": "listMyEntitlements",
-       "provenance": "contract access.yaml GET /guests/me/entitlements"
+       "provenance": "corrected 2 October 2026 (CHG-SGU-021, design-notes correction)",
+       "notes": "One list with tabs, Upcoming and Past: the product, the date, the status in plain words, entries left and the code on opening. No ids, scope, template or order line."
       },
       {
        "kind": "dataTable",
@@ -110,25 +105,21 @@
        "provenance": "contract access.yaml GET /entitlements/{entitlementId}/history"
       },
       {
-       "kind": "dataTable",
-       "label": "Every entitlement",
+       "kind": "cardList",
+       "label": "Past",
        "bindsTo": "Entitlement",
        "columns": [
-        "Entitlement.id",
-        "Entitlement.templateId",
         "Entitlement.productId",
-        "Entitlement.orderId",
-        "Entitlement.orderLineId",
-        "Entitlement.subjectId",
-        "Entitlement.venueId",
-        "Entitlement.scopePath",
-        "Entitlement.mediaCode",
-        "Entitlement.status",
-        "Entitlement.statusNote",
-        "Entitlement.validFrom"
+        "Entitlement.validFrom",
+        "Entitlement.validTo",
+        "Entitlement.lifecycleLabel",
+        "Entitlement.entriesUsed",
+        "Entitlement.entriesAllowed",
+        "Entitlement.holderName"
        ],
        "operation": "listEntitlements",
-       "provenance": "contract access.yaml GET /my/entitlements/all"
+       "provenance": "corrected 2 October 2026 (CHG-SGU-021, design-notes correction)",
+       "notes": "The Past tab of the same list."
       }
      ]
     },
@@ -415,10 +406,10 @@
       },
       {
        "kind": "detailPanel",
-       "label": "Entitlement credential",
+       "label": "Show code",
        "operation": "getEntitlementCredential",
-       "notes": "Shows `mediaCode`, `payload`, `expiresAt` from `getEntitlementCredential`'s inline response. **The response has no named schema**, so this cannot bind until the contract names one. **A rotating code derived on the device** (decided 28 September, audit R230): while online the screen fetches `rotation` (secret, `timeStepSeconds`, `digits`, `algorithm`, valid `validFrom` to `validTo`) and computes the current code from the seed and the clock, with a visible countdown to the next step; it keeps rotating with no signal. A null `rotation` (wristband, wallet pass) shows the static code.",
-       "provenance": "contract access.yaml GET /entitlements/{entitlementId}/credential"
+       "notes": "The primary act on a ticket: the code, full screen and bright (F50 step 5). Transfer is secondary.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-021, design-notes correction)"
       },
       {
        "kind": "dataTable",
@@ -434,7 +425,7 @@
      "slot": "rowActions",
      "components": [
       {
-       "kind": "primaryButton",
+       "kind": "secondaryButton",
        "label": "Transfer order tickets",
        "operation": "transferOrderTickets",
        "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
@@ -894,11 +885,11 @@
     }
    ]
   },
-  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement. Order History. **`transferOrderTickets` was the only declared operation**, which is not history. Raised by Pranay. **Rewired on the 20 August review.** **`listMyOrders` wired 24 August, raised in review.** The staff-scoped list was on this guest screen — **a guest-facing list must be scoped to the caller, not filtered by a subject parameter**, or a guest is one parameter away from somebody else’s. **Renamed 31 August** from *Order History (Wallet)*. **A guest surface is one product with two renderings** — a screen named differently on web and app is two screens to a developer and one journey to a guest. **Cross-surface parity, 31 August**: added transferOrderTickets. **A guest does not know which surface they are on** — the same named screen on web and app now calls the same guest-callable operations.",
+  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement. Order History. **`transferOrderTickets` was the only declared operation**, which is not history. Raised by Pranay. **Rewired on the 20 August review.** **`listMyOrders` wired 24 August, raised in review.** The staff-scoped list was on this guest screen — **a guest-facing list must be scoped to the caller, not filtered by a subject parameter**, or a guest is one parameter away from somebody else’s. **Renamed 31 August** from *Order History (Wallet)*. **A guest surface is one product with two renderings** — a screen named differently on web and app is two screens to a developer and one journey to a guest. **Cross-surface parity, 31 August**: added transferOrderTickets. **A guest does not know which surface they are on** — the same named screen on web and app now calls the same guest-callable operations.\n\n**Tax documents, as the UAE requires them** (research 2 October 2026, CHG-FIN-011; Executive Regulation Art. 59-60): the document a paid order gets is titled \"Tax Invoice\" (a simplified tax invoice for a guest, a full one with the buyer's name, address and TRN on request), never \"Receipt\" or \"VAT receipt\" as the title, and a correction is a \"Tax Credit Note\" (the contract calls it a credit memo). A simplified tax invoice is issued automatically when the order is paid; a full one is offered for a VAT-registered buyer and is the only kind above AED 10,000 for them. Amounts and VAT are in AED; a guest who paid in another currency sees the amount paid, the currency and the rate as payment information (CHG-FIN-001). A refund shows where the money went and in which currency: \"USD 81.72 back to your Visa ending 4417\" (CHG-FIN-001).",
   "density": "comfortable",
   "pattern": "listDetail",
   "patternReason": "`listOrders` reads the population and `getOrder` reads one of them — list, select, act",
-  "purpose": "Find order history (wallet) for this venue.",
+  "purpose": "My orders at this venue, with their tax documents; transfer tickets or ask for a refund from here.",
   "layout": {
    "template": "split",
    "regions": [
@@ -921,6 +912,34 @@
        "operation": "listMyOrders",
        "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)",
        "notes": "Was the generated table 'Every order'; staff and plumbing columns removed (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3))."
+      },
+      {
+       "kind": "cardList",
+       "label": "Tax invoices",
+       "operation": "listTaxInvoices",
+       "notes": "The VAT receipt (simplified tax invoice) and any full tax invoice for the order, with its number.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction finance-insights GST-019)"
+      },
+      {
+       "kind": "cardList",
+       "label": "Tax credit notes",
+       "operation": "listCreditMemos",
+       "notes": "Any tax credit note issued after a refund (DEC-086).",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction finance-insights GST-019)"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The tax invoice",
+       "bindsTo": "FinTaxInvoice",
+       "operation": "getTaxInvoice",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction finance-insights GST-019)"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Download or email the PDF",
+       "operation": "getTaxDocumentRendition",
+       "notes": "Opens or sends the PDF in the template's languages.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction finance-insights GST-019)"
       }
      ]
     },
@@ -942,11 +961,27 @@
         "Order.netAmount",
         "Order.refundedAmount",
         "Order.lines",
-        "Order.payments"
+        "Order.payments",
+        "Order.chargeCurrency",
+        "Order.chargeTotal",
+        "Order.chargeFxRate"
        ],
        "operation": "getOrder",
        "provenance": "contract orders.yaml GET /orders/{orderId}",
        "notes": "The selected order: lines, totals, payments and status."
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "secondaryButton",
+       "label": "Get a tax invoice",
+       "operation": "issueTaxInvoice",
+       "notes": "Issues a full invoice and shows its number; if the order is already on an invoice, says so and shows it rather than an error.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction finance-insights GST-019)"
       }
      ]
     }
@@ -1065,6 +1100,22 @@
     "source": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
    }
   ],
+  "overlays": [
+   {
+    "id": "formIssueTaxInvoice",
+    "component": "modal",
+    "trigger": "Get a tax invoice",
+    "body": "The company name and TRN to put on the invoice, and where to email it; the order is the one selected and the invoice type is full.",
+    "confirm": {
+     "label": "Get a tax invoice",
+     "operation": "issueTaxInvoice"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction finance-insights GST-019)"
+   }
+  ],
   "_platform": {
    "code": "P02",
    "audience": "guest",
@@ -1149,6 +1200,12 @@
        ],
        "operation": "getWishlist",
        "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}/wishlist"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Browse",
+       "notes": "Shown when the list is empty: saving is done with the heart on the product and date cards (WEB-005, WEB-006, GST-004), never by typing an id here.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)"
       }
      ]
     },
@@ -1157,16 +1214,17 @@
      "slot": "rowActions",
      "components": [
       {
-       "kind": "primaryButton",
-       "label": "Add to wishlist",
-       "operation": "addToWishlist",
-       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/wishlist"
-      },
-      {
        "kind": "destructiveButton",
        "label": "Remove from wishlist",
        "operation": "removeFromWishlist",
        "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/wishlist/{itemId}"
+      },
+      {
+       "kind": "toast",
+       "label": "Removed. Undo",
+       "operation": "addToWishlist",
+       "notes": "The 5-second Undo after Remove; re-saves the same entry.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)"
       }
      ]
     }
@@ -1178,25 +1236,6 @@
     "component": "confirmDialog",
     "trigger": "Remove from wishlist",
     "body": "**Names what `removeFromWishlist` changes and what it leaves alone**, in the consequence rather than the verb. A saved items wishlist this affects should be identified in the dialog, not just counted.",
-    "provenance": "client-verified"
-   },
-   {
-    "id": "formAddToWishlist",
-    "component": "modal",
-    "trigger": "Add to wishlist",
-    "body": "**Collects what `addToWishlist` sends before it is called.** Required: `variantId`. Optional: `performanceId`, `note`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Add to wishlist",
-     "operation": "addToWishlist"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "variantId",
-      "performanceId",
-      "note"
-     ]
-    },
     "provenance": "client-verified"
    }
   ],
@@ -1216,7 +1255,7 @@
    {
     "operationId": "addToWishlist",
     "contract": "marketing-crm",
-    "purpose": "Save an item",
+    "purpose": "Undo after a remove re-saves the same variant and date (idempotent); saving itself happens on the product and date cards",
     "trigger": "onAction"
    },
    {
@@ -1351,40 +1390,11 @@
      "slot": "fields",
      "components": [
       {
-       "kind": "textField",
-       "label": "purpose",
-       "bindsTo": "RecordConsentRequest.purpose",
-       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/consents"
-      },
-      {
-       "kind": "textField",
-       "label": "decision",
-       "bindsTo": "RecordConsentRequest.decision",
-       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/consents"
-      },
-      {
-       "kind": "textField",
-       "label": "channels",
-       "bindsTo": "RecordConsentRequest.channels",
-       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/consents"
-      },
-      {
-       "kind": "textField",
-       "label": "noticeVersion",
-       "bindsTo": "RecordConsentRequest.noticeVersion",
-       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/consents"
-      },
-      {
-       "kind": "textField",
-       "label": "source",
-       "bindsTo": "RecordConsentRequest.source",
-       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/consents"
-      },
-      {
-       "kind": "textField",
-       "label": "recordedAt",
-       "bindsTo": "RecordConsentRequest.recordedAt",
-       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/consents"
+       "kind": "detailPanel",
+       "label": "My details",
+       "operation": "getMyProfile",
+       "notes": "Name, email, mobile, language, preferred channel, dietary and accessibility needs; same rules as WEB-020. At least one of email or mobile remains.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)"
       },
       {
        "kind": "banner",
@@ -1392,6 +1402,29 @@
        "operation": "updateMyProfile",
        "notes": "For a profile created by guest checkout (W1): asks for what the pop-up did not, whenever the guest likes; never blocks anything.",
        "provenance": "decided 29 September 2026, W1"
+      },
+      {
+       "kind": "consentBlock",
+       "label": "What we may send you",
+       "bindsTo": "ConsentState.purposes",
+       "operation": "getGuestConsents",
+       "notes": "One row per configured purpose (`listConsentPurposes`), its channels as toggles, its plain-language description and the notice version in force; the current position from `getGuestConsents` (Given with date, Withdrawn with date, Not asked, Needs renewing). A change is recorded at once with `recordConsent` (source and notice version set by the app; the guest never types a purpose, decision, source or time). Withdrawing is as easy as giving.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)"
+      },
+      {
+       "kind": "cardList",
+       "label": "Purposes and notices",
+       "operation": "listConsentPurposes",
+       "notes": "The configured purposes with their plain-language description, channels and the notice version in force.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)"
+      },
+      {
+       "kind": "toggle",
+       "label": "Consent toggle",
+       "operation": "recordConsent",
+       "notes": "Per purpose and channel; recorded at once on change, append-only.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)",
+       "bindsTo": "ConsentState.purposes"
       }
      ]
     },
@@ -1401,12 +1434,6 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Record consent",
-       "operation": "recordConsent",
-       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/consents"
-      },
-      {
-       "kind": "secondaryButton",
        "label": "Save my profile",
        "operation": "updateMyProfile",
        "provenance": "contract marketing-crm.yaml PATCH /guests/me/profile"
@@ -1426,7 +1453,7 @@
    {
     "operationId": "recordConsent",
     "contract": "marketing-crm",
-    "purpose": "Record a consent decision",
+    "purpose": "A consent toggle changed: recorded at once with source guestApp and the notice version",
     "trigger": "onAction"
    },
    {
@@ -1434,6 +1461,24 @@
     "contract": "marketing-crm",
     "purpose": "Change name, contact and preferences",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "getMyProfile",
+    "contract": "marketing-crm",
+    "purpose": "The guest's own details, read by session",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getGuestConsents",
+    "contract": "marketing-crm",
+    "purpose": "The current consent position the toggles change",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listConsentPurposes",
+    "contract": "marketing-crm",
+    "purpose": "The purposes the consent rows show",
+    "trigger": "onLoad"
    }
   ],
   "entryState": {
@@ -1624,12 +1669,14 @@
       {
        "kind": "secondaryButton",
        "label": "Continue with Apple or Google",
+       "notes": "**Nothing is typed.** The Apple or Google sheet returns the `idToken` and the client sends it with `provider` and the device's `deviceId` straight to `guestSocialLogin`; there is no form (CHG-DOOR-006: the overlay that asked the guest for an idToken was removed).",
        "operation": "guestSocialLogin",
        "provenance": "contract identity.yaml POST /auth/guest/social"
       },
       {
        "kind": "secondaryButton",
        "label": "Continue with UAE Pass",
+       "notes": "**Nothing is typed.** The UAE Pass app or web flow redirects back with `code` and `state`, and the client sends them with its own `redirectUri` to `guestUaePassLogin`; there is no form (CHG-DOOR-006: the overlay that asked the guest for a code and redirect URI was removed).",
        "operation": "guestUaePassLogin",
        "provenance": "contract identity.yaml POST /auth/guest/uae-pass"
       },
@@ -1679,13 +1726,6 @@
        "label": "Link an order I placed as a guest",
        "operation": "linkGuestCheckout",
        "provenance": "contract identity.yaml POST /auth/guest/link-checkout"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Refresh token",
-       "operation": "refreshToken",
-       "notes": "Not a button the guest sees; the client rotates the access token before it expires.",
-       "provenance": "contract identity.yaml POST /auth/refresh"
       }
      ]
     }
@@ -1735,45 +1775,6 @@
     "provenance": "client-verified"
    },
    {
-    "id": "formGuestSocialLogin",
-    "component": "modal",
-    "trigger": "Continue with Apple or Google",
-    "body": "**Collects what `guestSocialLogin` sends before it is called.** Required: `provider`, `idToken`. Optional: `deviceId`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Guest social login",
-     "operation": "guestSocialLogin"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "provider",
-      "idToken",
-      "deviceId"
-     ]
-    },
-    "provenance": "client-verified"
-   },
-   {
-    "id": "formGuestUaePassLogin",
-    "component": "modal",
-    "trigger": "Continue with UAE Pass",
-    "body": "**Collects what `guestUaePassLogin` sends before it is called.** Required: `code`, `redirectUri`. Optional: `state`, `deviceId`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Guest uae pass login",
-     "operation": "guestUaePassLogin"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "code",
-      "redirectUri",
-      "state",
-      "deviceId"
-     ]
-    },
-    "provenance": "client-verified"
-   },
-   {
     "id": "formLinkGuestCheckout",
     "component": "modal",
     "trigger": "Link an order I placed as a guest",
@@ -1792,27 +1793,10 @@
     "provenance": "client-verified"
    },
    {
-    "id": "formRefreshToken",
-    "component": "modal",
-    "trigger": "Refresh token",
-    "body": "**Collects what `refreshToken` sends before it is called.** Required: `refreshToken`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Refresh token",
-     "operation": "refreshToken"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "refreshToken"
-     ]
-    },
-    "provenance": "client-verified"
-   },
-   {
     "id": "formRequestGuestOtp",
     "component": "modal",
     "trigger": "Send me a code",
-    "body": "**Collects what `requestGuestOtp` sends before it is called.** Required: `identifier`, `channel`. Optional: `purpose`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects only the email or mobile number.** The channel follows from the identifier and the tenant's configured delivery (DI-209). Dismissing sends nothing.",
     "confirm": {
      "label": "Request guest OTP",
      "operation": "requestGuestOtp"
@@ -1825,7 +1809,7 @@
       "purpose"
      ]
     },
-    "provenance": "client-verified"
+    "provenance": "corrected 2 October 2026 (CHG-SGU-019, design-notes correction)"
    },
    {
     "id": "formVerifyGuestOtp",
@@ -1917,7 +1901,7 @@
     "operationId": "refreshToken",
     "contract": "identity",
     "purpose": "Rotate the access token",
-    "trigger": "onAction"
+    "trigger": "background"
    },
    {
     "operationId": "requestGuestOtp",
@@ -2198,9 +2182,9 @@
   },
   "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement.",
   "density": "comfortable",
-  "pattern": "configEditor",
-  "patternReason": "the screen declares only writes (`transferOrderTickets`) and no read of a population — it is settings, not a list",
-  "purpose": "Find dynamic qr ticket for this venue.",
+  "pattern": "credentialView",
+  "patternReason": "A code the holder presents at a gate: rendered to be scanned, bright and full screen (CHG-SGU-021)",
+  "purpose": "Show the live ticket code at the gate.",
   "gaps": [
    {
     "operation": "getEntitlementCredential",
@@ -2215,12 +2199,6 @@
      "name": "actionBar",
      "slot": "publish",
      "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Transfer order tickets",
-       "operation": "transferOrderTickets",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
-      },
       {
        "kind": "secondaryButton",
        "label": "Bind credential device",
@@ -2256,11 +2234,11 @@
        "provenance": "contract access.yaml GET /guests/me/entitlements"
       },
       {
-       "kind": "detailPanel",
-       "label": "Entitlement credential",
+       "kind": "credentialDisplay",
+       "label": "Your code",
        "operation": "getEntitlementCredential",
-       "notes": "Shows `mediaCode`, `payload`, `expiresAt` from `getEntitlementCredential`'s inline response. **The response has no named schema**, so this cannot bind until the contract names one. **A rotating code derived on the device** (decided 28 September, audit R230): while online the screen fetches `rotation` (secret, `timeStepSeconds`, `digits`, `algorithm`, valid `validFrom` to `validTo`) and computes the current code from the seed and the clock, with a visible countdown to the next step; it keeps rotating with no signal. A null `rotation` (wristband, wallet pass) shows the static code.",
-       "provenance": "contract access.yaml GET /entitlements/{entitlementId}/credential"
+       "notes": "**The code rotates every 30 seconds by default, the venue's setting** (decided by Chinmay, 2 October 2026; DEC-136; `DynamicQrSecurityProfile.refreshIntervalSeconds`: 15, 30, 45, 60 or a custom value of at least 5 seconds, matching BO-165). A countdown shows the seconds to the next code; the seed's time step is that one setting, never a value of its own (CHG-SGU-003).",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-003, decided by Chinmay 2 October 2026, DEC-136)"
       },
       {
        "kind": "detailPanel",
@@ -2286,26 +2264,6 @@
        ],
        "operation": "getEntitlement",
        "provenance": "contract access.yaml GET /entitlements/{entitlementId}"
-      },
-      {
-       "kind": "multiSelect",
-       "label": "Ticket ids",
-       "operation": "transferOrderTickets",
-       "notes": "Required.",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
-      },
-      {
-       "kind": "textField",
-       "label": "Recipient",
-       "operation": "transferOrderTickets",
-       "notes": "Required.",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
-      },
-      {
-       "kind": "textField",
-       "label": "Message",
-       "operation": "transferOrderTickets",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
       }
      ]
     }
@@ -2335,12 +2293,6 @@
     "operationId": "getEntitlementCredential",
     "contract": "access",
     "purpose": "The QR code that gets scanned, refreshed — with the `rotation` seed the device derives the rotating code from (audit R230)",
-    "trigger": "onAction"
-   },
-   {
-    "operationId": "transferOrderTickets",
-    "contract": "orders",
-    "purpose": "Transfer tickets to another guest",
     "trigger": "onAction"
    },
    {
@@ -2500,6 +2452,29 @@
        ],
        "operation": "getGuestConsents",
        "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}/consents"
+      },
+      {
+       "kind": "consentBlock",
+       "label": "What we may send you",
+       "bindsTo": "ConsentState.purposes",
+       "operation": "getGuestConsents",
+       "notes": "One row per configured purpose (`listConsentPurposes`), its channels as toggles, its plain-language description and the notice version in force; the current position from `getGuestConsents` (Given with date, Withdrawn with date, Not asked, Needs renewing). A change is recorded at once with `recordConsent` (source and notice version set by the app; the guest never types a purpose, decision, source or time). Withdrawing is as easy as giving.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)"
+      },
+      {
+       "kind": "cardList",
+       "label": "Purposes and notices",
+       "operation": "listConsentPurposes",
+       "notes": "The configured purposes with their plain-language description, channels and the notice version in force.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)"
+      },
+      {
+       "kind": "toggle",
+       "label": "Consent toggle",
+       "operation": "recordConsent",
+       "notes": "Per purpose and channel; recorded at once on change, append-only.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)",
+       "bindsTo": "ConsentState.purposes"
       }
      ]
     },
@@ -2509,25 +2484,13 @@
      "components": [
       {
        "kind": "destructiveButton",
-       "label": "Delete guest account",
+       "label": "Delete my account",
        "operation": "deleteGuestAccount",
        "provenance": "contract identity.yaml DELETE /auth/guest/account"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save guest preferences",
-       "operation": "updateGuestPreferences",
-       "provenance": "contract marketing-crm.yaml PUT /guests/{subjectId}/preferences"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Upload guest document",
-       "operation": "uploadGuestDocument",
-       "provenance": "contract marketing-crm.yaml POST /guest-documents"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Export subject data",
+       "label": "Get a copy of my data",
        "operation": "exportSubjectData",
        "provenance": "contract identity.yaml POST /guests/{subjectId}/data-export"
       }
@@ -2539,58 +2502,8 @@
    {
     "id": "confirmDeleteGuestAccount",
     "component": "confirmDialog",
-    "trigger": "Delete guest account",
+    "trigger": "Delete my account",
     "body": "**Names what `deleteGuestAccount` changes and what it leaves alone**, in the consequence rather than the verb. A privacy data this affects should be identified in the dialog, not just counted.",
-    "provenance": "client-verified"
-   },
-   {
-    "id": "formUpdateGuestPreferences",
-    "component": "modal",
-    "trigger": "Save guest preferences",
-    "body": "**Collects what `updateGuestPreferences` sends before it is called.** Nothing in the body is required. Optional: `id`, `subjectId`, `seatingPreference`, `drinkPreferences`, `dietary`, `accessibility`, `preferredChannel`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "GuestPreferences",
-    "confirm": {
-     "label": "Save guest preferences",
-     "operation": "updateGuestPreferences"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "id",
-      "subjectId",
-      "seatingPreference",
-      "drinkPreferences",
-      "dietary",
-      "accessibility",
-      "preferredChannel"
-     ]
-    },
-    "provenance": "client-verified"
-   },
-   {
-    "id": "formUploadGuestDocument",
-    "component": "modal",
-    "trigger": "Upload guest document",
-    "body": "**Collects what `uploadGuestDocument` sends before it is called.** Required: `id`, `subjectId`, `kind`, `storageRef`, `retainUntil`. Optional: `contentType`, `consentPurposeId`, `uploadedAt`, `uploadedByPrincipalId`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "GuestDocument",
-    "confirm": {
-     "label": "Upload guest document",
-     "operation": "uploadGuestDocument"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "id",
-      "subjectId",
-      "kind",
-      "storageRef",
-      "retainUntil",
-      "contentType",
-      "consentPurposeId",
-      "uploadedAt",
-      "uploadedByPrincipalId"
-     ]
-    },
     "provenance": "client-verified"
    }
   ],
@@ -2599,7 +2512,7 @@
    "error": "Could not load. **Says what failed and offers one way onward**, never a bare failure.",
    "emptyFirstRun": "**Nothing requested yet.** No export, no erasure, no document — and that is the ordinary state. **The screen explains what each request means before offering it**, because an erasure a guest did not understand is one they will phone about.",
    "emptyNoResults": "**Nothing here yet.** The scope is what narrowed it — naming the scope is what stops somebody concluding the record does not exist.",
-   "emptyNoAccess": "**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "**There is no permission to name: a guest holds none** (ADR-0025). Not signed in: the guest is offered sign-in and brought back here. The data rights are the guest's own and always available to them.",
    "offline": "**Nothing here is offered offline, and the banner says so.** An erasure request or a device change queued and never sent is worse than one that could not be made — the legal clock starts when the platform receives it, and a device signed out offline is still signed in."
   },
   "apis": [
@@ -2620,18 +2533,6 @@
     "contract": "marketing-crm",
     "purpose": "Read a guest's consent state",
     "trigger": "onLoad"
-   },
-   {
-    "operationId": "updateGuestPreferences",
-    "contract": "marketing-crm",
-    "purpose": "The things a regular should not have to say twice",
-    "trigger": "onAction"
-   },
-   {
-    "operationId": "uploadGuestDocument",
-    "contract": "marketing-crm",
-    "purpose": "Store a guest photo, ID or signed document",
-    "trigger": "onAction"
    },
    {
     "operationId": "getCookieConsentRuntime",
@@ -2660,6 +2561,18 @@
     "purpose": "Change or withdraw tracking preferences",
     "trigger": "onAction",
     "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "recordConsent",
+    "contract": "marketing-crm",
+    "purpose": "Withdraw or give a consent from the privacy page: withdrawal as easy as granting",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "listConsentPurposes",
+    "contract": "marketing-crm",
+    "purpose": "The purposes the consent rows show",
+    "trigger": "onLoad"
    }
   ],
   "entryState": {

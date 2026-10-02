@@ -101,6 +101,17 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Subscription_Licensing_AI_Self_Service.pdf, page 58"
+   },
+   {
+    "operation": "setTrialConfiguration",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-021): setTrialConfiguration sets TICVAI's trial rules (PLATFORM_PLAN_MANAGE); the prospect chooses, TICVAI configures trials on ADM-413 (design-notes correction platform-foundation SGN-018). See the CHG-WIR-024 gap.",
+    "source": "contracts/satellite/subscription.yaml#setTrialConfiguration"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-024): No prospect-callable operation records whether the prospect buys or starts a trial.",
+    "source": "screens/P17-ticvai-signup.yaml#SGN-018"
    }
   ],
   "layout": {
@@ -108,41 +119,18 @@
    "regions": [
     {
      "name": "contentBody",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "setTrialConfiguration",
-       "label": "Save trial configuration",
-       "notes": "The act the screen exists for."
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "setTrialConfiguration"
-      }
-     ]
+     "components": []
     }
    ]
   },
   "states": {
    "loading": "The purchase trial journey list.",
    "error": "Could not load. Names which read failed and leaves the purchase trial journey untouched.",
-   "emptyFirstRun": "No purchase trial journey yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No purchase trial journey yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the purchase trial journey are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Not shown: nothing on this screen needs a permission of its own; the app's sign-in decides access."
   },
-  "apis": [
-   {
-    "operationId": "setTrialConfiguration",
-    "contract": "subscription",
-    "purpose": "Purchase or trial",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026"
-   }
-  ],
+  "apis": [],
   "wireframe": {
    "status": "notStarted",
    "board": "wireframes/P09 TICVAI Web.dc.html#adm-409",
@@ -381,12 +369,63 @@
        "kind": "secondaryButton",
        "label": "Validate Entity / Save / Continue",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 60 §Actions"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Save billing entity",
+       "operation": "setBillingEntity",
+       "provenance": "contract subscription.yaml PUT /tenants/{tenantId}/billing-entity"
       }
      ]
     },
     {
      "name": "contentBody",
-     "components": []
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Tenant",
+       "bindsTo": "Tenant.id",
+       "columns": [
+        "Tenant.code",
+        "Tenant.name",
+        "Tenant.status"
+       ],
+       "operation": "listTenants",
+       "notes": "**Pick a tenant first** (audit R098; decided 2 October 2026, Chinmay: console screens get the tenant picker and grant, CHG-SBO-001). This screen's operations run in that tenant's cell, and a platform token carries no tenant permission there until a platform-staff grant into it is open.",
+       "provenance": "contract subscription.yaml GET /tenants"
+      },
+      {
+       "kind": "banner",
+       "label": "Open grant into this tenant",
+       "bindsTo": "PlatformStaffGrant",
+       "columns": [
+        "PlatformStaffGrant.operatorDisplayName",
+        "PlatformStaffGrant.permissions",
+        "PlatformStaffGrant.reason",
+        "PlatformStaffGrant.ticketRef",
+        "PlatformStaffGrant.openedAt",
+        "PlatformStaffGrant.expiresAt"
+       ],
+       "operation": "listOwnPlatformStaffGrants",
+       "notes": "**Always visible while the screen acts on a tenant** (audit R098, the ADM-412 pattern): which tenant, which permissions, why, and the time left to `expiresAt`. At expiry every tenant action is disabled and the screen returns to its grantRequired state; a new need is a new grant. The tenant sees the grant in its own audit log. Found again after a reload with `listOwnPlatformStaffGrants`.",
+       "provenance": "contract identity.yaml GET /platform-staff-grants/mine"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Open access grant",
+       "operation": "openPlatformStaffGrant",
+       "notes": "Shown until a grant into the picked tenant is open; asks for the second factor first (step-up, audit R135).",
+       "provenance": "contract identity.yaml POST /platform-staff-grants"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Billing entity",
+       "bindsTo": "BillingEntity",
+       "operation": "getBillingEntity",
+       "notes": "**The invoiced company and its TRN certificate are a billing-entity record (decided 2 October 2026 by Chinmay, DEC-209; CHG-CSA-030):** a trade licence always, a VAT certificate when a TRN is entered, configurable per country (DEC-210; `RegionSettings.requiredBillingDocuments`).",
+       "provenance": "contract subscription.yaml GET /tenants/{tenantId}/billing-entity"
+      }
+     ]
     }
    ]
   },
@@ -395,7 +434,8 @@
    "error": "Could not load. Names which read failed and leaves the billing legal entity untouched.",
    "emptyFirstRun": "No billing legal entity yet. Carries the create action; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the billing legal entity are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "grantRequired": "**No access into this tenant yet.** A tenant is picked and no platform-staff grant into it is open, so every tenant action is disabled and the screen offers **Open access grant** (`openPlatformStaffGrant`: reason, permissions `ACCOUNT_CONFIGURE`, expiry). The same state returns when the grant reaches `expiresAt` (audit R098; CHG-SBO-001)."
   },
   "apis": [
    {
@@ -404,6 +444,41 @@
     "purpose": "Billing and legal entity",
     "trigger": "onAction",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "listTenants",
+    "contract": "subscription",
+    "purpose": "The tenant picker: the operator picks a tenant before acting in its cell (audit R098; decided 2 October 2026, CHG-SBO-001)",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listOwnPlatformStaffGrants",
+    "contract": "identity",
+    "purpose": "Find a grant into the picked tenant already open, after a reload (audit R098; CHG-SBO-001)",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "openPlatformStaffGrant",
+    "contract": "identity",
+    "purpose": "Open a time-boxed, audited platform-staff grant into the picked tenant before any tenant-scoped operation here; the tenant sees it (audit R098; decided 2 October 2026, CHG-SBO-001)",
+    "trigger": "onAction",
+    "invalidates": [
+     "listOwnPlatformStaffGrants"
+    ]
+   },
+   {
+    "operationId": "getBillingEntity",
+    "contract": "subscription",
+    "purpose": "The company TICVAI invoices and its documents (DEC-209)",
+    "trigger": "onLoad",
+    "provenance": "design-note correction, 2 October 2026 (ADM-411)"
+   },
+   {
+    "operationId": "setBillingEntity",
+    "contract": "subscription",
+    "purpose": "Set the company TICVAI invoices for a tenant",
+    "trigger": "onAction",
+    "provenance": "design-note correction, 2 October 2026 (ADM-411)"
    }
   ],
   "wireframe": {
@@ -412,6 +487,61 @@
    "workshopBoard": "wireframes/WS157 Subscription Licensing AI Self Service Board 5.dc.html#adm-411"
   },
   "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 60. 0 of 0 labels bound to a contract property; 2 of 21 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formOpenPlatformStaffGrant",
+    "component": "modal",
+    "trigger": "Open access grant",
+    "body": "**Collects what `openPlatformStaffGrant` sends before it is called** (audit R098). Required: `id` (a client UUIDv7, generated silently), `permissions` (tenant permissions only; `ACCOUNT_CONFIGURE` preselected for this screen), `reason`, `expiresAt` (at most 8 hours ahead, proposed). Optional: `ticketRef`. Requires step-up: the operator presents a second factor first. The tenant sees the grant and everything done under it. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Open access grant",
+     "operation": "openPlatformStaffGrant"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "permissions",
+      "reason",
+      "ticketRef",
+      "expiresAt"
+     ]
+    },
+    "provenance": "contract identity.yaml POST /platform-staff-grants"
+   },
+   {
+    "id": "formSetBillingEntity",
+    "component": "modal",
+    "trigger": "Save billing entity",
+    "body": "**Collects what `setBillingEntity` sends before it is called.** Nothing in the body is required. Optional: `legalName`, `tradeLicenceNumber`, `trn`, `countryCode`, `address`, `invoiceEmail`, `documents`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save billing entity",
+     "operation": "setBillingEntity"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "legalName",
+      "tradeLicenceNumber",
+      "trn",
+      "countryCode",
+      "address",
+      "invoiceEmail",
+      "documents"
+     ]
+    },
+    "provenance": "contract subscription.yaml PUT /tenants/{tenantId}/billing-entity"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "tenantId",
+     "from": "navigation",
+     "optional": true
+    }
+   ]
+  },
+  "notes": "**Tenant picker and platform-staff grant added 2 October 2026** (CHG-SBO-001; Chinmay, pre-apply round: console screens get the R098 tenant picker and grant, the ADM-412 pattern). The Console runs outside every cell; `createLegalEntity` (ACCOUNT_CONFIGURE) are tenant operations, refused 403 to a platform token until a time-boxed, audited grant into the picked tenant is open. The tenant sees the grant and every action under it.\n\n**Billing entity (decided 2 October 2026 by Chinmay, DEC-209, DEC-210; CHG-CSA-030, CHG-CSP-008):** the invoiced company and its TRN certificate are a billing-entity record in the subscription contract (`getBillingEntity`, `setBillingEntity`); a trade licence is always required, a VAT certificate when a TRN is entered, configurable per country (`RegionSettings.requiredBillingDocuments`). This screen is the console copy of SGN-020: the bindings land through `tools/applied/apply-subscription-placement.py` once the P17 twin is updated (screens-other).",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -473,13 +603,8 @@
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
-  "purpose": "Configure how TICVAI collects its fees.",
+  "purpose": "Set up a tenant's payment provider and settlement for a venue, from the console under an open grant.",
   "gaps": [
-   {
-    "operation": null,
-    "why": "**Payment Method & Settlement Setup declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
-    "source": "contract — the screen's declared operations"
-   },
    {
     "operation": null,
     "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
@@ -501,7 +626,7 @@
       {
        "kind": "multiSelect",
        "label": "Payment methods",
-       "bindsTo": "PaymentProvider",
+       "bindsTo": "PaymentProvider.id",
        "columns": [
         "PaymentProvider.supportedMethods"
        ],
@@ -523,7 +648,7 @@
       {
        "kind": "selectField",
        "label": "Tenant",
-       "bindsTo": "Tenant",
+       "bindsTo": "Tenant.id",
        "columns": [
         "Tenant.id",
         "Tenant.code",
@@ -533,6 +658,17 @@
        "operation": "listTenants",
        "notes": "**Pick a tenant first** (decided 28 September, audit R098). This screen's operations run in that tenant's cell, and a platform token carries no tenant permission there until a platform-staff grant into it is open.",
        "provenance": "contract subscription.yaml GET /tenants"
+      },
+      {
+       "kind": "selectField",
+       "label": "Venue",
+       "bindsTo": "OrgUnit.id",
+       "columns": [
+        "OrgUnit.name"
+       ],
+       "operation": "listOrgUnits",
+       "notes": "After the tenant, the venue: `setPaymentProvider` is configured per venue (ADR-0018), so a venue is picked inside the open grant.",
+       "provenance": "contract tenancy.yaml GET /org-units"
       },
       {
        "kind": "detailPanel",
@@ -547,7 +683,7 @@
         "PlatformStaffGrant.openedAt",
         "PlatformStaffGrant.expiresAt"
        ],
-       "operation": "openPlatformStaffGrant",
+       "operation": "listOwnPlatformStaffGrants",
        "notes": "**Always visible while the screen acts on a tenant** (decided 28 September, audit R098): which tenant, which permissions, why, and the time left to `expiresAt`. At expiry every tenant action is disabled and the screen returns to its grantRequired state; a new need is a new grant. The tenant sees the grant in its own audit log.",
        "provenance": "contract identity.yaml POST /platform-staff-grants"
       },
@@ -611,6 +747,19 @@
     "purpose": "Payment and settlement setup",
     "trigger": "onAction",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "listOwnPlatformStaffGrants",
+    "contract": "identity",
+    "purpose": "Find a grant into the picked tenant already open, after a reload (audit R098; CHG-SBO-001)",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "listOrgUnits",
+    "contract": "tenancy",
+    "purpose": "The picked tenant's venues, to pick the venue the payment provider is set for",
+    "trigger": "onLoad",
+    "provenance": "design-note correction, 2 October 2026 (ADM-412)"
    }
   ],
   "wireframe": {
@@ -619,6 +768,16 @@
    "workshopBoard": "wireframes/WS157 Subscription Licensing AI Self Service Board 5.dc.html#adm-412"
   },
   "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 61. 0 of 0 labels bound to a contract property; 3 of 24 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "tenantId",
+     "from": "navigation",
+     "optional": true
+    }
+   ]
+  },
+  "purposeNote": "Purpose corrected 2 October 2026 (CHG-SBO-011): `setPaymentProvider` configures how a tenant's venue collects from guests; TICVAI's own fees are subscription billing (ADM-009), not this screen.",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -911,7 +1070,7 @@
   "states": {
    "loading": "The order commercial pricing list.",
    "error": "Could not load. Names which read failed and leaves the order commercial pricing untouched.",
-   "emptyFirstRun": "No order commercial pricing yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No order commercial pricing yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the order commercial pricing are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -1197,7 +1356,7 @@
   "states": {
    "loading": "The payment contract commercial list.",
    "error": "Could not load. Names which read failed and leaves the payment contract commercial untouched.",
-   "emptyFirstRun": "No payment contract commercial yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No payment contract commercial yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the payment contract commercial are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -1482,25 +1641,14 @@
     {
      "name": "actionBar",
      "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Retry / Investigate / Assign / Escalate",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 69 §Actions"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Revised Board 5 — Commercial Model Behavior",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 69 §Actions"
-      }
-     ]
+     "components": []
     }
    ]
   },
   "states": {
    "loading": "The subscription lifecycle trial-to-paid list.",
    "error": "Could not load. Names which read failed and leaves the subscription lifecycle trial-to-paid untouched.",
-   "emptyFirstRun": "No subscription lifecycle trial-to-paid yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No subscription lifecycle trial-to-paid yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the subscription lifecycle trial-to-paid are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -1535,6 +1683,7 @@
    "workshopBoard": "wireframes/WS157 Subscription Licensing AI Self Service Board 5.dc.html#adm-418"
   },
   "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 69. 0 of 14 labels bound to a contract property; 16 of 88 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "notes": "Retry, investigate, assign and escalate are four row actions on a stuck conversion; they need an operation each (none exists yet).",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",

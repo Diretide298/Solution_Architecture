@@ -1,10 +1,48 @@
 {
+ "applyConfigPackage": {
+  "method": "POST",
+  "path": "/config-packages/{packageId}/apply",
+  "contract": "platform-ops",
+  "summary": "Apply an approved package to the target environment",
+  "permission": "PLATFORM_MIGRATION_APPLY",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
  "applyMigration": {
   "method": "POST",
   "path": "/migrations/apply",
   "contract": "platform-ops",
   "summary": "Apply a planned migration run",
   "permission": "PLATFORM_MIGRATION_APPLY",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "createMfaChallenge": {
+  "method": "POST",
+  "path": "/auth/mfa/challenge",
+  "contract": "identity",
+  "summary": "Second factor at staff sign-in, and step-up for a sensitive action",
+  "permission": null,
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
@@ -55,6 +93,44 @@
   ],
   "requestBody": null,
   "responds": "ApiVersion"
+ },
+ "diffConfigPackage": {
+  "method": "POST",
+  "path": "/config-packages/{packageId}/diff",
+  "contract": "platform-ops",
+  "summary": "Compare a package with the target environment",
+  "permission": "PLATFORM_RELEASE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ConfigPackageDiff"
+ },
+ "exportConfigPackage": {
+  "method": "POST",
+  "path": "/config-packages",
+  "contract": "platform-ops",
+  "summary": "Export a tenant's configuration as a versioned package",
+  "permission": "PLATFORM_RELEASE_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ConfigPackage"
  },
  "getMigrationRun": {
   "method": "GET",
@@ -155,6 +231,35 @@
   "requestBody": null,
   "responds": "Page"
  },
+ "listOwnPlatformStaffGrants": {
+  "method": "GET",
+  "path": "/platform-staff-grants/mine",
+  "contract": "identity",
+  "summary": "The calling platform operator's own grants into this tenant",
+  "permission": "PLATFORM_TENANT_ACCESS",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "activeOnly",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "listReleases": {
   "method": "GET",
   "path": "/releases",
@@ -202,6 +307,40 @@
   "requestBody": null,
   "responds": "SupportNotice"
  },
+ "listTenants": {
+  "method": "GET",
+  "path": "/tenants",
+  "contract": "subscription",
+  "summary": "List tenants",
+  "permission": "PLATFORM_TENANT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "planId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "listUpgradeSchedules": {
   "method": "GET",
   "path": "/upgrade-schedules",
@@ -214,6 +353,25 @@
   "parameters": [],
   "requestBody": null,
   "responds": "UpgradeSchedule"
+ },
+ "openPlatformStaffGrant": {
+  "method": "POST",
+  "path": "/platform-staff-grants",
+  "contract": "identity",
+  "summary": "A platform operator opens a time-boxed grant into this tenant",
+  "permission": "PLATFORM_TENANT_ACCESS",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "PlatformStaffGrant"
  },
  "planMigration": {
   "method": "POST",
@@ -347,6 +505,25 @@
   ],
   "requestBody": "UpgradeSchedule",
   "responds": "UpgradeSchedule"
+ },
+ "verifyMfaChallenge": {
+  "method": "POST",
+  "path": "/auth/mfa/challenge/{challengeId}/verify",
+  "contract": "identity",
+  "summary": "Complete a sign-in or step-up challenge",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
  },
  "withdrawRelease": {
   "method": "POST",

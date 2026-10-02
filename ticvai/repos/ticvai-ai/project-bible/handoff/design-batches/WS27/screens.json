@@ -963,6 +963,12 @@
        "bindsTo": "GroupPackageExperienceBuilderView",
        "operation": "setGroupPackageExperience",
        "provenance": "pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 9 §Show"
+      },
+      {
+       "kind": "dataTable",
+       "label": "The school-trip formats or party packages on offer",
+       "operation": "listGroupPackages",
+       "provenance": "contract catalogue.yaml GET /group-packages; wiring fix, 2 October 2026"
       }
      ]
     },
@@ -1026,6 +1032,13 @@
     "contract": "orders",
     "purpose": "Group Package & Experience Builder",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "listGroupPackages",
+    "contract": "catalogue",
+    "purpose": "The school-trip formats or party packages on offer",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "entryState": {
@@ -1207,6 +1220,13 @@
    "workshopBoard": "wireframes/WS68 Group Sales   Corporate Booking Management Board 1.dc.html#bo-269"
   },
   "apisNote": "Regenerated 9 September 2026 from Group_Sales___Corporate_Booking_Management_Reference.pdf page 11. 0 of 0 labels bound to a contract property; 11 of 36 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-027): A read (get or list) of the group quotation that setGroupQuotationProposal writes.",
+    "source": "contracts/spine/orders.yaml#setGroupQuotationProposal | screens/P08-venue-back-office.yaml#BO-269"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1417,6 +1437,11 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 13"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-027): A read (get or list) of the group discount exceptions awaiting a decision that approveGroupDiscountException writes.",
+    "source": "contracts/spine/orders.yaml#approveGroupDiscountException | screens/P08-venue-back-office.yaml#BO-271"
    }
   ],
   "layout": {
@@ -1724,6 +1749,13 @@
        "bindsTo": "GroupBooking360HandoverWorkspaceView",
        "operation": "setGroupBookingHandover",
        "provenance": "pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 16 §Display"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "A group, its leader and its name-capture duty",
+       "bindsTo": "GroupBooking",
+       "operation": "getGroupBooking",
+       "provenance": "contract orders.yaml GET /group-bookings/{groupBookingId}; wiring fix, 2 October 2026"
       }
      ]
     },
@@ -1795,6 +1827,13 @@
     "contract": "orders",
     "purpose": "Group Booking 360° & Handover Workspace",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "getGroupBooking",
+    "contract": "orders",
+    "purpose": "A group, its leader and its name-capture duty",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "entryState": {
@@ -1805,6 +1844,12 @@
     "GroupBooking360HandoverWorkspaceView.catering",
     "GroupBooking360HandoverWorkspaceView.accessibility",
     "GroupBooking360HandoverWorkspaceView.transport"
+   ],
+   "params": [
+    {
+     "name": "groupBookingId",
+     "from": "navigation"
+    }
    ]
   },
   "wireframe": {

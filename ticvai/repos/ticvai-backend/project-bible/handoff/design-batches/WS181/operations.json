@@ -52,6 +52,30 @@
   "requestBody": null,
   "responds": "ProductRelationship"
  },
+ "listRecommendationStrategies": {
+  "method": "GET",
+  "path": "/recommendation-strategies",
+  "contract": "promotions",
+  "summary": "The strategies deciding what gets offered where",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "placement",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "RecommendationStrategy"
+ },
  "quoteUpgrade": {
   "method": "POST",
   "path": "/orders/{orderId}/upgrade-quote",

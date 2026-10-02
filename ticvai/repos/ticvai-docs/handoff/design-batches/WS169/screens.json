@@ -367,7 +367,10 @@
      "to": "BO-993",
      "trigger": "Back to Experience Command Center",
      "provenance": "structural — pack board 5 wiring, 19 September 2026",
-     "back": true
+     "back": true,
+     "carries": [
+      "seatMapId"
+     ]
     }
    ]
   },
@@ -406,6 +409,13 @@
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
        "impliedBy": "assignSeats"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Seat status for a performance",
+       "bindsTo": "SeatAvailability",
+       "operation": "getSeatAvailability",
+       "provenance": "contract seating.yaml GET /performances/{performanceId}/seat-availability; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -424,6 +434,13 @@
     "contract": "seating",
     "purpose": "Pick and hold the best available seats",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "getSeatAvailability",
+    "contract": "seating",
+    "purpose": "Seat status for a performance",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {
@@ -633,6 +650,12 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 23"
+   },
+   {
+    "operation": "listRealTimeAvailability",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-025): listRealTimeAvailability is promotions checkout validation, not seat locks; seat locks are seating's, and getSeatInventory returns every seat's state for a performance (design-notes correction ticketing-backoffice BO-997)",
+    "source": "contracts/satellite/promotions.yaml#listRealTimeAvailability | contracts/satellite/seating.yaml#getSeatInventory"
    }
   ],
   "layout": {
@@ -642,10 +665,11 @@
      "name": "contentBody",
      "components": [
       {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listRealTimeAvailability",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "kind": "detailPanel",
+       "label": "Seat states",
+       "bindsTo": "SeatInventory",
+       "operation": "getSeatInventory",
+       "provenance": "contract seating.yaml GET /seat-inventory; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -654,16 +678,17 @@
   "states": {
    "loading": "The real-time availability locking list.",
    "error": "Could not load. Names which read failed and leaves the real-time availability locking untouched.",
-   "emptyFirstRun": "No real-time availability locking yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No real-time availability locking yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the real-time availability locking are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
-    "operationId": "listRealTimeAvailability",
-    "contract": "promotions",
-    "purpose": "Real-Time Availability & Checkout Validation",
-    "trigger": "onLoad"
+    "operationId": "getSeatInventory",
+    "contract": "seating",
+    "purpose": "Every seat's current state, with its locks",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {
@@ -672,6 +697,7 @@
    "workshopBoard": "wireframes/WS144 Seat Management Venue Mapping Reference v1.0 Board 5.dc.html#bo-997"
   },
   "apisNote": "Regenerated 9 September 2026 from Seat_Management_Venue_Mapping_Reference v1.0.pdf page 23. 0 of 0 labels bound to a contract property; 0 of 9 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {},
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -743,6 +769,23 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 23"
+   },
+   {
+    "operation": "extendSeatHold",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-025): Lock timeouts are configured here, not performed: extending or relinquishing one hold (extendSeatHold, relinquishSeatHold) is a selection-time act; the missing policy write and read are recorded as a contract gap (design-notes correction ticketing-backoffice BO-998)",
+    "source": "contracts/satellite/seating.yaml#extendSeatHold | contracts/satellite/seating.yaml#relinquishSeatHold | screens/P08-venue-back-office.yaml#BO-998"
+   },
+   {
+    "operation": "relinquishSeatHold",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-025): Lock timeouts are configured here, not performed: extending or relinquishing one hold (extendSeatHold, relinquishSeatHold) is a selection-time act; the missing policy write and read are recorded as a contract gap (design-notes correction ticketing-backoffice BO-998)",
+    "source": "contracts/satellite/seating.yaml#extendSeatHold | contracts/satellite/seating.yaml#relinquishSeatHold | screens/P08-venue-back-office.yaml#BO-998"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-027): A seat-lock timeout and concurrency policy (default duration, warning, grace, extension and auto-release by channel or event), with its read and write.",
+    "source": "contracts/satellite/seating.yaml#extendSeatHold | contracts/satellite/seating.yaml#relinquishSeatHold | screens/P08-venue-back-office.yaml#BO-998"
    }
   ],
   "layout": {
@@ -750,67 +793,25 @@
    "regions": [
     {
      "name": "contentBody",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "extendSeatHold",
-       "notes": "The act the screen exists for."
-      },
-      {
-       "kind": "destructiveButton",
-       "derived": true,
-       "impliedBy": "relinquishSeatHold",
-       "notes": "**Always confirms, never the default focus.** The consequence goes in the body — which seat hold is affected and what goes with it, in the screen's own words; *are you sure* is not a confirmation."
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "extendSeatHold"
-      }
-     ]
+     "components": []
     }
    ]
   },
   "states": {
    "loading": "The lock timeout concurrency list.",
    "error": "Could not load. Names which read failed and leaves the lock timeout concurrency untouched.",
-   "emptyFirstRun": "No lock timeout concurrency yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No lock timeout concurrency yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the lock timeout concurrency are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Not shown: nothing on this screen needs a permission of its own; the app's sign-in decides access."
   },
-  "apis": [
-   {
-    "operationId": "extendSeatHold",
-    "contract": "seating",
-    "purpose": "Extend before it lapses",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026"
-   },
-   {
-    "operationId": "relinquishSeatHold",
-    "contract": "seating",
-    "purpose": "Release on abandonment",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026"
-   }
-  ],
+  "apis": [],
   "wireframe": {
    "status": "notStarted",
    "board": "wireframes/P08 Venue Management.dc.html#bo-998",
    "workshopBoard": "wireframes/WS144 Seat Management Venue Mapping Reference v1.0 Board 5.dc.html#bo-998"
   },
   "apisNote": "Regenerated 9 September 2026 from Seat_Management_Venue_Mapping_Reference v1.0.pdf page 23. 0 of 0 labels bound to a contract property; 0 of 9 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "entryState": {
-   "params": [
-    {
-     "name": "holdId",
-     "from": "navigation"
-    }
-   ]
-  },
+  "entryState": {},
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1132,7 +1133,10 @@
      "to": "BO-993",
      "trigger": "Back to Experience Command Center",
      "provenance": "structural — pack board 5 wiring, 19 September 2026",
-     "back": true
+     "back": true,
+     "carries": [
+      "seatMapId"
+     ]
     }
    ]
   },
@@ -1170,6 +1174,13 @@
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
        "impliedBy": "recommendSeats"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Seat status for a performance",
+       "bindsTo": "SeatAvailability",
+       "operation": "getSeatAvailability",
+       "provenance": "contract seating.yaml GET /performances/{performanceId}/seat-availability; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -1189,6 +1200,13 @@
     "purpose": "Compare and preview",
     "trigger": "onAction",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "getSeatAvailability",
+    "contract": "seating",
+    "purpose": "Seat status for a performance",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {
@@ -1258,7 +1276,10 @@
      "to": "BO-993",
      "trigger": "Back to Experience Command Center",
      "provenance": "structural — pack board 5 wiring, 19 September 2026",
-     "back": true
+     "back": true,
+     "carries": [
+      "seatMapId"
+     ]
     }
    ]
   },
@@ -1296,6 +1317,13 @@
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
        "impliedBy": "recommendSeats"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Seat status for a performance",
+       "bindsTo": "SeatAvailability",
+       "operation": "getSeatAvailability",
+       "provenance": "contract seating.yaml GET /performances/{performanceId}/seat-availability; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -1315,6 +1343,13 @@
     "purpose": "What the assistant proposes",
     "trigger": "onAction",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "getSeatAvailability",
+    "contract": "seating",
+    "purpose": "Seat status for a performance",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {

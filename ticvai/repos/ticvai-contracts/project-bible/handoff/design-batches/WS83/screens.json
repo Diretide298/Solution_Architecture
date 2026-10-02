@@ -172,24 +172,30 @@
   "states": {
    "loading": "The redemption operations list; the counts above it resolve separately.",
    "error": "Could not load. Names which read failed and leaves the redemption operations untouched.",
-   "emptyFirstRun": "No redemption operations yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No redemption operations yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the redemption operations are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Not shown: nothing on this screen needs a permission of its own; the app's sign-in decides access."
   },
-  "apis": [
-   {
-    "operationId": "listRedemption",
-    "contract": "promotions",
-    "purpose": "Redemption Analytics, Audit & AI Optimization",
-    "trigger": "onLoad"
-   }
-  ],
+  "apis": [],
   "wireframe": {
    "status": "notStarted",
    "board": "wireframes/P08 Venue Management.dc.html#bo-444",
    "workshopBoard": "wireframes/WS63 Game and Ride Board 6.dc.html#bo-444"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 53. 0 of 7 labels bound to a contract property; 15 of 26 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "gaps": [
+   {
+    "operation": "listRedemption",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-025): listRedemption is coupon redemption analytics (promotions); the games redemption dashboard is about prize redemption (DI-878), two meanings of redemption (design-notes correction ticketing-backoffice BO-444)",
+    "source": "DI-878 | contracts/satellite/promotions.yaml#listRedemption"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-027): A read of prize redemptions (redeemPrize records them; nothing lists them) for the redemption operations dashboard.",
+    "source": "screens/P08-venue-back-office.yaml#BO-444"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -317,27 +323,17 @@
   "states": {
    "loading": "The redemption credit rule configuration as saved.",
    "error": "Could not load. Names which read failed and leaves the redemption credit rule untouched.",
-   "emptyFirstRun": "No redemption credit rule configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyFirstRun": "No redemption credit rule configured yet. Offers no create action — this screen declares no operation that makes one and says what the platform does in the meantime.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },
   "apis": [
    {
-    "operationId": "listPrizes",
-    "contract": "games",
-    "purpose": "Redemption operations",
-    "trigger": "onLoad",
-    "provenance": "board reading, 19 September 2026"
-   },
-   {
     "operationId": "setRedemptionRules",
     "contract": "games",
     "purpose": "Save how games earn redemption credits (credit source per earn rule)",
     "trigger": "onAction",
-    "provenance": "decided 29 September, VM close-out (venue management and configuration): serves the pack action(s) External Game Value, Machine-Reported Value",
-    "invalidates": [
-     "listPrizes"
-    ]
+    "provenance": "decided 29 September, VM close-out (venue management and configuration): serves the pack action(s) External Game Value, Machine-Reported Value"
    }
   ],
   "wireframe": {
@@ -346,6 +342,19 @@
    "workshopBoard": "wireframes/WS63 Game and Ride Board 6.dc.html#bo-445"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 54. 0 of 0 labels bound to a contract property; 9 of 24 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** External Game Value, Machine-Reported Value: `setRedemptionRules`.",
+  "gaps": [
+   {
+    "operation": "listPrizes",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): The prize catalogue has nothing to do with how games earn credits; it belongs to BO-449 and BO-450 (design-notes correction venue-operations BO-445).",
+    "source": "contracts/satellite/games.yaml#listPrizes"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-004): No read of redemption rules (setRedemptionRules has no get).",
+    "source": "contracts/satellite/games.yaml#setRedemptionRules"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -567,6 +576,13 @@
        "bindsTo": null,
        "operation": null,
        "provenance": "pack Game_and_Ride_Module.pdf, page 56 §Guest taps card"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Redemption games",
+       "bindsTo": "Game",
+       "operation": "listGames",
+       "provenance": "contract games.yaml GET /games; wiring fix, 2 October 2026"
       }
      ]
     },
@@ -605,6 +621,13 @@
     "invalidates": [
      "listPrizes"
     ]
+   },
+   {
+    "operationId": "listGames",
+    "contract": "games",
+    "purpose": "Redemption games and the points they award",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-001)"
    }
   ],
   "entryState": {
@@ -805,6 +828,12 @@
     "operation": null,
     "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
     "source": "pack Game_and_Ride_Module.pdf, page 58 §Scan / Tap Customer Card"
+   },
+   {
+    "operation": "setRedemptionRules",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): A counter attendant does not change earn rules; the binding gave a till a configuration write (design-notes correction venue-operations BO-449).",
+    "source": "contracts/satellite/games.yaml#setRedemptionRules"
    }
   ],
   "layout": {
@@ -903,21 +932,11 @@
   "states": {
    "loading": "The redemption counter prize list.",
    "error": "Could not load. Names which read failed and leaves the redemption counter prize untouched.",
-   "emptyFirstRun": "No redemption counter prize yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No redemption counter prize yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the redemption counter prize are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
-   {
-    "operationId": "setRedemptionRules",
-    "contract": "games",
-    "purpose": "Ticketless redemption",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026",
-    "invalidates": [
-     "listPrizes"
-    ]
-   },
    {
     "operationId": "listPrizes",
     "contract": "games",
@@ -1026,6 +1045,12 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Game_and_Ride_Module.pdf, page 59"
+   },
+   {
+    "operation": "redeemPrize",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): The catalogue configures prizes; handing one over (redeemPrize) belongs to the counter BO-449. The catalogue's writes are createPrize and setPrizeCost (design-notes corrections venue-operations BO-450).",
+    "source": "contracts/satellite/games.yaml#redeemPrize | contracts/satellite/games.yaml#createPrize"
    }
   ],
   "layout": {
@@ -1035,23 +1060,27 @@
      "name": "contentBody",
      "components": [
       {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "redeemPrize",
-       "notes": "The act the screen exists for."
-      },
-      {
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listPrizes",
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "components": [
+      {
+       "kind": "secondaryButton",
+       "label": "Add prize",
+       "operation": "createPrize",
+       "provenance": "contract games.yaml POST /prizes; wiring fix, 2 October 2026"
       },
       {
        "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "redeemPrize"
+       "label": "Set credit cost",
+       "operation": "setPrizeCost",
+       "provenance": "contract games.yaml PUT /prizes/{prizeId}/cost; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -1066,18 +1095,25 @@
   },
   "apis": [
    {
-    "operationId": "redeemPrize",
-    "contract": "games",
-    "purpose": "Hand over a prize",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026"
-   },
-   {
     "operationId": "listPrizes",
     "contract": "games",
     "purpose": "The prize catalogue",
     "trigger": "onLoad",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "createPrize",
+    "contract": "games",
+    "purpose": "Add a prize to the catalogue",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-001)"
+   },
+   {
+    "operationId": "setPrizeCost",
+    "contract": "games",
+    "purpose": "Set the credit cost of a prize",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-001)"
    }
   ],
   "wireframe": {
@@ -1086,6 +1122,44 @@
    "workshopBoard": "wireframes/WS63 Game and Ride Board 6.dc.html#bo-450"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 59. 0 of 0 labels bound to a contract property; 0 of 19 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formCreatePrize",
+    "component": "modal",
+    "trigger": "Add prize",
+    "body": "**Collects what `createPrize` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Add prize",
+     "operation": "createPrize"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "contract games.yaml POST /prizes; wiring fix, 2 October 2026"
+   },
+   {
+    "id": "formSetPrizeCost",
+    "component": "modal",
+    "trigger": "Set credit cost",
+    "body": "**Collects what `setPrizeCost` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Set credit cost",
+     "operation": "setPrizeCost"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "contract games.yaml PUT /prizes/{prizeId}/cost; wiring fix, 2 October 2026"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "prizeId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1183,6 +1257,12 @@
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
        "impliedBy": "setPrizeCost"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Prize stock",
+       "operation": "getStockPositions",
+       "provenance": "contract inventory.yaml GET /stock; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -1212,6 +1292,13 @@
     "purpose": "Add a prize",
     "trigger": "onAction",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "getStockPositions",
+    "contract": "inventory",
+    "purpose": "Prize stock on hand by item and location",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-001)"
    }
   ],
   "wireframe": {
@@ -1352,6 +1439,20 @@
        "operation": "getStockPositions",
        "notes": "Only stock is bound. No operation lists machines, so the machine columns are pack labels.",
        "provenance": "pack Game_and_Ride_Module.pdf, page 61"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Machines",
+       "bindsTo": "Game",
+       "operation": "listGames",
+       "provenance": "contract games.yaml GET /games; wiring fix, 2 October 2026"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Readers",
+       "bindsTo": "Reader",
+       "operation": "listReaders",
+       "provenance": "contract games.yaml GET /readers; wiring fix, 2 October 2026"
       }
      ]
     },
@@ -1385,6 +1486,17 @@
        "provenance": "pack Game_and_Ride_Module.pdf, page 61"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "components": [
+      {
+       "kind": "secondaryButton",
+       "label": "Save play price",
+       "operation": "setGamePricing",
+       "provenance": "contract games.yaml PUT /game-pricing; wiring fix, 2 October 2026"
+      }
+     ]
     }
    ]
   },
@@ -1402,6 +1514,27 @@
     "purpose": "Prize stock",
     "trigger": "onLoad",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "listGames",
+    "contract": "games",
+    "purpose": "The prize machines",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-008)"
+   },
+   {
+    "operationId": "listReaders",
+    "contract": "games",
+    "purpose": "The readers on each machine",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-008)"
+   },
+   {
+    "operationId": "setGamePricing",
+    "contract": "games",
+    "purpose": "The wallet price of a play",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-008)"
    }
   ],
   "wireframe": {
@@ -1410,6 +1543,23 @@
    "workshopBoard": "wireframes/WS63 Game and Ride Board 6.dc.html#bo-452"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 61. 0 of 0 labels bound to a contract property; 0 of 27 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Layout drafted 29 September (VM close-out)** from pack Game_and_Ride_Module.pdf p.61; contract inventory.yaml GET /stock. Pack labels with no schema field yet (shown as plain labels): Machine ID, Machine name, Machine type (Crane / Capsule / Direct Prize / Skill Prize), Venue, Zone, Reader, Play price, Machine status, A machine read (bound op is getStockPositions).",
+  "overlays": [
+   {
+    "id": "formSetGamePricing",
+    "component": "modal",
+    "trigger": "Save play price",
+    "body": "**Collects what `setGamePricing` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save play price",
+     "operation": "setGamePricing"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "contract games.yaml PUT /game-pricing; wiring fix, 2 October 2026"
+   }
+  ],
+  "entryState": {},
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1477,6 +1627,17 @@
     "operation": null,
     "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
     "source": "pack Game_and_Ride_Module.pdf, page 62 §Compare"
+   },
+   {
+    "operation": "setPrizeCost",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): A ledger needs reads of plays with credits earned and of card movements; setPrizeCost is a configuration write, and the ledger is entered from the dashboard with no prize (design-notes correction venue-operations BO-453).",
+    "source": "contracts/satellite/games.yaml#setPrizeCost | contracts/satellite/games.yaml#listGameplayTransactions | contracts/satellite/wallet.yaml#listWalletTransactions"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-004): No read lists prize redemptions.",
+    "source": "contracts/satellite/games.yaml#redeemPrize"
    }
   ],
   "layout": {
@@ -1501,6 +1662,19 @@
        "bindsTo": null,
        "operation": null,
        "provenance": "pack Game_and_Ride_Module.pdf, page 62 §Compare"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Credits earned",
+       "bindsTo": "GameplayTransaction",
+       "operation": "listGameplayTransactions",
+       "provenance": "contract games.yaml GET /gameplay-transactions; wiring fix, 2 October 2026"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Card movements",
+       "operation": "listWalletTransactions",
+       "provenance": "contract wallet.yaml GET /wallets/{subjectId}/transactions; wiring fix, 2 October 2026"
       }
      ]
     },
@@ -1531,20 +1705,24 @@
   "states": {
    "loading": "The redemption transaction ledger list.",
    "error": "Could not load. Names which read failed and leaves the redemption transaction ledger untouched.",
-   "emptyFirstRun": "No redemption transaction ledger yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No redemption transaction ledger yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the redemption transaction ledger are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
-    "operationId": "setPrizeCost",
+    "operationId": "listGameplayTransactions",
     "contract": "games",
-    "purpose": "Direct-pay price",
+    "purpose": "Plays and the redemption credits they earned",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-001)"
+   },
+   {
+    "operationId": "listWalletTransactions",
+    "contract": "wallet",
+    "purpose": "One card's credit movements",
     "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026",
-    "invalidates": [
-     "listPrizes"
-    ]
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-001)"
    }
   ],
   "entryState": {
@@ -1558,7 +1736,7 @@
    ],
    "params": [
     {
-     "name": "prizeId",
+     "name": "subjectId",
      "from": "navigation"
     }
    ]

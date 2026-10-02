@@ -56,19 +56,6 @@
   "requestBody": null,
   "responds": "ProposedAction"
  },
- "getMarketingSubscription": {
-  "method": "GET",
-  "path": "/marketing-subscriptions",
-  "contract": "marketing-crm",
-  "summary": "What this guest has opted into",
-  "permission": "MARKETING_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "MarketingSubscription"
- },
  "listCommunicationService": {
   "method": "GET",
   "path": "/communication-service",
@@ -434,44 +421,6 @@
   ],
   "requestBody": null,
   "responds": "MessageDispatch"
- },
- "setLocalizationBrandingCustomer": {
-  "method": "PUT",
-  "path": "/localization-branding-customer",
-  "contract": "marketing-crm",
-  "summary": "Set a waiver version's languages, branding and channels",
-  "permission": "GUEST_MANAGE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "LocalizationBrandingCustomerExperienceConfigurationInput",
-  "responds": "LocalizationBrandingCustomerExperienceConfigurationView"
- },
- "setMarketingSubscription": {
-  "method": "PUT",
-  "path": "/marketing-subscriptions",
-  "contract": "marketing-crm",
-  "summary": "Subscribe or unsubscribe",
-  "permission": "MARKETING_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "MarketingSubscription",
-  "responds": "MarketingSubscription"
  },
  "setMessageTrigger": {
   "method": "POST",

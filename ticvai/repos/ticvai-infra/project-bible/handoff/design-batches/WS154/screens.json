@@ -1,7 +1,7 @@
 [
  {
   "id": "ADM-629",
-  "name": "Payment Risk & Fraud Command Center\\t166",
+  "name": "Payment Risk & Fraud Command Center",
   "module": "Commercial",
   "requiresModule": "core",
   "wave": 3,
@@ -12,17 +12,17 @@
    "page": 165
   },
   "implementation": {
-   "app": "ticvai-web",
+   "app": "venue-management-web",
    "route": "/commercial/payment-risk-fraud-command-center-t166-adm-629",
-   "component": "apps/ticvai-web/src/routes/commercial/PaymentRiskFraudCommandCenterT166.tsx",
+   "component": "apps/venue-management-web/src/routes/commercial/PaymentRiskFraudCommandCenterT166.tsx",
    "status": "notStarted"
   },
   "navigation": {
    "entryFrom": [
-    "ADM-002"
+    "BO-100"
    ],
    "exitTo": [
-    "ADM-002",
+    "BO-100",
     "ADM-630",
     "ADM-631",
     "ADM-632",
@@ -35,9 +35,9 @@
    ],
    "transitions": [
     {
-     "to": "ADM-002",
-     "trigger": "Back to Platform Dashboard",
-     "provenance": "structural — pack board 8 wiring, 19 September 2026",
+     "to": "BO-100",
+     "trigger": "Back to Venue Home",
+     "provenance": "moved to Venue Management 2 October 2026 (CHG-MOV-001); it returned to the console's Platform Dashboard (ADM-002)",
      "back": true
     },
     {
@@ -87,6 +87,7 @@
     }
    ]
   },
+  "notes": "**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: \"they are venue screens\"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.",
   "density": "compact",
   "pattern": "commandCentre",
   "patternReason": "the pack gives this screen both a metric directory (§KPI Cards) and a per-row directory (§Show; Analyze) — counts over a population, then the population",
@@ -235,37 +236,36 @@
   ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-629",
+   "board": "wireframes/P08 Venue Management.dc.html#adm-629",
    "workshopBoard": "wireframes/WS94 Payment Payment Orchestration Board 8.dc.html#adm-629"
   },
   "apisNote": "Regenerated 9 September 2026 from Payment_Payment_Orchestration.pdf page 165. 0 of 9 labels bound to a contract property; 21 of 35 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
+   "code": "P08",
+   "audience": "staff",
    "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
    "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
+   "app": "venue-management-web",
+   "operator": "venue",
    "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
     "shell": "web",
     "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
+     "P12",
+     "P13",
+     "P16"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
     "decided": "10 September 2026"
    }
   }
  },
  {
   "id": "ADM-630",
-  "name": "Payment Risk Rule & Decision Engine\\t167",
+  "name": "Payment Risk Rule & Decision Engine",
   "module": "Commercial",
   "requiresModule": "core",
   "wave": 3,
@@ -276,9 +276,9 @@
    "page": 166
   },
   "implementation": {
-   "app": "ticvai-web",
+   "app": "venue-management-web",
    "route": "/commercial/payment-risk-rule-decision-engine-t167-adm-630",
-   "component": "apps/ticvai-web/src/routes/commercial/PaymentRiskRuleDecisionEngineT167.tsx",
+   "component": "apps/venue-management-web/src/routes/commercial/PaymentRiskRuleDecisionEngineT167.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -297,6 +297,7 @@
     }
    ]
   },
+  "notes": "**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: \"they are venue screens\"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
@@ -395,37 +396,36 @@
   ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-630",
+   "board": "wireframes/P08 Venue Management.dc.html#adm-630",
    "workshopBoard": "wireframes/WS94 Payment Payment Orchestration Board 8.dc.html#adm-630"
   },
   "apisNote": "Regenerated 9 September 2026 from Payment_Payment_Orchestration.pdf page 166. 0 of 0 labels bound to a contract property; 6 of 36 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
+   "code": "P08",
+   "audience": "staff",
    "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
    "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
+   "app": "venue-management-web",
+   "operator": "venue",
    "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
     "shell": "web",
     "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
+     "P12",
+     "P13",
+     "P16"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
     "decided": "10 September 2026"
    }
   }
  },
  {
   "id": "ADM-631",
-  "name": "Velocity, Behavioral & Transaction Risk Controls\\t168",
+  "name": "Velocity, Behavioral & Transaction Risk Controls",
   "module": "Commercial",
   "requiresModule": "core",
   "wave": 3,
@@ -436,9 +436,9 @@
    "page": 167
   },
   "implementation": {
-   "app": "ticvai-web",
+   "app": "venue-management-web",
    "route": "/commercial/velocity-behavioral-transaction-risk-controls-t168-adm-631",
-   "component": "apps/ticvai-web/src/routes/commercial/VelocityBehavioralTransactionRiskControlsT168.tsx",
+   "component": "apps/venue-management-web/src/routes/commercial/VelocityBehavioralTransactionRiskControlsT168.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -457,6 +457,7 @@
     }
    ]
   },
+  "notes": "**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: \"they are venue screens\"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
@@ -476,6 +477,11 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Payment_Payment_Orchestration.pdf, page 167"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-027): No read of payment risk rules (setPaymentRiskRules has no get).",
+    "source": "contracts/satellite/payments.yaml#setPaymentRiskRules | screens/P08-venue-back-office.yaml#ADM-631"
    }
   ],
   "layout": {
@@ -536,37 +542,36 @@
   ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-631",
+   "board": "wireframes/P08 Venue Management.dc.html#adm-631",
    "workshopBoard": "wireframes/WS94 Payment Payment Orchestration Board 8.dc.html#adm-631"
   },
   "apisNote": "Regenerated 9 September 2026 from Payment_Payment_Orchestration.pdf page 167. 0 of 0 labels bound to a contract property; 5 of 26 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
+   "code": "P08",
+   "audience": "staff",
    "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
    "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
+   "app": "venue-management-web",
+   "operator": "venue",
    "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
     "shell": "web",
     "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
+     "P12",
+     "P13",
+     "P16"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
     "decided": "10 September 2026"
    }
   }
  },
  {
   "id": "ADM-632",
-  "name": "Risk Lists, Signals & Payment Control Center\\t169",
+  "name": "Risk Lists, Signals & Payment Control Center",
   "module": "Commercial",
   "requiresModule": "core",
   "wave": 3,
@@ -577,9 +582,9 @@
    "page": 168
   },
   "implementation": {
-   "app": "ticvai-web",
+   "app": "venue-management-web",
    "route": "/commercial/risk-lists-signals-payment-control-center-t169-adm-632",
-   "component": "apps/ticvai-web/src/routes/commercial/RiskListsSignalsPaymentControlCenterT169.tsx",
+   "component": "apps/venue-management-web/src/routes/commercial/RiskListsSignalsPaymentControlCenterT169.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -598,6 +603,7 @@
     }
    ]
   },
+  "notes": "**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: \"they are venue screens\"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
@@ -617,6 +623,11 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Payment_Payment_Orchestration.pdf, page 168"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-027): No read of payment risk lists and signals (setPaymentRiskRules has no get).",
+    "source": "contracts/satellite/payments.yaml#setPaymentRiskRules | screens/P08-venue-back-office.yaml#ADM-632"
    }
   ],
   "layout": {
@@ -672,37 +683,36 @@
   ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-632",
+   "board": "wireframes/P08 Venue Management.dc.html#adm-632",
    "workshopBoard": "wireframes/WS94 Payment Payment Orchestration Board 8.dc.html#adm-632"
   },
   "apisNote": "Regenerated 9 September 2026 from Payment_Payment_Orchestration.pdf page 168. 0 of 0 labels bound to a contract property; 4 of 29 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
+   "code": "P08",
+   "audience": "staff",
    "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
    "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
+   "app": "venue-management-web",
+   "operator": "venue",
    "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
     "shell": "web",
     "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
+     "P12",
+     "P13",
+     "P16"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
     "decided": "10 September 2026"
    }
   }
  },
  {
   "id": "ADM-633",
-  "name": "Fraud Alert, Investigation & Case Management\\t170",
+  "name": "Fraud Alert, Investigation & Case Management",
   "module": "Commercial",
   "requiresModule": "core",
   "wave": 3,
@@ -713,9 +723,9 @@
    "page": 169
   },
   "implementation": {
-   "app": "ticvai-web",
+   "app": "venue-management-web",
    "route": "/commercial/fraud-alert-investigation-case-management-t170-adm-633",
-   "component": "apps/ticvai-web/src/routes/commercial/FraudAlertInvestigationCaseManagementT170.tsx",
+   "component": "apps/venue-management-web/src/routes/commercial/FraudAlertInvestigationCaseManagementT170.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -734,6 +744,7 @@
     }
    ]
   },
+  "notes": "**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: \"they are venue screens\"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display; Show) and no metric row",
@@ -963,37 +974,36 @@
   },
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-633",
+   "board": "wireframes/P08 Venue Management.dc.html#adm-633",
    "workshopBoard": "wireframes/WS94 Payment Payment Orchestration Board 8.dc.html#adm-633"
   },
   "apisNote": "Regenerated 9 September 2026 from Payment_Payment_Orchestration.pdf page 169. 0 of 22 labels bound to a contract property; 31 of 38 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
+   "code": "P08",
+   "audience": "staff",
    "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
    "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
+   "app": "venue-management-web",
+   "operator": "venue",
    "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
     "shell": "web",
     "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
+     "P12",
+     "P13",
+     "P16"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
     "decided": "10 September 2026"
    }
   }
  },
  {
   "id": "ADM-634",
-  "name": "Chargeback & Dispute Command Center\\t172",
+  "name": "Chargeback & Dispute Command Center",
   "module": "Commercial",
   "requiresModule": "core",
   "wave": 3,
@@ -1004,9 +1014,9 @@
    "page": 171
   },
   "implementation": {
-   "app": "ticvai-web",
+   "app": "venue-management-web",
    "route": "/commercial/chargeback-dispute-command-center-t172-adm-634",
-   "component": "apps/ticvai-web/src/routes/commercial/ChargebackDisputeCommandCenterT172.tsx",
+   "component": "apps/venue-management-web/src/routes/commercial/ChargebackDisputeCommandCenterT172.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1025,6 +1035,7 @@
     }
    ]
   },
+  "notes": "**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: \"they are venue screens\"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.",
   "density": "compact",
   "pattern": "commandCentre",
   "patternReason": "the pack gives this screen both a metric directory (§KPI Cards) and a per-row directory (§Display) — counts over a population, then the population",
@@ -1213,7 +1224,7 @@
   ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-634",
+   "board": "wireframes/P08 Venue Management.dc.html#adm-634",
    "workshopBoard": "wireframes/WS94 Payment Payment Orchestration Board 8.dc.html#adm-634"
   },
   "apisNote": "Regenerated 9 September 2026 from Payment_Payment_Orchestration.pdf page 171. 0 of 13 labels bound to a contract property; 33 of 36 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
@@ -1226,32 +1237,31 @@
    ]
   },
   "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
+   "code": "P08",
+   "audience": "staff",
    "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
    "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
+   "app": "venue-management-web",
+   "operator": "venue",
    "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
     "shell": "web",
     "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
+     "P12",
+     "P13",
+     "P16"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
     "decided": "10 September 2026"
    }
   }
  },
  {
   "id": "ADM-635",
-  "name": "Chargeback Evidence & Representment Workspace\\t173",
+  "name": "Chargeback Evidence & Representment Workspace",
   "module": "Commercial",
   "requiresModule": "core",
   "wave": 3,
@@ -1262,9 +1272,9 @@
    "page": 172
   },
   "implementation": {
-   "app": "ticvai-web",
+   "app": "venue-management-web",
    "route": "/commercial/chargeback-evidence-representment-workspace-t173-adm-635",
-   "component": "apps/ticvai-web/src/routes/commercial/ChargebackEvidenceRepresentmentWorkspaceT173.tsx",
+   "component": "apps/venue-management-web/src/routes/commercial/ChargebackEvidenceRepresentmentWorkspaceT173.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1283,6 +1293,7 @@
     }
    ]
   },
+  "notes": "**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: \"they are venue screens\"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
@@ -1318,6 +1329,12 @@
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
        "impliedBy": "submitChargebackEvidence"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Open chargebacks",
+       "operation": "listChargebacks",
+       "provenance": "contract orders.yaml GET /chargebacks; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -1340,11 +1357,18 @@
     "invalidates": [
      "listChargebacks"
     ]
+   },
+   {
+    "operationId": "listChargebacks",
+    "contract": "orders",
+    "purpose": "Open disputes, by evidence deadline",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-635",
+   "board": "wireframes/P08 Venue Management.dc.html#adm-635",
    "workshopBoard": "wireframes/WS94 Payment Payment Orchestration Board 8.dc.html#adm-635"
   },
   "apisNote": "Regenerated 9 September 2026 from Payment_Payment_Orchestration.pdf page 172. 0 of 0 labels bound to a contract property; 0 of 24 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
@@ -1357,32 +1381,31 @@
    ]
   },
   "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
+   "code": "P08",
+   "audience": "staff",
    "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
    "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
+   "app": "venue-management-web",
+   "operator": "venue",
    "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
     "shell": "web",
     "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
+     "P12",
+     "P13",
+     "P16"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
     "decided": "10 September 2026"
    }
   }
  },
  {
   "id": "ADM-636",
-  "name": "Payment Performance & Conversion Analytics\\t174",
+  "name": "Payment Performance & Conversion Analytics",
   "module": "Commercial",
   "requiresModule": "core",
   "wave": 3,
@@ -1393,9 +1416,9 @@
    "page": 173
   },
   "implementation": {
-   "app": "ticvai-web",
+   "app": "venue-management-web",
    "route": "/commercial/payment-performance-conversion-analytics-t174-adm-636",
-   "component": "apps/ticvai-web/src/routes/commercial/PaymentPerformanceConversionAnalyticsT174.tsx",
+   "component": "apps/venue-management-web/src/routes/commercial/PaymentPerformanceConversionAnalyticsT174.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1414,6 +1437,7 @@
     }
    ]
   },
+  "notes": "**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: \"they are venue screens\"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.",
   "density": "compact",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Captured) and no display directory — it is settings, not a population",
@@ -1482,37 +1506,36 @@
   ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-636",
+   "board": "wireframes/P08 Venue Management.dc.html#adm-636",
    "workshopBoard": "wireframes/WS94 Payment Payment Orchestration Board 8.dc.html#adm-636"
   },
   "apisNote": "Regenerated 9 September 2026 from Payment_Payment_Orchestration.pdf page 173. 0 of 11 labels bound to a contract property; 24 of 44 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
+   "code": "P08",
+   "audience": "staff",
    "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
    "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
+   "app": "venue-management-web",
+   "operator": "venue",
    "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
     "shell": "web",
     "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
+     "P12",
+     "P13",
+     "P16"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
     "decided": "10 September 2026"
    }
   }
  },
  {
   "id": "ADM-637",
-  "name": "AI Fraud, Anomaly & Payment Intelligence Center\\t175",
+  "name": "AI Fraud, Anomaly & Payment Intelligence Center",
   "module": "Commercial",
   "requiresModule": "core",
   "wave": 3,
@@ -1523,9 +1546,9 @@
    "page": 174
   },
   "implementation": {
-   "app": "ticvai-web",
+   "app": "venue-management-web",
    "route": "/commercial/ai-fraud-anomaly-payment-intelligence-center-t175-adm-637",
-   "component": "apps/ticvai-web/src/routes/commercial/AiFraudAnomalyPaymentIntelligenceCenterT175.tsx",
+   "component": "apps/venue-management-web/src/routes/commercial/AiFraudAnomalyPaymentIntelligenceCenterT175.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1544,6 +1567,7 @@
     }
    ]
   },
+  "notes": "**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: \"they are venue screens\"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
@@ -1637,18 +1661,11 @@
     "purpose": "Chargeback analytics panel",
     "trigger": "onLoad",
     "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "getChargebackAnalytics",
-    "contract": "orders",
-    "purpose": "Chargeback trend beside payment risk",
-    "trigger": "onLoad",
-    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-637",
+   "board": "wireframes/P08 Venue Management.dc.html#adm-637",
    "workshopBoard": "wireframes/WS94 Payment Payment Orchestration Board 8.dc.html#adm-637"
   },
   "apisNote": "Regenerated 9 September 2026 from Payment_Payment_Orchestration.pdf page 174. 0 of 0 labels bound to a contract property; 0 of 27 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
@@ -1665,32 +1682,31 @@
    ]
   },
   "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
+   "code": "P08",
+   "audience": "staff",
    "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
    "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
+   "app": "venue-management-web",
+   "operator": "venue",
    "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
     "shell": "web",
     "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
+     "P12",
+     "P13",
+     "P16"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
     "decided": "10 September 2026"
    }
   }
  },
  {
   "id": "ADM-638",
-  "name": "Payment Executive Intelligence, Risk Simulator & AI Advisor\\t176",
+  "name": "Payment Executive Intelligence, Risk Simulator & AI Advisor",
   "module": "Commercial",
   "requiresModule": "core",
   "wave": 3,
@@ -1701,9 +1717,9 @@
    "page": 175
   },
   "implementation": {
-   "app": "ticvai-web",
+   "app": "venue-management-web",
    "route": "/commercial/payment-executive-intelligence-risk-simulator-ai-advisor-adm-638",
-   "component": "apps/ticvai-web/src/routes/commercial/PaymentExecutiveIntelligenceRiskSimulatorAiAdvis.tsx",
+   "component": "apps/venue-management-web/src/routes/commercial/PaymentExecutiveIntelligenceRiskSimulatorAiAdvis.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1722,6 +1738,7 @@
     }
    ]
   },
+  "notes": "**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: \"they are venue screens\"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.",
   "density": "compact",
   "pattern": "commandCentre",
   "patternReason": "the pack gives this screen a metric directory (§Show; Monitor) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's",
@@ -1787,6 +1804,13 @@
        "kind": "metricTile",
        "label": "↓",
        "provenance": "pack Payment_Payment_Orchestration.pdf, page 175 §Monitor"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Payment performance",
+       "bindsTo": "PaymentPerformanceRow",
+       "operation": "getPaymentPerformance",
+       "provenance": "contract payments.yaml GET /payment-performance; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -1813,34 +1837,41 @@
     "purpose": "Backtest a draft strategy",
     "trigger": "onAction",
     "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "getPaymentPerformance",
+    "contract": "payments",
+    "purpose": "Authorisation rate, conversion and where payments are lost",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-638",
+   "board": "wireframes/P08 Venue Management.dc.html#adm-638",
    "workshopBoard": "wireframes/WS94 Payment Payment Orchestration Board 8.dc.html#adm-638"
   },
   "apisNote": "Regenerated 9 September 2026 from Payment_Payment_Orchestration.pdf page 175. 0 of 0 labels bound to a contract property; 11 of 117 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {},
   "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
+   "code": "P08",
+   "audience": "staff",
    "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
    "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
+   "app": "venue-management-web",
+   "operator": "venue",
    "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
     "shell": "web",
     "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
+     "P12",
+     "P13",
+     "P16"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
     "decided": "10 September 2026"
    }
   }

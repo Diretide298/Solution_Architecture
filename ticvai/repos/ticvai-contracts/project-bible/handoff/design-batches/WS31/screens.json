@@ -45,7 +45,10 @@
      "to": "BO-305",
      "trigger": "Works in Order Detail & Transaction Workspace",
      "provenance": "flow F140 step 1→2",
-     "operation": "listOrderReservation"
+     "operation": "listOrderReservation",
+     "carries": [
+      "orderId"
+     ]
     },
     {
      "to": "BO-306",
@@ -281,8 +284,7 @@
     {
      "to": "BO-304",
      "trigger": "Returns to the board's landing screen",
-     "provenance": "flow F140 step 2→3",
-     "operation": "setOrderDetailTransaction"
+     "provenance": "flow F140 step 2→3"
     }
    ]
   },
@@ -422,38 +424,27 @@
        "label": "Related Orders",
        "provenance": "pack Order___Reservation_Management_Reference.pdf, page 5 §Show",
        "bindsTo": "OrderDetailTransactionWorkspaceView.relatedOrders"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Order",
+       "bindsTo": "Order",
+       "operation": "getOrder",
+       "provenance": "contract orders.yaml GET /orders/{orderId}; wiring fix, 2 October 2026"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Statement",
+       "bindsTo": "OrderStatement",
+       "operation": "getOrderStatement",
+       "provenance": "contract orders.yaml GET /orders/{orderId}/statement; wiring fix, 2 October 2026"
       }
      ]
     },
     {
      "name": "contentBody",
      "slot": "moduleTiles",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every order detail transaction",
-       "columns": [
-        "OrderDetailTransactionWorkspaceView.lines[].product",
-        "OrderDetailTransactionWorkspaceView.lines[].ticketType",
-        "OrderDetailTransactionWorkspaceView.lines[].event",
-        "OrderDetailTransactionWorkspaceView.lines[].performance",
-        "OrderDetailTransactionWorkspaceView.date",
-        "OrderDetailTransactionWorkspaceView.lines[].timeslot",
-        "OrderDetailTransactionWorkspaceView.lines[].quantity",
-        "OrderDetailTransactionWorkspaceView.lines[].personType",
-        "OrderDetailTransactionWorkspaceView.lines[].seat",
-        "OrderDetailTransactionWorkspaceView.lines[].unitPrice",
-        "OrderDetailTransactionWorkspaceView.lines[].discount",
-        "OrderDetailTransactionWorkspaceView.lines[].tax",
-        "OrderDetailTransactionWorkspaceView.lines[].fee",
-        "OrderDetailTransactionWorkspaceView.total",
-        "OrderDetailTransactionWorkspaceView.lines[].ticketStatus"
-       ],
-       "bindsTo": "OrderDetailTransactionWorkspaceView",
-       "operation": "setOrderDetailTransaction",
-       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 5 §Each line should display"
-      }
-     ]
+     "components": []
     },
     {
      "name": "contextPanel",
@@ -501,16 +492,24 @@
   "states": {
    "loading": "The order detail transaction list; the counts above it resolve separately.",
    "error": "Could not load. Names which read failed and leaves the order detail transaction untouched.",
-   "emptyFirstRun": "No order detail transaction yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No order detail transaction yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the order detail transaction are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
-    "operationId": "setOrderDetailTransaction",
+    "operationId": "getOrder",
     "contract": "orders",
-    "purpose": "Order Detail & Transaction Workspace",
-    "trigger": "onAction"
+    "purpose": "The order, its lines and its status",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
+   },
+   {
+    "operationId": "getOrderStatement",
+    "contract": "orders",
+    "purpose": "The full financial history of the order",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {
@@ -520,6 +519,22 @@
    "workshopBoard": "wireframes/WS84 Order   Reservation Management Board 1.dc.html#bo-305"
   },
   "apisNote": "Regenerated 9 September 2026 from Order___Reservation_Management_Reference.pdf page 5. 35 of 35 labels bound to a contract property; 36 of 51 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "orderId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "gaps": [
+   {
+    "operation": "setOrderDetailTransaction",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-025): The 360 view of one order declared only a write (setOrderDetailTransaction with order number and lines), which would edit lines outside modify, exchange and refund; a view of an order reads getOrder and getOrderStatement. F140 step 2 is repointed (design-notes correction ticketing-backoffice BO-305)",
+    "source": "contracts/spine/orders.yaml#setOrderDetailTransaction | screens/P08-venue-back-office.yaml#BO-305 | F140 step 2"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -722,6 +737,13 @@
    "workshopBoard": "wireframes/WS84 Order   Reservation Management Board 1.dc.html#bo-306"
   },
   "apisNote": "Regenerated 9 September 2026 from Order___Reservation_Management_Reference.pdf page 7. 0 of 0 labels bound to a contract property; 22 of 42 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Cart Hold, Checkout Hold, Agent Reservation, Group Reservation, B2B Reservation, Corporate Reservation, Manual Hold, Payment Hold … are choices sent by `setReservationHoldPolicy`.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-027): A read (get or list) of the reservation and hold policy that setReservationHoldPolicy writes.",
+    "source": "contracts/spine/orders.yaml#setReservationHoldPolicy | screens/P08-venue-back-office.yaml#BO-306"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -869,6 +891,13 @@
    "workshopBoard": "wireframes/WS84 Order   Reservation Management Board 1.dc.html#bo-307"
   },
   "apisNote": "Regenerated 9 September 2026 from Order___Reservation_Management_Reference.pdf page 9. 0 of 0 labels bound to a contract property; 8 of 29 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-027): A read (get or list) of the order and reservation status configuration that setOrderReservationStatus writes.",
+    "source": "contracts/spine/orders.yaml#setOrderReservationStatus | screens/P08-venue-back-office.yaml#BO-307"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1106,6 +1135,13 @@
    "workshopBoard": "wireframes/WS84 Order   Reservation Management Board 1.dc.html#bo-308"
   },
   "apisNote": "Regenerated 9 September 2026 from Order___Reservation_Management_Reference.pdf page 10. 0 of 0 labels bound to a contract property; 27 of 46 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** OTA Booking Reference, Reseller Order ID, External CRM Reference are choices sent by `createOrderSourceChannel`.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-027): A read (get or list) of the order source and channel configuration that createOrderSourceChannel writes.",
+    "source": "contracts/spine/orders.yaml#createOrderSourceChannel | screens/P08-venue-back-office.yaml#BO-308"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1288,6 +1324,13 @@
    "workshopBoard": "wireframes/WS84 Order   Reservation Management Board 1.dc.html#bo-309"
   },
   "apisNote": "Regenerated 9 September 2026 from Order___Reservation_Management_Reference.pdf page 11. 0 of 0 labels bound to a contract property; 16 of 36 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Registered Customer, Anonymous Sale where permitted, Link Existing, Continue Guest, Review Match are choices sent by `setCustomerGuestAccount`.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-027): A read (get or list) of the customer, guest and account assignment rules that setCustomerGuestAccount writes.",
+    "source": "contracts/spine/orders.yaml#setCustomerGuestAccount | screens/P08-venue-back-office.yaml#BO-309"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",

@@ -90,7 +90,10 @@ P17_NO_ACCESS = (
 # `sameAs`, nor re-copy ADM-412's fields into it, nor mint a new SGN twin because none carries
 # `sameAs: ADM-412` any more. Keyed twin id -> the detached P17 id; the screen still takes its place
 # in the book's journey.
-DETACHED = {"ADM-412": "SGN-021"}
+# ADM-411 -> SGN-020 the same way (2 October 2026, CHG-CLN-013): ADM-411 gained the R098 tenant picker and grant
+# (CHG-SBO-001) a prospect cannot use, and SGN-020 saves the billing entity on the onboarding application before
+# verification (workbook Q223); a re-run must not copy ADM-411 onto it again.
+DETACHED = {"ADM-412": "SGN-021", "ADM-411": "SGN-020"}
 
 
 def slug(text: str) -> str:

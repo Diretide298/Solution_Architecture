@@ -12,17 +12,17 @@
    "page": 63
   },
   "implementation": {
-   "app": "ticvai-web",
-   "route": "/commercial/bundle-combo-command-center-adm-178",
-   "component": "apps/ticvai-web/src/routes/commercial/BundleComboCommandCenter.tsx",
+   "app": "venue-management-web",
+   "route": "/venue-operations/packages-bundles/bundle-combo-command-center-adm-178",
+   "component": "apps/venue-management-web/src/routes/venue-operations/PackagesBundlesDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
    "entryFrom": [
-    "ADM-002"
+    "BO-100"
    ],
    "exitTo": [
-    "ADM-002",
+    "BO-100",
     "ADM-179",
     "ADM-180",
     "ADM-181",
@@ -31,33 +31,17 @@
     "ADM-184",
     "ADM-185",
     "ADM-186",
-    "ADM-187"
+    "ADM-187",
+    "BO-011"
    ],
    "inferred": false,
    "notes": "**The board's hub.** The workshop specified this module as boards of ten and opened each with a command centre; the other nine screens are that board's detail, so they are reached from here and return here.",
    "transitions": [
     {
-     "to": "ADM-002",
-     "trigger": "Platform Dashboard",
-     "provenance": "derived — ADM-002 declares entryState.params  and ADM-178 holds none of them. The edge carries nothing: ADM-178 is opened from ADM-002, so this edge is the way back and ADM-002 keeps its own state"
-    },
-    {
-     "to": "ADM-179",
-     "trigger": "Works in Bundle Definition & Setup",
-     "provenance": "flow F158 step 1→2",
-     "operation": "listBundleCombo"
-    },
-    {
-     "to": "ADM-180",
-     "trigger": "Works in Bundle Component Builder",
-     "provenance": "flow F158 step 3→4",
-     "operation": "listBundleCombo"
-    },
-    {
-     "to": "ADM-181",
-     "trigger": "Works in Guest Choice & Build-Your-Own Bundle Designer",
-     "provenance": "flow F158 step 5→6",
-     "operation": "listBundleCombo"
+     "to": "BO-100",
+     "trigger": "Back to Venue Home",
+     "provenance": "moved to Venue Management 2 October 2026 (CHG-MOV-001); it returned to the console's Platform Dashboard (ADM-002)",
+     "back": true
     },
     {
      "to": "ADM-182",
@@ -94,13 +78,37 @@
      "trigger": "Works in Bundle Preview, Simulation & AI Recommendation",
      "provenance": "flow F158 step 17→18",
      "operation": "listBundleCombo"
+    },
+    {
+     "to": "BO-011",
+     "trigger": "Open Packages & Bundles",
+     "provenance": "a section of BO-011 since 2 October 2026 (CHG-MOV-002)"
+    },
+    {
+     "to": "ADM-179",
+     "trigger": "Works in Bundle Definition & Setup, a section of BO-011, which saves the record with createBundle and…",
+     "provenance": "flow F158 step 1→2",
+     "operation": "listBundleCombo"
+    },
+    {
+     "to": "ADM-180",
+     "trigger": "Works in Bundle Component Builder, a section of BO-011, which saves the record with createBundle…",
+     "provenance": "flow F158 step 3→4",
+     "operation": "listBundleCombo"
+    },
+    {
+     "to": "ADM-181",
+     "trigger": "Works in Guest Choice & Build-Your-Own Bundle Designer, a section of BO-011, which saves the record with…",
+     "provenance": "flow F158 step 5→6",
+     "operation": "listBundleCombo"
     }
    ]
   },
+  "notes": "**Merged into BO-011 Packages & Bundles as a section of it** (decided 2 October 2026, Chinmay: DEC-100, \"merge them with BO-008 to BO-011 so one surface edits each record\", and the pre-apply round; CHG-MOV-002). It edits the same record as BO-011: it renders inside BO-011's component, under its route, and keeps its own operations, because the first-release slice and its ticket name them. Whether those duplicate writers retire in favour of the venue screen's is a contract and plan question (CHG-MOV-008).\n\n**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: \"they are venue screens\"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.",
   "density": "compact",
   "pattern": "commandCentre",
   "patternReason": "the pack gives this screen a metric directory (§KPI Cards) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's",
-  "purpose": "Provide centralized visibility and management of all bundles and combo products across",
+  "purpose": "Provide centralized visibility and management of all bundles and combo products across (a section of BO-011 Packages & Bundles since 2 October 2026).",
   "layout": {
    "template": "dashboard",
    "regions": [
@@ -256,30 +264,29 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-178",
+   "board": "wireframes/P08 Venue Management.dc.html#adm-178",
    "workshopBoard": "wireframes/WS110 Promotions   Bundles Management Board 5.dc.html#adm-178"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 63. 14 of 27 labels bound to a contract property; 37 of 40 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
+   "code": "P08",
+   "audience": "staff",
    "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
    "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
+   "app": "venue-management-web",
+   "operator": "venue",
    "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
     "shell": "web",
     "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
+     "P12",
+     "P13",
+     "P16"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
     "decided": "10 September 2026"
    }
   }
@@ -297,9 +304,9 @@
    "page": 65
   },
   "implementation": {
-   "app": "ticvai-web",
-   "route": "/commercial/bundle-definition-setup-adm-179",
-   "component": "apps/ticvai-web/src/routes/commercial/BundleDefinitionSetup.tsx",
+   "app": "venue-management-web",
+   "route": "/venue-operations/packages-bundles/bundle-definition-setup-adm-179",
+   "component": "apps/venue-management-web/src/routes/venue-operations/PackagesBundlesDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -307,7 +314,8 @@
     "ADM-178"
    ],
    "exitTo": [
-    "ADM-178"
+    "ADM-178",
+    "BO-011"
    ],
    "inferred": false,
    "notes": "**Reached from ADM-178, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
@@ -315,15 +323,20 @@
     {
      "to": "ADM-178",
      "trigger": "Returns to the board's landing screen",
-     "provenance": "flow F158 step 2→3",
-     "operation": "setBundleDefinition"
+     "provenance": "flow F158 step 2→3"
+    },
+    {
+     "to": "BO-011",
+     "trigger": "Open Packages & Bundles",
+     "provenance": "a section of BO-011 since 2 October 2026 (CHG-MOV-002)"
     }
    ]
   },
+  "notes": "**Its own writer is retired in r2** (decided 2 October 2026, Chinmay: \"13 dupes would be gone in r2\"; CHG-CLN-001). `setBundleDefinition` duplicated BO-011 Packages & Bundles's createBundle and updateBundle, so it is removed from the contract (BC-018) and BO-011 saves this record. This id stays the anchor of its section of BO-011: nothing on it writes separately.\n\n**Merged into BO-011 Packages & Bundles as a section of it** (decided 2 October 2026, Chinmay: DEC-100, \"merge them with BO-008 to BO-011 so one surface edits each record\", and the pre-apply round; CHG-MOV-002). It edits the same record as BO-011: it renders inside BO-011's component, under its route, and keeps its own operations, because the first-release slice and its ticket name them. Whether those duplicate writers retire in favour of the venue screen's is a contract and plan question (CHG-MOV-008).\n\n**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: \"they are venue screens\"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.",
   "density": "compact",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure; Configure whether the bundle) and no display directory — it is settings, not a population",
-  "purpose": "Create the commercial identity and high-level behavior of a bundle.",
+  "purpose": "Create the commercial identity and high-level behavior of a bundle. (a section of BO-011 Packages & Bundles since 2 October 2026).",
   "layout": {
    "template": "form",
    "regions": [
@@ -456,12 +469,6 @@
   },
   "apis": [
    {
-    "operationId": "setBundleDefinition",
-    "contract": "promotions",
-    "purpose": "Bundle Definition & Setup",
-    "trigger": "onAction"
-   },
-   {
     "operationId": "listCommercialCampaigns",
     "contract": "promotions",
     "purpose": "List commercial campaigns",
@@ -471,30 +478,29 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-179",
+   "board": "wireframes/P08 Venue Management.dc.html#adm-179",
    "workshopBoard": "wireframes/WS110 Promotions   Bundles Management Board 5.dc.html#adm-179"
   },
-  "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 65. 0 of 0 labels bound to a contract property; 11 of 26 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 65. 0 of 0 labels bound to a contract property; 11 of 26 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **2 October 2026 (CHG-CLN-001):** setBundleDefinition retired in r2 (BC-018); BO-011 Packages & Bundles writes the record with createBundle and updateBundle.",
   "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
+   "code": "P08",
+   "audience": "staff",
    "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
    "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
+   "app": "venue-management-web",
+   "operator": "venue",
    "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
     "shell": "web",
     "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
+     "P12",
+     "P13",
+     "P16"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
     "decided": "10 September 2026"
    }
   }
@@ -512,9 +518,9 @@
    "page": 66
   },
   "implementation": {
-   "app": "ticvai-web",
-   "route": "/commercial/bundle-component-builder-adm-180",
-   "component": "apps/ticvai-web/src/routes/commercial/BundleComponentBuilder.tsx",
+   "app": "venue-management-web",
+   "route": "/venue-operations/packages-bundles/bundle-component-builder-adm-180",
+   "component": "apps/venue-management-web/src/routes/venue-operations/PackagesBundlesDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -522,7 +528,8 @@
     "ADM-178"
    ],
    "exitTo": [
-    "ADM-178"
+    "ADM-178",
+    "BO-011"
    ],
    "inferred": false,
    "notes": "**Reached from ADM-178, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
@@ -530,15 +537,23 @@
     {
      "to": "ADM-178",
      "trigger": "Returns to the board's landing screen",
-     "provenance": "flow F158 step 4→5",
-     "operation": "setBundleComponent"
+     "provenance": "flow F158 step 4→5"
+    },
+    {
+     "to": "BO-011",
+     "trigger": "Open Packages & Bundles",
+     "provenance": "a section of BO-011 since 2 October 2026 (CHG-MOV-002)",
+     "carries": [
+      "bundleId"
+     ]
     }
    ]
   },
+  "notes": "**Its own writer is retired in r2** (decided 2 October 2026, Chinmay: \"13 dupes would be gone in r2\"; CHG-CLN-001). `setBundleComponent` duplicated BO-011 Packages & Bundles's createBundle, so it is removed from the contract (BC-019) and BO-011 saves this record. This id stays the anchor of its section of BO-011: nothing on it writes separately.\n\n**Merged into BO-011 Packages & Bundles as a section of it** (decided 2 October 2026, Chinmay: DEC-100, \"merge them with BO-008 to BO-011 so one surface edits each record\", and the pre-apply round; CHG-MOV-002). It edits the same record as BO-011: it renders inside BO-011's component, under its route, and keeps its own operations, because the first-release slice and its ticket name them. Whether those duplicate writers retire in favour of the venue screen's is a contract and plan question (CHG-MOV-008).\n\n**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: \"they are venue screens\"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.",
   "density": "compact",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
-  "purpose": "Define exactly what products and services make up the bundle.",
+  "purpose": "Define exactly what products and services make up the bundle. (a section of BO-011 Packages & Bundles since 2 October 2026).",
   "layout": {
    "template": "form",
    "regions": [
@@ -570,6 +585,13 @@
        "kind": "textField",
        "label": "Quantity based on ticket count",
        "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 66 §Configure"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The bundle",
+       "bindsTo": "Bundle",
+       "operation": "getBundle",
+       "provenance": "contract promotions.yaml GET /bundles/{bundleId}; wiring fix, 2 October 2026"
       }
      ]
     },
@@ -594,39 +616,47 @@
   },
   "apis": [
    {
-    "operationId": "setBundleComponent",
+    "operationId": "getBundle",
     "contract": "promotions",
-    "purpose": "Bundle Component Builder",
-    "trigger": "onAction"
+    "purpose": "The bundle with its components and allocation",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-180",
+   "board": "wireframes/P08 Venue Management.dc.html#adm-180",
    "workshopBoard": "wireframes/WS110 Promotions   Bundles Management Board 5.dc.html#adm-180"
   },
-  "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 66. 0 of 0 labels bound to a contract property; 5 of 31 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 66. 0 of 0 labels bound to a contract property; 5 of 31 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **2 October 2026 (CHG-CLN-001):** setBundleComponent retired in r2 (BC-019); BO-011 Packages & Bundles writes the record with createBundle.",
+  "entryState": {
+   "params": [
+    {
+     "name": "bundleId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
+   "code": "P08",
+   "audience": "staff",
    "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
    "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
+   "app": "venue-management-web",
+   "operator": "venue",
    "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
     "shell": "web",
     "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
+     "P12",
+     "P13",
+     "P16"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
     "decided": "10 September 2026"
    }
   }
@@ -644,9 +674,9 @@
    "page": 67
   },
   "implementation": {
-   "app": "ticvai-web",
-   "route": "/commercial/guest-choice-build-your-own-bundle-designer-adm-181",
-   "component": "apps/ticvai-web/src/routes/commercial/GuestChoiceBuildYourOwnBundleDesigner.tsx",
+   "app": "venue-management-web",
+   "route": "/venue-operations/packages-bundles/guest-choice-build-your-own-bundle-designer-adm-181",
+   "component": "apps/venue-management-web/src/routes/venue-operations/PackagesBundlesDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -654,7 +684,8 @@
     "ADM-178"
    ],
    "exitTo": [
-    "ADM-178"
+    "ADM-178",
+    "BO-011"
    ],
    "inferred": false,
    "notes": "**Reached from ADM-178, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
@@ -662,15 +693,23 @@
     {
      "to": "ADM-178",
      "trigger": "Returns to the board's landing screen",
-     "provenance": "flow F158 step 6→7",
-     "operation": "setGuestChoiceBuild"
+     "provenance": "flow F158 step 6→7"
+    },
+    {
+     "to": "BO-011",
+     "trigger": "Open Packages & Bundles",
+     "provenance": "a section of BO-011 since 2 October 2026 (CHG-MOV-002)",
+     "carries": [
+      "bundleId"
+     ]
     }
    ]
   },
+  "notes": "**Its own writer is retired in r2** (decided 2 October 2026, Chinmay: \"13 dupes would be gone in r2\"; CHG-CLN-001). `setGuestChoiceBuild` duplicated BO-011 Packages & Bundles's createBundle, so it is removed from the contract (BC-020) and BO-011 saves this record. This id stays the anchor of its section of BO-011: nothing on it writes separately.\n\n**Merged into BO-011 Packages & Bundles as a section of it** (decided 2 October 2026, Chinmay: DEC-100, \"merge them with BO-008 to BO-011 so one surface edits each record\", and the pre-apply round; CHG-MOV-002). It edits the same record as BO-011: it renders inside BO-011's component, under its route, and keeps its own operations, because the first-release slice and its ticket name them. Whether those duplicate writers retire in favour of the venue screen's is a contract and plan question (CHG-MOV-008).\n\n**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: \"they are venue screens\"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.",
   "density": "compact",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Choose 1 F&B Option) and no display directory — it is settings, not a population",
-  "purpose": "Configure bundles where the guest chooses products from predefined groups. The matrix specifically requires the guest to be able to choose attractions, experiences, F&B, retail products, or services from predefined categories while maintaining bundle pricing rules.",
+  "purpose": "Configure bundles where the guest chooses products from predefined groups. The matrix specifically requires the guest to be able to choose attractions, experiences, F&B, retail products, or services from predefined categories while maintaining bundle pricing rules. (a section of BO-011 Packages & Bundles since 2 October 2026).",
   "layout": {
    "template": "form",
    "regions": [
@@ -692,6 +731,13 @@
        "kind": "selectField",
        "label": "Meal C",
        "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 67 §Choose 1 F&B Option"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The bundle",
+       "bindsTo": "Bundle",
+       "operation": "getBundle",
+       "provenance": "contract promotions.yaml GET /bundles/{bundleId}; wiring fix, 2 October 2026"
       }
      ]
     },
@@ -716,42 +762,47 @@
   },
   "apis": [
    {
-    "operationId": "setGuestChoiceBuild",
+    "operationId": "getBundle",
     "contract": "promotions",
-    "purpose": "Guest Choice & Build-Your-Own Bundle Designer",
-    "trigger": "onAction",
-    "invalidates": [
-     "setGuestChoiceBuild"
-    ]
+    "purpose": "The bundle with its choice groups",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-181",
+   "board": "wireframes/P08 Venue Management.dc.html#adm-181",
    "workshopBoard": "wireframes/WS110 Promotions   Bundles Management Board 5.dc.html#adm-181"
   },
-  "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 67. 0 of 0 labels bound to a contract property; 3 of 27 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 67. 0 of 0 labels bound to a contract property; 3 of 27 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **2 October 2026 (CHG-CLN-001):** setGuestChoiceBuild retired in r2 (BC-020); BO-011 Packages & Bundles writes the record with createBundle.",
+  "entryState": {
+   "params": [
+    {
+     "name": "bundleId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
+   "code": "P08",
+   "audience": "staff",
    "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
    "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
+   "app": "venue-management-web",
+   "operator": "venue",
    "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
     "shell": "web",
     "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
+     "P12",
+     "P13",
+     "P16"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
     "decided": "10 September 2026"
    }
   }
@@ -769,9 +820,9 @@
    "page": 68
   },
   "implementation": {
-   "app": "ticvai-web",
+   "app": "venue-management-web",
    "route": "/commercial/bundle-pricing-commercial-model-adm-182",
-   "component": "apps/ticvai-web/src/routes/commercial/BundlePricingCommercialModel.tsx",
+   "component": "apps/venue-management-web/src/routes/commercial/BundlePricingCommercialModel.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -792,6 +843,7 @@
     }
    ]
   },
+  "notes": "**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: \"they are venue screens\"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.",
   "density": "compact",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Pricing Configuration) and no display directory — it is settings, not a population",
@@ -874,30 +926,29 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-182",
+   "board": "wireframes/P08 Venue Management.dc.html#adm-182",
    "workshopBoard": "wireframes/WS110 Promotions   Bundles Management Board 5.dc.html#adm-182"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 68. 0 of 0 labels bound to a contract property; 10 of 22 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
+   "code": "P08",
+   "audience": "staff",
    "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
    "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
+   "app": "venue-management-web",
+   "operator": "venue",
    "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
     "shell": "web",
     "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
+     "P12",
+     "P13",
+     "P16"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
     "decided": "10 September 2026"
    }
   }
@@ -915,9 +966,9 @@
    "page": 69
   },
   "implementation": {
-   "app": "ticvai-web",
+   "app": "venue-management-web",
    "route": "/commercial/bundle-availability-capacity-validation-adm-183",
-   "component": "apps/ticvai-web/src/routes/commercial/BundleAvailabilityCapacityValidation.tsx",
+   "component": "apps/venue-management-web/src/routes/commercial/BundleAvailabilityCapacityValidation.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -938,6 +989,7 @@
     }
    ]
   },
+  "notes": "**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: \"they are venue screens\"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§For each component display) and no metric row",
@@ -1005,30 +1057,29 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-183",
+   "board": "wireframes/P08 Venue Management.dc.html#adm-183",
    "workshopBoard": "wireframes/WS110 Promotions   Bundles Management Board 5.dc.html#adm-183"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 69. 7 of 7 labels bound to a contract property; 7 of 28 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
+   "code": "P08",
+   "audience": "staff",
    "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
    "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
+   "app": "venue-management-web",
+   "operator": "venue",
    "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
     "shell": "web",
     "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
+     "P12",
+     "P13",
+     "P16"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
     "decided": "10 September 2026"
    }
   }
@@ -1046,9 +1097,9 @@
    "page": 70
   },
   "implementation": {
-   "app": "ticvai-web",
+   "app": "venue-management-web",
    "route": "/commercial/bundle-validity-scheduling-redemption-rules-adm-184",
-   "component": "apps/ticvai-web/src/routes/commercial/BundleValiditySchedulingRedemptionRules.tsx",
+   "component": "apps/venue-management-web/src/routes/commercial/BundleValiditySchedulingRedemptionRules.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1069,6 +1120,7 @@
     }
    ]
   },
+  "notes": "**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: \"they are venue screens\"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
@@ -1083,6 +1135,11 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Promotions___Bundles_Management_Reference.pdf, page 70"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-027): No write for what listBundleValidityScheduling lists.",
+    "source": "contracts/satellite/promotions.yaml#listBundleValidityScheduling"
    }
   ],
   "layout": {
@@ -1124,30 +1181,29 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-184",
+   "board": "wireframes/P08 Venue Management.dc.html#adm-184",
    "workshopBoard": "wireframes/WS110 Promotions   Bundles Management Board 5.dc.html#adm-184"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 70. 0 of 0 labels bound to a contract property; 0 of 22 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
+   "code": "P08",
+   "audience": "staff",
    "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
    "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
+   "app": "venue-management-web",
+   "operator": "venue",
    "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
     "shell": "web",
     "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
+     "P12",
+     "P13",
+     "P16"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
     "decided": "10 September 2026"
    }
   }
@@ -1165,9 +1221,9 @@
    "page": 71
   },
   "implementation": {
-   "app": "ticvai-web",
+   "app": "venue-management-web",
    "route": "/commercial/partner-external-product-bundle-manager-adm-185",
-   "component": "apps/ticvai-web/src/routes/commercial/PartnerExternalProductBundleManager.tsx",
+   "component": "apps/venue-management-web/src/routes/commercial/PartnerExternalProductBundleManager.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1188,6 +1244,7 @@
     }
    ]
   },
+  "notes": "**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: \"they are venue screens\"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Show) and no metric row",
@@ -1309,7 +1366,7 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-185",
+   "board": "wireframes/P08 Venue Management.dc.html#adm-185",
    "workshopBoard": "wireframes/WS110 Promotions   Bundles Management Board 5.dc.html#adm-185"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 71. 6 of 6 labels bound to a contract property; 17 of 33 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
@@ -1333,25 +1390,24 @@
    }
   ],
   "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
+   "code": "P08",
+   "audience": "staff",
    "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
    "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
+   "app": "venue-management-web",
+   "operator": "venue",
    "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
     "shell": "web",
     "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
+     "P12",
+     "P13",
+     "P16"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
     "decided": "10 September 2026"
    }
   }
@@ -1369,9 +1425,9 @@
    "page": 72
   },
   "implementation": {
-   "app": "ticvai-web",
+   "app": "venue-management-web",
    "route": "/commercial/revenue-allocation-cost-settlement-rules-adm-186",
-   "component": "apps/ticvai-web/src/routes/commercial/RevenueAllocationCostSettlementRules.tsx",
+   "component": "apps/venue-management-web/src/routes/commercial/RevenueAllocationCostSettlementRules.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1392,6 +1448,7 @@
     }
    ]
   },
+  "notes": "**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: \"they are venue screens\"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.",
   "density": "compact",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Financial Configuration) and no display directory — it is settings, not a population",
@@ -1464,30 +1521,36 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-186",
+   "board": "wireframes/P08 Venue Management.dc.html#adm-186",
    "workshopBoard": "wireframes/WS110 Promotions   Bundles Management Board 5.dc.html#adm-186"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 72. 0 of 0 labels bound to a contract property; 8 of 25 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-027): No write for what listRevenueAllocationCost lists.",
+    "source": "contracts/satellite/promotions.yaml#listRevenueAllocationCost"
+   }
+  ],
   "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
+   "code": "P08",
+   "audience": "staff",
    "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
    "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
+   "app": "venue-management-web",
+   "operator": "venue",
    "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
     "shell": "web",
     "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
+     "P12",
+     "P13",
+     "P16"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
     "decided": "10 September 2026"
    }
   }
@@ -1505,9 +1568,9 @@
    "page": 32
   },
   "implementation": {
-   "app": "ticvai-web",
+   "app": "venue-management-web",
    "route": "/commercial/bundle-preview-simulation-ai-recommendation-adm-187",
-   "component": "apps/ticvai-web/src/routes/commercial/BundlePreviewSimulationAiRecommendation.tsx",
+   "component": "apps/venue-management-web/src/routes/commercial/BundlePreviewSimulationAiRecommendation.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1520,10 +1583,11 @@
    "inferred": false,
    "notes": "**Reached from ADM-178, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
   },
+  "notes": "**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: \"they are venue screens\"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
-  "purpose": "Allow administrators to test promotional rules before activating them. This is critical because the matrix requires simulation of redemption, discount exposure, revenue impact, margin impact and financial performance before activation.",
+  "purpose": "Validate a bundle end to end before it is published: preview it as a guest sees it, simulate its price and allocation, and review the AI recommendations on it.",
   "gaps": [
    {
     "operation": null,
@@ -1588,7 +1652,15 @@
     },
     {
      "name": "contentBody",
-     "components": []
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The bundle",
+       "bindsTo": "Bundle",
+       "operation": "getBundle",
+       "provenance": "contract promotions.yaml GET /bundles/{bundleId}; wiring fix, 2 October 2026"
+      }
+     ]
     }
    ]
   },
@@ -1605,35 +1677,50 @@
     "contract": "promotions",
     "purpose": "Bundle Preview, Simulation & AI Recommendation",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "getBundle",
+    "contract": "promotions",
+    "purpose": "The bundle being validated before publication",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-187",
+   "board": "wireframes/P08 Venue Management.dc.html#adm-187",
    "workshopBoard": "wireframes/WS110 Promotions   Bundles Management Board 5.dc.html#adm-187"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 32. 0 of 0 labels bound to a contract property; 17 of 76 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "bundleId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "purposeNote": "Purpose rewritten 2 October 2026 (CHG-WIR-026): The purpose was ADM-157's word for word (testing promotional rules); the pack attached it by page, and this screen validates a bundle before it is published (pack page 73) (design-notes correction ticketing-backoffice ADM-187).",
   "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
+   "code": "P08",
+   "audience": "staff",
    "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
    "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
+   "app": "venue-management-web",
+   "operator": "venue",
    "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
     "shell": "web",
     "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
+     "P12",
+     "P13",
+     "P16"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
     "decided": "10 September 2026"
    }
   }

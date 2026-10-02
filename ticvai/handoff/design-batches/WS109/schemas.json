@@ -231,7 +231,7 @@
  "AccreditationIdentityConflict": {
   "type": "object",
   "x-ticvai-persistence": "accreditation.identity_conflict",
-  "description": "Board 2.7. **One badge revoked and the other still opening doors.**\n\n**Stored, not recomputed on each read** (data model for the agreed operations, 29 September): a suspected pair is raised by `createAccreditationApplication` and `importAccreditationHolders` using `marketing-crm`'s identity resolution, and keeps its id and status while somebody decides it, so a pair rejected as two different people is not raised again on the next import. Resolved by `resolveIdentityConflict` (`pending` to `merged` or `rejected`, decided 29 September, writers pass); lifecycle in `states/accreditation-identity-conflict.yaml`.",
+  "description": "Board 2.7. **One badge revoked and the other still opening doors.**\n\n**`matchedOn` names `face` only where the programme's `faceMatching` is enabled** and both applicants consented (workbook Q461; CHG-CSA-031).\n\n**Stored, not recomputed on each read** (data model for the agreed operations, 29 September): a suspected pair is raised by `createAccreditationApplication` and `importAccreditationHolders` using `marketing-crm`'s identity resolution, and keeps its id and status while somebody decides it, so a pair rejected as two different people is not raised again on the next import. Resolved by `resolveIdentityConflict` (`pending` to `merged` or `rejected`, decided 29 September, writers pass); lifecycle in `states/accreditation-identity-conflict.yaml`.",
   "required": [
    "id",
    "holderIds",

@@ -107,14 +107,6 @@
        "provenance": "decided 29 September, rev 3 REV3-21"
       },
       {
-       "kind": "numberField",
-       "label": "Passengers",
-       "bindsTo": "PassengerType",
-       "notes": "Adult, child 5-11 and student at half fare, person of determination free (one companion at the adult fare); proof is checked at boarding.",
-       "operation": "getTransportFareTable",
-       "provenance": "decided 29 September, rev 3 REV3-21"
-      },
-      {
        "kind": "selectField",
        "label": "Time period",
        "notes": "Morning, Afternoon, Evening, Night, each with its count of departures.",
@@ -134,7 +126,8 @@
         "DepartureOffer.fare"
        ],
        "operation": "searchTransportDepartures",
-       "provenance": "decided 29 September, rev 3 REV3-21"
+       "provenance": "decided 29 September, rev 3 REV3-21",
+       "notes": "Departures list as soon as From, To and the date are set; there is no Search button (DI-1109)."
       },
       {
        "kind": "cardList",
@@ -163,6 +156,14 @@
        "notes": "The Favourites tab; *Book this route* prefills the one-way tab. Signed-in guests only.",
        "operation": "listMyFavouriteRoutes",
        "provenance": "decided 29 September, rev 3 REV3-21"
+      },
+      {
+       "kind": "numberField",
+       "label": "Passengers",
+       "bindsTo": "PassengerType",
+       "notes": "Asked after a departure is chosen (DI-1110): Adult, child 5-11 and student at half fare, person of determination free (one companion at the adult fare); proof is checked at boarding.",
+       "operation": "getTransportFareTable",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-020, design-notes correction)"
       }
      ]
     },
@@ -200,12 +201,6 @@
      "name": "actionBar",
      "slot": "rowActions",
      "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Search Trips",
-       "operation": "searchTransportDepartures",
-       "provenance": "decided 29 September, rev 3 REV3-21"
-      },
       {
        "kind": "secondaryButton",
        "label": "Next Available Trip",
@@ -301,7 +296,7 @@
    {
     "operationId": "listMyFavouriteRoutes",
     "contract": "transport",
-    "purpose": "The guest's saved routes",
+    "purpose": "The guest's saved routes Only when signed in (decided 2 October 2026 by Chinmay, fix before Block A starts (GFIX-6)).",
     "trigger": "onLoad"
    },
    {

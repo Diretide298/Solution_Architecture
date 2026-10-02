@@ -725,14 +725,6 @@
    "callCentre"
   ]
  },
- "ConsentDecision": {
-  "type": "string",
-  "enum": [
-   "granted",
-   "withdrawn",
-   "notAsked"
-  ]
- },
  "ConsentPurpose": {
   "type": "string",
   "enum": [
@@ -807,58 +799,6 @@
    "checkout"
   ],
   "description": "`checkout` (30 September, M18-15): an opt-in ticked beside the terms at checkout, carried on orders `checkoutCart` `marketingConsents[]` and recorded by `recordCheckoutConsents`, bound to the order and the verified contact. `cookieBanner` (29 September, build; BL-073 §4b): a decision made on the cookie banner or preference centre and moved onto the guest by `claimDeviceConsent`. Kept apart from `website`, a form submission, because the audit trail (2.6.56) has to tell the two apart."
- },
- "ConsentState": {
-  "x-ticvai-persistence": "none — projection over consent_record",
-  "type": "object",
-  "required": [
-   "subjectId",
-   "purposes"
-  ],
-  "properties": {
-   "subjectId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "purposes": {
-    "type": "array",
-    "items": {
-     "type": "object",
-     "required": [
-      "purpose",
-      "decision",
-      "requiresRenewal"
-     ],
-     "properties": {
-      "purpose": {
-       "$ref": "#/components/schemas/ConsentPurpose"
-      },
-      "decision": {
-       "$ref": "#/components/schemas/ConsentDecision"
-      },
-      "channels": {
-       "type": "array",
-       "items": {
-        "$ref": "#/components/schemas/MessageChannel"
-       }
-      },
-      "noticeVersion": {
-       "type": "string",
-       "nullable": true
-      },
-      "requiresRenewal": {
-       "type": "boolean",
-       "description": "True where the notice has been superseded since consent was given."
-      },
-      "decidedAt": {
-       "type": "string",
-       "format": "date-time",
-       "nullable": true
-      }
-     }
-    }
-   }
-  }
  },
  "CouponCode": {
   "x-ticvai-persistence": "promotions.coupon_code",
@@ -1147,7 +1087,7 @@
     "type": "string",
     "pattern": "^[A-Z]{3}$",
     "nullable": true,
-    "description": "The currency the guest handed over, where it is not the venue's — becomes `Payment.tenderCurrency`. Omit for a payment in the venue's own currency."
+    "description": "The currency the guest handed over, where it is not the venue's — becomes `Payment.tenderCurrency`. Omit for a payment in the venue's own currency. For a guest-channel card or wallet payment on an order with a `chargeCurrency`, the server sets it from the order (CHG-FIN-001)."
    },
    "tenderAmount": {
     "allOf": [
@@ -1263,13 +1203,13 @@
      "type": "string",
      "format": "uuid"
     },
-    "description": "The reward products, where the reward is not the qualifying product: the free gift of `freeItem`, the \"different product\" of a `buyXGetY` (setGiftFreeProduct, setBuyGetBogo). Absent means the reward is taken from the qualifying lines. (DM5, 29 September: data model for the agreed operations)"
+    "description": "The reward products, where the reward is not the qualifying product: the free gift of `freeItem`, the \"different product\" of a `buyXGetY` (createPromotion; the builders setGiftFreeProduct and setBuyGetBogo were retired in r2, CHG-CLN-001). Absent means the reward is taken from the qualifying lines. (DM5, 29 September: data model for the agreed operations)"
    },
    "maxApplicationsPerBasket": {
     "type": "integer",
     "minimum": 1,
     "nullable": true,
-    "description": "How many times the offer repeats in one basket: the \"maximum repetitions\" of an N-for-X offer (setFixedPriceOffer). Null repeats for every complete set. (DM5, 29 September: data model for the agreed operations)"
+    "description": "How many times the offer repeats in one basket: the \"maximum repetitions\" of an N-for-X offer (createPromotion; setFixedPriceOffer was retired in r2, CHG-CLN-001). Null repeats for every complete set. (DM5, 29 September: data model for the agreed operations)"
    }
   }
  },
@@ -1361,146 +1301,59 @@
   "description": "**An exchange rate: a decimal string, never a float**, for the reason `Money.amount` is one — a JavaScript client must not round a rate in transit. **Six decimal places**, the precision `finance.FxRate.rate` asks for, and stored at that precision.\n",
   "pattern": "^\\d+(\\.\\d{1,6})?$"
  },
- "GuestDevice": {
+ "GuestPreferences": {
   "type": "object",
-  "x-ticvai-persistence": "marketing.guest_device",
-  "required": [
-   "id",
-   "subjectId",
-   "platform",
-   "status",
-   "registeredAt"
-  ],
+  "x-ticvai-persistence": "marketing.guest_preference",
+  "description": "**What the guest likes, kept apart from what they permit** (consent) and from who they are (the profile). One row per subject. `dietary` and `accessibility` are here rather than as tags because BL-134 gives them their own consent purpose and retention.\n",
   "properties": {
    "id": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "subjectId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "platform": {
-    "type": "string",
-    "enum": [
-     "ios",
-     "android",
-     "web"
-    ]
-   },
-   "tokenFingerprint": {
-    "type": "string",
-    "description": "Hash of the token, not the token. The token itself is write-only — returning it would put a push credential in every response a support agent can read.\n"
-   },
-   "tokenRef": {
-    "type": "string",
-    "writeOnly": true,
-    "description": "**A vault reference to the push token**, written by the server from `registerGuestDevice.token` — the same pattern as `PaymentProvider.credentialRef`. Never the token and never returned; the sender resolves it at send time. Without it a registered device could not be sent to.\n"
-   },
-   "appVersion": {
-    "type": "string",
-    "nullable": true
-   },
-   "osVersion": {
-    "type": "string",
-    "nullable": true
-   },
-   "deviceModel": {
-    "type": "string",
-    "nullable": true
-   },
-   "locale": {
-    "type": "string",
-    "nullable": true
-   },
-   "status": {
-    "type": "string",
-    "enum": [
-     "active",
-     "revoked",
-     "failed"
-    ]
-   },
-   "failureCount": {
-    "type": "integer",
-    "description": "Consecutive delivery failures. Past the threshold the device is marked failed and stops being targeted — a dead token retried forever is wasted quota and a misleading delivery rate.\n"
-   },
-   "registeredAt": {
-    "type": "string",
-    "format": "date-time"
-   },
-   "lastSeenAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "revokedAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   }
-  }
- },
- "GuestDocument": {
-  "type": "object",
-  "x-ticvai-persistence": "marketing.guest_document",
-  "description": "BL-133. **No store for guest photos, avatars, IDs or signed documents anywhere.**\nDeliberately separate from `assets`, which holds a tenant's media library. **A guest's passport scan is not a marketing asset** — it has a different retention clock, a different access rule and a different reason to exist, and putting it in the same store means one careless query returns both.\n",
-  "required": [
-   "id",
-   "subjectId",
-   "kind",
-   "storageRef",
-   "retainUntil"
-  ],
-  "properties": {
-   "id": {
-    "readOnly": true,
-    "type": "string",
-    "format": "uuid"
-   },
-   "subjectId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "kind": {
-    "type": "string",
-    "enum": [
-     "avatar",
-     "idDocument",
-     "visa",
-     "signedWaiver",
-     "medicalNote",
-     "accessibilityEvidence",
-     "photo",
-     "other"
-    ]
-   },
-   "storageRef": {
-    "type": "string",
-    "description": "**The stored object's key in the guest-document store**, which is deliberately not `assets` (BL-133). No operation in this contract issues one yet: `assets` `createUpload` is staff-only and writes the media library, so the upload step for this store is still to be designed.\n"
-   },
-   "contentType": {
-    "type": "string"
-   },
-   "consentPurposeId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "retainUntil": {
-    "type": "string",
-    "format": "date",
-    "description": "**Required, not optional.** A guest document with no deletion date is a guest document kept forever, and the retention question is the one CF-64 is open on.\n**Kept until its purpose ends, then for the period client counsel sets (decided 28 September, audit R149).** The caller sets `retainUntil` to the end of the purpose (the visit, the waiver's validity, the visa's expiry) plus that period. **The period per `kind` is an open value**: until counsel names it, it is zero, so the document is deleted when the purpose ends.\n"
-   },
-   "uploadedAt": {
-    "readOnly": true,
-    "type": "string",
-    "format": "date-time"
-   },
-   "uploadedByPrincipalId": {
-    "readOnly": true,
     "type": "string",
     "format": "uuid",
-    "nullable": true
+    "readOnly": true
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "seatingPreference": {
+    "type": "string",
+    "nullable": true,
+    "maxLength": 200
+   },
+   "drinkPreferences": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "dietary": {
+    "type": "array",
+    "description": "Also written by `updateMyProfile`.",
+    "items": {
+     "type": "string"
+    }
+   },
+   "accessibility": {
+    "type": "array",
+    "description": "Also written by `updateMyProfile`.",
+    "items": {
+     "type": "string"
+    }
+   },
+   "preferredChannel": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/MessageChannel"
+     }
+    ],
+    "x-ticvai-persisted": false,
+    "description": "**Stored on the profile** (`GuestProfile.preferredChannel`) — carried here because the preference screen edits it beside the rest.\n"
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
    }
   }
  },
@@ -1602,106 +1455,12 @@
    }
   }
  },
- "GuestProfileDetail": {
-  "x-ticvai-persistence": "marketing.guest_profile",
-  "allOf": [
-   {
-    "$ref": "#/components/schemas/GuestProfile"
-   },
-   {
-    "type": "object",
-    "properties": {
-     "id": {
-      "type": "string",
-      "format": "uuid",
-      "readOnly": true,
-      "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
-     },
-     "consents": {
-      "$ref": "#/components/schemas/ConsentState"
-     },
-     "loyalty": {
-      "$ref": "#/components/schemas/LoyaltyPosition"
-     },
-     "openCaseCount": {
-      "type": "integer"
-     },
-     "recentOrderIds": {
-      "type": "array",
-      "items": {
-       "type": "string"
-      }
-     },
-     "membershipIds": {
-      "type": "array",
-      "items": {
-       "type": "string",
-       "format": "uuid"
-      }
-     },
-     "notes": {
-      "type": "string",
-      "nullable": true
-     }
-    }
-   }
-  ]
- },
- "LoyaltyPosition": {
-  "x-ticvai-persistence": "marketing.loyalty_position",
+ "LocalisedRichText": {
+  "x-ticvai-persistence": "none — jsonb column",
   "type": "object",
-  "required": [
-   "subjectId",
-   "programmeId",
-   "pointsBalance",
-   "tierCode"
-  ],
-  "properties": {
-   "leaderboardNickname": {
-    "type": "string",
-    "nullable": true,
-    "maxLength": 24,
-    "description": "BL-173. **The name shown on a leaderboard, chosen by the guest.** Offered whenever they reach the board and changeable afterwards; `setLeaderboardNickname` is the only thing that writes it.\n**Null means the guest has not chosen one yet, and the board shows a generated `Player-4821` in its place** — never `pii.subject.display_name`, which would disclose silently on the day a guest first placed and is the case this field exists to prevent.\n**The generated name is computed at read time and not stored here.** Writing it would make *\"has this guest chosen a name\"* unanswerable, and that flag is what the prompt-on-reaching-the-board depends on.\n"
-   },
-   "subjectId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "programmeId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "pointsBalance": {
-    "type": "integer"
-   },
-   "lifetimePoints": {
-    "type": "integer"
-   },
-   "tierId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "**The tier this row's `tierCode` and `tierName` are a copy of.** Added 20 September with `marketing.programme_tier`: the two strings were a cache of something that did not exist, and a cache with no source cannot be rebuilt or audited.\n"
-   },
-   "tierCode": {
-    "type": "string"
-   },
-   "tierName": {
-    "type": "string"
-   },
-   "pointsToNextTier": {
-    "type": "integer",
-    "nullable": true
-   },
-   "nextExpiryPoints": {
-    "type": "integer",
-    "nullable": true
-   },
-   "nextExpiryAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   }
+  "description": "Keyed by language code. Values are sanitised HTML.",
+  "additionalProperties": {
+   "type": "string"
   }
  },
  "MessageChannel": {
@@ -1815,6 +1574,46 @@
    },
    "refundedAmount": {
     "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "chargeCurrency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**The currency the guest selected and is charged in** (CHG-FIN-001, 2 October 2026). Null or equal to `currency` for a sale in the base currency. Everything else on the order, and every ledger posting, stays in the base currency `currency`."
+   },
+   "chargeFxRate": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/ExchangeRateDecimal"
+     }
+    ],
+    "nullable": true,
+    "readOnly": true,
+    "description": "Units of `chargeCurrency` per one unit of the base currency, from the region's `tender` rate in force at checkout (`finance.FxRate`), stored on the order so the payment, the receipt, the tax invoice and any refund use the same rate (CHG-FIN-001)."
+   },
+   "chargeFxRateId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The `finance.FxRate` row the rate was taken from, for audit."
+   },
+   "chargeTotal": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "readOnly": true,
+    "description": "`grossAmount` converted at `chargeFxRate` and rounded to the charge currency's scale: what the guest pays and what the payment request to the provider asks for (CHG-FIN-001)."
+   },
+   "chargeRateLockedUntil": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The quote holds until then (the cart lease). After it, the next payment attempt re-quotes at the rate then in force and the guest confirms the new amount (CHG-FIN-001)."
    },
    "droppedPromotions": {
     "type": "array",
@@ -2155,7 +1954,7 @@
     "type": "string",
     "pattern": "^[A-Z]{3}$",
     "nullable": true,
-    "description": "4.6.11 is deliberately asymmetric: **accept foreign currency, refund in local.** A till giving change in five currencies needs five floats and five counts, and the variance becomes unattributable.\n"
+    "description": "4.6.11 is deliberately asymmetric: **accept foreign currency, refund in local.** A till giving change in five currencies needs five floats and five counts, and the variance becomes unattributable.\n**Cash at a till only** (CHG-FIN-001, 2 October 2026). A card or wallet payment the guest made in a currency they selected is refunded in that currency (`Refund.tenderCurrency`).\n"
    },
    "amount": {
     "$ref": "../shared/common.yaml#/components/schemas/Money"
@@ -2340,6 +2139,16 @@
    }
   }
  },
+ "PolicyKind": {
+  "type": "string",
+  "enum": [
+   "privacy",
+   "termsAndConditions",
+   "refund",
+   "cookie",
+   "accessibility"
+  ]
+ },
  "PromotionEvaluation": {
   "x-ticvai-persistence": "none — computed",
   "type": "object",
@@ -2454,6 +2263,41 @@
    }
   }
  },
+ "PublishedPolicy": {
+  "x-ticvai-persistence": "none — a public projection of whitelabel.policy",
+  "type": "object",
+  "x-ticvai-agreed": "2 October: decided by Chinmay, fix before Block A starts (GFIX-2)",
+  "description": "The current version of one policy as a guest reads it (`listPublishedPolicies`). Who published it and the partition key stay on `Policy`.",
+  "required": [
+   "kind",
+   "version",
+   "body",
+   "effectiveFrom"
+  ],
+  "properties": {
+   "kind": {
+    "$ref": "#/components/schemas/PolicyKind"
+   },
+   "title": {
+    "type": "string"
+   },
+   "version": {
+    "type": "string",
+    "description": "The version a consent records (a guest who consented to version 3 consented to version 3)."
+   },
+   "body": {
+    "$ref": "#/components/schemas/LocalisedRichText"
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "format": "date"
+   },
+   "requiresReconsent": {
+    "type": "boolean",
+    "description": "True when guests who consented to an earlier version are asked again on next launch."
+   }
+  }
+ },
  "RecordConsentAnswersRequest": {
   "type": "object",
   "x-ticvai-persistence": "none — request only",
@@ -2527,42 +2371,6 @@
     "$ref": "#/components/schemas/ConsentSource"
    },
    "answeredAt": {
-    "type": "string",
-    "format": "date-time"
-   }
-  }
- },
- "RecordConsentRequest": {
-  "x-ticvai-persistence": "none — request only",
-  "type": "object",
-  "required": [
-   "purpose",
-   "decision",
-   "noticeVersion",
-   "source",
-   "recordedAt"
-  ],
-  "properties": {
-   "purpose": {
-    "$ref": "#/components/schemas/ConsentPurpose"
-   },
-   "decision": {
-    "$ref": "#/components/schemas/ConsentDecision"
-   },
-   "channels": {
-    "type": "array",
-    "description": "Omit to apply to every channel the purpose covers.",
-    "items": {
-     "$ref": "#/components/schemas/MessageChannel"
-    }
-   },
-   "noticeVersion": {
-    "type": "string"
-   },
-   "source": {
-    "$ref": "#/components/schemas/ConsentSource"
-   },
-   "recordedAt": {
     "type": "string",
     "format": "date-time"
    }
@@ -2687,80 +2495,5 @@
    "giftCard",
    "complimentary"
   ]
- },
- "Wishlist": {
-  "type": "object",
-  "required": [
-   "subjectId",
-   "items"
-  ],
-  "x-ticvai-persistence": "none — wrapper. The items are the table, keyed by subject",
-  "properties": {
-   "subjectId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "items": {
-    "type": "array",
-    "x-ticvai-persistence": "marketing.wishlist_item",
-    "items": {
-     "type": "object",
-     "required": [
-      "id",
-      "variantId",
-      "addedAt",
-      "isAvailable"
-     ],
-     "properties": {
-      "id": {
-       "type": "string",
-       "format": "uuid"
-      },
-      "variantId": {
-       "type": "string",
-       "format": "uuid"
-      },
-      "productName": {
-       "type": "string"
-      },
-      "performanceId": {
-       "type": "string",
-       "format": "uuid",
-       "nullable": true
-      },
-      "performanceStartsAt": {
-       "type": "string",
-       "format": "date-time",
-       "nullable": true
-      },
-      "price": {
-       "x-ticvai-column": "list_price",
-       "$ref": "../shared/common.yaml#/components/schemas/Money",
-       "description": "The variant's current list price when the wishlist is read. Stored as `list_price` (naming-and-style 5.1 bans a bare `price` column); the wire keeps `price`."
-      },
-      "imageAssetRef": {
-       "type": "string",
-       "nullable": true
-      },
-      "isAvailable": {
-       "type": "boolean",
-       "description": "False where the product has been withdrawn or the performance has passed. Returned rather than dropped — a guest who saved something and finds it silently gone assumes the feature is broken.\n"
-      },
-      "unavailableReason": {
-       "type": "string",
-       "nullable": true
-      },
-      "note": {
-       "type": "string",
-       "nullable": true
-      },
-      "addedAt": {
-       "type": "string",
-       "format": "date-time"
-      }
-     }
-    }
-   }
-  }
  }
 }

@@ -150,144 +150,6 @@
    }
   }
  },
- "BuyXGetYBogoRuleBuilderInput": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table covers these fields** — the closest is promotions.bundle_component at 7%, so this is not an update to anything the package stores today and no new table has been decided",
-  "description": "**What Buy X Get Y / BOGO Rule Builder submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
-  "properties": {
-   "product": {
-    "type": "string",
-    "description": "Product"
-   },
-   "productCategory": {
-    "type": "string",
-    "description": "Product category"
-   },
-   "ticketType": {
-    "type": "string",
-    "description": "Ticket type"
-   },
-   "quantity": {
-    "type": "integer",
-    "description": "Quantity"
-   },
-   "minimumSpend": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Minimum spend"
-   },
-   "customerSegment": {
-    "type": "string",
-    "description": "Customer segment"
-   },
-   "channel": {
-    "type": "string",
-    "description": "Channel"
-   },
-   "venue": {
-    "type": "string",
-    "description": "Venue"
-   },
-   "dateTime": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Date/time"
-   },
-   "sameProduct": {
-    "type": "string",
-    "description": "Same product"
-   },
-   "differentProduct": {
-    "type": "string",
-    "description": "Different product"
-   },
-   "free": {
-    "type": "string",
-    "description": "Free"
-   },
-   "percentageDiscount": {
-    "type": "number",
-    "description": "Percentage discount"
-   },
-   "fixedDiscount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Fixed discount"
-   },
-   "fixedRewardPrice": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Fixed reward price"
-   }
-  }
- },
- "BuyXGetYBogoRuleBuilderView": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
-  "description": "**What Buy X Get Y / BOGO Rule Builder displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
-  "properties": {
-   "product": {
-    "type": "string",
-    "description": "Product"
-   },
-   "productCategory": {
-    "type": "string",
-    "description": "Product category"
-   },
-   "ticketType": {
-    "type": "string",
-    "description": "Ticket type"
-   },
-   "quantity": {
-    "type": "integer",
-    "description": "Quantity"
-   },
-   "minimumSpend": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Minimum spend"
-   },
-   "customerSegment": {
-    "type": "string",
-    "description": "Customer segment"
-   },
-   "channel": {
-    "type": "string",
-    "description": "Channel"
-   },
-   "venue": {
-    "type": "string",
-    "description": "Venue"
-   },
-   "dateTime": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Date/time"
-   },
-   "sameProduct": {
-    "type": "string",
-    "description": "Same product"
-   },
-   "differentProduct": {
-    "type": "string",
-    "description": "Different product"
-   },
-   "free": {
-    "type": "string",
-    "description": "Free"
-   },
-   "percentageDiscount": {
-    "type": "number",
-    "description": "Percentage discount"
-   },
-   "fixedDiscount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Fixed discount"
-   },
-   "fixedRewardPrice": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Fixed reward price"
-   }
-  }
- },
  "CheapestLowestValueItemPromotionView": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
@@ -332,337 +194,113 @@
    }
   }
  },
- "CrossCategoryPromotionBuilderInput": {
+ "EvaluatePromotionsRequest": {
+  "x-ticvai-persistence": "none — request only",
   "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
-  "description": "**What Cross-Category Promotion Builder submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "required": [
+   "venueId",
+   "channel",
+   "lines"
+  ],
   "properties": {
-   "ticketing": {
+   "venueId": {
     "type": "string",
-    "description": "Ticketing"
+    "format": "uuid"
    },
-   "attractions": {
-    "type": "string",
-    "description": "Attractions"
+   "channel": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/SalesChannel"
+     }
+    ],
+    "description": "Where the sale is being made. Matched against `PromotionConditions.channels`, so both sides use the one shared vocabulary.\n"
    },
-   "events": {
+   "subjectId": {
     "type": "string",
-    "description": "Events"
+    "format": "uuid"
    },
-   "fB": {
+   "membershipTierId": {
     "type": "string",
-    "description": "F&B"
+    "format": "uuid"
    },
-   "retail": {
-    "type": "string",
-    "description": "Retail"
+   "couponCodes": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
    },
-   "membership": {
+   "evaluateAt": {
     "type": "string",
-    "description": "Membership"
+    "format": "date-time",
+    "description": "For back-office testing of a rule before publishing."
    },
-   "experiences": {
+   "orderId": {
     "type": "string",
-    "description": "Experiences"
+    "format": "uuid",
+    "nullable": true,
+    "description": "The order (`orders.sales_order`) being priced for payment. Sent only by the order service when it confirms an order; when present the evaluation writes one `promotions.promotion_evaluation_trace` row for it. (decided 29 September, writers pass)"
    },
-   "addOns": {
-    "type": "string",
-    "description": "Add-ons"
-   },
-   "parking": {
-    "type": "string",
-    "description": "Parking"
-   },
-   "services": {
-    "type": "string",
-    "description": "Services"
+   "lines": {
+    "type": "array",
+    "minItems": 1,
+    "items": {
+     "type": "object",
+     "required": [
+      "lineId",
+      "variantId",
+      "quantity",
+      "unitPrice"
+     ],
+     "properties": {
+      "lineId": {
+       "type": "string"
+      },
+      "variantId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "performanceId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "quantity": {
+       "type": "integer",
+       "minimum": 1
+      },
+      "unitPrice": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      }
+     }
+    }
    }
   }
  },
- "CrossCategoryPromotionBuilderView": {
+ "Money": {
   "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
-  "description": "**What Cross-Category Promotion Builder displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "x-ticvai-persistence-kind": "valueObject",
+  "x-ticvai-persistence-column": "numeric(18,4)",
+  "description": "**On the wire this is three fields; in the database it is one column.**\n24 August. Every column typed `Money` was landing as `jsonb` — 129 of them, including `orders.shift.opening_float`, `inventory.purchase_order.total` and `promotions.voucher.balance`. **`orders.cash_movement.amount` was `numeric(18,4)` because somebody hand-typed that one**, and the inconsistency is what made it visible.\n**A jsonb price cannot be summed in SQL.** Every total, variance and reconciliation moves into application code — and a shift variance computed in .NET against a ledger computed in Postgres is two answers to one question. That is F13 month-end and F98 takings-to-ledger, both walked, both assuming the arithmetic is in the database.\n**`currency` and `scale` are not stored per row.** ADR-0018 makes them region-scoped and not overridable below, so they resolve from the scope walk — storing AED against nine million rows in a UAE region is nine million copies of a fact that cannot differ. A row that needed its own currency would be a row in the wrong region.\n**They stay on the wire** because a client reading a figure should not have to walk a hierarchy to know what it means.\n",
+  "required": [
+   "amount",
+   "currency",
+   "scale"
+  ],
   "properties": {
-   "ticketing": {
+   "amount": {
     "type": "string",
-    "description": "Ticketing"
-   },
-   "attractions": {
-    "type": "string",
-    "description": "Attractions"
-   },
-   "events": {
-    "type": "string",
-    "description": "Events"
-   },
-   "fB": {
-    "type": "string",
-    "description": "F&B"
-   },
-   "retail": {
-    "type": "string",
-    "description": "Retail"
-   },
-   "membership": {
-    "type": "string",
-    "description": "Membership"
-   },
-   "experiences": {
-    "type": "string",
-    "description": "Experiences"
-   },
-   "addOns": {
-    "type": "string",
-    "description": "Add-ons"
-   },
-   "parking": {
-    "type": "string",
-    "description": "Parking"
-   },
-   "services": {
-    "type": "string",
-    "description": "Services"
-   }
-  }
- },
- "FixedPriceNForXOfferBuilderInput": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
-  "description": "**What Fixed-Price & “N for X” Offer Builder submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
-  "properties": {
-   "requiredQuantity": {
-    "type": "integer",
-    "description": "Required quantity"
-   },
-   "requiredProducts": {
-    "type": "string",
-    "description": "Required products"
-   },
-   "productCategory": {
-    "type": "string",
-    "description": "Product category"
-   },
-   "mixAndMatchAllowed": {
-    "type": "boolean",
-    "description": "Mix-and-match allowed"
-   },
-   "fixedPromotionalPrice": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Fixed promotional price"
+    "description": "Decimal string, never a float. Up to 4 decimal places. **Persisted as `numeric(18,4)`** — the string is a transport choice, so a JavaScript client cannot round a fare in transit.\n",
+    "pattern": "^-?\\d+(\\.\\d{1,4})?$"
    },
    "currency": {
     "type": "string",
-    "description": "Currency"
+    "description": "**Resolved from the region, not stored on the row** (ADR-0018). OMR uses 3 decimal places and AED uses 2 — a venue on a different scale from its region is a ledger that cannot consolidate.\n",
+    "pattern": "^[A-Z]{3}$"
    },
-   "maximumRepetitions": {
-    "type": "string",
-    "description": "Maximum repetitions"
-   },
-   "minimumMaximumProductValues": {
-    "type": "string",
-    "description": "Minimum/maximum product values"
-   }
-  }
- },
- "FixedPriceNForXOfferBuilderView": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
-  "description": "**What Fixed-Price & “N for X” Offer Builder displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
-  "properties": {
-   "requiredQuantity": {
+   "scale": {
     "type": "integer",
-    "description": "Required quantity"
-   },
-   "requiredProducts": {
-    "type": "string",
-    "description": "Required products"
-   },
-   "productCategory": {
-    "type": "string",
-    "description": "Product category"
-   },
-   "mixAndMatchAllowed": {
-    "type": "boolean",
-    "description": "Mix-and-match allowed"
-   },
-   "fixedPromotionalPrice": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Fixed promotional price"
-   },
-   "currency": {
-    "type": "string",
-    "description": "Currency"
-   },
-   "maximumRepetitions": {
-    "type": "string",
-    "description": "Maximum repetitions"
-   },
-   "minimumMaximumProductValues": {
-    "type": "string",
-    "description": "Minimum/maximum product values"
-   }
-  }
- },
- "GiftFreeProductAddedValueOfferBuilderInput": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table covers these fields** — the closest is promotions.bundle_component at 7%, so this is not an update to anything the package stores today and no new table has been decided",
-  "description": "**What Gift, Free Product & Added-Value Offer Builder submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
-  "properties": {
-   "basketValue": {
-    "type": "string",
-    "description": "Basket value"
-   },
-   "product": {
-    "type": "string",
-    "description": "Product"
-   },
-   "quantity": {
-    "type": "integer",
-    "description": "Quantity"
-   },
-   "productCategory": {
-    "type": "string",
-    "description": "Product category"
-   },
-   "ticket": {
-    "type": "string",
-    "description": "Ticket"
-   },
-   "membership": {
-    "type": "string",
-    "description": "Membership"
-   },
-   "customerSegment": {
-    "type": "string",
-    "description": "Customer segment"
-   },
-   "typesType": {
-    "type": "string",
-    "enum": [
-     "freeRetailProduct",
-     "freeFBProduct",
-     "freeTicket",
-     "freeAddOn",
-     "freeExperience",
-     "voucher",
-     "upgrade",
-     "service",
-     "additionalEntitlement"
-    ],
-    "description": "Vocabulary listed under Reward Types."
-   },
-   "inventoryAvailability": {
-    "type": "string",
-    "description": "Inventory availability"
-   },
-   "locationInventory": {
-    "type": "string",
-    "description": "Location inventory"
-   },
-   "eligibleFulfillmentPoint": {
-    "type": "string",
-    "description": "Eligible fulfillment point"
-   },
-   "substitutionRules": {
-    "type": "string",
-    "description": "Substitution rules"
-   },
-   "doNotOfferPromotion": {
-    "type": "string",
-    "description": "Do not offer promotion"
-   },
-   "provideAlternativeReward": {
-    "type": "string",
-    "description": "Provide alternative reward"
-   },
-   "allowLaterFulfillment": {
-    "type": "boolean",
-    "description": "Allow later fulfillment"
-   }
-  }
- },
- "GiftFreeProductAddedValueOfferBuilderView": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
-  "description": "**What Gift, Free Product & Added-Value Offer Builder displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
-  "properties": {
-   "basketValue": {
-    "type": "string",
-    "description": "Basket value"
-   },
-   "product": {
-    "type": "string",
-    "description": "Product"
-   },
-   "quantity": {
-    "type": "integer",
-    "description": "Quantity"
-   },
-   "productCategory": {
-    "type": "string",
-    "description": "Product category"
-   },
-   "ticket": {
-    "type": "string",
-    "description": "Ticket"
-   },
-   "membership": {
-    "type": "string",
-    "description": "Membership"
-   },
-   "customerSegment": {
-    "type": "string",
-    "description": "Customer segment"
-   },
-   "typesType": {
-    "type": "string",
-    "enum": [
-     "freeRetailProduct",
-     "freeFBProduct",
-     "freeTicket",
-     "freeAddOn",
-     "freeExperience",
-     "voucher",
-     "upgrade",
-     "service",
-     "additionalEntitlement"
-    ],
-    "description": "Vocabulary listed under Reward Types."
-   },
-   "inventoryAvailability": {
-    "type": "string",
-    "description": "Inventory availability"
-   },
-   "locationInventory": {
-    "type": "string",
-    "description": "Location inventory"
-   },
-   "eligibleFulfillmentPoint": {
-    "type": "string",
-    "description": "Eligible fulfillment point"
-   },
-   "substitutionRules": {
-    "type": "string",
-    "description": "Substitution rules"
-   },
-   "doNotOfferPromotion": {
-    "type": "string",
-    "description": "Do not offer promotion"
-   },
-   "provideAlternativeReward": {
-    "type": "string",
-    "description": "Provide alternative reward"
-   },
-   "allowLaterFulfillment": {
-    "type": "boolean",
-    "description": "Allow later fulfillment"
+    "description": "Resolved from the region alongside `currency`.",
+    "minimum": 0,
+    "maximum": 4
    }
   }
  },
@@ -763,6 +401,120 @@
    "finalTotal": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Final total"
+   }
+  }
+ },
+ "PromotionEvaluation": {
+  "x-ticvai-persistence": "none — computed",
+  "type": "object",
+  "required": [
+   "totalDiscount",
+   "lines",
+   "applied",
+   "rejected"
+  ],
+  "properties": {
+   "totalDiscount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "lines": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "lineId",
+      "originalPrice",
+      "discountedPrice",
+      "discount"
+     ],
+     "properties": {
+      "lineId": {
+       "type": "string"
+      },
+      "originalPrice": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "discountedPrice": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "discount": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "appliedPromotionIds": {
+       "type": "array",
+       "items": {
+        "type": "string",
+        "format": "uuid"
+       }
+      }
+     }
+    }
+   },
+   "applied": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "promotionId",
+      "promotionCode",
+      "discount"
+     ],
+     "properties": {
+      "promotionId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "promotionCode": {
+       "type": "string"
+      },
+      "promotionName": {
+       "type": "string"
+      },
+      "discount": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "couponCode": {
+       "type": "string",
+       "nullable": true
+      }
+     }
+    }
+   },
+   "rejected": {
+    "type": "array",
+    "description": "Promotions that matched the products but did not apply, with the reason. This is what a cashier reads to a guest who expected a discount.\n",
+    "items": {
+     "type": "object",
+     "required": [
+      "promotionCode",
+      "reason"
+     ],
+     "properties": {
+      "promotionCode": {
+       "type": "string"
+      },
+      "promotionName": {
+       "type": "string"
+      },
+      "reason": {
+       "type": "string",
+       "enum": [
+        "conditionsNotMet",
+        "supersededByBetterOffer",
+        "exclusivePromotionApplied",
+        "redemptionLimitReached",
+        "budgetExhausted",
+        "outsideValidPeriod",
+        "wrongChannel",
+        "membershipRequired",
+        "couponRequired"
+       ]
+      },
+      "detail": {
+       "type": "string"
+      }
+     }
+    }
    }
   }
  },

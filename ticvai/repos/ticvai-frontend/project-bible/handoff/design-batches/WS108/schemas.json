@@ -138,6 +138,169 @@
    }
   }
  },
+ "AccreditationCredential": {
+  "type": "object",
+  "x-ticvai-persistence": "accreditation.credential",
+  "description": "Board 4. **Not the accreditation** — reissuing one re-vets nobody.",
+  "required": [
+   "holderId",
+   "kind"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "holderId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "printedBadge",
+     "mobileCredential",
+     "qr",
+     "nfcCard",
+     "rfidCard",
+     "wristband"
+    ]
+   },
+   "symbology": {
+    "type": "string",
+    "nullable": true,
+    "description": "12.1.22. **How `encodedIdentifier` is carried**, so a reader and a badge renderer agree: `qr` for a QR credential and the default for a `mobileCredential`, a barcode where a printed badge carries one, `nfcNdef` or `rfidEpc` for an encoded card, `none` where nothing is encoded.\n",
+    "enum": [
+     "qr",
+     "dataMatrix",
+     "pdf417",
+     "aztec",
+     "code128",
+     "nfcNdef",
+     "rfidEpc",
+     "none"
+    ]
+   },
+   "serialNumber": {
+    "type": "string",
+    "nullable": true
+   },
+   "encodedIdentifier": {
+    "type": "string",
+    "nullable": true
+   },
+   "badgeTemplateId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "issuedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "issuedBy": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "activatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "pendingPrint",
+     "issued",
+     "active",
+     "lost",
+     "replaced",
+     "revoked",
+     "expired"
+    ]
+   },
+   "replacesCredentialId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "replacementCount": {
+    "type": "integer",
+    "default": 0
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "AccreditationDocument": {
+  "type": "object",
+  "x-ticvai-persistence": "accreditation.document",
+  "description": "Board 2.5. **Submitted against a named requirement, not into a folder.**",
+  "required": [
+   "requirementCode",
+   "assetId"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "holderId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "applicationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "requirementCode": {
+    "type": "string"
+   },
+   "assetId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "submittedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "submitted",
+     "verified",
+     "rejected",
+     "expired"
+    ]
+   },
+   "verifiedBy": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "verifiedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "rejectionReason": {
+    "type": "string",
+    "nullable": true
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date",
+    "nullable": true,
+    "description": "**An insurance certificate valid until March accredits somebody until March**, whatever the programme says.\n"
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
  "AccreditationHolder": {
   "type": "object",
   "x-ticvai-persistence": "accreditation.holder",
@@ -230,6 +393,82 @@
    },
    "completenessPercent": {
     "type": "integer",
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "AccreditationIdentityConflict": {
+  "type": "object",
+  "x-ticvai-persistence": "accreditation.identity_conflict",
+  "description": "Board 2.7. **One badge revoked and the other still opening doors.**\n\n**`matchedOn` names `face` only where the programme's `faceMatching` is enabled** and both applicants consented (workbook Q461; CHG-CSA-031).\n\n**Stored, not recomputed on each read** (data model for the agreed operations, 29 September): a suspected pair is raised by `createAccreditationApplication` and `importAccreditationHolders` using `marketing-crm`'s identity resolution, and keeps its id and status while somebody decides it, so a pair rejected as two different people is not raised again on the next import. Resolved by `resolveIdentityConflict` (`pending` to `merged` or `rejected`, decided 29 September, writers pass); lifecycle in `states/accreditation-identity-conflict.yaml`.",
+  "required": [
+   "id",
+   "holderIds",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "holderIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "score": {
+    "type": "number"
+   },
+   "matchedOn": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "differingAccess": {
+    "type": "boolean"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "pending",
+     "merged",
+     "rejected"
+    ]
+   },
+   "detectedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "survivingHolderId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The holder kept when the conflict was merged"
+   },
+   "resolutionReason": {
+    "type": "string",
+    "maxLength": 500,
+    "nullable": true,
+    "readOnly": true
+   },
+   "resolvedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true
+   },
+   "resolvedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
     "readOnly": true
    },
    "scopePath": {
@@ -347,6 +586,55 @@
      "closed",
      "archived"
     ]
+   },
+   "faceMatching": {
+    "type": "object",
+    "description": "**Face matching for duplicate applicants: only where the venue enables it, with each applicant's consent and the venue's legal sign-off; off by default** (Chinmay, 2 October, workbook Q461; ADR-0063; CHG-CSA-031). With `enabled` false, identity conflicts are raised on names, dates of birth and documents only and never on a face, and BO-631 shows no Face chip. Enabling needs `legalSignOffRef` (the venue's legal sign-off, recorded with who gave it and when), and a face is compared only for an applicant whose application carries a face-matching consent (the programme's consent form, CHG-CSA-026).",
+    "properties": {
+     "enabled": {
+      "type": "boolean",
+      "default": false
+     },
+     "legalSignOffRef": {
+      "type": "string",
+      "nullable": true,
+      "description": "The venue's legal sign-off document (a stored file reference)."
+     },
+     "signedOffByPrincipalId": {
+      "type": "string",
+      "format": "uuid",
+      "nullable": true,
+      "readOnly": true
+     },
+     "signedOffAt": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true,
+      "readOnly": true
+     }
+    }
+   },
+   "identityVerification": {
+    "type": "object",
+    "description": "**UAE Pass and ICP verification, in release 1** (Chinmay, 2 October, workbook Q457; CHG-CSA-031). Which government identity checks an applicant passes through: UAE Pass sign-in (identity `guestUaePassLogin`) and the ICP identity check (access's verification adaptor). **Both need the client's access to the government services** (an external dependency); until it is granted, `methods` may name them but the check answers `manualReview`.",
+    "properties": {
+     "methods": {
+      "type": "array",
+      "items": {
+       "type": "string",
+       "enum": [
+        "uaePass",
+        "icp",
+        "manualReview"
+       ]
+      }
+     },
+     "required": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether an application is blocked from approval until a listed check passes."
+     }
+    }
    },
    "scopePath": {
     "type": "string"
@@ -521,6 +809,20 @@
      "registration"
     ]
    },
+   "consentPurposes": {
+    "type": "array",
+    "description": "**What a `consentForm` consents to** (Chinmay, 2 October, batch 4; follows BO-188: biometric capture needs consent on the venue's own form; CHG-CSA-026). A guardian-signed form for a minor carries the guardian fields of the waiver builder (workbook Q237: guardian consent, configurable per country). Empty for any other kind.",
+    "items": {
+     "type": "string",
+     "enum": [
+      "facePass",
+      "faceTag",
+      "marketing",
+      "photography",
+      "waiver"
+     ]
+    }
+   },
    "version": {
     "readOnly": true,
     "type": "integer",
@@ -676,6 +978,25 @@
       "type": "string"
      }
     }
+   }
+  }
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
    }
   }
  }

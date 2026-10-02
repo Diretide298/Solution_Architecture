@@ -35,7 +35,6 @@ steps:
   action: Order Firing & Course Management.
   operations:
   - prioritiseKitchenTicket
-  - setCourseRules
   outcome: '**Drawn by the client as FNB-3C.** 2 operations on this step.'
   crossesDevice: true
 - step: 4

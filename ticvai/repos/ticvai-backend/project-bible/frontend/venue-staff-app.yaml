@@ -24,6 +24,7 @@ contracts:
 - access
 - accreditation
 - ai
+- approvals
 - assets
 - catalogue
 - fnb
@@ -32,6 +33,7 @@ contracts:
 - maintenance
 - marketing-crm
 - orders
+- payments
 - queue
 - rental
 - reporting

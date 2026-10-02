@@ -44,7 +44,6 @@ steps:
   operations:
   - listChannelCapacities
   - getChannelAllocations
-  - setChannelAllocations
   outcome: '**Capacity is an envelope, not a headcount.**  allocates capacity across channels — holding
     admission means taking it off the channels, which is a venue-wide act rather than a lane one.'
   crossesDevice: true

@@ -128,58 +128,6 @@
    }
   }
  },
- "ChallengeProgress": {
-  "type": "object",
-  "x-ticvai-persistence": "marketing.challenge_progress",
-  "description": "22.6.15. **Progress is shown, not just the outcome.** A guest two visits from a reward behaves differently from one who does not know how close they are, which is the entire mechanism.\n",
-  "required": [
-   "id",
-   "challengeId",
-   "subjectId",
-   "current",
-   "target"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "challengeId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "subjectId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "portfolioId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "For a family or group challenge — where the shared progress accrues."
-   },
-   "current": {
-    "type": "number"
-   },
-   "target": {
-    "type": "number"
-   },
-   "streakCount": {
-    "type": "integer",
-    "nullable": true
-   },
-   "completedAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "rewardIssuedAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   }
-  }
- },
  "Dashboard": {
   "x-ticvai-persistence": "reporting.dashboard + reporting.dashboard_tile",
   "allOf": [

@@ -63,86 +63,6 @@
    }
   }
  },
- "IndexJob": {
-  "type": "object",
-  "x-ticvai-persistence": "ai.index_job",
-  "required": [
-   "id",
-   "sourceId",
-   "status",
-   "startedAt"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "sourceId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "kind": {
-    "type": "string",
-    "enum": [
-     "full",
-     "incremental",
-     "removal"
-    ]
-   },
-   "reason": {
-    "type": "string"
-   },
-   "status": {
-    "type": "string",
-    "enum": [
-     "queued",
-     "building",
-     "verifying",
-     "swapping",
-     "complete",
-     "failed"
-    ]
-   },
-   "recordsTotal": {
-    "type": "integer"
-   },
-   "recordsEmbedded": {
-    "type": "integer"
-   },
-   "recordsFailed": {
-    "type": "integer",
-    "description": "**The number to watch.** A source silently failing on 3% of its rows is a search silently missing 3% of the answers, and nothing else in the system will say so.\n"
-   },
-   "failureSample": {
-    "type": "array",
-    "items": {
-     "type": "string"
-    }
-   },
-   "shadowCollection": {
-    "type": "string",
-    "nullable": true,
-    "description": "A full rebuild writes here and swaps on completion. Reindexing in place leaves the assistant answering from a half-built index.\n"
-   },
-   "shardKey": {
-    "type": "string",
-    "readOnly": true,
-    "description": "**The tenant boundary on shared placement** (ADR-0021). A collection is shared by every tenant using the same embedding model, and the shard is what separates them — set at provisioning from the tenant, never from a request.\nOn dedicated placement there is one shard and this is still populated, because a tenant moving from shared to dedicated moves a shard rather than being re-indexed.\n"
-   },
-   "embeddingModel": {
-    "type": "string"
-   },
-   "startedAt": {
-    "type": "string",
-    "format": "date-time"
-   },
-   "completedAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   }
-  }
- },
  "KpiValue": {
   "type": "object",
   "description": "BI board 10.3. **Value, target, variance, direction and freshness in one read.**",
@@ -295,7 +215,14 @@
    "isSystem": {
     "type": "boolean",
     "default": false,
-    "description": "**Seeded roles ship and are editable; deleting one is refused.** A venue that removes `cashier` and rebuilds it has two roles with one name in the audit log.\n**The seeded system roles are Cashier, Supervisor, Venue Manager, Finance and Tenant Admin** (proposed in `docs/active/seed-data-proposal.md` section 2, client to correct; audit R229).\n"
+    "description": "**Seeded roles ship and are editable; deleting one is refused.** A venue that removes `cashier` and rebuilds it has two roles with one name in the audit log.\n**The seeded system roles are Cashier, Supervisor, Venue Manager, Finance and Tenant Admin** (proposed in `docs/active/seed-data-proposal.md` section 2, client to correct; audit R229).\n\n**Superseded 2 October 2026: no fixed default roles** (Chinmay; DEC-007; CHG-CSP-003). The five are presets (`CapabilityTemplate`, `isPreset`) a role starts from, not roles a tenant is given. The field stays for clients built at r1 and is false on every role created from 2 October.\n"
+   },
+   "presetCode": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "maxLength": 64,
+    "description": "**The preset this role was started from, for the record only** (decided 2 October 2026, Chinmay; DEC-007; CHG-CSP-003): the first of `createRole.presetCodes`, or null for a role ticked by hand. It binds nothing; a later edit of the preset never changes this role.\n"
    },
    "principalCount": {
     "type": "integer"
@@ -447,6 +374,51 @@
       "nullable": true,
       "default": 0,
       "description": "BL-106. **How long a same-visit Face Tag survives past the close of the operating day**, and zero is the default because that is what 3.2.44 describes. A non-zero value is an operational allowance for a late reconciliation, not a retention period — **`facePass` ignores this entirely** and is bounded by its entitlement.\n"
+     },
+     "consentFormId": {
+      "type": "string",
+      "format": "uuid",
+      "nullable": true,
+      "description": "**The venue's own consent form, which every biometric capture is taken on** (decided 2 October 2026, Chinmay, batch 4, BO-188: \"Consent first, on the venue's consent form\"; DEC-128, DEC-549; CHG-CSP-018). A form from the venue's consent-form builder in Venue Management (the one builder Face Pass, Face Tag, marketing and waivers share; marketing-crm `setDigitalWaiverForm`). Turning `isEnabled` on without one is refused `422 consent-form-required`, as a missing DPIA is; each Face Pass and Face Tag capture records the form and its version it was consented on (access `enrolFacePass`, `enrolFaceTag`).\n"
+     },
+     "templatesHeldByTicvai": {
+      "type": "boolean",
+      "readOnly": true,
+      "description": "**True where TICVAI's platform stores this venue's biometric templates** (rather than the venue's own on-premises reader estate). Derived from the venue's access deployment. While true, Venue Management shows the venue a standing warning that every guest must accept the venue's consent form before capture, because the data sits with TICVAI as the venue's processor (decided 2 October 2026, Chinmay, batch 4, BO-188: \"If we store the data, highlight or notify the venue that the client must accept a consent form\"; DEC-128; CHG-CSP-018).\n"
+     },
+     "allowMinors": {
+      "type": "boolean",
+      "default": true,
+      "description": "**Whether this venue enrols minors at all** (decided 2 October 2026, Chinmay, critical set 1, BO-187 and CMS-029: \"Guardian consent on the venue's form; minor age per country; the venue can switch minors off\"; supersedes the GST-069 default; DEC-237; CHG-CSP-019). On: a minor (below `RegionSettings.minorAgeThreshold`) is enrolled only with a guardian's consent on the venue's consent form. Off: a minor's enrolment is refused (`422 minors-not-enrolled`) and the guest uses another verification method.\n"
+     },
+     "accreditationFaceMatching": {
+      "type": "object",
+      "nullable": true,
+      "description": "**Face matching to find duplicate accreditation applicants, off unless the venue enables it** (decided 2 October 2026, Chinmay, critical set 3, BO-631: \"Only where the venue enables it, with applicant consent and the venue's legal sign-off; off by default\"; DEC-461; CHG-CSP-022). Enabling it is refused without `legalSignOffReference` (`422 legal-sign-off-required`); each applicant matched must have consented on the application (accreditation's own record). Null is off.\n",
+      "properties": {
+       "isEnabled": {
+        "type": "boolean",
+        "default": false
+       },
+       "legalSignOffReference": {
+        "type": "string",
+        "nullable": true,
+        "maxLength": 200,
+        "description": "The venue's own reference for its legal sign-off; the platform records that one was named, by whom and when."
+       },
+       "signedOffByPrincipalId": {
+        "type": "string",
+        "format": "uuid",
+        "nullable": true,
+        "readOnly": true
+       },
+       "signedOffAt": {
+        "type": "string",
+        "format": "date-time",
+        "nullable": true,
+        "readOnly": true
+       }
+      }
      }
     }
    },
@@ -561,6 +533,15 @@
      "pattern": "^[A-Z]{3}$"
     }
    },
+   "chargeCurrencies": {
+    "type": "array",
+    "nullable": true,
+    "description": "**Which currencies a guest may select and pay in** (decided 2 October 2026, Chinmay; CHG-FIN-001; MoM 10 Aug 2026 4.7 option (b), DI-211). A subset of `displayCurrencies`: each code must also be one the venue's payment provider can charge (`orders.PaymentProvider.presentmentCurrencies`) and one the region holds a `tender` rate for; anything else is refused `400`. Null or empty: guests pay in the trading (base) currency only and the other display currencies stay approximate. The ledger is always in the base currency, with the rate recorded on every payment and refund.\n",
+    "items": {
+     "type": "string",
+     "pattern": "^[A-Z]{3}$"
+    }
+   },
    "cartLeaseSeconds": {
     "type": "integer",
     "nullable": true,
@@ -625,6 +606,15 @@
     ],
     "nullable": true,
     "description": "Over or short at shift close beyond which the shift waits in `pendingVariance` for `shift.acceptShiftVariance`. **Proposed tenant default AED 20.00, bounds 0 to 1,000 in the venue currency; client finance to correct (audit R094).**\n"
+   },
+   "cashDrawerLimit": {
+    "oneOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true,
+    "description": "**The most cash a till drawer should hold before some is lifted to the safe** (decided 2 October 2026, Chinmay, batch 6 set 3, BO-042: \"Add drawer limit setting (warn + offer cash lift)\"; DEC-179; CHG-CSP-016; DI-274: on a busy day the cashier unloads excess cash mid-shift and it is reconciled at close). The venue default; a till may set its own (`Workstation.cashDrawerLimit`). When the cash a till has taken since its last count takes the drawer over it, the till warns and offers a cash lift (`shift.createCashMovement` kind `lift`) and BO-042 flags the box (`shift.DepositBox.overDrawerLimit`). A warning, never a block: a sale is not refused because the drawer is full. Null sets no limit. **No proposed default: the client's finance team sets it.**\n"
    },
    "catalogue": {
     "type": "object",
@@ -758,6 +748,15 @@
       "maximum": 60,
       "default": 10,
       "description": "Minutes after a bump during which `recallKitchenTicket` still recalls; after it the act is a refire. Proposed, client to correct (audit R094)."
+     },
+     "tableReservedLeadMinutes": {
+      "type": "integer",
+      "nullable": true,
+      "minimum": 0,
+      "maximum": 240,
+      "default": 30,
+      "deprecated": true,
+      "description": "**Deprecated (2 October 2026, CHG-CLN-009): `fnb.FnbReservationPolicy.reservedLeadMinutes` is canonical.** The table state model reads the reservation policy (`states/table.yaml`); this venue setting is kept for compatibility, never read, and not drawn. Its former meaning: **How long before a pre-allocated booking its table shows Reserved** (decided 2 October 2026, Chinmay, batch 6 set 6b, EMP-052: \"Reserved when a booking names the table, or N minutes (venue-set) before a pre-allocated booking\"; DEC-202; CHG-CSP-017; DI-689, DI-336). A booking that names its table holds it as Reserved for the booking's whole slot; a booking the host pre-allocated shows its table Reserved from this many minutes before it. Zero shows Reserved only once the booking is due. The fnb table state model applies it (`states/table.yaml`, owned by fnb). Proposed default 30 minutes, client to correct.\n"
      },
      "compEscalationAmount": {
       "allOf": [

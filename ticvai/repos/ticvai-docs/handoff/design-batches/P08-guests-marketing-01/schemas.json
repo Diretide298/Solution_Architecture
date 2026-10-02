@@ -96,6 +96,99 @@
   "maximum": 4,
   "description": "**One autonomy scale for every capability** (design 3.8 and 5.5, GOV 0 to 4; ADR-0050). 0 disabled; 1 advisory (explains and recommends, nothing is drafted to run); 2 prepare (drafts a proposal a person applies in the owning screen); 3 execute with approval (the plan runs after approval, through owning APIs); 4 controlled auto (runs without approval, only for listed low-risk reversible actions inside pre-approved ranges). **Not the approval tier**: `ProposedAction.approvalLevel` is the tier."
  },
+ "AiByokEnablement": {
+  "type": "object",
+  "x-ticvai-persistence": "ai.byok_enablement",
+  "description": "**Whether a tenant may bring its own model key** (decided 29 September, design 8 on 5.9). TICVAI decides it per tenant with `PLATFORM_AI_MANAGE`; it is not tenant self-service. Until it is enabled, `setAiProvider` refuses `managedBy: tenant`. One row per tenant.",
+  "required": [
+   "tenantId",
+   "enabled"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "tenantId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "enabled": {
+    "type": "boolean"
+   },
+   "coverage": {
+    "type": "string",
+    "enum": [
+     "perTask",
+     "allTasks"
+    ],
+    "default": "perTask",
+    "description": "Whether the tenant may supply a key per task or one key for everything."
+   },
+   "allowedTasks": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Where `coverage` is `perTask`: the gateway tasks a tenant key may serve. Empty means any."
+   },
+   "taskModelMap": {
+    "x-ticvai-persistence-kind": "valueObject",
+    "x-ticvai-persistence-column": "jsonb",
+    "type": "array",
+    "readOnly": true,
+    "description": "**The provider's equivalent model for each task, chosen by TICVAI** (Chinmay, 2 October, workbook Q1; closes AI-D20; CHG-CSA-001). For each task the tenant key serves, the model of the tenant's provider at the tier the task needs, taken from TICVAI's curated range (`AiModel.curatedRange`). The tenant does not choose it; a task with no curated equivalent at the tenant's provider stays on the TICVAI-managed model and is listed with `modelId` null.",
+    "items": {
+     "type": "object",
+     "properties": {
+      "taskKey": {
+       "type": "string"
+      },
+      "tier": {
+       "type": "string"
+      },
+      "modelId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true,
+       "x-ticvai-references": "ai.model"
+      },
+      "compatibilityPassed": {
+       "type": "boolean",
+       "nullable": true,
+       "description": "Whether the provider's compatibility test passed for this task (`AiProviderCompatibility`, CHG-FUP-008); a task that has not passed stays on the TICVAI-managed model."
+      }
+     }
+    }
+   },
+   "reason": {
+    "type": "string",
+    "maxLength": 1000
+   },
+   "platformStaffGrantId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "The open platform-staff grant the change was made under (audit R098)."
+   },
+   "decidedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "decidedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."
+   }
+  }
+ },
  "AiCapabilityFamily": {
   "type": "string",
   "enum": [
@@ -496,7 +589,7 @@
    },
    "maskedFields": {
     "type": "array",
-    "description": "Redacted before a prompt leaves the platform (8.3.73). **Defaults to every field in the pii schema** — a masking list nobody filled in should send nothing rather than everything.\nEach entry is a column named `schema.table.column`, as the DDL names it — `pii.subject_contact.email`. **Omitted, null and an empty array all take the default**, because each of them is a list nobody filled in. An entry naming no column is refused at save rather than silently masking nothing.\n",
+    "description": "Redacted before a prompt leaves the platform (8.3.73). **Defaults to every field in the pii schema** — a masking list nobody filled in should send nothing rather than everything.\nEach entry is a column named `schema.table.column`, as the DDL names it — `pii.subject_contact.email`. **Omitted, null and an empty array all take the default**, because each of them is a list nobody filled in. An entry naming no column is refused at save rather than silently masking nothing.\n**Column masking is in addition to the gateway scrubber, never instead of it** (CHG-CSA-003): free text a guest types is not a column, so every prompt also passes the offline scrubber (`scrubbing`).\n",
     "items": {
      "type": "string",
      "pattern": "^[a-z][a-z0-9_]*\\.[a-z][a-z0-9_]*\\.[a-z][a-z0-9_]*$"
@@ -514,6 +607,34 @@
       "financial",
       "configuration"
      ]
+    }
+   },
+   "scrubbing": {
+    "type": "object",
+    "readOnly": true,
+    "description": "**Mandatory offline PII scrubbing and moderation on every LLM call** (Chinmay, 2 October: \"we may need to scrub personal info no matter what\"; ADR-0020 amended; CHG-CSA-003). Not a setting: it applies whatever the tenant's residency class, and a tenant cannot switch it off. Before a prompt leaves the cell the gateway runs Microsoft Presidio (offline) with UAE recognisers (Emirates ID, UAE phone, passport, IBAN, Luhn-checked card, email) and an Arabic NER model; each value found becomes a reversible placeholder (`[GUEST_1]`) whose map never leaves the cell, and the reply is re-filled before it reaches the user. An offline guard model (Qwen3Guard, which covers Arabic) checks input and output. **Fails closed**: with the scrubber or the guard down, the call is refused (`503 scrubber-unavailable`), never sent raw. This object reports what is in force.\n",
+    "properties": {
+     "mode": {
+      "type": "string",
+      "enum": [
+       "mandatory"
+      ]
+     },
+     "recognisers": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      },
+      "description": "The recogniser set in force, e.g. `emiratesId`, `uaePhone`, `passport`, `iban`, `card`, `email`, `arabicPersonName`."
+     },
+     "reversibleTokens": {
+      "type": "boolean",
+      "description": "Always true; the placeholder map stays in the cell."
+     },
+     "guardModel": {
+      "type": "string",
+      "description": "The input and output guard model in force, e.g. `qwen3guard`."
+     }
     }
    },
    "monthlyTokenCeiling": {
@@ -836,10 +957,72 @@
   ],
   "description": "Business, customer, financial, operational, security and compliance impact of a capability or action type (AIC-144, ADM-521). The governance decision point scores against it."
  },
+ "AiSpendCeiling": {
+  "type": "object",
+  "x-ticvai-persistence": "ai.spend_ceiling",
+  "description": "**The AI spend ceiling in money** (Chinmay, 2 October, workbook Q8; CHG-CSA-004). One row per `scopePath`, as `AiPolicy`: the tenant's default and a venue's narrowing.",
+  "required": [
+   "spend"
+  ],
+  "properties": {
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "The partition key (ADR-0005); the tenant's node or a venue's."
+   },
+   "spend": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "Per month, in the tenant's selected currency (USD by default)."
+   },
+   "tokenEquivalent": {
+    "type": "integer",
+    "readOnly": true,
+    "nullable": true,
+    "description": "What `spend` buys at the current blended rate, shown beside it on BO-091."
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
  "AiUsageReport": {
   "type": "object",
   "x-ticvai-persistence": "none — aggregated from ai.activity",
   "properties": {
+   "currency": {
+    "type": "string",
+    "minLength": 3,
+    "maxLength": 3,
+    "readOnly": true,
+    "description": "**The tenant's selected currency, USD by default** (Chinmay, 2 October, workbook Q8; CHG-CSA-004). Every `cost` here is in it; token counts sit beside each cost."
+   },
+   "ceiling": {
+    "type": "object",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The spend ceiling in force (`getAiSpendCeiling`), with the tokens it equals at the current blended rate and what is used so far (CHG-CSA-004).",
+    "properties": {
+     "spend": {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     },
+     "tokens": {
+      "type": "integer",
+      "nullable": true
+     },
+     "usedSpend": {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     },
+     "usedTokens": {
+      "type": "integer"
+     }
+    }
+   },
    "from": {
     "type": "string",
     "format": "date"
@@ -1114,6 +1297,39 @@
    }
   }
  },
+ "CatalogueState": {
+  "x-ticvai-persistence": "none — computed from workstation bundle_version",
+  "type": "object",
+  "description": "The workstation's local catalogue position. A terminal beyond `staleAfter` must refuse to trade rather than transact against stale prices.\n",
+  "required": [
+   "appliedBundleVersion",
+   "appliedAt",
+   "staleAfter",
+   "isStale"
+  ],
+  "properties": {
+   "appliedBundleVersion": {
+    "type": "string"
+   },
+   "appliedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "staleAfter": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Beyond this the terminal refuses to trade."
+   },
+   "isStale": {
+    "type": "boolean"
+   },
+   "pendingBundleVersion": {
+    "type": "string",
+    "nullable": true,
+    "description": "Published but not yet applied."
+   }
+  }
+ },
  "ConsentPurpose": {
   "type": "string",
   "enum": [
@@ -1259,6 +1475,42 @@
       "description": "Set by the automatic rule, or by a person through `updateCampaign`."
      }
     }
+   }
+  }
+ },
+ "DeploymentProfile": {
+  "type": "string",
+  "description": "How this workstation obtains catalogue and inventory (ADR-0013).\n- `terminalLocal` — own SQLite, leases direct from the cell. Small venues, 4G sites - `venueEdge` — own SQLite, distributed via the venue edge node which holds the\n  venue lease and sub-leases to terminals. Mid and large venues, stadium gates\n- `thin` — no local catalogue, server reads. Non-transactional surfaces only\n",
+  "enum": [
+   "terminalLocal",
+   "venueEdge",
+   "thin"
+  ]
+ },
+ "DeviceBinding": {
+  "x-ticvai-persistence": "platform.device",
+  "type": "object",
+  "required": [
+   "kind",
+   "driver"
+  ],
+  "properties": {
+   "kind": {
+    "$ref": "#/components/schemas/DeviceKind"
+   },
+   "driver": {
+    "type": "string",
+    "description": "Driver identifier. Adding a vendor is a driver plus configuration, never a core change — every venue arrives with hardware not previously seen.\n"
+   },
+   "identifier": {
+    "type": "string",
+    "description": "Serial",
+    "port or network address.": null
+   },
+   "isRequired": {
+    "type": "boolean",
+    "default": false,
+    "description": "When true, the workstation refuses to open a shift if the device is absent.\n"
    }
   }
  },
@@ -1515,6 +1767,30 @@
    }
   }
  },
+ "LostItemMatch": {
+  "type": "object",
+  "description": "**The point of the module.** A found item and a lost report, proposed as the same thing.\n",
+  "properties": {
+   "lostItemId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "foundItemId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "score": {
+    "type": "number"
+   },
+   "matchedOn": {
+    "type": "array",
+    "description": "What agreed — kind, colour, brand, location, date.",
+    "items": {
+     "type": "string"
+    }
+   }
+  }
+ },
  "MarketingCampaignVariant": {
   "type": "object",
   "x-ticvai-persistence": "marketing.campaign_variant",
@@ -1608,6 +1884,53 @@
    }
   ]
  },
+ "OrgUnit": {
+  "x-ticvai-persistence": "platform.scope",
+  "type": "object",
+  "required": [
+   "id",
+   "level",
+   "path",
+   "code",
+   "name",
+   "isActive"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "level": {
+    "$ref": "#/components/schemas/ScopeLevel"
+   },
+   "parentId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "path": {
+    "type": "string",
+    "description": "Materialised ltree path, e.g. `t_ref.b_alpha.r_north.v_alpha1`.",
+    "pattern": "^[a-z0-9_]+(\\.[a-z0-9_]+)*$"
+   },
+   "code": {
+    "type": "string",
+    "maxLength": 64
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "isActive": {
+    "type": "boolean",
+    "description": "False causes every permission query at or beneath this node to resolve to DENY.\n"
+   },
+   "childCount": {
+    "type": "integer",
+    "minimum": 0
+   }
+  }
+ },
  "Page": {
   "type": "object",
   "required": [
@@ -1626,202 +1949,6 @@
     "type": "boolean"
    }
   }
- },
- "Permission": {
-  "type": "string",
-  "enum": [
-   "SESSION_FORCE_LOGOUT",
-   "USER_MANAGE",
-   "ROLE_MANAGE",
-   "PERMISSION_GRANT",
-   "PERMISSION_VIEW",
-   "PERMISSION_MANAGE",
-   "PLATFORM_TENANT_VIEW",
-   "PLATFORM_TENANT_MANAGE",
-   "PLATFORM_TENANT_TERMINATE",
-   "PLATFORM_PLAN_MANAGE",
-   "PLATFORM_CELL_VIEW",
-   "PLATFORM_CELL_MANAGE",
-   "PLATFORM_BILLING_VIEW",
-   "PLATFORM_AI_MANAGE",
-   "PLATFORM_BILLING_MANAGE",
-   "PLATFORM_RELEASE_VIEW",
-   "PLATFORM_RELEASE_MANAGE",
-   "PLATFORM_RELEASE_PROMOTE",
-   "PLATFORM_MIGRATION_VIEW",
-   "PLATFORM_MIGRATION_APPLY",
-   "PLATFORM_TENANT_ACCESS",
-   "TENANT_CONFIGURE",
-   "TENANT_VIEW",
-   "TENANT_PUBLISH",
-   "SCOPE_VIEW",
-   "SCOPE_MANAGE",
-   "REGION_CONFIGURE",
-   "WORKSTATION_CONFIGURE",
-   "PRODUCT_VIEW",
-   "PRODUCT_CONFIGURE",
-   "PRODUCT_APPROVE",
-   "PRODUCT_PUBLISH",
-   "PRICE_VIEW",
-   "PRICE_CONFIGURE",
-   "EVENT_CONFIGURE",
-   "PERFORMANCE_CONFIGURE",
-   "CAPACITY_CONFIGURE",
-   "ORDER_VIEW",
-   "ORDER_VIEW_OTHER",
-   "ORDER_CREATE",
-   "ORDER_MODIFY",
-   "ORDER_DISCOUNT",
-   "ORDER_CANCEL",
-   "ORDER_VOID",
-   "ORDER_REFUND",
-   "ORDER_REFUND_APPROVE",
-   "ORDER_REFUND_BULK",
-   "ORDER_EXCHANGE",
-   "ORDER_RESCHEDULE",
-   "ORDER_REPRINT",
-   "PRICE_OVERRIDE",
-   "DISCOUNT_APPLY",
-   "CREDIT_MANAGE",
-   "CREDIT_OVERRIDE",
-   "WALLET_VIEW",
-   "WALLET_OPERATE",
-   "WALLET_CONFIGURE",
-   "PAYMENT_VIEW",
-   "PAYMENT_CONFIGURE",
-   "PAYMENT_PROVIDER_MANAGE",
-   "PAYMENT_DISPUTE",
-   "SHIFT_OPEN",
-   "SHIFT_CLOSE",
-   "SHIFT_SUSPEND",
-   "SHIFT_CLOSE_OTHER",
-   "SHIFT_APPROVE_OPEN",
-   "SHIFT_APPROVE_CLOSE",
-   "SHIFT_REOPEN",
-   "CASH_LIFT",
-   "CASH_ADD",
-   "CASH_NO_SALE",
-   "DEPOSIT_BOX_MODIFY_OWN",
-   "DEPOSIT_BOX_MODIFY_OTHER",
-   "OVERSHORT_ACCEPT",
-   "ACCESS_VALIDATE",
-   "ACCESS_OVERRIDE",
-   "ACCESS_POINT_CONFIGURE",
-   "TURNSTILE_MODE_SET",
-   "TICKET_LOOKUP",
-   "ACCREDITATION_VIEW",
-   "ACCREDITATION_APPLY",
-   "ACCREDITATION_APPROVE",
-   "ACCREDITATION_ISSUE",
-   "ACCREDITATION_MANAGE",
-   "ACCREDITATION_CONFIGURE",
-   "REPORT_VIEW_OWN",
-   "REPORT_VIEW_WORKSTATION",
-   "REPORT_VIEW_VENUE",
-   "REPORT_VIEW_REGION",
-   "REPORT_VIEW_TENANT",
-   "REPORT_EXPORT",
-   "REPORT_EXPORT_PII",
-   "REPORT_MANAGE",
-   "REPORT_SCHEDULE",
-   "LEDGER_VIEW",
-   "LEDGER_POST",
-   "LEDGER_APPROVE",
-   "TAX_CONFIGURE",
-   "ACCOUNT_CONFIGURE",
-   "SETTLEMENT_VIEW",
-   "SETTLEMENT_RECONCILE",
-   "GUEST_VIEW",
-   "GUEST_VIEW_PII",
-   "GUEST_MANAGE",
-   "VENUE_MAP_VIEW",
-   "VENUE_MAP_MANAGE",
-   "VENUE_MAP_PUBLISH",
-   "RESOURCE_VIEW",
-   "RESOURCE_BOOK",
-   "RESOURCE_MANAGE",
-   "RESOURCE_CONFIGURE",
-   "RENTAL_VIEW",
-   "RENTAL_BOOK",
-   "RENTAL_OPERATE",
-   "RENTAL_MANAGE",
-   "RENTAL_CONFIGURE",
-   "RENTAL_PRICE",
-   "RENTAL_APPROVE",
-   "RENTAL_OVERRIDE",
-   "DEVELOPER_VIEW",
-   "DEVELOPER_MANAGE",
-   "DEVELOPER_ADMIN",
-   "LOYALTY_ACCRUE",
-   "LOYALTY_REDEEM",
-   "LOYALTY_ADJUST",
-   "MARKETING_VIEW",
-   "MARKETING_MANAGE",
-   "MARKETING_SEND",
-   "CASE_VIEW",
-   "CASE_MANAGE",
-   "ASSET_LIBRARY_VIEW",
-   "ASSET_LIBRARY_MANAGE",
-   "ASSET_LIBRARY_APPROVE",
-   "ASSET_LIBRARY_SHARE",
-   "QUEUE_VIEW",
-   "QUEUE_MANAGE",
-   "QUEUE_REDEEM",
-   "QUEUE_OVERRIDE",
-   "TRANSPORT_VIEW",
-   "TRANSPORT_MANAGE",
-   "TRANSPORT_PRICE",
-   "ASSET_VIEW",
-   "ASSET_MANAGE",
-   "WORK_ORDER_VIEW",
-   "WORK_ORDER_MANAGE",
-   "WORK_ORDER_VERIFY",
-   "INSPECTION_VIEW",
-   "INSPECTION_SUBMIT",
-   "INSPECTION_MANAGE",
-   "INCIDENT_REPORT",
-   "INCIDENT_VIEW",
-   "INCIDENT_MANAGE",
-   "KIOSK_ATTEND",
-   "DEVICE_VIEW",
-   "DEVICE_CONFIGURE",
-   "DEVICE_MANAGE",
-   "APPROVAL_ACT",
-   "APPROVAL_DELEGATE",
-   "AI_USE",
-   "AI_CONFIGURE",
-   "AI_APPROVE",
-   "AI_AUDIT_VIEW",
-   "RISK_REVIEW",
-   "RISK_INVESTIGATE",
-   "AUDIT_VIEW",
-   "APPROVAL_VIEW",
-   "APPROVAL_REQUEST",
-   "APPROVAL_DECIDE",
-   "APPROVAL_CONFIGURE",
-   "MAINTENANCE_EXECUTE",
-   "MAINTENANCE_APPROVE",
-   "WORKFORCE_VIEW",
-   "WORKFORCE_MANAGE",
-   "ATTENDANCE_RECORD",
-   "ANNOUNCEMENT_PUBLISH",
-   "ANNOUNCEMENT_EMERGENCY",
-   "PARTNER_VIEW",
-   "PARTNER_MANAGE",
-   "PARKING_CONFIGURE",
-   "PAYMENT_VOID",
-   "PROCUREMENT_VIEW",
-   "PROCUREMENT_REQUEST",
-   "PROCUREMENT_MANAGE",
-   "PROCUREMENT_RECEIVE"
-  ]
- },
- "PermissionSet": {
-  "type": "array",
-  "items": {
-   "$ref": "#/components/schemas/Permission"
-  },
-  "uniqueItems": true
  },
  "PlatformStaffGrant": {
   "type": "object",
@@ -1879,22 +2006,29 @@
    }
   }
  },
- "ScopedPermissions": {
-  "type": "object",
-  "description": "Permissions effective at a given scope path, after deny resolution. Clients filter navigation on this and never compute permissions themselves.\n",
-  "required": [
-   "scopePath",
-   "permissions"
-  ],
-  "properties": {
-   "scopePath": {
-    "type": "string",
-    "pattern": "^[a-z0-9_]+(\\.[a-z0-9_]+)*$"
-   },
-   "permissions": {
-    "$ref": "#/components/schemas/PermissionSet"
-   }
-  }
+ "SaleBoardKind": {
+  "type": "string",
+  "enum": [
+   "ticketing",
+   "fnb",
+   "retail",
+   "mixed"
+  ]
+ },
+ "ScopeLevel": {
+  "type": "string",
+  "description": "**The eight organisational levels, plus `subject`.** Restored 24 August.\n`tenancy.yaml` holds the authoritative definition of the eight levels and this mirrors them so a contract can reference a level without depending on the whole tenancy surface. **Seven organisational levels plus `outlet`** — a commercial branch beside the organisational one (CF-138, ADR-0018). **A department has requisitions and rotas; an outlet has a menu and stock**, and modelling a restaurant as a department would put it in the staffing tree.\n\n**`subject` is the one value tenancy does not have, and it is not a level.** It is here because `check-package` reads this enum as the closed vocabulary for `x-ticvai-scope-level`, and some operations act on one guest's own resources, which sit in no node of the venue hierarchy. So `subject` is valid as an operation's scope level and never as a `ScopeRef.level`: every `ScopeRef` is a row of `platform.scope`, and those carry one of the eight.\n",
+  "enum": [
+   "tenant",
+   "brand",
+   "region",
+   "venue",
+   "department",
+   "subDepartment",
+   "workstation",
+   "outlet",
+   "subject"
+  ]
  },
  "SuggestionProviderAssignments": {
   "type": "array",
@@ -2047,6 +2181,51 @@
       "nullable": true,
       "default": 0,
       "description": "BL-106. **How long a same-visit Face Tag survives past the close of the operating day**, and zero is the default because that is what 3.2.44 describes. A non-zero value is an operational allowance for a late reconciliation, not a retention period — **`facePass` ignores this entirely** and is bounded by its entitlement.\n"
+     },
+     "consentFormId": {
+      "type": "string",
+      "format": "uuid",
+      "nullable": true,
+      "description": "**The venue's own consent form, which every biometric capture is taken on** (decided 2 October 2026, Chinmay, batch 4, BO-188: \"Consent first, on the venue's consent form\"; DEC-128, DEC-549; CHG-CSP-018). A form from the venue's consent-form builder in Venue Management (the one builder Face Pass, Face Tag, marketing and waivers share; marketing-crm `setDigitalWaiverForm`). Turning `isEnabled` on without one is refused `422 consent-form-required`, as a missing DPIA is; each Face Pass and Face Tag capture records the form and its version it was consented on (access `enrolFacePass`, `enrolFaceTag`).\n"
+     },
+     "templatesHeldByTicvai": {
+      "type": "boolean",
+      "readOnly": true,
+      "description": "**True where TICVAI's platform stores this venue's biometric templates** (rather than the venue's own on-premises reader estate). Derived from the venue's access deployment. While true, Venue Management shows the venue a standing warning that every guest must accept the venue's consent form before capture, because the data sits with TICVAI as the venue's processor (decided 2 October 2026, Chinmay, batch 4, BO-188: \"If we store the data, highlight or notify the venue that the client must accept a consent form\"; DEC-128; CHG-CSP-018).\n"
+     },
+     "allowMinors": {
+      "type": "boolean",
+      "default": true,
+      "description": "**Whether this venue enrols minors at all** (decided 2 October 2026, Chinmay, critical set 1, BO-187 and CMS-029: \"Guardian consent on the venue's form; minor age per country; the venue can switch minors off\"; supersedes the GST-069 default; DEC-237; CHG-CSP-019). On: a minor (below `RegionSettings.minorAgeThreshold`) is enrolled only with a guardian's consent on the venue's consent form. Off: a minor's enrolment is refused (`422 minors-not-enrolled`) and the guest uses another verification method.\n"
+     },
+     "accreditationFaceMatching": {
+      "type": "object",
+      "nullable": true,
+      "description": "**Face matching to find duplicate accreditation applicants, off unless the venue enables it** (decided 2 October 2026, Chinmay, critical set 3, BO-631: \"Only where the venue enables it, with applicant consent and the venue's legal sign-off; off by default\"; DEC-461; CHG-CSP-022). Enabling it is refused without `legalSignOffReference` (`422 legal-sign-off-required`); each applicant matched must have consented on the application (accreditation's own record). Null is off.\n",
+      "properties": {
+       "isEnabled": {
+        "type": "boolean",
+        "default": false
+       },
+       "legalSignOffReference": {
+        "type": "string",
+        "nullable": true,
+        "maxLength": 200,
+        "description": "The venue's own reference for its legal sign-off; the platform records that one was named, by whom and when."
+       },
+       "signedOffByPrincipalId": {
+        "type": "string",
+        "format": "uuid",
+        "nullable": true,
+        "readOnly": true
+       },
+       "signedOffAt": {
+        "type": "string",
+        "format": "date-time",
+        "nullable": true,
+        "readOnly": true
+       }
+      }
      }
     }
    },
@@ -2161,6 +2340,15 @@
      "pattern": "^[A-Z]{3}$"
     }
    },
+   "chargeCurrencies": {
+    "type": "array",
+    "nullable": true,
+    "description": "**Which currencies a guest may select and pay in** (decided 2 October 2026, Chinmay; CHG-FIN-001; MoM 10 Aug 2026 4.7 option (b), DI-211). A subset of `displayCurrencies`: each code must also be one the venue's payment provider can charge (`orders.PaymentProvider.presentmentCurrencies`) and one the region holds a `tender` rate for; anything else is refused `400`. Null or empty: guests pay in the trading (base) currency only and the other display currencies stay approximate. The ledger is always in the base currency, with the rate recorded on every payment and refund.\n",
+    "items": {
+     "type": "string",
+     "pattern": "^[A-Z]{3}$"
+    }
+   },
    "cartLeaseSeconds": {
     "type": "integer",
     "nullable": true,
@@ -2225,6 +2413,15 @@
     ],
     "nullable": true,
     "description": "Over or short at shift close beyond which the shift waits in `pendingVariance` for `shift.acceptShiftVariance`. **Proposed tenant default AED 20.00, bounds 0 to 1,000 in the venue currency; client finance to correct (audit R094).**\n"
+   },
+   "cashDrawerLimit": {
+    "oneOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true,
+    "description": "**The most cash a till drawer should hold before some is lifted to the safe** (decided 2 October 2026, Chinmay, batch 6 set 3, BO-042: \"Add drawer limit setting (warn + offer cash lift)\"; DEC-179; CHG-CSP-016; DI-274: on a busy day the cashier unloads excess cash mid-shift and it is reconciled at close). The venue default; a till may set its own (`Workstation.cashDrawerLimit`). When the cash a till has taken since its last count takes the drawer over it, the till warns and offers a cash lift (`shift.createCashMovement` kind `lift`) and BO-042 flags the box (`shift.DepositBox.overDrawerLimit`). A warning, never a block: a sale is not refused because the drawer is full. Null sets no limit. **No proposed default: the client's finance team sets it.**\n"
    },
    "catalogue": {
     "type": "object",
@@ -2359,6 +2556,15 @@
       "default": 10,
       "description": "Minutes after a bump during which `recallKitchenTicket` still recalls; after it the act is a refire. Proposed, client to correct (audit R094)."
      },
+     "tableReservedLeadMinutes": {
+      "type": "integer",
+      "nullable": true,
+      "minimum": 0,
+      "maximum": 240,
+      "default": 30,
+      "deprecated": true,
+      "description": "**Deprecated (2 October 2026, CHG-CLN-009): `fnb.FnbReservationPolicy.reservedLeadMinutes` is canonical.** The table state model reads the reservation policy (`states/table.yaml`); this venue setting is kept for compatibility, never read, and not drawn. Its former meaning: **How long before a pre-allocated booking its table shows Reserved** (decided 2 October 2026, Chinmay, batch 6 set 6b, EMP-052: \"Reserved when a booking names the table, or N minutes (venue-set) before a pre-allocated booking\"; DEC-202; CHG-CSP-017; DI-689, DI-336). A booking that names its table holds it as Reserved for the booking's whole slot; a booking the host pre-allocated shows its table Reserved from this many minutes before it. Zero shows Reserved only once the booking is due. The fnb table state model applies it (`states/table.yaml`, owned by fnb). Proposed default 30 minutes, client to correct.\n"
+     },
      "compEscalationAmount": {
       "allOf": [
        {
@@ -2471,6 +2677,157 @@
       }
      }
     }
+   }
+  }
+ },
+ "Workstation": {
+  "x-ticvai-persistence": "platform.workstation",
+  "type": "object",
+  "required": [
+   "id",
+   "code",
+   "name",
+   "venueId",
+   "regionId",
+   "scopePath",
+   "saleBoard",
+   "currency",
+   "currencyScale",
+   "timeZone"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string",
+    "maxLength": 64
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "regionId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "departmentId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "outletId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**The outlet this till stands in** (CHG-CSP-006). Its board is the till's board unless the till overrides it. Null on a workstation that belongs to no outlet (a ticket office counter set up before outlets), which must then carry its own board.\n"
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "saleBoard": {
+    "type": "object",
+    "description": "Determines which front end loads. Bound to the workstation, not the role — the F&B terminal opens the F&B board. What the operator may then DO within it is governed by their permissions.\n**The effective board** since 2 October 2026 (DEC-183; CHG-CSP-006): the till's own when it overrides the outlet, otherwise the outlet's (`saleBoardSource`).\n",
+    "required": [
+     "id",
+     "kind"
+    ],
+    "properties": {
+     "id": {
+      "type": "string",
+      "format": "uuid"
+     },
+     "kind": {
+      "$ref": "#/components/schemas/SaleBoardKind"
+     },
+     "name": {
+      "type": "string"
+     }
+    }
+   },
+   "saleBoardSource": {
+    "type": "string",
+    "enum": [
+     "outlet",
+     "workstation"
+    ],
+    "readOnly": true,
+    "description": "**Where `saleBoard` came from** (decided 2 October 2026, Chinmay, BO-109: \"Per outlet, with a till override\"; DEC-183; CHG-CSP-006): `outlet` when the till uses its outlet's layout, `workstation` when this till overrides it. BO-109 shows which tills differ from their outlet.\n"
+   },
+   "cashDrawerLimit": {
+    "oneOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true,
+    "description": "**This till's drawer limit, overriding the venue's** (`VenueSettings.cashDrawerLimit`; DEC-179; CHG-CSP-016). Null inherits the venue's. Above it the till warns and offers a cash lift.\n"
+   },
+   "accessPointId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Inherited from the workstation, never selected by the operator. Null where the workstation is not at an access point.\n"
+   },
+   "devices": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/DeviceBinding"
+    }
+   },
+   "currency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$",
+    "x-ticvai-persisted": false,
+    "description": "**Resolved from the region, not stored** (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and cannot be anything else. **Kept on the wire , removed from the table** — a client should not walk a hierarchy to read a figure, and the  database should not hold nine million copies of AED. Four tables genuinely differ from their\n region and keep a stored currency: `orders.payment.tender_currency`, `inventory.supplier`, \n`ledger.account`, `control.partner_agreement`.\n"
+   },
+   "currencyScale": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 4,
+    "x-ticvai-persisted": false,
+    "description": "**Resolved from the region, not stored** (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and cannot be anything else — storing it per ro w is a copy of a fact that cannot differ. **Kept on the wire, removed from the table**: a cl ient reading a figure should not walk a hierarchy to know what it means, and the database sh ould not hold nine million copies of AED. Four tables genuinely differ from their region and\n keep a stored currency — `orders.payment.tender_currency`, `inventory.supplier`, `ledger.ac\ncount`, `control.partner_agreement`. **A guest paying USD at an AED venue is a real row; a w orkstation with its own currency is a misconfiguration.**\n"
+   },
+   "timeZone": {
+    "type": "string"
+   },
+   "deploymentProfile": {
+    "$ref": "#/components/schemas/DeploymentProfile"
+   },
+   "edgeNodeId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Present when `deploymentProfile` is `venueEdge`."
+   },
+   "healthScore": {
+    "type": "integer",
+    "nullable": true,
+    "minimum": 0,
+    "maximum": 100,
+    "readOnly": true,
+    "description": "Board 1 of the client's POS set. **A number a manager can sort by** — the package held `lastHeartbeatAt` and a heartbeat timestamp is not a score.\nThe client's board shows 1,248 workstations at 96% healthy, and **the value of that figure is that it ranks**: a fleet dashboard exists so somebody can open the worst one first.\n**Derived from its devices, its heartbeat age, its firmware currency and its error rate.** Read-only, because a workstation that could set its own score would.\n**The formula, proposed, client to correct (audit R096 (2)):** score = 40% device online share (the share of its devices reporting online) + 25% heartbeat freshness (100 at one minute old or less, 0 at 15 minutes or more, linear between) + 20% firmware and profile currency (100 on the latest, 50 one version behind, 0 older) + 15% error rate (100 at 0 errors an hour, 0 at 10 or more, linear between), rounded to a whole number. **Below 80 is a warning and below 60 a failure.**\n"
+   },
+   "configurationProfileId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Which profile this workstation runs, and at which version. **The client's board shows a fleet split four ways — 72% latest, 18.8% one behind, 6.1% outdated** — and the package had a firmware version field and no profile.\n**A profile is what a venue changes; a version is what it deploys.** Conflating them means a venue cannot say *roll the ticketing counters back and leave the kiosks*.\n"
+   },
+   "catalogueState": {
+    "$ref": "#/components/schemas/CatalogueState"
+   },
+   "offlineCapable": {
+    "type": "boolean",
+    "description": "Derived from `deploymentProfile`. False only for `thin`. Under local-first, catalogue READS are always local on transactional surfaces; this flag governs whether WRITES can be queued.\n"
+   },
+   "isActive": {
+    "type": "boolean"
    }
   }
  }

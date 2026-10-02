@@ -167,25 +167,6 @@
   "requestBody": "ResourceAllocationPolicy",
   "responds": "ResourceAllocationPolicy"
  },
- "setResourceQualifications": {
-  "method": "PUT",
-  "path": "/resources/{resourceId}/qualifications",
-  "contract": "resources",
-  "summary": "What a person resource is certified to do, and until when",
-  "permission": "RESOURCE_MANAGE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Qualification"
- },
  "setResourceSelectionPolicy": {
   "method": "PUT",
   "path": "/resource-selection-policy",
@@ -238,5 +219,24 @@
   ],
   "requestBody": null,
   "responds": "Resource"
+ },
+ "updateResourcePackage": {
+  "method": "PUT",
+  "path": "/resource-packages/{packageId}",
+  "contract": "resources",
+  "summary": "Change a combination",
+  "permission": "RESOURCE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ResourcePackage",
+  "responds": "ResourcePackage"
  }
 }

@@ -27,10 +27,10 @@ steps:
 - step: 2
   screen: SCN-013
   action: Scans journal locally while the network is gone.
-  operations:
-  - listScans
+  operations: []
   outcome: '**Every scan is kept, including the refusals.** A refusal offline is as much a record as
     an admission.'
+  note: '**Corrected 2 October (CHG-WIR-001).** The journal is local to the device; listScans reads server scans and needs the venue report permission.'
 - step: 3
   screen: SCN-014
   action: The network returns and the journal posts.

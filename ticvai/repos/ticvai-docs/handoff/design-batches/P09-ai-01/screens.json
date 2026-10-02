@@ -3,7 +3,7 @@
   "id": "ADM-037",
   "name": "AI Provider & Credentials",
   "module": "AI",
-  "requiresModule": "ai",
+  "requiresModule": "core",
   "wave": 1,
   "capability": "C00",
   "implementation": {
@@ -25,18 +25,24 @@
     {
      "to": "ADM-001",
      "trigger": "Platform Login / MFA",
-     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId and ADM-037 holds none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and ADM-001 opens on its own"
+     "carries": [
+      "providerId"
+     ],
+     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId, providerId and ADM-037 holds providerId, so an edge into it carries them"
     },
     {
      "to": "BO-091",
      "trigger": "AI Policy & Spend",
      "provenance": "flow F100 step 1→2",
      "crossesDevice": true,
-     "back": false
+     "back": false,
+     "carries": [
+      "tenantId"
+     ]
     }
    ]
   },
-  "notes": "Added 17 August. **The key is entered once and never returned** — the screen shows a reference, a rotation date and a last-verified date, never a secret. Test before activate. **Not on the wireframe board.**\n\n**Per tenant, not per region (decided 28 September, audit R203).** Platform staff pick a tenant, open a platform-staff grant into it (audit R098), and set that tenant's provider with `setAiProvider` (`PLATFORM_TENANT_MANAGE`, read from the operator's own token; the open grant ties the change to the tenant's audit); the region only restricts the choice. The screen shows the tenant's region's residency restriction before the form, and a provider whose `residency` is outside it is refused `409 residency-refused`, which the form shows against the residency field.",
+  "notes": "Added 17 August. **The key is entered once and never returned** — the screen shows a reference, a rotation date and a last-verified date, never a secret. Test before activate. **Not on the wireframe board.**\n\n**Per tenant, not per region (decided 28 September, audit R203).** Platform staff pick a tenant, open a platform-staff grant into it (audit R098), and set that tenant's provider with `setAiProvider` (`PLATFORM_TENANT_MANAGE`, read from the operator's own token; the open grant ties the change to the tenant's audit); the region only restricts the choice. The screen shows the tenant's region's residency restriction before the form, and a provider whose `residency` is outside it is refused `409 residency-refused`, which the form shows against the residency field.\n\n**Decided 2 October 2026 by Chinmay (DEC-001, DEC-002; CHG-SBO-007):** the client cannot change the model per agent; TICVAI curates it per task, and with BYOK the agent assigns that provider's equivalent from the curated range, billed to the client's key. The residency class (UAE-only by default) limits which providers qualify (CHG-CSA-002).",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listAiProviders` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
@@ -57,7 +63,7 @@
       {
        "kind": "selectField",
        "label": "Tenant",
-       "bindsTo": "Tenant",
+       "bindsTo": "Tenant.id",
        "columns": [
         "Tenant.id",
         "Tenant.code",
@@ -103,7 +109,6 @@
        "label": "Every AI provider",
        "bindsTo": "AiProvider",
        "columns": [
-        "AiProvider.id",
         "AiProvider.kind",
         "AiProvider.capability",
         "AiProvider.model",
@@ -111,13 +116,30 @@
         "AiProvider.degradeGracefully",
         "AiProvider.priority",
         "AiProvider.scopeLevel",
-        "AiProvider.scopePath",
-        "AiProvider.credentialRef",
         "AiProvider.credentialRotatedAt",
-        "AiProvider.credentialExpiresAt"
+        "AiProvider.credentialExpiresAt",
+        "AiProvider.vendor",
+        "AiProvider.credentialHint",
+        "AiProvider.compatibility"
        ],
        "operation": "listAiProviders",
        "provenance": "contract ai.yaml GET /providers"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Curated models per task",
+       "bindsTo": "AiModel",
+       "columns": [
+        "AiModel.modelName",
+        "AiModel.providerKind",
+        "AiModel.producerType",
+        "AiModel.curatedRange",
+        "AiModel.residencyClasses",
+        "AiModel.lifecycle"
+       ],
+       "operation": "listAiModels",
+       "notes": "**The curated range (decided 2 October 2026 by Chinmay, DEC-001, DEC-002; CHG-CSA-001)**: for every AI task TICVAI keeps a best-suited model and 3-4 alternatives, by tier, not by name (`curatedRange`: task, tier, rank, BYOK-eligible). Read-only to the tenant; platform staff maintain it with Save model.",
+       "provenance": "contract ai.yaml GET /models"
       }
      ]
     },
@@ -138,14 +160,16 @@
         "AiProvider.degradeGracefully",
         "AiProvider.priority",
         "AiProvider.scopeLevel",
-        "AiProvider.scopePath",
-        "AiProvider.credentialRef",
         "AiProvider.credentialRotatedAt",
         "AiProvider.credentialExpiresAt",
         "AiProvider.lastVerifiedAt",
         "AiProvider.endpoint",
         "AiProvider.residency",
-        "AiProvider.maxTokens"
+        "AiProvider.maxTokens",
+        "AiProvider.vendor",
+        "AiProvider.residencyClasses",
+        "AiProvider.credentialHint",
+        "AiProvider.compatibility"
        ],
        "operation": "listAiProviders",
        "provenance": "contract ai.yaml GET /providers"
@@ -161,15 +185,31 @@
         "AiProvider.modelId"
        ],
        "operation": "listAiProviders",
-       "notes": "**One managed provider by default (AI-D02)**, with a small and a stronger model per agent task; a second provider or a tenant key only where TICVAI enabled it (AI-D14). `taskKeys` binds a provider to named agent tasks (M21-03). **Fitness warnings are shown, never blocking** (M21-09): a model below a task's floor is underpowered, one far above its ceiling is overpowered.",
+       "notes": "**TICVAI curates the model for every task (decided 2 October 2026 by Chinmay, DEC-002, CHG-CSA-001; overturns AI-D18 \"warns, never blocks\").** `taskKeys` binds a provider to named agent tasks; a model outside the curated range for a task is refused by `setAiProvider` and `setAiModel` with 422 `model-not-curated`, shown against the model field. A client cannot pick a cheaper model per agent. `fitnessWarnings` stay informative for models inside the range.",
        "provenance": "29 September pass (group A)"
       },
       {
        "kind": "banner",
-       "label": "Model fit warning",
+       "label": "Model not curated for this task",
        "operation": "setAiProvider",
-       "notes": "Shown after `setAiProvider` returns `fitnessWarnings`: names the task, the score and the band.",
+       "notes": "Shown when `setAiProvider` or `setAiModel` answers 422 `model-not-curated` (DEC-002, CHG-CSA-001): names the task and the curated tiers it accepts. A residency class the tenant cannot use answers 409 `residency-class-refused` (CHG-CSA-002) and is shown against the residency field.",
        "provenance": "29 September pass (group A)"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Bring your own key",
+       "bindsTo": "AiByokEnablement",
+       "columns": [
+        "AiByokEnablement.enabled",
+        "AiByokEnablement.coverage",
+        "AiByokEnablement.allowedTasks",
+        "AiByokEnablement.taskModelMap",
+        "AiByokEnablement.reason",
+        "AiByokEnablement.decidedAt"
+       ],
+       "operation": "getAiByokEnablement",
+       "notes": "**BYOK (decided 2 October 2026 by Chinmay, DEC-001; closes AI-D20).** With the client's own key, each AI task is mapped by TICVAI to that provider's equivalent model from the curated range (`taskModelMap`: task, tier, model); the client never picks the model. Usage on the client key is billed to that key, not re-billed by TICVAI. Any provider with an API key qualifies, after the compatibility test (Test AI provider).",
+       "provenance": "contract ai.yaml GET /tenants/{tenantId}/byok"
       }
      ]
     },
@@ -187,13 +227,29 @@
        "kind": "secondaryButton",
        "label": "Save AI credential",
        "operation": "setAiCredential",
-       "provenance": "contract ai.yaml PUT /ai-providers/{providerId}/credential"
+       "provenance": "contract ai.yaml PUT /ai-providers/{providerId}/credential",
+       "notes": "**Any provider with an API key (Chinmay, 2 October 2026; CHG-FUP-005):** the key is stored per tenant in Key Vault, encrypted and write-only; the screen shows only the key hint (`credentialHint`), never the key. The provider is active only after Test AI provider passes the compatibility test (`compatibility`, AiProviderCompatibility: status, tested at, per task)."
       },
       {
        "kind": "secondaryButton",
        "label": "Test AI provider",
        "operation": "testAiProvider",
-       "provenance": "contract ai.yaml POST /ai-providers/{providerId}/test"
+       "provenance": "contract ai.yaml POST /ai-providers/{providerId}/test",
+       "notes": "Runs the compatibility test for the curated tasks (`taskKeys`) and records `AiProviderCompatibility`; **activation is refused until it passes** (CHG-FUP-005)."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save model",
+       "operation": "setAiModel",
+       "notes": "Platform staff add or change a catalogue model and its curated range; a model outside the range for a task cannot be bound to that task (422 `model-not-curated`, DEC-002).",
+       "provenance": "contract ai.yaml PUT /models/{modelId}"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save BYOK enablement",
+       "operation": "setAiByokEnablement",
+       "notes": "Enables or disables bring-your-own-key for the picked tenant under the open grant; the task-to-model map is TICVAI's, filled from the curated range (DEC-001).",
+       "provenance": "contract ai.yaml PUT /tenants/{tenantId}/byok"
       }
      ]
     }
@@ -202,7 +258,7 @@
   "states": {
    "loading": "The provider credentials list.",
    "error": "Could not load. Names which read failed and leaves the provider credentials untouched.",
-   "emptyFirstRun": "No provider credentials yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyFirstRun": "No AI provider for this tenant yet; the managed default (TICVAI curated, UAE-only through Core42 Compass unless the tenant is Global-allowed) answers meanwhile. Offers Save AI provider (`setAiProvider`, `id` optional, so it creates one); distinct from a filter that matched nothing.",
    "emptyNoResults": "Never shown: `listAiProviders` takes no filter, so an empty list is always the first-run state above.",
    "emptyNoAccess": "Shown when the caller lacks `AI_CONFIGURE`, which `listAiProviders` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "grantRequired": "**No access into this tenant yet.** A tenant is picked and no platform-staff grant into it is open, so the provider list and every action are disabled and the screen offers **Open access grant** (`openPlatformStaffGrant`: reason, permissions, expiry). The same state returns when the grant reaches `expiresAt` (decided 28 September, audit R098, R203)."
@@ -423,6 +479,60 @@
      ]
     },
     "provenance": "contract ai.yaml PUT /ai-providers/{providerId}/credential"
+   },
+   {
+    "id": "formSetAiModel",
+    "component": "modal",
+    "trigger": "Save model",
+    "body": "**Collects what `setAiModel` sends before it is called.** Required: `layer`, `modelName`, `producerType`. Optional: `providerKind`, `vendor`, `capabilities`, `contextTokens`, `toolCalling`, `structuredOutput`, `languages`, `residency`, `inputCostPerMillionTokens`, `outputCostPerMillionTokens`, `lifecycle`, `isDefaultForTasks`, `curatedRange`, `residencyClasses`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save model",
+     "operation": "setAiModel"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "layer",
+      "modelName",
+      "producerType",
+      "providerKind",
+      "vendor",
+      "capabilities",
+      "contextTokens",
+      "toolCalling",
+      "structuredOutput",
+      "languages",
+      "residency",
+      "inputCostPerMillionTokens",
+      "outputCostPerMillionTokens",
+      "lifecycle",
+      "isDefaultForTasks",
+      "curatedRange",
+      "residencyClasses"
+     ]
+    },
+    "provenance": "contract ai.yaml PUT /models/{modelId}"
+   },
+   {
+    "id": "formSetAiByokEnablement",
+    "component": "modal",
+    "trigger": "Save BYOK enablement",
+    "body": "**Collects what `setAiByokEnablement` sends before it is called.** Required: `tenantId`, `enabled`. Optional: `coverage`, `allowedTasks`, `reason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save BYOK enablement",
+     "operation": "setAiByokEnablement"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "tenantId",
+      "enabled",
+      "coverage",
+      "allowedTasks",
+      "reason"
+     ]
+    },
+    "provenance": "contract ai.yaml PUT /tenants/{tenantId}/byok"
    }
   ],
   "_platform": {

@@ -3,7 +3,7 @@
   "id": "KSK-015",
   "name": "Assistant",
   "module": "AI",
-  "requiresModule": "ticketing",
+  "requiresModule": "ai",
   "wave": 2,
   "capability": "C00",
   "implementation": {
@@ -31,7 +31,6 @@
      "crossesDevice": true,
      "back": false,
      "carries": [
-      "caseId",
       "conversationId"
      ]
     }
@@ -42,8 +41,8 @@
   "boardFrames": [
    "Kiosk Board 2.dc.html#KSK-015"
   ],
-  "pattern": "listDetail",
-  "patternReason": "`listProducts` reads the population and `getAvailability` reads one of them — list, select, act",
+  "pattern": "statusTracker",
+  "patternReason": "A conversation: the question, the answer and its product cards are the content (CHG-SGU-016)",
   "purpose": "Help a guest choose and pay, and nothing else.",
   "gaps": [
    {
@@ -60,53 +59,30 @@
      "slot": "collection",
      "components": [
       {
-       "kind": "textField",
-       "label": "Venue id",
-       "operation": "listProducts",
-       "notes": "Sends `?venueId=` to `listProducts`.",
-       "provenance": "contract catalogue.yaml GET /products"
+       "kind": "assistantPanel",
+       "label": "Ask for help",
+       "operation": "sendAiMessage",
+       "notes": "Voice or a constrained touch interface, no keyboard. Products appear as cards inside the conversation (from `listProducts`, guest projection: name, price, what it includes), never as a table or a venue-id filter; tapping one returns the guest to the ticket step.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-016, design-notes correction)"
       },
       {
-       "kind": "textField",
-       "label": "Kind",
-       "operation": "listProducts",
-       "notes": "Sends `?kind=` to `listProducts`.",
-       "provenance": "contract catalogue.yaml GET /products"
-      },
-      {
-       "kind": "toggle",
-       "label": "Is sellable",
-       "operation": "listProducts",
-       "notes": "Sends `?isSellable=` to `listProducts`.",
-       "provenance": "contract catalogue.yaml GET /products"
-      },
-      {
-       "kind": "dataTable",
-       "label": "Every product",
+       "kind": "cardList",
+       "label": "Products Sahli suggests",
        "bindsTo": "Product",
        "columns": [
-        "Product.id",
-        "Product.code",
         "Product.name",
-        "Product.description",
-        "Product.kind",
-        "Product.venueId",
-        "Product.scopePath",
-        "Product.createdByPrincipalId",
-        "Product.approvedByPrincipalId",
-        "Product.responsibleDepartmentId",
-        "Product.onSaleFrom",
-        "Product.onSaleTo"
+        "Product.description"
        ],
        "operation": "listProducts",
-       "provenance": "contract catalogue.yaml GET /products"
+       "notes": "Cards inside the conversation with the price for today; tapping one returns the guest to the ticket step (KSK-004).",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-016, design-notes correction)"
       },
       {
-       "kind": "dataTable",
-       "label": "Availability",
+       "kind": "banner",
+       "label": "Available today",
        "operation": "getAvailability",
-       "notes": "Shows `channelCapacityId`, `performanceId`, `capacity`, `sold`, `leased`, `remaining`, `byChannel` from `getAvailability`'s inline response. **The response has no named schema**, so this cannot bind until the contract names one.",
-       "provenance": "contract catalogue.yaml GET /availability"
+       "notes": "On a suggested card: whether it can still be bought today.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-016, design-notes correction)"
       }
      ]
     },
@@ -115,16 +91,11 @@
      "slot": "rowActions",
      "components": [
       {
-       "kind": "primaryButton",
-       "label": "Send AI message",
-       "operation": "sendAiMessage",
-       "provenance": "contract ai.yaml POST /conversations/{conversationId}/messages"
-      },
-      {
        "kind": "secondaryButton",
-       "label": "Handover to agent",
+       "label": "Talk to a person",
        "operation": "handoverToAgent",
-       "provenance": "contract marketing-crm.yaml POST /conversations/{conversationId}/handover"
+       "notes": "One tap; reason guestRequested.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-016, design-notes correction)"
       }
      ]
     }
@@ -133,9 +104,8 @@
   "states": {
    "loading": "The assistant list.",
    "error": "Could not load. Names which read failed and leaves the assistant untouched.",
-   "emptyFirstRun": "No assistant yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
-   "emptyNoResults": "Nothing matches the filter on venueId, kind, isSellable and the assistant are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "The ask prompt with three starter questions (tickets, timings, what is included).",
+   "emptyNoAccess": "**A kiosk holds no permission and needs none** (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)): it sells to whoever is standing at it, and reads what the tenant has published like any visitor. A kiosk whose device registration is revoked goes out of service (KSK-014); it never shows a sign-in or names a permission."
   },
   "apis": [
    {
@@ -150,14 +120,14 @@
    {
     "operationId": "listProducts",
     "contract": "catalogue",
-    "purpose": "List products",
-    "trigger": "onLoad"
+    "purpose": "Products shown as cards inside the conversation",
+    "trigger": "onAction"
    },
    {
     "operationId": "getAvailability",
     "contract": "catalogue",
-    "purpose": "Live remaining capacity",
-    "trigger": "onLoad"
+    "purpose": "Whether a product suggested in the conversation can still be bought today",
+    "trigger": "onAction"
    },
    {
     "operationId": "handoverToAgent",
@@ -174,6 +144,12 @@
     "purpose": "Say whether an answer helped",
     "trigger": "onAction",
     "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "createAiConversation",
+    "contract": "ai",
+    "purpose": "Opened silently on the first tap; the kiosk session is the scope",
+    "trigger": "background"
    }
   ],
   "entryState": {
@@ -187,7 +163,7 @@
      "from": "navigation"
     }
    ],
-   "coldEntry": "A conversation link an agent opens from a notification. Resolves, or says it was closed and by whom.",
+   "coldEntry": "None: a kiosk has no notification cold entry. The assistant opens from KSK-004 at the point of confusion and closes when the guest returns or the session times out.",
    "preloaded": []
   },
   "wireframe": {
@@ -200,41 +176,18 @@
   "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "overlays": [
    {
-    "id": "formSendAiMessage",
-    "component": "modal",
-    "trigger": "Send AI message",
-    "body": "**Collects what `sendAiMessage` sends before it is called.** Required: `content`. Optional: `collectionIds`. Dismissing sends nothing; the screen behind is unchanged.",
+    "id": "confirmHandover",
+    "component": "confirmDialog",
+    "trigger": "Talk to a person",
+    "body": "Ask a person to help? The conversation so far goes with it (reason guestRequested, Sahli's own summary); the guest types nothing.",
     "confirm": {
-     "label": "Send AI message",
-     "operation": "sendAiMessage"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "content",
-      "collectionIds"
-     ]
-    },
-    "provenance": "contract ai.yaml POST /conversations/{conversationId}/messages"
-   },
-   {
-    "id": "formHandoverToAgent",
-    "component": "modal",
-    "trigger": "Handover to agent",
-    "body": "**Collects what `handoverToAgent` sends before it is called.** Required: `reason`. Optional: `summary`, `preferredQueueId`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Handover to agent",
+     "label": "Ask a person",
      "operation": "handoverToAgent"
     },
     "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "reason",
-      "summary",
-      "preferredQueueId"
-     ]
+     "label": "Keep asking"
     },
-    "provenance": "contract marketing-crm.yaml POST /conversations/{conversationId}/handover"
+    "provenance": "corrected 2 October 2026 (CHG-SGU-016, design-notes correction)"
    }
   ],
   "_platform": {

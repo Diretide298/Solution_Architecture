@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Food & Beverage
   version: 0.1.0
-  x-ticvai-screen-count: 114
+  x-ticvai-screen-count: 122
   x-ticvai-tier: satellite
   x-ticvai-module: 7 — F&B POS  ·  5 — F&B & Guest Management (service)
   x-ticvai-requirements: 151
@@ -1469,6 +1469,8 @@ paths:
         format: uuid
     get:
       operationId: getKitchenSla
+      x-ticvai-consumed-by:
+        - "P15 KIT-009 SLA, Priority & Service Rules"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -2734,6 +2736,8 @@ paths:
         format: uuid
     get:
       operationId: getCourseRules
+      x-ticvai-consumed-by:
+        - "P15 KIT-009 SLA, Priority & Service Rules"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -3572,8 +3576,8 @@ paths:
     post:
       operationId: transferTableVisit
       x-ticvai-consumed-by:
-        - "P06 EMP-058 Live Table & Service Management"
         - "P04 POS-028 Table Service"
+        - "P06 EMP-058 Live Table & Service Management"
       summary: Move a check to another server
       description: 'BL-125. **A shift change mid-service leaves a check with a server who has gone home.**
 
@@ -3901,8 +3905,8 @@ paths:
       operationId: updateTableReservation
       x-ticvai-consumed-by:
         - "P01 WEB-031 My Reservations"
-        - "P02 GST-070 Reserve a Table"
         - "P01 WEB-036 F&B – Browse & Order"
+        - "P02 GST-070 Reserve a Table"
       security:
       - guestAuth: []
       x-ticvai-self-scoped: subject
@@ -5253,6 +5257,8 @@ paths:
         format: uuid
     put:
       operationId: setMenuItemDailyCount
+      x-ticvai-consumed-by:
+        - "P08 BO-140 Product Availability, 86 & Operational Food Safety"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '2 October: Chinmay, workbook Q194 (BO-140, FNB-2H "Count set"): daily counts with automatic
@@ -6021,8 +6027,8 @@ paths:
     patch:
       operationId: updateTableVisit
       x-ticvai-consumed-by:
-        - "P06 EMP-058 Live Table & Service Management"
         - "P04 POS-028 Table Service"
+        - "P06 EMP-058 Live Table & Service Management"
       x-ticvai-audience:
       - staff
       summary: Amend covers, move table, or reassign server
@@ -7422,6 +7428,8 @@ paths:
   /waste-approval-policy:
     get:
       operationId: getWasteApprovalPolicy
+      x-ticvai-consumed-by:
+        - "P08 BO-139 Wastage, Spoilage, Returns & Write-Off"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -7450,6 +7458,8 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setWasteApprovalPolicy
+      x-ticvai-consumed-by:
+        - "P08 BO-139 Wastage, Spoilage, Returns & Write-Off"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '2 October: Chinmay, workbook Q192 (BO-139, FNB-5E bands AED 100 / 500 / 2,000, photo above
@@ -7507,6 +7517,8 @@ paths:
         format: uuid
     get:
       operationId: getKitchenRoutingRules
+      x-ticvai-consumed-by:
+        - "P08 BO-135 Order Routing & KDS/Printer Rules"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -7538,6 +7550,8 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setKitchenRoutingRules
+      x-ticvai-consumed-by:
+        - "P08 BO-135 Order Routing & KDS/Printer Rules"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '2 October: Chinmay, workbook Q189 and Q190 (BO-135, DI-323); shape follows setCourseRules'
@@ -7680,6 +7694,9 @@ paths:
         format: uuid
     post:
       operationId: printPrepSheet
+      x-ticvai-consumed-by:
+        - "P08 BO-112 Production Planning & Production Sheets"
+        - "P08 BO-134 Kitchen & Preparation Stations"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '2 October: Chinmay, workbook Q185 and Q187 (BO-112, BO-134): prep sheets print from a template to
@@ -7750,6 +7767,9 @@ paths:
         format: uuid
     post:
       operationId: createTableReservationForGuest
+      x-ticvai-consumed-by:
+        - "P04 POS-028 Table Service"
+        - "P06 EMP-055 Create / Edit Reservation"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '2 October: contract gap CHG-WIR-011 (POS-028: the v2 Reservations tab needs a staff booking

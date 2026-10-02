@@ -67,6 +67,11 @@
     "name": "groupBy",
     "in": "query",
     "required": null
+   },
+   {
+    "name": "module",
+    "in": "query",
+    "required": null
    }
   ],
   "requestBody": null,
@@ -84,19 +89,6 @@
   "parameters": [],
   "requestBody": null,
   "responds": "VenueSettings"
- },
- "listIndexJobs": {
-  "method": "GET",
-  "path": "/index-jobs",
-  "contract": "ai",
-  "summary": "Indexing in flight and recently finished",
-  "permission": "AI_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "IndexJob"
  },
  "listRoles": {
   "method": "GET",

@@ -155,7 +155,7 @@
   "states": {
    "loading": "The commercial rules overview list; the counts above it resolve separately.",
    "error": "Could not load. Names which read failed and leaves the commercial rules overview untouched.",
-   "emptyFirstRun": "No commercial rules overview yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "**Nothing to show yet**: the figures fill as activity is recorded. Offers no create action — a monitor creates nothing — and says so rather than showing empty tiles.",
    "emptyNoResults": "The filter narrowed it and the commercial rules overview are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -1418,7 +1418,7 @@
   "states": {
    "loading": "The commercial model rule list.",
    "error": "Could not load. Names which read failed and leaves the commercial model rule untouched.",
-   "emptyFirstRun": "No commercial model rule yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No commercial model rule yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the commercial model rule are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -1532,22 +1532,26 @@
     {
      "name": "actionBar",
      "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Revised Board 3 — Critical Architecture",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 41 §Actions"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "1. Operational Classification",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 41 §Actions"
-      }
-     ]
+     "components": []
     },
     {
      "name": "contentBody",
-     "components": []
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "createPlanVersion",
+       "label": "Create plan version",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "createPlanVersion"
+      }
+     ]
     }
    ]
   },

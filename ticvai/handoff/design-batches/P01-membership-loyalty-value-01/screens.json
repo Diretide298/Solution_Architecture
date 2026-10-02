@@ -939,7 +939,7 @@
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listGuestDevices` reads the population and `getWishlist` reads one of them — list, select, act",
-  "purpose": "See loyalty & rewards for this venue.",
+  "purpose": "Your devices, security, cookie choices and data rights.",
   "layout": {
    "template": "split",
    "regions": [
@@ -995,6 +995,29 @@
        "label": "Confirm",
        "notes": "**The consequence goes in the body, not the title.** *Cancel 3 orders worth AED 480* is a confirmation; *are you sure* is not — and a dialog that cannot name what it destroys is a dialog somebody dismisses.\n\n**Added 31 August.** `confirmDialog` and `modal` were both in the component library and used **zero times across 492 screens**, while `destructiveButton` was used 39 times and its own entry reads *always requires confirmation*.",
        "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "consentBlock",
+       "label": "What we may send you",
+       "bindsTo": "ConsentState.purposes",
+       "operation": "getGuestConsents",
+       "notes": "One row per configured purpose (`listConsentPurposes`), its channels as toggles, its plain-language description and the notice version in force; the current position from `getGuestConsents` (Given with date, Withdrawn with date, Not asked, Needs renewing). A change is recorded at once with `recordConsent` (source and notice version set by the app; the guest never types a purpose, decision, source or time). Withdrawing is as easy as giving.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)"
+      },
+      {
+       "kind": "cardList",
+       "label": "Purposes and notices",
+       "operation": "listConsentPurposes",
+       "notes": "The configured purposes with their plain-language description, channels and the notice version in force.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)"
+      },
+      {
+       "kind": "toggle",
+       "label": "Consent toggle",
+       "operation": "recordConsent",
+       "notes": "Per purpose and channel; recorded at once on change, append-only.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)",
+       "bindsTo": "ConsentState.purposes"
       }
      ]
     },
@@ -1096,10 +1119,10 @@
       },
       {
        "kind": "cardList",
-       "label": "Signed-in devices",
-       "notes": "The devices signed in to this account, with **Sign out this device** for a lost one (`revokeGuestDevice`).",
+       "label": "Notifications on my devices",
+       "notes": "Push registrations (`listGuestDevices`). \"Stop notifications on this device\" (`revokeGuestDevice`) stops notifications; it does not sign a lost device out. No guest operation lists or ends other sessions yet (CHG-SGU-024).",
        "operation": "listGuestDevices",
-       "provenance": "decided 29 September, rev 3 GAP-D1"
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)"
       }
      ]
     },
@@ -1108,52 +1131,22 @@
      "slot": "rowActions",
      "components": [
       {
-       "kind": "primaryButton",
-       "label": "Add to wishlist",
-       "operation": "addToWishlist",
-       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/wishlist"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Record consent",
-       "operation": "recordConsent",
-       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/consents"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Register guest device",
-       "operation": "registerGuestDevice",
-       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/devices"
-      },
-      {
        "kind": "destructiveButton",
-       "label": "Remove from wishlist",
-       "operation": "removeFromWishlist",
-       "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/wishlist/{itemId}"
-      },
-      {
-       "kind": "destructiveButton",
-       "label": "Revoke guest device",
+       "label": "Stop notifications on this device",
        "operation": "revokeGuestDevice",
-       "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/devices/{deviceId}"
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)"
       },
       {
        "kind": "destructiveButton",
-       "label": "Delete guest account",
+       "label": "Delete my account",
        "operation": "deleteGuestAccount",
        "provenance": "contract identity.yaml DELETE /auth/guest/account"
       },
       {
        "kind": "secondaryButton",
-       "label": "Export subject data",
+       "label": "Get a copy of my data",
        "operation": "exportSubjectData",
        "provenance": "contract identity.yaml POST /guests/{subjectId}/data-export"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Grant delegation",
-       "operation": "grantDelegation",
-       "provenance": "contract identity.yaml POST /guests/{subjectId}/delegations"
       },
       {
        "kind": "destructiveButton",
@@ -1167,47 +1160,17 @@
   },
   "overlays": [
    {
-    "id": "confirmRemoveFromWishlist",
-    "component": "confirmDialog",
-    "trigger": "Remove from wishlist",
-    "body": "**Names what `removeFromWishlist` changes and what it leaves alone**, in the consequence rather than the verb. A devices wishlist consent this affects should be identified in the dialog, not just counted.",
-    "provenance": "client-verified"
-   },
-   {
     "id": "confirmRevokeGuestDevice",
     "component": "confirmDialog",
-    "trigger": "Revoke guest device",
+    "trigger": "Stop notifications on this device",
     "body": "**Names what `revokeGuestDevice` changes and what it leaves alone**, in the consequence rather than the verb. A devices wishlist consent this affects should be identified in the dialog, not just counted.",
     "provenance": "client-verified"
    },
    {
     "id": "confirmDeleteGuestAccount",
     "component": "confirmDialog",
-    "trigger": "Delete guest account",
+    "trigger": "Delete my account",
     "body": "**Names what `deleteGuestAccount` changes and what it leaves alone**, in the consequence rather than the verb. A devices wishlist consent this affects should be identified in the dialog, not just counted.",
-    "provenance": "client-verified"
-   },
-   {
-    "id": "formGrantDelegation",
-    "component": "modal",
-    "trigger": "Grant delegation",
-    "body": "**Collects what `grantDelegation` sends before it is called.** Required: `overSubjectId`, `delegationKind`, `permission`. Optional: `overObjectRef`, `quota`, `validTo`, `isRevocableBySubject`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Grant delegation",
-     "operation": "grantDelegation"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "overSubjectId",
-      "delegationKind",
-      "permission",
-      "overObjectRef",
-      "quota",
-      "validTo",
-      "isRevocableBySubject"
-     ]
-    },
     "provenance": "client-verified"
    },
    {
@@ -1215,70 +1178,6 @@
     "component": "confirmDialog",
     "trigger": "Revoke face pass",
     "body": "**Names what `revokeFacePass` changes and what it leaves alone**, in the consequence rather than the verb. A devices wishlist consent this affects should be identified in the dialog, not just counted.",
-    "provenance": "client-verified"
-   },
-   {
-    "id": "formAddToWishlist",
-    "component": "modal",
-    "trigger": "Add to wishlist",
-    "body": "**Collects what `addToWishlist` sends before it is called.** Required: `variantId`. Optional: `performanceId`, `note`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Add to wishlist",
-     "operation": "addToWishlist"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "variantId",
-      "performanceId",
-      "note"
-     ]
-    },
-    "provenance": "client-verified"
-   },
-   {
-    "id": "formRecordConsent",
-    "component": "modal",
-    "trigger": "Record consent",
-    "body": "**Collects what `recordConsent` sends before it is called.** Required: `purpose`, `decision`, `noticeVersion`, `source`, `recordedAt`. Optional: `channels`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "RecordConsentRequest",
-    "confirm": {
-     "label": "Record consent",
-     "operation": "recordConsent"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "purpose",
-      "decision",
-      "noticeVersion",
-      "source",
-      "recordedAt",
-      "channels"
-     ]
-    },
-    "provenance": "client-verified"
-   },
-   {
-    "id": "formRegisterGuestDevice",
-    "component": "modal",
-    "trigger": "Register guest device",
-    "body": "**Collects what `registerGuestDevice` sends before it is called.** Required: `platform`, `token`. Optional: `appVersion`, `osVersion`, `deviceModel`, `locale`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Register guest device",
-     "operation": "registerGuestDevice"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "platform",
-      "token",
-      "appVersion",
-      "osVersion",
-      "deviceModel",
-      "locale"
-     ]
-    },
     "provenance": "client-verified"
    }
   ],
@@ -1291,15 +1190,6 @@
    "offline": "**Nothing here is offered offline, and the banner says so.** An erasure request or a device change queued and never sent is worse than one that could not be made — the legal clock starts when the platform receives it, and a device signed out offline is still signed in."
   },
   "apis": [
-   {
-    "operationId": "addToWishlist",
-    "contract": "marketing-crm",
-    "purpose": "Save an item",
-    "trigger": "onAction",
-    "invalidates": [
-     "listGuestDevices"
-    ]
-   },
    {
     "operationId": "getWishlist",
     "contract": "marketing-crm",
@@ -1316,24 +1206,6 @@
     "operationId": "recordConsent",
     "contract": "marketing-crm",
     "purpose": "Record a consent decision",
-    "trigger": "onAction",
-    "invalidates": [
-     "listGuestDevices"
-    ]
-   },
-   {
-    "operationId": "registerGuestDevice",
-    "contract": "marketing-crm",
-    "purpose": "Register a device for push",
-    "trigger": "onAction",
-    "invalidates": [
-     "listGuestDevices"
-    ]
-   },
-   {
-    "operationId": "removeFromWishlist",
-    "contract": "marketing-crm",
-    "purpose": "Remove a saved item",
     "trigger": "onAction",
     "invalidates": [
      "listGuestDevices"
@@ -1377,12 +1249,6 @@
     "contract": "marketing-crm",
     "purpose": "Which waivers are signed and which are due",
     "trigger": "onLoad"
-   },
-   {
-    "operationId": "grantDelegation",
-    "contract": "identity",
-    "purpose": "Let somebody else manage a booking",
-    "trigger": "onAction"
    },
    {
     "operationId": "listDelegations",
@@ -1456,6 +1322,12 @@
     "purpose": "Change or withdraw cookie preferences",
     "trigger": "onAction",
     "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "listConsentPurposes",
+    "contract": "marketing-crm",
+    "purpose": "The purposes the consent rows show",
+    "trigger": "onLoad"
    }
   ],
   "entryState": {
@@ -1629,6 +1501,27 @@
        "kind": "detailPanel",
        "label": "Detail",
        "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "cardList",
+       "label": "Rewards",
+       "operation": "listRewards",
+       "notes": "What points can be turned into, with the points each needs; Redeem on a reward the guest can afford.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)"
+      },
+      {
+       "kind": "cardList",
+       "label": "My badges",
+       "operation": "listCustomerBadges",
+       "notes": "Status badges the guest holds (DI-392).",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)"
+      },
+      {
+       "kind": "cardList",
+       "label": "Leaderboard",
+       "operation": "listLeaderboard",
+       "notes": "Standings by nickname; the guest sets theirs with Choose my name.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)"
       }
      ]
     },
@@ -1651,15 +1544,21 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Create referral",
+       "label": "Invite a friend",
        "operation": "createReferral",
        "provenance": "contract marketing-crm.yaml POST /referrals"
       },
       {
        "kind": "secondaryButton",
-       "label": "Redeem loyalty points",
+       "label": "Redeem",
        "operation": "redeemLoyaltyPoints",
        "provenance": "contract marketing-crm.yaml POST /loyalty/redemptions"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Choose my name",
+       "operation": "setLeaderboardNickname",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)"
       }
      ]
     }
@@ -1717,12 +1616,40 @@
     "purpose": "Report impressions, clicks and declines of recommended items",
     "trigger": "onAction",
     "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "listRewards",
+    "contract": "marketing-crm",
+    "purpose": "What points can be turned into",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listCustomerBadges",
+    "contract": "marketing-crm",
+    "purpose": "Badges the guest holds",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listLeaderboard",
+    "contract": "marketing-crm",
+    "purpose": "Standings, by nickname",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "setLeaderboardNickname",
+    "contract": "marketing-crm",
+    "purpose": "Choose the name shown on the board",
+    "trigger": "onAction"
    }
   ],
   "entryState": {
    "params": [
     {
      "name": "subjectId",
+     "from": "session"
+    },
+    {
+     "name": "customerId",
      "from": "session"
     }
    ],
@@ -1744,52 +1671,46 @@
   "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "overlays": [
    {
-    "id": "formCreateReferral",
-    "component": "modal",
-    "trigger": "Create referral",
-    "body": "**Collects what `createReferral` sends before it is called.** Required: `id`, `referrerSubjectId`, `code`, `status`. Optional: `refereeSubjectId`, `qualifyingAction`, `referrerRewardId`, `refereeRewardId`, `expiresAt`, `scopePath`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "Referral",
+    "id": "confirmCreateReferral",
+    "component": "confirmDialog",
+    "trigger": "Invite a friend",
+    "body": "One tap: the code that comes back is shown with Share. Code, status, qualifying action, rewards and expiry are set by the platform; the guest types nothing.",
     "confirm": {
-     "label": "Create referral",
+     "label": "Invite a friend",
      "operation": "createReferral"
     },
     "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "id",
-      "referrerSubjectId",
-      "code",
-      "status",
-      "refereeSubjectId",
-      "qualifyingAction",
-      "referrerRewardId",
-      "refereeRewardId",
-      "expiresAt",
-      "scopePath"
-     ]
+     "label": "Cancel"
     },
-    "provenance": "client-verified"
+    "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)"
    },
    {
     "id": "formRedeemLoyaltyPoints",
     "component": "modal",
-    "trigger": "Redeem loyalty points",
-    "body": "**Collects what `redeemLoyaltyPoints` sends before it is called.** Required: `subjectId`, `programmeId`, `points`. Optional: `rewardId`, `orderId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "trigger": "Redeem",
+    "body": "The reward chosen from the list and its points; the guest is the caller, so no subject or programme is asked.",
     "confirm": {
-     "label": "Redeem loyalty points",
+     "label": "Redeem",
      "operation": "redeemLoyaltyPoints"
     },
     "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "subjectId",
-      "programmeId",
-      "points",
-      "rewardId",
-      "orderId"
-     ]
+     "label": "Cancel"
     },
-    "provenance": "client-verified"
+    "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)"
+   },
+   {
+    "id": "formSetLeaderboardNickname",
+    "component": "modal",
+    "trigger": "Choose my name",
+    "body": "The nickname shown on the leaderboard.",
+    "confirm": {
+     "label": "Choose my name",
+     "operation": "setLeaderboardNickname"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)"
    }
   ],
   "_platform": {

@@ -32,7 +32,6 @@ steps:
   action: The cashier takes the order from the menu board.
   operations:
   - getGuestMenu
-  - listModifierGroups
   - addCartLine
   outcome: '**Sections in the order the outlet set them, not alphabetical.** A menu board that sorts
     by name puts Desserts above Mains forever.'
@@ -40,7 +39,6 @@ steps:
   screen: POS-021
   action: Modifiers are chosen — no onions, large, extra shot.
   operations:
-  - listModifierGroups
   - evaluatePromotions
   outcome: '**The group is attached to the item, not chosen per sale.** *How would you like that cooked*
     is one group on nine steaks.'
@@ -52,7 +50,9 @@ steps:
   - listKitchenTickets
   outcome: '**Send to kitchen, then charge** (decided 28 September, audit R261), as POS-022 says. A kitchen
     ticket on the rail while the card is still in the guest''s hand; **this is the step that did not exist**
-    — `createFnbOrder` was reachable from the guest app and the staff app and from no till.'
+    — `createFnbOrder` was reachable from the guest app and the staff app and from no till. **That is the
+    default, not the only order:** an outlet set to *Pay first* charges before anything reaches the kitchen
+    (decided 2 October 2026, DEC-064; the branch at step 3).'
 - step: 4
   screen: POS-005
   action: The guest pays.
@@ -92,6 +92,18 @@ branches:
     an order the guest then pays for is the failure this prevents.'
   severity: high
   resolvedBy: createFnbOrder
+- at: 3
+  condition: The outlet's payment timing is Pay first.
+  behaviour: '**The guest pays before anything reaches the kitchen** (decided 2 October 2026, Chinmay, POS-021:
+    "Two configurations: one takes the bill (payment) first, the other sends first and charges after";
+    DEC-064, refines audit R261 per outlet; CHG-CSA-010, CHG-CSP-004, CHG-DOC-013). The outlet setting
+    `Outlet.paymentTiming` is `payFirst`: `createFnbOrder` creates the order with no kitchen tickets and the
+    till goes to payment (step 4) first; the tickets are created only when the payment is captured
+    (`FnbOrder.sentToKitchenAt` stays empty until then), and an unpaid order at a pay-first outlet never
+    reaches the kitchen. The walk-away branch below cannot happen there, and the 86''d-from-cache branch
+    becomes a refund of the line. Quick-service counters are the usual pay-first outlets.'
+  severity: recoverable
+  resolvedBy: The outlet setting (BO-044); createFnbOrder honours it
 - at: 4
   condition: The guest walks away without paying.
   behaviour: '**The kitchen ticket is cancelled while it is still `ordered` or `accepted`**; once it is

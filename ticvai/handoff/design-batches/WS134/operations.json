@@ -1,128 +1,34 @@
 {
- "createTable": {
-  "method": "POST",
-  "path": "/tables",
+ "getFnbServiceChargePolicy": {
+  "method": "GET",
+  "path": "/service-charge-policy",
   "contract": "fnb",
-  "summary": "A table as a thing, not an inference",
-  "permission": "PRODUCT_CONFIGURE",
-  "offlineCapable": false,
+  "summary": "The service charge a venue applies, and on what",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": true,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "TableDefinition",
-  "responds": "TableDefinition"
- },
- "getKpiValues": {
-  "method": "GET",
-  "path": "/kpi-values",
-  "contract": "reporting",
-  "summary": "Current values, against target, with movement",
-  "permission": "REPORT_VIEW_VENUE",
-  "offlineCapable": null,
-  "conflictPolicy": null,
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "kpiIds",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "kpiCodes",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "scopePath",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "period",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "compareTo",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "interval",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "groupBy",
-    "in": "query",
-    "required": null
-   }
-  ],
+  "parameters": [],
   "requestBody": null,
-  "responds": "KpiValue"
+  "responds": "FnbServiceChargePolicy"
  },
- "listKitchenTickets": {
+ "listDevices": {
   "method": "GET",
-  "path": "/kitchen/tickets",
-  "contract": "fnb",
-  "summary": "Kitchen ticket queue",
-  "permission": "ORDER_VIEW",
+  "path": "/devices",
+  "contract": "tenancy",
+  "summary": "List registered devices",
+  "permission": "DEVICE_VIEW",
   "offlineCapable": true,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
-    "name": "stationId",
+    "name": "workstationId",
     "in": "query",
     "required": null
    },
    {
-    "name": "status",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "course",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- },
- "listMenus": {
-  "method": "GET",
-  "path": "/menus",
-  "contract": "fnb",
-  "summary": "List menus",
-  "permission": "PRODUCT_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "outletId",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "activeAt",
+    "name": "kind",
     "in": "query",
     "required": null
    },
@@ -198,13 +104,13 @@
   "requestBody": null,
   "responds": "Outlet"
  },
- "setFnbReservationPolicy": {
+ "setDeviceAssignment": {
   "method": "PUT",
-  "path": "/reservation-policy",
-  "contract": "fnb",
-  "summary": "Set turn times and seating buffers",
-  "permission": "PRODUCT_CONFIGURE",
-  "offlineCapable": false,
+  "path": "/devices/{deviceId}/assignment",
+  "contract": "tenancy",
+  "summary": "Who owns it, who holds it, and where it is",
+  "permission": "DEVICE_MANAGE",
+  "offlineCapable": null,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
@@ -212,15 +118,10 @@
     "name": null,
     "in": null,
     "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
    }
   ],
-  "requestBody": "FnbReservationPolicy",
-  "responds": "FnbReservationPolicy"
+  "requestBody": "DeviceAssignment",
+  "responds": "DeviceAssignment"
  },
  "setFnbServiceChargePolicy": {
   "method": "PUT",
@@ -270,12 +171,12 @@
   "requestBody": "OutletTemplateInput",
   "responds": "OutletTemplate"
  },
- "setSectionLayout": {
-  "method": "PUT",
-  "path": "/outlets/{outletId}/sections",
-  "contract": "fnb",
-  "summary": "Divide the floor into sections and give each a server",
-  "permission": "PRODUCT_CONFIGURE",
+ "updateOutlet": {
+  "method": "PATCH",
+  "path": "/outlets/{outletId}",
+  "contract": "tenancy",
+  "summary": "Amend an outlet",
+  "permission": "REGION_CONFIGURE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
@@ -284,38 +185,9 @@
     "name": null,
     "in": null,
     "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
    }
   ],
-  "requestBody": "SectionLayout",
-  "responds": "SectionLayout"
- },
- "updateTable": {
-  "method": "PUT",
-  "path": "/tables/{tableId}",
-  "contract": "fnb",
-  "summary": "Change what a table is",
-  "permission": "PRODUCT_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "TableDefinition",
-  "responds": "TableDefinition"
+  "requestBody": null,
+  "responds": "Outlet"
  }
 }

@@ -492,6 +492,8 @@ screens:
     - to: PTR-008
       trigger: Book against the allocation
       provenance: 'wiring fix, 2 October 2026 (CHG-WIR-022): flow F10 step 1→2'
+      carries:
+      - orderId
   notes: States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement. **createRefund removed
@@ -3556,6 +3558,8 @@ screens:
       operation: listOrders
       crossesDevice: true
       back: false
+      carries:
+      - variantId
   notes: 'States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement. **Cross-platform navigation
@@ -5377,10 +5381,6 @@ screens:
       trigger: Reads the application the applicant submitted
       provenance: flow F110 step 2→3
       operation: listPartner
-    - to: PTR-025
-      trigger: Creates the partner's first user
-      provenance: flow F110 step 12→13
-      operation: listPartner
     - to: PTR-027
       trigger: Assigns the brands, venues and business scope the partner may sell
       provenance: flow F110 step 6→7
@@ -5389,9 +5389,13 @@ screens:
       trigger: Checks the compliance and documentation file
       provenance: flow F110 step 8→9
       operation: listPartner
+    - to: PTR-025
+      trigger: Creates the partner's first user
+      provenance: flow F110 step 10→11
+      operation: listPartner
     - to: PTR-030
       trigger: Approves the partner and moves it to active
-      provenance: flow F110 step 14→15
+      provenance: flow F110 step 12→13
       operation: listPartner
   density: compact
   purposeNote: Authorized administrators can identify every partner, its business relationship, current
@@ -5875,7 +5879,7 @@ screens:
     transitions:
     - to: PTR-022
       trigger: Returns to the command centre
-      provenance: flow F110 step 13→14
+      provenance: flow F110 step 11→12
       operation: listPartnerContactUser
   density: compact
   purposeNote: Every external user accessing TICVAI on behalf of a partner is associated with a valid
@@ -6421,6 +6425,10 @@ screens:
     18. 0 of 0 labels bound to a contract property; 15 of 42 pack bullets carried onto the screen — the
     rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
     rather than here.
+  entryState:
+    params:
+    - name: challengeId
+      from: navigation
 - id: PTR-031
   name: Partner 360° Profile, Readiness & AI Review
   module: Partners
@@ -6549,15 +6557,15 @@ screens:
       operation: listCommercialAgreement
     - to: PTR-038
       trigger: Works in Payment Terms, Billing & Account Configuration
-      provenance: flow F131 step 11→12
+      provenance: flow F131 step 5→6
       operation: listCommercialAgreement
     - to: PTR-040
       trigger: Works in Booking Limits, Commercial Exceptions & Approval
-      provenance: flow F131 step 15→16
+      provenance: flow F131 step 7→8
       operation: listCommercialAgreement
     - to: PTR-041
       trigger: Works in Commercial Agreement 360°, Health & AI Review
-      provenance: flow F131 step 17→18
+      provenance: flow F131 step 9→10
       operation: listCommercialAgreement
   density: compact
   purposeNote: Commercial management can understand the status, exposure, expiry and major commercial
@@ -7003,7 +7011,7 @@ screens:
     transitions:
     - to: PTR-032
       trigger: Returns to the board's landing screen
-      provenance: flow F131 step 12→13
+      provenance: flow F131 step 6→7
       operation: setPaymentTermBilling
   density: compact
   purposeNote: Every partner transaction can be routed to the correct approved payment and billing model
@@ -7118,7 +7126,7 @@ screens:
     transitions:
     - to: PTR-032
       trigger: Returns to the board's landing screen
-      provenance: flow F131 step 16→17
+      provenance: flow F131 step 8→9
       operation: approveBookingLimitCommercial
   density: compact
   purposeNote: Transactions outside standard partner commercial rules cannot proceed without the appropriate
@@ -7253,6 +7261,10 @@ screens:
     37. 0 of 0 labels bound to a contract property; 22 of 39 pack bullets carried onto the screen — the
     rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
     rather than here.
+  entryState:
+    params:
+    - name: challengeId
+      from: navigation
 - id: PTR-041
   name: Commercial Agreement 360°, Health & AI Review
   module: Partners
@@ -7403,15 +7415,15 @@ screens:
       operation: listPartner2
     - to: PTR-049
       trigger: Works in Partner Disputes, Cases & Service Management
-      provenance: flow F132 step 13→14
+      provenance: flow F132 step 9→10
       operation: listPartner2
     - to: PTR-050
       trigger: Works in Partner Performance Scorecard & Risk Monitoring
-      provenance: flow F132 step 15→16
+      provenance: flow F132 step 11→12
       operation: listPartner2
     - to: PTR-051
       trigger: Works in Partner AI Intelligence & Relationship Optimization
-      provenance: flow F132 step 17→18
+      provenance: flow F132 step 13→14
       operation: listPartner2
   density: compact
   purposeNote: Authorized users can understand current partner activity, financial exposure and operational
@@ -8161,7 +8173,7 @@ screens:
     transitions:
     - to: PTR-042
       trigger: Returns to the board's landing screen
-      provenance: flow F132 step 14→15
+      provenance: flow F132 step 10→11
       operation: listPartnerDisputeCase
   density: compact
   purposeNote: Every partner dispute has a traceable owner, SLA, supporting evidence, financial context
@@ -8342,7 +8354,7 @@ screens:
     transitions:
     - to: PTR-042
       trigger: Returns to the board's landing screen
-      provenance: flow F132 step 16→17
+      provenance: flow F132 step 12→13
       operation: listPartnerPerformanceScorecard
   density: compact
   purposeNote: Management can objectively compare partners and identify commercial, operational or financial

@@ -165,7 +165,7 @@
     "verified": "2026-09-28",
     "match": "exact",
     "view": "Account → All screens → Wave 2 → Offers & promotions",
-    "differences": "Promo code entry is here in the prototype; the YAML puts applyCartPromoCode on GST-041."
+    "differences": "Promo code entry is here in the prototype; the YAML puts applyCartPromoCode on GST-041. **Codes are applied in the basket (GST-041), not here**: one place to apply a code (CHG-SGU-020)."
    }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",

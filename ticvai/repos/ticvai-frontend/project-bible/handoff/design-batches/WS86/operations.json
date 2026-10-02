@@ -1,23 +1,4 @@
 {
- "certifyIntegration": {
-  "method": "POST",
-  "path": "/listings/{listingId}/certify",
-  "contract": "public-api",
-  "summary": "Approve, reject or revoke a certification",
-  "permission": "DEVELOPER_ADMIN",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "IntegrationListing"
- },
  "deployReaderConfiguration": {
   "method": "POST",
   "path": "/readers/{readerId}/deploy",
@@ -36,6 +17,25 @@
   ],
   "requestBody": null,
   "responds": null
+ },
+ "listDeviceTypeHardware": {
+  "method": "GET",
+  "path": "/device-type-hardware",
+  "contract": "access",
+  "summary": "Device Type & Hardware Library",
+  "permission": "DEVICE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "DeviceTypeHardwareLibraryView"
  },
  "listReaders": {
   "method": "GET",
@@ -60,6 +60,25 @@
   ],
   "requestBody": null,
   "responds": "Reader"
+ },
+ "setHardwareModel": {
+  "method": "PUT",
+  "path": "/hardware-models",
+  "contract": "access",
+  "summary": "Create or replace a hardware model in the library",
+  "permission": "DEVICE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AccessHardwareModel",
+  "responds": "AccessHardwareModel"
  },
  "setReaderConfiguration": {
   "method": "PUT",

@@ -56,6 +56,44 @@
   "requestBody": "GuidedChoice",
   "responds": "GuidedChoice"
  },
+ "createPreview": {
+  "method": "POST",
+  "path": "/tenant-config/preview",
+  "contract": "white-label",
+  "summary": "Generate a preview link",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Preview"
+ },
+ "createUrlRedirect": {
+  "method": "POST",
+  "path": "/seo-redirects",
+  "contract": "marketing-crm",
+  "summary": "301, 302 and custom redirects",
+  "permission": "MARKETING_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "UrlRedirect",
+  "responds": "UrlRedirect"
+ },
  "deleteGuidedChoice": {
   "method": "DELETE",
   "path": "/guided-choices/{guidedChoiceId}",
@@ -94,6 +132,25 @@
   "requestBody": null,
   "responds": "ConfigDiff"
  },
+ "exportSitePackage": {
+  "method": "POST",
+  "path": "/site-package",
+  "contract": "white-label",
+  "summary": "Generate a site package (self-hosted)",
+  "permission": "TENANT_PUBLISH",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
  "getBookingFlowConfig": {
   "method": "GET",
   "path": "/tenant-config/booking-flow",
@@ -126,6 +183,74 @@
   "requestBody": null,
   "responds": "AiGuidedChoiceSuggestion"
  },
+ "getPlatformSubdomain": {
+  "method": "GET",
+  "path": "/platform-subdomain",
+  "contract": "white-label",
+  "summary": "The tenant's platform subdomain",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "PlatformSubdomain"
+ },
+ "getPublishReviewPolicy": {
+  "method": "GET",
+  "path": "/publish-review-policy",
+  "contract": "white-label",
+  "summary": "Whether publishing needs a review",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "PublishReviewPolicy"
+ },
+ "getSeoMetadata": {
+  "method": "GET",
+  "path": "/seo-metadata",
+  "contract": "marketing-crm",
+  "summary": "The metadata in force for one page",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "entityKind",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "entityId",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "locale",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "SeoMetadata"
+ },
+ "getSitePackage": {
+  "method": "GET",
+  "path": "/site-package/{packageId}",
+  "contract": "white-label",
+  "summary": "A site package and its download link",
+  "permission": "TENANT_PUBLISH",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "SitePackage"
+ },
  "getTenantAppStatus": {
   "method": "GET",
   "path": "/tenant-config/status",
@@ -157,6 +282,19 @@
   ],
   "requestBody": null,
   "responds": "TenantConfig"
+ },
+ "getTranslationProposals": {
+  "method": "GET",
+  "path": "/ai/translate/{translationJobId}",
+  "contract": "ai",
+  "summary": "Follow a translation job",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "TranslationProposals"
  },
  "listAnalyticsProviders": {
   "method": "GET",
@@ -634,6 +772,25 @@
   "requestBody": null,
   "responds": "ConfigVersion"
  },
+ "regenerateDomainToken": {
+  "method": "POST",
+  "path": "/tenant-domains/{domainId}/token",
+  "contract": "white-label",
+  "summary": "Issue a new validation token",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "CustomDomain"
+ },
  "relinquishCustomDomain": {
   "method": "DELETE",
   "path": "/tenant-domains/{domainId}",
@@ -767,6 +924,44 @@
   "requestBody": null,
   "responds": "Policy"
  },
+ "setPrimaryDomain": {
+  "method": "POST",
+  "path": "/tenant-domains/{domainId}/primary",
+  "contract": "white-label",
+  "summary": "Make a domain the primary one",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "CustomDomain"
+ },
+ "setPublishReviewPolicy": {
+  "method": "PUT",
+  "path": "/publish-review-policy",
+  "contract": "white-label",
+  "summary": "Switch the publish review step on or off",
+  "permission": "TENANT_PUBLISH",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "PublishReviewPolicy",
+  "responds": "PublishReviewPolicy"
+ },
  "setSeoMetadata": {
   "method": "PUT",
   "path": "/seo-metadata",
@@ -861,6 +1056,25 @@
   ],
   "requestBody": null,
   "responds": "GuidedChoice"
+ },
+ "updatePrincipal": {
+  "method": "PATCH",
+  "path": "/principals/{principalId}",
+  "contract": "identity",
+  "summary": "Update or deactivate a principal",
+  "permission": "USER_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Principal"
  },
  "validateTenantConfig": {
   "method": "POST",

@@ -7,7 +7,7 @@
 | Tier | commerce: The sale path. Highest availability, highest write rate. |
 | Contracts | `access` |
 | Schemas owned | `access` |
-| Operations in the slice | 38 of 246 |
+| Operations in the slice | 33 of 250 |
 | Scale | Read-heavy, extreme latency sensitivity, edge-cached. `frozenDays` is held rather than replayed precisely because the gate cannot afford the arithmetic. |
 | If it is down | Down means the gates stop. Runs at the edge with a local decision cache. |
 
@@ -32,39 +32,34 @@
 | access | [`deleteAccessPointGroup`](#deleteaccesspointgroup) | DELETE | `/access-point-groups/{groupId}` | setup | 1 | BO-151 |
 | access | [`enrolFacePass`](#enrolfacepass) | POST | `/face-pass/enrolments` | core | 2 | GST-069 |
 | access | [`enrolFaceTag`](#enrolfacetag) | POST | `/face-tag/enrolments` | core | 1 | POS-005 |
-| access | [`getEntitlement`](#getentitlement) | GET | `/entitlements/{entitlementId}` | core | 1 | GST-012, GST-013, GST-055, WEB-018 |
-| access | [`getEntitlementCredential`](#getentitlementcredential) | GET | `/entitlements/{entitlementId}/credential` | core | 1 | GST-012, GST-013, GST-055, WEB-018 |
-| access | [`getEntitlementHistory`](#getentitlementhistory) | GET | `/entitlements/{entitlementId}/history` | core | 1 | GST-012, GST-013, WEB-018 |
+| access | [`getEntitlement`](#getentitlement) | GET | `/entitlements/{entitlementId}` | core | 1 | BO-355, GST-012, GST-013, GST-055, WEB-018 |
+| access | [`getEntitlementCredential`](#getentitlementcredential) | GET | `/entitlements/{entitlementId}/credential` | core | 1 | BO-355, GST-012, GST-013, GST-055, WEB-018 |
+| access | [`getEntitlementHistory`](#getentitlementhistory) | GET | `/entitlements/{entitlementId}/history` | core | 1 | BO-355, GST-012, GST-013, WEB-018 |
 | access | [`getFacePassEnrolment`](#getfacepassenrolment) | GET | `/face-pass/enrolments/{enrolmentId}` | core | 2 | GST-069, WEB-024 |
 | access | [`listEntitlements`](#listentitlements) | GET | `/my/entitlements/all` | core | 1 | GST-012, WEB-018 |
-| access | [`listMyEntitlements`](#listmyentitlements) | GET | `/guests/me/entitlements` | core | 1 | GST-001, GST-012, GST-055, POS-002, WEB-001, WEB-018 |
+| access | [`listMyEntitlements`](#listmyentitlements) | GET | `/guests/me/entitlements` | core | 1 | GST-001, GST-012, GST-055, POS-002, WEB-001, WEB-017 … |
 | access | [`listParkingFacilities`](#listparkingfacilities) | GET | `/parking-facilities` | core | 2 | BO-006, GST-027, GST-028, WEB-041 |
 | access | [`revokeFacePass`](#revokefacepass) | DELETE | `/face-pass/enrolments/{enrolmentId}` | core | 2 | GST-069, WEB-024 |
-| access | [`rollbackAccessPolicy`](#rollbackaccesspolicy) | POST | `/dynamic-access-policy/{policyId}/rollback` | setup | 1 | BO-243 |
-| access | [`setAccessAttributeCatalog`](#setaccessattributecatalog) | PUT | `/access-attribute-catalog` | setup | 1 | BO-235 |
 | access | [`setAccessPointGroup`](#setaccesspointgroup) | PUT | `/access-point-groups` | setup | 1 | BO-151 |
-| access | [`setBiometricVerificationProfile`](#setbiometricverificationprofile) | PUT | `/biometric-verification-profile` | setup | 1 | BO-184, BO-185, BO-191 |
+| access | [`setBiometricVerificationProfile`](#setbiometricverificationprofile) | PUT | `/biometric-verification-profile` | setup | 1 | BO-185 |
 | access | [`setBleBeaconGeofence`](#setblebeacongeofence) | PUT | `/ble-beacon-geofence` | setup | 1 | BO-168 |
-| access | [`setContextTimeEvent`](#setcontexttimeevent) | PUT | `/context-time-event` | setup | 1 | BO-222, BO-237 |
 | access | [`setCredentialActivationDisplay`](#setcredentialactivationdisplay) | PUT | `/credential-activation-display` | setup | 1 | BO-166 |
-| access | [`setDeviceBindingPolicy`](#setdevicebindingpolicy) | PUT | `/device-binding-policy` | setup | 1 | BO-164, BO-167 |
+| access | [`setDeviceBindingPolicy`](#setdevicebindingpolicy) | PUT | `/device-binding-policy` | setup | 1 | BO-167 |
 | access | [`setFaceMatchingVerification`](#setfacematchingverification) | PUT | `/face-matching-verification` | setup | 1 | BO-189 |
-| access | [`setFacePassEnrollment`](#setfacepassenrollment) | PUT | `/face-pass-enrollment` | setup | 1 | BO-184, BO-186 |
+| access | [`setFacePassEnrollment`](#setfacepassenrollment) | PUT | `/face-pass-enrollment` | setup | 1 | BO-186 |
 | access | [`setFaceTagTemporaryEnrollment`](#setfacetagtemporaryenrollment) | PUT | `/face-tag-temporary` | setup | 1 | BO-188 |
 | access | [`setGateModePolicy`](#setgatemodepolicy) | PUT | `/gate-mode-policies` | setup | 1 | BO-201 |
 | access | [`setParkingFacility`](#setparkingfacility) | PUT | `/parking-facilities` | setup | 2 | BO-006 |
 | access | [`setVirtualTicketIdentity`](#setvirtualticketidentity) | PUT | `/virtual-ticket-identity` | setup | 1 | BO-335 |
 | access | [`setVisualAccessRule`](#setvisualaccessrule) | PUT | `/visual-access-rule` | setup | 1 | BO-155 |
-| access | [`setVisualDynamicPolicy`](#setvisualdynamicpolicy) | PUT | `/visual-dynamic-policy` | setup | 1 | BO-234, BO-236, BO-238 |
 | access | [`updateParkingEntitlement`](#updateparkingentitlement) | PATCH | `/parking-entitlements/{entitlementId}` | core | 2 | GST-027, WEB-041 |
 | accessPoint | [`addBlacklistEntry`](#addblacklistentry) | POST | `/blacklist` | setup | 1 | BO-033 |
-| accessPoint | [`createAccessPoint`](#createaccesspoint) | POST | `/access-points` | setup | 1 | BO-064, BO-144 |
-| accessPoint | [`createAdmissionRules`](#createadmissionrules) | POST | `/admission-rules` | setup | 1 | BO-032, BO-154, BO-214, BO-222 |
+| accessPoint | [`createAccessPoint`](#createaccesspoint) | POST | `/access-points` | setup | 1 | BO-064, BO-148 |
+| accessPoint | [`createAdmissionRules`](#createadmissionrules) | POST | `/admission-rules` | setup | 1 | BO-032, BO-154, BO-222 |
 | accessPoint | [`setAccessPointGeofence`](#setaccesspointgeofence) | PUT | `/access-points/{accessPointId}/geofence` | setup | 1 | BO-064 |
-| accessPoint | [`setTurnstileMode`](#setturnstilemode) | PUT | `/access-points/{accessPointId}/mode` | setup | 1 | BO-064, BO-194, BO-230, SCN-002, SCN-016 |
-| accessPoint | [`updateAccessPoint`](#updateaccesspoint) | PATCH | `/access-points/{accessPointId}` | setup | 1 | BO-006, BO-064 |
+| accessPoint | [`setTurnstileMode`](#setturnstilemode) | PUT | `/access-points/{accessPointId}/mode` | setup | 1 | BO-230, SCN-016 |
+| accessPoint | [`updateAccessPoint`](#updateaccesspoint) | PATCH | `/access-points/{accessPointId}` | setup | 1 | BO-064, BO-147, BO-148 |
 | accessPoint | [`updateAdmissionRules`](#updateadmissionrules) | PUT | `/admission-rules/{profileId}` | setup | 1 | BO-032, BO-156, BO-158, BO-160, BO-219, BO-220 |
-| sync | [`getOfflinePackage`](#getofflinepackage) | GET | `/access/offline-package` | core | 1 | BO-034, BO-035, BO-037, BO-060, BO-207, EMP-010 … |
 
 ## Group: access
 
@@ -86,7 +81,7 @@
 |---|---|
 | Permission | `ACCESS_OVERRIDE` |
 | Scope level | venue |
-| Part of slice | setup, makes `access.scan_event` non-empty |
+| Part of slice | setup, changes rows of `access.scan_event` that another operation creates |
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
@@ -215,7 +210,7 @@ Deletes a group. **Refused `409 group-in-use`** while another group is nested un
 |---|---|
 | Permission | `ACCESS_POINT_CONFIGURE` |
 | Scope level | venue |
-| Part of slice | setup, makes `access.access_point_group` non-empty |
+| Part of slice | setup, changes rows of `access.access_point_group` that another operation creates |
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
@@ -251,6 +246,9 @@ Deletes a group. **Refused `409 group-in-use`** while another group is nested un
 **Consent is captured in the same transaction and is not implied by enrolment.** Under PDPL a biometric is a special category, and a consent record written afterwards is a consent record for something that already happened.
 **A minor's consent is given by a guardian**, and the guardian is recorded. The child-protection journey (3.2.12) sits above this.
 **How a guardian consents in the app — decided 28 September, audit R205.** The signed-in adult enrols a linked child: on the guest surfaces `subjectId` may be the caller or a subject the caller holds a `familyMember` or `primaryHolder` delegation over (`identity.listDelegations`), and **the caller is recorded as guardian** — the server sets `consent.guardianSubjectId` to the caller and ignores any other value sent. A guest may not enrol anybody else. **The age below which a subject is a minor is an open value that client counsel sets**; a subject with no date of birth is treated as a minor (audit R126).
+
+**Decided 2 October 2026 (Chinmay, critical set 1; CHG-CSP-019, CHG-CSP-021, CHG-CSP-018):**
+- **A self-service kiosk may enrol, with the consent shown on its screen; a turnstile may not** (BO-186: "App + staffed counters + self-service kiosk (consent shown); not the turnstile"; DEC-236; MoM DI-641). `source` gains `selfServiceKiosk` where the venue's Face Pass configuration enables that channel; a gate stays absent. The 3.2.43 sentence above is amended for the kiosk only. The enrolment reports its channel as `FacePassEnrolment.enrolmentChannel`; its `source` keeps the r1 values and reads `ticketCounter` for a kiosk enrolment (an on-site enrolment), so a client built at r1 meets no value it does not know. - **Minors: guardian consent on the venue's form; the minor age per country; the venue can switch minors off** (BO-187, CMS-029; supersedes the GST-069 default; DEC-237). The age is `tenancy.RegionSettings.minorAgeThreshold` (default 18, for counsel to confirm per country, R205); with `VenueSettings.biometrics.allowMinors` off a minor's enrolment is refused `422 minors-not-enrolled`. - **Consent on the venue's own consent form** (BO-188; DEC-128, DEC-549): `consent.consentFormId` and `consentFormVersion` name the form shown, as for a Face Tag.
 No image is stored — a template is. **The template cannot reconstruct the face**, and that is the property that makes retention defensible at all (CF-35, CF-64).
 **The face-capture SDK and the template format are an open value** (decided 28 September, audit R077 (b)): they are those of the facial-reader vendor the client has contracted, and the client names that vendor. Until then the template is carried as the vendor's opaque format and nothing here depends on which one it is.
 
@@ -282,10 +280,12 @@ No image is stored — a template is. **The template cannot reconstruct the face
 | entitlementId | string (uuid) | yes | An Entitlement.id, which is a UUIDv7. |
 | template | string (password) | yes | Write-only, never returned. |
 | capturedAt | string (date-time) | yes |  |
-| source | enum (guestApp, ticketCounter, annualPassCounter) | yes | The three surfaces 3.2.43 allows. |
+| source | enum (guestApp, ticketCounter, annualPassCounter, selfServiceKiosk) | yes | The three surfaces 3.2.43 allows, and the self-service kiosk since 2 October 2026 (Chinmay, BO-186; DEC-236; CHG-CSP-021): a kiosk shows the venue's consent form on its screen and enrols only where t… |
 | consent | object | yes |  |
 | consent.purposeId | string (uuid) | yes |  |
 | consent.givenAt | string (date-time) | yes |  |
+| consent.consentFormId | string (uuid) |  | The venue's consent form accepted (DEC-128; CHG-CSP-018). (nullable) |
+| consent.consentFormVersion | integer |  | The version of that form shown (CHG-CSP-018). (min 1; nullable) |
 | consent.guardianSubjectId | string (uuid) |  | Required where the subject is a minor. (nullable) |
 | consent.guardianRelationship | string |  | (nullable) |
 | reasonForReEnrollment | enum (appearanceChange, poorOriginalCapture, technicalIssue, guestRequest, recovery, other) |  | Required when the subject already has a Face Pass: why the face is being enrolled again (decided 29 September, writers pass) (nullable) |
@@ -300,6 +300,9 @@ No image is stored — a template is. **The template cannot reconstruct the face
 | kind | BiometricKind: enum (facePass, faceTag) | yes | BL-106, CF-35. |
 | retentionAnchor | object |  | BL-106. |
 | source | enum (guestApp, ticketCounter, annualPassCounter, entryGate) | yes | entryGate is valid for faceTag only, and 3.2.43's omission of it from Face Pass is deliberate: an enduring enrolment is a considered act with consent attached, not something done in a queue. |
+| enrolmentChannel | enum (guestApp, ticketCounter, annualPassCounter, selfServiceKiosk, entryGate) |  | Where the face was actually captured (decided 2 October 2026, Chinmay, BO-186; DEC-236; CHG-CSP-021): source with selfServiceKiosk told apart. (read-only) |
+| consentFormId | string (uuid) |  | The venue's consent form the capture was consented on, and its version below (DEC-128; CHG-CSP-018). (read-only; nullable) |
+| consentFormVersion | integer |  | (read-only; nullable) |
 | capturedAt | string (date-time) | yes |  |
 | consentPurposeId | string (uuid) |  |  |
 | consentGivenAt | string (date-time) |  |  |
@@ -326,6 +329,8 @@ No image is stored — a template is. **The template cannot reconstruct the face
 **No consent form to sign, and consent is still explicit and recorded.** The matrix asks that a Face Tag need no signed consent form, and it does not: `consent.method` `onScreenAcknowledgement` is a tap on the counter or gate screen after the notice is shown, recorded with the purpose and the time (decided 29 September, build pass). PDPL Article 4 is a closed list of exceptions with **no legitimate-interests basis**, so there is no route that makes a short-lived biometric consent-free; what a short life changes is what the consent is *for*, not whether it is needed. Whether a notice alone would do is the make-or-break question on this operation (CF-35).
 **Refused where `VenueSettings.biometrics.isEnabled` is false**, and that switch cannot be turned on without a DPIA reference and a consent-notice acknowledgement (CF-35).
 **A template is stored, never an image**, and the template cannot reconstruct the face.
+
+**Consent first, on the venue's own consent form** (decided 2 October 2026, Chinmay, batch 4, BO-188: "Where needed, consent first, using a consent form from the venue"; DEC-128, DEC-549; CHG-CSP-018). The notice the guest acknowledges is the venue's form (`VenueSettings.biometrics.consentFormId`, from the consent-form builder in Venue Management), and `consent.consentFormId` and `consentFormVersion` record which form and version were shown; a capture against any other form is `409`. Where TICVAI holds the templates (`VenueSettings.biometrics.templatesHeldByTicvai`) the venue is warned in Venue Management that every guest must accept that form first. A minor is captured only with a guardian's consent on the same form, and not at all where the venue has switched minors off (`VenueSettings.biometrics.allowMinors`; DEC-237; `422 minors-not-enrolled`).
 
 |  |  |
 |---|---|
@@ -358,6 +363,8 @@ No image is stored — a template is. **The template cannot reconstruct the face
 | consent.purposeId | string (uuid) | yes |  |
 | consent.method | enum (onScreenAcknowledgement, signedForm) |  | How the guest consented (added 29 September, build pass, 3.2.44). (default onScreenAcknowledgement) |
 | consent.givenAt | string (date-time) | yes |  |
+| consent.consentFormId | string (uuid) |  | The venue's consent form the guest accepted (VenueSettings.biometrics.consentFormId; DEC-128; CHG-CSP-018). (nullable) |
+| consent.consentFormVersion | integer |  | The version of that form shown (CHG-CSP-018). (min 1; nullable) |
 | consent.guardianSubjectId | string (uuid) |  | Required where the subject is a minor (3.2.12). (nullable) |
 | consent.guardianRelationship | string |  | (nullable) |
 
@@ -371,6 +378,9 @@ No image is stored — a template is. **The template cannot reconstruct the face
 | kind | BiometricKind: enum (facePass, faceTag) | yes | BL-106, CF-35. |
 | retentionAnchor | object |  | BL-106. |
 | source | enum (guestApp, ticketCounter, annualPassCounter, entryGate) | yes | entryGate is valid for faceTag only, and 3.2.43's omission of it from Face Pass is deliberate: an enduring enrolment is a considered act with consent attached, not something done in a queue. |
+| enrolmentChannel | enum (guestApp, ticketCounter, annualPassCounter, selfServiceKiosk, entryGate) |  | Where the face was actually captured (decided 2 October 2026, Chinmay, BO-186; DEC-236; CHG-CSP-021): source with selfServiceKiosk told apart. (read-only) |
+| consentFormId | string (uuid) |  | The venue's consent form the capture was consented on, and its version below (DEC-128; CHG-CSP-018). (read-only; nullable) |
+| consentFormVersion | integer |  | (read-only; nullable) |
 | capturedAt | string (date-time) | yes |  |
 | consentPurposeId | string (uuid) |  |  |
 | consentGivenAt | string (date-time) |  |  |
@@ -384,7 +394,7 @@ No image is stored — a template is. **The template cannot reconstruct the face
 |---|---|---|
 | 201 |  | Tagged |
 | 409 |  | Biometrics are not enabled at this venue, this ticket type's biometricPolicy is disabled, or consent.method is not the one the venue's Face Tag profile requires (consentCapture). |
-| 422 |  | Capture quality too low to match against later in the visit. |
+| 422 |  | Capture quality too low to match against later in the visit, or the subject is a minor and the venue does not enrol minors (minors-not-enrolled; DEC-237; CHG-CSP-019). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### getEntitlement
@@ -406,7 +416,7 @@ No image is stored — a template is. **The template cannot reconstruct the face
 | Guest callable | True |
 | Reads | `access.entitlement`, `catalogue.entitlement_template`, `identity.delegated_access` |
 | Writes | - |
-| Called by | GST-012, GST-013, GST-055, WEB-018 |
+| Called by | BO-355, GST-012, GST-013, GST-055, WEB-018 |
 
 **Parameters**
 
@@ -434,6 +444,10 @@ No image is stored — a template is. **The template cannot reconstruct the face
 | entriesUsed | integer |  | The number validateAccess decrements and nothing was decrementing. (default 0; read-only) |
 | entriesAllowed | integer |  | (nullable) |
 | lastEntryAt | string (date-time) |  | recordedAt of the latest admission counted in entriesUsed, written by the same writes. (read-only; nullable) |
+| firstEntryAt | string (date-time) |  | recordedAt of the first admission, written by the same writes as lastEntryAt; it starts a time-bound entitlement's window (DEC-232; CHG-CSP-030). (read-only; nullable) |
+| timeBoundUntil | string (date-time) |  | Where the template is time-bound, when its window closes: firstEntryAt plus the validity rule's minutesAfterFirstScan (decided 2 October 2026, Chinmay, BO-159; DEC-232; CHG-CSP-030). (read-only; nullable) |
+| lifecycleLabel | enum (created, pendingFulfillment, active, partiallyUsed, used, expired, suspended, cancelled, …) |  | The Virtual Ticket status in the client's 13 names, mapped onto the entitlement model (decided 2 October 2026, Chinmay, critical set 2, BO-336: "Map the pack's 13 names onto the model; add any missin… (read-only) |
+| cancellationKind | enum (voided, refunded, performanceCancelled, superseded) |  | Which act cancelled the entitlement, so the pack's Voided, Refunded and Reissued / superseded are told apart while status keeps the one r1 value cancelled (DEC-266; CHG-CSP-033). (read-only; nullable) |
 | frozenDays | integer |  | Days added by a freeze. (default 0; read-only) |
 | suspendedReason | string |  | (nullable) |
 | freezeReason | enum (travelling, injury, personal, seasonal, other) |  | The reason of the latest freezeEntitlement (audit R222). (nullable) |
@@ -473,7 +487,7 @@ The QR payload, wallet pass reference or wristband serial. **Separated from `get
 | Guest callable | True |
 | Reads | `access.entitlement` |
 | Writes | `access.entitlement` |
-| Called by | GST-012, GST-013, GST-055, WEB-018 |
+| Called by | BO-355, GST-012, GST-013, GST-055, WEB-018 |
 
 **Parameters**
 
@@ -523,7 +537,7 @@ The QR payload, wallet pass reference or wristband serial. **Separated from `get
 | Guest callable | True |
 | Reads | `access.entitlement`, `access.scan_event` |
 | Writes | - |
-| Called by | GST-012, GST-013, WEB-018 |
+| Called by | BO-355, GST-012, GST-013, WEB-018 |
 
 **Parameters**
 
@@ -575,6 +589,9 @@ The QR payload, wallet pass reference or wristband serial. **Separated from `get
 | kind | BiometricKind: enum (facePass, faceTag) | yes | BL-106, CF-35. |
 | retentionAnchor | object |  | BL-106. |
 | source | enum (guestApp, ticketCounter, annualPassCounter, entryGate) | yes | entryGate is valid for faceTag only, and 3.2.43's omission of it from Face Pass is deliberate: an enduring enrolment is a considered act with consent attached, not something done in a queue. |
+| enrolmentChannel | enum (guestApp, ticketCounter, annualPassCounter, selfServiceKiosk, entryGate) |  | Where the face was actually captured (decided 2 October 2026, Chinmay, BO-186; DEC-236; CHG-CSP-021): source with selfServiceKiosk told apart. (read-only) |
+| consentFormId | string (uuid) |  | The venue's consent form the capture was consented on, and its version below (DEC-128; CHG-CSP-018). (read-only; nullable) |
+| consentFormVersion | integer |  | (read-only; nullable) |
 | capturedAt | string (date-time) | yes |  |
 | consentPurposeId | string (uuid) |  |  |
 | consentGivenAt | string (date-time) |  |  |
@@ -641,6 +658,10 @@ The QR payload, wallet pass reference or wristband serial. **Separated from `get
 | items[].entriesUsed | integer |  | The number validateAccess decrements and nothing was decrementing. (default 0; read-only) |
 | items[].entriesAllowed | integer |  | (nullable) |
 | items[].lastEntryAt | string (date-time) |  | recordedAt of the latest admission counted in entriesUsed, written by the same writes. (read-only; nullable) |
+| items[].firstEntryAt | string (date-time) |  | recordedAt of the first admission, written by the same writes as lastEntryAt; it starts a time-bound entitlement's window (DEC-232; CHG-CSP-030). (read-only; nullable) |
+| items[].timeBoundUntil | string (date-time) |  | Where the template is time-bound, when its window closes: firstEntryAt plus the validity rule's minutesAfterFirstScan (decided 2 October 2026, Chinmay, BO-159; DEC-232; CHG-CSP-030). (read-only; nullable) |
+| items[].lifecycleLabel | enum (created, pendingFulfillment, active, partiallyUsed, used, expired, suspended, cancelled, …) |  | The Virtual Ticket status in the client's 13 names, mapped onto the entitlement model (decided 2 October 2026, Chinmay, critical set 2, BO-336: "Map the pack's 13 names onto the model; add any missin… (read-only) |
+| items[].cancellationKind | enum (voided, refunded, performanceCancelled, superseded) |  | Which act cancelled the entitlement, so the pack's Voided, Refunded and Reissued / superseded are told apart while status keeps the one r1 value cancelled (DEC-266; CHG-CSP-033). (read-only; nullable) |
 | items[].frozenDays | integer |  | Days added by a freeze. (default 0; read-only) |
 | items[].suspendedReason | string |  | (nullable) |
 | items[].freezeReason | enum (travelling, injury, personal, seasonal, other) |  | The reason of the latest freezeEntitlement (audit R222). (nullable) |
@@ -682,7 +703,7 @@ The QR payload, wallet pass reference or wristband serial. **Separated from `get
 | Guest callable | True |
 | Reads | `access.entitlement`, `catalogue.entitlement_template`, `catalogue.product`, `identity.delegated_access` |
 | Writes | - |
-| Called by | GST-001, GST-012, GST-055, POS-002, WEB-001, WEB-018 |
+| Called by | GST-001, GST-012, GST-055, POS-002, WEB-001, WEB-017, WEB-018 |
 
 **Parameters**
 
@@ -715,6 +736,10 @@ The QR payload, wallet pass reference or wristband serial. **Separated from `get
 | items[].entriesUsed | integer |  | The number validateAccess decrements and nothing was decrementing. (default 0; read-only) |
 | items[].entriesAllowed | integer |  | (nullable) |
 | items[].lastEntryAt | string (date-time) |  | recordedAt of the latest admission counted in entriesUsed, written by the same writes. (read-only; nullable) |
+| items[].firstEntryAt | string (date-time) |  | recordedAt of the first admission, written by the same writes as lastEntryAt; it starts a time-bound entitlement's window (DEC-232; CHG-CSP-030). (read-only; nullable) |
+| items[].timeBoundUntil | string (date-time) |  | Where the template is time-bound, when its window closes: firstEntryAt plus the validity rule's minutesAfterFirstScan (decided 2 October 2026, Chinmay, BO-159; DEC-232; CHG-CSP-030). (read-only; nullable) |
+| items[].lifecycleLabel | enum (created, pendingFulfillment, active, partiallyUsed, used, expired, suspended, cancelled, …) |  | The Virtual Ticket status in the client's 13 names, mapped onto the entitlement model (decided 2 October 2026, Chinmay, critical set 2, BO-336: "Map the pack's 13 names onto the model; add any missin… (read-only) |
+| items[].cancellationKind | enum (voided, refunded, performanceCancelled, superseded) |  | Which act cancelled the entitlement, so the pack's Voided, Refunded and Reissued / superseded are told apart while status keeps the one r1 value cancelled (DEC-266; CHG-CSP-033). (read-only; nullable) |
 | items[].frozenDays | integer |  | Days added by a freeze. (default 0; read-only) |
 | items[].suspendedReason | string |  | (nullable) |
 | items[].freezeReason | enum (travelling, injury, personal, seasonal, other) |  | The reason of the latest freezeEntitlement (audit R222). (nullable) |
@@ -829,120 +854,6 @@ Withdrawn by the guest, ended with the pass, or erased under a DSAR.
 | 204 |  | Destroyed |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
-### rollbackAccessPolicy
-
-**`POST /dynamic-access-policy/{policyId}/rollback`**: Put a previous policy version back
-
-**Restoring creates a new version rather than rewinding to an old one** (decided 29 September, VM close-out), following `restoreProductVersion` and `restoreConfigVersion`: the version that was wrong stays in the history, because an access decision made under it must still be explainable.
-
-The restored version takes the same approval route as any policy change (`evaluateApprovalRequirement`): where approval is required it is `pendingApproval` and the current version stays active until it is granted; where none is required it is `active` at once.
-
-|  |  |
-|---|---|
-| Permission | `ACCESS_POINT_CONFIGURE` |
-| Scope level | venue |
-| Part of slice | setup, makes `access.dynamic_policy` non-empty |
-| Wave | 1 |
-| Offline | no |
-| Conflict policy | serverWins |
-| Read routing | primary |
-| Reads | `access.dynamic_policy`, `access.dynamic_policy_version`, `cache:idempotency` |
-| Writes | `access.configuration_change`, `access.dynamic_policy`, `access.dynamic_policy_version`, `cache:idempotency` |
-| Called by | BO-243 |
-
-**Parameters**
-
-| Name | In | Required | Type | Notes |
-|---|---|---|---|---|
-| policyId | path | yes | string |  |
-| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
-
-**Request body**
-
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| targetVersion | integer | yes | The version whose content is restored (min 1) |
-| reason | string | yes | (min length 3; max length 300) |
-
-**Response**: `DynamicAccessPolicyCommandCenterView`
-
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| version | integer |  | Current version. (min 1) |
-| policyId | string | yes |  |
-| policyName | string |  | e.g. |
-| scope | string |  | Where the policy applies, e.g. |
-| policyType | enum (guestAttribute, accreditation, occupancy, employee, risk, membership, timeEvent) |  |  |
-| priority | integer |  |  |
-| status | enum (draft, pendingApproval, active, inactive, expired) |  |  |
-
-**Responses**
-
-| Code | Shape | Meaning |
-|---|---|---|
-| 200 |  | Restored as a new version |
-| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
-| 409 |  | targetVersion is the current version, or does not exist for this policy |
-| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
-
-### setAccessAttributeCatalog
-
-**`PUT /access-attribute-catalog`**: Add or amend an access attribute
-
-**The write behind the Access Attribute Catalog** (decided 29 September, VM close-out): the attributes dynamic access policies test (guest category, tier, age band, ...).
-
-**Upsert keyed by `attributeKey`**, unique within the tenant. An attribute a published policy tests cannot change `dataType` or be disabled (`409`); a new attribute is added instead.
-
-|  |  |
-|---|---|
-| Permission | `ACCESS_POINT_CONFIGURE` |
-| Scope level | venue |
-| Part of slice | setup, makes `access.access_attribute` non-empty |
-| Wave | 1 |
-| Offline | no |
-| Conflict policy | serverWins |
-| Read routing | primary |
-| Reads | `access.access_attribute`, `access.dynamic_policy`, `cache:idempotency` |
-| Writes | `access.access_attribute`, `access.configuration_change`, `cache:idempotency` |
-| Called by | BO-235 |
-
-**Parameters**
-
-| Name | In | Required | Type | Notes |
-|---|---|---|---|---|
-| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
-
-**Request body**: `AccessAttributeCatalogInput`
-
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| attributeKey | string | yes | Stable key a policy condition names, e.g. (max length 100; pattern ^[a-z][a-zA-Z0-9]*(\.[a-z][a-zA-Z0-9]*)*$) |
-| category | enum (guest, credential, employee, location, time, operational, device, risk) | yes |  |
-| label | string | yes | (max length 200) |
-| dataType | enum (string, integer, number, boolean, date, dateTime, enum) | yes |  |
-| allowedValues | array of string |  | Required when dataType is enum |
-| enabled | boolean |  | (default True) |
-
-**Response**: `AccessAttributeCatalogView`
-
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| category | enum (guest, credential, employee, location, time, operational, device, risk) | yes |  |
-| attributeKey | string | yes | Dotted governed key, e.g. |
-| label | string |  |  |
-| dataType | enum (string, integer, number, boolean, date, dateTime, enum) |  |  |
-| allowedValues | array of string |  | For enum attributes, e.g. |
-| enabled | boolean |  | Whether the venue may use this attribute in policies (e.g. |
-
-**Responses**
-
-| Code | Shape | Meaning |
-|---|---|---|
-| 200 |  | Saved |
-| 409 |  | Changing the data type of, or disabling, an attribute a published policy tests |
-| 422 |  | dataType enum with no allowedValues |
-| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
-
 ### setAccessPointGroup
 
 **`PUT /access-point-groups`**: Create or replace an access-point group
@@ -1032,7 +943,7 @@ A group may not be its own ancestor (`409 group-cycle`), and every member access
 | Read routing | primary |
 | Reads | `access.access_point`, `access.biometric_profile`, `cache:idempotency` |
 | Writes | `access.biometric_profile`, `access.configuration_change`, `cache:idempotency` |
-| Called by | BO-184, BO-185, BO-191 |
+| Called by | BO-185 |
 | State model | AccessBiometricProfile ([states/access-biometric-profile.yaml](../../../states/access-biometric-profile.yaml)): moves `active` -> `inactive`, `inactive` -> `active` |
 
 **Parameters**
@@ -1153,96 +1064,6 @@ A group may not be its own ancestor (`409 group-cycle`), and every member access
 | 200 |  | BLE Beacon & Geofence Configuration |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
-### setContextTimeEvent
-
-**`PUT /context-time-event`**: Context, Time, Event & Capacity Policy Builder
-
-**Drafted from the workshop pack and checked against it on 29 September.** Access Control Module, page 137. The screen says: Configure policies driven by changing venue conditions rather than only guest attributes.
-
-**Every property carries the sentence it came from.** 13 were read from the screen's own bulleted directory and 13 bullets were dropped as prose, examples or hierarchy illustrations rather than bent into fields. Names and types are this package's reading of those sentences, checked against the pack on 29 September.
-
-**Agreed (decided 29 September, readiness close-out).** The supported condition kinds were separate fields; they are now one contextType enum with a condition expression and result. Sample occupancy bands became two configurable thresholds, and the write gained the policy identity.
-
-|  |  |
-|---|---|
-| Permission | `ACCESS_POINT_CONFIGURE` |
-| Scope level | venue |
-| Part of slice | setup, makes `access.dynamic_policy` non-empty |
-| Wave | 1 |
-| Offline | no |
-| Conflict policy | serverWins |
-| Read routing | primary |
-| Reads | `access.dynamic_policy`, `cache:idempotency` |
-| Writes | `access.configuration_change`, `access.dynamic_policy`, `access.dynamic_policy_version`, `cache:idempotency` |
-| Called by | BO-222, BO-237 |
-| State model | AccessDynamicPolicy ([states/access-dynamic-policy.yaml](../../../states/access-dynamic-policy.yaml)): moves `draft` -> `pendingApproval`, `draft` -> `inactive`, `active` -> `inactive`, `inactive` -> `pendingApproval` |
-
-**Parameters**
-
-| Name | In | Required | Type | Notes |
-|---|---|---|---|---|
-| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
-
-**Request body**: `ContextTimeEventCapacityPolicyBuilderInput`
-
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| result | enum (allow, deny, review, requireId, requireBiometric, requireCompanion, requireSupervisor) | yes |  |
-| conditionRule | AdmissionRule | yes | One rule format that runs on both sides (ADR-0068, accepted 1 October). |
-| conditionRule.formatVersion | enum (1) |  | The rule format's version. (default 1) |
-| conditionRule.match | enum (all, any) | yes |  |
-| conditionRule.conditions | array of AdmissionCondition | yes | (min items 1; max items 50) |
-| conditionRule.conditions[].subject | enum (guestAttribute, accreditation, occupancy, employee, risk, membership, timeEvent) | yes | What the condition tests, from the policyType enum. |
-| conditionRule.conditions[].context | enum (date, day, time, season, event, performance, specialEvent, holiday, …) |  | For a timeEvent or occupancy subject, which context value is tested, from the contextType enum. (nullable) |
-| conditionRule.conditions[].attributeKey | string | yes | An access.access_attribute key (for example accreditationLevel, zone), or the context's own value where context is set. (max length 100) |
-| conditionRule.conditions[].comparator | enum (equals, notEquals, in, notIn, between, lessThan, lessOrEqual, greaterThan, …) | yes |  |
-| conditionRule.conditions[].values | array of string |  | Operands as strings, read as the attribute's type (a number, an ISO 8601 date or time, true or false). (max items 100) |
-| conditionRule.conditions[].negate | boolean |  | (default False) |
-| conditionRule.groups | array of object |  | (max items 10) |
-| conditionRule.groups[].match | enum (all, any) | yes |  |
-| conditionRule.groups[].negate | boolean |  | (default False) |
-| conditionRule.groups[].conditions | array of AdmissionCondition | yes | (min items 1; max items 50) |
-| name | string | yes |  |
-| policyId | string | yes |  |
-| contextType | enum (date, day, time, season, event, performance, specialEvent, holiday, …) | yes | Kind of venue condition the policy reacts to |
-| monitorThresholdPercent | integer |  | Occupancy percent at which the band becomes Monitor |
-| restrictThresholdPercent | integer |  | Occupancy percent at which the band becomes Restrict |
-| status | enum (active, inactive) |  | inactive switches the policy off at once; active on a new or inactive policy submits it for approval (pendingApproval) (decided 29 September, writers pass) (default active) |
-| validFrom | string (date-time) |  | Start of validity; null for at once (decided 29 September, writers pass) (nullable) |
-| validTo | string (date-time) |  | End of validity: after it a timer moves the policy to expired (decided 29 September, writers pass) (nullable) |
-
-**Response**: `ContextTimeEventCapacityPolicyBuilderView`
-
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| result | enum (allow, deny, review, requireId, requireBiometric, requireCompanion, requireSupervisor) | yes |  |
-| conditionRule | AdmissionRule | yes | One rule format that runs on both sides (ADR-0068, accepted 1 October). |
-| conditionRule.formatVersion | enum (1) |  | The rule format's version. (default 1) |
-| conditionRule.match | enum (all, any) | yes |  |
-| conditionRule.conditions | array of AdmissionCondition | yes | (min items 1; max items 50) |
-| conditionRule.conditions[].subject | enum (guestAttribute, accreditation, occupancy, employee, risk, membership, timeEvent) | yes | What the condition tests, from the policyType enum. |
-| conditionRule.conditions[].context | enum (date, day, time, season, event, performance, specialEvent, holiday, …) |  | For a timeEvent or occupancy subject, which context value is tested, from the contextType enum. (nullable) |
-| conditionRule.conditions[].attributeKey | string | yes | An access.access_attribute key (for example accreditationLevel, zone), or the context's own value where context is set. (max length 100) |
-| conditionRule.conditions[].comparator | enum (equals, notEquals, in, notIn, between, lessThan, lessOrEqual, greaterThan, …) | yes |  |
-| conditionRule.conditions[].values | array of string |  | Operands as strings, read as the attribute's type (a number, an ISO 8601 date or time, true or false). (max items 100) |
-| conditionRule.conditions[].negate | boolean |  | (default False) |
-| conditionRule.groups | array of object |  | (max items 10) |
-| conditionRule.groups[].match | enum (all, any) | yes |  |
-| conditionRule.groups[].negate | boolean |  | (default False) |
-| conditionRule.groups[].conditions | array of AdmissionCondition | yes | (min items 1; max items 50) |
-| name | string | yes |  |
-| policyId | string | yes |  |
-| contextType | enum (date, day, time, season, event, performance, specialEvent, holiday, …) | yes | Kind of venue condition the policy reacts to |
-| monitorThresholdPercent | integer |  | Occupancy percent at which the band becomes Monitor |
-| restrictThresholdPercent | integer |  | Occupancy percent at which the band becomes Restrict |
-
-**Responses**
-
-| Code | Shape | Meaning |
-|---|---|---|
-| 200 |  | Context, Time, Event & Capacity Policy Builder |
-| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
-
 ### setCredentialActivationDisplay
 
 **`PUT /credential-activation-display`**: Save a credential activation and display rule
@@ -1322,7 +1143,7 @@ A rule takes effect for credentials rendered after the save; a QR already shown 
 | Read routing | primary |
 | Reads | `access.credential_policy`, `cache:idempotency` |
 | Writes | `access.configuration_change`, `access.credential_policy`, `cache:idempotency` |
-| Called by | BO-164, BO-167 |
+| Called by | BO-167 |
 
 **Parameters**
 
@@ -1480,7 +1301,7 @@ A rule takes effect for credentials rendered after the save; a QR already shown 
 | Read routing | primary |
 | Reads | `access.biometric_profile`, `cache:idempotency` |
 | Writes | `access.biometric_profile`, `access.configuration_change`, `cache:idempotency` |
-| Called by | BO-184, BO-186 |
+| Called by | BO-186 |
 | State model | AccessBiometricProfile ([states/access-biometric-profile.yaml](../../../states/access-biometric-profile.yaml)): moves `active` -> `inactive`, `inactive` -> `active` |
 
 **Parameters**
@@ -1494,7 +1315,7 @@ A rule takes effect for credentials rendered after the save; a QR already shown 
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | venueId | string | yes | Venue this enrolment configuration applies to |
-| enrollmentChannels | array of enum (ticvaiApp, ticketCounter, annualPassCounter, selfServiceKiosk, otherAuthorizedChannel) |  | Channels where Face Pass enrolment is enabled |
+| enrollmentChannels | array of enum (ticvaiApp, ticketCounter, annualPassCounter, selfServiceKiosk, otherAuthorizedChannel) |  | Channels where Face Pass enrolment is enabled. |
 | accountLoginRequired | boolean |  | Account login required |
 | validTicketPassRequired | boolean |  | Valid ticket/pass required |
 | identityCheckRequired | boolean |  | Identity check required |
@@ -1510,7 +1331,7 @@ A rule takes effect for credentials rendered after the save; a QR already shown 
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | venueId | string | yes | Venue this enrolment configuration applies to |
-| enrollmentChannels | array of enum (ticvaiApp, ticketCounter, annualPassCounter, selfServiceKiosk, otherAuthorizedChannel) |  | Channels where Face Pass enrolment is enabled |
+| enrollmentChannels | array of enum (ticvaiApp, ticketCounter, annualPassCounter, selfServiceKiosk, otherAuthorizedChannel) |  | Channels where Face Pass enrolment is enabled. |
 | accountLoginRequired | boolean |  | Account login required |
 | validTicketPassRequired | boolean |  | Valid ticket/pass required |
 | identityCheckRequired | boolean |  | Identity check required |
@@ -1536,6 +1357,8 @@ A rule takes effect for credentials rendered after the save; a QR already shown 
 **Upsert keyed by `profileId`.** A body without `profileId` creates one and the response carries the new key; a body with one replaces that record whole (PUT semantics: a field left out takes its default or null); an unknown `profileId` is a `404`, never a create.
 
 **Face Tags are kept apart from Face Pass records and deleted automatically at the trigger.** A trigger of `operationalRetentionThreshold` needs `retentionThresholdHours` (`422` without it). That number has no default: it is the one make-or-break value on this screen, and until the client's counsel names it a venue can use every other trigger.
+
+**Consent first, on the venue's own form, and a warning where TICVAI holds the data** (decided 2 October 2026, Chinmay, batch 4, BO-188; DEC-128; CHG-CSP-018). A profile names the consent form its captures are taken on (`consentFormId`); where TICVAI stores the templates the response says so (`FaceTagTemporaryEnrollmentView.templatesHeldByTicvai`) and the screen warns the venue. How long a Face Tag may be kept past its trigger is still for counsel (DEC-240, research pending).
 
 |  |  |
 |---|---|
@@ -1568,6 +1391,7 @@ A rule takes effect for credentials rendered after the save; a QR already shown 
 | bindTo | enum (ticket, visit, temporaryCredential) | yes | What the Face Tag is bound to (default ticket) |
 | deletionTrigger | enum (ticketFullyRedeemed, endOfVisit, ticketExpiration, credentialCancellation, operationalRetentionThreshold) | yes | When the Face Tag is deleted automatically. (default ticketFullyRedeemed) |
 | retentionThresholdHours | integer |  | Used only when deletionTrigger is operationalRetentionThreshold, and then required. (min 1) |
+| consentFormId | string (uuid) |  | The venue's own consent form a Face Tag is captured on (decided 2 October 2026, Chinmay, batch 4, BO-188: "consent first, using a consent form from the venue"; DEC-128, DEC-549; CHG-CSP-018). (nullable) |
 | consentCapture | enum (onScreenAcknowledgement, signedForm) |  | How consent is taken when a Face Tag is captured (3.2.44; added 29 September, build pass). (default onScreenAcknowledgement) |
 | status | enum (active, inactive) |  | Switches the profile on or off; an inactive profile is not applied at any gate and stays for reuse (decided 29 September, writers pass) (default active) |
 
@@ -1575,6 +1399,8 @@ A rule takes effect for credentials rendered after the save; a QR already shown 
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
+| templatesHeldByTicvai | boolean |  | Where TICVAI stores the Face Tag templates, the screen warns the venue that every guest must accept the venue's consent form before capture (decided 2 October 2026, Chinmay, batch 4, BO-188; DEC-128;… (read-only) |
+| consentFormId | string (uuid) |  | The venue's consent form this profile captures on (DEC-128; CHG-CSP-018). (nullable) |
 | enrollmentChannels | array of enum (ticketCounter, entryGate) |  | Where a Face Tag may be captured |
 | bindTo | enum (ticket, visit, temporaryCredential) |  | What the Face Tag is bound to |
 | deletionTrigger | enum (ticketFullyRedeemed, endOfVisit, ticketExpiration, credentialCancellation, operationalRetentionThreshold) |  | When the Face Tag is automatically deleted; default ticketFullyRedeemed |
@@ -1590,7 +1416,7 @@ A rule takes effect for credentials rendered after the save; a QR already shown 
 |---|---|---|
 | 200 |  | Saved |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
-| 422 |  | operationalRetentionThreshold chosen with no retentionThresholdHours |
+| 422 |  | operationalRetentionThreshold chosen with no retentionThresholdHours, or no consent form on the profile or the venue (consent-form-required; CHG-CSP-018) |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setGateModePolicy
@@ -1875,95 +1701,6 @@ A fourth case is out of scope: pay-per-hour parking unrelated to a ticket runs o
 | 200 |  | Visual Access Rule Builder |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
-### setVisualDynamicPolicy
-
-**`PUT /visual-dynamic-policy`**: Visual Dynamic Policy Builder
-
-**Drafted from the workshop pack and checked against it on 29 September.** Access Control Module, page 136. The screen says: Provide a no-code interface for constructing contextual access policies.
-
-**Every property carries the sentence it came from.** 7 were read from the screen's own bulleted directory and 14 bullets were dropped as prose, examples or hierarchy illustrations rather than bent into fields. Names and types are this package's reading of those sentences, checked against the pack on 29 September.
-
-**Agreed (decided 29 September, readiness close-out).** The seven result labels were separate fields; they are now one result enum. The write gained the policy identity and the condition expression it was missing.
-
-**The screen's actions are behaviour, not fields:** Simulate (`simulatePolicyConflictImpact`).
-
-|  |  |
-|---|---|
-| Permission | `ACCESS_POINT_CONFIGURE` |
-| Scope level | venue |
-| Part of slice | setup, makes `access.dynamic_policy` non-empty |
-| Wave | 1 |
-| Offline | no |
-| Config scope | venue |
-| Conflict policy | serverWins |
-| Read routing | primary |
-| Reads | `access.access_attribute`, `access.dynamic_policy`, `cache:idempotency` |
-| Writes | `access.configuration_change`, `access.dynamic_policy`, `access.dynamic_policy_version`, `cache:idempotency` |
-| Called by | BO-234, BO-236, BO-238 |
-| State model | AccessDynamicPolicy ([states/access-dynamic-policy.yaml](../../../states/access-dynamic-policy.yaml)): moves `draft` -> `pendingApproval`, `draft` -> `inactive`, `active` -> `inactive`, `inactive` -> `pendingApproval` |
-
-**Parameters**
-
-| Name | In | Required | Type | Notes |
-|---|---|---|---|---|
-| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
-
-**Request body**: `VisualDynamicPolicyBuilderInput`
-
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| conditionRule | AdmissionRule | yes | One rule format that runs on both sides (ADR-0068, accepted 1 October). |
-| conditionRule.formatVersion | enum (1) |  | The rule format's version. (default 1) |
-| conditionRule.match | enum (all, any) | yes |  |
-| conditionRule.conditions | array of AdmissionCondition | yes | (min items 1; max items 50) |
-| conditionRule.conditions[].subject | enum (guestAttribute, accreditation, occupancy, employee, risk, membership, timeEvent) | yes | What the condition tests, from the policyType enum. |
-| conditionRule.conditions[].context | enum (date, day, time, season, event, performance, specialEvent, holiday, …) |  | For a timeEvent or occupancy subject, which context value is tested, from the contextType enum. (nullable) |
-| conditionRule.conditions[].attributeKey | string | yes | An access.access_attribute key (for example accreditationLevel, zone), or the context's own value where context is set. (max length 100) |
-| conditionRule.conditions[].comparator | enum (equals, notEquals, in, notIn, between, lessThan, lessOrEqual, greaterThan, …) | yes |  |
-| conditionRule.conditions[].values | array of string |  | Operands as strings, read as the attribute's type (a number, an ISO 8601 date or time, true or false). (max items 100) |
-| conditionRule.conditions[].negate | boolean |  | (default False) |
-| conditionRule.groups | array of object |  | (max items 10) |
-| conditionRule.groups[].match | enum (all, any) | yes |  |
-| conditionRule.groups[].negate | boolean |  | (default False) |
-| conditionRule.groups[].conditions | array of AdmissionCondition | yes | (min items 1; max items 50) |
-| name | string | yes | e.g. |
-| policyId | string | yes |  |
-| result | enum (allow, deny, review, requireId, requireBiometric, requireCompanion, requireSupervisor) | yes | Decision the policy returns when its condition holds |
-| priority | integer |  |  |
-| status | enum (active, inactive) |  | inactive switches the policy off at once; active on a new or inactive policy submits it for approval (pendingApproval) (decided 29 September, writers pass) (default active) |
-| validFrom | string (date-time) |  | Start of validity; null for at once (decided 29 September, writers pass) (nullable) |
-| validTo | string (date-time) |  | End of validity: after it a timer moves the policy to expired (decided 29 September, writers pass) (nullable) |
-
-**Response**: `VisualDynamicPolicyBuilderView`
-
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| conditionRule | AdmissionRule | yes | One rule format that runs on both sides (ADR-0068, accepted 1 October). |
-| conditionRule.formatVersion | enum (1) |  | The rule format's version. (default 1) |
-| conditionRule.match | enum (all, any) | yes |  |
-| conditionRule.conditions | array of AdmissionCondition | yes | (min items 1; max items 50) |
-| conditionRule.conditions[].subject | enum (guestAttribute, accreditation, occupancy, employee, risk, membership, timeEvent) | yes | What the condition tests, from the policyType enum. |
-| conditionRule.conditions[].context | enum (date, day, time, season, event, performance, specialEvent, holiday, …) |  | For a timeEvent or occupancy subject, which context value is tested, from the contextType enum. (nullable) |
-| conditionRule.conditions[].attributeKey | string | yes | An access.access_attribute key (for example accreditationLevel, zone), or the context's own value where context is set. (max length 100) |
-| conditionRule.conditions[].comparator | enum (equals, notEquals, in, notIn, between, lessThan, lessOrEqual, greaterThan, …) | yes |  |
-| conditionRule.conditions[].values | array of string |  | Operands as strings, read as the attribute's type (a number, an ISO 8601 date or time, true or false). (max items 100) |
-| conditionRule.conditions[].negate | boolean |  | (default False) |
-| conditionRule.groups | array of object |  | (max items 10) |
-| conditionRule.groups[].match | enum (all, any) | yes |  |
-| conditionRule.groups[].negate | boolean |  | (default False) |
-| conditionRule.groups[].conditions | array of AdmissionCondition | yes | (min items 1; max items 50) |
-| name | string | yes | e.g. |
-| policyId | string | yes |  |
-| result | enum (allow, deny, review, requireId, requireBiometric, requireCompanion, requireSupervisor) | yes | Decision the policy returns when its condition holds |
-| priority | integer |  |  |
-
-**Responses**
-
-| Code | Shape | Meaning |
-|---|---|---|
-| 200 |  | Visual Dynamic Policy Builder |
-| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
-
 ### updateParkingEntitlement
 
 **`PATCH /parking-entitlements/{entitlementId}`**: Change the plate, or revoke
@@ -2033,6 +1770,8 @@ Revocation removes the plate from the whitelist. A refunded parking entitlement 
 **`POST /blacklist`**: Blacklist a media code
 
 Denies outright regardless of entitlement state. Included in the offline package so it holds during an outage — a blacklist that only works online is not a blacklist.
+
+**A whitelist entry needs a second approver; a blacklist entry does not** (decided 2 October 2026, Chinmay, critical set 1, BO-229: "Second approver for permanent locks, whitelist, and releasing identity/permanent locks"; DEC-254; CHG-CSP-031). `listType` `whitelist` (an approved exception to a restriction, BO-229) is not written at once: the call answers `202` with the approval request it raised (approvals kind `accessPermissionChange`, subject type `whitelistEntry`) and the entry is written when a second person approves; the requester cannot approve their own. Until 2 October this write could only blacklist; `listType` and `disableScope` are optional and default to the blacklist behaviour.
 **One entry per media code in the tenant** (decided 28 September, audit R108). A media code is honoured at every venue of the tenant, so a second entry for the same code is refused `409` rather than stored beside the first; change the existing entry by removing and re-adding it.
 
 |  |  |
@@ -2060,6 +1799,8 @@ Denies outright regardless of entitlement state. Included in the offline package
 | mediaCode | string | yes | (max length 256) |
 | reason | string | yes | (min length 3; max length 500) |
 | expiresAt | string (date-time) |  |  |
+| listType | enum (blacklist, whitelist) |  | A whitelist entry waits for a second approver (DEC-254; CHG-CSP-031). (default blacklist) |
+| disableScope | enum (entireCredential, venueAccess, attractionAccess, reEntry, fastPass, specificEntitlement) |  | What the entry disables (BlacklistEntry.disableScope). (default entireCredential) |
 
 **Response**: `BlacklistEntry`
 
@@ -2080,6 +1821,7 @@ Denies outright regardless of entitlement state. Included in the offline package
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Added |
+| 202 |  | A whitelist entry, held for a second approver (DEC-254; CHG-CSP-031). |
 | 409 | DuplicateCode | A business code the request names is already used within its uniqueness scope (the scope the property's x-ticvai-unique names; decided 28 September, audit R108). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
@@ -2097,7 +1839,7 @@ Denies outright regardless of entitlement state. Included in the offline package
 | Conflict policy | serverWins |
 | Reads | `access.access_point`, `cache:idempotency` |
 | Writes | `access.access_point`, `access.configuration_change`, `cache:idempotency` |
-| Called by | BO-064, BO-144 |
+| Called by | BO-064, BO-148 |
 
 **Parameters**
 
@@ -2132,6 +1874,12 @@ Denies outright regardless of entitlement state. Included in the offline package
 | vehicleLocationCapture | boolean |  | BL-023. (default False) |
 | mode | object |  | Narrows operatingMode only: freeRotation or closed within normal or podium, null otherwise and whenever the turnstile validates in its fixed direction (audit R221). (nullable) |
 | direction | object |  | Fixed per access point (audit R221): set in the back office by createAccessPoint and updateAccessPoint, never by the podium. |
+| temporaryClosure | object |  | What the access point does while its attraction is temporarily closed (decided 2 October 2026, Chinmay, batch 6 set 9, BO-147: "Deny + reopening time + a virtual-queue return window where enabled"; D… (nullable) |
+| temporaryClosure.isClosed | boolean |  | (default False) |
+| temporaryClosure.reason | string |  | Shown to staff; the guest sees "Attraction temporarily closed". (max length 200; nullable) |
+| temporaryClosure.reopensAt | string (date-time) |  | When it is expected to reopen; shown to the guest when known. (nullable) |
+| temporaryClosure.offerVirtualQueueReturn | boolean |  | Offer a virtual-queue return window at the denied scan, where the attraction has a queue. (default False) |
+| temporaryClosure.queueId | string (uuid) |  | The virtual queue the return window is taken in. (nullable) |
 | antiPassbackEnabled | boolean |  |  |
 | requiresExitBeforeReentry | boolean |  | Written by createAccessPoint and updateAccessPoint, and returned so the edit form reads back what it wrote. (default False) |
 | driver | string |  | Driver identifier for the controller behind this access point, as written by createAccessPoint and updateAccessPoint. (nullable) |
@@ -2167,7 +1915,7 @@ Denies outright regardless of entitlement state. Included in the offline package
 | Conflict policy | serverWins |
 | Reads | `access.admission_rules`, `cache:idempotency` |
 | Writes | `access.admission_rules`, `access.configuration_change`, `cache:idempotency` |
-| Called by | BO-032, BO-154, BO-214, BO-222 |
+| Called by | BO-032, BO-154, BO-222 |
 
 **Parameters**
 
@@ -2328,6 +2076,12 @@ Enforcement is configurable — `off`, `warn` or `deny` — because GPS accuracy
 | vehicleLocationCapture | boolean |  | BL-023. (default False) |
 | mode | object |  | Narrows operatingMode only: freeRotation or closed within normal or podium, null otherwise and whenever the turnstile validates in its fixed direction (audit R221). (nullable) |
 | direction | object |  | Fixed per access point (audit R221): set in the back office by createAccessPoint and updateAccessPoint, never by the podium. |
+| temporaryClosure | object |  | What the access point does while its attraction is temporarily closed (decided 2 October 2026, Chinmay, batch 6 set 9, BO-147: "Deny + reopening time + a virtual-queue return window where enabled"; D… (nullable) |
+| temporaryClosure.isClosed | boolean |  | (default False) |
+| temporaryClosure.reason | string |  | Shown to staff; the guest sees "Attraction temporarily closed". (max length 200; nullable) |
+| temporaryClosure.reopensAt | string (date-time) |  | When it is expected to reopen; shown to the guest when known. (nullable) |
+| temporaryClosure.offerVirtualQueueReturn | boolean |  | Offer a virtual-queue return window at the denied scan, where the attraction has a queue. (default False) |
+| temporaryClosure.queueId | string (uuid) |  | The virtual queue the return window is taken in. (nullable) |
 | antiPassbackEnabled | boolean |  |  |
 | requiresExitBeforeReentry | boolean |  | Written by createAccessPoint and updateAccessPoint, and returned so the edit form reads back what it wrote. (default False) |
 | driver | string |  | Driver identifier for the controller behind this access point, as written by createAccessPoint and updateAccessPoint. (nullable) |
@@ -2360,6 +2114,8 @@ Podium operation. Changes what the gate does, not who may pass it.
 
 **The gate mode policy is enforced here** (`setGateModePolicy`): for `freeFlow` or `dropArm`, a caller whose role is not in the policy's `whoCanActivate` is refused `403`, a missing reason where `reasonRequired` is `400`, and an activation whose policy says `createsIncident` opens an access incident.
 
+**R221 amended 2 October 2026** (Chinmay, critical set 1, BO-230; DEC-255; CHG-CSP-032): the direction can now be switched live, by `setAccessPointDirection` and its own permission, not by this operation; a mode change still never changes the direction.
+
 |  |  |
 |---|---|
 | Permission | `TURNSTILE_MODE_SET` |
@@ -2370,7 +2126,7 @@ Podium operation. Changes what the gate does, not who may pass it.
 | Conflict policy | serverWins |
 | Reads | `access.access_point`, `access.access_point_group`, `access.gate_mode_change`, `access.gate_mode_policy`, `cache:idempotency` |
 | Writes | `access.access_incident`, `access.access_point`, `access.gate_mode_change`, `cache:idempotency` |
-| Called by | BO-064, BO-194, BO-230, SCN-002, SCN-016 |
+| Called by | BO-230, SCN-016 |
 
 **Parameters**
 
@@ -2403,6 +2159,12 @@ Podium operation. Changes what the gate does, not who may pass it.
 | vehicleLocationCapture | boolean |  | BL-023. (default False) |
 | mode | object |  | Narrows operatingMode only: freeRotation or closed within normal or podium, null otherwise and whenever the turnstile validates in its fixed direction (audit R221). (nullable) |
 | direction | object |  | Fixed per access point (audit R221): set in the back office by createAccessPoint and updateAccessPoint, never by the podium. |
+| temporaryClosure | object |  | What the access point does while its attraction is temporarily closed (decided 2 October 2026, Chinmay, batch 6 set 9, BO-147: "Deny + reopening time + a virtual-queue return window where enabled"; D… (nullable) |
+| temporaryClosure.isClosed | boolean |  | (default False) |
+| temporaryClosure.reason | string |  | Shown to staff; the guest sees "Attraction temporarily closed". (max length 200; nullable) |
+| temporaryClosure.reopensAt | string (date-time) |  | When it is expected to reopen; shown to the guest when known. (nullable) |
+| temporaryClosure.offerVirtualQueueReturn | boolean |  | Offer a virtual-queue return window at the denied scan, where the attraction has a queue. (default False) |
+| temporaryClosure.queueId | string (uuid) |  | The virtual queue the return window is taken in. (nullable) |
 | antiPassbackEnabled | boolean |  |  |
 | requiresExitBeforeReentry | boolean |  | Written by createAccessPoint and updateAccessPoint, and returned so the edit form reads back what it wrote. (default False) |
 | driver | string |  | Driver identifier for the controller behind this access point, as written by createAccessPoint and updateAccessPoint. (nullable) |
@@ -2434,13 +2196,13 @@ Podium operation. Changes what the gate does, not who may pass it.
 |---|---|
 | Permission | `ACCESS_POINT_CONFIGURE` |
 | Scope level | venue |
-| Part of slice | setup, makes `access.access_point` non-empty |
+| Part of slice | setup, changes rows of `access.access_point` that another operation creates |
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `access.access_point`, `cache:idempotency` |
 | Writes | `access.access_point`, `access.configuration_change`, `cache:idempotency` |
-| Called by | BO-006, BO-064 |
+| Called by | BO-064, BO-147, BO-148 |
 
 **Parameters**
 
@@ -2459,6 +2221,12 @@ Podium operation. Changes what the gate does, not who may pass it.
 | requiresExitBeforeReentry | boolean |  |  |
 | isActive | boolean |  |  |
 | driver | string |  | Driver identifier for the controller behind this access point. |
+| temporaryClosure | object |  | Close or reopen the access point's attraction for a while (AccessPoint.temporaryClosure; DEC-228; CHG-CSP-026). (nullable) |
+| temporaryClosure.isClosed | boolean |  |  |
+| temporaryClosure.reason | string |  | (max length 200; nullable) |
+| temporaryClosure.reopensAt | string (date-time) |  | (nullable) |
+| temporaryClosure.offerVirtualQueueReturn | boolean |  |  |
+| temporaryClosure.queueId | string (uuid) |  | (nullable) |
 
 **Response**: `AccessPoint`
 
@@ -2475,6 +2243,12 @@ Podium operation. Changes what the gate does, not who may pass it.
 | vehicleLocationCapture | boolean |  | BL-023. (default False) |
 | mode | object |  | Narrows operatingMode only: freeRotation or closed within normal or podium, null otherwise and whenever the turnstile validates in its fixed direction (audit R221). (nullable) |
 | direction | object |  | Fixed per access point (audit R221): set in the back office by createAccessPoint and updateAccessPoint, never by the podium. |
+| temporaryClosure | object |  | What the access point does while its attraction is temporarily closed (decided 2 October 2026, Chinmay, batch 6 set 9, BO-147: "Deny + reopening time + a virtual-queue return window where enabled"; D… (nullable) |
+| temporaryClosure.isClosed | boolean |  | (default False) |
+| temporaryClosure.reason | string |  | Shown to staff; the guest sees "Attraction temporarily closed". (max length 200; nullable) |
+| temporaryClosure.reopensAt | string (date-time) |  | When it is expected to reopen; shown to the guest when known. (nullable) |
+| temporaryClosure.offerVirtualQueueReturn | boolean |  | Offer a virtual-queue return window at the denied scan, where the attraction has a queue. (default False) |
+| temporaryClosure.queueId | string (uuid) |  | The virtual queue the return window is taken in. (nullable) |
 | antiPassbackEnabled | boolean |  |  |
 | requiresExitBeforeReentry | boolean |  | Written by createAccessPoint and updateAccessPoint, and returned so the edit form reads back what it wrote. (default False) |
 | driver | string |  | Driver identifier for the controller behind this access point, as written by createAccessPoint and updateAccessPoint. (nullable) |
@@ -2507,7 +2281,7 @@ Changes take effect at terminals after the next offline package refresh, not imm
 |---|---|
 | Permission | `ACCESS_POINT_CONFIGURE` |
 | Scope level | venue |
-| Part of slice | setup, makes `access.admission_rules` non-empty |
+| Part of slice | setup, changes rows of `access.admission_rules` that another operation creates |
 | Wave | 1 |
 | Offline | no |
 | Config scope | venue |
@@ -2626,146 +2400,9 @@ Changes take effect at terminals after the next offline package refresh, not imm
 | 422 |  | A count missing for an n* entry mode, days missing for a relative validity anchor, or validity.to before validity.from |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
-
-## Group: sync
-
-### getOfflinePackage
-
-**`GET /access/offline-package`**: Entitlement and rule set for offline validation
-
-Pulled by scanners and venue edge nodes so validation continues through a WAN outage. Returns entitlements valid within the requested window for the session's access point, plus the deny rules needed to evaluate them.
-`etag` supports conditional refresh — a device on a slow link should not re-download an unchanged package.
-**Workstation-scoped: the access point is the session's.** A caller whose session has no workstation — a back-office browser, a partner, a guest — is refused `403`, because there is no access point to build a package for.
-**Accreditation credentials travel in the package** (29 September, build; BL-181): `accreditationCredentials` carries the admitting `access.accreditation_credential` rows whose zones include this access point's, so an accredited person is admitted, and a suspended or revoked one refused, with no network. A holder status change or a replacement changes the `etag`, so the next conditional refresh takes it.
-
-|  |  |
-|---|---|
-| Permission | `ACCESS_VALIDATE` |
-| Scope level | workstation |
-| Part of slice | core |
-| Wave | 1 |
-| Offline | no |
-| Conflict policy | serverWins |
-| Read routing | replica |
-| Reads | `access.access_point`, `access.accreditation_credential`, `access.admission_rules`, `access.blacklist`, `access.dynamic_policy`, `access.entitlement` |
-| Writes | - |
-| Called by | BO-034, BO-035, BO-037, BO-060, BO-207, EMP-010, EMP-015, EMP-017, POS-013, SCN-003, SCN-007, SCN-008, SCN-009, SCN-013, SCN-014, SCN-015 |
-
-**Parameters**
-
-| Name | In | Required | Type | Notes |
-|---|---|---|---|---|
-| sinceVersion | query |  | integer | The entitlementsVersion of the package the device holds; omitted, the whole package (SD-052). |
-| X-Consistency-Token | header |  | string | Opaque token returned by a prior write: the database instance and its WAL LSN (SD-025, 29 September; ADR-0040 allows several instances per region, so an LSN alone is ambiguous). |
-| validFrom | query | yes | string (date-time) |  |
-| validTo | query | yes | string (date-time) |  |
-| If-None-Match | header |  | string |  |
-
-**Response**: `OfflinePackage`
-
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| etag | string | yes |  |
-| generatedAt | string (date-time) | yes |  |
-| validFrom | string (date-time) | yes |  |
-| validTo | string (date-time) | yes |  |
-| accessPointId | string (uuid) | yes |  |
-| entitlementsVersion | integer |  | The highest access.entitlement change included (SD-052, 29 September). |
-| policySetVersion | string |  | The active admission policy version the package carries (ADR-0068, 1 October): a fingerprint of the (id, currentVersion) of every policy in dynamicPolicies, computed the same way by validateAccess on… |
-| dynamicPolicies | array of AccessDynamicPolicy |  | The active guest-admission dynamic policies for this access point's zones (SD-052), each at its active version with its conditionRule (ADR-0068), so an offline gate applies the same rules as an onlin… |
-| dynamicPolicies[].id | string (uuid) | yes | The policyId |
-| dynamicPolicies[].venueId | string (uuid) |  | (nullable) |
-| dynamicPolicies[].scopePath | string | yes | ltree of the owning scope node; where it applies further is access.policy_scope_assignment |
-| dynamicPolicies[].name | string | yes | (max length 200) |
-| dynamicPolicies[].policyType | enum (guestAttribute, accreditation, occupancy, employee, risk, membership, timeEvent) | yes |  |
-| dynamicPolicies[].contextType | enum (date, day, time, season, event, performance, specialEvent, holiday, …) |  | Context/time/event policies (setContextTimeEvent) (nullable) |
-| dynamicPolicies[].identityType | enum (guest, member, annualPassHolder, employee, contractor, vendor, performer, media, …) |  | Identity-based policies (listIdentityMembershipAccreditation) (nullable) |
-| dynamicPolicies[].conditionRule | AdmissionRule | yes | One rule format that runs on both sides (ADR-0068, accepted 1 October). |
-| dynamicPolicies[].conditionRule.formatVersion | enum (1) |  | The rule format's version. (default 1) |
-| dynamicPolicies[].conditionRule.match | enum (all, any) | yes |  |
-| dynamicPolicies[].conditionRule.conditions | array of AdmissionCondition | yes | (min items 1; max items 50) |
-| dynamicPolicies[].conditionRule.groups | array of object |  | (max items 10) |
-| dynamicPolicies[].result | enum (allow, deny, review, requireId, requireBiometric, requireCompanion, requireSupervisor) | yes |  |
-| dynamicPolicies[].priority | integer |  | (nullable) |
-| dynamicPolicies[].allowedZoneIds | array of string (uuid) |  |  |
-| dynamicPolicies[].deniedZoneIds | array of string (uuid) |  |  |
-| dynamicPolicies[].monitorThresholdPercent | integer |  | Occupancy policies. (min 0; max 100; nullable) |
-| dynamicPolicies[].restrictThresholdPercent | integer |  | Occupancy policies. (min 0; max 100; nullable) |
-| dynamicPolicies[].validFrom | string (date-time) |  | (nullable) |
-| dynamicPolicies[].validTo | string (date-time) |  | The grant expires automatically at validTo (nullable) |
-| dynamicPolicies[].status | enum (draft, pendingApproval, active, inactive, expired) | yes | (default draft) |
-| dynamicPolicies[].currentVersion | integer | yes | The version in force (access.dynamic_policy_version) (min 1) |
-| dynamicPolicies[].createdAt | string (date-time) |  | (read-only) |
-| dynamicPolicies[].updatedAt | string (date-time) |  | (read-only) |
-| entitlements | array of object | yes | Read from access.entitlement (SD-052). |
-| entitlements[].ticketId | string (uuid) | yes | The Entitlement.id. |
-| entitlements[].mediaCodes | array of string | yes | A ticket may carry several media over its life. |
-| entitlements[].validFrom | string (date-time) | yes |  |
-| entitlements[].validTo | string (date-time) | yes |  |
-| entitlements[].performanceId | string (uuid) |  | (nullable) |
-| entitlements[].entriesAllowed | integer | yes | (nullable) |
-| entitlements[].entriesUsed | integer |  |  |
-| entitlements[].reentryAllowed | boolean | yes |  |
-| entitlements[].admissionRulesId | string (uuid) |  |  |
-| delegatedRights | array of object |  | Redemption rights issued by other cells and valid at this access point. |
-| delegatedRights[].rightId | string | yes |  |
-| delegatedRights[].ticketId | string (uuid) | yes | The Entitlement.id in the issuing cell. |
-| delegatedRights[].issuingCellId | string | yes |  |
-| delegatedRights[].guestLinkId | string |  | (nullable) |
-| delegatedRights[].mediaCodes | array of string |  |  |
-| delegatedRights[].validFrom | string (date-time) | yes |  |
-| delegatedRights[].validTo | string (date-time) | yes |  |
-| delegatedRights[].entriesAllowed | integer | yes | (nullable) |
-| delegatedRights[].entriesConsumed | integer | yes |  |
-| delegatedRights[].admissionRulesId | string (uuid) |  |  |
-| blacklist | array of string |  | Media codes to deny outright regardless of entitlement state. |
-| admissionRules | array of object |  |  |
-| admissionRules[].id | string (uuid) | yes |  |
-| admissionRules[].openMinutesBefore | integer | yes |  |
-| admissionRules[].closeMinutesAfter | integer | yes |  |
-| admissionRules[].maxDurationMinutes | integer |  | (nullable) |
-| admissionRules[].requiresExitBeforeReentry | boolean |  |  |
-| accreditationCredentials | array of AccessAccreditationCredential |  | Accreditation credentials that admit at this access point, from access.accreditation_credential (29 September, build; BL-181). |
-| accreditationCredentials[].id | string (uuid) | yes | The accreditation credential's id (credentialId on the events). |
-| accreditationCredentials[].holderId | string (uuid) | yes |  |
-| accreditationCredentials[].programmeId | string (uuid) |  | (nullable) |
-| accreditationCredentials[].kind | string |  | printedBadge, mobileCredential, qr, nfcCard, rfidCard or wristband, as issued. |
-| accreditationCredentials[].encodedIdentifier | string | yes | What the gate reads from the credential. |
-| accreditationCredentials[].validFrom | string (date) |  | (nullable) |
-| accreditationCredentials[].validTo | string (date) |  | (nullable) |
-| accreditationCredentials[].zoneIds | array of string (uuid) |  | The holder's effective zones, from the event (effectiveZones). |
-| accreditationCredentials[].holderStatus | enum (active, suspended, revoked, expired, archived) |  | The holder's status as last published; only active admits. |
-| accreditationCredentials[].admits | boolean | yes | False once the credential is replaced or the holder is not active. |
-| accreditationCredentials[].sourceChangedAt | string (date-time) |  | The issuedAt or changedAt of the event last applied; an older event arriving late is ignored. |
-| accreditationCredentials[].scopePath | string | yes | The partition key (ADR-0005), the accreditation programme's scope. |
-
-**Responses**
-
-| Code | Shape | Meaning |
-|---|---|---|
-| 200 |  | Package |
-| 304 |  | Unchanged since the supplied ETag |
-| 403 | Forbidden | Authenticated but not permitted at the requested scope |
-| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
-
 ## Tables
 
 Every table this service owns that the slice reads or writes, with its columns as derived into `backend/tenant/*.sql`.
-
-### `access.access_attribute`
-
-| Column | Type | Required | Notes |
-|---|---|---|---|
-| id | uuid | yes |  |
-| scope_path | text | yes | ltree of the owning scope node (tenant) |
-| attribute_key | text | yes | Stable key a policy condition names, e.g. |
-| category | text | yes |  |
-| label | text | yes |  |
-| data_type | text | yes |  |
-| allowed_values | text[] | no | Required when dataType is enum |
-| is_enabled | boolean | yes |  |
-| created_at | timestamptz | no |  |
-| updated_at | timestamptz | no |  |
 
 ### `access.access_incident`
 
@@ -2799,6 +2436,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | vehicle_location_capture | boolean | no | BL-023. |
 | mode | text | no | Narrows operatingMode only: freeRotation or closed within normal or podium, null otherwise and whenever the turnstile validates in its fixed direction (audit R221). |
 | direction | text | no | Fixed per access point (audit R221): set in the back office by createAccessPoint and updateAccessPoint, never by the podium. |
+| temporary_closure | jsonb | no | What the access point does while its attraction is temporarily closed (decided 2 October 2026, Chinmay, batch 6 set 9, BO-147: "Deny + reopening time + a virtual-queue return window where enabled"; D… |
 | is_anti_passback_enabled | boolean | no |  |
 | requires_exit_before_reentry | boolean | no | Written by createAccessPoint and updateAccessPoint, and returned so the edit form reads back what it wrote. |
 | driver | text | no | Driver identifier for the controller behind this access point, as written by createAccessPoint and updateAccessPoint. |
@@ -2818,23 +2456,6 @@ Every table this service owns that the slice reads or writes, with its columns a
 | scope_path | text | yes | ltree of the owning scope node (ADR-0005) |
 | created_at | timestamptz | no |  |
 | updated_at | timestamptz | no |  |
-
-### `access.accreditation_credential`
-
-| Column | Type | Required | Notes |
-|---|---|---|---|
-| id | uuid | yes | The accreditation credential's id (credentialId on the events). |
-| holder_id | uuid | yes |  |
-| programme_id | uuid | no |  |
-| kind | text | no | printedBadge, mobileCredential, qr, nfcCard, rfidCard or wristband, as issued. |
-| encoded_identifier | text | yes | What the gate reads from the credential. |
-| valid_from | date | no |  |
-| valid_to | date | no |  |
-| zone_ids | text[] | no | The holder's effective zones, from the event (effectiveZones). |
-| holder_status | text | no | The holder's status as last published; only active admits. |
-| admits | boolean | yes | False once the credential is replaced or the holder is not active. |
-| source_changed_at | timestamptz | no | The issuedAt or changedAt of the event last applied; an older event arriving late is ignored. |
-| scope_path | text | yes | The partition key (ADR-0005), the accreditation programme's scope. |
 
 ### `access.admission_rules`
 
@@ -3038,46 +2659,6 @@ Every table this service owns that the slice reads or writes, with its columns a
 | updated_at | timestamptz | no |  |
 | hardware_model_id | uuid | no | Points at access.hardware_model. |
 
-### `access.dynamic_policy`
-
-| Column | Type | Required | Notes |
-|---|---|---|---|
-| id | uuid | yes | The policyId |
-| venue_id | uuid | no |  |
-| scope_path | text | yes | ltree of the owning scope node; where it applies further is access.policy_scope_assignment |
-| name | text | yes |  |
-| policy_type | text | yes |  |
-| context_type | text | no | Context/time/event policies (setContextTimeEvent) |
-| identity_type | text | no | Identity-based policies (listIdentityMembershipAccreditation) |
-| condition_rule | jsonb | yes | The condition, in the closed JSON rule format evaluated the same way online and at the gate (ADR-0068; replaces the free-text conditionExpression). |
-| result | text | yes |  |
-| priority | integer | no |  |
-| allowed_zone_ids | text[] | no |  |
-| denied_zone_ids | text[] | no |  |
-| monitor_threshold_percent | integer | no | Occupancy policies. |
-| restrict_threshold_percent | integer | no | Occupancy policies. |
-| valid_from | timestamptz | no |  |
-| valid_to | timestamptz | no | The grant expires automatically at validTo |
-| status | text | yes |  |
-| current_version | integer | yes | The version in force (access.dynamic_policy_version) |
-| created_at | timestamptz | no |  |
-| updated_at | timestamptz | no |  |
-
-### `access.dynamic_policy_version`
-
-| Column | Type | Required | Notes |
-|---|---|---|---|
-| id | uuid | yes |  |
-| dynamic_policy_id | uuid | yes |  |
-| scope_path | text | yes | ltree of the owning scope node |
-| version | integer | yes | Unique per policy |
-| status | text | yes |  |
-| definition | jsonb | yes | The policy content of this version - name, policyType, contextType, identityType, conditionRule, result, priority, zones, thresholds and validity - as on access.dynamic_policy |
-| restored_from_version | integer | no | Set by rollbackAccessPolicy (its targetVersion) |
-| reason | text | no |  |
-| created_by_principal_id | uuid | no |  |
-| created_at | timestamptz | yes |  |
-
 ### `access.entitlement`
 
 | Column | Type | Required | Notes |
@@ -3098,6 +2679,9 @@ Every table this service owns that the slice reads or writes, with its columns a
 | entries_used | integer | no | The number validateAccess decrements and nothing was decrementing. |
 | entries_allowed | integer | no |  |
 | last_entry_at | timestamptz | no | recordedAt of the latest admission counted in entriesUsed, written by the same writes. |
+| first_entry_at | timestamptz | no | recordedAt of the first admission, written by the same writes as lastEntryAt; it starts a time-bound entitlement's window (DEC-232; CHG-CSP-030). |
+| time_bound_until | timestamptz | no | Where the template is time-bound, when its window closes: firstEntryAt plus the validity rule's minutesAfterFirstScan (decided 2 October 2026, Chinmay, BO-159; DEC-232; CHG-CSP-030). |
+| cancellation_kind | text | no | Which act cancelled the entitlement, so the pack's Voided, Refunded and Reissued / superseded are told apart while status keeps the one r1 value cancelled (DEC-266; CHG-CSP-033). |
 | frozen_days | integer | no | Days added by a freeze. |
 | suspended_reason | text | no |  |
 | freeze_reason | text | no | The reason of the latest freezeEntitlement (audit R222). |
@@ -3148,6 +2732,8 @@ Every table this service owns that the slice reads or writes, with its columns a
 | access_point_id | uuid | yes |  |
 | from_mode | text | no |  |
 | target_mode | text | yes |  |
+| from_direction | text | no | Set on a live direction switch (setAccessPointDirection; DEC-255; CHG-CSP-032); null on a mode change. |
+| to_direction | text | no | The direction switched to (CHG-CSP-032). |
 | status | text | yes |  |
 | reason | text | no |  |
 | effective_at | timestamptz | no |  |
@@ -3237,12 +2823,12 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-208 operations, added to this service in later releases without changing any of the above.
+217 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
-| access | `approveMultiMediaPreview`, `archiveMediaTemplate`, `cancelGateModeChange`, `createParkingEntitlement`, `deleteJourneySequenceRule`, `deleteMediaBindingRule`, `deleteOperatingCalendarEntry`, `deletePodium`, `deleteReasonCode`, `deliverCredential`, `endPodiumShift`, `getAccessRiskScore`, `getCredentialIssuanceRetryPolicy`, `listAccess`, `listAccessAttributeCatalog`, `listAccessChanges`, `listAccessExecutiveInsight`, `listAccessLocationGrouping`, `listAccessMonitoring`, `listAccessReportScheduled`, `listAccessRiskScoring`, `listAccessRule`, `listAccessSecurityFraud`, `listAccessValidityTime`, `listAntiPassbackJourney`, `listAttendanceAdmission`, `listAuthorizationGovernanceTemporary`, `listBiometric`, `listBiometricAccess`, `listBiometricIdentityIntegrity`, `listBiometricValidationGate`, `listBrandingLocalizationTemplate`, `listConnectivityFailureDegraded`, `listCredential`, `listCredentialActivationDisplay`, `listCredentialDeliveryDistribution`, `listCredentialDisableBlacklist`, `listCredentialGenerationIssuance`, `listCredentialIdentityToken`, `listCredentialReplacementReissue`, `listCredentialRevocationLifecycle`, `listCredentialSecurity`, `listCredentialSecurityOperational`, `listCredentialSharingConcurrent`, `listCredentialTransferRebinding`, `listCredentialUsageCross`, `listDeviceBindingSession`, `listDeviceGate`, `listDeviceTypeHardware`, `listDigitalCredentialSecurity`, `listDynamicAccessPolicy`, `listDynamicPolicyEffectiveness`, `listEdgePackageData`, `listEdgeSecurityDeployment`, `listEntitlementConsumption`, `listEntitlementCrossMedia`, `listEntryExitCrossover`, `listEntryExitRule`, `listEntryRulePoints`, `listEntryTemporaryExit`, `listExternalPartnerCredential`, `listFaceChangeEnrollment`, `listFaceMatchingVerification`, `listFaceTagTemporary`, `listFailedGenerationDelivery`, `listFamilyChildPod`, `listFastPassAttraction`, `listFraudDetectionRule`, `listGateModeFree`, `listGraphicalAccessMap`, `listGroupAdmissionQuantity`, `listGroupAttendancePartial`, `listGroupLeaderFast`, `listGuestCompanionEligibility`, `listGuestDwellTime`, `listGuestJourney`, `listHardwareCompatibilityHealth`, `listHotelWalletExternal`, `listIdentityMembershipAccreditation`, `listLiveAccess`, `listLiveGateMode`, `listLiveVenueOccupancy`, `listMediaActivationPriority`, `listMediaCredential`, `listMediaDesign`, `listMediaIssuanceEncoding`, `listMediaReplacementRevocation`, `listMediaSwapReplacement`, `listMediaTypeCredential`, `listMediaTypeTechnology`, `listMultiMediaBinding`, `listMultiParkCrossover`, `listMultiParkCrossover2`, `listOfflineCredentialRevocation`, `listOfflineCryptographicValidation`, `listOfflineEdge`, `listOfflineEntitlementUsage`, `listOperatingCalendarSpecial`, `listPhysicalDeviceRegistration`, `listPodiumConsole`, `listPolicyEvaluationArchitecture`, `listPolicyScopeHierarchy`, `listQueueThroughputLane`, `listReconnectionSynchronizationConflict`, `listRelationshipCompanionFraud`, `listSecurityDetectionGovernance`, `listShiftHandoverSummary`, `listSpecialEventFree`, `listThroughputQueueValidation`, `listTicketCredentialInvestigation`, `listTicketMedia`, `listUnifiedIdentityCredential`, `listValidationExceptionReason`, `listValidationOutcomeRejection`, `listVenueParkAccess`, `listVerificationMethodSelection`, `listVirtualCredentialMedia`, `listVirtualTicket`, `listVirtualTicketArchitecture`, `listVirtualTicketStatus`, `lockIdentity`, `placeAccessDevice`, `publishHardwareDeployment`, `publishMediaCompatibilityTesting`, `publishRuleConflictCheck`, `publishTopologyValidation`, `releaseCredentialDevice`, `releaseIdentityLock`, `replaceCredential`, `resolveCredentialException`, `retryCredentialGeneration`, `reviewFaceReenrolment`, `rollbackConfigurationVersion`, `setAccessAreaZone`, `setAccessGraphicalMap`, `setAppleWalletPass`, `setAttractionAccess`, `setBiometricLifecycleRetention`, `setBrandingLocalizationTemplate`, `setCredentialEventPropagationRule`, `setCredentialIssuanceRetryPolicy`, `setDeviceSoftwareContent`, `setDigitalBarcodeTicket`, `setDigitalCardMembership`, `setDynamicFieldData`, `setDynamicSecurityProfile`, `setEdgeNodeLocal`, `setEmbeddedEntitlementPayload`, `setEntitlementConsumption`, `setEntryRulePoints`, `setFastPassProfile`, `setFraudDetectionRule`, `setGateLane`, `setGateOfflinePolicy`, `setGoogleWalletPass`, `setGroupAdmissionProfile`, `setGuestCompanionEligibility`, `setHandheldMobileAccess`, `setHardwareModel`, `setHotelWalletExternal`, `setJourneyProfile`, `setJourneySequenceRule`, `setMediaBindingActivation`, `setMediaBindingRule`, `setMediaIssuanceEncoding`, `setMediaReplacementRevocation`, `setMediaTypeTechnology`, `setOperatingCalendarEntry`, `setOperationalIncidentException`, `setPdfPrintablePos`, `setPodium`, `setPolicyEvaluationSetting`, `setPolicyScopeHierarchy`, `setReaderScannerPeripheral`, `setRealTimeSecurity`, `setReasonCode`, `setRelationshipFraudRule`, `setRfidNfc`, `setRfidNfcCard`, `setRiskScoringConfig`, `setSecurityInvestigationEvidence`, `setTicketStatusTransition`, `setTurnstileLaneBehavior`, `setValidationOutcomeGuest`, `setVerificationMethodPolicy`, `setVirtualTicketCredential`, `simulateBiometricConfiguration`, `simulateGuestJourney`, `simulateOfflineResilienceTesting`, `simulatePolicyConflictImpact`, `startPodiumShift`, `updateAccessDevicePlacement`, `updateSecurityAlert`, `verifyIdentity` |
-| accessPoint | `getAccessPoint`, `listAccessPoints`, `listAdmissionRules`, `listBlacklist`, `removeBlacklistEntry` |
+| access | `approveMultiMediaPreview`, `archiveMediaTemplate`, `cancelGateModeChange`, `createParkingEntitlement`, `deleteJourneySequenceRule`, `deleteMediaBindingRule`, `deleteOperatingCalendarEntry`, `deletePodium`, `deleteReasonCode`, `deliverCredential`, `endPodiumShift`, `getAccessRiskScore`, `getCredentialIssuanceRetryPolicy`, `getFaceReenrolmentImages`, `getHardwareModelCertification`, `listAccess`, `listAccessAttributeCatalog`, `listAccessChanges`, `listAccessExecutiveInsight`, `listAccessLocationGrouping`, `listAccessMonitoring`, `listAccessReportScheduled`, `listAccessRiskScoring`, `listAccessRule`, `listAccessSecurityFraud`, `listAccessValidityTime`, `listAntiPassbackJourney`, `listAttendanceAdmission`, `listAuthorizationGovernanceTemporary`, `listBiometric`, `listBiometricAccess`, `listBiometricIdentityIntegrity`, `listBiometricValidationGate`, `listBrandingLocalizationTemplate`, `listConnectivityFailureDegraded`, `listCredential`, `listCredentialActivationDisplay`, `listCredentialDeliveryDistribution`, `listCredentialDisableBlacklist`, `listCredentialGenerationIssuance`, `listCredentialIdentityToken`, `listCredentialReplacementReissue`, `listCredentialRevocationLifecycle`, `listCredentialSecurity`, `listCredentialSecurityOperational`, `listCredentialSharingConcurrent`, `listCredentialTransferRebinding`, `listCredentialUsageCross`, `listDeviceBindingSession`, `listDeviceGate`, `listDeviceTypeHardware`, `listDigitalCredentialSecurity`, `listDynamicAccessPolicy`, `listDynamicPolicyEffectiveness`, `listEdgePackageData`, `listEdgeSecurityDeployment`, `listEntitlementConsumption`, `listEntitlementCrossMedia`, `listEntryExitCrossover`, `listEntryExitRule`, `listEntryRulePoints`, `listEntryTemporaryExit`, `listExternalPartnerCredential`, `listFaceChangeEnrollment`, `listFaceMatchingVerification`, `listFaceTagTemporary`, `listFailedGenerationDelivery`, `listFamilyChildPod`, `listFastPassAttraction`, `listFraudDetectionRule`, `listGateModeFree`, `listGraphicalAccessMap`, `listGroupAdmissionQuantity`, `listGroupAttendancePartial`, `listGroupLeaderFast`, `listGuestCompanionEligibility`, `listGuestDwellTime`, `listGuestJourney`, `listHardwareCompatibilityHealth`, `listHotelWalletExternal`, `listIdentityMembershipAccreditation`, `listLiveAccess`, `listLiveGateMode`, `listLiveVenueOccupancy`, `listMediaActivationPriority`, `listMediaCredential`, `listMediaDesign`, `listMediaIssuanceEncoding`, `listMediaReplacementRevocation`, `listMediaSwapReplacement`, `listMediaTypeCredential`, `listMediaTypeTechnology`, `listMultiMediaBinding`, `listMultiParkCrossover`, `listMultiParkCrossover2`, `listOfflineCredentialRevocation`, `listOfflineCryptographicValidation`, `listOfflineEdge`, `listOfflineEntitlementUsage`, `listOperatingCalendarSpecial`, `listPhysicalDeviceRegistration`, `listPodiumConsole`, `listPolicyEvaluationArchitecture`, `listPolicyScopeHierarchy`, `listQueueThroughputLane`, `listReconnectionSynchronizationConflict`, `listRelationshipCompanionFraud`, `listSecurityDetectionGovernance`, `listShiftHandoverSummary`, `listSpecialEventFree`, `listThroughputQueueValidation`, `listTicketCredentialInvestigation`, `listTicketMedia`, `listUnifiedIdentityCredential`, `listValidationExceptionReason`, `listValidationOutcomeRejection`, `listVenueParkAccess`, `listVerificationMethodSelection`, `listVirtualCredentialMedia`, `listVirtualTicket`, `listVirtualTicketArchitecture`, `listVirtualTicketStatus`, `lockIdentity`, `placeAccessDevice`, `publishHardwareDeployment`, `publishMediaCompatibilityTesting`, `publishRuleConflictCheck`, `publishTopologyValidation`, `releaseCredentialDevice`, `releaseIdentityLock`, `replaceCredential`, `resolveCredentialException`, `retryCredentialGeneration`, `reviewFaceReenrolment`, `rollbackAccessPolicy`, `rollbackConfigurationVersion`, `setAccessAreaZone`, `setAccessAttributeCatalog`, `setAccessGraphicalMap`, `setAppleWalletPass`, `setAttractionAccess`, `setBiometricLifecycleRetention`, `setBrandingLocalizationTemplate`, `setContextTimeEvent`, `setCredentialEventPropagationRule`, `setCredentialIssuanceRetryPolicy`, `setDeviceSoftwareContent`, `setDigitalBarcodeTicket`, `setDigitalCardMembership`, `setDynamicFieldData`, `setDynamicSecurityProfile`, `setEdgeNodeLocal`, `setEmbeddedEntitlementPayload`, `setEntitlementConsumption`, `setEntryRulePoints`, `setFastPassProfile`, `setFraudDetectionRule`, `setGateLane`, `setGateOfflinePolicy`, `setGoogleWalletPass`, `setGroupAdmissionProfile`, `setGuestCompanionEligibility`, `setHandheldMobileAccess`, `setHardwareModel`, `setHardwareModelCertification`, `setHotelWalletExternal`, `setJourneyProfile`, `setJourneySequenceRule`, `setMediaBindingActivation`, `setMediaBindingRule`, `setMediaIssuanceEncoding`, `setMediaReplacementRevocation`, `setMediaTypeTechnology`, `setOperatingCalendarEntry`, `setOperationalIncidentException`, `setPdfPrintablePos`, `setPodium`, `setPolicyEvaluationSetting`, `setPolicyScopeHierarchy`, `setReaderScannerPeripheral`, `setRealTimeSecurity`, `setReasonCode`, `setRelationshipFraudRule`, `setRfidNfc`, `setRfidNfcCard`, `setRiskScoringConfig`, `setSecurityInvestigationEvidence`, `setTicketStatusTransition`, `setTurnstileLaneBehavior`, `setValidationOutcomeGuest`, `setVerificationMethodPolicy`, `setVirtualTicketCredential`, `setVisualDynamicPolicy`, `simulateBiometricConfiguration`, `simulateGuestJourney`, `simulateOfflineResilienceTesting`, `simulatePolicyConflictImpact`, `startPodiumShift`, `updateAccessDevicePlacement`, `updateSecurityAlert`, `verifyIdentity` |
+| accessPoint | `getAccessPoint`, `listAccessPoints`, `listAdmissionRules`, `listBlacklist`, `removeBlacklistEntry`, `setAccessPointDirection` |
 | drafted | `listBiometricConsentGuardian`, `listBiometricLifecycleRetention` |
-| sync | `listScans`, `syncScans` |
+| sync | `getOfflinePackage`, `listScans`, `syncScans` |
 | validation | `issueOrderEntitlements`, `lookupTicket`, `overrideAccess`, `validateAccess`, `validateGroupAccess` |

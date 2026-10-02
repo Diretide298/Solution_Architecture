@@ -1,23 +1,4 @@
 {
- "createCase": {
-  "method": "POST",
-  "path": "/cases",
-  "contract": "marketing-crm",
-  "summary": "Raise a service case",
-  "permission": "CASE_MANAGE",
-  "offlineCapable": true,
-  "conflictPolicy": "append",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "CreateCaseRequest",
-  "responds": "Case"
- },
  "getVisitPlan": {
   "method": "GET",
   "path": "/visit-plans/{planId}",
@@ -85,41 +66,16 @@
   "requestBody": null,
   "responds": "Page"
  },
- "listCases": {
+ "listMyCases": {
   "method": "GET",
-  "path": "/cases",
+  "path": "/my/cases",
   "contract": "marketing-crm",
-  "summary": "List service cases",
-  "permission": "CASE_VIEW",
+  "summary": "The cases this guest raised",
+  "permission": null,
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
+  "scopeLevel": "tenant",
   "parameters": [
-   {
-    "name": "status",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "assignedToPrincipalId",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "breachedSla",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "priority",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "membershipId",
-    "in": "query",
-    "required": null
-   },
    {
     "name": null,
     "in": null,
@@ -162,6 +118,44 @@
   ],
   "requestBody": null,
   "responds": "Page"
+ },
+ "raiseMyCase": {
+  "method": "POST",
+  "path": "/my/cases",
+  "contract": "marketing-crm",
+  "summary": "Report something — lost property, a complaint, a question",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "append",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Case"
+ },
+ "replyToMyCase": {
+  "method": "POST",
+  "path": "/my/cases/{caseId}/messages",
+  "contract": "marketing-crm",
+  "summary": "Reply on a case the guest raised",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "append",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "CaseDetail"
  },
  "updateVisitPlan": {
   "method": "PUT",

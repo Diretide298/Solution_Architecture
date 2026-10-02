@@ -1147,7 +1147,24 @@
   "catalogue.waiting_room_setting": "2026-10-01",
   "control.outbox_republish": "2026-10-01",
   "identity.authorisation_policy": "2026-10-01",
-  "identity.authorisation_policy_version": "2026-10-01"
+  "identity.authorisation_policy_version": "2026-10-01",
+  "access.hardware_certification": "2026-10-02",
+  "ai.spend_ceiling": "2026-10-02",
+  "catalogue.event_change_treatment_policy": "2026-10-02",
+  "catalogue.seat_pricing_rule": "2026-10-02",
+  "control.billing_entity": "2026-10-02",
+  "control.config_package": "2026-10-02",
+  "control.config_package_application": "2026-10-02",
+  "control.config_package_diff": "2026-10-02",
+  "fnb.kitchen_routing_rule": "2026-10-02",
+  "fnb.prep_sheet_template": "2026-10-02",
+  "fnb.waste_approval_policy": "2026-10-02",
+  "marketing.cookie_scan_finding": "2026-10-02",
+  "marketing.tracking_technology_catalogue": "2026-10-02",
+  "orders.till_shift_policy": "2026-10-02",
+  "reporting.analytics_governance_policy": "2026-10-02",
+  "whitelabel.publish_review_policy": "2026-10-02",
+  "whitelabel.site_package": "2026-10-02"
  },
  "renames": [
   {
@@ -1344,5 +1361,5 @@
   "ai.chunk_ref": "2026-09-30"
  },
  "baseline": "2026-09-19",
- "generated": "2026-10-01"
+ "generated": "2026-10-02"
 }

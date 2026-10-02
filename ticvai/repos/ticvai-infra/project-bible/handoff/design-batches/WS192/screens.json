@@ -69,7 +69,10 @@
     {
      "to": "BO-1148",
      "trigger": "Reversal & Transaction Correction Management",
-     "provenance": "structural — pack board 7 wiring, 19 September 2026"
+     "provenance": "structural — pack board 7 wiring, 19 September 2026",
+     "carries": [
+      "subjectId"
+     ]
     },
     {
      "to": "BO-1149",
@@ -499,6 +502,13 @@
    "workshopBoard": "wireframes/WS192 Wallet Configuration Backend Structure v1.0 Board 7.dc.html#bo-1144"
   },
   "apisNote": "Regenerated 9 September 2026 from Wallet_Configuration_Backend_Structure_v1.0.pdf page 76. 0 of 0 labels bound to a contract property; 26 of 39 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Wallet ID, Customer ID, Membership ID, Contact selection, API are choices sent by `setWalletTransferRules` (field gap: add recipientLookupMethods walletId|customerId|membershipId|contact|api).",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-027): A read (get or list) of the wallet transfer rules that setWalletTransferRules writes.",
+    "source": "contracts/satellite/wallet.yaml#setWalletTransferRules | screens/P08-venue-back-office.yaml#BO-1144"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -689,6 +699,13 @@
    "workshopBoard": "wireframes/WS192 Wallet Configuration Backend Structure v1.0 Board 7.dc.html#bo-1145"
   },
   "apisNote": "Regenerated 9 September 2026 from Wallet_Configuration_Backend_Structure_v1.0.pdf page 77. 0 of 0 labels bound to a contract property; 19 of 41 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-027): A read (get or list) of the wallet transfer rules that setWalletTransferRules writes.",
+    "source": "contracts/satellite/wallet.yaml#setWalletTransferRules | screens/P08-venue-back-office.yaml#BO-1145"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -862,6 +879,13 @@
        "kind": "textField",
        "label": "Wallet → AED 200 returned",
        "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 79 §Refund policy can define"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Read a venue's refund policy",
+       "bindsTo": "RefundPolicy",
+       "operation": "getRefundPolicy",
+       "provenance": "contract orders.yaml GET /venues/{venueId}/refund-policy; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -887,6 +911,13 @@
     "purpose": "What a refund puts back, and where",
     "trigger": "onAction",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "getRefundPolicy",
+    "contract": "orders",
+    "purpose": "Read a venue's refund policy",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {
@@ -904,6 +935,14 @@
    ],
    "coldEntry": "**Reached from the list that owns it**, so the identifier arrives with the navigation. Opened cold without one, the screen says what is missing and offers that list — never an empty form that looks configurable."
   },
+  "gaps": [
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-027): A per-source refund destination in the wallet refund policy (ticket, event, F&B, retail, rental, parking, membership, compensation), or a narrowed purpose.",
+    "source": "screens/P08-venue-back-office.yaml#BO-1146 | contracts/satellite/wallet.yaml#setWalletRefundPolicy"
+   }
+  ],
+  "notes": "**Two sections, gated separately (PR-6; design-note correction, 2 October 2026):** the venue refund policy (`setRefundPolicy`, region configuration) and the refund-to-wallet policy (`setWalletRefundPolicy`, wallet configuration). A user holding one sees the other read-only.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1002,6 +1041,19 @@
        "kind": "selectField",
        "label": "FEFO Interaction",
        "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 80 §Configure"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Read an order",
+       "bindsTo": "Order",
+       "operation": "getOrder",
+       "provenance": "contract orders.yaml GET /orders/{orderId}; wiring fix, 2 October 2026"
+      },
+      {
+       "kind": "dataTable",
+       "label": "List refunds against an order",
+       "operation": "listOrderRefunds",
+       "provenance": "contract orders.yaml GET /orders/{orderId}/refunds; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -1028,6 +1080,20 @@
     "purpose": "Issue the refund",
     "trigger": "onAction",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "getOrder",
+    "contract": "orders",
+    "purpose": "Read an order",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
+   },
+   {
+    "operationId": "listOrderRefunds",
+    "contract": "orders",
+    "purpose": "List refunds against an order",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {
@@ -1097,7 +1163,10 @@
      "to": "BO-1143",
      "trigger": "Back to Wallet Operations Command Center",
      "provenance": "structural — pack board 7 wiring, 19 September 2026",
-     "back": true
+     "back": true,
+     "carries": [
+      "subjectId"
+     ]
     }
    ]
   },
@@ -1167,6 +1236,12 @@
        "kind": "selectField",
        "label": "Reconciliation behavior",
        "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 81 §Configure"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Wallet transaction history",
+       "operation": "listWalletTransactions",
+       "provenance": "contract wallet.yaml GET /wallets/{subjectId}/transactions; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -1190,6 +1265,13 @@
      "listWalletTransactions",
      "listCreditLots"
     ]
+   },
+   {
+    "operationId": "listWalletTransactions",
+    "contract": "wallet",
+    "purpose": "Wallet transaction history",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {
@@ -1198,6 +1280,21 @@
    "workshopBoard": "wireframes/WS192 Wallet Configuration Backend Structure v1.0 Board 7.dc.html#bo-1148"
   },
   "apisNote": "Regenerated 9 September 2026 from Wallet_Configuration_Backend_Structure_v1.0.pdf page 81. 0 of 0 labels bound to a contract property; 11 of 30 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "subjectId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "gaps": [
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-027): Reversals of payments, transfers and refunds on a wallet (reverseWalletFunding reverses a top-up only).",
+    "source": "screens/P08-venue-back-office.yaml#BO-1148"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1321,6 +1418,20 @@
        "kind": "selectField",
        "label": "Supporting reference",
        "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 81 §Configure"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Read a guest wallet",
+       "bindsTo": "Wallet",
+       "operation": "getWallet",
+       "provenance": "contract wallet.yaml GET /wallets/{subjectId}; wiring fix, 2 October 2026"
+      },
+      {
+       "kind": "dataTable",
+       "label": "What requires approval here",
+       "bindsTo": "ApprovalMatrix",
+       "operation": "listApprovalMatrices",
+       "provenance": "contract approvals.yaml GET /approval-matrices; wiring fix, 2 October 2026"
       }
      ]
     },
@@ -1363,6 +1474,20 @@
     "purpose": "Require multi-level approval on balance adjustments",
     "trigger": "onAction",
     "provenance": "decided 29 September, VM close-out (venue management and configuration): serves the pack action(s) Multi-level approval"
+   },
+   {
+    "operationId": "getWallet",
+    "contract": "wallet",
+    "purpose": "Read a guest wallet",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
+   },
+   {
+    "operationId": "listApprovalMatrices",
+    "contract": "approvals",
+    "purpose": "What requires approval here",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {
@@ -1480,6 +1605,13 @@
        "kind": "selectField",
        "label": "Example",
        "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 82 §Configure"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Read a guest wallet",
+       "bindsTo": "Wallet",
+       "operation": "getWallet",
+       "provenance": "contract wallet.yaml GET /wallets/{subjectId}; wiring fix, 2 October 2026"
       }
      ]
     },
@@ -1585,12 +1717,23 @@
     "purpose": "Suspend the wallet",
     "trigger": "onAction",
     "provenance": "decided 29 September, VM close-out (venue management and configuration): serves the pack action(s) Suspend wallet"
+   },
+   {
+    "operationId": "getWallet",
+    "contract": "wallet",
+    "purpose": "Read a guest wallet",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "entryState": {
    "params": [
     {
      "name": "walletId",
+     "from": "navigation"
+    },
+    {
+     "name": "subjectId",
      "from": "navigation"
     }
    ],
@@ -1778,6 +1921,12 @@
        "label": "Withdraw dispute",
        "operation": "withdrawWalletDispute",
        "provenance": "contract wallet.yaml POST /wallet-disputes/{disputeId}/withdraw (decided 29 September, VM close-out)"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Resolve dispute",
+       "operation": "resolveWalletDispute",
+       "provenance": "contract wallet.yaml POST /wallet-disputes/{disputeId}/resolve; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -1813,6 +1962,13 @@
     "contract": "wallet",
     "purpose": "Withdraw dispute",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "resolveWalletDispute",
+    "contract": "wallet",
+    "purpose": "Work the selected dispute or integration exception to a resolution",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {
@@ -1829,6 +1985,22 @@
     }
    ]
   },
+  "overlays": [
+   {
+    "id": "formResolveWalletDispute",
+    "component": "modal",
+    "trigger": "Resolve dispute",
+    "body": "**Collects what `resolveWalletDispute` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Resolve dispute",
+     "operation": "resolveWalletDispute"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "contract wallet.yaml POST /wallet-disputes/{disputeId}/resolve; wiring fix, 2 October 2026"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",

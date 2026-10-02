@@ -22,9 +22,9 @@ modulesUsed:
 - module: resources
   screens: 30
 - module: core
-  screens: 18
+  screens: 19
 - module: fnb
-  screens: 11
+  screens: 10
 - module: maintenance
   screens: 8
 - module: ticketing
@@ -36,39 +36,41 @@ modulesUsed:
 - module: ai
   screens: 4
 - module: marketing
-  screens: 4
+  screens: 3
 - module: queue
   screens: 2
+- module: retail
+  screens: 1
 - module: analytics
   screens: 1
 servicesCalled:
 - service: VenueOpsService
-  operationCalls: 121
+  operationCalls: 102
 - service: OrderService
-  operationCalls: 70
+  operationCalls: 43
 - service: FnbService
-  operationCalls: 50
+  operationCalls: 43
 - service: TenancyService
-  operationCalls: 40
-- service: AccessService
-  operationCalls: 23
+  operationCalls: 30
 - service: InventoryService
-  operationCalls: 21
-- service: MarketingService
+  operationCalls: 27
+- service: AccessService
   operationCalls: 20
+- service: MarketingService
+  operationCalls: 19
 - service: IdentityService
   operationCalls: 18
 - service: CatalogueService
-  operationCalls: 17
+  operationCalls: 11
 - service: AiService
   operationCalls: 10
 - service: ReportingService
-  operationCalls: 6
+  operationCalls: 9
 - service: RetailService
-  operationCalls: 2
+  operationCalls: 6
 coverage:
   screens: 96
-  inAFlow: 43
+  inAFlow: 41
   drawn: 96
   note: '**A screen in no flow has been specified and never walked.** Every flow written in this package
     has found a defect.'
@@ -80,22 +82,29 @@ screens:
   wave: 1
   density: comfortable
   operations:
+  - changeOwnCredential
+  - completeSsoAuthorization
   - createMfaChallenge
   - getCurrentSession
-  - listMfaMethods
   - listSsoProviders
   - login
+  - selectRole
+  - startSsoAuthorization
   - verifyMfaChallenge
   states:
+  - denied
   - emptyFirstRun
+  - emptyNoAccess
   - emptyNoResults
   - error
   - loading
   - mfaRequired
   - offline
+  - sessionHeld
   offlineState: true
   entryParams:
   - challengeId<-navigation
+  - providerId<-deepLink
   goesTo:
   - EMP-002
   - EMP-003
@@ -113,9 +122,6 @@ screens:
   density: comfortable
   operations:
   - getCurrentSession
-  - listMfaMethods
-  - listRoles
-  - listSsoProviders
   - selectRole
   states:
   - emptyFirstRun
@@ -143,22 +149,12 @@ screens:
   wave: 1
   density: comfortable
   operations:
-  - acceptShiftVariance
-  - approveShiftOpen
-  - closeShift
-  - getCurrentShift
   - getIncident
   - getShift
-  - listCashMovements
+  - getWorkstationShift
   - listIncidents
-  - listShifts
-  - openShift
   - recordAuthorityNotification
-  - recordNoSale
-  - reopenShift
   - reportIncident
-  - resumeShift
-  - suspendShift
   - updateIncident
   states:
   - emptyFirstRun
@@ -171,6 +167,7 @@ screens:
   entryParams:
   - incidentId<-deepLink
   - shiftId<-session
+  - workstationId<-session
   goesTo:
   - EMP-001
   - EMP-002
@@ -236,7 +233,6 @@ screens:
   wave: 1
   density: comfortable
   operations:
-  - createInspectionTemplate
   - listInspectionTemplates
   - listInspections
   - submitInspection
@@ -250,8 +246,6 @@ screens:
   offlineState: true
   entryParams: []
   goesTo:
-  - EMP-001
-  - EMP-002
   - EMP-003
   boardFrames: null
   wireframe: wireframes/P06 Venue Staff App.dc.html#emp-048
@@ -266,17 +260,11 @@ screens:
   density: comfortable
   operations:
   - acceptShiftVariance
-  - approveShiftOpen
-  - closeShift
-  - createCashMovement
   - getCurrentShift
   - getShift
   - listCashMovements
   - listShifts
-  - openShift
-  - recordNoSale
-  - reopenShift
-  - resumeShift
+  - submitShiftCount
   - suspendShift
   states:
   - emptyFirstRun
@@ -305,11 +293,8 @@ screens:
   wave: 1
   density: comfortable
   operations:
-  - getOfflinePackage
-  - listScans
   - lookupTicket
   - overrideAccess
-  - syncScans
   - validateAccess
   - validateGroupAccess
   - verifyAccreditationCredential
@@ -337,20 +322,11 @@ screens:
   wave: 1
   density: comfortable
   operations:
-  - applyManualDiscount
-  - createOrder
-  - createRefund
-  - exchangeOrderLines
   - getOrder
   - getOrderStatement
-  - holdOrder
   - listOrderRefunds
   - listOrders
-  - modifyOrder
   - reprintOrder
-  - rescheduleOrder
-  - resumeOrder
-  - voidOrder
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -410,7 +386,6 @@ screens:
   - listSyncRejections
   - lookupTicket
   - overrideAccess
-  - syncOrders
   - syncScans
   - validateAccess
   - validateGroupAccess
@@ -470,20 +445,9 @@ screens:
   density: comfortable
   operations:
   - acceptWorkOrder
-  - attachWorkOrderEvidence
-  - cancelWorkOrder
-  - closeWorkOrder
-  - completeWorkOrder
   - getWorkOrder
   - listWorkOrders
-  - pauseWorkOrder
-  - recordWorkOrderParts
-  - recordWorkOrderTime
   - rejectWorkOrder
-  - resumeWorkOrder
-  - startWorkOrder
-  - updateWorkOrder
-  - verifyWorkOrder
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -495,8 +459,6 @@ screens:
   entryParams:
   - workOrderId<-deepLink
   goesTo:
-  - EMP-001
-  - EMP-002
   - EMP-003
   - EMP-005
   boardFrames: null
@@ -514,8 +476,6 @@ screens:
   operations:
   - acceptWorkOrder
   - attachWorkOrderEvidence
-  - cancelWorkOrder
-  - closeWorkOrder
   - completeWorkOrder
   - createStockReservation
   - getWorkOrder
@@ -528,8 +488,6 @@ screens:
   - releaseStockReservation
   - resumeWorkOrder
   - startWorkOrder
-  - updateWorkOrder
-  - verifyWorkOrder
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -602,10 +560,7 @@ screens:
   wave: 2
   density: comfortable
   operations:
-  - acknowledgeAnnouncement
-  - getAnnouncementReach
-  - listAnnouncements
-  - publishAnnouncement
+  - listWorkOrders
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -614,11 +569,8 @@ screens:
   - loading
   - offline
   offlineState: true
-  entryParams:
-  - announcementId<-deepLink
+  entryParams: []
   goesTo:
-  - EMP-001
-  - EMP-002
   - EMP-003
   - EMP-009
   boardFrames: null
@@ -634,10 +586,10 @@ screens:
   density: comfortable
   operations:
   - getCurrentShift
+  - getServiceSummary
   - getShift
   - listCashMovements
   - listShifts
-  - suspendShift
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -693,6 +645,7 @@ screens:
   wave: 1
   density: comfortable
   operations:
+  - askReportingQuestion
   - createAiConversation
   - listAiConversations
   - recordAnswerFeedback
@@ -761,8 +714,6 @@ screens:
   operations:
   - getQueue
   - getWaitTimes
-  - listQueueEntries
-  - listQueues
   - setWaitTime
   states:
   - emptyFirstRun
@@ -791,12 +742,9 @@ screens:
   wave: 2
   density: comfortable
   operations:
-  - createChannelCapacity
   - getChannelAllocations
   - listChannelCapacities
   - relinquishChannelAllocation
-  - setChannelAllocations
-  - updateChannelCapacity
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -840,10 +788,7 @@ screens:
   - rescheduleOrder
   - resolveProductByCode
   - resumeOrder
-  - setAlternativeCodes
-  - setProductAttributes
   - splitOrder
-  - transitionProductLifecycle
   - voidOrder
   states:
   - emptyFirstRun
@@ -933,10 +878,10 @@ screens:
   - acknowledgeAnnouncement
   - getAnnouncementReach
   - listAnnouncements
+  - listApprovalRequests
   - listStaffConversations
   - listStaffMessages
   - markStaffConversationRead
-  - publishAnnouncement
   - sendStaffMessage
   states:
   - emptyFirstRun
@@ -964,9 +909,7 @@ screens:
   density: comfortable
   operations:
   - acknowledgeAnnouncement
-  - getAnnouncementReach
   - listAnnouncements
-  - publishAnnouncement
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -992,9 +935,7 @@ screens:
   density: comfortable
   operations:
   - acknowledgeAnnouncement
-  - getAnnouncementReach
   - listAnnouncements
-  - publishAnnouncement
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -1012,8 +953,7 @@ screens:
   - EMP-050
   boardFrames: null
   wireframe: wireframes/P06 Venue Staff App.dc.html#emp-047
-  inFlows:
-  - F69 An incident is reported, escalated and closed
+  inFlows: null
 - screen: EMP-050
   name: Post-incident restore
   module: Operations
@@ -1023,7 +963,6 @@ screens:
   operations:
   - getIncident
   - listIncidents
-  - recordAuthorityNotification
   - updateIncident
   states:
   - emptyFirstRun
@@ -1042,8 +981,7 @@ screens:
   - EMP-047
   boardFrames: null
   wireframe: wireframes/P06 Venue Staff App.dc.html#emp-050
-  inFlows:
-  - F69 An incident is reported, escalated and closed
+  inFlows: null
 - screen: EMP-021
   name: Roster
   module: Operations
@@ -1079,7 +1017,6 @@ screens:
   wave: 1
   density: comfortable
   operations:
-  - getCurrentShift
   - listRotaAssignments
   - requestShiftSwap
   states:
@@ -1137,7 +1074,6 @@ screens:
   wave: 1
   density: comfortable
   operations:
-  - amendAttendance
   - listAttendance
   - recordAttendance
   states:
@@ -1195,9 +1131,7 @@ screens:
   operations:
   - getIncident
   - listIncidents
-  - recordAuthorityNotification
   - reportIncident
-  - updateIncident
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -1228,8 +1162,10 @@ screens:
   operations:
   - getIncident
   - listIncidents
+  - recordAuthorityNotification
   - updateIncident
   states:
+  - denied
   - emptyFirstRun
   - emptyNoAccess
   - emptyNoResults
@@ -1328,8 +1264,6 @@ screens:
   operations:
   - getVenueMap
   - getVenueMapLive
-  - listDeliveryLocations
-  - listDiningOutlets
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -1358,7 +1292,6 @@ screens:
   wave: 2
   density: comfortable
   operations:
-  - acknowledgeAnnouncement
   - getAnnouncementReach
   - listAnnouncements
   - publishAnnouncement
@@ -1378,7 +1311,8 @@ screens:
   - EMP-003
   boardFrames: null
   wireframe: wireframes/P06 Venue Staff App.dc.html#emp-038
-  inFlows: null
+  inFlows:
+  - F69 An incident is reported, escalated and closed
 - screen: EMP-040
   name: Knowledge base
   module: Operations
@@ -1462,7 +1396,7 @@ screens:
 - screen: EMP-043
   name: Device settings
   module: Operations
-  requiresModule: marketing
+  requiresModule: core
   wave: 1
   density: comfortable
   operations:
@@ -1613,7 +1547,6 @@ screens:
   density: comfortable
   operations:
   - getTableMap
-  - setTableLayout
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -1636,10 +1569,9 @@ screens:
   wave: 2
   density: comfortable
   operations:
-  - createTable
   - setSectionLayout
+  - setTableCombinations
   - setTableLayout
-  - updateTable
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -1650,7 +1582,6 @@ screens:
   entryParams:
   - venueId<-session
   - outletId<-EMP-003
-  - tableId<-navigation
   goesTo: []
   boardFrames:
   - FnB Board 4.dc.html#fnb-4c
@@ -1664,6 +1595,7 @@ screens:
   density: comfortable
   operations:
   - listTableReservations
+  - resolveBookingConflict
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -1686,8 +1618,10 @@ screens:
   wave: 2
   density: comfortable
   operations:
-  - createTableReservation
+  - createTableReservationForGuest
+  - getFnbReservationPolicy
   - matchGuest
+  - sendBookingConfirmation
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -1697,6 +1631,8 @@ screens:
   offlineState: true
   entryParams:
   - venueId<-session
+  - reservationId<-navigation
+  - outletId<-navigation
   goesTo: []
   boardFrames:
   - FnB Board 4.dc.html#fnb-4e
@@ -1711,6 +1647,8 @@ screens:
   operations:
   - joinRestaurantWaitlist
   - leaveRestaurantWaitlist
+  - notifyWaitlistParty
+  - quoteWaitTime
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -1765,17 +1703,12 @@ screens:
   - fireCourse
   - getTableVisit
   - holdCourse
-  - joinRestaurantWaitlist
   - mergeTableVisits
   - moveTableVisit
-  - notifyServer
-  - notifyWaitlistParty
   - openTableVisit
-  - quoteWaitTime
   - reassignServer
   - seatTableReservation
   - setServiceStage
-  - setTableCombinations
   - transferTableVisit
   - updateTableVisit
   states:
@@ -1789,7 +1722,6 @@ screens:
   - venueId<-session
   - visitId<-EMP-003
   - reservationId<-deepLink
-  - entryId<-deepLink
   - outletId<-session
   - ticketId<-deepLink
   goesTo:
@@ -1844,6 +1776,7 @@ screens:
   wave: 2
   density: comfortable
   operations:
+  - getKpiValues
   - getTableMap
   - listTableReservations
   states:
@@ -1857,8 +1790,7 @@ screens:
   entryParams:
   - venueId<-session
   - outletId<-EMP-003
-  goesTo:
-  - EMP-061
+  goesTo: []
   boardFrames:
   - FnB Board 4.dc.html#fnb-4c
   wireframe: wireframes/P06 Venue Staff App.dc.html#emp-060
@@ -1901,14 +1833,13 @@ screens:
 - screen: EMP-062
   name: Store Stock & SKU Availability
   module: Stock on the Floor
-  requiresModule: fnb
+  requiresModule: retail
   wave: 2
   density: comfortable
   operations:
-  - getHaccpStatus
+  - getOutletStock
   - getStockPositions
-  - logTemperature
-  - setItemAvailability
+  - lookupMerchandise
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -1918,14 +1849,13 @@ screens:
   offlineState: true
   entryParams:
   - venueId<-session
-  - itemId<-EMP-003
+  - outletId<-navigation
   goesTo:
   - EMP-067
   boardFrames:
   - FnB Board 5.dc.html#fnb-5j
   wireframe: wireframes/P06 Venue Staff App.dc.html#emp-062
-  inFlows:
-  - F28 A temperature excursion is caught and signed off
+  inFlows: null
 - screen: EMP-063
   name: Requisition & Smart Store Replenishment
   module: Stock on the Floor
@@ -1934,7 +1864,9 @@ screens:
   density: comfortable
   operations:
   - createRequisition
+  - getSuggestedRequisitions
   - listRequisitions
+  - updateRequisitionLines
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -1958,7 +1890,10 @@ screens:
   density: comfortable
   operations:
   - createStockTransfer
+  - getStockTransfer
   - listStockLocations
+  - listStockTransfers
+  - receiveStockTransfer
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -1975,7 +1910,7 @@ screens:
   wireframe: wireframes/P06 Venue Staff App.dc.html#emp-064
   inFlows: null
 - screen: EMP-065
-  name: Receiving & Store Put-Away
+  name: Receiving
   module: Stock on the Floor
   requiresModule: inventory
   wave: 2
@@ -1983,7 +1918,9 @@ screens:
   operations:
   - createGoodsReceipt
   - getStockTransfer
+  - listPurchaseOrders
   - logColdChain
+  - receiveStockTransfer
   - rejectReceivedGoods
   states:
   - emptyFirstRun
@@ -2010,9 +1947,7 @@ screens:
   density: comfortable
   operations:
   - enterCountLine
-  - getCountVariance
-  - postStockCount
-  - requestRecount
+  - listStockCounts
   - setDailyCount
   - startStockCount
   states:
@@ -2039,6 +1974,7 @@ screens:
   density: comfortable
   operations:
   - createStockMovement
+  - getHaccpStatus
   - logTemperature
   - recordWaste
   - signCorrectiveAction
@@ -2066,6 +2002,8 @@ screens:
   wave: 2
   density: comfortable
   operations:
+  - cancelMerchandiseReservation
+  - collectMerchandiseReservation
   - getStockPositions
   - reserveMerchandise
   states:
@@ -2078,6 +2016,7 @@ screens:
   entryParams:
   - venueId<-session
   - outletId<-EMP-003
+  - reservationId<-navigation
   goesTo: []
   boardFrames:
   - Retail Board 4.dc.html#ret-4h
@@ -2218,6 +2157,7 @@ screens:
   density: comfortable
   operations:
   - assignRentalEquipment
+  - getRentalAvailability
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -2548,7 +2488,6 @@ screens:
   density: comfortable
   operations:
   - listOverdueRentals
-  - sendTransactionalMessage
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -2807,6 +2746,7 @@ screens:
   wave: 3
   density: comfortable
   operations:
+  - listDepositActivity
   - returnRental
   states:
   - emptyFirstRun
@@ -2818,6 +2758,7 @@ screens:
   offlineState: true
   entryParams:
   - bookingId<-navigation
+  - depositId<-navigation
   goesTo:
   - EMP-091
   boardFrames: null
@@ -2831,7 +2772,6 @@ screens:
   density: comfortable
   operations:
   - returnRental
-  - setAssetStatus
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -2841,7 +2781,6 @@ screens:
   - offline
   offlineState: true
   entryParams:
-  - assetId<-navigation
   - bookingId<-navigation
   goesTo:
   - EMP-091

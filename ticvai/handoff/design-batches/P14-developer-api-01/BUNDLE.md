@@ -61,6 +61,35 @@ convincingly. It is never a caption.
   and its error; and, element by element, what is shown and in what format, what each action
   produces and where the user goes next. Draw exactly that.
 
+## The processes these screens belong to
+
+Written by the owner of each process (`handoff/design-notes/`). Read before any screen: it says how the process runs end to end and which words the screens must use.
+
+### Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management)
+
+Platform Foundation is everything the apps stand on. Five apps each have one door: the guest app and website (WEB-016, GST-042: a six-digit code to email or mobile, a password, Apple or Google, UAE Pass; never enterprise SSO), the till (POS-000: employee number and PIN, recent operators as tiles; the kitchen display is the same app), the staff handheld and scanner (EMP-001, SCN-001), Venue Management (SUP-001, the single door for the back office P08, the CMS P13, analytics P16 and the support desk P12) and TICVAI Control (ADM-001 for TICVAI's own platform operators, PTR-001 for partner users; the developer portal P14 and the sign-up P17 belong to this app too). A second factor is required by permission, not by role or device: ROLE_MANAGE, LEDGER_APPROVE and every PLATFORM_* permission, plus any the tenant adds; so a cashier never sees it and a platform operator always does. The factor is an authenticator app with an emailed code as fallback; five wrong codes lock step-up for the lockout minutes, never permanently. Guests get two-step verification only at a venue that switched it on. One person holds one session per workstation: a second sign-in is refused and only a supervisor ends the other session. Several roles mean a role prompt; one role goes straight in. The workstation decides the Sale Board, hardware and till identity, never what a person may do. Sensitive actions (refund approval, journal approval, credential reset, partner credit, commission rules, opening a platform-staff grant and 17 more) demand a fresh step-up on the operation itself, asked in place in the action's confirmation; the tenant may raise the strength, never remove it. Permission outcomes are three, never one word: self-authorised (proceeds, audited), escalated (a supervisor PIN in place), refused (the denied state, naming the permission); a missing permission is never an empty table, and a record outside the person's venues is "not found", indistinguishable from absent. The hierarchy is binding (tenant, brand, region, venue, department, sub-department, workstation; outlet beside department for F&B and retail); region owns currency, decimals, time zone, date format and fiscal year; configuration resolves nearest-ancestor across tenant, region and venue (outlet for F&B and retail), venue is the floor and a workstation is assigned a profile, never configured; every configuration screen says which level it writes and what it inherits. Venue Management is one tenant-level surface filtering across the venues in the session's scope. TICVAI's Console runs outside every cell: a platform operator picks a tenant and opens a time-boxed, audited platform-staff grant (with step-up) before any tenant action, and the tenant sees every action in its audit log (ADM-412 is the reference implementation). Approval workflows record authorisations and never perform the action; the requester cannot approve their own request; a venue may tighten and never loosen a rule from above; in-flight …
+*(source: screens/P12-support-agent-console.yaml#SUP-001; R135; R126; R167; DI-1072; ADR-0002; ADR-0003; ADR-0004; R184; contracts/spine/identity.yaml#createMfaChallenge; contracts/spine/approvals.yaml#setStepUpPolicy; ADR-0011; ADR-0018; ADR-0029; R098; contracts/spine/approvals.yaml#decideApprovalRequest …)*
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Sign in / Sign out | Entering and leaving any app, staff or guest. | Login, Log in, Logon, Logout | screens/P04-point-of-sale.yaml#POS-000 … |
+| Authentication code | The staff second factor from the authenticator app (or the emailed fallback). | OTP, 2FA code, token | screens/P09-platform-admin-console.yaml#ADM-001 |
+| One-time code | The six-digit code a guest receives to sign in or prove a contact. | OTP, PIN, password | DI-1034; R167 |
+| Two-step verification | The guest's optional second factor, asked only at venues that switched it on. | MFA, 2FA | DI-1072 |
+| Tenant / Brand / Region / Venue / Department / Outlet | The binding hierarchy levels; region owns currency and dates; outlet is F&B or retail inside a venue. | Client, Customer, Org (for tenant), Site, Park, Property (for venue), Area, Territory (for region) | ADR-0011; ADR-0018 |
+| Workstation (back office) / till (operator copy) | A configured device; decides Sale Board, hardware and till identity, never authorisation. | Terminal, Station, POS (for the device), till (for the Deposit Box) | ADR-0002; R156 |
+| Sale Board | The configured front end a workstation loads (ticketing, F&B or retail). | Screen, Layout, Menu | ADR-0003 |
+| Role | A named, fully configurable grouping of permissions; the seeded five are editable starting points. | Group, Profile | R229 |
+| Staff member / Partner user / Platform operator | A tenant's staff principal; a partner's user; a TICVAI employee in the Console. | User (alone), Account, Agent (for venue staff) | F104 step 1; F104 step 4; F104 step 5 |
+| Platform-staff grant | The time-boxed, audited access a platform operator opens into one tenant before acting in it. | Impersonation, Support login | R098 |
+| Escalate / Refused | Escalate is supervisor approval captured in place; Refused is the denied state that names the permission. | Denied (for an action that can be escalated) | R197 |
+| Approve / Reject / Return / Request information | The four decisions on an approval request; Withdraw is the requester's own act and never a rejection. | Accept, Decline, Cancel (for withdraw) | contracts/spine/approvals.yaml#decideApprovalRequest … |
+| Subscription / Plan / Module / Licence | TICVAI's commercial relationship with a tenant, its plan, the modules it licenses and the limits. | Membership (that is the guest's pass) | R214 |
+| Membership / Annual pass | A guest's pass product and its holder (BO-284 to BO-303). | Subscription (that is the tenant's TICVAI plan) | screens/P08-venue-back-office.yaml#BO-284 |
+| Sandbox client / Production client | A developer's own test credential; a TICVAI-issued live credential after certification. | Test key, Live key, API key (without environment) | DI-927 |
+| Asset (DAM) / Media (ticket) | A digital file in the library; ticket media is a wristband or card carrying entitlements. Never mix them. | Media (for a library asset) | contracts/satellite/assets.yaml#searchMedia … |
+
+
 ## The screens
 
 Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs count fields; requirements are matrix rows; meeting inputs are the ones naming the screen (the module and platform ones are below); white label says whether the tenant's brand reaches it (guest) or it sets the brand (configures).
@@ -68,13 +97,13 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `DEV-001` | API Reference | B–D | 1 | 38 | 6 | 11 | 4 | 0 | — | notStarted (generated) |
-| `DEV-002` | Register & Organisation | A | 18 | 0 | 5 | 6 | 0 | 0 | — | notStarted (generated) |
-| `DEV-003` | Clients & Credentials | A | 15 | 20 | 6 | 17 | 4 | 0 | — | notStarted (generated) |
-| `DEV-004` | Sandbox | B–D | 14 | 33 | 6 | 20 | 3 | 0 | — | notStarted (generated) |
-| `DEV-005` | Webhooks | B–D | 9 | 28 | 6 | 13 | 0 | 0 | — | notStarted (generated) |
-| `DEV-006` | Usage & Limits | B–D | 0 | 15 | 6 | 5 | 1 | 0 | — | notStarted (generated) |
-| `DEV-007` | Marketplace Listing | B–D | 8 | 22 | 6 | 2 | 1 | 0 | — | notStarted (generated) |
-| `DEV-008` | Programme Administration | A | 43 | 17 | 6 | 4 | 0 | 0 | — | notStarted (generated) |
+| `DEV-002` | Register & Organisation | A | 12 | 0 | 5 | 6 | 0 | 0 | — | notStarted (generated) |
+| `DEV-003` | Clients & Credentials | A | 15 | 16 | 6 | 17 | 4 | 0 | — | notStarted (generated) |
+| `DEV-004` | Sandbox | B–D | 14 | 31 | 6 | 20 | 3 | 0 | — | notStarted (generated) |
+| `DEV-005` | Webhooks | B–D | 9 | 21 | 6 | 13 | 0 | 0 | — | notStarted (generated) |
+| `DEV-006` | Usage & Limits | B–D | 0 | 14 | 6 | 5 | 1 | 0 | — | notStarted (generated) |
+| `DEV-007` | Marketplace Listing | B–D | 8 | 20 | 6 | 2 | 1 | 0 | — | notStarted (generated) |
+| `DEV-008` | Programme Administration | A | 41 | 24 | 6 | 4 | 0 | 0 | — | notStarted (generated) |
 
 ---
 
@@ -100,6 +129,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 **What the spec says about it.** CF-135. **A portal over artefacts that already exist**, which is why this is frontend scope rather than a contract gap — the twelve domain-13 rows left open after the contract landed are all this screen and its siblings. **The API reference.** A developer arrives at the documentation, not at a sign-up form — registration is what they do after reading. **Declared 20 August** — `isEntryPoint` existed in the schema and five platforms used none, so every screen in them read as unreachable.
 
+**From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** The API reference grouped by licensable module then contract, with versions, changelog per version and "Try it" against the developer's sandbox. A link to an operation opens at that operation.
+
 #### Inputs: what the user enters or picks
 
 **On the screen**
@@ -112,7 +143,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | Filter | Drawn as | Default | Allowed values, rules | Source |
 |---|---|---|---|---|
-| Module | select | — | Tickets and booking · Membership · Events · Attractions · Virtual queue · Dining and fnb · Shop · Parking · Gamification · Photo gallery · Wallet · Loyalty … | `listApiScopes` ?module |
+| Module | field | — | — | `listApiScopes` ?module |
 
 #### Outputs: what the screen shows and produces
 
@@ -170,7 +201,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|---|
 | Items | list or chips (count when long) | — |
 | Scope | text | e.g. `ticketing.read`. |
-| Module | chip: Tickets and booking, Membership, Events, Attractions, Virtual queue, Dining and fnb… | `visitPlanner` (decided 29 September, MOB-1 and the Plan tab in Block A) is the Plan tab and WEB-050; off, the tab and the page are not … |
+| Module | text | — |
 | Access | chip: Read, Write | — |
 | Description | text | — |
 | Operations | list or chips (count when long) | — |
@@ -185,6 +216,10 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
 | Try it (primary button) | navigation or local | — | — | — | — |
+
+**Rules for what is shown** (from the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process; these refine the tables above and win where they differ)
+
+- **Versions**: Status (current, deprecated with sunset date, retired), minimum notice months and migration guide; breaking changes marked in the changelog. *(source: contracts/satellite/public-api.yaml#listApiVersions; ADR-0026)*
 
 **Data it reads**: `listApiVersions` (onLoad, Which versions exist and which is current); `listApiScopes` (onLoad, The module scope catalogue the reference is grouped by)
 
@@ -204,6 +239,17 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Empty, no results (`?state=emptyNoResults`) | No operation matches this search. **Search covers the summary and the description**, not just the operationId, because a developer looking for *"how do I refund"* does not know it is called `createRefund`. |
 | Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `DEVELOPER_VIEW`, which `listApiVersions` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+versions:
+- version: v1
+  status: current
+  releasedAt: 01/12/2026
+```
 
 #### Permissions
 
@@ -280,7 +326,21 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | `developerId` (deepLink) · cold entry: **A partner link resolves within that partner's own scope and refuses outside it.** A forwarded link between partners must not open another partner's record. … |
 | Route | `/developer/organisation` |
 
-**What the spec says about it.** 13.1.6 to 13.1.10. **The organisation administers its own people** — Softlabs maintaining every integrator's staff list is Softlabs doing their HR.
+**What the spec says about it.** 13.1.6 to 13.1.10. **The organisation administers its own people** — Softlabs maintaining every integrator's staff list is Softlabs doing their HR. **Form rebuilt 2 October 2026 (CHG-SOT-014, design-notes corrections DEV-002).** Registration asks name, email, website and country; the eight raw schema names (id, status, verifiedAt, partnerId among them) are gone from the form. Never `id` or `status`: the id is a client UUIDv7 generated silently and the status is the server's.
+
+**From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** An integrator registers their organisation (not a personal account) and its owner manages who in it may do what: owner, admin, developer, read-only. Registration is pending until TICVAI verifies it; nothing is provisioned before that, because an unverified account with live credentials is an open door.
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- registerDeveloper requires DEVELOPER_VIEW with audience public. (CHG-SOT-016)
+
+**Fixed on main** (the package already carries these; draw what it says): Text fields for id, status, verifiedAt and partnerId. (CHG-SOT-014); 8 text fields are raw schema property names, not inputs: id, organisationName, contactEmail, websiteUrl, countryCode, partnerId, status … (CHG-SOT-014).
+
+#### Decided on this screen
+
+Answered questions: draw the decision, not the old default. Where a decision and the tables below differ, the decision wins.
+
+- **Which door does a developer sign in through? P14 belongs to TICVAI Control, whose doors are ADM-001 (platform staff) and PTR-001 (partners).** → Drawn default accepted: Developers sign in through the partner door with a developer account; draw a "Sign in to the Developer Portal" variant of PTR-001. *(decided by Chinmay, 2026-10-02; DEC-096 / CHG-NOTE-005)*
 
 #### Inputs: what the user enters or picks
 
@@ -288,16 +348,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
 |---|---|---|---|---|---|---|---|
-| id | picker: choose an id (drawn as a picker, not a text box) | optional | — | — | shows names, sends the id | — | `DeveloperAccount.id` |
-| organisationName | text field | optional | — | — | — | — | `DeveloperAccount.organisationName` |
-| contactEmail | email field | optional | — | — | name@example.ae | — | `DeveloperAccount.contactEmail` |
-| websiteUrl | text field | optional | — | — | — | — | `DeveloperAccount.websiteUrl` |
-| countryCode | text field | optional | — | — | — | — | `DeveloperAccount.countryCode` |
-| partnerId | picker: choose a partner (drawn as a picker, not a text box) | optional | — | — | shows names, sends the id | Where this developer is also a commercial partner. The link exists and the two are not the same record, which is what CF-135a was about. | `DeveloperAccount.partnerId` |
-| status | radio group | optional | — | Pending · Verified · Suspended · Closed | — | — | `DeveloperAccount.status` |
-| verifiedAt | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `DeveloperAccount.verifiedAt` |
-| Organisation name | text field | — | — | — | — | — | — |
-| Contact email | text field | — | — | — | — | — | — |
+| Organisation name | text field | optional | — | — | — | — | `DeveloperAccount.organisationName` |
+| Contact email | email field | optional | — | — | name@example.ae | Where the verification email goes. | `DeveloperAccount.contactEmail` |
+| Website | text field | optional | — | — | — | — | `DeveloperAccount.websiteUrl` |
+| Country | text field | optional | — | — | — | — | `DeveloperAccount.countryCode` |
 
 **Form: Save developer members** (modal, opened by *Save developer members*; *Save developer members* calls `setDeveloperMembers`, *Cancel* sends nothing)
 
@@ -319,9 +373,16 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Country code `countryCode` | text field | optional | — | — | — | — | `registerDeveloper` body |
 | Partner `partnerId` | picker: choose a partner | optional | — | — | shows names, sends the id | Where this developer is also a commercial partner. The link exists and the two are not the same record, which is what CF-135a was about. | `registerDeveloper` body |
 
+**Rules for these inputs** (from the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process; these refine the tables above and win where they differ)
+
+- **Organisation**: Organisation name, contact email (verified by email), website, country; the person registering becomes owner. *(source: contracts/satellite/public-api.yaml#registerDeveloper; F27 step 2)*
+- **Members**: Invite by email with a role (owner, admin, developer, read-only); at least one owner always remains. *(source: contracts/satellite/public-api.yaml#setDeveloperMembers)*
+
 #### Outputs: what the screen shows and produces
 
 **Shown**
+
+**Registration status** (banner): Shown after registering: "Pending: check your email" until the email is verified, then "Verified on <date>" (`DeveloperAccount.status`, `verifiedAt`). The partner link (`partnerId`) is set by TICVAI, never typed.
 
 **Data table** (data table): Role per member — owner, admin, developer, read-only.
 
@@ -332,6 +393,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Invite (primary button) | navigation or local | — | — | — | — |
 | Register developer (primary button) | `registerDeveloper` POST `/developers` | DeveloperAccount | DeveloperAccount | — | — |
 | Save developer members (secondary button) | `setDeveloperMembers` PUT `/developers/{developerId}/members` | inline | inline | — | opens modal first |
+
+**Rules for what is shown** (from the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process; these refine the tables above and win where they differ)
+
+- **Verification status**: Pending, verified (with date), suspended or closed, and what pending means ("we review within 2 working days; you can explore the docs and sandbox meanwhile"). *(source: contracts/satellite/public-api.yaml#/components/schemas/DeveloperAccount)*
 
 **Where the user goes next**
 
@@ -346,6 +411,29 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Empty, first run (`?state=emptyFirstRun`) | **You are the first member and you are the owner.** An integration outlives the engineer who built it, so this is an organisation rather than a personal account — and the invite action is the point of the state. |
 | Permission denied (`?state=emptyNoAccess`) | **You are a member and not an owner.** Stated plainly rather than shown as an empty list, because a developer who sees no colleagues assumes the page is broken. |
 | Offline (`?state=offline`) | online only |
+
+#### Consistency with other screens
+
+- Match `DEV-003`: Clients are created after verification.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+organisation:
+  name: Gulf Kiosk Systems FZ-LLC
+  contactEmail: dev@gulfkiosk.ae
+  country: AE
+  status: pending
+members:
+- name: Nadia Farouk
+  email: nadia@gulfkiosk.ae
+  role: owner
+- name: Karim Youssef
+  email: karim@gulfkiosk.ae
+  role: developer
+```
 
 #### Permissions
 
@@ -385,13 +473,14 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (18), with its required mark, default, format and its error state.
+- [ ] Every input above is drawn (12), with its required mark, default, format and its error state.
 - [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#DEV-002?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Invite, Register developer, Save developer members.
 - [ ] Every transition is wired: `DEV-003`.
 - [ ] Every gated control is gated: `DEVELOPER_MANAGE`, `DEVELOPER_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 1 decision(s) taken on this screen are drawn as decided, not as the old default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -414,6 +503,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **What the spec says about it.** CF-135a. **The one credential model** — 2.7.52, 7.1.25 and 7.1.30 each asserted their own. **Rotation carries an overlap window and revocation does not**: one is hygiene, the other is what you reach for when a secret has leaked, and a grace period defeats it.
 
+**From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** A developer creates sandbox clients, picks scopes by module, takes the secret once, rotates with an overlap window or revokes at once, and requests production access for a certified integration. Production clients are never created here; TICVAI issues them on an approved request.
+
+**Fixed on main** (the package already carries these; draw what it says): formCreateApiClient requires id, status and environment and offers lastUsedAt. (CHG-SOT-014); Tables show every schema field, plumbing included: 'Every API client' drop id, developerId, clientId, allowedTenantIds. (CHG-SOT-014).
+
 #### Inputs: what the user enters or picks
 
 **On the screen**
@@ -426,11 +519,11 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | Filter | Drawn as | Default | Allowed values, rules | Source |
 |---|---|---|---|---|
-| Module | select | — | Tickets and booking · Membership · Events · Attractions · Virtual queue · Dining and fnb · Shop · Parking · Gamification · Photo gallery · Wallet · Loyalty … | `listApiScopes` ?module |
+| Module | field | — | — | `listApiScopes` ?module |
 
 **Form: Create API client** (modal, opened by *Create API client*; *Create API client* calls `createApiClient`, *Cancel* sends nothing)
 
-**Collects what `createApiClient` sends before it is called.** Required: `id`, `developerId`, `name`, `environment`, `scopes`, `status`. Optional: `clientId`, `allowedTenantIds`, `ipAllowList`, `lastUsedAt`. Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `createApiClient` sends before it is called.** The person enters `name` and picks `scopes` (by module); `ipAllowList` is optional. **The environment is sandbox here**: a production client is issued by TICVAI after certification (DI-927, F36 step 5), so the form offers no environment choice. `developerId` comes from the session. Never `id` or `status`: the id is a client UUIDv7 generated silently and the status is the server's. `lastUsedAt` is the server's and never asked. Dismissing sends nothing; the screen behind is unchanged.
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
@@ -467,21 +560,24 @@ Errors to draw in the form: 409 A `production` client without a current certific
 
 Errors to draw in the form: 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 The listing is not certified, or its certification has lapsed (`certification-required`); or the client is not a sandbox client, or a request for it is already …; 422 An empty `ipAllowList` (`ip-allow-list-required`) or an unknown scope (`unknown-scope`).
 
+**Rules for these inputs** (from the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process; these refine the tables above and win where they differ)
+
+- **Create client**: Name and scopes only; environment fixed to sandbox and shown as such; the client id and status are the server's. *(source: contracts/satellite/public-api.yaml#createApiClient; DI-927)*
+- **Scopes**: Grouped by module, {module}.read and {module}.write; unlicensed modules shown disabled with "not licensed by any tenant you work for", not hidden. *(source: DI-926; contracts/satellite/public-api.yaml#listApiScopes)*
+- **Rotate**: Overlap hours for the old secret (hygiene); Revoke has no overlap (a leak). *(source: contracts/satellite/public-api.yaml#rotateApiCredential)*
+- **Request production access**: The certified listing, tenants, scopes and at least one IP allow-list address; the form says a new production key will be issued and the sandbox key stays sandbox. *(source: DI-927; DI-928; F36 step 4)*
+
 #### Outputs: what the screen shows and produces
 
 **Shown**
 
-**Every API client** (data table, from `listApiClients`)
+**Every API client** (data table, from `listApiClients`): Name, environment, scopes, IP allow-list, status and last used. The client id and the developer are in the detail panel, with a copy action; allowed tenants are shown by venue name there (design-notes correction DEV-003).
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Developer | the name it points at, never the id | — |
 | Name | text | — |
-| Client | text | — |
 | Environment | chip: Sandbox, Production | Bound to one, stated on the object rather than by naming convention. A key that works in both is a key somebody will use in the wrong one. |
 | Scopes | list or chips (count when long) | Resolved against the tenant's licence at token issue (13.3.24). A scope granted here and not licensed there produces no token — and the … |
-| Allowed tenants | list or chips (count when long) | 13.1.46. Which tenants this client may act for. |
 | Ip allow list | list or chips (count when long) | 13.1.38. Required on a production client (17 September minutes, M17-07: endpoints are protected by IP allow-listing, not left open to the … |
 | Status | chip: Active, Suspended, Revoked | — |
 | Last used at | 1 Oct 2026, 14:30 | A credential unused for a year is a credential nobody will notice being stolen. |
@@ -515,6 +611,12 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 | Revoke API credential (destructive button) | `revokeApiCredential` DELETE `/api-clients/{clientId}/credentials` | — | — | — | — |
 | Request production access (secondary button) | `requestProductionAccess` POST `/api-clients/{clientId}/production-access` | inline | ProductionAccessRequest | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 The listing is not certified, or its certification has lapsed (`certification-required`); or the client is not … | opens modal first |
 
+**Rules for what is shown** (from the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process; these refine the tables above and win where they differ)
+
+- **Environment**: A column in words (Sandbox / Production) with distinct styling; a sandbox and a production key must not look alike. *(source: screens/P14-developer-portal.yaml#DEV-003)*
+- **Secret**: Shown once at creation or rotation, with copy; the banner says so before it is generated. *(source: F27 step 3)*
+- **Production access status**: Sandbox only, requested (pending), approved, or rejected with the reason. *(source: DI-927)*
+
 **Data it reads**: `listApiClients` (onLoad, Clients with their environment and scopes); `listApiScopes` (onLoad, Scopes to choose from, by module)
 
 **Where the user goes next**
@@ -538,6 +640,38 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 | Permission denied (`?state=emptyNoAccess`) | You are a read-only member. Credentials are hidden, not absent. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 A `production` client without a current certification, or asked for by a developer rather than issued by TICVAI (`certification-required`, M17-06).; 409 The listing is not certified, or its certification has lapsed (`certification-required`); or the client is not a sandbox client, or a request for it is already …; 422 A `production` client with an empty `ipAllowList` … |
+
+#### Edge cases to draw
+
+- **Can read but not change (holds DEVELOPER_VIEW only)**: Everything reads; the actions needing another permission are not offered as live buttons: DEVELOPER_MANAGE for Create API client, Rotate API credential, Revoke API credential. Where the person would reasonably expect the action, it shows disabled with the permission named. The server refuses with 403 forbidden regardless. *(source: contracts/satellite/public-api.yaml#createApiClient)*
+- **createApiClient answers 409**: Show it as something the person can act on, not a failure: A `production` client without a current certification, or asked for by a developer rather than issued by TICVAI (`certification-required`, M17-06). Use `requestProductionAccess`. *(source: contracts/satellite/public-api.yaml#createApiClient)*
+- **createApiClient answers 422**: Show it as something the person can act on, not a failure: A `production` client with an empty `ipAllowList` (`ip-allow-list-required`, M17-07), or a scope that is not in the scope catalogue (`unknown-scope`, M17-05). *(source: contracts/satellite/public-api.yaml#createApiClient)*
+- **requestProductionAccess answers 409**: Show it as something the person can act on, not a failure: The listing is not certified, or its certification has lapsed (`certification-required`); or the client is not a sandbox client, or a request for it is already pending (`production-access-pending`). *(source: contracts/satellite/public-api.yaml#requestProductionAccess)*
+- **requestProductionAccess answers 422**: Show it as something the person can act on, not a failure: An empty `ipAllowList` (`ip-allow-list-required`) or an unknown scope (`unknown-scope`). *(source: contracts/satellite/public-api.yaml#requestProductionAccess)*
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+clients:
+- name: Kiosk connector (test)
+  environment: Sandbox
+  scopes:
+  - ticketing.read
+  - orders.write
+  status: active
+  lastUsed: 01/10/2026 08:40
+  expires: 30/12/2026
+- name: Kiosk connector
+  environment: Production
+  issuedBy: TICVAI
+  tenants:
+  - Marina Leisure Group
+  ipAllowList:
+  - 185.53.2.10
+  expires: 30/09/2027
+```
 
 #### Permissions
 
@@ -599,12 +733,13 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (15), with its required mark, default, format and its error state (404, 409, 422).
-- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (16 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#DEV-003?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Create client, Create API client, Rotate API credential, Revoke API credential, Request production access.
 - [ ] Every transition is wired: `DEV-005`, `DEV-004`, `DEV-008`.
 - [ ] Every gated control is gated: `DEVELOPER_MANAGE`, `DEVELOPER_VIEW`.
 - [ ] The 4 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 5 edge case(s) from the process notes are drawn.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -626,6 +761,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Route | `/developer/sandbox` |
 
 **What the spec says about it.** Decisions D2 and D3. **One shared sandbox, synthetic data only** — which removes the PDPL and DESC exposure entirely. Tenant-specific validation runs on per-customer staging.
+
+**From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** A developer's sandboxes with synthetic data: create, reset to a known state, see expiry. Sandboxes never contain production data. Production access is requested from the client, not promoted from a sandbox.
+
+**Fixed on main** (the package already carries these; draw what it says): "Promote to production" on the sandbox. (CHG-SOT-014); Tables show every schema field, plumbing included: 'Every sandbox' drop id, developerId. (CHG-SOT-014).
 
 #### Inputs: what the user enters or picks
 
@@ -651,7 +790,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Locale `dataProfile.locale` | text field | optional | en-AE | — | — | — | `createSandbox` body |
 | Expires after days `expiresAfterDays` | number field (days) | optional | 90 | — | — | — | `createSandbox` body |
 
-**Form: Promote to production** (modal, opened by *Promote to production*; *Promote to production* calls `requestProductionAccess`, *Cancel* sends nothing)
+**Form: Request production access** (modal, opened by *Request production access*; *Promote to production* calls `requestProductionAccess`, *Cancel* sends nothing)
 
 **Collects what `requestProductionAccess` sends before it is called.** Required: `listingId`, `scopes`, `allowedTenantIds`, `ipAllowList`. Optional: `note`.
 
@@ -673,9 +812,7 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Name | text | — |
-| Developer | the name it points at, never the id | — |
 | Status | chip: Provisioning, Active, Resetting, Expired, Deleted | — |
 | Data profile | grouped details | 13.2.5 and 13.2.13. What the synthetic dataset contains, so a developer can test against a shape that resembles a real venue without any of … |
 | Contains production data | yes / no (icon or chip) | Always false, and stated rather than assumed (D2). No cloning, no masking. |
@@ -729,7 +866,7 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 | Reset (secondary button) | navigation or local | — | — | — | — |
 | Create sandbox (primary button) | `createSandbox` POST `/sandboxes` | inline | Sandbox | — | opens modal first |
 | Reset sandbox (destructive button) | `resetSandbox` POST `/sandboxes/{sandboxId}/reset` | — | Sandbox | — | — |
-| Promote to production (secondary button) | `requestProductionAccess` POST `/api-clients/{clientId}/production-access` | inline | ProductionAccessRequest | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 The listing is not certified, or its certification has lapsed (`certification-required`); or the client is not … | opens modal first |
+| Request production access (secondary button) | `requestProductionAccess` POST `/api-clients/{clientId}/production-access` | inline | ProductionAccessRequest | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 The listing is not certified, or its certification has lapsed (`certification-required`); or the client is not … | opens modal first |
 
 **Data it reads**: `listSandboxes` (onLoad, Sandboxes and their expiry); `listProductionAccessRequests` (onLoad, The path to production and its state)
 
@@ -753,6 +890,32 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 | Permission denied (`?state=emptyNoAccess`) | You do not have DEVELOPER_MANAGE. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 The listing is not certified, or its certification has lapsed (`certification-required`); or the client is not a sandbox client, or a request for it is already …; 422 An empty `ipAllowList` (`ip-allow-list-required`) or an unknown scope (`unknown-scope`). |
+
+#### Edge cases to draw
+
+- **Can read but not change (holds DEVELOPER_VIEW only)**: Everything reads; the actions needing another permission are not offered as live buttons: DEVELOPER_MANAGE for Create sandbox, Reset sandbox, Promote to production. Where the person would reasonably expect the action, it shows disabled with the permission named. The server refuses with 403 forbidden regardless. *(source: contracts/satellite/public-api.yaml#createSandbox)*
+- **requestProductionAccess answers 409**: Show it as something the person can act on, not a failure: The listing is not certified, or its certification has lapsed (`certification-required`); or the client is not a sandbox client, or a request for it is already pending (`production-access-pending`). *(source: contracts/satellite/public-api.yaml#requestProductionAccess)*
+- **requestProductionAccess answers 422**: Show it as something the person can act on, not a failure: An empty `ipAllowList` (`ip-allow-list-required`) or an unknown scope (`unknown-scope`). *(source: contracts/satellite/public-api.yaml#requestProductionAccess)*
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+Every sandbox:
+- name: Kiosk connector (sandbox)
+  status: active
+  expiresAt: 31/12/2026 23:59
+  lastResetAt: 01/10/2026 09:14
+- name: OTA availability feed
+  status: pending
+  expiresAt: 15/10/2026 00:00
+  lastResetAt: 30/09/2026 18:02
+- name: Wallet sync
+  status: suspended
+  expiresAt: 01/11/2026 06:00
+  lastResetAt: 28/09/2026 11:45
+```
 
 #### Permissions
 
@@ -808,12 +971,13 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (14), with its required mark, default, format and its error state (404, 409, 422).
-- [ ] Every output is drawn (33 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (31 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#DEV-004?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: Provision sandbox, Reset, Create sandbox, Reset sandbox, Promote to production.
+- [ ] Every action is wired with its success and its failure: Provision sandbox, Reset, Create sandbox, Reset sandbox, Request production access.
 - [ ] Every transition is wired: `DEV-005`, `DEV-007`.
 - [ ] Every gated control is gated: `DEVELOPER_MANAGE`, `DEVELOPER_VIEW`.
 - [ ] The 3 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 3 edge case(s) from the process notes are drawn.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -836,6 +1000,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **What the spec says about it.** 13.1.26 to 13.1.30, 13.3.17 to 13.3.23. **The 29 events already existed and nothing outside could receive one.**
 
+**From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** A developer's webhook subscriptions, every delivery with status and response, and replay of missed events from a point in time. The signing secret is shown once.
+
+**Fixed on main** (the package already carries these; draw what it says): The subscription table shows signingSecret. (CHG-SOT-014); formCreateWebhookSubscription asks the person for status, id. (CHG-SOT-014); Tables show every schema field, plumbing included: 'Every webhook subscription' drop id, clientId; 'Every webhook delivery' drop id … (CHG-SOT-014).
+
 #### Inputs: what the user enters or picks
 
 **On the screen**
@@ -852,7 +1020,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Form: Create webhook subscription** (modal, opened by *Create webhook subscription*; *Create webhook subscription* calls `createWebhookSubscription`, *Cancel* sends nothing)
 
-**Collects what `createWebhookSubscription` sends before it is called.** Required: `id`, `clientId`, `endpointUrl`, `eventTypes`, `status`. Optional: `filters`, `signingSecret`, `consecutiveFailures`, `disabledReason`. Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `createWebhookSubscription` sends before it is called.** The person picks the API client (by name) and enters `endpointUrl`, `eventTypes` and optional `filters`. Never `id` or `status`: the id is a client UUIDv7 generated silently and the status is the server's. `signingSecret`, `consecutiveFailures` and `disabledReason` are the server's: the secret is returned once in the response and shown then. Dismissing sends nothing; the screen behind is unchanged.
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
@@ -882,12 +1050,9 @@ Errors to draw in the form: 422 An entry in `eventTypes` is not in the webhook e
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Client | the name it points at, never the id | — |
 | Endpoint URL | text | — |
 | Event types | list or chips (count when long) | Filtered at subscription, not at delivery. A subscriber taking every event and discarding 99% is a subscriber the platform pays to talk to. |
 | Filters | grouped details | 13.3.22. Tenant, venue, or a business condition on the payload. |
-| Signing secret | text | How the receiver knows it was TICVAI. Without a signature an endpoint accepts a ticket-sale event from anybody who learns the URL. |
 | Status | chip: Pending verification, Active, Paused, Failing, Disabled | — |
 | Consecutive failures | 1,234 | — |
 | Disabled reason | text | 13.1.29. An endpoint failing for days is disabled rather than retried forever, and the developer is told — a queue growing against a dead … |
@@ -896,9 +1061,6 @@ Errors to draw in the form: 422 An entry in `eventTypes` is not in the webhook e
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Subscription | the name it points at, never the id | — |
-| Event | the name it points at, never the id | — |
 | Event type | text | — |
 | Status | chip: Pending, Delivered, Failed, Retrying, Abandoned | — |
 | Attempt count | 1,234 | — |
@@ -909,7 +1071,7 @@ Errors to draw in the form: 422 An entry in `eventTypes` is not in the webhook e
 
 **Data table** (data table): Status, attempts, response code and an excerpt of the receiver's own error. **The excerpt is what makes the log useful** — a 500 with their own message in it answers the question without a support conversation.
 
-**The selected webhook subscription** (detail panel, from `listWebhookSubscriptions`)
+**The selected webhook subscription** (detail panel, from `listWebhookSubscriptions`): **The signing secret is shown once, at creation**, in the confirmation, with a copy action; afterwards it is never displayed (a secret in a list is a leak). The API client is shown by name.
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -918,7 +1080,6 @@ Errors to draw in the form: 422 An entry in `eventTypes` is not in the webhook e
 | Endpoint URL | text | — |
 | Event types | list or chips (count when long) | Filtered at subscription, not at delivery. A subscriber taking every event and discarding 99% is a subscriber the platform pays to talk to. |
 | Filters | grouped details | 13.3.22. Tenant, venue, or a business condition on the payload. |
-| Signing secret | text | How the receiver knows it was TICVAI. Without a signature an endpoint accepts a ticket-sale event from anybody who learns the URL. |
 | Status | chip: Pending verification, Active, Paused, Failing, Disabled | — |
 | Consecutive failures | 1,234 | — |
 | Disabled reason | text | 13.1.29. An endpoint failing for days is disabled rather than retried forever, and the developer is told — a queue growing against a dead … |
@@ -950,6 +1111,31 @@ Errors to draw in the form: 422 An entry in `eventTypes` is not in the webhook e
 | Permission denied (`?state=emptyNoAccess`) | You do not have DEVELOPER_VIEW. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 422 An entry in `eventTypes` is not in the webhook event catalogue. |
+
+#### Edge cases to draw
+
+- **Can read but not change (holds DEVELOPER_VIEW only)**: Everything reads; the actions needing another permission are not offered as live buttons: DEVELOPER_MANAGE for Create webhook subscription, Replay events. Where the person would reasonably expect the action, it shows disabled with the permission named. The server refuses with 403 forbidden regardless. *(source: contracts/satellite/public-api.yaml#createWebhookSubscription)*
+- **createWebhookSubscription answers 422**: Show it as something the person can act on, not a failure: An entry in `eventTypes` is not in the webhook event catalogue. *(source: contracts/satellite/public-api.yaml#createWebhookSubscription)*
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+listWebhookDeliveries (WebhookDelivery):
+- status: active
+  attemptCount: 12
+  responseCode: 12
+  isReplay: true
+  isTest: true
+  deliveredAt: 01/10/2026 09:14
+- status: pending
+  attemptCount: 3
+  responseCode: 3
+  isReplay: false
+  isTest: false
+  deliveredAt: 30/09/2026 18:02
+```
 
 #### Permissions
 
@@ -1000,12 +1186,13 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (9), with its required mark, default, format and its error state (422).
-- [ ] Every output is drawn (28 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (21 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#DEV-005?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Replay from…, Create webhook subscription, Replay events.
 - [ ] Every transition is wired: `DEV-006`.
 - [ ] Every gated control is gated: `DEVELOPER_MANAGE`, `DEVELOPER_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 2 edge case(s) from the process notes are drawn.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -1027,6 +1214,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Route | `/developer/usage` |
 
 **What the spec says about it.** 13.1.16 to 13.1.20 and 13.1.41 to 13.1.45. **One screen for five requirements, because they are one question asked five ways.**
+
+**From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** Usage against quota and flagged anomalies for the developer's clients, so they can tell whose fault a failure is.
+
+**Fixed on main** (the package already carries these; draw what it says): Tables show every schema field, plumbing included: 'Flagged traffic' drop clientId. (CHG-SOT-014).
 
 #### Inputs: what the user enters or picks
 
@@ -1065,11 +1256,10 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Data table** (data table): Per operation, sorted by error rate rather than by volume.
 
-**Flagged traffic** (data table, from `listApiAnomalies`): **Abnormal volume on your own clients** (17 September minutes, M17-07), so a runaway integration is seen here before a venue calls.
+**Flagged traffic** (data table, from `listApiAnomalies`): **Abnormal volume on your own clients** (17 September minutes, M17-07), so a runaway integration is seen here before a venue calls. The API client is shown by name, not by `clientId` (design-notes correction DEV-006).
 
 | Shows | Format | Notes |
 |---|---|---|
-| Client | the name it points at, never the id | — |
 | Measure | text | — |
 | Observed | 1,234.5 | — |
 | Baseline | 1,234.5 | — |
@@ -1092,6 +1282,30 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | No calls in this window. |
 | Permission denied (`?state=emptyNoAccess`) | You do not have DEVELOPER_VIEW. |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+getApiUsage (ApiUsageSummary):
+- totalCalls: 12
+  successRate: 12
+  clientErrorRate: 12
+  serverErrorRate: 12
+  p50LatencyMs: 12
+  p95LatencyMs: 12
+  p99LatencyMs: 12
+  quotaBreaches: 12
+- totalCalls: 3
+  successRate: 3
+  clientErrorRate: 3
+  serverErrorRate: 3
+  p50LatencyMs: 3
+  p95LatencyMs: 3
+  p99LatencyMs: 3
+  quotaBreaches: 3
+```
 
 #### Permissions
 
@@ -1133,7 +1347,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (15 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (14 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#DEV-006?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `DEV-007`.
@@ -1161,11 +1375,15 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **What the spec says about it.** 13.1.49 and 13.1.50, decision D1. **A listing, not an installation** — the integration runs on the developer's own infrastructure, and third-party code does not execute inside TICVAI.
 
+**From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** The developer's view of support and status for the API.
+
+**Fixed on main** (the package already carries these; draw what it says): formSubmitIntegrationListing asks the person for status, id. (CHG-SOT-014); Tables show every schema field, plumbing included: 'Every integration listing' drop id, developerId. (CHG-SOT-014).
+
 #### Inputs: what the user enters or picks
 
 **Form: Submit integration listing** (modal, opened by *Submit integration listing*; *Submit integration listing* calls `submitIntegrationListing`, *Cancel* sends nothing)
 
-**Collects what `submitIntegrationListing` sends before it is called.** Required: `id`, `developerId`, `name`, `category`, `status`. Optional: `description`, `integrationUrl`, `requiredScopes`, `certifiedUntil`, `certifiedAgainstVersion`, `listingFeeModel`. Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `submitIntegrationListing` sends before it is called.** The person enters `name`, `category`, `description`, `integrationUrl` and the `requiredScopes`, and chooses `visibility`. `developerId` comes from the session. Never `id` or `status`: the id is a client UUIDv7 generated silently and the status is the server's. Certification fields (`certifiedUntil`, `certifiedAgainstVersion`) and `listingFeeModel` are set by TICVAI on DEV-008. Dismissing sends nothing.
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
@@ -1186,8 +1404,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Developer | the name it points at, never the id | — |
 | Name | text | — |
 | Category | chip: Crm, Marketing, Accounting, Hotel, Transport, Analytics… | — |
 | Description | text | — |
@@ -1240,6 +1456,30 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Permission denied (`?state=emptyNoAccess`) | You do not have DEVELOPER_MANAGE. |
 | Offline (`?state=offline`) | online only |
 
+#### Edge cases to draw
+
+- **Can read but not change (holds DEVELOPER_VIEW only)**: Everything reads; the actions needing another permission are not offered as live buttons: DEVELOPER_MANAGE for Submit integration listing. Where the person would reasonably expect the action, it shows disabled with the permission named. The server refuses with 403 forbidden regardless. *(source: contracts/satellite/public-api.yaml#submitIntegrationListing)*
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+Every integration listing:
+- name: Kiosk connector (sandbox)
+  description: Guest charged twice at Main Gate Till 3
+  status: active
+  certifiedUntil: 31/12/2026 23:59
+- name: OTA availability feed
+  description: Group of 40 from Desert Gate Tours
+  status: pending
+  certifiedUntil: 15/10/2026 00:00
+- name: Wallet sync
+  description: Annual pass upgrade for the Al Nuaimi family
+  status: suspended
+  certifiedUntil: 01/11/2026 06:00
+```
+
 #### Permissions
 
 - `listIntegrationListings` → `DEVELOPER_VIEW` (read) · public, staff, partner
@@ -1280,12 +1520,13 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (8), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (22 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#DEV-007?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Submit for certification, Submit integration listing.
 - [ ] Every transition is wired: `DEV-008`.
 - [ ] Every gated control is gated: `DEVELOPER_MANAGE`, `DEVELOPER_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 1 edge case(s) from the process notes are drawn.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -1306,7 +1547,15 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | `listingId` (deepLink), `version` (deepLink), `requestId` (navigation) · cold entry: **A version link is expected to point at something superseded — that is what versions are for.** The screen opens the requested version read-only, says it is … |
 | Route | `/developer/admin` |
 
-**What the spec says about it.** **`DEVELOPER_ADMIN` throughout, and never shown to a developer.** Decision D5 makes the commercial model configuration rather than code — this is the surface, and the rates themselves remain CF-135c. **Staff audience on a partner platform, and deliberately.** Every operation here — `setApiQuota`, `certifyIntegration`, `setApiLicensing`, `deprecateApiVersion` — is **Softlabs administering the programme, not a developer self-serving.** A developer who could set their own quota has no quota. **Declared on the screen rather than the platform** because P14 is a partner surface with one staff screen on it, and moving the screen to P09 would separate the console from the catalogue it governs. `check-screens` reads `screen.audience` before the platform’s.
+**What the spec says about it.** **`DEVELOPER_ADMIN` throughout, and never shown to a developer.** Decision D5 makes the commercial model configuration rather than code — this is the surface, and the rates themselves remain CF-135c. **Staff audience on a partner platform, and deliberately.** Every operation here — `setApiQuota`, `certifyIntegration`, `setApiLicensing`, `deprecateApiVersion` — is **Softlabs administering the programme, not a developer self-serving.** A developer who could set their own quota has no quota. **Declared on the screen rather than the platform** because P14 is a partner surface with one staff screen on it, and moving the screen to P09 would separate the console from the catalogue it governs. `check-screens` reads `screen.audience` before the platform’s. **Quota form labelled 2 October 2026 (CHG-SOT-014, design-notes correction DEV-008):** number fields with units and a client picker replace the raw schema names; the quota id is the server's.
+
+**From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** TICVAI's programme administration behind the developer portal: per-client quotas, certification of integrations (with an end date), the production-access queue, anomaly rules, API licensing per tenant and version deprecation. Never shown to a developer; a developer reaching it is told plainly it is a TICVAI screen.
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- listProductionAccessRequests allows the partner audience with DEVELOPER_VIEW. (CHG-SOT-016)
+
+**Fixed on main** (the package already carries these; draw what it says): Text fields named id, clientId, sustainedPerMinute, burstPerSecond, dailyCap, perOperationOverrides, onBreach. (CHG-SOT-014).
 
 #### Inputs: what the user enters or picks
 
@@ -1314,13 +1563,11 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
 |---|---|---|---|---|---|---|---|
-| id | picker: choose an id (drawn as a picker, not a text box) | optional | — | — | shows names, sends the id | Added 20 August. The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so … | `ApiQuota.id` |
-| clientId | picker: choose a client (drawn as a picker, not a text box) | optional | — | — | shows names, sends the id | — | `ApiQuota.clientId` |
-| sustainedPerMinute | number field | optional | — | — | — | — | `ApiQuota.sustainedPerMinute` |
-| burstPerSecond | number field | optional | — | — | — | Separate from the sustained rate, because a nightly sync is a legitimate spike and a flat per-second limit either blocks it or permits the flood it was meant to stop. | `ApiQuota.burstPerSecond` |
-| dailyCap | number field | optional | — | — | — | — | `ApiQuota.dailyCap` |
-| perOperationOverrides | key and value settings | optional | — | — | — | Availability checks and order creation deserve different limits — one is cheap and polled, the other is expensive and rare. | `ApiQuota.perOperationOverrides` |
-| onBreach | segmented control | optional | Throttle | Throttle · Reject · Queue | — | — | `ApiQuota.onBreach` |
+| API client | picker: choose a client | optional | — | — | shows names, sends the id | A picker of API clients by developer and name, never a typed id. | `ApiQuota.clientId` |
+| Sustained calls per minute | number field | optional | — | — | — | — | `ApiQuota.sustainedPerMinute` |
+| Burst calls per second | number field | optional | — | — | — | Separate from the sustained rate, because a nightly sync is a legitimate spike and a flat per-second limit either blocks it or permits the flood it was meant to stop. | `ApiQuota.burstPerSecond` |
+| Daily cap (calls) | number field | optional | — | — | — | Empty for no daily cap. | `ApiQuota.dailyCap` |
+| On breach | segmented control | optional | Throttle | Throttle · Reject · Queue | — | What happens when the quota is exceeded. | `ApiQuota.onBreach` |
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
 
@@ -1345,7 +1592,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
 | Tenant `tenantId` | picker: choose a tenant | required | — | — | shows names, sends the id | — | `setApiLicensing` body |
-| Licensed modules `licensedModules` | multi-select chips | required | — | Tickets and booking · Membership · Events · Attractions · Virtual queue · Dining and fnb · Shop · Parking · Gamification · Photo gallery · Wallet · Loyalty … | — | The example in the requirement is the shape: a venue licensing the ticketing API and not the F&B one. | `setApiLicensing` body |
+| Licensed modules `licensedModules` | list of values (chips) | required | — | — | — | The example in the requirement is the shape: a venue licensing the ticketing API and not the F&B one. | `setApiLicensing` body |
 | Call allowance per month `callAllowancePerMonth` | number field | optional | — | — | — | — | `setApiLicensing` body |
 | Catalogue write exception `catalogueWriteException` | group | optional | — | — | — | M17-04: the one way a client reaches a catalogue write, set by TICVAI platform staff only (`setApiLicensing` refuses anyone else 403 `platform-staff-only`). | `setApiLicensing` body |
 | Client `catalogueWriteException.clientId` | picker: choose a client | required | — | — | shows names, sends the id | — | `setApiLicensing` body |
@@ -1408,9 +1655,28 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 | Per operation overrides `perOperationOverrides` | key and value settings | optional | — | — | — | Availability checks and order creation deserve different limits — one is cheap and polled, the other is expensive and rare. | `setApiQuota` body |
 | On breach `onBreach` | segmented control | optional | Throttle | Throttle · Reject · Queue | — | — | `setApiQuota` body |
 
+**Rules for these inputs** (from the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process; these refine the tables above and win where they differ)
+
+- **Quota**: Sustained per minute, burst per second, daily cap, per-operation overrides and the action on breach; within the tenant's request budget. *(source: contracts/satellite/public-api.yaml#setApiQuota; ADR-0064)*
+- **Decide production access**: Approve issues a new production client bound to the certified listing with its own expiry (default 365 days, 1 to 730); scopes may only be narrowed; reject needs a reason the developer can act on. *(source: contracts/satellite/public-api.yaml#decideProductionAccess; F36 step 5)*
+- **Deprecate version**: Sunset date, reason and migration guide; the banner names how many clients call it and which operations they use. *(source: contracts/satellite/public-api.yaml#deprecateApiVersion; ADR-0026)*
+- **Scope this applies at**: Not a free choice; each write has one level and the selector says it: setApiQuota, setApiLicensing, setApiAnomalyRule: tenant-wide only, no region or venue override is offered. Nearest ancestor wins; a workstation is assigned a profile, never configured. *(source: ADR-0018; ADR-0029; screens/_patterns.yaml#configEditor; contracts/satellite/public-api.yaml#setApiQuota)*
+
 #### Outputs: what the screen shows and produces
 
 **Shown**
+
+**Per-operation limits** (data table, from `setApiQuota`): An operation and its own per-minute limit, one row each.
+
+| Shows | Format | Notes |
+|---|---|---|
+| ID | the name it points at, never the id | Added 20 August. The schema reference derives table columns from API response schemas, and a response is not a table — this one returned … |
+| Client | the name it points at, never the id | — |
+| Sustained per minute | 1,234 | — |
+| Burst per second | 1,234 | Separate from the sustained rate, because a nightly sync is a legitimate spike and a flat per-second limit either blocks it or permits the … |
+| Daily cap | 1,234 | — |
+| Per operation overrides | grouped details | Availability checks and order creation deserve different limits — one is cheap and polled, the other is expensive and rare. |
+| On breach | chip: Throttle, Reject, Queue | — |
 
 **Banner** (banner): **Deprecating a version names how many clients call it and which operations they use.** A generic "v1 is retiring" to somebody using three of two hundred endpoints is a message they will ignore.
 
@@ -1469,6 +1735,40 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 Already decided (`already-decided`), or the listing's certification lapsed since the request (`certification-required`).; 422 `reject` without a `reason`. |
 
+#### Edge cases to draw
+
+- **Can read but not change (holds DEVELOPER_VIEW only)**: Everything reads; the actions needing another permission are not offered as live buttons: DEVELOPER_ADMIN for Save API quota, Certify integration, Save API licensing. Where the person would reasonably expect the action, it shows disabled with the permission named. The server refuses with 403 forbidden regardless. *(source: contracts/satellite/public-api.yaml#setApiQuota)*
+- **setApiLicensing answers 403**: Show it as something the person can act on, not a failure: `catalogueWriteException` was sent by a principal that is not TICVAI platform staff (`platform-staff-only`, M17-04). *(source: contracts/satellite/public-api.yaml#setApiLicensing)*
+- **decideProductionAccess answers 409**: Show it as something the person can act on, not a failure: Already decided (`already-decided`), or the listing's certification lapsed since the request (`certification-required`). *(source: contracts/satellite/public-api.yaml#decideProductionAccess)*
+- **decideProductionAccess answers 422**: Show it as something the person can act on, not a failure: `reject` without a `reason`. *(source: contracts/satellite/public-api.yaml#decideProductionAccess)*
+
+#### Consistency with other screens
+
+- Match `DEV-003`: The developer's request and status shown there are decided here.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+queue:
+- developer: Gulf Kiosk Systems FZ-LLC
+  listing: AquaCove Kiosk Connector v1.2
+  tenants:
+  - Marina Leisure Group
+  scopes:
+  - ticketing.read
+  - orders.write
+  ip: 185.53.2.10
+  requested: 30/09/2026
+quota:
+  client: Kiosk connector
+  sustainedPerMinute: 600
+  burstPerSecond: 20
+  dailyCap: 200000
+  onBreach: throttle
+```
+
 #### Permissions
 
 - `setApiQuota` → `DEVELOPER_ADMIN` (configure) · staff
@@ -1512,13 +1812,14 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (43), with its required mark, default, format and its error state (403, 404, 409, 422).
-- [ ] Every output is drawn (17 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (41), with its required mark, default, format and its error state (403, 404, 409, 422).
+- [ ] Every output is drawn (24 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#DEV-008?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, emptyNoResults, offline.
 - [ ] Every action is wired with its success and its failure: Approve, Reject, Save API quota, Certify integration, Save API licensing, Deprecate API version, Decide production access, Save anomaly rule.
 - [ ] Every transition is wired: `DEV-003`.
 - [ ] Every gated control is gated: `DEVELOPER_ADMIN`, `DEVELOPER_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 4 edge case(s) from the process notes are drawn.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---

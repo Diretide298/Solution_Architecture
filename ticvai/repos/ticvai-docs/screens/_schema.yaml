@@ -597,6 +597,27 @@ properties:
                 view: { type: string, description: How a reviewer reaches the view in the prototype. }
                 differences: { type: string, description: What the prototype does that this definition does not, or the reverse. }
                 note: { type: string }
+            candidate:
+              type: object
+              additionalProperties: false
+              required: [file, rev, captured, match, view]
+              description: >
+                **A build of our own that improves on the client's prototype and is not yet
+                client-approved** (added 1 October for the POS v2 build). The screen's frame is a
+                capture of this view, so its `provenance` is `designed` and its `status` is `review`;
+                `prototype` keeps the client-approved view, untouched. When the client approves the
+                build, the candidate becomes the prototype block and the provenance client-verified.
+                The file can be kept out of git (sources/designs/TICVAI_POS_Terminal_v2.html is
+                9.7 MB and excluded), so nothing checks that it is on disk: the capture in
+                `capture` and the frame in wireframes/frames/ are the record.
+              properties:
+                file: { type: string, description: The build file, relative to the package root. }
+                rev: { type: string }
+                captured: { type: string, description: The date the frame was captured from it. }
+                capture: { type: string, description: The raw capture, under wireframes/incoming/. }
+                match: { type: string, enum: [exact, partial, none] }
+                view: { type: string, description: How a reviewer reaches the view in the build. }
+                differences: { type: string, description: What the build does that this definition does not, or the reverse. }
         notes: { type: string }
         openQuestions:
           type: array

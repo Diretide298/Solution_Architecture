@@ -1,24 +1,4 @@
 {
- "AllergenCode": {
-  "type": "string",
-  "description": "**The fourteen declarable allergens, as one closed list.** Every allergen field in this contract uses it — the menu claim, the ticket line, a substitution's delta, a modifier option, the label on a bag — so a declared set and an actual set compare without anybody normalising case or synonyms. It was the `Allergen.contains` enum; the other fields were free text.\n",
-  "enum": [
-   "gluten",
-   "crustaceans",
-   "eggs",
-   "fish",
-   "peanuts",
-   "soybeans",
-   "milk",
-   "nuts",
-   "celery",
-   "mustard",
-   "sesame",
-   "sulphites",
-   "lupin",
-   "molluscs"
-  ]
- },
  "AllocationComponent": {
   "x-ticvai-persistence": "promotions.allocation_component",
   "type": "object",
@@ -333,6 +313,56 @@
        "format": "uuid"
       },
       "reason": {
+       "type": "string"
+      }
+     }
+    }
+   }
+  }
+ },
+ "BulkProductUpdateResult": {
+  "type": "object",
+  "description": "What `bulkUpdateCatalogueProducts` matched and changed, or would change in a preview (CHG-FUP-011).",
+  "required": [
+   "applied",
+   "matched"
+  ],
+  "properties": {
+   "applied": {
+    "type": "boolean",
+    "description": "False for a preview."
+   },
+   "matched": {
+    "type": "integer",
+    "minimum": 0
+   },
+   "succeeded": {
+    "type": "integer",
+    "minimum": 0
+   },
+   "failed": {
+    "type": "integer",
+    "minimum": 0
+   },
+   "failures": {
+    "type": "array",
+    "description": "One entry per product the change was refused for. Empty on a clean run.",
+    "items": {
+     "type": "object",
+     "required": [
+      "productId",
+      "code"
+     ],
+     "properties": {
+      "productId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "code": {
+       "type": "string",
+       "description": "The validation rule the product failed, as in `Problem.errors[].code`."
+      },
+      "message": {
        "type": "string"
       }
      }
@@ -1334,6 +1364,105 @@
    }
   }
  },
+ "ConsentQuestion": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.consent_question + marketing.consent_question_version",
+  "description": "**A venue-defined consent question asked at booking** (decided 29 September, rev 3 REV3-26). Each version's text is kept in `consent_question_version`, so an answer always points at the exact words the guest saw. Attached to products by the catalogue and to booking flows by the white-label flow configuration; one or several per flow, as the venue chooses.\n",
+  "required": [
+   "id",
+   "kind",
+   "text",
+   "version",
+   "scope",
+   "required",
+   "blockingAnswer",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "kind": {
+    "$ref": "#/components/schemas/ConsentQuestionKind"
+   },
+   "text": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/LocalisedText"
+     }
+    ],
+    "description": "The question as the guest reads it, per locale."
+   },
+   "helpText": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/LocalisedText"
+     }
+    ],
+    "nullable": true
+   },
+   "version": {
+    "type": "integer",
+    "minimum": 1,
+    "readOnly": true,
+    "description": "Raised by one each time the question changes (`updateConsentQuestion`)."
+   },
+   "scope": {
+    "type": "string",
+    "enum": [
+     "perPerson",
+     "perBooking"
+    ],
+    "default": "perPerson",
+    "description": "Asked for each declared person, or once for the whole booking."
+   },
+   "required": {
+    "type": "boolean",
+    "default": true,
+    "description": "Checkout waits until it is answered (`orders.checkoutCart` 422 `consentRequired`)."
+   },
+   "blockingAnswer": {
+    "type": "string",
+    "enum": [
+     "yes",
+     "no",
+     "none"
+    ],
+    "default": "none",
+    "description": "The answer that stops the booking, for the person or the booking it covers. `none` records the answer and blocks nothing."
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "active",
+     "retired"
+    ],
+    "default": "active"
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Operations write it at `venue` scope."
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
+ "ConsentQuestionKind": {
+  "type": "string",
+  "description": "What the question is about (decided 29 September, rev 3 REV3-26). `swim` feeds the derived `confidentSwimmer` on the order line; the others are recorded and checked as the venue set them.",
+  "enum": [
+   "swim",
+   "scuba",
+   "risk",
+   "custom"
+  ]
+ },
  "CouponCampaign": {
   "x-ticvai-persistence": "promotions.coupon_campaign",
   "allOf": [
@@ -1840,6 +1969,104 @@
    "priority": {
     "type": "integer",
     "default": 0
+   },
+   "description": {
+    "type": "string",
+    "nullable": true,
+    "description": "**The price list master fields** (data model DM3) are written here since setPriceListMaster was retired in r2 (BC-008, CHG-CLN-001); each is optional and means what it means on `PriceList`."
+   },
+   "priceListType": {
+    "type": "string",
+    "enum": [
+     "standardRetail",
+     "venue",
+     "attraction",
+     "event",
+     "membership",
+     "group",
+     "corporate",
+     "b2b",
+     "reseller",
+     "ota",
+     "internal",
+     "specialMarket"
+    ]
+   },
+   "ownerPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "tags": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "legalEntityId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "brand": {
+    "type": "string",
+    "maxLength": 100,
+    "nullable": true
+   },
+   "businessUnit": {
+    "type": "string",
+    "maxLength": 100,
+    "nullable": true
+   },
+   "countryCode": {
+    "type": "string",
+    "maxLength": 2,
+    "nullable": true,
+    "pattern": "^[A-Z]{2}$"
+   },
+   "marketCode": {
+    "type": "string",
+    "maxLength": 40,
+    "nullable": true
+   },
+   "scopeLevel": {
+    "type": "string",
+    "enum": [
+     "global",
+     "country",
+     "market",
+     "brand",
+     "venue",
+     "event",
+     "businessUnit"
+    ]
+   },
+   "defaultPriceCategoryId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "roundingProfileId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "priceResolutionPolicyId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "allowOverrides": {
+    "type": "boolean"
+   },
+   "allowInheritance": {
+    "type": "boolean"
+   },
+   "allowMultipleCurrencies": {
+    "type": "boolean"
+   },
+   "allowProductSpecificRates": {
+    "type": "boolean"
    }
   }
  },
@@ -2249,13 +2476,13 @@
      "type": "string",
      "format": "uuid"
     },
-    "description": "The reward products, where the reward is not the qualifying product: the free gift of `freeItem`, the \"different product\" of a `buyXGetY` (setGiftFreeProduct, setBuyGetBogo). Absent means the reward is taken from the qualifying lines. (DM5, 29 September: data model for the agreed operations)"
+    "description": "The reward products, where the reward is not the qualifying product: the free gift of `freeItem`, the \"different product\" of a `buyXGetY` (createPromotion; the builders setGiftFreeProduct and setBuyGetBogo were retired in r2, CHG-CLN-001). Absent means the reward is taken from the qualifying lines. (DM5, 29 September: data model for the agreed operations)"
    },
    "maxApplicationsPerBasket": {
     "type": "integer",
     "minimum": 1,
     "nullable": true,
-    "description": "How many times the offer repeats in one basket: the \"maximum repetitions\" of an N-for-X offer (setFixedPriceOffer). Null repeats for every complete set. (DM5, 29 September: data model for the agreed operations)"
+    "description": "How many times the offer repeats in one basket: the \"maximum repetitions\" of an N-for-X offer (createPromotion; setFixedPriceOffer was retired in r2, CHG-CLN-001). Null repeats for every complete set. (DM5, 29 September: data model for the agreed operations)"
    }
   }
  },
@@ -2928,6 +3155,235 @@
    "type": "string"
   }
  },
+ "MediaAsset": {
+  "x-ticvai-persistence": "assets.media_asset",
+  "type": "object",
+  "required": [
+   "id",
+   "kind",
+   "status",
+   "filename",
+   "contentType",
+   "sizeBytes",
+   "referenceCount",
+   "createdAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "kind": {
+    "$ref": "#/components/schemas/MediaKind"
+   },
+   "status": {
+    "$ref": "#/components/schemas/MediaStatus"
+   },
+   "filename": {
+    "type": "string"
+   },
+   "contentType": {
+    "type": "string"
+   },
+   "sizeBytes": {
+    "type": "integer"
+   },
+   "title": {
+    "$ref": "#/components/schemas/LocalisedText"
+   },
+   "description": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/LocalisedText"
+     }
+    ],
+    "description": "Set by `updateMediaAsset` and matched by `searchMedia`'s `search`. It was accepted and searched on before it had anywhere to be stored.\n"
+   },
+   "altText": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/LocalisedText"
+     }
+    ],
+    "description": "Required before use in a guest-facing surface. WCAG 2.2 AA."
+   },
+   "width": {
+    "type": "integer",
+    "nullable": true
+   },
+   "height": {
+    "type": "integer",
+    "nullable": true
+   },
+   "durationSeconds": {
+    "type": "number",
+    "nullable": true
+   },
+   "customMetadata": {
+    "type": "object",
+    "nullable": true,
+    "additionalProperties": true,
+    "description": "BL-178. **`assets` is a strong contract and its metadata was fixed** — kind, title, alt text, dimensions, rights. A venue photographing four thousand products wants its own fields: shoot date, photographer, model release, season.\n**Free-form and searchable, not a schema.** Every venue would want a different one, and a fixed set would be wrong for all of them.\n"
+   },
+   "sharedWithTenantIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    },
+    "description": "BL-178. **Cross-tenant sharing, and it is refused by default for a reason.** A brand operating three venues wants one logo library; two unrelated tenants sharing an asset store is the isolation breach ADR-0011 exists to prevent.\n**Only within one tenant's own scope tree.** A share naming a tenant outside it is refused rather than warned about — this is the one place where a permissive default would be a cross-tenant data leak.\n"
+   },
+   "tags": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "categoryId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The asset's category, one of `MediaTaxonomy.categories[].id`; null while unclassified. Set by `bulkUpdateMediaAssets` (`setCategoryId`) (decided 29 September, data model DM4).\n"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "url": {
+    "type": "string",
+    "description": "Signed and expiring for private assets; stable CDN URL for public ones."
+   },
+   "thumbnailUrl": {
+    "type": "string",
+    "nullable": true
+   },
+   "referenceCount": {
+    "type": "integer",
+    "description": "How many surfaces reference this asset. Non-zero refuses deletion.\n"
+   },
+   "rights": {
+    "$ref": "#/components/schemas/MediaRights"
+   },
+   "isRightsExpired": {
+    "type": "boolean"
+   },
+   "version": {
+    "type": "integer"
+   },
+   "uploadedByPrincipalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "MediaKind": {
+  "type": "string",
+  "enum": [
+   "image",
+   "video",
+   "audio",
+   "document",
+   "vector",
+   "font",
+   "archive"
+  ]
+ },
+ "MediaRights": {
+  "x-ticvai-persistence": "none — embedded in asset",
+  "type": "object",
+  "description": "Licensing terms. Tracked because an expired licence on a live surface is a legal exposure, not a housekeeping item.\n",
+  "properties": {
+   "licenceKind": {
+    "type": "string",
+    "enum": [
+     "owned",
+     "royaltyFree",
+     "rightsManaged",
+     "creativeCommons",
+     "editorialOnly",
+     "unknown"
+    ]
+   },
+   "licensor": {
+    "type": "string",
+    "nullable": true
+   },
+   "licenceReference": {
+    "type": "string",
+    "nullable": true
+   },
+   "validFrom": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "validTo": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "permittedUses": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "web",
+      "print",
+      "socialMedia",
+      "inVenue",
+      "advertising",
+      "internal"
+     ]
+    }
+   },
+   "attributionRequired": {
+    "type": "boolean",
+    "default": false
+   },
+   "attributionText": {
+    "type": "string",
+    "nullable": true
+   },
+   "permittedTerritories": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "ISO country or region codes. **Empty means unrestricted, which is a claim rather than an absence** — an unknown territory and a worldwide licence are not the same thing, and `licenceKind: unknown` is how the second is said.\n"
+   },
+   "permittedChannels": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Distribution channel codes, checked by `setMediaDistributionChannels`. Narrower than `permittedUses`, which describes the medium rather than the route.\n"
+   },
+   "modelReleaseHeld": {
+    "type": "boolean",
+    "default": false
+   },
+   "renewalOwner": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   }
+  }
+ },
+ "MediaStatus": {
+  "type": "string",
+  "enum": [
+   "processing",
+   "ready",
+   "quarantined",
+   "failed",
+   "archived"
+  ]
+ },
  "Menu": {
   "x-ticvai-persistence": "fnb.menu",
   "type": "object",
@@ -3015,88 +3471,6 @@
     "format": "date",
     "nullable": true,
     "description": "Calendar day, in the Region's time zone, not UTC."
-   }
-  }
- },
- "MenuItem": {
-  "x-ticvai-persistence": "fnb.menu_item",
-  "type": "object",
-  "required": [
-   "id",
-   "productVariantId",
-   "name",
-   "price",
-   "isAvailable"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "productVariantId": {
-    "type": "string",
-    "format": "uuid",
-    "description": "The catalogue variant this item sells. Pricing and tax come from there — a menu is a presentation of the catalogue, not a second catalogue.\n"
-   },
-   "name": {
-    "type": "string"
-   },
-   "description": {
-    "type": "string",
-    "nullable": true
-   },
-   "price": {
-    "x-ticvai-column": "list_price",
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "sortOrder": {
-    "type": "integer"
-   },
-   "modifierGroupIds": {
-    "type": "array",
-    "items": {
-     "type": "string",
-     "format": "uuid"
-    }
-   },
-   "stationId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "menuSectionId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "readOnly": true,
-    "description": "The section the item sits in, set by `setMenuSections` and `applyMenuActions` (`moveSection`)."
-   },
-   "isStockTracked": {
-    "type": "boolean",
-    "description": "True where a recipe exists. Stock-tracked items cannot be sold offline."
-   },
-   "isAvailable": {
-    "type": "boolean"
-   },
-   "unavailableReason": {
-    "type": "string",
-    "nullable": true
-   },
-   "restoreAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true,
-    "description": "When an unavailable item comes back on its own (`setItemAvailability`). Null means by hand."
-   },
-   "preparationMinutes": {
-    "type": "integer",
-    "nullable": true
-   },
-   "allergens": {
-    "type": "array",
-    "items": {
-     "$ref": "#/components/schemas/AllergenCode"
-    }
    }
   }
  },
@@ -3691,7 +4065,7 @@
    "description": {
     "type": "string",
     "nullable": true,
-    "description": "Price list master fields (29 September, data model DM3), set with `setPriceListMaster` (ADM-058)."
+    "description": "Price list master fields (29 September, data model DM3), set with `createPriceList` and `updatePriceList` since setPriceListMaster was retired in r2 (BC-008, CHG-CLN-001)."
    },
    "priceListType": {
     "type": "string",
@@ -4246,6 +4620,42 @@
    }
   }
  },
+ "ProductChangeImpact": {
+  "type": "object",
+  "description": "1.4.4 and 1.4.16. What a proposed change would touch. **Modelled on `PerformanceCancellationResult`**, which does this for a cancellation.\n",
+  "required": [
+   "entitlementsIssued",
+   "ordersAffected",
+   "propagates"
+  ],
+  "properties": {
+   "entitlementsIssued": {
+    "type": "integer",
+    "description": "How many live entitlements came from this product."
+   },
+   "ordersAffected": {
+    "type": "integer"
+   },
+   "futurePerformances": {
+    "type": "integer"
+   },
+   "openCarts": {
+    "type": "integer",
+    "description": "**A guest with this product in a cart while its price changes underneath them** is the case nobody thinks about until it happens.\n"
+   },
+   "propagates": {
+    "type": "boolean",
+    "description": "Whether the change reaches what has already been sold. **A name correction should; a price change must not**, and the difference is the whole reason this operation exists.\n"
+   },
+   "blockedBy": {
+    "type": "array",
+    "description": "Reasons the change would be refused outright.",
+    "items": {
+     "type": "string"
+    }
+   }
+  }
+ },
  "ProductDisplayTag": {
   "x-ticvai-persistence": "none — jsonb column on catalogue.product",
   "type": "object",
@@ -4440,6 +4850,49 @@
    }
   }
  },
+ "ProductVersion": {
+  "type": "object",
+  "x-ticvai-persistence": "catalogue.product_version",
+  "description": "1.1.47, 1.4.9 to 1.4.11. **Follows `white-label.ConfigVersion`** — the same pattern for the same reason, and the fourth place this mechanism was asked for.\n",
+  "required": [
+   "version",
+   "publishedAt",
+   "publishedByPrincipalId"
+  ],
+  "properties": {
+   "version": {
+    "type": "integer"
+   },
+   "productId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "publishedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "publishedByPrincipalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "note": {
+    "type": "string",
+    "nullable": true
+   },
+   "isCurrent": {
+    "type": "boolean"
+   },
+   "contentHash": {
+    "type": "string",
+    "description": "**Lets a diff be cheap and a no-op change be recognised.** Republishing an unchanged product should not create a version.\n"
+   },
+   "restoredFromVersion": {
+    "type": "integer",
+    "nullable": true,
+    "description": "Set where this version was created by a restore. **A restore is a new version, not a rewind** — a price that was wrong for three days stays visible, because a finance query run next quarter has to reproduce what was charged.\n"
+   }
+  }
+ },
  "Promotion": {
   "x-ticvai-persistence": "promotions.promotion",
   "allOf": [
@@ -4607,7 +5060,7 @@
      "type": "string",
      "format": "uuid"
     },
-    "description": "Reusable eligibility rules (`promotions.promotion_rule` rows of `ruleType: eligibility` with no promotion of their own, saved by setEligibilityRule) that must also hold. Each is evaluated with its own `effect`. (DM5, 29 September: data model for the agreed operations)"
+    "description": "Reusable eligibility rules (`promotions.promotion_rule` rows of `ruleType: eligibility` with no promotion of their own) that must also hold. **Deprecated in r2** (CHG-CLN-001): setEligibilityRule, which saved library rules, was retired (BC-017), so no operation creates one; send the conditions inline. Rules already saved still apply. Each is evaluated with its own `effect`. (DM5, 29 September: data model for the agreed operations)"
    }
   }
  },
@@ -5218,6 +5671,52 @@
    }
   }
  },
+ "TicketProof": {
+  "type": "object",
+  "x-ticvai-persistence": "none — rendered on request, nothing is stored",
+  "description": "A sample ticket from a template, **marked as a proof on the artefact itself** so it cannot be presented at a gate.",
+  "required": [
+   "templateId",
+   "mediaType",
+   "contentRef"
+  ],
+  "properties": {
+   "templateId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "mediaType": {
+    "type": "string",
+    "enum": [
+     "thermalTicket",
+     "a4Pdf",
+     "wristband",
+     "rfidCard",
+     "walletPass",
+     "qrOnly",
+     "sms"
+    ]
+   },
+   "locale": {
+    "type": "string",
+    "nullable": true
+   },
+   "contentRef": {
+    "type": "string",
+    "format": "uri",
+    "description": "Where the rendered proof can be fetched or sent to the printer from."
+   },
+   "walletPlatform": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "appleWallet",
+     "googleWallet"
+    ],
+    "description": "Which wallet the pass preview is for, where `mediaType` is `walletPass` (DEC-151; CHG-CSP-038)."
+   }
+  }
+ },
  "UpdateProductRequest": {
   "type": "object",
   "minProperties": 1,
@@ -5427,85 +5926,6 @@
      }
     }
    }
-  ]
- },
- "WaitlistEntry": {
-  "type": "object",
-  "x-ticvai-persistence": "catalogue.waitlist_entry",
-  "required": [
-   "performanceId",
-   "partySize"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid",
-    "readOnly": true
-   },
-   "performanceId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "variantId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "subjectId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "contactPoint": {
-    "type": "string",
-    "description": "**Where the offer goes.** An entry with no way to reach the guest is an entry that can never be honoured, so this is required even for an anonymous guest.\n"
-   },
-   "partySize": {
-    "type": "integer",
-    "minimum": 1
-   },
-   "status": {
-    "allOf": [
-     {
-      "$ref": "#/components/schemas/WaitlistStatus"
-     }
-    ],
-    "readOnly": true,
-    "description": "Set by the server. `joinWaitlist` does not take it; a new entry is `waiting`."
-   },
-   "position": {
-    "type": "integer",
-    "readOnly": true,
-    "description": "First in, first offered. Shown to the guest, because not knowing is worse than waiting."
-   },
-   "offeredAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true,
-    "readOnly": true
-   },
-   "offerExpiresAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true,
-    "readOnly": true,
-    "description": "**The offer moves on when this passes.** Notifying everyone at once produces a race the fastest guest wins; holding indefinitely for someone asleep leaves the seat unsold.\n"
-   },
-   "joinedAt": {
-    "type": "string",
-    "format": "date-time",
-    "readOnly": true
-   }
-  }
- },
- "WaitlistStatus": {
-  "type": "string",
-  "enum": [
-   "waiting",
-   "offered",
-   "converted",
-   "expired",
-   "left"
   ]
  }
 }

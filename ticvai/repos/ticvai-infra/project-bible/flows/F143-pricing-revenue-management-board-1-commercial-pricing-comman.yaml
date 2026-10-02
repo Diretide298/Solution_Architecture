@@ -1,11 +1,11 @@
 id: F143
 name: 'Pricing   Revenue Management board 1: Commercial Pricing Command Center'
-actor: platformAdmin
+actor: venueManager
 wave: 3
 frequency: routine
 criticality: operational
 platforms:
-- P09 TICVAI Web
+- P08 Venue Management
 provenance: derived-from-board
 offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
   not guess.
@@ -25,9 +25,8 @@ steps:
     is the first page a Revenue/Pricing Administrator sees when entering the module.
 - step: 2
   screen: ADM-049
-  action: Works in Price List Master Configuration
-  operations:
-  - setPriceListMaster
+  action: Works in Price List Master Configuration, a section of BO-009, which saves the record with createPriceList and updatePriceList (setPriceListMaster retired in r2, CHG-CLN-001)
+  operations: []
   outcome: Create the master container that holds commercial rates. A Price List should be reusable across
     products and channels.
 - step: 3
@@ -51,9 +50,8 @@ steps:
   outcome: Ready for the next screen on this board
 - step: 6
   screen: ADM-051
-  action: Works in Rate Structure Builder
-  operations:
-  - setRateStructure
+  action: Works in Rate Structure Builder, a section of BO-009, which saves the record with setPrices (setRateStructure retired in r2, CHG-CLN-001)
+  operations: []
   outcome: Define the actual monetary rates contained within a price list. This is the core commercial
     configuration screen.
 - step: 7

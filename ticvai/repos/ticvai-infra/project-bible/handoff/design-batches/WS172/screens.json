@@ -212,6 +212,11 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 34"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-027): A group type definition (minimum and maximum size, hold days, deposit, release, cancellation) with its read and write; listGroupSeatRequests lists requests, not types.",
+    "source": "contracts/satellite/seating.yaml#listGroupSeatRequests"
    }
   ],
   "layout": {
@@ -344,6 +349,13 @@
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
        "impliedBy": "createGroupSeatRequest"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Group bookings, their status and their deposits",
+       "bindsTo": "GroupSeatRequest",
+       "operation": "listGroupSeatRequests",
+       "provenance": "contract seating.yaml GET /group-seat-requests; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -366,6 +378,13 @@
     "invalidates": [
      "listGroupSeatRequests"
     ]
+   },
+   {
+    "operationId": "listGroupSeatRequests",
+    "contract": "seating",
+    "purpose": "Group bookings, their status and their deposits",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {
@@ -374,6 +393,7 @@
    "workshopBoard": "wireframes/WS147 Seat Management Venue Mapping Reference v1.0 Board 8.dc.html#bo-1025"
   },
   "apisNote": "Regenerated 9 September 2026 from Seat_Management_Venue_Mapping_Reference v1.0.pdf page 34. 0 of 0 labels bound to a contract property; 0 of 10 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {},
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -465,6 +485,13 @@
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
        "impliedBy": "allocateGroupSeats"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Group bookings, their status and their deposits",
+       "bindsTo": "GroupSeatRequest",
+       "operation": "listGroupSeatRequests",
+       "provenance": "contract seating.yaml GET /group-seat-requests; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -488,6 +515,13 @@
      "listGroupSeatRequests",
      "getSeatInventory"
     ]
+   },
+   {
+    "operationId": "listGroupSeatRequests",
+    "contract": "seating",
+    "purpose": "Group bookings, their status and their deposits",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {
@@ -595,6 +629,13 @@
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
        "impliedBy": "allocateGroupSeats"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Group bookings, their status and their deposits",
+       "bindsTo": "GroupSeatRequest",
+       "operation": "listGroupSeatRequests",
+       "provenance": "contract seating.yaml GET /group-seat-requests; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -618,6 +659,13 @@
      "listGroupSeatRequests",
      "getSeatInventory"
     ]
+   },
+   {
+    "operationId": "listGroupSeatRequests",
+    "contract": "seating",
+    "purpose": "Group bookings, their status and their deposits",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {
@@ -726,6 +774,13 @@
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
        "impliedBy": "setGroupSeatRoster"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Group bookings, their status and their deposits",
+       "bindsTo": "GroupSeatRequest",
+       "operation": "listGroupSeatRequests",
+       "provenance": "contract seating.yaml GET /group-seat-requests; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -748,6 +803,13 @@
     "invalidates": [
      "listGroupSeatRequests"
     ]
+   },
+   {
+    "operationId": "listGroupSeatRequests",
+    "contract": "seating",
+    "purpose": "Group bookings, their status and their deposits",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {

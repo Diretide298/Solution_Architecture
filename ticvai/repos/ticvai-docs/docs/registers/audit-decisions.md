@@ -24,7 +24,7 @@ contract, state model, screen, table and document it touches says the same thing
 | R094 | Configured limits: values | Each is a venue setting with a tenant-level default. We send a sheet with proposed values for you to correct. | Client operations (client finance for the variance and journal thresholds) | yes | applied 28 September |
 | R095 | Allowed states per action | Confirm the current state models as the rule. We send a one-page table of each status word mapped to its statuses for you to correct. | Client product | yes | applied 28 September: docs/active/status-words-proposal.md, proposed |
 | R096 | Rules stated, not defined | (1) canary, partial, full. (2) We propose a weighted score and send it for review. (3) English and Arabic. (4) An app with a published configuration. (5) We propose the net line price falling below a stated minimum. (6) 24 hours. (7) All criteria must match (AND). (8) Clone-only. (9) The venue's food-safety lead. | Client product | yes | applied 28 September |
-| R098 | Platform staff in a tenant | The operator picks a tenant, then acts under a time-boxed platform-staff grant. Every action is audited and visible to the tenant. | Client security / client product | yes | applied 28 September |
+| R098 | Platform staff in a tenant | The operator picks a tenant, then acts under a time-boxed platform-staff grant. Every action is audited and visible to the tenant. | Client security / client product | yes | applied 28 September · **superseded in part** |
 | R101 | Catalogue rules | (1) Zero or below. (2) We list the combinations for review. (3) Allocate proportionally to list price, with the rounding remainder on the first component; list price is the variant's current price. (4) Must sum to 100, no minimum. (5) Held seats count; leases count. (6) Leased units count; oversell does not. (7) Single-use by default; assigned guests must not exceed the quantity. (8) Refused at checkout. | Client product (client finance for 1, 3 and 8) | yes | applied 28 September |
 | R106 | Venue operations rules | (1) Last reading within the feed's expected interval. (2) Attraction category. (3) Refuse online; accept and report when it arrives from an offline device. (4) Damaged means unavailable and blocks bookings until inspected. (5) History (append). (6) Refused if not reportable; repeats are recorded. (7) From every public entrance. (8) No. (9) A supervisor other than the technician. (10) Referenced by live content. | Client operations | yes | applied 28 September |
 | R108 | Unique codes | Configuration codes (roles, products, categories, suppliers, programmes) are unique per tenant. Asset tags, table codes and venue-map points are unique per venue. | Client operations | yes | applied 28 September |
@@ -40,7 +40,7 @@ contract, state model, screen, table and document it touches says the same thing
 | R132 | Password reuse | The last 5 passwords, configurable per tenant. | Client security | yes | applied 28 September |
 | R135 | Who must use MFA | By permission. The list is ROLE_MANAGE, LEDGER_APPROVE and every platform-staff permission, and you may add to it. | Client security | yes | applied 28 September |
 | R139 | Journeys vs contracts | (a) Refused. (b) Restore, then review, then publish. (c) Receipt or order number only in the first release. (d) Maintenance. | Client product | yes | applied 28 September |
-| R144 | Which actions need approval | Finance and procurement actions (close and reopen period, cancel or short-close a purchase order) go through the approvals engine to a finance approver. Shift reopen, stock recount and retail returns above the threshold need a supervisor's step-up on the same device. Rollouts need the platform release manager. | Client operations / client finance | yes | applied 28 September |
+| R144 | Which actions need approval | Finance and procurement actions (close and reopen period, cancel or short-close a purchase order) go through the approvals engine to a finance approver. Shift reopen, stock recount and retail returns above the threshold need a supervisor's step-up on the same device. Rollouts need the platform release manager. | Client operations / client finance | yes | applied 28 September · **superseded in part** |
 | R145 | Glossary: Booking and Hold | Allow 'Booking' in guest-facing labels as a recorded exception. Code and contracts use Order and Reservation. | Client product | yes | applied 28 September |
 | R146 | Glossary definitions | We draft each definition from the contracts and you approve it. | Client product | yes | applied 28 September |
 | R148 | Raising a case offline | It needs the connection, as F54 and the four screens say. Offline, the screen shows how to reach staff in person. | Client product | yes | applied 28 September |
@@ -61,14 +61,14 @@ contract, state model, screen, table and document it touches says the same thing
 | R194 | Glossary: Department, zone | Department is canonical. 'Zone' is defined as a physical area inside a venue. | Client product | yes | applied 28 September |
 | R197 | Escalated permissions | Escalate above a configured value threshold to a distinct manager permission. Where no threshold makes sense, drop the escalation. | Client operations / security | yes | applied 28 September |
 | R203 | AI data residency owner | Per tenant with a compliance gate, as ADR-0009 says. Platform staff set it on ADM-037, and a region may restrict the choice. | Client counsel / client product | yes | applied 28 September |
-| R205 | Minors and Face Pass | The signed-in adult enrols a linked child and is recorded as guardian. Counsel sets the age. | Client counsel | yes | applied 28 September, one value open: Counsel sets the age below which a subject is a minor; missing DOB counts as a minor meanwhile. |
+| R205 | Minors and Face Pass | The signed-in adult enrols a linked child and is recorded as guardian. Counsel sets the age. | Client counsel | yes | applied 28 September, one value open: Counsel sets the age below which a subject is a minor; missing DOB counts as a minor meanwhile. · **superseded in part** |
 | R209 | Guest AI day plans | Follow R187: if the planner is deferred, remove the itinerary suggestion from those screens. If it ships, add a guest-allowed itinerary kind. | Client product | yes | applied 28 September · **superseded in part** |
 | R210 | Glossary: Kitchen Ticket | Yes to Kitchen Ticket as its own term. 'QR' is allowed in guest-facing copy only. | Client product | yes | applied 28 September |
 | R213 | AI suggestion rules | (1) We draft a one-line rule and a minimum history per kind for you to correct. (2) Proposed: 7 days; approved but not applied: 24 hours. (3) Anything touching prices or permissions needs a manager; everything else needs the requester's own approval. | Client product | yes | applied 28 September · **superseded in part** |
 | R214 | Subscription rules | (1) Upgrades take effect immediately with proration; downgrades take effect at the next renewal. (2) Active, renewing one term from start. (3) Suspended yes, terminated no. (4) Per tenant, filterable by client. | Client finance / commercial | yes | applied 28 September |
 | R215 | Retail rules | (1) The outlet of the workstation asking; inactive items are not found. (2) At least 15 minutes ahead and no later than the end of the visit day. (3) Receipt barcode first, then receipt number, then order number; several matches return a list. | Client operations (retail) | yes | applied 28 September |
 | R220 | Glossary: Game and Gift Card | Keep Game Card and Gift Card as recorded exceptions, since guests know them by those names. | Client product | yes | applied 28 September |
-| R221 | Gate operating mode | The podium sets the operating mode. Direction is fixed per access point. Turnstile mode is reduced to free rotation or closed within the operating mode. | Client operations (gates) | yes | applied 28 September |
+| R221 | Gate operating mode | The podium sets the operating mode. Direction is fixed per access point. Turnstile mode is reduced to free rotation or closed within the operating mode. | Client operations (gates) | yes | applied 28 September · **superseded in part** |
 | R222 | 'Other' as a reason | Allow 'Other' only with a required note, and review the notes quarterly to add real reasons. | Client operations | yes | applied 28 September |
 | R228 | Access override rule | Keep the denial and record the override as its own row. Face Tags are not returned by the Face Pass lookup. | Client operations / security | yes | applied 28 September |
 | R229 | Seed data | Notes 5, 10, 20, 50, 100, 200, 500 and 1000 AED; coins 25 fils, 50 fils and 1 AED. We draft cashier, supervisor, venue manager, finance and tenant admin roles from the permission list for you to correct. | Client operations / client finance | yes | applied 28 September |
@@ -80,7 +80,7 @@ contract, state model, screen, table and document it touches says the same thing
 | R252 | Wireframe sign-off | One named design reviewer, with sign-off within 3 working days of each batch. | Client design | yes | applied 28 September, one value open: Rule recorded: one named design reviewer, sign-off within 3 working days of each batch. Missing: the reviewer's name. |
 | R254 | Screen operations | Confirm the proposal as written. | Client product | yes | applied 28 September |
 | R258 | Archived drawn frames | Restore them as reference. Each is replaced by its redrawn frame when that batch lands. | Client design | yes | applied: F7 (1340dba) |
-| R261 | Journey intent | Each journey follows the purpose of the screens it visits. POS F&B: send to kitchen, then charge. | Client product | yes | applied 28 September |
+| R261 | Journey intent | Each journey follows the purpose of the screens it visits. POS F&B: send to kitchen, then charge. | Client product | yes | applied 28 September · **superseded in part** |
 | R267 | Guest's current venue | The guest picks a venue on first open, and the choice is remembered and changeable. On the day of a visit, the app suggests the venue on the guest's ticket. | Client product | yes | applied 28 September |
 | R270 | Screen limits | PNG or SVG, up to 2 MB. For connectivity, we propose bounds for you to correct. | Client design (assets), client IT (connectivity) | yes | applied 28 September |
 | R275 | Pack fields to keep | Keep (c) and (d), and we add them to the contract. Map (b) onto age rules. Keep (f) as accept, edit and reject. (a) and (e) follow the contract unless you need them. | Client product | yes | applied 28 September |
@@ -241,6 +241,8 @@ contract, state model, screen, table and document it touches says the same thing
 **Decided (28 September, our recommendation).** The operator picks a tenant, then acts under a time-boxed platform-staff grant. Every action is audited and visible to the tenant.
 
 **Client confirms.** Client security / client product
+
+**Superseded.** Refined 2 October (Chinmay; CHG-DOC-014): the 410 workshop-pack screens on the console (370 Commercial, 20 Catalogue lifecycle, 20 Rules and workflow) are venue screens and move to Venue Management, merged with BO-008 to BO-011, reached by TICVAI staff only under the platform-staff grant (DEC-100); console screens that act on a tenant get the ADM-412 pattern, a tenant picker and a time-boxed grant with step-up (PRE-5); for a site hosted with TICVAI, platform staff may publish under a grant, and a self-hosted venue generates a site package (DEC-144).
 
 ### R101: Catalogue rules
 
@@ -433,6 +435,8 @@ contract, state model, screen, table and document it touches says the same thing
 **Decided (28 September, our recommendation).** Finance and procurement actions (close and reopen period, cancel or short-close a purchase order) go through the approvals engine to a finance approver. Shift reopen, stock recount and retail returns above the threshold need a supervisor's step-up on the same device. Rollouts need the platform release manager.
 
 **Client confirms.** Client operations / client finance
+
+**Superseded.** Extended 2 October (Chinmay, DEC-192; CHG-DOC-015): waste joins the list as a policy the venue switches on or off (off by default); when on, approval by value band and a photo above a value.
 
 ### R145: Glossary: Booking and Hold
 
@@ -690,6 +694,8 @@ contract, state model, screen, table and document it touches says the same thing
 
 **Client confirms.** Client counsel
 
+**Superseded.** Amended 2 October (Chinmay, DEC-237, with DEC-138 and DEC-283; CHG-DOC-016): minors may be enrolled with guardian consent on the venue's own consent form; the age below which a guest is a minor is set per country; the venue can switch minors' enrolment off. Supersedes the GST-069 default that no under-18 is enrolled.
+
 ### R209: Guest AI day plans
 
 **Question.** If the itinerary planner ships, may a guest ask the AI for a day plan? requestSuggestion currently refuses anything but prepPlan, upsell and waitTime from guests, while F49 uses kind=scenario.
@@ -777,6 +783,8 @@ contract, state model, screen, table and document it touches says the same thing
 **Decided (28 September, our recommendation).** The podium sets the operating mode. Direction is fixed per access point. Turnstile mode is reduced to free rotation or closed within the operating mode.
 
 **Client confirms.** Client operations (gates)
+
+**Superseded.** Amended 2 October (Chinmay, DEC-255; CHG-DOC-012): direction is no longer fixed per access point. A gate's direction can be switched live (Entry to Exit) by a user with a specific permission, and every switch is logged as an audit event. The operating mode stays the podium's setting.
 
 ### R222: 'Other' as a reason
 
@@ -923,6 +931,8 @@ contract, state model, screen, table and document it touches says the same thing
 **Decided (28 September, our recommendation).** Each journey follows the purpose of the screens it visits. POS F&B: send to kitchen, then charge.
 
 **Client confirms.** Client product
+
+**Superseded.** Amended 2 October (Chinmay, DEC-064; CHG-DOC-013): payment timing is an outlet setting, 'Pay first' or 'Send to kitchen first, then pay' (outlet-scoped, ADR-0029). Send first, then charge stays the behaviour of an outlet set that way; POSV2-4 is amended with it.
 
 ### R267: Guest's current venue
 

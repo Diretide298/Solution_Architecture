@@ -82,6 +82,19 @@
   "requestBody": null,
   "responds": "BookingFlow"
  },
+ "getBrandIdentity": {
+  "method": "GET",
+  "path": "/tenant-config/brand",
+  "contract": "white-label",
+  "summary": "Read brand identity",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "BrandIdentity"
+ },
  "getPublishedBookingFlow": {
   "method": "GET",
   "path": "/venues/{venueId}/booking-flow",
@@ -394,6 +407,25 @@
   ],
   "requestBody": null,
   "responds": "AiMessage"
+ },
+ "setBrandIdentity": {
+  "method": "PUT",
+  "path": "/tenant-config/brand",
+  "contract": "white-label",
+  "summary": "Set logo, favicon and splash",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "BrandIdentity",
+  "responds": "BrandIdentity"
  },
  "setProductCategories": {
   "method": "PUT",

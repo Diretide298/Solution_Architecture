@@ -34,6 +34,8 @@
     "POS-027",
     "POS-028",
     "POS-029",
+    "POS-030",
+    "POS-031",
     "KIT-001",
     "KIT-002",
     "KIT-003",
@@ -211,41 +213,42 @@
     "CMS-104",
     "ADM-016",
     "ADM-017",
-    "ADM-018"
+    "ADM-018",
+    "ADM-424"
    ]
   }
  },
  "deferredScreens": [],
  "counts": {
-  "core": 465,
-  "setup": 234,
-  "allOperations": 2668
+  "core": 502,
+  "setup": 216,
+  "allOperations": 2731
  },
  "services": {
   "AccessService": {
-   "core": 13,
-   "setup": 25,
-   "total": 246
+   "core": 12,
+   "setup": 21,
+   "total": 250
   },
   "AiService": {
-   "core": 22,
-   "setup": 28,
-   "total": 141
+   "core": 41,
+   "setup": 24,
+   "total": 144
   },
   "CatalogueService": {
-   "core": 43,
-   "setup": 50,
-   "total": 449
+   "core": 36,
+   "setup": 28,
+   "total": 443
   },
   "FnbService": {
-   "core": 54,
-   "setup": 13,
-   "total": 120
+   "core": 53,
+   "setup": 20,
+   "total": 131
   },
   "IdentityService": {
-   "core": 32,
-   "setup": 5,
-   "total": 89
+   "core": 34,
+   "setup": 3,
+   "total": 94
   },
   "InventoryService": {
    "core": 1,
@@ -253,54 +256,54 @@
    "total": 58
   },
   "LedgerService": {
-   "core": 8,
-   "setup": 10,
+   "core": 7,
+   "setup": 8,
    "total": 72
   },
   "MarketingService": {
-   "core": 46,
-   "setup": 14,
-   "total": 264
+   "core": 53,
+   "setup": 18,
+   "total": 272
   },
   "OrderService": {
-   "core": 76,
+   "core": 86,
    "setup": 7,
-   "total": 288
+   "total": 297
   },
   "PlatformService": {
-   "core": 1,
-   "setup": 17,
-   "total": 216
+   "core": 3,
+   "setup": 18,
+   "total": 221
   },
   "ReportingService": {
-   "core": 9,
-   "setup": 8,
-   "total": 48
+   "core": 7,
+   "setup": 10,
+   "total": 51
   },
   "RetailService": {
-   "core": 11,
+   "core": 13,
    "setup": 3,
    "total": 25
   },
   "TenancyService": {
-   "core": 16,
-   "setup": 12,
-   "total": 204
+   "core": 12,
+   "setup": 16,
+   "total": 209
   },
   "VenueOpsService": {
-   "core": 48,
-   "setup": 26,
+   "core": 44,
+   "setup": 25,
    "total": 285
   },
   "WalletService": {
-   "core": 9,
+   "core": 10,
    "setup": 8,
-   "total": 66
+   "total": 68
   },
   "WhiteLabelService": {
-   "core": 76,
-   "setup": 2,
-   "total": 79
+   "core": 90,
+   "setup": 1,
+   "total": 93
   }
  },
  "operations": {
@@ -332,13 +335,10 @@
     "POS"
    ],
    "screens": [
-    "BO-039",
     "BO-040",
-    "EMP-003",
+    "BO-043",
     "EMP-009",
-    "POS-001",
-    "POS-007",
-    "POS-009"
+    "POS-007"
    ],
    "enables": []
   },
@@ -353,7 +353,6 @@
     "POS"
    ],
    "screens": [
-    "BO-018",
     "POS-003"
    ],
    "enables": []
@@ -388,7 +387,6 @@
    "screens": [
     "GST-007",
     "GST-008",
-    "GST-009",
     "GST-026",
     "GST-027",
     "GST-032",
@@ -406,6 +404,7 @@
     "POS-002",
     "POS-021",
     "POS-023",
+    "POS-030",
     "PTR-010",
     "WEB-006",
     "WEB-008",
@@ -449,10 +448,8 @@
     "POS"
    ],
    "screens": [
-    "BO-024",
     "EMP-035",
-    "POS-005",
-    "PTR-012"
+    "POS-005"
    ],
    "enables": []
   },
@@ -469,30 +466,7 @@
    ],
    "screens": [
     "GST-020",
-    "WEB-009",
-    "WEB-011",
-    "WEB-017",
-    "WEB-024",
-    "WEB-027"
-   ],
-   "enables": []
-  },
-  "adjustDepositBoxFloat": {
-   "part": "core",
-   "service": "OrderService",
-   "contract": "shift",
-   "verb": "POST",
-   "path": "/deposit-boxes/{boxId}/adjust-float",
-   "perm": "CASH_ADD",
-   "platforms": [
-    "POS"
-   ],
-   "screens": [
-    "POS-001",
-    "POS-007",
-    "POS-011",
-    "POS-012",
-    "POS-013"
+    "WEB-009"
    ],
    "enables": []
   },
@@ -523,8 +497,7 @@
    ],
    "screens": [
     "BO-010",
-    "POS-002",
-    "PTR-010"
+    "POS-002"
    ],
    "enables": []
   },
@@ -536,12 +509,10 @@
    "path": "/media/{mediaCode}/entitlements",
    "perm": "ORDER_CREATE",
    "platforms": [
-    "POS",
-    "WL"
+    "POS"
    ],
    "screens": [
     "BO-027",
-    "CMS-010",
     "EMP-036",
     "POS-010"
    ],
@@ -579,16 +550,10 @@
     "BO-023",
     "BO-026",
     "BO-047",
-    "EMP-014",
     "EMP-034",
     "POS-002",
     "POS-006",
-    "POS-014",
-    "PTR-002",
-    "PTR-005",
-    "PTR-008",
-    "PTR-015",
-    "PTR-016"
+    "POS-014"
    ],
    "enables": []
   },
@@ -662,13 +627,7 @@
     "POS"
    ],
    "screens": [
-    "BO-039",
-    "BO-040",
-    "EMP-003",
-    "EMP-009",
-    "POS-001",
-    "POS-007",
-    "POS-009"
+    "POS-001"
    ],
    "enables": []
   },
@@ -693,6 +652,7 @@
     "BO-059",
     "BO-060",
     "BO-593",
+    "EMP-020",
     "KIT-010",
     "POS-008",
     "PTR-018",
@@ -713,6 +673,21 @@
    ],
    "enables": [
     "fnb.menu_item_modifier"
+   ]
+  },
+  "awardBadge": {
+   "part": "setup",
+   "service": "MarketingService",
+   "contract": "marketing-crm",
+   "verb": "POST",
+   "path": "/customers/{customerId}/badges",
+   "perm": "MARKETING_MANAGE",
+   "platforms": [],
+   "screens": [
+    "BO-826"
+   ],
+   "enables": [
+    "marketing.customer_badge"
    ]
   },
   "bindCredentialDevice": {
@@ -748,6 +723,21 @@
    ],
    "enables": []
   },
+  "buildDeepLink": {
+   "part": "core",
+   "service": "WhiteLabelService",
+   "contract": "white-label",
+   "verb": "POST",
+   "path": "/deep-links",
+   "perm": "TENANT_CONFIGURE",
+   "platforms": [
+    "WL"
+   ],
+   "screens": [
+    "CMS-009"
+   ],
+   "enables": []
+  },
   "buildProductionPlan": {
    "part": "setup",
    "service": "FnbService",
@@ -757,7 +747,7 @@
    "perm": "PRODUCT_CONFIGURE",
    "platforms": [],
    "screens": [
-    "BO-136"
+    "BO-112"
    ],
    "enables": [
     "fnb.production_plan"
@@ -786,12 +776,26 @@
    "path": "/products/bulk",
    "perm": "PRODUCT_CONFIGURE",
    "platforms": [],
-   "screens": [
-    "BO-007"
-   ],
+   "screens": [],
    "enables": [
     "inventory.item"
    ]
+  },
+  "cancelFnbOrder": {
+   "part": "core",
+   "service": "FnbService",
+   "contract": "fnb",
+   "verb": "POST",
+   "path": "/fnb-orders/{orderId}/cancel",
+   "perm": "ORDER_MODIFY",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "BO-020",
+    "POS-022"
+   ],
+   "enables": []
   },
   "cancelReservation": {
    "part": "core",
@@ -802,11 +806,13 @@
    "perm": "ORDER_CANCEL",
    "platforms": [
     "MOB",
+    "POS",
     "WEB"
    ],
    "screens": [
     "GST-016",
     "GST-017",
+    "POS-031",
     "WEB-031"
    ],
    "enables": []
@@ -851,7 +857,6 @@
    "perm": "DEVELOPER_ADMIN",
    "platforms": [],
    "screens": [
-    "BO-483",
     "DEV-008"
    ],
    "enables": [
@@ -869,7 +874,13 @@
     "POS"
    ],
    "screens": [
-    "POS-000"
+    "ADM-001",
+    "ADM-699",
+    "EMP-001",
+    "POS-000",
+    "PTR-001",
+    "SCN-001",
+    "SUP-001"
    ],
    "enables": []
   },
@@ -918,16 +929,12 @@
    ],
    "screens": [
     "GST-009",
-    "GST-026",
-    "GST-027",
     "GST-032",
     "GST-041",
     "KSK-006",
     "PTR-010",
     "WEB-010",
-    "WEB-033",
-    "WEB-041",
-    "WEB-042"
+    "WEB-033"
    ],
    "enables": []
   },
@@ -995,28 +1002,7 @@
    ],
    "screens": [
     "GST-024",
-    "GST-030",
-    "WEB-036",
-    "WEB-046"
-   ],
-   "enables": []
-  },
-  "claimTableSession": {
-   "part": "core",
-   "service": "FnbService",
-   "contract": "fnb",
-   "verb": "POST",
-   "path": "/table-sessions",
-   "perm": null,
-   "platforms": [
-    "MOB",
-    "WEB"
-   ],
-   "screens": [
-    "GST-024",
-    "GST-025",
-    "WEB-036",
-    "WEB-038"
+    "WEB-036"
    ],
    "enables": []
   },
@@ -1028,12 +1014,10 @@
    "path": "/ticket-transfers/{transferId}/claim",
    "perm": null,
    "platforms": [
-    "MOB",
-    "WEB"
+    "MOB"
    ],
    "screens": [
-    "GST-014",
-    "WEB-030"
+    "GST-014"
    ],
    "enables": []
   },
@@ -1064,7 +1048,8 @@
     "BO-696"
    ],
    "enables": [
-    "catalogue.event"
+    "catalogue.event",
+    "catalogue.performance"
    ]
   },
   "cloneProduct": {
@@ -1082,22 +1067,6 @@
     "catalogue.variant"
    ]
   },
-  "closeDepositBoxes": {
-   "part": "core",
-   "service": "OrderService",
-   "contract": "shift",
-   "verb": "POST",
-   "path": "/deposit-boxes/close",
-   "perm": "SHIFT_CLOSE",
-   "platforms": [
-    "POS"
-   ],
-   "screens": [
-    "BO-024",
-    "POS-007"
-   ],
-   "enables": []
-  },
   "closeShift": {
    "part": "core",
    "service": "OrderService",
@@ -1109,13 +1078,9 @@
     "POS"
    ],
    "screens": [
-    "BO-039",
     "BO-040",
-    "EMP-003",
-    "EMP-009",
-    "POS-001",
-    "POS-007",
-    "POS-009"
+    "BO-043",
+    "POS-007"
    ],
    "enables": []
   },
@@ -1132,6 +1097,21 @@
    "screens": [
     "EMP-059",
     "POS-028"
+   ],
+   "enables": []
+  },
+  "collectShopAndDrop": {
+   "part": "core",
+   "service": "RetailService",
+   "contract": "retail",
+   "verb": "POST",
+   "path": "/shop-and-drop/{dropId}/collect",
+   "perm": "ORDER_MODIFY",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "POS-012"
    ],
    "enables": []
   },
@@ -1165,27 +1145,10 @@
     "BO-955",
     "CMS-002",
     "CMS-010",
-    "CMS-063"
+    "CMS-063",
+    "SUP-013"
    ],
    "enables": []
-  },
-  "configureAiCapability": {
-   "part": "setup",
-   "service": "AiService",
-   "contract": "ai",
-   "verb": "PUT",
-   "path": "/governance/capabilities/{capabilityKey}",
-   "perm": "AI_CONFIGURE",
-   "platforms": [],
-   "screens": [
-    "ADM-520",
-    "ADM-521",
-    "ADM-522",
-    "ANL-060"
-   ],
-   "enables": [
-    "ai.capability"
-   ]
   },
   "configureAssistantProfile": {
    "part": "setup",
@@ -1203,22 +1166,6 @@
     "ai.assistant_profile"
    ]
   },
-  "configureQueueFeed": {
-   "part": "setup",
-   "service": "VenueOpsService",
-   "contract": "queue",
-   "verb": "PUT",
-   "path": "/queue-feeds",
-   "perm": "QUEUE_MANAGE",
-   "platforms": [],
-   "screens": [
-    "BO-001",
-    "BO-003"
-   ],
-   "enables": [
-    "queue.feed"
-   ]
-  },
   "configureWorkstation": {
    "part": "core",
    "service": "TenancyService",
@@ -1231,7 +1178,6 @@
    ],
    "screens": [
     "BO-036",
-    "BO-129",
     "BO-602",
     "POS-016"
    ],
@@ -1249,10 +1195,23 @@
     "ADM-556"
    ],
    "enables": [
-    "ai.capability",
-    "ai.policy_exception",
     "ai.release"
    ]
+  },
+  "convertReservation": {
+   "part": "core",
+   "service": "OrderService",
+   "contract": "orders",
+   "verb": "POST",
+   "path": "/reservations/{reservationId}/convert",
+   "perm": "ORDER_CREATE",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "POS-031"
+   ],
+   "enables": []
   },
   "copyPriceList": {
    "part": "setup",
@@ -1279,25 +1238,10 @@
    "platforms": [],
    "screens": [
     "BO-064",
-    "BO-144"
+    "BO-148"
    ],
    "enables": [
     "access.access_point"
-   ]
-  },
-  "createAccount": {
-   "part": "setup",
-   "service": "LedgerService",
-   "contract": "finance",
-   "verb": "POST",
-   "path": "/accounts",
-   "perm": "ACCOUNT_CONFIGURE",
-   "platforms": [],
-   "screens": [
-    "BO-074"
-   ],
-   "enables": [
-    "ledger.account"
    ]
   },
   "createAdmissionRules": {
@@ -1311,7 +1255,6 @@
    "screens": [
     "BO-032",
     "BO-154",
-    "BO-214",
     "BO-222"
    ],
    "enables": [
@@ -1337,7 +1280,9 @@
     "EMP-019",
     "EMP-020",
     "GST-031",
+    "GST-033",
     "GST-054",
+    "KSK-015",
     "WEB-044"
    ],
    "enables": []
@@ -1357,22 +1302,8 @@
     "ADM-530"
    ],
    "enables": [
+    "ai.governance_policy",
     "ai.governance_policy_version"
-   ]
-  },
-  "createAiPolicyException": {
-   "part": "setup",
-   "service": "AiService",
-   "contract": "ai",
-   "verb": "POST",
-   "path": "/governance/policy-exceptions",
-   "perm": "AI_APPROVE",
-   "platforms": [],
-   "screens": [
-    "ADM-526"
-   ],
-   "enables": [
-    "ai.policy_exception"
    ]
   },
   "createApiClient": {
@@ -1384,9 +1315,6 @@
    "perm": "DEVELOPER_MANAGE",
    "platforms": [],
    "screens": [
-    "BO-067",
-    "BO-1073",
-    "BO-1173",
     "BO-1177",
     "DEV-003",
     "PTR-019"
@@ -1425,10 +1353,12 @@
    ],
    "screens": [
     "ADM-567",
+    "BO-045",
     "BO-1010",
     "BO-1031",
     "BO-1080",
     "BO-1181",
+    "BO-163",
     "BO-243",
     "BO-301",
     "BO-718",
@@ -1470,21 +1400,6 @@
    ],
    "enables": []
   },
-  "createBulkProductCatalogue": {
-   "part": "setup",
-   "service": "CatalogueService",
-   "contract": "catalogue",
-   "verb": "POST",
-   "path": "/bulk-product-catalogue",
-   "perm": "PRODUCT_CONFIGURE",
-   "platforms": [],
-   "screens": [
-    "ADM-121"
-   ],
-   "enables": [
-    "catalogue.variant"
-   ]
-  },
   "createBundle": {
    "part": "setup",
    "service": "CatalogueService",
@@ -1513,10 +1428,10 @@
    "perm": "MARKETING_MANAGE",
    "platforms": [],
    "screens": [
-    "BO-005",
     "BO-107",
     "BO-118",
     "BO-121",
+    "BO-766",
     "BO-767"
    ],
    "enables": [
@@ -1538,30 +1453,6 @@
    ],
    "enables": []
   },
-  "createCase": {
-   "part": "core",
-   "service": "MarketingService",
-   "contract": "marketing-crm",
-   "verb": "POST",
-   "path": "/cases",
-   "perm": "CASE_MANAGE",
-   "platforms": [
-    "MOB",
-    "WEB"
-   ],
-   "screens": [
-    "BO-806",
-    "EMP-028",
-    "EMP-029",
-    "GST-068",
-    "PTR-021",
-    "SUP-002",
-    "SUP-004",
-    "SUP-005",
-    "WEB-025"
-   ],
-   "enables": []
-  },
   "createCashMovement": {
    "part": "core",
    "service": "OrderService",
@@ -1573,13 +1464,8 @@
     "POS"
    ],
    "screens": [
-    "BO-039",
-    "BO-040",
     "BO-041",
-    "EMP-009",
-    "POS-001",
-    "POS-007",
-    "POS-013",
+    "BO-042",
     "POS-017",
     "POS-018"
    ],
@@ -1595,7 +1481,6 @@
    "platforms": [],
    "screens": [
     "BO-825",
-    "BO-826",
     "BO-829"
    ],
    "enables": [
@@ -1618,22 +1503,6 @@
    ],
    "enables": []
   },
-  "createCommercialCampaign": {
-   "part": "setup",
-   "service": "CatalogueService",
-   "contract": "promotions",
-   "verb": "POST",
-   "path": "/commercial-campaigns",
-   "perm": "PRICE_CONFIGURE",
-   "platforms": [],
-   "screens": [
-    "ADM-139",
-    "ADM-219"
-   ],
-   "enables": [
-    "promotions.campaign"
-   ]
-  },
   "createConsentQuestion": {
    "part": "core",
    "service": "MarketingService",
@@ -1650,19 +1519,20 @@
    "enables": []
   },
   "createContentBlock": {
-   "part": "setup",
+   "part": "core",
    "service": "WhiteLabelService",
    "contract": "white-label",
    "verb": "POST",
    "path": "/content-blocks",
    "perm": "TENANT_CONFIGURE",
-   "platforms": [],
-   "screens": [
-    "BO-839"
+   "platforms": [
+    "WL"
    ],
-   "enables": [
-    "control.content_block"
-   ]
+   "screens": [
+    "BO-839",
+    "CMS-007"
+   ],
+   "enables": []
   },
   "createContentPage": {
    "part": "core",
@@ -1755,10 +1625,8 @@
    "perm": "EVENT_CONFIGURE",
    "platforms": [],
    "screens": [
-    "BO-001",
     "BO-015",
-    "BO-019",
-    "BO-063"
+    "BO-019"
    ],
    "enables": [
     "catalogue.event"
@@ -1775,7 +1643,6 @@
     "POS"
    ],
    "screens": [
-    "BO-020",
     "EMP-058",
     "EMP-059",
     "POS-022"
@@ -1811,12 +1678,14 @@
    "platforms": [],
    "screens": [
     "BO-618",
+    "BO-747",
     "BO-815",
-    "BO-817",
-    "BO-838"
+    "CMS-042",
+    "CMS-043"
    ],
    "enables": [
-    "marketing.form_definition"
+    "marketing.form_definition",
+    "marketing.form_definition_field"
    ]
   },
   "createGoodsReceipt": {
@@ -1829,7 +1698,6 @@
    "platforms": [],
    "screens": [
     "BO-052",
-    "BO-080",
     "EMP-065"
    ],
    "enables": [
@@ -1879,7 +1747,7 @@
    "perm": "INSPECTION_MANAGE",
    "platforms": [],
    "screens": [
-    "EMP-048"
+    "BO-911"
    ],
    "enables": [
     "maintenance.inspection_template"
@@ -1927,9 +1795,7 @@
    "path": "/invitation-campaigns",
    "perm": "MARKETING_MANAGE",
    "platforms": [],
-   "screens": [
-    "BO-766"
-   ],
+   "screens": [],
    "enables": [
     "marketing.invitation_campaign"
    ]
@@ -1973,8 +1839,7 @@
    "platforms": [],
    "screens": [
     "ADM-411",
-    "BO-074",
-    "SGN-020"
+    "BO-074"
    ],
    "enables": [
     "ledger.legal_entity"
@@ -1989,7 +1854,6 @@
    "perm": "MARKETING_MANAGE",
    "platforms": [],
    "screens": [
-    "BO-827",
     "BO-828"
    ],
    "enables": [
@@ -1999,21 +1863,19 @@
    ]
   },
   "createMenu": {
-   "part": "core",
+   "part": "setup",
    "service": "FnbService",
    "contract": "fnb",
    "verb": "POST",
    "path": "/menus",
    "perm": "PRODUCT_CONFIGURE",
-   "platforms": [
-    "WL"
-   ],
+   "platforms": [],
    "screens": [
-    "BO-045",
-    "BO-104",
-    "CMS-009"
+    "BO-045"
    ],
-   "enables": []
+   "enables": [
+    "fnb.menu"
+   ]
   },
   "createMerchandise": {
    "part": "setup",
@@ -2064,11 +1926,23 @@
    ],
    "screens": [
     "ADM-001",
+    "ADM-247",
+    "ADM-699",
+    "ADM-700",
+    "BO-053",
+    "BO-284",
+    "BO-293",
     "EMP-001",
     "GST-042",
     "GST-073",
     "POS-000",
     "PTR-001",
+    "PTR-029",
+    "PTR-030",
+    "PTR-035",
+    "PTR-036",
+    "PTR-040",
+    "PTR-048",
     "SCN-001",
     "SUP-001",
     "WEB-016"
@@ -2105,11 +1979,8 @@
    ],
    "screens": [
     "BO-022",
-    "BO-023",
     "BO-026",
     "BO-047",
-    "BO-130",
-    "EMP-014",
     "EMP-034",
     "GST-009",
     "POS-002",
@@ -2118,10 +1989,8 @@
     "POS-006",
     "POS-013",
     "PTR-002",
-    "PTR-005",
     "PTR-008",
     "PTR-015",
-    "PTR-016",
     "WEB-012"
    ],
    "enables": []
@@ -2137,6 +2006,7 @@
    "screens": [
     "ADM-006",
     "ADM-420",
+    "ADM-421",
     "BO-064",
     "BO-145"
    ],
@@ -2172,21 +2042,16 @@
     "WEB"
    ],
    "screens": [
-    "BO-024",
     "EMP-035",
     "EMP-059",
     "GST-009",
-    "GST-026",
-    "GST-027",
     "KSK-007",
     "POS-002",
     "POS-004",
     "POS-005",
     "PTR-012",
     "WEB-012",
-    "WEB-033",
-    "WEB-041",
-    "WEB-042"
+    "WEB-033"
    ],
    "enables": []
   },
@@ -2206,6 +2071,22 @@
     "payments.provider_connection"
    ]
   },
+  "createPerformances": {
+   "part": "setup",
+   "service": "CatalogueService",
+   "contract": "catalogue",
+   "verb": "POST",
+   "path": "/events/{eventId}/performances",
+   "perm": "PERFORMANCE_CONFIGURE",
+   "platforms": [],
+   "screens": [
+    "BO-015",
+    "BO-019"
+   ],
+   "enables": [
+    "catalogue.performance"
+   ]
+  },
   "createPlan": {
    "part": "setup",
    "service": "PlatformService",
@@ -2216,7 +2097,6 @@
    "platforms": [],
    "screens": [
     "ADM-008",
-    "ADM-019",
     "ADM-392"
    ],
    "enables": [
@@ -2233,7 +2113,6 @@
    "platforms": [],
    "screens": [
     "ADM-008",
-    "ADM-019",
     "ADM-398"
    ],
    "enables": [
@@ -2252,7 +2131,9 @@
    ],
    "screens": [
     "ADM-016",
-    "CMS-006"
+    "CMS-006",
+    "CMS-012",
+    "CMS-014"
    ],
    "enables": []
   },
@@ -2269,24 +2150,6 @@
    ],
    "enables": [
     "catalogue.price_list"
-   ]
-  },
-  "createPrincipal": {
-   "part": "setup",
-   "service": "IdentityService",
-   "contract": "identity",
-   "verb": "POST",
-   "path": "/principals",
-   "perm": "USER_MANAGE",
-   "platforms": [],
-   "screens": [
-    "ADM-020",
-    "ADM-421",
-    "BO-053",
-    "PTR-003"
-   ],
-   "enables": [
-    "identity.principal"
    ]
   },
   "createPromoBlock": {
@@ -2330,9 +2193,7 @@
    "screens": [
     "BO-001",
     "BO-002",
-    "BO-004",
-    "BO-005",
-    "BO-038"
+    "BO-005"
    ],
    "enables": [
     "queue.queue",
@@ -2352,7 +2213,7 @@
    ],
    "screens": [
     "BO-830",
-    "GST-072",
+    "GST-036",
     "WEB-043"
    ],
    "enables": []
@@ -2368,19 +2229,16 @@
     "POS"
    ],
    "screens": [
+    "ADM-610",
     "ADM-616",
     "BO-022",
     "BO-023",
     "BO-026",
     "BO-047",
     "BO-1147",
-    "EMP-014",
     "EMP-034",
-    "POS-002",
     "POS-006",
-    "POS-011",
-    "PTR-008",
-    "PTR-015"
+    "POS-011"
    ],
    "enables": []
   },
@@ -2396,8 +2254,6 @@
     "WEB"
    ],
    "screens": [
-    "ADM-610",
-    "BO-028",
     "GST-067",
     "WEB-019"
    ],
@@ -2423,7 +2279,9 @@
     "SUP-008"
    ],
    "enables": [
-    "reporting.report_definition_version"
+    "reporting.report_definition",
+    "reporting.report_definition_version",
+    "reporting.report_parameter"
    ]
   },
   "createResaleListing": {
@@ -2443,6 +2301,21 @@
    ],
    "enables": []
   },
+  "createReservation": {
+   "part": "core",
+   "service": "OrderService",
+   "contract": "orders",
+   "verb": "POST",
+   "path": "/reservations",
+   "perm": "ORDER_CREATE",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "POS-031"
+   ],
+   "enables": []
+  },
   "createResource": {
    "part": "setup",
    "service": "VenueOpsService",
@@ -2453,8 +2326,7 @@
    "platforms": [],
    "screens": [
     "BO-095",
-    "BO-857",
-    "BO-863"
+    "BO-857"
    ],
    "enables": [
     "resources.resource"
@@ -2523,7 +2395,6 @@
     "POS"
    ],
    "screens": [
-    "POS-002",
     "POS-011"
    ],
    "enables": []
@@ -2562,24 +2433,23 @@
    ]
   },
   "createRotaAssignment": {
-   "part": "core",
+   "part": "setup",
    "service": "TenancyService",
    "contract": "workforce",
    "verb": "POST",
    "path": "/rota-assignments",
    "perm": "WORKFORCE_MANAGE",
-   "platforms": [
-    "POS"
-   ],
+   "platforms": [],
    "screens": [
     "BO-055",
     "BO-712",
+    "BO-714",
     "BO-884",
-    "BO-917",
-    "POS-009",
-    "POS-018"
+    "BO-917"
    ],
-   "enables": []
+   "enables": [
+    "workforce.rota_assignment"
+   ]
   },
   "createSaleBoard": {
    "part": "setup",
@@ -2590,6 +2460,7 @@
    "perm": "WORKSTATION_CONFIGURE",
    "platforms": [],
    "screens": [
+    "BO-109",
     "BO-124"
    ],
    "enables": [
@@ -2655,6 +2526,21 @@
     "marketing.segment"
    ]
   },
+  "createShopAndDrop": {
+   "part": "core",
+   "service": "RetailService",
+   "contract": "retail",
+   "verb": "POST",
+   "path": "/shop-and-drop",
+   "perm": "ORDER_CREATE",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "POS-005"
+   ],
+   "enables": []
+  },
   "createTableReservation": {
    "part": "core",
    "service": "FnbService",
@@ -2667,9 +2553,24 @@
     "WEB"
    ],
    "screens": [
-    "EMP-055",
     "GST-070",
     "WEB-036"
+   ],
+   "enables": []
+  },
+  "createTableReservationForGuest": {
+   "part": "core",
+   "service": "FnbService",
+   "contract": "fnb",
+   "verb": "POST",
+   "path": "/outlets/{outletId}/table-reservations",
+   "perm": "ORDER_CREATE",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "EMP-055",
+    "POS-028"
    ],
    "enables": []
   },
@@ -2698,7 +2599,8 @@
    "platforms": [],
    "screens": [
     "ADM-005",
-    "ADM-419"
+    "ADM-419",
+    "ADM-420"
    ],
    "enables": [
     "control.tenant"
@@ -2795,7 +2697,24 @@
     "BO-955",
     "CMS-002",
     "CMS-010",
-    "CMS-063"
+    "CMS-063",
+    "SUP-013"
+   ],
+   "enables": []
+  },
+  "createUrlRedirect": {
+   "part": "core",
+   "service": "MarketingService",
+   "contract": "marketing-crm",
+   "verb": "POST",
+   "path": "/seo-redirects",
+   "perm": "MARKETING_MANAGE",
+   "platforms": [
+    "WL"
+   ],
+   "screens": [
+    "BO-842",
+    "CMS-013"
    ],
    "enables": []
   },
@@ -2844,12 +2763,11 @@
    ],
    "screens": [
     "ADM-145",
-    "ADM-249",
     "BO-084",
     "BO-085",
-    "BO-133",
     "BO-243",
     "BO-367",
+    "BO-374",
     "BO-377",
     "BO-378",
     "BO-940",
@@ -2904,6 +2822,7 @@
     "ADM-531",
     "ADM-532",
     "ANL-009",
+    "BO-598",
     "BO-762",
     "BO-793",
     "BO-928",
@@ -3095,25 +3014,24 @@
    "enables": []
   },
   "deleteReport": {
-   "part": "core",
+   "part": "setup",
    "service": "ReportingService",
    "contract": "reporting",
    "verb": "DELETE",
    "path": "/reports/{reportId}",
    "perm": "REPORT_MANAGE",
-   "platforms": [
-    "POS"
-   ],
+   "platforms": [],
    "screens": [
     "BO-029",
     "BO-058",
     "BO-059",
     "BO-060",
-    "POS-008",
     "PTR-018",
     "SUP-008"
    ],
-   "enables": []
+   "enables": [
+    "reporting.report_definition"
+   ]
   },
   "deprecateApiVersion": {
    "part": "setup",
@@ -3143,7 +3061,7 @@
    ],
    "screens": [
     "ADM-016",
-    "CMS-006",
+    "CMS-014",
     "CMS-015"
    ],
    "enables": []
@@ -3191,8 +3109,11 @@
    ],
    "screens": [
     "ADM-001",
+    "ADM-699",
     "EMP-042",
     "GST-073",
+    "PTR-001",
+    "SUP-001",
     "WEB-024"
    ],
    "enables": []
@@ -3256,10 +3177,7 @@
     "ADM-337",
     "ADM-530",
     "ADM-532",
-    "BO-085",
-    "BO-368",
-    "POS-002",
-    "POS-004"
+    "POS-002"
    ],
    "enables": []
   },
@@ -3275,6 +3193,8 @@
     "WEB"
    ],
    "screens": [
+    "ADM-157",
+    "ADM-177",
     "BO-010",
     "KSK-006",
     "POS-002",
@@ -3301,17 +3221,14 @@
     "BO-023",
     "BO-026",
     "BO-047",
-    "EMP-014",
+    "BO-315",
     "EMP-034",
-    "POS-002",
     "POS-006",
     "POS-010",
     "POS-011",
     "PTR-002",
-    "PTR-005",
     "PTR-008",
-    "PTR-015",
-    "PTR-016"
+    "PTR-015"
    ],
    "enables": []
   },
@@ -3348,6 +3265,22 @@
     "ai.insight"
    ]
   },
+  "exportSitePackage": {
+   "part": "core",
+   "service": "WhiteLabelService",
+   "contract": "white-label",
+   "verb": "POST",
+   "path": "/site-package",
+   "perm": "TENANT_PUBLISH",
+   "platforms": [
+    "WL"
+   ],
+   "screens": [
+    "ADM-016",
+    "CMS-014"
+   ],
+   "enables": []
+  },
   "exportSubjectData": {
    "part": "core",
    "service": "IdentityService",
@@ -3382,6 +3315,21 @@
    ],
    "enables": []
   },
+  "extendReservation": {
+   "part": "core",
+   "service": "OrderService",
+   "contract": "orders",
+   "verb": "POST",
+   "path": "/reservations/{reservationId}/extend",
+   "perm": "ORDER_CREATE",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "POS-031"
+   ],
+   "enables": []
+  },
   "extendResourceHold": {
    "part": "core",
    "service": "VenueOpsService",
@@ -3399,22 +3347,6 @@
    ],
    "enables": []
   },
-  "extendSeatHold": {
-   "part": "core",
-   "service": "CatalogueService",
-   "contract": "seating",
-   "verb": "POST",
-   "path": "/seat-holds/{holdId}/extend",
-   "perm": "ORDER_CREATE",
-   "platforms": [
-    "POS"
-   ],
-   "screens": [
-    "BO-998",
-    "POS-004"
-   ],
-   "enables": []
-  },
   "fireCourse": {
    "part": "core",
    "service": "FnbService",
@@ -3427,7 +3359,6 @@
    ],
    "screens": [
     "EMP-058",
-    "KIT-002",
     "KIT-003"
    ],
    "enables": []
@@ -3443,10 +3374,8 @@
     "POS"
    ],
    "screens": [
-    "ADM-001",
-    "POS-000",
-    "PTR-001",
-    "SUP-001"
+    "BO-053",
+    "POS-000"
    ],
    "enables": []
   },
@@ -3459,6 +3388,7 @@
    "perm": "PRICE_CONFIGURE",
    "platforms": [],
    "screens": [
+    "ADM-160",
     "BO-010"
    ],
    "enables": [
@@ -3480,6 +3410,22 @@
     "GST-051",
     "GST-052",
     "WEB-050"
+   ],
+   "enables": []
+  },
+  "getAiByokEnablement": {
+   "part": "core",
+   "service": "AiService",
+   "contract": "ai",
+   "verb": "GET",
+   "path": "/tenants/{tenantId}/byok",
+   "perm": "AI_CONFIGURE",
+   "platforms": [
+    "AI"
+   ],
+   "screens": [
+    "ADM-037",
+    "BO-091"
    ],
    "enables": []
   },
@@ -3510,6 +3456,7 @@
    ],
    "screens": [
     "ADM-549",
+    "ANL-070",
     "BO-091"
    ],
    "enables": []
@@ -3526,7 +3473,8 @@
    ],
    "screens": [
     "ADM-489",
-    "ANL-071"
+    "ANL-071",
+    "BO-927"
    ],
    "enables": []
   },
@@ -3588,6 +3536,22 @@
    ],
    "enables": []
   },
+  "getBill": {
+   "part": "core",
+   "service": "FnbService",
+   "contract": "fnb",
+   "verb": "GET",
+   "path": "/table-visits/{visitId}/bill",
+   "perm": "ORDER_VIEW",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "EMP-059",
+    "POS-028"
+   ],
+   "enables": []
+  },
   "getBillingStatement": {
    "part": "core",
    "service": "OrderService",
@@ -3631,6 +3595,7 @@
     "WL"
    ],
    "screens": [
+    "CMS-006",
     "CMS-016"
    ],
    "enables": []
@@ -3648,7 +3613,9 @@
    "screens": [
     "ADM-016",
     "CMS-002",
-    "CMS-004"
+    "CMS-004",
+    "CMS-006",
+    "CMS-104"
    ],
    "enables": []
   },
@@ -3664,6 +3631,9 @@
     "WEB"
    ],
    "screens": [
+    "ADM-180",
+    "ADM-181",
+    "ADM-187",
     "GST-004",
     "GST-056",
     "WEB-008"
@@ -3733,6 +3703,21 @@
    ],
    "enables": []
   },
+  "getCourseRules": {
+   "part": "core",
+   "service": "FnbService",
+   "contract": "fnb",
+   "verb": "GET",
+   "path": "/outlets/{outletId}/course-rules",
+   "perm": "PRODUCT_VIEW",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "KIT-009"
+   ],
+   "enables": []
+  },
   "getCurrentSession": {
    "part": "core",
    "service": "IdentityService",
@@ -3766,18 +3751,11 @@
     "POS"
    ],
    "screens": [
-    "BO-039",
-    "BO-040",
-    "EMP-003",
     "EMP-008",
     "EMP-009",
-    "EMP-022",
     "POS-001",
     "POS-007",
-    "POS-009",
-    "POS-012",
-    "POS-025",
-    "SCN-001"
+    "POS-012"
    ],
    "enables": []
   },
@@ -3812,6 +3790,21 @@
    ],
    "enables": []
   },
+  "getDeepLinkScheme": {
+   "part": "core",
+   "service": "WhiteLabelService",
+   "contract": "white-label",
+   "verb": "GET",
+   "path": "/deep-links",
+   "perm": "TENANT_CONFIGURE",
+   "platforms": [
+    "WL"
+   ],
+   "screens": [
+    "CMS-009"
+   ],
+   "enables": []
+  },
   "getDeviceConsentHistory": {
    "part": "core",
    "service": "MarketingService",
@@ -3829,6 +3822,27 @@
    ],
    "enables": []
   },
+  "getEffectiveAiPolicy": {
+   "part": "core",
+   "service": "AiService",
+   "contract": "ai",
+   "verb": "GET",
+   "path": "/governance/effective-policy",
+   "perm": "AI_USE",
+   "platforms": [
+    "AI"
+   ],
+   "screens": [
+    "ADM-489",
+    "ADM-522",
+    "ADM-525",
+    "ADM-526",
+    "ADM-528",
+    "ANL-060",
+    "BO-091"
+   ],
+   "enables": []
+  },
   "getEntitlement": {
    "part": "core",
    "service": "AccessService",
@@ -3841,6 +3855,7 @@
     "WEB"
    ],
    "screens": [
+    "BO-355",
     "GST-012",
     "GST-013",
     "GST-055",
@@ -3860,6 +3875,7 @@
     "WEB"
    ],
    "screens": [
+    "BO-355",
     "GST-012",
     "GST-013",
     "GST-055",
@@ -3879,6 +3895,7 @@
     "WEB"
    ],
    "screens": [
+    "BO-355",
     "GST-012",
     "GST-013",
     "WEB-018"
@@ -3935,27 +3952,6 @@
    ],
    "enables": []
   },
-  "getFinancialReport": {
-   "part": "core",
-   "service": "LedgerService",
-   "contract": "finance",
-   "verb": "GET",
-   "path": "/reports/financial",
-   "perm": "REPORT_VIEW_VENUE",
-   "platforms": [
-    "POS"
-   ],
-   "screens": [
-    "BO-029",
-    "BO-058",
-    "BO-059",
-    "BO-060",
-    "POS-008",
-    "PTR-018",
-    "SUP-008"
-   ],
-   "enables": []
-  },
   "getFnbDeliveryPolicy": {
    "part": "core",
    "service": "FnbService",
@@ -4001,7 +3997,76 @@
     "WL"
    ],
    "screens": [
-    "CMS-003"
+    "CMS-003",
+    "CMS-006"
+   ],
+   "enables": []
+  },
+  "getForecast": {
+   "part": "core",
+   "service": "AiService",
+   "contract": "ai",
+   "verb": "GET",
+   "path": "/forecasts",
+   "perm": "AI_USE",
+   "platforms": [
+    "AI"
+   ],
+   "screens": [
+    "ADM-499",
+    "ADM-502",
+    "ADM-503",
+    "ADM-504",
+    "ADM-505",
+    "ADM-506",
+    "ADM-507",
+    "ADM-509",
+    "ADM-510",
+    "ADM-511",
+    "ADM-512",
+    "ADM-513",
+    "ADM-514",
+    "ADM-515",
+    "ADM-516",
+    "ANL-008",
+    "ANL-057",
+    "BO-919",
+    "BO-926",
+    "BO-927"
+   ],
+   "enables": []
+  },
+  "getForecastAccuracy": {
+   "part": "core",
+   "service": "AiService",
+   "contract": "ai",
+   "verb": "GET",
+   "path": "/forecast-accuracy",
+   "perm": "AI_USE",
+   "platforms": [
+    "AI"
+   ],
+   "screens": [
+    "ADM-506",
+    "ADM-508"
+   ],
+   "enables": []
+  },
+  "getForm": {
+   "part": "core",
+   "service": "MarketingService",
+   "contract": "marketing-crm",
+   "verb": "GET",
+   "path": "/forms/{formId}",
+   "perm": "GUEST_VIEW",
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "BO-618",
+    "GST-035",
+    "WEB-026"
    ],
    "enables": []
   },
@@ -4017,13 +4082,12 @@
     "WEB"
    ],
    "screens": [
-    "BO-396",
     "BO-454",
     "BO-455",
     "BO-457",
     "BO-462",
     "BO-486",
-    "GST-026",
+    "GST-011",
     "WEB-021"
    ],
    "enables": []
@@ -4041,6 +4105,7 @@
    ],
    "screens": [
     "BO-1123",
+    "BO-1125",
     "GST-071",
     "WEB-021"
    ],
@@ -4055,11 +4120,14 @@
    "perm": "ORDER_VIEW",
    "platforms": [
     "MOB",
+    "POS",
     "WEB"
    ],
    "screens": [
     "BO-026",
+    "BO-273",
     "GST-072",
+    "POS-031",
     "WEB-031"
    ],
    "enables": []
@@ -4111,9 +4179,33 @@
     "WEB"
    ],
    "screens": [
+    "BO-737",
     "BO-749",
+    "GST-039",
+    "GST-065",
     "GST-066",
-    "WEB-024"
+    "WEB-020",
+    "WEB-024",
+    "WEB-027"
+   ],
+   "enables": []
+  },
+  "getGuestLoyalty": {
+   "part": "core",
+   "service": "MarketingService",
+   "contract": "marketing-crm",
+   "verb": "GET",
+   "path": "/guests/{subjectId}/loyalty",
+   "perm": "GUEST_VIEW",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "BO-735",
+    "BO-737",
+    "BO-831",
+    "POS-002",
+    "POS-027"
    ],
    "enables": []
   },
@@ -4130,7 +4222,6 @@
     "WEB"
    ],
    "screens": [
-    "BO-044",
     "GST-024",
     "GST-031",
     "GST-061",
@@ -4154,35 +4245,11 @@
     "WEB"
    ],
    "screens": [
-    "BO-021",
     "GST-024",
     "GST-025",
     "GST-032",
     "WEB-036",
     "WEB-038"
-   ],
-   "enables": []
-  },
-  "getGuestProfile": {
-   "part": "core",
-   "service": "MarketingService",
-   "contract": "marketing-crm",
-   "verb": "GET",
-   "path": "/guests/{subjectId}",
-   "perm": "GUEST_VIEW",
-   "platforms": [
-    "MOB",
-    "WEB"
-   ],
-   "screens": [
-    "ADM-680",
-    "BO-735",
-    "BO-738",
-    "BO-740",
-    "EMP-057",
-    "GST-001",
-    "WEB-011",
-    "WEB-020"
    ],
    "enables": []
   },
@@ -4231,7 +4298,8 @@
    ],
    "screens": [
     "BO-044",
-    "EMP-062",
+    "BO-140",
+    "EMP-067",
     "KIT-008"
    ],
    "enables": []
@@ -4248,6 +4316,21 @@
    ],
    "screens": [
     "CMS-007"
+   ],
+   "enables": []
+  },
+  "getKitchenSla": {
+   "part": "core",
+   "service": "FnbService",
+   "contract": "fnb",
+   "verb": "GET",
+   "path": "/outlets/{outletId}/kitchen-sla",
+   "perm": "PRODUCT_VIEW",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "KIT-009"
    ],
    "enables": []
   },
@@ -4278,13 +4361,11 @@
    "perm": null,
    "platforms": [
     "MOB",
-    "POS",
     "WEB"
    ],
    "screens": [
-    "BO-831",
     "GST-036",
-    "POS-002",
+    "WEB-017",
     "WEB-043"
    ],
    "enables": []
@@ -4318,7 +4399,6 @@
     "WEB"
    ],
    "screens": [
-    "BO-788",
     "GST-065",
     "WEB-027"
    ],
@@ -4336,7 +4416,6 @@
     "WL"
    ],
    "screens": [
-    "BO-027",
     "CMS-010",
     "CMS-068",
     "CMS-082",
@@ -4353,30 +4432,12 @@
    "path": "/media/{mediaCode}/entitlements",
    "perm": "ORDER_VIEW",
    "platforms": [
-    "POS",
-    "WL"
+    "POS"
    ],
    "screens": [
     "BO-027",
-    "CMS-010",
     "EMP-036",
     "POS-010"
-   ],
-   "enables": []
-  },
-  "getMenu": {
-   "part": "core",
-   "service": "FnbService",
-   "contract": "fnb",
-   "verb": "GET",
-   "path": "/menus/{menuId}",
-   "perm": "PRODUCT_VIEW",
-   "platforms": [
-    "WL"
-   ],
-   "screens": [
-    "BO-045",
-    "CMS-009"
    ],
    "enables": []
   },
@@ -4391,6 +4452,7 @@
     "WL"
    ],
    "screens": [
+    "ADM-424",
     "CMS-001",
     "CMS-007"
    ],
@@ -4404,12 +4466,9 @@
    "path": "/guests/me/challenges",
    "perm": "MARKETING_VIEW",
    "platforms": [
-    "MOB",
     "WEB"
    ],
    "screens": [
-    "BO-824",
-    "GST-072",
     "WEB-017"
    ],
    "enables": []
@@ -4422,11 +4481,9 @@
    "path": "/auth/guest/identity-verifications/current",
    "perm": null,
    "platforms": [
-    "MOB",
     "WEB"
    ],
    "screens": [
-    "GST-073",
     "WEB-020"
    ],
    "enables": []
@@ -4446,6 +4503,25 @@
     "GST-015",
     "WEB-022",
     "WEB-023"
+   ],
+   "enables": []
+  },
+  "getMyProfile": {
+   "part": "core",
+   "service": "MarketingService",
+   "contract": "marketing-crm",
+   "verb": "GET",
+   "path": "/guests/me/profile",
+   "perm": "GUEST_VIEW",
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "GST-001",
+    "GST-039",
+    "WEB-011",
+    "WEB-020"
    ],
    "enables": []
   },
@@ -4481,36 +4557,6 @@
    ],
    "enables": []
   },
-  "getOfflinePackage": {
-   "part": "core",
-   "service": "AccessService",
-   "contract": "access",
-   "verb": "GET",
-   "path": "/access/offline-package",
-   "perm": "ACCESS_VALIDATE",
-   "platforms": [
-    "POS"
-   ],
-   "screens": [
-    "BO-034",
-    "BO-035",
-    "BO-037",
-    "BO-060",
-    "BO-207",
-    "EMP-010",
-    "EMP-015",
-    "EMP-017",
-    "POS-013",
-    "SCN-003",
-    "SCN-007",
-    "SCN-008",
-    "SCN-009",
-    "SCN-013",
-    "SCN-014",
-    "SCN-015"
-   ],
-   "enables": []
-  },
   "getOrder": {
    "part": "core",
    "service": "OrderService",
@@ -4528,6 +4574,9 @@
     "BO-023",
     "BO-026",
     "BO-047",
+    "BO-1147",
+    "BO-305",
+    "BO-315",
     "EMP-014",
     "EMP-034",
     "GST-010",
@@ -4538,6 +4587,7 @@
     "KSK-011",
     "POS-002",
     "POS-006",
+    "POS-030",
     "PTR-002",
     "PTR-005",
     "PTR-008",
@@ -4579,9 +4629,9 @@
     "BO-023",
     "BO-026",
     "BO-047",
+    "BO-305",
     "EMP-014",
     "EMP-034",
-    "POS-002",
     "POS-006",
     "PTR-002",
     "PTR-005",
@@ -4622,15 +4672,30 @@
     "WEB"
    ],
    "screens": [
-    "BO-002",
     "BO-015",
     "BO-019",
-    "BO-063",
+    "BO-726",
     "GST-006",
     "GST-041",
     "POS-004",
     "WEB-006",
     "WEB-010"
+   ],
+   "enables": []
+  },
+  "getPlatformSubdomain": {
+   "part": "core",
+   "service": "WhiteLabelService",
+   "contract": "white-label",
+   "verb": "GET",
+   "path": "/platform-subdomain",
+   "perm": "TENANT_CONFIGURE",
+   "platforms": [
+    "WL"
+   ],
+   "screens": [
+    "ADM-017",
+    "CMS-017"
    ],
    "enables": []
   },
@@ -4693,6 +4758,7 @@
     "WEB"
    ],
    "screens": [
+    "ADM-140",
     "BO-010",
     "GST-037",
     "POS-002",
@@ -4713,9 +4779,25 @@
    ],
    "screens": [
     "ADM-138",
+    "ADM-140",
     "BO-010",
     "POS-002",
     "PTR-010"
+   ],
+   "enables": []
+  },
+  "getPublishReviewPolicy": {
+   "part": "core",
+   "service": "WhiteLabelService",
+   "contract": "white-label",
+   "verb": "GET",
+   "path": "/publish-review-policy",
+   "perm": "TENANT_CONFIGURE",
+   "platforms": [
+    "WL"
+   ],
+   "screens": [
+    "CMS-014"
    ],
    "enables": []
   },
@@ -4766,42 +4848,43 @@
    ],
    "enables": []
   },
-  "getQueue": {
+  "getPublishedTenantConfig": {
    "part": "core",
-   "service": "VenueOpsService",
-   "contract": "queue",
+   "service": "WhiteLabelService",
+   "contract": "white-label",
    "verb": "GET",
-   "path": "/queues/{queueId}",
-   "perm": "QUEUE_VIEW",
+   "path": "/storefront/tenant-config",
+   "perm": null,
    "platforms": [
-    "POS"
+    "MOB",
+    "WEB"
    ],
    "screens": [
-    "BO-001",
-    "BO-002",
-    "BO-004",
-    "BO-005",
-    "BO-038",
-    "EMP-031",
-    "EMP-032",
-    "POS-029"
+    "GST-001",
+    "GST-043",
+    "GST-047",
+    "KSK-002",
+    "WEB-001",
+    "WEB-028",
+    "WEB-029"
    ],
    "enables": []
   },
-  "getQueueFeedHealth": {
+  "getRegionSettings": {
    "part": "core",
-   "service": "VenueOpsService",
-   "contract": "queue",
+   "service": "TenancyService",
+   "contract": "tenancy",
    "verb": "GET",
-   "path": "/queue-feeds/{feedId}/health",
-   "perm": "QUEUE_MANAGE",
+   "path": "/regions/{regionId}/settings",
+   "perm": "SCOPE_VIEW",
    "platforms": [
-    "POS"
+    "AI"
    ],
    "screens": [
-    "BO-001",
-    "BO-003",
-    "POS-029"
+    "ADM-037",
+    "ADM-426",
+    "BO-1064",
+    "BO-1065"
    ],
    "enables": []
   },
@@ -4816,6 +4899,7 @@
     "POS"
    ],
    "screens": [
+    "ANL-023",
     "BO-029",
     "BO-058",
     "BO-059",
@@ -4835,11 +4919,13 @@
    "perm": "ORDER_VIEW",
    "platforms": [
     "MOB",
+    "POS",
     "WEB"
    ],
    "screens": [
     "GST-016",
     "GST-017",
+    "POS-031",
     "WEB-031"
    ],
    "enables": []
@@ -4908,6 +4994,7 @@
    ],
    "screens": [
     "BO-044",
+    "BO-143",
     "POS-011"
    ],
    "enables": []
@@ -4925,13 +5012,16 @@
     "WEB"
    ],
    "screens": [
-    "BO-002",
     "BO-015",
     "BO-019",
-    "BO-063",
     "BO-1000",
+    "BO-1001",
+    "BO-1002",
+    "BO-1039",
+    "BO-1040",
     "BO-986",
     "BO-994",
+    "BO-995",
     "BO-996",
     "GST-049",
     "POS-004",
@@ -4956,27 +5046,51 @@
    ],
    "enables": []
   },
-  "getShift": {
+  "getSeoMetadata": {
+   "part": "core",
+   "service": "MarketingService",
+   "contract": "marketing-crm",
+   "verb": "GET",
+   "path": "/seo-metadata",
+   "perm": "MARKETING_VIEW",
+   "platforms": [
+    "WL"
+   ],
+   "screens": [
+    "CMS-013"
+   ],
+   "enables": []
+  },
+  "getShiftCountLines": {
    "part": "core",
    "service": "OrderService",
    "contract": "shift",
    "verb": "GET",
-   "path": "/shifts/{shiftId}",
+   "path": "/shifts/{shiftId}/count-lines",
    "perm": "REPORT_VIEW_WORKSTATION",
    "platforms": [
     "POS"
    ],
    "screens": [
-    "BO-039",
     "BO-040",
-    "BO-041",
-    "BO-042",
-    "EMP-003",
-    "EMP-008",
-    "EMP-009",
-    "POS-001",
-    "POS-007",
-    "POS-009"
+    "BO-043",
+    "POS-007"
+   ],
+   "enables": []
+  },
+  "getSitePackage": {
+   "part": "core",
+   "service": "WhiteLabelService",
+   "contract": "white-label",
+   "verb": "GET",
+   "path": "/site-package/{packageId}",
+   "perm": "TENANT_PUBLISH",
+   "platforms": [
+    "WL"
+   ],
+   "screens": [
+    "ADM-016",
+    "CMS-014"
    ],
    "enables": []
   },
@@ -4991,6 +5105,7 @@
     "WL"
    ],
    "screens": [
+    "CMS-001",
     "CMS-102"
    ],
    "enables": []
@@ -5025,6 +5140,23 @@
     "EMP-051",
     "EMP-052",
     "EMP-060",
+    "POS-024",
+    "POS-028"
+   ],
+   "enables": []
+  },
+  "getTableVisit": {
+   "part": "core",
+   "service": "FnbService",
+   "contract": "fnb",
+   "verb": "GET",
+   "path": "/table-visits/{visitId}",
+   "perm": "ORDER_VIEW",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "EMP-058",
     "POS-028"
    ],
    "enables": []
@@ -5046,6 +5178,7 @@
     "BO-023",
     "GST-019",
     "POS-026",
+    "POS-030",
     "WEB-019"
    ],
    "enables": []
@@ -5095,7 +5228,6 @@
     "KSK-002",
     "WEB-001",
     "WEB-025",
-    "WEB-028",
     "WEB-029",
     "WEB-045",
     "WEB-050"
@@ -5110,19 +5242,39 @@
    "path": "/tenant-config",
    "perm": "TENANT_CONFIGURE",
    "platforms": [
-    "MOB",
-    "WEB",
     "WL"
    ],
    "screens": [
-    "BO-599",
+    "ADM-018",
     "BO-834",
-    "CMS-001",
-    "CMS-012",
-    "CMS-016",
-    "GST-001",
-    "KSK-002",
-    "WEB-001"
+    "CMS-011"
+   ],
+   "enables": []
+  },
+  "getTenantLicences": {
+   "part": "core",
+   "service": "PlatformService",
+   "contract": "subscription",
+   "verb": "GET",
+   "path": "/tenants/{tenantId}/licences",
+   "perm": "PLATFORM_TENANT_VIEW",
+   "platforms": [
+    "WL"
+   ],
+   "screens": [
+    "ADM-002",
+    "ADM-005",
+    "ADM-006",
+    "ADM-007",
+    "ADM-008",
+    "ADM-009",
+    "ADM-010",
+    "ADM-011",
+    "ADM-012",
+    "ADM-015",
+    "ADM-422",
+    "ADM-424",
+    "ADM-450"
    ],
    "enables": []
   },
@@ -5138,8 +5290,39 @@
    ],
    "screens": [
     "ADM-016",
-    "CMS-003",
-    "CMS-005"
+    "CMS-005",
+    "CMS-006"
+   ],
+   "enables": []
+  },
+  "getTillShiftPolicy": {
+   "part": "core",
+   "service": "OrderService",
+   "contract": "shift",
+   "verb": "GET",
+   "path": "/venues/{venueId}/till-shift-policy",
+   "perm": "SCOPE_VIEW",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "BO-065",
+    "POS-019"
+   ],
+   "enables": []
+  },
+  "getTranslationProposals": {
+   "part": "core",
+   "service": "AiService",
+   "contract": "ai",
+   "verb": "GET",
+   "path": "/ai/translate/{translationJobId}",
+   "perm": "TENANT_CONFIGURE",
+   "platforms": [
+    "WL"
+   ],
+   "screens": [
+    "CMS-011"
    ],
    "enables": []
   },
@@ -5251,36 +5434,6 @@
    ],
    "enables": []
   },
-  "getVenueSettings": {
-   "part": "core",
-   "service": "TenancyService",
-   "contract": "tenancy",
-   "verb": "GET",
-   "path": "/venues/{venueId}/settings",
-   "perm": "TENANT_VIEW",
-   "platforms": [
-    "POS"
-   ],
-   "screens": [
-    "BO-063",
-    "BO-065",
-    "BO-100",
-    "BO-101",
-    "BO-102",
-    "BO-103",
-    "BO-104",
-    "BO-105",
-    "BO-106",
-    "BO-1063",
-    "BO-107",
-    "BO-108",
-    "BO-136",
-    "BO-142",
-    "BO-143",
-    "POS-019"
-   ],
-   "enables": []
-  },
   "getVisitPlan": {
    "part": "core",
    "service": "VenueOpsService",
@@ -5331,7 +5484,6 @@
     "BO-002",
     "BO-004",
     "BO-005",
-    "BO-038",
     "EMP-031",
     "EMP-032",
     "GST-003",
@@ -5393,12 +5545,10 @@
    "path": "/guests/{subjectId}/waiver-status",
    "perm": "GUEST_VIEW",
    "platforms": [
-    "MOB",
     "WEB"
    ],
    "screens": [
     "BO-852",
-    "GST-067",
     "WEB-024"
    ],
    "enables": []
@@ -5416,11 +5566,17 @@
    ],
    "screens": [
     "BO-1086",
+    "BO-1100",
+    "BO-1149",
+    "BO-1150",
     "BO-414",
     "BO-416",
+    "BO-422",
     "BO-448",
     "BO-487",
+    "BO-488",
     "GST-011",
+    "WEB-017",
     "WEB-021"
    ],
    "enables": []
@@ -5476,10 +5632,8 @@
    "screens": [
     "GST-020",
     "WEB-009",
-    "WEB-011",
     "WEB-017",
-    "WEB-024",
-    "WEB-027"
+    "WEB-024"
    ],
    "enables": []
   },
@@ -5495,11 +5649,25 @@
    ],
    "screens": [
     "BO-036",
-    "BO-1069",
-    "BO-125",
     "BO-128",
     "BO-129",
     "POS-001",
+    "POS-025"
+   ],
+   "enables": []
+  },
+  "getWorkstationShift": {
+   "part": "core",
+   "service": "OrderService",
+   "contract": "shift",
+   "verb": "GET",
+   "path": "/shifts/current/overview",
+   "perm": "REPORT_VIEW_WORKSTATION",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "EMP-003",
     "POS-025"
    ],
    "enables": []
@@ -5512,12 +5680,10 @@
    "path": "/guests/{subjectId}/delegations",
    "perm": "GUEST_MANAGE",
    "platforms": [
-    "MOB",
-    "WEB"
+    "MOB"
    ],
    "screens": [
-    "GST-015",
-    "WEB-024"
+    "GST-015"
    ],
    "enables": []
   },
@@ -5602,9 +5768,9 @@
     "WEB"
    ],
    "screens": [
-    "BO-799",
     "GST-031",
     "GST-032",
+    "GST-033",
     "KSK-015",
     "WEB-044"
    ],
@@ -5622,7 +5788,6 @@
    ],
    "screens": [
     "EMP-058",
-    "KIT-002",
     "KIT-003"
    ],
    "enables": []
@@ -5639,18 +5804,14 @@
    ],
    "screens": [
     "BO-022",
-    "BO-023",
     "BO-026",
     "BO-047",
-    "EMP-014",
     "EMP-034",
     "POS-002",
     "POS-006",
     "PTR-002",
-    "PTR-005",
     "PTR-008",
-    "PTR-015",
-    "PTR-016"
+    "PTR-015"
    ],
    "enables": []
   },
@@ -5753,7 +5914,9 @@
    "path": "/collections/{collectionId}/documents",
    "perm": "AI_CONFIGURE",
    "platforms": [],
-   "screens": [],
+   "screens": [
+    "BO-798"
+   ],
    "enables": [
     "ai.chunk_embedding",
     "ai.knowledge_document"
@@ -5833,6 +5996,7 @@
     "BO-022",
     "GST-019",
     "POS-026",
+    "POS-030",
     "WEB-019"
    ],
    "enables": []
@@ -5884,26 +6048,8 @@
    ],
    "screens": [
     "EMP-056",
-    "EMP-058",
     "GST-070",
     "WEB-036"
-   ],
-   "enables": []
-  },
-  "joinWaitlist": {
-   "part": "core",
-   "service": "CatalogueService",
-   "contract": "catalogue",
-   "verb": "POST",
-   "path": "/waitlist-entries",
-   "perm": null,
-   "platforms": [
-    "MOB",
-    "WEB"
-   ],
-   "screens": [
-    "GST-070",
-    "WEB-040"
    ],
    "enables": []
   },
@@ -5916,7 +6062,7 @@
    "perm": "MARKETING_SEND",
    "platforms": [],
    "screens": [
-    "BO-005"
+    "BO-766"
    ],
    "enables": [
     "marketing.campaign"
@@ -5957,23 +6103,6 @@
    ],
    "enables": []
   },
-  "leaveWaitlist": {
-   "part": "core",
-   "service": "CatalogueService",
-   "contract": "catalogue",
-   "verb": "DELETE",
-   "path": "/waitlist-entries/{entryId}",
-   "perm": null,
-   "platforms": [
-    "MOB",
-    "WEB"
-   ],
-   "screens": [
-    "GST-070",
-    "WEB-040"
-   ],
-   "enables": []
-  },
   "linkGuestCheckout": {
    "part": "core",
    "service": "IdentityService",
@@ -5986,7 +6115,9 @@
     "WEB"
    ],
    "screens": [
+    "GST-010",
     "GST-042",
+    "WEB-013",
     "WEB-016"
    ],
    "enables": []
@@ -6002,6 +6133,7 @@
     "POS"
    ],
    "screens": [
+    "BO-140",
     "KIT-008"
    ],
    "enables": []
@@ -6017,10 +6149,29 @@
     "POS"
    ],
    "screens": [
-    "ADM-001",
-    "POS-000",
-    "PTR-001",
-    "SUP-001"
+    "BO-053",
+    "POS-000"
+   ],
+   "enables": []
+  },
+  "listAiCapabilities": {
+   "part": "core",
+   "service": "AiService",
+   "contract": "ai",
+   "verb": "GET",
+   "path": "/governance/capabilities",
+   "perm": "AI_USE",
+   "platforms": [
+    "AI"
+   ],
+   "screens": [
+    "ADM-519",
+    "ADM-520",
+    "ADM-521",
+    "ADM-522",
+    "ADM-536",
+    "ANL-060",
+    "BO-091"
    ],
    "enables": []
   },
@@ -6039,8 +6190,112 @@
     "BO-932",
     "EMP-019",
     "EMP-020",
+    "GST-031",
     "GST-068",
     "WEB-044"
+   ],
+   "enables": []
+  },
+  "listAiEvaluations": {
+   "part": "core",
+   "service": "AiService",
+   "contract": "ai",
+   "verb": "GET",
+   "path": "/evaluations",
+   "perm": "AI_USE",
+   "platforms": [
+    "AI"
+   ],
+   "screens": [
+    "ADM-554",
+    "ANL-060"
+   ],
+   "enables": []
+  },
+  "listAiGovernanceAlerts": {
+   "part": "core",
+   "service": "AiService",
+   "contract": "ai",
+   "verb": "GET",
+   "path": "/governance-alerts",
+   "perm": "AI_USE",
+   "platforms": [
+    "AI"
+   ],
+   "screens": [
+    "ADM-519",
+    "ADM-549",
+    "ADM-552",
+    "ADM-553",
+    "ADM-554",
+    "ADM-555",
+    "ADM-558"
+   ],
+   "enables": []
+  },
+  "listAiGovernancePolicyVersions": {
+   "part": "core",
+   "service": "AiService",
+   "contract": "ai",
+   "verb": "GET",
+   "path": "/governance/policy-versions",
+   "perm": "AI_USE",
+   "platforms": [
+    "AI"
+   ],
+   "screens": [
+    "ADM-523",
+    "ADM-524",
+    "ADM-526",
+    "ADM-527",
+    "ADM-528",
+    "ADM-530"
+   ],
+   "enables": []
+  },
+  "listAiIncidents": {
+   "part": "core",
+   "service": "AiService",
+   "contract": "ai",
+   "verb": "GET",
+   "path": "/incidents",
+   "perm": "AI_USE",
+   "platforms": [
+    "AI"
+   ],
+   "screens": [
+    "ADM-549",
+    "ADM-556"
+   ],
+   "enables": []
+  },
+  "listAiProviders": {
+   "part": "core",
+   "service": "AiService",
+   "contract": "ai",
+   "verb": "GET",
+   "path": "/providers",
+   "perm": "AI_CONFIGURE",
+   "platforms": [
+    "AI"
+   ],
+   "screens": [
+    "ADM-037"
+   ],
+   "enables": []
+  },
+  "listAiTrainingRuns": {
+   "part": "core",
+   "service": "AiService",
+   "contract": "ai",
+   "verb": "GET",
+   "path": "/training-runs",
+   "perm": "AI_USE",
+   "platforms": [
+    "AI"
+   ],
+   "screens": [
+    "ADM-554"
    ],
    "enables": []
   },
@@ -6060,13 +6315,11 @@
     "ANL-009",
     "ANL-012",
     "BO-036",
-    "BO-125",
     "BO-133",
     "BO-141",
     "BO-886",
     "EMP-061",
     "EMP-070",
-    "POS-009",
     "POS-020",
     "POS-025"
    ],
@@ -6085,7 +6338,6 @@
    "screens": [
     "BO-007",
     "BO-012",
-    "BO-014",
     "EMP-034",
     "POS-002",
     "POS-003",
@@ -6213,32 +6465,6 @@
    ],
    "enables": []
   },
-  "listCases": {
-   "part": "core",
-   "service": "MarketingService",
-   "contract": "marketing-crm",
-   "verb": "GET",
-   "path": "/cases",
-   "perm": "CASE_VIEW",
-   "platforms": [
-    "MOB",
-    "WEB"
-   ],
-   "screens": [
-    "BO-804",
-    "BO-805",
-    "BO-813",
-    "EMP-028",
-    "EMP-029",
-    "GST-068",
-    "PTR-021",
-    "SUP-002",
-    "SUP-004",
-    "SUP-005",
-    "WEB-025"
-   ],
-   "enables": []
-  },
   "listCashMovements": {
    "part": "core",
    "service": "OrderService",
@@ -6253,14 +6479,9 @@
     "BO-039",
     "BO-040",
     "BO-041",
-    "BO-042",
-    "EMP-003",
     "EMP-008",
     "EMP-009",
-    "POS-001",
     "POS-007",
-    "POS-009",
-    "POS-013",
     "POS-015"
    ],
    "enables": []
@@ -6273,17 +6494,14 @@
    "path": "/catalogue/bundles",
    "perm": "PRODUCT_VIEW",
    "platforms": [
-    "MOB",
-    "WEB"
+    "MOB"
    ],
    "screens": [
     "BO-011",
     "BO-037",
     "BO-094",
     "EMP-018",
-    "GST-052",
-    "GST-056",
-    "WEB-008"
+    "GST-052"
    ],
    "enables": []
   },
@@ -6316,7 +6534,6 @@
    ],
    "screens": [
     "ADM-016",
-    "CMS-006",
     "CMS-015"
    ],
    "enables": []
@@ -6351,9 +6568,13 @@
    "screens": [
     "BO-747",
     "CMS-018",
+    "GST-039",
     "GST-065",
+    "GST-066",
     "WEB-011",
-    "WEB-020"
+    "WEB-020",
+    "WEB-024",
+    "WEB-027"
    ],
    "enables": []
   },
@@ -6382,16 +6603,11 @@
    "path": "/tenant-config/pages",
    "perm": "TENANT_CONFIGURE",
    "platforms": [
-    "MOB",
-    "WEB",
     "WL"
    ],
    "screens": [
     "BO-837",
-    "CMS-007",
-    "GST-040",
-    "GST-057",
-    "WEB-045"
+    "CMS-007"
    ],
    "enables": []
   },
@@ -6407,6 +6623,7 @@
     "WEB"
    ],
    "screens": [
+    "ANL-072",
     "BO-023",
     "BO-1081",
     "GST-019",
@@ -6430,6 +6647,23 @@
    ],
    "enables": []
   },
+  "listCustomerBadges": {
+   "part": "core",
+   "service": "MarketingService",
+   "contract": "marketing-crm",
+   "verb": "GET",
+   "path": "/customers/{customerId}/badges",
+   "perm": "MARKETING_VIEW",
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "GST-036",
+    "WEB-043"
+   ],
+   "enables": []
+  },
   "listDelegations": {
    "part": "core",
    "service": "IdentityService",
@@ -6442,7 +6676,6 @@
     "WEB"
    ],
    "screens": [
-    "BO-385",
     "GST-015",
     "GST-069",
     "WEB-024"
@@ -6461,9 +6694,6 @@
     "WEB"
    ],
    "screens": [
-    "BO-062",
-    "BO-065",
-    "EMP-030",
     "GST-024",
     "GST-029",
     "WEB-036"
@@ -6483,10 +6713,7 @@
    "screens": [
     "BO-1065",
     "POS-001",
-    "POS-007",
-    "POS-011",
-    "POS-012",
-    "POS-013"
+    "POS-007"
    ],
    "enables": []
   },
@@ -6502,7 +6729,8 @@
    ],
    "screens": [
     "BO-042",
-    "POS-015"
+    "POS-015",
+    "POS-018"
    ],
    "enables": []
   },
@@ -6521,6 +6749,8 @@
     "ANL-003",
     "BO-036",
     "BO-124",
+    "BO-405",
+    "BO-732",
     "EMP-043",
     "POS-016",
     "POS-025"
@@ -6539,9 +6769,6 @@
     "WEB"
    ],
    "screens": [
-    "BO-062",
-    "BO-065",
-    "EMP-030",
     "GST-024",
     "GST-029",
     "WEB-036"
@@ -6576,32 +6803,10 @@
     "WL"
    ],
    "screens": [
-    "BO-001",
     "BO-015",
     "BO-019",
-    "BO-063",
     "BO-694",
     "CMS-101"
-   ],
-   "enables": []
-  },
-  "listFaqs": {
-   "part": "core",
-   "service": "WhiteLabelService",
-   "contract": "white-label",
-   "verb": "GET",
-   "path": "/tenant-config/faqs",
-   "perm": "TENANT_CONFIGURE",
-   "platforms": [
-    "MOB",
-    "WEB",
-    "WL"
-   ],
-   "screens": [
-    "ADM-018",
-    "GST-040",
-    "SUP-006",
-    "WEB-045"
    ],
    "enables": []
   },
@@ -6617,10 +6822,26 @@
    ],
    "screens": [
     "BO-020",
-    "BO-044",
+    "BO-021",
     "EMP-051",
     "KIT-001",
     "POS-029"
+   ],
+   "enables": []
+  },
+  "listForecastVersions": {
+   "part": "core",
+   "service": "AiService",
+   "contract": "ai",
+   "verb": "GET",
+   "path": "/forecast-versions",
+   "perm": "AI_USE",
+   "platforms": [
+    "AI"
+   ],
+   "screens": [
+    "ADM-506",
+    "ADM-508"
    ],
    "enables": []
   },
@@ -6659,6 +6880,22 @@
    ],
    "enables": []
   },
+  "listGroupArrivalCheck": {
+   "part": "core",
+   "service": "OrderService",
+   "contract": "orders",
+   "verb": "GET",
+   "path": "/group-arrival-check",
+   "perm": "ORDER_VIEW",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "BO-280",
+    "POS-031"
+   ],
+   "enables": []
+  },
   "listGroupPackages": {
    "part": "core",
    "service": "CatalogueService",
@@ -6671,6 +6908,7 @@
     "WEB"
    ],
    "screens": [
+    "BO-268",
     "GST-072",
     "WEB-031"
    ],
@@ -6689,28 +6927,7 @@
    ],
    "screens": [
     "GST-073",
-    "WEB-011",
-    "WEB-017",
-    "WEB-024",
-    "WEB-027"
-   ],
-   "enables": []
-  },
-  "listGuestMemberships": {
-   "part": "core",
-   "service": "CatalogueService",
-   "contract": "catalogue",
-   "verb": "GET",
-   "path": "/guest/memberships",
-   "perm": "PRODUCT_VIEW",
-   "platforms": [
-    "MOB",
-    "WEB"
-   ],
-   "screens": [
-    "GST-015",
-    "WEB-022",
-    "WEB-023"
+    "WEB-024"
    ],
    "enables": []
   },
@@ -6759,7 +6976,6 @@
    ],
    "screens": [
     "BO-018",
-    "BO-1057",
     "POS-003"
    ],
    "enables": []
@@ -6775,8 +6991,6 @@
     "POS"
    ],
    "screens": [
-    "BO-020",
-    "BO-046",
     "BO-134",
     "KIT-001",
     "KIT-005"
@@ -6796,7 +7010,6 @@
    "screens": [
     "BO-020",
     "BO-046",
-    "BO-731",
     "KIT-001",
     "KIT-002",
     "KIT-003",
@@ -6806,6 +7019,38 @@
     "KIT-007",
     "KIT-008",
     "POS-022"
+   ],
+   "enables": []
+  },
+  "listLandingPageTemplates": {
+   "part": "core",
+   "service": "WhiteLabelService",
+   "contract": "white-label",
+   "verb": "GET",
+   "path": "/landing-page-templates",
+   "perm": "TENANT_CONFIGURE",
+   "platforms": [
+    "WL"
+   ],
+   "screens": [
+    "CMS-007"
+   ],
+   "enables": []
+  },
+  "listLeaderboard": {
+   "part": "core",
+   "service": "MarketingService",
+   "contract": "marketing-crm",
+   "verb": "GET",
+   "path": "/loyalty/leaderboard",
+   "perm": null,
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "GST-036",
+    "WEB-043"
    ],
    "enables": []
   },
@@ -6827,31 +7072,6 @@
    ],
    "enables": []
   },
-  "listMenus": {
-   "part": "core",
-   "service": "FnbService",
-   "contract": "fnb",
-   "verb": "GET",
-   "path": "/menus",
-   "perm": "PRODUCT_VIEW",
-   "platforms": [
-    "POS",
-    "WL"
-   ],
-   "screens": [
-    "BO-007",
-    "BO-011",
-    "BO-045",
-    "BO-104",
-    "BO-109",
-    "BO-729",
-    "BO-730",
-    "CMS-009",
-    "POS-021",
-    "POS-024"
-   ],
-   "enables": []
-  },
   "listMerchandise": {
    "part": "core",
    "service": "RetailService",
@@ -6866,13 +7086,11 @@
    ],
    "screens": [
     "BO-007",
-    "BO-044",
     "BO-048",
     "BO-116",
     "GST-026",
     "KSK-017",
     "POS-002",
-    "POS-023",
     "WEB-033",
     "WEB-042"
    ],
@@ -6890,37 +7108,37 @@
     "WEB"
    ],
    "screens": [
-    "ADM-001",
     "ADM-342",
-    "EMP-001",
-    "EMP-002",
+    "ADM-699",
     "EMP-042",
     "GST-073",
-    "PTR-001",
-    "SCN-001",
-    "SUP-001",
     "WEB-024"
    ],
    "enables": []
   },
-  "listModifierGroups": {
+  "listModuleCatalogue": {
    "part": "core",
-   "service": "FnbService",
-   "contract": "fnb",
+   "service": "PlatformService",
+   "contract": "subscription",
    "verb": "GET",
-   "path": "/modifier-groups",
-   "perm": "PRODUCT_VIEW",
+   "path": "/module-catalogue",
+   "perm": "PLATFORM_PLAN_MANAGE",
    "platforms": [
-    "MOB",
-    "POS",
-    "WEB"
+    "WL"
    ],
    "screens": [
-    "GST-024",
-    "GST-061",
-    "POS-021",
-    "WEB-036",
-    "WEB-037"
+    "ADM-386",
+    "ADM-401",
+    "ADM-402",
+    "ADM-403",
+    "ADM-404",
+    "ADM-423",
+    "ADM-424",
+    "SGN-008",
+    "SGN-013",
+    "SGN-014",
+    "SGN-015",
+    "SGN-016"
    ],
    "enables": []
   },
@@ -6936,10 +7154,10 @@
     "WEB"
    ],
    "screens": [
-    "BO-804",
-    "BO-813",
     "GST-034",
     "GST-040",
+    "GST-068",
+    "WEB-025",
     "WEB-034"
    ],
    "enables": []
@@ -6962,6 +7180,7 @@
     "GST-055",
     "POS-002",
     "WEB-001",
+    "WEB-017",
     "WEB-018"
    ],
    "enables": []
@@ -7012,8 +7231,13 @@
     "WEB"
    ],
    "screens": [
+    "GST-014",
     "GST-019",
-    "WEB-019"
+    "GST-035",
+    "WEB-017",
+    "WEB-019",
+    "WEB-026",
+    "WEB-030"
    ],
    "enables": []
   },
@@ -7034,6 +7258,34 @@
    ],
    "enables": []
   },
+  "listOperationalRequirements": {
+   "part": "core",
+   "service": "AiService",
+   "contract": "ai",
+   "verb": "GET",
+   "path": "/operational-requirements",
+   "perm": "AI_USE",
+   "platforms": [
+    "AI"
+   ],
+   "screens": [
+    "ADM-509",
+    "ADM-510",
+    "ADM-511",
+    "ADM-512",
+    "ADM-513",
+    "ADM-514",
+    "ADM-515",
+    "ADM-516",
+    "ADM-517",
+    "ADM-518",
+    "BO-919",
+    "BO-925",
+    "BO-926",
+    "BO-927"
+   ],
+   "enables": []
+  },
   "listOrderRefunds": {
    "part": "core",
    "service": "OrderService",
@@ -7046,13 +7298,14 @@
    ],
    "screens": [
     "ADM-609",
+    "ADM-616",
     "BO-022",
     "BO-023",
     "BO-026",
     "BO-047",
+    "BO-1147",
     "EMP-014",
     "EMP-034",
-    "POS-002",
     "POS-006",
     "PTR-002",
     "PTR-005",
@@ -7070,9 +7323,7 @@
    "path": "/orders",
    "perm": "ORDER_VIEW",
    "platforms": [
-    "MOB",
-    "POS",
-    "WEB"
+    "POS"
    ],
    "screens": [
     "ANL-009",
@@ -7080,24 +7331,20 @@
     "BO-023",
     "BO-026",
     "BO-047",
-    "BO-082",
     "BO-101",
     "EMP-014",
     "EMP-034",
     "EMP-057",
-    "GST-014",
-    "GST-018",
-    "GST-019",
     "POS-002",
     "POS-006",
     "POS-012",
+    "POS-030",
     "PTR-002",
     "PTR-005",
     "PTR-008",
     "PTR-015",
     "PTR-016",
-    "WEB-019",
-    "WEB-030"
+    "SUP-014"
    ],
    "enables": []
   },
@@ -7113,30 +7360,140 @@
    ],
    "screens": [
     "ADM-006",
+    "ADM-412",
+    "BO-055",
     "BO-064",
+    "BO-068",
     "BO-145",
     "CMS-016"
    ],
    "enables": []
   },
-  "listOutlets": {
+  "listOwnPlatformStaffGrants": {
    "part": "core",
-   "service": "TenancyService",
-   "contract": "tenancy",
+   "service": "IdentityService",
+   "contract": "identity",
    "verb": "GET",
-   "path": "/outlets",
-   "perm": "SCOPE_VIEW",
+   "path": "/platform-staff-grants/mine",
+   "perm": "PLATFORM_TENANT_ACCESS",
    "platforms": [
-    "POS"
+    "AI",
+    "WL"
    ],
    "screens": [
-    "BO-044",
-    "BO-134",
-    "BO-727",
-    "BO-728",
-    "BO-732",
-    "POS-011",
-    "POS-024"
+    "ADM-004",
+    "ADM-005",
+    "ADM-006",
+    "ADM-015",
+    "ADM-016",
+    "ADM-017",
+    "ADM-018",
+    "ADM-019",
+    "ADM-020",
+    "ADM-021",
+    "ADM-026",
+    "ADM-031",
+    "ADM-037",
+    "ADM-068",
+    "ADM-411",
+    "ADM-412",
+    "ADM-420",
+    "ADM-421",
+    "ADM-422",
+    "ADM-424",
+    "ADM-425",
+    "ADM-426",
+    "ADM-469",
+    "ADM-470",
+    "ADM-471",
+    "ADM-472",
+    "ADM-473",
+    "ADM-474",
+    "ADM-475",
+    "ADM-476",
+    "ADM-477",
+    "ADM-478",
+    "ADM-479",
+    "ADM-480",
+    "ADM-481",
+    "ADM-482",
+    "ADM-483",
+    "ADM-484",
+    "ADM-485",
+    "ADM-486",
+    "ADM-487",
+    "ADM-488",
+    "ADM-489",
+    "ADM-490",
+    "ADM-491",
+    "ADM-492",
+    "ADM-493",
+    "ADM-494",
+    "ADM-495",
+    "ADM-496",
+    "ADM-497",
+    "ADM-498",
+    "ADM-499",
+    "ADM-500",
+    "ADM-501",
+    "ADM-502",
+    "ADM-503",
+    "ADM-504",
+    "ADM-505",
+    "ADM-506",
+    "ADM-507",
+    "ADM-508",
+    "ADM-509",
+    "ADM-510",
+    "ADM-511",
+    "ADM-512",
+    "ADM-513",
+    "ADM-514",
+    "ADM-515",
+    "ADM-516",
+    "ADM-517",
+    "ADM-518",
+    "ADM-519",
+    "ADM-520",
+    "ADM-521",
+    "ADM-522",
+    "ADM-523",
+    "ADM-524",
+    "ADM-525",
+    "ADM-526",
+    "ADM-527",
+    "ADM-528",
+    "ADM-529",
+    "ADM-530",
+    "ADM-531",
+    "ADM-532",
+    "ADM-533",
+    "ADM-534",
+    "ADM-535",
+    "ADM-536",
+    "ADM-537",
+    "ADM-538",
+    "ADM-539",
+    "ADM-540",
+    "ADM-541",
+    "ADM-542",
+    "ADM-543",
+    "ADM-544",
+    "ADM-545",
+    "ADM-546",
+    "ADM-547",
+    "ADM-548",
+    "ADM-549",
+    "ADM-550",
+    "ADM-551",
+    "ADM-552",
+    "ADM-553",
+    "ADM-554",
+    "ADM-555",
+    "ADM-556",
+    "ADM-557",
+    "ADM-558",
+    "ADM-619"
    ],
    "enables": []
   },
@@ -7188,10 +7545,9 @@
     "WEB"
    ],
    "screens": [
-    "BO-001",
     "BO-015",
     "BO-019",
-    "BO-063",
+    "BO-725",
     "GST-003",
     "GST-004",
     "GST-005",
@@ -7215,8 +7571,7 @@
     "WL"
    ],
    "screens": [
-    "ADM-018",
-    "BO-243",
+    "BO-748",
     "CMS-018"
    ],
    "enables": []
@@ -7229,7 +7584,6 @@
    "path": "/principals",
    "perm": "USER_MANAGE",
    "platforms": [
-    "POS",
     "WL"
    ],
    "screens": [
@@ -7239,7 +7593,6 @@
     "BO-057",
     "BO-873",
     "CMS-019",
-    "POS-018",
     "PTR-003"
    ],
    "enables": []
@@ -7302,7 +7655,6 @@
     "BO-007",
     "BO-008",
     "BO-012",
-    "BO-014",
     "EMP-034",
     "GST-008",
     "GST-041",
@@ -7401,7 +7753,6 @@
    ],
    "screens": [
     "ADM-138",
-    "ADM-140",
     "ADM-145",
     "BO-010",
     "GST-036",
@@ -7410,6 +7761,61 @@
     "PTR-010",
     "WEB-032",
     "WEB-043"
+   ],
+   "enables": []
+  },
+  "listPublishedContentPages": {
+   "part": "core",
+   "service": "WhiteLabelService",
+   "contract": "white-label",
+   "verb": "GET",
+   "path": "/storefront/pages",
+   "perm": null,
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "GST-040",
+    "GST-057",
+    "WEB-045"
+   ],
+   "enables": []
+  },
+  "listPublishedFaqs": {
+   "part": "core",
+   "service": "WhiteLabelService",
+   "contract": "white-label",
+   "verb": "GET",
+   "path": "/storefront/faqs",
+   "perm": null,
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "GST-040",
+    "WEB-025",
+    "WEB-045"
+   ],
+   "enables": []
+  },
+  "listPublishedPolicies": {
+   "part": "core",
+   "service": "WhiteLabelService",
+   "contract": "white-label",
+   "verb": "GET",
+   "path": "/storefront/policies",
+   "perm": null,
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "GST-009",
+    "GST-040",
+    "WEB-012",
+    "WEB-045"
    ],
    "enables": []
   },
@@ -7430,28 +7836,6 @@
    ],
    "enables": []
   },
-  "listQueueEntries": {
-   "part": "core",
-   "service": "VenueOpsService",
-   "contract": "queue",
-   "verb": "GET",
-   "path": "/queues/{queueId}/entries",
-   "perm": "QUEUE_VIEW",
-   "platforms": [
-    "POS"
-   ],
-   "screens": [
-    "BO-001",
-    "BO-002",
-    "BO-004",
-    "BO-005",
-    "BO-038",
-    "EMP-031",
-    "EMP-032",
-    "POS-029"
-   ],
-   "enables": []
-  },
   "listQueues": {
    "part": "core",
    "service": "VenueOpsService",
@@ -7468,12 +7852,9 @@
     "BO-002",
     "BO-004",
     "BO-005",
-    "BO-038",
     "BO-221",
     "EMP-031",
-    "EMP-032",
     "GST-023",
-    "SUP-020",
     "WEB-039"
    ],
    "enables": []
@@ -7489,6 +7870,7 @@
     "POS"
    ],
    "screens": [
+    "ANL-023",
     "ANL-031",
     "BO-029",
     "BO-058",
@@ -7510,10 +7892,12 @@
    "perm": "ORDER_VIEW",
    "platforms": [
     "MOB",
+    "POS",
     "WEB"
    ],
    "screens": [
     "GST-016",
+    "POS-031",
     "WEB-031"
    ],
    "enables": []
@@ -7533,6 +7917,23 @@
    ],
    "enables": []
   },
+  "listRewards": {
+   "part": "core",
+   "service": "MarketingService",
+   "contract": "marketing-crm",
+   "verb": "GET",
+   "path": "/loyalty/rewards",
+   "perm": "MARKETING_VIEW",
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "GST-036",
+    "WEB-043"
+   ],
+   "enables": []
+  },
   "listRoles": {
    "part": "core",
    "service": "IdentityService",
@@ -7547,9 +7948,7 @@
     "ADM-021",
     "BO-054",
     "BO-106",
-    "BO-142",
-    "CMS-019",
-    "EMP-002"
+    "CMS-019"
    ],
    "enables": []
   },
@@ -7565,13 +7964,14 @@
    ],
    "screens": [
     "BO-055",
-    "BO-882",
+    "BO-712",
+    "BO-714",
     "BO-883",
+    "BO-884",
     "EMP-021",
     "EMP-022",
     "EMP-023",
-    "POS-009",
-    "POS-018"
+    "POS-009"
    ],
    "enables": []
   },
@@ -7586,12 +7986,11 @@
     "POS"
    ],
    "screens": [
-    "BO-115",
+    "BO-109",
     "BO-116",
-    "BO-117",
-    "BO-118",
     "BO-122",
     "BO-123",
+    "BO-124",
     "BO-126",
     "POS-002",
     "POS-025"
@@ -7610,7 +8009,6 @@
    ],
    "screens": [
     "BO-114",
-    "BO-505",
     "EMP-069",
     "POS-011"
    ],
@@ -7630,15 +8028,34 @@
     "BO-039",
     "BO-040",
     "BO-041",
-    "BO-042",
+    "BO-043",
     "BO-100",
-    "EMP-003",
     "EMP-008",
     "EMP-009",
-    "POS-001",
-    "POS-007",
     "POS-009",
     "POS-019"
+   ],
+   "enables": []
+  },
+  "listSyncRejections": {
+   "part": "core",
+   "service": "OrderService",
+   "contract": "orders",
+   "verb": "GET",
+   "path": "/sync/rejections",
+   "perm": "ORDER_VIEW",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "BO-037",
+    "BO-038",
+    "BO-130",
+    "BO-132",
+    "BO-133",
+    "EMP-017",
+    "POS-013",
+    "SCN-014"
    ],
    "enables": []
   },
@@ -7673,6 +8090,7 @@
    ],
    "screens": [
     "ADM-068",
+    "ANL-072",
     "BO-022",
     "BO-1081",
     "GST-019",
@@ -7692,6 +8110,7 @@
    ],
    "screens": [
     "ADM-002",
+    "ADM-004",
     "ADM-005",
     "ADM-006",
     "ADM-007",
@@ -7705,13 +8124,114 @@
     "ADM-017",
     "ADM-018",
     "ADM-019",
+    "ADM-020",
+    "ADM-021",
+    "ADM-026",
     "ADM-031",
     "ADM-037",
+    "ADM-068",
     "ADM-369",
     "ADM-370",
     "ADM-374",
+    "ADM-411",
     "ADM-412",
+    "ADM-420",
     "ADM-421",
+    "ADM-422",
+    "ADM-424",
+    "ADM-425",
+    "ADM-426",
+    "ADM-469",
+    "ADM-470",
+    "ADM-471",
+    "ADM-472",
+    "ADM-473",
+    "ADM-474",
+    "ADM-475",
+    "ADM-476",
+    "ADM-477",
+    "ADM-478",
+    "ADM-479",
+    "ADM-480",
+    "ADM-481",
+    "ADM-482",
+    "ADM-483",
+    "ADM-484",
+    "ADM-485",
+    "ADM-486",
+    "ADM-487",
+    "ADM-488",
+    "ADM-489",
+    "ADM-490",
+    "ADM-491",
+    "ADM-492",
+    "ADM-493",
+    "ADM-494",
+    "ADM-495",
+    "ADM-496",
+    "ADM-497",
+    "ADM-498",
+    "ADM-499",
+    "ADM-500",
+    "ADM-501",
+    "ADM-502",
+    "ADM-503",
+    "ADM-504",
+    "ADM-505",
+    "ADM-506",
+    "ADM-507",
+    "ADM-508",
+    "ADM-509",
+    "ADM-510",
+    "ADM-511",
+    "ADM-512",
+    "ADM-513",
+    "ADM-514",
+    "ADM-515",
+    "ADM-516",
+    "ADM-517",
+    "ADM-518",
+    "ADM-519",
+    "ADM-520",
+    "ADM-521",
+    "ADM-522",
+    "ADM-523",
+    "ADM-524",
+    "ADM-525",
+    "ADM-526",
+    "ADM-527",
+    "ADM-528",
+    "ADM-529",
+    "ADM-530",
+    "ADM-531",
+    "ADM-532",
+    "ADM-533",
+    "ADM-534",
+    "ADM-535",
+    "ADM-536",
+    "ADM-537",
+    "ADM-538",
+    "ADM-539",
+    "ADM-540",
+    "ADM-541",
+    "ADM-542",
+    "ADM-543",
+    "ADM-544",
+    "ADM-545",
+    "ADM-546",
+    "ADM-547",
+    "ADM-548",
+    "ADM-549",
+    "ADM-550",
+    "ADM-551",
+    "ADM-552",
+    "ADM-553",
+    "ADM-554",
+    "ADM-555",
+    "ADM-556",
+    "ADM-557",
+    "ADM-558",
+    "ADM-619",
     "BO-594"
    ],
    "enables": []
@@ -7824,33 +8344,13 @@
     "BO-1102",
     "BO-1142",
     "BO-1143",
+    "BO-1148",
     "BO-414",
     "BO-423",
+    "BO-453",
     "BO-469",
     "GST-011",
     "WEB-021"
-   ],
-   "enables": []
-  },
-  "listWorkstations": {
-   "part": "core",
-   "service": "TenancyService",
-   "contract": "tenancy",
-   "verb": "GET",
-   "path": "/workstations",
-   "perm": "SCOPE_VIEW",
-   "platforms": [
-    "POS"
-   ],
-   "screens": [
-    "BO-036",
-    "BO-037",
-    "BO-116",
-    "BO-126",
-    "BO-128",
-    "BO-129",
-    "BO-135",
-    "POS-009"
    ],
    "enables": []
   },
@@ -7909,7 +8409,6 @@
    "perm": "INCIDENT_REPORT",
    "platforms": [],
    "screens": [
-    "EMP-062",
     "EMP-067"
    ],
    "enables": [
@@ -7950,15 +8449,14 @@
     "WEB"
    ],
    "screens": [
-    "BO-048",
     "BO-114",
+    "EMP-062",
     "EMP-069",
     "GST-026",
     "KSK-017",
     "POS-002",
     "POS-023",
-    "WEB-033",
-    "WEB-042"
+    "WEB-033"
    ],
    "enables": []
   },
@@ -7973,6 +8471,7 @@
     "POS"
    ],
    "screens": [
+    "BO-021",
     "POS-005",
     "POS-011"
    ],
@@ -7987,12 +8486,14 @@
    "perm": "ORDER_VIEW",
    "platforms": [
     "MOB",
+    "POS",
     "WEB"
    ],
    "screens": [
     "BO-143",
     "GST-062",
     "KSK-011",
+    "POS-012",
     "WEB-042"
    ],
    "enables": []
@@ -8030,22 +8531,6 @@
    ],
    "enables": []
   },
-  "mergeTableVisits": {
-   "part": "core",
-   "service": "FnbService",
-   "contract": "fnb",
-   "verb": "POST",
-   "path": "/table-visits/{visitId}/merge",
-   "perm": "ORDER_MODIFY",
-   "platforms": [
-    "POS"
-   ],
-   "screens": [
-    "EMP-058",
-    "POS-028"
-   ],
-   "enables": []
-  },
   "modifyOrder": {
    "part": "core",
    "service": "OrderService",
@@ -8062,31 +8547,12 @@
     "BO-026",
     "BO-047",
     "BO-281",
-    "EMP-014",
+    "BO-315",
     "EMP-034",
-    "POS-002",
     "POS-006",
     "PTR-002",
-    "PTR-005",
     "PTR-008",
-    "PTR-015",
-    "PTR-016"
-   ],
-   "enables": []
-  },
-  "moveTableVisit": {
-   "part": "core",
-   "service": "FnbService",
-   "contract": "fnb",
-   "verb": "POST",
-   "path": "/table-visits/{visitId}/move",
-   "perm": "ORDER_MODIFY",
-   "platforms": [
-    "POS"
-   ],
-   "screens": [
-    "EMP-058",
-    "POS-028"
+    "PTR-015"
    ],
    "enables": []
   },
@@ -8101,8 +8567,23 @@
     "POS"
    ],
    "screens": [
-    "EMP-058",
     "KIT-002"
+   ],
+   "enables": []
+  },
+  "openAiIncident": {
+   "part": "core",
+   "service": "AiService",
+   "contract": "ai",
+   "verb": "POST",
+   "path": "/incidents",
+   "perm": "AI_CONFIGURE",
+   "platforms": [
+    "AI"
+   ],
+   "screens": [
+    "ADM-555",
+    "ADM-556"
    ],
    "enables": []
   },
@@ -8117,15 +8598,119 @@
     "WL"
    ],
    "screens": [
+    "ADM-004",
     "ADM-005",
+    "ADM-006",
+    "ADM-015",
     "ADM-016",
     "ADM-017",
     "ADM-018",
     "ADM-019",
+    "ADM-020",
+    "ADM-021",
+    "ADM-026",
     "ADM-031",
     "ADM-037",
+    "ADM-068",
+    "ADM-411",
     "ADM-412",
-    "ADM-421"
+    "ADM-420",
+    "ADM-421",
+    "ADM-422",
+    "ADM-424",
+    "ADM-425",
+    "ADM-426",
+    "ADM-469",
+    "ADM-470",
+    "ADM-471",
+    "ADM-472",
+    "ADM-473",
+    "ADM-474",
+    "ADM-475",
+    "ADM-476",
+    "ADM-477",
+    "ADM-478",
+    "ADM-479",
+    "ADM-480",
+    "ADM-481",
+    "ADM-482",
+    "ADM-483",
+    "ADM-484",
+    "ADM-485",
+    "ADM-486",
+    "ADM-487",
+    "ADM-488",
+    "ADM-489",
+    "ADM-490",
+    "ADM-491",
+    "ADM-492",
+    "ADM-493",
+    "ADM-494",
+    "ADM-495",
+    "ADM-496",
+    "ADM-497",
+    "ADM-498",
+    "ADM-499",
+    "ADM-500",
+    "ADM-501",
+    "ADM-502",
+    "ADM-503",
+    "ADM-504",
+    "ADM-505",
+    "ADM-506",
+    "ADM-507",
+    "ADM-508",
+    "ADM-509",
+    "ADM-510",
+    "ADM-511",
+    "ADM-512",
+    "ADM-513",
+    "ADM-514",
+    "ADM-515",
+    "ADM-516",
+    "ADM-517",
+    "ADM-518",
+    "ADM-519",
+    "ADM-520",
+    "ADM-521",
+    "ADM-522",
+    "ADM-523",
+    "ADM-524",
+    "ADM-525",
+    "ADM-526",
+    "ADM-527",
+    "ADM-528",
+    "ADM-529",
+    "ADM-530",
+    "ADM-531",
+    "ADM-532",
+    "ADM-533",
+    "ADM-534",
+    "ADM-535",
+    "ADM-536",
+    "ADM-537",
+    "ADM-538",
+    "ADM-539",
+    "ADM-540",
+    "ADM-541",
+    "ADM-542",
+    "ADM-543",
+    "ADM-544",
+    "ADM-545",
+    "ADM-546",
+    "ADM-547",
+    "ADM-548",
+    "ADM-549",
+    "ADM-550",
+    "ADM-551",
+    "ADM-552",
+    "ADM-553",
+    "ADM-554",
+    "ADM-555",
+    "ADM-556",
+    "ADM-557",
+    "ADM-558",
+    "ADM-619"
    ],
    "enables": []
   },
@@ -8140,14 +8725,7 @@
     "POS"
    ],
    "screens": [
-    "BO-039",
-    "BO-040",
-    "EMP-003",
-    "EMP-009",
-    "POS-001",
-    "POS-007",
-    "POS-009",
-    "POS-012"
+    "POS-001"
    ],
    "enables": []
   },
@@ -8167,6 +8745,40 @@
    ],
    "enables": []
   },
+  "overrideAiDecision": {
+   "part": "core",
+   "service": "AiService",
+   "contract": "ai",
+   "verb": "POST",
+   "path": "/decision-records/{decisionRecordId}/override",
+   "perm": "AI_APPROVE",
+   "platforms": [
+    "AI"
+   ],
+   "screens": [
+    "ADM-533",
+    "ADM-536"
+   ],
+   "enables": []
+  },
+  "pauseAiCapability": {
+   "part": "core",
+   "service": "AiService",
+   "contract": "ai",
+   "verb": "POST",
+   "path": "/governance/capabilities/{capabilityKey}/pause",
+   "perm": "AI_CONFIGURE",
+   "platforms": [
+    "AI"
+   ],
+   "screens": [
+    "ADM-519",
+    "ADM-536",
+    "ADM-556",
+    "ADM-696"
+   ],
+   "enables": []
+  },
   "payByLink": {
    "part": "core",
    "service": "OrderService",
@@ -8181,6 +8793,22 @@
    "screens": [
     "GST-009",
     "WEB-014"
+   ],
+   "enables": []
+  },
+  "previewProductTickets": {
+   "part": "core",
+   "service": "OrderService",
+   "contract": "orders",
+   "verb": "GET",
+   "path": "/products/{productId}/ticket-previews",
+   "perm": "PRODUCT_VIEW",
+   "platforms": [
+    "WL"
+   ],
+   "screens": [
+    "BO-008",
+    "CMS-006"
    ],
    "enables": []
   },
@@ -8212,8 +8840,7 @@
    "screens": [
     "BO-020",
     "BO-046",
-    "KIT-003",
-    "KIT-009"
+    "KIT-003"
    ],
    "enables": []
   },
@@ -8230,6 +8857,7 @@
     "ADM-554"
    ],
    "enables": [
+    "ai.forecast_definition",
     "ai.policy",
     "ai.release"
    ]
@@ -8313,6 +8941,7 @@
     "ADM-528"
    ],
    "enables": [
+    "ai.governance_policy",
     "ai.governance_policy_version"
    ]
   },
@@ -8325,7 +8954,6 @@
    "perm": "PRODUCT_CONFIGURE",
    "platforms": [],
    "screens": [
-    "BO-011",
     "BO-013",
     "BO-014",
     "BO-037"
@@ -8335,17 +8963,19 @@
    ]
   },
   "publishContentBlock": {
-   "part": "setup",
+   "part": "core",
    "service": "WhiteLabelService",
    "contract": "white-label",
    "verb": "POST",
    "path": "/content-blocks/{blockId}/publish",
    "perm": "TENANT_PUBLISH",
-   "platforms": [],
-   "screens": [],
-   "enables": [
-    "control.content_block"
-   ]
+   "platforms": [
+    "WL"
+   ],
+   "screens": [
+    "CMS-007"
+   ],
+   "enables": []
   },
   "publishForecastVersion": {
    "part": "setup",
@@ -8378,6 +9008,21 @@
    ],
    "enables": []
   },
+  "publishMenu": {
+   "part": "setup",
+   "service": "FnbService",
+   "contract": "fnb",
+   "verb": "POST",
+   "path": "/menus/{menuId}/publish",
+   "perm": "PRODUCT_CONFIGURE",
+   "platforms": [],
+   "screens": [
+    "BO-045"
+   ],
+   "enables": [
+    "fnb.menu"
+   ]
+  },
   "publishPromotion": {
    "part": "setup",
    "service": "CatalogueService",
@@ -8387,6 +9032,7 @@
    "perm": "PRICE_CONFIGURE",
    "platforms": [],
    "screens": [
+    "ADM-141",
     "BO-010"
    ],
    "enables": [
@@ -8402,8 +9048,7 @@
    "perm": "AI_APPROVE",
    "platforms": [],
    "screens": [
-    "ADM-037",
-    "ANL-060"
+    "ADM-037"
    ],
    "enables": [
     "ai.prompt_template",
@@ -8423,7 +9068,6 @@
    "screens": [
     "ADM-016",
     "BO-843",
-    "CMS-006",
     "CMS-014",
     "CMS-103"
    ],
@@ -8512,10 +9156,12 @@
     "WEB"
    ],
    "screens": [
-    "BO-938",
     "GST-034",
     "GST-035",
     "GST-040",
+    "GST-068",
+    "WEB-025",
+    "WEB-026",
     "WEB-034"
    ],
    "enables": []
@@ -8574,19 +9220,15 @@
    "perm": "PRODUCT_VIEW",
    "platforms": [
     "MOB",
-    "POS",
     "WEB"
    ],
    "screens": [
-    "BO-002",
     "BO-015",
     "BO-019",
-    "BO-063",
     "BO-1001",
     "BO-1002",
     "BO-1039",
     "GST-049",
-    "POS-004",
     "WEB-007"
    ],
    "enables": []
@@ -8604,9 +9246,32 @@
    ],
    "screens": [
     "EMP-020",
+    "GST-031",
     "GST-032",
+    "GST-033",
     "KSK-015",
     "WEB-044"
+   ],
+   "enables": []
+  },
+  "recordAttendance": {
+   "part": "core",
+   "service": "TenancyService",
+   "contract": "workforce",
+   "verb": "POST",
+   "path": "/attendance/clock",
+   "perm": "ATTENDANCE_RECORD",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "BO-056",
+    "BO-889",
+    "BO-935",
+    "BO-936",
+    "EMP-024",
+    "EMP-025",
+    "POS-009"
    ],
    "enables": []
   },
@@ -8619,14 +9284,15 @@
    "perm": null,
    "platforms": [
     "MOB",
+    "POS",
     "WEB"
    ],
    "screens": [
     "BO-748",
     "GST-039",
     "GST-065",
-    "WEB-011",
-    "WEB-017",
+    "GST-066",
+    "POS-027",
     "WEB-020",
     "WEB-024",
     "WEB-027"
@@ -8698,21 +9364,37 @@
    ],
    "enables": []
   },
-  "recordDeviceHeartbeat": {
+  "recordGroupCheckIn": {
    "part": "core",
-   "service": "TenancyService",
-   "contract": "tenancy",
+   "service": "OrderService",
+   "contract": "orders",
    "verb": "POST",
-   "path": "/devices/{deviceId}/heartbeat",
-   "perm": null,
+   "path": "/group-bookings/{groupBookingId}/check-in",
+   "perm": "ORDER_MODIFY",
    "platforms": [
     "POS"
    ],
    "screens": [
-    "BO-036",
-    "BO-124",
-    "BO-125",
-    "POS-016"
+    "BO-280",
+    "POS-031"
+   ],
+   "enables": []
+  },
+  "recordLostItem": {
+   "part": "core",
+   "service": "MarketingService",
+   "contract": "marketing-crm",
+   "verb": "POST",
+   "path": "/lost-items",
+   "perm": "CASE_MANAGE",
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "BO-073",
+    "GST-034",
+    "WEB-034"
    ],
    "enables": []
   },
@@ -8727,14 +9409,6 @@
     "POS"
    ],
    "screens": [
-    "BO-039",
-    "BO-040",
-    "BO-041",
-    "EMP-003",
-    "EMP-009",
-    "POS-001",
-    "POS-007",
-    "POS-009",
     "POS-014",
     "POS-020"
    ],
@@ -8752,6 +9426,7 @@
    ],
    "screens": [
     "BO-021",
+    "KIT-006",
     "KIT-007",
     "POS-012"
    ],
@@ -8769,7 +9444,6 @@
     "WEB"
    ],
    "screens": [
-    "BO-102",
     "GST-001",
     "GST-036",
     "GST-048",
@@ -8809,6 +9483,7 @@
     "WEB"
    ],
    "screens": [
+    "GST-036",
     "GST-071",
     "POS-002",
     "POS-005",
@@ -8845,6 +9520,22 @@
    "screens": [
     "GST-042",
     "WEB-016"
+   ],
+   "enables": []
+  },
+  "regenerateDomainToken": {
+   "part": "core",
+   "service": "WhiteLabelService",
+   "contract": "white-label",
+   "verb": "POST",
+   "path": "/tenant-domains/{domainId}/token",
+   "perm": "TENANT_CONFIGURE",
+   "platforms": [
+    "WL"
+   ],
+   "screens": [
+    "ADM-017",
+    "CMS-017"
    ],
    "enables": []
   },
@@ -8888,15 +9579,10 @@
    "path": "/guests/{subjectId}/devices",
    "perm": null,
    "platforms": [
-    "MOB",
-    "WEB"
+    "MOB"
    ],
    "screens": [
-    "GST-073",
-    "WEB-011",
-    "WEB-017",
-    "WEB-024",
-    "WEB-027"
+    "GST-073"
    ],
    "enables": []
   },
@@ -8944,6 +9630,23 @@
     "inventory.goods_receipt"
    ]
   },
+  "rejectShiftVariance": {
+   "part": "core",
+   "service": "OrderService",
+   "contract": "shift",
+   "verb": "POST",
+   "path": "/shifts/{shiftId}/reject-variance",
+   "perm": "OVERSHORT_ACCEPT",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "BO-040",
+    "BO-043",
+    "POS-007"
+   ],
+   "enables": []
+  },
   "releaseProductionPlan": {
    "part": "setup",
    "service": "FnbService",
@@ -8953,7 +9656,7 @@
    "perm": "PRODUCT_CONFIGURE",
    "platforms": [],
    "screens": [
-    "BO-136"
+    "BO-112"
    ],
    "enables": [
     "fnb.production_plan"
@@ -8968,7 +9671,8 @@
    "perm": "RESOURCE_MANAGE",
    "platforms": [],
    "screens": [
-    "BO-870"
+    "BO-870",
+    "BO-910"
    ],
    "enables": [
     "resources.resource_block"
@@ -9003,22 +9707,6 @@
    ],
    "enables": []
   },
-  "relinquishInventoryHold": {
-   "part": "core",
-   "service": "CatalogueService",
-   "contract": "catalogue",
-   "verb": "DELETE",
-   "path": "/inventory-holds/{inventoryHoldId}",
-   "perm": "ORDER_CREATE",
-   "platforms": [
-    "POS"
-   ],
-   "screens": [
-    "BO-018",
-    "POS-003"
-   ],
-   "enables": []
-  },
   "relinquishResourceHold": {
    "part": "core",
    "service": "VenueOpsService",
@@ -9049,7 +9737,6 @@
     "WEB"
    ],
    "screens": [
-    "BO-998",
     "BO-999",
     "GST-049",
     "POS-004",
@@ -9088,11 +9775,7 @@
    ],
    "screens": [
     "GST-020",
-    "WEB-009",
-    "WEB-011",
-    "WEB-017",
-    "WEB-024",
-    "WEB-027"
+    "WEB-009"
    ],
    "enables": []
   },
@@ -9108,26 +9791,10 @@
     "WEB"
    ],
    "screens": [
-    "ADM-001",
+    "ADM-699",
     "EMP-042",
     "GST-073",
     "WEB-024"
-   ],
-   "enables": []
-  },
-  "renewInventoryHold": {
-   "part": "core",
-   "service": "CatalogueService",
-   "contract": "catalogue",
-   "verb": "POST",
-   "path": "/inventory-holds/{inventoryHoldId}/renew",
-   "perm": "ORDER_CREATE",
-   "platforms": [
-    "POS"
-   ],
-   "screens": [
-    "BO-018",
-    "POS-003"
    ],
    "enables": []
   },
@@ -9142,13 +9809,7 @@
     "POS"
    ],
    "screens": [
-    "BO-039",
-    "BO-040",
-    "EMP-003",
-    "EMP-009",
-    "POS-001",
-    "POS-007",
-    "POS-009"
+    "POS-025"
    ],
    "enables": []
   },
@@ -9163,7 +9824,6 @@
     "WL"
    ],
    "screens": [
-    "BO-027",
     "CMS-010",
     "CMS-076",
     "CMS-095"
@@ -9184,6 +9844,8 @@
    "screens": [
     "GST-034",
     "GST-040",
+    "GST-068",
+    "WEB-025",
     "WEB-034"
    ],
    "enables": []
@@ -9208,9 +9870,13 @@
     "EMP-014",
     "EMP-034",
     "GST-010",
+    "KSK-009",
+    "KSK-010",
+    "KSK-012",
     "POS-002",
     "POS-006",
     "POS-026",
+    "POS-030",
     "PTR-002",
     "PTR-005",
     "PTR-008",
@@ -9232,8 +9898,8 @@
    ],
    "screens": [
     "POS-005",
-    "POS-007",
-    "POS-026"
+    "POS-026",
+    "POS-030"
    ],
    "enables": []
   },
@@ -9249,6 +9915,22 @@
    ],
    "screens": [
     "CMS-104"
+   ],
+   "enables": []
+  },
+  "requestBill": {
+   "part": "core",
+   "service": "FnbService",
+   "contract": "fnb",
+   "verb": "POST",
+   "path": "/table-visits/{visitId}/request-bill",
+   "perm": "ORDER_MODIFY",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "EMP-059",
+    "POS-028"
    ],
    "enables": []
   },
@@ -9304,9 +9986,6 @@
     "ANL-006",
     "ANL-010",
     "BO-005",
-    "BO-115",
-    "BO-117",
-    "BO-138",
     "BO-139",
     "BO-772",
     "BO-782",
@@ -9334,15 +10013,12 @@
     "BO-026",
     "BO-047",
     "BO-281",
-    "EMP-014",
+    "BO-315",
     "EMP-034",
-    "POS-002",
     "POS-006",
     "PTR-002",
-    "PTR-005",
     "PTR-008",
-    "PTR-015",
-    "PTR-016"
+    "PTR-015"
    ],
    "enables": []
   },
@@ -9358,7 +10034,6 @@
     "POS"
    ],
    "screens": [
-    "BO-044",
     "EMP-068",
     "GST-026",
     "KSK-017",
@@ -9379,7 +10054,6 @@
    "screens": [
     "BO-007",
     "BO-012",
-    "BO-014",
     "EMP-034",
     "POS-002",
     "POS-003",
@@ -9416,7 +10090,6 @@
    ],
    "screens": [
     "ADM-016",
-    "CMS-006",
     "CMS-015"
    ],
    "enables": []
@@ -9437,21 +10110,6 @@
     "wallet.refund_policy"
    ]
   },
-  "resumeAiCapability": {
-   "part": "setup",
-   "service": "AiService",
-   "contract": "ai",
-   "verb": "POST",
-   "path": "/governance/capabilities/{capabilityKey}/resume",
-   "perm": "AI_APPROVE",
-   "platforms": [],
-   "screens": [
-    "ADM-536"
-   ],
-   "enables": [
-    "ai.capability"
-   ]
-  },
   "resumeOrder": {
    "part": "core",
    "service": "OrderService",
@@ -9464,18 +10122,14 @@
    ],
    "screens": [
     "BO-022",
-    "BO-023",
     "BO-026",
     "BO-047",
-    "EMP-014",
     "EMP-034",
     "POS-002",
     "POS-006",
     "PTR-002",
-    "PTR-005",
     "PTR-008",
-    "PTR-015",
-    "PTR-016"
+    "PTR-015"
    ],
    "enables": []
   },
@@ -9490,13 +10144,7 @@
     "POS"
    ],
    "screens": [
-    "BO-039",
-    "BO-040",
-    "EMP-003",
-    "EMP-009",
-    "POS-001",
-    "POS-007",
-    "POS-009"
+    "POS-001"
    ],
    "enables": []
   },
@@ -9514,6 +10162,21 @@
    "screens": [
     "GST-015",
     "WEB-023"
+   ],
+   "enables": []
+  },
+  "revokeAiPolicyException": {
+   "part": "core",
+   "service": "AiService",
+   "contract": "ai",
+   "verb": "POST",
+   "path": "/governance/policy-exceptions/{exceptionId}/revoke",
+   "perm": "AI_APPROVE",
+   "platforms": [
+    "AI"
+   ],
+   "screens": [
+    "ADM-526"
    ],
    "enables": []
   },
@@ -9547,27 +10210,9 @@
    ],
    "screens": [
     "GST-073",
-    "WEB-011",
-    "WEB-017",
-    "WEB-024",
-    "WEB-027"
+    "WEB-024"
    ],
    "enables": []
-  },
-  "rollbackAccessPolicy": {
-   "part": "setup",
-   "service": "AccessService",
-   "contract": "access",
-   "verb": "POST",
-   "path": "/dynamic-access-policy/{policyId}/rollback",
-   "perm": "ACCESS_POINT_CONFIGURE",
-   "platforms": [],
-   "screens": [
-    "BO-243"
-   ],
-   "enables": [
-    "access.dynamic_policy"
-   ]
   },
   "rollbackAiRelease": {
    "part": "setup",
@@ -9579,11 +10224,28 @@
    "platforms": [],
    "screens": [
     "ADM-554",
-    "ADM-556"
+    "ADM-556",
+    "ADM-696"
    ],
    "enables": [
+    "ai.forecast_definition",
     "ai.policy",
     "ai.release"
+   ]
+  },
+  "rollbackMenu": {
+   "part": "setup",
+   "service": "FnbService",
+   "contract": "fnb",
+   "verb": "POST",
+   "path": "/menus/{menuId}/rollback",
+   "perm": "PRODUCT_CONFIGURE",
+   "platforms": [],
+   "screens": [
+    "BO-045"
+   ],
+   "enables": [
+    "fnb.menu"
    ]
   },
   "rotateApiCredential": {
@@ -9615,6 +10277,7 @@
     "ANL-060"
    ],
    "enables": [
+    "ai.eval_run",
     "ai.release"
    ]
   },
@@ -9663,12 +10326,9 @@
     "BO-060",
     "BO-1059",
     "BO-1082",
-    "BO-115",
     "BO-118",
-    "BO-126",
     "BO-133",
     "BO-262",
-    "BO-682",
     "POS-008",
     "POS-020",
     "PTR-018",
@@ -9694,26 +10354,41 @@
    "enables": []
   },
   "saveNaturalLanguageQuery": {
-   "part": "core",
+   "part": "setup",
    "service": "ReportingService",
    "contract": "reporting",
    "verb": "POST",
    "path": "/reports/ask/{conversationId}/save",
    "perm": "REPORT_MANAGE",
-   "platforms": [
-    "POS"
-   ],
+   "platforms": [],
    "screens": [
     "ANL-052",
     "BO-029",
     "BO-058",
     "BO-059",
     "BO-060",
-    "POS-008",
     "PTR-018",
     "SUP-008"
    ],
-   "enables": []
+   "enables": [
+    "reporting.report_definition",
+    "reporting.report_parameter"
+   ]
+  },
+  "scheduleMenuPublish": {
+   "part": "setup",
+   "service": "FnbService",
+   "contract": "fnb",
+   "verb": "POST",
+   "path": "/menus/{menuId}/schedule",
+   "perm": "PRODUCT_CONFIGURE",
+   "platforms": [],
+   "screens": [
+    "BO-045"
+   ],
+   "enables": [
+    "fnb.menu"
+   ]
   },
   "searchCatalogue": {
    "part": "core",
@@ -9749,7 +10424,8 @@
    "screens": [
     "BO-734",
     "BO-735",
-    "POS-027"
+    "POS-027",
+    "POS-030"
    ],
    "enables": []
   },
@@ -9766,7 +10442,6 @@
    "screens": [
     "BO-008",
     "BO-094",
-    "BO-838",
     "CMS-010",
     "CMS-061",
     "CMS-062",
@@ -9819,10 +10494,14 @@
     "POS"
    ],
    "screens": [
+    "ADM-001",
+    "EMP-001",
     "EMP-002",
     "POS-000",
     "POS-001",
-    "SCN-001"
+    "PTR-001",
+    "SCN-001",
+    "SUP-001"
    ],
    "enables": []
   },
@@ -9840,7 +10519,8 @@
     "CMS-010",
     "CMS-062",
     "EMP-040",
-    "EMP-041"
+    "EMP-041",
+    "SUP-006"
    ],
    "enables": []
   },
@@ -9886,26 +10566,12 @@
    ],
    "screens": [
     "BO-799",
+    "GST-031",
     "GST-032",
     "SUP-005",
     "WEB-044"
    ],
    "enables": []
-  },
-  "setAccessAttributeCatalog": {
-   "part": "setup",
-   "service": "AccessService",
-   "contract": "access",
-   "verb": "PUT",
-   "path": "/access-attribute-catalog",
-   "perm": "ACCESS_POINT_CONFIGURE",
-   "platforms": [],
-   "screens": [
-    "BO-235"
-   ],
-   "enables": [
-    "access.access_attribute"
-   ]
   },
   "setAccessPointGeofence": {
    "part": "setup",
@@ -9968,21 +10634,6 @@
     "ai.byok_enablement"
    ]
   },
-  "setAiCredential": {
-   "part": "setup",
-   "service": "AiService",
-   "contract": "ai",
-   "verb": "PUT",
-   "path": "/ai-providers/{providerId}/credential",
-   "perm": "AI_CONFIGURE",
-   "platforms": [],
-   "screens": [
-    "ADM-037"
-   ],
-   "enables": [
-    "ai.provider"
-   ]
-  },
   "setAiModel": {
    "part": "setup",
    "service": "AiService",
@@ -10013,21 +10664,6 @@
     "ai.policy"
    ]
   },
-  "setAiProvider": {
-   "part": "setup",
-   "service": "AiService",
-   "contract": "ai",
-   "verb": "PUT",
-   "path": "/providers",
-   "perm": "AI_CONFIGURE",
-   "platforms": [],
-   "screens": [
-    "ADM-037"
-   ],
-   "enables": [
-    "ai.provider"
-   ]
-  },
   "setAiVenueSettings": {
    "part": "core",
    "service": "AiService",
@@ -10039,8 +10675,10 @@
     "AI"
    ],
    "screens": [
+    "ADM-471",
     "ADM-489",
-    "ANL-071"
+    "ANL-071",
+    "BO-927"
    ],
    "enables": []
   },
@@ -10071,9 +10709,7 @@
    "platforms": [],
    "screens": [
     "BO-007",
-    "BO-012",
-    "BO-014",
-    "EMP-034"
+    "BO-012"
    ],
    "enables": [
     "catalogue.alternative_code"
@@ -10149,7 +10785,6 @@
    "perm": "APPROVAL_CONFIGURE",
    "platforms": [],
    "screens": [
-    "ADM-242",
     "ADM-243",
     "ADM-330",
     "ADM-331",
@@ -10178,9 +10813,7 @@
    "perm": "ACCESS_POINT_CONFIGURE",
    "platforms": [],
    "screens": [
-    "BO-184",
-    "BO-185",
-    "BO-191"
+    "BO-185"
    ],
    "enables": [
     "access.biometric_profile"
@@ -10216,22 +10849,6 @@
    ],
    "enables": []
   },
-  "setBookingVelocityTime": {
-   "part": "setup",
-   "service": "CatalogueService",
-   "contract": "catalogue",
-   "verb": "PUT",
-   "path": "/booking-velocity-time",
-   "perm": "PRODUCT_CONFIGURE",
-   "platforms": [],
-   "screens": [
-    "ADM-091"
-   ],
-   "enables": [
-    "pricing.dynamic_price_action",
-    "pricing.dynamic_price_condition"
-   ]
-  },
   "setBrandIdentity": {
    "part": "core",
    "service": "WhiteLabelService",
@@ -10246,69 +10863,10 @@
     "ADM-016",
     "BO-836",
     "CMS-002",
-    "CMS-004"
+    "CMS-004",
+    "CMS-104"
    ],
    "enables": []
-  },
-  "setBundleComponent": {
-   "part": "setup",
-   "service": "CatalogueService",
-   "contract": "promotions",
-   "verb": "PUT",
-   "path": "/bundle-component",
-   "perm": "PRICE_CONFIGURE",
-   "platforms": [],
-   "screens": [
-    "ADM-180"
-   ],
-   "enables": [
-    "promotions.bundle_component"
-   ]
-  },
-  "setBundleDefinition": {
-   "part": "setup",
-   "service": "CatalogueService",
-   "contract": "promotions",
-   "verb": "PUT",
-   "path": "/bundle-definition",
-   "perm": "PRICE_CONFIGURE",
-   "platforms": [],
-   "screens": [
-    "ADM-179"
-   ],
-   "enables": [
-    "promotions.bundle"
-   ]
-  },
-  "setBuyGetBogo": {
-   "part": "setup",
-   "service": "CatalogueService",
-   "contract": "promotions",
-   "verb": "PUT",
-   "path": "/buy-get-bogo",
-   "perm": "PRICE_CONFIGURE",
-   "platforms": [],
-   "screens": [
-    "ADM-169"
-   ],
-   "enables": [
-    "promotions.promotion"
-   ]
-  },
-  "setCampaignBudgetFinancial": {
-   "part": "setup",
-   "service": "CatalogueService",
-   "contract": "promotions",
-   "verb": "PUT",
-   "path": "/campaign-budget-financial",
-   "perm": "PRICE_CONFIGURE",
-   "platforms": [],
-   "screens": [
-    "ADM-219"
-   ],
-   "enables": [
-    "promotions.campaign"
-   ]
   },
   "setCodeDistributionManager": {
    "part": "setup",
@@ -10342,22 +10900,6 @@
    ],
    "enables": []
   },
-  "setContextTimeEvent": {
-   "part": "setup",
-   "service": "AccessService",
-   "contract": "access",
-   "verb": "PUT",
-   "path": "/context-time-event",
-   "perm": "ACCESS_POINT_CONFIGURE",
-   "platforms": [],
-   "screens": [
-    "BO-222",
-    "BO-237"
-   ],
-   "enables": [
-    "access.dynamic_policy"
-   ]
-  },
   "setCookieBannerDesign": {
    "part": "setup",
    "service": "MarketingService",
@@ -10373,36 +10915,20 @@
     "marketing.cookie_banner_design"
    ]
   },
-  "setCouponPromoCode": {
-   "part": "setup",
-   "service": "CatalogueService",
-   "contract": "promotions",
-   "verb": "PUT",
-   "path": "/coupon-promo-code",
-   "perm": "PRICE_CONFIGURE",
-   "platforms": [],
-   "screens": [
-    "ADM-159"
-   ],
-   "enables": [
-    "promotions.coupon_campaign",
-    "promotions.coupon_code"
-   ]
-  },
   "setCourseRules": {
-   "part": "core",
+   "part": "setup",
    "service": "FnbService",
    "contract": "fnb",
    "verb": "PUT",
    "path": "/outlets/{outletId}/course-rules",
    "perm": "PRODUCT_CONFIGURE",
-   "platforms": [
-    "POS"
-   ],
+   "platforms": [],
    "screens": [
-    "KIT-003"
+    "BO-136"
    ],
-   "enables": []
+   "enables": [
+    "fnb.course_rule"
+   ]
   },
   "setCredentialActivationDisplay": {
    "part": "setup",
@@ -10419,36 +10945,6 @@
     "access.credential_policy"
    ]
   },
-  "setCrossCategoryPromotion": {
-   "part": "setup",
-   "service": "CatalogueService",
-   "contract": "promotions",
-   "verb": "PUT",
-   "path": "/cross-category-promotion",
-   "perm": "PRICE_CONFIGURE",
-   "platforms": [],
-   "screens": [
-    "ADM-174"
-   ],
-   "enables": [
-    "promotions.promotion"
-   ]
-  },
-  "setCurrencyRoundingRule": {
-   "part": "setup",
-   "service": "CatalogueService",
-   "contract": "catalogue",
-   "verb": "PUT",
-   "path": "/rounding-profiles",
-   "perm": "PRICE_CONFIGURE",
-   "platforms": [],
-   "screens": [
-    "ADM-075"
-   ],
-   "enables": [
-    "catalogue.rounding_profile"
-   ]
-  },
   "setDeliveryLocationOutletMapping": {
    "part": "setup",
    "service": "FnbService",
@@ -10463,22 +10959,6 @@
    ],
    "enables": [
     "fnb.delivery_location_outlet"
-   ]
-  },
-  "setDemandOccupancyAvailability": {
-   "part": "setup",
-   "service": "CatalogueService",
-   "contract": "catalogue",
-   "verb": "PUT",
-   "path": "/demand-occupancy-availability",
-   "perm": "PRODUCT_CONFIGURE",
-   "platforms": [],
-   "screens": [
-    "ADM-090"
-   ],
-   "enables": [
-    "pricing.dynamic_price_action",
-    "pricing.dynamic_price_condition"
    ]
   },
   "setDenominations": {
@@ -10523,6 +11003,7 @@
    ],
    "screens": [
     "ADM-582",
+    "BO-732",
     "POS-016"
    ],
    "enables": []
@@ -10536,45 +11017,23 @@
    "perm": "ACCESS_POINT_CONFIGURE",
    "platforms": [],
    "screens": [
-    "BO-164",
     "BO-167"
    ],
    "enables": [
     "access.credential_policy"
    ]
   },
-  "setDynamicPriceRule": {
+  "setDynamicFieldQuestion": {
    "part": "setup",
-   "service": "CatalogueService",
-   "contract": "catalogue",
+   "service": "MarketingService",
+   "contract": "marketing-crm",
    "verb": "PUT",
-   "path": "/pricing/dynamic-rules/{ruleId}",
-   "perm": "PRICE_CONFIGURE",
+   "path": "/dynamic-field-question",
+   "perm": "GUEST_MANAGE",
    "platforms": [],
-   "screens": [
-    "BO-009",
-    "BO-443"
-   ],
+   "screens": [],
    "enables": [
-    "pricing.dynamic_price_action",
-    "pricing.dynamic_price_condition"
-   ]
-  },
-  "setDynamicPricingGuardrailPolicy": {
-   "part": "setup",
-   "service": "CatalogueService",
-   "contract": "catalogue",
-   "verb": "PUT",
-   "path": "/dynamic-pricing-controls",
-   "perm": "PRICE_CONFIGURE",
-   "platforms": [],
-   "screens": [
-    "ADM-095",
-    "ADM-096",
-    "ADM-114"
-   ],
-   "enables": [
-    "catalogue.dynamic_pricing_control"
+    "marketing.form_definition_field"
    ]
   },
   "setEInvoicingProvider": {
@@ -10592,22 +11051,6 @@
     "ledger.einvoicing_provider"
    ]
   },
-  "setEligibilityRule": {
-   "part": "setup",
-   "service": "CatalogueService",
-   "contract": "promotions",
-   "verb": "PUT",
-   "path": "/eligibility-rule",
-   "perm": "PRICE_CONFIGURE",
-   "platforms": [],
-   "screens": [
-    "ADM-199",
-    "ADM-279"
-   ],
-   "enables": [
-    "promotions.promotion_rule"
-   ]
-  },
   "setEventLifecycleState": {
    "part": "setup",
    "service": "CatalogueService",
@@ -10621,7 +11064,8 @@
     "BO-717"
    ],
    "enables": [
-    "catalogue.event"
+    "catalogue.event",
+    "catalogue.performance"
    ]
   },
   "setExperienceResourceRequirements": {
@@ -10634,7 +11078,8 @@
    "platforms": [],
    "screens": [
     "BO-877",
-    "BO-893"
+    "BO-893",
+    "BO-894"
    ],
    "enables": [
     "resources.resource_requirement"
@@ -10664,7 +11109,6 @@
    "perm": "ACCESS_POINT_CONFIGURE",
    "platforms": [],
    "screens": [
-    "BO-184",
     "BO-186"
    ],
    "enables": [
@@ -10687,19 +11131,17 @@
    ]
   },
   "setFaqs": {
-   "part": "core",
+   "part": "setup",
    "service": "WhiteLabelService",
    "contract": "white-label",
    "verb": "PUT",
    "path": "/tenant-config/faqs",
    "perm": "TENANT_CONFIGURE",
-   "platforms": [
-    "WL"
-   ],
-   "screens": [
-    "ADM-018"
-   ],
-   "enables": []
+   "platforms": [],
+   "screens": [],
+   "enables": [
+    "whitelabel.faq_entry"
+   ]
   },
   "setFeatureToggles": {
    "part": "core",
@@ -10715,21 +11157,6 @@
     "CMS-001"
    ],
    "enables": []
-  },
-  "setFixedPriceOffer": {
-   "part": "setup",
-   "service": "CatalogueService",
-   "contract": "promotions",
-   "verb": "PUT",
-   "path": "/fixed-price-offer",
-   "perm": "PRICE_CONFIGURE",
-   "platforms": [],
-   "screens": [
-    "ADM-172"
-   ],
-   "enables": [
-    "promotions.promotion"
-   ]
   },
   "setFnbDeliveryPolicy": {
    "part": "setup",
@@ -10772,9 +11199,25 @@
     "WL"
    ],
    "screens": [
-    "CMS-007"
+    "CMS-009"
    ],
    "enables": []
+  },
+  "setForecastDefinition": {
+   "part": "setup",
+   "service": "AiService",
+   "contract": "ai",
+   "verb": "PUT",
+   "path": "/forecast-definitions/{definitionKey}",
+   "perm": "AI_CONFIGURE",
+   "platforms": [],
+   "screens": [
+    "ADM-500",
+    "ADM-501"
+   ],
+   "enables": [
+    "ai.forecast_definition"
+   ]
   },
   "setFxProvider": {
    "part": "setup",
@@ -10819,21 +11262,6 @@
     "access.gate_mode_policy"
    ]
   },
-  "setGiftFreeProduct": {
-   "part": "setup",
-   "service": "CatalogueService",
-   "contract": "promotions",
-   "verb": "PUT",
-   "path": "/gift-free-product",
-   "perm": "PRICE_CONFIGURE",
-   "platforms": [],
-   "screens": [
-    "ADM-173"
-   ],
-   "enables": [
-    "promotions.promotion"
-   ]
-  },
   "setGroupPackageDefinition": {
    "part": "setup",
    "service": "CatalogueService",
@@ -10847,22 +11275,6 @@
    ],
    "enables": [
     "catalogue.group_package"
-   ]
-  },
-  "setGuestChoiceBuild": {
-   "part": "setup",
-   "service": "CatalogueService",
-   "contract": "promotions",
-   "verb": "PUT",
-   "path": "/guest-choice-build",
-   "perm": "PRICE_CONFIGURE",
-   "platforms": [],
-   "screens": [
-    "ADM-181"
-   ],
-   "enables": [
-    "promotions.bundle_choice_group",
-    "promotions.bundle_choice_option"
    ]
   },
   "setGuestVerificationPolicy": {
@@ -10891,7 +11303,7 @@
     "WL"
    ],
    "screens": [
-    "CMS-007"
+    "CMS-009"
    ],
    "enables": []
   },
@@ -10965,10 +11377,7 @@
     "POS"
    ],
    "screens": [
-    "BO-014",
-    "BO-049",
     "BO-140",
-    "EMP-062",
     "KIT-008",
     "POS-021",
     "POS-024"
@@ -10991,25 +11400,6 @@
    ],
    "enables": []
   },
-  "setKitchenStations": {
-   "part": "core",
-   "service": "FnbService",
-   "contract": "fnb",
-   "verb": "PUT",
-   "path": "/kitchen/stations",
-   "perm": "PRODUCT_CONFIGURE",
-   "platforms": [
-    "POS"
-   ],
-   "screens": [
-    "BO-020",
-    "BO-046",
-    "BO-134",
-    "BO-135",
-    "KIT-005"
-   ],
-   "enables": []
-  },
   "setKitchenTicketStatus": {
    "part": "core",
    "service": "FnbService",
@@ -11026,7 +11416,6 @@
     "KIT-002",
     "KIT-003",
     "KIT-006",
-    "KIT-008",
     "POS-022"
    ],
    "enables": []
@@ -11044,6 +11433,23 @@
    "screens": [
     "ADM-018",
     "CMS-011"
+   ],
+   "enables": []
+  },
+  "setLeaderboardNickname": {
+   "part": "core",
+   "service": "MarketingService",
+   "contract": "marketing-crm",
+   "verb": "PUT",
+   "path": "/loyalty/leaderboard-nickname",
+   "perm": null,
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "GST-036",
+    "WEB-043"
    ],
    "enables": []
   },
@@ -11089,28 +11495,26 @@
     "WEB"
    ],
    "screens": [
-    "BO-788",
     "GST-065",
     "WEB-027"
    ],
    "enables": []
   },
   "setMenuSections": {
-   "part": "core",
+   "part": "setup",
    "service": "FnbService",
    "contract": "fnb",
    "verb": "PUT",
    "path": "/menus/{menuId}/sections",
    "perm": "PRODUCT_CONFIGURE",
-   "platforms": [
-    "WL"
-   ],
+   "platforms": [],
    "screens": [
     "BO-045",
-    "BO-109",
-    "CMS-009"
+    "BO-109"
    ],
-   "enables": []
+   "enables": [
+    "fnb.menu"
+   ]
   },
   "setModuleEnablement": {
    "part": "core",
@@ -11123,9 +11527,23 @@
     "WL"
    ],
    "screens": [
+    "ADM-424",
     "CMS-001"
    ],
    "enables": []
+  },
+  "setModuleListing": {
+   "part": "setup",
+   "service": "PlatformService",
+   "contract": "subscription",
+   "verb": "PUT",
+   "path": "/module-catalogue",
+   "perm": "PLATFORM_PLAN_MANAGE",
+   "platforms": [],
+   "screens": [],
+   "enables": [
+    "subscription.module_listing"
+   ]
   },
   "setNavigation": {
    "part": "core",
@@ -11167,7 +11585,7 @@
    "platforms": [],
    "screens": [
     "ADM-342",
-    "ADM-421"
+    "ADM-422"
    ],
    "enables": [
     "identity.password_policy"
@@ -11215,55 +11633,9 @@
     "WL"
    ],
    "screens": [
-    "ADM-018",
     "CMS-018"
    ],
    "enables": []
-  },
-  "setPriceCategoryRateType": {
-   "part": "setup",
-   "service": "CatalogueService",
-   "contract": "catalogue",
-   "verb": "PUT",
-   "path": "/price-categories",
-   "perm": "PRICE_CONFIGURE",
-   "platforms": [],
-   "screens": [
-    "ADM-050"
-   ],
-   "enables": [
-    "catalogue.price_category"
-   ]
-  },
-  "setPriceHierarchyInheritance": {
-   "part": "setup",
-   "service": "CatalogueService",
-   "contract": "catalogue",
-   "verb": "PUT",
-   "path": "/price-hierarchy-inheritance",
-   "perm": "PRODUCT_CONFIGURE",
-   "platforms": [],
-   "screens": [
-    "ADM-055"
-   ],
-   "enables": [
-    "catalogue.price_resolution_policy"
-   ]
-  },
-  "setPriceListMaster": {
-   "part": "setup",
-   "service": "CatalogueService",
-   "contract": "catalogue",
-   "verb": "PUT",
-   "path": "/price-list-master",
-   "perm": "PRODUCT_CONFIGURE",
-   "platforms": [],
-   "screens": [
-    "ADM-049"
-   ],
-   "enables": [
-    "catalogue.price_list"
-   ]
   },
   "setPrices": {
    "part": "setup",
@@ -11281,6 +11653,22 @@
    "enables": [
     "catalogue.price_list"
    ]
+  },
+  "setPrimaryDomain": {
+   "part": "core",
+   "service": "WhiteLabelService",
+   "contract": "white-label",
+   "verb": "POST",
+   "path": "/tenant-domains/{domainId}/primary",
+   "perm": "TENANT_CONFIGURE",
+   "platforms": [
+    "WL"
+   ],
+   "screens": [
+    "ADM-017",
+    "CMS-017"
+   ],
+   "enables": []
   },
   "setProductCategories": {
    "part": "core",
@@ -11313,22 +11701,6 @@
     "catalogue.product_eligibility_rule"
    ]
   },
-  "setPromotionRule": {
-   "part": "setup",
-   "service": "CatalogueService",
-   "contract": "promotions",
-   "verb": "PUT",
-   "path": "/promotion-rule",
-   "perm": "PRICE_CONFIGURE",
-   "platforms": [],
-   "screens": [
-    "ADM-148",
-    "ADM-210"
-   ],
-   "enables": [
-    "promotions.promotion_rule"
-   ]
-  },
   "setPromotionVariants": {
    "part": "setup",
    "service": "CatalogueService",
@@ -11338,26 +11710,27 @@
    "perm": "PRICE_CONFIGURE",
    "platforms": [],
    "screens": [
+    "ADM-226",
     "BO-010"
    ],
    "enables": [
     "promotions.promotion"
    ]
   },
-  "setRateStructure": {
-   "part": "setup",
-   "service": "CatalogueService",
-   "contract": "catalogue",
+  "setPublishReviewPolicy": {
+   "part": "core",
+   "service": "WhiteLabelService",
+   "contract": "white-label",
    "verb": "PUT",
-   "path": "/rate-structure",
-   "perm": "PRODUCT_CONFIGURE",
-   "platforms": [],
-   "screens": [
-    "ADM-051"
+   "path": "/publish-review-policy",
+   "perm": "TENANT_PUBLISH",
+   "platforms": [
+    "WL"
    ],
-   "enables": [
-    "catalogue.rate"
-   ]
+   "screens": [
+    "CMS-014"
+   ],
+   "enables": []
   },
   "setRecipe": {
    "part": "setup",
@@ -11368,7 +11741,6 @@
    "perm": "PRODUCT_CONFIGURE",
    "platforms": [],
    "screens": [
-    "BO-110",
     "BO-111"
    ],
    "enables": [
@@ -11384,7 +11756,6 @@
    "perm": "REGION_CONFIGURE",
    "platforms": [],
    "screens": [
-    "ADM-611",
     "BO-062",
     "BO-065",
     "BO-1146",
@@ -11420,26 +11791,26 @@
    "perm": "REGION_CONFIGURE",
    "platforms": [],
    "screens": [
-    "BO-044"
+    "BO-044",
+    "BO-143"
    ],
    "enables": [
     "retail.return_policy"
    ]
   },
-  "setRulePriorityConflict": {
+  "setReward": {
    "part": "setup",
-   "service": "CatalogueService",
-   "contract": "catalogue",
+   "service": "MarketingService",
+   "contract": "marketing-crm",
    "verb": "PUT",
-   "path": "/rule-priority-conflict",
-   "perm": "PRODUCT_CONFIGURE",
+   "path": "/loyalty/rewards",
+   "perm": "MARKETING_MANAGE",
    "platforms": [],
    "screens": [
-    "ADM-097",
-    "BO-441"
+    "BO-828"
    ],
    "enables": [
-    "catalogue.price_resolution_policy"
+    "marketing.reward"
    ]
   },
   "setSemanticModel": {
@@ -11513,7 +11884,6 @@
    "platforms": [],
    "screens": [
     "ADM-008",
-    "ADM-011",
     "ADM-410",
     "ADM-417",
     "ADM-463",
@@ -11548,7 +11918,7 @@
     "POS"
    ],
    "screens": [
-    "EMP-058",
+    "EMP-053",
     "POS-024"
    ],
    "enables": []
@@ -11565,7 +11935,6 @@
    ],
    "screens": [
     "BO-044",
-    "EMP-052",
     "EMP-053",
     "POS-024"
    ],
@@ -11583,8 +11952,23 @@
    ],
    "screens": [
     "ADM-016",
-    "CMS-003",
     "CMS-005"
+   ],
+   "enables": []
+  },
+  "setTillShiftPolicy": {
+   "part": "core",
+   "service": "OrderService",
+   "contract": "shift",
+   "verb": "PUT",
+   "path": "/venues/{venueId}/till-shift-policy",
+   "perm": "WORKSTATION_CONFIGURE",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "BO-065",
+    "POS-019"
    ],
    "enables": []
   },
@@ -11629,10 +12013,7 @@
    "perm": "TURNSTILE_MODE_SET",
    "platforms": [],
    "screens": [
-    "BO-064",
-    "BO-194",
     "BO-230",
-    "SCN-002",
     "SCN-016"
    ],
    "enables": [
@@ -11655,26 +12036,40 @@
    ]
   },
   "setVenueSettings": {
-   "part": "core",
+   "part": "setup",
    "service": "TenancyService",
    "contract": "tenancy",
    "verb": "PUT",
    "path": "/venues/{venueId}/settings",
    "perm": "TENANT_CONFIGURE",
-   "platforms": [
-    "POS"
-   ],
+   "platforms": [],
    "screens": [
     "BO-065",
     "BO-1063",
-    "BO-116",
     "BO-136",
-    "BO-143",
-    "BO-600",
-    "KIT-009",
-    "POS-019"
+    "BO-187",
+    "BO-600"
    ],
-   "enables": []
+   "enables": [
+    "platform.venue_settings"
+   ]
+  },
+  "setVenueSettingsDefaults": {
+   "part": "setup",
+   "service": "TenancyService",
+   "contract": "tenancy",
+   "verb": "PUT",
+   "path": "/venue-settings-defaults",
+   "perm": "TENANT_CONFIGURE",
+   "platforms": [],
+   "screens": [
+    "ADM-019",
+    "ADM-426",
+    "BO-1062"
+   ],
+   "enables": [
+    "platform.venue_settings"
+   ]
   },
   "setVirtualTicketIdentity": {
    "part": "setup",
@@ -11719,23 +12114,6 @@
    ],
    "enables": [
     "access.admission_rules"
-   ]
-  },
-  "setVisualDynamicPolicy": {
-   "part": "setup",
-   "service": "AccessService",
-   "contract": "access",
-   "verb": "PUT",
-   "path": "/visual-dynamic-policy",
-   "perm": "ACCESS_POINT_CONFIGURE",
-   "platforms": [],
-   "screens": [
-    "BO-234",
-    "BO-236",
-    "BO-238"
-   ],
-   "enables": [
-    "access.dynamic_policy"
    ]
   },
   "setWalletAutoReloadSetting": {
@@ -11864,6 +12242,22 @@
     "ai.governance_policy_version"
    ]
   },
+  "splitBill": {
+   "part": "core",
+   "service": "FnbService",
+   "contract": "fnb",
+   "verb": "POST",
+   "path": "/table-visits/{visitId}/bill/split",
+   "perm": "ORDER_MODIFY",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "EMP-059",
+    "POS-028"
+   ],
+   "enables": []
+  },
   "stopCampaign": {
    "part": "setup",
    "service": "MarketingService",
@@ -11872,9 +12266,7 @@
    "path": "/campaigns/{campaignId}/stop",
    "perm": "MARKETING_SEND",
    "platforms": [],
-   "screens": [
-    "BO-005"
-   ],
+   "screens": [],
    "enables": [
     "marketing.campaign"
    ]
@@ -11896,6 +12288,23 @@
    ],
    "enables": []
   },
+  "submitForm": {
+   "part": "core",
+   "service": "MarketingService",
+   "contract": "marketing-crm",
+   "verb": "POST",
+   "path": "/form-submissions",
+   "perm": "GUEST_VIEW",
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "GST-035",
+    "WEB-026"
+   ],
+   "enables": []
+  },
   "submitGuestIdentityDocument": {
    "part": "core",
    "service": "IdentityService",
@@ -11904,11 +12313,9 @@
    "path": "/auth/guest/identity-verifications",
    "perm": null,
    "platforms": [
-    "MOB",
     "WEB"
    ],
    "screens": [
-    "GST-073",
     "WEB-020"
    ],
    "enables": []
@@ -11927,6 +12334,22 @@
    "screens": [
     "GST-035",
     "WEB-026"
+   ],
+   "enables": []
+  },
+  "submitShiftCount": {
+   "part": "core",
+   "service": "OrderService",
+   "contract": "shift",
+   "verb": "POST",
+   "path": "/shifts/{shiftId}/count",
+   "perm": "SHIFT_CLOSE",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "EMP-009",
+    "POS-007"
    ],
    "enables": []
   },
@@ -11956,14 +12379,8 @@
     "POS"
    ],
    "screens": [
-    "BO-039",
-    "BO-040",
-    "EMP-003",
-    "EMP-008",
     "EMP-009",
-    "POS-001",
-    "POS-007",
-    "POS-009"
+    "POS-025"
    ],
    "enables": []
   },
@@ -11994,12 +12411,8 @@
    ],
    "screens": [
     "BO-037",
-    "BO-130",
     "BO-132",
-    "EMP-017",
-    "POS-002",
-    "POS-013",
-    "SCN-014"
+    "POS-013"
    ],
    "enables": []
   },
@@ -12019,18 +12432,34 @@
     "subscription.contract"
    ]
   },
-  "transferGameCard": {
+  "testAiProvider": {
    "part": "core",
-   "service": "VenueOpsService",
-   "contract": "games",
+   "service": "AiService",
+   "contract": "ai",
    "verb": "POST",
-   "path": "/game-cards/{cardCode}/transfer",
-   "perm": "ORDER_MODIFY",
+   "path": "/ai-providers/{providerId}/test",
+   "perm": "AI_CONFIGURE",
+   "platforms": [
+    "AI"
+   ],
+   "screens": [
+    "ADM-037"
+   ],
+   "enables": []
+  },
+  "topUpWallet": {
+   "part": "core",
+   "service": "WalletService",
+   "contract": "wallet",
+   "verb": "POST",
+   "path": "/wallets/{subjectId}/top-ups",
+   "perm": "ORDER_CREATE",
    "platforms": [
     "POS"
    ],
    "screens": [
-    "POS-002"
+    "BO-488",
+    "POS-027"
    ],
    "enables": []
   },
@@ -12046,23 +12475,28 @@
     "WEB"
    ],
    "screens": [
-    "GST-009",
-    "GST-010",
     "GST-012",
     "GST-013",
     "GST-014",
-    "GST-019",
     "GST-045",
-    "GST-055",
-    "KSK-009",
-    "KSK-010",
-    "KSK-012",
-    "WEB-012",
-    "WEB-013",
     "WEB-018",
-    "WEB-019",
-    "WEB-023",
     "WEB-030"
+   ],
+   "enables": []
+  },
+  "transferTableVisit": {
+   "part": "core",
+   "service": "FnbService",
+   "contract": "fnb",
+   "verb": "POST",
+   "path": "/table-visits/{visitId}/transfer",
+   "perm": "FNB_SERVE",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "EMP-058",
+    "POS-028"
    ],
    "enables": []
   },
@@ -12124,26 +12558,12 @@
    "perm": "ACCESS_POINT_CONFIGURE",
    "platforms": [],
    "screens": [
-    "BO-006",
-    "BO-064"
+    "BO-064",
+    "BO-147",
+    "BO-148"
    ],
    "enables": [
     "access.access_point"
-   ]
-  },
-  "updateAccount": {
-   "part": "setup",
-   "service": "LedgerService",
-   "contract": "finance",
-   "verb": "PATCH",
-   "path": "/accounts/{accountId}",
-   "perm": "ACCOUNT_CONFIGURE",
-   "platforms": [],
-   "screens": [
-    "BO-074"
-   ],
-   "enables": [
-    "ledger.account"
    ]
   },
   "updateAdmissionRules": {
@@ -12222,7 +12642,6 @@
    "perm": "MARKETING_MANAGE",
    "platforms": [],
    "screens": [
-    "BO-005",
     "BO-767",
     "BO-768",
     "BO-769",
@@ -12249,22 +12668,6 @@
     "WEB-010"
    ],
    "enables": []
-  },
-  "updateCommercialCampaign": {
-   "part": "setup",
-   "service": "CatalogueService",
-   "contract": "promotions",
-   "verb": "PATCH",
-   "path": "/commercial-campaigns/{campaignId}",
-   "perm": "PRICE_CONFIGURE",
-   "platforms": [],
-   "screens": [
-    "ADM-139",
-    "ADM-219"
-   ],
-   "enables": [
-    "promotions.campaign"
-   ]
   },
   "updateConsentQuestion": {
    "part": "core",
@@ -12340,10 +12743,8 @@
    "perm": "EVENT_CONFIGURE",
    "platforms": [],
    "screens": [
-    "BO-001",
     "BO-015",
-    "BO-019",
-    "BO-063"
+    "BO-019"
    ],
    "enables": [
     "catalogue.event"
@@ -12357,12 +12758,10 @@
    "path": "/guests/{subjectId}/preferences",
    "perm": "GUEST_MANAGE",
    "platforms": [
-    "MOB",
     "WEB"
    ],
    "screens": [
     "BO-740",
-    "GST-066",
     "WEB-020"
    ],
    "enables": []
@@ -12415,21 +12814,19 @@
    "enables": []
   },
   "updateMenu": {
-   "part": "core",
+   "part": "setup",
    "service": "FnbService",
    "contract": "fnb",
    "verb": "PATCH",
    "path": "/menus/{menuId}",
    "perm": "PRODUCT_CONFIGURE",
-   "platforms": [
-    "WL"
-   ],
+   "platforms": [],
    "screens": [
-    "BO-045",
-    "BO-111",
-    "CMS-009"
+    "BO-045"
    ],
-   "enables": []
+   "enables": [
+    "fnb.menu"
+   ]
   },
   "updateMerchandise": {
    "part": "setup",
@@ -12491,7 +12888,8 @@
    "platforms": [],
    "screens": [
     "BO-044",
-    "BO-063"
+    "BO-063",
+    "BO-731"
    ],
    "enables": [
     "platform.outlet"
@@ -12515,23 +12913,21 @@
    "enables": []
   },
   "updatePerformance": {
-   "part": "core",
+   "part": "setup",
    "service": "CatalogueService",
    "contract": "catalogue",
    "verb": "PATCH",
    "path": "/performances/{performanceId}",
    "perm": "PERFORMANCE_CONFIGURE",
-   "platforms": [
-    "POS"
-   ],
+   "platforms": [],
    "screens": [
-    "BO-002",
     "BO-015",
     "BO-019",
-    "BO-063",
-    "POS-004"
+    "BO-978"
    ],
-   "enables": []
+   "enables": [
+    "catalogue.performance"
+   ]
   },
   "updatePriceList": {
    "part": "setup",
@@ -12549,21 +12945,23 @@
    ]
   },
   "updatePrincipal": {
-   "part": "setup",
+   "part": "core",
    "service": "IdentityService",
    "contract": "identity",
    "verb": "PATCH",
    "path": "/principals/{principalId}",
    "perm": "USER_MANAGE",
-   "platforms": [],
+   "platforms": [
+    "WL"
+   ],
    "screens": [
     "ADM-020",
     "BO-053",
+    "BO-054",
+    "CMS-019",
     "PTR-003"
    ],
-   "enables": [
-    "identity.principal"
-   ]
+   "enables": []
   },
   "updateProduct": {
    "part": "core",
@@ -12579,7 +12977,6 @@
     "BO-007",
     "BO-008",
     "BO-012",
-    "BO-014",
     "CMS-103"
    ],
    "enables": []
@@ -12625,9 +13022,7 @@
    "screens": [
     "BO-001",
     "BO-002",
-    "BO-004",
     "BO-005",
-    "BO-038",
     "BO-221"
    ],
    "enables": [
@@ -12643,7 +13038,7 @@
    "perm": "REGION_CONFIGURE",
    "platforms": [],
    "screens": [
-    "ADM-425",
+    "ADM-426",
     "BO-1065"
    ],
    "enables": [
@@ -12671,7 +13066,9 @@
     "SUP-008"
    ],
    "enables": [
-    "reporting.report_definition_version"
+    "reporting.report_definition",
+    "reporting.report_definition_version",
+    "reporting.report_parameter"
    ]
   },
   "updateResource": {
@@ -12684,7 +13081,6 @@
    "platforms": [],
    "screens": [
     "BO-857",
-    "BO-863",
     "BO-866"
    ],
    "enables": [
@@ -12700,10 +13096,27 @@
    "perm": "RESOURCE_CONFIGURE",
    "platforms": [],
    "screens": [
-    "BO-861"
+    "BO-861",
+    "BO-895",
+    "BO-918"
    ],
    "enables": [
     "resources.resource_requirement"
+   ]
+  },
+  "updateRotaAssignment": {
+   "part": "setup",
+   "service": "TenancyService",
+   "contract": "workforce",
+   "verb": "PATCH",
+   "path": "/rota-assignments/{assignmentId}",
+   "perm": "WORKFORCE_MANAGE",
+   "platforms": [],
+   "screens": [
+    "BO-055"
+   ],
+   "enables": [
+    "workforce.rota_assignment"
    ]
   },
   "updateSaleBoard": {
@@ -12717,8 +13130,6 @@
    "screens": [
     "BO-109",
     "BO-116",
-    "BO-117",
-    "BO-118",
     "BO-124",
     "BO-125",
     "BO-126"
@@ -12742,7 +13153,24 @@
    ],
    "screens": [
     "GST-070",
-    "WEB-031"
+    "WEB-031",
+    "WEB-036"
+   ],
+   "enables": []
+  },
+  "updateTableVisit": {
+   "part": "core",
+   "service": "FnbService",
+   "contract": "fnb",
+   "verb": "PATCH",
+   "path": "/table-visits/{visitId}",
+   "perm": "ORDER_MODIFY",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "EMP-058",
+    "POS-028"
    ],
    "enables": []
   },
@@ -12828,22 +13256,17 @@
    "enables": []
   },
   "uploadGuestDocument": {
-   "part": "core",
+   "part": "setup",
    "service": "MarketingService",
    "contract": "marketing-crm",
    "verb": "POST",
    "path": "/guest-documents",
    "perm": "GUEST_VIEW_PII",
-   "platforms": [
-    "MOB",
-    "WEB"
-   ],
-   "screens": [
-    "BO-743",
-    "GST-066",
-    "WEB-011"
-   ],
-   "enables": []
+   "platforms": [],
+   "screens": [],
+   "enables": [
+    "marketing.guest_document"
+   ]
   },
   "validateBookingFlow": {
    "part": "core",
@@ -12941,11 +13364,23 @@
    ],
    "screens": [
     "ADM-001",
+    "ADM-247",
+    "ADM-699",
+    "ADM-700",
+    "BO-053",
+    "BO-284",
+    "BO-293",
     "EMP-001",
     "GST-042",
     "GST-073",
     "POS-000",
     "PTR-001",
+    "PTR-029",
+    "PTR-030",
+    "PTR-035",
+    "PTR-036",
+    "PTR-040",
+    "PTR-048",
     "SCN-001",
     "SUP-001",
     "WEB-016"
@@ -12965,8 +13400,11 @@
    ],
    "screens": [
     "ADM-001",
+    "ADM-699",
     "EMP-042",
     "GST-073",
+    "PTR-001",
+    "SUP-001",
     "WEB-024"
    ],
    "enables": []
@@ -12987,16 +13425,9 @@
     "BO-026",
     "BO-047",
     "BO-319",
-    "EMP-014",
     "EMP-034",
-    "POS-002",
     "POS-006",
-    "POS-014",
-    "PTR-002",
-    "PTR-005",
-    "PTR-008",
-    "PTR-015",
-    "PTR-016"
+    "POS-014"
    ],
    "enables": []
   },
@@ -13012,7 +13443,6 @@
    ],
    "screens": [
     "BO-042",
-    "POS-013",
     "POS-018"
    ],
    "enables": []
@@ -13021,12 +13451,6 @@
  "fedElsewhere": {
   "games.credit_ledger": [
    "syncGamePlays"
-  ],
-  "ledger.fiscal_period": [
-   "abandonPeriodClose",
-   "beginPeriodClose",
-   "closeFiscalPeriod",
-   "reopenPeriod"
   ],
   "maintenance.work_order": [
    "acceptWorkOrder",
@@ -13043,17 +13467,14 @@
    "updateWorkOrder",
    "verifyWorkOrder"
   ],
-  "marketing.form_submission": [
-   "submitForm"
-  ],
   "orders.fraud_rule": [
    "setFraudRules"
   ],
+  "orders.group_participant": [
+   "setParticipantGuestList"
+  ],
   "orders.invitation": [
    "issueInvitation"
-  ],
-  "orders.reservation_line": [
-   "createReservation"
   ],
   "queue.reading": [
    "submitQueueReading",
@@ -13067,11 +13488,6 @@
    "checkInResource",
    "checkOutResource"
   ],
-  "retail.shop_and_drop": [
-   "collectShopAndDrop",
-   "createShopAndDrop",
-   "disposeShopAndDrop"
-  ],
   "seating.seat": [
    "assignSeats"
   ],
@@ -13083,15 +13499,18 @@
   ]
  },
  "noWriter": [
-  "access.accreditation_credential",
   "ai.capability_maturity",
   "ai.eval_suite",
+  "ai.forecast_accuracy",
+  "ai.training_run",
+  "fnb.menu_schedule",
+  "fnb.menu_version",
   "fnb.sold_out_item",
+  "fnb.sub_bill",
   "identity.platform_staff_grant",
   "inventory.serialised_item",
   "inventory.stock_batch",
   "inventory.stock_level",
-  "ledger.event_budget",
   "marketing.attribution_touch",
   "marketing.booking_consent_record",
   "marketing.challenge_progress",
@@ -13100,9 +13519,12 @@
   "orders.ticket_template_channel",
   "payments.stored_forward",
   "platform.device_heartbeat",
+  "promotions.promotion_rule",
   "retail.shop_and_drop_line",
   "subscription.plan_module",
-  "venuemap.map_version"
+  "venuemap.map_version",
+  "whitelabel.site_package",
+  "workforce.attendance_amendment"
  ],
  "missingFromLineage": []
 }

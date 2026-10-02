@@ -18,6 +18,25 @@
   "requestBody": "AdmissionRules",
   "responds": "AdmissionRules"
  },
+ "createApprovalRequest": {
+  "method": "POST",
+  "path": "/approval-requests",
+  "contract": "approvals",
+  "summary": "Raise a request",
+  "permission": "APPROVAL_REQUEST",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateApprovalRequest",
+  "responds": "ApprovalRequest"
+ },
  "deleteJourneySequenceRule": {
   "method": "DELETE",
   "path": "/journey-sequence-rules/{ruleId}",
@@ -201,25 +220,6 @@
   "requestBody": null,
   "responds": "EntitlementConsumptionEngineView"
  },
- "listEntryExitRule": {
-  "method": "GET",
-  "path": "/entry-exit-rule",
-  "contract": "access",
-  "summary": "Entry, Exit & Re-entry Rules",
-  "permission": "SCOPE_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "EntryExitReEntryRulesView"
- },
  "listGroupAdmissionQuantity": {
   "method": "GET",
   "path": "/group-admission-quantity",
@@ -257,25 +257,6 @@
   ],
   "requestBody": null,
   "responds": "GuestCompanionEligibilityRulesView"
- },
- "listMultiParkCrossover": {
-  "method": "GET",
-  "path": "/multi-park-crossover",
-  "contract": "access",
-  "summary": "Multi-Park & Crossover Rules",
-  "permission": "SCOPE_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "MultiParkCrossoverRulesView"
  },
  "publishRuleConflictCheck": {
   "method": "PUT",

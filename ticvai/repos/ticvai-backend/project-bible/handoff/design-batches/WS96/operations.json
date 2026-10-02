@@ -363,6 +363,25 @@
   "requestBody": null,
   "responds": "Page"
  },
+ "pauseWorkOrder": {
+  "method": "POST",
+  "path": "/work-orders/{workOrderId}/pause",
+  "contract": "maintenance",
+  "summary": "Stopped, and why",
+  "permission": "MAINTENANCE_EXECUTE",
+  "offlineCapable": true,
+  "conflictPolicy": "lastWriterWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "WorkOrder"
+ },
  "recordWorkOrderParts": {
   "method": "POST",
   "path": "/work-orders/{workOrderId}/parts",
@@ -419,6 +438,25 @@
   ],
   "requestBody": null,
   "responds": "InventoryStockReservation"
+ },
+ "resumeWorkOrder": {
+  "method": "POST",
+  "path": "/work-orders/{workOrderId}/resume",
+  "contract": "maintenance",
+  "summary": "Back to work",
+  "permission": "MAINTENANCE_EXECUTE",
+  "offlineCapable": true,
+  "conflictPolicy": "lastWriterWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "WorkOrder"
  },
  "setAssetStatus": {
   "method": "PUT",

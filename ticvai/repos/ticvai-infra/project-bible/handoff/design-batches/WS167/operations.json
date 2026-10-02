@@ -285,12 +285,12 @@
   "requestBody": null,
   "responds": "SeatHoldPool"
  },
- "simulatePolicyConflictImpact": {
-  "method": "PUT",
-  "path": "/policy-conflict-impact",
-  "contract": "access",
-  "summary": "Policy Simulation, Conflict & Impact Analysis",
-  "permission": "ACCESS_POINT_CONFIGURE",
+ "updatePerformance": {
+  "method": "PATCH",
+  "path": "/performances/{performanceId}",
+  "contract": "catalogue",
+  "summary": "Amend a performance",
+  "permission": "PERFORMANCE_CONFIGURE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
@@ -301,8 +301,8 @@
     "required": null
    }
   ],
-  "requestBody": "PolicySimulationConflictImpactAnalysisInput",
-  "responds": "PolicySimulationConflictImpactAnalysisView"
+  "requestBody": null,
+  "responds": "Performance"
  },
  "validateSeatMap": {
   "method": "POST",

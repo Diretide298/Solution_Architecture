@@ -1,6 +1,6 @@
 # P09-support-communications-01 — P09 · Support & Communications
 
-**2 screens · 4 operations · 3 schemas · 4 permissions**
+**2 screens · 2 operations · 1 schemas · 2 permissions**
 
 Platform P09 TICVAI Web · ships as **ticvai-control** ·
 platformAdmin audience · web ·
@@ -48,8 +48,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 4 permissions apply here:
-  `ANNOUNCEMENT_PUBLISH, PLATFORM_RELEASE_MANAGE, PLATFORM_RELEASE_VIEW, WORKFORCE_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 2 permissions apply here:
+  `PLATFORM_RELEASE_MANAGE, PLATFORM_RELEASE_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -61,14 +61,43 @@ convincingly. It is never a caption.
   and its error; and, element by element, what is shown and in what format, what each action
   produces and where the user goes next. Draw exactly that.
 
+## The processes these screens belong to
+
+Written by the owner of each process (`handoff/design-notes/`). Read before any screen: it says how the process runs end to end and which words the screens must use.
+
+### Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management)
+
+Platform Foundation is everything the apps stand on. Five apps each have one door: the guest app and website (WEB-016, GST-042: a six-digit code to email or mobile, a password, Apple or Google, UAE Pass; never enterprise SSO), the till (POS-000: employee number and PIN, recent operators as tiles; the kitchen display is the same app), the staff handheld and scanner (EMP-001, SCN-001), Venue Management (SUP-001, the single door for the back office P08, the CMS P13, analytics P16 and the support desk P12) and TICVAI Control (ADM-001 for TICVAI's own platform operators, PTR-001 for partner users; the developer portal P14 and the sign-up P17 belong to this app too). A second factor is required by permission, not by role or device: ROLE_MANAGE, LEDGER_APPROVE and every PLATFORM_* permission, plus any the tenant adds; so a cashier never sees it and a platform operator always does. The factor is an authenticator app with an emailed code as fallback; five wrong codes lock step-up for the lockout minutes, never permanently. Guests get two-step verification only at a venue that switched it on. One person holds one session per workstation: a second sign-in is refused and only a supervisor ends the other session. Several roles mean a role prompt; one role goes straight in. The workstation decides the Sale Board, hardware and till identity, never what a person may do. Sensitive actions (refund approval, journal approval, credential reset, partner credit, commission rules, opening a platform-staff grant and 17 more) demand a fresh step-up on the operation itself, asked in place in the action's confirmation; the tenant may raise the strength, never remove it. Permission outcomes are three, never one word: self-authorised (proceeds, audited), escalated (a supervisor PIN in place), refused (the denied state, naming the permission); a missing permission is never an empty table, and a record outside the person's venues is "not found", indistinguishable from absent. The hierarchy is binding (tenant, brand, region, venue, department, sub-department, workstation; outlet beside department for F&B and retail); region owns currency, decimals, time zone, date format and fiscal year; configuration resolves nearest-ancestor across tenant, region and venue (outlet for F&B and retail), venue is the floor and a workstation is assigned a profile, never configured; every configuration screen says which level it writes and what it inherits. Venue Management is one tenant-level surface filtering across the venues in the session's scope. TICVAI's Console runs outside every cell: a platform operator picks a tenant and opens a time-boxed, audited platform-staff grant (with step-up) before any tenant action, and the tenant sees every action in its audit log (ADM-412 is the reference implementation). Approval workflows record authorisations and never perform the action; the requester cannot approve their own request; a venue may tighten and never loosen a rule from above; in-flight …
+*(source: screens/P12-support-agent-console.yaml#SUP-001; R135; R126; R167; DI-1072; ADR-0002; ADR-0003; ADR-0004; R184; contracts/spine/identity.yaml#createMfaChallenge; contracts/spine/approvals.yaml#setStepUpPolicy; ADR-0011; ADR-0018; ADR-0029; R098; contracts/spine/approvals.yaml#decideApprovalRequest …)*
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Sign in / Sign out | Entering and leaving any app, staff or guest. | Login, Log in, Logon, Logout | screens/P04-point-of-sale.yaml#POS-000 … |
+| Authentication code | The staff second factor from the authenticator app (or the emailed fallback). | OTP, 2FA code, token | screens/P09-platform-admin-console.yaml#ADM-001 |
+| One-time code | The six-digit code a guest receives to sign in or prove a contact. | OTP, PIN, password | DI-1034; R167 |
+| Two-step verification | The guest's optional second factor, asked only at venues that switched it on. | MFA, 2FA | DI-1072 |
+| Tenant / Brand / Region / Venue / Department / Outlet | The binding hierarchy levels; region owns currency and dates; outlet is F&B or retail inside a venue. | Client, Customer, Org (for tenant), Site, Park, Property (for venue), Area, Territory (for region) | ADR-0011; ADR-0018 |
+| Workstation (back office) / till (operator copy) | A configured device; decides Sale Board, hardware and till identity, never authorisation. | Terminal, Station, POS (for the device), till (for the Deposit Box) | ADR-0002; R156 |
+| Sale Board | The configured front end a workstation loads (ticketing, F&B or retail). | Screen, Layout, Menu | ADR-0003 |
+| Role | A named, fully configurable grouping of permissions; the seeded five are editable starting points. | Group, Profile | R229 |
+| Staff member / Partner user / Platform operator | A tenant's staff principal; a partner's user; a TICVAI employee in the Console. | User (alone), Account, Agent (for venue staff) | F104 step 1; F104 step 4; F104 step 5 |
+| Platform-staff grant | The time-boxed, audited access a platform operator opens into one tenant before acting in it. | Impersonation, Support login | R098 |
+| Escalate / Refused | Escalate is supervisor approval captured in place; Refused is the denied state that names the permission. | Denied (for an action that can be escalated) | R197 |
+| Approve / Reject / Return / Request information | The four decisions on an approval request; Withdraw is the requester's own act and never a rejection. | Accept, Decline, Cancel (for withdraw) | contracts/spine/approvals.yaml#decideApprovalRequest … |
+| Subscription / Plan / Module / Licence | TICVAI's commercial relationship with a tenant, its plan, the modules it licenses and the limits. | Membership (that is the guest's pass) | R214 |
+| Membership / Annual pass | A guest's pass product and its holder (BO-284 to BO-303). | Subscription (that is the tenant's TICVAI plan) | screens/P08-venue-back-office.yaml#BO-284 |
+| Sandbox client / Production client | A developer's own test credential; a TICVAI-issued live credential after certification. | Test key, Live key, API key (without environment) | DI-927 |
+| Asset (DAM) / Media (ticket) | A digital file in the library; ticket media is a wristband or card carrying entitlements. Never mix them. | Media (for a library asset) | contracts/satellite/assets.yaml#searchMedia … |
+
+
 ## The screens
 
 Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs count fields; requirements are matrix rows; meeting inputs are the ones naming the screen (the module and platform ones are below); white label says whether the tenant's brand reaches it (guest) or it sets the brand (configures).
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-035` | Support & Escalation Console | B–D | 7 | 14 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-036` | Platform Notification Broadcast | B–D | 18 | 26 | 6 | 4 | 0 | 0 | — | notStarted (generated) |
+| `ADM-035` | Support & Escalation Console | B–D | 7 | 10 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-036` | Platform Notification Broadcast | B–D | 7 | 14 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 
 ---
 
@@ -78,7 +107,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 ### `ADM-035` Support & Escalation Console
 
-**Answer a question without needing a person.**
+**Work the support escalations that reach TICVAI, and tell tenants what is known.**
 
 | | |
 |---|---|
@@ -94,13 +123,17 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 **What the spec says about it.** Purpose derived from the screen name and its operations on 17 August, not from a requirement.
 
-**Known gaps.**  Open: No contract — overlaps P12
+**Known gaps.** Contract gap recorded 2 October 2026 (CHG-WIR-024): No operation lists or works the support escalations that reach TICVAI. Open: No contract — overlaps P12
+
+**From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** TICVAI support: notices and escalations raised to platform support.
+
+**Fixed on main** (the package already carries these; draw what it says): Purpose "Answer a question without needing a person"; operations are support notices only. (CHG-WIR-023); formPublishSupportNotice asks the person for publishedAt, id. (CHG-SBO-004); Tables show every schema field, plumbing included: 'Every support notice' drop id, affectedTenantIds, publishedByPrincipalId, scopePath. (CHG-SBO-004); emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything. (CHG-SBO-002).
 
 #### Inputs: what the user enters or picks
 
 **Form: Publish support notice** (modal, opened by *Publish support notice*; *Publish support notice* calls `publishSupportNotice`, *Cancel* sends nothing)
 
-**Collects what `publishSupportNotice` sends before it is called.** Required: `id`, `supportEndsAt`, `publishedAt`. Optional: `message`, `affectedTenantIds`, `publishedByPrincipalId`, `scopePath`. Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `publishSupportNotice` sends before it is called.** Required: `supportEndsAt`. Optional: `message`, `affectedTenantIds`, `publishedByPrincipalId`, `scopePath`. **Not asked:** `id` is a client UUIDv7 generated silently; `publishedAt` is set by the server (design-note correction, 2 October 2026). Dismissing sends nothing; the screen behind is unchanged.
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
@@ -120,13 +153,9 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Support ends at | 1 Oct 2026 | — |
 | Message | grouped details | — |
-| Affected tenants | list or chips (count when long) | Computed from cell versions, never typed. A notice to the wrong list is worse than none. |
-| Published by principal | the name it points at, never the id | — |
 | Published at | 1 Oct 2026, 14:30 | — |
-| Scope path | text | The partition key (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it … |
 
 **The selected support notice** (detail panel, from `listSupportNotices`)
 
@@ -148,6 +177,10 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Publish support notice (primary button) | `publishSupportNotice` POST `/support-notices` | SupportNotice | SupportNotice | — | opens modal first |
 | What publishing changes (publish gate) | navigation or local | — | — | — | — |
 
+**What each action does** (from the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process; these refine the tables above and win where they differ)
+
+- **Publish support notice**: Separate from Save. The publish gate names what goes live, where and from when before it happens; blocked names what is wrong and how to fix it; an override past a warning is recorded with who authorised it. *(source: screens/_components.yaml#publishGate; contracts/satellite/platform-ops.yaml#publishSupportNotice)*
+
 **Data it reads**: `listSupportNotices` (onLoad, End-of-support notices)
 
 **Where the user goes next**
@@ -161,10 +194,28 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | Loading (`?state=loading`) | The support escalation console list. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the support escalation console untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No support escalation console yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table. |
+| Empty, first run (`?state=emptyFirstRun`) | No support escalation console yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | Never shown: `listSupportNotices` takes no filter, so an empty list is always the first-run state above. |
 | Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PLATFORM_RELEASE_VIEW`, which `listSupportNotices` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Edge cases to draw
+
+- **Can read but not change (holds PLATFORM_RELEASE_VIEW only)**: Everything reads; the actions needing another permission are not offered as live buttons: PLATFORM_RELEASE_MANAGE for Publish support notice. Where the person would reasonably expect the action, it shows disabled with the permission named. The server refuses with 403 forbidden regardless. *(source: contracts/satellite/platform-ops.yaml#publishSupportNotice)*
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+Every support notice:
+- supportEndsAt: 01/10/2026 09:14
+  publishedAt: 01/10/2026 09:14
+- supportEndsAt: 30/09/2026 18:02
+  publishedAt: 30/09/2026 18:02
+- supportEndsAt: 28/09/2026 11:45
+  publishedAt: 28/09/2026 11:45
+```
 
 #### Permissions
 
@@ -194,26 +245,27 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (7), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (14 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (10 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-035?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: , Publish support notice, What publishing changes.
 - [ ] Every transition is wired: `ADM-001`, `ADM-002`.
 - [ ] Every gated control is gated: `PLATFORM_RELEASE_MANAGE`, `PLATFORM_RELEASE_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 1 edge case(s) from the process notes are drawn.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
 
 ### `ADM-036` Platform Notification Broadcast
 
-**Push live platform notification broadcast for this venue.**
+**Broadcast a notice to every tenant, or to some of them.**
 
 | | |
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Support & Communications · wave 3 · needs the `core` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `ANNOUNCEMENT_PUBLISH`, `PLATFORM_RELEASE_MANAGE`, `PLATFORM_RELEASE_VIEW`, `WORKFORCE_VIEW` (2 configure, 2 read) |
+| Who uses it | ticvai staff holding `PLATFORM_RELEASE_MANAGE`, `PLATFORM_RELEASE_VIEW` (1 configure, 1 read) |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listSupportNotices` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
 | Offline | online only |
@@ -222,19 +274,17 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **What the spec says about it.** Purpose derived from the screen name and its operations on 17 August, not from a requirement.
 
-**Known gaps.**  Open: No contract — not specified
+**Known gaps.** Removed 2 October 2026 (CHG-WIR-021): listAnnouncements and publishAnnouncement are the tenant's staff announcements (WORKFORCE_VIEW, ANNOUNCEMENT_PUBLISH); a platform broadcast is a support notice … Removed 2 October 2026 (CHG-WIR-021): listAnnouncements and publishAnnouncement are the tenant's staff announcements (WORKFORCE_VIEW, ANNOUNCEMENT_PUBLISH); a platform broadcast is a support notice … Open: No contract — not specified
+
+**From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** Broadcast a platform notice to tenants (maintenance, incidents) and see what was sent.
+
+**Fixed on main** (the package already carries these; draw what it says): listAnnouncements and publishAnnouncement (tenant staff announcements, WORKFORCE_VIEW, ANNOUNCEMENT_PUBLISH). (CHG-WIR-021); formPublishSupportNotice asks the person for publishedAt, id. (CHG-SBO-004); formPublishAnnouncement asks the person for publishedAt. (CHG-WIR-021); Tables show every schema field, plumbing included: 'Every support notice' drop id, affectedTenantIds, publishedByPrincipalId, scopePath … (CHG-WIR-021); emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything. (CHG-SBO-002).
 
 #### Inputs: what the user enters or picks
 
-**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
-
-| Filter | Drawn as | Default | Allowed values, rules | Source |
-|---|---|---|---|---|
-| Unacknowledged only | toggle | — | — | `listAnnouncements` ?unacknowledgedOnly |
-
 **Form: Publish support notice** (modal, opened by *Publish support notice*; *Publish support notice* calls `publishSupportNotice`, *Cancel* sends nothing)
 
-**Collects what `publishSupportNotice` sends before it is called.** Required: `id`, `supportEndsAt`, `publishedAt`. Optional: `message`, `affectedTenantIds`, `publishedByPrincipalId`, `scopePath`. Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `publishSupportNotice` sends before it is called.** Required: `supportEndsAt`. Optional: `message`, `affectedTenantIds`, `publishedByPrincipalId`, `scopePath`. **Not asked:** `id` is a client UUIDv7 generated silently; `publishedAt` is set by the server (design-note correction, 2 October 2026). Dismissing sends nothing; the screen behind is unchanged.
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
@@ -245,26 +295,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Published by principal `publishedByPrincipalId` | picker: choose a published by principal | optional | — | — | shows names, sends the id | — | `publishSupportNotice` body |
 | Published at `publishedAt` | date and time picker | required | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `publishSupportNotice` body |
 | Scope path `scopePath` | text field | optional | — | — | — | The partition key (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — 49 tables were in that state, so a row … | `publishSupportNotice` body |
-
-**Form: Publish announcement** (modal, opened by *Publish announcement*; *Publish announcement* calls `publishAnnouncement`, *Cancel* sends nothing)
-
-**Collects what `publishAnnouncement` sends before it is called.** Required: `title`, `body`, `kind`, `publishedAt`. Optional: `id`, `venueIds`, `departmentIds`, `roleIds`, `requiresAcknowledgement`, `expiresAt`, `publishedByPrincipalId`, `locale`. Dismissing sends nothing; the screen behind is unchanged.
-
-| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
-|---|---|---|---|---|---|---|---|
-| Title `title` | text field | required | — | max length 140 | — | — | `publishAnnouncement` body |
-| Body `body` | text area | required | — | max length 4000 | — | — | `publishAnnouncement` body |
-| Kind `kind` | radio group | required | — | Operational · Safety · Emergency · Hr · Celebration | — | `emergency` is not a louder `operational`. It overrides the home screen, bypasses quiet hours, requires acknowledgement, and carries a separate permission. | `publishAnnouncement` body |
-| Venues `venueIds` | multi-picker: choose venues | optional | — | — | — | — | `publishAnnouncement` body |
-| Departments `departmentIds` | multi-picker: choose departments | optional | — | — | — | — | `publishAnnouncement` body |
-| Roles `roleIds` | multi-picker: choose roles | optional | — | — | — | — | `publishAnnouncement` body |
-| Requires acknowledgement `requiresAcknowledgement` | toggle | optional | — | — | — | — | `publishAnnouncement` body |
-| Delivery channels `deliveryChannels` | multi-select chips | optional | In app, Push | In app · Push | — | How it reaches people (29 September, build, 18.1.5). `inApp` always; `push` to the targeted people's registered staff phones (tenancy `RegisteredDevice`, kind `mobileHandset`). | `publishAnnouncement` body |
-| Expires at `expiresAt` | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `publishAnnouncement` body |
-| Published at `publishedAt` | date and time picker | required | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `publishAnnouncement` body |
-| Locale `locale` | text field | optional | — | — | — | — | `publishAnnouncement` body |
-
-Errors to draw in the form: 403 The caller lacks `ANNOUNCEMENT_PUBLISH` at the target scope, or sent `kind` `emergency` without `ANNOUNCEMENT_EMERGENCY` (problem type …
 
 #### Outputs: what the screen shows and produces
 
@@ -281,23 +311,6 @@ Errors to draw in the form: 403 The caller lacks `ANNOUNCEMENT_PUBLISH` at the t
 | Published by principal | the name it points at, never the id | — |
 | Published at | 1 Oct 2026, 14:30 | — |
 | Scope path | text | The partition key (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it … |
-
-**Every announcement** (data table, from `listAnnouncements`)
-
-| Shows | Format | Notes |
-|---|---|---|
-| ID | the name it points at, never the id | — |
-| Title | text | — |
-| Body | text | — |
-| Kind | chip: Operational, Safety, Emergency, Hr, Celebration | `emergency` is not a louder `operational`. It overrides the home screen, bypasses quiet hours, requires acknowledgement, and carries a … |
-| Venues | list or chips (count when long) | — |
-| Departments | list or chips (count when long) | — |
-| Roles | list or chips (count when long) | — |
-| Requires acknowledgement | yes / no (icon or chip) | — |
-| Expires at | 1 Oct 2026, 14:30 | — |
-| Published by principal | the name it points at, never the id | — |
-| Published at | 1 Oct 2026, 14:30 | — |
-| Locale | text | — |
 
 **The selected support notice** (detail panel, from `listSupportNotices`)
 
@@ -317,10 +330,13 @@ Errors to draw in the form: 403 The caller lacks `ANNOUNCEMENT_PUBLISH` at the t
 |---|---|---|---|---|---|
 |  (publish gate) | navigation or local | — | — | — | — |
 | Publish support notice (primary button) | `publishSupportNotice` POST `/support-notices` | SupportNotice | SupportNotice | — | opens modal first |
-| Publish announcement (secondary button) | `publishAnnouncement` POST `/announcements` | Announcement | Announcement | 403 The caller lacks `ANNOUNCEMENT_PUBLISH` at the target scope, or sent `kind` `emergency` without `ANNOUNCEMENT_EMERGENCY` (problem type … | opens modal first |
 | What publishing changes (publish gate) | navigation or local | — | — | — | — |
 
-**Data it reads**: `listSupportNotices` (onLoad, End-of-support notices); `listAnnouncements` (onLoad, What has been broadcast)
+**What each action does** (from the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process; these refine the tables above and win where they differ)
+
+- **Publish support notice**: Separate from Save. The publish gate names what goes live, where and from when before it happens; blocked names what is wrong and how to fix it; an override past a warning is recorded with who authorised it. *(source: screens/_components.yaml#publishGate; contracts/satellite/platform-ops.yaml#publishSupportNotice)*
+
+**Data it reads**: `listSupportNotices` (onLoad, End-of-support notices)
 
 **Where the user goes next**
 
@@ -333,30 +349,40 @@ Errors to draw in the form: 403 The caller lacks `ANNOUNCEMENT_PUBLISH` at the t
 |---|---|
 | Loading (`?state=loading`) | The platform notification broadcast list. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the platform notification broadcast untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No platform notification broadcast yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table. |
+| Empty, first run (`?state=emptyFirstRun`) | No platform notification broadcast yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | Never shown: `listSupportNotices` takes no filter, so an empty list is always the first-run state above. |
 | Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PLATFORM_RELEASE_VIEW`, which `listSupportNotices` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Edge cases to draw
+
+- **Can read but not change (holds PLATFORM_RELEASE_VIEW, WORKFORCE_VIEW only)**: Everything reads; the actions needing another permission are not offered as live buttons: PLATFORM_RELEASE_MANAGE for Publish support notice; ANNOUNCEMENT_PUBLISH for Publish announcement. Where the person would reasonably expect the action, it shows disabled with the permission named. The server refuses with 403 forbidden regardless. *(source: contracts/satellite/platform-ops.yaml#publishSupportNotice)*
+- **publishAnnouncement answers 403**: Show it as something the person can act on, not a failure: The caller lacks `ANNOUNCEMENT_PUBLISH` at the target scope, or sent `kind` `emergency` without `ANNOUNCEMENT_EMERGENCY` (problem type `emergency-permission-required`, audit R091 (1)). *(source: contracts/satellite/workforce.yaml#publishAnnouncement)*
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+Every support notice:
+- supportEndsAt: 01/10/2026 09:14
+  publishedAt: 01/10/2026 09:14
+- supportEndsAt: 30/09/2026 18:02
+  publishedAt: 30/09/2026 18:02
+- supportEndsAt: 28/09/2026 11:45
+  publishedAt: 28/09/2026 11:45
+```
 
 #### Permissions
 
 - `publishSupportNotice` → `PLATFORM_RELEASE_MANAGE` (configure) · staff
 - `listSupportNotices` → `PLATFORM_RELEASE_VIEW` (read) · staff
-- `listAnnouncements` → `WORKFORCE_VIEW` (read) · staff
-- `publishAnnouncement` → `ANNOUNCEMENT_PUBLISH` (configure) · staff
 
 **A refused user sees:** Shown when the caller lacks `PLATFORM_RELEASE_VIEW`, which `listSupportNotices` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
 #### Requirements it meets
 
-4 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
-
-| Ref | Requirement (shortened) | Domain | Verdict | Via |
-|---|---|---|---|---|
-| 1.2.66 | System shall send assignment and schedule notifications. | Ticketing Catalogue | CONTRACTED | `publishAnnouncement` |
-| 18.1.5 | Push Notifications - System shall support push notifications. | Employee Mobile App & AI Assistant | CONTRACTED | `publishAnnouncement` |
-| 18.9.3 | Announcements - Users shall receive announcements. | Employee Mobile App & AI Assistant | CONTRACTED | `publishAnnouncement` |
-| 18.9.4 | Emergency Alerts - Users shall receive emergency notifications. | Employee Mobile App & AI Assistant | CONTRACTED | `publishAnnouncement` |
+No matrix row traces to this screen's operations or data.
 
 #### Client meeting inputs
 
@@ -374,13 +400,14 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (18), with its required mark, default, format and its error state (403).
-- [ ] Every output is drawn (26 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (7), with its required mark, default, format and its error state.
+- [ ] Every output is drawn (14 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-036?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: , Publish support notice, Publish announcement, What publishing changes.
+- [ ] Every action is wired with its success and its failure: , Publish support notice, What publishing changes.
 - [ ] Every transition is wired: `ADM-001`, `ADM-002`.
-- [ ] Every gated control is gated: `ANNOUNCEMENT_PUBLISH`, `PLATFORM_RELEASE_MANAGE`, `PLATFORM_RELEASE_VIEW`, `WORKFORCE_VIEW`.
+- [ ] Every gated control is gated: `PLATFORM_RELEASE_MANAGE`, `PLATFORM_RELEASE_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 2 edge case(s) from the process notes are drawn.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -456,9 +483,7 @@ Method, path, parameters, request and response for every operation these screens
 
 ```json
 {
-"listAnnouncements": {"method":"GET","path":"/announcements","contract":"workforce","summary":"What staff have been told","permission":"WORKFORCE_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"unacknowledgedOnly","in":"query","required":null}],"requestBody":null,"responds":"Announcement"},
 "listSupportNotices": {"method":"GET","path":"/support-notices","contract":"platform-ops","summary":"End-of-support notices","permission":"PLATFORM_RELEASE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[],"requestBody":null,"responds":"SupportNotice"},
-"publishAnnouncement": {"method":"POST","path":"/announcements","contract":"workforce","summary":"Tell staff something","permission":"ANNOUNCEMENT_PUBLISH","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"Announcement","responds":"Announcement"},
 "publishSupportNotice": {"method":"POST","path":"/support-notices","contract":"platform-ops","summary":"Publish an end-of-support notice","permission":"PLATFORM_RELEASE_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"SupportNotice","responds":"SupportNotice"}
 }
 ```
@@ -469,8 +494,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
-"Announcement": {"type":"object","x-ticvai-persistence":"workforce.announcement","required":["title","body","kind","publishedAt"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"title":{"type":"string","maxLength":140},"body":{"type":"string","maxLength":4000},"kind":{"$ref":"#/components/schemas/AnnouncementKind"},"venueIds":{"type":"array","items":{"type":"string","format":"uuid"}},"departmentIds":{"type":"array","items":{"type":"string","format":"uuid"}},"roleIds":{"type":"array","items":{"type":"string","format":"uuid"}},"requiresAcknowledgement":{"type":"boolean"},"deliveryChannels":{"type":"array","description":"How it reaches people (29 September, build, 18.1.5). `inApp` always; `push` to the targeted people's registered staff phones (tenancy `RegisteredDevice`, kind `mobileHandset`). `emergency` is sent by both whatever is set here.\n","items":{"type":"string","enum":["inApp","push"]},"default":["inApp","push"]},"expiresAt":{"type":"string","format":"date-time","nullable":true},"publishedByPrincipalId":{"type":"string","format":"uuid","readOnly":true},"publishedAt":{"type":"string","format":"date-time"},"locale":{"type":"string","nullable":true}}},
-"AnnouncementKind": {"type":"string","description":"`emergency` is not a louder `operational`. It overrides the home screen, bypasses quiet hours, requires acknowledgement, and carries a separate permission.\n","enum":["operational","safety","emergency","hr","celebration"]},
 "SupportNotice": {"type":"object","x-ticvai-persistence":"control.support_notice","required":["id","version","supportEndsAt","publishedAt"],"properties":{"id":{"type":"string","format":"uuid"},"version":{"type":"string"},"supportEndsAt":{"type":"string","format":"date"},"message":{"type":"object","additionalProperties":{"type":"string"}},"affectedTenantIds":{"type":"array","readOnly":true,"description":"Computed from cell versions, never typed. A notice to the wrong list is worse than none.","items":{"type":"string","format":"uuid"}},"publishedByPrincipalId":{"type":"string","format":"uuid"},"publishedAt":{"type":"string","format":"date-time"},"scopePath":{"type":"string","description":"**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `tenant` scope.**"}}}
 }
 ```

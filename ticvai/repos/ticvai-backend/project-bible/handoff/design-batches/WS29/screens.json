@@ -110,6 +110,13 @@
      "slot": "headline",
      "components": [
       {
+       "kind": "multiSelect",
+       "label": "Membership type",
+       "operation": "listMembershipAnnualPass",
+       "notes": "Monthly, fixed-term, corporate, family, individual, student, VIP or custom: a filter (and the type chosen when creating), not buttons.",
+       "provenance": "contract subscription.yaml GET /membership-annual-pass"
+      },
+      {
        "kind": "metricTile",
        "label": "Active Membership Products",
        "bindsTo": "MembershipAnnualPassCommandCenterSummary.activeMembershipProducts",
@@ -244,46 +251,6 @@
      "slot": "rowActions",
      "components": [
       {
-       "kind": "primaryButton",
-       "label": "Monthly Membership",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 4 §Support configurable types such as"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Fixed-Term Membership",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 4 §Support configurable types such as"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Corporate Membership",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 4 §Support configurable types such as"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Family Membership",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 4 §Support configurable types such as"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Individual Membership",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 4 §Support configurable types such as"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Student Membership",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 4 §Support configurable types such as"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "VIP Membership",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 4 §Support configurable types such as"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Custom Membership",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 4 §Support configurable types such as"
-      },
-      {
        "kind": "destructiveButton",
        "label": "Suspend membership product",
        "operation": "approveMembershipProductValidation",
@@ -298,6 +265,19 @@
        "permission": "PLATFORM_CELL_MANAGE",
        "notes": "Quick action: sends `action: reinstate`, moving a `suspended` version back to `active`; refused once its `effectiveTo` has passed (decided 29 September, writers pass; DM4).",
        "provenance": "contract subscription.yaml PUT /membership-product-validation"
+      },
+      {
+       "kind": "textField",
+       "label": "Authentication code",
+       "operation": "verifyMfaChallenge",
+       "notes": "Asked in the confirmation of the approval: `approveMembershipProductValidation` is step-up mfa and refuses without a fresh token.",
+       "provenance": "contract identity.yaml POST /auth/mfa/challenge/{challengeId}/verify"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Email me a code instead",
+       "operation": "createMfaChallenge",
+       "provenance": "contract identity.yaml POST /auth/mfa/challenge"
       }
      ]
     }
@@ -306,7 +286,7 @@
   "states": {
    "loading": "The membership annual pass list.",
    "error": "Could not load. Names which read failed and leaves the membership annual pass untouched.",
-   "emptyFirstRun": "No membership annual pass yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No membership annual pass yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the membership annual pass are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -325,6 +305,20 @@
     "invalidates": [
      "listMembershipAnnualPass"
     ]
+   },
+   {
+    "operationId": "createMfaChallenge",
+    "contract": "identity",
+    "purpose": "The step-up approveMembershipProductValidation asks for, in place",
+    "trigger": "onAction",
+    "provenance": "design-note correction, 2 October 2026 (BO-284)"
+   },
+   {
+    "operationId": "verifyMfaChallenge",
+    "contract": "identity",
+    "purpose": "Answers the step-up; its token goes into the approval",
+    "trigger": "onAction",
+    "provenance": "design-note correction, 2 October 2026 (BO-284)"
    }
   ],
   "entryState": {
@@ -335,6 +329,12 @@
     "MembershipAnnualPassCommandCenterSummary.activeMembers",
     "MembershipAnnualPassCommandCenterSummary.familyMemberships",
     "MembershipAnnualPassCommandCenterSummary.membershipsExpiringSoon"
+   ],
+   "params": [
+    {
+     "name": "challengeId",
+     "from": "navigation"
+    }
    ]
   },
   "wireframe": {
@@ -426,44 +426,60 @@
      "slot": "fields",
      "components": [
       {
-       "kind": "selectField",
+       "kind": "textField",
        "label": "Membership Name",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 5 §Capture"
+       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 5 §Capture",
+       "operation": "setMembershipProductTier",
+       "bindsTo": "MembershipProductTierBuilderInput.membershipName"
       },
       {
-       "kind": "selectField",
+       "kind": "textField",
        "label": "Membership Code",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 5 §Capture"
+       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 5 §Capture",
+       "operation": "setMembershipProductTier",
+       "bindsTo": "MembershipProductTierBuilderInput.membershipCode"
       },
       {
-       "kind": "selectField",
+       "kind": "textField",
        "label": "Description",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 5 §Capture"
+       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 5 §Capture",
+       "operation": "setMembershipProductTier",
+       "bindsTo": "MembershipProductTierBuilderInput.description"
       },
       {
        "kind": "selectField",
        "label": "Membership Type",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 5 §Capture"
+       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 5 §Capture",
+       "operation": "setMembershipProductTier",
+       "bindsTo": "MembershipProductTierBuilderInput.membershipType"
       },
       {
-       "kind": "selectField",
+       "kind": "textField",
        "label": "Brand",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 5 §Capture"
+       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 5 §Capture",
+       "operation": "setMembershipProductTier",
+       "bindsTo": "MembershipProductTierBuilderInput.brand"
       },
       {
-       "kind": "selectField",
+       "kind": "textField",
        "label": "Venue",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 5 §Capture"
+       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 5 §Capture",
+       "operation": "setMembershipProductTier",
+       "bindsTo": "MembershipProductTierBuilderInput.venue"
       },
       {
-       "kind": "selectField",
+       "kind": "textField",
        "label": "Attraction",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 5 §Capture"
+       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 5 §Capture",
+       "operation": "setMembershipProductTier",
+       "bindsTo": "MembershipProductTierBuilderInput.attraction"
       },
       {
-       "kind": "selectField",
+       "kind": "textField",
        "label": "Market",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 5 §Capture"
+       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 5 §Capture",
+       "operation": "setMembershipProductTier",
+       "bindsTo": "MembershipProductTierBuilderInput.market"
       },
       {
        "kind": "selectField",
@@ -471,24 +487,32 @@
        "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 5 §Capture"
       },
       {
-       "kind": "selectField",
+       "kind": "datePicker",
        "label": "Effective From",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 5 §Capture"
+       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 5 §Capture",
+       "operation": "setMembershipProductTier",
+       "bindsTo": "MembershipProductTierBuilderInput.effectiveFrom"
       },
       {
-       "kind": "selectField",
+       "kind": "datePicker",
        "label": "Effective To",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 5 §Capture"
+       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 5 §Capture",
+       "operation": "setMembershipProductTier",
+       "bindsTo": "MembershipProductTierBuilderInput.effectiveTo"
       },
       {
        "kind": "selectField",
        "label": "Tier Level",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 5 §Define"
+       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 5 §Define",
+       "operation": "setMembershipProductTier",
+       "bindsTo": "MembershipProductTierBuilderInput.tierLevel"
       },
       {
-       "kind": "selectField",
+       "kind": "numberField",
        "label": "Display Order",
-       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 5 §Define"
+       "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 5 §Define",
+       "operation": "setMembershipProductTier",
+       "bindsTo": "MembershipProductTierBuilderInput.displayOrder"
       },
       {
        "kind": "selectField",
@@ -548,8 +572,9 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Save changes",
-       "provenance": "contract operation setMembershipProductTier"
+       "label": "Save membership product",
+       "provenance": "contract operation setMembershipProductTier",
+       "operation": "setMembershipProductTier"
       }
      ]
     }
@@ -583,6 +608,49 @@
    "workshopBoard": "wireframes/WS82 Membership   Annual Pass Management Board 1.dc.html#bo-285"
   },
   "apisNote": "Regenerated 9 September 2026 from Membership___Annual_Pass_Management_Reference.pdf page 5. 0 of 0 labels bound to a contract property; 23 of 39 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetMembershipProductTier",
+    "component": "modal",
+    "trigger": "Save membership product",
+    "body": "**Collects what `setMembershipProductTier` sends before it is called.** Nothing in the body is required. Optional: `membershipName`, `membershipCode`, `description`, `membershipType`, `brand`, `venue`, `attraction`, `market`, `currencyContext`, `effectiveFrom`, `effectiveTo`, `tierLevel`, `displayOrder`, `parentMembership`, `replacementMembership`, `holderModel`, `transferable`, `credentialForm`, `renewable`, `autoRenewEligible`, `benefitModel`, `tier`, `upgradePath`, `downgradePath`, `catalogueProductId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save membership product",
+     "operation": "setMembershipProductTier"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "membershipName",
+      "membershipCode",
+      "description",
+      "membershipType",
+      "brand",
+      "venue",
+      "attraction",
+      "market",
+      "currencyContext",
+      "effectiveFrom",
+      "effectiveTo",
+      "tierLevel",
+      "displayOrder",
+      "parentMembership",
+      "replacementMembership",
+      "holderModel",
+      "transferable",
+      "credentialForm",
+      "renewable",
+      "autoRenewEligible",
+      "benefitModel",
+      "tier",
+      "upgradePath",
+      "downgradePath",
+      "catalogueProductId"
+     ]
+    },
+    "provenance": "contract subscription.yaml PUT /membership-product-tier"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -2076,6 +2144,19 @@
        "kind": "primaryButton",
        "label": "Approve",
        "provenance": "contract operation approveMembershipProductValidation"
+      },
+      {
+       "kind": "textField",
+       "label": "Authentication code",
+       "operation": "verifyMfaChallenge",
+       "notes": "Asked in the confirmation of the approval: `approveMembershipProductValidation` is step-up mfa and refuses without a fresh token.",
+       "provenance": "contract identity.yaml POST /auth/mfa/challenge/{challengeId}/verify"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Email me a code instead",
+       "operation": "createMfaChallenge",
+       "provenance": "contract identity.yaml POST /auth/mfa/challenge"
       }
      ]
     }
@@ -2084,7 +2165,7 @@
   "states": {
    "loading": "The membership product validation configuration as saved.",
    "error": "Could not load. Names which read failed and leaves the membership product validation untouched.",
-   "emptyFirstRun": "No membership product validation configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyFirstRun": "No membership product validation configured yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
@@ -2093,6 +2174,20 @@
     "contract": "subscription",
     "purpose": "Membership Product Validation, Approval, Publication & Versioning",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "createMfaChallenge",
+    "contract": "identity",
+    "purpose": "The step-up approveMembershipProductValidation asks for, in place",
+    "trigger": "onAction",
+    "provenance": "design-note correction, 2 October 2026 (BO-293)"
+   },
+   {
+    "operationId": "verifyMfaChallenge",
+    "contract": "identity",
+    "purpose": "Answers the step-up; its token goes into the approval",
+    "trigger": "onAction",
+    "provenance": "design-note correction, 2 October 2026 (BO-293)"
    }
   ],
   "wireframe": {
@@ -2102,6 +2197,14 @@
    "workshopBoard": "wireframes/WS82 Membership   Annual Pass Management Board 1.dc.html#bo-293"
   },
   "apisNote": "Regenerated 9 September 2026 from Membership___Annual_Pass_Management_Reference.pdf page 17. 0 of 0 labels bound to a contract property; 8 of 112 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "challengeId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",

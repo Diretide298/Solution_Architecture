@@ -25,12 +25,12 @@
 
 | Group | Operation | Method | Path | Part | Wave | Called by |
 |---|---|---|---|---|---|---|
-| inventory | [`bulkUpdateProducts`](#bulkupdateproducts) | POST | `/products/bulk` | setup | 1 | BO-007 |
-| inventory | [`listSerialisedItems`](#listserialiseditems) | GET | `/serialised-items` | core | 1 | BO-114, BO-505, EMP-069, POS-011 |
+| inventory | [`bulkUpdateProducts`](#bulkupdateproducts) | POST | `/products/bulk` | setup | 1 |  |
+| inventory | [`listSerialisedItems`](#listserialiseditems) | GET | `/serialised-items` | core | 1 | BO-114, EMP-069, POS-011 |
 | item | [`createInventoryItem`](#createinventoryitem) | POST | `/inventory-items` | setup | 1 | BO-081, BO-105 |
 | item | [`setInventoryKitDefinition`](#setinventorykitdefinition) | PUT | `/inventory-items/{itemId}/kit-definition` | setup | 1 | BO-081 |
 | item | [`updateInventoryItem`](#updateinventoryitem) | PATCH | `/inventory-items/{itemId}` | setup | 1 | BO-081 |
-| receipt | [`createGoodsReceipt`](#creategoodsreceipt) | POST | `/goods-receipts` | setup | 2 | BO-052, BO-080, EMP-065 |
+| receipt | [`createGoodsReceipt`](#creategoodsreceipt) | POST | `/goods-receipts` | setup | 2 | BO-052, EMP-065 |
 | receipt | [`rejectReceivedGoods`](#rejectreceivedgoods) | POST | `/goods-receipts/{receiptId}/reject` | setup | 2 | BO-052, EMP-065 |
 
 ## Group: inventory
@@ -38,6 +38,8 @@
 ### bulkUpdateProducts
 
 **`POST /products/bulk`**: Change many products at once, with a preview
+
+**Deprecated on 2 October; retired at the next major version** (Chinmay, contract follow-ups: "catalogue.bulkUpdateProducts is added; the inventory one is deprecated"; CHG-FUP-011). A bulk edit of catalogue products is the catalogue's act: new screens bind `catalogue.bulkUpdateCatalogueProducts`. Kept, with its path and id, for clients built at r1; it forwards to the catalogue.
 
 Board 2C. **Retire a season, reprice a category, change a tax class across two hundred SKUs.** One at a time is two hundred edits and a mistake somewhere in the middle.
 **Previewed by default, and the preview counts.** *Reprice all* and *reprice all in this category* differ by a day's margin, and **a bulk action that cannot be seen before it runs is one somebody runs twice.**
@@ -53,7 +55,7 @@ Board 2C. **Retire a season, reprice a category, change a tax class across two h
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `catalogue.price`, `catalogue.product`, `inventory.item` |
 | Writes | `cache:idempotency`, `cache:resolution`, `catalogue.price`, `catalogue.product`, `inventory.item` |
-| Called by | BO-007 |
+| Called by | **no screen**: no screen lists it in its apis, so it is reachable only by API or import until one does (README, Known gaps) |
 
 **Parameters**
 
@@ -106,7 +108,7 @@ Retail Board 4. **A lot number answers which delivery; a serial answers which on
 | Read routing | replica |
 | Reads | `inventory.item`, `inventory.serialised_item`, `inventory.stock_batch` |
 | Writes | - |
-| Called by | BO-114, BO-505, EMP-069, POS-011 |
+| Called by | BO-114, EMP-069, POS-011 |
 
 **Parameters**
 
@@ -302,7 +304,7 @@ Retail Board 4. **A lot number answers which delivery; a serial answers which on
 |---|---|
 | Permission | `PRODUCT_CONFIGURE` |
 | Scope level | venue |
-| Part of slice | setup, makes `inventory.item` non-empty |
+| Part of slice | setup, changes rows of `inventory.item` that another operation creates |
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
@@ -397,7 +399,7 @@ Receipt increments stock and creates the accrual the invoice will later match ag
 | Conflict policy | append |
 | Reads | `cache:idempotency`, `inventory.goods_receipt`, `inventory.goods_receipt_line` |
 | Writes | `cache:idempotency`, `inventory.goods_receipt`, `inventory.goods_receipt_line`, `platform.outbox` |
-| Called by | BO-052, BO-080, EMP-065 |
+| Called by | BO-052, EMP-065 |
 | State model | Purchase order ([states/purchase-order.yaml](../../../states/purchase-order.yaml)): moves `acknowledged` -> `partiallyReceived`, `sent` -> `partiallyReceived`, `partiallyReceived` -> `received`, `acknowledged` -> `received` |
 
 **Parameters**
@@ -475,7 +477,7 @@ Quality failure, damage, wrong item, expiry too near. Reverses the stock increme
 |---|---|
 | Permission | `PROCUREMENT_RECEIVE` |
 | Scope level | venue |
-| Part of slice | setup, makes `inventory.goods_receipt` non-empty |
+| Part of slice | setup, changes rows of `inventory.goods_receipt` that another operation creates |
 | Wave | 2 |
 | Offline | no |
 | Conflict policy | serverWins |

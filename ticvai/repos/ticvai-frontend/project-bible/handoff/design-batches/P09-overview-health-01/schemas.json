@@ -440,7 +440,7 @@
    "localLlm",
    "openaiCompatible"
   ],
-  "description": "`openaiCompatible` (added 29 September, AI design 3.3): a customer endpoint that speaks the OpenAI API, taken with no custom development (AIC-009). Any other protocol needs an adapter.\n"
+  "description": "`openaiCompatible` (added 29 September, AI design 3.3): a customer endpoint that speaks the OpenAI API, taken with no custom development (AIC-009). Any other protocol needs an adapter.\n**Core42 Compass is reached through `openaiCompatible`** (Chinmay, 2 October: the AI residency decision, amending AI-D02; CHG-CSA-002). Compass is the provider of the `uaeOnly` residency class (common `AiResidencyClass`): Small tier Compass GPT-4.1 mini (or Seraj), Strong tier Compass GPT-5, with OpenAI UAE and then the in-cell open-weights model as the fallback chain. OpenAI UAE is `openai` with a UAE `endpoint`; the in-cell model is `localLlm`.\n**A kind is a protocol, not a vendor** (Chinmay, 2 October, contract follow-ups: BYOK accepts any provider; CHG-FUP-008). Any vendor is accepted, named in `AiProvider.vendor`: Mistral, Cohere or any other is reached through `openaiCompatible` where its API speaks it, which the compatibility test confirms before activation (`AiProviderCompatibility`). A new native adapter is a new value here, a breaking change for a client built earlier that goes out with an approval (`docs/active/breaking-changes.yaml`); until then a vendor without either protocol is refused `422 provider-protocol-unsupported`.\n"
  },
  "AiSourceList": {
   "type": "array",
@@ -449,6 +449,61 @@
   "description": "**The sources an answer was grounded in, stored with the answer** (8.3.70). One `jsonb` column on the row that carries it — `ai.message.sources` and `ai.activity.sources` — because the grounding audit reads the list as it was when the answer was given, and a source is never queried on its own.\n",
   "items": {
    "$ref": "#/components/schemas/AiSource"
+  }
+ },
+ "AuditRecord": {
+  "x-ticvai-append-only": "occurredAt",
+  "type": "object",
+  "x-ticvai-persistence": "platform.audit_record",
+  "description": "26 September, pull audit R198. **One row of the platform audit trail, as `listAuditRecords` returns it.** It was a free-form object, so nothing said what an audit row carries. These are the fields the operation already filters on — who, where, on which workstation, what action, on what, and when — and nothing more. Written by the operations that audit themselves; never edited and never deleted.\n",
+  "required": [
+   "id",
+   "action",
+   "occurredAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "principalId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "Who acted."
+   },
+   "orgUnitId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The scope node the action happened in."
+   },
+   "workstationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The workstation it was done from, where there was one."
+   },
+   "action": {
+    "type": "string",
+    "description": "What was done, as the writing operation names it."
+   },
+   "subjectRef": {
+    "type": "string",
+    "nullable": true,
+    "description": "**The thing acted on** — a profile, a shift, an order. The same value the `subjectRef` filter matches.\n"
+   },
+   "occurredAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "When. The list is ordered by this, most recent first."
+   },
+   "platformStaffGrantId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**Set when a TICVAI platform operator acted, naming the grant they acted under** (`identity.openPlatformStaffGrant`; decided 28 September, audit R098). Null for the tenant's own staff. Every platform action in a tenant carries one, so the tenant can see all of them.\n"
+   }
   }
  },
  "Cell": {
@@ -797,97 +852,6 @@
    "clientHosted"
   ]
  },
- "CrossRegionEntitlement": {
-  "x-ticvai-persistence": "platform.cross_region_entitlement",
-  "type": "object",
-  "required": [
-   "rightId",
-   "ticketId",
-   "issuingCellName",
-   "consumingCellName",
-   "validFrom",
-   "validTo",
-   "entriesAllowed",
-   "entriesConsumed",
-   "status"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid",
-    "readOnly": true,
-    "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
-   },
-   "rightId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "ticketId": {
-    "type": "string"
-   },
-   "guestLinkId": {
-    "type": "string",
-    "nullable": true
-   },
-   "issuingCellName": {
-    "type": "string"
-   },
-   "consumingCellName": {
-    "type": "string"
-   },
-   "mediaCodes": {
-    "type": "array",
-    "items": {
-     "type": "string"
-    }
-   },
-   "validFrom": {
-    "type": "string",
-    "format": "date-time"
-   },
-   "validTo": {
-    "type": "string",
-    "format": "date-time"
-   },
-   "admissionRulesId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "venueId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "Null where the right is valid at any venue in the consuming cell."
-   },
-   "entriesAllowed": {
-    "type": "integer",
-    "nullable": true,
-    "description": "Null means unlimited."
-   },
-   "entriesConsumed": {
-    "type": "integer"
-   },
-   "status": {
-    "type": "string",
-    "enum": [
-     "active",
-     "exhausted",
-     "revoked",
-     "expired"
-    ]
-   },
-   "lastConsumedAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "lastReconciledAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   }
-  }
- },
  "EntitlementLimit": {
   "type": "object",
   "required": [
@@ -982,6 +946,12 @@
    "limits"
   ],
   "properties": {
+   "poweredByRemovable": {
+    "type": "boolean",
+    "readOnly": true,
+    "default": false,
+    "description": "**Whether the tenant's licence lets it switch \"Powered by TICVAI\" off** (Chinmay, 2 October, workbook Q160 and the pre-apply round; CHG-CSA-036). False by default; true where TICVAI sold the tenant the add-on keyed `poweredByRemoval` (`addLicenceAddOn`). White label's `setBrandIdentity` refuses `showPoweredBy` false while this is false."
+   },
    "tenantId": {
     "type": "string",
     "format": "uuid"
@@ -1037,35 +1007,6 @@
    "type": "string"
   }
  },
- "Money": {
-  "type": "object",
-  "x-ticvai-persistence-kind": "valueObject",
-  "x-ticvai-persistence-column": "numeric(18,4)",
-  "description": "**On the wire this is three fields; in the database it is one column.**\n24 August. Every column typed `Money` was landing as `jsonb` — 129 of them, including `orders.shift.opening_float`, `inventory.purchase_order.total` and `promotions.voucher.balance`. **`orders.cash_movement.amount` was `numeric(18,4)` because somebody hand-typed that one**, and the inconsistency is what made it visible.\n**A jsonb price cannot be summed in SQL.** Every total, variance and reconciliation moves into application code — and a shift variance computed in .NET against a ledger computed in Postgres is two answers to one question. That is F13 month-end and F98 takings-to-ledger, both walked, both assuming the arithmetic is in the database.\n**`currency` and `scale` are not stored per row.** ADR-0018 makes them region-scoped and not overridable below, so they resolve from the scope walk — storing AED against nine million rows in a UAE region is nine million copies of a fact that cannot differ. A row that needed its own currency would be a row in the wrong region.\n**They stay on the wire** because a client reading a figure should not have to walk a hierarchy to know what it means.\n",
-  "required": [
-   "amount",
-   "currency",
-   "scale"
-  ],
-  "properties": {
-   "amount": {
-    "type": "string",
-    "description": "Decimal string, never a float. Up to 4 decimal places. **Persisted as `numeric(18,4)`** — the string is a transport choice, so a JavaScript client cannot round a fare in transit.\n",
-    "pattern": "^-?\\d+(\\.\\d{1,4})?$"
-   },
-   "currency": {
-    "type": "string",
-    "description": "**Resolved from the region, not stored on the row** (ADR-0018). OMR uses 3 decimal places and AED uses 2 — a venue on a different scale from its region is a ledger that cannot consolidate.\n",
-    "pattern": "^[A-Z]{3}$"
-   },
-   "scale": {
-    "type": "integer",
-    "description": "Resolved from the region alongside `currency`.",
-    "minimum": 0,
-    "maximum": 4
-   }
-  }
- },
  "Page": {
   "type": "object",
   "required": [
@@ -1085,56 +1026,268 @@
    }
   }
  },
- "PropagateRightRequest": {
+ "Permission": {
+  "type": "string",
+  "enum": [
+   "SESSION_FORCE_LOGOUT",
+   "USER_MANAGE",
+   "ROLE_MANAGE",
+   "PERMISSION_GRANT",
+   "PERMISSION_VIEW",
+   "PERMISSION_MANAGE",
+   "PLATFORM_TENANT_VIEW",
+   "PLATFORM_TENANT_MANAGE",
+   "PLATFORM_TENANT_TERMINATE",
+   "PLATFORM_PLAN_MANAGE",
+   "PLATFORM_CELL_VIEW",
+   "PLATFORM_CELL_MANAGE",
+   "PLATFORM_BILLING_VIEW",
+   "PLATFORM_AI_MANAGE",
+   "PLATFORM_BILLING_MANAGE",
+   "PLATFORM_RELEASE_VIEW",
+   "PLATFORM_RELEASE_MANAGE",
+   "PLATFORM_RELEASE_PROMOTE",
+   "PLATFORM_MIGRATION_VIEW",
+   "PLATFORM_MIGRATION_APPLY",
+   "PLATFORM_TENANT_ACCESS",
+   "TENANT_CONFIGURE",
+   "TENANT_VIEW",
+   "TENANT_PUBLISH",
+   "SCOPE_VIEW",
+   "SCOPE_MANAGE",
+   "REGION_CONFIGURE",
+   "WORKSTATION_CONFIGURE",
+   "PRODUCT_VIEW",
+   "PRODUCT_CONFIGURE",
+   "PRODUCT_APPROVE",
+   "PRODUCT_PUBLISH",
+   "PRICE_VIEW",
+   "PRICE_CONFIGURE",
+   "EVENT_CONFIGURE",
+   "PERFORMANCE_CONFIGURE",
+   "CAPACITY_CONFIGURE",
+   "ORDER_VIEW",
+   "ORDER_VIEW_OTHER",
+   "ORDER_CREATE",
+   "ORDER_MODIFY",
+   "ORDER_DISCOUNT",
+   "ORDER_CANCEL",
+   "ORDER_VOID",
+   "ORDER_REFUND",
+   "ORDER_REFUND_APPROVE",
+   "ORDER_REFUND_BULK",
+   "ORDER_EXCHANGE",
+   "ORDER_RESCHEDULE",
+   "ORDER_REPRINT",
+   "PRICE_OVERRIDE",
+   "DISCOUNT_APPLY",
+   "CREDIT_MANAGE",
+   "CREDIT_OVERRIDE",
+   "WALLET_VIEW",
+   "WALLET_OPERATE",
+   "WALLET_CONFIGURE",
+   "PAYMENT_VIEW",
+   "PAYMENT_CONFIGURE",
+   "PAYMENT_PROVIDER_MANAGE",
+   "PAYMENT_DISPUTE",
+   "SHIFT_OPEN",
+   "SHIFT_CLOSE",
+   "SHIFT_SUSPEND",
+   "SHIFT_CLOSE_OTHER",
+   "SHIFT_APPROVE_OPEN",
+   "SHIFT_APPROVE_CLOSE",
+   "SHIFT_REOPEN",
+   "CASH_LIFT",
+   "CASH_ADD",
+   "CASH_NO_SALE",
+   "DEPOSIT_BOX_MODIFY_OWN",
+   "DEPOSIT_BOX_MODIFY_OTHER",
+   "OVERSHORT_ACCEPT",
+   "ACCESS_VALIDATE",
+   "ACCESS_OVERRIDE",
+   "ACCESS_POINT_CONFIGURE",
+   "TURNSTILE_MODE_SET",
+   "TICKET_LOOKUP",
+   "ACCREDITATION_VIEW",
+   "ACCREDITATION_APPLY",
+   "ACCREDITATION_APPROVE",
+   "ACCREDITATION_ISSUE",
+   "ACCREDITATION_MANAGE",
+   "ACCREDITATION_CONFIGURE",
+   "REPORT_VIEW_OWN",
+   "REPORT_VIEW_WORKSTATION",
+   "REPORT_VIEW_VENUE",
+   "REPORT_VIEW_REGION",
+   "REPORT_VIEW_TENANT",
+   "REPORT_EXPORT",
+   "REPORT_EXPORT_PII",
+   "REPORT_MANAGE",
+   "REPORT_SCHEDULE",
+   "LEDGER_VIEW",
+   "LEDGER_POST",
+   "LEDGER_APPROVE",
+   "TAX_CONFIGURE",
+   "ACCOUNT_CONFIGURE",
+   "SETTLEMENT_VIEW",
+   "SETTLEMENT_RECONCILE",
+   "GUEST_VIEW",
+   "GUEST_VIEW_PII",
+   "GUEST_MANAGE",
+   "VENUE_MAP_VIEW",
+   "VENUE_MAP_MANAGE",
+   "VENUE_MAP_PUBLISH",
+   "RESOURCE_VIEW",
+   "RESOURCE_BOOK",
+   "RESOURCE_MANAGE",
+   "RESOURCE_CONFIGURE",
+   "RENTAL_VIEW",
+   "RENTAL_BOOK",
+   "RENTAL_OPERATE",
+   "RENTAL_MANAGE",
+   "RENTAL_CONFIGURE",
+   "RENTAL_PRICE",
+   "RENTAL_APPROVE",
+   "RENTAL_OVERRIDE",
+   "DEVELOPER_VIEW",
+   "DEVELOPER_MANAGE",
+   "DEVELOPER_ADMIN",
+   "LOYALTY_ACCRUE",
+   "LOYALTY_REDEEM",
+   "LOYALTY_ADJUST",
+   "MARKETING_VIEW",
+   "MARKETING_MANAGE",
+   "MARKETING_SEND",
+   "CASE_VIEW",
+   "CASE_MANAGE",
+   "ASSET_LIBRARY_VIEW",
+   "ASSET_LIBRARY_MANAGE",
+   "ASSET_LIBRARY_APPROVE",
+   "ASSET_LIBRARY_SHARE",
+   "QUEUE_VIEW",
+   "QUEUE_MANAGE",
+   "QUEUE_REDEEM",
+   "QUEUE_OVERRIDE",
+   "TRANSPORT_VIEW",
+   "TRANSPORT_MANAGE",
+   "TRANSPORT_PRICE",
+   "ASSET_VIEW",
+   "ASSET_MANAGE",
+   "WORK_ORDER_VIEW",
+   "WORK_ORDER_MANAGE",
+   "WORK_ORDER_VERIFY",
+   "INSPECTION_VIEW",
+   "INSPECTION_SUBMIT",
+   "INSPECTION_MANAGE",
+   "INCIDENT_REPORT",
+   "INCIDENT_VIEW",
+   "INCIDENT_MANAGE",
+   "KIOSK_ATTEND",
+   "DEVICE_VIEW",
+   "DEVICE_CONFIGURE",
+   "DEVICE_MANAGE",
+   "APPROVAL_ACT",
+   "APPROVAL_DELEGATE",
+   "AI_USE",
+   "AI_CONFIGURE",
+   "AI_APPROVE",
+   "AI_AUDIT_VIEW",
+   "RISK_REVIEW",
+   "RISK_INVESTIGATE",
+   "AUDIT_VIEW",
+   "APPROVAL_VIEW",
+   "APPROVAL_REQUEST",
+   "APPROVAL_DECIDE",
+   "APPROVAL_CONFIGURE",
+   "MAINTENANCE_EXECUTE",
+   "MAINTENANCE_APPROVE",
+   "WORKFORCE_VIEW",
+   "WORKFORCE_MANAGE",
+   "ATTENDANCE_RECORD",
+   "ANNOUNCEMENT_PUBLISH",
+   "ANNOUNCEMENT_EMERGENCY",
+   "PARTNER_VIEW",
+   "PARTNER_MANAGE",
+   "PARKING_CONFIGURE",
+   "PAYMENT_VOID",
+   "PROCUREMENT_VIEW",
+   "PROCUREMENT_REQUEST",
+   "PROCUREMENT_MANAGE",
+   "PROCUREMENT_RECEIVE",
+   "CORE_AI_PUBLISH",
+   "TICKETING_AI_PUBLISH",
+   "ACCESS_AI_PUBLISH",
+   "FNB_AI_PUBLISH",
+   "RETAIL_AI_PUBLISH",
+   "INVENTORY_AI_PUBLISH",
+   "SEATING_AI_PUBLISH",
+   "MEMBERSHIP_AI_PUBLISH",
+   "MARKETING_AI_PUBLISH",
+   "RESOURCES_AI_PUBLISH",
+   "QUEUE_AI_PUBLISH",
+   "TRANSPORT_AI_PUBLISH",
+   "GAMES_AI_PUBLISH",
+   "MAINTENANCE_AI_PUBLISH",
+   "ACCREDITATION_AI_PUBLISH",
+   "PARTNER_AI_PUBLISH",
+   "ANALYTICS_AI_PUBLISH",
+   "BIOMETRIC_IMAGE_VIEW",
+   "ACCESS_DIRECTION_SET",
+   "REPORT_GOVERNANCE_MANAGE"
+  ]
+ },
+ "PlatformStaffGrant": {
   "type": "object",
+  "x-ticvai-persistence": "identity.platform_staff_grant",
+  "description": "**One platform operator's time-boxed access into this tenant** (decided 28 September, audit R098). Written by `openPlatformStaffGrant`, read by the tenant through `listPlatformStaffGrants`, and never edited: a grant ends at `expiresAt`, and a new need is a new grant.\n",
   "required": [
-   "rightId",
-   "ticketId",
-   "issuingCellName",
-   "validFrom",
-   "validTo",
-   "admissionRulesId",
-   "entriesAllowed"
+   "id",
+   "operatorPrincipalId",
+   "permissions",
+   "reason",
+   "openedAt",
+   "expiresAt"
   ],
   "properties": {
-   "rightId": {
+   "id": {
     "type": "string",
     "format": "uuid"
    },
-   "ticketId": {
-    "type": "string"
+   "operatorPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "The platform operator, from the Control Plane token. Set by the server."
    },
-   "guestLinkId": {
-    "type": "string"
+   "operatorDisplayName": {
+    "type": "string",
+    "readOnly": true
    },
-   "issuingCellName": {
-    "type": "string"
-   },
-   "mediaCodes": {
+   "permissions": {
     "type": "array",
     "items": {
-     "type": "string"
+     "$ref": "../shared/permissions.yaml#/components/schemas/Permission"
     }
    },
-   "validFrom": {
-    "type": "string",
-    "format": "date-time"
+   "reason": {
+    "type": "string"
    },
-   "validTo": {
+   "ticketRef": {
     "type": "string",
-    "format": "date-time"
-   },
-   "admissionRulesId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "venueId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "entriesAllowed": {
-    "type": "integer",
     "nullable": true
+   },
+   "openedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "The tenant root. **Operations write it at `tenant` scope**; the server sets it."
    }
   }
  },
@@ -1296,99 +1449,6 @@
    "failed",
    "rolledBack"
   ]
- },
- "SsoGroupMapping": {
-  "x-ticvai-persistence": "identity.sso_group_mapping",
-  "type": "object",
-  "required": [
-   "externalGroup",
-   "roleId"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid",
-    "readOnly": true,
-    "description": "**Added 20 August.** The table had no key at all — the response returned the external group, the role and the scope, which is everything a caller needs and not the row own identity.\n**(provider, external_group) is unique and would serve**, but a mapping is edited and revoked by an administrator, and **a row addressed by the values it holds cannot be corrected** — changing the group means deleting a mapping and creating another, which loses who granted it and when.\n"
-   },
-   "externalGroup": {
-    "type": "string"
-   },
-   "roleId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "scopePath": {
-    "type": "string",
-    "description": "Scope the mapped role is granted at."
-   }
-  }
- },
- "SsoProtocol": {
-  "type": "string",
-  "enum": [
-   "oidc",
-   "saml2"
-  ]
- },
- "SsoProviderConfig": {
-  "x-ticvai-persistence": "identity.sso_provider",
-  "type": "object",
-  "required": [
-   "id",
-   "displayName",
-   "protocol",
-   "groupMappings"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "displayName": {
-    "type": "string"
-   },
-   "protocol": {
-    "$ref": "#/components/schemas/SsoProtocol"
-   },
-   "metadataUrl": {
-    "type": "string",
-    "nullable": true
-   },
-   "issuer": {
-    "type": "string",
-    "nullable": true
-   },
-   "clientId": {
-    "type": "string",
-    "nullable": true
-   },
-   "clientSecretRef": {
-    "type": "string",
-    "nullable": true,
-    "description": "Key vault reference. The secret itself is never returned."
-   },
-   "groupMappings": {
-    "type": "array",
-    "minItems": 1,
-    "description": "**A group with no mapping grants nothing.** No default role, ever — otherwise the identity provider becomes a way to mint access nobody configured.\n",
-    "items": {
-     "$ref": "#/components/schemas/SsoGroupMapping"
-    }
-   },
-   "autoProvisionPrincipals": {
-    "type": "boolean",
-    "default": false,
-    "description": "Create a principal on first successful sign-in."
-   },
-   "isEnforced": {
-    "type": "boolean",
-    "default": false
-   },
-   "isActive": {
-    "type": "boolean"
-   }
-  }
  },
  "Subscription": {
   "x-ticvai-persistence": "subscription.contract",
@@ -1635,52 +1695,5 @@
    "transactions",
    "guestProfiles"
   ]
- },
- "WalletAllocation": {
-  "x-ticvai-persistence": "platform.wallet_authorisation",
-  "type": "object",
-  "required": [
-   "guestLinkId",
-   "mode",
-   "availableAmount"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid",
-    "readOnly": true,
-    "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
-   },
-   "guestLinkId": {
-    "type": "string"
-   },
-   "mode": {
-    "type": "string",
-    "enum": [
-     "none",
-     "fixed",
-     "percentageOfBalance"
-    ]
-   },
-   "allocatedAmount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "drawnAmount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "availableAmount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "lastToppedUpAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "allocationCurrency": {
-    "type": "string",
-    "pattern": "^[A-Z]{3}$",
-    "description": "**The allocation is denominated in the home currency.** A ceiling set in AED does not become a different ceiling because the guest walked into a Saudi venue — converting the limit as well as the spend is how a policy silently loosens when a rate moves."
-   }
-  }
  }
 }

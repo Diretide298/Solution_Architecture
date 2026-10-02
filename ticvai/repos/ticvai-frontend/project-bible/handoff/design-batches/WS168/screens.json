@@ -509,6 +509,11 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 18"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-027): A seat status model (status codes, transitions, availability effect) with its read and write; the screen's operations are seat categories.",
+    "source": "screens/P08-venue-back-office.yaml#BO-985"
    }
   ],
   "layout": {
@@ -1249,6 +1254,12 @@
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
        "impliedBy": "createSeatBlock"
+      },
+      {
+       "kind": "dataTable",
+       "label": "List seat blocks",
+       "operation": "listSeatBlocks",
+       "provenance": "contract seating.yaml GET /seat-blocks; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -1279,6 +1290,13 @@
     "purpose": "Raise the repair",
     "trigger": "onAction",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "listSeatBlocks",
+    "contract": "seating",
+    "purpose": "List seat blocks",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {
@@ -1287,6 +1305,7 @@
    "workshopBoard": "wireframes/WS143 Seat Management Venue Mapping Reference v1.0 Board 4.dc.html#bo-990"
   },
   "apisNote": "Regenerated 9 September 2026 from Seat_Management_Venue_Mapping_Reference v1.0.pdf page 20. 0 of 0 labels bound to a contract property; 0 of 8 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {},
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1358,6 +1377,11 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 20"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-027): A read of one seat's event history (locks, holds, sales, releases, scans, blocks) for a performance; listSeats lists seats of a map.",
+    "source": "screens/P08-venue-back-office.yaml#BO-991"
    }
   ],
   "layout": {

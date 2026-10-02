@@ -216,6 +216,12 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 58"
+   },
+   {
+    "operation": "listWaiver",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-005): The template builder declared only listWaiver (the operations command centre read); it needs the waiver template list and the layout write (listWaiverTemplateMaster, setDigitalWaiverForm) (design-notes correction customer-marketing BO-845).",
+    "source": "contracts/satellite/marketing-crm.yaml#setDigitalWaiverForm"
    }
   ],
   "layout": {
@@ -226,9 +232,20 @@
      "components": [
       {
        "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listWaiver",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "label": "Templates",
+       "operation": "listWaiverTemplateMaster",
+       "provenance": "contract marketing-crm.yaml GET /waiver-template-master; wiring fix, 2 October 2026"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "components": [
+      {
+       "kind": "secondaryButton",
+       "label": "Save layout",
+       "operation": "setDigitalWaiverForm",
+       "provenance": "contract marketing-crm.yaml PUT /digital-waiver-form; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -237,17 +254,24 @@
   "states": {
    "loading": "The waiver template list.",
    "error": "Could not load. Names which read failed and leaves the waiver template untouched.",
-   "emptyFirstRun": "No waiver template yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No waiver template yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the waiver template are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
-    "operationId": "listWaiver",
+    "operationId": "listWaiverTemplateMaster",
     "contract": "marketing-crm",
-    "purpose": "Waivers and their state",
+    "purpose": "The waiver templates",
     "trigger": "onLoad",
-    "provenance": "board reading, 19 September 2026"
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-005)"
+   },
+   {
+    "operationId": "setDigitalWaiverForm",
+    "contract": "marketing-crm",
+    "purpose": "Save the waiver's layout",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-005)"
    }
   ],
   "wireframe": {
@@ -256,6 +280,23 @@
    "workshopBoard": "wireframes/WS81 Marketing CRM Configuration Reference v1.0 Board 12.dc.html#bo-845"
   },
   "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 58. 0 of 0 labels bound to a contract property; 0 of 9 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetDigitalWaiverForm",
+    "component": "modal",
+    "trigger": "Save layout",
+    "body": "**Collects what `setDigitalWaiverForm` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save layout",
+     "operation": "setDigitalWaiverForm"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "contract marketing-crm.yaml PUT /digital-waiver-form; wiring fix, 2 October 2026"
+   }
+  ],
+  "entryState": {},
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -327,6 +368,12 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 58"
+   },
+   {
+    "operation": "setDigitalWaiverForm",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-005): setDigitalWaiverForm saves a waiver's layout; assignment is the trigger and eligibility rules (listWaiverTriggerEligibility, as on CMS-047) (design-notes correction customer-marketing BO-846).",
+    "source": "contracts/satellite/marketing-crm.yaml#setDigitalWaiverForm"
    }
   ],
   "layout": {
@@ -342,18 +389,10 @@
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
       },
       {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "setDigitalWaiverForm",
-       "label": "Save digital waiver form",
-       "notes": "The act the screen exists for."
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "setDigitalWaiverForm"
+       "kind": "dataTable",
+       "label": "Assignment rules",
+       "operation": "listWaiverTriggerEligibility",
+       "provenance": "contract marketing-crm.yaml GET /waiver-trigger-eligibility; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -362,7 +401,7 @@
   "states": {
    "loading": "The rules list.",
    "error": "Could not load. Names which read failed and leaves the rules untouched.",
-   "emptyFirstRun": "No rules yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No rules yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the rules are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -375,11 +414,11 @@
     "provenance": "board reading, 19 September 2026"
    },
    {
-    "operationId": "setDigitalWaiverForm",
+    "operationId": "listWaiverTriggerEligibility",
     "contract": "marketing-crm",
-    "purpose": "Build one",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026"
+    "purpose": "The assignment rules",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-005)"
    }
   ],
   "wireframe": {
@@ -388,6 +427,7 @@
    "workshopBoard": "wireframes/WS81 Marketing CRM Configuration Reference v1.0 Board 12.dc.html#bo-846"
   },
   "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 58. 0 of 0 labels bound to a contract property; 0 of 9 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {},
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -459,6 +499,12 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 59"
+   },
+   {
+    "operation": "listWaiverTriggerEligibility",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-005): BO-847 Version, Expiry & Renewal declared listWaiverTriggerEligibility while BO-848 declared listVersioningEffectiveDate; the reads were swapped, and versions belong here (design-notes correction customer-marketing BO-847).",
+    "source": "contracts/satellite/marketing-crm.yaml#listVersioningEffectiveDate"
    }
   ],
   "layout": {
@@ -469,9 +515,9 @@
      "components": [
       {
        "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listWaiverTriggerEligibility",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "label": "Versions",
+       "operation": "listVersioningEffectiveDate",
+       "provenance": "contract marketing-crm.yaml GET /versioning-effective-date; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -480,17 +526,17 @@
   "states": {
    "loading": "The version expiry renewal list.",
    "error": "Could not load. Names which read failed and leaves the version expiry renewal untouched.",
-   "emptyFirstRun": "No version expiry renewal yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No version expiry renewal yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the version expiry renewal are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
-    "operationId": "listWaiverTriggerEligibility",
+    "operationId": "listVersioningEffectiveDate",
     "contract": "marketing-crm",
-    "purpose": "Assignment rules",
+    "purpose": "Version history, effective dates and expiry",
     "trigger": "onLoad",
-    "provenance": "board reading, 19 September 2026"
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-005)"
    }
   ],
   "wireframe": {
@@ -499,6 +545,7 @@
    "workshopBoard": "wireframes/WS81 Marketing CRM Configuration Reference v1.0 Board 12.dc.html#bo-847"
   },
   "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 59. 0 of 0 labels bound to a contract property; 0 of 7 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {},
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -575,6 +622,12 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 59"
+   },
+   {
+    "operation": "listVersioningEffectiveDate",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-005): The version history read was swapped with BO-847; the signing setup needs the signatory configuration (getSignatorySignatureGuardian, setSignatorySignatureGuardian) (design-notes correction customer-marketing BO-848).",
+    "source": "contracts/satellite/marketing-crm.yaml#listVersioningEffectiveDate | contracts/satellite/marketing-crm.yaml#setSignatorySignatureGuardian"
    }
   ],
   "layout": {
@@ -584,10 +637,22 @@
      "name": "contentBody",
      "components": [
       {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listVersioningEffectiveDate",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "kind": "detailPanel",
+       "label": "Signatory rules",
+       "bindsTo": "SignatorySignatureGuardianRuleConfigurationView",
+       "operation": "getSignatorySignatureGuardian",
+       "provenance": "contract marketing-crm.yaml GET /signatory-signature-guardian; wiring fix, 2 October 2026"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "components": [
+      {
+       "kind": "secondaryButton",
+       "label": "Save signing setup",
+       "operation": "setSignatorySignatureGuardian",
+       "provenance": "contract marketing-crm.yaml PUT /signatory-signature-guardian; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -596,17 +661,24 @@
   "states": {
    "loading": "The signature experience list.",
    "error": "Could not load. Names which read failed and leaves the signature experience untouched.",
-   "emptyFirstRun": "No signature experience yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No signature experience yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the signature experience are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
-    "operationId": "listVersioningEffectiveDate",
+    "operationId": "getSignatorySignatureGuardian",
     "contract": "marketing-crm",
-    "purpose": "Version, expiry and renewal",
+    "purpose": "Who must sign a waiver version",
     "trigger": "onLoad",
-    "provenance": "board reading, 19 September 2026"
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-005)"
+   },
+   {
+    "operationId": "setSignatorySignatureGuardian",
+    "contract": "marketing-crm",
+    "purpose": "Set who must sign and how",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-005)"
    }
   ],
   "wireframe": {
@@ -615,6 +687,23 @@
    "workshopBoard": "wireframes/WS81 Marketing CRM Configuration Reference v1.0 Board 12.dc.html#bo-848"
   },
   "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 59. 0 of 0 labels bound to a contract property; 0 of 9 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetSignatorySignatureGuardian",
+    "component": "modal",
+    "trigger": "Save signing setup",
+    "body": "**Collects what `setSignatorySignatureGuardian` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save signing setup",
+     "operation": "setSignatorySignatureGuardian"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "contract marketing-crm.yaml PUT /signatory-signature-guardian; wiring fix, 2 October 2026"
+   }
+  ],
+  "entryState": {},
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -818,6 +907,12 @@
        "derived": true,
        "impliedBy": "listMinorGuardianGroup",
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      },
+      {
+       "kind": "dataTable",
+       "label": "Participants to chase",
+       "operation": "listParticipantWaiverStatus",
+       "provenance": "contract marketing-crm.yaml GET /participant-waiver-statu; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -837,6 +932,13 @@
     "purpose": "Guardian and group signing",
     "trigger": "onLoad",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "listParticipantWaiverStatus",
+    "contract": "marketing-crm",
+    "purpose": "Which participants still have to sign before arrival",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-005)"
    }
   ],
   "wireframe": {
@@ -845,6 +947,7 @@
    "workshopBoard": "wireframes/WS81 Marketing CRM Configuration Reference v1.0 Board 12.dc.html#bo-850"
   },
   "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 59. 0 of 0 labels bound to a contract property; 0 of 9 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {},
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1054,6 +1157,12 @@
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
        "impliedBy": "setWaiverVerificationValidation"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Signed waivers",
+       "operation": "listComplianceEvidenceWaiver",
+       "provenance": "contract marketing-crm.yaml GET /compliance-evidence-waiver; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -1080,6 +1189,13 @@
     "purpose": "Whether this guest may enter",
     "trigger": "onAction",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "listComplianceEvidenceWaiver",
+    "contract": "marketing-crm",
+    "purpose": "Signed waiver evidence",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-005)"
    }
   ],
   "wireframe": {

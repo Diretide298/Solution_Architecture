@@ -416,7 +416,7 @@
     "type": "integer",
     "minimum": 0,
     "nullable": true,
-    "description": "Hours a gate may validate offline"
+    "description": "**Hours a reader may validate offline; past it, readers refuse offline taps** (decided 2 October 2026, Chinmay, critical set 1, BO-471: \"Yes: the venue sets a maximum offline duration; readers then refuse offline taps\"; DEC-426; CHG-CSP-035). Counted from the reader's last successful sync. Past the limit an access gate, a handheld and a games reader refuse every tap they would have validated from their local package (`ValidationResult.denyCause` `offlineLimitExceeded`) until they reconnect; `afterThresholdBehavior` decides only what the operator is shown and whether a supervisor may admit by hand (`supervisorMode`), and none of its values lets a reader keep validating unattended. The limit travels in the offline package (ADR-0068), so a reader that has lost the platform still knows it. Null sets no limit beyond the package's own expiry."
    },
    "offlineChecks": {
     "type": "array",
@@ -1314,7 +1314,9 @@
    },
    "refreshIntervalSeconds": {
     "type": "integer",
-    "description": "QR rotation interval, e.g. 15, 30, 45, 60 or custom"
+    "default": 30,
+    "minimum": 5,
+    "description": "**QR rotation interval: 30 seconds by default; the screen offers 15, 30, 45 and 60 and a custom value no shorter than 5 seconds** (decided 2 October 2026, Chinmay, batch 1, GST-055: \"30 seconds\", and covered-by-earlier set, BO-165; DEC-136, DEC-233; CHG-CSP-024; DI-1083, DI-632, DI-630). The venue's setting; the guest app's countdown (GST-055) shows the same value. The 6 to 12 seconds the client mentioned for beacon-activated codes is reachable as a custom value."
    }
   },
   "required": [
@@ -1367,7 +1369,9 @@
    },
    "refreshIntervalSeconds": {
     "type": "integer",
-    "description": "QR rotation interval, e.g. 15, 30, 45, 60 or custom"
+    "default": 30,
+    "minimum": 5,
+    "description": "**QR rotation interval: 30 seconds by default; the screen offers 15, 30, 45 and 60 and a custom value no shorter than 5 seconds** (decided 2 October 2026, Chinmay, batch 1, GST-055: \"30 seconds\", and covered-by-earlier set, BO-165; DEC-136, DEC-233; CHG-CSP-024; DI-1083, DI-632, DI-630). The venue's setting; the guest app's countdown (GST-055) shows the same value. The 6 to 12 seconds the client mentioned for beacon-activated codes is reachable as a custom value."
    }
   },
   "required": [
@@ -1521,82 +1525,6 @@
    "maxOfflineDurationHours",
    "afterThresholdBehavior"
   ]
- },
- "OfflinePolicy": {
-  "type": "object",
-  "x-ticvai-persistence": "platform.offline_policy",
-  "description": "Board 5 of the client's POS set. **ADR-0013 makes the POS local-first and nothing configured the policy** — one of only two things in 36 board screens the package genuinely could not do.\nCF-115 reframed offline into three data classes: catalogue and policy always local, contended inventory leased, transactional facts journalled. **This is where a venue says how far that goes for them.**\n**One per scope node, keyed on `scopePath`** (pull audit R162). `id` is server-owned and absent where `getOfflinePolicy` returns the defaults for a node with nothing saved.\n**The `minimum` and `maximum` on each field are proposed, client to correct (decided 28 September, audit R129).** A value outside them is refused `400`, `errors[]` naming the field.\n",
-  "required": [
-   "scopePath"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid",
-    "readOnly": true
-   },
-   "scopePath": {
-    "type": "string",
-    "pattern": "^[a-z0-9_]+(\\.[a-z0-9_]+)*$",
-    "description": "**The node this policy is for, and the key `setOfflinePolicy` upserts on.** The body names its target here, because the path does not.\n"
-   },
-   "maxOfflineHours": {
-    "type": "integer",
-    "default": 24,
-    "minimum": 1,
-    "maximum": 72,
-    "description": "**After which the workstation refuses to sell rather than keep journalling.** A till three days offline holding 900 unsynced sales is a reconciliation nobody can do and a fraud nobody can detect. Bounds 1 to 72 hours: proposed, client to correct (audit R129).\n"
-   },
-   "allowedOffline": {
-    "type": "array",
-    "description": "**What may happen with no network**, by data class. Selling from a cached catalogue is safe; issuing a refund is not, because the original sale cannot be verified.\n",
-    "items": {
-     "type": "string",
-     "enum": [
-      "sale",
-      "refund",
-      "exchange",
-      "entitlementIssue",
-      "entitlementValidate",
-      "loyaltyAccrual",
-      "loyaltyRedemption",
-      "walletSpend",
-      "priceOverride",
-      "discount",
-      "voidLine",
-      "noSale"
-     ]
-    }
-   },
-   "offlineValueCeiling": {
-    "allOf": [
-     {
-      "$ref": "../shared/common.yaml#/components/schemas/Money"
-     }
-    ],
-    "description": "Above zero, and in the currency of the venue the policy resolves to; a ceiling in another currency is refused `400` (decided 28 September, audit R129).\n"
-   },
-   "offlineTransactionCeiling": {
-    "type": "integer",
-    "nullable": true,
-    "minimum": 1,
-    "maximum": 5000,
-    "description": "**A ceiling on count as well as value.** Nine hundred small sales and one large one are different risks, and a value ceiling alone catches only the second. Bounds 1 to 5,000: proposed, client to correct (audit R129).\n"
-   },
-   "onCeilingBreach": {
-    "type": "string",
-    "enum": [
-     "warn",
-     "blockNewSales",
-     "blockAll"
-    ],
-    "default": "blockNewSales"
-   },
-   "requiresManagerToExtend": {
-    "type": "boolean",
-    "default": true
-   }
-  }
  },
  "Page": {
   "type": "object",

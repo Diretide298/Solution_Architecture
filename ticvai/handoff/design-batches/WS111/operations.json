@@ -56,6 +56,30 @@
   "requestBody": "AccreditationCredential",
   "responds": "AccreditationCredential"
  },
+ "listAccreditationAudit": {
+  "method": "GET",
+  "path": "/accreditation-audit",
+  "contract": "accreditation",
+  "summary": "The immutable record of who granted what to whom",
+  "permission": "ACCREDITATION_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "holderId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AccreditationAuditRecord"
+ },
  "listAccreditationCredentials": {
   "method": "GET",
   "path": "/accreditation-credentials",
@@ -79,6 +103,40 @@
   ],
   "requestBody": null,
   "responds": "AccreditationCredential"
+ },
+ "listAccreditationHolders": {
+  "method": "GET",
+  "path": "/accreditation-holders",
+  "contract": "accreditation",
+  "summary": "Everybody accredited, and what state they are in",
+  "permission": "ACCREDITATION_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "programmeId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "organisationId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "expiringWithinDays",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AccreditationHolder"
  },
  "listBadgePrintJobs": {
   "method": "GET",
@@ -106,76 +164,16 @@
   "requestBody": null,
   "responds": "BadgeTemplate"
  },
- "listCredential": {
-  "method": "GET",
-  "path": "/credential",
-  "contract": "access",
-  "summary": "Credential Operations Command Center",
-  "permission": "SCOPE_VIEW",
-  "offlineCapable": false,
+ "replaceAccreditationCredential": {
+  "method": "POST",
+  "path": "/accreditation-credentials/{credentialId}/replace",
+  "contract": "accreditation",
+  "summary": "Reissue after loss, damage or a name change",
+  "permission": "ACCREDITATION_ISSUE",
+  "offlineCapable": null,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
-   {
-    "name": "brand",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "venue",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "date",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "media",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "status",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "channel",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "customer",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "event",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "product",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "provider",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "exception",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
    {
     "name": null,
     "in": null,
@@ -183,51 +181,7 @@
    }
   ],
   "requestBody": null,
-  "responds": "Page"
- },
- "listCredentialGenerationIssuance": {
-  "method": "GET",
-  "path": "/credential-generation-issuance",
-  "contract": "access",
-  "summary": "Credential Generation & Issuance Monitor",
-  "permission": "SCOPE_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "status",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "trigger",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "event",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "venue",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
+  "responds": "AccreditationCredential"
  },
  "setBadgeTemplate": {
   "method": "PUT",

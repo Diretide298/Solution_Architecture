@@ -61,6 +61,70 @@ convincingly. It is never a caption.
   and its error; and, element by element, what is shown and in what format, what each action
   produces and where the user goes next. Draw exactly that.
 
+## The processes these screens belong to
+
+Written by the owner of each process (`handoff/design-notes/`). Read before any screen: it says how the process runs end to end and which words the screens must use.
+
+### Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue)
+
+Venue operations is everything that happens after a sale and inside the gates. A guest's ticket is one virtual ticket with interchangeable media (QR, dynamic QR, RFID wristband, NFC, Face Pass or Face Tag); at an access point a scanner (P07, or the scan function inside the Staff App P06) validates the media against the admission profile and the guest admission policy, offline if it must, and every deny carries a reason and a next action. The back office (Venue Management P08) configures that estate: the venue topology (venue, park, zone, attraction, access point, gate and lane, device placement), admission profiles and rules (entry, exit, re-entry, anti-passback, validity, crossover, companions), credential security (dynamic QR, device binding, beacons), biometrics, gate modes, and the live operations, fraud and monitoring views. Accreditation (P08 setup and review, P11 web portal for applicants, web first) takes an applicant from a configurable form through document checks, OCR, duplicate blocking and multi-level approval to a credential with zone rights. Resources and capacity manage bookable resources (rooms, vehicles, equipment, cabanas, instructors) that are booked as a consequence of selling a product, never sold directly. Workforce covers shift templates, rosters, attendance, swaps and breaks, mirrored on the Staff App. Maintenance and safety cover the asset register, preventive calendars, work orders with scored priority, inspections and incidents, with technicians working from the Staff App. Games and rides configure readers, credit types and consumption priority, play entitlements, game pricing, retry pricing, redemption and the card lifecycle. The virtual queue (Q1) gives a guest a live wait time and a return window for a ride; it is not the on-sale waiting room (Q2). Every calendar has day, week and month views. Configuration resolves tenant, region, venue (outlet only for F&B and retail), and a user's permissions, never the device, decide what they may do. The guest apps (P01, P02) show the guest's side of this: My Tickets, the scan code, Face Pass, wait times, the virtual queue, map booking of cabanas and the visit planner.
+*(source: F06 step 1 / F112 step 1 / F111 step 1 / ADR-0002 / ADR-0012 / ADR-0018 / ADR-0041 / ADR-0066 / ADR-0067 / ADR-0068 / DI-652 / DI-627 / DI-640 / DI-654 / DI-666 / DI-482 / DI-483 / DI-907 / DI-919 / DI-923 / DI-865 / DI-678 / TRACKER Actions row 160 / MoM 2026-09-02 AccessControl / MoM 2026-09-07 …)*
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Ticket | The one virtual record a guest owns (ticket number, product, validity, entries). Its number never changes, whatever media carries it or whoever it is transferred or resold to. | Pass (unless the product is a pass), Booking, Order line | DI-652 / DI-620 / contracts/spine/access.yaml#/components/schemas/TicketStatus |
+| Media | What the ticket is presented by at a gate (QR code, dynamic QR, wristband/RFID card, NFC, Face Pass, Face Tag). One ticket can carry several media as fallbacks; a media code can also cover several tickets scanned as one group. Show one … | Credential (for guest media; keep Credential for accreditation badges and staff), Ticket code | DI-180 / DI-608 / DI-652 |
+| Access point | A place where a scan is judged, with a fixed direction (entry, exit, re-entry, crossover). Hierarchy shown to users is Venue > Park > Zone > Attraction > Access point > Gate/lane > Device. | Scanner (that is the device), Door | screens/P08-venue-back-office.yaml#BO-144 / … |
+| Admission profile | The named set of rules an access point enforces (opening window, entries, exit scan, re-entry, validity, crossover). Products point at a profile; tiers such as Bronze/Silver/Gold are profiles with gate allow and deny lists. | Admission rules (as a screen title), Access rule set | DI-185 / contracts/spine/access.yaml#/components/schemas/AdmissionRules |
+| Admitted / Denied / Overridden | The three scan outcomes. A denial is always shown with its reason in plain words and a next action; an override is a supervisor admitting despite a denial, and is always attributed and reasoned. | Valid/Invalid, Success/Fail, Error | contracts/spine/access.yaml#/components/schemas/ScanOutcome / … |
+| Used | A ticket entry is used the moment a scan succeeds, whether or not the guest physically passed. Mistakes are resolved from the scan history, not by un-scanning. | Redeemed (for admission), Checked in (that is group check-in, a different step) | DI-627 / TRACKER Actions row 221 / TRACKER Actions row 189 |
+| Gate mode | What a lane is doing now, set live by the podium or supervisor - Normal, Free flow (counts, does not validate), Drop arm (everybody through, evacuation), Closed (nobody through), Podium (staff validating by eye), Maintenance. Direction is … | Turnstile mode (as a label for direction), Open/Locked | contracts/spine/access.yaml#/components/schemas/AccessPointOperatingMode / R221 |
+| Offline package | What a scanner holds to validate with no network - entitlements, blacklist, admission profiles and the active guest admission policy version - with its age always visible. | Cache, Local DB | F06 step 3 / ADR-0068 |
+| Sync and reconciliation | Sending the offline scan journal to the server, and the duty manager's review of scans the server rejected after the device had already admitted the guest. | Upload, Retry | F06 step 6 / DI-065 |
+| Face Pass / Face Tag | Face Pass is the long-lived face credential for members and season-pass holders (renewable); Face Tag is short-lived, for one day or event. Retention is set per tier by the venue. | Face ID, Biometric login | DI-640 / ADR-0063 |
+| Accreditation / Credential (accreditation) | Accreditation is the application and approval of a person (media, contractor, corporate, staff of a partner) for an event or season; the credential is what is issued after approval (photo badge, QR or RFID) with zone access rights. | Registration (for the whole process), Ticket | DI-654 / DI-662 |
+| Resource | A bookable thing or person a product needs (room, vehicle, cabana, equipment set, instructor). Guests buy products; resources are assigned to the booking, pre-assigned or dynamically. | Asset (that is maintenance), Inventory (that is stock) | DI-475 / DI-482 / TRACKER Actions row 160 |
+| Asset | A physical item maintained by the venue (ride, turnstile, printer, pump) with a register record, documents, warranty and maintenance history. | Resource, Device (unless it is an IT device in the device register) | DI-910 / ADR-0067 |
+| Work order | A unit of maintenance work, lifecycle Created > Assigned > In progress > Review > Closed, with a resolution timer. | Ticket (reserved for guest tickets), Job card | DI-231 |
+| Game / attraction (games module) | In the games and rides module an attraction is an individual game or ride (roller coaster, racing game, bumper cars), not a venue. | Venue, Park | DI-863 |
+| Virtual queue / Return window | A guest's place in a ride's queue held without standing in line, with a return window (for example 4:50 to 5:00 PM) that recalculates live. Distinct from the walk-in line and the VIP/express lane, and from the on-sale waiting room. | Waiting room, Fast pass (that is the express product), Booking | DI-675 / DI-678 / DI-679 / ADR-0066 |
+| Wait time source | Where a ride's wait time comes from - Sensor, Throughput, Manual, or Unavailable - always shown beside the number. | Live (when the source is manual) | contracts/satellite/queue.yaml#/components/schemas/WaitTimeSource / DI-315 |
+
+### Ticketing & Guest Commerce, as the venue and TICVAI configure and run it
+
+WHAT THE PROCESS IS. Everything a guest can buy is set up, priced, promoted and serviced here, on Venue Management (P08, the venue's own back office, served inside the venue's cell) and on the TICVAI Console (P09, TICVAI's control plane, outside every cell). End to end: (1) CATALOGUE. A product has one of twelve kinds (admission, timedAdmission, datedAdmission, openDated, seated, membership, bundle, fnb, retail, rental, addOn, giftCard). Its ticket types (adult, child, senior, resident...) are not typed one by one: they are generated from the product's attributes (components) and each value combination becomes a sellable ticket type with no extra setup (DI-164). What a ticket grants (validity, entries, re-entry, days of week, blackout dates, expiry anchor, fast track, transfer) lives on a reusable entitlement template, not on the product. Who may take part (age, height, supervision, certification) is the eligibility rule; what the guest must answer is the data mask and the consent questions; how the guest sees it is guestListing (bookable, infoOnly, hidden), display tags (at most six), media and the booking flow. Group, family and corporate products and every after-sales policy (reschedule, exchange, refund, cancellation, upgrade, transfer) are configured inside the one product configuration, never on separate screens (DI-465, DI-466). (2) LIFECYCLE AND PUBLICATION. A product moves draft, inReview, approved, live, withdrawn, archived. Approval and publication are two acts with two permissions (PRODUCT_APPROVE, PRODUCT_PUBLISH, R091); every product is authorised before it sells online or on site (DI-438). Approved is still not on a till: a till sells only what is in the signed catalogue release it pulled (publishBundle, ADR-0013), so a saved price is a back-office fact until the venue publishes to tills. Changing something that has sold is preceded by an impact check (assessProductChange: orders affected, entitlements issued, future performances, open carts); restoring a version creates a new version, and sold tickets keep the price and terms they were sold under (restoreProductVersion, DI-938, TRACKER Actions row 145). (3) PRICE. Prices live in price lists: per venue, per channel set, with validity dates and a priority, copied for the next season with an uplift (copyPriceList) and repriced in bulk only after a dry run (bulkChangePrices). Currency and decimal scale are never chosen on a form: they resolve from the venue's region (ADR-0008, ADR-0018; AED 2 places, OMR and BHD 3). When several rules apply, the configured hierarchy decides; there is no "lowest price wins" default (DI-595). Tax on the pre-discount price and three-decimal rounding are regional settings (DI-598). Dynamic rules always show their minimum and maximum price guardrails beside the trigger (getDynamicPriceRule). (4) PROMOTE AND BUNDLE. A promotion is a rule (automatic, or gated by a code) created in draft, made live only by Publish, which first analyses stacking; a …
+*(source: DI-164; DI-171; DI-438; DI-465; DI-466; DI-595; DI-598; DI-387; DI-039; DI-044; DI-474; DI-671; DI-987; DI-019; DI-080; ADR-0008; ADR-0013; ADR-0018; ADR-0019; ADR-0030; R091; R098; R101; R222; REV3-21; contracts/spine/catalogue.yaml#transitionProductLifecycle …)*
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Product | Anything sellable, of one of the twelve kinds. The record that carries names, channels, listing, media and policies. | Item (except on F&B and retail screens), SKU (for tickets), Offering | contracts/spine/catalogue.yaml#/components/schemas/ProductKind |
+| Ticket type | One sellable variant of an admission or event product (Adult, Child, Resident Adult), generated from the product's attributes. For retail and F&B the same record is labelled Variant. | Variant (on ticket screens), Sub-product, Rate (that is a price), Axis value | contracts/spine/catalogue.yaml#updateProductVariant / DI-164 / DI-437 |
+| Attribute | A dimension that generates ticket types (Guest category, Residency, Tier, Length). Each has values; adding a value adds ticket types. | Axis, Component (the client's word; use it only in help text), Option | contracts/spine/catalogue.yaml#setProductAttributes / DI-164 / DI-450 |
+| Entitlement | What a ticket lets the holder do (validity, entries, re-entry, days, blackout dates, expiry, fast track, transfer), defined once on an entitlement template and shared by several products. | Access rights, Ticket rules, Validity profile | contracts/spine/catalogue.yaml#createEntitlementTemplate / DI-171 / DI-451 |
+| Eligibility rule | Who may take part in or buy a product (age, height, supervision, waiver, certification). Distinct from a promotion's eligibility, which decides who gets a discount. | Restriction, Access rule (that is access control) | contracts/spine/catalogue.yaml#setProductEligibilityRule / DI-463 |
+| Price list | A set of prices for one venue and a set of channels, valid between two dates, with a priority. Several coexist (B2C, B2B, season). | Price book, Rate card, Tariff | contracts/spine/catalogue.yaml#createPriceList / DI-140 / DI-163 |
+| Price category | A standard rate type (Adult, Child, Member) reused across lists so venues do not invent "Adult Standard" and "Normal Adult". | Price band (that is a seat-category band), Fare type (transport) | contracts/spine/catalogue.yaml#setPriceCategoryRateType / … |
+| Price band | A priced band on a seat category (code, label, colour, amount, channel, from-date). | Price category, Zone price | contracts/satellite/seating.yaml#/components/schemas/SeatPriceBand |
+| Promotion | A rule that changes a price automatically or when a code is entered; draft until published; declares how it stacks. | Offer (except in guest copy), Deal, Discount rule | contracts/satellite/promotions.yaml#createPromotion / DI-173 / DI-174 |
+| Coupon code | A code issued from a coupon campaign that applies a promotion-style discount; one shared code or many single-use codes. | Voucher, Promo voucher | contracts/satellite/promotions.yaml#createCouponCampaign / DI-173 |
+| Voucher | A code that carries money (face value, balance), sold or issued; a liability until redeemed or expired. | Coupon, Credit note | contracts/satellite/promotions.yaml#listVoucherBatches / … |
+| Bundle | A product sold as one line whose price differs from the sum of its components, with a mandatory revenue allocation. "Package" is acceptable in guest copy. | Combo (that is an F&B meal deal), Catalogue bundle | contracts/satellite/promotions.yaml#createBundle / DI-220 / ADR-0019 |
+| Catalogue release | The signed snapshot of a venue's catalogue, prices, promotions and sale boards that tills, kiosks and devices pull. Its action label is "Publish to tills". | Bundle, Catalogue bundle, Sync, Deploy | contracts/spine/catalogue.yaml#publishBundle / … |
+| Approve / Publish / Save | Save keeps a draft; Approve records that it is authorised (PRODUCT_APPROVE); Publish makes it live for guests and channels (PRODUCT_PUBLISH). Three different buttons, never merged. | Submit, Go live, Activate (except CatalogueConfigStatus active), Deploy | R091 / contracts/spine/catalogue.yaml#transitionProductLifecycle / DI-438 |
+| Product states | Draft, In review, Approved, Live, Withdrawn, Archived (ProductLifecycleState), always as coloured badges with these exact labels. | Published (for a product), Pending, Inactive (for a product) | contracts/spine/catalogue.yaml#/components/schemas/ProductLifecycleState |
+| Channel | Where something is sold. Labels: pos Point of sale; kiosk Kiosk; web and guestWeb Website; mobile and guestApp App; b2b B2B partners; partner Partner; ota Travel agents (OTA); callCentre Call centre; api API; backOffice Back office. | Touchpoint, Outlet (an outlet is a business inside a venue), raw enum values | contracts/spine/catalogue.yaml#/components/schemas/Channel / … |
+| Refund | Money returned after settlement, wholly or for some lines, under the venue's refund policy. | Return (that is retail goods), Reversal, Void | contracts/spine/orders.yaml#createRefund / DI-252 |
+| Void | Cancelling a whole order before settlement, within the same shift, with a reason from the void list. After settlement it is a refund. | Cancel order, Delete | contracts/spine/orders.yaml#voidOrder / R222 |
+| Exchange / Reschedule | Exchange swaps lines for other products or dates and settles only the difference; Reschedule is the same product moved to another date or time. | Rebook, Date change (acceptable only in guest copy), Refund and resell | contracts/spine/orders.yaml#exchangeOrderLines / … |
+| Hold / Capture / Release | A deposit or stored-value amount is held, then partly or fully captured, and the rest released. A held deposit is not a payment. | Charge, Pre-auth (in staff copy), Block funds | contracts/spine/orders.yaml#authoriseStoredValue / … |
+| Wallet (TICVAI wallet) | The guest's stored-value balance on TICVAI, spent by hold and capture. Distinct from the tender "Apple Pay / Google Pay", which the contract also calls wallet. | Digital wallet (for stored value), E-wallet, Credit (without a type) | contracts/spine/orders.yaml#/components/schemas/TenderKind / R080 |
+| Credit lot | One amount of wallet credit of one credit type (cash, bonus, gift) with its own expiry; lots are spent nearest expiry first and the guest sees the breakdown but cannot choose. | Bucket, Batch, Top-up | TRACKER Actions row 171 / contracts/satellite/wallet.yaml#expireCreditLots |
+| Venue map / Seat map | A venue map is the wayfinding map of a park or a floor (points, paths, bookable places); a seat map is the seating layout of an auditorium or stand. Never just "map" where both could be meant. | Layout (alone), Floor plan (unless it is a floor map), Map (alone) | contracts/satellite/venue-map.yaml#createVenueMap / … |
+| Point / Bookable place | A point is a place on a venue map (toilet, ride, restaurant, exit). A bookable place is a cabana, lounger, table or pitch placed on the map and sold through its price band. | Pin, POI, Marker, Resource (in staff copy) | contracts/satellite/venue-map.yaml#setVenuePoint / … |
+| Station / Route / Timetable / Departure / Fare table / Pass … | A route is an ordered list of stations with offsets; a timetable generates departures up to its release horizon; a fare table prices a route per passenger type; a pass type is a multi-trip or unlimited pass sold as a product. | Stop (except in the stop list), Line (except lineCode), Schedule, Trip (except a guest's journey) | contracts/satellite/transport.yaml / REV3-21 |
+| Applies from | The effective date of a change. Every dated change shows it, and sold items keep their old terms. | Effective date (in labels), Start date (for a change) | contracts/satellite/seating.yaml#updateSeatCategory / TRACKER Actions row 194 |
+
+
 ## The screens
 
 Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs count fields; requirements are matrix rows; meeting inputs are the ones naming the screen (the module and platform ones are below); white label says whether the tenant's brand reaches it (guest) or it sets the brand (configures).
@@ -71,7 +135,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-485` | Self-Service Kiosk Profile & Channel Configuration | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-486` | Customer Card / Wallet Identification | B–D | 0 | 4 | 6 | 2 | 1 | 6 | — | notStarted (—) |
 | `BO-487` | Customer Wallet & Balance Summary | B–D | 0 | 6 | 6 | 16 | 1 | 6 | — | notStarted (—) |
-| `BO-488` | Self-Service Wallet Top-Up | B–D | 0 | 0 | 6 | 6 | 1 | 6 | — | notStarted (—) |
+| `BO-488` | Self-Service Wallet Top-Up | B–D | 0 | 15 | 6 | 33 | 1 | 6 | — | notStarted (—) |
 | `BO-489` | Bonus, Free Game & Benefit View | B–D | 3 | 22 | 6 | 0 | 1 | 6 | — | notStarted (—) |
 | `BO-490` | Game & Ride Eligibility / “What Can I Play?” | B–D | 2 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
 | `BO-491` | Redemption Balance & Prize Discovery | B–D | 2 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
@@ -97,12 +161,23 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Games & Rides · wave 3 · needs the `games` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `PRODUCT_VIEW` (1 read); in the flows as venue manager |
+| Who uses it | venue; in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | commandCentre (compact density): the pack gives this screen a metric directory (§KPI Cards) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/games-rides/self-service-experience-command-center-bo-484` |
+
+**Known gaps.** Removed 2 October 2026 (CHG-WIR-001): getGameEligibility answers what one card can play; the overview needs the kiosk devices and session counts, which have no read yet (contract gap CHG-WIR-004) … Contract gap recorded 2 October 2026 (CHG-WIR-004): No read of game kiosks and their session counts.
+
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** The landing of the self-service board: every guest-facing game-wallet kiosk and balance station, whether it is online, how much it is used, and how many sessions fail. Administrators open the kiosk profile, journey design and customer-flow previews from here. The pack is firm that this board is an experience layer and never re-creates wallet, price or entitlement rules. The one thing to get right: device health and usage tiles first, then a device list, with "Preview customer flow" one click away.
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- Five of the pack's eight KPI tiles drawn (CHG-SBO-005)
+- Board 10's customer screens have no guest-app counterpart (CHG-SBO-020)
+
+**Fixed on main** (the package already carries these; draw what it says): getGameEligibility is the bound read (CHG-WIR-001).
 
 #### Inputs: what the user enters or picks
 
@@ -113,12 +188,9 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Search self-service experience | search field | — | — | — | — | — | — |
 | Filter by | multi select | — | — | — | — | The pack filters this screen by client, venue, zone, device type, status — which are present is a decision the pack already made. | — |
 
-**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
 
-| Filter | Drawn as | Default | Allowed values, rules | Source |
-|---|---|---|---|---|
-| Card | picker: choose a card | — | — | `getGameEligibility` ?cardId |
-| Subject | picker: choose a subject | — | — | `getGameEligibility` ?subjectId |
+- **Filters**: Zone, Device type (Self-service kiosk, Balance station, Operator kiosk), Status. Venue from the top bar; the pack's Client filter belongs to the platform console. *(source: screens/P08-venue-back-office.yaml#BO-485)*
 
 #### Outputs: what the screen shows and produces
 
@@ -134,7 +206,18 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 **Balance Checks** (metric tile)
 
-**Data it reads**: `getGameEligibility` (onLoad, Self-service overview)
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **KPI tiles**: All eight of the pack's - Total self-service devices, Online, Offline, Customer sessions today, Balance checks, Top-ups (count and AED), Wallets viewed, Failed sessions. *(source: screens/P08-venue-back-office.yaml#BO-484 / screens/P08-venue-back-office.yaml#BO-485)*
+- **Channel overview**: Columns Device, Type, Zone, Sessions today, Last activity, Status. Offline devices first. *(source: screens/P08-venue-back-office.yaml#BO-485)*
+- **Board tiles**: Kiosk profile (BO-485), Identification (BO-486), Balance summary (BO-487), Top-up (BO-488), Benefits (BO-489), What can I play (BO-490), Prize discovery (BO-491), History (BO-492), Theme and journey (BO-493). *(source: screens/P08-venue-back-office.yaml#BO-484)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Configure experience**: Opens BO-493 for the selected kiosk or group. *(source: screens/P08-venue-back-office.yaml#BO-485)*
+- **View device**: Opens the device in the device register (status, firmware, heartbeat). *(source: ADR-0067)*
+- **Preview customer flow**: Opens a kiosk-sized preview walking the configured steps with a test card. *(source: screens/P08-venue-back-office.yaml#BO-485)*
+- **View sessions**: Greyed until session records exist (VO-R13). *(source: DI-653)*
 
 **Where the user goes next**
 
@@ -155,16 +238,58 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | Loading (`?state=loading`) | The self-service experience list; the counts above it resolve separately. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the self-service experience untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No self-service experience yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, first run (`?state=emptyFirstRun`) | No self-service experience yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the self-service experience are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Not shown: nothing on this screen needs a permission of its own; the app's sign-in decides access. |
 | Offline (`?state=offline`) | online only |
+
+#### Edge cases to draw
+
+- **Kiosk online but its last session failed repeatedly**: Failed sessions tile links to the device; row shows "5 failed sessions in the last hour" in amber. *(source: screens/P08-venue-back-office.yaml#BO-485)*
+
+#### Consistency with other screens
+
+- Match `BO-036`: Kiosks are devices in the one device register (ADR-0067); status matches the device registry.
+- Match `KSK-001`: The general guest kiosk (P05) is a separate journey for tickets, food and shop; if one physical kiosk runs both, its home menu must offer the game wallet as one entry.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+kpis:
+  devices: 14
+  online: 13
+  offline: 1
+  sessions: 2693
+  balanceChecks: 1890
+  topUps: 412, AED 41,850
+  walletsViewed: 2210
+  failed: 23
+devices:
+- device: KSK-01
+  type: Self-service kiosk
+  zone: Main Park
+  sessions: 842
+  lastActivity: '10:42'
+  status: Online
+- device: BAL-05
+  type: Balance station
+  zone: Summit Peaks Arcade
+  sessions: 1240
+  lastActivity: '10:42'
+  status: Online
+- device: KSK-08
+  type: Self-service kiosk
+  zone: Family Zone
+  sessions: 611
+  lastActivity: 09:58
+  status: Offline
+```
 
 #### Permissions
 
-- `getGameEligibility` → `PRODUCT_VIEW` (read) · staff, guest
-
-**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Not shown: nothing on this screen needs a permission of its own; the app's sign-in decides access.
 
 #### Requirements it meets
 
@@ -206,8 +331,9 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every state opens from `#BO-484?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-100`, `BO-485`, `BO-486`, `BO-487`, `BO-488`, `BO-489`, `BO-490`, `BO-491`, `BO-492`, `BO-493`.
-- [ ] Every gated control is gated: `PRODUCT_VIEW`.
+- [ ] Sign-in is asked only where the spec asks for it.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 1 edge case(s) from the process notes are drawn.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -228,11 +354,27 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | nothing: it opens on its own |
 | Route | `/games-rides/self-service-kiosk-profile-channel-configuration-bo-485` |
 
-**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built. Contract gap recorded 2 October 2026 (CHG-WIR-004): No read of the game kiosk configuration.
+
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** Defines each kiosk's role: which game-wallet functions it offers, how a guest identifies, which languages it speaks. A balance station in the arcade may only show balances; a kiosk at the entrance may top up and sell packages. The one thing to get right: the functions list is a set of switches in the guest's words, and it decides which journey steps the kiosk shows.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **Only Save and Cancel are drawn** Why: The kiosk profile, function switches and access methods in the pack are not drawn. *(source: screens/P08-venue-back-office.yaml#BO-485; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **No read for the kiosk configuration** Why: setGameKioskConfiguration is a whole-record PUT with no GET, so the editor cannot open pre-filled (VO-R04). *(source: contracts/satellite/games.yaml#setGameKioskConfiguration; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **No step for buying gaming products, card expiry, replacing a card or asking for help** Why: DI-883 asks for buying gaming products at the kiosk; the steps enum has none of these. *(source: DI-883 / contracts/satellite/games.yaml#/components/schemas/GameKioskConfig; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
 
 #### Inputs: what the user enters or picks
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Kiosk**: Pick a registered kiosk or balance station; its id, name, zone, device type and status come from the device register and are read-only here. Currency is the region's (VO-R10), not a field. *(source: screens/P08-venue-back-office.yaml#BO-485 / ADR-0067)*
+- **Available functions**: Switches - Check balance, View bonus, View redemption credits, View free games, View entitlements, Top up wallet, View recent transactions, View card expiry; optional Replace or issue card, Customer support request. Mapped to the journey steps identify, balance, topUp, entitlements, whatCanIPlay, redemption, history; switches with no step (card expiry, replace card, support request) greyed. *(source: screens/P08-venue-back-office.yaml#BO-485 / screens/P08-venue-back-office.yaml#BO-486 / contracts/satellite/games.yaml#/components/schemas/GameKioskConfig)*
+- **Require PIN for top-up**: Shown under Top up wallet, default off. *(source: contracts/satellite/games.yaml#/components/schemas/GameKioskConfig)*
+- **Access methods**: Checkboxes RFID tap, NFC tap, QR, Card number, Digital wallet credential; only those the device's reader supports; greyed until held (VO-R13). *(source: screens/P08-venue-back-office.yaml#BO-486)*
+- **Languages**: Multi-select, English and Arabic on by default; first one is the start language. *(source: contracts/satellite/games.yaml#/components/schemas/GameKioskConfig)*
 
 #### Outputs: what the screen shows and produces
 
@@ -242,6 +384,14 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |---|---|---|---|---|---|
 | Save (primary button) | navigation or local | — | — | — | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
+
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Kiosk list**: Columns Kiosk, Type, Zone, Functions (icons), Languages, Status. *(source: screens/P08-venue-back-office.yaml#BO-485)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Save**: Saves the kiosk's whole configuration (VO-R04), including the steps also ordered on BO-493. *(source: contracts/satellite/games.yaml#setGameKioskConfiguration)*
 
 **Where the user goes next**
 
@@ -257,6 +407,29 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the self-service kiosk profile are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Edge cases to draw
+
+- **Top up switched on but the kiosk has no payment device**: Warn "No payment terminal paired with KSK-08; top-up will fail". *(source: designer default)*
+- **Every function switched off**: Save refused; a kiosk must offer at least Check balance. *(source: designer default)*
+
+#### Consistency with other screens
+
+- Match `BO-493`: Same kiosk configuration record; the order of steps is set there, the on/off here. One Save path (VO-R14).
+- Match `BO-462`: Which data a function shows is the channel visibility defined there.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+kiosk:
+  kiosk: KSK-01
+  zone: Main Park
+  functions: Check balance, Top up, What can I play, Redemption, History
+  pinForTopUp: 'Off'
+  languages: English, Arabic
+```
 
 #### Permissions
 
@@ -296,6 +469,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-484`.
 - [ ] Every gated control is gated: `TENANT_CONFIGURE`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 2 edge case(s) from the process notes are drawn.
+- [ ] The 3 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -318,9 +493,28 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
 
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** Configures and previews the first step of the kiosk journey: the guest taps or scans their card, TICVAI identifies the wallet and checks the card, and a session opens only if it is valid. The one thing to get right: each failure (card not found, blocked, expired, replaced, wallet inactive) has its own guest message and next step, and the welcome never exposes more than a first name on a public screen.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **Table "Every customer card wallet" with columns "4321" and an arrow** Why: The pack's example parsed as columns; this is a configuration form with a kiosk preview. *(source: screens/P08-venue-back-office.yaml#BO-486; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **No field for welcome text, methods or failure messages** Why: The kiosk configuration holds steps, languages, theme, timeout and PIN only. *(source: contracts/satellite/games.yaml#/components/schemas/GameKioskConfig; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+
+#### Decided on this screen
+
+Answered questions: draw the decision, not the old default. Where a decision and the tables below differ, the decision wins.
+
+- **Should manual card-number entry need a PIN before balances show, since anyone who knows a number could read it?** → Drawn default accepted: Card number entry shows balances only after the PIN when "Require PIN" is on. *(decided by Chinmay, 2026-10-02; DEC-431 / CHG-NOTE-008)* **Reviewable:** a default the lead may still overrule before the block is tasked.
+
 #### Inputs: what the user enters or picks
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Welcome screen text**: Title and instruction, English and Arabic, defaults "WELCOME" and "Tap your card to continue". *(source: screens/P08-venue-back-office.yaml#BO-486)*
+- **Identification methods**: RFID, NFC, QR, Card number, Digital credential; only methods enabled on the kiosk profile (BO-485) appear. *(source: screens/P08-venue-back-office.yaml#BO-486)*
+- **Invalid result messages**: One row each for Card not found, Card blocked, Card expired, Card replaced, Wallet inactive: guest message (English and Arabic) and next step (Try again, See guest services, Use your new card). *(source: screens/P08-venue-back-office.yaml#BO-486 / contracts/satellite/games.yaml#/components/schemas/GameCard)*
 
 #### Outputs: what the screen shows and produces
 
@@ -340,6 +534,15 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | ↓ | text | not in the schema: `↓` |
 | 4321 | text | not in the schema: `4321` |
 
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Runtime flow**: Guest taps, Reader captures credential, TICVAI identifies wallet, Card status checked, Session opens. *(source: screens/P08-venue-back-office.yaml#BO-486)*
+- **Kiosk preview**: Kiosk-size frame with tenant brand and "Powered by TICVAI" (VO-R15); states Welcome, Recognised ("Card ****4321 / Welcome, John"), and each failure. *(source: screens/P08-venue-back-office.yaml#BO-486 / screens/P08-venue-back-office.yaml#BO-487)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Try a card**: Reads a real card and shows which state the kiosk would reach; read-only. *(source: contracts/satellite/games.yaml#getGameCard)*
+
 **Where the user goes next**
 
 - → `BO-484` Self-Service Experience Command Center: *Back to Self-Service Experience Command Center*
@@ -354,6 +557,33 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the customer card wallet are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Edge cases to draw
+
+- **Card read while the network is down**: The read is offline-capable; the kiosk shows the balance with "as of 10:41" and disables top-up. *(source: contracts/satellite/games.yaml#getGameCard / MATRIX 10.2.3)*
+- **Unregistered card**: Session opens with "Welcome" and no name. *(source: contracts/satellite/games.yaml#/components/schemas/GameCard)*
+
+#### Consistency with other screens
+
+- Match `BO-460`: The blocked message here matches the reader's blocked message (BO-480).
+- Match `KSK-002`: Language choice follows the guest kiosk's language select pattern.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+recognised:
+  card: '****4321'
+  greeting: Welcome, Khalid
+failures:
+- result: Card expired
+  message: This card expired on 04 Sep 2026
+  next: See guest services
+- result: Card replaced
+  message: This card was replaced
+  next: Use your new card
+```
 
 #### Permissions
 
@@ -403,6 +633,9 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - [ ] Every transition is wired: `BO-484`.
 - [ ] Sign-in is asked only where the spec asks for it.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 2 edge case(s) from the process notes are drawn.
+- [ ] The 2 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
+- [ ] The 1 decision(s) taken on this screen are drawn as decided, not as the old default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -424,6 +657,12 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | Route | `/games-rides/customer-wallet-balance-summary-bo-487` |
 
 **Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** The wallet balances a guest sees at a self-service kiosk, and the exit settlement.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **A guest self-service kiosk screen sits on Venue Management (P08).** Why: Kiosk screens belong to the kiosk app (P05); the back office needs only the operator view (BO-416). *(source: screens/P08-venue-back-office.yaml#BO-487; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
 
 #### Inputs: what the user enters or picks
 
@@ -449,6 +688,10 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Card expiry | text | not in the schema: `Card Expiry` |
 | Last recharge | text | not in the schema: `Last Recharge` |
 
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **balances**: Money balances and points separated, expiring lots flagged. *(source: contracts/satellite/wallet.yaml#getWallet / contracts/satellite/wallet.yaml#getWalletExitBalance)*
+
 **Data it reads**: `getWalletExitBalance` (onLoad, Balance due / refundable at exit)
 
 **Where the user goes next**
@@ -466,6 +709,17 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 Nothing is due or refundable, or the action does not match the balance (`collect` on a wallet in credit), or `waive` by a guest.; 422 The card was declined, or `waive` without a reason. |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+balance:
+  cash: AED 42.00
+  bonus: AED 12.00
+  points: 320
+```
 
 #### Permissions
 
@@ -528,6 +782,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - [ ] Every transition is wired: `BO-484`.
 - [ ] Every gated control is gated: `WALLET_OPERATE`, `WALLET_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -541,7 +796,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Games & Rides · wave 3 · needs the `games` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `WALLET_OPERATE` (1 operate); in the flows as venue manager |
+| Who uses it | venue staff holding `WALLET_OPERATE`, `WALLET_VIEW` (1 operate, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
 | Offline | online only |
@@ -550,11 +805,41 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** A guest adds value to their game wallet at a kiosk.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **A guest self-service top-up screen sits on Venue Management (P08).** Why: As BO-487. *(source: screens/P08-venue-back-office.yaml#BO-488; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
+
+**Fixed on main** (the package already carries these; draw what it says): No read operation: the screen declares only topUpWallet and nothing that returns the current configuration. (CHG-WIR-025).
+
 #### Inputs: what the user enters or picks
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
 
 #### Outputs: what the screen shows and produces
+
+**Shown**
+
+**Read a guest wallet** (detail panel, from `getWallet`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| ID | the name it points at, never the id | Added 20 August. The schema reference derives table columns from API response schemas, and a response is not a table — this one returned … |
+| Subject | the name it points at, never the id | — |
+| Balance | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Credits | list or chips (count when long) | 4.3.5 and 4.3.19. One balance and one bonus balance with one expiry could not express what the requirement asks for — cash, bonus and … |
+| Kind | chip: Cash, Bonus, Redemption, Refund, Goodwill | `cash` is money the guest paid and the others are not. That distinction decides what is refundable, what expires, and what shows as a … |
+| Amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Expires at | 1 Oct 2026, 14:30 | — |
+| Source ref | text | — |
+| Is refundable | yes / no (icon or chip) | True only for `cash`. A guest cannot cash out a promotional credit, and a wallet that lets them has given away the promotion twice. |
+| Bonus balance | AED 1,234.50 | Promotional value. Typically non-refundable and spent first. |
+| Currency | text | — |
+| Status | chip: Active, Suspended, Closed | — |
+| Home cell name | text | Where the authoritative balance lives. Present when the guest is linked across cells. |
+| Expires at | 1 Oct 2026, 14:30 | — |
+| Last activity at | 1 Oct 2026, 14:30 | — |
 
 **Actions and what each produces**
 
@@ -562,6 +847,12 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |---|---|---|---|---|---|
 |  (primary button) | navigation or local | — | — | — | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
+
+**What each action does** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **Top up**: Creates a liability, not revenue; bonus applied by the funding rules. *(source: contracts/satellite/wallet.yaml#topUpWallet)*
+
+**Data it reads**: `getWallet` (onLoad, Read a guest wallet)
 
 **Where the user goes next**
 
@@ -578,15 +869,26 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+topUp:
+  amount: AED 100.00
+  bonus: AED 25.00
+```
+
 #### Permissions
 
 - `topUpWallet` → `WALLET_OPERATE` (operate) · staff, guest
+- `getWallet` → `WALLET_VIEW` (read) · staff, guest
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
 #### Requirements it meets
 
-6 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+33 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
 
 | Ref | Requirement (shortened) | Domain | Verdict | Via |
 |---|---|---|---|---|
@@ -596,6 +898,13 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | 2.7.8 | Enable real-time top-up and automatic balance updates to reduce dependency on finance confirmations and speed up transactions. | Ticketing Sales | CONTRACTED | `topUpWallet` |
 | 4.3.9 | The system should support multiple methods to fund value to a digital wallet. The final list of the payment methods will be dependent on the capabilities of the payment service provider. Expected … | Bundles and Promotions | CONTRACTED | `topUpWallet` |
 | 4.4.28 | Support wallet payments, wallet refunds, balance inquiries, top-ups, and mixed payment methods. | Bundles and Promotions | CONTRACTED | `topUpWallet` |
+| 19.2.9 | Digital Wallet - System shall provide a digital wallet. | Guest Mobile App & Branding | CONTRACTED | `getWallet` |
+| 1.1.105 | Stored value card management | Ticketing Catalogue | CONTRACTED | `getWallet` |
+| 1.1.108 | Balance enquiry | Ticketing Catalogue | CONTRACTED | `getWallet` |
+| 1.1.111 | Expiry management | Ticketing Catalogue | CONTRACTED | `getWallet` |
+| 2.6.48 | System shall provide one unified wallet experience across website, mobile app, POS, kiosk, and membership channels. The wallet shall show stored value, vouchers, loyalty points, membership benefits … | Ticketing Sales | CONTRACTED | `getWallet` |
+| 2.13.34 | Digital Wallet Integration | Ticketing Sales | CONTRACTED | `getWallet` |
+| … 21 more | | | | `traceability.json` |
 
 #### Client meeting inputs
 
@@ -623,13 +932,14 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (402).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (402, 404).
+- [ ] Every output is drawn (15 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-488?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: , Cancel.
 - [ ] Every transition is wired: `BO-484`.
-- [ ] Every gated control is gated: `WALLET_OPERATE`.
+- [ ] Every gated control is gated: `WALLET_OPERATE`, `WALLET_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -652,6 +962,13 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 
 **Known gaps.** **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** Previews and checks how the kiosk explains promotional value to a guest: bonus credit and where it can be used, free plays and where, and passes valid today. Guests misread bonus as cash; this screen must make the restriction visible ("Games and rides only, not F&B or Retail"). The one thing to get right: every benefit shows what it is, where it works, and until when.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **The bound read has no bonus balance, bonus validity or usage restriction** Why: getGameEligibility returns games with cost kind and remaining plays; bonus balance and expiry are on the wallet and the where-usable rule is the credit type's eligibility rule. *(source: contracts/satellite/games.yaml#/components/schemas/GameEligibility / contracts/satellite/wallet.yaml#getWalletBalance / contracts/satellite/wallet.yaml#setCreditEligibilityRules; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **Venue drawn as a filter** Why: The venue is the top-bar venue (VO-R09). *(source: screens/P08-venue-back-office.yaml#BO-489; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+
 #### Inputs: what the user enters or picks
 
 **On the screen**
@@ -668,6 +985,10 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 |---|---|---|---|---|
 | Card | picker: choose a card | — | — | `getGameEligibility` ?cardId |
 | Subject | picker: choose a subject | — | — | `getGameEligibility` ?subjectId |
+
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Test card**: Card number or guest search to fill the preview; venue from the top bar. *(source: contracts/satellite/games.yaml#getGameEligibility)*
 
 #### Outputs: what the screen shows and produces
 
@@ -715,6 +1036,16 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | Can be used at | text | not in the schema: `Can be used at` |
 | Cannot be used at | text | not in the schema: `Cannot be used at` |
 
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Bonus section**: "Bonus credit AED 25.00, valid until 30 Sep 2026", then two lists with ticks and crosses - Can be used at Games, Rides; Cannot be used at F&B, Retail. *(source: screens/P08-venue-back-office.yaml#BO-489 / screens/P08-venue-back-office.yaml#BO-490)*
+- **Free plays**: Each free-play benefit by name ("Birthday Free Play"), remaining count, and the games it covers. *(source: screens/P08-venue-back-office.yaml#BO-490)*
+- **Entitlements**: Passes with validity ("Kids Unlimited Ride Pass, valid today, unlimited"). *(source: screens/P08-venue-back-office.yaml#BO-490)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Preview on kiosk**: Shows the section in the kiosk frame, English and Arabic (right-to-left). *(source: ADR-0011 / DI-019 / DI-296 / DI-297)*
+
 **Data it reads**: `getGameEligibility` (onLoad, Bonus, free game and benefits)
 
 **Where the user goes next**
@@ -731,6 +1062,36 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the bonus free game are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Edge cases to draw
+
+- **Bonus expires today**: Amber "Expires today at 23:59" in the guest's view. *(source: designer default)*
+- **No benefits**: The kiosk shows "No bonus or free plays right now" with the current top-up offer from the wallet rules, not an empty page. *(source: screens/P08-venue-back-office.yaml#BO-489)*
+
+#### Consistency with other screens
+
+- Match `BO-421`: Free plays shown are those managed on the free-game credit screen; names match.
+- Match `BO-490`: Free plays here and "Free play" status there come from the same eligibility answer.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+bonus:
+  amount: AED 25.00
+  validUntil: 30 Sep 2026
+  usableAt: Games, Rides
+  notUsableAt: F&B, Retail
+freePlays:
+  benefit: Birthday Free Play
+  remaining: 2
+  games: VR Racing, Basketball Pro, Bumper Cars
+entitlement:
+  pass: Kids Unlimited Ride Pass
+  validity: Today
+  usage: Unlimited
+```
 
 #### Permissions
 
@@ -775,6 +1136,8 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - [ ] Every transition is wired: `BO-484`.
 - [ ] Every gated control is gated: `PRODUCT_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 2 edge case(s) from the process notes are drawn.
+- [ ] The 2 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -797,6 +1160,13 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 
 **Known gaps.** **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** "What can I play?": for one card, every game and ride with its normal price, what this guest would pay (included, free, a price, or not eligible and why). The contract calls it the most useful screen in the pack, because a guest holding a card cannot otherwise know what it is good for. The one thing to get right: the answer per game is one of four plain statuses, playable ones first, and "Not eligible" always says why.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **One price per game** Why: GameEligibility.price is what this guest pays; the pack's Normal price column has no field. *(source: screens/P08-venue-back-office.yaml#BO-490 / contracts/satellite/games.yaml#/components/schemas/GameEligibility; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **Included and Free cannot be told apart, and type filters have no field** Why: costKind freeWithEntitlement covers both a package play and a free play, and the answer carries no attraction type for the Rides / Video / Skill filters. *(source: contracts/satellite/games.yaml#/components/schemas/GameEligibility; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+
 #### Inputs: what the user enters or picks
 
 **On the screen**
@@ -813,7 +1183,21 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | Card | picker: choose a card | — | — | `getGameEligibility` ?cardId |
 | Subject | picker: choose a subject | — | — | `getGameEligibility` ?subjectId |
 
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Test card**: Card number for the preview; on the kiosk the identified card. *(source: contracts/satellite/games.yaml#getGameEligibility)*
+- **Filters**: Rides, Video games, Skill games, Free for me, Included in my package. *(source: screens/P08-venue-back-office.yaml#BO-490)*
+
 #### Outputs: what the screen shows and produces
+
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Customer position**: Header strip - Wallet AED 125, Bonus AED 25, Free plays 2, Package Arcade Pass. *(source: screens/P08-venue-back-office.yaml#BO-490)*
+- **Attraction results**: Columns Attraction, Normal price, Your access, Status. Status Included ("Included, 2 plays left"), Free (free play), Pay to play (AED 35.00), Pay at machine (direct pay), Not eligible with the reason ("Needs 120 cm", "Not in your pass"). Order Included, Free, Pay, Not eligible. Earned credits hint where typical ("Earn about 200 credits"). *(source: screens/P08-venue-back-office.yaml#BO-490 / contracts/satellite/games.yaml#/components/schemas/GameEligibility)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Preview on kiosk**: Shows the list in the kiosk frame with large touch rows. *(source: DI-296 / DI-297)*
 
 **Data it reads**: `getGameEligibility` (onLoad, What can I play)
 
@@ -831,6 +1215,50 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the game ride eligibility are still there. The pack's own statuses are Included — the state names which is selected. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Edge cases to draw
+
+- **Short of balance for a game**: Shown "Pay to play AED 35.00, top up AED 10.00 more" with a Top up shortcut when the kiosk offers top-up. *(source: contracts/satellite/games.yaml#getGameEligibility / designer default)*
+- **Game out of service**: Not eligible, "Closed for maintenance". *(source: contracts/satellite/games.yaml#/components/schemas/Game)*
+
+#### Consistency with other screens
+
+- Match `BO-442`: The price shown is resolved by the same priority as the pricing preview; same card, same time, same price.
+- Match `BO-470`: Plays remaining equal the consumption monitor's remaining.
+- Match `GST-011`: If the guest app shows game eligibility, it uses the same four statuses.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+position:
+  wallet: AED 125.00
+  bonus: AED 25.00
+  freePlays: 2
+  package: Arcade Pass
+results:
+- attraction: VR Racing
+  normal: AED 20.00
+  access: Included, 2 plays left
+  status: Play
+- attraction: Basketball Pro
+  normal: AED 20.00
+  access: Free play
+  status: Play
+- attraction: Falcon Coaster
+  normal: AED 35.00
+  access: AED 35.00
+  status: Play
+- attraction: Premium Crane 01
+  normal: AED 15.00
+  access: Pay at machine
+  status: Play
+- attraction: Wave Rider
+  normal: AED 30.00
+  access: Needs 120 cm
+  status: Not eligible
+```
 
 #### Permissions
 
@@ -875,6 +1303,8 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - [ ] Every transition is wired: `BO-484`.
 - [ ] Every gated control is gated: `PRODUCT_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 2 edge case(s) from the process notes are drawn.
+- [ ] The 2 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -897,6 +1327,13 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 
 **Known gaps.** **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** Lets a guest see their redemption credits and which prizes they can afford before walking to the counter, and how many more credits a locked prize needs. View only: redemption itself stays at the counter. The one thing to get right: "Affordable now" and "Need more credits" are two groups, and out-of-stock prizes stay visible with their stock state so a child is not promised something that is gone.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **listPrizes is staff-only** Why: The kiosk is a guest surface; the prize list must be guest-callable like getGameEligibility, or the kiosk cannot show it. *(source: contracts/satellite/games.yaml#listPrizes / contracts/satellite/games.yaml#getGameEligibility; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **No low-stock threshold on the prize** Why: The Low stock indicator needs a reorder level; Prize carries only onHand and isAvailable. *(source: screens/P08-venue-back-office.yaml#BO-491 / contracts/satellite/games.yaml#/components/schemas/Prize; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+
 #### Inputs: what the user enters or picks
 
 **On the screen**
@@ -912,7 +1349,22 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 |---|---|---|---|---|
 | Max points | number field | — | — | `listPrizes` ?maxPoints |
 
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Test card**: Card for the preview; on the kiosk the identified card. *(source: contracts/satellite/games.yaml#getGameCard)*
+- **Filters**: Available now, Prize category, Credit range. Venue from the top bar. *(source: screens/P08-venue-back-office.yaml#BO-491)*
+
 #### Outputs: what the screen shows and produces
+
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Balance**: "2,450 credits" large; credits, never AED. *(source: screens/P08-venue-back-office.yaml#BO-491)*
+- **Affordable now**: Prize cards with image, name, cost, stock indicator (Available, Low stock, Out of stock), cheapest last so the best affordable prize comes first. *(source: screens/P08-venue-back-office.yaml#BO-491 / contracts/satellite/games.yaml#listPrizes)*
+- **Need more credits**: "Headphones, 3,500 credits. You need 1,050 more." A progress bar of balance against cost. *(source: screens/P08-venue-back-office.yaml#BO-491)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Preview on kiosk**: Kiosk-size prize wall laid out by prize tier. *(source: contracts/satellite/games.yaml#/components/schemas/Prize)*
 
 **Data it reads**: `listPrizes` (onLoad, Prize discovery)
 
@@ -930,6 +1382,38 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the redemption balance prize are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Edge cases to draw
+
+- **Prize out of stock**: Shown greyed "Out of stock" in its group, never hidden. *(source: contracts/satellite/games.yaml#listPrizes)*
+- **Guest asks to redeem at the kiosk**: No redeem button; "Take your card to the prize counter". *(source: screens/P08-venue-back-office.yaml#BO-491)*
+
+#### Consistency with other screens
+
+- Match `BO-449`: Same prizes, costs and stock as the counter.
+- Match `BO-450`: Images and tiers come from the catalogue.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+balance: 2450
+affordable:
+- prize: Football
+  cost: 1000
+  stock: Low stock
+- prize: Teddy Bear
+  cost: 800
+  stock: Available
+- prize: Water Bottle
+  cost: 300
+  stock: Available
+locked:
+  prize: Headphones
+  cost: 3500
+  needMore: 1050
+```
 
 #### Permissions
 
@@ -967,6 +1451,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-484`.
 - [ ] Every gated control is gated: `PRODUCT_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 2 edge case(s) from the process notes are drawn.
+- [ ] The 2 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -989,6 +1475,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Known gaps.** **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** Lets a guest review recent activity on their card at the kiosk: plays, top-ups, bonus, redemption credits earned and spent. The one thing to get right: money and credits are different units with different signs ("-AED 20.00" for a play, "+200 credits" earned, "Free play" with no amount), and the list is short and recent, because it is shown on a public screen.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **The bound read is staff-only, plays-only and cannot filter by card** Why: listGameplayTransactions takes from, readerId and outcome; top-ups and bonus are wallet transactions and redemptions are prize redemptions, none of which it returns. *(source: contracts/satellite/games.yaml#listGameplayTransactions / contracts/satellite/wallet.yaml#listWalletTransactions; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+
 #### Inputs: what the user enters or picks
 
 **On the screen**
@@ -1006,7 +1498,21 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Reader | picker: choose a reader | — | — | `listGameplayTransactions` ?readerId |
 | Outcome | segmented control | — | Allowed · Refused · Reversed | `listGameplayTransactions` ?outcome |
 
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Test card**: Card for the preview; on the kiosk the identified card. *(source: screens/P08-venue-back-office.yaml#BO-492)*
+- **Filters**: Games and rides, Top-ups, Bonus, Redemption, Free play. *(source: screens/P08-venue-back-office.yaml#BO-493)*
+
 #### Outputs: what the screen shows and produces
+
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Recent transactions**: Columns Time, Activity, Amount. Plays "-AED 20.00", top-ups "+AED 100.00", bonus "+AED 25.00 bonus", free plays "Free play", credits "+200 credits". Last 30 days at most, newest first. *(source: screens/P08-venue-back-office.yaml#BO-493)*
+- **Transaction detail**: Attraction, reader, type, price, funding source, credits earned, remaining balance, date and time. *(source: screens/P08-venue-back-office.yaml#BO-493)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Preview on kiosk**: Kiosk-size history with large rows and a Done button. *(source: DI-296 / DI-297)*
 
 **Data it reads**: `listGameplayTransactions` (onLoad, Transaction history)
 
@@ -1024,6 +1530,38 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the customer game wallet are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Edge cases to draw
+
+- **A play reversed after a machine fault**: Shown as "+AED 20.00 refunded, Basketball Pro" next to the play. *(source: contracts/satellite/games.yaml#/components/schemas/GameplayTransaction)*
+
+#### Consistency with other screens
+
+- Match `BO-465`: Plays carry the same attraction names and amounts as the staff feed.
+- Match `GST-011`: The guest app's wallet history uses the same activity words.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+history:
+- time: '10:42'
+  activity: VR Racing
+  amount: -AED 20.00
+- time: '10:30'
+  activity: Bonus added
+  amount: +AED 25.00 bonus
+- time: '10:30'
+  activity: Top-up
+  amount: +AED 100.00
+- time: '10:15'
+  activity: Basketball Pro
+  amount: Free play
+- time: 09:50
+  activity: Prize credits earned
+  amount: +200 credits
+```
 
 #### Permissions
 
@@ -1066,6 +1604,8 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - [ ] Every transition is wired: `BO-484`.
 - [ ] Every gated control is gated: `PRODUCT_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 1 edge case(s) from the process notes are drawn.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -1086,6 +1626,13 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | Opens with | nothing: it opens on its own |
 | Route | `/games-rides/self-service-ui-theme-language-journey-configuration-bo-493` |
 
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** Brands and shapes the kiosk journey centrally without touching business rules: logo, welcome, hero image, languages, the order of the home menu, session timeouts, accessibility, with a draft, preview and publish cycle applied to a kiosk, a venue, a kiosk group or all of the tenant's kiosks. The one thing to get right: the live kiosk preview beside the controls, in English and Arabic, and a publish step that names how many kiosks change.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **Session Timeout, Auto Logout and Confirmation Timeout are select fields; Privacy Reset is a text field** Why: Timeouts are numbers in seconds; auto logout and privacy reset are switches. *(source: screens/P08-venue-back-office.yaml#BO-493; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **The kiosk configuration holds only steps, languages, theme code, idle timeout and PIN** Why: Welcome text, hero image, confirmation timeout, privacy reset, accessibility, draft and publish, and applying to a group or the venue have no field; the record is per kiosk. *(source: screens/P08-venue-back-office.yaml#BO-493 / contracts/satellite/games.yaml#/components/schemas/GameKioskConfig; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+
 #### Inputs: what the user enters or picks
 
 **On the screen**
@@ -1097,7 +1644,24 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | Confirmation Timeout | select field | — | — | — | — | — | — |
 | Privacy Reset After Session | text field | — | — | — | — | — | — |
 
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Branding**: Client logo, background, welcome message (English and Arabic), hero image from the asset library. Tenant brand with "Powered by TICVAI" (VO-R15; on unless the venue switched it off on CMS-104). *(source: screens/P08-venue-back-office.yaml#BO-493)*
+- **Languages**: English and Arabic by default; other configured languages addable. *(source: screens/P08-venue-back-office.yaml#BO-493 / contracts/satellite/games.yaml#/components/schemas/GameKioskConfig)*
+- **Home menu order**: Drag-to-order list - Check balance, Top up, My benefits, What can I play, Redemption, Transactions. Only functions enabled on the kiosk profile appear. *(source: screens/P08-venue-back-office.yaml#BO-493 / contracts/satellite/games.yaml#/components/schemas/GameKioskConfig)*
+- **Session**: Session timeout in seconds (number, default 30), Confirmation timeout in seconds, Auto logout and Privacy reset after session as switches (default on). Not select or text fields. *(source: screens/P08-venue-back-office.yaml#BO-493 / contracts/satellite/games.yaml#/components/schemas/GameKioskConfig)*
+- **Accessibility**: Large text, High contrast, Audio guidance (only where the device has audio). *(source: screens/P08-venue-back-office.yaml#BO-493)*
+- **Apply to**: Selected kiosk, Venue, Kiosk group, All tenant kiosks; the count of kiosks affected shown. *(source: screens/P08-venue-back-office.yaml#BO-493)*
+
 #### Outputs: what the screen shows and produces
+
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Kiosk preview**: "WELCOME TO THE PARK / Tap your card" at kiosk size, switchable English and Arabic (right-to-left) and normal or high contrast. *(source: screens/P08-venue-back-office.yaml#BO-493)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Save draft, Preview, Publish**: Publish confirms "Applies to 6 kiosks at Summit Peaks; guests see it on their next session". Sessions in progress are not interrupted. *(source: screens/P08-venue-back-office.yaml#BO-493)*
 
 **Where the user goes next**
 
@@ -1113,6 +1677,30 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Empty, no results (`?state=emptyNoResults`) | **Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist |
 | Offline (`?state=offline`) | online only |
+
+#### Edge cases to draw
+
+- **Arabic welcome missing when Arabic is enabled**: Publish blocked with "Add the Arabic welcome message". *(source: ADR-0011 / DI-019)*
+- **Timeout shorter than a top-up payment takes**: Warn that sessions under 30 seconds may end during card payment. *(source: contracts/satellite/games.yaml#/components/schemas/GameKioskConfig)*
+
+#### Consistency with other screens
+
+- Match `BO-485`: Same kiosk configuration record; functions on/off there, order here (VO-R14).
+- Match `CMS-001`: Brand assets and themes are the tenant's white-label theme; reference it by theme rather than uploading logos twice.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+theme:
+  logo: Yas Leisure Group
+  welcome: Welcome to Summit Peaks
+  welcomeAr: مرحبا بكم في سوميت بيكس
+  menu: Check balance, Top up, What can I play, My benefits, Redemption, Transactions
+  timeout: 30 s
+  applyTo: 'Venue: Summit Peaks (6 kiosks)'
+```
 
 #### Permissions
 
@@ -1155,6 +1743,8 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - [ ] Every transition is wired: `BO-484`.
 - [ ] Every gated control is gated: `TENANT_CONFIGURE`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 2 edge case(s) from the process notes are drawn.
+- [ ] The 2 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---

@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Platform Operations
   version: 0.1.0
-  x-ticvai-screen-count: 36
+  x-ticvai-screen-count: 39
   x-ticvai-tier: satellite
   x-ticvai-module: Cross-cutting — Control Plane release and environment management
   x-ticvai-capabilities:
@@ -166,7 +166,6 @@ paths:
       operationId: createRelease
       x-ticvai-consumed-by:
         - "P09 ADM-022 Release & Version Management"
-        - "P09 ADM-023 Staging Promotion & Approval"
       x-ticvai-audience:
       - staff
       summary: Cut a release
@@ -311,7 +310,6 @@ paths:
       operationId: withdrawRelease
       x-ticvai-consumed-by:
         - "P09 ADM-022 Release & Version Management"
-        - "P09 ADM-023 Staging Promotion & Approval"
       x-ticvai-audience:
       - staff
       summary: Withdraw a release
@@ -558,7 +556,6 @@ paths:
     post:
       operationId: startRollout
       x-ticvai-consumed-by:
-        - "P08 BO-126 Deployment, Preview & Audit"
         - "P09 ADM-029 Deployment Monitor"
       x-ticvai-audience:
       - staff
@@ -957,6 +954,198 @@ paths:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /config-packages:
+    post:
+      operationId: exportConfigPackage
+      x-ticvai-consumed-by:
+        - "P09 ADM-700 Configuration Promotion"
+      x-ticvai-audience:
+      - staff
+      x-ticvai-agreed: '2 October: Chinmay, workbook Q168 (ADM-122: "industry standard: forward-only migrations; config
+        packages with diff, approval and idempotent upsert"); shape follows planMigration'
+      summary: Export a tenant's configuration as a versioned package
+      description: '**Configuration moves as a versioned package, never as a database** (Chinmay, 2 October, workbook
+        Q168; CHG-CSA-034). Production databases are never merged or reverse-migrated; schema goes forward only
+        through versioned migrations, expand then contract (`planMigration`, `applyMigration`). This exports the
+        configuration of one tenant in one environment (pre-production, say) as a package: every configuration
+        record with its **stable key** (the record''s code or natural key, never a database id), versioned and
+        checksummed. **Secrets and environment settings never travel in it**: credentials, key-vault references,
+        endpoints and anything environment-specific are left out and listed as `excludedKinds`. Then
+        `diffConfigPackage` against the target, approval, and `applyConfigPackage`.
+
+        '
+      tags:
+      - migration
+      x-ticvai-permission: PLATFORM_RELEASE_MANAGE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - sourceEnvironment
+              properties:
+                sourceEnvironment:
+                  $ref: '#/components/schemas/EnvironmentKind'
+                kinds:
+                  type: array
+                  description: The configuration kinds to include (e.g. products, price lists, access profiles,
+                    templates); all where absent.
+                  items:
+                    type: string
+      responses:
+        '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: The package
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConfigPackage'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /config-packages/{packageId}/diff:
+    parameters:
+    - name: packageId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: diffConfigPackage
+      x-ticvai-consumed-by:
+        - "P09 ADM-700 Configuration Promotion"
+      x-ticvai-audience:
+      - staff
+      x-ticvai-agreed: '2 October: Chinmay, workbook Q168; shape follows planMigration'
+      summary: Compare a package with the target environment
+      description: 'Every record the package would add, change or leave, matched on its stable key against the target
+        environment''s configuration (CHG-CSA-034). Writes nothing; the diff is what the approver reviews, and
+        `applyConfigPackage` takes its id, so what is applied is what was reviewed.
+
+        '
+      tags:
+      - migration
+      x-ticvai-permission: PLATFORM_RELEASE_VIEW
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - targetEnvironment
+              properties:
+                targetEnvironment:
+                  $ref: '#/components/schemas/EnvironmentKind'
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: The diff
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConfigPackageDiff'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '409':
+          description: The package was exported for a different tenant than the target (`package-tenant-mismatch`).
+          x-ticvai-problem-types:
+          - package-tenant-mismatch
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /config-packages/{packageId}/apply:
+    parameters:
+    - name: packageId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: applyConfigPackage
+      x-ticvai-consumed-by:
+        - "P09 ADM-700 Configuration Promotion"
+      x-ticvai-audience:
+      - staff
+      x-ticvai-agreed: '2 October: Chinmay, workbook Q168; shape follows applyMigration'
+      summary: Apply an approved package to the target environment
+      description: '**An idempotent upsert by stable key, approved and audited** (Chinmay, 2 October, workbook Q168;
+        CHG-CSA-034). Takes the reviewed diff''s id: a diff computed against a target that has since changed is
+        refused 409 `diff-stale`. Each record is inserted or updated by its stable key, never by a database id, so
+        applying the same package twice changes nothing the second time. Records in the target that the package
+        does not name are left alone. Needs a step-up and the diff''s approval (an `approvals` request); every
+        record written is audited against the package. **Rollback re-applies the previous package** (the target''s
+        last applied package, kept with its diff); there is no reverse migration.
+
+        '
+      tags:
+      - migration
+      x-ticvai-permission: PLATFORM_MIGRATION_APPLY
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - diffId
+              - stepUpToken
+              properties:
+                diffId:
+                  type: string
+                  format: uuid
+                approvalRequestId:
+                  type: string
+                  format: uuid
+                  description: The approved request for this diff.
+                stepUpToken:
+                  type: string
+      responses:
+        '202':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Applying
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConfigPackageApplication'
+        '409':
+          description: The diff is stale (`diff-stale`), or not approved (`diff-not-approved`).
+          x-ticvai-problem-types:
+          - diff-stale
+          - diff-not-approved
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /migrations/runs/{runId}:
     parameters:
     - name: runId
@@ -1085,6 +1274,7 @@ paths:
       operationId: listEnvironments
       x-ticvai-consumed-by:
         - "P09 ADM-028 Environment Registry"
+        - "P09 ADM-700 Configuration Promotion"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -2551,6 +2741,106 @@ components:
 
 
             **Operations write it at `tenant` scope.**'
+    ConfigPackage:
+      type: object
+      x-ticvai-persistence: control.config_package
+      description: A tenant's configuration exported with stable keys (`exportConfigPackage`, CHG-CSA-034). Immutable.
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        tenantId:
+          type: string
+          format: uuid
+        sourceEnvironment:
+          $ref: '#/components/schemas/EnvironmentKind'
+        version:
+          type: integer
+          readOnly: true
+        checksum:
+          type: string
+          readOnly: true
+        recordCounts:
+          type: object
+          additionalProperties:
+            type: integer
+          description: Records per configuration kind.
+        excludedKinds:
+          type: array
+          description: What never travels in a package (secrets, credentials, endpoints, environment settings).
+          items:
+            type: string
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+    ConfigPackageDiff:
+      type: object
+      x-ticvai-persistence: control.config_package_diff
+      description: What applying a package would change in a target environment, by stable key (CHG-CSA-034).
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        packageId:
+          type: string
+          format: uuid
+        targetEnvironment:
+          $ref: '#/components/schemas/EnvironmentKind'
+        computedAt:
+          type: string
+          format: date-time
+        changes:
+          x-ticvai-persistence-kind: valueObject
+          x-ticvai-persistence-column: jsonb
+          type: array
+          items:
+            type: object
+            properties:
+              kind:
+                type: string
+              stableKey:
+                type: string
+              change:
+                type: string
+                enum:
+                - add
+                - update
+                - unchanged
+              fields:
+                type: array
+                items:
+                  type: string
+    ConfigPackageApplication:
+      type: object
+      x-ticvai-persistence: control.config_package_application
+      description: One application of a package to a target (`applyConfigPackage`, CHG-CSA-034), audited.
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        diffId:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum:
+          - applying
+          - applied
+          - failed
+        appliedCount:
+          type: integer
+        previousPackageId:
+          type: string
+          format: uuid
+          nullable: true
+          description: What a rollback re-applies.
+        startedAt:
+          type: string
+          format: date-time
     MigrationRun:
       type: object
       x-ticvai-persistence: control.migration_run + control.migration_run_cell + control.migration_run_tenant

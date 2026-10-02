@@ -1161,6 +1161,12 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 12"
+   },
+   {
+    "operation": "updateSeats",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-012): \"Save seats\" called updateSeats directly next to the AI proposal; applying the AI's proposal goes through its approval (decideProposedAction, declared), not a direct seat write (ADR-0020; design-notes correction ai BO-970).",
+    "source": "ADR-0020 | contracts/satellite/ai.yaml#decideProposedAction"
    }
   ],
   "layout": {
@@ -1172,16 +1178,21 @@
       {
        "kind": "primaryButton",
        "derived": true,
-       "impliedBy": "updateSeats",
-       "label": "Save seats",
+       "impliedBy": "decideProposedAction",
        "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "detailPanel",
+       "derived": true,
+       "impliedBy": "getActionPlan",
+       "notes": "One record, read-only."
       },
       {
        "kind": "secondaryButton",
        "label": "Cancel",
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
-       "impliedBy": "updateSeats"
+       "impliedBy": "decideProposedAction"
       }
      ]
     }
@@ -1190,18 +1201,11 @@
   "states": {
    "loading": "The numbering labeling list.",
    "error": "Could not load. Names which read failed and leaves the numbering labeling untouched.",
-   "emptyFirstRun": "No numbering labeling yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No numbering labeling yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the numbering labeling are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
-   {
-    "operationId": "updateSeats",
-    "contract": "seating",
-    "purpose": "Numbering and labelling",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026"
-   },
    {
     "operationId": "decideProposedAction",
     "contract": "ai",
@@ -1497,6 +1501,20 @@
        "label": "What publishing changes",
        "notes": "**Replaces the map every channel sells from.** Seats already sold keep their labels; seats that no longer exist in the new map are listed before this proceeds.",
        "provenance": "authored — required by check-screens, 19 September 2026"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Import progress and findings",
+       "bindsTo": "ImportJob",
+       "operation": "getImportJob",
+       "provenance": "contract seating.yaml GET /seat-maps/{seatMapId}/import/{jobId}; wiring fix, 2 October 2026"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Read a seat map with its structure",
+       "bindsTo": "SeatMap",
+       "operation": "getSeatMap",
+       "provenance": "contract seating.yaml GET /seat-maps/{seatMapId}; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -1528,6 +1546,20 @@
      "listSeatMaps",
      "getSeatMap"
     ]
+   },
+   {
+    "operationId": "getImportJob",
+    "contract": "seating",
+    "purpose": "Import progress and findings",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
+   },
+   {
+    "operationId": "getSeatMap",
+    "contract": "seating",
+    "purpose": "Read a seat map with its structure",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {

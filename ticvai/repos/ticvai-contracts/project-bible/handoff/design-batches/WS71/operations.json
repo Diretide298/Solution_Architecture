@@ -18,6 +18,30 @@
   "requestBody": "KpiDefinition",
   "responds": "KpiDefinition"
  },
+ "getAiUsage": {
+  "method": "GET",
+  "path": "/usage",
+  "contract": "ai",
+  "summary": "Usage, cost and performance",
+  "permission": "AI_AUDIT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "groupBy",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AiUsageReport"
+ },
  "getAnalyticsBenchmark": {
   "method": "GET",
   "path": "/analytics-benchmarks",
@@ -46,6 +70,19 @@
   ],
   "requestBody": null,
   "responds": "BenchmarkRow"
+ },
+ "getAnalyticsGovernancePolicy": {
+  "method": "GET",
+  "path": "/analytics-governance-policy",
+  "contract": "reporting",
+  "summary": "The tenant's analytics governance policy",
+  "permission": "REPORT_VIEW_TENANT",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "AnalyticsGovernancePolicy"
  },
  "getAnalyticsUsage": {
   "method": "GET",
@@ -115,6 +152,11 @@
     "name": "groupBy",
     "in": "query",
     "required": null
+   },
+   {
+    "name": "module",
+    "in": "query",
+    "required": null
    }
   ],
   "requestBody": null,
@@ -133,6 +175,45 @@
   "requestBody": null,
   "responds": "SemanticModel"
  },
+ "listAiInteractions": {
+  "method": "GET",
+  "path": "/interactions",
+  "contract": "ai",
+  "summary": "Every prompt, response and action",
+  "permission": "AI_AUDIT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "principalId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "outcome",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "listAnalyticsPipelines": {
   "method": "GET",
   "path": "/analytics-pipelines",
@@ -145,6 +226,70 @@
   "parameters": [],
   "requestBody": null,
   "responds": "AnalyticsPipeline"
+ },
+ "listAuditRecords": {
+  "method": "GET",
+  "path": "/audit-records",
+  "contract": "tenancy",
+  "summary": "Who did what, where, and when",
+  "permission": "AUDIT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "orgUnitId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "principalId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "workstationId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "action",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "subjectRef",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "platformStaffGrantId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
  },
  "listDashboards": {
   "method": "GET",
@@ -182,80 +327,6 @@
   "parameters": [],
   "requestBody": null,
   "responds": "KpiDefinition"
- },
- "listSecurityDetectionGovernance": {
-  "method": "GET",
-  "path": "/security-detection-governance",
-  "contract": "access",
-  "summary": "Security Analytics, AI Detection & Governance",
-  "permission": "REPORT_VIEW_VENUE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": "venue",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "park",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "event",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "product",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "channel",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "reseller",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "credentialType",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "media",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "device",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "gate",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "timeDay",
-    "in": "query",
-    "required": false
-   }
-  ],
-  "requestBody": null,
-  "responds": "SecurityAnalyticsAiDetectionGovernanceView"
  },
  "listSiteNormalisationBases": {
   "method": "GET",
@@ -295,6 +366,25 @@
   ],
   "requestBody": null,
   "responds": "Page"
+ },
+ "setAnalyticsGovernancePolicy": {
+  "method": "PUT",
+  "path": "/analytics-governance-policy",
+  "contract": "reporting",
+  "summary": "Set the analytics governance policy",
+  "permission": "REPORT_GOVERNANCE_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AnalyticsGovernancePolicy",
+  "responds": "AnalyticsGovernancePolicy"
  },
  "setKpiTargets": {
   "method": "PUT",

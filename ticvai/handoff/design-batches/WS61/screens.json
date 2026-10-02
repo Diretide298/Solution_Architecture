@@ -385,7 +385,7 @@
      "to": "BO-354",
      "trigger": "Returns to the board's landing screen",
      "provenance": "flow F170 step 2→3",
-     "operation": "setVirtualTicketCredential"
+     "operation": "getEntitlement"
     }
    ]
   },
@@ -508,34 +508,32 @@
        "label": "Revoked historical media",
        "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 43 §Identify",
        "bindsTo": "VirtualTicketCredential360WorkspaceView.mediaRole"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The ticket",
+       "bindsTo": "Entitlement",
+       "operation": "getEntitlement",
+       "provenance": "contract access.yaml GET /entitlements/{entitlementId}; wiring fix, 2 October 2026"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Credential",
+       "operation": "getEntitlementCredential",
+       "provenance": "contract access.yaml GET /entitlements/{entitlementId}/credential; wiring fix, 2 October 2026"
+      },
+      {
+       "kind": "dataTable",
+       "label": "History",
+       "operation": "getEntitlementHistory",
+       "provenance": "contract access.yaml GET /entitlements/{entitlementId}/history; wiring fix, 2 October 2026"
       }
      ]
     },
     {
      "name": "contentBody",
      "slot": "moduleTiles",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every virtual ticket credential",
-       "columns": [
-        "VirtualTicketCredential360WorkspaceView.bindingId",
-        "VirtualTicketCredential360WorkspaceView.mediaType",
-        "VirtualTicketCredential360WorkspaceView.provider",
-        "VirtualTicketCredential360WorkspaceView.issued",
-        "VirtualTicketCredential360WorkspaceView.delivered",
-        "VirtualTicketCredential360WorkspaceView.activated",
-        "Valid From/To",
-        "VirtualTicketCredential360WorkspaceView.lastUpdate",
-        "Last presentation/use",
-        "VirtualTicketCredential360WorkspaceView.deviceReferenceWhereAppropriate",
-        "VirtualTicketCredential360WorkspaceView.status"
-       ],
-       "bindsTo": "VirtualTicketCredential360WorkspaceView",
-       "operation": "setVirtualTicketCredential",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 43 §For each media show"
-      }
-     ]
+     "components": []
     },
     {
      "name": "contextPanel",
@@ -585,16 +583,31 @@
   "states": {
    "loading": "The virtual ticket credential list; the counts above it resolve separately.",
    "error": "Could not load. Names which read failed and leaves the virtual ticket credential untouched.",
-   "emptyFirstRun": "No virtual ticket credential yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No virtual ticket credential yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the virtual ticket credential are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
-    "operationId": "setVirtualTicketCredential",
+    "operationId": "getEntitlement",
     "contract": "access",
-    "purpose": "Virtual Ticket & Credential 360° Workspace",
-    "trigger": "onAction"
+    "purpose": "The virtual ticket: one entitlement, with what remains on it",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-001)"
+   },
+   {
+    "operationId": "getEntitlementCredential",
+    "contract": "access",
+    "purpose": "Its current credential, masked",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-001)"
+   },
+   {
+    "operationId": "getEntitlementHistory",
+    "contract": "access",
+    "purpose": "Every scan, freeze, share and reissue against it",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-001)"
    }
   ],
   "wireframe": {
@@ -604,6 +617,22 @@
    "workshopBoard": "wireframes/WS167 Ticket Media   Credential Management Board 3.dc.html#bo-355"
   },
   "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 43. 27 of 29 labels bound to a contract property; 39 of 53 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "entitlementId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "gaps": [
+   {
+    "operation": "setVirtualTicketCredential",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): The 360 workspace was bound to setVirtualTicketCredential, a PUT, as its data; the contract itself says the screen writes nothing. It reads the entitlement, its credential (masked) and its history (design-notes correction venue-operations BO-355).",
+    "source": "contracts/spine/access.yaml#setVirtualTicketCredential | contracts/spine/access.yaml#getEntitlementHistory"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1139,6 +1168,13 @@
        "bindsTo": "MediaBindingActivationAssignmentOperationsView",
        "operation": "setMediaBindingActivation",
        "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 48 §Display"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Find ticket",
+       "bindsTo": "TicketStatus",
+       "operation": "lookupTicket",
+       "provenance": "contract access.yaml GET /access/lookup; wiring fix, 2 October 2026"
       }
      ]
     },
@@ -1222,6 +1258,13 @@
     "contract": "access",
     "purpose": "Media Binding, Activation & Assignment Operations",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "lookupTicket",
+    "contract": "access",
+    "purpose": "Find the ticket a medium is bound to, without admitting",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-001)"
    }
   ],
   "entryState": {
@@ -1240,6 +1283,13 @@
    "workshopBoard": "wireframes/WS167 Ticket Media   Credential Management Board 3.dc.html#bo-358"
   },
   "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 48. 10 of 10 labels bound to a contract property; 18 of 40 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Scan, Batch assignment, Encoder assignment, Activate Now, Schedule, Activate on First Use, Activate on Collection are choices sent by `setMediaBindingActivation`.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-004): No read lists media bindings pending assignment or activation.",
+    "source": "contracts/spine/access.yaml#setMediaBindingActivation"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",

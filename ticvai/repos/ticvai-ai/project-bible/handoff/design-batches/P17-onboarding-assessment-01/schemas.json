@@ -1,4 +1,103 @@
 {
+ "BillingEntity": {
+  "type": "object",
+  "x-ticvai-persistence": "control.billing_entity",
+  "description": "**The company TICVAI invoices for a tenant, with its trade licence and VAT certificate** (Chinmay, 2 October, workbook Q209: \"a new billing-entity record in the subscription contract\"; DI-830; CHG-CSA-030). One per tenant, mastered in the control plane. `legalName` and `countryCode` are required on save (400 otherwise); they are not marked required here so the record can ride, optional, on an onboarding application. **Documents** (workbook Q210, the default): a trade licence always; a VAT certificate when a `trn` is entered. Which documents a country requires is configurable per country (tenancy `RegionSettings`); the default is that rule.",
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "tenantId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "Null while it rides on an onboarding application."
+   },
+   "legalName": {
+    "type": "string",
+    "maxLength": 300
+   },
+   "tradeLicenceNumber": {
+    "type": "string",
+    "maxLength": 100,
+    "nullable": true
+   },
+   "trn": {
+    "type": "string",
+    "maxLength": 30,
+    "nullable": true,
+    "description": "The tax registration number; entering one makes the VAT certificate required."
+   },
+   "countryCode": {
+    "type": "string",
+    "minLength": 2,
+    "maxLength": 2
+   },
+   "address": {
+    "type": "string",
+    "maxLength": 1000,
+    "nullable": true
+   },
+   "invoiceEmail": {
+    "type": "string",
+    "format": "email",
+    "nullable": true
+   },
+   "documents": {
+    "x-ticvai-persistence-kind": "valueObject",
+    "x-ticvai-persistence-column": "jsonb",
+    "type": "array",
+    "description": "The trade licence and, where a TRN is entered, the VAT certificate, each a stored file with its verification.",
+    "items": {
+     "type": "object",
+     "properties": {
+      "documentType": {
+       "type": "string",
+       "enum": [
+        "tradeLicence",
+        "vatCertificate"
+       ]
+      },
+      "fileRef": {
+       "type": "string",
+       "nullable": true
+      },
+      "expiryDate": {
+       "type": "string",
+       "format": "date",
+       "nullable": true
+      },
+      "verificationStatus": {
+       "type": "string",
+       "enum": [
+        "missing",
+        "uploaded",
+        "verified",
+        "rejected",
+        "expired"
+       ]
+      }
+     }
+    }
+   },
+   "missingDocuments": {
+    "type": "array",
+    "readOnly": true,
+    "description": "The documents the country's rule requires that are not yet uploaded and verified.",
+    "items": {
+     "type": "string"
+    }
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
  "ModuleListing": {
   "type": "object",
   "x-ticvai-persistence": "subscription.module_listing",
@@ -153,159 +252,80 @@
     "type": "string",
     "format": "uuid",
     "nullable": true
+   },
+   "billingEntity": {
+    "$ref": "#/components/schemas/BillingEntity",
+    "description": "**The company to be invoiced, saved on the application before verification** (Chinmay, 2 October, workbook Q209 and Q223; CHG-CSA-030). Nothing is provisioned until the application is verified; on provisioning it becomes the tenant's billing entity (`getBillingEntity`)."
    }
   }
  },
- "Page": {
+ "ProspectSignupChallenge": {
   "type": "object",
+  "x-ticvai-persistence": "none — the challenge is held by identity for its lifetime (CHG-CLN-019)",
   "required": [
-   "items",
-   "hasMore"
+   "challengeId",
+   "expiresInSeconds"
   ],
   "properties": {
-   "items": {
-    "type": "array",
-    "items": {}
+   "challengeId": {
+    "type": "string",
+    "format": "uuid"
    },
-   "nextCursor": {
-    "type": "string"
+   "expiresInSeconds": {
+    "type": "integer"
    },
-   "hasMore": {
-    "type": "boolean"
+   "resendAfterSeconds": {
+    "type": "integer"
    }
   }
  },
- "SalesChannelCommandCenterSummary": {
+ "ProspectSignupSession": {
   "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection; the headline tiles over the list, computed at read time for the filters in force",
-  "description": "**The headline figures on Sales Channel Command Center.** The pack's KPI cards, split out of the row (decided 29 September, readiness close-out): a count describes the list, not each item in it.",
+  "x-ticvai-persistence": "none — a session token, not a table the package reads (CHG-CLN-019)",
+  "required": [
+   "token",
+   "expiresAt",
+   "resumed"
+  ],
   "properties": {
-   "totalChannels": {
-    "type": "integer",
-    "description": "Total Channels"
+   "token": {
+    "type": "string",
+    "description": "The `prospectAuth` bearer token, scoped to one onboarding application."
    },
-   "activeChannels": {
-    "type": "integer",
-    "description": "Active Channels"
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time"
    },
-   "inactiveChannels": {
-    "type": "integer",
-    "description": "Inactive Channels"
+   "onboardingApplicationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The application in progress for this email, or null until the first `submitOnboardingApplication`."
    },
-   "channelsInDraft": {
-    "type": "integer",
-    "description": "Channels in Draft"
-   },
-   "channelsWithErrors": {
-    "type": "integer",
-    "description": "Channels With Errors"
-   },
-   "productsDistributed": {
-    "type": "integer",
-    "description": "Products Distributed: distinct products assigned to at least one active channel"
-   },
-   "channelsWithCapacityAlerts": {
-    "type": "integer",
-    "description": "Channels With Capacity Alerts"
-   },
-   "channelsWithPricingIssues": {
-    "type": "integer",
-    "description": "Channels With Pricing Issues"
-   },
-   "scheduledActivations": {
-    "type": "integer",
-    "description": "Scheduled Activations"
-   },
-   "scheduledDeactivations": {
-    "type": "integer",
-    "description": "Scheduled Deactivations"
+   "resumed": {
+    "type": "boolean",
+    "description": "True when the email already had an application in progress (\"Continue saved setup\")."
    }
   }
  },
- "SalesChannelCommandCenterView": {
+ "StartProspectSignupRequest": {
   "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
-  "description": "**What Sales Channel Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "x-ticvai-persistence": "none — request only (DEC-167; CHG-CLN-019)",
+  "required": [
+   "email"
+  ],
   "properties": {
-   "channelId": {
+   "email": {
     "type": "string",
-    "description": "Channel ID"
+    "format": "email",
+    "maxLength": 256,
+    "description": "The prospect's work email; the one-time code goes here."
    },
-   "channelName": {
+   "locale": {
     "type": "string",
-    "description": "Channel Name"
-   },
-   "channelType": {
-    "type": "string",
-    "enum": [
-     "b2cWeb",
-     "b2cMobileApp",
-     "pos",
-     "mobilePos",
-     "flyingPos",
-     "kiosk",
-     "callCentre",
-     "b2bPortal",
-     "reseller",
-     "ota",
-     "api",
-     "partnerPortal",
-     "marketplace",
-     "thirdPartyChannel",
-     "customChannel"
-    ],
-    "description": "Channel Type (pack p.3-4 Channel Types). The type decides which configuration applies (p.6); each type reports under one SalesChannel value (see salesChannel)"
-   },
-   "brand": {
-    "type": "string",
-    "description": "Brand"
-   },
-   "venueScope": {
-    "type": "string",
-    "description": "Venue/Scope: the channel's operational scope level and the name of the scoped item (e.g. a venue name, or Global)"
-   },
-   "products": {
-    "type": "integer",
-    "description": "Products: number of products assigned to the channel"
-   },
-   "currency": {
-    "type": "string",
-    "description": "Currency: ISO 4217 code",
-    "pattern": "^[A-Z]{3}$"
-   },
-   "status": {
-    "type": "string",
-    "description": "Status: draft, configuration, validation, approved, scheduled, active, suspended, disabled or archived (the pack's suggested lifecycle, p.5)"
-   },
-   "publicationStatus": {
-    "type": "string",
-    "description": "Publication Status: unpublished, pendingApproval, scheduled or published (decided 29 September, readiness close-out)"
-   },
-   "integrationStatus": {
-    "type": "string",
-    "description": "Integration Status: notRequired, notConfigured, connected, degraded or offline (decided 29 September, readiness close-out)"
-   },
-   "lastUpdated": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Last Updated"
-   },
-   "owner": {
-    "type": "string",
-    "description": "Owner: the channel's commercial owner (user ID)"
-   },
-   "salesChannel": {
-    "$ref": "../shared/common.yaml#/components/schemas/SalesChannel",
-    "description": "The shared reporting dimension this channel's sales are attributed to (b2cWeb -> guestWeb, b2cMobileApp -> guestApp, the POS types -> pos, callCentre, b2bPortal -> b2b, ota and marketplace -> ota, api, reseller/partnerPortal/thirdPartyChannel -> partner; a custom channel picks one) (decided 29 September, readiness close-out)"
-   },
-   "aiInsights": {
-    "type": "array",
-    "items": {
-     "type": "string"
-    },
-    "description": "Configuration problems AI flags on this channel (pack p.5, e.g. products assigned without a valid price profile for the channel). Advisory only: nothing is changed until a user acts."
+    "maxLength": 16,
+    "nullable": true,
+    "description": "The language the code message is written in (BCP 47), default English."
    }
   }
  },
@@ -323,6 +343,20 @@
    "transactions",
    "guestProfiles"
   ]
+ },
+ "VerifyProspectSignupCodeRequest": {
+  "type": "object",
+  "x-ticvai-persistence": "none — request only (CHG-CLN-019)",
+  "required": [
+   "code"
+  ],
+  "properties": {
+   "code": {
+    "type": "string",
+    "pattern": "^[0-9]{6}$",
+    "description": "The six-digit one-time code sent to the email."
+   }
+  }
  },
  "VsiAssessment": {
   "type": "object",

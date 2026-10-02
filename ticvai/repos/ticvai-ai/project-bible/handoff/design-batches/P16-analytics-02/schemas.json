@@ -403,6 +403,797 @@
    }
   }
  },
+ "FinCreditMemo": {
+  "x-ticvai-persistence": "ledger.credit_memo + ledger.credit_memo_line",
+  "type": "object",
+  "description": "5.7.94. **A tax credit note against one tax invoice**, with its own series. Never edited.",
+  "required": [
+   "id",
+   "creditMemoNumber",
+   "taxInvoiceId",
+   "kind",
+   "reason",
+   "legalEntityId",
+   "issuedAt",
+   "currency",
+   "netAmount",
+   "taxAmount",
+   "grossAmount",
+   "lines"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "creditMemoNumber": {
+    "type": "string",
+    "readOnly": true,
+    "description": "Server-assigned from the legal entity's credit memo series, in sequence without gaps."
+   },
+   "taxInvoiceId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "taxInvoiceNumber": {
+    "type": "string",
+    "readOnly": true
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "full",
+     "partial"
+    ]
+   },
+   "reason": {
+    "type": "string",
+    "enum": [
+     "refund",
+     "cancellation",
+     "priceAdjustment",
+     "returnOfGoods",
+     "billingError",
+     "other"
+    ]
+   },
+   "refundId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "cancelledOrderId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "legalEntityId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "buyerSubjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "issuedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "currency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$"
+   },
+   "netAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "taxAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "grossAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "taxAmountInLegalCurrency": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "legalFxRate": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/FxRateValue"
+     }
+    ],
+    "nullable": true,
+    "readOnly": true,
+    "description": "The invoice's own `legalFxRate`, never today's (CHG-FIN-011)."
+   },
+   "invoiceSupplyValue": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "readOnly": true,
+    "description": "**The value of the supply shown on the tax invoice** (Executive Regulation Art. 60(1)(e)), adjusted by any earlier credit note on the same invoice. With `correctedSupplyValue` and `netAmount` (the difference) and `taxAmountInLegalCurrency` (the tax on the difference in AED), the four figures the law requires (CHG-FIN-011)."
+   },
+   "correctedSupplyValue": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "readOnly": true,
+    "description": "The correct value of the supply after this credit note (Art. 60(1)(e))."
+   },
+   "supplierName": {
+    "type": "string",
+    "readOnly": true,
+    "description": "Snapshot of the legal entity at issue, as on the invoice (Art. 60(1)(b))."
+   },
+   "supplierAddress": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true
+   },
+   "supplierTaxRegistrationNumber": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true
+   },
+   "buyerName": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The recipient as on the invoice; name, address and TRN where they are registered (Art. 60(1)(c))."
+   },
+   "buyerAddress": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true
+   },
+   "buyerTaxRegistrationNumber": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true
+   },
+   "note": {
+    "type": "string",
+    "nullable": true,
+    "description": "The brief explanation of why the credit note was issued, printed on it (Art. 60(1)(f)); the reason's own wording when no note is given (CHG-FIN-011)."
+   },
+   "renditionAssetId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true
+   },
+   "eInvoiceStatus": {
+    "$ref": "#/components/schemas/FinEInvoiceTransmissionStatus"
+   },
+   "issuedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true
+   },
+   "lines": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/FinCreditMemoLine"
+    }
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true
+   }
+  }
+ },
+ "FinCreditMemoLine": {
+  "type": "object",
+  "required": [
+   "invoiceLineNumber",
+   "netAmount",
+   "taxAmount",
+   "grossAmount"
+  ],
+  "properties": {
+   "invoiceLineNumber": {
+    "type": "integer",
+    "minimum": 1
+   },
+   "description": {
+    "type": "string",
+    "maxLength": 500
+   },
+   "quantity": {
+    "type": "number",
+    "nullable": true
+   },
+   "netAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "taxRate": {
+    "type": "number"
+   },
+   "taxCategory": {
+    "$ref": "#/components/schemas/FinTaxCategory"
+   },
+   "taxAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "grossAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   }
+  }
+ },
+ "FinEInvoiceTransmission": {
+  "x-ticvai-persistence": "ledger.einvoice_transmission",
+  "type": "object",
+  "description": "6.1.1. One attempt to send one tax document to the provider, and its answer.",
+  "required": [
+   "id",
+   "documentKind",
+   "documentId",
+   "legalEntityId",
+   "status",
+   "createdAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "documentKind": {
+    "type": "string",
+    "enum": [
+     "taxInvoice",
+     "creditMemo"
+    ]
+   },
+   "documentId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "documentNumber": {
+    "type": "string"
+   },
+   "legalEntityId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "providerId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "mode": {
+    "type": "string",
+    "enum": [
+     "test",
+     "live"
+    ]
+   },
+   "status": {
+    "$ref": "#/components/schemas/FinEInvoiceTransmissionStatus"
+   },
+   "payloadHash": {
+    "type": "string",
+    "nullable": true,
+    "description": "SHA-256 of the document as sent, so a resend can be shown to be the same document."
+   },
+   "providerMessageId": {
+    "type": "string",
+    "nullable": true
+   },
+   "attempt": {
+    "type": "integer",
+    "minimum": 1
+   },
+   "errorCodes": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "errorMessage": {
+    "type": "string",
+    "nullable": true
+   },
+   "sentAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "answeredAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true
+   }
+  }
+ },
+ "FinEInvoiceTransmissionStatus": {
+  "type": "string",
+  "description": "6.1.1. `notRequired` where the legal entity's provider is `disabled` or absent.",
+  "enum": [
+   "notRequired",
+   "queued",
+   "sent",
+   "accepted",
+   "rejected",
+   "failed"
+  ]
+ },
+ "FinTaxCategory": {
+  "type": "string",
+  "description": "How a line is treated for VAT. Taken from the tax code the line was posted with.",
+  "enum": [
+   "standardRated",
+   "zeroRated",
+   "exempt",
+   "outOfScope",
+   "reverseCharge"
+  ]
+ },
+ "FinTaxInvoice": {
+  "x-ticvai-persistence": "ledger.tax_invoice + ledger.tax_invoice_line",
+  "type": "object",
+  "description": "5.7.93, 5.10.3. **A guest tax invoice, as issued, never edited.** Corrections are credit memos. The supplier block is a snapshot of the legal entity at issue, so a later change of address does not change a document already given to a guest.",
+  "required": [
+   "id",
+   "invoiceNumber",
+   "invoiceType",
+   "status",
+   "legalEntityId",
+   "issuedAt",
+   "supplyDate",
+   "currency",
+   "netAmount",
+   "taxAmount",
+   "grossAmount",
+   "lines"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "invoiceNumber": {
+    "type": "string",
+    "readOnly": true,
+    "description": "Server-assigned from the legal entity's series for the document kind, in sequence and without gaps, e.g. `INV-2026-000123`. Never reused."
+   },
+   "invoiceType": {
+    "$ref": "#/components/schemas/FinTaxInvoiceType"
+   },
+   "status": {
+    "$ref": "#/components/schemas/FinTaxInvoiceStatus"
+   },
+   "legalEntityId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "templateId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "orderIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "supplierName": {
+    "type": "string"
+   },
+   "supplierAddress": {
+    "type": "string",
+    "nullable": true
+   },
+   "supplierTaxRegistrationNumber": {
+    "type": "string",
+    "nullable": true
+   },
+   "buyerSubjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The guest the orders belong to; the key a guest's own reads filter on."
+   },
+   "buyerName": {
+    "type": "string",
+    "nullable": true
+   },
+   "buyerAddress": {
+    "type": "string",
+    "nullable": true
+   },
+   "buyerCountryCode": {
+    "type": "string",
+    "pattern": "^[A-Z]{2}$",
+    "nullable": true
+   },
+   "buyerTaxRegistrationNumber": {
+    "type": "string",
+    "nullable": true
+   },
+   "customerAccountId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "issuedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "supplyDate": {
+    "type": "string",
+    "format": "date",
+    "description": "The date of supply where it differs from the issue date (the latest order's payment date on a consolidated invoice). A day in the region's time zone."
+   },
+   "currency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$"
+   },
+   "netAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "discountAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "taxAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "grossAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "taxAmountInLegalCurrency": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "The tax in the legal entity's currency (AED in the UAE) where the invoice currency differs. **In the UAE the converted amounts use the UAE Central Bank rate at the date of supply** (Decree-Law Art. 69) and the rate is printed (`legalFxRate`, Executive Regulation Art. 59(1)(k)); CHG-FIN-011."
+   },
+   "legalCurrency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$",
+    "readOnly": true,
+    "description": "The legal entity's currency (AED in the UAE), in which the law requires the tax and the gross amount (CHG-FIN-011)."
+   },
+   "grossAmountInLegalCurrency": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "readOnly": true,
+    "description": "The gross amount payable in the legal currency (Executive Regulation Art. 59(1)(j); for a simplified invoice the total consideration, Art. 59(2)(e)). Equal to `grossAmount` when the invoice is in the legal currency (CHG-FIN-011)."
+   },
+   "legalFxRate": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/FxRateValue"
+     }
+    ],
+    "nullable": true,
+    "readOnly": true,
+    "description": "Units of the legal currency per one unit of `currency`, printed with the tax where the invoice is not in the legal currency (Art. 59(1)(k)). Null when it is (CHG-FIN-011)."
+   },
+   "legalFxRateSource": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/FxRateSource"
+     }
+    ],
+    "nullable": true,
+    "readOnly": true,
+    "description": "`uaeCentralBank` for a UAE legal entity (Decree-Law Art. 69)."
+   },
+   "paidCurrency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$",
+    "nullable": true,
+    "readOnly": true,
+    "description": "Where the guest paid in a currency they selected (`orders.Order.chargeCurrency`, CHG-FIN-001), printed as payment information with `paidAmount` and the charge rate. The invoice itself is in the base currency, so the AED amounts the law requires are the invoice's own figures (CHG-FIN-011)."
+   },
+   "paidAmount": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "readOnly": true,
+    "description": "What the guest paid in `paidCurrency` (`orders.Order.chargeTotal`)."
+   },
+   "reverseChargeStatement": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "Where the recipient must account for the tax, the statement saying so and the Decree-Law provision (Art. 59(1)(l), Art. 48). Null otherwise (CHG-FIN-011)."
+   },
+   "creditedAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "languages": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "supersedesInvoiceId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "renditionAssetId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The PDF rendered at issue; read through getTaxDocumentRendition."
+   },
+   "eInvoiceStatus": {
+    "$ref": "#/components/schemas/FinEInvoiceTransmissionStatus"
+   },
+   "issuedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "Null where the platform issued it."
+   },
+   "lines": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/FinTaxInvoiceLine"
+    }
+   },
+   "taxSummary": {
+    "type": "array",
+    "x-ticvai-persisted": false,
+    "description": "VAT per rate and category, summed from the lines for the response.",
+    "items": {
+     "type": "object",
+     "properties": {
+      "taxCategory": {
+       "$ref": "#/components/schemas/FinTaxCategory"
+      },
+      "taxRate": {
+       "type": "number"
+      },
+      "taxableAmount": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "taxAmount": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      }
+     }
+    }
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Written at the scope of the venue the orders were sold at, or the region for a consolidated invoice across venues."
+   }
+  }
+ },
+ "FinTaxInvoiceLine": {
+  "type": "object",
+  "description": "One line as it was sold and taxed. Amounts are in the invoice currency.",
+  "required": [
+   "lineNumber",
+   "description",
+   "quantity",
+   "netAmount",
+   "taxAmount",
+   "grossAmount",
+   "taxCategory"
+  ],
+  "properties": {
+   "lineNumber": {
+    "type": "integer",
+    "minimum": 1
+   },
+   "orderId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "orderLineId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "description": {
+    "type": "string",
+    "maxLength": 500
+   },
+   "quantity": {
+    "type": "number"
+   },
+   "unitPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "discountAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "netAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "taxCodeId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "taxRate": {
+    "type": "number",
+    "minimum": 0,
+    "maximum": 100
+   },
+   "taxCategory": {
+    "$ref": "#/components/schemas/FinTaxCategory"
+   },
+   "taxAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "grossAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "creditedAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "grossAmountInLegalCurrency": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "readOnly": true,
+    "description": "The amount payable for the line in the legal currency (AED), Executive Regulation Art. 59(1)(h); equal to `grossAmount` on an invoice in the legal currency (CHG-FIN-011)."
+   }
+  }
+ },
+ "FinTaxInvoiceStatus": {
+  "type": "string",
+  "description": "`issued` until a credit memo is issued against it; `superseded` where a full invoice replaced a simplified one for the same supply (only if the law allows it; see issueTaxInvoice).",
+  "enum": [
+   "issued",
+   "partiallyCredited",
+   "fullyCredited",
+   "superseded"
+  ]
+ },
+ "FinTaxInvoiceType": {
+  "type": "string",
+  "description": "5.7.93. `simplified` for one order with no recipient details, `full` for one order with them, `consolidated` for several paid orders of one buyer on one invoice.\n**When a simplified tax invoice is allowed in the UAE** (research 2 October 2026, CHG-FIN-011; Executive Regulation, Cabinet Decision 52 of 2017 as amended, Art. 59(5)): the recipient is not VAT-registered, or is registered and the consideration does not exceed AED 10,000, and the reverse charge does not apply. Otherwise the invoice is `full`. Both kinds carry the title \"Tax Invoice\" (Art. 59(1)(a), 59(2)(a)); a simplified one is issued on the date of supply (Art. 59(13)(1)), a full one within 14 days (Decree-Law Art. 67(1)).",
+  "enum": [
+   "simplified",
+   "full",
+   "consolidated"
+  ]
+ },
+ "FxRateSource": {
+  "type": "string",
+  "description": "**Where the rate came from, and which provider specifically.** `source: provider` said a feed set it and not which one — two tenants on different feeds were indistinguishable in the ledger, and a rate cannot be defended in an audit without naming its origin.\n\n**`uaeCentralBank` is the default for AED pairs.** The UAE Central Bank publishes an official daily rate and it is what a UAE auditor expects to see — a commercial feed is defensible for tender and awkward for statutory reporting.\n\n**`openExchangeRates` and `ecb` are the commercial and reference options.** ECB publishes daily reference rates free and is the usual fallback for non-AED pairs; Open Exchange Rates is the common commercial feed with intraday granularity. **The choice is per purpose, not per platform** — a tender rate wants intraday, a reporting rate wants the official daily close.",
+  "enum": [
+   "manual",
+   "uaeCentralBank",
+   "ecb",
+   "openExchangeRates",
+   "cardScheme",
+   "provider"
+  ]
+ },
+ "FxRateValue": {
+  "x-ticvai-persistence-column": "numeric(18,6)",
+  "type": "string",
+  "pattern": "^\\d+(\\.\\d{1,6})?$",
+  "description": "**An exchange rate: a decimal string, never a float**, for the reason `Money.amount` is one (naming-and-style 5.1). Up to six decimal places — a two-place rate on a three-place currency loses money on every transaction, quietly — and stored as `numeric(18,6)` so the six places the wire carries survive the database.\n"
+ },
+ "KpiValue": {
+  "type": "object",
+  "description": "BI board 10.3. **Value, target, variance, direction and freshness in one read.**",
+  "properties": {
+   "kpiId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string"
+   },
+   "bucketStart": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "The start of the bucket this value covers, when `getKpiValues` was asked for an `interval`; null otherwise."
+   },
+   "groupKey": {
+    "type": "string",
+    "nullable": true,
+    "description": "The value of the `groupBy` dimension this row is for (a status, a category code, a tier); null when no `groupBy` was asked."
+   },
+   "name": {
+    "type": "string"
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "period": {
+    "type": "string"
+   },
+   "value": {
+    "$ref": "#/components/schemas/MetricValue"
+   },
+   "target": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/MetricValue"
+     }
+    ],
+    "nullable": true
+   },
+   "comparison": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/MetricValue"
+     }
+    ],
+    "nullable": true
+   },
+   "variancePercent": {
+    "type": "number",
+    "nullable": true
+   },
+   "direction": {
+    "type": "string",
+    "enum": [
+     "up",
+     "down",
+     "flat"
+    ]
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "green",
+     "amber",
+     "red",
+     "noTarget"
+    ]
+   },
+   "asOf": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "stale": {
+    "type": "boolean",
+    "description": "**True when the pipeline behind it has not refreshed.** A number nobody flagged as stale is a number somebody will act on.\n"
+   }
+  }
+ },
+ "MetricValue": {
+  "x-ticvai-persistence-column": "numeric(18,4)",
+  "description": "**A reading of a metric or KPI, or a threshold on one.** A `Money` where the metric is money-valued — `MetricSource` lists those in `x-ticvai-money-valued`, and a KPI is when its `unit` is `currency` — and a plain number otherwise. naming-and-style 5.1: money is never a float, at any layer.\nStored as `numeric(18,4)` either way: a money value stores its amount, and currency and scale resolve from the scope as they do for every `Money`.\n",
+  "oneOf": [
+   {
+    "type": "number"
+   },
+   {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   }
+  ]
+ },
  "Page": {
   "type": "object",
   "required": [
@@ -444,5 +1235,81 @@
    "queueBalancing",
    "itinerary"
   ]
+ },
+ "UnifiedReconciliation": {
+  "type": "object",
+  "description": "4.2.19. **Four sources and the variances between them.** A view showing each balanced against itself has not reconciled anything.\n",
+  "properties": {
+   "from": {
+    "type": "string",
+    "format": "date",
+    "description": "A day in the region's time zone, local midnight to local midnight."
+   },
+   "to": {
+    "type": "string",
+    "format": "date",
+    "description": "A day in the region's time zone, local midnight to local midnight."
+   },
+   "sources": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "source": {
+       "type": "string",
+       "enum": [
+        "pos",
+        "gateway",
+        "bank",
+        "wallet",
+        "ledger"
+       ]
+      },
+      "providerName": {
+       "type": "string",
+       "nullable": true
+      },
+      "total": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "transactionCount": {
+       "type": "integer"
+      }
+     }
+    }
+   },
+   "variances": {
+    "type": "array",
+    "description": "**Where two sources disagree, named.** A discrepancy is usually the gap between two of them rather than inside one, and *\"out by 240\"* without saying between what is not actionable.\n",
+    "items": {
+     "type": "object",
+     "properties": {
+      "between": {
+       "type": "array",
+       "description": "The two sources that disagree, as named in `sources[].source`.",
+       "minItems": 2,
+       "maxItems": 2,
+       "items": {
+        "type": "string",
+        "enum": [
+         "pos",
+         "gateway",
+         "bank",
+         "wallet",
+         "ledger"
+        ]
+       }
+      },
+      "amount": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "likelyCause": {
+       "type": "string",
+       "nullable": true
+      }
+     }
+    }
+   }
+  }
  }
 }

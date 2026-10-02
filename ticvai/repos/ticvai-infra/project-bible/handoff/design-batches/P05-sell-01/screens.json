@@ -152,53 +152,22 @@
    "regions": [
     {
      "name": "contentBody",
-     "slot": "record",
      "components": [
       {
-       "kind": "detailPanel",
-       "label": "The tenant app status",
-       "bindsTo": "TenantAppStatus",
-       "columns": [
-        "TenantAppStatus.isPublished",
-        "TenantAppStatus.publishedVersion",
-        "TenantAppStatus.publishedAt",
-        "TenantAppStatus.draftVersion",
-        "TenantAppStatus.hasUnpublishedChanges",
-        "TenantAppStatus.activeModuleCount",
-        "TenantAppStatus.licensedModuleCount",
-        "TenantAppStatus.activePageCount",
-        "TenantAppStatus.isInMaintenance",
-        "TenantAppStatus.maintenanceMessage",
-        "TenantAppStatus.expectedBackAt",
-        "TenantAppStatus.recentChanges"
-       ],
-       "operation": "getTenantAppStatus",
-       "provenance": "contract white-label.yaml GET /tenant-config/status"
+       "kind": "selectField",
+       "label": "Choose your language",
+       "bindsTo": "PublishedTenantConfig.languages",
+       "operation": "getPublishedTenantConfig",
+       "notes": "One large button per published language (`languages`), each in its own script; the right-to-left ones lay the kiosk out right to left. From the cached configuration when the kiosk is offline.",
+       "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-1)"
       },
       {
-       "kind": "detailPanel",
-       "label": "The tenant config",
-       "bindsTo": "TenantConfig",
-       "columns": [
-        "TenantConfig.isDraft",
-        "TenantConfig.brand",
-        "TenantConfig.appIcons",
-        "TenantConfig.bookingFlow",
-        "TenantConfig.theme",
-        "TenantConfig.fonts",
-        "TenantConfig.footer",
-        "TenantConfig.notificationBranding",
-        "TenantConfig.enabledPaymentMethods",
-        "TenantConfig.accessibility",
-        "TenantConfig.header",
-        "TenantConfig.navigation",
-        "TenantConfig.homepage",
-        "TenantConfig.modules",
-        "TenantConfig.features",
-        "TenantConfig.languages"
-       ],
-       "operation": "getTenantConfig",
-       "provenance": "contract white-label.yaml GET /tenant-config"
+       "kind": "banner",
+       "label": "Closed for maintenance",
+       "bindsTo": "TenantAppStatus.maintenanceMessage",
+       "operation": "getTenantAppStatus",
+       "notes": "Only when `isInMaintenance`: the tenant's message and expected-back time, and nothing can be bought.",
+       "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-1)"
       }
      ]
     }
@@ -208,8 +177,8 @@
    "loading": "The language select, read by `getTenantAppStatus`.",
    "error": "Could not load. Names which read failed and leaves the language select untouched.",
    "emptyFirstRun": "No language select yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
-   "emptyNoAccess": "Shown when the caller lacks `TENANT_CONFIGURE`, which `getTenantConfig` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "Not available"
+   "emptyNoAccess": "**A kiosk holds no permission and needs none** (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)): it sells to whoever is standing at it, and reads what the tenant has published like any visitor. A kiosk whose device registration is revoked goes out of service (KSK-014); it never shows a sign-in or names a permission.",
+   "offline": "**From the cached configuration.** The languages the kiosk last read stay on screen; buying waits for the connection."
   },
   "apis": [
    {
@@ -219,10 +188,11 @@
     "trigger": "onLoad"
    },
    {
-    "operationId": "getTenantConfig",
+    "operationId": "getPublishedTenantConfig",
     "contract": "white-label",
-    "purpose": "Full working configuration",
-    "trigger": "onLoad"
+    "purpose": "The published languages and branding the kiosk renders in, cached for offline (GFIX-1)",
+    "trigger": "onLoad",
+    "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-1)"
    }
   ],
   "wireframe": {
@@ -233,6 +203,14 @@
    "note": "**Drawn by Claude Design on `Kiosk Board 1.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "gaps": [
+   {
+    "operation": "getTenantConfig",
+    "removed": true,
+    "why": "Replaced by `getPublishedTenantConfig`, the guest read of the same data.",
+    "source": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-1)"
+   }
+  ],
   "_platform": {
    "code": "P05",
    "audience": "guest",
@@ -322,77 +300,18 @@
      "slot": "collection",
      "components": [
       {
-       "kind": "textField",
-       "label": "Venue id",
-       "operation": "listProducts",
-       "notes": "Sends `?venueId=` to `listProducts`.",
-       "provenance": "contract catalogue.yaml GET /products"
-      },
-      {
-       "kind": "textField",
-       "label": "Kind",
-       "operation": "listProducts",
-       "notes": "Sends `?kind=` to `listProducts`.",
-       "provenance": "contract catalogue.yaml GET /products"
-      },
-      {
-       "kind": "toggle",
-       "label": "Is sellable",
-       "operation": "listProducts",
-       "notes": "Sends `?isSellable=` to `listProducts`.",
-       "provenance": "contract catalogue.yaml GET /products"
-      },
-      {
-       "kind": "dataTable",
-       "label": "Every product",
+       "kind": "cardList",
+       "label": "What would you like?",
        "bindsTo": "Product",
        "columns": [
-        "Product.id",
-        "Product.code",
         "Product.name",
         "Product.description",
-        "Product.kind",
-        "Product.venueId",
-        "Product.scopePath",
-        "Product.createdByPrincipalId",
-        "Product.approvedByPrincipalId",
-        "Product.responsibleDepartmentId",
-        "Product.onSaleFrom",
-        "Product.onSaleTo"
+        "Product.media",
+        "Product.displayTags"
        ],
        "operation": "listProducts",
-       "provenance": "contract catalogue.yaml GET /products"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected product",
-       "bindsTo": "Product",
-       "columns": [
-        "Product.id",
-        "Product.code",
-        "Product.name",
-        "Product.description",
-        "Product.kind",
-        "Product.venueId",
-        "Product.scopePath",
-        "Product.createdByPrincipalId",
-        "Product.approvedByPrincipalId",
-        "Product.responsibleDepartmentId",
-        "Product.onSaleFrom",
-        "Product.onSaleTo",
-        "Product.lifecycleState",
-        "Product.isSellable",
-        "Product.hasVariants",
-        "Product.variantCount"
-       ],
-       "operation": "listProducts",
-       "provenance": "contract catalogue.yaml GET /products"
+       "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)",
+       "notes": "The venue is the one the guest picked on Home (`venueId` from the session, audit R267), never typed. Was the generated table 'Every product'; staff and plumbing columns removed (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3))."
       }
      ]
     }
@@ -402,8 +321,8 @@
    "loading": "The what are you list.",
    "error": "Could not load. Names which read failed and leaves the what are you untouched.",
    "emptyFirstRun": "No what are you yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
-   "emptyNoResults": "Nothing matches the filter on venueId, kind, isSellable and the what are you are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoResults": "Never shown: the kiosk sends no filter a guest chose; the venue is the kiosk's.",
+   "emptyNoAccess": "**A kiosk holds no permission and needs none** (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)): it sells to whoever is standing at it, and reads what the tenant has published like any visitor. A kiosk whose device registration is revoked goes out of service (KSK-014); it never shows a sign-in or names a permission.",
    "offline": "Not available"
   },
   "apis": [
@@ -489,14 +408,14 @@
     }
    ]
   },
-  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written.",
+  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written.\n\n**Tickets first, then date and time (decided by Chinmay, 2 October 2026; DEC-170).** The kiosk differs from the web and the app, which pick the date and time first (REV3-2); REV3-2 is superseded for the kiosk only. The order is KSK-003, KSK-004 (tickets), KSK-005 (session), as F07 already walks it (CHG-SGU-015).",
   "density": "touchLarge",
   "boardFrames": [
    "Kiosk Board 1.dc.html#KSK-004"
   ],
   "pattern": "listDetail",
   "patternReason": "`listProductVariants` reads the population and `getAvailability` reads one of them — list, select, act",
-  "purpose": "Quantities, with targets a gloved hand can hit.",
+  "purpose": "Choose the tickets first, then the date and time: quantities, with targets a gloved hand can hit.",
   "gaps": [
    {
     "operation": "getAvailability",
@@ -512,18 +431,16 @@
      "slot": "collection",
      "components": [
       {
-       "kind": "dataTable",
-       "label": "Every product variant",
+       "kind": "cardList",
+       "label": "Tickets",
        "bindsTo": "ProductVariant",
        "columns": [
-        "ProductVariant.id",
-        "ProductVariant.productId",
-        "ProductVariant.sku",
-        "ProductVariant.axisValues",
-        "ProductVariant.isActive"
+        "ProductVariant.name",
+        "ProductVariant.description"
        ],
        "operation": "listProductVariants",
-       "provenance": "contract catalogue.yaml GET /products/{productId}/variants"
+       "provenance": "corrected 2 October 2026 (CHG-SGU-015, decided by Chinmay 2 October 2026, DEC-170)",
+       "notes": "Large counters per ticket type; inactive variants never shown. Was the generated table 'Every product variant'; staff and plumbing columns removed (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3))."
       },
       {
        "kind": "dataTable",
@@ -541,7 +458,7 @@
    "error": "Could not load. Names which read failed and leaves the choose tickets untouched.",
    "emptyFirstRun": "No choose tickets yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
    "emptyNoResults": "Never shown: `listProductVariants` takes no filter, so an empty list is always the first-run state above.",
-   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `getAvailability` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "**A kiosk holds no permission and needs none** (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)): it sells to whoever is standing at it, and reads what the tenant has published like any visitor. A kiosk whose device registration is revoked goes out of service (KSK-014); it never shows a sign-in or names a permission.",
    "offline": "Not available"
   },
   "apis": [
@@ -647,18 +564,6 @@
    "template": "detail",
    "regions": [
     {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Acquire inventory hold",
-       "operation": "addCartLine",
-       "provenance": "contract catalogue.yaml POST /inventory-holds"
-      }
-     ]
-    },
-    {
      "name": "contentBody",
      "slot": "carried",
      "components": [
@@ -668,6 +573,13 @@
        "operation": "getAvailability",
        "notes": "Shows `channelCapacityId`, `performanceId`, `capacity`, `sold`, `leased`, `remaining`, `byChannel` from `getAvailability`'s inline response. **The response has no named schema**, so this cannot bind until the contract names one.",
        "provenance": "contract catalogue.yaml GET /availability"
+      },
+      {
+       "kind": "cardList",
+       "label": "Times",
+       "operation": "addCartLine",
+       "notes": "A tap on a time adds the chosen tickets for it (`addCartLine`), which takes the hold; the guest never sees the word hold.",
+       "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
       }
      ]
     }
@@ -677,7 +589,7 @@
    "loading": "The choose session list.",
    "error": "Could not load. Names which read failed and leaves the choose session untouched.",
    "emptyFirstRun": "No choose session yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
-   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `getAvailability` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "**A kiosk holds no permission and needs none** (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)): it sells to whoever is standing at it, and reads what the tenant has published like any visitor. A kiosk whose device registration is revoked goes out of service (KSK-014); it never shows a sign-in or names a permission.",
    "offline": "Not available"
   },
   "apis": [
@@ -702,30 +614,6 @@
    "note": "**Drawn by Claude Design on `Kiosk Board 1.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
-  "overlays": [
-   {
-    "id": "formAcquireInventoryHold",
-    "component": "modal",
-    "trigger": "Add to cart",
-    "body": "**Collects what `addCartLine` sends before it is called; the cart takes the hold server-side.** Required: `variantId`, `quantity`. Optional: `performanceId`, `seatIds`, `parentLineId`, `attributes`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "AddCartLineRequest",
-    "confirm": {
-     "label": "Add to cart",
-     "operation": "addCartLine"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "id",
-      "channelCapacityId",
-      "requestedUnits",
-      "ttlSeconds",
-      "channel"
-     ]
-    },
-    "provenance": "contract catalogue.yaml POST /inventory-holds"
-   }
-  ],
   "entryState": {
    "params": [
     {
@@ -818,14 +706,9 @@
        "label": "The cart",
        "bindsTo": "Cart",
        "columns": [
-        "Cart.id",
-        "Cart.token",
-        "Cart.venueId",
         "Cart.channel",
-        "Cart.subjectId",
         "Cart.status",
         "Cart.lines",
-        "Cart.conflicts",
         "Cart.subtotal",
         "Cart.discountTotal",
         "Cart.taxTotal",
@@ -837,30 +720,32 @@
        ],
        "operation": "getCart",
        "provenance": "contract orders.yaml GET /carts/{cartId}"
+      },
+      {
+       "kind": "banner",
+       "label": "Offers applied",
+       "operation": "evaluatePromotions",
+       "notes": "The promotions that apply and the near misses, evaluated by themselves (`evaluatePromotions`) and shown before payment (F75 step 4).",
+       "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
+      },
+      {
+       "kind": "numberField",
+       "label": "Quantity",
+       "operation": "addCartLine",
+       "notes": "A large stepper per line; + adds one more (`addCartLine`).",
+       "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
       }
      ]
     },
     {
      "name": "actionBar",
-     "slot": "rowActions",
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Add cart line",
-       "operation": "addCartLine",
-       "provenance": "contract orders.yaml POST /carts/{cartId}/lines"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Checkout cart",
+       "label": "Pay",
        "operation": "checkoutCart",
-       "provenance": "contract orders.yaml POST /carts/{cartId}/checkout"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Evaluate promotions",
-       "operation": "evaluatePromotions",
-       "provenance": "contract promotions.yaml POST /promotions/evaluate"
+       "notes": "Checks the cart out (`checkoutCart`) and goes to payment.",
+       "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
       }
      ]
     }
@@ -870,14 +755,14 @@
    "loading": "The review, read by `getCart`.",
    "error": "Could not load. Names which read failed and leaves the review untouched.",
    "emptyFirstRun": "No review yet. Offers Add cart line (`addCartLine`).",
-   "emptyNoAccess": "Shown when the caller lacks `PRICE_VIEW`, which `evaluatePromotions` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "**A kiosk holds no permission and needs none** (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)): it sells to whoever is standing at it, and reads what the tenant has published like any visitor. A kiosk whose device registration is revoked goes out of service (KSK-014); it never shows a sign-in or names a permission.",
    "offline": "Not available"
   },
   "apis": [
    {
     "operationId": "getCart",
     "contract": "orders",
-    "purpose": "The cart, priced and checked, right now",
+    "purpose": "The cart, priced and checked, right now With the guest session the device already holds: signed in, or the anonymous cart session a visitor gets with the first line (ADR-0045) (decided 2 October 2026 by Chinmay, fix before Block A starts (GFIX-6)).",
     "trigger": "onLoad"
    },
    {
@@ -916,73 +801,6 @@
    "note": "**Drawn by Claude Design on `Kiosk Board 1.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
-  "overlays": [
-   {
-    "id": "formAddCartLine",
-    "component": "modal",
-    "trigger": "Add cart line",
-    "body": "**Collects what `addCartLine` sends before it is called.** Required: `variantId`, `quantity`. Optional: `performanceId`, `seatIds`, `parentLineId`, `attributes`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "AddCartLineRequest",
-    "confirm": {
-     "label": "Add cart line",
-     "operation": "addCartLine"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "variantId",
-      "quantity",
-      "performanceId",
-      "seatIds",
-      "parentLineId",
-      "attributes"
-     ]
-    },
-    "provenance": "contract orders.yaml POST /carts/{cartId}/lines"
-   },
-   {
-    "id": "formCheckoutCart",
-    "component": "modal",
-    "trigger": "Checkout cart",
-    "body": "**Collects what `checkoutCart` sends before it is called.** Nothing in the body is required. Optional: `subjectId`, `attendees`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Checkout cart",
-     "operation": "checkoutCart"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "subjectId",
-      "attendees"
-     ]
-    },
-    "provenance": "contract orders.yaml POST /carts/{cartId}/checkout"
-   },
-   {
-    "id": "formEvaluatePromotions",
-    "component": "modal",
-    "trigger": "Evaluate promotions",
-    "body": "**Collects what `evaluatePromotions` sends before it is called.** Required: `venueId`, `channel`, `lines`. Optional: `subjectId`, `membershipTierId`, `couponCodes`, `evaluateAt`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "EvaluatePromotionsRequest",
-    "confirm": {
-     "label": "Evaluate promotions",
-     "operation": "evaluatePromotions"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "venueId",
-      "channel",
-      "lines",
-      "subjectId",
-      "membershipTierId",
-      "couponCodes",
-      "evaluateAt"
-     ]
-    },
-    "provenance": "contract promotions.yaml POST /promotions/evaluate"
-   }
-  ],
   "_platform": {
    "code": "P05",
    "audience": "guest",
@@ -1048,7 +866,7 @@
     }
    ]
   },
-  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. **Card only. No foreign cash** — a kiosk accepting foreign notes needs a note reader and a per-currency float, and neither is specified. A guest paying by card in a foreign currency is converted by their own issuer, which is not our rate. **Card only. No foreign cash** — a kiosk accepting notes needs a note reader and a per-currency float, and neither is specified. Dynamic currency conversion by the terminal is recorded as `fxRateSource: cardScheme`, because that rate is the scheme's rather than ours.",
+  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. **Card only. No foreign cash** — a kiosk accepting foreign notes needs a note reader and a per-currency float, and neither is specified. A guest paying by card in a foreign currency is converted by their own issuer, which is not our rate. **Card only. No foreign cash** — a kiosk accepting notes needs a note reader and a per-currency float, and neither is specified. Dynamic currency conversion by the terminal is recorded as `fxRateSource: cardScheme`, because that rate is the scheme's rather than ours.\n\n**The guest selects the currency and pays in it** (decided 2 October 2026, Chinmay; CHG-FIN-001; reverses the display-only rule, CF-37 and \"payment will be processed in AED\", in favour of option (b) of MoM 10 Aug 2026 4.7, DI-211). The venue lists the currencies a guest may pay in (`VenueSettings.chargeCurrencies`, a subset of the currencies it shows); `listFxRates` with `chargeable=true` returns them, each marked `chargeable`. The selected currency is sent at checkout (`checkoutCart.chargeCurrency`), the rate is locked on the order (`Order.chargeFxRate`, `chargeTotal`, until `chargeRateLockedUntil`), and the payment request goes to the payment partner in that currency. The ledger stays in the venue's base currency, with the rate recorded on the order, the payment and any refund. **Refunds go back in the currency paid**, at the sale rate, so a full refund returns exactly what was charged. A currency the venue shows but does not charge is still an approximate price, marked \"approx.\", with \"You pay in <base currency>\" beside it. **At the kiosk:** the guest may pick a chargeable currency before paying by card.",
   "density": "touchLarge",
   "boardFrames": [
    "Kiosk Board 1.dc.html#KSK-007"
@@ -1061,67 +879,27 @@
    "regions": [
     {
      "name": "contentBody",
-     "slot": "fields",
      "components": [
       {
-       "kind": "textField",
-       "label": "id",
-       "bindsTo": "CreatePaymentRequest.id",
-       "provenance": "contract orders.yaml POST /payments"
+       "kind": "paymentTerminal",
+       "label": "Tap, insert or scan to pay",
+       "operation": "createPayment",
+       "notes": "The amount due and the card terminal's prompt. The kiosk and the terminal fill the payment (`createPayment`): order, tender, amount and device are never typed. Card only (F75 step 5).",
+       "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
       },
-      {
-       "kind": "textField",
-       "label": "orderId",
-       "bindsTo": "CreatePaymentRequest.orderId",
-       "provenance": "contract orders.yaml POST /payments"
-      },
-      {
-       "kind": "textField",
-       "label": "tender",
-       "bindsTo": "CreatePaymentRequest.tender",
-       "provenance": "contract orders.yaml POST /payments"
-      },
-      {
-       "kind": "textField",
-       "label": "amount",
-       "bindsTo": "CreatePaymentRequest.amount",
-       "provenance": "contract orders.yaml POST /payments"
-      },
-      {
-       "kind": "textField",
-       "label": "tenderedAmount",
-       "bindsTo": "CreatePaymentRequest.tenderAmount",
-       "provenance": "contract orders.yaml POST /payments"
-      },
-      {
-       "kind": "textField",
-       "label": "walletAuthorisationId",
-       "bindsTo": "CreatePaymentRequest.walletAuthorisationId",
-       "provenance": "contract orders.yaml POST /payments"
-      },
-      {
-       "kind": "textField",
-       "label": "deviceId",
-       "bindsTo": "CreatePaymentRequest.deviceId",
-       "provenance": "contract orders.yaml POST /payments"
-      },
-      {
-       "kind": "textField",
-       "label": "recordedAt",
-       "bindsTo": "CreatePaymentRequest.recordedAt",
-       "provenance": "contract orders.yaml POST /payments"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "publish",
-     "components": [
       {
        "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "createPayment",
        "label": "Create payment",
-       "operation": "createPayment",
-       "provenance": "contract orders.yaml POST /payments"
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "createPayment"
       }
      ]
     }
@@ -1131,7 +909,7 @@
    "loading": "The saved payment.",
    "error": "Could not load. Names which read failed and leaves the payment untouched.",
    "emptyFirstRun": "No payment configured. The form opens empty and `createPayment` saves the first one; it says what the platform does in the meantime.",
-   "emptyNoAccess": "Shown when the caller lacks `ORDER_CREATE`, which `createPayment` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "**A kiosk holds no permission and needs none** (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)): it sells to whoever is standing at it, and reads what the tenant has published like any visitor. A kiosk whose device registration is revoked goes out of service (KSK-014); it never shows a sign-in or names a permission.",
    "offline": "Not available. **Card only, and card needs the acquirer**"
   },
   "apis": [
@@ -1258,7 +1036,7 @@
    "loading": "The saved payment unresolved.",
    "error": "Could not load. Names which read failed and leaves the payment unresolved untouched.",
    "emptyFirstRun": "No payment unresolved configured. The form opens empty and `inquirePaymentStatus` saves the first one; it says what the platform does in the meantime.",
-   "emptyNoAccess": "Shown when the caller lacks `ORDER_CREATE`, which `inquirePaymentStatus` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "**A kiosk holds no permission and needs none** (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)): it sells to whoever is standing at it, and reads what the tenant has published like any visitor. A kiosk whose device registration is revoked goes out of service (KSK-014); it never shows a sign-in or names a permission.",
    "offline": "Not applicable"
   },
   "apis": [
@@ -1366,22 +1144,16 @@
        "label": "The order",
        "bindsTo": "Order",
        "columns": [
-        "Order.id",
         "Order.orderNumber",
         "Order.channel",
-        "Order.venueId",
-        "Order.scopePath",
         "Order.status",
         "Order.currency",
-        "Order.currencyScale",
         "Order.grossAmount",
         "Order.taxAmount",
         "Order.netAmount",
         "Order.refundedAmount",
-        "Order.totalPriceVariance",
         "Order.lines",
-        "Order.payments",
-        "Order.principalId"
+        "Order.payments"
        ],
        "operation": "getOrder",
        "provenance": "contract orders.yaml GET /orders/{orderId}"
@@ -1394,9 +1166,9 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Transfer order tickets",
-       "operation": "transferOrderTickets",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
+       "label": "Send to my phone",
+       "operation": "reprintOrder",
+       "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
       }
      ]
     }
@@ -1406,20 +1178,21 @@
    "loading": "The ticket issued, read by `getOrder`.",
    "error": "Could not load. Names which read failed and leaves the ticket issued untouched.",
    "emptyFirstRun": "No ticket issued yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
-   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `getOrder` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "**A kiosk holds no permission and needs none** (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)): it sells to whoever is standing at it, and reads what the tenant has published like any visitor. A kiosk whose device registration is revoked goes out of service (KSK-014); it never shows a sign-in or names a permission.",
    "offline": "Not applicable"
   },
   "apis": [
    {
-    "operationId": "transferOrderTickets",
+    "operationId": "reprintOrder",
     "contract": "orders",
-    "purpose": "Transfer tickets to another guest",
-    "trigger": "onAction"
+    "purpose": "Send the guest's own tickets again, or print them (`reprintOrder`); a kiosk changes no owner (GFIX-3)",
+    "trigger": "onAction",
+    "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
    },
    {
     "operationId": "getOrder",
     "contract": "orders",
-    "purpose": "Read an order",
+    "purpose": "Read an order With the guest session the device already holds: signed in, or the anonymous cart session a visitor gets with the first line (ADR-0045) (decided 2 October 2026 by Chinmay, fix before Block A starts (GFIX-6)).",
     "trigger": "onLoad"
    }
   ],
@@ -1442,23 +1215,29 @@
   "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "overlays": [
    {
-    "id": "formTransferOrderTickets",
+    "id": "sendTickets",
     "component": "modal",
-    "trigger": "Transfer order tickets",
-    "body": "**Collects what `transferOrderTickets` sends before it is called.** Required: `ticketIds`, `recipient`. Optional: `message`. Dismissing sends nothing; the screen behind is unchanged.",
+    "trigger": "Send to my phone",
+    "body": "**Email or SMS, then the address.** `reprintOrder` with `delivery` email or sms for this order's tickets; nobody else becomes their owner.",
     "confirm": {
-     "label": "Transfer order tickets",
-     "operation": "transferOrderTickets"
+     "label": "Send to my phone",
+     "operation": "reprintOrder"
     },
     "dismiss": {
-     "label": "Cancel",
+     "label": "Back",
      "discards": [
-      "ticketIds",
-      "recipient",
-      "message"
+      "destination"
      ]
     },
-    "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
+    "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
+   }
+  ],
+  "gaps": [
+   {
+    "operation": "transferOrderTickets",
+    "removed": true,
+    "why": "A transfer changes the tickets' owner; at a kiosk the guest is resending or printing their own tickets, which is `reprintOrder` by email, SMS or print.",
+    "source": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
    }
   ],
   "_platform": {
@@ -1514,7 +1293,7 @@
      "to": "KSK-013",
      "trigger": "They call for help",
      "provenance": "flow F57 step 3→4",
-     "operation": "transferOrderTickets"
+     "operation": "reprintOrder"
     }
    ]
   },
@@ -1535,35 +1314,21 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Transfer order tickets",
-       "operation": "transferOrderTickets",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
+       "label": "Send to my phone",
+       "operation": "reprintOrder",
+       "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
       }
      ]
     },
     {
      "name": "contentBody",
-     "slot": "carried",
      "components": [
       {
-       "kind": "multiSelect",
-       "label": "Ticket ids",
-       "operation": "transferOrderTickets",
-       "notes": "Required.",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
-      },
-      {
-       "kind": "textField",
-       "label": "Recipient",
-       "operation": "transferOrderTickets",
-       "notes": "Required.",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
-      },
-      {
-       "kind": "textField",
-       "label": "Message",
-       "operation": "transferOrderTickets",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
+       "kind": "selectField",
+       "label": "Send to",
+       "notes": "Email or SMS, then the address on the kiosk keyboard. `reprintOrder` with `reason` `printerFault`: the sale stands and the tickets go to the guest's phone.",
+       "operation": "reprintOrder",
+       "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
       }
      ]
     }
@@ -1577,10 +1342,11 @@
   },
   "apis": [
    {
-    "operationId": "transferOrderTickets",
+    "operationId": "reprintOrder",
     "contract": "orders",
-    "purpose": "Transfer tickets to another guest",
-    "trigger": "onAction"
+    "purpose": "Send the guest's own tickets again, or print them (`reprintOrder`); a kiosk changes no owner (GFIX-3)",
+    "trigger": "onAction",
+    "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
    }
   ],
   "entryState": {
@@ -1600,6 +1366,14 @@
    "note": "**Drawn by Claude Design on `Kiosk Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "gaps": [
+   {
+    "operation": "transferOrderTickets",
+    "removed": true,
+    "why": "A transfer changes the tickets' owner; at a kiosk the guest is resending or printing their own tickets, which is `reprintOrder` by email, SMS or print.",
+    "source": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
+   }
+  ],
   "_platform": {
    "code": "P05",
    "audience": "guest",

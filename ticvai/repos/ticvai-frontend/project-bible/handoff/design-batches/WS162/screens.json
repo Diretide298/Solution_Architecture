@@ -368,6 +368,11 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Resource_Management_Configuration_Reference.pdf, page 120"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-014): No operation proposes named staff for a requirement.",
+    "source": "contracts/satellite/ai.yaml#/components/schemas/SuggestionKind"
    }
   ],
   "layout": {
@@ -632,7 +637,7 @@
    ]
   },
   "density": "compact",
-  "pattern": "configEditor",
+  "pattern": "listDetail",
   "patternReason": "the pack gives this screen a configuration directory (§Configured rule) and no display directory — it is settings, not a population",
   "purpose": "Translate forecast operational demand into specific workforce requirements.",
   "purposeNote": "Forecast demand is automatically translated into role, skill, certification, quantity, and time-specific workforce requirements.",
@@ -644,28 +649,72 @@
      "slot": "fields",
      "components": [
       {
-       "kind": "textField",
-       "label": "1 Lifeguard / 250 guests",
-       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 122 §Configured rule"
+       "kind": "dataTable",
+       "label": "Staffing requirements",
+       "bindsTo": "AiOperationalRequirement",
+       "columns": [
+        "AiOperationalRequirement.subjectRef",
+        "AiOperationalRequirement.periodStart",
+        "AiOperationalRequirement.periodEnd",
+        "AiOperationalRequirement.quantity",
+        "AiOperationalRequirement.quantityP90",
+        "AiOperationalRequirement.unit",
+        "AiOperationalRequirement.productivityStandard",
+        "AiOperationalRequirement.status"
+       ],
+       "operation": "listOperationalRequirements",
+       "provenance": "contract ai.yaml GET /operational-requirements"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected requirement",
+       "bindsTo": "AiOperationalRequirement",
+       "columns": [
+        "AiOperationalRequirement.kind",
+        "AiOperationalRequirement.targetContract",
+        "AiOperationalRequirement.decisionNote",
+        "AiOperationalRequirement.decidedAt",
+        "AiOperationalRequirement.handoverRef"
+       ],
+       "operation": "listOperationalRequirements",
+       "provenance": "contract ai.yaml GET /operational-requirements"
       },
       {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listOperationalRequirements",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
-      },
+       "kind": "detailPanel",
+       "label": "Productivity standards",
+       "bindsTo": "AiVenueSettings",
+       "columns": [
+        "AiVenueSettings.staffProductivity",
+        "AiVenueSettings.capacity",
+        "AiVenueSettings.updatedAt"
+       ],
+       "operation": "getAiVenueSettings",
+       "notes": "Standards live on the venue AI profile, not on this screen. A lifeguard ratio (\"1 per 250 guests present\") is a concurrent ratio, not units per staff hour; the ratio kind is a logged contract gap (CHG-SBO-005).",
+       "provenance": "contract ai.yaml GET /venues/{venueId}/ai-settings"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
       {
        "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "decideOperationalRequirement",
-       "notes": "The act the screen exists for."
+       "label": "Decide requirement",
+       "operation": "decideOperationalRequirement",
+       "provenance": "contract ai.yaml POST /operational-requirements/{requirementId}/decide"
       },
       {
        "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "decideOperationalRequirement"
+       "label": "Save productivity standards",
+       "operation": "setAiVenueSettings",
+       "provenance": "contract ai.yaml PUT /venues/{venueId}/ai-settings"
       }
      ]
     }
@@ -674,7 +723,7 @@
   "states": {
    "loading": "The staffing requirement forecast configuration as saved.",
    "error": "Could not load. Names which read failed and leaves the staffing requirement forecast untouched.",
-   "emptyFirstRun": "No staffing requirement forecast configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyFirstRun": "No staffing requirement issued for this period yet; they appear when a forecast version is published. Offers no create action: requirements come from the forecast.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },
@@ -706,6 +755,20 @@
     "purpose": "AI staffing requirement against the rota (basis=forecastRequirement): forecast figure, p90, version, gap",
     "trigger": "onLoad",
     "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "getAiVenueSettings",
+    "contract": "ai",
+    "purpose": "The venue AI profile, where productivity standards are kept",
+    "trigger": "onLoad",
+    "provenance": "design-note correction, 2 October 2026 (BO-927)"
+   },
+   {
+    "operationId": "setAiVenueSettings",
+    "contract": "ai",
+    "purpose": "Set the productivity standards on the venue AI profile",
+    "trigger": "onAction",
+    "provenance": "design-note correction, 2 October 2026 (BO-927)"
    }
   ],
   "wireframe": {
@@ -719,9 +782,61 @@
     {
      "name": "requirementId",
      "from": "navigation"
+    },
+    {
+     "name": "venueId",
+     "from": "session"
     }
    ]
   },
+  "overlays": [
+   {
+    "id": "formDecideOperationalRequirement",
+    "component": "modal",
+    "trigger": "Decide requirement",
+    "body": "**Collects what `decideOperationalRequirement` sends before it is called.** Required: `decision`. Optional: `quantity`, `note`. `decision` is accept, modify (with `quantity`) or reject; a person then creates the shifts (coverage target only, DEC default for BO-927). Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Decide requirement",
+     "operation": "decideOperationalRequirement"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "decision",
+      "quantity",
+      "note"
+     ]
+    },
+    "provenance": "contract ai.yaml POST /operational-requirements/{requirementId}/decide"
+   },
+   {
+    "id": "formSetAiVenueSettings",
+    "component": "modal",
+    "trigger": "Save productivity standards",
+    "body": "**Collects what `setAiVenueSettings` sends before it is called.** Required: `venueId`, `venueType`. Optional: `isOutdoor`, `capacity`, `openingHours`, `typicalWeekdayAttendance`, `typicalWeekendAttendance`, `peakMonths`, `averageSpend`, `fnbAttachRate`, `staffProductivity`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save productivity standards",
+     "operation": "setAiVenueSettings"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "venueId",
+      "venueType",
+      "isOutdoor",
+      "capacity",
+      "openingHours",
+      "typicalWeekdayAttendance",
+      "typicalWeekendAttendance",
+      "peakMonths",
+      "averageSpend",
+      "fnbAttachRate",
+      "staffProductivity"
+     ]
+    },
+    "provenance": "contract ai.yaml PUT /venues/{venueId}/ai-settings"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1350,8 +1465,8 @@
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
-  "purpose": "Allow managers to interact with the complete Resource Management module using natural- language questions and commands. Provide TICVAI employees and operational managers with a mobile-first Resource Operations Workspace where they can see their schedules and assignments, receive operational instructions, check in and out, manage resource handovers, submit workforce requests, approve operational actions, and receive real-time notifications. Board 9 shall expose the appropriate functions through the TICVAI Employee App rather than creating a separate Resource Management mobile application. The mobile experience shall consume the same centralized services used by the TICVAI backend: Resource Master → Calendar → Workforce → Assignment → Attendance → Assets → Events → AI → Mobile Therefore, an assignment changed in the backend must immediately appear in the employee's application, subject to synchronization and connectivity. The experience must be designed for frontline operations: Minimal typing Large touch targets Scan-first workflows Clear status Fast confirmation Mobile notifications Offline support where required Role-specific interfaces Real-time synchronization Arabic and English Primary matrix coverage: 1.2.60–1.2.66. Supporting coverage: 1.2.11, 1.2.17, 1.2.30–1.2.38, 1.2.52, 1.2.60–1.2.66, 1.2.80–1.2.81.",
-  "purposeNote": "Authorized users can query, analyze, simulate, and initiate governed resource-management actions conversationally without bypassing normal platform permissions or approval controls. Board 8 — AI Decision Architecture Board 8 should operate through a common Resource Intelligence Layer consuming trusted operational data from the Resource Management domain.",
+  "purpose": "Ask the Resource Management module questions and give it commands in plain language, from the back office.",
+  "purposeNote": "Authorized users can query, analyze, simulate, and initiate governed resource-management actions conversationally without bypassing normal platform permissions or approval controls. Board 8 — AI Decision Architecture Board 8 should operate through a common Resource Intelligence Layer consuming trusted operational data from the Resource Management domain. Purpose rewritten 2 October 2026 (CHG-WIR-013): The purpose carried pasted board text describing the Employee App's mobile workspace; the mobile part belongs to the Staff App, and this screen is the back-office copilot (design-notes correction ai BO-932).",
   "gaps": [
    {
     "operation": null,

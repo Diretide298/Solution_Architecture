@@ -1,4 +1,42 @@
 {
+ "approveDevice": {
+  "method": "POST",
+  "path": "/devices/{deviceId}/approval",
+  "contract": "tenancy",
+  "summary": "Approve a device into production, or reject it",
+  "permission": "DEVICE_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "RegisteredDevice"
+ },
+ "enrolDevice": {
+  "method": "POST",
+  "path": "/devices/{deviceId}/enrolment",
+  "contract": "tenancy",
+  "summary": "Take a registered device through enrolment to activation",
+  "permission": "DEVICE_MANAGE",
+  "offlineCapable": null,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "DeviceEnrolment",
+  "responds": "RegisteredDevice"
+ },
  "listAccessPoints": {
   "method": "GET",
   "path": "/access-points",
@@ -308,25 +346,6 @@
   ],
   "requestBody": "TurnstileLaneBehaviorConfigurationInput",
   "responds": "TurnstileLaneBehaviorConfigurationView"
- },
- "setTurnstileMode": {
-  "method": "PUT",
-  "path": "/access-points/{accessPointId}/mode",
-  "contract": "access",
-  "summary": "Set the operating mode of an access point",
-  "permission": "TURNSTILE_MODE_SET",
-  "offlineCapable": true,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "AccessPoint"
  },
  "setValidationOutcomeGuest": {
   "method": "PUT",

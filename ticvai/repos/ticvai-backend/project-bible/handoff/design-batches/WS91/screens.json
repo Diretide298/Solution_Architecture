@@ -714,105 +714,35 @@
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
-  "purpose": "Connect Rental Management to TICVAI's broader Dynamic Pricing capability without duplicating the core Dynamic Pricing module. The original rental requirements explicitly support dynamic pricing.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
-    "source": "pack Rental_Management.pdf, page 42"
-   },
-   {
-    "operation": null,
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
-    "source": "pack Rental_Management.pdf, page 42"
-   }
-  ],
+  "purpose": "Connect Rental Management to TICVAI's broader Dynamic Pricing capability without duplicating the core Dynamic Pricing module. The original rental requirements explicitly support dynamic pricing (merged into ADM-088 Dynamic Pricing Strategy Command Center).",
   "layout": {
    "template": "split",
    "regions": [
     {
      "name": "actionBar",
      "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Accept | Modify | Reject | Schedule",
-       "provenance": "pack Rental_Management.pdf, page 42 §Actions"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Transition dynamic pricing strategy",
-       "operation": "transitionDynamicPricingStrategy",
-       "permission": "PRICE_CONFIGURE",
-       "notes": "**The strategy's status moves, as calls** (29 September, writers pass).",
-       "provenance": "contract catalogue.yaml POST /dynamic-pricing-strategies/{strategyId}/lifecycle"
-      }
-     ]
+     "components": []
     },
     {
      "name": "contentBody",
-     "components": [
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listDynamicPricingStrategy",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
-      }
-     ]
+     "components": []
     }
    ]
   },
   "states": {
-   "loading": "The dynamic pricing recommendation list.",
-   "error": "Could not load. Names which read failed and leaves the dynamic pricing recommendation untouched.",
-   "emptyFirstRun": "No dynamic pricing recommendation yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the dynamic pricing recommendation are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "loading": "Routes to ADM-088 while it opens.",
+   "error": "Could not open ADM-088; says so and offers to retry.",
+   "emptyFirstRun": "Never shown: this id routes to ADM-088, whose empty states apply.",
+   "emptyNoResults": "Never shown: this id routes to ADM-088.",
+   "emptyNoAccess": "As ADM-088: shown when the caller lacks the access ADM-088 requires, named in words."
   },
-  "apis": [
-   {
-    "operationId": "listDynamicPricingStrategy",
-    "contract": "catalogue",
-    "purpose": "Dynamic pricing",
-    "trigger": "onLoad",
-    "provenance": "board reading, 19 September 2026"
-   },
-   {
-    "operationId": "transitionDynamicPricingStrategy",
-    "contract": "catalogue",
-    "purpose": "Activate, pause, resume or retire a dynamic pricing strategy",
-    "trigger": "onAction",
-    "invalidates": [
-     "listDynamicPricingStrategy"
-    ]
-   }
-  ],
+  "apis": [],
   "wireframe": {
    "status": "notStarted",
    "board": "wireframes/P08 Venue Management.dc.html#bo-528",
    "workshopBoard": "wireframes/WS119 Rental Management Board 4.dc.html#bo-528"
   },
-  "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 42. 0 of 0 labels bound to a contract property; 1 of 22 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Accept | Modify | Reject | Schedule dropped (AI design pending review (accept/modify/reject/schedule acts on AI pricing recommendations; would bind ai decideProposedAction)).",
-  "overlays": [
-   {
-    "id": "formTransitionDynamicPricingStrategy",
-    "component": "modal",
-    "trigger": "Transition dynamic pricing strategy",
-    "body": "**Collects what `transitionDynamicPricingStrategy` sends before it is called.** Required: `action`. Optional: `reason`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Transition dynamic pricing strategy",
-     "operation": "transitionDynamicPricingStrategy"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "action",
-      "reason"
-     ]
-    },
-    "provenance": "contract catalogue.yaml POST /dynamic-pricing-strategies/{strategyId}/lifecycle"
-   }
-  ],
+  "apisNote": "No operations of its own since 2 October 2026 (CHG-SBO-021): merged into ADM-088, whose operations it routes to.",
   "entryState": {
    "params": [
     {
@@ -822,6 +752,7 @@
     }
    ]
   },
+  "notes": "**Merged into ADM-088** (decided 2 October 2026, Chinmay: duplicate screens merged as proposed; CHG-SBO-021). Rental dynamic pricing is the one dynamic pricing strategy list (ADM-088), filtered to rental resources; BO-528 duplicated it with the same list operation. **One implementation, both ids kept**, as the M24-03 merges do: this id stays for traceability and routes to ADM-088, and nothing on it is built separately.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1403,6 +1334,12 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Rental_Management.pdf, page 46"
+   },
+   {
+    "operation": "listCommercialPricing",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-008): listCommercialPricing is ticket catalogue pricing, not rental pricing; bulk-attached (R254; design-notes correction fnb-retail BO-533).",
+    "source": "contracts/spine/catalogue.yaml#listCommercialPricing | R254"
    }
   ],
   "layout": {
@@ -1411,12 +1348,6 @@
     {
      "name": "contentBody",
      "components": [
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listCommercialPricing",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
-      },
       {
        "kind": "primaryButton",
        "derived": true,
@@ -1437,17 +1368,11 @@
   "states": {
    "loading": "The pricing simulation validation list.",
    "error": "Could not load. Names which read failed and leaves the pricing simulation validation untouched.",
-   "emptyFirstRun": "No pricing simulation validation yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No pricing simulation validation yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the pricing simulation validation are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
-   {
-    "operationId": "listCommercialPricing",
-    "contract": "catalogue",
-    "purpose": "Commercial Pricing Command Center",
-    "trigger": "onLoad"
-   },
    {
     "operationId": "simulateRentalPricing",
     "contract": "rental",

@@ -346,6 +346,25 @@
   "requestBody": null,
   "responds": "ValidationExceptionReasonCodeManagerView"
  },
+ "lockIdentity": {
+  "method": "POST",
+  "path": "/identity-locks",
+  "contract": "access",
+  "summary": "Lock an identity",
+  "permission": "INCIDENT_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "IdentityLockInput",
+  "responds": "AccessIdentityLock"
+ },
  "overrideAccess": {
   "method": "POST",
   "path": "/access/override",
@@ -364,6 +383,44 @@
   ],
   "requestBody": null,
   "responds": "ValidationResult"
+ },
+ "releaseIdentityLock": {
+  "method": "POST",
+  "path": "/identity-locks/{lockId}/release",
+  "contract": "access",
+  "summary": "Release an identity lock",
+  "permission": "INCIDENT_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AccessIdentityLock"
+ },
+ "setAccessPointDirection": {
+  "method": "PUT",
+  "path": "/access-points/{accessPointId}/direction",
+  "contract": "access",
+  "summary": "Switch a gate's direction live",
+  "permission": "ACCESS_DIRECTION_SET",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AccessPoint"
  },
  "setOperationalIncidentException": {
   "method": "PUT",
@@ -440,24 +497,5 @@
   ],
   "requestBody": null,
   "responds": "AccessPoint"
- },
- "startPodiumShift": {
-  "method": "POST",
-  "path": "/podiums/{podiumId}/shifts",
-  "contract": "access",
-  "summary": "Start an operator shift on a podium",
-  "permission": "TURNSTILE_MODE_SET",
-  "offlineCapable": true,
-  "conflictPolicy": "append",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "AccessPodiumShift"
  }
 }

@@ -55,6 +55,19 @@
   "requestBody": null,
   "responds": "PaymentPerformanceRow"
  },
+ "getPaymentRules": {
+  "method": "GET",
+  "path": "/payments/rules",
+  "contract": "payments",
+  "summary": "Currency, eligibility and fee rules as one set",
+  "permission": "PAYMENT_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "PaymentRuleSet"
+ },
  "inquirePaymentStatus": {
   "method": "POST",
   "path": "/payments/{paymentId}/inquiry",

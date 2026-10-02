@@ -51,8 +51,8 @@
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
-  "purpose": "Provide management with a consolidated backend view of the financial, commercial, sponsorship, attendance and operational performance of events.",
-  "purposeNote": "Authorized users can obtain a consolidated view of event commercial and operational performance while data visibility remains controlled by tenant, entity and role permissions.",
+  "purpose": "See the events in the catalogue with their type, dates and status, and open one to configure it.",
+  "purposeNote": "Authorized users can obtain a consolidated view of event commercial and operational performance while data visibility remains controlled by tenant, entity and role permissions. Purpose rewritten 2 October 2026 (CHG-WIR-026): The purpose was pack text attached by page rather than by screen and does not describe this screen; it is rewritten from the screen's name and operations (design-notes correction ticketing-backoffice BO-694)",
   "gaps": [
    {
     "operation": null,
@@ -163,8 +163,8 @@
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
-  "purpose": "Configure dashboards used to measure event sales, attendance and check-in performance.",
-  "purposeNote": "Authorized users can monitor configured sales and attendance KPIs with current check-in information supplied by shared Ticketing and Access Control services.",
+  "purpose": "Define the event types and the default behaviour each type gives the events created from it.",
+  "purposeNote": "Authorized users can monitor configured sales and attendance KPIs with current check-in information supplied by shared Ticketing and Access Control services. Purpose rewritten 2 October 2026 (CHG-WIR-026): The purpose was pack text attached by page rather than by screen and does not describe this screen; it is rewritten from the screen's name and operations (design-notes correction ticketing-backoffice BO-695)",
   "gaps": [
    {
     "operation": null,
@@ -185,23 +185,22 @@
      "components": [
       {
        "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listEventTypes",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
-      },
+       "label": "Event types",
+       "operation": "listEventTypes",
+       "provenance": "contract catalogue.yaml GET /event-types"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
       {
        "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "setEventType",
        "label": "Save event type",
-       "notes": "The act the screen exists for."
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "setEventType"
+       "operation": "setEventType",
+       "notes": "**Applies to the whole tenant**: `setEventType` writes at tenant scope while the list reads the venue's; the dialog says so.",
+       "provenance": "contract catalogue.yaml PUT /event-types"
       }
      ]
     }
@@ -239,6 +238,34 @@
    "workshopBoard": "wireframes/WS48 Event Management Configuration Backend Structure v1.0 Board 1.dc.html#bo-695"
   },
   "apisNote": "Regenerated 9 September 2026 from Event_Management_Configuration_Backend_Structure_v1.0.pdf page 85. 0 of 0 labels bound to a contract property; 0 of 28 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetEventType",
+    "component": "modal",
+    "trigger": "Save event type",
+    "body": "**Collects what `setEventType` sends before it is called.** Required: `code`, `name`. Optional: `hasPerformances`, `capacityBasis`, `ticketNamesDate`, `multiDay`, `requiresRegistration`, `requiresAccreditation`, `seatingModesAllowed`, `defaultLifecycle`. `id` is a client UUIDv7 generated silently, never asked. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save event type",
+     "operation": "setEventType"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "code",
+      "name",
+      "hasPerformances",
+      "capacityBasis",
+      "ticketNamesDate",
+      "multiDay",
+      "requiresRegistration",
+      "requiresAccreditation",
+      "seatingModesAllowed",
+      "defaultLifecycle"
+     ]
+    },
+    "provenance": "contract catalogue.yaml PUT /event-types"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -299,8 +326,8 @@
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
-  "purpose": "Configure automatic invoice generation for eligible event-related customers and commercial accounts.",
-  "purposeNote": "Eligible event transactions can trigger automated invoice requests with complete event and customer references while financial posting remains controlled by Finance.",
+  "purpose": "Copy an existing event, with the parts and dates chosen, to start a new one.",
+  "purposeNote": "Eligible event transactions can trigger automated invoice requests with complete event and customer references while financial posting remains controlled by Finance. Purpose rewritten 2 October 2026 (CHG-WIR-026): The purpose was pack text attached by page rather than by screen and does not describe this screen; it is rewritten from the screen's name and operations (design-notes correction ticketing-backoffice BO-696)",
   "gaps": [
    {
     "operation": null,
@@ -331,6 +358,13 @@
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
        "impliedBy": "cloneEvent"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Read an event",
+       "bindsTo": "Event",
+       "operation": "getEvent",
+       "provenance": "contract catalogue.yaml GET /events/{eventId}; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -353,6 +387,13 @@
     "invalidates": [
      "listEvents"
     ]
+   },
+   {
+    "operationId": "getEvent",
+    "contract": "catalogue",
+    "purpose": "Read an event",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {

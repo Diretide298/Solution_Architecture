@@ -1,6 +1,6 @@
 # WS158 — Resource Management Configuration board 4
 
-**10 screens · 15 operations · 17 schemas · 5 permissions**
+**10 screens · 15 operations · 18 schemas · 5 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -61,6 +61,66 @@ convincingly. It is never a caption.
   and its error; and, element by element, what is shown and in what format, what each action
   produces and where the user goes next. Draw exactly that.
 
+## The processes these screens belong to
+
+Written by the owner of each process (`handoff/design-notes/`). Read before any screen: it says how the process runs end to end and which words the screens must use.
+
+### Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue)
+
+Venue operations is everything that happens after a sale and inside the gates. A guest's ticket is one virtual ticket with interchangeable media (QR, dynamic QR, RFID wristband, NFC, Face Pass or Face Tag); at an access point a scanner (P07, or the scan function inside the Staff App P06) validates the media against the admission profile and the guest admission policy, offline if it must, and every deny carries a reason and a next action. The back office (Venue Management P08) configures that estate: the venue topology (venue, park, zone, attraction, access point, gate and lane, device placement), admission profiles and rules (entry, exit, re-entry, anti-passback, validity, crossover, companions), credential security (dynamic QR, device binding, beacons), biometrics, gate modes, and the live operations, fraud and monitoring views. Accreditation (P08 setup and review, P11 web portal for applicants, web first) takes an applicant from a configurable form through document checks, OCR, duplicate blocking and multi-level approval to a credential with zone rights. Resources and capacity manage bookable resources (rooms, vehicles, equipment, cabanas, instructors) that are booked as a consequence of selling a product, never sold directly. Workforce covers shift templates, rosters, attendance, swaps and breaks, mirrored on the Staff App. Maintenance and safety cover the asset register, preventive calendars, work orders with scored priority, inspections and incidents, with technicians working from the Staff App. Games and rides configure readers, credit types and consumption priority, play entitlements, game pricing, retry pricing, redemption and the card lifecycle. The virtual queue (Q1) gives a guest a live wait time and a return window for a ride; it is not the on-sale waiting room (Q2). Every calendar has day, week and month views. Configuration resolves tenant, region, venue (outlet only for F&B and retail), and a user's permissions, never the device, decide what they may do. The guest apps (P01, P02) show the guest's side of this: My Tickets, the scan code, Face Pass, wait times, the virtual queue, map booking of cabanas and the visit planner.
+*(source: F06 step 1 / F112 step 1 / F111 step 1 / ADR-0002 / ADR-0012 / ADR-0018 / ADR-0041 / ADR-0066 / ADR-0067 / ADR-0068 / DI-652 / DI-627 / DI-640 / DI-654 / DI-666 / DI-482 / DI-483 / DI-907 / DI-919 / DI-923 / DI-865 / DI-678 / TRACKER Actions row 160 / MoM 2026-09-02 AccessControl / MoM 2026-09-07 …)*
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Ticket | The one virtual record a guest owns (ticket number, product, validity, entries). Its number never changes, whatever media carries it or whoever it is transferred or resold to. | Pass (unless the product is a pass), Booking, Order line | DI-652 / DI-620 / contracts/spine/access.yaml#/components/schemas/TicketStatus |
+| Media | What the ticket is presented by at a gate (QR code, dynamic QR, wristband/RFID card, NFC, Face Pass, Face Tag). One ticket can carry several media as fallbacks; a media code can also cover several tickets scanned as one group. Show one … | Credential (for guest media; keep Credential for accreditation badges and staff), Ticket code | DI-180 / DI-608 / DI-652 |
+| Access point | A place where a scan is judged, with a fixed direction (entry, exit, re-entry, crossover). Hierarchy shown to users is Venue > Park > Zone > Attraction > Access point > Gate/lane > Device. | Scanner (that is the device), Door | screens/P08-venue-back-office.yaml#BO-144 / … |
+| Admission profile | The named set of rules an access point enforces (opening window, entries, exit scan, re-entry, validity, crossover). Products point at a profile; tiers such as Bronze/Silver/Gold are profiles with gate allow and deny lists. | Admission rules (as a screen title), Access rule set | DI-185 / contracts/spine/access.yaml#/components/schemas/AdmissionRules |
+| Admitted / Denied / Overridden | The three scan outcomes. A denial is always shown with its reason in plain words and a next action; an override is a supervisor admitting despite a denial, and is always attributed and reasoned. | Valid/Invalid, Success/Fail, Error | contracts/spine/access.yaml#/components/schemas/ScanOutcome / … |
+| Used | A ticket entry is used the moment a scan succeeds, whether or not the guest physically passed. Mistakes are resolved from the scan history, not by un-scanning. | Redeemed (for admission), Checked in (that is group check-in, a different step) | DI-627 / TRACKER Actions row 221 / TRACKER Actions row 189 |
+| Gate mode | What a lane is doing now, set live by the podium or supervisor - Normal, Free flow (counts, does not validate), Drop arm (everybody through, evacuation), Closed (nobody through), Podium (staff validating by eye), Maintenance. Direction is … | Turnstile mode (as a label for direction), Open/Locked | contracts/spine/access.yaml#/components/schemas/AccessPointOperatingMode / R221 |
+| Offline package | What a scanner holds to validate with no network - entitlements, blacklist, admission profiles and the active guest admission policy version - with its age always visible. | Cache, Local DB | F06 step 3 / ADR-0068 |
+| Sync and reconciliation | Sending the offline scan journal to the server, and the duty manager's review of scans the server rejected after the device had already admitted the guest. | Upload, Retry | F06 step 6 / DI-065 |
+| Face Pass / Face Tag | Face Pass is the long-lived face credential for members and season-pass holders (renewable); Face Tag is short-lived, for one day or event. Retention is set per tier by the venue. | Face ID, Biometric login | DI-640 / ADR-0063 |
+| Accreditation / Credential (accreditation) | Accreditation is the application and approval of a person (media, contractor, corporate, staff of a partner) for an event or season; the credential is what is issued after approval (photo badge, QR or RFID) with zone access rights. | Registration (for the whole process), Ticket | DI-654 / DI-662 |
+| Resource | A bookable thing or person a product needs (room, vehicle, cabana, equipment set, instructor). Guests buy products; resources are assigned to the booking, pre-assigned or dynamically. | Asset (that is maintenance), Inventory (that is stock) | DI-475 / DI-482 / TRACKER Actions row 160 |
+| Asset | A physical item maintained by the venue (ride, turnstile, printer, pump) with a register record, documents, warranty and maintenance history. | Resource, Device (unless it is an IT device in the device register) | DI-910 / ADR-0067 |
+| Work order | A unit of maintenance work, lifecycle Created > Assigned > In progress > Review > Closed, with a resolution timer. | Ticket (reserved for guest tickets), Job card | DI-231 |
+| Game / attraction (games module) | In the games and rides module an attraction is an individual game or ride (roller coaster, racing game, bumper cars), not a venue. | Venue, Park | DI-863 |
+| Virtual queue / Return window | A guest's place in a ride's queue held without standing in line, with a return window (for example 4:50 to 5:00 PM) that recalculates live. Distinct from the walk-in line and the VIP/express lane, and from the on-sale waiting room. | Waiting room, Fast pass (that is the express product), Booking | DI-675 / DI-678 / DI-679 / ADR-0066 |
+| Wait time source | Where a ride's wait time comes from - Sensor, Throughput, Manual, or Unavailable - always shown beside the number. | Live (when the source is manual) | contracts/satellite/queue.yaml#/components/schemas/WaitTimeSource / DI-315 |
+
+### Finance, Ledger & Tax · Reporting & Analytics
+
+Finance and insights run underneath every sale. A sale at a till (P04), kiosk, web storefront (P01) or guest app (P02) is priced and taxed per line at the moment of sale, recorded in the venue's base currency (AED in the UAE; 2 decimals, or 3 for BHD, KWD and OMR, never rounded away), and posted to an append-only dual ledger through account mappings per money event; anything unmapped lands in suspense. Tax follows the jurisdiction's tax profile: inclusive or exclusive, compound where a tax applies on another, zero-rated or exempt with verified evidence, and computed on the discounted price by default or on the price before discount where the region requires it (Egypt). A guest may select a currency the venue charges and pay in it: the rate is locked on the order, the payment partner is asked in that currency, the ledger keeps the base amount with the rate, and a refund goes back in the currency paid (decided 2 October 2026, Chinmay); a currency shown but not charged is an approximate price. Foreign cash at a till is recorded at its base equivalent and change is given in base currency. A paid order can carry a VAT receipt (simplified tax invoice), a full tax invoice with the buyer's TRN, or a consolidated invoice for a company, each numbered without gaps and never edited; corrections are credit memos. Revenue is recognised by rule: POS-style immediate, tickets on the visit, gift cards and wallet on use, annual passes straight-line or per visit, breakage on expiry; deferred revenue is a balance that ages. Each venue's day is reconciled (POS cash, gateways, bank, wallet against the ledger, provider files matched automatically, only genuine mismatches to a person); chargebacks are defended against the bank's deadline; month end runs seven close checks and goes to a finance approver. Nothing posted is deleted: a correction is a reversal, an approver is never the preparer, and ledger approval needs a second factor. Back-office finance lives in Venue Management (P08: chart of accounts, mapping, FX, journals, recognition, reconciliation, period close, chargebacks); tax profiles, calculation validation and platform reconciliation in the TICVAI Console (P09); partner settlement in P10. Reporting is one consolidated, permission-based area (Analytics, P16): seeded standard dashboards and reports plus no-code builders over a governed business catalogue; the P08 report screens, the POS terminal day view and the kitchen performance view are scoped windows onto the same definitions and must show the same numbers. Every figure is read from a lag-tolerant reporting copy and shows its "as of" time; scope comes from the person's rights, never from a filter; AI explains and recommends but never acts, answers only within the person's role, labels forecasts, and is phase two for finance ledgers.
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Base currency | The venue's region currency; the currency every record and ledger posting is in. A guest may pay in a currency they select (where the venue charges it); the books still hold the base amount and the rate. | Home currency, Local price, Default currency | DI-211 / DI-282 / contracts/spine/orders.yaml#/components/schemas/Order |
+| Pay in USD (a currency the venue charges) | The guest's selected payment currency; the card is charged in it at the rate locked on the order, and refunds go back in it. | Converted price, Approx. (for a charged currency) | contracts/spine/orders.yaml#checkoutCart / … |
+| ≈ (approx.) price in USD / SAR / … | A conversion of a base-currency price for a currency the venue shows but does not charge, always next to the base price. | Converted price, USD price | DI-211 / screens/P02-guest-mobile-app.yaml#GST-044 |
+| Takings | Money received in the period less refunds (cash-basis); the seeded KPI on hubs. | Revenue, Sales, Income | contracts/satellite/reporting.yaml#/components/schemas/ReportingSystemKpi / R283 |
+| Gross sales | Issued sales before discounts and refunds; whether tax is included must be stated on the tile. | Revenue, Turnover | MATRIX 6.1.78 |
+| Net revenue | Gross sales less discounts less refunds, adjusted per finance policy. | Net sales, Revenue, Income | MATRIX 6.1.78 |
+| Recognised revenue / Deferred revenue | Earned under the recognition rules / paid for but not yet earned. Kept distinct from sales. | Realised revenue, Unearned income, Wallet revenue | MATRIX 5.12.6 / DI-260 / contracts/spine/finance.yaml#getDeferredRevenue |
+| VAT receipt | The simplified tax invoice issued on a paid order. | Receipt (when it is a tax document), Bill | contracts/spine/finance.yaml#issueTaxInvoice |
+| Tax invoice / Combined tax invoice | A full invoice with the buyer's details / one invoice for several paid orders of one buyer. | Bill, Statement | contracts/spine/finance.yaml#/components/schemas/FinTaxInvoiceType |
+| Credit memo | The document that corrects an issued invoice after a refund; the invoice itself is never edited. | Credit note (until the client's tax adviser chooses "Tax credit note"), Edit invoice | contracts/spine/finance.yaml#/components/schemas/FinTaxInvoice |
+| VAT (or the jurisdiction's tax name) | Use the tax profile's own name on every surface; "Tax" only where several kinds are summed. | GST in UAE, Service charge for a tax | contracts/spine/catalogue.yaml#setTaxProfileJurisdiction |
+| Price before discount | The taxable base where the jurisdiction taxes the undiscounted price. | Gross price, List tax | DI-598 |
+| Post / Reverse | A journal reaches the ledger when approved and posted; a correction is a reversal, never an edit or delete. | Edit entry, Delete entry, Undo | contracts/spine/finance.yaml#reverseJournalEntry |
+| Period (Open / Closing / Closed) | A fiscal period's state; closing stops postings, closed locks them. | Month locked, Frozen | contracts/spine/finance.yaml#/components/schemas/PeriodStatus |
+| Variance (Over / Short) | The difference between expected and counted or recorded, always saying between which two figures. | Discrepancy, Error, Loss | DI-275 / contracts/spine/finance.yaml#/components/schemas/UnifiedReconciliation |
+| Settlement / Exception / Resolve | A provider's file for a day / a line that did not match / the recorded explanation. | Payout file, Error, Close | contracts/spine/finance.yaml#/components/schemas/SettlementException |
+| Chargeback | A bank-initiated reversal with an evidence deadline; not a refund. | Dispute refund, Reversal | contracts/spine/orders.yaml#/components/schemas/Chargeback |
+| Report / Dashboard / Tile / KPI | A runnable, exportable, schedulable definition / a page of tiles / one visual bound to a report / a company-wide measure defined once. | Widget (outside the builder's library), Board (for a user-facing dashboard) | contracts/satellite/reporting.yaml#/components/schemas/DashboardTile / … |
+| Warning / Critical | KPI status bands set by a target's amber and red thresholds; always words plus colour. | Amber, Red (alone), Bad | contracts/satellite/reporting.yaml#/components/schemas/KpiTarget |
+| As of HH:MM / Updated N sec ago | The freshness of every figure read from the reporting copy; stale shows a warning. | Live (unless refreshed), Real-time | MATRIX 8.7.22 |
+| Forecast | Any projected figure, with its range; never shown as a fact. | Expected, Will be | DI-973 |
+| Outlet / Workstation (till) | A sales point / the device; staff copy may say "till" for the workstation. | Store, POS (in copy), Drawer (for the device) | R156 |
+| Channel | POS, Web, App, Kiosk, B2B, OTA, from one closed list. | Source, Platform | MoM 2026-08-18 4.2 Recipes, Operating Hours & Service Channels / MATRIX 1.4.7 |
+
+
 ## The screens
 
 Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs count fields; requirements are matrix rows; meeting inputs are the ones naming the screen (the module and platform ones are below); white label says whether the tenant's brand reaches it (guest) or it sets the brand (configures).
@@ -68,10 +128,10 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-883` | Workforce Roster Command Center | B–D | 0 | 0 | 6 | 10 | 1 | 0 | — | notStarted (—) |
-| `BO-884` | Attraction & Operational Staffing Roster | B–D | 0 | 20 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-884` | Attraction & Operational Staffing Roster | B–D | 0 | 77 | 6 | 11 | 1 | 0 | — | notStarted (—) |
 | `BO-885` | Minimum Staffing & Coverage Rule Configuration | B–D | 5 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-886` | Staffing Gap & Coverage Control Center | B–D | 4 | 27 | 6 | 1 | 2 | 0 | — | notStarted (—) |
-| `BO-887` | Shift Marketplace & Workforce Requests | B–D | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
+| `BO-887` | Shift Marketplace & Workforce Requests | B–D | 0 | 8 | 6 | 0 | 1 | 6 | — | notStarted (—) |
 | `BO-888` | Attendance & Live Workforce Command Center | B–D | 0 | 22 | 6 | 1 | 1 | 0 | — | notStarted (—) |
 | `BO-889` | Staff Check-In, Check-Out & Attendance Exceptions | B–D | 19 | 5 | 6 | 4 | 1 | 0 | — | notStarted (—) |
 | `BO-890` | Workforce Compliance Validation Center | B–D | 0 | 12 | 6 | 0 | 1 | 0 | — | notStarted (—) |
@@ -80,7 +140,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 ## Thin screens in this batch
 
-**BO-883, BO-884, BO-887, BO-888, BO-890 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**BO-883, BO-887, BO-888, BO-890 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ---
 
@@ -106,6 +166,20 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** The workforce roster command centre: the manager's landing page for board 4 - who is scheduled, on shift, checked in, absent or late now, where operations are understaffed, overtime and compliance risk, and today's staffing cost - above the roster timeline, with tiles into the board's detail screens. The one thing to get right: KPIs are metric tiles (per VO-R02) and the roster below is the shared rota calendar (Day, Week, Month, pivotable by venue, attraction, event, department, employee, role), not a blank data table.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **The screen is a single dataTable with no label and no columns** Why: A command centre is KPI tiles, alerts and board tiles (VO-R02), and the pack lists twelve KPIs and a roster timeline. *(source: screens/P08-venue-back-office.yaml#BO-883; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **No calendar; the pack asks for Day, Week and Month roster views** Why: Every roster is a calendar (VO-R01). *(source: screens/P08-venue-back-office.yaml#BO-883; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **Navigation lists BO-884 to BO-892 but only BO-884 to BO-888 have triggers** Why: BO-889 to BO-892 are reached from here too and need their tiles and triggers. *(source: screens/P08-venue-back-office.yaml#BO-883; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+
+#### Decided on this screen
+
+Answered questions: draw the decision, not the old default. Where a decision and the tables below differ, the decision wins.
+
+- **How is a roster published (no publish operation; status changes one assignment at a time through updateRotaAssignment)?** → Drawn default accepted: Draw "Publish roster" for the date range with the compliance gate; mark the bulk write as pending. *(decided by Chinmay, 2026-10-02; DEC-500 / CHG-NOTE-008)* **Reviewable:** a default the lead may still overrule before the block is tasked.
+
 #### Inputs: what the user enters or picks
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
@@ -122,11 +196,29 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
 
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Date range and view**: Day (default today, hours from the venue day start), Week, Month; pivot chips Venue / Attraction / Event / Department / Employee / Role. *(source: screens/P08-venue-back-office.yaml#BO-883)*
+- **Coverage basis**: "Measure against" Minimum / Forecast / Higher of both (default Minimum); each coverage figure says which it used. *(source: contracts/satellite/workforce.yaml#getStaffingCoverage)*
+
 #### Outputs: what the screen shows and produces
 
 **Shown**
 
 **Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **KPI tiles**: Total scheduled, On shift now, Checked in, Absent / no-show, Late arrivals, On leave, Open shifts, Unfilled positions, Understaffed operations, Overtime risk (hours), Compliance warnings, Staffing cost today (AED, with overtime share), AI staffing recommendations (count). Each with a delta against the same day last week and a tap into its detail screen. *(source: screens/P08-venue-back-office.yaml#BO-883 / DI-488)*
+- **Coverage overview**: Per operation (Aqua Park Zone A, Wave Rider, Main Plaza gates) a severity pill (Covered, Tight, Short, Blocking) with "2 short at 14:00". *(source: screens/P08-venue-back-office.yaml#BO-883 / contracts/satellite/workforce.yaml#getStaffingCoverage)*
+- **Roster timeline**: Person rows with assignment and break blocks ("08:00-10:00 Group lesson", "10:00-10:30 Break") and the smart status per person: Scheduled, Checked in, Working, On break, Available, Late, Absent, No-show, Overtime, Checked out. *(source: screens/P08-venue-back-office.yaml#BO-883 / screens/P08-venue-back-office.yaml#BO-884)*
+- **Board tiles**: Attraction roster (BO-884), Minimum staffing rules (BO-885), Staffing gaps (BO-886), Shift marketplace (BO-887), Live attendance (BO-888), Exceptions (BO-889), Compliance (BO-890), Labour cost (BO-891), AI planner (BO-892). *(source: screens/P08-venue-back-office.yaml#BO-883)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Quick actions on a roster block**: Assign employee, Move assignment, Replace employee, Open shift (release to the marketplace), Notify employee; each opens a sheet and refuses overlaps or missing roles with the reason. *(source: screens/P08-venue-back-office.yaml#BO-884 / contracts/satellite/workforce.yaml#createRotaAssignment / contracts/satellite/workforce.yaml#updateRotaAssignment)*
+- **Publish roster**: Runs the pre-publish compliance check first; blocking findings stop publication unless an authorised override is recorded; confirm names how many people will be notified. *(source: screens/P08-venue-back-office.yaml#BO-890 / screens/P08-venue-back-office.yaml#BO-891)*
+- **Run AI optimisation**: Opens BO-892 with the same date range. *(source: screens/P08-venue-back-office.yaml#BO-884)*
 
 **Data it reads**: `listRotaAssignments` (onLoad, The roster); `getStaffingCoverage` (onLoad, Where it is short)
 
@@ -153,6 +245,46 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the workforce roster are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Edge cases to draw
+
+- **Forecast basis chosen for a period with no forecast handed over**: Rows fall back to the minimum and say "No forecast for this period - measured against minimum". *(source: contracts/satellite/workforce.yaml#/components/schemas/StaffingCoverage)*
+- **Manager scoped to some venues only**: Tiles count only permitted venues; the venue chip says "2 of 3 venues". *(source: screens/P08-venue-back-office.yaml#BO-884)*
+
+#### Consistency with other screens
+
+- Match `BO-055`: The roster timeline here is the BO-055 rota calendar (same component, statuses and flags); draw once (per VO-R14).
+- Match `BO-888`: Checked in, late and absent counts are the same numbers as the live attendance centre.
+- Match `EMP-021`: The supervisor's phone roster is the mobile view of this timeline.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+tiles:
+  scheduled: 126 (+8.5%)
+  checkedIn: '98'
+  onShift: '82'
+  absentNoShow: '12'
+  late: '6'
+  openShifts: '9'
+  understaffed: 2 operations
+  overtimeRisk: 22 h
+  compliance: 7 warnings
+  costToday: AED 38,450 (overtime AED 6,850)
+  aiRecommendations: '4'
+coverage:
+- operation: Aqua Park - Zone A lifeguards
+  status: Short
+  detail: 1 short 15:00-18:00
+- operation: Summit Peaks - Ski School
+  status: Tight
+  detail: 90% 10:00-14:00
+- operation: Main Plaza gates
+  status: Covered
+  detail: 100%
+```
 
 #### Permissions
 
@@ -216,6 +348,9 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-100`, `BO-884`, `BO-885`, `BO-886`, `BO-887`, `BO-888`, `BO-889`, `BO-890`, `BO-891`, `BO-892`.
 - [ ] Every gated control is gated: `WORKFORCE_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 2 edge case(s) from the process notes are drawn.
+- [ ] The 3 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
+- [ ] The 1 decision(s) taken on this screen are drawn as decided, not as the old default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -229,18 +364,53 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Rentals · wave 3 · needs the `resources` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `WORKFORCE_MANAGE` (1 configure); in the flows as venue manager |
+| Who uses it | venue staff holding `WORKFORCE_MANAGE`, `WORKFORCE_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Each candidate shall show) and no metric row |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/rentals/attraction-operational-staffing-roster-bo-884` |
 
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
+**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape … Contract gap recorded 2 October 2026 (CHG-WIR-004): No read returns candidates for a rota position (skill, availability, suitability).
+
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** The staffing roster for one attraction, experience, event or department on one date and operating period: the required roles against who is scheduled and who has checked in, the gap per role, and candidate cards to fill it by hand, drag and drop or smart assign. The one thing to get right: the required / scheduled / checked-in / gap table per role is the screen; candidates are the side panel that fills the gaps, and demand (tickets sold for each session) is visible beside the requirement it drives.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **The table "Every attraction operational staffing" has candidate-card columns (Name, Photograph, Skill level, AI suitability score)** Why: The main table is the role requirement table; candidate fields belong on the cards. *(source: screens/P08-venue-back-office.yaml#BO-884; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **"AI suitability score" as a label** Why: Skill matching was agreed as attribute matching, not a model; show "Match" with its reasons. *(source: contracts/satellite/resources.yaml#suggestResources; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+
+**Fixed on main** (the package already carries these; draw what it says): Only createRotaAssignment is bound; nothing reads the roster, the coverage or the candidates (CHG-WIR-001).
+
+#### Decided on this screen
+
+Answered questions: draw the decision, not the old default. Where a decision and the tables below differ, the decision wins.
+
+- **Where does ticket demand per session come from (tickets sold to staff required)?** → Drawn default accepted: Show the demand line from the forecast requirement where present; otherwise "Demand not linked". *(decided by Chinmay, 2026-10-02; DEC-501 / CHG-NOTE-008)* **Reviewable:** a default the lead may still overrule before the block is tasked.
 
 #### Inputs: what the user enters or picks
 
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| From | date picker | — | — | `listRotaAssignments` ?from |
+| To | date picker | — | — | `listRotaAssignments` ?to |
+| Principal | picker: choose a principal | — | — | `listRotaAssignments` ?principalId |
+| Department | picker: choose a department | — | — | `listRotaAssignments` ?departmentId |
+| From | date picker | — | — | `getStaffingCoverage` ?from |
+| To | date picker | — | — | `getStaffingCoverage` ?to |
+| Basis | segmented control | Minimum | Minimum · Forecast requirement · Higher of both | `getStaffingCoverage` ?basis |
+| Date | date picker | — | — | `listAttendance` ?date |
+| Principal | picker: choose a principal | — | — | `listAttendance` ?principalId |
+| Exceptions only | toggle | — | — | `listAttendance` ?exceptionsOnly |
+
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Scope**: Date, venue, attraction or experience or event, department, operating period (e.g. 10:00-18:00); pickers, not ids. *(source: screens/P08-venue-back-office.yaml#BO-884)*
+- **Assign**: Drag a candidate onto a role row or slot, or choose "Smart assign" for a ranked list; the assignment is a rota assignment (person, position code, start, end, break minutes). Position codes come from the minimum-staffing rules so coverage counts them. *(source: contracts/satellite/workforce.yaml#createRotaAssignment / contracts/satellite/workforce.yaml#/components/schemas/RotaAssignment)*
 
 #### Outputs: what the screen shows and produces
 
@@ -261,6 +431,78 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Overtime impact | text | not in the schema: `Overtime impact` |
 | AI suitability score | text | not in the schema: `AI suitability score` |
 
+**Roster** (data table, from `listRotaAssignments`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| Overtime minutes | 1,234 | BL-044, 1.2.83. UAE labour law limits working hours and mandates rest periods, and nothing in the package counted either. |
+| Rest period before | 1,234 | Minutes since the previous shift ended. The check that stops a closing shift followed by an opening one, which is legal in most places and … |
+| Breaches working hour limit | yes / no (icon or chip) | Flagged at assignment, not discovered at payroll. A rota that breaches a statutory limit is a rota somebody has to redo, and finding out a … |
+| Labour cost | AED 1,234.50 | Cost at the point of scheduling. A manager building a rota without seeing its cost is a manager who finds out from finance. |
+| ID | the name it points at, never the id | — |
+| Principal | the name it points at, never the id | — |
+| Display name | text | — |
+| Venue | the name it points at, never the id | — |
+| Department | the name it points at, never the id | — |
+| Position | text | What they are rostered to do — gate steward, cashier, lifeguard, technician. Most positions never touch a till, which is why a rota … |
+| Required role | the name it points at, never the id | Checked on assignment. A rota naming someone unqualified is a rota that gets overridden. |
+| Workstation | the name it points at, never the id | Where the position needs a till. The link between a rota and a cash session, without merging the two. |
+| Starts at | 1 Oct 2026, 14:30 | — |
+| Ends at | 1 Oct 2026, 14:30 | — |
+| Status | chip: Planned, Published, Confirmed, Swap pending, Cancelled, Completed… | — |
+| Break minutes | 1,234 | — |
+| Note | text | — |
+| Next cursor | text | — |
+| Has more | yes / no (icon or chip) | — |
+
+**Coverage** (data table, from `getStaffingCoverage`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Date | 1 Oct 2026 | — |
+| Venue | the name it points at, never the id | — |
+| Position code | text | — |
+| Label | text | — |
+| From | text | — |
+| To | text | — |
+| Required | 1,234 | — |
+| Rostered | 1,234 | — |
+| Qualified | 1,234 | A position filled by somebody not qualified for it is still a gap. |
+| Gap | 1,234 | — |
+| Severity | chip: Covered, Tight, Short, Blocking | — |
+| Open shifts | list or chips (count when long) | — |
+| Basis applied | chip: Minimum, Forecast requirement | Which figure `required` is for this row. With `higherOfBoth`, the larger; with `forecastRequirement` and no handed-over requirement for the … |
+| Minimum required | 1,234 | The configured minimum for the position and window. |
+| Forecast required | 1,234.5 | The forecast staff requirement (p50) for the position and window, from `workforce.forecast_requirement`. |
+| Forecast required P90 | 1,234.5 | The busy-case requirement, for planning to the busy case. |
+| Forecast version | the name it points at, never the id | The AI forecast version the requirement is bound to (AIP-067), so a manager can open the forecast behind it. |
+
+**Checked in** (data table, from `listAttendance`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| ID | the name it points at, never the id | — |
+| Principal | the name it points at, never the id | — |
+| Assignment | the name it points at, never the id | — |
+| Venue | the name it points at, never the id | — |
+| Kind | chip: Clock in, Clock out, Break start, Break end | — |
+| Occurred at | 1 Oct 2026, 14:30 | Device time — when it happened. |
+| Recorded at | 1 Oct 2026, 14:30 | When the server received it. Both are kept: a steward clocking in offline at a gate is not late because the sync was. |
+| Access point | the name it points at, never the id | — |
+| Latitude | 1,234.5 | — |
+| Longitude | 1,234.5 | — |
+| Is amended | yes / no (icon or chip) | — |
+| Amended by principal | the name it points at, never the id | Who made the latest amendment. The full history is `amendments` (audit R129 (7)). |
+| Amendment reason | text | The latest amendment's reason. The full history is `amendments` (audit R129 (7)). |
+| Original occurred at | 1 Oct 2026, 14:30 | The original is never overwritten. Attendance feeds pay, and a record that can be quietly rewritten is not evidence. |
+| Amendments | list or chips (count when long) | Every correction, oldest first, one row each (decided 28 September, audit R129 (7)). |
+| ID | the name it points at, never the id | — |
+| Attendance record | the name it points at, never the id | — |
+| Amended by principal | the name it points at, never the id | — |
+| Amended at | 1 Oct 2026, 14:30 | — |
+| Occurred at before | 1 Oct 2026, 14:30 | The record's time before this correction. |
+
 **The selected attraction operational staffing** (detail panel): The pack groups this record's detail under its own headings: “Managers shall select”, “Required”, “Scheduled”, “Managers may assign employees through”, “Ticket/Experience Visibility”.
 
 | Shows | Format | Notes |
@@ -275,6 +517,19 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Venue | text | not in the schema: `Venue` |
 | Overtime impact | text | not in the schema: `Overtime impact` |
 | AI suitability score | text | not in the schema: `AI suitability score` |
+
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Role requirement table**: Role / position, Required, Scheduled, Checked in, Gap, Coverage % and actions; gaps red with a count, surplus grey. Header tiles: Required 24, Scheduled 21, Checked in 17, Gap 3, Coverage 87%. *(source: screens/P08-venue-back-office.yaml#BO-884 / DI-489)*
+- **Demand driver**: Per session the tickets sold and the staff that requires ("14:00 Group lesson - 18 tickets - needs 3 instructors - 2 assigned - gap 1"). *(source: screens/P08-venue-back-office.yaml#BO-884)*
+- **Candidate cards**: Name, photo, role, skill level, certifications (valid / expiring), availability, hours this week, venue, overtime impact ("+2 h overtime"), and a match score with its reasons. Candidates who fail a mandatory requirement are not listed as available; a "Show ineligible" toggle lists them with why. *(source: screens/P08-venue-back-office.yaml#BO-884 / screens/P08-venue-back-office.yaml#BO-882)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Assign / Move / Replace**: Creates or changes the assignment; refusals name the clash ("Omar Haddad is on Falcon Coaster 10:00-14:00") or the missing role. Rest and hour breaches come back as flags on the new block. *(source: contracts/satellite/workforce.yaml#createRotaAssignment / contracts/satellite/workforce.yaml#updateRotaAssignment)*
+- **Smart assign**: Proposes the top candidate per gap with reasons; nothing is assigned until the manager applies it. *(source: contracts/satellite/resources.yaml#suggestResources)*
+
+**Data it reads**: `listRotaAssignments` (onLoad, Who is rostered on each position); `getStaffingCoverage` (onLoad, Where the roster is short); `listAttendance` (onLoad, Who has checked in)
 
 **Where the user goes next**
 
@@ -292,15 +547,79 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 Overlaps an existing assignment, or the person lacks the required role |
 
+#### Edge cases to draw
+
+- **Assigned person is not qualified for the position**: The slot still counts as a gap ("Rostered 2, qualified 1") and says why. *(source: contracts/satellite/workforce.yaml#/components/schemas/StaffingCoverage)*
+- **Two managers assign the same person at once**: The second gets the overlap refusal and the candidate card refreshes to "Assigned". *(source: contracts/satellite/workforce.yaml#createRotaAssignment)*
+
+#### Consistency with other screens
+
+- Match `BO-885`: Required counts come from the rules there; same position names.
+- Match `BO-714`: Event rosters use the same grid.
+- Match `BO-917`: Event staff candidates use the same card.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+scope: Summit Peaks - Ski School - Sat 10 Oct 2026, 09:00-17:00
+roles:
+- role: Ski School Supervisor
+  required: 1
+  scheduled: 1
+  checkedIn: 1
+  gap: 0
+- role: Ski Instructor - Level 3
+  required: 12
+  scheduled: 10
+  checkedIn: 8
+  gap: 2
+- role: Ski Instructor - Level 2
+  required: 6
+  scheduled: 5
+  checkedIn: 4
+  gap: 1
+- role: Customer Service Agent
+  required: 2
+  scheduled: 2
+  checkedIn: 2
+  gap: 0
+candidate:
+  name: Layla Al Suwaidi
+  role: Ski Instructor - Level 3
+  certs: PSIA Level 3 valid to Jan 2027
+  hours: 32 of 48 h
+  overtime: None
+  match: 96% - available, level 3, same venue, no overtime
+```
+
 #### Permissions
 
 - `createRotaAssignment` → `WORKFORCE_MANAGE` (configure) · staff
+- `listRotaAssignments` → `WORKFORCE_VIEW` (read) · staff
+- `getStaffingCoverage` → `WORKFORCE_VIEW` (read) · staff
+- `listAttendance` → `WORKFORCE_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
 #### Requirements it meets
 
-No matrix row traces to this screen's operations or data.
+11 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+
+| Ref | Requirement (shortened) | Domain | Verdict | Via |
+|---|---|---|---|---|
+| 1.2.11 | The system should be able to generate operational rosters for staff resources. The rosters should provide information on the staff resources associated with an attraction, their availability, booked … | Ticketing Catalogue | CONTRACTED | `listRotaAssignments` |
+| 1.2.32 | System shall support staff scheduling and assignment. | Ticketing Catalogue | CONTRACTED | `listRotaAssignments` |
+| 1.2.33 | System shall manage employee shifts. | Ticketing Catalogue | CONTRACTED | `listRotaAssignments` |
+| 1.2.60 | Employees shall receive assignments on mobile devices. | Ticketing Catalogue | CONTRACTED | `listRotaAssignments` |
+| 1.2.61 | Employees shall check into assigned resources. | Ticketing Catalogue | CONTRACTED | `listRotaAssignments` |
+| 1.2.62 | Employees shall check out assigned resources. | Ticketing Catalogue | CONTRACTED | `listRotaAssignments` |
+| 1.2.63 | Employees shall view schedules via mobile app. | Ticketing Catalogue | CONTRACTED | `listRotaAssignments` |
+| 18.1.1 | iOS Mobile Application - System shall provide a native iOS application. | Employee Mobile App & AI Assistant | CONTRACTED | `listRotaAssignments` |
+| 18.1.2 | Android Mobile Application - System shall provide a native Android application. | Employee Mobile App & AI Assistant | CONTRACTED | `listRotaAssignments` |
+| 8.2.49 | System shall generate staffing shortage alerts. | Unified Operations Dashboard | CONTRACTED | `getStaffingCoverage` |
+| 8.9.7 | System shall display staffing levels, shift attendance, assignments, absences, overtime, and workforce utilization. | Unified Operations Dashboard | CONTRACTED | `listAttendance` |
 
 #### Client meeting inputs
 
@@ -324,12 +643,15 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state (409).
-- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (77 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-884?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-883`.
-- [ ] Every gated control is gated: `WORKFORCE_MANAGE`.
+- [ ] Every gated control is gated: `WORKFORCE_MANAGE`, `WORKFORCE_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 2 edge case(s) from the process notes are drawn.
+- [ ] The 2 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
+- [ ] The 1 decision(s) taken on this screen are drawn as decided, not as the old default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -350,6 +672,20 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | nothing: it opens on its own |
 | Route | `/rentals/minimum-staffing-coverage-rule-configuration-bo-885` |
 
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** Minimum staffing and coverage rules: how many of which role, with which qualifications, each operation needs to run safely - fixed (Waterpark Zone A needs 1 supervisor, 4 lifeguards, 1 first-aider) or driven by demand (1 instructor per 8 participants) - with thresholds and what happens when a roster falls short. The one thing to get right: a rule says in plain words what it requires and what it enforces ("Wave Rider cannot run with fewer than 2 operators - closes rather than runs short").
+
+**Known correction pending (do not draw the wrong version)**
+
+- **Write with no read (no getStaffingRules), shared with BO-881 on a whole-record PUT** Why: The editor cannot open pre-filled, and saving from either screen without the other's values erases them. *(source: contracts/satellite/workforce.yaml#setStaffingRules; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **Demand-based ratios, Target / Recommended / Maximum thresholds, event, experience and department dimensions, language, and the four enforcement levels have no field** Why: minimumCover holds a fixed minimum headcount, qualifications and blocksOperation only. *(source: screens/P08-venue-back-office.yaml#BO-885 / screens/P08-venue-back-office.yaml#BO-886 / contracts/satellite/workforce.yaml#/components/schemas/StaffingRules; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **"Minimum", "Target", "Recommended", "Maximum", "Enforcement" drawn as select fields with nothing around them** Why: They are numbers and one choice inside a rule; without the rule builder they mean nothing. *(source: screens/P08-venue-back-office.yaml#BO-886; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+
+#### Decided on this screen
+
+Answered questions: draw the decision, not the old default. Where a decision and the tables below differ, the decision wins.
+
+- **Where does the list of position codes come from (RotaAssignment.position is tenant-defined text)?** → Drawn default accepted: A position picker seeded from job titles; mark the list source as pending. *(decided by Chinmay, 2026-10-02; DEC-502 / CHG-NOTE-008)* **Reviewable:** a default the lead may still overrule before the block is tasked.
+
 #### Inputs: what the user enters or picks
 
 **On the screen**
@@ -362,7 +698,24 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Maximum | select field | — | — | — | — | — | — |
 | Enforcement | select field | — | — | — | — | — | — |
 
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Applies to**: Venue, attraction or experience, event, department, resource type; days of week (chips, empty = every open day); time window (from-to, empty = opening to closing). *(source: screens/P08-venue-back-office.yaml#BO-885 / contracts/satellite/workforce.yaml#/components/schemas/StaffingRules)*
+- **Requirement**: Rows of position (picker of position codes) with minimum headcount and required qualifications (certification, skill level, language); "Fixed" or "Per demand" - per demand reads "1 per [8] participants" with a worked preview ("40 booked = 5 instructors"). *(source: screens/P08-venue-back-office.yaml#BO-885)*
+- **Thresholds**: Minimum, Target, Recommended, Maximum as numbers on one line; minimum is the one coverage measures. *(source: screens/P08-venue-back-office.yaml#BO-886)*
+- **Enforcement**: One choice: Warn / Require approval / Prevent roster publication / Trigger escalation, plus "Close the operation rather than run short" for safety-critical positions. *(source: screens/P08-venue-back-office.yaml#BO-886 / contracts/satellite/workforce.yaml#/components/schemas/StaffingRules)*
+- **Rule id**: Never an input (per VO-R03), even though each minimumCover row requires an id. *(source: contracts/satellite/workforce.yaml#/components/schemas/StaffingRules)*
+
 #### Outputs: what the screen shows and produces
+
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Rules library**: List of rules by operation with status (Active) and a one-line summary; the selected rule's requirement logic as a table, as in the client render. *(source: screens/P08-venue-back-office.yaml#BO-885)*
+- **Effect preview**: Against next week's roster - "Zone A would be short on 3 days" - before Save. *(source: contracts/satellite/workforce.yaml#getStaffingCoverage)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Save rules**: Sends the whole staffing-rules record: every minimum-cover row for the venue plus the working-hour and overtime values from BO-881 (per VO-R04); confirm says "A position left out no longer has a minimum" if rows were removed. *(source: contracts/satellite/workforce.yaml#setStaffingRules)*
 
 **Where the user goes next**
 
@@ -378,6 +731,37 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Empty, no results (`?state=emptyNoResults`) | **Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist |
 | Offline (`?state=offline`) | online only |
+
+#### Edge cases to draw
+
+- **Position code typed differently from the rota's positions**: Not possible - positions are picked from one list; otherwise coverage would count against nothing. *(source: contracts/satellite/workforce.yaml#/components/schemas/RotaAssignment)*
+- **Rule removed while the operation is open today**: Confirm names it ("Wave Rider will have no minimum from now"). *(source: contracts/satellite/workforce.yaml#setStaffingRules)*
+
+#### Consistency with other screens
+
+- Match `BO-881`: Same record; one editor with two sections, or both screens load and send the whole record.
+- Match `BO-884`: Required counts shown there come from these rules.
+- Match `BO-890`: "Below minimum cover" findings refer to these rules by name.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+rules:
+- operation: Aqua Park - Zone A
+  fixed: 1 Supervisor, 4 Lifeguards, 1 First-aid qualified
+  days: Every open day
+  window: 10:00-19:00
+  enforcement: Prevent roster publication
+- operation: Summit Peaks - Ski School
+  perDemand: 1 Instructor (Level 2+) per 8 participants
+  preview: 40 booked = 5 instructors
+  enforcement: Warn
+- operation: Falcon Coaster
+  fixed: 2 Ride operators
+  enforcement: Close rather than run short
+```
 
 #### Permissions
 
@@ -417,6 +801,9 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-883`.
 - [ ] Every gated control is gated: `WORKFORCE_MANAGE`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 2 edge case(s) from the process notes are drawn.
+- [ ] The 3 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
+- [ ] The 1 decision(s) taken on this screen are drawn as decided, not as the old default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -438,6 +825,14 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Route | `/rentals/staffing-gap-coverage-control-center-bo-886` |
 
 **Known gaps.** **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+**From the Finance, Ledger & Tax · Reporting & Analytics process.** Staffing gaps before and during the day: required, scheduled and checked-in per role and slot, the gap each leaves and how severe it is, with a shortage alert. An operational control screen with actions, not a dashboard.
+
+#### Decided on this screen
+
+Answered questions: draw the decision, not the old default. Where a decision and the tables below differ, the decision wins.
+
+- **How does the pack's four-level severity map onto covered, tight, short, blocking?** → Drawn default accepted: Informational = tight, Warning = short, High and Critical = blocking. *(decided by Chinmay, 2026-10-02; DEC-360 / CHG-NOTE-003)* **Reviewable:** a default the lead may still overrule before the block is tasked.
 
 #### Inputs: what the user enters or picks
 
@@ -519,6 +914,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Recommended employee | text | not in the schema: `Recommended employee` |
 | Match score | text | not in the schema: `Match score` |
 
+**Rules for what is shown** (from the Finance, Ledger & Tax · Reporting & Analytics process; these refine the tables above and win where they differ)
+
+- **gap row**: Role, slot, required, scheduled, checked in, planned gap (required minus scheduled), live gap (required minus checked in), severity. *(source: DI-489 / DI-490)*
+
 **Data it reads**: `getStaffingCoverage` (onLoad, Gaps, by severity); `listAlerts` (onLoad, Staffing shortage alerts (metric staffingShortfall))
 
 **Where the user goes next**
@@ -536,6 +935,19 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 An `outsideRange` rule without both `threshold` and `thresholdUpper`, or with the upper not above the lower (audit R158) |
+
+#### Consistency with other screens
+
+- Match `P16 ANL-003 Operational Performance`: The staffing tile there links here; not a duplicate because this screen acts.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+- Ski instructors Level 2 · Sat 3 Oct 09:00–12:00 · required 12 · scheduled 10 · checked in 9 · planned gap 2 ·
+  live gap 3 · Short
+```
 
 #### Permissions
 
@@ -582,6 +994,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-883`.
 - [ ] Every gated control is gated: `REPORT_MANAGE`, `REPORT_VIEW_VENUE`, `WORKFORCE_VIEW`.
 - [ ] The 2 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 1 decision(s) taken on this screen are drawn as decided, not as the old default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -602,11 +1015,26 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | nothing: it opens on its own |
 | Route | `/rentals/shift-marketplace-workforce-requests-bo-887` |
 
-**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built. Removed 2 October 2026 (CHG-WIR-001): Claiming an open shift is an employee act on the Staff App; the manager publishes and approves here. The manager's queue needs the swap requests (design-notes …
+
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** The shift marketplace and workforce request queue for managers: swap, transfer, pickup and release requests with their validation, and the open shifts published for eligible staff to claim, all approved through the same approval path. The one thing to get right: each request shows the validation result before the manager decides (role, skills, certification, availability, hours, rest, overtime, minimum staffing, venue permission), and open shifts are only ever offered to people who meet the rules.
+
+**Fixed on main** (the package already carries these; draw what it says): "Claim open shift" is a primary button on the back-office screen (CHG-WIR-001); No operation publishes, releases or withdraws an open shift, and transfer has none at all (CHG-WIR-001); Swap requests (listShiftSwapRequests) and approvals are not bound, though the client render's first tab is Swap Requests with approve and … (CHG-WIR-001).
+
+#### Decided on this screen
+
+Answered questions: draw the decision, not the old default. Where a decision and the tables below differ, the decision wins.
+
+- **Which approvals does each request type need (employee acceptance, supervisor, department, workforce manager)?** → Drawn default accepted: Swap - colleague then supervisor; pickup - supervisor; release - supervisor; shown as a step tracker per row. *(decided by Chinmay, 2026-10-02; DEC-503 / CHG-NOTE-008)* **Reviewable:** a default the lead may still overrule before the block is tasked.
 
 #### Inputs: what the user enters or picks
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Request tabs**: Swap requests / Pickup requests / Release requests / Open shifts, each with a count; status filter Pending, Approved, Rejected. *(source: screens/P08-venue-back-office.yaml#BO-887)*
+- **Publish open shift**: From an unfilled assignment or a template: position, from-to, required qualifications, reason, and an incentive multiplier defaulted from the venue rule and capped at its maximum (above the approval threshold the release needs a second person). *(source: contracts/satellite/workforce.yaml#/components/schemas/OpenShift / contracts/satellite/workforce.yaml#/components/schemas/StaffingRules)*
 
 #### Outputs: what the screen shows and produces
 
@@ -614,14 +1042,31 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
 
-**Actions and what each produces**
+**Swap requests** (data table, from `listShiftSwapRequests`)
 
-| Action | Calls | Sends | On success returns | Errors to show | Notes |
-|---|---|---|---|---|---|
-| Claim open shift (primary button) | navigation or local | — | — | — | — |
-| Cancel (secondary button) | navigation or local | — | — | — | — |
+| Shows | Format | Notes |
+|---|---|---|
+| ID | the name it points at, never the id | — |
+| Assignment | the name it points at, never the id | — |
+| From principal | the name it points at, never the id | — |
+| To principal | the name it points at, never the id | — |
+| Status | chip: Awaiting peer, Awaiting approval, Approved, Rejected, Withdrawn | Both parties before the supervisor. A swap approved against someone who never agreed is a gap in the rota nobody notices until the shift … |
+| Approval request | text | Routed through `approvals` rather than a second mechanism here. |
+| Reason | text | — |
+| Requested at | 1 Oct 2026, 14:30 | — |
 
-**Data it reads**: `listOpenShifts` (onLoad, The shift marketplace)
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Request row**: Type pill (Swap, Pickup, Release, Transfer), from and to people with photos, shift date and time, status (Awaiting employee, Awaiting supervisor, Auto-match recommended, Approved), and Approve / Reject. *(source: screens/P08-venue-back-office.yaml#BO-887 / contracts/satellite/workforce.yaml#/components/schemas/ShiftSwap)*
+- **Validation panel**: Checklist with ticks and crosses: role, skills, certification, availability, working-hour limits, rest, overtime ("David: +2 overtime hours"), minimum staffing maintained, venue permission; and the recommendation in one sentence ("All mandatory rules pass; creates 2 overtime hours"). *(source: screens/P08-venue-back-office.yaml#BO-888 / screens/P08-venue-back-office.yaml#BO-941)*
+- **Open shift row**: Position, time, venue, required qualifications, eligible people ("6 eligible"), incentive ("x1.5"), status (Open, Claimed, Pending approval, Filled, Expired, Withdrawn). *(source: contracts/satellite/workforce.yaml#listOpenShifts)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Approve / Reject / Request changes**: Decides the approval request behind the swap or claim; a requester can never approve their own; reject needs a reason, which reaches the requester. *(source: contracts/spine/approvals.yaml#decideApprovalRequest / contracts/satellite/workforce.yaml#requestShiftSwap / DI-235)*
+- **Publish open shift**: Confirm names who will see it ("Offered to 6 eligible lifeguards at Aqua Park"). *(source: contracts/satellite/workforce.yaml#/components/schemas/OpenShift)*
+
+**Data it reads**: `listOpenShifts` (onLoad, The shift marketplace); `listShiftSwapRequests` (onLoad, Swap requests waiting on the manager)
 
 **Where the user goes next**
 
@@ -633,16 +1078,56 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |---|---|
 | Loading (`?state=loading`) | The shift marketplace workforce list. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the shift marketplace workforce untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No shift marketplace workforce yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, first run (`?state=emptyFirstRun`) | No shift marketplace workforce yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the shift marketplace workforce are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 409 Already taken, not eligible, or it would breach a working-hour rule |
+
+#### Edge cases to draw
+
+- **A claim would breach a working-hour rule**: Refused at claim ("would exceed 60 h this week"); shown on the row as Rejected by rule, not by a person. *(source: contracts/satellite/workforce.yaml#claimOpenShift)*
+- **Swap not accepted by the colleague before the shift**: Expires; the original assignment stands and the row says so. *(source: F68 step 3)*
+
+#### Consistency with other screens
+
+- Match `EMP-023`: Staff create swaps there; the status words are identical.
+- Match `BO-939`: The employee-side marketplace (open shifts, request shift) is the mobile half of this screen.
+- Match `BO-883`: The Open shifts tile counts open rows here.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+requests:
+- type: Swap
+  from: Maria Santos
+  to: Omar Haddad
+  shift: Tue 13 Oct 08:00-16:00
+  status: Awaiting supervisor
+  validation: All pass; Omar +2 h overtime
+- type: Pickup
+  from: Open shift
+  to: Rahul Menon
+  shift: Sat 17 Oct 14:00-22:00
+  status: Auto-match recommended
+- type: Release
+  from: Fatima Al Hashimi
+  shift: Fri 16 Oct 14:00-23:00
+  status: Approved
+openShift:
+  position: Lifeguard
+  time: Sat 17 Oct 15:00-18:00
+  venue: Aqua Park - Zone B
+  eligible: 6
+  incentive: x1.5
+  status: Open
+```
 
 #### Permissions
 
 - `listOpenShifts` → `WORKFORCE_VIEW` (read) · staff
-- `claimOpenShift` → `WORKFORCE_VIEW` (read) · staff
+- `listShiftSwapRequests` → `WORKFORCE_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -676,13 +1161,15 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (409).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
+- [ ] Every output is drawn (8 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-887?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: Claim open shift, Cancel.
+- [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-883`.
 - [ ] Every gated control is gated: `WORKFORCE_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 2 edge case(s) from the process notes are drawn.
+- [ ] The 1 decision(s) taken on this screen are drawn as decided, not as the old default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -705,6 +1192,20 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 
 **Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
 
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** The live attendance command centre: in real time, whether the people scheduled today actually reported - checked in, not yet arrived, late, absent, on break, checked out, in overtime - and the operational impact ("Ski School staffing has fallen below minimum coverage"). The one thing to get right: counts are KPI tiles and the per-person planned-versus-actual list includes the people with no clock-in, which is the list a duty manager needs.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **The pack's KPIs (Scheduled today, Checked in, Not yet arrived...) are drawn as columns of a data table** Why: KPIs are metric tiles (VO-R02). *(source: screens/P08-venue-back-office.yaml#BO-888; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **listAttendance returns attendance records only; a scheduled person with no clock-in has no record** Why: "Not yet arrived" and "No-show" need the rota joined in; the description says "against the rota" but the response cannot list people who never clocked. *(source: contracts/satellite/workforce.yaml#listAttendance; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **The gap says the operation returns no schema, though AttendanceRecord is fully described** Why: Bind the per-person list to it. *(source: contracts/satellite/workforce.yaml#/components/schemas/AttendanceRecord; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+
+#### Decided on this screen
+
+Answered questions: draw the decision, not the old default. Where a decision and the tables below differ, the decision wins.
+
+- **Is this screen live-updating (push) or refreshed on an interval?** → Drawn default accepted: Auto-refresh every 30 seconds with "Updated 14:31" and a manual refresh, as the client render's footer implies. *(decided by Chinmay, 2026-10-02; DEC-504 / CHG-NOTE-008)* **Reviewable:** a default the lead may still overrule before the block is tasked.
+
 #### Inputs: what the user enters or picks
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
@@ -716,6 +1217,10 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | Exceptions only | toggle | — | — | `listAttendance` ?exceptionsOnly |
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Date and filters**: Today by default; venue, department and position chips; "Exceptions only" toggle. *(source: contracts/satellite/workforce.yaml#listAttendance)*
 
 #### Outputs: what the screen shows and produces
 
@@ -753,6 +1258,18 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Attendance exceptions | text | not in the schema: `Attendance exceptions` |
 | Planned vs actual | text | not in the schema: `Planned vs Actual` |
 
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **KPI tiles**: Scheduled today, Checked in, Not yet arrived, Late, Absent, No-show, On break, Checked out, Overtime, Attendance exceptions - with percentage of scheduled and change against yesterday. *(source: screens/P08-venue-back-office.yaml#BO-888 / screens/P08-venue-back-office.yaml#BO-889)*
+- **Planned versus actual**: Per person: name, role, planned start, actual in, actual out, status (Working, Late 14 min, No-show, On break, Checked out), location as a place name, and a Message action. Sorted with exceptions first. *(source: screens/P08-venue-back-office.yaml#BO-889 / screens/P08-venue-back-office.yaml#BO-888)*
+- **Live alerts**: "Omar Haddad arrived 14 minutes late", "Maria Santos has not checked in", "Ski School staffing has fallen below minimum coverage", newest first, each linking to the person or the gap. *(source: screens/P08-venue-back-office.yaml#BO-889 / DI-490)*
+- **Attendance trend**: Checked-in percentage by day for the week as a small line chart. *(source: screens/P08-venue-back-office.yaml#BO-888)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Find replacement**: From a no-show row, opens the gap with ranked replacements (applied by a person). *(source: DI-490)*
+- **Message**: Direct message to the person. *(source: contracts/satellite/workforce.yaml#sendStaffMessage)*
+
 **Data it reads**: `listAttendance` (onLoad, Live attendance)
 
 **Where the user goes next**
@@ -769,6 +1286,51 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the attendance live workforce are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Edge cases to draw
+
+- **Clock-in made offline and not yet synced**: The person may show "Not yet arrived" until sync; when the record arrives it shows device time, so they are not marked late retroactively. *(source: contracts/satellite/workforce.yaml#/components/schemas/AttendanceRecord)*
+- **Missing clock-out at end of day**: Flagged "No clock-out", never filled in. *(source: contracts/satellite/workforce.yaml#recordAttendance)*
+
+#### Consistency with other screens
+
+- Match `BO-056`: The per-person list is BO-056's day view (same columns and status words); draw once (per VO-R14).
+- Match `BO-883`: Same counts as the roster command centre tiles.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+tiles:
+  scheduled: 126
+  checkedIn: 98 (77.8%)
+  notYetArrived: 12
+  late: 6
+  absent: 10
+  onBreak: 9
+  overtime: 4 people
+rows:
+- person: Rahul Menon
+  role: Gate steward
+  planned: 07:00
+  in: 06:52
+  out: '-'
+  status: Working
+  at: Staff Entrance North
+- person: Maria Santos
+  role: Cashier
+  planned: 09:00
+  in: 09:18
+  out: '-'
+  status: Late 18 min
+- person: Omar Haddad
+  role: Gate steward
+  planned: 07:00
+  in: '-'
+  out: '-'
+  status: No-show
+```
 
 #### Permissions
 
@@ -812,6 +1374,9 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-883`.
 - [ ] Every gated control is gated: `WORKFORCE_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 2 edge case(s) from the process notes are drawn.
+- [ ] The 3 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
+- [ ] The 1 decision(s) taken on this screen are drawn as decided, not as the old default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -831,6 +1396,21 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Offline | online only |
 | Opens with | `recordId` (navigation) |
 | Route | `/rentals/staff-check-in-check-out-attendance-exceptions-bo-889` |
+
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** One person's attendance record for a shift and its exceptions: planned against actual check-in and check-out, lateness, early departure, overtime, no-show, the source of each clock, and every correction with the original kept. A supervisor marks exceptions and corrects times here. The one thing to get right: the original value is never overwritten - each correction appends a row with who, when, before, after and why.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **recordAttendance has no person field, so a manager cannot check someone in on their behalf** Why: The pack lists manager check-in and the client render has "Mark as Present"; the operation records the caller's own attendance only. (BO-056's "Record attendance (on behalf)" has the same gap.) *(source: screens/P08-venue-back-office.yaml#BO-889 / contracts/satellite/workforce.yaml#recordAttendance; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **amendAttendance corrects a time only; exceptions cannot be marked and the exception enum lacks sick, approved absence, emergency and system error** Why: DI-491 asks for manually marked exceptions (active, not active, absent, other). *(source: DI-491 / contracts/satellite/workforce.yaml#/components/schemas/AttendanceRecord; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **Planned check-in, actual check-in, lateness and the history columns (Original value, New value, User, Timestamp, Reason) are drawn as select fields** Why: They are read values and table columns, not inputs. *(source: screens/P08-venue-back-office.yaml#BO-889; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **AttendanceRecord has no source or device field** Why: The pack's "Source/device" cannot be shown beyond the access point. *(source: screens/P08-venue-back-office.yaml#BO-889 / contracts/satellite/workforce.yaml#/components/schemas/AttendanceRecord; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+
+#### Decided on this screen
+
+Answered questions: draw the decision, not the old default. Where a decision and the tables below differ, the decision wins.
+
+- **Which corrections need approval ("Approval where required"), and by whom?** → Drawn default accepted: None by default; a greyed "Requires approval above 60 min" setting. *(decided by Chinmay, 2026-10-02; DEC-505 / CHG-NOTE-008)* **Reviewable:** a default the lead may still overrule before the block is tasked.
 
 #### Inputs: what the user enters or picks
 
@@ -858,6 +1438,11 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Approval where required | select field | — | — | — | — | — | — |
 | Mobile Assignment Check-In | select field | — | — | — | — | — | — |
 
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Correct time**: New time (date-time in venue time) and a required reason (max 300, chips "Phone died", "Forgot to clock out", "System error"). *(source: contracts/satellite/workforce.yaml#amendAttendance)*
+- **Mark exception**: One choice: Late arrival, Early departure, Missed check-in, Missed check-out, Approved absence, Sick, Emergency, System error, Manager adjustment; with a note. *(source: screens/P08-venue-back-office.yaml#BO-889 / DI-491)*
+
 #### Outputs: what the screen shows and produces
 
 **Shown**
@@ -871,6 +1456,18 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Occurred at before | 1 Oct 2026, 14:30 | The record's time before this correction. |
 | Occurred at after | 1 Oct 2026, 14:30 | The time this correction set (`correctedAt` on the request). |
 | Reason | text | — |
+
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Record header**: Person, role, shift (planned in-out), actual in-out, attendance status, and computed lateness, early departure and overtime in minutes. Read-only values, not select fields. *(source: screens/P08-venue-back-office.yaml#BO-889 / contracts/satellite/workforce.yaml#/components/schemas/AttendanceRecord)*
+- **Source of each clock**: Employee App, Manager, Staff terminal, QR, NFC, Integrated system - with the place name and "Outside the venue area" where flagged. *(source: screens/P08-venue-back-office.yaml#BO-889 / contracts/satellite/workforce.yaml#/components/schemas/AttendanceRecord)*
+- **Correction history**: Every amendment, oldest first - original value, new value, user, timestamp, reason, approval where required. *(source: screens/P08-venue-back-office.yaml#BO-889 / contracts/satellite/workforce.yaml#/components/schemas/AttendanceAmendment)*
+- **Assignment check-ins**: Where configured, check-ins to specific activities ("Checked in - Private ski lesson - Ski School Zone A - 13:57"). *(source: screens/P08-venue-back-office.yaml#BO-889)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Save adjustment**: Appends the correction; the header shows "Amended" with the original time struck through beside the new one. *(source: contracts/satellite/workforce.yaml#amendAttendance)*
+- **Mark as present (no-show)**: Records the person's attendance with the supervisor named as source and a reason; needs a confirm. *(source: screens/P08-venue-back-office.yaml#BO-889)*
 
 **Where the user goes next**
 
@@ -887,6 +1484,37 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Empty, no results (`?state=emptyNoResults`) | **Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 Out of sequence — a clock-out with no clock-in, or a second clock-in. Reported rather than silently corrected. |
+
+#### Edge cases to draw
+
+- **Second correction to the same record**: Both corrections are listed; the first is not replaced. *(source: contracts/satellite/workforce.yaml#amendAttendance)*
+- **Supervisor corrects their own record**: Refused or routed to another supervisor, with the reason. *(source: designer default)*
+
+#### Consistency with other screens
+
+- Match `BO-056`: The same amendment form and history; draw once and open it from both.
+- Match `EMP-024`: The person's phone shows "Corrected by" with the original kept.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+record:
+  person: Maria Santos
+  role: Cashier
+  planned: 09:00-17:00
+  actualIn: 09:18 (original) / 09:02 (amended)
+  actualOut: '17:00'
+  status: Amended
+  source: Employee App - Staff Entrance North
+amendments:
+- when: 10 Oct 2026 09:40
+  by: Fatima Al Hashimi
+  before: Clock in 09:18
+  after: Clock in 09:02
+  reason: Phone died at the staff entrance; seen on post at 09:02
+```
 
 #### Permissions
 
@@ -934,6 +1562,9 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-883`.
 - [ ] Every gated control is gated: `ATTENDANCE_RECORD`, `WORKFORCE_MANAGE`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 2 edge case(s) from the process notes are drawn.
+- [ ] The 4 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
+- [ ] The 1 decision(s) taken on this screen are drawn as decided, not as the old default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -956,6 +1587,19 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
 
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** The workforce compliance validation centre: every place the planned rota breaks a legal, safety, certification or organisational rule, before it is published - expired qualifications, exceeded hours, insufficient rest, missed breaks, consecutive days, under-age night shifts, below minimum cover. The one thing to get right: each finding names the person, the rule, the affected shift, the operational impact and the action to fix it, and critical findings stop publication unless an authorised override is recorded.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **The table is drawn with the pack's labels as unbound text and the gap says no schema exists** Why: validateWorkforceCompliance returns WorkforceComplianceFinding; bind code, severity, principalName, date, detail, rotaAssignmentIds. *(source: contracts/satellite/workforce.yaml#validateWorkforceCompliance; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **Findings have no operational impact or recommended action, severity is breach or warning only, and there is no override operation or non-overridable setting** Why: The pack requires each issue to show impact and action, three severities in the client render, and authorised overrides. *(source: screens/P08-venue-back-office.yaml#BO-890 / screens/P08-venue-back-office.yaml#BO-891 / contracts/satellite/workforce.yaml#/components/schemas/WorkforceComplianceFinding; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+
+#### Decided on this screen
+
+Answered questions: draw the decision, not the old default. Where a decision and the tables below differ, the decision wins.
+
+- **Who may override a compliance finding, and is the override routed through approvals?** → Drawn default accepted: Override with reason by a workforce manager, logged; greyed for rules marked non-overridable. *(decided by Chinmay, 2026-10-02; DEC-506 / CHG-NOTE-008)* **Reviewable:** a default the lead may still overrule before the block is tasked.
+
 #### Inputs: what the user enters or picks
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
@@ -966,6 +1610,11 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | To | date picker | — | — | `validateWorkforceCompliance` ?to |
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Period**: From-to dates (default the next 7 days); severity tabs All / Critical / Warning / Info with counts. *(source: screens/P08-venue-back-office.yaml#BO-890 / contracts/satellite/workforce.yaml#validateWorkforceCompliance)*
+- **Override**: Where policy permits, a reason (required) and approver; rules configured as non-overridable show no override. *(source: screens/P08-venue-back-office.yaml#BO-891)*
 
 #### Outputs: what the screen shows and produces
 
@@ -993,6 +1642,16 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Operational impact | text | not in the schema: `Operational impact` |
 | Recommended action | text | not in the schema: `Recommended action` |
 
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Findings table**: Issue in words (Rest period violation, Weekly hours exceeded, Certification expired, Missing skill level, Consecutive days exceeded, Break not scheduled, Under-age night shift, Below minimum cover), Employee, Rule ("Min 11 h rest required"), Severity (Breach shown as Critical, Warning), Affected shift, Operational impact, Recommended action. *(source: screens/P08-venue-back-office.yaml#BO-890 / contracts/satellite/workforce.yaml#/components/schemas/WorkforceComplianceFinding)*
+- **Pre-publish checklist**: Availability, Qualification, Certification, Coverage, Working-hour, Rest, Overtime and Conflict checks, each Pass or count of findings. *(source: screens/P08-venue-back-office.yaml#BO-890 / screens/P08-venue-back-office.yaml#BO-891)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Validate roster**: Runs the check for the period and refreshes the table with "Checked 14:20". *(source: contracts/satellite/workforce.yaml#validateWorkforceCompliance)*
+- **Open shift**: Opens the affected assignment on the roster to move, replace or shorten it. *(source: contracts/satellite/workforce.yaml#/components/schemas/WorkforceComplianceFinding)*
+
 **Data it reads**: `validateWorkforceCompliance` (onLoad, Where the rota breaks a rule)
 
 **Where the user goes next**
@@ -1009,6 +1668,44 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the workforce compliance validation are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Edge cases to draw
+
+- **Employee with no date of birth on a night shift**: A Warning "Age not on file", not assumed to be of age. *(source: contracts/satellite/workforce.yaml#/components/schemas/WorkforceEmployee)*
+- **No findings**: "No issues for 10-16 Oct. Roster can be published." with the checklist all passed. *(source: designer default)*
+
+#### Consistency with other screens
+
+- Match `BO-881`: Rule names and limits are the ones configured there.
+- Match `BO-885`: Below-minimum findings name the rule from there.
+- Match `BO-883`: Compliance warnings tile counts these findings.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+findings:
+- issue: Rest period violation
+  employee: Fatima Al Hashimi
+  rule: Min 11 h rest required, scheduled 9 h
+  severity: Critical
+  shift: Sat 10 Oct 14:00-23:00
+  impact: Shift cannot be confirmed
+  action: Move start to 16:00 or replace
+- issue: Certification expiring
+  employee: Rahul Menon
+  rule: First aid expires in 5 days
+  severity: Warning
+  shift: Thu 15 Oct 07:00-15:00
+  action: Book renewal
+- issue: Below minimum cover
+  employee: '-'
+  rule: Aqua Park Zone A - 4 lifeguards
+  severity: Critical
+  shift: Sat 17 Oct 15:00-18:00
+  action: Publish open shift
+```
 
 #### Permissions
 
@@ -1048,6 +1745,9 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-883`.
 - [ ] Every gated control is gated: `WORKFORCE_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 2 edge case(s) from the process notes are drawn.
+- [ ] The 2 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
+- [ ] The 1 decision(s) taken on this screen are drawn as decided, not as the old default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -1069,6 +1769,20 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Route | `/rentals/labor-cost-staffing-budget-control-bo-891` |
 
 **Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
+
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** Labour cost and staffing budget control: scheduled, forecast and actual labour cost against the budget a manager is held to, per venue, department and period, with the cost drivers (base, overtime, premium, temporary, cross-venue) and AI suggestions to reduce cost without breaking a rule. The one thing to get right: the budget comparison is four figures and a variance stated in words ("AED 600 favourable"), and the budget itself is edited per venue, department and period without overlaps.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **"Venue id" and "Department id" text filters; the budget table shows id, venueId, departmentId and scopePath** Why: Pickers and names (VO-R12). *(source: screens/P08-venue-back-office.yaml#BO-891; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **getLabourCost has no forecast figure, no cost-driver breakdown, and cannot group by event or attraction** Why: The pack's comparison is Budget, Scheduled, Forecast, Actual, Variance and its cost kinds include event and attraction staffing cost. *(source: screens/P08-venue-back-office.yaml#BO-891 / contracts/satellite/workforce.yaml#getLabourCost; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **LabourBudget.id is a required request field** Why: Server-assigned (VO-R03); the PUT is keyed by venue, department and period start. *(source: contracts/satellite/workforce.yaml#/components/schemas/LabourBudget; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+
+#### Decided on this screen
+
+Answered questions: draw the decision, not the old default. Where a decision and the tables below differ, the decision wins.
+
+- **What is "Forecast" cost - rostered plus expected overtime, or the cost of the forecast staff requirement?** → Drawn default accepted: Draw the tile with "Forecast not available yet" until defined. *(decided by Chinmay, 2026-10-02; DEC-507 / CHG-NOTE-008)* **Reviewable:** a default the lead may still overrule before the block is tasked.
 
 #### Inputs: what the user enters or picks
 
@@ -1103,6 +1817,11 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Scope path `scopePath` | text field | optional | — | — | — | — | `setLabourBudget` body |
 
 Errors to draw in the form: 409 The period overlaps another budget for the same venue and department; 422 periodEnd is before periodStart
+
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Period and grouping**: From-to (required), group by Venue / Department / Role / Day / Person; venue and department pickers, no id fields. *(source: contracts/satellite/workforce.yaml#getLabourCost / contracts/satellite/workforce.yaml#listLabourBudgets)*
+- **Set budget**: Venue (top bar), department (empty = whole venue), period start and end (dates in the region's time zone), amount in AED. No id field. Periods for one venue and department may not overlap. *(source: contracts/satellite/workforce.yaml#setLabourBudget)*
 
 #### Outputs: what the screen shows and produces
 
@@ -1146,6 +1865,18 @@ Errors to draw in the form: 409 The period overlaps another budget for the same 
 |---|---|---|---|---|---|
 | Save labour budget (primary button) | `setLabourBudget` PUT `/labour-budgets` | LabourBudget | LabourBudget | 409 The period overlaps another budget for the same venue and department; 422 periodEnd is before periodStart | gated `WORKFORCE_MANAGE`; opens modal first |
 
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Budget tiles**: Budget, Scheduled cost, Forecast cost, Actual cost, Variance (amount and %, "favourable" or "over" in words and colour). *(source: screens/P08-venue-back-office.yaml#BO-891)*
+- **Cost table**: Per group - rostered hours, actual hours, overtime hours, rostered cost, actual cost, budget, variance, headcount; money as "AED 16,750.00". *(source: contracts/satellite/workforce.yaml#/components/schemas/LabourCostRow)*
+- **Cost drivers**: Breakdown of regular pay, overtime, premium shifts, allowances and other as a donut with amounts and shares. *(source: screens/P08-venue-back-office.yaml#BO-892 / screens/P08-venue-back-office.yaml#BO-891)*
+- **AI cost suggestion**: "Replace Maria Santos (AED 480 incl. overtime) with Omar Haddad (AED 320) - saving AED 160 - equally qualified." with Apply; never offered when a mandatory rule would break. *(source: screens/P08-venue-back-office.yaml#BO-892)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Save budget**: Creates or replaces the budget for that venue, department and period start; 409 "Overlaps the October budget for Guest Services" and 422 end before start shown against the fields. Past cost is not rewritten. *(source: contracts/satellite/workforce.yaml#setLabourBudget)*
+- **Optimise with AI**: Opens BO-892 focused on cost. *(source: screens/P08-venue-back-office.yaml#BO-891)*
+
 **Data it reads**: `getLabourCost` (onLoad, Cost against budget); `listLabourBudgets` (onLoad, Labour budgets, per venue, department and period)
 
 **Where the user goes next**
@@ -1163,6 +1894,35 @@ Errors to draw in the form: 409 The period overlaps another budget for the same 
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 The period overlaps another budget for the same venue and department; 422 periodEnd is before periodStart |
+
+#### Edge cases to draw
+
+- **No budget for the period**: Budget and variance show "No budget set" with Set budget; costs still shown. *(source: contracts/satellite/workforce.yaml#getLabourCost)*
+- **Viewer without pay visibility**: Costs hidden with "Needs labour cost rights"; hours remain. *(source: screens/P08-venue-back-office.yaml#BO-882)*
+
+#### Consistency with other screens
+
+- Match `BO-883`: Staffing cost today tile is this screen's actual cost for today.
+- Match `BO-892`: Projected cost and saving there use the same figures.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+week:
+  budget: AED 120,000.00
+  scheduled: AED 112,450.00
+  forecast: AED 115,200.00
+  actual: AED 74,310.00 (to Thu)
+  variance: AED 4,800.00 favourable
+event:
+  name: Winter Lights Festival
+  budget: AED 18,000.00
+  scheduled: AED 16,750.00
+  forecast: AED 17,400.00
+  variance: AED 600.00 favourable
+```
 
 #### Permissions
 
@@ -1204,13 +1964,16 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-883`.
 - [ ] Every gated control is gated: `WORKFORCE_MANAGE`, `WORKFORCE_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 2 edge case(s) from the process notes are drawn.
+- [ ] The 3 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
+- [ ] The 1 decision(s) taken on this screen are drawn as decided, not as the old default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
 
 ### `BO-892` AI Workforce Planner & Roster Optimization
 
-**Provide TICVAI's intelligent workforce-planning experience by automatically generating or optimizing operational rosters. Administrators may configure optimization priorities such as: Best operational coverage Minimize overtime Minimize labor cost Balance employee hours Minimize cross-venue movement Maximize skill match Prioritize employee continuity Safety, compliance, and mandatory qualification rules shall remain hard constraints. AI Explanation Provide TICVAI with a centralized Resource Requirement & Assignment Engine that connects ticket products, attraction experiences, sessions, and time slots with the operational resources required to deliver them. Board 5 shall allow administrators to configure: Which resources an experience requires How many resources are required Which resource combinations are valid Which skills and qualifications are mandatory How resource requirements change with ticket quantity or capacity Whether customers may select a specific resource Whether customers may select a resource skill/type rather than a specific person Whether TICVAI should automatically allocate resources How resource priority is calculated What happens when the assigned resource becomes unavailable How assignments are exposed through POS, B2C, B2B, mobile, and APIs**
+**Generate or optimise operational rosters against configured priorities, with safety, compliance and mandatory qualifications kept as hard constraints.**
 
 | | |
 |---|---|
@@ -1224,7 +1987,19 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | nothing: it opens on its own |
 | Route | `/rentals/ai-workforce-planner-roster-optimization-bo-892` |
 
-**Known gaps.** **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+**Known gaps.** **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built. Contract gap recorded 2 October 2026 (CHG-WIR-004): No roster generation or optimisation operation.
+
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** The AI workforce planner: generate or optimise a roster for a period from demand, required roles, minimum staffing, skills, certifications, availability, leave, shift patterns and working-hour rules, against chosen objectives, and compare it with the current roster before a manager accepts any of it. The one thing to get right: AI prepares a proposal a person applies (L2 Prepare); safety, compliance and mandatory qualifications are hard constraints, every assignment explains itself, and nothing publishes automatically.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **"Generate roster with AI" and the Coverage, Overtime hours, Projected labour cost and Projected saving tiles are bound to nothing** Why: No roster-generation or optimisation operation exists; only the current coverage can be read. *(source: screens/P08-venue-back-office.yaml#BO-892 / contracts/satellite/workforce.yaml#getStaffingCoverage; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+
+#### Decided on this screen
+
+Answered questions: draw the decision, not the old default. Where a decision and the tables below differ, the decision wins.
+
+- **Which operation generates the plan, and at what autonomy level (L2 Prepare is assumed)?** → Drawn default accepted: Draw the full flow with Generate and the comparison greyed "Planner not connected yet", current coverage live. *(decided by Chinmay, 2026-10-02; DEC-508 / CHG-NOTE-008)* **Reviewable:** a default the lead may still overrule before the block is tasked.
 
 #### Inputs: what the user enters or picks
 
@@ -1244,6 +2019,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | From | date picker | — | — | `getStaffingCoverage` ?from |
 | To | date picker | — | — | `getStaffingCoverage` ?to |
 | Basis | segmented control | Minimum | Minimum · Forecast requirement · Higher of both | `getStaffingCoverage` ?basis |
+
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Period and venue**: From-to (required) and venue; the period defaults to next week. *(source: contracts/satellite/workforce.yaml#getStaffingCoverage)*
+- **Objectives**: Ranked chips: Best coverage, Minimise overtime, Minimise labour cost, Balance employee hours, Minimise cross-venue movement, Maximise skill match, Prioritise continuity. A locked list beneath: "Always enforced - safety, compliance, mandatory qualifications". *(source: screens/P08-venue-back-office.yaml#BO-892)*
+- **Demand basis**: Minimum / Forecast / Higher of both, with the forecast version named ("Forecast v12, 28 Sep"). *(source: contracts/satellite/workforce.yaml#getStaffingCoverage / DI-501)*
 
 #### Outputs: what the screen shows and produces
 
@@ -1308,6 +2089,17 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|---|---|---|---|
 | Generate roster with AI (primary button) | navigation or local | — | — | — | — |
 
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Scenario comparison**: Current roster against AI optimised, as paired tiles: Coverage 94% to 100%, Overtime 22 h to 8 h, Staffing gaps 4 to 0, Cross-venue transfers 7 to 3, Projected labour cost AED 48,200 to AED 45,900, Projected saving AED 2,300. *(source: screens/P08-venue-back-office.yaml#BO-892)*
+- **Recommended assignments**: Each proposed assignment with person, shift, match and a "Why" line ("Available, Level 3 instructor, certification valid, language match, already at venue, no overtime"). *(source: screens/P08-venue-back-office.yaml#BO-892)*
+- **Current coverage**: Table of date, position, from-to, required, rostered, qualified, gap, severity - the gaps the plan is solving. *(source: contracts/satellite/workforce.yaml#/components/schemas/StaffingCoverage)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Generate roster with AI**: Produces a draft plan; nothing changes on the rota. *(source: screens/P08-venue-back-office.yaml#BO-892 / ADR-0050)*
+- **Accept all / Accept selected / Modify / Reject / Regenerate with different priorities**: Accepted rows become Planned assignments (not published); the confirm counts them; publication stays a separate, approved step. *(source: screens/P08-venue-back-office.yaml#BO-892 / ADR-0050)*
+
 **Data it reads**: `getStaffingCoverage` (onLoad, What the planner is optimising)
 
 **Where the user goes next**
@@ -1324,6 +2116,38 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the workforce planner roster are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Edge cases to draw
+
+- **No feasible plan meets all hard constraints**: "Cannot cover Zone B 15:00-18:00 without breaking a rule - 1 lifeguard short." The gap stays; no rule-breaking suggestion is offered. *(source: screens/P08-venue-back-office.yaml#BO-892)*
+- **Rota changed after the plan was generated**: Banner "The roster changed at 14:05; regenerate before accepting". *(source: designer default)*
+
+#### Consistency with other screens
+
+- Match `BO-883`: Opened from Run AI optimisation; returns there.
+- Match `BO-891`: Cost and saving figures use the same basis.
+- Match `BO-890`: An accepted plan must pass the same compliance check before publication.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+comparison:
+  coverage: 94% to 100%
+  overtime: 22 h to 8 h
+  gaps: 4 to 0
+  transfers: 7 to 3
+  cost: AED 48,200 to AED 45,900
+  saving: AED 2,300
+recommendations:
+- person: Layla Al Suwaidi
+  assignment: Ski Instructor L3, Sat 10 Oct 14:00-16:00
+  why: Available, Level 3, certification valid, English and Hindi, already at Summit Peaks, no overtime
+- person: Hessa Al Marzooqi
+  assignment: Lifeguard, Aqua Park Zone B, Sat 17 Oct 15:00-18:00
+  why: Available, lifeguard certificate valid to Mar 2027, no overtime
+```
 
 #### Permissions
 
@@ -1367,6 +2191,9 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - [ ] Every transition is wired: `BO-883`.
 - [ ] Every gated control is gated: `WORKFORCE_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 2 edge case(s) from the process notes are drawn.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
+- [ ] The 1 decision(s) taken on this screen are drawn as decided, not as the old default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -1464,7 +2291,6 @@ Method, path, parameters, request and response for every operation these screens
 ```json
 {
 "amendAttendance": {"method":"POST","path":"/attendance/{recordId}/amend","contract":"workforce","summary":"A supervisor corrects a record","permission":"WORKFORCE_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"AttendanceRecord"},
-"claimOpenShift": {"method":"POST","path":"/shift-marketplace","contract":"workforce","summary":"Pick up a released shift","permission":"WORKFORCE_VIEW","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"OpenShift"},
 "createRotaAssignment": {"method":"POST","path":"/rota-assignments","contract":"workforce","summary":"Put someone on the rota","permission":"WORKFORCE_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"RotaAssignment","responds":"RotaAssignment"},
 "getLabourCost": {"method":"GET","path":"/labour-cost","contract":"workforce","summary":"Rostered and actual labour cost against budget","permission":"WORKFORCE_VIEW","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[{"name":"from","in":"query","required":true},{"name":"to","in":"query","required":true},{"name":"groupBy","in":"query","required":null}],"requestBody":null,"responds":"LabourCostRow"},
 "getStaffingCoverage": {"method":"GET","path":"/staffing-coverage","contract":"workforce","summary":"Where the rota is short, and by how much","permission":"WORKFORCE_VIEW","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[{"name":"from","in":"query","required":true},{"name":"to","in":"query","required":true},{"name":"venueId","in":"query","required":null},{"name":"basis","in":"query","required":null}],"requestBody":null,"responds":"StaffingCoverage"},
@@ -1473,6 +2299,7 @@ Method, path, parameters, request and response for every operation these screens
 "listLabourBudgets": {"method":"GET","path":"/labour-budgets","contract":"workforce","summary":"Labour budgets, per venue, department and period","permission":"WORKFORCE_VIEW","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[{"name":"venueId","in":"query","required":null},{"name":"departmentId","in":"query","required":null},{"name":"from","in":"query","required":null},{"name":"to","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listOpenShifts": {"method":"GET","path":"/shift-marketplace","contract":"workforce","summary":"Shifts offered back, and who may take them","permission":"WORKFORCE_VIEW","offlineCapable":true,"conflictPolicy":null,"scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"OpenShift"},
 "listRotaAssignments": {"method":"GET","path":"/rota-assignments","contract":"workforce","summary":"The rota","permission":"WORKFORCE_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"from","in":"query","required":null},{"name":"to","in":"query","required":null},{"name":"principalId","in":"query","required":null},{"name":"departmentId","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
+"listShiftSwapRequests": {"method":"GET","path":"/shift-swaps","contract":"workforce","summary":"Swap requests and their state","permission":"WORKFORCE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"ShiftSwap"},
 "recordAttendance": {"method":"POST","path":"/attendance/clock","contract":"workforce","summary":"Clock in, clock out, or take a break","permission":"ATTENDANCE_RECORD","offlineCapable":true,"conflictPolicy":"append","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"AttendanceRecord"},
 "setAlertRule": {"method":"PUT","path":"/alert-rules","contract":"reporting","summary":"Watch a metric and tell somebody","permission":"REPORT_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"AlertRule","responds":"AlertRule"},
 "setLabourBudget": {"method":"PUT","path":"/labour-budgets","contract":"workforce","summary":"Set the labour budget for a venue, department and period","permission":"WORKFORCE_MANAGE","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"LabourBudget","responds":"LabourBudget"},
@@ -1495,12 +2322,13 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "AttendanceRecord": {"type":"object","x-ticvai-persistence":"workforce.attendance","required":["id","principalId","kind","occurredAt"],"properties":{"id":{"type":"string","format":"uuid"},"principalId":{"type":"string","format":"uuid"},"assignmentId":{"type":"string","format":"uuid","nullable":true},"venueId":{"type":"string","format":"uuid"},"kind":{"type":"string","enum":["clockIn","clockOut","breakStart","breakEnd"]},"occurredAt":{"type":"string","format":"date-time","description":"Device time — when it happened."},"recordedAt":{"type":"string","format":"date-time","description":"When the server received it. **Both are kept**: a steward clocking in offline at a gate is not late because the sync was.\n"},"accessPointId":{"type":"string","format":"uuid","nullable":true},"latitude":{"type":"number","nullable":true},"longitude":{"type":"number","nullable":true},"isAmended":{"type":"boolean","readOnly":true},"amendedByPrincipalId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"Who made the latest amendment. The full history is `amendments` (audit R129 (7))."},"amendmentReason":{"type":"string","nullable":true,"readOnly":true,"description":"The latest amendment's reason. The full history is `amendments` (audit R129 (7))."},"originalOccurredAt":{"type":"string","format":"date-time","nullable":true,"description":"**The original is never overwritten.** Attendance feeds pay, and a record that can be quietly rewritten is not evidence.\n"},"amendments":{"type":"array","readOnly":true,"description":"**Every correction, oldest first, one row each** (decided 28 September, audit R129 (7)). A single set of amendment columns holds only the last one, and the second correction to a record would erase the evidence of the first.\n","items":{"$ref":"#/components/schemas/AttendanceAmendment"}},"exception":{"type":"string","nullable":true,"enum":["late","earlyLeave","missingClockOut","noShow","outOfGeofence","unscheduled"],"description":"Computed against the rota. Null where the record matches what was expected."}}},
 "LabourBudget": {"type":"object","x-ticvai-persistence":"workforce.labour_budget","description":"**The labour budget a general manager is held to, per venue, department and period** (resource board 4.9; data model for the agreed operations, 29 September). `getLabourCost` compares rostered and actual cost against it (`LabourCostRow.budget`). A null `departmentId` is the whole venue's budget. Periods for one venue and department do not overlap. Written by `setLabourBudget`, listed by `listLabourBudgets` (decided 29 September, writers pass).","required":["id","venueId","periodStart","periodEnd","budgetAmount"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"venueId":{"type":"string","format":"uuid"},"departmentId":{"type":"string","format":"uuid","nullable":true},"periodStart":{"type":"string","format":"date","description":"First day of the period, in the Region's time zone"},"periodEnd":{"type":"string","format":"date","description":"Last day of the period, in the Region's time zone"},"budgetAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"scopePath":{"type":"string"},"createdAt":{"type":"string","format":"date-time","readOnly":true},"updatedAt":{"type":"string","format":"date-time","readOnly":true}}},
 "LabourCostRow": {"type":"object","description":"Resource board 4.9. **Rostered and actual diverge every day.**","properties":{"key":{"type":"string"},"label":{"type":"string"},"rosteredHours":{"type":"number"},"actualHours":{"type":"number"},"overtimeHours":{"type":"number"},"rosteredCost":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"actualCost":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"budget":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"variance":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"variancePercent":{"type":"number"},"headcount":{"type":"integer"}}},
-"MetricSource": {"type":"string","description":"**A named metric with a verified source.** BL-053, 75 requirement rows.\n`reporting` is a generic builder, and **a generic builder makes every reporting requirement look covered** — it will happily assemble a report over data nobody produces. That is the shape to watch across the whole walk, and this enum is the answer to it: each value below was checked against the schema before being named.\n| Metric | Source | |---|---| | `occupancy` | `catalogue.channel_capacity.sold` and `leased` against `capacity` | | `capacityUtilisation` | `catalogue.channel_capacity.remaining` over the same window | | `admissionRate` | `access.scan_event.outcome`, in-direction | | `noShowRate` | Entitlements issued against scans that never arrived | | `conversion` | `orders.cart` against `orders.sales_order` | | `salesByOperator` | `orders.sales_order.principal_id` | | `salesByWorkstation` | The workstation on the shift that took it | | `waitTime` | `queue.waiting_guest.estimated_call_at` against `called_at` | | `throughput` | `queue.waiting_guest` completions per hour | | `abandonmentRate` | Queue entries that left before being called |\n**`salesByInstructor` was deliberately absent from the first cut** because it needed the staff-assignment link CL-01 covers. It was added on 18 August once `resources.Resource` produced it — see `x-ticvai-extension-note` below. Naming a metric with no source is still the defect this enum exists to prevent.\n**Money-valued metrics are listed in `x-ticvai-money-valued`.** A reading or threshold on one of them is a `Money`, never a float (`MetricValue`).\n","enum":["occupancy","capacityUtilisation","admissionRate","noShowRate","conversion","salesByOperator","salesByWorkstation","waitTime","throughput","abandonmentRate","inventoryValuation","stockTurnover","stockAgeing","wastageRate","resaleVolume","resaleCommission","salesByInstructor","resourceUtilisation","allocationUtilisation","channelAllocationBurn","membershipChurn","membershipRenewalRate","supplierDeliveryPerformance","revenuePerEntitlement","revenuePerVisitor","assetDowntime","meanTimeToRepair","challengeCompletionRate","attributedRevenue","loyaltyActiveMembers","loyaltyTierDistribution","loyaltyPointsLiability","loyaltyBreakageRate","loyaltyMemberRetention","challengeParticipationRate","gamificationLoyaltyImpact","gamificationMembershipImpact","gamificationRetention","accreditationApplications","accreditationTimeToDecision","accreditationCredentialsIssued","accreditationActiveHolders","accreditationRenewalsDue","staffingShortfall"],"x-ticvai-money-valued":["inventoryValuation","resaleCommission","revenuePerEntitlement","revenuePerVisitor","attributedRevenue","loyaltyPointsLiability"],"x-ticvai-extended-29-september":"**Fourteen metrics added 29 September (build pass)**, each checked against the schema of the contract that produces it.\n\n| Metric | Source | Requirement | |---|---|---| | `loyaltyActiveMembers` | `marketing.loyalty_position` members with a `marketing.loyalty_points` movement in the period | 5.4.27 | | `loyaltyTierDistribution` | `marketing.loyalty_position.tier_id` against `marketing.programme_tier`, members per tier | 5.4.27 | | `loyaltyPointsLiability` | the balance of `ledger.journal_line` on each programme's `pointsLiabilityAccountId`, where points post on accrual and release on redemption or expiry | 5.4.27 | | `loyaltyBreakageRate` | `marketing.loyalty_points` expiry movements over points earned, in the period | 5.4.27 | | `loyaltyMemberRetention` | members with a movement in the previous period who also have one in this period | 5.4.27 | | `challengeParticipationRate` | distinct `marketing.challenge_progress.subject_id` over active loyalty members | 22.6.20 | | `gamificationLoyaltyImpact` | points earned per member, challenge participants against non-participants (`marketing.loyalty_points` split by `marketing.challenge_progress`) | 22.6.20 | | `gamificationMembershipImpact` | joins and renewals in `identity.customer_membership`, participants against non-participants | 22.6.20 | | `gamificationRetention` | return visits (`access.scan_event`, in-direction) of participants against non-participants | 22.6.20 | | `accreditationApplications` | `accreditation.application` by `status` | 12.1.50 | | `accreditationTimeToDecision` | `accreditation.application.decided_at` minus `submitted_at` | 12.1.50 | | `accreditationCredentialsIssued` | `accreditation.credential.issued_at` | 12.1.50 | | `accreditationActiveHolders` | `accreditation.holder` `active`, by `category_code` | 12.1.50 | | `accreditationRenewalsDue` | `accreditation.holder.valid_to` inside `accreditation.validity.renewal_window_days` | 12.1.50 |\n\n**`staffingShortfall` added the same evening (build pass, group G2; 8.2.49)**: the largest gap in the window between the staff rostered and the staff the forecast requires, per venue and position, from `workforce.forecast_requirement` (the handed-over AI staff requirement) against `workforce.rota_assignment` and `workforce.open_shift`, computed as `workforce.getStaffingCoverage` with `basis` `forecastRequirement`. An `AlertRule` on it with `comparator` `above` and `threshold` 0 is the staffing shortage alert; `windowMinutes` looks ahead rather than back for this metric (the rota for the coming window), and `cooldownMinutes` stops one short shift alerting every quarter hour.\n\n**Points issued, points redeemed, campaign performance and reward redemption were already served** by the `loyalty` and `campaigns` sources, and challenge completion and revenue attribution by `challengeCompletionRate` and `attributedRevenue`.\n","x-ticvai-money-valued-note":"**`salesByOperator`, `salesByWorkstation` and `resaleVolume` are not listed because the package does not say whether they count sales or sum their value.** Until that is decided, a rule on them carries a plain number.\n","x-ticvai-extended":"18 August 2026","x-ticvai-extension-note":"**Nineteen metrics added when their upstream models landed**, which is how BL-053 was always going to close — not by changing `reporting` but by building the things it wanted to report on.\n`inventoryValuation`, `stockTurnover`, `stockAgeing` and `wastageRate` came from `inventory.StockBatch`; `resaleVolume` and `resaleCommission` from `orders.ResaleListing`; **`salesByInstructor` from `resources.Resource`, which was the one metric this enum deliberately refused to name in the morning** because nothing produced it. `allocationUtilisation` from `PartnerUser` and `ChannelListing`, `membershipChurn` from `Journey`, `supplierDeliveryPerformance` from `ProductionRun`, `assetDowntime` and `meanTimeToRepair` from `WorkOrder.downtimeMinutes`, `challengeCompletionRate` from `ChallengeProgress`, `attributedRevenue` from `AttributionTouch`.\n**Each was checked against the schema before being named.** That rule has not changed — naming a metric with no source is the defect this enum exists to prevent.\n"},
+"MetricSource": {"type":"string","description":"**A named metric with a verified source.** BL-053, 75 requirement rows.\n`reporting` is a generic builder, and **a generic builder makes every reporting requirement look covered** — it will happily assemble a report over data nobody produces. That is the shape to watch across the whole walk, and this enum is the answer to it: each value below was checked against the schema before being named.\n| Metric | Source | |---|---| | `occupancy` | `catalogue.channel_capacity.sold` and `leased` against `capacity` | | `capacityUtilisation` | `catalogue.channel_capacity.remaining` over the same window | | `admissionRate` | `access.scan_event.outcome`, in-direction | | `noShowRate` | Entitlements issued against scans that never arrived | | `conversion` | `orders.cart` against `orders.sales_order` | | `salesByOperator` | `orders.sales_order.principal_id` | | `salesByWorkstation` | The workstation on the shift that took it | | `waitTime` | `queue.waiting_guest.estimated_call_at` against `called_at` | | `throughput` | `queue.waiting_guest` completions per hour | | `abandonmentRate` | Queue entries that left before being called |\n**`salesByInstructor` was deliberately absent from the first cut** because it needed the staff-assignment link CL-01 covers. It was added on 18 August once `resources.Resource` produced it — see `x-ticvai-extension-note` below. Naming a metric with no source is still the defect this enum exists to prevent.\n**Money-valued metrics are listed in `x-ticvai-money-valued`.** A reading or threshold on one of them is a `Money`, never a float (`MetricValue`).\n","enum":["occupancy","capacityUtilisation","admissionRate","noShowRate","conversion","salesByOperator","salesByWorkstation","waitTime","throughput","abandonmentRate","inventoryValuation","stockTurnover","stockAgeing","wastageRate","resaleVolume","resaleCommission","salesByInstructor","resourceUtilisation","allocationUtilisation","channelAllocationBurn","membershipChurn","membershipRenewalRate","supplierDeliveryPerformance","revenuePerEntitlement","revenuePerVisitor","assetDowntime","meanTimeToRepair","challengeCompletionRate","attributedRevenue","loyaltyActiveMembers","loyaltyTierDistribution","loyaltyPointsLiability","loyaltyBreakageRate","loyaltyMemberRetention","challengeParticipationRate","gamificationLoyaltyImpact","gamificationMembershipImpact","gamificationRetention","accreditationApplications","accreditationTimeToDecision","accreditationCredentialsIssued","accreditationActiveHolders","accreditationRenewalsDue","staffingShortfall","grossSales","discounts","refunds","netRevenue","recognisedRevenue","deferredRevenue","taxCollected","takings"],"x-ticvai-money-valued":["grossSales","discounts","refunds","netRevenue","recognisedRevenue","deferredRevenue","taxCollected","takings","inventoryValuation","resaleCommission","revenuePerEntitlement","revenuePerVisitor","attributedRevenue","loyaltyPointsLiability"],"x-ticvai-extended-29-september":"**Fourteen metrics added 29 September (build pass)**, each checked against the schema of the contract that produces it.\n\n| Metric | Source | Requirement | |---|---|---| | `loyaltyActiveMembers` | `marketing.loyalty_position` members with a `marketing.loyalty_points` movement in the period | 5.4.27 | | `loyaltyTierDistribution` | `marketing.loyalty_position.tier_id` against `marketing.programme_tier`, members per tier | 5.4.27 | | `loyaltyPointsLiability` | the balance of `ledger.journal_line` on each programme's `pointsLiabilityAccountId`, where points post on accrual and release on redemption or expiry | 5.4.27 | | `loyaltyBreakageRate` | `marketing.loyalty_points` expiry movements over points earned, in the period | 5.4.27 | | `loyaltyMemberRetention` | members with a movement in the previous period who also have one in this period | 5.4.27 | | `challengeParticipationRate` | distinct `marketing.challenge_progress.subject_id` over active loyalty members | 22.6.20 | | `gamificationLoyaltyImpact` | points earned per member, challenge participants against non-participants (`marketing.loyalty_points` split by `marketing.challenge_progress`) | 22.6.20 | | `gamificationMembershipImpact` | joins and renewals in `identity.customer_membership`, participants against non-participants | 22.6.20 | | `gamificationRetention` | return visits (`access.scan_event`, in-direction) of participants against non-participants | 22.6.20 | | `accreditationApplications` | `accreditation.application` by `status` | 12.1.50 | | `accreditationTimeToDecision` | `accreditation.application.decided_at` minus `submitted_at` | 12.1.50 | | `accreditationCredentialsIssued` | `accreditation.credential.issued_at` | 12.1.50 | | `accreditationActiveHolders` | `accreditation.holder` `active`, by `category_code` | 12.1.50 | | `accreditationRenewalsDue` | `accreditation.holder.valid_to` inside `accreditation.validity.renewal_window_days` | 12.1.50 |\n\n**`staffingShortfall` added the same evening (build pass, group G2; 8.2.49)**: the largest gap in the window between the staff rostered and the staff the forecast requires, per venue and position, from `workforce.forecast_requirement` (the handed-over AI staff requirement) against `workforce.rota_assignment` and `workforce.open_shift`, computed as `workforce.getStaffingCoverage` with `basis` `forecastRequirement`. An `AlertRule` on it with `comparator` `above` and `threshold` 0 is the staffing shortage alert; `windowMinutes` looks ahead rather than back for this metric (the rota for the coming window), and `cooldownMinutes` stops one short shift alerting every quarter hour.\n\n**Points issued, points redeemed, campaign performance and reward redemption were already served** by the `loyalty` and `campaigns` sources, and challenge completion and revenue attribution by `challengeCompletionRate` and `attributedRevenue`.\n","x-ticvai-extended-2-october":"**Eight finance measures added 2 October 2026** (Chinmay; CHG-FIN-007, CHG-FIN-010), each with the source and formula of the seeded KPI of the same code in `ReportingSystemKpi`: `grossSales`, `discounts`, `refunds`, `netRevenue`, `recognisedRevenue`, `deferredRevenue`, `taxCollected` and `takings`, so an alert rule can watch them (a refund spike, takings below a target). Formulas are the D-185 default; client finance sign-off is pending.","x-ticvai-money-valued-note":"**`salesByOperator`, `salesByWorkstation` and `resaleVolume` are not listed because the package does not say whether they count sales or sum their value.** Until that is decided, a rule on them carries a plain number.\n","x-ticvai-extended":"18 August 2026","x-ticvai-extension-note":"**Nineteen metrics added when their upstream models landed**, which is how BL-053 was always going to close — not by changing `reporting` but by building the things it wanted to report on.\n`inventoryValuation`, `stockTurnover`, `stockAgeing` and `wastageRate` came from `inventory.StockBatch`; `resaleVolume` and `resaleCommission` from `orders.ResaleListing`; **`salesByInstructor` from `resources.Resource`, which was the one metric this enum deliberately refused to name in the morning** because nothing produced it. `allocationUtilisation` from `PartnerUser` and `ChannelListing`, `membershipChurn` from `Journey`, `supplierDeliveryPerformance` from `ProductionRun`, `assetDowntime` and `meanTimeToRepair` from `WorkOrder.downtimeMinutes`, `challengeCompletionRate` from `ChallengeProgress`, `attributedRevenue` from `AttributionTouch`.\n**Each was checked against the schema before being named.** That rule has not changed — naming a metric with no source is the defect this enum exists to prevent.\n"},
 "MetricValue": {"x-ticvai-persistence-column":"numeric(18,4)","description":"**A reading of a metric or KPI, or a threshold on one.** A `Money` where the metric is money-valued — `MetricSource` lists those in `x-ticvai-money-valued`, and a KPI is when its `unit` is `currency` — and a plain number otherwise. naming-and-style 5.1: money is never a float, at any layer.\nStored as `numeric(18,4)` either way: a money value stores its amount, and currency and scale resolve from the scope as they do for every `Money`.\n","oneOf":[{"type":"number"},{"$ref":"../shared/common.yaml#/components/schemas/Money"}]},
 "OpenShift": {"type":"object","x-ticvai-persistence":"workforce.open_shift","description":"Resource board 4.6. **How a gap gets filled at nine on a Friday without a manager ringing round.**\n","properties":{"id":{"type":"string","format":"uuid"},"rotaAssignmentId":{"type":"string","format":"uuid","nullable":true},"shiftTemplateId":{"type":"string","format":"uuid","nullable":true},"venueId":{"type":"string","format":"uuid"},"positionCode":{"type":"string"},"from":{"type":"string","format":"date-time"},"to":{"type":"string","format":"date-time"},"releasedBy":{"type":"string","format":"uuid","nullable":true},"reason":{"type":"string","nullable":true},"requiredQualifications":{"type":"array","items":{"type":"string"}},"eligiblePrincipalCount":{"type":"integer","readOnly":true},"incentiveRateMultiplier":{"type":"number","nullable":true},"status":{"type":"string","enum":["open","claimed","pendingApproval","filled","expired","withdrawn"]},"claimedBy":{"type":"string","format":"uuid","nullable":true},"claimedAt":{"type":"string","format":"date-time","nullable":true},"scopePath":{"type":"string"}}},
 "Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}},
 "RotaAssignment": {"type":"object","x-ticvai-persistence":"workforce.rota_assignment","required":["principalId","venueId","startsAt","endsAt","position"],"properties":{"overtimeMinutes":{"type":"integer","nullable":true,"readOnly":true,"description":"BL-044, 1.2.83. **UAE labour law limits working hours and mandates rest periods**, and nothing in the package counted either. Derived from attendance against the shift.\n"},"restPeriodBefore":{"type":"integer","nullable":true,"description":"Minutes since the previous shift ended. **The check that stops a closing shift followed by an opening one**, which is legal in most places and unsafe in all of them.\n"},"breachesWorkingHourLimit":{"type":"boolean","default":false,"readOnly":true,"description":"**Flagged at assignment, not discovered at payroll.** A rota that breaches a statutory limit is a rota somebody has to redo, and finding out a month later means it was worked.\n"},"labourCost":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"description":"**Cost at the point of scheduling.** A manager building a rota without seeing its cost is a manager who finds out from finance.\n"},"id":{"type":"string","format":"uuid","readOnly":true},"principalId":{"type":"string","format":"uuid"},"displayName":{"type":"string","readOnly":true},"venueId":{"type":"string","format":"uuid"},"departmentId":{"type":"string","format":"uuid","nullable":true},"position":{"type":"string","description":"What they are rostered to do — gate steward, cashier, lifeguard, technician. **Most positions never touch a till**, which is why a rota assignment is not a shift.\n**A position code, not a label.** It is the same value as `StaffingRules.minimumCover[].positionCode`, `OpenShift.positionCode` and `StaffingCoverage.positionCode`: coverage counts rostered people per position, so an assignment spelled differently from the rule it fills is counted against nothing and the gap stays open. Tenant-defined, which is why it is not an enum here.\n"},"requiredRoleId":{"type":"string","format":"uuid","nullable":true,"description":"Checked on assignment. A rota naming someone unqualified is a rota that gets overridden."},"workstationId":{"type":"string","format":"uuid","nullable":true,"description":"Where the position needs a till. **The link between a rota and a cash session**, without merging the two.\n"},"startsAt":{"type":"string","format":"date-time"},"endsAt":{"type":"string","format":"date-time"},"status":{"$ref":"#/components/schemas/RotaStatus"},"breakMinutes":{"type":"integer","nullable":true},"note":{"type":"string","nullable":true}}},
 "RotaStatus": {"type":"string","enum":["planned","published","confirmed","swapPending","cancelled","completed","noShow"]},
+"ShiftSwap": {"type":"object","x-ticvai-persistence":"workforce.shift_swap","required":["id","assignmentId","fromPrincipalId","toPrincipalId","status"],"properties":{"id":{"type":"string","format":"uuid"},"assignmentId":{"type":"string","format":"uuid"},"fromPrincipalId":{"type":"string","format":"uuid"},"toPrincipalId":{"type":"string","format":"uuid"},"status":{"type":"string","enum":["awaitingPeer","awaitingApproval","approved","rejected","withdrawn"],"description":"**Both parties before the supervisor.** A swap approved against someone who never agreed is a gap in the rota nobody notices until the shift starts.\n"},"approvalRequestId":{"type":"string","nullable":true,"description":"Routed through `approvals` rather than a second mechanism here."},"reason":{"type":"string","nullable":true},"requestedAt":{"type":"string","format":"date-time"}}},
 "StaffingCoverage": {"type":"object","description":"Resource board 4.4. **The gap is the product.**","properties":{"date":{"type":"string","format":"date"},"venueId":{"type":"string","format":"uuid"},"positionCode":{"type":"string"},"label":{"type":"string"},"from":{"type":"string"},"to":{"type":"string"},"required":{"type":"integer"},"rostered":{"type":"integer"},"qualified":{"type":"integer","description":"**A position filled by somebody not qualified for it is still a gap.**"},"gap":{"type":"integer"},"severity":{"type":"string","enum":["covered","tight","short","blocking"]},"openShiftIds":{"type":"array","items":{"type":"string","format":"uuid"}},"basisApplied":{"type":"string","enum":["minimum","forecastRequirement"],"description":"Which figure `required` is for this row. With `higherOfBoth`, the larger; with `forecastRequirement` and no handed-over requirement for the period, `minimum`."},"minimumRequired":{"type":"integer","nullable":true,"description":"The configured minimum for the position and window."},"forecastRequired":{"type":"number","nullable":true,"description":"The forecast staff requirement (p50) for the position and window, from `workforce.forecast_requirement`. Null where none was handed over."},"forecastRequiredP90":{"type":"number","nullable":true,"description":"The busy-case requirement, for planning to the busy case."},"forecastVersionId":{"type":"string","format":"uuid","nullable":true,"description":"The AI forecast version the requirement is bound to (AIP-067), so a manager can open the forecast behind it."}}},
 "StaffingRules": {"type":"object","x-ticvai-persistence":"workforce.staffing_rules + workforce.position_requirement","description":"Resource board 4.3. **A safety rule before it is a cost rule.**","properties":{"minimumCover":{"type":"array","description":"**Minimum staffing per position, venue and time window, with the qualifications it requires**: the rows of `workforce.position_requirement` (data model for the agreed operations, 29 September). `getStaffingCoverage` measures the rota against them; before this they were an array with no table, so no minimum was stored.","items":{"type":"object","required":["id","positionCode","minimumHeadcount"],"properties":{"id":{"type":"string","format":"uuid"},"positionCode":{"type":"string"},"label":{"type":"string"},"venueId":{"type":"string","format":"uuid","nullable":true},"attractionId":{"type":"string","format":"uuid","nullable":true},"minimumHeadcount":{"type":"integer","minimum":0},"daysOfWeek":{"type":"array","nullable":true,"description":"Days the minimum applies; absent means every day the venue is open","items":{"type":"string","enum":["monday","tuesday","wednesday","thursday","friday","saturday","sunday"]}},"startsAt":{"type":"string","nullable":true,"description":"Start of the time window, local time (HH:MM) as `ShiftTemplate.startsAt`; absent means opening"},"endsAt":{"type":"string","nullable":true,"description":"End of the time window, local time (HH:MM); absent means closing"},"requiredQualifications":{"type":"array","items":{"type":"string"}},"appliesWhenOpen":{"type":"boolean","default":true},"blocksOperation":{"type":"boolean","default":true,"description":"**A ride requiring two operators cannot run with one.** Where this is true the attraction closes rather than running short.\n"}}}},"maximumHoursPerDay":{"type":"integer","nullable":true},"maximumHoursPerWeek":{"type":"integer","nullable":true},"minimumRestHours":{"type":"integer","nullable":true},"maximumConsecutiveDays":{"type":"integer","nullable":true},"overtime":{"type":"object","properties":{"allowed":{"type":"boolean","default":true},"afterHoursPerWeek":{"type":"integer","nullable":true},"rateMultiplier":{"type":"number","nullable":true},"requiresApproval":{"type":"boolean","default":true}}},"minimumAgeForNightShift":{"type":"integer","nullable":true},"defaultIncentiveRateMultiplier":{"type":"number","nullable":true,"minimum":1,"description":"**What an open shift pays above base when it is released.** Added 22 September: `workforce.open_shift.incentive_rate_multiplier` was set per shift with nothing behind it, so two identical shifts could price differently and record no reason. The shift still carries its own value — **as the snapshot**, the rule-and-record split `payments.fee_rule` and `orders.order_fee` use — and this is where it comes from.\n**Top-level rather than beside `overtime`** so the value is its own column. Nested in an object it would be a key inside a JSON blob, which nothing can index, constrain or pair to the shift that uses it.\n"},"maximumIncentiveRateMultiplier":{"type":"number","nullable":true,"minimum":1,"description":"**The ceiling on an incentive.** A shift nobody claims is the moment somebody raises the multiplier in a hurry — the same reason `maximumDailyCharge` bounds a late fee."},"incentiveApprovalAbove":{"type":"number","nullable":true,"minimum":1,"description":"**Above this multiplier a second person approves the release.** Routed as an approval, not a boolean — `overtime.requiresApproval` beside it is one of 26 approval flags across the contracts that no approval kind, matrix row or SLA reaches."},"scopePath":{"type":"string"}}},
 "WorkforceComplianceFinding": {"type":"object","description":"Resource board 4.8. **Checked before the rota is published, not in an inspection.**","properties":{"code":{"type":"string","enum":["expiredQualification","missingQualification","exceededDailyHours","exceededWeeklyHours","insufficientRest","missedBreak","consecutiveDaysExceeded","underAgeNightShift","belowMinimumCover"]},"severity":{"type":"string","enum":["breach","warning"]},"principalId":{"type":"string","format":"uuid","nullable":true},"principalName":{"type":"string","nullable":true},"date":{"type":"string","format":"date","nullable":true},"detail":{"type":"string"},"rotaAssignmentIds":{"type":"array","items":{"type":"string","format":"uuid"}}}}

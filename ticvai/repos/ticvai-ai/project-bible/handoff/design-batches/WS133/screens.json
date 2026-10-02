@@ -35,15 +35,18 @@
     {
      "to": "BO-726",
      "trigger": "Participant Photo & Video Assignment",
-     "provenance": "structural — pack board 9 wiring, 19 September 2026"
+     "provenance": "structural — pack board 9 wiring, 19 September 2026",
+     "carries": [
+      "performanceId"
+     ]
     }
    ]
   },
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
-  "purpose": "Provide management with a consolidated backend view of the financial, commercial, sponsorship, attendance and operational performance of events.",
-  "purposeNote": "Authorized users can obtain a consolidated view of event commercial and operational performance while data visibility remains controlled by tenant, entity and role permissions.",
+  "purpose": "See the performances running and their occupancy, and the slot templates they run on.",
+  "purposeNote": "Authorized users can obtain a consolidated view of event commercial and operational performance while data visibility remains controlled by tenant, entity and role permissions. Purpose rewritten 2 October 2026 (CHG-WIR-026): The purpose was pack text attached by page rather than by screen and does not describe this screen; it is rewritten from the screen's name and operations (design-notes correction ticketing-backoffice BO-725)",
   "gaps": [
    {
     "operation": null,
@@ -67,6 +70,12 @@
        "derived": true,
        "impliedBy": "listPerformanceTemplates",
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      },
+      {
+       "kind": "dataTable",
+       "label": "Performances",
+       "operation": "listPerformances",
+       "provenance": "contract catalogue.yaml GET /events/{eventId}/performances; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -86,6 +95,13 @@
     "purpose": "Sessions running",
     "trigger": "onLoad",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "listPerformances",
+    "contract": "catalogue",
+    "purpose": "The performances running, with their occupancy",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {
@@ -94,6 +110,14 @@
    "workshopBoard": "wireframes/WS56 Event Management Configuration Backend Structure v1.0 Board 9.dc.html#bo-725"
   },
   "apisNote": "Regenerated 9 September 2026 from Event_Management_Configuration_Backend_Structure_v1.0.pdf page 81. 0 of 0 labels bound to a contract property; 0 of 40 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "eventId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -147,15 +171,18 @@
      "to": "BO-725",
      "trigger": "Back to Performance Operations Command Center",
      "provenance": "structural — pack board 9 wiring, 19 September 2026",
-     "back": true
+     "back": true,
+     "carries": [
+      "eventId"
+     ]
     }
    ]
   },
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
-  "purpose": "Provide detailed analytics for individual participant activity, especially for minute-based and flight/activity businesses.",
-  "purposeNote": "Authorized users can access accurate participant activity statistics derived from booking and completed-session records while respecting CRM/data-access permissions.",
+  "purpose": "Attach the photos and videos taken during a performance to its participants.",
+  "purposeNote": "Authorized users can access accurate participant activity statistics derived from booking and completed-session records while respecting CRM/data-access permissions. Purpose rewritten 2 October 2026 (CHG-WIR-026): The purpose was pack text attached by page rather than by screen and does not describe this screen; it is rewritten from the screen's name and operations (design-notes correction ticketing-backoffice BO-726)",
   "gaps": [
    {
     "operation": null,
@@ -187,6 +214,13 @@
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
        "impliedBy": "assignPerformanceMedia"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Read a performance",
+       "bindsTo": "Performance",
+       "operation": "getPerformance",
+       "provenance": "contract catalogue.yaml GET /performances/{performanceId}; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -206,6 +240,13 @@
     "purpose": "Attach photos to participants",
     "trigger": "onAction",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "getPerformance",
+    "contract": "catalogue",
+    "purpose": "Read a performance",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {

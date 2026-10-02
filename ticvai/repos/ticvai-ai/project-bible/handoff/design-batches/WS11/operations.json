@@ -33,6 +33,25 @@
   "requestBody": null,
   "responds": "AccessRiskScore"
  },
+ "getFaceReenrolmentImages": {
+  "method": "GET",
+  "path": "/face-reenrolment-attempts/{attemptId}/images",
+  "contract": "access",
+  "summary": "View the images behind a face re-enrolment review (logged)",
+  "permission": "BIOMETRIC_IMAGE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "reason",
+    "in": "query",
+    "required": true
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
  "listAccessRiskScoring": {
   "method": "GET",
   "path": "/access-risk-scoring",

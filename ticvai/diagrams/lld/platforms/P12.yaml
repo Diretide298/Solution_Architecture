@@ -29,16 +29,18 @@ servicesCalled:
 - service: MarketingService
   operationCalls: 60
 - service: IdentityService
-  operationCalls: 9
+  operationCalls: 11
 - service: ReportingService
   operationCalls: 8
 - service: AiService
   operationCalls: 4
+- service: VenueOpsService
+  operationCalls: 2
 - service: WhiteLabelService
   operationCalls: 1
 - service: LedgerService
   operationCalls: 1
-- service: VenueOpsService
+- service: OrderService
   operationCalls: 1
 coverage:
   screens: 28
@@ -54,25 +56,33 @@ screens:
   wave: 3
   density: compact
   operations:
+  - changeOwnCredential
+  - completeSsoAuthorization
   - createMfaChallenge
-  - forceLogout
+  - enrolMfaMethod
   - getCurrentSession
-  - listActiveSessions
-  - listMfaMethods
   - listSsoProviders
   - login
-  - revokeAllSessions
+  - selectRole
+  - startSsoAuthorization
   - verifyMfaChallenge
+  - verifyMfaEnrolment
   states:
+  - denied
   - emptyFirstRun
   - emptyNoAccess
   - emptyNoResults
   - error
   - loading
+  - mfaEnrolmentRequired
   - mfaRequired
-  offlineState: false
+  - offline
+  - sessionHeld
+  offlineState: true
   entryParams:
   - challengeId<-navigation
+  - providerId<-deepLink
+  - methodId<-navigation
   goesTo:
   - ANL-001
   - BO-001
@@ -150,16 +160,9 @@ screens:
   wave: 2
   density: compact
   operations:
-  - addCaseMessage
   - claimConversation
-  - createCase
-  - escalateCase
-  - getCase
-  - listCases
   - listConversations
-  - reopenCase
   - transferConversation
-  - updateCase
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -168,7 +171,6 @@ screens:
   - loading
   offlineState: false
   entryParams:
-  - caseId<-deepLink
   - conversationId<-deepLink
   goesTo:
   - SUP-001
@@ -178,7 +180,6 @@ screens:
   boardFrames: null
   wireframe: wireframes/P12 Venue Support.dc.html#sup-004
   inFlows:
-  - F05 Agent resolves a guest complaint
   - F24 A guest asks the assistant and ends up with a person
 - screen: SUP-005
   name: Live Chat Workspace
@@ -225,8 +226,8 @@ screens:
   density: compact
   operations:
   - listFaqs
-  - listKnowledgeCollections
   - listKnowledgeGaps
+  - semanticSearch
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -234,11 +235,7 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams:
-  - bannerId<-deepLink
-  - pageId<-deepLink
-  - policyKind<-deepLink
-  - version<-deepLink
+  entryParams: []
   goesTo:
   - SUP-001
   - SUP-003
@@ -385,6 +382,7 @@ screens:
   wave: 3
   density: compact
   operations:
+  - createCase
   - createCaseClassificationIntelligent
   - listCaseCategories
   states:
@@ -407,7 +405,12 @@ screens:
   wave: 3
   density: compact
   operations:
+  - addCaseMessage
+  - completeUpload
+  - createUpload
+  - getCase
   - setCaseInvestigationResolution
+  - updateCase
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -415,7 +418,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - caseId<-navigation
   goesTo:
   - SUP-009
   boardFrames: null
@@ -429,6 +433,7 @@ screens:
   wave: 3
   density: compact
   operations:
+  - listOrders
   - setOrderBookingTicket
   states:
   - emptyFirstRun
@@ -495,13 +500,15 @@ screens:
   density: compact
   operations:
   - listCaseResolutionClosure
+  - updateCase
   states:
   - emptyFirstRun
   - emptyNoAccess
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - caseId<-navigation
   goesTo:
   - SUP-009
   boardFrames: null
@@ -571,7 +578,6 @@ screens:
   wave: 3
   density: compact
   operations:
-  - listQueues
   - listServiceQueues
   - setServiceQueueDefinition
   states:
@@ -619,6 +625,7 @@ screens:
   density: compact
   operations:
   - listSlaPolicyService
+  - setSlaPolicy
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -640,6 +647,7 @@ screens:
   density: compact
   operations:
   - listAgentWorkloadAvailability
+  - updateCase
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -647,7 +655,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - caseId<-navigation
   goesTo:
   - SUP-019
   boardFrames: null

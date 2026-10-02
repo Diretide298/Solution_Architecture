@@ -191,84 +191,6 @@
    }
   }
  },
- "PartnerAccessRolesPermissionProfileView": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over control.partner_capability_grant (PartnerCapabilityGrant) and the existing subscription state, assembled at read time (data model DM4)",
-  "description": "**What Partner Access, Roles & Permission Profile displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
-  "properties": {
-   "partnerId": {
-    "type": "string",
-    "format": "uuid",
-    "description": "Partner"
-   },
-   "capability": {
-    "type": "string",
-    "enum": [
-     "searchAvailability",
-     "createBooking",
-     "holdInventory",
-     "confirmBooking",
-     "cancelBooking",
-     "modifyBooking",
-     "rescheduleBooking",
-     "downloadTicket",
-     "printTicket",
-     "sendTicket",
-     "accessCustomerDetails",
-     "useCredit",
-     "usePaymentCard",
-     "viewCommission",
-     "viewNetRates",
-     "accessReports",
-     "exportData",
-     "useApi",
-     "createSubAgents",
-     "refund",
-     "manualPriceOverride",
-     "creditAdjustment",
-     "highValueBooking",
-     "customerDataExport"
-    ],
-    "description": "Organization-level capability (pack pp.16-17; refund and rescheduleBooking from MoM 31 Aug 4.3)"
-   },
-   "allowed": {
-    "type": "boolean",
-    "description": "Whether the partner may use this capability"
-   },
-   "requiresInternalApproval": {
-    "type": "boolean",
-    "description": "Sensitive function: each use needs additional internal approval"
-   },
-   "grantType": {
-    "type": "string",
-    "enum": [
-     "permanent",
-     "temporary",
-     "seasonal",
-     "eventSpecific"
-    ],
-    "description": "Effective Dates: how long the grant lasts"
-   },
-   "effectiveFrom": {
-    "type": "string",
-    "format": "date",
-    "description": "Effective from",
-    "nullable": true
-   },
-   "effectiveTo": {
-    "type": "string",
-    "format": "date",
-    "description": "Effective to",
-    "nullable": true
-   },
-   "eventId": {
-    "type": "string",
-    "description": "Event the grant is limited to, for an eventSpecific grant",
-    "nullable": true
-   }
-  }
- },
  "PartnerAgreementStatus": {
   "type": "string",
   "enum": [
@@ -967,111 +889,6 @@
    }
   }
  },
- "PartnerCapabilityGrant": {
-  "type": "object",
-  "x-ticvai-persistence": "control.partner_capability_grant",
-  "description": "The ceiling on one capability for one partner: whether the organisation may use it, whether each use needs internal approval, and for how long. A partner user's own permissions sit inside this ceiling (decided 29 September, data model DM4)\n\n**Written by** setPartnerCapabilityGrants, which replaces the partner's ceiling as a set (decided 29 September, writers pass; DM4).",
-  "required": [
-   "id",
-   "partnerId",
-   "capability",
-   "allowed",
-   "grantType"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid",
-    "readOnly": true
-   },
-   "partnerId": {
-    "type": "string",
-    "format": "uuid",
-    "description": "The partner (control.partner)."
-   },
-   "capability": {
-    "type": "string",
-    "enum": [
-     "searchAvailability",
-     "createBooking",
-     "holdInventory",
-     "confirmBooking",
-     "cancelBooking",
-     "modifyBooking",
-     "rescheduleBooking",
-     "downloadTicket",
-     "printTicket",
-     "sendTicket",
-     "accessCustomerDetails",
-     "useCredit",
-     "usePaymentCard",
-     "viewCommission",
-     "viewNetRates",
-     "accessReports",
-     "exportData",
-     "useApi",
-     "createSubAgents",
-     "refund",
-     "manualPriceOverride",
-     "creditAdjustment",
-     "highValueBooking",
-     "customerDataExport"
-    ],
-    "description": "Organisation-level capability (pack pp.16-17; refund and rescheduleBooking from MoM 31 Aug 4.3)."
-   },
-   "allowed": {
-    "type": "boolean",
-    "description": "Whether the partner may use this capability."
-   },
-   "requiresInternalApproval": {
-    "type": "boolean",
-    "default": false,
-    "description": "Sensitive function: each use needs additional internal approval."
-   },
-   "grantType": {
-    "type": "string",
-    "enum": [
-     "permanent",
-     "temporary",
-     "seasonal",
-     "eventSpecific"
-    ],
-    "description": "How long the grant lasts."
-   },
-   "effectiveFrom": {
-    "type": "string",
-    "format": "date",
-    "nullable": true,
-    "description": "Effective from."
-   },
-   "effectiveTo": {
-    "type": "string",
-    "format": "date",
-    "nullable": true,
-    "description": "Effective to."
-   },
-   "eventId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "Event (catalogue.event) the grant is limited to, for an eventSpecific grant."
-   },
-   "scopePath": {
-    "type": "string",
-    "description": "The partition key (ADR-0005), written at `tenant` scope."
-   },
-   "createdAt": {
-    "type": "string",
-    "format": "date-time",
-    "readOnly": true
-   },
-   "updatedAt": {
-    "type": "string",
-    "format": "date-time",
-    "readOnly": true
-   }
-  }
- },
  "PartnerContact": {
   "type": "object",
   "x-ticvai-persistence": "control.partner_contact",
@@ -1377,151 +1194,6 @@
     "format": "uuid",
     "description": "Identity principal of the B2B user account; empty for a contact with no account",
     "nullable": true
-   }
-  }
- },
- "PartnerDistributionRight": {
-  "type": "object",
-  "x-ticvai-persistence": "control.partner_distribution_right",
-  "description": "One territory, market and distribution right for a partner: where it may sell, by which methods, how exclusively and whether it may appoint sub-agents. A blank dimension means all; `allowed: false` is an explicit exclusion (decided 29 September, data model DM4)\n\n**Written by** setPartnerDistributionRights, which replaces the partner's rights as a set (decided 29 September, writers pass; DM4).",
-  "required": [
-   "id",
-   "partnerId",
-   "allowed",
-   "exclusivity",
-   "effectiveFrom"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid",
-    "readOnly": true
-   },
-   "partnerId": {
-    "type": "string",
-    "format": "uuid",
-    "description": "The partner (control.partner)."
-   },
-   "country": {
-    "type": "string",
-    "nullable": true,
-    "description": "Country, ISO 3166-1 alpha-2; blank = all."
-   },
-   "region": {
-    "type": "string",
-    "nullable": true,
-    "description": "Region; blank = all in the country."
-   },
-   "city": {
-    "type": "string",
-    "nullable": true,
-    "description": "City; blank = all in the region."
-   },
-   "market": {
-    "type": "string",
-    "nullable": true,
-    "description": "Market (source market the partner sells into)."
-   },
-   "brandId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "Brand (a platform.scope node); blank = all."
-   },
-   "venueId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "Venue; blank = all venues in scope."
-   },
-   "attractionId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "Attraction; blank = all."
-   },
-   "eventId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "Event (catalogue.event); blank = all."
-   },
-   "allowed": {
-    "type": "boolean",
-    "description": "Allowed (true) or explicitly not allowed (false), the pack's Allowed / Not allowed example."
-   },
-   "distributionMethods": {
-    "type": "array",
-    "items": {
-     "type": "string",
-     "enum": [
-      "b2bPortal",
-      "api",
-      "otaConnection",
-      "agentPortal",
-      "affiliateLink",
-      "voucherDistribution",
-      "bulkTicketExport",
-      "other"
-     ]
-    },
-    "description": "Distribution methods this right covers."
-   },
-   "exclusivity": {
-    "type": "string",
-    "enum": [
-     "nonExclusive",
-     "exclusive",
-     "preferred",
-     "restricted"
-    ],
-    "description": "Exclusivity."
-   },
-   "subAgentRule": {
-    "type": "string",
-    "enum": [
-     "allowed",
-     "prohibited",
-     "approvalRequired"
-    ],
-    "description": "Sub-agent rights."
-   },
-   "maximumHierarchyDepth": {
-    "type": "integer",
-    "minimum": 0,
-    "nullable": true,
-    "description": "Maximum hierarchy depth of sub-agents below the partner."
-   },
-   "effectiveFrom": {
-    "type": "string",
-    "format": "date",
-    "description": "Effective from."
-   },
-   "effectiveTo": {
-    "type": "string",
-    "format": "date",
-    "nullable": true,
-    "description": "Effective to; empty for open-ended."
-   },
-   "reviewDate": {
-    "type": "string",
-    "format": "date",
-    "nullable": true,
-    "description": "Review date."
-   },
-   "scopePath": {
-    "type": "string",
-    "description": "The partition key (ADR-0005), written at `tenant` scope."
-   },
-   "createdAt": {
-    "type": "string",
-    "format": "date-time",
-    "readOnly": true
-   },
-   "updatedAt": {
-    "type": "string",
-    "format": "date-time",
-    "readOnly": true
    }
   }
  },
@@ -2457,142 +2129,154 @@
    }
   }
  },
- "TerritoryMarketDistributionRightsView": {
+ "Session": {
   "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over control.partner_distribution_right (PartnerDistributionRight) and the existing subscription state, assembled at read time (data model DM4)",
-  "description": "**What Territory, Market & Distribution Rights displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "required": [
+   "sessionId",
+   "principalId",
+   "roleId",
+   "scope",
+   "effectivePermissions"
+  ],
   "properties": {
-   "country": {
+   "sessionId": {
     "type": "string",
-    "description": "Country, ISO 3166-1 alpha-2; blank = all",
-    "nullable": true
+    "format": "uuid"
    },
-   "region": {
+   "principalId": {
     "type": "string",
-    "description": "Region; blank = all in the country",
-    "nullable": true
+    "format": "uuid"
    },
-   "city": {
+   "roleId": {
     "type": "string",
-    "description": "City; blank = all in the region",
-    "nullable": true
+    "format": "uuid"
    },
-   "market": {
-    "type": "string",
-    "description": "Market (source market the partner sells into)",
-    "nullable": true
+   "displayName": {
+    "type": "string"
    },
-   "venue": {
-    "type": "string",
-    "description": "Venue id; blank = all venues in scope",
-    "nullable": true
-   },
-   "attraction": {
-    "type": "string",
-    "description": "Attraction id",
-    "nullable": true
-   },
-   "event": {
-    "type": "string",
-    "description": "Event id",
-    "nullable": true
-   },
-   "brand": {
-    "type": "string",
-    "description": "Brand id",
-    "nullable": true
-   },
-   "maximumHierarchyDepth": {
-    "type": "integer",
-    "description": "Maximum hierarchy depth of sub-agents below the partner",
-    "nullable": true
-   },
-   "effectiveFrom": {
-    "type": "string",
-    "format": "date",
-    "description": "Effective From"
-   },
-   "effectiveTo": {
-    "type": "string",
-    "format": "date",
-    "description": "Effective To; empty for open-ended",
-    "nullable": true
-   },
-   "rightId": {
-    "type": "string",
-    "format": "uuid",
-    "description": "Distribution right id"
-   },
-   "partnerId": {
-    "type": "string",
-    "format": "uuid",
-    "description": "Partner"
-   },
-   "allowed": {
-    "type": "boolean",
-    "description": "Allowed (true) or explicitly not allowed (false), the pack's Allowed / Not allowed example"
-   },
-   "distributionMethods": {
+   "scope": {
     "type": "array",
+    "description": "Scope nodes this session may act within, resolved once at login from the ltree hierarchy with deny-overrides-allow. Clients filter navigation against this — they never compute it.\n",
     "items": {
-     "type": "string",
-     "enum": [
-      "b2bPortal",
-      "api",
-      "otaConnection",
-      "agentPortal",
-      "affiliateLink",
-      "voucherDistribution",
-      "bulkTicketExport",
-      "other"
-     ]
-    },
-    "description": "Distribution Rights: Distribution methods: b2bPortal (the TICVAI B2B portal), api (partner consumes the TICVAI API), otaConnection (TICVAI integrates into the OTA, either direction per MoM 31 Aug 4.3), agentPortal, affiliateLink, voucherDistribution, bulkTicketExport (pre-generated QR tickets as CSV, MoM 5 Aug option 3), other"
+     "$ref": "../shared/common.yaml#/components/schemas/ScopeRef"
+    }
    },
-   "exclusivity": {
-    "type": "string",
-    "enum": [
-     "nonExclusive",
-     "exclusive",
-     "preferred",
-     "restricted"
+   "effectivePermissions": {
+    "allOf": [
+     {
+      "$ref": "../shared/permissions.yaml#/components/schemas/PermissionSet"
+     }
     ],
-    "description": "Exclusivity"
+    "description": "Flattened set across all granted scopes, after deny resolution. Convenience for coarse checks. Anything scope-sensitive must use `permissionsByScope`.\n"
    },
-   "subAgentRule": {
-    "type": "string",
-    "enum": [
-     "allowed",
-     "prohibited",
-     "approvalRequired"
-    ],
-    "description": "Sub-Agent Rights"
-   },
-   "reviewDate": {
-    "type": "string",
-    "format": "date",
-    "description": "Review Date",
-    "nullable": true
-   },
-   "validationIssues": {
+   "permissionsByScope": {
     "type": "array",
-    "description": "Conflict Detection: e.g. two partners exclusive for the same market and period",
+    "description": "Permissions effective at each granted scope path. Clients filter navigation on this and never compute permissions themselves.\n",
+    "items": {
+     "$ref": "../shared/permissions.yaml#/components/schemas/ScopedPermissions"
+    }
+   },
+   "saleBoardId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "Landing surface, derived from the WORKSTATION, not the role (12 Aug 2026 §3). Ticketing, F&B or Retail board.\n\n**Optional since 2 October 2026: only a till session carries it** (Chinmay, door follow-ups; CHG-CSP-002; breaking change against r1 approved as BC-001 to BC-005 in `docs/active/breaking-changes.yaml`). A browser door (ADM-001, SUP-001, PTR-001) and a staff handheld (EMP-001) sign in with no workstation since CHG-DOOR-001, so they have no board to land on and the field is absent. On a till it is the workstation's effective board: the outlet's board unless the till overrides it (`tenancy.Workstation.saleBoardSource`; CHG-CSP-006). A client reads its landing from this field when present and from its own platform otherwise.\n"
+   },
+   "workstation": {
+    "$ref": "#/components/schemas/WorkstationContext"
+   },
+   "openedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "WorkstationContext": {
+  "type": "object",
+  "required": [
+   "id",
+   "code",
+   "venueId",
+   "regionId"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "regionId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "accessPointId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "Inherited from the workstation, never selected by the operator."
+   },
+   "devices": {
+    "type": "array",
     "items": {
      "type": "object",
+     "required": [
+      "kind",
+      "driver"
+     ],
      "properties": {
-      "code": {
+      "kind": {
        "type": "string",
        "enum": [
-        "overlappingExclusiveRight",
-        "outsideBusinessScope"
+        "receiptPrinter",
+        "ticketPrinter",
+        "cashDrawer",
+        "barcodeScanner",
+        "rfidReader",
+        "paymentTerminal",
+        "customerDisplay"
        ]
       },
-      "message": {
+      "driver": {
+       "type": "string"
+      },
+      "identifier": {
        "type": "string"
       }
      }
     }
+   },
+   "currency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$"
+   },
+   "currencyScale": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 4
+   },
+   "timezone": {
+    "type": "string"
+   },
+   "cellName": {
+    "type": "string",
+    "description": "The cell serving this workstation's region. One cell per tenant per region (ADR-0014). A client uses this only for diagnostics and telemetry tagging — never for routing, which the Control Plane resolves.\n"
+   },
+   "deploymentProfile": {
+    "type": "string",
+    "enum": [
+     "terminalLocal",
+     "venueEdge",
+     "thin"
+    ],
+    "description": "Whether this surface reads catalogue locally (ADR-0013). Determines which flows the client enables offline.\n"
    }
   }
  }

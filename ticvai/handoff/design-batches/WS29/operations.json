@@ -1,4 +1,23 @@
 {
+ "approveMembershipProductValidation": {
+  "method": "PUT",
+  "path": "/membership-product-validation",
+  "contract": "subscription",
+  "summary": "Membership Product Validation, Approval, Publication & Versioning",
+  "permission": "PLATFORM_CELL_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "MembershipProductValidationApprovalPublicationVersioInput",
+  "responds": "MembershipProductValidationApprovalPublicationVersioView"
+ },
  "createEntitlementTemplate": {
   "method": "POST",
   "path": "/entitlement-templates",
@@ -18,6 +37,25 @@
   "requestBody": "EntitlementTemplate",
   "responds": "EntitlementTemplate"
  },
+ "createMfaChallenge": {
+  "method": "POST",
+  "path": "/auth/mfa/challenge",
+  "contract": "identity",
+  "summary": "Second factor at staff sign-in, and step-up for a sensitive action",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
  "listEntitlementTemplates": {
   "method": "GET",
   "path": "/entitlement-templates",
@@ -30,6 +68,133 @@
   "parameters": [],
   "requestBody": null,
   "responds": "EntitlementTemplate"
+ },
+ "listMembershipAnnualPass": {
+  "method": "GET",
+  "path": "/membership-annual-pass",
+  "contract": "subscription",
+  "summary": "Membership & Annual Pass Command Center",
+  "permission": "PLATFORM_TENANT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "membershipType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "tier",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "venue",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "hasConfigurationIssues",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "search",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listMembershipCommercialPricing": {
+  "method": "GET",
+  "path": "/membership-commercial-pricing",
+  "contract": "subscription",
+  "summary": "Membership Commercial, Pricing & Channel Association",
+  "permission": "PLATFORM_TENANT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "membershipCode",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "salesPeriod",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listMembershipUsageVisit": {
+  "method": "GET",
+  "path": "/membership-usage-visit",
+  "contract": "subscription",
+  "summary": "Membership Usage, Visit & Consumption Rules",
+  "permission": "PLATFORM_TENANT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "membershipCode",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "tier",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
  },
  "listPriceLists": {
   "method": "GET",
@@ -79,6 +244,25 @@
   "requestBody": "ChannelPublicationAvailabilityInput",
   "responds": "ChannelPublicationAvailabilityView"
  },
+ "setFamilyHouseholdDependent": {
+  "method": "PUT",
+  "path": "/family-household-dependent",
+  "contract": "subscription",
+  "summary": "Family, Household & Dependent Membership Configuration",
+  "permission": "PLATFORM_CELL_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "FamilyHouseholdDependentMembershipConfigurationInput",
+  "responds": "FamilyHouseholdDependentMembershipConfigurationView"
+ },
  "setMembershipBenefit": {
   "method": "PUT",
   "path": "/membership-benefits",
@@ -98,6 +282,82 @@
   "requestBody": "CatalogueMembershipBenefit",
   "responds": "CatalogueMembershipBenefit"
  },
+ "setMembershipCommercialConfig": {
+  "method": "PUT",
+  "path": "/membership-commercial-config",
+  "contract": "subscription",
+  "summary": "Save a membership product's commercial references, payment eligibility and sales period",
+  "permission": "PLATFORM_CELL_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "MembershipCommercialConfigInput",
+  "responds": "MembershipCommercialPricingChannelAssociationView"
+ },
+ "setMembershipEligibilityQualification": {
+  "method": "PUT",
+  "path": "/membership-eligibility-qualification",
+  "contract": "subscription",
+  "summary": "Membership Eligibility & Qualification Rule Builder",
+  "permission": "PLATFORM_CELL_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "MembershipEligibilityQualificationRuleBuilderInput",
+  "responds": "MembershipEligibilityQualificationRuleBuilderView"
+ },
+ "setMembershipEntitlementAdmission": {
+  "method": "PUT",
+  "path": "/membership-entitlement-admission",
+  "contract": "subscription",
+  "summary": "Membership Entitlement & Admission Benefit Builder",
+  "permission": "PLATFORM_CELL_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "MembershipEntitlementAdmissionBenefitBuilderInput",
+  "responds": "MembershipEntitlementAdmissionBenefitBuilderView"
+ },
+ "setMembershipProductTier": {
+  "method": "PUT",
+  "path": "/membership-product-tier",
+  "contract": "subscription",
+  "summary": "Membership Product & Tier Builder",
+  "permission": "PLATFORM_CELL_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "MembershipProductTierBuilderInput",
+  "responds": "MembershipProductTierBuilderView"
+ },
  "setMembershipProgramme": {
   "method": "PUT",
   "path": "/membership-programmes",
@@ -116,6 +376,25 @@
   ],
   "requestBody": "CatalogueMembershipProgramme",
   "responds": "CatalogueMembershipProgramme"
+ },
+ "setMembershipUsagePolicy": {
+  "method": "PUT",
+  "path": "/membership-usage-policy",
+  "contract": "subscription",
+  "summary": "Save a membership product's usage, visit and consumption rules",
+  "permission": "PLATFORM_CELL_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "MembershipUsagePolicyInput",
+  "responds": "MembershipUsageVisitConsumptionRulesView"
  },
  "setPlanBenefits": {
   "method": "PUT",
@@ -156,6 +435,63 @@
     "in": null,
     "required": null
    },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "setRenewalAutoMembership": {
+  "method": "PUT",
+  "path": "/renewal-auto-membership",
+  "contract": "subscription",
+  "summary": "Renewal, Auto-Renewal & Membership Continuity Configuration",
+  "permission": "PLATFORM_CELL_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RenewalAutoRenewalMembershipContinuityConfigurationInput",
+  "responds": "RenewalAutoRenewalMembershipContinuityConfigurationView"
+ },
+ "setValidityActivationExpiry": {
+  "method": "PUT",
+  "path": "/validity-activation-expiry",
+  "contract": "subscription",
+  "summary": "Validity, Activation & Expiry Configuration",
+  "permission": "PLATFORM_CELL_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ValidityActivationExpiryConfigurationInput",
+  "responds": "ValidityActivationExpiryConfigurationView"
+ },
+ "verifyMfaChallenge": {
+  "method": "POST",
+  "path": "/auth/mfa/challenge/{challengeId}/verify",
+  "contract": "identity",
+  "summary": "Complete a sign-in or step-up challenge",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
    {
     "name": null,
     "in": null,

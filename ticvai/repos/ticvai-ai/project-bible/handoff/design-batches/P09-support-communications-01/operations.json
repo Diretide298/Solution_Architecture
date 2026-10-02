@@ -1,23 +1,4 @@
 {
- "listAnnouncements": {
-  "method": "GET",
-  "path": "/announcements",
-  "contract": "workforce",
-  "summary": "What staff have been told",
-  "permission": "WORKFORCE_VIEW",
-  "offlineCapable": true,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "unacknowledgedOnly",
-    "in": "query",
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Announcement"
- },
  "listSupportNotices": {
   "method": "GET",
   "path": "/support-notices",
@@ -30,25 +11,6 @@
   "parameters": [],
   "requestBody": null,
   "responds": "SupportNotice"
- },
- "publishAnnouncement": {
-  "method": "POST",
-  "path": "/announcements",
-  "contract": "workforce",
-  "summary": "Tell staff something",
-  "permission": "ANNOUNCEMENT_PUBLISH",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "Announcement",
-  "responds": "Announcement"
  },
  "publishSupportNotice": {
   "method": "POST",

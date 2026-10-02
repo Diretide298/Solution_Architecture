@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Promotions & Bundles
   version: 0.1.0
-  x-ticvai-screen-count: 144
+  x-ticvai-screen-count: 134
   x-ticvai-tier: satellite
   x-ticvai-module: 4 — Bundles and Promotions
   x-ticvai-requirements: 229
@@ -85,9 +85,9 @@ paths:
     post:
       operationId: simulatePromotion
       x-ticvai-consumed-by:
-        - "P08 BO-010 Promotions & Coupons"
         - "P08 ADM-157 Rule Test, Simulation & AI Recommendation Workspace"
         - "P08 ADM-177 Offer Simulation, Basket Trace & AI Optimization"
+        - "P08 BO-010 Promotions & Coupons"
       summary: What this promotion would have cost on real history
       description: 'BL-114. **A promotion is priced by guessing until it runs.** Run it against a past
         period and the answer is arithmetic: how many orders would have qualified, what the discount would
@@ -159,8 +159,8 @@ paths:
     put:
       operationId: setPromotionVariants
       x-ticvai-consumed-by:
-        - "P08 BO-010 Promotions & Coupons"
         - "P08 ADM-226 Campaign Experiment & A/B Test Manager"
+        - "P08 BO-010 Promotions & Coupons"
       summary: A/B test two versions against each other
       description: 'BL-114. **Split by a stable hash of the subject, not at random per request** — a guest
         who sees 10% on Monday and 15% on Tuesday has learned to wait.
@@ -380,9 +380,9 @@ paths:
         - "P02 GST-036 Loyalty & Rewards"
         - "P02 GST-037 Offers & Promotions"
         - "P04 POS-002 Sell — Ticket Catalogue"
-        - "P08 BO-010 Promotions & Coupons"
         - "P08 ADM-138 Promotion Command Center Dashboard"
         - "P08 ADM-145 Promotion Approval Inbox"
+        - "P08 BO-010 Promotions & Coupons"
         - "P10 PTR-010 Cart & Quote"
       # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
       # or staff token is still accepted. `{}` makes the credential optional.
@@ -526,8 +526,8 @@ paths:
         - "P01 WEB-032 Offers & Promotions"
         - "P02 GST-037 Offers & Promotions"
         - "P04 POS-002 Sell — Ticket Catalogue"
-        - "P08 BO-010 Promotions & Coupons"
         - "P08 ADM-140 Promotion Overview"
+        - "P08 BO-010 Promotions & Coupons"
         - "P10 PTR-010 Cart & Quote"
       # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
       # or staff token is still accepted. `{}` makes the credential optional.
@@ -644,8 +644,8 @@ paths:
     post:
       operationId: pausePromotion
       x-ticvai-consumed-by:
-        - "P08 BO-010 Promotions & Coupons"
         - "P08 ADM-141 Promotion Lifecycle & Status Manager"
+        - "P08 BO-010 Promotions & Coupons"
       x-ticvai-api-scope: ticketing.write
       x-ticvai-audience:
       - staff
@@ -702,8 +702,8 @@ paths:
     post:
       operationId: endPromotion
       x-ticvai-consumed-by:
-        - "P08 BO-010 Promotions & Coupons"
         - "P08 ADM-141 Promotion Lifecycle & Status Manager"
+        - "P08 BO-010 Promotions & Coupons"
       x-ticvai-api-scope: ticketing.write
       x-ticvai-audience:
       - staff
@@ -761,8 +761,8 @@ paths:
     post:
       operationId: unschedulePromotion
       x-ticvai-consumed-by:
-        - "P08 BO-010 Promotions & Coupons"
         - "P08 ADM-141 Promotion Lifecycle & Status Manager"
+        - "P08 BO-010 Promotions & Coupons"
       x-ticvai-api-scope: ticketing.write
       x-ticvai-audience:
       - staff
@@ -808,8 +808,8 @@ paths:
     post:
       operationId: publishPromotion
       x-ticvai-consumed-by:
-        - "P08 BO-010 Promotions & Coupons"
         - "P08 ADM-141 Promotion Lifecycle & Status Manager"
+        - "P08 BO-010 Promotions & Coupons"
       x-ticvai-api-scope: ticketing.write
       x-ticvai-audience:
       - staff
@@ -914,9 +914,9 @@ paths:
       operationId: getPromotionUsage
       x-ticvai-consumed-by:
         - "P04 POS-002 Sell — Ticket Catalogue"
-        - "P08 BO-010 Promotions & Coupons"
         - "P08 ADM-138 Promotion Command Center Dashboard"
         - "P08 ADM-140 Promotion Overview"
+        - "P08 BO-010 Promotions & Coupons"
         - "P10 PTR-010 Cart & Quote"
       x-ticvai-api-scope: ticketing.read
       x-ticvai-audience:
@@ -951,8 +951,8 @@ paths:
     get:
       operationId: listCouponCampaigns
       x-ticvai-consumed-by:
-        - "P08 BO-010 Promotions & Coupons"
         - "P08 ADM-159 Coupon & Promo Code Builder"
+        - "P08 BO-010 Promotions & Coupons"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -1035,9 +1035,9 @@ paths:
     get:
       operationId: listCouponCodes
       x-ticvai-consumed-by:
-        - "P08 BO-010 Promotions & Coupons"
         - "P08 ADM-158 Coupon & Promo Code Command Center"
         - "P08 ADM-164 Code Distribution & Assignment Manager"
+        - "P08 BO-010 Promotions & Coupons"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -1080,8 +1080,8 @@ paths:
     post:
       operationId: generateCouponCodes
       x-ticvai-consumed-by:
-        - "P08 BO-010 Promotions & Coupons"
         - "P08 ADM-160 Unique Code Generation & Batch Manager"
+        - "P08 BO-010 Promotions & Coupons"
       x-ticvai-audience:
       - staff
       summary: Generate codes in bulk
@@ -2030,9 +2030,9 @@ paths:
         - "P04 POS-021 Sell — Food & Drink"
         - "P04 POS-023 Sell — Merchandise"
         - "P05 KSK-006 Review"
-        - "P08 BO-010 Promotions & Coupons"
         - "P08 ADM-157 Rule Test, Simulation & AI Recommendation Workspace"
         - "P08 ADM-177 Offer Simulation, Basket Trace & AI Optimization"
+        - "P08 BO-010 Promotions & Coupons"
         - "P10 PTR-010 Cart & Quote"
       security:
       - guestAuth: []
@@ -2307,8 +2307,8 @@ paths:
     get:
       operationId: listCampaignCalendarTimeline
       x-ticvai-consumed-by:
-        - "P08 BO-765 Campaign Library & Calendar"
         - "P08 ADM-142 Campaign Calendar & Timeline"
+        - "P08 BO-765 Campaign Library & Calendar"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.12; no promotions minutes on file (the 3 September walkthrough was not minuted), so our build plan; shape fixed (7 filters to query parameters; 13 non-field properties removed; enums calendarState; added promotionId, promotionName, startDate, endDate, venue, channel)'
@@ -4496,9 +4496,9 @@ paths:
     get:
       operationId: listRealTimeAvailability
       x-ticvai-consumed-by:
-        - "P08 BO-518 Real-Time Availability Calendar"
         - "P08 ADM-194 Real-Time Availability & Checkout Validation"
         - "P08 ADM-271 Real-Time Channel Availability & Inventory Monitor"
+        - "P08 BO-518 Real-Time Availability Calendar"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.84; no promotions minutes on file (the 3 September walkthrough was not minuted), so our build plan; shape fixed (enums failedChecks; added bundleId, sellable)'
@@ -5101,8 +5101,8 @@ paths:
     get:
       operationId: listAudienceDiscoveryTargeting
       x-ticvai-consumed-by:
-        - "P08 BO-761 AI Audience Discovery"
         - "P08 ADM-207 AI Audience Discovery & Targeting Optimization"
+        - "P08 BO-761 AI Audience Discovery"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -5827,8 +5827,8 @@ paths:
     put:
       operationId: approveCampaignWorkflow
       x-ticvai-consumed-by:
-        - "P08 BO-770 Campaign Approval Workflow"
         - "P08 ADM-223 Campaign Approval Workflow Designer"
+        - "P08 BO-770 Campaign Approval Workflow"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.131; no promotions minutes on file (the 3 September walkthrough was not minuted), so our build plan; shape fixed (1 non-field properties removed)'
@@ -7411,13 +7411,13 @@ paths:
     get:
       operationId: listCommercialCampaigns
       x-ticvai-consumed-by:
-        - "P08 BO-010 Promotions & Coupons"
-        - "P08 BO-011 Packages & Bundles"
         - "P08 ADM-139 Promotion & Campaign Directory"
         - "P08 ADM-142 Campaign Calendar & Timeline"
         - "P08 ADM-179 Bundle Definition & Setup"
         - "P08 ADM-219 Campaign Budget & Financial Limit Setup"
         - "P08 ADM-229 Campaign & Promotion Performance Explorer"
+        - "P08 BO-010 Promotions & Coupons"
+        - "P08 BO-011 Packages & Bundles"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: writers pass; pack Promotions___Bundles_Management_Reference.pdf p.8 (Promotion & Campaign Directory lists every commercial campaign) and p.12 (Campaign Calendar & Timeline); no promotions minutes on file, so our build plan; shape follows listPromotions'

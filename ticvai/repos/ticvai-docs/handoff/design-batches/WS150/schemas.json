@@ -374,7 +374,7 @@
     "type": "string",
     "pattern": "^[A-Z]{3}$",
     "nullable": true,
-    "description": "4.6.11 is deliberately asymmetric: **accept foreign currency, refund in local.** A till giving change in five currencies needs five floats and five counts, and the variance becomes unattributable.\n"
+    "description": "4.6.11 is deliberately asymmetric: **accept foreign currency, refund in local.** A till giving change in five currencies needs five floats and five counts, and the variance becomes unattributable.\n**Cash at a till only** (CHG-FIN-001, 2 October 2026). A card or wallet payment the guest made in a currency they selected is refunded in that currency (`Refund.tenderCurrency`).\n"
    },
    "amount": {
     "$ref": "../shared/common.yaml#/components/schemas/Money"
@@ -836,6 +836,251 @@
    },
    "topDeclineReason": {
     "type": "string",
+    "nullable": true
+   }
+  }
+ },
+ "PaymentRuleSet": {
+  "type": "object",
+  "x-ticvai-persistence": "none — composed from the three payment rule tables",
+  "description": "**Three tables, one decision.** Whether a guest may pay with this method, in this currency, and what it costs the venue are evaluated together at checkout. An administrator changing one without seeing the others is how a method becomes eligible in a currency it cannot settle.\n",
+  "properties": {
+   "currencyRules": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/PaymentsCurrencyRule"
+    }
+   },
+   "eligibilityRules": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/PaymentsEligibilityRule"
+    }
+   },
+   "feeRules": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/PaymentsFeeRule"
+    }
+   }
+  }
+ },
+ "PaymentsCurrencyRule": {
+  "type": "object",
+  "x-ticvai-persistence": "payments.currency_rule",
+  "description": "**Taken from the backend workbook, 20 September.** NEW TABLE. Defines payment-level currency rules such as accepted/settlement currency, min/max payment amount and rounding.",
+  "required": [
+   "paymentPolicyId",
+   "code",
+   "isActive",
+   "createdAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "paymentPolicyId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "scopePath": {
+    "type": "string",
+    "nullable": true
+   },
+   "channelId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "code": {
+    "type": "string",
+    "maxLength": 10
+   },
+   "settlementCurrencyCode": {
+    "type": "string",
+    "maxLength": 10,
+    "nullable": true
+   },
+   "minPaymentAmount": {
+    "type": "number",
+    "nullable": true
+   },
+   "maxPaymentAmount": {
+    "type": "number",
+    "nullable": true
+   },
+   "roundingIncrement": {
+    "type": "number",
+    "nullable": true
+   },
+   "isActive": {
+    "type": "boolean"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "PaymentsEligibilityRule": {
+  "type": "object",
+  "x-ticvai-persistence": "payments.eligibility_rule",
+  "description": "**Taken from the backend workbook, 20 September.** NEW TABLE. Defines when a payment method is allowed or denied for a transaction.",
+  "required": [
+   "paymentPolicyId",
+   "paymentMethodId",
+   "effect",
+   "priority",
+   "isActive",
+   "createdAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "paymentPolicyId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "paymentMethodId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "scopePath": {
+    "type": "string",
+    "nullable": true
+   },
+   "channelId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "businessArea": {
+    "type": "string",
+    "maxLength": 30,
+    "nullable": true
+   },
+   "currencyCode": {
+    "type": "string",
+    "maxLength": 10,
+    "nullable": true
+   },
+   "minOrderAmount": {
+    "type": "number",
+    "nullable": true
+   },
+   "maxOrderAmount": {
+    "type": "number",
+    "nullable": true
+   },
+   "effect": {
+    "type": "string",
+    "maxLength": 10
+   },
+   "priority": {
+    "type": "integer"
+   },
+   "isActive": {
+    "type": "boolean"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "PaymentsFeeRule": {
+  "type": "object",
+  "x-ticvai-persistence": "payments.fee_rule",
+  "description": "**Taken from the backend workbook, 20 September.** NEW TABLE. Defines payment-related fees or surcharges that may be applied to an order.",
+  "required": [
+   "paymentPolicyId",
+   "name",
+   "category",
+   "calculationType",
+   "value",
+   "isActive",
+   "createdAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "paymentPolicyId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "paymentMethodId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "providerId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "channelId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "businessArea": {
+    "type": "string",
+    "maxLength": 30,
+    "nullable": true
+   },
+   "currencyCode": {
+    "type": "string",
+    "maxLength": 10,
+    "nullable": true
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 150
+   },
+   "category": {
+    "type": "string",
+    "maxLength": 20
+   },
+   "calculationType": {
+    "type": "string",
+    "maxLength": 20
+   },
+   "value": {
+    "type": "number"
+   },
+   "minFee": {
+    "type": "number",
+    "nullable": true
+   },
+   "maxFee": {
+    "type": "number",
+    "nullable": true
+   },
+   "isActive": {
+    "type": "boolean"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
     "nullable": true
    }
   }

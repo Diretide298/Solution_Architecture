@@ -94,31 +94,12 @@
   "requestBody": "CreatePaymentRequest",
   "responds": "Payment"
  },
- "createTable": {
+ "createTableReservationForGuest": {
   "method": "POST",
-  "path": "/tables",
+  "path": "/outlets/{outletId}/table-reservations",
   "contract": "fnb",
-  "summary": "A table as a thing, not an inference",
-  "permission": "PRODUCT_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "TableDefinition",
-  "responds": "TableDefinition"
- },
- "createTableReservation": {
-  "method": "POST",
-  "path": "/table-reservations",
-  "contract": "fnb",
-  "summary": "Book a table in advance",
-  "permission": null,
+  "summary": "Book a table for a guest (staff)",
+  "permission": "ORDER_CREATE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
@@ -164,6 +145,25 @@
   "requestBody": null,
   "responds": "Bill"
  },
+ "getFnbReservationPolicy": {
+  "method": "GET",
+  "path": "/reservation-policy",
+  "contract": "fnb",
+  "summary": "How long a table is held, by party size",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "outletId",
+    "in": "query",
+    "required": false
+   }
+  ],
+  "requestBody": null,
+  "responds": "FnbReservationPolicy"
+ },
  "getGuestProfile": {
   "method": "GET",
   "path": "/guests/{subjectId}",
@@ -176,6 +176,60 @@
   "parameters": [],
   "requestBody": null,
   "responds": "GuestProfileDetail"
+ },
+ "getKpiValues": {
+  "method": "GET",
+  "path": "/kpi-values",
+  "contract": "reporting",
+  "summary": "Current values, against target, with movement",
+  "permission": "REPORT_VIEW_VENUE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "kpiIds",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "kpiCodes",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "scopePath",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "period",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "compareTo",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "interval",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "groupBy",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "module",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "KpiValue"
  },
  "getTableMap": {
   "method": "GET",
@@ -340,6 +394,21 @@
     "required": null
    },
    {
+    "name": "workstationId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "subjectId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "tender",
+    "in": "query",
+    "required": null
+   },
+   {
     "name": null,
     "in": null,
     "required": null
@@ -463,25 +532,6 @@
   "requestBody": null,
   "responds": "TableVisit"
  },
- "notifyServer": {
-  "method": "POST",
-  "path": "/table-visits/{visitId}/notify-server",
-  "contract": "fnb",
-  "summary": "The kitchen calls the server to the pass",
-  "permission": "ORDER_MODIFY",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": null
- },
  "notifyWaitlistParty": {
   "method": "POST",
   "path": "/waitlist/{entryId}/notify",
@@ -577,6 +627,30 @@
   "requestBody": null,
   "responds": "TableVisit"
  },
+ "resolveBookingConflict": {
+  "method": "GET",
+  "path": "/table-reservations/conflicts",
+  "contract": "fnb",
+  "summary": "Two bookings, one table — and what to do about it",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "date",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "outletId",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
  "seatTableReservation": {
   "method": "POST",
   "path": "/table-reservations/{reservationId}/seat",
@@ -595,6 +669,25 @@
   ],
   "requestBody": null,
   "responds": "TableReservation"
+ },
+ "sendBookingConfirmation": {
+  "method": "POST",
+  "path": "/table-reservations/{reservationId}/confirm",
+  "contract": "fnb",
+  "summary": "Confirm a booking, and ask them to confirm back",
+  "permission": "ORDER_MODIFY",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
  },
  "setSectionLayout": {
   "method": "PUT",
@@ -743,30 +836,6 @@
   ],
   "requestBody": null,
   "responds": "TableVisit"
- },
- "updateTable": {
-  "method": "PUT",
-  "path": "/tables/{tableId}",
-  "contract": "fnb",
-  "summary": "Change what a table is",
-  "permission": "PRODUCT_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "TableDefinition",
-  "responds": "TableDefinition"
  },
  "updateTableVisit": {
   "method": "PATCH",

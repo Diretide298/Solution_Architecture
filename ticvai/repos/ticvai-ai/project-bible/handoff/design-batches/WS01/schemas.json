@@ -96,7 +96,17 @@
    },
    "securityClassification": {
     "type": "string",
-    "description": "security classification"
+    "description": "The venue's label for the classification level, renamable (DEC-227; CHG-CSP-025)"
+   },
+   "securityClassificationLevel": {
+    "type": "string",
+    "enum": [
+     "public",
+     "restricted",
+     "secure",
+     "critical"
+    ],
+    "description": "Public, Restricted, Secure or Critical (decided 2 October 2026, Chinmay, BO-146; DEC-227; CHG-CSP-025); the label shown is `securityClassification`"
    },
    "entryRequirements": {
     "type": "string",
@@ -170,7 +180,17 @@
    },
    "securityClassification": {
     "type": "string",
-    "description": "security classification"
+    "description": "The venue's label for the classification level, renamable (DEC-227; CHG-CSP-025)"
+   },
+   "securityClassificationLevel": {
+    "type": "string",
+    "enum": [
+     "public",
+     "restricted",
+     "secure",
+     "critical"
+    ],
+    "description": "Public, Restricted, Secure or Critical (decided 2 October 2026, Chinmay, BO-146; DEC-227; CHG-CSP-025); the label shown is `securityClassification`"
    },
    "entryRequirements": {
     "type": "string",
@@ -604,6 +624,18 @@
     "nullable": true,
     "description": "Special windows: operator enters attendance count"
    },
+   "venueClosed": {
+    "type": "boolean",
+    "default": false,
+    "description": "**A day the whole venue is closed** (design-notes correction on BO-019, Block B: \"No operation sets product blackout dates or a venue closure day\"; CHG-CSP-051). Every gate refuses admission for the entry's dates, as `temporaryClosure` does for one attraction, and the closures screen shows it beside the product blackouts (catalogue `setEntitlementTemplateBlackoutDates`). Stopping sales for those dates is the performances' own (`cancelPerformance`, catalogue)."
+   },
+   "priority": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 1000,
+    "default": 0,
+    "description": "**Which entry wins where two overlap: the higher priority** (decided 2 October 2026, Chinmay, batch 6 set 10a, BO-152: \"The venue sets a priority per entry\"; DEC-229; CHG-CSP-027). A holiday inside a season, a private event on a free-entry day: the venue says which applies by giving it the higher number. Two overlapping entries with the same priority are refused `422 overlapping-entry-same-priority`, so the calendar never has to guess."
+   },
    "scopePath": {
     "type": "string",
     "description": "ltree of the owning scope node (ADR-0005)"
@@ -694,7 +726,41 @@
       "$ref": "#/components/schemas/Direction"
      }
     ],
-    "description": "**Fixed per access point** (audit R221): set in the back office by `createAccessPoint` and `updateAccessPoint`, never by the podium.\n"
+    "description": "**Fixed per access point** (audit R221): set in the back office by `createAccessPoint` and `updateAccessPoint`, never by the podium.\n\n**R221 amended 2 October 2026: a gate's direction can be switched live** (Chinmay, critical set 1, BO-230: \"Live direction switch with permission, logged\"; DEC-255; CHG-CSP-032; DI-648: more entry gates in the morning, more exit gates in the evening). `setAccessPointDirection` switches it from Live Gate Mode & Lane Control (BO-230) or the scanner's gate mode screen (SCN-016) for a holder of the configuration right, logged; the podium's `setTurnstileMode` still never touches it.\n"
+   },
+   "temporaryClosure": {
+    "type": "object",
+    "nullable": true,
+    "description": "**What the access point does while its attraction is temporarily closed** (decided 2 October 2026, Chinmay, batch 6 set 9, BO-147: \"Deny + reopening time + a virtual-queue return window where enabled\"; DEC-228; CHG-CSP-026). While `isClosed`, every scan is denied (`ValidationResult.denyCause` `attractionTemporarilyClosed`) with the reopening time when it is known; where the venue offers it and the attraction has a virtual queue, the guest is offered a return window (`queue.joinQueue`) instead of being turned away empty-handed. Set with `updateAccessPoint`; null when open. Travels in the offline package, so an offline gate denies the same way.",
+    "properties": {
+     "isClosed": {
+      "type": "boolean",
+      "default": false
+     },
+     "reason": {
+      "type": "string",
+      "maxLength": 200,
+      "nullable": true,
+      "description": "Shown to staff; the guest sees \"Attraction temporarily closed\"."
+     },
+     "reopensAt": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true,
+      "description": "When it is expected to reopen; shown to the guest when known."
+     },
+     "offerVirtualQueueReturn": {
+      "type": "boolean",
+      "default": false,
+      "description": "Offer a virtual-queue return window at the denied scan, where the attraction has a queue."
+     },
+     "queueId": {
+      "type": "string",
+      "format": "uuid",
+      "nullable": true,
+      "description": "The virtual queue the return window is taken in."
+     }
+    }
    },
    "antiPassbackEnabled": {
     "type": "boolean"
@@ -1443,6 +1509,19 @@
   "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
   "description": "**What Topology Validation & Publication displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
+   "awaitingApproval": {
+    "type": "boolean",
+    "readOnly": true,
+    "default": false,
+    "description": "True when the venue's approval policy is on and the publication waits for a second person (DEC-230; CHG-CSP-028)."
+   },
+   "approvalRequestId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The approval request the publication waits on (approvals `ApprovalRequest`), when it waits."
+   },
    "publishMode": {
     "type": "string",
     "enum": [

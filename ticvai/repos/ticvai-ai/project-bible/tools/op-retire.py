@@ -90,6 +90,67 @@ OTHER = {
 }
 
 
+# **Replaced in r2** (decided 2 October 2026, Chinmay: "13 dupes would be gone in r2"; CHG-CLN-001, CHG-CLN-002). The
+# section merges of the ADM-049 move kept 13 workshop-pack writers beside the typed writers the venue screens call;
+# r2 removes them from the contracts (BC-008..BC-020). Each pushed APP-SETUP-ADM ticket hosted only that writer, so it
+# leaves the plan and is closed with a "replaced by" note naming the venue screen's ticket that builds the record.
+# Retiring is not renaming: the old key keeps its ticket, closed, and no new key carries its screen.
+REPLACED_RELEASE = "r2"
+REPLACED = {
+    "APP-SETUP-ADM-049": ("APP-SETUP-BO-009", "setPriceListMaster", "createPriceList and updatePriceList on BO-009"),
+    "APP-SETUP-ADM-051": ("APP-SETUP-BO-009", "setRateStructure", "setPrices on BO-009"),
+    "APP-SETUP-ADM-121": ("APP-SETUP-BO-117", "createBulkProductCatalogue",
+                          "importProductCatalogue and commitCatalogueImport on BO-117"),
+    "APP-SETUP-ADM-148": ("APP-SETUP-BO-010", "setPromotionRule", "createPromotion and updatePromotion on BO-010"),
+    "APP-SETUP-ADM-159": ("APP-SETUP-BO-010", "setCouponPromoCode",
+                          "createCouponCampaign and generateCouponCodes on BO-010"),
+    "APP-SETUP-ADM-169": ("APP-SETUP-BO-010", "setBuyGetBogo", "createPromotion (a buyXGetY discount) on BO-010"),
+    "APP-SETUP-ADM-172": ("APP-SETUP-BO-010", "setFixedPriceOffer", "createPromotion (an N-for-X offer) on BO-010"),
+    "APP-SETUP-ADM-173": ("APP-SETUP-BO-010", "setGiftFreeProduct", "createPromotion (a freeItem discount) on BO-010"),
+    "APP-SETUP-ADM-174": ("APP-SETUP-BO-010", "setCrossCategoryPromotion",
+                          "createPromotion (its PromotionConditions) on BO-010"),
+    "APP-SETUP-ADM-199": ("APP-SETUP-BO-010", "setEligibilityRule",
+                          "createPromotion (its PromotionConditions) on BO-010"),
+    "APP-SETUP-ADM-179": ("APP-SETUP-BO-011", "setBundleDefinition", "createBundle and updateBundle on BO-011"),
+    "APP-SETUP-ADM-180": ("APP-SETUP-BO-011", "setBundleComponent", "createBundle (its components) on BO-011"),
+    "APP-SETUP-ADM-181": ("APP-SETUP-BO-011", "setGuestChoiceBuild", "createBundle (its choice groups) on BO-011"),
+    # The service chunk three of the writers made up most of: with them gone, its last operation,
+    # setDemandOccupancyAvailability, is chunked into SVC-CATALOGUE-DRAFTED-1 (found by a local derive, 2 October).
+    "SVC-CATALOGUE-DRAFTED-3": ("SVC-CATALOGUE-DRAFTED-1",
+                                "setCrossCategoryPromotion, setEligibilityRule and setFixedPriceOffer",
+                                "createPromotion, and setDemandOccupancyAvailability on SVC-CATALOGUE-DRAFTED-1"),
+}
+# The same 13 writers as service sub-tasks (SVC-CATALOGUE-DRAFTED-n#op): each is closed as replaced by the planned
+# sub-task that builds its typed writer, not put on hold as work that merely left the plan.
+REPLACED_OPS = {
+    "setPriceListMaster": "createPriceList", "setRateStructure": "setPrices",
+    "createBulkProductCatalogue": "commitCatalogueImport", "setPromotionRule": "createPromotion",
+    "setCouponPromoCode": "createCouponCampaign", "setBuyGetBogo": "createPromotion",
+    "setFixedPriceOffer": "createPromotion", "setGiftFreeProduct": "createPromotion",
+    "setCrossCategoryPromotion": "createPromotion", "setEligibilityRule": "createPromotion",
+    "setBundleDefinition": "createBundle", "setBundleComponent": "createBundle", "setGuestChoiceBuild": "createBundle",
+}
+
+# **Merged at r2** (the lead, 2 October 2026, CHG-CLN-017): the regrouping of the operations after the 2 October merges
+# put each of these tickets' work into one planned task with another pushed ticket's work; that task keeps the key
+# whose work it overlaps most, so this ticket is closed as merged into it. Found by check-key-stability on a fresh
+# derive of main (e80beb7b); not a rename the reconciler should have kept: one task can carry only one key.
+MERGED_R2 = {
+    "SVC-ACCESS-SYNC-1": ("VM-ACCESS-SYNC-1", "getOfflinePackage"),
+    "SVC-LEDGER-REPORTING-1": ("VM-LEDGER-REPORTING-1", "getFinancialReport"),
+    "SVC-VENUEOPS-FEED-1": ("VM-VENUEOPS-FEED-1", "configureQueueFeed and getQueueFeedHealth"),
+    "VM-MARKETING-MARKETING-2": ("SVC-MARKETING-MARKETING-4", "recordLostItem"),
+    "VM-ORDER-SYNC-1": ("SVC-ORDER-SYNC-1", "listSyncRejections"),
+}
+
+
+def replaced_note(into: str, into_id, op: str, how: str) -> str:
+    return (f"**Replaced by {into}**{f' (#{into_id})' if into_id else ''} (decided 2 October 2026, release "
+            f"{REPLACED_RELEASE}): `{op}` duplicated a typed writer and was removed from the contract (Chinmay: "
+            f"\"13 dupes would be gone in r2\"; CHG-CLN-001). The record is built by {how}, which that ticket "
+            "carries, so this ticket is closed.")
+
+
 def build_plan():
     """(map, [(key, 'defer' | 'merge', comment)], [unexplained keys]). No network: tools/op-review.py reads it too."""
     mp = json.loads(MAP.read_text(encoding="utf-8"))
@@ -129,6 +190,20 @@ def build_plan():
                     "the board; it comes back when its release is planned.")
         plan += [(x, kind, note) for x in [key] + [s_ for s_ in mp if s_.startswith(key + "#")]]
         covered.add(key)
+    for key, (into, op, how) in REPLACED.items():
+        if key not in mp or key in planned:
+            continue
+        note = replaced_note(into, mp.get(into), op, how)
+        plan += [(x, "merge", note) for x in [key] + [s_ for s_ in mp if s_.startswith(key + "#")]]
+        covered.add(key)
+    for key, (into, what) in MERGED_R2.items():
+        if key not in mp or key in planned:
+            continue
+        note = (f"**Merged into {into}**{f' (#{mp[into]})' if into in mp else ''} (decided 2 October 2026, release "
+                f"{REPLACED_RELEASE}): its work ({what}) is now built in one task with that ticket's, under that key "
+                "(CHG-CLN-017), so this ticket is closed.")
+        plan += [(x, "merge", note) for x in [key] + [s_ for s_ in mp if s_.startswith(key + "#")]]
+        covered.add(key)
     # A pushed sub-task whose task is still planned but whose operation or table is no longer under it (the task
     # was split or regrouped, 29-30 September): 128 on 1 October. Its work is either on another planned sub-task
     # (a duplicate in effect: closed, pointing at that one) or has left the plan (on hold). Decided 1 October.
@@ -146,7 +221,17 @@ def build_plan():
         base, _, part = k.partition("#")
         if not part or k in subs or k in done or base not in planned or not isinstance(mp[k], int):
             continue
+        if part in REPLACED_OPS:
+            into = home.get(REPLACED_OPS[part])
+            plan.append((k, "merge", replaced_note(into or REPLACED_OPS[part], mp.get(into), part,
+                                                   f"`{REPLACED_OPS[part]}`")))
+            continue
         other = home.get(part)
+        if not re.match(r"^[a-z][A-Za-z0-9]+$", part) and "." not in part:
+            plan.append((k, "merge", f"**Not a separate piece of work** (1 October): `{part}` was a fragment of "
+                                     f"{base}'s title, read as an operation by mistake. {base} itself carries it, "
+                                     "so this sub-task is closed."))
+            continue
         if other and other in mp:
             plan.append((k, "merge", f"**Duplicate of #{mp[other]}** (decided 1 October): `{part}` moved to "
                                      f"{other.partition('#')[0]} when its task was regrouped; that sub-task carries "

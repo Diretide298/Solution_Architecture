@@ -7,7 +7,7 @@
 | Tier | operations: What a venue does with what it sold. Licensed per module. |
 | Contracts | `queue`, `maintenance`, `resources`, `venue-map`, `assets`, `games`, `rental`, `transport` |
 | Schemas owned | `queue`, `maintenance`, `resources`, `venuemap`, `assets`, `games`, `rental`, `transport` |
-| Operations in the slice | 74 of 285 |
+| Operations in the slice | 69 of 285 |
 | Scale | Low and steady. Queue readings are the only frequent write. |
 | If it is down | Down degrades venue operations. Selling and admitting continue. |
 
@@ -30,13 +30,12 @@
 | Group | Operation | Method | Path | Part | Wave | Called by |
 |---|---|---|---|---|---|---|
 | asset | [`deleteMediaAsset`](#deletemediaasset) | DELETE | `/media/{mediaId}` | core | 2 | CMS-010, CMS-075 |
-| asset | [`getMediaAsset`](#getmediaasset) | GET | `/media/{mediaId}` | core | 1 | BO-027, CMS-010, CMS-068, CMS-082, EMP-036, POS-010 |
-| asset | [`replaceMediaAsset`](#replacemediaasset) | POST | `/media/{mediaId}/replace` | core | 2 | BO-027, CMS-010, CMS-076, CMS-095 |
-| asset | [`searchMedia`](#searchmedia) | GET | `/media` | core | 2 | BO-008, BO-094, BO-838, CMS-010, CMS-061, CMS-062 … |
+| asset | [`getMediaAsset`](#getmediaasset) | GET | `/media/{mediaId}` | core | 1 | CMS-010, CMS-068, CMS-082, EMP-036, POS-010 |
+| asset | [`replaceMediaAsset`](#replacemediaasset) | POST | `/media/{mediaId}/replace` | core | 2 | CMS-010, CMS-076, CMS-095 |
+| asset | [`searchMedia`](#searchmedia) | GET | `/media` | core | 2 | BO-008, BO-094, CMS-010, CMS-061, CMS-062, CMS-067 … |
 | asset | [`updateMediaAsset`](#updatemediaasset) | PATCH | `/media/{mediaId}` | core | 2 | CMS-010, CMS-075, CMS-082 |
-| card | [`getGameCard`](#getgamecard) | GET | `/game-cards/{cardCode}` | core | 2 | BO-396, BO-454, BO-455, BO-457, BO-462, BO-486 … |
+| card | [`getGameCard`](#getgamecard) | GET | `/game-cards/{cardCode}` | core | 2 | BO-454, BO-455, BO-457, BO-462, BO-486, GST-011 … |
 | card | [`issueGameCard`](#issuegamecard) | POST | `/game-cards` | core | 1 | POS-002 |
-| card | [`transferGameCard`](#transfergamecard) | POST | `/game-cards/{cardCode}/transfer` | core | 1 | POS-002 |
 | collection | [`createCollection`](#createcollection) | POST | `/media/collections` | core | 2 | CMS-010, CMS-064 |
 | collection | [`listCollections`](#listcollections) | GET | `/media/collections` | core | 2 | CMS-010, CMS-062, CMS-064 |
 | departure | [`getNextTransportDeparture`](#getnexttransportdeparture) | GET | `/transport/departures/next` | core | 3 | GST-076, WEB-049 |
@@ -44,25 +43,21 @@
 | entry | [`getWaitingGuest`](#getwaitingguest) | GET | `/waiting-guests/{entryId}` | core | 2 | GST-023, WEB-040 |
 | entry | [`joinQueue`](#joinqueue) | POST | `/waiting-guests` | core | 2 | GST-023, WEB-040 |
 | entry | [`leaveQueue`](#leavequeue) | DELETE | `/waiting-guests/{entryId}` | core | 2 | GST-023, WEB-040 |
-| entry | [`listQueueEntries`](#listqueueentries) | GET | `/queues/{queueId}/entries` | core | 1 | BO-001, BO-002, BO-004, BO-005, BO-038, EMP-031 … |
 | fare | [`getTransportFareTable`](#gettransportfaretable) | GET | `/transport/routes/{routeId}/fare-table` | core | 3 | BO-1185, GST-077, WEB-049 |
 | fare | [`quoteTransportFare`](#quotetransportfare) | POST | `/transport/fare-quotes` | core | 3 | BO-1185, GST-077, WEB-049 |
 | fare | [`setTransportFareTable`](#settransportfaretable) | PUT | `/transport/routes/{routeId}/fare-table` | setup | 3 | BO-1185 |
 | favourite | [`deleteFavouriteRoute`](#deletefavouriteroute) | DELETE | `/transport/favourite-routes/{favouriteId}` | core | 3 | GST-079, WEB-049 |
 | favourite | [`listMyFavouriteRoutes`](#listmyfavouriteroutes) | GET | `/transport/favourite-routes` | core | 3 | GST-079, WEB-049 |
 | favourite | [`saveFavouriteRoute`](#savefavouriteroute) | POST | `/transport/favourite-routes` | core | 3 | GST-077, WEB-049 |
-| feed | [`configureQueueFeed`](#configurequeuefeed) | PUT | `/queue-feeds` | setup | 1 | BO-001, BO-003 |
-| feed | [`getQueueFeedHealth`](#getqueuefeedhealth) | GET | `/queue-feeds/{feedId}/health` | core | 1 | BO-001, BO-003, POS-029 |
-| inspection | [`createInspectionTemplate`](#createinspectiontemplate) | POST | `/inspection-templates` | setup | 1 | EMP-048 |
+| inspection | [`createInspectionTemplate`](#createinspectiontemplate) | POST | `/inspection-templates` | setup | 1 | BO-911 |
 | networkImport | [`applyTransportNetworkImport`](#applytransportnetworkimport) | POST | `/transport/network-imports/{importId}/apply` | setup | 3 | BO-1189 |
 | networkImport | [`importTransportNetwork`](#importtransportnetwork) | POST | `/transport/network-imports` | setup | 3 | BO-1189 |
 | pass | [`createTransportPassType`](#createtransportpasstype) | POST | `/transport/pass-types` | setup | 3 | BO-1188 |
 | pass | [`listTransportPassOffers`](#listtransportpassoffers) | GET | `/transport/pass-offers` | core | 3 | GST-078, WEB-049 |
-| queue | [`createQueue`](#createqueue) | POST | `/queues` | setup | 1 | BO-001, BO-002, BO-004, BO-005, BO-038 |
-| queue | [`getQueue`](#getqueue) | GET | `/queues/{queueId}` | core | 1 | BO-001, BO-002, BO-004, BO-005, BO-038, EMP-031 … |
-| queue | [`listQueues`](#listqueues) | GET | `/queues` | core | 2 | BO-001, BO-002, BO-004, BO-005, BO-038, BO-221 … |
-| queue | [`updateQueue`](#updatequeue) | PATCH | `/queues/{queueId}` | setup | 1 | BO-001, BO-002, BO-004, BO-005, BO-038, BO-221 |
-| resources | [`createResource`](#createresource) | POST | `/resources` | setup | 2 | BO-095, BO-857, BO-863 |
+| queue | [`createQueue`](#createqueue) | POST | `/queues` | setup | 1 | BO-001, BO-002, BO-005 |
+| queue | [`listQueues`](#listqueues) | GET | `/queues` | core | 2 | BO-001, BO-002, BO-004, BO-005, BO-221, EMP-031 … |
+| queue | [`updateQueue`](#updatequeue) | PATCH | `/queues/{queueId}` | setup | 1 | BO-001, BO-002, BO-005, BO-221 |
+| resources | [`createResource`](#createresource) | POST | `/resources` | setup | 2 | BO-095, BO-857 |
 | resources | [`createResourceBlock`](#createresourceblock) | POST | `/resource-blocks` | setup | 2 | BO-864, BO-870, BO-880, BO-910 |
 | resources | [`createResourceHold`](#createresourcehold) | POST | `/resource-holds` | core | 3 | GST-074, WEB-047 |
 | resources | [`createResourcePackage`](#createresourcepackage) | POST | `/resource-packages` | setup | 3 | BO-861, BO-895, BO-918 |
@@ -71,12 +66,12 @@
 | resources | [`getResourceAvailability`](#getresourceavailability) | GET | `/resources/{resourceId}/availability` | core | 2 | BO-096, BO-857, BO-866, WEB-031 |
 | resources | [`getResourceHold`](#getresourcehold) | GET | `/resource-holds/{holdId}` | core | 1 | GST-041, GST-074, WEB-010, WEB-047 |
 | resources | [`listProductStartTimes`](#listproductstarttimes) | GET | `/resource-start-times` | core | 3 | GST-075, WEB-048 |
-| resources | [`releaseResourceBlock`](#releaseresourceblock) | DELETE | `/resource-blocks/{blockId}` | setup | 2 | BO-870 |
+| resources | [`releaseResourceBlock`](#releaseresourceblock) | DELETE | `/resource-blocks/{blockId}` | setup | 2 | BO-870, BO-910 |
 | resources | [`relinquishResourceHold`](#relinquishresourcehold) | DELETE | `/resource-holds/{holdId}` | core | 3 | GST-074, WEB-047 |
-| resources | [`setExperienceResourceRequirements`](#setexperienceresourcerequirements) | PUT | `/experiences/{experienceId}/resource-requirements` | setup | 3 | BO-877, BO-893 |
+| resources | [`setExperienceResourceRequirements`](#setexperienceresourcerequirements) | PUT | `/experiences/{experienceId}/resource-requirements` | setup | 3 | BO-877, BO-893, BO-894 |
 | resources | [`setResourceSchedule`](#setresourceschedule) | PUT | `/resources/{resourceId}/schedule` | setup | 3 | BO-866, BO-867, BO-878 |
-| resources | [`updateResource`](#updateresource) | PUT | `/resources/{resourceId}` | setup | 2 | BO-857, BO-863, BO-866 |
-| resources | [`updateResourcePackage`](#updateresourcepackage) | PUT | `/resource-packages/{packageId}` | setup | 3 | BO-861 |
+| resources | [`updateResource`](#updateresource) | PUT | `/resources/{resourceId}` | setup | 2 | BO-857, BO-866 |
+| resources | [`updateResourcePackage`](#updateresourcepackage) | PUT | `/resource-packages/{packageId}` | setup | 3 | BO-861, BO-895, BO-918 |
 | rights | [`getExpiringRights`](#getexpiringrights) | GET | `/media/rights-expiring` | core | 2 | CMS-010, CMS-081, CMS-088, CMS-090 |
 | route | [`createTransportRoute`](#createtransportroute) | POST | `/transport/routes` | setup | 3 | BO-1184 |
 | route | [`getTransportRoute`](#gettransportroute) | GET | `/transport/routes/{routeId}` | core | 3 | BO-1184, GST-077, WEB-049 |
@@ -87,8 +82,8 @@
 | station | [`listTransportStations`](#listtransportstations) | GET | `/transport/stations` | core | 3 | BO-1183, BO-1184, GST-076, GST-078, WEB-049 |
 | timetable | [`createTransportTimetable`](#createtransporttimetable) | POST | `/transport/routes/{routeId}/timetables` | setup | 3 | BO-1186 |
 | timetable | [`publishTransportTimetable`](#publishtransporttimetable) | POST | `/transport/timetables/{timetableId}/publish` | setup | 3 | BO-1186 |
-| upload | [`completeUpload`](#completeupload) | POST | `/media/uploads/{uploadId}/complete` | core | 2 | BO-1189, BO-955, CMS-002, CMS-010, CMS-063 |
-| upload | [`createUpload`](#createupload) | POST | `/media/uploads` | core | 2 | BO-1189, BO-955, CMS-002, CMS-010, CMS-063 |
+| upload | [`completeUpload`](#completeupload) | POST | `/media/uploads/{uploadId}/complete` | core | 2 | BO-1189, BO-955, CMS-002, CMS-010, CMS-063, SUP-013 |
+| upload | [`createUpload`](#createupload) | POST | `/media/uploads` | core | 2 | BO-1189, BO-955, CMS-002, CMS-010, CMS-063, SUP-013 |
 | venueMap | [`createVenueMap`](#createvenuemap) | POST | `/venue-maps` | setup | 1 | BO-092 |
 | venueMap | [`getVenueMap`](#getvenuemap) | GET | `/venue-maps/{mapId}` | core | 1 | BO-094, EMP-030, GST-004, GST-021, GST-074, WEB-039 … |
 | venueMap | [`getVenueMapGraph`](#getvenuemapgraph) | GET | `/venue-maps/{mapId}/graph` | core | 2 | BO-094, GST-021, WEB-039 |
@@ -102,7 +97,7 @@
 | visitPlan | [`getVisitPlan`](#getvisitplan) | GET | `/visit-plans/{planId}` | core | 1 | GST-053, GST-054, GST-059, WEB-050 |
 | visitPlan | [`listVisitPlanAlternatives`](#listvisitplanalternatives) | GET | `/visit-plans/{planId}/items/{itemId}/alternatives` | core | 1 | GST-053, GST-059, WEB-050 |
 | visitPlan | [`updateVisitPlan`](#updatevisitplan) | PUT | `/visit-plans/{planId}` | core | 1 | GST-053, GST-054, GST-059, WEB-050 |
-| waitTime | [`getWaitTimes`](#getwaittimes) | GET | `/queues/wait-times` | core | 1 | BO-001, BO-002, BO-004, BO-005, BO-038, EMP-031 … |
+| waitTime | [`getWaitTimes`](#getwaittimes) | GET | `/queues/wait-times` | core | 1 | BO-001, BO-002, BO-004, BO-005, EMP-031, EMP-032 … |
 
 ## Group: asset
 
@@ -158,7 +153,7 @@ Returns every generated size and every place the asset is referenced. Usage is w
 | Offline note | 24 August: The asset is on the device before the shift; a media issue with no artwork is a blank card. |
 | Reads | `assets.media_asset`, `assets.media_usage` |
 | Writes | - |
-| Called by | BO-027, CMS-010, CMS-068, CMS-082, EMP-036, POS-010 |
+| Called by | CMS-010, CMS-068, CMS-082, EMP-036, POS-010 |
 
 **Parameters**
 
@@ -254,7 +249,7 @@ Derivatives regenerate. The previous version is retained for rollback.
 | Conflict policy | serverWins |
 | Reads | `assets.media_asset`, `cache:idempotency` |
 | Writes | `assets.asset_version`, `assets.media_asset`, `assets.media_fingerprint`, `cache:idempotency` |
-| Called by | BO-027, CMS-010, CMS-076, CMS-095 |
+| Called by | CMS-010, CMS-076, CMS-095 |
 
 **Parameters**
 
@@ -341,7 +336,7 @@ Filter by kind, tag, collection, venue or usage. `unusedOnly` surfaces assets no
 | Read routing | replica |
 | Reads | `assets.media_asset` |
 | Writes | - |
-| Called by | BO-008, BO-094, BO-838, CMS-010, CMS-061, CMS-062, CMS-067, CMS-073 |
+| Called by | BO-008, BO-094, CMS-010, CMS-061, CMS-062, CMS-067, CMS-073 |
 
 **Parameters**
 
@@ -532,7 +527,7 @@ The reader path. Offline-capable so a machine can validate a card during a netwo
 | Read routing | primary |
 | Reads | `games.card`, `games.credit_ledger` |
 | Writes | - |
-| Called by | BO-396, BO-454, BO-455, BO-457, BO-462, BO-486, GST-026, WEB-021 |
+| Called by | BO-454, BO-455, BO-457, BO-462, BO-486, GST-011, WEB-021 |
 
 **Parameters**
 
@@ -627,66 +622,6 @@ Physical cards are pre-printed and activated at sale; digital cards live in the 
 |---|---|---|
 | 201 |  | Issued |
 | 409 |  | Card already active, or the code is unknown |
-| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
-
-### transferGameCard
-
-**`POST /game-cards/{cardCode}/transfer`**: Move balances to another card
-
-A damaged or lost card. The source moves to status `transferred`, with `transferredToCardCode` set to the target, and stops working immediately; its balances move whole — split transfers are not offered, because a card with a partial balance and a replacement with the rest is a dispute waiting to happen. `transferred` is terminal (states/game-card.yaml), so the source cannot be unblocked or reused afterwards.
-
-|  |  |
-|---|---|
-| Permission | `ORDER_MODIFY` |
-| Scope level | venue |
-| Part of slice | core |
-| Wave | 1 |
-| Offline | no |
-| Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `games.card` |
-| Writes | `cache:idempotency`, `games.card` |
-| Called by | POS-002 |
-| State model | Game card ([states/game-card.yaml](../../../states/game-card.yaml)): moves `active` -> `transferred` |
-
-**Parameters**
-
-| Name | In | Required | Type | Notes |
-|---|---|---|---|---|
-| cardCode | path | yes | string |  |
-| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
-
-**Request body**
-
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| targetCardCode | string | yes |  |
-| reason | enum (damaged, lost, faulty, guestRequest, upgrade) | yes |  |
-| note | string |  | (max length 500) |
-
-**Response**: `GameCard`
-
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| cardCode | string | yes | A pre-printed card keeps the code printed on it. |
-| kind | string |  |  |
-| venueId | string (uuid) | yes |  |
-| subjectId | string (uuid) |  | (nullable) |
-| credits | integer | yes | Bought with money. |
-| bonusCredits | integer | yes | From a promotion. |
-| points | integer | yes | Won by playing. |
-| status | enum (active, blocked, expired, transferred) | yes |  |
-| blockedReason | string |  | (nullable) |
-| transferredToCardCode | string |  | (nullable) |
-| lastPlayedAt | string (date-time) |  | (nullable) |
-| issuedAt | string (date-time) | yes |  |
-| expiresAt | string (date-time) |  | (nullable) |
-
-**Responses**
-
-| Code | Shape | Meaning |
-|---|---|---|
-| 200 |  | Transferred; the source card is now transferred |
-| 409 |  | Target already carries a balance, or either card is not active (blocked, expired or already transferred). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
@@ -1080,71 +1015,6 @@ Where the party includes someone below the height requirement, the join is refus
 |---|---|---|
 | 204 |  | Left |
 | 409 |  | Already called or redeemed |
-| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
-
-### listQueueEntries
-
-**`GET /queues/{queueId}/entries`**: List entries in a queue
-
-Operator view. Position order, with no-shows and expiries visible.
-
-|  |  |
-|---|---|
-| Permission | `QUEUE_VIEW` |
-| Scope level | venue |
-| Part of slice | core |
-| Wave | 1 |
-| Offline | no |
-| Conflict policy | serverWins |
-| Read routing | primary |
-| Reads | `queue.entry` |
-| Writes | - |
-| Called by | BO-001, BO-002, BO-004, BO-005, BO-038, EMP-031, EMP-032, POS-029 |
-
-**Parameters**
-
-| Name | In | Required | Type | Notes |
-|---|---|---|---|---|
-| queueId | path | yes | string (uuid) |  |
-| status | query |  | QueueEntryStatus: enum (waiting, called, redeemed, expired, noShow, cancelled, released) |  |
-| pageSize | query |  | integer |  |
-| cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
-
-**Response**: `object`
-
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| items | array of WaitingGuest | yes |  |
-| items[].id | string (uuid) | yes | The client-generated UUIDv7 from JoinQueueRequest.id, and the entryId every entry path takes. |
-| items[].queueId | string (uuid) | yes |  |
-| items[].queueName | LocalisedText |  |  |
-| items[].subjectId | string (uuid) |  | (nullable) |
-| items[].partyNumber | integer | yes | What the guest sees and what appears on signage. |
-| items[].partySize | integer | yes |  |
-| items[].status | QueueEntryStatus: enum (waiting, called, redeemed, expired, noShow, cancelled, released) | yes |  |
-| items[].positionInQueue | integer |  | (nullable) |
-| items[].partiesAhead | integer |  | (nullable) |
-| items[].estimatedCallAt | string (date-time) |  | (nullable) |
-| items[].isFastPass | boolean |  |  |
-| items[].priorityBasis | enum (none, entitlement, loyaltyTier, promotion, accessibility) |  | Why this party is priority, when it is (decided 29 September, build pass; 5.6.7, 5.6.34): the first QueueFastPass criterion met at join, in the order entitlement, loyalty tier, promotion, accessibili… (default none) |
-| items[].priorityTierId | string (uuid) |  | The loyalty tier that granted priority, where priorityBasis is loyaltyTier. (nullable) |
-| items[].priorityPromotionId | string (uuid) |  | The promotion that granted priority, where priorityBasis is promotion. (nullable) |
-| items[].accessibilityNeedDeclared | boolean |  | What the party declared at join, shown to the operator at the front. (default False) |
-| items[].entitlementId | string |  | (nullable) |
-| items[].calledAt | string (date-time) |  | (nullable) |
-| items[].returnWindowEndsAt | string (date-time) |  | (nullable) |
-| items[].redeemedAt | string (date-time) |  | (nullable) |
-| items[].admittedCount | integer |  | (nullable) |
-| items[].joinedAt | string (date-time) | yes |  |
-| items[].syncedAt | string (date-time) |  | (nullable) |
-| nextCursor | string |  |  |
-| hasMore | boolean | yes |  |
-
-**Responses**
-
-| Code | Shape | Meaning |
-|---|---|---|
-| 200 |  | Entries |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
@@ -1542,134 +1412,6 @@ The Favourites tab (decided 29 September, rev 3 REV3-21): each saved pair of sta
 | 422 |  | The stations are the same, or no active route serves them in this order. |
 
 
-## Group: feed
-
-### configureQueueFeed
-
-**`PUT /queue-feeds`**: Configure a sensor feed
-
-Enables integration for a venue and selects an adaptor. **TICVAI ships no vendor adaptors** — the framework is vendor-agnostic and a named-vendor adaptor is bespoke work, quoted separately (ADR-0012).
-`mock` exists so the whole feature can be built and demonstrated with no vendor involvement at all.
-**PUT semantics — an upsert keyed on the body's `id`.** There is no id in the path, so the body names its target: where no feed has that `id`, one is created and the answer is `201`; where one does, the body replaces it whole and the answer is `200`. Omitted optional fields take their defaults or null — an omitted `credentialsRef` removes the stored reference, and an omitted `expectedIntervalSeconds` returns to 60. A feed never moves between queues: a body whose `queueId` differs from the stored feed's is refused with `409`. `health` is read-only and ignored on input.
-
-|  |  |
-|---|---|
-| Permission | `QUEUE_MANAGE` |
-| Scope level | venue |
-| Part of slice | setup, makes `queue.feed` non-empty |
-| Wave | 1 |
-| Offline | no |
-| Config scope | venue |
-| Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `queue.feed` |
-| Writes | `cache:idempotency`, `queue.feed` |
-| Called by | BO-001, BO-003 |
-
-**Parameters**
-
-| Name | In | Required | Type | Notes |
-|---|---|---|---|---|
-| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
-
-**Request body**: `QueueFeed`
-
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| id | string (uuid) | yes |  |
-| queueId | string (uuid) | yes |  |
-| adaptor | QueueFeedAdaptor: enum (generic, mock, vendorAdaptor) | yes | Vendor adaptors are bespoke work (ADR-0012). |
-| adaptorName | string |  | Named vendor where adaptor is vendorAdaptor. (nullable) |
-| credentialsRef | string |  | Key vault reference. (nullable) |
-| expectedIntervalSeconds | integer |  | Beyond this without a reading, the feed is considered quiet. (default 60) |
-| isEnabled | boolean | yes |  |
-| health | object |  | Whether the feed is currently reporting, computed on read — what listQueueFeeds promises per row. (read-only) |
-| health.feedId | string (uuid) | yes |  |
-| health.adaptor | QueueFeedAdaptor: enum (generic, mock, vendorAdaptor) |  | Vendor adaptors are bespoke work (ADR-0012). |
-| health.isHealthy | boolean | yes | Healthy means the last reading arrived within the feed's expected interval (decided 28 September, audit R106 (1)): lastReadingAt is no older than expectedIntervalSeconds. |
-| health.isQuiet | boolean | yes | No reading within the expected interval. |
-| health.lastReadingAt | string (date-time) |  | (nullable) |
-| health.expectedIntervalSeconds | integer |  | The feed's expectedIntervalSeconds — the interval isQuiet is judged against, returned here so a health panel does not need the feed row as well. |
-| health.readingsLastHour | integer |  |  |
-| health.discardedLastHour | integer |  | Out-of-order readings rejected in the last hour — rows of queue.reading for this feed with disposition: discardedOutOfOrder. |
-
-**Response**: `QueueFeed`
-
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| id | string (uuid) | yes |  |
-| queueId | string (uuid) | yes |  |
-| adaptor | QueueFeedAdaptor: enum (generic, mock, vendorAdaptor) | yes | Vendor adaptors are bespoke work (ADR-0012). |
-| adaptorName | string |  | Named vendor where adaptor is vendorAdaptor. (nullable) |
-| credentialsRef | string |  | Key vault reference. (nullable) |
-| expectedIntervalSeconds | integer |  | Beyond this without a reading, the feed is considered quiet. (default 60) |
-| isEnabled | boolean | yes |  |
-| health | object |  | Whether the feed is currently reporting, computed on read — what listQueueFeeds promises per row. (read-only) |
-| health.feedId | string (uuid) | yes |  |
-| health.adaptor | QueueFeedAdaptor: enum (generic, mock, vendorAdaptor) |  | Vendor adaptors are bespoke work (ADR-0012). |
-| health.isHealthy | boolean | yes | Healthy means the last reading arrived within the feed's expected interval (decided 28 September, audit R106 (1)): lastReadingAt is no older than expectedIntervalSeconds. |
-| health.isQuiet | boolean | yes | No reading within the expected interval. |
-| health.lastReadingAt | string (date-time) |  | (nullable) |
-| health.expectedIntervalSeconds | integer |  | The feed's expectedIntervalSeconds — the interval isQuiet is judged against, returned here so a health panel does not need the feed row as well. |
-| health.readingsLastHour | integer |  |  |
-| health.discardedLastHour | integer |  | Out-of-order readings rejected in the last hour — rows of queue.reading for this feed with disposition: discardedOutOfOrder. |
-
-**Responses**
-
-| Code | Shape | Meaning |
-|---|---|---|
-| 200 |  | Configured — an existing feed with this id, replaced |
-| 201 |  | Created — no feed had this id |
-| 409 |  | The feed with this id belongs to a different queue. |
-| 400 |  | Unknown adaptor, or credentials missing for the selected adaptor |
-| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
-
-### getQueueFeedHealth
-
-**`GET /queue-feeds/{feedId}/health`**: Feed health
-
-Last reading, expected interval, and whether the feed has gone quiet. A silent feed falls back to throughput-derived estimates and the wait time is marked accordingly — it does not simply freeze at the last value.
-**A feed is healthy when its last reading is within its expected interval** (decided 28 September, audit R106 (1)).
-
-|  |  |
-|---|---|
-| Permission | `QUEUE_MANAGE` |
-| Scope level | venue |
-| Part of slice | core |
-| Wave | 1 |
-| Offline | no |
-| Conflict policy | serverWins |
-| Read routing | replica |
-| Reads | `queue.feed` |
-| Writes | - |
-| Called by | BO-001, BO-003, POS-029 |
-
-**Parameters**
-
-| Name | In | Required | Type | Notes |
-|---|---|---|---|---|
-| feedId | path | yes | string (uuid) |  |
-
-**Response**: `QueueFeedHealth`
-
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| feedId | string (uuid) | yes |  |
-| adaptor | QueueFeedAdaptor: enum (generic, mock, vendorAdaptor) |  | Vendor adaptors are bespoke work (ADR-0012). |
-| isHealthy | boolean | yes | Healthy means the last reading arrived within the feed's expected interval (decided 28 September, audit R106 (1)): lastReadingAt is no older than expectedIntervalSeconds. |
-| isQuiet | boolean | yes | No reading within the expected interval. |
-| lastReadingAt | string (date-time) |  | (nullable) |
-| expectedIntervalSeconds | integer |  | The feed's expectedIntervalSeconds — the interval isQuiet is judged against, returned here so a health panel does not need the feed row as well. |
-| readingsLastHour | integer |  |  |
-| discardedLastHour | integer |  | Out-of-order readings rejected in the last hour — rows of queue.reading for this feed with disposition: discardedOutOfOrder. |
-
-**Responses**
-
-| Code | Shape | Meaning |
-|---|---|---|
-| 200 |  | Health |
-| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
-
-
 ## Group: inspection
 
 ### createInspectionTemplate
@@ -1689,7 +1431,7 @@ Items may be marked safety-critical. **A failed safety-critical item blocks the 
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `maintenance.inspection_template`, `maintenance.inspection_template_item` |
 | Writes | `cache:idempotency`, `maintenance.inspection_template`, `maintenance.inspection_template_item` |
-| Called by | EMP-048 |
+| Called by | BO-911 |
 
 **Parameters**
 
@@ -2044,7 +1786,7 @@ Bound to an attraction and, where one exists, to an asset — so a ride taken ou
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `queue.queue`, `queue.queue_operating_window` |
 | Writes | `cache:idempotency`, `queue.queue`, `queue.queue_operating_window` |
-| Called by | BO-001, BO-002, BO-004, BO-005, BO-038 |
+| Called by | BO-001, BO-002, BO-005 |
 | State model | Queue ([states/queue.yaml](../../../states/queue.yaml)): created as `closed` |
 
 **Parameters**
@@ -2144,97 +1886,6 @@ Bound to an attraction and, where one exists, to an asset — so a ride taken ou
 | 400 | BadRequest | Validation failed |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
-### getQueue
-
-**`GET /queues/{queueId}`**: Read a queue with live position
-
-|  |  |
-|---|---|
-| Permission | `QUEUE_VIEW` |
-| Scope level | venue |
-| Part of slice | core |
-| Wave | 1 |
-| Offline | yes |
-| Conflict policy | serverWins |
-| Read routing | replica |
-| Reads | `queue.queue`, `queue.queue_operating_window` |
-| Writes | - |
-| Called by | BO-001, BO-002, BO-004, BO-005, BO-038, EMP-031, EMP-032, POS-029 |
-
-**Parameters**
-
-| Name | In | Required | Type | Notes |
-|---|---|---|---|---|
-| queueId | path | yes | string (uuid) |  |
-
-**Response**: `QueueDetail`
-
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| code | string | yes | (max length 64) |
-| name | LocalisedText | yes |  |
-| venueId | string (uuid) | yes |  |
-| attractionProductId | string (uuid) |  |  |
-| assetId | string (uuid) |  | The ride. (nullable) |
-| accessPointId | string (uuid) |  | (nullable) |
-| kind | enum (standby, singleRider, fastPass, virtual, accessible, groupOnly, staffOnly) |  | 5.6.x. (default standby) |
-| operatingWindows | array of object |  | When the queue runs, which is not when the venue is open. |
-| operatingWindows[].day | enum (mon, tue, wed, thu, fri, sat, sun) | yes |  |
-| operatingWindows[].from | string | yes | Venue local time, 24-hour HH:MM, when the queue starts running. (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$) |
-| operatingWindows[].to | string | yes | Venue local time, 24-hour HH:MM, when the queue stops running. (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$) |
-| operatingWindows[].lastEntryMinutesBefore | integer |  | When the queue stops accepting, which is before it stops running. (default 0) |
-| parentQueueId | string (uuid) |  | Where several queues share one capacity. (nullable) |
-| loadBalanceWithQueueIds | array of string (uuid) |  | BL-137. |
-| inQueueOfferEnabled | boolean |  | A guest with twenty minutes to wait is a guest with twenty minutes to buy something. (default False) |
-| notifyBeforeCallMinutes | integer |  | BL-017, 19.2.61. (default 5) |
-| capacityPerCycle | integer | yes | (min 1) |
-| cycleMinutes | number | yes | (min 0) |
-| maxPartySize | integer |  | (default 6) |
-| returnWindowMinutes | integer |  | How long a called party has to arrive before the entry expires. (default 15) |
-| heightRequirementCm | integer |  | (nullable) |
-| fastPassAllocationPercent | number |  | Share of each cycle reserved for Fast Pass holders. (min 0; max 100; default 0) |
-| zone | string |  | (nullable) |
-| fastPass | object |  | The lane's Fast Pass block (decided 29 September, VM close-out). (nullable) |
-| fastPass.entitlementProductIds | array of string (uuid) | yes | Catalogue products whose entitlement admits to this lane. |
-| fastPass.loyaltyTierIds | array of string (uuid) |  | 5.6.7 and 5.6.34 (decided 29 September, build pass). |
-| fastPass.promotionIds | array of string (uuid) |  | 5.6.34 (decided 29 September, build pass). |
-| fastPass.accessibilityPriority | boolean |  | 5.6.7 (decided 29 September, build pass). (default False) |
-| fastPass.returnWindowMinutes | integer |  | How long after the booked return time a Fast Pass holder may still enter. (min 1; max 240; default 60) |
-| fastPass.maxPerGuestPerDay | integer |  | Fast Pass redemptions one guest may make on this lane per day; null is no cap. (min 1; nullable) |
-| fastPass.allowedAccessPointIds | array of string (uuid) |  | Access points that redeem Fast Pass for this lane; empty is the queue's own. |
-| id | string (uuid) | yes |  |
-| status | QueueStatus: enum (open, paused, closed, atCapacity) | yes |  |
-| statusReason | string |  | (nullable) |
-| waitingPartyCount | integer | yes |  |
-| waitingGuestCount | integer |  |  |
-| currentWaitMinutes | integer |  | (nullable) |
-| waitTimeSource | WaitTimeSource: enum (sensor, throughput, manual, unavailable) |  | Where the estimate came from. |
-| waitTimeAsOf | string (date-time) |  | When currentWaitMinutes was last set, by whichever source set it. (read-only; nullable) |
-| manualWaitExpiresAt | string (date-time) |  | Set by setWaitTime as now plus expiresInMinutes. (read-only; nullable) |
-| manualWaitNote | string |  | The note given with the current manual figure. (max length 200; read-only; nullable) |
-| expectedReopenAt | string (date-time) |  | (nullable) |
-| nowServingPartyNumber | integer |  | (nullable) |
-| lastCalledAt | string (date-time) |  | (nullable) |
-| throughputLastHour | integer |  |  |
-| noShowRatePercent | number |  |  |
-| feed | QueueFeedHealth |  |  |
-| feed.feedId | string (uuid) | yes |  |
-| feed.adaptor | QueueFeedAdaptor: enum (generic, mock, vendorAdaptor) |  | Vendor adaptors are bespoke work (ADR-0012). |
-| feed.isHealthy | boolean | yes | Healthy means the last reading arrived within the feed's expected interval (decided 28 September, audit R106 (1)): lastReadingAt is no older than expectedIntervalSeconds. |
-| feed.isQuiet | boolean | yes | No reading within the expected interval. |
-| feed.lastReadingAt | string (date-time) |  | (nullable) |
-| feed.expectedIntervalSeconds | integer |  | The feed's expectedIntervalSeconds — the interval isQuiet is judged against, returned here so a health panel does not need the feed row as well. |
-| feed.readingsLastHour | integer |  |  |
-| feed.discardedLastHour | integer |  | Out-of-order readings rejected in the last hour — rows of queue.reading for this feed with disposition: discardedOutOfOrder. |
-
-**Responses**
-
-| Code | Shape | Meaning |
-|---|---|---|
-| 200 |  | Queue |
-| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
-| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
-
 ### listQueues
 
 **`GET /queues`**: List queues
@@ -2252,7 +1903,7 @@ Guest-facing when called with a guest token — returns only queues that are ope
 | Read routing | replica |
 | Reads | `queue.queue`, `queue.queue_operating_window` |
 | Writes | - |
-| Called by | BO-001, BO-002, BO-004, BO-005, BO-038, BO-221, EMP-031, EMP-032, GST-023, SUP-020, WEB-039 |
+| Called by | BO-001, BO-002, BO-004, BO-005, BO-221, EMP-031, GST-023, WEB-039 |
 
 **Parameters**
 
@@ -2329,13 +1980,13 @@ Guest-facing when called with a guest token — returns only queues that are ope
 |---|---|
 | Permission | `QUEUE_MANAGE` |
 | Scope level | venue |
-| Part of slice | setup, makes `queue.queue` non-empty |
+| Part of slice | setup, changes rows of `queue.queue` that another operation creates |
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `queue.queue`, `queue.queue_operating_window` |
 | Writes | `cache:idempotency`, `queue.queue` |
-| Called by | BO-001, BO-002, BO-004, BO-005, BO-038, BO-221 |
+| Called by | BO-001, BO-002, BO-005, BO-221 |
 
 **Parameters**
 
@@ -2436,7 +2087,7 @@ Guest-facing when called with a guest token — returns only queues that are ope
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `resources.resource` |
 | Writes | `cache:idempotency`, `resources.resource` |
-| Called by | BO-095, BO-857, BO-863 |
+| Called by | BO-095, BO-857 |
 | State model | Resource ([states/resource.yaml](../../../states/resource.yaml)): created as `available`; moves `available` -> `maintenance`, `maintenance` -> `retired`, `available` -> `retired` **(not settled: see the Gaps sheet)** |
 
 **Parameters**
@@ -3035,13 +2686,13 @@ Start times fall on `stepMinutes` from the venue's opening on that date, and a w
 |---|---|
 | Permission | `RESOURCE_MANAGE` |
 | Scope level | venue |
-| Part of slice | setup, makes `resources.resource_block` non-empty |
+| Part of slice | setup, changes rows of `resources.resource_block` that another operation creates |
 | Wave | 2 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `resources.resource_block` |
 | Writes | `cache:idempotency`, `resources.resource_block` |
-| Called by | BO-870 |
+| Called by | BO-870, BO-910 |
 
 **Parameters**
 
@@ -3109,7 +2760,7 @@ Requirements are stated as type and quantity with optional qualifications — *o
 | Conflict policy | serverWins |
 | Reads | `resources.resource_requirement` |
 | Writes | `resources.resource_requirement` |
-| Called by | BO-877, BO-893 |
+| Called by | BO-877, BO-893, BO-894 |
 
 **Parameters**
 
@@ -3230,13 +2881,13 @@ Boards 2.03 and 2.04. **A pattern, not a list of days.** A schedule written as c
 |---|---|
 | Permission | `RESOURCE_MANAGE` |
 | Scope level | venue |
-| Part of slice | setup, makes `resources.resource` non-empty |
+| Part of slice | setup, changes rows of `resources.resource` that another operation creates |
 | Wave | 2 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `resources.resource` |
 | Writes | `resources.resource` |
-| Called by | BO-857, BO-863, BO-866 |
+| Called by | BO-857, BO-866 |
 
 **Parameters**
 
@@ -3319,13 +2970,13 @@ Boards 2.03 and 2.04. **A pattern, not a list of days.** A schedule written as c
 |---|---|
 | Permission | `RESOURCE_CONFIGURE` |
 | Scope level | venue |
-| Part of slice | setup, makes `resources.resource_requirement` non-empty |
+| Part of slice | setup, changes rows of `resources.resource_requirement` that another operation creates |
 | Wave | 3 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `resources.resource_package`, `resources.resource_requirement` |
 | Writes | `resources.resource_package`, `resources.resource_requirement` |
-| Called by | BO-861 |
+| Called by | BO-861, BO-895, BO-918 |
 
 **Parameters**
 
@@ -3734,7 +3385,7 @@ A guest or public caller sees `active` routes only; `status` is honoured only fo
 |---|---|
 | Permission | `TRANSPORT_MANAGE` |
 | Scope level | venue |
-| Part of slice | setup, makes `transport.route`, `transport.route_stop` non-empty |
+| Part of slice | setup, changes rows of `transport.route`, `transport.route_stop` that another operation creates |
 | Wave | 3 |
 | Offline | no |
 | Conflict policy | serverWins |
@@ -4070,7 +3721,7 @@ Files are scanned before becoming available. An asset that fails scanning is qua
 | Conflict policy | serverWins |
 | Reads | `assets.media_asset`, `assets.media_upload`, `cache:idempotency` |
 | Writes | `assets.media_asset`, `assets.media_fingerprint`, `cache:idempotency` |
-| Called by | BO-1189, BO-955, CMS-002, CMS-010, CMS-063 |
+| Called by | BO-1189, BO-955, CMS-002, CMS-010, CMS-063, SUP-013 |
 | State model | Media asset ([states/media.yaml](../../../states/media.yaml)): created as `processing` |
 
 **Parameters**
@@ -4169,7 +3820,7 @@ Confirm with `POST /media/uploads/{id}/complete` once the transfer finishes. The
 | Conflict policy | serverWins |
 | Reads | `assets.media_upload`, `cache:idempotency` |
 | Writes | `assets.media_upload`, `cache:idempotency` |
-| Called by | BO-1189, BO-955, CMS-002, CMS-010, CMS-063 |
+| Called by | BO-1189, BO-955, CMS-002, CMS-010, CMS-063, SUP-013 |
 
 **Parameters**
 
@@ -5397,7 +5048,7 @@ A guest who waits forty minutes for a fifteen-minute estimate deserves a system 
 | Read routing | replica |
 | Reads | `queue.entry`, `queue.queue`, `queue.reading` |
 | Writes | - |
-| Called by | BO-001, BO-002, BO-004, BO-005, BO-038, EMP-031, EMP-032, GST-003, GST-004, GST-021, GST-022, GST-023, GST-038, GST-051, GST-053, GST-054, GST-059, WEB-002, WEB-004, WEB-039, WEB-040 |
+| Called by | BO-001, BO-002, BO-004, BO-005, EMP-031, EMP-032, GST-003, GST-004, GST-021, GST-022, GST-023, GST-038, GST-051, GST-053, GST-054, GST-059, WEB-002, WEB-004, WEB-039, WEB-040 |
 
 **Parameters**
 
@@ -5668,18 +5319,6 @@ Every table this service owns that the slice reads or writes, with its columns a
 | admitted_count | integer | no |  |
 | joined_at | timestamptz | yes |  |
 | synced_at | timestamptz | no |  |
-
-### `queue.feed`
-
-| Column | Type | Required | Notes |
-|---|---|---|---|
-| id | uuid | yes |  |
-| queue_id | uuid | yes |  |
-| adaptor | text | yes |  |
-| adaptor_name | text | no | Named vendor where adaptor is vendorAdaptor. |
-| credentials_ref | text | no | Key vault reference. |
-| expected_interval_seconds | integer | no | Beyond this without a reading, the feed is considered quiet. |
-| is_enabled | boolean | yes |  |
 
 ### `queue.queue`
 
@@ -6186,15 +5825,16 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-211 operations, added to this service in later releases without changing any of the above.
+216 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
 | asset | `createAsset`, `getAsset`, `getAssetHistory`, `listAssets`, `lookupAsset`, `setAssetStatus`, `updateAsset` |
 | assets | `analyseMediaAsset`, `bulkUpdateMediaAssets`, `createMediaShare`, `findSimilarMediaAssets`, `getMediaDistribution`, `getMediaTaxonomy`, `getMediaUsageAnalytics`, `listMediaAssetAudit`, `listMediaAssetVersions`, `listMediaRenditions`, `requestMediaRendition`, `setMediaAssetApproval`, `setMediaAssetRights`, `setMediaAssetTags`, `setMediaDistributionChannels`, `setMediaTaxonomy` |
+| card | `transferGameCard` |
 | departure | `listTransportRouteDepartures`, `updateTransportDeparture` |
-| entry | `callNextParties`, `listMyWaitingGuests`, `overrideWaitingGuest`, `redeemWaitingGuest` |
-| feed | `listQueueFeeds`, `submitQueueReading`, `testQueueFeed` |
+| entry | `callNextParties`, `listMyWaitingGuests`, `listQueueEntries`, `overrideWaitingGuest`, `redeemWaitingGuest` |
+| feed | `configureQueueFeed`, `getQueueFeedHealth`, `listQueueFeeds`, `submitQueueReading`, `testQueueFeed` |
 | game | `cloneGame`, `createGame`, `listGames`, `updateGame` |
 | games | `authoriseGameplay`, `cloneReaderConfiguration`, `createGameEntitlement`, `deployReaderConfiguration`, `getGameEligibility`, `getGamePricing`, `getGameplaySyncStatus`, `getGameplayValidationRules`, `listAttractionTypes`, `listGameEntitlements`, `listGameplayTransactions`, `listReaders`, `reportReaderQueue`, `setAttractionType`, `setGameCardExpiryRules`, `setGameCardLifecycle`, `setGameKioskConfiguration`, `setGameOperationalConfiguration`, `setGamePricing`, `setGameplayValidationRules`, `setPrizeCost`, `setReaderConfiguration`, `setReaderProfile`, `setRedemptionRules`, `simulateGameplayAuthorisation`, `testReader`, `validateGameConfiguration` |
 | incident | `getIncident`, `listIncidents`, `recordAuthorityNotification`, `reportIncident`, `updateIncident` |
@@ -6205,7 +5845,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | planned | `createMaintenancePlan`, `getDueMaintenance`, `listMaintenancePlans`, `updateMaintenancePlan` |
 | play | `recordGamePlay`, `syncGamePlays` |
 | prize | `createPrize`, `listPrizes`, `lookupPrize`, `redeemPrize` |
-| queue | `setQueueStatus` |
+| queue | `getQueue`, `setQueueStatus` |
 | rental | `assessRentalDamage`, `assignRentalEquipment`, `checkOutRental`, `createRentalAgreement`, `createRentalBlackout`, `createRentalBooking`, `createRentalCategory`, `createRentalPricingProfile`, `createRentalProduct`, `explainRentalPrice`, `extendRental`, `getRentalAgreement`, `getRentalAvailability`, `getRentalBooking`, `getRentalProduct`, `importRentalCatalogue`, `listOverdueRentals`, `listRentalAgreements`, `listRentalBookings`, `listRentalCategories`, `listRentalPricingProfiles`, `listRentalProducts`, `publishRentalProduct`, `quoteRentalPrice`, `recordRentalInspection`, `reportRentalIncident`, `requestRentalCommercialOverride`, `returnRental`, `setRentalAgreementRequirements`, `setRentalAvailabilityRules`, `setRentalDepositPolicy`, `setRentalDurationRules`, `setRentalFeePolicy`, `setRentalInventoryModel`, `setRentalOperationalRules`, `setRentalProductLocations`, `signRentalAgreement`, `simulateRentalPricing`, `swapRentalEquipment`, `updateRentalBooking`, `updateRentalPricingProfile`, `updateRentalProduct`, `validateRentalProduct` |
 | resources | `allocateResources`, `bookResource`, `cancelResourceBooking`, `checkInResource`, `checkOutResource`, `cloneResource`, `createResourceAttribute`, `createResourceCategory`, `createResourceCost`, `createResourceType`, `deleteResourceCost`, `getExperienceResourceRequirements`, `getPerformanceManifest`, `getResource`, `getResourceAllocationPolicy`, `getResourceAuditTrail`, `getResourceCalendar`, `getResourceCostAnalytics`, `getResourceDependencies`, `getResourceHierarchy`, `getResourceQualifications`, `getResourceSchedule`, `getResourceUtilisation`, `listResourceAttributes`, `listResourceBlocks`, `listResourceBookings`, `listResourceCategories`, `listResourceCosts`, `listResourcePackages`, `listResourceTypes`, `listResources`, `raiseResourceRequest`, `reorderPerformanceManifest`, `replaceResourceAllocation`, `setResourceAllocationPolicy`, `setResourceBookingProgress`, `setResourceDependencies`, `setResourceHierarchy`, `setResourceLifecycleState`, `setResourceQualifications`, `setResourceSelectionPolicy`, `setResourceVenueAssignment`, `suggestResources`, `updateResourceBooking`, `updateResourceCategory`, `updateResourceType` |
 | route | `setTransportRouteStatus` |

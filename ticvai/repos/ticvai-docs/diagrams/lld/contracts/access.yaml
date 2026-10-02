@@ -1,5 +1,5 @@
 id: LLD-access
-title: access — 246 operations
+title: access — 250 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: spine
@@ -393,6 +393,27 @@ operations:
   offline: false
   reads:
   - pii.subject_biometric
+  writes: []
+- operation: getFaceReenrolmentImages
+  verb: GET
+  path: /face-reenrolment-attempts/{attemptId}/images
+  scope: venue
+  permission: BIOMETRIC_IMAGE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: getHardwareModelCertification
+  verb: GET
+  path: /hardware-models/{modelId}/certification
+  scope: tenant
+  permission: DEVICE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - access.hardware_certification
   writes: []
 - operation: getOfflinePackage
   verb: GET
@@ -2259,6 +2280,18 @@ operations:
   - access.access_map
   - access.configuration_change
   - cache:idempotency
+- operation: setAccessPointDirection
+  verb: PUT
+  path: /access-points/{accessPointId}/direction
+  scope: venue
+  permission: ACCESS_DIRECTION_SET
+  audience:
+  - staff
+  offline: false
+  reads:
+  - access.access_point
+  - access.gate_mode_change
+  writes: []
 - operation: setAccessPointGeofence
   verb: PUT
   path: /access-points/{accessPointId}/geofence
@@ -2784,6 +2817,18 @@ operations:
   - access.configuration_change
   - access.hardware_model
   - cache:idempotency
+- operation: setHardwareModelCertification
+  verb: PUT
+  path: /hardware-models/{modelId}/certification
+  scope: tenant
+  permission: DEVICE_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - access.hardware_certification
+  writes:
+  - access.hardware_certification
 - operation: setHotelWalletExternal
   verb: PUT
   path: /hotel-wallet-external

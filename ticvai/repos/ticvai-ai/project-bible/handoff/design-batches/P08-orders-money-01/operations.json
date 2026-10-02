@@ -18,25 +18,6 @@
   "requestBody": null,
   "responds": "Shift"
  },
- "addTip": {
-  "method": "POST",
-  "path": "/payments/{paymentId}/tip",
-  "contract": "orders",
-  "summary": "Record a tip against a payment",
-  "permission": "ORDER_MODIFY",
-  "offlineCapable": true,
-  "conflictPolicy": "append",
-  "scopeLevel": "workstation",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Payment"
- },
  "appendEntitlementToMedia": {
   "method": "POST",
   "path": "/media/{mediaCode}/entitlements",
@@ -75,12 +56,12 @@
   "requestBody": "ManualDiscountRequest",
   "responds": "Order"
  },
- "approveShiftOpen": {
+ "approveRefund": {
   "method": "POST",
-  "path": "/shifts/{shiftId}/approve-open",
-  "contract": "shift",
-  "summary": "Approve a shift opening outside tolerance",
-  "permission": "SHIFT_APPROVE_OPEN",
+  "path": "/refunds/{refundId}/approve",
+  "contract": "orders",
+  "summary": "Approve a refund held for approval",
+  "permission": "ORDER_REFUND_APPROVE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
@@ -92,7 +73,7 @@
    }
   ],
   "requestBody": null,
-  "responds": "Shift"
+  "responds": "Refund"
  },
  "askReportingQuestion": {
   "method": "POST",
@@ -112,25 +93,6 @@
   ],
   "requestBody": null,
   "responds": "NaturalLanguageAnswer"
- },
- "assessProductChange": {
-  "method": "POST",
-  "path": "/products/{productId}/change-impact",
-  "contract": "catalogue",
-  "summary": "What a change would touch, before making it",
-  "permission": "PRODUCT_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "ProductChangeImpact"
  },
  "assignChargeback": {
   "method": "POST",
@@ -170,25 +132,6 @@
   "requestBody": null,
   "responds": "Payment"
  },
- "cloneProduct": {
-  "method": "POST",
-  "path": "/products/{productId}/clone",
-  "contract": "catalogue",
-  "summary": "Copy a product as a new draft",
-  "permission": "PRODUCT_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Product"
- },
  "closeDepositBoxes": {
   "method": "POST",
   "path": "/deposit-boxes/close",
@@ -216,7 +159,7 @@
   "permission": "SHIFT_CLOSE",
   "offlineCapable": false,
   "conflictPolicy": "append",
-  "scopeLevel": "workstation",
+  "scopeLevel": "venue",
   "parameters": [
    {
     "name": null,
@@ -227,14 +170,14 @@
   "requestBody": "CloseShiftRequest",
   "responds": "ShiftCloseResult"
  },
- "createCashMovement": {
+ "createBulkRefund": {
   "method": "POST",
-  "path": "/shifts/{shiftId}/cash-movements",
-  "contract": "shift",
-  "summary": "Record a cash lift or add",
-  "permission": "CASH_LIFT",
-  "offlineCapable": true,
-  "conflictPolicy": "append",
+  "path": "/refunds/bulk",
+  "contract": "orders",
+  "summary": "Refund every order against an event, performance or date",
+  "permission": "ORDER_REFUND_BULK",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -243,8 +186,8 @@
     "required": null
    }
   ],
-  "requestBody": "CreateCashMovementRequest",
-  "responds": "CashMovement"
+  "requestBody": null,
+  "responds": null
  },
  "createGroupBooking": {
   "method": "POST",
@@ -284,25 +227,6 @@
   "requestBody": "CreateOrderRequest",
   "responds": "Order"
  },
- "createPayment": {
-  "method": "POST",
-  "path": "/payments",
-  "contract": "orders",
-  "summary": "Take a payment against an order",
-  "permission": "ORDER_CREATE",
-  "offlineCapable": true,
-  "conflictPolicy": "append",
-  "scopeLevel": "workstation",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "CreatePaymentRequest",
-  "responds": "Payment"
- },
  "createRefund": {
   "method": "POST",
   "path": "/orders/{orderId}/refunds",
@@ -320,25 +244,6 @@
    }
   ],
   "requestBody": "CreateRefundRequest",
-  "responds": null
- },
- "createRefundRequest": {
-  "method": "POST",
-  "path": "/refund-requests",
-  "contract": "orders",
-  "summary": "Guest-initiated refund request",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
   "responds": null
  },
  "createReport": {
@@ -447,58 +352,6 @@
   "requestBody": null,
   "responds": "OrdChargebackAnalytics"
  },
- "getCurrentShift": {
-  "method": "GET",
-  "path": "/shifts/current",
-  "contract": "shift",
-  "summary": "The open or suspended shift on the session's workstation",
-  "permission": "SHIFT_OPEN",
-  "offlineCapable": true,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "workstation",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "Shift"
- },
- "getFinancialReport": {
-  "method": "GET",
-  "path": "/reports/financial",
-  "contract": "finance",
-  "summary": "Financial statements, revenue and tax summaries",
-  "permission": "REPORT_VIEW_VENUE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "report",
-    "in": "query",
-    "required": true
-   },
-   {
-    "name": "fiscalPeriodId",
-    "in": "query",
-    "required": true
-   },
-   {
-    "name": "legalEntityId",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "venueId",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "costCenterId",
-    "in": "query",
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "FinancialReport"
- },
  "getGroupBooking": {
   "method": "GET",
   "path": "/group-bookings/{groupBookingId}",
@@ -511,19 +364,6 @@
   "parameters": [],
   "requestBody": null,
   "responds": "GroupBooking"
- },
- "getMediaAsset": {
-  "method": "GET",
-  "path": "/media/{mediaId}",
-  "contract": "assets",
-  "summary": "Read an asset with derivatives and usage",
-  "permission": "ASSET_LIBRARY_VIEW",
-  "offlineCapable": true,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "MediaAssetDetail"
  },
  "getMediaEntitlements": {
   "method": "GET",
@@ -569,19 +409,6 @@
   "parameters": [],
   "requestBody": null,
   "responds": "OrderStatement"
- },
- "getProduct": {
-  "method": "GET",
-  "path": "/products/{productId}",
-  "contract": "catalogue",
-  "summary": "Read a product",
-  "permission": "PRODUCT_VIEW",
-  "offlineCapable": true,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "Product"
  },
  "getRefundPolicy": {
   "method": "GET",
@@ -634,6 +461,35 @@
   "parameters": [],
   "requestBody": null,
   "responds": "Shift"
+ },
+ "getShiftCountLines": {
+  "method": "GET",
+  "path": "/shifts/{shiftId}/count-lines",
+  "contract": "shift",
+  "summary": "The denomination breakdown of a shift's counts",
+  "permission": "REPORT_VIEW_WORKSTATION",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "countKind",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
  },
  "getTaxDocumentRendition": {
   "method": "GET",
@@ -762,35 +618,6 @@
   "requestBody": "FinIssueTaxInvoiceRequest",
   "responds": "FinTaxInvoice"
  },
- "listBookingFlows": {
-  "method": "GET",
-  "path": "/venues/{venueId}/booking-flows",
-  "contract": "white-label",
-  "summary": "A venue's booking flows, in the working draft",
-  "permission": "TENANT_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "flowTypeKey",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- },
  "listCashMovements": {
   "method": "GET",
   "path": "/shifts/{shiftId}/cash-movements",
@@ -801,40 +628,6 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- },
- "listConsentQuestions": {
-  "method": "GET",
-  "path": "/consent-questions",
-  "contract": "marketing-crm",
-  "summary": "The consent questions a venue asks at booking",
-  "permission": "GUEST_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "kind",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "status",
-    "in": "query",
-    "required": null
-   },
    {
     "name": null,
     "in": null,
@@ -917,6 +710,30 @@
   "requestBody": null,
   "responds": "Page"
  },
+ "listDeposits": {
+  "method": "GET",
+  "path": "/deposits",
+  "contract": "orders",
+  "summary": "Deposits and their authorisation state",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "listOrderRefunds": {
   "method": "GET",
   "path": "/orders/{orderId}/refunds",
@@ -982,6 +799,21 @@
     "required": null
    },
    {
+    "name": "workstationId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "subjectId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "tender",
+    "in": "query",
+    "required": null
+   },
+   {
     "name": null,
     "in": null,
     "required": null
@@ -995,13 +827,13 @@
   "requestBody": null,
   "responds": "Page"
  },
- "listProductVariants": {
+ "listPaymentReconciliationException": {
   "method": "GET",
-  "path": "/products/{productId}/variants",
-  "contract": "catalogue",
-  "summary": "List generated variants",
-  "permission": "PRODUCT_VIEW",
-  "offlineCapable": true,
+  "path": "/payment-reconciliation-exception",
+  "contract": "orders",
+  "summary": "Payment Reconciliation & Exception Management",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
@@ -1009,28 +841,10 @@
     "name": null,
     "in": null,
     "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
    }
   ],
   "requestBody": null,
-  "responds": "Page"
- },
- "listProductVersions": {
-  "method": "GET",
-  "path": "/products/{productId}/versions",
-  "contract": "catalogue",
-  "summary": "What this product used to be",
-  "permission": "PRODUCT_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "ProductVersion"
+  "responds": "PaymentReconciliationExceptionManagementView"
  },
  "listReports": {
   "method": "GET",
@@ -1246,6 +1060,40 @@
   "requestBody": null,
   "responds": "TicketReissueFulfillmentRegenerationView"
  },
+ "listWorkstations": {
+  "method": "GET",
+  "path": "/workstations",
+  "contract": "tenancy",
+  "summary": "List workstations",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "saleBoardKind",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "modifyOrder": {
   "method": "POST",
   "path": "/orders/{orderId}/modify",
@@ -1264,25 +1112,6 @@
   ],
   "requestBody": "ModifyOrderRequest",
   "responds": "OrderModificationResult"
- },
- "openShift": {
-  "method": "POST",
-  "path": "/shifts",
-  "contract": "shift",
-  "summary": "Open a shift",
-  "permission": "SHIFT_OPEN",
-  "offlineCapable": false,
-  "conflictPolicy": "append",
-  "scopeLevel": "workstation",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "OpenShiftRequest",
-  "responds": "Shift"
  },
  "recordChargeback": {
   "method": "POST",
@@ -1322,33 +1151,14 @@
   "requestBody": null,
   "responds": "Chargeback"
  },
- "recordNoSale": {
+ "rejectShiftVariance": {
   "method": "POST",
-  "path": "/shifts/{shiftId}/no-sale",
+  "path": "/shifts/{shiftId}/reject-variance",
   "contract": "shift",
-  "summary": "Open the Deposit Box without a sale",
-  "permission": "CASH_NO_SALE",
-  "offlineCapable": true,
-  "conflictPolicy": "append",
-  "scopeLevel": "workstation",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "NoSaleEvent"
- },
- "reopenShift": {
-  "method": "POST",
-  "path": "/shifts/{shiftId}/reopen",
-  "contract": "shift",
-  "summary": "Reopen a shift closed in error",
-  "permission": "SHIFT_REOPEN",
+  "summary": "Send a counted shift back for a recount",
+  "permission": "OVERSHORT_ACCEPT",
   "offlineCapable": false,
-  "conflictPolicy": "serverWins",
+  "conflictPolicy": "append",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -1360,12 +1170,12 @@
   "requestBody": null,
   "responds": "Shift"
  },
- "replaceMediaAsset": {
+ "replaceCredential": {
   "method": "POST",
-  "path": "/media/{mediaId}/replace",
-  "contract": "assets",
-  "summary": "Replace the file behind an asset",
-  "permission": "ASSET_LIBRARY_MANAGE",
+  "path": "/credentials/{credentialId}/replace",
+  "contract": "access",
+  "summary": "Replace a credential's media",
+  "permission": "ORDER_EXCHANGE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
@@ -1376,8 +1186,8 @@
     "required": null
    }
   ],
-  "requestBody": null,
-  "responds": "MediaReplaceResult"
+  "requestBody": "CredentialReplacementInput",
+  "responds": "CredentialOperationsCommandCenterView"
  },
  "reprintOrder": {
   "method": "POST",
@@ -1436,25 +1246,6 @@
   "requestBody": null,
   "responds": "SettlementException"
  },
- "restoreProductVersion": {
-  "method": "POST",
-  "path": "/products/{productId}/versions/{version}/restore",
-  "contract": "catalogue",
-  "summary": "Put a previous version back",
-  "permission": "PRODUCT_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Product"
- },
  "resumeOrder": {
   "method": "POST",
   "path": "/orders/{orderId}/resume",
@@ -1473,25 +1264,6 @@
   ],
   "requestBody": null,
   "responds": "OrderResumeResult"
- },
- "resumeShift": {
-  "method": "POST",
-  "path": "/shifts/{shiftId}/resume",
-  "contract": "shift",
-  "summary": "Resume a suspended shift",
-  "permission": "SHIFT_OPEN",
-  "offlineCapable": true,
-  "conflictPolicy": "append",
-  "scopeLevel": "workstation",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Shift"
  },
  "runReport": {
   "method": "POST",
@@ -1531,84 +1303,6 @@
   "requestBody": null,
   "responds": "ReportDefinition"
  },
- "searchMedia": {
-  "method": "GET",
-  "path": "/media",
-  "contract": "assets",
-  "summary": "Search the asset library",
-  "permission": "ASSET_LIBRARY_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "kind",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "tag",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "collectionId",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "venueId",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "search",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "unusedOnly",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "rightsExpiringWithinDays",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- },
- "setProductAttributes": {
-  "method": "PUT",
-  "path": "/products/{productId}/attributes",
-  "contract": "catalogue",
-  "summary": "Set the attribute axes for a product",
-  "permission": "PRODUCT_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": null
- },
  "settleDeposit": {
   "method": "POST",
   "path": "/deposits/{depositId}/settle",
@@ -1627,25 +1321,6 @@
   ],
   "requestBody": null,
   "responds": "Deposit"
- },
- "suspendShift": {
-  "method": "POST",
-  "path": "/shifts/{shiftId}/suspend",
-  "contract": "shift",
-  "summary": "Suspend a shift so another user can log in",
-  "permission": "SHIFT_SUSPEND",
-  "offlineCapable": true,
-  "conflictPolicy": "append",
-  "scopeLevel": "workstation",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Shift"
  },
  "updateGroupBooking": {
   "method": "PATCH",
@@ -1670,49 +1345,6 @@
   ],
   "requestBody": "UpdateGroupBookingRequest",
   "responds": "GroupBooking"
- },
- "updateProduct": {
-  "method": "PATCH",
-  "path": "/products/{productId}",
-  "contract": "catalogue",
-  "summary": "Update a product",
-  "permission": "PRODUCT_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "UpdateProductRequest",
-  "responds": "Product"
- },
- "updateProductVariant": {
-  "method": "PATCH",
-  "path": "/products/{productId}/variants/{variantId}",
-  "contract": "catalogue",
-  "summary": "Describe a variant",
-  "permission": "PRODUCT_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "ProductVariant"
  },
  "updateReport": {
   "method": "PUT",

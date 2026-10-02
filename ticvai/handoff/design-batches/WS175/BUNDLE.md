@@ -1,6 +1,6 @@
 # WS175 — Seat Management Venue Mapping Reference v1.0 board 11
 
-**10 screens · 9 operations · 25 schemas · 5 permissions**
+**10 screens · 9 operations · 23 schemas · 5 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -61,6 +61,75 @@ convincingly. It is never a caption.
   and its error; and, element by element, what is shown and in what format, what each action
   produces and where the user goes next. Draw exactly that.
 
+## The processes these screens belong to
+
+Written by the owner of each process (`handoff/design-notes/`). Read before any screen: it says how the process runs end to end and which words the screens must use.
+
+### Ticketing & Guest Commerce, as the venue and TICVAI configure and run it
+
+WHAT THE PROCESS IS. Everything a guest can buy is set up, priced, promoted and serviced here, on Venue Management (P08, the venue's own back office, served inside the venue's cell) and on the TICVAI Console (P09, TICVAI's control plane, outside every cell). End to end: (1) CATALOGUE. A product has one of twelve kinds (admission, timedAdmission, datedAdmission, openDated, seated, membership, bundle, fnb, retail, rental, addOn, giftCard). Its ticket types (adult, child, senior, resident...) are not typed one by one: they are generated from the product's attributes (components) and each value combination becomes a sellable ticket type with no extra setup (DI-164). What a ticket grants (validity, entries, re-entry, days of week, blackout dates, expiry anchor, fast track, transfer) lives on a reusable entitlement template, not on the product. Who may take part (age, height, supervision, certification) is the eligibility rule; what the guest must answer is the data mask and the consent questions; how the guest sees it is guestListing (bookable, infoOnly, hidden), display tags (at most six), media and the booking flow. Group, family and corporate products and every after-sales policy (reschedule, exchange, refund, cancellation, upgrade, transfer) are configured inside the one product configuration, never on separate screens (DI-465, DI-466). (2) LIFECYCLE AND PUBLICATION. A product moves draft, inReview, approved, live, withdrawn, archived. Approval and publication are two acts with two permissions (PRODUCT_APPROVE, PRODUCT_PUBLISH, R091); every product is authorised before it sells online or on site (DI-438). Approved is still not on a till: a till sells only what is in the signed catalogue release it pulled (publishBundle, ADR-0013), so a saved price is a back-office fact until the venue publishes to tills. Changing something that has sold is preceded by an impact check (assessProductChange: orders affected, entitlements issued, future performances, open carts); restoring a version creates a new version, and sold tickets keep the price and terms they were sold under (restoreProductVersion, DI-938, TRACKER Actions row 145). (3) PRICE. Prices live in price lists: per venue, per channel set, with validity dates and a priority, copied for the next season with an uplift (copyPriceList) and repriced in bulk only after a dry run (bulkChangePrices). Currency and decimal scale are never chosen on a form: they resolve from the venue's region (ADR-0008, ADR-0018; AED 2 places, OMR and BHD 3). When several rules apply, the configured hierarchy decides; there is no "lowest price wins" default (DI-595). Tax on the pre-discount price and three-decimal rounding are regional settings (DI-598). Dynamic rules always show their minimum and maximum price guardrails beside the trigger (getDynamicPriceRule). (4) PROMOTE AND BUNDLE. A promotion is a rule (automatic, or gated by a code) created in draft, made live only by Publish, which first analyses stacking; a …
+*(source: DI-164; DI-171; DI-438; DI-465; DI-466; DI-595; DI-598; DI-387; DI-039; DI-044; DI-474; DI-671; DI-987; DI-019; DI-080; ADR-0008; ADR-0013; ADR-0018; ADR-0019; ADR-0030; R091; R098; R101; R222; REV3-21; contracts/spine/catalogue.yaml#transitionProductLifecycle …)*
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Product | Anything sellable, of one of the twelve kinds. The record that carries names, channels, listing, media and policies. | Item (except on F&B and retail screens), SKU (for tickets), Offering | contracts/spine/catalogue.yaml#/components/schemas/ProductKind |
+| Ticket type | One sellable variant of an admission or event product (Adult, Child, Resident Adult), generated from the product's attributes. For retail and F&B the same record is labelled Variant. | Variant (on ticket screens), Sub-product, Rate (that is a price), Axis value | contracts/spine/catalogue.yaml#updateProductVariant / DI-164 / DI-437 |
+| Attribute | A dimension that generates ticket types (Guest category, Residency, Tier, Length). Each has values; adding a value adds ticket types. | Axis, Component (the client's word; use it only in help text), Option | contracts/spine/catalogue.yaml#setProductAttributes / DI-164 / DI-450 |
+| Entitlement | What a ticket lets the holder do (validity, entries, re-entry, days, blackout dates, expiry, fast track, transfer), defined once on an entitlement template and shared by several products. | Access rights, Ticket rules, Validity profile | contracts/spine/catalogue.yaml#createEntitlementTemplate / DI-171 / DI-451 |
+| Eligibility rule | Who may take part in or buy a product (age, height, supervision, waiver, certification). Distinct from a promotion's eligibility, which decides who gets a discount. | Restriction, Access rule (that is access control) | contracts/spine/catalogue.yaml#setProductEligibilityRule / DI-463 |
+| Price list | A set of prices for one venue and a set of channels, valid between two dates, with a priority. Several coexist (B2C, B2B, season). | Price book, Rate card, Tariff | contracts/spine/catalogue.yaml#createPriceList / DI-140 / DI-163 |
+| Price category | A standard rate type (Adult, Child, Member) reused across lists so venues do not invent "Adult Standard" and "Normal Adult". | Price band (that is a seat-category band), Fare type (transport) | contracts/spine/catalogue.yaml#setPriceCategoryRateType / … |
+| Price band | A priced band on a seat category (code, label, colour, amount, channel, from-date). | Price category, Zone price | contracts/satellite/seating.yaml#/components/schemas/SeatPriceBand |
+| Promotion | A rule that changes a price automatically or when a code is entered; draft until published; declares how it stacks. | Offer (except in guest copy), Deal, Discount rule | contracts/satellite/promotions.yaml#createPromotion / DI-173 / DI-174 |
+| Coupon code | A code issued from a coupon campaign that applies a promotion-style discount; one shared code or many single-use codes. | Voucher, Promo voucher | contracts/satellite/promotions.yaml#createCouponCampaign / DI-173 |
+| Voucher | A code that carries money (face value, balance), sold or issued; a liability until redeemed or expired. | Coupon, Credit note | contracts/satellite/promotions.yaml#listVoucherBatches / … |
+| Bundle | A product sold as one line whose price differs from the sum of its components, with a mandatory revenue allocation. "Package" is acceptable in guest copy. | Combo (that is an F&B meal deal), Catalogue bundle | contracts/satellite/promotions.yaml#createBundle / DI-220 / ADR-0019 |
+| Catalogue release | The signed snapshot of a venue's catalogue, prices, promotions and sale boards that tills, kiosks and devices pull. Its action label is "Publish to tills". | Bundle, Catalogue bundle, Sync, Deploy | contracts/spine/catalogue.yaml#publishBundle / … |
+| Approve / Publish / Save | Save keeps a draft; Approve records that it is authorised (PRODUCT_APPROVE); Publish makes it live for guests and channels (PRODUCT_PUBLISH). Three different buttons, never merged. | Submit, Go live, Activate (except CatalogueConfigStatus active), Deploy | R091 / contracts/spine/catalogue.yaml#transitionProductLifecycle / DI-438 |
+| Product states | Draft, In review, Approved, Live, Withdrawn, Archived (ProductLifecycleState), always as coloured badges with these exact labels. | Published (for a product), Pending, Inactive (for a product) | contracts/spine/catalogue.yaml#/components/schemas/ProductLifecycleState |
+| Channel | Where something is sold. Labels: pos Point of sale; kiosk Kiosk; web and guestWeb Website; mobile and guestApp App; b2b B2B partners; partner Partner; ota Travel agents (OTA); callCentre Call centre; api API; backOffice Back office. | Touchpoint, Outlet (an outlet is a business inside a venue), raw enum values | contracts/spine/catalogue.yaml#/components/schemas/Channel / … |
+| Refund | Money returned after settlement, wholly or for some lines, under the venue's refund policy. | Return (that is retail goods), Reversal, Void | contracts/spine/orders.yaml#createRefund / DI-252 |
+| Void | Cancelling a whole order before settlement, within the same shift, with a reason from the void list. After settlement it is a refund. | Cancel order, Delete | contracts/spine/orders.yaml#voidOrder / R222 |
+| Exchange / Reschedule | Exchange swaps lines for other products or dates and settles only the difference; Reschedule is the same product moved to another date or time. | Rebook, Date change (acceptable only in guest copy), Refund and resell | contracts/spine/orders.yaml#exchangeOrderLines / … |
+| Hold / Capture / Release | A deposit or stored-value amount is held, then partly or fully captured, and the rest released. A held deposit is not a payment. | Charge, Pre-auth (in staff copy), Block funds | contracts/spine/orders.yaml#authoriseStoredValue / … |
+| Wallet (TICVAI wallet) | The guest's stored-value balance on TICVAI, spent by hold and capture. Distinct from the tender "Apple Pay / Google Pay", which the contract also calls wallet. | Digital wallet (for stored value), E-wallet, Credit (without a type) | contracts/spine/orders.yaml#/components/schemas/TenderKind / R080 |
+| Credit lot | One amount of wallet credit of one credit type (cash, bonus, gift) with its own expiry; lots are spent nearest expiry first and the guest sees the breakdown but cannot choose. | Bucket, Batch, Top-up | TRACKER Actions row 171 / contracts/satellite/wallet.yaml#expireCreditLots |
+| Venue map / Seat map | A venue map is the wayfinding map of a park or a floor (points, paths, bookable places); a seat map is the seating layout of an auditorium or stand. Never just "map" where both could be meant. | Layout (alone), Floor plan (unless it is a floor map), Map (alone) | contracts/satellite/venue-map.yaml#createVenueMap / … |
+| Point / Bookable place | A point is a place on a venue map (toilet, ride, restaurant, exit). A bookable place is a cabana, lounger, table or pitch placed on the map and sold through its price band. | Pin, POI, Marker, Resource (in staff copy) | contracts/satellite/venue-map.yaml#setVenuePoint / … |
+| Station / Route / Timetable / Departure / Fare table / Pass … | A route is an ordered list of stations with offsets; a timetable generates departures up to its release horizon; a fare table prices a route per passenger type; a pass type is a multi-trip or unlimited pass sold as a product. | Stop (except in the stop list), Line (except lineCode), Schedule, Trip (except a guest's journey) | contracts/satellite/transport.yaml / REV3-21 |
+| Applies from | The effective date of a change. Every dated change shows it, and sold items keep their old terms. | Effective date (in labels), Start date (for a change) | contracts/satellite/seating.yaml#updateSeatCategory / TRACKER Actions row 194 |
+
+### Finance, Ledger & Tax · Reporting & Analytics
+
+Finance and insights run underneath every sale. A sale at a till (P04), kiosk, web storefront (P01) or guest app (P02) is priced and taxed per line at the moment of sale, recorded in the venue's base currency (AED in the UAE; 2 decimals, or 3 for BHD, KWD and OMR, never rounded away), and posted to an append-only dual ledger through account mappings per money event; anything unmapped lands in suspense. Tax follows the jurisdiction's tax profile: inclusive or exclusive, compound where a tax applies on another, zero-rated or exempt with verified evidence, and computed on the discounted price by default or on the price before discount where the region requires it (Egypt). A guest may select a currency the venue charges and pay in it: the rate is locked on the order, the payment partner is asked in that currency, the ledger keeps the base amount with the rate, and a refund goes back in the currency paid (decided 2 October 2026, Chinmay); a currency shown but not charged is an approximate price. Foreign cash at a till is recorded at its base equivalent and change is given in base currency. A paid order can carry a VAT receipt (simplified tax invoice), a full tax invoice with the buyer's TRN, or a consolidated invoice for a company, each numbered without gaps and never edited; corrections are credit memos. Revenue is recognised by rule: POS-style immediate, tickets on the visit, gift cards and wallet on use, annual passes straight-line or per visit, breakage on expiry; deferred revenue is a balance that ages. Each venue's day is reconciled (POS cash, gateways, bank, wallet against the ledger, provider files matched automatically, only genuine mismatches to a person); chargebacks are defended against the bank's deadline; month end runs seven close checks and goes to a finance approver. Nothing posted is deleted: a correction is a reversal, an approver is never the preparer, and ledger approval needs a second factor. Back-office finance lives in Venue Management (P08: chart of accounts, mapping, FX, journals, recognition, reconciliation, period close, chargebacks); tax profiles, calculation validation and platform reconciliation in the TICVAI Console (P09); partner settlement in P10. Reporting is one consolidated, permission-based area (Analytics, P16): seeded standard dashboards and reports plus no-code builders over a governed business catalogue; the P08 report screens, the POS terminal day view and the kitchen performance view are scoped windows onto the same definitions and must show the same numbers. Every figure is read from a lag-tolerant reporting copy and shows its "as of" time; scope comes from the person's rights, never from a filter; AI explains and recommends but never acts, answers only within the person's role, labels forecasts, and is phase two for finance ledgers.
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Base currency | The venue's region currency; the currency every record and ledger posting is in. A guest may pay in a currency they select (where the venue charges it); the books still hold the base amount and the rate. | Home currency, Local price, Default currency | DI-211 / DI-282 / contracts/spine/orders.yaml#/components/schemas/Order |
+| Pay in USD (a currency the venue charges) | The guest's selected payment currency; the card is charged in it at the rate locked on the order, and refunds go back in it. | Converted price, Approx. (for a charged currency) | contracts/spine/orders.yaml#checkoutCart / … |
+| ≈ (approx.) price in USD / SAR / … | A conversion of a base-currency price for a currency the venue shows but does not charge, always next to the base price. | Converted price, USD price | DI-211 / screens/P02-guest-mobile-app.yaml#GST-044 |
+| Takings | Money received in the period less refunds (cash-basis); the seeded KPI on hubs. | Revenue, Sales, Income | contracts/satellite/reporting.yaml#/components/schemas/ReportingSystemKpi / R283 |
+| Gross sales | Issued sales before discounts and refunds; whether tax is included must be stated on the tile. | Revenue, Turnover | MATRIX 6.1.78 |
+| Net revenue | Gross sales less discounts less refunds, adjusted per finance policy. | Net sales, Revenue, Income | MATRIX 6.1.78 |
+| Recognised revenue / Deferred revenue | Earned under the recognition rules / paid for but not yet earned. Kept distinct from sales. | Realised revenue, Unearned income, Wallet revenue | MATRIX 5.12.6 / DI-260 / contracts/spine/finance.yaml#getDeferredRevenue |
+| VAT receipt | The simplified tax invoice issued on a paid order. | Receipt (when it is a tax document), Bill | contracts/spine/finance.yaml#issueTaxInvoice |
+| Tax invoice / Combined tax invoice | A full invoice with the buyer's details / one invoice for several paid orders of one buyer. | Bill, Statement | contracts/spine/finance.yaml#/components/schemas/FinTaxInvoiceType |
+| Credit memo | The document that corrects an issued invoice after a refund; the invoice itself is never edited. | Credit note (until the client's tax adviser chooses "Tax credit note"), Edit invoice | contracts/spine/finance.yaml#/components/schemas/FinTaxInvoice |
+| VAT (or the jurisdiction's tax name) | Use the tax profile's own name on every surface; "Tax" only where several kinds are summed. | GST in UAE, Service charge for a tax | contracts/spine/catalogue.yaml#setTaxProfileJurisdiction |
+| Price before discount | The taxable base where the jurisdiction taxes the undiscounted price. | Gross price, List tax | DI-598 |
+| Post / Reverse | A journal reaches the ledger when approved and posted; a correction is a reversal, never an edit or delete. | Edit entry, Delete entry, Undo | contracts/spine/finance.yaml#reverseJournalEntry |
+| Period (Open / Closing / Closed) | A fiscal period's state; closing stops postings, closed locks them. | Month locked, Frozen | contracts/spine/finance.yaml#/components/schemas/PeriodStatus |
+| Variance (Over / Short) | The difference between expected and counted or recorded, always saying between which two figures. | Discrepancy, Error, Loss | DI-275 / contracts/spine/finance.yaml#/components/schemas/UnifiedReconciliation |
+| Settlement / Exception / Resolve | A provider's file for a day / a line that did not match / the recorded explanation. | Payout file, Error, Close | contracts/spine/finance.yaml#/components/schemas/SettlementException |
+| Chargeback | A bank-initiated reversal with an evidence deadline; not a refund. | Dispute refund, Reversal | contracts/spine/orders.yaml#/components/schemas/Chargeback |
+| Report / Dashboard / Tile / KPI | A runnable, exportable, schedulable definition / a page of tiles / one visual bound to a report / a company-wide measure defined once. | Widget (outside the builder's library), Board (for a user-facing dashboard) | contracts/satellite/reporting.yaml#/components/schemas/DashboardTile / … |
+| Warning / Critical | KPI status bands set by a target's amber and red thresholds; always words plus colour. | Amber, Red (alone), Bad | contracts/satellite/reporting.yaml#/components/schemas/KpiTarget |
+| As of HH:MM / Updated N sec ago | The freshness of every figure read from the reporting copy; stale shows a warning. | Live (unless refreshed), Real-time | MATRIX 8.7.22 |
+| Forecast | Any projected figure, with its range; never shown as a fact. | Expected, Will be | DI-973 |
+| Outlet / Workstation (till) | A sales point / the device; staff copy may say "till" for the workstation. | Store, POS (in copy), Drawer (for the device) | R156 |
+| Channel | POS, Web, App, Kiosk, B2B, OTA, from one closed list. | Source, Platform | MoM 2026-08-18 4.2 Recipes, Operating Hours & Service Channels / MATRIX 1.4.7 |
+
+
 ## The screens
 
 Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs count fields; requirements are matrix rows; meeting inputs are the ones naming the screen (the module and platform ones are below); white label says whether the tenant's brand reaches it (guest) or it sets the brand (configures).
@@ -73,7 +142,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-1054` | Revenue by Section | B–D | 3 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-1055` | Revenue by Seat Category | B–D | 0 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
 | `BO-1056` | Seat Utilization Analytics | B–D | 2 | 19 | 6 | 0 | 0 | 6 | — | notStarted (—) |
-| `BO-1057` | Hold Inventory Reporting | B–D | 0 | 0 | 6 | 0 | 0 | 4 | — | notStarted (—) |
+| `BO-1057` | Hold Inventory Reporting | B–D | 0 | 12 | 6 | 0 | 0 | 4 | — | notStarted (—) |
 | `BO-1058` | Sales Pace & Pick Curves | B–D | 0 | 0 | 6 | 3 | 0 | 0 | — | notStarted (—) |
 | `BO-1059` | Heat Maps & Drill-Down | B–D | 0 | 0 | 6 | 6 | 0 | 0 | — | notStarted (—) |
 | `BO-1060` | Report Builder, Export & Audit | B–D | 0 | 0 | 6 | 87 | 0 | 0 | — | notStarted (—) |
@@ -104,7 +173,13 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Opens with | `seatMapId` (navigation) · cold entry: **Reached from the list that owns it**, so the identifier arrives with the navigation. Opened cold without one, the screen says what is missing and offers that … |
 | Route | `/access-venue/seat-analytics-command-center-bo-1051` |
 
-**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built. Contract gap recorded 2 October 2026 (CHG-WIR-027): A seat analytics read (occupancy, revenue, yield by section and performance); listSeats carries no sales.
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Seat commercial and operational performance: occupancy, revenue, utilisation, average price, holds.
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- The only read lists seats of a map; it carries no sales or revenue. (CHG-WIR-027)
 
 #### Inputs: what the user enters or picks
 
@@ -115,6 +190,10 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 **Shown**
 
 **Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **KPIs**: KPI cards (DI-041) and a section table. *(source: contracts/satellite/seating.yaml#listSeats / DI-041)*
 
 **Where the user goes next**
 
@@ -139,6 +218,16 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the seat analytics are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+kpis:
+  occupancy: 86%
+  avgPrice: AED 312.00
+```
 
 #### Permissions
 
@@ -219,6 +308,13 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 
 **Known gaps.** **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Finance, Ledger & Tax · Reporting & Analytics process.** Sold and attended occupancy against capacity for an event or performance, with every capacity figure defined: capacity, blocked, sellable, sold, issued (including complimentary), scanned, no-show, available. Utilisation divides by sellable capacity and says how holds and blocked seats are treated.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **The layout notes say the occupancy and no-show KPIs are "not seeded"; occupancy, capacity utilisation and no-show rate are already named metric sources, so they are KPI definitions to create, not contract gaps. No seat-level drill or section breakdown exists.** Why: Prevents a contract change request for something the KPI builder covers. *(source: contracts/satellite/reporting.yaml#/components/schemas/MetricSource / screens/P08-venue-back-office.yaml#BO-1052; Finance, Ledger & Tax · Reporting & Analytics)*
+- **Occupancy reporting inside the seating module duplicates the reporting area's capacity dashboard.** Why: DI-721. *(source: DI-721 / screens/P16-venue-analytics.yaml#ANL-015; Finance, Ledger & Tax · Reporting & Analytics)*
+
 #### Inputs: what the user enters or picks
 
 **On the screen**
@@ -240,6 +336,7 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 | Compare to | radio group | — | Previous period · Same period last year · Target · Benchmark | `getKpiValues` ?compareTo |
 | Interval | radio group | — | Hour · Day · Week · Month | `getKpiValues` ?interval |
 | Group by | text field | — | — | `getKpiValues` ?groupBy |
+| Module | field | — | — | `getKpiValues` ?module |
 
 #### Outputs: what the screen shows and produces
 
@@ -285,6 +382,11 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 | Status | chip: Green, Amber, Red, No target | — |
 | As of | 1 Oct 2026, 14:30 | — |
 
+**Rules for what is shown** (from the Finance, Ledger & Tax · Reporting & Analytics process; these refine the tables above and win where they differ)
+
+- **measures**: Sold occupancy = sold over sellable; Scanned occupancy = scanned over sellable; No-show rate = issued not scanned over issued. Each figure's definition in an info popover; percentages 2 decimals. *(source: MATRIX 8.2.36 / MATRIX 1.1.40 / MATRIX 8.9.2 / contracts/satellite/reporting.yaml#/components/schemas/MetricSource)*
+- **status band**: Capacity utilisation amber from 80%, red from 95% unless the venue set its own target bands; 90–95% sits in amber. *(source: MATRIX 8.2.36 / MATRIX 1.1.40 / DI-704)*
+
 **Data it reads**: `getKpiValues` (onLoad, Occupancy KPIs)
 
 **Where the user goes next**
@@ -302,6 +404,24 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed |
+
+#### Edge cases to draw
+
+- **event still on sale**: Scanned occupancy and no-shows show "After doors open" rather than 0%. *(source: designer default)*
+
+#### Consistency with other screens
+
+- Match `P16 ANL-015 Capacity & Utilization Monitor, ANL-014 Attendance & Footfall`: Same occupancy definition and colours.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+event: Etihad Arena, Abu Dhabi · Arabian Nights Gala · 24 Sep 2026
+figures: Capacity 18,000 · Blocked 420 · Sellable 17,580 · Sold 15,906 (90.48%, amber) · Issued 16,216 incl. 310
+  complimentary · Scanned 14,872 (84.60%) · No-shows 1,344 (8.29%)
+```
 
 #### Permissions
 
@@ -339,6 +459,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-1051`.
 - [ ] Every gated control is gated: `REPORT_VIEW_VENUE`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 1 edge case(s) from the process notes are drawn.
+- [ ] The 2 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -361,6 +483,13 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Known gaps.** **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Finance, Ledger & Tax · Reporting & Analytics process.** Zones ranked by capacity, sold, occupancy, average price and revenue, compared with target, prior period and the venue benchmark, drilling from zone to section, row and seat while keeping the chosen measure and filters.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **KPI values carry a scope path and no zone dimension; zones are reachable only if they are scope paths.** Why: The ranking cannot be read as declared. *(source: contracts/satellite/reporting.yaml#/components/schemas/KpiValue; Finance, Ledger & Tax · Reporting & Analytics)*
+- **Zone reporting duplicates the reporting area.** Why: DI-721. *(source: DI-721 / screens/P16-venue-analytics.yaml#ANL-020; Finance, Ledger & Tax · Reporting & Analytics)*
+
 #### Inputs: what the user enters or picks
 
 **On the screen**
@@ -382,6 +511,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Compare to | radio group | — | Previous period · Same period last year · Target · Benchmark | `getKpiValues` ?compareTo |
 | Interval | radio group | — | Hour · Day · Week · Month | `getKpiValues` ?interval |
 | Group by | text field | — | — | `getKpiValues` ?groupBy |
+| Module | field | — | — | `getKpiValues` ?module |
 
 #### Outputs: what the screen shows and produces
 
@@ -416,6 +546,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Direction | chip: Up, Down, Flat | — |
 | Status | chip: Green, Amber, Red, No target | — |
 
+**Rules for what is shown** (from the Finance, Ledger & Tax · Reporting & Analytics process; these refine the tables above and win where they differ)
+
+- **zone ranking**: One measure at a time, ranked high to low; zone totals must add up to the event total shown above. *(source: screens/P08-venue-back-office.yaml#BO-1053)*
+
 **Data it reads**: `getKpiValues` (onLoad, By zone)
 
 **Where the user goes next**
@@ -433,6 +567,19 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed |
+
+#### Consistency with other screens
+
+- Match `P16 ANL-015, ANL-020 Multi-Site & Performance Comparison`: Same ranking component and comparison words.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+- Platinum 1,188 of 1,200 (99.00%) · Gold 4,512 of 4,800 (94.00%) · Silver 6,336 of 7,200 (88.00%) · Upper 3,870
+  of 4,380 (88.36%) · total 15,906 of 17,580
+```
 
 #### Permissions
 
@@ -470,6 +617,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-1051`.
 - [ ] Every gated control is gated: `REPORT_VIEW_VENUE`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 2 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -490,7 +638,17 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | nothing: it opens on its own |
 | Route | `/access-venue/revenue-by-section-bo-1054` |
 
+**What the spec says about it.** **Measure names, not "Revenue"** (decided 2 October 2026, Chinmay; CHG-FIN-002; BOARDREQ MOM-2758..2761). Takings (money taken less money paid back, a cash-control figure), Gross sales (before discounts, excluding VAT), Net revenue (gross sales less discounts and refunds), Recognised revenue and Deferred revenue are different numbers and never share a label; a tile takes its label from the seeded KPI it is bound to (`ReportingSystemKpi`).
+
 **Known gaps.** **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+**From the Finance, Ledger & Tax · Reporting & Analytics process.** Each seating section's financial contribution: gross sales, discounts, refunds, net revenue, VAT, fees, average ticket price and share of the performance total, linked to order detail and reconciliation status. Gross and net are never the same column.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **Section revenue duplicates the reporting area's sales and revenue views.** Why: DI-721. *(source: DI-721 / screens/P16-venue-analytics.yaml#ANL-002; Finance, Ledger & Tax · Reporting & Analytics)*
+
+**Fixed on main** (the package already carries these; draw what it says): The "Net revenue" tile is bound to the seeded takings KPI. (CHG-FIN-007).
 
 #### Inputs: what the user enters or picks
 
@@ -513,12 +671,13 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Compare to | radio group | — | Previous period · Same period last year · Target · Benchmark | `getKpiValues` ?compareTo |
 | Interval | radio group | — | Hour · Day · Week · Month | `getKpiValues` ?interval |
 | Group by | text field | — | — | `getKpiValues` ?groupBy |
+| Module | field | — | — | `getKpiValues` ?module |
 
 #### Outputs: what the screen shows and produces
 
 **Shown**
 
-**Net revenue** (metric tile, from `getKpiValues`): `takings` is the only seeded money KPI.
+**Net revenue** (metric tile, from `getKpiValues`): `getKpiValues?kpiCodes=netRevenue` (CHG-FIN-007). Never the `takings` KPI (CHG-FIN-002, CHG-FIN-010).
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -534,7 +693,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Comparison | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
 | Direction | chip: Up, Down, Flat | — |
 
-**Revenue by section** (data table, from `getKpiValues`): KpiValue has no section dimension; the section columns are pack labels.
+**Net revenue by section** (data table, from `getKpiValues`): KpiValue has no section dimension; the section columns are pack labels. (CHG-FIN-002: never a bare "Revenue")
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -545,13 +704,17 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Variance percent | 1,234.5 | — |
 | Status | chip: Green, Amber, Red, No target | — |
 | Section | text | not in the schema: `Section` |
-| Gross revenue | text | not in the schema: `Gross revenue` |
+| Gross sales | text | not in the schema: `Gross sales` |
 | Tax | text | not in the schema: `Tax` |
 | Fees | text | not in the schema: `Fees` |
 | Discounts | text | not in the schema: `Discounts` |
 | Refunds | text | not in the schema: `Refunds` |
 | % of performance total | text | not in the schema: `% of performance total` |
 | Reconciliation status | text | not in the schema: `Reconciliation status` |
+
+**Rules for what is shown** (from the Finance, Ledger & Tax · Reporting & Analytics process; these refine the tables above and win where they differ)
+
+- **section table**: Section, sold, Gross sales, Discounts, Refunds, Net revenue, VAT, Fees, Average ticket price (excludes complimentary tickets), % of performance total (adds to 100.00%). Totals row equals the performance's figures. *(source: MATRIX 6.1.66 / MATRIX 8.7.21 / MATRIX 8.1.3 / screens/P08-venue-back-office.yaml#BO-1054)*
 
 **Data it reads**: `getKpiValues` (onLoad, Revenue by section)
 
@@ -570,6 +733,20 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+performance: Etihad Arena · Arabian Nights Gala · 24 Sep 2026 · gross sales excl. VAT
+sections:
+- Platinum · 1,188 · AED 1,722,600.00 · ATP 1,450.00 · 19.87%
+- Gold · 4,512 · AED 3,384,000.00 · ATP 750.00 · 39.03%
+- Silver · 6,336 · AED 2,692,800.00 · ATP 425.00 · 31.06%
+- Upper · 3,870 · AED 870,750.00 · ATP 225.00 · 10.04%
+- Total · 15,906 · AED 8,670,150.00 · 100.00%
+```
 
 #### Permissions
 
@@ -607,6 +784,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-1051`.
 - [ ] Every gated control is gated: `REPORT_VIEW_VENUE`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -629,6 +807,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Revenue by seat category: mix, seats sold, average price, discount, refunds, sell-through.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **List operation(s) listSeatCategories return a bare array, not the paged list envelope (items, nextCursor, hasMore).** Why: The table cannot page, and a row without an id cannot open, edit or link to the record it summarises. *(source: contracts/satellite/seating.yaml#listSeatCategories; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
+
 #### Inputs: what the user enters or picks
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
@@ -638,6 +822,10 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 **Shown**
 
 **Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **category table**: Categories as rows with revenue mix. *(source: contracts/satellite/seating.yaml#listSeatCategories)*
 
 **Data it reads**: `listSeatCategories` (onLoad, List seat categories)
 
@@ -655,6 +843,17 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the revenue seat category are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+row:
+  category: Gold
+  revenue: AED 412,000.00
+  sellThrough: 91%
+```
 
 #### Permissions
 
@@ -697,6 +896,7 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 - [ ] Every transition is wired: `BO-1051`.
 - [ ] Every gated control is gated: `PRODUCT_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -719,6 +919,13 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 
 **Known gaps.** **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Finance, Ledger & Tax · Reporting & Analytics process.** How well seats are used across performances: booked, sold, scanned, idle and unavailable seat-performances by section, seat type, day and time, pointing at permanently underused areas and recurring blocks.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **Utilisation by section, seat type or time cannot be read; KPI values have no such dimension.** Why: The heatmap cannot bind. *(source: contracts/satellite/reporting.yaml#/components/schemas/KpiValue; Finance, Ledger & Tax · Reporting & Analytics)*
+- **Seat utilisation duplicates the reporting area's capacity dashboard.** Why: DI-721. *(source: DI-721 / screens/P16-venue-analytics.yaml#ANL-015; Finance, Ledger & Tax · Reporting & Analytics)*
+
 #### Inputs: what the user enters or picks
 
 **On the screen**
@@ -739,6 +946,7 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 | Compare to | radio group | — | Previous period · Same period last year · Target · Benchmark | `getKpiValues` ?compareTo |
 | Interval | radio group | — | Hour · Day · Week · Month | `getKpiValues` ?interval |
 | Group by | text field | — | — | `getKpiValues` ?groupBy |
+| Module | field | — | — | `getKpiValues` ?module |
 
 #### Outputs: what the screen shows and produces
 
@@ -783,6 +991,10 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 | Time | text | not in the schema: `Time` |
 | Utilization | text | not in the schema: `Utilization` |
 
+**Rules for what is shown** (from the Finance, Ledger & Tax · Reporting & Analytics process; these refine the tables above and win where they differ)
+
+- **underused areas**: A heatmap of section by day of week, coloured by utilisation; a block repeated on 3 or more performances is called out. *(source: MATRIX 6.1.69 / screens/P08-venue-back-office.yaml#BO-1056)*
+
 **Data it reads**: `getKpiValues` (onLoad, Seat utilisation)
 
 **Where the user goes next**
@@ -800,6 +1012,15 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+- Upper tier, Section 412 · 18 performances · utilisation 61.20% · idle seat-performances 2,140 · blocked for camera
+  position on 12 of 18
+```
 
 #### Permissions
 
@@ -842,6 +1063,7 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 - [ ] Every transition is wired: `BO-1051`.
 - [ ] Every gated control is gated: `REPORT_VIEW_VENUE`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 2 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -855,14 +1077,18 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 3 · needs the `seating` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `PRODUCT_VIEW` (1 read); in the flows as venue manager |
+| Who uses it | venue staff holding `CAPACITY_CONFIGURE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/access-venue/hold-inventory-reporting-bo-1057` |
 
-**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built. Removed 2 October 2026 (CHG-WIR-025): listInventoryHolds lists terminal and basket leases, not stakeholder seat holds; VIP, sponsor and media holds are seating's pools (listSeatHoldPools) …
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Seat holds by size, age and outcome (VIP, sponsor, artist, media, corporate, internal): held quantity and value, upcoming releases, converted and expired unused.
+
+**Fixed on main** (the package already carries these; draw what it says): listInventoryHolds lists terminal and basket leases, not stakeholder seat holds. (CHG-WIR-025).
 
 #### Inputs: what the user enters or picks
 
@@ -870,9 +1096,7 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 
 | Filter | Drawn as | Default | Allowed values, rules | Source |
 |---|---|---|---|---|
-| Channel capacity | picker: choose a channel capacity | — | — | `listInventoryHolds` ?channelCapacityId |
-| Holder workstation | picker: choose a holder workstation | — | — | `listInventoryHolds` ?holderWorkstationId |
-| Status | radio group | — | Active · Expired · Released · Force released · Converted | `listInventoryHolds` ?status |
+| Performance | picker: choose a performance | — | — | `listSeatHoldPools` ?performanceId |
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
 
@@ -880,9 +1104,28 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+**Hold pools** (data table, from `listSeatHoldPools`)
 
-**Data it reads**: `listInventoryHolds` (onLoad, List leases)
+| Shows | Format | Notes |
+|---|---|---|
+| ID | the name it points at, never the id | — |
+| Hold type | the name it points at, never the id | — |
+| Performance | the name it points at, never the id | — |
+| Seats | list or chips (count when long) | — |
+| Seat count | 1,234 | — |
+| Used count | 1,234 | — |
+| Released count | 1,234 | — |
+| Holder name | text | — |
+| Reason | text | — |
+| Release at | 1 Oct 2026, 14:30 | — |
+| Status | chip: Active, Partially released, Released, Expired | — |
+| Created by | the name it points at, never the id | — |
+
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **holds report**: Grouped by hold type and owner with age and value. *(source: contracts/spine/catalogue.yaml#listInventoryHolds)*
+
+**Data it reads**: `listSeatHoldPools` (onLoad, Held seats by pool and stakeholder, with what is left and …)
 
 **Where the user goes next**
 
@@ -894,14 +1137,27 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |---|---|
 | Loading (`?state=loading`) | The hold inventory reporting list. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the hold inventory reporting untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No hold inventory reporting yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, first run (`?state=emptyFirstRun`) | No hold inventory reporting yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the hold inventory reporting are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+holds:
+- type: Sponsor
+  owner: Emirates Bank
+  seats: 40
+  value: AED 18,000.00
+  age: 12 days
+```
+
 #### Permissions
 
-- `listInventoryHolds` → `PRODUCT_VIEW` (read) · staff
+- `listSeatHoldPools` → `CAPACITY_CONFIGURE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -932,11 +1188,11 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (12 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-1057?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-1051`.
-- [ ] Every gated control is gated: `PRODUCT_VIEW`.
+- [ ] Every gated control is gated: `CAPACITY_CONFIGURE`.
 - [ ] The module and platform inputs below are applied.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -959,6 +1215,8 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 | Route | `/access-venue/sales-pace-pick-curves-bo-1058` |
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** When seats sell and which seats sell first: cumulative sales against target and comparable events, and the pick order by section and price.
 
 #### Inputs: what the user enters or picks
 
@@ -985,6 +1243,10 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
 
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **pick curve**: Cumulative curve by days to event with the target line. *(source: contracts/spine/catalogue.yaml#listDemandBookingCurve)*
+
 **Data it reads**: `listDemandBookingCurve` (onLoad, Sales pace and pick curve)
 
 **Where the user goes next**
@@ -1001,6 +1263,18 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the sales pace pick are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+curve:
+  event: Desert Symphony
+  daysOut: 30
+  sold: 54%
+  target: 50%
+```
 
 #### Permissions
 
@@ -1066,6 +1340,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Performance drawn on the seat map: occupancy, revenue, price, demand, holds and scans as heat maps.
+
 #### Inputs: what the user enters or picks
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
@@ -1086,6 +1362,10 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |  (primary button) | navigation or local | — | — | — | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
 
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **heat map**: Metric picker, colour scale with legend, drill from level to seat. *(source: contracts/satellite/seating.yaml#getSeatInventory / contracts/satellite/reporting.yaml#runReport)*
+
 **Data it reads**: `getSeatInventory` (onLoad, The map behind the heat)
 
 **Where the user goes next**
@@ -1103,6 +1383,16 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Required parameter missing, or the date range exceeds `maxDateRangeDays` (366 days when the definition sets none, audit R158) |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+heat:
+  metric: occupancy
+  performance: Desert Symphony 22 Nov
+```
 
 #### Permissions
 
@@ -1172,9 +1462,20 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Known gaps.** **Report Builder, Export & Audit declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Finance, Ledger & Tax · Reporting & Analytics process.** Building and distributing seat reports: approved dimensions and measures, filters, grouping, chart or map, saved views, scheduled delivery and exports, with every definition, recipient and download logged. Definitions use versioned metrics, so "occupancy" means the same everywhere.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **BO-1060 duplicates the reporting area's builder, export centre and audit trail.** Why: DI-721. *(source: DI-721 / screens/P16-venue-analytics.yaml#ANL-032; Finance, Ledger & Tax · Reporting & Analytics)*
+- **The screen arrives with an execution id but its only write creates a definition.** Why: Entry parameter does not match the act. *(source: screens/P08-venue-back-office.yaml#BO-1060; Finance, Ledger & Tax · Reporting & Analytics)*
+
 #### Inputs: what the user enters or picks
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+**Rules for these inputs** (from the Finance, Ledger & Tax · Reporting & Analytics process; these refine the tables above and win where they differ)
+
+- **dimensions and measures**: Only from the approved seating dataset; seat-level and guest-level fields are offered only to users allowed to see them. *(source: MATRIX 6.1.13 / screens/P08-venue-back-office.yaml#BO-1060)*
 
 #### Outputs: what the screen shows and produces
 
@@ -1184,6 +1485,14 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |---|---|---|---|---|---|
 | Create report (primary button) | navigation or local | — | — | — | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
+
+**Rules for what is shown** (from the Finance, Ledger & Tax · Reporting & Analytics process; these refine the tables above and win where they differ)
+
+- **audit**: Who built, changed, ran, scheduled and downloaded each report, with the scope applied. *(source: MATRIX 6.1.15 / contracts/satellite/reporting.yaml#listReportExecutions)*
+
+**What each action does** (from the Finance, Ledger & Tax · Reporting & Analytics process; these refine the tables above and win where they differ)
+
+- **Export**: CSV, Excel or PDF; large ones run in the background and notify when ready; links expire. *(source: contracts/satellite/reporting.yaml#/components/schemas/ReportExport)*
 
 **Where the user goes next**
 
@@ -1200,6 +1509,19 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Unknown field, invalid filter, or estimated cost beyond the limit |
+
+#### Consistency with other screens
+
+- Match `P16 ANL-032 Report Creation Wizard, ANL-045 Export & Download Center, ANL-049 Report Audit Trail`: Same builder; seat reports are definitions over the seating source.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+- Seat sales by section and price band · Etihad Arena · Arabian Nights Gala 24 Sep · saved by Rahul Menon · shared
+  with Box Office team
+```
 
 #### Permissions
 
@@ -1254,6 +1576,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-1051`.
 - [ ] Every gated control is gated: `REPORT_EXPORT`, `REPORT_MANAGE`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 2 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -1354,11 +1677,11 @@ Method, path, parameters, request and response for every operation these screens
 {
 "createReport": {"method":"POST","path":"/reports","contract":"reporting","summary":"Create a custom report definition","permission":"REPORT_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"CreateReportRequest","responds":"ReportDefinition"},
 "exportReportResult": {"method":"POST","path":"/report-executions/{executionId}/export","contract":"reporting","summary":"Export a completed result","permission":"REPORT_EXPORT","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":null},
-"getKpiValues": {"method":"GET","path":"/kpi-values","contract":"reporting","summary":"Current values, against target, with movement","permission":"REPORT_VIEW_VENUE","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[{"name":"kpiIds","in":"query","required":null},{"name":"kpiCodes","in":"query","required":null},{"name":"scopePath","in":"query","required":null},{"name":"period","in":"query","required":null},{"name":"compareTo","in":"query","required":null},{"name":"interval","in":"query","required":null},{"name":"groupBy","in":"query","required":null}],"requestBody":null,"responds":"KpiValue"},
+"getKpiValues": {"method":"GET","path":"/kpi-values","contract":"reporting","summary":"Current values, against target, with movement","permission":"REPORT_VIEW_VENUE","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[{"name":"kpiIds","in":"query","required":null},{"name":"kpiCodes","in":"query","required":null},{"name":"scopePath","in":"query","required":null},{"name":"period","in":"query","required":null},{"name":"compareTo","in":"query","required":null},{"name":"interval","in":"query","required":null},{"name":"groupBy","in":"query","required":null},{"name":"module","in":"query","required":null}],"requestBody":null,"responds":"KpiValue"},
 "getSeatInventory": {"method":"GET","path":"/seat-inventory","contract":"seating","summary":"Every seat's state for a performance, in one read","permission":"CAPACITY_CONFIGURE","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[{"name":"performanceId","in":"query","required":true},{"name":"sectionId","in":"query","required":null}],"requestBody":null,"responds":"SeatInventory"},
 "listDemandBookingCurve": {"method":"GET","path":"/demand-booking-curve","contract":"catalogue","summary":"AI Demand Forecasting & Booking Curve Studio","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"venue","in":"query","required":false},{"name":"product","in":"query","required":false},{"name":"event","in":"query","required":false},{"name":"performance","in":"query","required":false},{"name":"channel","in":"query","required":false},{"name":"horizon","in":"query","required":false},{"name":"dateFrom","in":"query","required":false},{"name":"dateTo","in":"query","required":false},{"name":"priceCategory","in":"query","required":false},{"name":"sectionCode","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
-"listInventoryHolds": {"method":"GET","path":"/inventory-holds","contract":"catalogue","summary":"List inventory holds","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"channelCapacityId","in":"query","required":null},{"name":"holderWorkstationId","in":"query","required":null},{"name":"status","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listSeatCategories": {"method":"GET","path":"/seat-categories","contract":"seating","summary":"List seat categories","permission":"PRODUCT_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"venueId","in":"query","required":null}],"requestBody":null,"responds":"SeatCategory"},
+"listSeatHoldPools": {"method":"GET","path":"/seat-hold-pools","contract":"seating","summary":"Held seats, by pool, with what is left and when it releases","permission":"CAPACITY_CONFIGURE","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[{"name":"performanceId","in":"query","required":null}],"requestBody":null,"responds":"SeatHoldPool"},
 "listSeats": {"method":"GET","path":"/seat-maps/{seatMapId}/seats","contract":"seating","summary":"List seats in a map","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"sectionCode","in":"query","required":null},{"name":"rowLabel","in":"query","required":null},{"name":"categoryId","in":"query","required":null},{"name":"attribute","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "runReport": {"method":"POST","path":"/reports/{reportId}/run","contract":"reporting","summary":"Run a report","permission":"REPORT_VIEW_VENUE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"RunReportRequest","responds":"ReportResult"}
 }
@@ -1376,15 +1699,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "DataSource": {"type":"string","description":"What a report may be built over. **A closed set, and that is the point** — a builder that accepts any table will happily produce a report over data nobody maintains.\n**Eight sources added 18 August** (BL-143), each because the matrix asks for a report the builder could not source. `stockCounts` and `waste`: 6.1.21 wants count variance and `stockMovements` records the movement rather than **the count that found the discrepancy**. `workstations`, `devices` and `principals`: 6.1.28 — **who did what at which till** is the question an auditor asks first and it had no source. `loyalty`: 6.1.37, points earned, burned and expiring. `reviews`: 6.1.46. `queueEntries`: **wait times are already measured and nothing could report on them.**\n**Adding a source is a decision, not an omission.** `principals`, `guests`, `loyalty` and `reviews` all name a person, and `REPORT_EXPORT_PII` gates them.\n\n**`forecastPoints` added 29 September** (8.2.55, build pass, group G2): the points of published AI forecast versions; see `x-ticvai-forecast-points`.\n\n**Three accreditation sources added 29 September** (12.1.50, build pass): `accreditationApplications`, `accreditationHolders` and `accreditationCredentials`, over `accreditation.application`, `accreditation.holder` and `accreditation.credential`. They are what the accreditation KPIs and any accreditation report or export (`exportReportResult`, csv or xlsx) are built over. **All three name a person**, and `REPORT_EXPORT_PII` gates them as it gates `guests`.\n","enum":["orders","orderLines","payments","refunds","shifts","scanEvents","entitlements","products","inventory","stockMovements","stockCounts","waste","workstations","devices","principals","loyalty","reviews","queueEntries","guests","campaigns","cases","ledgerEntries","workOrders","approvals","purchaseOrders","receipts","requisitions","stockBatches","resourceBookings","delegations","forms","challenges","wallets","resaleListings","accreditationApplications","accreditationHolders","accreditationCredentials","forecastPoints"],"x-ticvai-forecast-points":"**`forecastPoints` added 29 September (build pass, group G2; 8.2.55)**: one row per forecast point (`ai.forecast_point`) of a **published** forecast version (`ai.forecast_version` status `published`), with the definition it belongs to (`ai.forecast_definition`: subject, grain, unit), the period, the dimension key and the p10, p50 and p90 values. Draft, awaiting-approval and superseded versions are not reachable, and scenario points (`scenarioId` set) only with the scenario named as a filter: **a forecast leaves the platform as the one somebody published**. It is how a forecast is exported (`runReport` then `exportReportResult`, csv or xlsx), scheduled or put on a dashboard. Names no person, so `REPORT_EXPORT` is enough. Read from the reporting replica of the AI log database (design 2.4), never from the model service.\n"},
 "ExportFormat": {"type":"string","enum":["csv","xlsx","pdf","json"]},
 "FieldType": {"type":"string","enum":["string","integer","decimal","money","boolean","date","dateTime","uuid","enum"]},
-"InventoryHold": {"x-ticvai-persistence":"catalogue.inventory_hold","type":"object","required":["id","channelCapacityId","holderKind","grantedUnits","consumedUnits","status","acquiredAt","expiresAt"],"properties":{"id":{"type":"string"},"channelCapacityId":{"type":"string","format":"uuid"},"holderKind":{"$ref":"#/components/schemas/InventoryHoldHolderKind"},"holderWorkstationId":{"type":"string","format":"uuid","nullable":true,"description":"The holding workstation when `holderKind` is `workstation`; null on a cart hold, because a browser has none (SD-023, 29 September)."},"holderCartId":{"type":"string","format":"uuid","nullable":true,"description":"The holding cart (`orders.cart`) when `holderKind` is `cart` (SD-023, 29 September)."},"convertedOrderId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"The paid order the hold was converted for, set by `convertInventoryHold`."},"convertedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true},"parentLeaseId":{"type":"string","nullable":true,"description":"Present when sub-leased from a venue edge node."},"requestedUnits":{"type":"integer"},"channel":{"allOf":[{"$ref":"#/components/schemas/Channel"}],"description":"Allocation this lease draws from."},"grantedUnits":{"type":"integer","description":"May be less than requested — a partial grant is not an error. Constrained by the channel's remaining allocation plus the general pool, never by raw capacity.\n"},"consumedUnits":{"type":"integer"},"status":{"$ref":"#/components/schemas/LeaseStatus"},"acquiredAt":{"type":"string","format":"date-time"},"expiresAt":{"type":"string","format":"date-time"},"releasedAt":{"type":"string","format":"date-time","nullable":true},"forceReleasedByPrincipalId":{"type":"string","format":"uuid","nullable":true},"forceReleaseReason":{"type":"string","nullable":true}}},
-"InventoryHoldHolderKind": {"type":"string","enum":["workstation","cart"],"default":"workstation","description":"**Who holds the units** (decided 29 September, SD-023). A till, kiosk or edge node holds as a `workstation`; a guest's web or app cart holds as a `cart`, acquired by the order service. A browser has no workstation, so a cart hold carries `cartId` and no `holderWorkstationId`.\n"},
 "KpiValue": {"type":"object","description":"BI board 10.3. **Value, target, variance, direction and freshness in one read.**","properties":{"kpiId":{"type":"string","format":"uuid"},"code":{"type":"string"},"bucketStart":{"type":"string","format":"date-time","nullable":true,"description":"The start of the bucket this value covers, when `getKpiValues` was asked for an `interval`; null otherwise."},"groupKey":{"type":"string","nullable":true,"description":"The value of the `groupBy` dimension this row is for (a status, a category code, a tier); null when no `groupBy` was asked."},"name":{"type":"string"},"scopePath":{"type":"string"},"period":{"type":"string"},"value":{"$ref":"#/components/schemas/MetricValue"},"target":{"allOf":[{"$ref":"#/components/schemas/MetricValue"}],"nullable":true},"comparison":{"allOf":[{"$ref":"#/components/schemas/MetricValue"}],"nullable":true},"variancePercent":{"type":"number","nullable":true},"direction":{"type":"string","enum":["up","down","flat"]},"status":{"type":"string","enum":["green","amber","red","noTarget"]},"asOf":{"type":"string","format":"date-time"},"stale":{"type":"boolean","description":"**True when the pipeline behind it has not refreshed.** A number nobody flagged as stale is a number somebody will act on.\n"}}},
-"LeaseStatus": {"type":"string","description":"`states/lease.yaml`. **`expired` is set by that model's timer transition when `expiresAt` passes without a renewal**, not by any operation in this contract. The job that runs the timer is the sweeper ADR-0037 deferred: it returns an expired hold's unconsumed units to `remaining` in the same guarded statement as a release (SD-023, 29 September), and **writes `inventoryHold.expired` to the outbox in the same transaction** (SD-023/SD-033, applied 30 September; `events/inventoryHold-expired.yaml`), so the cart that held the units hears of it before checkout. A `converted` hold is never swept.\n**`converted` is set by `convertInventoryHold`** when the order that holds the units is paid (decided 29 September, SD-023); its units are `sold` and the sweeper never touches it.\n","enum":["active","expired","released","forceReleased","converted"]},
 "MetricValue": {"x-ticvai-persistence-column":"numeric(18,4)","description":"**A reading of a metric or KPI, or a threshold on one.** A `Money` where the metric is money-valued — `MetricSource` lists those in `x-ticvai-money-valued`, and a KPI is when its `unit` is `currency` — and a plain number otherwise. naming-and-style 5.1: money is never a float, at any layer.\nStored as `numeric(18,4)` either way: a money value stores its amount, and currency and scale resolve from the scope as they do for every `Money`.\n","oneOf":[{"type":"number"},{"$ref":"../shared/common.yaml#/components/schemas/Money"}]},
 "Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}},
 "Point": {"type":"object","required":["x","y"],"properties":{"x":{"type":"number"},"y":{"type":"number"}}},
 "ReportCategory": {"type":"string","enum":["sales","admission","financial","inventory","guest","operations","marketing","workforce","compliance","custom"]},
-"ReportColumn": {"x-ticvai-persistence":"reporting.report_column","type":"object","required":["field"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true,"description":"**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"},"field":{"type":"string"},"label":{"type":"string"},"aggregation":{"allOf":[{"$ref":"#/components/schemas/Aggregation"}],"default":"none"},"sortOrder":{"type":"integer"},"sortDirection":{"type":"string","enum":["asc","desc"]},"format":{"type":"string","nullable":true}}},
+"ReportColumn": {"x-ticvai-persistence":"reporting.report_column","type":"object","required":["field"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true,"description":"**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"},"field":{"type":"string"},"label":{"type":"string"},"aggregation":{"allOf":[{"$ref":"#/components/schemas/Aggregation"}],"default":"none"},"sortOrder":{"type":"integer"},"sortDirection":{"type":"string","enum":["asc","desc"]},"format":{"type":"string","nullable":true},"role":{"type":"string","nullable":true,"enum":["dimension","measure"],"description":"**What the column is to a chart** (decided 2 October 2026, Chinmay; CHG-FIN-007). A `dimension` groups (date, venue, channel, product); a `measure` is aggregated (sum of net revenue, count of admissions). Null on a column only a table shows."},"encoding":{"type":"string","nullable":true,"enum":["category","x","y","series","value","size","colour","location","stage","source","target","row","column","hierarchyLevel","label","tooltip"],"description":"**Which field well the column fills** (CHG-FIN-007), the binding the twenty marks of `DashboardTile.visualisation` need. The per-mark rule is on that field."},"axis":{"type":"string","nullable":true,"enum":["primary","secondary"],"description":"For a measure on a `combo`, the axis it is drawn against. A secondary axis needs its own `unitLabel` (CHG-FIN-007)."},"seriesType":{"type":"string","nullable":true,"enum":["bar","line","area"],"description":"For a measure on a `combo`, how that series is drawn (CHG-FIN-007)."},"hierarchyLevel":{"type":"integer","nullable":true,"minimum":1,"description":"For `matrix` rows and columns, `treemap` nesting and `decompositionTree` levels, the depth of this dimension, 1 outermost. Levels must follow a real hierarchy (DI-709), for example year, month, day, or region, venue, outlet (CHG-FIN-007)."},"unitLabel":{"type":"string","nullable":true,"maxLength":40,"description":"The unit an axis states, for example \"AED\" or \"Admissions\". Required on a secondary axis (CHG-FIN-007)."}}},
 "ReportDefinition": {"x-ticvai-persistence":"reporting.report_definition + reporting.report_column + reporting.report_filter","allOf":[{"$ref":"#/components/schemas/CreateReportRequest"},{"type":"object","required":["id","version","isSystem","isRetired","createdAt"],"properties":{"id":{"type":"string","format":"uuid"},"version":{"type":"string","description":"The current version. Assigned by the server on each publish; earlier ones are kept as `ReportDefinitionVersion`."},"isSystem":{"type":"boolean","description":"Shipped with the platform — seeded at provisioning (BL-053, `SeededReport`). **Clone-only (decided 28 September, audit R096)**: `updateReport` and `deleteReport` refuse it with 409 `system-report`; a venue changes a copy made with `createReport`.\n"},"isRetired":{"type":"boolean"},"estimatedCost":{"type":"string","enum":["low","medium","high"],"description":"Informs whether it may run inline or must be queued."},"createdByPrincipalId":{"type":"string","format":"uuid","nullable":true},"createdAt":{"type":"string","format":"date-time"},"lastRunAt":{"type":"string","format":"date-time","nullable":true},"scopePath":{"type":"string","description":"**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"}}}]},
 "ReportFilter": {"x-ticvai-persistence":"reporting.report_filter","type":"object","required":["field","operator"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true,"description":"**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"},"field":{"type":"string"},"operator":{"type":"string","enum":["equals","notEquals","greaterThan","lessThan","between","in","notIn","contains","isNull","isNotNull"]},"value":{"description":"**Open on purpose; its type is the field's.** One value, of the `FieldType` that `listReportFields` gives for `field` — a string, number, boolean, or a date, date-time or uuid as a string. Absent for `in`, `notIn`, `between`, `isNull` and `isNotNull`.\n"},"values":{"type":"array","description":"The values for `in` and `notIn`, or exactly two (from, to) for `between`. Each of the field's `FieldType`, as `value`.","items":{}},"isParameter":{"type":"boolean","default":false,"description":"Prompted at run time rather than fixed. Parameters narrow the result; they never widen scope.\n"}}},
 "ReportParameter": {"x-ticvai-persistence":"reporting.report_parameter","type":"object","required":["key","label","type","isRequired"],"properties":{"key":{"type":"string"},"label":{"type":"string"},"type":{"$ref":"#/components/schemas/FieldType"},"isRequired":{"type":"boolean"},"defaultValue":{"description":"Open on purpose. A value of this parameter's `type`, used when a run supplies none."}}},
@@ -1393,6 +1713,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "Seat": {"x-ticvai-persistence":"seating.seat","type":"object","required":["id","sectionCode","rowLabel","seatNumber","attribute"],"properties":{"id":{"type":"string","format":"uuid","description":"**Stable for the life of the seat.** Section, row and number are display labels that change on a refit; this does not. A ticket sold today must still resolve after a renumbering.\n"},"sectionCode":{"type":"string"},"rowLabel":{"type":"string"},"seatNumber":{"type":"string"},"displayLabel":{"type":"string","description":"What the guest sees, e.g. `A2-7-11`."},"position":{"allOf":[{"$ref":"#/components/schemas/Point"}],"nullable":true},"categoryId":{"type":"string","format":"uuid","nullable":true},"attribute":{"$ref":"#/components/schemas/SeatAttribute"},"companionSeatIds":{"type":"array","items":{"type":"string"},"description":"Present on accessible seats. Sold together, released together."},"isActive":{"type":"boolean"}}},
 "SeatAttribute": {"type":"string","description":"BL-168. **Extended from eight values on 18 August.** Amenity and view filters needed attributes the original set did not carry, and a guest filtering for *aisle seat with power* was filtering on something the model could not express.\n","enum":["standard","accessible","companion","obstructedView","restrictedLegroom","premium","houseSeat","buffer","aisle","endOfRow","extraLegroom","powerOutlet","tableService","shaded","covered","nearExit","nearAccessibleWc","wheelchairTransfer","limitedRecline","sofa","beanbag"]},
 "SeatCategory": {"x-ticvai-persistence":"seating.seat_category","type":"object","required":["id","code","name","venueId","rank"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string"},"name":{"type":"string"},"venueId":{"type":"string","format":"uuid"},"displayColour":{"type":"string","nullable":true},"rank":{"type":"integer","description":"Ordering for best-seat assignment. Lower is better."},"seatCount":{"type":"integer"},"priceBands":{"type":"array","description":"What a seat in this category costs, by band (decided 28 September, audit R275 (d), from the BO-1045 pack). Written by `createSeatCategory` and `updateSeatCategory`. A band may be narrowed to a sales channel or a customer segment and to a window; where several match a sale, the narrowest wins.\n","items":{"$ref":"#/components/schemas/SeatPriceBand"}}}},
+"SeatHoldPool": {"type":"object","x-ticvai-persistence":"seating.hold_pool","description":"Board 6.3. **Utilisation decides next season's allocation.**","required":["holdTypeId","performanceId"],"properties":{"id":{"type":"string","format":"uuid"},"holdTypeId":{"type":"string","format":"uuid"},"performanceId":{"type":"string","format":"uuid"},"seatIds":{"type":"array","items":{"type":"string","format":"uuid"}},"seatCount":{"type":"integer","readOnly":true},"usedCount":{"type":"integer","readOnly":true},"releasedCount":{"type":"integer","readOnly":true},"holderName":{"type":"string","nullable":true},"reason":{"type":"string","nullable":true},"releaseAt":{"type":"string","format":"date-time","nullable":true},"status":{"type":"string","enum":["active","partiallyReleased","released","expired"]},"createdBy":{"type":"string","format":"uuid"},"scopePath":{"type":"string"}}},
 "SeatInventory": {"type":"object","description":"Board 4. **One read, because a real-time map assembling four endpoints renders one state late.**\n","properties":{"performanceId":{"type":"string","format":"uuid"},"asOf":{"type":"string","format":"date-time"},"totals":{"type":"object","properties":{"capacity":{"type":"integer"},"available":{"type":"integer"},"held":{"type":"integer"},"reserved":{"type":"integer"},"sold":{"type":"integer"},"blocked":{"type":"integer"},"outOfService":{"type":"integer"}}},"seats":{"type":"array","items":{"type":"object","properties":{"seatId":{"type":"string","format":"uuid"},"label":{"type":"string"},"state":{"type":"string","enum":["available","held","reserved","sold","blocked","outOfService","killed"]},"holdPoolId":{"type":"string","format":"uuid","nullable":true},"orderId":{"type":"string","format":"uuid","nullable":true},"expiresAt":{"type":"string","format":"date-time","nullable":true}}}}}},
 "SeatPriceBand": {"x-ticvai-persistence":"seating.seat_price_band","type":"object","description":"One price band on a seat category (decided 28 September, audit R275 (d)). The currency is `amount.currency`, resolved from the region like every `Money` (ADR-0018), so the band carries no currency of its own.\n","required":["code","displayLabel","amount","effectiveFrom"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"seatCategoryId":{"type":"string","format":"uuid","readOnly":true},"code":{"type":"string","maxLength":64,"description":"Unique within the category."},"displayLabel":{"type":"string","maxLength":200},"displayColour":{"type":"string","nullable":true,"pattern":"^#[0-9A-Fa-f]{6}$"},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"channel":{"nullable":true,"description":"Null means every channel.","allOf":[{"$ref":"../shared/common.yaml#/components/schemas/SalesChannel"}]},"customerSegmentId":{"type":"string","format":"uuid","nullable":true,"description":"A `marketing-crm` customer segment; null means everyone."},"effectiveFrom":{"type":"string","format":"date-time"},"effectiveTo":{"type":"string","format":"date-time","nullable":true,"description":"Null means open-ended."}}}
 }

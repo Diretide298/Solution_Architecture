@@ -1,23 +1,4 @@
 {
- "applyManualDiscount": {
-  "method": "POST",
-  "path": "/orders/{orderId}/discounts",
-  "contract": "orders",
-  "summary": "Apply a discount a cashier chose",
-  "permission": "ORDER_DISCOUNT",
-  "offlineCapable": true,
-  "conflictPolicy": "append",
-  "scopeLevel": "workstation",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "ManualDiscountRequest",
-  "responds": "Order"
- },
  "createOrder": {
   "method": "POST",
   "path": "/orders",
@@ -36,25 +17,6 @@
   ],
   "requestBody": "CreateOrderRequest",
   "responds": "Order"
- },
- "createRefund": {
-  "method": "POST",
-  "path": "/orders/{orderId}/refunds",
-  "contract": "orders",
-  "summary": "Refund an order, wholly or in part",
-  "permission": "ORDER_REFUND",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "CreateRefundRequest",
-  "responds": null
  },
  "exchangeOrderLines": {
   "method": "POST",
@@ -294,24 +256,5 @@
   ],
   "requestBody": null,
   "responds": "OrderResumeResult"
- },
- "voidOrder": {
-  "method": "POST",
-  "path": "/orders/{orderId}/voids",
-  "contract": "orders",
-  "summary": "Void an order",
-  "permission": "ORDER_VOID",
-  "offlineCapable": true,
-  "conflictPolicy": "append",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Order"
  }
 }

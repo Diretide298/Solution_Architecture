@@ -1,4 +1,23 @@
 {
+ "getPublishedTenantConfig": {
+  "method": "GET",
+  "path": "/storefront/tenant-config",
+  "contract": "white-label",
+  "summary": "The published guest-facing configuration, before anyone signs in",
+  "permission": null,
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": false
+   }
+  ],
+  "requestBody": null,
+  "responds": "PublishedTenantConfig"
+ },
  "getTenantAppStatus": {
   "method": "GET",
   "path": "/tenant-config/status",

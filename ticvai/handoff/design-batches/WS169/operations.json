@@ -37,25 +37,6 @@
   "requestBody": "CreateSeatHoldRequest",
   "responds": "SeatHold"
  },
- "extendSeatHold": {
-  "method": "POST",
-  "path": "/seat-holds/{holdId}/extend",
-  "contract": "seating",
-  "summary": "Extend a hold",
-  "permission": "ORDER_CREATE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "SeatHold"
- },
  "getAccessibleSeating": {
   "method": "GET",
   "path": "/accessible-seating",
@@ -122,6 +103,30 @@
   "requestBody": null,
   "responds": "SeatHold"
  },
+ "getSeatInventory": {
+  "method": "GET",
+  "path": "/seat-inventory",
+  "contract": "seating",
+  "summary": "Every seat's state for a performance, in one read",
+  "permission": "CAPACITY_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "performanceId",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "sectionId",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "SeatInventory"
+ },
  "getSeatingRules": {
   "method": "GET",
   "path": "/seat-maps/{seatMapId}/rules",
@@ -134,19 +139,6 @@
   "parameters": [],
   "requestBody": null,
   "responds": "SeatingRules"
- },
- "listRealTimeAvailability": {
-  "method": "GET",
-  "path": "/real-time-availability",
-  "contract": "promotions",
-  "summary": "Real-Time Availability & Checkout Validation",
-  "permission": "PRICE_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "RealTimeAvailabilityCheckoutValidationView"
  },
  "recommendSeats": {
   "method": "POST",

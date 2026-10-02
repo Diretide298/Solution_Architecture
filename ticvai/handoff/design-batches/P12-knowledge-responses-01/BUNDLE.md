@@ -1,6 +1,6 @@
 # P12-knowledge-responses-01 — P12 · Knowledge & Responses
 
-**2 screens · 5 operations · 8 schemas · 5 permissions**
+**2 screens · 5 operations · 8 schemas · 4 permissions**
 
 Platform P12 Venue Support · ships as **venue-management** ·
 staff audience · web ·
@@ -48,8 +48,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 5 permissions apply here:
-  `AI_CONFIGURE, AI_USE, MARKETING_MANAGE, MARKETING_VIEW, TENANT_CONFIGURE`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 4 permissions apply here:
+  `AI_USE, MARKETING_MANAGE, MARKETING_VIEW, TENANT_CONFIGURE`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -61,13 +61,72 @@ convincingly. It is never a caption.
   and its error; and, element by element, what is shown and in what format, what each action
   produces and where the user goes next. Draw exactly that.
 
+## The processes these screens belong to
+
+Written by the owner of each process (`handoff/design-notes/`). Read before any screen: it says how the process runs end to end and which words the screens must use.
+
+### AI & Intelligence
+
+AI in TICVAI is one governed engine behind many screens. The guest meets it as Sahli, the concierge (WEB-044, GST-031, GST-033), as the planner agent that refines a rules-built day plan by chat (GST-054), and as upsell and cross-sell offers on a separate Extras step (WEB-008, GST-048). Staff meet it as the Staff App's AI tab (EMP-019/020, knowledge EMP-040/041), the kiosk assistant (KSK-015) and the support copilot (SUP-006, SUP-018). Venue managers meet it in Venue Management (BO-091 policy and spend, BO-919/BO-925..932 resource and staffing forecasts, BO-597/598 configuration drafts, BO-772/782 marketing optimisation, BO-793 translations, BO-970/975 seat-map generation, BO-1048 seat upsell, BO-1160 fraud cases) and in Analytics (ANL-010 suggestions, ANL-019 management insights, ANL-055 anomalies, ANL-057 forecasting studio, ANL-059 insight history, ANL-060 governance, ANL-071 AI maturity). The governance, configuration-assistant, forecasting, oversight, audit and monitoring boards sit on the TICVAI Console (P09: ADM-037 providers, ADM-469..498 configuration assistant, ADM-499..518 forecasting, ADM-519..558 governance, ADM-633/637 fraud, ADM-680..697 recommendation governance). Five rules hold on every one of these screens. (1) Baseline first, then it learns per tenant: every data-driven answer (forecast, suggestion, risk score, recommendation) exists from day one, from the venue AI profile, a starting pattern for the venue type, the UAE calendar and the weather, and shifts to the venue's own data as it trades; nothing says "comes later" or refuses for lack of history - a refusal only names a missing setting. (2) Every answer shows its basis and maturity: a "Based on" line, a stage badge (Starting, Learning, Established, Trained on your data), "Limited historical data" while the starting pattern carries more than half the weight, ranges or bands rather than a bare percentage, a confidence only where the producer really has one, a plain-words explanation always. (3) A trained model replaces the baseline only when it beats it in a shadow run of at least six weeks and an admin promotes it; the platform raises "Ready to promote" and never switches by itself. (4) The LLM never reads raw data: numbers come only from query results the platform runs (the answer shows the query), only the masked prompt and retrieved context leave the platform, and AI only drafts - the owning screen applies. (5) One autonomy scale, L0 Disabled to L4 Controlled auto, with first-release ceilings, separate from user permission and from the approval tier; impactful actions route to a person, who sees current against proposed, impact, risk and what is affected, and can approve within a limit, challenge, override or roll back; every decision is traceable (data, model, approver, time) and searchable by customer, venue and capability. In Block A (5 October to 20 November 2026) the guest concierge with retrieval, Help me choose, translations, the planner agent, the gateway and …
+*(source: ADR-0051; ADR-0050; ADR-0020; ADR-0052; ADR-0053; ADR-0054; ADR-0059; ADR-0051 (AI-D01..AI-D20); ADR-0051 (AI functions review 30 Sep §2 §4 §9); MoM 18 Sep 4.1-4.10; MoM 21 Sep 4.1-4.14; MoM 30 Sep 4.1 4.7; ADR-0059 (Block A slice: tasks.csv))*
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Sahli | The guest concierge's name; the entry reads "Ask Sahli" and shows as mascot art when the venue's Concierge mascot setting is on (default), otherwise a plain button. | Chatbot, Bot, AI Concierge (as a visible label), Virtual agent | DI-1069 / screens/P01-guest-web-storefront.yaml#WEB-044 |
+| Based on | The line on every AI answer that says what it was computed from, e.g. "Based on: your venue profile, UAE calendar, weather, 23 days of your sales". Always present. | Data sources, Model inputs, Powered by AI | ADR-0051 Maturity / contracts/satellite/ai.yaml#/components/schemas/AiMaturity |
+| Starting / Learning / Established / Trained on your data | The four maturity stages (enum starting, learning, established, learned), shown as one badge. Moves by itself from Starting to Established as own data arrives; Trained on your data only after an admin promotion. | Beta, Experimental, Low confidence, Cold start (in UI), Not enough data | ADR-0051 / ADR-0051 (AI functions review 30 Sep §2) |
+| Limited historical data | Shown while own data carries less than half the weight (AiMaturity.limitedHistory, ownDataShare < 0.5). An honest qualifier, never a refusal. | Insufficient data, Not available until, Comes later | ADR-0051 / contracts/satellite/ai.yaml#/components/schemas/AiMaturity |
+| Range | The 10th-90th percentile band a forecast or estimate is shown with (e.g. "1,850-3,400 guests, most likely 2,600"). Never a bare accuracy percentage on an answer; measured accuracy (WAPE, bias, coverage) appears only on accuracy screens … | Accuracy 92%, Confidence 0.87 (on a heuristic), Exact | ADR-0051 / contracts/satellite/ai.yaml#getForecast / … |
+| Running in the background | A trained model in shadow next to the live answer (AiRelease.stage shadow); it changes nothing a person sees. | Live, Active model, Testing in production | ADR-0051 Promotion / ADR-0051 (AI functions review 30 Sep §2) |
+| Ready to promote / Promote | A shadow model passed its gate (governance alert promotionReady); an admin promotes it one stage at a time (canary, then production). The only way a model replaces the baseline. | Deploy, Go live, Auto-switch, Activate model, Upgrade AI | ADR-0051 (AI-D16) / contracts/satellite/ai.yaml#promoteAiRelease |
+| L0 Disabled / L1 Advisory / L2 Prepare / L3 Execute with … | The one autonomy scale for every AI capability, shown as "L2 Prepare" etc. with the capability's ceiling beside it. Lower scopes tighten, never raise. | Autopilot, Copilot mode, Level 0-3 (CFG book), Approval level (for autonomy), Manual/Semi/Auto | ADR-0050 / ADR-0050 (AI-D04) / … |
+| Approval tier | How many people must approve a proposed action (ProposedAction.approvalLevel, 1 or 2). Not an autonomy level. | Autonomy level, Approval level (ambiguous) | ADR-0050 |
+| Suggestion / Draft | What AI produces. A suggestion advises; a draft is a ready-to-review change that a person applies in the owning screen. Copy says "Nothing is applied until you approve it." | AI changed, Auto-applied, AI updated your prices | ADR-0020 / ADR-0051 (AI functions review 30 Sep §4 Configuration assistant) / … |
+| Why this? | The link or expander that opens an answer's explanation (Suggestion.explanation, recommendation template reason, decision trace). Plain words; for guests a template reason. | Explainability, SHAP, Feature importance (in operator copy) | ADR-0052 (AI-D09) / contracts/satellite/ai.yaml#/components/schemas/Suggestion |
+| No thanks | The explicit decline on an offer. Only this counts as a decline and it is remembered across channels; scrolling past or closing the step is not a decline. | Dismiss (as a decline), Skip (as a decline), X (as a decline) | ADR-0052 (AI-D07) / DI-962 / … |
+| Hold for review | What a high fraud or risk score does to a payment or order. The transaction goes through; it is held for a person. | Decline, Block, Reject (for a risk score), Fraud detected | ADR-0053 / ADR-0053 (AI-D06) |
+| Hand over to a person | The concierge passes the whole conversation and its own summary to a live agent; the guest does not repeat themselves. | Escalate, Transfer, Contact bot | contracts/satellite/marketing-crm.yaml#handoverToAgent |
+| Not available yet | The analytics assistant's answer to a question outside the semantic model; it records a knowledge gap and never improvises a number. | I cannot answer, Error, Unknown | ADR-0054 |
+
+### Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers)
+
+Customer & marketing is how a venue knows its guests and talks to them. There is ONE guest profile per person across ticketing, F&B and retail, so a guest who books online and later dines is the same profile (DI-339). A profile needs at least an email or a mobile, never neither (DI-372). Profiles are created by registration, by guest checkout, or by staff at a till or desk. Repeat guest checkouts with the same verified email or phone attach to the same profile automatically (DI-941, R120 default). Two records that might be the same person are NEVER merged automatically: the guest is asked to confirm, and an admin review queue runs alongside (DI-377). Each candidate shows why it matched; the record that loses is superseded, not deleted; consent takes the narrower of the two positions (DI-808). Around the profile sit three things that must never be confused. CONSENT is what the law allows: per purpose and per channel, append-only, with the notice version and the source (recordConsent). It is Given, Withdrawn or Not asked. A SUBSCRIPTION is what the guest asked to receive, e.g. a newsletter list (MarketingSubscription). A PREFERENCE is what they like: table, dietary, accessibility (updateGuestPreferences). An anonymous visitor's cookie decision is recorded against a device key (recordDeviceConsent) and attaches to the guest when they sign in (claimDeviceConsent). Marketing consent at GUEST CHECKOUT is an open client question, and the design follows its default: an unticked opt-in beside the terms, one per channel and purpose. It is recorded with source "checkout" against the order and the verified contact, and nothing is sent without it. Whether that is sufficient consent under PDPL is the client DPO's call (M18-15 (audit R-M18-15), DI-954, DI-940). Marketing reads profiles through SEGMENTS (rules, evaluated when used) and static LISTS (imported). It reaches guests by CAMPAIGNS (one send to an audience) and JOURNEYS (automations started by an event, with waits and branches). Journeys may offer only pre-configured offers, never a free-typed discount (MoM 2026-08-20 4.6). Everything goes through ONE communications module that every other module uses (MoM 2026-08-31 4.6). Consent and suppression are applied at send time, and the number excluded, with the reasons, is reported before anything goes out (launchCampaign). Transactional messages (tickets, receipts, queue calls, case replies) do not need marketing consent and must never carry marketing. LOYALTY pays for spend: points, tiers, rewards and expiry. GAMIFICATION pays for behaviour: challenges, badges, streaks, referrals and leaderboards (createChallenge). A guest reads their own loyalty position (getLoyaltyPosition). A till, the back office or support reads a named guest's (getGuestLoyalty, or identifyGuest at a till). SERVICE: one Case object covers lost property, complaints, questions, accessibility and refund requests (CaseKind). A guest raises one with raiseMyCase, which needs the connection …
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Guest | The person the venue serves, signed in or not. In body copy on every surface. | Customer, User, Subject, Contact, Patron | contracts/satellite/marketing-crm.yaml#/components/schemas/GuestProfile |
+| Guest profile | The CRM record of one person (details, consent, preferences, history). Distinct from the Account, which is how a guest signs in. | Customer record, Contact, Subject | contracts/satellite/marketing-crm.yaml#getGuestProfile |
+| Consent - Given / Withdrawn / Not asked | What the law allows, per purpose (marketing, personalisation, profiling, third-party sharing, AI processing, transactional) and per channel. "Not asked" is not "Withdrawn" and must look different. | Opted in/out as a status, Accepted, Declined, Revoked, Unsubscribed (that is a subscription) | contracts/satellite/marketing-crm.yaml#/components/schemas/ConsentDecision |
+| Subscription | A list the guest asked to receive (a newsletter, event news), per channel. Unsubscribing from a list is not withdrawing consent. | Consent, Opt-in | contracts/satellite/marketing-crm.yaml#/components/schemas/MarketingSubscription |
+| Preferences | What the guest likes or needs (seating, drinks, dietary, accessibility, contact channel). Never grants permission. | Consents, Settings | contracts/satellite/marketing-crm.yaml#updateGuestPreferences |
+| Send me offers and news | The marketing opt-in label beside the terms at checkout, unticked, one per channel and purpose. | I agree to marketing, Pre-ticked boxes, Keep me updated ticked by default | DI-954 |
+| Points / Tier / Points to next tier / Expiring points | The loyalty position. Points are a liability earned per programme; tiers are ranked (Bronze, Silver, Gold, Platinum in the meetings). | Credits, Coins, Balance alone (wallet money is "credit"), Level | DI-382 |
+| Pending points | Points earned on a purchase still inside its refund window; shown apart from spendable points. | Available points for pending ones | contracts/satellite/marketing-crm.yaml#getLoyaltyPosition |
+| Reward | What points can be turned into (rewards catalogue). | Prize (games redemption uses prize), Voucher unless it is one | contracts/satellite/marketing-crm.yaml#listRewards |
+| Challenge / Badge / Streak / Referral | Gamification - rewards for behaviour, not spend. Status badges such as Explorer, Adventurer, Legend. | Mission and Quest used interchangeably on one screen, Loyalty tier for a badge | DI-392 |
+| Case | One service record - lost property, complaint, question, accessibility, refund request or other - with a number (venue prefix plus sequence), a status and an SLA. | Ticket (a ticket is an admission product), Issue, Incident (that is maintenance and safety) | contracts/satellite/marketing-crm.yaml#/components/schemas/CaseKind |
+| Reply to guest / Internal note | The two kinds of case message. The agent always chooses one explicitly; there is no default. | Comment, Message (ambiguous) | F05 step 2 |
+| Conversation | A live chat session (web chat, in-app, WhatsApp, SMS, email, kiosk, voice). With the assistant, then queued, then with an agent. It is not a case. | Ticket, Case (until one is raised from it) | contracts/satellite/marketing-crm.yaml#/components/schemas/ConversationState |
+| Segment / List / Audience | A segment is rules evaluated when used. A list is static, imported or hand-picked. The audience is what a campaign or journey targets. | Group, Cohort, Target list for a segment | DI-381 |
+| Campaign / Journey | A campaign is one send (one-off, scheduled, triggered or recurring) to an audience. A journey is an automation started by an event, with steps, waits and branches. | Flow (booking flows use it), Automation for a one-off send, Blast | R146 |
+| Offer | A pre-configured, system-validated discount or benefit that a campaign or journey references. It is never typed into the builder. | Discount field, Coupon (unless the offer is a coupon code) | MoM 2026-08-20 4.6 |
+| Reachable | How many guests in an audience can actually be sent to on a channel after consent and suppression. Always shown beside the matching count. | Audience size alone | contracts/satellite/marketing-crm.yaml#previewSegment |
+| Possible duplicate / Merge | Two profiles that may be one person. Never called "Duplicate" as a verdict. Merging needs confirmation and stays reversible for 30 days. | Duplicate (as a status), Combine, Auto-merge | DI-808 |
+| Data request | A guest's privacy request - a copy of my data, a correction, erasure, a restriction - with a legal clock. Statuses submitted, in progress, completed. | DSAR on guest screens, Subject data, Ticket | DI-379 |
+| Waiver / Consent question | A waiver is a signed, versioned form. A consent question ("Are you able to swim?", "I accept the risk") is a single question asked per person or per booking and recorded as consent. | Contract, Disclaimer, Form for a waiver in guest copy | DI-1062 |
+| Lost item / Found item / Possible match | The two directions of lost property and the suggested pairing between them. | Lost case, Claim before it is claimed | contracts/satellite/marketing-crm.yaml#/components/schemas/LostItem |
+| Wishlist | Products and dates a guest saved to buy later, including F&B and retail to buy on site. | Favourites (used for transport routes), Saved for later on one surface and Wishlist on another | DI-202 |
+| Notification / Message | A notification is an item in the guest's in-app feed. A message is one send on a channel (email, SMS, WhatsApp, push, in-app). | Alert for marketing content, Inbox for the guest feed | contracts/satellite/marketing-crm.yaml#/components/schemas/GuestNotification |
+| Template | A reusable message body per channel and language with merge fields. Transactional and marketing templates are separate kinds. | Layout, Design | contracts/satellite/marketing-crm.yaml#createMessageTemplate |
+
+
 ## The screens
 
 Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs count fields; requirements are matrix rows; meeting inputs are the ones naming the screen (the module and platform ones are below); white label says whether the tenant's brand reaches it (guest) or it sets the brand (configures).
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `SUP-006` | Knowledge Base Search | B–D | 0 | 29 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `SUP-006` | Knowledge Base Search | B–D | 3 | 5 | 6 | 2 | 0 | 0 | — | notStarted (generated) |
 | `SUP-007` | Canned Response Management | B–D | 10 | 18 | 6 | 7 | 0 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
@@ -89,14 +148,24 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | App · platform | TICVAI Venue Management · P12 Venue Support (web) |
 | Module | Knowledge & Responses · wave 3 · needs the `core` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `AI_CONFIGURE`, `AI_USE`, `TENANT_CONFIGURE` (2 configure, 1 operate) |
+| Who uses it | venue staff holding `AI_USE`, `TENANT_CONFIGURE` (1 operate, 1 configure) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listKnowledgeCollections` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
 | Offline | online only |
-| Opens with | `bannerId` (deepLink), `pageId` (deepLink), `policyKind` (deepLink), `version` (deepLink) · cold entry: **A version link is expected to point at something superseded — that is what versions are for.** The screen opens the requested version read-only, says it is … |
+| Opens with | nothing: it opens on its own · cold entry: **A version link is expected to point at something superseded — that is what versions are for.** The screen opens the requested version read-only, says it is … |
 | Route | `/general/knowledge-base-search` |
 
 **What the spec says about it.** States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived from the screen name and its operations on 17 August, not from a requirement. **41 operations removed 24 August.** Every white-label screen across P09, P12 and P13 declared the **identical 41 operations** — a Typography screen that could create banners and a Component Preview that could set FAQs. **The worst instance of the 18 August bulk attach found so far**, and only walking the white-label journey surfaced it.
+
+**Known gaps.** Removed 2 October 2026 (CHG-WIR-012): Agents search content; collection engineering (listKnowledgeCollections, AI_CONFIGURE, with shard and embedding columns) belongs to knowledge administration, and …
+
+**From the AI & Intelligence process.** Knowledge base search for support agents: find the policy or FAQ when the guest does not know what it is called, and see which questions the assistant could not answer. The one thing to get right: it is a search for agents, not an admin list of collections with embedding settings.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **entry params bannerId, pageId, policyKind, version.** Why: Left over from the white-label bulk attach; a knowledge search takes a query. *(source: screens/P12-support-agent-console.yaml#SUP-006 (notes); AI & Intelligence)*
+
+**Fixed on main** (the package already carries these; draw what it says): Main table lists knowledge collections with shardKey, sparseModel, idfScope, embeddingModel columns (AI_CONFIGURE). (CHG-WIR-012).
 
 #### Inputs: what the user enters or picks
 
@@ -108,28 +177,19 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Kind | segmented control | — | Knowledge · Analytics | `listKnowledgeGaps` ?kind |
 | Audience | segmented control | — | Staff · Guest | `listKnowledgeGaps` ?audience |
 
-Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+**Form: Search** (modal, opened by *Search*; *Search* calls `semanticSearch`, *Cancel* sends nothing)
+
+**Collects what `semanticSearch` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Query `query` | text area | required | — | min length 2; max length 500 | — | — | `semanticSearch` body |
+| Kinds `kinds` | multi-select chips | optional | — | Product · Entitlement · Membership · Document · Knowledge · FAQ · Report · Media | — | — | `semanticSearch` body |
+| Limit `limit` | number field | optional | 20 | max 100 | — | — | `semanticSearch` body |
 
 #### Outputs: what the screen shows and produces
 
 **Shown**
-
-**Every knowledge collection** (data table, from `listKnowledgeCollections`)
-
-| Shows | Format | Notes |
-|---|---|---|
-| ID | the name it points at, never the id | — |
-| Name | text | — |
-| Description | text | — |
-| Scope level | chip: Tenant, Region, Venue | — |
-| Scope path | text | — |
-| Document count | 1,234 | — |
-| Shard key | text | The tenant boundary on shared placement (ADR-0021). A collection is shared by every tenant using the same embedding model, and the shard … |
-| Retrieval | chip: Dense, Hybrid | Set at creation and not changeable. A collection created dense-only cannot gain a sparse index without a full rebuild, which is why this is … |
-| Sparse model | text | The sparse signal, where `retrieval` is `hybrid`. BM25 unless a tenant needs otherwise. |
-| Idf scope | chip: Shard, Tenant, Venue | Which population the sparse score measures rarity against (ADR-0021). Qdrant computes IDF statistics shard-wide by default, so a term … |
-| Embedding model | text | This is what decides how many collections exist (ADR-0021). A collection carries its own vector configuration and a shard cannot, so … |
-| Is active | yes / no (icon or chip) | — |
 
 **Every faq category** (data table, from `listFaqs`)
 
@@ -141,24 +201,18 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Entries | list or chips (count when long) | — |
 | Scope path | text | The partition key (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it … |
 
-**The selected knowledge collection** (detail panel, from `listKnowledgeCollections`)
+**Actions and what each produces**
 
-| Shows | Format | Notes |
-|---|---|---|
-| ID | the name it points at, never the id | — |
-| Name | text | — |
-| Description | text | — |
-| Scope level | chip: Tenant, Region, Venue | — |
-| Scope path | text | — |
-| Document count | 1,234 | — |
-| Shard key | text | The tenant boundary on shared placement (ADR-0021). A collection is shared by every tenant using the same embedding model, and the shard … |
-| Retrieval | chip: Dense, Hybrid | Set at creation and not changeable. A collection created dense-only cannot gain a sparse index without a full rebuild, which is why this is … |
-| Sparse model | text | The sparse signal, where `retrieval` is `hybrid`. BM25 unless a tenant needs otherwise. |
-| Idf scope | chip: Shard, Tenant, Venue | Which population the sparse score measures rarity against (ADR-0021). Qdrant computes IDF statistics shard-wide by default, so a term … |
-| Embedding model | text | This is what decides how many collections exist (ADR-0021). A collection carries its own vector configuration and a shard cannot, so … |
-| Is active | yes / no (icon or chip) | — |
+| Action | Calls | Sends | On success returns | Errors to show | Notes |
+|---|---|---|---|---|---|
+| Search (secondary button) | `semanticSearch` POST `/search` | inline | SearchResult[] | — | opens modal first |
 
-**Data it reads**: `listKnowledgeCollections` (onLoad, Collections an agent may search); `listFaqs` (onLoad, Published answers, as the guest sees them); `listKnowledgeGaps` (onLoad, Questions the assistant could not answer)
+**Rules for what is shown** (from the AI & Intelligence process; these refine the tables above and win where they differ)
+
+- **results**: Semantic results from FAQs and the venue's knowledge collections, each with source and updated date; one-tap "Insert into reply". *(source: contracts/satellite/ai.yaml#semanticSearch / contracts/satellite/white-label.yaml#listFaqs)*
+- **knowledge gaps**: Unanswered questions grouped and counted, newest first, for the content owner (analytics gaps marked as such). *(source: contracts/satellite/ai.yaml#listKnowledgeGaps)*
+
+**Data it reads**: `listFaqs` (onLoad, Published answers, as the guest sees them); `listKnowledgeGaps` (onLoad, Questions the assistant could not answer)
 
 **Where the user goes next**
 
@@ -171,21 +225,38 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Loading (`?state=loading`) | The knowledge base search list. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the knowledge base search untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No knowledge base search yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table. |
-| Empty, no results (`?state=emptyNoResults`) | Never shown: `listKnowledgeCollections` takes no filter, so an empty list is always the first-run state above. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `AI_CONFIGURE`, which `listKnowledgeCollections` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Empty, no results (`?state=emptyNoResults`) | Never shown: nothing on this screen filters its list, so an empty list is always the first-run state above. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `TENANT_CONFIGURE`, which `listFaqs` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+search: reschedule cabana
+gaps:
+- question: Can I move my cabana to another day?
+  count: 23
+  audience: guest
+```
 
 #### Permissions
 
-- `listKnowledgeCollections` → `AI_CONFIGURE` (configure) · staff
 - `listFaqs` → `TENANT_CONFIGURE` (configure) · staff, guest
 - `listKnowledgeGaps` → `AI_USE` (operate) · staff
+- `semanticSearch` → `AI_USE` (operate) · staff
 
-**A refused user sees:** Shown when the caller lacks `AI_CONFIGURE`, which `listKnowledgeCollections` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `TENANT_CONFIGURE`, which `listFaqs` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
 #### Requirements it meets
 
-No matrix row traces to this screen's operations or data.
+2 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+
+| Ref | Requirement (shortened) | Domain | Verdict | Via |
+|---|---|---|---|---|
+| 8.4.39 | System shall support semantic search across products, tickets, memberships, documents, knowledge bases, support content, assets, and operational data using vector-based retrieval and relevance … | Unified Operations Dashboard | CONTRACTED | `semanticSearch` |
+| 23.1.6 | AI shall support semantic search allowing users to locate assets using natural language queries. | Digital Asset Management | CONTRACTED | `semanticSearch` |
 
 #### Client meeting inputs
 
@@ -203,13 +274,14 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (29 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (3), with its required mark, default, format and its error state.
+- [ ] Every output is drawn (5 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#SUP-006?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
+- [ ] Every action is wired with its success and its failure: Search.
 - [ ] Every transition is wired: `SUP-001`.
-- [ ] Every gated control is gated: `AI_CONFIGURE`, `AI_USE`, `TENANT_CONFIGURE`.
+- [ ] Every gated control is gated: `AI_USE`, `TENANT_CONFIGURE`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -231,6 +303,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Route | `/general/canned-response-management` |
 
 **What the spec says about it.** States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+
+**From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** Canned responses agents insert into chats and case replies, per language and channel, with merge fields. They are agent shortcuts, not marketing templates.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **Canned responses are stored as message templates (createMessageTemplate needs MARKETING_MANAGE).** Why: An agent permission should manage canned responses, and they should not appear in the marketing template library; give them their own kind or object. *(source: contracts/satellite/marketing-crm.yaml#createMessageTemplate; Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers))*
 
 #### Inputs: what the user enters or picks
 
@@ -257,6 +335,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Ownership `ownership` | segmented control | optional | Crm | Platform · Crm | — | `platform` = a transactional template owned by the communication service; `crm` = a marketing template owned by CRM (`listSystemTransactionalTemplate`). | `createMessageTemplate` body |
 
 Errors to draw in the form: 400 Unknown merge field, or a required language is missing
+
+**Rules for these inputs** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
+
+- **Response**: Title, shortcut, body in English and Arabic, channel limits. *(source: DI-019)*
 
 #### Outputs: what the screen shows and produces
 
@@ -314,6 +396,16 @@ Errors to draw in the form: 400 Unknown merge field, or a required language is m
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Unknown merge field, or a required language is missing |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+responses:
+- /reschedule - You can change the date of your ticket up to 24 hours before your visit from My Bookings.
+- /lost - We are sorry you lost something. Please tell us what it looks like and where you last had it.
+```
+
 #### Permissions
 
 - `listMessageTemplates` → `MARKETING_VIEW` (read) · staff
@@ -358,6 +450,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `SUP-001`.
 - [ ] Every gated control is gated: `MARKETING_MANAGE`, `MARKETING_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -433,9 +526,9 @@ Method, path, parameters, request and response for every operation these screens
 {
 "createMessageTemplate": {"method":"POST","path":"/message-templates","contract":"marketing-crm","summary":"Create a message template","permission":"MARKETING_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"MessageTemplate","responds":"MessageTemplate"},
 "listFaqs": {"method":"GET","path":"/tenant-config/faqs","contract":"white-label","summary":"List FAQs","permission":"TENANT_CONFIGURE","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[],"requestBody":null,"responds":"FaqCategory"},
-"listKnowledgeCollections": {"method":"GET","path":"/collections","contract":"ai","summary":"Collections available to this tenant","permission":"AI_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[],"requestBody":null,"responds":"KnowledgeCollection"},
 "listKnowledgeGaps": {"method":"GET","path":"/knowledge-gaps","contract":"ai","summary":"Questions the assistant could not answer","permission":"AI_USE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":"status","in":"query","required":null},{"name":"kind","in":"query","required":null},{"name":"audience","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
-"listMessageTemplates": {"method":"GET","path":"/message-templates","contract":"marketing-crm","summary":"List message templates","permission":"MARKETING_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"channel","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"}
+"listMessageTemplates": {"method":"GET","path":"/message-templates","contract":"marketing-crm","summary":"List message templates","permission":"MARKETING_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"channel","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
+"semanticSearch": {"method":"POST","path":"/search","contract":"ai","summary":"Search meaning, not words","permission":"AI_USE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"SearchResult"}
 }
 ```
 
@@ -447,11 +540,11 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 {
 "AiKnowledgeGap": {"type":"object","x-ticvai-persistence":"ai.knowledge_gap","description":"**A question the assistant could not answer**, grouped so the content owner gets a task, not a log (AIC-061, AIC-062). Also written for an analytics question outside the semantic model (design 5.7).","required":["question","status"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"question":{"type":"string","description":"The normalised question."},"examples":{"type":"array","items":{"type":"string"},"description":"Up to ten phrasings as asked, with personal data masked."},"occurrences":{"type":"integer","minimum":1,"readOnly":true},"audience":{"type":"string","enum":["staff","guest"]},"locale":{"type":"string","nullable":true},"kind":{"type":"string","enum":["knowledge","analytics"]},"suggestedCollectionId":{"type":"string","format":"uuid","nullable":true,"x-ticvai-references":"ai.knowledge_collection"},"ownerPrincipalId":{"type":"string","format":"uuid","nullable":true,"x-ticvai-references":"identity.principal"},"status":{"type":"string","enum":["open","assigned","answered","dismissed"]},"resolvedDocumentId":{"type":"string","format":"uuid","nullable":true,"x-ticvai-references":"ai.knowledge_document"},"lastAskedAt":{"type":"string","format":"date-time","readOnly":true},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."}}},
 "FaqCategory": {"x-ticvai-persistence":"whitelabel.faq_category + whitelabel.faq_entry","type":"object","required":["code","name","entries"],"properties":{"code":{"type":"string"},"name":{"$ref":"#/components/schemas/LocalisedText"},"sortOrder":{"type":"integer"},"entries":{"type":"array","items":{"type":"object","required":["id","question","answer"],"properties":{"id":{"type":"string","format":"uuid"},"question":{"$ref":"#/components/schemas/LocalisedText"},"answer":{"$ref":"#/components/schemas/LocalisedRichText"},"sortOrder":{"type":"integer"},"isPublished":{"type":"boolean"}}}},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `tenant` scope.**"}}},
-"KnowledgeCollection": {"type":"object","x-ticvai-persistence":"ai.knowledge_collection","required":["name","scopeLevel"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"name":{"type":"string"},"description":{"type":"string"},"scopeLevel":{"type":"string","enum":["tenant","region","venue"]},"scopePath":{"type":"string","readOnly":true},"documentCount":{"type":"integer","readOnly":true},"shardKey":{"type":"string","readOnly":true,"description":"**The tenant boundary on shared placement** (ADR-0021). A collection is shared by every tenant using the same embedding model, and the shard separates them — set at provisioning from the tenant, never from a request.\nOn dedicated placement there is one shard and this is still populated, because a tenant moving from shared to dedicated moves a shard rather than being re-indexed.\n"},"retrieval":{"type":"string","enum":["dense","hybrid"],"default":"hybrid","description":"**Set at creation and not changeable.** A collection created dense-only cannot gain a sparse index without a full rebuild, which is why this is a creation decision rather than a query one.\nHybrid is the default because **a venue corpus is mostly proper nouns** — Yas Waterworld, Bronze Annual Pass, a menu item name. Dense retrieval is good at meaning and poor at exact tokens, and half our queries are exact tokens.\n"},"sparseModel":{"type":"string","nullable":true,"description":"The sparse signal, where `retrieval` is `hybrid`. BM25 unless a tenant needs otherwise."},"idfScope":{"type":"string","enum":["shard","tenant","venue"],"default":"tenant","description":"**Which population the sparse score measures rarity against** (ADR-0021). Qdrant computes IDF statistics shard-wide by default, so a term common at one venue and rare at another gets one score for both. Shard-per-tenant fixes the cross-tenant case; **inside a dedicated cell the shard is the whole tenant and venues share it**, which is what this narrows.\n"},"embeddingModel":{"type":"string","readOnly":true,"description":"**This is what decides how many collections exist** (ADR-0021). A collection carries its own vector configuration and a shard cannot, so vectors from two models cannot share one. A tenant that residency forces onto a local model therefore has its own collection — forced by the model, not chosen for isolation.\nRead-only because **changing it invalidates every embedding in the collection**, and a collection silently searched with mismatched vectors returns plausible nonsense.\n"},"isActive":{"type":"boolean"}}},
 "LocalisedRichText": {"x-ticvai-persistence":"none — jsonb column","type":"object","description":"Keyed by language code. Values are sanitised HTML.","additionalProperties":{"type":"string"}},
 "LocalisedText": {"x-ticvai-persistence":"none — jsonb column","type":"object","additionalProperties":{"type":"string"}},
 "MessageChannel": {"type":"string","enum":["email","sms","whatsapp","push","inApp","post"]},
 "MessageTemplate": {"x-ticvai-persistence":"marketing.message_template","type":"object","required":["id","code","name","channel","bodies"],"properties":{"id":{"readOnly":true,"type":"string","format":"uuid"},"code":{"type":"string","maxLength":64},"name":{"type":"string","maxLength":200},"channel":{"$ref":"#/components/schemas/MessageChannel"},"subjects":{"type":"object","description":"Per language. Email only.","additionalProperties":{"type":"string"}},"bodies":{"type":"object","description":"Per language, keyed by ISO 639-1 code.","additionalProperties":{"type":"string"}},"mergeFields":{"type":"array","items":{"type":"string"}},"missingLanguages":{"type":"array","readOnly":true,"description":"Enabled languages without a body. Flagged rather than silently falling back — a guest receiving English when they chose Arabic is a defect.\n","items":{"type":"string"}},"providerTemplateId":{"type":"string","nullable":true,"description":"Required for WhatsApp, where templates are pre-approved by the provider."},"brandId":{"type":"string","format":"uuid","nullable":true,"description":"The brand whose identity the template carries; null for the tenant default."},"ownership":{"type":"string","enum":["platform","crm"],"default":"crm","description":"`platform` = a transactional template owned by the communication service; `crm` = a marketing template owned by CRM (`listSystemTransactionalTemplate`). Content by language and version is in `MessageTemplateVersion`. (decided 29 September, data model for the agreed operations)"}}},
-"Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}}
+"Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}},
+"SearchResult": {"type":"object","x-ticvai-persistence":"none — computed","properties":{"kind":{"type":"string"},"id":{"type":"string"},"title":{"type":"string"},"excerpt":{"type":"string"},"relevance":{"type":"number"},"collectionId":{"type":"string","format":"uuid","nullable":true},"scopePath":{"type":"string"},"assetId":{"type":"string","format":"uuid","nullable":true,"description":"For kind `media`, the asset (29 September, build; 23.1.6)."},"mediaType":{"type":"string","nullable":true,"enum":["image","video","audio","document"]},"matchedOn":{"type":"string","nullable":true,"enum":["title","description","tags","aiDescription"],"description":"Which text the match came from, so a wrong hit can be traced to a wrong tag."}}}
 }
 ```

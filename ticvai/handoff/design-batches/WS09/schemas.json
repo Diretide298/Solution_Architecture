@@ -41,6 +41,24 @@
      }
     ]
    },
+   "fromDirection": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/Direction"
+     }
+    ],
+    "nullable": true,
+    "description": "Set on a live direction switch (`setAccessPointDirection`; DEC-255; CHG-CSP-032); null on a mode change. On a direction switch `targetMode` repeats the unchanged operating mode."
+   },
+   "toDirection": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/Direction"
+     }
+    ],
+    "nullable": true,
+    "description": "The direction switched to (CHG-CSP-032)."
+   },
    "status": {
     "type": "string",
     "enum": [
@@ -71,6 +89,151 @@
    "scopePath": {
     "type": "string",
     "description": "ltree of the owning scope node (ADR-0005)"
+   }
+  }
+ },
+ "AccessIdentityLock": {
+  "type": "object",
+  "x-ticvai-persistence": "access.identity_lock",
+  "description": "One lock on an identity - its scope, duration, reason, the credentials linked to it, where it has propagated and whether it is still active (declared 29 September, data-model close-out DM1). Written by lockIdentity and releaseIdentityLock, by the fraud detection job where a rule's response is temporarilyLock or fullIdentityLock, and released by a timer for endOfDay and nHours locks (decided 29 September, writers pass).",
+  "required": [
+   "id",
+   "scopePath",
+   "subjectId",
+   "lockScope",
+   "lockDuration",
+   "lockReason",
+   "status",
+   "lockedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The lockId"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Set when lockScope is venue"
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "ltree of the owning scope node"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The locked identity (the list's identityId, pii.subject)"
+   },
+   "lockScope": {
+    "type": "string",
+    "enum": [
+     "credentialOnly",
+     "mediaOnly",
+     "entitlement",
+     "venue",
+     "allVenueAccess",
+     "fullIdentity"
+    ]
+   },
+   "lockDuration": {
+    "type": "string",
+    "enum": [
+     "untilManuallyReleased",
+     "endOfDay",
+     "nHours",
+     "untilInvestigationComplete",
+     "permanent"
+    ]
+   },
+   "lockHours": {
+    "type": "integer",
+    "minimum": 1,
+    "nullable": true,
+    "description": "Used when lockDuration is nHours"
+   },
+   "lockReason": {
+    "type": "string",
+    "enum": [
+     "credentialSharing",
+     "fraudSuspected",
+     "securityIncident",
+     "identityMismatch",
+     "stolenCredential",
+     "guestRemoval"
+    ]
+   },
+   "associatedEntitlementIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    },
+    "description": "The linked credentials (the list's associatedCredentialIds)"
+   },
+   "associatedCredentialTypes": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "ticket",
+      "rfidWristband",
+      "dynamicQr",
+      "walletCredential",
+      "facePass",
+      "membership",
+      "fastPass"
+     ]
+    }
+   },
+   "propagatedTo": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "centralPlatform",
+      "venueEdge",
+      "onlineGates",
+      "offlineRevocationPackage",
+      "mobileDevices"
+     ]
+    },
+    "description": "Channels the lock has reached"
+   },
+   "securityInvestigationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The investigation an untilInvestigationComplete lock waits for"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "active",
+     "released"
+    ],
+    "default": "active"
+   },
+   "lockedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "lockedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "releasedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "releasedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
    }
   }
  },
@@ -261,7 +424,41 @@
       "$ref": "#/components/schemas/Direction"
      }
     ],
-    "description": "**Fixed per access point** (audit R221): set in the back office by `createAccessPoint` and `updateAccessPoint`, never by the podium.\n"
+    "description": "**Fixed per access point** (audit R221): set in the back office by `createAccessPoint` and `updateAccessPoint`, never by the podium.\n\n**R221 amended 2 October 2026: a gate's direction can be switched live** (Chinmay, critical set 1, BO-230: \"Live direction switch with permission, logged\"; DEC-255; CHG-CSP-032; DI-648: more entry gates in the morning, more exit gates in the evening). `setAccessPointDirection` switches it from Live Gate Mode & Lane Control (BO-230) or the scanner's gate mode screen (SCN-016) for a holder of the configuration right, logged; the podium's `setTurnstileMode` still never touches it.\n"
+   },
+   "temporaryClosure": {
+    "type": "object",
+    "nullable": true,
+    "description": "**What the access point does while its attraction is temporarily closed** (decided 2 October 2026, Chinmay, batch 6 set 9, BO-147: \"Deny + reopening time + a virtual-queue return window where enabled\"; DEC-228; CHG-CSP-026). While `isClosed`, every scan is denied (`ValidationResult.denyCause` `attractionTemporarilyClosed`) with the reopening time when it is known; where the venue offers it and the attraction has a virtual queue, the guest is offered a return window (`queue.joinQueue`) instead of being turned away empty-handed. Set with `updateAccessPoint`; null when open. Travels in the offline package, so an offline gate denies the same way.",
+    "properties": {
+     "isClosed": {
+      "type": "boolean",
+      "default": false
+     },
+     "reason": {
+      "type": "string",
+      "maxLength": 200,
+      "nullable": true,
+      "description": "Shown to staff; the guest sees \"Attraction temporarily closed\"."
+     },
+     "reopensAt": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true,
+      "description": "When it is expected to reopen; shown to the guest when known."
+     },
+     "offerVirtualQueueReturn": {
+      "type": "boolean",
+      "default": false,
+      "description": "Offer a virtual-queue return window at the denied scan, where the attraction has a queue."
+     },
+     "queueId": {
+      "type": "string",
+      "format": "uuid",
+      "nullable": true,
+      "description": "The virtual queue the return window is taken in."
+     }
+    }
    },
    "antiPassbackEnabled": {
     "type": "boolean"
@@ -565,6 +762,78 @@
      "type": "string",
      "format": "uuid"
     }
+   }
+  }
+ },
+ "IdentityLockInput": {
+  "type": "object",
+  "x-ticvai-persistence": "none — request only; written as access.identity_lock (declared 29 September, writers pass)",
+  "required": [
+   "subjectId",
+   "lockScope",
+   "lockDuration",
+   "lockReason"
+  ],
+  "properties": {
+   "subjectId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Required for a venue lock; null for allVenueAccess and fullIdentity"
+   },
+   "lockScope": {
+    "type": "string",
+    "enum": [
+     "credentialOnly",
+     "mediaOnly",
+     "entitlement",
+     "venue",
+     "allVenueAccess",
+     "fullIdentity"
+    ]
+   },
+   "lockDuration": {
+    "type": "string",
+    "enum": [
+     "untilManuallyReleased",
+     "endOfDay",
+     "nHours",
+     "untilInvestigationComplete",
+     "permanent"
+    ]
+   },
+   "lockHours": {
+    "type": "integer",
+    "minimum": 1,
+    "maximum": 720,
+    "nullable": true
+   },
+   "lockReason": {
+    "type": "string",
+    "enum": [
+     "credentialSharing",
+     "fraudSuspected",
+     "securityIncident",
+     "identityMismatch",
+     "stolenCredential",
+     "guestRemoval"
+    ]
+   },
+   "associatedEntitlementIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "securityInvestigationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
    }
   }
  },
@@ -1357,6 +1626,41 @@
    "denyDetail": {
     "type": "string",
     "description": "Human-readable, localised. For operator display, never for logic."
+   },
+   "denyCause": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "attractionTemporarilyClosed",
+     "timeBoundWindowElapsed",
+     "offlineLimitExceeded"
+    ],
+    "description": "**The finer cause of three denials decided on 2 October 2026**, beside the r1 `denyReason` a client already switches on (a new `DenyReason` value would be a breaking change against r1; CHG-CSP-026, CHG-CSP-030, CHG-CSP-035). `attractionTemporarilyClosed` (DEC-228): `denyReason` `outsideAdmissionWindow`, with `reopensAt` and `queueReturnOffer`. `timeBoundWindowElapsed` (DEC-232): a time-bound entitlement scanned after its window from first scan, `denyReason` `expired`. `offlineLimitExceeded` (DEC-426): a reader offline longer than the venue's `AccessOfflinePolicy.maxOfflineDurationHours` refusing a tap it cannot check, `denyReason` `outsideAdmissionWindow`. Null for every other denial."
+   },
+   "reopensAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "When a temporarily closed attraction expects to reopen, where known (DEC-228; CHG-CSP-026)."
+   },
+   "queueReturnOffer": {
+    "type": "object",
+    "nullable": true,
+    "description": "A virtual-queue return window offered at a denied scan of a temporarily closed attraction, where the venue enables it (DEC-228; CHG-CSP-026). Taking it is `queue.joinQueue`.",
+    "properties": {
+     "queueId": {
+      "type": "string",
+      "format": "uuid"
+     },
+     "returnWindowStart": {
+      "type": "string",
+      "format": "date-time"
+     },
+     "returnWindowEnd": {
+      "type": "string",
+      "format": "date-time"
+     }
+    }
    },
    "accessPointId": {
     "type": "string",

@@ -1243,6 +1243,82 @@
    }
   }
  },
+ "GroupPackageDefinition": {
+  "type": "object",
+  "x-ticvai-persistence": "catalogue.group_package",
+  "required": [
+   "kind",
+   "maxParticipants",
+   "durationMinutes"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "productId": {
+    "type": "string",
+    "readOnly": true
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "school",
+     "party"
+    ]
+   },
+   "maxParticipants": {
+    "type": "integer",
+    "minimum": 1,
+    "description": "Pupils or children, e.g. 30 or 10."
+   },
+   "durationMinutes": {
+    "type": "integer",
+    "minimum": 15
+   },
+   "hostCount": {
+    "type": "integer",
+    "minimum": 0,
+    "default": 1,
+    "description": "Party hosts included."
+   },
+   "pricingBasis": {
+    "type": "string",
+    "enum": [
+     "perParticipant",
+     "perPackage"
+    ]
+   },
+   "freeLeaderRatio": {
+    "type": "integer",
+    "nullable": true,
+    "default": 10,
+    "description": "Schools: one teacher or assistant enters free per this many pupils."
+   },
+   "paymentMode": {
+    "type": "string",
+    "enum": [
+     "invoice",
+     "deposit",
+     "full"
+    ],
+    "description": "Schools are invoiced; parties take a deposit (see `DepositPolicy`)."
+   },
+   "includes": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "maxLength": 120
+    }
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Operations write it at `venue` scope."
+   }
+  }
+ },
  "GroupPackageExperienceBuilderInput": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
@@ -1988,6 +2064,25 @@
    "depositsPending": {
     "type": "integer",
     "description": "Deposits pending"
+   }
+  }
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
    }
   }
  },

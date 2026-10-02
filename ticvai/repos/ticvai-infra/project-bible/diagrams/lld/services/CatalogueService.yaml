@@ -1,5 +1,5 @@
 id: LLD-CatalogueService
-title: CatalogueService — 449 operations, 135 tables
+title: CatalogueService — 443 operations, 137 tables
 generatedBy: tools/derive-diagrams.py
 tier: commerce
 deployable: commerce
@@ -16,14 +16,14 @@ why: '**What is sold, at what price, in which seat.** Promotions and seating are
 scale: Read-heavy, bundle-published to tills. **The catalogue bundle is this service's output** (ADR-0013).
 ifDown: A bad publish reaches every workstation. Versioned and rollback-able for that reason.
 coverage:
-  operations: 449
-  inAFlow: 256
-  percent: 57%
+  operations: 443
+  inAFlow: 240
+  percent: 54%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
 - schema: catalogue
-  tables: 80
+  tables: 82
   stores:
   - postgres
   largestTable: catalogue.channel_sales_rule
@@ -44,7 +44,7 @@ schemas:
   largestTable: seating.group_request
 operationsByContract:
 - contract: catalogue
-  count: 241
+  count: 245
   operations:
   - operation: acquireInventoryHold
     verb: POST
@@ -102,6 +102,14 @@ operationsByContract:
     offline: false
     reads: 3
     writes: 3
+  - operation: bulkUpdateCatalogueProducts
+    verb: POST
+    path: /products/bulk-update
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
   - operation: cancelPerformance
     verb: POST
     path: /performances/{performanceId}/cancel
@@ -166,14 +174,6 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 2
-  - operation: createBulkProductCatalogue
-    verb: POST
-    path: /bulk-product-catalogue
-    scope: venue
-    permission: PRODUCT_CONFIGURE
-    offline: false
-    reads: 3
-    writes: 5
   - operation: createChannelCapacity
     verb: POST
     path: /channel-capacities
@@ -339,6 +339,14 @@ operationsByContract:
     path: /events/{eventId}
     scope: venue
     permission: PRODUCT_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: getEventChangeTreatmentPolicy
+    verb: GET
+    path: /venues/{venueId}/event-change-treatment-policy
+    scope: venue
+    permission: PERFORMANCE_CONFIGURE
     offline: false
     reads: 1
     writes: 0
@@ -1038,6 +1046,14 @@ operationsByContract:
     offline: false
     reads: 3
     writes: 0
+  - operation: listProductApprovalWorkflows
+    verb: GET
+    path: /product-approval-workflows
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 0
+    writes: 0
   - operation: listProductCategories
     verb: GET
     path: /product-categories
@@ -1221,6 +1237,14 @@ operationsByContract:
     permission: PRODUCT_VIEW
     offline: false
     reads: 5
+    writes: 0
+  - operation: listSeatPricingRules
+    verb: GET
+    path: /seat-pricing-rules
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 1
     writes: 0
   - operation: listSignalDataQuality
     verb: GET
@@ -1534,11 +1558,27 @@ operationsByContract:
     offline: false
     reads: 4
     writes: 3
+  - operation: setEntitlementTemplateBlackoutDates
+    verb: PUT
+    path: /entitlement-templates/{templateId}/blackout-dates
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 0
   - operation: setEventCapacityProfile
     verb: PUT
     path: /events/{eventId}/capacity-profile
     scope: venue
     permission: CAPACITY_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: setEventChangeTreatmentPolicy
+    verb: PUT
+    path: /venues/{venueId}/event-change-treatment-policy
+    scope: venue
+    permission: PERFORMANCE_CONFIGURE
     offline: false
     reads: 1
     writes: 1
@@ -1702,14 +1742,6 @@ operationsByContract:
     offline: false
     reads: 4
     writes: 3
-  - operation: setPriceListMaster
-    verb: PUT
-    path: /price-list-master
-    scope: venue
-    permission: PRODUCT_CONFIGURE
-    offline: false
-    reads: 5
-    writes: 3
   - operation: setPrices
     verb: PUT
     path: /price-lists/{priceListId}/prices
@@ -1798,14 +1830,6 @@ operationsByContract:
     offline: false
     reads: 6
     writes: 3
-  - operation: setRateStructure
-    verb: PUT
-    path: /rate-structure
-    scope: venue
-    permission: PRODUCT_CONFIGURE
-    offline: false
-    reads: 6
-    writes: 3
   - operation: setRulePriorityConflict
     verb: PUT
     path: /rule-priority-conflict
@@ -1814,6 +1838,14 @@ operationsByContract:
     offline: false
     reads: 7
     writes: 5
+  - operation: setSeatPricingRule
+    verb: PUT
+    path: /seat-pricing-rules/{ruleId}
+    scope: venue
+    permission: PRICE_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
   - operation: setSignalRegistryPolicy
     verb: PUT
     path: /signal-registry
@@ -1975,7 +2007,7 @@ operationsByContract:
     reads: 1
     writes: 0
 - contract: promotions
-  count: 153
+  count: 143
   operations:
   - operation: analysePromotionConflicts
     verb: GET
@@ -2977,22 +3009,6 @@ operationsByContract:
     offline: false
     reads: 3
     writes: 3
-  - operation: setBundleComponent
-    verb: PUT
-    path: /bundle-component
-    scope: venue
-    permission: PRICE_CONFIGURE
-    offline: false
-    reads: 3
-    writes: 3
-  - operation: setBundleDefinition
-    verb: PUT
-    path: /bundle-definition
-    scope: venue
-    permission: PRICE_CONFIGURE
-    offline: false
-    reads: 3
-    writes: 3
   - operation: setBundlePartnerProductMappings
     verb: PUT
     path: /bundles/{bundleId}/partner-products
@@ -3000,14 +3016,6 @@ operationsByContract:
     permission: PRODUCT_CONFIGURE
     offline: false
     reads: 4
-    writes: 3
-  - operation: setBuyGetBogo
-    verb: PUT
-    path: /buy-get-bogo
-    scope: venue
-    permission: PRICE_CONFIGURE
-    offline: false
-    reads: 2
     writes: 3
   - operation: setCampaignBudgetFinancial
     verb: PUT
@@ -3025,54 +3033,6 @@ operationsByContract:
     offline: false
     reads: 3
     writes: 3
-  - operation: setCouponPromoCode
-    verb: PUT
-    path: /coupon-promo-code
-    scope: venue
-    permission: PRICE_CONFIGURE
-    offline: false
-    reads: 3
-    writes: 4
-  - operation: setCrossCategoryPromotion
-    verb: PUT
-    path: /cross-category-promotion
-    scope: venue
-    permission: PRICE_CONFIGURE
-    offline: false
-    reads: 2
-    writes: 3
-  - operation: setEligibilityRule
-    verb: PUT
-    path: /eligibility-rule
-    scope: venue
-    permission: PRICE_CONFIGURE
-    offline: false
-    reads: 3
-    writes: 3
-  - operation: setFixedPriceOffer
-    verb: PUT
-    path: /fixed-price-offer
-    scope: venue
-    permission: PRICE_CONFIGURE
-    offline: false
-    reads: 2
-    writes: 3
-  - operation: setGiftFreeProduct
-    verb: PUT
-    path: /gift-free-product
-    scope: venue
-    permission: PRICE_CONFIGURE
-    offline: false
-    reads: 2
-    writes: 3
-  - operation: setGuestChoiceBuild
-    verb: PUT
-    path: /guest-choice-build
-    scope: venue
-    permission: PRICE_CONFIGURE
-    offline: false
-    reads: 4
-    writes: 4
   - operation: setProductRelationships
     verb: PUT
     path: /product-relationships
@@ -3081,14 +3041,6 @@ operationsByContract:
     offline: false
     reads: 1
     writes: 2
-  - operation: setPromotionRule
-    verb: PUT
-    path: /promotion-rule
-    scope: venue
-    permission: PRICE_CONFIGURE
-    offline: false
-    reads: 3
-    writes: 3
   - operation: setPromotionStackingRule
     verb: PUT
     path: /promotion-stacking-rule
@@ -3679,7 +3631,6 @@ tables:
   - convertInventoryHold
   - copyPriceList
   - copySeatMapSection
-  - createBulkProductCatalogue
   - createBundle
   - createChannelCapacity
   - createChannelProfile
@@ -3739,10 +3690,7 @@ tables:
   - setAlternativeCodes
   - setBookingVelocityTime
   - setBundleCapacityPolicy
-  - setBundleComponent
-  - setBundleDefinition
   - setBundlePartnerProductMappings
-  - setBuyGetBogo
   - setCampaignBudgetFinancial
   - setCatalogueReview
   - setChannelAllocations
@@ -3753,21 +3701,15 @@ tables:
   - setChannelSyncSetting
   - setCodeDistributionManager
   - setConfigurationTemplate
-  - setCouponPromoCode
-  - setCrossCategoryPromotion
   - setCurrencyRoundingRule
   - setDemandOccupancyAvailability
   - setDemandSignalConfiguration
   - setDynamicPricingGuardrailPolicy
   - setDynamicPricingStrategy
-  - setEligibilityRule
   - setEventLifecycleState
   - setFeeApplicabilityCharging
   - setFeeDefinition
-  - setFixedPriceOffer
-  - setGiftFreeProduct
   - setGroupSeatRoster
-  - setGuestChoiceBuild
   - setLifecycleStatuWorkflow
   - setMapZones
   - setMarketPricingConfiguration
@@ -3776,7 +3718,6 @@ tables:
   - setPriceCategoryRateType
   - setPriceHierarchyInheritance
   - setPriceLadderMatrix
-  - setPriceListMaster
   - setPrices
   - setPricing
   - setPricingChangeRequest
@@ -3787,10 +3728,8 @@ tables:
   - setProductContextOwnership
   - setProductLinks
   - setProductServicePrice
-  - setPromotionRule
   - setPromotionStackingRule
   - setPromotionVariants
-  - setRateStructure
   - setRulePriorityConflict
   - setRuleTestRecommendation
   - setSeatingRules
@@ -3842,7 +3781,6 @@ tables:
   - commitImportJob
   - convertInventoryHold
   - copyPriceList
-  - createBulkProductCatalogue
   - createBundle
   - createChannelCapacity
   - createChannelProfile
@@ -3899,10 +3837,7 @@ tables:
   - setAlternativeCodes
   - setBookingVelocityTime
   - setBundleCapacityPolicy
-  - setBundleComponent
-  - setBundleDefinition
   - setBundlePartnerProductMappings
-  - setBuyGetBogo
   - setCampaignBudgetFinancial
   - setCatalogueReview
   - setChannelAllocations
@@ -3913,21 +3848,15 @@ tables:
   - setChannelSyncSetting
   - setCodeDistributionManager
   - setConfigurationTemplate
-  - setCouponPromoCode
-  - setCrossCategoryPromotion
   - setCurrencyRoundingRule
   - setDemandOccupancyAvailability
   - setDemandSignalConfiguration
   - setDynamicPricingGuardrailPolicy
   - setDynamicPricingStrategy
-  - setEligibilityRule
   - setEventLifecycleState
   - setFeeApplicabilityCharging
   - setFeeDefinition
-  - setFixedPriceOffer
-  - setGiftFreeProduct
   - setGroupSeatRoster
-  - setGuestChoiceBuild
   - setLifecycleStatuWorkflow
   - setMapZones
   - setMarketPricingConfiguration
@@ -3936,7 +3865,6 @@ tables:
   - setPriceCategoryRateType
   - setPriceHierarchyInheritance
   - setPriceLadderMatrix
-  - setPriceListMaster
   - setPrices
   - setPricing
   - setPricingChangeRequest
@@ -3947,10 +3875,8 @@ tables:
   - setProductContextOwnership
   - setProductLinks
   - setProductServicePrice
-  - setPromotionRule
   - setPromotionStackingRule
   - setPromotionVariants
-  - setRateStructure
   - setRulePriorityConflict
   - setRuleTestRecommendation
   - setSeatingRules
@@ -4168,6 +4094,13 @@ tables:
   columns: 12
   store: postgres
   parent: catalogue.event
+  writtenBy:
+  - catalogue
+  foreignWriters: null
+- table: catalogue.event_change_treatment_policy
+  columns: 4
+  store: postgres
+  parent: null
   writtenBy:
   - catalogue
   foreignWriters: null
@@ -4497,8 +4430,7 @@ tables:
   columns: 17
   store: postgres
   parent: null
-  writtenBy:
-  - catalogue
+  writtenBy: []
   foreignWriters: null
 - table: catalogue.rollback_action
   columns: 26
@@ -4516,6 +4448,13 @@ tables:
   foreignWriters: null
 - table: catalogue.sales_channel
   columns: 45
+  store: postgres
+  parent: null
+  writtenBy:
+  - catalogue
+  foreignWriters: null
+- table: catalogue.seat_pricing_rule
+  columns: 16
   store: postgres
   parent: null
   writtenBy:
@@ -4741,8 +4680,7 @@ tables:
   columns: 13
   store: postgres
   parent: promotions.promotion
-  writtenBy:
-  - promotions
+  writtenBy: []
   foreignWriters: null
 - table: promotions.promotion_variant
   columns: 5
@@ -5093,7 +5031,6 @@ screens:
 - P01:WEB-031 My Reservations
 - P01:WEB-032 Offers & Promotions
 - P01:WEB-035 Multi-Currency & Pricing
-- P01:WEB-040 Virtual Queue
 - P01:WEB-043 Loyalty & Rewards
 - P01:WEB-048 Book a Space by the Hour
 - P01:WEB-050 Plan Your Visit
@@ -5121,7 +5058,6 @@ screens:
 - P02:GST-056 Bundle Package
 - P02:GST-058 Resource Availability (Cabana)
 - P02:GST-063 Explore – Search Results
-- P02:GST-070 Reserve a Table
 - P02:GST-072 Share & Group Booking
 - P02:GST-075 Book a Space by the Hour
 - P04:POS-002 Sell — Ticket Catalogue
@@ -5137,8 +5073,265 @@ screens:
 - P06:EMP-018 Offline package
 - P06:EMP-033 Capacity view
 - P06:EMP-034 Walk-up sale
-- P08:BO-001 Queue Directory
-- P08:BO-002 Queue Configuration
+- P08:ADM-048 Commercial Pricing Command Center
+- P08:ADM-049 Price List Master Configuration
+- P08:ADM-050 Price Category & Rate Type Library
+- P08:ADM-051 Rate Structure Builder
+- P08:ADM-052 Product & Service Price Assignment
+- P08:ADM-053 Package, Bundle & Add-On Pricing
+- P08:ADM-054 Market, Venue & Currency Pricing Structure
+- P08:ADM-055 Price Hierarchy & Inheritance Configuration
+- P08:ADM-056 Price List Templates, Clone & Reuse
+- P08:ADM-057 Commercial Pricing Structure Validation
+- P08:ADM-058 Pricing Rule Command Center
+- P08:ADM-059 Customer Segment & Profile Pricing Rules
+- P08:ADM-060 Membership & Loyalty Pricing Rules
+- P08:ADM-061 Residency, Nationality & Market Pricing Rules
+- P08:ADM-062 Channel-Based Pricing Rules
+- P08:ADM-063 Location, Venue & Event Pricing Rules
+- P08:ADM-064 Quantity, Group & Volume Pricing Rules
+- P08:ADM-065 Effective Date, Season & Day-Based Pricing Rules
+- P08:ADM-066 Timeslot, Performance & Time-of-Day Pricing Rules
+- P08:ADM-067 Pricing Rule Priority, Conflict Resolution & Testing
+- P08:ADM-069 Tax Profile & Jurisdiction Configuration
+- P08:ADM-070 Tax Rule & Treatment Builder
+- P08:ADM-071 Fee & Surcharge Library
+- P08:ADM-072 Fee Applicability & Charging Rule Builder
+- P08:ADM-073 Fee Waiver, Tax Exemption & Exception Rules
+- P08:ADM-074 Price Calculation Sequence & Formula Engine
+- P08:ADM-075 Currency Precision, Rounding & Monetary Rules
+- P08:ADM-076 Price Breakdown, Calculation Simulation & Explainability
+- P08:ADM-077 Calculation Validation, Reconciliation & Service Interface
+- P08:ADM-078 Pricing Governance Command Center
+- P08:ADM-079 Pricing Change Request & Workspace
+- P08:ADM-080 Bulk Pricing Update, Import & Mass Maintenance
+- P08:ADM-081 Pricing Version & Baseline Management
+- P08:ADM-082 Pricing Change Impact Analysis
+- P08:ADM-083 Pricing Approval Workflow & Authority Matrix
+- P08:ADM-084 Pricing Publication & Effective-Date Scheduler
+- P08:ADM-085 Pricing Distribution, Synchronization & Publication Monitor
+- P08:ADM-086 Pricing Rollback & Emergency Control Center
+- P08:ADM-087 Pricing History, Audit & Compliance Explorer
+- P08:ADM-088 Dynamic Pricing Strategy Command Center
+- P08:ADM-089 Dynamic Pricing Strategy Builder
+- P08:ADM-090 Demand, Occupancy & Availability Rule Builder
+- P08:ADM-091 Booking Velocity & Time-to-Event Rule Builder
+- P08:ADM-092 Seasonal, Calendar, Day & Timeslot Dynamic Rules
+- P08:ADM-093 Channel, Customer Segment & Location Dynamic Rules
+- P08:ADM-094 Dynamic Price Bands, Ladders & Adjustment Matrix
+- P08:ADM-095 Dynamic Pricing Guardrails & Commercial Protection
+- P08:ADM-096 Dynamic Pricing Automation Policy & Control
+- P08:ADM-098 AI Pricing Intelligence Command Center
+- P08:ADM-099 Internal Demand & Booking Signal Hub
+- P08:ADM-100 Weather Intelligence & Demand Impact Configuration
+- P08:ADM-101 Nearby Event, Exhibition & Local Demand Intelligence
+- P08:ADM-102 Competitor Pricing & Market Position Intelligence
+- P08:ADM-103 Market, Tourism, Holiday & Contextual Signal Hub
+- P08:ADM-104 AI Demand Forecasting & Booking Curve Studio
+- P08:ADM-105 Price Elasticity & Revenue Response Intelligence
+- P08:ADM-106 AI Pricing Recommendation & Explainability Center
+- P08:ADM-107 AI Signal Registry, Data Quality & Model Governance
+- P08:ADM-108 Revenue Optimization Command Center
+- P08:ADM-109 Pricing Simulation Studio
+- P08:ADM-110 Scenario Modeling & What-If Analysis
+- P08:ADM-111 A/B Pricing Experiment Studio
+- P08:ADM-112 Revenue & Demand Impact Forecasting
+- P08:ADM-113 AI Recommendation Review & Decision Queue
+- P08:ADM-114 Automation Policy & Autonomous Pricing Orchestrator
+- P08:ADM-115 Live Dynamic Price Execution & Deployment Monitor
+- P08:ADM-116 Dynamic Pricing Performance & Optimization Analytics
+- P08:ADM-117 AI Learning, Model Performance & Optimization Feedback
+- P08:ADM-118 Product Lifecycle Command Center
+- P08:ADM-119 Product Creation Workspace
+- P08:ADM-120 Lifecycle Status & Workflow Configuration
+- P08:ADM-122 Product Import / Export & Environment Transfer
+- P08:ADM-123 Product Context, Ownership & Assignment
+- P08:ADM-124 Channel Publication & Availability
+- P08:ADM-125 Publication & Activation Scheduler
+- P08:ADM-126 Product Duplication & Template Library
+- P08:ADM-127 AI Catalogue Builder & Configuration Review
+- P08:ADM-128 Product Governance Command Center
+- P08:ADM-129 Approval Workflow Designer
+- P08:ADM-130 Approval Review & Decision Workspace
+- P08:ADM-131 Product Version Management
+- P08:ADM-132 Rollback & Recovery Management
+- P08:ADM-133 Change Impact Analysis
+- P08:ADM-134 Change Propagation & Dependency Control
+- P08:ADM-135 Product Retirement, Suspension & Archive
+- P08:ADM-136 Product Audit Trail & Change History
+- P08:ADM-137 Governance Risk, AI Monitoring & Control Center
+- P08:ADM-138 Promotion Command Center Dashboard
+- P08:ADM-139 Promotion & Campaign Directory
+- P08:ADM-140 Promotion Overview
+- P08:ADM-141 Promotion Lifecycle & Status Manager
+- P08:ADM-142 Campaign Calendar & Timeline
+- P08:ADM-143 Promotion Channel & Publication Monitor
+- P08:ADM-144 Promotion Alerts & Exception Center
+- P08:ADM-145 Promotion Approval Inbox
+- P08:ADM-146 Promotion Health & Performance Monitor
+- P08:ADM-147 Promotion Audit, Activity & Version History
+- P08:ADM-148 Promotion Rule Builder
+- P08:ADM-149 Percentage & Fixed Discount Configurator
+- P08:ADM-150 Cart & Transaction Threshold Rules
+- P08:ADM-151 Volume, Bulk & Tier Discount Configurator
+- P08:ADM-152 Time-Based & Seasonal Discount Rules
+- P08:ADM-153 Customer, Membership & Segment Discount Rules
+- P08:ADM-154 Payment Method, Bank & Partner Discount Rules
+- P08:ADM-155 Special Price & Guest Offer Configurator
+- P08:ADM-156 Discount Limits, Guardrails & Commercial Controls
+- P08:ADM-157 Rule Test, Simulation & AI Recommendation Workspace
+- P08:ADM-158 Coupon & Promo Code Command Center
+- P08:ADM-159 Coupon & Promo Code Builder
+- P08:ADM-160 Unique Code Generation & Batch Manager
+- P08:ADM-161 Code Eligibility & Restriction Manager
+- P08:ADM-162 Usage, Capacity & Frequency Control
+- P08:ADM-163 Validity, Date & Time Control
+- P08:ADM-164 Code Distribution & Assignment Manager
+- P08:ADM-165 Redemption Monitor & Code Lookup
+- P08:ADM-166 Code Security, Fraud & Exception Center
+- P08:ADM-167 Redemption Analytics, Audit & AI Optimization
+- P08:ADM-168 Advanced Offer Command Center
+- P08:ADM-170 Multi-Buy & Quantity Offer Configurator
+- P08:ADM-171 Cheapest / Lowest-Value Item Promotion
+- P08:ADM-175 Reward Selection, Substitution & Customer Choice
+- P08:ADM-176 Advanced Offer Guardrails & Conflict Controls
+- P08:ADM-177 Offer Simulation, Basket Trace & AI Optimization
+- P08:ADM-178 Bundle & Combo Command Center
+- P08:ADM-179 Bundle Definition & Setup
+- P08:ADM-180 Bundle Component Builder
+- P08:ADM-181 Guest Choice & Build-Your-Own Bundle Designer
+- P08:ADM-182 Bundle Pricing & Commercial Model
+- P08:ADM-183 Bundle Availability, Capacity & Validation
+- P08:ADM-184 Bundle Validity, Scheduling & Redemption Rules
+- P08:ADM-185 Partner & External Product Bundle Manager
+- P08:ADM-186 Revenue Allocation, Cost & Settlement Rules
+- P08:ADM-187 Bundle Preview, Simulation & AI Recommendation
+- P08:ADM-188 Dynamic Bundle Operations Command Center
+- P08:ADM-189 Component Inventory & Availability Matrix
+- P08:ADM-190 Bundle Sellability & Dependency Rule Engine
+- P08:ADM-191 Capacity Pool & Reservation Manager
+- P08:ADM-192 Dynamic Component Substitution Engine
+- P08:ADM-193 Dynamic Bundle Rule & Composition Engine
+- P08:ADM-194 Real-Time Availability & Checkout Validation
+- P08:ADM-195 Bundle Availability by Channel, Venue & Partner
+- P08:ADM-196 Bundle Availability Forecast, Alerts & Recovery
+- P08:ADM-197 Dynamic Bundle Simulation & AI Optimization
+- P08:ADM-198 Targeting & Eligibility Command Center
+- P08:ADM-200 CRM & Customer Segment Manager
+- P08:ADM-201 Membership, Loyalty & Guest Eligibility
+- P08:ADM-202 Behavioral & Transaction Targeting
+- P08:ADM-203 Context, Location, Channel & Time Targeting
+- P08:ADM-204 Partner, B2B & Payment Eligibility
+- P08:ADM-205 Audience Preview, Reach & Eligibility Simulator
+- P08:ADM-206 Targeting Conflict, Frequency & Exclusion Controls
+- P08:ADM-207 AI Audience Discovery & Targeting Optimization
+- P08:ADM-208 Stacking & Conflict Command Center
+- P08:ADM-209 Promotion Priority & Hierarchy Manager
+- P08:ADM-210 Promotion Stacking Rule Builder
+- P08:ADM-211 Promotion Exclusion & Compatibility Matrix
+- P08:ADM-212 Discount Calculation & Application Sequence
+- P08:ADM-213 Best Offer & Customer Benefit Resolver
+- P08:ADM-214 Discount Cap & Maximum Benefit Controller
+- P08:ADM-215 Conflict Detection & Resolution Center
+- P08:ADM-216 Promotion Decision Trace & Transaction Explainer
+- P08:ADM-217 Conflict Simulation & AI Optimization
+- P08:ADM-218 Campaign Governance & Budget Command Center
+- P08:ADM-219 Campaign Budget & Financial Limit Setup
+- P08:ADM-220 Redemption, Discount & Exposure Limit Manager
+- P08:ADM-221 Budget Consumption & Forecast Monitor
+- P08:ADM-222 Threshold Actions & Automatic Suspension
+- P08:ADM-223 Campaign Approval Workflow Designer
+- P08:ADM-224 Approval Inbox & Decision Workspace
+- P08:ADM-225 Campaign Financial & Commercial Simulator
+- P08:ADM-226 Campaign Experiment & A/B Test Manager
+- P08:ADM-227 Governance Audit, AI Risk & Launch Readiness
+- P08:ADM-228 Promotion Performance Command Center
+- P08:ADM-229 Campaign & Promotion Performance Explorer
+- P08:ADM-230 Redemption, Conversion & Funnel Analytics
+- P08:ADM-231 Discount, Margin & Profitability Analytics
+- P08:ADM-232 Bundle, BOGO & Advanced Offer Analytics
+- P08:ADM-233 Upsell, Cross-Sell & Attach-Rate Analytics
+- P08:ADM-234 Customer, Segment, Channel & Partner Analytics
+- P08:ADM-235 Incrementality, Attribution & Cannibalization Analysis
+- P08:ADM-236 AI Optimization & Next-Best-Action Center
+- P08:ADM-237 Executive Promotion Intelligence & Reporting Studio
+- P08:ADM-258 Sales Channel Command Center
+- P08:ADM-259 Channel Creation & Profile Configuration
+- P08:ADM-260 Product & Catalogue Assignment
+- P08:ADM-261 Channel Pricing & Commercial Profile Assignment
+- P08:ADM-262 Inventory, Capacity & Channel Allocation
+- P08:ADM-263 Channel Sales Schedule & Availability Windows
+- P08:ADM-264 Customer & Eligibility Rules by Channel
+- P08:ADM-265 Channel Sales Rules, Limits & Restrictions
+- P08:ADM-266 Channel Fees, Payment & Fulfillment Configuration
+- P08:ADM-267 Channel Publication, Readiness & AI Validation
+- P08:ADM-268 Channel Operations Command Center
+- P08:ADM-269 Channel Connection & Integration Manager
+- P08:ADM-270 Product, Price & Availability Synchronization
+- P08:ADM-271 Real-Time Channel Availability & Inventory Monitor
+- P08:ADM-272 Channel Allocation & Rebalancing Operations
+- P08:ADM-273 Channel Exceptions, Incidents & Recovery
+- P08:ADM-274 Channel Performance & Commercial Analytics
+- P08:ADM-275 Channel Audit, Logs & Transaction Traceability
+- P08:ADM-276 Channel Governance, SLA & Partner Control
+- P08:ADM-277 AI Channel Optimization & Intelligence Center
+- P08:ADM-319 Approval Workflow Library
+- P08:ADM-365 Risk & Governance Analytics
+- P08:ADM-639 Recommendation Command Center
+- P08:ADM-640 Recommendation Strategy Manager
+- P08:ADM-641 Recommendation Objective & KPI Configuration
+- P08:ADM-642 Recommendation Type & Product Relationship Manager
+- P08:ADM-643 Recommendation Placement & Touchpoint Manager
+- P08:ADM-644 Channel & Journey Strategy Manager
+- P08:ADM-645 Recommendation Priority, Ranking & Suppression Manager17
+- P08:ADM-646 Recommendation Guardrails & Business Controls
+- P08:ADM-647 Recommendation Policy, AI Control & Governance
+- P08:ADM-648 Recommendation Strategy Simulator & AI Advisor
+- P08:ADM-649 Upsell & Upgrade Command Center
+- P08:ADM-650 Upgrade Path & Product Ladder Builder
+- P08:ADM-651 Upsell Eligibility & Qualification Rules
+- P08:ADM-652 Upgrade Price Difference & Value Proposition Manager
+- P08:ADM-653 Ticket, Experience & Bundle Upgrade Manager
+- P08:ADM-654 Membership & Pass Upgrade Engine
+- P08:ADM-655 Pre-Purchase, Cart & Checkout Upsell Manager
+- P08:ADM-656 Post-Purchase & In-Journey Upgrade Manager
+- P08:ADM-657 Upsell Ranking, Propensity & AI Opportunity Engine
+- P08:ADM-658 Upgrade Simulator, Comparison & AI Advisor
+- P08:ADM-659 Cross-Sell Command Center
+- P08:ADM-660 Cross-Sell Relationship Builder
+- P08:ADM-661 Product Affinity Matrix & Relationship Map
+- P08:ADM-662 Frequently Bought Together & Basket Pattern Engine
+- P08:ADM-663 Cross-Category Recommendation Manager
+- P08:ADM-664 Multi-Attraction, Destination & Partner Cross-Sell
+- P08:ADM-665 Basket-Aware Cross-Sell & Duplicate Prevention
+- P08:ADM-666 Availability, Inventory & Capacity-Aware Cross-Sell
+- P08:ADM-667 AI Cross-Sell Discovery, Scoring & Ranking Engine
+- P08:ADM-668 Cross-Sell Simulator & AI Opportunity Advisor
+- P08:ADM-669 Journey & Context Command Center
+- P08:ADM-670 Customer Journey Map & Touchpoint Designer
+- P08:ADM-671 Real-Time Context Rule Engine
+- P08:ADM-672 Pre-Purchase & Booking Journey Recommendation Manager
+- P08:ADM-673 Post-Purchase & Pre-Visit Recommendation Manager
+- P08:ADM-674 In-Venue & Location-Aware Recommendation Engine
+- P08:ADM-675 Visit State, Itinerary & Time-Aware Recommendation
+- P08:ADM-676 Omnichannel Recommendation Synchronization
+- P08:ADM-677 Contextual Trigger, Frequency & Experience Controls
+- P08:ADM-678 Journey Simulator, Decision Trace & AI Optimization
+- P08:ADM-679 Personalization & NBO Command Center
+- P08:ADM-681 Customer Feature & Signal Configuration
+- P08:ADM-682 Propensity Model & Customer Intent Manager
+- P08:ADM-683 Next-Best-Offer Decision Studio
+- P08:ADM-684 Personalized Ranking & Decision Policy Builder
+- P08:ADM-685 Customer Preference, Fatigue & Suppression Intelligence
+- P08:ADM-688 Personalization Simulator & Next-Best-Offer Lab
+- P08:ADM-689 Recommendation Performance Command Center
+- P08:ADM-690 Recommendation Strategy & Placement Analytics
+- P08:ADM-691 Recommendation Experiment & A/B Test Studio
+- P08:ADM-692 Experiment Results & Winner Decision Workspace
+- P08:ADM-693 Recommendation Attribution & Incrementality Analytics
+- P08:ADM-694 AI Model Performance & Drift Monitor
+- P08:ADM-695 Recommendation Governance & Deployment Control
+- P08:ADM-698 AI Optimization & Recommendation Intelligence Lab
 - P08:BO-007 Product Directory
 - P08:BO-008 Product Detail & Variants
 - P08:BO-009 Pricing Rules
@@ -5153,7 +5346,6 @@ screens:
 - P08:BO-018 Allocation & Holds
 - P08:BO-019 Closures & Blackouts
 - P08:BO-037 Offline Package Status
-- P08:BO-063 Opening Hours & Calendar
 - P08:BO-094 Map Editor & Publish
 - P08:BO-1000 Mobile & Accessible Selection
 - P08:BO-1001 View Preview, Compare & Heat Map
@@ -5213,8 +5405,6 @@ screens:
 - P08:BO-1061 Platform Command Center
 - P08:BO-1064 Naming, Numbering & Localization
 - P08:BO-1070 Setup, Clone & Inheritance
-- P08:BO-1072 Seat Management APIs
-- P08:BO-1079 Immutable Seat Audit Logs
 - P08:BO-115 Category, Brand & Merchandise Hierarchy
 - P08:BO-117 Product Import, Governance & AI Configuration Assistant
 - P08:BO-1187 Transport Departure Board
@@ -5222,23 +5412,19 @@ screens:
 - P08:BO-1190 Donation Campaigns
 - P08:BO-125 Product & Category Button Configuration
 - P08:BO-161 Guest, Companion & Eligibility Rules
+- P08:BO-268 Group Package & Experience Builder
 - P08:BO-285 Membership Product & Tier Builder
 - P08:BO-288 Membership Entitlement & Admission Benefit Builder
 - P08:BO-289 Membership Usage, Visit & Consumption Rules
 - P08:BO-291 Membership Commercial, Pricing & Channel Association
 - P08:BO-298 Membership Freeze, Suspension & Reactivation Management
 - P08:BO-301 Member Exceptions, Overrides & Service Recovery
-- P08:BO-374 Approval Decision Workspace
 - P08:BO-441 Price Priority & Conflict Rules
 - P08:BO-443 Pricing Audit, Approval & Publication
-- P08:BO-444 Redemption Operations Dashboard
 - P08:BO-518 Real-Time Availability Calendar
-- P08:BO-528 Dynamic Pricing & AI Recommendation
-- P08:BO-533 Pricing Simulation, Validation & AI Commercial Intelligence
 - P08:BO-591 Rental Forecasting & Demand Intelligence
 - P08:BO-601 Product, Pricing & Sales Channel Setup
 - P08:BO-637 Approval Workflow Builder
-- P08:BO-642 Approval Decision History
 - P08:BO-694 Event Catalogue Command Center
 - P08:BO-695 Event Type & Behaviour Configuration
 - P08:BO-696 Event Duplication & Clone Configuration
@@ -5270,7 +5456,6 @@ screens:
 - P08:BO-724 Walk-In / There-and-Then Booking Configuration
 - P08:BO-725 Performance Operations Command Center
 - P08:BO-726 Participant Photo & Video Assignment
-- P08:BO-737 Customer 360 Profile
 - P08:BO-761 AI Audience Discovery
 - P08:BO-765 Campaign Library & Calendar
 - P08:BO-770 Campaign Approval Workflow
@@ -5297,7 +5482,6 @@ screens:
 - P08:BO-967 AI Section Recognition
 - P08:BO-968 AI Row & Seat Recognition
 - P08:BO-969 AI Aisle, VIP & Accessibility
-- P08:BO-970 AI Numbering & Labeling
 - P08:BO-971 Validation & Correction
 - P08:BO-972 AI Venue Designer & Publish
 - P08:BO-973 Layout Command Center
@@ -5308,6 +5492,7 @@ screens:
 - P08:BO-978 Multi-Performance Assignment
 - P08:BO-979 Temporary Seat Blocking
 - P08:BO-980 Scheduled Seat Release
+- P08:BO-981 Conflict & Impact Simulation
 - P08:BO-982 Approval, Publish & Rollback
 - P08:BO-983 Inventory Command Center
 - P08:BO-984 Real-Time Seat Map
@@ -5324,277 +5509,8 @@ screens:
 - P08:BO-995 Find Seats For Me
 - P08:BO-996 Filters & Interactive Legend
 - P08:BO-997 Real-Time Availability & Locking
-- P08:BO-998 Lock Timeout & Concurrency
 - P08:BO-999 Cart & Multi-Seat Management
-- P09:ADM-048 Commercial Pricing Command Center
-- P09:ADM-049 Price List Master Configuration
-- P09:ADM-050 Price Category & Rate Type Library
-- P09:ADM-051 Rate Structure Builder
-- P09:ADM-052 Product & Service Price Assignment
-- P09:ADM-053 Package, Bundle & Add-On Pricing
-- P09:ADM-054 Market, Venue & Currency Pricing Structure
-- P09:ADM-055 Price Hierarchy & Inheritance Configuration
-- P09:ADM-056 Price List Templates, Clone & Reuse
-- P09:ADM-057 Commercial Pricing Structure Validation
-- P09:ADM-058 Pricing Rule Command Center
-- P09:ADM-059 Customer Segment & Profile Pricing Rules
-- P09:ADM-060 Membership & Loyalty Pricing Rules
-- P09:ADM-061 Residency, Nationality & Market Pricing Rules
-- P09:ADM-062 Channel-Based Pricing Rules
-- P09:ADM-063 Location, Venue & Event Pricing Rules
-- P09:ADM-064 Quantity, Group & Volume Pricing Rules
-- P09:ADM-065 Effective Date, Season & Day-Based Pricing Rules
-- P09:ADM-066 Timeslot, Performance & Time-of-Day Pricing Rules
-- P09:ADM-067 Pricing Rule Priority, Conflict Resolution & Testing
 - P09:ADM-068 Tax, Fee & Calculation Command Center
-- P09:ADM-069 Tax Profile & Jurisdiction Configuration
-- P09:ADM-070 Tax Rule & Treatment Builder
-- P09:ADM-071 Fee & Surcharge Library
-- P09:ADM-072 Fee Applicability & Charging Rule Builder
-- P09:ADM-073 Fee Waiver, Tax Exemption & Exception Rules
-- P09:ADM-074 Price Calculation Sequence & Formula Engine
-- P09:ADM-075 Currency Precision, Rounding & Monetary Rules
-- P09:ADM-076 Price Breakdown, Calculation Simulation & Explainability
-- P09:ADM-077 Calculation Validation, Reconciliation & Service Interface
-- P09:ADM-078 Pricing Governance Command Center
-- P09:ADM-079 Pricing Change Request & Workspace
-- P09:ADM-080 Bulk Pricing Update, Import & Mass Maintenance
-- P09:ADM-081 Pricing Version & Baseline Management
-- P09:ADM-082 Pricing Change Impact Analysis
-- P09:ADM-083 Pricing Approval Workflow & Authority Matrix
-- P09:ADM-084 Pricing Publication & Effective-Date Scheduler
-- P09:ADM-085 Pricing Distribution, Synchronization & Publication Monitor
-- P09:ADM-086 Pricing Rollback & Emergency Control Center
-- P09:ADM-087 Pricing History, Audit & Compliance Explorer
-- P09:ADM-088 Dynamic Pricing Strategy Command Center
-- P09:ADM-089 Dynamic Pricing Strategy Builder
-- P09:ADM-090 Demand, Occupancy & Availability Rule Builder
-- P09:ADM-091 Booking Velocity & Time-to-Event Rule Builder
-- P09:ADM-092 Seasonal, Calendar, Day & Timeslot Dynamic Rules
-- P09:ADM-093 Channel, Customer Segment & Location Dynamic Rules
-- P09:ADM-094 Dynamic Price Bands, Ladders & Adjustment Matrix
-- P09:ADM-095 Dynamic Pricing Guardrails & Commercial Protection
-- P09:ADM-096 Dynamic Pricing Automation Policy & Control
-- P09:ADM-097 Rule Priority, Conflict Resolution & Dynamic Pricing Test Console
-- P09:ADM-098 AI Pricing Intelligence Command Center
-- P09:ADM-099 Internal Demand & Booking Signal Hub
-- P09:ADM-100 Weather Intelligence & Demand Impact Configuration
-- P09:ADM-101 Nearby Event, Exhibition & Local Demand Intelligence
-- P09:ADM-102 Competitor Pricing & Market Position Intelligence
-- P09:ADM-103 Market, Tourism, Holiday & Contextual Signal Hub
-- P09:ADM-104 AI Demand Forecasting & Booking Curve Studio
-- P09:ADM-105 Price Elasticity & Revenue Response Intelligence
-- P09:ADM-106 AI Pricing Recommendation & Explainability Center
-- P09:ADM-107 AI Signal Registry, Data Quality & Model Governance
-- P09:ADM-108 Revenue Optimization Command Center
-- P09:ADM-109 Pricing Simulation Studio
-- P09:ADM-110 Scenario Modeling & What-If Analysis
-- P09:ADM-111 A/B Pricing Experiment Studio
-- P09:ADM-112 Revenue & Demand Impact Forecasting
-- P09:ADM-113 AI Recommendation Review & Decision Queue
-- P09:ADM-114 Automation Policy & Autonomous Pricing Orchestrator
-- P09:ADM-115 Live Dynamic Price Execution & Deployment Monitor
-- P09:ADM-116 Dynamic Pricing Performance & Optimization Analytics
-- P09:ADM-117 AI Learning, Model Performance & Optimization Feedback
-- P09:ADM-118 Product Lifecycle Command Center
-- P09:ADM-119 Product Creation Workspace
-- P09:ADM-120 Lifecycle Status & Workflow Configuration
-- P09:ADM-121 Bulk Product Creation & Catalogue Import
-- P09:ADM-122 Product Import / Export & Environment Transfer
-- P09:ADM-123 Product Context, Ownership & Assignment
-- P09:ADM-124 Channel Publication & Availability
-- P09:ADM-125 Publication & Activation Scheduler
-- P09:ADM-126 Product Duplication & Template Library
-- P09:ADM-127 AI Catalogue Builder & Configuration Review
-- P09:ADM-128 Product Governance Command Center
-- P09:ADM-129 Approval Workflow Designer
-- P09:ADM-130 Approval Review & Decision Workspace
-- P09:ADM-131 Product Version Management
-- P09:ADM-132 Rollback & Recovery Management
-- P09:ADM-133 Change Impact Analysis
-- P09:ADM-134 Change Propagation & Dependency Control
-- P09:ADM-135 Product Retirement, Suspension & Archive
-- P09:ADM-136 Product Audit Trail & Change History
-- P09:ADM-137 Governance Risk, AI Monitoring & Control Center
-- P09:ADM-138 Promotion Command Center Dashboard
-- P09:ADM-139 Promotion & Campaign Directory
-- P09:ADM-140 Promotion Overview
-- P09:ADM-141 Promotion Lifecycle & Status Manager
-- P09:ADM-142 Campaign Calendar & Timeline
-- P09:ADM-143 Promotion Channel & Publication Monitor
-- P09:ADM-144 Promotion Alerts & Exception Center
-- P09:ADM-145 Promotion Approval Inbox
-- P09:ADM-146 Promotion Health & Performance Monitor
-- P09:ADM-147 Promotion Audit, Activity & Version History
-- P09:ADM-148 Promotion Rule Builder
-- P09:ADM-149 Percentage & Fixed Discount Configurator
-- P09:ADM-150 Cart & Transaction Threshold Rules
-- P09:ADM-151 Volume, Bulk & Tier Discount Configurator
-- P09:ADM-152 Time-Based & Seasonal Discount Rules
-- P09:ADM-153 Customer, Membership & Segment Discount Rules
-- P09:ADM-154 Payment Method, Bank & Partner Discount Rules
-- P09:ADM-155 Special Price & Guest Offer Configurator
-- P09:ADM-156 Discount Limits, Guardrails & Commercial Controls
-- P09:ADM-157 Rule Test, Simulation & AI Recommendation Workspace
-- P09:ADM-158 Coupon & Promo Code Command Center
-- P09:ADM-159 Coupon & Promo Code Builder
-- P09:ADM-160 Unique Code Generation & Batch Manager
-- P09:ADM-161 Code Eligibility & Restriction Manager
-- P09:ADM-162 Usage, Capacity & Frequency Control
-- P09:ADM-163 Validity, Date & Time Control
-- P09:ADM-164 Code Distribution & Assignment Manager
-- P09:ADM-165 Redemption Monitor & Code Lookup
-- P09:ADM-166 Code Security, Fraud & Exception Center
-- P09:ADM-167 Redemption Analytics, Audit & AI Optimization
-- P09:ADM-168 Advanced Offer Command Center
-- P09:ADM-169 Buy X Get Y / BOGO Rule Builder
-- P09:ADM-170 Multi-Buy & Quantity Offer Configurator
-- P09:ADM-171 Cheapest / Lowest-Value Item Promotion
-- P09:ADM-172 Fixed-Price & “N for X” Offer Builder
-- P09:ADM-173 Gift, Free Product & Added-Value Offer Builder
-- P09:ADM-174 Cross-Category Promotion Builder
-- P09:ADM-175 Reward Selection, Substitution & Customer Choice
-- P09:ADM-176 Advanced Offer Guardrails & Conflict Controls
-- P09:ADM-177 Offer Simulation, Basket Trace & AI Optimization
-- P09:ADM-178 Bundle & Combo Command Center
-- P09:ADM-179 Bundle Definition & Setup
-- P09:ADM-180 Bundle Component Builder
-- P09:ADM-181 Guest Choice & Build-Your-Own Bundle Designer
-- P09:ADM-182 Bundle Pricing & Commercial Model
-- P09:ADM-183 Bundle Availability, Capacity & Validation
-- P09:ADM-184 Bundle Validity, Scheduling & Redemption Rules
-- P09:ADM-185 Partner & External Product Bundle Manager
-- P09:ADM-186 Revenue Allocation, Cost & Settlement Rules
-- P09:ADM-187 Bundle Preview, Simulation & AI Recommendation
-- P09:ADM-188 Dynamic Bundle Operations Command Center
-- P09:ADM-189 Component Inventory & Availability Matrix
-- P09:ADM-190 Bundle Sellability & Dependency Rule Engine
-- P09:ADM-191 Capacity Pool & Reservation Manager
-- P09:ADM-192 Dynamic Component Substitution Engine
-- P09:ADM-193 Dynamic Bundle Rule & Composition Engine
-- P09:ADM-194 Real-Time Availability & Checkout Validation
-- P09:ADM-195 Bundle Availability by Channel, Venue & Partner
-- P09:ADM-196 Bundle Availability Forecast, Alerts & Recovery
-- P09:ADM-197 Dynamic Bundle Simulation & AI Optimization
-- P09:ADM-198 Targeting & Eligibility Command Center
-- P09:ADM-199 Eligibility Rule Builder
-- P09:ADM-200 CRM & Customer Segment Manager
-- P09:ADM-201 Membership, Loyalty & Guest Eligibility
-- P09:ADM-202 Behavioral & Transaction Targeting
-- P09:ADM-203 Context, Location, Channel & Time Targeting
-- P09:ADM-204 Partner, B2B & Payment Eligibility
-- P09:ADM-205 Audience Preview, Reach & Eligibility Simulator
-- P09:ADM-206 Targeting Conflict, Frequency & Exclusion Controls
-- P09:ADM-207 AI Audience Discovery & Targeting Optimization
-- P09:ADM-208 Stacking & Conflict Command Center
-- P09:ADM-209 Promotion Priority & Hierarchy Manager
-- P09:ADM-210 Promotion Stacking Rule Builder
-- P09:ADM-211 Promotion Exclusion & Compatibility Matrix
-- P09:ADM-212 Discount Calculation & Application Sequence
-- P09:ADM-213 Best Offer & Customer Benefit Resolver
-- P09:ADM-214 Discount Cap & Maximum Benefit Controller
-- P09:ADM-215 Conflict Detection & Resolution Center
-- P09:ADM-216 Promotion Decision Trace & Transaction Explainer
-- P09:ADM-217 Conflict Simulation & AI Optimization
-- P09:ADM-218 Campaign Governance & Budget Command Center
-- P09:ADM-219 Campaign Budget & Financial Limit Setup
-- P09:ADM-220 Redemption, Discount & Exposure Limit Manager
-- P09:ADM-221 Budget Consumption & Forecast Monitor
-- P09:ADM-222 Threshold Actions & Automatic Suspension
-- P09:ADM-223 Campaign Approval Workflow Designer
-- P09:ADM-224 Approval Inbox & Decision Workspace
-- P09:ADM-225 Campaign Financial & Commercial Simulator
-- P09:ADM-226 Campaign Experiment & A/B Test Manager
-- P09:ADM-227 Governance Audit, AI Risk & Launch Readiness
-- P09:ADM-228 Promotion Performance Command Center
-- P09:ADM-229 Campaign & Promotion Performance Explorer
-- P09:ADM-230 Redemption, Conversion & Funnel Analytics
-- P09:ADM-231 Discount, Margin & Profitability Analytics
-- P09:ADM-232 Bundle, BOGO & Advanced Offer Analytics
-- P09:ADM-233 Upsell, Cross-Sell & Attach-Rate Analytics
-- P09:ADM-234 Customer, Segment, Channel & Partner Analytics
-- P09:ADM-235 Incrementality, Attribution & Cannibalization Analysis
-- P09:ADM-236 AI Optimization & Next-Best-Action Center
-- P09:ADM-237 Executive Promotion Intelligence & Reporting Studio
-- P09:ADM-258 Sales Channel Command Center
-- P09:ADM-259 Channel Creation & Profile Configuration
-- P09:ADM-260 Product & Catalogue Assignment
-- P09:ADM-261 Channel Pricing & Commercial Profile Assignment
-- P09:ADM-262 Inventory, Capacity & Channel Allocation
-- P09:ADM-263 Channel Sales Schedule & Availability Windows
-- P09:ADM-264 Customer & Eligibility Rules by Channel
-- P09:ADM-265 Channel Sales Rules, Limits & Restrictions
-- P09:ADM-266 Channel Fees, Payment & Fulfillment Configuration
-- P09:ADM-267 Channel Publication, Readiness & AI Validation
-- P09:ADM-268 Channel Operations Command Center
-- P09:ADM-269 Channel Connection & Integration Manager
-- P09:ADM-270 Product, Price & Availability Synchronization
-- P09:ADM-271 Real-Time Channel Availability & Inventory Monitor
-- P09:ADM-272 Channel Allocation & Rebalancing Operations
-- P09:ADM-273 Channel Exceptions, Incidents & Recovery
-- P09:ADM-274 Channel Performance & Commercial Analytics
-- P09:ADM-275 Channel Audit, Logs & Transaction Traceability
-- P09:ADM-276 Channel Governance, SLA & Partner Control
-- P09:ADM-277 AI Channel Optimization & Intelligence Center
-- P09:ADM-279 Resale Eligibility Rule Configuration
-- P09:ADM-319 Approval Workflow Library
-- P09:ADM-365 Risk & Governance Analytics
-- P09:ADM-383 Sales Channel Assessment
-- P09:ADM-483 Pricing & Commercial Configuration
-- P09:ADM-492 Configuration Approval Workflow
-- P09:ADM-549 AI Governance Monitoring Command Center
-- P09:ADM-639 Recommendation Command Center
-- P09:ADM-640 Recommendation Strategy Manager
-- P09:ADM-641 Recommendation Objective & KPI Configuration
-- P09:ADM-642 Recommendation Type & Product Relationship Manager
-- P09:ADM-643 Recommendation Placement & Touchpoint Manager
-- P09:ADM-644 Channel & Journey Strategy Manager
-- P09:ADM-645 Recommendation Priority, Ranking & Suppression Manager17
-- P09:ADM-646 Recommendation Guardrails & Business Controls
-- P09:ADM-647 Recommendation Policy, AI Control & Governance
-- P09:ADM-648 Recommendation Strategy Simulator & AI Advisor
-- P09:ADM-649 Upsell & Upgrade Command Center
-- P09:ADM-650 Upgrade Path & Product Ladder Builder
-- P09:ADM-651 Upsell Eligibility & Qualification Rules
-- P09:ADM-655 Pre-Purchase, Cart & Checkout Upsell Manager
-- P09:ADM-656 Post-Purchase & In-Journey Upgrade Manager
-- P09:ADM-657 Upsell Ranking, Propensity & AI Opportunity Engine
-- P09:ADM-658 Upgrade Simulator, Comparison & AI Advisor
-- P09:ADM-659 Cross-Sell Command Center
-- P09:ADM-660 Cross-Sell Relationship Builder
-- P09:ADM-661 Product Affinity Matrix & Relationship Map
-- P09:ADM-662 Frequently Bought Together & Basket Pattern Engine
-- P09:ADM-663 Cross-Category Recommendation Manager
-- P09:ADM-664 Multi-Attraction, Destination & Partner Cross-Sell
-- P09:ADM-665 Basket-Aware Cross-Sell & Duplicate Prevention
-- P09:ADM-666 Availability, Inventory & Capacity-Aware Cross-Sell
-- P09:ADM-667 AI Cross-Sell Discovery, Scoring & Ranking Engine
-- P09:ADM-668 Cross-Sell Simulator & AI Opportunity Advisor
-- P09:ADM-669 Journey & Context Command Center
-- P09:ADM-670 Customer Journey Map & Touchpoint Designer
-- P09:ADM-671 Real-Time Context Rule Engine
-- P09:ADM-672 Pre-Purchase & Booking Journey Recommendation Manager
-- P09:ADM-673 Post-Purchase & Pre-Visit Recommendation Manager
-- P09:ADM-674 In-Venue & Location-Aware Recommendation Engine
-- P09:ADM-675 Visit State, Itinerary & Time-Aware Recommendation
-- P09:ADM-676 Omnichannel Recommendation Synchronization
-- P09:ADM-677 Contextual Trigger, Frequency & Experience Controls
-- P09:ADM-678 Journey Simulator, Decision Trace & AI Optimization
-- P09:ADM-679 Personalization & NBO Command Center
-- P09:ADM-681 Customer Feature & Signal Configuration
-- P09:ADM-682 Propensity Model & Customer Intent Manager
-- P09:ADM-683 Next-Best-Offer Decision Studio
-- P09:ADM-684 Personalized Ranking & Decision Policy Builder
-- P09:ADM-685 Customer Preference, Fatigue & Suppression Intelligence
-- P09:ADM-688 Personalization Simulator & Next-Best-Offer Lab
-- P09:ADM-689 Recommendation Performance Command Center
-- P09:ADM-690 Recommendation Strategy & Placement Analytics
-- P09:ADM-691 Recommendation Experiment & A/B Test Studio
-- P09:ADM-692 Experiment Results & Winner Decision Workspace
-- P09:ADM-693 Recommendation Attribution & Incrementality Analytics
-- P09:ADM-694 AI Model Performance & Drift Monitor
-- P09:ADM-695 Recommendation Governance & Deployment Control
-- P09:ADM-698 AI Optimization & Recommendation Intelligence Lab
 - P10:PTR-005 Inventory & Allocation View
 - P10:PTR-006 Product Catalog (B2B Pricing)
 - P10:PTR-007 Availability Search
@@ -5604,7 +5520,6 @@ screens:
 - P13:CMS-103 Booking Flows
 - P16:ANL-004 Product Performance
 - P16:ANL-018 Alerts & Exception Center
-- P17:SGN-005 Sales Channel Assessment
 flows:
 - F01 Guest buys a ticket online
 - F02 Guest buys seated tickets

@@ -158,7 +158,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; login · listSsoProviders · startSsoAuthorization · completeSsoAuthorization +4</div>
+          <div><b>OPERATIONS</b> &middot; login · listSsoProviders · startSsoAuthorization · completeSsoAuthorization +5</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · emptyFirstRun · error · denied · emptyNoAccess · emptyNoResults · sessionHeld</span></div>
           <div><b>ARRIVES WITH</b> &middot; challengeId&larr;navigation, providerId&larr;deepLink</div>
           <div><b>GOES TO</b> &middot; entry point · <a href="#emp-002">EMP-002</a>  &mdash; <i>Selects venue and role</i><br><a href="#emp-003">EMP-003</a>  &mdash; <i>Home — on duty</i><br><a href="#emp-048">EMP-048</a>  &mdash; <i>Opening checklist</i></div>
@@ -183,12 +183,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             <div class="strip">offline capable · works from the local journal</div>
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><b>Every MFA method</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div><div class="panel"><b>Every SSO provider</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div><div class="panel"><b>Every role</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the split template — not declared on the screen.</span></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; selectRole · getCurrentSession · listMfaMethods · listSsoProviders +1</div>
+          <div><b>OPERATIONS</b> &middot; selectRole · getCurrentSession</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; sessionId&larr;session</div>
           <div><b>GOES TO</b> &middot; <a href="#emp-001">EMP-001</a>  &mdash; <i>Sign in</i><br><a href="#emp-003">EMP-003</a>  &mdash; <i>Home — on duty</i><br><a href="#emp-048">EMP-048</a>  &mdash; <i>Works the opening checklist</i></div>
@@ -213,17 +213,17 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             <div class="strip">offline capable · works from the local journal</div>
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><b>Severity</b><div class="chip">Severity</div><span class="why">Sends `?severity=` to `listIncidents`.</span></div><div class="panel"><b>Status</b><div class="chip">Status</div><span class="why">Sends `?status=` to `listIncidents`.</span></div><div class="panel"><b>Is reportable</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Sends `?isReportable=` to `listIncidents`.</span></div></div><div class="side"><div class="panel"><b>Waiting for a decision</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div><div class="panel"><b>Every cash movement</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Severity</b><div class="chip">Severity</div><span class="why">Sends `?severity=` to `listIncidents`.</span></div><div class="panel"><b>Status</b><div class="chip">Status</div><span class="why">Sends `?status=` to `listIncidents`.</span></div><div class="panel"><b>Is reportable</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Sends `?isReportable=` to `listIncidents`.</span></div></div><div class="side"><div class="panel"><b>Waiting for a decision</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getWorkstationShift · listIncidents · acceptShiftVariance · approveShiftOpen +13</div>
+          <div><b>OPERATIONS</b> &middot; getWorkstationShift · listIncidents · getIncident · getShift +3</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; incidentId&larr;deepLink, shiftId&larr;session, workstationId&larr;session</div>
           <div><b>GOES TO</b> &middot; <a href="#emp-001">EMP-001</a>  &mdash; <i>Sign in</i><br><a href="#emp-002">EMP-002</a>  &mdash; <i>Select venue &amp; role</i><br><a href="#emp-004">EMP-004</a>  &mdash; <i>Works the task list</i><br><a href="#emp-006">EMP-006</a>  &mdash; <i>Raise a task</i><br><a href="#emp-008">EMP-008</a> <br><a href="#emp-010">EMP-010</a> <br><a href="#emp-014">EMP-014</a>  &mdash; <i>Ticket lookup</i><br><a href="#emp-017">EMP-017</a> <br><a href="#emp-019">EMP-019</a>  &mdash; <i>AI assistant — home</i><br><a href="#emp-021">EMP-021</a>  &mdash; <i>Roster</i><br><a href="#emp-022">EMP-022</a>  &mdash; <i>My rota</i><br><a href="#emp-024">EMP-024</a>  &mdash; <i>Clock in / out</i><br><a href="#emp-025">EMP-025</a>  &mdash; <i>Break management</i><br><a href="#emp-026">EMP-026</a>  &mdash; <i>Incident report</i> <span class="car">incidentId</span><br><a href="#emp-028">EMP-028</a>  &mdash; <i>Lost &amp; found</i><br><a href="#emp-029">EMP-029</a>  &mdash; <i>Guest assistance</i> <span class="car">incidentId</span><br><a href="#emp-030">EMP-030</a>  &mdash; <i>Venue map</i><br><a href="#emp-031">EMP-031</a>  &mdash; <i>Queue monitor</i><br><a href="#emp-033">EMP-033</a>  &mdash; <i>Capacity view</i><br><a href="#emp-034">EMP-034</a>  &mdash; <i>Walk-up sale</i><br><a href="#emp-037">EMP-037</a>  &mdash; <i>Notifications</i><br><a href="#emp-038">EMP-038</a>  &mdash; <i>Broadcast to team</i><br><a href="#emp-039">EMP-039</a>  &mdash; <i>Announcements</i><br><a href="#emp-040">EMP-040</a> <br><a href="#emp-042">EMP-042</a>  &mdash; <i>Profile</i><br><a href="#emp-043">EMP-043</a> <br><a href="#emp-046">EMP-046</a> <br><a href="#emp-047">EMP-047</a>  &mdash; <i>Emergency mode</i><br><a href="#emp-048">EMP-048</a> <br><a href="#emp-051">EMP-051</a>  &mdash; <i>Restaurant Service Command Center</i><br><a href="#emp-052">EMP-052</a>  &mdash; <i>Floor Plan &amp; Table Map</i><br><a href="#emp-053">EMP-053</a>  &mdash; <i>Table &amp; Seating Configuration</i><br><a href="#emp-054">EMP-054</a>  &mdash; <i>Reservation Calendar &amp; Timeline</i><br><a href="#emp-055">EMP-055</a>  &mdash; <i>Create / Edit Reservation</i><br><a href="#emp-056">EMP-056</a>  &mdash; <i>Walk-In &amp; Waitlist Management</i><br><a href="#emp-057">EMP-057</a>  &mdash; <i>Guest Profile &amp; Dining History</i><br><a href="#emp-058">EMP-058</a>  &mdash; <i>Live Table &amp; Service Management</i><br><a href="#emp-059">EMP-059</a>  &mdash; <i>Table Order, Bill &amp; Payment Management</i><br><a href="#emp-060">EMP-060</a>  &mdash; <i>Reservation &amp; Table Performance</i><br><a href="#emp-061">EMP-061</a>  &mdash; <i>Retail Inventory Command Center</i><br><a href="#emp-062">EMP-062</a>  &mdash; <i>Store Stock &amp; SKU Availability</i><br><a href="#emp-063">EMP-063</a>  &mdash; <i>Requisition &amp; Smart Store Replenishment</i><br><a href="#emp-064">EMP-064</a>  &mdash; <i>Store-to-Store &amp; Warehouse Transfers</i><br><a href="#emp-065">EMP-065</a>  &mdash; <i>Receiving &amp; Store Put-Away</i><br><a href="#emp-066">EMP-066</a>  &mdash; <i>Stock Count &amp; Cycle Count Management</i><br><a href="#emp-067">EMP-067</a>  &mdash; <i>Damage, Loss, Shrinkage &amp; Stock Adjustment</i><br><a href="#emp-068">EMP-068</a>  &mdash; <i>Reservation, Allocation &amp; Omnichannel Invent</i><br><a href="#emp-069">EMP-069</a>  &mdash; <i>Barcode, RFID, Serialized Stock &amp; Traceabili</i><br><a href="#emp-070">EMP-070</a>  &mdash; <i>Inventory Exceptions, AI Replenishment &amp; Act</i><br><a href="#emp-071">EMP-071</a>  &mdash; <i>Rental Checkout Command Center</i><br><a href="#emp-081">EMP-081</a>  &mdash; <i>Active Rental Operations Command Center</i><br><a href="#emp-091">EMP-091</a>  &mdash; <i>Rental Return Command Center</i></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>confirmDialog</b> confirmCloseShift &middot; <i>Close shift</i></div><div class="ov"><b>confirmDialog</b> confirmSuspendShift &middot; <i>Suspend shift</i></div><div class="ov"><b>modal</b> formAcceptShiftVariance &middot; <i>Accept shift variance</i> &middot; <b>Accept shift variance</b> &middot; Cancel <span class="dis">discards reason</span></div><div class="ov"><b>modal</b> formApproveShiftOpen &middot; <i>Approve shift open</i> &middot; <b>Approve shift open</b> &middot; Cancel <span class="dis">discards reason</span></div><div class="ov"><b>modal</b> formOpenShift &middot; <i>Open shift</i> &middot; <b>Open shift</b> &middot; Cancel <span class="dis">discards workstationId · openingFloat · depositBoxCode · bagNumber · recordedAt</span></div><div class="ov"><b>modal</b> formRecordAuthorityNotification &middot; <i>Record authority notification</i> &middot; <b>Record authority notification</b> &middot; Cancel <span class="dis">discards authority · notifiedAt · reference · notifiedByPrincipalId · attachmentRefs</span></div><div class="ov"><b>modal</b> formRecordNoSale &middot; <i>Record no sale</i> &middot; <b>Record no sale</b> &middot; Cancel <span class="dis">discards id · reason · recordedAt · note</span></div><div class="ov"><b>modal</b> formReopenShift &middot; <i>Reopen shift</i> &middot; <b>Reopen shift</b> &middot; Cancel <span class="dis">discards reason · supervisorStepUp</span></div><div class="ov"><b>modal</b> formReportIncident &middot; <i>Report incident</i> &middot; <b>Report incident</b> &middot; Cancel <span class="dis">discards id · kind · severity · venueId · description · occurredAt · recordedAt · assetId · locationDescription · involvedSubjectIds · involvedStaffPrincipalIds · witnessCount · firstAidGiven · emergencyServicesCalled · attachmentRefs</span></div><div class="ov"><b>modal</b> formResumeShift &middot; <i>Resume shift</i> &middot; <b>Resume shift</b> &middot; Cancel <span class="dis">discards recordedAt</span></div><div class="ov"><b>modal</b> formUpdateIncident &middot; <i>Save incident</i> &middot; <b>Save incident</b> &middot; Cancel <span class="dis">discards status · severity · assignedToPrincipalId · investigationNote · rootCause · correctiveActions · correctiveWorkOrderId · attachmentRefs</span></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formRecordAuthorityNotification &middot; <i>Record authority notification</i> &middot; <b>Record authority notification</b> &middot; Cancel <span class="dis">discards authority · notifiedAt · reference · notifiedByPrincipalId · attachmentRefs</span></div><div class="ov"><b>modal</b> formReportIncident &middot; <i>Report incident</i> &middot; <b>Report incident</b> &middot; Cancel <span class="dis">discards id · kind · severity · venueId · description · occurredAt · recordedAt · assetId · locationDescription · involvedSubjectIds · involvedStaffPrincipalIds · witnessCount · firstAidGiven · emergencyServicesCalled · attachmentRefs</span></div><div class="ov"><b>modal</b> formUpdateIncident &middot; <i>Save incident</i> &middot; <b>Save incident</b> &middot; Cancel <span class="dis">discards status · severity · assignedToPrincipalId · investigationNote · rootCause · correctiveActions · correctiveWorkOrderId · attachmentRefs</span></div></div>
         </div>
       </div>
       <div id="emp-048" class="scr">
@@ -248,12 +248,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listInspectionTemplates · submitInspection · createInspectionTemplate · listInspections</div>
+          <div><b>OPERATIONS</b> &middot; listInspectionTemplates · submitInspection · listInspections</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
           
-          <div><b>GOES TO</b> &middot; <a href="#emp-001">EMP-001</a>  &mdash; <i>Sign in</i><br><a href="#emp-002">EMP-002</a>  &mdash; <i>Select venue &amp; role</i><br><a href="#emp-003">EMP-003</a>  &mdash; <i>Sees the home screen on duty</i></div>
+          <div><b>GOES TO</b> &middot; <a href="#emp-003">EMP-003</a>  &mdash; <i>Sees the home screen on duty</i></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSubmitInspection &middot; <i>Submit inspection</i> &middot; <b>Submit inspection</b> &middot; Cancel <span class="dis">discards id · templateId · venueId · responses · recordedAt · assetId · signatureRef</span></div><div class="ov"><b>modal</b> formCreateInspectionTemplate &middot; <i>Create inspection template</i> &middot; <b>Create inspection template</b> &middot; Cancel <span class="dis">discards id · code · name · items · instructions · venueId · appliesToAssetCategoryId · frequency · retentionYears · isActive</span></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSubmitInspection &middot; <i>Submit inspection</i> &middot; <b>Submit inspection</b> &middot; Cancel <span class="dis">discards id · templateId · venueId · responses · recordedAt · assetId · signatureRef</span></div></div>
         </div>
       </div>
       <div id="emp-009" class="scr">
@@ -278,12 +278,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; closeShift · acceptShiftVariance · approveShiftOpen · createCashMovement +9</div>
+          <div><b>OPERATIONS</b> &middot; submitShiftCount · acceptShiftVariance · getCurrentShift · getShift +3</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; shiftId&larr;session</div>
           <div><b>GOES TO</b> &middot; <a href="#emp-001">EMP-001</a>  &mdash; <i>Sign in</i><br><a href="#emp-002">EMP-002</a>  &mdash; <i>Select venue &amp; role</i><br><a href="#emp-003">EMP-003</a>  &mdash; <i>Home — on duty</i><br><a href="#emp-049">EMP-049</a> </div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>confirmDialog</b> confirmCloseShift &middot; <i>Close shift</i></div><div class="ov"><b>confirmDialog</b> confirmSuspendShift &middot; <i>Suspend shift</i></div><div class="ov"><b>modal</b> formAcceptShiftVariance &middot; <i>Accept shift variance</i> &middot; <b>Accept shift variance</b> &middot; Cancel <span class="dis">discards reason</span></div><div class="ov"><b>modal</b> formApproveShiftOpen &middot; <i>Approve shift open</i> &middot; <b>Approve shift open</b> &middot; Cancel <span class="dis">discards reason</span></div><div class="ov"><b>modal</b> formCreateCashMovement &middot; <i>Create cash movement</i> &middot; <b>Create cash movement</b> &middot; Cancel <span class="dis">discards id · kind · amount · recordedAt · denominations · reference · reason</span></div><div class="ov"><b>modal</b> formOpenShift &middot; <i>Open shift</i> &middot; <b>Open shift</b> &middot; Cancel <span class="dis">discards workstationId · openingFloat · depositBoxCode · bagNumber · recordedAt</span></div><div class="ov"><b>modal</b> formRecordNoSale &middot; <i>Record no sale</i> &middot; <b>Record no sale</b> &middot; Cancel <span class="dis">discards id · reason · recordedAt · note</span></div><div class="ov"><b>modal</b> formReopenShift &middot; <i>Reopen shift</i> &middot; <b>Reopen shift</b> &middot; Cancel <span class="dis">discards reason · supervisorStepUp</span></div><div class="ov"><b>modal</b> formResumeShift &middot; <i>Resume shift</i> &middot; <b>Resume shift</b> &middot; Cancel <span class="dis">discards recordedAt</span></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>confirmDialog</b> confirmCloseShift &middot; <i>Close shift</i> &middot; <b>Submit count</b> <span class="car">shiftId · countedFloat · cashierReason</span> &middot; Not yet</div><div class="ov"><b>confirmDialog</b> confirmSuspendShift &middot; <i>Suspend shift</i></div><div class="ov"><b>modal</b> formAcceptShiftVariance &middot; <i>Accept shift variance</i> &middot; <b>Accept shift variance</b> &middot; Cancel <span class="dis">discards reason</span></div></div>
         </div>
       </div>
       <div id="emp-010" class="scr">
@@ -303,17 +303,17 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             <div class="strip">offline capable · works from the local journal</div>
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><b>Access point id</b><div class="chip">Access point id</div><span class="why">Sends `?accessPointId=` to `listScans`.</span></div><div class="panel"><b>Ticket id</b><div class="chip">Ticket id</div><span class="why">Sends `?ticketId=` to `listScans`.</span></div><div class="panel"><b>Outcome</b><div class="chip">Outcome</div><span class="why">Sends `?outcome=` to `listScans`.</span></div></div><div class="side"><div class="panel"><b>Recorded from</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Sends `?recordedFrom=` to `listScans`.</span></div><div class="panel"><b>Recorded to</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Sends `?recordedTo=` to `listScans`.</span></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Search</b><div class="chip">Search</div><span class="why">A search that returns nothing must say so differently from a search not yet run.</span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the split template — not declared on the screen.</span></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listScans · syncScans · getOfflinePackage · lookupTicket +4</div>
+          <div><b>OPERATIONS</b> &middot; lookupTicket · overrideAccess · validateAccess · validateGroupAccess +1</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#emp-001">EMP-001</a>  &mdash; <i>Sign in</i><br><a href="#emp-002">EMP-002</a>  &mdash; <i>Select venue &amp; role</i><br><a href="#emp-003">EMP-003</a>  &mdash; <i>Home — on duty</i><br><a href="#emp-015">EMP-015</a> </div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>confirmDialog</b> confirmOverrideAccess &middot; <i>Override access</i></div><div class="ov"><b>modal</b> formSyncScans &middot; <i>Sync scans</i> &middot; <b>Sync scans</b> &middot; Cancel <span class="dis">discards deviceId · scans</span></div><div class="ov"><b>modal</b> formValidateAccess &middot; <i>Validate access</i> &middot; <b>Validate access</b> &middot; Cancel <span class="dis">discards id · mediaCode · mediaKind · direction · recordedAt · groupSize · proximityToken</span></div><div class="ov"><b>modal</b> formValidateGroupAccess &middot; <i>Validate group access</i> &middot; <b>Validate group access</b> &middot; Cancel <span class="dis">discards id · mediaCode · admitCount · recordedAt · direction</span></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>confirmDialog</b> confirmOverrideAccess &middot; <i>Override access</i></div><div class="ov"><b>modal</b> formValidateAccess &middot; <i>Validate access</i> &middot; <b>Validate access</b> &middot; Cancel <span class="dis">discards id · mediaCode · mediaKind · direction · recordedAt · groupSize · proximityToken</span></div><div class="ov"><b>modal</b> formValidateGroupAccess &middot; <i>Validate group access</i> &middot; <b>Validate group access</b> &middot; Cancel <span class="dis">discards id · mediaCode · admitCount · recordedAt · direction</span></div></div>
         </div>
       </div>
       <div id="emp-014" class="scr">
@@ -338,12 +338,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listOrders · getOrder · createOrder · applyManualDiscount +10</div>
+          <div><b>OPERATIONS</b> &middot; listOrders · getOrder · getOrderStatement · listOrderRefunds +1</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; orderId&larr;deepLink</div>
           <div><b>GOES TO</b> &middot; <a href="#emp-001">EMP-001</a>  &mdash; <i>Sign in</i><br><a href="#emp-002">EMP-002</a>  &mdash; <i>Select venue &amp; role</i><br><a href="#emp-003">EMP-003</a>  &mdash; <i>Home — on duty</i></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>confirmDialog</b> confirmVoidOrder &middot; <i>Void order</i></div><div class="ov"><b>modal</b> formCreateOrder &middot; <i>Create order</i> &middot; <b>Create order</b> &middot; Cancel <span class="dis">discards id · venueId · channel · lines · recordedAt · shiftId · subjectId · guestLinkId · catalogueBundleVersion</span></div><div class="ov"><b>modal</b> formApplyManualDiscount &middot; <i>Apply manual discount</i> &middot; <b>Apply manual discount</b> &middot; Cancel <span class="dis">discards id · reason · recordedAt · lineId · amount · percentage · reasonCode · approverPrincipalId</span></div><div class="ov"><b>modal</b> formCreateRefund &middot; <i>Create refund</i> &middot; <b>Create refund</b> &middot; Cancel <span class="dis">discards id · amount · reason · recordedAt · lineIds · secondaryAuthorisation · refundToOriginalTender · alternateTender</span></div><div class="ov"><b>modal</b> formExchangeOrderLines &middot; <i>Exchange order lines</i> &middot; <b>Exchange order lines</b> &middot; Cancel <span class="dis">discards id · outgoingLineIds · incomingLines · recordedAt · waiveFee · reason</span></div><div class="ov"><b>modal</b> formHoldOrder &middot; <i>Hold order</i> &middot; <b>Hold order</b> &middot; Cancel <span class="dis">discards recordedAt · label · holdUntil</span></div><div class="ov"><b>modal</b> formModifyOrder &middot; <i>Modify order</i> &middot; <b>Modify order</b> &middot; Cancel <span class="dis">discards id · recordedAt · addLines · removeLineIds · reason</span></div><div class="ov"><b>modal</b> formReprintOrder &middot; <i>Reprint order</i> &middot; <b>Reprint order</b> &middot; Cancel <span class="dis">discards delivery · recordedAt · destination · lineIds · reason</span></div><div class="ov"><b>modal</b> formRescheduleOrder &middot; <i>Reschedule order</i> &middot; <b>Reschedule order</b> &middot; Cancel <span class="dis">discards targetPerformanceId · recordedAt · lineIds · waiveFee · reason</span></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formReprintOrder &middot; <i>Reprint order</i> &middot; <b>Reprint order</b> &middot; Cancel <span class="dis">discards delivery · recordedAt · destination · lineIds · reason</span></div></div>
         </div>
       </div>
       <div id="emp-015" class="scr">
@@ -398,12 +398,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; syncScans · listSyncRejections · getOfflinePackage · listScans +5</div>
+          <div><b>OPERATIONS</b> &middot; syncScans · listSyncRejections · getOfflinePackage · listScans +4</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
           
-          <div><b>GOES TO</b> &middot; <a href="#emp-001">EMP-001</a>  &mdash; <i>Sign in</i><br><a href="#emp-002">EMP-002</a>  &mdash; <i>Select venue &amp; role</i><br><a href="#emp-003">EMP-003</a>  &mdash; <i>Home — on duty</i><br><a href="#emp-009">EMP-009</a>  &mdash; <i>The supervisor closes it</i><br><a href="#emp-018">EMP-018</a>  &mdash; <i>Offline package</i></div>
+          <div><b>GOES TO</b> &middot; <a href="#emp-001">EMP-001</a>  &mdash; <i>Sign in</i><br><a href="#emp-002">EMP-002</a>  &mdash; <i>Select venue &amp; role</i><br><a href="#emp-003">EMP-003</a>  &mdash; <i>Home — on duty</i><br><a href="#emp-009">EMP-009</a>  &mdash; <i>The cashier submits a blind count;</i><br><a href="#emp-018">EMP-018</a>  &mdash; <i>Offline package</i></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>confirmDialog</b> confirmOverrideAccess &middot; <i>Override access</i></div><div class="ov"><b>modal</b> formSyncScans &middot; <i>Sync scans</i> &middot; <b>Sync scans</b> &middot; Cancel <span class="dis">discards deviceId · scans</span></div><div class="ov"><b>modal</b> formSyncOrders &middot; <i>Sync orders</i> &middot; <b>Sync orders</b> &middot; Cancel <span class="dis">discards deviceId · orders</span></div><div class="ov"><b>modal</b> formValidateAccess &middot; <i>Validate access</i> &middot; <b>Validate access</b> &middot; Cancel <span class="dis">discards id · mediaCode · mediaKind · direction · recordedAt · groupSize · proximityToken</span></div><div class="ov"><b>modal</b> formValidateGroupAccess &middot; <i>Validate group access</i> &middot; <b>Validate group access</b> &middot; Cancel <span class="dis">discards id · mediaCode · admitCount · recordedAt · direction</span></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>confirmDialog</b> confirmOverrideAccess &middot; <i>Override access</i></div><div class="ov"><b>modal</b> formSyncScans &middot; <i>Sync scans</i> &middot; <b>Sync scans</b> &middot; Cancel <span class="dis">discards deviceId · scans</span></div><div class="ov"><b>modal</b> formValidateAccess &middot; <i>Validate access</i> &middot; <b>Validate access</b> &middot; Cancel <span class="dis">discards id · mediaCode · mediaKind · direction · recordedAt · groupSize · proximityToken</span></div><div class="ov"><b>modal</b> formValidateGroupAccess &middot; <i>Validate group access</i> &middot; <b>Validate group access</b> &middot; Cancel <span class="dis">discards id · mediaCode · admitCount · recordedAt · direction</span></div></div>
         </div>
       </div>
       <div id="emp-018" class="scr">
@@ -453,17 +453,17 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             <div class="strip">offline capable · works from the local journal</div>
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><b>Assigned to principal id</b><div class="chip">Assigned to principal id</div><span class="why">Sends `?assignedToPrincipalId=` to `listWorkOrders`.</span></div><div class="panel"><b>Status</b><div class="chip">Status</div><span class="why">Sends `?status=` to `listWorkOrders`.</span></div><div class="panel"><b>Priority</b><div class="chip">Priority</div><span class="why">Sends `?priority=` to `listWorkOrders`.</span></div></div><div class="side"><div class="panel"><b>Asset id</b><div class="chip">Asset id</div><span class="why">Sends `?assetId=` to `listWorkOrders`.</span></div><div class="panel"><b>Overdue only</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Sends `?overdueOnly=` to `listWorkOrders`.</span></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Status and priority</b><div class="chip">Status and priority</div><span class="why">Chips from the closed sets; my own queue is the default, not a filter (VO-R12; design-notes correction venue-operations EMP-004). No ids are typed.</span></div><div class="panel"><b>Overdue only</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Sends `?overdueOnly=` to `listWorkOrders`.</span></div><div class="panel"><b>My work orders</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div><div class="side"><div class="panel"><b>Confirm</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">**The consequence goes in the body, not the title.** *Cancel 3 orders worth AED 480* is a confirmation; *are you sure* is not — and a dialog that cannot name what it dest</span></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listWorkOrders · acceptWorkOrder · rejectWorkOrder · attachWorkOrderEvidence +11</div>
+          <div><b>OPERATIONS</b> &middot; listWorkOrders · acceptWorkOrder · rejectWorkOrder · getWorkOrder</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; workOrderId&larr;deepLink</div>
-          <div><b>GOES TO</b> &middot; <a href="#emp-001">EMP-001</a>  &mdash; <i>Sign in</i><br><a href="#emp-002">EMP-002</a>  &mdash; <i>Select venue &amp; role</i><br><a href="#emp-003">EMP-003</a>  &mdash; <i>Home — on duty</i><br><a href="#emp-005">EMP-005</a>  &mdash; <i>Completes a task</i> <span class="car">workOrderId</span></div>
+          <div><b>GOES TO</b> &middot; <a href="#emp-003">EMP-003</a>  &mdash; <i>Home — on duty</i><br><a href="#emp-005">EMP-005</a>  &mdash; <i>Completes a task</i> <span class="car">workOrderId</span></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>confirmDialog</b> confirmRejectWorkOrder &middot; <i>Reject work order</i></div><div class="ov"><b>confirmDialog</b> confirmCancelWorkOrder &middot; <i>Cancel work order</i></div><div class="ov"><b>confirmDialog</b> confirmCloseWorkOrder &middot; <i>Close work order</i></div><div class="ov"><b>modal</b> formAttachWorkOrderEvidence &middot; <i>Attach work order evidence</i> &middot; <b>Attach work order evidence</b> &middot; Cancel <span class="dis">discards kind · assetRef · text · capturedAt · stage</span></div><div class="ov"><b>modal</b> formCompleteWorkOrder &middot; <i>Complete work order</i> &middot; <b>Complete work order</b> &middot; Cancel <span class="dis">discards resolution · recordedAt · resolutionCode · attachmentRefs · followUpRequired · followUpNote</span></div><div class="ov"><b>modal</b> formPauseWorkOrder &middot; <i>Pause work order</i> &middot; <b>Pause work order</b> &middot; Cancel <span class="dis">discards reason · note · requisitionId</span></div><div class="ov"><b>modal</b> formRecordWorkOrderParts &middot; <i>Record work order parts</i> &middot; <b>Record work order parts</b> &middot; Cancel <span class="dis">discards lines</span></div><div class="ov"><b>modal</b> formRecordWorkOrderTime &middot; <i>Record work order time</i> &middot; <b>Record work order time</b> &middot; Cancel <span class="dis">discards id · action · recordedAt · pauseReason · note</span></div><div class="ov"><b>modal</b> formStartWorkOrder &middot; <i>Start work order</i> &middot; <b>Start work order</b> &middot; Cancel <span class="dis">discards startedAt</span></div><div class="ov"><b>modal</b> formUpdateWorkOrder &middot; <i>Save work order</i> &middot; <b>Save work order</b> &middot; Cancel <span class="dis">discards assignedToPrincipalId · priority · dueAt · description · categoryId</span></div><div class="ov"><b>modal</b> formVerifyWorkOrder &middot; <i>Verify work order</i> &middot; <b>Verify work order</b> &middot; Cancel <span class="dis">discards outcome · note</span></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>confirmDialog</b> confirmRejectWorkOrder &middot; <i>Reject work order</i></div></div>
         </div>
       </div>
       <div id="emp-005" class="scr">
@@ -488,12 +488,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listStockReservations · createStockReservation · releaseStockReservation · getWorkOrder +14</div>
+          <div><b>OPERATIONS</b> &middot; listStockReservations · createStockReservation · releaseStockReservation · getWorkOrder +10</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; workOrderId&larr;deepLink, stockReservationId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#emp-001">EMP-001</a>  &mdash; <i>Sign in</i><br><a href="#emp-002">EMP-002</a>  &mdash; <i>Select venue &amp; role</i><br><a href="#emp-003">EMP-003</a>  &mdash; <i>Home — on duty</i><br><a href="#emp-007">EMP-007</a>  &mdash; <i>Writes handover notes</i></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>confirmDialog</b> confirmCancelWorkOrder &middot; <i>Cancel work order</i></div><div class="ov"><b>confirmDialog</b> confirmCloseWorkOrder &middot; <i>Close work order</i></div><div class="ov"><b>confirmDialog</b> confirmRejectWorkOrder &middot; <i>Reject work order</i></div><div class="ov"><b>modal</b> formStartWorkOrder &middot; <i>Start work order</i> &middot; <b>Start work order</b> &middot; Cancel <span class="dis">discards startedAt</span></div><div class="ov"><b>modal</b> formPauseWorkOrder &middot; <i>Pause work order</i> &middot; <b>Pause work order</b> &middot; Cancel <span class="dis">discards reason · note · requisitionId</span></div><div class="ov"><b>modal</b> formCompleteWorkOrder &middot; <i>Complete work order</i> &middot; <b>Complete work order</b> &middot; Cancel <span class="dis">discards resolution · recordedAt · resolutionCode · attachmentRefs · followUpRequired · followUpNote</span></div><div class="ov"><b>modal</b> formAttachWorkOrderEvidence &middot; <i>Attach work order evidence</i> &middot; <b>Attach work order evidence</b> &middot; Cancel <span class="dis">discards kind · assetRef · text · capturedAt · stage</span></div><div class="ov"><b>modal</b> formRecordWorkOrderParts &middot; <i>Record work order parts</i> &middot; <b>Record work order parts</b> &middot; Cancel <span class="dis">discards lines</span></div><div class="ov"><b>modal</b> formRecordWorkOrderTime &middot; <i>Record work order time</i> &middot; <b>Record work order time</b> &middot; Cancel <span class="dis">discards id · action · recordedAt · pauseReason · note</span></div><div class="ov"><b>modal</b> formUpdateWorkOrder &middot; <i>Save work order</i> &middot; <b>Save work order</b> &middot; Cancel <span class="dis">discards assignedToPrincipalId · priority · dueAt · description · categoryId</span></div><div class="ov"><b>modal</b> formVerifyWorkOrder &middot; <i>Verify work order</i> &middot; <b>Verify work order</b> &middot; Cancel <span class="dis">discards outcome · note</span></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>confirmDialog</b> confirmRejectWorkOrder &middot; <i>Reject work order</i></div><div class="ov"><b>modal</b> formStartWorkOrder &middot; <i>Start work order</i> &middot; <b>Start work order</b> &middot; Cancel <span class="dis">discards startedAt</span></div><div class="ov"><b>modal</b> formPauseWorkOrder &middot; <i>Pause work order</i> &middot; <b>Pause work order</b> &middot; Cancel <span class="dis">discards reason · note · requisitionId</span></div><div class="ov"><b>modal</b> formCompleteWorkOrder &middot; <i>Complete work order</i> &middot; <b>Complete work order</b> &middot; Cancel <span class="dis">discards resolution · recordedAt · resolutionCode · attachmentRefs · followUpRequired · followUpNote</span></div><div class="ov"><b>modal</b> formAttachWorkOrderEvidence &middot; <i>Attach work order evidence</i> &middot; <b>Attach work order evidence</b> &middot; Cancel <span class="dis">discards kind · assetRef · text · capturedAt · stage</span></div><div class="ov"><b>modal</b> formRecordWorkOrderParts &middot; <i>Record work order parts</i> &middot; <b>Record work order parts</b> &middot; Cancel <span class="dis">discards lines</span></div><div class="ov"><b>modal</b> formRecordWorkOrderTime &middot; <i>Record work order time</i> &middot; <b>Record work order time</b> &middot; Cancel <span class="dis">discards id · action · recordedAt · pauseReason · note</span></div></div>
         </div>
       </div>
       <div id="emp-006" class="scr">
@@ -543,18 +543,17 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             <div class="strip">offline capable · works from the local journal</div>
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><b>Unacknowledged only</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Sends `?unacknowledgedOnly=` to `listAnnouncements`.</span></div><div class="panel"><b>Every announcement</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div><div class="panel"><span class="kind">publishGate</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Declares `publishAnnouncement`. **The gate names what the publish will affect before it happens** — a disabled Publish with no reason is the state operators escalate.
-</span></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Carried over</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listAnnouncements · publishAnnouncement · acknowledgeAnnouncement · getAnnouncementReach</div>
+          <div><b>OPERATIONS</b> &middot; listWorkOrders</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
-          <div><b>ARRIVES WITH</b> &middot; announcementId&larr;deepLink</div>
-          <div><b>GOES TO</b> &middot; <a href="#emp-001">EMP-001</a>  &mdash; <i>Sign in</i><br><a href="#emp-002">EMP-002</a>  &mdash; <i>Select venue &amp; role</i><br><a href="#emp-003">EMP-003</a>  &mdash; <i>Home — on duty</i><br><a href="#emp-009">EMP-009</a>  &mdash; <i>Ends the shift</i></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formPublishAnnouncement &middot; <i>Publish announcement</i> &middot; <b>Publish announcement</b> &middot; Cancel <span class="dis">discards title · body · kind · publishedAt · id · venueIds · departmentIds · roleIds · requiresAcknowledgement · expiresAt · publishedByPrincipalId · locale</span></div></div>
+          <div><b>GOES TO</b> &middot; <a href="#emp-003">EMP-003</a>  &mdash; <i>Home — on duty</i><br><a href="#emp-009">EMP-009</a>  &mdash; <i>Ends the shift with a blind count (no expect</i></div>
+          
+          
         </div>
       </div>
       <div id="emp-008" class="scr">
@@ -574,7 +573,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             <div class="strip">offline capable · works from the local journal</div>
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><b>Workstation id</b><div class="chip">Workstation id</div><span class="why">Sends `?workstationId=` to `listShifts`.</span></div><div class="panel"><b>Status</b><div class="chip">Status</div><span class="why">Sends `?status=` to `listShifts`.</span></div><div class="panel"><b>Opened from</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Sends `?openedFrom=` to `listShifts`.</span></div></div><div class="side"><div class="panel"><b>Opened to</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Sends `?openedTo=` to `listShifts`.</span></div><div class="panel"><b>Every shift</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>My service today: covers, tables, sales, tips</b><div class="rows"><div class="bar"><i style="width:78%"></i></div><div class="bar"><i style="width:54%"></i></div><div class="bar"><i style="width:92%"></i></div><div class="bar"><i style="width:36%"></i></div><div class="bar"><i style="width:61%"></i></div></div><span class="why">For a server without a till (decided 2 October 2026, Chinmay, batch 6, EMP-008: &quot;Yes: a service summary (covers, tables, sales, tips)&quot;; DEC-199; CHG-CSA-020). S</span></div><div class="panel"><b>Workstation id</b><div class="chip">Workstation id</div><span class="why">Sends `?workstationId=` to `listShifts`.</span></div><div class="panel"><b>Status</b><div class="chip">Status</div><span class="why">Sends `?status=` to `listShifts`.</span></div></div><div class="side"><div class="panel"><b>Opened from</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Sends `?openedFrom=` to `listShifts`.</span></div><div class="panel"><b>Opened to</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Sends `?openedTo=` to `listShifts`.</span></div></div></div>
             </div>
           </div>
         </div>
@@ -584,14 +583,14 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>ARRIVES WITH</b> &middot; shiftId&larr;session</div>
           <div><b>GOES TO</b> &middot; <a href="#emp-001">EMP-001</a>  &mdash; <i>Sign in</i><br><a href="#emp-002">EMP-002</a>  &mdash; <i>Select venue &amp; role</i><br><a href="#emp-003">EMP-003</a>  &mdash; <i>Home — on duty</i><br><a href="#emp-017">EMP-017</a>  &mdash; <i>Anything unsynced is pushed first</i></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>confirmDialog</b> confirmSuspendShift &middot; <i>Suspend shift</i></div></div>
+          
         </div>
       </div>
       <div id="emp-019" class="scr">
         <div>
           <div class="hdr"><span class="code">EMP-019</span>
             <span class="ttl">AI assistant — home</span><span class="pill off">offline</span></div>
-          <div class="pur">The tab that is already in the shell.</div>
+          <div class="pur">Ask and be answered within your role, with the source.</div>
         </div>
         <div class="frame dark">
           <aside class="rail"><div class="brand"><b>TICVAI</b><span>Operations</span></div><nav class="nav"><i class="">Dashboard</i><i class="on">Operations</i><i class="">Settings</i><i class="">Reports</i><i class="">People</i></nav></aside>
@@ -639,12 +638,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; sendAiMessage · createAiConversation · listAiConversations · recordAnswerFeedback</div>
+          <div><b>OPERATIONS</b> &middot; sendAiMessage · createAiConversation · listAiConversations · recordAnswerFeedback +1</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; conversationId&larr;deepLink, messageId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#emp-001">EMP-001</a>  &mdash; <i>Sign in</i><br><a href="#emp-002">EMP-002</a>  &mdash; <i>Select venue &amp; role</i><br><a href="#emp-003">EMP-003</a>  &mdash; <i>Home — on duty</i><br><a href="#emp-040">EMP-040</a>  &mdash; <i>Knowledge base</i></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSendAiMessage &middot; <i>Send AI message</i> &middot; <b>Send AI message</b> &middot; Cancel <span class="dis">discards content · collectionIds</span></div><div class="ov"><b>modal</b> formCreateAiConversation &middot; <i>Create AI conversation</i> &middot; <b>Create AI conversation</b> &middot; Cancel <span class="dis">discards module · locale</span></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSendAiMessage &middot; <i>Send AI message</i> &middot; <b>Send AI message</b> &middot; Cancel <span class="dis">discards content · collectionIds</span></div><div class="ov"><b>modal</b> formCreateAiConversation &middot; <i>Create AI conversation</i> &middot; <b>Create AI conversation</b> &middot; Cancel <span class="dis">discards module · locale</span></div><div class="ov"><b>modal</b> formAskReportingQuestion &middot; <i>Ask a number</i> &middot; <b>Ask a number</b> &middot; Cancel</div></div>
         </div>
       </div>
       <div id="emp-031" class="scr">
@@ -694,12 +693,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             <div class="strip">offline capable · works from the local journal</div>
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><b>Status</b><div class="chip">Status</div><span class="why">Sends `?status=` to `listQueueEntries`.</span></div><div class="panel"><b>Every waiting guest</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div><div class="panel"><b>Every queue</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the split template — not declared on the screen.</span></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; setWaitTime · getWaitTimes · getQueue · listQueueEntries +1</div>
+          <div><b>OPERATIONS</b> &middot; setWaitTime · getWaitTimes · getQueue</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; queueId&larr;deepLink</div>
           <div><b>GOES TO</b> &middot; <a href="#emp-001">EMP-001</a>  &mdash; <i>Sign in</i><br><a href="#emp-002">EMP-002</a>  &mdash; <i>Select venue &amp; role</i><br><a href="#emp-003">EMP-003</a>  &mdash; <i>Home — on duty</i><br><a href="#emp-033">EMP-033</a>  &mdash; <i>Capacity is checked against occupancy</i></div>
@@ -729,12 +728,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listChannelCapacities · getChannelAllocations · createChannelCapacity · relinquishChannelAllocation +2</div>
+          <div><b>OPERATIONS</b> &middot; listChannelCapacities · getChannelAllocations · relinquishChannelAllocation</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; channelCapacityId&larr;deepLink</div>
           <div><b>GOES TO</b> &middot; <a href="#emp-001">EMP-001</a>  &mdash; <i>Sign in</i><br><a href="#emp-002">EMP-002</a>  &mdash; <i>Select venue &amp; role</i><br><a href="#emp-003">EMP-003</a>  &mdash; <i>Home — on duty</i></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formCreateChannelCapacity &middot; <i>Create channel capacity</i> &middot; <b>Create channel capacity</b> &middot; Cancel <span class="dis">discards performanceId · name · capacity · seatCategoryId</span></div><div class="ov"><b>modal</b> formRelinquishChannelAllocation &middot; <i>Release channel allocation</i> &middot; <b>Release channel allocation</b> &middot; Cancel <span class="dis">discards channels · reason</span></div><div class="ov"><b>modal</b> formSetChannelAllocations &middot; <i>Save channel allocations</i> &middot; <b>Save channel allocations</b> &middot; Cancel <span class="dis">discards allocations</span></div><div class="ov"><b>modal</b> formUpdateChannelCapacity &middot; <i>Save channel capacity</i> &middot; <b>Save channel capacity</b> &middot; Cancel <span class="dis">discards name · capacity</span></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formRelinquishChannelAllocation &middot; <i>Release channel allocation</i> &middot; <b>Release channel allocation</b> &middot; Cancel <span class="dis">discards channels · reason</span></div></div>
         </div>
       </div>
       <div id="emp-034" class="scr">
@@ -759,12 +758,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; createOrder · listProducts · applyManualDiscount · createRefund +19</div>
+          <div><b>OPERATIONS</b> &middot; createOrder · listProducts · applyManualDiscount · createRefund +16</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; orderId&larr;deepLink, productId&larr;deepLink</div>
           <div><b>GOES TO</b> &middot; <a href="#emp-001">EMP-001</a>  &mdash; <i>Sign in</i><br><a href="#emp-002">EMP-002</a>  &mdash; <i>Select venue &amp; role</i><br><a href="#emp-003">EMP-003</a>  &mdash; <i>Home — on duty</i><br><a href="#emp-035">EMP-035</a>  &mdash; <i>The guest taps a card on the device</i> <span class="car">paymentId</span><br><a href="#emp-036">EMP-036</a>  &mdash; <i>Issue media</i></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>confirmDialog</b> confirmVoidOrder &middot; <i>Void order</i></div><div class="ov"><b>modal</b> formSplitOrder &middot; <i>Split order</i> &middot; <b>Split order</b> &middot; Cancel <span class="dis">discards groups</span></div><div class="ov"><b>modal</b> formCreateOrder &middot; <i>Create order</i> &middot; <b>Create order</b> &middot; Cancel <span class="dis">discards id · venueId · channel · lines · recordedAt · shiftId · subjectId · guestLinkId · catalogueBundleVersion</span></div><div class="ov"><b>modal</b> formApplyManualDiscount &middot; <i>Apply manual discount</i> &middot; <b>Apply manual discount</b> &middot; Cancel <span class="dis">discards id · reason · recordedAt · lineId · amount · percentage · reasonCode · approverPrincipalId</span></div><div class="ov"><b>modal</b> formCreateRefund &middot; <i>Create refund</i> &middot; <b>Create refund</b> &middot; Cancel <span class="dis">discards id · amount · reason · recordedAt · lineIds · secondaryAuthorisation · refundToOriginalTender · alternateTender</span></div><div class="ov"><b>modal</b> formExchangeOrderLines &middot; <i>Exchange order lines</i> &middot; <b>Exchange order lines</b> &middot; Cancel <span class="dis">discards id · outgoingLineIds · incomingLines · recordedAt · waiveFee · reason</span></div><div class="ov"><b>modal</b> formHoldOrder &middot; <i>Hold order</i> &middot; <b>Hold order</b> &middot; Cancel <span class="dis">discards recordedAt · label · holdUntil</span></div><div class="ov"><b>modal</b> formModifyOrder &middot; <i>Modify order</i> &middot; <b>Modify order</b> &middot; Cancel <span class="dis">discards id · recordedAt · addLines · removeLineIds · reason</span></div><div class="ov"><b>modal</b> formReprintOrder &middot; <i>Reprint order</i> &middot; <b>Reprint order</b> &middot; Cancel <span class="dis">discards delivery · recordedAt · destination · lineIds · reason</span></div><div class="ov"><b>modal</b> formRescheduleOrder &middot; <i>Reschedule order</i> &middot; <b>Reschedule order</b> &middot; Cancel <span class="dis">discards targetPerformanceId · recordedAt · lineIds · waiveFee · reason</span></div><div class="ov"><b>modal</b> formSetAlternativeCodes &middot; <i>Save alternative codes</i> &middot; <b>Save alternative codes</b> &middot; Cancel <span class="dis">discards codes</span></div><div class="ov"><b>modal</b> formSetProductAttributes &middot; <i>Save product attributes</i> &middot; <b>Save product attributes</b> &middot; Cancel <span class="dis">discards axes</span></div><div class="ov"><b>modal</b> formTransitionProductLifecycle &middot; <i>Transition product lifecycle</i> &middot; <b>Transition product lifecycle</b> &middot; Cancel <span class="dis">discards transition · reason · effectiveAt</span></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>confirmDialog</b> confirmVoidOrder &middot; <i>Void order</i></div><div class="ov"><b>modal</b> formSplitOrder &middot; <i>Split order</i> &middot; <b>Split order</b> &middot; Cancel <span class="dis">discards groups</span></div><div class="ov"><b>modal</b> formCreateOrder &middot; <i>Create order</i> &middot; <b>Create order</b> &middot; Cancel <span class="dis">discards id · venueId · channel · lines · recordedAt · shiftId · subjectId · guestLinkId · catalogueBundleVersion</span></div><div class="ov"><b>modal</b> formApplyManualDiscount &middot; <i>Apply manual discount</i> &middot; <b>Apply manual discount</b> &middot; Cancel <span class="dis">discards id · reason · recordedAt · lineId · amount · percentage · reasonCode · approverPrincipalId</span></div><div class="ov"><b>modal</b> formCreateRefund &middot; <i>Create refund</i> &middot; <b>Create refund</b> &middot; Cancel <span class="dis">discards id · amount · reason · recordedAt · lineIds · secondaryAuthorisation · refundToOriginalTender · alternateTender</span></div><div class="ov"><b>modal</b> formExchangeOrderLines &middot; <i>Exchange order lines</i> &middot; <b>Exchange order lines</b> &middot; Cancel <span class="dis">discards id · outgoingLineIds · incomingLines · recordedAt · waiveFee · reason</span></div><div class="ov"><b>modal</b> formHoldOrder &middot; <i>Hold order</i> &middot; <b>Hold order</b> &middot; Cancel <span class="dis">discards recordedAt · label · holdUntil</span></div><div class="ov"><b>modal</b> formModifyOrder &middot; <i>Modify order</i> &middot; <b>Modify order</b> &middot; Cancel <span class="dis">discards id · recordedAt · addLines · removeLineIds · reason</span></div><div class="ov"><b>modal</b> formReprintOrder &middot; <i>Reprint order</i> &middot; <b>Reprint order</b> &middot; Cancel <span class="dis">discards delivery · recordedAt · destination · lineIds · reason</span></div><div class="ov"><b>modal</b> formRescheduleOrder &middot; <i>Reschedule order</i> &middot; <b>Reschedule order</b> &middot; Cancel <span class="dis">discards targetPerformanceId · recordedAt · lineIds · waiveFee · reason</span></div></div>
         </div>
       </div>
       <div id="emp-035" class="scr">
@@ -844,18 +843,17 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             <div class="strip">offline capable · works from the local journal</div>
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><b>Unacknowledged only</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Sends `?unacknowledgedOnly=` to `listAnnouncements`.</span></div><div class="panel"><b>Every announcement</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div><div class="panel"><span class="kind">publishGate</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Declares `publishAnnouncement`. **The gate names what the publish will affect before it happens** — a disabled Publish with no reason is the state operators escalate.
-</span></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Unacknowledged only</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Sends `?unacknowledgedOnly=` to `listAnnouncements`.</span></div><div class="panel"><b>Every announcement</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div><div class="panel"><b>Action required</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listAnnouncements · acknowledgeAnnouncement · getAnnouncementReach · publishAnnouncement +4</div>
+          <div><b>OPERATIONS</b> &middot; listAnnouncements · acknowledgeAnnouncement · getAnnouncementReach · listStaffConversations +4</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; announcementId&larr;deepLink, conversationId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#emp-001">EMP-001</a>  &mdash; <i>Sign in</i><br><a href="#emp-002">EMP-002</a>  &mdash; <i>Select venue &amp; role</i><br><a href="#emp-003">EMP-003</a>  &mdash; <i>Home — on duty</i></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formPublishAnnouncement &middot; <i>Publish announcement</i> &middot; <b>Publish announcement</b> &middot; Cancel <span class="dis">discards title · body · kind · publishedAt · id · venueIds · departmentIds · roleIds · requiresAcknowledgement · expiresAt · publishedByPrincipalId · locale</span></div></div>
+          
         </div>
       </div>
       <div id="emp-039" class="scr">
@@ -875,18 +873,17 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             <div class="strip">offline capable · works from the local journal</div>
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><b>Unacknowledged only</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Sends `?unacknowledgedOnly=` to `listAnnouncements`.</span></div><div class="panel"><b>Every announcement</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div><div class="panel"><span class="kind">publishGate</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Declares `publishAnnouncement`. **The gate names what the publish will affect before it happens** — a disabled Publish with no reason is the state operators escalate.
-</span></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Unacknowledged only</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Sends `?unacknowledgedOnly=` to `listAnnouncements`.</span></div><div class="panel"><b>Every announcement</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listAnnouncements · acknowledgeAnnouncement · getAnnouncementReach · publishAnnouncement</div>
+          <div><b>OPERATIONS</b> &middot; listAnnouncements · acknowledgeAnnouncement</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; announcementId&larr;deepLink</div>
           <div><b>GOES TO</b> &middot; <a href="#emp-001">EMP-001</a>  &mdash; <i>Sign in</i><br><a href="#emp-002">EMP-002</a>  &mdash; <i>Select venue &amp; role</i><br><a href="#emp-003">EMP-003</a>  &mdash; <i>Home — on duty</i></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formPublishAnnouncement &middot; <i>Publish announcement</i> &middot; <b>Publish announcement</b> &middot; Cancel <span class="dis">discards title · body · kind · publishedAt · id · venueIds · departmentIds · roleIds · requiresAcknowledgement · expiresAt · publishedByPrincipalId · locale</span></div></div>
+          
         </div>
       </div>
       <div id="emp-047" class="scr">
@@ -906,18 +903,17 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             <div class="strip">offline capable · works from the local journal</div>
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><b>Unacknowledged only</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Sends `?unacknowledgedOnly=` to `listAnnouncements`.</span></div><div class="panel"><b>Every announcement</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div><div class="panel"><span class="kind">publishGate</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Declares `publishAnnouncement`. **The gate names what the publish will affect before it happens** — a disabled Publish with no reason is the state operators escalate.
-</span></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Unacknowledged only</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Sends `?unacknowledgedOnly=` to `listAnnouncements`.</span></div><div class="panel"><b>Every announcement</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listAnnouncements · acknowledgeAnnouncement · getAnnouncementReach · publishAnnouncement</div>
+          <div><b>OPERATIONS</b> &middot; listAnnouncements · acknowledgeAnnouncement</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; announcementId&larr;deepLink</div>
           <div><b>GOES TO</b> &middot; <a href="#emp-001">EMP-001</a>  &mdash; <i>Sign in</i><br><a href="#emp-002">EMP-002</a>  &mdash; <i>Select venue &amp; role</i><br><a href="#emp-003">EMP-003</a>  &mdash; <i>Home — on duty</i><br><a href="#emp-050">EMP-050</a>  &mdash; <i>Post-incident restore</i></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formPublishAnnouncement &middot; <i>Publish announcement</i> &middot; <b>Publish announcement</b> &middot; Cancel <span class="dis">discards title · body · kind · publishedAt · id · venueIds · departmentIds · roleIds · requiresAcknowledgement · expiresAt · publishedByPrincipalId · locale</span></div></div>
+          
         </div>
       </div>
       <div id="emp-050" class="scr">
@@ -942,12 +938,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listIncidents · getIncident · recordAuthorityNotification · updateIncident</div>
+          <div><b>OPERATIONS</b> &middot; listIncidents · getIncident · updateIncident</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; incidentId&larr;deepLink</div>
           <div><b>GOES TO</b> &middot; <a href="#emp-001">EMP-001</a>  &mdash; <i>Sign in</i><br><a href="#emp-002">EMP-002</a>  &mdash; <i>Select venue &amp; role</i><br><a href="#emp-003">EMP-003</a>  &mdash; <i>Home — on duty</i> <span class="car">incidentId</span><br><a href="#emp-047">EMP-047</a>  &mdash; <i>If it is a venue-wide event, an announcement</i></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formRecordAuthorityNotification &middot; <i>Record authority notification</i> &middot; <b>Record authority notification</b> &middot; Cancel <span class="dis">discards authority · notifiedAt · reference · notifiedByPrincipalId · attachmentRefs</span></div><div class="ov"><b>modal</b> formUpdateIncident &middot; <i>Save incident</i> &middot; <b>Save incident</b> &middot; Cancel <span class="dis">discards status · severity · assignedToPrincipalId · investigationNote · rootCause · correctiveActions · correctiveWorkOrderId · attachmentRefs</span></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formUpdateIncident &middot; <i>Save incident</i> &middot; <b>Save incident</b> &middot; Cancel <span class="dis">discards status · severity · assignedToPrincipalId · investigationNote · rootCause · correctiveActions · correctiveWorkOrderId · attachmentRefs</span></div></div>
         </div>
       </div>
       <div id="emp-021" class="scr">
@@ -1002,7 +998,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listRotaAssignments · requestShiftSwap · getCurrentShift</div>
+          <div><b>OPERATIONS</b> &middot; listRotaAssignments · requestShiftSwap</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; assignmentId&larr;deepLink</div>
           <div><b>GOES TO</b> &middot; <a href="#emp-001">EMP-001</a>  &mdash; <i>Sign in</i><br><a href="#emp-002">EMP-002</a>  &mdash; <i>Select venue &amp; role</i><br><a href="#emp-003">EMP-003</a>  &mdash; <i>Home — on duty</i><br><a href="#emp-023">EMP-023</a>  &mdash; <i>They ask to swap one</i> <span class="car">assignmentId</span></div>
@@ -1062,12 +1058,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; recordAttendance · listAttendance · amendAttendance</div>
+          <div><b>OPERATIONS</b> &middot; recordAttendance · listAttendance</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; recordId&larr;deepLink</div>
           <div><b>GOES TO</b> &middot; <a href="#emp-001">EMP-001</a>  &mdash; <i>Sign in</i><br><a href="#emp-002">EMP-002</a>  &mdash; <i>Select venue &amp; role</i><br><a href="#emp-003">EMP-003</a>  &mdash; <i>Home — on duty</i><br><a href="#emp-025">EMP-025</a>  &mdash; <i>They take a break and come back</i> <span class="car">recordId</span></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formRecordAttendance &middot; <i>Record attendance</i> &middot; <b>Record attendance</b> &middot; Cancel <span class="dis">discards kind · occurredAt · assignmentId · accessPointId · latitude · longitude</span></div><div class="ov"><b>modal</b> formAmendAttendance &middot; <i>Amend attendance</i> &middot; <b>Amend attendance</b> &middot; Cancel <span class="dis">discards correctedAt · reason</span></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formRecordAttendance &middot; <i>Record attendance</i> &middot; <b>Record attendance</b> &middot; Cancel <span class="dis">discards kind · occurredAt · assignmentId · accessPointId · latitude · longitude</span></div></div>
         </div>
       </div>
       <div id="emp-025" class="scr">
@@ -1122,12 +1118,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; reportIncident · getIncident · listIncidents · recordAuthorityNotification +1</div>
+          <div><b>OPERATIONS</b> &middot; reportIncident · getIncident · listIncidents</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; incidentId&larr;deepLink</div>
           <div><b>GOES TO</b> &middot; <a href="#emp-001">EMP-001</a>  &mdash; <i>Sign in</i><br><a href="#emp-002">EMP-002</a>  &mdash; <i>Select venue &amp; role</i><br><a href="#emp-003">EMP-003</a>  &mdash; <i>Home — on duty</i> <span class="car">incidentId</span><br><a href="#emp-004">EMP-004</a>  &mdash; <i>Technician picks up the work order</i><br><a href="#emp-027">EMP-027</a>  &mdash; <i>A supervisor reads it and adds detail</i> <span class="car">incidentId</span></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formReportIncident &middot; <i>Report incident</i> &middot; <b>Report incident</b> &middot; Cancel <span class="dis">discards id · kind · severity · venueId · description · occurredAt · recordedAt · assetId · locationDescription · involvedSubjectIds · involvedStaffPrincipalIds · witnessCount · firstAidGiven · emergencyServicesCalled · attachmentRefs</span></div><div class="ov"><b>modal</b> formRecordAuthorityNotification &middot; <i>Record authority notification</i> &middot; <b>Record authority notification</b> &middot; Cancel <span class="dis">discards authority · notifiedAt · reference · notifiedByPrincipalId · attachmentRefs</span></div><div class="ov"><b>modal</b> formUpdateIncident &middot; <i>Save incident</i> &middot; <b>Save incident</b> &middot; Cancel <span class="dis">discards status · severity · assignedToPrincipalId · investigationNote · rootCause · correctiveActions · correctiveWorkOrderId · attachmentRefs</span></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formReportIncident &middot; <i>Report incident</i> &middot; <b>Report incident</b> &middot; Cancel <span class="dis">discards id · kind · severity · venueId · description · occurredAt · recordedAt · assetId · locationDescription · involvedSubjectIds · involvedStaffPrincipalIds · witnessCount · firstAidGiven · emergencyServicesCalled · attachmentRefs</span></div></div>
         </div>
       </div>
       <div id="emp-027" class="scr">
@@ -1152,12 +1148,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getIncident · updateIncident · listIncidents</div>
-          <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
+          <div><b>OPERATIONS</b> &middot; getIncident · updateIncident · listIncidents · recordAuthorityNotification</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline · denied</span></div>
           <div><b>ARRIVES WITH</b> &middot; incidentId&larr;deepLink</div>
-          <div><b>GOES TO</b> &middot; <a href="#emp-001">EMP-001</a>  &mdash; <i>Sign in</i><br><a href="#emp-002">EMP-002</a>  &mdash; <i>Select venue &amp; role</i><br><a href="#emp-003">EMP-003</a>  &mdash; <i>Home — on duty</i> <span class="car">incidentId</span><br><a href="#emp-050">EMP-050</a>  &mdash; <i>Where required, the authorities are notified</i> <span class="car">incidentId</span></div>
+          <div><b>GOES TO</b> &middot; <a href="#emp-001">EMP-001</a>  &mdash; <i>Sign in</i><br><a href="#emp-002">EMP-002</a>  &mdash; <i>Select venue &amp; role</i><br><a href="#emp-003">EMP-003</a>  &mdash; <i>Home — on duty</i> <span class="car">incidentId</span><br><a href="#emp-038">EMP-038</a>  &mdash; <i>If it is a venue-wide event, an announcement</i><br><a href="#emp-050">EMP-050</a>  &mdash; <i>Where required, the authorities are notified</i> <span class="car">incidentId</span></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formUpdateIncident &middot; <i>Save incident</i> &middot; <b>Save incident</b> &middot; Cancel <span class="dis">discards status · severity · assignedToPrincipalId · investigationNote · rootCause · correctiveActions · correctiveWorkOrderId · attachmentRefs</span></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formUpdateIncident &middot; <i>Save incident</i> &middot; <b>Save incident</b> &middot; Cancel <span class="dis">discards status · severity · assignedToPrincipalId · investigationNote · rootCause · correctiveActions · correctiveWorkOrderId · attachmentRefs</span></div><div class="ov"><b>modal</b> formRecordAuthorityNotification &middot; <i>Record authority notification</i> &middot; <b>Record authority notification</b> &middot; Cancel</div></div>
         </div>
       </div>
       <div id="emp-028" class="scr">
@@ -1237,12 +1233,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             <div class="strip">offline capable · works from the local journal</div>
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><b>Open now</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Sends `?openNow=` to `listDiningOutlets`.</span></div><div class="panel"><b>Ordering method</b><div class="chip">Ordering method</div><span class="why">Sends `?orderingMethod=` to `listDiningOutlets`.</span></div><div class="panel"><b>Every dining outlet</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div><div class="side"><div class="panel"><b>Every delivery location</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the split template — not declared on the screen.</span></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listDiningOutlets · listDeliveryLocations · getVenueMap · getVenueMapLive</div>
+          <div><b>OPERATIONS</b> &middot; getVenueMap · getVenueMapLive</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; mapId&larr;deepLink, venueId&larr;session</div>
           <div><b>GOES TO</b> &middot; <a href="#emp-001">EMP-001</a>  &mdash; <i>Sign in</i><br><a href="#emp-002">EMP-002</a>  &mdash; <i>Select venue &amp; role</i><br><a href="#emp-003">EMP-003</a>  &mdash; <i>Home — on duty</i><br><a href="#emp-028">EMP-028</a>  &mdash; <i>A lost item is logged</i></div>
@@ -1273,7 +1269,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; publishAnnouncement · getAnnouncementReach · acknowledgeAnnouncement · listAnnouncements</div>
+          <div><b>OPERATIONS</b> &middot; publishAnnouncement · getAnnouncementReach · listAnnouncements</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; announcementId&larr;deepLink</div>
           <div><b>GOES TO</b> &middot; <a href="#emp-001">EMP-001</a>  &mdash; <i>Sign in</i><br><a href="#emp-002">EMP-002</a>  &mdash; <i>Select venue &amp; role</i><br><a href="#emp-003">EMP-003</a>  &mdash; <i>Home — on duty</i></div>
@@ -1388,7 +1384,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             <div class="strip">offline capable · works from the local journal</div>
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><b>Workstation id</b><div class="chip">Workstation id</div><span class="why">Sends `?workstationId=` to `listDevices`.</span></div><div class="panel"><b>Kind</b><div class="chip">Kind</div><span class="why">Sends `?kind=` to `listDevices`.</span></div><div class="panel"><b>Every registered device</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Every registered device</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div>
             </div>
           </div>
         </div>
@@ -1398,7 +1394,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>ARRIVES WITH</b> &middot; subjectId&larr;session</div>
           <div><b>GOES TO</b> &middot; <a href="#emp-001">EMP-001</a>  &mdash; <i>Sign in</i><br><a href="#emp-002">EMP-002</a>  &mdash; <i>Select venue &amp; role</i><br><a href="#emp-003">EMP-003</a>  &mdash; <i>Home — on duty</i><br><a href="#emp-018">EMP-018</a>  &mdash; <i>It pulls its offline package</i><br><a href="#emp-044">EMP-044</a> <br><a href="#emp-045">EMP-045</a> </div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formRegisterDevice &middot; <i>Register device</i> &middot; <b>Register device</b> &middot; Cancel <span class="dis">discards id · kind · driver · workstationId · identifier · model · pushToken · pushPlatform · pushFailureCount · offlineScope · firmwareVersion · isRequired · status · batteryPercent · lastCheckedAt · health · lastHeartbeatAt · capabilities</span></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formRegisterDevice &middot; <i>Register device</i> &middot; <b>Register device</b> &middot; Cancel <span class="dis">discards kind · driver · workstationId · identifier · model · pushToken · pushPlatform · pushFailureCount · offlineScope · firmwareVersion · isRequired · status · batteryPercent · lastCheckedAt · health · lastHeartbeatAt · capabilities</span></div></div>
         </div>
       </div>
       <div id="emp-044" class="scr">
@@ -1568,17 +1564,17 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             <div class="strip">offline capable · works from the local journal</div>
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><b>The table map</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Search floor plan</b><div class="chip">Search floor plan</div></div><div class="panel"><span class="kind">cardList</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">**Cards rather than a table.** One thumb, arm’s length, and a person who is walking.</span></div></div><div class="side"><div class="panel"><b>Confirm</b><div class="chip cta">Confirm</div></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>The table map</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">**Table states** (DI-336; CHG-CSA-012): Available, Ordered, Table closed (a short state after payment, ended by Make available; DEC-201, default) and Reserved, shown when</span></div><div class="panel"><b>Search floor plan</b><div class="chip">Search floor plan</div></div><div class="panel"><span class="kind">cardList</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">**Cards rather than a table.** One thumb, arm’s length, and a person who is walking.</span></div></div><div class="side"><div class="panel"><b>Confirm</b><div class="chip cta">Confirm</div></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getTableMap · setTableLayout</div>
+          <div><b>OPERATIONS</b> &middot; getTableMap</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; venueId&larr;session, outletId&larr;EMP-003</div>
           <div><b>GOES TO</b> &middot; nothing declared</div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetTableLayout &middot; <i>Save table layout</i> &middot; <b>Save table layout</b> &middot; Cancel <span class="dis">discards tables</span></div></div>
+          
         </div>
       </div>
       <div id="emp-053" class="scr">
@@ -1603,12 +1599,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; setTableLayout · createTable · updateTable · setSectionLayout</div>
+          <div><b>OPERATIONS</b> &middot; setTableLayout · setSectionLayout · setTableCombinations</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoAccess · offline</span></div>
-          <div><b>ARRIVES WITH</b> &middot; venueId&larr;session, outletId&larr;EMP-003, tableId&larr;navigation</div>
+          <div><b>ARRIVES WITH</b> &middot; venueId&larr;session, outletId&larr;EMP-003</div>
           <div><b>GOES TO</b> &middot; nothing declared</div>
           
-          
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetTableCombinations &middot; <i>Save table combinations</i> &middot; <b>Save table combinations</b> &middot; Cancel</div></div>
         </div>
       </div>
       <div id="emp-054" class="scr">
@@ -1633,7 +1629,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listTableReservations</div>
+          <div><b>OPERATIONS</b> &middot; listTableReservations · resolveBookingConflict</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; venueId&larr;session</div>
           <div><b>GOES TO</b> &middot; nothing declared</div>
@@ -1658,14 +1654,14 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             <div class="strip">offline capable · works from the local journal</div>
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><b>id</b><div class="chip">id</div></div><div class="panel"><b>outletId</b><div class="chip">outletId</div></div><div class="panel"><b>subjectId</b><div class="chip">subjectId</div></div></div><div class="side"><div class="panel"><b>guestName</b><div class="chip">guestName</div></div><div class="panel"><b>contactPoint</b><div class="chip">contactPoint</div></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>guestName</b><div class="chip">guestName</div></div><div class="panel"><b>contactPoint</b><div class="chip">contactPoint</div></div><div class="panel"><b>partySize</b><div class="chip">partySize</div></div></div><div class="side"><div class="panel"><b>startsAt</b><div class="chip">startsAt</div></div><div class="panel"><b>durationMinutes</b><div class="chip">durationMinutes</div></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; createTableReservation · matchGuest</div>
+          <div><b>OPERATIONS</b> &middot; matchGuest · getFnbReservationPolicy · sendBookingConfirmation · createTableReservationForGuest</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoAccess · offline</span></div>
-          <div><b>ARRIVES WITH</b> &middot; venueId&larr;session</div>
+          <div><b>ARRIVES WITH</b> &middot; venueId&larr;session, reservationId&larr;navigation, outletId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; nothing declared</div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formMatchGuest &middot; <i>Find matches for guest</i> &middot; <b>Find matches for guest</b> &middot; Cancel <span class="dis">discards name · phone · email</span></div></div>
@@ -1693,7 +1689,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; joinRestaurantWaitlist · leaveRestaurantWaitlist</div>
+          <div><b>OPERATIONS</b> &middot; joinRestaurantWaitlist · leaveRestaurantWaitlist · quoteWaitTime · notifyWaitlistParty</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; venueId&larr;session, entryId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; nothing declared</div>
@@ -1748,17 +1744,17 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             <div class="strip">offline capable · works from the local journal</div>
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><b>id</b><div class="chip">id</div></div><div class="panel"><b>tableId</b><div class="chip">tableId</div></div><div class="panel"><b>covers</b><div class="chip">covers</div></div></div><div class="side"><div class="panel"><b>serverPrincipalId</b><div class="chip">serverPrincipalId</div></div><div class="panel"><b>subjectId</b><div class="chip">subjectId</div></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>The table visit</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Search live table</b><div class="chip">Search live table</div></div><div class="panel"><span class="kind">cardList</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">**Cards rather than a table.** One thumb, arm’s length, and a person who is walking.</span></div></div><div class="side"><div class="panel"><b>Confirm</b><div class="chip cta">Confirm</div></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; openTableVisit · updateTableVisit · mergeTableVisits · transferTableVisit +13</div>
+          <div><b>OPERATIONS</b> &middot; openTableVisit · updateTableVisit · mergeTableVisits · transferTableVisit +8</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; venueId&larr;session, visitId&larr;EMP-003, reservationId&larr;deepLink</div>
           <div><b>GOES TO</b> &middot; <a href="#emp-059">EMP-059</a>  &mdash; <i>Food is ordered with courses</i> <span class="car">visitId</span><br><a href="#emp-060">EMP-060</a>  &mdash; <i>Reservation &amp; Table Performance</i> <span class="car">outletId</span></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>confirmDialog</b> confirmMergeTableVisits &middot; <i>Merge table visits</i></div><div class="ov"><b>modal</b> formUpdateTableVisit &middot; <i>Save table visit</i> &middot; <b>Save table visit</b> &middot; Cancel <span class="dis">discards recordedAt · covers · tableId · serverPrincipalId · note</span></div><div class="ov"><b>modal</b> formTransferTableVisit &middot; <i>Transfer table visit</i> &middot; <b>Transfer table visit</b> &middot; Cancel <span class="dis">discards toPrincipalId · reason · recordedAt · note</span></div><div class="ov"><b>modal</b> formSeatTableReservation &middot; <i>Seat table reservation</i> &middot; <b>Seat table reservation</b> &middot; Cancel <span class="dis">discards tableIds · recordedAt · actualPartySize</span></div><div class="ov"><b>modal</b> formSetServiceStage &middot; <i>Save service stage</i> &middot; <b>Save service stage</b> &middot; Cancel <span class="dis">discards recordedAt · stage</span></div><div class="ov"><b>modal</b> formMoveTableVisit &middot; <i>Move table visit</i> &middot; <b>Move table visit</b> &middot; Cancel <span class="dis">discards toTableId · recordedAt · reason · note</span></div><div class="ov"><b>modal</b> formReassignServer &middot; <i>Reassign server</i> &middot; <b>Reassign server</b> &middot; Cancel <span class="dis">discards recordedAt · serverPrincipalId · splitGratuity</span></div><div class="ov"><b>modal</b> formNotifyServer &middot; <i>Notify server</i> &middot; <b>Notify server</b> &middot; Cancel <span class="dis">discards reason</span></div><div class="ov"><b>modal</b> formCreateFnbOrder &middot; <i>Create F&amp;B order</i> &middot; <b>Create F&amp;B order</b> &middot; Cancel <span class="dis">discards id · outletId · serviceMode · lines · recordedAt · tableVisitId</span></div><div class="ov"><b>modal</b> formFireCourse &middot; <i>Fire course</i> &middot; <b>Fire course</b> &middot; Cancel <span class="dis">discards recordedAt · course · fireAt</span></div><div class="ov"><b>modal</b> formHoldCourse &middot; <i>Hold course</i> &middot; <b>Hold course</b> &middot; Cancel <span class="dis">discards recordedAt · course · reason · note</span></div><div class="ov"><b>modal</b> formSetTableCombinations &middot; <i>Save table combinations</i> &middot; <b>Save table combinations</b> &middot; Cancel <span class="dis">discards combinations</span></div><div class="ov"><b>modal</b> formJoinRestaurantWaitlist &middot; <i>Join restaurant waitlist</i> &middot; <b>Join restaurant waitlist</b> &middot; Cancel <span class="dis">discards id · outletId · partySize · status · recordedAt · subjectId · quotedWaitMinutes · seatingPreference · notifiedAt · syncedAt · holdExpiresAt</span></div><div class="ov"><b>modal</b> formNotifyWaitlistParty &middot; <i>Notify waitlist party</i> &middot; <b>Notify waitlist party</b> &middot; Cancel <span class="dis">discards channel · holdMinutes</span></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>confirmDialog</b> confirmMergeTableVisits &middot; <i>Merge table visits</i></div><div class="ov"><b>modal</b> formUpdateTableVisit &middot; <i>Save table visit</i> &middot; <b>Save table visit</b> &middot; Cancel <span class="dis">discards recordedAt · covers · tableId · serverPrincipalId · note</span></div><div class="ov"><b>modal</b> formTransferTableVisit &middot; <i>Transfer table visit</i> &middot; <b>Transfer table visit</b> &middot; Cancel <span class="dis">discards toPrincipalId · reason · recordedAt · note</span></div><div class="ov"><b>modal</b> formSeatTableReservation &middot; <i>Seat table reservation</i> &middot; <b>Seat table reservation</b> &middot; Cancel <span class="dis">discards tableIds · recordedAt · actualPartySize</span></div><div class="ov"><b>modal</b> formSetServiceStage &middot; <i>Save service stage</i> &middot; <b>Save service stage</b> &middot; Cancel <span class="dis">discards recordedAt · stage</span></div><div class="ov"><b>modal</b> formMoveTableVisit &middot; <i>Move table visit</i> &middot; <b>Move table visit</b> &middot; Cancel <span class="dis">discards toTableId · recordedAt · reason · note</span></div><div class="ov"><b>modal</b> formReassignServer &middot; <i>Reassign server</i> &middot; <b>Reassign server</b> &middot; Cancel <span class="dis">discards recordedAt · serverPrincipalId · splitGratuity</span></div><div class="ov"><b>modal</b> formCreateFnbOrder &middot; <i>Create F&amp;B order</i> &middot; <b>Create F&amp;B order</b> &middot; Cancel <span class="dis">discards id · outletId · serviceMode · lines · recordedAt · tableVisitId</span></div><div class="ov"><b>modal</b> formFireCourse &middot; <i>Fire course</i> &middot; <b>Fire course</b> &middot; Cancel <span class="dis">discards recordedAt · course · fireAt</span></div><div class="ov"><b>modal</b> formHoldCourse &middot; <i>Hold course</i> &middot; <b>Hold course</b> &middot; Cancel <span class="dis">discards recordedAt · course · reason · note</span></div></div>
         </div>
       </div>
       <div id="emp-059" class="scr">
@@ -1808,12 +1804,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             <div class="strip">offline capable · works from the local journal</div>
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><b>Outlet id</b><div class="chip">Outlet id</div><span class="why">Sends `?outletId=` to `listTableReservations`.</span></div><div class="panel"><b>Date</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Sends `?date=` to `listTableReservations`.</span></div><div class="panel"><b>Every table reservation</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div><div class="side"><div class="panel"><b>Search reservation</b><div class="chip">Search reservation</div></div><div class="panel"><span class="kind">cardList</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">**Cards rather than a table.** One thumb, arm’s length, and a person who is walking.</span></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Turn time, no-shows, covers, wait accuracy</b><div class="rows"><div class="bar"><i style="width:78%"></i></div><div class="bar"><i style="width:54%"></i></div><div class="bar"><i style="width:92%"></i></div><div class="bar"><i style="width:36%"></i></div><div class="bar"><i style="width:61%"></i></div></div><span class="why">All four from reporting, never computed on the device (decided 2 October 2026, Chinmay, batch 6, EMP-060; DEC-205; CHG-CSA-020): `tableTurnTime`, `noShowRate`, `covers`, </span></div><div class="panel"><b>Outlet id</b><div class="chip">Outlet id</div><span class="why">Sends `?outletId=` to `listTableReservations`.</span></div><div class="panel"><b>Date</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Sends `?date=` to `listTableReservations`.</span></div></div><div class="side"><div class="panel"><b>Every table reservation</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div><div class="panel"><b>Search reservation</b><div class="chip">Search reservation</div></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listTableReservations · getTableMap</div>
+          <div><b>OPERATIONS</b> &middot; listTableReservations · getTableMap · getKpiValues</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; venueId&larr;session, outletId&larr;EMP-003</div>
           <div><b>GOES TO</b> &middot; <a href="#emp-061">EMP-061</a>  &mdash; <i>Retail Inventory Command Center</i></div>
@@ -1868,17 +1864,17 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             <div class="strip">offline capable · works from the local journal</div>
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><b>The stock position</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Haccp status</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Shows `checksDue`, `checksMissed`, `openActions`, `unsignedActions`, `oldestOpenActionAgeHours`, `lastInspectionAt` from `getHaccpStatus`&#x27;s inline response. **The re</span></div><div class="panel"><b>Search store stock</b><div class="chip">Search store stock</div></div></div><div class="side"><div class="panel"><span class="kind">cardList</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">**Cards rather than a table.** One thumb, arm’s length, and a person who is walking.</span></div><div class="panel"><b>Confirm</b><div class="chip cta">Confirm</div></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>The stock position</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Search store stock</b><div class="chip">Search store stock</div></div><div class="panel"><span class="kind">cardList</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">**Cards rather than a table.** One thumb, arm’s length, and a person who is walking.</span></div></div><div class="side"><div class="panel"><b>Confirm</b><div class="chip cta">Confirm</div></div><div class="panel"><b>Outlet stock</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getStockPositions · setItemAvailability · getHaccpStatus · logTemperature</div>
+          <div><b>OPERATIONS</b> &middot; getStockPositions · getOutletStock · lookupMerchandise</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoAccess · offline</span></div>
-          <div><b>ARRIVES WITH</b> &middot; venueId&larr;session, itemId&larr;EMP-003</div>
-          <div><b>GOES TO</b> &middot; <a href="#emp-067">EMP-067</a>  &mdash; <i>They read the unit and record the temperatur</i></div>
+          <div><b>ARRIVES WITH</b> &middot; venueId&larr;session, outletId&larr;navigation</div>
+          <div><b>GOES TO</b> &middot; <a href="#emp-067">EMP-067</a>  &mdash; <i>They read the unit and record the temperatur</i> <span class="car">outletId</span></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetItemAvailability &middot; <i>Save item availability</i> &middot; <b>Save item availability</b> &middot; Cancel <span class="dis">discards isAvailable · recordedAt · reason · restoreAt · note</span></div><div class="ov"><b>modal</b> formLogTemperature &middot; <i>Log temperature</i> &middot; <b>Log temperature</b> &middot; Cancel <span class="dis">discards id · checkPointId · recordedAt · valueCelsius · outcome · checkPointKind · recordedByPrincipalId · minCelsius · maxCelsius · deviceReported · correctiveActionId</span></div></div>
+          
         </div>
       </div>
       <div id="emp-063" class="scr">
@@ -1903,12 +1899,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; createRequisition · listRequisitions</div>
+          <div><b>OPERATIONS</b> &middot; createRequisition · listRequisitions · getSuggestedRequisitions · updateRequisitionLines</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
-          <div><b>ARRIVES WITH</b> &middot; venueId&larr;session</div>
+          <div><b>ARRIVES WITH</b> &middot; venueId&larr;session, requisitionId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; nothing declared</div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formCreateRequisition &middot; <i>Create requisition</i> &middot; <b>Create requisition</b> &middot; Cancel <span class="dis">discards id · venueId · lines · requiredBy · departmentId · costCenterId · justification</span></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formCreateRequisition &middot; <i>Create requisition</i> &middot; <b>Create requisition</b> &middot; Cancel <span class="dis">discards id · venueId · lines · requiredBy · departmentId · costCenterId · justification</span></div><div class="ov"><b>modal</b> formUpdateRequisitionLines &middot; <i>Edit lines</i> &middot; <b>Edit lines</b> &middot; Cancel</div></div>
         </div>
       </div>
       <div id="emp-064" class="scr">
@@ -1928,47 +1924,47 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             <div class="strip">offline capable · works from the local journal</div>
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><b>Every stock location</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div><div class="panel"><b>Search store-to-store</b><div class="chip">Search store-to-store</div></div><div class="panel"><span class="kind">cardList</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">**Cards rather than a table.** One thumb, arm’s length, and a person who is walking.</span></div></div><div class="side"><div class="panel"><b>Confirm</b><div class="chip cta">Confirm</div></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Every stock location</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div><div class="panel"><b>Search store-to-store</b><div class="chip">Search store-to-store</div></div><div class="panel"><span class="kind">cardList</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">**Cards rather than a table.** One thumb, arm’s length, and a person who is walking.</span></div></div><div class="side"><div class="panel"><b>Confirm</b><div class="chip cta">Confirm</div></div><div class="panel"><b>Transfers</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; createStockTransfer · listStockLocations</div>
+          <div><b>OPERATIONS</b> &middot; createStockTransfer · listStockLocations · listStockTransfers · getStockTransfer +1</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
-          <div><b>ARRIVES WITH</b> &middot; venueId&larr;session</div>
+          <div><b>ARRIVES WITH</b> &middot; venueId&larr;session, transferId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; nothing declared</div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formCreateStockTransfer &middot; <i>Create stock transfer</i> &middot; <b>Create stock transfer</b> &middot; Cancel <span class="dis">discards id · fromLocationId · toLocationId · lines · recordedAt · note</span></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formCreateStockTransfer &middot; <i>Create stock transfer</i> &middot; <b>Create stock transfer</b> &middot; Cancel <span class="dis">discards id · fromLocationId · toLocationId · lines · recordedAt · note</span></div><div class="ov"><b>modal</b> formReceiveStockTransfer &middot; <i>Receive</i> &middot; <b>Receive</b> &middot; Cancel</div></div>
         </div>
       </div>
       <div id="emp-065" class="scr">
         <div>
           <div class="hdr"><span class="code">EMP-065</span>
-            <span class="ttl">Receiving &amp; Store Put-Away</span><span class="pill off">offline</span><span class="pill named" title="Board archived to _dump/; the link is history and no drawn frame for this screen is in wireframes/">archived: FnB Board 5.dc.html#fnb-5g</span></div>
+            <span class="ttl">Receiving</span><span class="pill off">offline</span><span class="pill named" title="Board archived to _dump/; the link is history and no drawn frame for this screen is in wireframes/">archived: FnB Board 5.dc.html#fnb-5g</span></div>
           <div class="pur">Receiving &amp; Store Put-Away — from the client design board, 20 August.</div>
         </div>
         <div class="frame dark">
           <aside class="rail"><div class="brand"><b>TICVAI</b><span>Stock on the Floor</span></div><nav class="nav"><i class="">Dashboard</i><i class="on">Stock on the Floor</i><i class="">Settings</i><i class="">Reports</i><i class="">People</i></nav></aside>
           <div class="body">
             <div class="top">
-              <div><h2>Receiving &amp; Store Put-Away</h2>
+              <div><h2>Receiving</h2>
                 <small>Venue Staff App &middot; wave 2 &middot; comfortable</small></div>
               <div class="acts"><div class="chip">This venue &#9662;</div><div class="chip live">Live</div><div class="chip cta">Primary action</div></div>
             </div>
             <div class="strip">offline capable · works from the local journal</div>
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><b>Search receiving</b><div class="chip">Search receiving</div></div><div class="panel"><span class="kind">cardList</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">**Cards rather than a table.** One thumb, arm’s length, and a person who is walking.</span></div><div class="panel"><b>Confirm</b><div class="chip cta">Confirm</div></div></div><div class="side"><div class="panel"><b>The stock transfer</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Search receiving</b><div class="chip">Search receiving</div></div><div class="panel"><span class="kind">cardList</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">**Cards rather than a table.** One thumb, arm’s length, and a person who is walking.</span></div><div class="panel"><b>Confirm</b><div class="chip cta">Confirm</div></div></div><div class="side"><div class="panel"><b>The stock transfer</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Expected deliveries</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; createGoodsReceipt · rejectReceivedGoods · logColdChain · getStockTransfer</div>
+          <div><b>OPERATIONS</b> &middot; createGoodsReceipt · rejectReceivedGoods · logColdChain · getStockTransfer +2</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; venueId&larr;session, receiptId&larr;EMP-003, transferId&larr;deepLink</div>
           <div><b>GOES TO</b> &middot; nothing declared</div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>confirmDialog</b> confirmRejectReceivedGoods &middot; <i>Reject received goods</i></div><div class="ov"><b>modal</b> formCreateGoodsReceipt &middot; <i>Create goods receipt</i> &middot; <b>Create goods receipt</b> &middot; Cancel <span class="dis">discards id · purchaseOrderId · locationId · lines · recordedAt · deliveryNoteReference</span></div><div class="ov"><b>modal</b> formLogColdChain &middot; <i>Log cold chain</i> &middot; <b>Log cold chain</b> &middot; Cancel <span class="dis">discards id · recordedAt · valueCelsius · decision · goodsReceiptId · transferId · thresholdCelsius · correctiveActionId · supplierClaimRaised</span></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>confirmDialog</b> confirmRejectReceivedGoods &middot; <i>Reject received goods</i></div><div class="ov"><b>modal</b> formCreateGoodsReceipt &middot; <i>Create goods receipt</i> &middot; <b>Create goods receipt</b> &middot; Cancel <span class="dis">discards id · purchaseOrderId · locationId · lines · recordedAt · deliveryNoteReference</span></div><div class="ov"><b>modal</b> formLogColdChain &middot; <i>Log cold chain</i> &middot; <b>Log cold chain</b> &middot; Cancel <span class="dis">discards id · recordedAt · valueCelsius · decision · goodsReceiptId · transferId · thresholdCelsius · correctiveActionId · supplierClaimRaised</span></div><div class="ov"><b>modal</b> formReceiveStockTransfer &middot; <i>Receive transfer</i> &middot; <b>Receive transfer</b> &middot; Cancel</div></div>
         </div>
       </div>
       <div id="emp-066" class="scr">
@@ -1988,17 +1984,17 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             <div class="strip">offline capable · works from the local journal</div>
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><b>The count variance</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">**Shown only after the count is submitted.** While the count is `open` or `counting` the screen shows no expected quantity and no variance, and `getCountVariance` answers</span></div><div class="panel"><b>Search stock count</b><div class="chip">Search stock count</div></div><div class="panel"><span class="kind">cardList</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">**Cards rather than a table.** One thumb, arm’s length, and a person who is walking. **The lines arrive pre-filled from on-hand stock** — one card per item at the locatio</span></div></div><div class="side"><div class="panel"><b>Confirm</b><div class="chip cta">Confirm</div></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Search stock count</b><div class="chip">Search stock count</div></div><div class="panel"><span class="kind">cardList</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">**Cards rather than a table.** One thumb, arm’s length, and a person who is walking. **The lines arrive pre-filled from on-hand stock** — one card per item at the locatio</span></div><div class="panel"><b>Confirm</b><div class="chip cta">Confirm</div></div></div><div class="side"><div class="panel"><b>Open counts</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; startStockCount · postStockCount · getCountVariance · enterCountLine +2</div>
+          <div><b>OPERATIONS</b> &middot; startStockCount · enterCountLine · setDailyCount · listStockCounts</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; venueId&larr;session, countId&larr;EMP-003</div>
           <div><b>GOES TO</b> &middot; nothing declared</div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formStartStockCount &middot; <i>Start stock count</i> &middot; <b>Start stock count</b> &middot; Cancel <span class="dis">discards id · locationId · kind · categoryIds · isBlind</span></div><div class="ov"><b>modal</b> formPostStockCount &middot; <i>Post stock count</i> &middot; <b>Post stock count</b> &middot; Cancel <span class="dis">discards note</span></div><div class="ov"><b>modal</b> formEnterCountLine &middot; <i>Enter count line</i> &middot; <b>Enter count line</b> &middot; Cancel <span class="dis">discards recordedAt · itemId · countedQuantity · locationId · uom · batchId · note</span></div><div class="ov"><b>modal</b> formRequestRecount &middot; <i>Request recount</i> &middot; <b>Request recount</b> &middot; Cancel <span class="dis">discards lineIds · reason</span></div><div class="ov"><b>modal</b> formSetDailyCount &middot; <i>Save daily count</i> &middot; <b>Save daily count</b> &middot; Cancel <span class="dis">discards itemIds · locationId · dueBy · postsAdjustment</span></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formStartStockCount &middot; <i>Start stock count</i> &middot; <b>Start stock count</b> &middot; Cancel <span class="dis">discards id · locationId · kind · categoryIds · isBlind</span></div><div class="ov"><b>modal</b> formEnterCountLine &middot; <i>Enter count line</i> &middot; <b>Enter count line</b> &middot; Cancel <span class="dis">discards recordedAt · itemId · countedQuantity · locationId · uom · batchId · note</span></div><div class="ov"><b>modal</b> formSetDailyCount &middot; <i>Save daily count</i> &middot; <b>Save daily count</b> &middot; Cancel <span class="dis">discards itemIds · locationId · dueBy · postsAdjustment</span></div></div>
         </div>
       </div>
       <div id="emp-067" class="scr">
@@ -2023,7 +2019,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; recordWaste · createStockMovement · logTemperature · signCorrectiveAction</div>
+          <div><b>OPERATIONS</b> &middot; recordWaste · createStockMovement · logTemperature · signCorrectiveAction +1</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; venueId&larr;session, outletId&larr;EMP-003, actionId&larr;deepLink</div>
           <div><b>GOES TO</b> &middot; nothing declared</div>
@@ -2053,9 +2049,9 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getStockPositions · reserveMerchandise</div>
+          <div><b>OPERATIONS</b> &middot; getStockPositions · reserveMerchandise · collectMerchandiseReservation · cancelMerchandiseReservation</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoAccess · offline</span></div>
-          <div><b>ARRIVES WITH</b> &middot; venueId&larr;session, outletId&larr;EMP-003</div>
+          <div><b>ARRIVES WITH</b> &middot; venueId&larr;session, outletId&larr;EMP-003, reservationId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; nothing declared</div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formReserveMerchandise &middot; <i>Reserve merchandise</i> &middot; <b>Reserve merchandise</b> &middot; Cancel <span class="dis">discards id · lines · expiresAt · subjectId · collectionNote</span></div></div>
@@ -2228,12 +2224,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             <div class="strip">offline capable · works from the local journal</div>
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><b>Assign rental equipment</b><div class="chip cta">Assign rental equipment</div><span class="why">The act the screen exists for.</span></div><div class="panel"><b>Cancel</b><div class="chip">Cancel</div><span class="why">**A screen that can submit must be leaveable without submitting.**</span></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Assign rental equipment</b><div class="chip cta">Assign rental equipment</div><span class="why">The act the screen exists for.</span></div><div class="panel"><b>Cancel</b><div class="chip">Cancel</div><span class="why">**A screen that can submit must be leaveable without submitting.**</span></div><div class="panel"><b>Available units</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; assignRentalEquipment</div>
+          <div><b>OPERATIONS</b> &middot; assignRentalEquipment · getRentalAvailability</div>
           <div><b>STATES</b> &middot; <span class="warn">emptyFirstRun · emptyNoAccess · emptyNoResults · error · loading · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; bookingId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#emp-071">EMP-071</a>  &mdash; <i>Back to Rental Checkout Command Center</i></div>
@@ -2648,12 +2644,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             <div class="strip">offline capable · works from the local journal</div>
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue&#x27;s busiest hour is a list that skips rows.</span></div><div class="panel"><b>Send transactional message</b><div class="chip cta">Send transactional message</div><span class="why">The act the screen exists for.</span></div><div class="panel"><b>Cancel</b><div class="chip">Cancel</div><span class="why">**A screen that can submit must be leaveable without submitting.**</span></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue&#x27;s busiest hour is a list that skips rows.</span></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listOverdueRentals · sendTransactionalMessage</div>
+          <div><b>OPERATIONS</b> &middot; listOverdueRentals</div>
           <div><b>STATES</b> &middot; <span class="warn">emptyFirstRun · emptyNoAccess · emptyNoResults · error · loading · offline</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#emp-081">EMP-081</a>  &mdash; <i>Back to Active Rental Operations Command Cen</i></div>
@@ -2978,14 +2974,14 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             <div class="strip">offline capable · works from the local journal</div>
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><span class="kind">primaryButton</span><div class="chip cta">primaryButton</div><span class="why">The act the screen exists for.</span></div><div class="panel"><b>Cancel</b><div class="chip">Cancel</div><span class="why">**A screen that can submit must be leaveable without submitting.**</span></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">primaryButton</span><div class="chip cta">primaryButton</div><span class="why">The act the screen exists for.</span></div><div class="panel"><b>Cancel</b><div class="chip">Cancel</div><span class="why">**A screen that can submit must be leaveable without submitting.**</span></div><div class="panel"><b>Deposit history</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; returnRental</div>
+          <div><b>OPERATIONS</b> &middot; returnRental · listDepositActivity</div>
           <div><b>STATES</b> &middot; <span class="warn">emptyFirstRun · emptyNoAccess · emptyNoResults · error · loading · offline</span></div>
-          <div><b>ARRIVES WITH</b> &middot; bookingId&larr;navigation</div>
+          <div><b>ARRIVES WITH</b> &middot; bookingId&larr;navigation, depositId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#emp-091">EMP-091</a>  &mdash; <i>Back to Rental Return Command Center</i></div>
           
           
@@ -3013,9 +3009,9 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; returnRental · setAssetStatus</div>
+          <div><b>OPERATIONS</b> &middot; returnRental</div>
           <div><b>STATES</b> &middot; <span class="warn">emptyFirstRun · emptyNoAccess · emptyNoResults · error · loading · offline</span></div>
-          <div><b>ARRIVES WITH</b> &middot; assetId&larr;navigation, bookingId&larr;navigation</div>
+          <div><b>ARRIVES WITH</b> &middot; bookingId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#emp-091">EMP-091</a>  &mdash; <i>Back to Rental Return Command Center</i></div>
           
           

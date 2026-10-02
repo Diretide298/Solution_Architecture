@@ -1,14 +1,14 @@
 # WS65 — Ticket Upgrade, Exchange & Conversion board 1
 
-**10 screens · 10 operations · 13 schemas · 2 permissions**
+**10 screens · 11 operations · 15 schemas · 2 permissions**
 
-Platform P09 TICVAI Web · ships as **ticvai-control** ·
-platformAdmin audience · web ·
+Platform P08 Venue Management · ships as **venue-management** ·
+staff audience · web ·
 online only
 
 ## Who this is for
 
-**platformAdmin on web.** Everything below is how you know what is
+**staff on web.** Everything below is how you know what is
 true. **None of it is the subject.** The subject is the person in front of the screen and the one
 thing they came to do.
 
@@ -61,6 +61,45 @@ convincingly. It is never a caption.
   and its error; and, element by element, what is shown and in what format, what each action
   produces and where the user goes next. Draw exactly that.
 
+## The processes these screens belong to
+
+Written by the owner of each process (`handoff/design-notes/`). Read before any screen: it says how the process runs end to end and which words the screens must use.
+
+### Ticketing & Guest Commerce, as the venue and TICVAI configure and run it
+
+WHAT THE PROCESS IS. Everything a guest can buy is set up, priced, promoted and serviced here, on Venue Management (P08, the venue's own back office, served inside the venue's cell) and on the TICVAI Console (P09, TICVAI's control plane, outside every cell). End to end: (1) CATALOGUE. A product has one of twelve kinds (admission, timedAdmission, datedAdmission, openDated, seated, membership, bundle, fnb, retail, rental, addOn, giftCard). Its ticket types (adult, child, senior, resident...) are not typed one by one: they are generated from the product's attributes (components) and each value combination becomes a sellable ticket type with no extra setup (DI-164). What a ticket grants (validity, entries, re-entry, days of week, blackout dates, expiry anchor, fast track, transfer) lives on a reusable entitlement template, not on the product. Who may take part (age, height, supervision, certification) is the eligibility rule; what the guest must answer is the data mask and the consent questions; how the guest sees it is guestListing (bookable, infoOnly, hidden), display tags (at most six), media and the booking flow. Group, family and corporate products and every after-sales policy (reschedule, exchange, refund, cancellation, upgrade, transfer) are configured inside the one product configuration, never on separate screens (DI-465, DI-466). (2) LIFECYCLE AND PUBLICATION. A product moves draft, inReview, approved, live, withdrawn, archived. Approval and publication are two acts with two permissions (PRODUCT_APPROVE, PRODUCT_PUBLISH, R091); every product is authorised before it sells online or on site (DI-438). Approved is still not on a till: a till sells only what is in the signed catalogue release it pulled (publishBundle, ADR-0013), so a saved price is a back-office fact until the venue publishes to tills. Changing something that has sold is preceded by an impact check (assessProductChange: orders affected, entitlements issued, future performances, open carts); restoring a version creates a new version, and sold tickets keep the price and terms they were sold under (restoreProductVersion, DI-938, TRACKER Actions row 145). (3) PRICE. Prices live in price lists: per venue, per channel set, with validity dates and a priority, copied for the next season with an uplift (copyPriceList) and repriced in bulk only after a dry run (bulkChangePrices). Currency and decimal scale are never chosen on a form: they resolve from the venue's region (ADR-0008, ADR-0018; AED 2 places, OMR and BHD 3). When several rules apply, the configured hierarchy decides; there is no "lowest price wins" default (DI-595). Tax on the pre-discount price and three-decimal rounding are regional settings (DI-598). Dynamic rules always show their minimum and maximum price guardrails beside the trigger (getDynamicPriceRule). (4) PROMOTE AND BUNDLE. A promotion is a rule (automatic, or gated by a code) created in draft, made live only by Publish, which first analyses stacking; a …
+*(source: DI-164; DI-171; DI-438; DI-465; DI-466; DI-595; DI-598; DI-387; DI-039; DI-044; DI-474; DI-671; DI-987; DI-019; DI-080; ADR-0008; ADR-0013; ADR-0018; ADR-0019; ADR-0030; R091; R098; R101; R222; REV3-21; contracts/spine/catalogue.yaml#transitionProductLifecycle …)*
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Product | Anything sellable, of one of the twelve kinds. The record that carries names, channels, listing, media and policies. | Item (except on F&B and retail screens), SKU (for tickets), Offering | contracts/spine/catalogue.yaml#/components/schemas/ProductKind |
+| Ticket type | One sellable variant of an admission or event product (Adult, Child, Resident Adult), generated from the product's attributes. For retail and F&B the same record is labelled Variant. | Variant (on ticket screens), Sub-product, Rate (that is a price), Axis value | contracts/spine/catalogue.yaml#updateProductVariant / DI-164 / DI-437 |
+| Attribute | A dimension that generates ticket types (Guest category, Residency, Tier, Length). Each has values; adding a value adds ticket types. | Axis, Component (the client's word; use it only in help text), Option | contracts/spine/catalogue.yaml#setProductAttributes / DI-164 / DI-450 |
+| Entitlement | What a ticket lets the holder do (validity, entries, re-entry, days, blackout dates, expiry, fast track, transfer), defined once on an entitlement template and shared by several products. | Access rights, Ticket rules, Validity profile | contracts/spine/catalogue.yaml#createEntitlementTemplate / DI-171 / DI-451 |
+| Eligibility rule | Who may take part in or buy a product (age, height, supervision, waiver, certification). Distinct from a promotion's eligibility, which decides who gets a discount. | Restriction, Access rule (that is access control) | contracts/spine/catalogue.yaml#setProductEligibilityRule / DI-463 |
+| Price list | A set of prices for one venue and a set of channels, valid between two dates, with a priority. Several coexist (B2C, B2B, season). | Price book, Rate card, Tariff | contracts/spine/catalogue.yaml#createPriceList / DI-140 / DI-163 |
+| Price category | A standard rate type (Adult, Child, Member) reused across lists so venues do not invent "Adult Standard" and "Normal Adult". | Price band (that is a seat-category band), Fare type (transport) | contracts/spine/catalogue.yaml#setPriceCategoryRateType / … |
+| Price band | A priced band on a seat category (code, label, colour, amount, channel, from-date). | Price category, Zone price | contracts/satellite/seating.yaml#/components/schemas/SeatPriceBand |
+| Promotion | A rule that changes a price automatically or when a code is entered; draft until published; declares how it stacks. | Offer (except in guest copy), Deal, Discount rule | contracts/satellite/promotions.yaml#createPromotion / DI-173 / DI-174 |
+| Coupon code | A code issued from a coupon campaign that applies a promotion-style discount; one shared code or many single-use codes. | Voucher, Promo voucher | contracts/satellite/promotions.yaml#createCouponCampaign / DI-173 |
+| Voucher | A code that carries money (face value, balance), sold or issued; a liability until redeemed or expired. | Coupon, Credit note | contracts/satellite/promotions.yaml#listVoucherBatches / … |
+| Bundle | A product sold as one line whose price differs from the sum of its components, with a mandatory revenue allocation. "Package" is acceptable in guest copy. | Combo (that is an F&B meal deal), Catalogue bundle | contracts/satellite/promotions.yaml#createBundle / DI-220 / ADR-0019 |
+| Catalogue release | The signed snapshot of a venue's catalogue, prices, promotions and sale boards that tills, kiosks and devices pull. Its action label is "Publish to tills". | Bundle, Catalogue bundle, Sync, Deploy | contracts/spine/catalogue.yaml#publishBundle / … |
+| Approve / Publish / Save | Save keeps a draft; Approve records that it is authorised (PRODUCT_APPROVE); Publish makes it live for guests and channels (PRODUCT_PUBLISH). Three different buttons, never merged. | Submit, Go live, Activate (except CatalogueConfigStatus active), Deploy | R091 / contracts/spine/catalogue.yaml#transitionProductLifecycle / DI-438 |
+| Product states | Draft, In review, Approved, Live, Withdrawn, Archived (ProductLifecycleState), always as coloured badges with these exact labels. | Published (for a product), Pending, Inactive (for a product) | contracts/spine/catalogue.yaml#/components/schemas/ProductLifecycleState |
+| Channel | Where something is sold. Labels: pos Point of sale; kiosk Kiosk; web and guestWeb Website; mobile and guestApp App; b2b B2B partners; partner Partner; ota Travel agents (OTA); callCentre Call centre; api API; backOffice Back office. | Touchpoint, Outlet (an outlet is a business inside a venue), raw enum values | contracts/spine/catalogue.yaml#/components/schemas/Channel / … |
+| Refund | Money returned after settlement, wholly or for some lines, under the venue's refund policy. | Return (that is retail goods), Reversal, Void | contracts/spine/orders.yaml#createRefund / DI-252 |
+| Void | Cancelling a whole order before settlement, within the same shift, with a reason from the void list. After settlement it is a refund. | Cancel order, Delete | contracts/spine/orders.yaml#voidOrder / R222 |
+| Exchange / Reschedule | Exchange swaps lines for other products or dates and settles only the difference; Reschedule is the same product moved to another date or time. | Rebook, Date change (acceptable only in guest copy), Refund and resell | contracts/spine/orders.yaml#exchangeOrderLines / … |
+| Hold / Capture / Release | A deposit or stored-value amount is held, then partly or fully captured, and the rest released. A held deposit is not a payment. | Charge, Pre-auth (in staff copy), Block funds | contracts/spine/orders.yaml#authoriseStoredValue / … |
+| Wallet (TICVAI wallet) | The guest's stored-value balance on TICVAI, spent by hold and capture. Distinct from the tender "Apple Pay / Google Pay", which the contract also calls wallet. | Digital wallet (for stored value), E-wallet, Credit (without a type) | contracts/spine/orders.yaml#/components/schemas/TenderKind / R080 |
+| Credit lot | One amount of wallet credit of one credit type (cash, bonus, gift) with its own expiry; lots are spent nearest expiry first and the guest sees the breakdown but cannot choose. | Bucket, Batch, Top-up | TRACKER Actions row 171 / contracts/satellite/wallet.yaml#expireCreditLots |
+| Venue map / Seat map | A venue map is the wayfinding map of a park or a floor (points, paths, bookable places); a seat map is the seating layout of an auditorium or stand. Never just "map" where both could be meant. | Layout (alone), Floor plan (unless it is a floor map), Map (alone) | contracts/satellite/venue-map.yaml#createVenueMap / … |
+| Point / Bookable place | A point is a place on a venue map (toilet, ride, restaurant, exit). A bookable place is a cabana, lounger, table or pitch placed on the map and sold through its price band. | Pin, POI, Marker, Resource (in staff copy) | contracts/satellite/venue-map.yaml#setVenuePoint / … |
+| Station / Route / Timetable / Departure / Fare table / Pass … | A route is an ordered list of stations with offsets; a timetable generates departures up to its release horizon; a fare table prices a route per passenger type; a pass type is a multi-trip or unlimited pass sold as a product. | Stop (except in the stop list), Line (except lineCode), Schedule, Trip (except a guest's journey) | contracts/satellite/transport.yaml / REV3-21 |
+| Applies from | The effective date of a change. Every dated change shows it, and sold items keep their old terms. | Effective date (in labels), Start date (for a change) | contracts/satellite/seating.yaml#updateSeatCategory / TRACKER Actions row 194 |
+
+
 ## The screens
 
 Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs count fields; requirements are matrix rows; meeting inputs are the ones naming the screen (the module and platform ones are below); white label says whether the tenant's brand reaches it (guest) or it sets the brand (configures).
@@ -75,7 +114,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `ADM-313` | Pro-Rata, Residual Value & Entitlement Credit Configuration | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
 | `ADM-314` | Person-Type, Product & Entitlement Conversion Rules | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
 | `ADM-315` | Bulk, Group & Assisted Upgrade Operations | B–D | 9 | 0 | 5 | 0 | 2 | 0 | — | notStarted (generated) |
-| `ADM-316` | Upgrade Execution, Credential Regeneration & Channel Controls | B–D | 8 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
+| `ADM-316` | Upgrade Execution, Credential Regeneration & Channel Controls | B–D | 8 | 17 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
 | `ADM-317` | Upgrade History, Exception Management & Audit Explorer | B–D | 2 | 2 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
@@ -94,15 +133,23 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `ticketing` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `ORDER_VIEW` (1 read); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `ORDER_VIEW` (1 read); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | commandCentre (compact density): the pack gives this screen both a metric directory (§Display) and a per-row directory (§Each configuration displays) — counts over a population, then the population |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/commercial/upgrade-conversion-command-center-adm-308` |
+
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** All ticket upgrade, exchange and conversion configuration and activity.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **List operation(s) listUpgradeConversion return a bare array, not the paged list envelope (items, nextCursor, hasMore).** Why: The table cannot page, and a row without an id cannot open, edit or link to the record it summarises. *(source: contracts/spine/orders.yaml#listUpgradeConversion; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
 
 #### Inputs: what the user enters or picks
 
@@ -188,11 +235,15 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Status | text | Status |
 | Owner | text | Owner |
 
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **overview**: Paths configured, upgrades today, revenue. *(source: contracts/spine/orders.yaml#listUpgradeConversion)*
+
 **Data it reads**: `listUpgradeConversion` (onLoad, Upgrade & Conversion Command Center)
 
 **Where the user goes next**
 
-- → `ADM-002` Platform Dashboard: *Platform Dashboard*
+- → `BO-100` Venue Home: *Back to Venue Home*
 - → `ADM-309` Upgrade & Conversion Path Builder: *Works in Upgrade & Conversion Path Builder*; calls `listUpgradeConversion`
 - → `ADM-310` Upgrade Eligibility & Qualification Rules: *Works in Upgrade Eligibility & Qualification Rules*; calls `listUpgradeConversion`
 - → `ADM-311` Upgrade Timing, Usage & Ticket Status Rules: *Works in Upgrade Timing, Usage & Ticket Status Rules*; calls `listUpgradeConversion`
@@ -214,6 +265,17 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+kpis:
+  paths: 14
+  upgradesToday: 41
+  revenue: AED 6,150.00
+```
+
 #### Permissions
 
 - `listUpgradeConversion` → `ORDER_VIEW` (read) · staff
@@ -231,7 +293,7 @@ For this screen, newest first. An **Open question** is built to the default it s
 - Workshop packs group screens ten to a board, each opened by a command centre; that grouping is the navigation: the nine detail screens are reached from the board's hub and return to it. *(agreed · screen note 4 Sep 2026, BO-144 and the other board hubs · DI-653)*
 - Upgrade dashboard shows upgrade/exchange volume and upgrade revenue for a period. Paths define which product upgrades to which (adult ticket to membership; lower to higher membership tier), with downgrade paths where allowed. *(client request · MoM 1 Sep 2026, 4.9 Ticket Upgrade & Downgrade Configuration · DI-602)*
 
-Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -239,7 +301,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-308` · status **notStarted** · provenance generated
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-308` · status **notStarted** · provenance generated
 - Client workshop board: `wireframes/WS171 Ticket Upgrade, Exchange & Conversion Board 1.dc.html#adm-308`
 - Workshop pack: Ticket Upgrade, Exchange & Conversion_Reference.pdf board 1
 - Flow F174 *Ticket Upgrade, Exchange & Conversion board 1: Upgrade & Conversion Command …*, step 1: Opens Upgrade & Conversion Command Center → Provide administrators and operations teams with one centralized view of all ticket upgrade, exchange and conversion configurations and operational activity.
@@ -260,9 +322,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every output is drawn (24 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-308?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
-- [ ] Every transition is wired: `ADM-002`, `ADM-309`, `ADM-310`, `ADM-311`, `ADM-312`, `ADM-313`, `ADM-314`, `ADM-315`, `ADM-316`, `ADM-317`.
+- [ ] Every transition is wired: `BO-100`, `ADM-309`, `ADM-310`, `ADM-311`, `ADM-312`, `ADM-313`, `ADM-314`, `ADM-315`, `ADM-316`, `ADM-317`.
 - [ ] Every gated control is gated: `ORDER_VIEW`.
 - [ ] The 2 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -273,21 +336,33 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `ticketing` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `ORDER_CREATE` (1 operate); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `ORDER_CREATE` (1 operate); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/commercial/upgrade-conversion-path-builder-adm-309` |
 
-**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
+
+**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built. Contract gap recorded 2 October 2026 (CHG-WIR-027): No read of upgrade and conversion paths (setUpgradeConversionPath has no get or list).
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Which products may convert into which (day pass to annual pass, standard to VIP).
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- No read operation: the screen declares only setUpgradeConversionPath and nothing that returns the current configuration. (CHG-WIR-027)
 
 #### Inputs: what the user enters or picks
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **path**: From product, to product, direction (upgrade or downgrade), windows. *(source: contracts/spine/orders.yaml#setUpgradeConversionPath / TRACKER Actions row 207)*
 
 #### Outputs: what the screen shows and produces
 
@@ -313,6 +388,17 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+path:
+  from: Day Pass
+  to: Annual Pass Gold
+  window: same day, at the gate or in the app
+```
+
 #### Permissions
 
 - `setUpgradeConversionPath` → `ORDER_CREATE` (operate) · staff
@@ -329,7 +415,7 @@ For this screen, newest first. An **Open question** is built to the default it s
 
 - Upgrade dashboard shows upgrade/exchange volume and upgrade revenue for a period. Paths define which product upgrades to which (adult ticket to membership; lower to higher membership tier), with downgrade paths where allowed. *(client request · MoM 1 Sep 2026, 4.9 Ticket Upgrade & Downgrade Configuration · DI-602)*
 
-Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -337,7 +423,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-309` · status **notStarted** · provenance generated
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-309` · status **notStarted** · provenance generated
 - Client workshop board: `wireframes/WS171 Ticket Upgrade, Exchange & Conversion Board 1.dc.html#adm-309`
 - Workshop pack: Ticket Upgrade, Exchange & Conversion_Reference.pdf board 1
 - Flow F174 *Ticket Upgrade, Exchange & Conversion board 1: Upgrade & Conversion Command …*, step 2: Works in Upgrade & Conversion Path Builder → Define exactly which products/tickets may be converted into which other products. This becomes the central conversion relationship engine.
@@ -361,15 +447,29 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `ticketing` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `ORDER_VIEW` (1 read); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `ORDER_VIEW` (1 read); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure eligibility for) and no display directory — it is settings, not a population |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/commercial/upgrade-eligibility-qualification-rules-adm-310` |
+
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
+
+**Known gaps.** Contract gap recorded 2 October 2026 (CHG-WIR-027): No write for the upgrade rules listUpgradeEligibilityQualification lists.
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Whether a ticket and guest qualify for an upgrade path.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **List operation(s) listUpgradeEligibilityQualification return a bare array, not the paged list envelope (items, nextCursor, hasMore); rows of listUpgradeEligibilityQualification carry no identifier.** Why: The table cannot page, and a row without an id cannot open, edit or link to the record it summarises. *(source: contracts/spine/orders.yaml#listUpgradeEligibilityQualification; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- No write operation: a configuration screen (Upgrade Eligibility & Qualification Rules) declares only reads (listUpgradeEligibilityQualification). (CHG-WIR-027)
 
 #### Inputs: what the user enters or picks
 
@@ -387,6 +487,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Outputs: what the screen shows and produces
 
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **rules**: Conditions per path. *(source: contracts/spine/orders.yaml#listUpgradeEligibilityQualification)*
+
 **Data it reads**: `listUpgradeEligibilityQualification` (onLoad, Upgrade Eligibility & Qualification Rules)
 
 **Where the user goes next**
@@ -402,6 +506,14 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Empty, first run (`?state=emptyFirstRun`) | No upgrade eligibility qualification configured yet. Carries the create action and says what the platform does in the meantime. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+rule: 'Day Pass to Annual: only before 16:00 on the visit day'
+```
 
 #### Permissions
 
@@ -419,7 +531,7 @@ For this screen, newest first. An **Open question** is built to the default it s
 
 - Upgrade eligibility checks validity/usage. Cases: seated ticket to a better section same day, paying the difference at the counter; general admission to season pass with the amount paid credited. Windows: before use, after use within a window, or until a cutoff (event ticket until the guest exits). *(client request · MoM 1 Sep 2026, 4.9 Ticket Upgrade & Downgrade Configuration · DI-603)*
 
-Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -427,7 +539,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-310` · status **notStarted** · provenance generated
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-310` · status **notStarted** · provenance generated
 - Client workshop board: `wireframes/WS171 Ticket Upgrade, Exchange & Conversion Board 1.dc.html#adm-310`
 - Workshop pack: Ticket Upgrade, Exchange & Conversion_Reference.pdf board 1
 - Flow F174 *Ticket Upgrade, Exchange & Conversion board 1: Upgrade & Conversion Command …*, step 4: Works in Upgrade Eligibility & Qualification Rules → Determine whether a particular ticket/customer/transaction qualifies for a configured upgrade or conversion path. A path existing does not automatically mean every ticket can use it.
@@ -441,6 +553,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `ADM-308`.
 - [ ] Every gated control is gated: `ORDER_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -451,17 +564,30 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `ticketing` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `ORDER_VIEW` (1 read); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `ORDER_VIEW` (1 read); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure treatment of; Configure; Configure whether) and no display directory — it is settings, not a population |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/commercial/upgrade-timing-usage-ticket-status-rules-adm-311` |
 
-**Known gaps.** **The pack names 2 actions on this screen and the screen declares 1 operation.** Unserved: Before Expiry, Grace Period. Each needs an operation, or needs removing from the screen; this is the Phase 3 …
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
+
+**Known gaps.** **The pack names 2 actions on this screen and the screen declares 1 operation.** Unserved: Before Expiry, Grace Period. Each needs an operation, or needs removing from the screen; this is the Phase 3 … Contract gap recorded 2 October 2026 (CHG-WIR-027): No write for the upgrade rules listUpgradeTimingUsage lists.
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** How a ticket's state (unused, partly used, scanned) affects upgrade.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **Pack actions with no operation: Before Expiry, Grace Period.** Why: The workshop pack names them on this screen and no operation serves them; each needs an operation or removal from the screen. *(source: screens/P08-venue-back-office.yaml#ADM-311; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
+- **List operation(s) listUpgradeTimingUsage return a bare array, not the paged list envelope (items, nextCursor, hasMore); rows of listUpgradeTimingUsage carry no identifier.** Why: The table cannot page, and a row without an id cannot open, edit or link to the record it summarises. *(source: contracts/spine/orders.yaml#listUpgradeTimingUsage; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- No write operation: a configuration screen (Upgrade Timing, Usage & Ticket Status Rules) declares only reads (listUpgradeTimingUsage). (CHG-WIR-027)
 
 #### Inputs: what the user enters or picks
 
@@ -492,6 +618,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Before Expiry (primary button) | navigation or local | — | — | — | — |
 | Grace Period (secondary button) | navigation or local | — | — | — | — |
 
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **status rules**: Per status allowed or not. *(source: contracts/spine/orders.yaml#listUpgradeTimingUsage)*
+
 **Data it reads**: `listUpgradeTimingUsage` (onLoad, Upgrade Timing, Usage & Ticket Status Rules)
 
 **Where the user goes next**
@@ -507,6 +637,15 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Empty, first run (`?state=emptyFirstRun`) | No upgrade timing usage configured yet. Carries the create action and says what the platform does in the meantime. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+rule:
+  partlyUsed: allowed with residual credit
+```
 
 #### Permissions
 
@@ -524,7 +663,7 @@ For this screen, newest first. An **Open question** is built to the default it s
 
 - Upgrade eligibility checks validity/usage. Cases: seated ticket to a better section same day, paying the difference at the counter; general admission to season pass with the amount paid credited. Windows: before use, after use within a window, or until a cutoff (event ticket until the guest exits). *(client request · MoM 1 Sep 2026, 4.9 Ticket Upgrade & Downgrade Configuration · DI-603)*
 
-Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -532,7 +671,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-311` · status **notStarted** · provenance generated
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-311` · status **notStarted** · provenance generated
 - Client workshop board: `wireframes/WS171 Ticket Upgrade, Exchange & Conversion Board 1.dc.html#adm-311`
 - Workshop pack: Ticket Upgrade, Exchange & Conversion_Reference.pdf board 1
 - Flow F174 *Ticket Upgrade, Exchange & Conversion board 1: Upgrade & Conversion Command …*, step 6: Works in Upgrade Timing, Usage & Ticket Status Rules → Define how ticket lifecycle state affects upgrade and conversion behavior. This deserves its own screen because a ticket may already have been partially consumed.
@@ -546,6 +685,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `ADM-308`.
 - [ ] Every gated control is gated: `ORDER_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 2 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -556,15 +696,29 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `ticketing` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `ORDER_VIEW` (1 read); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `ORDER_VIEW` (1 read); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure whether target pricing uses; Configure whether existing) and no display directory — it is settings, not a population |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/commercial/upgrade-financial-treatment-price-difference-rules-adm-312` |
+
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
+
+**Known gaps.** Contract gap recorded 2 October 2026 (CHG-WIR-027): No write for the upgrade rules listUpgradeFinancialTreatment lists.
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** How the price difference is treated: pay the difference, full new price, credit.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **List operation(s) listUpgradeFinancialTreatment return a bare array, not the paged list envelope (items, nextCursor, hasMore); rows of listUpgradeFinancialTreatment carry no identifier.** Why: The table cannot page, and a row without an id cannot open, edit or link to the record it summarises. *(source: contracts/spine/orders.yaml#listUpgradeFinancialTreatment; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- No write operation: a configuration screen (Upgrade Financial Treatment & Price Difference Rules) declares only reads (listUpgradeFinancialTreatment). (CHG-WIR-027)
 
 #### Inputs: what the user enters or picks
 
@@ -585,6 +739,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Outputs: what the screen shows and produces
 
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **financial rules**: Per path, the treatment. *(source: contracts/spine/orders.yaml#listUpgradeFinancialTreatment)*
+
 **Data it reads**: `listUpgradeFinancialTreatment` (onLoad, Upgrade Financial Treatment & Price Difference Rules)
 
 **Where the user goes next**
@@ -600,6 +758,16 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Empty, first run (`?state=emptyFirstRun`) | No upgrade financial treatment configured yet. Carries the create action and says what the platform does in the meantime. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+rule:
+  path: Day Pass to Annual
+  treatment: pay the difference
+```
 
 #### Permissions
 
@@ -618,7 +786,7 @@ For this screen, newest first. An **Open question** is built to the default it s
 - Usage-based upgrades are pro-rata: e.g. 2 months used of a 1-year silver membership is credited and only the balance to the higher tier is charged. Attribute upgrades: a child ticket (sold by height) found to be adult on arrival is upgraded with the difference charged. *(agreed · MoM 1 Sep 2026, 4.9 Upgrade financial treatment · DI-604)*
 - Upgrade eligibility checks validity/usage. Cases: seated ticket to a better section same day, paying the difference at the counter; general admission to season pass with the amount paid credited. Windows: before use, after use within a window, or until a cutoff (event ticket until the guest exits). *(client request · MoM 1 Sep 2026, 4.9 Ticket Upgrade & Downgrade Configuration · DI-603)*
 
-Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -626,7 +794,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-312` · status **notStarted** · provenance generated
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-312` · status **notStarted** · provenance generated
 - Client workshop board: `wireframes/WS171 Ticket Upgrade, Exchange & Conversion Board 1.dc.html#adm-312`
 - Workshop pack: Ticket Upgrade, Exchange & Conversion_Reference.pdf board 1
 - Flow F174 *Ticket Upgrade, Exchange & Conversion board 1: Upgrade & Conversion Command …*, step 8: Works in Upgrade Financial Treatment & Price Difference Rules → Define how the financial relationship between the old and new product should be treated.
@@ -640,6 +808,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `ADM-308`.
 - [ ] Every gated control is gated: `ORDER_VIEW`.
 - [ ] The 2 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -650,21 +819,33 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `ticketing` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `ORDER_CREATE` (1 operate); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `ORDER_CREATE` (1 operate); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/commercial/pro-rata-residual-value-entitlement-credit-configuration-adm-313` |
 
-**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
+
+**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built. Contract gap recorded 2 October 2026 (CHG-WIR-027): No read of pro-rata and residual value configuration.
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Pro-rata credit for the unused part of an entitlement on upgrade.
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- No read operation: the screen declares only setProRataResidual and nothing that returns the current configuration. (CHG-WIR-027)
 
 #### Inputs: what the user enters or picks
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **residual value**: Method and an example ("Annual Pass used 4 of 12 months: credit AED 966.67"). *(source: contracts/spine/orders.yaml#setProRataResidual / TRACKER Actions row 208)*
 
 #### Outputs: what the screen shows and produces
 
@@ -690,6 +871,17 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+example:
+  pass: Annual Pass Silver AED 1,450.00
+  used: 4 of 12 months
+  credit: AED 966.67
+```
+
 #### Permissions
 
 - `setProRataResidual` → `ORDER_CREATE` (operate) · staff
@@ -706,7 +898,7 @@ For this screen, newest first. An **Open question** is built to the default it s
 
 - Usage-based upgrades are pro-rata: e.g. 2 months used of a 1-year silver membership is credited and only the balance to the higher tier is charged. Attribute upgrades: a child ticket (sold by height) found to be adult on arrival is upgraded with the difference charged. *(agreed · MoM 1 Sep 2026, 4.9 Upgrade financial treatment · DI-604)*
 
-Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -714,7 +906,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-313` · status **notStarted** · provenance generated
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-313` · status **notStarted** · provenance generated
 - Client workshop board: `wireframes/WS171 Ticket Upgrade, Exchange & Conversion Board 1.dc.html#adm-313`
 - Workshop pack: Ticket Upgrade, Exchange & Conversion_Reference.pdf board 1
 - Flow F174 *Ticket Upgrade, Exchange & Conversion board 1: Upgrade & Conversion Command …*, step 10: Works in Pro-Rata, Residual Value & Entitlement Credit Configuration → Handle complex upgrades where part of the original product has already been consumed.
@@ -738,17 +930,29 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `ticketing` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `ORDER_VIEW` (1 read); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `ORDER_VIEW` (1 read); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/commercial/person-type-product-entitlement-conversion-rules-adm-314` |
 
-**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
+
+**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built. Contract gap recorded 2 October 2026 (CHG-WIR-027): No write for the upgrade rules listPersonTypeProduct lists.
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Conversions that change person type, product or entitlement (child to adult, single to multi-park).
+
+**Known correction pending (do not draw the wrong version)**
+
+- **List operation(s) listPersonTypeProduct return a bare array, not the paged list envelope (items, nextCursor, hasMore); rows of listPersonTypeProduct carry no identifier.** Why: The table cannot page, and a row without an id cannot open, edit or link to the record it summarises. *(source: contracts/spine/orders.yaml#listPersonTypeProduct; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- No write operation: a configuration screen (Person-Type, Product & Entitlement Conversion Rules) declares only reads (listPersonTypeProduct). (CHG-WIR-027)
 
 #### Inputs: what the user enters or picks
 
@@ -759,6 +963,10 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 **Shown**
 
 **Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **conversion rules**: From and to with conditions. *(source: contracts/spine/orders.yaml#listPersonTypeProduct)*
 
 **Data it reads**: `listPersonTypeProduct` (onLoad, Person-Type, Product & Entitlement Conversion Rules)
 
@@ -777,6 +985,14 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+rule: Child to Adult when the guest turns 12 during the membership
+```
+
 #### Permissions
 
 - `listPersonTypeProduct` → `ORDER_VIEW` (read) · staff
@@ -793,7 +1009,7 @@ For this screen, newest first. An **Open question** is built to the default it s
 
 - Usage-based upgrades are pro-rata: e.g. 2 months used of a 1-year silver membership is credited and only the balance to the higher tier is charged. Attribute upgrades: a child ticket (sold by height) found to be adult on arrival is upgraded with the difference charged. *(agreed · MoM 1 Sep 2026, 4.9 Upgrade financial treatment · DI-604)*
 
-Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -801,7 +1017,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-314` · status **notStarted** · provenance generated
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-314` · status **notStarted** · provenance generated
 - Client workshop board: `wireframes/WS171 Ticket Upgrade, Exchange & Conversion Board 1.dc.html#adm-314`
 - Workshop pack: Ticket Upgrade, Exchange & Conversion_Reference.pdf board 1
 - Flow F174 *Ticket Upgrade, Exchange & Conversion board 1: Upgrade & Conversion Command …*, step 12: Works in Person-Type, Product & Entitlement Conversion Rules → Handle conversions that change more than simply the commercial level of a ticket.
@@ -815,6 +1031,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `ADM-308`.
 - [ ] Every gated control is gated: `ORDER_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -825,17 +1042,26 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `ticketing` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `ORDER_VIEW` (1 read); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `ORDER_VIEW` (1 read); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Select by; Configure) and no display directory — it is settings, not a population |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/commercial/bulk-group-assisted-upgrade-operations-adm-315` |
 
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
+
 **Known gaps.** **The pack names 4 actions on this screen and the screen declares 1 operation.** Unserved: Upgrade Selected, Convert Product, Change Person Type, Move to Alternative Performance. Each needs an …
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Upgrades of many tickets at once (groups, bulk), request-based.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **Pack actions with no operation: Upgrade Selected, Convert Product, Change Person Type, Move to Alternative Performance.** Why: The workshop pack names them on this screen and no operation serves them; each needs an operation or removal from the screen. *(source: screens/P08-venue-back-office.yaml#ADM-315; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
+- **List operation(s) listBulkGroupAssisted return a bare array, not the paged list envelope (items, nextCursor, hasMore); rows of listBulkGroupAssisted carry no identifier.** Why: The table cannot page, and a row without an id cannot open, edit or link to the record it summarises. *(source: contracts/spine/orders.yaml#listBulkGroupAssisted; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
 
 #### Inputs: what the user enters or picks
 
@@ -877,6 +1103,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Change Person Type (secondary button) | navigation or local | — | — | — | — |
 | Move to Alternative Performance (secondary button) | navigation or local | — | — | — | — |
 
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **bulk operations**: Requests with ticket count and status. *(source: contracts/spine/orders.yaml#listBulkGroupAssisted)*
+
 **Data it reads**: `listBulkGroupAssisted` (onLoad, Bulk, Group & Assisted Upgrade Operations)
 
 **Where the user goes next**
@@ -892,6 +1122,17 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Empty, first run (`?state=emptyFirstRun`) | No bulk group assisted configured yet. Carries the create action and says what the platform does in the meantime. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+request:
+  group: Gulf Engineering
+  tickets: 104
+  to: VIP lounge add-on
+```
 
 #### Permissions
 
@@ -910,7 +1151,7 @@ For this screen, newest first. An **Open question** is built to the default it s
 - Group ticket upgrades are business-configurable (off by default); where allowed a group raises an upgrade request (e.g. via chat/support) rather than self-serving like an individual. *(agreed · MoM 1 Sep 2026, 4.9 Clarified (group upgrades) · DI-607)*
 - Staff can upgrade multiple tickets in one action. "Quick upgrade" is a direct single-path upgrade (gold > platinum); "flexible upgrade" lets the guest choose among several eligible targets. *(client request · MoM 1 Sep 2026, 4.9 Ticket Upgrade & Downgrade Configuration · DI-605)*
 
-Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -918,7 +1159,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-315` · status **notStarted** · provenance generated
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-315` · status **notStarted** · provenance generated
 - Client workshop board: `wireframes/WS171 Ticket Upgrade, Exchange & Conversion Board 1.dc.html#adm-315`
 - Workshop pack: Ticket Upgrade, Exchange & Conversion_Reference.pdf board 1
 - Flow F174 *Ticket Upgrade, Exchange & Conversion board 1: Upgrade & Conversion Command …*, step 14: Works in Bulk, Group & Assisted Upgrade Operations → Support operational upgrades involving multiple tickets rather than requiring staff to process each individually.
@@ -932,6 +1173,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `ADM-308`.
 - [ ] Every gated control is gated: `ORDER_VIEW`.
 - [ ] The 2 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 2 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -942,15 +1184,21 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `ticketing` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `ORDER_CREATE` (1 operate); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `ORDER_CREATE`, `ORDER_VIEW` (1 operate, 1 read); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Depending on configuration) and no display directory — it is settings, not a population |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/commercial/upgrade-execution-credential-regeneration-channel-contro-adm-316` |
+
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** What happens after an upgrade is paid: new credential, channel rules.
+
+**Fixed on main** (the package already carries these; draw what it says): No read operation: the screen declares only createUpgradeCredentialRegeneration and nothing that returns the current configuration. (CHG-WIR-025).
 
 #### Inputs: what the user enters or picks
 
@@ -969,11 +1217,41 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Outputs: what the screen shows and produces
 
+**Shown**
+
+**Upgrades** (data table, from `listUpgrades`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
+| Number | text | — |
+| Order | the name it points at, never the id | — |
+| Original order line | the name it points at, never the id | — |
+| New order line | the name it points at, never the id | — |
+| Rule | the name it points at, never the id | The `UpgradeRule` (`orders.upgrade_rule`) this upgrade ran under; null for a supervisor override outside any rule (DM5, 29 September). |
+| Original amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| New amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Status | text | — |
+| Requested by principal | the name it points at, never the id | — |
+| Reason | text | — |
+| Completed at | 1 Oct 2026, 14:30 | — |
+| Cancelled at | 1 Oct 2026, 14:30 | — |
+| Next cursor | text | — |
+| Has more | yes / no (icon or chip) | — |
+
 **Actions and what each produces**
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
 | Create (primary button) | navigation or local | — | — | — | — |
+
+**What each action does** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **Execute**: Regenerates the credential and revokes the old one. *(source: contracts/spine/orders.yaml#createUpgradeCredentialRegeneration)*
+
+**Data it reads**: `listUpgrades` (onLoad, Upgrade requests and their outcome)
 
 **Where the user goes next**
 
@@ -989,9 +1267,20 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+execution:
+  ticket: T-2026-778120
+  newMedia: QR …A7F2
+```
+
 #### Permissions
 
 - `createUpgradeCredentialRegeneration` → `ORDER_CREATE` (operate) · staff
+- `listUpgrades` → `ORDER_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -1005,7 +1294,7 @@ For this screen, newest first. An **Open question** is built to the default it s
 
 - Staff can upgrade multiple tickets in one action. "Quick upgrade" is a direct single-path upgrade (gold > platinum); "flexible upgrade" lets the guest choose among several eligible targets. *(client request · MoM 1 Sep 2026, 4.9 Ticket Upgrade & Downgrade Configuration · DI-605)*
 
-Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -1013,7 +1302,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-316` · status **notStarted** · provenance generated
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-316` · status **notStarted** · provenance generated
 - Client workshop board: `wireframes/WS171 Ticket Upgrade, Exchange & Conversion Board 1.dc.html#adm-316`
 - Workshop pack: Ticket Upgrade, Exchange & Conversion_Reference.pdf board 1
 - Flow F174 *Ticket Upgrade, Exchange & Conversion board 1: Upgrade & Conversion Command …*, step 16: Works in Upgrade Execution, Credential Regeneration & Channel Controls → Control what happens operationally once an upgrade or conversion is approved and financially completed.
@@ -1021,11 +1310,11 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (8), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (17 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-316?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Create.
 - [ ] Every transition is wired: `ADM-308`.
-- [ ] Every gated control is gated: `ORDER_CREATE`.
+- [ ] Every gated control is gated: `ORDER_CREATE`, `ORDER_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -1037,15 +1326,23 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `ticketing` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `ORDER_VIEW` (1 read); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `ORDER_VIEW` (1 read); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Display) and no metric row |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/commercial/upgrade-history-exception-management-audit-explorer-adm-317` |
+
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** History and exceptions of every upgrade, downgrade, exchange and conversion.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **List operation(s) listUpgradeException return a bare array, not the paged list envelope (items, nextCursor, hasMore).** Why: The table cannot page, and a row without an id cannot open, edit or link to the record it summarises. *(source: contracts/spine/orders.yaml#listUpgradeException; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
 
 #### Inputs: what the user enters or picks
 
@@ -1087,6 +1384,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|---|
 | Exception type | chip: Eligibility override, Financial override, Expired ticket exception, Manual credit … | Exception or override. |
 
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **audit**: Before and after product, amount, who. *(source: contracts/spine/orders.yaml#listUpgradeException)*
+
 **Data it reads**: `listUpgradeException` (onLoad, Upgrade History, Exception Management & Audit Explorer)
 
 #### States
@@ -1099,6 +1400,17 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the upgrade history exception are still there. The pack's own statuses are controls — the state names which is selected. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+event:
+  from: Day Pass
+  to: Annual Pass Gold
+  paid: AED 1,155.00
+```
 
 #### Permissions
 
@@ -1114,7 +1426,7 @@ No matrix row traces to this screen's operations or data.
 
 None names this screen.
 
-Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -1122,7 +1434,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-317` · status **notStarted** · provenance generated
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-317` · status **notStarted** · provenance generated
 - Client workshop board: `wireframes/WS171 Ticket Upgrade, Exchange & Conversion Board 1.dc.html#adm-317`
 - Workshop pack: Ticket Upgrade, Exchange & Conversion_Reference.pdf board 1
 - Flow F174 *Ticket Upgrade, Exchange & Conversion board 1: Upgrade & Conversion Command …*, step 18: Works in Upgrade History, Exception Management & Audit Explorer → Provide complete operational and financial traceability for every upgrade, downgrade, exchange and conversion.
@@ -1136,6 +1448,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] No transition is declared; back returns where the user came from.
 - [ ] Every gated control is gated: `ORDER_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -1144,12 +1457,16 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 ## Reference designs and the trackers for this platform
 
-**P09 reference designs** (from `handoff/design-batches/apps/6-ticvai-controller/README.md`)
+**P08 reference designs** (from `handoff/design-batches/apps/5-venue-management/README.md`)
 
 - `sources/designs/TICVAI_POS_Terminal_client_approved.html`: the client-approved POS, for operator density and components.
 - `sources/designs/TICVAI_Mobile.dc.html`: for finish and motion.
 
-**Design Vision Book rules that apply** (`sources/designs/Ticvai_Design_Vision_Book_v1_1.pdf`): DI-021, DI-022, DI-023, DI-024, DI-025, DI-027, DI-028, DI-029, DI-032, DI-033, DI-034, DI-036, DI-037, DI-038, DI-039, DI-040, DI-041, DI-042, DI-044, DI-045, DI-046, DI-047, DI-048, DI-049, DI-050, DI-051 (each is in the design inputs below).
+**Design Vision Book rules that apply** (`sources/designs/Ticvai_Design_Vision_Book_v1_1.pdf`): DI-021, DI-022, DI-023, DI-024, DI-025, DI-027, DI-028, DI-029, DI-030, DI-032, DI-033, DI-034, DI-036, DI-037, DI-038, DI-039, DI-040, DI-041, DI-042, DI-043, DI-044, DI-045, DI-046, DI-047, DI-048, DI-049, DI-050, DI-051, DI-052 (each is in the design inputs below).
+
+**Workshop tracker rows about P08 as a whole** (1: 1 open, 0 closed). Open first; a closed row says where it went on 30 September.
+
+- **S8** Venue Management back-end configuration wireframes *(Chinmay Parab · In progress · due Fri 2 Oct · 30 Sep 2026 · 30 Sep tracker)*
 
 ## Design inputs from the client meetings
 
@@ -1187,17 +1504,32 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Brand personality: Modern, AI-First, Enterprise, Premium, Reliable, Minimal, Scalable, Human-Centred. Visual essence: intelligent and forward-thinking, clean and minimal, trustworthy and secure, modern and timeless, scalable and flexible. *(agreed · Design Vision Book 29 Jul 2026, 02 Brand Identity (p2) - Brand personality / Visual essence · DI-021)*
 - Arabic is a core requirement, not later localisation: full Arabic RTL across web, mobile, POS, reports, emails, WhatsApp, SMS, notifications, tickets and receipts, and administrative interfaces. *(agreed · MoM 28 Jul 2026, 27. Internationalisation and Arabic Support · DI-019)*
 
-### Across P09 TICVAI Web
+### Across P08 Venue Management
 
-- Portal access exposes TICVAI pricing, so prospects submit contact details and a trade license as proof of a real venue, reviewed and approved by TICVAI before access is granted. *(agreed · MoM 10 Sep 2026, 4.8 Customer Portal Access, Authentication & Verification · DI-827)*
+- Qossai: configuration screens should consolidate related functionality, potentially merging 3-4 previously separate screens into one, rather than the repetitive one-screen-per-concept pattern of the AI-built reference system. *(agreed · MoM 24 Sep 2026, 4.5 Screen Consolidation Philosophy · DI-987)*
+- **Open question.** Open: should AI monitoring live in one centralised AI command dashboard or be distributed as widgets in each functional module's own dashboard? Allam: Softlabs' call; the current proposal is illustrative and Softlabs may propose a better structure. *(open · MoM 18 Sep 2026, 4.4 AI Governance — Risk, Compliance & Continuous Monitoring · DI-936)*
 - Simulation functionality stays embedded within each relevant configuration section rather than being consolidated, since it tests that section's own configuration. *(agreed · MoM 8 Sep 2026, 4.11 Dashboard & Reporting Module Consolidation Strategy · DI-722)*
+- Client boards (POS Frontline, F&B, Retail, Inventory & Procurement) share one architecture: six boards of ten screens per domain, a command centre first and an AI/analytics board last, under the hierarchy Company > Venue > Department > Workstation > Operator/Shift > Transaction > Exception > Reconciliation > Analytics. *(agreed · client-design-boards-audit 20 Aug 2026, Opening / What the boards give us · DI-400)*
+- Decision: RBAC per role, per module, three levels — edit/view, view-only, hidden (e.g. a marketing officer does not see Finance at all) — plus sub-permissions within a module (a CRM role may get Campaigns and Communications but not Journeys). Default role templates, admin-customisable. *(agreed · MoM 20 Aug 2026, 4.7 Role-Based Access Control (RBAC); 5. Key Decisions · DI-387)*
+- **Open question.** Allam: a user's visibility must be restrictable to specific outlets (an F&B manager of one outlet should not see other outlets' items); also relevant for ticketing/event-specific access. Implementation approach still open. *(open · MoM 18 Aug 2026, 4.6 Role-Based & Outlet-Level Access Control — Open Item · DI-331)*
+- Access loads automatically at login on POS and web/admin. A user with one role logs straight in; a user with several roles (e.g. admin, cashier, supervisor, manager) is prompted to choose which role to use. *(agreed · MoM 12 Aug 2026, 4. Multiple Roles per User and Role Switching · DI-249)*
+- Back office is role-driven from any device: a finance user signing in from a workstation, laptop or home sees only finance reports and related information. *(agreed · MoM 12 Aug 2026, 3. Role-Based Access and Workstation-Linked Front-End · DI-248)*
+- Built-in help menu with step-by-step tutorials with screenshots for common tasks (e.g. how to sell a ticket at the POS). *(client request · MoM 7 Aug 2026, 8. Legacy POS Layout Designer & System Logging · DI-160)*
+- Custom data-capture fields ("data mask") at account, event, extended-ticket and product level: field types text, dropdown, radio, true/false; multi-language labels; validation (min/max length, required/optional); reusable value lists (e.g. country list). Standard fields come out of the box. *(agreed · MoM 7 Aug 2026, 6. Data Mask: Flexible Custom Data Capture · DI-155)*
+- Load/traffic dashboards respect the tenancy model: a venue manager sees traffic for their own venue only. *(agreed · MoM 31 Jul 2026, 4. Non-Functional Requirements: Scalability & Availability · DI-061)*
+- Allam: queue management is built into the system (not third-party) so traffic entering the site can be throttled from the back office itself. *(agreed · MoM 31 Jul 2026, 4. Non-Functional Requirements: Scalability & Availability · DI-060)*
 - **Open question.** Proposed tenant hierarchy Tenant > Organization/Brand > Region > Branch > Venue > Department, under review against TICVAI's own organisational hierarchy before finalising. *(open · MoM 30 Jul 2026, 2. Proposed Multi-Tenant Hierarchy · DI-055)*
+- Documentation deliverable includes user guides and help content; the preview shows a TICVAI Help Center with categories (Getting Started, Events, Tickets, Orders, Payments, Memberships, Access Control, Reports, Integrations), a "Welcome to TICVAI" getting-started article and Quick Links (Create an Event, Set Pricing, Manage Access, View Reports). *(agreed · Design Vision Book 29 Jul 2026, 09 Deliverables (p9) - What We Deliver / Key Deliverables Preview · DI-052)*
 - Typeface Inter (Light, Regular, Medium, Semibold, Bold). Scale: H1 32/40 Bold, H2 24/32 Semibold, H3 20/28 Semibold, Body 1 16/24 Regular, Body 2 14/20 Regular, Caption 12/16 Regular. *(agreed · Design Vision Book 29 Jul 2026, 08 Design System (p8) - 2. Typography · DI-047)*
 - Palette ("modern, trustworthy and accessible"): Primary #0D6EFD, #00B8FF, #00D4C4, #0B1324; Neutral #F7F9FC, #E5E7EB, #9CA3AF, #4B5563, #1F2937. *(agreed · Design Vision Book 29 Jul 2026, 08 Design System (p8) - 1. Color Palette · DI-046)*
+- AI Assistant panel: a short framing ("Based on last 30 days, here are 3 actions that can improve your revenue") then actionable recommendations, each with its potential impact (e.g. "Increase pricing for VIP seats, +12%") and a chevron, plus "View all recommendations". *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - AI Panels · DI-043)*
 - Chart cards: title with period dropdown ("This Week"), headline metrics with deltas (Tickets Sold 12,840 +8.7%, Visitors, Conversion). Data visualisations must be easy to read. *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - Charts · DI-041)*
 - Tables: titled card with "View all", columns (e.g. Order ID, Customer, Amount, Status), coloured status badges (Paid, Pending, Refunded) and pagination with "Showing 1 to 5 of 245" and page numbers. *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - Tables · DI-039)*
 - Primary button spec: height 40px, padding 12px 24px, radius 8px, Inter 14 Semibold, colour #0D6EFD, width auto. *(agreed · Design Vision Book 29 Jul 2026, 09 Deliverables (p9) - Developer Handoff preview · DI-037)*
+- Back-office shell: collapsible left sidebar with Overview, Events, Tickets, Orders, Customers, Memberships, Access Control, POS, Reports, Analytics, AI Assistant, Settings, and the signed-in user (name, role) at the bottom; top bar with global search (Cmd+K), current time and date, Notifications with unread dot, and user menu. *(agreed · Design Vision Book 29 Jul 2026, 04 Dashboard Vision (p4) - navigation shell · DI-030)*
 - Dynamic KPIs, forecasts and real-time insights; role-based dashboards, preferences and smart shortcuts for every user (e.g. greeting "Good morning, Ahmed" on the home screen, p2). *(agreed · Design Vision Book 29 Jul 2026, 03 Visual Direction (p3) - Smarter Data / Personalized Experience · DI-028)*
+- Reports and historical searches must still retrieve archived transactions when required; the retention period (e.g. keep 3 of 5+ years live) is configurable per customer, archival manual or automated. *(agreed · MoM 28 Jul 2026, 23. Database Optimisation and Archiving · DI-018)*
+- Back-office controls for the waiting room: configurable maximum active users and admission intervals, set per customer and venue. *(agreed · MoM 28 Jul 2026, 19. Auto-scaling and Virtual Waiting Room · DI-017)*
 
 **12 more name particular screens** and are in each screen's block above (*Client meeting inputs*).
 
@@ -1221,6 +1553,7 @@ Method, path, parameters, request and response for every operation these screens
 "listUpgradeException": {"method":"GET","path":"/upgrade-exception","contract":"orders","summary":"Upgrade History, Exception Management & Audit Explorer","permission":"ORDER_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":"ticket","in":"query","required":false},{"name":"event","in":"query","required":false},{"name":"product","in":"query","required":false},{"name":"date","in":"query","required":false},{"name":"exception","in":"query","required":false},{"name":"order","in":"query","required":false},{"name":"customer","in":"query","required":false},{"name":"agent","in":"query","required":false},{"name":"channel","in":"query","required":false},{"name":"transactionType","in":"query","required":false}],"requestBody":null,"responds":"UpgradeHistoryExceptionManagementAuditExplorerView"},
 "listUpgradeFinancialTreatment": {"method":"GET","path":"/upgrade-financial-treatment","contract":"orders","summary":"Upgrade Financial Treatment & Price Difference Rules","permission":"ORDER_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"UpgradeFinancialTreatmentPriceDifferenceRulesView"},
 "listUpgradeTimingUsage": {"method":"GET","path":"/upgrade-timing-usage","contract":"orders","summary":"Upgrade Timing, Usage & Ticket Status Rules","permission":"ORDER_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"UpgradeTimingUsageTicketStatusRulesView"},
+"listUpgrades": {"method":"GET","path":"/upgrades","contract":"orders","summary":"Upgrade requests and their outcome","permission":"ORDER_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "setProRataResidual": {"method":"PUT","path":"/pro-rata-residual","contract":"orders","summary":"Pro-Rata, Residual Value & Entitlement Credit Configuration","permission":"ORDER_CREATE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":"ProRataResidualValueEntitlementCreditConfigurationInput","responds":"ProRataResidualValueEntitlementCreditConfigurationView"},
 "setUpgradeConversionPath": {"method":"PUT","path":"/upgrade-conversion-path","contract":"orders","summary":"Upgrade & Conversion Path Builder","permission":"ORDER_CREATE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":"UpgradeConversionPathBuilderInput","responds":"UpgradeConversionPathBuilderView"}
 }
@@ -1233,6 +1566,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 ```json
 {
 "BulkGroupAssistedUpgradeOperationsView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over orders state, assembled at read time from tables that already exist","description":"**What Bulk, Group & Assisted Upgrade Operations displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"bulkAction":{"type":"string","enum":["upgradeAll","upgradeSelected","convertProduct","changePersonType","applyComplimentaryUpgrade","applyFixedUpgrade","moveToAlternativePerformance"],"description":"Bulk action previewed"},"selectedCount":{"type":"integer","description":"Tickets selected"},"eligibleCount":{"type":"integer","description":"Tickets eligible"},"notEligibleCount":{"type":"integer","description":"Tickets not eligible"},"ineligibilityReasons":{"type":"array","items":{"type":"string"},"description":"Reasons with counts, e.g. already used, expired, target unavailable"},"totalOriginalEligibleValue":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Total original eligible value"},"totalTargetValue":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Total target value"},"totalUpgradeDifference":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Total upgrade difference"},"fees":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Fees"},"taxes":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Taxes"},"finalCollectionOrRefund":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Final collection or refund requirement"},"partialProcessing":{"type":"string","enum":["processEligibleExcludeFailures","failEntireBatch"],"description":"Partial processing policy"}}},
+"OrdersUpgrade": {"type":"object","x-ticvai-persistence":"orders.upgrade","description":"**Taken from the backend workbook, 20 September.** Stores the real post-purchase upgrade transaction, including original line, upgraded line and additional amount. Existing orders.payment should be reused to collect the upgrade amount.","required":["number","orderId","originalOrderLineId","originalAmount","newAmount","amount","status","createdAt"],"properties":{"id":{"type":"string","format":"uuid"},"number":{"type":"string","maxLength":50},"orderId":{"type":"string","format":"uuid"},"originalOrderLineId":{"type":"string","format":"uuid"},"newOrderLineId":{"type":"string","format":"uuid","nullable":true},"ruleId":{"x-ticvai-references":"orders.upgrade_rule","type":"string","format":"uuid","nullable":true,"description":"The `UpgradeRule` (`orders.upgrade_rule`) this upgrade ran under; null for a supervisor override outside any rule (DM5, 29 September)."},"originalAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"newAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"status":{"type":"string","maxLength":30},"requestedByPrincipalId":{"type":"string","format":"uuid","nullable":true},"reason":{"type":"string","maxLength":500,"nullable":true},"createdAt":{"type":"string","format":"date-time"},"completedAt":{"type":"string","format":"date-time","nullable":true},"cancelledAt":{"type":"string","format":"date-time","nullable":true}}},
+"Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}},
 "PersonTypeProductEntitlementConversionRulesView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over orders state, assembled at read time from tables that already exist","description":"**What Person-Type, Product & Entitlement Conversion Rules displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"conversionType":{"type":"string","enum":["childAdult","juniorAdult","seniorAdult","residentTourist","standardMember","customPersonTypes"],"description":"Person-type conversion."},"entitlementTreatment":{"type":"string","enum":["retained","replaced","added","removed","alreadyConsumed"],"description":"What happens to each entitlement on conversion."},"targetRequirements":{"type":"array","items":{"type":"string","enum":["age","residency","corporateAssociation","identityVerification","otherEligibilityRules"]},"description":"What the target product may require."},"sourceProduct":{"type":"string","description":"Source product"},"targetProduct":{"type":"string","description":"Target product"}}},
 "ProRataResidualValueEntitlementCreditConfigurationInput": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — request only; lands in the pro-rata columns of `orders.upgrade_rule` (DM5, 29 September)","description":"**What Pro-Rata, Residual Value & Entitlement Credit Configuration submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.","properties":{"appliesTo":{"type":"array","items":{"type":"string","enum":["multiDayPasses","memberships","annualPasses","multiAttractionProducts","packages","storedEntitlements"]},"description":"Products this policy applies to"},"proRataMethod":{"type":"string","enum":["timeBased","usageBased","valueBased","entitlementBased","fixedCredit"],"description":"Remaining days over original days; remaining uses over total uses; remaining commercial value; value of unconsumed benefits; or a configured fixed amount"},"fixedCreditAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"For fixedCredit: the configured amount"},"maximumCreditPercent":{"type":"number","description":"Maximum credit, percent of the original value"},"minimumUpgradeAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Minimum upgrade amount"},"creditExpiryDays":{"type":"integer","description":"Days the credit stays usable"},"nonCreditableComponents":{"type":"array","items":{"type":"string"},"description":"Components that earn no credit"},"excludeFees":{"type":"boolean","description":"Fees are not credited"},"taxTreatment":{"type":"string","description":"How tax on the credit is treated"},"negativeDifferenceTreatment":{"type":"string","enum":["noRefund","refundDifference","walletCredit","voucherCredit","supervisorApproval"],"description":"When the target is worth less than the credit. No package default: the venue chooses when it enables downgrades"}}},
 "ProRataResidualValueEntitlementCreditConfigurationView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over orders state, assembled at read time from tables that already exist","description":"**What Pro-Rata, Residual Value & Entitlement Credit Configuration displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"appliesTo":{"type":"array","items":{"type":"string","enum":["multiDayPasses","memberships","annualPasses","multiAttractionProducts","packages","storedEntitlements"]},"description":"Products this policy applies to"},"proRataMethod":{"type":"string","enum":["timeBased","usageBased","valueBased","entitlementBased","fixedCredit"],"description":"Remaining days over original days; remaining uses over total uses; remaining commercial value; value of unconsumed benefits; or a configured fixed amount"},"fixedCreditAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"For fixedCredit: the configured amount"},"maximumCreditPercent":{"type":"number","description":"Maximum credit, percent of the original value"},"minimumUpgradeAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Minimum upgrade amount"},"creditExpiryDays":{"type":"integer","description":"Days the credit stays usable"},"nonCreditableComponents":{"type":"array","items":{"type":"string"},"description":"Components that earn no credit"},"excludeFees":{"type":"boolean","description":"Fees are not credited"},"taxTreatment":{"type":"string","description":"How tax on the credit is treated"},"negativeDifferenceTreatment":{"type":"string","enum":["noRefund","refundDifference","walletCredit","voucherCredit","supervisorApproval"],"description":"When the target is worth less than the credit. No package default: the venue chooses when it enables downgrades"}}},

@@ -709,6 +709,13 @@
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
        "impliedBy": "setMapZones"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Read a seat map with its structure",
+       "bindsTo": "SeatMap",
+       "operation": "getSeatMap",
+       "provenance": "contract seating.yaml GET /seat-maps/{seatMapId}; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -730,6 +737,13 @@
     "invalidates": [
      "getSeatMap"
     ]
+   },
+   {
+    "operationId": "getSeatMap",
+    "contract": "seating",
+    "purpose": "Read a seat map with its structure",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {
@@ -838,6 +852,13 @@
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
        "impliedBy": "setMapZones"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Read a seat map with its structure",
+       "bindsTo": "SeatMap",
+       "operation": "getSeatMap",
+       "provenance": "contract seating.yaml GET /seat-maps/{seatMapId}; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -859,6 +880,13 @@
     "invalidates": [
      "getSeatMap"
     ]
+   },
+   {
+    "operationId": "getSeatMap",
+    "contract": "seating",
+    "purpose": "Read a seat map with its structure",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {
@@ -967,6 +995,13 @@
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
        "impliedBy": "setMapZones"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Read a seat map with its structure",
+       "bindsTo": "SeatMap",
+       "operation": "getSeatMap",
+       "provenance": "contract seating.yaml GET /seat-maps/{seatMapId}; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -995,6 +1030,13 @@
     "purpose": "Propose categories, numbering, a stage variant or consistency findings for this map",
     "trigger": "onAction",
     "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "getSeatMap",
+    "contract": "seating",
+    "purpose": "Read a seat map with its structure",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {
@@ -1103,6 +1145,13 @@
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
        "impliedBy": "setMapZones"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Read a seat map with its structure",
+       "bindsTo": "SeatMap",
+       "operation": "getSeatMap",
+       "provenance": "contract seating.yaml GET /seat-maps/{seatMapId}; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -1124,6 +1173,13 @@
     "invalidates": [
      "getSeatMap"
     ]
+   },
+   {
+    "operationId": "getSeatMap",
+    "contract": "seating",
+    "purpose": "Read a seat map with its structure",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {
@@ -1232,6 +1288,13 @@
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
        "impliedBy": "setMapZones"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Read a seat map with its structure",
+       "bindsTo": "SeatMap",
+       "operation": "getSeatMap",
+       "provenance": "contract seating.yaml GET /seat-maps/{seatMapId}; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -1253,6 +1316,13 @@
     "invalidates": [
      "getSeatMap"
     ]
+   },
+   {
+    "operationId": "getSeatMap",
+    "contract": "seating",
+    "purpose": "Read a seat map with its structure",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {

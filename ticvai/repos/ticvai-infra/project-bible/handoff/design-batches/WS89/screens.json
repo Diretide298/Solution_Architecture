@@ -48,7 +48,10 @@
     {
      "to": "BO-506",
      "trigger": "Equipment / Asset Profile",
-     "provenance": "structural — pack board 2 wiring, 11 September 2026"
+     "provenance": "structural — pack board 2 wiring, 11 September 2026",
+     "carries": [
+      "assetId"
+     ]
     },
     {
      "to": "BO-507",
@@ -58,7 +61,10 @@
     {
      "to": "BO-508",
      "trigger": "Equipment Status & Condition Management",
-     "provenance": "structural — pack board 2 wiring, 11 September 2026"
+     "provenance": "structural — pack board 2 wiring, 11 September 2026",
+     "carries": [
+      "assetId"
+     ]
     },
     {
      "to": "BO-509",
@@ -119,6 +125,19 @@
        ],
        "notes": "The pack filters this screen by tenant, venue, location, product, category, tracking model and 3 more — which are present is a decision the pack already made.",
        "provenance": "pack Rental_Management.pdf, page 17 §Filters"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Rentals",
+       "bindsTo": "RentalBooking",
+       "operation": "listRentalBookings",
+       "provenance": "contract rental.yaml GET /rental-bookings; wiring fix, 2 October 2026"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Units",
+       "operation": "listAssets",
+       "provenance": "contract maintenance.yaml GET /assets; wiring fix, 2 October 2026"
       }
      ]
     },
@@ -183,24 +202,24 @@
   "states": {
    "loading": "The rental inventory list; the counts above it resolve separately.",
    "error": "Could not load. Names which read failed and leaves the rental inventory untouched.",
-   "emptyFirstRun": "No rental inventory yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No rental inventory yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the rental inventory are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
-    "operationId": "listInventoryItems",
-    "contract": "inventory",
-    "purpose": "Stock across locations",
+    "operationId": "listRentalBookings",
+    "contract": "rental",
+    "purpose": "Units out",
     "trigger": "onLoad",
-    "provenance": "board reading, 19 September 2026"
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-008)"
    },
    {
-    "operationId": "getStockPositions",
-    "contract": "inventory",
-    "purpose": "What is where",
+    "operationId": "listAssets",
+    "contract": "maintenance",
+    "purpose": "Rental units and their condition",
     "trigger": "onLoad",
-    "provenance": "board reading, 19 September 2026"
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-008)"
    }
   ],
   "entryState": {
@@ -219,6 +238,20 @@
    "workshopBoard": "wireframes/WS117 Rental Management Board 2.dc.html#bo-504"
   },
   "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 17. 0 of 9 labels bound to a contract property; 19 of 27 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "gaps": [
+   {
+    "operation": "getStockPositions",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-008): General inventory positions have no rented, reserved or maintenance state; rental unit status lives with rental bookings and assets (DI-744; design-notes correction fnb-retail BO-504).",
+    "source": "DI-744 | screens/P08-venue-back-office.yaml#BO-504"
+   },
+   {
+    "operation": "listInventoryItems",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-008): General inventory positions have no rented, reserved or maintenance state; rental unit status lives with rental bookings and assets (DI-744; design-notes correction fnb-retail BO-504).",
+    "source": "DI-744 | screens/P08-venue-back-office.yaml#BO-504"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -344,18 +377,11 @@
   "states": {
    "loading": "The serialized equipment registry configuration as saved.",
    "error": "Could not load. Names which read failed and leaves the serialized equipment registry untouched.",
-   "emptyFirstRun": "No serialized equipment registry configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyFirstRun": "No serialized equipment registry configured yet. Offers no create action — this screen declares no operation that makes one and says what the platform does in the meantime.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },
   "apis": [
-   {
-    "operationId": "listSerialisedItems",
-    "contract": "inventory",
-    "purpose": "Individually identified assets",
-    "trigger": "onLoad",
-    "provenance": "board reading, 19 September 2026"
-   },
    {
     "operationId": "listAssets",
     "contract": "maintenance",
@@ -370,6 +396,14 @@
    "workshopBoard": "wireframes/WS117 Rental Management Board 2.dc.html#bo-505"
   },
   "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 18. 0 of 0 labels bound to a contract property; 10 of 24 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "gaps": [
+   {
+    "operation": "listSerialisedItems",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-008): listSerialisedItems is retail serials (in stock, sold, returned); rental units are assets with rental states (listAssets, declared) (design-notes correction fnb-retail BO-505).",
+    "source": "contracts/satellite/inventory.yaml#listSerialisedItems"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -885,6 +919,11 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Rental_Management.pdf, page 21"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-004): No operation generates or prints asset labels.",
+    "source": "screens/P08-venue-back-office.yaml#BO-509"
    }
   ],
   "layout": {
@@ -997,6 +1036,17 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Rental_Management.pdf, page 22"
+   },
+   {
+    "operation": "createStockLocation",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-008): Creating a stock location is warehouse set-up, not allocation of rental units to stations (R254; design-notes correction fnb-retail BO-510).",
+    "source": "R254 | screens/P08-venue-back-office.yaml#BO-510"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-011): No rental-station allocation operation.",
+    "source": "screens/P08-venue-back-office.yaml#BO-510"
    }
   ],
   "layout": {
@@ -1010,20 +1060,6 @@
        "derived": true,
        "impliedBy": "listStockLocations",
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
-      },
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "createStockLocation",
-       "label": "Create stock location",
-       "notes": "The act the screen exists for."
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "createStockLocation"
       }
      ]
     }
@@ -1032,7 +1068,7 @@
   "states": {
    "loading": "The inventory location allocation list.",
    "error": "Could not load. Names which read failed and leaves the inventory location allocation untouched.",
-   "emptyFirstRun": "No inventory location allocation yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No inventory location allocation yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the inventory location allocation are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -1043,16 +1079,6 @@
     "purpose": "Where stock may sit",
     "trigger": "onLoad",
     "provenance": "board reading, 19 September 2026"
-   },
-   {
-    "operationId": "createStockLocation",
-    "contract": "inventory",
-    "purpose": "Add a location",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026",
-    "invalidates": [
-     "listStockLocations"
-    ]
    }
   ],
   "wireframe": {
@@ -1447,6 +1473,12 @@
     "operation": null,
     "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
     "source": "pack Rental_Management.pdf, page 24 §Display"
+   },
+   {
+    "operation": "getSuggestedRequisitions",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-008): Reorder suggestions buy stock; rebalancing moves rental units between stations (R254; design-notes correction fnb-retail BO-513).",
+    "source": "R254 | screens/P08-venue-back-office.yaml#BO-513"
    }
   ],
   "layout": {
@@ -1527,21 +1559,13 @@
     "provenance": "board reading, 19 September 2026"
    },
    {
-    "operationId": "getSuggestedRequisitions",
-    "contract": "inventory",
-    "purpose": "What to move, and where",
-    "trigger": "onLoad",
-    "provenance": "board reading, 19 September 2026"
-   },
-   {
     "operationId": "createStockTransfer",
     "contract": "inventory",
     "purpose": "Act on a rebalancing recommendation by raising the transfer (review/dismiss are client-side)",
     "trigger": "onAction",
     "provenance": "decided 29 September, VM close-out (venue management and configuration): serves the pack action(s) Review Recommendation | Create Transfer | Dismiss",
     "invalidates": [
-     "getStockPositions",
-     "getSuggestedRequisitions"
+     "getStockPositions"
     ]
    }
   ],

@@ -18,6 +18,38 @@
   "requestBody": "OrderCreationSourceChannelConfigurationInput",
   "responds": "OrderCreationSourceChannelConfigurationView"
  },
+ "getOrder": {
+  "method": "GET",
+  "path": "/orders/{orderId}",
+  "contract": "orders",
+  "summary": "Read an order",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Order"
+ },
+ "getOrderStatement": {
+  "method": "GET",
+  "path": "/orders/{orderId}/statement",
+  "contract": "orders",
+  "summary": "Full financial history of an order",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "OrderStatement"
+ },
  "listCapacityReservationInventory": {
   "method": "GET",
   "path": "/capacity-reservation-inventory",
@@ -211,30 +243,6 @@
   ],
   "requestBody": "CustomerGuestAccountAssignmentInput",
   "responds": "CustomerGuestAccountAssignmentView"
- },
- "setOrderDetailTransaction": {
-  "method": "PUT",
-  "path": "/order-detail-transaction",
-  "contract": "orders",
-  "summary": "Order Detail & Transaction Workspace",
-  "permission": "ORDER_CREATE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "OrderDetailTransactionWorkspaceInput",
-  "responds": "OrderDetailTransactionWorkspaceView"
  },
  "setOrderReservationStatus": {
   "method": "PUT",

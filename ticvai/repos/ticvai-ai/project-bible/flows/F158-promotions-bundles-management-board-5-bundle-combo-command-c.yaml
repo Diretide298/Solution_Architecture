@@ -1,11 +1,11 @@
 id: F158
 name: 'Promotions   Bundles Management board 5: Bundle & Combo Command Center'
-actor: platformAdmin
+actor: venueManager
 wave: 3
 frequency: routine
 criticality: operational
 platforms:
-- P09 TICVAI Web
+- P08 Venue Management
 provenance: derived-from-board
 offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
   not guess.
@@ -24,9 +24,8 @@ steps:
   outcome: Provide centralized visibility and management of all bundles and combo products across
 - step: 2
   screen: ADM-179
-  action: Works in Bundle Definition & Setup
-  operations:
-  - setBundleDefinition
+  action: Works in Bundle Definition & Setup, a section of BO-011, which saves the record with createBundle and updateBundle (setBundleDefinition retired in r2, CHG-CLN-001)
+  operations: []
   outcome: Create the commercial identity and high-level behavior of a bundle.
 - step: 3
   screen: ADM-178
@@ -36,9 +35,8 @@ steps:
   outcome: Ready for the next screen on this board
 - step: 4
   screen: ADM-180
-  action: Works in Bundle Component Builder
-  operations:
-  - setBundleComponent
+  action: Works in Bundle Component Builder, a section of BO-011, which saves the record with createBundle (setBundleComponent retired in r2, CHG-CLN-001)
+  operations: []
   outcome: Define exactly what products and services make up the bundle.
 - step: 5
   screen: ADM-178
@@ -48,9 +46,8 @@ steps:
   outcome: Ready for the next screen on this board
 - step: 6
   screen: ADM-181
-  action: Works in Guest Choice & Build-Your-Own Bundle Designer
-  operations:
-  - setGuestChoiceBuild
+  action: Works in Guest Choice & Build-Your-Own Bundle Designer, a section of BO-011, which saves the record with createBundle (setGuestChoiceBuild retired in r2, CHG-CLN-001)
+  operations: []
   outcome: Configure bundles where the guest chooses products from predefined groups. The matrix specifically
     requires the guest to be able to choose attractions, experiences, F&B, retail products, or services
     from predefined categories while maintaining bundle pricing rules.

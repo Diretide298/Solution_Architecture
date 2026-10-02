@@ -1,6 +1,6 @@
 # P01-cart-checkout-01 — P01 · Cart & Checkout
 
-**5 screens · 34 operations · 54 schemas · 7 permissions**
+**5 screens · 27 operations · 47 schemas · 6 permissions**
 
 Platform P01 Guest Web · ships as **guest** ·
 guest audience · web ·
@@ -48,8 +48,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 7 permissions apply here:
-  `GUEST_VIEW, GUEST_VIEW_PII, ORDER_CREATE, ORDER_REPRINT, ORDER_VIEW, PRICE_VIEW, PRODUCT_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 6 permissions apply here:
+  `GUEST_VIEW, ORDER_CREATE, ORDER_REPRINT, ORDER_VIEW, PRICE_VIEW, PRODUCT_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store. Offline, a screen shows what was already loaded, under the banner below.
 - **Offline, every screen shows one banner, the same on web and app:** *"You're offline. Connect to the internet to book, pay, order or join a queue."* The moment the connection drops, on every screen, above the screen's own content. By itself as soon as the connection is back, with a short "Back online" confirmation. **It never** Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing. Each screen's `states.offline` says what stays on screen and what waits.
@@ -62,16 +62,74 @@ convincingly. It is never a caption.
   and its error; and, element by element, what is shown and in what format, what each action
   produces and where the user goes next. Draw exactly that.
 
+## The processes these screens belong to
+
+Written by the owner of each process (`handoff/design-notes/`). Read before any screen: it says how the process runs end to end and which words the screens must use.
+
+### Ticketing & Guest Commerce (guest web, guest app, kiosk, partner portal, POS ticket sale)
+
+A guest finds something to do, picks when and how many, holds capacity, pays, and receives a ticket they can show at the gate, transfer or resell. The same booking engine serves the guest website (P01, WEB-), the guest app (P02, GST-) and, through the same catalogue, cart and order operations, the kiosk (P05), the cashier at the till (P04) and the staff handheld (P06); partners book on credit through the partner portal (P10). Guest surfaces are white-label (venue logo, colours, fonts, card layouts, step indicator style, cart placement) with "Powered by TICVAI" kept; the till and handheld stay TICVAI-branded. The booking runs in a fixed order that the client set on 29 September and confirmed on 30 September: for a dated product, the date first, then the time (hidden until a date), then the tickets (hidden until a time); undated products go straight to the tickets; product-first flows (workshops) pick the product, then the date; seated events with one performance open on the seat map, sections first, zoom into a section, pinch out to compare. Choosing a date, time or session commits nothing; capacity is held only when a quantity is set (a 15-minute basket window, 8 minutes for seats and cabanas, one extension). The guest counters (adult, child, senior, infant, person of determination) belong to the chosen ticket and take its prices, so a basket line is "<ticket> · <guest type> × <n>"; group and school products start from group ticket cards and a typed headcount (minus, plus, and +10 on the app), supervisors free. Help me choose filters the catalogue on the server (never a consent step) with Show everything; consent questions such as "Are you able to swim?" are asked once after the session is picked and never again where the page already asked. Sign-in or the six-digit guest code is asked when the guest leaves Add-ons (or at payment, per venue), only the fields the venue configured; after the code, only the T&Cs tick remains (W1). Payment creates the order first and treats an unknown outcome as "checking with your bank", never a second charge; tickets issue on payment, go to Apple or Google Wallet, and a dynamic-QR event's ticket lives in the app. The guest app is deliberately not a copy of the website (30 September): its structure is Home, Explore, Plan and Tickets tabs with a persistent Buy tickets button, item pages that propose the right product (a restaurant's meal combo that includes admission), ride videos that play with no loader, a visit planner that plans each day at one park from that park's rides, dining and shops only, and in-park walking navigation; the booking flow inside it is functionally identical to the web. Vocabulary in guest copy follows the glossary's recorded exceptions (Booking, Session, QR). source: [F01, F02, F03, F07, F49, F52, F55, F57, F58, F59, MoM 29 Sep 1 (W1-W12), MoM 29 Sep 2, MoM 29 Sep 3, MoM 30 Sep 4.4-4.8, CLIENT-RESPONSE-30SEP 1-6, CLIENT-RESPONSE-REV3-25SEP, REV3-1, REV3-2, REV3-3, REV3-4, REV3-26, DI-1086 …
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Booking | An order or reservation as the guest reads it (Booking Confirmation, Group Booking, My bookings). Code says Order or Reservation. | Order (in guest copy), Purchase record, Transaction | docs/glossary.md (Recorded exceptions, Booking, audit R145) |
+| Session | A dated, timed performance as the guest reads it (Pick a session, Surf sessions). Staff screens (POS, back office) keep Performance. | Slot, Showtime, Performance (in guest copy) | docs/glossary.md (Recorded exceptions, Session, rev 3 CFG-10); DI-1064 |
+| Basket | The guest's unpaid selection with its held capacity (Add to basket, Your basket). Never a paid order. The till and staff screens say Cart. | Cart (in guest copy), Bag, Order (for an unpaid selection) | CLIENT-RESPONSE-REV3-25SEP (Basket, 10) … |
+| Ticket | The issued instrument a guest shows at the gate. Product names from the catalogue keep their own words (Day Pass, Annual pass, 2 park ticket); the interface around them says ticket. | Admission, Voucher (for a ticket), Pass (in interface copy) | docs/glossary.md (Ticket) |
+| Adult, Child, Senior, Infant, Person of determination | The guest types of a ticket, each with its age or height band shown under it (Child 3-12, Under 1.20 m). A companion of a person of determination is its own free type where the product has one. | Disabled, Handicapped, Kid, Pax | DI-686; screens/P01-guest-web-storefront.yaml#WEB-049 (Passengers notes) … |
+| Held for | The countdown on held capacity ("Your seats are held for 7:42"); the release is Release hold. | Lease, Reserved for (a reservation is a different thing), Locked | contracts/spine/orders.yaml#/components/schemas/CartLine (leaseExpiresAt) … |
+| Reservation | Booked and not yet paid; holds capacity and expires (My Reservations). Paid tickets are in Tickets or My Tickets. | Booking (for an unpaid hold in lists), Pending order | docs/glossary.md (Reservation); DI-199 |
+| Help me choose | The venue's questions whose answers filter the products; Show everything clears them. | Quiz, Wizard, Experience builder, Consent | MoM 29 Sep W4; REV3-11 |
+| Info only / Not bookable online | A product listed with full details that cannot be booked online; it shows Contact sales to book with Call sales and Email sales. | Unavailable, Sold out, Coming soon | REV3-14; MoM 29 Sep W3 |
+| Guest code | The six-digit code sent to the guest's email or mobile to prove the contact at guest checkout; the copy says six digits. | OTP, PIN, Token, Verification key | DI-1034; MoM 29 Sep W1 |
+| How many people | The typed headcount of a group or school booking (number box with minus and plus; +10 on the app), with Supervisors listed separately and free. | Group size (the removed dropdown), Pax | DI-1104; DI-1105; CLIENT-RESPONSE-30SEP 1 |
+| Waiting room | The on-sale queue in front of a high-demand performance's sale (WEB-015, GST-046). | Virtual queue (that is the ride queue), Lobby | screens/P01-guest-web-storefront.yaml#WEB-015 notes (ADR-0066) |
+| QR | The code a guest shows, in guest copy only (Dynamic QR). Staff screens say Media code. | Barcode, Serial, Media code (in guest copy) | docs/glossary.md (Recorded exceptions, QR, audit R210) |
+| Not at this park | The planner's per-day notice that the day's park cannot meet a preference, naming the park that can. | Unavailable, No results | DI-1113 |
+| Book this plan | Turns the whole visit plan (tickets, Fast Track, meal combos) into basket lines. | Checkout plan, Buy itinerary | screens/P02-guest-mobile-app.yaml#GST-053 (Book this plan) |
+
+### Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers)
+
+Customer & marketing is how a venue knows its guests and talks to them. There is ONE guest profile per person across ticketing, F&B and retail, so a guest who books online and later dines is the same profile (DI-339). A profile needs at least an email or a mobile, never neither (DI-372). Profiles are created by registration, by guest checkout, or by staff at a till or desk. Repeat guest checkouts with the same verified email or phone attach to the same profile automatically (DI-941, R120 default). Two records that might be the same person are NEVER merged automatically: the guest is asked to confirm, and an admin review queue runs alongside (DI-377). Each candidate shows why it matched; the record that loses is superseded, not deleted; consent takes the narrower of the two positions (DI-808). Around the profile sit three things that must never be confused. CONSENT is what the law allows: per purpose and per channel, append-only, with the notice version and the source (recordConsent). It is Given, Withdrawn or Not asked. A SUBSCRIPTION is what the guest asked to receive, e.g. a newsletter list (MarketingSubscription). A PREFERENCE is what they like: table, dietary, accessibility (updateGuestPreferences). An anonymous visitor's cookie decision is recorded against a device key (recordDeviceConsent) and attaches to the guest when they sign in (claimDeviceConsent). Marketing consent at GUEST CHECKOUT is an open client question, and the design follows its default: an unticked opt-in beside the terms, one per channel and purpose. It is recorded with source "checkout" against the order and the verified contact, and nothing is sent without it. Whether that is sufficient consent under PDPL is the client DPO's call (M18-15 (audit R-M18-15), DI-954, DI-940). Marketing reads profiles through SEGMENTS (rules, evaluated when used) and static LISTS (imported). It reaches guests by CAMPAIGNS (one send to an audience) and JOURNEYS (automations started by an event, with waits and branches). Journeys may offer only pre-configured offers, never a free-typed discount (MoM 2026-08-20 4.6). Everything goes through ONE communications module that every other module uses (MoM 2026-08-31 4.6). Consent and suppression are applied at send time, and the number excluded, with the reasons, is reported before anything goes out (launchCampaign). Transactional messages (tickets, receipts, queue calls, case replies) do not need marketing consent and must never carry marketing. LOYALTY pays for spend: points, tiers, rewards and expiry. GAMIFICATION pays for behaviour: challenges, badges, streaks, referrals and leaderboards (createChallenge). A guest reads their own loyalty position (getLoyaltyPosition). A till, the back office or support reads a named guest's (getGuestLoyalty, or identifyGuest at a till). SERVICE: one Case object covers lost property, complaints, questions, accessibility and refund requests (CaseKind). A guest raises one with raiseMyCase, which needs the connection …
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Guest | The person the venue serves, signed in or not. In body copy on every surface. | Customer, User, Subject, Contact, Patron | contracts/satellite/marketing-crm.yaml#/components/schemas/GuestProfile |
+| Guest profile | The CRM record of one person (details, consent, preferences, history). Distinct from the Account, which is how a guest signs in. | Customer record, Contact, Subject | contracts/satellite/marketing-crm.yaml#getGuestProfile |
+| Consent - Given / Withdrawn / Not asked | What the law allows, per purpose (marketing, personalisation, profiling, third-party sharing, AI processing, transactional) and per channel. "Not asked" is not "Withdrawn" and must look different. | Opted in/out as a status, Accepted, Declined, Revoked, Unsubscribed (that is a subscription) | contracts/satellite/marketing-crm.yaml#/components/schemas/ConsentDecision |
+| Subscription | A list the guest asked to receive (a newsletter, event news), per channel. Unsubscribing from a list is not withdrawing consent. | Consent, Opt-in | contracts/satellite/marketing-crm.yaml#/components/schemas/MarketingSubscription |
+| Preferences | What the guest likes or needs (seating, drinks, dietary, accessibility, contact channel). Never grants permission. | Consents, Settings | contracts/satellite/marketing-crm.yaml#updateGuestPreferences |
+| Send me offers and news | The marketing opt-in label beside the terms at checkout, unticked, one per channel and purpose. | I agree to marketing, Pre-ticked boxes, Keep me updated ticked by default | DI-954 |
+| Points / Tier / Points to next tier / Expiring points | The loyalty position. Points are a liability earned per programme; tiers are ranked (Bronze, Silver, Gold, Platinum in the meetings). | Credits, Coins, Balance alone (wallet money is "credit"), Level | DI-382 |
+| Pending points | Points earned on a purchase still inside its refund window; shown apart from spendable points. | Available points for pending ones | contracts/satellite/marketing-crm.yaml#getLoyaltyPosition |
+| Reward | What points can be turned into (rewards catalogue). | Prize (games redemption uses prize), Voucher unless it is one | contracts/satellite/marketing-crm.yaml#listRewards |
+| Challenge / Badge / Streak / Referral | Gamification - rewards for behaviour, not spend. Status badges such as Explorer, Adventurer, Legend. | Mission and Quest used interchangeably on one screen, Loyalty tier for a badge | DI-392 |
+| Case | One service record - lost property, complaint, question, accessibility, refund request or other - with a number (venue prefix plus sequence), a status and an SLA. | Ticket (a ticket is an admission product), Issue, Incident (that is maintenance and safety) | contracts/satellite/marketing-crm.yaml#/components/schemas/CaseKind |
+| Reply to guest / Internal note | The two kinds of case message. The agent always chooses one explicitly; there is no default. | Comment, Message (ambiguous) | F05 step 2 |
+| Conversation | A live chat session (web chat, in-app, WhatsApp, SMS, email, kiosk, voice). With the assistant, then queued, then with an agent. It is not a case. | Ticket, Case (until one is raised from it) | contracts/satellite/marketing-crm.yaml#/components/schemas/ConversationState |
+| Segment / List / Audience | A segment is rules evaluated when used. A list is static, imported or hand-picked. The audience is what a campaign or journey targets. | Group, Cohort, Target list for a segment | DI-381 |
+| Campaign / Journey | A campaign is one send (one-off, scheduled, triggered or recurring) to an audience. A journey is an automation started by an event, with steps, waits and branches. | Flow (booking flows use it), Automation for a one-off send, Blast | R146 |
+| Offer | A pre-configured, system-validated discount or benefit that a campaign or journey references. It is never typed into the builder. | Discount field, Coupon (unless the offer is a coupon code) | MoM 2026-08-20 4.6 |
+| Reachable | How many guests in an audience can actually be sent to on a channel after consent and suppression. Always shown beside the matching count. | Audience size alone | contracts/satellite/marketing-crm.yaml#previewSegment |
+| Possible duplicate / Merge | Two profiles that may be one person. Never called "Duplicate" as a verdict. Merging needs confirmation and stays reversible for 30 days. | Duplicate (as a status), Combine, Auto-merge | DI-808 |
+| Data request | A guest's privacy request - a copy of my data, a correction, erasure, a restriction - with a legal clock. Statuses submitted, in progress, completed. | DSAR on guest screens, Subject data, Ticket | DI-379 |
+| Waiver / Consent question | A waiver is a signed, versioned form. A consent question ("Are you able to swim?", "I accept the risk") is a single question asked per person or per booking and recorded as consent. | Contract, Disclaimer, Form for a waiver in guest copy | DI-1062 |
+| Lost item / Found item / Possible match | The two directions of lost property and the suggested pairing between them. | Lost case, Claim before it is claimed | contracts/satellite/marketing-crm.yaml#/components/schemas/LostItem |
+| Wishlist | Products and dates a guest saved to buy later, including F&B and retail to buy on site. | Favourites (used for transport routes), Saved for later on one surface and Wishlist on another | DI-202 |
+| Notification / Message | A notification is an item in the guest's in-app feed. A message is one send on a channel (email, SMS, WhatsApp, push, in-app). | Alert for marketing content, Inbox for the guest feed | contracts/satellite/marketing-crm.yaml#/components/schemas/GuestNotification |
+| Template | A reusable message body per channel and language with merge fields. Transactional and marketing templates are separate kinds. | Layout, Design | contracts/satellite/marketing-crm.yaml#createMessageTemplate |
+
+
 ## The screens
 
 Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs count fields; requirements are matrix rows; meeting inputs are the ones naming the screen (the module and platform ones are below); white label says whether the tenant's brand reaches it (guest) or it sets the brand (configures).
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `WEB-010` | Shopping Cart | A | 12 | 70 | 5 | 35 | 12 | 6 | guest | review (client-verified) |
-| `WEB-011` | Guest Details & Attendee Forms | A | 33 | 52 | 6 | 44 | 15 | 0 | guest | review (client-verified) |
-| `WEB-012` | Checkout — Payment | A | 14 | 34 | 5 | 24 | 17 | 6 | guest | review (client-verified) |
-| `WEB-013` | Booking Confirmation | A | 5 | 10 | 5 | 10 | 4 | 6 | guest | review (client-verified) |
+| `WEB-010` | Shopping Cart | A | 13 | 70 | 5 | 35 | 12 | 6 | guest | review (client-verified) |
+| `WEB-011` | Guest Details & Attendee Forms | A | 12 | 21 | 6 | 7 | 15 | 0 | guest | review (client-verified) |
+| `WEB-012` | Checkout — Payment | A | 14 | 38 | 5 | 24 | 17 | 6 | guest | review (client-verified) |
+| `WEB-013` | Booking Confirmation | A | 7 | 10 | 5 | 11 | 4 | 6 | guest | review (client-verified) |
 | `WEB-014` | Pay for a Booking | A | 3 | 3 | 5 | 0 | 2 | 6 | guest | review (designed) |
 
 ---
@@ -90,13 +148,21 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Module | Cart & Checkout · wave 1 · needs the `ticketing` module |
 | Block | Block A · ticket #18014 (APP-WEB-WEB-010) |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025); in the flows as guest |
-| Device and orientation | This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. · LTR and RTL · light theme |
+| Device and orientation | This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. · LTR and RTL · the venue's theme |
 | Pattern | statusTracker (compact density): `getCart` reads one record and nothing reads a population — the screen is about that one thing |
 | Offline | **The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
 | Opens with | `cartId` (WEB-008), `code` (deepLink), `lineId` (deepLink), `performanceId` (navigation), `holdId` (navigation), `venueId` (session) · cold entry: **A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared ticket, a forwarded confirmation … |
 | Route | `/cart-and-checkout/shopping-cart` |
 
-**What the spec says about it.** **Rev 3 (decided 29 September).** Visit date per line (23SEP-9). **Layout (REV3-10):** `cartLayout` may be `floatingIcon` (a round basket button with the count); in Arabic the cart stays on the right unless `cartSideInRtl` is `mirror` (default `keepRight`). **A line holding a cabana or spot from the venue map** (`resourceHoldId`) counts down from its `ResourceHold.expiresAt` (REV3-15). **Consent (REV3-26):** `checkoutCart` answers `422 consentRequired` while a required consent question is unanswered, and `consentAnswerBlocks` when an answer blocks a line; both send the guest back to the questions (WEB-006 pop-up, or WEB-011 for a flow with no date step). Promo code and abandon are declared (`applyCartPromoCode`, `abandonCart`; GAP-B3, already). Every booking-flow setting named here is read from `getTenantConfig` `bookingFlow`, resolved for the venue the guest picked (audit R267): the tenant's values with that venue's `venueOverrides` entry laid over field by field (decided 29 September, rev 3 CFG-11). **The step order comes from the published booking flow** (W12, 29 September): `getPublishedBookingFlow` returns the flow the product (or its category, else the venue default for its kind) uses, with its enabled steps in `sortOrder`; this screen renders when that flow has its step and in the order the flow gives. Flow-level settings (`performanceReveal`, `signInAt`, `seatEventDateMode`, `extrasStep`, `quickTour`, `consentQuestionIds`) are read from the flow; venue-wide settings stay on `getTenantConfig` `bookingFlow`.
+**What the spec says about it.** **Rev 3 (decided 29 September).** Visit date per line (23SEP-9). **Layout (REV3-10):** `cartLayout` may be `floatingIcon` (a round basket button with the count); in Arabic the cart stays on the right unless `cartSideInRtl` is `mirror` (default `keepRight`). **A line holding a cabana or spot from the venue map** (`resourceHoldId`) counts down from its `ResourceHold.expiresAt` (REV3-15). **Consent (REV3-26):** `checkoutCart` answers `422 consentRequired` while a required consent question is unanswered, and `consentAnswerBlocks` when an answer blocks a line; both send the guest back to the questions (WEB-006 pop-up, or WEB-011 for a flow with no date step). Promo code and abandon are declared (`applyCartPromoCode`, `abandonCart`; GAP-B3, already). Every booking-flow setting named here is read from `getTenantConfig` `bookingFlow`, resolved for the venue the guest picked (audit R267): the tenant's values with that venue's `venueOverrides` entry laid over field by field (decided 29 September, rev 3 CFG-11). **The step order comes from the published booking flow** (W12, 29 September): `getPublishedBookingFlow` returns the flow the product (or its category, else the venue default for its kind) uses, with its enabled steps in `sortOrder`; this screen renders when that flow has its step and in the order the flow gives. Flow-level settings (`performanceReveal`, `signInAt`, `seatEventDateMode`, `extrasStep`, `quickTour`, `consentQuestionIds`) are read from the flow; venue-wide settings stay on `getTenantConfig` `bookingFlow`. **The guest selects the currency and pays in it** (decided …
+
+**From the Ticketing & Guest Commerce (guest web, guest app, kiosk, partner portal, POS ticket sale) process.** The basket. Block A. In the prototype it is not a page: it is the persistent cart beside every booking step (sidebar right by default; left, slide-in right, slide-up bottom, floating basket icon or single column per venue), and it opens as a full review before payment. Get right that every line names what, for when and for whom, that the hold countdown is visible, and that a refused promo code says why.
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- The glossary bans "Basket" as a synonym of Order and has no term for the cart, while guest screens and the client's responses say basket. (CHG-SGU-025)
+
+**Fixed on main** (the package already carries these; draw what it says): The action bar shows eight raw operations (Add cart line, Save cart line, Create cart, Checkout cart, Evaluate promotions, Abandon cart … (CHG-GST-003); The extend action is not in the prototype; only the seat step has a timer. (CHG-SGU-020).
 
 #### Inputs: what the user enters or picks
 
@@ -126,6 +192,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
 | Subject `subjectId` | picker: choose a subject | optional | — | — | shows names, sends the id | The guest the order is for. A guest caller may name only themselves (`guestAuth` never widens to another subject); omitted, the cart's own `subjectId` is used. | `checkoutCart` body |
+| Charge currency `chargeCurrency` | text field | optional | — | pattern `^[A-Z]{3}$`; A currency the venue does not take is refused 400 `currency-not-chargeable`. | — | The currency the guest selected to pay in (decided 2 October 2026, Chinmay; CHG-FIN-001). | `checkoutCart` body |
 | Marketing consents `marketingConsents` | repeatable rows | optional | — | — | — | Marketing opt-ins given at checkout (29 September, M18-15). Shown unticked beside the terms; one entry per channel and purpose the guest ticked. | `checkoutCart` body |
 | Channel `marketingConsents[].channel` | radio group | required | — | Email · SMS · Whatsapp · Push | — | — | `checkoutCart` body |
 | Purpose `marketingConsents[].purpose` | text field | required | — | max length 60 | — | The consent purpose code (marketing ConsentPurpose), for example `marketing`. | `checkoutCart` body |
@@ -134,6 +201,11 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Attendees `attendees` | repeatable rows | optional | — | — | — | The named holder for each cart line that needs one. Becomes `CreateOrderLine.holderName` on the order's matching line. | `checkoutCart` body |
 | Line `attendees[].lineId` | picker: choose a line | required | — | — | shows names, sends the id | A `CartLine.id` in this cart. | `checkoutCart` body |
 | Holder name `attendees[].holderName` | text field | required | — | — | — | — | `checkoutCart` body |
+
+**Rules for these inputs** (from the Ticketing & Guest Commerce (guest web, guest app, kiosk, partner portal, POS ticket sale) process; these refine the tables above and win where they differ)
+
+- **promo code**: One text field with Apply; applied to the cart at once. Two refusals read differently: "This code doesn't exist or has been used up" (promoCodeInvalid) and "This code is valid, but nothing in your basket qualifies" (promoCodeNotApplicable); an expired code says "expired on 30 Sep". Accepted codes show as removable chips and are re-checked on every read. *(source: contracts/spine/orders.yaml#applyCartPromoCode; DI-1074; F01 branch at step 5)*
+- **line quantity**: A stepper per line; lowering to 0 removes the line after a confirm that names it. Seats are removed one by one (each seat is its own line), not by a stepper. Removing a ticket also removes its add-ons (a locker with no admission is not a sale) and the confirm says so. *(source: contracts/spine/orders.yaml#/components/schemas/CartLine (parentLineId); DI-982)*
 
 #### Outputs: what the screen shows and produces
 
@@ -247,7 +319,20 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Remove (destructive button) | `removeCartLine` DELETE `/carts/{cartId}/lines/{lineId}` | — | Cart | — | — |
 | More time (secondary button) | `extendCart` POST `/carts/{cartId}/extend` | — | Cart | 409 Extension cap reached (`extensionCapReached`), or a lease could not be extended because the capacity has gone (`noCapacity`, naming the lines in `lineIds`). (CartProblem) | — |
 | Empty cart (destructive button) | `abandonCart` DELETE `/carts/{cartId}` | — | — | 409 The cart is not `active` or `expiring` (`cartNotOpen`) — an expired cart has nothing left to release, and a checked-out cart's leases already belong to its … (CartProblem) | — |
-| Checkout (primary button) | `checkoutCart` POST `/carts/{cartId}/checkout` | inline | Order | 403 The contact the tickets would go to is not proven — an unverified session (`sessionNotVerified`), or a guest checkout with no confirmed one-time code … (CartProblem); 409 A lease expired between the last read and … | emits `order.created` |
+| Checkout (primary button) | `checkoutCart` POST `/carts/{cartId}/checkout` | inline | Order | 400 `chargeCurrency` is not one the venue takes (problem type `currency-not-chargeable`, CHG-FIN-001).; 403 The contact the tickets would go to is not proven — an unverified session (`sessionNotVerified`), or a guest … | emits `order.created` |
+
+**Rules for what is shown** (from the Ticketing & Guest Commerce (guest web, guest app, kiosk, partner portal, POS ticket sale) process; these refine the tables above and win where they differ)
+
+- **line**: Product and guest type in one line ("2 park ticket · Adult × 3"), the visit date (the match date for a fixture, "Fri 2 Oct"), seat or cabana where held ("Stalls · Row F, Seat 9"; "Cabana B09 · Large cabana · Beach"), and the line total in AED. Fees are their own lines (booking fee, delivery), never folded into the ticket price. *(source: DI-1106; DI-1029; REV3 23SEP-9; contracts/spine/orders.yaml#/components/schemas/CartLine (feeKind))*
+- **automatic offers**: A buy-2-get-1 style offer adds its discounted item automatically with the price struck through (AED 245 → AED 0) and a short reason; a promotion that lapsed while the cart sat disappears on the next read with a notice. *(source: DI-174; DI-586; contracts/spine/orders.yaml#/components/schemas/Cart (appliedPromotionIds "re-evaluated on every read"))*
+- **hold countdown**: One countdown for the basket, from Cart.expiresAt (the earliest lease: 15 minutes for tickets, 8 for seats and cabanas). Under 2 minutes it turns amber and offers "More time" once; the button says it is the last extension. *(source: contracts/spine/orders.yaml#extendCart ("5 minutes, and 1 extension"); contracts/spine/orders.yaml#addCartLine ("the window is 15 minutes"); AUDIT-29SEP (amber under 2 minutes))*
+- **upgrades**: "Upgrade your day" appears only once a main ticket is in the basket. *(source: DI-978)*
+- **totals**: Subtotal, discounts, VAT (5%, shown as included or added per the venue's tax profile) and total in AED. *(source: contracts/spine/orders.yaml#/components/schemas/Cart (subtotal, discountTotal, taxTotal, total))*
+
+**What each action does** (from the Ticketing & Guest Commerce (guest web, guest app, kiosk, partner portal, POS ticket sale) process; these refine the tables above and win where they differ)
+
+- **Checkout**: Anonymous guest with signInAt atPayment, or guest checkout on, goes to sign-in or the guest code (WEB-016); a guest who proved the contact or is signed in goes straight to payment (WEB-012), skipping the details form unless the cart needs attendee forms or consents (WEB-011). Refused with the questions reopened when a required consent is unanswered. *(source: F01 step 6; MoM 29 Sep W1; screens/P01-guest-web-storefront.yaml#WEB-010 notes (consentRequired))*
+- **Empty basket**: Confirm names what is released ("Release 3 tickets and 2 seats?"); the holds are given back at once. *(source: DI-1074; contracts/spine/orders.yaml#abandonCart)*
 
 **Data it reads**: `getCart` (onLoad, The cart, priced and checked, right now With the guest …); `getCouponCode` (onLoad, Look up a code With the guest session the device already …); `createCart` (background, Started by the runtime the first time a line is added …); `getPerformance` (onLoad, The visit date and time of each line …); `getResourceHold` (onInterval, The countdown of a cabana or spot held on the venue map …); `getPublishedBookingFlow` (onLoad, The published booking flow for this product: which steps it …)
 
@@ -274,7 +359,33 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Empty, first run (`?state=emptyFirstRun`) | No shopping cart yet. Offers Add cart line (`addCartLine`). |
 | Permission denied (`?state=emptyNoAccess`) | **The cart is open to anyone** — signed in, unverified or anonymous (ADR-0045, 18 September 2026). Nobody is turned away from it. The fork between signing in and continuing as a guest waits on `WEB-011`, and `checkoutCart` is what refuses. |
 | Offline (`?state=offline`) | **The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
-| Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 A lease expired between the last read and checkout (`leaseExpired`), or a resource hold did (`resourceHoldInvalid`, rev 3 REV3-15). (CartProblem); 409 Extension cap reached (`extensionCapReached`), or a lease could not be extended because the capacity has gone (`noCapacity`, naming the lines in `lineIds`). (CartProblem); 409 No capacity, or the product is not sellable … |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 400 `chargeCurrency` is not one the venue takes (problem type `currency-not-chargeable`, CHG-FIN-001).; 409 A lease expired between the last read and checkout (`leaseExpired`), or a resource hold did (`resourceHoldInvalid`, rev 3 REV3-15). (CartProblem); 409 Extension cap reached (`extensionCapReached`), or a lease could not be extended because the capacity has gone … |
+
+#### Edge cases to draw
+
+- **A line became unavailable while the cart sat (lease expired or sold out)**: The line is marked "No longer available" with Remove, and Checkout stays off until it is removed or re-added; a lapsed lease says "Your hold ended" not "Sold out". *(source: contracts/spine/orders.yaml#/components/schemas/CartLine (isAvailable))*
+- **The cart expired (410 cartExpired)**: "Your basket has expired" with Start again that returns to the product; nothing is half-kept. *(source: screens/P01-guest-web-storefront.yaml#WEB-010 (Promo code notes))*
+- **Arabic**: The cart stays on the right unless the venue chose Mirror to left; the rest of the layout flips. *(source: REV3-10; DI-1051)*
+
+#### Consistency with other screens
+
+- Match `GST-041`: Same lines, same countdown, same promo messages. The app keeps the cart as a header button with a count during booking and a "save and finish later" option that keeps the order on the device.
+- Match `KSK-006`: The kiosk review uses the same line wording.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+lines:
+- 2 park ticket · Adult × 3 · Fri 2 Oct · AED 1,425
+- Fast Track · × 3 · AED 225
+- Cabana B09 · Large cabana · Beach · Fri 2 Oct · AED 1,855
+- Booking fee · AED 10
+promo: SUMMER10 applied · −AED 142.50
+countdown: Held for 12:41
+total: AED 3,372.50 incl. VAT AED 160.60
+```
 
 #### Permissions
 
@@ -291,7 +402,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 - `createCart` → no permission · guest
 - `getPerformance` → `PRODUCT_VIEW` (read) · staff, guest
 - `getResourceHold` → `ORDER_VIEW` (read) · staff, guest
-- `getPublishedBookingFlow` → no permission · guest
+- `getPublishedBookingFlow` → no permission · guest, staff
 
 **A refused user sees:** **The cart is open to anyone** — signed in, unverified or anonymous (ADR-0045, 18 September 2026). Nobody is turned away from it. The fork between signing in and continuing as a guest waits on `WEB-011`, and `checkoutCart` is what refuses.
 
@@ -345,9 +456,9 @@ Also apply: 2 for P01 · Cart & Checkout, 39 for all of P01, 29 for every app (s
 
 #### Configurable by the tenant
 
-This is a white-label guest screen: it is drawn in the venue's brand, never TICVAI's (except the fixed *Powered by TICVAI* credit). Draw it with the **default theme**, and on the key screens one **alternate tenant theme** (`handoff/design-batches/apps/1-guest-app/WHITE-LABEL.md`).
+This is a white-label guest screen: it is drawn in the venue's brand, never TICVAI's (except the *Powered by TICVAI* credit, a tenant toggle that is on by default: `brand.showPoweredBy`). It has no dark or light mode: the venue's theme applies on every device setting. Draw it with the **default theme**, and on the key screens one **alternate tenant theme** (`handoff/design-batches/apps/1-guest-app/WHITE-LABEL.md`).
 
-**Shell-wide, on every guest screen:** Brand (10, CMS-002, CMS-004, ADM-016); Theme (31, CMS-005, CMS-003, ADM-016); Fonts (5, CMS-003); Header (5, CMS-007); Navigation (17, CMS-009); Footer (website) (15, CMS-007); Languages and right-to-left (2, CMS-011, ADM-018); Modules shown to guests (3, CMS-001); Features (3, CMS-001); Custom domain (website) (3, CMS-017, ADM-017); SEO metadata (website) (13, CMS-013). Each element, its CMS field, allowed values and default: `handoff/design-batches/apps/1-guest-app/WHITE-LABEL.md`.
+**Shell-wide, on every guest screen:** Brand (11, CMS-002, CMS-004, CMS-104); Theme (27, CMS-005, ADM-016); Fonts (5, CMS-003); Header (5, CMS-009); Navigation (17, CMS-009); Footer (website) (15, CMS-009); Languages and right-to-left (2, CMS-011, ADM-018); Modules shown to guests (3, CMS-001, ADM-424); Features (3, CMS-001); Custom domain (website) (3, CMS-017, ADM-017); SEO metadata (website) (13, CMS-013). Each element, its CMS field, allowed values and default: `handoff/design-batches/apps/1-guest-app/WHITE-LABEL.md`.
 
 **Specific to this screen** (the tenant's setting is the input; the right column is what it changes here). Draw each with its default, and the alternate where the alternate theme sets one.
 
@@ -408,7 +519,7 @@ Also set there, as content the tenant writes: settings.
 #### References
 
 - Wireframe frame: `wireframes/P01 Guest Web.dc.html#web-010` · status **review** · provenance client-verified
-- Prototype (rev 3, verified 2026-09-28, match partial): `sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html`, view *Visible on every booking step as the cart sidebar (Config → Layout & locale → 'Cart & summary' changes it to slide-in, bottom sheet, floating icon or single …*. Differences: Not a separate screen: a persistent sidebar/drawer through the stepper, with a Rev 3 option to mirror it in Arabic. No 'extend hold' action (extendCart) — only hold timers on the seat step. Exit-intent dialog (exit.open) is a prototype addition.
+- Prototype (rev 3, verified 2026-09-28, match partial): `sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html`, view *Visible on every booking step as the cart sidebar (Config → Layout & locale → 'Cart & summary' changes it to slide-in, bottom sheet, floating icon or single …*. Differences: Not a separate screen: a persistent sidebar/drawer through the stepper, with a Rev 3 option to mirror it in Arabic. No 'extend hold' action (extendCart) — only hold timers on the seat step. Exit-intent dialog (exit.open) is a prototype addition. **Draw the countdown with More time (`extendCart`) on the basket**, although the prototype has no extend action and times only the seat step (CHG-SGU-020).
 - Flow F01 *Guest buys a ticket online*, step 5: Reviews the cart and may enter a promotion code → Final price, with any rejected code explained rather than silently ignored
 - Flow F02 *Guest buys seated tickets*, step 3: Reviews the cart → Held seats itemised with the countdown still visible
 - Flow F55 *A guest buys on the web and transfers to a friend*, step 1: They build a cart. → **`extendCart` exists because a cart with a timed-entry lease expires.** A guest deciding for ten minutes should not lose the slot silently.
@@ -419,10 +530,11 @@ Also set there, as content the tenant writes: settings.
 - ADR-0045 *Every order carries a proven contact, and the gate is the checkout page* (`docs/adr/0045-every-order-carries-a-proven-contact.md`)
 - ADR-0037 *A lock holds one statement, not a transaction* (`docs/adr/0037-what-may-be-inside-a-lock.md`)
 - ADR-0066 *The on-sale waiting room sits at the edge, apart from the ride queue* (`docs/adr/0066-the-on-sale-waiting-room-is-separate-from-the-ride-queue.md`)
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (12), with its required mark, default, format and its error state (400, 403, 404, 409, 410, 412, 422).
+- [ ] Every input above is drawn (13), with its required mark, default, format and its error state (400, 403, 404, 409, 410, 412, 422).
 - [ ] Every output is drawn (70 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#WEB-010?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Apply code, Remove, More time, Empty cart, Checkout.
@@ -430,6 +542,7 @@ Also set there, as content the tenant writes: settings.
 - [ ] Sign-in is asked only where the spec asks for it.
 - [ ] The 12 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] Drawn in the default theme; on a key screen also in the alternate tenant theme; nothing hard-codes a brand colour, logo or font.
+- [ ] The 3 edge case(s) from the process notes are drawn.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -444,13 +557,25 @@ Also set there, as content the tenant writes: settings.
 | Module | Cart & Checkout · wave 1 · needs the `marketing` module |
 | Block | Block A · ticket #17988 (APP-WEB-WEB-011) |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025); in the flows as guest |
-| Device and orientation | This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. · LTR and RTL · light theme |
+| Device and orientation | This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. · LTR and RTL · the venue's theme |
 | Pattern | listDetail (compact density): `listGuestDevices` reads the population and `getWishlist` reads one of them — list, select, act |
 | Offline | **Not available, and the offline banner says why.** A payment needs the gateway, and pretending otherwise takes money nobody can confirm. What was typed stays on screen so nothing is entered twice. |
-| Opens with | `deviceId` (deepLink), `itemId` (deepLink), `subjectId` (session), `cartId` (session), `venueId` (session) · cold entry: **A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared ticket, a forwarded confirmation … |
+| Opens with | `subjectId` (session), `cartId` (session), `venueId` (session) · cold entry: **A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared ticket, a forwarded confirmation … |
 | Route | `/cart-and-checkout/guest-details-and-attendee-forms` |
 
 **What the spec says about it.** **Wired 24 August from review**: updateMyProfile. **The operations existed and this screen could not call them** — reviewers reported them as missing APIs, which is what an unreachable operation looks like from a wireframe. **Rev 3 (decided 29 September).** Booking consent questions not yet answered are asked here (REV3-26). The sign-in gate may already have been passed at the Add-ons exit (`signInAt` `afterAddOns`, REV3-3); a guest who signed in there arrives with their details filled. **The step order comes from the published booking flow** (W12, 29 September): `getPublishedBookingFlow` returns the flow the product (or its category, else the venue default for its kind) uses, with its enabled steps in `sortOrder`; this screen renders when that flow has its step and in the order the flow gives. Flow-level settings (`performanceReveal`, `signInAt`, `seatEventDateMode`, `extrasStep`, `quickTour`, `consentQuestionIds`) are read from the flow; venue-wide settings stay on `getTenantConfig` `bookingFlow`. **29 September (W1).** **Skipped after the guest code, and when signed in**, unless the cart needs attendee forms or unanswered consent questions: no name, email or phone is asked again. The profile is created and completed later (WEB-020).
+
+**Known gaps.** An identity document a ticket requires cannot be uploaded end to end: uploadGuestDocument needs a storageRef that no operation issues, so the upload control is hidden until the document-store upload …
+
+**From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** The details step of the web checkout. It collects the buyer's contact once, the per-ticket holder details only where a ticket is name-bound, the booking consent questions the cart still needs, and the marketing opt-in. The step is skipped when the cart needs none of these (F01 step 6). From the customer-marketing angle there are two things to get right. Marketing consent is opt-in and unticked, per channel and purpose, beside the terms. And a buyer cannot consent on behalf of the friends they are buying for: consent is per attendee (F55 step 2).
+
+**Fixed on main** (the package already carries these; draw what it says): WEB-011 declares the wishlist and push-device operations (getWishlist, addToWishlist, removeFromWishlist, listGuestDevices … (CHG-SGU-017); The marketing opt-in is written with recordConsent from this screen. (CHG-SGU-017); The "Upload guest document" control is offered, but uploadGuestDocument needs a storageRef that no operation issues yet. (CHG-SGU-017); The emptyFirstRun state offers "Add to wishlist" on a checkout step. (CHG-SGU-017).
+
+#### Decided on this screen
+
+Answered questions: draw the decision, not the old default. Where a decision and the tables below differ, the decision wins.
+
+- **May a guest who checks out without an account be marketed to on the strength of the checkout opt-in (is it sufficient consent under PDPL)?** → Drawn default stands (answer: "Default / recommended accepted"): Draw the unticked opt-in beside the terms. Record it with source "checkout". Send nothing promotional to a guest-checkout buyer unless they ticked it. *(decided by Chinmay, 2026-10-02; DEC-023 / CHG-NOTE-002)*
 
 #### Inputs: what the user enters or picks
 
@@ -461,7 +586,7 @@ Also set there, as content the tenant writes: settings.
 | Full name | text field | — | — | — | — | — | — |
 | Email | text field | — | — | — | — | — | — |
 | Mobile | text field | — | — | — | — | — | — |
-|  | consent block | — | — | — | — | Marketing consent is opt-in and unticked. Transactional is required for service and is presented differently, not as a choice dressed as one | — |
+| Send me offers and news | consent block | — | — | — | — | One unticked checkbox per configured marketing channel and purpose, beside the terms, never pre-ticked. The ticks travel with checkout as `marketingConsents[]` and are recorded by … | — |
 | Booking consent questions | repeatable rows | optional | — | — | — | Any consent question in `Cart.consentQuestions` not answered yet (a flow with no date step, or a product added later): per person or once per booking, as each question says; answers go to … | `Cart.consentQuestions` |
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
@@ -471,59 +596,6 @@ Also set there, as content the tenant writes: settings.
 | Product | picker: choose a product | — | — | `getPublishedBookingFlow` ?productId |
 | Product category | picker: choose a product category | — | — | `getPublishedBookingFlow` ?productCategoryId |
 | Flow type key | select | — | Dated day pass · Timed entry · Open dated · Seated fixed performance · Seated date time seat map · Experience workshop · Surf session · Meeting room hourly · Cabana map · Cabana by size · Guided tour by language · Transport … | `getPublishedBookingFlow` ?flowTypeKey |
-
-**Form: Upload guest document** (modal, opened by *Upload guest document*; *Upload guest document* calls `uploadGuestDocument`, *Cancel* sends nothing)
-
-**Collects what `uploadGuestDocument` sends before it is called.** Required: `id`, `subjectId`, `kind`, `storageRef`, `retainUntil`. Optional: `contentType`, `consentPurposeId`, `uploadedAt`, `uploadedByPrincipalId`. Dismissing sends nothing; the screen behind is unchanged.
-
-| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
-|---|---|---|---|---|---|---|---|
-| Subject `subjectId` | picker: choose a subject | required | — | — | shows names, sends the id | — | `uploadGuestDocument` body |
-| Kind `kind` | select | required | — | Avatar · ID document · Visa · Signed waiver · Medical note · Accessibility evidence · Photo · Other | — | — | `uploadGuestDocument` body |
-| Storage ref `storageRef` | text field | required | — | — | — | The stored object's key in the guest-document store, which is deliberately not `assets` (BL-133). | `uploadGuestDocument` body |
-| Content type `contentType` | text field | optional | — | — | — | — | `uploadGuestDocument` body |
-| Consent purpose `consentPurposeId` | picker: choose a consent purpose | optional | — | — | shows names, sends the id | — | `uploadGuestDocument` body |
-| Retain until `retainUntil` | date picker | required | — | — | 1 Oct 2026 (dd MMM yyyy) | Required, not optional. A guest document with no deletion date is a guest document kept forever, and the retention question is the one CF-64 is open on. | `uploadGuestDocument` body |
-
-**Form: Add to wishlist** (modal, opened by *Add to wishlist*; *Add to wishlist* calls `addToWishlist`, *Cancel* sends nothing)
-
-**Collects what `addToWishlist` sends before it is called.** Required: `variantId`. Optional: `performanceId`, `note`. Dismissing sends nothing; the screen behind is unchanged.
-
-| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
-|---|---|---|---|---|---|---|---|
-| Variant `variantId` | picker: choose a variant | required | — | — | shows names, sends the id | — | `addToWishlist` body |
-| Performance `performanceId` | picker: choose a performance | optional | — | — | shows names, sends the id | Saving a specific date rather than the product generally. | `addToWishlist` body |
-| Note `note` | text area | optional | — | max length 200 | — | — | `addToWishlist` body |
-
-Errors to draw in the form: 404 Variant not found or not sellable in this venue
-
-**Form: Record consent** (modal, opened by *Record consent*; *Record consent* calls `recordConsent`, *Cancel* sends nothing)
-
-**Collects what `recordConsent` sends before it is called.** Required: `purpose`, `decision`, `noticeVersion`, `source`, `recordedAt`. Optional: `channels`. Dismissing sends nothing; the screen behind is unchanged.
-
-| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
-|---|---|---|---|---|---|---|---|
-| Purpose `purpose` | select | required | — | Marketing · Personalisation · Profiling · Third party sharing · AI processing · Transactional | — | — | `recordConsent` body |
-| Decision `decision` | segmented control | required | — | Granted · Withdrawn · Not asked | — | — | `recordConsent` body |
-| Channels `channels` | multi-select chips | optional | — | Email · SMS · Whatsapp · Push · In app · Post | — | Omit to apply to every channel the purpose covers. | `recordConsent` body |
-| Notice version `noticeVersion` | text field | required | — | — | — | — | `recordConsent` body |
-| Source `source` | select | required | — | Guest app · Website · Kiosk · POS · Call centre · Import · Agent recorded · Cookie banner · Checkout | — | `checkout` (30 September, M18-15): an opt-in ticked beside the terms at checkout, carried on orders `checkoutCart` `marketingConsents[]` and recorded by `recordCheckoutConsents` … | `recordConsent` body |
-| Recorded at `recordedAt` | date and time picker | required | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `recordConsent` body |
-
-Errors to draw in the form: 400 Notice version unknown, or the purpose is not configured
-
-**Form: Register guest device** (modal, opened by *Register guest device*; *Register guest device* calls `registerGuestDevice`, *Cancel* sends nothing)
-
-**Collects what `registerGuestDevice` sends before it is called.** Required: `platform`, `token`. Optional: `appVersion`, `osVersion`, `deviceModel`, `locale`. Dismissing sends nothing; the screen behind is unchanged.
-
-| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
-|---|---|---|---|---|---|---|---|
-| Platform `platform` | segmented control | required | — | Ios · Android · Web | — | — | `registerGuestDevice` body |
-| Token `token` | text area | required | — | max length 512 | — | — | `registerGuestDevice` body |
-| App version `appVersion` | text field | optional | — | — | — | — | `registerGuestDevice` body |
-| Os version `osVersion` | text field | optional | — | — | — | — | `registerGuestDevice` body |
-| Device model `deviceModel` | text field | optional | — | — | — | — | `registerGuestDevice` body |
-| Locale `locale` | text field | optional | — | — | — | — | `registerGuestDevice` body |
 
 **Form: Save my profile** (modal, opened by *Save my profile*; *Save my profile* calls `updateMyProfile`, *Cancel* sends nothing)
 
@@ -539,108 +611,70 @@ Errors to draw in the form: 400 Notice version unknown, or the purpose is not co
 | Dietary `dietary` | list of values (chips) | optional | — | — | — | Health-adjacent personal data, kept structured rather than as a tag (BL-134). `GuestProfile.tags` carries VIP-style markers adequately and is the wrong home for a nut allergy — … | `updateMyProfile` body |
 | Accessibility `accessibility` | list of values (chips) | optional | — | — | — | Same treatment, same reason. Stored as `GuestPreferences.accessibility`. | `updateMyProfile` body |
 
+**Rules for these inputs** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
+
+- **Email and Mobile (the buyer)**: At least one of the two is required, never both forced (either/or rule). Prefilled from the signed-in profile or UAE Pass. After the guest-checkout code is verified they are shown read-only and never asked again. Only the fields the back office configured are collected. *(source: DI-372; DI-123; DI-1002)*
+- **Full name**: Asked only if the venue's configuration requires it and it was not already captured; for a profile created by guest checkout the rest is completed later from the account, never here. *(source: DI-1002; DI-399)*
+- **Ticket holder details (per attendee)**: Shown only for tickets whose entitlement is name-bound; one block per holder, titled "Ticket 2 of 4 - Child". Season-pass and family products capture first and last name per holder. Ticket-type rules such as minimum age or Emirates ID for resident tickets are checked per holder. The holder is separate from the buyer, who receives the tickets. *(source: screens/P01-guest-web-storefront.yaml#WEB-011; DI-122; DI-178; DI-429; DI-443; DI-463)*
+- **Booking consent questions**: Only the questions still unanswered in the cart (a product added after the date step, a flow with no date step). Each is asked per person or once per booking, as the question says. A required question blocks Continue until answered. A blocking answer (No to "Are you able to swim?" on a deep-water product) stops that line: say why and offer "Remove this guest" or "Choose another activity". Answers are recorded append-only with the question's version. *(source: contracts/satellite/marketing-crm.yaml#recordConsentAnswers; contracts/satellite/marketing-crm.yaml#createConsentQuestion; DG-3; DI-1062)*
+- **Send me offers and news (marketing opt-in)**: One unticked checkbox per configured marketing channel and purpose (e.g. "by email", "by WhatsApp"), beside the terms, never pre-ticked and never inferred. It travels with checkout as marketingConsents[] and is recorded with source "checkout", bound to the order and the verified contact. Transactional messages (tickets, receipts) are required for service and are stated as a sentence, not drawn as a checkbox. *(source: DI-954; M18-15 (audit R-M18-15); screens/P01-guest-web-storefront.yaml#WEB-011; F01 step 6)*
+- **Preferred contact method**: Email or phone, asked beside the opt-in where the venue configured it. *(source: DI-616)*
+- **Identity document upload (where a ticket requires it)**: Only when the ticket's eligibility rule needs an Emirates ID or passport. Show what it is for and how long it is kept (retainUntil is required on every guest document). *(source: contracts/satellite/marketing-crm.yaml#uploadGuestDocument; DI-443; R149)*
+
 #### Outputs: what the screen shows and produces
 
 **Shown**
 
-**Every guest device** (data table, from `listGuestDevices`)
+**Ticket holder details** (detail panel, from `getCart`): One block per holder, titled "Ticket 2 of 4 - Child", only for lines whose ticket is name-bound; the buyer is separate from the holders.
 
 | Shows | Format | Notes |
 |---|---|---|
 | ID | the name it points at, never the id | — |
-| Subject | the name it points at, never the id | — |
-| Platform | chip: Ios, Android, Web | — |
-| Token fingerprint | text | Hash of the token, not the token. The token itself is write-only — returning it would put a push credential in every response a support … |
-| App version | text | — |
-| Os version | text | — |
-| Device model | text | — |
-| Locale | text | — |
-| Status | chip: Active, Revoked, Failed | — |
-| Failure count | 1,234 | Consecutive delivery failures. Past the threshold the device is marked failed and stops being targeted — a dead token retried forever is … |
-| Registered at | 1 Oct 2026, 14:30 | — |
-| Last seen at | 1 Oct 2026, 14:30 | — |
+| Token | text | How an anonymous guest returns to their cart, including from a recovery email. Rotated on claim, so a link shared before signing in does … |
+| Venue | the name it points at, never the id | — |
+| Channel | chip: POS, Kiosk, Guest app, Guest web, Call centre, Partner… | Where a sale came from. Restored 24 August — this was lost in the `Money` rewrite and nine references across four contracts were pointing … |
+| Subject | the name it points at, never the id | Null while anonymous. Set by `claimCart`. |
+| Status | chip: Active, Expiring, Expired, Abandoned, Checked out | — |
+| Lines | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
+| Variant | the name it points at, never the id | — |
+| Product name | text | — |
+| Quantity | 1,234 | — |
+| Performance | the name it points at, never the id | — |
+| Booked window | grouped details | The booked time window of an hourly product, such as a meeting room (decided 29 September, rev 3 REV3-13: meeting rooms by the hour are in … |
+| Starts at | 1 Oct 2026, 14:30 | — |
+| Ends at | 1 Oct 2026, 14:30 | After `startsAt`, on the same venue day. |
+| Recommendation | the name it points at, never the id | The `trackingId` of the ai `decideRecommendations` item this line came from (29 September, build, AI system design 2.2 A step 8), so a … |
+| Table reservation | the name it points at, never the id | Set on a table deposit line only (decided 29 September, rev 3 REV3-8b): the `fnb.TableReservation` this line secures. |
+| Seats | list or chips (count when long) | — |
+| Resource hold | the name it points at, never the id | The `resources.ResourceHold` this line buys (decided 29 September, rev 3 REV3-15). |
+| Attributes | grouped details | Open attributes of a line, kept from the cart to the order line. `transport` is the one with a defined shape (decided 29 September, rev 3 … |
 
-**Every consent purpose config** (data table, from `listConsentPurposes`)
-
-| Shows | Format | Notes |
-|---|---|---|
-| Purpose | chip: Marketing, Personalisation, Profiling, Third party sharing, AI processing … | — |
-| Display name | text | — |
-| Description | text | — |
-| Channels | list or chips (count when long) | — |
-| Notice version | text | Current version of the notice. A consent against a superseded version is reported as requiring renewal rather than silently honoured. |
-| Is required for service | yes / no (icon or chip) | True for transactional. Withdrawing it means the service cannot be delivered, so it is presented differently. |
-| Expires after months | 1,234 | — |
-
-**Detail panel** (detail panel): Per-attendee fields appear only where the entitlement is name-bound. Most are not — identity and entitlement are separate concerns
-
-**Booking steps** (progress indicator, from `getPublishedBookingFlow`): The steps of the published flow in their `sortOrder`, this one (details) highlighted. A step the flow has turned off is not shown and is skipped by Continue and Back.
+**Booking steps** (progress indicator, from `getPublishedBookingFlow`): The steps of the published flow in their `sortOrder`, this one (details) highlighted. A step the flow has turned off is not shown and is skipped by Continue and Back. Drawn in the venue's `BookingFlowSettings.stepIndicator` style; `embedMode` and `singleEventPage` come from the same published settings (CMS-016) (CHG-SGU-022).
 
 | Shows | Format | Notes |
 |---|---|---|
 | Steps | list or chips (count when long) | Every step of the type, in the venue's order. Filled from the type when left out on create. |
 
-**The selected guest device** (detail panel, from `listGuestDevices`)
-
-| Shows | Format | Notes |
-|---|---|---|
-| ID | the name it points at, never the id | — |
-| Subject | the name it points at, never the id | — |
-| Platform | chip: Ios, Android, Web | — |
-| Token fingerprint | text | Hash of the token, not the token. The token itself is write-only — returning it would put a push credential in every response a support … |
-| Token ref | text | A vault reference to the push token, written by the server from `registerGuestDevice.token` — the same pattern as … |
-| App version | text | — |
-| Os version | text | — |
-| Device model | text | — |
-| Locale | text | — |
-| Status | chip: Active, Revoked, Failed | — |
-| Failure count | 1,234 | Consecutive delivery failures. Past the threshold the device is marked failed and stops being targeted — a dead token retried forever is … |
-| Registered at | 1 Oct 2026, 14:30 | — |
-| Last seen at | 1 Oct 2026, 14:30 | — |
-| Revoked at | 1 Oct 2026, 14:30 | — |
-
-**The guest profile** (detail panel, from `getGuestProfile`)
-
-| Shows | Format | Notes |
-|---|---|---|
-| ID | the name it points at, never the id | Added 20 August. The schema reference derives table columns from API response schemas, and a response is not a table — this one returned … |
-| Subject | the name it points at, never the id | Opaque reference. Personal data lives in the separately erasable store, which is what makes erasure possible against an append-only ledger. |
-| Display name | text | — |
-| Email | text | — |
-| Phone | +971 50 123 4567 | — |
-| Preferred language | text | — |
-| Preferred channel | chip: Email, SMS, Whatsapp, Push, In app, Post | — |
-| Guest link | text | Present where the guest is linked across cells. Marketing acts locally. |
-| Tags | list or chips (count when long) | — |
-| Engagement score | 1,234 | 22.2.20 and 22.2.21. `lifetimeValue` and `visitCount` existed, so value was a stored figure and engagement was not. |
-| Engagement tier | chip: New, Active, Occasional, Lapsing, Lapsed, Dormant | 5.3.19. Automatic classification, computed rather than assigned. |
-| Lifetime value | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Visit count | 1,234 | — |
-| Last visit at | 1 Oct 2026, 14:30 | — |
-| Is active | yes / no (icon or chip) | — |
-| Merged into subject | the name it points at, never the id | Set on the absorbed profile by `mergeGuestProfiles` and `mergeGuests`, which retain it as a redirect rather than deleting it. |
-
-**The wishlist** (detail panel, from `getWishlist`)
-
-| Shows | Format | Notes |
-|---|---|---|
-| Subject | the name it points at, never the id | — |
-| Items | list or chips (count when long) | — |
-
 **Actions and what each produces**
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Add to wishlist (primary button) | `addToWishlist` POST `/guests/{subjectId}/wishlist` | inline | Wishlist | 404 Variant not found or not sellable in this venue | opens modal first |
-| Record consent (secondary button) | `recordConsent` POST `/guests/{subjectId}/consents` | RecordConsentRequest | ConsentState | 400 Notice version unknown, or the purpose is not configured | opens modal first |
-| Register guest device (secondary button) | `registerGuestDevice` POST `/guests/{subjectId}/devices` | inline | GuestDevice | — | opens modal first |
-| Remove from wishlist (destructive button) | `removeFromWishlist` DELETE `/guests/{subjectId}/wishlist/{itemId}` | — | — | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path. | — |
-| Revoke guest device (destructive button) | `revokeGuestDevice` DELETE `/guests/{subjectId}/devices/{deviceId}` | — | — | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path. | — |
 | Save my profile (secondary button) | `updateMyProfile` PATCH `/guests/me/profile` | inline | GuestProfile | — | opens modal first |
-| Upload guest document (secondary button) | `uploadGuestDocument` POST `/guest-documents` | GuestDocument | GuestDocument | — | opens modal first |
 | Continue to payment (primary button) | navigation or local | — | — | — | — |
 
-**Data it reads**: `getWishlist` (onLoad, Read a guest's saved items); `listGuestDevices` (onLoad, A guest's registered devices); `getGuestProfile` (onLoad, Read a guest profile); `listConsentPurposes` (onLoad, Configured consent purposes); `getCart` (onLoad, The cart's consent questions still unanswered); `getPublishedBookingFlow` (onLoad, The published booking flow for this product: which steps it …)
+**Rules for what is shown** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
+
+- **Step indicator**: The steps of the published booking flow in their order, with this step highlighted. Steps the flow turned off are not shown and are skipped by Continue and Back. *(source: contracts/satellite/white-label.yaml#getPublishedBookingFlow; DI-426)*
+- **Hold countdown**: For seated or capacity-held lines the hold timer stays visible through this step. *(source: F02 step 4)*
+- **Terms line**: "By continuing you accept the Terms and Privacy Policy" with links to the current published versions. Acceptance is by proceeding; the marketing opt-in sits next to it and is separate. *(source: DI-588; DI-954)*
+
+**What each action does** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
+
+- **Continue to payment**: Enabled when every required field and required consent question is answered. Goes to WEB-012 with the opt-ins carried for checkout. A failed save keeps everything typed. *(source: screens/P01-guest-web-storefront.yaml#WEB-011; contracts/satellite/marketing-crm.yaml#recordConsentAnswers)*
+- **Back to cart**: Returns to WEB-010 with answers kept on the cart (they are recorded against the cart). *(source: contracts/satellite/marketing-crm.yaml#recordConsentAnswers)*
+
+**Data it reads**: `listConsentPurposes` (onLoad, Configured consent purposes); `getCart` (onLoad, The cart's consent questions still unanswered); `getPublishedBookingFlow` (onLoad, The published booking flow for this product: which steps it …); `getMyProfile` (onLoad, Prefill the buyer's contact from their own profile)
 
 **Where the user goes next**
 
@@ -649,61 +683,74 @@ Errors to draw in the form: 400 Notice version unknown, or the purpose is not co
 - → `WEB-012` Checkout — Payment: *Skipped: nothing to ask (guest code proved, or signed in, and no attendee forms)*
 - → `WEB-010` Shopping Cart: *They check out*; carries `cartId`, `performanceId`
 
-**What opens over it**
-
-- confirmDialog *Remove from wishlist*: **Names what `removeFromWishlist` changes and what it leaves alone**, in the consequence rather than the verb. A guest attendee forms this affects should be identified in the dialog, not just counted.
-- confirmDialog *Revoke guest device*: **Names what `revokeGuestDevice` changes and what it leaves alone**, in the consequence rather than the verb. A guest attendee forms this affects should be identified in the dialog, not just counted.
-
 #### States
 
 | State | What it shows |
 |---|---|
 | Loading (`?state=loading`) | The guest attendee forms list. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the guest attendee forms untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No guest attendee forms yet. Offers Add to wishlist (`addToWishlist`). |
+| Empty, first run (`?state=emptyFirstRun`) | Nothing to fill in: continue to payment. The step is normally skipped when the cart needs no details, holders or consent answers (F01 step 6). |
 | Empty, no results (`?state=emptyNoResults`) | Never shown: `listGuestDevices` takes no filter, so an empty list is always the first-run state above. |
 | Permission denied (`?state=emptyNoAccess`) | **There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the … |
 | Offline (`?state=offline`) | **Not available, and the offline banner says why.** A payment needs the gateway, and pretending otherwise takes money nobody can confirm. What was typed stays on screen so nothing is entered twice. |
-| Validation and conflict | the form keeps what was entered and marks the problem: 400 Notice version unknown, or the purpose is not configured; 409 The question has changed since the cart was read (`questionVersionSuperseded`); the client re-reads the cart and asks the current version. (ConsentAnswerProblem); 422 A `perPerson` question answered without a person (`personRequired`), a question this cart does not ask (`questionNotAsked`), or a retired one … (ConsentAnswerProblem) |
+| Validation and conflict | the form keeps what was entered and marks the problem: 409 The question has changed since the cart was read (`questionVersionSuperseded`); the client re-reads the cart and asks the current version. (ConsentAnswerProblem); 422 A `perPerson` question answered without a person (`personRequired`), a question this cart does not ask (`questionNotAsked`), or a retired one … (ConsentAnswerProblem) |
+
+#### Edge cases to draw
+
+- **A ticket holder has no date of birth and the product has an age rule**: Treat the holder as a minor until a date of birth is given (missing DOB counts as a minor) and ask for it inline. *(source: R205)*
+- **A consent question was reworded while the guest was on this step**: The cart asks the new version on its next read; show the new wording and clear the old answer for that question only. *(source: contracts/satellite/marketing-crm.yaml#updateConsentQuestion)*
+- **The guest's verified contact matches an existing profile**: Nothing about the other profile is shown here. The match prompt belongs to sign-in and guest checkout (WEB-016/WEB-012) and never shows the other profile's name. *(source: DI-1035)*
+- **The hold expires during the step**: Return to the cart with the lines marked "Hold expired - check availability again". Answers are kept. *(source: F02 step 4)*
+
+#### Consistency with other screens
+
+- Match `GST-009`: The app's checkout uses the same opt-in wording, the same unticked default and the same per-channel checkboxes.
+- Match `WEB-012`: The opt-in is carried into checkout (marketingConsents[]); WEB-012 must not ask for it a second time.
+- Match `CMS-027`: CMS-027 configures which consent purposes and channels appear at the checkout capture point.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+buyer:
+  name: Fatima Al Mansoori
+  email: fatima.almansoori@example.ae
+  mobile: +971 50 123 4567
+holders:
+- Ticket 1 of 3 - Adult - Fatima Al Mansoori
+- Ticket 2 of 3 - Child - Omar Haddad, born 14 Mar 2017
+- Ticket 3 of 3 - Child - Layla Haddad, date of birth missing (asked inline)
+consentQuestion: Are you able to swim? (asked for each person; No blocks the Deep Dive session)
+optIns:
+- Send me offers and news by email
+- Send me offers and news by WhatsApp
+```
 
 #### Permissions
 
-- `addToWishlist` → no permission · guest
-- `getWishlist` → no permission · guest
-- `listGuestDevices` → no permission · guest
-- `recordConsent` → no permission · guest
-- `registerGuestDevice` → no permission · guest
-- `removeFromWishlist` → no permission · guest
-- `revokeGuestDevice` → no permission · guest
-- `getGuestProfile` → `GUEST_VIEW` (read) · staff, guest
 - `listConsentPurposes` → `GUEST_VIEW` (read) · staff, guest
 - `updateMyProfile` → `GUEST_VIEW` (read) · guest
-- `uploadGuestDocument` → `GUEST_VIEW_PII` (operate) · staff, guest
 - `getCart` → no permission · guest, partner, staff
 - `recordConsentAnswers` → `ORDER_CREATE` (operate) · guest, staff
-- `getPublishedBookingFlow` → no permission · guest
+- `getPublishedBookingFlow` → no permission · guest, staff
+- `getMyProfile` → `GUEST_VIEW` (read) · guest
 
 **A refused user sees:** **There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the …
 
 #### Requirements it meets
 
-44 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+7 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
 
 | Ref | Requirement (shortened) | Domain | Verdict | Via |
 |---|---|---|---|---|
-| 2.6.44 | System shall allow guests to save tickets, memberships, events, packages, add-ons, F&B items, retail products, and experiences to a wishlist for future purchase. Wishlist items shall remain linked to … | Ticketing Sales | CONTRACTED | `addToWishlist` |
-| 5.3.9 | The system should allow the guest to explicitly opt in to receive any information from venue or its partners. | F&B & Guest Management | CONTRACTED | `recordConsent` |
-| 5.3.18 | Maintain auditable consent records for Email, SMS, WhatsApp, Push Notifications, Marketing Communications, Privacy Policies, Terms & Conditions, and GDPR compliance. | F&B & Guest Management | CONTRACTED | `recordConsent` |
-| 7.3.9 | Store and manage customer consent preferences for email, SMS, WhatsApp, push notifications and third-party marketing. Record consent status, source, timestamp, IP address and revocation history. … | F&B POS | CONTRACTED | `recordConsent` |
-| 22.2.18 | Consent Management | Marketing & CRM | CONTRACTED | `recordConsent` |
-| 22.4.5 | Subscription Management | Marketing & CRM | CONTRACTED | `recordConsent` |
-| 22.13.1 | Consent Management Framework | Marketing & CRM | CONTRACTED | `recordConsent` |
-| 22.13.2 | Marketing Consent Management | Marketing & CRM | CONTRACTED | `recordConsent` |
-| 22.13.3 | Channel-Specific Consent | Marketing & CRM | CONTRACTED | `recordConsent` |
-| 22.13.4 | Consent Capture Workflows | Marketing & CRM | CONTRACTED | `recordConsent` |
-| 22.13.9 | Data Processing Consent | Marketing & CRM | CONTRACTED | `recordConsent` |
-| 13.3.8 | APIs shall support guest profile creation, updates, segmentation, communication preferences and activity history retrieval. | Developer & API Management | CONTRACTED | `getGuestProfile` |
-| … 32 more | | | | `traceability.json` |
+| 19.2.7 | Profile Management - System shall support profile management. | Guest Mobile App & Branding | CONTRACTED | `updateMyProfile` |
+| 2.6.40 | Customer should be able to view and amend user profile | Ticketing Sales | CONTRACTED | `updateMyProfile` |
+| 5.3.5 | The system should allow user to amend account contact details (postal address, email address, telephone number, newsletter opt-in, SMS opt-in, etc.) | F&B & Guest Management | CONTRACTED | `updateMyProfile` |
+| 22.13.13 | Right to Rectification | Marketing & CRM | CONTRACTED | `updateMyProfile` |
+| 2.9.2 | The system should provide a service to enable the dynamic composition of the shop cart. The system must provide back all the information in real time, such as the performance availabilities of an … | Ticketing Sales | CONTRACTED | `getCart` |
+| 2.9.5 | The system should highlight conflicting times at different attractions when trying to purchase tickets in the same time-slot for one guest. For example, if a ticket for Golf 1 to 2 pm has been added … | Ticketing Sales | CONTRACTED | `getCart` |
+| 2.6.1 | B2C website should support: 1.Home page 1) Banners display packages, upgrades, and discounts 2) All available products are shown by category: Packages, Tickets, Experiences, Annual Passes, Others 3) … | Ticketing Sales | CONTRACTED | data `BookingFlow` |
 
 #### Client meeting inputs
 
@@ -733,15 +780,11 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Configurable by the tenant
 
-This is a white-label guest screen: it is drawn in the venue's brand, never TICVAI's (except the fixed *Powered by TICVAI* credit). Draw it with the **default theme**, and on the key screens one **alternate tenant theme** (`handoff/design-batches/apps/1-guest-app/WHITE-LABEL.md`).
+This is a white-label guest screen: it is drawn in the venue's brand, never TICVAI's (except the *Powered by TICVAI* credit, a tenant toggle that is on by default: `brand.showPoweredBy`). It has no dark or light mode: the venue's theme applies on every device setting. Draw it with the **default theme**, and on the key screens one **alternate tenant theme** (`handoff/design-batches/apps/1-guest-app/WHITE-LABEL.md`).
 
-**Shell-wide, on every guest screen:** Brand (10, CMS-002, CMS-004, ADM-016); Theme (31, CMS-005, CMS-003, ADM-016); Fonts (5, CMS-003); Header (5, CMS-007); Navigation (17, CMS-009); Footer (website) (15, CMS-007); Languages and right-to-left (2, CMS-011, ADM-018); Modules shown to guests (3, CMS-001); Features (3, CMS-001); Custom domain (website) (3, CMS-017, ADM-017); SEO metadata (website) (13, CMS-013). Each element, its CMS field, allowed values and default: `handoff/design-batches/apps/1-guest-app/WHITE-LABEL.md`.
+**Shell-wide, on every guest screen:** Brand (11, CMS-002, CMS-004, CMS-104); Theme (27, CMS-005, ADM-016); Fonts (5, CMS-003); Header (5, CMS-009); Navigation (17, CMS-009); Footer (website) (15, CMS-009); Languages and right-to-left (2, CMS-011, ADM-018); Modules shown to guests (3, CMS-001, ADM-424); Features (3, CMS-001); Custom domain (website) (3, CMS-017, ADM-017); SEO metadata (website) (13, CMS-013). Each element, its CMS field, allowed values and default: `handoff/design-batches/apps/1-guest-app/WHITE-LABEL.md`.
 
 **Specific to this screen** (the tenant's setting is the input; the right column is what it changes here). Draw each with its default, and the alternate where the alternate theme sets one.
-
-*Footer*, set in `CMS-007` Page Builder:
-
-Also set there, as content the tenant writes: social links: platform.
 
 *Booking settings (tenant, with per-venue overrides)*, set in `CMS-016` Site Settings:
 
@@ -797,17 +840,13 @@ Also set there, as content the tenant writes: venue overrides: settings.
 
 Also set there, as content the tenant writes: settings.
 
-*SEO metadata*, set in `CMS-013` SEO & Metadata:
-
-Also set there, as content the tenant writes: locale.
-
 #### References
 
 - Wireframe frame: `wireframes/P01 Guest Web.dc.html#web-011` · status **review** · provenance client-verified
 - Prototype (rev 3, verified 2026-09-28, match exact): `sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html`, view *Book → 'Your details' step (after Extras)*. Differences: Sections are driven by the flow's requires list; prototype adds a signature, diving certification and vehicle plate fields. Wishlist/device operations listed in the YAML apis have no counterpart here. Saved guests prefill is described in Account but not shown on this step.
 - Flow F01 *Guest buys a ticket online*, step 6: Answers attendee forms and consent, only where the cart needs them → Marketing consent unticked by default. Transactional consent presented as required for service, not as a choice dressed up as one. **Skipped for a guest who proved the contact with the code, or is …
 - Flow F02 *Guest buys seated tickets*, step 4: Enters contact details and answers consent → The hold is still counting down. The countdown stays visible through this step
-- Flow F55 *A guest buys on the web and transfers to a friend*, step 2: Attendee details are captured. → **Consent per attendee, not per purchase.** A guest buying for three friends cannot consent on their behalf — CF-160 again, and this is where it bites.
+- Flow F55 *A guest buys on the web and transfers to a friend*, step 2: Attendee details are captured. → **Consent per attendee, not per purchase.** A guest buying for three friends cannot consent on their behalf (CF-160 again, and this is where it bites). The marketing opt-ins ticked here travel with …
 - Flow F01 branch at step 6 (abandonsFlow): when The guest abandons at the details form, **The cart's capacity holds lapse on their own.** `addCartLine` took a cart hold (catalogue `acquireInventoryHold`, holder kind `cart`, 15 minutes, extended while the guest is active); left alone …
 - Flow F02 branch at step 4 (requiresStaff): when The hold expires while the guest fills in the details form, The most likely place to lose it — a form takes longer than a cart. Extension is offered proactively as the countdown nears zero, not after it passes.
 - ADR-0045 *Every order carries a proven contact, and the gate is the checkout page* (`docs/adr/0045-every-order-carries-a-proven-contact.md`)
@@ -815,14 +854,16 @@ Also set there, as content the tenant writes: locale.
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (33), with its required mark, default, format and its error state (400, 404, 409, 410, 422).
-- [ ] Every output is drawn (52 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (12), with its required mark, default, format and its error state (404, 409, 410, 422).
+- [ ] Every output is drawn (21 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#WEB-011?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: Add to wishlist, Record consent, Register guest device, Remove from wishlist, Revoke guest device, Save my profile, Upload guest document, Continue to payment.
+- [ ] Every action is wired with its success and its failure: Save my profile, Continue to payment.
 - [ ] Every transition is wired: `WEB-016`, `WEB-012`, `WEB-012`, `WEB-010`.
 - [ ] Sign-in is asked only where the spec asks for it.
 - [ ] The 15 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] Drawn in the default theme; on a key screen also in the alternate tenant theme; nothing hard-codes a brand colour, logo or font.
+- [ ] The 4 edge case(s) from the process notes are drawn.
+- [ ] The 1 decision(s) taken on this screen are drawn as decided, not as the old default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -837,7 +878,7 @@ Also set there, as content the tenant writes: locale.
 | Module | Cart & Checkout · wave 1 · needs the `ticketing` module |
 | Block | Block A · ticket #17989 (APP-WEB-WEB-012) |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025); in the flows as guest |
-| Device and orientation | This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. · LTR and RTL · light theme |
+| Device and orientation | This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. · LTR and RTL · the venue's theme |
 | Pattern | statusTracker (compact density): `getOrder` reads one record and nothing reads a population — the screen is about that one thing |
 | Offline | **Not available, and the offline banner says why.** A payment needs the gateway, and pretending otherwise takes money nobody can confirm. What was typed stays on screen so nothing is entered twice. |
 | Opens with | `orderId` (deepLink), `paymentId` (navigation), `venueId` (session) · cold entry: **A guest opening an order link weeks later.** Shows the order if it still resolves; if it was refunded or the performance passed, says which and offers the … |
@@ -846,6 +887,21 @@ Also set there, as content the tenant writes: locale.
 **What the spec says about it.** The unknown outcome is the one to build for. A payment taken but never confirmed must offer inquiry, not a retry — a retry double-charges and the guest finds out. **Card or wallet** (TenderKind `card`, `wallet`; decided 28 September, audit R080 (a)), **both in base currency, so tender currency equals base currency.** A guest paying with a foreign card is converted by their own issuer at their own rate — that is not our conversion and is not recorded as one. The displayed comparison price (`WEB-035`) and the charged amount are different numbers and the screen says so before the guest commits. **Wired 24 August from review**: getOrder. **The operations existed and this screen could not call them** — reviewers reported them as missing APIs, which is what an unreachable operation looks like from a wireframe. **No 'is this you?' at checkout** (decided 28 September, audit R120 (b)): a verified contact that matches an existing profile attaches the order automatically inside `checkoutCart` (ADR-0045), so `checkGuestCheckoutMatch` and `decideGuestCheckoutMatch` were removed from this screen; only unverified matches go to staff review. **Rev 3 (decided 29 September, rev 3 REV3-3).** With `BookingFlowConfig.signInAt` `atPayment` the sign-in or guest-code gate is here rather than at the Add-ons exit; the basket is kept. Unknown and declined payment outcomes are declared (`inquirePaymentStatus`; GAP-B3, already). **The step order comes from the published booking flow** (W12, 29 September): `getPublishedBookingFlow` returns the flow the product (or its category, else the venue default …
 
 **Known gaps.** Transfers happen after purchase from the tickets (WEB-030); on the payment screen it offered to give away tickets not yet paid for (F55 step 4). Open: Sandbox credentials for Stripe and Network International are outstanding. The recovery paths cannot be tested without them.
+
+**From the Ticketing & Guest Commerce (guest web, guest app, kiosk, partner portal, POS ticket sale) process.** Pay and create the order. Block A. After the 29 September decision (W1) a guest who proved their contact with the six-digit code, or is signed in, arrives here straight from the basket and only ticks the T&Cs; nothing is asked twice. Design for the unknown outcome first: a payment taken but not confirmed must offer "we're checking with your bank", never a retry that could charge twice.
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- DI-1035 (29 September) keeps a match prompt after the code ("Use this profile" / "Not me"), while the screen removed the "is this you?" step on 28 September (R120 b, matches attach automatically). (CHG-SGU-025)
+
+**Fixed on main** (the package already carries these; draw what it says): "Transfer order tickets" is the primary action on the payment screen. (CHG-GST-003); "Create order", "Create payment" and "Inquire payment status" are buttons with forms that collect id, venueId, channel, lines, tender … (CHG-GST-003); The prototype offers Tabby split-in-4, pay on arrival and invoice/PO, against the 28 September decision of card or wallet only. (CHG-SGU-020).
+
+#### Decided on this screen
+
+Answered questions: draw the decision, not the old default. Where a decision and the tables below differ, the decision wins.
+
+- **May a guest-checkout customer be marketed on the opt-in taken at checkout?** → Drawn default stands (answer: "Same as WEB-011: default accepted (batch 2)"): Unticked by default; nothing sent without it. *(decided by Chinmay, 2026-10-02; DEC-119 / CHG-NOTE-007)*
+- **Is the post-code match prompt (DI-1035) still wanted after W1 and R120 (b)?** → Drawn default accepted: No prompt; a verified match attaches automatically. *(decided by Chinmay, 2026-10-02; DEC-120 / CHG-NOTE-007)*
 
 #### Inputs: what the user enters or picks
 
@@ -882,6 +938,13 @@ Also set there, as content the tenant writes: locale.
 | Device `deviceId` | picker: choose a device | optional | — | — | shows names, sends the id | — | `createPayment` body |
 | Recorded at `recordedAt` | date and time picker | required | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `createPayment` body |
 
+**Rules for these inputs** (from the Ticketing & Guest Commerce (guest web, guest app, kiosk, partner portal, POS ticket sale) process; these refine the tables above and win where they differ)
+
+- **guest contact (guest checkout)**: Only the fields the venue configured (email only by default; or email + name; or email + mobile + name), then a code of exactly six digits; the copy says six. After the code nothing about the guest is asked again; the profile is created and completed later. With guest checkout off, the sign-in screen says "This venue requires an account for checkout. Your basket is kept." *(source: MoM 29 Sep W1; DI-1002; DI-1034; contracts/satellite/white-label.yaml#/components/schemas/BookingFlowSettings (guestContactFields))*
+- **Terms and conditions**: A required tick with the venue's T&Cs link; Pay stays off until ticked. Beside it "Send me offers and news", never pre-ticked; nothing is sent without it. *(source: MoM 29 Sep W1; DI-954; screens/P01-guest-web-storefront.yaml#WEB-012 x-ticvai-make-or-break)*
+- **payment method**: Card (embedded Stripe or Network International fields, or the hosted page) with Apple Pay and Google Pay as the device's wallet buttons. Wallet balance as a tender for signed-in guests with a balance, and split with card (e.g. AED 500 from the wallet, AED 200 on card). *(source: DI-079; DI-589; DI-525; screens/P01-guest-web-storefront.yaml#WEB-012 notes (card or wallet, R080))*
+- **delivery address (shop items only)**: The shipping fee appears as its own line once the emirate is chosen (Dubai, Abu Dhabi, Ras Al Khaimah, international), before Pay. *(source: DI-360; DI-597)*
+
 #### Outputs: what the screen shows and produces
 
 **Shown**
@@ -900,10 +963,14 @@ Also set there, as content the tenant writes: locale.
 | Refunded amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Lines | list or chips (count when long) | — |
 | Payments | list or chips (count when long) | — |
+| Charge currency | text | The currency the guest selected and is charged in (CHG-FIN-001, 2 October 2026). |
+| Charge total | AED 1,234.50 | `grossAmount` converted at `chargeFxRate` and rounded to the charge currency's scale: what the guest pays and what the payment request to … |
+| Charge FX rate | text | Units of `chargeCurrency` per one unit of the base currency, from the region's `tender` rate in force at checkout (`finance.FxRate`) … |
+| Charge rate locked until | 1 Oct 2026, 14:30 | The quote holds until then (the cart lease). After it, the next payment attempt re-quotes at the rate then in force and the guest confirms … |
 
 **Cart panel** (cart panel): Order summary stays visible throughout. Never collapsed behind a link
 
-**Booking steps** (progress indicator, from `getPublishedBookingFlow`): The steps of the published flow in their `sortOrder`, this one (payment) highlighted. A step the flow has turned off is not shown and is skipped by Continue and Back.
+**Booking steps** (progress indicator, from `getPublishedBookingFlow`): The steps of the published flow in their `sortOrder`, this one (payment) highlighted. A step the flow has turned off is not shown and is skipped by Continue and Back. Drawn in the venue's `BookingFlowSettings.stepIndicator` style; `embedMode` and `singleEventPage` come from the same published settings (CMS-016) (CHG-SGU-022).
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -948,6 +1015,15 @@ Also set there, as content the tenant writes: locale.
 |---|---|---|---|---|---|
 | Pay now (primary button) | `createPayment` POST `/payments` | CreatePaymentRequest | Payment | 402 Declined by the provider (`providerDeclined`). (PaymentProblem); 409 Tender unavailable offline (`tenderUnavailableOffline`), amount exceeds the balance due (`exceedsBalanceDue`), or a guest channel sent a tender … | emits `payment.captured`, `order.paid` |
 
+**Rules for what is shown** (from the Ticketing & Guest Commerce (guest web, guest app, kiosk, partner portal, POS ticket sale) process; these refine the tables above and win where they differ)
+
+- **order summary**: Stays visible throughout, never collapsed behind a link; same lines as the basket. *(source: screens/P01-guest-web-storefront.yaml#WEB-012 (cartPanel notes))*
+- **currency note**: Charged in the currency the guest selected where the venue charges it ("You'll be charged USD 388.02. AED 1,425.00 at 3.6725, rate held until 14:25."); otherwise charged in AED with "Shown in EUR for reference only." before Pay. Decided 2 October 2026 (Chinmay). *(source: contracts/spine/orders.yaml#checkoutCart; contracts/spine/orders.yaml#/components/schemas/Order; DI-211; DI-1071)*
+
+**What each action does** (from the Ticketing & Guest Commerce (guest web, guest app, kiosk, partner portal, POS ticket sale) process; these refine the tables above and win where they differ)
+
+- **Pay**: Creates the order first, then the payment, so an unknown outcome has an order to attach to. 3-D Secure or the hosted page opens as the provider asks. Paid → WEB-013. Declined → the provider's reason in plain words and the holds released at once; the guest may try another card on a fresh hold. *(source: F01 step 7; DI-422; contracts/spine/orders.yaml#/components/schemas/Payment (nextAction))*
+
 **Data it reads**: `getOrder` (onLoad, Read an order With the guest session the device already …); `getPublishedBookingFlow` (onLoad, The published booking flow for this product: which steps it …); `listPublishedPolicies` (onLoad, The current terms and conditions the guest ticks, with …)
 
 **Where the user goes next**
@@ -968,13 +1044,35 @@ Also set there, as content the tenant writes: locale.
 | Offline (`?state=offline`) | **Not available, and the offline banner says why.** A payment needs the gateway, and pretending otherwise takes money nobody can confirm. What was typed stays on screen so nothing is entered twice. |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 A lease covering a line has expired (`leaseExpired`), capacity is exhausted (`capacityExhausted`), or the catalogue bundle the client priced from is beyond its … (OrderRefusedProblem); 409 Tender unavailable offline (`tenderUnavailableOffline`), amount exceeds the balance due (`exceedsBalanceDue`), or a guest channel sent a tender other than card … (PaymentProblem); 422 … |
 
+#### Edge cases to draw
+
+- **The payment outcome is unknown (timeout, closed tab, no webhook yet)**: "We're checking with your bank. You won't be charged twice." The page inquires (inquirePaymentStatus) and lands on paid, declined or still unknown; still unknown says the result will be emailed and shows the order reference, never a Pay again button. *(source: screens/P01-guest-web-storefront.yaml#WEB-012 notes; DI-1074)*
+- **A hold lapsed before Pay**: The line is re-acquired before the card is charged, or refused with the reason; the card is never charged for capacity that is gone. *(source: F01 step 7)*
+- **Offline**: Pay is unavailable with the reason; what was typed stays on screen. *(source: screens/P01-guest-web-storefront.yaml#WEB-012 states.offline)*
+
+#### Consistency with other screens
+
+- Match `GST-009`: Same W1 rule and the same unknown-outcome wording; the app's checkout is 4 steps with Apple Pay and adds the ticket to Apple or Google Wallet.
+- Match `WEB-016`: The sign-in or guest-code gate is here only when signInAt is atPayment; otherwise it was passed on leaving Add-ons.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+guest: Fatima Al Hashimi, fatima.h@example.ae, code sent to f•••@example.ae
+total: AED 1,660 (2 park ticket · Adult × 3 AED 1,425; Fast Track × 3 AED 225; booking fee AED 10)
+card: Visa •••• 4242
+declined: '"Your bank declined this payment (insufficient funds). Try another card."'
+```
+
 #### Permissions
 
 - `createOrder` → `ORDER_CREATE` (operate) · staff, guest, partner
 - `createPayment` → `ORDER_CREATE` (operate) · staff, guest, partner
 - `getOrder` → `ORDER_VIEW` (read) · staff, guest, partner
 - `inquirePaymentStatus` → `ORDER_CREATE` (operate) · staff, guest, partner
-- `getPublishedBookingFlow` → no permission · guest
+- `getPublishedBookingFlow` → no permission · guest, staff
 - `listPublishedPolicies` → no permission · anonymous, guest, device
 
 **A refused user sees:** **There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the …
@@ -1034,9 +1132,9 @@ Also apply: 2 for P01 · Cart & Checkout, 39 for all of P01, 29 for every app (s
 
 #### Configurable by the tenant
 
-This is a white-label guest screen: it is drawn in the venue's brand, never TICVAI's (except the fixed *Powered by TICVAI* credit). Draw it with the **default theme**, and on the key screens one **alternate tenant theme** (`handoff/design-batches/apps/1-guest-app/WHITE-LABEL.md`).
+This is a white-label guest screen: it is drawn in the venue's brand, never TICVAI's (except the *Powered by TICVAI* credit, a tenant toggle that is on by default: `brand.showPoweredBy`). It has no dark or light mode: the venue's theme applies on every device setting. Draw it with the **default theme**, and on the key screens one **alternate tenant theme** (`handoff/design-batches/apps/1-guest-app/WHITE-LABEL.md`).
 
-**Shell-wide, on every guest screen:** Brand (10, CMS-002, CMS-004, ADM-016); Theme (31, CMS-005, CMS-003, ADM-016); Fonts (5, CMS-003); Header (5, CMS-007); Navigation (17, CMS-009); Footer (website) (15, CMS-007); Languages and right-to-left (2, CMS-011, ADM-018); Modules shown to guests (3, CMS-001); Features (3, CMS-001); Custom domain (website) (3, CMS-017, ADM-017); SEO metadata (website) (13, CMS-013). Each element, its CMS field, allowed values and default: `handoff/design-batches/apps/1-guest-app/WHITE-LABEL.md`.
+**Shell-wide, on every guest screen:** Brand (11, CMS-002, CMS-004, CMS-104); Theme (27, CMS-005, ADM-016); Fonts (5, CMS-003); Header (5, CMS-009); Navigation (17, CMS-009); Footer (website) (15, CMS-009); Languages and right-to-left (2, CMS-011, ADM-018); Modules shown to guests (3, CMS-001, ADM-424); Features (3, CMS-001); Custom domain (website) (3, CMS-017, ADM-017); SEO metadata (website) (13, CMS-013). Each element, its CMS field, allowed values and default: `handoff/design-batches/apps/1-guest-app/WHITE-LABEL.md`.
 
 **Specific to this screen** (the tenant's setting is the input; the right column is what it changes here). Draw each with its default, and the alternate where the alternate theme sets one.
 
@@ -1097,7 +1195,7 @@ Also set there, as content the tenant writes: settings.
 #### References
 
 - Wireframe frame: `wireframes/P01 Guest Web.dc.html#web-012` · status **review** · provenance client-verified
-- Prototype (rev 3, verified 2026-09-28, match partial): `sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html`, view *Book → 'Payment' step; Config → Layout & locale → 'Payment outcome (demo)' = Interrupted / Declined for the failure states; Config → Steps & cards → 'Guest …*. Differences: Contradicts 28 Sep decisions: YAML allows card or wallet only (R080) — prototype offers Apple Pay, Tabby split-in-4, pay on arrival and invoice/PO; YAML removed the 'is this you?' match at checkout (R120 b) — prototype still asks the guest to link or keep separate. The unknown-outcome inquiry state matches the YAML ('We couldn't confirm this payment yet… you won't be charged twice').
+- Prototype (rev 3, verified 2026-09-28, match partial): `sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html`, view *Book → 'Payment' step; Config → Layout & locale → 'Payment outcome (demo)' = Interrupted / Declined for the failure states; Config → Steps & cards → 'Guest …*. Differences: Contradicts 28 Sep decisions: YAML allows card or wallet only (R080) — prototype offers Apple Pay, Tabby split-in-4, pay on arrival and invoice/PO; YAML removed the 'is this you?' match at checkout (R120 b) — prototype still asks the guest to link or keep separate. The unknown-outcome inquiry state matches the YAML ('We couldn't confirm this payment yet… you won't be charged twice'). **Draw card, Apple Pay, Google Pay and wallet only** (R080, 28 September); Tabby split-in-4, pay on arrival and …
 - Flow F01 *Guest buys a ticket online*, step 7: Pays → Order created before payment, so an unknown payment outcome has an order to attach to. This ordering is the whole reason recovery is possible. **Payment converts the cart's holds**: in the paying …
 - Flow F02 *Guest buys seated tickets*, step 5: Pays → Hold converts to entitlements on payment
 - Flow F01 branch at step 7 (recoverable): when Payment declined, Retry reuses the same idempotency key. The order persists in an unpaid state rather than being torn down, so a second attempt does not rebuild the cart.
@@ -1109,13 +1207,15 @@ Also set there, as content the tenant writes: settings.
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (14), with its required mark, default, format and its error state (400, 402, 403, 404, 409, 422).
-- [ ] Every output is drawn (34 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (38 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#WEB-012?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Pay now.
 - [ ] Every transition is wired: `WEB-010`, `WEB-011`, `WEB-016`, `WEB-013`.
 - [ ] Sign-in is asked only where the spec asks for it.
 - [ ] The 17 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] Drawn in the default theme; on a key screen also in the alternate tenant theme; nothing hard-codes a brand colour, logo or font.
+- [ ] The 3 edge case(s) from the process notes are drawn.
+- [ ] The 2 decision(s) taken on this screen are drawn as decided, not as the old default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -1130,7 +1230,7 @@ Also set there, as content the tenant writes: settings.
 | Module | Cart & Checkout · wave 1 · needs the `ticketing` module |
 | Block | Block A · ticket #17921 (APP-WEB-WEB-013) |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025); in the flows as guest |
-| Device and orientation | This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. · LTR and RTL · light theme |
+| Device and orientation | This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. · LTR and RTL · the venue's theme |
 | Pattern | statusTracker (compact density): `getOrder` reads one record and nothing reads a population — the screen is about that one thing |
 | Offline | **The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
 | Opens with | `orderId` (WEB-012) · cold entry: Resolves from the session; a cold arrival is the ordinary case. |
@@ -1139,6 +1239,10 @@ Also set there, as content the tenant writes: settings.
 **What the spec says about it.** **Renamed 31 August** from *Order Confirmation*. **A guest surface is one product with two renderings** — a screen named differently on web and app is two screens to a developer and one journey to a guest.
 
 **Known gaps.** The tickets are the primary action here (wallet, resend); transfer is WEB-030's, opened from My Tickets.
+
+**From the Ticketing & Guest Commerce (guest web, guest app, kiosk, partner portal, POS ticket sale) process.** The confirmation and the tickets. Block A. The order number is the first thing read, the tickets are deliverable from here (wallet, email, SMS, WhatsApp), and a dynamic-QR event bought on the web says the working code is in the app.
+
+**Fixed on main** (the package already carries these; draw what it says): "Transfer order tickets" is the primary action, with a form collecting ticketIds and recipient. (CHG-GST-003); The prototype allows editing attendee details after purchase and Reissue QR; neither is declared on this screen. (CHG-SGU-020).
 
 #### Inputs: what the user enters or picks
 
@@ -1155,6 +1259,17 @@ Also set there, as content the tenant writes: settings.
 | Recorded at `recordedAt` | date and time picker | required | — | — | 1 Oct 2026, 14:30 (venue time zone) | When the till reprinted — device time, as for every offline-capable write. | `reprintOrder` body |
 
 Errors to draw in the form: 400 Validation failed
+
+**Form: Set a password** (modal, opened by *Set a password*; *Set a password* calls `linkGuestCheckout`, *Cancel* sends nothing)
+
+A password for the account; the order and the verified contact come from the checkout just made.
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Order reference `orderReference` | text field | required | — | — | — | — | `linkGuestCheckout` body |
+| Verification code `verificationCode` | text field | optional | — | — | — | From the booking confirmation. Proves possession of the booking. | `linkGuestCheckout` body |
+
+Errors to draw in the form: 403 Contact detail on the order does not match the verified identifier
 
 #### Outputs: what the screen shows and produces
 
@@ -1184,6 +1299,19 @@ Errors to draw in the form: 400 Validation failed
 | Add to wallet (secondary button) | navigation or local | — | — | — | — |
 | Resend my tickets (secondary button) | `reprintOrder` POST `/orders/{orderId}/reprints` | inline | inline | 400 Validation failed | opens modal first; produces a document or message: Reprint or resend tickets |
 | Transfer tickets (secondary button) | navigation or local | — | — | — | — |
+| Set a password (secondary button) | `linkGuestCheckout` POST `/auth/guest/link-checkout` | inline | inline | 403 Contact detail on the order does not match the verified identifier | opens modal first |
+
+**Rules for what is shown** (from the Ticketing & Guest Commerce (guest web, guest app, kiosk, partner portal, POS ticket sale) process; these refine the tables above and win where they differ)
+
+- **order number**: Prominent, in the venue's format (venue prefix and sequence, e.g. YAS1-000123), with copy and "Sent to f•••@example.ae". It is the reference the venue's support asks for. *(source: contracts/spine/orders.yaml#/components/schemas/Order (orderNumber); F01 step 8)*
+- **tickets**: One card per ticket with guest type, visit date and its QR; for a dynamic-QR event no code is shown on the web, but "Your tickets activate in the app" with app store links and a link that opens the order in the app. *(source: DI-635)*
+- **what happens next**: Opening hours on the visit date, where to enter, what to bring (ID for resident tickets), and the cancellation policy line. *(source: designer default)*
+
+**What each action does** (from the Ticketing & Guest Commerce (guest web, guest app, kiosk, partner portal, POS ticket sale) process; these refine the tables above and win where they differ)
+
+- **Add to Apple Wallet / Add to Google Wallet**: One button for the device's wallet (Apple on iOS and Safari, Google elsewhere). *(source: DI-198; DI-609)*
+- **Resend tickets**: Choose email, SMS or WhatsApp and the address (prefilled from the order); confirms "Sent to +971 50 ••• 1234". *(source: DI-198; contracts/spine/orders.yaml#reprintOrder)*
+- **Send to a friend**: Opens WEB-030 for chosen tickets of this order. *(source: F55 step 4)*
 
 **Data it reads**: `getOrder` (onLoad, Read an order With the guest session the device already …)
 
@@ -1206,16 +1334,37 @@ Errors to draw in the form: 400 Validation failed
 | Offline (`?state=offline`) | **The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed |
 
+#### Edge cases to draw
+
+- **The confirmation is opened weeks later from the email**: Shows the order as it is now (refunded, partly used, performance passed) with the reason, never an error. *(source: screens/P01-guest-web-storefront.yaml#WEB-012 entryState.coldEntry)*
+- **The booking is unpaid (a reservation with a payment link)**: An "Unpaid, pay by 14:32" banner with Pay now opening WEB-014. *(source: screens/P01-guest-web-storefront.yaml#WEB-013 wireframe.prototype.differences)*
+
+#### Consistency with other screens
+
+- Match `GST-010`: Same content; the app shows the code directly and adds to wallet and calendar.
+- Match `KSK-009`: Same order number format on the printed ticket.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+orderNumber: YAS1-000123
+tickets: 3 × 2 park ticket · Adult · Fri 2 Oct
+sentTo: f•••@example.ae
+```
+
 #### Permissions
 
 - `getOrder` → `ORDER_VIEW` (read) · staff, guest, partner
 - `reprintOrder` → `ORDER_REPRINT` (operate) · staff, guest, partner
+- `linkGuestCheckout` → no permission · guest
 
 **A refused user sees:** **There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the …
 
 #### Requirements it meets
 
-10 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+11 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
 
 | Ref | Requirement (shortened) | Domain | Verdict | Via |
 |---|---|---|---|---|
@@ -1229,6 +1378,7 @@ Errors to draw in the form: 400 Validation failed
 | 2.12.22 | The systems allows to manage Ticket re-issuance | Ticketing Sales | CONTRACTED | `reprintOrder` |
 | 2.16.3 | System should provide the ability to print the tickets virtually on screen upon completing the sale | Ticketing Sales | CONTRACTED | `reprintOrder` |
 | 5.10.1 | The system should provide a simple way to print receipts for guests depending on their purchases and their consumptions (i.e. pay‐per‐use). | F&B & Guest Management | CONTRACTED | `reprintOrder` |
+| 5.3.3 | The system should be able to accept checkout for guests that do not wish to create an account in order to complete an order. Minimum required information as configured (e.g. email address) will still … | F&B & Guest Management | CONTRACTED | `linkGuestCheckout` |
 
 #### Client meeting inputs
 
@@ -1252,14 +1402,14 @@ Also apply: 2 for P01 · Cart & Checkout, 39 for all of P01, 29 for every app (s
 
 #### Configurable by the tenant
 
-This is a white-label guest screen: it is drawn in the venue's brand, never TICVAI's (except the fixed *Powered by TICVAI* credit). Draw it with the **default theme**, and on the key screens one **alternate tenant theme** (`handoff/design-batches/apps/1-guest-app/WHITE-LABEL.md`).
+This is a white-label guest screen: it is drawn in the venue's brand, never TICVAI's (except the *Powered by TICVAI* credit, a tenant toggle that is on by default: `brand.showPoweredBy`). It has no dark or light mode: the venue's theme applies on every device setting. Draw it with the **default theme**, and on the key screens one **alternate tenant theme** (`handoff/design-batches/apps/1-guest-app/WHITE-LABEL.md`).
 
-**Shell-wide, on every guest screen:** Brand (10, CMS-002, CMS-004, ADM-016); Theme (31, CMS-005, CMS-003, ADM-016); Fonts (5, CMS-003); Header (5, CMS-007); Navigation (17, CMS-009); Footer (website) (15, CMS-007); Languages and right-to-left (2, CMS-011, ADM-018); Modules shown to guests (3, CMS-001); Features (3, CMS-001); Custom domain (website) (3, CMS-017, ADM-017); SEO metadata (website) (13, CMS-013). Each element, its CMS field, allowed values and default: `handoff/design-batches/apps/1-guest-app/WHITE-LABEL.md`.
+**Shell-wide, on every guest screen:** Brand (11, CMS-002, CMS-004, CMS-104); Theme (27, CMS-005, ADM-016); Fonts (5, CMS-003); Header (5, CMS-009); Navigation (17, CMS-009); Footer (website) (15, CMS-009); Languages and right-to-left (2, CMS-011, ADM-018); Modules shown to guests (3, CMS-001, ADM-424); Features (3, CMS-001); Custom domain (website) (3, CMS-017, ADM-017); SEO metadata (website) (13, CMS-013). Each element, its CMS field, allowed values and default: `handoff/design-batches/apps/1-guest-app/WHITE-LABEL.md`.
 
 #### References
 
 - Wireframe frame: `wireframes/P01 Guest Web.dc.html#web-013` · status **review** · provenance client-verified
-- Prototype (rev 3, verified 2026-09-28, match exact): `sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html`, view *Book → final step 'Confirmed' after paying*. Differences: Prototype adds editing attendee details after purchase ('Change your details', signed-in only) and Reissue QR. No 'unpaid — pay now' route to WEB-014.
+- Prototype (rev 3, verified 2026-09-28, match exact): `sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html`, view *Book → final step 'Confirmed' after paying*. Differences: Prototype adds editing attendee details after purchase ('Change your details', signed-in only) and Reissue QR. No 'unpaid — pay now' route to WEB-014. **Leave out** editing attendee details after purchase and Reissue QR: no operation on this screen declares them (CHG-SGU-020).
 - Flow F01 *Guest buys a ticket online*, step 8: Receives confirmation and tickets → Order number visible immediately, tickets delivered by the chosen channel
 - Flow F01 branch at step 8 (recoverable): when Payment succeeded but confirmation fails to load, Shows the order number and a support route. Never implies the purchase failed — a guest told their payment did not work will pay twice.
 - ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
@@ -1267,14 +1417,15 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (5), with its required mark, default, format and its error state (400, 404).
+- [ ] Every input above is drawn (7), with its required mark, default, format and its error state (400, 403, 404).
 - [ ] Every output is drawn (10 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#WEB-013?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: Add to wallet, Resend my tickets, Transfer tickets.
+- [ ] Every action is wired with its success and its failure: Add to wallet, Resend my tickets, Transfer tickets, Set a password.
 - [ ] Every transition is wired: `WEB-010`, `WEB-011`, `WEB-012`, `WEB-018`, `WEB-014`.
 - [ ] Sign-in is asked only where the spec asks for it.
 - [ ] The 4 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] Drawn in the default theme; on a key screen also in the alternate tenant theme; nothing hard-codes a brand colour, logo or font.
+- [ ] The 2 edge case(s) from the process notes are drawn.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -1289,13 +1440,21 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 | Module | Cart & Checkout · wave 1 · needs the `ticketing` module |
 | Block | Block A · ticket #17922 (APP-WEB-WEB-014) |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025) |
-| Device and orientation | This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. · LTR and RTL · light theme |
+| Device and orientation | This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. · LTR and RTL · the venue's theme |
 | Pattern | statusTracker (compact density): `getPaymentLink` reads one record and nothing reads a population — the screen is about that one thing |
 | Offline | **Not available, and the offline banner says why.** A payment needs the gateway, and pretending otherwise takes money nobody can confirm. What was typed stays on screen so nothing is entered twice. |
 | Opens with | `token` (deepLink) · cold entry: **Cold is the only way in.** The guest arrives from an email, an SMS or a WhatsApp message with no session and quite possibly no account. **A link opened three … |
 | Route | `/pay/:token` |
 
 **What the spec says about it.** BL-072, rebuilt 20 August. **Declared `getCart` and `checkoutCart` until then, and `createPaymentLink` takes an `orderId`** — the screen was looking for a cart that was never created, and its entryState said `cartId` came from the session when **a guest arriving from an email has no session.** Wired by name-matching rather than by following the journey.
+
+**From the Ticketing & Guest Commerce (guest web, guest app, kiosk, partner portal, POS ticket sale) process.** Pay for a booking the venue's sales team made (a school trip, a corporate day, a phone booking), from a link in an email, SMS or WhatsApp, with no account. Block A. Cold entry is the only way in. Show what is being paid for before how to pay, and the deadline as time remaining.
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- No prototype frame exists (match none). (CHG-SGU-026)
+
+**Fixed on main** (the package already carries these; draw what it says): Two pay buttons (Pay now, and Pay by link with a form collecting providerToken). (CHG-GST-003).
 
 #### Inputs: what the user enters or picks
 
@@ -1311,6 +1470,11 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 |---|---|---|---|---|---|---|---|
 | Provider token `providerToken` | text field | required | — | — | — | — | `payByLink` body |
 | Email `email` | email field | optional | — | — | name@example.ae | Optional, and only to send the ticket. Requiring an account before taking money is how a paid booking becomes an abandoned one. | `payByLink` body |
+
+**Rules for these inputs** (from the Ticketing & Guest Commerce (guest web, guest app, kiosk, partner portal, POS ticket sale) process; these refine the tables above and win where they differ)
+
+- **email for your tickets**: Optional and only to send the tickets; never an account step. *(source: screens/P01-guest-web-storefront.yaml#WEB-014 (textField notes))*
+- **payment**: The gateway's card or Apple Pay fields; the provider token is never something the guest types. *(source: contracts/spine/orders.yaml#payByLink)*
 
 #### Outputs: what the screen shows and produces
 
@@ -1334,6 +1498,11 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 |---|---|---|---|---|---|
 | Pay now (primary button) | `payByLink` POST `/payment-links/{token}/pay` | inline | inline | 409 The hold went while they were paying (`linesUnavailable`). Rare and real — a link near its expiry and a guest reading slowly. (PaymentLinkProblem) | — |
 
+**Rules for what is shown** (from the Ticketing & Guest Commerce (guest web, guest app, kiosk, partner portal, POS ticket sale) process; these refine the tables above and win where they differ)
+
+- **booking summary**: Venue, lines, visit date, total and, for a deposit link, what this payment is ("Deposit 25% · AED 1,631 of AED 6,525; balance due by 14 Oct"). *(source: DI-567; DI-615)*
+- **deadline**: "Expires in 46 minutes" (or "in 2 days"), never only a timestamp; at expiry the hold is released and the booking cancels. *(source: screens/P01-guest-web-storefront.yaml#WEB-014; contracts/spine/orders.yaml#/components/schemas/PaymentLink (expiresAt "the expiry releases the hold"))*
+
 **Data it reads**: `getPaymentLink` (onLoad, What is owed and until when)
 
 **Where the user goes next**
@@ -1350,6 +1519,24 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 | Permission denied (`?state=emptyNoAccess`) | **The token is the credential, so there is no permission case** — either it resolves or it has gone. |
 | Offline (`?state=offline`) | **Not available, and the offline banner says why.** A payment needs the gateway, and pretending otherwise takes money nobody can confirm. What was typed stays on screen so nothing is entered twice. |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 The hold went while they were paying (`linesUnavailable`). Rare and real — a link near its expiry and a guest reading slowly. (PaymentLinkProblem) |
+
+#### Edge cases to draw
+
+- **The link has expired, been superseded by a resend, or was already paid**: Each says which ("This link was replaced by a newer one sent on 1 Oct"; "Already paid on 30 Sep, your tickets were sent to f•••@example.ae") with the venue's contact. *(source: contracts/spine/orders.yaml#/components/schemas/PaymentLink (status, resendCount))*
+
+#### Consistency with other screens
+
+- Match `WEB-012`: Same payment component and the same unknown-outcome state.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+booking: Al Noor Private School · School group · Guests × 45 · Tue 21 Oct
+amount: Deposit AED 1,631.25 of AED 6,525
+expires: Expires in 2 days
+```
 
 #### Permissions
 
@@ -1382,9 +1569,9 @@ Also apply: 2 for P01 · Cart & Checkout, 39 for all of P01, 29 for every app (s
 
 #### Configurable by the tenant
 
-This is a white-label guest screen: it is drawn in the venue's brand, never TICVAI's (except the fixed *Powered by TICVAI* credit). Draw it with the **default theme**, and on the key screens one **alternate tenant theme** (`handoff/design-batches/apps/1-guest-app/WHITE-LABEL.md`).
+This is a white-label guest screen: it is drawn in the venue's brand, never TICVAI's (except the *Powered by TICVAI* credit, a tenant toggle that is on by default: `brand.showPoweredBy`). It has no dark or light mode: the venue's theme applies on every device setting. Draw it with the **default theme**, and on the key screens one **alternate tenant theme** (`handoff/design-batches/apps/1-guest-app/WHITE-LABEL.md`).
 
-**Shell-wide, on every guest screen:** Brand (10, CMS-002, CMS-004, ADM-016); Theme (31, CMS-005, CMS-003, ADM-016); Fonts (5, CMS-003); Header (5, CMS-007); Navigation (17, CMS-009); Footer (website) (15, CMS-007); Languages and right-to-left (2, CMS-011, ADM-018); Modules shown to guests (3, CMS-001); Features (3, CMS-001); Custom domain (website) (3, CMS-017, ADM-017); SEO metadata (website) (13, CMS-013). Each element, its CMS field, allowed values and default: `handoff/design-batches/apps/1-guest-app/WHITE-LABEL.md`.
+**Shell-wide, on every guest screen:** Brand (11, CMS-002, CMS-004, CMS-104); Theme (27, CMS-005, ADM-016); Fonts (5, CMS-003); Header (5, CMS-009); Navigation (17, CMS-009); Footer (website) (15, CMS-009); Languages and right-to-left (2, CMS-011, ADM-018); Modules shown to guests (3, CMS-001, ADM-424); Features (3, CMS-001); Custom domain (website) (3, CMS-017, ADM-017); SEO metadata (website) (13, CMS-013). Each element, its CMS field, allowed values and default: `handoff/design-batches/apps/1-guest-app/WHITE-LABEL.md`.
 
 #### References
 
@@ -1402,6 +1589,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 - [ ] Sign-in is asked only where the spec asks for it.
 - [ ] The 2 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] Drawn in the default theme; on a key screen also in the alternate tenant theme; nothing hard-codes a brand colour, logo or font.
+- [ ] The 1 edge case(s) from the process notes are drawn.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -1412,46 +1600,46 @@ Every guest screen in this batch is white-label. These elements are set by the t
 
 | Element | Configured in | Allowed values | Default | What it changes |
 |---|---|---|---|---|
-| Logo (`brand.logoAssetRef`) | `CMS-002`, `CMS-004`, `ADM-016` | PNG or SVG ≤ 2 MB for logos; images ≥ 1600 px; video MP4 | — | the logo in the header or nav bar, the splash and the footer |
-| Logo dark image (`brand.logoDarkAssetRef`) | `CMS-002`, `CMS-004`, `ADM-016` | PNG or SVG ≤ 2 MB for logos; images ≥ 1600 px; video MP4 | — | the logo on dark backgrounds (falls back to the primary logo) |
-| Logo variant (`brand.logoVariant`) | `CMS-002`, `CMS-004`, `ADM-016` | Light · Dark · Duotone | Light | which logo lockup sits in the nav bar, and whose colours drive the theme |
-| Favicon (`brand.faviconAssetRef`) | `CMS-002`, `CMS-004`, `ADM-016` | PNG or SVG ≤ 2 MB for logos; images ≥ 1600 px; video MP4 | — | the browser tab icon (website only) |
-| Splash image (`brand.splashImageAssetRefs`) | `CMS-002`, `CMS-004`, `ADM-016` | PNG, JPG, SVG or MP4 from the media library | — | Splash images, shown in order. Build-time on the native apps (`splashChangeScope`); immediate on web, reaching guests with the publish (audit R163). |
-| Splash duration seconds (`brand.splashDurationSeconds`) | `CMS-002`, `CMS-004`, `ADM-016` | min 0; max 10 | 3 | — |
-| Splash background colour (`brand.splashBackgroundColour`) | `CMS-002`, `CMS-004`, `ADM-016` | #RRGGBB | — | — |
-| Show loading indicator (`brand.showLoadingIndicator`) | `CMS-002`, `CMS-004`, `ADM-016` | — | on | — |
-| Intro video (`brand.introVideoAssetRef`) | `CMS-002`, `CMS-004`, `ADM-016` | PNG or SVG ≤ 2 MB for logos; images ≥ 1600 px; video MP4 | — | The optional intro video (decided 29 September, MOB-5). A video `MediaAsset` from the media library (CMS-010). |
-| Intro video mode (`brand.introVideoMode`) | `CMS-002`, `CMS-004`, `ADM-016` | Off · First launch · Every launch; Anything but `off` needs `introVideoAssetRef`, or 400. | Off | When GST-001 plays it full screen. "Skip introduction" is always shown. |
-| Primary colour (`theme.primaryColour`) | `CMS-005`, `CMS-003`, `ADM-016` | #RRGGBB | — | the brand colour (the `accentSolid` token): primary buttons (Book, Continue, Add to cart, Pay), the active step of the step indicator, selected date and time chips, focus rings |
-| Secondary colour (`theme.secondaryColour`) | `CMS-005`, `CMS-003`, `ADM-016` | #RRGGBB | — | secondary buttons and secondary emphasis: unselected chips, secondary tabs |
-| Accent colour (`theme.accentColour`) | `CMS-005`, `CMS-003`, `ADM-016` | #RRGGBB | — | highlights: badges (LIMITED, NEW, BESTSELLER), availability counts, sale prices |
-| Background colour (`theme.backgroundColour`) | `CMS-005`, `CMS-003`, `ADM-016` | #RRGGBB | — | the page background behind every screen (the `ground` token) |
-| Text colour (`theme.textColour`) | `CMS-005`, `CMS-003`, `ADM-016` | #RRGGBB | — | body text on the background |
-| Dark mode (`theme.darkMode`) | `CMS-005`, `CMS-003`, `ADM-016` | — | — | the dark variant on a device in dark mode (mobile app); derived from the light theme when absent |
-| Corner radius (`theme.cornerRadius`) | `CMS-005`, `CMS-003`, `ADM-016` | min 0; max 32 | — | the corners of cards, buttons, inputs, sheets and the cart (0 square to 22 the prototype's roundest) |
-| Surface style (`theme.surfaceStyle`) | `CMS-005`, `CMS-003`, `ADM-016` | Glass · Solid | Glass | cards and panels: frosted glass (default) or opaque (the `surfaceRaised` token) |
-| Button style (`theme.buttonStyle`) | `CMS-005`, `CMS-003`, `ADM-016` | Solid · Outline · Pill | Solid | every button's shape: solid fill, outline, or pill |
-| Component colours (`theme.componentColours`) | `CMS-005`, `CMS-003`, `ADM-016` | — | — | Colours for single interactive elements (decided 17 September, M17-11). Each is optional and falls back to the theme colours. |
+| Logo (`brand.logoAssetRef`) | `CMS-002`, `CMS-004`, `CMS-104`, `ADM-016` | PNG or SVG ≤ 2 MB for logos; images ≥ 1600 px; video MP4 | — | the logo in the header or nav bar, the splash and the footer |
+| Logo dark image (`brand.logoDarkAssetRef`) | `CMS-002`, `CMS-004`, `CMS-104`, `ADM-016` | PNG or SVG ≤ 2 MB for logos; images ≥ 1600 px; video MP4 | — | the logo on dark backgrounds (falls back to the primary logo) |
+| Logo variant (`brand.logoVariant`) | `CMS-002`, `CMS-004`, `CMS-104`, `ADM-016` | Light · Dark · Duotone | Light | which logo lockup sits in the nav bar, and whose colours drive the theme |
+| Favicon (`brand.faviconAssetRef`) | `CMS-002`, `CMS-004`, `CMS-104`, `ADM-016` | PNG or SVG ≤ 2 MB for logos; images ≥ 1600 px; video MP4 | — | the browser tab icon (website only) |
+| Splash image (`brand.splashImageAssetRefs`) | `CMS-002`, `CMS-004`, `CMS-104`, `ADM-016` | PNG, JPG, SVG or MP4 from the media library | — | Splash images, shown in order. Build-time on the native apps (`splashChangeScope`); immediate on web, reaching guests with the publish (audit R163). |
+| Splash duration seconds (`brand.splashDurationSeconds`) | `CMS-002`, `CMS-004`, `CMS-104`, `ADM-016` | min 0; max 10 | 3 | — |
+| Splash background colour (`brand.splashBackgroundColour`) | `CMS-002`, `CMS-004`, `CMS-104`, `ADM-016` | #RRGGBB | — | — |
+| Show loading indicator (`brand.showLoadingIndicator`) | `CMS-002`, `CMS-004`, `CMS-104`, `ADM-016` | — | on | — |
+| Intro video (`brand.introVideoAssetRef`) | `CMS-002`, `CMS-004`, `CMS-104`, `ADM-016` | PNG or SVG ≤ 2 MB for logos; images ≥ 1600 px; video MP4 | — | The optional intro video (decided 29 September, MOB-5). A video `MediaAsset` from the media library (CMS-010). |
+| Intro video mode (`brand.introVideoMode`) | `CMS-002`, `CMS-004`, `CMS-104`, `ADM-016` | Off · First launch · Every launch; Anything but `off` needs `introVideoAssetRef`, or 400. | Off | When GST-001 plays it full screen. "Skip introduction" is always shown. |
+| Powered by TICVAI credit (`brand.showPoweredBy`) | `CMS-002`, `CMS-004`, `CMS-104`, `ADM-016` | — | on | the *Powered by TICVAI* credit on the launch screen, at the foot of Account and in the web footer; on by default, and switching it off needs the licence add-on (403 … |
+| Primary colour (`theme.primaryColour`) | `CMS-005`, `ADM-016` | #RRGGBB | — | the brand colour (the `accentSolid` token): primary buttons (Book, Continue, Add to cart, Pay), the active step of the step indicator, selected date and time chips, focus rings |
+| Secondary colour (`theme.secondaryColour`) | `CMS-005`, `ADM-016` | #RRGGBB | — | secondary buttons and secondary emphasis: unselected chips, secondary tabs |
+| Accent colour (`theme.accentColour`) | `CMS-005`, `ADM-016` | #RRGGBB | — | highlights: badges (LIMITED, NEW, BESTSELLER), availability counts, sale prices |
+| Background colour (`theme.backgroundColour`) | `CMS-005`, `ADM-016` | #RRGGBB | — | the page background behind every screen (the `ground` token) |
+| Text colour (`theme.textColour`) | `CMS-005`, `ADM-016` | #RRGGBB | — | body text on the background |
+| Corner radius (`theme.cornerRadius`) | `CMS-005`, `ADM-016` | min 0; max 32 | — | the corners of cards, buttons, inputs, sheets and the cart (0 square to 22 the prototype's roundest) |
+| Surface style (`theme.surfaceStyle`) | `CMS-005`, `ADM-016` | Glass · Solid | Glass | cards and panels: frosted glass (default) or opaque (the `surfaceRaised` token) |
+| Button style (`theme.buttonStyle`) | `CMS-005`, `ADM-016` | Solid · Outline · Pill | Solid | every button's shape: solid fill, outline, or pill |
+| Component colours (`theme.componentColours`) | `CMS-005`, `ADM-016` | — | — | Colours for single interactive elements (decided 17 September, M17-11). Each is optional and falls back to the theme colours. |
 | Primary latin (`fonts.primaryLatin`) | `CMS-003` | — | — | headings and body text in English |
 | Primary arabic (`fonts.primaryArabic`) | `CMS-003` | Required when `ar` is among the tenant's languages (audit R163). | — | headings and body text in Arabic |
 | Secondary latin (`fonts.secondaryLatin`) | `CMS-003` | — | — | the secondary face (eyebrows, numbers) in English |
 | Secondary arabic (`fonts.secondaryArabic`) | `CMS-003` | Required whenever `secondaryLatin` is set and `ar` is among the tenant's languages (decided 28 September, audit R163). | — | the secondary face in Arabic |
 | Custom font images (`fonts.customFontAssetRefs`) | `CMS-003` | PNG, JPG, SVG or MP4 from the media library | — | Uploaded font files, as `MediaAsset` ids. |
-| Header layout (`header.layout`) | `CMS-007` | Logo left · Logo centre · Logo with menu | — | the header: logo left, logo centred, or logo with the menu |
-| Show logo (`header.showLogo`) | `CMS-007` | — | on | — |
-| Show menu (`header.showMenu`) | `CMS-007` | — | on | — |
-| Show notifications (`header.showNotifications`) | `CMS-007` | — | on | — |
-| Background colour (`header.backgroundColour`) | `CMS-007` | #RRGGBB | — | — |
+| Header layout (`header.layout`) | `CMS-009` | Logo left · Logo centre · Logo with menu | — | the header: logo left, logo centred, or logo with the menu |
+| Show logo (`header.showLogo`) | `CMS-009` | — | on | — |
+| Show menu (`header.showMenu`) | `CMS-009` | — | on | — |
+| Show notifications (`header.showNotifications`) | `CMS-009` | — | on | — |
+| Background colour (`header.backgroundColour`) | `CMS-009` | #RRGGBB | — | — |
 | Navigation kind (`navigation.kind`) | `CMS-009` | Bottom navigation · Drawer · Tabs | — | the main navigation: bottom tab bar, drawer, or tabs |
 | Navigation items (`navigation.items`) | `CMS-009` | at most 12 | — | — |
 | Buy button (`navigation.buyButton`) | `CMS-009` | — | — | The persistent Buy tickets button (decided 29 September, MOB-2). On every screen of the mobile app except the booking and checkout steps; it opens GST-003. |
-| Footer columns (`footer.columns`) | `CMS-007` | — | — | — |
-| Legal links (`footer.legalLinks`) | `CMS-007` | — | — | Required links, held separately from the free-form columns — a tenant reorganising their footer must not be able to remove the privacy notice by accident. |
-| Copyright text (`footer.copyrightText`) | `CMS-007` | — | — | — |
-| Social links (`footer.socialLinks`) | `CMS-007` | — | — | — |
+| Footer columns (`footer.columns`) | `CMS-009` | — | — | — |
+| Legal links (`footer.legalLinks`) | `CMS-009` | — | — | Required links, held separately from the free-form columns — a tenant reorganising their footer must not be able to remove the privacy notice by accident. |
+| Copyright text (`footer.copyrightText`) | `CMS-009` | — | — | — |
+| Social links (`footer.socialLinks`) | `CMS-009` | — | — | — |
 | Languages (`languages.languages`) | `CMS-011`, `ADM-018` | at least 1 | — | the language button in the header; Arabic flips every screen right to left |
 | Default language (`languages.defaultLanguage`) | `CMS-011`, `ADM-018` | ISO 639-1 code, shown as the language name | — | the language a first visit opens in |
-| Modules (`modules.modules`) | `CMS-001` | — | — | — |
+| Modules (`modules.modules`) | `CMS-001`, `ADM-424` | — | — | — |
 | Features (`features.features`) | `CMS-001` | — | — | — |
 | Custom domain hostname (`domains.hostname`) | `CMS-017`, `ADM-017` | — | — | — |
 | Custom domain kind (`domains.kind`) | `CMS-017`, `ADM-017` | Guest web · Guest app · Partner portal · Developer portal | — | — |
@@ -1469,15 +1657,17 @@ Every guest screen in this batch is white-label. These elements are set by the t
 | Open graph (`seo.openGraph`) | `CMS-013` | — | — | — |
 | Is auto generated (`seo.isAutoGenerated`) | `CMS-013` | — | on | 22.11.2. Generated by default and overridable. |
 | No index (`seo.noIndex`) | `CMS-013` | — | off | — |
-| Favicon (`brand.faviconAssetRef`) | `CMS-002`, `CMS-004`, `ADM-016` | PNG or SVG ≤ 2 MB for logos; images ≥ 1600 px; video MP4 | — | the browser tab icon (website only) |
-| Component colours: primary CTA (`theme.componentColours.primaryCta`) | `CMS-005`, `CMS-003`, `ADM-016` | — | — | the one main call to action on each screen, when it should differ from the brand colour |
-| Component colours: pay button (`theme.componentColours.payButton`) | `CMS-005`, `CMS-003`, `ADM-016` | — | — | the Pay button at checkout |
+| Favicon (`brand.faviconAssetRef`) | `CMS-002`, `CMS-004`, `CMS-104`, `ADM-016` | PNG or SVG ≤ 2 MB for logos; images ≥ 1600 px; video MP4 | — | the browser tab icon (website only) |
+| Component colours: primary CTA (`theme.componentColours.primaryCta`) | `CMS-005`, `ADM-016` | — | — | the one main call to action on each screen, when it should differ from the brand colour |
+| Component colours: pay button (`theme.componentColours.payButton`) | `CMS-005`, `ADM-016` | — | — | the Pay button at checkout |
 | Buy button: style (`navigation.buyButton.style`) | `CMS-009` | Raised · Floating · Flat · Hidden | Raised | the Buy tickets button in the tab bar: raised (default), floating, flat, or hidden |
 
 **The alternate tenant theme (Coastal Aqua)**: Primary colour #0077B6; Secondary colour #023E8A; Accent colour #FFB703; Background colour #F5FAFC; Text colour #0B1324; Corner radius 18; Surface style Solid; Button style Pill; Logo variant Duotone; Header layout Logo centre; Step indicator Dots; Card layout Cards across; Card size Standard; Cart layout Floating icon; Fonts Poppins / Tajawal.
 **Key screens to show in it:** `WEB-001`, `WEB-005`, `WEB-006`, `WEB-010`, `WEB-012`, `GST-001`, `GST-007`, `GST-041`, `KSK-002`, `KSK-003`.
 
-**Never configurable:** The *Powered by TICVAI* credit in the footer is fixed and never client-editable (MoM 3 Aug, DI-111; MoM 12 Aug, DI-250). Semantic colour pairs (success, warning, danger, neutral) are not overridable: a tenant who recolours danger to their brand green has made a destructive confirmation look like a success (`screens/_design-tokens.yaml` whiteLabel). Site structure and the navigation flow are fixed and adapt to the product configuration (MoM 3 Aug, DI-119); a guest always books a product or package, never a resource (DI-502). A colour pair that fails 4.5:1 contrast is refused by the CMS, not warned (setTheme 400 ContrastProblem, audit R139).
+**Decided for every guest screen:** **No dark or light mode.** The venue's chosen theme applies on every device setting; `Theme.darkMode` is deprecated and ignored, never drawn, and the guest app has no Light/Dark switch (Chinmay, 2 October, Q150; CHG-CSA-035). ***Powered by TICVAI* is a tenant toggle, on by default** (`brand.showPoweredBy`): shown on the launch screen, at the foot of Account and in the web footer; switching it off needs the licence add-on, or 403 `powered-by-locked` (Chinmay, 2 October, Q160; DI-297; CHG-CSA-036). **Each homepage section sets its card count and its scroll animation** (`maxItems`; `scrollAnimation` rise, scale, slide, blur or none, default rise): every customisation option of the approved wireframe (Chinmay, 2 October, Q152 and Q153; DI-1088; CHG-CSA-040). **Landing-page templates.** A tenant with no landing page of its own starts from a TICVAI template (`listLandingPageTemplates`, kept as `HomepageLayout.templateKey`); one with its own site links in with deep links (`landingSource` ownSite) (Chinmay, 2 October, batch 2 #41; CHG-CSA-037).
+
+**Never configurable:** A dark or light mode: the guest surfaces have one theme, the venue's (Chinmay, 2 October; CHG-CSA-035). Semantic colour pairs (success, warning, danger, neutral) are not overridable: a tenant who recolours danger to their brand green has made a destructive confirmation look like a success (`screens/_design-tokens.yaml` whiteLabel). Site structure and the navigation flow are fixed and adapt to the product configuration (MoM 3 Aug, DI-119); a guest always books a product or package, never a resource (DI-502). A colour pair that fails 4.5:1 contrast is refused by the CMS, not warned (setTheme 400 ContrastProblem, audit R139).
 
 ## Reference designs and the trackers for this platform
 
@@ -1605,7 +1795,6 @@ Method, path, parameters, request and response for every operation these screens
 {
 "abandonCart": {"method":"DELETE","path":"/carts/{cartId}","contract":"orders","summary":"Empty it deliberately","permission":null,"offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":null},
 "addCartLine": {"method":"POST","path":"/carts/{cartId}/lines","contract":"orders","summary":"Add something","permission":null,"offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":"AddCartLineRequest","responds":"Cart"},
-"addToWishlist": {"method":"POST","path":"/guests/{subjectId}/wishlist","contract":"marketing-crm","summary":"Save an item","permission":null,"offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"subject","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Wishlist"},
 "applyCartPromoCode": {"method":"POST","path":"/carts/{cartId}/promo-codes","contract":"orders","summary":"Apply a promo code to the cart","permission":null,"offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"ApplyCartPromoCodeRequest","responds":"Cart"},
 "checkoutCart": {"method":"POST","path":"/carts/{cartId}/checkout","contract":"orders","summary":"Turn the cart into an order","permission":null,"offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Order"},
 "createCart": {"method":"POST","path":"/carts","contract":"orders","summary":"Start a cart","permission":null,"offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Cart"},
@@ -1615,28 +1804,22 @@ Method, path, parameters, request and response for every operation these screens
 "extendCart": {"method":"POST","path":"/carts/{cartId}/extend","contract":"orders","summary":"Give the guest more time","permission":null,"offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Cart"},
 "getCart": {"method":"GET","path":"/carts/{cartId}","contract":"orders","summary":"The cart, priced and checked, right now","permission":null,"offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Cart"},
 "getCouponCode": {"method":"GET","path":"/coupon-codes/{code}","contract":"promotions","summary":"Look up a code","permission":"PRICE_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"CouponCode"},
-"getGuestProfile": {"method":"GET","path":"/guests/{subjectId}","contract":"marketing-crm","summary":"Read a guest profile","permission":"GUEST_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"GuestProfileDetail"},
+"getMyProfile": {"method":"GET","path":"/guests/me/profile","contract":"marketing-crm","summary":"A guest reading their own details","permission":"GUEST_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"subject","parameters":[],"requestBody":null,"responds":null},
 "getOrder": {"method":"GET","path":"/orders/{orderId}","contract":"orders","summary":"Read an order","permission":"ORDER_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Order"},
 "getPaymentLink": {"method":"GET","path":"/payment-links/{token}","contract":"orders","summary":"What a guest holding a link is being asked to pay for","permission":"ORDER_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":null},
 "getPerformance": {"method":"GET","path":"/performances/{performanceId}","contract":"catalogue","summary":"Read a performance","permission":"PRODUCT_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"Performance"},
 "getPublishedBookingFlow": {"method":"GET","path":"/venues/{venueId}/booking-flow","contract":"white-label","summary":"The published booking flow a product or category books through","permission":null,"offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"productId","in":"query","required":false},{"name":"productCategoryId","in":"query","required":false},{"name":"flowTypeKey","in":"query","required":false}],"requestBody":null,"responds":"BookingFlow"},
 "getResourceHold": {"method":"GET","path":"/resource-holds/{holdId}","contract":"resources","summary":"Read a resource hold","permission":"ORDER_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"ResourceHold"},
-"getWishlist": {"method":"GET","path":"/guests/{subjectId}/wishlist","contract":"marketing-crm","summary":"Read a guest's saved items","permission":null,"offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"subject","parameters":[],"requestBody":null,"responds":"Wishlist"},
 "inquirePaymentStatus": {"method":"POST","path":"/payments/{paymentId}/inquiry","contract":"orders","summary":"Ask the provider what actually happened","permission":"ORDER_CREATE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"workstation","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Payment"},
+"linkGuestCheckout": {"method":"POST","path":"/auth/guest/link-checkout","contract":"identity","summary":"Attach a guest checkout to an account","permission":null,"offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":null},
 "listConsentPurposes": {"method":"GET","path":"/consent-purposes","contract":"marketing-crm","summary":"Configured consent purposes","permission":"GUEST_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
-"listGuestDevices": {"method":"GET","path":"/guests/{subjectId}/devices","contract":"marketing-crm","summary":"A guest's registered devices","permission":null,"offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"subject","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listPublishedPolicies": {"method":"GET","path":"/storefront/policies","contract":"white-label","summary":"The tenant's current legal policies, readable before sign-in","permission":null,"offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":"kind","in":"query","required":false}],"requestBody":null,"responds":"PublishedPolicy"},
 "payByLink": {"method":"POST","path":"/payment-links/{token}/pay","contract":"orders","summary":"Pay for a booking taken at a till","permission":"ORDER_CREATE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":null},
-"recordConsent": {"method":"POST","path":"/guests/{subjectId}/consents","contract":"marketing-crm","summary":"Record a consent decision","permission":null,"offlineCapable":false,"conflictPolicy":"append","scopeLevel":"subject","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"RecordConsentRequest","responds":"ConsentState"},
 "recordConsentAnswers": {"method":"POST","path":"/consent-answers","contract":"marketing-crm","summary":"Answer the consent questions a booking asks","permission":"ORDER_CREATE","offlineCapable":false,"conflictPolicy":"append","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"RecordConsentAnswersRequest","responds":null},
-"registerGuestDevice": {"method":"POST","path":"/guests/{subjectId}/devices","contract":"marketing-crm","summary":"Register a device for push","permission":null,"offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"subject","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"GuestDevice"},
 "removeCartLine": {"method":"DELETE","path":"/carts/{cartId}/lines/{lineId}","contract":"orders","summary":"Take something out","permission":null,"offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Cart"},
-"removeFromWishlist": {"method":"DELETE","path":"/guests/{subjectId}/wishlist/{itemId}","contract":"marketing-crm","summary":"Remove a saved item","permission":null,"offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"subject","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":null},
 "reprintOrder": {"method":"POST","path":"/orders/{orderId}/reprints","contract":"orders","summary":"Reprint or resend tickets","permission":"ORDER_REPRINT","offlineCapable":true,"conflictPolicy":"append","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":null},
-"revokeGuestDevice": {"method":"DELETE","path":"/guests/{subjectId}/devices/{deviceId}","contract":"marketing-crm","summary":"Revoke a device registration","permission":null,"offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"subject","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":null},
 "updateCartLine": {"method":"PATCH","path":"/carts/{cartId}/lines/{lineId}","contract":"orders","summary":"Change a quantity","permission":null,"offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Cart"},
-"updateMyProfile": {"method":"PATCH","path":"/guests/me/profile","contract":"marketing-crm","summary":"A guest correcting their own details","permission":"GUEST_VIEW","offlineCapable":false,"conflictPolicy":"lastWriterWins","scopeLevel":"subject","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"GuestProfile"},
-"uploadGuestDocument": {"method":"POST","path":"/guest-documents","contract":"marketing-crm","summary":"Store a guest photo, ID or signed document","permission":"GUEST_VIEW_PII","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"GuestDocument","responds":"GuestDocument"}
+"updateMyProfile": {"method":"PATCH","path":"/guests/me/profile","contract":"marketing-crm","summary":"A guest correcting their own details","permission":"GUEST_VIEW","offlineCapable":false,"conflictPolicy":"lastWriterWins","scopeLevel":"subject","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"GuestProfile"}
 }
 ```
 
@@ -1659,46 +1842,39 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "CartLine": {"type":"object","x-ticvai-persistence":"orders.cart_line","required":["id","variantId","quantity"],"properties":{"id":{"type":"string","format":"uuid"},"variantId":{"type":"string","format":"uuid"},"productName":{"type":"string","readOnly":true},"quantity":{"type":"integer","minimum":1},"performanceId":{"type":"string","format":"uuid","nullable":true},"bookedWindow":{"$ref":"#/components/schemas/BookedWindow"},"recommendationId":{"type":"string","format":"uuid","nullable":true,"description":"The `trackingId` of the ai `decideRecommendations` item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather than guessed. Set from `addCartLine`; checkout copies it to the order line.\n"},"tableReservationId":{"type":"string","format":"uuid","nullable":true,"description":"Set on a table deposit line only (decided 29 September, rev 3 REV3-8b): the `fnb.TableReservation` this line secures. Priced from the deposit the booking snapshotted, not from the variant. Becomes an `orders.deposit` row at checkout, not revenue. A table booking with no deposit never has a line (rev 3 REV3-8).\n"},"seatIds":{"type":"array","maxItems":50,"items":{"type":"string","format":"uuid"}},"resourceHoldId":{"type":"string","format":"uuid","nullable":true,"description":"The `resources.ResourceHold` this line buys (decided 29 September, rev 3 REV3-15). While set, `leaseExpiresAt` is the hold's `expiresAt` and `inventoryHoldId` is null."},"attributes":{"$ref":"#/components/schemas/OrderLineAttributes"},"parentLineId":{"type":"string","format":"uuid","nullable":true,"description":"The line this add-on is attached to, from `AddCartLineRequest.parentLineId`. Kept on the line because **removing the parent removes the child**, and `removeCartLine` has to be able to find the children.\n"},"overridePrice":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"overrideReason":{"type":"string","nullable":true,"enum":["priceMatch","serviceRecovery","negotiated","damagedGoods","staffSale","error"],"description":"BL-085. **An operator could apply an approved discount and not enter a price.** A price match against a competitor and a service-recovery gesture are not discounts off a list — they are a number somebody decided.\n**Escalated above a configured threshold, and the reason is a closed set**: a free-text override reason is an override nobody can report on, and this is the field an auditor reads first.\n"},"feeKind":{"type":"string","nullable":true,"enum":["booking","transaction","service","delivery","convenience","cancellation"],"description":"**A fee is a line, not an adjustment.** `orders` already separates a service charge from a tip for the reason that applies here: **a guest is entitled to see what they are being charged for**, and a fee folded into the ticket price is a fee nobody can question.\nItemised at checkout, taxed on its own code, and refundable separately — **a cancellation fee is usually the one thing not refunded**, which only works if it is its own line.\n"},"unitPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"lineTotal":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"inventoryHoldId":{"type":"string","nullable":true,"description":"The capacity held for this line — a `catalogue.InventoryHold.id`, typed as that id is. **Null for a product with no capacity** — a t-shirt needs stock, not a lease.\n"},"leaseExpiresAt":{"type":"string","format":"date-time","nullable":true,"description":"Shown to the guest. *\"Your seats are held for 6 minutes\"* is better than discovering it at checkout.\n"},"isAvailable":{"type":"boolean","readOnly":true,"description":"Re-checked on every read. **A line can become unavailable while the cart sits** — a lease expiring is not the same as the product selling out, and both land here.\n"}}},
 "CartStatus": {"type":"string","enum":["active","expiring","expired","abandoned","checkedOut"]},
 "Channel": {"type":"string","enum":["pos","kiosk","web","mobile","b2b","ota","callCentre"]},
-"ConsentDecision": {"type":"string","enum":["granted","withdrawn","notAsked"]},
 "ConsentPurpose": {"type":"string","enum":["marketing","personalisation","profiling","thirdPartySharing","aiProcessing","transactional"]},
 "ConsentPurposeConfig": {"x-ticvai-persistence":"marketing.consent_purpose + marketing.consent_purpose_channel","type":"object","required":["purpose","channels","noticeVersion","isRequiredForService"],"properties":{"purpose":{"$ref":"#/components/schemas/ConsentPurpose"},"displayName":{"type":"string"},"description":{"type":"string"},"channels":{"type":"array","items":{"$ref":"#/components/schemas/MessageChannel"}},"noticeVersion":{"type":"string","description":"Current version of the notice. A consent against a superseded version is reported as requiring renewal rather than silently honoured.\n"},"isRequiredForService":{"type":"boolean","description":"True for transactional. Withdrawing it means the service cannot be delivered, so it is presented differently.\n"},"expiresAfterMonths":{"type":"integer","nullable":true}}},
 "ConsentQuestionKind": {"type":"string","description":"What the question is about (decided 29 September, rev 3 REV3-26). `swim` feeds the derived `confidentSwimmer` on the order line; the others are recorded and checked as the venue set them.","enum":["swim","scuba","risk","custom"]},
 "ConsentSource": {"type":"string","enum":["guestApp","website","kiosk","pos","callCentre","import","agentRecorded","cookieBanner","checkout"],"description":"`checkout` (30 September, M18-15): an opt-in ticked beside the terms at checkout, carried on orders `checkoutCart` `marketingConsents[]` and recorded by `recordCheckoutConsents`, bound to the order and the verified contact. `cookieBanner` (29 September, build; BL-073 §4b): a decision made on the cookie banner or preference centre and moved onto the guest by `claimDeviceConsent`. Kept apart from `website`, a form submission, because the audit trail (2.6.56) has to tell the two apart."},
-"ConsentState": {"x-ticvai-persistence":"none — projection over consent_record","type":"object","required":["subjectId","purposes"],"properties":{"subjectId":{"type":"string","format":"uuid"},"purposes":{"type":"array","items":{"type":"object","required":["purpose","decision","requiresRenewal"],"properties":{"purpose":{"$ref":"#/components/schemas/ConsentPurpose"},"decision":{"$ref":"#/components/schemas/ConsentDecision"},"channels":{"type":"array","items":{"$ref":"#/components/schemas/MessageChannel"}},"noticeVersion":{"type":"string","nullable":true},"requiresRenewal":{"type":"boolean","description":"True where the notice has been superseded since consent was given."},"decidedAt":{"type":"string","format":"date-time","nullable":true}}}}}},
 "CouponCode": {"x-ticvai-persistence":"promotions.coupon_code","type":"object","required":["code","campaignId","status"],"properties":{"code":{"type":"string"},"campaignId":{"type":"string","format":"uuid"},"batchId":{"type":"string","format":"uuid","nullable":true,"description":"The `generateCouponCodes` batch that issued this code. Null where no batch did."},"status":{"$ref":"#/components/schemas/CouponStatus"},"assignedSubjectId":{"type":"string","format":"uuid","nullable":true},"redemptionCount":{"type":"integer"},"maxRedemptions":{"type":"integer"},"discount":{"$ref":"#/components/schemas/Discount"},"invalidReason":{"type":"string","nullable":true,"description":"Why the code cannot be applied. A cashier reading `expired` to a guest is a very different conversation from reading `already used`.\n","enum":["expired","alreadyRedeemed","voided","notYetValid","wrongVenue","conditionsNotMet","notAssignedToGuest"]},"validFrom":{"type":"string","format":"date-time","nullable":true},"validTo":{"type":"string","format":"date-time","nullable":true},"redeemedAt":{"type":"string","format":"date-time","nullable":true},"redeemedOrderId":{"type":"string","nullable":true},"scopePath":{"type":"string","description":"**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"}}},
 "CouponStatus": {"type":"string","enum":["issued","assigned","redeemed","expired","voided"]},
 "CreateOrderLine": {"x-ticvai-persistence":"none — request only","type":"object","required":["id","variantId","quantity","quotedUnitPrice"],"properties":{"id":{"type":"string","format":"uuid","description":"Client-generated UUIDv7 of the line. `lineIds` everywhere in this contract are these."},"variantId":{"type":"string","format":"uuid"},"recommendationId":{"type":"string","format":"uuid","nullable":true,"description":"The `trackingId` of the ai `decideRecommendations` item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather than guessed. Carried from the cart line at checkout; stored on `orders.order_line` and sent in `order.completed` lines.\n"},"performanceId":{"type":"string","format":"uuid"},"bookedWindow":{"$ref":"#/components/schemas/BookedWindow"},"inventoryHoldId":{"type":"string","nullable":true,"description":"Lease the units were drawn from — a `catalogue.InventoryHold.id`. Absent for uncontended products."},"seatIds":{"type":"array","maxItems":50,"items":{"type":"string","format":"uuid"},"description":"Seated products only, as `seating.Seat.id`. Not available offline. **At most `VenueSettings.seating.maxSeatsPerGuestOrder` seats per booking on a guest channel** (default 10, bounds 1 to 50, decided 29 September, rev 3 REV3-7); **at most 10 per sale on staff and POS** (audit R080 (c)), across all the lines of one order for one performance. `createOrder` refuses more with 422 `seatLimitExceeded` (problem type `seat-limit-exceeded`)."},"resourceHoldId":{"type":"string","format":"uuid","nullable":true,"description":"A `resources.ResourceHold` on a resource the guest picked on a venue map (decided 29 September, rev 3 REV3-15); `variantId` is the placed resource's price-band variant. `createOrder` converts the hold into a `ResourceBooking` without releasing it. Not available offline."},"attributes":{"$ref":"#/components/schemas/OrderLineAttributes"},"quantity":{"type":"integer","minimum":1},"eligibilityDeclaration":{"type":"array","nullable":true,"x-ticvai-note":"One row per declared guest in `orders.order_line_eligibility` (named on `OrderLine`), because an array of objects is a child table's rows, not a column.\n","items":{"type":"object","properties":{"ageBand":{"type":"string","enum":["infant","child","junior","adult","senior"],"description":"Infant under 3, child 3–12, junior 13–17, adult 18–59, senior 60+."},"ageYears":{"type":"integer","nullable":true},"heightBandIndex":{"type":"integer","nullable":true},"confidentSwimmer":{"type":"boolean","nullable":true,"description":"**Derived, kept for the gate check** (decided 29 September, rev 3 REV3-26). The swim question is a consent: the answer is a `marketing.BookingConsentRecord` of kind `swim`, and this is filled from it (true for a `yes` covering this person, whether answered for them or once for the booking). A value sent that contradicts the record is ignored and the record wins. No longer the place a swim answer is captured.\n"},"guardianSigned":{"type":"boolean"}}},"description":"What was declared for each guest on this line, kept as the record staff check at the gate."},"quotedUnitPrice":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"description":"What the client charged, from its local bundle."},"holderName":{"type":"string","nullable":true},"dataMaskValues":{"type":"object","additionalProperties":true,"description":"**Deliberately open.** Custom fields keyed by the venue's data mask: the field definitions travel in the catalogue bundle (`catalogue.CatalogueBundle.payload`), so the keys are the venue's to define, as on `catalogue`'s own `dataMaskValues`.\n"}}},
 "CreateOrderRequest": {"type":"object","required":["id","venueId","channel","lines","recordedAt"],"properties":{"id":{"type":"string","format":"uuid","description":"Client-generated UUIDv7. Also the idempotency key: it must equal the `Idempotency-Key` header, and a replay or a mismatch follows `IdempotencyKey` in `shared/common.yaml`. Offline replay through `syncOrders` carries no header, and this id alone deduplicates there.\n"},"venueId":{"type":"string","format":"uuid"},"channel":{"$ref":"#/components/schemas/Channel"},"shiftId":{"type":"string","format":"uuid"},"subjectId":{"type":"string","format":"uuid","nullable":true,"description":"Null for an anonymous sale. Identity and entitlement are separate."},"guestLinkId":{"type":"string","nullable":true,"description":"Present where the guest is linked across cells."},"catalogueBundleVersion":{"type":"string","description":"The bundle the client priced from. Lets the server explain a variance rather than merely report one.\n"},"lines":{"type":"array","minItems":1,"items":{"$ref":"#/components/schemas/CreateOrderLine"}},"recordedAt":{"type":"string","format":"date-time"}}},
-"CreatePaymentRequest": {"type":"object","required":["id","orderId","tender","amount","recordedAt"],"properties":{"id":{"type":"string","format":"uuid","description":"Client-generated UUIDv7 of the payment, and its idempotency key — it must equal the `Idempotency-Key` header."},"orderId":{"type":"string","format":"uuid"},"tender":{"$ref":"#/components/schemas/TenderKind"},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"tenderCurrency":{"type":"string","pattern":"^[A-Z]{3}$","nullable":true,"description":"The currency the guest handed over, where it is not the venue's — becomes `Payment.tenderCurrency`. Omit for a payment in the venue's own currency."},"tenderAmount":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"description":"**What the guest handed over**, in `tenderCurrency` — becomes `Payment.tenderAmount`, one name for one concept (renamed from `tenderedAmount` on 26 September). For cash, change is the difference.\n"},"walletAuthorisationId":{"type":"string","nullable":true,"description":"Cross-cell wallet hold, where the guest's home cell is elsewhere."},"walletHoldId":{"type":"string","format":"uuid","nullable":true,"description":"For a `wallet` tender, the hold `wallet.holdWalletFunds` placed (SD-027). Capture debits it; the order service writes no wallet table."},"returnUrl":{"type":"string","format":"uri","nullable":true,"description":"Where the provider returns the guest after a 3-D Secure challenge or hosted page (SD-034). Required for a card payment from the guest web or app."},"terminalId":{"type":"string","format":"uuid","nullable":true,"description":"The card terminal to instruct, for a card payment at a till (ECR flow, SD-034)."},"deviceId":{"type":"string","format":"uuid","nullable":true},"recordedAt":{"type":"string","format":"date-time"}}},
-"Discount": {"x-ticvai-persistence":"none — embedded in promotion","type":"object","required":["kind"],"properties":{"kind":{"$ref":"#/components/schemas/DiscountKind"},"percentage":{"type":"number","minimum":0,"maximum":100},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"fixedPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"buyQuantity":{"type":"integer","minimum":1},"getQuantity":{"type":"integer","minimum":1},"getDiscountPercentage":{"type":"number","minimum":0,"maximum":100,"description":"100 makes the free items actually free; lower values give a partial discount."},"tiers":{"type":"array","description":"For `tieredPercentage` — more units, larger discount.","items":{"type":"object","required":["minQuantity","percentage"],"properties":{"minQuantity":{"type":"integer","minimum":1},"percentage":{"type":"number","minimum":0,"maximum":100}}}},"maxDiscountAmount":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"description":"Cap on a percentage discount. Prevents an unbounded discount on a large basket."},"rewardVariantIds":{"type":"array","nullable":true,"items":{"type":"string","format":"uuid"},"description":"The reward products, where the reward is not the qualifying product: the free gift of `freeItem`, the \"different product\" of a `buyXGetY` (setGiftFreeProduct, setBuyGetBogo). Absent means the reward is taken from the qualifying lines. (DM5, 29 September: data model for the agreed operations)"},"maxApplicationsPerBasket":{"type":"integer","minimum":1,"nullable":true,"description":"How many times the offer repeats in one basket: the \"maximum repetitions\" of an N-for-X offer (setFixedPriceOffer). Null repeats for every complete set. (DM5, 29 September: data model for the agreed operations)"}}},
+"CreatePaymentRequest": {"type":"object","required":["id","orderId","tender","amount","recordedAt"],"properties":{"id":{"type":"string","format":"uuid","description":"Client-generated UUIDv7 of the payment, and its idempotency key — it must equal the `Idempotency-Key` header."},"orderId":{"type":"string","format":"uuid"},"tender":{"$ref":"#/components/schemas/TenderKind"},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"tenderCurrency":{"type":"string","pattern":"^[A-Z]{3}$","nullable":true,"description":"The currency the guest handed over, where it is not the venue's — becomes `Payment.tenderCurrency`. Omit for a payment in the venue's own currency. For a guest-channel card or wallet payment on an order with a `chargeCurrency`, the server sets it from the order (CHG-FIN-001)."},"tenderAmount":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"description":"**What the guest handed over**, in `tenderCurrency` — becomes `Payment.tenderAmount`, one name for one concept (renamed from `tenderedAmount` on 26 September). For cash, change is the difference.\n"},"walletAuthorisationId":{"type":"string","nullable":true,"description":"Cross-cell wallet hold, where the guest's home cell is elsewhere."},"walletHoldId":{"type":"string","format":"uuid","nullable":true,"description":"For a `wallet` tender, the hold `wallet.holdWalletFunds` placed (SD-027). Capture debits it; the order service writes no wallet table."},"returnUrl":{"type":"string","format":"uri","nullable":true,"description":"Where the provider returns the guest after a 3-D Secure challenge or hosted page (SD-034). Required for a card payment from the guest web or app."},"terminalId":{"type":"string","format":"uuid","nullable":true,"description":"The card terminal to instruct, for a card payment at a till (ECR flow, SD-034)."},"deviceId":{"type":"string","format":"uuid","nullable":true},"recordedAt":{"type":"string","format":"date-time"}}},
+"Discount": {"x-ticvai-persistence":"none — embedded in promotion","type":"object","required":["kind"],"properties":{"kind":{"$ref":"#/components/schemas/DiscountKind"},"percentage":{"type":"number","minimum":0,"maximum":100},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"fixedPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"buyQuantity":{"type":"integer","minimum":1},"getQuantity":{"type":"integer","minimum":1},"getDiscountPercentage":{"type":"number","minimum":0,"maximum":100,"description":"100 makes the free items actually free; lower values give a partial discount."},"tiers":{"type":"array","description":"For `tieredPercentage` — more units, larger discount.","items":{"type":"object","required":["minQuantity","percentage"],"properties":{"minQuantity":{"type":"integer","minimum":1},"percentage":{"type":"number","minimum":0,"maximum":100}}}},"maxDiscountAmount":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"description":"Cap on a percentage discount. Prevents an unbounded discount on a large basket."},"rewardVariantIds":{"type":"array","nullable":true,"items":{"type":"string","format":"uuid"},"description":"The reward products, where the reward is not the qualifying product: the free gift of `freeItem`, the \"different product\" of a `buyXGetY` (createPromotion; the builders setGiftFreeProduct and setBuyGetBogo were retired in r2, CHG-CLN-001). Absent means the reward is taken from the qualifying lines. (DM5, 29 September: data model for the agreed operations)"},"maxApplicationsPerBasket":{"type":"integer","minimum":1,"nullable":true,"description":"How many times the offer repeats in one basket: the \"maximum repetitions\" of an N-for-X offer (createPromotion; setFixedPriceOffer was retired in r2, CHG-CLN-001). Null repeats for every complete set. (DM5, 29 September: data model for the agreed operations)"}}},
 "EvaluatePromotionsRequest": {"x-ticvai-persistence":"none — request only","type":"object","required":["venueId","channel","lines"],"properties":{"venueId":{"type":"string","format":"uuid"},"channel":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/SalesChannel"}],"description":"Where the sale is being made. Matched against `PromotionConditions.channels`, so both sides use the one shared vocabulary.\n"},"subjectId":{"type":"string","format":"uuid"},"membershipTierId":{"type":"string","format":"uuid"},"couponCodes":{"type":"array","items":{"type":"string"}},"evaluateAt":{"type":"string","format":"date-time","description":"For back-office testing of a rule before publishing."},"orderId":{"type":"string","format":"uuid","nullable":true,"description":"The order (`orders.sales_order`) being priced for payment. Sent only by the order service when it confirms an order; when present the evaluation writes one `promotions.promotion_evaluation_trace` row for it. (decided 29 September, writers pass)"},"lines":{"type":"array","minItems":1,"items":{"type":"object","required":["lineId","variantId","quantity","unitPrice"],"properties":{"lineId":{"type":"string"},"variantId":{"type":"string","format":"uuid"},"performanceId":{"type":"string","format":"uuid"},"quantity":{"type":"integer","minimum":1},"unitPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money"}}}}}},
 "ExchangeRateDecimal": {"type":"string","x-ticvai-persistence-kind":"valueObject","x-ticvai-persistence-column":"numeric(18,6)","description":"**An exchange rate: a decimal string, never a float**, for the reason `Money.amount` is one — a JavaScript client must not round a rate in transit. **Six decimal places**, the precision `finance.FxRate.rate` asks for, and stored at that precision.\n","pattern":"^\\d+(\\.\\d{1,6})?$"},
-"GuestDevice": {"type":"object","x-ticvai-persistence":"marketing.guest_device","required":["id","subjectId","platform","status","registeredAt"],"properties":{"id":{"type":"string","format":"uuid"},"subjectId":{"type":"string","format":"uuid"},"platform":{"type":"string","enum":["ios","android","web"]},"tokenFingerprint":{"type":"string","description":"Hash of the token, not the token. The token itself is write-only — returning it would put a push credential in every response a support agent can read.\n"},"tokenRef":{"type":"string","writeOnly":true,"description":"**A vault reference to the push token**, written by the server from `registerGuestDevice.token` — the same pattern as `PaymentProvider.credentialRef`. Never the token and never returned; the sender resolves it at send time. Without it a registered device could not be sent to.\n"},"appVersion":{"type":"string","nullable":true},"osVersion":{"type":"string","nullable":true},"deviceModel":{"type":"string","nullable":true},"locale":{"type":"string","nullable":true},"status":{"type":"string","enum":["active","revoked","failed"]},"failureCount":{"type":"integer","description":"Consecutive delivery failures. Past the threshold the device is marked failed and stops being targeted — a dead token retried forever is wasted quota and a misleading delivery rate.\n"},"registeredAt":{"type":"string","format":"date-time"},"lastSeenAt":{"type":"string","format":"date-time","nullable":true},"revokedAt":{"type":"string","format":"date-time","nullable":true}}},
-"GuestDocument": {"type":"object","x-ticvai-persistence":"marketing.guest_document","description":"BL-133. **No store for guest photos, avatars, IDs or signed documents anywhere.**\nDeliberately separate from `assets`, which holds a tenant's media library. **A guest's passport scan is not a marketing asset** — it has a different retention clock, a different access rule and a different reason to exist, and putting it in the same store means one careless query returns both.\n","required":["id","subjectId","kind","storageRef","retainUntil"],"properties":{"id":{"readOnly":true,"type":"string","format":"uuid"},"subjectId":{"type":"string","format":"uuid"},"kind":{"type":"string","enum":["avatar","idDocument","visa","signedWaiver","medicalNote","accessibilityEvidence","photo","other"]},"storageRef":{"type":"string","description":"**The stored object's key in the guest-document store**, which is deliberately not `assets` (BL-133). No operation in this contract issues one yet: `assets` `createUpload` is staff-only and writes the media library, so the upload step for this store is still to be designed.\n"},"contentType":{"type":"string"},"consentPurposeId":{"type":"string","format":"uuid"},"retainUntil":{"type":"string","format":"date","description":"**Required, not optional.** A guest document with no deletion date is a guest document kept forever, and the retention question is the one CF-64 is open on.\n**Kept until its purpose ends, then for the period client counsel sets (decided 28 September, audit R149).** The caller sets `retainUntil` to the end of the purpose (the visit, the waiver's validity, the visa's expiry) plus that period. **The period per `kind` is an open value**: until counsel names it, it is zero, so the document is deleted when the purpose ends.\n"},"uploadedAt":{"readOnly":true,"type":"string","format":"date-time"},"uploadedByPrincipalId":{"readOnly":true,"type":"string","format":"uuid","nullable":true}}},
+"GuestPreferences": {"type":"object","x-ticvai-persistence":"marketing.guest_preference","description":"**What the guest likes, kept apart from what they permit** (consent) and from who they are (the profile). One row per subject. `dietary` and `accessibility` are here rather than as tags because BL-134 gives them their own consent purpose and retention.\n","properties":{"id":{"type":"string","format":"uuid","readOnly":true},"subjectId":{"type":"string","format":"uuid","readOnly":true},"seatingPreference":{"type":"string","nullable":true,"maxLength":200},"drinkPreferences":{"type":"array","items":{"type":"string"}},"dietary":{"type":"array","description":"Also written by `updateMyProfile`.","items":{"type":"string"}},"accessibility":{"type":"array","description":"Also written by `updateMyProfile`.","items":{"type":"string"}},"preferredChannel":{"allOf":[{"$ref":"#/components/schemas/MessageChannel"}],"x-ticvai-persisted":false,"description":"**Stored on the profile** (`GuestProfile.preferredChannel`) — carried here because the preference screen edits it beside the rest.\n"},"updatedAt":{"type":"string","format":"date-time","readOnly":true}}},
 "GuestProfile": {"x-ticvai-persistence":"marketing.guest_profile","type":"object","required":["subjectId","isActive"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true,"description":"**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"},"subjectId":{"type":"string","format":"uuid","description":"Opaque reference. Personal data lives in the separately erasable store, which is what makes erasure possible against an append-only ledger.\n"},"displayName":{"type":"string","nullable":true},"email":{"type":"string","nullable":true},"phone":{"type":"string","nullable":true},"preferredLanguage":{"type":"string","nullable":true},"preferredChannel":{"$ref":"#/components/schemas/MessageChannel"},"guestLinkId":{"type":"string","nullable":true,"description":"Present where the guest is linked across cells. Marketing acts locally."},"tags":{"type":"array","items":{"type":"string"}},"engagementScore":{"type":"integer","nullable":true,"minimum":0,"maximum":100,"description":"22.2.20 and 22.2.21. **`lifetimeValue` and `visitCount` existed, so value was a stored figure and engagement was not.** They are different questions: a guest who spent a lot once and a guest who visits monthly have the same LTV and need opposite treatment.\n**Recency, frequency and breadth, not spend** — spend is already `lifetimeValue`, and folding it in here would make one number twice.\n"},"engagementTier":{"type":"string","nullable":true,"enum":["new","active","occasional","lapsing","lapsed","dormant"],"description":"5.3.19. **Automatic classification, computed rather than assigned.** `lapsing` is the tier the whole field exists for — **a guest who has not been for a while and still might is the only one marketing can change**, and lumping them with `lapsed` wastes the window.\n"},"lifetimeValue":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"visitCount":{"type":"integer"},"lastVisitAt":{"type":"string","format":"date-time","nullable":true},"isActive":{"type":"boolean"},"mergedIntoSubjectId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"**Set on the absorbed profile by `mergeGuestProfiles` and `mergeGuests`**, which retain it as a redirect rather than deleting it. A read that lands here follows it; a second merge of a profile that has one is refused as `alreadyMerged`.\n"},"mergedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true}}},
-"GuestProfileDetail": {"x-ticvai-persistence":"marketing.guest_profile","allOf":[{"$ref":"#/components/schemas/GuestProfile"},{"type":"object","properties":{"id":{"type":"string","format":"uuid","readOnly":true,"description":"**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"},"consents":{"$ref":"#/components/schemas/ConsentState"},"loyalty":{"$ref":"#/components/schemas/LoyaltyPosition"},"openCaseCount":{"type":"integer"},"recentOrderIds":{"type":"array","items":{"type":"string"}},"membershipIds":{"type":"array","items":{"type":"string","format":"uuid"}},"notes":{"type":"string","nullable":true}}}]},
 "LocalisedRichText": {"x-ticvai-persistence":"none — jsonb column","type":"object","description":"Keyed by language code. Values are sanitised HTML.","additionalProperties":{"type":"string"}},
-"LoyaltyPosition": {"x-ticvai-persistence":"marketing.loyalty_position","type":"object","required":["subjectId","programmeId","pointsBalance","tierCode"],"properties":{"leaderboardNickname":{"type":"string","nullable":true,"maxLength":24,"description":"BL-173. **The name shown on a leaderboard, chosen by the guest.** Offered whenever they reach the board and changeable afterwards; `setLeaderboardNickname` is the only thing that writes it.\n**Null means the guest has not chosen one yet, and the board shows a generated `Player-4821` in its place** — never `pii.subject.display_name`, which would disclose silently on the day a guest first placed and is the case this field exists to prevent.\n**The generated name is computed at read time and not stored here.** Writing it would make *\"has this guest chosen a name\"* unanswerable, and that flag is what the prompt-on-reaching-the-board depends on.\n"},"subjectId":{"type":"string","format":"uuid"},"programmeId":{"type":"string","format":"uuid"},"pointsBalance":{"type":"integer"},"lifetimePoints":{"type":"integer"},"tierId":{"type":"string","format":"uuid","nullable":true,"description":"**The tier this row's `tierCode` and `tierName` are a copy of.** Added 20 September with `marketing.programme_tier`: the two strings were a cache of something that did not exist, and a cache with no source cannot be rebuilt or audited.\n"},"tierCode":{"type":"string"},"tierName":{"type":"string"},"pointsToNextTier":{"type":"integer","nullable":true},"nextExpiryPoints":{"type":"integer","nullable":true},"nextExpiryAt":{"type":"string","format":"date-time","nullable":true}}},
 "MessageChannel": {"type":"string","enum":["email","sms","whatsapp","push","inApp","post"]},
 "Money": {"type":"object","x-ticvai-persistence-kind":"valueObject","x-ticvai-persistence-column":"numeric(18,4)","description":"**On the wire this is three fields; in the database it is one column.**\n24 August. Every column typed `Money` was landing as `jsonb` — 129 of them, including `orders.shift.opening_float`, `inventory.purchase_order.total` and `promotions.voucher.balance`. **`orders.cash_movement.amount` was `numeric(18,4)` because somebody hand-typed that one**, and the inconsistency is what made it visible.\n**A jsonb price cannot be summed in SQL.** Every total, variance and reconciliation moves into application code — and a shift variance computed in .NET against a ledger computed in Postgres is two answers to one question. That is F13 month-end and F98 takings-to-ledger, both walked, both assuming the arithmetic is in the database.\n**`currency` and `scale` are not stored per row.** ADR-0018 makes them region-scoped and not overridable below, so they resolve from the scope walk — storing AED against nine million rows in a UAE region is nine million copies of a fact that cannot differ. A row that needed its own currency would be a row in the wrong region.\n**They stay on the wire** because a client reading a figure should not have to walk a hierarchy to know what it means.\n","required":["amount","currency","scale"],"properties":{"amount":{"type":"string","description":"Decimal string, never a float. Up to 4 decimal places. **Persisted as `numeric(18,4)`** — the string is a transport choice, so a JavaScript client cannot round a fare in transit.\n","pattern":"^-?\\d+(\\.\\d{1,4})?$"},"currency":{"type":"string","description":"**Resolved from the region, not stored on the row** (ADR-0018). OMR uses 3 decimal places and AED uses 2 — a venue on a different scale from its region is a ledger that cannot consolidate.\n","pattern":"^[A-Z]{3}$"},"scale":{"type":"integer","description":"Resolved from the region alongside `currency`.","minimum":0,"maximum":4}}},
-"Order": {"x-ticvai-persistence":"orders.sales_order + orders.order_line","type":"object","required":["id","venueId","scopePath","channel","status","currency","currencyScale","grossAmount","taxAmount","netAmount","lines","createdAt","recordedAt"],"properties":{"id":{"type":"string","format":"uuid","description":"The client UUIDv7 from `CreateOrderRequest.id`."},"orderNumber":{"type":"string","readOnly":true,"description":"The number a guest reads and a cashier types. **Server-assigned: the venue prefix and a sequence per venue**, for example `DXB1-000123` (decided 28 September, audit R152). A till holds a reserved range of the venue sequence, so an order taken offline gets its number on the till and keeps it through `syncOrders`. **Not gapless**: an unused reserved range leaves a gap, and that is allowed. Only tax invoices are gapless, per legal entity. The receipt carries this number.\n"},"channel":{"allOf":[{"$ref":"#/components/schemas/OrderChannel"}],"description":"Where it came from. Drives revenue attribution, promotion eligibility and the self-service adoption figures the operator will ask for within a month of launch.\n"},"venueId":{"type":"string","format":"uuid"},"scopePath":{"type":"string"},"status":{"$ref":"#/components/schemas/OrderStatus"},"currency":{"type":"string","pattern":"^[A-Z]{3}$","x-ticvai-persisted":false,"description":"**Resolved from the region, not stored** (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and cannot be anything else. **Kept on the wire , removed from the table** — a client should not walk a hierarchy to read a figure, and the  database should not hold nine million copies of AED. Four tables genuinely differ from their\n region and keep a stored currency: `orders.payment.tender_currency`, `inventory.supplier`, \n`ledger.account`, `control.partner_agreement`.\n"},"currencyScale":{"type":"integer","minimum":0,"maximum":4,"x-ticvai-persisted":false,"description":"**Resolved from the region, not stored** (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and cannot be anything else — storing it per ro w is a copy of a fact that cannot differ. **Kept on the wire, removed from the table**: a cl ient reading a figure should not walk a hierarchy to know what it means, and the database sh ould not hold nine million copies of AED. Four tables genuinely differ from their region and\n keep a stored currency — `orders.payment.tender_currency`, `inventory.supplier`, `ledger.ac\ncount`, `control.partner_agreement`. **A guest paying USD at an AED venue is a real row; a w orkstation with its own currency is a misconfiguration.**\n"},"grossAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"taxAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"netAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"refundedAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"droppedPromotions":{"type":"array","readOnly":true,"x-ticvai-persisted":false,"description":"**Promotions left off this order at checkout because their budget cap would have been exceeded** (decided 28 September, audit R101 (8)). Empty when none was dropped. Returned by `checkoutCart` and `createOrder`, not stored.\n","items":{"type":"object","required":["promotionId"],"properties":{"promotionId":{"type":"string","format":"uuid"},"name":{"type":"string"},"reason":{"type":"string","enum":["budgetCapReached"]}}}},"totalPriceVariance":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"description":"Sum across lines. Zero on a normal order."},"lines":{"type":"array","items":{"$ref":"#/components/schemas/OrderLine"}},"payments":{"type":"array","items":{"$ref":"#/components/schemas/Payment"}},"principalId":{"type":"string","format":"uuid"},"workstationId":{"type":"string","format":"uuid"},"shiftId":{"type":"string","format":"uuid","nullable":true},"subjectId":{"type":"string","format":"uuid","nullable":true},"holdLabel":{"type":"string","maxLength":60,"nullable":true,"readOnly":true,"description":"The `label` a cashier gave when parking it with `holdOrder` — how they find it again. Null on an order never held."},"heldUntil":{"type":"string","format":"date-time","nullable":true,"readOnly":true,"description":"When a held order expires and is voided (states/order.yaml), from `holdOrder`'s `holdUntil`. Null on an order not currently held."},"createdAt":{"type":"string","format":"date-time"},"recordedAt":{"type":"string","format":"date-time"},"syncedAt":{"type":"string","format":"date-time","nullable":true}}},
+"Order": {"x-ticvai-persistence":"orders.sales_order + orders.order_line","type":"object","required":["id","venueId","scopePath","channel","status","currency","currencyScale","grossAmount","taxAmount","netAmount","lines","createdAt","recordedAt"],"properties":{"id":{"type":"string","format":"uuid","description":"The client UUIDv7 from `CreateOrderRequest.id`."},"orderNumber":{"type":"string","readOnly":true,"description":"The number a guest reads and a cashier types. **Server-assigned: the venue prefix and a sequence per venue**, for example `DXB1-000123` (decided 28 September, audit R152). A till holds a reserved range of the venue sequence, so an order taken offline gets its number on the till and keeps it through `syncOrders`. **Not gapless**: an unused reserved range leaves a gap, and that is allowed. Only tax invoices are gapless, per legal entity. The receipt carries this number.\n"},"channel":{"allOf":[{"$ref":"#/components/schemas/OrderChannel"}],"description":"Where it came from. Drives revenue attribution, promotion eligibility and the self-service adoption figures the operator will ask for within a month of launch.\n"},"venueId":{"type":"string","format":"uuid"},"scopePath":{"type":"string"},"status":{"$ref":"#/components/schemas/OrderStatus"},"currency":{"type":"string","pattern":"^[A-Z]{3}$","x-ticvai-persisted":false,"description":"**Resolved from the region, not stored** (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and cannot be anything else. **Kept on the wire , removed from the table** — a client should not walk a hierarchy to read a figure, and the  database should not hold nine million copies of AED. Four tables genuinely differ from their\n region and keep a stored currency: `orders.payment.tender_currency`, `inventory.supplier`, \n`ledger.account`, `control.partner_agreement`.\n"},"currencyScale":{"type":"integer","minimum":0,"maximum":4,"x-ticvai-persisted":false,"description":"**Resolved from the region, not stored** (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and cannot be anything else — storing it per ro w is a copy of a fact that cannot differ. **Kept on the wire, removed from the table**: a cl ient reading a figure should not walk a hierarchy to know what it means, and the database sh ould not hold nine million copies of AED. Four tables genuinely differ from their region and\n keep a stored currency — `orders.payment.tender_currency`, `inventory.supplier`, `ledger.ac\ncount`, `control.partner_agreement`. **A guest paying USD at an AED venue is a real row; a w orkstation with its own currency is a misconfiguration.**\n"},"grossAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"taxAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"netAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"refundedAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"chargeCurrency":{"type":"string","pattern":"^[A-Z]{3}$","nullable":true,"readOnly":true,"description":"**The currency the guest selected and is charged in** (CHG-FIN-001, 2 October 2026). Null or equal to `currency` for a sale in the base currency. Everything else on the order, and every ledger posting, stays in the base currency `currency`."},"chargeFxRate":{"allOf":[{"$ref":"#/components/schemas/ExchangeRateDecimal"}],"nullable":true,"readOnly":true,"description":"Units of `chargeCurrency` per one unit of the base currency, from the region's `tender` rate in force at checkout (`finance.FxRate`), stored on the order so the payment, the receipt, the tax invoice and any refund use the same rate (CHG-FIN-001)."},"chargeFxRateId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"The `finance.FxRate` row the rate was taken from, for audit."},"chargeTotal":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"readOnly":true,"description":"`grossAmount` converted at `chargeFxRate` and rounded to the charge currency's scale: what the guest pays and what the payment request to the provider asks for (CHG-FIN-001)."},"chargeRateLockedUntil":{"type":"string","format":"date-time","nullable":true,"readOnly":true,"description":"The quote holds until then (the cart lease). After it, the next payment attempt re-quotes at the rate then in force and the guest confirms the new amount (CHG-FIN-001)."},"droppedPromotions":{"type":"array","readOnly":true,"x-ticvai-persisted":false,"description":"**Promotions left off this order at checkout because their budget cap would have been exceeded** (decided 28 September, audit R101 (8)). Empty when none was dropped. Returned by `checkoutCart` and `createOrder`, not stored.\n","items":{"type":"object","required":["promotionId"],"properties":{"promotionId":{"type":"string","format":"uuid"},"name":{"type":"string"},"reason":{"type":"string","enum":["budgetCapReached"]}}}},"totalPriceVariance":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"description":"Sum across lines. Zero on a normal order."},"lines":{"type":"array","items":{"$ref":"#/components/schemas/OrderLine"}},"payments":{"type":"array","items":{"$ref":"#/components/schemas/Payment"}},"principalId":{"type":"string","format":"uuid"},"workstationId":{"type":"string","format":"uuid"},"shiftId":{"type":"string","format":"uuid","nullable":true},"subjectId":{"type":"string","format":"uuid","nullable":true},"holdLabel":{"type":"string","maxLength":60,"nullable":true,"readOnly":true,"description":"The `label` a cashier gave when parking it with `holdOrder` — how they find it again. Null on an order never held."},"heldUntil":{"type":"string","format":"date-time","nullable":true,"readOnly":true,"description":"When a held order expires and is voided (states/order.yaml), from `holdOrder`'s `holdUntil`. Null on an order not currently held."},"createdAt":{"type":"string","format":"date-time"},"recordedAt":{"type":"string","format":"date-time"},"syncedAt":{"type":"string","format":"date-time","nullable":true}}},
 "OrderChannel": {"type":"string","description":"Where the order originated. Added when guest self-ordering was contracted — an order a guest placed on their own phone is commercially and operationally different from one a cashier typed, and reporting that cannot separate them cannot answer whether self-ordering is working.\n","enum":["pos","kiosk","guestApp","guestWeb","callCentre","partner","api","backOffice"]},
 "OrderLine": {"x-ticvai-persistence":"orders.order_line + orders.order_line_eligibility + orders.order_line_discount","x-ticvai-retired-columns":["promotion_id","name","reason"],"allOf":[{"$ref":"#/components/schemas/CreateOrderLine"},{"type":"object","required":["serverUnitPrice","taxAmount","netAmount","grossAmount"],"properties":{"serverUnitPrice":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"description":"What the server computed on ingest."},"priceVariance":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"description":"Server minus quoted. Non-zero means the quoted price was honoured and the difference posted to the variance account.\n"},"taxAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"netAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"grossAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"entitlementIds":{"type":"array","description":"The entitlements this line issued. **These are the ticket ids** — `transferOrderTickets.ticketIds` and `reprintOrder.reissuedTicketIds` take and return them.","items":{"type":"string","format":"uuid"}},"crossRegionRightIds":{"type":"array","items":{"type":"string"},"description":"Redemption rights propagated to other cells for this line."},"reprintCount":{"type":"integer","minimum":0,"default":0,"readOnly":true,"description":"How many times this line's tickets were reprinted or resent. `reprintOrder` increments it; repeated reprints are the signal worth surfacing."},"venueId":{"type":"string","format":"uuid","readOnly":true,"description":"The order's venue, copied onto the line (ADR-0044's own example; system-design review SD-008, 29 September) so a line is scoped and partitionable without its order."},"discounts":{"type":"array","readOnly":true,"description":"**The discounts applied to this line, one row each** (system-design review SD-008, 29 September). Until then a discount object was flattened into the line as `promotion_id NOT NULL`, so a line with no promotion could not be inserted. A line with no discount has none.","items":{"$ref":"#/components/schemas/OrderLineDiscount"}}}}]},
 "OrderLineAttributes": {"type":"object","nullable":true,"additionalProperties":true,"x-ticvai-persistence":"none — embedded as attributes (jsonb) on orders.cart_line and orders.order_line","description":"Open attributes of a line, kept from the cart to the order line. **`transport` is the one with a defined shape** (decided 29 September, rev 3 REV3-21); other keys are free.\n","properties":{"transport":{"$ref":"#/components/schemas/TransportLineAttributes"}}},
 "OrderLineDiscount": {"type":"object","description":"One discount applied to one order line (SD-008). Rows of `orders.order_line_discount`.","required":["id","amount","source"],"properties":{"id":{"type":"string","format":"uuid"},"promotionId":{"type":"string","format":"uuid","nullable":true,"x-ticvai-references":"promotions.promotion","description":"The promotion that gave it. Null for a manual discount."},"source":{"type":"string","enum":["promotion","promoCode","manual","bundle","member"]},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"reason":{"type":"string","maxLength":200,"nullable":true,"description":"A cashier's reason for a manual discount."}}},
 "OrderStatus": {"type":"string","enum":["pending","held","paid","partiallyPaid","completed","voided","refunded","partiallyRefunded","failed"],"description":"`held` is a parked sale — the cashier freed the till and the guest will return. It holds no inventory and expires, because a till that accumulates parked sales across a shift cannot be closed.\n"},
 "Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}},
-"Payment": {"x-ticvai-persistence":"orders.payment","type":"object","required":["id","orderId","tender","amount","status","recordedAt"],"properties":{"id":{"type":"string","format":"uuid"},"orderId":{"type":"string","format":"uuid"},"tender":{"$ref":"#/components/schemas/TenderKind"},"tenderCurrency":{"type":"string","pattern":"^[A-Z]{3}$","description":"4.6.11. **What the guest actually handed over**, which is not always what the venue books. A tourist paying USD cash at a till is a foreign tender; the sale is still recorded in base currency.\nEqual to the base currency for almost every payment. **Present on all of them so the foreign-tender report has a source** — `getForeignTenderReport` promised *what was taken in which currency* and nothing recorded it until 18 August.\n"},"tenderAmount":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"description":"The amount in `tenderCurrency`, at that currency's own scale."},"fxRate":{"allOf":[{"$ref":"#/components/schemas/ExchangeRateDecimal"}],"nullable":true,"description":"The rate applied, **stored on the payment rather than looked up later** (CF-37). A payment reconciled next month is reconciled at the rate of the day it was taken.\n"},"fxRateSource":{"type":"string","nullable":true,"enum":["manual","feed","cardScheme"],"description":"4.2.8. Manual or fed on a schedule. **`cardScheme` is where the terminal did the conversion and told us** — dynamic currency conversion, the scheme's rate rather than ours.\n"},"changeCurrency":{"type":"string","pattern":"^[A-Z]{3}$","nullable":true,"description":"4.6.11 is deliberately asymmetric: **accept foreign currency, refund in local.** A till giving change in five currencies needs five floats and five counts, and the variance becomes unattributable.\n"},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"changeAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"status":{"type":"string","enum":["authorised","captured","pendingConfirmation","declined","failed","voided","refunded"]},"providerName":{"type":"string","nullable":true},"providerReference":{"type":"string","nullable":true,"description":"The provider's own id for the charge (Stripe PaymentIntent, NI order reference). What `payments.receivePaymentProviderWebhook` matches an incoming event on (SD-034)."},"providerIdempotencyKey":{"type":"string","nullable":true,"readOnly":true,"description":"The idempotency key sent to the provider, which is this payment's `id` (SD-034, 29 September). A retried provider call cannot charge twice."},"terminalId":{"type":"string","format":"uuid","nullable":true,"description":"The card terminal a till payment ran on (ECR flow, SD-034)."},"nextAction":{"type":"object","nullable":true,"x-ticvai-persisted":false,"description":"**What the caller does while the payment is `pendingConfirmation`** (SD-034, 29 September). `redirect`: send the browser to `url` (3-D Secure challenge or hosted page); the provider returns the guest to `returnUrl` and the result arrives by webhook. `terminal`: the card terminal has been instructed; wait for its result. Null once the payment has an outcome.","properties":{"kind":{"type":"string","enum":["redirect","terminal"]},"url":{"type":"string","format":"uri","nullable":true},"expiresAt":{"type":"string","format":"date-time","nullable":true}}},"lastInquiryAt":{"type":"string","format":"date-time","nullable":true},"recordedAt":{"type":"string","format":"date-time"},"syncedAt":{"type":"string","format":"date-time","nullable":true}}},
+"Payment": {"x-ticvai-persistence":"orders.payment","type":"object","required":["id","orderId","tender","amount","status","recordedAt"],"properties":{"id":{"type":"string","format":"uuid"},"orderId":{"type":"string","format":"uuid"},"tender":{"$ref":"#/components/schemas/TenderKind"},"tenderCurrency":{"type":"string","pattern":"^[A-Z]{3}$","description":"4.6.11. **What the guest actually handed over**, which is not always what the venue books. A tourist paying USD cash at a till is a foreign tender; the sale is still recorded in base currency.\nEqual to the base currency for almost every payment. **Present on all of them so the foreign-tender report has a source** — `getForeignTenderReport` promised *what was taken in which currency* and nothing recorded it until 18 August.\n"},"tenderAmount":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"description":"The amount in `tenderCurrency`, at that currency's own scale."},"fxRate":{"allOf":[{"$ref":"#/components/schemas/ExchangeRateDecimal"}],"nullable":true,"description":"The rate applied, **stored on the payment rather than looked up later** (CF-37). A payment reconciled next month is reconciled at the rate of the day it was taken.\n"},"fxRateSource":{"type":"string","nullable":true,"enum":["manual","feed","cardScheme"],"description":"4.2.8. Manual or fed on a schedule. **`cardScheme` is where the terminal did the conversion and told us** — dynamic currency conversion, the scheme's rate rather than ours.\n"},"changeCurrency":{"type":"string","pattern":"^[A-Z]{3}$","nullable":true,"description":"4.6.11 is deliberately asymmetric: **accept foreign currency, refund in local.** A till giving change in five currencies needs five floats and five counts, and the variance becomes unattributable.\n**Cash at a till only** (CHG-FIN-001, 2 October 2026). A card or wallet payment the guest made in a currency they selected is refunded in that currency (`Refund.tenderCurrency`).\n"},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"changeAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"status":{"type":"string","enum":["authorised","captured","pendingConfirmation","declined","failed","voided","refunded"]},"providerName":{"type":"string","nullable":true},"providerReference":{"type":"string","nullable":true,"description":"The provider's own id for the charge (Stripe PaymentIntent, NI order reference). What `payments.receivePaymentProviderWebhook` matches an incoming event on (SD-034)."},"providerIdempotencyKey":{"type":"string","nullable":true,"readOnly":true,"description":"The idempotency key sent to the provider, which is this payment's `id` (SD-034, 29 September). A retried provider call cannot charge twice."},"terminalId":{"type":"string","format":"uuid","nullable":true,"description":"The card terminal a till payment ran on (ECR flow, SD-034)."},"nextAction":{"type":"object","nullable":true,"x-ticvai-persisted":false,"description":"**What the caller does while the payment is `pendingConfirmation`** (SD-034, 29 September). `redirect`: send the browser to `url` (3-D Secure challenge or hosted page); the provider returns the guest to `returnUrl` and the result arrives by webhook. `terminal`: the card terminal has been instructed; wait for its result. Null once the payment has an outcome.","properties":{"kind":{"type":"string","enum":["redirect","terminal"]},"url":{"type":"string","format":"uri","nullable":true},"expiresAt":{"type":"string","format":"date-time","nullable":true}}},"lastInquiryAt":{"type":"string","format":"date-time","nullable":true},"recordedAt":{"type":"string","format":"date-time"},"syncedAt":{"type":"string","format":"date-time","nullable":true}}},
 "PaymentLinkView": {"type":"object","x-ticvai-persistence":"none — projection of orders.payment_link for its holder","description":"What an anonymous holder of a payment link is shown about the link itself.","required":["status","expiresAt"],"properties":{"status":{"type":"string","enum":["issued","viewed","paid","expired","cancelled","superseded"]},"expiresAt":{"type":"string","format":"date-time"},"releaseHoldOnExpiry":{"type":"boolean"}}},
 "Performance": {"x-ticvai-persistence":"catalogue.performance","type":"object","required":["id","eventId","startsAt","endsAt","status"],"properties":{"id":{"type":"string","format":"uuid"},"eventId":{"type":"string","format":"uuid"},"startsAt":{"type":"string","format":"date-time"},"endsAt":{"type":"string","format":"date-time"},"approvalRequestId":{"type":"string","format":"uuid","nullable":true,"description":"BL-048. **The approval chain and the occurrence lifecycle sat on different entities**, so neither was complete: `states/performance.yaml` models scheduled, onSale, soldOut, suspended, cancelled and completed properly, and nothing said which of those transitions somebody had to sign.\n**Set on the transition that needs it, not on the performance.** Publishing a performance is routine; cancelling one that has sold is the act somebody signs — and binding approval to the whole entity would have required a signature to reschedule a wet Tuesday.\n"},"requiresApprovalToCancel":{"type":"boolean","default":true,"description":"**Cancelling a sold performance is the one transition that needs a name against it.** `assessProductChange` already answers how many tickets are affected; this decides who has to look at that number before the button works.\n"},"status":{"type":"string","enum":["scheduled","onSale","soldOut","suspended","cancelled","completed"]},"admissionRulesId":{"type":"string","format":"uuid","nullable":true},"seatMapId":{"type":"string","format":"uuid","nullable":true},"language":{"type":"string","nullable":true,"maxLength":35,"pattern":"^[A-Za-z]{2,3}(-[A-Za-z0-9]{1,8})*$","description":"The language the performance is given in, as a BCP 47 tag (`en`, `ar`, `fr`, `de`, `zh`, `ru`, `ar-AE`). **A guided tour at 10:00 in French and one at 10:00 in Arabic are two performances**, so a guest who picks a language sees only the tours in it (`listPerformances` `language`). Null when the performance is not language-specific (decided 29 September, rev 3 REV3-17).\n"},"format":{"type":"string","nullable":true,"maxLength":40,"description":"How it is presented, free text the venue chooses, e.g. `2D`, `3D`, `IMAX`, `subtitled`. A cinema screening shows language and format together. Null when it does not apply (decided 29 September, rev 3 REV3-17).\n"}}},
 "PolicyKind": {"type":"string","enum":["privacy","termsAndConditions","refund","cookie","accessibility"]},
 "PromotionEvaluation": {"x-ticvai-persistence":"none — computed","type":"object","required":["totalDiscount","lines","applied","rejected"],"properties":{"totalDiscount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"lines":{"type":"array","items":{"type":"object","required":["lineId","originalPrice","discountedPrice","discount"],"properties":{"lineId":{"type":"string"},"originalPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"discountedPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"discount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"appliedPromotionIds":{"type":"array","items":{"type":"string","format":"uuid"}}}}},"applied":{"type":"array","items":{"type":"object","required":["promotionId","promotionCode","discount"],"properties":{"promotionId":{"type":"string","format":"uuid"},"promotionCode":{"type":"string"},"promotionName":{"type":"string"},"discount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"couponCode":{"type":"string","nullable":true}}}},"rejected":{"type":"array","description":"Promotions that matched the products but did not apply, with the reason. This is what a cashier reads to a guest who expected a discount.\n","items":{"type":"object","required":["promotionCode","reason"],"properties":{"promotionCode":{"type":"string"},"promotionName":{"type":"string"},"reason":{"type":"string","enum":["conditionsNotMet","supersededByBetterOffer","exclusivePromotionApplied","redemptionLimitReached","budgetExhausted","outsideValidPeriod","wrongChannel","membershipRequired","couponRequired"]},"detail":{"type":"string"}}}}}},
 "PublishedPolicy": {"x-ticvai-persistence":"none — a public projection of whitelabel.policy","type":"object","x-ticvai-agreed":"2 October: decided by Chinmay, fix before Block A starts (GFIX-2)","description":"The current version of one policy as a guest reads it (`listPublishedPolicies`). Who published it and the partition key stay on `Policy`.","required":["kind","version","body","effectiveFrom"],"properties":{"kind":{"$ref":"#/components/schemas/PolicyKind"},"title":{"type":"string"},"version":{"type":"string","description":"The version a consent records (a guest who consented to version 3 consented to version 3)."},"body":{"$ref":"#/components/schemas/LocalisedRichText"},"effectiveFrom":{"type":"string","format":"date"},"requiresReconsent":{"type":"boolean","description":"True when guests who consented to an earlier version are asked again on next launch."}}},
 "RecordConsentAnswersRequest": {"type":"object","x-ticvai-persistence":"none — request only","required":["cartId","answers","source","answeredAt"],"properties":{"cartId":{"type":"string","format":"uuid","description":"The cart the answers are given for. `checkoutCart` binds them to its order."},"answers":{"type":"array","minItems":1,"maxItems":200,"items":{"type":"object","required":["questionId","questionVersion","answer"],"properties":{"questionId":{"type":"string","format":"uuid"},"questionVersion":{"type":"integer","minimum":1,"description":"The version the guest was shown, from `Cart.consentQuestions`."},"answer":{"type":"string","enum":["yes","no"]},"cartLineId":{"type":"string","format":"uuid","nullable":true,"description":"For a `perPerson` question, the line the person is on."},"personIndex":{"type":"integer","minimum":0,"nullable":true,"description":"For a `perPerson` question, the person's row in that line's `eligibilityDeclaration`, counting from 0."},"personName":{"type":"string","maxLength":120,"nullable":true},"personSubjectId":{"type":"string","format":"uuid","nullable":true,"description":"Where the person is a known guest, such as the booker or a family member."}}}},"source":{"$ref":"#/components/schemas/ConsentSource"},"answeredAt":{"type":"string","format":"date-time"}}},
-"RecordConsentRequest": {"x-ticvai-persistence":"none — request only","type":"object","required":["purpose","decision","noticeVersion","source","recordedAt"],"properties":{"purpose":{"$ref":"#/components/schemas/ConsentPurpose"},"decision":{"$ref":"#/components/schemas/ConsentDecision"},"channels":{"type":"array","description":"Omit to apply to every channel the purpose covers.","items":{"$ref":"#/components/schemas/MessageChannel"}},"noticeVersion":{"type":"string"},"source":{"$ref":"#/components/schemas/ConsentSource"},"recordedAt":{"type":"string","format":"date-time"}}},
 "ResourceHold": {"x-ticvai-persistence":"resources.resource_hold","type":"object","description":"**A guest's pick on the map, held while they pay** (decided 29 September, rev 3 REV3-15). The resource counterpart of `seating.SeatHold`: named resources, short-lived, converted by the order rather than released. States in `states/resource-hold.yaml`.\n","required":["id","mapId","resourceIds","from","to","status","createdAt","expiresAt"],"properties":{"id":{"type":"string","format":"uuid"},"mapId":{"type":"string","format":"uuid"},"resourceIds":{"type":"array","items":{"type":"string","format":"uuid"}},"from":{"type":"string","format":"date-time"},"to":{"type":"string","format":"date-time"},"partySize":{"type":"integer","nullable":true},"status":{"type":"string","enum":["held","converted","released","expired"]},"totalPrice":{"x-ticvai-column":"gross_amount","$ref":"../shared/common.yaml#/components/schemas/Money"},"heldByPrincipalId":{"type":"string","format":"uuid","nullable":true},"subjectId":{"type":"string","format":"uuid","nullable":true},"orderId":{"type":"string","format":"uuid","nullable":true,"description":"Set when the order converts it."},"extensionCount":{"type":"integer","default":0},"createdAt":{"type":"string","format":"date-time"},"expiresAt":{"type":"string","format":"date-time"},"scopePath":{"type":"string","description":"The partition key (ADR-0005), written at `venue` scope."}}},
 "SalesChannel": {"type":"string","description":"**Where a sale came from.** Restored 24 August — this was lost in the `Money` rewrite and nine references across four contracts were pointing at nothing.\n**Not interchangeable with the local `Channel` enums.** `catalogue.Channel` and `orders.Channel` are byte-identical duplicates of each other listing `pos, kiosk, web, mobile, b2b, ota, callCentre`; `orders.OrderChannel` lists `guestApp, guestWeb, partner, api, backOffice` on top. **Pointing the nine at a local enum would silently narrow them** — and the duplication between the two `Channel` enums is the reason a shared one existed in the first place.\n**This is the reporting dimension**: attribution, promotion eligibility and settlement all group by it, which is why it has to mean the same thing in `orders`, `catalogue`, `subscription` and `marketing-crm` rather than four things that nearly line up.\n","enum":["pos","kiosk","guestApp","guestWeb","callCentre","partner","api","backOffice","b2b","ota"]},
-"TenderKind": {"type":"string","description":"`wallet` is a **digital wallet** (Apple Pay, Google Pay and the like, taken through the gateway), the value the guest channels accept beside `card` (decided 28 September, audit R080 (a)). **The stored-value TICVAI wallet is a separate tender**: it is spent through `authoriseStoredValue` and `captureStoredValue` (`StoredValueKind` `wallet`), never as this value, so the client can see which of the two the decision meant.\n","enum":["cash","card","wallet","voucher","bankTransfer","hotelCharge","installment","giftCard","complimentary"]},
-"Wishlist": {"type":"object","required":["subjectId","items"],"x-ticvai-persistence":"none — wrapper. The items are the table, keyed by subject","properties":{"subjectId":{"type":"string","format":"uuid"},"items":{"type":"array","x-ticvai-persistence":"marketing.wishlist_item","items":{"type":"object","required":["id","variantId","addedAt","isAvailable"],"properties":{"id":{"type":"string","format":"uuid"},"variantId":{"type":"string","format":"uuid"},"productName":{"type":"string"},"performanceId":{"type":"string","format":"uuid","nullable":true},"performanceStartsAt":{"type":"string","format":"date-time","nullable":true},"price":{"x-ticvai-column":"list_price","$ref":"../shared/common.yaml#/components/schemas/Money","description":"The variant's current list price when the wishlist is read. Stored as `list_price` (naming-and-style 5.1 bans a bare `price` column); the wire keeps `price`."},"imageAssetRef":{"type":"string","nullable":true},"isAvailable":{"type":"boolean","description":"False where the product has been withdrawn or the performance has passed. Returned rather than dropped — a guest who saved something and finds it silently gone assumes the feature is broken.\n"},"unavailableReason":{"type":"string","nullable":true},"note":{"type":"string","nullable":true},"addedAt":{"type":"string","format":"date-time"}}}}}}
+"TenderKind": {"type":"string","description":"`wallet` is a **digital wallet** (Apple Pay, Google Pay and the like, taken through the gateway), the value the guest channels accept beside `card` (decided 28 September, audit R080 (a)). **The stored-value TICVAI wallet is a separate tender**: it is spent through `authoriseStoredValue` and `captureStoredValue` (`StoredValueKind` `wallet`), never as this value, so the client can see which of the two the decision meant.\n","enum":["cash","card","wallet","voucher","bankTransfer","hotelCharge","installment","giftCard","complimentary"]}
 }
 ```

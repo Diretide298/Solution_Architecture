@@ -25,17 +25,18 @@ steps:
   operations:
   - login
   - listSsoProviders
-  - listMfaMethods
+  - startSsoAuthorization
+  - verifyMfaChallenge
   outcome: '**SSO where the venue uses it, MFA where the role demands it.** A gate steward and a finance
     controller do not need the same ceremony.'
 - step: 2
   screen: EMP-002
   action: They pick a venue and a role for the shift.
   operations:
-  - listRoles
   - getCurrentSession
   outcome: '**One person, several roles, one at a time** (ADR-0002). A supervisor covering a lane takes
     the steward role and loses the supervisor one until they change back.'
+  note: '**Repointed 2 October (CHG-WIR-021).** listRoles needs ROLE_MANAGE, which a steward never holds; the roles to choose from come from the login response (availableRoles).'
 - step: 3
   screen: EMP-048
   action: The opening checklist is worked.
@@ -45,7 +46,7 @@ steps:
   screen: EMP-003
   action: They go on duty.
   operations:
-  - getCurrentShift
+  - getWorkstationShift
   - listIncidents
   outcome: '**Open incidents surface before anything else.** A steward starting a shift needs yesterday’s
     unresolved problem before today’s first task.'

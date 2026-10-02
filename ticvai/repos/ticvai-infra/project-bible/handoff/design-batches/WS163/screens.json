@@ -970,6 +970,12 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Resource_Management_Configuration_Reference.pdf, page 142"
+   },
+   {
+    "operation": "raiseMyCase",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-005): raiseMyCase is a guest-only operation for guest cases; an employee request is raiseResourceRequest (design-notes correction customer-marketing BO-938).",
+    "source": "contracts/satellite/marketing-crm.yaml#raiseMyCase | contracts/satellite/resources.yaml#raiseResourceRequest"
    }
   ],
   "layout": {
@@ -1043,13 +1049,6 @@
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
-   {
-    "operationId": "raiseMyCase",
-    "contract": "marketing-crm",
-    "purpose": "Raise a request",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026"
-   },
    {
     "operationId": "raiseResourceRequest",
     "contract": "resources",
@@ -1314,7 +1313,7 @@
   "states": {
    "loading": "The mobile approval list.",
    "error": "Could not load. Names which read failed and leaves the mobile approval untouched.",
-   "emptyFirstRun": "No mobile approval yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No mobile approval yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the mobile approval are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -1559,8 +1558,8 @@
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
-  "purpose": "Configure and monitor how Resource Management operates on mobile devices, particularly where connectivity is unreliable. Provide TICVAI with the executive and administrative control layer for the entire Resource Management ecosystem. Board 10 shall consolidate information from all previous boards to answer four fundamental questions: 1. Are our resources being used efficiently? 2. Are they generating the expected operational and financial value? 3. Are resource decisions compliant, controlled, and auditable? 4. What should management change to improve future performance?",
-  "purposeNote": "The Employee App can support configured resource operations during temporary connectivity loss and safely synchronize transactions when connectivity returns without compromising the authoritative resource state. Board 9 — Role-Based Mobile Experience Board 9 should not show every employee the same application. The mobile interface shall adapt based on role.",
+  "purpose": "Configure and monitor how Resource Management operates on mobile devices, particularly where connectivity is unreliable.",
+  "purposeNote": "The Employee App can support configured resource operations during temporary connectivity loss and safely synchronize transactions when connectivity returns without compromising the authoritative resource state. Board 9 — Role-Based Mobile Experience Board 9 should not show every employee the same application. The mobile interface shall adapt based on role. Purpose rewritten 2 October 2026 (CHG-WIR-003): The purpose carried the board 10 introduction (\"Provide TICVAI with the executive and administrative control layer ... Board 10 shall consolidate ...\") after the screen's own sentence.",
   "gaps": [
    {
     "operation": null,
@@ -1571,6 +1570,17 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Resource_Management_Configuration_Reference.pdf, page 146"
+   },
+   {
+    "operation": "getGameplaySyncStatus",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): getGameplaySyncStatus reports game readers' offline plays; the Employee App's handsets and pending resource actions are not game readers. No read of mobile resource sync exists (contract gap CHG-WIR-004) (design-notes correction venue-operations BO-942).",
+    "source": "contracts/satellite/games.yaml#getGameplaySyncStatus"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-004): No read of mobile resource-operation sync state per handset.",
+    "source": "contracts/satellite/games.yaml#getGameplaySyncStatus"
    }
   ],
   "layout": {
@@ -1579,13 +1589,7 @@
     {
      "name": "actionBar",
      "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Board 9 — Smart Mobile Home Principle",
-       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 146 §Operations Manager"
-      }
-     ]
+     "components": []
     },
     {
      "name": "contentBody",
@@ -1596,19 +1600,11 @@
   "states": {
    "loading": "The mobile operations offline list.",
    "error": "Could not load. Names which read failed and leaves the mobile operations offline untouched.",
-   "emptyFirstRun": "No mobile operations offline yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No mobile operations offline yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the mobile operations offline are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Not shown: nothing on this screen needs a permission of its own; the app's sign-in decides access."
   },
-  "apis": [
-   {
-    "operationId": "getGameplaySyncStatus",
-    "contract": "games",
-    "purpose": "Offline sync state",
-    "trigger": "onLoad",
-    "provenance": "board reading, 19 September 2026"
-   }
-  ],
+  "apis": [],
   "wireframe": {
    "status": "notStarted",
    "board": "wireframes/P08 Venue Management.dc.html#bo-942",

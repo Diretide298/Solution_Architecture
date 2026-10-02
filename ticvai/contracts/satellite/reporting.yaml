@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Reporting & Analytics
   version: 0.1.0
-  x-ticvai-screen-count: 46
+  x-ticvai-screen-count: 49
   x-ticvai-tier: satellite
   x-ticvai-module: 8 — Unified Operations Dashboard  ·  cross-cutting
   x-ticvai-requirements: 332
@@ -2058,6 +2058,7 @@ paths:
     get:
       operationId: getKpiValues
       x-ticvai-consumed-by:
+        - "P06 EMP-060 Reservation & Table Performance"
         - "P06 EMP-061 Retail Inventory Command Center"
         - "P08 BO-005 Queue Monitor"
         - "P08 BO-100 Venue Home"
@@ -2086,7 +2087,6 @@ paths:
         - "P16 ANL-017 Customer, Membership & Loyalty Pulse"
         - "P16 ANL-057 Forecasting & Predictive Analytics Studio"
         - "P16 ANL-063 KPI Targets, Thresholds & Scorecards"
-        - "P06 EMP-060 Reservation & Table Performance"
         - "P16 ANL-072 Finance Dashboard"
       summary: Current values, against target, with movement
       description: 'BI boards 1 and 10.3. **The scorecard read.** Value, target, variance, direction and
@@ -2214,6 +2214,9 @@ paths:
   /service-summary:
     get:
       operationId: getServiceSummary
+      x-ticvai-consumed-by:
+        - "P06 EMP-008 Shift summary"
+        - "P08 BO-104 Food & Beverage"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -2254,6 +2257,9 @@ paths:
   /analytics-governance-policy:
     get:
       operationId: getAnalyticsGovernancePolicy
+      x-ticvai-consumed-by:
+        - "P16 ANL-047 Report Access & Sharing Control"
+        - "P16 ANL-070 Analytics Governance, Security & Audit Center"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -2282,6 +2288,8 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setAnalyticsGovernancePolicy
+      x-ticvai-consumed-by:
+        - "P16 ANL-070 Analytics Governance, Security & Audit Center"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '2 October: Chinmay, workbook Q225 ("add a governance policy operation: masking, export,

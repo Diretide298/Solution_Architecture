@@ -409,6 +409,35 @@
   "requestBody": null,
   "responds": "Page"
  },
+ "listUpsellRules": {
+  "method": "GET",
+  "path": "/upsell-rules",
+  "contract": "promotions",
+  "summary": "List upsell and cross-sell rules",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "placement",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "listWorkstations": {
   "method": "GET",
   "path": "/workstations",
@@ -477,25 +506,6 @@
   "requestBody": null,
   "responds": "PriceCheck"
  },
- "requestSuggestion": {
-  "method": "POST",
-  "path": "/ai/suggestions",
-  "contract": "ai",
-  "summary": "Ask for an answer, however it is currently produced",
-  "permission": "AI_USE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Suggestion"
- },
  "runReport": {
   "method": "POST",
   "path": "/reports/{reportId}/run",
@@ -533,44 +543,6 @@
   ],
   "requestBody": null,
   "responds": "ProductCategory"
- },
- "setRolePermissions": {
-  "method": "PUT",
-  "path": "/roles/{roleId}/permissions",
-  "contract": "tenancy",
-  "summary": "What this role may do",
-  "permission": "ROLE_MANAGE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": null
- },
- "setVenueSettings": {
-  "method": "PUT",
-  "path": "/venues/{venueId}/settings",
-  "contract": "tenancy",
-  "summary": "Set support hours, quiet hours, segregated access and alerting",
-  "permission": "TENANT_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "VenueSettings",
-  "responds": "VenueSettings"
  },
  "updateDonationCampaign": {
   "method": "PATCH",

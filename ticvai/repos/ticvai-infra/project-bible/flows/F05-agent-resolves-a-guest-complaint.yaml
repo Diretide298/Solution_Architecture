@@ -13,14 +13,15 @@ platforms:
 offlineBehaviour: Case creation is offline-capable; resolution is not.
 trigger:
   description: A guest contacts support about an order.
-  entryScreen: SUP-004
+  entryScreen: SUP-005
 steps:
 - step: 1
-  screen: SUP-004
+  screen: SUP-005
   action: Picks up the case
   operations:
   - listCases
   outcome: Sees SLA state and priority, breached first
+  note: '**Repointed 2 October (CHG-WIR-005).** SUP-004 Conversation Queue lost its case toolset (it is about conversations); the case is picked up in the workspace that holds it.'
 - step: 2
   screen: SUP-005
   action: Reads the history and replies

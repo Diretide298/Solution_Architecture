@@ -41,11 +41,9 @@ modulesUsed:
   screens: 10
 servicesCalled:
 - service: FnbService
-  operationCalls: 37
+  operationCalls: 34
 - service: ReportingService
   operationCalls: 3
-- service: TenancyService
-  operationCalls: 1
 coverage:
   screens: 10
   inAFlow: 6
@@ -97,8 +95,6 @@ screens:
   wave: 2
   density: touchLarge
   operations:
-  - fireCourse
-  - holdCourse
   - listKitchenTickets
   - notifyServer
   - recallKitchenTicket
@@ -139,7 +135,6 @@ screens:
   - holdCourse
   - listKitchenTickets
   - prioritiseKitchenTicket
-  - setCourseRules
   - setKitchenTicketStatus
   states:
   - emptyFirstRun
@@ -203,7 +198,6 @@ screens:
   - listKitchenStations
   - listKitchenTickets
   - rebalanceStationLoad
-  - setKitchenStations
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -232,6 +226,7 @@ screens:
   - listKitchenTickets
   - markOrderCollected
   - printOrderLabel
+  - recordOrderHandover
   - setKitchenTicketStatus
   states:
   - emptyFirstRun
@@ -293,7 +288,6 @@ screens:
   - listKitchenTickets
   - logKitchenException
   - setItemAvailability
-  - setKitchenTicketStatus
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -322,9 +316,9 @@ screens:
   wave: 2
   density: touchLarge
   operations:
-  - prioritiseKitchenTicket
+  - getCourseRules
+  - getKitchenSla
   - setKitchenSla
-  - setVenueSettings
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -336,7 +330,6 @@ screens:
   - venueId<-session
   - stationId<-session
   - outletId<-session
-  - ticketId<-KIT-002
   goesTo:
   - KIT-001
   boardFrames:

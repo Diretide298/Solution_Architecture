@@ -18,25 +18,6 @@
   "requestBody": null,
   "responds": "Alert"
  },
- "completeProductionRun": {
-  "method": "POST",
-  "path": "/production-runs/{runId}/complete",
-  "contract": "fnb",
-  "summary": "Record what was actually made",
-  "permission": "PRODUCT_CONFIGURE",
-  "offlineCapable": true,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "ProductionRun"
- },
  "createInventoryItem": {
   "method": "POST",
   "path": "/inventory-items",
@@ -88,6 +69,19 @@
   "requestBody": null,
   "responds": "CountVariance"
  },
+ "getHaccpStatus": {
+  "method": "GET",
+  "path": "/food-safety/status",
+  "contract": "fnb",
+  "summary": "Where this venue stands, right now",
+  "permission": "INCIDENT_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": null
+ },
  "getKpiValues": {
   "method": "GET",
   "path": "/kpi-values",
@@ -132,10 +126,28 @@
     "name": "groupBy",
     "in": "query",
     "required": null
+   },
+   {
+    "name": "module",
+    "in": "query",
+    "required": null
    }
   ],
   "requestBody": null,
   "responds": "KpiValue"
+ },
+ "getMenu": {
+  "method": "GET",
+  "path": "/menus/{menuId}",
+  "contract": "fnb",
+  "summary": "Read a menu with sections and items",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "Menu"
  },
  "getProductionRun": {
   "method": "GET",
@@ -150,18 +162,47 @@
   "requestBody": null,
   "responds": "ProductionRun"
  },
- "getVenueSettings": {
+ "getWasteApprovalPolicy": {
   "method": "GET",
-  "path": "/venues/{venueId}/settings",
-  "contract": "tenancy",
-  "summary": "Operational settings for this venue",
-  "permission": "TENANT_VIEW",
-  "offlineCapable": true,
+  "path": "/waste-approval-policy",
+  "contract": "fnb",
+  "summary": "The venue's waste-approval policy",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [],
   "requestBody": null,
-  "responds": "VenueSettings"
+  "responds": "WasteApprovalPolicy"
+ },
+ "list86Events": {
+  "method": "GET",
+  "path": "/outlets/{outletId}/86-events",
+  "contract": "fnb",
+  "summary": "What came off the menu today, when, and for how long",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
  },
  "listAlerts": {
   "method": "GET",
@@ -202,79 +243,6 @@
   "requestBody": null,
   "responds": "Alert"
  },
- "listExpiringBatches": {
-  "method": "GET",
-  "path": "/stock-batches/expiring",
-  "contract": "inventory",
-  "summary": "What is about to go out of date",
-  "permission": "PRODUCT_VIEW",
-  "offlineCapable": true,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "withinDays",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- },
- "listInventoryItems": {
-  "method": "GET",
-  "path": "/inventory-items",
-  "contract": "inventory",
-  "summary": "List inventory items",
-  "permission": "PRODUCT_VIEW",
-  "offlineCapable": true,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "venueId",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "categoryId",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "belowReorderPoint",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "search",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- },
  "listProductionRuns": {
   "method": "GET",
   "path": "/production-runs",
@@ -297,40 +265,6 @@
    },
    {
     "name": "from",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- },
- "listPurchaseOrders": {
-  "method": "GET",
-  "path": "/purchase-orders",
-  "contract": "inventory",
-  "summary": "List purchase orders",
-  "permission": "PROCUREMENT_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "status",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "supplierId",
     "in": "query",
     "required": null
    },
@@ -382,13 +316,13 @@
   "requestBody": null,
   "responds": "Page"
  },
- "planProductionRun": {
-  "method": "POST",
-  "path": "/production-runs",
+ "listTemperatureCheckpoints": {
+  "method": "GET",
+  "path": "/food-safety/checkpoints",
   "contract": "fnb",
-  "summary": "Plan a batch, for one outlet or several",
-  "permission": "PRODUCT_CONFIGURE",
-  "offlineCapable": false,
+  "summary": "The units that get read, and the range each must hold",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": true,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
@@ -396,10 +330,15 @@
     "name": null,
     "in": null,
     "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
-  "requestBody": "ProductionRun",
-  "responds": "ProductionRun"
+  "requestBody": null,
+  "responds": "Page"
  },
  "recordWaste": {
   "method": "POST",
@@ -463,6 +402,30 @@
   "requestBody": null,
   "responds": "MenuItem"
  },
+ "setMenuItemDailyCount": {
+  "method": "PUT",
+  "path": "/menu-items/{itemId}/daily-count",
+  "contract": "fnb",
+  "summary": "Set today's count for a dish",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "MenuItem"
+ },
  "setTemperatureCheckpoint": {
   "method": "PUT",
   "path": "/food-safety/checkpoints",
@@ -486,5 +449,29 @@
   ],
   "requestBody": "TemperatureCheckpoint",
   "responds": "TemperatureCheckpoint"
+ },
+ "setWasteApprovalPolicy": {
+  "method": "PUT",
+  "path": "/waste-approval-policy",
+  "contract": "fnb",
+  "summary": "Switch waste approval on or off, and set its bands",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "WasteApprovalPolicy",
+  "responds": "WasteApprovalPolicy"
  }
 }

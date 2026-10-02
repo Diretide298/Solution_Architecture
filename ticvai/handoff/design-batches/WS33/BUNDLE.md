@@ -1,6 +1,6 @@
 # WS33 — Order   Reservation Management board 3
 
-**10 screens · 21 operations · 25 schemas · 7 permissions**
+**10 screens · 21 operations · 26 schemas · 7 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -61,6 +61,45 @@ convincingly. It is never a caption.
   and its error; and, element by element, what is shown and in what format, what each action
   produces and where the user goes next. Draw exactly that.
 
+## The processes these screens belong to
+
+Written by the owner of each process (`handoff/design-notes/`). Read before any screen: it says how the process runs end to end and which words the screens must use.
+
+### Ticketing & Guest Commerce, as the venue and TICVAI configure and run it
+
+WHAT THE PROCESS IS. Everything a guest can buy is set up, priced, promoted and serviced here, on Venue Management (P08, the venue's own back office, served inside the venue's cell) and on the TICVAI Console (P09, TICVAI's control plane, outside every cell). End to end: (1) CATALOGUE. A product has one of twelve kinds (admission, timedAdmission, datedAdmission, openDated, seated, membership, bundle, fnb, retail, rental, addOn, giftCard). Its ticket types (adult, child, senior, resident...) are not typed one by one: they are generated from the product's attributes (components) and each value combination becomes a sellable ticket type with no extra setup (DI-164). What a ticket grants (validity, entries, re-entry, days of week, blackout dates, expiry anchor, fast track, transfer) lives on a reusable entitlement template, not on the product. Who may take part (age, height, supervision, certification) is the eligibility rule; what the guest must answer is the data mask and the consent questions; how the guest sees it is guestListing (bookable, infoOnly, hidden), display tags (at most six), media and the booking flow. Group, family and corporate products and every after-sales policy (reschedule, exchange, refund, cancellation, upgrade, transfer) are configured inside the one product configuration, never on separate screens (DI-465, DI-466). (2) LIFECYCLE AND PUBLICATION. A product moves draft, inReview, approved, live, withdrawn, archived. Approval and publication are two acts with two permissions (PRODUCT_APPROVE, PRODUCT_PUBLISH, R091); every product is authorised before it sells online or on site (DI-438). Approved is still not on a till: a till sells only what is in the signed catalogue release it pulled (publishBundle, ADR-0013), so a saved price is a back-office fact until the venue publishes to tills. Changing something that has sold is preceded by an impact check (assessProductChange: orders affected, entitlements issued, future performances, open carts); restoring a version creates a new version, and sold tickets keep the price and terms they were sold under (restoreProductVersion, DI-938, TRACKER Actions row 145). (3) PRICE. Prices live in price lists: per venue, per channel set, with validity dates and a priority, copied for the next season with an uplift (copyPriceList) and repriced in bulk only after a dry run (bulkChangePrices). Currency and decimal scale are never chosen on a form: they resolve from the venue's region (ADR-0008, ADR-0018; AED 2 places, OMR and BHD 3). When several rules apply, the configured hierarchy decides; there is no "lowest price wins" default (DI-595). Tax on the pre-discount price and three-decimal rounding are regional settings (DI-598). Dynamic rules always show their minimum and maximum price guardrails beside the trigger (getDynamicPriceRule). (4) PROMOTE AND BUNDLE. A promotion is a rule (automatic, or gated by a code) created in draft, made live only by Publish, which first analyses stacking; a …
+*(source: DI-164; DI-171; DI-438; DI-465; DI-466; DI-595; DI-598; DI-387; DI-039; DI-044; DI-474; DI-671; DI-987; DI-019; DI-080; ADR-0008; ADR-0013; ADR-0018; ADR-0019; ADR-0030; R091; R098; R101; R222; REV3-21; contracts/spine/catalogue.yaml#transitionProductLifecycle …)*
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Product | Anything sellable, of one of the twelve kinds. The record that carries names, channels, listing, media and policies. | Item (except on F&B and retail screens), SKU (for tickets), Offering | contracts/spine/catalogue.yaml#/components/schemas/ProductKind |
+| Ticket type | One sellable variant of an admission or event product (Adult, Child, Resident Adult), generated from the product's attributes. For retail and F&B the same record is labelled Variant. | Variant (on ticket screens), Sub-product, Rate (that is a price), Axis value | contracts/spine/catalogue.yaml#updateProductVariant / DI-164 / DI-437 |
+| Attribute | A dimension that generates ticket types (Guest category, Residency, Tier, Length). Each has values; adding a value adds ticket types. | Axis, Component (the client's word; use it only in help text), Option | contracts/spine/catalogue.yaml#setProductAttributes / DI-164 / DI-450 |
+| Entitlement | What a ticket lets the holder do (validity, entries, re-entry, days, blackout dates, expiry, fast track, transfer), defined once on an entitlement template and shared by several products. | Access rights, Ticket rules, Validity profile | contracts/spine/catalogue.yaml#createEntitlementTemplate / DI-171 / DI-451 |
+| Eligibility rule | Who may take part in or buy a product (age, height, supervision, waiver, certification). Distinct from a promotion's eligibility, which decides who gets a discount. | Restriction, Access rule (that is access control) | contracts/spine/catalogue.yaml#setProductEligibilityRule / DI-463 |
+| Price list | A set of prices for one venue and a set of channels, valid between two dates, with a priority. Several coexist (B2C, B2B, season). | Price book, Rate card, Tariff | contracts/spine/catalogue.yaml#createPriceList / DI-140 / DI-163 |
+| Price category | A standard rate type (Adult, Child, Member) reused across lists so venues do not invent "Adult Standard" and "Normal Adult". | Price band (that is a seat-category band), Fare type (transport) | contracts/spine/catalogue.yaml#setPriceCategoryRateType / … |
+| Price band | A priced band on a seat category (code, label, colour, amount, channel, from-date). | Price category, Zone price | contracts/satellite/seating.yaml#/components/schemas/SeatPriceBand |
+| Promotion | A rule that changes a price automatically or when a code is entered; draft until published; declares how it stacks. | Offer (except in guest copy), Deal, Discount rule | contracts/satellite/promotions.yaml#createPromotion / DI-173 / DI-174 |
+| Coupon code | A code issued from a coupon campaign that applies a promotion-style discount; one shared code or many single-use codes. | Voucher, Promo voucher | contracts/satellite/promotions.yaml#createCouponCampaign / DI-173 |
+| Voucher | A code that carries money (face value, balance), sold or issued; a liability until redeemed or expired. | Coupon, Credit note | contracts/satellite/promotions.yaml#listVoucherBatches / … |
+| Bundle | A product sold as one line whose price differs from the sum of its components, with a mandatory revenue allocation. "Package" is acceptable in guest copy. | Combo (that is an F&B meal deal), Catalogue bundle | contracts/satellite/promotions.yaml#createBundle / DI-220 / ADR-0019 |
+| Catalogue release | The signed snapshot of a venue's catalogue, prices, promotions and sale boards that tills, kiosks and devices pull. Its action label is "Publish to tills". | Bundle, Catalogue bundle, Sync, Deploy | contracts/spine/catalogue.yaml#publishBundle / … |
+| Approve / Publish / Save | Save keeps a draft; Approve records that it is authorised (PRODUCT_APPROVE); Publish makes it live for guests and channels (PRODUCT_PUBLISH). Three different buttons, never merged. | Submit, Go live, Activate (except CatalogueConfigStatus active), Deploy | R091 / contracts/spine/catalogue.yaml#transitionProductLifecycle / DI-438 |
+| Product states | Draft, In review, Approved, Live, Withdrawn, Archived (ProductLifecycleState), always as coloured badges with these exact labels. | Published (for a product), Pending, Inactive (for a product) | contracts/spine/catalogue.yaml#/components/schemas/ProductLifecycleState |
+| Channel | Where something is sold. Labels: pos Point of sale; kiosk Kiosk; web and guestWeb Website; mobile and guestApp App; b2b B2B partners; partner Partner; ota Travel agents (OTA); callCentre Call centre; api API; backOffice Back office. | Touchpoint, Outlet (an outlet is a business inside a venue), raw enum values | contracts/spine/catalogue.yaml#/components/schemas/Channel / … |
+| Refund | Money returned after settlement, wholly or for some lines, under the venue's refund policy. | Return (that is retail goods), Reversal, Void | contracts/spine/orders.yaml#createRefund / DI-252 |
+| Void | Cancelling a whole order before settlement, within the same shift, with a reason from the void list. After settlement it is a refund. | Cancel order, Delete | contracts/spine/orders.yaml#voidOrder / R222 |
+| Exchange / Reschedule | Exchange swaps lines for other products or dates and settles only the difference; Reschedule is the same product moved to another date or time. | Rebook, Date change (acceptable only in guest copy), Refund and resell | contracts/spine/orders.yaml#exchangeOrderLines / … |
+| Hold / Capture / Release | A deposit or stored-value amount is held, then partly or fully captured, and the rest released. A held deposit is not a payment. | Charge, Pre-auth (in staff copy), Block funds | contracts/spine/orders.yaml#authoriseStoredValue / … |
+| Wallet (TICVAI wallet) | The guest's stored-value balance on TICVAI, spent by hold and capture. Distinct from the tender "Apple Pay / Google Pay", which the contract also calls wallet. | Digital wallet (for stored value), E-wallet, Credit (without a type) | contracts/spine/orders.yaml#/components/schemas/TenderKind / R080 |
+| Credit lot | One amount of wallet credit of one credit type (cash, bonus, gift) with its own expiry; lots are spent nearest expiry first and the guest sees the breakdown but cannot choose. | Bucket, Batch, Top-up | TRACKER Actions row 171 / contracts/satellite/wallet.yaml#expireCreditLots |
+| Venue map / Seat map | A venue map is the wayfinding map of a park or a floor (points, paths, bookable places); a seat map is the seating layout of an auditorium or stand. Never just "map" where both could be meant. | Layout (alone), Floor plan (unless it is a floor map), Map (alone) | contracts/satellite/venue-map.yaml#createVenueMap / … |
+| Point / Bookable place | A point is a place on a venue map (toilet, ride, restaurant, exit). A bookable place is a cabana, lounger, table or pitch placed on the map and sold through its price band. | Pin, POI, Marker, Resource (in staff copy) | contracts/satellite/venue-map.yaml#setVenuePoint / … |
+| Station / Route / Timetable / Departure / Fare table / Pass … | A route is an ordered list of stations with offsets; a timetable generates departures up to its release horizon; a fare table prices a route per passenger type; a pass type is a multi-trip or unlimited pass sold as a product. | Stop (except in the stop list), Line (except lineCode), Schedule, Trip (except a guest's journey) | contracts/satellite/transport.yaml / REV3-21 |
+| Applies from | The effective date of a change. Every dated change shows it, and sold items keep their old terms. | Effective date (in labels), Start date (for a change) | contracts/satellite/seating.yaml#updateSeatCategory / TRACKER Actions row 194 |
+
+
 ## The screens
 
 Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs count fields; requirements are matrix rows; meeting inputs are the ones naming the screen (the module and platform ones are below); white label says whether the tenant's brand reaches it (guest) or it sets the brand (configures).
@@ -103,6 +142,12 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/orders-money/payment-order-financial-command-center-bo-324` |
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** The financial status of orders: paid, part-paid, outstanding, instalment plans and their next due dates.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **List operation(s) listPaymentOrderFinancial return a bare array, not the paged list envelope (items, nextCursor, hasMore).** Why: The table cannot page, and a row without an id cannot open, edit or link to the record it summarises. *(source: contracts/spine/orders.yaml#listPaymentOrderFinancial; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
 
 #### Inputs: what the user enters or picks
 
@@ -193,6 +238,10 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Failed (secondary button) | navigation or local | — | — | — | — |
 | Reconciliation Required (secondary button) | navigation or local | — | — | — | — |
 
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **finance view**: Outstanding balances and plans due this week first. *(source: contracts/spine/orders.yaml#listPaymentOrderFinancial / contracts/satellite/payments.yaml#listInstalmentPlans)*
+
 **Data it reads**: `listPaymentOrderFinancial` (onLoad, Payment & Order Financial Command Center); `listInstalmentPlans` (onLoad, Instalment plans and schedule)
 
 **Where the user goes next**
@@ -219,6 +268,17 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 The order already has a plan, or is already paid in full.; 422 The order or product does not qualify under the instalment policy, or the count or frequency is outside it, or the first instalment was declined. |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+plans:
+- order: MB-2026-0112
+  next: '2026-12-01'
+  amount: AED 120.83
+```
 
 #### Permissions
 
@@ -274,6 +334,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-100`, `BO-325`, `BO-326`, `BO-327`, `BO-329`, `BO-331`, `BO-332`, `BO-333`, `BO-328`, `BO-330`.
 - [ ] Every gated control is gated: `ORDER_CREATE`, `ORDER_VIEW`, `PAYMENT_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -293,6 +354,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/orders-money/order-payment-detail-transaction-ledger-bo-325` |
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Every payment on one order: tender, amount, status, provider reference, refunds.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **List operation(s) listOrderPaymentDetail return a bare array, not the paged list envelope (items, nextCursor, hasMore); rows of listOrderPaymentDetail carry no identifier.** Why: The table cannot page, and a row without an id cannot open, edit or link to the record it summarises. *(source: contracts/spine/orders.yaml#listOrderPaymentDetail; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
 
 #### Inputs: what the user enters or picks
 
@@ -345,6 +412,10 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Void (destructive button) | navigation or local | — | — | — | — |
 | Reversal (secondary button) | navigation or local | — | — | — | — |
 
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **payment ledger**: Chronological with running balance; card masked. *(source: contracts/spine/orders.yaml#listOrderPaymentDetail / DI-069)*
+
 **Data it reads**: `listOrderPaymentDetail` (onLoad, Order Payment Detail & Transaction Ledger)
 
 **Where the user goes next**
@@ -365,6 +436,17 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the order payment detail are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+payment:
+  tender: Card •••• 4417
+  amount: AED 1,180.00
+  status: captured
+```
 
 #### Permissions
 
@@ -404,6 +486,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-324`.
 - [ ] Every gated control is gated: `ORDER_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -423,6 +506,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/orders-money/multi-payment-split-tender-payment-allocation-configurat-bo-326` |
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** How a split-tender payment is allocated (order, line, product, tax and fee component, ticket, deposit), per channel, terminal and product.
 
 #### Inputs: what the user enters or picks
 
@@ -446,6 +531,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Terminal id | picker: choose a terminal (drawn as a picker, not a text box) | optional | — | — | shows names, sends the id | Sends `?terminalId=` to `listPaymentAllocationRules`. | `listPaymentAllocationRules` ?terminalId |
 | Product id | picker: choose a product (drawn as a picker, not a text box) | optional | — | — | shows names, sends the id | Sends `?productId=` to `listPaymentAllocationRules`. | `listPaymentAllocationRules` ?productId |
 | Is active | toggle | optional | on | — | — | Sends `?isActive=` to `listPaymentAllocationRules`. | `listPaymentAllocationRules` ?isActive |
+
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **allocationLevel**: One level per rule; rules listed beside. *(source: contracts/spine/orders.yaml#setMultiPaymentSplit / contracts/spine/orders.yaml#listPaymentAllocationRules)*
 
 #### Outputs: what the screen shows and produces
 
@@ -486,6 +575,16 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Empty, first run (`?state=emptyFirstRun`) | No multi-payment split tender configured yet. Carries the create action and says what the platform does in the meantime. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+rule:
+  channel: Point of sale
+  level: orderLineLevel
+```
 
 #### Permissions
 
@@ -544,6 +643,13 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | `depositId` (navigation) |
 | Route | `/orders-money/deposit-partial-payment-outstanding-balance-management-bo-327` |
 
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Deposits and balances: how deposits work (fixed, per guest, percent, bands), when the balance is due, and the movements on each deposit.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **recordDepositActivity takes amount as a plain number and type as free text.** Why: Money and an enumerated movement type (authorise, capture, release, forfeit). *(source: contracts/satellite/payments.yaml#recordDepositActivity; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
+- **List operation(s) listDepositPartialPayment, listDepositActivity return a bare array, not the paged list envelope (items, nextCursor, hasMore); rows of listDepositPartialPayment carry no identifier.** Why: The table cannot page, and a row without an id cannot open, edit or link to the record it summarises. *(source: contracts/spine/orders.yaml#listDepositPartialPayment / contracts/satellite/payments.yaml#listDepositActivity; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
+
 #### Inputs: what the user enters or picks
 
 **Form: Save table deposit** (modal, opened by *Save table deposit*; *Save table deposit* calls `setDepositPolicy`, *Cancel* sends nothing)
@@ -575,6 +681,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Refundable until hours `refundableUntilHours` | number field (hours) | optional | 24 | min 0 | — | — | `setDepositPolicy` body |
 
 Errors to draw in the form: 400 Validation failed; 403 Authenticated but not permitted at the requested scope; 412 The row changed since the `If-Match` version was read (SD-013). Re-read and retry.
+
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **deposit policy**: Applies to party, dining, school, event; basis and amount; balance due rule. *(source: contracts/spine/orders.yaml#setDepositPolicy)*
 
 #### Outputs: what the screen shows and produces
 
@@ -652,6 +762,20 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+policy:
+  appliesTo:
+  - party
+  basis: percentOfTotal
+  percent: 30
+  balanceDue: on the day
+  refundableUntil: 24 h before
+```
+
 #### Permissions
 
 - `getDepositPolicy` → `PRODUCT_VIEW` (read) · staff
@@ -692,6 +816,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-324`.
 - [ ] Every gated control is gated: `ORDER_VIEW`, `PAYMENT_CONFIGURE`, `PAYMENT_VIEW`, `PRODUCT_CONFIGURE`, `PRODUCT_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 2 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -714,6 +839,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Split one order into independent orders, or merge orders, without destroying history; payments follow the lines they paid for.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **List operation(s) listOrderSplitMerge return a bare array, not the paged list envelope (items, nextCursor, hasMore); rows of listOrderSplitMerge carry no identifier.** Why: The table cannot page, and a row without an id cannot open, edit or link to the record it summarises. *(source: contracts/spine/orders.yaml#listOrderSplitMerge; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
+
 #### Inputs: what the user enters or picks
 
 **Sent by *Merge orders*** (`mergeOrders`; no form is declared, so these are filled from the screen or collected inline)
@@ -734,6 +865,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Order Line (secondary button) | navigation or local | — | — | — | — |
 | Payment Responsibility (secondary button) | navigation or local | — | — | — | — |
 | Merge orders (destructive button) | `mergeOrders` POST `/orders/{orderId}/merge` | inline | Order | 403 Authenticated but not permitted at the requested scope; 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 The orders differ in customer, venue or currency … | gated `ORDER_MODIFY` |
+
+**What each action does** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **Split**: Select lines into new orders; shows how payments follow. *(source: contracts/spine/orders.yaml#splitOrder)*
 
 **Data it reads**: `listOrderSplitMerge` (onLoad, Order Split, Merge & Transaction Relationship Management)
 
@@ -756,6 +891,18 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 The order is partly paid and the payment is not yet allocated to lines (`paymentNotAllocated`), which the description makes a precondition of splitting. (OrderRefusedProblem); 409 The orders differ in customer, venue or currency (`mergeMismatch`), or one is voided (`orderVoided`). (OrderRefusedProblem) |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+split:
+  order: GB-2026-0077
+  into:
+  - Engineering dept
+  - Finance dept
+```
 
 #### Permissions
 
@@ -801,6 +948,7 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 - [ ] Every transition is wired: `BO-324`.
 - [ ] Every gated control is gated: `ORDER_MODIFY`, `ORDER_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -820,6 +968,12 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/orders-money/related-order-transaction-relationship-explorer-bo-329` |
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** A visual map of related orders and transactions after amendments, exchanges, reissues, splits and refunds.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **List operation(s) listRelatedOrderTransaction return a bare array, not the paged list envelope (items, nextCursor, hasMore).** Why: The table cannot page, and a row without an id cannot open, edit or link to the record it summarises. *(source: contracts/spine/orders.yaml#listRelatedOrderTransaction; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
 
 #### Inputs: what the user enters or picks
 
@@ -870,6 +1024,10 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 | Reissue | text | not in the schema: `Reissue` |
 | Refund | text | not in the schema: `Refund` |
 
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **relationship graph**: Nodes for orders and transactions, edges labelled by relation. *(source: contracts/spine/orders.yaml#listRelatedOrderTransaction)*
+
 **Data it reads**: `listRelatedOrderTransaction` (onLoad, Related Order & Transaction Relationship Explorer)
 
 **Where the user goes next**
@@ -886,6 +1044,15 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the related order transaction are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+graph:
+- DP-2026-104882 → exchange → DP-2026-105120
+```
 
 #### Permissions
 
@@ -923,6 +1090,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-324`.
 - [ ] Every gated control is gated: `ORDER_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -942,6 +1110,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Offline | online only |
 | Opens with | `orderId` (navigation) |
 | Route | `/orders-money/external-payment-partner-settlement-reference-mapping-bo-330` |
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Map orders to references other systems hold: gateways, acquirers, banks, partners, OTAs, ERP, settlement batches.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **List operation(s) listExternalPaymentPartner return a bare array, not the paged list envelope (items, nextCursor, hasMore).** Why: The table cannot page, and a row without an id cannot open, edit or link to the record it summarises. *(source: contracts/spine/orders.yaml#listExternalPaymentPartner; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
 
 #### Inputs: what the user enters or picks
 
@@ -1016,6 +1190,10 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | Wallet Providers (secondary button) | navigation or local | — | — | — | — |
 | Record external reference (secondary button) | `recordExternalReference` POST `/orders/{orderId}/external-references` | CreateExternalReferenceMappingRequest | ExternalReferenceMapping | 400 Validation failed; 403 Authenticated but not permitted at the requested scope; 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path. | gated `ORDER_MODIFY`; opens modal first |
 
+**What each action does** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **Map by hand**: Source system, provider, external reference, linked payment or refund. *(source: contracts/spine/orders.yaml#recordExternalReference)*
+
 **Data it reads**: `listExternalPaymentPartner` (onLoad, External Payment, Partner & Settlement Reference Mapping); `listExternalReferenceMappings` (onLoad, The references other systems hold for this order)
 
 **Where the user goes next**
@@ -1032,6 +1210,18 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+mapping:
+  order: DP-2026-104882
+  system: otas
+  provider: Klook
+  ref: KLK-55120931
+```
 
 #### Permissions
 
@@ -1071,6 +1261,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-324`.
 - [ ] Every gated control is gated: `ORDER_MODIFY`, `ORDER_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -1090,6 +1281,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/orders-money/payment-reconciliation-exception-management-bo-331` |
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Payment records compared with external settlement records; mismatches as exceptions to resolve.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **List operation(s) listPaymentReconciliationException return a bare array, not the paged list envelope (items, nextCursor, hasMore).** Why: The table cannot page, and a row without an id cannot open, edit or link to the record it summarises. *(source: contracts/spine/orders.yaml#listPaymentReconciliationException; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
 
 #### Inputs: what the user enters or picks
 
@@ -1111,6 +1308,10 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |---|---|---|
 | Source system | chip: Payment gateway, Acquirer, Bank, POS, Ota, Reseller… | Source system. |
 
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **exceptions**: Unmatched, amount mismatch, duplicate, with both sides shown. *(source: contracts/spine/orders.yaml#listPaymentReconciliationException)*
+
 **Data it reads**: `listPaymentReconciliationException` (onLoad, Payment Reconciliation & Exception Management)
 
 **Where the user goes next**
@@ -1127,6 +1328,17 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the payment reconciliation exception are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+exception:
+  type: amount mismatch
+  ticvai: AED 590.00
+  provider: AED 580.00
+```
 
 #### Permissions
 
@@ -1167,6 +1379,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-324`.
 - [ ] Every gated control is gated: `ORDER_VIEW`.
 - [ ] The 2 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -1186,6 +1399,13 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/orders-money/financial-traceability-control-audit-explorer-bo-332` |
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** The financial audit trail across the order lifecycle.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **List operation(s) listFinancialTraceability return a bare array, not the paged list envelope (items, nextCursor, hasMore); rows of listFinancialTraceability carry no identifier.** Why: The table cannot page, and a row without an id cannot open, edit or link to the record it summarises. *(source: contracts/spine/orders.yaml#listFinancialTraceability; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
+- **No write operation: a configuration screen (Financial Traceability, Control & Audit Explorer) declares only reads (listFinancialTraceability).** Why: Nothing it shows can be changed from it; either it is a view (and its edits happen on the record editor, which it should link to) or a write is missing. *(source: contracts/spine/orders.yaml#listFinancialTraceability; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
 
 #### Inputs: what the user enters or picks
 
@@ -1207,6 +1427,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
 
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **audit**: Filter by order, user, event. *(source: contracts/spine/orders.yaml#listFinancialTraceability)*
+
 **Data it reads**: `listFinancialTraceability` (onLoad, Financial Traceability, Control & Audit Explorer)
 
 **Where the user goes next**
@@ -1222,6 +1446,17 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Empty, first run (`?state=emptyFirstRun`) | No financial traceability audit configured yet. Carries the create action and says what the platform does in the meantime. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+event:
+  order: DP-2026-104882
+  event: refund posted
+  ledger: JE-2026-77812
+```
 
 #### Permissions
 
@@ -1261,6 +1496,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-324`.
 - [ ] Every gated control is gated: `ORDER_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 2 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -1280,6 +1516,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/orders-money/order-financial-analytics-ai-reconciliation-intelligence-bo-333` |
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Management analytics on payment performance, balances, settlement and reconciliation.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **List operation(s) listOrderFinancialReconciliation return a bare array, not the paged list envelope (items, nextCursor, hasMore); rows of listOrderFinancialReconciliation carry no identifier.** Why: The table cannot page, and a row without an id cannot open, edit or link to the record it summarises. *(source: contracts/spine/orders.yaml#listOrderFinancialReconciliation; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
 
 #### Inputs: what the user enters or picks
 
@@ -1327,6 +1569,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Reconciliation exceptions | text | Reconciliation Exceptions |
 | Refund processing time | text | not in the schema: `Refund Processing Time` |
 
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **KPIs**: KPI cards with deltas (DI-041). *(source: contracts/spine/orders.yaml#listOrderFinancialReconciliation)*
+
 **Data it reads**: `listOrderFinancialReconciliation` (onLoad, Order Financial Analytics & AI Reconciliation Intelligence)
 
 #### States
@@ -1339,6 +1585,16 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the order financial analytics are still there. The pack's own statuses are 4 Management — the state names which is selected. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+kpis:
+  reconciled: 99.2%
+  outstanding: AED 184,200.00
+```
 
 #### Permissions
 
@@ -1376,6 +1632,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] No transition is declared; back returns where the user came from.
 - [ ] Every gated control is gated: `ORDER_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -1514,12 +1771,13 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "DepositPartialPaymentOutstandingBalanceManagementView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over orders state, assembled at read time from tables that already exist","description":"**What Deposit, Partial Payment & Outstanding Balance Management displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"total":{"type":"integer","description":"Total"},"depositRequired":{"type":"boolean","description":"Deposit Required"},"depositPaid":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Deposit Paid"},"remainingBalance":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Remaining Balance"},"dueDate":{"type":"string","format":"date-time","description":"Due Date"},"daysRemaining":{"type":"string","description":"Days Remaining"},"status":{"type":"integer","description":"Status"},"warning":{"type":"string","description":"Warning"},"gracePeriod":{"type":"string","format":"date-time","description":"Grace Period"},"requireApproval":{"type":"boolean","description":"Require Approval"},"appliesTo":{"type":"array","items":{"type":"string","enum":["groups","b2b","corporateSales","schools","events","largeReservations"]},"description":"Bookings this deposit model applies to."},"paymentModel":{"type":"string","enum":["fullPayment","fixedDeposit","percentageDeposit","stagedPayment","balanceBeforeVisit","balanceByFixedDate","creditAccount","payOnCollection"],"description":"Payment model."},"reminderStage":{"type":"string","enum":["paymentReminder","dueSoon","overdue","finalNotice"],"description":"Balance reminder stage."}}},
 "DepositPolicy": {"type":"object","x-ticvai-persistence":"orders.deposit_policy","required":["basis"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"appliesTo":{"type":"array","description":"Which bookings the top-level `basis` covers. **`dining` is deprecated here since 29 September** (rev 3 REV3-8b): a table deposit is the `dining` block below, with its own switch, basis and amount, and `setDepositPolicy` refuses `dining` in this list with 400.\n","items":{"type":"string","enum":["party","dining","school","event"]}},"dining":{"$ref":"#/components/schemas/DiningDepositPolicy"},"basis":{"type":"string","enum":["fixedPerBooking","fixedPerGuest","percentOfTotal","perBand"]},"amount":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"nullable":true},"percent":{"type":"number","minimum":0,"maximum":100,"nullable":true},"bandSize":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"nullable":true,"description":"`perBand`: one `amount` per this much of the total, e.g. AED 100 per AED 400."},"balanceDue":{"type":"string","enum":["onTheDay","daysBefore"],"default":"onTheDay"},"balanceDueDaysBefore":{"type":"integer","minimum":0,"nullable":true},"refundableUntilHours":{"type":"integer","minimum":0,"default":24},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005). Operations write it at `venue` scope."}}},
 "DiningDepositPolicy": {"type":"object","x-ticvai-persistence":"none — embedded as the dining jsonb column of orders.deposit_policy","description":"**The table deposit hold: a venue option, off unless the venue enables it** (decided 29 September, rev 3 REV3-8b, superseding audit R077 (a) \"no table deposit in the first release\"; the capability ships, disabled by default). Set in Venue Management through `setDepositPolicy` and read by `fnb.createTableReservation`. **Nothing about the amount is in code**: the AED 100 per guest in the rev 3 prototype is an example a venue may type, not a default. With `enabled` false a table booking takes no payment and never enters the cart (rev 3 REV3-8).\n","properties":{"enabled":{"type":"boolean","default":false,"description":"Off unless the venue enables it. While false every other field is kept but not applied."},"basis":{"type":"string","enum":["fixedPerGuest","fixedPerTable","percentOfMinimumSpend"],"default":"fixedPerGuest","description":"`fixedPerGuest`, `amount` times the party size; `fixedPerTable`, `amount` once per booking; `percentOfMinimumSpend`, `percent` of `minimumSpendPerGuest` times the party size.\n"},"amount":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"nullable":true,"description":"Required for the two fixed bases."},"percent":{"type":"number","minimum":0,"maximum":100,"nullable":true,"description":"Required for `percentOfMinimumSpend`."},"minimumSpendPerGuest":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"nullable":true,"description":"Required for `percentOfMinimumSpend`."},"appliesFromPartySize":{"type":"integer","minimum":1,"maximum":50,"default":1,"description":"A party smaller than this books with no deposit. Proposed default, client to correct."},"outletIds":{"type":"array","description":"The outlets it applies to. Empty means every outlet of the venue that takes bookings.","items":{"type":"string","format":"uuid"}},"collection":{"type":"string","enum":["authorisationHold","charge"],"default":"authorisationHold","description":"`authorisationHold` authorises the card and captures only on a late cancel or no-show; `charge` takes the money now and holds it as a deposit. Either way it is an `orders.deposit` row, not a sale. A hold the card network would let lapse before the booking date is taken as `charge` instead, and the guest is told so.\n"},"depositVariantId":{"type":"string","format":"uuid","nullable":true,"description":"The catalogue variant the deposit line is sold as: a non-inventory product the venue set up whose ledger mapping posts to deposit liability, not revenue. Required while `enabled` is true.\n"},"refundableUntilHours":{"type":"integer","minimum":0,"maximum":168,"default":24,"description":"Cancelling at least this long before the booking releases the deposit in full. Proposed default, client to correct."},"onLateCancelOrNoShow":{"type":"string","enum":["forfeit","release"],"default":"forfeit","description":"What happens to the deposit on a later cancel or a `noShow`. Settled through `finance.settleDeposit`."},"onArrival":{"type":"string","enum":["releaseHold","applyToBill"],"default":"releaseHold","description":"When the party is seated, release the deposit or put it towards the bill."}}},
+"ExchangeRateDecimal": {"type":"string","x-ticvai-persistence-kind":"valueObject","x-ticvai-persistence-column":"numeric(18,6)","description":"**An exchange rate: a decimal string, never a float**, for the reason `Money.amount` is one — a JavaScript client must not round a rate in transit. **Six decimal places**, the precision `finance.FxRate.rate` asks for, and stored at that precision.\n","pattern":"^\\d+(\\.\\d{1,6})?$"},
 "ExternalPaymentPartnerSettlementReferenceMappingView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over orders state, assembled at read time from tables that already exist","description":"**What External Payment, Partner & Settlement Reference Mapping displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"ticvaiOrderId":{"type":"string","description":"TICVAI Order ID"},"ticvaiPaymentId":{"type":"string","description":"TICVAI Payment ID"},"provider":{"type":"string","description":"Provider"},"merchantId":{"type":"string","description":"Merchant ID"},"externalTransactionId":{"type":"string","description":"External Transaction ID"},"authorizationCode":{"type":"string","description":"Authorization Code"},"partnerOrderId":{"type":"string","description":"Partner Order ID"},"settlementBatch":{"type":"string","description":"Settlement Batch"},"settlementDate":{"type":"string","format":"date-time","description":"Settlement Date"},"erpReference":{"type":"string","description":"ERP Reference"},"currency":{"type":"string","description":"Currency"},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Amount"},"reason":{"type":"string","description":"Reason"},"user":{"type":"string","description":"User"},"timestamp":{"type":"string","format":"date-time","description":"Timestamp"},"approvalReference":{"type":"boolean","description":"Approval where required"},"sourceSystem":{"type":"string","enum":["paymentGateways","acquirers","banks","posTerminals","b2bPartners","resellers","otas","erp","financeSystems","walletProviders"],"description":"External system the reference comes from."}}},
 "ExternalReferenceMapping": {"type":"object","x-ticvai-persistence":"orders.external_reference_mapping","description":"**A reference another system holds for an order, payment or refund, and who mapped it** (DM5, 29 September: data model for the agreed operations). Gateway references already on `orders.payment` and `orders.refund` are not copied; this holds the partner, OTA, ERP and settlement-batch references nothing else stores, and the manual mappings with their reason.\n**Written by the integration jobs** (partner and OTA order sync, ERP posting, settlement-file ingestion) with `isManual` false, and by `recordExternalReference` with `isManual` true; read by `listExternalReferenceMappings`, `listExternalPaymentPartner` and `listFinancialTraceability`. Append-only (decided 29 September, writers pass).","required":["id","orderId","sourceSystem","createdAt"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"orderId":{"type":"string","format":"uuid"},"paymentId":{"type":"string","format":"uuid","nullable":true},"refundId":{"type":"string","format":"uuid","nullable":true},"sourceSystem":{"type":"string","enum":["paymentGateways","acquirers","banks","posTerminals","b2bPartners","resellers","otas","erp","financeSystems","walletProviders"]},"provider":{"type":"string","maxLength":60,"nullable":true},"merchantId":{"type":"string","maxLength":60,"nullable":true},"externalTransactionId":{"type":"string","maxLength":100,"nullable":true},"authorizationCode":{"type":"string","maxLength":40,"nullable":true},"partnerOrderId":{"type":"string","maxLength":100,"nullable":true},"settlementBatch":{"type":"string","maxLength":100,"nullable":true},"settlementDate":{"type":"string","format":"date","nullable":true},"erpReference":{"type":"string","maxLength":100,"nullable":true},"amount":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"nullable":true},"isManual":{"type":"boolean","default":false},"reason":{"type":"string","maxLength":500,"nullable":true,"description":"Required when `isManual` is true."},"approvalReference":{"type":"string","maxLength":100,"nullable":true},"createdByPrincipalId":{"type":"string","format":"uuid","nullable":true},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005). Operations write it at `venue` scope."},"createdAt":{"type":"string","format":"date-time","readOnly":true}}},
 "FinancialTraceabilityControlAuditExplorerView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over orders state, assembled at read time from tables that already exist","description":"**What Financial Traceability, Control & Audit Explorer displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Amount"},"currency":{"type":"string","description":"Currency"},"priceVersion":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Price Version"},"tax":{"type":"string","description":"Tax"},"fee":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Fee"},"discount":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Discount"},"paymentMethod":{"type":"string","description":"Payment Method"},"provider":{"type":"string","description":"Provider"},"user":{"type":"string","description":"User"},"channel":{"type":"string","description":"Channel"},"timestamp":{"type":"string","format":"date-time","description":"Timestamp"},"interventionType":{"type":"string","enum":["manualPaymentAdjustment","manualAllocation","manualReconciliation","manualRefund","feeWaiver","creditOverride","manualSettlementMapping"],"description":"Manual intervention recorded."}}},
 "MultiPaymentSplitTenderPaymentAllocationConfiguratioInput": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — request only; lands in `orders.payment_allocation_rule` (DM5, 29 September)","description":"**What Multi-Payment, Split Tender & Payment Allocation Configuration submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.","properties":{"channel":{"type":"string","description":"Channel"},"venue":{"type":"string","description":"Venue"},"terminal":{"type":"string","description":"Terminal"},"product":{"type":"string","description":"Product"},"orderType":{"type":"string","description":"Order Type"},"customerType":{"type":"string","description":"Customer Type"},"allocationLevel":{"type":"string","enum":["orderLevel","orderLineLevel","productLevel","taxFeeComponent","specificTicket","deposit"],"description":"What a payment is allocated against."},"isActive":{"type":"boolean","default":true,"description":"False retires the rule for this match key (decided 29 September, writers pass)."}}},
 "MultiPaymentSplitTenderPaymentAllocationConfiguratioView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over orders state, assembled at read time from tables that already exist","description":"**What Multi-Payment, Split Tender & Payment Allocation Configuration displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"channel":{"type":"string","description":"Channel"},"venue":{"type":"string","description":"Venue"},"terminal":{"type":"string","description":"Terminal"},"product":{"type":"string","description":"Product"},"orderType":{"type":"string","description":"Order Type"},"customerType":{"type":"string","description":"Customer Type"},"allocationLevel":{"type":"string","enum":["orderLevel","orderLineLevel","productLevel","taxFeeComponent","specificTicket","deposit"],"description":"What a payment is allocated against."}}},
-"Order": {"x-ticvai-persistence":"orders.sales_order + orders.order_line","type":"object","required":["id","venueId","scopePath","channel","status","currency","currencyScale","grossAmount","taxAmount","netAmount","lines","createdAt","recordedAt"],"properties":{"id":{"type":"string","format":"uuid","description":"The client UUIDv7 from `CreateOrderRequest.id`."},"orderNumber":{"type":"string","readOnly":true,"description":"The number a guest reads and a cashier types. **Server-assigned: the venue prefix and a sequence per venue**, for example `DXB1-000123` (decided 28 September, audit R152). A till holds a reserved range of the venue sequence, so an order taken offline gets its number on the till and keeps it through `syncOrders`. **Not gapless**: an unused reserved range leaves a gap, and that is allowed. Only tax invoices are gapless, per legal entity. The receipt carries this number.\n"},"channel":{"allOf":[{"$ref":"#/components/schemas/OrderChannel"}],"description":"Where it came from. Drives revenue attribution, promotion eligibility and the self-service adoption figures the operator will ask for within a month of launch.\n"},"venueId":{"type":"string","format":"uuid"},"scopePath":{"type":"string"},"status":{"$ref":"#/components/schemas/OrderStatus"},"currency":{"type":"string","pattern":"^[A-Z]{3}$","x-ticvai-persisted":false,"description":"**Resolved from the region, not stored** (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and cannot be anything else. **Kept on the wire , removed from the table** — a client should not walk a hierarchy to read a figure, and the  database should not hold nine million copies of AED. Four tables genuinely differ from their\n region and keep a stored currency: `orders.payment.tender_currency`, `inventory.supplier`, \n`ledger.account`, `control.partner_agreement`.\n"},"currencyScale":{"type":"integer","minimum":0,"maximum":4,"x-ticvai-persisted":false,"description":"**Resolved from the region, not stored** (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and cannot be anything else — storing it per ro w is a copy of a fact that cannot differ. **Kept on the wire, removed from the table**: a cl ient reading a figure should not walk a hierarchy to know what it means, and the database sh ould not hold nine million copies of AED. Four tables genuinely differ from their region and\n keep a stored currency — `orders.payment.tender_currency`, `inventory.supplier`, `ledger.ac\ncount`, `control.partner_agreement`. **A guest paying USD at an AED venue is a real row; a w orkstation with its own currency is a misconfiguration.**\n"},"grossAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"taxAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"netAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"refundedAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"droppedPromotions":{"type":"array","readOnly":true,"x-ticvai-persisted":false,"description":"**Promotions left off this order at checkout because their budget cap would have been exceeded** (decided 28 September, audit R101 (8)). Empty when none was dropped. Returned by `checkoutCart` and `createOrder`, not stored.\n","items":{"type":"object","required":["promotionId"],"properties":{"promotionId":{"type":"string","format":"uuid"},"name":{"type":"string"},"reason":{"type":"string","enum":["budgetCapReached"]}}}},"totalPriceVariance":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"description":"Sum across lines. Zero on a normal order."},"lines":{"type":"array","items":{"$ref":"#/components/schemas/OrderLine"}},"payments":{"type":"array","items":{"$ref":"#/components/schemas/Payment"}},"principalId":{"type":"string","format":"uuid"},"workstationId":{"type":"string","format":"uuid"},"shiftId":{"type":"string","format":"uuid","nullable":true},"subjectId":{"type":"string","format":"uuid","nullable":true},"holdLabel":{"type":"string","maxLength":60,"nullable":true,"readOnly":true,"description":"The `label` a cashier gave when parking it with `holdOrder` — how they find it again. Null on an order never held."},"heldUntil":{"type":"string","format":"date-time","nullable":true,"readOnly":true,"description":"When a held order expires and is voided (states/order.yaml), from `holdOrder`'s `holdUntil`. Null on an order not currently held."},"createdAt":{"type":"string","format":"date-time"},"recordedAt":{"type":"string","format":"date-time"},"syncedAt":{"type":"string","format":"date-time","nullable":true}}},
+"Order": {"x-ticvai-persistence":"orders.sales_order + orders.order_line","type":"object","required":["id","venueId","scopePath","channel","status","currency","currencyScale","grossAmount","taxAmount","netAmount","lines","createdAt","recordedAt"],"properties":{"id":{"type":"string","format":"uuid","description":"The client UUIDv7 from `CreateOrderRequest.id`."},"orderNumber":{"type":"string","readOnly":true,"description":"The number a guest reads and a cashier types. **Server-assigned: the venue prefix and a sequence per venue**, for example `DXB1-000123` (decided 28 September, audit R152). A till holds a reserved range of the venue sequence, so an order taken offline gets its number on the till and keeps it through `syncOrders`. **Not gapless**: an unused reserved range leaves a gap, and that is allowed. Only tax invoices are gapless, per legal entity. The receipt carries this number.\n"},"channel":{"allOf":[{"$ref":"#/components/schemas/OrderChannel"}],"description":"Where it came from. Drives revenue attribution, promotion eligibility and the self-service adoption figures the operator will ask for within a month of launch.\n"},"venueId":{"type":"string","format":"uuid"},"scopePath":{"type":"string"},"status":{"$ref":"#/components/schemas/OrderStatus"},"currency":{"type":"string","pattern":"^[A-Z]{3}$","x-ticvai-persisted":false,"description":"**Resolved from the region, not stored** (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and cannot be anything else. **Kept on the wire , removed from the table** — a client should not walk a hierarchy to read a figure, and the  database should not hold nine million copies of AED. Four tables genuinely differ from their\n region and keep a stored currency: `orders.payment.tender_currency`, `inventory.supplier`, \n`ledger.account`, `control.partner_agreement`.\n"},"currencyScale":{"type":"integer","minimum":0,"maximum":4,"x-ticvai-persisted":false,"description":"**Resolved from the region, not stored** (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and cannot be anything else — storing it per ro w is a copy of a fact that cannot differ. **Kept on the wire, removed from the table**: a cl ient reading a figure should not walk a hierarchy to know what it means, and the database sh ould not hold nine million copies of AED. Four tables genuinely differ from their region and\n keep a stored currency — `orders.payment.tender_currency`, `inventory.supplier`, `ledger.ac\ncount`, `control.partner_agreement`. **A guest paying USD at an AED venue is a real row; a w orkstation with its own currency is a misconfiguration.**\n"},"grossAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"taxAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"netAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"refundedAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"chargeCurrency":{"type":"string","pattern":"^[A-Z]{3}$","nullable":true,"readOnly":true,"description":"**The currency the guest selected and is charged in** (CHG-FIN-001, 2 October 2026). Null or equal to `currency` for a sale in the base currency. Everything else on the order, and every ledger posting, stays in the base currency `currency`."},"chargeFxRate":{"allOf":[{"$ref":"#/components/schemas/ExchangeRateDecimal"}],"nullable":true,"readOnly":true,"description":"Units of `chargeCurrency` per one unit of the base currency, from the region's `tender` rate in force at checkout (`finance.FxRate`), stored on the order so the payment, the receipt, the tax invoice and any refund use the same rate (CHG-FIN-001)."},"chargeFxRateId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"The `finance.FxRate` row the rate was taken from, for audit."},"chargeTotal":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"readOnly":true,"description":"`grossAmount` converted at `chargeFxRate` and rounded to the charge currency's scale: what the guest pays and what the payment request to the provider asks for (CHG-FIN-001)."},"chargeRateLockedUntil":{"type":"string","format":"date-time","nullable":true,"readOnly":true,"description":"The quote holds until then (the cart lease). After it, the next payment attempt re-quotes at the rate then in force and the guest confirms the new amount (CHG-FIN-001)."},"droppedPromotions":{"type":"array","readOnly":true,"x-ticvai-persisted":false,"description":"**Promotions left off this order at checkout because their budget cap would have been exceeded** (decided 28 September, audit R101 (8)). Empty when none was dropped. Returned by `checkoutCart` and `createOrder`, not stored.\n","items":{"type":"object","required":["promotionId"],"properties":{"promotionId":{"type":"string","format":"uuid"},"name":{"type":"string"},"reason":{"type":"string","enum":["budgetCapReached"]}}}},"totalPriceVariance":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"description":"Sum across lines. Zero on a normal order."},"lines":{"type":"array","items":{"$ref":"#/components/schemas/OrderLine"}},"payments":{"type":"array","items":{"$ref":"#/components/schemas/Payment"}},"principalId":{"type":"string","format":"uuid"},"workstationId":{"type":"string","format":"uuid"},"shiftId":{"type":"string","format":"uuid","nullable":true},"subjectId":{"type":"string","format":"uuid","nullable":true},"holdLabel":{"type":"string","maxLength":60,"nullable":true,"readOnly":true,"description":"The `label` a cashier gave when parking it with `holdOrder` — how they find it again. Null on an order never held."},"heldUntil":{"type":"string","format":"date-time","nullable":true,"readOnly":true,"description":"When a held order expires and is voided (states/order.yaml), from `holdOrder`'s `holdUntil`. Null on an order not currently held."},"createdAt":{"type":"string","format":"date-time"},"recordedAt":{"type":"string","format":"date-time"},"syncedAt":{"type":"string","format":"date-time","nullable":true}}},
 "OrderChannel": {"type":"string","description":"Where the order originated. Added when guest self-ordering was contracted — an order a guest placed on their own phone is commercially and operationally different from one a cashier typed, and reporting that cannot separate them cannot answer whether self-ordering is working.\n","enum":["pos","kiosk","guestApp","guestWeb","callCentre","partner","api","backOffice"]},
 "OrderFinancialAnalyticsAiReconciliationIntelligenceView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over orders state, assembled at read time from tables that already exist","description":"**What Order Financial Analytics & AI Reconciliation Intelligence displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"grossOrderValue":{"type":"string","description":"Gross Order Value"},"netCollected":{"type":"string","description":"Net Collected"},"outstandingBalance":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Outstanding Balance"},"collectionRate":{"type":"number","description":"Collection Rate"},"paymentFailureRate":{"type":"number","description":"Payment Failure Rate"},"reconciliationRate":{"type":"number","description":"Reconciliation Rate"},"settlementVariance":{"type":"string","description":"Settlement Variance"},"averagePaymentMethodsPerOrder":{"type":"number","description":"Average Payment Methods per Order"},"depositExposure":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Deposit Exposure"},"overdueBalance":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Overdue Balance"},"current":{"type":"string","description":"Current"},"approvalRate":{"type":"number","description":"Approval Rate"},"failureRate":{"type":"number","description":"Failure Rate"},"settlementDelay":{"type":"string","description":"Settlement Delay"},"reconciliationExceptions":{"type":"string","description":"Reconciliation Exceptions"}}},
 "OrderLine": {"x-ticvai-persistence":"orders.order_line + orders.order_line_eligibility + orders.order_line_discount","x-ticvai-retired-columns":["promotion_id","name","reason"],"allOf":[{"$ref":"#/components/schemas/CreateOrderLine"},{"type":"object","required":["serverUnitPrice","taxAmount","netAmount","grossAmount"],"properties":{"serverUnitPrice":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"description":"What the server computed on ingest."},"priceVariance":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"description":"Server minus quoted. Non-zero means the quoted price was honoured and the difference posted to the variance account.\n"},"taxAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"netAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"grossAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"entitlementIds":{"type":"array","description":"The entitlements this line issued. **These are the ticket ids** — `transferOrderTickets.ticketIds` and `reprintOrder.reissuedTicketIds` take and return them.","items":{"type":"string","format":"uuid"}},"crossRegionRightIds":{"type":"array","items":{"type":"string"},"description":"Redemption rights propagated to other cells for this line."},"reprintCount":{"type":"integer","minimum":0,"default":0,"readOnly":true,"description":"How many times this line's tickets were reprinted or resent. `reprintOrder` increments it; repeated reprints are the signal worth surfacing."},"venueId":{"type":"string","format":"uuid","readOnly":true,"description":"The order's venue, copied onto the line (ADR-0044's own example; system-design review SD-008, 29 September) so a line is scoped and partitionable without its order."},"discounts":{"type":"array","readOnly":true,"description":"**The discounts applied to this line, one row each** (system-design review SD-008, 29 September). Until then a discount object was flattened into the line as `promotion_id NOT NULL`, so a line with no promotion could not be inserted. A line with no discount has none.","items":{"$ref":"#/components/schemas/OrderLineDiscount"}}}}]},
@@ -1529,7 +1787,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}},
 "PayInstalment": {"type":"object","description":"One scheduled charge in an instalment plan.","required":["sequence","dueDate","amount","status"],"properties":{"sequence":{"type":"integer","minimum":1},"dueDate":{"type":"string","format":"date"},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"status":{"type":"string","enum":["scheduled","paid","failed","waived","cancelled"]},"paymentId":{"type":"string","format":"uuid","nullable":true},"dunningCaseId":{"type":"string","format":"uuid","nullable":true},"attemptedAt":{"type":"string","format":"date-time","nullable":true}}},
 "PayInstalmentPlan": {"type":"object","x-ticvai-persistence":"payments.instalment_plan + payments.instalment","description":"4.2.17. A schedule of charges for one order, independent of the product's term.","required":["id","orderId","frequency","status","total","instalments"],"properties":{"id":{"type":"string","format":"uuid"},"orderId":{"type":"string","format":"uuid"},"subjectId":{"type":"string","format":"uuid","nullable":true},"frequency":{"type":"string","enum":["monthly","quarterly","custom"]},"paymentTokenId":{"type":"string","format":"uuid"},"status":{"type":"string","enum":["active","completed","inArrears","cancelled"]},"total":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"paidToDate":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"nextDueDate":{"type":"string","format":"date","nullable":true},"instalments":{"type":"array","items":{"$ref":"#/components/schemas/PayInstalment"}},"createdAt":{"type":"string","format":"date-time"},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005). Written at the scope of the venue the order was sold at."}}},
-"Payment": {"x-ticvai-persistence":"orders.payment","type":"object","required":["id","orderId","tender","amount","status","recordedAt"],"properties":{"id":{"type":"string","format":"uuid"},"orderId":{"type":"string","format":"uuid"},"tender":{"$ref":"#/components/schemas/TenderKind"},"tenderCurrency":{"type":"string","pattern":"^[A-Z]{3}$","description":"4.6.11. **What the guest actually handed over**, which is not always what the venue books. A tourist paying USD cash at a till is a foreign tender; the sale is still recorded in base currency.\nEqual to the base currency for almost every payment. **Present on all of them so the foreign-tender report has a source** — `getForeignTenderReport` promised *what was taken in which currency* and nothing recorded it until 18 August.\n"},"tenderAmount":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"description":"The amount in `tenderCurrency`, at that currency's own scale."},"fxRate":{"allOf":[{"$ref":"#/components/schemas/ExchangeRateDecimal"}],"nullable":true,"description":"The rate applied, **stored on the payment rather than looked up later** (CF-37). A payment reconciled next month is reconciled at the rate of the day it was taken.\n"},"fxRateSource":{"type":"string","nullable":true,"enum":["manual","feed","cardScheme"],"description":"4.2.8. Manual or fed on a schedule. **`cardScheme` is where the terminal did the conversion and told us** — dynamic currency conversion, the scheme's rate rather than ours.\n"},"changeCurrency":{"type":"string","pattern":"^[A-Z]{3}$","nullable":true,"description":"4.6.11 is deliberately asymmetric: **accept foreign currency, refund in local.** A till giving change in five currencies needs five floats and five counts, and the variance becomes unattributable.\n"},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"changeAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"status":{"type":"string","enum":["authorised","captured","pendingConfirmation","declined","failed","voided","refunded"]},"providerName":{"type":"string","nullable":true},"providerReference":{"type":"string","nullable":true,"description":"The provider's own id for the charge (Stripe PaymentIntent, NI order reference). What `payments.receivePaymentProviderWebhook` matches an incoming event on (SD-034)."},"providerIdempotencyKey":{"type":"string","nullable":true,"readOnly":true,"description":"The idempotency key sent to the provider, which is this payment's `id` (SD-034, 29 September). A retried provider call cannot charge twice."},"terminalId":{"type":"string","format":"uuid","nullable":true,"description":"The card terminal a till payment ran on (ECR flow, SD-034)."},"nextAction":{"type":"object","nullable":true,"x-ticvai-persisted":false,"description":"**What the caller does while the payment is `pendingConfirmation`** (SD-034, 29 September). `redirect`: send the browser to `url` (3-D Secure challenge or hosted page); the provider returns the guest to `returnUrl` and the result arrives by webhook. `terminal`: the card terminal has been instructed; wait for its result. Null once the payment has an outcome.","properties":{"kind":{"type":"string","enum":["redirect","terminal"]},"url":{"type":"string","format":"uri","nullable":true},"expiresAt":{"type":"string","format":"date-time","nullable":true}}},"lastInquiryAt":{"type":"string","format":"date-time","nullable":true},"recordedAt":{"type":"string","format":"date-time"},"syncedAt":{"type":"string","format":"date-time","nullable":true}}},
+"Payment": {"x-ticvai-persistence":"orders.payment","type":"object","required":["id","orderId","tender","amount","status","recordedAt"],"properties":{"id":{"type":"string","format":"uuid"},"orderId":{"type":"string","format":"uuid"},"tender":{"$ref":"#/components/schemas/TenderKind"},"tenderCurrency":{"type":"string","pattern":"^[A-Z]{3}$","description":"4.6.11. **What the guest actually handed over**, which is not always what the venue books. A tourist paying USD cash at a till is a foreign tender; the sale is still recorded in base currency.\nEqual to the base currency for almost every payment. **Present on all of them so the foreign-tender report has a source** — `getForeignTenderReport` promised *what was taken in which currency* and nothing recorded it until 18 August.\n"},"tenderAmount":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"description":"The amount in `tenderCurrency`, at that currency's own scale."},"fxRate":{"allOf":[{"$ref":"#/components/schemas/ExchangeRateDecimal"}],"nullable":true,"description":"The rate applied, **stored on the payment rather than looked up later** (CF-37). A payment reconciled next month is reconciled at the rate of the day it was taken.\n"},"fxRateSource":{"type":"string","nullable":true,"enum":["manual","feed","cardScheme"],"description":"4.2.8. Manual or fed on a schedule. **`cardScheme` is where the terminal did the conversion and told us** — dynamic currency conversion, the scheme's rate rather than ours.\n"},"changeCurrency":{"type":"string","pattern":"^[A-Z]{3}$","nullable":true,"description":"4.6.11 is deliberately asymmetric: **accept foreign currency, refund in local.** A till giving change in five currencies needs five floats and five counts, and the variance becomes unattributable.\n**Cash at a till only** (CHG-FIN-001, 2 October 2026). A card or wallet payment the guest made in a currency they selected is refunded in that currency (`Refund.tenderCurrency`).\n"},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"changeAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"status":{"type":"string","enum":["authorised","captured","pendingConfirmation","declined","failed","voided","refunded"]},"providerName":{"type":"string","nullable":true},"providerReference":{"type":"string","nullable":true,"description":"The provider's own id for the charge (Stripe PaymentIntent, NI order reference). What `payments.receivePaymentProviderWebhook` matches an incoming event on (SD-034)."},"providerIdempotencyKey":{"type":"string","nullable":true,"readOnly":true,"description":"The idempotency key sent to the provider, which is this payment's `id` (SD-034, 29 September). A retried provider call cannot charge twice."},"terminalId":{"type":"string","format":"uuid","nullable":true,"description":"The card terminal a till payment ran on (ECR flow, SD-034)."},"nextAction":{"type":"object","nullable":true,"x-ticvai-persisted":false,"description":"**What the caller does while the payment is `pendingConfirmation`** (SD-034, 29 September). `redirect`: send the browser to `url` (3-D Secure challenge or hosted page); the provider returns the guest to `returnUrl` and the result arrives by webhook. `terminal`: the card terminal has been instructed; wait for its result. Null once the payment has an outcome.","properties":{"kind":{"type":"string","enum":["redirect","terminal"]},"url":{"type":"string","format":"uri","nullable":true},"expiresAt":{"type":"string","format":"date-time","nullable":true}}},"lastInquiryAt":{"type":"string","format":"date-time","nullable":true},"recordedAt":{"type":"string","format":"date-time"},"syncedAt":{"type":"string","format":"date-time","nullable":true}}},
 "PaymentAllocationRule": {"type":"object","x-ticvai-persistence":"orders.payment_allocation_rule","description":"**At what level a split-tender payment is allocated, per channel, terminal, product, order type or customer type** (DM5, 29 September: data model for the agreed operations; written by `setMultiPaymentSplit`). The tender limits themselves stay in `payments.mixed_tender_rules`; this row says what each tender is allocated against. Narrowest match wins; a row naming nothing is the venue default.","required":["id","allocationLevel","isActive","createdAt"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"channel":{"type":"string","maxLength":40,"nullable":true},"terminalId":{"type":"string","format":"uuid","nullable":true},"productId":{"type":"string","format":"uuid","nullable":true},"orderType":{"type":"string","maxLength":40,"nullable":true},"customerType":{"type":"string","maxLength":40,"nullable":true},"allocationLevel":{"type":"string","enum":["orderLevel","orderLineLevel","productLevel","taxFeeComponent","specificTicket","deposit"]},"isActive":{"type":"boolean"},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005). Operations write it at `venue` scope."},"createdAt":{"type":"string","format":"date-time","readOnly":true},"updatedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true}}},
 "PaymentOrderFinancialCommandCenterView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over orders state, assembled at read time from tables that already exist","description":"**What Payment & Order Financial Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"grossOrderValue":{"type":"string","description":"Gross Order Value"},"fullyPaidOrders":{"type":"integer","description":"Fully Paid Orders"},"partiallyPaidOrders":{"type":"integer","description":"Partially Paid Orders"},"unpaidOrders":{"type":"integer","description":"Unpaid Orders"},"outstandingBalance":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Outstanding Balance"},"paymentsToday":{"type":"string","description":"Payments Today"},"failedPayments":{"type":"integer","description":"Failed Payments"},"pendingPayments":{"type":"integer","description":"Pending Payments"},"refundsPending":{"type":"integer","description":"Refunds Pending"},"reconciliationExceptions":{"type":"integer","description":"Reconciliation Exceptions"},"unallocatedPayments":{"type":"integer","description":"Unallocated Payments"},"settlementVariance":{"type":"string","description":"Settlement Variance"},"orderId":{"type":"string","description":"Order ID"},"customer":{"type":"string","description":"Customer"},"channel":{"type":"string","description":"Channel"},"orderValue":{"type":"string","description":"Order Value"},"amountPaid":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Amount Paid"},"refunded":{"type":"string","description":"Refunded"},"outstanding":{"type":"string","description":"Outstanding"},"paymentMethods":{"type":"integer","description":"Payment Methods"},"settlementStatus":{"type":"integer","description":"Settlement Status"},"reconciliationStatus":{"type":"integer","description":"Reconciliation Status"},"paymentStatus":{"type":"string","enum":["notRequired","unpaid","paymentInitiated","authorized","partiallyPaid","paid","overpaid","partiallyRefunded","refunded","failed","reversed","reconciliationRequired"],"description":"Payment status"}}},
 "PaymentReconciliationExceptionManagementView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over orders state, assembled at read time from tables that already exist","description":"**What Payment Reconciliation & Exception Management displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"transactionId":{"type":"string","description":"Transaction ID"},"externalReference":{"type":"string","description":"External Reference"},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Amount"},"currency":{"type":"string","description":"Currency"},"date":{"type":"string","format":"date-time","description":"Date"},"merchant":{"type":"string","description":"Merchant"},"order":{"type":"string","description":"Order"},"authorizationCode":{"type":"string","description":"Authorization Code"},"sourceSystem":{"type":"string","enum":["paymentGateway","acquirer","bank","pos","ota","reseller","wallet","erp"],"description":"Source system."},"exceptionType":{"type":"string","description":"Exception, e.g. amount mismatch, unmatched settlement"},"expectedAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Expected amount"},"actualAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Actual amount"}}},

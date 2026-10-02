@@ -54,8 +54,8 @@
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
-  "purpose": "Provide management with a consolidated backend view of the financial, commercial, sponsorship, attendance and operational performance of events.",
-  "purposeNote": "Authorized users can obtain a consolidated view of event commercial and operational performance while data visibility remains controlled by tenant, entity and role permissions.",
+  "purpose": "Set and review an event's schedule: its dates, sessions and timings.",
+  "purposeNote": "Authorized users can obtain a consolidated view of event commercial and operational performance while data visibility remains controlled by tenant, entity and role permissions. Purpose rewritten 2 October 2026 (CHG-WIR-026): The purpose was pack text attached by page rather than by screen and does not describe this screen; it is rewritten from the screen's name and operations (design-notes correction ticketing-backoffice BO-697)",
   "gaps": [
    {
     "operation": null,
@@ -87,6 +87,13 @@
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
        "impliedBy": "setEventSchedule"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Read an event",
+       "bindsTo": "Event",
+       "operation": "getEvent",
+       "provenance": "contract catalogue.yaml GET /events/{eventId}; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -109,6 +116,13 @@
     "invalidates": [
      "listEvents"
     ]
+   },
+   {
+    "operationId": "getEvent",
+    "contract": "catalogue",
+    "purpose": "Read an event",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {
@@ -188,8 +202,8 @@
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Configure KPI by; Display) and no metric row",
-  "purpose": "Configure measurable operational KPIs for staff, instructors and activity operators.",
-  "purposeNote": "Administrators can define measurable operator/instructor KPIs and calculate performance using traceable operational records from completed sessions.",
+  "purpose": "Set how long an event's performances last, including durations that vary by day or session.",
+  "purposeNote": "Administrators can define measurable operator/instructor KPIs and calculate performance using traceable operational records from completed sessions. Purpose rewritten 2 October 2026 (CHG-WIR-026): The purpose was pack text attached by page rather than by screen and does not describe this screen; it is rewritten from the screen's name and operations (design-notes correction ticketing-backoffice BO-698)",
   "gaps": [
    {
     "operation": null,
@@ -213,6 +227,13 @@
        "bindsTo": null,
        "operation": null,
        "provenance": "pack Event_Management_Configuration_Backend_Structure_v1.0.pdf, page 86 §Display"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Read an event",
+       "bindsTo": "Event",
+       "operation": "getEvent",
+       "provenance": "contract catalogue.yaml GET /events/{eventId}; wiring fix, 2 October 2026"
       }
      ]
     },
@@ -251,6 +272,13 @@
     "invalidates": [
      "listEvents"
     ]
+   },
+   {
+    "operationId": "getEvent",
+    "contract": "catalogue",
+    "purpose": "Read an event",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "entryState": {
@@ -333,8 +361,8 @@
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
-  "purpose": "Configure automatic invoice generation for eligible event-related customers and commercial accounts.",
-  "purposeNote": "Eligible event transactions can trigger automated invoice requests with complete event and customer references while financial posting remains controlled by Finance.",
+  "purpose": "Move an event to new dates and decide how its existing bookings follow.",
+  "purposeNote": "Eligible event transactions can trigger automated invoice requests with complete event and customer references while financial posting remains controlled by Finance. Purpose rewritten 2 October 2026 (CHG-WIR-026): The purpose was pack text attached by page rather than by screen and does not describe this screen; it is rewritten from the screen's name and operations (design-notes correction ticketing-backoffice BO-699)",
   "gaps": [
    {
     "operation": null,
@@ -365,6 +393,13 @@
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
        "impliedBy": "rescheduleEvent"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Read an event",
+       "bindsTo": "Event",
+       "operation": "getEvent",
+       "provenance": "contract catalogue.yaml GET /events/{eventId}; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -388,6 +423,13 @@
      "listEvents",
      "getSeatInventory"
     ]
+   },
+   {
+    "operationId": "getEvent",
+    "contract": "catalogue",
+    "purpose": "Read an event",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {

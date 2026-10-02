@@ -26,42 +26,40 @@ modulesUsed:
 - module: marketing
   screens: 7
 - module: fnb
-  screens: 7
+  screens: 6
 - module: access
   screens: 4
 - module: transport
   screens: 4
+- module: retail
+  screens: 3
 - module: queue
   screens: 3
-- module: retail
-  screens: 2
-- module: seating
-  screens: 2
 - module: ai
+  screens: 3
+- module: seating
   screens: 2
 - module: resources
   screens: 2
-- module: games
-  screens: 1
 servicesCalled:
 - service: OrderService
-  operationCalls: 77
+  operationCalls: 67
+- service: MarketingService
+  operationCalls: 59
 - service: CatalogueService
-  operationCalls: 62
+  operationCalls: 58
 - service: VenueOpsService
   operationCalls: 51
-- service: MarketingService
-  operationCalls: 46
 - service: IdentityService
-  operationCalls: 28
-- service: FnbService
-  operationCalls: 25
+  operationCalls: 27
+- service: WhiteLabelService
+  operationCalls: 22
 - service: AccessService
   operationCalls: 20
-- service: WhiteLabelService
-  operationCalls: 18
 - service: AiService
-  operationCalls: 16
+  operationCalls: 20
+- service: FnbService
+  operationCalls: 20
 - service: WalletService
   operationCalls: 8
 - service: LedgerService
@@ -70,7 +68,7 @@ servicesCalled:
   operationCalls: 4
 coverage:
   screens: 77
-  inAFlow: 33
+  inAFlow: 32
   drawn: 77
   note: '**A screen in no flow has been specified and never walked.** Every flow written in this package
     has found a defect.'
@@ -84,9 +82,9 @@ screens:
   operations:
   - decideRecommendations
   - getCookieConsentRuntime
-  - getGuestProfile
+  - getMyProfile
+  - getPublishedTenantConfig
   - getTenantAppStatus
-  - getTenantConfig
   - listAnalyticsProviders
   - listMyEntitlements
   - listProductCategories
@@ -413,7 +411,6 @@ screens:
   wave: 1
   density: comfortable
   operations:
-  - addCartLine
   - checkoutCart
   - createOrder
   - createPayment
@@ -421,8 +418,8 @@ screens:
   - getPaymentLink
   - getPublishedBookingFlow
   - inquirePaymentStatus
+  - listPublishedPolicies
   - payByLink
-  - transferOrderTickets
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -439,10 +436,12 @@ screens:
   goesTo:
   - GST-001
   - GST-002
+  - GST-010
   boardFrames: null
   wireframe: wireframes/P02 Guest App.dc.html#gst-009
   inFlows:
   - F11 Guest orders food to a lounger
+  - F50 A guest arrives, parks, and gets in
 - screen: GST-010
   name: Booking Confirmation
   module: Cart & Checkout
@@ -451,8 +450,8 @@ screens:
   density: comfortable
   operations:
   - getOrder
+  - linkGuestCheckout
   - reprintOrder
-  - transferOrderTickets
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -475,6 +474,7 @@ screens:
   wave: 2
   density: comfortable
   operations:
+  - getGameCard
   - getWallet
   - getWalletAutoReloadSetting
   - getWalletExitBalance
@@ -490,7 +490,8 @@ screens:
   - offline
   offlineState: true
   entryParams:
-  - subjectId<-GST-001
+  - cardCode<-deepLink
+  - subjectId<-session
   - walletId<-navigation
   goesTo:
   - GST-001
@@ -499,6 +500,7 @@ screens:
   boardFrames: null
   wireframe: wireframes/P02 Guest App.dc.html#gst-011
   inFlows:
+  - F18 A guest plays an arcade game
   - F53 A guest earns, sees and spends loyalty
 - screen: GST-012
   name: My Tickets
@@ -522,11 +524,11 @@ screens:
   - offline
   offlineState: true
   entryParams:
+  - subjectId<-session
   - entitlementId<-deepLink
   - orderId<-deepLink
   goesTo:
   - GST-001
-  - GST-002
   - GST-013
   boardFrames: null
   wireframe: wireframes/P02 Guest App.dc.html#gst-012
@@ -552,6 +554,7 @@ screens:
   - offline
   offlineState: true
   entryParams:
+  - subjectId<-session
   - entitlementId<-deepLink
   - orderId<-deepLink
   - credentialId<-navigation
@@ -571,7 +574,7 @@ screens:
   density: comfortable
   operations:
   - claimTicketTransfer
-  - listOrders
+  - listMyOrders
   - transferOrderTickets
   states:
   - emptyFirstRun
@@ -582,6 +585,7 @@ screens:
   - offline
   offlineState: true
   entryParams:
+  - subjectId<-session
   - orderId<-deepLink
   - transferId<-deepLink
   goesTo:
@@ -604,7 +608,6 @@ screens:
   - grantDelegation
   - listBillingStatements
   - listDelegations
-  - listGuestMemberships
   - listInstalmentPlans
   - listMyPaymentIssues
   - listProducts
@@ -619,7 +622,7 @@ screens:
   offlineState: true
   entryParams:
   - guestLinkId<-deepLink
-  - subjectId<-GST-001
+  - subjectId<-session
   - caseId<-navigation
   - statementId<-navigation
   goesTo:
@@ -648,6 +651,7 @@ screens:
   - offline
   offlineState: true
   entryParams:
+  - subjectId<-session
   - reservationId<-deepLink
   goesTo:
   - GST-001
@@ -674,6 +678,7 @@ screens:
   - offline
   offlineState: true
   entryParams:
+  - subjectId<-session
   - reservationId<-deepLink
   goesTo:
   - GST-001
@@ -693,7 +698,6 @@ screens:
   - getOrderCalendarEvent
   - getVisitReminder
   - issueWalletPass
-  - listOrders
   - setVisitReminder
   states:
   - emptyFirstRun
@@ -724,9 +728,7 @@ screens:
   - issueTaxInvoice
   - listCreditMemos
   - listMyOrders
-  - listOrders
   - listTaxInvoices
-  - transferOrderTickets
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -736,6 +738,7 @@ screens:
   - offline
   offlineState: true
   entryParams:
+  - subjectId<-session
   - orderId<-deepLink
   - documentId<-navigation
   - invoiceId<-navigation
@@ -764,7 +767,7 @@ screens:
   offlineState: true
   entryParams:
   - itemId<-deepLink
-  - subjectId<-GST-001
+  - subjectId<-session
   goesTo:
   - GST-001
   - GST-002
@@ -823,7 +826,6 @@ screens:
   entryParams: []
   goesTo:
   - GST-001
-  - GST-002
   - GST-003
   - GST-023
   - GST-059
@@ -852,6 +854,7 @@ screens:
   - offline
   offlineState: true
   entryParams:
+  - subjectId<-session
   - entryId<-deepLink
   goesTo:
   - GST-001
@@ -869,7 +872,6 @@ screens:
   density: comfortable
   operations:
   - claimLocationSession
-  - claimTableSession
   - createGuestFnbOrder
   - getFnbDeliveryPolicy
   - getGuestMenu
@@ -877,7 +879,6 @@ screens:
   - listDeliveryLocations
   - listDiningOutlets
   - listFulfilmentSlots
-  - listModifierGroups
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -907,7 +908,6 @@ screens:
   wave: 2
   density: comfortable
   operations:
-  - claimTableSession
   - getGuestBill
   - getGuestOrderStatus
   states:
@@ -932,14 +932,11 @@ screens:
 - screen: GST-026
   name: Retail / Merchandise
   module: Retail
-  requiresModule: games
+  requiresModule: retail
   wave: 2
   density: comfortable
   operations:
   - addCartLine
-  - checkoutCart
-  - createPayment
-  - getGameCard
   - listMerchandise
   - lookupMerchandise
   - reserveMerchandise
@@ -953,16 +950,14 @@ screens:
   offlineState: true
   entryParams:
   - cartId<-session
-  - cardCode<-deepLink
   - outletId<-session
   goesTo:
   - GST-001
   - GST-002
+  - GST-041
   boardFrames: null
   wireframe: wireframes/P02 Guest App.dc.html#gst-026
-  inFlows:
-  - F17 A guest buys merchandise and collects later
-  - F18 A guest plays an arcade game
+  inFlows: null
 - screen: GST-027
   name: Parking – Reserve & Pay
   module: In-venue Services
@@ -971,8 +966,6 @@ screens:
   density: comfortable
   operations:
   - addCartLine
-  - checkoutCart
-  - createPayment
   - listParkingFacilities
   - updateParkingEntitlement
   states:
@@ -1025,7 +1018,7 @@ screens:
 - screen: GST-029
   name: Venue Info & Services
   module: In-venue Services
-  requiresModule: fnb
+  requiresModule: core
   wave: 2
   density: comfortable
   operations:
@@ -1054,7 +1047,6 @@ screens:
   wave: 2
   density: comfortable
   operations:
-  - claimLocationSession
   - listMyNotifications
   - markMyNotificationsRead
   states:
@@ -1064,7 +1056,8 @@ screens:
   - loading
   - offline
   offlineState: true
-  entryParams: []
+  entryParams:
+  - subjectId<-session
   goesTo:
   - GST-001
   - GST-002
@@ -1075,15 +1068,18 @@ screens:
 - screen: GST-031
   name: AI Concierge – Home
   module: Engagement & Support
-  requiresModule: fnb
+  requiresModule: ai
   wave: 2
   density: comfortable
   operations:
   - createAiConversation
   - getGuestMenu
   - handoverToAgent
+  - listAiConversations
+  - recordAnswerFeedback
   - requestSuggestion
   - sendAiMessage
+  - sendConversationMessage
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -1094,6 +1090,7 @@ screens:
   entryParams:
   - conversationId<-deepLink
   - outletId<-deepLink
+  - messageId<-navigation
   goesTo:
   - GST-001
   - GST-002
@@ -1120,6 +1117,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   - offline
@@ -1143,6 +1141,9 @@ screens:
   wave: 2
   density: comfortable
   operations:
+  - createAiConversation
+  - handoverToAgent
+  - recordAnswerFeedback
   - sendAiMessage
   states:
   - emptyFirstRun
@@ -1153,6 +1154,7 @@ screens:
   offlineState: true
   entryParams:
   - conversationId<-deepLink
+  - messageId<-navigation
   goesTo:
   - GST-001
   - GST-002
@@ -1168,6 +1170,7 @@ screens:
   operations:
   - listMyCases
   - raiseMyCase
+  - recordLostItem
   - replyToMyCase
   states:
   - emptyFirstRun
@@ -1177,7 +1180,7 @@ screens:
   - offline
   offlineState: true
   entryParams:
-  - orderId<-deepLink
+  - subjectId<-session
   - caseId<-deepLink
   goesTo:
   - GST-001
@@ -1193,7 +1196,10 @@ screens:
   wave: 3
   density: comfortable
   operations:
+  - getForm
+  - listMyOrders
   - raiseMyCase
+  - submitForm
   - submitReview
   states:
   - emptyFirstRun
@@ -1201,7 +1207,8 @@ screens:
   - loading
   - offline
   offlineState: true
-  entryParams: []
+  entryParams:
+  - formId<-deepLink
   goesTo:
   - GST-001
   - GST-002
@@ -1215,11 +1222,17 @@ screens:
   wave: 2
   density: comfortable
   operations:
+  - createReferral
   - decideRecommendations
   - getLoyaltyPosition
+  - listCustomerBadges
+  - listLeaderboard
   - listLoyaltyProgrammes
   - listPromotions
+  - listRewards
   - recordRecommendationEvents
+  - redeemLoyaltyPoints
+  - setLeaderboardNickname
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -1228,7 +1241,9 @@ screens:
   - loading
   - offline
   offlineState: true
-  entryParams: []
+  entryParams:
+  - subjectId<-session
+  - customerId<-session
   goesTo:
   - GST-001
   - GST-002
@@ -1305,6 +1320,9 @@ screens:
   wave: 1
   density: comfortable
   operations:
+  - getGuestConsents
+  - getMyProfile
+  - listConsentPurposes
   - recordConsent
   - updateMyProfile
   states:
@@ -1336,9 +1354,10 @@ screens:
   density: comfortable
   operations:
   - getTenantAppStatus
-  - listContentPages
-  - listFaqs
   - listMyCases
+  - listPublishedContentPages
+  - listPublishedFaqs
+  - listPublishedPolicies
   - raiseMyCase
   - replyToMyCase
   states:
@@ -1395,6 +1414,7 @@ screens:
   goesTo:
   - GST-001
   - GST-002
+  - GST-009
   - GST-042
   - GST-059
   boardFrames: null
@@ -1447,7 +1467,8 @@ screens:
   requiresModule: core
   wave: 1
   density: comfortable
-  operations: []
+  operations:
+  - getPublishedTenantConfig
   states:
   - emptyFirstRun
   - error
@@ -1495,6 +1516,7 @@ screens:
   - transferOrderTickets
   states:
   - emptyFirstRun
+  - emptyNoResults
   - error
   - loading
   - offline
@@ -1539,13 +1561,16 @@ screens:
   wave: 1
   density: comfortable
   operations:
+  - getPublishedTenantConfig
   - getTenantAppStatus
   states:
   - closed
   - emptyFirstRun
+  - emptyNoAccess
   - error
   - forcedUpgrade
   - loading
+  - maintenance
   - offline
   - soldOut
   offlineState: true
@@ -1607,6 +1632,8 @@ screens:
   goesTo:
   - GST-001
   - GST-002
+  - GST-008
+  - GST-041
   boardFrames:
   - Seat Board 4.dc.html#seat-4a
   wireframe: wireframes/P02 Guest App.dc.html#gst-049
@@ -1779,7 +1806,6 @@ screens:
   - getEntitlement
   - getEntitlementCredential
   - listMyEntitlements
-  - transferOrderTickets
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -1788,6 +1814,7 @@ screens:
   - offline
   offlineState: true
   entryParams:
+  - subjectId<-session
   - orderId<-deepLink
   - entitlementId<-navigation
   - credentialId<-navigation
@@ -1807,7 +1834,6 @@ screens:
   operations:
   - addCartLine
   - getBundle
-  - listCatalogueBundles
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -1833,7 +1859,7 @@ screens:
   wave: 2
   density: comfortable
   operations:
-  - listContentPages
+  - listPublishedContentPages
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -1915,20 +1941,20 @@ screens:
   density: comfortable
   operations:
   - getGuestMenu
-  - listModifierGroups
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   - offline
   offlineState: true
   entryParams:
   - outletId<-deepLink
+  - menuItemId<-deepLink
   goesTo:
   - GST-001
-  - GST-062
+  - GST-024
+  - GST-041
   boardFrames: null
   wireframe: wireframes/P02 Guest App.dc.html#gst-061
   inFlows: null
@@ -1936,7 +1962,7 @@ screens:
   name: Shop & Drop Collection
   module: In-Venue Experience
   requiresModule: retail
-  wave: 3
+  wave: 2
   density: comfortable
   operations:
   - lookupShopAndDrop
@@ -1950,10 +1976,10 @@ screens:
   entryParams: []
   goesTo:
   - GST-001
-  - GST-061
   boardFrames: null
   wireframe: wireframes/P02 Guest App.dc.html#gst-062
   inFlows:
+  - F17 A guest buys merchandise and collects later
   - F51 A guest shops in the venue and collects on the way out
 - screen: GST-063
   name: Explore – Search Results
@@ -1985,6 +2011,7 @@ screens:
   wave: 3
   density: comfortable
   operations:
+  - getGuestConsents
   - getMarketingSubscription
   - listConsentPurposes
   - recordConsent
@@ -2017,10 +2044,10 @@ screens:
   - getCookieConsentRuntime
   - getDeviceConsentHistory
   - getGuestConsents
+  - listConsentPurposes
   - listPublishedTrackingTechnologies
+  - recordConsent
   - recordDeviceConsent
-  - updateGuestPreferences
-  - uploadGuestDocument
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -2045,7 +2072,6 @@ screens:
   operations:
   - createRefundRequest
   - createResaleListing
-  - getWaiverStatus
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -2068,13 +2094,13 @@ screens:
   wave: 2
   density: comfortable
   operations:
-  - createCase
   - listAiConversations
-  - listCases
+  - listMyCases
+  - raiseMyCase
+  - replyToMyCase
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   - offline
@@ -2117,16 +2143,14 @@ screens:
 - screen: GST-070
   name: Reserve a Table
   module: In-venue Services
-  requiresModule: core
+  requiresModule: fnb
   wave: 2
   density: comfortable
   operations:
   - addCartLine
   - createTableReservation
   - joinRestaurantWaitlist
-  - joinWaitlist
   - leaveRestaurantWaitlist
-  - leaveWaitlist
   - updateTableReservation
   states:
   - emptyFirstRun
@@ -2183,10 +2207,8 @@ screens:
   wave: 2
   density: comfortable
   operations:
-  - createReferral
   - getGroupBooking
   - getGroupPackageDefinition
-  - getMyChallenges
   - listGroupPackages
   - requestGroupBooking
   - respondToInvitation
@@ -2220,14 +2242,12 @@ screens:
   - createMfaChallenge
   - enrolMfaMethod
   - getGuestSession
-  - getMyIdentityVerification
   - guestLogout
   - listGuestDevices
   - listMfaMethods
   - registerGuestDevice
   - removeMfaMethod
   - revokeGuestDevice
-  - submitGuestIdentityDocument
   - verifyGuestEmail
   - verifyMfaChallenge
   - verifyMfaEnrolment
@@ -2420,6 +2440,7 @@ screens:
   - offline
   offlineState: true
   entryParams:
+  - subjectId<-session
   - favouriteId<-navigation
   goesTo:
   - GST-042

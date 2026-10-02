@@ -107,7 +107,6 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-008 Product Detail & Variants"
         - "P08 BO-094 Map Editor & Publish"
-        - "P08 BO-838 Content, Media & Forms"
         - "P13 CMS-010 Media Library"
         - "P13 CMS-061 Digital Asset Management Command Center"
         - "P13 CMS-062 Central Digital Asset Library"
@@ -177,7 +176,6 @@ paths:
       x-ticvai-consumed-by:
         - "P04 POS-010 Add to Existing Ticket"
         - "P06 EMP-036 Issue media"
-        - "P08 BO-027 Reissue & Media Replacement"
         - "P13 CMS-010 Media Library"
         - "P13 CMS-068 Digital Asset 360° Profile"
         - "P13 CMS-082 Asset Ownership & Responsibility Management"
@@ -330,7 +328,6 @@ paths:
     post:
       operationId: replaceMediaAsset
       x-ticvai-consumed-by:
-        - "P08 BO-027 Reissue & Media Replacement"
         - "P13 CMS-010 Media Library"
         - "P13 CMS-076 Asset Version Control & Revision History"
         - "P13 CMS-095 Asset Replacement & Propagation Management"
@@ -389,6 +386,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-1189 Transport Network Import"
         - "P08 BO-955 Sections & Zones"
+        - "P12 SUP-013 Case Investigation & Resolution Workspace"
         - "P13 CMS-002 Brand Kit"
         - "P13 CMS-010 Media Library"
         - "P13 CMS-063 Upload & Asset Ingestion Workspace"
@@ -449,6 +447,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-1189 Transport Network Import"
         - "P08 BO-955 Sections & Zones"
+        - "P12 SUP-013 Case Investigation & Resolution Workspace"
         - "P13 CMS-002 Brand Kit"
         - "P13 CMS-010 Media Library"
         - "P13 CMS-063 Upload & Asset Ingestion Workspace"

@@ -13,17 +13,7 @@
    "status": "notStarted"
   },
   "navigation": {
-   "exitTo": [
-    "BO-001"
-   ],
-   "inferred": true,
-   "transitions": [
-    {
-     "to": "BO-001",
-     "trigger": "Queue Directory",
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId and BO-034 holds none of them. The edge carries nothing: eventId, feedId, queueId only pre-select (deep link or optional), and BO-001 opens on its own"
-    }
-   ]
+   "inferred": true
   },
   "notes": "Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.",
   "density": "compact",
@@ -138,23 +128,6 @@
        "operation": "listScans",
        "notes": "**An override is its own row** (decided 28 September, audit R228): outcome `overridden`, `operatorPrincipalId` is the supervisor who overrode, and `overridesScanId` links it to the denied scan, which is never updated. Selecting either row shows the other.",
        "provenance": "contract access.yaml GET /access/scans"
-      },
-      {
-       "kind": "detailPanel",
-       "label": "The offline package",
-       "bindsTo": "OfflinePackage",
-       "columns": [
-        "OfflinePackage.generatedAt",
-        "OfflinePackage.validFrom",
-        "OfflinePackage.validTo",
-        "OfflinePackage.accessPointId",
-        "OfflinePackage.entitlements",
-        "OfflinePackage.delegatedRights",
-        "OfflinePackage.blacklist",
-        "OfflinePackage.admissionRules"
-       ],
-       "operation": "getOfflinePackage",
-       "provenance": "contract access.yaml GET /access/offline-package"
       }
      ]
     },
@@ -163,111 +136,15 @@
      "slot": "rowActions",
      "components": [
       {
-       "kind": "primaryButton",
-       "label": "Sync scans",
-       "operation": "syncScans",
-       "provenance": "contract access.yaml POST /access/scans"
-      },
-      {
        "kind": "secondaryButton",
        "label": "Lookup ticket",
        "operation": "lookupTicket",
        "provenance": "contract access.yaml GET /access/lookup"
-      },
-      {
-       "kind": "destructiveButton",
-       "label": "Override access",
-       "operation": "overrideAccess",
-       "provenance": "contract access.yaml POST /access/override"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Validate access",
-       "operation": "validateAccess",
-       "provenance": "contract access.yaml POST /access/validate"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Validate group access",
-       "operation": "validateGroupAccess",
-       "provenance": "contract access.yaml POST /access/group-validate"
       }
      ]
     }
    ]
   },
-  "overlays": [
-   {
-    "id": "confirmOverrideAccess",
-    "component": "confirmDialog",
-    "trigger": "Override access",
-    "body": "**Names what `overrideAccess` changes and what it leaves alone**, in the consequence rather than the verb. A scan activity this affects should be identified in the dialog, not just counted. **Collects what `overrideAccess` sends before it is called.** Required: `id`, `scanId`, `reason`, `recordedAt`.",
-    "provenance": "contract access.yaml POST /access/override"
-   },
-   {
-    "id": "formSyncScans",
-    "component": "modal",
-    "trigger": "Sync scans",
-    "body": "**Collects what `syncScans` sends before it is called.** Required: `deviceId`, `scans`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Sync scans",
-     "operation": "syncScans"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "deviceId",
-      "scans"
-     ]
-    },
-    "provenance": "contract access.yaml POST /access/scans"
-   },
-   {
-    "id": "formValidateAccess",
-    "component": "modal",
-    "trigger": "Validate access",
-    "body": "**Collects what `validateAccess` sends before it is called.** Required: `id`, `mediaCode`, `mediaKind`, `direction`, `recordedAt`. Optional: `groupSize`, `proximityToken`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "ValidateRequest",
-    "confirm": {
-     "label": "Validate access",
-     "operation": "validateAccess"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "id",
-      "mediaCode",
-      "mediaKind",
-      "direction",
-      "recordedAt",
-      "groupSize",
-      "proximityToken"
-     ]
-    },
-    "provenance": "contract access.yaml POST /access/validate"
-   },
-   {
-    "id": "formValidateGroupAccess",
-    "component": "modal",
-    "trigger": "Validate group access",
-    "body": "**Collects what `validateGroupAccess` sends before it is called.** Required: `id`, `mediaCode`, `admitCount`, `recordedAt`. Optional: `direction`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Validate group access",
-     "operation": "validateGroupAccess"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "id",
-      "mediaCode",
-      "admitCount",
-      "recordedAt",
-      "direction"
-     ]
-    },
-    "provenance": "contract access.yaml POST /access/group-validate"
-   }
-  ],
   "states": {
    "loading": "The scan activity list.",
    "error": "Could not load. Names which read failed and leaves the scan activity untouched.",
@@ -283,52 +160,10 @@
     "trigger": "onLoad"
    },
    {
-    "operationId": "syncScans",
-    "contract": "access",
-    "purpose": "Replay scans recorded offline",
-    "trigger": "onAction",
-    "invalidates": [
-     "listScans"
-    ]
-   },
-   {
-    "operationId": "getOfflinePackage",
-    "contract": "access",
-    "purpose": "Entitlement and rule set for offline validation",
-    "trigger": "onLoad"
-   },
-   {
     "operationId": "lookupTicket",
     "contract": "access",
     "purpose": "Read-only validity check without admitting",
     "trigger": "onAction"
-   },
-   {
-    "operationId": "overrideAccess",
-    "contract": "access",
-    "purpose": "Admit against a failed validation",
-    "trigger": "onAction",
-    "invalidates": [
-     "listScans"
-    ]
-   },
-   {
-    "operationId": "validateAccess",
-    "contract": "access",
-    "purpose": "Validate media at an access point and admit or deny",
-    "trigger": "onAction",
-    "invalidates": [
-     "listScans"
-    ]
-   },
-   {
-    "operationId": "validateGroupAccess",
-    "contract": "access",
-    "purpose": "Admit a group on one read",
-    "trigger": "onAction",
-    "invalidates": [
-     "listScans"
-    ]
    }
   ],
   "entryState": {
@@ -346,6 +181,38 @@
    "board": "wireframes/P08 Venue Management.dc.html#bo-034"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "gaps": [
+   {
+    "operation": "getOfflinePackage",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): Sync, validate, group-validate, override and the offline package are workstation-scoped scanner operations the contract refuses (403) for a back-office browser; back-office screens read through listScans (design-notes correction venue-operations BO-034).",
+    "source": "contracts/spine/access.yaml#validateAccess | contracts/spine/access.yaml#syncScans | contracts/spine/access.yaml#getOfflinePackage"
+   },
+   {
+    "operation": "overrideAccess",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): Sync, validate, group-validate, override and the offline package are workstation-scoped scanner operations the contract refuses (403) for a back-office browser; back-office screens read through listScans (design-notes correction venue-operations BO-034).",
+    "source": "contracts/spine/access.yaml#validateAccess | contracts/spine/access.yaml#syncScans | contracts/spine/access.yaml#getOfflinePackage"
+   },
+   {
+    "operation": "syncScans",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): Sync, validate, group-validate, override and the offline package are workstation-scoped scanner operations the contract refuses (403) for a back-office browser; back-office screens read through listScans (design-notes correction venue-operations BO-034).",
+    "source": "contracts/spine/access.yaml#validateAccess | contracts/spine/access.yaml#syncScans | contracts/spine/access.yaml#getOfflinePackage"
+   },
+   {
+    "operation": "validateAccess",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): Sync, validate, group-validate, override and the offline package are workstation-scoped scanner operations the contract refuses (403) for a back-office browser; back-office screens read through listScans (design-notes correction venue-operations BO-034).",
+    "source": "contracts/spine/access.yaml#validateAccess | contracts/spine/access.yaml#syncScans | contracts/spine/access.yaml#getOfflinePackage"
+   },
+   {
+    "operation": "validateGroupAccess",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): Sync, validate, group-validate, override and the offline package are workstation-scoped scanner operations the contract refuses (403) for a back-office browser; back-office screens read through listScans (design-notes correction venue-operations BO-034).",
+    "source": "contracts/spine/access.yaml#validateAccess | contracts/spine/access.yaml#syncScans | contracts/spine/access.yaml#getOfflinePackage"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -383,17 +250,7 @@
    "status": "notStarted"
   },
   "navigation": {
-   "exitTo": [
-    "BO-001"
-   ],
-   "inferred": true,
-   "transitions": [
-    {
-     "to": "BO-001",
-     "trigger": "Queue Directory",
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId and BO-035 holds none of them. The edge carries nothing: eventId, feedId, queueId only pre-select (deep link or optional), and BO-001 opens on its own"
-    }
-   ]
+   "inferred": true
   },
   "notes": "Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.",
   "density": "compact",
@@ -524,23 +381,6 @@
        "operation": "listScans",
        "notes": "**An override is its own row** (decided 28 September, audit R228): outcome `overridden`, `operatorPrincipalId` is the supervisor who overrode, and `overridesScanId` links it to the denied scan, which is never updated. Selecting either row shows the other.",
        "provenance": "contract access.yaml GET /access/scans"
-      },
-      {
-       "kind": "detailPanel",
-       "label": "The offline package",
-       "bindsTo": "OfflinePackage",
-       "columns": [
-        "OfflinePackage.generatedAt",
-        "OfflinePackage.validFrom",
-        "OfflinePackage.validTo",
-        "OfflinePackage.accessPointId",
-        "OfflinePackage.entitlements",
-        "OfflinePackage.delegatedRights",
-        "OfflinePackage.blacklist",
-        "OfflinePackage.admissionRules"
-       ],
-       "operation": "getOfflinePackage",
-       "provenance": "contract access.yaml GET /access/offline-package"
       }
      ]
     },
@@ -553,107 +393,11 @@
        "label": "Lookup ticket",
        "operation": "lookupTicket",
        "provenance": "contract access.yaml GET /access/lookup"
-      },
-      {
-       "kind": "destructiveButton",
-       "label": "Override access",
-       "operation": "overrideAccess",
-       "provenance": "contract access.yaml POST /access/override"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Sync scans",
-       "operation": "syncScans",
-       "provenance": "contract access.yaml POST /access/scans"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Validate access",
-       "operation": "validateAccess",
-       "provenance": "contract access.yaml POST /access/validate"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Validate group access",
-       "operation": "validateGroupAccess",
-       "provenance": "contract access.yaml POST /access/group-validate"
       }
      ]
     }
    ]
   },
-  "overlays": [
-   {
-    "id": "confirmOverrideAccess",
-    "component": "confirmDialog",
-    "trigger": "Override access",
-    "body": "**Names what `overrideAccess` changes and what it leaves alone**, in the consequence rather than the verb. A override audit this affects should be identified in the dialog, not just counted. **Collects what `overrideAccess` sends before it is called.** Required: `id`, `scanId`, `reason`, `recordedAt`.",
-    "provenance": "contract access.yaml POST /access/override"
-   },
-   {
-    "id": "formSyncScans",
-    "component": "modal",
-    "trigger": "Sync scans",
-    "body": "**Collects what `syncScans` sends before it is called.** Required: `deviceId`, `scans`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Sync scans",
-     "operation": "syncScans"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "deviceId",
-      "scans"
-     ]
-    },
-    "provenance": "contract access.yaml POST /access/scans"
-   },
-   {
-    "id": "formValidateAccess",
-    "component": "modal",
-    "trigger": "Validate access",
-    "body": "**Collects what `validateAccess` sends before it is called.** Required: `id`, `mediaCode`, `mediaKind`, `direction`, `recordedAt`. Optional: `groupSize`, `proximityToken`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "ValidateRequest",
-    "confirm": {
-     "label": "Validate access",
-     "operation": "validateAccess"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "id",
-      "mediaCode",
-      "mediaKind",
-      "direction",
-      "recordedAt",
-      "groupSize",
-      "proximityToken"
-     ]
-    },
-    "provenance": "contract access.yaml POST /access/validate"
-   },
-   {
-    "id": "formValidateGroupAccess",
-    "component": "modal",
-    "trigger": "Validate group access",
-    "body": "**Collects what `validateGroupAccess` sends before it is called.** Required: `id`, `mediaCode`, `admitCount`, `recordedAt`. Optional: `direction`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Validate group access",
-     "operation": "validateGroupAccess"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "id",
-      "mediaCode",
-      "admitCount",
-      "recordedAt",
-      "direction"
-     ]
-    },
-    "provenance": "contract access.yaml POST /access/group-validate"
-   }
-  ],
   "states": {
    "loading": "The override audit list.",
    "error": "Could not load. Names which read failed and leaves the override audit untouched.",
@@ -669,52 +413,10 @@
     "trigger": "onLoad"
    },
    {
-    "operationId": "getOfflinePackage",
-    "contract": "access",
-    "purpose": "Entitlement and rule set for offline validation",
-    "trigger": "onLoad"
-   },
-   {
     "operationId": "lookupTicket",
     "contract": "access",
     "purpose": "Read-only validity check without admitting",
     "trigger": "onAction"
-   },
-   {
-    "operationId": "overrideAccess",
-    "contract": "access",
-    "purpose": "Admit against a failed validation",
-    "trigger": "onAction",
-    "invalidates": [
-     "listScans"
-    ]
-   },
-   {
-    "operationId": "syncScans",
-    "contract": "access",
-    "purpose": "Replay scans recorded offline",
-    "trigger": "onAction",
-    "invalidates": [
-     "listScans"
-    ]
-   },
-   {
-    "operationId": "validateAccess",
-    "contract": "access",
-    "purpose": "Validate media at an access point and admit or deny",
-    "trigger": "onAction",
-    "invalidates": [
-     "listScans"
-    ]
-   },
-   {
-    "operationId": "validateGroupAccess",
-    "contract": "access",
-    "purpose": "Admit a group on one read",
-    "trigger": "onAction",
-    "invalidates": [
-     "listScans"
-    ]
    },
    {
     "operationId": "listAuditRecords",
@@ -738,6 +440,38 @@
    "board": "wireframes/P08 Venue Management.dc.html#bo-035"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 8 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "gaps": [
+   {
+    "operation": "getOfflinePackage",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): An audit screen performs none of override, validate, group-validate or sync; the scanner operations are refused for a back-office session, and overriding belongs at the gate (SCN-003) (F06 step 5; design-notes correction venue-operations BO-035).",
+    "source": "contracts/spine/access.yaml#overrideAccess | F06 step 5"
+   },
+   {
+    "operation": "overrideAccess",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): An audit screen performs none of override, validate, group-validate or sync; the scanner operations are refused for a back-office session, and overriding belongs at the gate (SCN-003) (F06 step 5; design-notes correction venue-operations BO-035).",
+    "source": "contracts/spine/access.yaml#overrideAccess | F06 step 5"
+   },
+   {
+    "operation": "syncScans",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): An audit screen performs none of override, validate, group-validate or sync; the scanner operations are refused for a back-office session, and overriding belongs at the gate (SCN-003) (F06 step 5; design-notes correction venue-operations BO-035).",
+    "source": "contracts/spine/access.yaml#overrideAccess | F06 step 5"
+   },
+   {
+    "operation": "validateAccess",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): An audit screen performs none of override, validate, group-validate or sync; the scanner operations are refused for a back-office session, and overriding belongs at the gate (SCN-003) (F06 step 5; design-notes correction venue-operations BO-035).",
+    "source": "contracts/spine/access.yaml#overrideAccess | F06 step 5"
+   },
+   {
+    "operation": "validateGroupAccess",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): An audit screen performs none of override, validate, group-validate or sync; the scanner operations are refused for a back-office session, and overriding belongs at the gate (SCN-003) (F06 step 5; design-notes correction venue-operations BO-035).",
+    "source": "contracts/spine/access.yaml#overrideAccess | F06 step 5"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -765,7 +499,7 @@
   "id": "BO-038",
   "name": "Reconciliation Queue",
   "module": "Access & Venue",
-  "requiresModule": "queue",
+  "requiresModule": "access",
   "wave": 1,
   "capability": "C00",
   "implementation": {
@@ -775,21 +509,7 @@
    "status": "notStarted"
   },
   "navigation": {
-   "exitTo": [
-    "BO-001"
-   ],
-   "inferred": true,
-   "transitions": [
-    {
-     "to": "BO-001",
-     "trigger": "Queue Directory",
-     "carries": [
-      "feedId",
-      "queueId"
-     ],
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId and BO-038 holds feedId, queueId, so an edge into it carries them"
-    }
-   ]
+   "inferred": true
   },
   "notes": "Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.",
   "density": "compact",
@@ -804,161 +524,27 @@
      "slot": "collection",
      "components": [
       {
-       "kind": "textField",
-       "label": "Venue id",
-       "operation": "listQueues",
-       "notes": "Sends `?venueId=` to `listQueues`.",
-       "provenance": "contract queue.yaml GET /queues"
-      },
-      {
-       "kind": "toggle",
-       "label": "Open only",
-       "operation": "listQueues",
-       "notes": "Sends `?openOnly=` to `listQueues`.",
-       "provenance": "contract queue.yaml GET /queues"
-      },
-      {
        "kind": "dataTable",
-       "label": "Every queue",
-       "bindsTo": "Queue",
-       "columns": [
-        "Queue.code",
-        "Queue.name",
-        "Queue.venueId",
-        "Queue.attractionProductId",
-        "Queue.assetId",
-        "Queue.accessPointId",
-        "Queue.kind",
-        "Queue.operatingWindows",
-        "Queue.parentQueueId",
-        "Queue.loadBalanceWithQueueIds",
-        "Queue.inQueueOfferEnabled",
-        "Queue.notifyBeforeCallMinutes"
-       ],
-       "operation": "listQueues",
-       "provenance": "contract queue.yaml GET /queues"
-      },
-      {
-       "kind": "dataTable",
-       "label": "Every waiting guest",
-       "bindsTo": "WaitingGuest",
-       "columns": [
-        "WaitingGuest.id",
-        "WaitingGuest.queueId",
-        "WaitingGuest.queueName",
-        "WaitingGuest.subjectId",
-        "WaitingGuest.partyNumber",
-        "WaitingGuest.partySize",
-        "WaitingGuest.status",
-        "WaitingGuest.positionInQueue",
-        "WaitingGuest.partiesAhead",
-        "WaitingGuest.estimatedCallAt",
-        "WaitingGuest.isFastPass",
-        "WaitingGuest.entitlementId"
-       ],
-       "operation": "listQueueEntries",
-       "provenance": "contract queue.yaml GET /queues/{queueId}/entries"
+       "label": "Refused on replay",
+       "operation": "listSyncRejections",
+       "provenance": "contract orders.yaml GET /sync/rejections; wiring fix, 2 October 2026"
       }
      ]
     },
     {
      "name": "contextPanel",
      "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected queue",
-       "bindsTo": "Queue",
-       "columns": [
-        "Queue.code",
-        "Queue.name",
-        "Queue.venueId",
-        "Queue.attractionProductId",
-        "Queue.assetId",
-        "Queue.accessPointId",
-        "Queue.kind",
-        "Queue.operatingWindows",
-        "Queue.parentQueueId",
-        "Queue.loadBalanceWithQueueIds",
-        "Queue.inQueueOfferEnabled",
-        "Queue.notifyBeforeCallMinutes",
-        "Queue.capacityPerCycle",
-        "Queue.cycleMinutes",
-        "Queue.maxPartySize",
-        "Queue.returnWindowMinutes"
-       ],
-       "operation": "listQueues",
-       "provenance": "contract queue.yaml GET /queues"
-      },
-      {
-       "kind": "detailPanel",
-       "label": "The wait time",
-       "bindsTo": "WaitTime",
-       "columns": [
-        "WaitTime.queueId",
-        "WaitTime.queueName",
-        "WaitTime.attractionProductId",
-        "WaitTime.attractionCategoryId",
-        "WaitTime.status",
-        "WaitTime.waitMinutes",
-        "WaitTime.source",
-        "WaitTime.isStale",
-        "WaitTime.heightRequirementCm",
-        "WaitTime.zone",
-        "WaitTime.asOf"
-       ],
-       "operation": "getWaitTimes",
-       "provenance": "contract queue.yaml GET /queues/wait-times"
-      },
-      {
-       "kind": "detailPanel",
-       "label": "The queue",
-       "bindsTo": "QueueDetail",
-       "columns": [
-        "QueueDetail.nowServingPartyNumber",
-        "QueueDetail.lastCalledAt",
-        "QueueDetail.throughputLastHour",
-        "QueueDetail.noShowRatePercent",
-        "QueueDetail.feed"
-       ],
-       "operation": "getQueue",
-       "provenance": "contract queue.yaml GET /queues/{queueId}"
-      }
-     ]
+     "components": []
     },
     {
      "name": "actionBar",
      "slot": "rowActions",
      "components": [
       {
-       "kind": "primaryButton",
-       "label": "Create queue",
-       "operation": "createQueue",
-       "provenance": "contract queue.yaml POST /queues"
-      },
-      {
        "kind": "secondaryButton",
-       "label": "Call next parties",
-       "operation": "callNextParties",
-       "provenance": "contract queue.yaml POST /queues/{queueId}/call-next"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Save queue status",
-       "operation": "setQueueStatus",
-       "provenance": "contract queue.yaml PUT /queues/{queueId}/status"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Save wait time",
-       "operation": "setWaitTime",
-       "provenance": "contract queue.yaml PUT /queues/{queueId}/wait-time"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Save queue",
-       "operation": "updateQueue",
-       "provenance": "contract queue.yaml PATCH /queues/{queueId}"
+       "label": "Mark resolved",
+       "operation": "resolveSyncRejection",
+       "provenance": "contract orders.yaml POST /sync/rejections/{rejectionId}/resolve; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -967,88 +553,27 @@
   "states": {
    "loading": "The reconciliation queue list.",
    "error": "Could not load. Names which read failed and leaves the reconciliation queue untouched.",
-   "emptyFirstRun": "No reconciliation queue yet. Offers Create queue (`createQueue`); distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No reconciliation queue yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "Nothing matches the filter on venueId, openOnly and the reconciliation queue are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `QUEUE_VIEW`, which `listQueues` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `listSyncRejections` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
-    "operationId": "listQueues",
-    "contract": "queue",
-    "purpose": "List queues",
-    "trigger": "onLoad"
+    "operationId": "listSyncRejections",
+    "contract": "orders",
+    "purpose": "Entries the server refused on replay",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-001)"
    },
    {
-    "operationId": "getQueue",
-    "contract": "queue",
-    "purpose": "Read a queue with live position",
-    "trigger": "onAction"
-   },
-   {
-    "operationId": "createQueue",
-    "contract": "queue",
-    "purpose": "Create a queue",
+    "operationId": "resolveSyncRejection",
+    "contract": "orders",
+    "purpose": "Record what was done about a refused entry",
     "trigger": "onAction",
-    "invalidates": [
-     "listQueues"
-    ]
-   },
-   {
-    "operationId": "callNextParties",
-    "contract": "queue",
-    "purpose": "Call the next parties forward",
-    "trigger": "onAction",
-    "invalidates": [
-     "listQueues"
-    ]
-   },
-   {
-    "operationId": "getWaitTimes",
-    "contract": "queue",
-    "purpose": "Wait times across a venue",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "listQueueEntries",
-    "contract": "queue",
-    "purpose": "List entries in a queue",
-    "trigger": "onAction"
-   },
-   {
-    "operationId": "setQueueStatus",
-    "contract": "queue",
-    "purpose": "Open, pause or close a queue",
-    "trigger": "onAction",
-    "invalidates": [
-     "listQueues"
-    ]
-   },
-   {
-    "operationId": "setWaitTime",
-    "contract": "queue",
-    "purpose": "Manually set a wait time",
-    "trigger": "onAction",
-    "invalidates": [
-     "listQueues"
-    ]
-   },
-   {
-    "operationId": "updateQueue",
-    "contract": "queue",
-    "purpose": "Amend queue configuration",
-    "trigger": "onAction",
-    "invalidates": [
-     "listQueues"
-    ]
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-001)"
    }
   ],
   "entryState": {
-   "params": [
-    {
-     "name": "queueId",
-     "from": "deepLink"
-    }
-   ],
    "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `queueId`.",
    "preloaded": [
     "Queue.code",
@@ -1056,6 +581,12 @@
     "Queue.venueId",
     "Queue.attractionProductId",
     "Queue.assetId"
+   ],
+   "params": [
+    {
+     "name": "rejectionId",
+     "from": "navigation"
+    }
    ]
   },
   "wireframe": {
@@ -1066,118 +597,79 @@
   "apisNote": "Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "overlays": [
    {
-    "id": "formCreateQueue",
+    "id": "formResolveSyncRejection",
     "component": "modal",
-    "trigger": "Create queue",
-    "body": "**Collects what `createQueue` sends before it is called.** Required: `code`, `name`, `venueId`, `capacityPerCycle`, `cycleMinutes`. Optional: `attractionProductId`, `assetId`, `accessPointId`, `kind`, `operatingWindows`, `parentQueueId`, `loadBalanceWithQueueIds`, `inQueueOfferEnabled`, `notifyBeforeCallMinutes`, `maxPartySize`, `returnWindowMinutes`, `heightRequirementCm` and 2 more. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "CreateQueueRequest",
+    "trigger": "Mark resolved",
+    "body": "**Collects what `resolveSyncRejection` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.",
     "confirm": {
-     "label": "Create queue",
-     "operation": "createQueue"
+     "label": "Mark resolved",
+     "operation": "resolveSyncRejection"
     },
     "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "code",
-      "name",
-      "venueId",
-      "capacityPerCycle",
-      "cycleMinutes",
-      "attractionProductId",
-      "assetId",
-      "accessPointId",
-      "kind",
-      "operatingWindows",
-      "parentQueueId",
-      "loadBalanceWithQueueIds",
-      "inQueueOfferEnabled",
-      "notifyBeforeCallMinutes",
-      "maxPartySize",
-      "returnWindowMinutes",
-      "heightRequirementCm",
-      "fastPassAllocationPercent"
-     ]
+     "label": "Cancel"
     },
-    "provenance": "contract queue.yaml POST /queues"
+    "provenance": "contract orders.yaml POST /sync/rejections/{rejectionId}/resolve; wiring fix, 2 October 2026"
+   }
+  ],
+  "gaps": [
+   {
+    "operation": "callNextParties",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): Every operation bound was a ride virtual-queue operation while the purpose is scan reconciliation; the sync-rejection read and resolve action named by F06 step 6 replace them, and the screen leaves the queue module (design-notes corrections venue-operations BO-038).",
+    "source": "screens/P08-venue-back-office.yaml#BO-038 | contracts/spine/orders.yaml#listSyncRejections | F06 step 6"
    },
    {
-    "id": "formCallNextParties",
-    "component": "modal",
-    "trigger": "Call next parties",
-    "body": "**Collects what `callNextParties` sends before it is called.** Nothing in the body is required. Optional: `partyCount`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Call next parties",
-     "operation": "callNextParties"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "partyCount"
-     ]
-    },
-    "provenance": "contract queue.yaml POST /queues/{queueId}/call-next"
+    "operation": "createQueue",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): Every operation bound was a ride virtual-queue operation while the purpose is scan reconciliation; the sync-rejection read and resolve action named by F06 step 6 replace them, and the screen leaves the queue module (design-notes corrections venue-operations BO-038).",
+    "source": "screens/P08-venue-back-office.yaml#BO-038 | contracts/spine/orders.yaml#listSyncRejections | F06 step 6"
    },
    {
-    "id": "formSetQueueStatus",
-    "component": "modal",
-    "trigger": "Save queue status",
-    "body": "**Collects what `setQueueStatus` sends before it is called.** Required: `status`, `reason`. Optional: `guestMessage`, `expectedReopenAt`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Save queue status",
-     "operation": "setQueueStatus"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "status",
-      "reason",
-      "guestMessage",
-      "expectedReopenAt"
-     ]
-    },
-    "provenance": "contract queue.yaml PUT /queues/{queueId}/status"
+    "operation": "getQueue",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): Every operation bound was a ride virtual-queue operation while the purpose is scan reconciliation; the sync-rejection read and resolve action named by F06 step 6 replace them, and the screen leaves the queue module (design-notes corrections venue-operations BO-038).",
+    "source": "screens/P08-venue-back-office.yaml#BO-038 | contracts/spine/orders.yaml#listSyncRejections | F06 step 6"
    },
    {
-    "id": "formSetWaitTime",
-    "component": "modal",
-    "trigger": "Save wait time",
-    "body": "**Collects what `setWaitTime` sends before it is called.** Required: `waitMinutes`. Optional: `expiresInMinutes`, `note`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Save wait time",
-     "operation": "setWaitTime"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "waitMinutes",
-      "expiresInMinutes",
-      "note"
-     ]
-    },
-    "provenance": "contract queue.yaml PUT /queues/{queueId}/wait-time"
+    "operation": "getWaitTimes",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): Every operation bound was a ride virtual-queue operation while the purpose is scan reconciliation; the sync-rejection read and resolve action named by F06 step 6 replace them, and the screen leaves the queue module (design-notes corrections venue-operations BO-038).",
+    "source": "screens/P08-venue-back-office.yaml#BO-038 | contracts/spine/orders.yaml#listSyncRejections | F06 step 6"
    },
    {
-    "id": "formUpdateQueue",
-    "component": "modal",
-    "trigger": "Save queue",
-    "body": "**Collects what `updateQueue` sends before it is called.** Nothing in the body is required. Optional: `name`, `capacityPerCycle`, `cycleMinutes`, `maxPartySize`, `returnWindowMinutes`, `heightRequirementCm`, `fastPassAllocationPercent`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Save queue",
-     "operation": "updateQueue"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "name",
-      "capacityPerCycle",
-      "cycleMinutes",
-      "maxPartySize",
-      "returnWindowMinutes",
-      "heightRequirementCm",
-      "fastPassAllocationPercent"
-     ]
-    },
-    "provenance": "contract queue.yaml PATCH /queues/{queueId}"
+    "operation": "listQueueEntries",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): Every operation bound was a ride virtual-queue operation while the purpose is scan reconciliation; the sync-rejection read and resolve action named by F06 step 6 replace them, and the screen leaves the queue module (design-notes corrections venue-operations BO-038).",
+    "source": "screens/P08-venue-back-office.yaml#BO-038 | contracts/spine/orders.yaml#listSyncRejections | F06 step 6"
+   },
+   {
+    "operation": "listQueues",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): Every operation bound was a ride virtual-queue operation while the purpose is scan reconciliation; the sync-rejection read and resolve action named by F06 step 6 replace them, and the screen leaves the queue module (design-notes corrections venue-operations BO-038).",
+    "source": "screens/P08-venue-back-office.yaml#BO-038 | contracts/spine/orders.yaml#listSyncRejections | F06 step 6"
+   },
+   {
+    "operation": "setQueueStatus",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): Every operation bound was a ride virtual-queue operation while the purpose is scan reconciliation; the sync-rejection read and resolve action named by F06 step 6 replace them, and the screen leaves the queue module (design-notes corrections venue-operations BO-038).",
+    "source": "screens/P08-venue-back-office.yaml#BO-038 | contracts/spine/orders.yaml#listSyncRejections | F06 step 6"
+   },
+   {
+    "operation": "setWaitTime",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): Every operation bound was a ride virtual-queue operation while the purpose is scan reconciliation; the sync-rejection read and resolve action named by F06 step 6 replace them, and the screen leaves the queue module (design-notes corrections venue-operations BO-038).",
+    "source": "screens/P08-venue-back-office.yaml#BO-038 | contracts/spine/orders.yaml#listSyncRejections | F06 step 6"
+   },
+   {
+    "operation": "updateQueue",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): Every operation bound was a ride virtual-queue operation while the purpose is scan reconciliation; the sync-rejection read and resolve action named by F06 step 6 replace them, and the screen leaves the queue module (design-notes corrections venue-operations BO-038).",
+    "source": "screens/P08-venue-back-office.yaml#BO-038 | contracts/spine/orders.yaml#listSyncRejections | F06 step 6"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-004): Confirm that scan rejections are served by orders.listSyncRejections/resolveSyncRejection, or add access-side equivalents for refused scan replays.",
+    "source": "F06 step 6 | contracts/spine/orders.yaml#listSyncRejections"
    }
   ],
   "_platform": {
@@ -1230,6 +722,10 @@
       "workOrderId"
      ]
     }
+   ],
+   "entryFrom": [
+    "BO-030",
+    "BO-070"
    ]
   },
   "notes": "Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.",
@@ -1245,25 +741,20 @@
      "slot": "collection",
      "components": [
       {
-       "kind": "textField",
-       "label": "Venue id",
+       "kind": "selectField",
+       "label": "Category",
        "operation": "listAssets",
-       "notes": "Sends `?venueId=` to `listAssets`.",
-       "provenance": "contract maintenance.yaml GET /assets"
+       "notes": "Asset categories by name.",
+       "provenance": "contract maintenance.yaml GET /assets",
+       "bindsTo": "Asset.categoryId"
       },
       {
-       "kind": "textField",
-       "label": "Category id",
-       "operation": "listAssets",
-       "notes": "Sends `?categoryId=` to `listAssets`.",
-       "provenance": "contract maintenance.yaml GET /assets"
-      },
-      {
-       "kind": "textField",
+       "kind": "multiSelect",
        "label": "Status",
        "operation": "listAssets",
-       "notes": "Sends `?status=` to `listAssets`.",
-       "provenance": "contract maintenance.yaml GET /assets"
+       "notes": "Asset statuses in words.",
+       "provenance": "contract maintenance.yaml GET /assets",
+       "bindsTo": "Asset.status"
       },
       {
        "kind": "toggle",
@@ -1292,27 +783,6 @@
        ],
        "operation": "listAssets",
        "provenance": "contract maintenance.yaml GET /assets"
-      },
-      {
-       "kind": "dataTable",
-       "label": "Every game",
-       "bindsTo": "Game",
-       "columns": [
-        "Game.id",
-        "Game.code",
-        "Game.name",
-        "Game.venueId",
-        "Game.zone",
-        "Game.assetId",
-        "Game.readerId",
-        "Game.creditCost",
-        "Game.minPointsAwarded",
-        "Game.maxPointsAwarded",
-        "Game.heightRequirementCm",
-        "Game.status"
-       ],
-       "operation": "listGames",
-       "provenance": "contract games.yaml GET /games"
       },
       {
        "kind": "searchField",
@@ -1408,24 +878,6 @@
        "label": "Save asset",
        "operation": "updateAsset",
        "provenance": "contract maintenance.yaml PATCH /assets/{assetId}"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Save game",
-       "operation": "updateGame",
-       "provenance": "contract games.yaml PATCH /games/{gameId}"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Record game play",
-       "operation": "recordGamePlay",
-       "provenance": "contract games.yaml POST /game-plays"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Sync game plays",
-       "operation": "syncGamePlays",
-       "provenance": "contract games.yaml POST /game-plays/sync"
       }
      ]
     },
@@ -1503,49 +955,12 @@
     "invalidates": [
      "listAssets"
     ]
-   },
-   {
-    "operationId": "listGames",
-    "contract": "games",
-    "purpose": "List games",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "updateGame",
-    "contract": "games",
-    "purpose": "Amend a game",
-    "trigger": "onAction",
-    "invalidates": [
-     "listAssets"
-    ]
-   },
-   {
-    "operationId": "recordGamePlay",
-    "contract": "games",
-    "purpose": "Record a play",
-    "trigger": "onAction",
-    "invalidates": [
-     "listAssets"
-    ]
-   },
-   {
-    "operationId": "syncGamePlays",
-    "contract": "games",
-    "purpose": "Replay plays recorded offline",
-    "trigger": "onAction",
-    "invalidates": [
-     "listAssets"
-    ]
    }
   ],
   "entryState": {
    "params": [
     {
      "name": "assetId",
-     "from": "deepLink"
-    },
-    {
-     "name": "gameId",
      "from": "deepLink"
     }
    ],
@@ -1645,70 +1060,32 @@
      ]
     },
     "provenance": "contract maintenance.yaml PATCH /assets/{assetId}"
+   }
+  ],
+  "gaps": [
+   {
+    "operation": "listGames",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): recordGamePlay and syncGamePlays are device-audience operations and game configuration belongs to the games boards (BO-395); keep only the asset register (design-notes correction venue-operations BO-069).",
+    "source": "contracts/satellite/games.yaml#recordGamePlay | contracts/satellite/games.yaml#syncGamePlays | R254"
    },
    {
-    "id": "formUpdateGame",
-    "component": "modal",
-    "trigger": "Save game",
-    "body": "**Collects what `updateGame` sends before it is called.** Nothing in the body is required. Optional: `name`, `creditCost`, `minPointsAwarded`, `maxPointsAwarded`, `status`, `heightRequirementCm`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Save game",
-     "operation": "updateGame"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "name",
-      "creditCost",
-      "minPointsAwarded",
-      "maxPointsAwarded",
-      "status",
-      "heightRequirementCm"
-     ]
-    },
-    "provenance": "contract games.yaml PATCH /games/{gameId}"
+    "operation": "recordGamePlay",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): recordGamePlay and syncGamePlays are device-audience operations and game configuration belongs to the games boards (BO-395); keep only the asset register (design-notes correction venue-operations BO-069).",
+    "source": "contracts/satellite/games.yaml#recordGamePlay | contracts/satellite/games.yaml#syncGamePlays | R254"
    },
    {
-    "id": "formRecordGamePlay",
-    "component": "modal",
-    "trigger": "Record game play",
-    "body": "**Collects what `recordGamePlay` sends before it is called.** Required: `id`, `cardCode`, `gameId`, `recordedAt`. Optional: `creditsUsed`, `pointsAwarded`, `sequence`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "RecordPlayRequest",
-    "confirm": {
-     "label": "Record game play",
-     "operation": "recordGamePlay"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "id",
-      "cardCode",
-      "gameId",
-      "recordedAt",
-      "creditsUsed",
-      "pointsAwarded",
-      "sequence"
-     ]
-    },
-    "provenance": "contract games.yaml POST /game-plays"
+    "operation": "syncGamePlays",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): recordGamePlay and syncGamePlays are device-audience operations and game configuration belongs to the games boards (BO-395); keep only the asset register (design-notes correction venue-operations BO-069).",
+    "source": "contracts/satellite/games.yaml#recordGamePlay | contracts/satellite/games.yaml#syncGamePlays | R254"
    },
    {
-    "id": "formSyncGamePlays",
-    "component": "modal",
-    "trigger": "Sync game plays",
-    "body": "**Collects what `syncGamePlays` sends before it is called.** Required: `readerId`, `plays`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Sync game plays",
-     "operation": "syncGamePlays"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "readerId",
-      "plays"
-     ]
-    },
-    "provenance": "contract games.yaml POST /game-plays/sync"
+    "operation": "updateGame",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): recordGamePlay and syncGamePlays are device-audience operations and game configuration belongs to the games boards (BO-395); keep only the asset register (design-notes correction venue-operations BO-069).",
+    "source": "contracts/satellite/games.yaml#recordGamePlay | contracts/satellite/games.yaml#syncGamePlays | R254"
    }
   ],
   "_platform": {
@@ -1854,9 +1231,9 @@
       },
       {
        "kind": "secondaryButton",
-       "label": "Save role permissions",
-       "operation": "setRolePermissions",
-       "provenance": "contract tenancy.yaml PUT /roles/{roleId}/permissions"
+       "label": "Change plan",
+       "operation": "updateMaintenancePlan",
+       "provenance": "contract maintenance.yaml PATCH /maintenance-plans/{planId}; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -1892,22 +1269,14 @@
     "trigger": "onLoad"
    },
    {
-    "operationId": "setRolePermissions",
-    "contract": "tenancy",
-    "purpose": "What this role may do",
+    "operationId": "updateMaintenancePlan",
+    "contract": "maintenance",
+    "purpose": "Amend or suspend a plan",
     "trigger": "onAction",
-    "invalidates": [
-     "listMaintenancePlans"
-    ]
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-001)"
    }
   ],
   "entryState": {
-   "params": [
-    {
-     "name": "roleId",
-     "from": "deepLink"
-    }
-   ],
    "coldEntry": "A role opened from the directory. **Permissions are set per role, not per person** — ADR-0002 makes authorisation user-driven through roles.",
    "preloaded": [
     "MaintenancePlan.id",
@@ -1915,6 +1284,12 @@
     "MaintenancePlan.assetId",
     "MaintenancePlan.assetCategoryId",
     "MaintenancePlan.intervalDays"
+   ],
+   "params": [
+    {
+     "name": "planId",
+     "from": "navigation"
+    }
    ]
   },
   "wireframe": {
@@ -1953,22 +1328,26 @@
     "provenance": "contract maintenance.yaml POST /maintenance-plans"
    },
    {
-    "id": "formSetRolePermissions",
+    "id": "formUpdateMaintenancePlan",
     "component": "modal",
-    "trigger": "Save role permissions",
-    "body": "**Collects what `setRolePermissions` sends before it is called.** Required: `permissions`. Optional: `inheritsFromRoleId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "trigger": "Change plan",
+    "body": "**Collects what `updateMaintenancePlan` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.",
     "confirm": {
-     "label": "Save role permissions",
-     "operation": "setRolePermissions"
+     "label": "Change plan",
+     "operation": "updateMaintenancePlan"
     },
     "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "permissions",
-      "inheritsFromRoleId"
-     ]
+     "label": "Cancel"
     },
-    "provenance": "contract tenancy.yaml PUT /roles/{roleId}/permissions"
+    "provenance": "contract maintenance.yaml PATCH /maintenance-plans/{planId}; wiring fix, 2 October 2026"
+   }
+  ],
+  "gaps": [
+   {
+    "operation": "setRolePermissions",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): Bulk-attach residue: role permissions are tenant identity administration and have nothing to do with maintenance plans. Only createMaintenancePlan was bound; updateMaintenancePlan (PATCH, suspend) exists and a plan library that cannot change a plan is incomplete (design-notes correction venue-operations BO-071).",
+    "source": "screens/P08-venue-back-office.yaml#BO-071 | contracts/spine/tenancy.yaml#setRolePermissions | contracts/satellite/maintenance.yaml#updateMaintenancePlan"
    }
   ],
   "_platform": {
@@ -2488,8 +1867,7 @@
     "id": "formCreateVenueMap",
     "component": "modal",
     "trigger": "Create venue map",
-    "body": "**Collects what `createVenueMap` sends before it is called.** Required: `id`, `name`, `venueId`, `status`. Optional: `scopePath`, `kind`, `floorLevel`, `publishedVersion`, `graphVersion`, `isGeoreferenced`, `baseAssetId`, `baseImageAlignment`, `tileSetRef`, `boundsGeoJson`, `graphStatus`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "VenueMap",
+    "body": "**Collects what `createVenueMap` sends before it is called.** Required: `name`, `venueId`. Optional: `kind`, `floorLevel`, `baseAssetId`, `baseImageAlignment`, `boundsGeoJson`. `id`, `status` (draft) and scope are the server's; the form asks only for the map's own fields. Dismissing sends nothing; the screen behind is unchanged.",
     "confirm": {
      "label": "Create venue map",
      "operation": "createVenueMap"
@@ -2497,21 +1875,13 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "id",
       "name",
       "venueId",
-      "status",
-      "scopePath",
       "kind",
       "floorLevel",
-      "publishedVersion",
-      "graphVersion",
-      "isGeoreferenced",
       "baseAssetId",
       "baseImageAlignment",
-      "tileSetRef",
-      "boundsGeoJson",
-      "graphStatus"
+      "boundsGeoJson"
      ]
     },
     "provenance": "contract venue-map.yaml POST /venue-maps"

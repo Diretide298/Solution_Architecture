@@ -18,6 +18,19 @@
   "requestBody": null,
   "responds": null
  },
+ "getPerformance": {
+  "method": "GET",
+  "path": "/performances/{performanceId}",
+  "contract": "catalogue",
+  "summary": "Read a performance",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "Performance"
+ },
  "listPerformanceTemplates": {
   "method": "GET",
   "path": "/performance-templates",
@@ -30,5 +43,49 @@
   "parameters": [],
   "requestBody": null,
   "responds": "PerformanceTemplate"
+ },
+ "listPerformances": {
+  "method": "GET",
+  "path": "/events/{eventId}/performances",
+  "contract": "catalogue",
+  "summary": "List performances of an event",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "categoryId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "language",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
  }
 }

@@ -37,25 +37,6 @@
   "requestBody": "CreateRefundRequest",
   "responds": null
  },
- "createRefundRequest": {
-  "method": "POST",
-  "path": "/refund-requests",
-  "contract": "orders",
-  "summary": "Guest-initiated refund request",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": null
- },
  "getRefundPolicy": {
   "method": "GET",
   "path": "/venues/{venueId}/refund-policy",
@@ -155,6 +136,25 @@
   "requestBody": null,
   "responds": "Page"
  },
+ "listVoidReversalSame": {
+  "method": "GET",
+  "path": "/void-reversal-same",
+  "contract": "orders",
+  "summary": "Void, Reversal & Same-Day Correction Management",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "VoidReversalSameDayCorrectionManagementView"
+ },
  "setFraudRules": {
   "method": "PUT",
   "path": "/fraud-rules",
@@ -178,30 +178,6 @@
   ],
   "requestBody": "FraudRuleSet",
   "responds": "FraudRuleSet"
- },
- "setRefundPolicy": {
-  "method": "PUT",
-  "path": "/venues/{venueId}/refund-policy",
-  "contract": "orders",
-  "summary": "Set a venue's refund policy",
-  "permission": "REGION_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "RefundPolicy",
-  "responds": "RefundPolicy"
  },
  "setWalletRefundPolicy": {
   "method": "PUT",

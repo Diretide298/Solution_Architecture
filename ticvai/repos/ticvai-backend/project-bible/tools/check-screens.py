@@ -740,6 +740,14 @@ def check(path: Path, kinds: set[str], regions: set[str], ops: set[str], all_ids
             ERRORS.append(f"{name}: screen id {sid!r} does not match the schema's own pattern "
                           f"{id_pat.pattern!r} — the id is what every other artefact joins on")
 
+        # **A screen name carries no tab and no pack page number** (2 October 2026, CHG-SBO-023; closes
+        # CHG-MOV-004). The workshop-pack import left "Payment Command Center\t7" — a tab, real or escaped,
+        # then the pack page — on 76 names, and the names reach the bundles, the boards and the tickets.
+        _nm = str(s.get("name") or "")
+        if "\t" in _nm or "\\t" in _nm:
+            ERRORS.append(f"{name}: {sid} name {_nm!r} carries a tab (real or escaped) and the pack page "
+                          f"number after it — the name is the screen's, not the pack's layout")
+
         # **A template outside the enum is a layout nothing knows how to render.** The deriver,
         # the viewer and every board generator switch on this value; an unknown one falls through
         # to whatever the default branch happens to be, silently.

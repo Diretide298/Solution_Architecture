@@ -12,7 +12,7 @@ platform:
   directions:
   - ltr
   - rtl
-  screenCount: 51
+  screenCount: 43
   app: partner-web
   appStatus: not scaffolded
   packages:
@@ -97,9 +97,6 @@ screens:
     - to: PTR-002
       trigger: Partner Dashboard
       provenance: structural — PTR-001 is P10's home screen and its exits are its launcher
-      carries:
-      - accountId
-      - orderId
     - to: PTR-003
       trigger: Profile & Company Details
       provenance: structural — PTR-001 is P10's home screen and its exits are its launcher
@@ -116,10 +113,8 @@ screens:
         and PTR-006 opens on its own'
     - to: PTR-008
       trigger: Booking Creation
-      carries:
-      - orderId
-      provenance: derived — PTR-008 declares entryState.params orderId and PTR-001 holds orderId, so an
-        edge into it carries them
+      provenance: derived; the door holds no record id since CHG-DOOR-002/003 made it a sign-in form,
+        so the edge carries nothing and PTR-008 opens on its own
     - to: PTR-009
       trigger: Group / Bulk Booking
       provenance: 'derived — PTR-009 declares entryState.params blockId and PTR-001 holds none of them.
@@ -142,10 +137,8 @@ screens:
         on its own'
     - to: PTR-013
       trigger: Credit Limit & Balance
-      carries:
-      - accountId
-      provenance: derived — PTR-013 declares entryState.params accountId and PTR-001 holds accountId,
-        so an edge into it carries them
+      provenance: derived; the door holds no record id since CHG-DOOR-002/003 made it a sign-in form,
+        so the edge carries nothing and PTR-013 opens on its own
     - to: PTR-014
       trigger: Settlement & Payment History
       provenance: 'derived — PTR-014 declares entryState.params settlementId and PTR-001 holds none of
@@ -153,16 +146,12 @@ screens:
         opens on its own'
     - to: PTR-015
       trigger: Order History
-      carries:
-      - orderId
-      provenance: derived — PTR-015 declares entryState.params orderId and PTR-001 holds orderId, so an
-        edge into it carries them
+      provenance: derived; the door holds no record id since CHG-DOOR-002/003 made it a sign-in form,
+        so the edge carries nothing and PTR-015 opens on its own
     - to: PTR-016
       trigger: Voucher / Ticket Download
-      carries:
-      - orderId
-      provenance: derived — PTR-016 declares entryState.params orderId and PTR-001 holds orderId, so an
-        edge into it carries them
+      provenance: derived; the door holds no record id since CHG-DOOR-002/003 made it a sign-in form,
+        so the edge carries nothing and PTR-016 opens on its own
     - to: PTR-017
       trigger: Commission Statement
       provenance: 'derived — PTR-017 declares entryState.params agreementId and PTR-001 holds none of
@@ -200,9 +189,7 @@ screens:
     - to: PTR-005
       trigger: Books against the allocation
       provenance: flow F10 step 1→2
-      operation: getB2bCredit
-      carries:
-      - orderId
+      operation: login
     - to: SUP-001
       trigger: A back-office user signs in through the same door
       provenance: flow F104 step 4→5
@@ -210,358 +197,263 @@ screens:
       back: false
       carries:
       - challengeId
-  notes: States derived from the screen pattern on 17 August, not individually considered — sound for
-    a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
-    from the screen name and its operations on 17 August, not from a requirement.
+      - methodId
+      - providerId
+  notes: '**Rebuilt as a sign-in form on 2 October 2026 (CHG-DOOR-002/003; Chinmay, 2 October 2026: fix
+    the Block A blockers now).** It was generated as a list over active sessions, MFA methods and SSO
+    providers with Force logout and Revoke all sessions on the door, which a person who is not yet signed
+    in can never use (platform-foundation process notes). The sequence is the same on every staff and
+    partner door: credentials (or the organisation''s SSO) -> the authentication code only when a permission
+    demands it (R135) -> the role prompt when several roles are held (ADR-0003) -> the landing. Managing
+    sessions moved to the staff directory (BO-053); managing MFA methods stays on each app''s own security
+    or profile screen. **The credit operations left the door** (getB2bCredit, setB2bCreditLimit, overrideCreditLimit,
+    listPartnerAgreements): the partner reads credit on PTR-002 and PTR-013, and setting or overriding
+    a limit is the tenant''s act, not the partner''s.'
   density: compact
-  pattern: listDetail
-  patternReason: '`listActiveSessions` reads the population and `getB2bCredit` reads one of them — list,
-    select, act'
-  purpose: Get someone into the app, fast, on a device that may be shared.
+  pattern: form
+  patternReason: 'A sign-in: two fields, the organisation''s SSO where configured, and the second-factor
+    and role steps in place - a form, not a list to browse.'
+  purpose: 'Get a partner user (reseller, OTA, developer) into the partner portal: username and password
+    or the tenant''s SSO, the second factor only for a listed permission, then the partner home with the
+    allocation and credit.'
   layout:
-    template: split
+    template: form
     regions:
     - name: contentBody
-      slot: collection
+      slot: form
       components:
       - kind: textField
-        label: Venue id
-        operation: listActiveSessions
-        notes: Sends `?venueId=` to `listActiveSessions`.
-        provenance: contract identity.yaml GET /auth/sessions
+        label: Email or username
+        notes: Goes into `LoginRequest.username`.
       - kind: textField
-        label: Principal id
-        operation: listActiveSessions
-        notes: Sends `?principalId=` to `listActiveSessions`.
-        provenance: contract identity.yaml GET /auth/sessions
-      - kind: textField
-        label: Workstation id
-        operation: listActiveSessions
-        notes: Sends `?workstationId=` to `listActiveSessions`.
-        provenance: contract identity.yaml GET /auth/sessions
-      - kind: dataTable
-        label: Every active session
-        bindsTo: ActiveSession
-        columns:
-        - ActiveSession.sessionId
-        - ActiveSession.principalId
-        - ActiveSession.principalName
-        - ActiveSession.roleId
-        - ActiveSession.roleName
-        - ActiveSession.workstationId
-        - ActiveSession.workstationName
-        - ActiveSession.venueId
-        - ActiveSession.ipAddress
-        - ActiveSession.deviceInfo
-        - ActiveSession.hasOpenShift
-        - ActiveSession.mfaSatisfied
-        operation: listActiveSessions
-        provenance: contract identity.yaml GET /auth/sessions
-      - kind: dataTable
-        label: Every MFA method
-        bindsTo: MfaMethod
-        columns:
-        - MfaMethod.id
-        - MfaMethod.kind
-        - MfaMethod.label
-        - MfaMethod.maskedTarget
-        - MfaMethod.isActive
-        - MfaMethod.isPrimary
-        - MfaMethod.enrolledAt
-        - MfaMethod.lastUsedAt
-        operation: listMfaMethods
-        provenance: contract identity.yaml GET /auth/mfa/methods
-      - kind: dataTable
-        label: Every SSO provider
+        label: Password
+        notes: 'Goes into `LoginRequest.credential` with `method: password`. Minimum 8, show/hide. **No
+          workstation is sent: a browser is not a registered device** (CHG-DOOR-001), and no PIN is offered,
+          because a PIN is bounded by a device this door does not have.'
+      - kind: primaryButton
+        label: Sign in
+        operation: login
+        notes: 'Sends `LoginRequest`. 409 means this person already holds a session elsewhere (audit R184):
+          the screen says where and since when, and that only a holder of SESSION_FORCE_LOGOUT can end
+          it; signing in never ends the other session.'
+        provenance: contract identity.yaml POST /auth/login
+      - kind: cardList
+        label: Sign in with your organisation
         bindsTo: SsoProvider
         columns:
-        - SsoProvider.id
         - SsoProvider.displayName
         - SsoProvider.protocol
-        - SsoProvider.iconAssetRef
         - SsoProvider.isEnforced
-        - SsoProvider.scopePath
         operation: listSsoProviders
+        notes: One button per identity provider the tenant configured for partners; **absent, not disabled,
+          when there is none.** Read before sign-in, unauthenticated. When a provider `isEnforced` for
+          this person, the password field is hidden and only this remains.
         provenance: contract identity.yaml GET /auth/sso/providers
-      - kind: dataTable
-        label: Every partner agreement
-        bindsTo: PartnerAgreement
-        columns:
-        - PartnerAgreement.id
-        - PartnerAgreement.partnerId
-        - PartnerAgreement.partnerName
-        - PartnerAgreement.status
-        - PartnerAgreement.rateMode
-        - PartnerAgreement.commissionPercent
-        - PartnerAgreement.volumeTiers
-        - PartnerAgreement.volumeWindow
-        - PartnerAgreement.seasonalRates
-        - PartnerAgreement.segmentTier
-        - PartnerAgreement.brandingAssetId
-        - PartnerAgreement.storefrontSubdomain
-        operation: listPartnerAgreements
-        provenance: contract subscription.yaml GET /partner-agreements
-    - name: contextPanel
-      slot: selection
+      - kind: secondaryButton
+        label: Continue with your organisation
+        operation: startSsoAuthorization
+        notes: Hands off to the identity provider with this door's `redirectUri`; nothing is typed here.
+          Staff and partner doors only, never a guest door (audit R167).
+        provenance: contract identity.yaml GET /auth/sso/{providerId}/authorize
+      - kind: progressIndicator
+        label: Finishing sign-in with your organisation
+        operation: completeSsoAuthorization
+        notes: 'On the provider''s redirect back (`code` and `state` from the redirect, never typed).
+          Returns the same `LoginResponse` as `login`, so the second factor and the role prompt follow
+          exactly as below. 403: the provider proved who this is and no group maps to a role in this tenant,
+          which grants nothing.'
+        provenance: contract identity.yaml POST /auth/sso/{providerId}/callback
+    - name: secondFactor
+      slot: form
       components:
-      - kind: detailPanel
-        label: The selected active session
-        bindsTo: ActiveSession
-        columns:
-        - ActiveSession.status
-        - ActiveSession.sessionId
-        - ActiveSession.principalId
-        - ActiveSession.principalName
-        - ActiveSession.roleId
-        - ActiveSession.roleName
-        - ActiveSession.workstationId
-        - ActiveSession.workstationName
-        - ActiveSession.venueId
-        - ActiveSession.ipAddress
-        - ActiveSession.deviceInfo
-        - ActiveSession.hasOpenShift
-        - ActiveSession.mfaSatisfied
-        - ActiveSession.startedAt
-        - ActiveSession.lastSeenAt
-        operation: listActiveSessions
-        provenance: contract identity.yaml GET /auth/sessions
-      - kind: detailPanel
-        label: The session
-        bindsTo: Session
-        columns:
-        - Session.sessionId
-        - Session.principalId
-        - Session.roleId
-        - Session.displayName
-        - Session.scope
-        - Session.effectivePermissions
-        - Session.permissionsByScope
-        - Session.saleBoardId
-        - Session.workstation
-        - Session.openedAt
-        - Session.expiresAt
-        operation: getCurrentSession
-        provenance: contract identity.yaml GET /auth/session
-      - kind: detailPanel
-        label: The credit position
-        bindsTo: CreditPosition
-        columns:
-        - CreditPosition.id
-        - CreditPosition.accountId
-        - CreditPosition.accountName
-        - CreditPosition.creditLimit
-        - CreditPosition.used
-        - CreditPosition.available
-        - CreditPosition.isOverLimit
-        - CreditPosition.isSuspended
-        - CreditPosition.paymentTermsDays
-        - CreditPosition.oldestUnpaidInvoiceAt
-        - CreditPosition.daysOverdue
-        - CreditPosition.activeOverrides
-        - CreditPosition.scopePath
-        operation: getB2bCredit
-        provenance: contract orders.yaml GET /b2b-accounts/{accountId}/credit
-    - name: actionBar
-      slot: rowActions
-      components:
-      - kind: primaryButton
-        label: Login
-        operation: login
-        provenance: contract identity.yaml POST /auth/login
       - kind: textField
         label: Authentication code
         operation: verifyMfaChallenge
-        notes: Shown only in the mfaRequired state, after `login`, for the authenticator-app code or the
-          emailed code (decided 28 September, audit R135, R126 (5)).
+        notes: 'Shown only when the sign-in comes back `requiresMfa`: the person holds a permission in
+          `PasswordPolicy.mfaRequiredForPermissions` (ROLE_MANAGE, LEDGER_APPROVE, every PLATFORM_* permission,
+          or one the tenant added; audit R135). Six digits from the authenticator app.'
         provenance: contract identity.yaml POST /auth/mfa/challenge/{challengeId}/verify
       - kind: primaryButton
         label: Verify
         operation: verifyMfaChallenge
-        notes: Completes sign-in; the session is usable only after it. Five wrong codes lock step-up (429
-          step-up-locked, audit R126 (6)).
+        notes: Completes the sign-in; the session is usable only after it. Five wrong codes lock step-up
+          for the policy's lockout minutes, never permanently (audit R126 (6)), and the screen says until
+          when.
         provenance: contract identity.yaml POST /auth/mfa/challenge/{challengeId}/verify
       - kind: secondaryButton
         label: Email me a code instead
         operation: createMfaChallenge
-        notes: 'The fallback: a new challenge with the email method (`emailOtp`) instead of the authenticator
-          app (decided 28 September, audit R126 (5)).'
+        notes: '`action: signIn`. The authenticator app is the primary method and an emailed code the
+          fallback (audit R126 (5)).'
         provenance: contract identity.yaml POST /auth/mfa/challenge
-      - kind: destructiveButton
-        label: Force logout
-        operation: forceLogout
-        provenance: contract identity.yaml POST /auth/sessions/{sessionId}/force-logout
-      - kind: destructiveButton
-        label: Override credit limit
-        operation: overrideCreditLimit
-        provenance: contract orders.yaml POST /b2b-accounts/{accountId}/credit/override
-      - kind: destructiveButton
-        label: Revoke all sessions
-        operation: revokeAllSessions
-        provenance: contract identity.yaml POST /auth/sessions/revoke-all
       - kind: secondaryButton
-        label: Save b2b credit limit
-        operation: setB2bCreditLimit
-        provenance: contract orders.yaml PUT /b2b-accounts/{accountId}/credit
-  overlays:
-  - id: confirmForceLogout
-    component: confirmDialog
-    trigger: Force logout
-    body: '**Names what `forceLogout` changes and what it leaves alone**, in the consequence rather than
-      the verb. A partner login mfa this affects should be identified in the dialog, not just counted.
-      **Collects what `forceLogout` sends before it is called.** Required: `reason`.'
-    provenance: contract identity.yaml POST /auth/sessions/{sessionId}/force-logout
-  - id: confirmOverrideCreditLimit
-    component: confirmDialog
-    trigger: Override credit limit
-    body: '**Names what `overrideCreditLimit` changes and what it leaves alone**, in the consequence rather
-      than the verb. A partner login mfa this affects should be identified in the dialog, not just counted.
-      **Collects what `overrideCreditLimit` sends before it is called.** Required: `orderId`, `amount`,
-      `reason`. Optional: `expiresAt`.'
-    provenance: contract orders.yaml POST /b2b-accounts/{accountId}/credit/override
-  - id: confirmRevokeAllSessions
-    component: confirmDialog
-    trigger: Revoke all sessions
-    body: '**Names what `revokeAllSessions` changes and what it leaves alone**, in the consequence rather
-      than the verb. A partner login mfa this affects should be identified in the dialog, not just counted.
-      **Collects what `revokeAllSessions` sends before it is called.** Required: `reason`, `stepUpToken`.
-      Optional: `venueId`, `excludeSelf`.'
-    provenance: contract identity.yaml POST /auth/sessions/revoke-all
-  - id: formLogin
-    component: modal
-    trigger: Login
-    body: '**Collects what `login` sends before it is called.** Required: `username`, `credential`, `workstationId`.
-      Optional: `method`, `deviceFingerprint`. Dismissing sends nothing; the screen behind is unchanged.'
-    bindsTo: LoginRequest
-    confirm:
-      label: Login
-      operation: login
-    dismiss:
-      label: Cancel
-      discards:
-      - username
-      - credential
-      - workstationId
-      - method
-      - deviceFingerprint
-    provenance: contract identity.yaml POST /auth/login
-  - id: formSetB2bCreditLimit
-    component: modal
-    trigger: Save b2b credit limit
-    body: '**Collects what `setB2bCreditLimit` sends before it is called.** Required: `creditLimit`, `reason`.
-      Optional: `paymentTermsDays`, `isSuspended`. Dismissing sends nothing; the screen behind is unchanged.'
-    confirm:
-      label: Save b2b credit limit
-      operation: setB2bCreditLimit
-    dismiss:
-      label: Cancel
-      discards:
-      - creditLimit
-      - reason
-      - paymentTermsDays
-      - isSuspended
-    provenance: contract orders.yaml PUT /b2b-accounts/{accountId}/credit
+        label: Set up the authenticator app
+        operation: enrolMfaMethod
+        notes: 'Only when the sign-in comes back `requiresMfa` with `hasMfaMethod: false`: the first method
+          is enrolled here before anything else (audit R135). Authenticator app (`totp`) or email (`emailOtp`)
+          only; the secret as QR and text.'
+        provenance: contract identity.yaml POST /auth/mfa/methods
+      - kind: credentialDisplay
+        label: Recovery codes
+        operation: verifyMfaEnrolment
+        notes: The method is active once its first code is verified. Recovery codes are shown once, with
+          copy and download, and never again.
+        provenance: contract identity.yaml POST /auth/mfa/methods/{methodId}
+    - name: actionBar
+      slot: rowActions
+      components:
+      - kind: banner
+        label: Signed in as
+        operation: getCurrentSession
+        notes: 'Read once the sign-in is complete (after the code and the role, where asked): the person''s
+          name and role, then straight on. A partner user lands on the partner home (PTR-002), which shows
+          the allocation and credit; credit details live on PTR-013.'
+        provenance: contract identity.yaml GET /auth/session
+      - kind: secondaryButton
+        label: Choose role
+        operation: selectRole
+        notes: 'Only when `LoginResponse.requiresRoleSelection` is true: large role buttons, one per role
+          the person holds (ADR-0003). One role goes straight in. A partner user lands on the partner
+          home (PTR-002), which shows the allocation and credit; credit details live on PTR-013.'
+        provenance: contract identity.yaml POST /auth/select-role
+      - kind: textField
+        label: New password
+        operation: changeOwnCredential
+        notes: 'Only when the credential was reset and is temporary: a new one is set before anything
+          else, twice, and the last five cannot be reused (audit R132).'
+        provenance: contract identity.yaml POST /auth/credential
   states:
-    loading: The partner login mfa list.
-    error: Could not load. Names which read failed and leaves the partner login mfa untouched.
-    emptyFirstRun: No partner login mfa yet. **Offers no create action** — this screen declares no operation
-      that makes one — and says so rather than showing an empty table.
-    emptyNoResults: Nothing matches the filter on venueId, principalId, workstationId and the partner
-      login mfa are still there. Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `ORDER_VIEW`, which `getB2bCredit` requires, and names
-      that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    loading: Checking the credential. The form stays visible and disabled.
+    emptyFirstRun: '**Nobody signed in** - the normal state of a door. The form offers username and password
+      and, where the tenant configured one for partners, its SSO.'
+    error: Identity could not be reached. **Says so rather than saying the password is wrong**, and keeps
+      what was typed.
+    denied: The credential does not match, or the account is locked. One message for both, with the attempts
+      left before the lock; a locked account says when to try again.
+    emptyNoAccess: Signed in, and the person holds no role in this app. Says who at the tenant grants
+      access; distinct from a wrong password. A door has no permission of its own to name, because the
+      person is not signed in until it succeeds.
+    emptyNoResults: 'Never shown: `listSsoProviders` takes no filter; a tenant with no identity provider
+      shows no SSO buttons at all, and the form is the whole door.'
+    sessionHeld: '`login` answered 409: this person already holds a session elsewhere (audit R184, ADR-0004).
+      Says where and since when; only a holder of SESSION_FORCE_LOGOUT ends it, on the staff directory
+      (BO-053), and signing in never ends it by itself.'
     mfaRequired: '**Signed in, not yet through.** The principal holds a permission that requires MFA (ROLE_MANAGE,
-      LEDGER_APPROVE, any platform-staff permission, or one the tenant added), so after `login` the screen
-      calls `createMfaChallenge` and asks for the authenticator code; `verifyMfaChallenge` completes the
-      sign-in. **Email me a code instead** is the fallback. Five wrong codes lock step-up for the policy''s
-      lockout minutes and the screen says so. A principal with no enrolled method is sent to enrol first
-      (decided 28 September, audit R135, R126).'
+      LEDGER_APPROVE, any PLATFORM_* permission, or one the tenant added), so the screen calls `createMfaChallenge`
+      (`action: signIn`) and asks for the authentication code; `verifyMfaChallenge` completes the sign-in.
+      **Email me a code instead** is the fallback. Five wrong codes lock step-up for the policy''s lockout
+      minutes and the screen says until when (audit R135, R126). A person without such a permission never
+      reaches this state.'
+    mfaEnrolmentRequired: '**First sign-in, no method yet.** A person who requires MFA and has no active
+      method enrols the authenticator app (email as the fallback) with `enrolMfaMethod`, confirms it with
+      the first code (`verifyMfaEnrolment`), sees the recovery codes once, then continues to the code
+      step (audit R135, R126 (5)).'
+    offline: 'Not available, and the offline banner says why: signing in needs a connection.'
   apis:
+  - operationId: login
+    contract: identity
+    purpose: Authenticate from a browser, with no workstation (CHG-DOOR-001)
+    trigger: onAction
+  - operationId: listSsoProviders
+    contract: identity
+    purpose: Which identity providers this door offers; unauthenticated, read before sign-in
+    trigger: onLoad
+  - operationId: startSsoAuthorization
+    contract: identity
+    purpose: Hand off to the identity provider where the tenant has SSO
+    trigger: onAction
+  - operationId: completeSsoAuthorization
+    contract: identity
+    purpose: Exchange the provider's code for the same LoginResponse as login, on the redirect back
+    trigger: background
   - operationId: createMfaChallenge
     contract: identity
-    purpose: Second factor after login when the principal holds a permission in mfaRequiredForPermissions;
-      action `signIn`, the primary method (authenticator app), or the email method as the fallback (decided
-      28 September, audit R135, R126 (5))
+    purpose: Second factor after sign-in when the principal holds a permission in mfaRequiredForPermissions;
+      action `signIn`, the authenticator app, or the email method as the fallback (audit R135, R126 (5))
     trigger: onAction
   - operationId: verifyMfaChallenge
     contract: identity
     purpose: Completes sign-in with the code; the session is usable only after it. Five wrong codes lock
       step-up (audit R126 (6))
     trigger: onAction
-  - operationId: login
+  - operationId: enrolMfaMethod
     contract: identity
-    purpose: from page inventory
+    purpose: 'The first method, at a first sign-in that requires one: authenticator app, or email as the
+      fallback (audit R135, R126 (5))'
     trigger: onAction
-  - operationId: getB2bCredit
-    contract: orders
-    purpose: From the flow it appears in
-    trigger: onLoad
-  - operationId: forceLogout
+  - operationId: verifyMfaEnrolment
     contract: identity
-    purpose: Supervisor termination of an abandoned session
+    purpose: Activates the enrolled method with its first code; recovery codes shown once
     trigger: onAction
-    invalidates:
-    - listActiveSessions
+  - operationId: selectRole
+    contract: identity
+    purpose: Choose which role to work as when sign-in returns more than one (ADR-0003)
+    trigger: onAction
+  - operationId: changeOwnCredential
+    contract: identity
+    purpose: Replace a temporary password or PIN at the first sign-in after a reset (audit R132)
+    trigger: onAction
   - operationId: getCurrentSession
     contract: identity
-    purpose: Current session and effective permissions
-    trigger: onLoad
-  - operationId: listActiveSessions
-    contract: identity
-    purpose: List active sessions
-    trigger: onLoad
-  - operationId: listMfaMethods
-    contract: identity
-    purpose: Enrolled MFA methods
-    trigger: onLoad
-  - operationId: listSsoProviders
-    contract: identity
-    purpose: Identity providers configured for this tenant
-    trigger: onLoad
-  - operationId: overrideCreditLimit
-    contract: orders
-    purpose: Authorise an order beyond the credit limit
+    purpose: Read the session the sign-in just opened, for the landing
     trigger: onAction
-    invalidates:
-    - listActiveSessions
-  - operationId: revokeAllSessions
-    contract: identity
-    purpose: Revoke every session in scope
-    trigger: onAction
-    invalidates:
-    - listActiveSessions
-  - operationId: setB2bCreditLimit
-    contract: orders
-    purpose: Set a partner credit limit
-    trigger: onAction
-    invalidates:
-    - listActiveSessions
-  - operationId: listPartnerAgreements
-    contract: subscription
-    purpose: Commercial agreements with B2B partners
-    trigger: onLoad
   entryState:
     params:
-    - name: accountId
-      from: deepLink
     - name: challengeId
       from: navigation
-    coldEntry: '**A partner link resolves within that partner''s own scope and refuses outside it.** A
-      forwarded link between partners must not open another partner''s record. If the target is gone the
-      screen says so and offers the partner''s own list. Arrives with `accountId`.'
-    preloaded:
-    - ActiveSession.status
-    - ActiveSession.sessionId
-    - ActiveSession.principalId
-    - ActiveSession.principalName
-    - ActiveSession.roleId
+    - name: providerId
+      from: deepLink
+      optional: true
+    - name: methodId
+      from: navigation
+    coldEntry: '**Needs nothing; that is what makes it the door.** No workstation travels with a browser
+      sign-in (CHG-DOOR-001). `providerId` arrives only on the identity provider''s redirect back, with
+      the `code` and `state` that `completeSsoAuthorization` exchanges; an expired or replayed redirect
+      lands on the form with "That sign-in link has expired; sign in again".'
+  apisNote: 'Declared by hand on 2 October 2026 (CHG-DOOR-002/003): sign-in, SSO, the second factor and
+    its first enrolment, the role prompt, a temporary credential''s replacement and the session read for
+    the landing. Nothing that needs a signed-in session to list or end sessions is here.'
   wireframe:
     status: notStarted
     provenance: generated
     board: wireframes/P10 Partner Web.dc.html#ptr-001
-  apisNote: Rebuilt 9 September 2026 from the 12 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  gaps:
+  - operation: getB2bCredit
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-021): A sign-in door shows no credit and no agreements: the
+      credit read and the limit writes (getB2bCredit, setB2bCreditLimit, overrideCreditLimit) belong to
+      the partner''s credit screens (PTR-002, PTR-013), and setting or overriding a limit is the tenant''s
+      act, not the partner''s; partner agreements live on the agreement screens. The accountId entry parameter
+      existed only for the credit calls. F10 step 1 now reads credit on the dashboard (design-notes correction
+      platform-foundation PTR-001).'
+    source: screens/P10-partner-reseller-portal.yaml#PTR-001; contracts/spine/orders.yaml#overrideCreditLimit
+  - operation: listPartnerAgreements
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-021): A sign-in door shows no credit and no agreements: the
+      credit read and the limit writes (getB2bCredit, setB2bCreditLimit, overrideCreditLimit) belong to
+      the partner''s credit screens (PTR-002, PTR-013), and setting or overriding a limit is the tenant''s
+      act, not the partner''s; partner agreements live on the agreement screens. The accountId entry parameter
+      existed only for the credit calls. F10 step 1 now reads credit on the dashboard (design-notes correction
+      platform-foundation PTR-001).'
+    source: screens/P10-partner-reseller-portal.yaml#PTR-001; contracts/spine/orders.yaml#overrideCreditLimit
+  - operation: overrideCreditLimit
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-021): A sign-in door shows no credit and no agreements: the
+      credit read and the limit writes (getB2bCredit, setB2bCreditLimit, overrideCreditLimit) belong to
+      the partner''s credit screens (PTR-002, PTR-013), and setting or overriding a limit is the tenant''s
+      act, not the partner''s; partner agreements live on the agreement screens. The accountId entry parameter
+      existed only for the credit calls. F10 step 1 now reads credit on the dashboard (design-notes correction
+      platform-foundation PTR-001).'
+    source: screens/P10-partner-reseller-portal.yaml#PTR-001; contracts/spine/orders.yaml#overrideCreditLimit
+  - operation: setB2bCreditLimit
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-021): A sign-in door shows no credit and no agreements: the
+      credit read and the limit writes (getB2bCredit, setB2bCreditLimit, overrideCreditLimit) belong to
+      the partner''s credit screens (PTR-002, PTR-013), and setting or overriding a limit is the tenant''s
+      act, not the partner''s; partner agreements live on the agreement screens. The accountId entry parameter
+      existed only for the credit calls. F10 step 1 now reads credit on the dashboard (design-notes correction
+      platform-foundation PTR-001).'
+    source: screens/P10-partner-reseller-portal.yaml#PTR-001; contracts/spine/orders.yaml#overrideCreditLimit
 - id: PTR-002
   name: Partner Dashboard
   module: Overview
@@ -581,6 +473,7 @@ screens:
     - PTR-001
     - PTR-003
     - PTR-007
+    - PTR-008
     flowDerived: true
     transitions:
     - to: PTR-007
@@ -589,14 +482,18 @@ screens:
       operation: getB2bCredit
     - to: PTR-001
       trigger: Partner Login / MFA
-      carries:
-      - accountId
-      provenance: derived — PTR-001 declares entryState.params accountId, challengeId and PTR-002 holds
-        accountId, so an edge into it carries them
+      provenance: 'derived — PTR-001 declares entryState.params challengeId, methodId, providerId and
+        PTR-002 holds none of them. The edge carries nothing: PTR-002 is opened from PTR-001, so this
+        edge is the way back and PTR-001 keeps its own state'
     - to: PTR-003
       trigger: Profile & Company Details
       provenance: 'derived — PTR-003 declares entryState.params  and PTR-002 holds none of them. The edge
         carries nothing: PTR-003 needs nothing to open'
+    - to: PTR-008
+      trigger: Book against the allocation
+      provenance: 'wiring fix, 2 October 2026 (CHG-WIR-022): flow F10 step 1→2'
+      carries:
+      - orderId
   notes: States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement. **createRefund removed
@@ -611,7 +508,7 @@ screens:
   pattern: listDetail
   patternReason: '`listOrders` reads the population and `getB2bCredit` reads one of them — list, select,
     act'
-  purpose: The screen this app sits on. Everything else is entered from here and returns to it.
+  purpose: See the partner's credit position and bookings at a glance, and start from here.
   layout:
     template: split
     regions:
@@ -756,10 +653,6 @@ screens:
     - name: actionBar
       slot: rowActions
       components:
-      - kind: primaryButton
-        label: Apply manual discount
-        operation: applyManualDiscount
-        provenance: contract orders.yaml POST /orders/{orderId}/discounts
       - kind: secondaryButton
         label: Create order
         operation: createOrder
@@ -776,10 +669,6 @@ screens:
         label: Modify order
         operation: modifyOrder
         provenance: contract orders.yaml POST /orders/{orderId}/modify
-      - kind: destructiveButton
-        label: Override credit limit
-        operation: overrideCreditLimit
-        provenance: contract orders.yaml POST /b2b-accounts/{accountId}/credit/override
       - kind: secondaryButton
         label: Reprint order
         operation: reprintOrder
@@ -792,52 +681,7 @@ screens:
         label: Resume order
         operation: resumeOrder
         provenance: contract orders.yaml POST /orders/{orderId}/resume
-      - kind: secondaryButton
-        label: Save b2b credit limit
-        operation: setB2bCreditLimit
-        provenance: contract orders.yaml PUT /b2b-accounts/{accountId}/credit
-      - kind: destructiveButton
-        label: Void order
-        operation: voidOrder
-        provenance: contract orders.yaml POST /orders/{orderId}/voids
   overlays:
-  - id: confirmOverrideCreditLimit
-    component: confirmDialog
-    trigger: Override credit limit
-    body: '**Names what `overrideCreditLimit` changes and what it leaves alone**, in the consequence rather
-      than the verb. A partner this affects should be identified in the dialog, not just counted. **Collects
-      what `overrideCreditLimit` sends before it is called.** Required: `orderId`, `amount`, `reason`.
-      Optional: `expiresAt`.'
-    provenance: contract orders.yaml POST /b2b-accounts/{accountId}/credit/override
-  - id: confirmVoidOrder
-    component: confirmDialog
-    trigger: Void order
-    body: '**Names what `voidOrder` changes and what it leaves alone**, in the consequence rather than
-      the verb. A partner this affects should be identified in the dialog, not just counted. **Collects
-      what `voidOrder` sends before it is called.** Required: `id`, `reason`, `recordedAt`.'
-    provenance: contract orders.yaml POST /orders/{orderId}/voids
-  - id: formApplyManualDiscount
-    component: modal
-    trigger: Apply manual discount
-    body: '**Collects what `applyManualDiscount` sends before it is called.** Required: `id`, `reason`,
-      `recordedAt`. Optional: `lineId`, `amount`, `percentage`, `reasonCode`, `approverPrincipalId`. Dismissing
-      sends nothing; the screen behind is unchanged.'
-    bindsTo: ManualDiscountRequest
-    confirm:
-      label: Apply manual discount
-      operation: applyManualDiscount
-    dismiss:
-      label: Cancel
-      discards:
-      - id
-      - reason
-      - recordedAt
-      - lineId
-      - amount
-      - percentage
-      - reasonCode
-      - approverPrincipalId
-    provenance: contract orders.yaml POST /orders/{orderId}/discounts
   - id: formCreateOrder
     component: modal
     trigger: Create order
@@ -949,22 +793,6 @@ screens:
       - waiveFee
       - reason
     provenance: contract orders.yaml POST /orders/{orderId}/reschedule
-  - id: formSetB2bCreditLimit
-    component: modal
-    trigger: Save b2b credit limit
-    body: '**Collects what `setB2bCreditLimit` sends before it is called.** Required: `creditLimit`, `reason`.
-      Optional: `paymentTermsDays`, `isSuspended`. Dismissing sends nothing; the screen behind is unchanged.'
-    confirm:
-      label: Save b2b credit limit
-      operation: setB2bCreditLimit
-    dismiss:
-      label: Cancel
-      discards:
-      - creditLimit
-      - reason
-      - paymentTermsDays
-      - isSuspended
-    provenance: contract orders.yaml PUT /b2b-accounts/{accountId}/credit
   states:
     loading: The partner list.
     error: Could not load. Names which read failed and leaves the partner untouched.
@@ -984,12 +812,6 @@ screens:
     contract: orders
     purpose: from page inventory
     trigger: onLoad
-  - operationId: applyManualDiscount
-    contract: orders
-    purpose: Apply a discount a cashier chose
-    trigger: onAction
-    invalidates:
-    - listOrders
   - operationId: createOrder
     contract: orders
     purpose: Create an order
@@ -1026,12 +848,6 @@ screens:
     trigger: onAction
     invalidates:
     - listOrders
-  - operationId: overrideCreditLimit
-    contract: orders
-    purpose: Authorise an order beyond the credit limit
-    trigger: onAction
-    invalidates:
-    - listOrders
   - operationId: reprintOrder
     contract: orders
     purpose: Reprint or resend tickets
@@ -1047,18 +863,6 @@ screens:
   - operationId: resumeOrder
     contract: orders
     purpose: Bring a parked sale back to a till
-    trigger: onAction
-    invalidates:
-    - listOrders
-  - operationId: setB2bCreditLimit
-    contract: orders
-    purpose: Set a partner credit limit
-    trigger: onAction
-    invalidates:
-    - listOrders
-  - operationId: voidOrder
-    contract: orders
-    purpose: Void an order
     trigger: onAction
     invalidates:
     - listOrders
@@ -1087,6 +891,34 @@ screens:
   apisNote: Rebuilt 9 September 2026 from the 16 operations this screen declares, not from a workshop
     pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
     them to the ones that matter is work a person still owes this screen.
+  gaps:
+  - operation: applyManualDiscount
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-018): A partner cannot set or override its own credit limit,
+      apply a manual discount or void an order; those are venue actions (design-notes correction ticketing-guest
+      PTR-002).'
+    source: screens/P10-partner-reseller-portal.yaml#PTR-002
+  - operation: overrideCreditLimit
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-018): A partner cannot set or override its own credit limit,
+      apply a manual discount or void an order; those are venue actions (design-notes correction ticketing-guest
+      PTR-002).'
+    source: screens/P10-partner-reseller-portal.yaml#PTR-002
+  - operation: setB2bCreditLimit
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-018): A partner cannot set or override its own credit limit,
+      apply a manual discount or void an order; those are venue actions (design-notes correction ticketing-guest
+      PTR-002).'
+    source: screens/P10-partner-reseller-portal.yaml#PTR-002
+  - operation: voidOrder
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-018): A partner cannot set or override its own credit limit,
+      apply a manual discount or void an order; those are venue actions (design-notes correction ticketing-guest
+      PTR-002).'
+    source: screens/P10-partner-reseller-portal.yaml#PTR-002
+  purposeNote: 'Purpose rewritten 2 October 2026 (CHG-WIR-020): The purpose ("The screen this app sits
+    on...") was the generic home template; the dashboard is the partner''s credit and bookings overview
+    (design-notes correction ticketing-guest PTR-002).'
 - id: PTR-003
   name: Profile & Company Details
   module: Access & Account
@@ -1108,9 +940,9 @@ screens:
     transitions:
     - to: PTR-001
       trigger: Partner Login / MFA
-      provenance: 'derived — PTR-001 declares entryState.params accountId, challengeId and PTR-003 holds
-        none of them. The edge carries nothing: PTR-003 is opened from PTR-001, so this edge is the way
-        back and PTR-001 keeps its own state'
+      provenance: 'derived — PTR-001 declares entryState.params challengeId, methodId, providerId and
+        PTR-003 holds none of them. The edge carries nothing: PTR-003 is opened from PTR-001, so this
+        edge is the way back and PTR-001 keeps its own state'
     - to: PTR-004
       trigger: Notifications
       provenance: 'derived — PTR-004 declares entryState.params messageId and PTR-003 holds none of them.
@@ -1123,7 +955,7 @@ screens:
   pattern: listDetail
   patternReason: '`listPrincipals` reads the population and `getPrincipal` reads one of them — list, select,
     act'
-  purpose: What we hold about staff, and what they can change.
+  purpose: The partner's company details and its users, and what each may change.
   layout:
     template: split
     regions:
@@ -1144,17 +976,17 @@ screens:
         label: Every principal
         bindsTo: Principal
         columns:
-        - Principal.id
         - Principal.username
         - Principal.displayName
         - Principal.isActive
         - Principal.validFrom
         - Principal.validTo
-        - Principal.primaryRoleId
         - Principal.roles
         - Principal.lastLoginAt
         operation: listPrincipals
         provenance: contract identity.yaml GET /principals
+        notes: The role is shown by name (from `roles`); the principal id is in the detail panel with
+          a copy action.
     - name: contextPanel
       slot: selection
       components:
@@ -1271,6 +1103,9 @@ screens:
       - validTo
       - primaryRoleId
     provenance: contract identity.yaml PATCH /principals/{principalId}
+  purposeNote: 'Purpose rewritten 2 October 2026 (CHG-WIR-023): The purpose "What we hold about staff"
+    was copied from a staff screen; these are the partner''s own users (design-notes correction platform-foundation
+    PTR-003).'
 - id: PTR-004
   name: Notifications
   module: Access & Account
@@ -1292,9 +1127,9 @@ screens:
     transitions:
     - to: PTR-001
       trigger: Partner Login / MFA
-      provenance: 'derived — PTR-001 declares entryState.params accountId, challengeId and PTR-004 holds
-        none of them. The edge carries nothing: PTR-004 is opened from PTR-001, so this edge is the way
-        back and PTR-001 keeps its own state'
+      provenance: 'derived — PTR-001 declares entryState.params challengeId, methodId, providerId and
+        PTR-004 holds none of them. The edge carries nothing: PTR-004 is opened from PTR-001, so this
+        edge is the way back and PTR-001 keeps its own state'
     - to: PTR-003
       trigger: Profile & Company Details
       provenance: 'derived — PTR-003 declares entryState.params  and PTR-004 holds none of them. The edge
@@ -1306,7 +1141,7 @@ screens:
   pattern: statusTracker
   patternReason: '`getMessageStatus` reads one record and nothing reads a population — the screen is about
     that one thing'
-  purpose: Work with notifications for this venue.
+  purpose: See the messages sent to this partner and whether each was delivered.
   layout:
     template: detail
     regions:
@@ -1385,6 +1220,9 @@ screens:
       - channel
       - mergeValues
     provenance: contract marketing-crm.yaml POST /messages
+  purposeNote: 'Purpose rewritten 2 October 2026 (CHG-WIR-006): The purpose ("Work with notifications
+    for this venue") was the generic template; a partner portal''s notifications page is a feed of messages
+    to the partner (design-notes correction customer-marketing PTR-004).'
 - id: PTR-005
   name: Inventory & Allocation View
   module: Inventory & Pricing
@@ -1419,7 +1257,6 @@ screens:
     - to: PTR-008
       trigger: Receives vouchers
       provenance: flow F10 step 2→3
-      operation: createOrder
       carries:
       - orderId
   notes: States derived from the screen pattern on 17 August, not individually considered — sound for
@@ -1581,26 +1418,6 @@ screens:
     - name: actionBar
       slot: rowActions
       components:
-      - kind: primaryButton
-        label: Create order
-        operation: createOrder
-        provenance: contract orders.yaml POST /orders
-      - kind: secondaryButton
-        label: Apply manual discount
-        operation: applyManualDiscount
-        provenance: contract orders.yaml POST /orders/{orderId}/discounts
-      - kind: secondaryButton
-        label: Exchange order lines
-        operation: exchangeOrderLines
-        provenance: contract orders.yaml POST /orders/{orderId}/exchanges
-      - kind: secondaryButton
-        label: Hold order
-        operation: holdOrder
-        provenance: contract orders.yaml POST /orders/{orderId}/hold
-      - kind: secondaryButton
-        label: Modify order
-        operation: modifyOrder
-        provenance: contract orders.yaml POST /orders/{orderId}/modify
       - kind: secondaryButton
         label: Release channel allocation
         operation: relinquishChannelAllocation
@@ -1609,124 +1426,7 @@ screens:
         label: Reprint order
         operation: reprintOrder
         provenance: contract orders.yaml POST /orders/{orderId}/reprints
-      - kind: secondaryButton
-        label: Reschedule order
-        operation: rescheduleOrder
-        provenance: contract orders.yaml POST /orders/{orderId}/reschedule
-      - kind: secondaryButton
-        label: Resume order
-        operation: resumeOrder
-        provenance: contract orders.yaml POST /orders/{orderId}/resume
-      - kind: destructiveButton
-        label: Void order
-        operation: voidOrder
-        provenance: contract orders.yaml POST /orders/{orderId}/voids
   overlays:
-  - id: confirmVoidOrder
-    component: confirmDialog
-    trigger: Void order
-    body: '**Names what `voidOrder` changes and what it leaves alone**, in the consequence rather than
-      the verb. A inventory allocation this affects should be identified in the dialog, not just counted.
-      **Collects what `voidOrder` sends before it is called.** Required: `id`, `reason`, `recordedAt`.'
-    provenance: contract orders.yaml POST /orders/{orderId}/voids
-  - id: formCreateOrder
-    component: modal
-    trigger: Create order
-    body: '**Collects what `createOrder` sends before it is called.** Required: `id`, `venueId`, `channel`,
-      `lines`, `recordedAt`. Optional: `shiftId`, `subjectId`, `guestLinkId`, `catalogueBundleVersion`.
-      Dismissing sends nothing; the screen behind is unchanged.'
-    bindsTo: CreateOrderRequest
-    confirm:
-      label: Create order
-      operation: createOrder
-    dismiss:
-      label: Cancel
-      discards:
-      - id
-      - venueId
-      - channel
-      - lines
-      - recordedAt
-      - shiftId
-      - subjectId
-      - guestLinkId
-      - catalogueBundleVersion
-    provenance: contract orders.yaml POST /orders
-  - id: formApplyManualDiscount
-    component: modal
-    trigger: Apply manual discount
-    body: '**Collects what `applyManualDiscount` sends before it is called.** Required: `id`, `reason`,
-      `recordedAt`. Optional: `lineId`, `amount`, `percentage`, `reasonCode`, `approverPrincipalId`. Dismissing
-      sends nothing; the screen behind is unchanged.'
-    bindsTo: ManualDiscountRequest
-    confirm:
-      label: Apply manual discount
-      operation: applyManualDiscount
-    dismiss:
-      label: Cancel
-      discards:
-      - id
-      - reason
-      - recordedAt
-      - lineId
-      - amount
-      - percentage
-      - reasonCode
-      - approverPrincipalId
-    provenance: contract orders.yaml POST /orders/{orderId}/discounts
-  - id: formExchangeOrderLines
-    component: modal
-    trigger: Exchange order lines
-    body: '**Collects what `exchangeOrderLines` sends before it is called.** Required: `id`, `outgoingLineIds`,
-      `incomingLines`, `recordedAt`. Optional: `waiveFee`, `reason`. Dismissing sends nothing; the screen
-      behind is unchanged.'
-    bindsTo: ExchangeOrderRequest
-    confirm:
-      label: Exchange order lines
-      operation: exchangeOrderLines
-    dismiss:
-      label: Cancel
-      discards:
-      - id
-      - outgoingLineIds
-      - incomingLines
-      - recordedAt
-      - waiveFee
-      - reason
-    provenance: contract orders.yaml POST /orders/{orderId}/exchanges
-  - id: formHoldOrder
-    component: modal
-    trigger: Hold order
-    body: '**Collects what `holdOrder` sends before it is called.** Required: `recordedAt`. Optional:
-      `label`, `holdUntil`. Dismissing sends nothing; the screen behind is unchanged.'
-    confirm:
-      label: Hold order
-      operation: holdOrder
-    dismiss:
-      label: Cancel
-      discards:
-      - recordedAt
-      - label
-      - holdUntil
-    provenance: contract orders.yaml POST /orders/{orderId}/hold
-  - id: formModifyOrder
-    component: modal
-    trigger: Modify order
-    body: '**Collects what `modifyOrder` sends before it is called.** Required: `id`, `recordedAt`. Optional:
-      `addLines`, `removeLineIds`, `reason`. Dismissing sends nothing; the screen behind is unchanged.'
-    bindsTo: ModifyOrderRequest
-    confirm:
-      label: Modify order
-      operation: modifyOrder
-    dismiss:
-      label: Cancel
-      discards:
-      - id
-      - recordedAt
-      - addLines
-      - removeLineIds
-      - reason
-    provenance: contract orders.yaml POST /orders/{orderId}/modify
   - id: formRelinquishChannelAllocation
     component: modal
     trigger: Release channel allocation
@@ -1758,29 +1458,11 @@ screens:
       - lineIds
       - reason
     provenance: contract orders.yaml POST /orders/{orderId}/reprints
-  - id: formRescheduleOrder
-    component: modal
-    trigger: Reschedule order
-    body: '**Collects what `rescheduleOrder` sends before it is called.** Required: `targetPerformanceId`,
-      `recordedAt`. Optional: `lineIds`, `waiveFee`, `reason`. Dismissing sends nothing; the screen behind
-      is unchanged.'
-    confirm:
-      label: Reschedule order
-      operation: rescheduleOrder
-    dismiss:
-      label: Cancel
-      discards:
-      - targetPerformanceId
-      - recordedAt
-      - lineIds
-      - waiveFee
-      - reason
-    provenance: contract orders.yaml POST /orders/{orderId}/reschedule
   states:
     loading: The inventory allocation list.
     error: Could not load. Names which read failed and leaves the inventory allocation untouched.
-    emptyFirstRun: No inventory allocation yet. Offers Create order (`createOrder`); distinct from a filter
-      that matched nothing.
+    emptyFirstRun: No inventory allocation yet. Offers no create action — this screen declares no operation
+      that makes one; distinct from a filter that matched nothing.
     emptyNoResults: Nothing matches the filter on performanceId and the inventory allocation are still
       there. Names the active filter and offers to clear it.
     emptyNoAccess: Shown when the caller lacks `PRODUCT_VIEW`, which `getChannelAllocations` requires,
@@ -1791,22 +1473,6 @@ screens:
     contract: catalogue
     purpose: from page inventory
     trigger: onAction
-  - operationId: createOrder
-    contract: orders
-    purpose: From the flow it appears in
-    trigger: onAction
-  - operationId: applyManualDiscount
-    contract: orders
-    purpose: Apply a discount a cashier chose
-    trigger: onAction
-    invalidates:
-    - listChannelCapacities
-  - operationId: exchangeOrderLines
-    contract: orders
-    purpose: Exchange lines for different products or dates
-    trigger: onAction
-    invalidates:
-    - listChannelCapacities
   - operationId: getOrder
     contract: orders
     purpose: Read an order
@@ -1815,12 +1481,6 @@ screens:
     contract: orders
     purpose: Full financial history of an order
     trigger: onAction
-  - operationId: holdOrder
-    contract: orders
-    purpose: Park a sale and free the till
-    trigger: onAction
-    invalidates:
-    - listChannelCapacities
   - operationId: listChannelCapacities
     contract: catalogue
     purpose: List capacity envelopes
@@ -1833,12 +1493,6 @@ screens:
     contract: orders
     purpose: List orders
     trigger: onLoad
-  - operationId: modifyOrder
-    contract: orders
-    purpose: Add or remove lines on an existing order
-    trigger: onAction
-    invalidates:
-    - listChannelCapacities
   - operationId: relinquishChannelAllocation
     contract: catalogue
     purpose: Return unsold channel allocation to the general pool
@@ -1848,24 +1502,6 @@ screens:
   - operationId: reprintOrder
     contract: orders
     purpose: Reprint or resend tickets
-    trigger: onAction
-    invalidates:
-    - listChannelCapacities
-  - operationId: rescheduleOrder
-    contract: orders
-    purpose: Move an order to another performance
-    trigger: onAction
-    invalidates:
-    - listChannelCapacities
-  - operationId: resumeOrder
-    contract: orders
-    purpose: Bring a parked sale back to a till
-    trigger: onAction
-    invalidates:
-    - listChannelCapacities
-  - operationId: voidOrder
-    contract: orders
-    purpose: Void an order
     trigger: onAction
     invalidates:
     - listChannelCapacities
@@ -1890,6 +1526,55 @@ screens:
   apisNote: Rebuilt 9 September 2026 from the 19 operations this screen declares, not from a workshop
     pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
     them to the ones that matter is work a person still owes this screen.
+  gaps:
+  - operation: applyManualDiscount
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-018): Order actions (create, discount, exchange, hold, modify,
+      void) on an inventory view; booking is PTR-008 and this view reads and returns allocation (design-notes
+      correction ticketing-guest PTR-005).'
+    source: screens/P10-partner-reseller-portal.yaml#PTR-005
+  - operation: createOrder
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-018): Order actions (create, discount, exchange, hold, modify,
+      void) on an inventory view; booking is PTR-008 and this view reads and returns allocation (design-notes
+      correction ticketing-guest PTR-005).'
+    source: screens/P10-partner-reseller-portal.yaml#PTR-005
+  - operation: exchangeOrderLines
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-018): Order actions (create, discount, exchange, hold, modify,
+      void) on an inventory view; booking is PTR-008 and this view reads and returns allocation (design-notes
+      correction ticketing-guest PTR-005).'
+    source: screens/P10-partner-reseller-portal.yaml#PTR-005
+  - operation: holdOrder
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-018): Order actions (create, discount, exchange, hold, modify,
+      void) on an inventory view; booking is PTR-008 and this view reads and returns allocation (design-notes
+      correction ticketing-guest PTR-005).'
+    source: screens/P10-partner-reseller-portal.yaml#PTR-005
+  - operation: modifyOrder
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-018): Order actions (create, discount, exchange, hold, modify,
+      void) on an inventory view; booking is PTR-008 and this view reads and returns allocation (design-notes
+      correction ticketing-guest PTR-005).'
+    source: screens/P10-partner-reseller-portal.yaml#PTR-005
+  - operation: rescheduleOrder
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-018): Order actions (create, discount, exchange, hold, modify,
+      void) on an inventory view; booking is PTR-008 and this view reads and returns allocation (design-notes
+      correction ticketing-guest PTR-005).'
+    source: screens/P10-partner-reseller-portal.yaml#PTR-005
+  - operation: resumeOrder
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-018): Order actions (create, discount, exchange, hold, modify,
+      void) on an inventory view; booking is PTR-008 and this view reads and returns allocation (design-notes
+      correction ticketing-guest PTR-005).'
+    source: screens/P10-partner-reseller-portal.yaml#PTR-005
+  - operation: voidOrder
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-018): Order actions (create, discount, exchange, hold, modify,
+      void) on an inventory view; booking is PTR-008 and this view reads and returns allocation (design-notes
+      correction ticketing-guest PTR-005).'
+    source: screens/P10-partner-reseller-portal.yaml#PTR-005
 - id: PTR-006
   name: Product Catalog (B2B Pricing)
   module: Inventory & Pricing
@@ -2166,7 +1851,7 @@ screens:
   pattern: statusTracker
   patternReason: '`getAvailability` reads one record and nothing reads a population — the screen is about
     that one thing'
-  purpose: Find something when the guest does not know what it is called.
+  purpose: See what is available to sell on the partner channel, by product and performance.
   gaps:
   - operation: getAvailability
     why: '**`getAvailability` declares its response inline**, so the component that shows it names fields
@@ -2204,6 +1889,9 @@ screens:
   apisNote: Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
+  purposeNote: 'Purpose rewritten 2 October 2026 (CHG-WIR-020): The purpose was copied from the guest
+    search ("Find something when the guest does not know what it is called"); the screen is availability
+    for the partner''s products (design-notes correction ticketing-guest PTR-007).'
 - id: PTR-008
   name: Booking Creation
   module: Booking & Quotes
@@ -2219,6 +1907,7 @@ screens:
     entryFrom:
     - PTR-001
     - PTR-007
+    - PTR-002
     inferred: true
     exitTo:
     - PTR-002
@@ -2389,14 +2078,6 @@ screens:
         operation: createOrder
         provenance: contract orders.yaml POST /orders
       - kind: secondaryButton
-        label: Apply manual discount
-        operation: applyManualDiscount
-        provenance: contract orders.yaml POST /orders/{orderId}/discounts
-      - kind: secondaryButton
-        label: Create refund
-        operation: createRefund
-        provenance: contract orders.yaml POST /orders/{orderId}/refunds
-      - kind: secondaryButton
         label: Exchange order lines
         operation: exchangeOrderLines
         provenance: contract orders.yaml POST /orders/{orderId}/exchanges
@@ -2420,18 +2101,7 @@ screens:
         label: Resume order
         operation: resumeOrder
         provenance: contract orders.yaml POST /orders/{orderId}/resume
-      - kind: destructiveButton
-        label: Void order
-        operation: voidOrder
-        provenance: contract orders.yaml POST /orders/{orderId}/voids
   overlays:
-  - id: confirmVoidOrder
-    component: confirmDialog
-    trigger: Void order
-    body: '**Names what `voidOrder` changes and what it leaves alone**, in the consequence rather than
-      the verb. A booking creation this affects should be identified in the dialog, not just counted.
-      **Collects what `voidOrder` sends before it is called.** Required: `id`, `reason`, `recordedAt`.'
-    provenance: contract orders.yaml POST /orders/{orderId}/voids
   - id: formCreateOrder
     component: modal
     trigger: Create order
@@ -2455,50 +2125,6 @@ screens:
       - guestLinkId
       - catalogueBundleVersion
     provenance: contract orders.yaml POST /orders
-  - id: formApplyManualDiscount
-    component: modal
-    trigger: Apply manual discount
-    body: '**Collects what `applyManualDiscount` sends before it is called.** Required: `id`, `reason`,
-      `recordedAt`. Optional: `lineId`, `amount`, `percentage`, `reasonCode`, `approverPrincipalId`. Dismissing
-      sends nothing; the screen behind is unchanged.'
-    bindsTo: ManualDiscountRequest
-    confirm:
-      label: Apply manual discount
-      operation: applyManualDiscount
-    dismiss:
-      label: Cancel
-      discards:
-      - id
-      - reason
-      - recordedAt
-      - lineId
-      - amount
-      - percentage
-      - reasonCode
-      - approverPrincipalId
-    provenance: contract orders.yaml POST /orders/{orderId}/discounts
-  - id: formCreateRefund
-    component: modal
-    trigger: Create refund
-    body: '**Collects what `createRefund` sends before it is called.** Required: `id`, `amount`, `reason`,
-      `recordedAt`. Optional: `lineIds`, `secondaryAuthorisation`, `refundToOriginalTender`, `alternateTender`.
-      Dismissing sends nothing; the screen behind is unchanged.'
-    bindsTo: CreateRefundRequest
-    confirm:
-      label: Create refund
-      operation: createRefund
-    dismiss:
-      label: Cancel
-      discards:
-      - id
-      - amount
-      - reason
-      - recordedAt
-      - lineIds
-      - secondaryAuthorisation
-      - refundToOriginalTender
-      - alternateTender
-    provenance: contract orders.yaml POST /orders/{orderId}/refunds
   - id: formExchangeOrderLines
     component: modal
     trigger: Exchange order lines
@@ -2607,18 +2233,6 @@ screens:
     contract: orders
     purpose: From the flow it appears in
     trigger: onLoad
-  - operationId: applyManualDiscount
-    contract: orders
-    purpose: Apply a discount a cashier chose
-    trigger: onAction
-    invalidates:
-    - listOrders
-  - operationId: createRefund
-    contract: orders
-    purpose: Refund an order, wholly or in part
-    trigger: onAction
-    invalidates:
-    - listOrders
   - operationId: exchangeOrderLines
     contract: orders
     purpose: Exchange lines for different products or dates
@@ -2667,12 +2281,6 @@ screens:
     trigger: onAction
     invalidates:
     - listOrders
-  - operationId: voidOrder
-    contract: orders
-    purpose: Void an order
-    trigger: onAction
-    invalidates:
-    - listOrders
   entryState:
     params:
     - name: orderId
@@ -2692,6 +2300,22 @@ screens:
   apisNote: Rebuilt 9 September 2026 from the 14 operations this screen declares, not from a workshop
     pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
     them to the ones that matter is work a person still owes this screen.
+  gaps:
+  - operation: applyManualDiscount
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-018): The partner creates a booking; refund, void and discount
+      are venue-side (design-notes correction ticketing-guest PTR-008).'
+    source: screens/P10-partner-reseller-portal.yaml#PTR-008
+  - operation: createRefund
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-018): The partner creates a booking; refund, void and discount
+      are venue-side (design-notes correction ticketing-guest PTR-008).'
+    source: screens/P10-partner-reseller-portal.yaml#PTR-008
+  - operation: voidOrder
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-018): The partner creates a booking; refund, void and discount
+      are venue-side (design-notes correction ticketing-guest PTR-008).'
+    source: screens/P10-partner-reseller-portal.yaml#PTR-008
 - id: PTR-009
   name: Group / Bulk Booking
   module: Booking & Quotes
@@ -3062,10 +2686,6 @@ screens:
         operation: evaluatePromotions
         provenance: contract promotions.yaml POST /promotions/evaluate
       - kind: secondaryButton
-        label: Analyse promotion conflicts
-        operation: analysePromotionConflicts
-        provenance: contract promotions.yaml GET /promotions/{promotionId}/conflicts
-      - kind: secondaryButton
         label: Add cart line
         operation: addCartLine
         provenance: contract orders.yaml POST /carts/{cartId}/lines
@@ -3171,10 +2791,6 @@ screens:
     contract: promotions
     purpose: from page inventory
     trigger: onLoad
-  - operationId: analysePromotionConflicts
-    contract: promotions
-    purpose: Analyse stacking against live promotions
-    trigger: onAction
   - operationId: getPromotion
     contract: promotions
     purpose: Read a promotion
@@ -3239,6 +2855,12 @@ screens:
   apisNote: Rebuilt 9 September 2026 from the 10 operations this screen declares, not from a workshop
     pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
     them to the ones that matter is work a person still owes this screen.
+  gaps:
+  - operation: analysePromotionConflicts
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-018): Promotion analysis (analysePromotionConflicts) is a venue
+      tool, not a partner''s cart action (design-notes correction ticketing-guest PTR-010).'
+    source: screens/P10-partner-reseller-portal.yaml#PTR-010
 - id: PTR-011
   name: Quote Management
   module: Booking & Quotes
@@ -3269,7 +2891,7 @@ screens:
   pattern: listDetail
   patternReason: '`listPartnerAgreements` reads the population and `getCommissionStatement` reads one
     of them — list, select, act'
-  purpose: Find quote management for this venue.
+  purpose: Raise quotes and follow the ones offered to this partner.
   layout:
     template: split
     regions:
@@ -3290,8 +2912,6 @@ screens:
         label: Every partner agreement
         bindsTo: PartnerAgreement
         columns:
-        - PartnerAgreement.id
-        - PartnerAgreement.partnerId
         - PartnerAgreement.partnerName
         - PartnerAgreement.status
         - PartnerAgreement.rateMode
@@ -3300,23 +2920,21 @@ screens:
         - PartnerAgreement.volumeWindow
         - PartnerAgreement.seasonalRates
         - PartnerAgreement.segmentTier
-        - PartnerAgreement.brandingAssetId
         - PartnerAgreement.storefrontSubdomain
         operation: listPartnerAgreements
         provenance: contract subscription.yaml GET /partner-agreements
+        notes: The partner and agreement are shown by name; ids stay in the detail panel with a copy action.
       - kind: dataTable
         label: Every partner quote
         bindsTo: PartnerQuote
         columns:
-        - PartnerQuote.id
-        - PartnerQuote.partnerId
-        - PartnerQuote.agreementId
         - PartnerQuote.currency
         - PartnerQuote.totalMinor
         - PartnerQuote.state
         - PartnerQuote.validUntil
         operation: listPartnerQuotes
         provenance: contract subscription.yaml GET /partner-quotes
+        notes: The partner and agreement are shown by name; ids stay in the detail panel with a copy action.
     - name: contextPanel
       slot: selection
       components:
@@ -3419,9 +3037,10 @@ screens:
   - id: formCreatePartnerQuote
     component: modal
     trigger: Create partner quote
-    body: '**Collects what `createPartnerQuote` sends before it is called.** Required: `id`. Optional:
-      `partnerId`, `agreementId`, `currency`, `totalMinor`, `state`, `validUntil`. Dismissing sends nothing;
-      the screen behind is unchanged.'
+    body: '**Collects what `createPartnerQuote` sends before it is called.** The person picks the agreement
+      and enters the amount, currency and validity; `partnerId` comes from the session. Never `id` or
+      `status`: an id is a client UUIDv7 generated silently and the status and timestamps are the server''s
+      (design-notes correction, CHG-SOT-015). Dismissing sends nothing; the screen behind is unchanged.'
     bindsTo: PartnerQuote
     confirm:
       label: Create partner quote
@@ -3429,14 +3048,14 @@ screens:
     dismiss:
       label: Cancel
       discards:
-      - id
-      - partnerId
       - agreementId
       - currency
       - totalMinor
-      - state
       - validUntil
     provenance: contract subscription.yaml POST /partner-quotes
+  purposeNote: 'Purpose rewritten 2 October 2026 (CHG-WIR-023): The purpose ("Find quote management for
+    this venue") was the generic template; quotes belong to the partner, not a venue (design-notes correction
+    platform-foundation PTR-011).'
 - id: PTR-012
   name: Checkout / Credit Purchase
   module: Credit & Settlement
@@ -3525,10 +3144,6 @@ screens:
         operation: createPayment
         provenance: contract orders.yaml POST /payments
       - kind: secondaryButton
-        label: Add tip
-        operation: addTip
-        provenance: contract orders.yaml POST /payments/{paymentId}/tip
-      - kind: secondaryButton
         label: Capture payment
         operation: capturePayment
         provenance: contract orders.yaml POST /payments/{paymentId}/capture
@@ -3548,10 +3163,6 @@ screens:
   - operationId: createPayment
     contract: orders
     purpose: from page inventory
-    trigger: onAction
-  - operationId: addTip
-    contract: orders
-    purpose: Record a tip against a payment
     trigger: onAction
   - operationId: capturePayment
     contract: orders
@@ -3576,22 +3187,6 @@ screens:
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
   overlays:
-  - id: formAddTip
-    component: modal
-    trigger: Add tip
-    body: '**Collects what `addTip` sends before it is called.** Required: `amount`, `source`, `recordedAt`.
-      Optional: `allocateToPrincipalId`. Dismissing sends nothing; the screen behind is unchanged.'
-    confirm:
-      label: Add tip
-      operation: addTip
-    dismiss:
-      label: Cancel
-      discards:
-      - amount
-      - source
-      - recordedAt
-      - allocateToPrincipalId
-    provenance: contract orders.yaml POST /payments/{paymentId}/tip
   - id: formCapturePayment
     component: modal
     trigger: Capture payment
@@ -3605,6 +3200,12 @@ screens:
       discards:
       - amount
     provenance: contract orders.yaml POST /payments/{paymentId}/capture
+  gaps:
+  - operation: addTip
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-018): A partner checkout has no tip (design-notes correction
+      ticketing-guest PTR-012).'
+    source: screens/P10-partner-reseller-portal.yaml#PTR-012
 - id: PTR-013
   name: Credit Limit & Balance
   module: Credit & Settlement
@@ -3627,10 +3228,9 @@ screens:
     transitions:
     - to: PTR-001
       trigger: Partner Login / MFA
-      carries:
-      - accountId
-      provenance: derived — PTR-001 declares entryState.params accountId, challengeId and PTR-013 holds
-        accountId, so an edge into it carries them
+      provenance: 'derived — PTR-001 declares entryState.params challengeId, methodId, providerId and
+        PTR-013 holds none of them. The edge carries nothing: PTR-013 is opened from PTR-001, so this
+        edge is the way back and PTR-001 keeps its own state'
     - to: PTR-002
       trigger: Partner Dashboard
       carries:
@@ -3677,40 +3277,7 @@ screens:
         provenance: contract orders.yaml GET /b2b-accounts/{accountId}/credit
     - name: actionBar
       slot: rowActions
-      components:
-      - kind: destructiveButton
-        label: Override credit limit
-        operation: overrideCreditLimit
-        provenance: contract orders.yaml POST /b2b-accounts/{accountId}/credit/override
-      - kind: secondaryButton
-        label: Save b2b credit limit
-        operation: setB2bCreditLimit
-        provenance: contract orders.yaml PUT /b2b-accounts/{accountId}/credit
-  overlays:
-  - id: confirmOverrideCreditLimit
-    component: confirmDialog
-    trigger: Override credit limit
-    body: '**Names what `overrideCreditLimit` changes and what it leaves alone**, in the consequence rather
-      than the verb. A credit limit balance this affects should be identified in the dialog, not just
-      counted. **Collects what `overrideCreditLimit` sends before it is called.** Required: `orderId`,
-      `amount`, `reason`. Optional: `expiresAt`.'
-    provenance: contract orders.yaml POST /b2b-accounts/{accountId}/credit/override
-  - id: formSetB2bCreditLimit
-    component: modal
-    trigger: Save b2b credit limit
-    body: '**Collects what `setB2bCreditLimit` sends before it is called.** Required: `creditLimit`, `reason`.
-      Optional: `paymentTermsDays`, `isSuspended`. Dismissing sends nothing; the screen behind is unchanged.'
-    confirm:
-      label: Save b2b credit limit
-      operation: setB2bCreditLimit
-    dismiss:
-      label: Cancel
-      discards:
-      - creditLimit
-      - reason
-      - paymentTermsDays
-      - isSuspended
-    provenance: contract orders.yaml PUT /b2b-accounts/{accountId}/credit
+      components: []
   states:
     loading: The credit limit balance, read by `getB2bCredit`.
     error: Could not load. Names which read failed and leaves the credit limit balance untouched.
@@ -3724,14 +3291,6 @@ screens:
     contract: orders
     purpose: from page inventory
     trigger: onLoad
-  - operationId: overrideCreditLimit
-    contract: orders
-    purpose: Authorise an order beyond the credit limit
-    trigger: onAction
-  - operationId: setB2bCreditLimit
-    contract: orders
-    purpose: Set a partner credit limit
-    trigger: onAction
   entryState:
     params:
     - name: accountId
@@ -3744,6 +3303,17 @@ screens:
   apisNote: Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
+  gaps:
+  - operation: overrideCreditLimit
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-018): Overriding and setting the credit limit are venue actions;
+      the partner reads (design-notes correction ticketing-guest PTR-013).'
+    source: screens/P10-partner-reseller-portal.yaml#PTR-013
+  - operation: setB2bCreditLimit
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-018): Overriding and setting the credit limit are venue actions;
+      the partner reads (design-notes correction ticketing-guest PTR-013).'
+    source: screens/P10-partner-reseller-portal.yaml#PTR-013
 - id: PTR-014
   name: Settlement & Payment History
   module: Reports & Settlement
@@ -3988,6 +3558,8 @@ screens:
       operation: listOrders
       crossesDevice: true
       back: false
+      carries:
+      - variantId
   notes: 'States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement. **Cross-platform navigation
@@ -4124,18 +3696,10 @@ screens:
     - name: actionBar
       slot: rowActions
       components:
-      - kind: primaryButton
-        label: Apply manual discount
-        operation: applyManualDiscount
-        provenance: contract orders.yaml POST /orders/{orderId}/discounts
       - kind: secondaryButton
         label: Create order
         operation: createOrder
         provenance: contract orders.yaml POST /orders
-      - kind: secondaryButton
-        label: Create refund
-        operation: createRefund
-        provenance: contract orders.yaml POST /orders/{orderId}/refunds
       - kind: secondaryButton
         label: Exchange order lines
         operation: exchangeOrderLines
@@ -4160,40 +3724,7 @@ screens:
         label: Resume order
         operation: resumeOrder
         provenance: contract orders.yaml POST /orders/{orderId}/resume
-      - kind: destructiveButton
-        label: Void order
-        operation: voidOrder
-        provenance: contract orders.yaml POST /orders/{orderId}/voids
   overlays:
-  - id: confirmVoidOrder
-    component: confirmDialog
-    trigger: Void order
-    body: '**Names what `voidOrder` changes and what it leaves alone**, in the consequence rather than
-      the verb. A order history this affects should be identified in the dialog, not just counted. **Collects
-      what `voidOrder` sends before it is called.** Required: `id`, `reason`, `recordedAt`.'
-    provenance: contract orders.yaml POST /orders/{orderId}/voids
-  - id: formApplyManualDiscount
-    component: modal
-    trigger: Apply manual discount
-    body: '**Collects what `applyManualDiscount` sends before it is called.** Required: `id`, `reason`,
-      `recordedAt`. Optional: `lineId`, `amount`, `percentage`, `reasonCode`, `approverPrincipalId`. Dismissing
-      sends nothing; the screen behind is unchanged.'
-    bindsTo: ManualDiscountRequest
-    confirm:
-      label: Apply manual discount
-      operation: applyManualDiscount
-    dismiss:
-      label: Cancel
-      discards:
-      - id
-      - reason
-      - recordedAt
-      - lineId
-      - amount
-      - percentage
-      - reasonCode
-      - approverPrincipalId
-    provenance: contract orders.yaml POST /orders/{orderId}/discounts
   - id: formCreateOrder
     component: modal
     trigger: Create order
@@ -4217,28 +3748,6 @@ screens:
       - guestLinkId
       - catalogueBundleVersion
     provenance: contract orders.yaml POST /orders
-  - id: formCreateRefund
-    component: modal
-    trigger: Create refund
-    body: '**Collects what `createRefund` sends before it is called.** Required: `id`, `amount`, `reason`,
-      `recordedAt`. Optional: `lineIds`, `secondaryAuthorisation`, `refundToOriginalTender`, `alternateTender`.
-      Dismissing sends nothing; the screen behind is unchanged.'
-    bindsTo: CreateRefundRequest
-    confirm:
-      label: Create refund
-      operation: createRefund
-    dismiss:
-      label: Cancel
-      discards:
-      - id
-      - amount
-      - reason
-      - recordedAt
-      - lineIds
-      - secondaryAuthorisation
-      - refundToOriginalTender
-      - alternateTender
-    provenance: contract orders.yaml POST /orders/{orderId}/refunds
   - id: formExchangeOrderLines
     component: modal
     trigger: Exchange order lines
@@ -4346,21 +3855,9 @@ screens:
     contract: orders
     purpose: from page inventory
     trigger: onAction
-  - operationId: applyManualDiscount
-    contract: orders
-    purpose: Apply a discount a cashier chose
-    trigger: onAction
-    invalidates:
-    - listOrders
   - operationId: createOrder
     contract: orders
     purpose: Create an order
-    trigger: onAction
-    invalidates:
-    - listOrders
-  - operationId: createRefund
-    contract: orders
-    purpose: Refund an order, wholly or in part
     trigger: onAction
     invalidates:
     - listOrders
@@ -4408,12 +3905,6 @@ screens:
     trigger: onAction
     invalidates:
     - listOrders
-  - operationId: voidOrder
-    contract: orders
-    purpose: Void an order
-    trigger: onAction
-    invalidates:
-    - listOrders
   entryState:
     params:
     - name: orderId
@@ -4433,6 +3924,25 @@ screens:
   apisNote: Rebuilt 9 September 2026 from the 14 operations this screen declares, not from a workshop
     pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
     them to the ones that matter is work a person still owes this screen.
+  gaps:
+  - operation: applyManualDiscount
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-018): Venue-side actions (refund, void, discount) on the partner''s
+      history; the partner requests changes and the venue performs them (design-notes correction ticketing-guest
+      PTR-015).'
+    source: screens/P10-partner-reseller-portal.yaml#PTR-015
+  - operation: createRefund
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-018): Venue-side actions (refund, void, discount) on the partner''s
+      history; the partner requests changes and the venue performs them (design-notes correction ticketing-guest
+      PTR-015).'
+    source: screens/P10-partner-reseller-portal.yaml#PTR-015
+  - operation: voidOrder
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-018): Venue-side actions (refund, void, discount) on the partner''s
+      history; the partner requests changes and the venue performs them (design-notes correction ticketing-guest
+      PTR-015).'
+    source: screens/P10-partner-reseller-portal.yaml#PTR-015
 - id: PTR-016
   name: Voucher / Ticket Download
   module: Orders & Fulfilment
@@ -4593,46 +4103,7 @@ screens:
         label: Reprint order
         operation: reprintOrder
         provenance: contract orders.yaml POST /orders/{orderId}/reprints
-      - kind: secondaryButton
-        label: Apply manual discount
-        operation: applyManualDiscount
-        provenance: contract orders.yaml POST /orders/{orderId}/discounts
-      - kind: secondaryButton
-        label: Create order
-        operation: createOrder
-        provenance: contract orders.yaml POST /orders
-      - kind: secondaryButton
-        label: Exchange order lines
-        operation: exchangeOrderLines
-        provenance: contract orders.yaml POST /orders/{orderId}/exchanges
-      - kind: secondaryButton
-        label: Hold order
-        operation: holdOrder
-        provenance: contract orders.yaml POST /orders/{orderId}/hold
-      - kind: secondaryButton
-        label: Modify order
-        operation: modifyOrder
-        provenance: contract orders.yaml POST /orders/{orderId}/modify
-      - kind: secondaryButton
-        label: Reschedule order
-        operation: rescheduleOrder
-        provenance: contract orders.yaml POST /orders/{orderId}/reschedule
-      - kind: secondaryButton
-        label: Resume order
-        operation: resumeOrder
-        provenance: contract orders.yaml POST /orders/{orderId}/resume
-      - kind: destructiveButton
-        label: Void order
-        operation: voidOrder
-        provenance: contract orders.yaml POST /orders/{orderId}/voids
   overlays:
-  - id: confirmVoidOrder
-    component: confirmDialog
-    trigger: Void order
-    body: '**Names what `voidOrder` changes and what it leaves alone**, in the consequence rather than
-      the verb. A voucher ticket download this affects should be identified in the dialog, not just counted.
-      **Collects what `voidOrder` sends before it is called.** Required: `id`, `reason`, `recordedAt`.'
-    provenance: contract orders.yaml POST /orders/{orderId}/voids
   - id: formReprintOrder
     component: modal
     trigger: Reprint order
@@ -4650,126 +4121,11 @@ screens:
       - lineIds
       - reason
     provenance: contract orders.yaml POST /orders/{orderId}/reprints
-  - id: formApplyManualDiscount
-    component: modal
-    trigger: Apply manual discount
-    body: '**Collects what `applyManualDiscount` sends before it is called.** Required: `id`, `reason`,
-      `recordedAt`. Optional: `lineId`, `amount`, `percentage`, `reasonCode`, `approverPrincipalId`. Dismissing
-      sends nothing; the screen behind is unchanged.'
-    bindsTo: ManualDiscountRequest
-    confirm:
-      label: Apply manual discount
-      operation: applyManualDiscount
-    dismiss:
-      label: Cancel
-      discards:
-      - id
-      - reason
-      - recordedAt
-      - lineId
-      - amount
-      - percentage
-      - reasonCode
-      - approverPrincipalId
-    provenance: contract orders.yaml POST /orders/{orderId}/discounts
-  - id: formCreateOrder
-    component: modal
-    trigger: Create order
-    body: '**Collects what `createOrder` sends before it is called.** Required: `id`, `venueId`, `channel`,
-      `lines`, `recordedAt`. Optional: `shiftId`, `subjectId`, `guestLinkId`, `catalogueBundleVersion`.
-      Dismissing sends nothing; the screen behind is unchanged.'
-    bindsTo: CreateOrderRequest
-    confirm:
-      label: Create order
-      operation: createOrder
-    dismiss:
-      label: Cancel
-      discards:
-      - id
-      - venueId
-      - channel
-      - lines
-      - recordedAt
-      - shiftId
-      - subjectId
-      - guestLinkId
-      - catalogueBundleVersion
-    provenance: contract orders.yaml POST /orders
-  - id: formExchangeOrderLines
-    component: modal
-    trigger: Exchange order lines
-    body: '**Collects what `exchangeOrderLines` sends before it is called.** Required: `id`, `outgoingLineIds`,
-      `incomingLines`, `recordedAt`. Optional: `waiveFee`, `reason`. Dismissing sends nothing; the screen
-      behind is unchanged.'
-    bindsTo: ExchangeOrderRequest
-    confirm:
-      label: Exchange order lines
-      operation: exchangeOrderLines
-    dismiss:
-      label: Cancel
-      discards:
-      - id
-      - outgoingLineIds
-      - incomingLines
-      - recordedAt
-      - waiveFee
-      - reason
-    provenance: contract orders.yaml POST /orders/{orderId}/exchanges
-  - id: formHoldOrder
-    component: modal
-    trigger: Hold order
-    body: '**Collects what `holdOrder` sends before it is called.** Required: `recordedAt`. Optional:
-      `label`, `holdUntil`. Dismissing sends nothing; the screen behind is unchanged.'
-    confirm:
-      label: Hold order
-      operation: holdOrder
-    dismiss:
-      label: Cancel
-      discards:
-      - recordedAt
-      - label
-      - holdUntil
-    provenance: contract orders.yaml POST /orders/{orderId}/hold
-  - id: formModifyOrder
-    component: modal
-    trigger: Modify order
-    body: '**Collects what `modifyOrder` sends before it is called.** Required: `id`, `recordedAt`. Optional:
-      `addLines`, `removeLineIds`, `reason`. Dismissing sends nothing; the screen behind is unchanged.'
-    bindsTo: ModifyOrderRequest
-    confirm:
-      label: Modify order
-      operation: modifyOrder
-    dismiss:
-      label: Cancel
-      discards:
-      - id
-      - recordedAt
-      - addLines
-      - removeLineIds
-      - reason
-    provenance: contract orders.yaml POST /orders/{orderId}/modify
-  - id: formRescheduleOrder
-    component: modal
-    trigger: Reschedule order
-    body: '**Collects what `rescheduleOrder` sends before it is called.** Required: `targetPerformanceId`,
-      `recordedAt`. Optional: `lineIds`, `waiveFee`, `reason`. Dismissing sends nothing; the screen behind
-      is unchanged.'
-    confirm:
-      label: Reschedule order
-      operation: rescheduleOrder
-    dismiss:
-      label: Cancel
-      discards:
-      - targetPerformanceId
-      - recordedAt
-      - lineIds
-      - waiveFee
-      - reason
-    provenance: contract orders.yaml POST /orders/{orderId}/reschedule
   states:
     loading: The voucher ticket download list.
     error: Could not load. Names which read failed and leaves the voucher ticket download untouched.
-    emptyFirstRun: No voucher ticket download yet. Offers Create order (`createOrder`).
+    emptyFirstRun: No voucher ticket download yet. Offers no create action — this screen declares no operation
+      that makes one.
     emptyNoResults: 'Never shown: `listOrderRefunds` takes no filter, so an empty list is always the first-run
       state above.'
     emptyNoAccess: Shown when the caller lacks `ORDER_VIEW`, which `getOrder` requires, and names that
@@ -4780,24 +4136,6 @@ screens:
     contract: orders
     purpose: from page inventory
     trigger: onAction
-  - operationId: applyManualDiscount
-    contract: orders
-    purpose: Apply a discount a cashier chose
-    trigger: onAction
-    invalidates:
-    - listOrderRefunds
-  - operationId: createOrder
-    contract: orders
-    purpose: Create an order
-    trigger: onAction
-    invalidates:
-    - listOrderRefunds
-  - operationId: exchangeOrderLines
-    contract: orders
-    purpose: Exchange lines for different products or dates
-    trigger: onAction
-    invalidates:
-    - listOrderRefunds
   - operationId: getOrder
     contract: orders
     purpose: Read an order
@@ -4806,12 +4144,6 @@ screens:
     contract: orders
     purpose: Full financial history of an order
     trigger: onLoad
-  - operationId: holdOrder
-    contract: orders
-    purpose: Park a sale and free the till
-    trigger: onAction
-    invalidates:
-    - listOrderRefunds
   - operationId: listOrderRefunds
     contract: orders
     purpose: List refunds against an order
@@ -4820,30 +4152,6 @@ screens:
     contract: orders
     purpose: List orders
     trigger: onLoad
-  - operationId: modifyOrder
-    contract: orders
-    purpose: Add or remove lines on an existing order
-    trigger: onAction
-    invalidates:
-    - listOrderRefunds
-  - operationId: rescheduleOrder
-    contract: orders
-    purpose: Move an order to another performance
-    trigger: onAction
-    invalidates:
-    - listOrderRefunds
-  - operationId: resumeOrder
-    contract: orders
-    purpose: Bring a parked sale back to a till
-    trigger: onAction
-    invalidates:
-    - listOrderRefunds
-  - operationId: voidOrder
-    contract: orders
-    purpose: Void an order
-    trigger: onAction
-    invalidates:
-    - listOrderRefunds
   entryState:
     params:
     - name: orderId
@@ -4862,6 +4170,47 @@ screens:
   apisNote: Rebuilt 9 September 2026 from the 13 operations this screen declares, not from a workshop
     pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
     them to the ones that matter is work a person still owes this screen.
+  gaps:
+  - operation: applyManualDiscount
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-018): Order-changing actions on a download screen; the screen
+      downloads and resends only (design-notes correction ticketing-guest PTR-016).'
+    source: screens/P10-partner-reseller-portal.yaml#PTR-016
+  - operation: createOrder
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-018): Order-changing actions on a download screen; the screen
+      downloads and resends only (design-notes correction ticketing-guest PTR-016).'
+    source: screens/P10-partner-reseller-portal.yaml#PTR-016
+  - operation: exchangeOrderLines
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-018): Order-changing actions on a download screen; the screen
+      downloads and resends only (design-notes correction ticketing-guest PTR-016).'
+    source: screens/P10-partner-reseller-portal.yaml#PTR-016
+  - operation: holdOrder
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-018): Order-changing actions on a download screen; the screen
+      downloads and resends only (design-notes correction ticketing-guest PTR-016).'
+    source: screens/P10-partner-reseller-portal.yaml#PTR-016
+  - operation: modifyOrder
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-018): Order-changing actions on a download screen; the screen
+      downloads and resends only (design-notes correction ticketing-guest PTR-016).'
+    source: screens/P10-partner-reseller-portal.yaml#PTR-016
+  - operation: rescheduleOrder
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-018): Order-changing actions on a download screen; the screen
+      downloads and resends only (design-notes correction ticketing-guest PTR-016).'
+    source: screens/P10-partner-reseller-portal.yaml#PTR-016
+  - operation: resumeOrder
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-018): Order-changing actions on a download screen; the screen
+      downloads and resends only (design-notes correction ticketing-guest PTR-016).'
+    source: screens/P10-partner-reseller-portal.yaml#PTR-016
+  - operation: voidOrder
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-018): Order-changing actions on a download screen; the screen
+      downloads and resends only (design-notes correction ticketing-guest PTR-016).'
+    source: screens/P10-partner-reseller-portal.yaml#PTR-016
 - id: PTR-017
   name: Commission Statement
   module: Reports & Settlement
@@ -4913,8 +4262,6 @@ screens:
         label: Every partner agreement
         bindsTo: PartnerAgreement
         columns:
-        - PartnerAgreement.id
-        - PartnerAgreement.partnerId
         - PartnerAgreement.partnerName
         - PartnerAgreement.status
         - PartnerAgreement.rateMode
@@ -4923,10 +4270,10 @@ screens:
         - PartnerAgreement.volumeWindow
         - PartnerAgreement.seasonalRates
         - PartnerAgreement.segmentTier
-        - PartnerAgreement.brandingAssetId
         - PartnerAgreement.storefrontSubdomain
         operation: listPartnerAgreements
         provenance: contract subscription.yaml GET /partner-agreements
+        notes: The partner is shown by name; ids stay in the detail panel with a copy action.
     - name: contextPanel
       slot: selection
       components:
@@ -4972,8 +4319,8 @@ screens:
   states:
     loading: The commission statement list.
     error: Could not load. Names which read failed and leaves the commission statement untouched.
-    emptyFirstRun: No commission statement yet. **Offers no create action** — this screen declares no
-      operation that makes one — and says so rather than showing an empty table.
+    emptyFirstRun: 'No commission statement for this agreement and period yet: nothing has settled against
+      it. Offers no action; the statement fills as bookings settle.'
     emptyNoResults: Nothing matches the filter on expiringWithinDays, status and the commission statement
       are still there. Names the active filter and offers to clear it.
     emptyNoAccess: Shown when the caller lacks `PARTNER_VIEW`, which `getCommissionStatement` requires,
@@ -5339,9 +4686,9 @@ screens:
     transitions:
     - to: PTR-001
       trigger: Partner Login / MFA
-      provenance: 'derived — PTR-001 declares entryState.params accountId, challengeId and PTR-019 holds
-        none of them. The edge carries nothing: PTR-019 is opened from PTR-001, so this edge is the way
-        back and PTR-001 keeps its own state'
+      provenance: 'derived — PTR-001 declares entryState.params challengeId, methodId, providerId and
+        PTR-019 holds none of them. The edge carries nothing: PTR-019 is opened from PTR-001, so this
+        edge is the way back and PTR-001 keeps its own state'
     - to: PTR-003
       trigger: Profile & Company Details
       provenance: 'derived — PTR-003 declares entryState.params  and PTR-019 holds none of them. The edge
@@ -5385,18 +4732,16 @@ screens:
         label: Every API client
         bindsTo: ApiClient
         columns:
-        - ApiClient.id
-        - ApiClient.developerId
         - ApiClient.name
-        - ApiClient.clientId
         - ApiClient.environment
         - ApiClient.scopes
-        - ApiClient.allowedTenantIds
         - ApiClient.ipAllowList
         - ApiClient.status
         - ApiClient.lastUsedAt
         operation: listApiClients
         provenance: contract public-api.yaml GET /api-clients
+        notes: Name, environment, scopes, IP allow-list, status and last used; the client id is in the
+          detail panel with a copy action, allowed tenants by venue name.
     - name: contextPanel
       slot: selection
       components:
@@ -5468,9 +4813,12 @@ screens:
   - id: formCreateApiClient
     component: modal
     trigger: Create API client
-    body: '**Collects what `createApiClient` sends before it is called.** Required: `id`, `developerId`,
-      `name`, `environment`, `scopes`, `status`. Optional: `clientId`, `allowedTenantIds`, `ipAllowList`,
-      `lastUsedAt`. Dismissing sends nothing; the screen behind is unchanged.'
+    body: '**Collects what `createApiClient` sends before it is called.** The person enters `name`, picks
+      `scopes` and an optional `ipAllowList`. **The environment is sandbox**: production clients are issued
+      by TICVAI after certification (DI-927); `developerId` comes from the session; `clientId` and `lastUsedAt`
+      are the server''s. Never `id` or `status`: an id is a client UUIDv7 generated silently and the status
+      and timestamps are the server''s (design-notes correction, CHG-SOT-015). Dismissing sends nothing;
+      the screen behind is unchanged.'
     bindsTo: ApiClient
     confirm:
       label: Create API client
@@ -5478,16 +4826,9 @@ screens:
     dismiss:
       label: Cancel
       discards:
-      - id
-      - developerId
       - name
-      - environment
       - scopes
-      - status
-      - clientId
-      - allowedTenantIds
       - ipAllowList
-      - lastUsedAt
     provenance: contract public-api.yaml POST /api-clients
   - id: formRotateApiCredential
     component: modal
@@ -5590,9 +4931,9 @@ screens:
     transitions:
     - to: PTR-001
       trigger: Partner Login / MFA
-      provenance: 'derived — PTR-001 declares entryState.params accountId, challengeId and PTR-020 holds
-        none of them. The edge carries nothing: PTR-020 is opened from PTR-001, so this edge is the way
-        back and PTR-001 keeps its own state'
+      provenance: 'derived — PTR-001 declares entryState.params challengeId, methodId, providerId and
+        PTR-020 holds none of them. The edge carries nothing: PTR-020 is opened from PTR-001, so this
+        edge is the way back and PTR-001 keeps its own state'
     - to: PTR-003
       trigger: Profile & Company Details
       provenance: 'derived — PTR-003 declares entryState.params  and PTR-020 holds none of them. The edge
@@ -5604,7 +4945,7 @@ screens:
   pattern: listDetail
   patternReason: '`listDelegatedAccess` reads a population and nothing reads one of them; the detail is
     the row until a `get` exists'
-  purpose: Add sub-agent management for this venue.
+  purpose: Give the partner's own sub-agents access, and take it back.
   layout:
     template: split
     regions:
@@ -5625,20 +4966,16 @@ screens:
         label: Every delegated access
         bindsTo: DelegatedAccess
         columns:
-        - DelegatedAccess.id
-        - DelegatedAccess.principalId
-        - DelegatedAccess.roleId
         - DelegatedAccess.permission
-        - DelegatedAccess.subjectId
-        - DelegatedAccess.overSubjectId
         - DelegatedAccess.overObjectRef
         - DelegatedAccess.delegationKind
         - DelegatedAccess.quota
         - DelegatedAccess.isRevocableBySubject
-        - DelegatedAccess.scopePath
         - DelegatedAccess.effect
         operation: listDelegatedAccess
         provenance: contract identity.yaml GET /delegated-access
+        notes: The sub-agent, the role and the subject are shown by name; the scope as the venue or branch
+          it names; ids stay in the detail panel.
     - name: contextPanel
       slot: selection
       components:
@@ -5747,6 +5084,9 @@ screens:
   apisNote: Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
+  purposeNote: 'Purpose rewritten 2 October 2026 (CHG-WIR-023): The purpose ("Add sub-agent management
+    for this venue") was the generic template; sub-agents belong to the partner, not a venue (design-notes
+    correction platform-foundation PTR-020).'
 - id: PTR-021
   name: Support & Contact
   module: Support
@@ -5786,11 +5126,6 @@ screens:
         label: Status
         operation: listCases
         notes: Sends `?status=` to `listCases`.
-        provenance: contract marketing-crm.yaml GET /cases
-      - kind: textField
-        label: Assigned to principal id
-        operation: listCases
-        notes: Sends `?assignedToPrincipalId=` to `listCases`.
         provenance: contract marketing-crm.yaml GET /cases
       - kind: toggle
         label: Breached sla
@@ -5879,17 +5214,9 @@ screens:
         operation: addCaseMessage
         provenance: contract marketing-crm.yaml POST /cases/{caseId}/messages
       - kind: secondaryButton
-        label: Escalate case
-        operation: escalateCase
-        provenance: contract marketing-crm.yaml POST /cases/{caseId}/escalate
-      - kind: secondaryButton
         label: Reopen case
         operation: reopenCase
         provenance: contract marketing-crm.yaml POST /cases/{caseId}/reopen
-      - kind: secondaryButton
-        label: Save case
-        operation: updateCase
-        provenance: contract marketing-crm.yaml PATCH /cases/{caseId}
   states:
     loading: The support contact list.
     error: Could not load. Names which read failed and leaves the support contact untouched.
@@ -5911,12 +5238,6 @@ screens:
     trigger: onAction
     invalidates:
     - listCases
-  - operationId: escalateCase
-    contract: marketing-crm
-    purpose: Escalate a case
-    trigger: onAction
-    invalidates:
-    - listCases
   - operationId: getCase
     contract: marketing-crm
     purpose: Read a case with its thread
@@ -5928,12 +5249,6 @@ screens:
   - operationId: reopenCase
     contract: marketing-crm
     purpose: Reopen a resolved case
-    trigger: onAction
-    invalidates:
-    - listCases
-  - operationId: updateCase
-    contract: marketing-crm
-    purpose: Assign, reprioritise or resolve a case
     trigger: onAction
     invalidates:
     - listCases
@@ -6003,21 +5318,6 @@ screens:
       - channel
       - attachmentRefs
     provenance: contract marketing-crm.yaml POST /cases/{caseId}/messages
-  - id: formEscalateCase
-    component: modal
-    trigger: Escalate case
-    body: '**Collects what `escalateCase` sends before it is called.** Required: `reason`. Optional: `assignToPrincipalId`,
-      `newPriority`. Dismissing sends nothing; the screen behind is unchanged.'
-    confirm:
-      label: Escalate case
-      operation: escalateCase
-    dismiss:
-      label: Cancel
-      discards:
-      - reason
-      - assignToPrincipalId
-      - newPriority
-    provenance: contract marketing-crm.yaml POST /cases/{caseId}/escalate
   - id: formReopenCase
     component: modal
     trigger: Reopen case
@@ -6031,24 +5331,17 @@ screens:
       discards:
       - reason
     provenance: contract marketing-crm.yaml POST /cases/{caseId}/reopen
-  - id: formUpdateCase
-    component: modal
-    trigger: Save case
-    body: '**Collects what `updateCase` sends before it is called.** Nothing in the body is required.
-      Optional: `status`, `priority`, `assignedToPrincipalId`, `categoryId`, `resolutionNote`. Dismissing
-      sends nothing; the screen behind is unchanged.'
-    confirm:
-      label: Save case
-      operation: updateCase
-    dismiss:
-      label: Cancel
-      discards:
-      - status
-      - priority
-      - assignedToPrincipalId
-      - categoryId
-      - resolutionNote
-    provenance: contract marketing-crm.yaml PATCH /cases/{caseId}
+  gaps:
+  - operation: escalateCase
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-005): A partner raises, reads and replies; assignment, status
+      and escalation are venue-side (design-notes correction customer-marketing PTR-021).'
+    source: screens/P10-partner-reseller-portal.yaml#PTR-021
+  - operation: updateCase
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-005): A partner raises, reads and replies; assignment, status
+      and escalation are venue-side (design-notes correction customer-marketing PTR-021).'
+    source: screens/P10-partner-reseller-portal.yaml#PTR-021
 - id: PTR-022
   name: Partner Management Command Center
   module: Partners
@@ -6071,10 +5364,8 @@ screens:
     - PTR-023
     - PTR-024
     - PTR-025
-    - PTR-026
     - PTR-027
     - PTR-028
-    - PTR-029
     - PTR-030
     - PTR-031
     inferred: false
@@ -6090,10 +5381,6 @@ screens:
       trigger: Reads the application the applicant submitted
       provenance: flow F110 step 2→3
       operation: listPartner
-    - to: PTR-025
-      trigger: Creates the partner's first user
-      provenance: flow F110 step 12→13
-      operation: listPartner
     - to: PTR-027
       trigger: Assigns the brands, venues and business scope the partner may sell
       provenance: flow F110 step 6→7
@@ -6102,13 +5389,13 @@ screens:
       trigger: Checks the compliance and documentation file
       provenance: flow F110 step 8→9
       operation: listPartner
-    - to: PTR-029
-      trigger: Chooses the permission profile the partner's own users will inherit
+    - to: PTR-025
+      trigger: Creates the partner's first user
       provenance: flow F110 step 10→11
       operation: listPartner
     - to: PTR-030
       trigger: Approves the partner and moves it to active
-      provenance: flow F110 step 14→15
+      provenance: flow F110 step 12→13
       operation: listPartner
   density: compact
   purposeNote: Authorized administrators can identify every partner, its business relationship, current
@@ -6259,7 +5546,8 @@ screens:
   states:
     loading: The partner list; the counts above it resolve separately.
     error: Could not load. Names which read failed and leaves the partner untouched.
-    emptyFirstRun: No partner yet. Carries the create action; distinct from a filter that matched nothing.
+    emptyFirstRun: 'No partners yet. Offers no create action here: a partner arrives through onboarding
+      (PTR-024), and this screen says so rather than showing an empty table.'
     emptyNoResults: The filter narrowed it and the partner are still there. The pack's own statuses are
       Suspended → Terminated → Archived — the state names which is selected.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
@@ -6333,34 +5621,34 @@ screens:
       - kind: selectField
         label: Partner ID
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 7 §Capture
-      - kind: selectField
+      - kind: textField
         label: Legal Entity Name
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 7 §Capture
-      - kind: selectField
+      - kind: textField
         label: Trading Name
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 7 §Capture
       - kind: selectField
         label: Partner Type
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 7 §Capture
-      - kind: selectField
+      - kind: textField
         label: Registration Number
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 7 §Capture
-      - kind: selectField
+      - kind: textField
         label: Tax/VAT Number
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 7 §Capture
       - kind: selectField
         label: Country
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 7 §Capture
-      - kind: selectField
+      - kind: textField
         label: City
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 7 §Capture
-      - kind: selectField
+      - kind: textField
         label: Registered Address
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 7 §Capture
-      - kind: selectField
+      - kind: textField
         label: Business Address
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 7 §Capture
-      - kind: selectField
+      - kind: textField
         label: Website
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 7 §Capture
       - kind: selectField
@@ -6516,8 +5804,8 @@ screens:
   states:
     loading: The partner onboarding application configuration as saved.
     error: Could not load. Names which read failed and leaves the partner onboarding application untouched.
-    emptyFirstRun: No partner onboarding application configured yet. Carries the create action and says
-      what the platform does in the meantime.
+    emptyFirstRun: 'No applications waiting: nothing to review, which is good news. Offers no create action;
+      applications arrive from the partner sign-up.'
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
   apis:
@@ -6591,7 +5879,7 @@ screens:
     transitions:
     - to: PTR-022
       trigger: Returns to the command centre
-      provenance: flow F110 step 13→14
+      provenance: flow F110 step 11→12
       operation: listPartnerContactUser
   density: compact
   purposeNote: Every external user accessing TICVAI on behalf of a partner is associated with a valid
@@ -6767,10 +6055,11 @@ screens:
   - id: formCreatePartnerUser
     component: modal
     trigger: Create partner user
-    body: '**Collects what `createPartnerUser` sends before it is called.** Required: `id`, `partnerId`,
-      `principalId`, `branchScopePath`. Optional: `role`, `salesLocation`, `currency`, `accountExpiresAt`,
-      `allocationQuota`, `creditLimitOverride`, `canManageUsers`. Dismissing sends nothing; the screen
-      behind is unchanged.'
+    body: '**Collects what `createPartnerUser` sends before it is called.** The person picks the user
+      (by name) and their branch, then the role, sales location, currency, expiry and limits; `partnerId`
+      comes from the session. Never `id` or `status`: an id is a client UUIDv7 generated silently and
+      the status and timestamps are the server''s (design-notes correction, CHG-SOT-015). Dismissing sends
+      nothing; the screen behind is unchanged.'
     bindsTo: PartnerUser
     confirm:
       label: Create partner user
@@ -6778,8 +6067,6 @@ screens:
     dismiss:
       label: Cancel
       discards:
-      - id
-      - partnerId
       - principalId
       - branchScopePath
       - role
@@ -6790,107 +6077,6 @@ screens:
       - creditLimitOverride
       - canManageUsers
     provenance: contract subscription.yaml POST /partners/{partnerId}/users
-  entryState:
-    params:
-    - name: partnerId
-      from: session
-- id: PTR-026
-  name: Territory, Market & Distribution Rights
-  module: Partners
-  requiresModule: partner
-  wave: 3
-  source:
-    pack: B2B, Reseller & OTA Partner Management_Reference.pdf
-    board: '1'
-    number: 8.1.5
-    page: 12
-  implementation:
-    app: partner-web
-    route: /partners/territory-market-distribution-rights-ptr-026
-    component: apps/partner-web/src/routes/partners/TerritoryMarketDistributionRights.tsx
-    status: notStarted
-  navigation:
-    entryFrom:
-    - PTR-022
-    exitTo:
-    - PTR-022
-    inferred: false
-    notes: '**Reached from PTR-022, the hub of its workshop board.** Stated on 4 September: the pack groups
-      its screens ten to a board behind a command centre, and that grouping is the navigation.'
-  density: compact
-  purposeNote: partner is authorized to use.
-  pattern: configEditor
-  patternReason: the pack gives this screen a configuration directory (§Configure) and no display directory
-    — it is settings, not a population
-  purpose: Define where and through what business scope a partner is authorized to distribute TICVAI products.
-  layout:
-    template: form
-    regions:
-    - name: contentBody
-      slot: fields
-      components:
-      - kind: selectField
-        label: Sub-agents allowed
-        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 12 §Configure
-      - kind: selectField
-        label: Sub-agents prohibited
-        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 12 §Configure
-      - kind: selectField
-        label: Approval required
-        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 12 §Configure
-      - kind: selectField
-        label: Maximum hierarchy depth
-        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 12 §Configure
-    - name: actionBar
-      slot: rowActions
-      components:
-      - kind: primaryButton
-        label: Save partner distribution rights
-        operation: setPartnerDistributionRights
-        permission: PARTNER_MANAGE
-        notes: The writer for PTR-026 (decided 29 September, writers pass; DM4).
-        provenance: contract subscription.yaml PUT /partners/{partnerId}/distribution-rights
-  states:
-    loading: The territory market distribution configuration as saved.
-    error: Could not load. Names which read failed and leaves the territory market distribution untouched.
-    emptyFirstRun: No territory market distribution configured yet. Carries the create action and says
-      what the platform does in the meantime.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
-  apis:
-  - operationId: listTerritoryMarketDistribution
-    contract: subscription
-    purpose: Territory, Market & Distribution Rights
-    trigger: onLoad
-  - operationId: setPartnerDistributionRights
-    contract: subscription
-    purpose: Replace a partner's territory, market and distribution rights
-    trigger: onAction
-    invalidates:
-    - listTerritoryMarketDistribution
-  wireframe:
-    status: notStarted
-    provenance: generated
-    board: wireframes/P10 Partner Web.dc.html#ptr-026
-    workshopBoard: wireframes/WS38 B2B, Reseller & OTA Partner Management Board 1.dc.html#ptr-026
-  apisNote: Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page
-    12. 0 of 0 labels bound to a contract property; 4 of 40 pack bullets carried onto the screen — the
-    rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
-    rather than here.
-  overlays:
-  - id: formSetPartnerDistributionRights
-    component: modal
-    trigger: Save partner distribution rights
-    body: '**Collects what `setPartnerDistributionRights` sends before it is called.** Required: `rights`.
-      Dismissing sends nothing; the screen behind is unchanged.'
-    confirm:
-      label: Save partner distribution rights
-      operation: setPartnerDistributionRights
-    dismiss:
-      label: Cancel
-      discards:
-      - rights
-    provenance: contract subscription.yaml PUT /partners/{partnerId}/distribution-rights
   entryState:
     params:
     - name: partnerId
@@ -7103,8 +6289,8 @@ screens:
   states:
     loading: The partner documentation compliance configuration as saved.
     error: Could not load. Names which read failed and leaves the partner documentation compliance untouched.
-    emptyFirstRun: No partner documentation compliance configured yet. Carries the create action and says
-      what the platform does in the meantime.
+    emptyFirstRun: 'No documents on file for this partner yet. Offers no action on this screen: documents
+      arrive with the onboarding application; it names which documents the partner type requires.'
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
   apis:
@@ -7121,180 +6307,6 @@ screens:
     15. 0 of 0 labels bound to a contract property; 19 of 39 pack bullets carried onto the screen — the
     rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
     rather than here.
-- id: PTR-029
-  name: Partner Access, Roles & Permission Profile
-  module: Partners
-  requiresModule: partner
-  wave: 3
-  source:
-    pack: B2B, Reseller & OTA Partner Management_Reference.pdf
-    board: '1'
-    number: 8.1.8
-    page: 16
-  implementation:
-    app: partner-web
-    route: /partners/partner-access-roles-permission-profile-ptr-029
-    component: apps/partner-web/src/routes/partners/PartnerAccessRolesPermissionProfile.tsx
-    status: notStarted
-  navigation:
-    entryFrom:
-    - PTR-022
-    exitTo:
-    - PTR-022
-    inferred: false
-    notes: '**Reached from PTR-022, the hub of its workshop board.** Stated on 4 September: the pack groups
-      its screens ten to a board behind a command centre, and that grouping is the navigation.'
-    transitions:
-    - to: PTR-022
-      trigger: Returns to the command centre
-      provenance: flow F110 step 11→12
-      operation: listPartnerAccessRole
-  density: compact
-  purposeNote: Partner organizations can access only the capabilities authorized by TICVAI, regardless
-    of permissions assigned to individual partner users.
-  pattern: configEditor
-  patternReason: the pack gives this screen a configuration directory (§Configure whether the partner
-    may) and no display directory — it is settings, not a population
-  purpose: Control what a partner organization is permitted to do, beyond individual-user permissions.
-  layout:
-    template: form
-    regions:
-    - name: contentBody
-      slot: fields
-      components:
-      - kind: selectField
-        label: Search Availability
-        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 16 §Configure whether
-          the partner may
-      - kind: selectField
-        label: Create Booking
-        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 16 §Configure whether
-          the partner may
-      - kind: selectField
-        label: Hold Inventory
-        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 16 §Configure whether
-          the partner may
-      - kind: selectField
-        label: Confirm Booking
-        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 16 §Configure whether
-          the partner may
-      - kind: selectField
-        label: Cancel Booking
-        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 16 §Configure whether
-          the partner may
-      - kind: selectField
-        label: Modify Booking
-        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 16 §Configure whether
-          the partner may
-      - kind: selectField
-        label: Download Ticket
-        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 16 §Configure whether
-          the partner may
-      - kind: selectField
-        label: Print Ticket
-        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 16 §Configure whether
-          the partner may
-      - kind: selectField
-        label: Send Ticket
-        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 16 §Configure whether
-          the partner may
-      - kind: selectField
-        label: Access Customer Details
-        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 16 §Configure whether
-          the partner may
-      - kind: selectField
-        label: Use Credit
-        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 16 §Configure whether
-          the partner may
-      - kind: selectField
-        label: Use Payment Card
-        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 16 §Configure whether
-          the partner may
-      - kind: selectField
-        label: View Commission
-        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 16 §Configure whether
-          the partner may
-      - kind: selectField
-        label: View Net Rates
-        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 16 §Configure whether
-          the partner may
-      - kind: selectField
-        label: Access Reports
-        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 16 §Configure whether
-          the partner may
-      - kind: selectField
-        label: Export Data
-        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 16 §Configure whether
-          the partner may
-      - kind: selectField
-        label: Use API
-        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 16 §Configure whether
-          the partner may
-      - kind: selectField
-        label: Create Sub-Agents
-        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 16 §Configure whether
-          the partner may
-    - name: actionBar
-      slot: publish
-      components:
-      - kind: banner
-        label: Permissions this screen separates
-        notes: '**The pack separates these permissions and no action on the screen claims them yet:**
-          ↓, Permanent, Temporary, Seasonal, Event-specific. Each needs attaching to the control it gates,
-          or the screen needs the control.'
-        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 16 §Partner Permission
-          Ceiling
-      - kind: primaryButton
-        label: Save partner capability grants
-        operation: setPartnerCapabilityGrants
-        permission: PARTNER_MANAGE
-        notes: The writer for PTR-029's organisation ceiling (decided 29 September, writers pass; DM4).
-        provenance: contract subscription.yaml PUT /partners/{partnerId}/capability-grants
-  states:
-    loading: The partner access roles configuration as saved.
-    error: Could not load. Names which read failed and leaves the partner access roles untouched.
-    emptyFirstRun: No partner access roles configured yet. Carries the create action and says what the
-      platform does in the meantime.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
-  apis:
-  - operationId: listPartnerAccessRole
-    contract: subscription
-    purpose: Partner Access, Roles & Permission Profile
-    trigger: onLoad
-  - operationId: setPartnerCapabilityGrants
-    contract: subscription
-    purpose: Replace the capability ceiling of a partner
-    trigger: onAction
-    invalidates:
-    - listPartnerAccessRole
-  wireframe:
-    status: notStarted
-    provenance: generated
-    board: wireframes/P10 Partner Web.dc.html#ptr-029
-    workshopBoard: wireframes/WS38 B2B, Reseller & OTA Partner Management Board 1.dc.html#ptr-029
-  apisNote: Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page
-    16. 0 of 0 labels bound to a contract property; 23 of 34 pack bullets carried onto the screen — the
-    rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
-    rather than here.
-  overlays:
-  - id: formSetPartnerCapabilityGrants
-    component: modal
-    trigger: Save partner capability grants
-    body: '**Collects what `setPartnerCapabilityGrants` sends before it is called.** Required: `grants`.
-      Dismissing sends nothing; the screen behind is unchanged.'
-    confirm:
-      label: Save partner capability grants
-      operation: setPartnerCapabilityGrants
-    dismiss:
-      label: Cancel
-      discards:
-      - grants
-    provenance: contract subscription.yaml PUT /partners/{partnerId}/capability-grants
-  entryState:
-    params:
-    - name: partnerId
-      from: session
 - id: PTR-030
   name: Partner Approval, Status & Lifecycle Management
   module: Partners
@@ -7369,11 +6381,24 @@ screens:
           it gates, or the screen needs the control.'
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 18 §Authorized users
           can
+      - kind: textField
+        label: Authentication code
+        operation: verifyMfaChallenge
+        notes: 'Asked in place inside the Approve confirmation, because `approvePartnerStatuLifecycle`
+          needs a fresh step-up token (`x-ticvai-step-up: mfa`); its result is the `stepUpToken`. Five
+          wrong codes lock step-up for the lockout minutes (audit R126).'
+        provenance: contract identity.yaml POST /auth/mfa/challenge/{challengeId}/verify
+      - kind: secondaryButton
+        label: Email me a code instead
+        operation: createMfaChallenge
+        notes: Opens the step-up challenge for Approve; the emailed code is the fallback to the authenticator
+          app (audit R126 (5)).
+        provenance: contract identity.yaml POST /auth/mfa/challenge
   states:
     loading: The partner approval status configuration as saved.
     error: Could not load. Names which read failed and leaves the partner approval status untouched.
-    emptyFirstRun: No partner approval status configured yet. Carries the create action and says what
-      the platform does in the meantime.
+    emptyFirstRun: 'Nothing waiting for approval: every partner is in a settled state. Offers no create
+      action.'
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
   apis:
@@ -7381,6 +6406,16 @@ screens:
     contract: subscription
     purpose: Partner Approval, Status & Lifecycle Management
     trigger: onAction
+  - operationId: createMfaChallenge
+    contract: identity
+    purpose: The step-up challenge Approve asks for in place
+    trigger: onAction
+    provenance: design-notes correction PTR-030, 2 October 2026 (CHG-SOT-015)
+  - operationId: verifyMfaChallenge
+    contract: identity
+    purpose: Answers the step-up challenge; its token goes into approvePartnerStatuLifecycle
+    trigger: onAction
+    provenance: design-notes correction PTR-030, 2 October 2026 (CHG-SOT-015)
   wireframe:
     status: notStarted
     provenance: generated
@@ -7390,6 +6425,10 @@ screens:
     18. 0 of 0 labels bound to a contract property; 15 of 42 pack bullets carried onto the screen — the
     rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
     rather than here.
+  entryState:
+    params:
+    - name: challengeId
+      from: navigation
 - id: PTR-031
   name: Partner 360° Profile, Readiness & AI Review
   module: Partners
@@ -7452,8 +6491,8 @@ screens:
   states:
     loading: The partner 360° profile list.
     error: Could not load. Names which read failed and leaves the partner 360° profile untouched.
-    emptyFirstRun: No partner 360° profile yet. Carries the create action; distinct from a filter that
-      matched nothing.
+    emptyFirstRun: 'No partner profile to review yet: readiness appears once a partner has an application.
+      Offers no create action.'
     emptyNoResults: The filter narrowed it and the partner 360° profile are still there. The pack's own
       statuses are 8.1.9 Partner lifecycle governance — the state names which is selected.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
@@ -7500,11 +6539,7 @@ screens:
     exitTo:
     - PTR-033
     - PTR-034
-    - PTR-035
-    - PTR-036
-    - PTR-037
     - PTR-038
-    - PTR-039
     - PTR-040
     - PTR-041
     inferred: false
@@ -7520,40 +6555,18 @@ screens:
       trigger: Works in Partner Rate & Net Pricing Configuration
       provenance: flow F131 step 3→4
       operation: listCommercialAgreement
-    - to: PTR-037
-      trigger: Works in Deposit, Guarantee & Financial Security Management
-      provenance: flow F131 step 9→10
-      operation: listCommercialAgreement
     - to: PTR-038
       trigger: Works in Payment Terms, Billing & Account Configuration
-      provenance: flow F131 step 11→12
+      provenance: flow F131 step 5→6
       operation: listCommercialAgreement
     - to: PTR-040
       trigger: Works in Booking Limits, Commercial Exceptions & Approval
-      provenance: flow F131 step 15→16
+      provenance: flow F131 step 7→8
       operation: listCommercialAgreement
     - to: PTR-041
       trigger: Works in Commercial Agreement 360°, Health & AI Review
-      provenance: flow F131 step 17→18
+      provenance: flow F131 step 9→10
       operation: listCommercialAgreement
-    - to: PTR-035
-      trigger: Works in Commission, Margin & Incentive Management
-      provenance: flow F131 step 5→6
-      operation: listCommercialAgreement
-      carries:
-      - agreementId
-    - to: PTR-036
-      trigger: Works in Credit Limit & Exposure Management
-      provenance: flow F131 step 7→8
-      operation: listCommercialAgreement
-      carries:
-      - agreementId
-    - to: PTR-039
-      trigger: Works in Commercial Allocation, Quota & Commitment Management
-      provenance: flow F131 step 13→14
-      operation: listCommercialAgreement
-      carries:
-      - agreementId
   density: compact
   purposeNote: Commercial management can understand the status, exposure, expiry and major commercial
     terms of every partner agreement from one central workspace.
@@ -7692,8 +6705,8 @@ screens:
   states:
     loading: The commercial agreement list; the counts above it resolve separately.
     error: Could not load. Names which read failed and leaves the commercial agreement untouched.
-    emptyFirstRun: No commercial agreement yet. Carries the create action; distinct from a filter that
-      matched nothing.
+    emptyFirstRun: 'No commercial agreements yet. Offers no create action here: agreements are drafted
+      on the terms builder (PTR-033).'
     emptyNoResults: The filter narrowed it and the commercial agreement are still there. Names the active
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
@@ -7766,19 +6779,19 @@ screens:
       - kind: selectField
         label: Agreement ID
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 25 §Configure
-      - kind: selectField
+      - kind: textField
         label: Agreement Name
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 25 §Configure
-      - kind: selectField
+      - kind: textField
         label: Partner
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 25 §Configure
       - kind: selectField
         label: Agreement Type
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 25 §Configure
-      - kind: selectField
+      - kind: textField
         label: Contract Reference
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 25 §Configure
-      - kind: selectField
+      - kind: textField
         label: Legal Entity
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 25 §Configure
       - kind: selectField
@@ -7787,13 +6800,13 @@ screens:
       - kind: selectField
         label: Venue
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 25 §Configure
-      - kind: selectField
+      - kind: textField
         label: Territory
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 25 §Configure
       - kind: selectField
         label: Currency
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 25 §Configure
-      - kind: selectField
+      - kind: datePicker
         label: Effective From
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 25 §Configure
       - kind: selectField
@@ -7817,13 +6830,13 @@ screens:
       - kind: selectField
         label: Pricing Basis
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 25 §Configure/reference
-      - kind: selectField
+      - kind: textField
         label: Credit Terms
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 25 §Configure/reference
-      - kind: selectField
+      - kind: textField
         label: Allocation Terms
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 25 §Configure/reference
-      - kind: selectField
+      - kind: textField
         label: Cancellation Conditions
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 25 §Configure/reference
       - kind: selectField
@@ -7915,16 +6928,16 @@ screens:
     - name: contentBody
       slot: fields
       components:
-      - kind: selectField
+      - kind: textField
         label: Partner
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 27 §Configure by
-      - kind: selectField
+      - kind: textField
         label: Agreement
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 27 §Configure by
       - kind: selectField
         label: Product
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 27 §Configure by
-      - kind: selectField
+      - kind: textField
         label: Product Family
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 27 §Configure by
       - kind: selectField
@@ -7933,13 +6946,13 @@ screens:
       - kind: selectField
         label: Event
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 27 §Configure by
-      - kind: selectField
+      - kind: textField
         label: Ticket Type
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 27 §Configure by
-      - kind: selectField
+      - kind: textField
         label: Price Category
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 27 §Configure by
-      - kind: selectField
+      - kind: textField
         label: Market
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 27 §Configure by
       - kind: selectField
@@ -7972,431 +6985,6 @@ screens:
     27. 0 of 0 labels bound to a contract property; 10 of 36 pack bullets carried onto the screen — the
     rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
     rather than here.
-- id: PTR-035
-  name: Commission, Margin & Incentive Management
-  module: Partners
-  requiresModule: partner
-  wave: 3
-  source:
-    pack: B2B, Reseller & OTA Partner Management_Reference.pdf
-    board: '2'
-    number: 8.2.4
-    page: 29
-  implementation:
-    app: partner-web
-    route: /partners/commission-margin-incentive-management-ptr-035
-    component: apps/partner-web/src/routes/partners/CommissionMarginIncentiveManagement.tsx
-    status: notStarted
-  navigation:
-    entryFrom:
-    - PTR-032
-    exitTo:
-    - PTR-032
-    inferred: false
-    notes: '**Reached from PTR-032, the hub of its workshop board.** Stated on 4 September: the pack groups
-      its screens ten to a board behind a command centre, and that grouping is the navigation.'
-    transitions:
-    - to: PTR-032
-      trigger: Returns to the board's landing screen
-      provenance: flow F131 step 6→7
-      operation: listCommissionMarginIncentive
-  density: compact
-  pattern: listDetail
-  patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no
-    display directory, no configuration directory. It falls to the default, and the fallback is recorded
-    rather than passed off as a decision'
-  purpose: Configure how partner commissions and commercial incentives are calculated.
-  gaps:
-  - operation: null
-    why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
-      acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere
-      in them. The screen has no content region rather than an empty one, and it needs a person before
-      it is built.'
-    source: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 29
-  - operation: null
-    why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
-      a default rather than a reading. It needs a person before it is built.'
-    source: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 29
-  layout:
-    template: split
-    regions:
-    - name: actionBar
-      slot: rowActions
-      components:
-      - kind: primaryButton
-        label: Campaign Incentive
-        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 29 §Support
-      - kind: secondaryButton
-        label: Save partner commission rules
-        operation: setPartnerCommissionRules
-        permission: PARTNER_MANAGE
-        notes: The writer for PTR-035 (decided 29 September, writers pass; DM4).
-        provenance: contract subscription.yaml PUT /partner-agreements/{agreementId}/commission-rules
-    - name: contentBody
-      components:
-      - kind: dataTable
-        derived: true
-        impliedBy: listCommissionMarginIncentive
-        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
-          a venue''s busiest hour is a list that skips rows.'
-  states:
-    loading: The commission margin incentive list.
-    error: Could not load. Names which read failed and leaves the commission margin incentive untouched.
-    emptyFirstRun: No commission margin incentive yet. Carries the create action; distinct from a filter
-      that matched nothing.
-    emptyNoResults: The filter narrowed it and the commission margin incentive are still there. Names
-      the active filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
-  apis:
-  - operationId: listCommissionMarginIncentive
-    contract: subscription
-    purpose: Commission, Margin & Incentive Management
-    trigger: onLoad
-  - operationId: setPartnerCommissionRules
-    contract: subscription
-    purpose: Replace the commission and incentive rules of an agreement
-    trigger: onAction
-    invalidates:
-    - listCommissionMarginIncentive
-  wireframe:
-    status: notStarted
-    provenance: generated
-    board: wireframes/P10 Partner Web.dc.html#ptr-035
-    workshopBoard: wireframes/WS39 B2B, Reseller & OTA Partner Management Board 2.dc.html#ptr-035
-  apisNote: Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page
-    29. 0 of 0 labels bound to a contract property; 1 of 9 pack bullets carried onto the screen — the
-    rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
-    rather than here.
-  overlays:
-  - id: formSetPartnerCommissionRules
-    component: modal
-    trigger: Save partner commission rules
-    body: '**Collects what `setPartnerCommissionRules` sends before it is called.** Required: `rules`.
-      Dismissing sends nothing; the screen behind is unchanged.'
-    confirm:
-      label: Save partner commission rules
-      operation: setPartnerCommissionRules
-    dismiss:
-      label: Cancel
-      discards:
-      - rules
-    provenance: contract subscription.yaml PUT /partner-agreements/{agreementId}/commission-rules
-  entryState:
-    params:
-    - name: agreementId
-      from: navigation
-      optional: true
-- id: PTR-036
-  name: Credit Limit & Exposure Management
-  module: Partners
-  requiresModule: partner
-  wave: 3
-  source:
-    pack: B2B, Reseller & OTA Partner Management_Reference.pdf
-    board: '2'
-    number: 8.2.5
-    page: 30
-  implementation:
-    app: partner-web
-    route: /partners/credit-limit-exposure-management-ptr-036
-    component: apps/partner-web/src/routes/partners/CreditLimitExposureManagement.tsx
-    status: notStarted
-  navigation:
-    entryFrom:
-    - PTR-032
-    exitTo:
-    - PTR-032
-    inferred: false
-    notes: '**Reached from PTR-032, the hub of its workshop board.** Stated on 4 September: the pack groups
-      its screens ten to a board behind a command centre, and that grouping is the navigation.'
-    transitions:
-    - to: PTR-032
-      trigger: Returns to the board's landing screen
-      provenance: flow F131 step 8→9
-      operation: listCreditLimitExposure
-  density: compact
-  purposeNote: time visibility of available and utilized credit.
-  pattern: configEditor
-  patternReason: the pack gives this screen a configuration directory (§Configure) and no display directory
-    — it is settings, not a population
-  purpose: Control the financial exposure TICVAI permits for partners buying on account. This should be
-    one of the strongest finance-control screens in the B2B module.
-  layout:
-    template: form
-    regions:
-    - name: contentBody
-      slot: fields
-      components:
-      - kind: selectField
-        label: Credit Enabled
-        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 30 §Configure
-      - kind: selectField
-        label: Approved Credit Limit
-        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 30 §Configure
-      - kind: selectField
-        label: Currency
-        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 30 §Configure
-      - kind: selectField
-        label: Temporary Credit Limit
-        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 30 §Configure
-      - kind: selectField
-        label: Effective Dates
-        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 30 §Configure
-      - kind: selectField
-        label: Credit Owner
-        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 30 §Configure
-      - kind: selectField
-        label: Risk Classification
-        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 30 §Configure
-      - kind: selectField
-        label: Approval Authority
-        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 30 §Configure
-      - kind: selectField
-        label: Warning at 70%
-        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 30 §Configure
-      - kind: textField
-        label: High Risk at 90%
-        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 30 §Configure
-      - kind: selectField
-        label: Block at 100%
-        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 30 §Configure
-    - name: actionBar
-      slot: publish
-      components:
-      - kind: banner
-        label: Permissions this screen separates
-        notes: '**The pack separates these permissions and no action on the screen claims them yet:**
-          Increase Limit, Reduce Limit, Temporary Increase, Place Credit Hold, Release Hold, Block Credit
-          Transactions. Each needs attaching to the control it gates, or the screen needs the control.'
-        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 30 §Authorized users
-          can
-      - kind: primaryButton
-        label: Save partner credit profile
-        operation: setPartnerCreditProfile
-        permission: CREDIT_MANAGE
-        notes: The writer for PTR-036 (decided 29 September, writers pass; DM4).
-        provenance: contract subscription.yaml PUT /partner-agreements/{agreementId}/credit-profile
-  states:
-    loading: The credit limit exposure configuration as saved.
-    error: Could not load. Names which read failed and leaves the credit limit exposure untouched.
-    emptyFirstRun: No credit limit exposure configured yet. Carries the create action and says what the
-      platform does in the meantime.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
-  apis:
-  - operationId: listCreditLimitExposure
-    contract: subscription
-    purpose: Credit Limit & Exposure Management
-    trigger: onLoad
-  - operationId: setPartnerCreditProfile
-    contract: subscription
-    purpose: Set the credit controls of an agreement
-    trigger: onAction
-    invalidates:
-    - listCreditLimitExposure
-  entryState:
-    preloaded:
-    - 'Open Invoices: AED 210,000'
-    - CreditLimitExposureManagementView.unbilledTransactions
-    - CreditLimitExposureManagementView.activeHoldsReservations
-    - CreditLimitExposureManagementView.availableCredit
-    params:
-    - name: agreementId
-      from: navigation
-      optional: true
-  wireframe:
-    status: notStarted
-    provenance: generated
-    board: wireframes/P10 Partner Web.dc.html#ptr-036
-    workshopBoard: wireframes/WS39 B2B, Reseller & OTA Partner Management Board 2.dc.html#ptr-036
-  apisNote: Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page
-    30. 0 of 0 labels bound to a contract property; 22 of 31 pack bullets carried onto the screen — the
-    rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
-    rather than here.
-  overlays:
-  - id: formSetPartnerCreditProfile
-    component: modal
-    trigger: Save partner credit profile
-    body: '**Collects what `setPartnerCreditProfile` sends before it is called.** Required: `id`, `partnerId`,
-      `agreementId`, `creditEnabled`, `creditStatus`. Optional: `temporaryCreditLimit`, `temporaryLimitUntil`,
-      `creditOwnerPrincipalId`, `approvalAuthority`, `riskClassification`, `warningThresholdPercent`,
-      `highRiskThresholdPercent`, `blockThresholdPercent`, `effectiveFrom`, `effectiveTo`, `approvalRequestId`,
-      `scopePath`. Dismissing sends nothing; the screen behind is unchanged.'
-    bindsTo: PartnerCreditProfile
-    confirm:
-      label: Save partner credit profile
-      operation: setPartnerCreditProfile
-    dismiss:
-      label: Cancel
-      discards:
-      - id
-      - partnerId
-      - agreementId
-      - creditEnabled
-      - creditStatus
-      - temporaryCreditLimit
-      - temporaryLimitUntil
-      - creditOwnerPrincipalId
-      - approvalAuthority
-      - riskClassification
-      - warningThresholdPercent
-      - highRiskThresholdPercent
-      - blockThresholdPercent
-      - effectiveFrom
-      - effectiveTo
-      - approvalRequestId
-      - scopePath
-    provenance: contract subscription.yaml PUT /partner-agreements/{agreementId}/credit-profile
-- id: PTR-037
-  name: Deposit, Guarantee & Financial Security Management
-  module: Partners
-  requiresModule: partner
-  wave: 3
-  source:
-    pack: B2B, Reseller & OTA Partner Management_Reference.pdf
-    board: '2'
-    number: 8.2.6
-    page: 32
-  implementation:
-    app: partner-web
-    route: /partners/deposit-guarantee-financial-security-management-ptr-037
-    component: apps/partner-web/src/routes/partners/DepositGuaranteeFinancialSecurityManagement.tsx
-    status: notStarted
-  navigation:
-    entryFrom:
-    - PTR-032
-    exitTo:
-    - PTR-032
-    inferred: false
-    notes: '**Reached from PTR-032, the hub of its workshop board.** Stated on 4 September: the pack groups
-      its screens ten to a board behind a command centre, and that grouping is the navigation.'
-    transitions:
-    - to: PTR-032
-      trigger: Returns to the board's landing screen
-      provenance: flow F131 step 10→11
-      operation: listDepositGuaranteeFinancial
-  density: compact
-  purposeNote: Finance can track all financial securities supporting partner exposure and automatically
-    enforce configured controls when security becomes insufficient or expires.
-  pattern: listDetail
-  patternReason: the pack gives this screen a display directory (§Display) and no metric row
-  purpose: Manage financial security required to support partner credit or commercial access.
-  layout:
-    template: split
-    regions:
-    - name: contentBody
-      slot: collection
-      components:
-      - kind: dataTable
-        label: Every deposit guarantee financial
-        columns:
-        - DepositGuaranteeFinancialSecurityManagementView.creditExposure
-        - DepositGuaranteeFinancialSecurityManagementView.securityCoverage
-        - DepositGuaranteeFinancialSecurityManagementView.unsecuredExposure
-        bindsTo: DepositGuaranteeFinancialSecurityManagementView
-        operation: listDepositGuaranteeFinancial
-        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 32 §Display
-    - name: contextPanel
-      slot: selection
-      components:
-      - kind: detailPanel
-        label: The selected deposit guarantee financial
-        bindsTo: DepositGuaranteeFinancialSecurityManagementView
-        columns:
-        - DepositGuaranteeFinancialSecurityManagementView.creditExposure
-        - DepositGuaranteeFinancialSecurityManagementView.securityCoverage
-        - DepositGuaranteeFinancialSecurityManagementView.unsecuredExposure
-        notes: null
-        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 32 §Display
-    - name: actionBar
-      slot: rowActions
-      components:
-      - kind: primaryButton
-        label: Cash Deposit
-        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 32 §Support
-      - kind: secondaryButton
-        label: Security Deposit
-        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 32 §Support
-      - kind: secondaryButton
-        label: Prepayment Balance
-        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 32 §Support
-      - kind: secondaryButton
-        label: Other Approved Security
-        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 32 §Support
-      - kind: secondaryButton
-        label: Save partner security
-        operation: setPartnerSecurity
-        permission: CREDIT_MANAGE
-        notes: The writer for PTR-037 (decided 29 September, writers pass; DM4).
-        provenance: contract subscription.yaml PUT /partners/{partnerId}/securities
-  states:
-    loading: The deposit guarantee financial list.
-    error: Could not load. Names which read failed and leaves the deposit guarantee financial untouched.
-    emptyFirstRun: No deposit guarantee financial yet. Carries the create action; distinct from a filter
-      that matched nothing.
-    emptyNoResults: The filter narrowed it and the deposit guarantee financial are still there. Names
-      the active filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
-  apis:
-  - operationId: listDepositGuaranteeFinancial
-    contract: subscription
-    purpose: Deposit, Guarantee & Financial Security Management
-    trigger: onLoad
-  - operationId: setPartnerSecurity
-    contract: subscription
-    purpose: Record, amend, verify or reject a partner's deposit or guarantee
-    trigger: onAction
-    invalidates:
-    - listDepositGuaranteeFinancial
-  entryState:
-    preloaded:
-    - DepositGuaranteeFinancialSecurityManagementView.creditExposure
-    - DepositGuaranteeFinancialSecurityManagementView.securityCoverage
-    - DepositGuaranteeFinancialSecurityManagementView.unsecuredExposure
-    params:
-    - name: partnerId
-      from: session
-  wireframe:
-    status: notStarted
-    provenance: generated
-    board: wireframes/P10 Partner Web.dc.html#ptr-037
-    workshopBoard: wireframes/WS39 B2B, Reseller & OTA Partner Management Board 2.dc.html#ptr-037
-  apisNote: Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page
-    32. 3 of 3 labels bound to a contract property; 24 of 32 pack bullets carried onto the screen — the
-    rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
-    rather than here.
-  overlays:
-  - id: formSetPartnerSecurity
-    component: modal
-    trigger: Save partner security
-    body: '**Collects what `setPartnerSecurity` sends before it is called.** Required: `id`, `partnerId`,
-      `securityType`, `amount`, `currency`, `effectiveDate`, `verificationStatus`. Optional: `agreementId`,
-      `issuingInstitution`, `reference`, `expiryDate`, `documentId`, `expiryAction`, `scopePath`. Dismissing
-      sends nothing; the screen behind is unchanged.'
-    bindsTo: PartnerSecurity
-    confirm:
-      label: Save partner security
-      operation: setPartnerSecurity
-    dismiss:
-      label: Cancel
-      discards:
-      - id
-      - partnerId
-      - securityType
-      - amount
-      - currency
-      - effectiveDate
-      - verificationStatus
-      - agreementId
-      - issuingInstitution
-      - reference
-      - expiryDate
-      - documentId
-      - expiryAction
-      - scopePath
-    provenance: contract subscription.yaml PUT /partners/{partnerId}/securities
 - id: PTR-038
   name: Payment Terms, Billing & Account Configuration
   module: Partners
@@ -8423,7 +7011,7 @@ screens:
     transitions:
     - to: PTR-032
       trigger: Returns to the board's landing screen
-      provenance: flow F131 step 12→13
+      provenance: flow F131 step 6→7
       operation: setPaymentTermBilling
   density: compact
   purposeNote: Every partner transaction can be routed to the correct approved payment and billing model
@@ -8444,6 +7032,11 @@ screens:
     - name: contentBody
       slot: collection
       components:
+      - kind: multiSelect
+        label: Accepted payment methods
+        notes: 'The payment methods this partner account may use. Options: Immediate Payment; Credit Account;
+          Deposit Balance; Bank Transfer; Card; Payment Link; Prepaid Balance; Other approved method.'
+        provenance: 'design-notes correction PTR-038, 2 October 2026 (CHG-SOT-015): a choice, not buttons'
       - kind: dataTable
         label: Every payment terms billing
         columns:
@@ -8475,31 +7068,7 @@ screens:
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 33 §Show
     - name: actionBar
       slot: rowActions
-      components:
-      - kind: primaryButton
-        label: Immediate Payment
-        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 33 §Support
-      - kind: secondaryButton
-        label: Credit Account
-        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 33 §Support
-      - kind: secondaryButton
-        label: Deposit Balance
-        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 33 §Support
-      - kind: secondaryButton
-        label: Bank Transfer
-        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 33 §Allow/reference
-      - kind: secondaryButton
-        label: Card
-        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 33 §Allow/reference
-      - kind: secondaryButton
-        label: Payment Link
-        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 33 §Allow/reference
-      - kind: secondaryButton
-        label: Prepaid Balance
-        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 33 §Allow/reference
-      - kind: secondaryButton
-        label: Other approved method
-        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 33 §Allow/reference
+      components: []
   states:
     loading: The payment terms billing list.
     error: Could not load. Names which read failed and leaves the payment terms billing untouched.
@@ -8531,164 +7100,6 @@ screens:
     33. 7 of 7 labels bound to a contract property; 24 of 41 pack bullets carried onto the screen — the
     rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
     rather than here.
-- id: PTR-039
-  name: Commercial Allocation, Quota & Commitment Management
-  module: Partners
-  requiresModule: partner
-  wave: 3
-  source:
-    pack: B2B, Reseller & OTA Partner Management_Reference.pdf
-    board: '2'
-    number: 8.2.8
-    page: 35
-  implementation:
-    app: partner-web
-    route: /partners/commercial-allocation-quota-commitment-management-ptr-039
-    component: apps/partner-web/src/routes/partners/CommercialAllocationQuotaCommitmentManagement.tsx
-    status: notStarted
-  navigation:
-    entryFrom:
-    - PTR-032
-    exitTo:
-    - PTR-032
-    inferred: false
-    notes: '**Reached from PTR-032, the hub of its workshop board.** Stated on 4 September: the pack groups
-      its screens ten to a board behind a command centre, and that grouping is the navigation.'
-    transitions:
-    - to: PTR-032
-      trigger: Returns to the board's landing screen
-      provenance: flow F131 step 14→15
-      operation: listCommercialAllocationQuota
-  density: compact
-  purposeNote: permitted availability with central capacity management.
-  pattern: listDetail
-  patternReason: the pack gives this screen a display directory (§Display) and no metric row
-  purpose: Define the commercial commitment of inventory to a partner. This differs from Area 4's operational
-    channel allocation.
-  layout:
-    template: split
-    regions:
-    - name: contentBody
-      slot: collection
-      components:
-      - kind: dataTable
-        label: Every commercial allocation quota
-        columns:
-        - CommercialAllocationQuotaCommitmentManagementView.allocated
-        - CommercialAllocationQuotaCommitmentManagementView.booked
-        - CommercialAllocationQuotaCommitmentManagementView.sold
-        - CommercialAllocationQuotaCommitmentManagementView.returned
-        - CommercialAllocationQuotaCommitmentManagementView.remaining
-        - CommercialAllocationQuotaCommitmentManagementView.utilization
-        - CommercialAllocationQuotaCommitmentManagementView.commitmentAchievement
-        bindsTo: CommercialAllocationQuotaCommitmentManagementView
-        operation: listCommercialAllocationQuota
-        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 35 §Display
-    - name: contextPanel
-      slot: selection
-      components:
-      - kind: detailPanel
-        label: The selected commercial allocation quota
-        bindsTo: CommercialAllocationQuotaCommitmentManagementView
-        columns:
-        - CommercialAllocationQuotaCommitmentManagementView.allocated
-        - CommercialAllocationQuotaCommitmentManagementView.booked
-        - CommercialAllocationQuotaCommitmentManagementView.sold
-        - CommercialAllocationQuotaCommitmentManagementView.returned
-        - CommercialAllocationQuotaCommitmentManagementView.remaining
-        - CommercialAllocationQuotaCommitmentManagementView.utilization
-        - CommercialAllocationQuotaCommitmentManagementView.commitmentAchievement
-        notes: 'The pack groups this record''s detail under its own headings: “Area 4 asks”, “This screen
-          asks”, “Integration”.'
-        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 35 §Display
-    - name: actionBar
-      slot: rowActions
-      components:
-      - kind: primaryButton
-        label: Guaranteed Allocation
-        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 35 §Support
-      - kind: secondaryButton
-        label: On-Request Allocation
-        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 35 §Support
-      - kind: secondaryButton
-        label: Shared Allocation
-        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 35 §Support
-      - kind: secondaryButton
-        label: Fixed Quantity
-        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 35 §Support
-      - kind: secondaryButton
-        label: Percentage Allocation
-        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 35 §Support
-      - kind: secondaryButton
-        label: Rolling Allocation
-        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 35 §Support
-      - kind: secondaryButton
-        label: Seasonal Allocation
-        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 35 §Support
-      - kind: secondaryButton
-        label: Take-or-pay where commercially applicable
-        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 35 §Support
-      - kind: secondaryButton
-        label: Save partner allocations
-        operation: setPartnerAllocations
-        permission: PARTNER_MANAGE
-        notes: The writer for PTR-039 (decided 29 September, writers pass; DM4).
-        provenance: contract subscription.yaml PUT /partner-agreements/{agreementId}/allocations
-  states:
-    loading: The commercial allocation quota list.
-    error: Could not load. Names which read failed and leaves the commercial allocation quota untouched.
-    emptyFirstRun: No commercial allocation quota yet. Carries the create action; distinct from a filter
-      that matched nothing.
-    emptyNoResults: The filter narrowed it and the commercial allocation quota are still there. Names
-      the active filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
-  apis:
-  - operationId: listCommercialAllocationQuota
-    contract: subscription
-    purpose: Commercial Allocation, Quota & Commitment Management
-    trigger: onLoad
-  - operationId: setPartnerAllocations
-    contract: subscription
-    purpose: Replace the allocations of an agreement
-    trigger: onAction
-    invalidates:
-    - listCommercialAllocationQuota
-  entryState:
-    preloaded:
-    - CommercialAllocationQuotaCommitmentManagementView.allocated
-    - CommercialAllocationQuotaCommitmentManagementView.booked
-    - CommercialAllocationQuotaCommitmentManagementView.sold
-    - CommercialAllocationQuotaCommitmentManagementView.returned
-    - CommercialAllocationQuotaCommitmentManagementView.remaining
-    - CommercialAllocationQuotaCommitmentManagementView.utilization
-    params:
-    - name: agreementId
-      from: navigation
-      optional: true
-  wireframe:
-    status: notStarted
-    provenance: generated
-    board: wireframes/P10 Partner Web.dc.html#ptr-039
-    workshopBoard: wireframes/WS39 B2B, Reseller & OTA Partner Management Board 2.dc.html#ptr-039
-  apisNote: Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page
-    35. 7 of 7 labels bound to a contract property; 27 of 45 pack bullets carried onto the screen — the
-    rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
-    rather than here.
-  overlays:
-  - id: formSetPartnerAllocations
-    component: modal
-    trigger: Save partner allocations
-    body: '**Collects what `setPartnerAllocations` sends before it is called.** Required: `allocations`.
-      Dismissing sends nothing; the screen behind is unchanged.'
-    confirm:
-      label: Save partner allocations
-      operation: setPartnerAllocations
-    dismiss:
-      label: Cancel
-      discards:
-      - allocations
-    provenance: contract subscription.yaml PUT /partner-agreements/{agreementId}/allocations
 - id: PTR-040
   name: Booking Limits, Commercial Exceptions & Approval
   module: Partners
@@ -8715,7 +7126,7 @@ screens:
     transitions:
     - to: PTR-032
       trigger: Returns to the board's landing screen
-      provenance: flow F131 step 16→17
+      provenance: flow F131 step 8→9
       operation: approveBookingLimitCommercial
   density: compact
   purposeNote: Transactions outside standard partner commercial rules cannot proceed without the appropriate
@@ -8767,22 +7178,22 @@ screens:
       - kind: selectField
         label: Partner
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 37 §Capture
-      - kind: selectField
+      - kind: textField
         label: Agreement
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 37 §Capture
       - kind: selectField
         label: Request Type
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 37 §Capture
-      - kind: selectField
+      - kind: textField
         label: Current Rule
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 37 §Capture
-      - kind: selectField
+      - kind: textField
         label: Requested Exception
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 37 §Capture
       - kind: selectField
         label: Amount/Impact
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 37 §Capture
-      - kind: selectField
+      - kind: textField
         label: Reason
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 37 §Capture
       - kind: selectField
@@ -8806,11 +7217,24 @@ screens:
       - kind: secondaryButton
         label: Booking Limit Exception
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 37 §Support
+      - kind: textField
+        label: Authentication code
+        operation: verifyMfaChallenge
+        notes: 'Asked in place inside the Approve the exception confirmation, because `approveBookingLimitCommercial`
+          needs a fresh step-up token (`x-ticvai-step-up: mfa`); its result is the `stepUpToken`. Five
+          wrong codes lock step-up for the lockout minutes (audit R126).'
+        provenance: contract identity.yaml POST /auth/mfa/challenge/{challengeId}/verify
+      - kind: secondaryButton
+        label: Email me a code instead
+        operation: createMfaChallenge
+        notes: Opens the step-up challenge for Approve the exception; the emailed code is the fallback
+          to the authenticator app (audit R126 (5)).
+        provenance: contract identity.yaml POST /auth/mfa/challenge
   states:
     loading: The booking limits commercial configuration as saved.
     error: Could not load. Names which read failed and leaves the booking limits commercial untouched.
-    emptyFirstRun: No booking limits commercial configured yet. Carries the create action and says what
-      the platform does in the meantime.
+    emptyFirstRun: 'No booking-limit exception waiting: nothing to approve, which is good news. Offers
+      no create action.'
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
   apis:
@@ -8818,6 +7242,16 @@ screens:
     contract: subscription
     purpose: Booking Limits, Commercial Exceptions & Approval
     trigger: onAction
+  - operationId: createMfaChallenge
+    contract: identity
+    purpose: The step-up challenge Approve the exception asks for in place
+    trigger: onAction
+    provenance: design-notes correction PTR-040, 2 October 2026 (CHG-SOT-015)
+  - operationId: verifyMfaChallenge
+    contract: identity
+    purpose: Answers the step-up challenge; its token goes into approveBookingLimitCommercial
+    trigger: onAction
+    provenance: design-notes correction PTR-040, 2 October 2026 (CHG-SOT-015)
   wireframe:
     status: notStarted
     provenance: generated
@@ -8827,6 +7261,10 @@ screens:
     37. 0 of 0 labels bound to a contract property; 22 of 39 pack bullets carried onto the screen — the
     rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
     rather than here.
+  entryState:
+    params:
+    - name: challengeId
+      from: navigation
 - id: PTR-041
   name: Commercial Agreement 360°, Health & AI Review
   module: Partners
@@ -8902,8 +7340,8 @@ screens:
   states:
     loading: The commercial agreement 360° list.
     error: Could not load. Names which read failed and leaves the commercial agreement 360° untouched.
-    emptyFirstRun: No commercial agreement 360° yet. Carries the create action; distinct from a filter
-      that matched nothing.
+    emptyFirstRun: 'No agreement to review yet: health appears once an agreement is active. Offers no
+      create action.'
     emptyNoResults: The filter narrowed it and the commercial agreement 360° are still there. Names the
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
@@ -8951,8 +7389,6 @@ screens:
     - PTR-044
     - PTR-045
     - PTR-046
-    - PTR-047
-    - PTR-048
     - PTR-049
     - PTR-050
     - PTR-051
@@ -8977,25 +7413,17 @@ screens:
       trigger: Works in Partner Statement & Account Activity
       provenance: flow F132 step 7→8
       operation: listPartner2
-    - to: PTR-047
-      trigger: Works in Partner Reconciliation & Exception Management
-      provenance: flow F132 step 9→10
-      operation: listPartner2
-    - to: PTR-048
-      trigger: Works in Commission Calculation & Settlement Management
-      provenance: flow F132 step 11→12
-      operation: listPartner2
     - to: PTR-049
       trigger: Works in Partner Disputes, Cases & Service Management
-      provenance: flow F132 step 13→14
+      provenance: flow F132 step 9→10
       operation: listPartner2
     - to: PTR-050
       trigger: Works in Partner Performance Scorecard & Risk Monitoring
-      provenance: flow F132 step 15→16
+      provenance: flow F132 step 11→12
       operation: listPartner2
     - to: PTR-051
       trigger: Works in Partner AI Intelligence & Relationship Optimization
-      provenance: flow F132 step 17→18
+      provenance: flow F132 step 13→14
       operation: listPartner2
   density: compact
   purposeNote: Authorized users can understand current partner activity, financial exposure and operational
@@ -9131,8 +7559,8 @@ screens:
   states:
     loading: The partner operations list; the counts above it resolve separately.
     error: Could not load. Names which read failed and leaves the partner operations untouched.
-    emptyFirstRun: No partner operations yet. Carries the create action; distinct from a filter that matched
-      nothing.
+    emptyFirstRun: No partner activity yet today. Offers no create action; the tiles show zero sales,
+      not missing data.
     emptyNoResults: The filter narrowed it and the partner operations are still there. Names the active
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
@@ -9279,8 +7707,8 @@ screens:
   states:
     loading: The partner orders booking list.
     error: Could not load. Names which read failed and leaves the partner orders booking untouched.
-    emptyFirstRun: No partner orders booking yet. Carries the create action; distinct from a filter that
-      matched nothing.
+    emptyFirstRun: 'No partner bookings yet. Offers no create action: partners book on their own booking
+      screens.'
     emptyNoResults: The filter narrowed it and the partner orders booking are still there. Names the active
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
@@ -9412,8 +7840,7 @@ screens:
   states:
     loading: The reservations holds release list.
     error: Could not load. Names which read failed and leaves the reservations holds release untouched.
-    emptyFirstRun: No reservations holds release yet. Carries the create action; distinct from a filter
-      that matched nothing.
+    emptyFirstRun: 'No holds open: no partner inventory is reserved right now. Offers no create action.'
     emptyNoResults: The filter narrowed it and the reservations holds release are still there. Names the
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
@@ -9700,8 +8127,8 @@ screens:
   states:
     loading: The partner statement account list; the counts above it resolve separately.
     error: Could not load. Names which read failed and leaves the partner statement account untouched.
-    emptyFirstRun: No partner statement account yet. Carries the create action; distinct from a filter
-      that matched nothing.
+    emptyFirstRun: 'No account activity in this period: the opening balance is the closing balance. Offers
+      no create action.'
     emptyNoResults: The filter narrowed it and the partner statement account are still there. Names the
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
@@ -9720,382 +8147,6 @@ screens:
     51. 20 of 20 labels bound to a contract property; 24 of 43 pack bullets carried onto the screen —
     the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the
     contracts rather than here.
-- id: PTR-047
-  name: Partner Reconciliation & Exception Management
-  module: Partners
-  requiresModule: partner
-  wave: 3
-  source:
-    pack: B2B, Reseller & OTA Partner Management_Reference.pdf
-    board: '3'
-    number: 8.3.6
-    page: 52
-  implementation:
-    app: partner-web
-    route: /partners/partner-reconciliation-exception-management-ptr-047
-    component: apps/partner-web/src/routes/partners/PartnerReconciliationExceptionManagement.tsx
-    status: notStarted
-  navigation:
-    entryFrom:
-    - PTR-042
-    exitTo:
-    - PTR-042
-    inferred: false
-    notes: '**Reached from PTR-042, the hub of its workshop board.** Stated on 4 September: the pack groups
-      its screens ten to a board behind a command centre, and that grouping is the navigation.'
-    transitions:
-    - to: PTR-042
-      trigger: Returns to the board's landing screen
-      provenance: flow F132 step 10→11
-      operation: listPartnerReconciliationException
-  density: compact
-  purposeNote: Partner operational and financial records can be reconciled systematically, with every
-    unresolved difference tracked through resolution.
-  pattern: listDetail
-  patternReason: the pack gives this screen a display directory (§Display) and no metric row
-  purpose: Reconcile operational bookings against financial and channel records and identify discrepancies.
-  layout:
-    template: split
-    regions:
-    - name: contentBody
-      slot: headline
-      components:
-      - kind: metricTile
-        label: Records Reconciled
-        bindsTo: PartnerReconciliationExceptionManagementSummary.recordsReconciled
-        operation: listPartnerReconciliationException
-        provenance: moved from the row table to the list summary (decided 29 September, readiness close-out)
-      - kind: metricTile
-        label: Unmatched Orders
-        bindsTo: PartnerReconciliationExceptionManagementSummary.unmatchedOrders
-        operation: listPartnerReconciliationException
-        provenance: moved from the row table to the list summary (decided 29 September, readiness close-out)
-      - kind: metricTile
-        label: Amount Mismatches
-        bindsTo: PartnerReconciliationExceptionManagementSummary.amountMismatches
-        operation: listPartnerReconciliationException
-        provenance: moved from the row table to the list summary (decided 29 September, readiness close-out)
-      - kind: metricTile
-        label: Missing Tickets
-        bindsTo: PartnerReconciliationExceptionManagementSummary.missingTickets
-        operation: listPartnerReconciliationException
-        provenance: moved from the row table to the list summary (decided 29 September, readiness close-out)
-      - kind: metricTile
-        label: Pricing Differences
-        bindsTo: PartnerReconciliationExceptionManagementSummary.pricingDifferences
-        operation: listPartnerReconciliationException
-        provenance: moved from the row table to the list summary (decided 29 September, readiness close-out)
-      - kind: metricTile
-        label: Commission Differences
-        bindsTo: PartnerReconciliationExceptionManagementSummary.commissionDifferences
-        operation: listPartnerReconciliationException
-        provenance: moved from the row table to the list summary (decided 29 September, readiness close-out)
-      - kind: metricTile
-        label: Payment Differences
-        bindsTo: PartnerReconciliationExceptionManagementSummary.paymentDifferences
-        operation: listPartnerReconciliationException
-        provenance: moved from the row table to the list summary (decided 29 September, readiness close-out)
-      - kind: metricTile
-        label: Pending Investigation
-        bindsTo: PartnerReconciliationExceptionManagementSummary.pendingInvestigation
-        operation: listPartnerReconciliationException
-        provenance: moved from the row table to the list summary (decided 29 September, readiness close-out)
-    - name: contentBody
-      slot: collection
-      components:
-      - kind: dataTable
-        label: Every partner reconciliation exception
-        bindsTo: PartnerReconciliationExceptionManagementView
-        operation: listPartnerReconciliationException
-        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 52 §Display
-    - name: contextPanel
-      slot: selection
-      components:
-      - kind: detailPanel
-        label: The selected partner reconciliation exception
-        bindsTo: PartnerReconciliationExceptionManagementView
-        notes: 'The pack groups this record''s detail under its own headings: “Partner Orders”, “Partner
-          Reference OTA-82714”, “Exception Types”.'
-        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 52 §Display
-    - name: actionBar
-      slot: rowActions
-      components:
-      - kind: banner
-        label: Permissions this screen separates
-        notes: '**The pack separates these permissions and no action on the screen claims them yet:**
-          Match, Correct, Accept Difference, Create Adjustment, Assign, Escalate, Dispute. Each needs
-          attaching to the control it gates, or the screen needs the control.'
-        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 52 §Authorized users
-          can
-      - kind: primaryButton
-        label: Act on partner reconciliation exception
-        operation: actOnPartnerReconciliationException
-        permission: SETTLEMENT_RECONCILE
-        notes: The owner actions on PTR-047 (decided 29 September, writers pass; DM4); the rows themselves
-          are created and re-matched by the reconciliation job.
-        provenance: contract subscription.yaml POST /partner-reconciliation-exceptions/{exceptionId}/actions
-  states:
-    loading: The partner reconciliation exception list.
-    error: Could not load. Names which read failed and leaves the partner reconciliation exception untouched.
-    emptyFirstRun: No partner reconciliation exception yet. Carries the create action; distinct from a
-      filter that matched nothing.
-    emptyNoResults: The filter narrowed it and the partner reconciliation exception are still there. Names
-      the active filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
-  apis:
-  - operationId: listPartnerReconciliationException
-    contract: subscription
-    purpose: Partner Reconciliation & Exception Management
-    trigger: onLoad
-  - operationId: actOnPartnerReconciliationException
-    contract: subscription
-    purpose: Work a partner reconciliation exception
-    trigger: onAction
-    invalidates:
-    - listPartnerReconciliationException
-  entryState:
-    preloaded:
-    - PartnerReconciliationExceptionManagementSummary.recordsReconciled
-    - PartnerReconciliationExceptionManagementSummary.unmatchedOrders
-    - PartnerReconciliationExceptionManagementSummary.amountMismatches
-    - PartnerReconciliationExceptionManagementSummary.missingTickets
-    - PartnerReconciliationExceptionManagementSummary.pricingDifferences
-    - PartnerReconciliationExceptionManagementSummary.commissionDifferences
-    params:
-    - name: exceptionId
-      from: navigation
-      optional: true
-  wireframe:
-    status: notStarted
-    provenance: generated
-    board: wireframes/P10 Partner Web.dc.html#ptr-047
-    workshopBoard: wireframes/WS40 B2B, Reseller & OTA Partner Management Board 3.dc.html#ptr-047
-  apisNote: Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page
-    52. 8 of 8 labels bound to a contract property; 15 of 39 pack bullets carried onto the screen — the
-    rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
-    rather than here.
-  overlays:
-  - id: formActOnPartnerReconciliationException
-    component: modal
-    trigger: Act on partner reconciliation exception
-    body: '**Collects what `actOnPartnerReconciliationException` sends before it is called.** Required:
-      `action`. Optional: `assigneePrincipalId`, `adjustmentRef`, `note`. Dismissing sends nothing; the
-      screen behind is unchanged.'
-    confirm:
-      label: Act on partner reconciliation exception
-      operation: actOnPartnerReconciliationException
-    dismiss:
-      label: Cancel
-      discards:
-      - action
-      - assigneePrincipalId
-      - adjustmentRef
-      - note
-    provenance: contract subscription.yaml POST /partner-reconciliation-exceptions/{exceptionId}/actions
-- id: PTR-048
-  name: Commission Calculation & Settlement Management
-  module: Partners
-  requiresModule: partner
-  wave: 3
-  source:
-    pack: B2B, Reseller & OTA Partner Management_Reference.pdf
-    board: '3'
-    number: 8.3.7
-    page: 54
-  implementation:
-    app: partner-web
-    route: /partners/commission-calculation-settlement-management-ptr-048
-    component: apps/partner-web/src/routes/partners/CommissionCalculationSettlementManagement.tsx
-    status: notStarted
-  navigation:
-    entryFrom:
-    - PTR-042
-    exitTo:
-    - PTR-042
-    inferred: false
-    notes: '**Reached from PTR-042, the hub of its workshop board.** Stated on 4 September: the pack groups
-      its screens ten to a board behind a command centre, and that grouping is the navigation.'
-    transitions:
-    - to: PTR-042
-      trigger: Returns to the board's landing screen
-      provenance: flow F132 step 12→13
-      operation: listCommissionCalculationSettlement
-  density: compact
-  purposeNote: until relevant transactions and adjustments have been reconciled.
-  pattern: listDetail
-  patternReason: the pack gives this screen a display directory (§Display) and no metric row
-  purpose: Calculate, approve and settle commission or incentive amounts owed under partner commercial
-    agreements.
-  gaps:
-  - operation: null
-    why: '**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Per
-      Transaction. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation
-      seen from the screen side rather than the contract side.'
-    source: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 54 §Support
-  layout:
-    template: split
-    regions:
-    - name: contentBody
-      slot: headline
-      components:
-      - kind: metricTile
-        label: Commission Earned
-        bindsTo: CommissionCalculationSettlementManagementSummary.commissionEarned
-        operation: listCommissionCalculationSettlement
-        provenance: moved from the row table to the list summary (decided 29 September, readiness close-out)
-      - kind: metricTile
-        label: Commission Pending
-        bindsTo: CommissionCalculationSettlementManagementSummary.commissionPending
-        operation: listCommissionCalculationSettlement
-        provenance: moved from the row table to the list summary (decided 29 September, readiness close-out)
-      - kind: metricTile
-        label: Approved
-        bindsTo: CommissionCalculationSettlementManagementSummary.approved
-        operation: listCommissionCalculationSettlement
-        provenance: moved from the row table to the list summary (decided 29 September, readiness close-out)
-      - kind: metricTile
-        label: On Hold
-        bindsTo: CommissionCalculationSettlementManagementSummary.onHold
-        operation: listCommissionCalculationSettlement
-        provenance: moved from the row table to the list summary (decided 29 September, readiness close-out)
-      - kind: metricTile
-        label: Paid
-        bindsTo: CommissionCalculationSettlementManagementSummary.paid
-        operation: listCommissionCalculationSettlement
-        provenance: moved from the row table to the list summary (decided 29 September, readiness close-out)
-      - kind: metricTile
-        label: Reversed
-        bindsTo: CommissionCalculationSettlementManagementSummary.reversed
-        operation: listCommissionCalculationSettlement
-        provenance: moved from the row table to the list summary (decided 29 September, readiness close-out)
-      - kind: metricTile
-        label: Incentives Earned
-        bindsTo: CommissionCalculationSettlementManagementSummary.incentivesEarned
-        operation: listCommissionCalculationSettlement
-        provenance: moved from the row table to the list summary (decided 29 September, readiness close-out)
-      - kind: metricTile
-        label: Next Settlement date
-        bindsTo: CommissionCalculationSettlementManagementSummary.nextSettlement
-        operation: listCommissionCalculationSettlement
-        provenance: moved from the row table to the list summary (decided 29 September, readiness close-out)
-    - name: contentBody
-      slot: collection
-      components:
-      - kind: dataTable
-        label: Every commission calculation settlement
-        bindsTo: CommissionCalculationSettlementManagementView
-        operation: listCommissionCalculationSettlement
-        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 54 §Display
-    - name: contextPanel
-      slot: selection
-      components:
-      - kind: detailPanel
-        label: The selected commission calculation settlement
-        bindsTo: CommissionCalculationSettlementManagementView
-        notes: 'The pack groups this record''s detail under its own headings: “For each transaction”,
-          “Automatically account for”, “Exception states”, “Settlement Batch”, “Important Boundary”.'
-        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 54 §Display
-    - name: actionBar
-      slot: rowActions
-      components:
-      - kind: primaryButton
-        label: Per Transaction
-        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 54 §Support
-      - kind: secondaryButton
-        label: Act on partner commission line
-        operation: actOnPartnerCommissionLine
-        permission: SETTLEMENT_RECONCILE
-        notes: The line actions on PTR-048 (decided 29 September, writers pass; DM4).
-        provenance: contract subscription.yaml POST /partner-commission-lines/{lineId}/actions
-      - kind: secondaryButton
-        label: Act on partner settlement batch
-        operation: actOnPartnerSettlementBatch
-        permission: SETTLEMENT_RECONCILE
-        notes: The batch actions on PTR-048 (decided 29 September, writers pass; DM4).
-        provenance: contract subscription.yaml POST /partner-settlement-batches/{batchId}/actions
-  states:
-    loading: The commission calculation settlement list.
-    error: Could not load. Names which read failed and leaves the commission calculation settlement untouched.
-    emptyFirstRun: No commission calculation settlement yet. Carries the create action; distinct from
-      a filter that matched nothing.
-    emptyNoResults: The filter narrowed it and the commission calculation settlement are still there.
-      Names the active filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
-  apis:
-  - operationId: listCommissionCalculationSettlement
-    contract: subscription
-    purpose: Commission Calculation & Settlement Management
-    trigger: onLoad
-  - operationId: actOnPartnerCommissionLine
-    contract: subscription
-    purpose: Hold, release, dispute or reverse a single commission line
-    trigger: onAction
-    invalidates:
-    - listCommissionCalculationSettlement
-  - operationId: actOnPartnerSettlementBatch
-    contract: subscription
-    purpose: Move a commission settlement batch through Finance
-    trigger: onAction
-    invalidates:
-    - listCommissionCalculationSettlement
-  entryState:
-    preloaded:
-    - CommissionCalculationSettlementManagementSummary.commissionEarned
-    - CommissionCalculationSettlementManagementSummary.commissionPending
-    - CommissionCalculationSettlementManagementSummary.approved
-    - CommissionCalculationSettlementManagementSummary.onHold
-    - CommissionCalculationSettlementManagementSummary.paid
-    - CommissionCalculationSettlementManagementSummary.reversed
-    params:
-    - name: lineId
-      from: navigation
-      optional: true
-    - name: batchId
-      from: navigation
-      optional: true
-  wireframe:
-    status: notStarted
-    provenance: generated
-    board: wireframes/P10 Partner Web.dc.html#ptr-048
-    workshopBoard: wireframes/WS40 B2B, Reseller & OTA Partner Management Board 3.dc.html#ptr-048
-  apisNote: Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page
-    54. 8 of 8 labels bound to a contract property; 9 of 42 pack bullets carried onto the screen — the
-    rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
-    rather than here.
-  overlays:
-  - id: formActOnPartnerCommissionLine
-    component: modal
-    trigger: Act on partner commission line
-    body: '**Collects what `actOnPartnerCommissionLine` sends before it is called.** Required: `action`.
-      Optional: `reason`, `caseId`. Dismissing sends nothing; the screen behind is unchanged.'
-    confirm:
-      label: Act on partner commission line
-      operation: actOnPartnerCommissionLine
-    dismiss:
-      label: Cancel
-      discards:
-      - action
-      - reason
-      - caseId
-    provenance: contract subscription.yaml POST /partner-commission-lines/{lineId}/actions
-  - id: formActOnPartnerSettlementBatch
-    component: modal
-    trigger: Act on partner settlement batch
-    body: '**Collects what `actOnPartnerSettlementBatch` sends before it is called.** Required: `action`.
-      Optional: `scheduledDate`, `reason`, `caseId`. Dismissing sends nothing; the screen behind is unchanged.'
-    confirm:
-      label: Act on partner settlement batch
-      operation: actOnPartnerSettlementBatch
-    dismiss:
-      label: Cancel
-      discards:
-      - action
-      - scheduledDate
-      - reason
-      - caseId
-    provenance: contract subscription.yaml POST /partner-settlement-batches/{batchId}/actions
 - id: PTR-049
   name: Partner Disputes, Cases & Service Management
   module: Partners
@@ -10122,7 +8173,7 @@ screens:
     transitions:
     - to: PTR-042
       trigger: Returns to the board's landing screen
-      provenance: flow F132 step 14→15
+      provenance: flow F132 step 10→11
       operation: listPartnerDisputeCase
   density: compact
   purposeNote: Every partner dispute has a traceable owner, SLA, supporting evidence, financial context
@@ -10144,6 +8195,12 @@ screens:
     - name: contentBody
       slot: collection
       components:
+      - kind: selectField
+        label: Case type
+        notes: 'Chosen when creating a case (`createPartnerCase.category`). Options: Booking Dispute;
+          Pricing Dispute; Credit Dispute; Ticket Issue; Allocation Issue; API Issue; Finance review;
+          Technical review.'
+        provenance: 'design-notes correction PTR-049, 2 October 2026 (CHG-SOT-015): a choice, not buttons'
       - kind: dataTable
         label: Every partner disputes cases
         columns:
@@ -10170,30 +8227,6 @@ screens:
     - name: actionBar
       slot: rowActions
       components:
-      - kind: primaryButton
-        label: Booking Dispute
-        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 56 §Support
-      - kind: secondaryButton
-        label: Pricing Dispute
-        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 56 §Support
-      - kind: secondaryButton
-        label: Credit Dispute
-        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 56 §Support
-      - kind: secondaryButton
-        label: Ticket Issue
-        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 56 §Support
-      - kind: secondaryButton
-        label: Allocation Issue
-        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 56 §Support
-      - kind: secondaryButton
-        label: API Issue
-        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 56 §Support
-      - kind: secondaryButton
-        label: Finance review
-        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 56 §Allow
-      - kind: secondaryButton
-        label: Technical review
-        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 56 §Allow
       - kind: secondaryButton
         label: Create partner case
         operation: createPartnerCase
@@ -10253,10 +8286,13 @@ screens:
   - id: formCreatePartnerCase
     component: modal
     trigger: Create partner case
-    body: '**Collects what `createPartnerCase` sends before it is called.** Required: `id`, `partnerId`,
-      `category`, `priority`, `description`, `status`, `resolutionTargetAt`. Optional: `contactId`, `orderId`,
-      `invoiceReference`, `settlementBatchId`, `amountInDispute`, `evidence`, `ownerPrincipalId`, `slaPolicyId`,
-      `firstResponseAt`, `resolvedAt`, `scopePath`. Dismissing sends nothing; the screen behind is unchanged.'
+    body: '**Collects what `createPartnerCase` sends before it is called.** The person picks the **case
+      type** (booking dispute, pricing dispute, credit dispute, ticket issue, allocation issue, API issue)
+      and the priority, describes it and links the order, invoice or settlement batch; `partnerId` comes
+      from the session; the owner, SLA policy, resolution target and response times are the server''s.
+      Never `id` or `status`: an id is a client UUIDv7 generated silently and the status and timestamps
+      are the server''s (design-notes correction, CHG-SOT-015). Dismissing sends nothing; the screen behind
+      is unchanged.'
     bindsTo: PartnerCase
     confirm:
       label: Create partner case
@@ -10264,24 +8300,15 @@ screens:
     dismiss:
       label: Cancel
       discards:
-      - id
-      - partnerId
       - category
       - priority
       - description
-      - status
-      - resolutionTargetAt
       - contactId
       - orderId
       - invoiceReference
       - settlementBatchId
       - amountInDispute
       - evidence
-      - ownerPrincipalId
-      - slaPolicyId
-      - firstResponseAt
-      - resolvedAt
-      - scopePath
     provenance: contract subscription.yaml POST /partner-cases
   - id: formActOnPartnerCase
     component: modal
@@ -10327,7 +8354,7 @@ screens:
     transitions:
     - to: PTR-042
       trigger: Returns to the board's landing screen
-      provenance: flow F132 step 16→17
+      provenance: flow F132 step 12→13
       operation: listPartnerPerformanceScorecard
   density: compact
   purposeNote: Management can objectively compare partners and identify commercial, operational or financial
@@ -10363,8 +8390,8 @@ screens:
   states:
     loading: The partner performance scorecard list.
     error: Could not load. Names which read failed and leaves the partner performance scorecard untouched.
-    emptyFirstRun: No partner performance scorecard yet. Carries the create action; distinct from a filter
-      that matched nothing.
+    emptyFirstRun: 'No scorecard yet: a partner is scored after its first full period of trading. Offers
+      no create action.'
     emptyNoResults: The filter narrowed it and the partner performance scorecard are still there. Names
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
@@ -10445,8 +8472,8 @@ screens:
   states:
     loading: The partner intelligence relationship list.
     error: Could not load. Names which read failed and leaves the partner intelligence relationship untouched.
-    emptyFirstRun: No partner intelligence relationship yet. Carries the create action; distinct from
-      a filter that matched nothing.
+    emptyFirstRun: 'No recommendations yet: there is not enough partner history to learn from. Offers
+      no create action.'
     emptyNoResults: The filter narrowed it and the partner intelligence relationship are still there.
       Names the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no

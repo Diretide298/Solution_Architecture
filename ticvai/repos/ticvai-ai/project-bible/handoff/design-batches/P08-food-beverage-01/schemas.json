@@ -98,36 +98,415 @@
    }
   }
  },
- "CatalogueState": {
-  "x-ticvai-persistence": "none — computed from workstation bundle_version",
+ "ApprovalDecision": {
   "type": "object",
-  "description": "The workstation's local catalogue position. A terminal beyond `staleAfter` must refuse to trade rather than transact against stale prices.\n",
+  "x-ticvai-persistence": "approvals.decision",
   "required": [
-   "appliedBundleVersion",
-   "appliedAt",
-   "staleAfter",
-   "isStale"
+   "level",
+   "principalId",
+   "decision",
+   "decidedAt"
   ],
   "properties": {
-   "appliedBundleVersion": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
+   },
+   "level": {
+    "type": "integer"
+   },
+   "principalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "displayName": {
     "type": "string"
    },
-   "appliedAt": {
+   "isDelegate": {
+    "type": "boolean"
+   },
+   "delegatedFrom": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "decision": {
+    "type": "string",
+    "enum": [
+     "approve",
+     "reject"
+    ]
+   },
+   "comment": {
+    "type": "string",
+    "nullable": true
+   },
+   "reason": {
+    "type": "string",
+    "nullable": true
+   },
+   "usedMfa": {
+    "type": "boolean"
+   },
+   "signatureRef": {
+    "type": "string",
+    "nullable": true
+   },
+   "decidedAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "ApprovalKind": {
+  "type": "string",
+  "description": "11.1.7 and 11.1.30–11.1.37. **The first four already exist as bespoke implementations** and this contract is what they collapse into.\n**Which actions route here — decided 28 September, audit R144.** Finance and procurement acts go through this engine to a **finance approver**: closing a fiscal period (`periodClose`), reopening one (`periodReopen`), cancelling a purchase order (`purchaseOrderCancel`) and closing one short (`purchaseOrderShortClose`). The tenant default matrix for each of these names the finance approver role; a venue may tighten it and never loosen it. Starting a release rollout routes through `releasePromotion` to the platform release manager (a holder of `PLATFORM_RELEASE_PROMOTE`). **Not every `requiresApproval` goes here:** reopening a shift, recounting a stock count and a retail return above the venue threshold take a supervisor's step-up on the same device instead, and never raise a request.\n**Catalogue change requests route through `productChange` and `pricingChange`** (decided 29 September, writers pass): a product change and a price or pricing change raised in `catalogue` ask for approval under these two kinds, so a venue can route product edits and price edits to different approvers.\n\n**Optional review steps a venue switches on, decided 2 October 2026** (Chinmay; CHG-CSP-036, CHG-CSP-028, CHG-CSP-031). Each is an existing kind narrowed by the rule's `subjectTypes`, so no kind is added (a new value here would be a breaking change against r1) and each is off until the venue saves an active matrix for it:\n- **Publishing white-label content** (`configurationChange`, subject `whiteLabelPublication`): simulate, then a single publish by a holder of the permission; a review step only where the venue sets one up (batch 1, CMS-014; DEC-156). - **Recording F&B waste above a value** (`stockWriteOff`, subject `fnbWaste`): the venue's waste-approval policy, value bands as `minAmount` and `maxAmount`, photo evidence above a value held by fnb (batch 6 #192, BO-139; DEC-192; R144). - **Publishing an access topology** (`configurationChange`, subject `topologyPublication`): second-person approval when the venue switches it on (batch 6 #230, BO-153; DEC-230). - **A permanent identity lock, a whitelist entry, or releasing a full-identity or permanent lock** (`accessPermissionChange`, subjects `identityLock`, `whitelistEntry`, `identityLockRelease`): always a second approver, never for an until-end-of-day lock (critical set 1, BO-229 and BO-247; DEC-254, DEC-260); the tenant default matrix names the security approver role and a venue may tighten it, never remove it.\n",
+  "enum": [
+   "refund",
+   "priceOverride",
+   "discountOverride",
+   "complimentaryTicket",
+   "membershipCancellation",
+   "accessPermissionChange",
+   "configurationChange",
+   "aiRecommendation",
+   "releasePromotion",
+   "requisition",
+   "stockWriteOff",
+   "journalEntry",
+   "periodClose",
+   "periodReopen",
+   "purchaseOrderCancel",
+   "purchaseOrderShortClose",
+   "tenantMigration",
+   "productChange",
+   "pricingChange"
+  ]
+ },
+ "ApprovalMode": {
+  "type": "string",
+  "description": "11.1.43–11.1.46. **Sequential** asks one at a time, **parallel** asks everyone at once, **consensus** needs all of them, **majority** needs more than half.\nParallel and consensus differ in when it completes: parallel completes on the first approval, consensus waits for all. Conflating them is how a four-eyes rule turns into a one-eye rule.\n",
+  "enum": [
+   "sequential",
+   "parallel",
+   "consensus",
+   "majority"
+  ]
+ },
+ "ApprovalRequest": {
+  "type": "object",
+  "x-ticvai-persistence": "approvals.request",
+  "required": [
+   "id",
+   "kind",
+   "status",
+   "requestedByPrincipalId",
+   "requestedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string"
+   },
+   "kind": {
+    "$ref": "#/components/schemas/ApprovalKind"
+   },
+   "rerouteOnNoApprover": {
+    "type": "boolean",
+    "default": true,
+    "description": "BL-154. **An approver on leave is an approval that waits for them to come back.** Reroutes to the next in the chain rather than stalling — `workforce` already knows who is on leave, and an approval queue nobody is watching is the thing that stops a venue.\n"
+   },
+   "outOfOfficeDelegateId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "allowEmailApproval": {
+    "type": "boolean",
+    "default": false,
+    "description": "**Approving from an email link with no second factor is the weakest path in the system**, so it is off by default and available only below a configured value.\n"
+   },
+   "reopenedFrom": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**Reopening a decided approval creates a new one that points back.** Editing a decision in place destroys the record of what was originally approved, which is the only thing an audit wants.\n"
+   },
+   "status": {
+    "$ref": "#/components/schemas/ApprovalStatus"
+   },
+   "subjectContract": {
+    "type": "string"
+   },
+   "subjectType": {
+    "type": "string"
+   },
+   "subjectId": {
+    "type": "string"
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "summary": {
+    "type": "string"
+   },
+   "amount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "justification": {
+    "type": "string",
+    "nullable": true
+   },
+   "requestedByPrincipalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "matrixVersion": {
+    "type": "integer"
+   },
+   "mode": {
+    "$ref": "#/components/schemas/ApprovalMode"
+   },
+   "currentLevel": {
+    "type": "integer"
+   },
+   "totalLevels": {
+    "type": "integer"
+   },
+   "pendingApprovers": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "principalId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "displayName": {
+       "type": "string"
+      },
+      "isDelegate": {
+       "type": "boolean"
+      }
+     }
+    }
+   },
+   "decisions": {
+    "type": "array",
+    "description": "Every decision at every level, in order. **Immutable once the request completes** (11.1.56) — an approval is evidence, and amending one is a different fact.\n",
+    "items": {
+     "$ref": "#/components/schemas/ApprovalDecision"
+    }
+   },
+   "escalations": {
+    "type": "array",
+    "description": "11.1.48. Who was asked, when, and why it moved up. **Escalation adds an approver rather than replacing one**, so the original stays in the record.\n",
+    "items": {
+     "type": "object",
+     "properties": {
+      "at": {
+       "type": "string",
+       "format": "date-time"
+      },
+      "reason": {
+       "type": "string"
+      },
+      "fromLevel": {
+       "type": "integer"
+      },
+      "toLevel": {
+       "type": "integer"
+      },
+      "wasAutomatic": {
+       "type": "boolean"
+      }
+     }
+    }
+   },
+   "resubmittedFromId": {
+    "type": "string",
+    "nullable": true
+   },
+   "reopenedFromId": {
+    "type": "string",
+    "nullable": true
+   },
+   "slaDueAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "slaBreached": {
+    "type": "boolean"
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "assignedToPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "Who claimed or was assigned the request in a shared queue (`assignApprovalRequest`; DI-723; CHG-CSP-042). Null while it sits in the queue."
+   },
+   "assignedToDepartmentId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The department queue it was assigned to, where it went to a department rather than a person (CHG-CSP-042)."
+   },
+   "assignedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   },
+   "requestedAt": {
     "type": "string",
     "format": "date-time"
    },
-   "staleAfter": {
+   "completedAt": {
     "type": "string",
     "format": "date-time",
-    "description": "Beyond this the terminal refuses to trade."
+    "nullable": true
    },
-   "isStale": {
-    "type": "boolean"
-   },
-   "pendingBundleVersion": {
-    "type": "string",
+   "aiAssessment": {
+    "type": "object",
     "nullable": true,
-    "description": "Published but not yet applied."
+    "readOnly": true,
+    "description": "**AI context for the reviewer, never an input to the decision** (11.1.73 to 11.1.75; MoM 8 September; 29 September, build pass, group G2). Written by approvals from `ai.scoreApprovalRequest` on submit and on each SLA tick; null where AI is off or has not answered. Shown on the request labelled as AI; orders the inbox only when `sort=aiPriority` is asked for.",
+    "properties": {
+     "riskScore": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100
+     },
+     "riskBand": {
+      "type": "string",
+      "enum": [
+       "low",
+       "medium",
+       "high",
+       "critical"
+      ]
+     },
+     "priorityScore": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100
+     },
+     "escalationSuggestion": {
+      "type": "object",
+      "description": "A suggestion a person may act on through `escalateApprovalRequest`, or the tenant's own SLA policy may; nothing escalates because of it.",
+      "properties": {
+       "action": {
+        "type": "string",
+        "enum": [
+         "escalate",
+         "addBackupApprover",
+         "none"
+        ]
+       },
+       "reason": {
+        "type": "string",
+        "nullable": true
+       }
+      }
+     },
+     "signals": {
+      "type": "array",
+      "maxItems": 10,
+      "description": "The signals behind the scores, largest first, as `ai.AiApprovalRequestScore.signals`.",
+      "items": {
+       "type": "object",
+       "properties": {
+        "code": {
+         "type": "string"
+        },
+        "contribution": {
+         "type": "number"
+        },
+        "detail": {
+         "type": "string",
+         "nullable": true
+        }
+       }
+      }
+     },
+     "scoreId": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The `ai.approval_request_score` row it was copied from; `ai.getApprovalRequestScore` gives the full context. Not a foreign key (the score lives in the AI service)."
+     },
+     "decisionRecordId": {
+      "type": "string",
+      "description": "The ai decision record, for the audit of what the AI said and why."
+     },
+     "assessedAt": {
+      "type": "string",
+      "format": "date-time"
+     }
+    }
+   }
+  }
+ },
+ "ApprovalStatus": {
+  "type": "string",
+  "enum": [
+   "draft",
+   "pending",
+   "escalated",
+   "returned",
+   "informationRequested",
+   "approved",
+   "rejected",
+   "withdrawn",
+   "expired",
+   "cancelled"
+  ]
+ },
+ "CourseRules": {
+  "type": "object",
+  "x-ticvai-persistence": "fnb.course_rule",
+  "description": "**An outlet's coursing default.** It was written to the resolution cache only, which the service model calls losable without consequence — an outlet's default vanished on a cache flush. One row per outlet.\n",
+  "properties": {
+   "outletId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "The outlet in the path."
+   },
+   "defaultCoursing": {
+    "$ref": "#/components/schemas/CoursingPolicy"
+   },
+   "courseNames": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "autoFireMinutes": {
+    "type": "integer",
+    "nullable": true
+   },
+   "serviceModeOverrides": {
+    "type": "object",
+    "description": "A different default per service mode.",
+    "propertyNames": {
+     "$ref": "#/components/schemas/ServiceMode"
+    },
+    "additionalProperties": {
+     "$ref": "#/components/schemas/CoursingPolicy"
+    }
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Operations write it at `outlet` scope."
    }
   }
  },
@@ -141,6 +520,63 @@
    "timed",
    "delayed"
   ]
+ },
+ "CreateApprovalRequest": {
+  "type": "object",
+  "x-ticvai-persistence": "none — request only",
+  "required": [
+   "id",
+   "kind",
+   "subjectContract",
+   "subjectType",
+   "subjectId",
+   "scopePath",
+   "summary"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "kind": {
+    "$ref": "#/components/schemas/ApprovalKind"
+   },
+   "subjectContract": {
+    "type": "string",
+    "description": "Which contract owns the thing being approved."
+   },
+   "subjectType": {
+    "type": "string"
+   },
+   "subjectId": {
+    "type": "string",
+    "description": "**A reference, never a copy.** A copy goes stale between raising and deciding, and an approver reading a stale copy approves something that no longer exists.\n"
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "summary": {
+    "type": "string",
+    "maxLength": 300,
+    "description": "What the approver sees in their queue before opening it."
+   },
+   "amount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "attributes": {
+    "type": "object",
+    "additionalProperties": true
+   },
+   "justification": {
+    "type": "string",
+    "maxLength": 1000
+   },
+   "isDraft": {
+    "type": "boolean",
+    "default": false,
+    "description": "True saves the request at `draft` without routing it; `submitApprovalRequest` sends it later (decided 28 September, audit R129).\n"
+   }
+  }
  },
  "CreateFnbOrderLine": {
   "x-ticvai-persistence": "none — request only",
@@ -193,53 +629,6 @@
    }
   }
  },
- "CreateFnbOrderRequest": {
-  "x-ticvai-persistence": "none — request only",
-  "type": "object",
-  "required": [
-   "id",
-   "outletId",
-   "serviceMode",
-   "lines",
-   "recordedAt"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "outletId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "serviceMode": {
-    "$ref": "#/components/schemas/ServiceMode"
-   },
-   "tableVisitId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "Required for table service. Absent for quick service."
-   },
-   "lines": {
-    "type": "array",
-    "minItems": 1,
-    "items": {
-     "$ref": "#/components/schemas/CreateFnbOrderLine"
-    }
-   },
-   "salesOrderId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "The `orders.sales_order` this F&B order fulfils (SD-046, 29 September). A POS sale sends the order it took payment on; the commercial order is the sales order and this is its fulfilment."
-   },
-   "recordedAt": {
-    "type": "string",
-    "format": "date-time"
-   }
-  }
- },
  "CreateMenuRequest": {
   "x-ticvai-persistence": "none — request only",
   "type": "object",
@@ -263,42 +652,6 @@
    },
    "availability": {
     "$ref": "#/components/schemas/MenuAvailability"
-   }
-  }
- },
- "DeploymentProfile": {
-  "type": "string",
-  "description": "How this workstation obtains catalogue and inventory (ADR-0013).\n- `terminalLocal` — own SQLite, leases direct from the cell. Small venues, 4G sites - `venueEdge` — own SQLite, distributed via the venue edge node which holds the\n  venue lease and sub-leases to terminals. Mid and large venues, stadium gates\n- `thin` — no local catalogue, server reads. Non-transactional surfaces only\n",
-  "enum": [
-   "terminalLocal",
-   "venueEdge",
-   "thin"
-  ]
- },
- "DeviceBinding": {
-  "x-ticvai-persistence": "platform.device",
-  "type": "object",
-  "required": [
-   "kind",
-   "driver"
-  ],
-  "properties": {
-   "kind": {
-    "$ref": "#/components/schemas/DeviceKind"
-   },
-   "driver": {
-    "type": "string",
-    "description": "Driver identifier. Adding a vendor is a driver plus configuration, never a core change — every venue arrives with hardware not previously seen.\n"
-   },
-   "identifier": {
-    "type": "string",
-    "description": "Serial",
-    "port or network address.": null
-   },
-   "isRequired": {
-    "type": "boolean",
-    "default": false,
-    "description": "When true, the workstation refuses to open a shift if the device is absent.\n"
    }
   }
  },
@@ -326,6 +679,22 @@
    "outletId": {
     "type": "string",
     "format": "uuid"
+   },
+   "paymentTiming": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/OutletPaymentTiming"
+     }
+    ],
+    "readOnly": true,
+    "description": "The outlet's payment timing when the order was placed (CHG-CSA-010), kept as a snapshot."
+   },
+   "sentToKitchenAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "When the order's kitchen tickets were created. Null on a `payFirst` order not yet paid (CHG-CSA-010)."
    },
    "serviceMode": {
     "$ref": "#/components/schemas/ServiceMode"
@@ -476,6 +845,69 @@
    }
   }
  },
+ "KitchenRoutingRules": {
+  "type": "object",
+  "x-ticvai-persistence": "fnb.kitchen_routing_rule",
+  "description": "**Where a line goes when its item names no station** (Chinmay, 2 October, workbook Q189 and Q190; DI-323; CHG-CSA-015). Item rules are `KitchenStation.menuItemIds`; these are the category rules, the default station and the fallback station of one outlet. One row per outlet.\n",
+  "required": [
+   "defaultStationId"
+  ],
+  "properties": {
+   "outletId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "The outlet in the path."
+   },
+   "categoryRules": {
+    "type": "array",
+    "x-ticvai-persistence-kind": "valueObject",
+    "x-ticvai-persistence-column": "jsonb",
+    "description": "Tried in order; the first match wins.",
+    "items": {
+     "type": "object",
+     "required": [
+      "matchKind",
+      "matchValue",
+      "stationId"
+     ],
+     "properties": {
+      "matchKind": {
+       "type": "string",
+       "enum": [
+        "menuSection",
+        "productCategory"
+       ]
+      },
+      "matchValue": {
+       "type": "string",
+       "description": "A `MenuSection.code`, or a catalogue product category code."
+      },
+      "stationId": {
+       "type": "string",
+       "format": "uuid"
+      }
+     }
+    }
+   },
+   "defaultStationId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "Where a line that matches no item rule and no category rule goes (workbook Q190). Never refused for want of a station."
+   },
+   "fallbackStationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Where a ticket goes when the station it routed to is inactive or every display assigned to it is down (DI-323)."
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Operations write it at `outlet` scope."
+   }
+  }
+ },
  "KitchenSla": {
   "type": "object",
   "description": "**How long a ticket may sit, per service mode, and what pushes it up the rail** (`setKitchenSla`). The priority weights are the ones `listKitchenTickets` orders the rail by.\n",
@@ -571,6 +1003,22 @@
     "type": "string",
     "nullable": true,
     "description": "The P15 Kitchen Display device this station's tickets go to (19 Sep: the display is TICVAI software on commodity hardware, per station, with a fallback device where the primary is down — 18 Aug minute). Absent where the station has no display assigned.\n"
+   },
+   "printerDeviceIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    },
+    "description": "**The kitchen printers assigned to this station** (Chinmay, 2 October, workbook Q187: kitchen printers are in release 1; CHG-CSA-014), as tenancy `RegisteredDevice` ids of kind `receiptPrinter` or `labelPrinter`. A station may have printers, displays or both; a ticket for a station with printers is printed there as well as shown, and `printPrepSheet` sends the station's part of a prep sheet to them.\n"
+   },
+   "servesOutletIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    },
+    "description": "**A producing outlet's station serving other outlets** (Chinmay, 2 October, workbook Q186 and Q188; DI-330; CHG-CSA-015). `outletId` is the producing outlet (the commissary or main kitchen); the outlets listed here route their orders to this station as if it were their own. Empty, the default, means the station serves only its own outlet.\n"
    },
    "isActive": {
     "type": "boolean"
@@ -1037,7 +1485,7 @@
    "productVariantId": {
     "type": "string",
     "format": "uuid",
-    "description": "The catalogue variant this item sells. Pricing and tax come from there — a menu is a presentation of the catalogue, not a second catalogue.\n"
+    "description": "**The catalogue variant this item links to, for reporting, stock and tax class only. It is not where the price comes from** (Chinmay, 2 October, workbook Q34; CHG-CSA-009). F&B owns its own catalogue: F&B prices were migrated into the F&B service so ticketing scales as an isolated service (ADR-0028), and the price an outlet sells at is `price` on this item. The central catalogue prices tickets and single-price booths; it never reprices a dish. A menu belongs to one outlet, so `price` is that outlet's price, and an outlet may set its own; it changes through `updateMenu`, `setMenuSections` or `applyMenuActions` (`reprice`). Tax is computed on the order line by the tax engine. (Replaces the earlier text \"pricing and tax come from there — a menu is a presentation of the catalogue\", which was stale.)\n"
    },
    "name": {
     "type": "string"
@@ -1049,6 +1497,20 @@
    "price": {
     "x-ticvai-column": "list_price",
     "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "dailyCount": {
+    "type": "integer",
+    "minimum": 0,
+    "nullable": true,
+    "readOnly": true,
+    "description": "**How many portions the kitchen set for today** (`setMenuItemDailyCount`; Chinmay, 2 October, workbook Q194; CHG-CSA-017). Null means the item is not counted. Reset at the venue day start.\n"
+   },
+   "remainingCount": {
+    "type": "integer",
+    "minimum": 0,
+    "nullable": true,
+    "readOnly": true,
+    "description": "**What is left of `dailyCount`** (\"6 left\" on the till and the guest menu). Each sale takes from it; **at zero the item is marked unavailable automatically**, with an `EightySixEvent` whose `source` is `dailyCount`. Null where the item is not counted.\n"
    },
    "sortOrder": {
     "type": "integer"
@@ -1391,6 +1853,11 @@
     "type": "string",
     "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$",
     "description": "Local time, 24-hour `HH:MM`, when the outlet closes."
+   },
+   "endsNextDay": {
+    "type": "boolean",
+    "default": false,
+    "description": "**A late-night window is one window past midnight** (decided 2 October 2026, Chinmay, batch 6 set 6a, BO-731; DEC-197; CHG-CSP-007). A bar open 23:00 to 01:00 on Friday is `day: fri`, `from: '23:00'`, `to: '01:00'`, `endsNextDay: true`: one service period, and its takings belong to Friday's trading day, not split across two days. With `endsNextDay` false, `to` must be later than `from` (`422 window-ends-before-start`); with it true, `to` must be earlier than or equal to `from`, so a window never spans more than 24 hours.\n"
    }
   }
  },
@@ -1416,7 +1883,11 @@
    },
    "name": {
     "type": "string",
-    "maxLength": 200
+    "maxLength": 200,
+    "description": "The outlet's name in English. Other languages are `nameTranslations` (CHG-CSP-005)."
+   },
+   "nameTranslations": {
+    "$ref": "#/components/schemas/OutletNameTranslations"
    },
    "venueId": {
     "type": "string",
@@ -1424,6 +1895,21 @@
    },
    "kind": {
     "$ref": "#/components/schemas/OutletKind"
+   },
+   "outletType": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/OutletType"
+     }
+    ],
+    "nullable": true,
+    "description": "The service model (DI-319; DEC-196; CHG-CSP-005). Null on an outlet that is not F&B or retail."
+   },
+   "departmentId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**The department the outlet belongs to** (DI-319: department, sub-department, cost centre and status; DEC-196; CHG-CSP-005): an `OrgUnit` of kind department, as `Workstation.departmentId`. The outlet itself is the sub-department, so it needs no second field.\n"
    },
    "zone": {
     "type": "string",
@@ -1441,6 +1927,39 @@
     "nullable": true,
     "description": "Revenue and cost attribution. Outlet is the natural grain for both."
    },
+   "paymentTiming": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/OutletPaymentTiming"
+     }
+    ],
+    "default": "sendFirst",
+    "description": "Pay first, or send to the kitchen first then pay (DEC-064; CHG-CSP-004)."
+   },
+   "admissionContext": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/OutletAdmissionContext"
+     }
+    ],
+    "default": "insideVenue",
+    "description": "Inside the venue (needs an admission ticket) or standalone (no ticket) (DEC-070; CHG-CSP-004)."
+   },
+   "producesForOutletIds": {
+    "type": "array",
+    "default": [],
+    "description": "**One kitchen serving several outlets is a producing outlet** (decided 2 October 2026, Chinmay, batch 6 set 5, BO-134: \"Yes: via a producing outlet (one kitchen outlet produces for several)\"; DEC-188; CHG-CSP-005). The outlets this one prepares food for, in the same venue. The model stays per outlet (DI-330): each outlet keeps its own menu and stations, and an order at a listed outlet may route to this outlet's kitchen stations (fnb `KitchenStation`). Empty on an outlet that only produces for itself. An outlet may not list itself, an outlet of another venue (`422 outlet-not-in-venue`), or one that lists it back.\n",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "saleBoardId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**The till layout every till in this outlet uses, unless a till overrides it** (decided 2 October 2026, Chinmay, batch 6 set 4, BO-109: \"Per outlet, with a till override\"; DEC-183; CHG-CSP-006). DI-326 puts the layout at the outlet; MATRIX 2.1.9 binds a board to a workstation. Both hold: a workstation with no board of its own (`ConfigureWorkstationRequest.saleBoardId` absent or null) uses this one, and `Workstation.saleBoardSource` says which applied.\n"
+   },
    "openingHours": {
     "type": "array",
     "description": "The weekly pattern, one entry per window. Several windows on a day are allowed.",
@@ -1453,6 +1972,14 @@
    }
   }
  },
+ "OutletAdmissionContext": {
+  "type": "string",
+  "description": "**Whether an outlet sits behind the admission gate** (decided 2 October 2026, Chinmay, batch 1, WEB-036: \"Inside the venue, a ticket is needed. A restaurant outside the venue (standalone) can sell without one\"; DEC-070; CHG-CSP-004). `insideVenue` (the default): a guest ordering food needs an admission ticket or a place inside, as DI-292 (14 August) decided. `standalone`: a restaurant outside the gate, which may sell takeaway and delivery (DI-1039) with no ticket. DI-292 is amended for standalone outlets only. The admission check itself stays in Access (ADR-0068). F&B keeps its own payment and its own receipt either way. **The canonical name** (2 October 2026, CHG-CLN-008): the field is `admissionContext` on the outlet and on F&B's guest `DiningOutlet`; common `OutletSiting` and the word \"siting\" are deprecated aliases of this.\n",
+  "enum": [
+   "insideVenue",
+   "standalone"
+  ]
+ },
  "OutletKind": {
   "type": "string",
   "enum": [
@@ -1464,6 +1991,39 @@
    "gameFloor",
    "ticketOffice",
    "mobile"
+  ]
+ },
+ "OutletNameTranslations": {
+  "type": "object",
+  "x-ticvai-persistence": "none — jsonb column on platform.outlet",
+  "description": "**The outlet's name in other languages, keyed by ISO 639-1 code** (decided 2 October 2026, Chinmay, batch 2 #26, BO-044: \"Yes, where a country needs it: the local language plus English\"; DEC-031; CHG-CSP-005). `Outlet.name` stays the English name. Where the region requires a local name (`RegionSettings.localLanguageNameLocales`, Arabic in the UAE), creating or amending an outlet without it is refused `422 local-name-required`. The same shape as catalogue's `LocalisedText` (DI-210).\n",
+  "additionalProperties": {
+   "type": "string",
+   "maxLength": 200
+  }
+ },
+ "OutletPaymentTiming": {
+  "type": "string",
+  "description": "**When an F&B order is paid, set per outlet** (Chinmay, 2 October, workbook Q64; refines audit R261 per outlet; CHG-CSA-010). `sendFirst`, the default and R261's rule: the order goes to the kitchen, then the till charges (table service, and quick service where the venue wants the kitchen started while the guest pays). `payFirst`: the till charges before anything reaches the kitchen; an unpaid order at a `payFirst` outlet is never sent (`fnb.createFnbOrder`, `fnb.fireCourse`). Shared because the outlet (tenancy `Outlet`) holds it and F&B enforces it.\n",
+  "enum": [
+   "sendFirst",
+   "payFirst"
+  ],
+  "default": "sendFirst"
+ },
+ "OutletType": {
+  "type": "string",
+  "description": "**How an F&B or retail outlet trades, which switches features on or off** (decided 2 October 2026, Chinmay, batch 6 set 6a, BO-729: \"Add both fields: outlet type and department (DI-319)\"; DEC-196; CHG-CSP-005). DI-319: a quick-service outlet needs no table booking, a fine-dining outlet needs a table layout. `kind` stays the physical place (a shop, a restaurant, a kiosk); this is the service model inside it. `commissary` is a producing kitchen (DEC-186, DEC-188).\n",
+  "enum": [
+   "fineDining",
+   "casualDining",
+   "quickService",
+   "coffeeShop",
+   "barLounge",
+   "foodCourt",
+   "buffet",
+   "commissary",
+   "retail"
   ]
  },
  "Page": {
@@ -1485,154 +2045,90 @@
    }
   }
  },
- "ProductionPlan": {
+ "PrepSheet": {
   "type": "object",
-  "x-ticvai-persistence": "fnb.production_plan + fnb.production_plan_line",
-  "description": "Board 2M. **Forecast demand against recipes, producing a prep list.** Built from `requestSuggestion(kind=prepPlan)` and then edited — **a forecast a chef cannot overrule is a forecast a chef ignores.**\n**A plan is not a production run and the separation is deliberate.** A plan is drafted, argued over and edited; releasing it creates the runs. **A plan that creates runs as it is drafted creates runs nobody asked for.**\n",
+  "x-ticvai-persistence": "none — rendered from the production plan and the template",
+  "description": "A production plan rendered through the venue's prep-sheet template (`printPrepSheet`, CHG-CSA-014).",
   "required": [
-   "id",
-   "forDate",
-   "status",
-   "lines"
+   "planId",
+   "sections"
   ],
   "properties": {
-   "id": {
+   "planId": {
     "type": "string",
     "format": "uuid"
    },
-   "outletId": {
+   "renderedAt": {
     "type": "string",
-    "format": "uuid"
+    "format": "date-time"
    },
-   "forDate": {
-    "type": "string",
-    "format": "date",
-    "description": "The trading day this prep list is for, in the Region's time zone."
-   },
-   "status": {
-    "type": "string",
-    "enum": [
-     "draft",
-     "released",
-     "superseded",
-     "cancelled"
-    ]
-   },
-   "basedOnSuggestionId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "**The forecast it started from.** Kept so plan-against-forecast can be compared later — which is the label `recordSuggestionOutcome` needs.\n"
-   },
-   "lines": {
+   "sections": {
     "type": "array",
     "items": {
      "type": "object",
-     "required": [
-      "itemId",
-      "plannedQuantity"
-     ],
      "properties": {
-      "itemId": {
-       "type": "string",
-       "format": "uuid"
-      },
-      "suggestedQuantity": {
-       "type": "number",
-       "nullable": true
-      },
-      "plannedQuantity": {
-       "type": "number"
-      },
-      "uom": {
-       "type": "string"
-      },
       "stationId": {
        "type": "string",
        "format": "uuid",
        "nullable": true
+      },
+      "title": {
+       "type": "string"
+      },
+      "lines": {
+       "type": "array",
+       "items": {
+        "type": "object",
+        "properties": {
+         "item": {
+          "type": "string"
+         },
+         "plannedQuantity": {
+          "type": "number"
+         },
+         "suggestedQuantity": {
+          "type": "number",
+          "nullable": true
+         },
+         "unit": {
+          "type": "string"
+         },
+         "allergens": {
+          "type": "array",
+          "items": {
+           "$ref": "#/components/schemas/AllergenCode"
+          }
+         }
+        }
+       }
       }
      }
     }
    },
-   "releasedRunIds": {
+   "printedTo": {
     "type": "array",
+    "description": "The printers each station's part was sent to (`target` `stationPrinters`).",
     "items": {
-     "type": "string",
-     "format": "uuid"
-    },
-    "readOnly": true
-   }
-  }
- },
- "ProductionRun": {
-  "type": "object",
-  "x-ticvai-persistence": "fnb.production_run",
-  "description": "BL-129. **A central kitchen makes 400 portions at 6am for four outlets**, and nothing modelled that — orders consume stock and no operation produced any.\n**Production converts ingredients into a sellable item**, which is a stock movement in both directions at once, and treating it as two unrelated adjustments loses the yield.\n",
-  "required": [
-   "id",
-   "recipeId",
-   "plannedQuantity",
-   "status"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid"
+     "type": "object",
+     "properties": {
+      "stationId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "deviceId": {
+       "type": "string",
+       "format": "uuid"
+      }
+     }
+    }
    },
-   "recipeId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "productionPlanId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "readOnly": true,
-    "description": "The plan whose release created this run. Null for a run planned directly."
-   },
-   "stationId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "**The station whose prep list this run is on.** Copied from the plan line on release, where runs are grouped by station (audit R125 (7)).\n"
-   },
-   "producingOutletId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "forOutletIds": {
+   "notPrinted": {
     "type": "array",
-    "description": "**Where it goes.** A central kitchen produces for outlets that did not make it.\n",
+    "description": "Stations in the plan with no printer assigned; never silently skipped.",
     "items": {
      "type": "string",
      "format": "uuid"
     }
-   },
-   "plannedQuantity": {
-    "type": "number"
-   },
-   "actualQuantity": {
-    "type": "number",
-    "nullable": true,
-    "description": "BL-126. **Theoretical against actual is the whole point of recording this.** A recipe says 400 portions from the ingredients issued; the run says how many were made, and the gap is waste, theft or a recipe that is wrong.\n"
-   },
-   "scheduledFor": {
-    "type": "string",
-    "format": "date-time"
-   },
-   "status": {
-    "type": "string",
-    "enum": [
-     "planned",
-     "inProgress",
-     "completed",
-     "cancelled"
-    ]
-   },
-   "varianceReason": {
-    "type": "string",
-    "nullable": true
    }
   }
  },
@@ -1650,14 +2146,116 @@
    "lateAdd"
   ]
  },
- "SaleBoardKind": {
-  "type": "string",
-  "enum": [
-   "ticketing",
-   "fnb",
-   "retail",
-   "mixed"
-  ]
+ "RetailSale": {
+  "x-ticvai-persistence": "retail.sale + retail.sale_line",
+  "type": "object",
+  "required": [
+   "id",
+   "receiptNumber",
+   "orderId",
+   "outletId",
+   "lines",
+   "grossAmount",
+   "createdAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string"
+   },
+   "receiptNumber": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**Server-assigned: the venue prefix plus a sequence per venue** (decided 28 September, audit R152). Each till holds a reserved range of the venue's sequence, so a sale made offline prints its number at once and the server accepts it on sync. **Not gapless**: an unused reserved number is skipped, not reissued. Only tax invoices are gapless, per legal entity.\n"
+   },
+   "orderId": {
+    "type": "string",
+    "description": "The order in the Order & Payment context. Retail does not keep its own ledger."
+   },
+   "outletId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "shiftId": {
+    "type": "string",
+    "nullable": true
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "lines": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "lineId": {
+       "type": "string"
+      },
+      "merchandiseId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "name": {
+       "type": "string"
+      },
+      "quantity": {
+       "type": "integer"
+      },
+      "unitPrice": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "discount": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "lineTotal": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "serialNumbers": {
+       "type": "array",
+       "items": {
+        "type": "string"
+       }
+      },
+      "returnedQuantity": {
+       "type": "integer"
+      },
+      "isReturnable": {
+       "type": "boolean",
+       "description": "False once the window has passed or the line is fully returned."
+      },
+      "notReturnableReason": {
+       "type": "string",
+       "nullable": true
+      }
+     }
+    }
+   },
+   "subtotal": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "x-ticvai-column": "net_amount"
+   },
+   "discountAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "taxAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "grossAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "reprintCount": {
+    "type": "integer"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
  },
  "SalesChannel": {
   "type": "string",
@@ -1684,6 +2282,44 @@
    "collection",
    "delivery"
   ]
+ },
+ "ServiceSummary": {
+  "x-ticvai-persistence": "none — computed from fnb.table_visit, the orders and payments on it",
+  "type": "object",
+  "description": "One server's service day (`getServiceSummary`, CHG-CSA-020).",
+  "required": [
+   "date",
+   "covers",
+   "tables"
+  ],
+  "properties": {
+   "date": {
+    "type": "string",
+    "format": "date"
+   },
+   "covers": {
+    "type": "integer"
+   },
+   "tables": {
+    "type": "integer",
+    "description": "Table visits served."
+   },
+   "sales": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "Excluding VAT, as `grossSales` (CHG-FIN-007)."
+   },
+   "tips": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "openTables": {
+    "type": "integer",
+    "description": "Visits still open, with their bills not yet settled."
+   }
+  }
  },
  "VenueSettings": {
   "type": "object",
@@ -1827,6 +2463,51 @@
       "nullable": true,
       "default": 0,
       "description": "BL-106. **How long a same-visit Face Tag survives past the close of the operating day**, and zero is the default because that is what 3.2.44 describes. A non-zero value is an operational allowance for a late reconciliation, not a retention period — **`facePass` ignores this entirely** and is bounded by its entitlement.\n"
+     },
+     "consentFormId": {
+      "type": "string",
+      "format": "uuid",
+      "nullable": true,
+      "description": "**The venue's own consent form, which every biometric capture is taken on** (decided 2 October 2026, Chinmay, batch 4, BO-188: \"Consent first, on the venue's consent form\"; DEC-128, DEC-549; CHG-CSP-018). A form from the venue's consent-form builder in Venue Management (the one builder Face Pass, Face Tag, marketing and waivers share; marketing-crm `setDigitalWaiverForm`). Turning `isEnabled` on without one is refused `422 consent-form-required`, as a missing DPIA is; each Face Pass and Face Tag capture records the form and its version it was consented on (access `enrolFacePass`, `enrolFaceTag`).\n"
+     },
+     "templatesHeldByTicvai": {
+      "type": "boolean",
+      "readOnly": true,
+      "description": "**True where TICVAI's platform stores this venue's biometric templates** (rather than the venue's own on-premises reader estate). Derived from the venue's access deployment. While true, Venue Management shows the venue a standing warning that every guest must accept the venue's consent form before capture, because the data sits with TICVAI as the venue's processor (decided 2 October 2026, Chinmay, batch 4, BO-188: \"If we store the data, highlight or notify the venue that the client must accept a consent form\"; DEC-128; CHG-CSP-018).\n"
+     },
+     "allowMinors": {
+      "type": "boolean",
+      "default": true,
+      "description": "**Whether this venue enrols minors at all** (decided 2 October 2026, Chinmay, critical set 1, BO-187 and CMS-029: \"Guardian consent on the venue's form; minor age per country; the venue can switch minors off\"; supersedes the GST-069 default; DEC-237; CHG-CSP-019). On: a minor (below `RegionSettings.minorAgeThreshold`) is enrolled only with a guardian's consent on the venue's consent form. Off: a minor's enrolment is refused (`422 minors-not-enrolled`) and the guest uses another verification method.\n"
+     },
+     "accreditationFaceMatching": {
+      "type": "object",
+      "nullable": true,
+      "description": "**Face matching to find duplicate accreditation applicants, off unless the venue enables it** (decided 2 October 2026, Chinmay, critical set 3, BO-631: \"Only where the venue enables it, with applicant consent and the venue's legal sign-off; off by default\"; DEC-461; CHG-CSP-022). Enabling it is refused without `legalSignOffReference` (`422 legal-sign-off-required`); each applicant matched must have consented on the application (accreditation's own record). Null is off.\n",
+      "properties": {
+       "isEnabled": {
+        "type": "boolean",
+        "default": false
+       },
+       "legalSignOffReference": {
+        "type": "string",
+        "nullable": true,
+        "maxLength": 200,
+        "description": "The venue's own reference for its legal sign-off; the platform records that one was named, by whom and when."
+       },
+       "signedOffByPrincipalId": {
+        "type": "string",
+        "format": "uuid",
+        "nullable": true,
+        "readOnly": true
+       },
+       "signedOffAt": {
+        "type": "string",
+        "format": "date-time",
+        "nullable": true,
+        "readOnly": true
+       }
+      }
      }
     }
    },
@@ -1941,6 +2622,15 @@
      "pattern": "^[A-Z]{3}$"
     }
    },
+   "chargeCurrencies": {
+    "type": "array",
+    "nullable": true,
+    "description": "**Which currencies a guest may select and pay in** (decided 2 October 2026, Chinmay; CHG-FIN-001; MoM 10 Aug 2026 4.7 option (b), DI-211). A subset of `displayCurrencies`: each code must also be one the venue's payment provider can charge (`orders.PaymentProvider.presentmentCurrencies`) and one the region holds a `tender` rate for; anything else is refused `400`. Null or empty: guests pay in the trading (base) currency only and the other display currencies stay approximate. The ledger is always in the base currency, with the rate recorded on every payment and refund.\n",
+    "items": {
+     "type": "string",
+     "pattern": "^[A-Z]{3}$"
+    }
+   },
    "cartLeaseSeconds": {
     "type": "integer",
     "nullable": true,
@@ -2005,6 +2695,15 @@
     ],
     "nullable": true,
     "description": "Over or short at shift close beyond which the shift waits in `pendingVariance` for `shift.acceptShiftVariance`. **Proposed tenant default AED 20.00, bounds 0 to 1,000 in the venue currency; client finance to correct (audit R094).**\n"
+   },
+   "cashDrawerLimit": {
+    "oneOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true,
+    "description": "**The most cash a till drawer should hold before some is lifted to the safe** (decided 2 October 2026, Chinmay, batch 6 set 3, BO-042: \"Add drawer limit setting (warn + offer cash lift)\"; DEC-179; CHG-CSP-016; DI-274: on a busy day the cashier unloads excess cash mid-shift and it is reconciled at close). The venue default; a till may set its own (`Workstation.cashDrawerLimit`). When the cash a till has taken since its last count takes the drawer over it, the till warns and offers a cash lift (`shift.createCashMovement` kind `lift`) and BO-042 flags the box (`shift.DepositBox.overDrawerLimit`). A warning, never a block: a sale is not refused because the drawer is full. Null sets no limit. **No proposed default: the client's finance team sets it.**\n"
    },
    "catalogue": {
     "type": "object",
@@ -2139,6 +2838,15 @@
       "default": 10,
       "description": "Minutes after a bump during which `recallKitchenTicket` still recalls; after it the act is a refire. Proposed, client to correct (audit R094)."
      },
+     "tableReservedLeadMinutes": {
+      "type": "integer",
+      "nullable": true,
+      "minimum": 0,
+      "maximum": 240,
+      "default": 30,
+      "deprecated": true,
+      "description": "**Deprecated (2 October 2026, CHG-CLN-009): `fnb.FnbReservationPolicy.reservedLeadMinutes` is canonical.** The table state model reads the reservation policy (`states/table.yaml`); this venue setting is kept for compatibility, never read, and not drawn. Its former meaning: **How long before a pre-allocated booking its table shows Reserved** (decided 2 October 2026, Chinmay, batch 6 set 6b, EMP-052: \"Reserved when a booking names the table, or N minutes (venue-set) before a pre-allocated booking\"; DEC-202; CHG-CSP-017; DI-689, DI-336). A booking that names its table holds it as Reserved for the booking's whole slot; a booking the host pre-allocated shows its table Reserved from this many minutes before it. Zero shows Reserved only once the booking is due. The fnb table state model applies it (`states/table.yaml`, owned by fnb). Proposed default 30 minutes, client to correct.\n"
+     },
      "compEscalationAmount": {
       "allOf": [
        {
@@ -2251,133 +2959,6 @@
       }
      }
     }
-   }
-  }
- },
- "Workstation": {
-  "x-ticvai-persistence": "platform.workstation",
-  "type": "object",
-  "required": [
-   "id",
-   "code",
-   "name",
-   "venueId",
-   "regionId",
-   "scopePath",
-   "saleBoard",
-   "currency",
-   "currencyScale",
-   "timeZone"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "code": {
-    "type": "string",
-    "maxLength": 64
-   },
-   "name": {
-    "type": "string",
-    "maxLength": 200
-   },
-   "venueId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "regionId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "departmentId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "scopePath": {
-    "type": "string"
-   },
-   "saleBoard": {
-    "type": "object",
-    "description": "Determines which front end loads. Bound to the workstation, not the role — the F&B terminal opens the F&B board. What the operator may then DO within it is governed by their permissions.\n",
-    "required": [
-     "id",
-     "kind"
-    ],
-    "properties": {
-     "id": {
-      "type": "string",
-      "format": "uuid"
-     },
-     "kind": {
-      "$ref": "#/components/schemas/SaleBoardKind"
-     },
-     "name": {
-      "type": "string"
-     }
-    }
-   },
-   "accessPointId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "Inherited from the workstation, never selected by the operator. Null where the workstation is not at an access point.\n"
-   },
-   "devices": {
-    "type": "array",
-    "items": {
-     "$ref": "#/components/schemas/DeviceBinding"
-    }
-   },
-   "currency": {
-    "type": "string",
-    "pattern": "^[A-Z]{3}$",
-    "x-ticvai-persisted": false,
-    "description": "**Resolved from the region, not stored** (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and cannot be anything else. **Kept on the wire , removed from the table** — a client should not walk a hierarchy to read a figure, and the  database should not hold nine million copies of AED. Four tables genuinely differ from their\n region and keep a stored currency: `orders.payment.tender_currency`, `inventory.supplier`, \n`ledger.account`, `control.partner_agreement`.\n"
-   },
-   "currencyScale": {
-    "type": "integer",
-    "minimum": 0,
-    "maximum": 4,
-    "x-ticvai-persisted": false,
-    "description": "**Resolved from the region, not stored** (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and cannot be anything else — storing it per ro w is a copy of a fact that cannot differ. **Kept on the wire, removed from the table**: a cl ient reading a figure should not walk a hierarchy to know what it means, and the database sh ould not hold nine million copies of AED. Four tables genuinely differ from their region and\n keep a stored currency — `orders.payment.tender_currency`, `inventory.supplier`, `ledger.ac\ncount`, `control.partner_agreement`. **A guest paying USD at an AED venue is a real row; a w orkstation with its own currency is a misconfiguration.**\n"
-   },
-   "timeZone": {
-    "type": "string"
-   },
-   "deploymentProfile": {
-    "$ref": "#/components/schemas/DeploymentProfile"
-   },
-   "edgeNodeId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "Present when `deploymentProfile` is `venueEdge`."
-   },
-   "healthScore": {
-    "type": "integer",
-    "nullable": true,
-    "minimum": 0,
-    "maximum": 100,
-    "readOnly": true,
-    "description": "Board 1 of the client's POS set. **A number a manager can sort by** — the package held `lastHeartbeatAt` and a heartbeat timestamp is not a score.\nThe client's board shows 1,248 workstations at 96% healthy, and **the value of that figure is that it ranks**: a fleet dashboard exists so somebody can open the worst one first.\n**Derived from its devices, its heartbeat age, its firmware currency and its error rate.** Read-only, because a workstation that could set its own score would.\n**The formula, proposed, client to correct (audit R096 (2)):** score = 40% device online share (the share of its devices reporting online) + 25% heartbeat freshness (100 at one minute old or less, 0 at 15 minutes or more, linear between) + 20% firmware and profile currency (100 on the latest, 50 one version behind, 0 older) + 15% error rate (100 at 0 errors an hour, 0 at 10 or more, linear between), rounded to a whole number. **Below 80 is a warning and below 60 a failure.**\n"
-   },
-   "configurationProfileId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "Which profile this workstation runs, and at which version. **The client's board shows a fleet split four ways — 72% latest, 18.8% one behind, 6.1% outdated** — and the package had a firmware version field and no profile.\n**A profile is what a venue changes; a version is what it deploys.** Conflating them means a venue cannot say *roll the ticketing counters back and leave the kiosks*.\n"
-   },
-   "catalogueState": {
-    "$ref": "#/components/schemas/CatalogueState"
-   },
-   "offlineCapable": {
-    "type": "boolean",
-    "description": "Derived from `deploymentProfile`. False only for `thin`. Under local-first, catalogue READS are always local on transactional surfaces; this flag governs whether WRITES can be queued.\n"
-   },
-   "isActive": {
-    "type": "boolean"
    }
   }
  }

@@ -24,6 +24,80 @@
    }
   }
  },
+ "CreditLot": {
+  "type": "object",
+  "x-ticvai-persistence": "wallet.credit_lot",
+  "description": "Board 3.7. **The tranche behind a balance.** Expiry belongs here, not on the wallet.",
+  "required": [
+   "id",
+   "walletId",
+   "creditTypeId"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "walletId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "creditTypeId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "issuedAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "remainingAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "issuedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "sourceKind": {
+    "type": "string",
+    "enum": [
+     "topUp",
+     "refund",
+     "promotion",
+     "giftCard",
+     "membershipBenefit",
+     "loyaltyConversion",
+     "transfer",
+     "adjustment"
+    ]
+   },
+   "sourceReference": {
+    "type": "string",
+    "nullable": true
+   },
+   "termsSnapshot": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "**The credit type's terms as they stood at issue.** Changing a credit type must not retro-expire credit already given, so the lot carries its own terms.\n**Open on purpose, and its shape lives in `CreditType`**: the snapshot is that credit type's properties copied at issue, so it follows `CreditType` as it stood then rather than as it stands now.\n"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "active",
+     "exhausted",
+     "expired",
+     "forfeited",
+     "reversed"
+    ]
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
  "GiftCard": {
   "x-ticvai-persistence": "wallet.gift_card",
   "type": "object",
@@ -205,6 +279,25 @@
     "description": "Resolved from the region alongside `currency`.",
     "minimum": 0,
     "maximum": 4
+   }
+  }
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
    }
   }
  },

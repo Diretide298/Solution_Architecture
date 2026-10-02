@@ -1,10 +1,10 @@
 id: LLD-MarketingService
-title: MarketingService — 264 operations, 130 tables
+title: MarketingService — 272 operations, 132 tables
 generatedBy: tools/derive-diagrams.py
 tier: engagement
 deployable: operations
 index: diagrams/hld/02-services.yaml
-why: '**264 operations and 130 tables — the biggest thing in the package, and probably two services
+why: '**272 operations and 132 tables — the biggest thing in the package, and probably two services
   eventually.** CRM and campaigns have different write patterns: a guest profile is read constantly
   and written rarely; a campaign send is a burst of millions of rows nobody reads again.
 
@@ -13,20 +13,20 @@ why: '**264 operations and 130 tables — the biggest thing in the package, and 
 scale: Bursty on send, read-heavy otherwise. **The one to watch for a split.**
 ifDown: Down stops campaigns and guest lookup. Neither stops trading.
 coverage:
-  operations: 264
+  operations: 272
   inAFlow: 102
-  percent: 39%
+  percent: 38%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
 - schema: marketing
-  tables: 130
+  tables: 132
   stores:
   - postgres
   largestTable: marketing.waiver_requirement
 operationsByContract:
 - contract: marketing-crm
-  count: 264
+  count: 272
   operations:
   - operation: accrueLoyaltyPoints
     verb: POST
@@ -52,6 +52,14 @@ operationsByContract:
     offline: false
     reads: 1
     writes: 1
+  - operation: activateChallenge
+    verb: POST
+    path: /challenges/{challengeId}/activate
+    scope: venue
+    permission: MARKETING_SEND
+    offline: false
+    reads: 1
+    writes: 0
   - operation: activateJourney
     verb: POST
     path: /journeys/{journeyId}/activate
@@ -329,6 +337,14 @@ operationsByContract:
     path: /case-investigation-resolution
     scope: venue
     permission: CASE_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: getChallenge
+    verb: GET
+    path: /challenges/{challengeId}
+    scope: venue
+    permission: MARKETING_VIEW
     offline: false
     reads: 1
     writes: 0
@@ -692,6 +708,14 @@ operationsByContract:
     offline: false
     reads: 1
     writes: 0
+  - operation: listChallenges
+    verb: GET
+    path: /challenges
+    scope: venue
+    permission: MARKETING_VIEW
+    offline: false
+    reads: 1
+    writes: 0
   - operation: listCommunicationService
     verb: GET
     path: /communication-service
@@ -777,6 +801,14 @@ operationsByContract:
     path: /cookie-banner-preference
     scope: venue
     permission: MARKETING_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listCookieScanFindings
+    verb: GET
+    path: /cookie-tracking-digital/scans/{scanRunId}/findings
+    scope: venue
+    permission: GUEST_VIEW
     offline: false
     reads: 1
     writes: 0
@@ -1020,6 +1052,14 @@ operationsByContract:
     offline: true
     reads: 3
     writes: 0
+  - operation: listMessageDispatches
+    verb: GET
+    path: /message-dispatches
+    scope: venue
+    permission: MARKETING_VIEW
+    offline: false
+    reads: 1
+    writes: 0
   - operation: listMessageTemplates
     verb: GET
     path: /message-templates
@@ -1252,6 +1292,14 @@ operationsByContract:
     offline: false
     reads: 4
     writes: 0
+  - operation: listTrackingTechnologyCatalogue
+    verb: GET
+    path: /cookie-tracking-digital/platform-catalogue
+    scope: venue
+    permission: GUEST_VIEW
+    offline: false
+    reads: 1
+    writes: 0
   - operation: listUnifiedInteractionCommunication
     verb: GET
     path: /unified-interaction-communication
@@ -1388,6 +1436,14 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 2
+  - operation: previewSegmentDraft
+    verb: POST
+    path: /segments/preview
+    scope: venue
+    permission: MARKETING_VIEW
+    offline: false
+    reads: 0
+    writes: 1
   - operation: raiseMyCase
     verb: POST
     path: /my/cases
@@ -1427,7 +1483,7 @@ operationsByContract:
     permission: GUEST_MANAGE
     offline: false
     reads: 4
-    writes: 3
+    writes: 4
   - operation: recordDeviceConsent
     verb: POST
     path: /consent/device
@@ -1985,6 +2041,14 @@ operationsByContract:
     path: /cookie-tracking-digital
     scope: venue
     permission: GUEST_MANAGE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: setTrackingTechnologyCatalogueEntry
+    verb: PUT
+    path: /cookie-tracking-digital/platform-catalogue/{entryKey}
+    scope: platform
+    permission: PLATFORM_PLAN_MANAGE
     offline: false
     reads: 1
     writes: 1
@@ -2607,15 +2671,22 @@ tables:
   writtenBy:
   - marketing-crm
   foreignWriters: null
+- table: marketing.cookie_scan_finding
+  columns: 19
+  store: postgres
+  parent: null
+  writtenBy:
+  - marketing-crm
+  foreignWriters: null
 - table: marketing.cookie_scan_policy
-  columns: 11
+  columns: 13
   store: postgres
   parent: null
   writtenBy:
   - marketing-crm
   foreignWriters: null
 - table: marketing.cookie_scan_run
-  columns: 11
+  columns: 12
   store: postgres
   parent: null
   writtenBy:
@@ -2655,7 +2726,7 @@ tables:
   writtenBy: []
   foreignWriters: null
 - table: marketing.form_definition
-  columns: 15
+  columns: 16
   store: postgres
   parent: null
   writtenBy:
@@ -3074,7 +3145,7 @@ tables:
   - marketing-crm
   foreignWriters: null
 - table: marketing.segment
-  columns: 9
+  columns: 14
   store: postgres
   parent: null
   writtenBy:
@@ -3138,6 +3209,13 @@ tables:
   foreignWriters: null
 - table: marketing.tracking_technology
   columns: 23
+  store: postgres
+  parent: null
+  writtenBy:
+  - marketing-crm
+  foreignWriters: null
+- table: marketing.tracking_technology_catalogue
+  columns: 14
   store: postgres
   parent: null
   writtenBy:
@@ -3344,6 +3422,7 @@ screens:
 - P02:GST-030 In-Venue Notifications
 - P02:GST-031 AI Concierge – Home
 - P02:GST-032 AI Concierge – Chat
+- P02:GST-033 AI Concierge – Contextual Help
 - P02:GST-034 Lost & Found
 - P02:GST-035 Feedback & Ratings
 - P02:GST-036 Loyalty & Rewards
@@ -3352,7 +3431,6 @@ screens:
 - P02:GST-042 Simple Registration & OTP
 - P02:GST-065 Newsletter & Preferences
 - P02:GST-066 Privacy & My Data
-- P02:GST-067 Refunds & Resale
 - P02:GST-068 Help & My Cases
 - P02:GST-071 Payment Methods
 - P02:GST-072 Share & Group Booking
@@ -3360,26 +3438,31 @@ screens:
 - P04:POS-002 Sell — Ticket Catalogue
 - P04:POS-005 Payment
 - P04:POS-027 Guest Lookup
+- P04:POS-030 Sales Journal
 - P05:KSK-013 Call staff
 - P05:KSK-015 Assistant
 - P06:EMP-028 Lost & found
 - P06:EMP-029 Guest assistance
 - P06:EMP-055 Create / Edit Reservation
 - P06:EMP-057 Guest Profile & Dining History
-- P06:EMP-088 Overdue Rental Management
-- P08:BO-005 Queue Monitor
+- P08:ADM-038 Communication Service Command Center
+- P08:ADM-039 Channel & Provider Configuration
+- P08:ADM-040 Sender Identity, Domain & Brand Configuration
+- P08:ADM-041 System Transactional Template Registry
+- P08:ADM-042 Business Event & Notification Trigger Mapping
+- P08:ADM-043 Routing, Priority, Throttling & Fallback Rules
+- P08:ADM-044 Consent, Preference & Communication Policy Enforcement
+- P08:ADM-045 Delivery Queue, Failure & Retry Management
+- P08:ADM-046 Provider Health, Usage & Cost Monitoring
+- P08:ADM-047 AI Delivery Optimization & Communication Platform Diagnostics
+- P08:ADM-680 Customer Recommendation Profile
 - P08:BO-008 Product Detail & Variants
 - P08:BO-073 Lost & Found Register
 - P08:BO-107 Guests & Marketing
 - P08:BO-118 Campaign & Audience Management
 - P08:BO-120 Omnichannel Commerce & Journey Configuration
 - P08:BO-121 Personalized Offers & Guest Engagement
-- P08:BO-223 Journey Simulation, Audit & Publication
-- P08:BO-561 Overdue Rental Management
 - P08:BO-618 Accreditation Form Builder
-- P08:BO-677 Communication Template Library
-- P08:BO-678 Channel, Language & Branding Configuration
-- P08:BO-679 Manual & Bulk Communication Center
 - P08:BO-734 CRM Command Center
 - P08:BO-735 Guest Directory
 - P08:BO-736 Guest Master Configuration
@@ -3435,11 +3518,9 @@ screens:
 - P08:BO-790 Scheduling, Priority & Approval
 - P08:BO-791 Delivery, Retry & Failover
 - P08:BO-792 Deliverability & Analytics
-- P08:BO-793 AI Content, Translation & Audit
 - P08:BO-794 Omnichannel Command Center
 - P08:BO-795 Unified Inbox
 - P08:BO-796 Guest Conversation 360
-- P08:BO-797 AI Chatbot Configuration
 - P08:BO-798 Intent & Knowledge Management
 - P08:BO-799 Agent Workspace
 - P08:BO-800 Routing & Queue Management
@@ -3454,19 +3535,15 @@ screens:
 - P08:BO-809 SLA Policy Configuration
 - P08:BO-810 Escalation Rules
 - P08:BO-811 Case Workspace
-- P08:BO-812 Service Recovery
 - P08:BO-813 Case Analytics & Audit
 - P08:BO-814 Voice of Customer Center
 - P08:BO-815 Survey Builder
 - P08:BO-816 Survey Triggers & Distribution
-- P08:BO-817 NPS, CSAT & CES Configuration
 - P08:BO-818 Survey Responses & Insights
 - P08:BO-819 Review Collection & Rating Rules
 - P08:BO-820 Moderation & Publishing
 - P08:BO-821 AI Sentiment & Topic Analysis
-- P08:BO-822 Service Recovery Automation
 - P08:BO-823 VOC Analytics & Audit
-- P08:BO-824 Gamification Command Center
 - P08:BO-825 Challenge Builder
 - P08:BO-826 Achievement & Badge Engine
 - P08:BO-827 Points & Activity Rules
@@ -3476,8 +3553,6 @@ screens:
 - P08:BO-831 Progress, Leaderboards & Hub
 - P08:BO-832 AI Engagement Optimization
 - P08:BO-833 Gamification Analytics & Audit
-- P08:BO-838 Content, Media & Forms
-- P08:BO-841 Personalization & Localization
 - P08:BO-842 SEO Management
 - P08:BO-844 Waiver Command Center
 - P08:BO-845 Waiver Template Builder
@@ -3489,19 +3564,6 @@ screens:
 - P08:BO-851 Verification & Access Control
 - P08:BO-852 Documents, Search & Retention
 - P08:BO-853 Legal Evidence & Audit
-- P08:BO-938 Employee Requests & Resource Support
-- P09:ADM-038 Communication Service Command Center
-- P09:ADM-039 Channel & Provider Configuration
-- P09:ADM-040 Sender Identity, Domain & Brand Configuration
-- P09:ADM-041 System Transactional Template Registry
-- P09:ADM-042 Business Event & Notification Trigger Mapping
-- P09:ADM-043 Routing, Priority, Throttling & Fallback Rules
-- P09:ADM-044 Consent, Preference & Communication Policy Enforcement
-- P09:ADM-045 Delivery Queue, Failure & Retry Management
-- P09:ADM-046 Provider Health, Usage & Cost Monitoring
-- P09:ADM-047 AI Delivery Optimization & Communication Platform Diagnostics
-- P09:ADM-328 Workflow Versioning & Change History
-- P09:ADM-680 Customer Recommendation Profile
 - P10:PTR-004 Notifications
 - P10:PTR-021 Support & Contact
 - P12:SUP-002 Agent Dashboard
@@ -3578,8 +3640,6 @@ flows:
 - F01 Guest buys a ticket online
 - F02 Guest buys seated tickets
 - F05 Agent resolves a guest complaint
-- F09 Event is cancelled and refunded
-- 'F118 Access Control board 8: Guest Journey Command Center'
 - 'F133 Communication & Notification Platform Services board 1: Communication Service Command Center'
 - 'F134 Customer Service board 1: Customer Service Command Center'
 - 'F135 Customer Service board 2: Contact Center Operations Command Center'

@@ -61,6 +61,36 @@ convincingly. It is never a caption.
   and its error; and, element by element, what is shown and in what format, what each action
   produces and where the user goes next. Draw exactly that.
 
+## The processes these screens belong to
+
+Written by the owner of each process (`handoff/design-notes/`). Read before any screen: it says how the process runs end to end and which words the screens must use.
+
+### Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue)
+
+Venue operations is everything that happens after a sale and inside the gates. A guest's ticket is one virtual ticket with interchangeable media (QR, dynamic QR, RFID wristband, NFC, Face Pass or Face Tag); at an access point a scanner (P07, or the scan function inside the Staff App P06) validates the media against the admission profile and the guest admission policy, offline if it must, and every deny carries a reason and a next action. The back office (Venue Management P08) configures that estate: the venue topology (venue, park, zone, attraction, access point, gate and lane, device placement), admission profiles and rules (entry, exit, re-entry, anti-passback, validity, crossover, companions), credential security (dynamic QR, device binding, beacons), biometrics, gate modes, and the live operations, fraud and monitoring views. Accreditation (P08 setup and review, P11 web portal for applicants, web first) takes an applicant from a configurable form through document checks, OCR, duplicate blocking and multi-level approval to a credential with zone rights. Resources and capacity manage bookable resources (rooms, vehicles, equipment, cabanas, instructors) that are booked as a consequence of selling a product, never sold directly. Workforce covers shift templates, rosters, attendance, swaps and breaks, mirrored on the Staff App. Maintenance and safety cover the asset register, preventive calendars, work orders with scored priority, inspections and incidents, with technicians working from the Staff App. Games and rides configure readers, credit types and consumption priority, play entitlements, game pricing, retry pricing, redemption and the card lifecycle. The virtual queue (Q1) gives a guest a live wait time and a return window for a ride; it is not the on-sale waiting room (Q2). Every calendar has day, week and month views. Configuration resolves tenant, region, venue (outlet only for F&B and retail), and a user's permissions, never the device, decide what they may do. The guest apps (P01, P02) show the guest's side of this: My Tickets, the scan code, Face Pass, wait times, the virtual queue, map booking of cabanas and the visit planner.
+*(source: F06 step 1 / F112 step 1 / F111 step 1 / ADR-0002 / ADR-0012 / ADR-0018 / ADR-0041 / ADR-0066 / ADR-0067 / ADR-0068 / DI-652 / DI-627 / DI-640 / DI-654 / DI-666 / DI-482 / DI-483 / DI-907 / DI-919 / DI-923 / DI-865 / DI-678 / TRACKER Actions row 160 / MoM 2026-09-02 AccessControl / MoM 2026-09-07 …)*
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Ticket | The one virtual record a guest owns (ticket number, product, validity, entries). Its number never changes, whatever media carries it or whoever it is transferred or resold to. | Pass (unless the product is a pass), Booking, Order line | DI-652 / DI-620 / contracts/spine/access.yaml#/components/schemas/TicketStatus |
+| Media | What the ticket is presented by at a gate (QR code, dynamic QR, wristband/RFID card, NFC, Face Pass, Face Tag). One ticket can carry several media as fallbacks; a media code can also cover several tickets scanned as one group. Show one … | Credential (for guest media; keep Credential for accreditation badges and staff), Ticket code | DI-180 / DI-608 / DI-652 |
+| Access point | A place where a scan is judged, with a fixed direction (entry, exit, re-entry, crossover). Hierarchy shown to users is Venue > Park > Zone > Attraction > Access point > Gate/lane > Device. | Scanner (that is the device), Door | screens/P08-venue-back-office.yaml#BO-144 / … |
+| Admission profile | The named set of rules an access point enforces (opening window, entries, exit scan, re-entry, validity, crossover). Products point at a profile; tiers such as Bronze/Silver/Gold are profiles with gate allow and deny lists. | Admission rules (as a screen title), Access rule set | DI-185 / contracts/spine/access.yaml#/components/schemas/AdmissionRules |
+| Admitted / Denied / Overridden | The three scan outcomes. A denial is always shown with its reason in plain words and a next action; an override is a supervisor admitting despite a denial, and is always attributed and reasoned. | Valid/Invalid, Success/Fail, Error | contracts/spine/access.yaml#/components/schemas/ScanOutcome / … |
+| Used | A ticket entry is used the moment a scan succeeds, whether or not the guest physically passed. Mistakes are resolved from the scan history, not by un-scanning. | Redeemed (for admission), Checked in (that is group check-in, a different step) | DI-627 / TRACKER Actions row 221 / TRACKER Actions row 189 |
+| Gate mode | What a lane is doing now, set live by the podium or supervisor - Normal, Free flow (counts, does not validate), Drop arm (everybody through, evacuation), Closed (nobody through), Podium (staff validating by eye), Maintenance. Direction is … | Turnstile mode (as a label for direction), Open/Locked | contracts/spine/access.yaml#/components/schemas/AccessPointOperatingMode / R221 |
+| Offline package | What a scanner holds to validate with no network - entitlements, blacklist, admission profiles and the active guest admission policy version - with its age always visible. | Cache, Local DB | F06 step 3 / ADR-0068 |
+| Sync and reconciliation | Sending the offline scan journal to the server, and the duty manager's review of scans the server rejected after the device had already admitted the guest. | Upload, Retry | F06 step 6 / DI-065 |
+| Face Pass / Face Tag | Face Pass is the long-lived face credential for members and season-pass holders (renewable); Face Tag is short-lived, for one day or event. Retention is set per tier by the venue. | Face ID, Biometric login | DI-640 / ADR-0063 |
+| Accreditation / Credential (accreditation) | Accreditation is the application and approval of a person (media, contractor, corporate, staff of a partner) for an event or season; the credential is what is issued after approval (photo badge, QR or RFID) with zone access rights. | Registration (for the whole process), Ticket | DI-654 / DI-662 |
+| Resource | A bookable thing or person a product needs (room, vehicle, cabana, equipment set, instructor). Guests buy products; resources are assigned to the booking, pre-assigned or dynamically. | Asset (that is maintenance), Inventory (that is stock) | DI-475 / DI-482 / TRACKER Actions row 160 |
+| Asset | A physical item maintained by the venue (ride, turnstile, printer, pump) with a register record, documents, warranty and maintenance history. | Resource, Device (unless it is an IT device in the device register) | DI-910 / ADR-0067 |
+| Work order | A unit of maintenance work, lifecycle Created > Assigned > In progress > Review > Closed, with a resolution timer. | Ticket (reserved for guest tickets), Job card | DI-231 |
+| Game / attraction (games module) | In the games and rides module an attraction is an individual game or ride (roller coaster, racing game, bumper cars), not a venue. | Venue, Park | DI-863 |
+| Virtual queue / Return window | A guest's place in a ride's queue held without standing in line, with a return window (for example 4:50 to 5:00 PM) that recalculates live. Distinct from the walk-in line and the VIP/express lane, and from the on-sale waiting room. | Waiting room, Fast pass (that is the express product), Booking | DI-675 / DI-678 / DI-679 / ADR-0066 |
+| Wait time source | Where a ride's wait time comes from - Sensor, Throughput, Manual, or Unavailable - always shown beside the number. | Live (when the source is manual) | contracts/satellite/queue.yaml#/components/schemas/WaitTimeSource / DI-315 |
+
+
 ## The screens
 
 Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs count fields; requirements are matrix rows; meeting inputs are the ones naming the screen (the module and platform ones are below); white label says whether the tenant's brand reaches it (guest) or it sets the brand (configures).
@@ -70,11 +100,11 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-854` | Resource Management Command Center | B–D | 30 | 0 | 6 | 0 | 2 | 0 | — | notStarted (—) |
 | `BO-855` | Resource Type Configuration | B–D | 13 | 0 | 6 | 0 | 3 | 0 | — | notStarted (—) |
 | `BO-856` | Resource Category Management | B–D | 15 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-857` | Resource Creation & Profile | B–D | 17 | 2 | 6 | 46 | 1 | 0 | — | notStarted (—) |
+| `BO-857` | Resource Creation & Profile | B–D | 14 | 22 | 6 | 46 | 1 | 0 | — | notStarted (—) |
 | `BO-858` | Configurable Attribute Builder | B–D | 15 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-859` | Resource Hierarchy & Parent–Child Relationships | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-860` | Resource Dependency Rules | B–D | 0 | 8 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-861` | Resource Package & Bundle Configuration | A | 14 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-861` | Resource Package & Bundle Configuration | A | 59 | 25 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-862` | Multi-Venue Resource Assignment | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-863` | Resource Lifecycle, Governance & Audit | A | 9 | 0 | 6 | 49 | 0 | 0 | — | notStarted (—) |
 
@@ -103,6 +133,21 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/rentals/resource-management-command-center-bo-854` |
+
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** The landing page of resource master data for administrators and operations managers: how big the permitted resource estate is, what state it is in, where configuration is incomplete, and one-click entry to every board 1 screen. It is a dashboard (KPI tiles, resources by type, availability status, smart alerts, recent activity, quick actions), not a form. The one thing to get right: everything is scoped to what the signed-in person may manage, and configuration problems are actionable links, not just counts.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **The 13 KPI widgets, 12 filters and 5 quick actions are all drawn as selectFields or textFields** Why: KPIs are metric tiles (VO-R02), filters are chips, quick actions are buttons; the pack's lists became form fields. *(source: screens/P08-venue-back-office.yaml#BO-854; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **Pattern configEditor with template form** Why: The pack and the client visual draw a command centre dashboard (ADR-0041), not a configuration form. *(source: screens/P08-venue-back-office.yaml#BO-854 / ADR-0041; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **Reserved vs Assigned, Suspended, and Configuration issues cannot be counted from the reads bound** Why: Resource.status has available, booked, checkedOut, maintenance and retired only, while lifecycle states (suspended, pending approval) live in another machine; no read reports configuration issues or expiring certifications in aggregate. *(source: contracts/satellite/resources.yaml#/components/schemas/Resource / contracts/satellite/resources.yaml#setResourceLifecycleState; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **Import resources and Assign resource to venue, Create package, Review configuration warnings have no screen edge or operation** Why: The pack lists eight quick actions; navigation carries only five board screens and no import operation exists. *(source: screens/P08-venue-back-office.yaml#BO-854; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+
+#### Decided on this screen
+
+Answered questions: draw the decision, not the old default. Where a decision and the tables below differ, the decision wins.
+
+- **DI-475 asks for a "switchable revenue view" on the overview; does it belong on this board or on the calendar command centre?** → Drawn default accepted: Put the revenue switch on BO-864 (bookings x revenue per resource) and show only a link here. *(decided by Chinmay, 2026-10-02; DEC-489 / CHG-NOTE-008)* **Reviewable:** a default the lead may still overrule before the block is tasked.
 
 #### Inputs: what the user enters or picks
 
@@ -152,7 +197,23 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | To | date and time picker | — | — | `getResourceUtilisation` ?to |
 | Group by | radio group | — | Resource · Resource type · Category · Venue | `getResourceUtilisation` ?groupBy |
 
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Filters**: Venue comes from the top-bar switcher (VO-R09); Tenant, Business unit and Country appear only for a tenant-level administrator. In-page filter chips for Resource type, Category, Status, Owner, Department, Tags, Availability status and Effective date ("as at" date picker, default today). Filters apply to every tile at once and are kept as a saved view. *(source: screens/P08-venue-back-office.yaml#BO-854 / ADR-0041)*
+
 #### Outputs: what the screen shows and produces
+
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **KPI tiles**: Metric tiles with delta vs last month (VO-R02), in this order - Total active resources, Available, Assigned, Reserved, Under maintenance, Suspended, Retired, Expiring certifications (30 days), Configuration issues, Created this month, Modified this month. Each tile opens the filtered resource list. Never drawn as select or text fields. *(source: screens/P08-venue-back-office.yaml#BO-854 / DI-476)*
+- **Resources by type and by venue**: A donut by resource type (type colour from BO-855) with counts and percent, and a bar per venue for multi-venue users; availability status as a bar chart (Available, Reserved, Assigned, Booked, Maintenance). *(source: screens/P08-venue-back-office.yaml#BO-854 / contracts/satellite/resources.yaml#listResourceTypes)*
+- **AI summary panel**: Findings as suggestions with a link each (per VO-R11) - Unused resources, Possible duplicates, Missing mandatory attributes, Approaching retirement, Without venue assignment, Unresolved dependencies, e.g. "8 resources have no venue assigned - Assign". Hidden findings never shown as zero. *(source: screens/P08-venue-back-office.yaml#BO-855)*
+- **Smart alerts and recent activity**: Alerts such as "12 staff certifications expiring in 30 days"; recent activity rows "Projector P-17 edited by Fatima Al Hashimi, 2 h ago" from the audit trail. *(source: screens/P08-venue-back-office.yaml#BO-854 / contracts/satellite/resources.yaml#getResourceAuditTrail)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Quick actions**: Create resource (BO-857), Create resource type (BO-855), Create category (BO-856), Import resources, Duplicate resource (clone on BO-857), Assign resource to venue (BO-862), Create package (BO-861), Review configuration warnings (filtered list). Each button disabled with the missing permission named for users without configure rights (VO-R08). *(source: screens/P08-venue-back-office.yaml#BO-854)*
+- **Customise**: Add, remove and reorder tiles; the layout is the saved dashboard of ADR-0041, seeded with the pack's tiles. *(source: screens/P08-venue-back-office.yaml#BO-854 / ADR-0041)*
 
 **Data it reads**: `listResources` (onLoad, Resources at this venue); `listResourceTypes` (onLoad, Resources by type); `getResourceUtilisation` (onLoad, Utilisation across the estate)
 
@@ -179,6 +240,45 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Empty, no results (`?state=emptyNoResults`) | **Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist |
 | Offline (`?state=offline`) | online only |
+
+#### Edge cases to draw
+
+- **User scoped to one department**: Every count reflects only that department's resources and the header says so ("Showing Ski School resources"). *(source: screens/P08-venue-back-office.yaml#BO-855)*
+- **Utilisation read fails while the resource list loads**: Counts render; the utilisation tile shows "Could not load" with retry, the rest of the board stays usable. *(source: designer default)*
+
+#### Consistency with other screens
+
+- Match `BO-864`: The calendar-based booking overview with the revenue switch (DI-475) is the resource calendar command centre; this board links to it rather than embedding a second calendar.
+- Match `BO-943`: Same tile component and deltas as the resource analytics command centre; Total active resources must agree for the same scope and date.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+scope: Yas Leisure Group - Aqua Park
+tiles:
+  totalActive: 1,248 (+8.3%)
+  available: '862'
+  assigned: '324'
+  reserved: '41'
+  underMaintenance: '18'
+  suspended: '3'
+  retired: '27'
+  expiringCerts: '12'
+  configIssues: '8'
+byType:
+  Staff: 42%
+  Rooms: 8%
+  Equipment: 21%
+  Rental items: 19%
+  Vehicles: 4%
+  Cabanas: 6%
+alerts:
+- 12 staff certifications expiring in 30 days
+- 8 resources have no venue assigned
+- 5 resources out of maintenance today
+```
 
 #### Permissions
 
@@ -231,6 +331,9 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-100`, `BO-855`, `BO-856`, `BO-857`, `BO-858`, `BO-859`, `BO-860`, `BO-861`, `BO-862`, `BO-863`.
 - [ ] Every gated control is gated: `RESOURCE_VIEW`.
 - [ ] The 2 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 2 edge case(s) from the process notes are drawn.
+- [ ] The 4 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
+- [ ] The 1 decision(s) taken on this screen are drawn as decided, not as the old default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -250,6 +353,21 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Offline | online only |
 | Opens with | `resourceTypeId` (navigation) |
 | Route | `/rentals/resource-type-configuration-bo-855` |
+
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** Where an administrator defines the classes of resource the tenant uses (Staff, Instructor, Security personnel, Venue, Room, Hall, Area, Cabana, Equipment, Asset, Rental item, Vehicle, Locker) and what each class can do: reservable, rentable, capacity- or schedule-controlled, inventory-controlled, needs staff qualification, maintenance-controlled, check-in/out, deposit, customer selectable. The one thing to get right: the flags decide which sections a resource of this type shows everywhere else, so each flag reads as a consequence, not a checkbox.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **The 13 example types (Staff, Instructor, ... Locker) are drawn as 13 selectFields** Why: They are seed rows of the types table, not fields. *(source: screens/P08-venue-back-office.yaml#BO-855; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **A Resource has a fixed kind enum and no resourceTypeId** Why: The configurable types this screen creates cannot be attached to a resource, so "configuration, not code" (the contract's own words) is not true end to end. *(source: contracts/satellite/resources.yaml#/components/schemas/Resource / contracts/satellite/resources.yaml#listResourceTypes; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **API visible flag and the per-type applicable configuration sections are missing** Why: The pack lists API visible yes/no and asks administrators to decide which sections apply per type. *(source: screens/P08-venue-back-office.yaml#BO-856 / contracts/satellite/resources.yaml#/components/schemas/ResourceType; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **Write bodies carry id and scopePath** Why: Server-owned (VO-R03). *(source: contracts/satellite/resources.yaml#createResourceType; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+
+#### Decided on this screen
+
+Answered questions: draw the decision, not the old default. Where a decision and the tables below differ, the decision wins.
+
+- **Do resource type changes need approval under tenant policy (pack Governance)?** → Drawn default accepted: Save directly; show a greyed "Requires approval" badge slot in the editor header. *(decided by Chinmay, 2026-10-02; DEC-490 / CHG-NOTE-008)* **Reviewable:** a default the lead may still overrule before the block is tasked.
 
 #### Inputs: what the user enters or picks
 
@@ -271,7 +389,23 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Vehicle | select field | — | — | — | — | — | — |
 | Locker | select field | — | — | — | — | — | — |
 
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Code / name / description**: Code upper-case short key (e.g. INSTR), unique in the tenant, locked once resources use the type; name with Arabic variant (VO-R10). *(source: contracts/satellite/resources.yaml#createResourceType)*
+- **Icon and display colour**: Icon picker from the product icon set and a colour from the calendar palette (no free hex); the colour is the one used for this type on every calendar and chart. *(source: screens/P08-venue-back-office.yaml#BO-855 / contracts/satellite/resources.yaml#/components/schemas/ResourceType)*
+- **Nature**: Radio Physical / Human / Virtual. Choosing Human shows a note "Resources of this type are people - they link to a staff record and their rota is managed in Workforce". *(source: contracts/satellite/resources.yaml#createResourceType)*
+- **Capability flags**: Toggles grouped as Booking (Reservable, Rentable, Customer selectable), Control (Capacity-controlled, Schedule-controlled, Inventory-controlled), Operations (Staff qualification required, Maintenance-controlled, Check-in/check-out, Deposit applicable). Defaults Reservable and Schedule-controlled on, all others off. Under Customer selectable - "Allows a ticket type to offer a choice; the ticket type decides". *(source: contracts/satellite/resources.yaml#/components/schemas/ResourceType / contracts/satellite/resources.yaml#setResourceSelectionPolicy)*
+- **Applicable sections**: A preview of which profile sections a resource of this type will show, driven by the flags (Staff - skills, certifications, shifts, breaks, attendance; Cabana - capacity, location, opening hours, price link, availability; Towel - inventory, checkout, deposit, return, condition). *(source: screens/P08-venue-back-office.yaml#BO-856)*
+
 #### Outputs: what the screen shows and produces
+
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Resource types table**: Type (icon and name), Code, Nature chip, Reservable, Rentable, Capacity-controlled ticks, resources using it (count), Active; sorted by name. *(source: screens/P08-venue-back-office.yaml#BO-855 / contracts/satellite/resources.yaml#listResourceTypes)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **New type / Save type**: Create, or full replace on edit (VO-R04). On a venue, the editor is read-only with "Defined by Yas Leisure Group" because types are tenant configuration. *(source: contracts/satellite/resources.yaml#createResourceType / contracts/satellite/resources.yaml#updateResourceType)*
 
 **Data it reads**: `listResourceTypes` (onLoad, The classes defined so far)
 
@@ -290,6 +424,49 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Empty, no results (`?state=emptyNoResults`) | **Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 Resources exist that the new definition would invalidate (ResourceInUseProblem) |
+
+#### Edge cases to draw
+
+- **Turning off check-in/out while resources of the type are checked out**: Save refused; the message names the count and the resources ("6 strollers are checked out - return them first"). *(source: contracts/satellite/resources.yaml#updateResourceType / contracts/satellite/resources.yaml#/components/schemas/ResourceInUseProblem)*
+- **A flag change invalidates existing resources (e.g. turning on Staff qualification required)**: Confirm lists how many resources become incomplete; they appear under Configuration issues on BO-854. *(source: screens/P08-venue-back-office.yaml#BO-856 / contracts/satellite/resources.yaml#updateResourceType)*
+
+#### Consistency with other screens
+
+- Match `BO-095`: The kinds on the resource register and the types defined here must be one list.
+- Match `BO-897`: Customer selectable here is the ceiling; the per-ticket-type selection policy decides.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+types:
+- name: Instructor
+  code: INSTR
+  nature: Human
+  reservable: true
+  qualificationRequired: true
+  customerSelectable: true
+  resources: 64
+- name: Cabana
+  code: CABANA
+  nature: Physical
+  reservable: true
+  capacityControlled: true
+  resources: 34
+- name: Stroller
+  code: STROLLER
+  nature: Physical
+  rentable: true
+  checkInOut: true
+  deposit: true
+  resources: 40
+- name: Online class room
+  code: VROOM
+  nature: Virtual
+  reservable: true
+  resources: 2
+```
 
 #### Permissions
 
@@ -333,6 +510,9 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-854`.
 - [ ] Every gated control is gated: `RESOURCE_CONFIGURE`, `RESOURCE_VIEW`.
 - [ ] The 3 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 2 edge case(s) from the process notes are drawn.
+- [ ] The 4 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
+- [ ] The 1 decision(s) taken on this screen are drawn as decided, not as the old default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -352,6 +532,14 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Offline | online only |
 | Opens with | `categoryId` (navigation) |
 | Route | `/rentals/resource-category-management-bo-856` |
+
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** The category tree beneath resource types (Staff > Instructor, Operations, Security, Technical crew; Equipment > AV, Lighting, Sound, Furniture; Rental > Towels, Strollers, Lockers, Cabanas) used for search, scheduling filters, reporting and defaults. The one thing to get right: it is a tree with inheritance - a subcategory shows which defaults it takes from its parent and which it overrides.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **The 15 example categories are drawn as selectFields** Why: They are tree nodes (seed data), not fields. *(source: screens/P08-venue-back-office.yaml#BO-856; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **Default availability policies has no field** Why: The pack lists it and the contract says availability policies cascade, but ResourceCategory has no availability field. *(source: screens/P08-venue-back-office.yaml#BO-857 / contracts/satellite/resources.yaml#/components/schemas/ResourceCategory; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **A Resource has no categoryId** Why: Resources cannot be placed in a category, so search, reporting and the calendar's category filter have nothing to filter on. *(source: contracts/satellite/resources.yaml#/components/schemas/Resource / contracts/satellite/resources.yaml#getResourceCalendar; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
 
 #### Inputs: what the user enters or picks
 
@@ -375,7 +563,24 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Lockers | select field | — | — | — | — | — | — |
 | Cabanas | select field | — | — | — | — | — | — |
 
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Parent category**: Picker over the tree; a category cannot be its own ancestor (the picker hides itself and its descendants); empty = top level. *(source: screens/P08-venue-back-office.yaml#BO-857 / contracts/satellite/resources.yaml#createResourceCategory)*
+- **Code, name, description, display order**: Code unique per tenant; name with Arabic variant; display order set by dragging in the tree, not typed. *(source: contracts/satellite/resources.yaml#/components/schemas/ResourceCategory)*
+- **Applicable resource types**: Multi-select chips from BO-855; a child may only narrow its parent's types. *(source: contracts/satellite/resources.yaml#/components/schemas/ResourceCategory)*
+- **Tags, reporting group, cost centre**: Tags as chips; reporting group from a list (Human Resources, Operations, Rentals...); cost centre code as text with the finance format. *(source: screens/P08-venue-back-office.yaml#BO-857)*
+- **Default attributes, default availability policy, default approval workflow**: Default attributes pick attribute definitions (BO-858) with default values; approval workflow from the tenant's workflows; each shows "From parent - Equipment" when inherited, with Override. *(source: screens/P08-venue-back-office.yaml#BO-857 / contracts/satellite/resources.yaml#/components/schemas/ResourceCategory)*
+
 #### Outputs: what the screen shows and produces
+
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Category tree**: Expand/collapse tree with resource count per node and an inactive style for inactive categories; search above it. *(source: screens/P08-venue-back-office.yaml#BO-856 / contracts/satellite/resources.yaml#listResourceCategories)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **New category / Save category**: Create, or full replace (VO-R04); category configuration is tenant scope, read-only for venue users. *(source: contracts/satellite/resources.yaml#updateResourceCategory)*
+- **Deactivate**: Sets inactive; there is no delete. A category in use asks for confirmation naming the count. *(source: contracts/satellite/resources.yaml#updateResourceCategory)*
 
 **Data it reads**: `listResourceCategories` (onLoad, The classification tree)
 
@@ -394,6 +599,35 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Empty, no results (`?state=emptyNoResults`) | **Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 The category is in use, and the refusal carries how many resources sit beneath it so the warning can say so. (ResourceInUseProblem) |
+
+#### Edge cases to draw
+
+- **Editing a category used by active resources**: The save comes back refused with the count; the confirm says "Used by 42 active resources - their defaults will change" and resends on confirm. *(source: contracts/satellite/resources.yaml#updateResourceCategory / contracts/satellite/resources.yaml#/components/schemas/ResourceInUseProblem)*
+- **Moving a subtree under a new parent**: Preview which inherited defaults change for the moved branch before saving. *(source: contracts/satellite/resources.yaml#listResourceCategories)*
+
+#### Consistency with other screens
+
+- Match `BO-865`: The calendar's category filter uses this tree.
+- Match `BO-944`: Utilisation grouped by category uses these categories and reporting groups.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+tree:
+- Staff > Instructor (64), Operations (210), Security (48), Technical crew (22)
+- Equipment > AV (36), Lighting (18), Sound (12), Furniture (140)
+- Rental > Towels (pooled), Strollers (40), Lockers (300), Cabanas (34)
+category:
+  name: Instructor
+  code: INSTR
+  parent: Staff
+  types: Staff, Instructor
+  reportingGroup: Human Resources
+  costCentre: CC-2041
+  defaultAttributes: Skill level, Languages, Certifications
+```
 
 #### Permissions
 
@@ -435,6 +669,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-854`.
 - [ ] Every gated control is gated: `RESOURCE_CONFIGURE`, `RESOURCE_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 2 edge case(s) from the process notes are drawn.
+- [ ] The 3 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -455,7 +691,14 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | `resourceId` (navigation) |
 | Route | `/rentals/resource-creation-profile-bo-857` |
 
-**Known gaps.** **Resource Creation & Profile declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write …
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** The workspace for one resource: identity, organisation, operational settings, location, commercial and integration sections as tabs, plus setup, teardown and the cleaning policy with a day preview, and the lifecycle actions (save draft, submit, activate, suspend, clone, archive, retire). The one thing to get right: a resource cannot become active until its mandatory configuration is complete, and the screen shows what is missing instead of failing on Activate.
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- Most of the pack's profile (short name, image, barcode/QR, external reference, business unit, department, owner, responsible manager, cost centre, building, floor, zone, GPS, hourly and daily cost, replacement value … (CHG-SBO-005)
+- createResource marks id as a required input (CHG-SBO-005)
+
+**Fixed on main** (the package already carries these; draw what it says): The gap note says the screen declares no write (CHG-SBO-009); Cleaning window from/to are textFields; operational settings are selectFields (CHG-SBO-009); Resource.status (available, booked, checkedOut, maintenance, retired) and the lifecycle state are two different machines with overlapping … (CHG-SBO-009).
 
 #### Inputs: what the user enters or picks
 
@@ -463,27 +706,57 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
 |---|---|---|---|---|---|---|---|
-| Active status | select field | — | — | — | — | — | — |
-| Reservable status | select field | — | — | — | — | — | — |
-| Rentable status | select field | — | — | — | — | — | — |
-| Capacity | select field | — | — | — | — | — | — |
+| Capacity | number field | — | — | — | — | A number with its unit (people or units); the pack drew a drop-down. | — |
 | Unit of measure | select field | — | — | — | — | — | — |
 | Customer selectable | select field | — | — | — | — | — | — |
 | Priority | select field | — | — | — | — | — | — |
 | Availability mode | select field | — | — | — | — | — | — |
 | Scheduling mode | select field | — | — | — | — | — | — |
-| Default duration | select field | — | — | — | — | — | — |
-| Minimum booking duration | select field | — | — | — | — | — | — |
-| Maximum booking duration | select field | — | — | — | — | — | — |
+| Default duration | number field | — | — | — | — | A number with its unit (minutes); the pack drew a drop-down. | — |
+| Minimum booking duration | number field | — | — | — | — | A number with its unit (minutes); the pack drew a drop-down. | — |
+| Maximum booking duration | number field | — | — | — | — | A number with its unit (minutes); the pack drew a drop-down. | — |
 | Cleaning | segmented control | optional | — | After every booking · Times per day | — | **How the room is cleaned between uses** (decided 29 September, W10). *After every booking* blocks a fixed buffer after each booking (e.g. 15 minutes); *N times a day* lets the system place N … | `Resource.cleaningPolicy.mode` |
 | Minutes per cleaning | number field (minutes) | optional | — | min 5; max 240 | — | Minutes one cleaning takes. The prototype uses 15 (proposed default, client to correct). | `Resource.cleaningPolicy.bufferMinutes` |
 | Cleanings per day | stepper or slider | optional | — | min 1; max 24 | — | Shown for *N times a day* only. | `Resource.cleaningPolicy.cleaningsPerDay` |
-| Cleaning window from | time picker | optional | — | — | HH:mm, 24-hour | Venue-local time the cleaning window opens. Null means the resource's opening time. | `Resource.cleaningPolicy.windowStart` |
-| Cleaning window to | time picker | optional | — | — | HH:mm, 24-hour | Venue-local time the cleaning window closes. Null means the resource's closing time. | `Resource.cleaningPolicy.windowEnd` |
+| Cleaning window from | time picker | optional | — | — | HH:mm, 24-hour | A time of day, HH:MM in venue time (the time-picker mode). | `Resource.cleaningPolicy.windowStart` |
+| Cleaning window to | time picker | optional | — | — | HH:mm, 24-hour | A time of day, HH:MM in venue time (the time-picker mode). | `Resource.cleaningPolicy.windowEnd` |
+
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Identity**: Resource type first (it decides which attribute fields and sections appear), then code, name, short name, category, description, image, barcode/QR (generated or scanned), external reference. No id or scopePath fields (VO-R03). For a Human type, pick the staff member (principal); name comes from the staff record. *(source: screens/P08-venue-back-office.yaml#BO-857 / contracts/satellite/resources.yaml#createResource)*
+- **Attributes**: The attribute definitions applicable to the type and category (BO-858), with their own controls, mandatory markers and conditional visibility (vehicle shows registration and passenger capacity). *(source: screens/P08-venue-back-office.yaml#BO-859 / contracts/satellite/resources.yaml#listResourceAttributes)*
+- **Setup and teardown**: Minutes before and after a booking (0 default), with the one-line preview "Booked 14:00-16:00 means unavailable 13:30-16:30". *(source: contracts/satellite/resources.yaml#/components/schemas/Resource)*
+- **Cleaning**: None / After every booking / N times a day. After every booking - minutes per cleaning (5-240, default 15), added after teardown. N times a day - minutes per cleaning, cleanings per day (1-24) and an optional window from-to as time pickers (empty = the resource's opening and closing). Fields appear only for the chosen mode. *(source: contracts/satellite/resources.yaml#/components/schemas/ResourceCleaningPolicy / DI-1012)*
+- **Deposit and qualifications**: Deposit in AED only for types with deposit applicable; required qualification codes only for types needing staff qualification. *(source: contracts/satellite/resources.yaml#/components/schemas/Resource)*
 
 #### Outputs: what the screen shows and produces
 
 **Shown**
+
+**Lifecycle and status** (detail panel, from `getResource`): The lifecycle state is shown in the header (changed only with `setResourceLifecycleState`); the operational status (available, booked, checked out, maintenance, retired) is read-only, never an input.
+
+| Shows | Format | Notes |
+|---|---|---|
+| ID | the name it points at, never the id | — |
+| Code | text | — |
+| Name | text | — |
+| Kind | chip: Cabana, Lounger, Locker, Wheelchair, Stroller, Equipment… | BL-135. `locker` was an entitlement kind in `orders` and nothing issued, assigned or released one. |
+| Venue | the name it points at, never the id | — |
+| Parent resource | the name it points at, never the id | A pool cabana belongs to the pool area; a seat belongs to an auditorium. Booking a parent takes its children with it, which is the … |
+| Principal | the name it points at, never the id | For a resource of kind `instructor` or `staff`. `workforce` still owns their rota — this says whether they are qualified and whether they … |
+| Attributes | grouped details | Configurable per kind — capacity, size, shade, power, poolside. |
+| Setup minutes | 1,234 | Before the booking, not inside it. An auditorium booked 14:00–16:00 is unavailable from 13:30 with a 30-minute setup, and a calendar that … |
+| Teardown minutes | 1,234 | After the booking. Kept as it is (decided 29 September, W10): with a `cleaningPolicy` of `afterEveryBooking` the cleaning buffer is added … |
+| Cleaning policy | grouped details | How the resource is cleaned between uses (decided 29 September, W10). Null means no cleaning is scheduled beyond `teardownMinutes`. |
+| Mode | chip: After every booking, Times per day | — |
+| Buffer minutes | 1,234 | Minutes one cleaning takes. The prototype uses 15 (proposed default, client to correct). |
+| Cleanings per day | 1,234 | Required for `timesPerDay`; ignored for `afterEveryBooking`. |
+| Window start | text | Venue-local time the cleaning window opens. Null means the resource's opening time. |
+| Window end | text | Venue-local time the cleaning window closes. Null means the resource's closing time. |
+| Requires qualification | list or chips (count when long) | Qualification codes a person must hold to be assigned to this. |
+| Deposit amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Status | chip: Available, Booked, Checked out, Maintenance, Retired | — |
+| Is active | yes / no (icon or chip) | — |
 
 **Day preview** (timeline, from `getResourceAvailability`): **A day preview before saving** (W10): bookings, holds and the cleanings the policy places, as `cleaning` blocked windows, so an operator sees what the policy takes out of availability.
 
@@ -491,6 +764,17 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|---|
 | Free windows | list or chips (count when long) | — |
 | Blocked windows | list or chips (count when long) | With a reason, because they are not the same. Booked and under repair need different responses from an operator looking for something free … |
+
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Day preview**: A one-day timeline for a chosen date with bookings, holds, setup/teardown and the cleanings the policy places (dotted bands), recalculated as the policy fields change, before saving. *(source: contracts/satellite/resources.yaml#getResourceAvailability / DI-1012)*
+- **Readiness checklist**: Right-hand panel "Before this can be activated" listing missing mandatory attributes, no venue assignment, no schedule, no category; each line links to the section or screen. *(source: screens/P08-venue-back-office.yaml#BO-863)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Save draft / Submit for approval**: Create (or full replace on edit, VO-R04) then move the lifecycle to draft or pending approval; approvers are notified. *(source: contracts/satellite/resources.yaml#createResource / contracts/satellite/resources.yaml#setResourceLifecycleState)*
+- **Activate / Suspend / Archive / Retire**: State change with reason (required for suspend and retire), effective from, replacement resource on retire; a refused transition says whether it is not allowed from this state or needs approval, and lists the allowed states. *(source: contracts/satellite/resources.yaml#setResourceLifecycleState / contracts/satellite/resources.yaml#/components/schemas/ResourceTransitionProblem)*
+- **Clone**: Asks how many and the code pattern (e.g. STR-{nn} from STR-013); copies configuration only - code, serial, barcode cleared, no bookings, history or deposits. "40 strollers created". *(source: contracts/satellite/resources.yaml#cloneResource)*
 
 **Data it reads**: `getResourceQualifications` (onLoad, What the resource is certified to do, and until when)
 
@@ -509,6 +793,36 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Empty, no results (`?state=emptyNoResults`) | **Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 The transition is not allowed from the current state, or an approval the configuration requires has not been given. (ResourceTransitionProblem); 422 A `cleaningPolicy` with `timesPerDay` and no `cleaningsPerDay`, or whose window ends before it starts (W10, 29 September). |
+
+#### Edge cases to draw
+
+- **N times a day without a count, or a window ending before it starts**: Refused against the field ("Enter how many cleanings a day"; "Window must end after it starts"). *(source: contracts/satellite/resources.yaml#/components/schemas/ResourceCleaningPolicy)*
+- **Possible duplicate (same name and type at the venue)**: An AI suggestion banner "Looks like Projector P-17 already exists" with Open and Ignore (VO-R11); never blocks save. *(source: screens/P08-venue-back-office.yaml#BO-858)*
+
+#### Consistency with other screens
+
+- Match `BO-095`: The register's New resource opens this screen; same fields, one editor.
+- Match `BO-863`: Lifecycle actions here and the state machine there must show the same nine states and words.
+- Match `BO-866`: The cleaning policy appears in the availability preview there.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+resource:
+  type: Room
+  code: MR-A
+  name: Meeting Room A
+  category: Venue > Rooms
+  parent: Aqua Park Conference Centre
+  capacity: 20
+  setup: 15 min
+  teardown: 15 min
+  cleaning: After every booking, 15 min
+preview: Sat 10 Oct 2026 - Setup 08:45-09:00, Booking 09:00-12:00 Yas Corporate, Teardown 12:00-12:15, Cleaning
+  12:15-12:30, Free 12:30-20:00
+```
 
 #### Permissions
 
@@ -563,13 +877,14 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (17), with its required mark, default, format and its error state (409, 422).
-- [ ] Every output is drawn (2 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (14), with its required mark, default, format and its error state (409, 422).
+- [ ] Every output is drawn (22 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-857?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, emptyNoResults, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-854`.
 - [ ] Every gated control is gated: `RESOURCE_MANAGE`, `RESOURCE_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 2 edge case(s) from the process notes are drawn.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -591,6 +906,14 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Route | `/rentals/configurable-attribute-builder-bo-858` |
 
 **Known gaps.** **Configurable Attribute Builder declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write …
+
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** Lets the tenant extend resource records with its own typed fields (skill level, languages, seating capacity, serial number, warranty expiry, rental condition) without a release: label, data type, where it applies, validation and whether it can be searched. The one thing to get right: Searchable decides whether skill-based matching can use the attribute, so say so next to the toggle.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **The 15 example attributes are drawn as selectFields and the gap note says nothing writes** Why: They are rows of the attribute list; createResourceAttribute is bound, so the note is stale. *(source: screens/P08-venue-back-office.yaml#BO-858 / contracts/satellite/resources.yaml#createResourceAttribute; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **No update or retire operation for an attribute definition** Why: A definition can be created but never corrected or withdrawn. *(source: contracts/satellite/resources.yaml#listResourceAttributes; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **Reportable, API exposed, Customer visible, Effective date, Display sequence and conditional rules have no field** Why: The pack requires all six; the definition has mandatory, default, allowed values, min/max, validation and searchable only. *(source: screens/P08-venue-back-office.yaml#BO-859 / contracts/satellite/resources.yaml#/components/schemas/ResourceAttributeDefinition; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
 
 #### Inputs: what the user enters or picks
 
@@ -614,7 +937,23 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Certification level | select field | — | — | — | — | — | — |
 | Rental condition | select field | — | — | — | — | — | — |
 
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Label and code**: Label with Arabic variant; code generated from the label (SKILL_LEVEL), editable until any resource holds a value. *(source: contracts/satellite/resources.yaml#createResourceAttribute)*
+- **Data type**: One choice from Text, Number, Decimal, Currency, Date, Date/time, Boolean, Single select, Multi-select, Lookup, Attachment, URL, Measurement, Formula; the rest of the form adapts (allowed values for selects, min/max for numbers, unit for measurement, expression editor for formula, AED for currency). *(source: screens/P08-venue-back-office.yaml#BO-859 / contracts/satellite/resources.yaml#/components/schemas/ResourceAttributeDefinition)*
+- **Applies to**: Resource types and categories as chips; empty means every type. A conditional rule "Show when type is Vehicle" is the pack's conditional attribute. *(source: screens/P08-venue-back-office.yaml#BO-859)*
+- **Mandatory, default, allowed values, min/max, validation expression**: Default rendered with the type's own control; allowed values as chips (Beginner, Intermediate, Advanced, Expert); validation expression under Advanced. *(source: contracts/satellite/resources.yaml#createResourceAttribute)*
+- **Searchable / Reportable / API exposed / Customer visible**: Toggles; under Searchable "Needed for skill matching and calendar filters". Customer visible warns that the value may appear on guest resource cards (BO-897). *(source: screens/P08-venue-back-office.yaml#BO-859 / contracts/satellite/resources.yaml#createResourceAttribute)*
+
 #### Outputs: what the screen shows and produces
+
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Attribute list**: Label, data type icon, applies to, mandatory, searchable; grouped by type; display sequence by drag. *(source: screens/P08-venue-back-office.yaml#BO-858 / contracts/satellite/resources.yaml#listResourceAttributes)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **New attribute / Save**: Creates the definition at tenant scope; the resource profile (BO-857) shows it at once for the matching types. *(source: contracts/satellite/resources.yaml#createResourceAttribute)*
 
 **Data it reads**: `listResourceAttributes` (onLoad, Attributes defined so far)
 
@@ -632,6 +971,49 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Empty, no results (`?state=emptyNoResults`) | **Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist |
 | Offline (`?state=offline`) | online only |
+
+#### Edge cases to draw
+
+- **Making an attribute mandatory when existing resources have no value**: Confirm "34 instructors have no Skill level - they will be flagged as incomplete"; they appear on BO-854's configuration issues. *(source: screens/P08-venue-back-office.yaml#BO-863)*
+- **Changing the data type after values exist**: Data type locked with "Values exist on 64 resources". *(source: designer default)*
+
+#### Consistency with other screens
+
+- Match `BO-898`: Searchable attributes are the ones offered as matching criteria there.
+- Match `BO-877`: Rule attributes (skill level, language) are these definitions.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+attributes:
+- label: Skill level
+  code: SKILL_LEVEL
+  type: Single select
+  values: Level 1, Level 2, Level 3, Level 4
+  appliesTo: Instructor
+  mandatory: true
+  searchable: true
+- label: Languages
+  code: LANGUAGES
+  type: Multi-select
+  values: Arabic, English, French, Russian
+  appliesTo: Instructor, Staff
+  searchable: true
+- label: Registration plate
+  code: REG_PLATE
+  type: Text
+  appliesTo: Vehicle
+  mandatory: true
+  validation: Dubai plate format
+- label: Seating capacity
+  code: SEATS
+  type: Number
+  min: 1
+  max: 2000
+  appliesTo: Room, Hall
+```
 
 #### Permissions
 
@@ -672,6 +1054,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-854`.
 - [ ] Every gated control is gated: `RESOURCE_CONFIGURE`, `RESOURCE_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 2 edge case(s) from the process notes are drawn.
+- [ ] The 3 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -694,9 +1078,27 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** The parent-child tree of resources (Venue > Building > Floor > Hall > Room; AV System > Projector, Screen, Speakers, Microphones) with named relationships. It is load-bearing - booking a parent takes its children, and closing a hall makes its dependent children unavailable. The one thing to get right: show the operational consequence of a move before it is saved, and show a refused cycle as the loop it would create.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **The screen has an empty detail panel and a generic "Save resource hierarchy" button, and the gap note says the pack gives nothing drawable** Why: The pack lists a tree view, expand/collapse, drag-and-drop, parent selection, child assignment, relationship type, effective date, priority and dependency indication. *(source: screens/P08-venue-back-office.yaml#BO-859; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **The parent is written in two places (Resource.parentResourceId by updateResource and the hierarchy by setResourceHierarchy)** Why: Two writers for one fact will disagree; one must own the parent. *(source: contracts/satellite/resources.yaml#updateResource / contracts/satellite/resources.yaml#setResourceHierarchy; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+
+#### Decided on this screen
+
+Answered questions: draw the decision, not the old default. Where a decision and the tables below differ, the decision wins.
+
+- **Which writer owns a resource's parent - the profile or the hierarchy?** → Drawn default accepted: Draw the profile's Parent as read-only with "Change in hierarchy". *(decided by Chinmay, 2026-10-02; DEC-491 / CHG-NOTE-008)* **Reviewable:** a default the lead may still overrule before the block is tasked.
+
 #### Inputs: what the user enters or picks
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Tree**: Expand/collapse tree with search; drag a node onto a new parent to re-parent (with confirm), or use Parent and Add child pickers for keyboard users. *(source: screens/P08-venue-back-office.yaml#BO-859)*
+- **Relationship details**: For the selected link - relationship type as one choice (Contains, Belongs to, Located in, Operated by, Supported by, Part of, Dedicated to), effective from (date), priority (number). No id fields. *(source: contracts/satellite/resources.yaml#/components/schemas/ResourceRelation)*
 
 #### Outputs: what the screen shows and produces
 
@@ -710,6 +1112,15 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |---|---|---|---|---|---|
 | Save resource hierarchy (primary button) | navigation or local | — | — | — | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
+
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Hierarchy preview**: A small diagram of the selected node's ancestors and children (as in the client board), with a dependency icon on nodes that have dependency rules (BO-860). *(source: screens/P08-venue-back-office.yaml#BO-859)*
+- **Impact note**: Before saving, "Booking Main Hall will also hold its 4 children; closing it makes them unavailable"; and "2 links added, 1 removed". *(source: contracts/satellite/resources.yaml#getResourceHierarchy)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Save hierarchy**: Replaces this resource's ancestors and children as sent (VO-R04); refusals shown inline. *(source: contracts/satellite/resources.yaml#setResourceHierarchy)*
 
 **Where the user goes next**
 
@@ -726,6 +1137,31 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 Circular, invalid, or cross-tenant without authorisation (ResourceHierarchyProblem) |
+
+#### Edge cases to draw
+
+- **Circular hierarchy**: Refused with the loop drawn as a path ("Main Building > Level 1 > Ski School Area > Main Building"); the dragged node snaps back. *(source: contracts/satellite/resources.yaml#/components/schemas/ResourceHierarchyProblem)*
+- **Invalid parent or a parent in another tenant without authorisation**: Refused with the reason in words ("A room cannot contain a building"; "Needs cross-tenant rights"). *(source: contracts/satellite/resources.yaml#setResourceHierarchy)*
+- **Re-parenting a resource with future bookings**: Warn with the count of future bookings whose parent changes. *(source: designer default)*
+
+#### Consistency with other screens
+
+- Match `BO-857`: The profile's Parent field and this tree must show the same parent.
+- Match `BO-860`: Dependency rules are a different relationship (requires, conflicts); keep the two editors visually distinct.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+tree: Summit Peaks > Main Building > Level 1 > Ski School Area > Training Area A; Level 2 > Equipment Storage
+link:
+  child: Training Area A
+  parent: Ski School Area
+  relation: Located in
+  effectiveFrom: 1 Oct 2026
+  priority: 1
+```
 
 #### Permissions
 
@@ -766,6 +1202,9 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-854`.
 - [ ] Every gated control is gated: `RESOURCE_MANAGE`, `RESOURCE_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 3 edge case(s) from the process notes are drawn.
+- [ ] The 2 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
+- [ ] The 1 decision(s) taken on this screen are drawn as decided, not as the old default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -788,9 +1227,23 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
 
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** Rules saying what a resource requires, requires one of, conflicts with, cannot run alongside, prefers, substitutes for, backs up, or shares capacity with (Stage A requires Sound System A and Lighting Rig A). They are checked before any assignment is confirmed. The one thing to get right: substitute and backup rows are the approved pool the automatic replacement draws from, so they must be visible as such.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **The table and detail columns are the four conflict counters, titled "Every resource dependency rules"** Why: Those are the conflict panel's headings; the table is the rule rows (kind, target, quantity, mandatory, priority, dates, venue), titled "Dependency rules". *(source: screens/P08-venue-back-office.yaml#BO-860; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **Time overlap rules, availability dependency and capacity dependency have no field** Why: The pack lists them as rule properties; ResourceDependency has none of them. *(source: screens/P08-venue-back-office.yaml#BO-860 / contracts/satellite/resources.yaml#/components/schemas/ResourceDependency; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **No read computes missing dependencies, circular warnings or unavailable dependents** Why: The conflict panel the pack requires has no source; only allocateResources reports a missing dependency, and only at allocation time. *(source: contracts/satellite/resources.yaml#getResourceDependencies / contracts/satellite/resources.yaml#allocateResources; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **The pack's examples are product rules (DI-478 "dependency rules per product") but the operation is per resource** Why: Product-level dependencies belong to experience requirements; this screen should say it is resource-to-resource. *(source: DI-478 / contracts/satellite/resources.yaml#setResourceDependencies; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+
 #### Inputs: what the user enters or picks
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Primary resource**: The resource the rules belong to (from the entry parameter or a picker); the list at left shows resources with rules. *(source: contracts/satellite/resources.yaml#getResourceDependencies)*
+- **Dependency rows**: Each row - kind (one of the nine, as a select with plain labels), target as either a specific resource or a resource type (radio), min and max quantity, mandatory/optional, priority, effective from-to, venue limitation. Requires one of / Requires all group several targets in one row. *(source: screens/P08-venue-back-office.yaml#BO-860 / contracts/satellite/resources.yaml#/components/schemas/ResourceDependency)*
 
 #### Outputs: what the screen shows and produces
 
@@ -814,6 +1267,15 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Circular dependency warnings | text | not in the schema: `Circular dependency warnings` |
 | Unavailable dependent resources | text | not in the schema: `Unavailable dependent resources` |
 
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Impact preview**: "When Stage A is assigned, these are also required - Sound System A (1), Lighting Rig A (1)"; substitutes listed as "Approved substitutes for Instructor Maria Santos - Ahmed Al Mansoori". *(source: screens/P08-venue-back-office.yaml#BO-860 / contracts/satellite/resources.yaml#replaceResourceAllocation)*
+- **Conflict detection**: Four counters with lists - Missing dependencies, Resource conflicts, Circular dependency warnings, Unavailable dependent resources; each item links to the resource. *(source: screens/P08-venue-back-office.yaml#BO-860)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Save rules**: Replaces the resource's whole rule set (VO-R04); allocation then refuses an assignment that misses a mandatory dependency, naming it. *(source: contracts/satellite/resources.yaml#setResourceDependencies / contracts/satellite/resources.yaml#/components/schemas/ResourceAllocationProblem)*
+
 **Where the user goes next**
 
 - → `BO-854` Resource Management Command Center: *Back to Resource Management Command Center*
@@ -828,6 +1290,39 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the resource dependency rules are still there. The pack's own statuses are Sound System A — the state names which is selected. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Edge cases to draw
+
+- **Rule makes a resource depend on itself through others (A requires B, B requires A)**: Warned as circular before save, with the chain. *(source: screens/P08-venue-back-office.yaml#BO-860)*
+- **A required resource is under maintenance today**: Listed under Unavailable dependent resources with its return date; the primary's assignments for that window show at risk. *(source: screens/P08-venue-back-office.yaml#BO-860)*
+
+#### Consistency with other screens
+
+- Match `BO-893`: "Private ski lesson needs one instructor and one training zone" is an experience requirement (BO-893), not a resource dependency; keep the pack's example there.
+- Match `BO-902`: Substitute for / Backup for rows feed the automatic replacement.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+primary: Stage A (Summit Peaks Amphitheatre)
+rules:
+- kind: Requires
+  target: Sound System A
+  qty: 1
+  mandatory: true
+- kind: Requires
+  target: Lighting Rig A
+  qty: 1
+  mandatory: true
+- kind: Cannot operate simultaneously
+  target: Stage B
+  mandatory: true
+- kind: Backup for
+  target: Stage B
+  priority: 1
+```
 
 #### Permissions
 
@@ -868,6 +1363,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-854`.
 - [ ] Every gated control is gated: `RESOURCE_CONFIGURE`, `RESOURCE_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 2 edge case(s) from the process notes are drawn.
+- [ ] The 4 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -888,28 +1385,153 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | `packageId` (navigation) |
 | Route | `/rentals/resource-package-bundle-configuration-bo-861` |
 
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** Reusable resource packages: a named combination of fixed resources, resource types with quantities, and skill-based placeholders ("1 x Technician with AV Level 2") that is booked as one (VIP Cabana = cabana + towels + locker + attendant). The one thing to get right: components can be a specific resource, a type, or a qualified-person placeholder, each mandatory or optional with substitutes.
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- Write bodies carry id and scopePath (CHG-SBO-005)
+
+**Fixed on main** (the package already carries these; draw what it says): Every field (package code, name, description, effective dates, internal cost) is a selectField (CHG-SBO-009).
+
 #### Inputs: what the user enters or picks
 
 **On the screen**
 
 | Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
 |---|---|---|---|---|---|---|---|
-| Package code | select field | — | — | — | — | — | — |
-| Package name | select field | — | — | — | — | — | — |
-| Description | select field | — | — | — | — | — | — |
-| Applicable venues | select field | — | — | — | — | — | — |
-| Included resources | select field | — | — | — | — | — | — |
-| Included resource types | select field | — | — | — | — | — | — |
-| Required quantities | select field | — | — | — | — | — | — |
-| Mandatory/optional components | select field | — | — | — | — | — | — |
-| Substitute resources | select field | — | — | — | — | — | — |
-| Allocation priority | select field | — | — | — | — | — | — |
-| Effective dates | select field | — | — | — | — | — | — |
-| Minimum/maximum duration | select field | — | — | — | — | — | — |
-| Approval requirement | select field | — | — | — | — | — | — |
-| Internal package cost | select field | — | — | — | — | — | — |
+| Code | text field | optional | — | — | — | — | `ResourcePackage.code` |
+| Name | text field | optional | — | — | — | — | `ResourcePackage.name` |
+| Description | text area | optional | — | — | — | — | `ResourcePackage.description` |
+| Applicable venues | multi-picker: choose applicable venues | optional | — | — | — | — | `ResourcePackage.applicableVenueIds` |
+| Allocation priority | number field | optional | 0 | — | — | — | `ResourcePackage.allocationPriority` |
+| Effective from | date picker | optional | — | — | 1 Oct 2026 (dd MMM yyyy) | — | `ResourcePackage.effectiveFrom` |
+| Minimum minutes | number field (minutes) | optional | — | — | — | — | `ResourcePackage.minimumMinutes` |
+| Requires approval | toggle | optional | off | — | — | — | `ResourcePackage.requiresApproval` |
+| Internal cost | money field | optional | — | A jsonb price cannot be summed in SQL. | AED, 2 decimals shown (up to 4 accepted), currency from the … | On the wire this is three fields; in the database it is one column. 24 August. | `ResourcePackage.internalCost` |
+| Effective to | date picker | optional | — | — | 1 Oct 2026 (dd MMM yyyy) | — | `ResourcePackage.effectiveTo` |
+| Maximum minutes | number field (minutes) | optional | — | — | — | — | `ResourcePackage.maximumMinutes` |
+
+**Form: Create package** (modal, opened by *Create package*; *Create package* calls `createResourcePackage`, *Cancel* sends nothing)
+
+**Collects what `createResourcePackage` sends before it is called.** Required: `code`, `name`. Optional: `description`, `applicableVenueIds`, `components`, `allocationPriority`, `effectiveFrom`, `effectiveTo`, `minimumMinutes`, `maximumMinutes`, `requiresApproval`, `internalCost`. `id` is a client UUIDv7 generated silently, never asked. Dismissing sends nothing; the screen behind is unchanged.
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| ID `id` | picker: choose an id | optional | — | — | shows names, sends the id | — | `createResourcePackage` body |
+| Code `code` | text field | required | — | — | — | — | `createResourcePackage` body |
+| Name `name` | text field | required | — | — | — | — | `createResourcePackage` body |
+| Description `description` | text area | optional | — | — | — | — | `createResourcePackage` body |
+| Applicable venues `applicableVenueIds` | multi-picker: choose applicable venues | optional | — | — | — | — | `createResourcePackage` body |
+| Components `components` | repeatable rows | optional | — | — | — | — | `createResourcePackage` body |
+| ID `components[].id` | picker: choose an id | optional | — | — | shows names, sends the id | — | `createResourcePackage` body |
+| Resource type `components[].resourceTypeId` | picker: choose a resource type | optional | — | — | shows names, sends the id | — | `createResourcePackage` body |
+| Category `components[].categoryId` | picker: choose a category | optional | — | — | shows names, sends the id | — | `createResourcePackage` body |
+| Resource `components[].resourceId` | picker: choose a resource | optional | — | — | shows names, sends the id | A fixed component, and the exception rather than the rule. Meeting Room A really is Meeting Room A; the technician is not. | `createResourcePackage` body |
+| Quantity `components[].quantity` | number field | required | 1 | — | — | — | `createResourcePackage` body |
+| Mandatory `components[].mandatory` | toggle | optional | on | — | — | — | `createResourcePackage` body |
+| Required qualifications `components[].requiredQualifications` | list of values (chips) | optional | — | — | — | — | `createResourcePackage` body |
+| Required attributes `components[].requiredAttributes` | key and value settings | optional | — | — | — | — | `createResourcePackage` body |
+| Substitute resources `components[].substituteResourceIds` | multi-picker: choose substitute resources | optional | — | — | — | — | `createResourcePackage` body |
+| Scope path `components[].scopePath` | text field | optional | — | — | — | — | `createResourcePackage` body |
+| Allocation priority `allocationPriority` | number field | optional | 0 | — | — | — | `createResourcePackage` body |
+| Effective from `effectiveFrom` | date picker | optional | — | — | 1 Oct 2026 (dd MMM yyyy) | — | `createResourcePackage` body |
+| Effective to `effectiveTo` | date picker | optional | — | — | 1 Oct 2026 (dd MMM yyyy) | — | `createResourcePackage` body |
+| Minimum minutes `minimumMinutes` | number field (minutes) | optional | — | — | — | — | `createResourcePackage` body |
+| Maximum minutes `maximumMinutes` | number field (minutes) | optional | — | — | — | — | `createResourcePackage` body |
+| Requires approval `requiresApproval` | toggle | optional | off | — | — | — | `createResourcePackage` body |
+| Internal cost `internalCost` | money field | optional | — | A jsonb price cannot be summed in SQL. | AED, 2 decimals shown (up to 4 accepted), currency from the … | On the wire this is three fields; in the database it is one column. 24 August. | `createResourcePackage` body |
+| Scope path `scopePath` | text field | optional | — | — | — | — | `createResourcePackage` body |
+
+**Form: Save package** (modal, opened by *Save package*; *Save package* calls `updateResourcePackage`, *Cancel* sends nothing)
+
+**Collects what `updateResourcePackage` sends before it is called.** Required: `code`, `name`. Optional: `description`, `applicableVenueIds`, `components`, `allocationPriority`, `effectiveFrom`, `effectiveTo`, `minimumMinutes`, `maximumMinutes`, `requiresApproval`, `internalCost`. `id` is a client UUIDv7 generated silently, never asked. Dismissing sends nothing; the screen behind is unchanged.
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| ID `id` | picker: choose an id | optional | — | — | shows names, sends the id | — | `updateResourcePackage` body |
+| Code `code` | text field | required | — | — | — | — | `updateResourcePackage` body |
+| Name `name` | text field | required | — | — | — | — | `updateResourcePackage` body |
+| Description `description` | text area | optional | — | — | — | — | `updateResourcePackage` body |
+| Applicable venues `applicableVenueIds` | multi-picker: choose applicable venues | optional | — | — | — | — | `updateResourcePackage` body |
+| Components `components` | repeatable rows | optional | — | — | — | — | `updateResourcePackage` body |
+| ID `components[].id` | picker: choose an id | optional | — | — | shows names, sends the id | — | `updateResourcePackage` body |
+| Resource type `components[].resourceTypeId` | picker: choose a resource type | optional | — | — | shows names, sends the id | — | `updateResourcePackage` body |
+| Category `components[].categoryId` | picker: choose a category | optional | — | — | shows names, sends the id | — | `updateResourcePackage` body |
+| Resource `components[].resourceId` | picker: choose a resource | optional | — | — | shows names, sends the id | A fixed component, and the exception rather than the rule. Meeting Room A really is Meeting Room A; the technician is not. | `updateResourcePackage` body |
+| Quantity `components[].quantity` | number field | required | 1 | — | — | — | `updateResourcePackage` body |
+| Mandatory `components[].mandatory` | toggle | optional | on | — | — | — | `updateResourcePackage` body |
+| Required qualifications `components[].requiredQualifications` | list of values (chips) | optional | — | — | — | — | `updateResourcePackage` body |
+| Required attributes `components[].requiredAttributes` | key and value settings | optional | — | — | — | — | `updateResourcePackage` body |
+| Substitute resources `components[].substituteResourceIds` | multi-picker: choose substitute resources | optional | — | — | — | — | `updateResourcePackage` body |
+| Scope path `components[].scopePath` | text field | optional | — | — | — | — | `updateResourcePackage` body |
+| Allocation priority `allocationPriority` | number field | optional | 0 | — | — | — | `updateResourcePackage` body |
+| Effective from `effectiveFrom` | date picker | optional | — | — | 1 Oct 2026 (dd MMM yyyy) | — | `updateResourcePackage` body |
+| Effective to `effectiveTo` | date picker | optional | — | — | 1 Oct 2026 (dd MMM yyyy) | — | `updateResourcePackage` body |
+| Minimum minutes `minimumMinutes` | number field (minutes) | optional | — | — | — | — | `updateResourcePackage` body |
+| Maximum minutes `maximumMinutes` | number field (minutes) | optional | — | — | — | — | `updateResourcePackage` body |
+| Requires approval `requiresApproval` | toggle | optional | off | — | — | — | `updateResourcePackage` body |
+| Internal cost `internalCost` | money field | optional | — | A jsonb price cannot be summed in SQL. | AED, 2 decimals shown (up to 4 accepted), currency from the … | On the wire this is three fields; in the database it is one column. 24 August. | `updateResourcePackage` body |
+| Scope path `scopePath` | text field | optional | — | — | — | — | `updateResourcePackage` body |
+
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Code, name, description, applicable venues**: Code unique; venues multi-select (a package may span venues). *(source: screens/P08-venue-back-office.yaml#BO-861 / contracts/satellite/resources.yaml#createResourcePackage)*
+- **Components**: Rows of component kind (Specific resource / Resource type / Skill-based placeholder), quantity, mandatory or optional, substitutes (alternative resources or types), required qualification for placeholders. *(source: screens/P08-venue-back-office.yaml#BO-861 / screens/P08-venue-back-office.yaml#BO-862 / contracts/satellite/resources.yaml#/components/schemas/ResourcePackage)*
+- **Allocation priority, effective dates, minimum/maximum duration, approval requirement, internal cost**: Priority number (higher first), effective from-to dates, duration in minutes or hours, approval toggle, internal cost in AED (not a guest price). *(source: contracts/satellite/resources.yaml#createResourcePackage)*
 
 #### Outputs: what the screen shows and produces
+
+**Shown**
+
+**Packages** (data table, from `listResourcePackages`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Code | text | — |
+| Name | text | — |
+| Effective from | 1 Oct 2026 | — |
+| Effective to | 1 Oct 2026 | — |
+| Requires approval | yes / no (icon or chip) | — |
+
+**Components** (data table, from `createResourcePackage`): One row per component: resource or resource type, quantity, mandatory or optional, substitutes (the pack's four separate drop-downs).
+
+| Shows | Format | Notes |
+|---|---|---|
+| ID | the name it points at, never the id | — |
+| Code | text | — |
+| Name | text | — |
+| Description | text | — |
+| Applicable venues | list or chips (count when long) | — |
+| Components | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
+| Resource type | the name it points at, never the id | — |
+| Category | the name it points at, never the id | — |
+| Resource | the name it points at, never the id | A fixed component, and the exception rather than the rule. Meeting Room A really is Meeting Room A; the technician is not. |
+| Quantity | 1,234 | — |
+| Mandatory | yes / no (icon or chip) | — |
+| Required qualifications | list or chips (count when long) | — |
+| Required attributes | grouped details | — |
+| Substitute resources | list or chips (count when long) | — |
+| Allocation priority | 1,234 | — |
+| Effective from | 1 Oct 2026 | — |
+| Effective to | 1 Oct 2026 | — |
+| Minimum minutes | 1,234 | — |
+| Maximum minutes | 1,234 | — |
+
+**Actions and what each produces**
+
+| Action | Calls | Sends | On success returns | Errors to show | Notes |
+|---|---|---|---|---|---|
+| Create package (primary button) | `createResourcePackage` POST `/resource-packages` | ResourcePackage | ResourcePackage | — | opens modal first |
+| Save package (secondary button) | `updateResourcePackage` PUT `/resource-packages/{packageId}` | ResourcePackage | ResourcePackage | — | opens modal first |
+
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Package list**: Code, name, components summary ("Cabana + 2 towels + locker + attendant"), venues, effective dates, approval flag. *(source: contracts/satellite/resources.yaml#listResourcePackages)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Save package**: Create or full update (PUT replaces the package, VO-R04). *(source: contracts/satellite/resources.yaml#updateResourcePackage)*
 
 **Data it reads**: `listResourcePackages` (onLoad, The packages)
 
@@ -927,6 +1549,26 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Empty, no results (`?state=emptyNoResults`) | **Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist |
 | Offline (`?state=offline`) | online only |
+
+#### Consistency with other screens
+
+- Match `BO-862`: Dependency rules and packages use the same component picker.
+- Match `BO-894`: The resource combination builder for experiences reuses packages.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+packages:
+- code: PKG-VIPCAB
+  name: VIP Cabana Package
+  components: 1 Cabana (Beach, mandatory), 4 Towels, 1 Locker, 1 Service attendant (placeholder)
+  cost: AED 140
+- code: PKG-CONF
+  name: Conference Package
+  components: Meeting Room A, Projector, Screen, Microphone, 1 Technician with AV Level 2
+```
 
 #### Permissions
 
@@ -961,10 +1603,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (14), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (59), with its required mark, default, format and its error state.
+- [ ] Every output is drawn (25 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-861?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, emptyNoResults, offline.
-- [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
+- [ ] Every action is wired with its success and its failure: Create package, Save package.
 - [ ] Every transition is wired: `BO-854`.
 - [ ] Every gated control is gated: `RESOURCE_CONFIGURE`, `RESOURCE_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
@@ -988,11 +1630,25 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | `resourceId` (navigation) |
 | Route | `/rentals/multi-venue-resource-assignment-bo-862` |
 
-**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built. Contract gap recorded 2 October 2026 (CHG-WIR-004): No read returns a resource's current venue assignment.
+
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** Where a resource may operate - its primary venue, any secondary venues, whether it is pooled and bookable across venues, and the travel buffer between venues that the calendar subtracts like setup. The one thing to get right: the sharing model is one plain choice (Venue-exclusive, Venue-shared, Tenant-wide, Temporary transfer, Centrally pooled) and the travel buffer is shown as unavailable time.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **The screen has only Save, Cancel and an empty detail panel; the gap note says the pack gives nothing drawable** Why: The pack lists twelve settings and five sharing models. *(source: screens/P08-venue-back-office.yaml#BO-862; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **Department ownership, venue availability, transfer time, venue-specific restrictions and venue-specific cost have no field** Why: The pack requires them; ResourceVenueAssignment has venues, three switches, travel buffer and dates only. *(source: screens/P08-venue-back-office.yaml#BO-862 / contracts/satellite/resources.yaml#/components/schemas/ResourceVenueAssignment; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **No read returns the current venue assignment** Why: The write is a full replace (VO-R04); without a read the form opens blank and overwrites blind. *(source: contracts/satellite/resources.yaml#setResourceVenueAssignment / contracts/satellite/resources.yaml#getResource; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
 
 #### Inputs: what the user enters or picks
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Sharing model**: One choice of the pack's five; it sets the underlying switches (shared pool, cross-venue booking allowed, transfer required) which are shown read-only beneath for clarity. Temporary transfer requires an effective to-date. *(source: screens/P08-venue-back-office.yaml#BO-862 / contracts/satellite/resources.yaml#/components/schemas/ResourceVenueAssignment)*
+- **Primary and secondary venues**: Primary venue required (single); secondary venues as ticked list of the tenant's venues the person may manage; a venue cannot be both. *(source: contracts/satellite/resources.yaml#setResourceVenueAssignment)*
+- **Travel buffer, effective dates**: Travel buffer in minutes (0 default) with preview "Booked at Aqua Park until 12:00 - earliest at Summit Peaks 12:40"; effective from-to dates. *(source: contracts/satellite/resources.yaml#setResourceVenueAssignment)*
 
 #### Outputs: what the screen shows and produces
 
@@ -1006,6 +1662,14 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |---|---|---|---|---|---|
 | Save (primary button) | navigation or local | — | — | — | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
+
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Venue availability**: A week grid per assigned venue showing on which days the resource is available there (as on the client board). *(source: screens/P08-venue-back-office.yaml#BO-862)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Save venue assignment**: Replaces the assignment (VO-R04). Refused when existing bookings would overlap once the travel buffer applies; the refusal lists each clash with times and the reason travel buffer. *(source: contracts/satellite/resources.yaml#setResourceVenueAssignment / contracts/satellite/resources.yaml#/components/schemas/ResourceConflictProblem)*
 
 **Where the user goes next**
 
@@ -1022,6 +1686,30 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 Overlapping assignment, or the travel buffer cannot be met (ResourceConflictProblem) |
+
+#### Edge cases to draw
+
+- **Instructor assigned at two venues without venue-specific qualification**: Warn "Not authorised for Summit Peaks slopes"; assignment saves but the instructor is not offered there. *(source: screens/P08-venue-back-office.yaml#BO-863)*
+- **Person lacks tenant rights**: Secondary venues outside their scope are not listed; a note explains (VO-R08). *(source: contracts/satellite/resources.yaml#setResourceVenueAssignment)*
+
+#### Consistency with other screens
+
+- Match `BO-864`: The travel buffer shows on the calendar as its own band between bookings at different venues.
+- Match `BO-945`: A move between venues is booked as a transfer cost there.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+resource: Portable Projector P-17
+assignment:
+  model: Venue-shared
+  primary: Aqua Park
+  secondary: Summit Peaks
+  travelBuffer: 40 min
+  effective: 1 Oct 2026 - open
+```
 
 #### Permissions
 
@@ -1060,13 +1748,15 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-854`.
 - [ ] Every gated control is gated: `RESOURCE_MANAGE`, `RESOURCE_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 2 edge case(s) from the process notes are drawn.
+- [ ] The 3 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
 
 ### `BO-863` Resource Lifecycle, Governance & Audit
 
-**Manage the entire operational lifecycle of a resource from creation through retirement while maintaining full traceability. Provide TICVAI with a centralized, real-time Resource Scheduling & Availability Engine where authorized users can visually see when resources are available, reserved, assigned, unavailable, under maintenance, or in conflict and can allocate or reassign them directly from the calendar. The calendar must operate as an interactive operational workspace, not simply a calendar display.**
+**Manage the entire operational lifecycle of a resource from creation through retirement while maintaining full traceability.**
 
 | | |
 |---|---|
@@ -1079,6 +1769,17 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Offline | online only |
 | Opens with | `resourceId` (navigation) |
 | Route | `/rentals/resource-lifecycle-governance-audit-bo-863` |
+
+**Known gaps.** Removed 2 October 2026 (CHG-WIR-001): Creating and editing resources is BO-095 and BO-857; this screen governs the lifecycle (design-notes correction venue-operations BO-863). Removed 2 October 2026 (CHG-WIR-001): Creating and editing resources is BO-095 and BO-857; this screen governs the lifecycle (design-notes correction venue-operations BO-863).
+
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** Governs a resource's lifecycle - Draft, Pending approval, Approved, Active, Temporarily unavailable, Under maintenance, Suspended, Retired, Archived - with allowed transitions, approval requirements (maker-checker, manager, finance, operations), reasons, replacement resource, disposal and depreciation references, and the immutable audit trail of every material change. The one thing to get right: show the state machine and the audit timeline, not a form of nine selects.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **Approval stages (Maker-checker, Manager, Finance, Operations approval) and permissions (Create, Edit, Approve, Activate) drawn as eight buttons** Why: They are configuration of who may do what, not actions on this screen. *(source: screens/P08-venue-back-office.yaml#BO-863; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **"Allowed status transitions" is listed as configurable but no operation stores transition rules** Why: setResourceLifecycleState moves a resource; nothing writes the allowed-transition configuration the pack asks for. *(source: screens/P08-venue-back-office.yaml#BO-863 / contracts/satellite/resources.yaml#setResourceLifecycleState; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+
+**Fixed on main** (the package already carries these; draw what it says): createResource and updateResource bound here (CHG-WIR-001).
 
 #### Inputs: what the user enters or picks
 
@@ -1096,6 +1797,11 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Depreciation reference | select field | — | — | — | — | — | — |
 | Asset-retirement information | select field | — | — | — | — | — | — |
 
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **State change**: Target state from the allowed transitions only, reason (required for suspend and retire), effective from, replacement resource (on retire), disposal details (on retire/archive). *(source: screens/P08-venue-back-office.yaml#BO-863 / contracts/satellite/resources.yaml#setResourceLifecycleState)*
+- **Approval controls**: Four-eyes or dual control on resource changes, minimum approvers, approver groups; set once per tenant, shown here read-only with a link. *(source: contracts/spine/approvals.yaml#setApprovalControlPolicy)*
+
 #### Outputs: what the screen shows and produces
 
 **Actions and what each produces**
@@ -1111,6 +1817,15 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Approve (secondary button) | navigation or local | — | — | — | — |
 | Activate (secondary button) | navigation or local | — | — | — | — |
 
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **State diagram**: The nine states as a flow with the current state highlighted and allowed next states clickable. *(source: screens/P08-venue-back-office.yaml#BO-863)*
+- **Audit timeline**: Every material change with who, when, before/after and reason; immutable. *(source: contracts/satellite/resources.yaml#getResourceAuditTrail)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Move to state**: Where approval is required, the change goes to Pending approval and the approver is notified. *(source: contracts/satellite/resources.yaml#setResourceLifecycleState / contracts/spine/approvals.yaml#setApprovalMatrix)*
+
 **Where the user goes next**
 
 - → `BO-854` Resource Management Command Center: *Back to Resource Management Command Center*
@@ -1121,11 +1836,28 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | Loading (`?state=loading`) | The resource lifecycle governance configuration as saved. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the resource lifecycle governance untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No resource lifecycle governance configured yet. Carries the create action and says what the platform does in the meantime. |
+| Empty, first run (`?state=emptyFirstRun`) | No resource lifecycle governance configured yet. Offers no create action — this screen declares no operation that makes one and says what the platform does in the meantime. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Empty, no results (`?state=emptyNoResults`) | **Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed. Includes a `scopeLevel` that is not the level of the scope node the caller acts at (audit R183); `errors[]` names `scopeLevel`.; 409 Refused, and nothing is stored. `refusedReason` says which: `loosensParentRule` — the matrix would loosen a rule set at a higher scope (a higher threshold … (ApprovalMatrixRefusedProblem); 409 The transition is not allowed from the current … |
+
+#### Consistency with other screens
+
+- Match `BO-069`: Retiring a resource that is also an asset should reflect the asset's retirement (DI-770).
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+resource:
+  name: SUV 2 (Dubai 45821)
+  state: Under maintenance
+  next: Active, Suspended, Retired
+audit:
+- 28 Sep 2026 10:14 - Fatima Al Hashimi - Active > Under maintenance - Tyre replacement
+```
 
 #### Permissions
 
@@ -1133,8 +1865,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - `setResourceLifecycleState` → `RESOURCE_MANAGE` (configure) · staff
 - `setApprovalControlPolicy` → `APPROVAL_CONFIGURE` (configure) · staff
 - `setApprovalMatrix` → `APPROVAL_CONFIGURE` (configure) · staff
-- `createResource` → `RESOURCE_MANAGE` (configure) · staff
-- `updateResource` → `RESOURCE_MANAGE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -1177,13 +1907,14 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (9), with its required mark, default, format and its error state (400, 409, 422).
+- [ ] Every input above is drawn (9), with its required mark, default, format and its error state (400, 409).
 - [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-863?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, emptyNoResults, offline.
 - [ ] Every action is wired with its success and its failure: Maker-checker approval, Manager approval, Finance approval, Operations approval, Create, Edit, Approve, Activate.
 - [ ] Every transition is wired: `BO-854`.
 - [ ] Every gated control is gated: `APPROVAL_CONFIGURE`, `RESOURCE_MANAGE`, `RESOURCE_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 2 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -1318,9 +2049,9 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 ```json
 {
 "ApprovalControlPolicy": {"type":"object","x-ticvai-persistence":"approvals.control_policy","description":"Approvals boards 6.2 and 6.3. **Which decisions one person may not take alone** — distinct from which roles one person may not hold, which is `identity.setSegregationRules`.\n","required":["code","control"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string"},"name":{"type":"string"},"appliesToRequestKinds":{"type":"array","items":{"$ref":"#/components/schemas/ApprovalKind"}},"appliesAboveValue":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"control":{"type":"string","enum":["fourEyes","dualControl","separationFromRequester","separationFromExecutor"],"description":"**`fourEyes` is two different people; `dualControl` is two people from different groups.** The second is stronger and is what a finance auditor means, and collapsing them makes the stronger control unexpressible.\n"},"requiredApproverGroupIds":{"type":"array","items":{"type":"string","format":"uuid"}},"minimumApprovers":{"type":"integer","default":2},"requiresStepUp":{"type":"boolean","default":false},"requiresSignature":{"type":"boolean","default":false},"breakGlassAllowed":{"type":"boolean","default":false,"description":"**Whether the control may be overridden in an emergency**, and if so it raises an alert rather than passing quietly. A control with no break-glass will be worked around by hand at three in the morning, which is worse.\n"},"scopePath":{"type":"string"},"isActive":{"type":"boolean","default":true}}},
-"ApprovalKind": {"type":"string","description":"11.1.7 and 11.1.30–11.1.37. **The first four already exist as bespoke implementations** and this contract is what they collapse into.\n**Which actions route here — decided 28 September, audit R144.** Finance and procurement acts go through this engine to a **finance approver**: closing a fiscal period (`periodClose`), reopening one (`periodReopen`), cancelling a purchase order (`purchaseOrderCancel`) and closing one short (`purchaseOrderShortClose`). The tenant default matrix for each of these names the finance approver role; a venue may tighten it and never loosen it. Starting a release rollout routes through `releasePromotion` to the platform release manager (a holder of `PLATFORM_RELEASE_PROMOTE`). **Not every `requiresApproval` goes here:** reopening a shift, recounting a stock count and a retail return above the venue threshold take a supervisor's step-up on the same device instead, and never raise a request.\n**Catalogue change requests route through `productChange` and `pricingChange`** (decided 29 September, writers pass): a product change and a price or pricing change raised in `catalogue` ask for approval under these two kinds, so a venue can route product edits and price edits to different approvers.\n","enum":["refund","priceOverride","discountOverride","complimentaryTicket","membershipCancellation","accessPermissionChange","configurationChange","aiRecommendation","releasePromotion","requisition","stockWriteOff","journalEntry","periodClose","periodReopen","purchaseOrderCancel","purchaseOrderShortClose","tenantMigration","productChange","pricingChange"]},
+"ApprovalKind": {"type":"string","description":"11.1.7 and 11.1.30–11.1.37. **The first four already exist as bespoke implementations** and this contract is what they collapse into.\n**Which actions route here — decided 28 September, audit R144.** Finance and procurement acts go through this engine to a **finance approver**: closing a fiscal period (`periodClose`), reopening one (`periodReopen`), cancelling a purchase order (`purchaseOrderCancel`) and closing one short (`purchaseOrderShortClose`). The tenant default matrix for each of these names the finance approver role; a venue may tighten it and never loosen it. Starting a release rollout routes through `releasePromotion` to the platform release manager (a holder of `PLATFORM_RELEASE_PROMOTE`). **Not every `requiresApproval` goes here:** reopening a shift, recounting a stock count and a retail return above the venue threshold take a supervisor's step-up on the same device instead, and never raise a request.\n**Catalogue change requests route through `productChange` and `pricingChange`** (decided 29 September, writers pass): a product change and a price or pricing change raised in `catalogue` ask for approval under these two kinds, so a venue can route product edits and price edits to different approvers.\n\n**Optional review steps a venue switches on, decided 2 October 2026** (Chinmay; CHG-CSP-036, CHG-CSP-028, CHG-CSP-031). Each is an existing kind narrowed by the rule's `subjectTypes`, so no kind is added (a new value here would be a breaking change against r1) and each is off until the venue saves an active matrix for it:\n- **Publishing white-label content** (`configurationChange`, subject `whiteLabelPublication`): simulate, then a single publish by a holder of the permission; a review step only where the venue sets one up (batch 1, CMS-014; DEC-156). - **Recording F&B waste above a value** (`stockWriteOff`, subject `fnbWaste`): the venue's waste-approval policy, value bands as `minAmount` and `maxAmount`, photo evidence above a value held by fnb (batch 6 #192, BO-139; DEC-192; R144). - **Publishing an access topology** (`configurationChange`, subject `topologyPublication`): second-person approval when the venue switches it on (batch 6 #230, BO-153; DEC-230). - **A permanent identity lock, a whitelist entry, or releasing a full-identity or permanent lock** (`accessPermissionChange`, subjects `identityLock`, `whitelistEntry`, `identityLockRelease`): always a second approver, never for an until-end-of-day lock (critical set 1, BO-229 and BO-247; DEC-254, DEC-260); the tenant default matrix names the security approver role and a venue may tighten it, never remove it.\n","enum":["refund","priceOverride","discountOverride","complimentaryTicket","membershipCancellation","accessPermissionChange","configurationChange","aiRecommendation","releasePromotion","requisition","stockWriteOff","journalEntry","periodClose","periodReopen","purchaseOrderCancel","purchaseOrderShortClose","tenantMigration","productChange","pricingChange"]},
 "ApprovalMatrix": {"type":"object","x-ticvai-persistence":"approvals.matrix","required":["kind","scopeLevel","rules"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"kind":{"$ref":"#/components/schemas/ApprovalKind"},"scopeLevel":{"type":"string","enum":["tenant","region","venue"]},"scopePath":{"type":"string","readOnly":true},"version":{"type":"integer","readOnly":true,"description":"11.1.80. **A request is decided by the rules it was raised under.** Changing the matrix mid-flight would mean an approver answering a question that changed while they read it.\n**(`kind`, `scopePath`, `version`) is unique**, and a stored version is never edited: a request's `matrixVersion` names exactly one rule set (decided 28 September, audit R129 (2)).\n"},"rules":{"type":"array","items":{"$ref":"#/components/schemas/ApprovalRule"}},"isActive":{"type":"boolean"}}},
-"ApprovalRule": {"type":"object","x-ticvai-persistence":"approvals.rule","required":["order","approverRoleIds","mode"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true,"description":"**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"},"order":{"type":"integer","description":"**First match wins.** Explicit ordering is what makes a matrix reviewable — an unordered set of overlapping rules is one nobody can reason about.\n"},"minAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"maxAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"riskScoreAbove":{"type":"number","nullable":true,"description":"11.1.12. **Not matched against the AI risk score** (29 September, build pass, group G2). The AI assessment on a request (`ApprovalRequest.aiAssessment`, from `ai.scoreApprovalRequest`) is context for the reviewer only (MoM 8 September: AI never influences approve or reject), and routing a request to more approvers because of it would be influence. A rule with this set matches only a `riskScore` the requesting contract passes in `attributes` from its own deterministic rules (a payment's rule score, for example). Using the AI score here needs the client to say so.\n"},"condition":{"type":"string","nullable":true,"description":"11.1.13. Evaluated against the attributes the caller supplied.\n\n**No condition language is defined yet** (pull audit R104, 26 September): the grammar, the attributes it may name and how two conditions are compared for `unreachableRule` are an open decision, not something to infer from this field.\n"},"approverRoleIds":{"type":"array","minItems":1,"description":"Role ids from `identity.listRoles` (`Role.id`), which is where an editor gets the names to show and pick from. This contract stores the ids only.\n","items":{"type":"string","format":"uuid"}},"approverScopeLevel":{"type":"string","enum":["venue","department","region","tenant"],"description":"11.1.39. Which organisational level the approver must sit at."},"mode":{"$ref":"#/components/schemas/ApprovalMode"},"levels":{"type":"integer","default":1,"description":"11.1.3. Multi-level chains ask each level in turn."},"requiresMfa":{"type":"boolean","default":false},"requiresSignature":{"type":"boolean","default":false},"slaMinutes":{"type":"integer","nullable":true,"description":"11.1.14. Null means no SLA, which is different from a long one."},"escalateAfterMinutes":{"type":"integer","nullable":true},"escalateToRoleIds":{"type":"array","description":"Role ids from `identity.listRoles`, as `approverRoleIds`.","items":{"type":"string","format":"uuid"}},"expiresAfterMinutes":{"type":"integer","nullable":true,"description":"11.1.53. An unanswered request eventually stops waiting."},"externalProviderId":{"type":"string","format":"uuid","nullable":true,"description":"11.1.65 (29 September). **This level is decided in an external workflow system** (`ApprovalExternalProvider`) rather than by a person in TICVAI. `approverRoleIds` stay required: they are who decides if the provider does not answer in time and its `onTimeout` is `fallBackToRoles`.\n"}}},
+"ApprovalRule": {"type":"object","x-ticvai-persistence":"approvals.rule","required":["order","approverRoleIds","mode"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true,"description":"**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"},"order":{"type":"integer","description":"**First match wins.** Explicit ordering is what makes a matrix reviewable — an unordered set of overlapping rules is one nobody can reason about.\n"},"minAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"maxAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"riskScoreAbove":{"type":"number","nullable":true,"description":"11.1.12. **Not matched against the AI risk score** (29 September, build pass, group G2). The AI assessment on a request (`ApprovalRequest.aiAssessment`, from `ai.scoreApprovalRequest`) is context for the reviewer only (MoM 8 September: AI never influences approve or reject), and routing a request to more approvers because of it would be influence. A rule with this set matches only a `riskScore` the requesting contract passes in `attributes` from its own deterministic rules (a payment's rule score, for example). Using the AI score here needs the client to say so.\n"},"condition":{"type":"string","nullable":true,"description":"11.1.13. Evaluated against the attributes the caller supplied.\n\n**No condition language is defined yet** (pull audit R104, 26 September): the grammar, the attributes it may name and how two conditions are compared for `unreachableRule` are an open decision, not something to infer from this field.\n"},"approverRoleIds":{"type":"array","minItems":1,"description":"Role ids from `identity.listRoles` (`Role.id`), which is where an editor gets the names to show and pick from. This contract stores the ids only.\n","items":{"type":"string","format":"uuid"}},"approverScopeLevel":{"type":"string","enum":["venue","department","region","tenant"],"description":"11.1.39. Which organisational level the approver must sit at."},"mode":{"$ref":"#/components/schemas/ApprovalMode"},"levels":{"type":"integer","default":1,"description":"11.1.3. Multi-level chains ask each level in turn."},"requiresMfa":{"type":"boolean","default":false},"requiresSignature":{"type":"boolean","default":false},"slaMinutes":{"type":"integer","nullable":true,"description":"11.1.14. Null means no SLA, which is different from a long one."},"escalateAfterMinutes":{"type":"integer","nullable":true},"escalateToRoleIds":{"type":"array","description":"Role ids from `identity.listRoles`, as `approverRoleIds`.","items":{"type":"string","format":"uuid"}},"expiresAfterMinutes":{"type":"integer","nullable":true,"description":"11.1.53. An unanswered request eventually stops waiting."},"subjectTypes":{"type":"array","description":"**Which subjects of the kind this rule matches** (decided 2 October 2026, Chinmay; CHG-CSP-028, CHG-CSP-036, CHG-CSP-031): the `CreateApprovalRequest.subjectType` values, for example `topologyPublication` or `whiteLabelPublication` under `configurationChange`. Empty matches every subject of the kind. It is how a venue switches an optional review step on for one kind of act without routing every act of the kind.","items":{"type":"string","maxLength":64}},"signatureMethods":{"type":"array","description":"**The signature methods this level accepts, where `requiresSignature` is true** (design-notes correction on ADM-344, Block B: \"Configuring which stages need a signature is a policy write\"; CHG-CSP-045). Values of `ApprovalSignature.method`. Empty accepts any of them. With `requiresSignature` this makes the rule the signature policy: which levels of which kinds need a signature, and how it is given; `signApprovalDecision` refuses a method the level does not accept.","items":{"type":"string","enum":["platformKey","uaePass","externalCertificate","drawnSignature"]}},"externalProviderId":{"type":"string","format":"uuid","nullable":true,"description":"11.1.65 (29 September). **This level is decided in an external workflow system** (`ApprovalExternalProvider`) rather than by a person in TICVAI. `approverRoleIds` stay required: they are who decides if the provider does not answer in time and its `onTimeout` is `fallBackToRoles`.\n"}}},
 "Qualification": {"type":"object","x-ticvai-persistence":"resources.qualification","description":"1.2.36. **A role is not a skill**, and the check happens before assignment rather than after.\n","required":["code","name"],"properties":{"resourceId":{"type":"string","format":"uuid","readOnly":true,"description":"**The resource that holds this qualification.** Set from the path of `setResourceQualifications`; without it a stored qualification belongs to nobody and the check before assignment has nothing to check against. One row per resource and `code`.\n"},"code":{"type":"string"},"name":{"type":"string"},"issuedAt":{"type":"string","format":"date","nullable":true},"expiresAt":{"type":"string","format":"date","nullable":true,"description":"**The field that makes this worth having.** A certification with no expiry is one nobody renews, and a lifeguard certificate that lapsed last month is a safety failure rather than a data-quality one.\n"},"issuer":{"type":"string","nullable":true},"documentAssetId":{"type":"string","format":"uuid","nullable":true},"scopePath":{"type":"string","description":"**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"}}},
 "Resource": {"type":"object","x-ticvai-persistence":"resources.resource","description":"**A specific object, not a quantity of interchangeable ones.** A venue with forty identical strollers has forty resources, because guest number twelve returned stroller number twelve.\n","required":["id","code","name","kind","venueId"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string"},"name":{"type":"string"},"kind":{"$ref":"#/components/schemas/ResourceKind"},"venueId":{"type":"string","format":"uuid"},"scopePath":{"type":"string"},"parentResourceId":{"type":"string","format":"uuid","nullable":true,"description":"**A pool cabana belongs to the pool area; a seat belongs to an auditorium.** Booking a parent takes its children with it, which is the behaviour a venue expects and would otherwise have to enforce by hand.\n"},"principalId":{"type":"string","format":"uuid","nullable":true,"description":"For a resource of kind `instructor` or `staff`. **`workforce` still owns their rota** — this says whether they are qualified and whether they are already committed.\n"},"attributes":{"type":"object","additionalProperties":true,"description":"Configurable per kind — capacity, size, shade, power, poolside."},"setupMinutes":{"type":"integer","default":0,"description":"**Before the booking, not inside it.** An auditorium booked 14:00–16:00 is unavailable from 13:30 with a 30-minute setup, and a calendar that cannot express that double-books every time.\n"},"teardownMinutes":{"type":"integer","default":0,"description":"After the booking. **Kept as it is** (decided 29 September, W10): with a `cleaningPolicy` of `afterEveryBooking` the cleaning buffer is added after the teardown, so a room with no teardown and a 15-minute clean is free 15 minutes after each booking ends.\n"},"cleaningPolicy":{"allOf":[{"$ref":"#/components/schemas/ResourceCleaningPolicy"}],"nullable":true,"description":"How the resource is cleaned between uses (decided 29 September, W10). Null means no cleaning is scheduled beyond `teardownMinutes`."},"requiresQualification":{"type":"array","items":{"type":"string"},"description":"Qualification codes a person must hold to be assigned to this."},"depositAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"status":{"type":"string","enum":["available","booked","checkedOut","maintenance","retired"]},"isActive":{"type":"boolean","default":true}}},
 "ResourceAttributeDefinition": {"type":"object","x-ticvai-persistence":"resources.attribute_definition","description":"Board 1.05. **A typed, validated field the customer adds.** The alternative was a column per customer request, which is a release per customer.\n","required":["code","label","dataType"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string"},"label":{"type":"string"},"dataType":{"type":"string","enum":["text","number","decimal","currency","date","dateTime","boolean","singleSelect","multiSelect","lookup","attachment","url","measurement","formula"]},"applicableResourceTypeIds":{"type":"array","items":{"type":"string","format":"uuid"}},"applicableCategoryIds":{"type":"array","items":{"type":"string","format":"uuid"}},"mandatory":{"type":"boolean","default":false},"defaultValue":{"nullable":true},"allowedValues":{"type":"array","items":{"type":"string"}},"minimum":{"type":"number","nullable":true},"maximum":{"type":"number","nullable":true},"validationExpression":{"type":"string","nullable":true},"searchable":{"type":"boolean","default":false,"description":"**The flag that decides whether `suggestResources` can use it.** An attribute nobody can filter by cannot take part in skill-based matching, which is the main reason the customer defined it.\n"},"scopePath":{"type":"string"}}},

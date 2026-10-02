@@ -1,4 +1,23 @@
 {
+ "evaluatePromotions": {
+  "method": "POST",
+  "path": "/promotions/evaluate",
+  "contract": "promotions",
+  "summary": "Evaluate promotions against a cart",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "EvaluatePromotionsRequest",
+  "responds": "PromotionEvaluation"
+ },
  "listAdvancedOffer": {
   "method": "GET",
   "path": "/advanced-offer",
@@ -149,12 +168,12 @@
   "requestBody": null,
   "responds": "RewardSelectionSubstitutionCustomerChoiceView"
  },
- "setBuyGetBogo": {
-  "method": "PUT",
-  "path": "/buy-get-bogo",
+ "simulatePromotion": {
+  "method": "POST",
+  "path": "/promotions/{promotionId}/simulate",
   "contract": "promotions",
-  "summary": "Buy X Get Y / BOGO Rule Builder",
-  "permission": "PRICE_CONFIGURE",
+  "summary": "What this promotion would have cost on real history",
+  "permission": "PRICE_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
@@ -165,64 +184,7 @@
     "required": null
    }
   ],
-  "requestBody": "BuyXGetYBogoRuleBuilderInput",
-  "responds": "BuyXGetYBogoRuleBuilderView"
- },
- "setCrossCategoryPromotion": {
-  "method": "PUT",
-  "path": "/cross-category-promotion",
-  "contract": "promotions",
-  "summary": "Cross-Category Promotion Builder",
-  "permission": "PRICE_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "CrossCategoryPromotionBuilderInput",
-  "responds": "CrossCategoryPromotionBuilderView"
- },
- "setFixedPriceOffer": {
-  "method": "PUT",
-  "path": "/fixed-price-offer",
-  "contract": "promotions",
-  "summary": "Fixed-Price & “N for X” Offer Builder",
-  "permission": "PRICE_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "FixedPriceNForXOfferBuilderInput",
-  "responds": "FixedPriceNForXOfferBuilderView"
- },
- "setGiftFreeProduct": {
-  "method": "PUT",
-  "path": "/gift-free-product",
-  "contract": "promotions",
-  "summary": "Gift, Free Product & Added-Value Offer Builder",
-  "permission": "PRICE_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "GiftFreeProductAddedValueOfferBuilderInput",
-  "responds": "GiftFreeProductAddedValueOfferBuilderView"
+  "requestBody": null,
+  "responds": null
  }
 }

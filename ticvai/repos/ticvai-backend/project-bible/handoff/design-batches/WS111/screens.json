@@ -63,7 +63,10 @@
     {
      "to": "BO-649",
      "trigger": "Digital & Mobile Credential Management",
-     "provenance": "structural — pack board 4 wiring, 19 September 2026"
+     "provenance": "structural — pack board 4 wiring, 19 September 2026",
+     "carries": [
+      "credentialId"
+     ]
     },
     {
      "to": "BO-650",
@@ -73,7 +76,10 @@
     {
      "to": "BO-651",
      "trigger": "Credential Activation & Delivery",
-     "provenance": "structural — pack board 4 wiring, 19 September 2026"
+     "provenance": "structural — pack board 4 wiring, 19 September 2026",
+     "carries": [
+      "credentialId"
+     ]
     },
     {
      "to": "BO-027",
@@ -101,6 +107,12 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack ACCREDITATION.pdf, page 28"
+   },
+   {
+    "operation": "listCredentialGenerationIssuance",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): listCredentialGenerationIssuance is the guest ticket-media generation monitor; accreditation credentials live in the accreditation contract (design-notes correction venue-operations BO-644).",
+    "source": "contracts/spine/access.yaml#listCredentialGenerationIssuance | contracts/satellite/accreditation.yaml#listAccreditationCredentials"
    }
   ],
   "layout": {
@@ -111,9 +123,24 @@
      "components": [
       {
        "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listCredentialGenerationIssuance",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "label": "Credentials",
+       "bindsTo": "AccreditationCredential",
+       "operation": "listAccreditationCredentials",
+       "provenance": "contract accreditation.yaml GET /accreditation-credentials; wiring fix, 2 October 2026"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Holders",
+       "bindsTo": "AccreditationHolder",
+       "operation": "listAccreditationHolders",
+       "provenance": "contract accreditation.yaml GET /accreditation-holders; wiring fix, 2 October 2026"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Print queue",
+       "bindsTo": "BadgePrintJob",
+       "operation": "listBadgePrintJobs",
+       "provenance": "contract accreditation.yaml GET /badge-print-jobs; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -122,16 +149,31 @@
   "states": {
    "loading": "The credential issuance list.",
    "error": "Could not load. Names which read failed and leaves the credential issuance untouched.",
-   "emptyFirstRun": "No credential issuance yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No credential issuance yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the credential issuance are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
-    "operationId": "listCredentialGenerationIssuance",
-    "contract": "access",
-    "purpose": "Credential Generation & Issuance Monitor",
-    "trigger": "onLoad"
+    "operationId": "listAccreditationCredentials",
+    "contract": "accreditation",
+    "purpose": "Accreditation credentials issued",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-001)"
+   },
+   {
+    "operationId": "listAccreditationHolders",
+    "contract": "accreditation",
+    "purpose": "Approved holders awaiting a credential",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-001)"
+   },
+   {
+    "operationId": "listBadgePrintJobs",
+    "contract": "accreditation",
+    "purpose": "The print queue, and what failed",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-001)"
    }
   ],
   "wireframe": {
@@ -140,6 +182,7 @@
    "workshopBoard": "wireframes/WS04 ACCREDITATION Board 4.dc.html#bo-644"
   },
   "apisNote": "Regenerated 9 September 2026 from ACCREDITATION.pdf page 28. 0 of 0 labels bound to a contract property; 0 of 22 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {},
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -224,6 +267,12 @@
        "kind": "primaryButton",
        "label": "Key requirement: 12.1.4",
        "provenance": "pack ACCREDITATION.pdf, page 29 §Actions"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Generate credential",
+       "operation": "issueAccreditationCredential",
+       "provenance": "contract accreditation.yaml POST /accreditation-credentials; wiring fix, 2 October 2026"
       }
      ]
     },
@@ -254,6 +303,13 @@
     "purpose": "Credentials issued",
     "trigger": "onLoad",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "issueAccreditationCredential",
+    "contract": "accreditation",
+    "purpose": "Generate the credential for an approved accreditation",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-001)"
    }
   ],
   "wireframe": {
@@ -262,6 +318,23 @@
    "workshopBoard": "wireframes/WS04 ACCREDITATION Board 4.dc.html#bo-645"
   },
   "apisNote": "Regenerated 9 September 2026 from ACCREDITATION.pdf page 29. 0 of 0 labels bound to a contract property; 1 of 22 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Key requirement: 12.1.4 are choices sent by `listAccreditationCredentials` (requirement reference shown on the workspace).",
+  "overlays": [
+   {
+    "id": "formIssueAccreditationCredential",
+    "component": "modal",
+    "trigger": "Generate credential",
+    "body": "**Collects what `issueAccreditationCredential` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Generate credential",
+     "operation": "issueAccreditationCredential"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "contract accreditation.yaml POST /accreditation-credentials; wiring fix, 2 October 2026"
+   }
+  ],
+  "entryState": {},
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -333,6 +406,17 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack ACCREDITATION.pdf, page 30"
+   },
+   {
+    "operation": "issueAccreditationCredential",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): Issuing a credential is BO-645's act; this screen configures media and has no operation in the contract yet (contract gap CHG-WIR-004) (design-notes correction venue-operations BO-646).",
+    "source": "contracts/satellite/accreditation.yaml#issueAccreditationCredential"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-004): No operation reads or saves the credential media configuration of a programme.",
+    "source": "screens/P08-venue-back-office.yaml#BO-646"
    }
   ],
   "layout": {
@@ -340,43 +424,18 @@
    "regions": [
     {
      "name": "contentBody",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "issueAccreditationCredential",
-       "notes": "The act the screen exists for."
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "issueAccreditationCredential"
-      }
-     ]
+     "components": []
     }
    ]
   },
   "states": {
    "loading": "The credential media list.",
    "error": "Could not load. Names which read failed and leaves the credential media untouched.",
-   "emptyFirstRun": "No credential media yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No credential media yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the credential media are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Not shown: nothing on this screen needs a permission of its own; the app's sign-in decides access."
   },
-  "apis": [
-   {
-    "operationId": "issueAccreditationCredential",
-    "contract": "accreditation",
-    "purpose": "Generate a credential",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026",
-    "invalidates": [
-     "listAccreditationCredentials"
-    ]
-   }
-  ],
+  "apis": [],
   "wireframe": {
    "status": "notStarted",
    "board": "wireframes/P08 Venue Management.dc.html#bo-646",
@@ -480,6 +539,13 @@
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
        "impliedBy": "setBadgeTemplate"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Badge templates",
+       "bindsTo": "BadgeTemplate",
+       "operation": "listBadgeTemplates",
+       "provenance": "contract accreditation.yaml GET /badge-templates; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -502,6 +568,13 @@
     "invalidates": [
      "listBadgeTemplates"
     ]
+   },
+   {
+    "operationId": "listBadgeTemplates",
+    "contract": "accreditation",
+    "purpose": "Badge designs to open",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-001)"
    }
   ],
   "wireframe": {
@@ -510,6 +583,7 @@
    "workshopBoard": "wireframes/WS04 ACCREDITATION Board 4.dc.html#bo-647"
   },
   "apisNote": "Regenerated 9 September 2026 from ACCREDITATION.pdf page 30. 0 of 0 labels bound to a contract property; 0 of 26 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {},
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -581,6 +655,18 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack ACCREDITATION.pdf, page 31"
+   },
+   {
+    "operation": "listBadgeTemplates",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): The badge-template read and write belong to the designer BO-647; the print queue needs listBadgePrintJobs and createBadgePrintJob, which were bound to BO-649 (design-notes correction venue-operations BO-648).",
+    "source": "contracts/satellite/accreditation.yaml#listBadgePrintJobs | contracts/satellite/accreditation.yaml#createBadgePrintJob"
+   },
+   {
+    "operation": "setBadgeTemplate",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): The badge-template read and write belong to the designer BO-647; the print queue needs listBadgePrintJobs and createBadgePrintJob, which were bound to BO-649 (design-notes correction venue-operations BO-648).",
+    "source": "contracts/satellite/accreditation.yaml#listBadgePrintJobs | contracts/satellite/accreditation.yaml#createBadgePrintJob"
    }
   ],
   "layout": {
@@ -591,23 +677,21 @@
      "components": [
       {
        "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listBadgeTemplates",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
-      },
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "setBadgeTemplate",
-       "label": "Save badge template",
-       "notes": "The act the screen exists for."
-      },
+       "label": "Print queue",
+       "bindsTo": "BadgePrintJob",
+       "operation": "listBadgePrintJobs",
+       "provenance": "contract accreditation.yaml GET /badge-print-jobs; wiring fix, 2 October 2026"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "components": [
       {
        "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "setBadgeTemplate"
+       "label": "Print badges",
+       "operation": "createBadgePrintJob",
+       "provenance": "contract accreditation.yaml POST /badge-print-jobs; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -622,21 +706,18 @@
   },
   "apis": [
    {
-    "operationId": "listBadgeTemplates",
+    "operationId": "listBadgePrintJobs",
     "contract": "accreditation",
-    "purpose": "Badge designs",
+    "purpose": "The print queue, and what failed",
     "trigger": "onLoad",
-    "provenance": "board reading, 19 September 2026"
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-001)"
    },
    {
-    "operationId": "setBadgeTemplate",
+    "operationId": "createBadgePrintJob",
     "contract": "accreditation",
-    "purpose": "Design one",
+    "purpose": "Queue badges for printing",
     "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026",
-    "invalidates": [
-     "listBadgeTemplates"
-    ]
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-001)"
    }
   ],
   "wireframe": {
@@ -645,6 +726,23 @@
    "workshopBoard": "wireframes/WS04 ACCREDITATION Board 4.dc.html#bo-648"
   },
   "apisNote": "Regenerated 9 September 2026 from ACCREDITATION.pdf page 31. 0 of 0 labels bound to a contract property; 0 of 20 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formCreateBadgePrintJob",
+    "component": "modal",
+    "trigger": "Print badges",
+    "body": "**Collects what `createBadgePrintJob` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Print badges",
+     "operation": "createBadgePrintJob"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "contract accreditation.yaml POST /badge-print-jobs; wiring fix, 2 October 2026"
+   }
+  ],
+  "entryState": {},
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -716,6 +814,18 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack ACCREDITATION.pdf, page 32"
+   },
+   {
+    "operation": "createBadgePrintJob",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): Print jobs belong to BO-648; this screen delivers mobile credentials (deliverAccreditationCredential) and lists the digital ones (design-notes correction venue-operations BO-649).",
+    "source": "contracts/satellite/accreditation.yaml#createBadgePrintJob | contracts/satellite/accreditation.yaml#deliverAccreditationCredential"
+   },
+   {
+    "operation": "listBadgePrintJobs",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): Print jobs belong to BO-648; this screen delivers mobile credentials (deliverAccreditationCredential) and lists the digital ones (design-notes correction venue-operations BO-649).",
+    "source": "contracts/satellite/accreditation.yaml#createBadgePrintJob | contracts/satellite/accreditation.yaml#deliverAccreditationCredential"
    }
   ],
   "layout": {
@@ -725,24 +835,24 @@
      "name": "contentBody",
      "components": [
       {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "createBadgePrintJob",
-       "label": "Create badge print job",
-       "notes": "The act the screen exists for."
+       "kind": "dataTable",
+       "label": "Digital credentials",
+       "bindsTo": "AccreditationCredential",
+       "operation": "listAccreditationCredentials",
+       "provenance": "contract accreditation.yaml GET /accreditation-credentials; wiring fix, 2 October 2026"
       },
       {
-       "kind": "dataTable",
+       "kind": "primaryButton",
        "derived": true,
-       "impliedBy": "listBadgePrintJobs",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "impliedBy": "deliverAccreditationCredential",
+       "notes": "The act the screen exists for."
       },
       {
        "kind": "secondaryButton",
        "label": "Cancel",
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
-       "impliedBy": "createBadgePrintJob"
+       "impliedBy": "deliverAccreditationCredential"
       }
      ]
     }
@@ -751,34 +861,24 @@
   "states": {
    "loading": "The digital mobile credential list.",
    "error": "Could not load. Names which read failed and leaves the digital mobile credential untouched.",
-   "emptyFirstRun": "No digital mobile credential yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No digital mobile credential yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the digital mobile credential are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
-   {
-    "operationId": "createBadgePrintJob",
-    "contract": "accreditation",
-    "purpose": "Queue for printing",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026",
-    "invalidates": [
-     "listBadgePrintJobs"
-    ]
-   },
-   {
-    "operationId": "listBadgePrintJobs",
-    "contract": "accreditation",
-    "purpose": "The print queue",
-    "trigger": "onLoad",
-    "provenance": "board reading, 19 September 2026"
-   },
    {
     "operationId": "deliverAccreditationCredential",
     "contract": "accreditation",
     "purpose": "Send a mobile credential to its holder",
     "trigger": "onAction",
     "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "listAccreditationCredentials",
+    "contract": "accreditation",
+    "purpose": "Digital and mobile credentials (mobile and QR kinds)",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-001)"
    }
   ],
   "wireframe": {
@@ -886,6 +986,31 @@
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
        "impliedBy": "issueAccreditationCredential"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Holders",
+       "bindsTo": "AccreditationHolder",
+       "operation": "listAccreditationHolders",
+       "provenance": "contract accreditation.yaml GET /accreditation-holders; wiring fix, 2 October 2026"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Existing credentials",
+       "bindsTo": "AccreditationCredential",
+       "operation": "listAccreditationCredentials",
+       "provenance": "contract accreditation.yaml GET /accreditation-credentials; wiring fix, 2 October 2026"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "components": [
+      {
+       "kind": "secondaryButton",
+       "label": "Replace medium",
+       "operation": "replaceAccreditationCredential",
+       "provenance": "contract accreditation.yaml POST /accreditation-credentials/{credentialId}/replace; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -908,6 +1033,27 @@
     "invalidates": [
      "listAccreditationCredentials"
     ]
+   },
+   {
+    "operationId": "listAccreditationHolders",
+    "contract": "accreditation",
+    "purpose": "Select the holder",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-001)"
+   },
+   {
+    "operationId": "listAccreditationCredentials",
+    "contract": "accreditation",
+    "purpose": "The holder's existing credentials",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-001)"
+   },
+   {
+    "operationId": "replaceAccreditationCredential",
+    "contract": "accreditation",
+    "purpose": "Replace the existing medium",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-001)"
    }
   ],
   "wireframe": {
@@ -916,6 +1062,30 @@
    "workshopBoard": "wireframes/WS04 ACCREDITATION Board 4.dc.html#bo-650"
   },
   "apisNote": "Regenerated 9 September 2026 from ACCREDITATION.pdf page 33. 0 of 0 labels bound to a contract property; 0 of 14 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formReplaceAccreditationCredential",
+    "component": "modal",
+    "trigger": "Replace medium",
+    "body": "**Collects what `replaceAccreditationCredential` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Replace medium",
+     "operation": "replaceAccreditationCredential"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "contract accreditation.yaml POST /accreditation-credentials/{credentialId}/replace; wiring fix, 2 October 2026"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "credentialId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -987,6 +1157,17 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack ACCREDITATION.pdf, page 33"
+   },
+   {
+    "operation": "issueAccreditationCredential",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): The issue call here was labelled \"NFC and RFID encoding\"; encoding is BO-650's job. This screen activates and delivers, and needs the credential list with delivery status (design-notes correction venue-operations BO-651).",
+    "source": "screens/P08-venue-back-office.yaml#BO-651 | contracts/satellite/accreditation.yaml#listAccreditationCredentials"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-004): No operation records a physical credential collection (collected by, when, issued by, collection point, acknowledgement).",
+    "source": "contracts/satellite/accreditation.yaml#deliverAccreditationCredential"
    }
   ],
   "layout": {
@@ -996,9 +1177,16 @@
      "name": "contentBody",
      "components": [
       {
+       "kind": "dataTable",
+       "label": "Credentials",
+       "bindsTo": "AccreditationCredential",
+       "operation": "listAccreditationCredentials",
+       "provenance": "contract accreditation.yaml GET /accreditation-credentials; wiring fix, 2 October 2026"
+      },
+      {
        "kind": "primaryButton",
        "derived": true,
-       "impliedBy": "issueAccreditationCredential",
+       "impliedBy": "deliverAccreditationCredential",
        "notes": "The act the screen exists for."
       },
       {
@@ -1006,7 +1194,7 @@
        "label": "Cancel",
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
-       "impliedBy": "issueAccreditationCredential"
+       "impliedBy": "deliverAccreditationCredential"
       }
      ]
     }
@@ -1015,27 +1203,24 @@
   "states": {
    "loading": "The credential activation delivery list.",
    "error": "Could not load. Names which read failed and leaves the credential activation delivery untouched.",
-   "emptyFirstRun": "No credential activation delivery yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No credential activation delivery yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the credential activation delivery are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
-   {
-    "operationId": "issueAccreditationCredential",
-    "contract": "accreditation",
-    "purpose": "NFC and RFID encoding",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026",
-    "invalidates": [
-     "listAccreditationCredentials"
-    ]
-   },
    {
     "operationId": "deliverAccreditationCredential",
     "contract": "accreditation",
     "purpose": "Deliver, and optionally activate on open",
     "trigger": "onAction",
     "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "listAccreditationCredentials",
+    "contract": "accreditation",
+    "purpose": "Issued credentials and their delivery state",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-001)"
    }
   ],
   "wireframe": {
@@ -1123,6 +1308,12 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack ACCREDITATION.pdf, page 34"
+   },
+   {
+    "operation": "listCredential",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): listCredential is the guest credential operations list; accreditation credentials are read by listAccreditationCredentials and their lifecycle timeline by listAccreditationAudit (design-notes correction venue-operations BO-653).",
+    "source": "contracts/spine/access.yaml#listCredential | contracts/satellite/accreditation.yaml#listAccreditationCredentials | contracts/satellite/accreditation.yaml#listAccreditationAudit"
    }
   ],
   "layout": {
@@ -1133,9 +1324,17 @@
      "components": [
       {
        "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listCredential",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "label": "Credential registry",
+       "bindsTo": "AccreditationCredential",
+       "operation": "listAccreditationCredentials",
+       "provenance": "contract accreditation.yaml GET /accreditation-credentials; wiring fix, 2 October 2026"
+      },
+      {
+       "kind": "dataTable",
+       "label": "History",
+       "bindsTo": "AccreditationAuditRecord",
+       "operation": "listAccreditationAudit",
+       "provenance": "contract accreditation.yaml GET /accreditation-audit; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -1144,16 +1343,24 @@
   "states": {
    "loading": "The credential registry credential list.",
    "error": "Could not load. Names which read failed and leaves the credential registry credential untouched.",
-   "emptyFirstRun": "No credential registry credential yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No credential registry credential yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the credential registry credential are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
-    "operationId": "listCredential",
-    "contract": "access",
-    "purpose": "Credential Operations Command Center",
-    "trigger": "onLoad"
+    "operationId": "listAccreditationCredentials",
+    "contract": "accreditation",
+    "purpose": "Every accreditation credential issued",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-001)"
+   },
+   {
+    "operationId": "listAccreditationAudit",
+    "contract": "accreditation",
+    "purpose": "The credential's lifecycle timeline, by holder",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-001)"
    }
   ],
   "wireframe": {
@@ -1162,6 +1369,7 @@
    "workshopBoard": "wireframes/WS04 ACCREDITATION Board 4.dc.html#bo-653"
   },
   "apisNote": "Regenerated 9 September 2026 from ACCREDITATION.pdf page 34. 0 of 0 labels bound to a contract property; 0 of 17 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {},
   "_platform": {
    "code": "P08",
    "audience": "staff",

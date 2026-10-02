@@ -754,13 +754,6 @@
   "patternReason": "the pack gives this screen a configuration directory (§Backend Configuration; Operational Configuration) and no display directory — it is settings, not a population",
   "purpose": "Provide the principal workspace for creating and maintaining an individual resource.",
   "purposeNote": "Authorized users can create and maintain a complete resource profile, save it as draft, validate its configuration, submit it through governance, and activate it for downstream use.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**Resource Creation & Profile declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
-    "source": "contract — the screen's declared operations"
-   }
-  ],
   "layout": {
    "template": "form",
    "regions": [
@@ -769,24 +762,17 @@
      "slot": "fields",
      "components": [
       {
-       "kind": "selectField",
-       "label": "Active status",
-       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 8 §Operational Configuration"
+       "kind": "detailPanel",
+       "label": "Lifecycle and status",
+       "operation": "getResource",
+       "notes": "The lifecycle state is shown in the header (changed only with `setResourceLifecycleState`); the operational status (available, booked, checked out, maintenance, retired) is read-only, never an input.",
+       "provenance": "contract resources.yaml GET /resources/{resourceId}"
       },
       {
-       "kind": "selectField",
-       "label": "Reservable status",
-       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 8 §Operational Configuration"
-      },
-      {
-       "kind": "selectField",
-       "label": "Rentable status",
-       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 8 §Operational Configuration"
-      },
-      {
-       "kind": "selectField",
+       "kind": "numberField",
        "label": "Capacity",
-       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 8 §Operational Configuration"
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 8 §Operational Configuration",
+       "notes": "A number with its unit (people or units); the pack drew a drop-down."
       },
       {
        "kind": "selectField",
@@ -814,19 +800,22 @@
        "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 8 §Operational Configuration"
       },
       {
-       "kind": "selectField",
+       "kind": "numberField",
        "label": "Default duration",
-       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 8 §Operational Configuration"
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 8 §Operational Configuration",
+       "notes": "A number with its unit (minutes); the pack drew a drop-down."
       },
       {
-       "kind": "selectField",
+       "kind": "numberField",
        "label": "Minimum booking duration",
-       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 8 §Operational Configuration"
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 8 §Operational Configuration",
+       "notes": "A number with its unit (minutes); the pack drew a drop-down."
       },
       {
-       "kind": "selectField",
+       "kind": "numberField",
        "label": "Maximum booking duration",
-       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 8 §Operational Configuration"
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 8 §Operational Configuration",
+       "notes": "A number with its unit (minutes); the pack drew a drop-down."
       }
      ]
     },
@@ -858,18 +847,20 @@
        "provenance": "contract resources.yaml ResourceCleaningPolicy.cleaningsPerDay"
       },
       {
-       "kind": "textField",
+       "kind": "datePicker",
        "label": "Cleaning window from",
        "bindsTo": "Resource.cleaningPolicy.windowStart",
        "operation": "updateResource",
-       "provenance": "contract resources.yaml ResourceCleaningPolicy.windowStart"
+       "provenance": "contract resources.yaml ResourceCleaningPolicy.windowStart",
+       "notes": "A time of day, HH:MM in venue time (the time-picker mode)."
       },
       {
-       "kind": "textField",
+       "kind": "datePicker",
        "label": "Cleaning window to",
        "bindsTo": "Resource.cleaningPolicy.windowEnd",
        "operation": "updateResource",
-       "provenance": "contract resources.yaml ResourceCleaningPolicy.windowEnd"
+       "provenance": "contract resources.yaml ResourceCleaningPolicy.windowEnd",
+       "notes": "A time of day, HH:MM in venue time (the time-picker mode)."
       },
       {
        "kind": "timeline",
@@ -1533,74 +1524,121 @@
      "slot": "fields",
      "components": [
       {
-       "kind": "selectField",
-       "label": "Package code",
-       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 14 §Administrators shall configure"
+       "kind": "dataTable",
+       "label": "Packages",
+       "bindsTo": "ResourcePackage",
+       "columns": [
+        "ResourcePackage.code",
+        "ResourcePackage.name",
+        "ResourcePackage.effectiveFrom",
+        "ResourcePackage.effectiveTo",
+        "ResourcePackage.requiresApproval"
+       ],
+       "operation": "listResourcePackages",
+       "provenance": "contract resources.yaml GET /resource-packages"
       },
       {
-       "kind": "selectField",
-       "label": "Package name",
-       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 14 §Administrators shall configure"
+       "kind": "textField",
+       "label": "Code",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 14 §Administrators shall configure",
+       "operation": "createResourcePackage",
+       "bindsTo": "ResourcePackage.code"
       },
       {
-       "kind": "selectField",
+       "kind": "textField",
+       "label": "Name",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 14 §Administrators shall configure",
+       "operation": "createResourcePackage",
+       "bindsTo": "ResourcePackage.name"
+      },
+      {
+       "kind": "textField",
        "label": "Description",
-       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 14 §Administrators shall configure"
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 14 §Administrators shall configure",
+       "operation": "createResourcePackage",
+       "bindsTo": "ResourcePackage.description"
       },
       {
-       "kind": "selectField",
+       "kind": "multiSelect",
        "label": "Applicable venues",
-       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 14 §Administrators shall configure"
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 14 §Administrators shall configure",
+       "operation": "createResourcePackage",
+       "bindsTo": "ResourcePackage.applicableVenueIds"
       },
       {
-       "kind": "selectField",
-       "label": "Included resources",
-       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 14 §Administrators shall configure"
+       "kind": "dataTable",
+       "label": "Components",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 14 §Administrators shall configure",
+       "operation": "createResourcePackage",
+       "bindsTo": "ResourcePackage.components",
+       "notes": "One row per component: resource or resource type, quantity, mandatory or optional, substitutes (the pack's four separate drop-downs)."
       },
       {
-       "kind": "selectField",
-       "label": "Included resource types",
-       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 14 §Administrators shall configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Required quantities",
-       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 14 §Administrators shall configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Mandatory/optional components",
-       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 14 §Administrators shall configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Substitute resources",
-       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 14 §Administrators shall configure"
-      },
-      {
-       "kind": "selectField",
+       "kind": "numberField",
        "label": "Allocation priority",
-       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 14 §Administrators shall configure"
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 14 §Administrators shall configure",
+       "operation": "createResourcePackage",
+       "bindsTo": "ResourcePackage.allocationPriority"
       },
       {
-       "kind": "selectField",
-       "label": "Effective dates",
-       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 14 §Administrators shall configure"
+       "kind": "datePicker",
+       "label": "Effective from",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 14 §Administrators shall configure",
+       "operation": "createResourcePackage",
+       "bindsTo": "ResourcePackage.effectiveFrom"
       },
       {
-       "kind": "selectField",
-       "label": "Minimum/maximum duration",
-       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 14 §Administrators shall configure"
+       "kind": "numberField",
+       "label": "Minimum minutes",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 14 §Administrators shall configure",
+       "operation": "createResourcePackage",
+       "bindsTo": "ResourcePackage.minimumMinutes"
       },
       {
-       "kind": "selectField",
-       "label": "Approval requirement",
-       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 14 §Administrators shall configure"
+       "kind": "toggle",
+       "label": "Requires approval",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 14 §Administrators shall configure",
+       "operation": "createResourcePackage",
+       "bindsTo": "ResourcePackage.requiresApproval"
       },
       {
-       "kind": "selectField",
-       "label": "Internal package cost",
-       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 14 §Administrators shall configure"
+       "kind": "numberField",
+       "label": "Internal cost",
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 14 §Administrators shall configure",
+       "operation": "createResourcePackage",
+       "bindsTo": "ResourcePackage.internalCost"
+      },
+      {
+       "kind": "datePicker",
+       "label": "Effective to",
+       "bindsTo": "ResourcePackage.effectiveTo",
+       "operation": "createResourcePackage",
+       "provenance": "contract resources.yaml POST /resource-packages"
+      },
+      {
+       "kind": "numberField",
+       "label": "Maximum minutes",
+       "bindsTo": "ResourcePackage.maximumMinutes",
+       "operation": "createResourcePackage",
+       "provenance": "contract resources.yaml POST /resource-packages"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Create package",
+       "operation": "createResourcePackage",
+       "provenance": "contract resources.yaml POST /resource-packages"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save package",
+       "operation": "updateResourcePackage",
+       "provenance": "contract resources.yaml PUT /resource-packages/{packageId}"
       }
      ]
     }
@@ -1656,6 +1694,64 @@
     }
    ]
   },
+  "overlays": [
+   {
+    "id": "formCreateResourcePackage",
+    "component": "modal",
+    "trigger": "Create package",
+    "body": "**Collects what `createResourcePackage` sends before it is called.** Required: `code`, `name`. Optional: `description`, `applicableVenueIds`, `components`, `allocationPriority`, `effectiveFrom`, `effectiveTo`, `minimumMinutes`, `maximumMinutes`, `requiresApproval`, `internalCost`. `id` is a client UUIDv7 generated silently, never asked. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Create package",
+     "operation": "createResourcePackage"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "code",
+      "name",
+      "description",
+      "applicableVenueIds",
+      "components",
+      "allocationPriority",
+      "effectiveFrom",
+      "effectiveTo",
+      "minimumMinutes",
+      "maximumMinutes",
+      "requiresApproval",
+      "internalCost"
+     ]
+    },
+    "provenance": "contract resources.yaml POST /resource-packages"
+   },
+   {
+    "id": "formUpdateResourcePackage",
+    "component": "modal",
+    "trigger": "Save package",
+    "body": "**Collects what `updateResourcePackage` sends before it is called.** Required: `code`, `name`. Optional: `description`, `applicableVenueIds`, `components`, `allocationPriority`, `effectiveFrom`, `effectiveTo`, `minimumMinutes`, `maximumMinutes`, `requiresApproval`, `internalCost`. `id` is a client UUIDv7 generated silently, never asked. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save package",
+     "operation": "updateResourcePackage"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "code",
+      "name",
+      "description",
+      "applicableVenueIds",
+      "components",
+      "allocationPriority",
+      "effectiveFrom",
+      "effectiveTo",
+      "minimumMinutes",
+      "maximumMinutes",
+      "requiresApproval",
+      "internalCost"
+     ]
+    },
+    "provenance": "contract resources.yaml PUT /resource-packages/{packageId}"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1728,6 +1824,11 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Resource_Management_Configuration_Reference.pdf, page 15"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-004): No read returns a resource's current venue assignment.",
+    "source": "contracts/satellite/resources.yaml#setResourceVenueAssignment"
    }
   ],
   "layout": {
@@ -1860,8 +1961,8 @@
   "density": "compact",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Administrators shall configure) and no display directory — it is settings, not a population",
-  "purpose": "Manage the entire operational lifecycle of a resource from creation through retirement while maintaining full traceability. Provide TICVAI with a centralized, real-time Resource Scheduling & Availability Engine where authorized users can visually see when resources are available, reserved, assigned, unavailable, under maintenance, or in conflict and can allocate or reassign them directly from the calendar. The calendar must operate as an interactive operational workspace, not simply a calendar display.",
-  "purposeNote": "The complete lifecycle of every resource is governed by permissions and configurable workflows, while every material configuration change remains permanently traceable through immutable audit history.",
+  "purpose": "Manage the entire operational lifecycle of a resource from creation through retirement while maintaining full traceability.",
+  "purposeNote": "The complete lifecycle of every resource is governed by permissions and configurable workflows, while every material configuration change remains permanently traceable through immutable audit history. Purpose rewritten 2 October 2026 (CHG-WIR-003): The purpose carried the board 2 introduction (\"Provide TICVAI with a centralized, real-time Resource Scheduling and Availability Engine ...\") pasted after the screen's own sentence.",
   "layout": {
    "template": "form",
    "regions": [
@@ -1967,7 +2068,7 @@
   "states": {
    "loading": "The resource lifecycle governance configuration as saved.",
    "error": "Could not load. Names which read failed and leaves the resource lifecycle governance untouched.",
-   "emptyFirstRun": "No resource lifecycle governance configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyFirstRun": "No resource lifecycle governance configured yet. Offers no create action — this screen declares no operation that makes one and says what the platform does in the meantime.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },
@@ -2004,26 +2105,6 @@
     "purpose": "Route resource changes to manager, finance or operations approvers",
     "trigger": "onAction",
     "provenance": "decided 29 September, VM close-out (venue management and configuration): serves the pack action(s) Maker-checker approval; Manager approval, Finance approval, Operations approval; Create; Edit"
-   },
-   {
-    "operationId": "createResource",
-    "contract": "resources",
-    "purpose": "Create a resource",
-    "trigger": "onAction",
-    "provenance": "decided 29 September, VM close-out (venue management and configuration): serves the pack action(s) Maker-checker approval; Manager approval, Finance approval, Operations approval; Create; Edit",
-    "invalidates": [
-     "getResourceAuditTrail"
-    ]
-   },
-   {
-    "operationId": "updateResource",
-    "contract": "resources",
-    "purpose": "Edit a resource",
-    "trigger": "onAction",
-    "provenance": "decided 29 September, VM close-out (venue management and configuration): serves the pack action(s) Maker-checker approval; Manager approval, Finance approval, Operations approval; Create; Edit",
-    "invalidates": [
-     "getResourceAuditTrail"
-    ]
    }
   ],
   "wireframe": {
@@ -2040,6 +2121,20 @@
     }
    ]
   },
+  "gaps": [
+   {
+    "operation": "createResource",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): Creating and editing resources is BO-095 and BO-857; this screen governs the lifecycle (design-notes correction venue-operations BO-863).",
+    "source": "screens/P08-venue-back-office.yaml#BO-863 | R254"
+   },
+   {
+    "operation": "updateResource",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): Creating and editing resources is BO-095 and BO-857; this screen governs the lifecycle (design-notes correction venue-operations BO-863).",
+    "source": "screens/P08-venue-back-office.yaml#BO-863 | R254"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",

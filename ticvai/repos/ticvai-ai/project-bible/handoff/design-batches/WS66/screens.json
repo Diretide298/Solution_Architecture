@@ -243,63 +243,159 @@
      "components": [
       {
        "kind": "metricTile",
-       "label": "Revenue Today",
-       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 5 §Display"
+       "label": "Gross sales today",
+       "provenance": "contract reporting.yaml ReportingSystemKpi (CHG-FIN-007, 2 October 2026)",
+       "notes": "`getKpiValues?kpiCodes=grossSales`, today; shows its as-of time (CHG-FIN-002, CHG-FIN-007).",
+       "bindsTo": "KpiValue",
+       "operation": "getKpiValues",
+       "columns": [
+        "KpiValue.value",
+        "KpiValue.comparison",
+        "KpiValue.direction"
+       ]
       },
       {
        "kind": "metricTile",
-       "label": "Revenue This Hour",
-       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 5 §Display"
+       "label": "Gross sales this hour",
+       "provenance": "contract reporting.yaml ReportingSystemKpi (CHG-FIN-007, 2 October 2026)",
+       "notes": "`getKpiValues?kpiCodes=grossSales`, this hour, interval=hour; shows its as-of time (CHG-FIN-002, CHG-FIN-007).",
+       "bindsTo": "KpiValue",
+       "operation": "getKpiValues",
+       "columns": [
+        "KpiValue.value",
+        "KpiValue.comparison",
+        "KpiValue.direction"
+       ]
       },
       {
        "kind": "metricTile",
-       "label": "Revenue vs Target",
-       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 5 §Display"
+       "label": "Net revenue vs target",
+       "provenance": "contract reporting.yaml ReportingSystemKpi (CHG-FIN-007, 2 October 2026)",
+       "notes": "`getKpiValues?kpiCodes=netRevenue`, today, with its target; shows its as-of time (CHG-FIN-002, CHG-FIN-007).",
+       "bindsTo": "KpiValue",
+       "operation": "getKpiValues",
+       "columns": [
+        "KpiValue.value",
+        "KpiValue.comparison",
+        "KpiValue.direction"
+       ]
       },
       {
        "kind": "metricTile",
-       "label": "Revenue vs Yesterday",
-       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 5 §Display"
+       "label": "Gross sales vs yesterday",
+       "provenance": "contract reporting.yaml ReportingSystemKpi (CHG-FIN-007, 2 October 2026)",
+       "notes": "`getKpiValues?kpiCodes=grossSales`, today against yesterday; shows its as-of time (CHG-FIN-002, CHG-FIN-007).",
+       "bindsTo": "KpiValue",
+       "operation": "getKpiValues",
+       "columns": [
+        "KpiValue.value",
+        "KpiValue.comparison",
+        "KpiValue.direction"
+       ]
       },
       {
        "kind": "metricTile",
-       "label": "Revenue vs Same Day Last Week",
-       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 5 §Display"
+       "label": "Gross sales vs same day last week",
+       "provenance": "contract reporting.yaml ReportingSystemKpi (CHG-FIN-007, 2 October 2026)",
+       "notes": "`getKpiValues?kpiCodes=grossSales`, today against the same day last week; shows its as-of time (CHG-FIN-002, CHG-FIN-007).",
+       "bindsTo": "KpiValue",
+       "operation": "getKpiValues",
+       "columns": [
+        "KpiValue.value",
+        "KpiValue.comparison",
+        "KpiValue.direction"
+       ]
       },
       {
        "kind": "metricTile",
-       "label": "Revenue vs Same Period Last Year",
-       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 5 §Display"
+       "label": "Gross sales vs same period last year",
+       "provenance": "contract reporting.yaml ReportingSystemKpi (CHG-FIN-007, 2 October 2026)",
+       "notes": "`getKpiValues?kpiCodes=grossSales`, the period against the same period last year; shows its as-of time (CHG-FIN-002, CHG-FIN-007).",
+       "bindsTo": "KpiValue",
+       "operation": "getKpiValues",
+       "columns": [
+        "KpiValue.value",
+        "KpiValue.comparison",
+        "KpiValue.direction"
+       ]
       },
       {
        "kind": "metricTile",
-       "label": "Revenue by Site",
-       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 5 §Display"
+       "label": "Gross sales by site",
+       "provenance": "contract reporting.yaml ReportingSystemKpi (CHG-FIN-007, 2 October 2026)",
+       "notes": "`getKpiValues?kpiCodes=grossSales`, groupBy=venue; shows its as-of time (CHG-FIN-002, CHG-FIN-007).",
+       "bindsTo": "KpiValue",
+       "operation": "getKpiValues",
+       "columns": [
+        "KpiValue.value",
+        "KpiValue.comparison",
+        "KpiValue.direction"
+       ]
       },
       {
        "kind": "metricTile",
-       "label": "Revenue by Attraction",
-       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 5 §Display"
+       "label": "Gross sales by attraction",
+       "provenance": "contract reporting.yaml ReportingSystemKpi (CHG-FIN-007, 2 October 2026)",
+       "notes": "`getKpiValues?kpiCodes=grossSales`, groupBy=attraction; shows its as-of time (CHG-FIN-002, CHG-FIN-007).",
+       "bindsTo": "KpiValue",
+       "operation": "getKpiValues",
+       "columns": [
+        "KpiValue.value",
+        "KpiValue.comparison",
+        "KpiValue.direction"
+       ]
       },
       {
        "kind": "metricTile",
-       "label": "Revenue by Product",
-       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 5 §Display"
+       "label": "Gross sales by product",
+       "provenance": "contract reporting.yaml ReportingSystemKpi (CHG-FIN-007, 2 October 2026)",
+       "notes": "`getKpiValues?kpiCodes=grossSales`, groupBy=product; shows its as-of time (CHG-FIN-002, CHG-FIN-007).",
+       "bindsTo": "KpiValue",
+       "operation": "getKpiValues",
+       "columns": [
+        "KpiValue.value",
+        "KpiValue.comparison",
+        "KpiValue.direction"
+       ]
       },
       {
        "kind": "metricTile",
-       "label": "Revenue by Channel",
-       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 5 §Display"
+       "label": "Gross sales by channel",
+       "provenance": "contract reporting.yaml ReportingSystemKpi (CHG-FIN-007, 2 October 2026)",
+       "notes": "`getKpiValues?kpiCodes=grossSales`, groupBy=channel; shows its as-of time (CHG-FIN-002, CHG-FIN-007).",
+       "bindsTo": "KpiValue",
+       "operation": "getKpiValues",
+       "columns": [
+        "KpiValue.value",
+        "KpiValue.comparison",
+        "KpiValue.direction"
+       ]
       },
       {
        "kind": "metricTile",
-       "label": "Revenue by Business Unit",
-       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 5 §Display"
+       "label": "Gross sales by business unit",
+       "provenance": "contract reporting.yaml ReportingSystemKpi (CHG-FIN-007, 2 October 2026)",
+       "notes": "`getKpiValues?kpiCodes=grossSales`, groupBy=businessUnit; shows its as-of time (CHG-FIN-002, CHG-FIN-007).",
+       "bindsTo": "KpiValue",
+       "operation": "getKpiValues",
+       "columns": [
+        "KpiValue.value",
+        "KpiValue.comparison",
+        "KpiValue.direction"
+       ]
       },
       {
        "kind": "metricTile",
-       "label": "Revenue by Payment Method",
-       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 5 §Display"
+       "label": "Takings by payment method",
+       "provenance": "contract reporting.yaml ReportingSystemKpi (CHG-FIN-007, 2 October 2026)",
+       "notes": "`getKpiValues?kpiCodes=takings`, groupBy=tender; shows its as-of time (CHG-FIN-002, CHG-FIN-007).",
+       "bindsTo": "KpiValue",
+       "operation": "getKpiValues",
+       "columns": [
+        "KpiValue.value",
+        "KpiValue.comparison",
+        "KpiValue.direction"
+       ]
       }
      ]
     }
@@ -337,6 +433,7 @@
    "workshopBoard": "wireframes/WS172 Unified BI Reporting and AI Analytics Platform Board 1.dc.html#anl-013"
   },
   "apisNote": "Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf page 5. 0 of 0 labels bound to a contract property; 12 of 21 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "notes": "**Measure names, not \"Revenue\"** (decided 2 October 2026, Chinmay; CHG-FIN-002; BOARDREQ MOM-2758..2761). Takings (money taken less money paid back, a cash-control figure), Gross sales (before discounts, excluding VAT), Net revenue (gross sales less discounts and refunds), Recognised revenue and Deferred revenue are different numbers and never share a label; a tile takes its label from the seeded KPI it is bound to (`ReportingSystemKpi`).\n\nIntraday figures are Gross sales (before discounts, excluding VAT) because refunds and recognition settle later; by payment method the figure is Takings, the money taken by tender. Net revenue is shown against target.",
   "_platform": {
    "code": "P16",
    "formFactor": "web",
@@ -1295,18 +1392,19 @@
   "density": "compact",
   "purposeNote": "Users receive explainable, traceable AI insights linked to the underlying supporting data.",
   "pattern": "listDetail",
-  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "patternReason": "`listAiInsights` reads the population and the selected insight is decided or explained — list, select, act (CHG-SOT-011).",
   "purpose": "Provide management with proactive AI-generated business intelligence rather than requiring users to manually analyze every dashboard.",
   "gaps": [
    {
-    "operation": null,
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
-    "source": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 10"
+    "operation": "listAnalyticsAnomalies",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-012): Two sources of anomalies on one card list show the same situation twice; ADR-0053 and the insight layer make ai.listAiInsights (kind anomaly) the one list (design-notes correction ai ANL-019).",
+    "source": "ADR-0053 | contracts/satellite/ai.yaml#listAiInsights | contracts/satellite/reporting.yaml#listAnalyticsAnomalies"
    },
    {
-    "operation": null,
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
-    "source": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 10"
+    "operation": "explainMetricChange",
+    "why": "**The explanation carries no query or semantic spec** (design-notes correction ai ANL-019). ADR-0054 says an answer shows the query it ran; `NaturalLanguageAnswer` has `semanticSpec` and `generatedQuery`, `AiMetricChangeExplanation` only evidence, so \"Show query\" cannot be drawn for an explanation. Logged as a contract gap 2 October 2026 (CHG-SOT-016).",
+    "source": "contracts/satellite/ai.yaml#explainMetricChange"
    }
   ],
   "layout": {
@@ -1314,25 +1412,126 @@
    "regions": [
     {
      "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Kind",
+       "operation": "listAiInsights",
+       "notes": "Sends `?kind=`: anomaly, forecast deviation, trend, opportunity, executive summary, root cause.",
+       "provenance": "contract ai.yaml GET /insights"
+      },
+      {
+       "kind": "selectField",
+       "label": "Priority",
+       "operation": "listAiInsights",
+       "notes": "Sends `?priority=`.",
+       "provenance": "contract ai.yaml GET /insights"
+      },
+      {
+       "kind": "selectField",
+       "label": "Status",
+       "operation": "listAiInsights",
+       "notes": "Sends `?status=`; new and reviewed first by default.",
+       "provenance": "contract ai.yaml GET /insights"
+      },
+      {
+       "kind": "cardList",
+       "label": "Insights",
+       "bindsTo": "AiInsight",
+       "columns": [
+        "AiInsight.title",
+        "AiInsight.kind",
+        "AiInsight.priority",
+        "AiInsight.metricKey",
+        "AiInsight.magnitude",
+        "AiInsight.status",
+        "AiInsight.detectedAt"
+       ],
+       "operation": "listAiInsights",
+       "notes": "**One list** (ADR-0053): anomalies are insights of kind anomaly, not a second source. Newest first; each card says what moved, by how much and how sure.",
+       "provenance": "contract ai.yaml GET /insights; design-notes correction ai ANL-019, 2 October 2026"
+      },
+      {
+       "kind": "assistantPanel",
+       "label": "Ask about what moved",
+       "operation": "askReportingQuestion",
+       "notes": "Answers through the semantic layer and shows the query it ran (ADR-0054).",
+       "provenance": "contract reporting.yaml POST /reports/ask"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected insight",
+       "bindsTo": "AiInsight",
+       "columns": [
+        "AiInsight.title",
+        "AiInsight.narrative",
+        "AiInsight.evidence",
+        "AiInsight.recommendedAction",
+        "AiInsight.expectedImpact",
+        "AiInsight.status",
+        "AiInsight.decidedAt",
+        "AiInsight.measuredImpact"
+       ],
+       "operation": "listAiInsights",
+       "notes": "**Explainable and traceable**: the evidence items link to the data behind them.",
+       "provenance": "contract ai.yaml AiInsight"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Why it changed",
+       "bindsTo": "AiMetricChangeExplanation",
+       "columns": [
+        "AiMetricChangeExplanation.metricKey",
+        "AiMetricChangeExplanation.period",
+        "AiMetricChangeExplanation.comparison",
+        "AiMetricChangeExplanation.change",
+        "AiMetricChangeExplanation.changePercent",
+        "AiMetricChangeExplanation.drivers",
+        "AiMetricChangeExplanation.narrative",
+        "AiMetricChangeExplanation.reliability",
+        "AiMetricChangeExplanation.dataAsOf"
+       ],
+       "operation": "explainMetricChange",
+       "notes": "The drivers in order of contribution and how reliable the explanation is (grounded, partial, conflicting sources, insufficient evidence).",
+       "provenance": "contract ai.yaml POST /insights/explain-metric-change"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
      "components": [
       {
        "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "askReportingQuestion",
-       "notes": "The act the screen exists for."
-      },
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listAnalyticsAnomalies",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "label": "Accept",
+       "operation": "decideAiInsight",
+       "provenance": "contract ai.yaml POST /insights/{insightId}/decide"
       },
       {
        "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "askReportingQuestion"
+       "label": "Mark actioned",
+       "operation": "decideAiInsight",
+       "provenance": "contract ai.yaml POST /insights/{insightId}/decide"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Reject",
+       "operation": "decideAiInsight",
+       "notes": "Asks for the reason; the rejection teaches the detector.",
+       "provenance": "contract ai.yaml POST /insights/{insightId}/decide"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Why did this change?",
+       "operation": "explainMetricChange",
+       "provenance": "contract ai.yaml POST /insights/explain-metric-change"
       }
      ]
     }
@@ -1341,9 +1540,9 @@
   "states": {
    "loading": "The insights list.",
    "error": "Could not load. Names which read failed and leaves the insights untouched.",
-   "emptyFirstRun": "No insights yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the insights are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No insights yet: nothing has moved enough to report. Good news, not a failure; the ask panel stays available.",
+   "emptyNoResults": "Nothing matches the kind, priority or status filter, and the insights are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `AI_USE`, which `listAiInsights` requires, and names that permission. **Never an empty list.**"
   },
   "apis": [
    {
@@ -1351,13 +1550,6 @@
     "contract": "reporting",
     "purpose": "Ask about what moved",
     "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026"
-   },
-   {
-    "operationId": "listAnalyticsAnomalies",
-    "contract": "reporting",
-    "purpose": "What moved unexpectedly",
-    "trigger": "onLoad",
     "provenance": "board reading, 19 September 2026"
    },
    {
@@ -1396,6 +1588,46 @@
     }
    ]
   },
+  "overlays": [
+   {
+    "id": "formDecideAiInsight",
+    "component": "modal",
+    "trigger": "Accept, Mark actioned or Reject",
+    "body": "**Collects what `decideAiInsight` sends.** Required: `decision` (set by the button: accept, actioned or reject). Optional: `reason` (asked for on Reject), `actionRef` (the work the insight led to, on Mark actioned). Dismissing sends nothing.",
+    "confirm": {
+     "label": "Record decision",
+     "operation": "decideAiInsight"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "decision",
+      "reason",
+      "actionRef"
+     ]
+    },
+    "provenance": "contract ai.yaml POST /insights/{insightId}/decide"
+   },
+   {
+    "id": "formExplainMetricChange",
+    "component": "drawer",
+    "trigger": "Why did this change?",
+    "body": "**Filled from the selected insight**: `metricKey` and `period` come from it; the person picks the `comparison` (previous period or same period last year) and may add dimensions. Dismissing sends nothing.",
+    "confirm": {
+     "label": "Explain",
+     "operation": "explainMetricChange"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "comparison",
+      "dimensions"
+     ]
+    },
+    "provenance": "contract ai.yaml POST /insights/explain-metric-change"
+   }
+  ],
+  "permission": "AI_USE",
   "_platform": {
    "code": "P16",
    "formFactor": "web",
@@ -1515,8 +1747,9 @@
      "components": [
       {
        "kind": "metricTile",
-       "label": "Revenue",
-       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 11 §Comparison KPIs"
+       "label": "Net revenue",
+       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 11 §Comparison KPIs",
+       "notes": "(CHG-FIN-002: never a bare \"Revenue\")"
       },
       {
        "kind": "metricTile",
@@ -1663,6 +1896,7 @@
    "workshopBoard": "wireframes/WS172 Unified BI Reporting and AI Analytics Platform Board 1.dc.html#anl-020"
   },
   "apisNote": "Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf page 11. 0 of 0 labels bound to a contract property; 14 of 43 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "notes": "**Measure names, not \"Revenue\"** (decided 2 October 2026, Chinmay; CHG-FIN-002; BOARDREQ MOM-2758..2761). Takings (money taken less money paid back, a cash-control figure), Gross sales (before discounts, excluding VAT), Net revenue (gross sales less discounts and refunds), Recognised revenue and Deferred revenue are different numbers and never share a label; a tile takes its label from the seeded KPI it is bound to (`ReportingSystemKpi`).",
   "_platform": {
    "code": "P16",
    "formFactor": "web",

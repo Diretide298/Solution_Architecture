@@ -20,12 +20,14 @@ deployment:
 why: null
 modulesUsed:
 - module: ticketing
-  screens: 10
+  screens: 9
 - module: core
   screens: 3
 - module: retail
   screens: 2
 - module: marketing
+  screens: 1
+- module: ai
   screens: 1
 - module: fnb
   screens: 1
@@ -36,17 +38,17 @@ servicesCalled:
   operationCalls: 7
 - service: RetailService
   operationCalls: 4
+- service: AiService
+  operationCalls: 3
 - service: WhiteLabelService
   operationCalls: 2
 - service: MarketingService
-  operationCalls: 2
-- service: AiService
   operationCalls: 2
 - service: FnbService
   operationCalls: 2
 coverage:
   screens: 17
-  inAFlow: 13
+  inAFlow: 12
   drawn: 17
   note: '**A screen in no flow has been specified and never walked.** Every flow written in this package
     has found a defect.'
@@ -83,8 +85,8 @@ screens:
   wave: 2
   density: touchLarge
   operations:
+  - getPublishedTenantConfig
   - getTenantAppStatus
-  - getTenantConfig
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -287,7 +289,7 @@ screens:
   density: touchLarge
   operations:
   - getOrder
-  - transferOrderTickets
+  - reprintOrder
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -316,7 +318,7 @@ screens:
   wave: 2
   density: touchLarge
   operations:
-  - transferOrderTickets
+  - reprintOrder
   states:
   - emptyFirstRun
   - error
@@ -369,7 +371,7 @@ screens:
   wave: 2
   density: touchLarge
   operations:
-  - transferOrderTickets
+  - reprintOrder
   states:
   - emptyFirstRun
   - error
@@ -437,10 +439,11 @@ screens:
 - screen: KSK-015
   name: Assistant
   module: AI
-  requiresModule: ticketing
+  requiresModule: ai
   wave: 2
   density: touchLarge
   operations:
+  - createAiConversation
   - getAvailability
   - handoverToAgent
   - listProducts
@@ -449,7 +452,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -509,9 +511,10 @@ screens:
   - outletId<-KSK-016
   - cartId<-session
   goesTo:
+  - KSK-006
+  - KSK-007
   - KSK-016
   boardFrames:
   - Kiosk Board 2.dc.html#KSK-017
   wireframe: wireframes/P05 Guest Kiosk.dc.html#ksk-017
-  inFlows:
-  - F51 A guest shops in the venue and collects on the way out
+  inFlows: null

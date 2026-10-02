@@ -337,40 +337,54 @@
   "requestBody": null,
   "responds": "Page"
  },
- "listGovernanceRiskMonitoring": {
+ "listOwnPlatformStaffGrants": {
   "method": "GET",
-  "path": "/governance-risk-monitoring",
-  "contract": "catalogue",
-  "summary": "Governance Risk, AI Monitoring & Control Center",
-  "permission": "PRODUCT_VIEW",
+  "path": "/platform-staff-grants/mine",
+  "contract": "identity",
+  "summary": "The calling platform operator's own grants into this tenant",
+  "permission": "PLATFORM_TENANT_ACCESS",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
+  "scopeLevel": "tenant",
   "parameters": [
    {
-    "name": "severity",
+    "name": "activeOnly",
     "in": "query",
-    "required": false
+    "required": null
    },
    {
-    "name": "risk",
-    "in": "query",
-    "required": false
+    "name": null,
+    "in": null,
+    "required": null
    },
    {
-    "name": "venueId",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "owner",
-    "in": "query",
-    "required": false
-   },
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listTenants": {
+  "method": "GET",
+  "path": "/tenants",
+  "contract": "subscription",
+  "summary": "List tenants",
+  "permission": "PLATFORM_TENANT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
    {
     "name": "status",
     "in": "query",
-    "required": false
+    "required": null
+   },
+   {
+    "name": "planId",
+    "in": "query",
+    "required": null
    },
    {
     "name": null,
@@ -405,6 +419,25 @@
   "requestBody": null,
   "responds": "AiIncident"
  },
+ "openPlatformStaffGrant": {
+  "method": "POST",
+  "path": "/platform-staff-grants",
+  "contract": "identity",
+  "summary": "A platform operator opens a time-boxed grant into this tenant",
+  "permission": "PLATFORM_TENANT_ACCESS",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "PlatformStaffGrant"
+ },
  "pauseAiCapability": {
   "method": "POST",
   "path": "/governance/capabilities/{capabilityKey}/pause",
@@ -429,7 +462,7 @@
   "path": "/releases/{releaseId}/promote",
   "contract": "ai",
   "summary": "Promote a release to its next stage (a person)",
-  "permission": "AI_APPROVE",
+  "permission": "AI_USE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",

@@ -34,6 +34,14 @@
      "slot": "record",
      "components": [
       {
+       "kind": "banner",
+       "label": "Closed for maintenance",
+       "bindsTo": "PublishedTenantConfig.maintenanceMessage",
+       "operation": "getPublishedTenantConfig",
+       "notes": "The main case: `isInMaintenance` with its message and the expected-back time (\"Back at 14:00\"), set live on CMS-001 (DI-215).",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-022, design-notes correction)"
+      },
+      {
        "kind": "detailPanel",
        "label": "The tenant app status",
        "bindsTo": "TenantAppStatus",
@@ -41,17 +49,11 @@
         "TenantAppStatus.isPublished",
         "TenantAppStatus.publishedVersion",
         "TenantAppStatus.publishedAt",
-        "TenantAppStatus.draftVersion",
-        "TenantAppStatus.hasUnpublishedChanges",
-        "TenantAppStatus.activeModuleCount",
-        "TenantAppStatus.licensedModuleCount",
-        "TenantAppStatus.activePageCount",
         "TenantAppStatus.isInMaintenance",
         "TenantAppStatus.maintenanceMessage",
         "TenantAppStatus.expectedBackAt",
         "TenantAppStatus.availability",
-        "TenantAppStatus.availabilityMessage",
-        "TenantAppStatus.recentChanges"
+        "TenantAppStatus.availabilityMessage"
        ],
        "operation": "getTenantAppStatus",
        "provenance": "contract white-label.yaml GET /tenant-config/status"
@@ -72,16 +74,23 @@
    "loading": "—",
    "error": "**This screen is the error state.** It distinguishes sold out, closed, and platform unavailable — three different things a guest must not confuse, because only one means come back later",
    "emptyFirstRun": "—",
-   "emptyNoAccess": "**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "**Nothing here needs a sign-in** (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-2)): the screen reads only what the tenant has published, which is public, so there is no no-access case. A host that belongs to no tenant shows the platform's neutral holding page.",
    "offline": "**The offline banner shows instead of this page.** Being offline is the guest's connection, not the venue's — an error or maintenance page shown for a dropped signal tells a guest the venue is down.",
    "soldOut": "**Sold out today.** `getTenantAppStatus.availability` is `soldOut`: the page says so with the tenant's `availabilityMessage` and offers another day, never a generic error (decided 28 September, audit R073 (f)).",
-   "closed": "**Closed.** `getTenantAppStatus.availability` is `closed`: the page says the venue is not open, with the tenant's `availabilityMessage` and the opening hours from `contact` (decided 28 September, audit R073 (f))."
+   "closed": "**Closed.** `getTenantAppStatus.availability` is `closed`: the page says the venue is not open, with the tenant's `availabilityMessage` and the opening hours from `contact` (decided 28 September, audit R073 (f)).",
+   "maintenance": "The venue's maintenance message and when it expects to be back; one way onward (try again at that time). Set live on CMS-001, never published."
   },
   "apis": [
    {
     "operationId": "getTenantAppStatus",
     "contract": "white-label",
     "purpose": "from page inventory",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getPublishedTenantConfig",
+    "contract": "white-label",
+    "purpose": "Maintenance, message and expected-back time, readable without signing in",
     "trigger": "onLoad"
    }
   ],
@@ -95,7 +104,7 @@
     "verified": "2026-09-28",
     "match": "exact",
     "view": "Footer 'Service status', or Discover → 'Service status'",
-    "differences": "Prototype has 'Maintenance' where YAML has 'closed'; sold-out offers 'Join the waitlist' (holds a returned place for 15 minutes), which the YAML screen (getTenantAppStatus only) cannot call."
+    "differences": "Prototype has 'Maintenance' where YAML has 'closed'; sold-out offers 'Join the waitlist' (holds a returned place for 15 minutes), which the YAML screen (getTenantAppStatus only) cannot call. **Do not draw \"Join the waitlist\" on the sold-out page**: this screen calls no waitlist operation; a sold-out performance waitlist belongs to the event booking screens (CHG-SGU-022)."
    }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",

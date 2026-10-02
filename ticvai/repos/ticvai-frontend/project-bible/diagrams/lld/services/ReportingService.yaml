@@ -1,5 +1,5 @@
 id: LLD-ReportingService
-title: ReportingService — 48 operations, 24 tables
+title: ReportingService — 51 operations, 25 tables
 generatedBy: tools/derive-diagrams.py
 tier: platform
 deployable: operations
@@ -10,21 +10,21 @@ why: '**Reads almost everything and writes only its own definitions.** Separate 
 scale: Analytical. Runs against the replica and the analytical store.
 ifDown: Down stops dashboards. **Nothing operational depends on it.**
 coverage:
-  operations: 48
+  operations: 51
   inAFlow: 17
-  percent: 35%
+  percent: 33%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
 - schema: reporting
-  tables: 24
+  tables: 25
   stores:
   - derived
   - postgres
   largestTable: reporting.alert
 operationsByContract:
 - contract: reporting
-  count: 48
+  count: 51
   operations:
   - operation: acknowledgeAlert
     verb: POST
@@ -130,6 +130,14 @@ operationsByContract:
     offline: false
     reads: 5
     writes: 0
+  - operation: getAnalyticsGovernancePolicy
+    verb: GET
+    path: /analytics-governance-policy
+    scope: tenant
+    permission: REPORT_VIEW_TENANT
+    offline: false
+    reads: 1
+    writes: 0
   - operation: getAnalyticsUsage
     verb: GET
     path: /analytics-usage
@@ -201,6 +209,14 @@ operationsByContract:
     permission: REPORT_VIEW_TENANT
     offline: false
     reads: 1
+    writes: 0
+  - operation: getServiceSummary
+    verb: GET
+    path: /service-summary
+    scope: venue
+    permission: REPORT_VIEW_OWN
+    offline: false
+    reads: 0
     writes: 0
   - operation: getSupplierPerformance
     verb: GET
@@ -362,6 +378,14 @@ operationsByContract:
     offline: false
     reads: 3
     writes: 2
+  - operation: setAnalyticsGovernancePolicy
+    verb: PUT
+    path: /analytics-governance-policy
+    scope: tenant
+    permission: REPORT_GOVERNANCE_MANAGE
+    offline: false
+    reads: 1
+    writes: 1
   - operation: setKpiTargets
     verb: PUT
     path: /kpis/{kpiId}/targets
@@ -476,6 +500,13 @@ tables:
   writtenBy:
   - reporting
   foreignWriters: null
+- table: reporting.analytics_governance_policy
+  columns: 8
+  store: postgres
+  parent: null
+  writtenBy:
+  - reporting
+  foreignWriters: null
 - table: reporting.anomaly
   columns: 11
   store: postgres
@@ -551,7 +582,7 @@ tables:
   writtenBy: []
   foreignWriters: null
 - table: reporting.report_column
-  columns: 8
+  columns: 14
   store: postgres
   parent: reporting.report_definition
   writtenBy:
@@ -654,9 +685,11 @@ writesOutside:
     - ai.activity
 screens:
 - P04:POS-008 Reports
-- P04:POS-009 Staff Roster
 - P04:POS-020 Shift Exceptions & Alerts
 - P04:POS-025 Till Home
+- P06:EMP-008 Shift summary
+- P06:EMP-020 AI assistant — answer
+- P06:EMP-060 Reservation & Table Performance
 - P06:EMP-061 Retail Inventory Command Center
 - P06:EMP-070 Inventory Exceptions, AI Replenishment & Action Center
 - P08:BO-005 Queue Monitor
@@ -683,21 +716,16 @@ screens:
 - P08:BO-108 Venue Operations
 - P08:BO-1081 Finance Dashboard
 - P08:BO-1082 Admissions Revenue
-- P08:BO-115 Category, Brand & Merchandise Hierarchy
 - P08:BO-118 Campaign & Audience Management
-- P08:BO-125 Product & Category Button Configuration
-- P08:BO-126 Deployment, Preview & Audit
 - P08:BO-133 Offline Alerts, Limits & Audit
 - P08:BO-141 Operational Alerts, AI Replenishment & Action Center
 - P08:BO-262 Access Reports, Scheduled Reporting & Data Export
 - P08:BO-585 Rental Revenue & Commercial Analytics
 - P08:BO-590 Location & Channel Performance
 - P08:BO-593 AI Rental Management Copilot & Action Center
-- P08:BO-682 Accreditation Export & Data Extract Center
 - P08:BO-684 Accreditation Executive Dashboard
 - P08:BO-685 Accreditation Status & Portfolio Reporting
 - P08:BO-688 Accreditation Trend & Comparative Analysis
-- P08:BO-733 Service Channel Configuration
 - P08:BO-833 Gamification Analytics & Audit
 - P08:BO-886 Staffing Gap & Coverage Control Center
 - P08:BO-951 Resource Integration & System Health Center
@@ -748,13 +776,13 @@ screens:
 - P16:ANL-044 Distribution & Delivery Configuration
 - P16:ANL-045 Export & Download Center
 - P16:ANL-046 Report API & Data Delivery Manager
+- P16:ANL-047 Report Access & Sharing Control
 - P16:ANL-048 Delivery Monitoring & Failure Management
 - P16:ANL-049 Report Audit Trail & Compliance
 - P16:ANL-051 AI Analytics Command Center
 - P16:ANL-052 Ask TICVAI — Natural Language Analytics
 - P16:ANL-053 AI-Generated Dashboard Studio
 - P16:ANL-054 AI Report Generator
-- P16:ANL-055 Anomaly Detection Center
 - P16:ANL-056 Root-Cause Analysis Explorer
 - P16:ANL-057 Forecasting & Predictive Analytics Studio
 - P16:ANL-058 AI Recommendation & Next-Best-Action Center
@@ -768,6 +796,8 @@ screens:
 - P16:ANL-067 Data Refresh, Pipeline & Data Health Monitor
 - P16:ANL-068 Embedded BI, Workspace & Tenant Administration
 - P16:ANL-069 Analytics Performance, Usage & Cost Monitor
+- P16:ANL-070 Analytics Governance, Security & Audit Center
+- P16:ANL-072 Finance Dashboard
 flows:
 - F106 A security dashboard surfaces something and it is investigated
 - F107 A report is defined, scheduled and delivered

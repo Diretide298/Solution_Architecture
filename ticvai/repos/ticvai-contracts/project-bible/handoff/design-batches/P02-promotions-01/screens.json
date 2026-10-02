@@ -49,46 +49,20 @@
      "slot": "collection",
      "components": [
       {
-       "kind": "textField",
-       "label": "Venue id",
-       "operation": "listPromotions",
-       "notes": "Sends `?venueId=` to `listPromotions`.",
-       "provenance": "contract promotions.yaml GET /promotions"
-      },
-      {
-       "kind": "textField",
-       "label": "Status",
-       "operation": "listPromotions",
-       "notes": "Sends `?status=` to `listPromotions`.",
-       "provenance": "contract promotions.yaml GET /promotions"
-      },
-      {
-       "kind": "datePicker",
-       "label": "Active at",
-       "operation": "listPromotions",
-       "notes": "Sends `?activeAt=` to `listPromotions`.",
-       "provenance": "contract promotions.yaml GET /promotions"
-      },
-      {
-       "kind": "dataTable",
-       "label": "Every promotion",
+       "kind": "cardList",
+       "label": "Offers",
        "bindsTo": "Promotion",
        "columns": [
         "Promotion.code",
         "Promotion.name",
         "Promotion.description",
-        "Promotion.venueId",
         "Promotion.discount",
-        "Promotion.conditions",
-        "Promotion.stackingMode",
-        "Promotion.stackingGroup",
-        "Promotion.precedence",
         "Promotion.validFrom",
-        "Promotion.validTo",
-        "Promotion.maxRedemptions"
+        "Promotion.validTo"
        ],
        "operation": "listPromotions",
-       "provenance": "contract promotions.yaml GET /promotions"
+       "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)",
+       "notes": "The offers active now at the guest's venue. The venue is the one the guest picked on Home (`venueId` from the session, audit R267), never typed. Was the generated table 'Every promotion'; staff and plumbing columns removed (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3))."
       }
      ]
     },
@@ -104,19 +78,10 @@
         "Promotion.code",
         "Promotion.name",
         "Promotion.description",
-        "Promotion.venueId",
         "Promotion.discount",
-        "Promotion.conditions",
-        "Promotion.stackingMode",
-        "Promotion.stackingGroup",
-        "Promotion.precedence",
         "Promotion.validFrom",
         "Promotion.validTo",
-        "Promotion.maxRedemptions",
-        "Promotion.maxRedemptionsPerGuest",
-        "Promotion.budgetCap",
-        "Promotion.id",
-        "Promotion.status"
+        "Promotion.maxRedemptionsPerGuest"
        ],
        "operation": "getPromotion",
        "provenance": "contract promotions.yaml GET /promotions/{promotionId}"
@@ -127,19 +92,13 @@
        "bindsTo": "CouponCode",
        "columns": [
         "CouponCode.code",
-        "CouponCode.campaignId",
-        "CouponCode.batchId",
         "CouponCode.status",
-        "CouponCode.assignedSubjectId",
         "CouponCode.redemptionCount",
-        "CouponCode.maxRedemptions",
         "CouponCode.discount",
         "CouponCode.invalidReason",
         "CouponCode.validFrom",
         "CouponCode.validTo",
-        "CouponCode.redeemedAt",
-        "CouponCode.redeemedOrderId",
-        "CouponCode.scopePath"
+        "CouponCode.redeemedAt"
        ],
        "operation": "getCouponCode",
        "provenance": "contract promotions.yaml GET /coupon-codes/{code}"
@@ -152,8 +111,8 @@
    "loading": "The offers promotions list.",
    "error": "Could not load. Names which read failed and leaves the offers promotions untouched.",
    "emptyFirstRun": "No offers promotions yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
-   "emptyNoResults": "Nothing matches the filter on venueId, status, activeAt and the offers promotions are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `PRICE_VIEW`, which `listPromotions` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoResults": "Never shown as a filter result: no offer is active at this venue now, said plainly.",
+   "emptyNoAccess": "**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "apis": [
@@ -206,7 +165,7 @@
     "verified": "2026-09-28",
     "match": "exact",
     "view": "Account → All screens → Wave 2 → Offers & promotions",
-    "differences": "Promo code entry is here in the prototype; the YAML puts applyCartPromoCode on GST-041."
+    "differences": "Promo code entry is here in the prototype; the YAML puts applyCartPromoCode on GST-041. **Codes are applied in the basket (GST-041), not here**: one place to apply a code (CHG-SGU-020)."
    }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",

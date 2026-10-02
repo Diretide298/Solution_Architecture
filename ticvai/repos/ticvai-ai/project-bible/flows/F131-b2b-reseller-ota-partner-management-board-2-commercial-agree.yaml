@@ -49,11 +49,11 @@ steps:
   - listCommercialAgreement
   outcome: Ready for the next screen on this board
 - step: 6
-  screen: PTR-035
-  action: Works in Commission, Margin & Incentive Management
+  screen: PTR-038
+  action: Works in Payment Terms, Billing & Account Configuration
   operations:
-  - listCommissionMarginIncentive
-  outcome: Configure how partner commissions and commercial incentives are calculated.
+  - setPaymentTermBilling
+  outcome: Define how the partner pays TICVAI and how transactions are financially grouped.
 - step: 7
   screen: PTR-032
   action: Returns to the board's landing screen
@@ -61,12 +61,11 @@ steps:
   - listCommercialAgreement
   outcome: Ready for the next screen on this board
 - step: 8
-  screen: PTR-036
-  action: Works in Credit Limit & Exposure Management
+  screen: PTR-040
+  action: Works in Booking Limits, Commercial Exceptions & Approval
   operations:
-  - listCreditLimitExposure
-  outcome: Control the financial exposure TICVAI permits for partners buying on account. This should be
-    one of the strongest finance-control screens in the B2B module.
+  - approveBookingLimitCommercial
+  outcome: Control transaction limits and provide a governed mechanism for commercial exceptions.
 - step: 9
   screen: PTR-032
   action: Returns to the board's landing screen
@@ -74,55 +73,6 @@ steps:
   - listCommercialAgreement
   outcome: Ready for the next screen on this board
 - step: 10
-  screen: PTR-037
-  action: Works in Deposit, Guarantee & Financial Security Management
-  operations:
-  - listDepositGuaranteeFinancial
-  outcome: Manage financial security required to support partner credit or commercial access.
-- step: 11
-  screen: PTR-032
-  action: Returns to the board's landing screen
-  operations:
-  - listCommercialAgreement
-  outcome: Ready for the next screen on this board
-- step: 12
-  screen: PTR-038
-  action: Works in Payment Terms, Billing & Account Configuration
-  operations:
-  - setPaymentTermBilling
-  outcome: Define how the partner pays TICVAI and how transactions are financially grouped.
-- step: 13
-  screen: PTR-032
-  action: Returns to the board's landing screen
-  operations:
-  - listCommercialAgreement
-  outcome: Ready for the next screen on this board
-- step: 14
-  screen: PTR-039
-  action: Works in Commercial Allocation, Quota & Commitment Management
-  operations:
-  - listCommercialAllocationQuota
-  outcome: Define the commercial commitment of inventory to a partner. This differs from Area 4's operational
-    channel allocation.
-- step: 15
-  screen: PTR-032
-  action: Returns to the board's landing screen
-  operations:
-  - listCommercialAgreement
-  outcome: Ready for the next screen on this board
-- step: 16
-  screen: PTR-040
-  action: Works in Booking Limits, Commercial Exceptions & Approval
-  operations:
-  - approveBookingLimitCommercial
-  outcome: Control transaction limits and provide a governed mechanism for commercial exceptions.
-- step: 17
-  screen: PTR-032
-  action: Returns to the board's landing screen
-  operations:
-  - listCommercialAgreement
-  outcome: Ready for the next screen on this board
-- step: 18
   screen: PTR-041
   action: Works in Commercial Agreement 360°, Health & AI Review
   operations:

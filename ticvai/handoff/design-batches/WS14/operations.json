@@ -70,45 +70,6 @@
   "requestBody": null,
   "responds": "Page"
  },
- "listVersioningEffectiveDate": {
-  "method": "GET",
-  "path": "/versioning-effective-date",
-  "contract": "marketing-crm",
-  "summary": "Versioning, Effective Dates & Legal Change Control",
-  "permission": "GUEST_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "formId",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "compareWith",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "status",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- },
  "setTriggerActionCross": {
   "method": "PUT",
   "path": "/trigger-action-cross",

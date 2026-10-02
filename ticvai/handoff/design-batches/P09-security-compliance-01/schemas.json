@@ -172,7 +172,7 @@
      "narrative": "**Generated prose belongs with `ai.Suggestion`.** The source's narrative / insight text (*\"Admissions are 12% above last Tuesday\"*) is model output with traceability requirements, not a way of drawing a query result.",
      "cohort": "**Not one of the eighteen.** It appears once in the source as a *usage* — *\"the Customer & Membership dashboard shall use cards, cohort and trend charts\"* — never as a specified component. A cohort view is a `matrix` or `heatmap` over a cohort dimension."
     },
-    "x-ticvai-note": "**These marks cannot yet bind data.** `ReportColumn` carries `field`, `label`, `aggregation` and `format` and **no encoding role** — no axis, series, size or colour. A `number` needs none and an eight-mark enum survived without one; a `scatter` needs x, y, size and colour, and a `combo` needs a secondary axis with stated units. **Adding `ReportColumn.role` is the harder half of this decision and is deliberately not made here** — it is the field-wells model the source's builder specifies, and it belongs with the engine and semantic-layer split that needs an ADR first.\n"
+    "x-ticvai-note": "**The marks bind through the report's column encodings** (decided 2 October 2026, Chinmay; CHG-FIN-007: build the nine). Superseding the note of 22 September, which left `ReportColumn.role` undecided. Each column of the tile's report carries `role` and `encoding` (and `axis`, `seriesType`, `hierarchyLevel`, `unitLabel` where the mark needs them), and `createDashboard` / `updateDashboard` refuse 422 `tile-encoding-missing` a tile whose report lacks what its mark requires:\n\n| Mark | Requires | |---|---| | `combo` | one `x` dimension; two or more measures, each with `axis` and `seriesType`; `unitLabel` on a secondary axis | | `matrix` | `row` dimensions (with `hierarchyLevel`), optional `column` dimensions, one or more `value` measures | | `funnel` | one `stage` dimension in order (`sortOrder`), one `value` measure | | `waterfall` | one `category` dimension of ordered steps, one `value` measure; the steps are a named measure set (for example Gross sales, Discounts, Refunds, Net revenue) and the last is the total | | `treemap` | one or more `category` dimensions with `hierarchyLevel`, one `size` measure, optional `colour` measure | | `scatter` | an `x` and a `y` measure, a `label` dimension, optional `size` and `colour` | | `map` | one `location` dimension (venue, zone or venue-map point), one `value` measure | | `ribbon` | an `x` dimension (period), a `series` dimension, one `value` measure (rank flow) | | `decompositionTree` | one `value` measure and two or more dimensions with `hierarchyLevel` |\n\nThe other eleven marks bind as before (`number` one measure; `line`, `area`, `bar` and the stacked bars an `x` dimension, optional `series`, one or more `y` measures; `pie`, `donut`, `gauge`, `heatmap`, `table` as their names). **Unchanged**: at most 24 tiles a dashboard, and every tile shows its as-of time and goes stale past its refresh (`KpiValue.asOf`, `stale`; BOARDREQ MOM-2713/2714).\n"
    },
    "parameters": {
     "type": "object",
@@ -206,6 +206,32 @@
       "type": "integer"
      }
     }
+   }
+  }
+ },
+ "LocalisedText": {
+  "x-ticvai-persistence": "none — jsonb column",
+  "type": "object",
+  "additionalProperties": {
+   "type": "string"
+  }
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
    }
   }
  },
@@ -395,7 +421,27 @@
    "PROCUREMENT_VIEW",
    "PROCUREMENT_REQUEST",
    "PROCUREMENT_MANAGE",
-   "PROCUREMENT_RECEIVE"
+   "PROCUREMENT_RECEIVE",
+   "CORE_AI_PUBLISH",
+   "TICKETING_AI_PUBLISH",
+   "ACCESS_AI_PUBLISH",
+   "FNB_AI_PUBLISH",
+   "RETAIL_AI_PUBLISH",
+   "INVENTORY_AI_PUBLISH",
+   "SEATING_AI_PUBLISH",
+   "MEMBERSHIP_AI_PUBLISH",
+   "MARKETING_AI_PUBLISH",
+   "RESOURCES_AI_PUBLISH",
+   "QUEUE_AI_PUBLISH",
+   "TRANSPORT_AI_PUBLISH",
+   "GAMES_AI_PUBLISH",
+   "MAINTENANCE_AI_PUBLISH",
+   "ACCREDITATION_AI_PUBLISH",
+   "PARTNER_AI_PUBLISH",
+   "ANALYTICS_AI_PUBLISH",
+   "BIOMETRIC_IMAGE_VIEW",
+   "ACCESS_DIRECTION_SET",
+   "REPORT_GOVERNANCE_MANAGE"
   ]
  },
  "PlatformStaffGrant": {
@@ -513,6 +559,135 @@
     "description": "Replica position the result was read at. Reporting reads a lag-tolerant replica, so this may trail the primary by seconds — stating it prevents an argument about a figure that moved.\n"
    }
   }
+ },
+ "SuspensionMode": {
+  "type": "string",
+  "description": "Access validation continues under every mode. A commercial dispute must not strand guests at a gate holding valid tickets.\n",
+  "enum": [
+   "readOnly",
+   "noNewSales",
+   "fullLockout"
+  ]
+ },
+ "Tenant": {
+  "x-ticvai-persistence": "control.tenant",
+  "type": "object",
+  "required": [
+   "id",
+   "code",
+   "name",
+   "status",
+   "createdAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "status": {
+    "$ref": "#/components/schemas/TenantStatus"
+   },
+   "suspensionMode": {
+    "$ref": "#/components/schemas/SuspensionMode"
+   },
+   "suspensionReason": {
+    "type": "string",
+    "nullable": true
+   },
+   "suspensionEffectiveAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "When the suspension takes, or took, effect — `suspendTenant.effectiveAt`. **A future value is a pending suspension**: the tenant stays `active` until then, and this row is the only place that says a suspension is coming."
+   },
+   "suspensionNoticeMessage": {
+    "$ref": "#/components/schemas/LocalisedText",
+    "description": "The notice shown to the tenant's users about the suspension — `suspendTenant.noticeMessage`."
+   },
+   "terminationScheduledAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "When `terminateTenant` started the retention window. Null when no termination is under way."
+   },
+   "terminationRetentionUntil": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "`terminationScheduledAt` plus the request's `retentionDays`. **Stored, not recomputed** — the day count is client-supplied and exists nowhere else, and this is the date the cells are destroyed after."
+   },
+   "terminationReason": {
+    "type": "string",
+    "maxLength": 1000,
+    "nullable": true
+   },
+   "terminationRequestedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "planId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "planName": {
+    "type": "string",
+    "nullable": true
+   },
+   "cellCount": {
+    "type": "integer"
+   },
+   "venueCount": {
+    "type": "integer"
+   },
+   "regionId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The tenant's home region: the `tenancy` region node whose `RegionSettings` govern tenant-wide gates, today `allowedAiResidencies` (decided 28 September, audit R203). Written by the server when the tenant's first region is created; null until then. ADM-037 reads it to show the region's residency restriction, and `ai.setAiProvider` checks against the same region.\n"
+   },
+   "billingEmail": {
+    "type": "string"
+   },
+   "billingAddress": {
+    "type": "string",
+    "maxLength": 500,
+    "nullable": true,
+    "description": "Accepted by `createTenant` and `updateTenant`; stored here so the response can return what was sent."
+   },
+   "accountManagerPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "activatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "TenantStatus": {
+  "type": "string",
+  "enum": [
+   "onboarding",
+   "active",
+   "suspended",
+   "terminating",
+   "terminated"
+  ]
  },
  "WafRule": {
   "type": "object",

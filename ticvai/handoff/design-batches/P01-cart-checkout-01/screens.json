@@ -374,11 +374,11 @@
     "verified": "2026-09-28",
     "match": "partial",
     "view": "Visible on every booking step as the cart sidebar (Config → Layout & locale → 'Cart & summary' changes it to slide-in, bottom sheet, floating icon or single column)",
-    "differences": "Not a separate screen: a persistent sidebar/drawer through the stepper, with a Rev 3 option to mirror it in Arabic. No 'extend hold' action (extendCart) — only hold timers on the seat step. Exit-intent dialog (exit.open) is a prototype addition."
+    "differences": "Not a separate screen: a persistent sidebar/drawer through the stepper, with a Rev 3 option to mirror it in Arabic. No 'extend hold' action (extendCart) — only hold timers on the seat step. Exit-intent dialog (exit.open) is a prototype addition. **Draw the countdown with More time (`extendCart`) on the basket**, although the prototype has no extend action and times only the seat step (CHG-SGU-020)."
    }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
-  "notes": "**Rev 3 (decided 29 September).** Visit date per line (23SEP-9). **Layout (REV3-10):** `cartLayout` may be `floatingIcon` (a round basket button with the count); in Arabic the cart stays on the right unless `cartSideInRtl` is `mirror` (default `keepRight`). **A line holding a cabana or spot from the venue map** (`resourceHoldId`) counts down from its `ResourceHold.expiresAt` (REV3-15). **Consent (REV3-26):** `checkoutCart` answers `422 consentRequired` while a required consent question is unanswered, and `consentAnswerBlocks` when an answer blocks a line; both send the guest back to the questions (WEB-006 pop-up, or WEB-011 for a flow with no date step). Promo code and abandon are declared (`applyCartPromoCode`, `abandonCart`; GAP-B3, already). Every booking-flow setting named here is read from `getTenantConfig` `bookingFlow`, resolved for the venue the guest picked (audit R267): the tenant's values with that venue's `venueOverrides` entry laid over field by field (decided 29 September, rev 3 CFG-11).\n\n**The step order comes from the published booking flow** (W12, 29 September): `getPublishedBookingFlow` returns the flow the product (or its category, else the venue default for its kind) uses, with its enabled steps in `sortOrder`; this screen renders when that flow has its step and in the order the flow gives. Flow-level settings (`performanceReveal`, `signInAt`, `seatEventDateMode`, `extrasStep`, `quickTour`, `consentQuestionIds`) are read from the flow; venue-wide settings stay on `getTenantConfig` `bookingFlow`.",
+  "notes": "**Rev 3 (decided 29 September).** Visit date per line (23SEP-9). **Layout (REV3-10):** `cartLayout` may be `floatingIcon` (a round basket button with the count); in Arabic the cart stays on the right unless `cartSideInRtl` is `mirror` (default `keepRight`). **A line holding a cabana or spot from the venue map** (`resourceHoldId`) counts down from its `ResourceHold.expiresAt` (REV3-15). **Consent (REV3-26):** `checkoutCart` answers `422 consentRequired` while a required consent question is unanswered, and `consentAnswerBlocks` when an answer blocks a line; both send the guest back to the questions (WEB-006 pop-up, or WEB-011 for a flow with no date step). Promo code and abandon are declared (`applyCartPromoCode`, `abandonCart`; GAP-B3, already). Every booking-flow setting named here is read from `getTenantConfig` `bookingFlow`, resolved for the venue the guest picked (audit R267): the tenant's values with that venue's `venueOverrides` entry laid over field by field (decided 29 September, rev 3 CFG-11).\n\n**The step order comes from the published booking flow** (W12, 29 September): `getPublishedBookingFlow` returns the flow the product (or its category, else the venue default for its kind) uses, with its enabled steps in `sortOrder`; this screen renders when that flow has its step and in the order the flow gives. Flow-level settings (`performanceReveal`, `signInAt`, `seatEventDateMode`, `extrasStep`, `quickTour`, `consentQuestionIds`) are read from the flow; venue-wide settings stay on `getTenantConfig` `bookingFlow`.\n\n**The guest selects the currency and pays in it** (decided 2 October 2026, Chinmay; CHG-FIN-001; reverses the display-only rule, CF-37 and \"payment will be processed in AED\", in favour of option (b) of MoM 10 Aug 2026 4.7, DI-211). The venue lists the currencies a guest may pay in (`VenueSettings.chargeCurrencies`, a subset of the currencies it shows); `listFxRates` with `chargeable=true` returns them, each marked `chargeable`. The selected currency is sent at checkout (`checkoutCart.chargeCurrency`), the rate is locked on the order (`Order.chargeFxRate`, `chargeTotal`, until `chargeRateLockedUntil`), and the payment request goes to the payment partner in that currency. The ledger stays in the venue's base currency, with the rate recorded on the order, the payment and any refund. **Refunds go back in the currency paid**, at the sale rate, so a full refund returns exactly what was charged. A currency the venue shows but does not charge is still an approximate price, marked \"approx.\", with \"You pay in <base currency>\" beside it. **On the cart:** prices show in the selected currency, marked approx. until checkout locks the rate.",
   "_platform": {
    "code": "P01",
    "audience": "guest",
@@ -479,68 +479,38 @@
      "slot": "collection",
      "components": [
       {
-       "kind": "dataTable",
-       "label": "Every guest device",
-       "bindsTo": "GuestDevice",
-       "columns": [
-        "GuestDevice.id",
-        "GuestDevice.subjectId",
-        "GuestDevice.platform",
-        "GuestDevice.tokenFingerprint",
-        "GuestDevice.appVersion",
-        "GuestDevice.osVersion",
-        "GuestDevice.deviceModel",
-        "GuestDevice.locale",
-        "GuestDevice.status",
-        "GuestDevice.failureCount",
-        "GuestDevice.registeredAt",
-        "GuestDevice.lastSeenAt"
-       ],
-       "operation": "listGuestDevices",
-       "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}/devices"
-      },
-      {
-       "kind": "dataTable",
-       "label": "Every consent purpose config",
-       "bindsTo": "ConsentPurposeConfig",
-       "columns": [
-        "ConsentPurposeConfig.purpose",
-        "ConsentPurposeConfig.displayName",
-        "ConsentPurposeConfig.description",
-        "ConsentPurposeConfig.channels",
-        "ConsentPurposeConfig.noticeVersion",
-        "ConsentPurposeConfig.isRequiredForService",
-        "ConsentPurposeConfig.expiresAfterMonths"
-       ],
-       "operation": "listConsentPurposes",
-       "provenance": "contract marketing-crm.yaml GET /consent-purposes"
-      },
-      {
        "kind": "textField",
        "label": "Full name",
-       "provenance": "carried from the previous definition"
+       "provenance": "carried from the previous definition",
+       "operation": "getMyProfile"
       },
       {
        "kind": "textField",
        "label": "Email",
-       "provenance": "carried from the previous definition"
+       "provenance": "carried from the previous definition",
+       "operation": "getMyProfile"
       },
       {
        "kind": "textField",
        "label": "Mobile",
-       "provenance": "carried from the previous definition"
+       "provenance": "carried from the previous definition",
+       "operation": "getMyProfile"
       },
       {
        "kind": "detailPanel",
-       "bindsTo": "EntitlementTemplate.isNameBound",
-       "notes": "Per-attendee fields appear only where the entitlement is name-bound. Most are not — identity and entitlement are separate concerns",
-       "provenance": "carried from the previous definition"
+       "bindsTo": "Cart.lines",
+       "notes": "One block per holder, titled \"Ticket 2 of 4 - Child\", only for lines whose ticket is name-bound; the buyer is separate from the holders.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)",
+       "operation": "getCart",
+       "label": "Ticket holder details"
       },
       {
        "kind": "consentBlock",
        "bindsTo": "ConsentPurposeConfig[]",
-       "notes": "Marketing consent is opt-in and unticked. Transactional is required for service and is presented differently, not as a choice dressed as one",
-       "provenance": "carried from the previous definition"
+       "notes": "One unticked checkbox per configured marketing channel and purpose, beside the terms, never pre-ticked. The ticks travel with checkout as `marketingConsents[]` and are recorded by `recordCheckoutConsents` with source checkout, bound to the order and the verified contact (M18-15); nothing is recorded from this step, so an unpaid order records no consent.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)",
+       "label": "Send me offers and news",
+       "operation": "listConsentPurposes"
       },
       {
        "kind": "consentBlock",
@@ -558,73 +528,8 @@
         "BookingFlow.steps"
        ],
        "operation": "getPublishedBookingFlow",
-       "notes": "The steps of the published flow in their `sortOrder`, this one (details) highlighted. A step the flow has turned off is not shown and is skipped by Continue and Back.",
+       "notes": "The steps of the published flow in their `sortOrder`, this one (details) highlighted. A step the flow has turned off is not shown and is skipped by Continue and Back. Drawn in the venue's `BookingFlowSettings.stepIndicator` style; `embedMode` and `singleEventPage` come from the same published settings (CMS-016) (CHG-SGU-022).",
        "provenance": "decided 29 September 2026, W12; CMS-103 Booking Flows"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected guest device",
-       "bindsTo": "GuestDevice",
-       "columns": [
-        "GuestDevice.id",
-        "GuestDevice.subjectId",
-        "GuestDevice.platform",
-        "GuestDevice.tokenFingerprint",
-        "GuestDevice.tokenRef",
-        "GuestDevice.appVersion",
-        "GuestDevice.osVersion",
-        "GuestDevice.deviceModel",
-        "GuestDevice.locale",
-        "GuestDevice.status",
-        "GuestDevice.failureCount",
-        "GuestDevice.registeredAt",
-        "GuestDevice.lastSeenAt",
-        "GuestDevice.revokedAt"
-       ],
-       "operation": "listGuestDevices",
-       "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}/devices"
-      },
-      {
-       "kind": "detailPanel",
-       "label": "The guest profile",
-       "bindsTo": "GuestProfileDetail",
-       "columns": [
-        "GuestProfileDetail.id",
-        "GuestProfileDetail.subjectId",
-        "GuestProfileDetail.displayName",
-        "GuestProfileDetail.email",
-        "GuestProfileDetail.phone",
-        "GuestProfileDetail.preferredLanguage",
-        "GuestProfileDetail.preferredChannel",
-        "GuestProfileDetail.guestLinkId",
-        "GuestProfileDetail.tags",
-        "GuestProfileDetail.engagementScore",
-        "GuestProfileDetail.engagementTier",
-        "GuestProfileDetail.lifetimeValue",
-        "GuestProfileDetail.visitCount",
-        "GuestProfileDetail.lastVisitAt",
-        "GuestProfileDetail.isActive",
-        "GuestProfileDetail.mergedIntoSubjectId"
-       ],
-       "operation": "getGuestProfile",
-       "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}"
-      },
-      {
-       "kind": "detailPanel",
-       "label": "The wishlist",
-       "bindsTo": "Wishlist",
-       "columns": [
-        "Wishlist.subjectId",
-        "Wishlist.items"
-       ],
-       "operation": "getWishlist",
-       "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}/wishlist"
       }
      ]
     },
@@ -633,46 +538,10 @@
      "slot": "rowActions",
      "components": [
       {
-       "kind": "primaryButton",
-       "label": "Add to wishlist",
-       "operation": "addToWishlist",
-       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/wishlist"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Record consent",
-       "operation": "recordConsent",
-       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/consents"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Register guest device",
-       "operation": "registerGuestDevice",
-       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/devices"
-      },
-      {
-       "kind": "destructiveButton",
-       "label": "Remove from wishlist",
-       "operation": "removeFromWishlist",
-       "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/wishlist/{itemId}"
-      },
-      {
-       "kind": "destructiveButton",
-       "label": "Revoke guest device",
-       "operation": "revokeGuestDevice",
-       "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/devices/{deviceId}"
-      },
-      {
        "kind": "secondaryButton",
        "label": "Save my profile",
        "operation": "updateMyProfile",
        "provenance": "contract marketing-crm.yaml PATCH /guests/me/profile"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Upload guest document",
-       "operation": "uploadGuestDocument",
-       "provenance": "contract marketing-crm.yaml POST /guest-documents"
       },
       {
        "kind": "primaryButton",
@@ -684,110 +553,6 @@
    ]
   },
   "overlays": [
-   {
-    "id": "confirmRemoveFromWishlist",
-    "component": "confirmDialog",
-    "trigger": "Remove from wishlist",
-    "body": "**Names what `removeFromWishlist` changes and what it leaves alone**, in the consequence rather than the verb. A guest attendee forms this affects should be identified in the dialog, not just counted.",
-    "provenance": "client-verified"
-   },
-   {
-    "id": "confirmRevokeGuestDevice",
-    "component": "confirmDialog",
-    "trigger": "Revoke guest device",
-    "body": "**Names what `revokeGuestDevice` changes and what it leaves alone**, in the consequence rather than the verb. A guest attendee forms this affects should be identified in the dialog, not just counted.",
-    "provenance": "client-verified"
-   },
-   {
-    "id": "formUploadGuestDocument",
-    "component": "modal",
-    "trigger": "Upload guest document",
-    "body": "**Collects what `uploadGuestDocument` sends before it is called.** Required: `id`, `subjectId`, `kind`, `storageRef`, `retainUntil`. Optional: `contentType`, `consentPurposeId`, `uploadedAt`, `uploadedByPrincipalId`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "GuestDocument",
-    "confirm": {
-     "label": "Upload guest document",
-     "operation": "uploadGuestDocument"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "id",
-      "subjectId",
-      "kind",
-      "storageRef",
-      "retainUntil",
-      "contentType",
-      "consentPurposeId",
-      "uploadedAt",
-      "uploadedByPrincipalId"
-     ]
-    },
-    "provenance": "client-verified"
-   },
-   {
-    "id": "formAddToWishlist",
-    "component": "modal",
-    "trigger": "Add to wishlist",
-    "body": "**Collects what `addToWishlist` sends before it is called.** Required: `variantId`. Optional: `performanceId`, `note`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Add to wishlist",
-     "operation": "addToWishlist"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "variantId",
-      "performanceId",
-      "note"
-     ]
-    },
-    "provenance": "client-verified"
-   },
-   {
-    "id": "formRecordConsent",
-    "component": "modal",
-    "trigger": "Record consent",
-    "body": "**Collects what `recordConsent` sends before it is called.** Required: `purpose`, `decision`, `noticeVersion`, `source`, `recordedAt`. Optional: `channels`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "RecordConsentRequest",
-    "confirm": {
-     "label": "Record consent",
-     "operation": "recordConsent"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "purpose",
-      "decision",
-      "noticeVersion",
-      "source",
-      "recordedAt",
-      "channels"
-     ]
-    },
-    "provenance": "client-verified"
-   },
-   {
-    "id": "formRegisterGuestDevice",
-    "component": "modal",
-    "trigger": "Register guest device",
-    "body": "**Collects what `registerGuestDevice` sends before it is called.** Required: `platform`, `token`. Optional: `appVersion`, `osVersion`, `deviceModel`, `locale`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Register guest device",
-     "operation": "registerGuestDevice"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "platform",
-      "token",
-      "appVersion",
-      "osVersion",
-      "deviceModel",
-      "locale"
-     ]
-    },
-    "provenance": "client-verified"
-   },
    {
     "id": "formUpdateMyProfile",
     "component": "modal",
@@ -815,75 +580,12 @@
   "states": {
    "loading": "The guest attendee forms list.",
    "error": "Could not load. Names which read failed and leaves the guest attendee forms untouched.",
-   "emptyFirstRun": "No guest attendee forms yet. Offers Add to wishlist (`addToWishlist`).",
+   "emptyFirstRun": "Nothing to fill in: continue to payment. The step is normally skipped when the cart needs no details, holders or consent answers (F01 step 6).",
    "emptyNoResults": "Never shown: `listGuestDevices` takes no filter, so an empty list is always the first-run state above.",
    "emptyNoAccess": "**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**Not available, and the offline banner says why.** A payment needs the gateway, and pretending otherwise takes money nobody can confirm. What was typed stays on screen so nothing is entered twice."
   },
   "apis": [
-   {
-    "operationId": "addToWishlist",
-    "contract": "marketing-crm",
-    "purpose": "Save an item",
-    "trigger": "onAction",
-    "invalidates": [
-     "listGuestDevices"
-    ]
-   },
-   {
-    "operationId": "getWishlist",
-    "contract": "marketing-crm",
-    "purpose": "Read a guest's saved items",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "listGuestDevices",
-    "contract": "marketing-crm",
-    "purpose": "A guest's registered devices",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "recordConsent",
-    "contract": "marketing-crm",
-    "purpose": "Record a consent decision",
-    "trigger": "onAction",
-    "invalidates": [
-     "listGuestDevices"
-    ]
-   },
-   {
-    "operationId": "registerGuestDevice",
-    "contract": "marketing-crm",
-    "purpose": "Register a device for push",
-    "trigger": "onAction",
-    "invalidates": [
-     "listGuestDevices"
-    ]
-   },
-   {
-    "operationId": "removeFromWishlist",
-    "contract": "marketing-crm",
-    "purpose": "Remove a saved item",
-    "trigger": "onAction",
-    "invalidates": [
-     "listGuestDevices"
-    ]
-   },
-   {
-    "operationId": "revokeGuestDevice",
-    "contract": "marketing-crm",
-    "purpose": "Revoke a device registration",
-    "trigger": "onAction",
-    "invalidates": [
-     "listGuestDevices"
-    ]
-   },
-   {
-    "operationId": "getGuestProfile",
-    "contract": "marketing-crm",
-    "purpose": "Read a guest profile",
-    "trigger": "onLoad"
-   },
    {
     "operationId": "listConsentPurposes",
     "contract": "marketing-crm",
@@ -894,15 +596,6 @@
     "operationId": "updateMyProfile",
     "contract": "marketing-crm",
     "purpose": "A guest correcting their own details",
-    "trigger": "onAction",
-    "invalidates": [
-     "listGuestDevices"
-    ]
-   },
-   {
-    "operationId": "uploadGuestDocument",
-    "contract": "marketing-crm",
-    "purpose": "Provide a document a booking requires",
     "trigger": "onAction"
    },
    {
@@ -926,18 +619,16 @@
     "purpose": "The published booking flow for this product: which steps it has and in what order (W12)",
     "trigger": "onLoad",
     "provenance": "decided 29 September 2026, W12"
+   },
+   {
+    "operationId": "getMyProfile",
+    "contract": "marketing-crm",
+    "purpose": "Prefill the buyer's contact from their own profile",
+    "trigger": "onLoad"
    }
   ],
   "entryState": {
    "params": [
-    {
-     "name": "deviceId",
-     "from": "deepLink"
-    },
-    {
-     "name": "itemId",
-     "from": "deepLink"
-    },
     {
      "name": "subjectId",
      "from": "session"
@@ -974,6 +665,13 @@
    }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 10 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "gaps": [
+   {
+    "operation": "uploadGuestDocument",
+    "why": "An identity document a ticket requires cannot be uploaded end to end: uploadGuestDocument needs a storageRef that no operation issues, so the upload control is hidden until the document-store upload operation exists (CHG-SGU-024).",
+    "source": "contracts/satellite/marketing-crm.yaml#uploadGuestDocument"
+   }
+  ],
   "_platform": {
    "code": "P01",
    "audience": "guest",
@@ -1043,7 +741,7 @@
     {
      "to": "WEB-011",
      "trigger": "Guest Details & Attendee Forms",
-     "provenance": "derived — WEB-011 declares entryState.params deviceId, itemId and WEB-012 holds none of them. The edge carries nothing: WEB-012 is opened from WEB-011, so this edge is the way back and WEB-011 keeps its own state"
+     "provenance": "derived — WEB-011 declares entryState.params  and WEB-012 holds none of them. The edge carries nothing: WEB-012 is opened from WEB-011, so this edge is the way back and WEB-011 keeps its own state"
     },
     {
      "to": "WEB-016",
@@ -1064,7 +762,7 @@
     }
    ]
   },
-  "notes": "The unknown outcome is the one to build for. A payment taken but never confirmed must offer inquiry, not a retry — a retry double-charges and the guest finds out. **Card or wallet** (TenderKind `card`, `wallet`; decided 28 September, audit R080 (a)), **both in base currency, so tender currency equals base currency.** A guest paying with a foreign card is converted by their own issuer at their own rate — that is not our conversion and is not recorded as one. The displayed comparison price (`WEB-035`) and the charged amount are different numbers and the screen says so before the guest commits. **Wired 24 August from review**: getOrder. **The operations existed and this screen could not call them** — reviewers reported them as missing APIs, which is what an unreachable operation looks like from a wireframe. **No 'is this you?' at checkout** (decided 28 September, audit R120 (b)): a verified contact that matches an existing profile attaches the order automatically inside `checkoutCart` (ADR-0045), so `checkGuestCheckoutMatch` and `decideGuestCheckoutMatch` were removed from this screen; only unverified matches go to staff review.\n\n**Rev 3 (decided 29 September, rev 3 REV3-3).** With `BookingFlowConfig.signInAt` `atPayment` the sign-in or guest-code gate is here rather than at the Add-ons exit; the basket is kept. Unknown and declined payment outcomes are declared (`inquirePaymentStatus`; GAP-B3, already).\n\n**The step order comes from the published booking flow** (W12, 29 September): `getPublishedBookingFlow` returns the flow the product (or its category, else the venue default for its kind) uses, with its enabled steps in `sortOrder`; this screen renders when that flow has its step and in the order the flow gives. Flow-level settings (`performanceReveal`, `signInAt`, `seatEventDateMode`, `extrasStep`, `quickTour`, `consentQuestionIds`) are read from the flow; venue-wide settings stay on `getTenantConfig` `bookingFlow`.\n\n**29 September.** W1: a guest who proved the contact with the code arrives here from the cart (WEB-011 skipped) and only ticks the T&Cs. M18-15: unticked marketing opt-in.",
+  "notes": "The unknown outcome is the one to build for. A payment taken but never confirmed must offer inquiry, not a retry — a retry double-charges and the guest finds out. **Card or wallet** (TenderKind `card`, `wallet`; decided 28 September, audit R080 (a)), **both in base currency, so tender currency equals base currency.** A guest paying with a foreign card is converted by their own issuer at their own rate — that is not our conversion and is not recorded as one. The displayed comparison price (`WEB-035`) and the charged amount are different numbers and the screen says so before the guest commits. **Wired 24 August from review**: getOrder. **The operations existed and this screen could not call them** — reviewers reported them as missing APIs, which is what an unreachable operation looks like from a wireframe. **No 'is this you?' at checkout** (decided 28 September, audit R120 (b)): a verified contact that matches an existing profile attaches the order automatically inside `checkoutCart` (ADR-0045), so `checkGuestCheckoutMatch` and `decideGuestCheckoutMatch` were removed from this screen; only unverified matches go to staff review.\n\n**Rev 3 (decided 29 September, rev 3 REV3-3).** With `BookingFlowConfig.signInAt` `atPayment` the sign-in or guest-code gate is here rather than at the Add-ons exit; the basket is kept. Unknown and declined payment outcomes are declared (`inquirePaymentStatus`; GAP-B3, already).\n\n**The step order comes from the published booking flow** (W12, 29 September): `getPublishedBookingFlow` returns the flow the product (or its category, else the venue default for its kind) uses, with its enabled steps in `sortOrder`; this screen renders when that flow has its step and in the order the flow gives. Flow-level settings (`performanceReveal`, `signInAt`, `seatEventDateMode`, `extrasStep`, `quickTour`, `consentQuestionIds`) are read from the flow; venue-wide settings stay on `getTenantConfig` `bookingFlow`.\n\n**29 September.** W1: a guest who proved the contact with the code arrives here from the cart (WEB-011 skipped) and only ticks the T&Cs. M18-15: unticked marketing opt-in.\n\n**The guest selects the currency and pays in it** (decided 2 October 2026, Chinmay; CHG-FIN-001; reverses the display-only rule, CF-37 and \"payment will be processed in AED\", in favour of option (b) of MoM 10 Aug 2026 4.7, DI-211). The venue lists the currencies a guest may pay in (`VenueSettings.chargeCurrencies`, a subset of the currencies it shows); `listFxRates` with `chargeable=true` returns them, each marked `chargeable`. The selected currency is sent at checkout (`checkoutCart.chargeCurrency`), the rate is locked on the order (`Order.chargeFxRate`, `chargeTotal`, until `chargeRateLockedUntil`), and the payment request goes to the payment partner in that currency. The ledger stays in the venue's base currency, with the rate recorded on the order, the payment and any refund. **Refunds go back in the currency paid**, at the sale rate, so a full refund returns exactly what was charged. A currency the venue shows but does not charge is still an approximate price, marked \"approx.\", with \"You pay in <base currency>\" beside it. **On this screen:** the total shows in the selected currency with the base amount and the rate beneath (\"USD 81.72 · AED 300.00 at 3.6710, held until 14:25\"); when the hold lapses the amount is re-quoted and the guest confirms the new figure before paying. The earlier rule above (\"both in base currency, so tender currency equals base currency\") is superseded for card and wallet.",
   "openQuestions": [
    "Sandbox credentials for Stripe and Network International are outstanding. The recovery paths cannot be tested without them."
   ],
@@ -1093,7 +791,11 @@
         "Order.netAmount",
         "Order.refundedAmount",
         "Order.lines",
-        "Order.payments"
+        "Order.payments",
+        "Order.chargeCurrency",
+        "Order.chargeTotal",
+        "Order.chargeFxRate",
+        "Order.chargeRateLockedUntil"
        ],
        "operation": "getOrder",
        "provenance": "contract orders.yaml GET /orders/{orderId}"
@@ -1111,7 +813,7 @@
         "BookingFlow.steps"
        ],
        "operation": "getPublishedBookingFlow",
-       "notes": "The steps of the published flow in their `sortOrder`, this one (payment) highlighted. A step the flow has turned off is not shown and is skipped by Continue and Back.",
+       "notes": "The steps of the published flow in their `sortOrder`, this one (payment) highlighted. A step the flow has turned off is not shown and is skipped by Continue and Back. Drawn in the venue's `BookingFlowSettings.stepIndicator` style; `embedMode` and `singleEventPage` come from the same published settings (CMS-016) (CHG-SGU-022).",
        "provenance": "decided 29 September 2026, W12; CMS-103 Booking Flows"
       },
       {
@@ -1239,7 +941,7 @@
     "verified": "2026-09-28",
     "match": "partial",
     "view": "Book → 'Payment' step; Config → Layout & locale → 'Payment outcome (demo)' = Interrupted / Declined for the failure states; Config → Steps & cards → 'Guest checkout (code proof)' for the guest route",
-    "differences": "Contradicts 28 Sep decisions: YAML allows card or wallet only (R080) — prototype offers Apple Pay, Tabby split-in-4, pay on arrival and invoice/PO; YAML removed the 'is this you?' match at checkout (R120 b) — prototype still asks the guest to link or keep separate. The unknown-outcome inquiry state matches the YAML ('We couldn't confirm this payment yet… you won't be charged twice')."
+    "differences": "Contradicts 28 Sep decisions: YAML allows card or wallet only (R080) — prototype offers Apple Pay, Tabby split-in-4, pay on arrival and invoice/PO; YAML removed the 'is this you?' match at checkout (R120 b) — prototype still asks the guest to link or keep separate. The unknown-outcome inquiry state matches the YAML ('We couldn't confirm this payment yet… you won't be charged twice'). **Draw card, Apple Pay, Google Pay and wallet only** (R080, 28 September); Tabby split-in-4, pay on arrival and invoice/PO are not in the first release (CHG-SGU-020)."
    }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
@@ -1321,7 +1023,7 @@
     {
      "to": "WEB-011",
      "trigger": "Guest Details & Attendee Forms",
-     "provenance": "derived — WEB-011 declares entryState.params deviceId, itemId and WEB-013 holds none of them. The edge carries nothing: deviceId, itemId only pre-select (deep link or optional), and WEB-011 opens on its own"
+     "provenance": "derived — WEB-011 declares entryState.params  and WEB-013 holds none of them. The edge carries nothing: WEB-011 needs nothing to open"
     },
     {
      "to": "WEB-012",
@@ -1405,6 +1107,13 @@
        "label": "Transfer tickets",
        "notes": "Opens Ticket Transfer (WEB-030 on the web, GST-014 in the app), after the tickets.",
        "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Set a password",
+       "operation": "linkGuestCheckout",
+       "notes": "Offered after a guest checkout: keeps these tickets in an account.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-020, design-notes correction)"
       }
      ]
     }
@@ -1429,6 +1138,12 @@
     "contract": "orders",
     "purpose": "Reprint or resend tickets",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "linkGuestCheckout",
+    "contract": "identity",
+    "purpose": "Set a password: turn the guest-checkout order into an account (parity with GST-010)",
+    "trigger": "onAction"
    }
   ],
   "entryState": {
@@ -1450,7 +1165,7 @@
     "verified": "2026-09-28",
     "match": "exact",
     "view": "Book → final step 'Confirmed' after paying",
-    "differences": "Prototype adds editing attendee details after purchase ('Change your details', signed-in only) and Reissue QR. No 'unpaid — pay now' route to WEB-014."
+    "differences": "Prototype adds editing attendee details after purchase ('Change your details', signed-in only) and Reissue QR. No 'unpaid — pay now' route to WEB-014. **Leave out** editing attendee details after purchase and Reissue QR: no operation on this screen declares them (CHG-SGU-020)."
    }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
@@ -1475,6 +1190,20 @@
      ]
     },
     "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
+   },
+   {
+    "id": "formLinkGuestCheckout",
+    "component": "modal",
+    "trigger": "Set a password",
+    "body": "A password for the account; the order and the verified contact come from the checkout just made.",
+    "confirm": {
+     "label": "Set a password",
+     "operation": "linkGuestCheckout"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "corrected 2 October 2026 (CHG-SGU-020, design-notes correction)"
    }
   ],
   "gaps": [

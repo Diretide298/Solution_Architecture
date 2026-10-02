@@ -1,6 +1,6 @@
 # P02-in-venue-experience-01 — P02 · In-Venue Experience
 
-**2 screens · 3 operations · 5 schemas · 2 permissions**
+**2 screens · 2 operations · 4 schemas · 1 permissions**
 
 Platform P02 Guest App · ships as **guest** ·
 guest audience · mobileApp ·
@@ -48,8 +48,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 2 permissions apply here:
-  `ORDER_VIEW, PRODUCT_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 1 permissions apply here:
+  `ORDER_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
 - **0 of these operations work offline**
   
@@ -63,18 +63,50 @@ convincingly. It is never a caption.
   and its error; and, element by element, what is shown and in what format, what each action
   produces and where the user goes next. Draw exactly that.
 
+## The processes these screens belong to
+
+Written by the owner of each process (`handoff/design-notes/`). Read before any screen: it says how the process runs end to end and which words the screens must use.
+
+### Food, Beverage & Retail
+
+Food & beverage, retail, rentals, inventory and procurement across the till (P04), the kitchen display (P15), the staff app (P06), Venue Management (P08), the guest web and app (P01/P02), the kiosk (P05) and the CMS (P13). COUNTER SERVICE (F108): the cashier takes the order on the Food & Drink board from the outlet's menu in force (sections in the outlet's order, option groups attached to the item), sends it to the kitchen, and only then charges — send to kitchen, then charge, for every POS F&B order (R261, upheld against the v2 frame by POSV2-4). The kitchen ticket is on the rail while the card is in the guest's hand; an unpaid sent order is cancelled while ordered or accepted and voided with a reason after (R125(3), R091(5)); the guest gets an order number, and the customer-facing status board (numbers only) is the kitchen display's KIT-007, mirrored on the till's queue (POSV2-7). TABLE SERVICE (F29, F80, F94): a party is seated with its covers, orders across the visit, courses are fired by the pass (DI-333, DI-407), the bill is printed and settled at the end and split by amount, covers, category, item or seat (DI-106); the client's table statuses are Available → Ordered → Table closed → Reserved with no cleaning status (DI-336); moving and merging tables stay on the staff app until after r2 (POSV2-8). GUEST ORDERING (F11, F48): a guest inside the venue orders in the app or web for pickup or delivery to a seat or a scanned location (DI-288, DI-291); F&B and retail are optional licensed modules completed inside TICVAI (DI-505), kept simple (DI-1091); no food without an admission ticket (DI-292); table reservations and the waitlist do not go through the cart and a dining deposit is a venue option, off by default (DI-1048, DI-1049, R077). KITCHEN (P15, F83, F88): TICVAI's own display on commodity screens (19 September, replacing the 31 July "integration point only", DI-077); one kitchen ticket per preparation station from the outlet's routing rules with a fallback display (DI-323); a fired timer counts up and resets per course, not shown for quick service (DI-334); displays are assigned to stations and filter by course, with no station-load tile in r1 (R277). 86 takes an item off sale on every till and guest menu immediately (R110(c)); guests always see "Sold out", never a missing dish. RETAIL (F17, F34, F51): scan and sell through the same cart, charge and payment as tickets and food (DI-795), one cart, one receipt and one QR per guest (DI-293); system stock per venue gates the sale (DI-294); returns by receipt or order number only in r1 (R139(c)), refund to the original tender with a reason code and note (DI-796, DI-797); Shop & Drop is paid online and collected on the way out (R236), a merchandise reservation lasts to the end of the visit day (R169, R215). TILL MONEY (F32, F73, F74, F87): the float is counted by denomination with note images and typed quantities (DI-775, DI-776, R229) while the hardware checks itself (DI-778); the close is a …
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Send to kitchen | Put the order on the kitchen rail. On the till it always comes before Charge. | Fire, Fire order, Submit order, kitchen fires on payment | R261 / POSV2-4 / F108 step 3 |
+| Charge | The till's single tender step (Payment, POS-005); the button reads "Charge AED 110.25". | Checkout (on staff screens), Pay now | F108 step 4 / screens/P04-point-of-sale.yaml#POS-021 |
+| Fire / Hold (a course) | Kitchen-pass words for releasing or holding the next course of a table, and the "fired" timer. | using "fire" for sending an order from the till | DI-333 / DI-334 / DI-407 |
+| Kitchen ticket | The slip on the kitchen display, one per preparation station. | Order (on the kitchen display), KOT | R210 |
+| Ready · Served · Collected · Delivered | How an order reaches the guest; a server marks Served, a counter Collected, a runner Delivered (with the location). | Done, Complete, Bumped (as a status) | R125 / contracts/satellite/fnb.yaml#recordOrderHandover |
+| Recall (kitchen) / Recall held sale (till) | Bring a mis-bumped kitchen ticket back to the rail; separately, bring a held cart back into a sale. Never "Recall" alone where both could apply. | Undo bump, Restore | contracts/satellite/fnb.yaml#recallKitchenTicket / POSV2-6 |
+| Unavailable (86) / Sold out | Staff screens say "Unavailable" and may add "86"; guest screens say "Sold out". Immediate everywhere. | Out of stock (for food), Disabled, Hidden | R110 / contracts/satellite/fnb.yaml#getGuestMenu |
+| Order type | Dine-in · Quick service · Takeaway · Delivery, chosen in the cart. | Service mode, Fulfilment source (on the till) | DI-789 / contracts/satellite/fnb.yaml#/components/schemas/ServiceMode |
+| Covers | The number of guests at a table, entered when seating; drives split-by-covers. | Pax (except as a small suffix on the floor plan), Heads | DI-104 / contracts/satellite/fnb.yaml#openTableVisit |
+| Vacant · Seated · Ordered · Bill requested · Table closed · … | Table statuses on every floor plan (till and staff app); "Table closed" is the client's word for after payment. | Cleaning, Needs clearing, Dirty | DI-336 / DI-792 |
+| Till · Cash drawer | Staff copy may say "till" for the workstation; the cash drawer is the deposit box. | Terminal id as a heading, Deposit box (on staff screens) | R156 |
+| Float · Count · Blind count · Variance | The opening float; the denomination count; the closing count made without seeing the expected cash; counted minus expected. | Expected in drawer, Discrepancy, Error | R080 / POSV2-3 |
+| Cash out · Cash in · Safe drop | Taking cash out of the drawer mid-shift, adding change, and a supervisor moving cash to the safe with the cashier as witness. | Lift, Withdrawal (as button labels) | DI-274 / contracts/spine/shift.yaml#createCashMovement / … |
+| Menu item · Merchandise item · Inventory item · SKU | The scoped product words; SKU is a variant's code, Product stays the sellable thing. | SKU as the item's name, Article | R131 |
+| Stock on hand · Allocated · Available | Available is on hand minus allocated. | Inventory (as a number), Free stock | R171 / DI-361 |
+| Requisition · Purchase order · Goods receipt · Transfer · … | The procurement and stock words, in that flow. | GRN as the only label, Indent | DI-341 / DI-348 / DI-362 / DI-363 |
+| Shop & Drop | Bought and paid now, collected on the way out. | Click & collect | R236 |
+| Check-out (rental) · Return (rental) | Handing equipment to the guest and taking it back. On the same screens payment is "Charge" or "Pay". | Checkout (for a handover), Check-in (for a return) | DI-758 / DI-765 |
+| Deposit hold · Release · Capture | A refundable deposit held, given back in full, or partly kept for damage with the rest released. | Charge deposit, Refund deposit | DI-752 / R127 |
+| Extension · Swap · Overdue · Late fee | The active-rental words; a quick swap restarts the clock, a late swap earns a free extension. | Renewal, Exchange (for a swap) | DI-761 / DI-762 / DI-764 |
+
+
 ## The screens
 
 Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs count fields; requirements are matrix rows; meeting inputs are the ones naming the screen (the module and platform ones are below); white label says whether the tenant's brand reaches it (guest) or it sets the brand (configures).
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `GST-061` | Menu Item Detail | A | 1 | 21 | 6 | 5 | 2 | 2 | guest | notStarted (client-verified) |
-| `GST-062` | Shop & Drop Collection | A | 0 | 0 | 5 | 0 | 2 | 0 | guest | notStarted (client-verified) |
+| `GST-061` | Menu Item Detail | A | 1 | 7 | 5 | 1 | 2 | 2 | guest | notStarted (client-verified) |
+| `GST-062` | Shop & Drop Collection | A | 0 | 20 | 5 | 0 | 2 | 0 | guest | notStarted (client-verified) |
 
 ## Thin screens in this batch
 
-**GST-062 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**GST-061, GST-062 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ---
 
@@ -92,13 +124,21 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Module | In-Venue Experience · wave 2 · needs the `fnb` module |
 | Block | Block A · ticket #18154 (APP-MOB-GST-061) |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025) |
-| Device and orientation | This is the guest phone app, 390 x 844, in the venue's brand, with the v4 tab bar (Home, Explore, Plan, Tickets) and the Buy tickets button. · LTR and RTL · light, dark theme |
-| Pattern | listDetail (comfortable density): `listModifierGroups` reads the population and `getGuestMenu` reads one of them — list, select, act |
+| Device and orientation | This is the guest phone app, 390 x 844, in the venue's brand, with the v4 tab bar (Home, Explore, Plan, Tickets) and the Buy tickets button. · LTR and RTL · the venue's theme |
+| Pattern | listDetail (comfortable density): One dish from the outlet's guest menu, with its modifiers and allergens (CHG-SGU-018) |
 | Offline | **The offline banner shows.** The dish already loaded stays, with a note that it may be out of date and its allergens in full. Ordering is refused — availability changes by the minute. |
-| Opens with | `outletId` (deepLink) · cold entry: **A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared ticket, a forwarded confirmation … |
+| Opens with | `outletId` (deepLink), `menuItemId` (deepLink) · cold entry: **A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared ticket, a forwarded confirmation … |
 | Route | `/in-venue-experience/menu-item-detail` |
 
 **What the spec says about it.** P02-019.1 in the client hierarchy. Absent from my page inventory until 14 August. **Cross-surface parity, 31 August**: added listModifierGroups. **The same screen on web and app was calling different operations** — one side could do something the other could not, and nothing recorded the difference as deliberate. **Rev 3 (decided 29 September).** Modifier side panel drawn (REV3-9, no api change); the *F&B add-ons & modifiers* toggle is dropped.
+
+**From the Food, Beverage & Retail process.** The app's dish page and modifier panel: decide on a dish, choose options, check allergens. It must be functionally identical to WEB-037. The one thing to get right: allergens are complete and update as options are chosen; required choices are clear before Add.
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- The guest menu's allergens lack "may contain" and the dietary flags. (CHG-SGU-024)
+
+**Fixed on main** (the package already carries these; draw what it says): Only outletId is taken on entry, with no dish identifier. A table "Every modifier group" lists every group with scopePath. The empty state … (CHG-SGU-018); The navigation leads from the dish page to GST-062 (Shop & Drop Collection). (CHG-SGU-018).
 
 #### Inputs: what the user enters or picks
 
@@ -115,37 +155,17 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | At | date and time picker | — | — | `getGuestMenu` ?at |
 | Language | language picker | — | — | `getGuestMenu` ?language |
 
+**Rules for these inputs** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
+
+- **Choose-one groups, add-ons, leave-outs, quantity, kitchen note**: Same rules as WEB-037. Required groups are marked and block Add until chosen. Maximums cap the checkboxes. Defaults are preselected. Unavailable options show "Sold out" and are never hidden. Quantity 1 to 20. Kitchen note up to 200 characters. *(source: contracts/satellite/fnb.yaml#/components/schemas/ModifierGroup / contracts/satellite/fnb.yaml#/components/schemas/CreateGuestOrderLine / DI-1050)*
+
 #### Outputs: what the screen shows and produces
 
 **Shown**
 
-**Every modifier group** (data table, from `listModifierGroups`)
-
-| Shows | Format | Notes |
-|---|---|---|
-| ID | the name it points at, never the id | — |
-| Code | text | — |
-| Name | text | — |
-| Min selections | 1,234 | Greater than zero makes the group required. |
-| Max selections | 1,234 | — |
-| Options | list or chips (count when long) | — |
-| Scope path | text | The partition key (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it … |
-
 **Banner** (banner): Allergens. Always present; not a field a tenant may omit (4.8.9)
 
-**The selected modifier group** (detail panel, from `listModifierGroups`)
-
-| Shows | Format | Notes |
-|---|---|---|
-| ID | the name it points at, never the id | — |
-| Code | text | — |
-| Name | text | — |
-| Min selections | 1,234 | Greater than zero makes the group required. |
-| Max selections | 1,234 | — |
-| Options | list or chips (count when long) | — |
-| Scope path | text | The partition key (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it … |
-
-**The guest menu** (detail panel, from `getGuestMenu`)
+**The dish** (detail panel, from `getGuestMenu`): The dish `menuItemId` resolved inside the outlet's `getGuestMenu`: photo, name, description, price, its modifier groups (min and max per group) and allergens. Until the guest menu carries the Allergen object, "Contains" is drawn from the current list and "May contain" and the diet badges (vegetarian, vegan, halal) are drawn as pending (CHG-SGU-024).
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -157,11 +177,22 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Currency scale | 1,234 | — |
 | Sections | list or chips (count when long) | — |
 
-**Data it reads**: `getGuestMenu` (onLoad, Item, modifiers and allergens); `listModifierGroups` (onLoad, List modifier groups)
+**Rules for what is shown** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
+
+- **Allergens, live total, basket line**: Same as WEB-037. Allergens appear in a banner that is always present, including those added by the chosen options. The total updates live, and the basket line lists the choices. *(source: contracts/satellite/fnb.yaml#/components/schemas/AllergenCode / DI-1050)*
+- **Panel form**: A bottom sheet on the phone, with Add to order fixed at the foot showing the live total ("Add 2 · AED 88.00"). *(source: DI-1050 / designer default)*
+
+**What each action does** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
+
+- **Add to order**: Adds the line to the GST-024 basket and closes the sheet. *(source: screens/P02-guest-mobile-app.yaml#GST-061)*
+
+**Data it reads**: `getGuestMenu` (onLoad, Item, modifiers and allergens)
 
 **Where the user goes next**
 
 - → `GST-001` Home: *Home – Default*
+- → `GST-024` F&B – Browse & Order: *Back to the menu*; carries `outletId`
+- → `GST-041` Checkout Entry: *Add and view the basket*
 
 **What opens over it**
 
@@ -174,28 +205,39 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Loading (`?state=loading`) | Item skeleton |
 | Error (`?state=error`) | Item unavailable, with a route back to the menu |
 | Empty, first run (`?state=emptyFirstRun`) | Not applicable |
-| Empty, no results (`?state=emptyNoResults`) | Never shown: `listModifierGroups` takes no filter, so an empty list is always the first-run state above. |
-| Permission denied (`?state=emptyNoAccess`) | **There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that … |
+| Permission denied (`?state=emptyNoAccess`) | Never shown: a menu is public and browsing a dish needs no sign-in. |
 | Offline (`?state=offline`) | **The offline banner shows.** The dish already loaded stays, with a note that it may be out of date and its allergens in full. Ordering is refused — availability changes by the minute. |
+
+#### Edge cases to draw
+
+- **Required group all sold out; constraint refused at order time; offline**: As WEB-037. *(source: contracts/satellite/fnb.yaml#/components/schemas/GuestOrderProblem / screens/P02-guest-mobile-app.yaml#GST-061)*
+
+#### Consistency with other screens
+
+- Match `WEB-037`: Functionally identical (DI-970, REV3-9).
+- Match `GST-024`: Opened by Add on a dish with groups; returns to the same basket.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+seeAlso: WEB-037 sampleData
+```
 
 #### Permissions
 
 - `getGuestMenu` → no permission · guest, staff
-- `listModifierGroups` → `PRODUCT_VIEW` (read) · staff, guest
 
-**A refused user sees:** **There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that …
+**A refused user sees:** Never shown: a menu is public and browsing a dish needs no sign-in.
 
 #### Requirements it meets
 
-5 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+1 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
 
 | Ref | Requirement (shortened) | Domain | Verdict | Via |
 |---|---|---|---|---|
 | 13.3.9 | APIs shall support menu retrieval, order creation, order status, kitchen status, inventory updates and promotions. | Developer & API Management | CONTRACTED | `getGuestMenu` |
-| 4.8.2 | The system should be able to send the modifier data of POS menu items to manage the stocking, reporting and re-order levels within the inventory system. | Bundles and Promotions | CONTRACTED | `listModifierGroups` |
-| 4.8.3 | The system should have the ability to pass the modifier data to Kitchen printers and/or kitchen display system, in order for the kitchen to include the requests in their preparations. | Bundles and Promotions | CONTRACTED | `listModifierGroups` |
-| 4.9.1 | The system should have the ability to set mandatory or optional modifiers for items. | Bundles and Promotions | CONTRACTED | `listModifierGroups` |
-| 4.9.5 | the system should have a separate list of modifiers which the guest can either add or remove as per their choice and the actual order could be charged to the guest. | Bundles and Promotions | CONTRACTED | `listModifierGroups` |
 
 #### Client meeting inputs
 
@@ -213,26 +255,26 @@ Also apply: 41 for all of P02, 29 for every app (section *Design inputs from the
 
 #### Configurable by the tenant
 
-This is a white-label guest screen: it is drawn in the venue's brand, never TICVAI's (except the fixed *Powered by TICVAI* credit). Draw it with the **default theme**, and on the key screens one **alternate tenant theme** (`handoff/design-batches/apps/1-guest-app/WHITE-LABEL.md`).
+This is a white-label guest screen: it is drawn in the venue's brand, never TICVAI's (except the *Powered by TICVAI* credit, a tenant toggle that is on by default: `brand.showPoweredBy`). It has no dark or light mode: the venue's theme applies on every device setting. Draw it with the **default theme**, and on the key screens one **alternate tenant theme** (`handoff/design-batches/apps/1-guest-app/WHITE-LABEL.md`).
 
-**Shell-wide, on every guest screen:** Brand (10, CMS-002, CMS-004, ADM-016); Theme (31, CMS-005, CMS-003, ADM-016); Fonts (5, CMS-003); Header (5, CMS-007); Navigation (17, CMS-009); Footer (website) (15, CMS-007); Languages and right-to-left (2, CMS-011, ADM-018); Modules shown to guests (3, CMS-001); Features (3, CMS-001); Custom domain (website) (3, CMS-017, ADM-017); SEO metadata (website) (13, CMS-013). Each element, its CMS field, allowed values and default: `handoff/design-batches/apps/1-guest-app/WHITE-LABEL.md`.
+**Shell-wide, on every guest screen:** Brand (11, CMS-002, CMS-004, CMS-104); Theme (27, CMS-005, ADM-016); Fonts (5, CMS-003); Header (5, CMS-009); Navigation (17, CMS-009); Footer (website) (15, CMS-009); Languages and right-to-left (2, CMS-011, ADM-018); Modules shown to guests (3, CMS-001, ADM-424); Features (3, CMS-001); Custom domain (website) (3, CMS-017, ADM-017); SEO metadata (website) (13, CMS-013). Each element, its CMS field, allowed values and default: `handoff/design-batches/apps/1-guest-app/WHITE-LABEL.md`.
 
 #### References
 
 - Wireframe frame: `wireframes/P02 Guest App.dc.html#gst-061` · status **notStarted** · provenance client-verified
 - Prototype (rev 3, verified 2026-09-28, match exact): `sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html`, view *Account → All screens → Wave 2 → Menu item detail; Rev 3 feedback → Menu item add-ons & modifiers*. Differences: Rev 3 adds min/max selection rules for each modifier group, priced add-ons, leave-outs and a live total.
-- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (1), with its required mark, default, format and its error state (404).
-- [ ] Every output is drawn (21 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
-- [ ] Every state opens from `#GST-061?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
+- [ ] Every output is drawn (7 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every state opens from `#GST-061?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
-- [ ] Every transition is wired: `GST-001`.
+- [ ] Every transition is wired: `GST-001`, `GST-024`, `GST-041`.
 - [ ] Sign-in is asked only where the spec asks for it.
 - [ ] The 2 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] Drawn in the default theme; on a key screen also in the alternate tenant theme; nothing hard-codes a brand colour, logo or font.
+- [ ] The 1 edge case(s) from the process notes are drawn.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -244,51 +286,130 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 | | |
 |---|---|
 | App · platform | TICVAI Guest · P02 Guest App (mobile) |
-| Module | In-Venue Experience · wave 3 · needs the `retail` module |
+| Module | In-Venue Experience · wave 2 · needs the `retail` module |
 | Block | Block A · ticket #18230 (APP-MOB-GST-062) |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025); in the flows as guest |
-| Device and orientation | This is the guest phone app, 390 x 844, in the venue's brand, with the v4 tab bar (Home, Explore, Plan, Tickets) and the Buy tickets button. · LTR and RTL · light, dark theme |
-| Pattern | configEditor (comfortable density): the screen declares only writes (`lookupShopAndDrop`) and no read of a population — it is settings, not a list |
+| Device and orientation | This is the guest phone app, 390 x 844, in the venue's brand, with the v4 tab bar (Home, Explore, Plan, Tickets) and the Buy tickets button. · LTR and RTL · the venue's theme |
+| Pattern | statusTracker (comfortable density): A status list of every shop-and-drop waiting for the guest, read by `lookupShopAndDrop` (a GET with query identifiers, so no request body) (CHG-SGU-018) |
 | Offline | **The offline banner shows, and lookup cannot run.** A drop reference already on screen stays visible so the guest can quote it at the collection point. Reserving merchandise needs the connection. |
 | Opens with | nothing: it opens on its own |
 | Route | `/in-venue-experience/shop-and-drop-collection` |
 
 **What the spec says about it.** 4.4.7. Claimed by the entitlement the guest is already carrying, not a paper slip.
 
-**Known gaps.** **`lookupShopAndDrop` declares no request body shape**, so nothing says what this editor edits. The fields cannot be derived and the screen needs the contract before it needs a designer.
+**From the Food, Beverage & Retail process.** "What am I collecting, where and by when." Every shop-and-drop waiting for the guest on one screen, claimed by the ticket they are already carrying rather than a paper slip. The one thing to get right: nothing to type for a signed-in guest, and a code big enough to show at the desk.
+
+**Fixed on main** (the package already carries these; draw what it says): The pattern is a settings editor ("configEditor", form template). The states read "The saved shop drop collection", "No shop drop … (CHG-SGU-018); The empty state for no access names ORDER_VIEW. (CHG-GST-004); The navigation leads to GST-061 (Menu Item Detail). (CHG-SGU-018); GST-062 is wave 3 while WEB-042, which does the same lookup, is wave 2. (CHG-SGU-018).
 
 #### Inputs: what the user enters or picks
 
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Entitlement | text field | — | — | `lookupShopAndDrop` ?entitlementId |
+| Drop reference | text field | — | — | `lookupShopAndDrop` ?dropReference |
+| Receipt number | text field | — | — | `lookupShopAndDrop` ?receiptNumber |
+
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+**Rules for these inputs** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
+
+- **Find by**: Automatic for a signed-in guest: the app looks up by the guest's own tickets. A fallback field "Drop reference or receipt number" is for a guest whose ticket is not in the app. At least one identifier is always sent. *(source: contracts/satellite/retail.yaml#lookupShopAndDrop / F17 step 3)*
 
 #### Outputs: what the screen shows and produces
 
 **Shown**
 
+**Waiting for you** (card list, from `lookupShopAndDrop`): Each drop with its collection point, collect-by time and a code large enough to show at the desk; claimed by the ticket the guest carries.
+
+| Shows | Format | Notes |
+|---|---|---|
+| ID | text | — |
+| Drop reference | text | Short and readable. Printed on the slip a guest may or may not keep. |
+| Sale | text | The till sale. Null for an online order, which sets `orderId` (audit R236). |
+| Order | the name it points at, never the id | The paid online order that created this collection (audit R236). |
+| Entitlement | text | The ticket that claims these goods. The point of 4.4.7 — a guest does not have to keep a receipt safe for eight hours in a water park. |
+| Subject | the name it points at, never the id | — |
+| Collection point | the name it points at, never the id | — |
+| Collection point name | text | — |
+| Status | chip: Awaiting collection, Partially collected, Collected, Uncollected, Disposed | — |
+| Lines | list or chips (count when long) | — |
+| Line | text | — |
+| Merchandise | the name it points at, never the id | — |
+| Name | text | — |
+| Quantity | 1,234 | — |
+| Collected quantity | 1,234 | — |
+| Dropped at | 1 Oct 2026, 14:30 | — |
+| Collect by | 1 Oct 2026, 14:30 | — |
+| Collected at | 1 Oct 2026, 14:30 | — |
+| Collected by principal | the name it points at, never the id | — |
+| Verified by | text | — |
+
 **Banner** (banner): Collect-by time. Usually venue close
 
-**Actions and what each produces**
+**Rules for what is shown** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
 
-| Action | Calls | Sends | On success returns | Errors to show | Notes |
-|---|---|---|---|---|---|
-| Lookup shop and drop (primary button) | `lookupShopAndDrop` GET `/shop-and-drop/lookup` | — | ShopAndDrop[] | 400 No identifier supplied | — |
+- **Collections list**: One card per drop: collection point name, "Collect by 22:00 today" in venue time, status (Waiting, Partly collected, Collected, Not collected), and the items with quantities (collected and still waiting where partial). Waiting first, newest first. *(source: contracts/satellite/retail.yaml#/components/schemas/ShopAndDrop / F51 step 3)*
+- **Show my code**: A full-screen, bright QR and the drop reference in large type, for the desk to scan. The guest's ticket QR works too, and the card says so. *(source: contracts/satellite/retail.yaml#collectShopAndDrop / screens/P02-guest-mobile-app.yaml#GST-062)*
+
+**What each action does** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
+
+- **Show my code**: Opens the code full screen. Handing over is done by staff at the desk (BO-048), not in the app. *(source: contracts/satellite/retail.yaml#collectShopAndDrop / F17 step 5)*
+- **Directions to the collection point**: Opens the venue map at the collection point. *(source: F51 step 3 / designer default)*
+
+**Data it reads**: `lookupShopAndDrop` (onLoad, Find a guest's dropped goods)
 
 **Where the user goes next**
 
 - → `GST-001` Home: *Home – Default*
-- → `GST-061` Menu Item Detail: *Menu Item Detail*
-- → `KSK-017` Shop: *Or they collect from a kiosk*; calls `lookupShopAndDrop`
+- → `POS-012` Omnichannel Order & Fulfilment Center: *Collected on the way out, at the exit desk*; carries `orderId`; calls `lookupShopAndDrop`
 
 #### States
 
 | State | What it shows |
 |---|---|
-| Loading (`?state=loading`) | The saved shop drop collection. |
+| Loading (`?state=loading`) | Finding what is waiting for you. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the shop drop collection untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No shop drop collection configured. The form opens empty and `lookupShopAndDrop` saves the first one; it says what the platform does in the meantime. |
+| Empty, first run (`?state=emptyFirstRun`) | Nothing waiting: no shop-and-drop for this guest. |
 | Permission denied (`?state=emptyNoAccess`) | **There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that … |
 | Offline (`?state=offline`) | **The offline banner shows, and lookup cannot run.** A drop reference already on screen stays visible so the guest can quote it at the collection point. Reserving merchandise needs the connection. |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 No identifier supplied |
+
+#### Edge cases to draw
+
+- **Nothing waiting**: "Nothing waiting for you to collect", with a link to the shop. *(source: designer default)*
+- **Past the collect-by time**: The status is "Not collected", with the venue contact. Uncollected goods return to stock or go to lost property after the window. *(source: F51 step 3 / F17 step 5)*
+- **Partly collected**: The items still waiting are listed; the same code collects the rest later. *(source: contracts/satellite/retail.yaml#collectShopAndDrop)*
+- **Offline**: A code already on screen stays visible; lookup waits for the connection. *(source: screens/P02-guest-mobile-app.yaml#GST-062)*
+
+#### Consistency with other screens
+
+- Match `WEB-042`: Functionally identical to WEB-042's "Find my collection" (DI-970), with the same card and code.
+- Match `GST-026`: Bought there; the collection card after payment links here.
+- Match `KSK-011`: If kiosks show shop-and-drop at all, it is the same card. A kiosk cannot hand goods over.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+seeAlso: WEB-042 sampleData
+drops:
+- reference: SD-4K7Q
+  point: Collect at the gate
+  collectBy: Sat 24 Oct 2026, 22:00
+  status: Waiting
+  items:
+  - Aqua Park tee ×2
+  - Kids' swim goggles
+- reference: SD-4K9C
+  point: East car park kiosk
+  collectBy: Sat 24 Oct 2026, 22:00
+  status: Partly collected
+  items:
+  - Beach umbrella ×2 (1 collected)
+```
 
 #### Permissions
 
@@ -315,14 +436,15 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Configurable by the tenant
 
-This is a white-label guest screen: it is drawn in the venue's brand, never TICVAI's (except the fixed *Powered by TICVAI* credit). Draw it with the **default theme**, and on the key screens one **alternate tenant theme** (`handoff/design-batches/apps/1-guest-app/WHITE-LABEL.md`).
+This is a white-label guest screen: it is drawn in the venue's brand, never TICVAI's (except the *Powered by TICVAI* credit, a tenant toggle that is on by default: `brand.showPoweredBy`). It has no dark or light mode: the venue's theme applies on every device setting. Draw it with the **default theme**, and on the key screens one **alternate tenant theme** (`handoff/design-batches/apps/1-guest-app/WHITE-LABEL.md`).
 
-**Shell-wide, on every guest screen:** Brand (10, CMS-002, CMS-004, ADM-016); Theme (31, CMS-005, CMS-003, ADM-016); Fonts (5, CMS-003); Header (5, CMS-007); Navigation (17, CMS-009); Footer (website) (15, CMS-007); Languages and right-to-left (2, CMS-011, ADM-018); Modules shown to guests (3, CMS-001); Features (3, CMS-001); Custom domain (website) (3, CMS-017, ADM-017); SEO metadata (website) (13, CMS-013). Each element, its CMS field, allowed values and default: `handoff/design-batches/apps/1-guest-app/WHITE-LABEL.md`.
+**Shell-wide, on every guest screen:** Brand (11, CMS-002, CMS-004, CMS-104); Theme (27, CMS-005, ADM-016); Fonts (5, CMS-003); Header (5, CMS-009); Navigation (17, CMS-009); Footer (website) (15, CMS-009); Languages and right-to-left (2, CMS-011, ADM-018); Modules shown to guests (3, CMS-001, ADM-424); Features (3, CMS-001); Custom domain (website) (3, CMS-017, ADM-017); SEO metadata (website) (13, CMS-013). Each element, its CMS field, allowed values and default: `handoff/design-batches/apps/1-guest-app/WHITE-LABEL.md`.
 
 #### References
 
 - Wireframe frame: `wireframes/P02 Guest App.dc.html#gst-062` · status **notStarted** · provenance client-verified
 - Prototype (rev 3, verified 2026-09-28, match exact): `sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html`, view *Account → All screens → Wave 3 → Shop & drop collection*. Differences: Prototype uses a separate SD code; the YAML says the guest collects with the ticket.
+- Flow F17 *A guest buys merchandise and collects later*, step 4: Guest tracks it in the app → Where it is, and until when
 - Flow F51 *A guest shops in the venue and collects on the way out*, step 3: On the way out they find their collection point. → **One lookup, one code.** A guest at the exit with four bags to collect wants one screen, not four orders.
 - Flow F51 branch at step 3 (medium): when The guest leaves without collecting., **Held to the venue policy and then returned to stock.** A collection point full of uncollected bags is a stockroom nobody counted.
 - ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
@@ -330,13 +452,14 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state (400).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#GST-062?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: Lookup shop and drop.
-- [ ] Every transition is wired: `GST-001`, `GST-061`, `KSK-017`.
+- [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
+- [ ] Every transition is wired: `GST-001`, `POS-012`.
 - [ ] Sign-in is asked only where the spec asks for it.
 - [ ] The 2 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] Drawn in the default theme; on a key screen also in the alternate tenant theme; nothing hard-codes a brand colour, logo or font.
+- [ ] The 4 edge case(s) from the process notes are drawn.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -347,46 +470,46 @@ Every guest screen in this batch is white-label. These elements are set by the t
 
 | Element | Configured in | Allowed values | Default | What it changes |
 |---|---|---|---|---|
-| Logo (`brand.logoAssetRef`) | `CMS-002`, `CMS-004`, `ADM-016` | PNG or SVG ≤ 2 MB for logos; images ≥ 1600 px; video MP4 | — | the logo in the header or nav bar, the splash and the footer |
-| Logo dark image (`brand.logoDarkAssetRef`) | `CMS-002`, `CMS-004`, `ADM-016` | PNG or SVG ≤ 2 MB for logos; images ≥ 1600 px; video MP4 | — | the logo on dark backgrounds (falls back to the primary logo) |
-| Logo variant (`brand.logoVariant`) | `CMS-002`, `CMS-004`, `ADM-016` | Light · Dark · Duotone | Light | which logo lockup sits in the nav bar, and whose colours drive the theme |
-| Favicon (`brand.faviconAssetRef`) | `CMS-002`, `CMS-004`, `ADM-016` | PNG or SVG ≤ 2 MB for logos; images ≥ 1600 px; video MP4 | — | the browser tab icon (website only) |
-| Splash image (`brand.splashImageAssetRefs`) | `CMS-002`, `CMS-004`, `ADM-016` | PNG, JPG, SVG or MP4 from the media library | — | Splash images, shown in order. Build-time on the native apps (`splashChangeScope`); immediate on web, reaching guests with the publish (audit R163). |
-| Splash duration seconds (`brand.splashDurationSeconds`) | `CMS-002`, `CMS-004`, `ADM-016` | min 0; max 10 | 3 | — |
-| Splash background colour (`brand.splashBackgroundColour`) | `CMS-002`, `CMS-004`, `ADM-016` | #RRGGBB | — | — |
-| Show loading indicator (`brand.showLoadingIndicator`) | `CMS-002`, `CMS-004`, `ADM-016` | — | on | — |
-| Intro video (`brand.introVideoAssetRef`) | `CMS-002`, `CMS-004`, `ADM-016` | PNG or SVG ≤ 2 MB for logos; images ≥ 1600 px; video MP4 | — | The optional intro video (decided 29 September, MOB-5). A video `MediaAsset` from the media library (CMS-010). |
-| Intro video mode (`brand.introVideoMode`) | `CMS-002`, `CMS-004`, `ADM-016` | Off · First launch · Every launch; Anything but `off` needs `introVideoAssetRef`, or 400. | Off | When GST-001 plays it full screen. "Skip introduction" is always shown. |
-| Primary colour (`theme.primaryColour`) | `CMS-005`, `CMS-003`, `ADM-016` | #RRGGBB | — | the brand colour (the `accentSolid` token): primary buttons (Book, Continue, Add to cart, Pay), the active step of the step indicator, selected date and time chips, focus rings |
-| Secondary colour (`theme.secondaryColour`) | `CMS-005`, `CMS-003`, `ADM-016` | #RRGGBB | — | secondary buttons and secondary emphasis: unselected chips, secondary tabs |
-| Accent colour (`theme.accentColour`) | `CMS-005`, `CMS-003`, `ADM-016` | #RRGGBB | — | highlights: badges (LIMITED, NEW, BESTSELLER), availability counts, sale prices |
-| Background colour (`theme.backgroundColour`) | `CMS-005`, `CMS-003`, `ADM-016` | #RRGGBB | — | the page background behind every screen (the `ground` token) |
-| Text colour (`theme.textColour`) | `CMS-005`, `CMS-003`, `ADM-016` | #RRGGBB | — | body text on the background |
-| Dark mode (`theme.darkMode`) | `CMS-005`, `CMS-003`, `ADM-016` | — | — | the dark variant on a device in dark mode (mobile app); derived from the light theme when absent |
-| Corner radius (`theme.cornerRadius`) | `CMS-005`, `CMS-003`, `ADM-016` | min 0; max 32 | — | the corners of cards, buttons, inputs, sheets and the cart (0 square to 22 the prototype's roundest) |
-| Surface style (`theme.surfaceStyle`) | `CMS-005`, `CMS-003`, `ADM-016` | Glass · Solid | Glass | cards and panels: frosted glass (default) or opaque (the `surfaceRaised` token) |
-| Button style (`theme.buttonStyle`) | `CMS-005`, `CMS-003`, `ADM-016` | Solid · Outline · Pill | Solid | every button's shape: solid fill, outline, or pill |
-| Component colours (`theme.componentColours`) | `CMS-005`, `CMS-003`, `ADM-016` | — | — | Colours for single interactive elements (decided 17 September, M17-11). Each is optional and falls back to the theme colours. |
+| Logo (`brand.logoAssetRef`) | `CMS-002`, `CMS-004`, `CMS-104`, `ADM-016` | PNG or SVG ≤ 2 MB for logos; images ≥ 1600 px; video MP4 | — | the logo in the header or nav bar, the splash and the footer |
+| Logo dark image (`brand.logoDarkAssetRef`) | `CMS-002`, `CMS-004`, `CMS-104`, `ADM-016` | PNG or SVG ≤ 2 MB for logos; images ≥ 1600 px; video MP4 | — | the logo on dark backgrounds (falls back to the primary logo) |
+| Logo variant (`brand.logoVariant`) | `CMS-002`, `CMS-004`, `CMS-104`, `ADM-016` | Light · Dark · Duotone | Light | which logo lockup sits in the nav bar, and whose colours drive the theme |
+| Favicon (`brand.faviconAssetRef`) | `CMS-002`, `CMS-004`, `CMS-104`, `ADM-016` | PNG or SVG ≤ 2 MB for logos; images ≥ 1600 px; video MP4 | — | the browser tab icon (website only) |
+| Splash image (`brand.splashImageAssetRefs`) | `CMS-002`, `CMS-004`, `CMS-104`, `ADM-016` | PNG, JPG, SVG or MP4 from the media library | — | Splash images, shown in order. Build-time on the native apps (`splashChangeScope`); immediate on web, reaching guests with the publish (audit R163). |
+| Splash duration seconds (`brand.splashDurationSeconds`) | `CMS-002`, `CMS-004`, `CMS-104`, `ADM-016` | min 0; max 10 | 3 | — |
+| Splash background colour (`brand.splashBackgroundColour`) | `CMS-002`, `CMS-004`, `CMS-104`, `ADM-016` | #RRGGBB | — | — |
+| Show loading indicator (`brand.showLoadingIndicator`) | `CMS-002`, `CMS-004`, `CMS-104`, `ADM-016` | — | on | — |
+| Intro video (`brand.introVideoAssetRef`) | `CMS-002`, `CMS-004`, `CMS-104`, `ADM-016` | PNG or SVG ≤ 2 MB for logos; images ≥ 1600 px; video MP4 | — | The optional intro video (decided 29 September, MOB-5). A video `MediaAsset` from the media library (CMS-010). |
+| Intro video mode (`brand.introVideoMode`) | `CMS-002`, `CMS-004`, `CMS-104`, `ADM-016` | Off · First launch · Every launch; Anything but `off` needs `introVideoAssetRef`, or 400. | Off | When GST-001 plays it full screen. "Skip introduction" is always shown. |
+| Powered by TICVAI credit (`brand.showPoweredBy`) | `CMS-002`, `CMS-004`, `CMS-104`, `ADM-016` | — | on | the *Powered by TICVAI* credit on the launch screen, at the foot of Account and in the web footer; on by default, and switching it off needs the licence add-on (403 … |
+| Primary colour (`theme.primaryColour`) | `CMS-005`, `ADM-016` | #RRGGBB | — | the brand colour (the `accentSolid` token): primary buttons (Book, Continue, Add to cart, Pay), the active step of the step indicator, selected date and time chips, focus rings |
+| Secondary colour (`theme.secondaryColour`) | `CMS-005`, `ADM-016` | #RRGGBB | — | secondary buttons and secondary emphasis: unselected chips, secondary tabs |
+| Accent colour (`theme.accentColour`) | `CMS-005`, `ADM-016` | #RRGGBB | — | highlights: badges (LIMITED, NEW, BESTSELLER), availability counts, sale prices |
+| Background colour (`theme.backgroundColour`) | `CMS-005`, `ADM-016` | #RRGGBB | — | the page background behind every screen (the `ground` token) |
+| Text colour (`theme.textColour`) | `CMS-005`, `ADM-016` | #RRGGBB | — | body text on the background |
+| Corner radius (`theme.cornerRadius`) | `CMS-005`, `ADM-016` | min 0; max 32 | — | the corners of cards, buttons, inputs, sheets and the cart (0 square to 22 the prototype's roundest) |
+| Surface style (`theme.surfaceStyle`) | `CMS-005`, `ADM-016` | Glass · Solid | Glass | cards and panels: frosted glass (default) or opaque (the `surfaceRaised` token) |
+| Button style (`theme.buttonStyle`) | `CMS-005`, `ADM-016` | Solid · Outline · Pill | Solid | every button's shape: solid fill, outline, or pill |
+| Component colours (`theme.componentColours`) | `CMS-005`, `ADM-016` | — | — | Colours for single interactive elements (decided 17 September, M17-11). Each is optional and falls back to the theme colours. |
 | Primary latin (`fonts.primaryLatin`) | `CMS-003` | — | — | headings and body text in English |
 | Primary arabic (`fonts.primaryArabic`) | `CMS-003` | Required when `ar` is among the tenant's languages (audit R163). | — | headings and body text in Arabic |
 | Secondary latin (`fonts.secondaryLatin`) | `CMS-003` | — | — | the secondary face (eyebrows, numbers) in English |
 | Secondary arabic (`fonts.secondaryArabic`) | `CMS-003` | Required whenever `secondaryLatin` is set and `ar` is among the tenant's languages (decided 28 September, audit R163). | — | the secondary face in Arabic |
 | Custom font images (`fonts.customFontAssetRefs`) | `CMS-003` | PNG, JPG, SVG or MP4 from the media library | — | Uploaded font files, as `MediaAsset` ids. |
-| Header layout (`header.layout`) | `CMS-007` | Logo left · Logo centre · Logo with menu | — | the header: logo left, logo centred, or logo with the menu |
-| Show logo (`header.showLogo`) | `CMS-007` | — | on | — |
-| Show menu (`header.showMenu`) | `CMS-007` | — | on | — |
-| Show notifications (`header.showNotifications`) | `CMS-007` | — | on | — |
-| Background colour (`header.backgroundColour`) | `CMS-007` | #RRGGBB | — | — |
+| Header layout (`header.layout`) | `CMS-009` | Logo left · Logo centre · Logo with menu | — | the header: logo left, logo centred, or logo with the menu |
+| Show logo (`header.showLogo`) | `CMS-009` | — | on | — |
+| Show menu (`header.showMenu`) | `CMS-009` | — | on | — |
+| Show notifications (`header.showNotifications`) | `CMS-009` | — | on | — |
+| Background colour (`header.backgroundColour`) | `CMS-009` | #RRGGBB | — | — |
 | Navigation kind (`navigation.kind`) | `CMS-009` | Bottom navigation · Drawer · Tabs | — | the main navigation: bottom tab bar, drawer, or tabs |
 | Navigation items (`navigation.items`) | `CMS-009` | at most 12 | — | — |
 | Buy button (`navigation.buyButton`) | `CMS-009` | — | — | The persistent Buy tickets button (decided 29 September, MOB-2). On every screen of the mobile app except the booking and checkout steps; it opens GST-003. |
-| Footer columns (`footer.columns`) | `CMS-007` | — | — | — |
-| Legal links (`footer.legalLinks`) | `CMS-007` | — | — | Required links, held separately from the free-form columns — a tenant reorganising their footer must not be able to remove the privacy notice by accident. |
-| Copyright text (`footer.copyrightText`) | `CMS-007` | — | — | — |
-| Social links (`footer.socialLinks`) | `CMS-007` | — | — | — |
+| Footer columns (`footer.columns`) | `CMS-009` | — | — | — |
+| Legal links (`footer.legalLinks`) | `CMS-009` | — | — | Required links, held separately from the free-form columns — a tenant reorganising their footer must not be able to remove the privacy notice by accident. |
+| Copyright text (`footer.copyrightText`) | `CMS-009` | — | — | — |
+| Social links (`footer.socialLinks`) | `CMS-009` | — | — | — |
 | Languages (`languages.languages`) | `CMS-011`, `ADM-018` | at least 1 | — | the language button in the header; Arabic flips every screen right to left |
 | Default language (`languages.defaultLanguage`) | `CMS-011`, `ADM-018` | ISO 639-1 code, shown as the language name | — | the language a first visit opens in |
-| Modules (`modules.modules`) | `CMS-001` | — | — | — |
+| Modules (`modules.modules`) | `CMS-001`, `ADM-424` | — | — | — |
 | Features (`features.features`) | `CMS-001` | — | — | — |
 | Custom domain hostname (`domains.hostname`) | `CMS-017`, `ADM-017` | — | — | — |
 | Custom domain kind (`domains.kind`) | `CMS-017`, `ADM-017` | Guest web · Guest app · Partner portal · Developer portal | — | — |
@@ -404,15 +527,17 @@ Every guest screen in this batch is white-label. These elements are set by the t
 | Open graph (`seo.openGraph`) | `CMS-013` | — | — | — |
 | Is auto generated (`seo.isAutoGenerated`) | `CMS-013` | — | on | 22.11.2. Generated by default and overridable. |
 | No index (`seo.noIndex`) | `CMS-013` | — | off | — |
-| Favicon (`brand.faviconAssetRef`) | `CMS-002`, `CMS-004`, `ADM-016` | PNG or SVG ≤ 2 MB for logos; images ≥ 1600 px; video MP4 | — | the browser tab icon (website only) |
-| Component colours: primary CTA (`theme.componentColours.primaryCta`) | `CMS-005`, `CMS-003`, `ADM-016` | — | — | the one main call to action on each screen, when it should differ from the brand colour |
-| Component colours: pay button (`theme.componentColours.payButton`) | `CMS-005`, `CMS-003`, `ADM-016` | — | — | the Pay button at checkout |
+| Favicon (`brand.faviconAssetRef`) | `CMS-002`, `CMS-004`, `CMS-104`, `ADM-016` | PNG or SVG ≤ 2 MB for logos; images ≥ 1600 px; video MP4 | — | the browser tab icon (website only) |
+| Component colours: primary CTA (`theme.componentColours.primaryCta`) | `CMS-005`, `ADM-016` | — | — | the one main call to action on each screen, when it should differ from the brand colour |
+| Component colours: pay button (`theme.componentColours.payButton`) | `CMS-005`, `ADM-016` | — | — | the Pay button at checkout |
 | Buy button: style (`navigation.buyButton.style`) | `CMS-009` | Raised · Floating · Flat · Hidden | Raised | the Buy tickets button in the tab bar: raised (default), floating, flat, or hidden |
 
 **The alternate tenant theme (Coastal Aqua)**: Primary colour #0077B6; Secondary colour #023E8A; Accent colour #FFB703; Background colour #F5FAFC; Text colour #0B1324; Corner radius 18; Surface style Solid; Button style Pill; Logo variant Duotone; Header layout Logo centre; Step indicator Dots; Card layout Cards across; Card size Standard; Cart layout Floating icon; Fonts Poppins / Tajawal.
 **Key screens to show in it:** `WEB-001`, `WEB-005`, `WEB-006`, `WEB-010`, `WEB-012`, `GST-001`, `GST-007`, `GST-041`, `KSK-002`, `KSK-003`.
 
-**Never configurable:** The *Powered by TICVAI* credit in the footer is fixed and never client-editable (MoM 3 Aug, DI-111; MoM 12 Aug, DI-250). Semantic colour pairs (success, warning, danger, neutral) are not overridable: a tenant who recolours danger to their brand green has made a destructive confirmation look like a success (`screens/_design-tokens.yaml` whiteLabel). Site structure and the navigation flow are fixed and adapt to the product configuration (MoM 3 Aug, DI-119); a guest always books a product or package, never a resource (DI-502). A colour pair that fails 4.5:1 contrast is refused by the CMS, not warned (setTheme 400 ContrastProblem, audit R139).
+**Decided for every guest screen:** **No dark or light mode.** The venue's chosen theme applies on every device setting; `Theme.darkMode` is deprecated and ignored, never drawn, and the guest app has no Light/Dark switch (Chinmay, 2 October, Q150; CHG-CSA-035). ***Powered by TICVAI* is a tenant toggle, on by default** (`brand.showPoweredBy`): shown on the launch screen, at the foot of Account and in the web footer; switching it off needs the licence add-on, or 403 `powered-by-locked` (Chinmay, 2 October, Q160; DI-297; CHG-CSA-036). **Each homepage section sets its card count and its scroll animation** (`maxItems`; `scrollAnimation` rise, scale, slide, blur or none, default rise): every customisation option of the approved wireframe (Chinmay, 2 October, Q152 and Q153; DI-1088; CHG-CSA-040). **Landing-page templates.** A tenant with no landing page of its own starts from a TICVAI template (`listLandingPageTemplates`, kept as `HomepageLayout.templateKey`); one with its own site links in with deep links (`landingSource` ownSite) (Chinmay, 2 October, batch 2 #41; CHG-CSA-037).
+
+**Never configurable:** A dark or light mode: the guest surfaces have one theme, the venue's (Chinmay, 2 October; CHG-CSA-035). Semantic colour pairs (success, warning, danger, neutral) are not overridable: a tenant who recolours danger to their brand green has made a destructive confirmation look like a success (`screens/_design-tokens.yaml` whiteLabel). Site structure and the navigation flow are fixed and adapt to the product configuration (MoM 3 Aug, DI-119); a guest always books a product or package, never a resource (DI-502). A colour pair that fails 4.5:1 contrast is refused by the CMS, not warned (setTheme 400 ContrastProblem, audit R139).
 
 ## Reference designs and the trackers for this platform
 
@@ -536,7 +661,6 @@ Method, path, parameters, request and response for every operation these screens
 ```json
 {
 "getGuestMenu": {"method":"GET","path":"/outlets/{outletId}/guest-menu","contract":"fnb","summary":"The menu a guest sees","permission":null,"offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"at","in":"query","required":null},{"name":"language","in":"query","required":null}],"requestBody":null,"responds":"GuestMenu"},
-"listModifierGroups": {"method":"GET","path":"/modifier-groups","contract":"fnb","summary":"List modifier groups","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "lookupShopAndDrop": {"method":"GET","path":"/shop-and-drop/lookup","contract":"retail","summary":"Find a guest's dropped goods","permission":"ORDER_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"entitlementId","in":"query","required":null},{"name":"dropReference","in":"query","required":null},{"name":"receiptNumber","in":"query","required":null}],"requestBody":null,"responds":"ShopAndDrop"}
 }
 ```
@@ -550,7 +674,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "AllergenCode": {"type":"string","description":"**The fourteen declarable allergens, as one closed list.** Every allergen field in this contract uses it — the menu claim, the ticket line, a substitution's delta, a modifier option, the label on a bag — so a declared set and an actual set compare without anybody normalising case or synonyms. It was the `Allergen.contains` enum; the other fields were free text.\n","enum":["gluten","crustaceans","eggs","fish","peanuts","soybeans","milk","nuts","celery","mustard","sesame","sulphites","lupin","molluscs"]},
 "GuestMenu": {"type":"object","x-ticvai-persistence":"none — projection over menu, item and availability","required":["outletId","menuId","name","inForceUntil","sections"],"properties":{"outletId":{"type":"string","format":"uuid"},"menuId":{"type":"string","format":"uuid"},"name":{"type":"string"},"inForceUntil":{"type":"string","format":"date-time","nullable":true,"description":"When this menu stops applying. The client shows it, because a guest browsing breakfast at 10:55 should know.\n"},"currency":{"type":"string","pattern":"^[A-Z]{3}$"},"currencyScale":{"type":"integer"},"sections":{"type":"array","items":{"type":"object","properties":{"name":{"type":"string"},"sortOrder":{"type":"integer"},"items":{"type":"array","items":{"type":"object","required":["menuItemId","name","price","isAvailable","allergens"],"properties":{"menuItemId":{"type":"string","format":"uuid"},"name":{"type":"string"},"description":{"type":"string","nullable":true},"price":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"imageAssetRef":{"type":"string","nullable":true},"isAvailable":{"type":"boolean","description":"Marked, not removed. A guest who saw a dish yesterday and cannot find it today assumes the app is broken; \"sold out\" is an answer.\n"},"unavailableReason":{"type":"string","nullable":true},"allergens":{"type":"array","description":"Always present. Not a field a tenant may choose to omit.","items":{"$ref":"#/components/schemas/AllergenCode"}},"preparationMinutes":{"type":"integer","nullable":true},"modifierGroups":{"type":"array","items":{"$ref":"#/components/schemas/ModifierGroup"}}}}}}}}}},
 "ModifierGroup": {"x-ticvai-persistence":"fnb.modifier_group + fnb.modifier_option","type":"object","description":"**An F&B modifier is a choice added to a dish at the moment of ordering** — *no onions*, *extra cheese*, *cooked medium*. **It is not an Attribute**, the axis that generates catalogue variants (naming-and-style §3 lists *Modifier* as a banned synonym for that), and the two must not be merged: a variant is a different product with its own stock, a modifier is an instruction on a line with at most a price delta.\n","required":["id","code","name","minSelections","maxSelections","options"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string"},"name":{"type":"string"},"minSelections":{"type":"integer","minimum":0,"description":"Greater than zero makes the group required."},"maxSelections":{"type":"integer","minimum":1},"options":{"type":"array","minItems":1,"items":{"type":"object","required":["id","name","priceDelta"],"properties":{"id":{"type":"string","format":"uuid"},"name":{"type":"string"},"priceDelta":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"isDefault":{"type":"boolean"},"isAvailable":{"type":"boolean"},"allergens":{"type":"array","description":"What choosing this option adds to the dish. `attachModifierGroup` refuses a group that adds one the item does not declare, and `verifyAllergens` reports it as `via` `modifier`.","items":{"$ref":"#/components/schemas/AllergenCode"}}}}},"scopePath":{"type":"string","description":"**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"}}},
-"Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}},
 "ShopAndDrop": {"type":"object","x-ticvai-persistence":"retail.shop_and_drop + retail.shop_and_drop_line","required":["id","dropReference","collectionPointId","status","collectBy"],"properties":{"id":{"type":"string"},"dropReference":{"type":"string","description":"Short and readable. Printed on the slip a guest may or may not keep."},"saleId":{"type":"string","nullable":true,"description":"The till sale. Null for an online order, which sets `orderId` (audit R236)."},"orderId":{"type":"string","format":"uuid","nullable":true,"description":"The paid online order that created this collection (audit R236)."},"entitlementId":{"type":"string","nullable":true,"description":"The ticket that claims these goods. The point of 4.4.7 — a guest does not have to keep a receipt safe for eight hours in a water park.\n"},"subjectId":{"type":"string","format":"uuid","nullable":true},"collectionPointId":{"type":"string","format":"uuid"},"collectionPointName":{"type":"string"},"status":{"type":"string","enum":["awaitingCollection","partiallyCollected","collected","uncollected","disposed"]},"lines":{"type":"array","items":{"type":"object","properties":{"lineId":{"type":"string"},"merchandiseId":{"type":"string","format":"uuid"},"name":{"type":"string"},"quantity":{"type":"integer"},"collectedQuantity":{"type":"integer"}}}},"droppedAt":{"type":"string","format":"date-time"},"collectBy":{"type":"string","format":"date-time"},"collectedAt":{"type":"string","format":"date-time","nullable":true},"collectedByPrincipalId":{"type":"string","format":"uuid","nullable":true},"verifiedBy":{"type":"string","nullable":true}}}
 }
 ```

@@ -225,7 +225,7 @@
   "states": {
    "loading": "The guest journey list.",
    "error": "Could not load. Names which read failed and leaves the guest journey untouched.",
-   "emptyFirstRun": "No guest journey yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No guest journey yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the guest journey are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -235,16 +235,6 @@
     "contract": "access",
     "purpose": "Guest Journey Command Center",
     "trigger": "onLoad"
-   },
-   {
-    "operationId": "createAdmissionRules",
-    "contract": "access",
-    "purpose": "Start a new guest journey from an admission profile",
-    "trigger": "onAction",
-    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
-    "invalidates": [
-     "listGuestJourney"
-    ]
    },
    {
     "operationId": "setJourneyProfile",
@@ -298,6 +288,14 @@
      ]
     },
     "provenance": "contract access.yaml PUT /journey-profiles"
+   }
+  ],
+  "gaps": [
+   {
+    "operation": "createAdmissionRules",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): Admission profiles are created on BO-032; a second create path on the command centre duplicates it (VO-R14) and a command centre carries no create forms (VO-R02) (design-notes correction venue-operations BO-214).",
+    "source": "contracts/spine/access.yaml#createAdmissionRules | screens/P08-venue-back-office.yaml#BO-032"
    }
   ],
   "_platform": {
@@ -360,10 +358,10 @@
    ]
   },
   "density": "compact",
-  "purposeNote": "Group admission behavior can be configured independently from standard individual-ticket admission.",
+  "purposeNote": "Group admission behavior can be configured independently from standard individual-ticket admission. Purpose rewritten 2 October 2026 (CHG-WIR-003): The purpose was the screen name itself (a generator placeholder); the screen configures group and B2B admission profiles (design-notes correction venue-operations BO-215, BO-162).",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure admission for) and no display directory — it is settings, not a population",
-  "purpose": "Group & B2B Admission Profile Builder",
+  "purpose": "Configure how a group or B2B booking is admitted: whole group, partial, in waves, by leader quantity or by manifest.",
   "layout": {
    "template": "form",
    "regions": [
@@ -442,6 +440,13 @@
    "workshopBoard": "wireframes/WS25 Access Control Board 8.dc.html#bo-215"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 102. 0 of 0 labels bound to a contract property; 7 of 24 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-004): No read of group admission profiles (setGroupAdmissionProfile has no list or get).",
+    "source": "contracts/spine/access.yaml#setGroupAdmissionProfile"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -900,7 +905,7 @@
      "to": "BO-214",
      "trigger": "Returns to the board's landing screen",
      "provenance": "flow F118 step 10→11",
-     "operation": "listEntryTemporaryExit"
+     "operation": "listAdmissionRules"
     }
    ]
   },
@@ -943,16 +948,10 @@
   "states": {
    "loading": "The re-entry temporary exit configuration as saved.",
    "error": "Could not load. Names which read failed and leaves the re-entry temporary exit untouched.",
-   "emptyFirstRun": "No re-entry temporary exit configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyFirstRun": "No re-entry temporary exit configured yet. Offers no create action — this screen declares no operation that makes one and says what the platform does in the meantime.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
-   {
-    "operationId": "listEntryTemporaryExit",
-    "contract": "access",
-    "purpose": "Re-entry & Temporary Exit Journey",
-    "trigger": "onLoad"
-   },
    {
     "operationId": "listAdmissionRules",
     "contract": "access",
@@ -967,7 +966,6 @@
     "trigger": "onAction",
     "provenance": "decided 29 September, VM close-out (venue management and configuration)",
     "invalidates": [
-     "listEntryTemporaryExit",
      "listAdmissionRules"
     ]
    }
@@ -987,6 +985,14 @@
     }
    ]
   },
+  "gaps": [
+   {
+    "operation": "listEntryTemporaryExit",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): listEntryTemporaryExit returns a separate re-entry rule (ruleId, maximum, name) beside the admission profile; re-entry is a block of the profile, read by listAdmissionRules (already declared), and a second rule list invites two truths (design-notes correction venue-operations BO-219).",
+    "source": "contracts/spine/access.yaml#listEntryTemporaryExit | contracts/spine/access.yaml#updateAdmissionRules"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1460,16 +1466,6 @@
     ]
    },
    {
-    "operationId": "setContextTimeEvent",
-    "contract": "access",
-    "purpose": "Tie the alternative admission to a date, event or calendar day",
-    "trigger": "onAction",
-    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
-    "invalidates": [
-     "listSpecialEventFree"
-    ]
-   },
-   {
     "operationId": "setOperatingCalendarEntry",
     "contract": "access",
     "purpose": "Create or replace an operating calendar entry",
@@ -1514,6 +1510,14 @@
      ]
     },
     "provenance": "contract access.yaml PUT /operating-calendar-entries"
+   }
+  ],
+  "gaps": [
+   {
+    "operation": "setContextTimeEvent",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): setContextTimeEvent is the context policy builder's write (BO-237, which declares it); a context policy is a different object from a special-event admission (design-notes correction venue-operations BO-222).",
+    "source": "contracts/spine/access.yaml#setContextTimeEvent"
    }
   ],
   "_platform": {
@@ -1581,18 +1585,9 @@
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every journey simulation audit",
-       "columns": [
-        "impossible journey sequences",
-        "missing gates",
-        "incompatible hardware",
-        "missing companion relationship",
-        "conflicting quantities",
-        "duplicate attendance"
-       ],
-       "bindsTo": "Journey",
-       "operation": "listJourneys",
-       "provenance": "pack Access Control Module_Reference.pdf, page 111 §Detect"
+       "label": "Access journeys",
+       "operation": "listGuestJourney",
+       "provenance": "contract access.yaml GET /guest-journey; wiring fix, 2 October 2026"
       }
      ]
     },
@@ -1639,22 +1634,23 @@
   "states": {
    "loading": "The journey simulation audit list.",
    "error": "Could not load. Names which read failed and leaves the journey simulation audit untouched.",
-   "emptyFirstRun": "No journey simulation audit yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No journey simulation audit yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the journey simulation audit are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
-    "operationId": "listJourneys",
-    "contract": "marketing-crm",
-    "purpose": "Automated journeys",
-    "trigger": "onLoad"
-   },
-   {
     "operationId": "simulateGuestJourney",
     "contract": "access",
     "purpose": "Run journey simulation",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "listGuestJourney",
+    "contract": "access",
+    "purpose": "The access journey profiles to simulate",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-005)"
    }
   ],
   "entryState": {
@@ -1674,6 +1670,14 @@
    "workshopBoard": "wireframes/WS25 Access Control Board 8.dc.html#bo-223"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 111. 0 of 6 labels bound to a contract property; 7 of 94 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** still owed by a contract change: `simulateGuestJourney`.",
+  "gaps": [
+   {
+    "operation": "listJourneys",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-005): \"Journey\" means two things here: this screen simulates access journeys (listGuestJourney, beside simulateGuestJourney), not marketing automation journeys (listJourneys) (design-notes correction customer-marketing BO-223).",
+    "source": "contracts/spine/access.yaml#simulateGuestJourney | contracts/spine/access.yaml#listGuestJourney"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",

@@ -61,6 +61,35 @@ convincingly. It is never a caption.
   and its error; and, element by element, what is shown and in what format, what each action
   produces and where the user goes next. Draw exactly that.
 
+## The processes these screens belong to
+
+Written by the owner of each process (`handoff/design-notes/`). Read before any screen: it says how the process runs end to end and which words the screens must use.
+
+### Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management)
+
+Platform Foundation is everything the apps stand on. Five apps each have one door: the guest app and website (WEB-016, GST-042: a six-digit code to email or mobile, a password, Apple or Google, UAE Pass; never enterprise SSO), the till (POS-000: employee number and PIN, recent operators as tiles; the kitchen display is the same app), the staff handheld and scanner (EMP-001, SCN-001), Venue Management (SUP-001, the single door for the back office P08, the CMS P13, analytics P16 and the support desk P12) and TICVAI Control (ADM-001 for TICVAI's own platform operators, PTR-001 for partner users; the developer portal P14 and the sign-up P17 belong to this app too). A second factor is required by permission, not by role or device: ROLE_MANAGE, LEDGER_APPROVE and every PLATFORM_* permission, plus any the tenant adds; so a cashier never sees it and a platform operator always does. The factor is an authenticator app with an emailed code as fallback; five wrong codes lock step-up for the lockout minutes, never permanently. Guests get two-step verification only at a venue that switched it on. One person holds one session per workstation: a second sign-in is refused and only a supervisor ends the other session. Several roles mean a role prompt; one role goes straight in. The workstation decides the Sale Board, hardware and till identity, never what a person may do. Sensitive actions (refund approval, journal approval, credential reset, partner credit, commission rules, opening a platform-staff grant and 17 more) demand a fresh step-up on the operation itself, asked in place in the action's confirmation; the tenant may raise the strength, never remove it. Permission outcomes are three, never one word: self-authorised (proceeds, audited), escalated (a supervisor PIN in place), refused (the denied state, naming the permission); a missing permission is never an empty table, and a record outside the person's venues is "not found", indistinguishable from absent. The hierarchy is binding (tenant, brand, region, venue, department, sub-department, workstation; outlet beside department for F&B and retail); region owns currency, decimals, time zone, date format and fiscal year; configuration resolves nearest-ancestor across tenant, region and venue (outlet for F&B and retail), venue is the floor and a workstation is assigned a profile, never configured; every configuration screen says which level it writes and what it inherits. Venue Management is one tenant-level surface filtering across the venues in the session's scope. TICVAI's Console runs outside every cell: a platform operator picks a tenant and opens a time-boxed, audited platform-staff grant (with step-up) before any tenant action, and the tenant sees every action in its audit log (ADM-412 is the reference implementation). Approval workflows record authorisations and never perform the action; the requester cannot approve their own request; a venue may tighten and never loosen a rule from above; in-flight …
+*(source: screens/P12-support-agent-console.yaml#SUP-001; R135; R126; R167; DI-1072; ADR-0002; ADR-0003; ADR-0004; R184; contracts/spine/identity.yaml#createMfaChallenge; contracts/spine/approvals.yaml#setStepUpPolicy; ADR-0011; ADR-0018; ADR-0029; R098; contracts/spine/approvals.yaml#decideApprovalRequest …)*
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Sign in / Sign out | Entering and leaving any app, staff or guest. | Login, Log in, Logon, Logout | screens/P04-point-of-sale.yaml#POS-000 … |
+| Authentication code | The staff second factor from the authenticator app (or the emailed fallback). | OTP, 2FA code, token | screens/P09-platform-admin-console.yaml#ADM-001 |
+| One-time code | The six-digit code a guest receives to sign in or prove a contact. | OTP, PIN, password | DI-1034; R167 |
+| Two-step verification | The guest's optional second factor, asked only at venues that switched it on. | MFA, 2FA | DI-1072 |
+| Tenant / Brand / Region / Venue / Department / Outlet | The binding hierarchy levels; region owns currency and dates; outlet is F&B or retail inside a venue. | Client, Customer, Org (for tenant), Site, Park, Property (for venue), Area, Territory (for region) | ADR-0011; ADR-0018 |
+| Workstation (back office) / till (operator copy) | A configured device; decides Sale Board, hardware and till identity, never authorisation. | Terminal, Station, POS (for the device), till (for the Deposit Box) | ADR-0002; R156 |
+| Sale Board | The configured front end a workstation loads (ticketing, F&B or retail). | Screen, Layout, Menu | ADR-0003 |
+| Role | A named, fully configurable grouping of permissions; the seeded five are editable starting points. | Group, Profile | R229 |
+| Staff member / Partner user / Platform operator | A tenant's staff principal; a partner's user; a TICVAI employee in the Console. | User (alone), Account, Agent (for venue staff) | F104 step 1; F104 step 4; F104 step 5 |
+| Platform-staff grant | The time-boxed, audited access a platform operator opens into one tenant before acting in it. | Impersonation, Support login | R098 |
+| Escalate / Refused | Escalate is supervisor approval captured in place; Refused is the denied state that names the permission. | Denied (for an action that can be escalated) | R197 |
+| Approve / Reject / Return / Request information | The four decisions on an approval request; Withdraw is the requester's own act and never a rejection. | Accept, Decline, Cancel (for withdraw) | contracts/spine/approvals.yaml#decideApprovalRequest … |
+| Subscription / Plan / Module / Licence | TICVAI's commercial relationship with a tenant, its plan, the modules it licenses and the limits. | Membership (that is the guest's pass) | R214 |
+| Membership / Annual pass | A guest's pass product and its holder (BO-284 to BO-303). | Subscription (that is the tenant's TICVAI plan) | screens/P08-venue-back-office.yaml#BO-284 |
+| Sandbox client / Production client | A developer's own test credential; a TICVAI-issued live credential after certification. | Test key, Live key, API key (without environment) | DI-927 |
+| Asset (DAM) / Media (ticket) | A digital file in the library; ticket media is a wristband or card carrying entitlements. Never mix them. | Media (for a library asset) | contracts/satellite/assets.yaml#searchMedia … |
+
+
 ## The screens
 
 Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs count fields; requirements are matrix rows; meeting inputs are the ones naming the screen (the module and platform ones are below); white label says whether the tenant's brand reaches it (guest) or it sets the brand (configures).
@@ -72,9 +101,9 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `CMS-083` | Rights, License & Usage Policy Management | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `CMS-084` | Asset Approval Workflow Management | B–D | 0 | 0 | 6 | 0 | 1 | 3 | — | notStarted (—) |
 | `CMS-085` | Publication Eligibility & Governance Validation | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `CMS-086` | Role-Based Asset Access & Permission Management | B–D | 0 | 0 | 6 | 3 | 1 | 5 | — | notStarted (—) |
+| `CMS-086` | Role-Based Asset Access & Permission Management | B–D | 19 | 20 | 6 | 3 | 1 | 5 | — | notStarted (—) |
 | `CMS-087` | Secure Internal & External Sharing | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `CMS-088` | Rights Expiry, Renewal & Usage Impact | B–D | 0 | 12 | 6 | 1 | 1 | 0 | — | notStarted (—) |
+| `CMS-088` | Rights Expiry, Renewal & Usage Impact | B–D | 0 | 8 | 6 | 1 | 1 | 0 | — | notStarted (—) |
 | `CMS-089` | Governance Audit Trail & Compliance Evidence | B–D | 1 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `CMS-090` | Governance Risk, Compliance & AI Recommendations | B–D | 0 | 20 | 6 | 1 | 1 | 0 | — | notStarted (—) |
 
@@ -105,6 +134,14 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Route | `/media-library/dam-governance-rights-command-center-cms-081` |
 
 **Known gaps.** **The pack names 5 actions on this screen and the screen declares 0 operations.** Unserved: Approval Queue, Rights Review, Expiring Assets, External Shares, Governance Issues. Each needs an … **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
+
+**From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** Asset governance overview: pending approval, restricted, expired, blocked, external shares, alerts.
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- The table's columns are the workshop pack's labels with no bound response field (0 of 8 labels bound). (CHG-SGU-024)
+
+**Fixed on main** (the package already carries these; draw what it says): emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything. (CHG-SGU-023).
 
 #### Inputs: what the user enters or picks
 
@@ -180,10 +217,46 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |---|---|
 | Loading (`?state=loading`) | The dam governance rights list. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the dam governance rights untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No dam governance rights yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, first run (`?state=emptyFirstRun`) | Nothing here yet for DAM Governance & Rights Command Center. This screen only reads, so it offers no create action and says where the records come from. |
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the dam governance rights are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Edge cases to draw
+
+- **A person whose grants cover only some venues, or a link to a record in another venue**: The venue filter lists only venues in the session's scope (Session.scope, resolved at sign-in); a record outside it renders Not found, deliberately indistinguishable from absent, never a 'you may not see venue X' message. *(source: ADR-0011; contracts/shared/common.yaml#/components/schemas/Problem; contracts/spine/identity.yaml#getCurrentSession)*
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+Every dam governance rights:
+- Active Assets: 128
+  Pending Approval: 128
+  Approved: 128
+  Pending: 11
+  Restricted: 312
+  Expired: 5
+  Blocked: 11
+  Critical Alerts: 128
+- Active Assets: 42
+  Pending Approval: 46
+  Approved: 46
+  Pending: 128
+  Restricted: 74
+  Expired: 1
+  Blocked: 128
+  Critical Alerts: 42
+- Active Assets: 7
+  Pending Approval: 312
+  Approved: 312
+  Pending: 46
+  Restricted: 19
+  Expired: 3
+  Blocked: 46
+  Critical Alerts: 7
+```
 
 #### Permissions
 
@@ -238,6 +311,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `CMS-001`, `CMS-082`, `CMS-083`, `CMS-084`, `CMS-085`, `CMS-086`, `CMS-087`, `CMS-088`, `CMS-089`, `CMS-090`.
 - [ ] Every gated control is gated: `ASSET_LIBRARY_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 1 edge case(s) from the process notes are drawn.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -259,6 +333,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Route | `/media-library/asset-ownership-responsibility-management-cms-082` |
 
 **Known gaps.** **The pack names 1 actions on this screen and the screen declares 0 operations.** Unserved: Partner. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+**From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** Business owner of each asset, separate from the uploader.
+
+**Fixed on main** (the package already carries these; draw what it says): emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything. (CHG-SGU-023).
 
 #### Inputs: what the user enters or picks
 
@@ -287,11 +365,35 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |---|---|
 | Loading (`?state=loading`) | The asset ownership responsibility list. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the asset ownership responsibility untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No asset ownership responsibility yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, first run (`?state=emptyFirstRun`) | Nothing here yet for Asset Ownership & Responsibility Management. This screen only reads, so it offers no create action and says where the records come from. |
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the asset ownership responsibility are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 Status change refused: archiving an asset that is still referenced (`inUse`, with every reference listed), or a transition `states/media.yaml` does not allow … (MediaStatusRefusedProblem) |
+
+#### Edge cases to draw
+
+- **A person whose grants cover only some venues, or a link to a record in another venue**: The venue filter lists only venues in the session's scope (Session.scope, resolved at sign-in); a record outside it renders Not found, deliberately indistinguishable from absent, never a 'you may not see venue X' message. *(source: ADR-0011; contracts/shared/common.yaml#/components/schemas/Problem; contracts/spine/identity.yaml#getCurrentSession)*
+- **Can read but not change (holds ASSET_LIBRARY_VIEW only)**: Everything reads; the actions needing another permission are not offered as live buttons: ASSET_LIBRARY_MANAGE for updateMediaAsset. Where the person would reasonably expect the action, it shows disabled with the permission named. The server refuses with 403 forbidden regardless. *(source: contracts/satellite/assets.yaml#updateMediaAsset)*
+- **updateMediaAsset answers 409**: Show it as something the person can act on, not a failure: Status change refused: archiving an asset that is still referenced (`inUse`, with every reference listed), or a transition `states/media.yaml` does not allow from the asset's current status (`transitionNotAllowed`) *(source: contracts/satellite/assets.yaml#updateMediaAsset)*
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+getMediaAsset (MediaAssetDetail):
+- kind: standard
+  status: active
+  sizeBytes: 12
+  title: Lazy river at sunset.jpg
+  description: Guest charged twice at Main Gate Till 3
+- kind: standard
+  status: pending
+  sizeBytes: 3
+  title: Wave pool promo (Arabic).mp4
+  description: Group of 40 from Desert Gate Tours
+```
 
 #### Permissions
 
@@ -336,6 +438,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `CMS-081`.
 - [ ] Every gated control is gated: `ASSET_LIBRARY_MANAGE`, `ASSET_LIBRARY_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 3 edge case(s) from the process notes are drawn.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -357,6 +460,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Route | `/media-library/rights-license-usage-policy-management-cms-083` |
 
 **Known gaps.** **The pack names 2 actions on this screen and the screen declares 0 operations.** Unserved: Commercial use permitted, Non-commercial only. Each needs an operation, or needs removing from the screen … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+**From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** How an asset may be used legally and commercially: licensor, territory, channels, dates, commercial or not.
 
 #### Inputs: what the user enters or picks
 
@@ -385,6 +490,22 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the rights license usage are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+rights:
+  licensor: Marina Leisure Group (own)
+  territory: GCC
+  channels:
+  - web
+  - app
+  - signage
+  validTo: 31/12/2027
+  commercialUse: true
+```
 
 #### Permissions
 
@@ -444,7 +565,13 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | `assetId` (navigation) |
 | Route | `/media-library/asset-approval-workflow-management-cms-084` |
 
+**What the spec says about it.** **No Delegate button (CHG-SGU-023).** Delegation is configured ahead of time (`createApprovalDelegation` on the approvals screens), not chosen per decision.
+
 **Known gaps.** **The pack names 6 actions on this screen and the screen declares 0 operations.** Unserved: Approve, Reject, Request Changes, Delegate, Add Comment, Rejection. Each needs an operation, or needs … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. …
+
+**From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** Approval of assets before public use: approve, reject with reason, request changes, comment.
+
+**Fixed on main** (the package already carries these; draw what it says): "Delegate" is a decision button. (CHG-SGU-023).
 
 #### Inputs: what the user enters or picks
 
@@ -459,7 +586,6 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Approve (primary button) | navigation or local | — | — | — | — |
 | Reject (destructive button) | navigation or local | — | — | — | — |
 | Request Changes (secondary button) | navigation or local | — | — | — | — |
-| Delegate (secondary button) | navigation or local | — | — | — | — |
 | Add Comment (secondary button) | navigation or local | — | — | — | — |
 | Rejection (secondary button) | navigation or local | — | — | — | — |
 
@@ -482,6 +608,21 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 Not eligible to publish; the unmet conditions are listed in `unmet` (MediaNotPublishableProblem) |
+
+#### Edge cases to draw
+
+- **setMediaAssetApproval answers 409**: Show it as something the person can act on, not a failure: Not eligible to publish; the unmet conditions are listed in `unmet` *(source: contracts/satellite/assets.yaml#setMediaAssetApproval)*
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+asset: Wave pool promo (Arabic).mp4
+requestedBy: Noura Al Hammadi
+approver: Aisha Al Nuaimi
+sla: 1 day
+```
 
 #### Permissions
 
@@ -519,10 +660,11 @@ Also apply: 8 for all of P13, 29 for every app (section *Design inputs from the 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state (409).
 - [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#CMS-084?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: Approve, Reject, Request Changes, Delegate, Add Comment, Rejection.
+- [ ] Every action is wired with its success and its failure: Approve, Reject, Request Changes, Add Comment, Rejection.
 - [ ] Every transition is wired: `CMS-081`.
 - [ ] Every gated control is gated: `ASSET_LIBRARY_APPROVE`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 1 edge case(s) from the process notes are drawn.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -544,6 +686,8 @@ Also apply: 8 for all of P13, 29 for every app (section *Design inputs from the 
 | Route | `/media-library/publication-eligibility-governance-validation-cms-085` |
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+**From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** Whether an asset may be published: approved, rights valid for the channel, rendition ready, not restricted. Available in the library does not mean publishable.
 
 #### Inputs: what the user enters or picks
 
@@ -577,6 +721,24 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 Not eligible to publish; the unmet conditions are listed in `unmet` (MediaNotPublishableProblem) |
+
+#### Edge cases to draw
+
+- **setMediaAssetApproval answers 409**: Show it as something the person can act on, not a failure: Not eligible to publish; the unmet conditions are listed in `unmet` *(source: contracts/satellite/assets.yaml#setMediaAssetApproval)*
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+asset: Lazy river at sunset.jpg
+approved: true
+rightsValidFor:
+- web
+- app
+renditionReady: true
+eligible: web and app only (signage not licensed)
+```
 
 #### Permissions
 
@@ -616,6 +778,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `CMS-081`.
 - [ ] Every gated control is gated: `ASSET_LIBRARY_APPROVE`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 1 edge case(s) from the process notes are drawn.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -638,6 +801,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** Who may discover, view, edit, download, share, approve or manage assets.
+
+**Fixed on main** (the package already carries these; draw what it says): Empty table and a generic policy create. (CHG-SGU-023).
+
 #### Inputs: what the user enters or picks
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
@@ -647,20 +814,70 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Status | radio group | — | Draft · Pending approval · Active · Suspended · Retired | `listAuthorisationPolicies` ?status |
 | Scope path | text field | — | — | `listAuthorisationPolicies` ?scopePath |
 
-Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+**Form: Grant an asset action to a role** (modal, opened by *Grant an asset action to a role*; *Grant an asset action to a role* calls `createAuthorisationPolicy`, *Cancel* sends nothing)
+
+The role, the asset actions it may take (discover, view, edit, download, share, approve, manage) and the scope it applies at. Dismissing sends nothing.
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Code `code` | text field | required | — | — | — | — | `createAuthorisationPolicy` body |
+| Name `name` | text field | required | — | — | — | — | `createAuthorisationPolicy` body |
+| Description `description` | text area | optional | — | — | — | — | `createAuthorisationPolicy` body |
+| Is template `isTemplate` | toggle | optional | off | — | — | — | `createAuthorisationPolicy` body |
+| Permissions `permissions` | list of values (chips) | optional | — | — | — | Which permissions this policy speaks to. A policy with an empty list speaks to all of them, which is powerful enough that it is worth being explicit about. | `createAuthorisationPolicy` body |
+| Conditions `conditions` | repeatable rows | optional | — | — | — | — | `createAuthorisationPolicy` body |
+| Attribute `conditions[].attribute` | select | required | — | User.attribute · Employee.attribute · Employee.on shift · Membership.tier · Membership.status · Accreditation.type · Accreditation.status · Customer.segment · Resource.classification · Venue.attribute · Venue.id · Attraction.attribute … | — | — | `createAuthorisationPolicy` body |
+| Key `conditions[].key` | text field | optional | — | — | — | For the `*.attribute` forms — which attribute, by code. | `createAuthorisationPolicy` body |
+| Operator `conditions[].operator` | select | required | — | Equals · Not equals · In · Not in · Greater than · Less than · Between · Contains · Starts with · Exists | — | — | `createAuthorisationPolicy` body |
+| Value `conditions[].value` | field | optional | — | — | — | The single comparand for `equals`, `notEquals`, `greaterThan`, `lessThan`, `contains` and `startsWith` — a string, number or boolean, by the attribute. | `createAuthorisationPolicy` body |
+| Values `conditions[].values` | list of values (chips) | optional | — | — | — | — | `createAuthorisationPolicy` body |
+| Combining `combining` | segmented control | optional | All must match | All must match · Any may match | — | — | `createAuthorisationPolicy` body |
+| Effect `effect` | segmented control | required | — | Permit · Deny | — | Deny wins over permit when two policies disagree. 3.3.32 asks for least-privilege, and a permit that can override a deny is not least-privilege by any reading — it is the union of … | `createAuthorisationPolicy` body |
+| Priority `priority` | number field | optional | 0 | — | — | — | `createAuthorisationPolicy` body |
+| Scope path `scopePath` | text field | optional | — | — | — | 3.3.40 to 3.3.43. Tenant, venue and cross-venue policies are one mechanism, because `scope_path` is prefix-comparable — `uae.dubai` contains `uae.dubai.marina` — and inheritance … | `createAuthorisationPolicy` body |
+| Applies to roles `appliesToRoleIds` | multi-picker: choose applies to roles | optional | — | — | — | — | `createAuthorisationPolicy` body |
+| Effective from `effectiveFrom` | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `createAuthorisationPolicy` body |
+| Effective to `effectiveTo` | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `createAuthorisationPolicy` body |
+| Delegated admin roles `delegatedAdminRoleIds` | multi-picker: choose delegated admin roles | optional | — | — | — | 3.3.35. Who may edit this policy without being a platform administrator. | `createAuthorisationPolicy` body |
+
+**Rules for these inputs** (from the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process; these refine the tables above and win where they differ)
+
+- **Scope this applies at**: Not a free choice; each write has one level and the selector says it: createAuthorisationPolicy: tenant-wide only, no region or venue override is offered. Nearest ancestor wins; a workstation is assigned a profile, never configured. *(source: ADR-0018; ADR-0029; screens/_patterns.yaml#configEditor; contracts/spine/identity.yaml#createAuthorisationPolicy)*
 
 #### Outputs: what the screen shows and produces
 
 **Shown**
 
-**Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+**Roles and asset actions** (data table, from `listAuthorisationPolicies`): One row per role, one column per asset action (discover, view, edit, download, share, approve, manage), each allowed or not, with the scope it applies at.
+
+| Shows | Format | Notes |
+|---|---|---|
+| ID | the name it points at, never the id | Assigned by the server on `createAuthorisationPolicy`; the path names the policy on update. |
+| Code | text | — |
+| Name | text | — |
+| Description | text | — |
+| Is template | yes / no (icon or chip) | — |
+| Permissions | list or chips (count when long) | Which permissions this policy speaks to. A policy with an empty list speaks to all of them, which is powerful enough that it is worth being … |
+| Conditions | list or chips (count when long) | — |
+| Attribute | chip: User.attribute, Employee.attribute, Employee.on shift, Membership.tier … | — |
+| Key | text | For the `*.attribute` forms — which attribute, by code. |
+| Operator | chip: Equals, Not equals, In, Not in, Greater than, Less than… | — |
+| Value | text | The single comparand for `equals`, `notEquals`, `greaterThan`, `lessThan`, `contains` and `startsWith` — a string, number or boolean, by … |
+| Values | list or chips (count when long) | — |
+| Combining | chip: All must match, Any may match | — |
+| Effect | chip: Permit, Deny | Deny wins over permit when two policies disagree. 3.3.32 asks for least-privilege, and a permit that can override a deny is not … |
+| Priority | 1,234 | — |
+| Applies to roles | list or chips (count when long) | — |
+| Status | chip: Draft, Pending approval, Active, Suspended, Retired | Moved only by `setAuthorisationPolicyState`. A policy is created as a `draft`, and a status sent in a create or update body is ignored — … |
+| Effective from | 1 Oct 2026, 14:30 | — |
+| Effective to | 1 Oct 2026, 14:30 | — |
+| Delegated admin roles | list or chips (count when long) | 3.3.35. Who may edit this policy without being a platform administrator. |
 
 **Actions and what each produces**
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Create access policy (primary button) | navigation or local | — | — | — | — |
-| Cancel (secondary button) | navigation or local | — | — | — | — |
+| Grant an asset action to a role (primary button) | `createAuthorisationPolicy` POST `/authorisation-policies` | AuthorisationPolicy | AuthorisationPolicy | — | opens modal first |
 
 **Data it reads**: `listAuthorisationPolicies` (onLoad, Who may see which assets)
 
@@ -678,6 +895,31 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the role-based asset access are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Edge cases to draw
+
+- **A person whose grants cover only some venues, or a link to a record in another venue**: The venue filter lists only venues in the session's scope (Session.scope, resolved at sign-in); a record outside it renders Not found, deliberately indistinguishable from absent, never a 'you may not see venue X' message. *(source: ADR-0011; contracts/shared/common.yaml#/components/schemas/Problem; contracts/spine/identity.yaml#getCurrentSession)*
+- **Can read but not change (holds PERMISSION_VIEW only)**: Everything reads; the actions needing another permission are not offered as live buttons: PERMISSION_MANAGE for createAuthorisationPolicy. Where the person would reasonably expect the action, it shows disabled with the permission named. The server refuses with 403 forbidden regardless. *(source: contracts/spine/identity.yaml#createAuthorisationPolicy)*
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+listAuthorisationPolicies (AuthorisationPolicy):
+- code: AQC-AUH
+  name: AquaCove Abu Dhabi
+  description: Guest charged twice at Main Gate Till 3
+  isTemplate: true
+  combining: allMustMatch
+  effect: permit
+- code: AQC-DXB
+  name: Main Gate Till 3
+  description: Group of 40 from Desert Gate Tours
+  isTemplate: false
+  combining: anyMayMatch
+  effect: deny
+```
 
 #### Permissions
 
@@ -722,13 +964,14 @@ Also apply: 8 for all of P13, 29 for every app (section *Design inputs from the 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (19), with its required mark, default, format and its error state.
+- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#CMS-086?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: Create access policy, Cancel.
+- [ ] Every action is wired with its success and its failure: Grant an asset action to a role.
 - [ ] Every transition is wired: `CMS-081`.
 - [ ] Every gated control is gated: `PERMISSION_MANAGE`, `PERMISSION_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 2 edge case(s) from the process notes are drawn.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -750,6 +993,8 @@ Also apply: 8 for all of P13, 29 for every app (section *Design inputs from the 
 | Route | `/media-library/secure-internal-external-sharing-cms-087` |
 
 **Known gaps.** **The pack names 5 actions on this screen and the screen declares 0 operations.** Unserved: Copy Secure Link, Extend, Change Permission, Revoke, View Activity. Each needs an operation, or needs … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+**From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** Secure share links with expiry and permission instead of downloads; extend, change or revoke, with activity.
 
 #### Inputs: what the user enters or picks
 
@@ -790,6 +1035,22 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 
+#### Edge cases to draw
+
+- **A person whose grants cover only some venues, or a link to a record in another venue**: The venue filter lists only venues in the session's scope (Session.scope, resolved at sign-in); a record outside it renders Not found, deliberately indistinguishable from absent, never a 'you may not see venue X' message. *(source: ADR-0011; contracts/shared/common.yaml#/components/schemas/Problem; contracts/spine/identity.yaml#getCurrentSession)*
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+share: Summer 2026 press kit
+recipient: press@gulfnews.example
+permission: view and download
+expires: 15/10/2026
+views: 6
+```
+
 #### Permissions
 
 - `createMediaShare` → `ASSET_LIBRARY_SHARE` (operate) · staff
@@ -828,6 +1089,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `CMS-081`.
 - [ ] Every gated control is gated: `ASSET_LIBRARY_SHARE`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 1 edge case(s) from the process notes are drawn.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -849,6 +1111,14 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Route | `/media-library/rights-expiry-renewal-usage-impact-cms-088` |
 
 **Known gaps.** **The pack names 6 actions on this screen and the screen declares 0 operations.** Unserved: Renew Rights, Upload Renewal Document, Change Expiry, Find Replacement, Notify Owner, Expiry Workflow. Each … **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
+
+**From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** Assets whose rights expire in 7, 30 or 60 days or have expired, with live usages and renewal or replacement.
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- The table's columns are the workshop pack's labels with no bound response field (0 of 6 labels bound). (CHG-SGU-024)
+
+**Fixed on main** (the package already carries these; draw what it says): "Example" and "DAM-IMG-008421" are table columns. (CHG-SGU-023).
 
 #### Inputs: what the user enters or picks
 
@@ -872,8 +1142,6 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Expires in 30 days | text | not in the schema: `Expires in 30 Days` |
 | Expires in 60 days | text | not in the schema: `Expires in 60 Days` |
 | Expired | text | not in the schema: `Expired` |
-| Example | text | not in the schema: `Example` |
-| DAM IMG 008421 | text | not in the schema: `DAM-IMG-008421` |
 
 **The selected rights expiry renewal** (detail panel): The pack groups this record's detail under its own headings: “Rights expire”, “Impact”, “Owner notification”, “Digital Asset Management”, “Escalation”, “Expired”.
 
@@ -883,8 +1151,6 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Expires in 30 days | text | not in the schema: `Expires in 30 Days` |
 | Expires in 60 days | text | not in the schema: `Expires in 60 Days` |
 | Expired | text | not in the schema: `Expired` |
-| Example | text | not in the schema: `Example` |
-| DAM IMG 008421 | text | not in the schema: `DAM-IMG-008421` |
 
 **Actions and what each produces**
 
@@ -913,6 +1179,37 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the rights expiry renewal are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Edge cases to draw
+
+- **A person whose grants cover only some venues, or a link to a record in another venue**: The venue filter lists only venues in the session's scope (Session.scope, resolved at sign-in); a record outside it renders Not found, deliberately indistinguishable from absent, never a 'you may not see venue X' message. *(source: ADR-0011; contracts/shared/common.yaml#/components/schemas/Problem; contracts/spine/identity.yaml#getCurrentSession)*
+- **Can read but not change (holds ASSET_LIBRARY_VIEW only)**: Everything reads; the actions needing another permission are not offered as live buttons: ASSET_LIBRARY_MANAGE for setMediaAssetRights. Where the person would reasonably expect the action, it shows disabled with the permission named. The server refuses with 403 forbidden regardless. *(source: contracts/satellite/assets.yaml#setMediaAssetRights)*
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+Every rights expiry renewal:
+- Expires in 7 Days: 46
+  Expires in 30 Days: 312
+  Expires in 60 Days: 312
+  Expired: 5
+  Example: 11
+  DAM-IMG-008421: 57
+- Expires in 7 Days: 312
+  Expires in 30 Days: 74
+  Expires in 60 Days: 74
+  Expired: 1
+  Example: 128
+  DAM-IMG-008421: 11
+- Expires in 7 Days: 74
+  Expires in 30 Days: 19
+  Expires in 60 Days: 19
+  Expired: 3
+  Example: 46
+  DAM-IMG-008421: 128
+```
 
 #### Permissions
 
@@ -951,12 +1248,13 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (12 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (8 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#CMS-088?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Renew Rights, Upload Renewal Document, Change Expiry, Find Replacement, Notify Owner, Expiry Workflow.
 - [ ] Every transition is wired: `CMS-081`.
 - [ ] Every gated control is gated: `ASSET_LIBRARY_MANAGE`, `ASSET_LIBRARY_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 2 edge case(s) from the process notes are drawn.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -978,6 +1276,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Route | `/media-library/governance-audit-trail-compliance-evidence-cms-089` |
 
 **Known gaps.** **The pack names 1 actions on this screen and the screen declares 0 operations.** Unserved: Action. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen …
+
+**From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** Every governance action on assets (approval, rights change, share, delete) with who and when.
+
+**Fixed on main** (the package already carries these; draw what it says): emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything. (CHG-SGU-023).
 
 #### Inputs: what the user enters or picks
 
@@ -1005,10 +1307,20 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | Loading (`?state=loading`) | The governance audit trail configuration as saved. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the governance audit trail untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No governance audit trail configured yet. Carries the create action and says what the platform does in the meantime. |
+| Empty, first run (`?state=emptyFirstRun`) | Nothing here yet for Governance Audit Trail & Compliance Evidence. This screen only reads, so it offers no create action and says where the records come from. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Empty, no results (`?state=emptyNoResults`) | **Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+entries:
+- 01/10/2026 10:02 Aisha Al Nuaimi approved Wave pool promo (Arabic).mp4
+- 30/09/2026 16:44 Noura Al Hammadi changed rights expiry on Lazy river at sunset.jpg
+```
 
 #### Permissions
 
@@ -1070,6 +1382,14 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
 
+**From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** Governance risks (no rights, expired in use, long-lived shares, missing evidence) with AI help.
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- The table's columns are the workshop pack's labels with no bound response field (0 of 10 labels bound). (CHG-SGU-024)
+
+**Fixed on main** (the package already carries these; draw what it says): emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything. (CHG-SGU-023).
+
 #### Inputs: what the user enters or picks
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
@@ -1128,10 +1448,46 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |---|---|
 | Loading (`?state=loading`) | The governance risk compliance list. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the governance risk compliance untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No governance risk compliance yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, first run (`?state=emptyFirstRun`) | Nothing here yet for Governance Risk, Compliance & AI Recommendations. This screen only reads, so it offers no create action and says where the records come from. |
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the governance risk compliance are still there. The pack's own statuses are 🟢 Valid — the state names which is selected. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Edge cases to draw
+
+- **A person whose grants cover only some venues, or a link to a record in another venue**: The venue filter lists only venues in the session's scope (Session.scope, resolved at sign-in); a record outside it renders Not found, deliberately indistinguishable from absent, never a 'you may not see venue X' message. *(source: ADR-0011; contracts/shared/common.yaml#/components/schemas/Problem; contracts/spine/identity.yaml#getCurrentSession)*
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+Every governance risk compliance:
+- Assets Without Rights: 233
+  Expired Assets: 128
+  Rights Expiring: 11
+  Unapproved Assets: 128
+  Restricted Assets in Active Usage: 3 h 20 min
+  External Shares: 11
+  Long-Lived Shares: 46
+  Missing Evidence: 0
+- Assets Without Rights: 57
+  Expired Assets: 42
+  Rights Expiring: 128
+  Unapproved Assets: 42
+  Restricted Assets in Active Usage: 42 min
+  External Shares: 128
+  Long-Lived Shares: 312
+  Missing Evidence: 5
+- Assets Without Rights: 11
+  Expired Assets: 7
+  Rights Expiring: 46
+  Unapproved Assets: 7
+  Restricted Assets in Active Usage: 1.8 s
+  External Shares: 46
+  Long-Lived Shares: 74
+  Missing Evidence: 1
+```
 
 #### Permissions
 
@@ -1175,6 +1531,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `CMS-081`.
 - [ ] Every gated control is gated: `ASSET_LIBRARY_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 1 edge case(s) from the process notes are drawn.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---

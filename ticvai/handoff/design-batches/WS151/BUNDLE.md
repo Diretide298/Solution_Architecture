@@ -1,14 +1,14 @@
 # WS151 — Payment Payment Orchestration board 5
 
-**10 screens · 16 operations · 16 schemas · 6 permissions**
+**10 screens · 17 operations · 16 schemas · 6 permissions**
 
-Platform P09 TICVAI Web · ships as **ticvai-control** ·
-platformAdmin audience · web ·
+Platform P08 Venue Management · ships as **venue-management** ·
+staff audience · web ·
 online only
 
 ## Who this is for
 
-**platformAdmin on web.** Everything below is how you know what is
+**staff on web.** Everything below is how you know what is
 true. **None of it is the subject.** The subject is the person in front of the screen and the one
 thing they came to do.
 
@@ -61,22 +61,61 @@ convincingly. It is never a caption.
   and its error; and, element by element, what is shown and in what format, what each action
   produces and where the user goes next. Draw exactly that.
 
+## The processes these screens belong to
+
+Written by the owner of each process (`handoff/design-notes/`). Read before any screen: it says how the process runs end to end and which words the screens must use.
+
+### Ticketing & Guest Commerce, as the venue and TICVAI configure and run it
+
+WHAT THE PROCESS IS. Everything a guest can buy is set up, priced, promoted and serviced here, on Venue Management (P08, the venue's own back office, served inside the venue's cell) and on the TICVAI Console (P09, TICVAI's control plane, outside every cell). End to end: (1) CATALOGUE. A product has one of twelve kinds (admission, timedAdmission, datedAdmission, openDated, seated, membership, bundle, fnb, retail, rental, addOn, giftCard). Its ticket types (adult, child, senior, resident...) are not typed one by one: they are generated from the product's attributes (components) and each value combination becomes a sellable ticket type with no extra setup (DI-164). What a ticket grants (validity, entries, re-entry, days of week, blackout dates, expiry anchor, fast track, transfer) lives on a reusable entitlement template, not on the product. Who may take part (age, height, supervision, certification) is the eligibility rule; what the guest must answer is the data mask and the consent questions; how the guest sees it is guestListing (bookable, infoOnly, hidden), display tags (at most six), media and the booking flow. Group, family and corporate products and every after-sales policy (reschedule, exchange, refund, cancellation, upgrade, transfer) are configured inside the one product configuration, never on separate screens (DI-465, DI-466). (2) LIFECYCLE AND PUBLICATION. A product moves draft, inReview, approved, live, withdrawn, archived. Approval and publication are two acts with two permissions (PRODUCT_APPROVE, PRODUCT_PUBLISH, R091); every product is authorised before it sells online or on site (DI-438). Approved is still not on a till: a till sells only what is in the signed catalogue release it pulled (publishBundle, ADR-0013), so a saved price is a back-office fact until the venue publishes to tills. Changing something that has sold is preceded by an impact check (assessProductChange: orders affected, entitlements issued, future performances, open carts); restoring a version creates a new version, and sold tickets keep the price and terms they were sold under (restoreProductVersion, DI-938, TRACKER Actions row 145). (3) PRICE. Prices live in price lists: per venue, per channel set, with validity dates and a priority, copied for the next season with an uplift (copyPriceList) and repriced in bulk only after a dry run (bulkChangePrices). Currency and decimal scale are never chosen on a form: they resolve from the venue's region (ADR-0008, ADR-0018; AED 2 places, OMR and BHD 3). When several rules apply, the configured hierarchy decides; there is no "lowest price wins" default (DI-595). Tax on the pre-discount price and three-decimal rounding are regional settings (DI-598). Dynamic rules always show their minimum and maximum price guardrails beside the trigger (getDynamicPriceRule). (4) PROMOTE AND BUNDLE. A promotion is a rule (automatic, or gated by a code) created in draft, made live only by Publish, which first analyses stacking; a …
+*(source: DI-164; DI-171; DI-438; DI-465; DI-466; DI-595; DI-598; DI-387; DI-039; DI-044; DI-474; DI-671; DI-987; DI-019; DI-080; ADR-0008; ADR-0013; ADR-0018; ADR-0019; ADR-0030; R091; R098; R101; R222; REV3-21; contracts/spine/catalogue.yaml#transitionProductLifecycle …)*
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Product | Anything sellable, of one of the twelve kinds. The record that carries names, channels, listing, media and policies. | Item (except on F&B and retail screens), SKU (for tickets), Offering | contracts/spine/catalogue.yaml#/components/schemas/ProductKind |
+| Ticket type | One sellable variant of an admission or event product (Adult, Child, Resident Adult), generated from the product's attributes. For retail and F&B the same record is labelled Variant. | Variant (on ticket screens), Sub-product, Rate (that is a price), Axis value | contracts/spine/catalogue.yaml#updateProductVariant / DI-164 / DI-437 |
+| Attribute | A dimension that generates ticket types (Guest category, Residency, Tier, Length). Each has values; adding a value adds ticket types. | Axis, Component (the client's word; use it only in help text), Option | contracts/spine/catalogue.yaml#setProductAttributes / DI-164 / DI-450 |
+| Entitlement | What a ticket lets the holder do (validity, entries, re-entry, days, blackout dates, expiry, fast track, transfer), defined once on an entitlement template and shared by several products. | Access rights, Ticket rules, Validity profile | contracts/spine/catalogue.yaml#createEntitlementTemplate / DI-171 / DI-451 |
+| Eligibility rule | Who may take part in or buy a product (age, height, supervision, waiver, certification). Distinct from a promotion's eligibility, which decides who gets a discount. | Restriction, Access rule (that is access control) | contracts/spine/catalogue.yaml#setProductEligibilityRule / DI-463 |
+| Price list | A set of prices for one venue and a set of channels, valid between two dates, with a priority. Several coexist (B2C, B2B, season). | Price book, Rate card, Tariff | contracts/spine/catalogue.yaml#createPriceList / DI-140 / DI-163 |
+| Price category | A standard rate type (Adult, Child, Member) reused across lists so venues do not invent "Adult Standard" and "Normal Adult". | Price band (that is a seat-category band), Fare type (transport) | contracts/spine/catalogue.yaml#setPriceCategoryRateType / … |
+| Price band | A priced band on a seat category (code, label, colour, amount, channel, from-date). | Price category, Zone price | contracts/satellite/seating.yaml#/components/schemas/SeatPriceBand |
+| Promotion | A rule that changes a price automatically or when a code is entered; draft until published; declares how it stacks. | Offer (except in guest copy), Deal, Discount rule | contracts/satellite/promotions.yaml#createPromotion / DI-173 / DI-174 |
+| Coupon code | A code issued from a coupon campaign that applies a promotion-style discount; one shared code or many single-use codes. | Voucher, Promo voucher | contracts/satellite/promotions.yaml#createCouponCampaign / DI-173 |
+| Voucher | A code that carries money (face value, balance), sold or issued; a liability until redeemed or expired. | Coupon, Credit note | contracts/satellite/promotions.yaml#listVoucherBatches / … |
+| Bundle | A product sold as one line whose price differs from the sum of its components, with a mandatory revenue allocation. "Package" is acceptable in guest copy. | Combo (that is an F&B meal deal), Catalogue bundle | contracts/satellite/promotions.yaml#createBundle / DI-220 / ADR-0019 |
+| Catalogue release | The signed snapshot of a venue's catalogue, prices, promotions and sale boards that tills, kiosks and devices pull. Its action label is "Publish to tills". | Bundle, Catalogue bundle, Sync, Deploy | contracts/spine/catalogue.yaml#publishBundle / … |
+| Approve / Publish / Save | Save keeps a draft; Approve records that it is authorised (PRODUCT_APPROVE); Publish makes it live for guests and channels (PRODUCT_PUBLISH). Three different buttons, never merged. | Submit, Go live, Activate (except CatalogueConfigStatus active), Deploy | R091 / contracts/spine/catalogue.yaml#transitionProductLifecycle / DI-438 |
+| Product states | Draft, In review, Approved, Live, Withdrawn, Archived (ProductLifecycleState), always as coloured badges with these exact labels. | Published (for a product), Pending, Inactive (for a product) | contracts/spine/catalogue.yaml#/components/schemas/ProductLifecycleState |
+| Channel | Where something is sold. Labels: pos Point of sale; kiosk Kiosk; web and guestWeb Website; mobile and guestApp App; b2b B2B partners; partner Partner; ota Travel agents (OTA); callCentre Call centre; api API; backOffice Back office. | Touchpoint, Outlet (an outlet is a business inside a venue), raw enum values | contracts/spine/catalogue.yaml#/components/schemas/Channel / … |
+| Refund | Money returned after settlement, wholly or for some lines, under the venue's refund policy. | Return (that is retail goods), Reversal, Void | contracts/spine/orders.yaml#createRefund / DI-252 |
+| Void | Cancelling a whole order before settlement, within the same shift, with a reason from the void list. After settlement it is a refund. | Cancel order, Delete | contracts/spine/orders.yaml#voidOrder / R222 |
+| Exchange / Reschedule | Exchange swaps lines for other products or dates and settles only the difference; Reschedule is the same product moved to another date or time. | Rebook, Date change (acceptable only in guest copy), Refund and resell | contracts/spine/orders.yaml#exchangeOrderLines / … |
+| Hold / Capture / Release | A deposit or stored-value amount is held, then partly or fully captured, and the rest released. A held deposit is not a payment. | Charge, Pre-auth (in staff copy), Block funds | contracts/spine/orders.yaml#authoriseStoredValue / … |
+| Wallet (TICVAI wallet) | The guest's stored-value balance on TICVAI, spent by hold and capture. Distinct from the tender "Apple Pay / Google Pay", which the contract also calls wallet. | Digital wallet (for stored value), E-wallet, Credit (without a type) | contracts/spine/orders.yaml#/components/schemas/TenderKind / R080 |
+| Credit lot | One amount of wallet credit of one credit type (cash, bonus, gift) with its own expiry; lots are spent nearest expiry first and the guest sees the breakdown but cannot choose. | Bucket, Batch, Top-up | TRACKER Actions row 171 / contracts/satellite/wallet.yaml#expireCreditLots |
+| Venue map / Seat map | A venue map is the wayfinding map of a park or a floor (points, paths, bookable places); a seat map is the seating layout of an auditorium or stand. Never just "map" where both could be meant. | Layout (alone), Floor plan (unless it is a floor map), Map (alone) | contracts/satellite/venue-map.yaml#createVenueMap / … |
+| Point / Bookable place | A point is a place on a venue map (toilet, ride, restaurant, exit). A bookable place is a cabana, lounger, table or pitch placed on the map and sold through its price band. | Pin, POI, Marker, Resource (in staff copy) | contracts/satellite/venue-map.yaml#setVenuePoint / … |
+| Station / Route / Timetable / Departure / Fare table / Pass … | A route is an ordered list of stations with offsets; a timetable generates departures up to its release horizon; a fare table prices a route per passenger type; a pass type is a multi-trip or unlimited pass sold as a product. | Stop (except in the stop list), Line (except lineCode), Schedule, Trip (except a guest's journey) | contracts/satellite/transport.yaml / REV3-21 |
+| Applies from | The effective date of a change. Every dated change shows it, and sold items keep their old terms. | Effective date (in labels), Start date (for a change) | contracts/satellite/seating.yaml#updateSeatCategory / TRACKER Actions row 194 |
+
+
 ## The screens
 
 Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs count fields; requirements are matrix rows; meeting inputs are the ones naming the screen (the module and platform ones are below); white label says whether the tenant's brand reaches it (guest) or it sets the brand (configures).
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-599` | Mixed Tender & Credit Command Center\t93 | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-600` | Mixed Tender Rule & Combination Builder\t93 | B–D | 0 | 6 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-601` | Split Payment & Tender Allocation Manager\t94 | B–D | 4 | 9 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-602` | B2B Credit Account & Limit Manager\t95 | B–D | 7 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-603` | B2B Invoice, On-Account & Payment Terms Configuration\t96 | A | 10 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-604` | Stored Value, Gift Card & Voucher Tender Controls\t97 | B–D | 11 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
-| `ADM-605` | Advanced Payment Eligibility, Sequence & Restriction Rules\t98 | B–D | 0 | 2 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-606` | Partial Payment, Failure & Recovery Manager\t100 | B–D | 0 | 4 | 6 | 1 | 0 | 0 | — | notStarted (—) |
-| `ADM-607` | Mixed Tender Transaction Trace & Allocation Audit\t100 | B–D | 11 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-608` | Mixed Tender Simulator, Credit Exposure & AI Advisor\t102 | B–D | 0 | 10 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-599` | Mixed Tender & Credit Command Center | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-600` | Mixed Tender Rule & Combination Builder | B–D | 0 | 15 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-601` | Split Payment & Tender Allocation Manager | B–D | 4 | 9 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-602` | B2B Credit Account & Limit Manager | B–D | 7 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-603` | B2B Invoice, On-Account & Payment Terms Configuration | A | 10 | 8 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-604` | Stored Value, Gift Card & Voucher Tender Controls | B–D | 11 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
+| `ADM-605` | Advanced Payment Eligibility, Sequence & Restriction Rules | B–D | 0 | 11 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-606` | Partial Payment, Failure & Recovery Manager | B–D | 0 | 4 | 6 | 1 | 0 | 0 | — | notStarted (—) |
+| `ADM-607` | Mixed Tender Transaction Trace & Allocation Audit | B–D | 11 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-608` | Mixed Tender Simulator, Credit Exposure & AI Advisor | B–D | 0 | 10 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 
@@ -88,21 +127,29 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 **One block per screen, in the order to build them.** Each says what the user enters (every control, with its rules), what the screen shows and produces (every field, with its format; every action, with what it returns and the errors to draw), every state, who may do what, the requirements it meets, what the client said about it, the tracker items, what the tenant configures, the references, and an acceptance checklist. **Everything in a block is for you, never for the screen**: no id, field name, operation or permission key may appear as text.
 
-### `ADM-599` Mixed Tender & Credit Command Center\t93
+### `ADM-599` Mixed Tender & Credit Command Center
 
 **Provide centralized operational visibility over mixed-tender and account-credit transactions.**
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `core` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `PAYMENT_VIEW` (1 read); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `PAYMENT_VIEW` (1 read); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | commandCentre (compact density): the pack gives this screen a metric directory (§KPI Cards) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/commercial/mixed-tender-credit-command-center-t93-adm-599` |
+
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Mixed-tender and account-credit transactions at a glance.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **The screen name ends in an escaped tab and the pack page number: "Mixed Tender & Credit Command Center\t93".** Why: The pack page number leaked into the name; it would print on the screen title and the navigation. *(source: screens/P08-venue-back-office.yaml#ADM-599; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
 
 #### Inputs: what the user enters or picks
 
@@ -136,20 +183,24 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Payment Allocation Exceptions** (metric tile)
 
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **tender rules**: Which tenders combine and in what order. *(source: contracts/satellite/payments.yaml#getMixedTenderRules)*
+
 **Data it reads**: `getMixedTenderRules` (onLoad, Tender rules in force)
 
 **Where the user goes next**
 
-- → `ADM-002` Platform Dashboard: *Back to Platform Dashboard*
-- → `ADM-600` Mixed Tender Rule & Combination Builder\t93: *Mixed Tender Rule & Combination Builder\t93*
-- → `ADM-601` Split Payment & Tender Allocation Manager\t94: *Split Payment & Tender Allocation Manager\t94*
-- → `ADM-602` B2B Credit Account & Limit Manager\t95: *B2B Credit Account & Limit Manager\t95*
-- → `ADM-603` B2B Invoice, On-Account & Payment Terms Configuration\t96: *B2B Invoice, On-Account & Payment Terms Configuration\t96*
-- → `ADM-604` Stored Value, Gift Card & Voucher Tender Controls\t97: *Stored Value, Gift Card & Voucher Tender Controls\t97*
-- → `ADM-605` Advanced Payment Eligibility, Sequence & Restriction Rules\t98: *Advanced Payment Eligibility, Sequence & Restriction Rules\t98*
-- → `ADM-606` Partial Payment, Failure & Recovery Manager\t100: *Partial Payment, Failure & Recovery Manager\t100*
-- → `ADM-607` Mixed Tender Transaction Trace & Allocation Audit\t100: *Mixed Tender Transaction Trace & Allocation Audit\t100*
-- → `ADM-608` Mixed Tender Simulator, Credit Exposure & AI Advisor\t102: *Mixed Tender Simulator, Credit Exposure & AI Advisor\t102*
+- → `BO-100` Venue Home: *Back to Venue Home*
+- → `ADM-600` Mixed Tender Rule & Combination Builder: *Mixed Tender Rule & Combination Builder\t93*
+- → `ADM-601` Split Payment & Tender Allocation Manager: *Split Payment & Tender Allocation Manager\t94*
+- → `ADM-602` B2B Credit Account & Limit Manager: *B2B Credit Account & Limit Manager\t95*
+- → `ADM-603` B2B Invoice, On-Account & Payment Terms Configuration: *B2B Invoice, On-Account & Payment Terms Configuration\t96*
+- → `ADM-604` Stored Value, Gift Card & Voucher Tender Controls: *Stored Value, Gift Card & Voucher Tender Controls\t97*
+- → `ADM-605` Advanced Payment Eligibility, Sequence & Restriction Rules: *Advanced Payment Eligibility, Sequence & Restriction Rules\t98*
+- → `ADM-606` Partial Payment, Failure & Recovery Manager: *Partial Payment, Failure & Recovery Manager\t100*
+- → `ADM-607` Mixed Tender Transaction Trace & Allocation Audit: *Mixed Tender Transaction Trace & Allocation Audit\t100*
+- → `ADM-608` Mixed Tender Simulator, Credit Exposure & AI Advisor: *Mixed Tender Simulator, Credit Exposure & AI Advisor\t102*
 
 #### States
 
@@ -161,6 +212,14 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the mixed tender credit are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+rule: Gift card, then TICVAI wallet, then card
+```
 
 #### Permissions
 
@@ -176,7 +235,7 @@ No matrix row traces to this screen's operations or data.
 
 None names this screen.
 
-Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -184,7 +243,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-599` · status **notStarted** · provenance —
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-599` · status **notStarted** · provenance —
 - Client workshop board: `wireframes/WS91 Payment Payment Orchestration Board 5.dc.html#adm-599`
 - Workshop pack: Payment_Payment_Orchestration.pdf board 5
 - Flow F260 *Payment Payment Orchestration board 5: Mixed Tender & Credit Command Center\t93*, step 1: Opens Mixed Tender & Credit Command Center\t93 → Provide centralized operational visibility over mixed-tender and account-credit transactions.
@@ -205,34 +264,49 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-599?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
-- [ ] Every transition is wired: `ADM-002`, `ADM-600`, `ADM-601`, `ADM-602`, `ADM-603`, `ADM-604`, `ADM-605`, `ADM-606`, `ADM-607`, `ADM-608`.
+- [ ] Every transition is wired: `BO-100`, `ADM-600`, `ADM-601`, `ADM-602`, `ADM-603`, `ADM-604`, `ADM-605`, `ADM-606`, `ADM-607`, `ADM-608`.
 - [ ] Every gated control is gated: `PAYMENT_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
 
-### `ADM-600` Mixed Tender Rule & Combination Builder\t93
+### `ADM-600` Mixed Tender Rule & Combination Builder
 
 **Define which payment methods may be combined within a single transaction.**
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `core` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `PAYMENT_CONFIGURE` (1 configure); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `PAYMENT_CONFIGURE`, `PAYMENT_VIEW` (1 configure, 1 read); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Card r t Credit; Card) and no metric row |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/commercial/mixed-tender-rule-combination-builder-t93-adm-600` |
 
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
+
 **Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape … **Mixed Tender Rule & Combination Builder\t93 declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so …
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Which methods may combine in one transaction and in what order; stored value before card.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **The screen name ends in an escaped tab and the pack page number: "Mixed Tender Rule & Combination Builder\t93".** Why: The pack page number leaked into the name; it would print on the screen title and the navigation. *(source: screens/P08-venue-back-office.yaml#ADM-600; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
+
+**Fixed on main** (the package already carries these; draw what it says): No read operation: the screen declares only setMixedTenderRules and nothing that returns the current configuration. (CHG-WIR-025).
 
 #### Inputs: what the user enters or picks
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **combinations**: Ordered sequence and forbidden combinations. *(source: contracts/satellite/payments.yaml#setMixedTenderRules)*
 
 #### Outputs: what the screen shows and produces
 
@@ -246,6 +320,20 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Cash ✓ — ✓ ✓ ✓ ✓ | text | not in the schema: `Cash ✓ — ✓ ✓ ✓ ✓` |
 | Voucher ✓ ✓ ✓* — ✓ ✓ | text | not in the schema: `Voucher ✓ ✓ ✓* — ✓ ✓` |
 
+**Current rules** (detail panel, from `getMixedTenderRules`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Split payment allowed | yes / no (icon or chip) | — |
+| Maximum tenders | 1,234 | — |
+| Tender order | list or chips (count when long) | Across tender kinds. `wallet` decides the order within stored value. |
+| Allowed combinations | list or chips (count when long) | — |
+| Method kinds | list or chips (count when long) | — |
+| Allowed | yes / no (icon or chip) | — |
+| Reason | text | — |
+| Partial payment allowed | yes / no (icon or chip) | — |
+| On partial failure | chip: Reverse all, Keep and retry, Keep and hold | Three tenders in, the fourth fails. Reversing all of it is the only answer that leaves the guest and the ledger in a state anybody can … |
+
 **The selected mixed tender rule** (detail panel): The pack groups this record's detail under its own headings: “Gift”, “Maximum”.
 
 | Shows | Format | Notes |
@@ -254,9 +342,11 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Cash ✓ — ✓ ✓ ✓ ✓ | text | not in the schema: `Cash ✓ — ✓ ✓ ✓ ✓` |
 | Voucher ✓ ✓ ✓* — ✓ ✓ | text | not in the schema: `Voucher ✓ ✓ ✓* — ✓ ✓` |
 
+**Data it reads**: `getMixedTenderRules` (onLoad, Which tenders may be combined, and in what order)
+
 **Where the user goes next**
 
-- → `ADM-599` Mixed Tender & Credit Command Center\t93: *Back to Mixed Tender & Credit Command Center\t93*
+- → `ADM-599` Mixed Tender & Credit Command Center: *Back to Mixed Tender & Credit Command Center\t93*
 
 #### States
 
@@ -269,9 +359,19 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+forbidden:
+- voucher + payment link
+```
+
 #### Permissions
 
 - `setMixedTenderRules` → `PAYMENT_CONFIGURE` (configure) · staff
+- `getMixedTenderRules` → `PAYMENT_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -283,7 +383,7 @@ No matrix row traces to this screen's operations or data.
 
 None names this screen.
 
-Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -291,7 +391,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-600` · status **notStarted** · provenance —
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-600` · status **notStarted** · provenance —
 - Client workshop board: `wireframes/WS91 Payment Payment Orchestration Board 5.dc.html#adm-600`
 - Workshop pack: Payment_Payment_Orchestration.pdf board 5
 - Flow F260 *Payment Payment Orchestration board 5: Mixed Tender & Credit Command Center\t93*, step 2: Works in Mixed Tender Rule & Combination Builder\t93 → Define which payment methods may be combined within a single transaction.
@@ -299,33 +399,42 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state (412).
-- [ ] Every output is drawn (6 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (15 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-600?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `ADM-599`.
-- [ ] Every gated control is gated: `PAYMENT_CONFIGURE`.
+- [ ] Every gated control is gated: `PAYMENT_CONFIGURE`, `PAYMENT_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
 
-### `ADM-601` Split Payment & Tender Allocation Manager\t94
+### `ADM-601` Split Payment & Tender Allocation Manager
 
 **Determine how an order total is allocated across several payment methods.**
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `core` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `ORDER_CREATE`, `ORDER_VIEW`, `PAYMENT_CONFIGURE` (1 operate, 1 read, 1 configure); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `ORDER_CREATE`, `ORDER_VIEW`, `PAYMENT_CONFIGURE` (1 operate, 1 read, 1 configure); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/commercial/split-payment-tender-allocation-manager-t94-adm-601` |
 
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
+
 **Known gaps.** **Split Payment & Tender Allocation Manager\t94 declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** How an order total is split across tenders and in what sequence (stored value before card).
+
+**Known correction pending (do not draw the wrong version)**
+
+- **The screen name ends in an escaped tab and the pack page number: "Split Payment & Tender Allocation Manager\t94".** Why: The pack page number leaked into the name; it would print on the screen title and the navigation. *(source: screens/P08-venue-back-office.yaml#ADM-601; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
 
 #### Inputs: what the user enters or picks
 
@@ -337,6 +446,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Terminal id | picker: choose a terminal (drawn as a picker, not a text box) | optional | — | — | shows names, sends the id | Sends `?terminalId=` to `listPaymentAllocationRules`. | `listPaymentAllocationRules` ?terminalId |
 | Product id | picker: choose a product (drawn as a picker, not a text box) | optional | — | — | shows names, sends the id | Sends `?productId=` to `listPaymentAllocationRules`. | `listPaymentAllocationRules` ?productId |
 | Is active | toggle | optional | on | — | — | Sends `?isActive=` to `listPaymentAllocationRules`. | `listPaymentAllocationRules` ?isActive |
+
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **sequence**: Ordered tenders; restrictions per tender. *(source: contracts/satellite/payments.yaml#setMixedTenderRules / contracts/spine/orders.yaml#setMultiPaymentSplit)*
 
 #### Outputs: what the screen shows and produces
 
@@ -367,7 +480,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Where the user goes next**
 
-- → `ADM-599` Mixed Tender & Credit Command Center\t93: *Back to Mixed Tender & Credit Command Center\t93*
+- → `ADM-599` Mixed Tender & Credit Command Center: *Back to Mixed Tender & Credit Command Center\t93*
 
 #### States
 
@@ -379,6 +492,17 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the split payment tender are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+sequence:
+- Gift card
+- TICVAI wallet
+- Card
+```
 
 #### Permissions
 
@@ -396,7 +520,7 @@ No matrix row traces to this screen's operations or data.
 
 None names this screen.
 
-Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -404,7 +528,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-601` · status **notStarted** · provenance —
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-601` · status **notStarted** · provenance —
 - Client workshop board: `wireframes/WS91 Payment Payment Orchestration Board 5.dc.html#adm-601`
 - Workshop pack: Payment_Payment_Orchestration.pdf board 5
 - Flow F260 *Payment Payment Orchestration board 5: Mixed Tender & Credit Command Center\t93*, step 4: Works in Split Payment & Tender Allocation Manager\t94 → Determine how an order total is allocated across several payment methods.
@@ -418,27 +542,37 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `ADM-599`.
 - [ ] Every gated control is gated: `ORDER_CREATE`, `ORDER_VIEW`, `PAYMENT_CONFIGURE`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
 
-### `ADM-602` B2B Credit Account & Limit Manager\t95
+### `ADM-602` B2B Credit Account & Limit Manager
 
 **Manage payment credit facilities granted to authorized B2B customers, resellers, corporate clients or partners. This is not the general B2B customer profile. The B2B/CRM module remains authoritative for the customer/account itself. Board 5 owns the payment-credit capability.**
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `core` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `CREDIT_MANAGE`, `PAYMENT_VIEW` (1 configure, 1 read); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `CREDIT_MANAGE`, `PAYMENT_VIEW` (1 configure, 1 read); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/commercial/b2b-credit-account-limit-manager-t95-adm-602` |
 
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
+
 **Known gaps.** **B2B Credit Account & Limit Manager\t95 declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either …
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** On-account credit facilities for B2B customers: limits and exposure.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **The screen name ends in an escaped tab and the pack page number: "B2B Credit Account & Limit Manager\t95".** Why: The pack page number leaked into the name; it would print on the screen title and the navigation. *(source: screens/P08-venue-back-office.yaml#ADM-602; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
+- **List operation(s) listB2bCreditAccounts return a bare array, not the paged list envelope (items, nextCursor, hasMore).** Why: The table cannot page, and a row without an id cannot open, edit or link to the record it summarises. *(source: contracts/satellite/payments.yaml#listB2bCreditAccounts; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
 
 #### Inputs: what the user enters or picks
 
@@ -462,11 +596,15 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Outputs: what the screen shows and produces
 
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **exposure**: Limit, used, available, overdue. *(source: contracts/satellite/payments.yaml#listB2bCreditAccounts)*
+
 **Data it reads**: `listB2bCreditAccounts` (onLoad, On-account customers)
 
 **Where the user goes next**
 
-- → `ADM-599` Mixed Tender & Credit Command Center\t93: *Back to Mixed Tender & Credit Command Center\t93*
+- → `ADM-599` Mixed Tender & Credit Command Center: *Back to Mixed Tender & Credit Command Center\t93*
 
 #### States
 
@@ -478,6 +616,21 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Empty, no results (`?state=emptyNoResults`) | **Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist |
 | Offline (`?state=offline`) | online only |
+
+#### Consistency with other screens
+
+- Match `ADM-603`: Terms are set on ADM-603.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+account:
+  name: Desert Tours LLC
+  limit: AED 150,000.00
+  used: AED 96,400.00
+```
 
 #### Permissions
 
@@ -494,7 +647,7 @@ No matrix row traces to this screen's operations or data.
 
 None names this screen.
 
-Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -502,7 +655,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-602` · status **notStarted** · provenance —
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-602` · status **notStarted** · provenance —
 - Client workshop board: `wireframes/WS91 Payment Payment Orchestration Board 5.dc.html#adm-602`
 - Workshop pack: Payment_Payment_Orchestration.pdf board 5
 - Flow F260 *Payment Payment Orchestration board 5: Mixed Tender & Credit Command Center\t93*, step 6: Works in B2B Credit Account & Limit Manager\t95 → Manage payment credit facilities granted to authorized B2B customers, resellers, corporate clients or partners. This is not the general B2B customer profile. The B2B/CRM module remains authoritative …
@@ -516,25 +669,36 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `ADM-599`.
 - [ ] Every gated control is gated: `CREDIT_MANAGE`, `PAYMENT_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 2 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
 
-### `ADM-603` B2B Invoice, On-Account & Payment Terms Configuration\t96
+### `ADM-603` B2B Invoice, On-Account & Payment Terms Configuration
 
 **Configure how approved B2B customers can transact without immediate full payment.**
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `core` module |
 | Block | Block A · ticket #20691 (APP-SETUP-ADM-603) |
-| Who uses it | ticvai staff holding `CREDIT_MANAGE`, `PAYMENT_CONFIGURE`, `PAYMENT_VIEW` (2 configure, 1 read); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `CREDIT_MANAGE`, `PAYMENT_CONFIGURE`, `PAYMENT_VIEW` (2 configure, 1 read); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Define) and no display directory — it is settings, not a population |
 | Offline | online only |
 | Opens with | `accountId` (navigation) |
 | Route | `/commercial/b2b-invoice-on-account-payment-terms-configuration-t96-adm-603` |
+
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** How an approved B2B customer may buy without paying in full: credit limit, payment terms, billing cycle, purchase order, deposit (the client gave 20 to 30% upfront for schools and corporates), when the balance is due, and what happens at the limit. What happens at the limit is the decision, not the limit; most venues want "allow with override" behind an approval. The same screen holds which products may be paid in instalments.
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- Instalment eligibility uses its own product-kind list (membership, annualPass, seasonPass, groupBooking, event), not the catalogue's ProductKind. (CHG-MOV-008)
+
+**Fixed on main** (the package already carries these; draw what it says): The screen can save B2B terms but has no operation to read the current terms of an account. (CHG-MOV-007); The screen name ends in an escaped tab and the pack page number: "B2B Invoice, On-Account & Payment Terms Configuration\t96". (CHG-MOV-004).
 
 #### Inputs: what the user enters or picks
 
@@ -553,13 +717,34 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Transaction maximum | select field | — | — | — | — | — | — |
 | Outstanding balance limit | select field | — | — | — | — | — | — |
 
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **atLimit**: Refuse, Warn, Allow with override; the override approval role appears only for the third. *(source: contracts/satellite/payments.yaml#setB2bPaymentTerms)*
+- **depositPercent and balanceDue**: Percentage with balance due on arrival, before arrival or on terms; worked example under it ("AED 12,000 booking, 25% now = AED 3,000.00"). *(source: contracts/satellite/payments.yaml#setB2bPaymentTerms / TRACKER Actions row 149)*
+- **instalment policy**: Eligible product kinds, minimum order value, maximum instalments, frequencies, share due at purchase, fee, stored card required. *(source: contracts/satellite/payments.yaml#setInstalmentPolicy)*
+
 #### Outputs: what the screen shows and produces
 
-**Data it reads**: `getInstalmentPolicy` (onLoad, Show the instalment policy)
+**Shown**
+
+**Current payment terms** (detail panel, from `getB2bPaymentTerms`): What setB2bPaymentTerms will replace, read for the picked account, so the form opens on the saved terms rather than empty (PR-9).
+
+| Shows | Format | Notes |
+|---|---|---|
+| Credit limit | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Payment term days | 1,234 | — |
+| Billing cycle | chip: Per booking, Weekly, Fortnightly, Monthly | — |
+| Purchase order required | yes / no (icon or chip) | — |
+| Deposit percent | 1,234.5 | 1 September: *"partial payment/deposit is supported for bulk bookings such as schools and corporates — e.g. |
+| Balance due | chip: On arrival, Before arrival, On terms | — |
+| At limit | chip: Refuse, Warn, Allow with override | — |
+| Override approval role | text | — |
+
+**Data it reads**: `getInstalmentPolicy` (onLoad, Show the instalment policy); `getB2bPaymentTerms` (onLoad, Read the account's current payment terms before they are …)
 
 **Where the user goes next**
 
-- → `ADM-599` Mixed Tender & Credit Command Center\t93: *Back to Mixed Tender & Credit Command Center\t93*
+- → `ADM-599` Mixed Tender & Credit Command Center: *Back to Mixed Tender & Credit Command Center\t93*
 
 #### States
 
@@ -573,11 +758,37 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 422 A share due at purchase outside 0-100, or more instalments than the frequency allows within the product's term. |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+terms:
+  account: Desert Tours LLC
+  creditLimit: AED 150,000.00
+  paymentTermDays: 30
+  billingCycle: monthly
+  purchaseOrderRequired: true
+  depositPercent: 25
+  atLimit: allowWithOverride
+  overrideApprover: Finance manager
+instalments:
+  enabled: true
+  kinds:
+  - membership
+  - annualPass
+  maximum: 4
+  frequencies:
+  - monthly
+  dueAtPurchase: 25
+```
+
 #### Permissions
 
 - `setB2bPaymentTerms` → `CREDIT_MANAGE` (configure) · staff
 - `getInstalmentPolicy` → `PAYMENT_VIEW` (read) · staff
 - `setInstalmentPolicy` → `PAYMENT_CONFIGURE` (configure) · staff
+- `getB2bPaymentTerms` → `PAYMENT_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -589,7 +800,7 @@ No matrix row traces to this screen's operations or data.
 
 None names this screen.
 
-Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -597,15 +808,15 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-603` · status **notStarted** · provenance —
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-603` · status **notStarted** · provenance —
 - Client workshop board: `wireframes/WS91 Payment Payment Orchestration Board 5.dc.html#adm-603`
 - Workshop pack: Payment_Payment_Orchestration.pdf board 5
 - Flow F260 *Payment Payment Orchestration board 5: Mixed Tender & Credit Command Center\t93*, step 8: Works in B2B Invoice, On-Account & Payment Terms Configuration\t96 → Configure how approved B2B customers can transact without immediate full payment.
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (10), with its required mark, default, format and its error state (412, 422).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (10), with its required mark, default, format and its error state (404, 412, 422).
+- [ ] Every output is drawn (8 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-603?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, emptyNoResults, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `ADM-599`.
@@ -615,21 +826,29 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 ---
 
-### `ADM-604` Stored Value, Gift Card & Voucher Tender Controls\t97
+### `ADM-604` Stored Value, Gift Card & Voucher Tender Controls
 
 **Manage how stored-value instruments participate in payment without duplicating the Wallet or Voucher modules.**
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `core` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `PAYMENT_CONFIGURE`, `WALLET_VIEW` (1 configure, 1 read); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `PAYMENT_CONFIGURE`, `WALLET_VIEW` (1 configure, 1 read); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/commercial/stored-value-gift-card-voucher-tender-controls-t97-adm-604` |
+
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** How stored value (gift cards, vouchers, TICVAI wallet) participates in payment, without duplicating the wallet.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **The screen name ends in an escaped tab and the pack page number: "Stored Value, Gift Card & Voucher Tender Controls\t97".** Why: The pack page number leaked into the name; it would print on the screen title and the navigation. *(source: screens/P08-venue-back-office.yaml#ADM-604; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
 
 #### Inputs: what the user enters or picks
 
@@ -651,11 +870,15 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Outputs: what the screen shows and produces
 
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **consumption order**: The wallet's consumption policy shown read-only beside the tender rules. *(source: contracts/satellite/wallet.yaml#getCreditConsumptionPolicy / contracts/satellite/payments.yaml#setMixedTenderRules)*
+
 **Data it reads**: `getCreditConsumptionPolicy` (onLoad, The order within stored value)
 
 **Where the user goes next**
 
-- → `ADM-599` Mixed Tender & Credit Command Center\t93: *Back to Mixed Tender & Credit Command Center\t93*
+- → `ADM-599` Mixed Tender & Credit Command Center: *Back to Mixed Tender & Credit Command Center\t93*
 
 #### States
 
@@ -667,6 +890,18 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Empty, no results (`?state=emptyNoResults`) | **Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+order:
+- Gift card
+- TICVAI wallet bonus
+- TICVAI wallet cash
+- Card
+```
 
 #### Permissions
 
@@ -683,7 +918,7 @@ No matrix row traces to this screen's operations or data.
 
 None names this screen.
 
-Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -696,7 +931,7 @@ Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-604` · status **notStarted** · provenance —
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-604` · status **notStarted** · provenance —
 - Client workshop board: `wireframes/WS91 Payment Payment Orchestration Board 5.dc.html#adm-604`
 - Workshop pack: Payment_Payment_Orchestration.pdf board 5
 - Flow F260 *Payment Payment Orchestration board 5: Mixed Tender & Credit Command Center\t93*, step 10: Works in Stored Value, Gift Card & Voucher Tender Controls\t97 → Manage how stored-value instruments participate in payment without duplicating the Wallet or Voucher modules.
@@ -710,31 +945,47 @@ Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the 
 - [ ] Every transition is wired: `ADM-599`.
 - [ ] Every gated control is gated: `PAYMENT_CONFIGURE`, `WALLET_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
 
-### `ADM-605` Advanced Payment Eligibility, Sequence & Restriction Rules\t98
+### `ADM-605` Advanced Payment Eligibility, Sequence & Restriction Rules
 
 **Provide advanced transaction-level payment rules beyond the general method availability configured in Board 1.**
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `core` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `PAYMENT_CONFIGURE` (1 configure); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `PAYMENT_CONFIGURE`, `PAYMENT_VIEW` (1 configure, 1 read); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Gift Card second) and no metric row |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/commercial/advanced-payment-eligibility-sequence-restriction-rules--adm-605` |
 
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
+
 **Known gaps.** **The pack names 3 actions on this screen and the screen declares 0 operations.** Unserved: Minimum card amount, Credit restriction, Voucher exclusivity. Each needs an operation, or needs removing … **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Transaction-level payment rules beyond method availability: sequence and restrictions.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **The screen name ends in an escaped tab and the pack page number: "Advanced Payment Eligibility, Sequence & Restriction Rules\t98".** Why: The pack page number leaked into the name; it would print on the screen title and the navigation. *(source: screens/P08-venue-back-office.yaml#ADM-605; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
+- **Pack actions with no operation: Minimum card amount, Credit restriction, Voucher exclusivity.** Why: The workshop pack names them on this screen and no operation serves them; each needs an operation or removal from the screen. *(source: screens/P08-venue-back-office.yaml#ADM-605; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
+
+**Fixed on main** (the package already carries these; draw what it says): No read operation: the screen declares only setMixedTenderRules and nothing that returns the current configuration. (CHG-WIR-025).
 
 #### Inputs: what the user enters or picks
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **restrictions**: Rules per product or amount. *(source: contracts/satellite/payments.yaml#setMixedTenderRules)*
 
 #### Outputs: what the screen shows and produces
 
@@ -745,6 +996,20 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Shows | Format | Notes |
 |---|---|---|
 | ↓ | text | not in the schema: `↓` |
+
+**Current rules** (detail panel, from `getMixedTenderRules`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Split payment allowed | yes / no (icon or chip) | — |
+| Maximum tenders | 1,234 | — |
+| Tender order | list or chips (count when long) | Across tender kinds. `wallet` decides the order within stored value. |
+| Allowed combinations | list or chips (count when long) | — |
+| Method kinds | list or chips (count when long) | — |
+| Allowed | yes / no (icon or chip) | — |
+| Reason | text | — |
+| Partial payment allowed | yes / no (icon or chip) | — |
+| On partial failure | chip: Reverse all, Keep and retry, Keep and hold | Three tenders in, the fourth fails. Reversing all of it is the only answer that leaves the guest and the ledger in a state anybody can … |
 
 **The selected advanced payment eligibility** (detail panel): The pack groups this record's detail under its own headings: “Board 1 answers”, “Board 5 answers”, “AND”, “Voucher first”, “B2B Credit third”.
 
@@ -760,9 +1025,11 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Credit restriction (secondary button) | navigation or local | — | — | — | — |
 | Voucher exclusivity (secondary button) | navigation or local | — | — | — | — |
 
+**Data it reads**: `getMixedTenderRules` (onLoad, Which tenders may be combined, and in what order)
+
 **Where the user goes next**
 
-- → `ADM-599` Mixed Tender & Credit Command Center\t93: *Back to Mixed Tender & Credit Command Center\t93*
+- → `ADM-599` Mixed Tender & Credit Command Center: *Back to Mixed Tender & Credit Command Center\t93*
 
 #### States
 
@@ -775,9 +1042,18 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+rule: Gift cards cannot pay for gift cards
+```
+
 #### Permissions
 
 - `setMixedTenderRules` → `PAYMENT_CONFIGURE` (configure) · staff
+- `getMixedTenderRules` → `PAYMENT_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -789,7 +1065,7 @@ No matrix row traces to this screen's operations or data.
 
 None names this screen.
 
-Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -797,7 +1073,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-605` · status **notStarted** · provenance —
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-605` · status **notStarted** · provenance —
 - Client workshop board: `wireframes/WS91 Payment Payment Orchestration Board 5.dc.html#adm-605`
 - Workshop pack: Payment_Payment_Orchestration.pdf board 5
 - Flow F260 *Payment Payment Orchestration board 5: Mixed Tender & Credit Command Center\t93*, step 12: Works in Advanced Payment Eligibility, Sequence & Restriction Rules\t98 → Provide advanced transaction-level payment rules beyond the general method availability configured in Board 1.
@@ -805,33 +1081,42 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state (412).
-- [ ] Every output is drawn (2 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (11 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-605?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Minimum card amount, Credit restriction, Voucher exclusivity.
 - [ ] Every transition is wired: `ADM-599`.
-- [ ] Every gated control is gated: `PAYMENT_CONFIGURE`.
+- [ ] Every gated control is gated: `PAYMENT_CONFIGURE`, `PAYMENT_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 2 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
 
-### `ADM-606` Partial Payment, Failure & Recovery Manager\t100
+### `ADM-606` Partial Payment, Failure & Recovery Manager
 
 **Handle situations where some tenders succeed but another tender fails. This is one of the most important screens in Board 5.**
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `core` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `PAYMENT_CONFIGURE` (1 configure); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `PAYMENT_CONFIGURE` (1 configure); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Gift Card; Card) and no metric row |
 | Offline | online only |
 | Opens with | `caseId` (navigation) |
 | Route | `/commercial/partial-payment-failure-recovery-manager-t100-adm-606` |
 
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
+
 **Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape … **Partial Payment, Failure & Recovery Manager\t100 declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none …
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** When some tenders succeed and one fails; and recurring charges that fail (dunning), a different axis from gateway retry.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **The screen name ends in an escaped tab and the pack page number: "Partial Payment, Failure & Recovery Manager\t100".** Why: The pack page number leaked into the name; it would print on the screen title and the navigation. *(source: screens/P08-venue-back-office.yaml#ADM-606; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
 
 #### Inputs: what the user enters or picks
 
@@ -861,11 +1146,15 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | AED 200 ✓ | text | not in the schema: `AED 200 ✓` |
 | AED 800 ✕ | text | not in the schema: `AED 800 ✕` |
 
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **dunning queue**: Cases being chased with next attempt; stop chasing with a reason. *(source: contracts/satellite/payments.yaml#listDunningCases / contracts/satellite/payments.yaml#resolveDunningCase)*
+
 **Data it reads**: `getDunningPolicy` (onLoad, Read the retry schedule this venue runs); `listDunningCases` (onLoad, The queue, ordered by attempts remaining)
 
 **Where the user goes next**
 
-- → `ADM-599` Mixed Tender & Credit Command Center\t93: *Back to Mixed Tender & Credit Command Center\t93*
+- → `ADM-599` Mixed Tender & Credit Command Center: *Back to Mixed Tender & Credit Command Center\t93*
 
 #### States
 
@@ -878,6 +1167,17 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 422 An attempt schedule that would breach the policy's own guard — more attempts than `maxAttempts`, two attempts inside `minimumHoursBetweenAttempts`, or a … |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+case:
+  member: Annual Pass Gold, Fatima Al Nuaimi
+  attempt: 2 of 4
+  next: '2026-11-18'
+```
 
 #### Permissions
 
@@ -901,7 +1201,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 None names this screen.
 
-Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -909,7 +1209,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-606` · status **notStarted** · provenance —
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-606` · status **notStarted** · provenance —
 - Client workshop board: `wireframes/WS91 Payment Payment Orchestration Board 5.dc.html#adm-606`
 - Workshop pack: Payment_Payment_Orchestration.pdf board 5
 - Flow F260 *Payment Payment Orchestration board 5: Mixed Tender & Credit Command Center\t93*, step 14: Works in Partial Payment, Failure & Recovery Manager\t100 → Handle situations where some tenders succeed but another tender fails. This is one of the most important screens in Board 5.
@@ -923,25 +1223,35 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `ADM-599`.
 - [ ] Every gated control is gated: `PAYMENT_CONFIGURE`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
 
-### `ADM-607` Mixed Tender Transaction Trace & Allocation Audit\t100
+### `ADM-607` Mixed Tender Transaction Trace & Allocation Audit
 
 **Provide a complete financial and operational explanation of every multi-tender transaction.**
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `core` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `ORDER_VIEW` (1 read); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `ORDER_VIEW` (1 read); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Capture) and no display directory — it is settings, not a population |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/commercial/mixed-tender-transaction-trace-allocation-audit-t100-adm-607` |
+
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** The explanation of every multi-tender transaction.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **The screen name ends in an escaped tab and the pack page number: "Mixed Tender Transaction Trace & Allocation Audit\t100".** Why: The pack page number leaked into the name; it would print on the screen title and the navigation. *(source: screens/P08-venue-back-office.yaml#ADM-607; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
+- **List operation(s) listOrderPaymentDetail return a bare array, not the paged list envelope (items, nextCursor, hasMore); rows of listOrderPaymentDetail carry no identifier.** Why: The table cannot page, and a row without an id cannot open, edit or link to the record it summarises. *(source: contracts/spine/orders.yaml#listOrderPaymentDetail; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
 
 #### Inputs: what the user enters or picks
 
@@ -963,11 +1273,15 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Outputs: what the screen shows and produces
 
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **allocation trace**: Each tender's amount and what it paid for. *(source: contracts/spine/orders.yaml#listOrderPaymentDetail)*
+
 **Data it reads**: `listOrderPaymentDetail` (onLoad, Trace the allocation)
 
 **Where the user goes next**
 
-- → `ADM-599` Mixed Tender & Credit Command Center\t93: *Back to Mixed Tender & Credit Command Center\t93*
+- → `ADM-599` Mixed Tender & Credit Command Center: *Back to Mixed Tender & Credit Command Center\t93*
 
 #### States
 
@@ -979,6 +1293,18 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Empty, no results (`?state=emptyNoResults`) | **Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+trace:
+  order: DP-2026-104990
+  tenders:
+  - Gift card AED 250.00
+  - Card AED 340.00
+```
 
 #### Permissions
 
@@ -994,7 +1320,7 @@ No matrix row traces to this screen's operations or data.
 
 None names this screen.
 
-Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -1002,7 +1328,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-607` · status **notStarted** · provenance —
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-607` · status **notStarted** · provenance —
 - Client workshop board: `wireframes/WS91 Payment Payment Orchestration Board 5.dc.html#adm-607`
 - Workshop pack: Payment_Payment_Orchestration.pdf board 5
 - Flow F260 *Payment Payment Orchestration board 5: Mixed Tender & Credit Command Center\t93*, step 16: Works in Mixed Tender Transaction Trace & Allocation Audit\t100 → Provide a complete financial and operational explanation of every multi-tender transaction.
@@ -1016,27 +1342,38 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `ADM-599`.
 - [ ] Every gated control is gated: `ORDER_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 2 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
 
-### `ADM-608` Mixed Tender Simulator, Credit Exposure & AI Advisor\t102
+### `ADM-608` Mixed Tender Simulator, Credit Exposure & AI Advisor
 
 **Allow administrators to test complex tender combinations before activating rules.**
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `core` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `PAYMENT_CONFIGURE`, `PAYMENT_VIEW` (1 configure, 1 read); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `PAYMENT_CONFIGURE`, `PAYMENT_VIEW` (1 configure, 1 read); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Gift Card; Card; Gift Card AED 200) and no metric row |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/commercial/mixed-tender-simulator-credit-exposure-ai-advisor-t102-adm-608` |
 
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
+
 **Known gaps.** **The pack names 4 actions on this screen and the screen declares 0 operations.** Unserved: Require card for excess, Request approval, Reject B2B credit, Reduce credit allocation. Each needs an … **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Test tender combinations and see credit exposure before activating rules.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **The screen name ends in an escaped tab and the pack page number: "Mixed Tender Simulator, Credit Exposure & AI Advisor\t102".** Why: The pack page number leaked into the name; it would print on the screen title and the navigation. *(source: screens/P08-venue-back-office.yaml#ADM-608; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
+- **Pack actions with no operation: Require card for excess, Request approval, Reject B2B credit, Reduce credit allocation.** Why: The workshop pack names them on this screen and no operation serves them; each needs an operation or removal from the screen. *(source: screens/P08-venue-back-office.yaml#ADM-608; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
+- **List operation(s) listB2bCreditAccounts return a bare array, not the paged list envelope (items, nextCursor, hasMore).** Why: The table cannot page, and a row without an id cannot open, edit or link to the record it summarises. *(source: contracts/satellite/payments.yaml#listB2bCreditAccounts; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
 
 #### Inputs: what the user enters or picks
 
@@ -1081,11 +1418,15 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Reject B2B credit (destructive button) | navigation or local | — | — | — | — |
 | Reduce credit allocation (secondary button) | navigation or local | — | — | — | — |
 
+**What each action does** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **Simulate**: As ADM-568, with B2B exposure shown. *(source: contracts/satellite/payments.yaml#simulatePaymentConfiguration)*
+
 **Data it reads**: `listB2bCreditAccounts` (onLoad, Credit exposure)
 
 **Where the user goes next**
 
-- → `ADM-599` Mixed Tender & Credit Command Center\t93: *Back to Mixed Tender & Credit Command Center\t93*
+- → `ADM-599` Mixed Tender & Credit Command Center: *Back to Mixed Tender & Credit Command Center\t93*
 
 **What opens over it**
 
@@ -1102,6 +1443,18 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+result:
+  basket: AED 12,000.00
+  tenders:
+  - B2B credit
+  exposureAfter: AED 108,400.00
+```
+
 #### Permissions
 
 - `simulatePaymentConfiguration` → `PAYMENT_CONFIGURE` (configure) · staff
@@ -1117,7 +1470,7 @@ No matrix row traces to this screen's operations or data.
 
 None names this screen.
 
-Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -1125,7 +1478,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-608` · status **notStarted** · provenance —
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-608` · status **notStarted** · provenance —
 - Client workshop board: `wireframes/WS91 Payment Payment Orchestration Board 5.dc.html#adm-608`
 - Workshop pack: Payment_Payment_Orchestration.pdf board 5
 - Flow F260 *Payment Payment Orchestration board 5: Mixed Tender & Credit Command Center\t93*, step 18: Works in Mixed Tender Simulator, Credit Exposure & AI Advisor\t102 → Allow administrators to test complex tender combinations before activating rules.
@@ -1139,6 +1492,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `ADM-599`.
 - [ ] Every gated control is gated: `PAYMENT_CONFIGURE`, `PAYMENT_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 3 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -1147,12 +1501,16 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 ## Reference designs and the trackers for this platform
 
-**P09 reference designs** (from `handoff/design-batches/apps/6-ticvai-controller/README.md`)
+**P08 reference designs** (from `handoff/design-batches/apps/5-venue-management/README.md`)
 
 - `sources/designs/TICVAI_POS_Terminal_client_approved.html`: the client-approved POS, for operator density and components.
 - `sources/designs/TICVAI_Mobile.dc.html`: for finish and motion.
 
-**Design Vision Book rules that apply** (`sources/designs/Ticvai_Design_Vision_Book_v1_1.pdf`): DI-021, DI-022, DI-023, DI-024, DI-025, DI-027, DI-028, DI-029, DI-032, DI-033, DI-034, DI-036, DI-037, DI-038, DI-039, DI-040, DI-041, DI-042, DI-044, DI-045, DI-046, DI-047, DI-048, DI-049, DI-050, DI-051 (each is in the design inputs below).
+**Design Vision Book rules that apply** (`sources/designs/Ticvai_Design_Vision_Book_v1_1.pdf`): DI-021, DI-022, DI-023, DI-024, DI-025, DI-027, DI-028, DI-029, DI-030, DI-032, DI-033, DI-034, DI-036, DI-037, DI-038, DI-039, DI-040, DI-041, DI-042, DI-043, DI-044, DI-045, DI-046, DI-047, DI-048, DI-049, DI-050, DI-051, DI-052 (each is in the design inputs below).
+
+**Workshop tracker rows about P08 as a whole** (1: 1 open, 0 closed). Open first; a closed row says where it went on 30 September.
+
+- **S8** Venue Management back-end configuration wireframes *(Chinmay Parab · In progress · due Fri 2 Oct · 30 Sep 2026 · 30 Sep tracker)*
 
 ## Design inputs from the client meetings
 
@@ -1190,17 +1548,32 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Brand personality: Modern, AI-First, Enterprise, Premium, Reliable, Minimal, Scalable, Human-Centred. Visual essence: intelligent and forward-thinking, clean and minimal, trustworthy and secure, modern and timeless, scalable and flexible. *(agreed · Design Vision Book 29 Jul 2026, 02 Brand Identity (p2) - Brand personality / Visual essence · DI-021)*
 - Arabic is a core requirement, not later localisation: full Arabic RTL across web, mobile, POS, reports, emails, WhatsApp, SMS, notifications, tickets and receipts, and administrative interfaces. *(agreed · MoM 28 Jul 2026, 27. Internationalisation and Arabic Support · DI-019)*
 
-### Across P09 TICVAI Web
+### Across P08 Venue Management
 
-- Portal access exposes TICVAI pricing, so prospects submit contact details and a trade license as proof of a real venue, reviewed and approved by TICVAI before access is granted. *(agreed · MoM 10 Sep 2026, 4.8 Customer Portal Access, Authentication & Verification · DI-827)*
+- Qossai: configuration screens should consolidate related functionality, potentially merging 3-4 previously separate screens into one, rather than the repetitive one-screen-per-concept pattern of the AI-built reference system. *(agreed · MoM 24 Sep 2026, 4.5 Screen Consolidation Philosophy · DI-987)*
+- **Open question.** Open: should AI monitoring live in one centralised AI command dashboard or be distributed as widgets in each functional module's own dashboard? Allam: Softlabs' call; the current proposal is illustrative and Softlabs may propose a better structure. *(open · MoM 18 Sep 2026, 4.4 AI Governance — Risk, Compliance & Continuous Monitoring · DI-936)*
 - Simulation functionality stays embedded within each relevant configuration section rather than being consolidated, since it tests that section's own configuration. *(agreed · MoM 8 Sep 2026, 4.11 Dashboard & Reporting Module Consolidation Strategy · DI-722)*
+- Client boards (POS Frontline, F&B, Retail, Inventory & Procurement) share one architecture: six boards of ten screens per domain, a command centre first and an AI/analytics board last, under the hierarchy Company > Venue > Department > Workstation > Operator/Shift > Transaction > Exception > Reconciliation > Analytics. *(agreed · client-design-boards-audit 20 Aug 2026, Opening / What the boards give us · DI-400)*
+- Decision: RBAC per role, per module, three levels — edit/view, view-only, hidden (e.g. a marketing officer does not see Finance at all) — plus sub-permissions within a module (a CRM role may get Campaigns and Communications but not Journeys). Default role templates, admin-customisable. *(agreed · MoM 20 Aug 2026, 4.7 Role-Based Access Control (RBAC); 5. Key Decisions · DI-387)*
+- **Open question.** Allam: a user's visibility must be restrictable to specific outlets (an F&B manager of one outlet should not see other outlets' items); also relevant for ticketing/event-specific access. Implementation approach still open. *(open · MoM 18 Aug 2026, 4.6 Role-Based & Outlet-Level Access Control — Open Item · DI-331)*
+- Access loads automatically at login on POS and web/admin. A user with one role logs straight in; a user with several roles (e.g. admin, cashier, supervisor, manager) is prompted to choose which role to use. *(agreed · MoM 12 Aug 2026, 4. Multiple Roles per User and Role Switching · DI-249)*
+- Back office is role-driven from any device: a finance user signing in from a workstation, laptop or home sees only finance reports and related information. *(agreed · MoM 12 Aug 2026, 3. Role-Based Access and Workstation-Linked Front-End · DI-248)*
+- Built-in help menu with step-by-step tutorials with screenshots for common tasks (e.g. how to sell a ticket at the POS). *(client request · MoM 7 Aug 2026, 8. Legacy POS Layout Designer & System Logging · DI-160)*
+- Custom data-capture fields ("data mask") at account, event, extended-ticket and product level: field types text, dropdown, radio, true/false; multi-language labels; validation (min/max length, required/optional); reusable value lists (e.g. country list). Standard fields come out of the box. *(agreed · MoM 7 Aug 2026, 6. Data Mask: Flexible Custom Data Capture · DI-155)*
+- Load/traffic dashboards respect the tenancy model: a venue manager sees traffic for their own venue only. *(agreed · MoM 31 Jul 2026, 4. Non-Functional Requirements: Scalability & Availability · DI-061)*
+- Allam: queue management is built into the system (not third-party) so traffic entering the site can be throttled from the back office itself. *(agreed · MoM 31 Jul 2026, 4. Non-Functional Requirements: Scalability & Availability · DI-060)*
 - **Open question.** Proposed tenant hierarchy Tenant > Organization/Brand > Region > Branch > Venue > Department, under review against TICVAI's own organisational hierarchy before finalising. *(open · MoM 30 Jul 2026, 2. Proposed Multi-Tenant Hierarchy · DI-055)*
+- Documentation deliverable includes user guides and help content; the preview shows a TICVAI Help Center with categories (Getting Started, Events, Tickets, Orders, Payments, Memberships, Access Control, Reports, Integrations), a "Welcome to TICVAI" getting-started article and Quick Links (Create an Event, Set Pricing, Manage Access, View Reports). *(agreed · Design Vision Book 29 Jul 2026, 09 Deliverables (p9) - What We Deliver / Key Deliverables Preview · DI-052)*
 - Typeface Inter (Light, Regular, Medium, Semibold, Bold). Scale: H1 32/40 Bold, H2 24/32 Semibold, H3 20/28 Semibold, Body 1 16/24 Regular, Body 2 14/20 Regular, Caption 12/16 Regular. *(agreed · Design Vision Book 29 Jul 2026, 08 Design System (p8) - 2. Typography · DI-047)*
 - Palette ("modern, trustworthy and accessible"): Primary #0D6EFD, #00B8FF, #00D4C4, #0B1324; Neutral #F7F9FC, #E5E7EB, #9CA3AF, #4B5563, #1F2937. *(agreed · Design Vision Book 29 Jul 2026, 08 Design System (p8) - 1. Color Palette · DI-046)*
+- AI Assistant panel: a short framing ("Based on last 30 days, here are 3 actions that can improve your revenue") then actionable recommendations, each with its potential impact (e.g. "Increase pricing for VIP seats, +12%") and a chevron, plus "View all recommendations". *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - AI Panels · DI-043)*
 - Chart cards: title with period dropdown ("This Week"), headline metrics with deltas (Tickets Sold 12,840 +8.7%, Visitors, Conversion). Data visualisations must be easy to read. *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - Charts · DI-041)*
 - Tables: titled card with "View all", columns (e.g. Order ID, Customer, Amount, Status), coloured status badges (Paid, Pending, Refunded) and pagination with "Showing 1 to 5 of 245" and page numbers. *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - Tables · DI-039)*
 - Primary button spec: height 40px, padding 12px 24px, radius 8px, Inter 14 Semibold, colour #0D6EFD, width auto. *(agreed · Design Vision Book 29 Jul 2026, 09 Deliverables (p9) - Developer Handoff preview · DI-037)*
+- Back-office shell: collapsible left sidebar with Overview, Events, Tickets, Orders, Customers, Memberships, Access Control, POS, Reports, Analytics, AI Assistant, Settings, and the signed-in user (name, role) at the bottom; top bar with global search (Cmd+K), current time and date, Notifications with unread dot, and user menu. *(agreed · Design Vision Book 29 Jul 2026, 04 Dashboard Vision (p4) - navigation shell · DI-030)*
 - Dynamic KPIs, forecasts and real-time insights; role-based dashboards, preferences and smart shortcuts for every user (e.g. greeting "Good morning, Ahmed" on the home screen, p2). *(agreed · Design Vision Book 29 Jul 2026, 03 Visual Direction (p3) - Smarter Data / Personalized Experience · DI-028)*
+- Reports and historical searches must still retrieve archived transactions when required; the retention period (e.g. keep 3 of 5+ years live) is configurable per customer, archival manual or automated. *(agreed · MoM 28 Jul 2026, 23. Database Optimisation and Archiving · DI-018)*
+- Back-office controls for the waiting room: configurable maximum active users and admission intervals, set per customer and venue. *(agreed · MoM 28 Jul 2026, 19. Auto-scaling and Virtual Waiting Room · DI-017)*
 
 ---
 
@@ -1215,6 +1588,7 @@ Method, path, parameters, request and response for every operation these screens
 ```json
 {
 "createB2bCreditAccount": {"method":"POST","path":"/b2b-credit-accounts","contract":"payments","summary":"Open an on-account relationship","permission":"CREDIT_MANAGE","offlineCapable":null,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"B2bCreditAccount","responds":"B2bCreditAccount"},
+"getB2bPaymentTerms": {"method":"GET","path":"/b2b-credit-accounts/{accountId}/terms","contract":"payments","summary":"An account's limit, terms, billing cycle and limit behaviour","permission":"PAYMENT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[],"requestBody":null,"responds":"B2bPaymentTerms"},
 "getCreditConsumptionPolicy": {"method":"GET","path":"/credit-consumption-policy","contract":"wallet","summary":"Which credit is spent first","permission":"WALLET_VIEW","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"CreditConsumptionPolicy"},
 "getDunningPolicy": {"method":"GET","path":"/dunning-policy","contract":"payments","summary":"How a failed recurring charge is chased","permission":"PAYMENT_CONFIGURE","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"tenant","parameters":[],"requestBody":null,"responds":"DunningPolicy"},
 "getInstalmentPolicy": {"method":"GET","path":"/instalment-policy","contract":"payments","summary":"What may be paid in instalments, and on what terms","permission":"PAYMENT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[],"requestBody":null,"responds":"PayInstalmentPolicy"},

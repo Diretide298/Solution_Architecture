@@ -61,6 +61,38 @@ convincingly. It is never a caption.
   and its error; and, element by element, what is shown and in what format, what each action
   produces and where the user goes next. Draw exactly that.
 
+## The processes these screens belong to
+
+Written by the owner of each process (`handoff/design-notes/`). Read before any screen: it says how the process runs end to end and which words the screens must use.
+
+### Food, Beverage & Retail
+
+Food & beverage, retail, rentals, inventory and procurement across the till (P04), the kitchen display (P15), the staff app (P06), Venue Management (P08), the guest web and app (P01/P02), the kiosk (P05) and the CMS (P13). COUNTER SERVICE (F108): the cashier takes the order on the Food & Drink board from the outlet's menu in force (sections in the outlet's order, option groups attached to the item), sends it to the kitchen, and only then charges — send to kitchen, then charge, for every POS F&B order (R261, upheld against the v2 frame by POSV2-4). The kitchen ticket is on the rail while the card is in the guest's hand; an unpaid sent order is cancelled while ordered or accepted and voided with a reason after (R125(3), R091(5)); the guest gets an order number, and the customer-facing status board (numbers only) is the kitchen display's KIT-007, mirrored on the till's queue (POSV2-7). TABLE SERVICE (F29, F80, F94): a party is seated with its covers, orders across the visit, courses are fired by the pass (DI-333, DI-407), the bill is printed and settled at the end and split by amount, covers, category, item or seat (DI-106); the client's table statuses are Available → Ordered → Table closed → Reserved with no cleaning status (DI-336); moving and merging tables stay on the staff app until after r2 (POSV2-8). GUEST ORDERING (F11, F48): a guest inside the venue orders in the app or web for pickup or delivery to a seat or a scanned location (DI-288, DI-291); F&B and retail are optional licensed modules completed inside TICVAI (DI-505), kept simple (DI-1091); no food without an admission ticket (DI-292); table reservations and the waitlist do not go through the cart and a dining deposit is a venue option, off by default (DI-1048, DI-1049, R077). KITCHEN (P15, F83, F88): TICVAI's own display on commodity screens (19 September, replacing the 31 July "integration point only", DI-077); one kitchen ticket per preparation station from the outlet's routing rules with a fallback display (DI-323); a fired timer counts up and resets per course, not shown for quick service (DI-334); displays are assigned to stations and filter by course, with no station-load tile in r1 (R277). 86 takes an item off sale on every till and guest menu immediately (R110(c)); guests always see "Sold out", never a missing dish. RETAIL (F17, F34, F51): scan and sell through the same cart, charge and payment as tickets and food (DI-795), one cart, one receipt and one QR per guest (DI-293); system stock per venue gates the sale (DI-294); returns by receipt or order number only in r1 (R139(c)), refund to the original tender with a reason code and note (DI-796, DI-797); Shop & Drop is paid online and collected on the way out (R236), a merchandise reservation lasts to the end of the visit day (R169, R215). TILL MONEY (F32, F73, F74, F87): the float is counted by denomination with note images and typed quantities (DI-775, DI-776, R229) while the hardware checks itself (DI-778); the close is a …
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Send to kitchen | Put the order on the kitchen rail. On the till it always comes before Charge. | Fire, Fire order, Submit order, kitchen fires on payment | R261 / POSV2-4 / F108 step 3 |
+| Charge | The till's single tender step (Payment, POS-005); the button reads "Charge AED 110.25". | Checkout (on staff screens), Pay now | F108 step 4 / screens/P04-point-of-sale.yaml#POS-021 |
+| Fire / Hold (a course) | Kitchen-pass words for releasing or holding the next course of a table, and the "fired" timer. | using "fire" for sending an order from the till | DI-333 / DI-334 / DI-407 |
+| Kitchen ticket | The slip on the kitchen display, one per preparation station. | Order (on the kitchen display), KOT | R210 |
+| Ready · Served · Collected · Delivered | How an order reaches the guest; a server marks Served, a counter Collected, a runner Delivered (with the location). | Done, Complete, Bumped (as a status) | R125 / contracts/satellite/fnb.yaml#recordOrderHandover |
+| Recall (kitchen) / Recall held sale (till) | Bring a mis-bumped kitchen ticket back to the rail; separately, bring a held cart back into a sale. Never "Recall" alone where both could apply. | Undo bump, Restore | contracts/satellite/fnb.yaml#recallKitchenTicket / POSV2-6 |
+| Unavailable (86) / Sold out | Staff screens say "Unavailable" and may add "86"; guest screens say "Sold out". Immediate everywhere. | Out of stock (for food), Disabled, Hidden | R110 / contracts/satellite/fnb.yaml#getGuestMenu |
+| Order type | Dine-in · Quick service · Takeaway · Delivery, chosen in the cart. | Service mode, Fulfilment source (on the till) | DI-789 / contracts/satellite/fnb.yaml#/components/schemas/ServiceMode |
+| Covers | The number of guests at a table, entered when seating; drives split-by-covers. | Pax (except as a small suffix on the floor plan), Heads | DI-104 / contracts/satellite/fnb.yaml#openTableVisit |
+| Vacant · Seated · Ordered · Bill requested · Table closed · … | Table statuses on every floor plan (till and staff app); "Table closed" is the client's word for after payment. | Cleaning, Needs clearing, Dirty | DI-336 / DI-792 |
+| Till · Cash drawer | Staff copy may say "till" for the workstation; the cash drawer is the deposit box. | Terminal id as a heading, Deposit box (on staff screens) | R156 |
+| Float · Count · Blind count · Variance | The opening float; the denomination count; the closing count made without seeing the expected cash; counted minus expected. | Expected in drawer, Discrepancy, Error | R080 / POSV2-3 |
+| Cash out · Cash in · Safe drop | Taking cash out of the drawer mid-shift, adding change, and a supervisor moving cash to the safe with the cashier as witness. | Lift, Withdrawal (as button labels) | DI-274 / contracts/spine/shift.yaml#createCashMovement / … |
+| Menu item · Merchandise item · Inventory item · SKU | The scoped product words; SKU is a variant's code, Product stays the sellable thing. | SKU as the item's name, Article | R131 |
+| Stock on hand · Allocated · Available | Available is on hand minus allocated. | Inventory (as a number), Free stock | R171 / DI-361 |
+| Requisition · Purchase order · Goods receipt · Transfer · … | The procurement and stock words, in that flow. | GRN as the only label, Indent | DI-341 / DI-348 / DI-362 / DI-363 |
+| Shop & Drop | Bought and paid now, collected on the way out. | Click & collect | R236 |
+| Check-out (rental) · Return (rental) | Handing equipment to the guest and taking it back. On the same screens payment is "Charge" or "Pay". | Checkout (for a handover), Check-in (for a return) | DI-758 / DI-765 |
+| Deposit hold · Release · Capture | A refundable deposit held, given back in full, or partly kept for damage with the rest released. | Charge deposit, Refund deposit | DI-752 / R127 |
+| Extension · Swap · Overdue · Late fee | The active-rental words; a quick swap restarts the clock, a late swap earns a free extension. | Renewal, Exchange (for a swap) | DI-761 / DI-762 / DI-764 |
+
+
 ## The screens
 
 Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs count fields; requirements are matrix rows; meeting inputs are the ones naming the screen (the module and platform ones are below); white label says whether the tenant's brand reaches it (guest) or it sets the brand (configures).
@@ -103,6 +135,12 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Offline | online only |
 | Opens with | `productId` (navigation) |
 | Route | `/rentals/rental-product-command-center-bo-494` |
+
+**From the Food, Beverage & Retail process.** The rental manager's list of every rental product (bicycles, kayaks, strollers, life jackets) with its status, tracking model and what still blocks it from sale. Entry point of the product set-up board. The one thing to get right: serialised and pooled products are told apart at a glance, and "configuration issues" lead straight to the step that is missing.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **The contract's tracking model value is "hybrid"; the client agreed "serialised, pooled or combined".** Why: Use "Combined" on screen; align the contract word so labels and data agree. *(source: DI-740 / contracts/satellite/rental.yaml#/components/schemas/RentalProduct; Food, Beverage & Retail)*
 
 #### Inputs: what the user enters or picks
 
@@ -149,6 +187,15 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | What publishing changes (publish gate) | navigation or local | — | — | — | — |
 | + Create Rental Product (primary button) | navigation or local | — | — | — | — |
 
+**Rules for what is shown** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
+
+- **Product list**: Name, category, tracking model (Serialised · Pooled · Combined), status (Draft · In review · Approved · Active · Suspended · Archived), locations, units. Category tiles show how many products sit under each. *(source: DI-739 / contracts/satellite/rental.yaml#listRentalProducts / contracts/satellite/rental.yaml#/components/schemas/RentalProduct)*
+- **Tiles**: Total, active, inactive, serialised, pooled, awaiting approval, with configuration issues; each tile filters the list. *(source: DI-739 / screens/P08-venue-back-office.yaml#BO-494)*
+
+**What each action does** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
+
+- **Import catalogue**: Loads the client's rental items and inventory at onboarding from a file; a result lists rows accepted and rejected with reasons. *(source: contracts/satellite/rental.yaml#importRentalCatalogue / DI-500)*
+
 **Data it reads**: `listRentalProducts` (onLoad, Products across venues)
 
 **Where the user goes next**
@@ -175,6 +222,29 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 Blocking findings remain; they are listed |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+products:
+- name: City Bicycle
+  category: Bikes
+  model: Serialised
+  units: 40
+  status: Active
+  locations: Beach Hut, Marina Gate
+- name: Life Jacket (adult)
+  category: Water safety
+  model: Pooled
+  units: 150
+  status: Active
+- name: Double Kayak
+  category: Water sports
+  model: Combined
+  status: In review · inventory not assigned
+```
 
 #### Permissions
 
@@ -232,6 +302,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - [ ] Every transition is wired: `BO-100`, `BO-495`, `BO-496`, `BO-497`, `BO-498`, `BO-499`, `BO-500`, `BO-501`, `BO-502`, `BO-503`.
 - [ ] Every gated control is gated: `RENTAL_APPROVE`, `RENTAL_CONFIGURE`, `RENTAL_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -254,9 +325,19 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 
 **Known gaps.** **Create Rental Product Wizard declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Food, Beverage & Retail process.** A guided wizard that creates a rental product step by step (basics, category, tracking model, locations, duration, rules, customer requirements, then validation) and saves a draft at each step. The one thing to get right: the wizard is the same set of steps as BO-496 to BO-502, not a separate form, and the last step is the validation report of BO-503.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **The screen has only Create and Cancel buttons and the gap notes say it "declares no operation that writes anything".** Why: The wizard needs the per-step setters (locations, duration, rules, agreement, inventory model) it orchestrates, or it is the same screen as BO-496. *(source: screens/P08-venue-back-office.yaml#BO-495 / contracts/satellite/rental.yaml#createRentalProduct; Food, Beverage & Retail)*
+
 #### Inputs: what the user enters or picks
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+**Rules for these inputs** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
+
+- **Tracking model**: Serialised (each unit numbered, e.g. bicycle #121) · Pooled (quantity only, e.g. life jackets) · Combined; plus scan required or simply picked, and whether substitution is allowed. *(source: DI-740 / contracts/satellite/rental.yaml#setRentalInventoryModel)*
 
 #### Outputs: what the screen shows and produces
 
@@ -281,6 +362,22 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the create rental product are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+steps:
+- 1 Basics · Double Kayak
+- 2 Category · Water sports
+- 3 Tracking · Serialised, scan at check-out
+- 4 Locations · Beach Hut (pick-up and return)
+- 5 Duration · 30–240 min, 30-min steps
+- 6 Rules · age 12+, guardian under 16
+- 7 Customer · name, mobile, Emirates ID
+- 8 Validate
+```
 
 #### Permissions
 
@@ -326,6 +423,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - [ ] Every transition is wired: `BO-494`.
 - [ ] Every gated control is gated: `RENTAL_CONFIGURE`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -347,6 +445,12 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | Route | `/rentals/rental-product-profile-bo-496` |
 
 **Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
+
+**From the Food, Beverage & Retail process.** One rental product's full configuration on one page, with each section (basics, inventory model, locations, duration, rules, customer requirements, pricing, deposit) summarised and editable. The one thing to get right: show which sections are complete and which block publication.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **Layout is "Every rental product profile" table and a detail panel; the gap says no column can be bound.** Why: A profile is one product, not a list. *(source: screens/P08-venue-back-office.yaml#BO-496; Food, Beverage & Retail)*
 
 #### Inputs: what the user enters or picks
 
@@ -394,6 +498,10 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Deposit requirement | text | not in the schema: `Deposit requirement` |
 | Current status | text | not in the schema: `Current status` |
 
+**Rules for what is shown** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
+
+- **Sections**: Each section card shows its current values and a "Complete / Missing" mark from validation; editing opens the section's screen. *(source: contracts/satellite/rental.yaml#getRentalProduct / contracts/satellite/rental.yaml#validateRentalProduct)*
+
 **Where the user goes next**
 
 - → `BO-494` Rental Product Command Center: *Back to Rental Product Command Center*; carries `productId`
@@ -408,6 +516,14 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the rental product profile are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+product: City Bicycle · BIKE-CITY · Serialised · 40 units · Active since 1 Nov 2026 · version 3
+```
 
 #### Permissions
 
@@ -451,6 +567,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - [ ] Every transition is wired: `BO-494`.
 - [ ] Every gated control is gated: `RENTAL_CONFIGURE`, `RENTAL_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -473,6 +590,8 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 
 **Known gaps.** **Rental Category & Classification Setup declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Food, Beverage & Retail process.** Reusable rental categories (Bikes, Water sports, Mobility, Beach) whose defaults products inherit, with the count of products under each. The one thing to get right: show what a product inherits from its category.
+
 #### Inputs: what the user enters or picks
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
@@ -490,6 +609,10 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Create rental category (primary button) | navigation or local | — | — | — | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
 
+**Rules for what is shown** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
+
+- **Categories**: Name, number of products and variants, inherited defaults (tracking model, deposit, duration). *(source: DI-739 / contracts/satellite/rental.yaml#listRentalCategories)*
+
 **Data it reads**: `listRentalCategories` (onLoad, Categories and their defaults)
 
 **Where the user goes next**
@@ -506,6 +629,17 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the rental category classification are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+categories:
+- Bikes · 3 products · default deposit AED 200
+- Water sports · 5 products
+- Mobility (strollers, wheelchairs) · 2 products · no deposit
+```
 
 #### Permissions
 
@@ -571,6 +705,12 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | Opens with | `productId` (navigation) |
 | Route | `/rentals/inventory-tracking-model-bo-498` |
 
+**From the Food, Beverage & Retail process.** How one product's physical units are tracked and handed out: serialised, pooled or combined, whether a unit must be assigned and scanned at check-out, manual assignment, substitution and swap. The one thing to get right: the choices read as plain yes/no questions with what they mean at the counter.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **Labels "Assignment Required at Checkout" (a text field) and "Inventory Unit" as select fields.** Why: "Check-out" is the handover word; yes/no settings are toggles, not text. *(source: screens/P08-venue-back-office.yaml#BO-498; Food, Beverage & Retail)*
+
 #### Inputs: what the user enters or picks
 
 **On the screen**
@@ -585,6 +725,11 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | Allow Manual Assignment | select field | — | — | — | — | — | — |
 | Allow Substitution | select field | — | — | — | — | — | — |
 | Allow Equipment Swap | select field | — | — | — | — | — | — |
+
+**Rules for these inputs** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
+
+- **Tracking model**: Serialised · Pooled · Combined (contract "hybrid"); combined lists its components. *(source: DI-740 / contracts/satellite/rental.yaml#/components/schemas/RentalInventoryModel)*
+- **At check-out**: Assign a specific unit (yes/no), scan required (yes/no), allow manual pick (yes/no), allow substitution, allow equipment swap. *(source: DI-740 / contracts/satellite/rental.yaml#/components/schemas/RentalInventoryModel)*
 
 #### Outputs: what the screen shows and produces
 
@@ -603,6 +748,15 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | Empty, no results (`?state=emptyNoResults`) | **Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 Bookings exist under the current model |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+model: Serialised · assign unit at check-out · scan required · manual pick allowed for supervisors · substitution
+  with same category allowed
+```
 
 #### Permissions
 
@@ -645,6 +799,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - [ ] Every transition is wired: `BO-494`.
 - [ ] Every gated control is gated: `RENTAL_CONFIGURE`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -667,9 +822,25 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Food, Beverage & Retail process.** Where a product can be picked up and returned, including returning at a different station (pick up at A, return at B). The one thing to get right: a pick-up × return matrix that makes cross-location returns explicit.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **Layout is two buttons, one labelled "Allow return to different location — YES/NO".** Why: A yes/no setting drawn as a button; nothing shows the stations. *(source: screens/P08-venue-back-office.yaml#BO-499; Food, Beverage & Retail)*
+
+#### Decided on this screen
+
+Answered questions: draw the decision, not the old default. Where a decision and the tables below differ, the decision wins.
+
+- **Must rental stations appear on the live venue map, and is the map builder enough to place them?** → Drawn default accepted: Stations listed by name only until the map question is answered. *(decided by Chinmay, 2026-10-02; DEC-297 / CHG-NOTE-004)* **Reviewable:** a default the lead may still overrule before the block is tasked.
+
 #### Inputs: what the user enters or picks
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+**Rules for these inputs** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
+
+- **Pick-up and return locations**: Choose stations; per station, allowed as pick-up, return or both; "Return to a different station" yes/no. *(source: DI-741 / contracts/satellite/rental.yaml#setRentalProductLocations)*
 
 #### Outputs: what the screen shows and produces
 
@@ -694,6 +865,17 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the rental location are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+locations:
+- Beach Hut — pick-up and return
+- Marina Gate — return only
+- Kayak Jetty — pick-up and return
+```
 
 #### Permissions
 
@@ -739,6 +921,8 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - [ ] Every transition is wired: `BO-494`.
 - [ ] Every gated control is gated: `RENTAL_CONFIGURE`.
 - [ ] The 2 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
+- [ ] The 1 decision(s) taken on this screen are drawn as decided, not as the old default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -759,6 +943,12 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | Opens with | `productId` (navigation) |
 | Route | `/rentals/rental-duration-turnaround-configuration-bo-500` |
 
+**From the Food, Beverage & Retail process.** How long a product can be rented: minimum, maximum, step, default, extensions, same-day return, overnight, and the turnaround buffer between rentals. The one thing to get right: durations in minutes shown as hours and minutes, with turnaround visibly subtracted from availability.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **Fields labelled "Recommended Addition — Turnaround Time" and "Preparation / Inspection / Cleaning Buffer" as text fields.** Why: Pack commentary used as labels; one numeric turnaround field exists in the contract. *(source: screens/P08-venue-back-office.yaml#BO-500 / contracts/satellite/rental.yaml#/components/schemas/RentalDurationRules; Food, Beverage & Retail)*
+
 #### Inputs: what the user enters or picks
 
 **On the screen**
@@ -776,6 +966,11 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | Recommended Addition — Turnaround Time | text field | — | — | — | — | — | — |
 | Preparation / Inspection / Cleaning Buffer | text field | — | — | — | — | — | — |
 
+**Rules for these inputs** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
+
+- **Durations**: Minimum, maximum, step (e.g. 30 min) and default in hours and minutes; fixed blocks (1 h, 2 h cycle) allowed. *(source: DI-741 / contracts/satellite/rental.yaml#/components/schemas/RentalDurationRules)*
+- **Turnaround**: Minutes for inspection and cleaning before the unit can be rented again; subtracted from availability. *(source: contracts/satellite/rental.yaml#getRentalAvailability)*
+
 #### Outputs: what the screen shows and produces
 
 **Where the user goes next**
@@ -792,6 +987,14 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Empty, no results (`?state=emptyNoResults`) | **Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+rules: Min 30 min · max 4 h · step 30 min · default 1 h · extension up to 2 h · same-day return · 10-min turnaround
+```
 
 #### Permissions
 
@@ -836,6 +1039,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - [ ] Every transition is wired: `BO-494`.
 - [ ] Every gated control is gated: `RENTAL_CONFIGURE`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -858,9 +1062,19 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Food, Beverage & Retail process.** Who may rent the product and what must happen at the counter: age, height, weight, ID, guardian, membership, licence, safety briefing, scans, inspections, photos, quantity per customer, partial returns, staff approval. The one thing to get right: each rule is Required · Optional · Not applicable, grouped by "who can rent" and "what happens at the counter".
+
+**Known correction pending (do not draw the wrong version)**
+
+- **Layout is only Save and Cancel.** Why: Nothing to draw; the rule fields exist in the contract. *(source: screens/P08-venue-back-office.yaml#BO-501; Food, Beverage & Retail)*
+
 #### Inputs: what the user enters or picks
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+**Rules for these inputs** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
+
+- **Requirements**: Each as Required / Optional / Not applicable; numeric limits (minimum age, maximum weight) only when set. *(source: DI-742 / contracts/satellite/rental.yaml#/components/schemas/RentalOperationalRules)*
 
 #### Outputs: what the screen shows and produces
 
@@ -885,6 +1099,15 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the rental rules operational are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+rules: Age 12+ · guardian required under 16 · Emirates ID required (kept with the item) · safety briefing required
+  · photo at return optional · max 4 per customer
+```
 
 #### Permissions
 
@@ -929,6 +1152,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - [ ] Every transition is wired: `BO-494`.
 - [ ] Every gated control is gated: `RENTAL_CONFIGURE`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -948,6 +1172,14 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | Offline | online only |
 | Opens with | `productId` (navigation) |
 | Route | `/rentals/customer-requirements-agreement-waiver-bo-502` |
+
+**From the Food, Beverage & Retail process.** What a customer must provide and sign before receiving the rental: profile fields, agreement, waiver, terms, safety declaration, e-signature, guardian signature, agreement version. The one thing to get right: each field is Required / Optional / Hidden, and the agreement version in force is named.
+
+#### Decided on this screen
+
+Answered questions: draw the decision, not the old default. Where a decision and the tables below differ, the decision wins.
+
+- **Which signature-capture device signs waivers at the counter?** → Drawn default accepted: Signature on the staff tablet screen. *(decided by Chinmay, 2026-10-02; DEC-298 / CHG-NOTE-004)* **Reviewable:** a default the lead may still overrule before the block is tasked.
 
 #### Inputs: what the user enters or picks
 
@@ -971,6 +1203,11 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | E-Signature Required | select field | — | — | — | — | — | — |
 | Guardian Signature for Minor | text field | — | — | — | — | — | — |
 | Agreement Version | select field | — | — | — | — | — | — |
+
+**Rules for these inputs** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
+
+- **Customer fields**: Name, mobile, email, nationality, ID number, date of birth, emergency contact, address, custom fields — each Required / Optional / Hidden. *(source: DI-742 / contracts/satellite/rental.yaml#setRentalAgreementRequirements)*
+- **Agreement and waiver**: Agreement, liability waiver, terms, safety declaration, e-signature, guardian signature for minors; agreement version selected from published versions. *(source: contracts/satellite/rental.yaml#setRentalAgreementRequirements)*
 
 #### Outputs: what the screen shows and produces
 
@@ -997,6 +1234,15 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Empty, no results (`?state=emptyNoResults`) | **Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+requirements: Name, mobile, Emirates ID required; email optional · waiver v2.1 required · e-signature required ·
+  guardian signs for under 18
+```
 
 #### Permissions
 
@@ -1039,6 +1285,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - [ ] Every transition is wired: `BO-494`.
 - [ ] Every gated control is gated: `RENTAL_CONFIGURE`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 1 decision(s) taken on this screen are drawn as decided, not as the old default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -1058,6 +1305,16 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | Offline | online only |
 | Opens with | `productId` (navigation) |
 | Route | `/rentals/product-validation-approval-publication-bo-503` |
+
+**Known gaps.** Removed 2 October 2026 (CHG-WIR-008): approveMembershipProductValidation (a membership operation) was bulk-attached by name; rental publication is publishRentalProduct (R254; design-notes correction …
+
+**From the Food, Beverage & Retail process.** The last gate before a rental product is sold: a checklist of every configuration section with what is missing, then maker/checker approval and publication on-site and online. The one thing to get right: nothing publishes while a blocking item remains, and the approver is not the maker.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **Sample values drawn as select fields ("Product - Double Kayak", "Configuration Score - 87%") and checklist ticks as selects.** Why: Pack content used as controls; no configuration score exists in the contract. *(source: screens/P08-venue-back-office.yaml#BO-503; Food, Beverage & Retail)*
+
+**Fixed on main** (the package already carries these; draw what it says): approveMembershipProductValidation (a membership operation) is attached. (CHG-WIR-008).
 
 #### Inputs: what the user enters or picks
 
@@ -1089,6 +1346,14 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | Rejection reason (secondary button) | navigation or local | — | — | — | — |
 | Version history (secondary button) | navigation or local | — | — | — | — |
 
+**Rules for what is shown** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
+
+- **Validation checklist**: Each section with Complete / Missing and the fix ("Inventory not yet assigned — go to Pooled inventory"); pricing, duration and inventory always checked. *(source: DI-743 / contracts/satellite/rental.yaml#validateRentalProduct)*
+
+**What each action does** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
+
+- **Submit for approval / Approve / Reject with reason / Publish**: Moves the product Draft → In review → Approved → Active; reject needs a reason; publish needs the approval permission. *(source: contracts/satellite/rental.yaml#publishRentalProduct)*
+
 **Where the user goes next**
 
 - → `BO-494` Rental Product Command Center: *Back to Rental Product Command Center*; carries `productId`
@@ -1104,6 +1369,14 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | Empty, no results (`?state=emptyNoResults`) | **Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 Blocking findings remain; they are listed |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+product: Double Kayak · 7 of 8 sections complete · Inventory not yet assigned
+```
 
 #### Permissions
 
@@ -1147,6 +1420,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - [ ] Every transition is wired: `BO-494`.
 - [ ] Every gated control is gated: `AUDIT_VIEW`, `RENTAL_APPROVE`, `RENTAL_CONFIGURE`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---

@@ -96,6 +96,17 @@
     "operation": null,
     "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
     "source": "pack ACCREDITATION.pdf, page 55 §Dashboard analytics shall show"
+   },
+   {
+    "operation": "setAccreditationNotificationRules",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): The only bound operation was the rule write, used \"at a glance\"; the rules are edited on BO-675. No read returns accreditation notification sends or delivery outcomes (contract gap CHG-WIR-004) (design-notes correction venue-operations BO-674).",
+    "source": "contracts/satellite/accreditation.yaml#setAccreditationNotificationRules | contracts/satellite/marketing-crm.yaml#listDeliveryQueueFailure"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-004): No read of accreditation notification sends and delivery outcomes (or an accreditation filter on listDeliveryQueueFailure).",
+    "source": "contracts/satellite/marketing-crm.yaml#listDeliveryQueueFailure"
    }
   ],
   "layout": {
@@ -106,8 +117,8 @@
      "slot": "collection",
      "components": [
       {
-       "kind": "dataTable",
-       "label": "Every accreditation communications",
+       "kind": "chart",
+       "label": "Communications",
        "columns": [
         "Delivery success rate",
         "Notifications by type",
@@ -115,50 +126,26 @@
         "Failure trends",
         "Upcoming scheduled communications"
        ],
-       "bindsTo": null,
-       "operation": null,
-       "provenance": "pack ACCREDITATION.pdf, page 55 §Dashboard analytics shall show"
+       "notes": "Delivery success rate, notifications by type and channel, failure trends and upcoming scheduled communications are charts and tiles on a dashboard (VO-R02), not table columns.",
+       "provenance": "design-note correction, 2 October 2026"
       }
      ]
     },
     {
      "name": "contextPanel",
      "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected accreditation communications",
-       "bindsTo": null,
-       "columns": [
-        "Delivery success rate",
-        "Notifications by type",
-        "Notifications by channel",
-        "Failure trends",
-        "Upcoming scheduled communications"
-       ],
-       "notes": "The pack groups this record's detail under its own headings: “Scope of Work”, “Key requirements”.",
-       "provenance": "pack ACCREDITATION.pdf, page 55 §Dashboard analytics shall show"
-      }
-     ]
+     "components": []
     }
    ]
   },
   "states": {
    "loading": "The accreditation communications list.",
    "error": "Could not load. Names which read failed and leaves the accreditation communications untouched.",
-   "emptyFirstRun": "No accreditation communications yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No accreditation communications yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the accreditation communications are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Not shown: nothing on this screen needs a permission of its own; the app's sign-in decides access."
   },
-  "apis": [
-   {
-    "operationId": "setAccreditationNotificationRules",
-    "contract": "accreditation",
-    "purpose": "Notifications at a glance",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026"
-   }
-  ],
+  "apis": [],
   "entryState": {
    "preloaded": [
     "Delivery success rate",
@@ -313,6 +300,13 @@
    "workshopBoard": "wireframes/WS07 ACCREDITATION Board 7.dc.html#bo-675"
   },
   "apisNote": "Regenerated 9 September 2026 from ACCREDITATION.pdf page 56. 0 of 0 labels bound to a contract property; 9 of 27 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-004): No read of AccreditationNotificationRules; affects BO-675 and BO-676.",
+    "source": "contracts/satellite/accreditation.yaml#setAccreditationNotificationRules"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -497,57 +491,31 @@
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
-  "purpose": "Manage reusable accreditation communication templates.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
-    "source": "pack ACCREDITATION.pdf, page 58"
-   },
-   {
-    "operation": null,
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
-    "source": "pack ACCREDITATION.pdf, page 58"
-   }
-  ],
+  "purpose": "Manage reusable accreditation communication templates (merged into BO-785 Template Library).",
   "layout": {
    "template": "split",
    "regions": [
     {
      "name": "contentBody",
-     "components": [
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listMessageTemplates",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
-      }
-     ]
+     "components": []
     }
    ]
   },
   "states": {
-   "loading": "The communication template list.",
-   "error": "Could not load. Names which read failed and leaves the communication template untouched.",
-   "emptyFirstRun": "No communication template yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the communication template are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "loading": "Routes to BO-785 while it opens.",
+   "error": "Could not open BO-785; says so and offers to retry.",
+   "emptyFirstRun": "Never shown: this id routes to BO-785, whose empty states apply.",
+   "emptyNoResults": "Never shown: this id routes to BO-785.",
+   "emptyNoAccess": "As BO-785: shown when the caller lacks the access BO-785 requires, named in words."
   },
-  "apis": [
-   {
-    "operationId": "listMessageTemplates",
-    "contract": "marketing-crm",
-    "purpose": "Template library",
-    "trigger": "onLoad",
-    "provenance": "board reading, 19 September 2026"
-   }
-  ],
+  "apis": [],
   "wireframe": {
    "status": "notStarted",
    "board": "wireframes/P08 Venue Management.dc.html#bo-677",
    "workshopBoard": "wireframes/WS07 ACCREDITATION Board 7.dc.html#bo-677"
   },
-  "apisNote": "Regenerated 9 September 2026 from ACCREDITATION.pdf page 58. 0 of 0 labels bound to a contract property; 0 of 28 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "No operations of its own since 2 October 2026 (CHG-SBO-021): merged into BO-785, whose operations it routes to.",
+  "notes": "**Merged into BO-785** (decided 2 October 2026, Chinmay: duplicate screens merged as proposed; CHG-SBO-021). Accreditation communication templates are message templates (listMessageTemplates) in the one library, filtered to the accreditation purpose (design-note correction customer-marketing BO-785). **One implementation, both ids kept**, as the M24-03 merges do: this id stays for traceability and routes to BO-785, and nothing on it is built separately.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -660,11 +628,6 @@
        "kind": "selectField",
        "label": "Contact information",
        "provenance": "pack ACCREDITATION.pdf, page 59 §Administrators shall configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Key requirement: 12.1.57",
-       "provenance": "pack ACCREDITATION.pdf, page 59 §Administrators shall configure"
       }
      ]
     }
@@ -673,25 +636,30 @@
   "states": {
    "loading": "The channel language branding configuration as saved.",
    "error": "Could not load. Names which read failed and leaves the channel language branding untouched.",
-   "emptyFirstRun": "No channel language branding configured yet. Carries the create action and says what the platform does in the meantime.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "No channel language branding configured yet. Offers no create action — this screen declares no operation that makes one and says what the platform does in the meantime.",
+   "emptyNoAccess": "Not shown: nothing on this screen needs a permission of its own; the app's sign-in decides access.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },
-  "apis": [
-   {
-    "operationId": "setLocalizationBrandingCustomer",
-    "contract": "marketing-crm",
-    "purpose": "Channel, language and branding",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026"
-   }
-  ],
+  "apis": [],
   "wireframe": {
    "status": "notStarted",
    "board": "wireframes/P08 Venue Management.dc.html#bo-678",
    "workshopBoard": "wireframes/WS07 ACCREDITATION Board 7.dc.html#bo-678"
   },
   "apisNote": "Regenerated 9 September 2026 from ACCREDITATION.pdf page 59. 0 of 0 labels bound to a contract property; 10 of 19 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "gaps": [
+   {
+    "operation": "setLocalizationBrandingCustomer",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-005): setLocalizationBrandingCustomer sets a waiver version's languages, branding and channels; accreditation communication branding is not a waiver version (design-notes correction customer-marketing BO-678).",
+    "source": "contracts/satellite/marketing-crm.yaml#setLocalizationBrandingCustomer"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-007): No operation configures accreditation communication branding and sender identity.",
+    "source": "contracts/satellite/marketing-crm.yaml#setLocalizationBrandingCustomer"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -763,6 +731,17 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack ACCREDITATION.pdf, page 59"
+   },
+   {
+    "operation": "sendTransactionalMessage",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-005): sendTransactionalMessage declares the service and partner audiences only, and is per message; a staff screen cannot call it (design-notes correction customer-marketing BO-679).",
+    "source": "contracts/satellite/marketing-crm.yaml#sendTransactionalMessage"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-007): No staff-audience bulk send for accreditation communications.",
+    "source": "contracts/satellite/marketing-crm.yaml#sendTransactionalMessage"
    }
   ],
   "layout": {
@@ -770,41 +749,18 @@
    "regions": [
     {
      "name": "contentBody",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "sendTransactionalMessage",
-       "label": "Send transactional message",
-       "notes": "The act the screen exists for."
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "sendTransactionalMessage"
-      }
-     ]
+     "components": []
     }
    ]
   },
   "states": {
    "loading": "The manual bulk communication list.",
    "error": "Could not load. Names which read failed and leaves the manual bulk communication untouched.",
-   "emptyFirstRun": "No manual bulk communication yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No manual bulk communication yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the manual bulk communication are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Not shown: nothing on this screen needs a permission of its own; the app's sign-in decides access."
   },
-  "apis": [
-   {
-    "operationId": "sendTransactionalMessage",
-    "contract": "marketing-crm",
-    "purpose": "Bulk communication",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026"
-   }
-  ],
+  "apis": [],
   "wireframe": {
    "status": "notStarted",
    "board": "wireframes/P08 Venue Management.dc.html#bo-679",
@@ -999,6 +955,17 @@
     "operation": null,
     "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
     "source": "pack ACCREDITATION.pdf, page 61 §The screen shall display"
+   },
+   {
+    "operation": "importAccreditationHolders",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): importAccreditationHolders (a POST that runs an import) was bound on load, so opening the monitor would start an import; the import is run from BO-680. A list of import batches does not exist (contract gap CHG-WIR-004) (design-notes correction venue-operations BO-681).",
+    "source": "contracts/satellite/accreditation.yaml#importAccreditationHolders"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-004): No read lists accreditation import batches or loads one.",
+    "source": "contracts/satellite/accreditation.yaml#importAccreditationHolders"
    }
   ],
   "layout": {
@@ -1010,7 +977,7 @@
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every import validation processing",
+       "label": "Import batches",
        "columns": [
         "Import batch ID",
         "File name",
@@ -1035,7 +1002,7 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected import validation processing",
+       "label": "The selected batch",
        "bindsTo": null,
        "columns": [
         "Import batch ID",
@@ -1059,22 +1026,11 @@
   "states": {
    "loading": "The import validation processing list.",
    "error": "Could not load. Names which read failed and leaves the import validation processing untouched.",
-   "emptyFirstRun": "No import validation processing yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No import validation processing yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the import validation processing are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Not shown: nothing on this screen needs a permission of its own; the app's sign-in decides access."
   },
-  "apis": [
-   {
-    "operationId": "importAccreditationHolders",
-    "contract": "accreditation",
-    "purpose": "Validation and processing",
-    "trigger": "onLoad",
-    "provenance": "board reading, 19 September 2026",
-    "invalidates": [
-     "listAccreditationHolders"
-    ]
-   }
-  ],
+  "apis": [],
   "entryState": {
    "preloaded": [
     "Import batch ID",
@@ -1201,7 +1157,7 @@
   "states": {
    "loading": "The accreditation export data configuration as saved.",
    "error": "Could not load. Names which read failed and leaves the accreditation export data untouched.",
-   "emptyFirstRun": "No accreditation export data configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyFirstRun": "No accreditation export data configured yet. Offers no create action — this screen declares no operation that makes one and says what the platform does in the meantime.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },
@@ -1233,20 +1189,6 @@
     "purpose": "Status and download link",
     "trigger": "onAction",
     "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "runReport",
-    "contract": "reporting",
-    "purpose": "Report over the accreditation data sources",
-    "trigger": "onAction",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "exportReportResult",
-    "contract": "reporting",
-    "purpose": "csv or xlsx extract",
-    "trigger": "onAction",
-    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {
@@ -1258,19 +1200,25 @@
   "entryState": {
    "params": [
     {
-     "name": "executionId",
-     "from": "navigation"
-    },
-    {
      "name": "exportId",
-     "from": "navigation"
-    },
-    {
-     "name": "reportId",
      "from": "navigation"
     }
    ]
   },
+  "gaps": [
+   {
+    "operation": "exportReportResult",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): runReport and exportReportResult were a second export path beside exportAccreditationData; the accreditation export is the one the pack describes, and reports export from the reporting screens (design-notes correction venue-operations BO-682).",
+    "source": "screens/P08-venue-back-office.yaml#BO-682 | contracts/satellite/accreditation.yaml#exportAccreditationData"
+   },
+   {
+    "operation": "runReport",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): runReport and exportReportResult were a second export path beside exportAccreditationData; the accreditation export is the one the pack describes, and reports export from the reporting screens (design-notes correction venue-operations BO-682).",
+    "source": "screens/P08-venue-back-office.yaml#BO-682 | contracts/satellite/accreditation.yaml#exportAccreditationData"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",

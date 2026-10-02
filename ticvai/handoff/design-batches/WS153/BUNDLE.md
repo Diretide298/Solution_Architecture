@@ -1,14 +1,14 @@
 # WS153 — Payment Payment Orchestration board 7
 
-**10 screens · 12 operations · 13 schemas · 6 permissions**
+**9 screens · 12 operations · 13 schemas · 6 permissions**
 
-Platform P09 TICVAI Web · ships as **ticvai-control** ·
-platformAdmin audience · web ·
+Platform P08 Venue Management · ships as **venue-management** ·
+staff audience · web ·
 online only
 
 ## Who this is for
 
-**platformAdmin on web.** Everything below is how you know what is
+**staff on web.** Everything below is how you know what is
 true. **None of it is the subject.** The subject is the person in front of the screen and the one
 thing they came to do.
 
@@ -61,22 +61,90 @@ convincingly. It is never a caption.
   and its error; and, element by element, what is shown and in what format, what each action
   produces and where the user goes next. Draw exactly that.
 
+## The processes these screens belong to
+
+Written by the owner of each process (`handoff/design-notes/`). Read before any screen: it says how the process runs end to end and which words the screens must use.
+
+### Ticketing & Guest Commerce, as the venue and TICVAI configure and run it
+
+WHAT THE PROCESS IS. Everything a guest can buy is set up, priced, promoted and serviced here, on Venue Management (P08, the venue's own back office, served inside the venue's cell) and on the TICVAI Console (P09, TICVAI's control plane, outside every cell). End to end: (1) CATALOGUE. A product has one of twelve kinds (admission, timedAdmission, datedAdmission, openDated, seated, membership, bundle, fnb, retail, rental, addOn, giftCard). Its ticket types (adult, child, senior, resident...) are not typed one by one: they are generated from the product's attributes (components) and each value combination becomes a sellable ticket type with no extra setup (DI-164). What a ticket grants (validity, entries, re-entry, days of week, blackout dates, expiry anchor, fast track, transfer) lives on a reusable entitlement template, not on the product. Who may take part (age, height, supervision, certification) is the eligibility rule; what the guest must answer is the data mask and the consent questions; how the guest sees it is guestListing (bookable, infoOnly, hidden), display tags (at most six), media and the booking flow. Group, family and corporate products and every after-sales policy (reschedule, exchange, refund, cancellation, upgrade, transfer) are configured inside the one product configuration, never on separate screens (DI-465, DI-466). (2) LIFECYCLE AND PUBLICATION. A product moves draft, inReview, approved, live, withdrawn, archived. Approval and publication are two acts with two permissions (PRODUCT_APPROVE, PRODUCT_PUBLISH, R091); every product is authorised before it sells online or on site (DI-438). Approved is still not on a till: a till sells only what is in the signed catalogue release it pulled (publishBundle, ADR-0013), so a saved price is a back-office fact until the venue publishes to tills. Changing something that has sold is preceded by an impact check (assessProductChange: orders affected, entitlements issued, future performances, open carts); restoring a version creates a new version, and sold tickets keep the price and terms they were sold under (restoreProductVersion, DI-938, TRACKER Actions row 145). (3) PRICE. Prices live in price lists: per venue, per channel set, with validity dates and a priority, copied for the next season with an uplift (copyPriceList) and repriced in bulk only after a dry run (bulkChangePrices). Currency and decimal scale are never chosen on a form: they resolve from the venue's region (ADR-0008, ADR-0018; AED 2 places, OMR and BHD 3). When several rules apply, the configured hierarchy decides; there is no "lowest price wins" default (DI-595). Tax on the pre-discount price and three-decimal rounding are regional settings (DI-598). Dynamic rules always show their minimum and maximum price guardrails beside the trigger (getDynamicPriceRule). (4) PROMOTE AND BUNDLE. A promotion is a rule (automatic, or gated by a code) created in draft, made live only by Publish, which first analyses stacking; a …
+*(source: DI-164; DI-171; DI-438; DI-465; DI-466; DI-595; DI-598; DI-387; DI-039; DI-044; DI-474; DI-671; DI-987; DI-019; DI-080; ADR-0008; ADR-0013; ADR-0018; ADR-0019; ADR-0030; R091; R098; R101; R222; REV3-21; contracts/spine/catalogue.yaml#transitionProductLifecycle …)*
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Product | Anything sellable, of one of the twelve kinds. The record that carries names, channels, listing, media and policies. | Item (except on F&B and retail screens), SKU (for tickets), Offering | contracts/spine/catalogue.yaml#/components/schemas/ProductKind |
+| Ticket type | One sellable variant of an admission or event product (Adult, Child, Resident Adult), generated from the product's attributes. For retail and F&B the same record is labelled Variant. | Variant (on ticket screens), Sub-product, Rate (that is a price), Axis value | contracts/spine/catalogue.yaml#updateProductVariant / DI-164 / DI-437 |
+| Attribute | A dimension that generates ticket types (Guest category, Residency, Tier, Length). Each has values; adding a value adds ticket types. | Axis, Component (the client's word; use it only in help text), Option | contracts/spine/catalogue.yaml#setProductAttributes / DI-164 / DI-450 |
+| Entitlement | What a ticket lets the holder do (validity, entries, re-entry, days, blackout dates, expiry, fast track, transfer), defined once on an entitlement template and shared by several products. | Access rights, Ticket rules, Validity profile | contracts/spine/catalogue.yaml#createEntitlementTemplate / DI-171 / DI-451 |
+| Eligibility rule | Who may take part in or buy a product (age, height, supervision, waiver, certification). Distinct from a promotion's eligibility, which decides who gets a discount. | Restriction, Access rule (that is access control) | contracts/spine/catalogue.yaml#setProductEligibilityRule / DI-463 |
+| Price list | A set of prices for one venue and a set of channels, valid between two dates, with a priority. Several coexist (B2C, B2B, season). | Price book, Rate card, Tariff | contracts/spine/catalogue.yaml#createPriceList / DI-140 / DI-163 |
+| Price category | A standard rate type (Adult, Child, Member) reused across lists so venues do not invent "Adult Standard" and "Normal Adult". | Price band (that is a seat-category band), Fare type (transport) | contracts/spine/catalogue.yaml#setPriceCategoryRateType / … |
+| Price band | A priced band on a seat category (code, label, colour, amount, channel, from-date). | Price category, Zone price | contracts/satellite/seating.yaml#/components/schemas/SeatPriceBand |
+| Promotion | A rule that changes a price automatically or when a code is entered; draft until published; declares how it stacks. | Offer (except in guest copy), Deal, Discount rule | contracts/satellite/promotions.yaml#createPromotion / DI-173 / DI-174 |
+| Coupon code | A code issued from a coupon campaign that applies a promotion-style discount; one shared code or many single-use codes. | Voucher, Promo voucher | contracts/satellite/promotions.yaml#createCouponCampaign / DI-173 |
+| Voucher | A code that carries money (face value, balance), sold or issued; a liability until redeemed or expired. | Coupon, Credit note | contracts/satellite/promotions.yaml#listVoucherBatches / … |
+| Bundle | A product sold as one line whose price differs from the sum of its components, with a mandatory revenue allocation. "Package" is acceptable in guest copy. | Combo (that is an F&B meal deal), Catalogue bundle | contracts/satellite/promotions.yaml#createBundle / DI-220 / ADR-0019 |
+| Catalogue release | The signed snapshot of a venue's catalogue, prices, promotions and sale boards that tills, kiosks and devices pull. Its action label is "Publish to tills". | Bundle, Catalogue bundle, Sync, Deploy | contracts/spine/catalogue.yaml#publishBundle / … |
+| Approve / Publish / Save | Save keeps a draft; Approve records that it is authorised (PRODUCT_APPROVE); Publish makes it live for guests and channels (PRODUCT_PUBLISH). Three different buttons, never merged. | Submit, Go live, Activate (except CatalogueConfigStatus active), Deploy | R091 / contracts/spine/catalogue.yaml#transitionProductLifecycle / DI-438 |
+| Product states | Draft, In review, Approved, Live, Withdrawn, Archived (ProductLifecycleState), always as coloured badges with these exact labels. | Published (for a product), Pending, Inactive (for a product) | contracts/spine/catalogue.yaml#/components/schemas/ProductLifecycleState |
+| Channel | Where something is sold. Labels: pos Point of sale; kiosk Kiosk; web and guestWeb Website; mobile and guestApp App; b2b B2B partners; partner Partner; ota Travel agents (OTA); callCentre Call centre; api API; backOffice Back office. | Touchpoint, Outlet (an outlet is a business inside a venue), raw enum values | contracts/spine/catalogue.yaml#/components/schemas/Channel / … |
+| Refund | Money returned after settlement, wholly or for some lines, under the venue's refund policy. | Return (that is retail goods), Reversal, Void | contracts/spine/orders.yaml#createRefund / DI-252 |
+| Void | Cancelling a whole order before settlement, within the same shift, with a reason from the void list. After settlement it is a refund. | Cancel order, Delete | contracts/spine/orders.yaml#voidOrder / R222 |
+| Exchange / Reschedule | Exchange swaps lines for other products or dates and settles only the difference; Reschedule is the same product moved to another date or time. | Rebook, Date change (acceptable only in guest copy), Refund and resell | contracts/spine/orders.yaml#exchangeOrderLines / … |
+| Hold / Capture / Release | A deposit or stored-value amount is held, then partly or fully captured, and the rest released. A held deposit is not a payment. | Charge, Pre-auth (in staff copy), Block funds | contracts/spine/orders.yaml#authoriseStoredValue / … |
+| Wallet (TICVAI wallet) | The guest's stored-value balance on TICVAI, spent by hold and capture. Distinct from the tender "Apple Pay / Google Pay", which the contract also calls wallet. | Digital wallet (for stored value), E-wallet, Credit (without a type) | contracts/spine/orders.yaml#/components/schemas/TenderKind / R080 |
+| Credit lot | One amount of wallet credit of one credit type (cash, bonus, gift) with its own expiry; lots are spent nearest expiry first and the guest sees the breakdown but cannot choose. | Bucket, Batch, Top-up | TRACKER Actions row 171 / contracts/satellite/wallet.yaml#expireCreditLots |
+| Venue map / Seat map | A venue map is the wayfinding map of a park or a floor (points, paths, bookable places); a seat map is the seating layout of an auditorium or stand. Never just "map" where both could be meant. | Layout (alone), Floor plan (unless it is a floor map), Map (alone) | contracts/satellite/venue-map.yaml#createVenueMap / … |
+| Point / Bookable place | A point is a place on a venue map (toilet, ride, restaurant, exit). A bookable place is a cabana, lounger, table or pitch placed on the map and sold through its price band. | Pin, POI, Marker, Resource (in staff copy) | contracts/satellite/venue-map.yaml#setVenuePoint / … |
+| Station / Route / Timetable / Departure / Fare table / Pass … | A route is an ordered list of stations with offsets; a timetable generates departures up to its release horizon; a fare table prices a route per passenger type; a pass type is a multi-trip or unlimited pass sold as a product. | Stop (except in the stop list), Line (except lineCode), Schedule, Trip (except a guest's journey) | contracts/satellite/transport.yaml / REV3-21 |
+| Applies from | The effective date of a change. Every dated change shows it, and sold items keep their old terms. | Effective date (in labels), Start date (for a change) | contracts/satellite/seating.yaml#updateSeatCategory / TRACKER Actions row 194 |
+
+### Finance, Ledger & Tax · Reporting & Analytics
+
+Finance and insights run underneath every sale. A sale at a till (P04), kiosk, web storefront (P01) or guest app (P02) is priced and taxed per line at the moment of sale, recorded in the venue's base currency (AED in the UAE; 2 decimals, or 3 for BHD, KWD and OMR, never rounded away), and posted to an append-only dual ledger through account mappings per money event; anything unmapped lands in suspense. Tax follows the jurisdiction's tax profile: inclusive or exclusive, compound where a tax applies on another, zero-rated or exempt with verified evidence, and computed on the discounted price by default or on the price before discount where the region requires it (Egypt). A guest may select a currency the venue charges and pay in it: the rate is locked on the order, the payment partner is asked in that currency, the ledger keeps the base amount with the rate, and a refund goes back in the currency paid (decided 2 October 2026, Chinmay); a currency shown but not charged is an approximate price. Foreign cash at a till is recorded at its base equivalent and change is given in base currency. A paid order can carry a VAT receipt (simplified tax invoice), a full tax invoice with the buyer's TRN, or a consolidated invoice for a company, each numbered without gaps and never edited; corrections are credit memos. Revenue is recognised by rule: POS-style immediate, tickets on the visit, gift cards and wallet on use, annual passes straight-line or per visit, breakage on expiry; deferred revenue is a balance that ages. Each venue's day is reconciled (POS cash, gateways, bank, wallet against the ledger, provider files matched automatically, only genuine mismatches to a person); chargebacks are defended against the bank's deadline; month end runs seven close checks and goes to a finance approver. Nothing posted is deleted: a correction is a reversal, an approver is never the preparer, and ledger approval needs a second factor. Back-office finance lives in Venue Management (P08: chart of accounts, mapping, FX, journals, recognition, reconciliation, period close, chargebacks); tax profiles, calculation validation and platform reconciliation in the TICVAI Console (P09); partner settlement in P10. Reporting is one consolidated, permission-based area (Analytics, P16): seeded standard dashboards and reports plus no-code builders over a governed business catalogue; the P08 report screens, the POS terminal day view and the kitchen performance view are scoped windows onto the same definitions and must show the same numbers. Every figure is read from a lag-tolerant reporting copy and shows its "as of" time; scope comes from the person's rights, never from a filter; AI explains and recommends but never acts, answers only within the person's role, labels forecasts, and is phase two for finance ledgers.
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Base currency | The venue's region currency; the currency every record and ledger posting is in. A guest may pay in a currency they select (where the venue charges it); the books still hold the base amount and the rate. | Home currency, Local price, Default currency | DI-211 / DI-282 / contracts/spine/orders.yaml#/components/schemas/Order |
+| Pay in USD (a currency the venue charges) | The guest's selected payment currency; the card is charged in it at the rate locked on the order, and refunds go back in it. | Converted price, Approx. (for a charged currency) | contracts/spine/orders.yaml#checkoutCart / … |
+| ≈ (approx.) price in USD / SAR / … | A conversion of a base-currency price for a currency the venue shows but does not charge, always next to the base price. | Converted price, USD price | DI-211 / screens/P02-guest-mobile-app.yaml#GST-044 |
+| Takings | Money received in the period less refunds (cash-basis); the seeded KPI on hubs. | Revenue, Sales, Income | contracts/satellite/reporting.yaml#/components/schemas/ReportingSystemKpi / R283 |
+| Gross sales | Issued sales before discounts and refunds; whether tax is included must be stated on the tile. | Revenue, Turnover | MATRIX 6.1.78 |
+| Net revenue | Gross sales less discounts less refunds, adjusted per finance policy. | Net sales, Revenue, Income | MATRIX 6.1.78 |
+| Recognised revenue / Deferred revenue | Earned under the recognition rules / paid for but not yet earned. Kept distinct from sales. | Realised revenue, Unearned income, Wallet revenue | MATRIX 5.12.6 / DI-260 / contracts/spine/finance.yaml#getDeferredRevenue |
+| VAT receipt | The simplified tax invoice issued on a paid order. | Receipt (when it is a tax document), Bill | contracts/spine/finance.yaml#issueTaxInvoice |
+| Tax invoice / Combined tax invoice | A full invoice with the buyer's details / one invoice for several paid orders of one buyer. | Bill, Statement | contracts/spine/finance.yaml#/components/schemas/FinTaxInvoiceType |
+| Credit memo | The document that corrects an issued invoice after a refund; the invoice itself is never edited. | Credit note (until the client's tax adviser chooses "Tax credit note"), Edit invoice | contracts/spine/finance.yaml#/components/schemas/FinTaxInvoice |
+| VAT (or the jurisdiction's tax name) | Use the tax profile's own name on every surface; "Tax" only where several kinds are summed. | GST in UAE, Service charge for a tax | contracts/spine/catalogue.yaml#setTaxProfileJurisdiction |
+| Price before discount | The taxable base where the jurisdiction taxes the undiscounted price. | Gross price, List tax | DI-598 |
+| Post / Reverse | A journal reaches the ledger when approved and posted; a correction is a reversal, never an edit or delete. | Edit entry, Delete entry, Undo | contracts/spine/finance.yaml#reverseJournalEntry |
+| Period (Open / Closing / Closed) | A fiscal period's state; closing stops postings, closed locks them. | Month locked, Frozen | contracts/spine/finance.yaml#/components/schemas/PeriodStatus |
+| Variance (Over / Short) | The difference between expected and counted or recorded, always saying between which two figures. | Discrepancy, Error, Loss | DI-275 / contracts/spine/finance.yaml#/components/schemas/UnifiedReconciliation |
+| Settlement / Exception / Resolve | A provider's file for a day / a line that did not match / the recorded explanation. | Payout file, Error, Close | contracts/spine/finance.yaml#/components/schemas/SettlementException |
+| Chargeback | A bank-initiated reversal with an evidence deadline; not a refund. | Dispute refund, Reversal | contracts/spine/orders.yaml#/components/schemas/Chargeback |
+| Report / Dashboard / Tile / KPI | A runnable, exportable, schedulable definition / a page of tiles / one visual bound to a report / a company-wide measure defined once. | Widget (outside the builder's library), Board (for a user-facing dashboard) | contracts/satellite/reporting.yaml#/components/schemas/DashboardTile / … |
+| Warning / Critical | KPI status bands set by a target's amber and red thresholds; always words plus colour. | Amber, Red (alone), Bad | contracts/satellite/reporting.yaml#/components/schemas/KpiTarget |
+| As of HH:MM / Updated N sec ago | The freshness of every figure read from the reporting copy; stale shows a warning. | Live (unless refreshed), Real-time | MATRIX 8.7.22 |
+| Forecast | Any projected figure, with its range; never shown as a fact. | Expected, Will be | DI-973 |
+| Outlet / Workstation (till) | A sales point / the device; staff copy may say "till" for the workstation. | Store, POS (in copy), Drawer (for the device) | R156 |
+| Channel | POS, Web, App, Kiosk, B2B, OTA, from one closed list. | Source, Platform | MoM 2026-08-18 4.2 Recipes, Operating Hours & Service Channels / MATRIX 1.4.7 |
+
+
 ## The screens
 
 Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs count fields; requirements are matrix rows; meeting inputs are the ones naming the screen (the module and platform ones are below); white label says whether the tenant's brand reaches it (guest) or it sets the brand (configures).
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-619` | Reconciliation & Settlement Command Center\t139 | B–D | 0 | 12 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-620` | Reconciliation Source & Import Manager\t141 | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-621` | Transaction Matching & Reconciliation Engine\t142 | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-622` | Reconciliation Exception & Investigation Center\t143 | B–D | 0 | 22 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-623` | Settlement & Payout Manager\t144 | B–D | 0 | 32 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-624` | Fees, Commission, FX & Settlement Economics\t145 | B–D | 0 | 10 | 6 | 0 | 0 | 4 | — | notStarted (—) |
-| `ADM-625` | Merchant Account & Settlement Calendar Manager\t146 | B–D | 2 | 16 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `ADM-626` | Settlement Posting, Finance Handoff & Close Manager\t148 | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-627` | Reconciliation Audit, Trace & Evidence Center\t149 | B–D | 7 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-628` | Reconciliation Simulator, Forecast & AI Operations Advisor\t150 | B–D | 0 | 14 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-620` | Reconciliation Source & Import Manager | B–D | 0 | 9 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-621` | Transaction Matching & Reconciliation Engine | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-622` | Reconciliation Exception & Investigation Center | B–D | 0 | 22 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-623` | Settlement & Payout Manager | B–D | 0 | 32 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-624` | Fees, Commission, FX & Settlement Economics | B–D | 0 | 10 | 6 | 0 | 0 | 4 | — | notStarted (—) |
+| `ADM-625` | Merchant Account & Settlement Calendar Manager | B–D | 2 | 16 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `ADM-626` | Settlement Posting, Finance Handoff & Close Manager | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-627` | Reconciliation Audit, Trace & Evidence Center | B–D | 7 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-628` | Reconciliation Simulator, Forecast & AI Operations Advisor | B–D | 0 | 14 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 
@@ -88,32 +156,36 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 **One block per screen, in the order to build them.** Each says what the user enters (every control, with its rules), what the screen shows and produces (every field, with its format; every action, with what it returns and the errors to draw), every state, who may do what, the requirements it meets, what the client said about it, the tracker items, what the tenant configures, the references, and an acceptance checklist. **Everything in a block is for you, never for the screen**: no id, field name, operation or permission key may appear as text.
 
-### `ADM-619` Reconciliation & Settlement Command Center\t139
+### `ADM-620` Reconciliation Source & Import Manager
 
-**Provide an executive and operational overview of payment reconciliation and settlement health.**
+**Manage all sources used to compare TICVAI payment records with external financial processing records.**
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `core` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `PAYMENT_VIEW`, `SETTLEMENT_VIEW` (2 read); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
-| Pattern | commandCentre (compact density): the pack gives this screen both a metric directory (§KPI Cards) and a per-row directory (§Show) — counts over a population, then the population |
+| Who uses it | venue staff holding `PAYMENT_CONFIGURE`, `PAYMENT_VIEW`, `SETTLEMENT_RECONCILE` (1 configure, 1 read, 1 operate); in the flows as platform admin |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
-| Route | `/commercial/reconciliation-settlement-command-center-t139-adm-619` |
+| Route | `/commercial/reconciliation-source-import-manager-t141-adm-620` |
 
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys. Its board's hub ADM-619 stays on the console (DEC-211 (Chinmay, 2 October, batch 6): a cross-tenant view of TICVAI's payment operations); this screen keeps that edge and is also reached from BO-100 Venue Home.
+
+**Known gaps.** **The pack names 1 actions on this screen and the screen declares 0 operations.** Unserved: Scheduled report imports. Each needs an operation, or needs removing from the screen; this is the Phase 3 … **Reconciliation Source & Import Manager\t141 declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. …
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Settlement and statement feeds and their import.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **The screen name ends in an escaped tab and the pack page number: "Reconciliation Source & Import Manager\t141".** Why: The pack page number leaked into the name; it would print on the screen title and the navigation. *(source: screens/P08-venue-back-office.yaml#ADM-620; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
+- **Pack actions with no operation: Scheduled report imports.** Why: The workshop pack names them on this screen and no operation serves them; each needs an operation or removal from the screen. *(source: screens/P08-venue-back-office.yaml#ADM-620; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
+
+**Fixed on main** (the package already carries these; draw what it says): No read operation: the screen declares only setReconciliationSource, ingestSettlementFile and nothing that returns the current … (CHG-WIR-025).
 
 #### Inputs: what the user enters or picks
-
-**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
-
-| Filter | Drawn as | Default | Allowed values, rules | Source |
-|---|---|---|---|---|
-| Provider name | text field | — | — | `listSettlements` ?providerName |
-| Status | select | — | Ingesting · Parsing · Matching · Matched · Has exceptions · Resolved · Failed | `listSettlements` ?status |
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
 
@@ -121,152 +193,19 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**TICVAI Transaction Value** (metric tile)
-
-**Provider Transaction Value** (metric tile)
-
-**Matched Transactions** (metric tile)
-
-**Match Rate** (metric tile)
-
-**Unmatched Transactions** (metric tile)
-
-**Unmatched Value** (metric tile)
-
-**Settlement Expected** (metric tile)
-
-**Settlement Received** (metric tile)
-
-**Settlement Variance** (metric tile)
-
-**Provider Fees** (metric tile)
-
-**Refund Settlement Value** (metric tile)
-
-**Open Exceptions** (metric tile)
-
-**Every reconciliation settlement \t139** (data table)
+**Sources** (data table, from `listReconciliationSources`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| Expected | text | not in the schema: `Expected` |
-| Pending | text | not in the schema: `Pending` |
-| Received | text | not in the schema: `Received` |
-| Partially received | text | not in the schema: `Partially Received` |
-| Variance | text | not in the schema: `Variance` |
-| Overdue | text | not in the schema: `Overdue` |
-
-**The selected reconciliation settlement \t139** (detail panel): The pack groups this record's detail under its own headings: “Matched”, “Match Rate”, “Breakdown”.
-
-| Shows | Format | Notes |
-|---|---|---|
-| Expected | text | not in the schema: `Expected` |
-| Pending | text | not in the schema: `Pending` |
-| Received | text | not in the schema: `Received` |
-| Partially received | text | not in the schema: `Partially Received` |
-| Variance | text | not in the schema: `Variance` |
-| Overdue | text | not in the schema: `Overdue` |
-
-**Data it reads**: `listSettlements` (onLoad, Settlements to date); `listReconciliationSources` (onLoad, Feeds and their freshness)
-
-**Where the user goes next**
-
-- → `ADM-002` Platform Dashboard: *Back to Platform Dashboard*
-- → `ADM-620` Reconciliation Source & Import Manager\t141: *Reconciliation Source & Import Manager\t141*
-- → `ADM-621` Transaction Matching & Reconciliation Engine\t142: *Transaction Matching & Reconciliation Engine\t142*
-- → `ADM-622` Reconciliation Exception & Investigation Center\t143: *Reconciliation Exception & Investigation Center\t143*; carries `settlementId`
-- → `ADM-623` Settlement & Payout Manager\t144: *Settlement & Payout Manager\t144*
-- → `ADM-624` Fees, Commission, FX & Settlement Economics\t145: *Fees, Commission, FX & Settlement Economics\t145*
-- → `ADM-625` Merchant Account & Settlement Calendar Manager\t146: *Merchant Account & Settlement Calendar Manager\t146*
-- → `ADM-626` Settlement Posting, Finance Handoff & Close Manager\t148: *Settlement Posting, Finance Handoff & Close Manager\t148*
-- → `ADM-627` Reconciliation Audit, Trace & Evidence Center\t149: *Reconciliation Audit, Trace & Evidence Center\t149*
-- → `ADM-628` Reconciliation Simulator, Forecast & AI Operations Advisor\t150: *Reconciliation Simulator, Forecast & AI Operations Advisor\t150*
-
-#### States
-
-| State | What it shows |
-|---|---|
-| Loading (`?state=loading`) | The reconciliation settlement \t139 list; the counts above it resolve separately. |
-| Error (`?state=error`) | Could not load. Names which read failed and leaves the reconciliation settlement \t139 untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No reconciliation settlement \t139 yet. Carries the create action; distinct from a filter that matched nothing. |
-| Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the reconciliation settlement \t139 are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| Offline (`?state=offline`) | online only |
-
-#### Permissions
-
-- `listSettlements` → `SETTLEMENT_VIEW` (read) · staff, partner
-- `listReconciliationSources` → `PAYMENT_VIEW` (read) · staff
-
-**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
-
-#### Requirements it meets
-
-No matrix row traces to this screen's operations or data.
-
-#### Client meeting inputs
-
-None names this screen.
-
-Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
-
-#### Workshop task tracker
-
-No tracker row concerns this screen; the rows for its platform are listed once, below.
-
-#### References
-
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-619` · status **notStarted** · provenance —
-- Client workshop board: `wireframes/WS93 Payment Payment Orchestration Board 7.dc.html#adm-619`
-- Workshop pack: Payment_Payment_Orchestration.pdf board 7
-- Flow F262 *Payment Payment Orchestration board 7: Reconciliation & Settlement Command …*, step 1: Opens Reconciliation & Settlement Command Center\t139 → Provide an executive and operational overview of payment reconciliation and settlement health.
-- Flow F262 *Payment Payment Orchestration board 7: Reconciliation & Settlement Command …*, step 3: Returns to the board's landing screen → Ready for the next screen on this board
-- Flow F262 *Payment Payment Orchestration board 7: Reconciliation & Settlement Command …*, step 5: Returns to the board's landing screen → Ready for the next screen on this board
-- Flow F262 *Payment Payment Orchestration board 7: Reconciliation & Settlement Command …*, step 7: Returns to the board's landing screen → Ready for the next screen on this board
-- Flow F262 *Payment Payment Orchestration board 7: Reconciliation & Settlement Command …*, step 9: Returns to the board's landing screen → Ready for the next screen on this board
-- Flow F262 *Payment Payment Orchestration board 7: Reconciliation & Settlement Command …*, step 11: Returns to the board's landing screen → Ready for the next screen on this board
-- Flow F262 *Payment Payment Orchestration board 7: Reconciliation & Settlement Command …*, step 13: Returns to the board's landing screen → Ready for the next screen on this board
-- Flow F262 *Payment Payment Orchestration board 7: Reconciliation & Settlement Command …*, step 15: Returns to the board's landing screen → Ready for the next screen on this board
-- … and 1 more flow steps (`flows/`)
-- Flow F262 branch at step 1 (expected): when Nothing has been set up on Reconciliation & Settlement Command Center\t139 yet, The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and it is a different situation from an empty result on an established one.
-- Flow F262 branch at step 1 (requiresStaff): when The operator does not hold the permission this screen requires, The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**, which is the right shape -- but the permission that would satisfy it is not granted by any role in …
-
-#### Acceptance for the design
-
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (12 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
-- [ ] Every state opens from `#ADM-619?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
-- [ ] Every transition is wired: `ADM-002`, `ADM-620`, `ADM-621`, `ADM-622`, `ADM-623`, `ADM-624`, `ADM-625`, `ADM-626`, `ADM-627`, `ADM-628`.
-- [ ] Every gated control is gated: `PAYMENT_VIEW`, `SETTLEMENT_VIEW`.
-- [ ] The module and platform inputs below are applied.
-- [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
-
----
-
-### `ADM-620` Reconciliation Source & Import Manager\t141
-
-**Manage all sources used to compare TICVAI payment records with external financial processing records.**
-
-| | |
-|---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
-| Module | Commercial · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `PAYMENT_CONFIGURE`, `SETTLEMENT_RECONCILE` (1 configure, 1 operate); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
-| Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
-| Offline | online only |
-| Opens with | nothing: it opens on its own |
-| Route | `/commercial/reconciliation-source-import-manager-t141-adm-620` |
-
-**Known gaps.** **The pack names 1 actions on this screen and the screen declares 0 operations.** Unserved: Scheduled report imports. Each needs an operation, or needs removing from the screen; this is the Phase 3 … **Reconciliation Source & Import Manager\t141 declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. …
-
-#### Inputs: what the user enters or picks
-
-Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
-
-#### Outputs: what the screen shows and produces
+| ID | the name it points at, never the id | — |
+| Code | text | — |
+| Connection | the name it points at, never the id | — |
+| Transport | chip: Sftp, API, Email, Manual upload | — |
+| Format | chip: Csv, Fixed width, Json, Xml, Camt053 | — |
+| Expected schedule | text | How often a file is expected. Daily by default, one per venue per trading day (decided 28 September, audit R110 (b)), because settlement is … |
+| Expected by time | text | — |
+| Alert if missing | yes / no (icon or chip) | — |
+| Field mapping | grouped details | — |
 
 **Actions and what each produces**
 
@@ -275,9 +214,16 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Scheduled report imports (primary button) | navigation or local | — | — | — | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
 
+**What each action does** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **Ingest file**: Step one of five (ingest, parse, match, classify, auto-resolve). *(source: contracts/spine/finance.yaml#ingestSettlementFile / contracts/satellite/payments.yaml#setReconciliationSource)*
+
+**Data it reads**: `listReconciliationSources` (onLoad, The files and feeds reconciliation is run against)
+
 **Where the user goes next**
 
-- → `ADM-619` Reconciliation & Settlement Command Center\t139: *Back to Reconciliation & Settlement Command Center\t139*
+- → `ADM-619` Reconciliation & Settlement Command Center: *Back to Reconciliation & Settlement Command Center\t139*
+- → `BO-100` Venue Home: *Back to Venue Home*
 
 #### States
 
@@ -291,10 +237,22 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 `fileReference` names no completed upload in the caller's scope, or the period is not a single day (`settlement-period-not-a-day`, audit R110 (b)). |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+feed:
+  provider: Network International
+  format: CSV daily
+  last: 2026-11-14 06:00
+```
+
 #### Permissions
 
 - `setReconciliationSource` → `PAYMENT_CONFIGURE` (configure) · staff
 - `ingestSettlementFile` → `SETTLEMENT_RECONCILE` (operate) · staff, partner
+- `listReconciliationSources` → `PAYMENT_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -306,7 +264,7 @@ No matrix row traces to this screen's operations or data.
 
 None names this screen.
 
-Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -314,7 +272,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-620` · status **notStarted** · provenance —
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-620` · status **notStarted** · provenance —
 - Client workshop board: `wireframes/WS93 Payment Payment Orchestration Board 7.dc.html#adm-620`
 - Workshop pack: Payment_Payment_Orchestration.pdf board 7
 - Flow F262 *Payment Payment Orchestration board 7: Reconciliation & Settlement Command …*, step 2: Works in Reconciliation Source & Import Manager\t141 → Manage all sources used to compare TICVAI payment records with external financial processing records.
@@ -322,35 +280,54 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state (400, 412).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (9 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-620?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Scheduled report imports, Cancel.
-- [ ] Every transition is wired: `ADM-619`.
-- [ ] Every gated control is gated: `PAYMENT_CONFIGURE`, `SETTLEMENT_RECONCILE`.
+- [ ] Every transition is wired: `ADM-619`, `BO-100`.
+- [ ] Every gated control is gated: `PAYMENT_CONFIGURE`, `PAYMENT_VIEW`, `SETTLEMENT_RECONCILE`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 2 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
 
-### `ADM-621` Transaction Matching & Reconciliation Engine\t142
+### `ADM-621` Transaction Matching & Reconciliation Engine
 
 **Automatically match TICVAI payment transactions against provider/acquirer records.**
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `core` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `PAYMENT_CONFIGURE` (1 configure); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `PAYMENT_CONFIGURE` (1 configure); in the flows as platform admin |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | commandCentre (compact density): the pack gives this screen a metric directory (§Display) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/commercial/transaction-matching-reconciliation-engine-t142-adm-621` |
 
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys. Its board's hub ADM-619 stays on the console (DEC-211 (Chinmay, 2 October, batch 6): a cross-tenant view of TICVAI's payment operations); this screen keeps that edge and is also reached from BO-100 Venue Home.
+
+**Known gaps.** Contract gap recorded 2 October 2026 (CHG-WIR-027): No read of reconciliation matching rules (setReconciliationMatchingRules has no get).
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** How a platform transaction is matched to a settled one: net of fees, rounding, batching.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **The screen name ends in an escaped tab and the pack page number: "Transaction Matching & Reconciliation Engine\t142".** Why: The pack page number leaked into the name; it would print on the screen title and the navigation. *(source: screens/P08-venue-back-office.yaml#ADM-621; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- No read operation: the screen declares only setReconciliationMatchingRules and nothing that returns the current configuration. (CHG-WIR-027)
+
 #### Inputs: what the user enters or picks
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **matching rules**: Keys and tolerances. *(source: contracts/satellite/payments.yaml#setReconciliationMatchingRules)*
 
 #### Outputs: what the screen shows and produces
 
@@ -364,7 +341,8 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Where the user goes next**
 
-- → `ADM-619` Reconciliation & Settlement Command Center\t139: *Back to Reconciliation & Settlement Command Center\t139*
+- → `ADM-619` Reconciliation & Settlement Command Center: *Back to Reconciliation & Settlement Command Center\t139*
+- → `BO-100` Venue Home: *Back to Venue Home*
 
 #### States
 
@@ -376,6 +354,16 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the transaction matching reconciliation are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+rule:
+  key: provider reference
+  tolerance: AED 0.05
+```
 
 #### Permissions
 
@@ -391,7 +379,7 @@ No matrix row traces to this screen's operations or data.
 
 None names this screen.
 
-Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -399,7 +387,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-621` · status **notStarted** · provenance —
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-621` · status **notStarted** · provenance —
 - Client workshop board: `wireframes/WS93 Payment Payment Orchestration Board 7.dc.html#adm-621`
 - Workshop pack: Payment_Payment_Orchestration.pdf board 7
 - Flow F262 *Payment Payment Orchestration board 7: Reconciliation & Settlement Command …*, step 4: Works in Transaction Matching & Reconciliation Engine\t142 → Automatically match TICVAI payment transactions against provider/acquirer records.
@@ -410,34 +398,49 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-621?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
-- [ ] Every transition is wired: `ADM-619`.
+- [ ] Every transition is wired: `ADM-619`, `BO-100`.
 - [ ] Every gated control is gated: `PAYMENT_CONFIGURE`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
 
-### `ADM-622` Reconciliation Exception & Investigation Center\t143
+### `ADM-622` Reconciliation Exception & Investigation Center
 
 **Centralize all payment discrepancies requiring operational or financial investigation.**
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `core` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `SETTLEMENT_RECONCILE`, `SETTLEMENT_VIEW` (1 operate, 1 read); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `SETTLEMENT_RECONCILE`, `SETTLEMENT_VIEW` (1 operate, 1 read); in the flows as platform admin |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Show) and no metric row |
 | Offline | online only |
 | Opens with | `settlementId` (navigation) |
 | Route | `/commercial/reconciliation-exception-investigation-center-t143-adm-622` |
 
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys. Its board's hub ADM-619 stays on the console (DEC-211 (Chinmay, 2 October, batch 6): a cross-tenant view of TICVAI's payment operations); this screen keeps that edge and is also reached from BO-100 Venue Home.
+
 **Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
+
+**From the Finance, Ledger & Tax · Reporting & Analytics process.** The queue of reconciliation exceptions that the automatic steps could not explain: each with what TICVAI recorded, what the provider reported, the difference and the likely cause, and a resolution that is recorded with who, when and why. Nothing is ever edited; resolving explains, it does not change the payment.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **The exception list is read per settlement (the path needs a settlement), so a centralised queue across settlements and providers has no read; the screen also loads it on action, not on arrival.** Why: The screen's purpose is the cross-settlement queue. *(source: contracts/spine/finance.yaml#listSettlementExceptions / screens/P08-venue-back-office.yaml#ADM-622; Finance, Ledger & Tax · Reporting & Analytics)*
+- **The pack's columns (order, merchant account, related refund or reversal, match result) are not on the exception record, which carries a payment reference only.** Why: Columns cannot bind. *(source: contracts/spine/finance.yaml#/components/schemas/SettlementException; Finance, Ledger & Tax · Reporting & Analytics)*
 
 #### Inputs: what the user enters or picks
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+**Rules for these inputs** (from the Finance, Ledger & Tax · Reporting & Analytics process; these refine the tables above and win where they differ)
+
+- **resolution**: One of Matched manually (requires choosing the payment), Write-off, Dispute raised, Provider error, Timing difference; a note is always required. *(source: contracts/spine/finance.yaml#/components/schemas/SettlementResolution / contracts/spine/finance.yaml#resolveSettlementException)*
+- **filters**: Exception kind, provider, venue, age, amount band; oldest and largest first by default. *(source: contracts/spine/finance.yaml#/components/schemas/SettlementException)*
 
 #### Outputs: what the screen shows and produces
 
@@ -475,9 +478,18 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Related refund/reversal | text | not in the schema: `Related refund/reversal` |
 | Match result | text | not in the schema: `Match result` |
 
+**Rules for what is shown** (from the Finance, Ledger & Tax · Reporting & Analytics process; these refine the tables above and win where they differ)
+
+- **exception row**: Kind in words (Not in provider file, Not in our records, Amount differs, Duplicate in provider file, Unexplained fee), provider reference, our payment, amount, expected amount, difference with Over or Short, age in days. *(source: contracts/spine/finance.yaml#/components/schemas/SettlementException)*
+
+**What each action does** (from the Finance, Ledger & Tax · Reporting & Analytics process; these refine the tables above and win where they differ)
+
+- **Resolve**: Records the resolution; the row leaves the open list and shows in the settlement's history with the resolver's name. *(source: contracts/spine/finance.yaml#resolveSettlementException)*
+
 **Where the user goes next**
 
-- → `ADM-619` Reconciliation & Settlement Command Center\t139: *Back to Reconciliation & Settlement Command Center\t139*
+- → `ADM-619` Reconciliation & Settlement Command Center: *Back to Reconciliation & Settlement Command Center\t139*
+- → `BO-100` Venue Home: *Back to Venue Home*
 
 #### States
 
@@ -490,6 +502,25 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 `matchedManually` without a `matchedPaymentId`, or one that names no payment. `errors[]` names the field.; 409 The exception is already resolved. |
+
+#### Edge cases to draw
+
+- **two people resolve the same exception**: The second sees "Already resolved by Omar Haddad at 10:41" and nothing is overwritten. *(source: contracts/spine/finance.yaml#resolveSettlementException)*
+- **an unresolved exception at month end**: It blocks the period close ("Settlements reconciled"). *(source: F13 step 1 / contracts/spine/finance.yaml#/components/schemas/PeriodCloseResult)*
+
+#### Consistency with other screens
+
+- Match `BO-043 Daily Reconciliation and BO-025 Chargebacks & Disputes`: Same five resolution words and the same exception kind wording.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+- Amount differs · NI ref 4471-0930-88213 · payment POS-0441871 · AED 1,200.00 vs AED 1,250.00 · Short AED 50.00
+  · likely partial refund · 1 day
+- Not in provider file · Stripe · order WEB-0098340, Fatima Al Mansoori · AED 385.00 · 2 days
+```
 
 #### Permissions
 
@@ -506,7 +537,7 @@ No matrix row traces to this screen's operations or data.
 
 None names this screen.
 
-Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -514,7 +545,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-622` · status **notStarted** · provenance —
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-622` · status **notStarted** · provenance —
 - Client workshop board: `wireframes/WS93 Payment Payment Orchestration Board 7.dc.html#adm-622`
 - Workshop pack: Payment_Payment_Orchestration.pdf board 7
 - Flow F262 *Payment Payment Orchestration board 7: Reconciliation & Settlement Command …*, step 6: Works in Reconciliation Exception & Investigation Center\t143 → Centralize all payment discrepancies requiring operational or financial investigation.
@@ -525,30 +556,40 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every output is drawn (22 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-622?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
-- [ ] Every transition is wired: `ADM-619`.
+- [ ] Every transition is wired: `ADM-619`, `BO-100`.
 - [ ] Every gated control is gated: `SETTLEMENT_RECONCILE`, `SETTLEMENT_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 2 edge case(s) from the process notes are drawn.
+- [ ] The 2 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
 
-### `ADM-623` Settlement & Payout Manager\t144
+### `ADM-623` Settlement & Payout Manager
 
 **Track expected and actual settlements from payment providers/acquirers.**
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `core` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `SETTLEMENT_VIEW` (1 read); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `SETTLEMENT_VIEW` (1 read); in the flows as platform admin |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Display) and no metric row |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/commercial/settlement-payout-manager-t144-adm-623` |
 
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys. Its board's hub ADM-619 stays on the console (DEC-211 (Chinmay, 2 October, batch 6): a cross-tenant view of TICVAI's payment operations); this screen keeps that edge and is also reached from BO-100 Venue Home. **Reconciliation is daily, per venue** (decided 2 October 2026, Chinmay; CHG-FIN-009; audit R110 (b)). The unit of work and of sign-off is one venue-day: POS cash, gateway settlements, bank and wallet against the ledger for that day. A longer range reviews days already reconciled; a provider's monthly file (DI-268) is matched day by day.
+
 **Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape … **Settlement & Payout Manager\t144 declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the …
+
+**From the Finance, Ledger & Tax · Reporting & Analytics process.** Expected against actual settlement per provider, merchant account and day: gross sales, minus refunds, chargebacks, fees, adjustments and any reserve held back, gives net expected; net received is what reached the bank. The gap between them, and how long it has been open, is what this screen is for.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **Of the 16 pack columns, acquirer, merchant account, legal entity, refunds, chargebacks, adjustments, reserve, net expected, net received and settlement date have no field on the settlement record (it carries provider gross, fees, net and ledger gross).** Why: The payout bridge cannot be drawn from the contract. *(source: contracts/spine/finance.yaml#/components/schemas/Settlement; Finance, Ledger & Tax · Reporting & Analytics)*
 
 #### Inputs: what the user enters or picks
 
@@ -607,11 +648,17 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Currency | text | not in the schema: `Currency` |
 | Settlement date | text | not in the schema: `Settlement Date` |
 
+**Rules for what is shown** (from the Finance, Ledger & Tax · Reporting & Analytics process; these refine the tables above and win where they differ)
+
+- **settlement row**: Provider, merchant account, legal entity, settlement day, then the bridge Gross sales, Refunds, Chargebacks, Fees, Adjustments, Reserve, Net expected, Net received, and the variance as Over or Short. Currency on every amount. *(source: screens/P08-venue-back-office.yaml#ADM-623)*
+- **ordering**: Unsettled and short first, then by age. *(source: designer default)*
+
 **Data it reads**: `listSettlements` (onLoad, Settlement and payout)
 
 **Where the user goes next**
 
-- → `ADM-619` Reconciliation & Settlement Command Center\t139: *Back to Reconciliation & Settlement Command Center\t139*
+- → `ADM-619` Reconciliation & Settlement Command Center: *Back to Reconciliation & Settlement Command Center\t139*
+- → `BO-100` Venue Home: *Back to Venue Home*
 
 #### States
 
@@ -623,6 +670,24 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the settlement payout \t144 are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Edge cases to draw
+
+- **settlement arrives in two payments**: Shown as Partially received with both receipts listed. *(source: screens/P09-platform-admin-console.yaml#ADM-619)*
+
+#### Consistency with other screens
+
+- Match `ADM-619`: Same tiles as the hub's settlement expected, received and variance.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+- Network International · MID 4471-AQV · UAE01 · 30 Sep · Gross 612,480.00 · Refunds 4,860.00 · Chargebacks 1,250.00
+  · Fees 12,104.40 · Net expected AED 594,265.60 · Received 594,265.60 · Settled
+- Stripe · acct_MGD · UAE02 · 29 Sep · Net expected AED 48,212.75 · Received 47,712.75 · Short AED 500.00 · 2 days
+```
 
 #### Permissions
 
@@ -638,7 +703,7 @@ No matrix row traces to this screen's operations or data.
 
 None names this screen.
 
-Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -646,7 +711,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-623` · status **notStarted** · provenance —
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-623` · status **notStarted** · provenance —
 - Client workshop board: `wireframes/WS93 Payment Payment Orchestration Board 7.dc.html#adm-623`
 - Workshop pack: Payment_Payment_Orchestration.pdf board 7
 - Flow F262 *Payment Payment Orchestration board 7: Reconciliation & Settlement Command …*, step 8: Works in Settlement & Payout Manager\t144 → Track expected and actual settlements from payment providers/acquirers.
@@ -657,30 +722,42 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every output is drawn (32 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-623?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
-- [ ] Every transition is wired: `ADM-619`.
+- [ ] Every transition is wired: `ADM-619`, `BO-100`.
 - [ ] Every gated control is gated: `SETTLEMENT_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 1 edge case(s) from the process notes are drawn.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
 
-### `ADM-624` Fees, Commission, FX & Settlement Economics\t145
+### `ADM-624` Fees, Commission, FX & Settlement Economics
 
 **Provide visibility into the financial deductions and differences between gross payment value and net settlement.**
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `core` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `PAYMENT_VIEW` (1 read); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `PAYMENT_VIEW` (1 read); in the flows as platform admin |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Compare) and no metric row |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/commercial/fees-commission-fx-settlement-economics-t145-adm-624` |
 
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys. Its board's hub ADM-619 stays on the console (DEC-211 (Chinmay, 2 October, batch 6): a cross-tenant view of TICVAI's payment operations); this screen keeps that edge and is also reached from BO-100 Venue Home.
+
 **Known gaps.** **The pack names 9 actions on this screen and the screen declares 0 operations.** Unserved: Fixed transaction fee, Percentage fee, Authorization fee, Capture fee, Refund fee, Chargeback fee … **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Gross to net: fees, commission and FX deducted before settlement.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **The screen name ends in an escaped tab and the pack page number: "Fees, Commission, FX & Settlement Economics\t145".** Why: The pack page number leaked into the name; it would print on the screen title and the navigation. *(source: screens/P08-venue-back-office.yaml#ADM-624; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
+- **Pack actions with no operation: Fixed transaction fee, Percentage fee, Authorization fee, Capture fee, Refund fee, Chargeback fee, Cross-border fee, Wallet/APM fee ….** Why: The workshop pack names them on this screen and no operation serves them; each needs an operation or removal from the screen. *(source: screens/P08-venue-back-office.yaml#ADM-624; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
+- **List operation(s) getPaymentProviderEconomics return a bare array, not the paged list envelope (items, nextCursor, hasMore).** Why: The table cannot page, and a row without an id cannot open, edit or link to the record it summarises. *(source: contracts/satellite/payments.yaml#getPaymentProviderEconomics; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
 
 #### Inputs: what the user enters or picks
 
@@ -730,11 +807,16 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Cross-border fee (secondary button) | navigation or local | — | — | — | — |
 | Wallet/APM fee (secondary button) | navigation or local | — | — | — | — |
 
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **economics**: Gross, deductions by kind, net. *(source: contracts/satellite/payments.yaml#getPaymentProviderEconomics)*
+
 **Data it reads**: `getPaymentProviderEconomics` (onLoad, Fees, commission and FX)
 
 **Where the user goes next**
 
-- → `ADM-619` Reconciliation & Settlement Command Center\t139: *Back to Reconciliation & Settlement Command Center\t139*
+- → `ADM-619` Reconciliation & Settlement Command Center: *Back to Reconciliation & Settlement Command Center\t139*
+- → `BO-100` Venue Home: *Back to Venue Home*
 
 #### States
 
@@ -746,6 +828,17 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the fees commission settlement are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+settlement:
+  gross: AED 1,240,000.00
+  fees: AED 22,800.00
+  net: AED 1,217,200.00
+```
 
 #### Permissions
 
@@ -761,7 +854,7 @@ No matrix row traces to this screen's operations or data.
 
 None names this screen.
 
-Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -772,7 +865,7 @@ Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-624` · status **notStarted** · provenance —
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-624` · status **notStarted** · provenance —
 - Client workshop board: `wireframes/WS93 Payment Payment Orchestration Board 7.dc.html#adm-624`
 - Workshop pack: Payment_Payment_Orchestration.pdf board 7
 - Flow F262 *Payment Payment Orchestration board 7: Reconciliation & Settlement Command …*, step 10: Works in Fees, Commission, FX & Settlement Economics\t145 → Provide visibility into the financial deductions and differences between gross payment value and net settlement.
@@ -783,30 +876,40 @@ Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the 
 - [ ] Every output is drawn (10 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-624?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Fixed transaction fee, Percentage fee, Authorization fee, Capture fee, Refund fee, Chargeback fee, Cross-border fee, Wallet/APM fee.
-- [ ] Every transition is wired: `ADM-619`.
+- [ ] Every transition is wired: `ADM-619`, `BO-100`.
 - [ ] Every gated control is gated: `PAYMENT_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 3 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
 
-### `ADM-625` Merchant Account & Settlement Calendar Manager\t146
+### `ADM-625` Merchant Account & Settlement Calendar Manager
 
 **Manage operational settlement expectations across providers, merchant accounts and legal entities.**
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `core` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `PAYMENT_CONFIGURE`, `PAYMENT_VIEW` (1 configure, 1 read); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `PAYMENT_CONFIGURE`, `PAYMENT_VIEW` (1 configure, 1 read); in the flows as platform admin |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Display) and no metric row Rendered on the calendar template (M17-03, 29 September). |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/commercial/merchant-account-settlement-calendar-manager-t146-adm-625` |
 
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys. Its board's hub ADM-619 stays on the console (DEC-211 (Chinmay, 2 October, batch 6): a cross-tenant view of TICVAI's payment operations); this screen keeps that edge and is also reached from BO-100 Venue Home.
+
 **Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape … **Merchant Account & Settlement Calendar Manager\t146 declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers …
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Merchant accounts, which legal entity gets the money and when (settlement calendars).
+
+**Known correction pending (do not draw the wrong version)**
+
+- **The screen name ends in an escaped tab and the pack page number: "Merchant Account & Settlement Calendar Manager\t146".** Why: The pack page number leaked into the name; it would print on the screen title and the navigation. *(source: screens/P08-venue-back-office.yaml#ADM-625; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
+- **List operation(s) listMerchantAccounts return a bare array, not the paged list envelope (items, nextCursor, hasMore).** Why: The table cannot page, and a row without an id cannot open, edit or link to the record it summarises. *(source: contracts/satellite/payments.yaml#listMerchantAccounts; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
 
 #### Inputs: what the user enters or picks
 
@@ -816,6 +919,10 @@ Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the 
 |---|---|---|---|---|---|---|---|
 | View: day, week or month | select field | — | — | — | — | **Every calendar has day, week and month views, and the day view is broken into hours from the venue's day start hour** (17 September minutes, M17-03). Built on the shared calendar view … | — |
 | Category | multi select | — | — | — | — | **Filtered by category, so a team sees only what is theirs** (M17-03). | — |
+
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **merchant account**: Entities, venues and calendar. *(source: contracts/satellite/payments.yaml#setMerchantAccount)*
 
 #### Outputs: what the screen shows and produces
 
@@ -856,7 +963,8 @@ Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the 
 
 **Where the user goes next**
 
-- → `ADM-619` Reconciliation & Settlement Command Center\t139: *Back to Reconciliation & Settlement Command Center\t139*
+- → `ADM-619` Reconciliation & Settlement Command Center: *Back to Reconciliation & Settlement Command Center\t139*
+- → `BO-100` Venue Home: *Back to Venue Home*
 
 #### States
 
@@ -868,6 +976,17 @@ Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the 
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the merchant account settlement are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+account:
+  mid: MID-DP-001
+  entity: Dune Park LLC
+  calendar: T+2
+```
 
 #### Permissions
 
@@ -886,7 +1005,7 @@ For this screen, newest first. An **Open question** is built to the default it s
 
 - Every calendar has day, week and month (and agenda) views, and the day view is broken into hours from the venue's day start hour (calendarDayStartHour). *(agreed · MoM 17 Sep 2026, M17-03 · DI-919)*
 
-Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -894,7 +1013,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-625` · status **notStarted** · provenance —
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-625` · status **notStarted** · provenance —
 - Client workshop board: `wireframes/WS93 Payment Payment Orchestration Board 7.dc.html#adm-625`
 - Workshop pack: Payment_Payment_Orchestration.pdf board 7
 - Flow F262 *Payment Payment Orchestration board 7: Reconciliation & Settlement Command …*, step 12: Works in Merchant Account & Settlement Calendar Manager\t146 → Manage operational settlement expectations across providers, merchant accounts and legal entities.
@@ -905,30 +1024,45 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every output is drawn (16 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-625?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
-- [ ] Every transition is wired: `ADM-619`.
+- [ ] Every transition is wired: `ADM-619`, `BO-100`.
 - [ ] Every gated control is gated: `PAYMENT_CONFIGURE`, `PAYMENT_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 2 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
 
-### `ADM-626` Settlement Posting, Finance Handoff & Close Manager\t148
+### `ADM-626` Settlement Posting, Finance Handoff & Close Manager
 
 **Control when reconciled payment information becomes ready for downstream financial posting and period close.**
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `core` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `LEDGER_POST` (1 operate); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `LEDGER_POST` (1 operate); in the flows as platform admin |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
 | Offline | online only |
 | Opens with | `obligationId` (navigation) |
 | Route | `/commercial/settlement-posting-finance-handoff-close-manager-t148-adm-626` |
 
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys. Its board's hub ADM-619 stays on the console (DEC-211 (Chinmay, 2 October, batch 6): a cross-tenant view of TICVAI's payment operations); this screen keeps that edge and is also reached from BO-100 Venue Home.
+
 **Known gaps.** **Settlement Posting, Finance Handoff & Close Manager\t148 declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+**From the Finance, Ledger & Tax · Reporting & Analytics process.** The gate between reconciliation and the ledger: which reconciled settlements are ready to post, which are held by open exceptions, what was posted, and whether the period can close. Posting is append-only; a wrong posting is reversed, never edited.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **The only operation is recordSettlement, which settles an inter-entity obligation (one entity paying another, at the obligation's rate), and the screen expects an obligation id.** Why: Nothing here posts reconciled provider settlements; the screen's operation serves a different process. *(source: contracts/spine/finance.yaml#recordSettlement / screens/P08-venue-back-office.yaml#ADM-626; Finance, Ledger & Tax · Reporting & Analytics)*
+
+#### Decided on this screen
+
+Answered questions: draw the decision, not the old default. Where a decision and the tables below differ, the decision wins.
+
+- **Do settlement postings happen automatically after reconciliation, or through this release gate?** → Drawn default stands (answer: "Automatic when fully matched; the screen shows status and held days"): Automatic for fully matched days; this screen shows status and the held ones. *(decided by Chinmay, 2026-10-02; DEC-213 / CHG-NOTE-003)*
 
 #### Inputs: what the user enters or picks
 
@@ -943,9 +1077,18 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |  (primary button) | navigation or local | — | — | — | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
 
+**Rules for what is shown** (from the Finance, Ledger & Tax · Reporting & Analytics process; these refine the tables above and win where they differ)
+
+- **posting queue**: Ready to post, Held (with the reason), Posted (with the journal number); counts and values per day. *(source: screens/P08-venue-back-office.yaml#ADM-626 / contracts/spine/finance.yaml#/components/schemas/PeriodCloseResult)*
+
+**What each action does** (from the Finance, Ledger & Tax · Reporting & Analytics process; these refine the tables above and win where they differ)
+
+- **Post**: Posts the selected ready settlements; each gets a journal number; confirmation names the total and the period. *(source: designer default)*
+
 **Where the user goes next**
 
-- → `ADM-619` Reconciliation & Settlement Command Center\t139: *Back to Reconciliation & Settlement Command Center\t139*
+- → `ADM-619` Reconciliation & Settlement Command Center: *Back to Reconciliation & Settlement Command Center\t139*
+- → `BO-100` Venue Home: *Back to Venue Home*
 
 #### States
 
@@ -958,6 +1101,18 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 The obligation is already `settled`. An `outstanding` or `disputed` one settles. |
+
+#### Edge cases to draw
+
+- **posting into a period that is closing**: The posting goes to the next open period with a reference to the trading date. *(source: F13 step 4)*
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+- 30 Sep 2026 · 14 settlements ready · AED 3,112,940.25 · 2 held (open exceptions)
+```
 
 #### Permissions
 
@@ -973,7 +1128,7 @@ No matrix row traces to this screen's operations or data.
 
 None names this screen.
 
-Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -981,7 +1136,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-626` · status **notStarted** · provenance —
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-626` · status **notStarted** · provenance —
 - Client workshop board: `wireframes/WS93 Payment Payment Orchestration Board 7.dc.html#adm-626`
 - Workshop pack: Payment_Payment_Orchestration.pdf board 7
 - Flow F262 *Payment Payment Orchestration board 7: Reconciliation & Settlement Command …*, step 14: Works in Settlement Posting, Finance Handoff & Close Manager\t148 → Control when reconciled payment information becomes ready for downstream financial posting and period close.
@@ -992,28 +1147,40 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-626?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: , Cancel.
-- [ ] Every transition is wired: `ADM-619`.
+- [ ] Every transition is wired: `ADM-619`, `BO-100`.
 - [ ] Every gated control is gated: `LEDGER_POST`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 1 edge case(s) from the process notes are drawn.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
+- [ ] The 1 decision(s) taken on this screen are drawn as decided, not as the old default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
 
-### `ADM-627` Reconciliation Audit, Trace & Evidence Center\t149
+### `ADM-627` Reconciliation Audit, Trace & Evidence Center
 
 **Provide a complete audit trail explaining how any payment became reconciled and financially closed.**
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `core` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `LEDGER_VIEW` (1 read); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `LEDGER_VIEW` (1 read); in the flows as platform admin |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Capture) and no display directory — it is settings, not a population |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/commercial/reconciliation-audit-trace-evidence-center-t149-adm-627` |
+
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys. Its board's hub ADM-619 stays on the console (DEC-211 (Chinmay, 2 October, batch 6): a cross-tenant view of TICVAI's payment operations); this screen keeps that edge and is also reached from BO-100 Venue Home. **Reconciliation is daily, per venue** (decided 2 October 2026, Chinmay; CHG-FIN-009; audit R110 (b)). The unit of work and of sign-off is one venue-day: POS cash, gateway settlements, bank and wallet against the ledger for that day. A longer range reviews days already reconciled; a provider's monthly file (DI-268) is matched day by day.
+
+**From the Finance, Ledger & Tax · Reporting & Analytics process.** The evidence trail of how one payment became reconciled and closed: ingested from which file, matched how, which exception, who resolved it with what reason and approval, and which journal posted it. Read-only and exportable for auditors.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **The audit columns (user, action, previous state, new state, reason, timestamp, approval) are drawn as select fields under a configuration pattern.** Why: They are a read-only trail, not settings. *(source: screens/P08-venue-back-office.yaml#ADM-627; Finance, Ledger & Tax · Reporting & Analytics)*
+- **getUnifiedReconciliation returns totals and variances for a date range; it returns no trail.** Why: The evidence comes from the exception's resolver, time and note and from the audit log. *(source: contracts/spine/finance.yaml#/components/schemas/UnifiedReconciliation; Finance, Ledger & Tax · Reporting & Analytics)*
 
 #### Inputs: what the user enters or picks
 
@@ -1038,11 +1205,20 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Outputs: what the screen shows and produces
 
+**Rules for what is shown** (from the Finance, Ledger & Tax · Reporting & Analytics process; these refine the tables above and win where they differ)
+
+- **trail**: A timeline, oldest first: file ingested, line matched or exception raised, resolution (user, action, previous state, new state, reason, time, approval), journal posted, period closed. Each step links to its record. *(source: screens/P08-venue-back-office.yaml#ADM-627 / contracts/spine/finance.yaml#/components/schemas/SettlementException)*
+
+**What each action does** (from the Finance, Ledger & Tax · Reporting & Analytics process; these refine the tables above and win where they differ)
+
+- **Export evidence**: PDF of the trail with the source file reference; retained with payment records for 10 years. *(source: ADR-0047)*
+
 **Data it reads**: `getUnifiedReconciliation` (onLoad, Audit and evidence)
 
 **Where the user goes next**
 
-- → `ADM-619` Reconciliation & Settlement Command Center\t139: *Back to Reconciliation & Settlement Command Center\t139*
+- → `ADM-619` Reconciliation & Settlement Command Center: *Back to Reconciliation & Settlement Command Center\t139*
+- → `BO-100` Venue Home: *Back to Venue Home*
 
 #### States
 
@@ -1054,6 +1230,15 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Empty, no results (`?state=emptyNoResults`) | **Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+- '30 Sep 22:10 file NI-20260930-AQV.csv ingested · 1 Oct 02:14 amount differs AED 50.00 · 1 Oct 10:41 Omar Haddad:
+  Timing difference, note ''partial refund settles 2 Oct'' · 2 Oct 06:00 matched · JE-2026-10-000311'
+```
 
 #### Permissions
 
@@ -1069,7 +1254,7 @@ No matrix row traces to this screen's operations or data.
 
 None names this screen.
 
-Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -1077,7 +1262,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-627` · status **notStarted** · provenance —
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-627` · status **notStarted** · provenance —
 - Client workshop board: `wireframes/WS93 Payment Payment Orchestration Board 7.dc.html#adm-627`
 - Workshop pack: Payment_Payment_Orchestration.pdf board 7
 - Flow F262 *Payment Payment Orchestration board 7: Reconciliation & Settlement Command …*, step 16: Works in Reconciliation Audit, Trace & Evidence Center\t149 → Provide a complete audit trail explaining how any payment became reconciled and financially closed.
@@ -1088,30 +1273,45 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-627?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, emptyNoResults, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
-- [ ] Every transition is wired: `ADM-619`.
+- [ ] Every transition is wired: `ADM-619`, `BO-100`.
 - [ ] Every gated control is gated: `LEDGER_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 2 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
 
-### `ADM-628` Reconciliation Simulator, Forecast & AI Operations Advisor\t150
+### `ADM-628` Reconciliation Simulator, Forecast & AI Operations Advisor
 
 **Provide simulation, forecasting and AI-assisted analysis across reconciliation and settlement operations.**
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `core` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `LEDGER_VIEW` (1 read); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `LEDGER_VIEW` (1 read); in the flows as platform admin |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Forecast) and no metric row |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/commercial/reconciliation-simulator-forecast-ai-operations-advisor--adm-628` |
 
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys. Its board's hub ADM-619 stays on the console (DEC-211 (Chinmay, 2 October, batch 6): a cross-tenant view of TICVAI's payment operations); this screen keeps that edge and is also reached from BO-100 Venue Home.
+
 **Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
+
+**From the Finance, Ledger & Tax · Reporting & Analytics process.** Forward look at settlement cash: expected settlement and cash receipt by date, after provider fees, refund and chargeback deductions and conversion, plus a what-if simulator. Every projected figure is labelled Forecast; with too little history the screen says so instead of drawing a line.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **The forecast is served by getUnifiedReconciliation, which returns past totals and variances only.** Why: No operation returns a settlement forecast. *(source: contracts/spine/finance.yaml#/components/schemas/UnifiedReconciliation; Finance, Ledger & Tax · Reporting & Analytics)*
+
+#### Decided on this screen
+
+Answered questions: draw the decision, not the old default. Where a decision and the tables below differ, the decision wins.
+
+- **Is the reconciliation simulator and AI advisor in phase one, given AI finance reporting is phase two?** → Drawn default stands (answer: "Actuals now; forecast and advisor drawn but switched off"): Build the actuals view; forecast and advisor drawn but switched off. *(decided by Chinmay, 2026-10-02; DEC-214 / CHG-NOTE-003)*
 
 #### Inputs: what the user enters or picks
 
@@ -1152,11 +1352,17 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Currency conversion | text | not in the schema: `Currency conversion` |
 | Merchant account payout | text | not in the schema: `Merchant account payout` |
 
+**Rules for what is shown** (from the Finance, Ledger & Tax · Reporting & Analytics process; these refine the tables above and win where they differ)
+
+- **forecast table**: Expected settlement, Expected cash receipt, Provider fees, Refund deductions, Chargeback deductions, Currency conversion, Merchant account payout, by expected settlement date; values labelled "Forecast" with the basis period. *(source: screens/P08-venue-back-office.yaml#ADM-628 / DI-973)*
+- **not enough history**: "Not enough settlement history to forecast yet (needs 90 days; 23 days so far)" with the actuals shown instead. *(source: DI-280)*
+
 **Data it reads**: `getUnifiedReconciliation` (onLoad, Forecast and trend)
 
 **Where the user goes next**
 
-- → `ADM-619` Reconciliation & Settlement Command Center\t139: *Back to Reconciliation & Settlement Command Center\t139*
+- → `ADM-619` Reconciliation & Settlement Command Center: *Back to Reconciliation & Settlement Command Center\t139*
+- → `BO-100` Venue Home: *Back to Venue Home*
 
 #### States
 
@@ -1168,6 +1374,19 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the reconciliation simulator forecast are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Edge cases to draw
+
+- **AI advice**: Explains why a figure moved and suggests an action; never posts, resolves or approves anything. *(source: DI-719 / DI-735)*
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+- Forecast · Fri 4 Sep · expected settlement AED 980,000 · basis last 8 Fridays
+- Forecast · Sun 6 Sep · AED 760,000
+```
 
 #### Permissions
 
@@ -1183,7 +1402,7 @@ No matrix row traces to this screen's operations or data.
 
 None names this screen.
 
-Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -1191,7 +1410,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-628` · status **notStarted** · provenance —
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-628` · status **notStarted** · provenance —
 - Client workshop board: `wireframes/WS93 Payment Payment Orchestration Board 7.dc.html#adm-628`
 - Workshop pack: Payment_Payment_Orchestration.pdf board 7
 - Flow F262 *Payment Payment Orchestration board 7: Reconciliation & Settlement Command …*, step 18: Works in Reconciliation Simulator, Forecast & AI Operations Advisor\t150 → Provide simulation, forecasting and AI-assisted analysis across reconciliation and settlement operations.
@@ -1202,9 +1421,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every output is drawn (14 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-628?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
-- [ ] Every transition is wired: `ADM-619`.
+- [ ] Every transition is wired: `ADM-619`, `BO-100`.
 - [ ] Every gated control is gated: `LEDGER_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 1 edge case(s) from the process notes are drawn.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
+- [ ] The 1 decision(s) taken on this screen are drawn as decided, not as the old default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -1213,12 +1435,16 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 ## Reference designs and the trackers for this platform
 
-**P09 reference designs** (from `handoff/design-batches/apps/6-ticvai-controller/README.md`)
+**P08 reference designs** (from `handoff/design-batches/apps/5-venue-management/README.md`)
 
 - `sources/designs/TICVAI_POS_Terminal_client_approved.html`: the client-approved POS, for operator density and components.
 - `sources/designs/TICVAI_Mobile.dc.html`: for finish and motion.
 
-**Design Vision Book rules that apply** (`sources/designs/Ticvai_Design_Vision_Book_v1_1.pdf`): DI-021, DI-022, DI-023, DI-024, DI-025, DI-027, DI-028, DI-029, DI-032, DI-033, DI-034, DI-036, DI-037, DI-038, DI-039, DI-040, DI-041, DI-042, DI-044, DI-045, DI-046, DI-047, DI-048, DI-049, DI-050, DI-051 (each is in the design inputs below).
+**Design Vision Book rules that apply** (`sources/designs/Ticvai_Design_Vision_Book_v1_1.pdf`): DI-021, DI-022, DI-023, DI-024, DI-025, DI-027, DI-028, DI-029, DI-030, DI-032, DI-033, DI-034, DI-036, DI-037, DI-038, DI-039, DI-040, DI-041, DI-042, DI-043, DI-044, DI-045, DI-046, DI-047, DI-048, DI-049, DI-050, DI-051, DI-052 (each is in the design inputs below).
+
+**Workshop tracker rows about P08 as a whole** (1: 1 open, 0 closed). Open first; a closed row says where it went on 30 September.
+
+- **S8** Venue Management back-end configuration wireframes *(Chinmay Parab · In progress · due Fri 2 Oct · 30 Sep 2026 · 30 Sep tracker)*
 
 ## Design inputs from the client meetings
 
@@ -1256,17 +1482,32 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Brand personality: Modern, AI-First, Enterprise, Premium, Reliable, Minimal, Scalable, Human-Centred. Visual essence: intelligent and forward-thinking, clean and minimal, trustworthy and secure, modern and timeless, scalable and flexible. *(agreed · Design Vision Book 29 Jul 2026, 02 Brand Identity (p2) - Brand personality / Visual essence · DI-021)*
 - Arabic is a core requirement, not later localisation: full Arabic RTL across web, mobile, POS, reports, emails, WhatsApp, SMS, notifications, tickets and receipts, and administrative interfaces. *(agreed · MoM 28 Jul 2026, 27. Internationalisation and Arabic Support · DI-019)*
 
-### Across P09 TICVAI Web
+### Across P08 Venue Management
 
-- Portal access exposes TICVAI pricing, so prospects submit contact details and a trade license as proof of a real venue, reviewed and approved by TICVAI before access is granted. *(agreed · MoM 10 Sep 2026, 4.8 Customer Portal Access, Authentication & Verification · DI-827)*
+- Qossai: configuration screens should consolidate related functionality, potentially merging 3-4 previously separate screens into one, rather than the repetitive one-screen-per-concept pattern of the AI-built reference system. *(agreed · MoM 24 Sep 2026, 4.5 Screen Consolidation Philosophy · DI-987)*
+- **Open question.** Open: should AI monitoring live in one centralised AI command dashboard or be distributed as widgets in each functional module's own dashboard? Allam: Softlabs' call; the current proposal is illustrative and Softlabs may propose a better structure. *(open · MoM 18 Sep 2026, 4.4 AI Governance — Risk, Compliance & Continuous Monitoring · DI-936)*
 - Simulation functionality stays embedded within each relevant configuration section rather than being consolidated, since it tests that section's own configuration. *(agreed · MoM 8 Sep 2026, 4.11 Dashboard & Reporting Module Consolidation Strategy · DI-722)*
+- Client boards (POS Frontline, F&B, Retail, Inventory & Procurement) share one architecture: six boards of ten screens per domain, a command centre first and an AI/analytics board last, under the hierarchy Company > Venue > Department > Workstation > Operator/Shift > Transaction > Exception > Reconciliation > Analytics. *(agreed · client-design-boards-audit 20 Aug 2026, Opening / What the boards give us · DI-400)*
+- Decision: RBAC per role, per module, three levels — edit/view, view-only, hidden (e.g. a marketing officer does not see Finance at all) — plus sub-permissions within a module (a CRM role may get Campaigns and Communications but not Journeys). Default role templates, admin-customisable. *(agreed · MoM 20 Aug 2026, 4.7 Role-Based Access Control (RBAC); 5. Key Decisions · DI-387)*
+- **Open question.** Allam: a user's visibility must be restrictable to specific outlets (an F&B manager of one outlet should not see other outlets' items); also relevant for ticketing/event-specific access. Implementation approach still open. *(open · MoM 18 Aug 2026, 4.6 Role-Based & Outlet-Level Access Control — Open Item · DI-331)*
+- Access loads automatically at login on POS and web/admin. A user with one role logs straight in; a user with several roles (e.g. admin, cashier, supervisor, manager) is prompted to choose which role to use. *(agreed · MoM 12 Aug 2026, 4. Multiple Roles per User and Role Switching · DI-249)*
+- Back office is role-driven from any device: a finance user signing in from a workstation, laptop or home sees only finance reports and related information. *(agreed · MoM 12 Aug 2026, 3. Role-Based Access and Workstation-Linked Front-End · DI-248)*
+- Built-in help menu with step-by-step tutorials with screenshots for common tasks (e.g. how to sell a ticket at the POS). *(client request · MoM 7 Aug 2026, 8. Legacy POS Layout Designer & System Logging · DI-160)*
+- Custom data-capture fields ("data mask") at account, event, extended-ticket and product level: field types text, dropdown, radio, true/false; multi-language labels; validation (min/max length, required/optional); reusable value lists (e.g. country list). Standard fields come out of the box. *(agreed · MoM 7 Aug 2026, 6. Data Mask: Flexible Custom Data Capture · DI-155)*
+- Load/traffic dashboards respect the tenancy model: a venue manager sees traffic for their own venue only. *(agreed · MoM 31 Jul 2026, 4. Non-Functional Requirements: Scalability & Availability · DI-061)*
+- Allam: queue management is built into the system (not third-party) so traffic entering the site can be throttled from the back office itself. *(agreed · MoM 31 Jul 2026, 4. Non-Functional Requirements: Scalability & Availability · DI-060)*
 - **Open question.** Proposed tenant hierarchy Tenant > Organization/Brand > Region > Branch > Venue > Department, under review against TICVAI's own organisational hierarchy before finalising. *(open · MoM 30 Jul 2026, 2. Proposed Multi-Tenant Hierarchy · DI-055)*
+- Documentation deliverable includes user guides and help content; the preview shows a TICVAI Help Center with categories (Getting Started, Events, Tickets, Orders, Payments, Memberships, Access Control, Reports, Integrations), a "Welcome to TICVAI" getting-started article and Quick Links (Create an Event, Set Pricing, Manage Access, View Reports). *(agreed · Design Vision Book 29 Jul 2026, 09 Deliverables (p9) - What We Deliver / Key Deliverables Preview · DI-052)*
 - Typeface Inter (Light, Regular, Medium, Semibold, Bold). Scale: H1 32/40 Bold, H2 24/32 Semibold, H3 20/28 Semibold, Body 1 16/24 Regular, Body 2 14/20 Regular, Caption 12/16 Regular. *(agreed · Design Vision Book 29 Jul 2026, 08 Design System (p8) - 2. Typography · DI-047)*
 - Palette ("modern, trustworthy and accessible"): Primary #0D6EFD, #00B8FF, #00D4C4, #0B1324; Neutral #F7F9FC, #E5E7EB, #9CA3AF, #4B5563, #1F2937. *(agreed · Design Vision Book 29 Jul 2026, 08 Design System (p8) - 1. Color Palette · DI-046)*
+- AI Assistant panel: a short framing ("Based on last 30 days, here are 3 actions that can improve your revenue") then actionable recommendations, each with its potential impact (e.g. "Increase pricing for VIP seats, +12%") and a chevron, plus "View all recommendations". *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - AI Panels · DI-043)*
 - Chart cards: title with period dropdown ("This Week"), headline metrics with deltas (Tickets Sold 12,840 +8.7%, Visitors, Conversion). Data visualisations must be easy to read. *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - Charts · DI-041)*
 - Tables: titled card with "View all", columns (e.g. Order ID, Customer, Amount, Status), coloured status badges (Paid, Pending, Refunded) and pagination with "Showing 1 to 5 of 245" and page numbers. *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - Tables · DI-039)*
 - Primary button spec: height 40px, padding 12px 24px, radius 8px, Inter 14 Semibold, colour #0D6EFD, width auto. *(agreed · Design Vision Book 29 Jul 2026, 09 Deliverables (p9) - Developer Handoff preview · DI-037)*
+- Back-office shell: collapsible left sidebar with Overview, Events, Tickets, Orders, Customers, Memberships, Access Control, POS, Reports, Analytics, AI Assistant, Settings, and the signed-in user (name, role) at the bottom; top bar with global search (Cmd+K), current time and date, Notifications with unread dot, and user menu. *(agreed · Design Vision Book 29 Jul 2026, 04 Dashboard Vision (p4) - navigation shell · DI-030)*
 - Dynamic KPIs, forecasts and real-time insights; role-based dashboards, preferences and smart shortcuts for every user (e.g. greeting "Good morning, Ahmed" on the home screen, p2). *(agreed · Design Vision Book 29 Jul 2026, 03 Visual Direction (p3) - Smarter Data / Personalized Experience · DI-028)*
+- Reports and historical searches must still retrieve archived transactions when required; the retention period (e.g. keep 3 of 5+ years live) is configurable per customer, archival manual or automated. *(agreed · MoM 28 Jul 2026, 23. Database Optimisation and Archiving · DI-018)*
+- Back-office controls for the waiting room: configurable maximum active users and admission intervals, set per customer and venue. *(agreed · MoM 28 Jul 2026, 19. Auto-scaling and Virtual Waiting Room · DI-017)*
 
 **1 more name particular screens** and are in each screen's block above (*Client meeting inputs*).
 

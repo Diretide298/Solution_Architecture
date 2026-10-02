@@ -1,6 +1,6 @@
 # P10-credit-settlement-01 — P10 · Credit & Settlement
 
-**2 screens · 7 operations · 6 schemas · 5 permissions**
+**2 screens · 4 operations · 6 schemas · 2 permissions**
 
 Platform P10 Partner Web · ships as **ticvai-control** ·
 partner audience · web ·
@@ -48,8 +48,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 5 permissions apply here:
-  `CREDIT_MANAGE, CREDIT_OVERRIDE, ORDER_CREATE, ORDER_MODIFY, ORDER_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 2 permissions apply here:
+  `ORDER_CREATE, ORDER_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -61,14 +61,41 @@ convincingly. It is never a caption.
   and its error; and, element by element, what is shown and in what format, what each action
   produces and where the user goes next. Draw exactly that.
 
+## The processes these screens belong to
+
+Written by the owner of each process (`handoff/design-notes/`). Read before any screen: it says how the process runs end to end and which words the screens must use.
+
+### Ticketing & Guest Commerce (guest web, guest app, kiosk, partner portal, POS ticket sale)
+
+A guest finds something to do, picks when and how many, holds capacity, pays, and receives a ticket they can show at the gate, transfer or resell. The same booking engine serves the guest website (P01, WEB-), the guest app (P02, GST-) and, through the same catalogue, cart and order operations, the kiosk (P05), the cashier at the till (P04) and the staff handheld (P06); partners book on credit through the partner portal (P10). Guest surfaces are white-label (venue logo, colours, fonts, card layouts, step indicator style, cart placement) with "Powered by TICVAI" kept; the till and handheld stay TICVAI-branded. The booking runs in a fixed order that the client set on 29 September and confirmed on 30 September: for a dated product, the date first, then the time (hidden until a date), then the tickets (hidden until a time); undated products go straight to the tickets; product-first flows (workshops) pick the product, then the date; seated events with one performance open on the seat map, sections first, zoom into a section, pinch out to compare. Choosing a date, time or session commits nothing; capacity is held only when a quantity is set (a 15-minute basket window, 8 minutes for seats and cabanas, one extension). The guest counters (adult, child, senior, infant, person of determination) belong to the chosen ticket and take its prices, so a basket line is "<ticket> · <guest type> × <n>"; group and school products start from group ticket cards and a typed headcount (minus, plus, and +10 on the app), supervisors free. Help me choose filters the catalogue on the server (never a consent step) with Show everything; consent questions such as "Are you able to swim?" are asked once after the session is picked and never again where the page already asked. Sign-in or the six-digit guest code is asked when the guest leaves Add-ons (or at payment, per venue), only the fields the venue configured; after the code, only the T&Cs tick remains (W1). Payment creates the order first and treats an unknown outcome as "checking with your bank", never a second charge; tickets issue on payment, go to Apple or Google Wallet, and a dynamic-QR event's ticket lives in the app. The guest app is deliberately not a copy of the website (30 September): its structure is Home, Explore, Plan and Tickets tabs with a persistent Buy tickets button, item pages that propose the right product (a restaurant's meal combo that includes admission), ride videos that play with no loader, a visit planner that plans each day at one park from that park's rides, dining and shops only, and in-park walking navigation; the booking flow inside it is functionally identical to the web. Vocabulary in guest copy follows the glossary's recorded exceptions (Booking, Session, QR). source: [F01, F02, F03, F07, F49, F52, F55, F57, F58, F59, MoM 29 Sep 1 (W1-W12), MoM 29 Sep 2, MoM 29 Sep 3, MoM 30 Sep 4.4-4.8, CLIENT-RESPONSE-30SEP 1-6, CLIENT-RESPONSE-REV3-25SEP, REV3-1, REV3-2, REV3-3, REV3-4, REV3-26, DI-1086 …
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Booking | An order or reservation as the guest reads it (Booking Confirmation, Group Booking, My bookings). Code says Order or Reservation. | Order (in guest copy), Purchase record, Transaction | docs/glossary.md (Recorded exceptions, Booking, audit R145) |
+| Session | A dated, timed performance as the guest reads it (Pick a session, Surf sessions). Staff screens (POS, back office) keep Performance. | Slot, Showtime, Performance (in guest copy) | docs/glossary.md (Recorded exceptions, Session, rev 3 CFG-10); DI-1064 |
+| Basket | The guest's unpaid selection with its held capacity (Add to basket, Your basket). Never a paid order. The till and staff screens say Cart. | Cart (in guest copy), Bag, Order (for an unpaid selection) | CLIENT-RESPONSE-REV3-25SEP (Basket, 10) … |
+| Ticket | The issued instrument a guest shows at the gate. Product names from the catalogue keep their own words (Day Pass, Annual pass, 2 park ticket); the interface around them says ticket. | Admission, Voucher (for a ticket), Pass (in interface copy) | docs/glossary.md (Ticket) |
+| Adult, Child, Senior, Infant, Person of determination | The guest types of a ticket, each with its age or height band shown under it (Child 3-12, Under 1.20 m). A companion of a person of determination is its own free type where the product has one. | Disabled, Handicapped, Kid, Pax | DI-686; screens/P01-guest-web-storefront.yaml#WEB-049 (Passengers notes) … |
+| Held for | The countdown on held capacity ("Your seats are held for 7:42"); the release is Release hold. | Lease, Reserved for (a reservation is a different thing), Locked | contracts/spine/orders.yaml#/components/schemas/CartLine (leaseExpiresAt) … |
+| Reservation | Booked and not yet paid; holds capacity and expires (My Reservations). Paid tickets are in Tickets or My Tickets. | Booking (for an unpaid hold in lists), Pending order | docs/glossary.md (Reservation); DI-199 |
+| Help me choose | The venue's questions whose answers filter the products; Show everything clears them. | Quiz, Wizard, Experience builder, Consent | MoM 29 Sep W4; REV3-11 |
+| Info only / Not bookable online | A product listed with full details that cannot be booked online; it shows Contact sales to book with Call sales and Email sales. | Unavailable, Sold out, Coming soon | REV3-14; MoM 29 Sep W3 |
+| Guest code | The six-digit code sent to the guest's email or mobile to prove the contact at guest checkout; the copy says six digits. | OTP, PIN, Token, Verification key | DI-1034; MoM 29 Sep W1 |
+| How many people | The typed headcount of a group or school booking (number box with minus and plus; +10 on the app), with Supervisors listed separately and free. | Group size (the removed dropdown), Pax | DI-1104; DI-1105; CLIENT-RESPONSE-30SEP 1 |
+| Waiting room | The on-sale queue in front of a high-demand performance's sale (WEB-015, GST-046). | Virtual queue (that is the ride queue), Lobby | screens/P01-guest-web-storefront.yaml#WEB-015 notes (ADR-0066) |
+| QR | The code a guest shows, in guest copy only (Dynamic QR). Staff screens say Media code. | Barcode, Serial, Media code (in guest copy) | docs/glossary.md (Recorded exceptions, QR, audit R210) |
+| Not at this park | The planner's per-day notice that the day's park cannot meet a preference, naming the park that can. | Unavailable, No results | DI-1113 |
+| Book this plan | Turns the whole visit plan (tickets, Fast Track, meal combos) into basket lines. | Checkout plan, Buy itinerary | screens/P02-guest-mobile-app.yaml#GST-053 (Book this plan) |
+
+
 ## The screens
 
 Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs count fields; requirements are matrix rows; meeting inputs are the ones naming the screen (the module and platform ones are below); white label says whether the tenant's brand reaches it (guest) or it sets the brand (configures).
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `PTR-012` | Checkout / Credit Purchase | B–D | 25 | 0 | 5 | 10 | 1 | 6 | — | notStarted (generated) |
-| `PTR-013` | Credit Limit & Balance | B–D | 8 | 13 | 5 | 5 | 1 | 0 | — | notStarted (generated) |
+| `PTR-012` | Checkout / Credit Purchase | B–D | 21 | 0 | 5 | 10 | 1 | 6 | — | notStarted (generated) |
+| `PTR-013` | Credit Limit & Balance | B–D | 0 | 13 | 5 | 5 | 1 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 
@@ -89,7 +116,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | App · platform | TICVAI Control · P10 Partner Web (web) |
 | Module | Credit & Settlement · wave 2 · needs the `partner` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | partner staff holding `ORDER_CREATE`, `ORDER_MODIFY` (2 operate) |
+| Who uses it | partner staff holding `ORDER_CREATE` (1 operate) |
 | Device and orientation | web · LTR and RTL · light theme |
 | Pattern | configEditor (compact density): the screen declares only writes (`createPayment`, `addTip`, `capturePayment`) and no read of a population — it is settings, not a list |
 | Offline | online only |
@@ -97,6 +124,12 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Route | `/general/checkout-credit-purchase` |
 
 **What the spec says about it.** States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived from the screen name and its operations on 17 August, not from a requirement. **The strongest multi-currency case in the platform.** A partner is billed in `PartnerAgreement.settlementCurrency`, which is often not the venue's — a UK operator selling a Dubai attraction is invoiced in GBP against sales booked in AED. **`creditLimit` is in the settlement currency**, so a limit in the wrong currency is a limit that moves with the exchange rate. Which rate converts the sale is `fxPolicy` and it is a commercial term, not a default.
+
+**Known gaps.** Removed 2 October 2026 (CHG-WIR-018): A partner checkout has no tip (design-notes correction ticketing-guest PTR-012).
+
+**From the Ticketing & Guest Commerce (guest web, guest app, kiosk, partner portal, POS ticket sale) process.** Checkout on credit, prepaid wallet or card, in the partner's settlement currency. After Block A.
+
+**Fixed on main** (the package already carries these; draw what it says): Raw CreatePaymentRequest text fields and Add tip. (CHG-WIR-018).
 
 #### Inputs: what the user enters or picks
 
@@ -112,19 +145,6 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | walletAuthorisationId | text field | optional | — | — | — | Cross-cell wallet hold, where the guest's home cell is elsewhere. | `CreatePaymentRequest.walletAuthorisationId` |
 | deviceId | picker: choose a device (drawn as a picker, not a text box) | optional | — | — | shows names, sends the id | — | `CreatePaymentRequest.deviceId` |
 | recordedAt | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `CreatePaymentRequest.recordedAt` |
-
-**Form: Add tip** (modal, opened by *Add tip*; *Add tip* calls `addTip`, *Cancel* sends nothing)
-
-**Collects what `addTip` sends before it is called.** Required: `amount`, `source`, `recordedAt`. Optional: `allocateToPrincipalId`. Dismissing sends nothing; the screen behind is unchanged.
-
-| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
-|---|---|---|---|---|---|---|---|
-| Amount `amount` | money field | required | — | A jsonb price cannot be summed in SQL. | AED, 2 decimals shown (up to 4 accepted), currency from the … | On the wire this is three fields; in the database it is one column. 24 August. | `addTip` body |
-| Source `source` | radio group | required | — | Terminal prompt · Cashier entered · Guest app · Service charge | — | `serviceCharge` is not a tip and is separated deliberately — it is revenue in most jurisdictions, and pooling it with tips is how a payroll dispute starts. | `addTip` body |
-| Allocate to principal `allocateToPrincipalId` | picker: choose an allocate to principal | optional | — | — | shows names, sends the id | Where the venue allocates rather than pools. | `addTip` body |
-| Recorded at `recordedAt` | date and time picker | required | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `addTip` body |
-
-Errors to draw in the form: 409 Payment not settled — not yet `captured` (`notCaptured`) — or a tip is already recorded against it (`tipAlreadyRecorded`). (PaymentProblem)
 
 **Form: Capture payment** (modal, opened by *Capture payment*; *Capture payment* calls `capturePayment`, *Cancel* sends nothing)
 
@@ -153,6 +173,10 @@ Errors to draw in the form: 402 Capture refused by the issuer (`providerDeclined
 | Device `deviceId` | picker: choose a device | optional | — | — | shows names, sends the id | — | `createPayment` body |
 | Recorded at `recordedAt` | date and time picker | required | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `createPayment` body |
 
+**Rules for these inputs** (from the Ticketing & Guest Commerce (guest web, guest app, kiosk, partner portal, POS ticket sale) process; these refine the tables above and win where they differ)
+
+- **payment model**: Credit (invoiced monthly), prepaid wallet (drawn down per sale) or card per transaction, as the agreement allows. *(source: DI-555)*
+
 #### Outputs: what the screen shows and produces
 
 **Actions and what each produces**
@@ -160,7 +184,6 @@ Errors to draw in the form: 402 Capture refused by the issuer (`providerDeclined
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
 | Create payment (primary button) | `createPayment` POST `/payments` | CreatePaymentRequest | Payment | 402 Declined by the provider (`providerDeclined`). (PaymentProblem); 409 Tender unavailable offline (`tenderUnavailableOffline`), amount exceeds the balance due (`exceedsBalanceDue`), or a guest channel sent a tender … | emits `payment.captured`, `order.paid` |
-| Add tip (secondary button) | `addTip` POST `/payments/{paymentId}/tip` | inline | Payment | 409 Payment not settled — not yet `captured` (`notCaptured`) — or a tip is already recorded against it (`tipAlreadyRecorded`). (PaymentProblem) | opens modal first |
 | Capture payment (secondary button) | `capturePayment` POST `/payments/{paymentId}/capture` | inline | Payment | 402 Capture refused by the issuer (`providerDeclined`); the payment moves to `declined` (states/payment.yaml). (PaymentProblem); 409 Only an `authorised` payment is captured (`notAuthorised`). The amount may not exceed … | emits `payment.captured`, `order.paid`; opens modal first |
 | Inquire payment status (secondary button) | `inquirePaymentStatus` POST `/payments/{paymentId}/inquiry` | — | Payment | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path. | — |
 
@@ -178,12 +201,19 @@ Errors to draw in the form: 402 Capture refused by the issuer (`providerDeclined
 | Empty, first run (`?state=emptyFirstRun`) | No checkout credit purchase configured. The form opens empty and `createPayment` saves the first one; it says what the platform does in the meantime. |
 | Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `ORDER_CREATE`, which `createPayment` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 409 Only an `authorised` payment is captured (`notAuthorised`). The amount may not exceed what was authorised (`aboveAuthorisedAmount`), and less than that is … (PaymentProblem); 409 Payment not settled — not yet `captured` (`notCaptured`) — or a tip is already recorded against it (`tipAlreadyRecorded`). (PaymentProblem); 409 Tender unavailable offline (`tenderUnavailableOffline`), amount exceeds … |
+| Validation and conflict | the form keeps what was entered and marks the problem: 409 Only an `authorised` payment is captured (`notAuthorised`). The amount may not exceed what was authorised (`aboveAuthorisedAmount`), and less than that is … (PaymentProblem); 409 Tender unavailable offline (`tenderUnavailableOffline`), amount exceeds the balance due (`exceedsBalanceDue`), or a guest channel sent a tender other than card … (PaymentProblem) |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+checkout: 'AED 5,200 · on credit · available after: AED 13,560'
+```
 
 #### Permissions
 
 - `createPayment` → `ORDER_CREATE` (operate) · staff, guest, partner
-- `addTip` → `ORDER_MODIFY` (operate) · staff, partner
 - `capturePayment` → `ORDER_CREATE` (operate) · staff, partner
 - `inquirePaymentStatus` → `ORDER_CREATE` (operate) · staff, guest, partner
 
@@ -229,12 +259,12 @@ Also apply: 12 for all of P10, 29 for every app (section *Design inputs from the
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (25), with its required mark, default, format and its error state (402, 404, 409).
+- [ ] Every input above is drawn (21), with its required mark, default, format and its error state (402, 404, 409).
 - [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#PTR-012?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: Create payment, Add tip, Capture payment, Inquire payment status.
+- [ ] Every action is wired with its success and its failure: Create payment, Capture payment, Inquire payment status.
 - [ ] Every transition is wired: `PTR-002`, `PTR-003`.
-- [ ] Every gated control is gated: `ORDER_CREATE`, `ORDER_MODIFY`.
+- [ ] Every gated control is gated: `ORDER_CREATE`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -249,7 +279,7 @@ Also apply: 12 for all of P10, 29 for every app (section *Design inputs from the
 | App · platform | TICVAI Control · P10 Partner Web (web) |
 | Module | Credit & Settlement · wave 2 · needs the `partner` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | partner staff holding `CREDIT_MANAGE`, `CREDIT_OVERRIDE`, `ORDER_VIEW` (1 configure, 1 operate, 1 read) |
+| Who uses it | partner staff holding `ORDER_VIEW` (1 read) |
 | Device and orientation | web · LTR and RTL · light theme |
 | Pattern | statusTracker (compact density): `getB2bCredit` reads one record and nothing reads a population — the screen is about that one thing |
 | Offline | online only |
@@ -258,29 +288,15 @@ Also apply: 12 for all of P10, 29 for every app (section *Design inputs from the
 
 **What the spec says about it.** States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived from the screen name and its operations on 17 August, not from a requirement.
 
+**Known gaps.** Removed 2 October 2026 (CHG-WIR-018): Overriding and setting the credit limit are venue actions; the partner reads (design-notes correction ticketing-guest PTR-013). Removed 2 October 2026 (CHG-WIR-018): Overriding and setting the credit limit are venue actions; the partner reads (design-notes correction ticketing-guest PTR-013).
+
+**From the Ticketing & Guest Commerce (guest web, guest app, kiosk, partner portal, POS ticket sale) process.** Credit limit and balance: limit, used, available, invoices and due dates. After Block A. Read only.
+
+**Fixed on main** (the package already carries these; draw what it says): Override credit limit and Save b2b credit limit. (CHG-WIR-018).
+
 #### Inputs: what the user enters or picks
 
-**Form: Save b2b credit limit** (modal, opened by *Save b2b credit limit*; *Save b2b credit limit* calls `setB2bCreditLimit`, *Cancel* sends nothing)
-
-**Collects what `setB2bCreditLimit` sends before it is called.** Required: `creditLimit`, `reason`. Optional: `paymentTermsDays`, `isSuspended`. Dismissing sends nothing; the screen behind is unchanged.
-
-| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
-|---|---|---|---|---|---|---|---|
-| Credit limit `creditLimit` | money field | required | — | A jsonb price cannot be summed in SQL. | AED, 2 decimals shown (up to 4 accepted), currency from the … | On the wire this is three fields; in the database it is one column. 24 August. | `setB2bCreditLimit` body |
-| Payment terms days `paymentTermsDays` | number field (days) | optional | — | min 0 | — | — | `setB2bCreditLimit` body |
-| Is suspended `isSuspended` | toggle | optional | — | — | — | — | `setB2bCreditLimit` body |
-| Reason `reason` | text area | required | — | min length 3; max length 500 | — | — | `setB2bCreditLimit` body |
-
-Errors to draw in the form: 412 The row changed since the `If-Match` version was read (SD-013). Re-read and retry.
-
-**Sent by *Override credit limit*** (`overrideCreditLimit`; no form is declared, so these are filled from the screen or collected inline)
-
-| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
-|---|---|---|---|---|---|---|---|
-| Order `orderId` | picker: choose an order | required | — | — | shows names, sends the id | — | `overrideCreditLimit` body |
-| Amount `amount` | money field | required | — | A jsonb price cannot be summed in SQL. | AED, 2 decimals shown (up to 4 accepted), currency from the … | On the wire this is three fields; in the database it is one column. 24 August. | `overrideCreditLimit` body |
-| Reason `reason` | text area | required | — | min length 3; max length 500 | — | — | `overrideCreditLimit` body |
-| Expires at `expiresAt` | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `overrideCreditLimit` body |
+Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
 
 #### Outputs: what the screen shows and produces
 
@@ -304,24 +320,13 @@ Errors to draw in the form: 412 The row changed since the `If-Match` version was
 | Active overrides | list or chips (count when long) | — |
 | Scope path | text | The partition key (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it … |
 
-**Actions and what each produces**
-
-| Action | Calls | Sends | On success returns | Errors to show | Notes |
-|---|---|---|---|---|---|
-| Override credit limit (destructive button) | `overrideCreditLimit` POST `/b2b-accounts/{accountId}/credit/override` | inline | CreditPosition | — | — |
-| Save b2b credit limit (secondary button) | `setB2bCreditLimit` PUT `/b2b-accounts/{accountId}/credit` | inline | CreditPosition | 412 The row changed since the `If-Match` version was read (SD-013). Re-read and retry. | opens modal first |
-
 **Data it reads**: `getB2bCredit` (onLoad, from page inventory)
 
 **Where the user goes next**
 
-- → `PTR-001` Partner Login / MFA: *Partner Login / MFA*; carries `accountId`
+- → `PTR-001` Partner Login / MFA: *Partner Login / MFA*
 - → `PTR-002` Partner Dashboard: *Partner Dashboard*; carries `accountId`, `orderId`
 - → `PTR-003` Profile & Company Details: *Profile & Company Details*
-
-**What opens over it**
-
-- confirmDialog *Override credit limit*: **Names what `overrideCreditLimit` changes and what it leaves alone**, in the consequence rather than the verb. A credit limit balance this affects should be identified in the dialog, not just counted. **Collects what `overrideCreditLimit` sends before it is called.** Required: `orderId`, `amount` …
 
 #### States
 
@@ -333,11 +338,17 @@ Errors to draw in the form: 412 The row changed since the `If-Match` version was
 | Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `ORDER_VIEW`, which `getB2bCredit` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+credit: Limit AED 50,000 · used AED 31,240 · next invoice 31 Oct
+```
+
 #### Permissions
 
 - `getB2bCredit` → `ORDER_VIEW` (read) · staff, partner
-- `overrideCreditLimit` → `CREDIT_OVERRIDE` (operate) · staff, partner
-- `setB2bCreditLimit` → `CREDIT_MANAGE` (configure) · staff, partner
 
 **A refused user sees:** Shown when the caller lacks `ORDER_VIEW`, which `getB2bCredit` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -371,12 +382,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (8), with its required mark, default, format and its error state (404, 412).
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (404).
 - [ ] Every output is drawn (13 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#PTR-013?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: Override credit limit, Save b2b credit limit.
+- [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `PTR-001`, `PTR-002`, `PTR-003`.
-- [ ] Every gated control is gated: `CREDIT_MANAGE`, `CREDIT_OVERRIDE`, `ORDER_VIEW`.
+- [ ] Every gated control is gated: `ORDER_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -468,13 +479,10 @@ Method, path, parameters, request and response for every operation these screens
 
 ```json
 {
-"addTip": {"method":"POST","path":"/payments/{paymentId}/tip","contract":"orders","summary":"Record a tip against a payment","permission":"ORDER_MODIFY","offlineCapable":true,"conflictPolicy":"append","scopeLevel":"workstation","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Payment"},
 "capturePayment": {"method":"POST","path":"/payments/{paymentId}/capture","contract":"orders","summary":"Capture a previously authorised payment","permission":"ORDER_CREATE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"workstation","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Payment"},
 "createPayment": {"method":"POST","path":"/payments","contract":"orders","summary":"Take a payment against an order","permission":"ORDER_CREATE","offlineCapable":true,"conflictPolicy":"append","scopeLevel":"workstation","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"CreatePaymentRequest","responds":"Payment"},
 "getB2bCredit": {"method":"GET","path":"/b2b-accounts/{accountId}/credit","contract":"orders","summary":"Partner credit position","permission":"ORDER_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"CreditPosition"},
-"inquirePaymentStatus": {"method":"POST","path":"/payments/{paymentId}/inquiry","contract":"orders","summary":"Ask the provider what actually happened","permission":"ORDER_CREATE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"workstation","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Payment"},
-"overrideCreditLimit": {"method":"POST","path":"/b2b-accounts/{accountId}/credit/override","contract":"orders","summary":"Authorise an order beyond the credit limit","permission":"CREDIT_OVERRIDE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"CreditPosition"},
-"setB2bCreditLimit": {"method":"PUT","path":"/b2b-accounts/{accountId}/credit","contract":"orders","summary":"Set a partner credit limit","permission":"CREDIT_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"CreditPosition"}
+"inquirePaymentStatus": {"method":"POST","path":"/payments/{paymentId}/inquiry","contract":"orders","summary":"Ask the provider what actually happened","permission":"ORDER_CREATE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"workstation","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Payment"}
 }
 ```
 
@@ -484,11 +492,11 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
-"CreatePaymentRequest": {"type":"object","required":["id","orderId","tender","amount","recordedAt"],"properties":{"id":{"type":"string","format":"uuid","description":"Client-generated UUIDv7 of the payment, and its idempotency key — it must equal the `Idempotency-Key` header."},"orderId":{"type":"string","format":"uuid"},"tender":{"$ref":"#/components/schemas/TenderKind"},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"tenderCurrency":{"type":"string","pattern":"^[A-Z]{3}$","nullable":true,"description":"The currency the guest handed over, where it is not the venue's — becomes `Payment.tenderCurrency`. Omit for a payment in the venue's own currency."},"tenderAmount":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"description":"**What the guest handed over**, in `tenderCurrency` — becomes `Payment.tenderAmount`, one name for one concept (renamed from `tenderedAmount` on 26 September). For cash, change is the difference.\n"},"walletAuthorisationId":{"type":"string","nullable":true,"description":"Cross-cell wallet hold, where the guest's home cell is elsewhere."},"walletHoldId":{"type":"string","format":"uuid","nullable":true,"description":"For a `wallet` tender, the hold `wallet.holdWalletFunds` placed (SD-027). Capture debits it; the order service writes no wallet table."},"returnUrl":{"type":"string","format":"uri","nullable":true,"description":"Where the provider returns the guest after a 3-D Secure challenge or hosted page (SD-034). Required for a card payment from the guest web or app."},"terminalId":{"type":"string","format":"uuid","nullable":true,"description":"The card terminal to instruct, for a card payment at a till (ECR flow, SD-034)."},"deviceId":{"type":"string","format":"uuid","nullable":true},"recordedAt":{"type":"string","format":"date-time"}}},
+"CreatePaymentRequest": {"type":"object","required":["id","orderId","tender","amount","recordedAt"],"properties":{"id":{"type":"string","format":"uuid","description":"Client-generated UUIDv7 of the payment, and its idempotency key — it must equal the `Idempotency-Key` header."},"orderId":{"type":"string","format":"uuid"},"tender":{"$ref":"#/components/schemas/TenderKind"},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"tenderCurrency":{"type":"string","pattern":"^[A-Z]{3}$","nullable":true,"description":"The currency the guest handed over, where it is not the venue's — becomes `Payment.tenderCurrency`. Omit for a payment in the venue's own currency. For a guest-channel card or wallet payment on an order with a `chargeCurrency`, the server sets it from the order (CHG-FIN-001)."},"tenderAmount":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"description":"**What the guest handed over**, in `tenderCurrency` — becomes `Payment.tenderAmount`, one name for one concept (renamed from `tenderedAmount` on 26 September). For cash, change is the difference.\n"},"walletAuthorisationId":{"type":"string","nullable":true,"description":"Cross-cell wallet hold, where the guest's home cell is elsewhere."},"walletHoldId":{"type":"string","format":"uuid","nullable":true,"description":"For a `wallet` tender, the hold `wallet.holdWalletFunds` placed (SD-027). Capture debits it; the order service writes no wallet table."},"returnUrl":{"type":"string","format":"uri","nullable":true,"description":"Where the provider returns the guest after a 3-D Secure challenge or hosted page (SD-034). Required for a card payment from the guest web or app."},"terminalId":{"type":"string","format":"uuid","nullable":true,"description":"The card terminal to instruct, for a card payment at a till (ECR flow, SD-034)."},"deviceId":{"type":"string","format":"uuid","nullable":true},"recordedAt":{"type":"string","format":"date-time"}}},
 "CreditPosition": {"x-ticvai-persistence":"orders.b2b_credit + orders.credit_override","type":"object","required":["accountId","creditLimit","used","available","isSuspended"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true,"description":"**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"},"accountId":{"type":"string","format":"uuid"},"accountName":{"type":"string"},"creditLimit":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"used":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"available":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"isOverLimit":{"type":"boolean"},"isSuspended":{"type":"boolean"},"paymentTermsDays":{"type":"integer"},"oldestUnpaidInvoiceAt":{"type":"string","format":"date-time","nullable":true},"daysOverdue":{"type":"integer"},"activeOverrides":{"type":"array","items":{"type":"object","properties":{"orderId":{"type":"string","format":"uuid"},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"authorisedByPrincipalId":{"type":"string","format":"uuid"},"reason":{"type":"string"},"expiresAt":{"type":"string","format":"date-time","nullable":true}}}},"scopePath":{"type":"string","description":"**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"}}},
 "ExchangeRateDecimal": {"type":"string","x-ticvai-persistence-kind":"valueObject","x-ticvai-persistence-column":"numeric(18,6)","description":"**An exchange rate: a decimal string, never a float**, for the reason `Money.amount` is one — a JavaScript client must not round a rate in transit. **Six decimal places**, the precision `finance.FxRate.rate` asks for, and stored at that precision.\n","pattern":"^\\d+(\\.\\d{1,6})?$"},
 "Money": {"type":"object","x-ticvai-persistence-kind":"valueObject","x-ticvai-persistence-column":"numeric(18,4)","description":"**On the wire this is three fields; in the database it is one column.**\n24 August. Every column typed `Money` was landing as `jsonb` — 129 of them, including `orders.shift.opening_float`, `inventory.purchase_order.total` and `promotions.voucher.balance`. **`orders.cash_movement.amount` was `numeric(18,4)` because somebody hand-typed that one**, and the inconsistency is what made it visible.\n**A jsonb price cannot be summed in SQL.** Every total, variance and reconciliation moves into application code — and a shift variance computed in .NET against a ledger computed in Postgres is two answers to one question. That is F13 month-end and F98 takings-to-ledger, both walked, both assuming the arithmetic is in the database.\n**`currency` and `scale` are not stored per row.** ADR-0018 makes them region-scoped and not overridable below, so they resolve from the scope walk — storing AED against nine million rows in a UAE region is nine million copies of a fact that cannot differ. A row that needed its own currency would be a row in the wrong region.\n**They stay on the wire** because a client reading a figure should not have to walk a hierarchy to know what it means.\n","required":["amount","currency","scale"],"properties":{"amount":{"type":"string","description":"Decimal string, never a float. Up to 4 decimal places. **Persisted as `numeric(18,4)`** — the string is a transport choice, so a JavaScript client cannot round a fare in transit.\n","pattern":"^-?\\d+(\\.\\d{1,4})?$"},"currency":{"type":"string","description":"**Resolved from the region, not stored on the row** (ADR-0018). OMR uses 3 decimal places and AED uses 2 — a venue on a different scale from its region is a ledger that cannot consolidate.\n","pattern":"^[A-Z]{3}$"},"scale":{"type":"integer","description":"Resolved from the region alongside `currency`.","minimum":0,"maximum":4}}},
-"Payment": {"x-ticvai-persistence":"orders.payment","type":"object","required":["id","orderId","tender","amount","status","recordedAt"],"properties":{"id":{"type":"string","format":"uuid"},"orderId":{"type":"string","format":"uuid"},"tender":{"$ref":"#/components/schemas/TenderKind"},"tenderCurrency":{"type":"string","pattern":"^[A-Z]{3}$","description":"4.6.11. **What the guest actually handed over**, which is not always what the venue books. A tourist paying USD cash at a till is a foreign tender; the sale is still recorded in base currency.\nEqual to the base currency for almost every payment. **Present on all of them so the foreign-tender report has a source** — `getForeignTenderReport` promised *what was taken in which currency* and nothing recorded it until 18 August.\n"},"tenderAmount":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"description":"The amount in `tenderCurrency`, at that currency's own scale."},"fxRate":{"allOf":[{"$ref":"#/components/schemas/ExchangeRateDecimal"}],"nullable":true,"description":"The rate applied, **stored on the payment rather than looked up later** (CF-37). A payment reconciled next month is reconciled at the rate of the day it was taken.\n"},"fxRateSource":{"type":"string","nullable":true,"enum":["manual","feed","cardScheme"],"description":"4.2.8. Manual or fed on a schedule. **`cardScheme` is where the terminal did the conversion and told us** — dynamic currency conversion, the scheme's rate rather than ours.\n"},"changeCurrency":{"type":"string","pattern":"^[A-Z]{3}$","nullable":true,"description":"4.6.11 is deliberately asymmetric: **accept foreign currency, refund in local.** A till giving change in five currencies needs five floats and five counts, and the variance becomes unattributable.\n"},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"changeAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"status":{"type":"string","enum":["authorised","captured","pendingConfirmation","declined","failed","voided","refunded"]},"providerName":{"type":"string","nullable":true},"providerReference":{"type":"string","nullable":true,"description":"The provider's own id for the charge (Stripe PaymentIntent, NI order reference). What `payments.receivePaymentProviderWebhook` matches an incoming event on (SD-034)."},"providerIdempotencyKey":{"type":"string","nullable":true,"readOnly":true,"description":"The idempotency key sent to the provider, which is this payment's `id` (SD-034, 29 September). A retried provider call cannot charge twice."},"terminalId":{"type":"string","format":"uuid","nullable":true,"description":"The card terminal a till payment ran on (ECR flow, SD-034)."},"nextAction":{"type":"object","nullable":true,"x-ticvai-persisted":false,"description":"**What the caller does while the payment is `pendingConfirmation`** (SD-034, 29 September). `redirect`: send the browser to `url` (3-D Secure challenge or hosted page); the provider returns the guest to `returnUrl` and the result arrives by webhook. `terminal`: the card terminal has been instructed; wait for its result. Null once the payment has an outcome.","properties":{"kind":{"type":"string","enum":["redirect","terminal"]},"url":{"type":"string","format":"uri","nullable":true},"expiresAt":{"type":"string","format":"date-time","nullable":true}}},"lastInquiryAt":{"type":"string","format":"date-time","nullable":true},"recordedAt":{"type":"string","format":"date-time"},"syncedAt":{"type":"string","format":"date-time","nullable":true}}},
+"Payment": {"x-ticvai-persistence":"orders.payment","type":"object","required":["id","orderId","tender","amount","status","recordedAt"],"properties":{"id":{"type":"string","format":"uuid"},"orderId":{"type":"string","format":"uuid"},"tender":{"$ref":"#/components/schemas/TenderKind"},"tenderCurrency":{"type":"string","pattern":"^[A-Z]{3}$","description":"4.6.11. **What the guest actually handed over**, which is not always what the venue books. A tourist paying USD cash at a till is a foreign tender; the sale is still recorded in base currency.\nEqual to the base currency for almost every payment. **Present on all of them so the foreign-tender report has a source** — `getForeignTenderReport` promised *what was taken in which currency* and nothing recorded it until 18 August.\n"},"tenderAmount":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"description":"The amount in `tenderCurrency`, at that currency's own scale."},"fxRate":{"allOf":[{"$ref":"#/components/schemas/ExchangeRateDecimal"}],"nullable":true,"description":"The rate applied, **stored on the payment rather than looked up later** (CF-37). A payment reconciled next month is reconciled at the rate of the day it was taken.\n"},"fxRateSource":{"type":"string","nullable":true,"enum":["manual","feed","cardScheme"],"description":"4.2.8. Manual or fed on a schedule. **`cardScheme` is where the terminal did the conversion and told us** — dynamic currency conversion, the scheme's rate rather than ours.\n"},"changeCurrency":{"type":"string","pattern":"^[A-Z]{3}$","nullable":true,"description":"4.6.11 is deliberately asymmetric: **accept foreign currency, refund in local.** A till giving change in five currencies needs five floats and five counts, and the variance becomes unattributable.\n**Cash at a till only** (CHG-FIN-001, 2 October 2026). A card or wallet payment the guest made in a currency they selected is refunded in that currency (`Refund.tenderCurrency`).\n"},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"changeAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"status":{"type":"string","enum":["authorised","captured","pendingConfirmation","declined","failed","voided","refunded"]},"providerName":{"type":"string","nullable":true},"providerReference":{"type":"string","nullable":true,"description":"The provider's own id for the charge (Stripe PaymentIntent, NI order reference). What `payments.receivePaymentProviderWebhook` matches an incoming event on (SD-034)."},"providerIdempotencyKey":{"type":"string","nullable":true,"readOnly":true,"description":"The idempotency key sent to the provider, which is this payment's `id` (SD-034, 29 September). A retried provider call cannot charge twice."},"terminalId":{"type":"string","format":"uuid","nullable":true,"description":"The card terminal a till payment ran on (ECR flow, SD-034)."},"nextAction":{"type":"object","nullable":true,"x-ticvai-persisted":false,"description":"**What the caller does while the payment is `pendingConfirmation`** (SD-034, 29 September). `redirect`: send the browser to `url` (3-D Secure challenge or hosted page); the provider returns the guest to `returnUrl` and the result arrives by webhook. `terminal`: the card terminal has been instructed; wait for its result. Null once the payment has an outcome.","properties":{"kind":{"type":"string","enum":["redirect","terminal"]},"url":{"type":"string","format":"uri","nullable":true},"expiresAt":{"type":"string","format":"date-time","nullable":true}}},"lastInquiryAt":{"type":"string","format":"date-time","nullable":true},"recordedAt":{"type":"string","format":"date-time"},"syncedAt":{"type":"string","format":"date-time","nullable":true}}},
 "TenderKind": {"type":"string","description":"`wallet` is a **digital wallet** (Apple Pay, Google Pay and the like, taken through the gateway), the value the guest channels accept beside `card` (decided 28 September, audit R080 (a)). **The stored-value TICVAI wallet is a separate tender**: it is spent through `authoriseStoredValue` and `captureStoredValue` (`StoredValueKind` `wallet`), never as this value, so the client can see which of the two the decision meant.\n","enum":["cash","card","wallet","voucher","bankTransfer","hotelCharge","installment","giftCard","complimentary"]}
 }
 ```

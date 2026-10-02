@@ -1,14 +1,14 @@
 # WS49 — Promotions   Bundles Management board 5
 
-**10 screens · 13 operations · 18 schemas · 4 permissions**
+**10 screens · 11 operations · 14 schemas · 4 permissions**
 
-Platform P09 TICVAI Web · ships as **ticvai-control** ·
-platformAdmin audience · web ·
+Platform P08 Venue Management · ships as **venue-management** ·
+staff audience · web ·
 online only
 
 ## Who this is for
 
-**platformAdmin on web.** Everything below is how you know what is
+**staff on web.** Everything below is how you know what is
 true. **None of it is the subject.** The subject is the person in front of the screen and the one
 thing they came to do.
 
@@ -61,6 +61,45 @@ convincingly. It is never a caption.
   and its error; and, element by element, what is shown and in what format, what each action
   produces and where the user goes next. Draw exactly that.
 
+## The processes these screens belong to
+
+Written by the owner of each process (`handoff/design-notes/`). Read before any screen: it says how the process runs end to end and which words the screens must use.
+
+### Ticketing & Guest Commerce, as the venue and TICVAI configure and run it
+
+WHAT THE PROCESS IS. Everything a guest can buy is set up, priced, promoted and serviced here, on Venue Management (P08, the venue's own back office, served inside the venue's cell) and on the TICVAI Console (P09, TICVAI's control plane, outside every cell). End to end: (1) CATALOGUE. A product has one of twelve kinds (admission, timedAdmission, datedAdmission, openDated, seated, membership, bundle, fnb, retail, rental, addOn, giftCard). Its ticket types (adult, child, senior, resident...) are not typed one by one: they are generated from the product's attributes (components) and each value combination becomes a sellable ticket type with no extra setup (DI-164). What a ticket grants (validity, entries, re-entry, days of week, blackout dates, expiry anchor, fast track, transfer) lives on a reusable entitlement template, not on the product. Who may take part (age, height, supervision, certification) is the eligibility rule; what the guest must answer is the data mask and the consent questions; how the guest sees it is guestListing (bookable, infoOnly, hidden), display tags (at most six), media and the booking flow. Group, family and corporate products and every after-sales policy (reschedule, exchange, refund, cancellation, upgrade, transfer) are configured inside the one product configuration, never on separate screens (DI-465, DI-466). (2) LIFECYCLE AND PUBLICATION. A product moves draft, inReview, approved, live, withdrawn, archived. Approval and publication are two acts with two permissions (PRODUCT_APPROVE, PRODUCT_PUBLISH, R091); every product is authorised before it sells online or on site (DI-438). Approved is still not on a till: a till sells only what is in the signed catalogue release it pulled (publishBundle, ADR-0013), so a saved price is a back-office fact until the venue publishes to tills. Changing something that has sold is preceded by an impact check (assessProductChange: orders affected, entitlements issued, future performances, open carts); restoring a version creates a new version, and sold tickets keep the price and terms they were sold under (restoreProductVersion, DI-938, TRACKER Actions row 145). (3) PRICE. Prices live in price lists: per venue, per channel set, with validity dates and a priority, copied for the next season with an uplift (copyPriceList) and repriced in bulk only after a dry run (bulkChangePrices). Currency and decimal scale are never chosen on a form: they resolve from the venue's region (ADR-0008, ADR-0018; AED 2 places, OMR and BHD 3). When several rules apply, the configured hierarchy decides; there is no "lowest price wins" default (DI-595). Tax on the pre-discount price and three-decimal rounding are regional settings (DI-598). Dynamic rules always show their minimum and maximum price guardrails beside the trigger (getDynamicPriceRule). (4) PROMOTE AND BUNDLE. A promotion is a rule (automatic, or gated by a code) created in draft, made live only by Publish, which first analyses stacking; a …
+*(source: DI-164; DI-171; DI-438; DI-465; DI-466; DI-595; DI-598; DI-387; DI-039; DI-044; DI-474; DI-671; DI-987; DI-019; DI-080; ADR-0008; ADR-0013; ADR-0018; ADR-0019; ADR-0030; R091; R098; R101; R222; REV3-21; contracts/spine/catalogue.yaml#transitionProductLifecycle …)*
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Product | Anything sellable, of one of the twelve kinds. The record that carries names, channels, listing, media and policies. | Item (except on F&B and retail screens), SKU (for tickets), Offering | contracts/spine/catalogue.yaml#/components/schemas/ProductKind |
+| Ticket type | One sellable variant of an admission or event product (Adult, Child, Resident Adult), generated from the product's attributes. For retail and F&B the same record is labelled Variant. | Variant (on ticket screens), Sub-product, Rate (that is a price), Axis value | contracts/spine/catalogue.yaml#updateProductVariant / DI-164 / DI-437 |
+| Attribute | A dimension that generates ticket types (Guest category, Residency, Tier, Length). Each has values; adding a value adds ticket types. | Axis, Component (the client's word; use it only in help text), Option | contracts/spine/catalogue.yaml#setProductAttributes / DI-164 / DI-450 |
+| Entitlement | What a ticket lets the holder do (validity, entries, re-entry, days, blackout dates, expiry, fast track, transfer), defined once on an entitlement template and shared by several products. | Access rights, Ticket rules, Validity profile | contracts/spine/catalogue.yaml#createEntitlementTemplate / DI-171 / DI-451 |
+| Eligibility rule | Who may take part in or buy a product (age, height, supervision, waiver, certification). Distinct from a promotion's eligibility, which decides who gets a discount. | Restriction, Access rule (that is access control) | contracts/spine/catalogue.yaml#setProductEligibilityRule / DI-463 |
+| Price list | A set of prices for one venue and a set of channels, valid between two dates, with a priority. Several coexist (B2C, B2B, season). | Price book, Rate card, Tariff | contracts/spine/catalogue.yaml#createPriceList / DI-140 / DI-163 |
+| Price category | A standard rate type (Adult, Child, Member) reused across lists so venues do not invent "Adult Standard" and "Normal Adult". | Price band (that is a seat-category band), Fare type (transport) | contracts/spine/catalogue.yaml#setPriceCategoryRateType / … |
+| Price band | A priced band on a seat category (code, label, colour, amount, channel, from-date). | Price category, Zone price | contracts/satellite/seating.yaml#/components/schemas/SeatPriceBand |
+| Promotion | A rule that changes a price automatically or when a code is entered; draft until published; declares how it stacks. | Offer (except in guest copy), Deal, Discount rule | contracts/satellite/promotions.yaml#createPromotion / DI-173 / DI-174 |
+| Coupon code | A code issued from a coupon campaign that applies a promotion-style discount; one shared code or many single-use codes. | Voucher, Promo voucher | contracts/satellite/promotions.yaml#createCouponCampaign / DI-173 |
+| Voucher | A code that carries money (face value, balance), sold or issued; a liability until redeemed or expired. | Coupon, Credit note | contracts/satellite/promotions.yaml#listVoucherBatches / … |
+| Bundle | A product sold as one line whose price differs from the sum of its components, with a mandatory revenue allocation. "Package" is acceptable in guest copy. | Combo (that is an F&B meal deal), Catalogue bundle | contracts/satellite/promotions.yaml#createBundle / DI-220 / ADR-0019 |
+| Catalogue release | The signed snapshot of a venue's catalogue, prices, promotions and sale boards that tills, kiosks and devices pull. Its action label is "Publish to tills". | Bundle, Catalogue bundle, Sync, Deploy | contracts/spine/catalogue.yaml#publishBundle / … |
+| Approve / Publish / Save | Save keeps a draft; Approve records that it is authorised (PRODUCT_APPROVE); Publish makes it live for guests and channels (PRODUCT_PUBLISH). Three different buttons, never merged. | Submit, Go live, Activate (except CatalogueConfigStatus active), Deploy | R091 / contracts/spine/catalogue.yaml#transitionProductLifecycle / DI-438 |
+| Product states | Draft, In review, Approved, Live, Withdrawn, Archived (ProductLifecycleState), always as coloured badges with these exact labels. | Published (for a product), Pending, Inactive (for a product) | contracts/spine/catalogue.yaml#/components/schemas/ProductLifecycleState |
+| Channel | Where something is sold. Labels: pos Point of sale; kiosk Kiosk; web and guestWeb Website; mobile and guestApp App; b2b B2B partners; partner Partner; ota Travel agents (OTA); callCentre Call centre; api API; backOffice Back office. | Touchpoint, Outlet (an outlet is a business inside a venue), raw enum values | contracts/spine/catalogue.yaml#/components/schemas/Channel / … |
+| Refund | Money returned after settlement, wholly or for some lines, under the venue's refund policy. | Return (that is retail goods), Reversal, Void | contracts/spine/orders.yaml#createRefund / DI-252 |
+| Void | Cancelling a whole order before settlement, within the same shift, with a reason from the void list. After settlement it is a refund. | Cancel order, Delete | contracts/spine/orders.yaml#voidOrder / R222 |
+| Exchange / Reschedule | Exchange swaps lines for other products or dates and settles only the difference; Reschedule is the same product moved to another date or time. | Rebook, Date change (acceptable only in guest copy), Refund and resell | contracts/spine/orders.yaml#exchangeOrderLines / … |
+| Hold / Capture / Release | A deposit or stored-value amount is held, then partly or fully captured, and the rest released. A held deposit is not a payment. | Charge, Pre-auth (in staff copy), Block funds | contracts/spine/orders.yaml#authoriseStoredValue / … |
+| Wallet (TICVAI wallet) | The guest's stored-value balance on TICVAI, spent by hold and capture. Distinct from the tender "Apple Pay / Google Pay", which the contract also calls wallet. | Digital wallet (for stored value), E-wallet, Credit (without a type) | contracts/spine/orders.yaml#/components/schemas/TenderKind / R080 |
+| Credit lot | One amount of wallet credit of one credit type (cash, bonus, gift) with its own expiry; lots are spent nearest expiry first and the guest sees the breakdown but cannot choose. | Bucket, Batch, Top-up | TRACKER Actions row 171 / contracts/satellite/wallet.yaml#expireCreditLots |
+| Venue map / Seat map | A venue map is the wayfinding map of a park or a floor (points, paths, bookable places); a seat map is the seating layout of an auditorium or stand. Never just "map" where both could be meant. | Layout (alone), Floor plan (unless it is a floor map), Map (alone) | contracts/satellite/venue-map.yaml#createVenueMap / … |
+| Point / Bookable place | A point is a place on a venue map (toilet, ride, restaurant, exit). A bookable place is a cabana, lounger, table or pitch placed on the map and sold through its price band. | Pin, POI, Marker, Resource (in staff copy) | contracts/satellite/venue-map.yaml#setVenuePoint / … |
+| Station / Route / Timetable / Departure / Fare table / Pass … | A route is an ordered list of stations with offsets; a timetable generates departures up to its release horizon; a fare table prices a route per passenger type; a pass type is a multi-trip or unlimited pass sold as a product. | Stop (except in the stop list), Line (except lineCode), Schedule, Trip (except a guest's journey) | contracts/satellite/transport.yaml / REV3-21 |
+| Applies from | The effective date of a change. Every dated change shows it, and sold items keep their old terms. | Effective date (in labels), Start date (for a change) | contracts/satellite/seating.yaml#updateSeatCategory / TRACKER Actions row 194 |
+
+
 ## The screens
 
 Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs count fields; requirements are matrix rows; meeting inputs are the ones naming the screen (the module and platform ones are below); white label says whether the tenant's brand reaches it (guest) or it sets the brand (configures).
@@ -69,14 +108,14 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|---|---|---|---|---|---|---|---|---|
 | `ADM-178` | Bundle & Combo Command Center | B–D | 2 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
 | `ADM-179` | Bundle Definition & Setup | A | 15 | 10 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-180` | Bundle Component Builder | A | 5 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
-| `ADM-181` | Guest Choice & Build-Your-Own Bundle Designer | A | 3 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-180` | Bundle Component Builder | A | 5 | 20 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
+| `ADM-181` | Guest Choice & Build-Your-Own Bundle Designer | A | 3 | 20 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-182` | Bundle Pricing & Commercial Model | B–D | 10 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-183` | Bundle Availability, Capacity & Validation | B–D | 0 | 4 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-184` | Bundle Validity, Scheduling & Redemption Rules | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-185` | Partner & External Product Bundle Manager | B–D | 13 | 14 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-186` | Revenue Allocation, Cost & Settlement Rules | B–D | 8 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-187` | Bundle Preview, Simulation & AI Recommendation | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-187` | Bundle Preview, Simulation & AI Recommendation | B–D | 0 | 20 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 
@@ -90,19 +129,27 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 ### `ADM-178` Bundle & Combo Command Center
 
-**Provide centralized visibility and management of all bundles and combo products across**
+**Provide centralized visibility and management of all bundles and combo products across (a section of BO-011 Packages & Bundles since 2 October 2026).**
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `marketing` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `PRICE_VIEW` (1 read); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `PRICE_VIEW` (1 read); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | commandCentre (compact density): the pack gives this screen a metric directory (§KPI Cards) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
-| Route | `/commercial/bundle-combo-command-center-adm-178` |
+| Route | `/venue-operations/packages-bundles/bundle-combo-command-center-adm-178` |
+
+**What the spec says about it.** **Merged into BO-011 Packages & Bundles as a section of it** (decided 2 October 2026, Chinmay: DEC-100, "merge them with BO-008 to BO-011 so one surface edits each record", and the pre-apply round; CHG-MOV-002). It edits the same record as BO-011: it renders inside BO-011's component, under its route, and keeps its own operations, because the first-release slice and its ticket name them. Whether those duplicate writers retire in favour of the venue screen's is a contract and plan question (CHG-MOV-008). **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** The hub of bundles and combos: counts by type and state, bundle sales, revenue, average value, conversion, margin.
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- List operation(s) listBundleCombo return a bare array, not the paged list envelope (items, nextCursor, hasMore); rows of listBundleCombo carry no identifier. (CHG-MOV-008)
 
 #### Inputs: what the user enters or picks
 
@@ -164,20 +211,25 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 **Bundle Margin** (metric tile)
 
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **KPIs and state chips**: Bundle KPIs; state counts as filters; the list opens bundle definition (ADM-179). *(source: contracts/satellite/promotions.yaml#listBundleCombo)*
+
 **Data it reads**: `listBundleCombo` (onLoad, Bundle & Combo Command Center)
 
 **Where the user goes next**
 
-- → `ADM-002` Platform Dashboard: *Platform Dashboard*
-- → `ADM-179` Bundle Definition & Setup: *Works in Bundle Definition & Setup*; calls `listBundleCombo`
-- → `ADM-180` Bundle Component Builder: *Works in Bundle Component Builder*; calls `listBundleCombo`
-- → `ADM-181` Guest Choice & Build-Your-Own Bundle Designer: *Works in Guest Choice & Build-Your-Own Bundle Designer*; calls `listBundleCombo`
+- → `BO-100` Venue Home: *Back to Venue Home*
 - → `ADM-182` Bundle Pricing & Commercial Model: *Works in Bundle Pricing & Commercial Model*; calls `listBundleCombo`
 - → `ADM-183` Bundle Availability, Capacity & Validation: *Works in Bundle Availability, Capacity & Validation*; calls `listBundleCombo`
 - → `ADM-184` Bundle Validity, Scheduling & Redemption Rules: *Works in Bundle Validity, Scheduling & Redemption Rules*; calls `listBundleCombo`
 - → `ADM-185` Partner & External Product Bundle Manager: *Works in Partner & External Product Bundle Manager*; calls `listBundleCombo`
 - → `ADM-186` Revenue Allocation, Cost & Settlement Rules: *Works in Revenue Allocation, Cost & Settlement Rules*; calls `listBundleCombo`
 - → `ADM-187` Bundle Preview, Simulation & AI Recommendation: *Works in Bundle Preview, Simulation & AI Recommendation*; calls `listBundleCombo`
+- → `BO-011` Packages & Bundles: *Open Packages & Bundles*
+- → `ADM-179` Bundle Definition & Setup: *Works in Bundle Definition & Setup, a section of BO-011, which saves the record with createBundle and…*; calls `listBundleCombo`
+- → `ADM-180` Bundle Component Builder: *Works in Bundle Component Builder, a section of BO-011, which saves the record with createBundle…*; calls `listBundleCombo`
+- → `ADM-181` Guest Choice & Build-Your-Own Bundle Designer: *Works in Guest Choice & Build-Your-Own Bundle Designer, a section of BO-011, which saves the record with…*; calls `listBundleCombo`
 
 #### States
 
@@ -189,6 +241,21 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the bundle combo are still there. The pack's own statuses are Draft — the state names which is selected. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Consistency with other screens
+
+- Match `BO-011`: The venue screen shows the same bundles.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+kpis:
+  active: 12
+  bundleRevenue: AED 640,200.00
+  averageBundleValue: AED 712.00
+```
 
 #### Permissions
 
@@ -206,7 +273,7 @@ For this screen, newest first. An **Open question** is built to the default it s
 
 - Workshop packs group screens ten to a board, each opened by a command centre; that grouping is the navigation: the nine detail screens are reached from the board's hub and return to it. *(agreed · screen note 4 Sep 2026, BO-144 and the other board hubs · DI-653)*
 
-Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -214,7 +281,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-178` · status **notStarted** · provenance generated
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-178` · status **notStarted** · provenance generated
 - Client workshop board: `wireframes/WS110 Promotions   Bundles Management Board 5.dc.html#adm-178`
 - Workshop pack: Promotions___Bundles_Management_Reference.pdf board 5
 - Flow F158 *Promotions Bundles Management board 5: Bundle & Combo Command Center*, step 1: Opens Bundle & Combo Command Center → Provide centralized visibility and management of all bundles and combo products across
@@ -235,7 +302,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-178?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
-- [ ] Every transition is wired: `ADM-002`, `ADM-179`, `ADM-180`, `ADM-181`, `ADM-182`, `ADM-183`, `ADM-184`, `ADM-185`, `ADM-186`, `ADM-187`.
+- [ ] Every transition is wired: `BO-100`, `ADM-182`, `ADM-183`, `ADM-184`, `ADM-185`, `ADM-186`, `ADM-187`, `BO-011`, `ADM-179`, `ADM-180`, `ADM-181`.
 - [ ] Every gated control is gated: `PRICE_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
@@ -244,19 +311,25 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 ### `ADM-179` Bundle Definition & Setup
 
-**Create the commercial identity and high-level behavior of a bundle.**
+**Create the commercial identity and high-level behavior of a bundle. (a section of BO-011 Packages & Bundles since 2 October 2026).**
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `marketing` module |
 | Block | Block A · ticket #20654 (APP-SETUP-ADM-179) |
-| Who uses it | ticvai staff holding `PRICE_CONFIGURE`, `PRICE_VIEW` (1 configure, 1 read); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `PRICE_VIEW` (1 read); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure; Configure whether the bundle) and no display directory — it is settings, not a population |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
-| Route | `/commercial/bundle-definition-setup-adm-179` |
+| Route | `/venue-operations/packages-bundles/bundle-definition-setup-adm-179` |
+
+**What the spec says about it.** **Its own writer is retired in r2** (decided 2 October 2026, Chinmay: "13 dupes would be gone in r2"; CHG-CLN-001). `setBundleDefinition` duplicated BO-011 Packages & Bundles's createBundle and updateBundle, so it is removed from the contract (BC-018) and BO-011 saves this record. This id stays the anchor of its section of BO-011: nothing on it writes separately. **Merged into BO-011 Packages & Bundles as a section of it** (decided 2 October 2026, Chinmay: DEC-100, "merge them with BO-008 to BO-011 so one surface edits each record", and the pre-apply round; CHG-MOV-002). It edits the same record as BO-011: it renders inside BO-011's component, under its route, and keeps its own operations, because the first-release slice and its ticket name them. Whether those duplicate writers retire in favour of the venue screen's is a contract and plan question (CHG-MOV-008). **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** A bundle's commercial identity: names (internal and guest-facing), category, owner, campaign, dates, sales status, type (fixed, configurable, build your own, dynamic, partner), whether it appears as a product on its own, whether checkout recommends it and whether it requires another product in the basket.
+
+**Fixed on main** (the package already carries these; draw what it says): setBundleDefinition duplicates createBundle (which already carries category, owner, campaign, standalone and recommended flags), with … (CHG-CLN-001).
 
 #### Inputs: what the user enters or picks
 
@@ -279,6 +352,11 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Active at | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | Sends `?activeAt=` to `listCommercialCampaigns`. | `listCommercialCampaigns` ?activeAt |
 | Owner principal id | picker: choose an owner principal (drawn as a picker, not a text box) | optional | — | — | shows names, sends the id | Sends `?ownerPrincipalId=` to `listCommercialCampaigns`. | `listCommercialCampaigns` ?ownerPrincipalId |
 | Q | text field | optional | — | max length 100 | — | Sends `?q=` to `listCommercialCampaigns`. | `listCommercialCampaigns` ?q |
+
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **bundleType**: Cards with one line each; Build your own and Dynamic lead to ADM-181, others to ADM-180. *(source: contracts/satellite/promotions.yaml#/components/schemas/BundleDefinitionSetupInput)*
+- **campaign**: Picked from the commercial campaigns list. *(source: contracts/satellite/promotions.yaml#listCommercialCampaigns)*
 
 #### Outputs: what the screen shows and produces
 
@@ -309,7 +387,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Where the user goes next**
 
-- → `ADM-178` Bundle & Combo Command Center: *Returns to the board's landing screen*; calls `setBundleDefinition`
+- → `ADM-178` Bundle & Combo Command Center: *Returns to the board's landing screen*
+- → `BO-011` Packages & Bundles: *Open Packages & Bundles*
 
 #### States
 
@@ -321,9 +400,28 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 
+#### Consistency with other screens
+
+- Match `BO-011`: Same bundle record as the venue's packages screen; same type names (PR-10).
+- Match `ADM-180`: Definition, components and guest choice are three sections of one bundle.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+bundle:
+  name: Family Fun Bundle
+  guestDescription: Two adults, two children and lunch at Harbour Kitchen
+  nameAr: باقة المرح العائلية
+  type: fixed
+  standalone: true
+  recommendedAtCheckout: true
+  campaign: Winter Family 2026
+```
+
 #### Permissions
 
-- `setBundleDefinition` → `PRICE_CONFIGURE` (configure) · staff
 - `listCommercialCampaigns` → `PRICE_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
@@ -336,7 +434,7 @@ No matrix row traces to this screen's operations or data.
 
 None names this screen.
 
-Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -344,10 +442,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-179` · status **notStarted** · provenance generated
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-179` · status **notStarted** · provenance generated
 - Client workshop board: `wireframes/WS110 Promotions   Bundles Management Board 5.dc.html#adm-179`
 - Workshop pack: Promotions___Bundles_Management_Reference.pdf board 5
-- Flow F158 *Promotions Bundles Management board 5: Bundle & Combo Command Center*, step 2: Works in Bundle Definition & Setup → Create the commercial identity and high-level behavior of a bundle.
+- Flow F158 *Promotions Bundles Management board 5: Bundle & Combo Command Center*, step 2: Works in Bundle Definition & Setup, a section of BO-011, which saves the record with createBundle and updateBundle … → Create the commercial identity and high-level behavior of a bundle.
 
 #### Acceptance for the design
 
@@ -355,8 +453,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every output is drawn (10 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-179?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save changes.
-- [ ] Every transition is wired: `ADM-178`.
-- [ ] Every gated control is gated: `PRICE_CONFIGURE`, `PRICE_VIEW`.
+- [ ] Every transition is wired: `ADM-178`, `BO-011`.
+- [ ] Every gated control is gated: `PRICE_VIEW`.
 - [ ] The module and platform inputs below are applied.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -364,19 +462,25 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 ### `ADM-180` Bundle Component Builder
 
-**Define exactly what products and services make up the bundle.**
+**Define exactly what products and services make up the bundle. (a section of BO-011 Packages & Bundles since 2 October 2026).**
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `marketing` module |
 | Block | Block A · ticket #20655 (APP-SETUP-ADM-180) |
-| Who uses it | ticvai staff holding `PRICE_CONFIGURE` (1 configure); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `PRODUCT_VIEW` (1 read); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population |
 | Offline | online only |
-| Opens with | nothing: it opens on its own |
-| Route | `/commercial/bundle-component-builder-adm-180` |
+| Opens with | `bundleId` (navigation) |
+| Route | `/venue-operations/packages-bundles/bundle-component-builder-adm-180` |
+
+**What the spec says about it.** **Its own writer is retired in r2** (decided 2 October 2026, Chinmay: "13 dupes would be gone in r2"; CHG-CLN-001). `setBundleComponent` duplicated BO-011 Packages & Bundles's createBundle, so it is removed from the contract (BC-019) and BO-011 saves this record. This id stays the anchor of its section of BO-011: nothing on it writes separately. **Merged into BO-011 Packages & Bundles as a section of it** (decided 2 October 2026, Chinmay: DEC-100, "merge them with BO-008 to BO-011 so one surface edits each record", and the pre-apply round; CHG-MOV-002). It edits the same record as BO-011: it renders inside BO-011's component, under its route, and keeps its own operations, because the first-release slice and its ticket name them. Whether those duplicate writers retire in favour of the venue screen's is a contract and plan question (CHG-MOV-008). **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** What a bundle is made of: each component's type (admission, attraction, event, time slot, experience, membership, F&B, retail, parking, locker, photo, rental, voucher, gift card, service, external) and role (mandatory, optional, choice, conditional, recommended), with quantity fixed or driven by guest or ticket count.
+
+**Fixed on main** (the package already carries these; draw what it says): No read operation: the screen declares only setBundleComponent and nothing that returns the current configuration. (CHG-WIR-025).
 
 #### Inputs: what the user enters or picks
 
@@ -390,7 +494,38 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Quantity based on guest count | text field | — | — | — | — | — | — |
 | Quantity based on ticket count | text field | — | — | — | — | — | — |
 
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **quantity**: Fixed, or per guest, or per ticket, as one choice; minimum and maximum only for optional and choice components. *(source: contracts/satellite/promotions.yaml#/components/schemas/BundleComponentBuilderInput)*
+
 #### Outputs: what the screen shows and produces
+
+**Shown**
+
+**The bundle** (detail panel, from `getBundle`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Code | text | — |
+| Name | text | — |
+| Description | text | — |
+| Venue | the name it points at, never the id | — |
+| Kind | chip: Fixed, Dynamic, Mandatory, Optional, Promotional | — |
+| Price | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Components | list or chips (count when long) | — |
+| ID | the name it points at, never the id | Added 20 August. The schema reference derives table columns from API response schemas, and a response is not a table — this one returned … |
+| Variant | the name it points at, never the id | — |
+| Component kind | chip: Admission, Fnb menu item, Retail, Add on, Other | What a bundle component entitles the guest to (decided 29 September, MOB-4). `admission` is a ticket; `fnbMenuItem` is a meal redeemed at … |
+| Menu item | the name it points at, never the id | The F&B menu item a `fnbMenuItem` component entitles the guest to (decided 29 September, MOB-4): the meal of a *meal combo with admission*. |
+| Redeem at outlets | list or chips (count when long) | Outlets that redeem an `fnbMenuItem` component; empty means any outlet of the component's venue that has the menu item on a live menu … |
+| Quantity | 1,234 | — |
+| Is optional | yes / no (icon or chip) | — |
+| Substitute variants | list or chips (count when long) | For dynamic bundles — guest chooses among these. |
+| Substitution triggers | list or chips (count when long) | When a substitute from `substituteVariantIds` may replace this component (Dynamic Component Substitution Engine). |
+| Substitution price effect | chip: Same price, Surcharge, Reduced price | What a substitution does to the bundle price. |
+| Substitution approval | chip: None, Customer, Operator | Who must accept a substitution before it stands. Customer by default, because a substitution the guest did not choose is a complaint at the … |
+| Venue | the name it points at, never the id | Where this component is redeemed. Differs from the selling venue for multi-venue passes, which is why the allocation split exists. |
+| Choice groups | list or chips (count when long) | Dynamic bundles (3.5.10). A bundle may carry fixed components and choice groups at once — a family pass with fixed parking and two groups … |
 
 **Actions and what each produces**
 
@@ -398,9 +533,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|---|---|---|---|
 | Save changes (primary button) | navigation or local | — | — | — | — |
 
+**Data it reads**: `getBundle` (onLoad, The bundle with its components and allocation)
+
 **Where the user goes next**
 
-- → `ADM-178` Bundle & Combo Command Center: *Returns to the board's landing screen*; calls `setBundleComponent`
+- → `ADM-178` Bundle & Combo Command Center: *Returns to the board's landing screen*
+- → `BO-011` Packages & Bundles: *Open Packages & Bundles*; carries `bundleId`
 
 #### States
 
@@ -412,9 +550,33 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 
+#### Edge cases to draw
+
+- **Components of a bundle that has sold**: Read-only, as on BO-011. *(source: contracts/satellite/promotions.yaml#updateBundle)*
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+components:
+- type: admissionTicket
+  item: Day Pass Adult
+  role: mandatory
+  quantity: per adult guest
+- type: fBMealPackage
+  item: Harbour Kitchen lunch
+  role: mandatory
+  quantity: per guest
+- type: parking
+  item: VIP parking
+  role: optional
+  max: 1
+```
+
 #### Permissions
 
-- `setBundleComponent` → `PRICE_CONFIGURE` (configure) · staff
+- `getBundle` → `PRODUCT_VIEW` (read) · staff, guest
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -428,7 +590,7 @@ For this screen, newest first. An **Open question** is built to the default it s
 
 - Multi-park / multi-attraction / multi-venue bundles are visually mapped, showing which venues, meal vouchers, VIP parking or upgrade options a bundle includes. *(client request · MoM 25 Aug 2026, 4.9 Bundles, Add-Ons, Donations & Policies · DI-469)*
 
-Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -436,39 +598,46 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-180` · status **notStarted** · provenance generated
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-180` · status **notStarted** · provenance generated
 - Client workshop board: `wireframes/WS110 Promotions   Bundles Management Board 5.dc.html#adm-180`
 - Workshop pack: Promotions___Bundles_Management_Reference.pdf board 5
-- Flow F158 *Promotions Bundles Management board 5: Bundle & Combo Command Center*, step 4: Works in Bundle Component Builder → Define exactly what products and services make up the bundle.
+- Flow F158 *Promotions Bundles Management board 5: Bundle & Combo Command Center*, step 4: Works in Bundle Component Builder, a section of BO-011, which saves the record with createBundle (setBundleComponent … → Define exactly what products and services make up the bundle.
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (5), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (5), with its required mark, default, format and its error state (404).
+- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-180?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save changes.
-- [ ] Every transition is wired: `ADM-178`.
-- [ ] Every gated control is gated: `PRICE_CONFIGURE`.
+- [ ] Every transition is wired: `ADM-178`, `BO-011`.
+- [ ] Every gated control is gated: `PRODUCT_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 1 edge case(s) from the process notes are drawn.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
 
 ### `ADM-181` Guest Choice & Build-Your-Own Bundle Designer
 
-**Configure bundles where the guest chooses products from predefined groups. The matrix specifically requires the guest to be able to choose attractions, experiences, F&B, retail products, or services from predefined categories while maintaining bundle pricing rules.**
+**Configure bundles where the guest chooses products from predefined groups. The matrix specifically requires the guest to be able to choose attractions, experiences, F&B, retail products, or services from predefined categories while maintaining bundle pricing rules. (a section of BO-011 Packages & Bundles since 2 October 2026).**
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `marketing` module |
 | Block | Block A · ticket #20656 (APP-SETUP-ADM-181) |
-| Who uses it | ticvai staff holding `PRICE_CONFIGURE` (1 configure); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `PRODUCT_VIEW` (1 read); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Choose 1 F&B Option) and no display directory — it is settings, not a population |
 | Offline | online only |
-| Opens with | nothing: it opens on its own |
-| Route | `/commercial/guest-choice-build-your-own-bundle-designer-adm-181` |
+| Opens with | `bundleId` (navigation) |
+| Route | `/venue-operations/packages-bundles/guest-choice-build-your-own-bundle-designer-adm-181` |
+
+**What the spec says about it.** **Its own writer is retired in r2** (decided 2 October 2026, Chinmay: "13 dupes would be gone in r2"; CHG-CLN-001). `setGuestChoiceBuild` duplicated BO-011 Packages & Bundles's createBundle, so it is removed from the contract (BC-020) and BO-011 saves this record. This id stays the anchor of its section of BO-011: nothing on it writes separately. **Merged into BO-011 Packages & Bundles as a section of it** (decided 2 October 2026, Chinmay: DEC-100, "merge them with BO-008 to BO-011 so one surface edits each record", and the pre-apply round; CHG-MOV-002). It edits the same record as BO-011: it renders inside BO-011's component, under its route, and keeps its own operations, because the first-release slice and its ticket name them. Whether those duplicate writers retire in favour of the venue screen's is a contract and plan question (CHG-MOV-008). **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Bundles where the guest chooses from predefined groups ("choose 3 of 5 attractions, 1 of 2 meals"). The bundle price stays fixed; the guest's choice changes only how revenue is allocated, in proportion to list prices at the moment of sale.
+
+**Fixed on main** (the package already carries these; draw what it says): No read operation: the screen declares only setGuestChoiceBuild and nothing that returns the current configuration. (CHG-WIR-025).
 
 #### Inputs: what the user enters or picks
 
@@ -480,7 +649,38 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Meal B | select field | — | — | — | — | — | — |
 | Meal C | select field | — | — | — | — | — | — |
 
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **choice group**: Group name, category, minimum and maximum selections, required or optional, eligible products, an extra charge for premium choices, display order. *(source: contracts/satellite/promotions.yaml#/components/schemas/GuestChoiceBuildYourOwnBundleDesignerInput / ADR-0019)*
+
 #### Outputs: what the screen shows and produces
+
+**Shown**
+
+**The bundle** (detail panel, from `getBundle`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Code | text | — |
+| Name | text | — |
+| Description | text | — |
+| Venue | the name it points at, never the id | — |
+| Kind | chip: Fixed, Dynamic, Mandatory, Optional, Promotional | — |
+| Price | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Components | list or chips (count when long) | — |
+| ID | the name it points at, never the id | Added 20 August. The schema reference derives table columns from API response schemas, and a response is not a table — this one returned … |
+| Variant | the name it points at, never the id | — |
+| Component kind | chip: Admission, Fnb menu item, Retail, Add on, Other | What a bundle component entitles the guest to (decided 29 September, MOB-4). `admission` is a ticket; `fnbMenuItem` is a meal redeemed at … |
+| Menu item | the name it points at, never the id | The F&B menu item a `fnbMenuItem` component entitles the guest to (decided 29 September, MOB-4): the meal of a *meal combo with admission*. |
+| Redeem at outlets | list or chips (count when long) | Outlets that redeem an `fnbMenuItem` component; empty means any outlet of the component's venue that has the menu item on a live menu … |
+| Quantity | 1,234 | — |
+| Is optional | yes / no (icon or chip) | — |
+| Substitute variants | list or chips (count when long) | For dynamic bundles — guest chooses among these. |
+| Substitution triggers | list or chips (count when long) | When a substitute from `substituteVariantIds` may replace this component (Dynamic Component Substitution Engine). |
+| Substitution price effect | chip: Same price, Surcharge, Reduced price | What a substitution does to the bundle price. |
+| Substitution approval | chip: None, Customer, Operator | Who must accept a substitution before it stands. Customer by default, because a substitution the guest did not choose is a complaint at the … |
+| Venue | the name it points at, never the id | Where this component is redeemed. Differs from the selling venue for multi-venue passes, which is why the allocation split exists. |
+| Choice groups | list or chips (count when long) | Dynamic bundles (3.5.10). A bundle may carry fixed components and choice groups at once — a family pass with fixed parking and two groups … |
 
 **Actions and what each produces**
 
@@ -488,9 +688,16 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|---|---|---|---|
 | Save changes (primary button) | navigation or local | — | — | — | — |
 
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **guest preview**: How the groups appear to the guest, with the fixed total that does not change while choosing. *(source: ADR-0019)*
+
+**Data it reads**: `getBundle` (onLoad, The bundle with its choice groups)
+
 **Where the user goes next**
 
-- → `ADM-178` Bundle & Combo Command Center: *Returns to the board's landing screen*; calls `setGuestChoiceBuild`
+- → `ADM-178` Bundle & Combo Command Center: *Returns to the board's landing screen*
+- → `BO-011` Packages & Bundles: *Open Packages & Bundles*; carries `bundleId`
 
 #### States
 
@@ -502,9 +709,34 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+groups:
+- name: Pick 3 attractions
+  category: Attractions
+  min: 3
+  max: 3
+  eligible:
+  - Aquarium
+  - Sandstorm Coaster
+  - Planetarium
+  - Splash Zone
+  - Cinema
+- name: Pick 1 meal
+  min: 1
+  max: 1
+  eligible:
+  - Lunch combo
+  - Snack combo (+AED 10.00)
+price: AED 250.00
+```
+
 #### Permissions
 
-- `setGuestChoiceBuild` → `PRICE_CONFIGURE` (configure) · staff
+- `getBundle` → `PRODUCT_VIEW` (read) · staff, guest
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -516,7 +748,7 @@ No matrix row traces to this screen's operations or data.
 
 None names this screen.
 
-Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -524,19 +756,19 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-181` · status **notStarted** · provenance generated
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-181` · status **notStarted** · provenance generated
 - Client workshop board: `wireframes/WS110 Promotions   Bundles Management Board 5.dc.html#adm-181`
 - Workshop pack: Promotions___Bundles_Management_Reference.pdf board 5
-- Flow F158 *Promotions Bundles Management board 5: Bundle & Combo Command Center*, step 6: Works in Guest Choice & Build-Your-Own Bundle Designer → Configure bundles where the guest chooses products from predefined groups. The matrix specifically requires the guest to be able to choose attractions, experiences, F&B, retail products, or services …
+- Flow F158 *Promotions Bundles Management board 5: Bundle & Combo Command Center*, step 6: Works in Guest Choice & Build-Your-Own Bundle Designer, a section of BO-011, which saves the record with createBundle … → Configure bundles where the guest chooses products from predefined groups. The matrix specifically requires the guest to be able to choose attractions, experiences, F&B, retail products, or services …
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (3), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (3), with its required mark, default, format and its error state (404).
+- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-181?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save changes.
-- [ ] Every transition is wired: `ADM-178`.
-- [ ] Every gated control is gated: `PRICE_CONFIGURE`.
+- [ ] Every transition is wired: `ADM-178`, `BO-011`.
+- [ ] Every gated control is gated: `PRODUCT_VIEW`.
 - [ ] The module and platform inputs below are applied.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -548,15 +780,23 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `marketing` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `PRICE_VIEW` (1 read); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `PRICE_VIEW` (1 read); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Pricing Configuration) and no display directory — it is settings, not a population |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/commercial/bundle-pricing-commercial-model-adm-182` |
+
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** How each bundle is priced (fixed package price, sum of components, discounted sum, component override) and what the guest sees.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **List operation(s) listBundlePricingCommercial return a bare array, not the paged list envelope (items, nextCursor, hasMore); rows of listBundlePricingCommercial carry no identifier.** Why: The table cannot page, and a row without an id cannot open, edit or link to the record it summarises. *(source: contracts/satellite/promotions.yaml#listBundlePricingCommercial; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
 
 #### Inputs: what the user enters or picks
 
@@ -577,6 +817,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Outputs: what the screen shows and produces
 
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **bundle pricing table**: Bundle, model, price, saving; Edit opens the package pricing on ADM-053. *(source: contracts/satellite/promotions.yaml#listBundlePricingCommercial / contracts/spine/catalogue.yaml#setPackagePricingDefinition)*
+
 **Data it reads**: `listBundlePricingCommercial` (onLoad, Bundle Pricing & Commercial Model)
 
 **Where the user goes next**
@@ -593,6 +837,22 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 
+#### Consistency with other screens
+
+- Match `ADM-053`: Same pricing models and wording.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+row:
+  bundle: Family Fun Bundle
+  model: discountedComponentSum
+  price: AED 899.00
+  saving: 17%
+```
+
 #### Permissions
 
 - `listBundlePricingCommercial` → `PRICE_VIEW` (read) · staff
@@ -607,7 +867,7 @@ No matrix row traces to this screen's operations or data.
 
 None names this screen.
 
-Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -615,7 +875,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-182` · status **notStarted** · provenance generated
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-182` · status **notStarted** · provenance generated
 - Client workshop board: `wireframes/WS110 Promotions   Bundles Management Board 5.dc.html#adm-182`
 - Workshop pack: Promotions___Bundles_Management_Reference.pdf board 5
 - Flow F158 *Promotions Bundles Management board 5: Bundle & Combo Command Center*, step 8: Works in Bundle Pricing & Commercial Model → Determine how the bundle is commercially priced.
@@ -629,6 +889,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `ADM-178`.
 - [ ] Every gated control is gated: `PRICE_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -639,15 +900,23 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `marketing` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `PRICE_VIEW` (1 read); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `PRICE_VIEW` (1 read); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§For each component display) and no metric row |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/commercial/bundle-availability-capacity-validation-adm-183` |
+
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** A bundle is sold only when every required component can be fulfilled; each component keeps its own inventory.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **List operation(s) listBundleAvailabilityCapacity return a bare array, not the paged list envelope (items, nextCursor, hasMore).** Why: The table cannot page, and a row without an id cannot open, edit or link to the record it summarises. *(source: contracts/satellite/promotions.yaml#listBundleAvailabilityCapacity; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
 
 #### Inputs: what the user enters or picks
 
@@ -671,6 +940,10 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Available | 1,234 | Quantity available |
 | Component status | chip: Available, Low availability, Sold out, Suspended, Unpublished, Invalid date… | Availability of the component. |
 
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **availability check**: Per bundle and date, each component's availability; the weakest component decides. *(source: contracts/satellite/promotions.yaml#listBundleAvailabilityCapacity)*
+
 **Data it reads**: `listBundleAvailabilityCapacity` (onLoad, Bundle Availability, Capacity & Validation)
 
 **Where the user goes next**
@@ -688,6 +961,17 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+check:
+  bundle: Family Fun Bundle
+  date: Sat 22 Nov
+  limitedBy: Harbour Kitchen lunch (40 left)
+```
+
 #### Permissions
 
 - `listBundleAvailabilityCapacity` → `PRICE_VIEW` (read) · staff
@@ -702,7 +986,7 @@ No matrix row traces to this screen's operations or data.
 
 None names this screen.
 
-Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -710,7 +994,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-183` · status **notStarted** · provenance generated
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-183` · status **notStarted** · provenance generated
 - Client workshop board: `wireframes/WS110 Promotions   Bundles Management Board 5.dc.html#adm-183`
 - Workshop pack: Promotions___Bundles_Management_Reference.pdf board 5
 - Flow F158 *Promotions Bundles Management board 5: Bundle & Combo Command Center*, step 10: Works in Bundle Availability, Capacity & Validation → Ensure that TICVAI does not sell a bundle unless all required components can actually be fulfilled. This is a direct requirement of the matrix: each bundle component maintains independent inventory …
@@ -724,6 +1008,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `ADM-178`.
 - [ ] Every gated control is gated: `PRICE_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -734,17 +1019,29 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `marketing` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `PRICE_VIEW` (1 read); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `PRICE_VIEW` (1 read); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/commercial/bundle-validity-scheduling-redemption-rules-adm-184` |
 
-**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
+
+**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built. Contract gap recorded 2 October 2026 (CHG-WIR-027): No write for what listBundleValidityScheduling lists.
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** When bundle components may be consumed and whether together or separately.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **List operation(s) listBundleValidityScheduling return a bare array, not the paged list envelope (items, nextCursor, hasMore); rows of listBundleValidityScheduling carry no identifier.** Why: The table cannot page, and a row without an id cannot open, edit or link to the record it summarises. *(source: contracts/satellite/promotions.yaml#listBundleValidityScheduling; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- No write operation: a configuration screen (Bundle Validity, Scheduling & Redemption Rules) declares only reads (listBundleValidityScheduling). (CHG-WIR-027)
 
 #### Inputs: what the user enters or picks
 
@@ -755,6 +1052,10 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 **Shown**
 
 **Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **redemption rules**: Per component, valid when and in what order. *(source: contracts/satellite/promotions.yaml#listBundleValidityScheduling)*
 
 **Data it reads**: `listBundleValidityScheduling` (onLoad, Bundle Validity, Scheduling & Redemption Rules)
 
@@ -773,6 +1074,14 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+rule: Lunch valid on the admission date only; parking any day of the visit
+```
+
 #### Permissions
 
 - `listBundleValidityScheduling` → `PRICE_VIEW` (read) · staff
@@ -787,7 +1096,7 @@ No matrix row traces to this screen's operations or data.
 
 None names this screen.
 
-Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -795,7 +1104,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-184` · status **notStarted** · provenance generated
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-184` · status **notStarted** · provenance generated
 - Client workshop board: `wireframes/WS110 Promotions   Bundles Management Board 5.dc.html#adm-184`
 - Workshop pack: Promotions___Bundles_Management_Reference.pdf board 5
 - Flow F158 *Promotions Bundles Management board 5: Bundle & Combo Command Center*, step 12: Works in Bundle Validity, Scheduling & Redemption Rules → Control when bundle components may be consumed and whether they must be redeemed together or separately.
@@ -809,6 +1118,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `ADM-178`.
 - [ ] Every gated control is gated: `PRICE_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -819,15 +1129,23 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `marketing` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `PRICE_VIEW`, `PRODUCT_CONFIGURE`, `PRODUCT_VIEW` (2 read, 1 configure); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `PRICE_VIEW`, `PRODUCT_CONFIGURE`, `PRODUCT_VIEW` (2 read, 1 configure); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Show) and no metric row |
 | Offline | online only |
 | Opens with | `bundleId` (navigation) |
 | Route | `/commercial/partner-external-product-bundle-manager-adm-185` |
+
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Bundles including products of external operators: which component stands for which partner product.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **List operation(s) listPartnerExternalProduct return a bare array, not the paged list envelope (items, nextCursor, hasMore).** Why: The table cannot page, and a row without an id cannot open, edit or link to the record it summarises. *(source: contracts/satellite/promotions.yaml#listPartnerExternalProduct; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
 
 #### Inputs: what the user enters or picks
 
@@ -852,6 +1170,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Redemption method `mappings[].redemptionMethod` | text field | optional | — | max length 100 | — | — | `setBundlePartnerProductMappings` body |
 
 Errors to draw in the form: 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 422 A `bundleComponentId` is not a component of this bundle, two rows map the same component, or an `id` names a mapping of another bundle.
+
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **partner mappings**: Component to partner product and reference; replaced as a set. *(source: contracts/satellite/promotions.yaml#setBundlePartnerProductMappings)*
 
 #### Outputs: what the screen shows and produces
 
@@ -910,6 +1232,17 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 422 A `bundleComponentId` is not a component of this bundle, two rows map the same component, or an `id` names a mapping of another bundle. |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+mapping:
+  component: Desert safari
+  partner: Desert Tours LLC
+  ref: DT-SAFARI-STD
+```
+
 #### Permissions
 
 - `listPartnerExternalProduct` → `PRICE_VIEW` (read) · staff
@@ -926,7 +1259,7 @@ No matrix row traces to this screen's operations or data.
 
 None names this screen.
 
-Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -934,7 +1267,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-185` · status **notStarted** · provenance generated
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-185` · status **notStarted** · provenance generated
 - Client workshop board: `wireframes/WS110 Promotions   Bundles Management Board 5.dc.html#adm-185`
 - Workshop pack: Promotions___Bundles_Management_Reference.pdf board 5
 - Flow F158 *Promotions Bundles Management board 5: Bundle & Combo Command Center*, step 14: Works in Partner & External Product Bundle Manager → Allow TICVAI bundles to include products or services owned by external operators. The matrix requires combinations with external products/services and bundles across different destinations, including …
@@ -948,6 +1281,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `ADM-178`.
 - [ ] Every gated control is gated: `PRICE_VIEW`, `PRODUCT_CONFIGURE`, `PRODUCT_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -958,15 +1292,29 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `marketing` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `PRICE_VIEW` (1 read); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `PRICE_VIEW` (1 read); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Financial Configuration) and no display directory — it is settings, not a population |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/commercial/revenue-allocation-cost-settlement-rules-adm-186` |
+
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
+
+**Known gaps.** Contract gap recorded 2 October 2026 (CHG-WIR-027): No write for what listRevenueAllocationCost lists.
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** How bundle revenue is allocated to components, departments, partners and accounts.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **List operation(s) listRevenueAllocationCost return a bare array, not the paged list envelope (items, nextCursor, hasMore); rows of listRevenueAllocationCost carry no identifier.** Why: The table cannot page, and a row without an id cannot open, edit or link to the record it summarises. *(source: contracts/satellite/promotions.yaml#listRevenueAllocationCost; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- No write operation: a configuration screen (Revenue Allocation, Cost & Settlement Rules) declares only reads (listRevenueAllocationCost). (CHG-WIR-027)
 
 #### Inputs: what the user enters or picks
 
@@ -985,6 +1333,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Outputs: what the screen shows and produces
 
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **allocation rules**: Per bundle, allocation method and the split; the ledger uses it. *(source: contracts/satellite/promotions.yaml#listRevenueAllocationCost / contracts/satellite/promotions.yaml#createBundle / R101)*
+
 **Data it reads**: `listRevenueAllocationCost` (onLoad, Revenue Allocation, Cost & Settlement Rules)
 
 **Where the user goes next**
@@ -1001,6 +1353,19 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+allocation:
+  bundle: Family Fun Bundle
+  method: proportional to list price
+  split:
+    admission: 82%
+    lunch: 18%
+```
+
 #### Permissions
 
 - `listRevenueAllocationCost` → `PRICE_VIEW` (read) · staff
@@ -1015,7 +1380,7 @@ No matrix row traces to this screen's operations or data.
 
 None names this screen.
 
-Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -1023,7 +1388,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-186` · status **notStarted** · provenance generated
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-186` · status **notStarted** · provenance generated
 - Client workshop board: `wireframes/WS110 Promotions   Bundles Management Board 5.dc.html#adm-186`
 - Workshop pack: Promotions___Bundles_Management_Reference.pdf board 5
 - Flow F158 *Promotions Bundles Management board 5: Bundle & Combo Command Center*, step 16: Works in Revenue Allocation, Cost & Settlement Rules → Determine how bundle revenue is allocated across its components. This is explicitly required by the matrix for allocation across products, attractions, departments, partners, operators, and …
@@ -1037,27 +1402,38 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `ADM-178`.
 - [ ] Every gated control is gated: `PRICE_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
 
 ### `ADM-187` Bundle Preview, Simulation & AI Recommendation
 
-**Allow administrators to test promotional rules before activating them. This is critical because the matrix requires simulation of redemption, discount exposure, revenue impact, margin impact and financial performance before activation.**
+**Validate a bundle end to end before it is published: preview it as a guest sees it, simulate its price and allocation, and review the AI recommendations on it.**
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `marketing` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `PRICE_CONFIGURE` (1 configure); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `PRICE_CONFIGURE`, `PRODUCT_VIEW` (1 configure, 1 read); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
 | Offline | online only |
-| Opens with | nothing: it opens on its own |
+| Opens with | `bundleId` (navigation) |
 | Route | `/commercial/bundle-preview-simulation-ai-recommendation-adm-187` |
 
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
+
 **Known gaps.** **The pack names 6 actions on this screen and the screen declares 1 operation.** Unserved: Campaign Manager, Commercial Manager, Revenue Manager, Finance, B2B Manager, Venue Manager. Each needs an … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Preview a bundle as the guest sees it and simulate its sales before activation.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **Pack actions with no operation: Campaign Manager, Commercial Manager, Revenue Manager, Finance, B2B Manager, Venue Manager.** Why: The workshop pack names them on this screen and no operation serves them; each needs an operation or removal from the screen. *(source: screens/P08-venue-back-office.yaml#ADM-187; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
+
+**Fixed on main** (the package already carries these; draw what it says): No read operation: the screen declares only simulateBundlePreviewRecommendation and nothing that returns the current configuration. (CHG-WIR-025); The purpose text is shared word for word with ADM-157 and does not describe this screen (Bundle Preview, Simulation & AI Recommendation). (CHG-WIR-026).
 
 #### Inputs: what the user enters or picks
 
@@ -1068,6 +1444,31 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 **Shown**
 
 **Permissions this screen separates** (banner): **The pack separates these permissions and no action on the screen claims them yet:** Create rules, Edit rules, Change discount, Change thresholds, Change segments, Change dates, Override limits, Run simulation, Submit, Approve, Activate. Each needs attaching to the control it gates, or the screen needs the control.
+
+**The bundle** (detail panel, from `getBundle`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Code | text | — |
+| Name | text | — |
+| Description | text | — |
+| Venue | the name it points at, never the id | — |
+| Kind | chip: Fixed, Dynamic, Mandatory, Optional, Promotional | — |
+| Price | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Components | list or chips (count when long) | — |
+| ID | the name it points at, never the id | Added 20 August. The schema reference derives table columns from API response schemas, and a response is not a table — this one returned … |
+| Variant | the name it points at, never the id | — |
+| Component kind | chip: Admission, Fnb menu item, Retail, Add on, Other | What a bundle component entitles the guest to (decided 29 September, MOB-4). `admission` is a ticket; `fnbMenuItem` is a meal redeemed at … |
+| Menu item | the name it points at, never the id | The F&B menu item a `fnbMenuItem` component entitles the guest to (decided 29 September, MOB-4): the meal of a *meal combo with admission*. |
+| Redeem at outlets | list or chips (count when long) | Outlets that redeem an `fnbMenuItem` component; empty means any outlet of the component's venue that has the menu item on a live menu … |
+| Quantity | 1,234 | — |
+| Is optional | yes / no (icon or chip) | — |
+| Substitute variants | list or chips (count when long) | For dynamic bundles — guest chooses among these. |
+| Substitution triggers | list or chips (count when long) | When a substitute from `substituteVariantIds` may replace this component (Dynamic Component Substitution Engine). |
+| Substitution price effect | chip: Same price, Surcharge, Reduced price | What a substitution does to the bundle price. |
+| Substitution approval | chip: None, Customer, Operator | Who must accept a substitution before it stands. Customer by default, because a substitution the guest did not choose is a complaint at the … |
+| Venue | the name it points at, never the id | Where this component is redeemed. Differs from the selling venue for multi-venue passes, which is why the allocation split exists. |
+| Choice groups | list or chips (count when long) | Dynamic bundles (3.5.10). A bundle may carry fixed components and choice groups at once — a family pass with fixed parking and two groups … |
 
 **Actions and what each produces**
 
@@ -1080,6 +1481,12 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | B2B Manager (secondary button) | navigation or local | — | — | — | — |
 | Venue Manager (secondary button) | navigation or local | — | — | — | — |
 
+**What each action does** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **Simulate**: Expected sales, revenue and capacity effect. *(source: contracts/satellite/promotions.yaml#simulateBundlePreviewRecommendation)*
+
+**Data it reads**: `getBundle` (onLoad, The bundle being validated before publication)
+
 #### States
 
 | State | What it shows |
@@ -1091,9 +1498,20 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+simulation:
+  bundle: Family Fun Bundle
+  expectedSales: 240 a week
+```
+
 #### Permissions
 
 - `simulateBundlePreviewRecommendation` → `PRICE_CONFIGURE` (configure) · staff
+- `getBundle` → `PRODUCT_VIEW` (read) · staff, guest
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -1105,7 +1523,7 @@ No matrix row traces to this screen's operations or data.
 
 None names this screen.
 
-Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -1113,20 +1531,21 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-187` · status **notStarted** · provenance generated
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-187` · status **notStarted** · provenance generated
 - Client workshop board: `wireframes/WS110 Promotions   Bundles Management Board 5.dc.html#adm-187`
 - Workshop pack: Promotions___Bundles_Management_Reference.pdf board 5
 - Flow F158 *Promotions Bundles Management board 5: Bundle & Combo Command Center*, step 18: Works in Bundle Preview, Simulation & AI Recommendation → Allow administrators to test promotional rules before activating them. This is critical because the matrix requires simulation of redemption, discount exposure, revenue impact, margin impact and …
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (404).
+- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-187?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Campaign Manager, Commercial Manager, Revenue Manager, Finance, B2B Manager, Venue Manager.
 - [ ] No transition is declared; back returns where the user came from.
-- [ ] Every gated control is gated: `PRICE_CONFIGURE`.
+- [ ] Every gated control is gated: `PRICE_CONFIGURE`, `PRODUCT_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -1135,12 +1554,16 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 ## Reference designs and the trackers for this platform
 
-**P09 reference designs** (from `handoff/design-batches/apps/6-ticvai-controller/README.md`)
+**P08 reference designs** (from `handoff/design-batches/apps/5-venue-management/README.md`)
 
 - `sources/designs/TICVAI_POS_Terminal_client_approved.html`: the client-approved POS, for operator density and components.
 - `sources/designs/TICVAI_Mobile.dc.html`: for finish and motion.
 
-**Design Vision Book rules that apply** (`sources/designs/Ticvai_Design_Vision_Book_v1_1.pdf`): DI-021, DI-022, DI-023, DI-024, DI-025, DI-027, DI-028, DI-029, DI-032, DI-033, DI-034, DI-036, DI-037, DI-038, DI-039, DI-040, DI-041, DI-042, DI-044, DI-045, DI-046, DI-047, DI-048, DI-049, DI-050, DI-051 (each is in the design inputs below).
+**Design Vision Book rules that apply** (`sources/designs/Ticvai_Design_Vision_Book_v1_1.pdf`): DI-021, DI-022, DI-023, DI-024, DI-025, DI-027, DI-028, DI-029, DI-030, DI-032, DI-033, DI-034, DI-036, DI-037, DI-038, DI-039, DI-040, DI-041, DI-042, DI-043, DI-044, DI-045, DI-046, DI-047, DI-048, DI-049, DI-050, DI-051, DI-052 (each is in the design inputs below).
+
+**Workshop tracker rows about P08 as a whole** (1: 1 open, 0 closed). Open first; a closed row says where it went on 30 September.
+
+- **S8** Venue Management back-end configuration wireframes *(Chinmay Parab · In progress · due Fri 2 Oct · 30 Sep 2026 · 30 Sep tracker)*
 
 ## Design inputs from the client meetings
 
@@ -1178,17 +1601,32 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Brand personality: Modern, AI-First, Enterprise, Premium, Reliable, Minimal, Scalable, Human-Centred. Visual essence: intelligent and forward-thinking, clean and minimal, trustworthy and secure, modern and timeless, scalable and flexible. *(agreed · Design Vision Book 29 Jul 2026, 02 Brand Identity (p2) - Brand personality / Visual essence · DI-021)*
 - Arabic is a core requirement, not later localisation: full Arabic RTL across web, mobile, POS, reports, emails, WhatsApp, SMS, notifications, tickets and receipts, and administrative interfaces. *(agreed · MoM 28 Jul 2026, 27. Internationalisation and Arabic Support · DI-019)*
 
-### Across P09 TICVAI Web
+### Across P08 Venue Management
 
-- Portal access exposes TICVAI pricing, so prospects submit contact details and a trade license as proof of a real venue, reviewed and approved by TICVAI before access is granted. *(agreed · MoM 10 Sep 2026, 4.8 Customer Portal Access, Authentication & Verification · DI-827)*
+- Qossai: configuration screens should consolidate related functionality, potentially merging 3-4 previously separate screens into one, rather than the repetitive one-screen-per-concept pattern of the AI-built reference system. *(agreed · MoM 24 Sep 2026, 4.5 Screen Consolidation Philosophy · DI-987)*
+- **Open question.** Open: should AI monitoring live in one centralised AI command dashboard or be distributed as widgets in each functional module's own dashboard? Allam: Softlabs' call; the current proposal is illustrative and Softlabs may propose a better structure. *(open · MoM 18 Sep 2026, 4.4 AI Governance — Risk, Compliance & Continuous Monitoring · DI-936)*
 - Simulation functionality stays embedded within each relevant configuration section rather than being consolidated, since it tests that section's own configuration. *(agreed · MoM 8 Sep 2026, 4.11 Dashboard & Reporting Module Consolidation Strategy · DI-722)*
+- Client boards (POS Frontline, F&B, Retail, Inventory & Procurement) share one architecture: six boards of ten screens per domain, a command centre first and an AI/analytics board last, under the hierarchy Company > Venue > Department > Workstation > Operator/Shift > Transaction > Exception > Reconciliation > Analytics. *(agreed · client-design-boards-audit 20 Aug 2026, Opening / What the boards give us · DI-400)*
+- Decision: RBAC per role, per module, three levels — edit/view, view-only, hidden (e.g. a marketing officer does not see Finance at all) — plus sub-permissions within a module (a CRM role may get Campaigns and Communications but not Journeys). Default role templates, admin-customisable. *(agreed · MoM 20 Aug 2026, 4.7 Role-Based Access Control (RBAC); 5. Key Decisions · DI-387)*
+- **Open question.** Allam: a user's visibility must be restrictable to specific outlets (an F&B manager of one outlet should not see other outlets' items); also relevant for ticketing/event-specific access. Implementation approach still open. *(open · MoM 18 Aug 2026, 4.6 Role-Based & Outlet-Level Access Control — Open Item · DI-331)*
+- Access loads automatically at login on POS and web/admin. A user with one role logs straight in; a user with several roles (e.g. admin, cashier, supervisor, manager) is prompted to choose which role to use. *(agreed · MoM 12 Aug 2026, 4. Multiple Roles per User and Role Switching · DI-249)*
+- Back office is role-driven from any device: a finance user signing in from a workstation, laptop or home sees only finance reports and related information. *(agreed · MoM 12 Aug 2026, 3. Role-Based Access and Workstation-Linked Front-End · DI-248)*
+- Built-in help menu with step-by-step tutorials with screenshots for common tasks (e.g. how to sell a ticket at the POS). *(client request · MoM 7 Aug 2026, 8. Legacy POS Layout Designer & System Logging · DI-160)*
+- Custom data-capture fields ("data mask") at account, event, extended-ticket and product level: field types text, dropdown, radio, true/false; multi-language labels; validation (min/max length, required/optional); reusable value lists (e.g. country list). Standard fields come out of the box. *(agreed · MoM 7 Aug 2026, 6. Data Mask: Flexible Custom Data Capture · DI-155)*
+- Load/traffic dashboards respect the tenancy model: a venue manager sees traffic for their own venue only. *(agreed · MoM 31 Jul 2026, 4. Non-Functional Requirements: Scalability & Availability · DI-061)*
+- Allam: queue management is built into the system (not third-party) so traffic entering the site can be throttled from the back office itself. *(agreed · MoM 31 Jul 2026, 4. Non-Functional Requirements: Scalability & Availability · DI-060)*
 - **Open question.** Proposed tenant hierarchy Tenant > Organization/Brand > Region > Branch > Venue > Department, under review against TICVAI's own organisational hierarchy before finalising. *(open · MoM 30 Jul 2026, 2. Proposed Multi-Tenant Hierarchy · DI-055)*
+- Documentation deliverable includes user guides and help content; the preview shows a TICVAI Help Center with categories (Getting Started, Events, Tickets, Orders, Payments, Memberships, Access Control, Reports, Integrations), a "Welcome to TICVAI" getting-started article and Quick Links (Create an Event, Set Pricing, Manage Access, View Reports). *(agreed · Design Vision Book 29 Jul 2026, 09 Deliverables (p9) - What We Deliver / Key Deliverables Preview · DI-052)*
 - Typeface Inter (Light, Regular, Medium, Semibold, Bold). Scale: H1 32/40 Bold, H2 24/32 Semibold, H3 20/28 Semibold, Body 1 16/24 Regular, Body 2 14/20 Regular, Caption 12/16 Regular. *(agreed · Design Vision Book 29 Jul 2026, 08 Design System (p8) - 2. Typography · DI-047)*
 - Palette ("modern, trustworthy and accessible"): Primary #0D6EFD, #00B8FF, #00D4C4, #0B1324; Neutral #F7F9FC, #E5E7EB, #9CA3AF, #4B5563, #1F2937. *(agreed · Design Vision Book 29 Jul 2026, 08 Design System (p8) - 1. Color Palette · DI-046)*
+- AI Assistant panel: a short framing ("Based on last 30 days, here are 3 actions that can improve your revenue") then actionable recommendations, each with its potential impact (e.g. "Increase pricing for VIP seats, +12%") and a chevron, plus "View all recommendations". *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - AI Panels · DI-043)*
 - Chart cards: title with period dropdown ("This Week"), headline metrics with deltas (Tickets Sold 12,840 +8.7%, Visitors, Conversion). Data visualisations must be easy to read. *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - Charts · DI-041)*
 - Tables: titled card with "View all", columns (e.g. Order ID, Customer, Amount, Status), coloured status badges (Paid, Pending, Refunded) and pagination with "Showing 1 to 5 of 245" and page numbers. *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - Tables · DI-039)*
 - Primary button spec: height 40px, padding 12px 24px, radius 8px, Inter 14 Semibold, colour #0D6EFD, width auto. *(agreed · Design Vision Book 29 Jul 2026, 09 Deliverables (p9) - Developer Handoff preview · DI-037)*
+- Back-office shell: collapsible left sidebar with Overview, Events, Tickets, Orders, Customers, Memberships, Access Control, POS, Reports, Analytics, AI Assistant, Settings, and the signed-in user (name, role) at the bottom; top bar with global search (Cmd+K), current time and date, Notifications with unread dot, and user menu. *(agreed · Design Vision Book 29 Jul 2026, 04 Dashboard Vision (p4) - navigation shell · DI-030)*
 - Dynamic KPIs, forecasts and real-time insights; role-based dashboards, preferences and smart shortcuts for every user (e.g. greeting "Good morning, Ahmed" on the home screen, p2). *(agreed · Design Vision Book 29 Jul 2026, 03 Visual Direction (p3) - Smarter Data / Personalized Experience · DI-028)*
+- Reports and historical searches must still retrieve archived transactions when required; the retention period (e.g. keep 3 of 5+ years live) is configurable per customer, archival manual or automated. *(agreed · MoM 28 Jul 2026, 23. Database Optimisation and Archiving · DI-018)*
+- Back-office controls for the waiting room: configurable maximum active users and admission intervals, set per customer and venue. *(agreed · MoM 28 Jul 2026, 19. Auto-scaling and Virtual Waiting Room · DI-017)*
 
 **2 more name particular screens** and are in each screen's block above (*Client meeting inputs*).
 
@@ -1204,6 +1642,7 @@ Method, path, parameters, request and response for every operation these screens
 
 ```json
 {
+"getBundle": {"method":"GET","path":"/bundles/{bundleId}","contract":"promotions","summary":"Read a bundle with components and allocation","permission":"PRODUCT_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"Bundle"},
 "listBundleAvailabilityCapacity": {"method":"GET","path":"/bundle-availability-capacity","contract":"promotions","summary":"Bundle Availability, Capacity & Validation","permission":"PRICE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"BundleAvailabilityCapacityValidationView"},
 "listBundleCombo": {"method":"GET","path":"/bundle-combo","contract":"promotions","summary":"Bundle & Combo Command Center","permission":"PRICE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":"ticketBundle","in":"query","required":false},{"name":"multiAttraction","in":"query","required":false},{"name":"multiPark","in":"query","required":false},{"name":"familyPackage","in":"query","required":false},{"name":"ticketFB","in":"query","required":false},{"name":"ticketRetail","in":"query","required":false},{"name":"ticketExperience","in":"query","required":false},{"name":"ticketParking","in":"query","required":false},{"name":"ticketFnb","in":"query","required":false},{"name":"membershipPackage","in":"query","required":false},{"name":"partnerBundle","in":"query","required":false},{"name":"hotelPackage","in":"query","required":false},{"name":"dynamicBundle","in":"query","required":false},{"name":"buildYourOwnBundle","in":"query","required":false}],"requestBody":null,"responds":"BundleComboCommandCenterView"},
 "listBundlePartnerProductMappings": {"method":"GET","path":"/bundles/{bundleId}/partner-products","contract":"promotions","summary":"List a bundle's partner product mappings","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
@@ -1212,10 +1651,7 @@ Method, path, parameters, request and response for every operation these screens
 "listCommercialCampaigns": {"method":"GET","path":"/commercial-campaigns","contract":"promotions","summary":"List commercial campaigns","permission":"PRICE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"venueId","in":"query","required":null},{"name":"activeAt","in":"query","required":null},{"name":"ownerPrincipalId","in":"query","required":null},{"name":"q","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listPartnerExternalProduct": {"method":"GET","path":"/partner-external-product","contract":"promotions","summary":"Partner & External Product Bundle Manager","permission":"PRICE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"PartnerExternalProductBundleManagerView"},
 "listRevenueAllocationCost": {"method":"GET","path":"/revenue-allocation-cost","contract":"promotions","summary":"Revenue Allocation, Cost & Settlement Rules","permission":"PRICE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"RevenueAllocationCostSettlementRulesView"},
-"setBundleComponent": {"method":"PUT","path":"/bundle-component","contract":"promotions","summary":"Bundle Component Builder","permission":"PRICE_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"BundleComponentBuilderInput","responds":"BundleComponentBuilderView"},
-"setBundleDefinition": {"method":"PUT","path":"/bundle-definition","contract":"promotions","summary":"Bundle Definition & Setup","permission":"PRICE_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"BundleDefinitionSetupInput","responds":"BundleDefinitionSetupView"},
 "setBundlePartnerProductMappings": {"method":"PUT","path":"/bundles/{bundleId}/partner-products","contract":"promotions","summary":"Set a bundle's partner product mappings","permission":"PRODUCT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":null},
-"setGuestChoiceBuild": {"method":"PUT","path":"/guest-choice-build","contract":"promotions","summary":"Guest Choice & Build-Your-Own Bundle Designer","permission":"PRICE_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"GuestChoiceBuildYourOwnBundleDesignerInput","responds":"GuestChoiceBuildYourOwnBundleDesignerView"},
 "simulateBundlePreviewRecommendation": {"method":"PUT","path":"/bundle-preview-recommendation","contract":"promotions","summary":"Bundle Preview, Simulation & AI Recommendation","permission":"PRICE_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"BundlePreviewSimulationAiRecommendationInput","responds":"BundlePreviewSimulationAiRecommendationView"}
 }
 ```
@@ -1226,20 +1662,16 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
+"Bundle": {"x-ticvai-persistence":"promotions.bundle + promotions.bundle_component","allOf":[{"$ref":"#/components/schemas/CreateBundleRequest"},{"type":"object","required":["id","savingsAmount","isActive","hasBeenSold"],"properties":{"id":{"type":"string","format":"uuid"},"savingsAmount":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"description":"Sum of component list prices less the bundle price."},"savingsPercentage":{"type":"number"},"hasBeenSold":{"type":"boolean","description":"True locks components and allocation against amendment."},"isActive":{"type":"boolean"}}}]},
 "BundleAvailabilityCapacityValidationView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over promotions state, assembled at read time from tables that already exist","description":"**What Bundle Availability, Capacity & Validation displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"componentStatus":{"type":"string","enum":["available","lowAvailability","soldOut","suspended","unpublished","invalidDate","capacityUnavailable"],"description":"Availability of the component."},"bundleId":{"type":"string","description":"Bundle ID"},"componentId":{"type":"string","description":"Component ID"},"componentName":{"type":"string","description":"Component"},"available":{"type":"integer","description":"Quantity available"},"failureBehavior":{"type":"string","enum":["preventSale","hideBundle","offerSubstitute","allowAlternateDate","allowAlternateTimeslot","removeOptionalComponent","recommendAnotherBundle"],"description":"Configured behaviour when a component is unavailable"}}},
 "BundleComboCommandCenterView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over promotions state, assembled at read time from tables that already exist","description":"**What Bundle & Combo Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"activeBundles":{"type":"integer","description":"Active Bundles"},"draftBundles":{"type":"integer","description":"Draft Bundles"},"scheduledBundles":{"type":"integer","description":"Scheduled Bundles"},"dynamicBundles":{"type":"integer","description":"Dynamic Bundles"},"fixedBundles":{"type":"integer","description":"Fixed Bundles"},"guestChoiceBundles":{"type":"integer","description":"Guest-Choice Bundles"},"partnerBundles":{"type":"integer","description":"Partner Bundles"},"bundleSales":{"type":"integer","description":"Bundle Sales"},"bundleRevenue":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Bundle Revenue"},"averageBundleValue":{"type":"number","description":"Average Bundle Value"},"bundleConversionRate":{"type":"number","description":"Bundle Conversion Rate"},"redemptionRate":{"type":"number","description":"Redemption Rate"},"aovUplift":{"type":"number","description":"AOV Uplift"},"bundleMargin":{"type":"number","description":"Bundle Margin"},"draft":{"type":"string","description":"Draft"},"incomplete":{"type":"string","description":"Incomplete"},"pendingValidation":{"type":"integer","description":"Pending Validation"},"pendingApproval":{"type":"integer","description":"Pending Approval"},"scheduled":{"type":"string","format":"date-time","description":"Scheduled"},"active":{"type":"integer","description":"Active"},"paused":{"type":"string","description":"Paused"},"suspended":{"type":"string","description":"Suspended"},"expired":{"type":"integer","description":"Expired"},"archived":{"type":"string","description":"Archived"}}},
-"BundleComponentBuilderInput": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures","description":"**What Bundle Component Builder submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.","properties":{"typesType":{"type":"string","enum":["mandatory","optional","choice","conditional","recommended"],"description":"Vocabulary listed under Component Types."},"fixedQuantity":{"type":"integer","description":"Fixed quantity"},"minimum":{"type":"string","description":"Minimum"},"maximum":{"type":"string","description":"Maximum"},"quantityBasedOnGuestCount":{"type":"integer","description":"Quantity based on guest count"},"quantityBasedOnTicketCount":{"type":"integer","description":"Quantity based on ticket count"},"componentType":{"type":"string","enum":["admissionTicket","attraction","event","timeslot","experience","membership","annualPass","fBProduct","fBMealPackage","retailProduct","parking","locker","photo","rental","voucher","giftCard","service","externalProduct"],"description":"What the component is."}}},
-"BundleComponentBuilderView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over promotions state, assembled at read time from tables that already exist","description":"**What Bundle Component Builder displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"typesType":{"type":"string","enum":["mandatory","optional","choice","conditional","recommended"],"description":"Vocabulary listed under Component Types."},"fixedQuantity":{"type":"integer","description":"Fixed quantity"},"minimum":{"type":"string","description":"Minimum"},"maximum":{"type":"string","description":"Maximum"},"quantityBasedOnGuestCount":{"type":"integer","description":"Quantity based on guest count"},"quantityBasedOnTicketCount":{"type":"integer","description":"Quantity based on ticket count"},"componentType":{"type":"string","enum":["admissionTicket","attraction","event","timeslot","experience","membership","annualPass","fBProduct","fBMealPackage","retailProduct","parking","locker","photo","rental","voucher","giftCard","service","externalProduct"],"description":"What the component is."}}},
-"BundleDefinitionSetupInput": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — request only; **no existing table covers these fields** — the closest is promotions.allocation_split at 5%, so this is not an update to anything the package stores today and no new table has been decided","description":"**What Bundle Definition & Setup submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.","properties":{"bundleName":{"type":"string","description":"Bundle name"},"bundleId":{"type":"string","description":"Bundle ID"},"internalDescription":{"type":"string","description":"Internal description"},"guestFacingDescription":{"type":"string","description":"Guest-facing description"},"businessEntity":{"type":"string","description":"Business entity"},"venue":{"type":"string","description":"Venue"},"bundleCategory":{"type":"string","description":"Bundle category"},"owner":{"type":"string","description":"Owner"},"campaign":{"type":"string","description":"Campaign"},"effectiveDates":{"type":"string","description":"Effective dates"},"salesStatus":{"type":"string","description":"Sales status"},"appearsAsStandaloneProduct":{"type":"string","description":"Appears as standalone product"},"isRecommendedDuringCheckout":{"type":"boolean","description":"Is recommended during checkout"},"requiresAnotherProduct":{"type":"string","description":"Requires another product"},"bundleType":{"type":"string","enum":["fixed","configurable","buildYourOwn","dynamic","partner"],"description":"Bundle type"}}},
-"BundleDefinitionSetupView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over promotions state, assembled at read time from tables that already exist","description":"**What Bundle Definition & Setup displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"bundleName":{"type":"string","description":"Bundle name"},"bundleId":{"type":"string","description":"Bundle ID"},"internalDescription":{"type":"string","description":"Internal description"},"guestFacingDescription":{"type":"string","description":"Guest-facing description"},"businessEntity":{"type":"string","description":"Business entity"},"venue":{"type":"string","description":"Venue"},"bundleCategory":{"type":"string","description":"Bundle category"},"owner":{"type":"string","description":"Owner"},"campaign":{"type":"string","description":"Campaign"},"effectiveDates":{"type":"string","description":"Effective dates"},"salesStatus":{"type":"string","description":"Sales status"},"appearsAsStandaloneProduct":{"type":"string","description":"Appears as standalone product"},"isRecommendedDuringCheckout":{"type":"boolean","description":"Is recommended during checkout"},"requiresAnotherProduct":{"type":"string","description":"Requires another product"},"bundleType":{"type":"string","enum":["fixed","configurable","buildYourOwn","dynamic","partner"],"description":"Bundle type: all components predefined; required plus optional choices; guest selects from permitted categories; changes with availability or rules; contains internal and external products"}}},
 "BundlePreviewSimulationAiRecommendationInput": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — request only; **no existing table covers these fields** — the closest is promotions.bundle_component at 3%, so this is not an update to anything the package stores today and no new table has been decided","description":"**What Bundle Preview, Simulation & AI Recommendation submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.","properties":{"bundleId":{"type":"string","description":"Bundle ID"},"previewChannel":{"type":"string","enum":["b2c","mobileApp","pos","kiosk","b2b","partnerChannel"],"description":"Channel whose guest journey is previewed"},"components":{"type":"array","items":{"type":"string"},"description":"Components to simulate"}}},
 "BundlePreviewSimulationAiRecommendationView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over promotions state, assembled at read time from tables that already exist","description":"**What Bundle Preview, Simulation & AI Recommendation displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"bundleId":{"type":"string","description":"Bundle ID"},"previewChannel":{"type":"string","enum":["b2c","mobileApp","pos","kiosk","b2b","partnerChannel"],"description":"Channel whose guest journey is previewed"},"components":{"type":"array","items":{"type":"string"},"description":"Components in the simulated bundle"},"individualValue":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Individual value of the components"},"bundlePrice":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Bundle price"},"guestSaving":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Guest saving"},"guestSavingPercent":{"type":"number","description":"Guest saving, percent"},"estimatedMargin":{"type":"number","description":"Estimated margin, percent"},"failedValidations":{"type":"array","items":{"type":"string","enum":["componentAvailability","capacity","pricing","validity","revenueAllocation","channelAssignment","tax","partnerConnection","marginFloor"]},"description":"Validations that block publication; empty means READY TO PUBLISH"},"readyToPublish":{"type":"boolean","description":"Ready to publish"},"aiRecommendation":{"type":"string","description":"AI bundle recommendation (a draft; never published without configured approval)"}}},
 "BundlePricingCommercialModelView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over promotions state, assembled at read time from tables that already exist","description":"**What Bundle Pricing & Commercial Model displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"basePrice":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Base price"},"currency":{"type":"string","description":"Currency"},"discount":{"type":"number","description":"Discount %"},"discountAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Discount amount"},"minimumPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Minimum price"},"maximumPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Maximum price"},"priceFloor":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Price floor"},"marginFloor":{"type":"number","description":"Margin floor"},"guestSpecificPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Guest-specific price"},"channelSpecificPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Channel-specific price"},"pricingModel":{"type":"string","enum":["fixedBundlePrice","sumMinusDiscount","componentPricing","startingFrom","tieredBundlePrice","dynamicBundlePrice"],"description":"How the bundle is priced; a dynamic bundle price is calculated by the pricing engine"},"upgradeCharge":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Surcharge when the guest picks a premium option"}}},
 "BundleValiditySchedulingRedemptionRulesView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over promotions state, assembled at read time from tables that already exist","description":"**What Bundle Validity, Scheduling & Redemption Rules displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"ownValidity":{"type":"string","description":"Own validity"},"ownCapacity":{"type":"integer","description":"Own capacity"},"ownTimeslot":{"type":"string","description":"Own timeslot"},"ownRedemptionCount":{"type":"integer","description":"Own redemption count"},"ownEntitlement":{"type":"string","description":"Own entitlement"},"ownAccessRule":{"type":"string","description":"Own access rule"},"redemptionModel":{"type":"string","enum":["allComponentsTogether","independentRedemption","sequentialRedemption","firstUseActivation","scheduledRedemption","timeslotReservationRequired"],"description":"How the bundle's components are redeemed."}}},
 "CampaignBudget": {"x-ticvai-persistence":"promotions.campaign_budget","type":"object","description":"One budget line of a commercial campaign (setCampaignBudgetFinancial): what kind of spend it caps, who funds it, what it covers, and what happens as it is consumed. **Consumed, committed and reserved are not stored**: consumed is the discount given on orders (`orders.discount`, `promotions.promotion.discount_given`), committed and reserved are priced carts not yet paid, all worked out on read so they cannot drift from the orders they summarise. (DM5, 29 September: data model for the agreed operations)","required":["budgetType","amount"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"budgetType":{"type":"string","enum":["total","discount","reward","freeProduct"],"description":"The spend this line caps (total campaign, discount, reward or free-product budget)."},"fundingSource":{"type":"string","nullable":true,"enum":["venue","department","marketing","partner"],"description":"Who pays for it; `partner` is a co-funded (e.g. bank or partner-funded) line."},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"scope":{"type":"string","enum":["entireCampaign","promotion","product","channel","partner","customerSegment"],"default":"entireCampaign","description":"What the line covers."},"scopeRef":{"type":"string","nullable":true,"description":"The promotion, product, partner or segment id, or the SalesChannel value, that `scope` names. Null for `entireCampaign`."},"ownerPrincipalId":{"type":"string","format":"uuid","nullable":true,"description":"The budget owner."},"costCentre":{"type":"string","maxLength":64,"nullable":true},"department":{"type":"string","maxLength":100,"nullable":true},"validFrom":{"type":"string","format":"date-time","nullable":true},"validTo":{"type":"string","format":"date-time","nullable":true},"thresholdPolicy":{"$ref":"#/components/schemas/BudgetThresholdPolicy"}}},
 "CommercialCampaign": {"x-ticvai-persistence":"promotions.campaign + promotions.campaign_budget","type":"object","description":"A commercial campaign: the grouping of promotions, coupon campaigns and bundles that share an owner, a business entity, dates and a budget. **Not `marketing.campaign`**, which is the CRM send campaign in another service. The header is saved with its budget lines by setCampaignBudgetFinancial (the budget screen is where the pack captures campaign, owner, business entity and effective dates), and on its own by createCommercialCampaign and updateCommercialCampaign; listCommercialCampaigns lists it (decided 29 September, writers pass); promotions, coupon campaigns and bundles point at it by `campaignId`. No status of its own: a campaign is live while its promotions are, and a threshold action that stops it pauses them. (DM5, 29 September: data model for the agreed operations)","required":["id","venueId","name"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"venueId":{"type":"string","format":"uuid"},"code":{"type":"string","maxLength":64,"nullable":true},"name":{"type":"string","maxLength":200},"description":{"type":"string","maxLength":1000,"nullable":true},"ownerPrincipalId":{"type":"string","format":"uuid","nullable":true,"description":"The campaign (and budget) owner."},"legalEntityId":{"type":"string","format":"uuid","nullable":true,"description":"The business entity that funds and books the campaign."},"validFrom":{"type":"string","format":"date-time","nullable":true},"validTo":{"type":"string","format":"date-time","nullable":true},"budgets":{"type":"array","description":"The rows of `promotions.campaign_budget`, one per budget line.","items":{"$ref":"#/components/schemas/CampaignBudget"}}}},
-"GuestChoiceBuildYourOwnBundleDesignerInput": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures","description":"**What Guest Choice & Build-Your-Own Bundle Designer submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.\n\n**The pack defines this as a record**, under *For each group* - one of only 13 drafted writes that does. That is the client writing a row rather than a screen, and it is where the table conversation should start.","properties":{"groupName":{"type":"string","description":"Group name"},"category":{"type":"string","description":"Category"},"minimumSelections":{"type":"string","description":"Minimum selections"},"maximumSelections":{"type":"string","description":"Maximum selections"},"requiredOptional":{"type":"string","description":"Required/optional"},"eligibleProducts":{"type":"string","description":"Eligible products"},"additionalCharge":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Additional charge"},"selectionOrder":{"type":"string","description":"Selection order"}},"x-ticvai-record-definition":"For each group"},
-"GuestChoiceBuildYourOwnBundleDesignerView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over promotions state, assembled at read time from tables that already exist","description":"**What Guest Choice & Build-Your-Own Bundle Designer displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"groupName":{"type":"string","description":"Group name"},"category":{"type":"string","description":"Category"},"minimumSelections":{"type":"string","description":"Minimum selections"},"maximumSelections":{"type":"string","description":"Maximum selections"},"requiredOptional":{"type":"string","description":"Required/optional"},"eligibleProducts":{"type":"string","description":"Eligible products"},"additionalCharge":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Additional charge"},"selectionOrder":{"type":"string","description":"Selection order"}}},
+"CreateBundleRequest": {"x-ticvai-persistence":"none — request only","type":"object","required":["code","name","venueId","kind","price","components","allocation"],"properties":{"code":{"type":"string","maxLength":64},"name":{"type":"string","maxLength":200},"description":{"type":"string","maxLength":1000},"venueId":{"type":"string","format":"uuid"},"kind":{"$ref":"#/components/schemas/BundleKind"},"price":{"x-ticvai-column":"list_price","$ref":"../shared/common.yaml#/components/schemas/Money"},"components":{"type":"array","minItems":0,"items":{"$ref":"#/components/schemas/BundleComponent"}},"choiceGroups":{"type":"array","description":"Dynamic bundles (3.5.10). A bundle may carry fixed components and choice groups at once — a family pass with fixed parking and two groups the guest chooses from. **The bundle price does not move with the choice** (ADR-0019).\n","items":{"$ref":"#/components/schemas/BundleChoiceGroup"}},"allocation":{"type":"object","required":["method","components"],"properties":{"method":{"allOf":[{"$ref":"#/components/schemas/AllocationMethod"}],"default":"proRataListPrice","description":"Proportional to list price by default. The rounding remainder in the currency's minor unit goes to the first component (decided 28 September, audit R101).\n"},"components":{"type":"array","items":{"$ref":"#/components/schemas/AllocationComponent"}}}},"validFrom":{"type":"string","format":"date-time"},"validTo":{"type":"string","format":"date-time"},"campaignId":{"type":"string","format":"uuid","nullable":true,"description":"The commercial campaign (`promotions.campaign`) the bundle is sold under. (DM5, 29 September: data model for the agreed operations)"},"ownerPrincipalId":{"type":"string","format":"uuid","nullable":true,"description":"The bundle owner (Bundle Definition & Setup). (DM5, 29 September: data model for the agreed operations)"},"category":{"type":"string","maxLength":100,"nullable":true,"description":"The bundle category the setup screen files it under. (DM5, 29 September: data model for the agreed operations)"},"isStandaloneProduct":{"type":"boolean","default":true,"description":"Whether the bundle appears as a product in its own right, or only as an offer on another product. (DM5, 29 September: data model for the agreed operations)"},"isRecommendedAtCheckout":{"type":"boolean","default":false,"description":"Whether checkout recommends the bundle. (DM5, 29 September: data model for the agreed operations)"},"requiredVariantIds":{"type":"array","nullable":true,"items":{"type":"string","format":"uuid"},"description":"Products that must already be in the basket for the bundle to be sold (the setup screen's \"requires another product\"). (DM5, 29 September: data model for the agreed operations)"}}},
 "Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}},
 "PartnerBundleProduct": {"x-ticvai-persistence":"promotions.partner_bundle_product","type":"object","description":"A partner's or external product sold as a bundle component: the partner's product id and source, its price to us and ours to the guest, the commission, and the settlement, cancellation and redemption terms (Partner & External Product Bundle Manager). Tied to the `promotions.bundle_component` that stands for it. `connectionStatus` is the last health reading of the partner integration, written by the sync job. (DM5, 29 September: data model for the agreed operations)\n**Written by setBundlePartnerProductMappings; read by listBundlePartnerProductMappings and listPartnerExternalProduct** (decided 29 September, writers pass). `connectionStatus` and `lastCheckedAt` are the partner sync job's alone: it polls each mapped partner product and writes them, and no operation takes them from a request.","required":["id","bundleComponentId","partnerId","externalProductId"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"bundleComponentId":{"type":"string","format":"uuid"},"partnerId":{"type":"string","format":"uuid"},"externalProductId":{"type":"string","maxLength":128},"productName":{"type":"string","maxLength":200},"apiSource":{"type":"string","maxLength":100,"nullable":true,"description":"The partner integration the product comes through."},"availabilitySource":{"type":"string","enum":["partnerApi","allocation","onRequest"],"default":"partnerApi","description":"Where availability is checked."},"externalPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"sellingPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"commission":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"settlementRule":{"type":"string","maxLength":500,"nullable":true},"cancellationRule":{"type":"string","maxLength":500,"nullable":true},"redemptionMethod":{"type":"string","maxLength":100,"nullable":true},"connectionStatus":{"type":"string","readOnly":true,"description":"Written by the partner sync job only; `available` until its first reading.","enum":["connected","available","degraded","apiError","productUnavailable","mappingError"]},"lastCheckedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true,"description":"When the partner sync job last read the partner."}}},
 "PartnerExternalProductBundleManagerView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over promotions state, assembled at read time from tables that already exist","description":"**What Partner & External Product Bundle Manager displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"partner":{"type":"string","description":"Partner"},"externalProductId":{"type":"string","description":"External product ID"},"productName":{"type":"string","description":"Product name"},"apiSource":{"type":"string","description":"API source"},"availabilitySource":{"type":"string","description":"Availability source"},"externalPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"External price"},"ticvaiSellingPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"TICVAI selling price"},"commission":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Commission"},"settlementRule":{"type":"string","description":"Settlement rule"},"cancellationRule":{"type":"string","description":"Cancellation rule"},"redemptionMethod":{"type":"string","description":"Redemption method"},"connectionStatus":{"type":"string","enum":["connected","available","degraded","apiError","productUnavailable","mappingError"],"description":"Partner connection status."}}},

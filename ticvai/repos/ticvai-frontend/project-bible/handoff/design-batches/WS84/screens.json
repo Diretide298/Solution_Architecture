@@ -215,6 +215,13 @@
    "workshopBoard": "wireframes/WS64 Game and Ride Board 7.dc.html#bo-454"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 64. 0 of 6 labels bound to a contract property; 14 of 22 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-004): No staff-audience read of a game card (getGameCard is guest-only; used on BO-396, BO-454, BO-455, BO-457, BO-462, BO-486).",
+    "source": "contracts/satellite/games.yaml#getGameCard"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -495,6 +502,13 @@
    "workshopBoard": "wireframes/WS64 Game and Ride Board 7.dc.html#bo-456"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 66. 0 of 0 labels bound to a contract property; 4 of 17 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-004): No read of game card expiry rules.",
+    "source": "contracts/satellite/games.yaml#setGameCardExpiryRules"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -685,6 +699,17 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Game_and_Ride_Module.pdf, page 68"
+   },
+   {
+    "operation": "setGameCardExpiryRules",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): A monitoring list needs a read of cards by expiry date; setGameCardExpiryRules is the configuration write of BO-456. No read of cards by expiry exists (contract gap CHG-WIR-004) (design-notes correction venue-operations BO-458).",
+    "source": "contracts/satellite/games.yaml#setGameCardExpiryRules"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-004): No read lists game cards by expiry date with their remaining value.",
+    "source": "screens/P08-venue-back-office.yaml#BO-458"
    }
   ],
   "layout": {
@@ -718,41 +743,25 @@
     {
      "name": "actionBar",
      "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "View Card | View Wallet | Export",
-       "provenance": "pack Game_and_Ride_Module.pdf, page 68 §Actions"
-      }
-     ]
+     "components": []
     }
    ]
   },
   "states": {
    "loading": "The expiry monitoring upcoming list.",
    "error": "Could not load. Names which read failed and leaves the expiry monitoring upcoming untouched.",
-   "emptyFirstRun": "No expiry monitoring upcoming yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No expiry monitoring upcoming yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the expiry monitoring upcoming are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Not shown: nothing on this screen needs a permission of its own; the app's sign-in decides access."
   },
-  "apis": [
-   {
-    "operationId": "setGameCardExpiryRules",
-    "contract": "games",
-    "purpose": "Warnings before expiry",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026",
-    "invalidates": [
-     "getGameCard"
-    ]
-   }
-  ],
+  "apis": [],
   "wireframe": {
    "status": "notStarted",
    "board": "wireframes/P08 Venue Management.dc.html#bo-458",
    "workshopBoard": "wireframes/WS64 Game and Ride Board 7.dc.html#bo-458"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 68. 0 of 6 labels bound to a contract property; 7 of 18 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** View Card | View Wallet | Export dropped (navigation (View Card / View Wallet) and a generic export already on the reporting screens).",
+  "notes": "View card and View wallet are row actions and Export a toolbar action (the board merged three actions into one label); no staff read of a game card or wallet exists (`getGameCard` is guest-only), so they wait for one (logged, CHG-SBO-005).",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -820,6 +829,12 @@
     "operation": null,
     "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
     "source": "pack Game_and_Ride_Module.pdf, page 68 §CARD VALID"
+   },
+   {
+    "operation": "authoriseGameplay",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): authoriseGameplay decides a real tap now and charges for it; a back-office check uses simulateGameplayAuthorisation, which returns the decision and trace without consuming anything (design-notes correction venue-operations BO-459).",
+    "source": "contracts/satellite/games.yaml#authoriseGameplay | contracts/satellite/games.yaml#simulateGameplayAuthorisation"
    }
   ],
   "layout": {
@@ -856,27 +871,34 @@
        "provenance": "pack Game_and_Ride_Module.pdf, page 68 §CARD VALID"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "components": [
+      {
+       "kind": "secondaryButton",
+       "label": "Test a tap",
+       "operation": "simulateGameplayAuthorisation",
+       "provenance": "contract games.yaml POST /gameplay-authorisations/simulate; wiring fix, 2 October 2026"
+      }
+     ]
     }
    ]
   },
   "states": {
    "loading": "The card expiry runtime list.",
    "error": "Could not load. Names which read failed and leaves the card expiry runtime untouched.",
-   "emptyFirstRun": "No card expiry runtime yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No card expiry runtime yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the card expiry runtime are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
-    "operationId": "authoriseGameplay",
+    "operationId": "simulateGameplayAuthorisation",
     "contract": "games",
-    "purpose": "Expiry checked at the reader",
+    "purpose": "What would happen if this card tapped this reader, expiry included",
     "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026",
-    "invalidates": [
-     "listGameplayTransactions",
-     "getGameCard"
-    ]
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-001)"
    }
   ],
   "entryState": {
@@ -890,6 +912,22 @@
    "workshopBoard": "wireframes/WS64 Game and Ride Board 7.dc.html#bo-459"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 68. 0 of 1 labels bound to a contract property; 1 of 14 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSimulateGameplayAuthorisation",
+    "component": "modal",
+    "trigger": "Test a tap",
+    "body": "**Collects what `simulateGameplayAuthorisation` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Test a tap",
+     "operation": "simulateGameplayAuthorisation"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "contract games.yaml POST /gameplay-authorisations/simulate; wiring fix, 2 October 2026"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",

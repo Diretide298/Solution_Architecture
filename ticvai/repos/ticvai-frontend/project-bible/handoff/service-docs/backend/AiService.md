@@ -7,7 +7,7 @@
 | Tier | engagement: Guests and intelligence. Nothing that takes money depends on these. |
 | Contracts | `ai` |
 | Schemas owned | `ai`, `qdrant` |
-| Operations in the slice | 50 of 141 |
+| Operations in the slice | 65 of 144 |
 | Scale | Latency-tolerant, cost-sensitive, token-metered. Different hardware from everything else. |
 | If it is down | Down degrades suggestions and the concierge. Nothing that takes money depends on it. |
 
@@ -33,58 +33,179 @@
 
 | Group | Operation | Method | Path | Part | Wave | Called by |
 |---|---|---|---|---|---|---|
+| actions | [`overrideAiDecision`](#overrideaidecision) | POST | `/decision-records/{decisionRecordId}/override` | core | 1 | ADM-533, ADM-536 |
+| ai | [`getTranslationProposals`](#gettranslationproposals) | GET | `/ai/translate/{translationJobId}` | core | 2 | CMS-011 |
 | ai | [`proposeTranslations`](#proposetranslations) | POST | `/ai/translate` | core | 1 | BO-785, BO-793 |
 | ai | [`proposeVenueLabels`](#proposevenuelabels) | POST | `/ai/venue-map/{mapId}/propose-labels` | core | 1 | BO-093 |
 | ai | [`requestSuggestion`](#requestsuggestion) | POST | `/ai/suggestions` | core | 1 | ADM-047, ADM-511, ANL-001, ANL-006, ANL-010, BO-005 … |
-| ai | [`setAiCredential`](#setaicredential) | PUT | `/ai-providers/{providerId}/credential` | setup | 1 | ADM-037 |
 | ai | [`setSuggestionProvider`](#setsuggestionprovider) | PUT | `/ai/suggestion-providers` | setup | 1 |  |
+| ai | [`testAiProvider`](#testaiprovider) | POST | `/ai-providers/{providerId}/test` | core | 1 | ADM-037 |
 | assist | [`createAiConversation`](#createaiconversation) | POST | `/conversations` | core | 1 | BO-928, BO-932, CMS-104, EMP-019, EMP-020, GST-031 … |
-| assist | [`listAiConversations`](#listaiconversations) | GET | `/conversations` | core | 2 | BO-932, EMP-019, EMP-020, GST-068, WEB-044 |
+| assist | [`listAiConversations`](#listaiconversations) | GET | `/conversations` | core | 2 | BO-932, EMP-019, EMP-020, GST-031, GST-068, WEB-044 |
 | assist | [`sendAiMessage`](#sendaimessage) | POST | `/conversations/{conversationId}/messages` | core | 1 | ADM-533, BO-928, BO-929, BO-932, CMS-104, EMP-019 … |
+| config | [`getAiByokEnablement`](#getaibyokenablement) | GET | `/tenants/{tenantId}/byok` | core | 1 | ADM-037, BO-091 |
 | config | [`getAiPolicy`](#getaipolicy) | GET | `/policy` | core | 1 | BO-091 |
+| config | [`listAiProviders`](#listaiproviders) | GET | `/providers` | core | 1 | ADM-037 |
 | config | [`setAiByokEnablement`](#setaibyokenablement) | PUT | `/tenants/{tenantId}/byok` | setup | 1 | ADM-037 |
 | config | [`setAiPolicy`](#setaipolicy) | PUT | `/policy` | setup | 1 | BO-091 |
-| config | [`setAiProvider`](#setaiprovider) | PUT | `/providers` | setup | 1 | ADM-037 |
 | configure | [`getGuidedChoiceSuggestion`](#getguidedchoicesuggestion) | GET | `/guided-choice-suggestions/{suggestionId}` | core | 2 | CMS-101 |
 | configure | [`suggestGuidedChoice`](#suggestguidedchoice) | POST | `/venues/{venueId}/guided-choice-suggestions` | core | 2 | CMS-101 |
 | forecast | [`createForecastScenario`](#createforecastscenario) | POST | `/forecast-scenarios` | setup | 1 | ADM-507, ADM-517, ANL-057, BO-919, BO-931 |
 | forecast | [`decideOperationalRequirement`](#decideoperationalrequirement) | POST | `/operational-requirements/{requirementId}/decide` | setup | 1 | ADM-518, BO-927 |
-| forecast | [`getAiVenueSettings`](#getaivenuesettings) | GET | `/venues/{venueId}/ai-settings` | core | 1 | ADM-489, ANL-071 |
+| forecast | [`getAiVenueSettings`](#getaivenuesettings) | GET | `/venues/{venueId}/ai-settings` | core | 1 | ADM-489, ANL-071, BO-927 |
+| forecast | [`getForecast`](#getforecast) | GET | `/forecasts` | core | 1 | ADM-499, ADM-502, ADM-503, ADM-504, ADM-505, ADM-506 … |
+| forecast | [`getForecastAccuracy`](#getforecastaccuracy) | GET | `/forecast-accuracy` | core | 1 | ADM-506, ADM-508 |
 | forecast | [`getVenueHistoryImport`](#getvenuehistoryimport) | GET | `/history-imports/{importId}` | core | 1 | ANL-071 |
 | forecast | [`importVenueHistory`](#importvenuehistory) | POST | `/venues/{venueId}/history-imports` | core | 1 | ANL-071 |
+| forecast | [`listForecastVersions`](#listforecastversions) | GET | `/forecast-versions` | core | 1 | ADM-506, ADM-508 |
+| forecast | [`listOperationalRequirements`](#listoperationalrequirements) | GET | `/operational-requirements` | core | 1 | ADM-509, ADM-510, ADM-511, ADM-512, ADM-513, ADM-514 … |
 | forecast | [`listVenueHistoryImports`](#listvenuehistoryimports) | GET | `/venues/{venueId}/history-imports` | core | 1 | ANL-071 |
 | forecast | [`publishForecastVersion`](#publishforecastversion) | POST | `/forecast-versions/{versionId}/publish` | setup | 1 | ADM-508 |
 | forecast | [`runForecast`](#runforecast) | POST | `/forecast-definitions/{definitionKey}/runs` | setup | 1 | ADM-500, ADM-508 |
-| forecast | [`setAiVenueSettings`](#setaivenuesettings) | PUT | `/venues/{venueId}/ai-settings` | core | 1 | ADM-489, ANL-071 |
+| forecast | [`setAiVenueSettings`](#setaivenuesettings) | PUT | `/venues/{venueId}/ai-settings` | core | 1 | ADM-471, ADM-489, ANL-071, BO-927 |
+| forecast | [`setForecastDefinition`](#setforecastdefinition) | PUT | `/forecast-definitions/{definitionKey}` | setup | 1 | ADM-500, ADM-501 |
 | generate | [`proposeMarketingContent`](#proposemarketingcontent) | POST | `/ai/content-drafts` | core | 2 | BO-766, BO-772, BO-785, BO-786, BO-787, BO-789 … |
-| governance | [`configureAiCapability`](#configureaicapability) | PUT | `/governance/capabilities/{capabilityKey}` | setup | 1 | ADM-520, ADM-521, ADM-522, ANL-060 |
 | governance | [`createAiGovernancePolicyDraft`](#createaigovernancepolicydraft) | POST | `/governance/policy-drafts` | setup | 2 | ADM-523, ADM-524, ADM-525, ADM-530 |
-| governance | [`createAiPolicyException`](#createaipolicyexception) | POST | `/governance/policy-exceptions` | setup | 1 | ADM-526 |
-| governance | [`decideProposedAction`](#decideproposedaction) | POST | `/proposed-actions/{actionId}/decide` | core | 2 | ADM-492, ADM-531, ADM-532, ANL-009, BO-762, BO-793 … |
+| governance | [`decideProposedAction`](#decideproposedaction) | POST | `/proposed-actions/{actionId}/decide` | core | 2 | ADM-492, ADM-531, ADM-532, ANL-009, BO-598, BO-762 … |
 | governance | [`evaluateAiGovernance`](#evaluateaigovernance) | POST | `/governance/evaluate` | core | 1 |  |
-| governance | [`getAiUsage`](#getaiusage) | GET | `/usage` | core | 1 | ADM-549, BO-091 |
+| governance | [`getAiUsage`](#getaiusage) | GET | `/usage` | core | 1 | ADM-549, ANL-070, BO-091 |
+| governance | [`getEffectiveAiPolicy`](#geteffectiveaipolicy) | GET | `/governance/effective-policy` | core | 1 | ADM-489, ADM-522, ADM-525, ADM-526, ADM-528, ANL-060 … |
+| governance | [`listAiCapabilities`](#listaicapabilities) | GET | `/governance/capabilities` | core | 1 | ADM-519, ADM-520, ADM-521, ADM-522, ADM-536, ANL-060 … |
+| governance | [`listAiGovernancePolicyVersions`](#listaigovernancepolicyversions) | GET | `/governance/policy-versions` | core | 1 | ADM-523, ADM-524, ADM-526, ADM-527, ADM-528, ADM-530 |
+| governance | [`pauseAiCapability`](#pauseaicapability) | POST | `/governance/capabilities/{capabilityKey}/pause` | core | 1 | ADM-519, ADM-536, ADM-556, ADM-696 |
 | governance | [`publishAiGovernancePolicy`](#publishaigovernancepolicy) | POST | `/governance/policy-versions/{versionId}/publish` | setup | 2 | ADM-528 |
-| governance | [`resumeAiCapability`](#resumeaicapability) | POST | `/governance/capabilities/{capabilityKey}/resume` | setup | 1 | ADM-536 |
+| governance | [`revokeAiPolicyException`](#revokeaipolicyexception) | POST | `/governance/policy-exceptions/{exceptionId}/revoke` | core | 1 | ADM-526 |
 | governance | [`simulateAiGovernancePolicy`](#simulateaigovernancepolicy) | POST | `/governance/policy-versions/{versionId}/simulate` | setup | 2 | ADM-527, ADM-538 |
 | insights | [`decideAiInsight`](#decideaiinsight) | POST | `/insights/{insightId}/decide` | setup | 1 | ANL-019, ANL-059, BO-772, BO-782 |
 | insights | [`explainMetricChange`](#explainmetricchange) | POST | `/insights/explain-metric-change` | setup | 1 | ADM-506, ANL-019, ANL-056 |
 | knowledge | [`configureAssistantProfile`](#configureassistantprofile) | PUT | `/assistant-profiles/{profileKey}` | setup | 1 | BO-091, SUP-018 |
-| knowledge | [`recordAnswerFeedback`](#recordanswerfeedback) | POST | `/messages/{messageId}/feedback` | core | 2 | EMP-020, GST-032, KSK-015, WEB-044 |
+| knowledge | [`recordAnswerFeedback`](#recordanswerfeedback) | POST | `/messages/{messageId}/feedback` | core | 2 | EMP-020, GST-031, GST-032, GST-033, KSK-015, WEB-044 |
+| models | [`listAiEvaluations`](#listaievaluations) | GET | `/evaluations` | core | 1 | ADM-554, ANL-060 |
+| models | [`listAiTrainingRuns`](#listaitrainingruns) | GET | `/training-runs` | core | 1 | ADM-554 |
 | models | [`promoteAiRelease`](#promoteairelease) | POST | `/releases/{releaseId}/promote` | setup | 1 | ADM-519, ADM-554 |
-| models | [`publishPromptTemplate`](#publishprompttemplate) | POST | `/prompt-templates/{templateKey}/versions` | setup | 1 | ADM-037, ANL-060 |
-| models | [`rollbackAiRelease`](#rollbackairelease) | POST | `/releases/{releaseId}/rollback` | setup | 1 | ADM-554, ADM-556 |
+| models | [`publishPromptTemplate`](#publishprompttemplate) | POST | `/prompt-templates/{templateKey}/versions` | setup | 1 | ADM-037 |
+| models | [`rollbackAiRelease`](#rollbackairelease) | POST | `/releases/{releaseId}/rollback` | setup | 1 | ADM-554, ADM-556, ADM-696 |
 | models | [`runAiEvaluation`](#runaievaluation) | POST | `/evaluations` | setup | 1 | ADM-554, ANL-060 |
 | models | [`setAiModel`](#setaimodel) | PUT | `/models/{modelId}` | setup | 1 | ADM-037 |
 | monitoring | [`containAiIncident`](#containaiincident) | POST | `/incidents/{incidentId}/contain` | setup | 1 | ADM-556 |
+| monitoring | [`listAiGovernanceAlerts`](#listaigovernancealerts) | GET | `/governance-alerts` | core | 1 | ADM-519, ADM-549, ADM-552, ADM-553, ADM-554, ADM-555 … |
+| monitoring | [`listAiIncidents`](#listaiincidents) | GET | `/incidents` | core | 1 | ADM-549, ADM-556 |
+| monitoring | [`openAiIncident`](#openaiincident) | POST | `/incidents` | core | 1 | ADM-555, ADM-556 |
 | recommend | [`decideRecommendations`](#deciderecommendations) | POST | `/recommendations/decide` | core | 1 | BO-102, BO-1048, BO-119, GST-001, GST-036, GST-048 … |
-| recommend | [`recordRecommendationEvents`](#recordrecommendationevents) | POST | `/recommendations/events` | core | 1 | BO-102, GST-001, GST-036, GST-048, WEB-001, WEB-008 … |
+| recommend | [`recordRecommendationEvents`](#recordrecommendationevents) | POST | `/recommendations/events` | core | 1 | GST-001, GST-036, GST-048, WEB-001, WEB-008, WEB-043 |
 | retrieval | [`createKnowledgeCollection`](#createknowledgecollection) | POST | `/collections` | setup | 2 |  |
-| retrieval | [`ingestKnowledgeDocument`](#ingestknowledgedocument) | POST | `/collections/{collectionId}/documents` | setup | 1 |  |
+| retrieval | [`ingestKnowledgeDocument`](#ingestknowledgedocument) | POST | `/collections/{collectionId}/documents` | setup | 1 | BO-798 |
 | retrieval | [`reindexSource`](#reindexsource) | POST | `/index-sources/{sourceId}/reindex` | setup | 1 |  |
-| retrieval | [`semanticSearch`](#semanticsearch) | POST | `/search` | core | 2 | CMS-010, CMS-062, EMP-040, EMP-041 |
+| retrieval | [`semanticSearch`](#semanticsearch) | POST | `/search` | core | 2 | CMS-010, CMS-062, EMP-040, EMP-041, SUP-006 |
 | retrieval | [`setIndexSource`](#setindexsource) | PUT | `/index-sources` | setup | 1 |  |
 
+## Group: actions
+
+The action pipeline and human oversight (design C3)
+
+### overrideAiDecision
+
+**`POST /decision-records/{decisionRecordId}/override`**: Override an AI decision
+
+**Human override is always possible** (AIC-187, ADM-536): the original decision and the human one are kept side by side as an intervention and an annotation on the decision record. It changes what AI does next; it does not reach into an owning module (a correction there is that module's own operation).
+
+|  |  |
+|---|---|
+| Permission | `AI_APPROVE` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `ai.decision_record`, `ai.intervention`, `cache:idempotency` |
+| Writes | `ai.decision_record`, `ai.intervention`, `cache:idempotency` |
+| Called by | ADM-533, ADM-536 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| decisionRecordId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| humanDecision | object | yes |  |
+| reason | string | yes | (max length 2000) |
+
+**Response**: `AiIntervention`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) |  | (read-only) |
+| kind | enum (override, pause, resume, cancel, retry, rollback, capabilityPause, capabilityResume) | yes |  |
+| targetKind | enum (plan, step, decision, capability) | yes |  |
+| targetRef | string | yes |  |
+| decisionRecordId | string (uuid) |  | (nullable) |
+| originalDecision | object |  | (nullable) |
+| humanDecision | object |  | (nullable) |
+| reason | string |  | (max length 2000) |
+| principalId | string (uuid) |  | (read-only) |
+| createdAt | string (date-time) |  | (read-only) |
+| scopePath | string |  | The partition key (ADR-0005). (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 201 |  | Override an AI decision |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
+
 ## Group: ai
+
+### getTranslationProposals
+
+**`GET /ai/translate/{translationJobId}`**: Follow a translation job
+
+The drafts a `proposeTranslations` job has written so far, and whether it has finished (contract gap logged in CHG-WIR-017 for CMS-011; built in CHG-CSA-045). The CMS polls it after the 202 to offer machine translation as a first pass for review (DI-081, DI-083); nothing is published from here.
+
+|  |  |
+|---|---|
+| Permission | `TENANT_CONFIGURE` |
+| Scope level | tenant |
+| Part of slice | core |
+| Wave | 2 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | primary |
+| Reads | - |
+| Writes | - |
+| Called by | CMS-011 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| translationJobId | path | yes | string (uuid) |  |
+
+**Response**: `TranslationProposals`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| targetLocale | string | yes |  |
+| translationJobId | string (uuid) |  | The job to follow with getTranslationProposals (contract gap CHG-WIR-017, CMS-011; CHG-CSA-045). (read-only) |
+| status | enum (running, completed, failed) |  | running while drafts are still being written; drafts then holds those done so far. (read-only) |
+| drafts | array of object | yes |  |
+| drafts[].targetKind | enum (contentBlock, productName, emailTemplate, messageTemplate) | yes |  |
+| drafts[].targetRef | string | yes | The id of the block, product or template the draft sits on. |
+| drafts[].draftText | string | yes | The first-pass translation, as saved on the draft. |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | The job and its drafts |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### proposeTranslations
 
@@ -125,6 +246,8 @@ BL-071, 2.6.34. **`setLanguages` already measures the gap** — `translationGaps
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | targetLocale | string | yes |  |
+| translationJobId | string (uuid) |  | The job to follow with getTranslationProposals (contract gap CHG-WIR-017, CMS-011; CHG-CSA-045). (read-only) |
+| status | enum (running, completed, failed) |  | running while drafts are still being written; drafts then holds those done so far. (read-only) |
 | drafts | array of object | yes |  |
 | drafts[].targetKind | enum (contentBlock, productName, emailTemplate, messageTemplate) | yes |  |
 | drafts[].targetRef | string | yes | The id of the block, product or template the draft sits on. |
@@ -201,7 +324,7 @@ Proposes and stops. `venue-map.acceptVenueLabelProposals` is the human half.
 | Guest callable | True |
 | Reads | `ai.capability_maturity`, `ai.forecast_point`, `ai.forecast_version`, `ai.history_observation`, `ai.insight`, `ai.operational_requirement`, `ai.policy`, `ai.provider`, `ai.rec_decline`, `ai.release`, `ai.suggestion`, `ai.venue_settings`, `cache:idempotency`, `cache:rec-candidates`, `fnb.production_plan`, `inventory.movement`, `inventory.stock_batch`, `marketing.attribution_touch`, `marketing.segment`, `queue.queue`, `queue.reading`, `venuemap.point`, `venuemap.visit_plan`, `venuemap.visit_plan_item` |
 | Writes | `ai.activity`, `ai.suggestion`, `cache:idempotency` |
-| Called by | ADM-047, ADM-511, ANL-001, ANL-006, ANL-010, BO-005, BO-115, BO-117, BO-138, BO-139, BO-772, BO-782, BO-925, EMP-031, GST-031, GST-054, WEB-044 |
+| Called by | ADM-047, ADM-511, ANL-001, ANL-006, ANL-010, BO-005, BO-139, BO-772, BO-782, BO-925, EMP-031, GST-031, GST-054, WEB-044 |
 
 **Parameters**
 
@@ -254,81 +377,6 @@ Proposes and stops. `venue-map.acceptVenueLabelProposals` is the human half.
 |---|---|---|
 | 200 |  | The suggestion, with its basis and its reasoning |
 | 422 |  | A setting the answer cannot do without is missing (29 September, AI functions review). |
-| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
-
-### setAiCredential
-
-**`PUT /ai-providers/{providerId}/credential`**: Store or rotate a provider key
-
-**The key goes to the vault and never to the database.** The request carries the secret once; what is stored is a `credentialRef`, and every read of this provider thereafter returns the reference rather than the value.
-**No surface ever holds a provider key.** A kiosk, an app and a browser all call TICVAI, and TICVAI calls the provider — because a token that reaches a client is a token that bills the tenant from somebody else's machine.
-Rotation is the same operation. The previous key is revoked at the vault after a grace window, so an in-flight request does not fail mid-answer. **The window is 24 hours (decided 28 September, audit R096)**: a replaced key keeps working for `graceMinutes`, 1,440 unless a shorter window is sent — a compromised key is rotated with `graceMinutes: 0`.
-**Only a tenant-managed provider takes a key here** (AI design 5.9, decided 29 September). A provider with `managedBy: ticvai` runs on TICVAI's Azure OpenAI subscription with a per-tenant key the platform provisions for attribution; nobody types it, and this refuses it with 409 `provider-managed-by-ticvai`.
-
-|  |  |
-|---|---|
-| Permission | `AI_CONFIGURE` |
-| Scope level | tenant |
-| Part of slice | setup, makes `ai.provider` non-empty |
-| Wave | 1 |
-| Offline | no |
-| Conflict policy | serverWins |
-| Reads | `ai.byok_enablement`, `ai.provider`, `cache:idempotency` |
-| Writes | `ai.provider`, `cache:idempotency` |
-| Called by | ADM-037 |
-
-**Parameters**
-
-| Name | In | Required | Type | Notes |
-|---|---|---|---|---|
-| providerId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
-
-**Request body**
-
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| secret | string (password) | yes | Write-only, never returned, never logged, never in an ai.interaction. |
-| expiresAt | string (date-time) |  | (nullable) |
-| graceMinutes | integer |  | How long the previous key stays valid, so in-flight requests survive. (min 0; max 1440; default 1440) |
-
-**Response**: `AiProvider`
-
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| id | string (uuid) |  | Assigned on create. |
-| kind | AiProviderKind: enum (openai, gemini, anthropic, azureOpenai, localLlm, openaiCompatible) | yes | openaiCompatible (added 29 September, AI design 3.3): a customer endpoint that speaks the OpenAI API, taken with no custom development (AIC-009). |
-| capability | AiCapability: enum (chat, embedding, vision, rerank, speechToText, textToSpeech) | yes | What a capability needs, not which provider serves it. |
-| model | string |  |  |
-| failoverProviderId | string (uuid) |  | BL-151. (nullable) |
-| degradeGracefully | boolean |  | Where no fallback answers, the surface degrades rather than errors. (default True) |
-| priority | integer | yes | Failover order (8.4.26). |
-| scopeLevel | enum (platform, tenant, venue) |  | Where this provider configuration applies, and therefore whose token pays for it. |
-| scopePath | string |  | Resolved scope node. |
-| tenantId | string (uuid) |  | Null only where scopeLevel is platform. (nullable) |
-| credentialRef | string |  | A key-vault reference, never the key. |
-| credentialRotatedAt | string (date-time) |  | (read-only; nullable) |
-| credentialExpiresAt | string (date-time) |  | Where the provider issues expiring keys. (nullable) |
-| lastVerifiedAt | string (date-time) |  | When testAiProvider last confirmed the key works. (read-only; nullable) |
-| endpoint | string |  | (nullable) |
-| residency | string |  | Where inference physically happens. |
-| maxTokens | integer |  |  |
-| isActive | boolean | yes |  |
-| managedBy | enum (ticvai, tenant) |  | Who holds the provider account, and so who pays (AI design 5.9, decided 29 September). (default ticvai) |
-| modelId | string (uuid) |  | The model in the catalogue (listAiModels) this provider serves. (nullable) |
-| taskKeys | array of string |  | Which agent tasks this provider serves (21 September minutes, M21-03: different agents may use different models chosen for the task). |
-| fitnessWarnings | array of object |  | The model-fitness check at the last write (21 September minutes, M21-09). (read-only) |
-| fitnessWarnings[].taskKey | string |  |  |
-| fitnessWarnings[].score | number |  | (nullable) |
-| fitnessWarnings[].floor | number |  |  |
-| fitnessWarnings[].direction | enum (underpowered, overpowered, unscored) |  |  |
-
-**Responses**
-
-| Code | Shape | Meaning |
-|---|---|---|
-| 200 |  | Stored, with a reference and no secret |
-| 409 |  | The provider is TICVAI-managed; its key is provisioned by the platform (provider-managed-by-ticvai). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setSuggestionProvider
@@ -390,6 +438,66 @@ Rotation is the same operation. The previous key is revoked at the vault after a
 | 200 |  | Set. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
+### testAiProvider
+
+**`POST /ai-providers/{providerId}/test`**: Check the key works before anyone relies on it
+
+A minimal call against the provider, using the stored credential.
+**And the compatibility test before activation** (Chinmay, 2 October, contract follow-ups; CHG-FUP-008). For a tenant-managed provider the call also runs the probes of `AiProviderCompatibility` for each task it would serve (or the `taskKeys` sent), against the vendor's equivalent model the curated task-to-tier map picks, and stores the result on `AiProvider.compatibility`. `setAiProvider` activates a tenant-managed provider only after a pass. A TICVAI-managed provider runs the minimal call only.
+**Run before activating and on a schedule after.** A key that lapses silently takes the assistant down with no error anyone reads — the failure surfaces as an assistant that stopped answering, which is diagnosed slowly.
+Costs a handful of tokens and **is billed to the tenant like any other call**, because pretending otherwise would put a hole in the reconciliation.
+
+|  |  |
+|---|---|
+| Permission | `AI_CONFIGURE` |
+| Scope level | tenant |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `ai.provider`, `cache:idempotency` |
+| Writes | `ai.activity`, `ai.provider`, `cache:idempotency` |
+| Called by | ADM-037 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| providerId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| taskKeys | array of string |  | The tasks to test; absent, every task the provider would serve. |
+
+**Response**: `object`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| ok | boolean |  |  |
+| model | string |  |  |
+| latencyMs | integer |  |  |
+| failureReason | enum (invalidKey, expiredKey, quotaExceeded, modelUnavailable, unreachable, residencyRefused) |  | (nullable) |
+| verifiedAt | string (date-time) |  |  |
+| compatibility | AiProviderCompatibility |  | Whether a provider can serve the tasks it would take, before it takes them (Chinmay, 2 October, contract follow-ups: BYOK accepts any provider, with a compatibility test before activation; CHG-FUP-00… |
+| compatibility.status | enum (notTested, passed, failed) | yes |  |
+| compatibility.testedAt | string (date-time) |  | (nullable) |
+| compatibility.tasks | array of object |  |  |
+| compatibility.tasks[].taskKey | string | yes |  |
+| compatibility.tasks[].tier | string |  |  |
+| compatibility.tasks[].modelName | string |  | The vendor's model the curated map picked for this task and tier; null where the vendor has no curated equivalent, and the task stays on the TICVAI-managed model. (nullable) |
+| compatibility.tasks[].passed | boolean | yes |  |
+| compatibility.tasks[].failedProbes | array of enum (toolCalling, structuredOutput, arabic, contextWindow, latency, residency) |  |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Result |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
 
 ## Group: assist
 
@@ -412,7 +520,7 @@ Scoped to a module and a role, because the same question means different things 
 | Conflict policy | serverWins |
 | Reads | `ai.conversation`, `cache:idempotency` |
 | Writes | `ai.conversation`, `cache:idempotency` |
-| Called by | BO-928, BO-932, CMS-104, EMP-019, EMP-020, GST-031, GST-054, WEB-044 |
+| Called by | BO-928, BO-932, CMS-104, EMP-019, EMP-020, GST-031, GST-033, GST-054, KSK-015, WEB-044 |
 
 **Parameters**
 
@@ -464,7 +572,7 @@ Scoped to a module and a role, because the same question means different things 
 | Read routing | replica |
 | Reads | `ai.conversation` |
 | Writes | - |
-| Called by | BO-932, EMP-019, EMP-020, GST-068, WEB-044 |
+| Called by | BO-932, EMP-019, EMP-020, GST-031, GST-068, WEB-044 |
 
 **Parameters**
 
@@ -504,6 +612,7 @@ Scoped to a module and a role, because the same question means different things 
 Retrieval runs **as the calling principal**. The assistant can see exactly what that person could have read directly and nothing more — no service account, no elevated query. This is the difference between an assistant and a privilege escalation with a friendly interface.
 Every response carries a trace id, the model and provider that produced it, token counts and its sources. Not for the user's benefit: for cost attribution and for the grounding audit that 8.3.70 requires.
 **Where the answer proposes an action, it is a draft.** The response carries a `proposedAction` the caller may apply through the owning contract, and applying it is a separate, permissioned, audited step (8.3.61–8.3.64).
+**Every message is scrubbed before it leaves the cell** (Chinmay, 2 October; ADR-0020 amended; CHG-CSA-003): the offline scrubber replaces personal data with reversible placeholders, the guard model checks the input and the reply, and the reply is re-filled in the cell (`AiPolicy.scrubbing`). It applies whatever the tenant's residency class. With the scrubber or the guard down the call is refused `503 scrubber-unavailable`, never sent raw; a message or reply the guard blocks is refused `422 guard-refused`.
 
 |  |  |
 |---|---|
@@ -582,11 +691,65 @@ Every response carries a trace id, the model and provider that produced it, toke
 | 200 |  | Answered |
 | 429 |  | Usage limit reached (8.3.76). |
 | 503 |  | Every configured provider failed. |
+| 422 |  | The guard model blocked the message or the reply (guard-refused, CHG-CSA-003). |
 
 
 ## Group: config
 
 Providers, models and policy
+
+### getAiByokEnablement
+
+**`GET /tenants/{tenantId}/byok`**: Whether a tenant may bring its own key
+
+Read by ADM-037 beside the tenant's providers, and by the tenant's own staff with `AI_CONFIGURE` so BO-091 can say whether a key of their own is possible.
+
+|  |  |
+|---|---|
+| Permission | `AI_CONFIGURE` |
+| Scope level | tenant |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | replica |
+| Reads | `ai.byok_enablement` |
+| Writes | - |
+| Called by | ADM-037, BO-091 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| tenantId | path | yes | string (uuid) |  |
+
+**Response**: `AiByokEnablement`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) |  | (read-only) |
+| tenantId | string (uuid) | yes |  |
+| enabled | boolean | yes |  |
+| coverage | enum (perTask, allTasks) |  | Whether the tenant may supply a key per task or one key for everything. (default perTask) |
+| allowedTasks | array of string |  | Where coverage is perTask: the gateway tasks a tenant key may serve. |
+| taskModelMap | array of object |  | The provider's equivalent model for each task, chosen by TICVAI (Chinmay, 2 October, workbook Q1; closes AI-D20; CHG-CSA-001). (read-only) |
+| taskModelMap[].taskKey | string |  |  |
+| taskModelMap[].tier | string |  |  |
+| taskModelMap[].modelId | string (uuid) |  | (nullable) |
+| taskModelMap[].compatibilityPassed | boolean |  | Whether the provider's compatibility test passed for this task (AiProviderCompatibility, CHG-FUP-008); a task that has not passed stays on the TICVAI-managed model. (nullable) |
+| reason | string |  | (max length 1000) |
+| platformStaffGrantId | string (uuid) |  | The open platform-staff grant the change was made under (audit R098). (read-only) |
+| decidedByPrincipalId | string (uuid) |  | (read-only) |
+| decidedAt | string (date-time) |  | (read-only) |
+| scopePath | string |  | The partition key (ADR-0005). (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Whether a tenant may bring its own key |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### getAiPolicy
 
@@ -627,6 +790,11 @@ Providers, models and policy
 | allowedRoleIds | array of string (uuid) |  |  |
 | maskedFields | array of string |  | Redacted before a prompt leaves the platform (8.3.73). |
 | requiresApprovalFor | array of enum (pricing, promotion, operational, financial, configuration) |  | 8.3.61–8.3.64. |
+| scrubbing | object |  | Mandatory offline PII scrubbing and moderation on every LLM call (Chinmay, 2 October: "we may need to scrub personal info no matter what"; ADR-0020 amended; CHG-CSA-003). (read-only) |
+| scrubbing.mode | enum (mandatory) |  |  |
+| scrubbing.recognisers | array of string |  | The recogniser set in force, e.g. |
+| scrubbing.reversibleTokens | boolean |  | Always true; the placeholder map stays in the cell. |
+| scrubbing.guardModel | string |  | The input and output guard model in force, e.g. |
 | monthlyTokenCeiling | integer |  | (nullable) |
 | ceilingBehaviour | enum (warn, warnThenDisable, block) |  | Decided 17 August: warn, and let the venue manager choose. (default warn) |
 | ceilingBehaviourByCapability | array of object |  | Ceiling behaviour per capability (AI design 5.9, AIC-227), so a budget never silently disables fraud scoring, which spends no tokens, or a critical capability. |
@@ -670,11 +838,41 @@ Providers, models and policy
 | 200 |  | Policy |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
+### listAiProviders
+
+**`GET /providers`**: Configured providers and their order
+
+8.4.21–8.4.26. OpenAI, Gemini, Claude and a local model, several at once, with failover.
+**Order is configuration, not code.** A capability names what it needs — a model that reasons, a model that embeds — and the platform resolves which provider serves it. That is what makes "no provider SDK in capability code" enforceable rather than aspirational.
+**Per tenant** (decided 28 September, audit R203; ADR-0009). Platform staff read and set a tenant's providers on ADM-037, acting inside the tenant under a platform-staff grant (audit R098); the tenant's own staff read them with `AI_CONFIGURE`. Each row carries `residency`, which the tenant's region may restrict (`tenancy.RegionSettings.allowedAiResidencies`). ADM-037 finds that region from `subscription.Tenant.regionId` and reads it with `tenancy.getRegionSettings`.
+
+|  |  |
+|---|---|
+| Permission | `AI_CONFIGURE` |
+| Scope level | tenant |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Config scope | tenant |
+| Conflict policy | serverWins |
+| Read routing | replica |
+| Reads | `ai.provider` |
+| Writes | - |
+| Called by | ADM-037 |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Providers |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
 ### setAiByokEnablement
 
 **`PUT /tenants/{tenantId}/byok`**: Enable or disable bring-your-own-key for a tenant (platform)
 
 **TICVAI decides, per tenant** (decided 29 September; design 8 on 5.9). BYOK is an override, not tenant self-service: `PLATFORM_AI_MANAGE` from the platform token, and an open platform-staff grant into the tenant (`openPlatformStaffGrant`, audit R098), without which it refuses `403 platform-grant-required`. Once enabled, the tenant's key is set per task or for everything through `setAiProvider` (`managedBy: tenant`) and `setAiCredential`; the tenant then pays the provider directly and TICVAI meters for visibility only. Disabling does not delete the tenant's providers; `setAiProvider` stops accepting new ones and the gateway routes back to TICVAI-managed models.
+**The models are mapped, not chosen** (Chinmay, 2 October, workbook Q1; CHG-CSA-001): once enabled, each task the key serves runs on that provider's equivalent from TICVAI's curated range (`AiByokEnablement.taskModelMap`), billed to the tenant's key. BYOK fits the `globalAllowed` residency class only (CHG-CSA-002).
 
 |  |  |
 |---|---|
@@ -705,6 +903,11 @@ Providers, models and policy
 | enabled | boolean | yes |  |
 | coverage | enum (perTask, allTasks) |  | Whether the tenant may supply a key per task or one key for everything. (default perTask) |
 | allowedTasks | array of string |  | Where coverage is perTask: the gateway tasks a tenant key may serve. |
+| taskModelMap | array of object |  | The provider's equivalent model for each task, chosen by TICVAI (Chinmay, 2 October, workbook Q1; closes AI-D20; CHG-CSA-001). (read-only) |
+| taskModelMap[].taskKey | string |  |  |
+| taskModelMap[].tier | string |  |  |
+| taskModelMap[].modelId | string (uuid) |  | (nullable) |
+| taskModelMap[].compatibilityPassed | boolean |  | Whether the provider's compatibility test passed for this task (AiProviderCompatibility, CHG-FUP-008); a task that has not passed stays on the TICVAI-managed model. (nullable) |
 | reason | string |  | (max length 1000) |
 | platformStaffGrantId | string (uuid) |  | The open platform-staff grant the change was made under (audit R098). (read-only) |
 | decidedByPrincipalId | string (uuid) |  | (read-only) |
@@ -720,6 +923,11 @@ Providers, models and policy
 | enabled | boolean | yes |  |
 | coverage | enum (perTask, allTasks) |  | Whether the tenant may supply a key per task or one key for everything. (default perTask) |
 | allowedTasks | array of string |  | Where coverage is perTask: the gateway tasks a tenant key may serve. |
+| taskModelMap | array of object |  | The provider's equivalent model for each task, chosen by TICVAI (Chinmay, 2 October, workbook Q1; closes AI-D20; CHG-CSA-001). (read-only) |
+| taskModelMap[].taskKey | string |  |  |
+| taskModelMap[].tier | string |  |  |
+| taskModelMap[].modelId | string (uuid) |  | (nullable) |
+| taskModelMap[].compatibilityPassed | boolean |  | Whether the provider's compatibility test passed for this task (AiProviderCompatibility, CHG-FUP-008); a task that has not passed stays on the TICVAI-managed model. (nullable) |
 | reason | string |  | (max length 1000) |
 | platformStaffGrantId | string (uuid) |  | The open platform-staff grant the change was made under (audit R098). (read-only) |
 | decidedByPrincipalId | string (uuid) |  | (read-only) |
@@ -775,6 +983,11 @@ Masking is the part to get right. `maskedFields` names what is redacted before a
 | allowedRoleIds | array of string (uuid) |  |  |
 | maskedFields | array of string |  | Redacted before a prompt leaves the platform (8.3.73). |
 | requiresApprovalFor | array of enum (pricing, promotion, operational, financial, configuration) |  | 8.3.61–8.3.64. |
+| scrubbing | object |  | Mandatory offline PII scrubbing and moderation on every LLM call (Chinmay, 2 October: "we may need to scrub personal info no matter what"; ADR-0020 amended; CHG-CSA-003). (read-only) |
+| scrubbing.mode | enum (mandatory) |  |  |
+| scrubbing.recognisers | array of string |  | The recogniser set in force, e.g. |
+| scrubbing.reversibleTokens | boolean |  | Always true; the placeholder map stays in the cell. |
+| scrubbing.guardModel | string |  | The input and output guard model in force, e.g. |
 | monthlyTokenCeiling | integer |  | (nullable) |
 | ceilingBehaviour | enum (warn, warnThenDisable, block) |  | Decided 17 August: warn, and let the venue manager choose. (default warn) |
 | ceilingBehaviourByCapability | array of object |  | Ceiling behaviour per capability (AI design 5.9, AIC-227), so a budget never silently disables fraud scoring, which spends no tokens, or a critical capability. |
@@ -822,6 +1035,11 @@ Masking is the part to get right. `maskedFields` names what is redacted before a
 | allowedRoleIds | array of string (uuid) |  |  |
 | maskedFields | array of string |  | Redacted before a prompt leaves the platform (8.3.73). |
 | requiresApprovalFor | array of enum (pricing, promotion, operational, financial, configuration) |  | 8.3.61–8.3.64. |
+| scrubbing | object |  | Mandatory offline PII scrubbing and moderation on every LLM call (Chinmay, 2 October: "we may need to scrub personal info no matter what"; ADR-0020 amended; CHG-CSA-003). (read-only) |
+| scrubbing.mode | enum (mandatory) |  |  |
+| scrubbing.recognisers | array of string |  | The recogniser set in force, e.g. |
+| scrubbing.reversibleTokens | boolean |  | Always true; the placeholder map stays in the cell. |
+| scrubbing.guardModel | string |  | The input and output guard model in force, e.g. |
 | monthlyTokenCeiling | integer |  | (nullable) |
 | ceilingBehaviour | enum (warn, warnThenDisable, block) |  | Decided 17 August: warn, and let the venue manager choose. (default warn) |
 | ceilingBehaviourByCapability | array of object |  | Ceiling behaviour per capability (AI design 5.9, AIC-227), so a budget never silently disables fraud scoring, which spends no tokens, or a critical capability. |
@@ -864,109 +1082,6 @@ Masking is the part to get right. `maskedFields` names what is redacted before a
 |---|---|---|
 | 200 |  | Set — the row at scopePath existed and is replaced |
 | 201 |  | Set — this created the row at scopePath |
-| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
-
-### setAiProvider
-
-**`PUT /providers`**: Configure a provider
-
-**Per tenant, with a compliance gate (decided 28 September, audit R203), as ADR-0009 says.** Inference is a data transfer: a prompt containing guest data leaves the jurisdiction the moment it reaches a provider hosted elsewhere. So **platform staff set a tenant's provider on ADM-037**, and **a region may restrict the choice**: a provider whose `residency` is not in the allowed residencies of the tenant's home region (`subscription.Tenant.regionId`, read through `tenancy.getRegionSettings` as `RegionSettings.allowedAiResidencies`; empty means no restriction) is refused with 409 `residency-refused`, which is the gate.
-**How the permission is honoured in the tenant's cell** (decided 28 September, audit R203). `PLATFORM_TENANT_MANAGE` is a platform permission: it is read from the operator's platform token, never from a platform-staff grant, which refuses `PLATFORM_*` values. The cell additionally requires the operator to have a grant into this tenant open (`openPlatformStaffGrant`, audit R098), so the change is audited against that grant (`AuditRecord.platformStaffGrantId`); without one it refuses `403 platform-grant-required`. A tenant's own staff cannot set a provider, whatever they hold.
-Credentials are a key-vault reference, never the key.
-**What the PUT does.** The body is one whole provider configuration, matched on `id`. With an `id`, it replaces that provider's configuration in full — a field left out takes its default or null, not its old value — and returns 200; an `id` that names no provider at the caller's scope is a 404. Without an `id`, it creates a provider and returns 201 with the new id. The other providers are never touched: this is not a replace-the-list call.
-**Who pays, and bring-your-own-key** (AI design 5.9, decided 29 September). `managedBy: ticvai` is the default: TICVAI-managed Azure OpenAI in UAE North, metered per tenant and re-billed per token. `managedBy: tenant` is bring-your-own-key, which **TICVAI enables per tenant** with `setAiByokEnablement` (`PLATFORM_AI_MANAGE`); until it is enabled, a tenant-managed provider is refused with 409 `byok-not-enabled`, and a task outside `AiByokEnablement.allowedTasks` likewise. `modelId` names the model in the catalogue (`listAiModels`) the provider serves.
-**Per agent task, and checked for fitness** (21 September minutes, M21-03 and M21-09). `taskKeys` binds the provider to named agent tasks; the response carries `fitnessWarnings` where the model scores outside a task's band in `AiModel.taskFitness` (underpowered, overpowered or never scored). A warning is shown and kept; it never refuses the write.
-
-|  |  |
-|---|---|
-| Permission | `PLATFORM_TENANT_MANAGE` |
-| Scope level | tenant |
-| Part of slice | setup, makes `ai.provider` non-empty |
-| Wave | 1 |
-| Offline | no |
-| Config scope | tenant |
-| Conflict policy | serverWins |
-| Reads | `ai.byok_enablement`, `ai.model`, `ai.provider`, `cache:idempotency` |
-| Writes | `ai.provider`, `cache:idempotency` |
-| Called by | ADM-037 |
-
-**Parameters**
-
-| Name | In | Required | Type | Notes |
-|---|---|---|---|---|
-| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
-
-**Request body**: `AiProvider`
-
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| id | string (uuid) |  | Assigned on create. |
-| kind | AiProviderKind: enum (openai, gemini, anthropic, azureOpenai, localLlm, openaiCompatible) | yes | openaiCompatible (added 29 September, AI design 3.3): a customer endpoint that speaks the OpenAI API, taken with no custom development (AIC-009). |
-| capability | AiCapability: enum (chat, embedding, vision, rerank, speechToText, textToSpeech) | yes | What a capability needs, not which provider serves it. |
-| model | string |  |  |
-| failoverProviderId | string (uuid) |  | BL-151. (nullable) |
-| degradeGracefully | boolean |  | Where no fallback answers, the surface degrades rather than errors. (default True) |
-| priority | integer | yes | Failover order (8.4.26). |
-| scopeLevel | enum (platform, tenant, venue) |  | Where this provider configuration applies, and therefore whose token pays for it. |
-| scopePath | string |  | Resolved scope node. |
-| tenantId | string (uuid) |  | Null only where scopeLevel is platform. (nullable) |
-| credentialRef | string |  | A key-vault reference, never the key. |
-| credentialRotatedAt | string (date-time) |  | (read-only; nullable) |
-| credentialExpiresAt | string (date-time) |  | Where the provider issues expiring keys. (nullable) |
-| lastVerifiedAt | string (date-time) |  | When testAiProvider last confirmed the key works. (read-only; nullable) |
-| endpoint | string |  | (nullable) |
-| residency | string |  | Where inference physically happens. |
-| maxTokens | integer |  |  |
-| isActive | boolean | yes |  |
-| managedBy | enum (ticvai, tenant) |  | Who holds the provider account, and so who pays (AI design 5.9, decided 29 September). (default ticvai) |
-| modelId | string (uuid) |  | The model in the catalogue (listAiModels) this provider serves. (nullable) |
-| taskKeys | array of string |  | Which agent tasks this provider serves (21 September minutes, M21-03: different agents may use different models chosen for the task). |
-| fitnessWarnings | array of object |  | The model-fitness check at the last write (21 September minutes, M21-09). (read-only) |
-| fitnessWarnings[].taskKey | string |  |  |
-| fitnessWarnings[].score | number |  | (nullable) |
-| fitnessWarnings[].floor | number |  |  |
-| fitnessWarnings[].direction | enum (underpowered, overpowered, unscored) |  |  |
-
-**Response**: `AiProvider`
-
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| id | string (uuid) |  | Assigned on create. |
-| kind | AiProviderKind: enum (openai, gemini, anthropic, azureOpenai, localLlm, openaiCompatible) | yes | openaiCompatible (added 29 September, AI design 3.3): a customer endpoint that speaks the OpenAI API, taken with no custom development (AIC-009). |
-| capability | AiCapability: enum (chat, embedding, vision, rerank, speechToText, textToSpeech) | yes | What a capability needs, not which provider serves it. |
-| model | string |  |  |
-| failoverProviderId | string (uuid) |  | BL-151. (nullable) |
-| degradeGracefully | boolean |  | Where no fallback answers, the surface degrades rather than errors. (default True) |
-| priority | integer | yes | Failover order (8.4.26). |
-| scopeLevel | enum (platform, tenant, venue) |  | Where this provider configuration applies, and therefore whose token pays for it. |
-| scopePath | string |  | Resolved scope node. |
-| tenantId | string (uuid) |  | Null only where scopeLevel is platform. (nullable) |
-| credentialRef | string |  | A key-vault reference, never the key. |
-| credentialRotatedAt | string (date-time) |  | (read-only; nullable) |
-| credentialExpiresAt | string (date-time) |  | Where the provider issues expiring keys. (nullable) |
-| lastVerifiedAt | string (date-time) |  | When testAiProvider last confirmed the key works. (read-only; nullable) |
-| endpoint | string |  | (nullable) |
-| residency | string |  | Where inference physically happens. |
-| maxTokens | integer |  |  |
-| isActive | boolean | yes |  |
-| managedBy | enum (ticvai, tenant) |  | Who holds the provider account, and so who pays (AI design 5.9, decided 29 September). (default ticvai) |
-| modelId | string (uuid) |  | The model in the catalogue (listAiModels) this provider serves. (nullable) |
-| taskKeys | array of string |  | Which agent tasks this provider serves (21 September minutes, M21-03: different agents may use different models chosen for the task). |
-| fitnessWarnings | array of object |  | The model-fitness check at the last write (21 September minutes, M21-09). (read-only) |
-| fitnessWarnings[].taskKey | string |  |  |
-| fitnessWarnings[].score | number |  | (nullable) |
-| fitnessWarnings[].floor | number |  |  |
-| fitnessWarnings[].direction | enum (underpowered, overpowered, unscored) |  |  |
-
-**Responses**
-
-| Code | Shape | Meaning |
-|---|---|---|
-| 200 |  | Configured — an existing provider, named by id, replaced |
-| 201 |  | Created — the body carried no id |
-| 403 |  | The caller lacks PLATFORM_TENANT_MANAGE on their platform token, or has no platform-staff grant into this tenant open (platform-grant-required, audit R203). |
-| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
-| 409 |  | The provider's residency is not in the tenant's region's allowedAiResidencies (residency-refused, audit R203), or it is tenant-managed (managedBy is tenant) and bring-your-own-key is not enabled for… |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
@@ -1254,7 +1369,7 @@ Forecasting and operational requirements (design C8)
 | Read routing | replica |
 | Reads | `ai.venue_settings` |
 | Writes | - |
-| Called by | ADM-489, ANL-071 |
+| Called by | ADM-489, ANL-071, BO-927 |
 
 **Parameters**
 
@@ -1294,6 +1409,148 @@ Forecasting and operational requirements (design C8)
 |---|---|---|
 | 200 |  | The venue AI settings. |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
+### getForecast
+
+**`GET /forecasts`**: Forecast values
+
+**The published forecast, one page of points** (design 2.2 C, 5.6): 10th, 50th and 90th percentile per period and breakdown, with drivers. Without `versionId`, the latest published version of the definition. `basis` says whether rules, statistics or a model produced it, and `stale` is set 36 hours after the last publication (design 3.7). BI reads published versions here rather than forecasting on its own (design 5.2).
+
+|  |  |
+|---|---|
+| Permission | `AI_USE` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | replica |
+| Reads | `ai.forecast_definition`, `ai.forecast_point`, `ai.forecast_version` |
+| Writes | - |
+| Called by | ADM-499, ADM-502, ADM-503, ADM-504, ADM-505, ADM-506, ADM-507, ADM-509, ADM-510, ADM-511, ADM-512, ADM-513, ADM-514, ADM-515, ADM-516, ANL-008, ANL-057, BO-919, BO-926, BO-927 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| definitionKey | query | yes | string |  |
+| versionId | query |  | string (uuid) |  |
+| from | query |  | string (date-time) |  |
+| to | query |  | string (date-time) |  |
+| dimensionKey | query |  | string | A canonical breakdown key, e.g. |
+| scenarioId | query |  | string (uuid) |  |
+| pageSize | query |  | integer |  |
+| cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
+
+**Response**: `object`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| items | array of AiForecastPoint | yes |  |
+| items[].id | string (uuid) |  | (read-only) |
+| items[].versionId | string (uuid) | yes |  |
+| items[].scenarioId | string (uuid) |  | Set where the point belongs to a what-if scenario rather than the version itself. (nullable) |
+| items[].targetStart | string (date-time) | yes |  |
+| items[].targetEnd | string (date-time) |  |  |
+| items[].dimensionKey | string |  | Canonical key of the breakdown, e.g. (nullable) |
+| items[].p10 | number |  | (nullable) |
+| items[].p50 | number | yes |  |
+| items[].p90 | number |  | (nullable) |
+| items[].unit | string |  |  |
+| items[].drivers | object |  | Component decomposition or SHAP contributions, largest first (ADM-506). (nullable) |
+| items[].scopePath | string |  | The partition key (ADR-0005). (read-only) |
+| nextCursor | string |  |  |
+| hasMore | boolean | yes |  |
+| version | AiForecastVersion |  | An immutable forecast version (AIP-032): producer, model version, data cut-off, horizon and status. |
+| version.id | string (uuid) |  | (read-only) |
+| version.definitionId | string (uuid) | yes |  |
+| version.versionNumber | integer | yes | (min 1) |
+| version.module | object |  | The module of the version's definition (AiForecastDefinition.module), copied when the version is produced; the module whose AI publish permission publishForecastVersion requires (CHG-FUP-004). (read-only) |
+| version.status | enum (running, draft, awaitingApproval, published, superseded, rejected, failed) | yes | (read-only) |
+| version.basis | SuggestionBasis: enum (heuristic, statistical, model, hybrid, manual) | yes | How the answer was reached, and this is the field the whole design exists for. |
+| version.maturity | AiMaturity |  | Where an answer stands, on every answer (29 September, AI functions review; baseline then learn). |
+| version.maturity.stage | enum (starting, learning, established, learned) | yes | starting: the baseline (venue AI settings, the starting pattern for the venue type, the UAE calendar, weather). |
+| version.maturity.basedOn | string | yes | The "Based on" line, in words, e.g. |
+| version.maturity.sources | array of object |  |  |
+| version.maturity.ownDataShare | number |  | The weight own data carries, n / (k + n). (min 0; max 1) |
+| version.maturity.limitedHistory | boolean |  |  |
+| version.maturity.nextStage | object |  | What the next stage needs, e.g. (nullable) |
+| version.producerRef | string |  |  |
+| version.modelVersion | string |  | (nullable) |
+| version.dataCutoffAt | string (date-time) |  | The analytical replica watermark the snapshot was taken at. |
+| version.horizonStart | string (date-time) |  |  |
+| version.horizonEnd | string (date-time) |  |  |
+| version.qualityChecks | object |  | Each gate and whether it passed. (read-only) |
+| version.publishedByPrincipalId | string (uuid) |  | Null where the definition auto-published. (read-only; nullable) |
+| version.publishedAt | string (date-time) |  | (read-only; nullable) |
+| version.decisionRecordId | string (uuid) |  | (read-only; nullable) |
+| version.createdAt | string (date-time) |  | (read-only) |
+| version.scopePath | string |  | The partition key (ADR-0005). (read-only) |
+| stale | boolean |  |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Forecast values |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
+### getForecastAccuracy
+
+**`GET /forecast-accuracy`**: Measured forecast accuracy
+
+**Accuracy by horizon, labelled measured** (AIP-044, design 5.6; ADM-506, ADM-508): WAPE, bias and interval coverage against the baseline rule, per producer. These are the figures the promotion gate reads.
+
+|  |  |
+|---|---|
+| Permission | `AI_USE` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | analytical |
+| Reads | `ai.forecast_accuracy` |
+| Writes | - |
+| Called by | ADM-506, ADM-508 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| definitionKey | query | yes | string |  |
+| horizonDays | query |  | integer |  |
+| from | query |  | string (date-time) |  |
+| pageSize | query |  | integer |  |
+| cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
+
+**Response**: `object`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| items | array of AiForecastAccuracy | yes |  |
+| items[].id | string (uuid) |  | (read-only) |
+| items[].definitionId | string (uuid) | yes |  |
+| items[].versionId | string (uuid) |  | (nullable) |
+| items[].producerRef | string |  |  |
+| items[].horizonDays | integer | yes | (min 0) |
+| items[].periodStart | string (date-time) | yes |  |
+| items[].periodEnd | string (date-time) |  |  |
+| items[].wape | number |  | (nullable) |
+| items[].bias | number |  | (nullable) |
+| items[].intervalCoverage | number |  | Share of actuals inside the 10th-90th percentile band. (min 0; max 1; nullable) |
+| items[].baselineWape | number |  | (nullable) |
+| items[].measuredAt | string (date-time) |  | (read-only) |
+| items[].scopePath | string |  | The partition key (ADR-0005). (read-only) |
+| nextCursor | string |  |  |
+| hasMore | boolean | yes |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Measured forecast accuracy |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### getVenueHistoryImport
@@ -1429,6 +1686,136 @@ The job's status, rows read, loaded and rejected, and each finding (a bad date, 
 | 422 |  | The mapping names no date or no measure column, or the asset is not a CSV or spreadsheet (history-mapping-invalid). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
+### listForecastVersions
+
+**`GET /forecast-versions`**: Forecast versions
+
+Immutable versions (AIP-032) with basis, producer, data cut-off, quality checks and status (ADM-508).
+
+|  |  |
+|---|---|
+| Permission | `AI_USE` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | replica |
+| Reads | `ai.forecast_version` |
+| Writes | - |
+| Called by | ADM-506, ADM-508 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| definitionKey | query |  | string |  |
+| status | query |  | enum (running, draft, awaitingApproval, published, superseded, rejected, failed) |  |
+| pageSize | query |  | integer |  |
+| cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
+
+**Response**: `object`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| items | array of AiForecastVersion | yes |  |
+| items[].id | string (uuid) |  | (read-only) |
+| items[].definitionId | string (uuid) | yes |  |
+| items[].versionNumber | integer | yes | (min 1) |
+| items[].module | object |  | The module of the version's definition (AiForecastDefinition.module), copied when the version is produced; the module whose AI publish permission publishForecastVersion requires (CHG-FUP-004). (read-only) |
+| items[].status | enum (running, draft, awaitingApproval, published, superseded, rejected, failed) | yes | (read-only) |
+| items[].basis | SuggestionBasis: enum (heuristic, statistical, model, hybrid, manual) | yes | How the answer was reached, and this is the field the whole design exists for. |
+| items[].maturity | AiMaturity |  | Where an answer stands, on every answer (29 September, AI functions review; baseline then learn). |
+| items[].maturity.stage | enum (starting, learning, established, learned) | yes | starting: the baseline (venue AI settings, the starting pattern for the venue type, the UAE calendar, weather). |
+| items[].maturity.basedOn | string | yes | The "Based on" line, in words, e.g. |
+| items[].maturity.sources | array of object |  |  |
+| items[].maturity.ownDataShare | number |  | The weight own data carries, n / (k + n). (min 0; max 1) |
+| items[].maturity.limitedHistory | boolean |  |  |
+| items[].maturity.nextStage | object |  | What the next stage needs, e.g. (nullable) |
+| items[].producerRef | string |  |  |
+| items[].modelVersion | string |  | (nullable) |
+| items[].dataCutoffAt | string (date-time) |  | The analytical replica watermark the snapshot was taken at. |
+| items[].horizonStart | string (date-time) |  |  |
+| items[].horizonEnd | string (date-time) |  |  |
+| items[].qualityChecks | object |  | Each gate and whether it passed. (read-only) |
+| items[].publishedByPrincipalId | string (uuid) |  | Null where the definition auto-published. (read-only; nullable) |
+| items[].publishedAt | string (date-time) |  | (read-only; nullable) |
+| items[].decisionRecordId | string (uuid) |  | (read-only; nullable) |
+| items[].createdAt | string (date-time) |  | (read-only) |
+| items[].scopePath | string |  | The partition key (ADR-0005). (read-only) |
+| nextCursor | string |  |  |
+| hasMore | boolean | yes |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Forecast versions |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
+### listOperationalRequirements
+
+**`GET /operational-requirements`**: Requirements derived from the forecast
+
+**Staff, POS, gates, F&B, stock and resources** derived from a published version with the tenant's productivity standards (design 2.2 C step 6, AIP-067; ADM-509..518, BO-919, BO-925..927).
+
+|  |  |
+|---|---|
+| Permission | `AI_USE` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | replica |
+| Reads | `ai.forecast_version`, `ai.operational_requirement` |
+| Writes | - |
+| Called by | ADM-509, ADM-510, ADM-511, ADM-512, ADM-513, ADM-514, ADM-515, ADM-516, ADM-517, ADM-518, BO-919, BO-925, BO-926, BO-927 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| kind | query |  | enum (staff, pos, kiosk, gates, fnb, retail, stock, resource, …) |  |
+| status | query |  | enum (issued, accepted, modified, rejected, handedOver, expired) |  |
+| from | query |  | string (date-time) |  |
+| to | query |  | string (date-time) |  |
+| versionId | query |  | string (uuid) |  |
+| pageSize | query |  | integer |  |
+| cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
+
+**Response**: `object`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| items | array of AiOperationalRequirement | yes |  |
+| items[].id | string (uuid) |  | (read-only) |
+| items[].versionId | string (uuid) | yes |  |
+| items[].kind | enum (staff, pos, kiosk, gates, fnb, retail, stock, resource, …) | yes |  |
+| items[].targetContract | string |  | The owning module that applies it: workforce, fnb, inventory, resources, access. |
+| items[].subjectRef | string |  | A role, outlet, gate, item or resource type. (nullable) |
+| items[].periodStart | string (date-time) | yes |  |
+| items[].periodEnd | string (date-time) |  |  |
+| items[].quantity | number | yes |  |
+| items[].quantityP90 | number |  | The requirement at the forecast's 90th percentile, for planning to the busy case. (nullable) |
+| items[].unit | string |  |  |
+| items[].productivityStandard | object |  | The standard used, e.g. (nullable) |
+| items[].status | enum (issued, accepted, modified, rejected, handedOver, expired) |  | (read-only) |
+| items[].decidedByPrincipalId | string (uuid) |  | (read-only; nullable) |
+| items[].decidedAt | string (date-time) |  | (read-only; nullable) |
+| items[].decisionNote | string |  | (nullable) |
+| items[].handoverRef | string |  | The owning module's record once handed over. (read-only; nullable) |
+| items[].scopePath | string |  | The partition key (ADR-0005). (read-only) |
+| nextCursor | string |  |  |
+| hasMore | boolean | yes |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Requirements derived from the forecast |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
 ### listVenueHistoryImports
 
 **`GET /venues/{venueId}/history-imports`**: The venue's history imports
@@ -1498,10 +1885,11 @@ Imports of the venue's own history, newest first, with the months each covered a
 **`POST /forecast-versions/{versionId}/publish`**: Publish a forecast version
 
 **Forecast publication where it is not automatic** (autonomy L3, design 3.8; ADM-508). The quality gates must pass (completeness, no blocking signal missing, no accuracy regression). The previous published version is superseded; operational requirements are derived from the new one. Emits `ai.forecastPublished`.
+**Who publishes: the holder of the module's AI publish permission, no default role** (Chinmay, 2 October, workbook Q3 and Q7; contract follow-ups: "replacing AI_APPROVE for model publishing"). The caller needs `AI_USE`, which reads forecasts, and the `<MODULE>_AI_PUBLISH` of the version's `module` (`x-ticvai-permission-by-module`; `contracts/shared/permissions.yaml` `x-ticvai-module-ai-publish`), held at the version's scope. Without it the call is refused `403 module-ai-publish-required`. `AI_APPROVE` no longer publishes a forecast; the switch is a logged breaking change against r1 (BC-006, CHG-FUP-004).
 
 |  |  |
 |---|---|
-| Permission | `AI_APPROVE` |
+| Permission | `AI_USE` |
 | Scope level | venue |
 | Part of slice | setup, makes `ai.forecast_version`, `ai.operational_requirement` non-empty |
 | Wave | 1 |
@@ -1532,6 +1920,7 @@ Imports of the venue's own history, newest first, with the months each covered a
 | id | string (uuid) |  | (read-only) |
 | definitionId | string (uuid) | yes |  |
 | versionNumber | integer | yes | (min 1) |
+| module | object |  | The module of the version's definition (AiForecastDefinition.module), copied when the version is produced; the module whose AI publish permission publishForecastVersion requires (CHG-FUP-004). (read-only) |
 | status | enum (running, draft, awaitingApproval, published, superseded, rejected, failed) | yes | (read-only) |
 | basis | SuggestionBasis: enum (heuristic, statistical, model, hybrid, manual) | yes | How the answer was reached, and this is the field the whole design exists for. |
 | maturity | AiMaturity |  | Where an answer stands, on every answer (29 September, AI functions review; baseline then learn). |
@@ -1565,7 +1954,8 @@ Imports of the venue's own history, newest first, with the months each covered a
 |---|---|---|
 | 200 |  | Publish a forecast version |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
-| 409 |  | Not publishable: a quality gate failed (quality-gate-failed) or the version is not the latest draft (version-not-current). |
+| 403 |  | The caller does not hold the AI publish permission of the version's module at its scope (module-ai-publish-required, CHG-FUP-004). |
+| 409 |  | Not publishable: a quality gate failed (quality-gate-failed), the version is not the latest draft (version-not-current), or its definition names no module and none follows from its subject (module-re… |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### runForecast
@@ -1600,6 +1990,7 @@ Outside the nightly run (design 2.2 C): snapshot, produce, reconcile, score. Ret
 | id | string (uuid) |  | (read-only) |
 | definitionId | string (uuid) | yes |  |
 | versionNumber | integer | yes | (min 1) |
+| module | object |  | The module of the version's definition (AiForecastDefinition.module), copied when the version is produced; the module whose AI publish permission publishForecastVersion requires (CHG-FUP-004). (read-only) |
 | status | enum (running, draft, awaitingApproval, published, superseded, rejected, failed) | yes | (read-only) |
 | basis | SuggestionBasis: enum (heuristic, statistical, model, hybrid, manual) | yes | How the answer was reached, and this is the field the whole design exists for. |
 | maturity | AiMaturity |  | Where an answer stands, on every answer (29 September, AI functions review; baseline then learn). |
@@ -1653,7 +2044,7 @@ Outside the nightly run (design 2.2 C): snapshot, produce, reconcile, score. Ret
 | Conflict policy | serverWins |
 | Reads | `ai.venue_settings`, `cache:idempotency` |
 | Writes | `ai.venue_settings`, `cache:idempotency` |
-| Called by | ADM-489, ANL-071 |
+| Called by | ADM-471, ADM-489, ANL-071, BO-927 |
 
 **Parameters**
 
@@ -1720,6 +2111,101 @@ Outside the nightly run (design 2.2 C): snapshot, produce, reconcile, score. Ret
 |---|---|---|
 | 200 |  | Set |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
+### setForecastDefinition
+
+**`PUT /forecast-definitions/{definitionKey}`**: Define a forecast
+
+**What to forecast, at what grain, for what horizon, how often** (ADM-500, ADM-501). `producer` can be set to `rule`, `statistical` or `ensemble` here; a `model` producer arrives only through `promoteAiRelease` (design 3.12). Matched on `definitionKey`: replaces (200) or creates (201).
+**Cold start and history window** (18 September minutes M18-16; 29 September AI functions review): `historyWindowMonths` (default 36) and `coldStart` decide what the forecast stands on before the venue has history, so a new venue gets a forecast with a wide range on day one rather than nothing.
+
+|  |  |
+|---|---|
+| Permission | `AI_CONFIGURE` |
+| Scope level | venue |
+| Part of slice | setup, makes `ai.forecast_definition` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Config scope | venue |
+| Conflict policy | serverWins |
+| Reads | `ai.forecast_definition`, `cache:idempotency` |
+| Writes | `ai.forecast_definition`, `cache:idempotency` |
+| Called by | ADM-500, ADM-501 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| definitionKey | path | yes | string |  |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
+
+**Request body**: `AiForecastDefinition`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) |  | (read-only) |
+| definitionKey | string | yes |  |
+| name | string |  |  |
+| subject | enum (attendance, arrivalPattern, productDemand, timeslotDemand, channelPace, revenue, occupancy, attractionUtilisation, …) | yes |  |
+| module | object |  | Whose AI this forecast is, and so who publishes it (Chinmay, 2 October, workbook Q3: "the permission holder for that module's AI"; CHG-FUP-004). |
+| grain | enum (hour, day, week, month) | yes |  |
+| dimensions | array of string |  | Breakdowns forecast directly or reconciled to. |
+| segmentIds | array of string (uuid) |  | The marketing-crm segments customerSegment breaks down by, in priority order where a guest is in several. |
+| horizonDays | integer | yes | (min 1; max 730) |
+| refreshCadence | enum (hourly, daily, weekly) |  |  |
+| producer | enum (rule, statistical, model, ensemble) | yes | Which producer is live (design 3.10). |
+| historyWindowMonths | integer |  | How much of the venue's own history the statistical producer reads (18 September minutes, M18-16: "36 months of history"). (min 1; max 60; default 36) |
+| coldStart | object |  | What the forecast stands on before the venue has history (29 September, AI functions review; forecasting book p.27 "New Venue / New Product Problem"). |
+| coldStart.strategy | enum (venueSettings, startingPattern, sisterVenue, categoryBaseline, importedHistory) |  | venueSettings uses the onboarding figures with the venue-type pattern; sisterVenue a venue of the same tenant; categoryBaseline a product category's own history; importedHistory means an import cover… (default venueSettings) |
+| coldStart.sisterVenueId | string (uuid) |  | For sisterVenue. (nullable) |
+| coldStart.priorWeightObservations | integer |  | k: how many own observations the prior is worth (4 same weekdays by default). (min 1; max 52; default 4) |
+| coldStart.startingBandPercent | integer |  | The width of the range while the prior carries most of the weight (about +/-40%). (min 5; max 80; default 40) |
+| producerRef | string |  | (read-only) |
+| shadowProducerRef | string |  | Runs alongside and is recorded, never shown (design 3.5). (read-only; nullable) |
+| autoPublish | boolean |  | Publish without approval when the quality gates pass (autonomy L4, design 3.8). (default False) |
+| qualityGates | object |  | Completeness, blocking signals and accuracy-regression thresholds a version must pass to publish. (nullable) |
+| signalKeys | array of string |  | Signal sources this definition may use (ADM-501). |
+| isActive | boolean |  | (default True) |
+| scopePath | string |  | The partition key (ADR-0005). (read-only) |
+
+**Response**: `AiForecastDefinition`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) |  | (read-only) |
+| definitionKey | string | yes |  |
+| name | string |  |  |
+| subject | enum (attendance, arrivalPattern, productDemand, timeslotDemand, channelPace, revenue, occupancy, attractionUtilisation, …) | yes |  |
+| module | object |  | Whose AI this forecast is, and so who publishes it (Chinmay, 2 October, workbook Q3: "the permission holder for that module's AI"; CHG-FUP-004). |
+| grain | enum (hour, day, week, month) | yes |  |
+| dimensions | array of string |  | Breakdowns forecast directly or reconciled to. |
+| segmentIds | array of string (uuid) |  | The marketing-crm segments customerSegment breaks down by, in priority order where a guest is in several. |
+| horizonDays | integer | yes | (min 1; max 730) |
+| refreshCadence | enum (hourly, daily, weekly) |  |  |
+| producer | enum (rule, statistical, model, ensemble) | yes | Which producer is live (design 3.10). |
+| historyWindowMonths | integer |  | How much of the venue's own history the statistical producer reads (18 September minutes, M18-16: "36 months of history"). (min 1; max 60; default 36) |
+| coldStart | object |  | What the forecast stands on before the venue has history (29 September, AI functions review; forecasting book p.27 "New Venue / New Product Problem"). |
+| coldStart.strategy | enum (venueSettings, startingPattern, sisterVenue, categoryBaseline, importedHistory) |  | venueSettings uses the onboarding figures with the venue-type pattern; sisterVenue a venue of the same tenant; categoryBaseline a product category's own history; importedHistory means an import cover… (default venueSettings) |
+| coldStart.sisterVenueId | string (uuid) |  | For sisterVenue. (nullable) |
+| coldStart.priorWeightObservations | integer |  | k: how many own observations the prior is worth (4 same weekdays by default). (min 1; max 52; default 4) |
+| coldStart.startingBandPercent | integer |  | The width of the range while the prior carries most of the weight (about +/-40%). (min 5; max 80; default 40) |
+| producerRef | string |  | (read-only) |
+| shadowProducerRef | string |  | Runs alongside and is recorded, never shown (design 3.5). (read-only; nullable) |
+| autoPublish | boolean |  | Publish without approval when the quality gates pass (autonomy L4, design 3.8). (default False) |
+| qualityGates | object |  | Completeness, blocking signals and accuracy-regression thresholds a version must pass to publish. (nullable) |
+| signalKeys | array of string |  | Signal sources this definition may use (ADM-501). |
+| isActive | boolean |  | (default True) |
+| scopePath | string |  | The partition key (ADR-0005). (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Define a forecast |
+| 201 |  | Created: the key had no definition |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 409 |  | A model producer was requested directly; models are promoted, not set (model-needs-promotion). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
@@ -1803,97 +2289,6 @@ Draft a configuration a person then reviews
 
 Logging, approval, explainability and cost
 
-### configureAiCapability
-
-**`PUT /governance/capabilities/{capabilityKey}`**: Register a capability, or change its owner, risk class or autonomy
-
-**`setAiCapability` in the design, renamed so the configuration-scope rules reach it** (tools/check-config-scope.py). Writes one registry entry (AIC-144, AIC-145; ADM-520..522). **Autonomy only tightens below the platform ceiling** (AIC-151): a level above `autonomyCeiling` is refused with 409 `autonomy-above-ceiling`, and a venue row cannot raise what the tenant row set. Autonomy is separate from user permission (AIC-154). The change is itself a governed decision and writes a decision record.
-
-**What the PUT does.** Matched on `capabilityKey`: replaces that entry in full (200), or creates it (201).
-
-|  |  |
-|---|---|
-| Permission | `AI_CONFIGURE` |
-| Scope level | tenant |
-| Part of slice | setup, makes `ai.capability` non-empty |
-| Wave | 1 |
-| Offline | no |
-| Config scope | tenant |
-| Conflict policy | serverWins |
-| Reads | `ai.capability`, `cache:idempotency` |
-| Writes | `ai.capability`, `ai.decision_record`, `cache:idempotency` |
-| Called by | ADM-520, ADM-521, ADM-522, ANL-060 |
-| State model | AI capability ([states/ai-capability.yaml](../../../states/ai-capability.yaml)): created as `active` |
-
-**Parameters**
-
-| Name | In | Required | Type | Notes |
-|---|---|---|---|---|
-| capabilityKey | path | yes | string |  |
-| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
-
-**Request body**: `AiCapabilityRegistration`
-
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| id | string (uuid) |  | (read-only) |
-| capabilityKey | string | yes | Stable key, unique per tenant: assistant.guest, forecast.attendance, risk.transaction, config.assistant, recommend.checkout. |
-| family | AiCapabilityFamily: enum (gatewayAndModels, governance, actionPipeline, knowledgeRetrieval, assistants, analyticsInsights, configurationAssistant, forecasting, …) | yes | The fourteen capabilities of the AI system design (section 1.1), C1 to C14 in order: gateway and model registry, governance decision point, action pipeline and human oversight, knowledge and retrieva… |
-| name | string |  |  |
-| description | string |  | (nullable) |
-| ownerPrincipalId | string (uuid) |  | The accountable business owner (AIC-144). (nullable) |
-| businessFunction | string |  | (nullable) |
-| riskClass | AiRiskClass: enum (low, medium, high, critical) | yes | Business, customer, financial, operational, security and compliance impact of a capability or action type (AIC-144, ADM-521). |
-| autonomyCeiling | object |  | The first-release ceiling for this capability (design 3.8 table). (read-only) |
-| autonomyLevel | object | yes | The level in force at this scope. |
-| dataCategories | array of string |  | Data categories the capability reads (ADM-524). |
-| lifecycle | object |  | Lifecycle per environment (AIC-145): a capability or model can be live in staging and still a draft in production. |
-| lifecycle.development | enum (draft, pilot, active, retired) |  |  |
-| lifecycle.staging | enum (draft, pilot, active, retired) |  |  |
-| lifecycle.production | enum (draft, pilot, active, retired) |  |  |
-| degradationMode | enum (rulesOnly, searchOnly, humanHandoff, hidden, failOpen, lastPublished) |  | What the capability does when its model or the service is unavailable (design 3.7, AIC-241). |
-| status | enum (active, paused) |  | Paused by pauseAiCapability: the capability answers from its degradation mode until resumed. (read-only) |
-| pausedReason | string |  | (read-only; nullable) |
-| pausedAt | string (date-time) |  | (read-only; nullable) |
-| updatedAt | string (date-time) |  | (read-only) |
-| scopePath | string |  | The partition key (ADR-0005). (read-only) |
-
-**Response**: `AiCapabilityRegistration`
-
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| id | string (uuid) |  | (read-only) |
-| capabilityKey | string | yes | Stable key, unique per tenant: assistant.guest, forecast.attendance, risk.transaction, config.assistant, recommend.checkout. |
-| family | AiCapabilityFamily: enum (gatewayAndModels, governance, actionPipeline, knowledgeRetrieval, assistants, analyticsInsights, configurationAssistant, forecasting, …) | yes | The fourteen capabilities of the AI system design (section 1.1), C1 to C14 in order: gateway and model registry, governance decision point, action pipeline and human oversight, knowledge and retrieva… |
-| name | string |  |  |
-| description | string |  | (nullable) |
-| ownerPrincipalId | string (uuid) |  | The accountable business owner (AIC-144). (nullable) |
-| businessFunction | string |  | (nullable) |
-| riskClass | AiRiskClass: enum (low, medium, high, critical) | yes | Business, customer, financial, operational, security and compliance impact of a capability or action type (AIC-144, ADM-521). |
-| autonomyCeiling | object |  | The first-release ceiling for this capability (design 3.8 table). (read-only) |
-| autonomyLevel | object | yes | The level in force at this scope. |
-| dataCategories | array of string |  | Data categories the capability reads (ADM-524). |
-| lifecycle | object |  | Lifecycle per environment (AIC-145): a capability or model can be live in staging and still a draft in production. |
-| lifecycle.development | enum (draft, pilot, active, retired) |  |  |
-| lifecycle.staging | enum (draft, pilot, active, retired) |  |  |
-| lifecycle.production | enum (draft, pilot, active, retired) |  |  |
-| degradationMode | enum (rulesOnly, searchOnly, humanHandoff, hidden, failOpen, lastPublished) |  | What the capability does when its model or the service is unavailable (design 3.7, AIC-241). |
-| status | enum (active, paused) |  | Paused by pauseAiCapability: the capability answers from its degradation mode until resumed. (read-only) |
-| pausedReason | string |  | (read-only; nullable) |
-| pausedAt | string (date-time) |  | (read-only; nullable) |
-| updatedAt | string (date-time) |  | (read-only) |
-| scopePath | string |  | The partition key (ADR-0005). (read-only) |
-
-**Responses**
-
-| Code | Shape | Meaning |
-|---|---|---|
-| 200 |  | Register a capability, or change its owner, risk class or autonomy |
-| 201 |  | Registered: the key had no entry |
-| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
-| 409 |  | The requested autonomyLevel is above the capability's autonomyCeiling (AIC-151). |
-| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
-
 ### createAiGovernancePolicyDraft
 
 **`POST /governance/policy-drafts`**: Draft a governance policy, or a new version of one
@@ -1904,7 +2299,7 @@ Logging, approval, explainability and cost
 |---|---|
 | Permission | `AI_CONFIGURE` |
 | Scope level | tenant |
-| Part of slice | setup, makes `ai.governance_policy_version` non-empty |
+| Part of slice | setup, makes `ai.governance_policy`, `ai.governance_policy_version` non-empty |
 | Wave | 2 |
 | Offline | no |
 | Config scope | tenant |
@@ -1980,75 +2375,6 @@ Logging, approval, explainability and cost
 | 201 |  | Draft a governance policy, or a new version of one |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
-### createAiPolicyException
-
-**`POST /governance/policy-exceptions`**: Grant a temporary exception to a governance policy
-
-**A legitimate exception, recorded, never a silent bypass** (AIC-162, ADM-526): an expiry, compensating controls and the approver, who is the caller. The effective policy shows it for as long as it is active.
-
-|  |  |
-|---|---|
-| Permission | `AI_APPROVE` |
-| Scope level | tenant |
-| Part of slice | setup, makes `ai.policy_exception` non-empty |
-| Wave | 1 |
-| Offline | no |
-| Config scope | tenant |
-| Conflict policy | serverWins |
-| Reads | `ai.governance_policy`, `ai.policy_exception`, `cache:idempotency` |
-| Writes | `ai.decision_record`, `ai.policy_exception`, `cache:idempotency` |
-| Called by | ADM-526 |
-| State model | AI policy exception ([states/ai-policy-exception.yaml](../../../states/ai-policy-exception.yaml)): created as `active` |
-
-**Parameters**
-
-| Name | In | Required | Type | Notes |
-|---|---|---|---|---|
-| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
-
-**Request body**: `AiPolicyException`
-
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| id | string (uuid) |  | (read-only) |
-| policyId | string (uuid) | yes |  |
-| capabilityKey | string |  | (nullable) |
-| reason | string | yes | (max length 2000) |
-| compensatingControls | array of string |  |  |
-| startsAt | string (date-time) |  | (nullable) |
-| expiresAt | string (date-time) | yes | Required. |
-| status | enum (active, expired, revoked) |  | (read-only) |
-| approvedByPrincipalId | string (uuid) |  | (read-only) |
-| revokedByPrincipalId | string (uuid) |  | (read-only; nullable) |
-| revokedAt | string (date-time) |  | (read-only; nullable) |
-| revokeReason | string |  | (read-only; nullable) |
-| scopePath | string |  | The partition key (ADR-0005). (read-only) |
-
-**Response**: `AiPolicyException`
-
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| id | string (uuid) |  | (read-only) |
-| policyId | string (uuid) | yes |  |
-| capabilityKey | string |  | (nullable) |
-| reason | string | yes | (max length 2000) |
-| compensatingControls | array of string |  |  |
-| startsAt | string (date-time) |  | (nullable) |
-| expiresAt | string (date-time) | yes | Required. |
-| status | enum (active, expired, revoked) |  | (read-only) |
-| approvedByPrincipalId | string (uuid) |  | (read-only) |
-| revokedByPrincipalId | string (uuid) |  | (read-only; nullable) |
-| revokedAt | string (date-time) |  | (read-only; nullable) |
-| revokeReason | string |  | (read-only; nullable) |
-| scopePath | string |  | The partition key (ADR-0005). (read-only) |
-
-**Responses**
-
-| Code | Shape | Meaning |
-|---|---|---|
-| 201 |  | Grant a temporary exception to a governance policy |
-| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
-
 ### decideProposedAction
 
 **`POST /proposed-actions/{actionId}/decide`**: Approve or reject a proposal
@@ -2070,7 +2396,7 @@ A rejection carries a reason. It is the only signal that the assistant is propos
 | Conflict policy | serverWins |
 | Reads | `ai.action_plan`, `ai.proposed_action`, `cache:idempotency` |
 | Writes | `ai.action_plan`, `ai.activity`, `ai.decision_record`, `ai.proposed_action`, `cache:idempotency` |
-| Called by | ADM-492, ADM-531, ADM-532, ANL-009, BO-762, BO-793, BO-928, BO-929, BO-970, BO-975, CMS-007, CMS-008 |
+| Called by | ADM-492, ADM-531, ADM-532, ANL-009, BO-598, BO-762, BO-793, BO-928, BO-929, BO-970, BO-975, CMS-007, CMS-008 |
 | State model | AI action plan ([states/ai-action-plan.yaml](../../../states/ai-action-plan.yaml)): moves `awaitingApproval` -> `approved`, `awaitingApproval` -> `cancelled`<br/>AI proposed action ([states/ai-proposed-action.yaml](../../../states/ai-proposed-action.yaml)): moves `proposed` -> `approved`, `proposed` -> `rejected` |
 
 **Parameters**
@@ -2185,6 +2511,7 @@ A rejection carries a reason. It is the only signal that the assistant is propos
 8.1.7, 8.3.81–8.3.83. Tokens, cost and latency by tenant, venue, principal, provider and capability.
 **Cost attribution is the reason every response carries a token count.** An AI feature with no cost signal is a bill nobody predicted, and the first month is when it matters.
 **Grouped by agent, model and task too, with a month-end projection** (AI design 2.3, 4.5). The projection is returned in `forecast`, labelled a forecast, beside the actual spend and never mixed into it. Tokens on TICVAI-managed providers are re-billed per token through `subscription.settleAiUsage` (decision 2); on a tenant's own key they are metered for visibility.
+**Money in the tenant's selected currency, tokens alongside** (Chinmay, 2 October, workbook Q8; CHG-CSA-004). Every cost and the spend ceiling are reported in the tenant's selected currency (USD by default), with the token counts beside them, never instead of them.
 
 |  |  |
 |---|---|
@@ -2197,7 +2524,7 @@ A rejection carries a reason. It is the only signal that the assistant is propos
 | Read routing | analytical |
 | Reads | `ai.activity`, `ai.model` |
 | Writes | - |
-| Called by | ADM-549, BO-091 |
+| Called by | ADM-549, ANL-070, BO-091 |
 
 **Parameters**
 
@@ -2210,6 +2537,18 @@ A rejection carries a reason. It is the only signal that the assistant is propos
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
+| currency | string |  | The tenant's selected currency, USD by default (Chinmay, 2 October, workbook Q8; CHG-CSA-004). (min length 3; max length 3; read-only) |
+| ceiling | object |  | The spend ceiling in force (getAiSpendCeiling), with the tokens it equals at the current blended rate and what is used so far (CHG-CSA-004). (read-only; nullable) |
+| ceiling.spend | Money |  | On the wire this is three fields; in the database it is one column. |
+| ceiling.spend.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| ceiling.spend.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| ceiling.spend.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| ceiling.tokens | integer |  | (nullable) |
+| ceiling.usedSpend | Money |  | On the wire this is three fields; in the database it is one column. |
+| ceiling.usedSpend.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| ceiling.usedSpend.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| ceiling.usedSpend.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| ceiling.usedTokens | integer |  |  |
 | from | string (date) |  |  |
 | to | string (date) |  |  |
 | groupBy | string |  |  |
@@ -2242,6 +2581,279 @@ A rejection carries a reason. It is the only signal that the assistant is propos
 | 200 |  | Usage |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
+### getEffectiveAiPolicy
+
+**`GET /governance/effective-policy`**: The policy in force for a capability at a scope
+
+**What the governance decision point would apply, resolved and explained** (AIC-153, AIC-161, AIC-165; ADM-525, ADM-528). The intersection of the capability entry, every published governance policy version reaching the scope, active exceptions and the tenant or venue `AiPolicy`, with conflicts shown with the more restrictive result they resolved to. Without `scopePath`, the caller's own scope.
+
+|  |  |
+|---|---|
+| Permission | `AI_USE` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | replica |
+| Reads | `ai.capability`, `ai.governance_policy`, `ai.governance_policy_version`, `ai.policy`, `ai.policy_exception` |
+| Writes | - |
+| Called by | ADM-489, ADM-522, ADM-525, ADM-526, ADM-528, ANL-060, BO-091 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| capabilityKey | query | yes | string |  |
+| scopePath | query |  | string |  |
+| environment | query |  | enum (development, sandbox, staging, production) |  |
+
+**Response**: `AiEffectivePolicy`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| capabilityKey | string | yes |  |
+| scopePath | string |  |  |
+| autonomyLevel | integer | yes | One autonomy scale for every capability (design 3.8 and 5.5, GOV 0 to 4; ADR-0050). (min 0; max 4) |
+| autonomyCeiling | integer |  | One autonomy scale for every capability (design 3.8 and 5.5, GOV 0 to 4; ADR-0050). (min 0; max 4) |
+| rules | array of object | yes |  |
+| rules[].rule | AiGovernanceRule |  | One rule of a governance policy version: which actions on which data, under which conditions, get which outcome (AIC-147..160). |
+| rules[].rule.effect | AiGovernanceOutcome: enum (allow, allowWithConditions, prepareOnly, approvalRequired, escalate, block) | yes | What the governance decision point returns (design 3.8, AIC-166). |
+| rules[].rule.capabilityKeys | array of string |  | Registered capabilities it applies to. |
+| rules[].rule.actions | array of enum (read, analyze, recommend, generate, prepare, create, modify, publish, …) |  | ADM-523: what AI may do, from reading to executing. |
+| rules[].rule.dataCategories | array of string |  | Data categories (ADM-524), e.g. |
+| rules[].rule.purposes | array of string |  | Permitted purposes for those categories (AIC-156, AIR-182). |
+| rules[].rule.maxAmount | object |  | Above this value the effect escalates one step (for example to approvalRequired). (nullable) |
+| rules[].rule.roleIds | array of string (uuid) |  | Roles the rule applies to; empty means every role. |
+| rules[].rule.environments | array of enum (development, sandbox, staging, production) |  | ADM-525. |
+| rules[].rule.conditions | object |  | Conditions attached to an allowWithConditions effect, for example maskFields or requireCitation. (nullable) |
+| rules[].policyKey | string |  |  |
+| rules[].version | integer |  |  |
+| rules[].scopePath | string |  |  |
+| exceptions | array of AiPolicyException |  |  |
+| exceptions[].id | string (uuid) |  | (read-only) |
+| exceptions[].policyId | string (uuid) | yes |  |
+| exceptions[].capabilityKey | string |  | (nullable) |
+| exceptions[].reason | string | yes | (max length 2000) |
+| exceptions[].compensatingControls | array of string |  |  |
+| exceptions[].startsAt | string (date-time) |  | (nullable) |
+| exceptions[].expiresAt | string (date-time) | yes | Required. |
+| exceptions[].status | enum (active, expired, revoked) |  | (read-only) |
+| exceptions[].approvedByPrincipalId | string (uuid) |  | (read-only) |
+| exceptions[].revokedByPrincipalId | string (uuid) |  | (read-only; nullable) |
+| exceptions[].revokedAt | string (date-time) |  | (read-only; nullable) |
+| exceptions[].revokeReason | string |  | (read-only; nullable) |
+| exceptions[].scopePath | string |  | The partition key (ADR-0005). (read-only) |
+| conflicts | array of object |  | Conflicting rules and the more restrictive result they resolved to (AIC-161). |
+| conflicts[].description | string |  |  |
+| conflicts[].resolvedTo | AiGovernanceOutcome: enum (allow, allowWithConditions, prepareOnly, approvalRequired, escalate, block) |  | What the governance decision point returns (design 3.8, AIC-166). |
+| resolvedAt | string (date-time) |  |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | The policy in force for a capability at a scope |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
+### listAiCapabilities
+
+**`GET /governance/capabilities`**: The capability registry
+
+**Every AI capability operating in the tenant, and nothing that is not in it** (AIC-143..145; ADM-519..522). Owner, family, risk class, the autonomy level in force against its ceiling, data categories, lifecycle per environment and whether it is paused. The P09 governance area and ANL-060 read this first.
+
+|  |  |
+|---|---|
+| Permission | `AI_USE` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | replica |
+| Reads | `ai.capability` |
+| Writes | - |
+| Called by | ADM-519, ADM-520, ADM-521, ADM-522, ADM-536, ANL-060, BO-091 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| family | query |  | AiCapabilityFamily: enum (gatewayAndModels, governance, actionPipeline, knowledgeRetrieval, assistants, analyticsInsights, configurationAssistant, forecasting, …) |  |
+| status | query |  | enum (active, paused) |  |
+| riskClass | query |  | AiRiskClass: enum (low, medium, high, critical) |  |
+| pageSize | query |  | integer |  |
+| cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
+
+**Response**: `object`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| items | array of AiCapabilityRegistration | yes |  |
+| items[].id | string (uuid) |  | (read-only) |
+| items[].capabilityKey | string | yes | Stable key, unique per tenant: assistant.guest, forecast.attendance, risk.transaction, config.assistant, recommend.checkout. |
+| items[].family | AiCapabilityFamily: enum (gatewayAndModels, governance, actionPipeline, knowledgeRetrieval, assistants, analyticsInsights, configurationAssistant, forecasting, …) | yes | The fourteen capabilities of the AI system design (section 1.1), C1 to C14 in order: gateway and model registry, governance decision point, action pipeline and human oversight, knowledge and retrieva… |
+| items[].name | string |  |  |
+| items[].description | string |  | (nullable) |
+| items[].ownerPrincipalId | string (uuid) |  | The accountable business owner (AIC-144). (nullable) |
+| items[].businessFunction | string |  | (nullable) |
+| items[].riskClass | AiRiskClass: enum (low, medium, high, critical) | yes | Business, customer, financial, operational, security and compliance impact of a capability or action type (AIC-144, ADM-521). |
+| items[].autonomyCeiling | object |  | The first-release ceiling for this capability (design 3.8 table). (read-only) |
+| items[].autonomyLevel | object | yes | The level in force at this scope. |
+| items[].dataCategories | array of string |  | Data categories the capability reads (ADM-524). |
+| items[].lifecycle | object |  | Lifecycle per environment (AIC-145): a capability or model can be live in staging and still a draft in production. |
+| items[].lifecycle.development | enum (draft, pilot, active, retired) |  |  |
+| items[].lifecycle.staging | enum (draft, pilot, active, retired) |  |  |
+| items[].lifecycle.production | enum (draft, pilot, active, retired) |  |  |
+| items[].degradationMode | enum (rulesOnly, searchOnly, humanHandoff, hidden, failOpen, lastPublished) |  | What the capability does when its model or the service is unavailable (design 3.7, AIC-241). |
+| items[].status | enum (active, paused) |  | Paused by pauseAiCapability: the capability answers from its degradation mode until resumed. (read-only) |
+| items[].pausedReason | string |  | (read-only; nullable) |
+| items[].pausedAt | string (date-time) |  | (read-only; nullable) |
+| items[].updatedAt | string (date-time) |  | (read-only) |
+| items[].scopePath | string |  | The partition key (ADR-0005). (read-only) |
+| nextCursor | string |  |  |
+| hasMore | boolean | yes |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | The capability registry |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
+### listAiGovernancePolicyVersions
+
+**`GET /governance/policy-versions`**: Governance policies and their versions
+
+Every version of every governance policy at the scope, newest first (ADM-523, ADM-526..528). Filter by `policyId` for one policy's history, or by `status` for what is in force.
+
+|  |  |
+|---|---|
+| Permission | `AI_USE` |
+| Scope level | tenant |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | replica |
+| Reads | `ai.governance_policy`, `ai.governance_policy_version` |
+| Writes | - |
+| Called by | ADM-523, ADM-524, ADM-526, ADM-527, ADM-528, ADM-530 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| policyId | query |  | string (uuid) |  |
+| status | query |  | enum (draft, simulated, published, superseded) |  |
+| kind | query |  | enum (action, data, scope, autonomy, approval, environment) |  |
+| pageSize | query |  | integer |  |
+| cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
+
+**Response**: `object`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| items | array of AiGovernancePolicyVersion | yes |  |
+| items[].id | string (uuid) |  | (read-only) |
+| items[].policyId | string (uuid) | yes |  |
+| items[].version | integer | yes | (min 1) |
+| items[].status | enum (draft, simulated, published, superseded) | yes |  |
+| items[].rules | array of AiGovernanceRule |  | The rules of one policy version, stored with the version as one jsonb column. |
+| items[].rules[].effect | AiGovernanceOutcome: enum (allow, allowWithConditions, prepareOnly, approvalRequired, escalate, block) | yes | What the governance decision point returns (design 3.8, AIC-166). |
+| items[].rules[].capabilityKeys | array of string |  | Registered capabilities it applies to. |
+| items[].rules[].actions | array of enum (read, analyze, recommend, generate, prepare, create, modify, publish, …) |  | ADM-523: what AI may do, from reading to executing. |
+| items[].rules[].dataCategories | array of string |  | Data categories (ADM-524), e.g. |
+| items[].rules[].purposes | array of string |  | Permitted purposes for those categories (AIC-156, AIR-182). |
+| items[].rules[].maxAmount | object |  | Above this value the effect escalates one step (for example to approvalRequired). (nullable) |
+| items[].rules[].roleIds | array of string (uuid) |  | Roles the rule applies to; empty means every role. |
+| items[].rules[].environments | array of enum (development, sandbox, staging, production) |  | ADM-525. |
+| items[].rules[].conditions | object |  | Conditions attached to an allowWithConditions effect, for example maskFields or requireCitation. (nullable) |
+| items[].changeNote | string |  | (nullable) |
+| items[].simulationSummary | object |  | The last simulateAiGovernancePolicy result: decisions that would change, by outcome. (read-only; nullable) |
+| items[].draftedByPrincipalId | string (uuid) |  | (read-only) |
+| items[].publishedByPrincipalId | string (uuid) |  | (read-only; nullable) |
+| items[].publishedAt | string (date-time) |  | (read-only; nullable) |
+| items[].supersededAt | string (date-time) |  | (read-only; nullable) |
+| items[].scopePath | string |  | The partition key (ADR-0005). (read-only) |
+| nextCursor | string |  |  |
+| hasMore | boolean | yes |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Governance policies and their versions |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
+### pauseAiCapability
+
+**`POST /governance/capabilities/{capabilityKey}/pause`**: Stop a capability now
+
+**The kill switch** (AIC-189, ADM-519, ADM-536, ADM-556). The capability answers from its declared degradation mode until resumed: recommendations leave the slot empty, fraud scoring falls back to the owners' rules, the concierge offers a person (design 3.7). In-flight plans of the capability pause at their next checkpoint. Emits `ai.capabilityPaused`.
+
+|  |  |
+|---|---|
+| Permission | `AI_CONFIGURE` |
+| Scope level | tenant |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `ai.capability`, `cache:idempotency` |
+| Writes | `ai.action_plan`, `ai.capability`, `ai.decision_record`, `ai.intervention`, `cache:idempotency` |
+| Called by | ADM-519, ADM-536, ADM-556, ADM-696 |
+| State model | AI capability ([states/ai-capability.yaml](../../../states/ai-capability.yaml)): moves `active` -> `paused` |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| capabilityKey | path | yes | string |  |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| reason | string | yes | (max length 1000) |
+| incidentId | string (uuid) |  | (nullable) |
+
+**Response**: `AiCapabilityRegistration`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) |  | (read-only) |
+| capabilityKey | string | yes | Stable key, unique per tenant: assistant.guest, forecast.attendance, risk.transaction, config.assistant, recommend.checkout. |
+| family | AiCapabilityFamily: enum (gatewayAndModels, governance, actionPipeline, knowledgeRetrieval, assistants, analyticsInsights, configurationAssistant, forecasting, …) | yes | The fourteen capabilities of the AI system design (section 1.1), C1 to C14 in order: gateway and model registry, governance decision point, action pipeline and human oversight, knowledge and retrieva… |
+| name | string |  |  |
+| description | string |  | (nullable) |
+| ownerPrincipalId | string (uuid) |  | The accountable business owner (AIC-144). (nullable) |
+| businessFunction | string |  | (nullable) |
+| riskClass | AiRiskClass: enum (low, medium, high, critical) | yes | Business, customer, financial, operational, security and compliance impact of a capability or action type (AIC-144, ADM-521). |
+| autonomyCeiling | object |  | The first-release ceiling for this capability (design 3.8 table). (read-only) |
+| autonomyLevel | object | yes | The level in force at this scope. |
+| dataCategories | array of string |  | Data categories the capability reads (ADM-524). |
+| lifecycle | object |  | Lifecycle per environment (AIC-145): a capability or model can be live in staging and still a draft in production. |
+| lifecycle.development | enum (draft, pilot, active, retired) |  |  |
+| lifecycle.staging | enum (draft, pilot, active, retired) |  |  |
+| lifecycle.production | enum (draft, pilot, active, retired) |  |  |
+| degradationMode | enum (rulesOnly, searchOnly, humanHandoff, hidden, failOpen, lastPublished) |  | What the capability does when its model or the service is unavailable (design 3.7, AIC-241). |
+| status | enum (active, paused) |  | Paused by pauseAiCapability: the capability answers from its degradation mode until resumed. (read-only) |
+| pausedReason | string |  | (read-only; nullable) |
+| pausedAt | string (date-time) |  | (read-only; nullable) |
+| updatedAt | string (date-time) |  | (read-only) |
+| scopePath | string |  | The partition key (ADR-0005). (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Stop a capability now |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 409 |  | Already paused. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
 ### publishAiGovernancePolicy
 
 **`POST /governance/policy-versions/{versionId}/publish`**: Publish a simulated policy version
@@ -2252,7 +2864,7 @@ A rejection carries a reason. It is the only signal that the assistant is propos
 |---|---|
 | Permission | `AI_APPROVE` |
 | Scope level | tenant |
-| Part of slice | setup, makes `ai.governance_policy_version` non-empty |
+| Part of slice | setup, makes `ai.governance_policy`, `ai.governance_policy_version` non-empty |
 | Wave | 2 |
 | Offline | no |
 | Config scope | tenant |
@@ -2307,30 +2919,31 @@ A rejection carries a reason. It is the only signal that the assistant is propos
 | 409 |  | Not publishable: the version has not been simulated (policy-not-simulated), or the caller drafted it (approver-is-requester). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
-### resumeAiCapability
+### revokeAiPolicyException
 
-**`POST /governance/capabilities/{capabilityKey}/resume`**: Resume a paused capability
+**`POST /governance/policy-exceptions/{exceptionId}/revoke`**: End an exception before it expires
 
-Resuming needs more authority than pausing (`AI_APPROVE`): stopping is always safe, starting again is a decision. Plans paused by the pause stay paused and are resumed one by one with `resumeActionPlan`, which revalidates them.
+Moves an `active` exception to `revoked` with a reason (ADM-526); the effective policy stops showing it at once.
 
 |  |  |
 |---|---|
 | Permission | `AI_APPROVE` |
 | Scope level | tenant |
-| Part of slice | setup, makes `ai.capability` non-empty |
+| Part of slice | core |
 | Wave | 1 |
 | Offline | no |
+| Config scope | tenant |
 | Conflict policy | serverWins |
-| Reads | `ai.capability`, `cache:idempotency` |
-| Writes | `ai.capability`, `ai.decision_record`, `ai.intervention`, `cache:idempotency` |
-| Called by | ADM-536 |
-| State model | AI capability ([states/ai-capability.yaml](../../../states/ai-capability.yaml)): moves `paused` -> `active` |
+| Reads | `ai.policy_exception`, `cache:idempotency` |
+| Writes | `ai.decision_record`, `ai.policy_exception`, `cache:idempotency` |
+| Called by | ADM-526 |
+| State model | AI policy exception ([states/ai-policy-exception.yaml](../../../states/ai-policy-exception.yaml)): moves `active` -> `revoked` |
 
 **Parameters**
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| capabilityKey | path | yes | string |  |
+| exceptionId | path | yes | string (uuid) |  |
 | Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
@@ -2339,39 +2952,31 @@ Resuming needs more authority than pausing (`AI_APPROVE`): stopping is always sa
 |---|---|---|---|
 | reason | string | yes | (max length 1000) |
 
-**Response**: `AiCapabilityRegistration`
+**Response**: `AiPolicyException`
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | id | string (uuid) |  | (read-only) |
-| capabilityKey | string | yes | Stable key, unique per tenant: assistant.guest, forecast.attendance, risk.transaction, config.assistant, recommend.checkout. |
-| family | AiCapabilityFamily: enum (gatewayAndModels, governance, actionPipeline, knowledgeRetrieval, assistants, analyticsInsights, configurationAssistant, forecasting, …) | yes | The fourteen capabilities of the AI system design (section 1.1), C1 to C14 in order: gateway and model registry, governance decision point, action pipeline and human oversight, knowledge and retrieva… |
-| name | string |  |  |
-| description | string |  | (nullable) |
-| ownerPrincipalId | string (uuid) |  | The accountable business owner (AIC-144). (nullable) |
-| businessFunction | string |  | (nullable) |
-| riskClass | AiRiskClass: enum (low, medium, high, critical) | yes | Business, customer, financial, operational, security and compliance impact of a capability or action type (AIC-144, ADM-521). |
-| autonomyCeiling | object |  | The first-release ceiling for this capability (design 3.8 table). (read-only) |
-| autonomyLevel | object | yes | The level in force at this scope. |
-| dataCategories | array of string |  | Data categories the capability reads (ADM-524). |
-| lifecycle | object |  | Lifecycle per environment (AIC-145): a capability or model can be live in staging and still a draft in production. |
-| lifecycle.development | enum (draft, pilot, active, retired) |  |  |
-| lifecycle.staging | enum (draft, pilot, active, retired) |  |  |
-| lifecycle.production | enum (draft, pilot, active, retired) |  |  |
-| degradationMode | enum (rulesOnly, searchOnly, humanHandoff, hidden, failOpen, lastPublished) |  | What the capability does when its model or the service is unavailable (design 3.7, AIC-241). |
-| status | enum (active, paused) |  | Paused by pauseAiCapability: the capability answers from its degradation mode until resumed. (read-only) |
-| pausedReason | string |  | (read-only; nullable) |
-| pausedAt | string (date-time) |  | (read-only; nullable) |
-| updatedAt | string (date-time) |  | (read-only) |
+| policyId | string (uuid) | yes |  |
+| capabilityKey | string |  | (nullable) |
+| reason | string | yes | (max length 2000) |
+| compensatingControls | array of string |  |  |
+| startsAt | string (date-time) |  | (nullable) |
+| expiresAt | string (date-time) | yes | Required. |
+| status | enum (active, expired, revoked) |  | (read-only) |
+| approvedByPrincipalId | string (uuid) |  | (read-only) |
+| revokedByPrincipalId | string (uuid) |  | (read-only; nullable) |
+| revokedAt | string (date-time) |  | (read-only; nullable) |
+| revokeReason | string |  | (read-only; nullable) |
 | scopePath | string |  | The partition key (ADR-0005). (read-only) |
 
 **Responses**
 
 | Code | Shape | Meaning |
 |---|---|---|
-| 200 |  | Resume a paused capability |
+| 200 |  | End an exception before it expires |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
-| 409 |  | Not paused. |
+| 409 |  | The exception is not active. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### simulateAiGovernancePolicy
@@ -2674,7 +3279,7 @@ One label per message per person (AIC-062): helpful or not, and why. Guests can 
 | Guest callable | True |
 | Reads | `ai.answer_feedback`, `ai.message`, `cache:idempotency` |
 | Writes | `ai.answer_feedback`, `ai.knowledge_gap`, `cache:idempotency` |
-| Called by | EMP-020, GST-032, KSK-015, WEB-044 |
+| Called by | EMP-020, GST-031, GST-032, GST-033, KSK-015, WEB-044 |
 
 **Parameters**
 
@@ -2720,17 +3325,135 @@ One label per message per person (AIC-062): helpful or not, and why. Guests can 
 
 Model catalogue, prompt registry, evaluation and release (design C1, C13)
 
+### listAiEvaluations
+
+**`GET /evaluations`**: Evaluation runs
+
+Runs with metrics and gate results, newest first.
+
+|  |  |
+|---|---|
+| Permission | `AI_USE` |
+| Scope level | tenant |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | analytical |
+| Reads | `ai.eval_run`, `ai.eval_suite` |
+| Writes | - |
+| Called by | ADM-554, ANL-060 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| releaseId | query |  | string (uuid) |  |
+| capabilityKey | query |  | string |  |
+| status | query |  | enum (queued, running, passed, failed, error) |  |
+| pageSize | query |  | integer |  |
+| cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
+
+**Response**: `object`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| items | array of AiEvaluationRun | yes |  |
+| items[].id | string (uuid) |  | (read-only) |
+| items[].suiteId | string (uuid) | yes |  |
+| items[].releaseId | string (uuid) |  | (nullable) |
+| items[].kind | enum (offline, backtest, shadow) | yes |  |
+| items[].candidateRef | string |  |  |
+| items[].baselineRef | string |  | (nullable) |
+| items[].status | enum (queued, running, passed, failed, error) | yes | (read-only) |
+| items[].metrics | object |  | (read-only; nullable) |
+| items[].gate | object |  | The promotion gate thresholds (design 3.5 table) and whether each passed. (read-only; nullable) |
+| items[].isolationCasesPassed | boolean |  | False blocks release, whatever the other metrics say. (read-only) |
+| items[].requestedByPrincipalId | string (uuid) |  | (read-only; nullable) |
+| items[].startedAt | string (date-time) |  | (read-only) |
+| items[].completedAt | string (date-time) |  | (read-only; nullable) |
+| items[].scopePath | string |  | The partition key (ADR-0005). (read-only) |
+| nextCursor | string |  |  |
+| hasMore | boolean | yes |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Evaluation runs |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
+### listAiTrainingRuns
+
+**`GET /training-runs`**: The per-tenant training and backtest runs
+
+**The registry of training runs** (29 September, AI functions review; design 3.5). Each trained producer is retrained weekly on the tenant's own data only (AIP-149), backtested against past actuals (`ai.eval_run` kind `backtest`), and run in shadow beside the live answer. A run whose shadow period passes the promotion gate raises a `promotionReady` governance alert to the admin; **nothing switches by itself** (AI-D16). Runs are scheduled by the platform; this reads them.
+
+|  |  |
+|---|---|
+| Permission | `AI_USE` |
+| Scope level | tenant |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | replica |
+| Reads | `ai.eval_run`, `ai.release`, `ai.training_run` |
+| Writes | - |
+| Called by | ADM-554 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| capabilityKey | query |  | string |  |
+| status | query |  | enum (queued, training, backtesting, shadow, gatePassed, gateFailed, failed) |  |
+| pageSize | query |  | integer |  |
+| cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
+
+**Response**: `object`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| items | array of AiTrainingRun | yes |  |
+| items[].id | string (uuid) |  | (read-only) |
+| items[].capabilityKey | string | yes |  |
+| items[].suggestionKind | object |  | (nullable) |
+| items[].forecastDefinitionKey | string |  | (nullable) |
+| items[].trainingWindowFrom | string (date) |  |  |
+| items[].trainingWindowTo | string (date) |  |  |
+| items[].dataCutoffAt | string (date-time) |  |  |
+| items[].includesImportedHistory | boolean |  | (default False) |
+| items[].featureSetVersion | string |  |  |
+| items[].artefactRef | string |  | The model file in the tenant's Blob container. (nullable) |
+| items[].backtestRunId | string (uuid) |  | (nullable) |
+| items[].releaseId | string (uuid) |  | (nullable) |
+| items[].status | enum (queued, training, backtesting, shadow, gatePassed, gateFailed, failed) | yes |  |
+| items[].metrics | object |  | (nullable) |
+| items[].startedAt | string (date-time) |  |  |
+| items[].completedAt | string (date-time) |  | (nullable) |
+| items[].scopePath | string |  | The partition key (ADR-0005). (read-only) |
+| nextCursor | string |  |  |
+| hasMore | boolean | yes |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Training runs, newest first |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
 ### promoteAiRelease
 
 **`POST /releases/{releaseId}/promote`**: Promote a release to its next stage (a person)
 
-**A trained model goes live only when a person promotes it** (design 3.12, decided 29 September). When a shadow run passes its gate the platform raises a `promotionReady` governance alert; nothing switches by itself. This moves the release one stage (shadow to canary, canary to production). A tenant release needs `AI_APPROVE`; a platform release needs `PLATFORM_AI_MANAGE`. **Refused to a service caller.** Where the capability answers a `requestSuggestion` kind, production rewrites that kind's assignment in `AiPolicy.suggestionProviders`, the only writer besides `setSuggestionProvider`. Resolves the `promotionReady` alert.
+**A trained model goes live only when a person promotes it** (design 3.12, decided 29 September). When a shadow run passes its gate the platform raises a `promotionReady` governance alert; nothing switches by itself. This moves the release one stage (shadow to canary, canary to production). A tenant release needs the module's AI publish permission; a platform release needs `PLATFORM_AI_MANAGE`. **Decided 2 October** (Chinmay, workbook Q7; contract follow-ups: "replacing AI_APPROVE for model publishing"): promotion goes to whoever holds the `<MODULE>_AI_PUBLISH` of the release's `module` (`x-ticvai-permission-by-module`; `contracts/shared/permissions.yaml` `x-ticvai-module-ai-publish`), on top of `AI_USE`; there is no default role. `AI_APPROVE` no longer promotes; the switch is a logged breaking change against r1 (BC-007, CHG-FUP-004). **Refused to a service caller.** Where the capability answers a `requestSuggestion` kind, production rewrites that kind's assignment in `AiPolicy.suggestionProviders`, the only writer besides `setSuggestionProvider`. Resolves the `promotionReady` alert.
 
 |  |  |
 |---|---|
-| Permission | `AI_APPROVE` |
+| Permission | `AI_USE` |
 | Scope level | tenant |
-| Part of slice | setup, makes `ai.policy`, `ai.release` non-empty |
+| Part of slice | setup, makes `ai.forecast_definition`, `ai.policy`, `ai.release` non-empty |
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
@@ -2765,6 +3488,7 @@ Model catalogue, prompt registry, evaluation and release (design C1, C13)
 | currentRef | string |  | What production runs now: the rule, or the previously promoted artefact. (nullable) |
 | previousRef | string |  | (read-only; nullable) |
 | layer | enum (platform, tenant) | yes |  |
+| module | object |  | Whose AI this release is, and so who promotes it (Chinmay, 2 October, workbook Q7: "AI release promotion goes to whoever holds it"; CHG-FUP-004). (nullable) |
 | suggestionKind | object |  | Where the capability answers a requestSuggestion kind: promotion rewrites that kind's assignment in AiPolicy.suggestionProviders. (nullable) |
 | stage | enum (draft, offlineEval, shadow, canary, production, monitored, rolledBack, rejected) | yes | (read-only) |
 | shadowStartedAt | string (date-time) |  | (read-only; nullable) |
@@ -2782,7 +3506,8 @@ Model catalogue, prompt registry, evaluation and release (design C1, C13)
 |---|---|---|
 | 200 |  | Promote a release to its next stage (a person) |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
-| 409 |  | Not promotable: the gate has not passed (gate-not-passed), an isolation case failed (isolation-cases-failed), or the stage cannot follow the current one (stage-out-of-order). |
+| 403 |  | A tenant release, and the caller does not hold the AI publish permission of its module (module-ai-publish-required, CHG-FUP-004); or a platform release, and the caller lacks PLATFORM_AI_MANAGE. |
+| 409 |  | Not promotable: the gate has not passed (gate-not-passed), an isolation case failed (isolation-cases-failed), the stage cannot follow the current one (stage-out-of-order), or a tenant release names n… |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### publishPromptTemplate
@@ -2802,7 +3527,7 @@ Model catalogue, prompt registry, evaluation and release (design C1, C13)
 | Conflict policy | serverWins |
 | Reads | `ai.prompt_template`, `cache:idempotency` |
 | Writes | `ai.prompt_template`, `ai.release`, `cache:idempotency` |
-| Called by | ADM-037, ANL-060 |
+| Called by | ADM-037 |
 
 **Parameters**
 
@@ -2857,13 +3582,13 @@ Model catalogue, prompt registry, evaluation and release (design C1, C13)
 |---|---|
 | Permission | `AI_APPROVE` |
 | Scope level | tenant |
-| Part of slice | setup, makes `ai.policy`, `ai.release` non-empty |
+| Part of slice | setup, makes `ai.forecast_definition`, `ai.policy`, `ai.release` non-empty |
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `ai.release`, `cache:idempotency` |
 | Writes | `ai.decision_record`, `ai.forecast_definition`, `ai.policy`, `ai.release`, `cache:idempotency` |
-| Called by | ADM-554, ADM-556 |
+| Called by | ADM-554, ADM-556, ADM-696 |
 
 **Parameters**
 
@@ -2889,6 +3614,7 @@ Model catalogue, prompt registry, evaluation and release (design C1, C13)
 | currentRef | string |  | What production runs now: the rule, or the previously promoted artefact. (nullable) |
 | previousRef | string |  | (read-only; nullable) |
 | layer | enum (platform, tenant) | yes |  |
+| module | object |  | Whose AI this release is, and so who promotes it (Chinmay, 2 October, workbook Q7: "AI release promotion goes to whoever holds it"; CHG-FUP-004). (nullable) |
 | suggestionKind | object |  | Where the capability answers a requestSuggestion kind: promotion rewrites that kind's assignment in AiPolicy.suggestionProviders. (nullable) |
 | stage | enum (draft, offlineEval, shadow, canary, production, monitored, rolledBack, rejected) | yes | (read-only) |
 | shadowStartedAt | string (date-time) |  | (read-only; nullable) |
@@ -2919,7 +3645,7 @@ Offline golden set, backtest or shadow comparison of a candidate against its bas
 |---|---|
 | Permission | `AI_CONFIGURE` |
 | Scope level | tenant |
-| Part of slice | setup, makes `ai.release` non-empty |
+| Part of slice | setup, makes `ai.eval_run`, `ai.release` non-empty |
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
@@ -2974,6 +3700,7 @@ Offline golden set, backtest or shadow comparison of a candidate against its bas
 **`PUT /models/{modelId}`**: Add or change a platform model (platform)
 
 **Platform layer only** (`PLATFORM_AI_MANAGE`, from the platform token). A tenant's own model arrives through `setAiProvider` with `managedBy: tenant` and `modelId`, where bring-your-own-key is enabled. Mastered in the control plane and replicated read-only into every tenant database; no configuration scope.
+**This is where TICVAI curates** (Chinmay, 2 October, workbook Q2 and the AI/ML model selection; CHG-CSA-001). `curatedRange` lists the tasks the model is curated for, its tier and its rank (the best-suited model, then three or four alternatives where they exist). A model named in `isDefaultForTasks` for a task its own `curatedRange` does not list is refused `422 model-not-curated`.
 
 |  |  |
 |---|---|
@@ -3001,6 +3728,7 @@ Offline golden set, backtest or shadow comparison of a candidate against its bas
 | id | string (uuid) |  | (read-only) |
 | layer | enum (platform, tenant) | yes |  |
 | providerKind | object |  | (nullable) |
+| vendor | string |  | Whose model this is (CHG-FUP-008): the provider company as AiProvider.vendor names it. (pattern ^[a-z0-9][a-z0-9-]{1,49}$; nullable) |
 | producerType | enum (llm, embedding, reranker, classical, rule) | yes |  |
 | modelName | string | yes | The deployment or model name as the provider knows it, or the package and version for a classical model. |
 | capabilities | array of AiCapability: enum (chat, embedding, vision, rerank, speechToText, textToSpeech) |  |  |
@@ -3022,6 +3750,12 @@ Offline golden set, backtest or shadow comparison of a candidate against its bas
 | lifecycle.staging | enum (draft, pilot, active, retired) |  |  |
 | lifecycle.production | enum (draft, pilot, active, retired) |  |  |
 | isDefaultForTasks | array of string |  | Tasks this model is the default for (AIC-010), e.g. |
+| curatedRange | array of object |  | TICVAI's curated range: the tasks this model may serve (Chinmay, 2 October, workbook Q1, Q2 and Q9; the AI/ML model selection of 2 October; CHG-CSA-001). |
+| curatedRange[].taskKey | string |  |  |
+| curatedRange[].tier | enum (small, strong, reasoning, vision, embedding, reranking, moderation, piiDetection, …) |  |  |
+| curatedRange[].rank | integer |  | (min 1; max 5) |
+| curatedRange[].byokEligible | boolean |  | (default True) |
+| residencyClasses | array of AiResidencyClass: enum (uaeOnly, globalAllowed, onPrem) |  | The tenant residency classes whose calls this model may serve (CHG-CSA-002). |
 | taskFitness | array of object |  | Evaluated fitness per task (21 September minutes, M21-09, our proposal): a score from the task's golden set (runAiEvaluation) and the band the task needs. (read-only) |
 | taskFitness[].taskKey | string | yes |  |
 | taskFitness[].score | number | yes | (min 0; max 1) |
@@ -3038,6 +3772,7 @@ Offline golden set, backtest or shadow comparison of a candidate against its bas
 | id | string (uuid) |  | (read-only) |
 | layer | enum (platform, tenant) | yes |  |
 | providerKind | object |  | (nullable) |
+| vendor | string |  | Whose model this is (CHG-FUP-008): the provider company as AiProvider.vendor names it. (pattern ^[a-z0-9][a-z0-9-]{1,49}$; nullable) |
 | producerType | enum (llm, embedding, reranker, classical, rule) | yes |  |
 | modelName | string | yes | The deployment or model name as the provider knows it, or the package and version for a classical model. |
 | capabilities | array of AiCapability: enum (chat, embedding, vision, rerank, speechToText, textToSpeech) |  |  |
@@ -3059,6 +3794,12 @@ Offline golden set, backtest or shadow comparison of a candidate against its bas
 | lifecycle.staging | enum (draft, pilot, active, retired) |  |  |
 | lifecycle.production | enum (draft, pilot, active, retired) |  |  |
 | isDefaultForTasks | array of string |  | Tasks this model is the default for (AIC-010), e.g. |
+| curatedRange | array of object |  | TICVAI's curated range: the tasks this model may serve (Chinmay, 2 October, workbook Q1, Q2 and Q9; the AI/ML model selection of 2 October; CHG-CSA-001). |
+| curatedRange[].taskKey | string |  |  |
+| curatedRange[].tier | enum (small, strong, reasoning, vision, embedding, reranking, moderation, piiDetection, …) |  |  |
+| curatedRange[].rank | integer |  | (min 1; max 5) |
+| curatedRange[].byokEligible | boolean |  | (default True) |
+| residencyClasses | array of AiResidencyClass: enum (uaeOnly, globalAllowed, onPrem) |  | The tenant residency classes whose calls this model may serve (CHG-CSA-002). |
 | taskFitness | array of object |  | Evaluated fitness per task (21 September minutes, M21-09, our proposal): a score from the task's golden set (runAiEvaluation) and the band the task needs. (read-only) |
 | taskFitness[].taskKey | string | yes |  |
 | taskFitness[].score | number | yes | (min 0; max 1) |
@@ -3073,6 +3814,7 @@ Offline golden set, backtest or shadow comparison of a candidate against its bas
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Add or change a platform model (platform) |
+| 422 |  | isDefaultForTasks names a task this model's curatedRange does not list (model-not-curated, CHG-CSA-001). |
 | 201 |  | Created |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
@@ -3092,7 +3834,7 @@ Records containment and performs it: pause a capability, roll back a release, re
 |---|---|
 | Permission | `AI_APPROVE` |
 | Scope level | tenant |
-| Part of slice | setup, makes `ai.capability`, `ai.policy_exception`, `ai.release` non-empty |
+| Part of slice | setup, makes `ai.release` non-empty |
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
@@ -3137,6 +3879,9 @@ Records containment and performs it: pause a capability, roll back a release, re
 | containment[].byPrincipalId | string (uuid) |  |  |
 | rootCause | string |  | (nullable) |
 | remediation | string |  | (nullable) |
+| impact | string |  | The post-incident review's impact (closeAiIncident, CHG-CSA-045). (nullable) |
+| controlFailure | string |  | (nullable) |
+| lessonsLearned | string |  | (nullable) |
 | ownerPrincipalId | string (uuid) |  | (nullable) |
 | openedAt | string (date-time) |  | (read-only) |
 | containedAt | string (date-time) |  | (read-only; nullable) |
@@ -3150,6 +3895,204 @@ Records containment and performs it: pause a capability, roll back a release, re
 | 200 |  | Contain an incident |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 409 |  | The incident is closed (incident-closed). |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
+### listAiGovernanceAlerts
+
+**`GET /governance-alerts`**: Governance alerts
+
+**Policy, control, data, behaviour and operational alerts in one place** (AIC-210..223; ADM-549..555), including `promotionReady` when a shadow model passes its gate (design 3.12), which the P09 governance area shows as a tile.
+
+|  |  |
+|---|---|
+| Permission | `AI_USE` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | replica |
+| Reads | `ai.governance_alert` |
+| Writes | - |
+| Called by | ADM-519, ADM-549, ADM-552, ADM-553, ADM-554, ADM-555, ADM-558 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| kind | query |  | enum (policyViolation, crossScopeAttempt, maskingDefect, dataUsage, behaviourDrift, inputDrift, bias, overrideRateShift, …) |  |
+| status | query |  | enum (open, acknowledged, dismissed, resolved, incidentOpened) |  |
+| severity | query |  | enum (info, low, medium, high, critical) |  |
+| pageSize | query |  | integer |  |
+| cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
+
+**Response**: `object`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| items | array of AiGovernanceAlert | yes |  |
+| items[].id | string (uuid) |  | (read-only) |
+| items[].kind | enum (policyViolation, crossScopeAttempt, maskingDefect, dataUsage, behaviourDrift, inputDrift, bias, overrideRateShift, …) | yes |  |
+| items[].severity | enum (info, low, medium, high, critical) | yes |  |
+| items[].capabilityKey | string |  | (nullable) |
+| items[].releaseId | string (uuid) |  | For promotionReady and evaluationRegression: the release concerned. (nullable) |
+| items[].subjectRef | string |  | (nullable) |
+| items[].evidence | object |  | (nullable) |
+| items[].status | enum (open, acknowledged, dismissed, resolved, incidentOpened) | yes | (read-only) |
+| items[].incidentId | string (uuid) |  | (read-only; nullable) |
+| items[].raisedAt | string (date-time) |  | (read-only) |
+| items[].decidedByPrincipalId | string (uuid) |  | (read-only; nullable) |
+| items[].decidedAt | string (date-time) |  | (read-only; nullable) |
+| items[].note | string |  | (read-only; nullable) |
+| items[].scopePath | string |  | The partition key (ADR-0005). (read-only) |
+| nextCursor | string |  |  |
+| hasMore | boolean | yes |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Governance alerts |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
+### listAiIncidents
+
+**`GET /incidents`**: AI incidents
+
+Governance incidents from detection to closure (ADM-549, ADM-556), linked to operational incidents where both apply (AIC-250).
+
+|  |  |
+|---|---|
+| Permission | `AI_USE` |
+| Scope level | tenant |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | replica |
+| Reads | `ai.incident` |
+| Writes | - |
+| Called by | ADM-549, ADM-556 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| status | query |  | enum (open, contained, investigating, remediating, closed) |  |
+| severity | query |  | enum (low, medium, high, critical) |  |
+| pageSize | query |  | integer |  |
+| cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
+
+**Response**: `object`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| items | array of AiIncident | yes |  |
+| items[].id | string (uuid) |  | (read-only) |
+| items[].reference | string | yes | (read-only) |
+| items[].title | string | yes |  |
+| items[].kind | enum (governance, operational, both) |  |  |
+| items[].severity | enum (low, medium, high, critical) | yes |  |
+| items[].status | enum (open, contained, investigating, remediating, closed) | yes | (read-only) |
+| items[].capabilityKeys | array of string |  |  |
+| items[].alertIds | array of string (uuid) |  |  |
+| items[].operationalIncidentRef | string |  | The linked operational incident, where both apply (AIC-250). (nullable) |
+| items[].containment | array of object |  | (read-only) |
+| items[].containment[].action | string |  |  |
+| items[].containment[].targetRef | string |  |  |
+| items[].containment[].at | string (date-time) |  |  |
+| items[].containment[].byPrincipalId | string (uuid) |  |  |
+| items[].rootCause | string |  | (nullable) |
+| items[].remediation | string |  | (nullable) |
+| items[].impact | string |  | The post-incident review's impact (closeAiIncident, CHG-CSA-045). (nullable) |
+| items[].controlFailure | string |  | (nullable) |
+| items[].lessonsLearned | string |  | (nullable) |
+| items[].ownerPrincipalId | string (uuid) |  | (nullable) |
+| items[].openedAt | string (date-time) |  | (read-only) |
+| items[].containedAt | string (date-time) |  | (read-only; nullable) |
+| items[].closedAt | string (date-time) |  | (read-only; nullable) |
+| items[].scopePath | string |  | The partition key (ADR-0005). (read-only) |
+| nextCursor | string |  |  |
+| hasMore | boolean | yes |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | AI incidents |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
+### openAiIncident
+
+**`POST /incidents`**: Open an AI incident
+
+From one or more governance alerts, or by hand (ADM-555, ADM-556). Emits `ai.incidentOpened`.
+
+|  |  |
+|---|---|
+| Permission | `AI_CONFIGURE` |
+| Scope level | tenant |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `ai.governance_alert`, `ai.incident`, `cache:idempotency` |
+| Writes | `ai.governance_alert`, `ai.incident`, `cache:idempotency` |
+| Called by | ADM-555, ADM-556 |
+| State model | AI incident ([states/ai-incident.yaml](../../../states/ai-incident.yaml)): created as `open` |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| title | string | yes |  |
+| kind | enum (governance, operational, both) |  | (default governance) |
+| severity | enum (low, medium, high, critical) | yes |  |
+| capabilityKeys | array of string |  |  |
+| alertIds | array of string (uuid) |  |  |
+| operationalIncidentRef | string |  | (nullable) |
+| ownerPrincipalId | string (uuid) |  | (nullable) |
+
+**Response**: `AiIncident`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) |  | (read-only) |
+| reference | string | yes | (read-only) |
+| title | string | yes |  |
+| kind | enum (governance, operational, both) |  |  |
+| severity | enum (low, medium, high, critical) | yes |  |
+| status | enum (open, contained, investigating, remediating, closed) | yes | (read-only) |
+| capabilityKeys | array of string |  |  |
+| alertIds | array of string (uuid) |  |  |
+| operationalIncidentRef | string |  | The linked operational incident, where both apply (AIC-250). (nullable) |
+| containment | array of object |  | (read-only) |
+| containment[].action | string |  |  |
+| containment[].targetRef | string |  |  |
+| containment[].at | string (date-time) |  |  |
+| containment[].byPrincipalId | string (uuid) |  |  |
+| rootCause | string |  | (nullable) |
+| remediation | string |  | (nullable) |
+| impact | string |  | The post-incident review's impact (closeAiIncident, CHG-CSA-045). (nullable) |
+| controlFailure | string |  | (nullable) |
+| lessonsLearned | string |  | (nullable) |
+| ownerPrincipalId | string (uuid) |  | (nullable) |
+| openedAt | string (date-time) |  | (read-only) |
+| containedAt | string (date-time) |  | (read-only; nullable) |
+| closedAt | string (date-time) |  | (read-only; nullable) |
+| scopePath | string |  | The partition key (ADR-0005). (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 201 |  | Open an AI incident |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
@@ -3194,6 +4137,7 @@ The recommendation and upsell engine (design C11)
 | productId | string (uuid) |  | The product in view, for a product-page placement. (nullable) |
 | subjectId | string (uuid) |  | Known customer, where signed in. (nullable) |
 | sessionRef | string |  | (nullable) |
+| previewOnly | boolean |  | A staff preview that records nothing (contract gap CHG-WIR-014, BO-102; CHG-CSA-045): the slot is filled as a guest would see it, but no impression, tracking id or decision record is written. (default False) |
 | maxItems | integer |  | (min 1; max 12; default 4) |
 | locale | string |  | (nullable) |
 | itemKinds | array of enum (upsell, crossSell, upgrade, bundle, addOn, membership, nextBestOffer, offer, …) |  | Only these kinds may fill the slot (29 September, build). |
@@ -3246,7 +4190,7 @@ Impressions, clicks, add-to-cart, dismissals and explicit declines, batched. A `
 | Guest callable | True |
 | Reads | `ai.rec_decision`, `cache:idempotency` |
 | Writes | `ai.rec_decline`, `ai.rec_event`, `cache:idempotency` |
-| Called by | BO-102, GST-001, GST-036, GST-048, WEB-001, WEB-008, WEB-043 |
+| Called by | GST-001, GST-036, GST-048, WEB-001, WEB-008, WEB-043 |
 
 **Parameters**
 
@@ -3364,7 +4308,7 @@ Sending both, or naming a document in another collection or in a state the trans
 | Conflict policy | serverWins |
 | Reads | `ai.chunk_embedding`, `ai.knowledge_collection`, `ai.knowledge_document`, `cache:embedding`, `cache:idempotency`, `qdrant:knowledge` |
 | Writes | `ai.chunk_embedding`, `ai.knowledge_document`, `cache:embedding`, `cache:idempotency`, `qdrant:knowledge` |
-| Called by | **no screen**: no screen lists it in its apis, so it is reachable only by API or import until one does (README, Known gaps) |
+| Called by | BO-798 |
 | State model | AI knowledge document ([states/ai-knowledge-document.yaml](../../../states/ai-knowledge-document.yaml)): moves `indexed` -> `processing`, `indexed` -> `superseded`, `failed` -> `processing` |
 
 **Parameters**
@@ -3496,7 +4440,7 @@ Results are scoped to the principal, and each carries the collection it came fro
 | Read routing | replica |
 | Reads | `ai.chunk_embedding`, `ai.knowledge_collection`, `ai.knowledge_document`, `assets.media_asset`, `cache:answer`, `cache:idempotency`, `catalogue.product`, `qdrant:knowledge` |
 | Writes | `ai.activity`, `cache:answer`, `cache:idempotency`, `qdrant:knowledge` |
-| Called by | CMS-010, CMS-062, EMP-040, EMP-041 |
+| Called by | CMS-010, CMS-062, EMP-040, EMP-041, SUP-006 |
 
 **Parameters**
 
@@ -3712,6 +4656,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | is_enabled | boolean | yes |  |
 | coverage | text | no | Whether the tenant may supply a key per task or one key for everything. |
 | allowed_tasks | text[] | no | Where coverage is perTask: the gateway tasks a tenant key may serve. |
+| task_model_map | jsonb | no | The provider's equivalent model for each task, chosen by TICVAI (Chinmay, 2 October, workbook Q1; closes AI-D20; CHG-CSA-001). |
 | reason | text | no |  |
 | platform_staff_grant_id | uuid | no | The open platform-staff grant the change was made under (audit R098). |
 | decided_by_principal_id | uuid | no |  |
@@ -3848,6 +4793,24 @@ Every table this service owns that the slice reads or writes, with its columns a
 | blob_ref | text | no |  |
 | scope_path | text | no | The partition key (ADR-0005). |
 
+### `ai.forecast_accuracy`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | no |  |
+| definition_id | uuid | yes |  |
+| version_id | uuid | no |  |
+| producer_ref | text | no |  |
+| horizon_days | integer | yes |  |
+| period_start | timestamptz | yes |  |
+| period_end | timestamptz | no |  |
+| wape | numeric | no |  |
+| bias | numeric | no |  |
+| interval_coverage | numeric | no | Share of actuals inside the 10th-90th percentile band. |
+| baseline_wape | numeric | no |  |
+| measured_at | timestamptz | no |  |
+| scope_path | text | no | The partition key (ADR-0005). |
+
 ### `ai.forecast_definition`
 
 | Column | Type | Required | Notes |
@@ -3856,6 +4819,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | definition_key | text | yes |  |
 | name | text | no |  |
 | subject | text | yes |  |
+| module | text | no | Whose AI this forecast is, and so who publishes it (Chinmay, 2 October, workbook Q3: "the permission holder for that module's AI"; CHG-FUP-004). |
 | grain | text | yes |  |
 | dimensions | text[] | no | Breakdowns forecast directly or reconciled to. |
 | segment_ids | text[] | no | The marketing-crm segments customerSegment breaks down by, in priority order where a guest is in several. |
@@ -3909,6 +4873,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | id | uuid | no |  |
 | definition_id | uuid | yes |  |
 | version_number | integer | yes |  |
+| module | text | no | The module of the version's definition (AiForecastDefinition.module), copied when the version is produced; the module whose AI publish permission publishForecastVersion requires (CHG-FUP-004). |
 | status | text | yes |  |
 | basis | text | yes |  |
 | maturity | jsonb | no |  |
@@ -4044,6 +5009,9 @@ Every table this service owns that the slice reads or writes, with its columns a
 | operational_incident_ref | text | no | The linked operational incident, where both apply (AIC-250). |
 | root_cause | text | no |  |
 | remediation | text | no |  |
+| impact | text | no | The post-incident review's impact (closeAiIncident, CHG-CSA-045). |
+| control_failure | text | no |  |
+| lessons_learned | text | no |  |
 | owner_principal_id | uuid | no |  |
 | opened_at | timestamptz | no |  |
 | contained_at | timestamptz | no |  |
@@ -4217,6 +5185,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | id | uuid | no |  |
 | layer | text | yes |  |
 | provider_kind | text | no |  |
+| vendor | text | no | Whose model this is (CHG-FUP-008): the provider company as AiProvider.vendor names it. |
 | producer_type | text | yes |  |
 | model_name | text | yes | The deployment or model name as the provider knows it, or the package and version for a classical model. |
 | capabilities | text[] | no |  |
@@ -4229,6 +5198,8 @@ Every table this service owns that the slice reads or writes, with its columns a
 | output_cost_per_million_tokens | numeric(18,4) | no |  |
 | lifecycle | jsonb | no | Lifecycle per environment (AIC-145): a capability or model can be live in staging and still a draft in production. |
 | is_default_for_tasks | text[] | no | Tasks this model is the default for (AIC-010), e.g. |
+| curated_range | jsonb | no | TICVAI's curated range: the tasks this model may serve (Chinmay, 2 October, workbook Q1, Q2 and Q9; the AI/ML model selection of 2 October; CHG-CSA-001). |
+| residency_classes | text[] | no | The tenant residency classes whose calls this model may serve (CHG-CSA-002). |
 | scope_path | text | no | The partition key (ADR-0005). |
 
 ### `ai.operational_requirement`
@@ -4264,8 +5235,11 @@ Every table this service owns that the slice reads or writes, with its columns a
 | allowed_role_ids | text[] | no |  |
 | masked_fields | text[] | no | Redacted before a prompt leaves the platform (8.3.73). |
 | requires_approval_for | text[] | no | 8.3.61–8.3.64. |
+| scrubbing | jsonb | no | Mandatory offline PII scrubbing and moderation on every LLM call (Chinmay, 2 October: "we may need to scrub personal info no matter what"; ADR-0020 amended; CHG-CSA-003). |
 | monthly_token_ceiling | integer | no |  |
 | ceiling_behaviour | text | no | Decided 17 August: warn, and let the venue manager choose. |
+| ceiling_behaviour_by_capability | jsonb | no | Ceiling behaviour per capability (AI design 5.9, AIC-227), so a budget never silently disables fraud scoring, which spends no tokens, or a critical capability. |
+| autonomy_overrides | jsonb | no | Tighten only (AI design 3.8, AIC-151). |
 | ceiling_warning_percent | integer | no | Warn before the ceiling, not at it. |
 | guest_capability_scope | text[] | no | What a guest-facing assistant may help with, and nothing else (2.1.28). |
 | retrieve_top_k | integer | no | How many chunks retrieval returns before reranking. |
@@ -4351,6 +5325,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 |---|---|---|---|
 | id | uuid | no | Assigned on create. |
 | kind | text | yes |  |
+| vendor | text | no | The provider company, any provider (Chinmay, 2 October, contract follow-ups: "As long as we get an API key it can be any model"; CHG-FUP-008), as a lower-case slug: mistral, cohere, core42, openai. |
 | capability | text | yes |  |
 | model | text | no |  |
 | failover_provider_id | uuid | no | BL-151. |
@@ -4360,11 +5335,14 @@ Every table this service owns that the slice reads or writes, with its columns a
 | scope_path | text | no | Resolved scope node. |
 | tenant_id | uuid | no | Null only where scopeLevel is platform. |
 | credential_ref | text | no | A key-vault reference, never the key. |
+| credential_hint | text | no | The last four characters of the stored key, so an operator can tell two keys apart. |
 | credential_rotated_at | timestamptz | no |  |
 | credential_expires_at | timestamptz | no | Where the provider issues expiring keys. |
 | last_verified_at | timestamptz | no | When testAiProvider last confirmed the key works. |
+| compatibility | jsonb | no | The last compatibility test of this provider (testAiProvider). |
 | endpoint | text | no |  |
 | residency | text | no | Where inference physically happens. |
+| residency_classes | text[] | no | The tenant residency classes this provider may serve (Chinmay, 2 October: the AI residency decision; CHG-CSA-002). |
 | max_tokens | integer | no |  |
 | is_active | boolean | yes |  |
 | managed_by | text | no | Who holds the provider account, and so who pays (AI design 5.9, decided 29 September). |
@@ -4438,6 +5416,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | current_ref | text | no | What production runs now: the rule, or the previously promoted artefact. |
 | previous_ref | text | no |  |
 | layer | text | yes |  |
+| module | text | no | Whose AI this release is, and so who promotes it (Chinmay, 2 October, workbook Q7: "AI release promotion goes to whoever holds it"; CHG-FUP-004). |
 | suggestion_kind | text | no | Where the capability answers a requestSuggestion kind: promotion rewrites that kind's assignment in AiPolicy.suggestionProviders. |
 | stage | text | yes |  |
 | shadow_started_at | timestamptz | no |  |
@@ -4467,6 +5446,28 @@ Every table this service owns that the slice reads or writes, with its columns a
 | produced_at | timestamptz | yes |  |
 | expires_at | timestamptz | no | A demand forecast for Saturday is worthless on Sunday. |
 
+### `ai.training_run`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | no |  |
+| capability_key | text | yes |  |
+| suggestion_kind | text | no |  |
+| forecast_definition_key | text | no |  |
+| training_window_from | date | no |  |
+| training_window_to | date | no |  |
+| data_cutoff_at | timestamptz | no |  |
+| includes_imported_history | boolean | no |  |
+| feature_set_version | text | no |  |
+| artefact_ref | text | no | The model file in the tenant's Blob container. |
+| backtest_run_id | uuid | no |  |
+| release_id | uuid | no |  |
+| status | text | yes |  |
+| metrics | jsonb | no |  |
+| started_at | timestamptz | no |  |
+| completed_at | timestamptz | no |  |
+| scope_path | text | no | The partition key (ADR-0005). |
+
 ### `ai.venue_settings`
 
 | Column | Type | Required | Notes |
@@ -4488,22 +5489,22 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-91 operations, added to this service in later releases without changing any of the above.
+79 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
-| actions | `cancelActionPlan`, `getActionPlan`, `listAiTools`, `overrideAiDecision`, `pauseActionPlan`, `resumeActionPlan`, `retryActionStep`, `rollbackActionPlan`, `setAiTool`, `simulateActionPlan` |
-| ai | `proposeWalkways`, `recordSuggestionOutcome`, `testAiProvider` |
+| actions | `cancelActionPlan`, `getActionPlan`, `listAiTools`, `pauseActionPlan`, `resumeActionPlan`, `retryActionStep`, `rollbackActionPlan`, `setAiTool`, `simulateActionPlan` |
+| ai | `proposeWalkways`, `recordSuggestionOutcome`, `setAiCredential` |
 | audit | `exportAiEvidencePackage`, `getAiDecisionTrace`, `replayAiDecision`, `searchAiDecisions` |
-| config | `getAiByokEnablement`, `listAiProviders` |
+| config | `getAiSpendCeiling`, `setAiProvider`, `setAiSpendCeiling` |
 | configure | `answerConfigurationQuestion`, `attachConfigurationSource`, `buildConfigurationPlan`, `decideBlueprintRecommendation`, `getConfigurationBlueprint`, `listConfigurationSessions`, `listConfigurationSources`, `proposeSeatMapChanges`, `startConfigurationSession` |
-| forecast | `compareForecastScenarios`, `configureForecastSignalSource`, `exportForecastVersion`, `getForecast`, `getForecastAccuracy`, `listForecastDefinitions`, `listForecastSignals`, `listForecastVersions`, `listOperationalRequirements`, `setForecastDefinition` |
+| forecast | `compareForecastScenarios`, `configureForecastSignalSource`, `exportForecastVersion`, `listForecastDefinitions`, `listForecastSignals` |
 | generate | `generateConfiguration`, `generateVenueLayout`, `proposeLookalikeSegment` |
-| governance | `getEffectiveAiPolicy`, `listAiCapabilities`, `listAiGovernancePolicyVersions`, `listAiInteractions`, `listProposedActions`, `pauseAiCapability`, `revokeAiPolicyException` |
+| governance | `configureAiCapability`, `createAiPolicyException`, `listAiInteractions`, `listProposedActions`, `resumeAiCapability` |
 | insights | `configureAnomalyDetector`, `listAiInsights`, `listAnomalyDetectors`, `listMarketingRecommendations` |
 | knowledge | `listAssistantProfiles`, `listKnowledgeGaps` |
-| models | `listAiEvaluations`, `listAiModels`, `listAiTrainingRuns`, `listPromptTemplates` |
-| monitoring | `closeAiIncident`, `decideAiGovernanceAlert`, `listAiCapabilityHealth`, `listAiCapabilityMaturity`, `listAiControls`, `listAiGovernanceAlerts`, `listAiIncidents`, `listAiRiskRegister`, `openAiIncident`, `runAiControlTest`, `setAiRiskRegisterEntry` |
+| models | `listAiModels`, `listPromptTemplates` |
+| monitoring | `closeAiIncident`, `decideAiGovernanceAlert`, `listAiCapabilityHealth`, `listAiCapabilityMaturity`, `listAiControls`, `listAiRiskRegister`, `runAiControlTest`, `setAiRiskRegisterEntry` |
 | recommend | `explainRecommendationDecision`, `getCustomerRecommendationProfile`, `simulateRecommendationDecision` |
 | retrieval | `listIndexFailures`, `listIndexJobs`, `listIndexSources`, `listKnowledgeCollections`, `removeIndexEntry` |
 | risk | `addRiskCaseEvidence`, `backtestRiskStrategy`, `closeRiskCase`, `configureRiskStrategy`, `createRiskCase`, `decideRiskAlert`, `expandRiskNetwork`, `getApprovalRequestScore`, `getEntityRisk`, `getRiskCase`, `listRiskAlerts`, `proposeRiskAction`, `scoreApprovalRequest`, `scoreTransactionRisk` |

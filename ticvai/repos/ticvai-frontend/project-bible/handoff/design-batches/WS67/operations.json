@@ -75,6 +75,19 @@
   "requestBody": null,
   "responds": "DashboardData"
  },
+ "getReport": {
+  "method": "GET",
+  "path": "/reports/{reportId}",
+  "contract": "reporting",
+  "summary": "Read a report definition",
+  "permission": "REPORT_VIEW_VENUE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ReportDefinition"
+ },
  "getSemanticModel": {
   "method": "GET",
   "path": "/semantic-model",
@@ -137,6 +150,40 @@
   "parameters": [],
   "requestBody": null,
   "responds": "KpiDefinition"
+ },
+ "listReports": {
+  "method": "GET",
+  "path": "/reports",
+  "contract": "reporting",
+  "summary": "List available report definitions",
+  "permission": "REPORT_VIEW_VENUE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "category",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "search",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
  },
  "recordDashboardView": {
   "method": "POST",

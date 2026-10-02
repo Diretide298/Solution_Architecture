@@ -1,14 +1,14 @@
 # WS39 — Pricing   Revenue Management board 6
 
-**10 screens · 12 operations · 15 schemas · 3 permissions**
+**10 screens · 13 operations · 17 schemas · 4 permissions**
 
-Platform P09 TICVAI Web · ships as **ticvai-control** ·
-platformAdmin audience · web ·
+Platform P08 Venue Management · ships as **venue-management** ·
+staff audience · web ·
 online only
 
 ## Who this is for
 
-**platformAdmin on web.** Everything below is how you know what is
+**staff on web.** Everything below is how you know what is
 true. **None of it is the subject.** The subject is the person in front of the screen and the one
 thing they came to do.
 
@@ -48,8 +48,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 3 permissions apply here:
-  `AI_CONFIGURE, PRICE_CONFIGURE, PRODUCT_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 4 permissions apply here:
+  `AI_APPROVE, AI_CONFIGURE, PRICE_CONFIGURE, PRODUCT_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -60,6 +60,45 @@ convincingly. It is never a caption.
   field, the control, whether it is required, its default, its limits and allowed values, its format
   and its error; and, element by element, what is shown and in what format, what each action
   produces and where the user goes next. Draw exactly that.
+
+## The processes these screens belong to
+
+Written by the owner of each process (`handoff/design-notes/`). Read before any screen: it says how the process runs end to end and which words the screens must use.
+
+### Ticketing & Guest Commerce, as the venue and TICVAI configure and run it
+
+WHAT THE PROCESS IS. Everything a guest can buy is set up, priced, promoted and serviced here, on Venue Management (P08, the venue's own back office, served inside the venue's cell) and on the TICVAI Console (P09, TICVAI's control plane, outside every cell). End to end: (1) CATALOGUE. A product has one of twelve kinds (admission, timedAdmission, datedAdmission, openDated, seated, membership, bundle, fnb, retail, rental, addOn, giftCard). Its ticket types (adult, child, senior, resident...) are not typed one by one: they are generated from the product's attributes (components) and each value combination becomes a sellable ticket type with no extra setup (DI-164). What a ticket grants (validity, entries, re-entry, days of week, blackout dates, expiry anchor, fast track, transfer) lives on a reusable entitlement template, not on the product. Who may take part (age, height, supervision, certification) is the eligibility rule; what the guest must answer is the data mask and the consent questions; how the guest sees it is guestListing (bookable, infoOnly, hidden), display tags (at most six), media and the booking flow. Group, family and corporate products and every after-sales policy (reschedule, exchange, refund, cancellation, upgrade, transfer) are configured inside the one product configuration, never on separate screens (DI-465, DI-466). (2) LIFECYCLE AND PUBLICATION. A product moves draft, inReview, approved, live, withdrawn, archived. Approval and publication are two acts with two permissions (PRODUCT_APPROVE, PRODUCT_PUBLISH, R091); every product is authorised before it sells online or on site (DI-438). Approved is still not on a till: a till sells only what is in the signed catalogue release it pulled (publishBundle, ADR-0013), so a saved price is a back-office fact until the venue publishes to tills. Changing something that has sold is preceded by an impact check (assessProductChange: orders affected, entitlements issued, future performances, open carts); restoring a version creates a new version, and sold tickets keep the price and terms they were sold under (restoreProductVersion, DI-938, TRACKER Actions row 145). (3) PRICE. Prices live in price lists: per venue, per channel set, with validity dates and a priority, copied for the next season with an uplift (copyPriceList) and repriced in bulk only after a dry run (bulkChangePrices). Currency and decimal scale are never chosen on a form: they resolve from the venue's region (ADR-0008, ADR-0018; AED 2 places, OMR and BHD 3). When several rules apply, the configured hierarchy decides; there is no "lowest price wins" default (DI-595). Tax on the pre-discount price and three-decimal rounding are regional settings (DI-598). Dynamic rules always show their minimum and maximum price guardrails beside the trigger (getDynamicPriceRule). (4) PROMOTE AND BUNDLE. A promotion is a rule (automatic, or gated by a code) created in draft, made live only by Publish, which first analyses stacking; a …
+*(source: DI-164; DI-171; DI-438; DI-465; DI-466; DI-595; DI-598; DI-387; DI-039; DI-044; DI-474; DI-671; DI-987; DI-019; DI-080; ADR-0008; ADR-0013; ADR-0018; ADR-0019; ADR-0030; R091; R098; R101; R222; REV3-21; contracts/spine/catalogue.yaml#transitionProductLifecycle …)*
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Product | Anything sellable, of one of the twelve kinds. The record that carries names, channels, listing, media and policies. | Item (except on F&B and retail screens), SKU (for tickets), Offering | contracts/spine/catalogue.yaml#/components/schemas/ProductKind |
+| Ticket type | One sellable variant of an admission or event product (Adult, Child, Resident Adult), generated from the product's attributes. For retail and F&B the same record is labelled Variant. | Variant (on ticket screens), Sub-product, Rate (that is a price), Axis value | contracts/spine/catalogue.yaml#updateProductVariant / DI-164 / DI-437 |
+| Attribute | A dimension that generates ticket types (Guest category, Residency, Tier, Length). Each has values; adding a value adds ticket types. | Axis, Component (the client's word; use it only in help text), Option | contracts/spine/catalogue.yaml#setProductAttributes / DI-164 / DI-450 |
+| Entitlement | What a ticket lets the holder do (validity, entries, re-entry, days, blackout dates, expiry, fast track, transfer), defined once on an entitlement template and shared by several products. | Access rights, Ticket rules, Validity profile | contracts/spine/catalogue.yaml#createEntitlementTemplate / DI-171 / DI-451 |
+| Eligibility rule | Who may take part in or buy a product (age, height, supervision, waiver, certification). Distinct from a promotion's eligibility, which decides who gets a discount. | Restriction, Access rule (that is access control) | contracts/spine/catalogue.yaml#setProductEligibilityRule / DI-463 |
+| Price list | A set of prices for one venue and a set of channels, valid between two dates, with a priority. Several coexist (B2C, B2B, season). | Price book, Rate card, Tariff | contracts/spine/catalogue.yaml#createPriceList / DI-140 / DI-163 |
+| Price category | A standard rate type (Adult, Child, Member) reused across lists so venues do not invent "Adult Standard" and "Normal Adult". | Price band (that is a seat-category band), Fare type (transport) | contracts/spine/catalogue.yaml#setPriceCategoryRateType / … |
+| Price band | A priced band on a seat category (code, label, colour, amount, channel, from-date). | Price category, Zone price | contracts/satellite/seating.yaml#/components/schemas/SeatPriceBand |
+| Promotion | A rule that changes a price automatically or when a code is entered; draft until published; declares how it stacks. | Offer (except in guest copy), Deal, Discount rule | contracts/satellite/promotions.yaml#createPromotion / DI-173 / DI-174 |
+| Coupon code | A code issued from a coupon campaign that applies a promotion-style discount; one shared code or many single-use codes. | Voucher, Promo voucher | contracts/satellite/promotions.yaml#createCouponCampaign / DI-173 |
+| Voucher | A code that carries money (face value, balance), sold or issued; a liability until redeemed or expired. | Coupon, Credit note | contracts/satellite/promotions.yaml#listVoucherBatches / … |
+| Bundle | A product sold as one line whose price differs from the sum of its components, with a mandatory revenue allocation. "Package" is acceptable in guest copy. | Combo (that is an F&B meal deal), Catalogue bundle | contracts/satellite/promotions.yaml#createBundle / DI-220 / ADR-0019 |
+| Catalogue release | The signed snapshot of a venue's catalogue, prices, promotions and sale boards that tills, kiosks and devices pull. Its action label is "Publish to tills". | Bundle, Catalogue bundle, Sync, Deploy | contracts/spine/catalogue.yaml#publishBundle / … |
+| Approve / Publish / Save | Save keeps a draft; Approve records that it is authorised (PRODUCT_APPROVE); Publish makes it live for guests and channels (PRODUCT_PUBLISH). Three different buttons, never merged. | Submit, Go live, Activate (except CatalogueConfigStatus active), Deploy | R091 / contracts/spine/catalogue.yaml#transitionProductLifecycle / DI-438 |
+| Product states | Draft, In review, Approved, Live, Withdrawn, Archived (ProductLifecycleState), always as coloured badges with these exact labels. | Published (for a product), Pending, Inactive (for a product) | contracts/spine/catalogue.yaml#/components/schemas/ProductLifecycleState |
+| Channel | Where something is sold. Labels: pos Point of sale; kiosk Kiosk; web and guestWeb Website; mobile and guestApp App; b2b B2B partners; partner Partner; ota Travel agents (OTA); callCentre Call centre; api API; backOffice Back office. | Touchpoint, Outlet (an outlet is a business inside a venue), raw enum values | contracts/spine/catalogue.yaml#/components/schemas/Channel / … |
+| Refund | Money returned after settlement, wholly or for some lines, under the venue's refund policy. | Return (that is retail goods), Reversal, Void | contracts/spine/orders.yaml#createRefund / DI-252 |
+| Void | Cancelling a whole order before settlement, within the same shift, with a reason from the void list. After settlement it is a refund. | Cancel order, Delete | contracts/spine/orders.yaml#voidOrder / R222 |
+| Exchange / Reschedule | Exchange swaps lines for other products or dates and settles only the difference; Reschedule is the same product moved to another date or time. | Rebook, Date change (acceptable only in guest copy), Refund and resell | contracts/spine/orders.yaml#exchangeOrderLines / … |
+| Hold / Capture / Release | A deposit or stored-value amount is held, then partly or fully captured, and the rest released. A held deposit is not a payment. | Charge, Pre-auth (in staff copy), Block funds | contracts/spine/orders.yaml#authoriseStoredValue / … |
+| Wallet (TICVAI wallet) | The guest's stored-value balance on TICVAI, spent by hold and capture. Distinct from the tender "Apple Pay / Google Pay", which the contract also calls wallet. | Digital wallet (for stored value), E-wallet, Credit (without a type) | contracts/spine/orders.yaml#/components/schemas/TenderKind / R080 |
+| Credit lot | One amount of wallet credit of one credit type (cash, bonus, gift) with its own expiry; lots are spent nearest expiry first and the guest sees the breakdown but cannot choose. | Bucket, Batch, Top-up | TRACKER Actions row 171 / contracts/satellite/wallet.yaml#expireCreditLots |
+| Venue map / Seat map | A venue map is the wayfinding map of a park or a floor (points, paths, bookable places); a seat map is the seating layout of an auditorium or stand. Never just "map" where both could be meant. | Layout (alone), Floor plan (unless it is a floor map), Map (alone) | contracts/satellite/venue-map.yaml#createVenueMap / … |
+| Point / Bookable place | A point is a place on a venue map (toilet, ride, restaurant, exit). A bookable place is a cabana, lounger, table or pitch placed on the map and sold through its price band. | Pin, POI, Marker, Resource (in staff copy) | contracts/satellite/venue-map.yaml#setVenuePoint / … |
+| Station / Route / Timetable / Departure / Fare table / Pass … | A route is an ordered list of stations with offsets; a timetable generates departures up to its release horizon; a fare table prices a route per passenger type; a pass type is a multi-trip or unlimited pass sold as a product. | Stop (except in the stop list), Line (except lineCode), Schedule, Trip (except a guest's journey) | contracts/satellite/transport.yaml / REV3-21 |
+| Applies from | The effective date of a change. Every dated change shows it, and sold items keep their old terms. | Effective date (in labels), Start date (for a change) | contracts/satellite/seating.yaml#updateSeatCategory / TRACKER Actions row 194 |
+
 
 ## The screens
 
@@ -75,7 +114,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `ADM-103` | Market, Tourism, Holiday & Contextual Signal Hub | B–D | 24 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
 | `ADM-104` | AI Demand Forecasting & Booking Curve Studio | B–D | 0 | 12 | 6 | 3 | 1 | 6 | — | notStarted (generated) |
 | `ADM-105` | Price Elasticity & Revenue Response Intelligence | B–D | 0 | 20 | 6 | 1 | 0 | 0 | — | notStarted (generated) |
-| `ADM-106` | AI Pricing Recommendation & Explainability Center | B–D | 0 | 0 | 6 | 12 | 1 | 0 | — | notStarted (generated) |
+| `ADM-106` | AI Pricing Recommendation & Explainability Center | B–D | 5 | 0 | 6 | 12 | 1 | 0 | — | notStarted (generated) |
 | `ADM-107` | AI Signal Registry, Data Quality & Model Governance | B–D | 18 | 48 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
@@ -94,15 +133,19 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `ticketing` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `PRODUCT_VIEW` (1 read); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `PRODUCT_VIEW` (1 read); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | commandCentre (compact density): the pack gives this screen both a metric directory (§Display) and a per-row directory (§Each opportunity displays) — counts over a population, then the population |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/commercial/ai-pricing-intelligence-command-center-adm-098` |
+
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** All AI signals, forecasts, opportunities and risks influencing pricing in one view for revenue managers.
 
 #### Inputs: what the user enters or picks
 
@@ -175,11 +218,15 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Risk | chip: Low, Medium, High | Risk of acting on the recommendation |
 | Urgency | chip: Low, Medium, High, Critical | Urgency (time to event and velocity) |
 
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **signals and recommendations**: KPI summary on top, paged list of pricing signals, each with confidence and the recommended action. *(source: contracts/spine/catalogue.yaml#listPricing / DI-043)*
+
 **Data it reads**: `listPricing` (onLoad, AI Pricing Intelligence Command Center)
 
 **Where the user goes next**
 
-- → `ADM-002` Platform Dashboard: *Platform Dashboard*
+- → `BO-100` Venue Home: *Back to Venue Home*
 - → `ADM-099` Internal Demand & Booking Signal Hub: *Works in Internal Demand & Booking Signal Hub*; calls `listPricing`
 - → `ADM-100` Weather Intelligence & Demand Impact Configuration: *Works in Weather Intelligence & Demand Impact Configuration*; calls `listPricing`
 - → `ADM-101` Nearby Event, Exhibition & Local Demand Intelligence: *Works in Nearby Event, Exhibition & Local Demand Intelligence*; calls `listPricing`
@@ -187,7 +234,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 - → `ADM-103` Market, Tourism, Holiday & Contextual Signal Hub: *Works in Market, Tourism, Holiday & Contextual Signal Hub*; calls `listPricing`
 - → `ADM-104` AI Demand Forecasting & Booking Curve Studio: *Works in AI Demand Forecasting & Booking Curve Studio*; calls `listPricing`
 - → `ADM-105` Price Elasticity & Revenue Response Intelligence: *Works in Price Elasticity & Revenue Response Intelligence*; calls `listPricing`
-- → `ADM-106` AI Pricing Recommendation & Explainability Center: *Works in AI Pricing Recommendation & Explainability Center*; calls `listPricing`
+- → `ADM-106` AI Pricing Recommendation & Explainability Center: *Works in AI Pricing Recommendation & Explainability Center*; carries `recommendationId`; calls `listPricing`
 - → `ADM-107` AI Signal Registry, Data Quality & Model Governance: *Works in AI Signal Registry, Data Quality & Model Governance*; calls `listPricing`
 
 #### States
@@ -200,6 +247,18 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the pricing intelligence are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+signal:
+  product: Day Pass
+  signal: Forecast rain Sat
+  recommendation: -10% Sat online
+  confidence: 0.74
+```
 
 #### Permissions
 
@@ -217,7 +276,7 @@ For this screen, newest first. An **Open question** is built to the default it s
 
 - Workshop packs group screens ten to a board, each opened by a command centre; that grouping is the navigation: the nine detail screens are reached from the board's hub and return to it. *(agreed · screen note 4 Sep 2026, BO-144 and the other board hubs · DI-653)*
 
-Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -225,7 +284,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-098` · status **notStarted** · provenance generated
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-098` · status **notStarted** · provenance generated
 - Client workshop board: `wireframes/WS100 Pricing   Revenue Management Board 6.dc.html#adm-098`
 - Workshop pack: Pricing___Revenue_Management_Reference.pdf board 6
 - Flow F148 *Pricing Revenue Management board 6: AI Pricing Intelligence Command Center*, step 1: Opens AI Pricing Intelligence Command Center → Provide Revenue Managers with a single operational view of all AI signals, forecasts, opportunities and risks influencing pricing.
@@ -246,7 +305,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-098?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
-- [ ] Every transition is wired: `ADM-002`, `ADM-099`, `ADM-100`, `ADM-101`, `ADM-102`, `ADM-103`, `ADM-104`, `ADM-105`, `ADM-106`, `ADM-107`.
+- [ ] Every transition is wired: `BO-100`, `ADM-099`, `ADM-100`, `ADM-101`, `ADM-102`, `ADM-103`, `ADM-104`, `ADM-105`, `ADM-106`, `ADM-107`.
 - [ ] Every gated control is gated: `PRODUCT_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
@@ -259,17 +318,21 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `ticketing` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `PRODUCT_VIEW` (1 read); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `PRODUCT_VIEW` (1 read); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/commercial/internal-demand-booking-signal-hub-adm-099` |
 
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
+
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Internal signals (sales pace, bookings, cancellations, occupancy, attendance) feeding forecasting and AI pricing; the highest-confidence signals.
 
 #### Inputs: what the user enters or picks
 
@@ -295,6 +358,10 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
 
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **signal list**: Signal, current value, trend, freshness. *(source: contracts/spine/catalogue.yaml#listInternalDemandBooking)*
+
 **Data it reads**: `listInternalDemandBooking` (onLoad, Internal Demand & Booking Signal Hub)
 
 **Where the user goes next**
@@ -312,6 +379,17 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+signal:
+  name: Bookings last 24 h
+  value: 1840
+  trend: +12%
+```
+
 #### Permissions
 
 - `listInternalDemandBooking` → `PRODUCT_VIEW` (read) · staff
@@ -326,7 +404,7 @@ No matrix row traces to this screen's operations or data.
 
 None names this screen.
 
-Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -339,7 +417,7 @@ Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-099` · status **notStarted** · provenance generated
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-099` · status **notStarted** · provenance generated
 - Client workshop board: `wireframes/WS100 Pricing   Revenue Management Board 6.dc.html#adm-099`
 - Workshop pack: Pricing___Revenue_Management_Reference.pdf board 6
 - Flow F148 *Pricing Revenue Management board 6: AI Pricing Intelligence Command Center*, step 2: Works in Internal Demand & Booking Signal Hub → Centralize the internal TICVAI signals used by forecasting and AI pricing models. These are generally the highest-confidence signals because they come directly from TICVAI transactions.
@@ -363,15 +441,19 @@ Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the 
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `ticketing` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `PRICE_CONFIGURE`, `PRODUCT_VIEW` (1 configure, 1 read); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `PRICE_CONFIGURE`, `PRODUCT_VIEW` (1 configure, 1 read); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | commandCentre (compact density): the pack gives this screen a metric directory (§Show) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's |
 | Offline | online only |
 | Opens with | `signalId` (navigation) |
 | Route | `/commercial/weather-intelligence-demand-impact-configuration-adm-100` |
+
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** How weather affects demand per venue and experience, and how the weather signal is used.
 
 #### Inputs: what the user enters or picks
 
@@ -416,6 +498,10 @@ Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the 
 
 Errors to draw in the form: 409 `feedSignal`.; 422 `invalidPeriod`.
 
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **weather signal configuration**: Impact range per condition (rain, heat over 42 degrees) and weight. *(source: contracts/spine/catalogue.yaml#setDemandSignalConfiguration)*
+
 #### Outputs: what the screen shows and produces
 
 **Shown**
@@ -450,6 +536,17 @@ Errors to draw in the form: 409 `feedSignal`.; 422 `invalidPeriod`.
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 `feedSignal`.; 422 `invalidPeriod`. |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+impact:
+  venue: Coastal Aqua
+  rain: -35%
+  heat42: -20%
+```
+
 #### Permissions
 
 - `listWeatherDemandImpact` → `PRODUCT_VIEW` (read) · staff
@@ -465,7 +562,7 @@ No matrix row traces to this screen's operations or data.
 
 None names this screen.
 
-Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -473,7 +570,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-100` · status **notStarted** · provenance generated
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-100` · status **notStarted** · provenance generated
 - Client workshop board: `wireframes/WS100 Pricing   Revenue Management Board 6.dc.html#adm-100`
 - Workshop pack: Pricing___Revenue_Management_Reference.pdf board 6
 - Flow F148 *Pricing Revenue Management board 6: AI Pricing Intelligence Command Center*, step 4: Works in Weather Intelligence & Demand Impact Configuration → Allow TICVAI to understand how weather conditions affect demand for different venues and experiences. This should be much more sophisticated than simply connecting a weather API.
@@ -497,15 +594,19 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `ticketing` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `PRICE_CONFIGURE`, `PRODUCT_VIEW` (1 configure, 1 read); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `PRICE_CONFIGURE`, `PRODUCT_VIEW` (1 configure, 1 read); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Detect/configure; Capture; Configure per TICVAI venue) and no display directory — it is settings, not a population |
 | Offline | online only |
 | Opens with | `signalId` (navigation) |
 | Route | `/commercial/nearby-event-exhibition-local-demand-intelligence-adm-101` |
+
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** External events near the venues that could change demand (an exhibition next door), with their expected impact.
 
 #### Inputs: what the user enters or picks
 
@@ -587,6 +688,10 @@ Errors to draw in the form: 409 `feedSignal`.; 422 `invalidPeriod`.
 |---|---|---|---|---|---|
 | Save demand signal configuration (primary button) | `setDemandSignalConfiguration` PUT `/demand-signals/{signalId}` | DemandSignal | DemandSignal | 409 `feedSignal`.; 422 `invalidPeriod`. | gated `PRICE_CONFIGURE`; opens modal first |
 
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **nearby events**: Event, distance, dates, expected impact. *(source: contracts/spine/catalogue.yaml#listNearbyEventExhibition)*
+
 **Data it reads**: `listNearbyEventExhibition` (onLoad, Nearby Event, Exhibition & Local Demand Intelligence)
 
 **Where the user goes next**
@@ -604,6 +709,18 @@ Errors to draw in the form: 409 `feedSignal`.; 422 `invalidPeriod`.
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 `feedSignal`.; 422 `invalidPeriod`. |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+event:
+  name: Big Boat Show
+  distance: 4 km
+  dates: 12-16 Nov
+  impact: +8%
+```
+
 #### Permissions
 
 - `listNearbyEventExhibition` → `PRODUCT_VIEW` (read) · staff
@@ -619,7 +736,7 @@ No matrix row traces to this screen's operations or data.
 
 None names this screen.
 
-Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -627,7 +744,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-101` · status **notStarted** · provenance generated
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-101` · status **notStarted** · provenance generated
 - Client workshop board: `wireframes/WS100 Pricing   Revenue Management Board 6.dc.html#adm-101`
 - Workshop pack: Pricing___Revenue_Management_Reference.pdf board 6
 - Flow F148 *Pricing Revenue Management board 6: AI Pricing Intelligence Command Center*, step 6: Works in Nearby Event, Exhibition & Local Demand Intelligence → Detect external events around TICVAI venues that could materially affect visitor demand. This directly addresses the exhibition-near-the-venue scenario.
@@ -651,15 +768,19 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `ticketing` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `PRICE_CONFIGURE`, `PRODUCT_VIEW` (1 configure, 1 read); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `PRICE_CONFIGURE`, `PRODUCT_VIEW` (1 configure, 1 read); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Track) and no metric row |
 | Offline | online only |
 | Opens with | `signalId` (navigation) |
 | Route | `/commercial/competitor-pricing-market-position-intelligence-adm-102` |
+
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Position against competitors' prices.
 
 #### Inputs: what the user enters or picks
 
@@ -744,6 +865,10 @@ Errors to draw in the form: 409 `feedSignal`.; 422 `invalidPeriod`.
 |---|---|---|---|---|---|
 | Save demand signal configuration (primary button) | `setDemandSignalConfiguration` PUT `/demand-signals/{signalId}` | DemandSignal | DemandSignal | 409 `feedSignal`.; 422 `invalidPeriod`. | gated `PRICE_CONFIGURE`; opens modal first |
 
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **competitor table**: Competitor, product compared, their price, our price, gap. *(source: contracts/spine/catalogue.yaml#listCompetitorPricingMarket)*
+
 **Data it reads**: `listCompetitorPricingMarket` (onLoad, Competitor Pricing & Market Position Intelligence)
 
 **Where the user goes next**
@@ -762,6 +887,18 @@ Errors to draw in the form: 409 `feedSignal`.; 422 `invalidPeriod`.
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 `feedSignal`.; 422 `invalidPeriod`. |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+row:
+  competitor: Competitor water park A
+  product: Day pass adult
+  theirs: AED 299.00
+  ours: AED 295.00
+```
+
 #### Permissions
 
 - `listCompetitorPricingMarket` → `PRODUCT_VIEW` (read) · staff
@@ -777,7 +914,7 @@ No matrix row traces to this screen's operations or data.
 
 None names this screen.
 
-Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -785,7 +922,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-102` · status **notStarted** · provenance generated
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-102` · status **notStarted** · provenance generated
 - Client workshop board: `wireframes/WS100 Pricing   Revenue Management Board 6.dc.html#adm-102`
 - Workshop pack: Pricing___Revenue_Management_Reference.pdf board 6
 - Flow F148 *Pricing Revenue Management board 6: AI Pricing Intelligence Command Center*, step 8: Works in Competitor Pricing & Market Position Intelligence → Allow TICVAI to understand its commercial position relative to relevant competitors.
@@ -809,17 +946,21 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `ticketing` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `PRICE_CONFIGURE`, `PRODUCT_VIEW` (1 configure, 1 read); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `PRICE_CONFIGURE`, `PRODUCT_VIEW` (1 configure, 1 read); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
 | Offline | online only |
 | Opens with | `signalId` (navigation) |
 | Route | `/commercial/market-tourism-holiday-contextual-signal-hub-adm-103` |
 
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
+
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Broader external signals: tourism, holidays, school breaks, transport, market.
 
 #### Inputs: what the user enters or picks
 
@@ -877,6 +1018,10 @@ Errors to draw in the form: 409 `feedSignal`.; 422 `invalidPeriod`.
 |---|---|---|---|---|---|
 | Save demand signal configuration (primary button) | `setDemandSignalConfiguration` PUT `/demand-signals/{signalId}` | DemandSignal | DemandSignal | 409 `feedSignal`.; 422 `invalidPeriod`. | gated `PRICE_CONFIGURE`; opens modal first |
 
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **contextual signals**: Calendar of signals with source and reliability. *(source: contracts/spine/catalogue.yaml#listMarketTourismHoliday / DI-942)*
+
 **Data it reads**: `listMarketTourismHoliday` (onLoad, Market, Tourism, Holiday & Contextual Signal Hub)
 
 **Where the user goes next**
@@ -895,6 +1040,18 @@ Errors to draw in the form: 409 `feedSignal`.; 422 `invalidPeriod`.
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 `feedSignal`.; 422 `invalidPeriod`. |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+signal:
+  name: UAE school winter break
+  from: '2026-12-14'
+  to: '2027-01-03'
+  reliability: 0.95
+```
+
 #### Permissions
 
 - `listMarketTourismHoliday` → `PRODUCT_VIEW` (read) · staff
@@ -912,7 +1069,7 @@ For this screen, newest first. An **Open question** is built to the default it s
 
 - Forecast signal configuration defines which data sources and coverage periods the AI may use, e.g. historical sales over the last 36 months, real-time bookings and attendance history; seasonality, festivities and weather (e.g. forecast rain) are factored in. *(client request · MoM 18 Sep 2026, 4.9 AI Forecasting — Model Strategies & Signal Configuration · DI-942)*
 
-Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -920,7 +1077,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-103` · status **notStarted** · provenance generated
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-103` · status **notStarted** · provenance generated
 - Client workshop board: `wireframes/WS100 Pricing   Revenue Management Board 6.dc.html#adm-103`
 - Workshop pack: Pricing___Revenue_Management_Reference.pdf board 6
 - Flow F148 *Pricing Revenue Management board 6: AI Pricing Intelligence Command Center*, step 10: Works in Market, Tourism, Holiday & Contextual Signal Hub → Capture broader external factors that may affect visitor demand beyond weather and nearby events.
@@ -944,17 +1101,25 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `ticketing` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `PRODUCT_VIEW` (1 read); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `PRODUCT_VIEW` (1 read); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Display; Track) and no metric row |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/commercial/ai-demand-forecasting-booking-curve-studio-adm-104` |
 
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
+
 **Known gaps.** **The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Event Horizon. Each needs an operation, or needs removing from the screen; this is the Phase 3 … **AI Demand Forecasting & Booking Curve Studio declares no operation that writes anything** — its only declared call is `listDemandBookingCurve`, a read. The name promises authoring and the contract …
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Granular demand forecasts with booking curves: pace, forecast and remaining opportunity by channel, with drivers and confidence, and a what-if simulator.
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- Pack actions with no operation: Event Horizon. (CHG-MOV-008)
 
 #### Inputs: what the user enters or picks
 
@@ -1007,6 +1172,10 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |---|---|---|---|---|---|
 | Event Horizon (primary button) | navigation or local | — | — | — | — |
 
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **booking curve**: Actual vs forecast by days to visit, confidence band, by channel. *(source: contracts/spine/catalogue.yaml#listDemandBookingCurve / DI-943)*
+
 **Data it reads**: `listDemandBookingCurve` (onLoad, AI Demand Forecasting & Booking Curve Studio)
 
 **Where the user goes next**
@@ -1023,6 +1192,19 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the demand forecasting booking are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+forecast:
+  product: Day Pass
+  date: Sat 22 Nov
+  forecast: 6100
+  capacity: 6500
+  confidence: 0.82
+```
 
 #### Permissions
 
@@ -1046,7 +1228,7 @@ For this screen, newest first. An **Open question** is built to the default it s
 
 - Demand forecasts show current sales pace, forecast and remaining opportunity broken down by sales channel; revenue forecasts show drivers and confidence levels. A forecast simulator models a hypothetical change (e.g. a 10% price decrease, reduced operating hours, staffing changes) before it is made. *(client request · MoM 18 Sep 2026, 4.10 AI Forecasting — Attendance, Demand, Revenue & Capacity Forecasting · DI-943)*
 
-Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -1059,7 +1241,7 @@ Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-104` · status **notStarted** · provenance generated
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-104` · status **notStarted** · provenance generated
 - Client workshop board: `wireframes/WS100 Pricing   Revenue Management Board 6.dc.html#adm-104`
 - Workshop pack: Pricing___Revenue_Management_Reference.pdf board 6
 - Flow F148 *Pricing Revenue Management board 6: AI Pricing Intelligence Command Center*, step 12: Works in AI Demand Forecasting & Booking Curve Studio → Predict future demand at a granular commercial level. This is the core predictive engine behind intelligent dynamic pricing.
@@ -1083,15 +1265,19 @@ Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the 
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `ticketing` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `PRODUCT_VIEW` (1 read); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `PRODUCT_VIEW` (1 read); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Analyze) and no metric row |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/commercial/price-elasticity-revenue-response-intelligence-adm-105` |
+
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** How guests respond to price: elasticity per product and segment, revenue response curve.
 
 #### Inputs: what the user enters or picks
 
@@ -1144,6 +1330,10 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Time | text | Time context of the curve: weekday/weekend, peak/off-peak or season label |
 | Product | text | Product id |
 
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **elasticity**: Curve of price vs expected volume and revenue with the revenue-maximising point marked. *(source: contracts/spine/catalogue.yaml#listPriceElasticityRevenue)*
+
 **Data it reads**: `listPriceElasticityRevenue` (onLoad, Price Elasticity & Revenue Response Intelligence)
 
 **Where the user goes next**
@@ -1160,6 +1350,17 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the price elasticity revenue are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+elasticity:
+  product: Day Pass Adult
+  elasticity: -1.4
+  optimum: AED 285.00
+```
 
 #### Permissions
 
@@ -1179,7 +1380,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 None names this screen.
 
-Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -1187,7 +1388,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-105` · status **notStarted** · provenance generated
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-105` · status **notStarted** · provenance generated
 - Client workshop board: `wireframes/WS100 Pricing   Revenue Management Board 6.dc.html#adm-105`
 - Workshop pack: Pricing___Revenue_Management_Reference.pdf board 6
 - Flow F148 *Pricing Revenue Management board 6: AI Pricing Intelligence Command Center*, step 14: Works in Price Elasticity & Revenue Response Intelligence → Estimate how customers are likely to respond to different prices.
@@ -1211,17 +1412,23 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `ticketing` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `PRODUCT_VIEW` (1 read); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `AI_APPROVE`, `PRODUCT_VIEW` (1 operate, 1 read); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
 | Offline | online only |
-| Opens with | nothing: it opens on its own |
+| Opens with | `recommendationId` (navigation) |
 | Route | `/commercial/ai-pricing-recommendation-explainability-center-adm-106` |
 
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
+
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Actionable AI pricing recommendations with their explanation, impact and confidence; a person decides.
+
+**Fixed on main** (the package already carries these; draw what it says): No operation accepts or dismisses a recommendation. (CHG-WIR-025).
 
 #### Inputs: what the user enters or picks
 
@@ -1237,7 +1444,19 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Objective | segmented control | — | Revenue · Occupancy · Conversion | `listPricingRecommendationExplainability` ?objective |
 | Price category | picker: choose a price category | — | — | `listPricingRecommendationExplainability` ?priceCategory |
 
-Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+**Form: Decide** (modal, opened by *Decide*; *Decide* calls `decidePricingRecommendation`, *Cancel* sends nothing)
+
+**Collects what `decidePricingRecommendation` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Decision `decision` | radio group | required | — | Accept · Modify · Reject · Schedule · Send for approval | — | — | `decidePricingRecommendation` body |
+| Rejection reason `rejectionReason` | select | optional | — | Commercial judgment · Brand positioning · Customer sensitivity · Event strategy · Incorrect signal · Data concern · Other | — | Required for reject. | `decidePricingRecommendation` body |
+| Rejection note `rejectionNote` | text area | optional | — | max length 2000 | — | — | `decidePricingRecommendation` body |
+| Human selected price `humanSelectedPrice` | money field | optional | — | — | AED, 2 decimals shown (up to 4 accepted), currency from the … | Required for modify; must sit inside the strategy's guardrails. | `decidePricingRecommendation` body |
+| Scheduled for `scheduledFor` | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | Required for schedule; in the future. | `decidePricingRecommendation` body |
+
+Errors to draw in the form: 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 The recommendation is no longer `pending` or `sentToSimulation` (`alreadyDecided`) or has expired (`recommendationExpired`).; 422 `rejectionReasonRequired`, `humanSelectedPriceRequired`, `guardrailBreached` or `scheduledForInPast`.
 
 #### Outputs: what the screen shows and produces
 
@@ -1246,6 +1465,16 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 **Permissions this screen separates** (banner): **The pack separates these permissions and no action on the screen claims them yet:** Accept, Reject, Modify, Send to Simulation, Send for Approval, Ignore, Add Comment. Each needs attaching to the control it gates, or the screen needs the control.
 
 **Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+
+**Actions and what each produces**
+
+| Action | Calls | Sends | On success returns | Errors to show | Notes |
+|---|---|---|---|---|---|
+| Decide (secondary button) | `decidePricingRecommendation` POST `/recommendation-review-decision/{recommendationId}/decision` | PricingRecommendationDecisionInput | PricingRecommendationDecision | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 The recommendation is no longer `pending` or `sentToSimulation` (`alreadyDecided`) or has expired … | opens modal first |
+
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **recommendation card**: Framing, recommendation, impact ("+12%"), confidence, drivers, then Accept or Dismiss, as DI-043. *(source: contracts/spine/catalogue.yaml#listPricingRecommendationExplainability / DI-043 / DI-601)*
 
 **Data it reads**: `listPricingRecommendationExplainability` (onLoad, AI Pricing Recommendation & Explainability Center)
 
@@ -1263,10 +1492,23 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the pricing recommendation explainability are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+| Validation and conflict | the form keeps what was entered and marks the problem: 409 The recommendation is no longer `pending` or `sentToSimulation` (`alreadyDecided`) or has expired (`recommendationExpired`).; 422 `rejectionReasonRequired`, `humanSelectedPriceRequired`, `guardrailBreached` or `scheduledForInPast`. |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+recommendation:
+  text: Increase Desert Symphony balcony seats by 8%
+  impact: +AED 22,000.00
+  confidence: 0.77
+```
 
 #### Permissions
 
 - `listPricingRecommendationExplainability` → `PRODUCT_VIEW` (read) · staff
+- `decidePricingRecommendation` → `AI_APPROVE` (operate) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -1295,7 +1537,7 @@ For this screen, newest first. An **Open question** is built to the default it s
 
 - AI forecasting recommends pricing/promotional action ahead of demand shifts (e.g. forecast rain > recommend a discount); a simulation tool previews the likely impact of a price change before it goes live. *(client request · MoM 1 Sep 2026, 4.8 AI Demand Forecasting & Pricing Simulation · DI-601)*
 
-Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -1303,19 +1545,19 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-106` · status **notStarted** · provenance generated
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-106` · status **notStarted** · provenance generated
 - Client workshop board: `wireframes/WS100 Pricing   Revenue Management Board 6.dc.html#adm-106`
 - Workshop pack: Pricing___Revenue_Management_Reference.pdf board 6
 - Flow F148 *Pricing Revenue Management board 6: AI Pricing Intelligence Command Center*, step 16: Works in AI Pricing Recommendation & Explainability Center → Convert all intelligence generated by Board 6 into actionable pricing recommendations. This is the central AI recommendation screen.
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
+- [ ] Every input above is drawn (5), with its required mark, default, format and its error state (404, 409, 422).
 - [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-106?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
+- [ ] Every action is wired with its success and its failure: Decide.
 - [ ] Every transition is wired: `ADM-098`.
-- [ ] Every gated control is gated: `PRODUCT_VIEW`.
+- [ ] Every gated control is gated: `AI_APPROVE`, `PRODUCT_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -1327,15 +1569,19 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `ticketing` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `AI_CONFIGURE`, `PRODUCT_VIEW` (1 configure, 1 read); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `AI_CONFIGURE`, `PRODUCT_VIEW` (1 configure, 1 read); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Display; Monitor; Track) and no metric row |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/commercial/ai-signal-registry-data-quality-model-governance-adm-107` |
+
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Governance of the signals and models behind AI pricing: provider, refresh, trust level (approved, experimental, advisory only, blocked), what AI may use each for, and what happens when a signal fails.
 
 #### Inputs: what the user enters or picks
 
@@ -1374,6 +1620,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Validation result `validationResult` | text field | optional | — | — | — | — | `setSignalRegistryPolicy` body |
 
 Errors to draw in the form: 422 `trustTooLow`.
+
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **trustLevel and aiUsePermissions**: Blocked removes every use; advisory only allows forecasting and recommendations but not automated pricing. *(source: contracts/spine/catalogue.yaml#setSignalRegistryPolicy)*
 
 #### Outputs: what the screen shows and produces
 
@@ -1459,6 +1709,20 @@ Errors to draw in the form: 422 `trustTooLow`.
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 422 `trustTooLow`. |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+signal:
+  name: Weather provider
+  trust: approved
+  uses:
+  - forecasting
+  - recommendations
+  fallback: reduceConfidence
+```
+
 #### Permissions
 
 - `listSignalDataQuality` → `PRODUCT_VIEW` (read) · staff
@@ -1476,7 +1740,7 @@ For this screen, newest first. An **Open question** is built to the default it s
 
 - Forecast signal configuration defines which data sources and coverage periods the AI may use, e.g. historical sales over the last 36 months, real-time bookings and attendance history; seasonality, festivities and weather (e.g. forecast rain) are factored in. *(client request · MoM 18 Sep 2026, 4.9 AI Forecasting — Model Strategies & Signal Configuration · DI-942)*
 
-Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -1484,7 +1748,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-107` · status **notStarted** · provenance generated
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-107` · status **notStarted** · provenance generated
 - Client workshop board: `wireframes/WS100 Pricing   Revenue Management Board 6.dc.html#adm-107`
 - Workshop pack: Pricing___Revenue_Management_Reference.pdf board 6
 - Flow F148 *Pricing Revenue Management board 6: AI Pricing Intelligence Command Center*, step 18: Works in AI Signal Registry, Data Quality & Model Governance → Govern the complete data and intelligence ecosystem behind AI pricing. This is critical. Without this screen, Development team could connect many external sources without giving TICVAI proper control …
@@ -1506,12 +1770,16 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 ## Reference designs and the trackers for this platform
 
-**P09 reference designs** (from `handoff/design-batches/apps/6-ticvai-controller/README.md`)
+**P08 reference designs** (from `handoff/design-batches/apps/5-venue-management/README.md`)
 
 - `sources/designs/TICVAI_POS_Terminal_client_approved.html`: the client-approved POS, for operator density and components.
 - `sources/designs/TICVAI_Mobile.dc.html`: for finish and motion.
 
-**Design Vision Book rules that apply** (`sources/designs/Ticvai_Design_Vision_Book_v1_1.pdf`): DI-021, DI-022, DI-023, DI-024, DI-025, DI-027, DI-028, DI-029, DI-032, DI-033, DI-034, DI-036, DI-037, DI-038, DI-039, DI-040, DI-041, DI-042, DI-044, DI-045, DI-046, DI-047, DI-048, DI-049, DI-050, DI-051 (each is in the design inputs below).
+**Design Vision Book rules that apply** (`sources/designs/Ticvai_Design_Vision_Book_v1_1.pdf`): DI-021, DI-022, DI-023, DI-024, DI-025, DI-027, DI-028, DI-029, DI-030, DI-032, DI-033, DI-034, DI-036, DI-037, DI-038, DI-039, DI-040, DI-041, DI-042, DI-043, DI-044, DI-045, DI-046, DI-047, DI-048, DI-049, DI-050, DI-051, DI-052 (each is in the design inputs below).
+
+**Workshop tracker rows about P08 as a whole** (1: 1 open, 0 closed). Open first; a closed row says where it went on 30 September.
+
+- **S8** Venue Management back-end configuration wireframes *(Chinmay Parab · In progress · due Fri 2 Oct · 30 Sep 2026 · 30 Sep tracker)*
 
 ## Design inputs from the client meetings
 
@@ -1549,17 +1817,32 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Brand personality: Modern, AI-First, Enterprise, Premium, Reliable, Minimal, Scalable, Human-Centred. Visual essence: intelligent and forward-thinking, clean and minimal, trustworthy and secure, modern and timeless, scalable and flexible. *(agreed · Design Vision Book 29 Jul 2026, 02 Brand Identity (p2) - Brand personality / Visual essence · DI-021)*
 - Arabic is a core requirement, not later localisation: full Arabic RTL across web, mobile, POS, reports, emails, WhatsApp, SMS, notifications, tickets and receipts, and administrative interfaces. *(agreed · MoM 28 Jul 2026, 27. Internationalisation and Arabic Support · DI-019)*
 
-### Across P09 TICVAI Web
+### Across P08 Venue Management
 
-- Portal access exposes TICVAI pricing, so prospects submit contact details and a trade license as proof of a real venue, reviewed and approved by TICVAI before access is granted. *(agreed · MoM 10 Sep 2026, 4.8 Customer Portal Access, Authentication & Verification · DI-827)*
+- Qossai: configuration screens should consolidate related functionality, potentially merging 3-4 previously separate screens into one, rather than the repetitive one-screen-per-concept pattern of the AI-built reference system. *(agreed · MoM 24 Sep 2026, 4.5 Screen Consolidation Philosophy · DI-987)*
+- **Open question.** Open: should AI monitoring live in one centralised AI command dashboard or be distributed as widgets in each functional module's own dashboard? Allam: Softlabs' call; the current proposal is illustrative and Softlabs may propose a better structure. *(open · MoM 18 Sep 2026, 4.4 AI Governance — Risk, Compliance & Continuous Monitoring · DI-936)*
 - Simulation functionality stays embedded within each relevant configuration section rather than being consolidated, since it tests that section's own configuration. *(agreed · MoM 8 Sep 2026, 4.11 Dashboard & Reporting Module Consolidation Strategy · DI-722)*
+- Client boards (POS Frontline, F&B, Retail, Inventory & Procurement) share one architecture: six boards of ten screens per domain, a command centre first and an AI/analytics board last, under the hierarchy Company > Venue > Department > Workstation > Operator/Shift > Transaction > Exception > Reconciliation > Analytics. *(agreed · client-design-boards-audit 20 Aug 2026, Opening / What the boards give us · DI-400)*
+- Decision: RBAC per role, per module, three levels — edit/view, view-only, hidden (e.g. a marketing officer does not see Finance at all) — plus sub-permissions within a module (a CRM role may get Campaigns and Communications but not Journeys). Default role templates, admin-customisable. *(agreed · MoM 20 Aug 2026, 4.7 Role-Based Access Control (RBAC); 5. Key Decisions · DI-387)*
+- **Open question.** Allam: a user's visibility must be restrictable to specific outlets (an F&B manager of one outlet should not see other outlets' items); also relevant for ticketing/event-specific access. Implementation approach still open. *(open · MoM 18 Aug 2026, 4.6 Role-Based & Outlet-Level Access Control — Open Item · DI-331)*
+- Access loads automatically at login on POS and web/admin. A user with one role logs straight in; a user with several roles (e.g. admin, cashier, supervisor, manager) is prompted to choose which role to use. *(agreed · MoM 12 Aug 2026, 4. Multiple Roles per User and Role Switching · DI-249)*
+- Back office is role-driven from any device: a finance user signing in from a workstation, laptop or home sees only finance reports and related information. *(agreed · MoM 12 Aug 2026, 3. Role-Based Access and Workstation-Linked Front-End · DI-248)*
+- Built-in help menu with step-by-step tutorials with screenshots for common tasks (e.g. how to sell a ticket at the POS). *(client request · MoM 7 Aug 2026, 8. Legacy POS Layout Designer & System Logging · DI-160)*
+- Custom data-capture fields ("data mask") at account, event, extended-ticket and product level: field types text, dropdown, radio, true/false; multi-language labels; validation (min/max length, required/optional); reusable value lists (e.g. country list). Standard fields come out of the box. *(agreed · MoM 7 Aug 2026, 6. Data Mask: Flexible Custom Data Capture · DI-155)*
+- Load/traffic dashboards respect the tenancy model: a venue manager sees traffic for their own venue only. *(agreed · MoM 31 Jul 2026, 4. Non-Functional Requirements: Scalability & Availability · DI-061)*
+- Allam: queue management is built into the system (not third-party) so traffic entering the site can be throttled from the back office itself. *(agreed · MoM 31 Jul 2026, 4. Non-Functional Requirements: Scalability & Availability · DI-060)*
 - **Open question.** Proposed tenant hierarchy Tenant > Organization/Brand > Region > Branch > Venue > Department, under review against TICVAI's own organisational hierarchy before finalising. *(open · MoM 30 Jul 2026, 2. Proposed Multi-Tenant Hierarchy · DI-055)*
+- Documentation deliverable includes user guides and help content; the preview shows a TICVAI Help Center with categories (Getting Started, Events, Tickets, Orders, Payments, Memberships, Access Control, Reports, Integrations), a "Welcome to TICVAI" getting-started article and Quick Links (Create an Event, Set Pricing, Manage Access, View Reports). *(agreed · Design Vision Book 29 Jul 2026, 09 Deliverables (p9) - What We Deliver / Key Deliverables Preview · DI-052)*
 - Typeface Inter (Light, Regular, Medium, Semibold, Bold). Scale: H1 32/40 Bold, H2 24/32 Semibold, H3 20/28 Semibold, Body 1 16/24 Regular, Body 2 14/20 Regular, Caption 12/16 Regular. *(agreed · Design Vision Book 29 Jul 2026, 08 Design System (p8) - 2. Typography · DI-047)*
 - Palette ("modern, trustworthy and accessible"): Primary #0D6EFD, #00B8FF, #00D4C4, #0B1324; Neutral #F7F9FC, #E5E7EB, #9CA3AF, #4B5563, #1F2937. *(agreed · Design Vision Book 29 Jul 2026, 08 Design System (p8) - 1. Color Palette · DI-046)*
+- AI Assistant panel: a short framing ("Based on last 30 days, here are 3 actions that can improve your revenue") then actionable recommendations, each with its potential impact (e.g. "Increase pricing for VIP seats, +12%") and a chevron, plus "View all recommendations". *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - AI Panels · DI-043)*
 - Chart cards: title with period dropdown ("This Week"), headline metrics with deltas (Tickets Sold 12,840 +8.7%, Visitors, Conversion). Data visualisations must be easy to read. *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - Charts · DI-041)*
 - Tables: titled card with "View all", columns (e.g. Order ID, Customer, Amount, Status), coloured status badges (Paid, Pending, Refunded) and pagination with "Showing 1 to 5 of 245" and page numbers. *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - Tables · DI-039)*
 - Primary button spec: height 40px, padding 12px 24px, radius 8px, Inter 14 Semibold, colour #0D6EFD, width auto. *(agreed · Design Vision Book 29 Jul 2026, 09 Deliverables (p9) - Developer Handoff preview · DI-037)*
+- Back-office shell: collapsible left sidebar with Overview, Events, Tickets, Orders, Customers, Memberships, Access Control, POS, Reports, Analytics, AI Assistant, Settings, and the signed-in user (name, role) at the bottom; top bar with global search (Cmd+K), current time and date, Notifications with unread dot, and user menu. *(agreed · Design Vision Book 29 Jul 2026, 04 Dashboard Vision (p4) - navigation shell · DI-030)*
 - Dynamic KPIs, forecasts and real-time insights; role-based dashboards, preferences and smart shortcuts for every user (e.g. greeting "Good morning, Ahmed" on the home screen, p2). *(agreed · Design Vision Book 29 Jul 2026, 03 Visual Direction (p3) - Smarter Data / Personalized Experience · DI-028)*
+- Reports and historical searches must still retrieve archived transactions when required; the retention period (e.g. keep 3 of 5+ years live) is configurable per customer, archival manual or automated. *(agreed · MoM 28 Jul 2026, 23. Database Optimisation and Archiving · DI-018)*
+- Back-office controls for the waiting room: configurable maximum active users and admission intervals, set per customer and venue. *(agreed · MoM 28 Jul 2026, 19. Auto-scaling and Virtual Waiting Room · DI-017)*
 
 **5 more name particular screens** and are in each screen's block above (*Client meeting inputs*).
 
@@ -1575,6 +1858,7 @@ Method, path, parameters, request and response for every operation these screens
 
 ```json
 {
+"decidePricingRecommendation": {"method":"POST","path":"/recommendation-review-decision/{recommendationId}/decision","contract":"catalogue","summary":"Record a human decision on an AI pricing recommendation","permission":"AI_APPROVE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"PricingRecommendationDecisionInput","responds":"PricingRecommendationDecision"},
 "listCompetitorPricingMarket": {"method":"GET","path":"/competitor-pricing-market","contract":"catalogue","summary":"Competitor Pricing & Market Position Intelligence","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"competitor","in":"query","required":false},{"name":"market","in":"query","required":false},{"name":"comparableTicvaiProduct","in":"query","required":false},{"name":"dateFrom","in":"query","required":false},{"name":"dateTo","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listDemandBookingCurve": {"method":"GET","path":"/demand-booking-curve","contract":"catalogue","summary":"AI Demand Forecasting & Booking Curve Studio","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"venue","in":"query","required":false},{"name":"product","in":"query","required":false},{"name":"event","in":"query","required":false},{"name":"performance","in":"query","required":false},{"name":"channel","in":"query","required":false},{"name":"horizon","in":"query","required":false},{"name":"dateFrom","in":"query","required":false},{"name":"dateTo","in":"query","required":false},{"name":"priceCategory","in":"query","required":false},{"name":"sectionCode","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listInternalDemandBooking": {"method":"GET","path":"/internal-demand-booking","contract":"catalogue","summary":"Internal Demand & Booking Signal Hub","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"granularity","in":"query","required":false},{"name":"venue","in":"query","required":false},{"name":"event","in":"query","required":false},{"name":"performance","in":"query","required":false},{"name":"product","in":"query","required":false},{"name":"channel","in":"query","required":false},{"name":"dateFrom","in":"query","required":false},{"name":"dateTo","in":"query","required":false},{"name":"compareTo","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
@@ -1609,6 +1893,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "NearbyEventExhibitionLocalDemandIntelligenceView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over catalogue state, assembled at read time from tables that already exist","description":"**What Nearby Event, Exhibition & Local Demand Intelligence displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"eventName":{"type":"string","description":"Event Name"},"venue":{"type":"string","description":"External venue hosting the event"},"location":{"type":"string","description":"Location (address or area)"},"distanceKm":{"type":"number","description":"Distance from the TICVAI venue, km"},"expectedAttendance":{"type":"integer","description":"Expected Attendance"},"eventType":{"type":"string","description":"Event Type","enum":["exhibition","conference","concert","sportsEvent","festival","tradeShow","convention","publicCelebration","majorAttractionEvent","schoolEvent","customLocalEvent"]},"audienceType":{"type":"string","description":"Audience Type (decided 29 September, readiness close-out)","enum":["family","business","youth","general","tourist","other"]},"source":{"type":"string","description":"Source: name of the event feed or 'manual' (vendor-neutral)"},"confidence":{"type":"number","description":"Confidence that the event and its attendance are accurate, percent"},"externalEventId":{"type":"string","description":"External event id"},"ticvaiVenue":{"type":"string","description":"TICVAI venue whose monitoring radius the event falls in"},"monitoringRadiusKm":{"type":"number","description":"Geographic Radius configured for that venue: 1, 3, 5, 10 or custom km; default 5 (decided 29 September, readiness close-out)"},"startDate":{"type":"string","description":"Start date","format":"date"},"endDate":{"type":"string","description":"End date","format":"date"},"startTime":{"type":"string","description":"Start time (HH:mm)","nullable":true},"endTime":{"type":"string","description":"End time (HH:mm)","nullable":true},"historicalCorrelation":{"type":"number","description":"Historical correlation: demand change seen at the venue for similar past events, percent"},"predictedImpactMin":{"type":"number","description":"Predicted demand impact, low end, percent"},"predictedImpactMax":{"type":"number","description":"Predicted demand impact, high end, percent"},"impactWindows":{"type":"array","items":{"type":"string","enum":["beforeEvent","duringEvent","lunchPeriod","afterEvent","evening","followingDay"]},"description":"Timing Intelligence: when the impact is expected"},"audienceMatch":{"type":"string","description":"Audience Matching between the event and the TICVAI venue","enum":["low","medium","high"]}}},
 "Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}},
 "PriceElasticityRevenueResponseIntelligenceView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over catalogue state, assembled at read time from tables that already exist","description":"**What Price Elasticity & Revenue Response Intelligence displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"price":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Price tested on the curve"},"demand":{"type":"integer","description":"Expected demand at this price"},"conversion":{"type":"number","description":"Expected conversion, percent"},"revenue":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Expected revenue"},"margin":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Expected margin"},"occupancy":{"type":"number","description":"Expected occupancy, percent"},"customerSegment":{"type":"string","description":"Customer segment (e.g. tourist, resident, family, VIP)","nullable":true},"channel":{"$ref":"#/components/schemas/Channel","description":"Channel"},"time":{"type":"string","description":"Time context of the curve: weekday/weekend, peak/off-peak or season label"},"product":{"type":"string","description":"Product id"},"venue":{"type":"string","description":"Venue id"},"priceSensitivity":{"type":"string","description":"Price sensitivity of the segment","enum":["low","medium","high"]},"elasticityCoefficient":{"type":"number","description":"Estimated price elasticity of demand (negative)","nullable":true},"elasticityConfidence":{"type":"string","description":"Elasticity Confidence","enum":["low","medium","high"]},"inRecommendedRevenueZone":{"type":"boolean","description":"Price lies inside the Recommended Revenue Zone"},"revenueZoneMin":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Optimal revenue range, low end"},"revenueZoneMax":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Optimal revenue range, high end"}}},
+"PricingRecommendationDecision": {"type":"object","x-ticvai-persistence":"catalogue.pricing_recommendation_decision","description":"**One human decision on one AI pricing recommendation** (decided 29 September, readiness close-out). New table: the queue row `AiRecommendationReviewDecisionQueueView` reads its decision fields from here. Written once by `decidePricingRecommendation` and never edited; a changed mind is a new recommendation.\n","required":["id","recommendationId","decision","decidedByPrincipalId","decidedAt"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"recommendationId":{"type":"string","format":"uuid","description":"A `catalogue.pricing_recommendation` (29 September, data model DM3)."},"decision":{"type":"string","enum":["accept","modify","reject","schedule","sendForApproval"]},"rejectionReason":{"type":"string","nullable":true,"enum":["commercialJudgment","brandPositioning","customerSensitivity","eventStrategy","incorrectSignal","dataConcern","other",null]},"rejectionNote":{"type":"string","nullable":true},"recommendedPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"humanSelectedPrice":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"nullable":true},"scheduledFor":{"type":"string","format":"date-time","nullable":true},"approvalRequestId":{"type":"string","format":"uuid","nullable":true,"description":"The approvals request opened by `sendForApproval`."},"executionId":{"type":"string","nullable":true,"readOnly":true,"description":"The `createLiveDynamicPrice` execution that carried it out, once it has."},"decidedByPrincipalId":{"type":"string","format":"uuid","readOnly":true},"decidedAt":{"type":"string","format":"date-time","readOnly":true},"scopePath":{"type":"string","readOnly":true}}},
+"PricingRecommendationDecisionInput": {"type":"object","x-ticvai-persistence":"none — request only","description":"What `decidePricingRecommendation` takes (decided 29 September, readiness close-out).","required":["decision"],"properties":{"decision":{"type":"string","enum":["accept","modify","reject","schedule","sendForApproval"]},"rejectionReason":{"type":"string","enum":["commercialJudgment","brandPositioning","customerSensitivity","eventStrategy","incorrectSignal","dataConcern","other"],"description":"Required for reject."},"rejectionNote":{"type":"string","maxLength":2000},"humanSelectedPrice":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"description":"Required for modify; must sit inside the strategy's guardrails."},"scheduledFor":{"type":"string","format":"date-time","description":"Required for schedule; in the future."}}},
 "SignalRegistryEntry": {"type":"object","x-ticvai-persistence":"catalogue.signal_registry","description":"**The registry of AI signals and models, with their trust and quality** (29 September, data model DM3). ADM-106 and ADM-118. A signal or model not `approved` for a use in `aiUsePermissions` is not used for it.","required":["id","scopePath","registryKind","name","trustLevel"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005). Operations write it at `tenant` scope."},"registryKind":{"type":"string","enum":["signal","model"]},"name":{"type":"string","maxLength":200},"category":{"type":"string","enum":["internalSales","inventory","weather","nearbyEvents","competitor","tourism","calendar","transport","market","other",null],"nullable":true},"provider":{"type":"string","maxLength":100,"nullable":true},"source":{"type":"string","maxLength":100,"nullable":true},"internalExternal":{"type":"string","enum":["internal","external",null],"nullable":true},"marketCode":{"type":"string","maxLength":40,"nullable":true},"refreshFrequency":{"type":"string","enum":["realTime","minutes10","hourly","daily","weekly","manual",null],"nullable":true},"trustLevel":{"type":"string","enum":["approved","experimental","advisoryOnly","blocked"],"default":"experimental"},"aiUsePermissions":{"type":"array","items":{"type":"string","enum":["forecasting","recommendations","simulation","automatedPricing"]}},"fallbackPolicy":{"type":"string","enum":["useHistoricalValue","ignore","substitute","reduceConfidence","stopAiRecommendation",null],"nullable":true},"status":{"type":"string","maxLength":40,"nullable":true},"ownerPrincipalId":{"type":"string","format":"uuid","nullable":true},"version":{"type":"string","maxLength":40,"nullable":true,"description":"Models."},"purpose":{"type":"string","nullable":true},"deployedAt":{"type":"string","format":"date-time","nullable":true},"trainingWindow":{"type":"string","maxLength":60,"nullable":true},"validationResult":{"type":"string","nullable":true},"lastUpdateAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true},"qualityCounts":{"type":"object","additionalProperties":true,"readOnly":true,"description":"Signals: `{missingData, delayedData, outliers, invalidValues, unexpectedChanges, sourceFailure, duplicateData}`."},"performance":{"type":"object","additionalProperties":true,"readOnly":true,"description":"Models: `{forecastAccuracy, bias, recommendationAccuracy, revenuePerformance, drift}` and the per-segment learning metrics."},"createdAt":{"type":"string","format":"date-time","readOnly":true},"updatedAt":{"type":"string","format":"date-time","readOnly":true}}},
 "WeatherIntelligenceDemandImpactConfigurationView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over catalogue state, assembled at read time from tables that already exist","description":"**What Weather Intelligence & Demand Impact Configuration displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"temperature":{"type":"number","description":"Temperature, degrees C"},"feelsLikeTemperature":{"type":"number","description":"Feels-Like Temperature, degrees C"},"rain":{"type":"number","description":"Rain, mm in the last hour"},"rainProbability":{"type":"number","description":"Rain Probability, percent"},"humidity":{"type":"number","description":"Humidity, percent"},"wind":{"type":"number","description":"Wind speed, km/h"},"visibility":{"type":"number","description":"Visibility, km"},"storm":{"type":"boolean","description":"Storm warning in force"},"extremeHeat":{"type":"boolean","description":"Extreme Heat: temperature at or above the venue's configured heat threshold"},"currentConditions":{"type":"string","description":"Current Conditions summary as reported by the source"},"hourlyForecast":{"type":"array","items":{"type":"object","properties":{"at":{"type":"string","format":"date-time","description":"Hour"},"temperature":{"type":"number","description":"Degrees C"},"rainProbability":{"type":"number","description":"Percent"},"conditions":{"type":"string","description":"Conditions"}}},"description":"Hourly Forecast"},"dailyForecast":{"type":"array","items":{"type":"object","properties":{"date":{"type":"string","format":"date","description":"Day"},"minTemperature":{"type":"number","description":"Degrees C"},"maxTemperature":{"type":"number","description":"Degrees C"},"rainProbability":{"type":"number","description":"Percent"},"conditions":{"type":"string","description":"Conditions"}}},"description":"Daily Forecast"},"weatherForecastConfidence":{"type":"number","description":"Weather Forecast Confidence, percent"},"estimatedDemandImpactMin":{"type":"number","description":"Estimated Demand Impact, low end of the range, percent"},"venue":{"type":"string","description":"TICVAI venue id"},"venueExposure":{"type":"string","description":"Venue Sensitivity: Indoor / Outdoor / Mixed","enum":["indoor","outdoor","mixed"]},"weatherSensitivity":{"type":"string","description":"Weather sensitivity of the venue; default medium (decided 29 September, readiness close-out)","enum":["low","medium","high"]},"airQualityIndex":{"type":"integer","description":"Air quality index where available","nullable":true},"conditionImpacts":{"type":"array","items":{"type":"object","properties":{"condition":{"type":"string","enum":["temperature","feelsLikeTemperature","rain","rainProbability","humidity","wind","visibility","storm","extremeHeat","airQuality","heavyRain","highTemperature"],"description":"Weather condition"},"threshold":{"type":"number","nullable":true,"description":"Threshold in the condition's unit, e.g. 42 (degrees C)"},"demandImpactPercent":{"type":"number","description":"Modelled demand impact, e.g. +8 indoor / -17 outdoor"}}},"description":"Weather Impact Model: condition -> demand impact rules for this venue"},"estimatedDemandImpactMax":{"type":"number","description":"Estimated Demand Impact, high end of the range, percent"},"forecastHorizon":{"type":"string","description":"Forecast Horizon","enum":["today","hours24","days3","days7","custom"]},"forecastWindowDays":{"type":"integer","description":"Configurable future window in days when forecastHorizon is custom; max 14 (decided 29 September, readiness close-out)","nullable":true},"dataFailurePolicy":{"type":"string","description":"What happens when weather data is unavailable; default reduceConfidence (decided 29 September, readiness close-out)","enum":["useLastValidSignal","useHistoricalBaseline","reduceConfidence","ignoreWeather","suspendWeatherDrivenRecommendation"]},"historicalInsights":{"type":"array","items":{"type":"string"},"description":"Historical Learning, e.g. similar weather historically gave +11% indoor demand. Advisory only: generated narrative never changes a price (decided 29 September, readiness close-out)"},"weatherSource":{"type":"string","description":"Name of the configured weather data source (vendor-neutral: the provider is data in the signal registry)"},"lastUpdated":{"type":"string","description":"When the source last refreshed","format":"date-time"}}}
 }

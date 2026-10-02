@@ -1709,6 +1709,150 @@
    }
   }
  },
+ "PricingRecommendationDecision": {
+  "type": "object",
+  "x-ticvai-persistence": "catalogue.pricing_recommendation_decision",
+  "description": "**One human decision on one AI pricing recommendation** (decided 29 September, readiness close-out). New table: the queue row `AiRecommendationReviewDecisionQueueView` reads its decision fields from here. Written once by `decidePricingRecommendation` and never edited; a changed mind is a new recommendation.\n",
+  "required": [
+   "id",
+   "recommendationId",
+   "decision",
+   "decidedByPrincipalId",
+   "decidedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "recommendationId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "A `catalogue.pricing_recommendation` (29 September, data model DM3)."
+   },
+   "decision": {
+    "type": "string",
+    "enum": [
+     "accept",
+     "modify",
+     "reject",
+     "schedule",
+     "sendForApproval"
+    ]
+   },
+   "rejectionReason": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "commercialJudgment",
+     "brandPositioning",
+     "customerSensitivity",
+     "eventStrategy",
+     "incorrectSignal",
+     "dataConcern",
+     "other",
+     null
+    ]
+   },
+   "rejectionNote": {
+    "type": "string",
+    "nullable": true
+   },
+   "recommendedPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "humanSelectedPrice": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true
+   },
+   "scheduledFor": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "approvalRequestId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The approvals request opened by `sendForApproval`."
+   },
+   "executionId": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The `createLiveDynamicPrice` execution that carried it out, once it has."
+   },
+   "decidedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "decidedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true
+   }
+  }
+ },
+ "PricingRecommendationDecisionInput": {
+  "type": "object",
+  "x-ticvai-persistence": "none — request only",
+  "description": "What `decidePricingRecommendation` takes (decided 29 September, readiness close-out).",
+  "required": [
+   "decision"
+  ],
+  "properties": {
+   "decision": {
+    "type": "string",
+    "enum": [
+     "accept",
+     "modify",
+     "reject",
+     "schedule",
+     "sendForApproval"
+    ]
+   },
+   "rejectionReason": {
+    "type": "string",
+    "enum": [
+     "commercialJudgment",
+     "brandPositioning",
+     "customerSensitivity",
+     "eventStrategy",
+     "incorrectSignal",
+     "dataConcern",
+     "other"
+    ],
+    "description": "Required for reject."
+   },
+   "rejectionNote": {
+    "type": "string",
+    "maxLength": 2000
+   },
+   "humanSelectedPrice": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "Required for modify; must sit inside the strategy's guardrails."
+   },
+   "scheduledFor": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Required for schedule; in the future."
+   }
+  }
+ },
  "SignalRegistryEntry": {
   "type": "object",
   "x-ticvai-persistence": "catalogue.signal_registry",

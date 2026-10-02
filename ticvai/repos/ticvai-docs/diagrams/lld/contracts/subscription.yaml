@@ -1,5 +1,5 @@
 id: LLD-subscription
-title: subscription — 148 operations
+title: subscription — 150 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -485,6 +485,17 @@ operations:
   - cache:idempotency
   - control.invoice
   - control.invoice_line
+- operation: getBillingEntity
+  verb: GET
+  path: /tenants/{tenantId}/billing-entity
+  scope: tenant
+  permission: PLATFORM_BILLING_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - control.billing_entity
+  writes: []
 - operation: getBillingReconciliation
   verb: GET
   path: /billing-reconciliation
@@ -1738,6 +1749,18 @@ operations:
   - cache:idempotency
   - control.partner_agreement
   - control.partner_document
+- operation: setBillingEntity
+  verb: PUT
+  path: /tenants/{tenantId}/billing-entity
+  scope: tenant
+  permission: PLATFORM_BILLING_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - control.billing_entity
+  writes:
+  - control.billing_entity
 - operation: setChannelListing
   verb: PUT
   path: /channel-listings
@@ -2251,11 +2274,13 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - control.billing_entity
   - control.onboarding_application
   - control.venue_type_template
   - subscription.plan
   writes:
   - cache:idempotency
+  - control.billing_entity
   - control.onboarding_application
 - operation: suspendTenant
   verb: POST

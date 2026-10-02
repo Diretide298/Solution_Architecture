@@ -1,42 +1,4 @@
 {
- "cancelDecommission": {
-  "method": "POST",
-  "path": "/cells/{cellId}/cancel-decommission",
-  "contract": "subscription",
-  "summary": "Halt a decommission",
-  "permission": "PLATFORM_CELL_MANAGE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": null
- },
- "decommissionCell": {
-  "method": "POST",
-  "path": "/cells/{cellId}/decommission",
-  "contract": "subscription",
-  "summary": "Begin decommissioning a cell",
-  "permission": "PLATFORM_CELL_MANAGE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": null
- },
  "getCell": {
   "method": "GET",
   "path": "/cells/{cellId}",
@@ -163,24 +125,5 @@
   ],
   "requestBody": "ScalingPolicy",
   "responds": "ScalingPolicy"
- },
- "updateCellTier": {
-  "method": "PATCH",
-  "path": "/cells/{cellId}",
-  "contract": "subscription",
-  "summary": "Change a cell's tier",
-  "permission": "PLATFORM_CELL_MANAGE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": null
  }
 }

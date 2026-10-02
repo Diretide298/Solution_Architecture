@@ -128,25 +128,6 @@
   "requestBody": null,
   "responds": "StackingConflictCommandCenterView"
  },
- "setPromotionRule": {
-  "method": "PUT",
-  "path": "/promotion-rule",
-  "contract": "promotions",
-  "summary": "Promotion Rule Builder",
-  "permission": "PRICE_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "PromotionRuleBuilderInput",
-  "responds": "PromotionRuleBuilderView"
- },
  "setPromotionStackingRule": {
   "method": "PUT",
   "path": "/promotion-stacking-rule",

@@ -46,10 +46,13 @@ steps:
   outcome: Priced with any membership benefit applied
 - step: 4
   screen: GST-009
-  action: Pays
+  action: Pays for the food order on its own
   operations:
   - createPayment
-  outcome: Card or wallet
+  outcome: 'Card or wallet. **The F&B order keeps its own payment step and its own receipt** (decided 2
+    October 2026, Chinmay: "F&B has its own receipt"; DEC-052, CHG-CSA-011). It does not go through the
+    shared cart (`addCartLine`, `checkoutCart`), and DI-293''s one cart, one receipt does not apply to
+    F&B: a guest who bought tickets earlier gets a separate F&B receipt here.'
 - step: 5
   screen: BO-020
   action: Kitchen accepts and prepares
@@ -83,6 +86,15 @@ branches:
 - at: 1
   condition: Location session expired
   behaviour: Re-scan. Sessions expire so that yesterday's guest cannot order to today's lounger.
+  severity: recoverable
+  resolvedBy: Guest
+- at: 3
+  condition: The outlet is inside the venue and the guest holds no admission ticket for today
+  behaviour: '**Refused before anything is held** (decided 2 October 2026, Chinmay: "Inside the venue, a
+    ticket is needed. A restaurant outside the venue (standalone) can sell without one"; DEC-070, DI-292
+    amended; CHG-CSA-011, CHG-CSP-004). `createGuestFnbOrder` answers `403 entry-ticket-required` and the
+    screen offers the ticket purchase rather than an error. A standalone outlet takes the order with no
+    ticket.'
   severity: recoverable
   resolvedBy: Guest
 - at: 5

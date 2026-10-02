@@ -32,7 +32,7 @@
     {
      "to": "ADM-001",
      "trigger": "Platform Login / MFA",
-     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId and ADM-022 holds none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and ADM-001 opens on its own"
+     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId, providerId and ADM-022 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and ADM-001 opens on its own"
     },
     {
      "to": "ADM-002",
@@ -48,7 +48,7 @@
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listReleases` reads the population and `getRelease` reads one of them — list, select, act",
-  "purpose": "Find release & version management for this venue.",
+  "purpose": "Cut releases and move them through the environments.",
   "layout": {
    "template": "split",
    "regions": [
@@ -80,9 +80,7 @@
         "Release.note",
         "Release.guestReleaseNotes",
         "Release.breakingChanges",
-        "Release.id",
         "Release.status",
-        "Release.createdByPrincipalId",
         "Release.promotedToStagingAt",
         "Release.promotedToProductionAt"
        ],
@@ -328,6 +326,7 @@
    "board": "wireframes/P09 TICVAI Web.dc.html#adm-022"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "purposeNote": "Purpose rewritten 2 October 2026 (CHG-WIR-023): The purpose was the generator template (\"Find release & version management for this venue\"); releases are platform-wide (design-notes correction platform-foundation ADM-022).",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -381,7 +380,7 @@
     {
      "to": "ADM-001",
      "trigger": "Platform Login / MFA",
-     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId and ADM-023 holds none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and ADM-001 opens on its own"
+     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId, providerId and ADM-023 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and ADM-001 opens on its own"
     },
     {
      "to": "ADM-002",
@@ -406,7 +405,7 @@
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listReleases` reads the population and `getReleaseReadiness` reads one of them — list, select, act",
-  "purpose": "Work with staging promotion & approval for this venue.",
+  "purpose": "Approve or reject a release's promotion out of staging.",
   "layout": {
    "template": "split",
    "regions": [
@@ -437,9 +436,7 @@
         "Release.requiredMigrations",
         "Release.note",
         "Release.breakingChanges",
-        "Release.id",
         "Release.status",
-        "Release.createdByPrincipalId",
         "Release.promotedToStagingAt",
         "Release.promotedToProductionAt"
        ],
@@ -514,22 +511,10 @@
        "provenance": "contract platform-ops.yaml POST /releases/{releaseId}/promote"
       },
       {
-       "kind": "secondaryButton",
-       "label": "Create release",
-       "operation": "createRelease",
-       "provenance": "contract platform-ops.yaml POST /releases"
-      },
-      {
        "kind": "destructiveButton",
        "label": "Reject release",
        "operation": "rejectRelease",
        "provenance": "contract platform-ops.yaml POST /releases/{releaseId}/reject"
-      },
-      {
-       "kind": "destructiveButton",
-       "label": "Withdraw release",
-       "operation": "withdrawRelease",
-       "provenance": "contract platform-ops.yaml POST /releases/{releaseId}/withdraw"
       },
       {
        "kind": "publishGate",
@@ -550,13 +535,6 @@
     "provenance": "contract platform-ops.yaml POST /releases/{releaseId}/reject"
    },
    {
-    "id": "confirmWithdrawRelease",
-    "component": "confirmDialog",
-    "trigger": "Withdraw release",
-    "body": "**Names what `withdrawRelease` changes and what it leaves alone**, in the consequence rather than the verb. A staging promotion approval this affects should be identified in the dialog, not just counted. **Collects what `withdrawRelease` sends before it is called.** Required: `reason`.",
-    "provenance": "contract platform-ops.yaml POST /releases/{releaseId}/withdraw"
-   },
-   {
     "id": "formPromoteRelease",
     "component": "modal",
     "trigger": "Promote release",
@@ -575,33 +553,12 @@
      ]
     },
     "provenance": "contract platform-ops.yaml POST /releases/{releaseId}/promote"
-   },
-   {
-    "id": "formCreateRelease",
-    "component": "modal",
-    "trigger": "Create release",
-    "body": "**Collects what `createRelease` sends before it is called.** Required: `components`, `note`. Optional: `requiredMigrations`, `breakingChanges`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "CreateReleaseRequest",
-    "confirm": {
-     "label": "Create release",
-     "operation": "createRelease"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "components",
-      "note",
-      "requiredMigrations",
-      "breakingChanges"
-     ]
-    },
-    "provenance": "contract platform-ops.yaml POST /releases"
    }
   ],
   "states": {
    "loading": "The staging promotion approval list.",
    "error": "Could not load. Names which read failed and leaves the staging promotion approval untouched.",
-   "emptyFirstRun": "No staging promotion approval yet. Offers Create release (`createRelease`); distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No staging promotion approval yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "Nothing matches the filter on status, environment and the staging promotion approval are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Shown when the caller lacks `PLATFORM_RELEASE_VIEW`, which `getReleaseReadiness` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -619,15 +576,6 @@
     "trigger": "onAction"
    },
    {
-    "operationId": "createRelease",
-    "contract": "platform-ops",
-    "purpose": "Cut a release",
-    "trigger": "onAction",
-    "invalidates": [
-     "listReleases"
-    ]
-   },
-   {
     "operationId": "getRelease",
     "contract": "platform-ops",
     "purpose": "Read a release with its rollout state",
@@ -643,15 +591,6 @@
     "operationId": "rejectRelease",
     "contract": "platform-ops",
     "purpose": "Reject a release back a stage",
-    "trigger": "onAction",
-    "invalidates": [
-     "listReleases"
-    ]
-   },
-   {
-    "operationId": "withdrawRelease",
-    "contract": "platform-ops",
-    "purpose": "Withdraw a release",
     "trigger": "onAction",
     "invalidates": [
      "listReleases"
@@ -680,6 +619,21 @@
    "board": "wireframes/P09 TICVAI Web.dc.html#adm-023"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "gaps": [
+   {
+    "operation": "createRelease",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-021): ADM-022 and ADM-023 declared the same seven release operations; ADM-023 is the staging approval step only, so cutting and withdrawing a release stay on ADM-022 (design-notes corrections platform-foundation ADM-022, ADM-023).",
+    "source": "screens/P09-platform-admin-console.yaml#ADM-022 | F04 step 3"
+   },
+   {
+    "operation": "withdrawRelease",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-021): ADM-022 and ADM-023 declared the same seven release operations; ADM-023 is the staging approval step only, so cutting and withdrawing a release stay on ADM-022 (design-notes corrections platform-foundation ADM-022, ADM-023).",
+    "source": "screens/P09-platform-admin-console.yaml#ADM-022 | F04 step 3"
+   }
+  ],
+  "purposeNote": "Purpose rewritten 2 October 2026 (CHG-WIR-023): The purpose was the generator template (\"Work with staging promotion & approval for this venue\"); platform-wide, and the screen is the staging approval step (design-notes correction platform-foundation ADM-023).",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -730,7 +684,7 @@
     {
      "to": "ADM-001",
      "trigger": "Platform Login / MFA",
-     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId and ADM-024 holds none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and ADM-001 opens on its own"
+     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId, providerId and ADM-024 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and ADM-001 opens on its own"
     },
     {
      "to": "ADM-002",
@@ -746,7 +700,7 @@
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listSupportNotices` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
-  "purpose": "Push live release notification composer for this venue.",
+  "purpose": "Tell tenants about a release before and after it ships.",
   "layout": {
    "template": "split",
    "regions": [
@@ -759,13 +713,9 @@
        "label": "Every support notice",
        "bindsTo": "SupportNotice",
        "columns": [
-        "SupportNotice.id",
         "SupportNotice.supportEndsAt",
         "SupportNotice.message",
-        "SupportNotice.affectedTenantIds",
-        "SupportNotice.publishedByPrincipalId",
-        "SupportNotice.publishedAt",
-        "SupportNotice.scopePath"
+        "SupportNotice.publishedAt"
        ],
        "operation": "listSupportNotices",
        "provenance": "contract platform-ops.yaml GET /support-notices"
@@ -780,9 +730,7 @@
         "Release.note",
         "Release.guestReleaseNotes",
         "Release.breakingChanges",
-        "Release.id",
         "Release.status",
-        "Release.createdByPrincipalId",
         "Release.promotedToStagingAt",
         "Release.promotedToProductionAt"
        ],
@@ -855,7 +803,7 @@
   "states": {
    "loading": "The release notification composer list.",
    "error": "Could not load. Names which read failed and leaves the release notification composer untouched.",
-   "emptyFirstRun": "No release notification composer yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyFirstRun": "No release notification composer yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "Never shown: `listSupportNotices` takes no filter, so an empty list is always the first-run state above.",
    "emptyNoAccess": "Shown when the caller lacks `PLATFORM_RELEASE_VIEW`, which `listSupportNotices` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -899,7 +847,7 @@
     "id": "formPublishSupportNotice",
     "component": "modal",
     "trigger": "Publish support notice",
-    "body": "**Collects what `publishSupportNotice` sends before it is called.** Required: `id`, `supportEndsAt`, `publishedAt`. Optional: `message`, `affectedTenantIds`, `publishedByPrincipalId`, `scopePath`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `publishSupportNotice` sends before it is called.** Required: `supportEndsAt`. Optional: `message`, `affectedTenantIds`, `publishedByPrincipalId`, `scopePath`. **Not asked:** `id` is a client UUIDv7 generated silently; `publishedAt` is set by the server (design-note correction, 2 October 2026). Dismissing sends nothing; the screen behind is unchanged.",
     "bindsTo": "SupportNotice",
     "confirm": {
      "label": "Publish support notice",
@@ -908,9 +856,7 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "id",
       "supportEndsAt",
-      "publishedAt",
       "message",
       "affectedTenantIds",
       "publishedByPrincipalId",
@@ -920,6 +866,7 @@
     "provenance": "contract platform-ops.yaml POST /support-notices"
    }
   ],
+  "purposeNote": "Purpose rewritten 2 October 2026 (CHG-WIR-023): The purpose was the generator template (\"Push live release notification composer for this venue\"); release notices target tenants (design-notes correction platform-foundation ADM-024).",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -970,7 +917,7 @@
     {
      "to": "ADM-001",
      "trigger": "Platform Login / MFA",
-     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId and ADM-025 holds none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and ADM-001 opens on its own"
+     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId, providerId and ADM-025 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and ADM-001 opens on its own"
     },
     {
      "to": "ADM-002",
@@ -986,7 +933,7 @@
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listUpgradeSchedules` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
-  "purpose": "Find tenant upgrade scheduler for this venue.",
+  "purpose": "Schedule or defer each tenant's upgrade.",
   "layout": {
    "template": "split",
    "regions": [
@@ -1051,7 +998,7 @@
   "states": {
    "loading": "The tenant upgrade scheduler list.",
    "error": "Could not load. Names which read failed and leaves the tenant upgrade scheduler untouched.",
-   "emptyFirstRun": "No tenant upgrade scheduler yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyFirstRun": "No tenant upgrade scheduler yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "Never shown: `listUpgradeSchedules` takes no filter, so an empty list is always the first-run state above.",
    "emptyNoAccess": "Shown when the caller lacks `PLATFORM_RELEASE_VIEW`, which `listUpgradeSchedules` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -1110,6 +1057,7 @@
     "provenance": "contract platform-ops.yaml POST /upgrade-schedules"
    }
   ],
+  "purposeNote": "Purpose rewritten 2 October 2026 (CHG-WIR-023): The purpose was the generator template (\"Find tenant upgrade scheduler for this venue\"); upgrades are per tenant (design-notes correction platform-foundation ADM-025).",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -1160,7 +1108,7 @@
     {
      "to": "ADM-001",
      "trigger": "Platform Login / MFA",
-     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId and ADM-026 holds none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and ADM-001 opens on its own"
+     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId, providerId and ADM-026 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and ADM-001 opens on its own"
     },
     {
      "to": "ADM-002",
@@ -1169,14 +1117,14 @@
     }
    ]
   },
-  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement.",
+  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement.\n\n**Tenant picker and platform-staff grant added 2 October 2026** (CHG-SBO-001; Chinmay, pre-apply round: console screens get the R098 tenant picker and grant, the ADM-412 pattern). The Console runs outside every cell; `deprecateApiVersion` (DEVELOPER_ADMIN) are tenant operations, refused 403 to a platform token until a time-boxed, audited grant into the picked tenant is open. The tenant sees the grant and every action under it.",
   "openQuestions": [
    "No contract — new scope, 30 Jul"
   ],
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listSupportNotices` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
-  "purpose": "Answer a question without needing a person.",
+  "purpose": "Announce when a version or an API version reaches end of support.",
   "layout": {
    "template": "split",
    "regions": [
@@ -1185,17 +1133,49 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "selectField",
+       "label": "Tenant",
+       "bindsTo": "Tenant.id",
+       "columns": [
+        "Tenant.code",
+        "Tenant.name",
+        "Tenant.status"
+       ],
+       "operation": "listTenants",
+       "notes": "**Pick a tenant first** (audit R098; decided 2 October 2026, Chinmay: console screens get the tenant picker and grant, CHG-SBO-001). This screen's operations run in that tenant's cell, and a platform token carries no tenant permission there until a platform-staff grant into it is open.",
+       "provenance": "contract subscription.yaml GET /tenants"
+      },
+      {
+       "kind": "banner",
+       "label": "Open grant into this tenant",
+       "bindsTo": "PlatformStaffGrant",
+       "columns": [
+        "PlatformStaffGrant.operatorDisplayName",
+        "PlatformStaffGrant.permissions",
+        "PlatformStaffGrant.reason",
+        "PlatformStaffGrant.ticketRef",
+        "PlatformStaffGrant.openedAt",
+        "PlatformStaffGrant.expiresAt"
+       ],
+       "operation": "listOwnPlatformStaffGrants",
+       "notes": "**Always visible while the screen acts on a tenant** (audit R098, the ADM-412 pattern): which tenant, which permissions, why, and the time left to `expiresAt`. At expiry every tenant action is disabled and the screen returns to its grantRequired state; a new need is a new grant. The tenant sees the grant in its own audit log. Found again after a reload with `listOwnPlatformStaffGrants`.",
+       "provenance": "contract identity.yaml GET /platform-staff-grants/mine"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Open access grant",
+       "operation": "openPlatformStaffGrant",
+       "notes": "Shown until a grant into the picked tenant is open; asks for the second factor first (step-up, audit R135).",
+       "provenance": "contract identity.yaml POST /platform-staff-grants"
+      },
+      {
        "kind": "dataTable",
        "label": "Every support notice",
        "bindsTo": "SupportNotice",
        "columns": [
-        "SupportNotice.id",
         "SupportNotice.supportEndsAt",
         "SupportNotice.message",
-        "SupportNotice.affectedTenantIds",
-        "SupportNotice.publishedByPrincipalId",
-        "SupportNotice.publishedAt",
-        "SupportNotice.scopePath"
+        "SupportNotice.publishedAt"
        ],
        "operation": "listSupportNotices",
        "provenance": "contract platform-ops.yaml GET /support-notices"
@@ -1259,9 +1239,10 @@
   "states": {
    "loading": "The end-of-support notice list.",
    "error": "Could not load. Names which read failed and leaves the end-of-support notice untouched.",
-   "emptyFirstRun": "No end-of-support notice yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyFirstRun": "No end-of-support notice yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "Never shown: `listSupportNotices` takes no filter, so an empty list is always the first-run state above.",
-   "emptyNoAccess": "Shown when the caller lacks `PLATFORM_RELEASE_VIEW`, which `listSupportNotices` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `PLATFORM_RELEASE_VIEW`, which `listSupportNotices` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "grantRequired": "**No access into this tenant yet.** A tenant is picked and no platform-staff grant into it is open, so every tenant action is disabled and the screen offers **Open access grant** (`openPlatformStaffGrant`: reason, permissions `DEVELOPER_ADMIN`, expiry). The same state returns when the grant reaches `expiresAt` (audit R098; CHG-SBO-001)."
   },
   "apis": [
    {
@@ -1287,6 +1268,27 @@
     "invalidates": [
      "listSupportNotices"
     ]
+   },
+   {
+    "operationId": "listTenants",
+    "contract": "subscription",
+    "purpose": "The tenant picker: the operator picks a tenant before acting in its cell (audit R098; decided 2 October 2026, CHG-SBO-001)",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listOwnPlatformStaffGrants",
+    "contract": "identity",
+    "purpose": "Find a grant into the picked tenant already open, after a reload (audit R098; CHG-SBO-001)",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "openPlatformStaffGrant",
+    "contract": "identity",
+    "purpose": "Open a time-boxed, audited platform-staff grant into the picked tenant before any tenant-scoped operation here; the tenant sees it (audit R098; decided 2 October 2026, CHG-SBO-001)",
+    "trigger": "onAction",
+    "invalidates": [
+     "listOwnPlatformStaffGrants"
+    ]
    }
   ],
   "entryState": {
@@ -1294,6 +1296,11 @@
     {
      "name": "version",
      "from": "navigation"
+    },
+    {
+     "name": "tenantId",
+     "from": "navigation",
+     "optional": true
     }
    ],
    "coldEntry": "**Reached from the list that owns it**, so the identifier arrives with the navigation. Opened cold without one the screen says what is missing and offers that list — never an empty form that looks configurable.",
@@ -1316,7 +1323,7 @@
     "id": "formPublishSupportNotice",
     "component": "modal",
     "trigger": "Publish support notice",
-    "body": "**Collects what `publishSupportNotice` sends before it is called.** Required: `id`, `supportEndsAt`, `publishedAt`. Optional: `message`, `affectedTenantIds`, `publishedByPrincipalId`, `scopePath`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `publishSupportNotice` sends before it is called.** Required: `supportEndsAt`. Optional: `message`, `affectedTenantIds`, `publishedByPrincipalId`, `scopePath`. **Not asked:** `id` is a client UUIDv7 generated silently; `publishedAt` is set by the server (design-note correction, 2 October 2026). Dismissing sends nothing; the screen behind is unchanged.",
     "bindsTo": "SupportNotice",
     "confirm": {
      "label": "Publish support notice",
@@ -1325,9 +1332,7 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "id",
       "supportEndsAt",
-      "publishedAt",
       "message",
       "affectedTenantIds",
       "publishedByPrincipalId",
@@ -1354,8 +1359,29 @@
      ]
     },
     "provenance": "contract public-api.yaml POST /api-versions/{version}/deprecate"
+   },
+   {
+    "id": "formOpenPlatformStaffGrant",
+    "component": "modal",
+    "trigger": "Open access grant",
+    "body": "**Collects what `openPlatformStaffGrant` sends before it is called** (audit R098). Required: `id` (a client UUIDv7, generated silently), `permissions` (tenant permissions only; `DEVELOPER_ADMIN` preselected for this screen), `reason`, `expiresAt` (at most 8 hours ahead, proposed). Optional: `ticketRef`. Requires step-up: the operator presents a second factor first. The tenant sees the grant and everything done under it. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Open access grant",
+     "operation": "openPlatformStaffGrant"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "permissions",
+      "reason",
+      "ticketRef",
+      "expiresAt"
+     ]
+    },
+    "provenance": "contract identity.yaml POST /platform-staff-grants"
    }
   ],
+  "purposeNote": "Purpose rewritten 2 October 2026 (CHG-WIR-023): The purpose \"Answer a question without needing a person\" was copied from a help screen (design-notes correction platform-foundation ADM-026).",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -1415,7 +1441,7 @@
     {
      "to": "ADM-001",
      "trigger": "Platform Login / MFA",
-     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId and ADM-027 holds none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and ADM-001 opens on its own"
+     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId, providerId and ADM-027 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and ADM-001 opens on its own"
     },
     {
      "to": "ADM-002",
@@ -1431,7 +1457,7 @@
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listMigrations` reads the population and `getVersionSkew` reads one of them — list, select, act",
-  "purpose": "Find database migration console for this venue.",
+  "purpose": "Plan, apply and roll back database migrations across the cells.",
   "layout": {
    "template": "split",
    "regions": [
@@ -1563,7 +1589,7 @@
   "states": {
    "loading": "The database migration console list.",
    "error": "Could not load. Names which read failed and leaves the database migration console untouched.",
-   "emptyFirstRun": "No database migration console yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyFirstRun": "No database migration console yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "Nothing matches the filter on appliedTo, pendingOnly and the database migration console are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Shown when the caller lacks `PLATFORM_MIGRATION_VIEW`, which `listMigrations` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -1690,6 +1716,7 @@
     "provenance": "contract platform-ops.yaml POST /migrations/runs/{runId}/rollback"
    }
   ],
+  "purposeNote": "Purpose rewritten 2 October 2026 (CHG-WIR-023): The purpose was the generator template (\"Find database migration console for this venue\"); platform-wide (design-notes correction platform-foundation ADM-027).",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -1734,18 +1761,24 @@
    "inferred": true,
    "exitTo": [
     "ADM-001",
-    "ADM-002"
+    "ADM-002",
+    "ADM-700"
    ],
    "transitions": [
     {
      "to": "ADM-001",
      "trigger": "Platform Login / MFA",
-     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId and ADM-028 holds none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and ADM-001 opens on its own"
+     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId, providerId and ADM-028 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and ADM-001 opens on its own"
     },
     {
      "to": "ADM-002",
      "trigger": "Platform Dashboard",
      "provenance": "derived — ADM-002 declares entryState.params  and ADM-028 holds none of them. The edge carries nothing: ADM-028 is opened from ADM-002, so this edge is the way back and ADM-002 keeps its own state"
+    },
+    {
+     "to": "ADM-700",
+     "trigger": "Configuration Promotion",
+     "provenance": "new screen, 2 October 2026 (CHG-SBO-024)"
     }
    ]
   },
@@ -1756,7 +1789,7 @@
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listEnvironments` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
-  "purpose": "Find environment registry for this venue.",
+  "purpose": "Keep the register of platform environments and the cells in each.",
   "layout": {
    "template": "split",
    "regions": [
@@ -1769,10 +1802,8 @@
        "label": "Every environment",
        "bindsTo": "Environment",
        "columns": [
-        "Environment.id",
         "Environment.kind",
         "Environment.name",
-        "Environment.cellIds",
         "Environment.requiresApprovalToPromote",
         "Environment.soakHours",
         "Environment.currentReleaseVersion",
@@ -1861,7 +1892,7 @@
     "id": "formRegisterEnvironment",
     "component": "modal",
     "trigger": "Register environment",
-    "body": "**Collects what `registerEnvironment` sends before it is called.** Required: `id`, `kind`, `name`. Optional: `cellIds`, `requiresApprovalToPromote`, `soakHours`, `currentReleaseVersion`, `isActive`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `registerEnvironment` sends before it is called.** Required: `kind`, `name`. Optional: `cellIds`, `requiresApprovalToPromote`, `soakHours`, `currentReleaseVersion`, `isActive`. **Not asked:** `id` is a client UUIDv7 generated silently (design-note correction, 2 October 2026). Dismissing sends nothing; the screen behind is unchanged.",
     "bindsTo": "Environment",
     "confirm": {
      "label": "Register environment",
@@ -1870,7 +1901,6 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "id",
       "kind",
       "name",
       "cellIds",
@@ -1883,6 +1913,315 @@
     "provenance": "contract platform-ops.yaml POST /environments"
    }
   ],
+  "purposeNote": "Purpose rewritten 2 October 2026 (CHG-WIR-023): The purpose was the generator template (\"Find environment registry for this venue\"); platform-wide (design-notes correction platform-foundation ADM-028).",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-700",
+  "name": "Configuration Promotion",
+  "module": "Releases & Environments",
+  "requiresModule": "core",
+  "wave": 2,
+  "capability": "C95",
+  "permission": "PLATFORM_RELEASE_VIEW",
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/releases-environments/configuration-promotion",
+   "component": "apps/ticvai-web/src/routes/releases-environments/ConfigurationPromotion.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-028"
+   ],
+   "exitTo": [
+    "ADM-028"
+   ],
+   "inferred": false,
+   "transitions": [
+    {
+     "to": "ADM-028",
+     "trigger": "Environment Registry",
+     "back": true,
+     "provenance": "new screen, 2 October 2026 (CHG-SBO-024)"
+    }
+   ]
+  },
+  "notes": "**Added 2 October 2026** (Chinmay, DEC-168, ADR-0070; the lead's call on CHG-MOV-010; CHG-SBO-024). Configuration moves between environments as a versioned package exported with stable keys, diffed against the target, approved, applied as an idempotent upsert by key and audited; rollback re-applies the previous package; secrets and environment settings never travel in it. Production databases are never merged or reverse-migrated: schema goes forward through versioned migrations. **Platform permissions only** (PLATFORM_RELEASE_MANAGE, PLATFORM_RELEASE_VIEW, PLATFORM_MIGRATION_APPLY), so no tenant grant is opened here; ADM-122 stays in Venue Management for product import and export.",
+  "density": "compact",
+  "pattern": "statusTracker",
+  "patternReason": "One package moving through export, diff, approval and apply; each step shows its result before the next.",
+  "purpose": "Move a tenant's configuration from one environment to another as a versioned package: export it, see the diff against the target, and apply it once approved.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "record",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Source environment",
+       "bindsTo": "Environment.id",
+       "operation": "listEnvironments",
+       "notes": "Pick lists of the environment registry (ADM-028), never typed.",
+       "provenance": "contract platform-ops.yaml GET /environments"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Package",
+       "bindsTo": "ConfigPackage",
+       "columns": [
+        "ConfigPackage.version",
+        "ConfigPackage.sourceEnvironment",
+        "ConfigPackage.checksum",
+        "ConfigPackage.recordCounts",
+        "ConfigPackage.excludedKinds",
+        "ConfigPackage.createdAt"
+       ],
+       "operation": "exportConfigPackage",
+       "notes": "What the package holds, by kind, and what it left out on purpose (secrets, environment settings).",
+       "provenance": "contract platform-ops.yaml POST /config-packages"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Changes against the target",
+       "bindsTo": "ConfigPackageDiff",
+       "columns": [
+        "ConfigPackageDiff.targetEnvironment",
+        "ConfigPackageDiff.computedAt",
+        "ConfigPackageDiff.changes"
+       ],
+       "operation": "diffConfigPackage",
+       "notes": "Every record to add, change or leave, by stable key; nothing applies that is not shown here.",
+       "provenance": "contract platform-ops.yaml POST /config-packages/{packageId}/diff"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Application",
+       "bindsTo": "ConfigPackageApplication",
+       "columns": [
+        "ConfigPackageApplication.status",
+        "ConfigPackageApplication.appliedCount",
+        "ConfigPackageApplication.previousPackageId",
+        "ConfigPackageApplication.startedAt"
+       ],
+       "operation": "applyConfigPackage",
+       "notes": "Rollback is re-applying `previousPackageId`.",
+       "provenance": "contract platform-ops.yaml POST /config-packages/{packageId}/apply"
+      },
+      {
+       "kind": "publishGate",
+       "label": "What applying changes",
+       "notes": "Names the target environment, the count of records it changes and the approval it rests on before Apply is pressed.",
+       "provenance": "design-note correction, 2 October 2026"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Export package",
+       "operation": "exportConfigPackage",
+       "provenance": "contract platform-ops.yaml POST /config-packages"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Compare with target",
+       "operation": "diffConfigPackage",
+       "provenance": "contract platform-ops.yaml POST /config-packages/{packageId}/diff"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Apply package",
+       "operation": "applyConfigPackage",
+       "notes": "After the approval; asks for the authentication code first (`stepUpToken`).",
+       "provenance": "contract platform-ops.yaml POST /config-packages/{packageId}/apply"
+      }
+     ]
+    }
+   ]
+  },
+  "overlays": [
+   {
+    "id": "formExportConfigPackage",
+    "component": "modal",
+    "trigger": "Export package",
+    "body": "**Collects what `exportConfigPackage` sends before it is called.** Required: `sourceEnvironment`. Optional: `kinds`. `kinds` narrows the package; secrets and environment settings never travel in it. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Export package",
+     "operation": "exportConfigPackage"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "sourceEnvironment",
+      "kinds"
+     ]
+    },
+    "provenance": "contract platform-ops.yaml POST /config-packages"
+   },
+   {
+    "id": "formDiffConfigPackage",
+    "component": "modal",
+    "trigger": "Compare with target",
+    "body": "**Collects what `diffConfigPackage` sends before it is called.** Required: `targetEnvironment`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Compare with target",
+     "operation": "diffConfigPackage"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "targetEnvironment"
+     ]
+    },
+    "provenance": "contract platform-ops.yaml POST /config-packages/{packageId}/diff"
+   },
+   {
+    "id": "formApplyConfigPackage",
+    "component": "modal",
+    "trigger": "Apply package",
+    "body": "**Collects what `applyConfigPackage` sends before it is called.** Required: `diffId`, `stepUpToken`. Optional: `approvalRequestId`. `stepUpToken` comes from the authentication code asked in this dialog (`createMfaChallenge`, `verifyMfaChallenge`); `approvalRequestId` names the approval it rests on. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Apply package",
+     "operation": "applyConfigPackage"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "diffId",
+      "stepUpToken",
+      "approvalRequestId"
+     ]
+    },
+    "provenance": "contract platform-ops.yaml POST /config-packages/{packageId}/apply"
+   },
+   {
+    "id": "confirmStepUpApply",
+    "component": "confirmDialog",
+    "trigger": "Apply package",
+    "body": "Asks for the authentication code before the package is applied.",
+    "confirm": {
+     "label": "Send the code",
+     "operation": "createMfaChallenge"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "contract identity.yaml POST /auth/mfa/challenge"
+   },
+   {
+    "id": "confirmVerifyApply",
+    "component": "confirmDialog",
+    "trigger": "Verify",
+    "body": "Verifies the code and returns the step-up token the apply needs.",
+    "confirm": {
+     "label": "Verify",
+     "operation": "verifyMfaChallenge"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "contract identity.yaml POST /auth/mfa/challenge/{challengeId}/verify"
+   }
+  ],
+  "states": {
+   "loading": "The package and its diff.",
+   "error": "Could not export, compare or apply; names which step failed and leaves the earlier results.",
+   "emptyFirstRun": "No package yet. Offers Export package (`exportConfigPackage`).",
+   "emptyNoResults": "Never shown: nothing on this screen filters.",
+   "emptyNoAccess": "You don't have access to promote configuration — it needs TICVAI's release permissions. Named in words, never an empty table."
+  },
+  "apis": [
+   {
+    "operationId": "listEnvironments",
+    "contract": "platform-ops",
+    "purpose": "The environments to move between",
+    "trigger": "onLoad",
+    "provenance": "new screen, 2 October 2026 (CHG-SBO-024)"
+   },
+   {
+    "operationId": "exportConfigPackage",
+    "contract": "platform-ops",
+    "purpose": "Export the tenant configuration as a versioned package",
+    "trigger": "onAction",
+    "provenance": "new screen, 2 October 2026 (CHG-SBO-024)"
+   },
+   {
+    "operationId": "diffConfigPackage",
+    "contract": "platform-ops",
+    "purpose": "Compare the package with the target environment",
+    "trigger": "onAction",
+    "provenance": "new screen, 2 October 2026 (CHG-SBO-024)"
+   },
+   {
+    "operationId": "applyConfigPackage",
+    "contract": "platform-ops",
+    "purpose": "Apply the approved package (step-up)",
+    "trigger": "onAction",
+    "provenance": "new screen, 2 October 2026 (CHG-SBO-024)"
+   },
+   {
+    "operationId": "createMfaChallenge",
+    "contract": "identity",
+    "purpose": "Raise the second factor before applying",
+    "trigger": "onAction",
+    "provenance": "new screen, 2 October 2026 (CHG-SBO-024)"
+   },
+   {
+    "operationId": "verifyMfaChallenge",
+    "contract": "identity",
+    "purpose": "Verify the code, for the step-up token",
+    "trigger": "onAction",
+    "provenance": "new screen, 2 October 2026 (CHG-SBO-024)"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "packageId",
+     "from": "navigation",
+     "optional": true
+    },
+    {
+     "name": "challengeId",
+     "from": "navigation"
+    }
+   ],
+   "coldEntry": "Opened cold, it starts at Export package; with a package id it opens that package."
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-700"
+  },
+  "apisNote": "Built 2 October 2026 (CHG-SBO-024) from the platform-ops configuration-package operations (CHG-CSA-034).",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",

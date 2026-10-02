@@ -18,6 +18,25 @@
   "requestBody": "ConfigureWorkstationRequest",
   "responds": "Workstation"
  },
+ "decideProposedAction": {
+  "method": "POST",
+  "path": "/proposed-actions/{actionId}/decide",
+  "contract": "ai",
+  "summary": "Approve or reject a proposal",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ProposedAction"
+ },
  "generateConfiguration": {
   "method": "POST",
   "path": "/generate/configuration",
@@ -50,24 +69,86 @@
   "requestBody": null,
   "responds": "AiActionPlanDetail"
  },
- "getTenantConfig": {
+ "getGoLiveReadiness": {
   "method": "GET",
-  "path": "/tenant-config",
-  "contract": "white-label",
-  "summary": "Full working configuration",
-  "permission": "TENANT_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
+  "path": "/go-live-readiness",
+  "contract": "subscription",
+  "summary": "Everything that must pass before a tenant can sell",
+  "permission": "PLATFORM_TENANT_MANAGE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "platform",
   "parameters": [
    {
-    "name": "version",
+    "name": "tenantId",
     "in": "query",
+    "required": true
+   }
+  ],
+  "requestBody": null,
+  "responds": "GoLiveReadiness"
+ },
+ "listPrices": {
+  "method": "GET",
+  "path": "/price-lists/{priceListId}/prices",
+  "contract": "catalogue",
+  "summary": "List prices in a list",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
     "required": null
    }
   ],
   "requestBody": null,
-  "responds": "TenantConfig"
+  "responds": "Page"
+ },
+ "publishChannelAvailability": {
+  "method": "PUT",
+  "path": "/channel-availability",
+  "contract": "catalogue",
+  "summary": "Channel Publication & Availability",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ChannelPublicationAvailabilityInput",
+  "responds": "ChannelPublicationAvailabilityView"
+ },
+ "runGoLiveValidation": {
+  "method": "POST",
+  "path": "/go-live-readiness/run",
+  "contract": "subscription",
+  "summary": "Run the validation plan against a tenant",
+  "permission": "PLATFORM_TENANT_MANAGE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "platform",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
  },
  "setPrices": {
   "method": "PUT",

@@ -1,14 +1,14 @@
 # WS62 — Ticket Resale Marketplace board 1
 
-**10 screens · 18 operations · 21 schemas · 4 permissions**
+**10 screens · 17 operations · 19 schemas · 3 permissions**
 
-Platform P09 TICVAI Web · ships as **ticvai-control** ·
-platformAdmin audience · web ·
+Platform P08 Venue Management · ships as **venue-management** ·
+staff audience · web ·
 online only
 
 ## Who this is for
 
-**platformAdmin on web.** Everything below is how you know what is
+**staff on web.** Everything below is how you know what is
 true. **None of it is the subject.** The subject is the person in front of the screen and the one
 thing they came to do.
 
@@ -48,8 +48,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 4 permissions apply here:
-  `ORDER_CREATE, ORDER_VIEW, PRICE_CONFIGURE, PRODUCT_CONFIGURE`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 3 permissions apply here:
+  `ORDER_CREATE, ORDER_VIEW, PRODUCT_CONFIGURE`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -61,6 +61,45 @@ convincingly. It is never a caption.
   and its error; and, element by element, what is shown and in what format, what each action
   produces and where the user goes next. Draw exactly that.
 
+## The processes these screens belong to
+
+Written by the owner of each process (`handoff/design-notes/`). Read before any screen: it says how the process runs end to end and which words the screens must use.
+
+### Ticketing & Guest Commerce, as the venue and TICVAI configure and run it
+
+WHAT THE PROCESS IS. Everything a guest can buy is set up, priced, promoted and serviced here, on Venue Management (P08, the venue's own back office, served inside the venue's cell) and on the TICVAI Console (P09, TICVAI's control plane, outside every cell). End to end: (1) CATALOGUE. A product has one of twelve kinds (admission, timedAdmission, datedAdmission, openDated, seated, membership, bundle, fnb, retail, rental, addOn, giftCard). Its ticket types (adult, child, senior, resident...) are not typed one by one: they are generated from the product's attributes (components) and each value combination becomes a sellable ticket type with no extra setup (DI-164). What a ticket grants (validity, entries, re-entry, days of week, blackout dates, expiry anchor, fast track, transfer) lives on a reusable entitlement template, not on the product. Who may take part (age, height, supervision, certification) is the eligibility rule; what the guest must answer is the data mask and the consent questions; how the guest sees it is guestListing (bookable, infoOnly, hidden), display tags (at most six), media and the booking flow. Group, family and corporate products and every after-sales policy (reschedule, exchange, refund, cancellation, upgrade, transfer) are configured inside the one product configuration, never on separate screens (DI-465, DI-466). (2) LIFECYCLE AND PUBLICATION. A product moves draft, inReview, approved, live, withdrawn, archived. Approval and publication are two acts with two permissions (PRODUCT_APPROVE, PRODUCT_PUBLISH, R091); every product is authorised before it sells online or on site (DI-438). Approved is still not on a till: a till sells only what is in the signed catalogue release it pulled (publishBundle, ADR-0013), so a saved price is a back-office fact until the venue publishes to tills. Changing something that has sold is preceded by an impact check (assessProductChange: orders affected, entitlements issued, future performances, open carts); restoring a version creates a new version, and sold tickets keep the price and terms they were sold under (restoreProductVersion, DI-938, TRACKER Actions row 145). (3) PRICE. Prices live in price lists: per venue, per channel set, with validity dates and a priority, copied for the next season with an uplift (copyPriceList) and repriced in bulk only after a dry run (bulkChangePrices). Currency and decimal scale are never chosen on a form: they resolve from the venue's region (ADR-0008, ADR-0018; AED 2 places, OMR and BHD 3). When several rules apply, the configured hierarchy decides; there is no "lowest price wins" default (DI-595). Tax on the pre-discount price and three-decimal rounding are regional settings (DI-598). Dynamic rules always show their minimum and maximum price guardrails beside the trigger (getDynamicPriceRule). (4) PROMOTE AND BUNDLE. A promotion is a rule (automatic, or gated by a code) created in draft, made live only by Publish, which first analyses stacking; a …
+*(source: DI-164; DI-171; DI-438; DI-465; DI-466; DI-595; DI-598; DI-387; DI-039; DI-044; DI-474; DI-671; DI-987; DI-019; DI-080; ADR-0008; ADR-0013; ADR-0018; ADR-0019; ADR-0030; R091; R098; R101; R222; REV3-21; contracts/spine/catalogue.yaml#transitionProductLifecycle …)*
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Product | Anything sellable, of one of the twelve kinds. The record that carries names, channels, listing, media and policies. | Item (except on F&B and retail screens), SKU (for tickets), Offering | contracts/spine/catalogue.yaml#/components/schemas/ProductKind |
+| Ticket type | One sellable variant of an admission or event product (Adult, Child, Resident Adult), generated from the product's attributes. For retail and F&B the same record is labelled Variant. | Variant (on ticket screens), Sub-product, Rate (that is a price), Axis value | contracts/spine/catalogue.yaml#updateProductVariant / DI-164 / DI-437 |
+| Attribute | A dimension that generates ticket types (Guest category, Residency, Tier, Length). Each has values; adding a value adds ticket types. | Axis, Component (the client's word; use it only in help text), Option | contracts/spine/catalogue.yaml#setProductAttributes / DI-164 / DI-450 |
+| Entitlement | What a ticket lets the holder do (validity, entries, re-entry, days, blackout dates, expiry, fast track, transfer), defined once on an entitlement template and shared by several products. | Access rights, Ticket rules, Validity profile | contracts/spine/catalogue.yaml#createEntitlementTemplate / DI-171 / DI-451 |
+| Eligibility rule | Who may take part in or buy a product (age, height, supervision, waiver, certification). Distinct from a promotion's eligibility, which decides who gets a discount. | Restriction, Access rule (that is access control) | contracts/spine/catalogue.yaml#setProductEligibilityRule / DI-463 |
+| Price list | A set of prices for one venue and a set of channels, valid between two dates, with a priority. Several coexist (B2C, B2B, season). | Price book, Rate card, Tariff | contracts/spine/catalogue.yaml#createPriceList / DI-140 / DI-163 |
+| Price category | A standard rate type (Adult, Child, Member) reused across lists so venues do not invent "Adult Standard" and "Normal Adult". | Price band (that is a seat-category band), Fare type (transport) | contracts/spine/catalogue.yaml#setPriceCategoryRateType / … |
+| Price band | A priced band on a seat category (code, label, colour, amount, channel, from-date). | Price category, Zone price | contracts/satellite/seating.yaml#/components/schemas/SeatPriceBand |
+| Promotion | A rule that changes a price automatically or when a code is entered; draft until published; declares how it stacks. | Offer (except in guest copy), Deal, Discount rule | contracts/satellite/promotions.yaml#createPromotion / DI-173 / DI-174 |
+| Coupon code | A code issued from a coupon campaign that applies a promotion-style discount; one shared code or many single-use codes. | Voucher, Promo voucher | contracts/satellite/promotions.yaml#createCouponCampaign / DI-173 |
+| Voucher | A code that carries money (face value, balance), sold or issued; a liability until redeemed or expired. | Coupon, Credit note | contracts/satellite/promotions.yaml#listVoucherBatches / … |
+| Bundle | A product sold as one line whose price differs from the sum of its components, with a mandatory revenue allocation. "Package" is acceptable in guest copy. | Combo (that is an F&B meal deal), Catalogue bundle | contracts/satellite/promotions.yaml#createBundle / DI-220 / ADR-0019 |
+| Catalogue release | The signed snapshot of a venue's catalogue, prices, promotions and sale boards that tills, kiosks and devices pull. Its action label is "Publish to tills". | Bundle, Catalogue bundle, Sync, Deploy | contracts/spine/catalogue.yaml#publishBundle / … |
+| Approve / Publish / Save | Save keeps a draft; Approve records that it is authorised (PRODUCT_APPROVE); Publish makes it live for guests and channels (PRODUCT_PUBLISH). Three different buttons, never merged. | Submit, Go live, Activate (except CatalogueConfigStatus active), Deploy | R091 / contracts/spine/catalogue.yaml#transitionProductLifecycle / DI-438 |
+| Product states | Draft, In review, Approved, Live, Withdrawn, Archived (ProductLifecycleState), always as coloured badges with these exact labels. | Published (for a product), Pending, Inactive (for a product) | contracts/spine/catalogue.yaml#/components/schemas/ProductLifecycleState |
+| Channel | Where something is sold. Labels: pos Point of sale; kiosk Kiosk; web and guestWeb Website; mobile and guestApp App; b2b B2B partners; partner Partner; ota Travel agents (OTA); callCentre Call centre; api API; backOffice Back office. | Touchpoint, Outlet (an outlet is a business inside a venue), raw enum values | contracts/spine/catalogue.yaml#/components/schemas/Channel / … |
+| Refund | Money returned after settlement, wholly or for some lines, under the venue's refund policy. | Return (that is retail goods), Reversal, Void | contracts/spine/orders.yaml#createRefund / DI-252 |
+| Void | Cancelling a whole order before settlement, within the same shift, with a reason from the void list. After settlement it is a refund. | Cancel order, Delete | contracts/spine/orders.yaml#voidOrder / R222 |
+| Exchange / Reschedule | Exchange swaps lines for other products or dates and settles only the difference; Reschedule is the same product moved to another date or time. | Rebook, Date change (acceptable only in guest copy), Refund and resell | contracts/spine/orders.yaml#exchangeOrderLines / … |
+| Hold / Capture / Release | A deposit or stored-value amount is held, then partly or fully captured, and the rest released. A held deposit is not a payment. | Charge, Pre-auth (in staff copy), Block funds | contracts/spine/orders.yaml#authoriseStoredValue / … |
+| Wallet (TICVAI wallet) | The guest's stored-value balance on TICVAI, spent by hold and capture. Distinct from the tender "Apple Pay / Google Pay", which the contract also calls wallet. | Digital wallet (for stored value), E-wallet, Credit (without a type) | contracts/spine/orders.yaml#/components/schemas/TenderKind / R080 |
+| Credit lot | One amount of wallet credit of one credit type (cash, bonus, gift) with its own expiry; lots are spent nearest expiry first and the guest sees the breakdown but cannot choose. | Bucket, Batch, Top-up | TRACKER Actions row 171 / contracts/satellite/wallet.yaml#expireCreditLots |
+| Venue map / Seat map | A venue map is the wayfinding map of a park or a floor (points, paths, bookable places); a seat map is the seating layout of an auditorium or stand. Never just "map" where both could be meant. | Layout (alone), Floor plan (unless it is a floor map), Map (alone) | contracts/satellite/venue-map.yaml#createVenueMap / … |
+| Point / Bookable place | A point is a place on a venue map (toilet, ride, restaurant, exit). A bookable place is a cabana, lounger, table or pitch placed on the map and sold through its price band. | Pin, POI, Marker, Resource (in staff copy) | contracts/satellite/venue-map.yaml#setVenuePoint / … |
+| Station / Route / Timetable / Departure / Fare table / Pass … | A route is an ordered list of stations with offsets; a timetable generates departures up to its release horizon; a fare table prices a route per passenger type; a pass type is a multi-trip or unlimited pass sold as a product. | Stop (except in the stop list), Line (except lineCode), Schedule, Trip (except a guest's journey) | contracts/satellite/transport.yaml / REV3-21 |
+| Applies from | The effective date of a change. Every dated change shows it, and sold items keep their old terms. | Effective date (in labels), Start date (for a change) | contracts/satellite/seating.yaml#updateSeatCategory / TRACKER Actions row 194 |
+
+
 ## The screens
 
 Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs count fields; requirements are matrix rows; meeting inputs are the ones naming the screen (the module and platform ones are below); white label says whether the tenant's brand reaches it (guest) or it sets the brand (configures).
@@ -70,13 +109,13 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `ADM-278` | Resale Marketplace Command Center | B–D | 2 | 48 | 6 | 0 | 1 | 5 | — | notStarted (generated) |
 | `ADM-279` | Resale Eligibility Rule Configuration | B–D | 13 | 0 | 5 | 0 | 2 | 5 | — | notStarted (generated) |
 | `ADM-280` | Resale Policy & Marketplace Settings | B–D | 54 | 16 | 5 | 0 | 0 | 5 | — | notStarted (generated) |
-| `ADM-281` | Listing Creation & Seller Configuration | B–D | 17 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-281` | Listing Creation & Seller Configuration | B–D | 17 | 20 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-282` | Resale Pricing & Price Guardrails | B–D | 48 | 16 | 5 | 0 | 1 | 5 | — | notStarted (generated) |
 | `ADM-283` | Resale Fees, Commission & Seller Proceeds | B–D | 8 | 0 | 5 | 0 | 2 | 5 | — | notStarted (generated) |
-| `ADM-284` | Listing Approval & Moderation | B–D | 0 | 20 | 6 | 0 | 1 | 3 | — | notStarted (generated) |
+| `ADM-284` | Listing Approval & Moderation | B–D | 0 | 40 | 6 | 0 | 1 | 3 | — | notStarted (generated) |
 | `ADM-285` | Resale Inventory & Availability Management | B–D | 0 | 0 | 6 | 0 | 0 | 6 | — | notStarted (generated) |
 | `ADM-286` | Listing Lifecycle, Expiry & Cancellation | B–D | 8 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-287` | AI Resale Configuration & Marketplace Recommendations | B–D | 8 | 0 | 5 | 1 | 0 | 5 | — | notStarted (generated) |
+| `ADM-287` | AI Resale Configuration & Marketplace Recommendations | B–D | 8 | 20 | 5 | 1 | 0 | 5 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 
@@ -94,15 +133,23 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `ticketing` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `ORDER_VIEW` (1 read); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `ORDER_VIEW` (1 read); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | commandCentre (compact density): the pack gives this screen both a metric directory (§Display) and a per-row directory (§Each listing should show) — counts over a population, then the population |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/commercial/resale-marketplace-command-center-adm-278` |
+
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** The hub of the resale marketplace: listings, sales, payouts, policy at a glance, for a tenant (PR-1). Resale keeps the original virtual ticket id and changes only the owner and the media.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **List operation(s) listResaleMarketplace, listTicketResaleMarketplace, listResalePolicyMarketplace, listOfficialResaleMarketplace return a bare array, not the paged list envelope (items, nextCursor, hasMore); rows of listTicketResaleMarketplace, listResalePolicyMarketplace …** Why: The table cannot page, and a row without an id cannot open, edit or link to the record it summarises. *(source: contracts/spine/orders.yaml#listResaleMarketplace / contracts/spine/orders.yaml#listTicketResaleMarketplace / contracts/spine/orders.yaml#listResalePolicyMarketplace / …; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
 
 #### Inputs: what the user enters or picks
 
@@ -219,11 +266,15 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Status | 1,234 | Status |
 | Risk indicator | text | Risk Indicator |
 
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **marketplace KPIs**: Active listings, sold today, average resale vs face value, pending payouts. *(source: contracts/spine/orders.yaml#listResaleMarketplace / TRACKER Actions row 215)*
+
 **Data it reads**: `listResaleMarketplace` (onLoad, Resale Marketplace Command Center); `listTicketResaleMarketplace` (onLoad, My Tickets & Resale Marketplace Entry); `listResalePolicyMarketplace` (onLoad, Resale Policy & Marketplace Settings); `listOfficialResaleMarketplace` (onLoad, Official Resale Marketplace & Buyer Discovery); `getResaleMarketplaceConfig` (onLoad, How the venue's resale marketplace runs)
 
 **Where the user goes next**
 
-- → `ADM-002` Platform Dashboard: *Platform Dashboard*
+- → `BO-100` Venue Home: *Back to Venue Home*
 - → `ADM-279` Resale Eligibility Rule Configuration: *Works in Resale Eligibility Rule Configuration*; calls `listResaleMarketplace`
 - → `ADM-280` Resale Policy & Marketplace Settings: *Works in Resale Policy & Marketplace Settings*; calls `listResaleMarketplace`
 - → `ADM-281` Listing Creation & Seller Configuration: *Works in Listing Creation & Seller Configuration*; calls `listResaleMarketplace`
@@ -245,6 +296,18 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+kpis:
+  listings: 214
+  soldToday: 38
+  avgVsFace: 104%
+  pendingPayouts: AED 12,400.00
+```
+
 #### Permissions
 
 - `listResaleMarketplace` → `ORDER_VIEW` (read) · staff
@@ -265,7 +328,7 @@ For this screen, newest first. An **Open question** is built to the default it s
 
 - Workshop packs group screens ten to a board, each opened by a command centre; that grouping is the navigation: the nine detail screens are reached from the board's hub and return to it. *(agreed · screen note 4 Sep 2026, BO-144 and the other board hubs · DI-653)*
 
-Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -277,7 +340,7 @@ Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-278` · status **notStarted** · provenance generated
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-278` · status **notStarted** · provenance generated
 - Client workshop board: `wireframes/WS168 Ticket Resale Marketplace Board 1.dc.html#adm-278`
 - Workshop pack: Ticket Resale Marketplace_Reference.pdf board 1
 - Flow F171 *Ticket Resale Marketplace board 1: Resale Marketplace Command Center*, step 1: Opens Resale Marketplace Command Center → Provide administrators with a centralized operational view of the TICVAI resale marketplace.
@@ -298,9 +361,10 @@ Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the 
 - [ ] Every output is drawn (48 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-278?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
-- [ ] Every transition is wired: `ADM-002`, `ADM-279`, `ADM-280`, `ADM-281`, `ADM-282`, `ADM-283`, `ADM-284`, `ADM-285`, `ADM-286`, `ADM-287`.
+- [ ] Every transition is wired: `BO-100`, `ADM-279`, `ADM-280`, `ADM-281`, `ADM-282`, `ADM-283`, `ADM-284`, `ADM-285`, `ADM-286`, `ADM-287`.
 - [ ] Every gated control is gated: `ORDER_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -311,17 +375,28 @@ Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the 
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `ticketing` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `ORDER_CREATE`, `PRICE_CONFIGURE` (1 operate, 1 configure); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `ORDER_CREATE` (1 operate); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Administrators can define eligibility by; Configure) and no display directory — it is settings, not a population |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/commercial/resale-eligibility-rule-configuration-adm-279` |
 
-**Known gaps.** **The pack names 2 actions on this screen and the screen declares 1 operation.** Unserved: Identity verification requirement, Membership restriction. Each needs an operation, or needs removing from …
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
+
+**Known gaps.** **The pack names 2 actions on this screen and the screen declares 1 operation.** Unserved: Identity verification requirement, Membership restriction. Each needs an operation, or needs removing from … Removed 2 October 2026 (CHG-WIR-025): The Resale Eligibility Rule Configuration also wrote setEligibilityRule, the promotion eligibility rule; promotion eligibility is a different concept and is … Contract gap recorded 2 October 2026 (CHG-WIR-027): No read of resale eligibility rules (setResaleEligibilityRule has no get).
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Which tickets may enter resale: product, ticket type, event, status, payment, ownership, windows, limits, and the conditions a ticket must meet (fully paid, not scanned, not expired, event not started, not refunded, complimentary, staff or disputed).
+
+**Known correction pending (do not draw the wrong version)**
+
+- **priceCategory is typed Money and ownership period a date-time.** Why: A category is an id; a period is a duration. *(source: contracts/spine/orders.yaml#setResaleEligibilityRule; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
+- **Pack actions with no operation: Identity verification requirement, Membership restriction.** Why: The workshop pack names them on this screen and no operation serves them; each needs an operation or removal from the screen. *(source: screens/P08-venue-back-office.yaml#ADM-279; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
+
+**Fixed on main** (the package already carries these; draw what it says): The screen also writes the promotion eligibility rule (setEligibilityRule). (CHG-WIR-025); No read operation: the screen declares only setResaleEligibilityRule, setEligibilityRule and nothing that returns the current configuration. (CHG-WIR-025).
 
 #### Inputs: what the user enters or picks
 
@@ -343,6 +418,10 @@ Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the 
 | Payment status | select field | — | — | — | — | — | — |
 | Ticket ownership status | select field | — | — | — | — | — | — |
 
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **requiredConditions**: Checkboxes, all ticked by default. *(source: contracts/spine/orders.yaml#setResaleEligibilityRule)*
+
 #### Outputs: what the screen shows and produces
 
 **Actions and what each produces**
@@ -362,14 +441,27 @@ Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the 
 |---|---|
 | Loading (`?state=loading`) | The resale eligibility rule configuration as saved. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the resale eligibility rule untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No resale eligibility rule configured yet. Carries the create action and says what the platform does in the meantime. |
+| Empty, first run (`?state=emptyFirstRun`) | No resale eligibility rule configured yet. Offers no create action — this screen declares no operation that makes one and says what the platform does in the meantime. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+rule:
+  product: Desert Symphony
+  conditions:
+  - fullyPaid
+  - notScanned
+  - eventNotStarted
+  maxListingsPerCustomer: 4
+```
 
 #### Permissions
 
 - `setResaleEligibilityRule` → `ORDER_CREATE` (operate) · staff
-- `setEligibilityRule` → `PRICE_CONFIGURE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -384,7 +476,7 @@ For this screen, newest first. An **Open question** is built to the default it s
 - Board 1 resale rules: eligibility, allowed price range, venue/tenant fees and commission, optional approval step. Board 2 resale purchase: payment, ownership transfer and settlement to the seller. *(client request · MoM 1 Sep 2026, 4.14 Resale Marketplace - Board 1 / Board 2 · DI-619)*
 - **Open question.** Resale lets a guest resell a ticket through a secured channel with configurable commission and eligibility (e.g. minimum time before validity date, no expired tickets). Open: TICVAI-owned secure portal vs inside each client's own B2C site/app. *(open · MoM 31 Aug 2026, 4.12 Resale Marketplace · DI-584)*
 
-Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -396,7 +488,7 @@ Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-279` · status **notStarted** · provenance generated
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-279` · status **notStarted** · provenance generated
 - Client workshop board: `wireframes/WS168 Ticket Resale Marketplace Board 1.dc.html#adm-279`
 - Workshop pack: Ticket Resale Marketplace_Reference.pdf board 1
 - Flow F171 *Ticket Resale Marketplace board 1: Resale Marketplace Command Center*, step 2: Works in Resale Eligibility Rule Configuration → Define whether a ticket is allowed to enter the resale marketplace. Not every TICVAI ticket should automatically be resellable.
@@ -408,8 +500,9 @@ Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the 
 - [ ] Every state opens from `#ADM-279?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Identity verification requirement, Membership restriction.
 - [ ] Every transition is wired: `ADM-278`.
-- [ ] Every gated control is gated: `ORDER_CREATE`, `PRICE_CONFIGURE`.
+- [ ] Every gated control is gated: `ORDER_CREATE`.
 - [ ] The 2 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 2 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -420,15 +513,23 @@ Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the 
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `ticketing` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `ORDER_VIEW`, `PRODUCT_CONFIGURE` (1 read, 1 configure); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `ORDER_VIEW`, `PRODUCT_CONFIGURE` (1 read, 1 configure); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Administrators can define; Configure) and no display directory — it is settings, not a population |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/commercial/resale-policy-marketplace-settings-adm-280` |
+
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** How the marketplace runs: pricing mode and guardrails, moderation, listing limits, deployment.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **List operation(s) listResalePolicyMarketplace return a bare array, not the paged list envelope (items, nextCursor, hasMore); rows of listResalePolicyMarketplace carry no identifier.** Why: The table cannot page, and a row without an id cannot open, edit or link to the record it summarises. *(source: contracts/spine/orders.yaml#listResalePolicyMarketplace; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
 
 #### Inputs: what the user enters or picks
 
@@ -500,6 +601,10 @@ Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the 
 
 Errors to draw in the form: 400 Validation failed; 403 Authenticated but not permitted at the requested scope; 412 The row changed since the `If-Match` version was read (SD-013). Re-read and retry.
 
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **marketplace config**: One configuration per venue; sections for pricing, moderation, limits. *(source: contracts/spine/orders.yaml#setResaleMarketplaceConfig)*
+
 #### Outputs: what the screen shows and produces
 
 **Shown**
@@ -548,6 +653,17 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+config:
+  pricing: face value to 120%
+  moderation: automatic
+  listingLimit: 4
+```
+
 #### Permissions
 
 - `listResalePolicyMarketplace` → `ORDER_VIEW` (read) · staff
@@ -564,7 +680,7 @@ No matrix row traces to this screen's operations or data.
 
 None names this screen.
 
-Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -576,7 +692,7 @@ Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-280` · status **notStarted** · provenance generated
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-280` · status **notStarted** · provenance generated
 - Client workshop board: `wireframes/WS168 Ticket Resale Marketplace Board 1.dc.html#adm-280`
 - Workshop pack: Ticket Resale Marketplace_Reference.pdf board 1
 - Flow F171 *Ticket Resale Marketplace board 1: Resale Marketplace Command Center*, step 4: Works in Resale Policy & Marketplace Settings → Configure the overall business policies governing a resale marketplace.
@@ -590,6 +706,7 @@ Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the 
 - [ ] Every transition is wired: `ADM-278`.
 - [ ] Every gated control is gated: `ORDER_VIEW`, `PRODUCT_CONFIGURE`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -600,17 +717,27 @@ Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the 
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `ticketing` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `ORDER_CREATE` (1 operate); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `ORDER_CREATE`, `ORDER_VIEW` (1 operate, 1 read); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure whether seller may; Capture) and no display directory — it is settings, not a population |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/commercial/listing-creation-seller-configuration-adm-281` |
 
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
+
 **Known gaps.** **The pack names 2 actions on this screen and the screen declares 1 operation.** Unserved: Single ticket listing, Multiple ticket listing. Each needs an operation, or needs removing from the screen …
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** How ticket holders create listings: what they choose, what is fixed.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **Pack actions with no operation: Single ticket listing, Multiple ticket listing.** Why: The workshop pack names them on this screen and no operation serves them; each needs an operation or removal from the screen. *(source: screens/P08-venue-back-office.yaml#ADM-281; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
+
+**Fixed on main** (the package already carries these; draw what it says): No read operation: the screen declares only createListingSeller and nothing that returns the current configuration. (CHG-WIR-025).
 
 #### Inputs: what the user enters or picks
 
@@ -638,12 +765,45 @@ Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the 
 
 #### Outputs: what the screen shows and produces
 
+**Shown**
+
+**Marketplace settings** (detail panel, from `getResaleMarketplaceConfig`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| ID | the name it points at, never the id | — |
+| Marketplace name | text | — |
+| Pricing mode | chip: Face value only, Fixed price, Seller selected price, Capped price, Operator … | — |
+| Maximum discount percent | 1,234.5 | The floor below face value, beside `ResaleFeePolicy.priceCapPercent` above it. |
+| Seller can edit price | yes / no (icon or chip) | — |
+| Maximum price changes | 1,234 | — |
+| Minimum minutes between price changes | 1,234 | — |
+| Moderation mode | chip: Automatic, Risk based, Manual | `reviewTriggers` sends a listing to `pendingReview` when `moderationMode` is `riskBased`; `manual` reviews every listing. |
+| Review triggers | list or chips (count when long) | — |
+| Expiry rule | chip: X minutes before event, X hours before event, At event start, At configured date | — |
+| Expiry offset | 1,234 | Minutes or hours, per `expiryRule`. |
+| Withdrawal policy | chip: Seller can withdraw anytime, Seller cannot withdraw while reserved | — |
+| Maximum withdrawals | 1,234 | — |
+| Cancellation fee | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Checkout hold minutes | 1,234 | How long a listing stays `reserved` for one buyer in checkout. |
+| Buyer identity verification required | yes / no (icon or chip) | — |
+| Settlement timing | chip: Immediately after resale, X days after resale, After event completion, X days after … | Default `afterAccessValidation`: the seller is paid after the buyer is admitted, not after they pay (`ResaleListing.payoutStatus`). |
+| Settlement delay days | 1,234 | — |
+| Minimum payout threshold | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Customer terms | text | — |
+
 **Actions and what each produces**
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
 | Single ticket listing (primary button) | navigation or local | — | — | — | — |
 | Multiple ticket listing (secondary button) | navigation or local | — | — | — | — |
+
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **listing form preview**: The seller's form as the guest sees it. *(source: contracts/spine/orders.yaml#createListingSeller)*
+
+**Data it reads**: `getResaleMarketplaceConfig` (onLoad, How the venue's resale marketplace runs, listing rules …)
 
 **Where the user goes next**
 
@@ -659,9 +819,20 @@ Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the 
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+listing:
+  ticket: Desert Symphony Lower 101 C-14
+  price: AED 480.00
+```
+
 #### Permissions
 
 - `createListingSeller` → `ORDER_CREATE` (operate) · staff
+- `getResaleMarketplaceConfig` → `ORDER_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -673,7 +844,7 @@ No matrix row traces to this screen's operations or data.
 
 None names this screen.
 
-Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -681,20 +852,21 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-281` · status **notStarted** · provenance generated
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-281` · status **notStarted** · provenance generated
 - Client workshop board: `wireframes/WS168 Ticket Resale Marketplace Board 1.dc.html#adm-281`
 - Workshop pack: Ticket Resale Marketplace_Reference.pdf board 1
 - Flow F171 *Ticket Resale Marketplace board 1: Resale Marketplace Command Center*, step 6: Works in Listing Creation & Seller Configuration → Define how eligible ticket holders create resale listings.
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (17), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (17), with its required mark, default, format and its error state (403).
+- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-281?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Single ticket listing, Multiple ticket listing.
 - [ ] Every transition is wired: `ADM-278`.
-- [ ] Every gated control is gated: `ORDER_CREATE`.
+- [ ] Every gated control is gated: `ORDER_CREATE`, `ORDER_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -705,15 +877,23 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `ticketing` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `ORDER_VIEW`, `PRODUCT_CONFIGURE` (1 read, 1 configure); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `ORDER_VIEW`, `PRODUCT_CONFIGURE` (1 read, 1 configure); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure; Configured resale policy) and no display directory — it is settings, not a population |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/commercial/resale-pricing-price-guardrails-adm-282` |
+
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** The permitted resale price range protecting operator, seller and buyer; often regulated.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **List operation(s) listResalePricingPrice return a bare array, not the paged list envelope (items, nextCursor, hasMore); rows of listResalePricingPrice carry no identifier.** Why: The table cannot page, and a row without an id cannot open, edit or link to the record it summarises. *(source: contracts/spine/orders.yaml#listResalePricingPrice; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
 
 #### Inputs: what the user enters or picks
 
@@ -779,6 +959,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 Errors to draw in the form: 400 Validation failed; 403 Authenticated but not permitted at the requested scope; 412 The row changed since the `If-Match` version was read (SD-013). Re-read and retry.
 
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **price guardrails**: Minimum and maximum as a percentage of face value, with a worked example. *(source: contracts/spine/orders.yaml#setResaleMarketplaceConfig)*
+
 #### Outputs: what the screen shows and produces
 
 **Shown**
@@ -827,6 +1011,18 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+guardrail:
+  min: 80% of face
+  max: 120% of face
+  face: AED 450.00
+  range: AED 360.00 to AED 540.00
+```
+
 #### Permissions
 
 - `listResalePricingPrice` → `ORDER_VIEW` (read) · staff
@@ -845,7 +1041,7 @@ For this screen, newest first. An **Open question** is built to the default it s
 
 - Board 1 resale rules: eligibility, allowed price range, venue/tenant fees and commission, optional approval step. Board 2 resale purchase: payment, ownership transfer and settlement to the seller. *(client request · MoM 1 Sep 2026, 4.14 Resale Marketplace - Board 1 / Board 2 · DI-619)*
 
-Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -857,7 +1053,7 @@ Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-282` · status **notStarted** · provenance generated
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-282` · status **notStarted** · provenance generated
 - Client workshop board: `wireframes/WS168 Ticket Resale Marketplace Board 1.dc.html#adm-282`
 - Workshop pack: Ticket Resale Marketplace_Reference.pdf board 1
 - Flow F171 *Ticket Resale Marketplace board 1: Resale Marketplace Command Center*, step 8: Works in Resale Pricing & Price Guardrails → Control the permitted resale price while protecting the operator, seller and buyer.
@@ -871,6 +1067,7 @@ Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the 
 - [ ] Every transition is wired: `ADM-278`.
 - [ ] Every gated control is gated: `ORDER_VIEW`, `PRODUCT_CONFIGURE`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -881,17 +1078,26 @@ Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the 
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `ticketing` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `ORDER_VIEW`, `PRODUCT_CONFIGURE` (1 read, 1 configure); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `ORDER_VIEW`, `PRODUCT_CONFIGURE` (1 read, 1 configure); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Define by) and no display directory — it is settings, not a population |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/commercial/resale-fees-commission-seller-proceeds-adm-283` |
 
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
+
 **Known gaps.** **The pack names 8 actions on this screen and the screen declares 1 operation.** Unserved: Seller fee, Buyer fee, Flat transaction fee, Percentage fee, Payment processing fee, Administrative fee …
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Resale commission and the price cap: seller fee, buyer fee and proceeds.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **Pack actions with no operation: Seller fee, Buyer fee, Flat transaction fee, Percentage fee, Payment processing fee, Administrative fee, Venue fee, Tax on fee.** Why: The workshop pack names them on this screen and no operation serves them; each needs an operation or removal from the screen. *(source: screens/P08-venue-back-office.yaml#ADM-283; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
+- **List operation(s) listResaleFeeCommission, listFeeSellerProceed return a bare array, not the paged list envelope (items, nextCursor, hasMore); rows of listResaleFeeCommission, listFeeSellerProceed carry no identifier.** Why: The table cannot page, and a row without an id cannot open, edit or link to the record it summarises. *(source: contracts/spine/orders.yaml#listResaleFeeCommission / contracts/spine/orders.yaml#listFeeSellerProceed; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
 
 #### Inputs: what the user enters or picks
 
@@ -907,6 +1113,10 @@ Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the 
 | Buyer type | select field | — | — | — | — | — | — |
 | Channel | select field | — | — | — | — | — | — |
 | Currency | select field | — | — | — | — | — | — |
+
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **fees and cap**: Seller and buyer fee percentages and the cap; regulated in several jurisdictions, so a note shows where. *(source: contracts/spine/orders.yaml#setResaleFeePolicy)*
 
 #### Outputs: what the screen shows and produces
 
@@ -939,6 +1149,18 @@ Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the 
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+fees:
+  seller: 10%
+  buyer: 5%
+  cap: 120%
+  proceedsOn: 'AED 480.00 sale: AED 432.00'
+```
+
 #### Permissions
 
 - `listResaleFeeCommission` → `ORDER_VIEW` (read) · staff
@@ -959,7 +1181,7 @@ For this screen, newest first. An **Open question** is built to the default it s
 - Board 1 resale rules: eligibility, allowed price range, venue/tenant fees and commission, optional approval step. Board 2 resale purchase: payment, ownership transfer and settlement to the seller. *(client request · MoM 1 Sep 2026, 4.14 Resale Marketplace - Board 1 / Board 2 · DI-619)*
 - **Open question.** Resale lets a guest resell a ticket through a secured channel with configurable commission and eligibility (e.g. minimum time before validity date, no expired tickets). Open: TICVAI-owned secure portal vs inside each client's own B2C site/app. *(open · MoM 31 Aug 2026, 4.12 Resale Marketplace · DI-584)*
 
-Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -971,7 +1193,7 @@ Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-283` · status **notStarted** · provenance generated
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-283` · status **notStarted** · provenance generated
 - Client workshop board: `wireframes/WS168 Ticket Resale Marketplace Board 1.dc.html#adm-283`
 - Workshop pack: Ticket Resale Marketplace_Reference.pdf board 1
 - Flow F171 *Ticket Resale Marketplace board 1: Resale Marketplace Command Center*, step 10: Works in Resale Fees, Commission & Seller Proceeds → Configure the commercial model of the resale marketplace.
@@ -985,6 +1207,7 @@ Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the 
 - [ ] Every transition is wired: `ADM-278`.
 - [ ] Every gated control is gated: `ORDER_VIEW`, `PRODUCT_CONFIGURE`.
 - [ ] The 2 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 2 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -995,19 +1218,29 @@ Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the 
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `ticketing` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `ORDER_CREATE` (1 operate); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `ORDER_CREATE`, `ORDER_VIEW` (1 operate, 1 read); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Display) and no metric row |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/commercial/listing-approval-moderation-adm-284` |
 
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Whether listings publish automatically or need review, and the moderation queue.
+
+**Fixed on main** (the package already carries these; draw what it says): No read operation: the screen declares only approveListingModeration and nothing that returns the current configuration. (CHG-WIR-025).
+
 #### Inputs: what the user enters or picks
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **moderation**: Automatic or review; decision approve or reject with reason. *(source: contracts/spine/orders.yaml#approveListingModeration)*
 
 #### Outputs: what the screen shows and produces
 
@@ -1027,6 +1260,31 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Risk score | 1,234.5 | Risk score |
 | Trigger reason | text | not in the schema: `Trigger reason` |
 | Submitted date | 1 Oct 2026, 14:30 | Submitted date |
+
+**Moderation settings** (detail panel, from `getResaleMarketplaceConfig`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| ID | the name it points at, never the id | — |
+| Marketplace name | text | — |
+| Pricing mode | chip: Face value only, Fixed price, Seller selected price, Capped price, Operator … | — |
+| Maximum discount percent | 1,234.5 | The floor below face value, beside `ResaleFeePolicy.priceCapPercent` above it. |
+| Seller can edit price | yes / no (icon or chip) | — |
+| Maximum price changes | 1,234 | — |
+| Minimum minutes between price changes | 1,234 | — |
+| Moderation mode | chip: Automatic, Risk based, Manual | `reviewTriggers` sends a listing to `pendingReview` when `moderationMode` is `riskBased`; `manual` reviews every listing. |
+| Review triggers | list or chips (count when long) | — |
+| Expiry rule | chip: X minutes before event, X hours before event, At event start, At configured date | — |
+| Expiry offset | 1,234 | Minutes or hours, per `expiryRule`. |
+| Withdrawal policy | chip: Seller can withdraw anytime, Seller cannot withdraw while reserved | — |
+| Maximum withdrawals | 1,234 | — |
+| Cancellation fee | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Checkout hold minutes | 1,234 | How long a listing stays `reserved` for one buyer in checkout. |
+| Buyer identity verification required | yes / no (icon or chip) | — |
+| Settlement timing | chip: Immediately after resale, X days after resale, After event completion, X days after … | Default `afterAccessValidation`: the seller is paid after the buyer is admitted, not after they pay (`ResaleListing.payoutStatus`). |
+| Settlement delay days | 1,234 | — |
+| Minimum payout threshold | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Customer terms | text | — |
 
 **The selected listing approval moderation** (detail panel): The pack groups this record's detail under its own headings: “Automatic Approval”, “Manual Approval”, “Risk-Based Approval”.
 
@@ -1051,6 +1309,8 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |---|---|---|---|---|---|
 | Approve (primary button) | navigation or local | — | — | — | — |
 
+**Data it reads**: `getResaleMarketplaceConfig` (onLoad, The moderation settings as saved)
+
 **Where the user goes next**
 
 - → `ADM-278` Resale Marketplace Command Center: *Returns to the board's landing screen*; calls `approveListingModeration`
@@ -1066,9 +1326,20 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+queue:
+  pending: 6
+  oldest: 2 h
+```
+
 #### Permissions
 
 - `approveListingModeration` → `ORDER_CREATE` (operate) · staff
+- `getResaleMarketplaceConfig` → `ORDER_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -1082,7 +1353,7 @@ For this screen, newest first. An **Open question** is built to the default it s
 
 - Board 1 resale rules: eligibility, allowed price range, venue/tenant fees and commission, optional approval step. Board 2 resale purchase: payment, ownership transfer and settlement to the seller. *(client request · MoM 1 Sep 2026, 4.14 Resale Marketplace - Board 1 / Board 2 · DI-619)*
 
-Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -1092,19 +1363,19 @@ Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-284` · status **notStarted** · provenance generated
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-284` · status **notStarted** · provenance generated
 - Client workshop board: `wireframes/WS168 Ticket Resale Marketplace Board 1.dc.html#adm-284`
 - Workshop pack: Ticket Resale Marketplace_Reference.pdf board 1
 - Flow F171 *Ticket Resale Marketplace board 1: Resale Marketplace Command Center*, step 12: Works in Listing Approval & Moderation → Determine whether listings are published automatically or require operator review.
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (412).
-- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (403, 412).
+- [ ] Every output is drawn (40 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-284?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Approve.
 - [ ] Every transition is wired: `ADM-278`.
-- [ ] Every gated control is gated: `ORDER_CREATE`.
+- [ ] Every gated control is gated: `ORDER_CREATE`, `ORDER_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -1116,17 +1387,25 @@ Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the 
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `ticketing` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `ORDER_VIEW` (1 read); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `ORDER_VIEW` (1 read); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/commercial/resale-inventory-availability-management-adm-285` |
 
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
+
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Tickets currently available through resale, kept in step with primary inventory.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **List operation(s) listResaleInventoryAvailability return a bare array, not the paged list envelope (items, nextCursor, hasMore); rows of listResaleInventoryAvailability carry no identifier.** Why: The table cannot page, and a row without an id cannot open, edit or link to the record it summarises. *(source: contracts/spine/orders.yaml#listResaleInventoryAvailability; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
 
 #### Inputs: what the user enters or picks
 
@@ -1137,6 +1416,10 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 **Shown**
 
 **Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **resale inventory**: Per event and section, listed and sold. *(source: contracts/spine/orders.yaml#listResaleInventoryAvailability)*
 
 **Data it reads**: `listResaleInventoryAvailability` (onLoad, Resale Inventory & Availability Management)
 
@@ -1155,6 +1438,17 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+inventory:
+  event: Desert Symphony 22 Nov
+  listed: 48
+  sold: 21
+```
+
 #### Permissions
 
 - `listResaleInventoryAvailability` → `ORDER_VIEW` (read) · staff
@@ -1169,7 +1463,7 @@ No matrix row traces to this screen's operations or data.
 
 None names this screen.
 
-Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -1182,7 +1476,7 @@ Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-285` · status **notStarted** · provenance generated
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-285` · status **notStarted** · provenance generated
 - Client workshop board: `wireframes/WS168 Ticket Resale Marketplace Board 1.dc.html#adm-285`
 - Workshop pack: Ticket Resale Marketplace_Reference.pdf board 1
 - Flow F171 *Ticket Resale Marketplace board 1: Resale Marketplace Command Center*, step 14: Works in Resale Inventory & Availability Management → Maintain an accurate, synchronized view of tickets currently available through resale.
@@ -1196,6 +1490,7 @@ Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the 
 - [ ] Every transition is wired: `ADM-278`.
 - [ ] Every gated control is gated: `ORDER_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -1206,15 +1501,23 @@ Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the 
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `ticketing` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `ORDER_VIEW` (1 read); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `ORDER_VIEW` (1 read); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure; Configure whether the ticket) and no display directory — it is settings, not a population |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/commercial/listing-lifecycle-expiry-cancellation-adm-286` |
+
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** A listing's life from creation to sale, withdrawal or expiry.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **List operation(s) listListingLifecycleExpiry return a bare array, not the paged list envelope (items, nextCursor, hasMore).** Why: The table cannot page, and a row without an id cannot open, edit or link to the record it summarises. *(source: contracts/spine/orders.yaml#listListingLifecycleExpiry; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
 
 #### Inputs: what the user enters or picks
 
@@ -1233,6 +1536,10 @@ Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the 
 
 #### Outputs: what the screen shows and produces
 
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **lifecycle**: Listings by state with expiry. *(source: contracts/spine/orders.yaml#listListingLifecycleExpiry)*
+
 **Data it reads**: `listListingLifecycleExpiry` (onLoad, Listing Lifecycle, Expiry & Cancellation)
 
 **Where the user goes next**
@@ -1249,6 +1556,16 @@ Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the 
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+listing:
+  state: listed
+  expires: 2 h before event
+```
+
 #### Permissions
 
 - `listListingLifecycleExpiry` → `ORDER_VIEW` (read) · staff
@@ -1263,7 +1580,7 @@ No matrix row traces to this screen's operations or data.
 
 None names this screen.
 
-Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -1271,7 +1588,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-286` · status **notStarted** · provenance generated
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-286` · status **notStarted** · provenance generated
 - Client workshop board: `wireframes/WS168 Ticket Resale Marketplace Board 1.dc.html#adm-286`
 - Workshop pack: Ticket Resale Marketplace_Reference.pdf board 1
 - Flow F171 *Ticket Resale Marketplace board 1: Resale Marketplace Command Center*, step 16: Works in Listing Lifecycle, Expiry & Cancellation → Control the full lifecycle of a resale listing from creation until sale, withdrawal or expiry.
@@ -1285,6 +1602,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `ADM-278`.
 - [ ] Every gated control is gated: `ORDER_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -1295,15 +1613,21 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `ticketing` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `ORDER_CREATE` (1 operate); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `ORDER_CREATE`, `ORDER_VIEW` (1 operate, 1 read); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configuration; AI Resale Configuration & Marketplace) and no display directory — it is settings, not a population |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/commercial/ai-resale-configuration-marketplace-recommendations-adm-287` |
+
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** AI suggestions for resale configuration; the operator decides.
+
+**Fixed on main** (the package already carries these; draw what it says): No read operation: the screen declares only setResaleMarketplaceRecommendation and nothing that returns the current configuration. (CHG-WIR-025).
 
 #### Inputs: what the user enters or picks
 
@@ -1322,11 +1646,44 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Outputs: what the screen shows and produces
 
+**Shown**
+
+**Current configuration** (detail panel, from `getResaleMarketplaceConfig`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| ID | the name it points at, never the id | — |
+| Marketplace name | text | — |
+| Pricing mode | chip: Face value only, Fixed price, Seller selected price, Capped price, Operator … | — |
+| Maximum discount percent | 1,234.5 | The floor below face value, beside `ResaleFeePolicy.priceCapPercent` above it. |
+| Seller can edit price | yes / no (icon or chip) | — |
+| Maximum price changes | 1,234 | — |
+| Minimum minutes between price changes | 1,234 | — |
+| Moderation mode | chip: Automatic, Risk based, Manual | `reviewTriggers` sends a listing to `pendingReview` when `moderationMode` is `riskBased`; `manual` reviews every listing. |
+| Review triggers | list or chips (count when long) | — |
+| Expiry rule | chip: X minutes before event, X hours before event, At event start, At configured date | — |
+| Expiry offset | 1,234 | Minutes or hours, per `expiryRule`. |
+| Withdrawal policy | chip: Seller can withdraw anytime, Seller cannot withdraw while reserved | — |
+| Maximum withdrawals | 1,234 | — |
+| Cancellation fee | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Checkout hold minutes | 1,234 | How long a listing stays `reserved` for one buyer in checkout. |
+| Buyer identity verification required | yes / no (icon or chip) | — |
+| Settlement timing | chip: Immediately after resale, X days after resale, After event completion, X days after … | Default `afterAccessValidation`: the seller is paid after the buyer is admitted, not after they pay (`ResaleListing.payoutStatus`). |
+| Settlement delay days | 1,234 | — |
+| Minimum payout threshold | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Customer terms | text | — |
+
 **Actions and what each produces**
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
 | Save changes (primary button) | navigation or local | — | — | — | — |
+
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **recommendations**: Recommendation, impact, accept or dismiss. *(source: contracts/spine/orders.yaml#setResaleMarketplaceRecommendation / DI-043)*
+
+**Data it reads**: `getResaleMarketplaceConfig` (onLoad, The marketplace configuration the recommendations apply to)
 
 #### States
 
@@ -1338,9 +1695,18 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+recommendation: 'Raise the cap to 125% for sold-out Fridays: +AED 3,200.00 fees'
+```
+
 #### Permissions
 
 - `setResaleMarketplaceRecommendation` → `ORDER_CREATE` (operate) · staff
+- `getResaleMarketplaceConfig` → `ORDER_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -1356,7 +1722,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 None names this screen.
 
-Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -1368,19 +1734,19 @@ Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-287` · status **notStarted** · provenance generated
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-287` · status **notStarted** · provenance generated
 - Client workshop board: `wireframes/WS168 Ticket Resale Marketplace Board 1.dc.html#adm-287`
 - Workshop pack: Ticket Resale Marketplace_Reference.pdf board 1
 - Flow F171 *Ticket Resale Marketplace board 1: Resale Marketplace Command Center*, step 18: Works in AI Resale Configuration & Marketplace Recommendations → Provide TICVAI's AI intelligence layer for optimizing resale configuration while keeping commercial control with the operator. Board 2 manages what happens once a resale listing attracts a buyer and …
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (8), with its required mark, default, format and its error state (412).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (8), with its required mark, default, format and its error state (403, 412).
+- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-287?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save changes.
 - [ ] No transition is declared; back returns where the user came from.
-- [ ] Every gated control is gated: `ORDER_CREATE`.
+- [ ] Every gated control is gated: `ORDER_CREATE`, `ORDER_VIEW`.
 - [ ] The module and platform inputs below are applied.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -1390,12 +1756,16 @@ Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the 
 
 ## Reference designs and the trackers for this platform
 
-**P09 reference designs** (from `handoff/design-batches/apps/6-ticvai-controller/README.md`)
+**P08 reference designs** (from `handoff/design-batches/apps/5-venue-management/README.md`)
 
 - `sources/designs/TICVAI_POS_Terminal_client_approved.html`: the client-approved POS, for operator density and components.
 - `sources/designs/TICVAI_Mobile.dc.html`: for finish and motion.
 
-**Design Vision Book rules that apply** (`sources/designs/Ticvai_Design_Vision_Book_v1_1.pdf`): DI-021, DI-022, DI-023, DI-024, DI-025, DI-027, DI-028, DI-029, DI-032, DI-033, DI-034, DI-036, DI-037, DI-038, DI-039, DI-040, DI-041, DI-042, DI-044, DI-045, DI-046, DI-047, DI-048, DI-049, DI-050, DI-051 (each is in the design inputs below).
+**Design Vision Book rules that apply** (`sources/designs/Ticvai_Design_Vision_Book_v1_1.pdf`): DI-021, DI-022, DI-023, DI-024, DI-025, DI-027, DI-028, DI-029, DI-030, DI-032, DI-033, DI-034, DI-036, DI-037, DI-038, DI-039, DI-040, DI-041, DI-042, DI-043, DI-044, DI-045, DI-046, DI-047, DI-048, DI-049, DI-050, DI-051, DI-052 (each is in the design inputs below).
+
+**Workshop tracker rows about P08 as a whole** (1: 1 open, 0 closed). Open first; a closed row says where it went on 30 September.
+
+- **S8** Venue Management back-end configuration wireframes *(Chinmay Parab · In progress · due Fri 2 Oct · 30 Sep 2026 · 30 Sep tracker)*
 
 ## Design inputs from the client meetings
 
@@ -1433,17 +1803,32 @@ Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the 
 - Brand personality: Modern, AI-First, Enterprise, Premium, Reliable, Minimal, Scalable, Human-Centred. Visual essence: intelligent and forward-thinking, clean and minimal, trustworthy and secure, modern and timeless, scalable and flexible. *(agreed · Design Vision Book 29 Jul 2026, 02 Brand Identity (p2) - Brand personality / Visual essence · DI-021)*
 - Arabic is a core requirement, not later localisation: full Arabic RTL across web, mobile, POS, reports, emails, WhatsApp, SMS, notifications, tickets and receipts, and administrative interfaces. *(agreed · MoM 28 Jul 2026, 27. Internationalisation and Arabic Support · DI-019)*
 
-### Across P09 TICVAI Web
+### Across P08 Venue Management
 
-- Portal access exposes TICVAI pricing, so prospects submit contact details and a trade license as proof of a real venue, reviewed and approved by TICVAI before access is granted. *(agreed · MoM 10 Sep 2026, 4.8 Customer Portal Access, Authentication & Verification · DI-827)*
+- Qossai: configuration screens should consolidate related functionality, potentially merging 3-4 previously separate screens into one, rather than the repetitive one-screen-per-concept pattern of the AI-built reference system. *(agreed · MoM 24 Sep 2026, 4.5 Screen Consolidation Philosophy · DI-987)*
+- **Open question.** Open: should AI monitoring live in one centralised AI command dashboard or be distributed as widgets in each functional module's own dashboard? Allam: Softlabs' call; the current proposal is illustrative and Softlabs may propose a better structure. *(open · MoM 18 Sep 2026, 4.4 AI Governance — Risk, Compliance & Continuous Monitoring · DI-936)*
 - Simulation functionality stays embedded within each relevant configuration section rather than being consolidated, since it tests that section's own configuration. *(agreed · MoM 8 Sep 2026, 4.11 Dashboard & Reporting Module Consolidation Strategy · DI-722)*
+- Client boards (POS Frontline, F&B, Retail, Inventory & Procurement) share one architecture: six boards of ten screens per domain, a command centre first and an AI/analytics board last, under the hierarchy Company > Venue > Department > Workstation > Operator/Shift > Transaction > Exception > Reconciliation > Analytics. *(agreed · client-design-boards-audit 20 Aug 2026, Opening / What the boards give us · DI-400)*
+- Decision: RBAC per role, per module, three levels — edit/view, view-only, hidden (e.g. a marketing officer does not see Finance at all) — plus sub-permissions within a module (a CRM role may get Campaigns and Communications but not Journeys). Default role templates, admin-customisable. *(agreed · MoM 20 Aug 2026, 4.7 Role-Based Access Control (RBAC); 5. Key Decisions · DI-387)*
+- **Open question.** Allam: a user's visibility must be restrictable to specific outlets (an F&B manager of one outlet should not see other outlets' items); also relevant for ticketing/event-specific access. Implementation approach still open. *(open · MoM 18 Aug 2026, 4.6 Role-Based & Outlet-Level Access Control — Open Item · DI-331)*
+- Access loads automatically at login on POS and web/admin. A user with one role logs straight in; a user with several roles (e.g. admin, cashier, supervisor, manager) is prompted to choose which role to use. *(agreed · MoM 12 Aug 2026, 4. Multiple Roles per User and Role Switching · DI-249)*
+- Back office is role-driven from any device: a finance user signing in from a workstation, laptop or home sees only finance reports and related information. *(agreed · MoM 12 Aug 2026, 3. Role-Based Access and Workstation-Linked Front-End · DI-248)*
+- Built-in help menu with step-by-step tutorials with screenshots for common tasks (e.g. how to sell a ticket at the POS). *(client request · MoM 7 Aug 2026, 8. Legacy POS Layout Designer & System Logging · DI-160)*
+- Custom data-capture fields ("data mask") at account, event, extended-ticket and product level: field types text, dropdown, radio, true/false; multi-language labels; validation (min/max length, required/optional); reusable value lists (e.g. country list). Standard fields come out of the box. *(agreed · MoM 7 Aug 2026, 6. Data Mask: Flexible Custom Data Capture · DI-155)*
+- Load/traffic dashboards respect the tenancy model: a venue manager sees traffic for their own venue only. *(agreed · MoM 31 Jul 2026, 4. Non-Functional Requirements: Scalability & Availability · DI-061)*
+- Allam: queue management is built into the system (not third-party) so traffic entering the site can be throttled from the back office itself. *(agreed · MoM 31 Jul 2026, 4. Non-Functional Requirements: Scalability & Availability · DI-060)*
 - **Open question.** Proposed tenant hierarchy Tenant > Organization/Brand > Region > Branch > Venue > Department, under review against TICVAI's own organisational hierarchy before finalising. *(open · MoM 30 Jul 2026, 2. Proposed Multi-Tenant Hierarchy · DI-055)*
+- Documentation deliverable includes user guides and help content; the preview shows a TICVAI Help Center with categories (Getting Started, Events, Tickets, Orders, Payments, Memberships, Access Control, Reports, Integrations), a "Welcome to TICVAI" getting-started article and Quick Links (Create an Event, Set Pricing, Manage Access, View Reports). *(agreed · Design Vision Book 29 Jul 2026, 09 Deliverables (p9) - What We Deliver / Key Deliverables Preview · DI-052)*
 - Typeface Inter (Light, Regular, Medium, Semibold, Bold). Scale: H1 32/40 Bold, H2 24/32 Semibold, H3 20/28 Semibold, Body 1 16/24 Regular, Body 2 14/20 Regular, Caption 12/16 Regular. *(agreed · Design Vision Book 29 Jul 2026, 08 Design System (p8) - 2. Typography · DI-047)*
 - Palette ("modern, trustworthy and accessible"): Primary #0D6EFD, #00B8FF, #00D4C4, #0B1324; Neutral #F7F9FC, #E5E7EB, #9CA3AF, #4B5563, #1F2937. *(agreed · Design Vision Book 29 Jul 2026, 08 Design System (p8) - 1. Color Palette · DI-046)*
+- AI Assistant panel: a short framing ("Based on last 30 days, here are 3 actions that can improve your revenue") then actionable recommendations, each with its potential impact (e.g. "Increase pricing for VIP seats, +12%") and a chevron, plus "View all recommendations". *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - AI Panels · DI-043)*
 - Chart cards: title with period dropdown ("This Week"), headline metrics with deltas (Tickets Sold 12,840 +8.7%, Visitors, Conversion). Data visualisations must be easy to read. *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - Charts · DI-041)*
 - Tables: titled card with "View all", columns (e.g. Order ID, Customer, Amount, Status), coloured status badges (Paid, Pending, Refunded) and pagination with "Showing 1 to 5 of 245" and page numbers. *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - Tables · DI-039)*
 - Primary button spec: height 40px, padding 12px 24px, radius 8px, Inter 14 Semibold, colour #0D6EFD, width auto. *(agreed · Design Vision Book 29 Jul 2026, 09 Deliverables (p9) - Developer Handoff preview · DI-037)*
+- Back-office shell: collapsible left sidebar with Overview, Events, Tickets, Orders, Customers, Memberships, Access Control, POS, Reports, Analytics, AI Assistant, Settings, and the signed-in user (name, role) at the bottom; top bar with global search (Cmd+K), current time and date, Notifications with unread dot, and user menu. *(agreed · Design Vision Book 29 Jul 2026, 04 Dashboard Vision (p4) - navigation shell · DI-030)*
 - Dynamic KPIs, forecasts and real-time insights; role-based dashboards, preferences and smart shortcuts for every user (e.g. greeting "Good morning, Ahmed" on the home screen, p2). *(agreed · Design Vision Book 29 Jul 2026, 03 Visual Direction (p3) - Smarter Data / Personalized Experience · DI-028)*
+- Reports and historical searches must still retrieve archived transactions when required; the retention period (e.g. keep 3 of 5+ years live) is configurable per customer, archival manual or automated. *(agreed · MoM 28 Jul 2026, 23. Database Optimisation and Archiving · DI-018)*
+- Back-office controls for the waiting room: configurable maximum active users and admission intervals, set per customer and venue. *(agreed · MoM 28 Jul 2026, 19. Auto-scaling and Virtual Waiting Room · DI-017)*
 
 **7 more name particular screens** and are in each screen's block above (*Client meeting inputs*).
 
@@ -1472,7 +1857,6 @@ Method, path, parameters, request and response for every operation these screens
 "listResalePolicyMarketplace": {"method":"GET","path":"/resale-policy-marketplace","contract":"orders","summary":"Resale Policy & Marketplace Settings","permission":"ORDER_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"ResalePolicyMarketplaceSettingsView"},
 "listResalePricingPrice": {"method":"GET","path":"/resale-pricing-price","contract":"orders","summary":"Resale Pricing & Price Guardrails","permission":"ORDER_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"ResalePricingPriceGuardrailsView"},
 "listTicketResaleMarketplace": {"method":"GET","path":"/ticket-resale-marketplace","contract":"orders","summary":"My Tickets & Resale Marketplace Entry","permission":"ORDER_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"MyTicketsResaleMarketplaceEntryView"},
-"setEligibilityRule": {"method":"PUT","path":"/eligibility-rule","contract":"promotions","summary":"Eligibility Rule Builder","permission":"PRICE_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"EligibilityRuleBuilderInput","responds":"EligibilityRuleBuilderView"},
 "setResaleEligibilityRule": {"method":"PUT","path":"/resale-eligibility-rule","contract":"orders","summary":"Resale Eligibility Rule Configuration","permission":"ORDER_CREATE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":"ResaleEligibilityRuleConfigurationInput","responds":"ResaleEligibilityRuleConfigurationView"},
 "setResaleFeePolicy": {"method":"PUT","path":"/resale-fee-policy","contract":"orders","summary":"Set resale commission and the price ceiling","permission":"PRODUCT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":"ResaleFeePolicy","responds":"ResaleFeePolicy"},
 "setResaleMarketplaceConfig": {"method":"PUT","path":"/resale-marketplace-config","contract":"orders","summary":"Set how the venue's resale marketplace runs","permission":"PRODUCT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":"ResaleMarketplaceConfig","responds":"ResaleMarketplaceConfig"},
@@ -1488,8 +1872,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 {
 "AiResaleConfigurationMarketplaceRecommendationsInput": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — request only; lands in `orders.resale_recommendation` (DM5, 29 September)","description":"**What AI Resale Configuration & Marketplace Recommendations submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.","properties":{"pricingRecommendations":{"type":"string","description":"Pricing recommendations"},"demandPrediction":{"type":"string","description":"Demand prediction"},"listingRecommendations":{"type":"string","description":"Listing recommendations"},"sellerRiskRecommendations":{"type":"string","description":"Seller risk recommendations"},"expiryRecommendations":{"type":"string","format":"date-time","description":"Expiry recommendations"},"marketplaceOptimization":{"type":"string","description":"Marketplace optimization"},"anomalyDetection":{"type":"string","description":"Anomaly detection"},"decision":{"type":"string","enum":["accept","modify","ignore"],"description":"What the administrator does with the recommendation"}}},
 "AiResaleConfigurationMarketplaceRecommendationsView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over orders state, assembled at read time from tables that already exist","description":"**What AI Resale Configuration & Marketplace Recommendations displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"pricingRecommendations":{"type":"string","description":"Pricing recommendations"},"demandPrediction":{"type":"string","description":"Demand prediction"},"listingRecommendations":{"type":"string","description":"Listing recommendations"},"sellerRiskRecommendations":{"type":"string","description":"Seller risk recommendations"},"expiryRecommendations":{"type":"string","format":"date-time","description":"Expiry recommendations"},"marketplaceOptimization":{"type":"string","description":"Marketplace optimization"},"anomalyDetection":{"type":"string","description":"Anomaly detection"},"decision":{"type":"string","enum":["accept","modify","ignore"],"description":"What the administrator does with the recommendation"}}},
-"EligibilityRuleBuilderInput": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — request only; saved as a `promotions.promotion_rule` row (PromotionRule, ruleType eligibility, its criteria as the condition group and ruleEffect as effect) (DM5, 29 September: data model for the agreed operations)","description":"**What Eligibility Rule Builder submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.","properties":{"guestType":{"type":"string","description":"Guest type"},"customerSegment":{"type":"string","description":"Customer segment"},"ageCategory":{"type":"string","description":"Age/category"},"membership":{"type":"string","description":"Membership"},"loyaltyTier":{"type":"string","description":"Loyalty tier"},"purchaseHistory":{"type":"string","description":"Purchase history"},"visitHistory":{"type":"string","description":"Visit history"},"transactionValue":{"type":"string","description":"Transaction value"},"productPurchased":{"type":"string","description":"Product purchased"},"channel":{"type":"string","description":"Channel"},"venue":{"type":"string","description":"Venue"},"location":{"type":"string","description":"Location"},"partner":{"type":"string","description":"Partner"},"dateTime":{"type":"string","format":"date-time","description":"Date/time"},"paymentMethod":{"type":"string","description":"Payment method"},"campaign":{"type":"string","description":"Campaign"},"customerAccountAttributes":{"type":"string","description":"Customer/account attributes"},"nestedGroups":{"type":"string","description":"Nested groups"},"multipleConditionSets":{"type":"string","description":"Multiple condition sets"},"ruleEffect":{"type":"string","enum":["include","exclude"],"description":"Whether matching guests are included or excluded."}}},
-"EligibilityRuleBuilderView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over promotions state, assembled at read time from tables that already exist","description":"**What Eligibility Rule Builder displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"guestType":{"type":"string","description":"Guest type"},"customerSegment":{"type":"string","description":"Customer segment"},"ageCategory":{"type":"string","description":"Age/category"},"membership":{"type":"string","description":"Membership"},"loyaltyTier":{"type":"string","description":"Loyalty tier"},"purchaseHistory":{"type":"string","description":"Purchase history"},"visitHistory":{"type":"string","description":"Visit history"},"transactionValue":{"type":"string","description":"Transaction value"},"productPurchased":{"type":"string","description":"Product purchased"},"channel":{"type":"string","description":"Channel"},"venue":{"type":"string","description":"Venue"},"location":{"type":"string","description":"Location"},"partner":{"type":"string","description":"Partner"},"dateTime":{"type":"string","format":"date-time","description":"Date/time"},"paymentMethod":{"type":"string","description":"Payment method"},"campaign":{"type":"string","description":"Campaign"},"customerAccountAttributes":{"type":"string","description":"Customer/account attributes"},"nestedGroups":{"type":"string","description":"Nested groups"},"multipleConditionSets":{"type":"string","description":"Multiple condition sets"},"ruleEffect":{"type":"string","enum":["include","exclude"],"description":"Whether matching guests are included or excluded."}}},
 "FeesSellerProceedsListingConfirmationView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over orders state, assembled at read time from tables that already exist","description":"**What Fees, Seller Proceeds & Listing Confirmation displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"marketplaceTerms":{"type":"integer","description":"Marketplace Terms"},"sellerTerms":{"type":"integer","description":"Seller Terms"},"cancellationPolicy":{"type":"string","description":"Cancellation Policy"},"settlementConditions":{"type":"integer","description":"Settlement Conditions"},"eventCancellationTreatment":{"type":"string","description":"Event Cancellation Treatment"},"applicablePrivacyNotice":{"type":"string","description":"Applicable privacy notice"},"sellingPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Selling price"},"fee":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Fee"},"estimatedProceeds":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Estimated seller proceeds"},"termsVersion":{"type":"string","description":"Terms version the seller accepts; stored with the acceptance"}}},
 "ListingApprovalModerationInput": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — request only; lands in the moderation columns of `orders.resale_listing` (DM5, 29 September)","description":"**What Listing Approval & Moderation submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.","properties":{"reviewReasons":{"type":"array","items":{"type":"string","enum":["highResalePrice","unusualDiscount","highValueTicket","vipTicket","sellerRisk","newSeller","multipleListings","identityIssue","paymentIssue","ticketOwnershipConcern","fraudIndicator"]},"description":"Why the listing is under review."},"decision":{"type":"string","enum":["approve","reject","requestInformation"],"description":"Moderation decision"},"reason":{"type":"string","description":"Reason"}}},
 "ListingApprovalModerationView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over orders state, assembled at read time from tables that already exist","description":"**What Listing Approval & Moderation displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"listing":{"type":"string","description":"Listing"},"seller":{"type":"string","description":"Seller"},"ticket":{"type":"string","description":"Ticket"},"event":{"type":"string","description":"Event"},"originalPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Original price"},"listingPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Listing price"},"priceVariance":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Price variance"},"riskScore":{"type":"number","description":"Risk score"},"submittedDate":{"type":"string","format":"date-time","description":"Submitted date"},"reviewReasons":{"type":"array","items":{"type":"string","enum":["highResalePrice","unusualDiscount","highValueTicket","vipTicket","sellerRisk","newSeller","multipleListings","identityIssue","paymentIssue","ticketOwnershipConcern","fraudIndicator"]},"description":"Why the listing is under review."},"decision":{"type":"string","enum":["approve","reject","requestInformation"],"description":"Moderation decision"}}},

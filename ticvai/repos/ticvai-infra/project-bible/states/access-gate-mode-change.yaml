@@ -13,7 +13,10 @@ description: One gate mode change on an access point, pending or applied, with i
   operator, reason and effective time (declared 29 September, writers pass). Append-only history.
   `setTurnstileMode` writes the row **`applied` at once when no future `effectiveAt` is sent, and
   `pending` when one is**; a timer applies a pending change at `effectiveAt`, and
-  `cancelGateModeChange` withdraws one that has not yet applied.
+  `cancelGateModeChange` withdraws one that has not yet applied. **`setAccessPointDirection` writes the same
+  row for a live direction switch** (decided 2 October 2026, Chinmay, BO-230; DEC-255; CHG-CSP-032; R221
+  amended), with `fromDirection` and `toDirection`, by the same rule, `applied` at once or `pending` until a
+  future `effectiveAt`.
 initial:
 - pending
 - applied
@@ -24,7 +27,8 @@ transitions:
 - from: pending
   to: applied
   trigger: timer
-  guard: '`effectiveAt` has come; the access point''s operating mode becomes the target mode'
+  guard: '`effectiveAt` has come; the access point''s operating mode becomes the target mode, or for a live
+    direction switch its direction becomes `toDirection` (CHG-CSP-032)'
 - from: pending
   to: cancelled
   operation: cancelGateModeChange

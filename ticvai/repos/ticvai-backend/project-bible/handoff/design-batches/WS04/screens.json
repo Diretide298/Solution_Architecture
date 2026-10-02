@@ -239,7 +239,7 @@
   "states": {
    "loading": "The media credential list.",
    "error": "Could not load. Names which read failed and leaves the media credential untouched.",
-   "emptyFirstRun": "No media credential yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No media credential yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the media credential are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -254,12 +254,6 @@
     "operationId": "listVirtualCredentialMedia",
     "contract": "access",
     "purpose": "Virtual Credential & Media Association",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "listMediaTypeCredential",
-    "contract": "access",
-    "purpose": "Media Type & Credential Technology Registry",
     "trigger": "onLoad"
    }
   ],
@@ -280,6 +274,14 @@
    "workshopBoard": "wireframes/WS21 Access Control Board 4.dc.html#bo-174"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 44. 12 of 12 labels bound to a contract property; 12 of 26 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "gaps": [
+   {
+    "operation": "listMediaTypeCredential",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): listMediaTypeCredential is the Ticket Media registry of BO-337; the hub needs no media-type catalogue, and the library belongs to BO-175 (VO-R14; design-notes correction venue-operations BO-174).",
+    "source": "contracts/spine/access.yaml#listMediaTypeCredential | contracts/spine/access.yaml#listMediaTypeTechnology"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -429,6 +431,13 @@
    "workshopBoard": "wireframes/WS21 Access Control Board 4.dc.html#bo-175"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 45. 0 of 0 labels bound to a contract property; 7 of 31 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-004): Merge the two media-type catalogues into one record, one read and one write that every media picker reads (BO-175, BO-337).",
+    "source": "contracts/spine/access.yaml#listMediaTypeTechnology | contracts/spine/access.yaml#listMediaTypeCredential | contracts/spine/access.yaml#setMediaTypeTechnology"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1131,7 +1140,7 @@
   "states": {
    "loading": "The rfid nfc configuration as saved.",
    "error": "Could not load. Names which read failed and leaves the rfid nfc untouched.",
-   "emptyFirstRun": "No rfid nfc configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyFirstRun": "No rfid nfc configured yet. Offers no create action — this screen declares no operation that makes one and says what the platform does in the meantime.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
@@ -1139,12 +1148,6 @@
     "operationId": "setRfidNfc",
     "contract": "access",
     "purpose": "RFID & NFC Configuration",
-    "trigger": "onAction"
-   },
-   {
-    "operationId": "setRfidNfcCard",
-    "contract": "access",
-    "purpose": "RFID, NFC, Card & Wristband Media Designer",
     "trigger": "onAction"
    }
   ],
@@ -1155,6 +1158,19 @@
    "workshopBoard": "wireframes/WS21 Access Control Board 4.dc.html#bo-180"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 50. 0 of 0 labels bound to a contract property; 11 of 25 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "gaps": [
+   {
+    "operation": "setRfidNfcCard",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): setRfidNfcCard is the physical card and wristband designer of the ticket media pack (BO-349); artwork, printing and deposit do not belong on reader-side RFID configuration (design-notes correction venue-operations BO-180).",
+    "source": "contracts/spine/access.yaml#setRfidNfcCard | screens/P08-venue-back-office.yaml#BO-349"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-004): No read of RFID and NFC reader profiles (setRfidNfc has no list or get).",
+    "source": "contracts/spine/access.yaml#setRfidNfc"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1477,6 +1493,11 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Access Control Module_Reference.pdf, page 54"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-004): No operation runs a media compatibility test and returns its results, and no read of the compatibility matrix.",
+    "source": "contracts/spine/access.yaml#publishMediaCompatibilityTesting"
    }
   ],
   "layout": {

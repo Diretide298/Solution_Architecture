@@ -1,11 +1,11 @@
 id: F155
 name: 'Promotions   Bundles Management board 2: Promotion Rule Builder'
-actor: platformAdmin
+actor: venueManager
 wave: 3
 frequency: routine
 criticality: operational
 platforms:
-- P09 TICVAI Web
+- P08 Venue Management
 provenance: derived-from-board
 offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
   not guess.
@@ -18,9 +18,8 @@ trigger:
 steps:
 - step: 1
   screen: ADM-148
-  action: Opens Promotion Rule Builder
-  operations:
-  - setPromotionRule
+  action: Opens Promotion Rule Builder, a section of BO-010, which saves the record with createPromotion and updatePromotion (setPromotionRule retired in r2, CHG-CLN-001)
+  operations: []
   outcome: Provide the main no-code workspace for creating the commercial logic behind a promotion.
 - step: 2
   screen: ADM-149
@@ -32,8 +31,7 @@ steps:
 - step: 3
   screen: ADM-148
   action: Returns to the board's landing screen
-  operations:
-  - setPromotionRule
+  operations: []
   outcome: Ready for the next screen on this board
 - step: 4
   screen: ADM-150
@@ -46,8 +44,7 @@ steps:
 - step: 5
   screen: ADM-148
   action: Returns to the board's landing screen
-  operations:
-  - setPromotionRule
+  operations: []
   outcome: Ready for the next screen on this board
 - step: 6
   screen: ADM-151
@@ -59,8 +56,7 @@ steps:
 - step: 7
   screen: ADM-148
   action: Returns to the board's landing screen
-  operations:
-  - setPromotionRule
+  operations: []
   outcome: Ready for the next screen on this board
 - step: 8
   screen: ADM-152
@@ -71,8 +67,7 @@ steps:
 - step: 9
   screen: ADM-148
   action: Returns to the board's landing screen
-  operations:
-  - setPromotionRule
+  operations: []
   outcome: Ready for the next screen on this board
 - step: 10
   screen: ADM-153
@@ -83,8 +78,7 @@ steps:
 - step: 11
   screen: ADM-148
   action: Returns to the board's landing screen
-  operations:
-  - setPromotionRule
+  operations: []
   outcome: Ready for the next screen on this board
 - step: 12
   screen: ADM-154
@@ -96,8 +90,7 @@ steps:
 - step: 13
   screen: ADM-148
   action: Returns to the board's landing screen
-  operations:
-  - setPromotionRule
+  operations: []
   outcome: Ready for the next screen on this board
 - step: 14
   screen: ADM-155
@@ -109,8 +102,7 @@ steps:
 - step: 15
   screen: ADM-148
   action: Returns to the board's landing screen
-  operations:
-  - setPromotionRule
+  operations: []
   outcome: Ready for the next screen on this board
 - step: 16
   screen: ADM-156
@@ -121,17 +113,17 @@ steps:
 - step: 17
   screen: ADM-148
   action: Returns to the board's landing screen
-  operations:
-  - setPromotionRule
+  operations: []
   outcome: Ready for the next screen on this board
 - step: 18
   screen: ADM-157
   action: Works in Rule Test, Simulation & AI Recommendation Workspace
   operations:
-  - setRuleTestRecommendation
+  - evaluatePromotions
   outcome: Allow administrators to test promotional rules before activating them. This is critical because
     the matrix requires simulation of redemption, discount exposure, revenue impact, margin impact and
     financial performance before activation.
+  note: 'Repointed 2 October (CHG-WIR-025): ADM-157 tests rules with evaluatePromotions (and simulatePromotion on history) instead of setRuleTestRecommendation, a PUT for a test that took its inputs as strings (design-notes correction ticketing-backoffice ADM-157).'
 branches:
 - at: 1
   condition: Nothing has been set up on Promotion Rule Builder yet

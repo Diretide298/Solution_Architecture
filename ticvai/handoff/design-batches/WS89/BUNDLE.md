@@ -1,6 +1,6 @@
 # WS89 — Rental Management board 2
 
-**10 screens · 16 operations · 26 schemas · 5 permissions**
+**10 screens · 13 operations · 24 schemas · 5 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -49,7 +49,7 @@ convincingly. It is never a caption.
 ## Rules that are not style preferences
 
 - **Every control that can be refused must be gated.** 5 permissions apply here:
-  `ASSET_MANAGE, ASSET_VIEW, PROCUREMENT_VIEW, PRODUCT_CONFIGURE, PRODUCT_VIEW`. A control nobody can use must say so,
+  `ASSET_MANAGE, ASSET_VIEW, PRODUCT_CONFIGURE, PRODUCT_VIEW, RENTAL_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -61,22 +61,79 @@ convincingly. It is never a caption.
   and its error; and, element by element, what is shown and in what format, what each action
   produces and where the user goes next. Draw exactly that.
 
+## The processes these screens belong to
+
+Written by the owner of each process (`handoff/design-notes/`). Read before any screen: it says how the process runs end to end and which words the screens must use.
+
+### Food, Beverage & Retail
+
+Food & beverage, retail, rentals, inventory and procurement across the till (P04), the kitchen display (P15), the staff app (P06), Venue Management (P08), the guest web and app (P01/P02), the kiosk (P05) and the CMS (P13). COUNTER SERVICE (F108): the cashier takes the order on the Food & Drink board from the outlet's menu in force (sections in the outlet's order, option groups attached to the item), sends it to the kitchen, and only then charges — send to kitchen, then charge, for every POS F&B order (R261, upheld against the v2 frame by POSV2-4). The kitchen ticket is on the rail while the card is in the guest's hand; an unpaid sent order is cancelled while ordered or accepted and voided with a reason after (R125(3), R091(5)); the guest gets an order number, and the customer-facing status board (numbers only) is the kitchen display's KIT-007, mirrored on the till's queue (POSV2-7). TABLE SERVICE (F29, F80, F94): a party is seated with its covers, orders across the visit, courses are fired by the pass (DI-333, DI-407), the bill is printed and settled at the end and split by amount, covers, category, item or seat (DI-106); the client's table statuses are Available → Ordered → Table closed → Reserved with no cleaning status (DI-336); moving and merging tables stay on the staff app until after r2 (POSV2-8). GUEST ORDERING (F11, F48): a guest inside the venue orders in the app or web for pickup or delivery to a seat or a scanned location (DI-288, DI-291); F&B and retail are optional licensed modules completed inside TICVAI (DI-505), kept simple (DI-1091); no food without an admission ticket (DI-292); table reservations and the waitlist do not go through the cart and a dining deposit is a venue option, off by default (DI-1048, DI-1049, R077). KITCHEN (P15, F83, F88): TICVAI's own display on commodity screens (19 September, replacing the 31 July "integration point only", DI-077); one kitchen ticket per preparation station from the outlet's routing rules with a fallback display (DI-323); a fired timer counts up and resets per course, not shown for quick service (DI-334); displays are assigned to stations and filter by course, with no station-load tile in r1 (R277). 86 takes an item off sale on every till and guest menu immediately (R110(c)); guests always see "Sold out", never a missing dish. RETAIL (F17, F34, F51): scan and sell through the same cart, charge and payment as tickets and food (DI-795), one cart, one receipt and one QR per guest (DI-293); system stock per venue gates the sale (DI-294); returns by receipt or order number only in r1 (R139(c)), refund to the original tender with a reason code and note (DI-796, DI-797); Shop & Drop is paid online and collected on the way out (R236), a merchandise reservation lasts to the end of the visit day (R169, R215). TILL MONEY (F32, F73, F74, F87): the float is counted by denomination with note images and typed quantities (DI-775, DI-776, R229) while the hardware checks itself (DI-778); the close is a …
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Send to kitchen | Put the order on the kitchen rail. On the till it always comes before Charge. | Fire, Fire order, Submit order, kitchen fires on payment | R261 / POSV2-4 / F108 step 3 |
+| Charge | The till's single tender step (Payment, POS-005); the button reads "Charge AED 110.25". | Checkout (on staff screens), Pay now | F108 step 4 / screens/P04-point-of-sale.yaml#POS-021 |
+| Fire / Hold (a course) | Kitchen-pass words for releasing or holding the next course of a table, and the "fired" timer. | using "fire" for sending an order from the till | DI-333 / DI-334 / DI-407 |
+| Kitchen ticket | The slip on the kitchen display, one per preparation station. | Order (on the kitchen display), KOT | R210 |
+| Ready · Served · Collected · Delivered | How an order reaches the guest; a server marks Served, a counter Collected, a runner Delivered (with the location). | Done, Complete, Bumped (as a status) | R125 / contracts/satellite/fnb.yaml#recordOrderHandover |
+| Recall (kitchen) / Recall held sale (till) | Bring a mis-bumped kitchen ticket back to the rail; separately, bring a held cart back into a sale. Never "Recall" alone where both could apply. | Undo bump, Restore | contracts/satellite/fnb.yaml#recallKitchenTicket / POSV2-6 |
+| Unavailable (86) / Sold out | Staff screens say "Unavailable" and may add "86"; guest screens say "Sold out". Immediate everywhere. | Out of stock (for food), Disabled, Hidden | R110 / contracts/satellite/fnb.yaml#getGuestMenu |
+| Order type | Dine-in · Quick service · Takeaway · Delivery, chosen in the cart. | Service mode, Fulfilment source (on the till) | DI-789 / contracts/satellite/fnb.yaml#/components/schemas/ServiceMode |
+| Covers | The number of guests at a table, entered when seating; drives split-by-covers. | Pax (except as a small suffix on the floor plan), Heads | DI-104 / contracts/satellite/fnb.yaml#openTableVisit |
+| Vacant · Seated · Ordered · Bill requested · Table closed · … | Table statuses on every floor plan (till and staff app); "Table closed" is the client's word for after payment. | Cleaning, Needs clearing, Dirty | DI-336 / DI-792 |
+| Till · Cash drawer | Staff copy may say "till" for the workstation; the cash drawer is the deposit box. | Terminal id as a heading, Deposit box (on staff screens) | R156 |
+| Float · Count · Blind count · Variance | The opening float; the denomination count; the closing count made without seeing the expected cash; counted minus expected. | Expected in drawer, Discrepancy, Error | R080 / POSV2-3 |
+| Cash out · Cash in · Safe drop | Taking cash out of the drawer mid-shift, adding change, and a supervisor moving cash to the safe with the cashier as witness. | Lift, Withdrawal (as button labels) | DI-274 / contracts/spine/shift.yaml#createCashMovement / … |
+| Menu item · Merchandise item · Inventory item · SKU | The scoped product words; SKU is a variant's code, Product stays the sellable thing. | SKU as the item's name, Article | R131 |
+| Stock on hand · Allocated · Available | Available is on hand minus allocated. | Inventory (as a number), Free stock | R171 / DI-361 |
+| Requisition · Purchase order · Goods receipt · Transfer · … | The procurement and stock words, in that flow. | GRN as the only label, Indent | DI-341 / DI-348 / DI-362 / DI-363 |
+| Shop & Drop | Bought and paid now, collected on the way out. | Click & collect | R236 |
+| Check-out (rental) · Return (rental) | Handing equipment to the guest and taking it back. On the same screens payment is "Charge" or "Pay". | Checkout (for a handover), Check-in (for a return) | DI-758 / DI-765 |
+| Deposit hold · Release · Capture | A refundable deposit held, given back in full, or partly kept for damage with the rest released. | Charge deposit, Refund deposit | DI-752 / R127 |
+| Extension · Swap · Overdue · Late fee | The active-rental words; a quick swap restarts the clock, a late swap earns a free extension. | Renewal, Exchange (for a swap) | DI-761 / DI-762 / DI-764 |
+
+### Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue)
+
+Venue operations is everything that happens after a sale and inside the gates. A guest's ticket is one virtual ticket with interchangeable media (QR, dynamic QR, RFID wristband, NFC, Face Pass or Face Tag); at an access point a scanner (P07, or the scan function inside the Staff App P06) validates the media against the admission profile and the guest admission policy, offline if it must, and every deny carries a reason and a next action. The back office (Venue Management P08) configures that estate: the venue topology (venue, park, zone, attraction, access point, gate and lane, device placement), admission profiles and rules (entry, exit, re-entry, anti-passback, validity, crossover, companions), credential security (dynamic QR, device binding, beacons), biometrics, gate modes, and the live operations, fraud and monitoring views. Accreditation (P08 setup and review, P11 web portal for applicants, web first) takes an applicant from a configurable form through document checks, OCR, duplicate blocking and multi-level approval to a credential with zone rights. Resources and capacity manage bookable resources (rooms, vehicles, equipment, cabanas, instructors) that are booked as a consequence of selling a product, never sold directly. Workforce covers shift templates, rosters, attendance, swaps and breaks, mirrored on the Staff App. Maintenance and safety cover the asset register, preventive calendars, work orders with scored priority, inspections and incidents, with technicians working from the Staff App. Games and rides configure readers, credit types and consumption priority, play entitlements, game pricing, retry pricing, redemption and the card lifecycle. The virtual queue (Q1) gives a guest a live wait time and a return window for a ride; it is not the on-sale waiting room (Q2). Every calendar has day, week and month views. Configuration resolves tenant, region, venue (outlet only for F&B and retail), and a user's permissions, never the device, decide what they may do. The guest apps (P01, P02) show the guest's side of this: My Tickets, the scan code, Face Pass, wait times, the virtual queue, map booking of cabanas and the visit planner.
+*(source: F06 step 1 / F112 step 1 / F111 step 1 / ADR-0002 / ADR-0012 / ADR-0018 / ADR-0041 / ADR-0066 / ADR-0067 / ADR-0068 / DI-652 / DI-627 / DI-640 / DI-654 / DI-666 / DI-482 / DI-483 / DI-907 / DI-919 / DI-923 / DI-865 / DI-678 / TRACKER Actions row 160 / MoM 2026-09-02 AccessControl / MoM 2026-09-07 …)*
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Ticket | The one virtual record a guest owns (ticket number, product, validity, entries). Its number never changes, whatever media carries it or whoever it is transferred or resold to. | Pass (unless the product is a pass), Booking, Order line | DI-652 / DI-620 / contracts/spine/access.yaml#/components/schemas/TicketStatus |
+| Media | What the ticket is presented by at a gate (QR code, dynamic QR, wristband/RFID card, NFC, Face Pass, Face Tag). One ticket can carry several media as fallbacks; a media code can also cover several tickets scanned as one group. Show one … | Credential (for guest media; keep Credential for accreditation badges and staff), Ticket code | DI-180 / DI-608 / DI-652 |
+| Access point | A place where a scan is judged, with a fixed direction (entry, exit, re-entry, crossover). Hierarchy shown to users is Venue > Park > Zone > Attraction > Access point > Gate/lane > Device. | Scanner (that is the device), Door | screens/P08-venue-back-office.yaml#BO-144 / … |
+| Admission profile | The named set of rules an access point enforces (opening window, entries, exit scan, re-entry, validity, crossover). Products point at a profile; tiers such as Bronze/Silver/Gold are profiles with gate allow and deny lists. | Admission rules (as a screen title), Access rule set | DI-185 / contracts/spine/access.yaml#/components/schemas/AdmissionRules |
+| Admitted / Denied / Overridden | The three scan outcomes. A denial is always shown with its reason in plain words and a next action; an override is a supervisor admitting despite a denial, and is always attributed and reasoned. | Valid/Invalid, Success/Fail, Error | contracts/spine/access.yaml#/components/schemas/ScanOutcome / … |
+| Used | A ticket entry is used the moment a scan succeeds, whether or not the guest physically passed. Mistakes are resolved from the scan history, not by un-scanning. | Redeemed (for admission), Checked in (that is group check-in, a different step) | DI-627 / TRACKER Actions row 221 / TRACKER Actions row 189 |
+| Gate mode | What a lane is doing now, set live by the podium or supervisor - Normal, Free flow (counts, does not validate), Drop arm (everybody through, evacuation), Closed (nobody through), Podium (staff validating by eye), Maintenance. Direction is … | Turnstile mode (as a label for direction), Open/Locked | contracts/spine/access.yaml#/components/schemas/AccessPointOperatingMode / R221 |
+| Offline package | What a scanner holds to validate with no network - entitlements, blacklist, admission profiles and the active guest admission policy version - with its age always visible. | Cache, Local DB | F06 step 3 / ADR-0068 |
+| Sync and reconciliation | Sending the offline scan journal to the server, and the duty manager's review of scans the server rejected after the device had already admitted the guest. | Upload, Retry | F06 step 6 / DI-065 |
+| Face Pass / Face Tag | Face Pass is the long-lived face credential for members and season-pass holders (renewable); Face Tag is short-lived, for one day or event. Retention is set per tier by the venue. | Face ID, Biometric login | DI-640 / ADR-0063 |
+| Accreditation / Credential (accreditation) | Accreditation is the application and approval of a person (media, contractor, corporate, staff of a partner) for an event or season; the credential is what is issued after approval (photo badge, QR or RFID) with zone access rights. | Registration (for the whole process), Ticket | DI-654 / DI-662 |
+| Resource | A bookable thing or person a product needs (room, vehicle, cabana, equipment set, instructor). Guests buy products; resources are assigned to the booking, pre-assigned or dynamically. | Asset (that is maintenance), Inventory (that is stock) | DI-475 / DI-482 / TRACKER Actions row 160 |
+| Asset | A physical item maintained by the venue (ride, turnstile, printer, pump) with a register record, documents, warranty and maintenance history. | Resource, Device (unless it is an IT device in the device register) | DI-910 / ADR-0067 |
+| Work order | A unit of maintenance work, lifecycle Created > Assigned > In progress > Review > Closed, with a resolution timer. | Ticket (reserved for guest tickets), Job card | DI-231 |
+| Game / attraction (games module) | In the games and rides module an attraction is an individual game or ride (roller coaster, racing game, bumper cars), not a venue. | Venue, Park | DI-863 |
+| Virtual queue / Return window | A guest's place in a ride's queue held without standing in line, with a return window (for example 4:50 to 5:00 PM) that recalculates live. Distinct from the walk-in line and the VIP/express lane, and from the on-sale waiting room. | Waiting room, Fast pass (that is the express product), Booking | DI-675 / DI-678 / DI-679 / ADR-0066 |
+| Wait time source | Where a ride's wait time comes from - Sensor, Throughput, Manual, or Unavailable - always shown beside the number. | Live (when the source is manual) | contracts/satellite/queue.yaml#/components/schemas/WaitTimeSource / DI-315 |
+
+
 ## The screens
 
 Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs count fields; requirements are matrix rows; meeting inputs are the ones naming the screen (the module and platform ones are below); white label says whether the tenant's brand reaches it (guest) or it sets the brand (configures).
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-504` | Rental Inventory Command Center | B–D | 2 | 0 | 6 | 15 | 1 | 6 | — | notStarted (—) |
+| `BO-504` | Rental Inventory Command Center | B–D | 2 | 40 | 6 | 0 | 1 | 6 | — | notStarted (—) |
 | `BO-505` | Serialized Equipment Registry | B–D | 10 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-506` | Equipment / Asset Profile | B–D | 0 | 0 | 6 | 2 | 1 | 0 | — | notStarted (—) |
 | `BO-507` | Pooled Inventory Management | B–D | 0 | 0 | 6 | 31 | 1 | 4 | — | notStarted (—) |
 | `BO-508` | Equipment Status & Condition Management | B–D | 0 | 0 | 6 | 2 | 2 | 0 | — | notStarted (—) |
 | `BO-509` | QR / Barcode Equipment Identification | B–D | 1 | 0 | 6 | 3 | 1 | 0 | — | notStarted (—) |
-| `BO-510` | Inventory Location Allocation | B–D | 0 | 0 | 6 | 6 | 1 | 4 | — | notStarted (—) |
+| `BO-510` | Inventory Location Allocation | B–D | 0 | 0 | 6 | 3 | 1 | 4 | — | notStarted (—) |
 | `BO-511` | Inventory Transfer Management | B–D | 0 | 8 | 6 | 8 | 1 | 4 | — | notStarted (—) |
 | `BO-512` | Inventory Adjustment & Exception Management | B–D | 0 | 0 | 6 | 12 | 1 | 4 | — | notStarted (—) |
-| `BO-513` | Inventory Intelligence & Rebalancing | B–D | 0 | 16 | 6 | 22 | 1 | 4 | — | notStarted (—) |
+| `BO-513` | Inventory Intelligence & Rebalancing | B–D | 0 | 16 | 6 | 19 | 1 | 4 | — | notStarted (—) |
 
 ## Thin screens in this batch
 
@@ -97,12 +154,18 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Rentals · wave 3 · needs the `resources` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `PRODUCT_VIEW` (1 read); in the flows as venue manager |
+| Who uses it | venue staff holding `ASSET_VIEW`, `RENTAL_VIEW` (2 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | commandCentre (compact density): the pack gives this screen a metric directory (§KPI Cards) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/rentals/rental-inventory-command-center-bo-504` |
+
+**Known gaps.** Removed 2 October 2026 (CHG-WIR-008): General inventory positions have no rented, reserved or maintenance state; rental unit status lives with rental bookings and assets (DI-744; design-notes … Removed 2 October 2026 (CHG-WIR-008): General inventory positions have no rented, reserved or maintenance state; rental unit status lives with rental bookings and assets (DI-744; design-notes …
+
+**From the Food, Beverage & Retail process.** Rental inventory across stations: how many units are available, reserved, rented, in maintenance, damaged, lost or out of service, per product and location. The one thing to get right: the simplified states agreed with the client, and a click from a number to the units behind it.
+
+**Fixed on main** (the package already carries these; draw what it says): Reads general inventory (listInventoryItems, getStockPositions) whose positions have no rented, reserved or maintenance state. (CHG-WIR-008).
 
 #### Inputs: what the user enters or picks
 
@@ -117,16 +180,67 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | Filter | Drawn as | Default | Allowed values, rules | Source |
 |---|---|---|---|---|
-| Category | picker: choose a category | — | — | `listInventoryItems` ?categoryId |
-| Below reorder point | toggle | — | — | `listInventoryItems` ?belowReorderPoint |
-| Search | text field | — | min length 1; max length 200 | `listInventoryItems` ?search |
-| Location | picker: choose a location | — | — | `getStockPositions` ?locationId |
-| Item | picker: choose an item | — | — | `getStockPositions` ?itemId |
-| Include zero | toggle | off | — | `getStockPositions` ?includeZero |
+| Status | text field | — | — | `listRentalBookings` ?status |
+| Location | picker: choose a location | — | — | `listRentalBookings` ?locationId |
+| From | date and time picker | — | — | `listRentalBookings` ?from |
+| To | date and time picker | — | — | `listRentalBookings` ?to |
+| Category | picker: choose a category | — | — | `listAssets` ?categoryId |
+| Status | select | — | In service · Out of service · Under maintenance · Awaiting parts · Retired · Disposed | `listAssets` ?status |
+| Maintenance due | toggle | — | — | `listAssets` ?maintenanceDue |
 
 #### Outputs: what the screen shows and produces
 
 **Shown**
+
+**Rentals** (data table, from `listRentalBookings`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| ID | the name it points at, never the id | — |
+| Reference | text | — |
+| Product | the name it points at, never the id | — |
+| Location | the name it points at, never the id | — |
+| Return location | the name it points at, never the id | — |
+| Customer | the name it points at, never the id | — |
+| Order | the name it points at, never the id | — |
+| From | 1 Oct 2026, 14:30 | — |
+| To | 1 Oct 2026, 14:30 | — |
+| Quantity | 1,234 | — |
+| Status | chip: Draft, Confirmed, Awaiting arrival, Checked out, Overdue, Partially returned… | — |
+| Checked out at | 1 Oct 2026, 14:30 | — |
+| Due back at | 1 Oct 2026, 14:30 | — |
+| Returned at | 1 Oct 2026, 14:30 | — |
+| Deposit authorisation | the name it points at, never the id | The card deposit's terminal pre-authorisation, written by `checkOutRental` (workbook Q304; CHG-CSA-029). |
+| Accrued late fee | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Readiness | list or chips (count when long) | Computed, not stored — agreement, requirements, deposit, equipment. |
+| Check | text | — |
+| Satisfied | yes / no (icon or chip) | — |
+| Detail | text | — |
+
+**Units** (data table, from `listAssets`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| Asset tag | text | Unique per venue (decided 28 September, audit R108). Two assets in one venue never share a tag; `createAsset` refuses a duplicate with … |
+| Name | text | — |
+| Venue | the name it points at, never the id | — |
+| Category | the name it points at, never the id | — |
+| Location description | text | — |
+| Criticality | chip: Safety critical, Revenue critical, Standard, Low | — |
+| Priority override | chip: Low, Normal, High, Urgent, Emergency | "If this device goes down, raise this priority" (decided 17 September, M17-01). A corrective work order raised on this asset takes this … |
+| Manufacturer | text | — |
+| Model | text | — |
+| Serial number | text | — |
+| Commissioned at | 1 Oct 2026 | — |
+| Warranty expires at | 1 Oct 2026 | — |
+| Supplier | the name it points at, never the id | — |
+| Linked products | list or chips (count when long) | Products this asset delivers. A fault here can stop them selling. |
+| Linked access point | the name it points at, never the id | Access point this asset controls. Out of service blocks it. |
+| Requires inspection to return | yes / no (icon or chip) | True means a completed inspection is required before return to service. A technician cannot simply declare a ride safe. |
+| Documents | list or chips (count when long) | Manuals, procedures, certificates, each with its name and kind. Stored one row per document in `maintenance.asset_document`, which is where … |
+| Ref | text | The document in the media store. |
+| Name | text | — |
 
 **Total Inventory** (metric tile)
 
@@ -148,15 +262,19 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 **Inventory Alerts** (metric tile)
 
-**Data it reads**: `listInventoryItems` (onLoad, Stock across locations); `getStockPositions` (onLoad, What is where)
+**Rules for what is shown** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
+
+- **Status totals**: Available · Reserved · Rented · Faulty / in maintenance (excluded from available until resolved) · Lost; per product and per station. *(source: DI-744 / DI-500)*
+
+**Data it reads**: `listRentalBookings` (onLoad, Units out); `listAssets` (onLoad, Rental units and their condition)
 
 **Where the user goes next**
 
 - → `BO-100` Venue Home: *Back to Venue Home*
 - → `BO-505` Serialized Equipment Registry: *Serialized Equipment Registry*
-- → `BO-506` Equipment / Asset Profile: *Equipment / Asset Profile*
+- → `BO-506` Equipment / Asset Profile: *Equipment / Asset Profile*; carries `assetId`
 - → `BO-507` Pooled Inventory Management: *Pooled Inventory Management*
-- → `BO-508` Equipment Status & Condition Management: *Equipment Status & Condition Management*
+- → `BO-508` Equipment Status & Condition Management: *Equipment Status & Condition Management*; carries `assetId`
 - → `BO-509` QR / Barcode Equipment Identification: *QR / Barcode Equipment Identification*
 - → `BO-510` Inventory Location Allocation: *Inventory Location Allocation*
 - → `BO-511` Inventory Transfer Management: *Inventory Transfer Management*
@@ -169,37 +287,29 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | Loading (`?state=loading`) | The rental inventory list; the counts above it resolve separately. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the rental inventory untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No rental inventory yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, first run (`?state=emptyFirstRun`) | No rental inventory yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the rental inventory are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+totals: 'City Bicycle: 40 total · 22 available · 6 reserved · 9 rented · 3 in maintenance'
+```
+
 #### Permissions
 
-- `listInventoryItems` → `PRODUCT_VIEW` (read) · staff
-- `getStockPositions` → `PRODUCT_VIEW` (read) · staff
+- `listRentalBookings` → `RENTAL_VIEW` (read) · staff
+- `listAssets` → `ASSET_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
 #### Requirements it meets
 
-15 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
-
-| Ref | Requirement (shortened) | Domain | Verdict | Via |
-|---|---|---|---|---|
-| 15.5.9 | Inventory APIs - System shall expose inventory APIs. | Inventory Management | CONTRACTED | `listInventoryItems` |
-| 15.5.10 | Procurement APIs - System shall expose procurement APIs. | Inventory Management | CONTRACTED | `listInventoryItems` |
-| 15.5.11 | Warehouse APIs - System shall expose warehouse APIs. | Inventory Management | CONTRACTED | `listInventoryItems` |
-| 4.4.9 | The system should allow multi-store retailing where the stores are connected with the inventory information of other stores. This should allow the guests to order items which are out of stock in the … | Bundles and Promotions | CONTRACTED | `getStockPositions` |
-| 4.4.14 | Support multiple warehouses, stores, kiosks, stock rooms, and inventory locations with centralized visibility. | Bundles and Promotions | CONTRACTED | `getStockPositions` |
-| 4.4.25 | Maintain one inventory source across POS, B2C, B2B, Mobile App, Kiosks, APIs, and future channels with real-time synchronization. | Bundles and Promotions | CONTRACTED | `getStockPositions` |
-| 15.1.9 | Real-Time Inventory Tracking - System shall track inventory levels in real time. | Inventory Management | CONTRACTED | `getStockPositions` |
-| 15.1.10 | Multi-Location Inventory - System shall support inventory across multiple locations. | Inventory Management | CONTRACTED | `getStockPositions` |
-| 15.1.11 | Multi-Warehouse Inventory - System shall support multiple warehouses. | Inventory Management | CONTRACTED | `getStockPositions` |
-| 15.1.12 | Available Stock Tracking - System shall track available stock. | Inventory Management | CONTRACTED | `getStockPositions` |
-| 15.1.13 | Reserved Stock Tracking - System shall track reserved inventory. | Inventory Management | CONTRACTED | `getStockPositions` |
-| 18.7.1 | Inventory Lookup - Users shall view inventory availability. | Employee Mobile App & AI Assistant | CONTRACTED | `getStockPositions` |
-| … 3 more | | | | `traceability.json` |
+No matrix row traces to this screen's operations or data.
 
 #### Client meeting inputs
 
@@ -238,11 +348,11 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (2), with its required mark, default, format and its error state (403).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (40 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-504?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-100`, `BO-505`, `BO-506`, `BO-507`, `BO-508`, `BO-509`, `BO-510`, `BO-511`, `BO-512`, `BO-513`.
-- [ ] Every gated control is gated: `PRODUCT_VIEW`.
+- [ ] Every gated control is gated: `ASSET_VIEW`, `RENTAL_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -257,12 +367,18 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Rentals · wave 3 · needs the `resources` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `ASSET_VIEW`, `PRODUCT_VIEW` (2 read); in the flows as venue manager |
+| Who uses it | venue staff holding `ASSET_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Fields) and no display directory — it is settings, not a population |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/rentals/serialized-equipment-registry-bo-505` |
+
+**Known gaps.** Removed 2 October 2026 (CHG-WIR-008): listSerialisedItems is retail serials (in stock, sold, returned); rental units are assets with rental states (listAssets, declared) (design-notes correction …
+
+**From the Food, Beverage & Retail process.** The register of individually numbered rental units: serial, asset code, product, station, purchase and warranty, condition and status, with each unit's history. The one thing to get right: search by serial or scan, and condition and history on one page.
+
+**Fixed on main** (the package already carries these; draw what it says): listSerialisedItems (retail serials, statuses in stock / sold / returned) is the main read, and the layout is a form of select fields. (CHG-WIR-008).
 
 #### Inputs: what the user enters or picks
 
@@ -285,15 +401,17 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 
 | Filter | Drawn as | Default | Allowed values, rules | Source |
 |---|---|---|---|---|
-| Serial | text field | — | — | `listSerialisedItems` ?serial |
-| Status | text field | — | — | `listSerialisedItems` ?status |
 | Category | picker: choose a category | — | — | `listAssets` ?categoryId |
 | Status | select | — | In service · Out of service · Under maintenance · Awaiting parts · Retired · Disposed | `listAssets` ?status |
 | Maintenance due | toggle | — | — | `listAssets` ?maintenanceDue |
 
 #### Outputs: what the screen shows and produces
 
-**Data it reads**: `listSerialisedItems` (onLoad, Individually identified assets); `listAssets` (onLoad, The asset register behind them)
+**Rules for what is shown** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
+
+- **Unit record**: Serial, asset code, product, station, purchase date and cost, warranty expiry, condition (Good · In repair · In maintenance), status, rentals and servicing history. *(source: DI-744 / DI-745)*
+
+**Data it reads**: `listAssets` (onLoad, The asset register behind them)
 
 **Where the user goes next**
 
@@ -305,14 +423,21 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 |---|---|
 | Loading (`?state=loading`) | The serialized equipment registry configuration as saved. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the serialized equipment registry untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No serialized equipment registry configured yet. Carries the create action and says what the platform does in the meantime. |
+| Empty, first run (`?state=emptyFirstRun`) | No serialized equipment registry configured yet. Offers no create action — this screen declares no operation that makes one and says what the platform does in the meantime. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Empty, no results (`?state=emptyNoResults`) | **Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist |
 | Offline (`?state=offline`) | online only |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+unit: BIKE-121 · City Bicycle · Beach Hut · bought 12 Mar 2026 · warranty to Mar 2028 · Good · 214 rentals
+```
+
 #### Permissions
 
-- `listSerialisedItems` → `PRODUCT_VIEW` (read) · staff
 - `listAssets` → `ASSET_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
@@ -347,7 +472,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every state opens from `#BO-505?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, emptyNoResults, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-504`.
-- [ ] Every gated control is gated: `ASSET_VIEW`, `PRODUCT_VIEW`.
+- [ ] Every gated control is gated: `ASSET_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -371,9 +496,30 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** The rental lens of an asset's record: one serialised rental item (a mountain bike, a kayak, a wheelchair) with its identity, where it is, its state and condition, its rental use and its maintenance, on one page with tabs. It is the same physical asset as the venue asset register; rental adds use counters and rental history. The one thing to get right: status (can it be rented now) and condition (what shape it is in) sit side by side in the header, with the next maintenance stated in the unit that matters for rentals ("in 6 rentals or 18 rental hours").
+
+**Known correction pending (do not draw the wrong version)**
+
+- **Gap note "the pack gives this screen nothing that can be drawn"** Why: Pack pages 19-20 list the creation fields, the profile's fifteen facts, seven tabs and the lifecycle timeline. *(source: screens/P08-venue-back-office.yaml#BO-506 / screens/P08-venue-back-office.yaml#BO-507; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **"Save asset" button bound to no operation, and an unlabelled detail panel** Why: getAsset reads it and updateAsset saves it; both are declared for this screen but not bound to components. *(source: screens/P08-venue-back-office.yaml#BO-506 / contracts/satellite/maintenance.yaml#updateAsset; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **Condition is shown by the pack but the asset has no condition field** Why: rental.yaml says "maintenance.Asset already carries serial, acquisition, warranty, condition and history", but Asset has no condition; only rental inspection items record one. *(source: contracts/satellite/rental.yaml#recordRentalInspection / contracts/satellite/maintenance.yaml#/components/schemas/Asset; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **Total rentals, rental hours and last rental have no source on the asset** Why: Asset carries a single usageCounter; rental counts come from rental agreements, and no read joins them to the asset. *(source: screens/P08-venue-back-office.yaml#BO-506 / contracts/satellite/maintenance.yaml#/components/schemas/Asset; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **A wrong serial number or acquisition cost cannot be corrected** Why: updateAsset accepts name, location, category, warranty, supplier, override and documents only. *(source: contracts/satellite/maintenance.yaml#updateAsset; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+
+#### Decided on this screen
+
+Answered questions: draw the decision, not the old default. Where a decision and the tables below differ, the decision wins.
+
+- **Which record owns condition - the asset (maintenance) or the latest rental inspection?** → Drawn default accepted: Show condition from the latest inspection with its date ("Good - inspected 30 Sep 17:10"). *(decided by Chinmay, 2026-10-02; DEC-432 / CHG-NOTE-008)* **Reviewable:** a default the lead may still overrule before the block is tasked.
+
 #### Inputs: what the user enters or picks
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Editable details**: Name, location, category, warranty expiry, supplier and fault-priority override are editable here; serial number, asset code, manufacturer and acquisition date and cost are shown read-only (they are set at creation). Documents upload with a name and a kind. *(source: screens/P08-venue-back-office.yaml#BO-506 / contracts/satellite/maintenance.yaml#updateAsset)*
+- **Asset code and serial number**: Asset code (tag) unique per venue; a duplicate serial is refused with the existing asset named - shown on creation and on import. *(source: screens/P08-venue-back-office.yaml#BO-506 / contracts/satellite/maintenance.yaml#createAsset)*
 
 #### Outputs: what the screen shows and produces
 
@@ -387,6 +533,19 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |---|---|---|---|---|---|
 | Save asset (primary button) | navigation or local | — | — | — | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
+
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Header**: BIKE-017, Mountain Bike - Adult, status chip and condition chip side by side, location (North Station, Summit Peaks), QR icon that shows the label. *(source: screens/P08-venue-back-office.yaml#BO-506 / screens/P08-venue-back-office.yaml#BO-507)*
+- **Overview facts**: Product, category, purchase date, warranty (amber within 60 days), total rentals, total rental hours, last rental, last inspection, last maintenance, next maintenance - each a labelled value, not a table. *(source: screens/P08-venue-back-office.yaml#BO-506 / contracts/satellite/maintenance.yaml#getAsset)*
+- **Tabs**: Overview, Rental history, Inspections, Damage, Maintenance, Transfers, Audit - in the pack's order. *(source: screens/P08-venue-back-office.yaml#BO-507)*
+- **Lifecycle strip**: A horizontal timeline Purchased > Activated > Rented x184 > Repaired > Returned to service, with dates on hover. *(source: screens/P08-venue-back-office.yaml#BO-507 / contracts/satellite/maintenance.yaml#getAssetHistory)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Save asset**: Sends only the changed fields; documents replace the list as a whole, so the confirm lists documents added and removed. *(source: contracts/satellite/maintenance.yaml#updateAsset)*
+- **Change status**: Opens BO-508 for this asset. *(source: screens/P08-venue-back-office.yaml#BO-508)*
+- **Raise a repair**: Opens the maintenance work order (BO-577) pre-filled with this asset. *(source: screens/P08-venue-back-office.yaml#BO-577)*
 
 **Where the user goes next**
 
@@ -402,6 +561,38 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the equipment asset profile are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Edge cases to draw
+
+- **Asset currently rented**: Header shows "Rented - due back 16:30" with the booking reference; status changes warn that a guest has it. *(source: contracts/satellite/rental.yaml#assignRentalEquipment / designer default)*
+- **Asset retired**: Read-only with a grey Retired banner and the retirement date; history stays visible. *(source: contracts/satellite/maintenance.yaml#/components/schemas/Asset)*
+
+#### Consistency with other screens
+
+- Match `BO-069`: Same Asset 360 component as the venue asset register; rental adds the rental counters and the Rental history tab. One component, not two designs (per VO-R14).
+- Match `BO-580`: The Maintenance tab is the maintenance history and lifecycle screen in short form.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+asset:
+  code: BIKE-017
+  name: Mountain Bike - Adult
+  serial: TRK-MB-22-004417
+  status: Available
+  condition: Good
+  location: North Station, Summit Peaks
+  purchased: 12 Jan 2026
+  warranty: 12 Jan 2028
+  rentals: 184
+  rentalHours: 276
+  lastRental: 30 Sep 2026
+  lastInspection: 30 Sep 2026 17:10
+  lastMaintenance: 8 Sep 2026 (brake repair)
+  nextMaintenance: In 6 rentals or 18 rental hours
+```
 
 #### Permissions
 
@@ -447,6 +638,9 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-504`.
 - [ ] Every gated control is gated: `ASSET_MANAGE`, `ASSET_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 2 edge case(s) from the process notes are drawn.
+- [ ] The 5 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
+- [ ] The 1 decision(s) taken on this screen are drawn as decided, not as the old default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -469,6 +663,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Food, Beverage & Retail process.** Quantity-only rental stock (life jackets, paddles, towels) per station: increase, decrease, adjust with a reason, transfer, or mark units out of service. The one thing to get right: every change carries a reason.
+
 #### Inputs: what the user enters or picks
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
@@ -480,6 +676,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Include zero | toggle | off | — | `getStockPositions` ?includeZero |
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+**Rules for these inputs** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
+
+- **Adjustment**: Quantity and reason (Damaged · Lost · Stolen · Found · Other with a note). *(source: DI-746 / R222)*
 
 #### Outputs: what the screen shows and produces
 
@@ -510,6 +710,14 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed, including an `adjustmentIn`, `adjustmentOut` or `waste` movement with no `reason` (audit R171).; 409 Insufficient stock at the source; 409 Insufficient stock, and the item does not permit negative balances |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+position: Life Jacket (adult) · Beach Hut 50 · Kayak Jetty 100 · 4 out of service
+```
 
 #### Permissions
 
@@ -592,9 +800,33 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** Where staff change a rental item's state - send it for repair, mark it out of service, return it - with a reason and an expected return date, keeping operational status (can it be rented) separate from physical condition (what shape it is in). The system enforces which moves are allowed, so a damaged or unsafe item cannot slip back into rentable stock. The one thing to get right: Available is never chosen by hand from a damaged or unsafe state - it is reached only through an inspection.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **The rental statuses (Available, Reserved, Rented, Inspection required, Cleaning, Lost) do not exist in AssetStatus** Why: AssetStatus is inService, outOfService, underMaintenance, awaitingParts, retired, disposed; rental availability is derived from bookings. The screen must show the derived rental state and set only the maintenance status. *(source: screens/P08-venue-back-office.yaml#BO-509 / contracts/satellite/maintenance.yaml#/components/schemas/AssetStatus; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **DI-500 agreed simplified states (available, rented, faulty) but the pack lists nine statuses and six conditions** Why: The two client inputs disagree; the lead should confirm which set the screen offers. *(source: screens/P08-venue-back-office.yaml#BO-509 / DI-500; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **No expected return-to-service date and no condition on the status change** Why: DI-745 asks for an estimated return date with the reason; SetAssetStatusRequest has neither, so availability cannot be restored on time. *(source: DI-745 / contracts/satellite/maintenance.yaml#/components/schemas/SetAssetStatusRequest; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **Allowed transitions are not enforced by the contract** Why: The pack requires TICVAI to control valid transitions; setAssetStatus accepts any status except return without inspection. *(source: screens/P08-venue-back-office.yaml#BO-509 / contracts/satellite/maintenance.yaml#setAssetStatus; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **Gap note "nothing that can be drawn"; Save asset status bound to no operation** Why: The pack lists both vocabularies and the transition rules; setAssetStatus is the save. *(source: screens/P08-venue-back-office.yaml#BO-509 / screens/P08-venue-back-office.yaml#BO-508; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+
+#### Decided on this screen
+
+Answered questions: draw the decision, not the old default. Where a decision and the tables below differ, the decision wins.
+
+- **Is Cleaning a status (item unavailable while cleaned) or part of the return inspection?** → Drawn default accepted: Draw Cleaning as part of the return inspection, not a status. *(decided by Chinmay, 2026-10-02; DEC-433 / CHG-NOTE-008)* **Reviewable:** a default the lead may still overrule before the block is tasked.
+
 #### Inputs: what the user enters or picks
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **New status**: Only the moves allowed from the current state are offered (for example from Rented: Returned > Inspection required; from Inspection required: Available after a passed inspection, or Under maintenance). Rented and Reserved are never offered - they come from bookings. *(source: screens/P08-venue-back-office.yaml#BO-509 / contracts/satellite/maintenance.yaml#setAssetStatus)*
+- **Condition**: Excellent, Good, Fair, Damaged, Major damage, Unsafe as colour chips; Damaged, Major damage and Unsafe force the status to Under maintenance or Out of service. *(source: screens/P08-venue-back-office.yaml#BO-509)*
+- **Reason**: Required, at least 3 characters (max 1000); short presets (Damage on return, Failed inspection, Preventive service due, Lost) plus free text. *(source: contracts/satellite/maintenance.yaml#/components/schemas/SetAssetStatusRequest / DI-745)*
+- **Expected back in service**: Date and time picker, required when taking an item out; feeds rental availability for future bookings. *(source: screens/P08-venue-back-office.yaml#BO-583 / DI-745)*
+- **Raise a work order**: A tick, on by default when moving to Under maintenance; opens the work order with this asset. *(source: contracts/satellite/maintenance.yaml#/components/schemas/SetAssetStatusRequest)*
 
 #### Outputs: what the screen shows and produces
 
@@ -608,6 +840,17 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |---|---|---|---|---|---|
 | Save asset status (primary button) | navigation or local | — | — | — | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
+
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Current state**: Status chip and condition chip side by side, with when and by whom each was last changed. *(source: screens/P08-venue-back-office.yaml#BO-509 / contracts/satellite/maintenance.yaml#/components/schemas/AssetStatusChange)*
+- **Downstream effect**: After saving, "BIKE-031 removed from rentable stock until 3 Oct 10:00 - 2 future bookings affected" with a link to the bookings. *(source: screens/P08-venue-back-office.yaml#BO-583 / contracts/satellite/maintenance.yaml#/components/schemas/AssetStatusResult)*
+- **Status history**: The sequence of changes (from, to, reason, who, when), newest first. *(source: contracts/satellite/maintenance.yaml#/components/schemas/AssetStatusChange)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Save status**: Sets the status with the reason; a return to service without the required inspection is refused 409 with "Complete the return-to-service inspection" and a link to BO-581. *(source: contracts/satellite/maintenance.yaml#setAssetStatus / screens/P08-venue-back-office.yaml#BO-581)*
+- **Scan**: Scanning the item's QR opens it here directly. *(source: DI-745 / contracts/satellite/maintenance.yaml#lookupAsset)*
 
 **Where the user goes next**
 
@@ -624,6 +867,32 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 Return to service attempted without the inspection this asset category requires. |
+
+#### Edge cases to draw
+
+- **Taking out an item that is booked for later today**: Confirm lists the bookings affected and offers to swap them to another item before saving (per VO-R16). *(source: screens/P08-venue-back-office.yaml#BO-583)*
+- **Item marked lost**: Lost needs a reason and the last known booking; it leaves available stock and is flagged for the damage/loss process. *(source: screens/P08-venue-back-office.yaml#BO-509)*
+
+#### Consistency with other screens
+
+- Match `BO-069`: The same status change control and consequence wording as Take out of service on the asset register.
+- Match `BO-581`: The only path back to Available from a damaged or unsafe state.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+item:
+  code: BIKE-028
+  status: Inspection required
+  condition: Fair
+  change:
+    to: Under maintenance
+    reason: Rear derailleur bent on return
+    backBy: 3 Oct 2026 10:00
+    workOrder: raised
+```
 
 #### Permissions
 
@@ -670,6 +939,9 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-504`.
 - [ ] Every gated control is gated: `ASSET_MANAGE`, `ASSET_VIEW`.
 - [ ] The 2 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 2 edge case(s) from the process notes are drawn.
+- [ ] The 5 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
+- [ ] The 1 decision(s) taken on this screen are drawn as decided, not as the old default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -690,7 +962,21 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | nothing: it opens on its own |
 | Route | `/rentals/qr-barcode-equipment-identification-bo-509` |
 
-**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built. Contract gap recorded 2 October 2026 (CHG-WIR-004): No operation generates or prints asset labels.
+
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** Every serialised rental item gets a scannable identity: generate and print its label, and scan it to see what it is, where it should be, its state and condition, and when it next needs maintenance, with the next actions. The one thing to get right: scanning is the fast path everywhere (works offline at a rental station), and the label carries only the code - details appear after a signed-in scan.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **Search field bound to no operation; gap note says nothing is drawable** Why: lookupAsset (by tag or serial) is the search; the pack gives the label, the result card and its actions. *(source: screens/P08-venue-back-office.yaml#BO-510 / screens/P08-venue-back-office.yaml#BO-509; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **No operation generates or prints asset labels** Why: The pack requires single and bulk label printing; nothing in the maintenance contract produces a label. *(source: screens/P08-venue-back-office.yaml#BO-509 / screens/P08-venue-back-office.yaml#BO-510; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **NFC and RFID lookups have no parameter** Why: lookupAsset takes assetTag or serialNumber only; an RFID or NFC tag id needs a field on the asset or the lookup. *(source: contracts/satellite/maintenance.yaml#lookupAsset / MATRIX 18.3.2; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+
+#### Decided on this screen
+
+Answered questions: draw the decision, not the old default. Where a decision and the tables below differ, the decision wins.
+
+- **Should the QR encode a URL (opens the asset after sign-in) or only the code?** → Drawn default accepted: Encode the code only; the label prints the code in text as well. *(decided by Chinmay, 2026-10-02; DEC-434 / CHG-NOTE-008)* **Reviewable:** a default the lead may still overrule before the block is tasked.
 
 #### Inputs: what the user enters or picks
 
@@ -700,7 +986,23 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|---|---|---|---|---|---|
 | Search | search field | — | — | — | — | A search that returns nothing must say so differently from a search not yet run. | — |
 
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Scan or type**: Camera scan of QR or barcode, NFC or RFID tap where the device supports it, or typing the asset code or serial number. Never a database id. *(source: screens/P08-venue-back-office.yaml#BO-509 / contracts/satellite/maintenance.yaml#lookupAsset)*
+- **Label printing**: Single label or bulk (pick a product and location); label shows the venue's TICVAI rental asset label, the code in text and the QR; template chosen once per venue. *(source: screens/P08-venue-back-office.yaml#BO-509 / screens/P08-venue-back-office.yaml#BO-510)*
+
 #### Outputs: what the screen shows and produces
+
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Scan result card**: "BIKE-001 - Mountain Bike", Location North Station, Status Available, Condition Good, Next maintenance "82 rental hours", with the asset's photo; wrong-location scans say "Expected at Marina Station". *(source: screens/P08-venue-back-office.yaml#BO-510 / contracts/satellite/maintenance.yaml#lookupAsset)*
+- **Actions on the card**: Inspect, Transfer, Maintenance (raise a repair), View history; Assign is shown only in checkout (rental board 6), here as a link. *(source: screens/P08-venue-back-office.yaml#BO-510)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Scan**: Opens the card in under a second; offline it uses the cached register and says "Offline - details from 09:40". *(source: contracts/satellite/maintenance.yaml#lookupAsset)*
+- **Maintenance**: Opens the maintenance work order (BO-577) with the asset filled in. *(source: screens/P08-venue-back-office.yaml#BO-577)*
+- **Print labels**: Produces a print sheet for the selected items; reprinting a label does not change the code. *(source: screens/P08-venue-back-office.yaml#BO-509)*
 
 **Where the user goes next**
 
@@ -716,6 +1018,31 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the barcode equipment identification are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Edge cases to draw
+
+- **Code not found**: "No item with this code at Summit Peaks" with "Search all venues" for those allowed (per VO-R09). *(source: contracts/satellite/maintenance.yaml#lookupAsset)*
+- **Scan of an item that belongs to another venue**: Shown read-only with "Belongs to Aqua Park" and a Transfer action; the venue is not switched. *(source: ADR-0030)*
+- **Damaged label**: Type the serial number; "Reprint label" offered on the result. *(source: contracts/satellite/maintenance.yaml#lookupAsset)*
+
+#### Consistency with other screens
+
+- Match `EMP-075`: The Staff App equipment scan uses the same lookup and the same result card.
+- Match `BO-069`: Asset labels for venue assets and rental items use one label template component.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+scan:
+  code: BIKE-001
+  product: Mountain Bike - Adult
+  location: North Station, Summit Peaks
+  status: Available
+  condition: Good
+  nextMaintenance: 82 rental hours
+```
 
 #### Permissions
 
@@ -761,6 +1088,9 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-504`.
 - [ ] Every gated control is gated: `ASSET_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 3 edge case(s) from the process notes are drawn.
+- [ ] The 3 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
+- [ ] The 1 decision(s) taken on this screen are drawn as decided, not as the old default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -774,14 +1104,18 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Rentals · wave 3 · needs the `resources` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `PRODUCT_CONFIGURE`, `PRODUCT_VIEW` (1 configure, 1 read); in the flows as venue manager |
+| Who uses it | venue staff holding `PRODUCT_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/rentals/inventory-location-allocation-bo-510` |
 
-**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built. Removed 2 October 2026 (CHG-WIR-008): Creating a stock location is warehouse set-up, not allocation of rental units to stations (R254; design-notes correction fnb-retail BO-510).
+
+**From the Food, Beverage & Retail process.** How rental units are spread across pick-up stations (50 life jackets at A, 100 at B), with the target per station. The one thing to get right: a station × product grid with current and target quantities.
+
+**Fixed on main** (the package already carries these; draw what it says): Bound to generic stock locations (list/create stock location). (CHG-WIR-008).
 
 #### Inputs: what the user enters or picks
 
@@ -793,12 +1127,9 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
 
-**Actions and what each produces**
+**Rules for what is shown** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
 
-| Action | Calls | Sends | On success returns | Errors to show | Notes |
-|---|---|---|---|---|---|
-| Create stock location (primary button) | navigation or local | — | — | — | — |
-| Cancel (secondary button) | navigation or local | — | — | — | — |
+- **Allocation grid**: Rows products, columns stations; current units, target, shortfall. *(source: DI-746)*
 
 **Data it reads**: `listStockLocations` (onLoad, Where stock may sit)
 
@@ -812,30 +1143,34 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |---|---|
 | Loading (`?state=loading`) | The inventory location allocation list. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the inventory location allocation untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No inventory location allocation yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, first run (`?state=emptyFirstRun`) | No inventory location allocation yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the inventory location allocation are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+grid: 'Life Jacket: Beach Hut 50 / target 60 · Kayak Jetty 100 / target 90'
+```
+
 #### Permissions
 
 - `listStockLocations` → `PRODUCT_VIEW` (read) · staff
-- `createStockLocation` → `PRODUCT_CONFIGURE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
 #### Requirements it meets
 
-6 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+3 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
 
 | Ref | Requirement (shortened) | Domain | Verdict | Via |
 |---|---|---|---|---|
 | 4.5.4 | The system should have the ability to record the local /in store inventory (stock management system: used for in-store stock view/management reporting) | Bundles and Promotions | CONTRACTED | `listStockLocations` |
 | 4.5.13 | Manage inventory across multiple warehouses and locations. | Bundles and Promotions | CONTRACTED | `listStockLocations` |
 | 10.1.5 | The system should have the ability to record the local /in store inventory( for in store stock view/management). | Games & F&B Integration | CONTRACTED | `listStockLocations` |
-| 15.2.1 | Warehouse Master - System shall support warehouse master management. | Inventory Management | CONTRACTED | `createStockLocation` |
-| 15.2.2 | Warehouse Zones - System shall support warehouse zones. | Inventory Management | CONTRACTED | `createStockLocation` |
-| 15.2.3 | Warehouse Locations - System shall support warehouse locations. | Inventory Management | CONTRACTED | `createStockLocation` |
 
 #### Client meeting inputs
 
@@ -864,9 +1199,9 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
 - [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-510?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: Create stock location, Cancel.
+- [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-504`.
-- [ ] Every gated control is gated: `PRODUCT_CONFIGURE`, `PRODUCT_VIEW`.
+- [ ] Every gated control is gated: `PRODUCT_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -889,6 +1224,12 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | Route | `/rentals/inventory-transfer-management-bo-511` |
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+**From the Food, Beverage & Retail process.** Moving rental units between stations: a serialised unit by scan, or a pooled quantity, sent and received. The one thing to get right: in transit units are not available at either end.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **Buttons for "Scheduled transfer" and "Emergency transfer".** Why: No operation or field distinguishes them. *(source: screens/P08-venue-back-office.yaml#BO-511; Food, Beverage & Retail)*
 
 #### Inputs: what the user enters or picks
 
@@ -927,6 +1268,10 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Scheduled transfer (secondary button) | navigation or local | — | — | — | — |
 | Emergency transfer (secondary button) | navigation or local | — | — | — | — |
 
+**Rules for what is shown** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
+
+- **Transfers**: From, to, items or quantity, sent and received times, status. *(source: DI-746 / contracts/satellite/inventory.yaml#listStockTransfers)*
+
 **Data it reads**: `listStockTransfers` (onLoad, Transfers in flight, inbound and outbound for this venue …)
 
 **Where the user goes next**
@@ -944,6 +1289,14 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 Insufficient stock at the source; 409 The transfer is not `inTransit` or `partiallyReceived` — it has already been received in full, or closed short |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+transfer: 20 × Life Jacket · Kayak Jetty → Beach Hut · sent 09:10 · received 09:35
+```
 
 #### Permissions
 
@@ -999,6 +1352,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - [ ] Every transition is wired: `BO-504`.
 - [ ] Every gated control is gated: `PRODUCT_CONFIGURE`, `PRODUCT_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -1021,6 +1375,8 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Food, Beverage & Retail process.** Recording damaged, lost or stolen rental units and other discrepancies with a reason, and the history of such adjustments. The one thing to get right: reason and person on every adjustment.
+
 #### Inputs: what the user enters or picks
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
@@ -1034,6 +1390,10 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | Recorded to | date and time picker | — | — | `listStockMovements` ?recordedTo |
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+**Rules for these inputs** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
+
+- **Reason**: Damaged · Lost · Stolen · Count difference · Other (note required). *(source: DI-746 / R222)*
 
 #### Outputs: what the screen shows and produces
 
@@ -1065,6 +1425,14 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed, including an `adjustmentIn`, `adjustmentOut` or `waste` movement with no `reason` (audit R171).; 409 Insufficient stock, and the item does not permit negative balances |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+adjustment: −2 × Paddle · Kayak Jetty · Lost · Omar Ziad · 14:20
+```
 
 #### Permissions
 
@@ -1136,14 +1504,24 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Rentals · wave 3 · needs the `resources` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `PROCUREMENT_VIEW`, `PRODUCT_CONFIGURE`, `PRODUCT_VIEW` (2 read, 1 configure); in the flows as venue manager |
+| Who uses it | venue staff holding `PRODUCT_CONFIGURE`, `PRODUCT_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Display) and no metric row |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/rentals/inventory-intelligence-rebalancing-bo-513` |
 
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
+**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape … Removed 2 October 2026 (CHG-WIR-008): Reorder suggestions buy stock; rebalancing moves rental units between stations (R254; design-notes correction fnb-retail BO-513).
+
+**From the Food, Beverage & Retail process.** Where rental units are short or idle across stations, and suggested transfers to rebalance. The one thing to get right: suggestions are advisory — a person creates the transfer.
+
+**Fixed on main** (the package already carries these; draw what it says): getSuggestedRequisitions (procurement reorder suggestions) is bound for rebalancing. (CHG-WIR-008).
+
+#### Decided on this screen
+
+Answered questions: draw the decision, not the old default. Where a decision and the tables below differ, the decision wins.
+
+- **Is AI rebalancing in scope, given the client limited rental AI to reporting and maintenance recommendations?** → Drawn default accepted: Show shortfalls as a report; no AI recommendation panel. *(decided by Chinmay, 2026-10-02; DEC-299 / CHG-NOTE-004)* **Reviewable:** a default the lead may still overrule before the block is tasked.
 
 #### Inputs: what the user enters or picks
 
@@ -1154,7 +1532,6 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | Location | picker: choose a location | — | — | `getStockPositions` ?locationId |
 | Item | picker: choose an item | — | — | `getStockPositions` ?itemId |
 | Include zero | toggle | off | — | `getStockPositions` ?includeZero |
-| Location | picker: choose a location | — | — | `getSuggestedRequisitions` ?locationId |
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
 
@@ -1194,7 +1571,11 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |---|---|---|---|---|---|
 | Review Recommendation / Create Transfer / Dismiss (primary button) | navigation or local | — | — | — | — |
 
-**Data it reads**: `getStockPositions` (onLoad, Imbalance across locations); `getSuggestedRequisitions` (onLoad, What to move, and where)
+**Rules for what is shown** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
+
+- **Shortfalls**: Per station and product, available vs expected demand; suggested moves with quantities. *(source: DI-746)*
+
+**Data it reads**: `getStockPositions` (onLoad, Imbalance across locations)
 
 **Where the user goes next**
 
@@ -1212,17 +1593,24 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 Insufficient stock at the source |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+suggestion: Move 10 City Bicycles Marina Gate → Beach Hut before 15:00 (Beach Hut sold out 2 of last 3 Fridays)
+```
+
 #### Permissions
 
 - `getStockPositions` → `PRODUCT_VIEW` (read) · staff
-- `getSuggestedRequisitions` → `PROCUREMENT_VIEW` (read) · staff
 - `createStockTransfer` → `PRODUCT_CONFIGURE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
 #### Requirements it meets
 
-22 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+19 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
 
 | Ref | Requirement (shortened) | Domain | Verdict | Via |
 |---|---|---|---|---|
@@ -1238,7 +1626,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | 18.7.2 | Stock Count - Users shall perform stock counts. | Employee Mobile App & AI Assistant | CONTRACTED | `getStockPositions` |
 | 18.7.3 | Inventory Transfers - Users shall execute inventory transfers. | Employee Mobile App & AI Assistant | CONTRACTED | `getStockPositions` |
 | 18.7.4 | Goods Receipt - Users shall record goods receipt transactions. | Employee Mobile App & AI Assistant | CONTRACTED | `getStockPositions` |
-| … 10 more | | | | `traceability.json` |
+| … 7 more | | | | `traceability.json` |
 
 #### Client meeting inputs
 
@@ -1269,8 +1657,9 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - [ ] Every state opens from `#BO-513?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Review Recommendation / Create Transfer ….
 - [ ] Every transition is wired: `BO-504`.
-- [ ] Every gated control is gated: `PROCUREMENT_VIEW`, `PRODUCT_CONFIGURE`, `PRODUCT_VIEW`.
+- [ ] Every gated control is gated: `PRODUCT_CONFIGURE`, `PRODUCT_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 1 decision(s) taken on this screen are drawn as decided, not as the old default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -1367,15 +1756,12 @@ Method, path, parameters, request and response for every operation these screens
 
 ```json
 {
-"createStockLocation": {"method":"POST","path":"/stock-locations","contract":"inventory","summary":"Create a stock location","permission":"PRODUCT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"StockLocation"},
 "createStockMovement": {"method":"POST","path":"/stock-movements","contract":"inventory","summary":"Record an issue, return or adjustment","permission":"PRODUCT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"CreateStockMovementRequest","responds":"StockMovement"},
 "createStockTransfer": {"method":"POST","path":"/stock-transfers","contract":"inventory","summary":"Send stock to another location","permission":"PRODUCT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"CreateStockTransferRequest","responds":"StockTransfer"},
 "getAsset": {"method":"GET","path":"/assets/{assetId}","contract":"maintenance","summary":"Read an asset with history and documents","permission":"ASSET_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"AssetDetail"},
 "getStockPositions": {"method":"GET","path":"/stock","contract":"inventory","summary":"Stock on hand by item and location","permission":"PRODUCT_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"locationId","in":"query","required":null},{"name":"itemId","in":"query","required":null},{"name":"includeZero","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
-"getSuggestedRequisitions": {"method":"GET","path":"/requisitions/suggested","contract":"inventory","summary":"Draft requisitions from reorder points","permission":"PROCUREMENT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"locationId","in":"query","required":null}],"requestBody":null,"responds":null},
 "listAssets": {"method":"GET","path":"/assets","contract":"maintenance","summary":"List assets","permission":"ASSET_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"venueId","in":"query","required":null},{"name":"categoryId","in":"query","required":null},{"name":"status","in":"query","required":null},{"name":"maintenanceDue","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
-"listInventoryItems": {"method":"GET","path":"/inventory-items","contract":"inventory","summary":"List inventory items","permission":"PRODUCT_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"venueId","in":"query","required":null},{"name":"categoryId","in":"query","required":null},{"name":"belowReorderPoint","in":"query","required":null},{"name":"search","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
-"listSerialisedItems": {"method":"GET","path":"/serialised-items","contract":"inventory","summary":"Where each individual item is","permission":"PRODUCT_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"serial","in":"query","required":null},{"name":"status","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
+"listRentalBookings": {"method":"GET","path":"/rental-bookings","contract":"rental","summary":"Reservations across venues and locations","permission":"RENTAL_VIEW","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[{"name":"status","in":"query","required":null},{"name":"locationId","in":"query","required":null},{"name":"from","in":"query","required":null},{"name":"to","in":"query","required":null}],"requestBody":null,"responds":"RentalBooking"},
 "listStockLocations": {"method":"GET","path":"/stock-locations","contract":"inventory","summary":"List stock locations","permission":"PRODUCT_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listStockMovements": {"method":"GET","path":"/stock-movements","contract":"inventory","summary":"The movement ledger","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"itemId","in":"query","required":null},{"name":"locationId","in":"query","required":null},{"name":"kind","in":"query","required":null},{"name":"recordedFrom","in":"query","required":null},{"name":"recordedTo","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listStockTransfers": {"method":"GET","path":"/stock-transfers","contract":"inventory","summary":"List transfers","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"status","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
@@ -1400,16 +1786,14 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "AssetStatus": {"type":"string","enum":["inService","outOfService","underMaintenance","awaitingParts","retired","disposed"]},
 "AssetStatusResult": {"x-ticvai-persistence":"none — computed","type":"object","required":["asset","downstreamEffects"],"properties":{"asset":{"$ref":"#/components/schemas/Asset"},"downstreamEffects":{"type":"object","description":"What else changed. Surfaced so the person taking a ride out of service sees the commercial consequence at the moment they do it.\n","properties":{"productsSuspended":{"type":"array","items":{"type":"string","format":"uuid"}},"accessPointBlocked":{"type":"boolean"},"performancesAffected":{"type":"integer"},"workOrderId":{"type":"string","format":"uuid","nullable":true}}}}},
 "CreateAssetRequest": {"x-ticvai-persistence":"none — request only","type":"object","required":["assetTag","name","venueId","criticality"],"properties":{"assetTag":{"type":"string","maxLength":64,"x-ticvai-unique":"venue","description":"**Unique per venue** (decided 28 September, audit R108). Two assets in one venue never share a tag; `createAsset` refuses a duplicate with `409` `duplicate-code`. Two venues may each have an `A-001`.\n"},"name":{"type":"string","maxLength":200},"venueId":{"type":"string","format":"uuid"},"categoryId":{"type":"string","format":"uuid"},"locationDescription":{"type":"string","maxLength":500},"criticality":{"$ref":"#/components/schemas/AssetCriticality"},"priorityOverride":{"allOf":[{"$ref":"#/components/schemas/WorkOrderPriority"}],"nullable":true,"description":"**\"If this device goes down, raise this priority\"** (decided 17 September, M17-01). A corrective work order raised on this asset takes this priority instead of the score. Null means the score decides.\n"},"manufacturer":{"type":"string","maxLength":200},"model":{"type":"string","maxLength":200},"serialNumber":{"type":"string","maxLength":128},"commissionedAt":{"type":"string","format":"date"},"warrantyExpiresAt":{"type":"string","format":"date"},"supplierId":{"type":"string","format":"uuid"},"linkedProductIds":{"type":"array","description":"Products this asset delivers. A fault here can stop them selling.\n","items":{"type":"string","format":"uuid"}},"linkedAccessPointId":{"type":"string","format":"uuid","nullable":true,"description":"Access point this asset controls. Out of service blocks it."},"requiresInspectionToReturn":{"type":"boolean","default":false,"description":"True means a completed inspection is required before return to service. A technician cannot simply declare a ride safe.\n"},"documents":{"type":"array","description":"Manuals, procedures, certificates, each with its name and kind. Stored one row per document in `maintenance.asset_document`, which is where `AssetDetail.documents` reads them from.\n","items":{"$ref":"#/components/schemas/AssetDocumentInput"}},"documentRefs":{"type":"array","x-ticvai-persisted":false,"description":"**The refs alone, kept for callers that predate `documents`.** Each ref sent here is stored as an `asset_document` row with no name and no kind. Returned as the refs of `documents`, computed on read — there is no second copy to fall out of step.\n","items":{"type":"string"}}}},
-"CreateInventoryItemRequest": {"x-ticvai-persistence":"none — request only","type":"object","required":["sku","name","venueId","baseUnit","costingMethod"],"properties":{"sku":{"type":"string","maxLength":64},"barcode":{"type":"string","maxLength":128},"name":{"type":"string","maxLength":200},"venueId":{"type":"string","format":"uuid"},"categoryId":{"type":"string","format":"uuid"},"baseUnit":{"type":"string","description":"The unit stock is held in. Immutable once movements exist."},"purchaseUnit":{"type":"string","description":"How the supplier sells it — a case of 24 against a base unit of one."},"purchaseUnitFactor":{"type":"number","minimum":0,"default":1},"costingMethod":{"$ref":"#/components/schemas/CostingMethod"},"reorderPoint":{"type":"number","minimum":0},"reorderQuantity":{"type":"number","minimum":0},"parLevel":{"type":"number","minimum":0},"preferredSupplierId":{"type":"string","format":"uuid"},"allowNegativeStock":{"type":"boolean","default":false,"description":"True permits issue beyond on-hand. Occasionally needed at a bar mid-service; dangerous everywhere else.\n"},"isPerishable":{"type":"boolean","default":false},"shelfLifeDays":{"type":"integer","nullable":true}}},
 "CreateStockMovementRequest": {"x-ticvai-persistence":"none — request only","type":"object","required":["id","itemId","locationId","kind","quantity","recordedAt"],"properties":{"id":{"type":"string","format":"uuid"},"itemId":{"type":"string","format":"uuid"},"locationId":{"type":"string","format":"uuid"},"kind":{"$ref":"#/components/schemas/MovementKind"},"quantity":{"type":"number","exclusiveMinimum":0,"description":"Always positive. **The `kind` decides whether it adds or removes stock**, not the sign (decided 28 September, audit R171).\n"},"unit":{"type":"string"},"reason":{"type":"string","maxLength":500,"description":"**Required for `adjustmentIn`, `adjustmentOut` and `waste`** (decided 28 September, audit R171); adjustments are reported separately.\n"},"costCenterId":{"type":"string","format":"uuid"},"recordedAt":{"type":"string","format":"date-time"}}},
 "CreateStockTransferRequest": {"x-ticvai-persistence":"none — request only","type":"object","required":["id","fromLocationId","toLocationId","lines","recordedAt"],"properties":{"id":{"type":"string","format":"uuid"},"fromLocationId":{"type":"string","format":"uuid"},"toLocationId":{"type":"string","format":"uuid"},"lines":{"type":"array","minItems":1,"items":{"type":"object","required":["itemId","quantity"],"properties":{"itemId":{"type":"string","format":"uuid"},"quantity":{"type":"number","minimum":0},"unit":{"type":"string"}}}},"note":{"type":"string","maxLength":500},"recordedAt":{"type":"string","format":"date-time"}}},
-"InventoryItem": {"x-ticvai-persistence":"inventory.item","allOf":[{"$ref":"#/components/schemas/CreateInventoryItemRequest"},{"type":"object","required":["id","onHand","isActive"],"properties":{"id":{"type":"string","format":"uuid"},"onHand":{"type":"number","description":"Derived from movements. Not directly editable."},"onOrder":{"type":"number"},"inTransit":{"type":"number"},"available":{"type":"number","description":"On-hand minus allocated, where allocated is stock reserved for orders (decided 28 September, audit R171)."},"averageCost":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"lastPurchasePrice":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"isBelowReorderPoint":{"type":"boolean"},"hasMovements":{"type":"boolean","description":"True locks costing method and base unit."},"isActive":{"type":"boolean"}}}]},
 "LocationKind": {"type":"string","enum":["mainStore","subStore","kitchen","bar","retailFloor","cellar","transit"]},
 "MaintenancePlan": {"x-ticvai-persistence":"maintenance.preventive_plan","type":"object","required":["id","name","assetId","taskTemplate"],"properties":{"id":{"type":"string","format":"uuid"},"name":{"type":"string","maxLength":200},"assetId":{"type":"string","format":"uuid"},"assetCategoryId":{"type":"string","format":"uuid","nullable":true,"description":"Applies to every asset in the category rather than one."},"intervalDays":{"type":"integer","nullable":true,"description":"Elapsed-time trigger."},"usageInterval":{"type":"number","nullable":true,"description":"Usage trigger — cycles, hours, kilometres. **Whichever comes first** when both are set. A ride serviced every three months or ten thousand cycles is one plan.\n"},"leadTimeDays":{"type":"integer","default":7,"description":"How far ahead the work order is generated, so parts can be ordered before the job is already late.\n"},"taskTemplate":{"type":"object","required":["title","priority"],"properties":{"title":{"type":"string"},"description":{"type":"string"},"priority":{"$ref":"#/components/schemas/WorkOrderPriority"},"estimatedMinutes":{"type":"integer"},"inspectionTemplateId":{"type":"string","format":"uuid"},"requiredPartIds":{"type":"array","items":{"type":"string","format":"uuid"}}}},"lastCompletedAt":{"type":"string","format":"date-time","nullable":true},"nextDueAt":{"type":"string","format":"date-time","nullable":true},"isActive":{"type":"boolean"}}},
 "MovementKind": {"type":"string","description":"**The kind decides the direction** (decided 28 September, audit R171). In: `receipt`, `transferIn`, `adjustmentIn`, `countGain`, `production` (the finished item entering stock; the ingredients leave as `issue`). Out: `issue`, `saleDepletion`, `waste`, `adjustmentOut`, `transferOut`, `countLoss`, `supplierReturn`. `adjustment` and `countAdjustment` were split into an in and an out kind so that no kind has two directions.\n","enum":["receipt","issue","saleDepletion","waste","adjustmentIn","adjustmentOut","transferOut","transferIn","countGain","countLoss","supplierReturn","production"]},
 "Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}},
-"RequisitionSuggestion": {"x-ticvai-persistence":"none — computed","type":"object","required":["itemId","onHand","reorderPoint","suggestedQuantity"],"properties":{"itemId":{"type":"string","format":"uuid"},"itemName":{"type":"string"},"sku":{"type":"string"},"onHand":{"type":"number"},"reorderPoint":{"type":"number"},"parLevel":{"type":"number"},"suggestedQuantity":{"type":"number"},"averageDailyConsumption":{"type":"number"},"daysOfCoverRemaining":{"type":"number"},"preferredSupplierId":{"type":"string","format":"uuid","nullable":true},"leadTimeDays":{"type":"integer","nullable":true}}},
-"SerialisedItem": {"type":"object","x-ticvai-persistence":"inventory.serialised_item","description":"Retail Board 4 of the client's design set, 20 August. **`StockBatch` was added on 18 August with a lot number, and serialisation to the individual item is a step beyond it.**\nA lot answers *which delivery did this come from*. A serial answers *where is this exact one* — which is what a jewellery counter, a phone, a ticketed collectible or anything with a warranty needs.\n**Most stock is not serialised and should not be.** Turning it on for a 2 AED keyring creates a row per keyring, so it is a per-item decision rather than a policy.\n","required":["id","itemId","serial","status"],"properties":{"id":{"type":"string","format":"uuid"},"itemId":{"type":"string","format":"uuid"},"batchId":{"type":"string","format":"uuid","nullable":true,"description":"The batch it arrived in, where the item is both lotted and serialised."},"serial":{"type":"string","description":"**Unique within the item, not globally.** Two manufacturers reuse serial numbers and a global constraint would refuse the second one.\n"},"locationId":{"type":"string","format":"uuid"},"status":{"type":"string","enum":["inStock","reserved","sold","returned","damaged","lost","inTransit","warranty"]},"soldOnOrderLineId":{"type":"string","format":"uuid","nullable":true,"description":"**The link that makes serialisation worth having.** A warranty claim, a recall and a proof of purchase all start with *which sale was this exact item*.\n"},"warrantyUntil":{"type":"string","format":"date","nullable":true},"receivedAt":{"type":"string","format":"date-time"}}},
+"RentalBooking": {"type":"object","x-ticvai-persistence":"rental.booking","description":"Board 5. **The booking outlives the order** — an order completes at payment and the rental is still out.\n","required":["id","productId","from","to","status"],"properties":{"id":{"type":"string","format":"uuid"},"reference":{"type":"string"},"productId":{"type":"string","format":"uuid"},"locationId":{"type":"string","format":"uuid"},"returnLocationId":{"type":"string","format":"uuid","nullable":true},"customerId":{"type":"string","format":"uuid","nullable":true},"orderId":{"type":"string","format":"uuid","nullable":true},"from":{"type":"string","format":"date-time"},"to":{"type":"string","format":"date-time"},"quantity":{"type":"integer"},"status":{"type":"string","enum":["draft","confirmed","awaitingArrival","checkedOut","overdue","partiallyReturned","completed","completedWithDamage","notReturned","cancelled","noShow"]},"checkedOutAt":{"type":"string","format":"date-time","nullable":true},"dueBackAt":{"type":"string","format":"date-time","nullable":true},"returnedAt":{"type":"string","format":"date-time","nullable":true},"depositAuthorisationId":{"type":"string","format":"uuid","nullable":true,"description":"The card deposit's terminal pre-authorisation, written by `checkOutRental` (workbook Q304; CHG-CSA-029). The hold is kept whole until every unit is back (workbook Q306)."},"accruedLateFee":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"readiness":{"type":"array","readOnly":true,"description":"**Computed, not stored** — agreement, requirements, deposit, equipment.","items":{"type":"object","properties":{"check":{"type":"string"},"satisfied":{"type":"boolean"},"detail":{"type":"string","nullable":true}}}},"participants":{"type":"array","items":{"$ref":"#/components/schemas/RentalParticipant"}},"scopePath":{"type":"string"}}},
+"RentalParticipant": {"type":"object","x-ticvai-persistence":"rental.participant","description":"Board 5.5. **A group rental is one booking with participants**, because the agreement, the deposit and the return are handled together.\n","properties":{"id":{"type":"string","format":"uuid"},"name":{"type":"string"},"isPrimaryRenter":{"type":"boolean","default":false},"dateOfBirth":{"type":"string","format":"date","nullable":true},"idNumber":{"type":"string","nullable":true},"guardianName":{"type":"string","nullable":true},"emergencyContact":{"type":"string","nullable":true},"hasSignedWaiver":{"type":"boolean","readOnly":true},"customFields":{"type":"object","additionalProperties":true}}},
 "SetAssetStatusRequest": {"x-ticvai-persistence":"none — request only","type":"object","required":["status","reason","recordedAt"],"properties":{"status":{"$ref":"#/components/schemas/AssetStatus"},"reason":{"type":"string","minLength":3,"maxLength":1000},"inspectionId":{"type":"string","format":"uuid","nullable":true,"description":"Required for return to service where the asset demands it."},"raiseWorkOrder":{"type":"boolean","default":false},"recordedAt":{"type":"string","format":"date-time"}}},
 "StockLocation": {"x-ticvai-persistence":"inventory.location","type":"object","required":["id","code","name","venueId","kind"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string"},"name":{"type":"string"},"venueId":{"type":"string","format":"uuid"},"kind":{"$ref":"#/components/schemas/LocationKind"},"parentLocationId":{"type":"string","format":"uuid","nullable":true},"isActive":{"type":"boolean"}}},
 "StockMovement": {"x-ticvai-persistence":"inventory.movement","allOf":[{"$ref":"#/components/schemas/CreateStockMovementRequest"},{"type":"object","required":["balanceAfter","principalId","createdAt"],"properties":{"balanceAfter":{"type":"number"},"unitCost":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"totalCost":{"x-ticvai-column":"net_cost_amount","$ref":"../shared/common.yaml#/components/schemas/Money"},"principalId":{"type":"string","format":"uuid"},"sourceType":{"type":"string","nullable":true,"description":"What generated it — an order, a count, a transfer."},"sourceId":{"type":"string","nullable":true},"journalEntryId":{"type":"string","nullable":true},"createdAt":{"type":"string","format":"date-time"}}}]},

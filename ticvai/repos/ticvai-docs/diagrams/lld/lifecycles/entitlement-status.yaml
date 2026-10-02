@@ -83,6 +83,20 @@ transitions:
   trigger: operation
   guard: '**Suspended is a flag, not a state.** A suspended pass is still issued and can be reinstated
     without reissuing'
+pack_status_map:
+  created: 'none yet: the order line is held (orders Order `held`)'
+  pendingFulfillment: 'none yet: paid, not yet issued (deferred seats, DI-423); "Reserved" in DI-670'
+  active: issued
+  partiallyUsed: partiallyConsumed
+  used: fullyConsumed
+  expired: expired
+  suspended: issued, with the suspended flag (suspendEntitlement)
+  blocked: issued, under an active identity lock (access lockIdentity)
+  cancelled: cancelled (cancellationKind null, a cancellation with no other cause)
+  voided: cancelled (cancellationKind voided, voidEntitlement)
+  refunded: cancelled (cancellationKind refunded, createRefund)
+  reissuedSuperseded: cancelled (cancellationKind superseded, a reissue)
+  transferred: surrendered
 notes: "**`expired` and `cancelled` are not interchangeable.** One is time passing and the other is\
   \ a decision, and only the second has money attached.\n\n**`surrendered` exists so a transfer is not\
   \ a void.** Voiding and reissuing produces two records where the truth is one ticket that changed\

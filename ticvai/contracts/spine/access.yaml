@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Access Control
   version: 1.0.0
-  x-ticvai-screen-count: 237
+  x-ticvai-screen-count: 239
   x-ticvai-tier: spine
   x-ticvai-module: 3 — Admission and Access
   x-ticvai-requirements: 201
@@ -224,12 +224,12 @@ paths:
       operationId: listMyEntitlements
       x-ticvai-consumed-by:
         - "P01 WEB-001 Home / Landing"
+        - "P01 WEB-017 My Account Dashboard"
         - "P01 WEB-018 My Tickets"
         - "P02 GST-001 Home"
         - "P02 GST-012 My Tickets"
         - "P02 GST-055 Dynamic QR Ticket"
         - "P04 POS-002 Sell — Ticket Catalogue"
-        - "P01 WEB-017 My Account Dashboard"
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -2041,6 +2041,9 @@ paths:
         format: uuid
     put:
       operationId: setAccessPointDirection
+      x-ticvai-consumed-by:
+        - "P07 SCN-016 Gate mode"
+        - "P08 BO-230 Live Gate Mode & Lane Control"
       x-ticvai-audience:
       - staff
       summary: Switch a gate's direction live
@@ -15487,6 +15490,9 @@ paths:
         format: uuid
     get:
       operationId: getFaceReenrolmentImages
+      x-ticvai-consumed-by:
+        - "P08 BO-190 Face Change, Re-enrollment & Identity Protection"
+        - "P08 BO-248 Biometric & Identity Integrity Monitoring"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: primary

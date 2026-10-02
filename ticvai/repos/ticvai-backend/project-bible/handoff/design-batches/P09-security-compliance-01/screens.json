@@ -3,7 +3,7 @@
   "id": "ADM-031",
   "name": "Security & Compliance Dashboard",
   "module": "Security & Compliance",
-  "requiresModule": "analytics",
+  "requiresModule": "core",
   "wave": 3,
   "capability": "C97",
   "implementation": {
@@ -26,12 +26,15 @@
     {
      "to": "ADM-004",
      "trigger": "Platform Audit Log",
-     "provenance": "flow F106 step 1→2"
+     "provenance": "flow F106 step 1→2",
+     "carries": [
+      "tenantId"
+     ]
     },
     {
      "to": "ADM-001",
      "trigger": "Platform Login / MFA",
-     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId and ADM-031 holds none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and ADM-001 opens on its own"
+     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId, providerId and ADM-031 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and ADM-001 opens on its own"
     },
     {
      "to": "ADM-002",
@@ -47,7 +50,7 @@
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listDashboards` reads the population and `getDashboard` reads one of them — list, select, act",
-  "purpose": "The screen this app sits on. Everything else is entered from here and returns to it.",
+  "purpose": "See a tenant's security and compliance position from the console: second-factor coverage, failed sign-ins, open grants and exports.",
   "layout": {
    "template": "split",
    "regions": [
@@ -58,7 +61,7 @@
       {
        "kind": "selectField",
        "label": "Tenant",
-       "bindsTo": "Tenant",
+       "bindsTo": "Tenant.id",
        "columns": [
         "Tenant.id",
         "Tenant.code",
@@ -82,7 +85,7 @@
         "PlatformStaffGrant.openedAt",
         "PlatformStaffGrant.expiresAt"
        ],
-       "operation": "openPlatformStaffGrant",
+       "operation": "listOwnPlatformStaffGrants",
        "notes": "**Always visible while the screen acts on a tenant** (decided 28 September, audit R098): which tenant, which permissions, why, and the time left to `expiresAt`. At expiry every tenant action is disabled and the screen returns to its grantRequired state; a new need is a new grant. The tenant sees the grant in its own audit log.",
        "provenance": "contract identity.yaml POST /platform-staff-grants"
       },
@@ -237,6 +240,12 @@
     "contract": "reporting",
     "purpose": "Record that a dashboard was opened — fired once when the dashboard renders; nothing on the screen waits for it.",
     "trigger": "background"
+   },
+   {
+    "operationId": "listOwnPlatformStaffGrants",
+    "contract": "identity",
+    "purpose": "Find a grant into the picked tenant already open, after a reload (audit R098; CHG-SBO-001)",
+    "trigger": "onAction"
    }
   ],
   "entryState": {
@@ -244,6 +253,11 @@
     {
      "name": "dashboardId",
      "from": "deepLink"
+    },
+    {
+     "name": "tenantId",
+     "from": "navigation",
+     "optional": true
     }
    ],
    "coldEntry": "**A platform-admin link resolves against the tenant in the link and refuses if the operator does not hold that tenant.** A link is not authorisation. If the target is gone the screen says so and returns to the directory — **an admin console that silently shows the wrong tenant is worse than one that shows nothing.** Arrives with `dashboardId`.",
@@ -357,7 +371,7 @@
   "id": "ADM-032",
   "name": "WAF & Security Policy View",
   "module": "Security & Compliance",
-  "requiresModule": "membership",
+  "requiresModule": "core",
   "wave": 3,
   "capability": "C96",
   "implementation": {
@@ -380,7 +394,7 @@
     {
      "to": "ADM-001",
      "trigger": "Platform Login / MFA",
-     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId and ADM-032 holds none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and ADM-001 opens on its own"
+     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId, providerId and ADM-032 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and ADM-001 opens on its own"
     },
     {
      "to": "ADM-002",
@@ -393,18 +407,18 @@
      "carries": [
       "cellId"
      ],
-     "provenance": "derived — ADM-003 declares entryState.params cellId, rightId and ADM-032 holds cellId, so an edge into it carries them"
+     "provenance": "derived — ADM-003 declares entryState.params cellId and ADM-032 holds cellId, so an edge into it carries them"
     }
    ]
   },
-  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement.",
+  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement.\n\nAn editor of the firewall policy (`setWafPolicy`) with the rules in force; the name says View and the screen edits (design-note correction).",
   "openQuestions": [
    "No contract — infrastructure"
   ],
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listCellJobs` reads the population and `getCellHealth` reads one of them — list, select, act",
-  "purpose": "See waf & security policy view for this venue.",
+  "purpose": "See the firewall rules in force and change the WAF policy.",
   "layout": {
    "template": "split",
    "regions": [
@@ -414,27 +428,9 @@
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every cell job",
-       "bindsTo": "CellJob",
-       "columns": [
-        "CellJob.id",
-        "CellJob.kind",
-        "CellJob.status",
-        "CellJob.progressPercent",
-        "CellJob.message",
-        "CellJob.error",
-        "CellJob.scheduledFor",
-        "CellJob.completedAt"
-       ],
-       "operation": "listCellJobs",
-       "provenance": "contract subscription.yaml GET /cells/{cellId}/jobs"
-      },
-      {
-       "kind": "dataTable",
        "label": "Every waf rule",
        "bindsTo": "WafRule",
        "columns": [
-        "WafRule.id",
         "WafRule.name",
         "WafRule.action",
         "WafRule.matchOn",
@@ -450,105 +446,12 @@
     {
      "name": "contextPanel",
      "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected cell job",
-       "bindsTo": "CellJob",
-       "columns": [
-        "CellJob.id",
-        "CellJob.kind",
-        "CellJob.status",
-        "CellJob.progressPercent",
-        "CellJob.message",
-        "CellJob.error",
-        "CellJob.scheduledFor",
-        "CellJob.completedAt"
-       ],
-       "operation": "listCellJobs",
-       "provenance": "contract subscription.yaml GET /cells/{cellId}/jobs"
-      },
-      {
-       "kind": "detailPanel",
-       "label": "The cell",
-       "bindsTo": "CellDetail",
-       "columns": [
-        "CellDetail.id",
-        "CellDetail.name",
-        "CellDetail.kind",
-        "CellDetail.clusterId",
-        "CellDetail.isReachable",
-        "CellDetail.lastContactAt",
-        "CellDetail.licenceExpiresAt",
-        "CellDetail.participatesInCrossCell",
-        "CellDetail.regionId",
-        "CellDetail.regionName",
-        "CellDetail.countryCode",
-        "CellDetail.tier",
-        "CellDetail.status",
-        "CellDetail.cloudProvider",
-        "CellDetail.cloudRegion",
-        "CellDetail.apiEndpoint"
-       ],
-       "operation": "getCell",
-       "provenance": "contract subscription.yaml GET /cells/{cellId}"
-      },
-      {
-       "kind": "detailPanel",
-       "label": "The cell capacity",
-       "bindsTo": "CellCapacity",
-       "columns": [
-        "CellCapacity.kind",
-        "CellCapacity.tenantCount",
-        "CellCapacity.isConstrained",
-        "CellCapacity.constrainedDimension",
-        "CellCapacity.dimensions",
-        "CellCapacity.forecastBreachAt",
-        "CellCapacity.measuredAt"
-       ],
-       "operation": "getCellCapacity",
-       "provenance": "contract subscription.yaml GET /cells/{cellId}/capacity"
-      },
-      {
-       "kind": "detailPanel",
-       "label": "The cell health",
-       "bindsTo": "CellHealth",
-       "columns": [
-        "CellHealth.isHealthy",
-        "CellHealth.isSchemaBehind",
-        "CellHealth.databaseStatus",
-        "CellHealth.replicationLagSeconds",
-        "CellHealth.lastBackupAt",
-        "CellHealth.lastRestoreDrillAt",
-        "CellHealth.checkedAt"
-       ],
-       "operation": "getCellHealth",
-       "provenance": "contract subscription.yaml GET /cells/{cellId}/health"
-      }
-     ]
+     "components": []
     },
     {
      "name": "actionBar",
      "slot": "rowActions",
      "components": [
-      {
-       "kind": "destructiveButton",
-       "label": "Cancel decommission",
-       "operation": "cancelDecommission",
-       "provenance": "contract subscription.yaml POST /cells/{cellId}/cancel-decommission"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Decommission cell",
-       "operation": "decommissionCell",
-       "provenance": "contract subscription.yaml POST /cells/{cellId}/decommission"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Save cell tier",
-       "operation": "updateCellTier",
-       "provenance": "contract subscription.yaml PATCH /cells/{cellId}"
-      },
       {
        "kind": "secondaryButton",
        "label": "Save waf policy",
@@ -561,52 +464,10 @@
   },
   "overlays": [
    {
-    "id": "confirmCancelDecommission",
-    "component": "confirmDialog",
-    "trigger": "Cancel decommission",
-    "body": "**Names what `cancelDecommission` changes and what it leaves alone**, in the consequence rather than the verb. A waf security policy this affects should be identified in the dialog, not just counted. **Collects what `cancelDecommission` sends before it is called.** Required: `reason`.",
-    "provenance": "contract subscription.yaml POST /cells/{cellId}/cancel-decommission"
-   },
-   {
-    "id": "formDecommissionCell",
-    "component": "modal",
-    "trigger": "Decommission cell",
-    "body": "**Collects what `decommissionCell` sends before it is called.** Required: `reason`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Decommission cell",
-     "operation": "decommissionCell"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "reason"
-     ]
-    },
-    "provenance": "contract subscription.yaml POST /cells/{cellId}/decommission"
-   },
-   {
-    "id": "formUpdateCellTier",
-    "component": "modal",
-    "trigger": "Save cell tier",
-    "body": "**Collects what `updateCellTier` sends before it is called.** Required: `tier`. Optional: `scheduledFor`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Save cell tier",
-     "operation": "updateCellTier"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "tier",
-      "scheduledFor"
-     ]
-    },
-    "provenance": "contract subscription.yaml PATCH /cells/{cellId}"
-   },
-   {
     "id": "formSetWafPolicy",
     "component": "modal",
     "trigger": "Save waf policy",
-    "body": "**Collects what `setWafPolicy` sends before it is called.** Required: `id`. Optional: `name`, `action`, `matchOn`, `pattern`, `enabled`, `hitCount24h`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setWafPolicy` sends before it is called.** Nothing in the body is required. Optional: `name`, `action`, `matchOn`, `pattern`, `enabled`, `hitCount24h`. **Not asked:** `id` is a client UUIDv7 generated silently (design-note correction, 2 October 2026). Dismissing sends nothing; the screen behind is unchanged.",
     "bindsTo": "WafRule",
     "confirm": {
      "label": "Save waf policy",
@@ -615,7 +476,6 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "id",
       "name",
       "action",
       "matchOn",
@@ -636,57 +496,6 @@
   },
   "apis": [
    {
-    "operationId": "getCellHealth",
-    "contract": "subscription",
-    "purpose": "Cell health and schema version",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "cancelDecommission",
-    "contract": "subscription",
-    "purpose": "Halt a decommission",
-    "trigger": "onAction",
-    "invalidates": [
-     "listCellJobs"
-    ]
-   },
-   {
-    "operationId": "decommissionCell",
-    "contract": "subscription",
-    "purpose": "Begin decommissioning a cell",
-    "trigger": "onAction",
-    "invalidates": [
-     "listCellJobs"
-    ]
-   },
-   {
-    "operationId": "getCell",
-    "contract": "subscription",
-    "purpose": "Read a cell",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "getCellCapacity",
-    "contract": "subscription",
-    "purpose": "Load against headroom",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "listCellJobs",
-    "contract": "subscription",
-    "purpose": "Provisioning, migration and maintenance jobs",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "updateCellTier",
-    "contract": "subscription",
-    "purpose": "Change a cell's tier",
-    "trigger": "onAction",
-    "invalidates": [
-     "listCellJobs"
-    ]
-   },
-   {
     "operationId": "listWafRules",
     "contract": "platform-ops",
     "purpose": "Firewall rules in force",
@@ -696,10 +505,7 @@
     "operationId": "setWafPolicy",
     "contract": "platform-ops",
     "purpose": "Change the firewall policy",
-    "trigger": "onAction",
-    "invalidates": [
-     "listCellJobs"
-    ]
+    "trigger": "onAction"
    }
   ],
   "entryState": {
@@ -724,6 +530,51 @@
    "board": "wireframes/P09 TICVAI Web.dc.html#adm-032"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "gaps": [
+   {
+    "operation": "cancelDecommission",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-021): Copied cell actions (decommission, tier) on the WAF policy screen; decommission stays on ADM-003 only (design-notes corrections platform-foundation ADM-032, ADM-013).",
+    "source": "screens/P09-platform-admin-console.yaml#ADM-032"
+   },
+   {
+    "operation": "decommissionCell",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-021): Copied cell actions (decommission, tier) on the WAF policy screen; decommission stays on ADM-003 only (design-notes corrections platform-foundation ADM-032, ADM-013).",
+    "source": "screens/P09-platform-admin-console.yaml#ADM-032"
+   },
+   {
+    "operation": "updateCellTier",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-021): Copied cell actions (decommission, tier) on the WAF policy screen; decommission stays on ADM-003 only (design-notes corrections platform-foundation ADM-032, ADM-013).",
+    "source": "screens/P09-platform-admin-console.yaml#ADM-032"
+   },
+   {
+    "operation": "listCellJobs",
+    "removed": true,
+    "why": "Copied cell operations are not part of this screen (design-note correction platform-foundation ADM-032, CHG-SBO-015).",
+    "source": "screens/P09-platform-admin-console.yaml#ADM-012"
+   },
+   {
+    "operation": "getCell",
+    "removed": true,
+    "why": "Copied cell operations are not part of this screen (design-note correction platform-foundation ADM-032, CHG-SBO-015).",
+    "source": "screens/P09-platform-admin-console.yaml#ADM-012"
+   },
+   {
+    "operation": "getCellCapacity",
+    "removed": true,
+    "why": "Copied cell operations are not part of this screen (design-note correction platform-foundation ADM-032, CHG-SBO-015).",
+    "source": "screens/P09-platform-admin-console.yaml#ADM-012"
+   },
+   {
+    "operation": "getCellHealth",
+    "removed": true,
+    "why": "Copied cell operations are not part of this screen (design-note correction platform-foundation ADM-032, CHG-SBO-015).",
+    "source": "screens/P09-platform-admin-console.yaml#ADM-012"
+   }
+  ],
+  "purposeNote": "Purpose rewritten 2 October 2026 (CHG-WIR-023): The purpose was the generator template (\"See waf & security policy view for this venue\").",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",

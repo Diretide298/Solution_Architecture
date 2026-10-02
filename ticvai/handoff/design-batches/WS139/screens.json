@@ -120,6 +120,13 @@
        "derived": true,
        "impliedBy": "listJourneys",
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Journey performance",
+       "bindsTo": "JourneyPerformance",
+       "operation": "getJourneyPerformance",
+       "provenance": "contract marketing-crm.yaml GET /journeys/{journeyId}/performance; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -139,6 +146,13 @@
     "purpose": "Journeys running",
     "trigger": "onLoad",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "getJourneyPerformance",
+    "contract": "marketing-crm",
+    "purpose": "Goal rate and errors for the selected journey",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-005)"
    }
   ],
   "wireframe": {
@@ -147,6 +161,14 @@
    "workshopBoard": "wireframes/WS74 Marketing CRM Configuration Reference v1.0 Board 5.dc.html#bo-774"
   },
   "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 26. 0 of 0 labels bound to a contract property; 0 of 10 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "journeyId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -495,6 +517,11 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 27"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-007): No operation simulates a marketing journey.",
+    "source": "contracts/satellite/marketing-crm.yaml#createJourney"
    }
   ],
   "layout": {
@@ -516,6 +543,12 @@
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
        "impliedBy": "createJourney"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Journeys",
+       "operation": "listJourneys",
+       "provenance": "contract marketing-crm.yaml GET /journeys; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -535,6 +568,13 @@
     "purpose": "Decision logic and timing",
     "trigger": "onAction",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "listJourneys",
+    "contract": "marketing-crm",
+    "purpose": "The journeys to open and branch",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-005)"
    }
   ],
   "wireframe": {
@@ -543,6 +583,7 @@
    "workshopBoard": "wireframes/WS74 Marketing CRM Configuration Reference v1.0 Board 5.dc.html#bo-777"
   },
   "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 27. 0 of 0 labels bound to a contract property; 0 of 10 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {},
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1240,6 +1281,13 @@
        "derived": true,
        "impliedBy": "listJourneys",
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Journey analytics",
+       "bindsTo": "JourneyPerformance",
+       "operation": "getJourneyPerformance",
+       "provenance": "contract marketing-crm.yaml GET /journeys/{journeyId}/performance; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -1258,6 +1306,13 @@
     "contract": "marketing-crm",
     "purpose": "Automated journeys",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "getJourneyPerformance",
+    "contract": "marketing-crm",
+    "purpose": "Node analytics for the selected journey",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-005)"
    }
   ],
   "wireframe": {
@@ -1266,6 +1321,14 @@
    "workshopBoard": "wireframes/WS74 Marketing CRM Configuration Reference v1.0 Board 5.dc.html#bo-783"
   },
   "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 28. 0 of 0 labels bound to a contract property; 0 of 26 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "journeyId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",

@@ -1,43 +1,4 @@
 {
- "getOfflinePackage": {
-  "method": "GET",
-  "path": "/access/offline-package",
-  "contract": "access",
-  "summary": "Entitlement and rule set for offline validation",
-  "permission": "ACCESS_VALIDATE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "workstation",
-  "parameters": [
-   {
-    "name": "sinceVersion",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": "validFrom",
-    "in": "query",
-    "required": true
-   },
-   {
-    "name": "validTo",
-    "in": "query",
-    "required": true
-   },
-   {
-    "name": "If-None-Match",
-    "in": "header",
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "OfflinePackage"
- },
  "listConnectivityFailureDegraded": {
   "method": "GET",
   "path": "/connectivity-failure-degraded",
@@ -215,25 +176,6 @@
   "requestBody": "HardwareDeploymentInput",
   "responds": "HardwareDeploymentView"
  },
- "setConnectivityThresholds": {
-  "method": "PUT",
-  "path": "/connectivity-policy",
-  "contract": "tenancy",
-  "summary": "When a workstation decides it is offline, and when it is back",
-  "permission": "TENANT_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "ConnectivityPolicy",
-  "responds": "ConnectivityPolicy"
- },
  "setEdgeNodeLocal": {
   "method": "PUT",
   "path": "/edge-node-local",
@@ -271,25 +213,6 @@
   ],
   "requestBody": "AccessOfflinePolicy",
   "responds": "AccessOfflinePolicy"
- },
- "setOfflinePolicy": {
-  "method": "PUT",
-  "path": "/offline-policy",
-  "contract": "tenancy",
-  "summary": "What a workstation may do with no network, and for how long",
-  "permission": "TENANT_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "OfflinePolicy",
-  "responds": "OfflinePolicy"
  },
  "simulateOfflineResilienceTesting": {
   "method": "PUT",

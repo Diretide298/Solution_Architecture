@@ -19,20 +19,34 @@
    "inferred": true,
    "exitTo": [
     "GST-001",
-    "GST-062"
+    "GST-024",
+    "GST-041"
    ],
    "transitions": [
     {
      "to": "GST-001",
      "trigger": "Home – Default",
      "provenance": "derived — GST-001 declares entryState.params  and GST-061 holds none of them. The edge carries nothing: GST-061 is opened from GST-001, so this edge is the way back and GST-001 keeps its own state"
+    },
+    {
+     "to": "GST-024",
+     "trigger": "Back to the menu",
+     "provenance": "corrected 2 October 2026 (CHG-SGU-018, design-notes correction)",
+     "carries": [
+      "outletId"
+     ]
+    },
+    {
+     "to": "GST-041",
+     "trigger": "Add and view the basket",
+     "provenance": "corrected 2 October 2026 (CHG-SGU-018, design-notes correction)"
     }
    ]
   },
   "notes": "P02-019.1 in the client hierarchy. Absent from my page inventory until 14 August. **Cross-surface parity, 31 August**: added listModifierGroups. **The same screen on web and app was calling different operations** — one side could do something the other could not, and nothing recorded the difference as deliberate.\n\n**Rev 3 (decided 29 September).** Modifier side panel drawn (REV3-9, no api change); the *F&B add-ons & modifiers* toggle is dropped.",
   "density": "comfortable",
   "pattern": "listDetail",
-  "patternReason": "`listModifierGroups` reads the population and `getGuestMenu` reads one of them — list, select, act",
+  "patternReason": "One dish from the outlet's guest menu, with its modifiers and allergens (CHG-SGU-018)",
   "purpose": "Decide on a dish, choose modifiers, check allergens.",
   "layout": {
    "template": "split",
@@ -41,22 +55,6 @@
      "name": "contentBody",
      "slot": "collection",
      "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every modifier group",
-       "bindsTo": "ModifierGroup",
-       "columns": [
-        "ModifierGroup.id",
-        "ModifierGroup.code",
-        "ModifierGroup.name",
-        "ModifierGroup.minSelections",
-        "ModifierGroup.maxSelections",
-        "ModifierGroup.options",
-        "ModifierGroup.scopePath"
-       ],
-       "operation": "listModifierGroups",
-       "provenance": "contract fnb.yaml GET /modifier-groups"
-      },
       {
        "kind": "selectField",
        "label": "Modifiers",
@@ -76,23 +74,7 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected modifier group",
-       "bindsTo": "ModifierGroup",
-       "columns": [
-        "ModifierGroup.id",
-        "ModifierGroup.code",
-        "ModifierGroup.name",
-        "ModifierGroup.minSelections",
-        "ModifierGroup.maxSelections",
-        "ModifierGroup.options",
-        "ModifierGroup.scopePath"
-       ],
-       "operation": "listModifierGroups",
-       "provenance": "contract fnb.yaml GET /modifier-groups"
-      },
-      {
-       "kind": "detailPanel",
-       "label": "The guest menu",
+       "label": "The dish",
        "bindsTo": "GuestMenu",
        "columns": [
         "GuestMenu.outletId",
@@ -104,7 +86,8 @@
         "GuestMenu.sections"
        ],
        "operation": "getGuestMenu",
-       "provenance": "contract fnb.yaml GET /outlets/{outletId}/guest-menu"
+       "provenance": "corrected 2 October 2026 (CHG-SGU-018, design-notes correction)",
+       "notes": "The dish `menuItemId` resolved inside the outlet's `getGuestMenu`: photo, name, description, price, its modifier groups (min and max per group) and allergens. Until the guest menu carries the Allergen object, \"Contains\" is drawn from the current list and \"May contain\" and the diet badges (vegetarian, vegan, halal) are drawn as pending (CHG-SGU-024)."
       }
      ]
     }
@@ -114,8 +97,7 @@
    "loading": "Item skeleton",
    "error": "Item unavailable, with a route back to the menu",
    "emptyFirstRun": "Not applicable",
-   "emptyNoResults": "Never shown: `listModifierGroups` takes no filter, so an empty list is always the first-run state above.",
-   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listModifierGroups` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "Never shown: a menu is public and browsing a dish needs no sign-in.",
    "offline": "**The offline banner shows.** The dish already loaded stays, with a note that it may be out of date and its allergens in full. Ordering is refused — availability changes by the minute."
   },
   "apis": [
@@ -124,18 +106,16 @@
     "contract": "fnb",
     "purpose": "Item, modifiers and allergens",
     "trigger": "onLoad"
-   },
-   {
-    "operationId": "listModifierGroups",
-    "contract": "fnb",
-    "purpose": "List modifier groups",
-    "trigger": "onLoad"
    }
   ],
   "entryState": {
    "params": [
     {
      "name": "outletId",
+     "from": "deepLink"
+    },
+    {
+     "name": "menuItemId",
      "from": "deepLink"
     }
    ],
@@ -220,7 +200,7 @@
   "name": "Shop & Drop Collection",
   "module": "In-Venue Experience",
   "requiresModule": "retail",
-  "wave": 3,
+  "wave": 2,
   "capability": "C21",
   "implementation": {
    "app": "guest-app",
@@ -234,8 +214,7 @@
    ],
    "inferred": true,
    "exitTo": [
-    "GST-001",
-    "GST-061"
+    "GST-001"
    ],
    "transitions": [
     {
@@ -244,32 +223,23 @@
      "provenance": "derived — GST-001 declares entryState.params  and GST-062 holds none of them. The edge carries nothing: GST-062 is opened from GST-001, so this edge is the way back and GST-001 keeps its own state"
     },
     {
-     "to": "GST-061",
-     "trigger": "Menu Item Detail",
-     "provenance": "derived — GST-061 declares entryState.params outletId and GST-062 holds none of them. The edge carries nothing: outletId only pre-selects (deep link or optional), and GST-061 opens on its own"
-    },
-    {
-     "to": "KSK-017",
-     "trigger": "Or they collect from a kiosk",
-     "provenance": "flow F51 step 3→4",
+     "to": "POS-012",
+     "trigger": "Collected on the way out, at the exit desk",
+     "provenance": "flow F17 step 4→5, F51 step 3→4",
      "operation": "lookupShopAndDrop",
      "crossesDevice": true,
-     "back": false
+     "back": false,
+     "carries": [
+      "orderId"
+     ]
     }
    ]
   },
   "notes": "4.4.7. Claimed by the entitlement the guest is already carrying, not a paper slip.",
   "density": "comfortable",
-  "pattern": "configEditor",
-  "patternReason": "the screen declares only writes (`lookupShopAndDrop`) and no read of a population — it is settings, not a list",
+  "pattern": "statusTracker",
+  "patternReason": "A status list of every shop-and-drop waiting for the guest, read by `lookupShopAndDrop` (a GET with query identifiers, so no request body) (CHG-SGU-018)",
   "purpose": "Collect shopping left earlier, using the ticket rather than a receipt.",
-  "gaps": [
-   {
-    "operation": "lookupShopAndDrop",
-    "why": "**`lookupShopAndDrop` declares no request body shape**, so nothing says what this editor edits. The fields cannot be derived and the screen needs the contract before it needs a designer.",
-    "source": "contract retail.yaml GET /shop-and-drop/lookup"
-   }
-  ],
   "layout": {
    "template": "form",
    "regions": [
@@ -278,10 +248,11 @@
      "slot": "publish",
      "components": [
       {
-       "kind": "primaryButton",
-       "label": "Lookup shop and drop",
+       "kind": "cardList",
+       "label": "Waiting for you",
        "operation": "lookupShopAndDrop",
-       "provenance": "contract retail.yaml GET /shop-and-drop/lookup"
+       "provenance": "contract retail.yaml GET /shop-and-drop/lookup",
+       "notes": "Each drop with its collection point, collect-by time and a code large enough to show at the desk; claimed by the ticket the guest carries."
       }
      ]
     },
@@ -299,10 +270,10 @@
    ]
   },
   "states": {
-   "loading": "The saved shop drop collection.",
+   "loading": "Finding what is waiting for you.",
    "error": "Could not load. Names which read failed and leaves the shop drop collection untouched.",
-   "emptyFirstRun": "No shop drop collection configured. The form opens empty and `lookupShopAndDrop` saves the first one; it says what the platform does in the meantime.",
-   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `lookupShopAndDrop` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "Nothing waiting: no shop-and-drop for this guest.",
+   "emptyNoAccess": "**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows, and lookup cannot run.** A drop reference already on screen stays visible so the guest can quote it at the collection point. Reserving merchandise needs the connection."
   },
   "apis": [
@@ -310,7 +281,7 @@
     "operationId": "lookupShopAndDrop",
     "contract": "retail",
     "purpose": "Find a guest's dropped goods",
-    "trigger": "onAction"
+    "trigger": "onLoad"
    }
   ],
   "wireframe": {

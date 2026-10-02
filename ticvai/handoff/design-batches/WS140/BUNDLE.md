@@ -1,6 +1,6 @@
 # WS140 — Marketing CRM Configuration Reference v1.0 board 6
 
-**10 screens · 16 operations · 16 schemas · 6 permissions**
+**10 screens · 13 operations · 12 schemas · 6 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -61,6 +61,65 @@ convincingly. It is never a caption.
   and its error; and, element by element, what is shown and in what format, what each action
   produces and where the user goes next. Draw exactly that.
 
+## The processes these screens belong to
+
+Written by the owner of each process (`handoff/design-notes/`). Read before any screen: it says how the process runs end to end and which words the screens must use.
+
+### Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers)
+
+Customer & marketing is how a venue knows its guests and talks to them. There is ONE guest profile per person across ticketing, F&B and retail, so a guest who books online and later dines is the same profile (DI-339). A profile needs at least an email or a mobile, never neither (DI-372). Profiles are created by registration, by guest checkout, or by staff at a till or desk. Repeat guest checkouts with the same verified email or phone attach to the same profile automatically (DI-941, R120 default). Two records that might be the same person are NEVER merged automatically: the guest is asked to confirm, and an admin review queue runs alongside (DI-377). Each candidate shows why it matched; the record that loses is superseded, not deleted; consent takes the narrower of the two positions (DI-808). Around the profile sit three things that must never be confused. CONSENT is what the law allows: per purpose and per channel, append-only, with the notice version and the source (recordConsent). It is Given, Withdrawn or Not asked. A SUBSCRIPTION is what the guest asked to receive, e.g. a newsletter list (MarketingSubscription). A PREFERENCE is what they like: table, dietary, accessibility (updateGuestPreferences). An anonymous visitor's cookie decision is recorded against a device key (recordDeviceConsent) and attaches to the guest when they sign in (claimDeviceConsent). Marketing consent at GUEST CHECKOUT is an open client question, and the design follows its default: an unticked opt-in beside the terms, one per channel and purpose. It is recorded with source "checkout" against the order and the verified contact, and nothing is sent without it. Whether that is sufficient consent under PDPL is the client DPO's call (M18-15 (audit R-M18-15), DI-954, DI-940). Marketing reads profiles through SEGMENTS (rules, evaluated when used) and static LISTS (imported). It reaches guests by CAMPAIGNS (one send to an audience) and JOURNEYS (automations started by an event, with waits and branches). Journeys may offer only pre-configured offers, never a free-typed discount (MoM 2026-08-20 4.6). Everything goes through ONE communications module that every other module uses (MoM 2026-08-31 4.6). Consent and suppression are applied at send time, and the number excluded, with the reasons, is reported before anything goes out (launchCampaign). Transactional messages (tickets, receipts, queue calls, case replies) do not need marketing consent and must never carry marketing. LOYALTY pays for spend: points, tiers, rewards and expiry. GAMIFICATION pays for behaviour: challenges, badges, streaks, referrals and leaderboards (createChallenge). A guest reads their own loyalty position (getLoyaltyPosition). A till, the back office or support reads a named guest's (getGuestLoyalty, or identifyGuest at a till). SERVICE: one Case object covers lost property, complaints, questions, accessibility and refund requests (CaseKind). A guest raises one with raiseMyCase, which needs the connection …
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Guest | The person the venue serves, signed in or not. In body copy on every surface. | Customer, User, Subject, Contact, Patron | contracts/satellite/marketing-crm.yaml#/components/schemas/GuestProfile |
+| Guest profile | The CRM record of one person (details, consent, preferences, history). Distinct from the Account, which is how a guest signs in. | Customer record, Contact, Subject | contracts/satellite/marketing-crm.yaml#getGuestProfile |
+| Consent - Given / Withdrawn / Not asked | What the law allows, per purpose (marketing, personalisation, profiling, third-party sharing, AI processing, transactional) and per channel. "Not asked" is not "Withdrawn" and must look different. | Opted in/out as a status, Accepted, Declined, Revoked, Unsubscribed (that is a subscription) | contracts/satellite/marketing-crm.yaml#/components/schemas/ConsentDecision |
+| Subscription | A list the guest asked to receive (a newsletter, event news), per channel. Unsubscribing from a list is not withdrawing consent. | Consent, Opt-in | contracts/satellite/marketing-crm.yaml#/components/schemas/MarketingSubscription |
+| Preferences | What the guest likes or needs (seating, drinks, dietary, accessibility, contact channel). Never grants permission. | Consents, Settings | contracts/satellite/marketing-crm.yaml#updateGuestPreferences |
+| Send me offers and news | The marketing opt-in label beside the terms at checkout, unticked, one per channel and purpose. | I agree to marketing, Pre-ticked boxes, Keep me updated ticked by default | DI-954 |
+| Points / Tier / Points to next tier / Expiring points | The loyalty position. Points are a liability earned per programme; tiers are ranked (Bronze, Silver, Gold, Platinum in the meetings). | Credits, Coins, Balance alone (wallet money is "credit"), Level | DI-382 |
+| Pending points | Points earned on a purchase still inside its refund window; shown apart from spendable points. | Available points for pending ones | contracts/satellite/marketing-crm.yaml#getLoyaltyPosition |
+| Reward | What points can be turned into (rewards catalogue). | Prize (games redemption uses prize), Voucher unless it is one | contracts/satellite/marketing-crm.yaml#listRewards |
+| Challenge / Badge / Streak / Referral | Gamification - rewards for behaviour, not spend. Status badges such as Explorer, Adventurer, Legend. | Mission and Quest used interchangeably on one screen, Loyalty tier for a badge | DI-392 |
+| Case | One service record - lost property, complaint, question, accessibility, refund request or other - with a number (venue prefix plus sequence), a status and an SLA. | Ticket (a ticket is an admission product), Issue, Incident (that is maintenance and safety) | contracts/satellite/marketing-crm.yaml#/components/schemas/CaseKind |
+| Reply to guest / Internal note | The two kinds of case message. The agent always chooses one explicitly; there is no default. | Comment, Message (ambiguous) | F05 step 2 |
+| Conversation | A live chat session (web chat, in-app, WhatsApp, SMS, email, kiosk, voice). With the assistant, then queued, then with an agent. It is not a case. | Ticket, Case (until one is raised from it) | contracts/satellite/marketing-crm.yaml#/components/schemas/ConversationState |
+| Segment / List / Audience | A segment is rules evaluated when used. A list is static, imported or hand-picked. The audience is what a campaign or journey targets. | Group, Cohort, Target list for a segment | DI-381 |
+| Campaign / Journey | A campaign is one send (one-off, scheduled, triggered or recurring) to an audience. A journey is an automation started by an event, with steps, waits and branches. | Flow (booking flows use it), Automation for a one-off send, Blast | R146 |
+| Offer | A pre-configured, system-validated discount or benefit that a campaign or journey references. It is never typed into the builder. | Discount field, Coupon (unless the offer is a coupon code) | MoM 2026-08-20 4.6 |
+| Reachable | How many guests in an audience can actually be sent to on a channel after consent and suppression. Always shown beside the matching count. | Audience size alone | contracts/satellite/marketing-crm.yaml#previewSegment |
+| Possible duplicate / Merge | Two profiles that may be one person. Never called "Duplicate" as a verdict. Merging needs confirmation and stays reversible for 30 days. | Duplicate (as a status), Combine, Auto-merge | DI-808 |
+| Data request | A guest's privacy request - a copy of my data, a correction, erasure, a restriction - with a legal clock. Statuses submitted, in progress, completed. | DSAR on guest screens, Subject data, Ticket | DI-379 |
+| Waiver / Consent question | A waiver is a signed, versioned form. A consent question ("Are you able to swim?", "I accept the risk") is a single question asked per person or per booking and recorded as consent. | Contract, Disclaimer, Form for a waiver in guest copy | DI-1062 |
+| Lost item / Found item / Possible match | The two directions of lost property and the suggested pairing between them. | Lost case, Claim before it is claimed | contracts/satellite/marketing-crm.yaml#/components/schemas/LostItem |
+| Wishlist | Products and dates a guest saved to buy later, including F&B and retail to buy on site. | Favourites (used for transport routes), Saved for later on one surface and Wishlist on another | DI-202 |
+| Notification / Message | A notification is an item in the guest's in-app feed. A message is one send on a channel (email, SMS, WhatsApp, push, in-app). | Alert for marketing content, Inbox for the guest feed | contracts/satellite/marketing-crm.yaml#/components/schemas/GuestNotification |
+| Template | A reusable message body per channel and language with merge fields. Transactional and marketing templates are separate kinds. | Layout, Design | contracts/satellite/marketing-crm.yaml#createMessageTemplate |
+
+### AI & Intelligence
+
+AI in TICVAI is one governed engine behind many screens. The guest meets it as Sahli, the concierge (WEB-044, GST-031, GST-033), as the planner agent that refines a rules-built day plan by chat (GST-054), and as upsell and cross-sell offers on a separate Extras step (WEB-008, GST-048). Staff meet it as the Staff App's AI tab (EMP-019/020, knowledge EMP-040/041), the kiosk assistant (KSK-015) and the support copilot (SUP-006, SUP-018). Venue managers meet it in Venue Management (BO-091 policy and spend, BO-919/BO-925..932 resource and staffing forecasts, BO-597/598 configuration drafts, BO-772/782 marketing optimisation, BO-793 translations, BO-970/975 seat-map generation, BO-1048 seat upsell, BO-1160 fraud cases) and in Analytics (ANL-010 suggestions, ANL-019 management insights, ANL-055 anomalies, ANL-057 forecasting studio, ANL-059 insight history, ANL-060 governance, ANL-071 AI maturity). The governance, configuration-assistant, forecasting, oversight, audit and monitoring boards sit on the TICVAI Console (P09: ADM-037 providers, ADM-469..498 configuration assistant, ADM-499..518 forecasting, ADM-519..558 governance, ADM-633/637 fraud, ADM-680..697 recommendation governance). Five rules hold on every one of these screens. (1) Baseline first, then it learns per tenant: every data-driven answer (forecast, suggestion, risk score, recommendation) exists from day one, from the venue AI profile, a starting pattern for the venue type, the UAE calendar and the weather, and shifts to the venue's own data as it trades; nothing says "comes later" or refuses for lack of history - a refusal only names a missing setting. (2) Every answer shows its basis and maturity: a "Based on" line, a stage badge (Starting, Learning, Established, Trained on your data), "Limited historical data" while the starting pattern carries more than half the weight, ranges or bands rather than a bare percentage, a confidence only where the producer really has one, a plain-words explanation always. (3) A trained model replaces the baseline only when it beats it in a shadow run of at least six weeks and an admin promotes it; the platform raises "Ready to promote" and never switches by itself. (4) The LLM never reads raw data: numbers come only from query results the platform runs (the answer shows the query), only the masked prompt and retrieved context leave the platform, and AI only drafts - the owning screen applies. (5) One autonomy scale, L0 Disabled to L4 Controlled auto, with first-release ceilings, separate from user permission and from the approval tier; impactful actions route to a person, who sees current against proposed, impact, risk and what is affected, and can approve within a limit, challenge, override or roll back; every decision is traceable (data, model, approver, time) and searchable by customer, venue and capability. In Block A (5 October to 20 November 2026) the guest concierge with retrieval, Help me choose, translations, the planner agent, the gateway and …
+*(source: ADR-0051; ADR-0050; ADR-0020; ADR-0052; ADR-0053; ADR-0054; ADR-0059; ADR-0051 (AI-D01..AI-D20); ADR-0051 (AI functions review 30 Sep §2 §4 §9); MoM 18 Sep 4.1-4.10; MoM 21 Sep 4.1-4.14; MoM 30 Sep 4.1 4.7; ADR-0059 (Block A slice: tasks.csv))*
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Sahli | The guest concierge's name; the entry reads "Ask Sahli" and shows as mascot art when the venue's Concierge mascot setting is on (default), otherwise a plain button. | Chatbot, Bot, AI Concierge (as a visible label), Virtual agent | DI-1069 / screens/P01-guest-web-storefront.yaml#WEB-044 |
+| Based on | The line on every AI answer that says what it was computed from, e.g. "Based on: your venue profile, UAE calendar, weather, 23 days of your sales". Always present. | Data sources, Model inputs, Powered by AI | ADR-0051 Maturity / contracts/satellite/ai.yaml#/components/schemas/AiMaturity |
+| Starting / Learning / Established / Trained on your data | The four maturity stages (enum starting, learning, established, learned), shown as one badge. Moves by itself from Starting to Established as own data arrives; Trained on your data only after an admin promotion. | Beta, Experimental, Low confidence, Cold start (in UI), Not enough data | ADR-0051 / ADR-0051 (AI functions review 30 Sep §2) |
+| Limited historical data | Shown while own data carries less than half the weight (AiMaturity.limitedHistory, ownDataShare < 0.5). An honest qualifier, never a refusal. | Insufficient data, Not available until, Comes later | ADR-0051 / contracts/satellite/ai.yaml#/components/schemas/AiMaturity |
+| Range | The 10th-90th percentile band a forecast or estimate is shown with (e.g. "1,850-3,400 guests, most likely 2,600"). Never a bare accuracy percentage on an answer; measured accuracy (WAPE, bias, coverage) appears only on accuracy screens … | Accuracy 92%, Confidence 0.87 (on a heuristic), Exact | ADR-0051 / contracts/satellite/ai.yaml#getForecast / … |
+| Running in the background | A trained model in shadow next to the live answer (AiRelease.stage shadow); it changes nothing a person sees. | Live, Active model, Testing in production | ADR-0051 Promotion / ADR-0051 (AI functions review 30 Sep §2) |
+| Ready to promote / Promote | A shadow model passed its gate (governance alert promotionReady); an admin promotes it one stage at a time (canary, then production). The only way a model replaces the baseline. | Deploy, Go live, Auto-switch, Activate model, Upgrade AI | ADR-0051 (AI-D16) / contracts/satellite/ai.yaml#promoteAiRelease |
+| L0 Disabled / L1 Advisory / L2 Prepare / L3 Execute with … | The one autonomy scale for every AI capability, shown as "L2 Prepare" etc. with the capability's ceiling beside it. Lower scopes tighten, never raise. | Autopilot, Copilot mode, Level 0-3 (CFG book), Approval level (for autonomy), Manual/Semi/Auto | ADR-0050 / ADR-0050 (AI-D04) / … |
+| Approval tier | How many people must approve a proposed action (ProposedAction.approvalLevel, 1 or 2). Not an autonomy level. | Autonomy level, Approval level (ambiguous) | ADR-0050 |
+| Suggestion / Draft | What AI produces. A suggestion advises; a draft is a ready-to-review change that a person applies in the owning screen. Copy says "Nothing is applied until you approve it." | AI changed, Auto-applied, AI updated your prices | ADR-0020 / ADR-0051 (AI functions review 30 Sep §4 Configuration assistant) / … |
+| Why this? | The link or expander that opens an answer's explanation (Suggestion.explanation, recommendation template reason, decision trace). Plain words; for guests a template reason. | Explainability, SHAP, Feature importance (in operator copy) | ADR-0052 (AI-D09) / contracts/satellite/ai.yaml#/components/schemas/Suggestion |
+| No thanks | The explicit decline on an offer. Only this counts as a decline and it is remembered across channels; scrolling past or closing the step is not a decline. | Dismiss (as a decline), Skip (as a decline), X (as a decline) | ADR-0052 (AI-D07) / DI-962 / … |
+| Hold for review | What a high fraud or risk score does to a payment or order. The transaction goes through; it is held for a person. | Decline, Block, Reject (for a risk score), Fraud detected | ADR-0053 / ADR-0053 (AI-D06) |
+| Hand over to a person | The concierge passes the whole conversation and its own summary to a live agent; the guest does not repeat themselves. | Escalate, Transfer, Contact bot | contracts/satellite/marketing-crm.yaml#handoverToAgent |
+| Not available yet | The analytics assistant's answer to a question outside the semantic model; it records a knowledge gap and never improvises a number. | I cannot answer, Error, Unknown | ADR-0054 |
+
+
 ## The screens
 
 Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs count fields; requirements are matrix rows; meeting inputs are the ones naming the screen (the module and platform ones are below); white label says whether the tenant's brand reaches it (guest) or it sets the brand (configures).
@@ -106,6 +165,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** Outbound communication at a glance for the venue: sent, delivered, failed, opened, clicked, converted, unsubscribed and attributed revenue, by channel and provider, with alerts for outage, high bounce, consent errors, queue delay or retries exhausted.
+
 #### Inputs: what the user enters or picks
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
@@ -122,6 +183,11 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 **Shown**
 
 **Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+
+**Rules for what is shown** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
+
+- **Channel tiles**: Email, WhatsApp, SMS, push, in-app - delivered, pending, failed; failures link to the delivery queue. *(source: DI-559; contracts/satellite/marketing-crm.yaml#listCommunicationService)*
+- **Consent errors**: Messages blocked at send time because consent was missing, shown as a count, not an error to fix by sending anyway. *(source: contracts/satellite/marketing-crm.yaml#listConsentPreferenceCommunication)*
 
 **Data it reads**: `listCommunicationService` (onLoad, Channel health and volume)
 
@@ -149,6 +215,24 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed |
+
+#### Consistency with other screens
+
+- Match `ADM-038`: Same object; ADM-038 is the platform view across tenants, this is the venue's.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+today:
+  sent: 14210
+  delivered: 13980
+  failed: 96
+  opened: 6120
+  unsubscribed: 18
+alert: WhatsApp provider latency high since 11:20
+```
 
 #### Permissions
 
@@ -218,7 +302,17 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | nothing: it opens on its own |
 | Route | `/engagement-support/template-library-bo-785` |
 
+**What the spec says about it.** **One template library** (decided 2 October 2026, merge as proposed; CHG-SBO-021): accreditation communication templates are message templates filtered to the accreditation purpose; BO-677 is merged in.
+
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+**From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** The library of reusable message templates per channel and purpose (marketing, ticketing, reservation, membership, loyalty, wallet, operational). Every template has a body per enabled language. A missing Arabic body is flagged, never silently replaced by English, because a guest who chose Arabic and gets English has met a defect.
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- Only listMessageTemplates and createMessageTemplate are wired; the purpose requires edit, version, approval, clone, archive, compare and change history. (CHG-SBO-005)
+
+**Fixed on main** (the package already carries these; draw what it says): BO-785 Template Library and BO-677 Communication Template Library both list message templates. (CHG-SBO-021).
 
 #### Inputs: what the user enters or picks
 
@@ -229,6 +323,13 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Channel | select | — | Email · SMS · Whatsapp · Push · In app · Post | `listMessageTemplates` ?channel |
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+**Rules for these inputs** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
+
+- **Channel and kind**: Email, SMS, WhatsApp, push, in-app; transactional vs marketing is a property of the template, and a transactional template cannot hold promotional blocks. *(source: contracts/satellite/marketing-crm.yaml#createMessageTemplate; contracts/satellite/marketing-crm.yaml#/components/schemas/MessageChannel)*
+- **Bodies per language**: English and Arabic side by side; the Arabic editor is right-to-left; email subjects per language. Merge fields from a picker, never typed. *(source: contracts/satellite/marketing-crm.yaml#createMessageTemplate; DI-019)*
+- **Provider template id**: Required where the provider needs a pre-approved template (WhatsApp); shown only for that channel. *(source: contracts/satellite/marketing-crm.yaml#/components/schemas/MessageTemplate)*
+- **Header, logo and footer**: Configurable per channel and brand, with the sender identity (from and reply-to) shown read-only from the brand settings. *(source: DI-560)*
 
 #### Outputs: what the screen shows and produces
 
@@ -242,6 +343,15 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |---|---|---|---|---|---|
 | Create message template (primary button) | navigation or local | — | — | — | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
+
+**Rules for what is shown** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
+
+- **Missing languages**: Each template row shows a warning chip listing enabled languages with no body. *(source: contracts/satellite/marketing-crm.yaml#/components/schemas/MessageTemplate)*
+- **Preview**: Rendered with test data in both directions (EN left-to-right, AR right-to-left), with SMS segment count and WhatsApp limits. *(source: screens/P08-venue-back-office.yaml#BO-785; DI-019)*
+
+**What each action does** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
+
+- **Translate with AI**: Fills missing languages as drafts on the template; protected terms (ride names, brand, tier names) come from the glossary and are not translated. A person reviews before use. *(source: contracts/satellite/ai.yaml#proposeTranslations)*
 
 **Data it reads**: `listMessageTemplates` (onLoad, The template library)
 
@@ -260,6 +370,33 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Unknown merge field, or a required language is missing; 409 Drafting is not allowed at this scope now: the capability is paused (`capability-paused`) or governance blocks it (`governance-blocked`, naming the policy and … |
+
+#### Consistency with other screens
+
+- Match `BO-677`: The communication template library appears to be the same library; see corrections.
+- Match `ADM-041`: System transactional templates owned by the platform are listed read-only beside the venue's own.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+templates:
+- code: TKT-CONFIRM
+  channel: Email
+  kind: Transactional
+  languages: EN AR
+  status: Active
+- code: MKT-AUTUMN
+  channel: WhatsApp
+  kind: Marketing
+  languages: EN (AR missing)
+  status: Draft
+mergeFields:
+- '{{guest.firstName}}'
+- '{{order.number}}'
+- '{{venue.name}}'
+```
 
 #### Permissions
 
@@ -341,9 +478,21 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Known gaps.** **Newsletter Builder declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write operations … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** Branded, responsive newsletters without code: drag-and-drop header, text, image, event, ticket, membership, loyalty, call-to-action, divider and footer blocks; personalisation, language variants, desktop and mobile preview; checks for accessibility, links, unsubscribe and sender before test or approval.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **The only write is createMessageTemplate; no save-draft, version, test-send or approval operation for a newsletter.** Why: The draft/test/approve lifecycle in the purpose has no operations. *(source: contracts/satellite/marketing-crm.yaml#createMessageTemplate; Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers))*
+
 #### Inputs: what the user enters or picks
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+**Rules for these inputs** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
+
+- **Blocks**: From approved content blocks; product blocks pull live price and availability. *(source: screens/P08-venue-back-office.yaml#BO-786)*
+- **Language variants**: English and Arabic; the Arabic preview is right-to-left; a missing language is flagged. *(source: contracts/satellite/marketing-crm.yaml#createMessageTemplate; DI-019)*
+- **AI draft**: Drafts copy for a person to edit; never publishes. *(source: contracts/satellite/ai.yaml#proposeMarketingContent)*
 
 #### Outputs: what the screen shows and produces
 
@@ -353,6 +502,10 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |---|---|---|---|---|---|
 | Create message template (primary button) | navigation or local | — | — | — | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
+
+**Rules for what is shown** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
+
+- **Pre-send checks**: Unsubscribe link present, sender identity verified, images have alt text, links resolve. *(source: screens/P08-venue-back-office.yaml#BO-786)*
 
 **Where the user goes next**
 
@@ -369,6 +522,15 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Unknown merge field, or a required language is missing; 409 Drafting is not allowed at this scope now: the capability is paused (`capability-paused`) or governance blocks it (`governance-blocked`, naming the policy and … |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+newsletter: Coastal Aqua October news - hero Halloween Splash Nights, 3 event blocks, member offer block, footer
+  with unsubscribe
+```
 
 #### Permissions
 
@@ -422,6 +584,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-784`.
 - [ ] Every gated control is gated: `AI_USE`, `MARKETING_MANAGE`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -444,9 +607,19 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** Reusable content blocks and live product feeds for messages: banners, copy, events, tickets, memberships, promotions, CTAs, footers; feeds from events, products, inventory, pricing and recommendations with filters, fallback when inventory is gone, refresh interval and expiry.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **Wired to createMessageTemplate; no content block or feed operation exists.** Why: Blocks and feeds are their own objects; add them or reduce the purpose. *(source: contracts/satellite/marketing-crm.yaml#createMessageTemplate; Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers))*
+
 #### Inputs: what the user enters or picks
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+**Rules for these inputs** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
+
+- **Feed fallback**: What shows when a product sells out or is withdrawn (hide block, show alternative, show "sold out"). *(source: screens/P08-venue-back-office.yaml#BO-787)*
 
 #### Outputs: what the screen shows and produces
 
@@ -472,6 +645,14 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Unknown merge field, or a required language is missing; 409 Drafting is not allowed at this scope now: the capability is paused (`capability-paused`) or governance blocks it (`governance-blocked`, naming the policy and … |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+block: Upcoming events feed - next 3 events with seats left, refresh hourly, fallback Explore all events
+```
 
 #### Permissions
 
@@ -530,6 +711,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - [ ] Every transition is wired: `BO-784`.
 - [ ] Every gated control is gated: `AI_USE`, `MARKETING_MANAGE`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -543,14 +725,18 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Engagement & Support · wave 3 · needs the `marketing` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `GUEST_MANAGE`, `MARKETING_VIEW` (1 configure, 1 read); in the flows as venue manager |
+| Who uses it | venue staff holding `GUEST_MANAGE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/engagement-support/subscriptions-preferences-bo-788` |
 
-**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built. Removed 2 October 2026 (CHG-WIR-005): getMarketingSubscription and setMarketingSubscription are guest-only operations; staff should not write a guest's subscription (design-notes correction …
+
+**From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** Newsletter subscriptions and messaging eligibility for the venue: categories, topics, channels, frequency, consent mapping, suppression and do-not-contact. Staff search a subscriber and see channel, verification, consent source, status and last change. Forced marketing opt-in is prevented: staff cannot subscribe a guest without a recorded consent.
+
+**Fixed on main** (the package already carries these; draw what it says): getMarketingSubscription and setMarketingSubscription are guest-only operations on this staff screen. (CHG-WIR-005).
 
 #### Inputs: what the user enters or picks
 
@@ -562,10 +748,16 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Save (primary button) | navigation or local | — | — | — | — |
+| Add suppression (primary button) | navigation or local | — | — | — | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
 
-**Data it reads**: `getMarketingSubscription` (onLoad, What a guest is subscribed to)
+**Rules for what is shown** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
+
+- **Subscriber view**: Lists and channels subscribed, beside the consent per channel (Given, Withdrawn, Not asked) and source. *(source: contracts/satellite/marketing-crm.yaml#getGuestConsents; DI-562)*
+
+**What each action does** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
+
+- **Suppress**: Adds an address to the suppression list (bounce, complaint, do-not-contact); suppressed guests are excluded at send time. *(source: contracts/satellite/marketing-crm.yaml#addSuppression)*
 
 **Where the user goes next**
 
@@ -582,10 +774,25 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 
+#### Consistency with other screens
+
+- Match `GST-065`: Same consent-then-lists model.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+subscriber:
+  guest: Sarah Thompson
+  lists:
+  - Coastal Aqua news (email)
+  - Member offers (WhatsApp)
+  consent: Email Given at checkout 1 Oct 2026
+```
+
 #### Permissions
 
-- `setMarketingSubscription` → `MARKETING_VIEW` (read) · guest
-- `getMarketingSubscription` → `MARKETING_VIEW` (read) · guest
 - `addSuppression` → `GUEST_MANAGE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
@@ -618,9 +825,9 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
 - [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-788?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: Save, Cancel.
+- [ ] Every action is wired with its success and its failure: Add suppression, Cancel.
 - [ ] Every transition is wired: `BO-784`.
-- [ ] Every gated control is gated: `GUEST_MANAGE`, `MARKETING_VIEW`.
+- [ ] Every gated control is gated: `GUEST_MANAGE`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -644,6 +851,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** Map operational events (purchase, reservation, check-in, membership, loyalty, wallet, refund, cancellation, waitlist) to the notification they send: template, channel, recipients, timing, priority, attachments. Mandatory transactional notices are visibly separate from optional marketing, and each applies its own consent policy.
+
 #### Inputs: what the user enters or picks
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
@@ -659,6 +868,11 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Status | segmented control | — | Draft · Published · Archived | `listSystemTransactionalTemplate` ?status |
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+**Rules for these inputs** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
+
+- **Event state**: Precise state (ticket scanned, not just sold) where the business intent needs it. *(source: DI-561)*
+- **Class**: Transactional (no marketing consent, no promotion) or marketing (consent checked at send). *(source: contracts/satellite/marketing-crm.yaml#sendTransactionalMessage)*
 
 #### Outputs: what the screen shows and produces
 
@@ -690,6 +904,21 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 400 `sendTimeMode` `optimised` on a trigger whose `priority` is `operational` or `transactional` (29 September, build pass, group G2), or an `event` not in the …; 409 Drafting is not allowed at this scope now: the capability is paused (`capability-paused`) or governance blocks it (`governance-blocked`, naming the policy and … |
+
+#### Consistency with other screens
+
+- Match `ADM-042`: Platform event mapping is the base; venue rules override per venue.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+rules:
+- Order confirmed -> TKT-CONFIRM email + WhatsApp immediately
+- Day before visit -> reminder WhatsApp 18:00
+- Waiver incomplete -> waiver reminder email 48h before
+```
 
 #### Permissions
 
@@ -763,6 +992,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** Message timing, urgency and governance: immediate, scheduled, recurring and event-relative delivery with windows and blackouts; Critical, High, Medium and Low priority; reviewer and approver stages for selected templates; a final pre-flight of audience, content, channel, cost and policy.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **Only listRoutingPriorityThrottling (read) is declared; no write and no approval operation.** Why: The screen configures and approves; it needs the routing rule write and an approval workflow link. *(source: contracts/satellite/marketing-crm.yaml#listRoutingPriorityThrottling; Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers))*
+
 #### Inputs: what the user enters or picks
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
@@ -782,6 +1017,10 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
 
+**Rules for what is shown** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
+
+- **Priority**: Critical messages (safety, closure) bypass quiet hours and frequency caps; marketing never does. *(source: screens/P08-venue-back-office.yaml#BO-790)*
+
 **Data it reads**: `listRoutingPriorityThrottling` (onLoad, Scheduling, priority and throttling)
 
 **Where the user goes next**
@@ -799,6 +1038,14 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+rule: Weather closure notice - Critical - all channels - no quiet hours
+```
 
 #### Permissions
 
@@ -838,6 +1085,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - [ ] Every transition is wired: `BO-784`.
 - [ ] Every gated control is gated: `MARKETING_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -859,6 +1107,8 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | Route | `/engagement-support/delivery-retry-failover-bo-791` |
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+**From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** Reliable delivery: providers per channel, retry counts and backoff, failover order between channels with consent rechecked on the new channel, message trace, provider responses and manual replay.
 
 #### Inputs: what the user enters or picks
 
@@ -891,6 +1141,14 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |  (primary button) | navigation or local | — | — | — | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
 
+**Rules for what is shown** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
+
+- **Message trace**: Each attempt with provider, response and failure reason. *(source: contracts/satellite/marketing-crm.yaml#listDeliveryQueueFailure)*
+
+**What each action does** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
+
+- **Retry or send by another channel**: Consent for the new channel is checked again; a marketing message never falls back to a channel without consent. *(source: contracts/satellite/marketing-crm.yaml#retryMessageDispatch; DI-559)*
+
 **Data it reads**: `listDeliveryQueueFailure` (onLoad, Failures and retries)
 
 **Where the user goes next**
@@ -908,6 +1166,14 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+dispatch: TKT-CONFIRM to +971 50 *** 4567 - WhatsApp failed (number not on WhatsApp) - fallback SMS delivered 11:02
+```
 
 #### Permissions
 
@@ -979,6 +1245,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** Technical delivery quality and outcomes: sender reputation, inbox placement, bounces, complaints, blocks, opens, clicks, conversions by provider, domain, channel, template, language and brand, with message tracing and threshold alerts.
+
 #### Inputs: what the user enters or picks
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
@@ -1003,6 +1271,10 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
 
+**Rules for what is shown** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
+
+- **Bounce and complaint rates**: With thresholds; crossing one raises an alert. *(source: contracts/satellite/marketing-crm.yaml#listProviderHealthUsage)*
+
 **Data it reads**: `listProviderHealthUsage` (onLoad, Deliverability and cost)
 
 **Where the user goes next**
@@ -1020,6 +1292,17 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+email:
+  hardBounce: 0.8%
+  complaints: 0.05%
+  inboxPlacement: 94%
+```
 
 #### Permissions
 
@@ -1070,18 +1353,26 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Engagement & Support · wave 3 · needs the `marketing` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `AI_USE`, `GUEST_MANAGE`, `TENANT_CONFIGURE` (1 operate, 2 configure); in the flows as venue manager |
+| Who uses it | venue staff holding `AI_USE`, `TENANT_CONFIGURE` (1 operate, 1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
 | Offline | online only |
 | Opens with | `actionId` (navigation) |
 | Route | `/engagement-support/ai-content-translation-audit-bo-793` |
 
-**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built. Removed 2 October 2026 (CHG-WIR-012): setLocalizationBrandingCustomer (waiver form languages, GUEST_MANAGE) is unrelated waiver configuration (design-notes correction ai BO-793).
+
+**From the AI & Intelligence process.** AI content and translation: draft subject lines, titles and message variants by objective, tone, audience and channel, and fill translation gaps (Arabic first) with a first pass that the venue's own team reviews before publishing - with the glossary, brand rules and protected placeholders kept. The one thing to get right: a machine translation is a draft marked as such until a person approves it.
+
+**Fixed on main** (the package already carries these; draw what it says): Declares setLocalizationBrandingCustomer (waiver form languages, GUEST_MANAGE). (CHG-WIR-012).
 
 #### Inputs: what the user enters or picks
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+**Rules for these inputs** (from the AI & Intelligence process; these refine the tables above and win where they differ)
+
+- **translation scope**: Target locale, scope (all gaps, content blocks, product names, email templates, message templates), glossary; placeholders like {guestName} locked. *(source: contracts/satellite/ai.yaml#proposeTranslations / DI-081)*
 
 #### Outputs: what the screen shows and produces
 
@@ -1089,8 +1380,12 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Save (primary button) | navigation or local | — | — | — | — |
+|  (primary button) | navigation or local | — | — | — | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
+
+**Rules for what is shown** (from the AI & Intelligence process; these refine the tables above and win where they differ)
+
+- **review list**: Source and draft side by side (RTL for Arabic), glossary terms highlighted, approve or edit per string. *(source: contracts/satellite/ai.yaml#decideProposedAction / DI-081)*
 
 **Where the user goes next**
 
@@ -1102,15 +1397,25 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |---|---|
 | Loading (`?state=loading`) | The content translation audit list. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the content translation audit untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No content translation audit yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, first run (`?state=emptyFirstRun`) | No content translation audit yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the content translation audit are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 A language of a published version was changed.; 409 Drafting is not allowed at this scope now: the capability is paused (`capability-paused`) or governance blocks it (`governance-blocked`, naming the policy and …; 409 The action is no longer `proposed` — already decided, or expired (7 days after it was proposed, audit R213). |
+| Validation and conflict | the form keeps what was entered and marks the problem: 409 Drafting is not allowed at this scope now: the capability is paused (`capability-paused`) or governance blocks it (`governance-blocked`, naming the policy and …; 409 The action is no longer `proposed` — already decided, or expired (7 days after it was proposed, audit R213). |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+string:
+  en: Your Family Day Pass for {date} is confirmed
+  ar: تم تأكيد تذكرة اليوم العائلي ليوم {date}
+  status: Draft
+```
 
 #### Permissions
 
-- `setLocalizationBrandingCustomer` → `GUEST_MANAGE` (configure) · staff
 - `proposeMarketingContent` → `AI_USE` (operate) · staff
 - `decideProposedAction` → `AI_USE` (operate) · staff
 - `proposeTranslations` → `TENANT_CONFIGURE` (configure) · staff
@@ -1158,12 +1463,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (400, 403, 404, 409, 422).
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (403, 404, 409).
 - [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-793?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: Save, Cancel.
+- [ ] Every action is wired with its success and its failure: , Cancel.
 - [ ] Every transition is wired: `BO-784`.
-- [ ] Every gated control is gated: `AI_USE`, `GUEST_MANAGE`, `TENANT_CONFIGURE`.
+- [ ] Every gated control is gated: `AI_USE`, `TENANT_CONFIGURE`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -1264,7 +1569,6 @@ Method, path, parameters, request and response for every operation these screens
 "addSuppression": {"method":"POST","path":"/consent/suppression-list","contract":"marketing-crm","summary":"Suppress an address","permission":"GUEST_MANAGE","offlineCapable":false,"conflictPolicy":"append","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Suppression"},
 "createMessageTemplate": {"method":"POST","path":"/message-templates","contract":"marketing-crm","summary":"Create a message template","permission":"MARKETING_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"MessageTemplate","responds":"MessageTemplate"},
 "decideProposedAction": {"method":"POST","path":"/proposed-actions/{actionId}/decide","contract":"ai","summary":"Approve or reject a proposal","permission":"AI_USE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"ProposedAction"},
-"getMarketingSubscription": {"method":"GET","path":"/marketing-subscriptions","contract":"marketing-crm","summary":"What this guest has opted into","permission":"MARKETING_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[],"requestBody":null,"responds":"MarketingSubscription"},
 "listCommunicationService": {"method":"GET","path":"/communication-service","contract":"marketing-crm","summary":"Communication Service Command Center","permission":"MARKETING_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":"venueId","in":"query","required":false},{"name":"from","in":"query","required":false},{"name":"to","in":"query","required":false}],"requestBody":null,"responds":"CommunicationServiceCommandCenterView"},
 "listDeliveryQueueFailure": {"method":"GET","path":"/delivery-queue-failure","contract":"marketing-crm","summary":"Delivery Queue, Failure & Retry Management","permission":"MARKETING_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"status","in":"query","required":false},{"name":"channel","in":"query","required":false},{"name":"sourceModule","in":"query","required":false},{"name":"businessEvent","in":"query","required":false},{"name":"providerId","in":"query","required":false},{"name":"priority","in":"query","required":false},{"name":"failureCategory","in":"query","required":false},{"name":"venueId","in":"query","required":false},{"name":"from","in":"query","required":false},{"name":"to","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listMessageTemplates": {"method":"GET","path":"/message-templates","contract":"marketing-crm","summary":"List message templates","permission":"MARKETING_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"channel","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
@@ -1274,8 +1578,6 @@ Method, path, parameters, request and response for every operation these screens
 "proposeMarketingContent": {"method":"POST","path":"/ai/content-drafts","contract":"ai","summary":"Draft marketing content for a person to edit and apply","permission":"AI_USE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":null},
 "proposeTranslations": {"method":"POST","path":"/ai/translate","contract":"ai","summary":"Fill translation gaps with a first pass, for a human to edit","permission":"TENANT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":null},
 "retryMessageDispatch": {"method":"POST","path":"/message-dispatches/{dispatchId}/retry","contract":"marketing-crm","summary":"Send it again, or by another channel","permission":"MARKETING_SEND","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"MessageDispatch"},
-"setLocalizationBrandingCustomer": {"method":"PUT","path":"/localization-branding-customer","contract":"marketing-crm","summary":"Set a waiver version's languages, branding and channels","permission":"GUEST_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"LocalizationBrandingCustomerExperienceConfigurationInput","responds":"LocalizationBrandingCustomerExperienceConfigurationView"},
-"setMarketingSubscription": {"method":"PUT","path":"/marketing-subscriptions","contract":"marketing-crm","summary":"Subscribe or unsubscribe","permission":"MARKETING_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"MarketingSubscription","responds":"MarketingSubscription"},
 "setMessageTrigger": {"method":"POST","path":"/message-triggers","contract":"marketing-crm","summary":"Fire a message from a platform event","permission":"MARKETING_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"MessageTrigger","responds":"MessageTrigger"}
 }
 ```
@@ -1288,10 +1590,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 {
 "CommunicationServiceCommandCenterView": {"type":"object","x-ticvai-persistence":"none — projection over marketing.message_dispatch, marketing.message_dispatch_attempt (new), marketing.communication_provider (new)","description":"Platform KPIs and breakdowns for the communication service over the requested window. Counts are messages (one dispatch = one message on one channel), not recipients.\n","required":["windowFrom","windowTo","messagesProcessed","byChannel","byModule"],"properties":{"windowFrom":{"type":"string","format":"date-time"},"windowTo":{"type":"string","format":"date-time"},"messagesProcessed":{"type":"integer","minimum":0,"description":"Messages accepted by the service in the window (the pack's \"Messages Processed Today\")."},"delivered":{"type":"integer","minimum":0},"failed":{"type":"integer","minimum":0},"pending":{"type":"integer","minimum":0},"retrying":{"type":"integer","minimum":0},"averageDeliverySeconds":{"type":"number","minimum":0,"description":"Mean time from acceptance to provider-confirmed delivery, in (fractional) seconds."},"providerAvailabilityRate":{"type":"number","minimum":0,"maximum":1,"description":"Share of the window the active providers were reachable, weighted by volume."},"byChannel":{"type":"array","description":"Sent volume and health per channel, one row per provider on it (the pack's channel tiles and Channel Health table).","items":{"type":"object","required":["channel","sent"],"properties":{"channel":{"$ref":"#/components/schemas/MessageChannel"},"providerId":{"type":"string","format":"uuid"},"providerName":{"type":"string"},"sent":{"type":"integer","minimum":0},"successRate":{"type":"number","minimum":0,"maximum":1},"averageLatencySeconds":{"type":"number","minimum":0},"health":{"type":"string","enum":["healthy","warning","critical"]}}}},"byModule":{"type":"array","description":"Volume originating from each TICVAI module.","items":{"type":"object","required":["module","volume"],"properties":{"module":{"type":"string","enum":["crm","ticketing","membership","waiver","groupSales","customerService","finance","wallet","resourceManagement","accessControl","other"]},"volume":{"type":"integer","minimum":0},"successRate":{"type":"number","minimum":0,"maximum":1},"averageLatencySeconds":{"type":"number","minimum":0},"health":{"type":"string","enum":["healthy","warning","critical"]}}}},"alerts":{"type":"array","description":"Live operational alerts (failure-rate spikes, queued backlogs, providers near their rate limit).","items":{"type":"object","required":["kind","severity","message","raisedAt"],"properties":{"kind":{"type":"string","enum":["failureRateSpike","queueBacklog","rateLimitApproaching","providerDegraded","other"]},"severity":{"type":"string","enum":["info","warning","critical"]},"message":{"type":"string"},"channel":{"$ref":"#/components/schemas/MessageChannel"},"providerId":{"type":"string","format":"uuid"},"raisedAt":{"type":"string","format":"date-time"}}}},"aiHealthSummary":{"type":"string","description":"AI-written plain-language summary of platform health; absent when AI processing is off for the tenant."}}},
 "DeliveryQueueFailureRetryManagementView": {"type":"object","x-ticvai-persistence":"none — projection over marketing.message_dispatch, marketing.message_dispatch_attempt (new), marketing.message_template, marketing.communication_provider (new)","description":"One communication in the delivery queue and where it stands.","required":["communicationId","channel","status","attempts","createdAt"],"properties":{"communicationId":{"type":"string","description":"marketing.message_dispatch id."},"sourceModule":{"type":"string","enum":["crm","ticketing","membership","waiver","groupSales","customerService","finance","wallet","resourceManagement","accessControl","other"]},"businessEvent":{"type":"string","description":"The originating event type, e.g. TicketIssued."},"businessEventId":{"type":"string","description":"The originating event instance, kept so a failed message can be replayed with its context."},"recipient":{"type":"string","description":"Address or number, masked (e.g. j***@example.com) unless the caller holds GUEST_VIEW_PII."},"subjectId":{"type":"string","format":"uuid"},"channel":{"$ref":"#/components/schemas/MessageChannel"},"template":{"type":"object","properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string"},"name":{"type":"string"}}},"provider":{"type":"object","properties":{"id":{"type":"string","format":"uuid"},"name":{"type":"string"}}},"priority":{"type":"string","enum":["P1","P2","P3","P4"]},"status":{"type":"string","enum":["pending","processing","sent","delivered","failed","retrying","deadLettered","cancelled"]},"attempts":{"type":"integer","minimum":0},"lastFailureCategory":{"type":"string","enum":["providerUnavailable","invalidAddress","invalidMobile","rateLimited","authenticationError","templateRejected","timeout","consentBlock","unknownError"]},"lastFailureMessage":{"type":"string"},"nextAttemptAt":{"type":"string","format":"date-time"},"createdAt":{"type":"string","format":"date-time"},"sentAt":{"type":"string","format":"date-time"}}},
-"LocalisedText": {"x-ticvai-persistence":"none — jsonb column","type":"object","additionalProperties":{"type":"string"}},
-"LocalizationBrandingCustomerExperienceConfigurationInput": {"description":"The request body of `setLocalizationBrandingCustomer`, the record itself; read-only properties are ignored.","allOf":[{"$ref":"#/components/schemas/LocalizationBrandingCustomerExperienceConfigurationView"}]},
-"LocalizationBrandingCustomerExperienceConfigurationView": {"type":"object","x-ticvai-persistence":"marketing.waiver_localisation","description":"Languages, branding and channels of one waiver version (pack 11.1.9), keyed on `formId` + `formVersion`.","required":["formId","formVersion","sourceLanguage","languages"],"properties":{"formId":{"type":"string","format":"uuid"},"formVersion":{"type":"integer","minimum":1},"sourceLanguage":{"type":"string","maxLength":10,"description":"The language the legal text is written and reviewed in."},"languages":{"type":"array","minItems":1,"description":"Every language the version is offered in, the source language included. Arabic renders right to left.","items":{"type":"object","required":["language","required","translationStatus","approvalStatus"],"properties":{"language":{"type":"string","maxLength":10},"required":{"type":"boolean","description":"Publication waits for this language's approval."},"translationStatus":{"type":"string","enum":["notStarted","aiDrafted","inTranslation","inReview","complete"]},"translatorUserId":{"type":"string","format":"uuid","nullable":true},"reviewerUserId":{"type":"string","format":"uuid","nullable":true},"approvalStatus":{"type":"string","enum":["pending","approved","rejected"]},"lastUpdated":{"type":"string","format":"date-time","readOnly":true}}}},"branding":{"type":"object","properties":{"brandLogoAssetId":{"type":"string","format":"uuid","nullable":true},"venueLogoAssetId":{"type":"string","format":"uuid","nullable":true},"themeId":{"type":"string","nullable":true,"description":"The white-label theme it takes colours and typography from."},"header":{"$ref":"#/components/schemas/LocalisedText"},"footer":{"$ref":"#/components/schemas/LocalisedText"},"customerInstructions":{"$ref":"#/components/schemas/LocalisedText"},"confirmationMessage":{"$ref":"#/components/schemas/LocalisedText"},"supportEmail":{"type":"string","format":"email","nullable":true},"supportPhone":{"type":"string","maxLength":30,"nullable":true}}},"channels":{"type":"array","items":{"type":"string","enum":["b2cWeb","mobileApp","emailLink","qrLink","kiosk","posFrontDesk","groupPortal"]},"description":"Where the waiver is offered; every channel renders the same version and rules."},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005)."},"updatedAt":{"type":"string","format":"date-time","readOnly":true}}},
-"MarketingSubscription": {"type":"object","x-ticvai-persistence":"marketing.subscription","x-ticvai-retired-columns":["guest_id","subscribed"],"description":"**Drafted 4 September.** What a guest asked to receive. **Deliberately separate from `marketing.consent`** - consent is what the law allows, a subscription is what the person wants, and a system that stores one and reports the other is the reason unsubscribe links stop working.","required":["id","subjectId","channel","listName","isSubscribed"],"properties":{"id":{"readOnly":true,"type":"string","format":"uuid"},"subjectId":{"type":"string","format":"uuid","readOnly":true,"description":"The guest — from the guest session, or from `unsubscribeToken` when there is no session."},"channel":{"type":"string","enum":["email","sms","push"]},"listName":{"type":"string"},"isSubscribed":{"type":"boolean"},"source":{"type":"string","description":"Where the opt-in happened, because a regulator asks."},"unsubscribeToken":{"writeOnly":true,"type":"string","description":"**Unsubscribe must work without a login.** The link in a message carries the token and `setMarketingSubscription` accepts it in place of a session. **Write-only: never returned**, so a `MARKETING_VIEW` holder reading subscriptions cannot act as the guest."},"updatedAt":{"readOnly":true,"type":"string","format":"date-time"}}},
 "MessageChannel": {"type":"string","enum":["email","sms","whatsapp","push","inApp","post"]},
 "MessageDispatch": {"x-ticvai-append-only":"queuedAt","x-ticvai-persistence":"marketing.message_dispatch","type":"object","required":["id","subjectId","channel","status","queuedAt"],"properties":{"id":{"type":"string"},"subjectId":{"type":"string","format":"uuid"},"campaignId":{"type":"string","format":"uuid","nullable":true},"channel":{"$ref":"#/components/schemas/MessageChannel"},"templateId":{"type":"string","format":"uuid"},"messageTriggerId":{"type":"string","format":"uuid","nullable":true,"description":"The `MessageTrigger` that fired it, and through its `event` the `BusinessEvent` and source module; null for a campaign or a direct send. Attempts are in `MessageDispatchAttempt`. (decided 29 September, data model for the agreed operations)"},"campaignVariantId":{"type":"string","format":"uuid","nullable":true,"x-ticvai-references":"marketing.campaign_variant","description":"The A/B variant sent (22.1.17; 29 September, build pass, group G2). Null for a single-content campaign or a triggered message."},"plannedSendAt":{"type":"string","format":"date-time","nullable":true,"description":"The per-recipient hour chosen by `sendTimeMode` `optimised` (22.3.19, 22.9.16); null when sent at the scheduled time."},"status":{"type":"string","enum":["queued","sent","delivered","opened","clicked","bounced","failed","suppressed"]},"failureReason":{"type":"string","nullable":true},"providerReference":{"type":"string","nullable":true},"queuedAt":{"type":"string","format":"date-time"},"deliveredAt":{"type":"string","format":"date-time","nullable":true},"isTest":{"type":"boolean","default":false,"description":"A `testSendCampaign` message. Excluded from `CampaignPerformance` and `Campaign.sentCount`."},"openedAt":{"type":"string","format":"date-time","nullable":true,"description":"From the provider's engagement events. `CampaignPerformance.opened` counts these."},"clickedAt":{"type":"string","format":"date-time","nullable":true},"complainedAt":{"type":"string","format":"date-time","nullable":true},"unsubscribedAt":{"type":"string","format":"date-time","nullable":true}}},
 "MessageTemplate": {"x-ticvai-persistence":"marketing.message_template","type":"object","required":["id","code","name","channel","bodies"],"properties":{"id":{"readOnly":true,"type":"string","format":"uuid"},"code":{"type":"string","maxLength":64},"name":{"type":"string","maxLength":200},"channel":{"$ref":"#/components/schemas/MessageChannel"},"subjects":{"type":"object","description":"Per language. Email only.","additionalProperties":{"type":"string"}},"bodies":{"type":"object","description":"Per language, keyed by ISO 639-1 code.","additionalProperties":{"type":"string"}},"mergeFields":{"type":"array","items":{"type":"string"}},"missingLanguages":{"type":"array","readOnly":true,"description":"Enabled languages without a body. Flagged rather than silently falling back — a guest receiving English when they chose Arabic is a defect.\n","items":{"type":"string"}},"providerTemplateId":{"type":"string","nullable":true,"description":"Required for WhatsApp, where templates are pre-approved by the provider."},"brandId":{"type":"string","format":"uuid","nullable":true,"description":"The brand whose identity the template carries; null for the tenant default."},"ownership":{"type":"string","enum":["platform","crm"],"default":"crm","description":"`platform` = a transactional template owned by the communication service; `crm` = a marketing template owned by CRM (`listSystemTransactionalTemplate`). Content by language and version is in `MessageTemplateVersion`. (decided 29 September, data model for the agreed operations)"}}},

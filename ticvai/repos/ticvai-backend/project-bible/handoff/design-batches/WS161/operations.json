@@ -336,5 +336,24 @@
   ],
   "requestBody": "EventResourcePlan",
   "responds": "EventResourcePlan"
+ },
+ "updateResourcePackage": {
+  "method": "PUT",
+  "path": "/resource-packages/{packageId}",
+  "contract": "resources",
+  "summary": "Change a combination",
+  "permission": "RESOURCE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ResourcePackage",
+  "responds": "ResourcePackage"
  }
 }

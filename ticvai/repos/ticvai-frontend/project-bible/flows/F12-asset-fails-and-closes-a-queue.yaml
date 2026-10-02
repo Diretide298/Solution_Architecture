@@ -52,11 +52,12 @@ steps:
   outcome: '**By someone other than the person who did the work.** Safety-critical assets cannot return
     without it'
 - step: 5
-  screen: BO-031
+  screen: BO-069
   action: Asset returns to service
   operations:
   - updateAsset
   outcome: The queue reopens and the guest app offers it again
+  note: '**Repointed 2 October (CHG-WIR-001).** BO-031 was merged into BO-069 Asset Register (the same register, kept once).'
 branches:
 - at: 1
   condition: Asset is not safety-critical

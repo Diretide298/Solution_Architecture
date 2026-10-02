@@ -147,40 +147,6 @@
    }
   }
  },
- "RealTimeAvailabilityCheckoutValidationView": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
-  "description": "**What Real-Time Availability & Checkout Validation displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
-  "properties": {
-   "failedChecks": {
-    "type": "array",
-    "items": {
-     "type": "string",
-     "enum": [
-      "productInactive",
-      "inventoryUnavailable",
-      "capacityUnavailable",
-      "timeslotUnavailable",
-      "resourceUnavailable",
-      "priceInvalid",
-      "promotionInvalid",
-      "partnerComponentInvalid",
-      "componentMappingInvalid"
-     ]
-    },
-    "description": "Checkout validations that failed; empty means the bundle is sellable."
-   },
-   "bundleId": {
-    "type": "string",
-    "description": "Bundle ID"
-   },
-   "sellable": {
-    "type": "boolean",
-    "description": "Whether the bundle can be sold now"
-   }
-  }
- },
  "SeatAttribute": {
   "type": "string",
   "description": "BL-168. **Extended from eight values on 18 August.** Amenity and view filters needed attributes the original set did not carry, and a guest filtering for *aisle seat with power* was filtering on something the model could not express.\n",
@@ -415,6 +381,88 @@
    "expiresAt": {
     "type": "string",
     "format": "date-time"
+   }
+  }
+ },
+ "SeatInventory": {
+  "type": "object",
+  "description": "Board 4. **One read, because a real-time map assembling four endpoints renders one state late.**\n",
+  "properties": {
+   "performanceId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "asOf": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "totals": {
+    "type": "object",
+    "properties": {
+     "capacity": {
+      "type": "integer"
+     },
+     "available": {
+      "type": "integer"
+     },
+     "held": {
+      "type": "integer"
+     },
+     "reserved": {
+      "type": "integer"
+     },
+     "sold": {
+      "type": "integer"
+     },
+     "blocked": {
+      "type": "integer"
+     },
+     "outOfService": {
+      "type": "integer"
+     }
+    }
+   },
+   "seats": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "seatId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "label": {
+       "type": "string"
+      },
+      "state": {
+       "type": "string",
+       "enum": [
+        "available",
+        "held",
+        "reserved",
+        "sold",
+        "blocked",
+        "outOfService",
+        "killed"
+       ]
+      },
+      "holdPoolId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true
+      },
+      "orderId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true
+      },
+      "expiresAt": {
+       "type": "string",
+       "format": "date-time",
+       "nullable": true
+      }
+     }
+    }
    }
   }
  },

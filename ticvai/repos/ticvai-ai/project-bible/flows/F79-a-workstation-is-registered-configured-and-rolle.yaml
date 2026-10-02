@@ -30,9 +30,9 @@ steps:
   action: A configuration profile is set for it.
   operations:
   - setConfigurationProfile
-  - setConnectivityThresholds
   outcome: Software version, settings and when it counts as offline.
   crossesDevice: true
+  note: '**Repointed 2 October (CHG-WIR-021).** Connectivity thresholds have their own screen (BO-131) and are set in F89; this step sets the configuration profile.'
 - step: 3
   screen: BO-124
   action: Its sale board layout is built.
@@ -46,10 +46,10 @@ steps:
   action: The configuration is deployed and rolled out.
   operations:
   - deployConfigurationProfile
-  - startRollout
   outcome: '**`startRollout` answers 202 until the release manager approves** (audit R144); a requester
     cannot approve their own.'
   crossesDevice: true
+  note: '**Repointed 2 October (CHG-WIR-021).** startRollout is TICVAI''s platform release act (PLATFORM_RELEASE_PROMOTE) that tenant staff cannot hold; the venue deploys its configuration profile with deployConfigurationProfile.'
 branches:
 - at: 1
   condition: A step in the chain is not licensed for this tenant.

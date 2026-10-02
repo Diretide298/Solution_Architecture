@@ -958,6 +958,11 @@
     "operation": null,
     "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
     "source": "pack Game_and_Ride_Module.pdf, page 48 §Guest taps card"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-004): No read lists stored retry prices.",
+    "source": "contracts/satellite/games.yaml#getGamePricing"
    }
   ],
   "layout": {
@@ -1053,8 +1058,8 @@
  {
   "id": "BO-441",
   "name": "Price Priority & Conflict Rules",
-  "module": "Games & Rides",
-  "requiresModule": "games",
+  "module": "Sell",
+  "requiresModule": "core",
   "wave": 3,
   "source": {
    "pack": "Game_and_Ride_Module.pdf",
@@ -1070,7 +1075,8 @@
   },
   "navigation": {
    "entryFrom": [
-    "BO-434"
+    "BO-434",
+    "ADM-088"
    ],
    "exitTo": [
     "BO-434"
@@ -1156,6 +1162,7 @@
    "workshopBoard": "wireframes/WS62 Game and Ride Board 5.dc.html#bo-441"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 49. 0 of 0 labels bound to a contract property; 1 of 23 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** still owed by a contract change: `setRulePriorityConflict`.",
+  "notes": "**Core, not games (2 October 2026, CHG-SBO-023):** the rule order governs every price at the venue, so a tenant without the games licence still needs it; filed under Sell (CHG-SBO-010).",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1436,6 +1443,12 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Game_and_Ride_Module.pdf, page 51"
+   },
+   {
+    "operation": "listPricing",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-025): listPricing is the AI pricing intelligence view, not the population of a pricing audit and publication screen; the screen keeps listDynamicPriceRules (the rules reviewed and published here) (design-notes correction ticketing-backoffice BO-443)",
+    "source": "contracts/spine/catalogue.yaml#listPricing"
    }
   ],
   "layout": {
@@ -1487,36 +1500,24 @@
   "states": {
    "loading": "The pricing audit approval list.",
    "error": "Could not load. Names which read failed and leaves the pricing audit approval untouched.",
-   "emptyFirstRun": "No pricing audit approval yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No pricing audit approval yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the pricing audit approval are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
-    "operationId": "listPricing",
-    "contract": "catalogue",
-    "purpose": "AI Pricing Intelligence Command Center",
-    "trigger": "onLoad"
-   },
-   {
     "operationId": "publishPricingEffectiveDate",
     "contract": "catalogue",
     "purpose": "Publish pricing now or on a scheduled effective date",
     "trigger": "onAction",
-    "provenance": "decided 29 September, VM close-out (venue management and configuration): serves the pack action(s) Publish Now, Schedule Publication; Deactivate Rule",
-    "invalidates": [
-     "listPricing"
-    ]
+    "provenance": "decided 29 September, VM close-out (venue management and configuration): serves the pack action(s) Publish Now, Schedule Publication; Deactivate Rule"
    },
    {
     "operationId": "setDynamicPriceRule",
     "contract": "catalogue",
     "purpose": "Deactivate the price rule (isActive=false)",
     "trigger": "onAction",
-    "provenance": "decided 29 September, VM close-out (venue management and configuration): serves the pack action(s) Publish Now, Schedule Publication; Deactivate Rule",
-    "invalidates": [
-     "listPricing"
-    ]
+    "provenance": "decided 29 September, VM close-out (venue management and configuration): serves the pack action(s) Publish Now, Schedule Publication; Deactivate Rule"
    },
    {
     "operationId": "listDynamicPriceRules",

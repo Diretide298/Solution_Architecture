@@ -57,6 +57,54 @@
   "requestBody": null,
   "responds": "RecommendationPerformance"
  },
+ "listProductRelationships": {
+  "method": "GET",
+  "path": "/product-relationships",
+  "contract": "promotions",
+  "summary": "Upgrade ladders, cross-sells, affinities and substitutes",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "productId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "kind",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ProductRelationship"
+ },
+ "listRecommendationStrategies": {
+  "method": "GET",
+  "path": "/recommendation-strategies",
+  "contract": "promotions",
+  "summary": "The strategies deciding what gets offered where",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "placement",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "RecommendationStrategy"
+ },
  "listUpsellCrossSell": {
   "method": "GET",
   "path": "/upsell-cross-sell",

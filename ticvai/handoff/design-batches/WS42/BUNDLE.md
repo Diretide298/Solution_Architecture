@@ -1,6 +1,6 @@
 # WS42 — Privacy  Consent   Preference Management board 2
 
-**10 screens · 11 operations · 21 schemas · 4 permissions**
+**10 screens · 14 operations · 22 schemas · 4 permissions**
 
 Platform P13 Venue CMS · ships as **venue-management** ·
 staff audience · web ·
@@ -61,6 +61,42 @@ convincingly. It is never a caption.
   and its error; and, element by element, what is shown and in what format, what each action
   produces and where the user goes next. Draw exactly that.
 
+## The processes these screens belong to
+
+Written by the owner of each process (`handoff/design-notes/`). Read before any screen: it says how the process runs end to end and which words the screens must use.
+
+### Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers)
+
+Customer & marketing is how a venue knows its guests and talks to them. There is ONE guest profile per person across ticketing, F&B and retail, so a guest who books online and later dines is the same profile (DI-339). A profile needs at least an email or a mobile, never neither (DI-372). Profiles are created by registration, by guest checkout, or by staff at a till or desk. Repeat guest checkouts with the same verified email or phone attach to the same profile automatically (DI-941, R120 default). Two records that might be the same person are NEVER merged automatically: the guest is asked to confirm, and an admin review queue runs alongside (DI-377). Each candidate shows why it matched; the record that loses is superseded, not deleted; consent takes the narrower of the two positions (DI-808). Around the profile sit three things that must never be confused. CONSENT is what the law allows: per purpose and per channel, append-only, with the notice version and the source (recordConsent). It is Given, Withdrawn or Not asked. A SUBSCRIPTION is what the guest asked to receive, e.g. a newsletter list (MarketingSubscription). A PREFERENCE is what they like: table, dietary, accessibility (updateGuestPreferences). An anonymous visitor's cookie decision is recorded against a device key (recordDeviceConsent) and attaches to the guest when they sign in (claimDeviceConsent). Marketing consent at GUEST CHECKOUT is an open client question, and the design follows its default: an unticked opt-in beside the terms, one per channel and purpose. It is recorded with source "checkout" against the order and the verified contact, and nothing is sent without it. Whether that is sufficient consent under PDPL is the client DPO's call (M18-15 (audit R-M18-15), DI-954, DI-940). Marketing reads profiles through SEGMENTS (rules, evaluated when used) and static LISTS (imported). It reaches guests by CAMPAIGNS (one send to an audience) and JOURNEYS (automations started by an event, with waits and branches). Journeys may offer only pre-configured offers, never a free-typed discount (MoM 2026-08-20 4.6). Everything goes through ONE communications module that every other module uses (MoM 2026-08-31 4.6). Consent and suppression are applied at send time, and the number excluded, with the reasons, is reported before anything goes out (launchCampaign). Transactional messages (tickets, receipts, queue calls, case replies) do not need marketing consent and must never carry marketing. LOYALTY pays for spend: points, tiers, rewards and expiry. GAMIFICATION pays for behaviour: challenges, badges, streaks, referrals and leaderboards (createChallenge). A guest reads their own loyalty position (getLoyaltyPosition). A till, the back office or support reads a named guest's (getGuestLoyalty, or identifyGuest at a till). SERVICE: one Case object covers lost property, complaints, questions, accessibility and refund requests (CaseKind). A guest raises one with raiseMyCase, which needs the connection …
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Guest | The person the venue serves, signed in or not. In body copy on every surface. | Customer, User, Subject, Contact, Patron | contracts/satellite/marketing-crm.yaml#/components/schemas/GuestProfile |
+| Guest profile | The CRM record of one person (details, consent, preferences, history). Distinct from the Account, which is how a guest signs in. | Customer record, Contact, Subject | contracts/satellite/marketing-crm.yaml#getGuestProfile |
+| Consent - Given / Withdrawn / Not asked | What the law allows, per purpose (marketing, personalisation, profiling, third-party sharing, AI processing, transactional) and per channel. "Not asked" is not "Withdrawn" and must look different. | Opted in/out as a status, Accepted, Declined, Revoked, Unsubscribed (that is a subscription) | contracts/satellite/marketing-crm.yaml#/components/schemas/ConsentDecision |
+| Subscription | A list the guest asked to receive (a newsletter, event news), per channel. Unsubscribing from a list is not withdrawing consent. | Consent, Opt-in | contracts/satellite/marketing-crm.yaml#/components/schemas/MarketingSubscription |
+| Preferences | What the guest likes or needs (seating, drinks, dietary, accessibility, contact channel). Never grants permission. | Consents, Settings | contracts/satellite/marketing-crm.yaml#updateGuestPreferences |
+| Send me offers and news | The marketing opt-in label beside the terms at checkout, unticked, one per channel and purpose. | I agree to marketing, Pre-ticked boxes, Keep me updated ticked by default | DI-954 |
+| Points / Tier / Points to next tier / Expiring points | The loyalty position. Points are a liability earned per programme; tiers are ranked (Bronze, Silver, Gold, Platinum in the meetings). | Credits, Coins, Balance alone (wallet money is "credit"), Level | DI-382 |
+| Pending points | Points earned on a purchase still inside its refund window; shown apart from spendable points. | Available points for pending ones | contracts/satellite/marketing-crm.yaml#getLoyaltyPosition |
+| Reward | What points can be turned into (rewards catalogue). | Prize (games redemption uses prize), Voucher unless it is one | contracts/satellite/marketing-crm.yaml#listRewards |
+| Challenge / Badge / Streak / Referral | Gamification - rewards for behaviour, not spend. Status badges such as Explorer, Adventurer, Legend. | Mission and Quest used interchangeably on one screen, Loyalty tier for a badge | DI-392 |
+| Case | One service record - lost property, complaint, question, accessibility, refund request or other - with a number (venue prefix plus sequence), a status and an SLA. | Ticket (a ticket is an admission product), Issue, Incident (that is maintenance and safety) | contracts/satellite/marketing-crm.yaml#/components/schemas/CaseKind |
+| Reply to guest / Internal note | The two kinds of case message. The agent always chooses one explicitly; there is no default. | Comment, Message (ambiguous) | F05 step 2 |
+| Conversation | A live chat session (web chat, in-app, WhatsApp, SMS, email, kiosk, voice). With the assistant, then queued, then with an agent. It is not a case. | Ticket, Case (until one is raised from it) | contracts/satellite/marketing-crm.yaml#/components/schemas/ConversationState |
+| Segment / List / Audience | A segment is rules evaluated when used. A list is static, imported or hand-picked. The audience is what a campaign or journey targets. | Group, Cohort, Target list for a segment | DI-381 |
+| Campaign / Journey | A campaign is one send (one-off, scheduled, triggered or recurring) to an audience. A journey is an automation started by an event, with steps, waits and branches. | Flow (booking flows use it), Automation for a one-off send, Blast | R146 |
+| Offer | A pre-configured, system-validated discount or benefit that a campaign or journey references. It is never typed into the builder. | Discount field, Coupon (unless the offer is a coupon code) | MoM 2026-08-20 4.6 |
+| Reachable | How many guests in an audience can actually be sent to on a channel after consent and suppression. Always shown beside the matching count. | Audience size alone | contracts/satellite/marketing-crm.yaml#previewSegment |
+| Possible duplicate / Merge | Two profiles that may be one person. Never called "Duplicate" as a verdict. Merging needs confirmation and stays reversible for 30 days. | Duplicate (as a status), Combine, Auto-merge | DI-808 |
+| Data request | A guest's privacy request - a copy of my data, a correction, erasure, a restriction - with a legal clock. Statuses submitted, in progress, completed. | DSAR on guest screens, Subject data, Ticket | DI-379 |
+| Waiver / Consent question | A waiver is a signed, versioned form. A consent question ("Are you able to swim?", "I accept the risk") is a single question asked per person or per booking and recorded as consent. | Contract, Disclaimer, Form for a waiver in guest copy | DI-1062 |
+| Lost item / Found item / Possible match | The two directions of lost property and the suggested pairing between them. | Lost case, Claim before it is claimed | contracts/satellite/marketing-crm.yaml#/components/schemas/LostItem |
+| Wishlist | Products and dates a guest saved to buy later, including F&B and retail to buy on site. | Favourites (used for transport routes), Saved for later on one surface and Wishlist on another | DI-202 |
+| Notification / Message | A notification is an item in the guest's in-app feed. A message is one send on a channel (email, SMS, WhatsApp, push, in-app). | Alert for marketing content, Inbox for the guest feed | contracts/satellite/marketing-crm.yaml#/components/schemas/GuestNotification |
+| Template | A reusable message body per channel and language with merge fields. Transactional and marketing templates are separate kinds. | Layout, Design | contracts/satellite/marketing-crm.yaml#createMessageTemplate |
+
+
 ## The screens
 
 Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs count fields; requirements are matrix rows; meeting inputs are the ones naming the screen (the module and platform ones are below); white label says whether the tenant's brand reaches it (guest) or it sets the brand (configures).
@@ -73,8 +109,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `CMS-034` | Data Subject / Customer Privacy Request Management | B–D | 0 | 8 | 6 | 0 | 0 | 4 | — | notStarted (generated) |
 | `CMS-035` | Data Discovery, Access, Export & Correction Workspace | B–D | 0 | 4 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `CMS-036` | Deletion, Anonymization & Restriction Operations | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `CMS-037` | Data Retention, Expiry & Legal Hold Operations | B–D | 0 | 12 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `CMS-038` | Privacy Compliance, Exception & Investigation Workspace | B–D | 0 | 20 | 6 | 0 | 0 | 4 | — | notStarted (generated) |
+| `CMS-037` | Data Retention, Expiry & Legal Hold Operations | B–D | 15 | 12 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `CMS-038` | Privacy Compliance, Exception & Investigation Workspace | B–D | 0 | 40 | 6 | 0 | 0 | 4 | — | notStarted (generated) |
 | `CMS-039` | Privacy Audit, Evidence & Compliance Reporting | B–D | 14 | 0 | 5 | 1 | 0 | 4 | — | notStarted (generated) |
 | `CMS-040` | Privacy Analytics & AI Compliance Intelligence | B–D | 2 | 26 | 6 | 1 | 0 | 4 | — | notStarted (generated) |
 
@@ -103,6 +139,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/policy/privacy-operations-command-center-cms-031` |
+
+**From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** Privacy operations overview: KPIs, consent health per category, the request queue by status and stage with deadlines, retention and deletion actions, exceptions, incidents. Separate permissions apply to viewing requests, handling PII and approving deletion.
 
 #### Inputs: what the user enters or picks
 
@@ -194,6 +232,22 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 
+#### Consistency with other screens
+
+- Match `BO-744`: Same queue and counts; one owner.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+kpis:
+  openRequests: 7
+  dueThisWeek: 3
+  consentHealthMarketing: 61%
+  incidents: 0
+```
+
 #### Permissions
 
 - `listPrivacy` → `GUEST_VIEW` (read) · staff
@@ -265,6 +319,12 @@ Also apply: 8 for all of P13, 29 for every app (section *Design inputs from the 
 | Opens with | nothing: it opens on its own |
 | Route | `/policy/customer-privacy-consent-preference-360-cms-032` |
 
+**From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** One guest's whole privacy relationship: consent per purpose and channel (Given, Withdrawn, Not asked), source and notice version of each, preferences, accepted policies, cookie decisions claimed, data requests and retention status. Needs PII permission.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **Drawn as a table of "every customer privacy consent".** Why: The 360 is one guest; open it from a search. *(source: screens/P13-white-label-cms.yaml#CMS-032; Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers))*
+
 #### Inputs: what the user enters or picks
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
@@ -314,6 +374,15 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+guest: Sarah Thompson - Marketing email Given (checkout, v4, 1 Oct 2026) - WhatsApp Not asked - Privacy policy v4
+  accepted - 1 open request
+```
+
 #### Permissions
 
 - `listCustomerPrivacyConsent` → `GUEST_VIEW_PII` (operate) · staff
@@ -353,6 +422,7 @@ Also apply: 8 for all of P13, 29 for every app (section *Design inputs from the 
 - [ ] Every transition is wired: `CMS-031`.
 - [ ] Every gated control is gated: `GUEST_VIEW_PII`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -372,6 +442,8 @@ Also apply: 8 for all of P13, 29 for every app (section *Design inputs from the 
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/policy/consent-evidence-history-withdrawal-management-cms-033` |
+
+**From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** Evidence of every consent event (presented, granted, declined, updated, withdrawn, expired, reconfirmed) and where each withdrawal has reached the downstream systems, plus the cookie decisions of visitors before they signed in.
 
 #### Inputs: what the user enters or picks
 
@@ -417,6 +489,10 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Target | chip: Crm, Marketing, Campaign audience, Connected system | — |
 | Status | chip: Requested, Processed, Propagated, Acknowledged, Failed, Retry required | — |
 
+**Rules for what is shown** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
+
+- **Withdrawal propagation**: Per withdrawal, each system it must reach (campaigns, journeys, providers) and whether it has. *(source: contracts/satellite/marketing-crm.yaml#listConsentEvidenceWithdrawal; contracts/satellite/marketing-crm.yaml#/components/schemas/ConsentPropagation)*
+
 **Data it reads**: `listConsentEvidenceWithdrawal` (onLoad, Consent Evidence, History & Withdrawal Management); `listDeviceConsents` (onLoad, Visitors' cookie decisions as evidence)
 
 **Where the user goes next**
@@ -433,6 +509,15 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the consent evidence history are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+event: Rahul Menon - Marketing WhatsApp - withdrawn 1 Oct 2026 09:14 (in app) - campaigns done, journeys done, WhatsApp
+  provider list pending
+```
 
 #### Permissions
 
@@ -499,6 +584,10 @@ Also apply: 8 for all of P13, 29 for every app (section *Design inputs from the 
 | Route | `/policy/data-subject-customer-privacy-request-management-cms-034` |
 
 **Known gaps.** **The pack names 7 actions on this screen and the screen declares 1 operation.** Unserved: Email/manual entry, POS, API, Authorized Representative, ID Review where permitted. Each needs an operation …
+
+**From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** Governed handling of privacy requests from customers, guardians or representatives received via portal, email, customer service, POS or API: identity review, statutory deadline, stage, owner. Status uses the meeting lifecycle submitted, in progress, completed.
+
+**Fixed on main** (the package already carries these; draw what it says): The action bar lists intake channels (Customer Portal, POS, API, Authorized Representative) as buttons, and no write is declared. (CHG-WIR-005).
 
 #### Inputs: what the user enters or picks
 
@@ -568,6 +657,20 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 
+#### Consistency with other screens
+
+- Match `BO-750`: Same queue; one owner.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+requests:
+- DR-2026-00431 - erasure - via app - submitted 1 Oct - due 31 Oct
+- DR-2026-00419 - access - via email by representative - ID review
+```
+
 #### Permissions
 
 - `listDataSubjectCustomer` → `GUEST_VIEW` (read) · staff
@@ -627,6 +730,12 @@ Also apply: 8 for all of P13, 29 for every app (section *Design inputs from the 
 | Opens with | nothing: it opens on its own |
 | Route | `/policy/data-discovery-access-export-correction-workspace-cms-035` |
 
+**From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** Locate a guest's data across systems to fulfil access, export or correction requests: discovery results per system, the export package (excluding other guests' data sharing a booking), and correction routing.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **The list is bound to setDataDiscoveryAccess (a write).** Why: Needs a read of the request's discovery. *(source: contracts/satellite/marketing-crm.yaml#setDataDiscoveryAccess; Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers))*
+
 #### Inputs: what the user enters or picks
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
@@ -671,6 +780,15 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 422 The request is not an access, export or correction request, is not `inProgress`, its identity is not verified, or the approver is the principal who generated … |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+discovery: DR-2026-00412 - found in CRM, Orders (14), Wallet (3), Cases (2), Marketing (41 dispatches) - export
+  PDF ready
+```
+
 #### Permissions
 
 - `setDataDiscoveryAccess` → `GUEST_VIEW_PII` (operate) · staff
@@ -707,6 +825,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `CMS-031`.
 - [ ] Every gated control is gated: `GUEST_VIEW_PII`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -728,6 +847,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Route | `/policy/deletion-anonymization-restriction-operations-cms-036` |
 
 **Known gaps.** **The pack names 4 actions on this screen and the screen declares 1 operation.** Unserved: Delete, Pseudonymize where configured, Remove Biometric Reference. Each needs an operation, or needs … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+**From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** Governed deletion, anonymisation, pseudonymisation, restriction, suppression and biometric removal, with strong controls because deletion touches financial, ticketing, fraud and legal records: ledger entries keep an anonymous reference; a biometric template is destroyed, not flagged.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **Delete, Pseudonymize, Restrict and Remove Biometric buttons have no operation; only a list is declared.** Why: The actions cannot be performed or approved. *(source: contracts/satellite/marketing-crm.yaml#listDeletionAnonymizationRestriction; Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers))*
 
 #### Inputs: what the user enters or picks
 
@@ -753,6 +878,10 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Restrict Processing (secondary button) | navigation or local | — | — | — | — |
 | Remove Biometric Reference (destructive button) | navigation or local | — | — | — | — |
 
+**Rules for what is shown** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
+
+- **Impact preview**: What will be deleted, what is anonymised, what is kept and why (legal hold, finance). *(source: contracts/satellite/marketing-crm.yaml#listDeletionAnonymizationRestriction; contracts/spine/identity.yaml#deleteGuestAccount)*
+
 **Data it reads**: `listDeletionAnonymizationRestriction` (onLoad, Deletion, Anonymization & Restriction Operations)
 
 **Where the user goes next**
@@ -774,6 +903,14 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the deletion anonymization restriction are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+action: Erase Rahul Menon - delete profile and documents, anonymise 14 orders, remove Face Pass - approval by DPO
+```
 
 #### Permissions
 
@@ -812,6 +949,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `CMS-031`.
 - [ ] Every gated control is gated: `GUEST_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -825,7 +963,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | App · platform | TICVAI Venue Management · P13 Venue CMS (web) |
 | Module | Policy · wave 3 · needs the `core` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `GUEST_VIEW` (1 read); in the flows as venue manager |
+| Who uses it | venue staff holding `GUEST_MANAGE`, `GUEST_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area, with a live preview of … · LTR and RTL · light theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Display) and no metric row |
 | Offline | online only |
@@ -833,6 +971,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Route | `/policy/data-retention-expiry-legal-hold-operations-cms-037` |
 
 **Known gaps.** **The pack names 6 actions on this screen and the screen declares 1 operation.** Unserved: Review, Extend where authorized, Delete, Archive, Place Hold, Release Hold. Each needs an operation, or …
+
+**From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** What retention will do next, per policy, and the holds that stop it: review, extend where authorised, archive, delete, place and release legal holds.
+
+**Fixed on main** (the package already carries these; draw what it says): Review, Extend, Archive, Delete, Place Hold and Release Hold have no operation. (CHG-WIR-005).
 
 #### Inputs: what the user enters or picks
 
@@ -844,7 +986,36 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Jurisdiction | text field | — | pattern `^[A-Z]{2}$` | `listDataRetentionExpiry` ?jurisdiction |
 | Hold status | segmented control | — | Pending approval · Active · Released | `listDataRetentionExpiry` ?holdStatus |
 
-Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+**Form: Run retention** (modal, opened by *Run retention*; *Run retention* calls `runDataRetention`, *Cancel* sends nothing)
+
+**Collects what `runDataRetention` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Policy `policyId` | picker: choose a policy | optional | — | — | shows names, sends the id | — | `runDataRetention` body |
+| Mode `mode` | segmented control | optional | Preview | Preview · Execute | — | — | `runDataRetention` body |
+| As of `asOf` | date picker | optional | — | — | 1 Oct 2026 (dd MMM yyyy) | — | `runDataRetention` body |
+
+**Form: Place or release hold** (modal, opened by *Place or release hold*; *Place or release hold* calls `setLegalHold`, *Cancel* sends nothing)
+
+**Collects what `setLegalHold` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Kind `kind` | radio group | optional | Legal | Legal · Operational · Fraud investigation · Regulator request | — | — | `setLegalHold` body |
+| Reason `reason` | text area | required | — | max length 1000 | — | — | `setLegalHold` body |
+| Scope `scope` | group | required | — | — | — | At least one selector. | `setLegalHold` body |
+| Subjects `scope.subjectIds` | multi-picker: choose subjects | optional | — | — | — | — | `setLegalHold` body |
+| Data categories `scope.dataCategories` | list of values (chips) | optional | — | — | — | — | `setLegalHold` body |
+| Retention policy codes `scope.retentionPolicyCodes` | list of values (chips) | optional | — | — | — | — | `setLegalHold` body |
+| Case `scope.caseId` | picker: choose a case | optional | — | — | shows names, sends the id | — | `setLegalHold` body |
+| Owner principal `ownerPrincipalId` | picker: choose an owner principal | optional | — | — | shows names, sends the id | — | `setLegalHold` body |
+| Starts at `startsAt` | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | Defaults to approval time. | `setLegalHold` body |
+| Review date `reviewDate` | date picker | optional | — | — | 1 Oct 2026 (dd MMM yyyy) | — | `setLegalHold` body |
+| Status `status` | segmented control | optional | Pending approval | Pending approval · Active · Released | — | Set `active` to approve, `released` to release. | `setLegalHold` body |
+| Release reason `releaseReason` | text area | optional | — | max length 1000 | — | — | `setLegalHold` body |
+
+Errors to draw in the form: 400 Validation failed; 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 422 Approved by the principal who placed it, released without a reason, or a change to a released hold.
 
 #### Outputs: what the screen shows and produces
 
@@ -882,6 +1053,8 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Archive (destructive button) | navigation or local | — | — | — | — |
 | Place Hold (secondary button) | navigation or local | — | — | — | — |
 | Release Hold (secondary button) | navigation or local | — | — | — | — |
+| Run retention (secondary button) | `runDataRetention` POST `/retention-runs` | inline | RetentionRunResult | — | opens modal first |
+| Place or release hold (secondary button) | `setLegalHold` PUT `/data-retention-expiry` | PrivacyLegalHold | PrivacyLegalHold | 400 Validation failed; 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 422 Approved by the principal who placed it, released without a reason, or a change to a … | opens modal first |
 
 **Data it reads**: `listDataRetentionExpiry` (onLoad, Data Retention, Expiry & Legal Hold Operations)
 
@@ -904,10 +1077,21 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the data retention expiry are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 422 Approved by the principal who placed it, released without a reason, or a change to a released hold. |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+next: 1,204 inactive profiles reach 5 years on 1 Nov 2026 - anonymise - 3 on legal hold
+```
 
 #### Permissions
 
 - `listDataRetentionExpiry` → `GUEST_VIEW` (read) · staff
+- `runDataRetention` → `GUEST_MANAGE` (configure) · staff
+- `setLegalHold` → `GUEST_MANAGE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -935,12 +1119,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (403).
+- [ ] Every input above is drawn (15), with its required mark, default, format and its error state (400, 403, 404, 422).
 - [ ] Every output is drawn (12 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#CMS-037?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: Review, Extend where authorized, Delete, Archive, Place Hold, Release Hold.
+- [ ] Every action is wired with its success and its failure: Review, Extend where authorized, Delete, Archive, Place Hold, Release Hold, Run retention, Place or release hold.
 - [ ] Every transition is wired: `CMS-031`.
-- [ ] Every gated control is gated: `GUEST_VIEW`.
+- [ ] Every gated control is gated: `GUEST_MANAGE`, `GUEST_VIEW`.
 - [ ] The module and platform inputs below are applied.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -955,7 +1139,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | App · platform | TICVAI Venue Management · P13 Venue CMS (web) |
 | Module | Policy · wave 3 · needs the `core` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `GUEST_MANAGE` (1 configure); in the flows as venue manager |
+| Who uses it | venue staff holding `GUEST_MANAGE`, `GUEST_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area, with a live preview of … · LTR and RTL · light theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Display) and no metric row |
 | Offline | online only |
@@ -964,7 +1148,23 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Known gaps.** **The pack names 3 actions on this screen and the screen declares 1 operation.** Unserved: Security, Operations, Data Owner. Each needs an operation, or needs removing from the screen; this is the …
 
+**From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** Privacy exceptions (configuration and operational) investigated through detected, triaged, assigned, investigated, corrective action, reviewed and closed, with security, operations and data-owner involvement.
+
+**Fixed on main** (the package already carries these; draw what it says): The list is bound to setPrivacyComplianceException (a write); buttons are team names. (CHG-WIR-005).
+
 #### Inputs: what the user enters or picks
+
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Category | select | — | Missing consent evidence · Consent propagation failure · Marketing after withdrawal · Policy version mismatch · Missing guardian consent · Retention failure · Deletion failure · Unknown tracking technology · Unauthorised data access · Unmapped processing … | `listPrivacyComplianceExceptions` ?category |
+| Severity | radio group | — | Low · Medium · High · Critical | `listPrivacyComplianceExceptions` ?severity |
+| Status | select | — | Detected · Triaged · Assigned · Investigated · Corrective action · Reviewed · Closed | `listPrivacyComplianceExceptions` ?status |
+| Owner principal | picker: choose an owner principal | — | — | `listPrivacyComplianceExceptions` ?ownerPrincipalId |
+| Subject | picker: choose a subject | — | — | `listPrivacyComplianceExceptions` ?subjectId |
+| Brand | picker: choose a brand | — | — | `listPrivacyComplianceExceptions` ?brandId |
+| Country | text field | — | pattern `^[A-Z]{2}$` | `listPrivacyComplianceExceptions` ?country |
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
 
@@ -979,13 +1179,38 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Severity | chip: Low, Medium, High, Critical | — |
 | Category | chip: Missing consent evidence, Consent propagation failure, Marketing after withdrawal … | — |
 | Subject | the name it points at, never the id | — |
-| System | chip: Tickets and booking, Membership, Events, Attractions, Virtual queue, Dining and fnb… | `visitPlanner` (decided 29 September, MOB-1 and the Plan tab in Block A) is the Plan tab and WEB-050; off, the tab and the page are not … |
+| System | text | — |
 | Brand | the name it points at, never the id | — |
 | Country | text | — |
 | Detected at | 1 Oct 2026, 14:30 | — |
 | Owner principal | the name it points at, never the id | — |
 | Sla due at | 1 Oct 2026, 14:30 | From the SLA policy for the severity (`setSlaPolicy`). |
 | Status | chip: Detected, Triaged, Assigned, Investigated, Corrective action, Reviewed… | — |
+
+**Privacy exceptions** (data table, from `listPrivacyComplianceExceptions`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| ID | the name it points at, never the id | Absent to raise; present to update. |
+| Category | chip: Missing consent evidence, Consent propagation failure, Marketing after withdrawal … | — |
+| Severity | chip: Low, Medium, High, Critical | — |
+| Summary | text | — |
+| Subject | the name it points at, never the id | — |
+| System | text | — |
+| Brand | the name it points at, never the id | — |
+| Country | text | — |
+| Owner principal | the name it points at, never the id | — |
+| Status | chip: Detected, Triaged, Assigned, Investigated, Corrective action, Reviewed… | — |
+| Related evidences | list or chips (count when long) | Consent evidence ids and audit event ids. |
+| Policy reference | text | The configuration or policy version involved. |
+| Root cause | text | — |
+| Corrective action | text | — |
+| Notes | text | — |
+| Attachment assets | list or chips (count when long) | — |
+| Escalated to | chip: Privacy, Legal, Security, It, Marketing, Operations… | — |
+| Privacy incident | the name it points at, never the id | The `recordPrivacyIncident` record, when the exception is also a breach. |
+| Detected at | 1 Oct 2026, 14:30 | — |
 
 **The selected privacy compliance exception** (detail panel): The pack groups this record's detail under its own headings: “Provide”, “Workflow”, “Important Boundary”.
 
@@ -994,7 +1219,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Severity | chip: Low, Medium, High, Critical | — |
 | Category | chip: Missing consent evidence, Consent propagation failure, Marketing after withdrawal … | — |
 | Subject | the name it points at, never the id | — |
-| System | chip: Tickets and booking, Membership, Events, Attractions, Virtual queue, Dining and fnb… | `visitPlanner` (decided 29 September, MOB-1 and the Plan tab in Block A) is the Plan tab and WEB-050; off, the tab and the page are not … |
+| System | text | — |
 | Brand | the name it points at, never the id | — |
 | Country | text | — |
 | Detected at | 1 Oct 2026, 14:30 | — |
@@ -1009,6 +1234,8 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Security (primary button) | navigation or local | — | — | — | — |
 | Operations (secondary button) | navigation or local | — | — | — | — |
 | Data Owner (secondary button) | navigation or local | — | — | — | — |
+
+**Data it reads**: `listPrivacyComplianceExceptions` (onLoad, The privacy exception queue)
 
 **Where the user goes next**
 
@@ -1026,9 +1253,18 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 422 Closed without root cause and corrective action, or a change to a closed exception. |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+exception: Marketing SMS sent to 12 guests with withdrawn consent - corrective action - provider list sync fixed
+```
+
 #### Permissions
 
 - `setPrivacyComplianceException` → `GUEST_MANAGE` (configure) · staff
+- `listPrivacyComplianceExceptions` → `GUEST_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -1058,12 +1294,12 @@ Also apply: 8 for all of P13, 29 for every app (section *Design inputs from the 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (400, 404, 422).
-- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (400, 403, 404, 422).
+- [ ] Every output is drawn (40 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#CMS-038?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Security, Operations, Data Owner.
 - [ ] Every transition is wired: `CMS-031`.
-- [ ] Every gated control is gated: `GUEST_MANAGE`.
+- [ ] Every gated control is gated: `GUEST_MANAGE`, `GUEST_VIEW`.
 - [ ] The module and platform inputs below are applied.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -1084,6 +1320,12 @@ Also apply: 8 for all of P13, 29 for every app (section *Design inputs from the 
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/policy/privacy-audit-evidence-compliance-reporting-cms-039` |
+
+**From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** The immutable privacy audit trail and compliance reports: consent granted and withdrawn, preferences, policy acceptance, requests, identity checks, exports, corrections, deletions, anonymisation, retention, holds, overrides and configuration changes; visitor cookie decisions as evidence.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **Event types are drawn as select fields in a configEditor.** Why: They are filters on a read-only list. *(source: screens/P13-white-label-cms.yaml#CMS-039; Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers))*
 
 #### Inputs: what the user enters or picks
 
@@ -1145,6 +1387,18 @@ Also apply: 8 for all of P13, 29 for every app (section *Design inputs from the 
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 
+#### Consistency with other screens
+
+- Match `BO-753`: Same trail.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+entry: 1 Oct 2026 09:14 - Consent withdrawn - Rahul Menon - Marketing WhatsApp - source guestApp - notice v4
+```
+
 #### Permissions
 
 - `listPrivacyEvidenceCompliance` → `AUDIT_VIEW` (read) · staff
@@ -1189,6 +1443,7 @@ Also apply: 8 for all of P13, 29 for every app (section *Design inputs from the 
 - [ ] Every transition is wired: `CMS-031`.
 - [ ] Every gated control is gated: `AUDIT_VIEW`, `GUEST_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -1208,6 +1463,8 @@ Also apply: 8 for all of P13, 29 for every app (section *Design inputs from the 
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/policy/privacy-analytics-ai-compliance-intelligence-cms-040` |
+
+**From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** Privacy analytics and AI-assisted risk detection for executives and the privacy officer: consent rates, request resolution and SLA, deletion and retention, with AI findings a human investigates.
 
 #### Inputs: what the user enters or picks
 
@@ -1295,6 +1552,14 @@ Also apply: 8 for all of P13, 29 for every app (section *Design inputs from the 
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+finding: Consent withdrawal on WhatsApp up 3x after the 28 Sep campaign (AI, model privacy-v1) - investigate frequency
+```
 
 #### Permissions
 
@@ -1433,8 +1698,11 @@ Method, path, parameters, request and response for every operation these screens
 "listDeviceConsents": {"method":"GET","path":"/consent/device","contract":"marketing-crm","summary":"Visitors' cookie decisions, as evidence","permission":"GUEST_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"channel","in":"query","required":false},{"name":"brandId","in":"query","required":false},{"name":"action","in":"query","required":false},{"name":"category","in":"query","required":false},{"name":"country","in":"query","required":false},{"name":"claimed","in":"query","required":false},{"name":"consentKey","in":"query","required":false},{"name":"from","in":"query","required":false},{"name":"to","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listPrivacy": {"method":"GET","path":"/privacy","contract":"marketing-crm","summary":"Privacy Operations Command Center","permission":"GUEST_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":"brandId","in":"query","required":false},{"name":"country","in":"query","required":false},{"name":"venueId","in":"query","required":false},{"name":"requestType","in":"query","required":false},{"name":"consentPurpose","in":"query","required":false},{"name":"channel","in":"query","required":false},{"name":"ownerPrincipalId","in":"query","required":false},{"name":"from","in":"query","required":false},{"name":"to","in":"query","required":false}],"requestBody":null,"responds":"PrivacyOperationsCommandCenterView"},
 "listPrivacyCompliance": {"method":"GET","path":"/privacy-compliance","contract":"marketing-crm","summary":"Privacy Analytics & AI Compliance Intelligence","permission":"GUEST_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":"from","in":"query","required":true},{"name":"to","in":"query","required":true},{"name":"brandId","in":"query","required":false},{"name":"country","in":"query","required":false},{"name":"venueId","in":"query","required":false},{"name":"channel","in":"query","required":false},{"name":"consentPurpose","in":"query","required":false},{"name":"segmentId","in":"query","required":false},{"name":"productId","in":"query","required":false},{"name":"policyVersion","in":"query","required":false},{"name":"language","in":"query","required":false}],"requestBody":null,"responds":"PrivacyAnalyticsAiComplianceIntelligenceView"},
+"listPrivacyComplianceExceptions": {"method":"GET","path":"/privacy-compliance-exception","contract":"marketing-crm","summary":"The privacy exception queue","permission":"GUEST_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"category","in":"query","required":false},{"name":"severity","in":"query","required":false},{"name":"status","in":"query","required":false},{"name":"ownerPrincipalId","in":"query","required":false},{"name":"subjectId","in":"query","required":false},{"name":"brandId","in":"query","required":false},{"name":"country","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listPrivacyEvidenceCompliance": {"method":"GET","path":"/privacy-evidence-compliance","contract":"marketing-crm","summary":"Privacy Audit, Evidence & Compliance Reporting","permission":"AUDIT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"action","in":"query","required":false},{"name":"report","in":"query","required":false},{"name":"subjectId","in":"query","required":false},{"name":"requestId","in":"query","required":false},{"name":"actorPrincipalId","in":"query","required":false},{"name":"from","in":"query","required":false},{"name":"to","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
+"runDataRetention": {"method":"POST","path":"/retention-runs","contract":"marketing-crm","summary":"Preview or execute a retention pass","permission":"GUEST_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"RetentionRunResult"},
 "setDataDiscoveryAccess": {"method":"PUT","path":"/data-discovery-access","contract":"marketing-crm","summary":"Data Discovery, Access, Export & Correction Workspace","permission":"GUEST_VIEW_PII","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"DataDiscoveryAccessExportCorrectionWorkspaceInput","responds":"DataDiscoveryAccessExportCorrectionWorkspaceView"},
+"setLegalHold": {"method":"PUT","path":"/data-retention-expiry","contract":"marketing-crm","summary":"Place, approve or release a legal or operational hold","permission":"GUEST_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"PrivacyLegalHold","responds":"PrivacyLegalHold"},
 "setPrivacyComplianceException": {"method":"PUT","path":"/privacy-compliance-exception","contract":"marketing-crm","summary":"Raise, investigate or close a privacy exception","permission":"GUEST_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"PrivacyComplianceExceptionInvestigationWorkspaceInput","responds":"PrivacyComplianceExceptionInvestigationWorkspaceView"}
 }
 ```
@@ -1465,6 +1733,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "PrivacyComplianceExceptionInvestigationWorkspaceInput": {"type":"object","x-ticvai-persistence":"marketing.privacy_exception","description":"What a user may send to raise or progress a privacy exception (pack 17.2.8).","required":["category","severity","summary"],"properties":{"id":{"type":"string","format":"uuid","description":"Absent to raise; present to update."},"category":{"type":"string","enum":["missingConsentEvidence","consentPropagationFailure","marketingAfterWithdrawal","policyVersionMismatch","missingGuardianConsent","retentionFailure","deletionFailure","unknownTrackingTechnology","unauthorisedDataAccess","unmappedProcessingPurpose","biometricPrivacyException","dataExportFailure","other"]},"severity":{"type":"string","enum":["low","medium","high","critical"]},"summary":{"type":"string","maxLength":1000},"subjectId":{"type":"string","format":"uuid","nullable":true},"system":{"$ref":"../shared/common.yaml#/components/schemas/ModuleKey"},"brandId":{"type":"string","format":"uuid","nullable":true},"country":{"type":"string","pattern":"^[A-Z]{2}$","nullable":true},"ownerPrincipalId":{"type":"string","format":"uuid","nullable":true},"status":{"type":"string","enum":["detected","triaged","assigned","investigated","correctiveAction","reviewed","closed"],"default":"detected"},"relatedEvidenceIds":{"type":"array","items":{"type":"string"},"description":"Consent evidence ids and audit event ids."},"policyReference":{"type":"string","maxLength":200,"nullable":true,"description":"The configuration or policy version involved."},"rootCause":{"type":"string","maxLength":2000,"nullable":true},"correctiveAction":{"type":"string","maxLength":2000,"nullable":true},"notes":{"type":"string","maxLength":4000,"nullable":true},"attachmentAssetIds":{"type":"array","items":{"type":"string","format":"uuid"}},"escalatedTo":{"type":"string","nullable":true,"enum":["privacy","legal","security","it","marketing","operations","dataOwner"]},"privacyIncidentId":{"type":"string","format":"uuid","nullable":true,"description":"The `recordPrivacyIncident` record, when the exception is also a breach."}}},
 "PrivacyComplianceExceptionInvestigationWorkspaceView": {"type":"object","x-ticvai-persistence":"marketing.privacy_exception","description":"One privacy exception as stored, with its investigation fields and timeline.","allOf":[{"$ref":"#/components/schemas/PrivacyComplianceExceptionInvestigationWorkspaceInput"},{"type":"object","required":["id","detectedAt"],"properties":{"detectedAt":{"type":"string","format":"date-time","readOnly":true},"detectedBy":{"type":"string","readOnly":true,"enum":["platformCheck","aiDetection","user"]},"slaDueAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true,"description":"From the SLA policy for the severity (`setSlaPolicy`)."},"timeline":{"type":"array","readOnly":true,"items":{"type":"object","properties":{"at":{"type":"string","format":"date-time"},"status":{"type":"string"},"principalId":{"type":"string","format":"uuid","nullable":true},"note":{"type":"string","nullable":true}}}},"closedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005)."},"updatedAt":{"type":"string","format":"date-time","readOnly":true}}}]},
 "PrivacyLegalHold": {"type":"object","x-ticvai-persistence":"marketing.legal_hold","description":"A legal or operational hold (pack 17.2.7 Hold information). Overrides scheduled deletion in its scope once approved.","required":["reason","scope"],"properties":{"holdId":{"type":"string","format":"uuid","readOnly":true},"kind":{"type":"string","enum":["legal","operational","fraudInvestigation","regulatorRequest"],"default":"legal"},"reason":{"type":"string","maxLength":1000},"scope":{"type":"object","description":"At least one selector.","properties":{"subjectIds":{"type":"array","items":{"type":"string","format":"uuid"}},"dataCategories":{"type":"array","items":{"type":"string"}},"retentionPolicyCodes":{"type":"array","items":{"type":"string"}},"caseId":{"type":"string","format":"uuid","nullable":true}}},"ownerPrincipalId":{"type":"string","format":"uuid","nullable":true},"startsAt":{"type":"string","format":"date-time","nullable":true,"description":"Defaults to approval time."},"reviewDate":{"type":"string","format":"date","nullable":true},"status":{"type":"string","enum":["pendingApproval","active","released"],"default":"pendingApproval","description":"Set `active` to approve, `released` to release."},"placedByPrincipalId":{"type":"string","format":"uuid","readOnly":true},"approvedByPrincipalId":{"type":"string","format":"uuid","nullable":true,"readOnly":true},"approvedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true},"releaseReason":{"type":"string","maxLength":1000,"nullable":true},"releasedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005)."},"updatedAt":{"type":"string","format":"date-time","readOnly":true}}},
-"PrivacyOperationsCommandCenterView": {"type":"object","x-ticvai-persistence":"none — projection over marketing.guest_profile, marketing.consent_record, marketing.privacy_request (new), marketing.privacy_action (new), marketing.retention_policy, marketing.privacy_exception (new), marketing.privacy_incident","description":"The privacy operations position for the caller's scope and filters (pack 17.2.1).","required":["totalCustomerPrivacyProfiles","consentHealth","requestQueue"],"properties":{"totalCustomerPrivacyProfiles":{"type":"integer","minimum":0},"activeConsentRecords":{"type":"integer","minimum":0},"withdrawnConsents":{"type":"integer","minimum":0},"marketingOptIns":{"type":"integer","minimum":0},"marketingOptOuts":{"type":"integer","minimum":0},"pendingDataRightsRequests":{"type":"integer","minimum":0,"description":"Requests not yet `completed`."},"overdueRequests":{"type":"integer","minimum":0},"requestsWithoutDeadline":{"type":"integer","minimum":0,"description":"Open requests whose jurisdiction has no configured response period."},"pendingDeletionActions":{"type":"integer","minimum":0},"pendingAnonymization":{"type":"integer","minimum":0},"retentionActionsDue":{"type":"integer","minimum":0,"description":"Records inside the 90-day notice window before their retention action (ADR-0047 §6)."},"consentEvidenceExceptions":{"type":"integer","minimum":0},"privacyIncidentsExceptions":{"type":"integer","minimum":0,"description":"Open privacy exceptions plus open privacy incidents."},"policyReAcceptancePending":{"type":"integer","minimum":0,"description":"Customers whose accepted notice version has been superseded."},"consentHealth":{"type":"array","items":{"type":"object","required":["category","granted","withdrawn","declined"],"properties":{"category":{"type":"string","enum":["emailMarketing","smsMarketing","whatsappMarketing","pushMarketing","personalisation","analytics","location","biometrics","other"]},"otherLabel":{"type":"string","nullable":true,"description":"The configured purpose name, when `category` is `other`."},"granted":{"type":"integer","minimum":0},"withdrawn":{"type":"integer","minimum":0},"declined":{"type":"integer","minimum":0},"requiresRenewal":{"type":"integer","minimum":0}}}},"requestQueue":{"type":"array","description":"Open and recently completed requests by status and configured stage.","items":{"type":"object","required":["status","count"],"properties":{"status":{"type":"string","enum":["submitted","inProgress","completed"]},"stage":{"type":"string","nullable":true},"count":{"type":"integer","minimum":0},"atRisk":{"type":"integer","minimum":0},"overdue":{"type":"integer","minimum":0}}}},"alerts":{"type":"array","items":{"type":"object","required":["kind","count"],"properties":{"kind":{"type":"string","enum":["requestsApproachingDeadline","requestsOverdue","requestsWithoutDeadline","supersededNoticeAccepted","withdrawnConsentInMarketingExport","consentPropagationFailed","retentionActionFailed"]},"count":{"type":"integer","minimum":0},"detail":{"type":"string","maxLength":300,"nullable":true}}}},"asOf":{"type":"string","format":"date-time"}}}
+"PrivacyOperationsCommandCenterView": {"type":"object","x-ticvai-persistence":"none — projection over marketing.guest_profile, marketing.consent_record, marketing.privacy_request (new), marketing.privacy_action (new), marketing.retention_policy, marketing.privacy_exception (new), marketing.privacy_incident","description":"The privacy operations position for the caller's scope and filters (pack 17.2.1).","required":["totalCustomerPrivacyProfiles","consentHealth","requestQueue"],"properties":{"totalCustomerPrivacyProfiles":{"type":"integer","minimum":0},"activeConsentRecords":{"type":"integer","minimum":0},"withdrawnConsents":{"type":"integer","minimum":0},"marketingOptIns":{"type":"integer","minimum":0},"marketingOptOuts":{"type":"integer","minimum":0},"pendingDataRightsRequests":{"type":"integer","minimum":0,"description":"Requests not yet `completed`."},"overdueRequests":{"type":"integer","minimum":0},"requestsWithoutDeadline":{"type":"integer","minimum":0,"description":"Open requests whose jurisdiction has no configured response period."},"pendingDeletionActions":{"type":"integer","minimum":0},"pendingAnonymization":{"type":"integer","minimum":0},"retentionActionsDue":{"type":"integer","minimum":0,"description":"Records inside the 90-day notice window before their retention action (ADR-0047 §6)."},"consentEvidenceExceptions":{"type":"integer","minimum":0},"privacyIncidentsExceptions":{"type":"integer","minimum":0,"description":"Open privacy exceptions plus open privacy incidents."},"policyReAcceptancePending":{"type":"integer","minimum":0,"description":"Customers whose accepted notice version has been superseded."},"consentHealth":{"type":"array","items":{"type":"object","required":["category","granted","withdrawn","declined"],"properties":{"category":{"type":"string","enum":["emailMarketing","smsMarketing","whatsappMarketing","pushMarketing","personalisation","analytics","location","biometrics","other"]},"otherLabel":{"type":"string","nullable":true,"description":"The configured purpose name, when `category` is `other`."},"granted":{"type":"integer","minimum":0},"withdrawn":{"type":"integer","minimum":0},"declined":{"type":"integer","minimum":0},"requiresRenewal":{"type":"integer","minimum":0}}}},"requestQueue":{"type":"array","description":"Open and recently completed requests by status and configured stage.","items":{"type":"object","required":["status","count"],"properties":{"status":{"type":"string","enum":["submitted","inProgress","completed"]},"stage":{"type":"string","nullable":true},"count":{"type":"integer","minimum":0},"atRisk":{"type":"integer","minimum":0},"overdue":{"type":"integer","minimum":0}}}},"alerts":{"type":"array","items":{"type":"object","required":["kind","count"],"properties":{"kind":{"type":"string","enum":["requestsApproachingDeadline","requestsOverdue","requestsWithoutDeadline","supersededNoticeAccepted","withdrawnConsentInMarketingExport","consentPropagationFailed","retentionActionFailed"]},"count":{"type":"integer","minimum":0},"detail":{"type":"string","maxLength":300,"nullable":true}}}},"asOf":{"type":"string","format":"date-time"}}},
+"RetentionRunResult": {"type":"object","x-ticvai-persistence":"marketing.retention_run","description":"Board 2.8. **Completion evidence is the half that gets forgotten until an audit.**","properties":{"runId":{"type":"string","format":"uuid","x-ticvai-column":"id","description":"The run, stored as `marketing.retention_run`; `PrivacyAction.retentionRunId` points here. Preview runs are stored too, so an executed pass can be compared with what it previewed."},"policyId":{"type":"string","format":"uuid"},"mode":{"type":"string","enum":["preview","execute"]},"recordsAffected":{"type":"integer"},"byAction":{"type":"object","additionalProperties":{"type":"integer"}},"heldBack":{"type":"integer"},"heldBackReasons":{"type":"object","additionalProperties":{"type":"integer"}},"dependencies":{"type":"array","x-ticvai-persisted":false,"description":"Computed for the response; the executed run's detail is in the evidence asset.","items":{"type":"object","properties":{"surface":{"type":"string"},"count":{"type":"integer"},"consequence":{"type":"string"}}}},"evidenceAssetId":{"type":"string","format":"uuid","nullable":true},"completedAt":{"type":"string","format":"date-time","nullable":true}}}
 }
 ```

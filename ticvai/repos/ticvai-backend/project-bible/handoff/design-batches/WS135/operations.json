@@ -74,6 +74,19 @@
   "requestBody": null,
   "responds": "GuestAttributeModel"
  },
+ "getGuestConsents": {
+  "method": "GET",
+  "path": "/guests/{subjectId}/consents",
+  "contract": "marketing-crm",
+  "summary": "Read a guest's consent state",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ConsentState"
+ },
  "getGuestIntelligence": {
   "method": "GET",
   "path": "/guests/{guestId}/intelligence",
@@ -160,55 +173,6 @@
   ],
   "requestBody": null,
   "responds": "GuestTimelineEvent"
- },
- "listCustomerSegmentProfile": {
-  "method": "GET",
-  "path": "/customer-segment-profile",
-  "contract": "catalogue",
-  "summary": "Customer Segment & Profile Pricing Rules",
-  "permission": "PRODUCT_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "dimension",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "segmentSource",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "customerId",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "status",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "search",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
  },
  "listCustomerServiceProfile": {
   "method": "GET",
@@ -449,24 +413,5 @@
   ],
   "requestBody": null,
   "responds": "GuestProfileDetail"
- },
- "uploadGuestDocument": {
-  "method": "POST",
-  "path": "/guest-documents",
-  "contract": "marketing-crm",
-  "summary": "Store a guest photo, ID or signed document",
-  "permission": "GUEST_VIEW_PII",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "GuestDocument",
-  "responds": "GuestDocument"
  }
 }

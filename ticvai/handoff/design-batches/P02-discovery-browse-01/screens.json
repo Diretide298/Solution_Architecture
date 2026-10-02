@@ -150,10 +150,7 @@
     {
      "to": "GST-011",
      "trigger": "Wallet Overview",
-     "carries": [
-      "subjectId"
-     ],
-     "provenance": "derived — GST-011 declares entryState.params subjectId, walletId and GST-001 holds subjectId, so an edge into it carries them"
+     "provenance": "derived — GST-011 declares entryState.params cardCode, walletId and GST-001 holds none of them. The edge carries nothing: cardCode only pre-selects (deep link or optional); GST-011 finds walletId (getWallet) itself, and GST-011 opens on its own"
     },
     {
      "to": "GST-012",
@@ -184,10 +181,7 @@
     {
      "to": "GST-015",
      "trigger": "Memberships",
-     "carries": [
-      "subjectId"
-     ],
-     "provenance": "derived — GST-015 declares entryState.params caseId, guestLinkId, statementId, subjectId and GST-001 holds subjectId, so an edge into it carries them"
+     "provenance": "derived — GST-015 declares entryState.params caseId, guestLinkId, statementId and GST-001 holds none of them. The edge carries nothing: guestLinkId only pre-selects (deep link or optional); GST-015 finds statementId (listBillingStatements) itself; GST-015 opens on listBillingStatements, and caseId has no source on GST-015 yet (a gap in GST-015, not in this edge)"
     },
     {
      "to": "GST-016",
@@ -218,10 +212,7 @@
     {
      "to": "GST-020",
      "trigger": "Saved Items / Wishlist",
-     "carries": [
-      "subjectId"
-     ],
-     "provenance": "derived — GST-020 declares entryState.params itemId, subjectId and GST-001 holds subjectId, so an edge into it carries them"
+     "provenance": "derived — GST-020 declares entryState.params itemId and GST-001 holds none of them. The edge carries nothing: itemId only pre-selects (deep link or optional), and GST-020 opens on its own"
     },
     {
      "to": "GST-021",
@@ -252,7 +243,7 @@
     {
      "to": "GST-026",
      "trigger": "Retail / Merchandise",
-     "provenance": "derived — GST-026 declares entryState.params cardCode and GST-001 holds none of them. The edge carries nothing: cardCode only pre-selects (deep link or optional), and GST-026 opens on its own"
+     "provenance": "derived — GST-026 declares entryState.params  and GST-001 holds none of them. The edge carries nothing: GST-026 needs nothing to open"
     },
     {
      "to": "GST-027",
@@ -265,7 +256,7 @@
     {
      "to": "GST-031",
      "trigger": "AI Concierge – Home",
-     "provenance": "derived — GST-031 declares entryState.params conversationId, outletId and GST-001 holds none of them. The edge carries nothing: conversationId, outletId only pre-select (deep link or optional), and GST-031 opens on its own"
+     "provenance": "derived — GST-031 declares entryState.params conversationId, messageId, outletId and GST-001 holds none of them. The edge carries nothing: conversationId, outletId, messageId only pre-select (deep link or optional), and GST-031 opens on its own"
     },
     {
      "to": "GST-032",
@@ -278,15 +269,12 @@
     {
      "to": "GST-033",
      "trigger": "AI Concierge – Contextual Help",
-     "provenance": "derived — GST-033 declares entryState.params conversationId and GST-001 holds none of them. The edge carries nothing: conversationId only pre-selects (deep link or optional), and GST-033 opens on its own"
+     "provenance": "derived — GST-033 declares entryState.params conversationId, messageId and GST-001 holds none of them. The edge carries nothing: conversationId, messageId only pre-select (deep link or optional), and GST-033 opens on its own"
     },
     {
      "to": "GST-034",
      "trigger": "Lost & Found",
-     "carries": [
-      "orderId"
-     ],
-     "provenance": "derived — GST-034 declares entryState.params caseId, orderId and GST-001 holds orderId, so an edge into it carries them"
+     "provenance": "derived — GST-034 declares entryState.params caseId and GST-001 holds none of them. The edge carries nothing: caseId only pre-selects (deep link or optional), and GST-034 opens on its own"
     },
     {
      "to": "GST-037",
@@ -367,7 +355,7 @@
     {
      "to": "GST-061",
      "trigger": "Menu Item Detail",
-     "provenance": "derived — GST-061 declares entryState.params outletId and GST-001 holds none of them. The edge carries nothing: outletId only pre-selects (deep link or optional), and GST-061 opens on its own"
+     "provenance": "derived — GST-061 declares entryState.params menuItemId, outletId and GST-001 holds none of them. The edge carries nothing: outletId, menuItemId only pre-select (deep link or optional), and GST-061 opens on its own"
     },
     {
      "to": "GST-070",
@@ -498,11 +486,11 @@
     "appTabs"
    ]
   },
-  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement. Landing. **Declared only a health check.** Pranay asked for guest details and tickets; Chitrangi asked for search. All three existed and none were wired. **Rewired on the 20 August review.** **Venue selection added 28 September** (decided 28 September, audit R267) — a venue picker on first open, remembered on the device, **Change venue**, and a visit-day suggestion from the guest's ticket (`listMyEntitlements`). Nothing in `getTenantAppStatus.venues` supplies the options, the tenant's active venues, public and cacheable.\n\n**Rev 3 (decided 29 September).** The in-venue notifications feed (GST-030) is back in the first release (GAP-C1, reversing audit R242). A transport venue's home opens the trip search (GST-076, REV3-21). The venue picked here (audit R267) is the venue whose booking-flow settings apply; the booking screens' *Booking at* bar changes it (REV3-18). Every booking-flow setting named here is read from `getTenantConfig` `bookingFlow`, resolved for the venue the guest picked (audit R267): the tenant's values with that venue's `venueOverrides` entry laid over field by field (decided 29 September, rev 3 CFG-11).\n\n**Mobile v4 (decided 29 September, MOB-1, MOB-3, MOB-5).** Retitled **Home** and made the Home tab root: hero (carousel, video, poster or split), the venue overview (description, opening hours, info), type tiles and one or two highlights per type; tapping a highlight opens Item Detail (GST-004). GST-005 What's On and GST-029 Venue Info & Services stay and are linked from here. The optional intro video is a first-launch state of this screen, not a screen. The Plan tab (GST-051) is in Block A (29 September re-plan, superseding audit R187 and rev 3 GAP-C3), so its links no longer carry a later-release precondition.",
+  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement. Landing. **Declared only a health check.** Pranay asked for guest details and tickets; Chitrangi asked for search. All three existed and none were wired. **Rewired on the 20 August review.** **Venue selection added 28 September** (decided 28 September, audit R267) — a venue picker on first open, remembered on the device, **Change venue**, and a visit-day suggestion from the guest's ticket (`listMyEntitlements`). Nothing in `getTenantAppStatus.venues` supplies the options, the tenant's active venues, public and cacheable.\n\n**Rev 3 (decided 29 September).** The in-venue notifications feed (GST-030) is back in the first release (GAP-C1, reversing audit R242). A transport venue's home opens the trip search (GST-076, REV3-21). The venue picked here (audit R267) is the venue whose booking-flow settings apply; the booking screens' *Booking at* bar changes it (REV3-18). Every booking-flow setting named here is read from `getTenantConfig` `bookingFlow`, resolved for the venue the guest picked (audit R267): the tenant's values with that venue's `venueOverrides` entry laid over field by field (decided 29 September, rev 3 CFG-11).\n\n**Mobile v4 (decided 29 September, MOB-1, MOB-3, MOB-5).** Retitled **Home** and made the Home tab root: hero (carousel, video, poster or split), the venue overview (description, opening hours, info), type tiles and one or two highlights per type; tapping a highlight opens Item Detail (GST-004). GST-005 What's On and GST-029 Venue Info & Services stay and are linked from here. The optional intro video is a first-launch state of this screen, not a screen. The Plan tab (GST-051) is in Block A (29 September re-plan, superseding audit R187 and rev 3 GAP-C3), so its links no longer carry a later-release precondition.\n\n**The client-approved app wireframe is the layout** (decided by Chinmay, 2 October 2026; DEC-163); it changes only where the spec breaks. The card count per section is the venue's choice (DEC-152) (CHG-SGU-005).",
   "density": "comfortable",
   "pattern": "listDetail",
   "patternReason": "`listMyEntitlements` reads the population and `getTenantAppStatus` reads one of them — list, select, act",
-  "purpose": "The Home tab: what this venue is, when it is open and what there is to do, with one or two highlights per type, from which everything else is entered.",
+  "purpose": "The Home tab: what this venue is, when it is open and what there is to do, with the highlights per type the venue chose, from which everything else is entered.",
   "layout": {
    "template": "split",
    "regions": [
@@ -595,8 +583,8 @@
        "kind": "cardList",
        "label": "Highlights per type",
        "operation": "listProducts",
-       "notes": "One or two items per type (`HomepageLayout.sections[].maxItems`, 1-2, set on CMS-007); a highlight opens Item Detail.",
-       "provenance": "decided 29 September 2026, MOB-3"
+       "notes": "The number of items per type the venue chose (`HomepageLayout.sections[].maxItems`, set on CMS-007; DEC-152); a highlight opens Item Detail.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-009, decided by Chinmay 2 October 2026, DEC-152, DEC-153)"
       }
      ]
     },

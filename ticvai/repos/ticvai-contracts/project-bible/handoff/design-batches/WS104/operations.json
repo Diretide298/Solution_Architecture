@@ -18,6 +18,25 @@
   "requestBody": "ConfigureWorkstationRequest",
   "responds": "Workstation"
  },
+ "decideProposedAction": {
+  "method": "POST",
+  "path": "/proposed-actions/{actionId}/decide",
+  "contract": "ai",
+  "summary": "Approve or reject a proposal",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ProposedAction"
+ },
  "generateConfiguration": {
   "method": "POST",
   "path": "/generate/configuration",
@@ -69,24 +88,48 @@
   "requestBody": null,
   "responds": "GoLiveReadiness"
  },
- "getTenantConfig": {
+ "listPrices": {
   "method": "GET",
-  "path": "/tenant-config",
-  "contract": "white-label",
-  "summary": "Full working configuration",
-  "permission": "TENANT_CONFIGURE",
+  "path": "/price-lists/{priceListId}/prices",
+  "contract": "catalogue",
+  "summary": "List prices in a list",
+  "permission": "PRICE_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
+  "scopeLevel": "venue",
   "parameters": [
    {
-    "name": "version",
-    "in": "query",
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
     "required": null
    }
   ],
   "requestBody": null,
-  "responds": "TenantConfig"
+  "responds": "Page"
+ },
+ "publishChannelAvailability": {
+  "method": "PUT",
+  "path": "/channel-availability",
+  "contract": "catalogue",
+  "summary": "Channel Publication & Availability",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ChannelPublicationAvailabilityInput",
+  "responds": "ChannelPublicationAvailabilityView"
  },
  "runGoLiveValidation": {
   "method": "POST",
@@ -106,25 +149,6 @@
   ],
   "requestBody": null,
   "responds": null
- },
- "setChannelListing": {
-  "method": "PUT",
-  "path": "/channel-listings",
-  "contract": "subscription",
-  "summary": "List a product on a channel, with its own allocation",
-  "permission": "PARTNER_MANAGE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "ChannelListing",
-  "responds": "ChannelListing"
  },
  "setPrices": {
   "method": "PUT",

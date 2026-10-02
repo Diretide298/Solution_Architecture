@@ -29,11 +29,8 @@ steps:
   action: Live Table & Service Management.
   operations:
   - holdCourse
-  - joinRestaurantWaitlist
   - mergeTableVisits
   - moveTableVisit
-  - notifyWaitlistParty
-  - quoteWaitTime
   outcome: '**Drawn by the client as FNB-4B.** 10 operations on this step.'
 - step: 3
   screen: EMP-060

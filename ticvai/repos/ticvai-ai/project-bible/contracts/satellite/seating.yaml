@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Seating & Venue Mapping
   version: 0.1.0
-  x-ticvai-screen-count: 55
+  x-ticvai-screen-count: 54
   x-ticvai-tier: satellite
   x-ticvai-module: 21 — Seat Management & Venue Mapping
   x-ticvai-requirements: 112
@@ -86,6 +86,9 @@ paths:
       operationId: assignSeats
       x-ticvai-consumed-by:
         - "P08 BO-995 Find Seats For Me"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       summary: Pick and hold the best available seats
       description: 'BL-168. **`recommendSeats` returned a set and nothing applied it**, so automatic assignment
         was left to the caller — and every caller wrote the same loop.
@@ -252,7 +255,6 @@ paths:
       operationId: listSeatMaps
       x-ticvai-consumed-by:
         - "P08 BO-1061 Platform Command Center"
-        - "P08 BO-1072 Seat Management APIs"
         - "P08 BO-953 Seat Map Command Center"
         - "P08 BO-973 Layout Command Center"
         - "P08 BO-978 Multi-Performance Assignment"
@@ -356,9 +358,18 @@ paths:
     get:
       operationId: getSeatMap
       x-ticvai-consumed-by:
+        - "P08 BO-1070 Setup, Clone & Inheritance"
         - "P08 BO-954 Venue Canvas"
         - "P08 BO-955 Sections & Zones"
+        - "P08 BO-957 Standing Zones"
+        - "P08 BO-958 Suites & Boxes"
+        - "P08 BO-959 Stage & Focal Point"
+        - "P08 BO-960 Entrances, Exits & Aisles"
+        - "P08 BO-961 Amenities & Obstructions"
+        - "P08 BO-972 AI Venue Designer & Publish"
         - "P08 BO-975 Event-Specific Layout"
+        - "P08 BO-976 Clone & Inheritance"
+        - "P08 BO-982 Approval, Publish & Rollback"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -477,7 +488,6 @@ paths:
         - "P08 BO-962 Templates, Validation & Publish"
         - "P08 BO-972 AI Venue Designer & Publish"
         - "P08 BO-975 Event-Specific Layout"
-        - "P08 BO-978 Multi-Performance Assignment"
         - "P08 BO-982 Approval, Publish & Rollback"
       x-ticvai-audience:
       - staff
@@ -651,7 +661,6 @@ paths:
         - "P08 BO-1064 Naming, Numbering & Localization"
         - "P08 BO-956 Rows & Seats"
         - "P08 BO-968 AI Row & Seat Recognition"
-        - "P08 BO-970 AI Numbering & Labeling"
       x-ticvai-audience:
       - staff
       summary: Bulk-amend seats
@@ -864,6 +873,7 @@ paths:
         - "P08 BO-964 PDF & Image Import"
         - "P08 BO-965 SVG & CAD Import"
         - "P08 BO-966 CSV & Excel Import"
+        - "P08 BO-972 AI Venue Designer & Publish"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -1205,14 +1215,23 @@ paths:
         - "P01 WEB-007 Interactive Seat Selection"
         - "P02 GST-049 Interactive Seat Selection"
         - "P04 POS-004 Sell — Seat Map"
-        - "P08 BO-002 Queue Configuration"
         - "P08 BO-015 Performance Calendar"
         - "P08 BO-019 Closures & Blackouts"
-        - "P08 BO-063 Opening Hours & Calendar"
         - "P08 BO-1000 Mobile & Accessible Selection"
+        - "P08 BO-1001 View Preview, Compare & Heat Map"
+        - "P08 BO-1002 AI Conversational Seat Assistant"
+        - "P08 BO-1039 Seat Upgrade Recommendations"
+        - "P08 BO-1040 Alternatives & Reseating"
         - "P08 BO-986 Availability Tracker"
         - "P08 BO-994 Choose My Seats"
+        - "P08 BO-995 Find Seats For Me"
         - "P08 BO-996 Filters & Interactive Legend"
+      # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
+      # or staff token is still accepted. `{}` makes the credential optional.
+      security:
+      - {}
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-audience:
       - staff
       - guest
@@ -1278,6 +1297,9 @@ paths:
         - "P02 GST-049 Interactive Seat Selection"
         - "P04 POS-004 Sell — Seat Map"
         - "P08 BO-994 Choose My Seats"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-audience:
       - staff
       - guest
@@ -1400,8 +1422,10 @@ paths:
         - "P01 WEB-007 Interactive Seat Selection"
         - "P02 GST-049 Interactive Seat Selection"
         - "P04 POS-004 Sell — Seat Map"
-        - "P08 BO-998 Lock Timeout & Concurrency"
         - "P08 BO-999 Cart & Multi-Seat Management"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-audience:
       - staff
       - guest
@@ -1455,9 +1479,7 @@ paths:
         format: uuid
     post:
       operationId: extendSeatHold
-      x-ticvai-consumed-by:
-        - "P04 POS-004 Sell — Seat Map"
-        - "P08 BO-998 Lock Timeout & Concurrency"
+      x-ticvai-consumed-by: []
       x-ticvai-audience:
       - staff
       summary: Extend a hold
@@ -1502,6 +1524,7 @@ paths:
       operationId: listSeatBlocks
       x-ticvai-consumed-by:
         - "P08 BO-987 Hold Tracker"
+        - "P08 BO-990 Maintenance & Out of Service"
         - "P10 PTR-009 Group / Bulk Booking"
       x-ticvai-api-scope: seating.read
       x-ticvai-audience:
@@ -1786,14 +1809,14 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-007 Interactive Seat Selection"
         - "P02 GST-049 Interactive Seat Selection"
-        - "P04 POS-004 Sell — Seat Map"
-        - "P08 BO-002 Queue Configuration"
         - "P08 BO-015 Performance Calendar"
         - "P08 BO-019 Closures & Blackouts"
-        - "P08 BO-063 Opening Hours & Calendar"
         - "P08 BO-1001 View Preview, Compare & Heat Map"
         - "P08 BO-1002 AI Conversational Seat Assistant"
         - "P08 BO-1039 Seat Upgrade Recommendations"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-audience:
       - staff
       - guest
@@ -1911,6 +1934,7 @@ paths:
       operationId: diffSeatMapVersions
       x-ticvai-consumed-by:
         - "P08 BO-977 Version Compare"
+        - "P08 BO-981 Conflict & Impact Simulation"
       summary: Compare two versions of a layout
       description: '**The layout version-comparison view, decided 21 August.** Seat counts and configuration
         differences between two saved layouts.
@@ -2058,6 +2082,8 @@ paths:
       operationId: listSeatHoldTypes
       x-ticvai-consumed-by:
         - "P08 BO-1004 Hold Type Master"
+        - "P08 BO-1006 Hold Rule Assignment"
+        - "P08 BO-1007 Expiration Rules"
         - "P08 BO-980 Scheduled Seat Release"
       summary: The kinds of hold a venue places, and who may release them
       description: 'Boards 6.2 and 6.4. **`createSeatBlock` existed and nothing said what a block
@@ -2128,9 +2154,13 @@ paths:
       operationId: listSeatHoldPools
       x-ticvai-consumed-by:
         - "P08 BO-1003 Hold Command Center"
+        - "P08 BO-1005 Hold Pool Creation"
+        - "P08 BO-1008 Automatic Hold Release"
+        - "P08 BO-1009 Release, Convert & Reassign"
         - "P08 BO-1010 Hold Approval Workflow"
         - "P08 BO-1011 Priority & Conflict Resolution"
         - "P08 BO-1012 Hold Utilization & Audit"
+        - "P08 BO-1057 Hold Inventory Reporting"
         - "P08 BO-979 Temporary Seat Blocking"
         - "P08 BO-989 Sales & Allocation Tracker"
       summary: Held seats, by pool, with what is left and when it releases
@@ -2270,6 +2300,10 @@ paths:
       operationId: getSeatRules
       x-ticvai-consumed-by:
         - "P08 BO-1013 Rules Command Center"
+        - "P08 BO-1014 Seat Kill Rules"
+        - "P08 BO-1015 Buffer Seat Rules"
+        - "P08 BO-1016 Companion Seat Rules"
+        - "P08 BO-1021 Flexible Spacing Rules"
       summary: Kill, buffer, companion and accessibility rules
       tags:
       - seating
@@ -2350,6 +2384,8 @@ paths:
         - "P08 BO-1000 Mobile & Accessible Selection"
         - "P08 BO-1017 Wheelchair Companion Rules"
         - "P08 BO-1018 Accessible Seating Master"
+        - "P08 BO-1019 Accessible Route Mapping"
+        - "P08 BO-1020 Accessible Filters & Eligibility"
         - "P08 BO-1038 Accessibility Recommendations"
       summary: Accessible seats, their routes and who may buy them
       description: 'Boards 7.6, 7.7 and 7.8. **An accessible seat with no accessible route to it is not
@@ -2459,6 +2495,10 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-1023 Group Reservation Center"
         - "P08 BO-1024 Group Type Configuration"
+        - "P08 BO-1025 Group Request Intake"
+        - "P08 BO-1026 Availability & Best-Fit Search"
+        - "P08 BO-1027 Bulk Seat Allocation"
+        - "P08 BO-1028 Roster & Participant Assignment"
         - "P08 BO-1029 Quote, Deposit & Payment"
         - "P08 BO-1030 Modify, Release & Cancel"
         - "P08 BO-1032 Group Reporting & Audit"
@@ -2644,6 +2684,11 @@ paths:
       operationId: getSeatRecommendationRules
       x-ticvai-consumed-by:
         - "P08 BO-1033 Recommendation Command Center"
+        - "P08 BO-1034 Best Seat Recommendations"
+        - "P08 BO-1035 Best Value Recommendations"
+        - "P08 BO-1036 Closest-to-Stage Recommendations"
+        - "P08 BO-1037 Family Seating Recommendations"
+        - "P08 BO-1041 Scoring Rules & Model Governance"
         - "P08 BO-1042 Performance, Feedback & Audit"
       summary: What "best" means at this venue
       tags:
@@ -2779,6 +2824,7 @@ paths:
         - "P08 BO-984 Real-Time Seat Map"
         - "P08 BO-988 Reservation Tracker"
         - "P08 BO-989 Sales & Allocation Tracker"
+        - "P08 BO-997 Real-Time Availability & Locking"
       summary: Every seat's state for a performance, in one read
       description: 'Board 4. **Available, held, reserved, sold, blocked, out of service, in a hold pool
         — and the difference matters to whoever is looking.** A house manager needs held-versus-sold; a
@@ -2820,7 +2866,6 @@ paths:
     get:
       operationId: getSeatReconciliation
       x-ticvai-consumed-by:
-        - "P08 BO-1079 Immutable Seat Audit Logs"
         - "P08 BO-992 Audit & Reconciliation"
       summary: The map against the orders, seat by seat
       description: 'Board 4.8. **A seat sold twice and a seat sold to nobody are both invisible until

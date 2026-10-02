@@ -289,25 +289,6 @@
   "requestBody": null,
   "responds": "MyTicketsResaleMarketplaceEntryView"
  },
- "setEligibilityRule": {
-  "method": "PUT",
-  "path": "/eligibility-rule",
-  "contract": "promotions",
-  "summary": "Eligibility Rule Builder",
-  "permission": "PRICE_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "EligibilityRuleBuilderInput",
-  "responds": "EligibilityRuleBuilderView"
- },
  "setResaleEligibilityRule": {
   "method": "PUT",
   "path": "/resale-eligibility-rule",

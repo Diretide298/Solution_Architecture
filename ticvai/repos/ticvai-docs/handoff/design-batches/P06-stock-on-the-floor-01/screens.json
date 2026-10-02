@@ -270,7 +270,7 @@
   "id": "EMP-062",
   "name": "Store Stock & SKU Availability",
   "module": "Stock on the Floor",
-  "requiresModule": "fnb",
+  "requiresModule": "retail",
   "wave": 2,
   "implementation": {
    "app": "venue-staff-app",
@@ -290,7 +290,9 @@
      "to": "EMP-067",
      "trigger": "They read the unit and record the temperature",
      "provenance": "flow F28 step 1→2",
-     "operation": "getHaccpStatus"
+     "carries": [
+      "outletId"
+     ]
     }
    ]
   },
@@ -307,6 +309,24 @@
     "operation": "getHaccpStatus",
     "why": "**`getHaccpStatus` declares its response inline**, so the component that shows it names fields but binds to no schema. The contract should name the shape.",
     "source": "contract fnb.yaml GET /food-safety/status"
+   },
+   {
+    "operation": "getHaccpStatus",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-008): The client defined this screen as retail store stock and availability; the HACCP status, Log temperature and the F&B 86 toggle are other processes attached through F28 and the F&B board. The shop-floor reads that exist for exactly this (getOutletStock, consumed only by BO-044, and lookupMerchandise) were not declared (DI-361, DI-233, R254; design-notes corrections fnb-retail EMP-062).",
+    "source": "DI-361 | DI-233 | R254 | contracts/satellite/retail.yaml#getOutletStock"
+   },
+   {
+    "operation": "logTemperature",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-008): The client defined this screen as retail store stock and availability; the HACCP status, Log temperature and the F&B 86 toggle are other processes attached through F28 and the F&B board. The shop-floor reads that exist for exactly this (getOutletStock, consumed only by BO-044, and lookupMerchandise) were not declared (DI-361, DI-233, R254; design-notes corrections fnb-retail EMP-062).",
+    "source": "DI-361 | DI-233 | R254 | contracts/satellite/retail.yaml#getOutletStock"
+   },
+   {
+    "operation": "setItemAvailability",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-008): The client defined this screen as retail store stock and availability; the HACCP status, Log temperature and the F&B 86 toggle are other processes attached through F28 and the F&B board. The shop-floor reads that exist for exactly this (getOutletStock, consumed only by BO-044, and lookupMerchandise) were not declared (DI-361, DI-233, R254; design-notes corrections fnb-retail EMP-062).",
+    "source": "DI-361 | DI-233 | R254 | contracts/satellite/retail.yaml#getOutletStock"
    }
   ],
   "layout": {
@@ -338,13 +358,6 @@
        "provenance": "contract inventory.yaml GET /stock"
       },
       {
-       "kind": "detailPanel",
-       "label": "Haccp status",
-       "operation": "getHaccpStatus",
-       "notes": "Shows `checksDue`, `checksMissed`, `openActions`, `unsignedActions`, `oldestOpenActionAgeHours`, `lastInspectionAt` from `getHaccpStatus`'s inline response. **The response has no named schema**, so this cannot bind until the contract names one.",
-       "provenance": "contract fnb.yaml GET /food-safety/status"
-      },
-      {
        "kind": "searchField",
        "label": "Search store stock",
        "provenance": "carried from the previous definition"
@@ -358,33 +371,33 @@
        "kind": "primaryButton",
        "label": "Confirm",
        "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Outlet stock",
+       "operation": "getOutletStock",
+       "provenance": "contract retail.yaml GET /outlets/{outletId}/stock-check; wiring fix, 2 October 2026"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Scan an item",
+       "bindsTo": "PriceCheck",
+       "operation": "lookupMerchandise",
+       "provenance": "contract retail.yaml GET /merchandise/lookup; wiring fix, 2 October 2026"
       }
      ]
     },
     {
      "name": "actionBar",
      "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Save item availability",
-       "operation": "setItemAvailability",
-       "provenance": "contract fnb.yaml PUT /menu-items/{itemId}/availability"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Log temperature",
-       "operation": "logTemperature",
-       "provenance": "contract fnb.yaml POST /food-safety/temperature-logs"
-      }
-     ]
+     "components": []
     }
    ]
   },
   "states": {
    "loading": "The store stock sku, read by `getStockPositions`.",
    "error": "Could not load. Names which read failed and leaves the store stock sku untouched.",
-   "emptyFirstRun": "No store stock sku yet. Offers Log temperature (`logTemperature`).",
+   "emptyFirstRun": "No store stock sku yet. Offers no create action — this screen declares no operation that makes one.",
    "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `getStockPositions` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**Works from cache and queues what it records.** Staff walk out of coverage constantly — a stock count in a warehouse corner and a table order on a terrace both happen where the signal does not reach, and a screen that blanks there is a screen nobody uses twice."
   },
@@ -396,22 +409,18 @@
     "trigger": "onLoad"
    },
    {
-    "operationId": "setItemAvailability",
-    "contract": "fnb",
-    "purpose": "Mark an item available or eighty-sixed",
-    "trigger": "onAction"
+    "operationId": "getOutletStock",
+    "contract": "retail",
+    "purpose": "This outlet's stock, low stock first, with sibling outlets",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-008)"
    },
    {
-    "operationId": "getHaccpStatus",
-    "contract": "fnb",
-    "purpose": "getHaccpStatus",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "logTemperature",
-    "contract": "fnb",
-    "purpose": "logTemperature",
-    "trigger": "onAction"
+    "operationId": "lookupMerchandise",
+    "contract": "retail",
+    "purpose": "Price and stock check by barcode",
+    "trigger": "onScan",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-008)"
    }
   ],
   "entryState": {
@@ -421,8 +430,8 @@
      "from": "session"
     },
     {
-     "name": "itemId",
-     "from": "EMP-003"
+     "name": "outletId",
+     "from": "navigation"
     }
    ],
    "coldEntry": "**Resolves from the session and the shift.** A handheld is signed into at the start of a shift, not navigated to."
@@ -436,57 +445,6 @@
    "note": "**Drawn by Claude Design on `FnB Board 5.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
-  "overlays": [
-   {
-    "id": "formSetItemAvailability",
-    "component": "modal",
-    "trigger": "Save item availability",
-    "body": "**Collects what `setItemAvailability` sends before it is called.** Required: `isAvailable`, `recordedAt`. Optional: `reason`, `restoreAt`. **`note` is collected too, and required when the reason is Other** — the operation refuses 400 without it (decided 28 September, audit R222). Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Save item availability",
-     "operation": "setItemAvailability"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "isAvailable",
-      "recordedAt",
-      "reason",
-      "restoreAt",
-      "note"
-     ]
-    },
-    "provenance": "contract fnb.yaml PUT /menu-items/{itemId}/availability"
-   },
-   {
-    "id": "formLogTemperature",
-    "component": "modal",
-    "trigger": "Log temperature",
-    "body": "**Collects what `logTemperature` sends before it is called.** Required: `id`, `checkPointId`, `recordedAt`, `valueCelsius`, `outcome`. Optional: `checkPointKind`, `recordedByPrincipalId`, `minCelsius`, `maxCelsius`, `deviceReported`, `correctiveActionId`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "TemperatureLog",
-    "confirm": {
-     "label": "Log temperature",
-     "operation": "logTemperature"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "id",
-      "checkPointId",
-      "recordedAt",
-      "valueCelsius",
-      "outcome",
-      "checkPointKind",
-      "recordedByPrincipalId",
-      "minCelsius",
-      "maxCelsius",
-      "deviceReported",
-      "correctiveActionId"
-     ]
-    },
-    "provenance": "contract fnb.yaml POST /food-safety/temperature-logs"
-   }
-  ],
   "_platform": {
    "code": "P06",
    "audience": "staff",
@@ -591,6 +549,13 @@
        "kind": "primaryButton",
        "label": "Confirm",
        "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Suggested",
+       "bindsTo": "RequisitionSug",
+       "operation": "getSuggestedRequisitions",
+       "provenance": "contract inventory.yaml GET /requisitions/suggested; wiring fix, 2 October 2026"
       }
      ]
     },
@@ -630,6 +595,12 @@
        "label": "Create requisition",
        "operation": "createRequisition",
        "provenance": "contract inventory.yaml POST /requisitions"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Edit lines",
+       "operation": "updateRequisitionLines",
+       "provenance": "contract inventory.yaml PUT /requisitions/{requisitionId}/lines; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -658,6 +629,20 @@
     "contract": "inventory",
     "purpose": "List requisitions",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "getSuggestedRequisitions",
+    "contract": "inventory",
+    "purpose": "Below-par items as a draft for review",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-008)"
+   },
+   {
+    "operationId": "updateRequisitionLines",
+    "contract": "inventory",
+    "purpose": "Change the lines before approval",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-008)"
    }
   ],
   "entryState": {
@@ -665,6 +650,10 @@
     {
      "name": "venueId",
      "from": "session"
+    },
+    {
+     "name": "requisitionId",
+     "from": "navigation"
     }
    ],
    "coldEntry": "**Resolves from the session and the shift.** A handheld is signed into at the start of a shift, not navigated to.",
@@ -709,6 +698,20 @@
      ]
     },
     "provenance": "contract inventory.yaml POST /requisitions"
+   },
+   {
+    "id": "formUpdateRequisitionLines",
+    "component": "modal",
+    "trigger": "Edit lines",
+    "body": "**Collects what `updateRequisitionLines` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Edit lines",
+     "operation": "updateRequisitionLines"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "contract inventory.yaml PUT /requisitions/{requisitionId}/lines; wiring fix, 2 October 2026"
    }
   ],
   "_platform": {
@@ -796,6 +799,19 @@
        "kind": "primaryButton",
        "label": "Confirm",
        "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Transfers",
+       "operation": "listStockTransfers",
+       "provenance": "contract inventory.yaml GET /stock-transfers; wiring fix, 2 October 2026"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Manifest",
+       "bindsTo": "StockTransfer",
+       "operation": "getStockTransfer",
+       "provenance": "contract inventory.yaml GET /stock-transfers/{transferId}; wiring fix, 2 October 2026"
       }
      ]
     },
@@ -830,6 +846,12 @@
        "label": "Create stock transfer",
        "operation": "createStockTransfer",
        "provenance": "contract inventory.yaml POST /stock-transfers"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Receive",
+       "operation": "receiveStockTransfer",
+       "provenance": "contract inventory.yaml POST /stock-transfers/{transferId}/receive; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -858,6 +880,27 @@
     "contract": "inventory",
     "purpose": "List stock locations",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listStockTransfers",
+    "contract": "inventory",
+    "purpose": "Inbound and outbound transfers",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-008)"
+   },
+   {
+    "operationId": "getStockTransfer",
+    "contract": "inventory",
+    "purpose": "One transfer and its manifest",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-008)"
+   },
+   {
+    "operationId": "receiveStockTransfer",
+    "contract": "inventory",
+    "purpose": "Receive an inbound transfer",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-008)"
    }
   ],
   "entryState": {
@@ -865,6 +908,10 @@
     {
      "name": "venueId",
      "from": "session"
+    },
+    {
+     "name": "transferId",
+     "from": "navigation"
     }
    ],
    "coldEntry": "**Resolves from the session and the shift.** A handheld is signed into at the start of a shift, not navigated to.",
@@ -908,6 +955,20 @@
      ]
     },
     "provenance": "contract inventory.yaml POST /stock-transfers"
+   },
+   {
+    "id": "formReceiveStockTransfer",
+    "component": "modal",
+    "trigger": "Receive",
+    "body": "**Collects what `receiveStockTransfer` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Receive",
+     "operation": "receiveStockTransfer"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "contract inventory.yaml POST /stock-transfers/{transferId}/receive; wiring fix, 2 October 2026"
    }
   ],
   "_platform": {
@@ -933,7 +994,7 @@
  },
  {
   "id": "EMP-065",
-  "name": "Receiving & Store Put-Away",
+  "name": "Receiving",
   "module": "Stock on the Floor",
   "requiresModule": "inventory",
   "wave": 2,
@@ -958,13 +1019,22 @@
      "back": false,
      "carries": [
       "purchaseOrderId",
-      "receiptId",
+      "receiptId"
+     ]
+    },
+    {
+     "to": "BO-080",
+     "trigger": "The rest is received and the transfer closes short",
+     "provenance": "flow F35 step 3→4",
+     "crossesDevice": true,
+     "back": false,
+     "carries": [
       "transferId"
      ]
     }
    ]
   },
-  "notes": "**Added 20 August from the client design board.** P06 had no table or stock operations at all — **twenty screens of floor work with nothing behind them** — and every operation these need already existed. **Food-safety operations wired 20 August** — boards 5G and 5J of the client F&B pack, and **HACCP is a regulatory obligation nothing in the package touched.**",
+  "notes": "**Added 20 August from the client design board.** P06 had no table or stock operations at all — **twenty screens of floor work with nothing behind them** — and every operation these need already existed. **Food-safety operations wired 20 August** — boards 5G and 5J of the client F&B pack, and **HACCP is a regulatory obligation nothing in the package touched.**\n\n**Retitled \"Receiving\"** (DI-346, the simplicity principle: no put-away, picking, packing or dispatching statuses; design-notes correction fnb-retail EMP-065; CHG-SPO-018). The screen id and route are unchanged.",
   "density": "comfortable",
   "boardFrames": [
    "FnB Board 5.dc.html#fnb-5g"
@@ -997,6 +1067,12 @@
        "label": "Log cold chain",
        "operation": "logColdChain",
        "provenance": "contract fnb.yaml POST /food-safety/cold-chain"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Receive transfer",
+       "operation": "receiveStockTransfer",
+       "provenance": "contract inventory.yaml POST /stock-transfers/{transferId}/receive; wiring fix, 2 October 2026"
       }
      ]
     },
@@ -1039,6 +1115,12 @@
        ],
        "operation": "getStockTransfer",
        "provenance": "contract inventory.yaml GET /stock-transfers/{transferId}"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Expected deliveries",
+       "operation": "listPurchaseOrders",
+       "provenance": "contract inventory.yaml GET /purchase-orders; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -1100,6 +1182,20 @@
      ]
     },
     "provenance": "contract fnb.yaml POST /food-safety/cold-chain"
+   },
+   {
+    "id": "formReceiveStockTransfer",
+    "component": "modal",
+    "trigger": "Receive transfer",
+    "body": "**Collects what `receiveStockTransfer` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Receive transfer",
+     "operation": "receiveStockTransfer"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "contract inventory.yaml POST /stock-transfers/{transferId}/receive; wiring fix, 2 October 2026"
    }
   ],
   "states": {
@@ -1133,6 +1229,20 @@
     "contract": "inventory",
     "purpose": "One transfer, its manifest and where it is",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listPurchaseOrders",
+    "contract": "inventory",
+    "purpose": "The supplier orders expected today",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-008)"
+   },
+   {
+    "operationId": "receiveStockTransfer",
+    "contract": "inventory",
+    "purpose": "Receive an inbound transfer",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-008)"
    }
   ],
   "entryState": {
@@ -1231,20 +1341,6 @@
      "slot": "record",
      "components": [
       {
-       "kind": "detailPanel",
-       "label": "The count variance",
-       "bindsTo": "CountVariance",
-       "columns": [
-        "CountVariance.countId",
-        "CountVariance.totalVarianceValue",
-        "CountVariance.exceptionCount",
-        "CountVariance.lines"
-       ],
-       "operation": "getCountVariance",
-       "provenance": "contract inventory.yaml GET /stock-counts/{countId}/variance",
-       "notes": "**Shown only after the count is submitted.** While the count is `open` or `counting` the screen shows no expected quantity and no variance, and `getCountVariance` answers 409 whatever the caller's permission (decided 28 September, audit R110 (a))."
-      },
-      {
        "kind": "searchField",
        "label": "Search stock count",
        "provenance": "carried from the previous definition"
@@ -1258,6 +1354,12 @@
        "kind": "primaryButton",
        "label": "Confirm",
        "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Open counts",
+       "operation": "listStockCounts",
+       "provenance": "contract inventory.yaml GET /stock-counts; wiring fix, 2 October 2026"
       }
      ]
     },
@@ -1273,21 +1375,9 @@
       },
       {
        "kind": "secondaryButton",
-       "label": "Post stock count",
-       "operation": "postStockCount",
-       "provenance": "contract inventory.yaml POST /stock-counts/{countId}/post"
-      },
-      {
-       "kind": "secondaryButton",
        "label": "Enter count line",
        "operation": "enterCountLine",
        "provenance": "contract fnb.yaml POST /fnb-stock-counts/{countId}/lines"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Request recount",
-       "operation": "requestRecount",
-       "provenance": "contract fnb.yaml POST /fnb-stock-counts/{countId}/recount"
       },
       {
        "kind": "secondaryButton",
@@ -1300,10 +1390,10 @@
    ]
   },
   "states": {
-   "loading": "The stock count cycle, read by `getCountVariance`.",
+   "loading": "The stock count cycle, read by `listStockCounts`.",
    "error": "Could not load. Names which read failed and leaves the stock count cycle untouched.",
-   "emptyFirstRun": "No stock count cycle yet. Offers Request recount (`requestRecount`).",
-   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `getCountVariance` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "No stock count cycle yet. Offers Start stock count (`startStockCount`).",
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listStockCounts` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**Works from cache and queues what it records.** Staff walk out of coverage constantly — a stock count in a warehouse corner and a table order on a terrace both happen where the signal does not reach, and a screen that blanks there is a screen nobody uses twice."
   },
   "apis": [
@@ -1314,27 +1404,9 @@
     "trigger": "onAction"
    },
    {
-    "operationId": "postStockCount",
-    "contract": "inventory",
-    "purpose": "Post a count and adjust stock",
-    "trigger": "onAction"
-   },
-   {
-    "operationId": "getCountVariance",
-    "contract": "inventory",
-    "purpose": "Variance between counted and expected, after submission only (409 while open or counting, audit R110 (a))",
-    "trigger": "onLoad"
-   },
-   {
     "operationId": "enterCountLine",
     "contract": "fnb",
     "purpose": "What was actually on the shelf",
-    "trigger": "onAction"
-   },
-   {
-    "operationId": "requestRecount",
-    "contract": "fnb",
-    "purpose": "Send a line back to be counted again",
     "trigger": "onAction"
    },
    {
@@ -1342,6 +1414,13 @@
     "contract": "inventory",
     "purpose": "Which items get counted every day",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "listStockCounts",
+    "contract": "inventory",
+    "purpose": "The open counts to enter lines on",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-008)"
    }
   ],
   "entryState": {
@@ -1389,23 +1468,6 @@
     "provenance": "contract inventory.yaml POST /stock-counts"
    },
    {
-    "id": "formPostStockCount",
-    "component": "modal",
-    "trigger": "Post stock count",
-    "body": "**Collects what `postStockCount` sends before it is called.** Nothing in the body is required. Optional: `note`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Post stock count",
-     "operation": "postStockCount"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "note"
-     ]
-    },
-    "provenance": "contract inventory.yaml POST /stock-counts/{countId}/post"
-   },
-   {
     "id": "formEnterCountLine",
     "component": "modal",
     "trigger": "Enter count line",
@@ -1429,24 +1491,6 @@
     "provenance": "contract fnb.yaml POST /fnb-stock-counts/{countId}/lines"
    },
    {
-    "id": "formRequestRecount",
-    "component": "modal",
-    "trigger": "Request recount",
-    "body": "**Collects what `requestRecount` sends before it is called.** Required: `lineIds`. Optional: `reason`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Request recount",
-     "operation": "requestRecount"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "lineIds",
-      "reason"
-     ]
-    },
-    "provenance": "contract fnb.yaml POST /fnb-stock-counts/{countId}/recount"
-   },
-   {
     "id": "formSetDailyCount",
     "component": "modal",
     "trigger": "Save daily count",
@@ -1465,6 +1509,26 @@
      ]
     },
     "provenance": "contract inventory.yaml PUT /stock-counts/daily"
+   }
+  ],
+  "gaps": [
+   {
+    "operation": "getCountVariance",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-008): In F30, variance review, recount requests and posting are the supervisor's steps on BO-079 (steps 4, 5 and 7); a counter's device showing variance weakens the blind count. Without the open-count list the counter cannot find the count (F30, R110; design-notes correction fnb-retail EMP-066).",
+    "source": "F30 step 4 | F30 step 5 | F30 step 7 | R110 | contracts/satellite/inventory.yaml#listStockCounts"
+   },
+   {
+    "operation": "postStockCount",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-008): In F30, variance review, recount requests and posting are the supervisor's steps on BO-079 (steps 4, 5 and 7); a counter's device showing variance weakens the blind count. Without the open-count list the counter cannot find the count (F30, R110; design-notes correction fnb-retail EMP-066).",
+    "source": "F30 step 4 | F30 step 5 | F30 step 7 | R110 | contracts/satellite/inventory.yaml#listStockCounts"
+   },
+   {
+    "operation": "requestRecount",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-008): In F30, variance review, recount requests and posting are the supervisor's steps on BO-079 (steps 4, 5 and 7); a counter's device showing variance weakens the blind count. Without the open-count list the counter cannot find the count (F30, R110; design-notes correction fnb-retail EMP-066).",
+    "source": "F30 step 4 | F30 step 5 | F30 step 7 | R110 | contracts/satellite/inventory.yaml#listStockCounts"
    }
   ],
   "_platform": {
@@ -1614,6 +1678,12 @@
        "label": "Note",
        "operation": "recordWaste",
        "provenance": "contract fnb.yaml POST /outlets/{outletId}/waste"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Food safety checks due",
+       "operation": "getHaccpStatus",
+       "provenance": "contract fnb.yaml GET /food-safety/status; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -1650,6 +1720,13 @@
     "contract": "fnb",
     "purpose": "signCorrectiveAction",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "getHaccpStatus",
+    "contract": "fnb",
+    "purpose": "Food-safety checks due and open findings",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-008)"
    }
   ],
   "entryState": {
@@ -1855,6 +1932,18 @@
        "label": "Reserve merchandise",
        "operation": "reserveMerchandise",
        "provenance": "contract retail.yaml POST /outlets/{outletId}/reserve"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Collected",
+       "operation": "collectMerchandiseReservation",
+       "provenance": "contract retail.yaml POST /merchandise-reservations/{reservationId}/collect; wiring fix, 2 October 2026"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Release hold",
+       "operation": "cancelMerchandiseReservation",
+       "provenance": "contract retail.yaml POST /merchandise-reservations/{reservationId}/cancel; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -1879,6 +1968,20 @@
     "contract": "retail",
     "purpose": "Reserve an item for collection",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "collectMerchandiseReservation",
+    "contract": "retail",
+    "purpose": "The guest collected the held item",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-008)"
+   },
+   {
+    "operationId": "cancelMerchandiseReservation",
+    "contract": "retail",
+    "purpose": "Release the hold",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-008)"
    }
   ],
   "entryState": {
@@ -1890,6 +1993,10 @@
     {
      "name": "outletId",
      "from": "EMP-003"
+    },
+    {
+     "name": "reservationId",
+     "from": "navigation"
     }
    ],
    "coldEntry": "**Resolves from the session and the shift.** A handheld is signed into at the start of a shift, not navigated to."
@@ -1923,6 +2030,13 @@
      ]
     },
     "provenance": "contract retail.yaml POST /outlets/{outletId}/reserve"
+   }
+  ],
+  "gaps": [
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-011): No read lists merchandise reservations (holds) for an outlet.",
+    "source": "contracts/satellite/retail.yaml#cancelMerchandiseReservation"
    }
   ],
   "_platform": {

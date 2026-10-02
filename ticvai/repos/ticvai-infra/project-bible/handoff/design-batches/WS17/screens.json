@@ -162,7 +162,7 @@
   "states": {
    "loading": "The delegation escalation list; the counts above it resolve separately.",
    "error": "Could not load. Names which read failed and leaves the delegation escalation untouched.",
-   "emptyFirstRun": "No delegation escalation yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "**Nothing to show yet**: the figures fill as activity is recorded. Offers no create action — a monitor creates nothing — and says so rather than showing empty tiles.",
    "emptyNoResults": "The filter narrowed it and the delegation escalation are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -313,12 +313,13 @@
      "components": [
       {
        "kind": "selectField",
-       "label": "Delegator: Ahmed Raza",
-       "provenance": "pack Approval_Workflows_and_Governance_Reference.pdf, page 41 §Delegation Setup"
+       "label": "Delegator",
+       "provenance": "pack Approval_Workflows_and_Governance_Reference.pdf, page 41 §Delegation Setup",
+       "notes": "A pick list of people by name; sample names belong in the sample data."
       },
       {
-       "kind": "textField",
-       "label": "Delegate To: Sara Khan",
+       "kind": "selectField",
+       "label": "Delegate to",
        "provenance": "pack Approval_Workflows_and_Governance_Reference.pdf, page 41 §Delegation Setup"
       }
      ]
@@ -329,8 +330,15 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Save Draft | Activate Delegation | Cancel",
-       "provenance": "pack Approval_Workflows_and_Governance_Reference.pdf, page 41 §Actions"
+       "label": "Activate delegation",
+       "operation": "createApprovalDelegation",
+       "provenance": "contract approvals.yaml POST /delegations"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Cancel delegation",
+       "operation": "revokeApprovalDelegation",
+       "provenance": "contract approvals.yaml DELETE /delegations/{delegationId}"
       }
      ]
     }
@@ -343,12 +351,6 @@
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
-   {
-    "operationId": "listDelegations",
-    "contract": "identity",
-    "purpose": "Who may act for this guest, and for whom they may act",
-    "trigger": "onAction"
-   },
    {
     "operationId": "createApprovalDelegation",
     "contract": "approvals",
@@ -383,16 +385,45 @@
   "entryState": {
    "params": [
     {
-     "name": "subjectId",
-     "from": "navigation"
-    },
-    {
      "name": "delegationId",
      "from": "navigation"
     }
    ],
    "coldEntry": "**Reached from the list that owns it**, so the identifier arrives with the navigation. Opened cold without one, the screen says what is missing and offers that list — never an empty form that looks configurable."
   },
+  "gaps": [
+   {
+    "operation": "listDelegations",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-021): listDelegations (GUEST_VIEW) lists who may act for a guest; approval delegation is listApprovalDelegations, already declared (design-notes correction platform-foundation BO-385).",
+    "source": "contracts/spine/identity.yaml#listDelegations | contracts/spine/approvals.yaml#listApprovalDelegations"
+   }
+  ],
+  "overlays": [
+   {
+    "id": "formCreateApprovalDelegation",
+    "component": "modal",
+    "trigger": "Activate delegation",
+    "body": "**Collects what `createApprovalDelegation` sends before it is called.** Required: `delegatorPrincipalId`, `delegatePrincipalId`, `from`, `to`. Optional: `kinds`, `maxAmount`, `reason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Activate delegation",
+     "operation": "createApprovalDelegation"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "delegatorPrincipalId",
+      "delegatePrincipalId",
+      "from",
+      "to",
+      "kinds",
+      "maxAmount",
+      "reason"
+     ]
+    },
+    "provenance": "contract approvals.yaml POST /delegations"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -795,6 +826,7 @@
    "workshopBoard": "wireframes/WS34 Approval Workflows and Governance Board 5.dc.html#bo-388"
   },
   "apisNote": "Regenerated 9 September 2026 from Approval_Workflows_and_Governance_Reference.pdf page 43. 0 of 0 labels bound to a contract property; 8 of 18 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "notes": "**One SLA policy screen (decided 2 October 2026, merge as proposed; CHG-SBO-021):** reminders and breach notifications (BO-389) and the escalation policy (BO-390) are sections of this one policy object.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -855,68 +887,31 @@
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
-  "purpose": "Configure proactive notifications before and after SLA breaches. The source requires reminders for pending approvals and alerts when SLA thresholds are exceeded.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
-    "source": "pack Approval_Workflows_and_Governance_Reference.pdf, page 44"
-   },
-   {
-    "operation": null,
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
-    "source": "pack Approval_Workflows_and_Governance_Reference.pdf, page 44"
-   }
-  ],
+  "purpose": "Configure proactive notifications before and after SLA breaches. The source requires reminders for pending approvals and alerts when SLA thresholds are exceeded (merged into BO-388 Approval SLA Policy Configuration).",
   "layout": {
    "template": "split",
    "regions": [
     {
      "name": "contentBody",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "setApprovalSlaPolicy",
-       "label": "Save approval SLA policy",
-       "notes": "The act the screen exists for."
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "setApprovalSlaPolicy"
-      }
-     ]
+     "components": []
     }
    ]
   },
   "states": {
-   "loading": "The reminder breach notification list.",
-   "error": "Could not load. Names which read failed and leaves the reminder breach notification untouched.",
-   "emptyFirstRun": "No reminder breach notification yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the reminder breach notification are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "loading": "Routes to BO-388 while it opens.",
+   "error": "Could not open BO-388; says so and offers to retry.",
+   "emptyFirstRun": "Never shown: this id routes to BO-388, whose empty states apply.",
+   "emptyNoResults": "Never shown: this id routes to BO-388.",
+   "emptyNoAccess": "As BO-388: shown when the caller lacks the access BO-388 requires, named in words."
   },
-  "apis": [
-   {
-    "operationId": "setApprovalSlaPolicy",
-    "contract": "approvals",
-    "purpose": "Reminder and breach rules",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026",
-    "invalidates": [
-     "listSlaEscalationReminder"
-    ]
-   }
-  ],
+  "apis": [],
   "wireframe": {
    "status": "notStarted",
    "board": "wireframes/P08 Venue Management.dc.html#bo-389",
    "workshopBoard": "wireframes/WS34 Approval Workflows and Governance Board 5.dc.html#bo-389"
   },
-  "apisNote": "Regenerated 9 September 2026 from Approval_Workflows_and_Governance_Reference.pdf page 44. 0 of 0 labels bound to a contract property; 0 of 23 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "No operations of its own since 2 October 2026 (CHG-SBO-021): merged into BO-388, whose operations it routes to.",
+  "notes": "**Merged into BO-388** (decided 2 October 2026, Chinmay: duplicate screens merged as proposed; CHG-SBO-021). Reminders, breach notifications and escalation are parts of the one approval SLA policy (`setApprovalSlaPolicy`), edited on BO-388 (design-note correction platform-foundation BO-389). **One implementation, both ids kept**, as the M24-03 merges do: this id stays for traceability and routes to BO-388, and nothing on it is built separately.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -977,73 +972,31 @@
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
-  "purpose": "Define what TICVAI should do when an approval remains unresolved or meets another escalation condition.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**Escalation Policy Builder declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
-    "source": "contract — the screen's declared operations"
-   },
-   {
-    "operation": null,
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
-    "source": "pack Approval_Workflows_and_Governance_Reference.pdf, page 45"
-   },
-   {
-    "operation": null,
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
-    "source": "pack Approval_Workflows_and_Governance_Reference.pdf, page 45"
-   }
-  ],
+  "purpose": "Define what TICVAI should do when an approval remains unresolved or meets another escalation condition (merged into BO-388 Approval SLA Policy Configuration).",
   "layout": {
    "template": "split",
    "regions": [
     {
      "name": "contentBody",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "setApprovalSlaPolicy",
-       "label": "Save approval SLA policy",
-       "notes": "The act the screen exists for."
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "setApprovalSlaPolicy"
-      }
-     ]
+     "components": []
     }
    ]
   },
   "states": {
-   "loading": "The escalation policy list.",
-   "error": "Could not load. Names which read failed and leaves the escalation policy untouched.",
-   "emptyFirstRun": "No escalation policy yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the escalation policy are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "loading": "Routes to BO-388 while it opens.",
+   "error": "Could not open BO-388; says so and offers to retry.",
+   "emptyFirstRun": "Never shown: this id routes to BO-388, whose empty states apply.",
+   "emptyNoResults": "Never shown: this id routes to BO-388.",
+   "emptyNoAccess": "As BO-388: shown when the caller lacks the access BO-388 requires, named in words."
   },
-  "apis": [
-   {
-    "operationId": "setApprovalSlaPolicy",
-    "contract": "approvals",
-    "purpose": "Escalation on breach",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026",
-    "invalidates": [
-     "listSlaEscalationReminder"
-    ]
-   }
-  ],
+  "apis": [],
   "wireframe": {
    "status": "notStarted",
    "board": "wireframes/P08 Venue Management.dc.html#bo-390",
    "workshopBoard": "wireframes/WS34 Approval Workflows and Governance Board 5.dc.html#bo-390"
   },
-  "apisNote": "Regenerated 9 September 2026 from Approval_Workflows_and_Governance_Reference.pdf page 45. 0 of 0 labels bound to a contract property; 0 of 16 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "No operations of its own since 2 October 2026 (CHG-SBO-021): merged into BO-388, whose operations it routes to.",
+  "notes": "**Merged into BO-388** (decided 2 October 2026, Chinmay: duplicate screens merged as proposed; CHG-SBO-021). Reminders, breach notifications and escalation are parts of the one approval SLA policy (`setApprovalSlaPolicy`), edited on BO-388 (design-note correction platform-foundation BO-390). **One implementation, both ids kept**, as the M24-03 merges do: this id stays for traceability and routes to BO-388, and nothing on it is built separately.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1087,10 +1040,12 @@
   },
   "navigation": {
    "entryFrom": [
-    "BO-384"
+    "BO-384",
+    "ADM-248"
    ],
    "exitTo": [
-    "BO-384"
+    "BO-384",
+    "ADM-248"
    ],
    "transitions": [
     {
@@ -1101,6 +1056,12 @@
      "carries": [
       "instanceId"
      ]
+    },
+    {
+     "to": "ADM-248",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F165 step 8→9",
+     "operation": "listSlaEscalationBottleneck"
     }
    ]
   },
@@ -1153,7 +1114,7 @@
   "states": {
    "loading": "The live escalation operations list.",
    "error": "Could not load. Names which read failed and leaves the live escalation operations untouched.",
-   "emptyFirstRun": "No live escalation operations yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No live escalation operations yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the live escalation operations are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -1336,7 +1297,7 @@
   "states": {
    "loading": "The sla escalation performance list.",
    "error": "Could not load. Names which read failed and leaves the sla escalation performance untouched.",
-   "emptyFirstRun": "No sla escalation performance yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No sla escalation performance yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the sla escalation performance are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -1580,7 +1541,7 @@
   "states": {
    "loading": "The sla escalation advisor list.",
    "error": "Could not load. Names which read failed and leaves the sla escalation advisor untouched.",
-   "emptyFirstRun": "No sla escalation advisor yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No sla escalation advisor yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the sla escalation advisor are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },

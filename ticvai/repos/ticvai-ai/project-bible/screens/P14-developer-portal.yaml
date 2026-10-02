@@ -239,10 +239,11 @@ screens:
       trigger: They create a sandbox client and take the secret
       provenance: flow F27 step 2→3
       operation: registerDeveloper
-  notes: '13.1.6 to 13.1.10. **The organisation administers its own people** — Softlabs maintaining every
-    integrator''s staff list is Softlabs doing their HR.
-
-    '
+  notes: "13.1.6 to 13.1.10. **The organisation administers its own people** — Softlabs maintaining every\
+    \ integrator's staff list is Softlabs doing their HR.\n **Form rebuilt 2 October 2026 (CHG-SOT-014,\
+    \ design-notes corrections DEV-002).** Registration asks name, email, website and country; the eight\
+    \ raw schema names (id, status, verifiedAt, partnerId among them) are gone from the form. Never `id`\
+    \ or `status`: the id is a client UUIDv7 generated silently and the status is the server's."
   density: compact
   pattern: configEditor
   patternReason: the screen declares only writes (`registerDeveloper`, `setDeveloperMembers`) and no read
@@ -255,43 +256,29 @@ screens:
       slot: fields
       components:
       - kind: textField
-        label: id
-        bindsTo: DeveloperAccount.id
-        provenance: contract public-api.yaml POST /developers
-      - kind: textField
-        label: organisationName
+        label: Organisation name
         bindsTo: DeveloperAccount.organisationName
         provenance: contract public-api.yaml POST /developers
       - kind: textField
-        label: contactEmail
+        label: Contact email
         bindsTo: DeveloperAccount.contactEmail
+        notes: Where the verification email goes.
         provenance: contract public-api.yaml POST /developers
       - kind: textField
-        label: websiteUrl
+        label: Website
         bindsTo: DeveloperAccount.websiteUrl
         provenance: contract public-api.yaml POST /developers
-      - kind: textField
-        label: countryCode
+      - kind: selectField
+        label: Country
         bindsTo: DeveloperAccount.countryCode
         provenance: contract public-api.yaml POST /developers
-      - kind: textField
-        label: partnerId
-        bindsTo: DeveloperAccount.partnerId
-        provenance: contract public-api.yaml POST /developers
-      - kind: textField
-        label: status
-        bindsTo: DeveloperAccount.status
-        provenance: contract public-api.yaml POST /developers
-      - kind: textField
-        label: verifiedAt
-        bindsTo: DeveloperAccount.verifiedAt
-        provenance: contract public-api.yaml POST /developers
-      - kind: textField
-        label: Organisation name
-        provenance: carried from the previous definition
-      - kind: textField
-        label: Contact email
-        provenance: carried from the previous definition
+      - kind: banner
+        label: Registration status
+        bindsTo: DeveloperAccount
+        notes: 'Shown after registering: "Pending: check your email" until the email is verified, then
+          "Verified on <date>" (`DeveloperAccount.status`, `verifiedAt`). The partner link (`partnerId`)
+          is set by TICVAI, never typed.'
+        provenance: contract public-api.yaml DeveloperAccount
       - kind: dataTable
         bindsTo: members
         notes: Role per member — owner, admin, developer, read-only.
@@ -414,18 +401,17 @@ screens:
         label: Every API client
         bindsTo: ApiClient
         columns:
-        - ApiClient.id
-        - ApiClient.developerId
         - ApiClient.name
-        - ApiClient.clientId
         - ApiClient.environment
         - ApiClient.scopes
-        - ApiClient.allowedTenantIds
         - ApiClient.ipAllowList
         - ApiClient.status
         - ApiClient.lastUsedAt
         operation: listApiClients
         provenance: contract public-api.yaml GET /api-clients
+        notes: Name, environment, scopes, IP allow-list, status and last used. The client id and the developer
+          are in the detail panel, with a copy action; allowed tenants are shown by venue name there (design-notes
+          correction DEV-003).
       - kind: dataTable
         bindsTo: ApiClient[]
         notes: 'Environment is a column and not a badge. **A sandbox key and a production key that look
@@ -500,9 +486,12 @@ screens:
   - id: formCreateApiClient
     component: modal
     trigger: Create API client
-    body: '**Collects what `createApiClient` sends before it is called.** Required: `id`, `developerId`,
-      `name`, `environment`, `scopes`, `status`. Optional: `clientId`, `allowedTenantIds`, `ipAllowList`,
-      `lastUsedAt`. Dismissing sends nothing; the screen behind is unchanged.'
+    body: '**Collects what `createApiClient` sends before it is called.** The person enters `name` and
+      picks `scopes` (by module); `ipAllowList` is optional. **The environment is sandbox here**: a production
+      client is issued by TICVAI after certification (DI-927, F36 step 5), so the form offers no environment
+      choice. `developerId` comes from the session. Never `id` or `status`: the id is a client UUIDv7
+      generated silently and the status is the server''s. `lastUsedAt` is the server''s and never asked.
+      Dismissing sends nothing; the screen behind is unchanged.'
     bindsTo: ApiClient
     confirm:
       label: Create API client
@@ -510,16 +499,9 @@ screens:
     dismiss:
       label: Cancel
       discards:
-      - id
-      - developerId
       - name
-      - environment
       - scopes
-      - status
-      - clientId
-      - allowedTenantIds
       - ipAllowList
-      - lastUsedAt
     provenance: contract public-api.yaml POST /api-clients
   - id: formRotateApiCredential
     component: modal
@@ -660,9 +642,7 @@ screens:
         label: Every sandbox
         bindsTo: Sandbox
         columns:
-        - Sandbox.id
         - Sandbox.name
-        - Sandbox.developerId
         - Sandbox.status
         - Sandbox.dataProfile
         - Sandbox.containsProductionData
@@ -727,10 +707,11 @@ screens:
         operation: resetSandbox
         provenance: contract public-api.yaml POST /sandboxes/{sandboxId}/reset
       - kind: secondaryButton
-        label: Promote to production
+        label: Request production access
         operation: requestProductionAccess
-        notes: Opens the production access request for the client tested here; disabled until the integration
-          is certified.
+        notes: '**Nothing is promoted.** Production access is a request for a certified integration; TICVAI
+          issues a new production client and this sandbox stays a sandbox (F36 step 5; design-notes correction
+          DEV-004).'
         provenance: 29 September pass (group A)
   overlays:
   - id: confirmResetSandbox
@@ -756,7 +737,7 @@ screens:
     provenance: contract public-api.yaml POST /sandboxes
   - id: formRequestProductionAccess
     component: modal
-    trigger: Promote to production
+    trigger: Request production access
     body: '**Collects what `requestProductionAccess` sends before it is called.** Required: `listingId`,
       `scopes`, `allowedTenantIds`, `ipAllowList`. Optional: `note`.'
     confirm:
@@ -879,12 +860,9 @@ screens:
         label: Every webhook subscription
         bindsTo: WebhookSubscription
         columns:
-        - WebhookSubscription.id
-        - WebhookSubscription.clientId
         - WebhookSubscription.endpointUrl
         - WebhookSubscription.eventTypes
         - WebhookSubscription.filters
-        - WebhookSubscription.signingSecret
         - WebhookSubscription.status
         - WebhookSubscription.consecutiveFailures
         - WebhookSubscription.disabledReason
@@ -894,9 +872,6 @@ screens:
         label: Every webhook delivery
         bindsTo: WebhookDelivery
         columns:
-        - WebhookDelivery.id
-        - WebhookDelivery.subscriptionId
-        - WebhookDelivery.eventId
         - WebhookDelivery.eventType
         - WebhookDelivery.status
         - WebhookDelivery.attemptCount
@@ -933,12 +908,14 @@ screens:
         - WebhookSubscription.endpointUrl
         - WebhookSubscription.eventTypes
         - WebhookSubscription.filters
-        - WebhookSubscription.signingSecret
         - WebhookSubscription.status
         - WebhookSubscription.consecutiveFailures
         - WebhookSubscription.disabledReason
         operation: listWebhookSubscriptions
         provenance: contract public-api.yaml GET /webhook-subscriptions
+        notes: '**The signing secret is shown once, at creation**, in the confirmation, with a copy action;
+          afterwards it is never displayed (a secret in a list is a leak). The API client is shown by
+          name.'
     - name: actionBar
       slot: rowActions
       components:
@@ -1021,9 +998,11 @@ screens:
   - id: formCreateWebhookSubscription
     component: modal
     trigger: Create webhook subscription
-    body: '**Collects what `createWebhookSubscription` sends before it is called.** Required: `id`, `clientId`,
-      `endpointUrl`, `eventTypes`, `status`. Optional: `filters`, `signingSecret`, `consecutiveFailures`,
-      `disabledReason`. Dismissing sends nothing; the screen behind is unchanged.'
+    body: '**Collects what `createWebhookSubscription` sends before it is called.** The person picks the
+      API client (by name) and enters `endpointUrl`, `eventTypes` and optional `filters`. Never `id` or
+      `status`: the id is a client UUIDv7 generated silently and the status is the server''s. `signingSecret`,
+      `consecutiveFailures` and `disabledReason` are the server''s: the secret is returned once in the
+      response and shown then. Dismissing sends nothing; the screen behind is unchanged.'
     bindsTo: WebhookSubscription
     confirm:
       label: Create webhook subscription
@@ -1031,15 +1010,10 @@ screens:
     dismiss:
       label: Cancel
       discards:
-      - id
       - clientId
       - endpointUrl
       - eventTypes
-      - status
       - filters
-      - signingSecret
-      - consecutiveFailures
-      - disabledReason
     provenance: contract public-api.yaml POST /webhook-subscriptions
   - id: formReplayEvents
     component: modal
@@ -1125,7 +1099,6 @@ screens:
         label: Flagged traffic
         bindsTo: ApiAnomaly
         columns:
-        - ApiAnomaly.clientId
         - ApiAnomaly.measure
         - ApiAnomaly.observed
         - ApiAnomaly.baseline
@@ -1133,7 +1106,8 @@ screens:
         - ApiAnomaly.detectedAt
         operation: listApiAnomalies
         notes: '**Abnormal volume on your own clients** (17 September minutes, M17-07), so a runaway integration
-          is seen here before a venue calls.'
+          is seen here before a venue calls. The API client is shown by name, not by `clientId` (design-notes
+          correction DEV-006).'
         provenance: 29 September pass (group A)
   states:
     loading: Call volume; the current window renders first.
@@ -1205,8 +1179,6 @@ screens:
         label: Every integration listing
         bindsTo: IntegrationListing
         columns:
-        - IntegrationListing.id
-        - IntegrationListing.developerId
         - IntegrationListing.name
         - IntegrationListing.category
         - IntegrationListing.description
@@ -1290,9 +1262,11 @@ screens:
   - id: formSubmitIntegrationListing
     component: modal
     trigger: Submit integration listing
-    body: '**Collects what `submitIntegrationListing` sends before it is called.** Required: `id`, `developerId`,
-      `name`, `category`, `status`. Optional: `description`, `integrationUrl`, `requiredScopes`, `certifiedUntil`,
-      `certifiedAgainstVersion`, `listingFeeModel`. Dismissing sends nothing; the screen behind is unchanged.'
+    body: '**Collects what `submitIntegrationListing` sends before it is called.** The person enters `name`,
+      `category`, `description`, `integrationUrl` and the `requiredScopes`, and chooses `visibility`.
+      `developerId` comes from the session. Never `id` or `status`: the id is a client UUIDv7 generated
+      silently and the status is the server''s. Certification fields (`certifiedUntil`, `certifiedAgainstVersion`)
+      and `listingFeeModel` are set by TICVAI on DEV-008. Dismissing sends nothing.'
     bindsTo: IntegrationListing
     confirm:
       label: Submit integration listing
@@ -1300,17 +1274,12 @@ screens:
     dismiss:
       label: Cancel
       discards:
-      - id
-      - developerId
       - name
       - category
-      - status
       - description
       - integrationUrl
       - requiredScopes
-      - certifiedUntil
-      - certifiedAgainstVersion
-      - listingFeeModel
+      - visibility
     provenance: contract public-api.yaml POST /listings
 - id: DEV-008
   name: Programme Administration
@@ -1347,7 +1316,9 @@ screens:
 
     **Declared on the screen rather than the platform** because P14 is a partner surface with one staff
     screen on it, and moving the screen to P09 would separate the console from the catalogue it governs.
-    `check-screens` reads `screen.audience` before the platform’s.'
+    `check-screens` reads `screen.audience` before the platform’s. **Quota form labelled 2 October 2026
+    (CHG-SOT-014, design-notes correction DEV-008):** number fields with units and a client picker replace
+    the raw schema names; the quota id is the server''s.'
   density: compact
   audience: staff
   pattern: configEditor
@@ -1360,34 +1331,40 @@ screens:
     - name: contentBody
       slot: fields
       components:
-      - kind: textField
-        label: id
-        bindsTo: ApiQuota.id
-        provenance: contract public-api.yaml PUT /api-quotas
-      - kind: textField
-        label: clientId
+      - kind: selectField
+        label: API client
         bindsTo: ApiQuota.clientId
         provenance: contract public-api.yaml PUT /api-quotas
-      - kind: textField
-        label: sustainedPerMinute
+        operation: setApiQuota
+        notes: A picker of API clients by developer and name, never a typed id.
+      - kind: numberField
+        label: Sustained calls per minute
         bindsTo: ApiQuota.sustainedPerMinute
         provenance: contract public-api.yaml PUT /api-quotas
-      - kind: textField
-        label: burstPerSecond
+        operation: setApiQuota
+      - kind: numberField
+        label: Burst calls per second
         bindsTo: ApiQuota.burstPerSecond
         provenance: contract public-api.yaml PUT /api-quotas
-      - kind: textField
-        label: dailyCap
+        operation: setApiQuota
+      - kind: numberField
+        label: Daily cap (calls)
         bindsTo: ApiQuota.dailyCap
         provenance: contract public-api.yaml PUT /api-quotas
-      - kind: textField
-        label: perOperationOverrides
+        operation: setApiQuota
+        notes: Empty for no daily cap.
+      - kind: dataTable
+        label: Per-operation limits
         bindsTo: ApiQuota.perOperationOverrides
         provenance: contract public-api.yaml PUT /api-quotas
-      - kind: textField
-        label: onBreach
+        operation: setApiQuota
+        notes: An operation and its own per-minute limit, one row each.
+      - kind: selectField
+        label: On breach
         bindsTo: ApiQuota.onBreach
         provenance: contract public-api.yaml PUT /api-quotas
+        operation: setApiQuota
+        notes: What happens when the quota is exceeded.
       - kind: primaryButton
         label: Approve
         provenance: carried from the previous definition

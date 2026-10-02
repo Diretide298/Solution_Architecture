@@ -1,6 +1,6 @@
 # WS105 — Subscription Licensing AI Self Service board 8
 
-**10 screens · 0 operations · 0 schemas · 0 permissions**
+**10 screens · 2 operations · 1 schemas · 1 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -48,8 +48,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 0 permissions apply here:
-  ``. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 1 permissions apply here:
+  `PLATFORM_TENANT_MANAGE`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -60,6 +60,35 @@ convincingly. It is never a caption.
   field, the control, whether it is required, its default, its limits and allowed values, its format
   and its error; and, element by element, what is shown and in what format, what each action
   produces and where the user goes next. Draw exactly that.
+
+## The processes these screens belong to
+
+Written by the owner of each process (`handoff/design-notes/`). Read before any screen: it says how the process runs end to end and which words the screens must use.
+
+### Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management)
+
+Platform Foundation is everything the apps stand on. Five apps each have one door: the guest app and website (WEB-016, GST-042: a six-digit code to email or mobile, a password, Apple or Google, UAE Pass; never enterprise SSO), the till (POS-000: employee number and PIN, recent operators as tiles; the kitchen display is the same app), the staff handheld and scanner (EMP-001, SCN-001), Venue Management (SUP-001, the single door for the back office P08, the CMS P13, analytics P16 and the support desk P12) and TICVAI Control (ADM-001 for TICVAI's own platform operators, PTR-001 for partner users; the developer portal P14 and the sign-up P17 belong to this app too). A second factor is required by permission, not by role or device: ROLE_MANAGE, LEDGER_APPROVE and every PLATFORM_* permission, plus any the tenant adds; so a cashier never sees it and a platform operator always does. The factor is an authenticator app with an emailed code as fallback; five wrong codes lock step-up for the lockout minutes, never permanently. Guests get two-step verification only at a venue that switched it on. One person holds one session per workstation: a second sign-in is refused and only a supervisor ends the other session. Several roles mean a role prompt; one role goes straight in. The workstation decides the Sale Board, hardware and till identity, never what a person may do. Sensitive actions (refund approval, journal approval, credential reset, partner credit, commission rules, opening a platform-staff grant and 17 more) demand a fresh step-up on the operation itself, asked in place in the action's confirmation; the tenant may raise the strength, never remove it. Permission outcomes are three, never one word: self-authorised (proceeds, audited), escalated (a supervisor PIN in place), refused (the denied state, naming the permission); a missing permission is never an empty table, and a record outside the person's venues is "not found", indistinguishable from absent. The hierarchy is binding (tenant, brand, region, venue, department, sub-department, workstation; outlet beside department for F&B and retail); region owns currency, decimals, time zone, date format and fiscal year; configuration resolves nearest-ancestor across tenant, region and venue (outlet for F&B and retail), venue is the floor and a workstation is assigned a profile, never configured; every configuration screen says which level it writes and what it inherits. Venue Management is one tenant-level surface filtering across the venues in the session's scope. TICVAI's Console runs outside every cell: a platform operator picks a tenant and opens a time-boxed, audited platform-staff grant (with step-up) before any tenant action, and the tenant sees every action in its audit log (ADM-412 is the reference implementation). Approval workflows record authorisations and never perform the action; the requester cannot approve their own request; a venue may tighten and never loosen a rule from above; in-flight …
+*(source: screens/P12-support-agent-console.yaml#SUP-001; R135; R126; R167; DI-1072; ADR-0002; ADR-0003; ADR-0004; R184; contracts/spine/identity.yaml#createMfaChallenge; contracts/spine/approvals.yaml#setStepUpPolicy; ADR-0011; ADR-0018; ADR-0029; R098; contracts/spine/approvals.yaml#decideApprovalRequest …)*
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Sign in / Sign out | Entering and leaving any app, staff or guest. | Login, Log in, Logon, Logout | screens/P04-point-of-sale.yaml#POS-000 … |
+| Authentication code | The staff second factor from the authenticator app (or the emailed fallback). | OTP, 2FA code, token | screens/P09-platform-admin-console.yaml#ADM-001 |
+| One-time code | The six-digit code a guest receives to sign in or prove a contact. | OTP, PIN, password | DI-1034; R167 |
+| Two-step verification | The guest's optional second factor, asked only at venues that switched it on. | MFA, 2FA | DI-1072 |
+| Tenant / Brand / Region / Venue / Department / Outlet | The binding hierarchy levels; region owns currency and dates; outlet is F&B or retail inside a venue. | Client, Customer, Org (for tenant), Site, Park, Property (for venue), Area, Territory (for region) | ADR-0011; ADR-0018 |
+| Workstation (back office) / till (operator copy) | A configured device; decides Sale Board, hardware and till identity, never authorisation. | Terminal, Station, POS (for the device), till (for the Deposit Box) | ADR-0002; R156 |
+| Sale Board | The configured front end a workstation loads (ticketing, F&B or retail). | Screen, Layout, Menu | ADR-0003 |
+| Role | A named, fully configurable grouping of permissions; the seeded five are editable starting points. | Group, Profile | R229 |
+| Staff member / Partner user / Platform operator | A tenant's staff principal; a partner's user; a TICVAI employee in the Console. | User (alone), Account, Agent (for venue staff) | F104 step 1; F104 step 4; F104 step 5 |
+| Platform-staff grant | The time-boxed, audited access a platform operator opens into one tenant before acting in it. | Impersonation, Support login | R098 |
+| Escalate / Refused | Escalate is supervisor approval captured in place; Refused is the denied state that names the permission. | Denied (for an action that can be escalated) | R197 |
+| Approve / Reject / Return / Request information | The four decisions on an approval request; Withdraw is the requester's own act and never a rejection. | Accept, Decline, Cancel (for withdraw) | contracts/spine/approvals.yaml#decideApprovalRequest … |
+| Subscription / Plan / Module / Licence | TICVAI's commercial relationship with a tenant, its plan, the modules it licenses and the limits. | Membership (that is the guest's pass) | R214 |
+| Membership / Annual pass | A guest's pass product and its holder (BO-284 to BO-303). | Subscription (that is the tenant's TICVAI plan) | screens/P08-venue-back-office.yaml#BO-284 |
+| Sandbox client / Production client | A developer's own test credential; a TICVAI-issued live credential after certification. | Test key, Live key, API key (without environment) | DI-927 |
+| Asset (DAM) / Media (ticket) | A digital file in the library; ticket media is a wristband or card carrying entitlements. Never mix them. | Media (for a library asset) | contracts/satellite/assets.yaml#searchMedia … |
+
 
 ## The screens
 
@@ -97,7 +126,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Setup & Go-Live · wave 3 · needs the `core` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue; in the flows as venue manager |
+| Who uses it | venue staff holding `PLATFORM_TENANT_MANAGE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
 | Offline | online only |
@@ -107,6 +136,14 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 **What the spec says about it.** **Moved from P09 `ADM-439` on 11 September 2026.** Board 8 is worked by the new customer's own administrator inside their tenant, not by TICVAI; `tools/applied/apply-subscription-placement.py` records why. `ADM-439` is retired and never reissued.
 
 **Known gaps.** **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+**From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** Whether the tenant is ready for production: readiness, blockers, warnings, tests passed and pending, by area; run all validations.
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- A Venue Management screen calls operations gated by TICVAI-only permissions: getGoLiveReadiness (PLATFORM_TENANT_MANAGE). (CHG-SBO-005)
+
+**Fixed on main** (the package already carries these; draw what it says): emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything. (CHG-SBO-002).
 
 #### Inputs: what the user enters or picks
 
@@ -126,43 +163,43 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 | Shows | Format | Notes |
 |---|---|---|
-| Status | text | not in the schema: `GoLiveReadiness.status` |
+| Status | chip: Not started, Running, Blocked, Ready with warnings, Ready | — |
 
 **Blockers** (metric tile, from `getGoLiveReadiness`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| Blockers | text | not in the schema: `GoLiveReadiness.blockers` |
+| Blockers | 1,234 | — |
 
 **Warnings** (metric tile, from `getGoLiveReadiness`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| Warnings | text | not in the schema: `GoLiveReadiness.warnings` |
+| Warnings | 1,234 | — |
 
 **Tests passed / pending** (metric tile, from `getGoLiveReadiness`): Counted by `outcome` across every group; pending is `skipped`.
 
 | Shows | Format | Notes |
 |---|---|---|
-| Outcome | text | not in the schema: `GoLiveReadiness.groups[].checks[].outcome` |
+| Outcome | chip: Pass, Warn, Fail, Skipped | — |
 
 **Validation areas** (data table, from `getGoLiveReadiness`): Area status is the worst check outcome in the group (Passed / Warning / Testing / Pending). The pack's Operational Readiness area has no group code.
 
 | Shows | Format | Notes |
 |---|---|---|
-| Code | text | not in the schema: `GoLiveReadiness.groups[].code` |
-| Label | text | not in the schema: `GoLiveReadiness.groups[].label` |
+| Code | chip: Ticketing and products, Sales channels, Payment, Ticket QR access, Users and … | — |
+| Label | text | — |
 | Area status | text | not in the schema: `Area status` |
 
 **Checks in the selected area** (detail panel, from `getGoLiveReadiness`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| Code | text | not in the schema: `GoLiveReadiness.groups[].checks[].code` |
-| Label | text | not in the schema: `GoLiveReadiness.groups[].checks[].label` |
-| Outcome | text | not in the schema: `GoLiveReadiness.groups[].checks[].outcome` |
-| Detail | text | not in the schema: `GoLiveReadiness.groups[].checks[].detail` |
-| Remediation | text | not in the schema: `GoLiveReadiness.groups[].checks[].remediation` |
+| Code | text | — |
+| Label | text | — |
+| Outcome | chip: Pass, Warn, Fail, Skipped | — |
+| Detail | text | — |
+| Remediation | text | — |
 
 **Actions and what each produces**
 
@@ -193,12 +230,26 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |---|---|
 | Loading (`?state=loading`) | The go-live readiness list. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the go-live readiness untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No go-live readiness yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, first run (`?state=emptyFirstRun`) | No go-live readiness yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the go-live readiness are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+readiness:
+  overall: 86%
+  blockers: 2
+  warnings: 5
+  tests: 41 passed / 6 pending
+```
+
 #### Permissions
+
+- `getGoLiveReadiness` → `PLATFORM_TENANT_MANAGE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -240,7 +291,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every state opens from `#BO-605?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Run all validations, View blockers, Ask AI.
 - [ ] Every transition is wired: `BO-100`, `BO-606`, `BO-607`, `BO-608`, `BO-609`, `BO-610`, `BO-611`, `BO-612`, `BO-613`, `BO-614`.
-- [ ] Sign-in is asked only where the spec asks for it.
+- [ ] Every gated control is gated: `PLATFORM_TENANT_MANAGE`.
 - [ ] The module and platform inputs below are applied.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -255,7 +306,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Setup & Go-Live · wave 3 · needs the `core` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue; in the flows as venue manager |
+| Who uses it | venue staff holding `PLATFORM_TENANT_MANAGE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
 | Offline | online only |
@@ -265,6 +316,14 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 **What the spec says about it.** **Moved from P09 `ADM-440` on 11 September 2026.** Board 8 is worked by the new customer's own administrator inside their tenant, not by TICVAI; `tools/applied/apply-subscription-placement.py` records why. `ADM-440` is retired and never reissued.
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+**From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** The validation plan generated from what the tenant bought and configured.
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- A Venue Management screen calls operations gated by TICVAI-only permissions: runGoLiveValidation (PLATFORM_TENANT_MANAGE). (CHG-SBO-005)
+
+**Fixed on main** (the package already carries these; draw what it says): emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything. (CHG-SBO-002).
 
 #### Inputs: what the user enters or picks
 
@@ -289,12 +348,27 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |---|---|
 | Loading (`?state=loading`) | The automated validation plan list. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the automated validation plan untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No automated validation plan yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, first run (`?state=emptyFirstRun`) | No automated validation plan yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the automated validation plan are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+plan:
+- Ticketing products (14 tests)
+- POS sale and refund (9)
+- Web checkout (11)
+- Gate admission (6)
+generatedFrom: ticketing, pos, b2c, access
+```
+
 #### Permissions
+
+- `runGoLiveValidation` → `PLATFORM_TENANT_MANAGE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -326,7 +400,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every state opens from `#BO-606?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: , Cancel.
 - [ ] Every transition is wired: `BO-605`.
-- [ ] Sign-in is asked only where the spec asks for it.
+- [ ] Every gated control is gated: `PLATFORM_TENANT_MANAGE`.
 - [ ] The module and platform inputs below are applied.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -341,7 +415,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Setup & Go-Live · wave 3 · needs the `core` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue; in the flows as venue manager |
+| Who uses it | venue staff holding `PLATFORM_TENANT_MANAGE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
 | Offline | online only |
@@ -351,6 +425,14 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 **What the spec says about it.** **Moved from P09 `ADM-441` on 11 September 2026.** Board 8 is worked by the new customer's own administrator inside their tenant, not by TICVAI; `tools/applied/apply-subscription-placement.py` records why. `ADM-441` is retired and never reissued.
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+**From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** Validate that configured products can be sold and admitted.
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- A Venue Management screen calls operations gated by TICVAI-only permissions: runGoLiveValidation (PLATFORM_TENANT_MANAGE). (CHG-SBO-005)
+
+**Fixed on main** (the package already carries these; draw what it says): emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything. (CHG-SBO-002).
 
 #### Inputs: what the user enters or picks
 
@@ -375,12 +457,27 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |---|---|
 | Loading (`?state=loading`) | The ticketing product validation list. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the ticketing product validation untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No ticketing product validation yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, first run (`?state=emptyFirstRun`) | No ticketing product validation yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the ticketing product validation are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+product: Day Pass Adult
+checks:
+  priced: pass
+  sellableOnChannels: web, POS
+  capacity: pass
+  taxCode: fail
+```
+
 #### Permissions
+
+- `runGoLiveValidation` → `PLATFORM_TENANT_MANAGE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -412,7 +509,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every state opens from `#BO-607?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: , Cancel.
 - [ ] Every transition is wired: `BO-605`.
-- [ ] Sign-in is asked only where the spec asks for it.
+- [ ] Every gated control is gated: `PLATFORM_TENANT_MANAGE`.
 - [ ] The module and platform inputs below are applied.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -427,7 +524,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Setup & Go-Live · wave 3 · needs the `core` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue; in the flows as venue manager |
+| Who uses it | venue staff holding `PLATFORM_TENANT_MANAGE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
 | Offline | online only |
@@ -437,6 +534,14 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 **What the spec says about it.** **Moved from P09 `ADM-442` on 11 September 2026.** Board 8 is worked by the new customer's own administrator inside their tenant, not by TICVAI; `tools/applied/apply-subscription-placement.py` records why. `ADM-442` is retired and never reissued.
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+**From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** Test a real transaction journey on each sales channel.
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- A Venue Management screen calls operations gated by TICVAI-only permissions: runGoLiveValidation (PLATFORM_TENANT_MANAGE). (CHG-SBO-005)
+
+**Fixed on main** (the package already carries these; draw what it says): emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything. (CHG-SBO-002).
 
 #### Inputs: what the user enters or picks
 
@@ -461,12 +566,25 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |---|---|
 | Loading (`?state=loading`) | The end-to-end sales channel list. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the end-to-end sales channel untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No end-to-end sales channel yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, first run (`?state=emptyFirstRun`) | No end-to-end sales channel yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the end-to-end sales channel are still there. The pack's own statuses are ✓ Passed — the state names which is selected. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+channel: Web
+journey: Select date, 2 adults, pay by card, ticket in wallet
+result: passed
+duration: 2 min 40 s
+```
+
 #### Permissions
+
+- `runGoLiveValidation` → `PLATFORM_TENANT_MANAGE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -498,7 +616,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every state opens from `#BO-608?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: , Cancel.
 - [ ] Every transition is wired: `BO-605`.
-- [ ] Sign-in is asked only where the spec asks for it.
+- [ ] Every gated control is gated: `PLATFORM_TENANT_MANAGE`.
 - [ ] The module and platform inputs below are applied.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -513,7 +631,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Setup & Go-Live · wave 3 · needs the `core` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue; in the flows as venue manager |
+| Who uses it | venue staff holding `PLATFORM_TENANT_MANAGE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
 | Offline | online only |
@@ -523,6 +641,14 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 **What the spec says about it.** **Moved from P09 `ADM-443` on 11 September 2026.** Board 8 is worked by the new customer's own administrator inside their tenant, not by TICVAI; `tools/applied/apply-subscription-placement.py` records why. `ADM-443` is retired and never reissued.
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+**From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** Validate payment, tax, refunds and settlement before taking real money.
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- A Venue Management screen calls operations gated by TICVAI-only permissions: runGoLiveValidation (PLATFORM_TENANT_MANAGE). (CHG-SBO-005)
+
+**Fixed on main** (the package already carries these; draw what it says): emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything. (CHG-SBO-002).
 
 #### Inputs: what the user enters or picks
 
@@ -547,12 +673,26 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |---|---|
 | Loading (`?state=loading`) | The payment financial validation list. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the payment financial validation untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No payment financial validation yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, first run (`?state=emptyFirstRun`) | No payment financial validation yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the payment financial validation are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+checks:
+  cardPayment: pass
+  refund: pass
+  vatOnReceipt: 5% shown
+  settlementFile: pending
+```
+
 #### Permissions
+
+- `runGoLiveValidation` → `PLATFORM_TENANT_MANAGE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -584,7 +724,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every state opens from `#BO-609?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: , Cancel.
 - [ ] Every transition is wired: `BO-605`.
-- [ ] Sign-in is asked only where the spec asks for it.
+- [ ] Every gated control is gated: `PLATFORM_TENANT_MANAGE`.
 - [ ] The module and platform inputs below are applied.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -599,7 +739,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Setup & Go-Live · wave 3 · needs the `core` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue; in the flows as venue manager |
+| Who uses it | venue staff holding `PLATFORM_TENANT_MANAGE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
 | Offline | online only |
@@ -609,6 +749,14 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 **What the spec says about it.** **Moved from P09 `ADM-444` on 11 September 2026.** Board 8 is worked by the new customer's own administrator inside their tenant, not by TICVAI; `tools/applied/apply-subscription-placement.py` records why. `ADM-444` is retired and never reissued.
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+**From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** Validate ticket creation to physical admission (QR, RFID, gates).
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- A Venue Management screen calls operations gated by TICVAI-only permissions: runGoLiveValidation (PLATFORM_TENANT_MANAGE). (CHG-SBO-005)
+
+**Fixed on main** (the package already carries these; draw what it says): emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything. (CHG-SBO-002).
 
 #### Inputs: what the user enters or picks
 
@@ -633,12 +781,25 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |---|---|
 | Loading (`?state=loading`) | The ticket access validation list. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the ticket access validation untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No ticket access validation yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, first run (`?state=emptyFirstRun`) | No ticket access validation yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the ticket access validation are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+ticket: QR AQC-AUH-260930-0412-01
+gate: Main Gate Lane 2
+result: admitted
+reentry: refused (single entry)
+```
+
 #### Permissions
+
+- `runGoLiveValidation` → `PLATFORM_TENANT_MANAGE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -670,7 +831,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every state opens from `#BO-610?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: , Cancel.
 - [ ] Every transition is wired: `BO-605`.
-- [ ] Sign-in is asked only where the spec asks for it.
+- [ ] Every gated control is gated: `PLATFORM_TENANT_MANAGE`.
 - [ ] The module and platform inputs below are applied.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -685,7 +846,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Setup & Go-Live · wave 3 · needs the `core` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue; in the flows as venue manager |
+| Who uses it | venue staff holding `PLATFORM_TENANT_MANAGE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
 | Offline | online only |
@@ -695,6 +856,14 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 **What the spec says about it.** **Moved from P09 `ADM-445` on 11 September 2026.** Board 8 is worked by the new customer's own administrator inside their tenant, not by TICVAI; `tools/applied/apply-subscription-placement.py` records why. `ADM-445` is retired and never reissued.
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+**From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** Validate users, roles, MFA for privileged staff and integrations before launch.
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- A Venue Management screen calls operations gated by TICVAI-only permissions: runGoLiveValidation (PLATFORM_TENANT_MANAGE). (CHG-SBO-005)
+
+**Fixed on main** (the package already carries these; draw what it says): emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything. (CHG-SBO-002).
 
 #### Inputs: what the user enters or picks
 
@@ -713,6 +882,10 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |  (primary button) | navigation or local | — | — | — | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
 
+**Rules for what is shown** (from the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process; these refine the tables above and win where they differ)
+
+- **MFA check**: Every holder of a permission in the MFA list has an enrolled method; missing ones listed by name. *(source: R135)*
+
 **Where the user goes next**
 
 - → `BO-605` Go-Live Readiness Command Center: *Back to Go-Live Readiness Command Center*
@@ -723,12 +896,25 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |---|---|
 | Loading (`?state=loading`) | The user security integration list. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the user security integration untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No user security integration yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, first run (`?state=emptyFirstRun`) | No user security integration yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the user security integration are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+checks:
+  adminsWithMfa: 3 of 3
+  rolesReviewed: true
+  apiClientsWithIpAllowList: 1 of 2 (1 missing)
+```
+
 #### Permissions
+
+- `runGoLiveValidation` → `PLATFORM_TENANT_MANAGE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -760,7 +946,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every state opens from `#BO-611?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: , Cancel.
 - [ ] Every transition is wired: `BO-605`.
-- [ ] Sign-in is asked only where the spec asks for it.
+- [ ] Every gated control is gated: `PLATFORM_TENANT_MANAGE`.
 - [ ] The module and platform inputs below are applied.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -775,7 +961,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Setup & Go-Live · wave 3 · needs the `core` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue; in the flows as venue manager |
+| Who uses it | venue staff holding `PLATFORM_TENANT_MANAGE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
 | Offline | online only |
@@ -785,6 +971,14 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 **What the spec says about it.** **Moved from P09 `ADM-446` on 11 September 2026.** Board 8 is worked by the new customer's own administrator inside their tenant, not by TICVAI; `tools/applied/apply-subscription-placement.py` records why. `ADM-446` is retired and never reissued.
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+**From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** Validate the messages the guest receives through the booking journey.
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- A Venue Management screen calls operations gated by TICVAI-only permissions: runGoLiveValidation (PLATFORM_TENANT_MANAGE). (CHG-SBO-005)
+
+**Fixed on main** (the package already carries these; draw what it says): emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything. (CHG-SBO-002).
 
 #### Inputs: what the user enters or picks
 
@@ -809,12 +1003,25 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |---|---|
 | Loading (`?state=loading`) | The communication customer journey list. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the communication customer journey untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No communication customer journey yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, first run (`?state=emptyFirstRun`) | No communication customer journey yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the communication customer journey are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+message: Booking confirmation (Arabic and English)
+channel: email
+received: true
+linksWork: true
+```
+
 #### Permissions
+
+- `runGoLiveValidation` → `PLATFORM_TENANT_MANAGE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -851,7 +1058,7 @@ Also apply: 3 for P08 · Setup & Go-Live, 24 for all of P08, 29 for every app (s
 - [ ] Every state opens from `#BO-612?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: , Cancel.
 - [ ] Every transition is wired: `BO-605`.
-- [ ] Sign-in is asked only where the spec asks for it.
+- [ ] Every gated control is gated: `PLATFORM_TENANT_MANAGE`.
 - [ ] The module and platform inputs below are applied.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -866,7 +1073,7 @@ Also apply: 3 for P08 · Setup & Go-Live, 24 for all of P08, 29 for every app (s
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Setup & Go-Live · wave 3 · needs the `core` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue; in the flows as venue manager |
+| Who uses it | venue staff holding `PLATFORM_TENANT_MANAGE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Where override is permitted, capture) and no display directory — it is settings, not a population |
 | Offline | online only |
@@ -874,6 +1081,14 @@ Also apply: 3 for P08 · Setup & Go-Live, 24 for all of P08, 29 for every app (s
 | Route | `/setup-go-live/blocker-warning-ai-resolution-center-bo-613` |
 
 **What the spec says about it.** **Moved from P09 `ADM-447` on 11 September 2026.** Board 8 is worked by the new customer's own administrator inside their tenant, not by TICVAI; `tools/applied/apply-subscription-placement.py` records why. `ADM-447` is retired and never reissued.
+
+**From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** All readiness problems in one place with AI help to resolve them; accepting a warning records who, why and until when.
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- A Venue Management screen calls operations gated by TICVAI-only permissions: getGoLiveReadiness (PLATFORM_TENANT_MANAGE). (CHG-SBO-005)
+
+**Fixed on main** (the package already carries these; draw what it says): emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything. (CHG-SBO-002).
 
 #### Inputs: what the user enters or picks
 
@@ -902,12 +1117,28 @@ Also apply: 3 for P08 · Setup & Go-Live, 24 for all of P08, 29 for every app (s
 |---|---|
 | Loading (`?state=loading`) | The blocker warning resolution configuration as saved. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the blocker warning resolution untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No blocker warning resolution configured yet. Carries the create action and says what the platform does in the meantime. |
+| Empty, first run (`?state=emptyFirstRun`) | No blocker warning resolution configured yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Empty, no results (`?state=emptyNoResults`) | **Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist |
 | Offline (`?state=offline`) | online only |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+form example:
+  Reason: 57
+  User: 233
+  Role: 57
+  Approval: 74
+  Timestamp: 42 min
+  Expiry where applicable: 19
+```
+
 #### Permissions
+
+- `getGoLiveReadiness` → `PLATFORM_TENANT_MANAGE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -944,7 +1175,7 @@ Also apply: 3 for P08 · Setup & Go-Live, 24 for all of P08, 29 for every app (s
 - [ ] Every state opens from `#BO-613?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, emptyNoResults, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-605`.
-- [ ] Sign-in is asked only where the spec asks for it.
+- [ ] Every gated control is gated: `PLATFORM_TENANT_MANAGE`.
 - [ ] The module and platform inputs below are applied.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -959,7 +1190,7 @@ Also apply: 3 for P08 · Setup & Go-Live, 24 for all of P08, 29 for every app (s
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Setup & Go-Live · wave 3 · needs the `core` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue; in the flows as venue manager |
+| Who uses it | venue staff holding `PLATFORM_TENANT_MANAGE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
 | Offline | online only |
@@ -969,6 +1200,14 @@ Also apply: 3 for P08 · Setup & Go-Live, 24 for all of P08, 29 for every app (s
 **What the spec says about it.** **Moved from P09 `ADM-448` on 11 September 2026.** Board 8 is worked by the new customer's own administrator inside their tenant, not by TICVAI; `tools/applied/apply-subscription-placement.py` records why. `ADM-448` is retired and never reissued.
 
 **Known gaps.** **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+**From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** The final decision to go live: readiness summary, accepted warnings, the customer's declaration, then Approve & go live. Blockers prevent the button.
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- A Venue Management screen calls operations gated by TICVAI-only permissions: getGoLiveReadiness (PLATFORM_TENANT_MANAGE). (CHG-SBO-005)
+
+**Fixed on main** (the package already carries these; draw what it says): emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything. (CHG-SBO-002).
 
 #### Inputs: what the user enters or picks
 
@@ -992,35 +1231,35 @@ Also apply: 3 for P08 · Setup & Go-Live, 24 for all of P08, 29 for every app (s
 
 | Shows | Format | Notes |
 |---|---|---|
-| Outcome | text | not in the schema: `GoLiveReadiness.groups[].checks[].outcome` |
+| Outcome | chip: Pass, Warn, Fail, Skipped | — |
 
 **Blockers** (metric tile, from `getGoLiveReadiness`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| Blockers | text | not in the schema: `GoLiveReadiness.blockers` |
+| Blockers | 1,234 | — |
 
 **Accepted non-critical warnings** (metric tile, from `getGoLiveReadiness`): The contract counts warnings; it does not record which were accepted.
 
 | Shows | Format | Notes |
 |---|---|---|
-| Warnings | text | not in the schema: `GoLiveReadiness.warnings` |
+| Warnings | 1,234 | — |
 
 **Validation summary** (data table, from `getGoLiveReadiness`): One line per area, as in the pack's ticked summary.
 
 | Shows | Format | Notes |
 |---|---|---|
-| Label | text | not in the schema: `GoLiveReadiness.groups[].label` |
-| Outcome | text | not in the schema: `GoLiveReadiness.groups[].checks[].outcome` |
+| Label | text | — |
+| Outcome | chip: Pass, Warn, Fail, Skipped | — |
 
 **Authorized by** (detail panel, from `getGoLiveReadiness`): The signer's role is a pack label with no field.
 
 | Shows | Format | Notes |
 |---|---|---|
-| Signed off by | text | not in the schema: `GoLiveReadiness.signedOffBy` |
-| Signed off at | text | not in the schema: `GoLiveReadiness.signedOffAt` |
-| Status | text | not in the schema: `GoLiveReadiness.status` |
-| Run at | text | not in the schema: `GoLiveReadiness.runAt` |
+| Signed off by | the name it points at, never the id | — |
+| Signed off at | 1 Oct 2026, 14:30 | — |
+| Status | chip: Not started, Running, Blocked, Ready with warnings, Ready | — |
+| Run at | 1 Oct 2026, 14:30 | — |
 | Role | text | not in the schema: `Role` |
 
 **Actions and what each produces**
@@ -1030,6 +1269,10 @@ Also apply: 3 for P08 · Setup & Go-Live, 24 for all of P08, 29 for every app (s
 | Approve & go live (primary button) | navigation or local | — | — | — | — |
 | Download validation report (secondary button) | navigation or local | — | — | — | — |
 | Return to configuration (secondary button) | navigation or local | — | — | — | — |
+
+**What each action does** (from the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process; these refine the tables above and win where they differ)
+
+- **Approve & go live**: Disabled while blockers exist, naming them; the declaration must be ticked; the act is recorded with who. *(source: screens/_components.yaml#publishGate)*
 
 **Where the user goes next**
 
@@ -1041,12 +1284,26 @@ Also apply: 3 for P08 · Setup & Go-Live, 24 for all of P08, 29 for every app (s
 |---|---|
 | Loading (`?state=loading`) | The final go-live approval list. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the final go-live approval untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No final go-live approval yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, first run (`?state=emptyFirstRun`) | No final go-live approval yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the final go-live approval are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+metric tiles:
+  Final readiness: 94%
+  Passed: 46
+  Blockers: 5
+  Accepted non-critical warnings: 1
+```
+
 #### Permissions
+
+- `getGoLiveReadiness` → `PLATFORM_TENANT_MANAGE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -1080,7 +1337,7 @@ Also apply: 3 for P08 · Setup & Go-Live, 24 for all of P08, 29 for every app (s
 - [ ] Every state opens from `#BO-614?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Approve & go live, Download validation report, Return to configuration.
 - [ ] Every transition is wired: `BO-605`.
-- [ ] Sign-in is asked only where the spec asks for it.
+- [ ] Every gated control is gated: `PLATFORM_TENANT_MANAGE`.
 - [ ] The module and platform inputs below are applied.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -1182,7 +1439,8 @@ Method, path, parameters, request and response for every operation these screens
 
 ```json
 {
-
+"getGoLiveReadiness": {"method":"GET","path":"/go-live-readiness","contract":"subscription","summary":"Everything that must pass before a tenant can sell","permission":"PLATFORM_TENANT_MANAGE","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"platform","parameters":[{"name":"tenantId","in":"query","required":true}],"requestBody":null,"responds":"GoLiveReadiness"},
+"runGoLiveValidation": {"method":"POST","path":"/go-live-readiness/run","contract":"subscription","summary":"Run the validation plan against a tenant","permission":"PLATFORM_TENANT_MANAGE","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"platform","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":null}
 }
 ```
 
@@ -1192,6 +1450,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
-
+"GoLiveReadiness": {"type":"object","x-ticvai-persistence":"subscription.go_live_readiness","description":"Board 8. **The screen that stops a launch going wrong in public.**","properties":{"tenantId":{"type":"string","format":"uuid"},"runAt":{"type":"string","format":"date-time"},"status":{"type":"string","enum":["notStarted","running","blocked","readyWithWarnings","ready"]},"groups":{"type":"array","items":{"type":"object","properties":{"code":{"type":"string","enum":["ticketingAndProducts","salesChannels","payment","ticketQrAccess","usersAndSecurity","integrations","communications","financialSetup"]},"label":{"type":"string"},"checks":{"type":"array","items":{"type":"object","properties":{"code":{"type":"string"},"label":{"type":"string"},"outcome":{"type":"string","enum":["pass","warn","fail","skipped"]},"detail":{"type":"string","nullable":true},"remediation":{"type":"string","nullable":true}}}}}}},"blockers":{"type":"integer"},"warnings":{"type":"integer"},"signedOffBy":{"type":"string","format":"uuid","nullable":true},"signedOffAt":{"type":"string","format":"date-time","nullable":true}}}
 }
 ```

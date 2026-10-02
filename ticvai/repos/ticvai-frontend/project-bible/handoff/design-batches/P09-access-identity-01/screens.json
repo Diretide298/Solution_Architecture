@@ -14,7 +14,8 @@
   },
   "navigation": {
    "entryFrom": [
-    "ADM-002"
+    "ADM-002",
+    "ADM-699"
    ],
    "inferred": true,
    "exitTo": [
@@ -30,155 +31,119 @@
     {
      "to": "ADM-004",
      "trigger": "Platform Audit Log",
-     "provenance": "derived — ADM-004 declares entryState.params decisionRecordId and ADM-001 holds none of them. The edge carries nothing: ADM-004 finds decisionRecordId (listAiInteractions) itself, and ADM-004 opens on its own"
+     "provenance": "derived — ADM-004 declares entryState.params decisionRecordId, tenantId and ADM-001 holds none of them. The edge carries nothing: tenantId only pre-selects (deep link or optional); ADM-004 finds decisionRecordId (listAiInteractions) itself, and ADM-004 opens on its own"
     },
     {
      "to": "PTR-001",
      "trigger": "A partner user signs in through the same door",
      "provenance": "flow F104 step 3→4",
+     "operation": "getCurrentSession",
      "crossesDevice": true,
      "back": false,
      "carries": [
-      "challengeId"
+      "challengeId",
+      "methodId",
+      "providerId"
      ]
     }
    ]
   },
-  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement.",
+  "notes": "**Rebuilt as a sign-in form on 2 October 2026 (CHG-DOOR-002/003; Chinmay, 2 October 2026: fix the Block A blockers now).** It was generated as a list over active sessions, MFA methods and SSO providers with Force logout and Revoke all sessions on the door, which a person who is not yet signed in can never use (platform-foundation process notes). The sequence is the same on every staff and partner door: credentials (or the organisation's SSO) -> the authentication code only when a permission demands it (R135) -> the role prompt when several roles are held (ADR-0003) -> the landing. Managing sessions moved to the staff directory (BO-053); managing MFA methods stays on each app's own security or profile screen. **Every platform operator holds a PLATFORM_* permission, so the code is always asked** and the first sign-in always enrols (F104). Platform operators' sessions are not listed here: a session list on the Console would call tenant-permission operations with no platform-staff grant (R098).",
   "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "`listActiveSessions` reads the population and `getCurrentSession` reads one of them — list, select, act",
-  "purpose": "Get someone into the app, fast, on a device that may be shared.",
+  "pattern": "form",
+  "patternReason": "A sign-in: two fields, the organisation's SSO where configured, and the second-factor and role steps in place - a form, not a list to browse.",
+  "purpose": "Get a TICVAI platform operator into the TICVAI Console: username and password (or TICVAI's own SSO), then always the authentication code, then the Platform Dashboard.",
   "layout": {
-   "template": "split",
+   "template": "form",
    "regions": [
     {
      "name": "contentBody",
-     "slot": "collection",
+     "slot": "form",
      "components": [
       {
        "kind": "textField",
-       "label": "Venue id",
-       "operation": "listActiveSessions",
-       "notes": "Sends `?venueId=` to `listActiveSessions`.",
-       "provenance": "contract identity.yaml GET /auth/sessions"
+       "label": "Username",
+       "notes": "Goes into `LoginRequest.username`."
       },
       {
        "kind": "textField",
-       "label": "Principal id",
-       "operation": "listActiveSessions",
-       "notes": "Sends `?principalId=` to `listActiveSessions`.",
-       "provenance": "contract identity.yaml GET /auth/sessions"
+       "label": "Password",
+       "notes": "Goes into `LoginRequest.credential` with `method: password`. Minimum 8, show/hide. **No workstation is sent: a browser is not a registered device** (CHG-DOOR-001), and no PIN is offered, because a PIN is bounded by a device this door does not have."
       },
       {
-       "kind": "textField",
-       "label": "Workstation id",
-       "operation": "listActiveSessions",
-       "notes": "Sends `?workstationId=` to `listActiveSessions`.",
-       "provenance": "contract identity.yaml GET /auth/sessions"
+       "kind": "primaryButton",
+       "label": "Sign in",
+       "operation": "login",
+       "notes": "Sends `LoginRequest`. 409 means this person already holds a session elsewhere (audit R184): the screen says where and since when, and that only a holder of SESSION_FORCE_LOGOUT can end it; signing in never ends the other session.",
+       "provenance": "contract identity.yaml POST /auth/login"
       },
       {
-       "kind": "dataTable",
-       "label": "Every active session",
-       "bindsTo": "ActiveSession",
-       "columns": [
-        "ActiveSession.sessionId",
-        "ActiveSession.principalId",
-        "ActiveSession.principalName",
-        "ActiveSession.roleId",
-        "ActiveSession.roleName",
-        "ActiveSession.workstationId",
-        "ActiveSession.workstationName",
-        "ActiveSession.venueId",
-        "ActiveSession.ipAddress",
-        "ActiveSession.deviceInfo",
-        "ActiveSession.hasOpenShift",
-        "ActiveSession.mfaSatisfied"
-       ],
-       "operation": "listActiveSessions",
-       "provenance": "contract identity.yaml GET /auth/sessions"
-      },
-      {
-       "kind": "dataTable",
-       "label": "Every MFA method",
-       "bindsTo": "MfaMethod",
-       "columns": [
-        "MfaMethod.id",
-        "MfaMethod.kind",
-        "MfaMethod.label",
-        "MfaMethod.maskedTarget",
-        "MfaMethod.isActive",
-        "MfaMethod.isPrimary",
-        "MfaMethod.enrolledAt",
-        "MfaMethod.lastUsedAt"
-       ],
-       "operation": "listMfaMethods",
-       "provenance": "contract identity.yaml GET /auth/mfa/methods"
-      },
-      {
-       "kind": "dataTable",
-       "label": "Every SSO provider",
+       "kind": "cardList",
+       "label": "Sign in with your organisation",
        "bindsTo": "SsoProvider",
        "columns": [
-        "SsoProvider.id",
         "SsoProvider.displayName",
         "SsoProvider.protocol",
-        "SsoProvider.iconAssetRef",
-        "SsoProvider.isEnforced",
-        "SsoProvider.scopePath"
+        "SsoProvider.isEnforced"
        ],
        "operation": "listSsoProviders",
+       "notes": "One button per identity provider TICVAI uses for its own staff; **absent, not disabled, when there is none.** Read before sign-in, unauthenticated. When a provider `isEnforced` for this person, the password field is hidden and only this remains.",
        "provenance": "contract identity.yaml GET /auth/sso/providers"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Continue with your organisation",
+       "operation": "startSsoAuthorization",
+       "notes": "Hands off to the identity provider with this door's `redirectUri`; nothing is typed here. Staff and partner doors only, never a guest door (audit R167).",
+       "provenance": "contract identity.yaml GET /auth/sso/{providerId}/authorize"
+      },
+      {
+       "kind": "progressIndicator",
+       "label": "Finishing sign-in with your organisation",
+       "operation": "completeSsoAuthorization",
+       "notes": "On the provider's redirect back (`code` and `state` from the redirect, never typed). Returns the same `LoginResponse` as `login`, so the second factor and the role prompt follow exactly as below. 403: the provider proved who this is and no group maps to a role in this tenant, which grants nothing.",
+       "provenance": "contract identity.yaml POST /auth/sso/{providerId}/callback"
       }
      ]
     },
     {
-     "name": "contextPanel",
-     "slot": "selection",
+     "name": "secondFactor",
+     "slot": "form",
      "components": [
       {
-       "kind": "detailPanel",
-       "label": "The selected active session",
-       "bindsTo": "ActiveSession",
-       "columns": [
-        "ActiveSession.status",
-        "ActiveSession.sessionId",
-        "ActiveSession.principalId",
-        "ActiveSession.principalName",
-        "ActiveSession.roleId",
-        "ActiveSession.roleName",
-        "ActiveSession.workstationId",
-        "ActiveSession.workstationName",
-        "ActiveSession.venueId",
-        "ActiveSession.ipAddress",
-        "ActiveSession.deviceInfo",
-        "ActiveSession.hasOpenShift",
-        "ActiveSession.mfaSatisfied",
-        "ActiveSession.startedAt",
-        "ActiveSession.lastSeenAt"
-       ],
-       "operation": "listActiveSessions",
-       "provenance": "contract identity.yaml GET /auth/sessions"
+       "kind": "textField",
+       "label": "Authentication code",
+       "operation": "verifyMfaChallenge",
+       "notes": "Shown only when the sign-in comes back `requiresMfa`: the person holds a permission in `PasswordPolicy.mfaRequiredForPermissions` (ROLE_MANAGE, LEDGER_APPROVE, every PLATFORM_* permission, or one the tenant added; audit R135). Six digits from the authenticator app.",
+       "provenance": "contract identity.yaml POST /auth/mfa/challenge/{challengeId}/verify"
       },
       {
-       "kind": "detailPanel",
-       "label": "The session",
-       "bindsTo": "Session",
-       "columns": [
-        "Session.sessionId",
-        "Session.principalId",
-        "Session.roleId",
-        "Session.displayName",
-        "Session.scope",
-        "Session.effectivePermissions",
-        "Session.permissionsByScope",
-        "Session.saleBoardId",
-        "Session.workstation",
-        "Session.openedAt",
-        "Session.expiresAt"
-       ],
-       "operation": "getCurrentSession",
-       "provenance": "contract identity.yaml GET /auth/session"
+       "kind": "primaryButton",
+       "label": "Verify",
+       "operation": "verifyMfaChallenge",
+       "notes": "Completes the sign-in; the session is usable only after it. Five wrong codes lock step-up for the policy's lockout minutes, never permanently (audit R126 (6)), and the screen says until when.",
+       "provenance": "contract identity.yaml POST /auth/mfa/challenge/{challengeId}/verify"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Email me a code instead",
+       "operation": "createMfaChallenge",
+       "notes": "`action: signIn`. The authenticator app is the primary method and an emailed code the fallback (audit R126 (5)).",
+       "provenance": "contract identity.yaml POST /auth/mfa/challenge"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Set up the authenticator app",
+       "operation": "enrolMfaMethod",
+       "notes": "Only when the sign-in comes back `requiresMfa` with `hasMfaMethod: false`: the first method is enrolled here before anything else (audit R135). Authenticator app (`totp`) or email (`emailOtp`) only; the secret as QR and text.",
+       "provenance": "contract identity.yaml POST /auth/mfa/methods"
+      },
+      {
+       "kind": "credentialDisplay",
+       "label": "Recovery codes",
+       "operation": "verifyMfaEnrolment",
+       "notes": "The method is active once its first code is verified. Recovery codes are shown once, with copy and download, and never again.",
+       "provenance": "contract identity.yaml POST /auth/mfa/methods/{methodId}"
       }
      ]
     },
@@ -187,167 +152,71 @@
      "slot": "rowActions",
      "components": [
       {
-       "kind": "primaryButton",
-       "label": "Login",
-       "operation": "login",
-       "provenance": "contract identity.yaml POST /auth/login"
+       "kind": "banner",
+       "label": "Signed in as",
+       "operation": "getCurrentSession",
+       "notes": "Read once the sign-in is complete (after the code and the role, where asked): the person's name and role, then straight on. A platform operator lands on the Platform Dashboard (ADM-002).",
+       "provenance": "contract identity.yaml GET /auth/session"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Choose role",
+       "operation": "selectRole",
+       "notes": "Only when `LoginResponse.requiresRoleSelection` is true: large role buttons, one per role the person holds (ADR-0003). One role goes straight in. A platform operator lands on the Platform Dashboard (ADM-002).",
+       "provenance": "contract identity.yaml POST /auth/select-role"
       },
       {
        "kind": "textField",
-       "label": "Authentication code",
-       "operation": "verifyMfaChallenge",
-       "notes": "Shown only in the mfaRequired state, after `login`, for the authenticator-app code or the emailed code (decided 28 September, audit R135, R126 (5)).",
-       "provenance": "contract identity.yaml POST /auth/mfa/challenge/{challengeId}/verify"
-      },
-      {
-       "kind": "primaryButton",
-       "label": "Verify",
-       "operation": "verifyMfaChallenge",
-       "notes": "Completes sign-in; the session is usable only after it. Five wrong codes lock step-up (429 step-up-locked, audit R126 (6)).",
-       "provenance": "contract identity.yaml POST /auth/mfa/challenge/{challengeId}/verify"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Email me a code instead",
-       "operation": "createMfaChallenge",
-       "notes": "The fallback: a new challenge with the email method (`emailOtp`) instead of the authenticator app (decided 28 September, audit R126 (5)).",
-       "provenance": "contract identity.yaml POST /auth/mfa/challenge"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Enrol MFA method",
-       "operation": "enrolMfaMethod",
-       "notes": "**A platform operator must hold a method to sign in** — every platform-staff permission is in the MFA floor (decided 28 September, audit R135). On a first sign-in with no method enrolled, the screen goes to enrolment before anything else. The kind picker offers only the authenticator app (`totp`) and email (`emailOtp`); any other kind is refused 422 mfa-kind-not-allowed (audit R126 (5)).",
-       "provenance": "contract identity.yaml POST /auth/mfa/methods"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Confirm enrolment",
-       "operation": "verifyMfaEnrolment",
-       "notes": "The method is not active until the first code is verified. Recovery codes are shown once, from the enrolment response, and never again.",
-       "provenance": "contract identity.yaml POST /auth/mfa/methods/{methodId}"
-      },
-      {
-       "kind": "destructiveButton",
-       "label": "Remove MFA method",
-       "operation": "removeMfaMethod",
-       "notes": "Removing the last active method is refused 409 while the principal holds a permission that requires MFA — for platform staff, always (decided 28 September, audit R135).",
-       "provenance": "contract identity.yaml DELETE /auth/mfa/methods/{methodId}"
-      },
-      {
-       "kind": "destructiveButton",
-       "label": "Force logout",
-       "operation": "forceLogout",
-       "provenance": "contract identity.yaml POST /auth/sessions/{sessionId}/force-logout"
-      },
-      {
-       "kind": "destructiveButton",
-       "label": "Revoke all sessions",
-       "operation": "revokeAllSessions",
-       "provenance": "contract identity.yaml POST /auth/sessions/revoke-all"
+       "label": "New password",
+       "operation": "changeOwnCredential",
+       "notes": "Only when the credential was reset and is temporary: a new one is set before anything else, twice, and the last five cannot be reused (audit R132).",
+       "provenance": "contract identity.yaml POST /auth/credential"
       }
      ]
     }
    ]
   },
-  "overlays": [
-   {
-    "id": "formEnrolMfaMethod",
-    "component": "modal",
-    "trigger": "Enrol MFA method",
-    "body": "**Collects what `enrolMfaMethod` sends before it is called.** Required: `kind` — the authenticator app (`totp`) or email (`emailOtp`) only (decided 28 September, audit R126 (5)). Optional: `target` (the email address for `emailOtp`). The response carries the secret or QR for the app and the recovery codes, shown once. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Enrol",
-     "operation": "enrolMfaMethod"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "kind",
-      "target"
-     ]
-    },
-    "provenance": "contract identity.yaml POST /auth/mfa/methods"
-   },
-   {
-    "id": "formVerifyMfaEnrolment",
-    "component": "modal",
-    "trigger": "Confirm enrolment",
-    "body": "**Collects what `verifyMfaEnrolment` sends before it is called.** Required: `code`, the first code from the new method. The method is active only after this. Dismissing sends nothing; the method stays pending.",
-    "confirm": {
-     "label": "Confirm enrolment",
-     "operation": "verifyMfaEnrolment"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "code"
-     ]
-    },
-    "provenance": "contract identity.yaml POST /auth/mfa/methods/{methodId}"
-   },
-   {
-    "id": "confirmRemoveMfaMethod",
-    "component": "confirmDialog",
-    "trigger": "Remove MFA method",
-    "body": "**Names the method being removed and what remains.** Removing the last active method is refused 409 while the principal holds a permission that requires MFA (decided 28 September, audit R135); the dialog says so before it is sent rather than after.",
-    "confirm": {
-     "label": "Remove",
-     "operation": "removeMfaMethod"
-    },
-    "provenance": "contract identity.yaml DELETE /auth/mfa/methods/{methodId}"
-   },
-   {
-    "id": "confirmForceLogout",
-    "component": "confirmDialog",
-    "trigger": "Force logout",
-    "body": "**Names what `forceLogout` changes and what it leaves alone**, in the consequence rather than the verb. A platform login mfa this affects should be identified in the dialog, not just counted. **Collects what `forceLogout` sends before it is called.** Required: `reason`.",
-    "provenance": "contract identity.yaml POST /auth/sessions/{sessionId}/force-logout"
-   },
-   {
-    "id": "confirmRevokeAllSessions",
-    "component": "confirmDialog",
-    "trigger": "Revoke all sessions",
-    "body": "**Names what `revokeAllSessions` changes and what it leaves alone**, in the consequence rather than the verb. A platform login mfa this affects should be identified in the dialog, not just counted. **Collects what `revokeAllSessions` sends before it is called.** Required: `reason`, `stepUpToken`. Optional: `venueId`, `excludeSelf`.",
-    "provenance": "contract identity.yaml POST /auth/sessions/revoke-all"
-   },
-   {
-    "id": "formLogin",
-    "component": "modal",
-    "trigger": "Login",
-    "body": "**Collects what `login` sends before it is called.** Required: `username`, `credential`, `workstationId`. Optional: `method`, `deviceFingerprint`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "LoginRequest",
-    "confirm": {
-     "label": "Login",
-     "operation": "login"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "username",
-      "credential",
-      "workstationId",
-      "method",
-      "deviceFingerprint"
-     ]
-    },
-    "provenance": "contract identity.yaml POST /auth/login"
-   }
-  ],
   "states": {
-   "loading": "The platform login mfa list.",
-   "error": "Could not load. Names which read failed and leaves the platform login mfa untouched.",
-   "emptyFirstRun": "No platform login mfa yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
-   "emptyNoResults": "Nothing matches the filter on venueId, principalId, workstationId and the platform login mfa are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `SESSION_FORCE_LOGOUT`, which `listActiveSessions` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "mfaRequired": "**Signed in, not yet through.** The principal holds a permission that requires MFA (ROLE_MANAGE, LEDGER_APPROVE, any platform-staff permission, or one the tenant added), so after `login` the screen calls `createMfaChallenge` and asks for the authenticator code; `verifyMfaChallenge` completes the sign-in. **Email me a code instead** is the fallback. Five wrong codes lock step-up for the policy's lockout minutes and the screen says so. A principal with no enrolled method is sent to enrol first (decided 28 September, audit R135, R126).",
-   "mfaEnrolmentRequired": "**First sign-in, no method yet.** A platform operator always requires MFA (every `PLATFORM_*` permission is in the floor), so one with no enrolled method cannot finish signing in: the screen enrols the authenticator app (`enrolMfaMethod`, email as the fallback), confirms it with the first code (`verifyMfaEnrolment`), then continues to the mfaRequired step (decided 28 September, audit R135, R126 (5))."
+   "loading": "Checking the credential. The form stays visible and disabled.",
+   "emptyFirstRun": "**Nobody signed in** - the normal state of a door. The form offers username and password and, where TICVAI uses one, its SSO.",
+   "error": "Identity could not be reached. **Says so rather than saying the password is wrong**, and keeps what was typed.",
+   "denied": "The credential does not match, or the account is locked. One message for both, with the attempts left before the lock; a locked account says when to try again.",
+   "emptyNoAccess": "Signed in, and the person holds no role in this app. Says who at the tenant grants access; distinct from a wrong password. A door has no permission of its own to name, because the person is not signed in until it succeeds.",
+   "emptyNoResults": "Never shown: `listSsoProviders` takes no filter; a tenant with no identity provider shows no SSO buttons at all, and the form is the whole door.",
+   "sessionHeld": "`login` answered 409: this person already holds a session elsewhere (audit R184, ADR-0004). Says where and since when; only a holder of SESSION_FORCE_LOGOUT ends it, on the staff directory (BO-053), and signing in never ends it by itself.",
+   "mfaRequired": "**Signed in, not yet through.** The principal holds a permission that requires MFA (ROLE_MANAGE, LEDGER_APPROVE, any PLATFORM_* permission, or one the tenant added), so the screen calls `createMfaChallenge` (`action: signIn`) and asks for the authentication code; `verifyMfaChallenge` completes the sign-in. **Email me a code instead** is the fallback. Five wrong codes lock step-up for the policy's lockout minutes and the screen says until when (audit R135, R126). A person without such a permission never reaches this state.",
+   "mfaEnrolmentRequired": "**First sign-in, no method yet.** A person who requires MFA and has no active method enrols the authenticator app (email as the fallback) with `enrolMfaMethod`, confirms it with the first code (`verifyMfaEnrolment`), sees the recovery codes once, then continues to the code step (audit R135, R126 (5)).",
+   "offline": "Not available, and the offline banner says why: signing in needs a connection."
   },
   "apis": [
    {
+    "operationId": "login",
+    "contract": "identity",
+    "purpose": "Authenticate from a browser, with no workstation (CHG-DOOR-001)",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "listSsoProviders",
+    "contract": "identity",
+    "purpose": "Which identity providers this door offers; unauthenticated, read before sign-in",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "startSsoAuthorization",
+    "contract": "identity",
+    "purpose": "Hand off to the identity provider where the tenant has SSO",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "completeSsoAuthorization",
+    "contract": "identity",
+    "purpose": "Exchange the provider's code for the same LoginResponse as login, on the redirect back",
+    "trigger": "background"
+   },
+   {
     "operationId": "createMfaChallenge",
     "contract": "identity",
-    "purpose": "Second factor after login when the principal holds a permission in mfaRequiredForPermissions; action `signIn`, the primary method (authenticator app), or the email method as the fallback (decided 28 September, audit R135, R126 (5))",
+    "purpose": "Second factor after sign-in when the principal holds a permission in mfaRequiredForPermissions; action `signIn`, the authenticator app, or the email method as the fallback (audit R135, R126 (5))",
     "trigger": "onAction"
    },
    {
@@ -359,77 +228,32 @@
    {
     "operationId": "enrolMfaMethod",
     "contract": "identity",
-    "purpose": "A platform operator's first method, at first sign-in — authenticator app, or email as the fallback (decided 28 September, audit R135, R126 (5))",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
+    "purpose": "The first method, at a first sign-in that requires one: authenticator app, or email as the fallback (audit R135, R126 (5))",
+    "trigger": "onAction"
    },
    {
     "operationId": "verifyMfaEnrolment",
     "contract": "identity",
-    "purpose": "Activates the enrolled method with its first code",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "removeMfaMethod",
-    "contract": "identity",
-    "purpose": "Remove a method; the last one is refused 409 while a listed permission is held (audit R135)",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "login",
-    "contract": "identity",
-    "purpose": "from page inventory",
+    "purpose": "Activates the enrolled method with its first code; recovery codes shown once",
     "trigger": "onAction"
    },
    {
-    "operationId": "forceLogout",
+    "operationId": "selectRole",
     "contract": "identity",
-    "purpose": "Supervisor termination of an abandoned session",
-    "trigger": "onAction",
-    "invalidates": [
-     "listActiveSessions"
-    ]
+    "purpose": "Choose which role to work as when sign-in returns more than one (ADR-0003)",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "changeOwnCredential",
+    "contract": "identity",
+    "purpose": "Replace a temporary password or PIN at the first sign-in after a reset (audit R132)",
+    "trigger": "onAction"
    },
    {
     "operationId": "getCurrentSession",
     "contract": "identity",
-    "purpose": "Current session and effective permissions",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "listActiveSessions",
-    "contract": "identity",
-    "purpose": "List active sessions",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "listMfaMethods",
-    "contract": "identity",
-    "purpose": "Enrolled MFA methods",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "listSsoProviders",
-    "contract": "identity",
-    "purpose": "Identity providers configured for this tenant",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "revokeAllSessions",
-    "contract": "identity",
-    "purpose": "Revoke every session in scope",
-    "trigger": "onAction",
-    "invalidates": [
-     "listActiveSessions"
-    ]
+    "purpose": "Read the session the sign-in just opened, for the landing",
+    "trigger": "onAction"
    }
   ],
   "entryState": {
@@ -439,25 +263,43 @@
      "from": "navigation"
     },
     {
+     "name": "providerId",
+     "from": "deepLink",
+     "optional": true
+    },
+    {
      "name": "methodId",
      "from": "navigation"
     }
    ],
-   "coldEntry": "Resolves from the session; a cold arrival is the ordinary case.",
-   "preloaded": [
-    "ActiveSession.status",
-    "ActiveSession.sessionId",
-    "ActiveSession.principalId",
-    "ActiveSession.principalName",
-    "ActiveSession.roleId"
-   ]
+   "coldEntry": "**Needs nothing; that is what makes it the door.** No workstation travels with a browser sign-in (CHG-DOOR-001). `providerId` arrives only on the identity provider's redirect back, with the `code` and `state` that `completeSsoAuthorization` exchanges; an expired or replayed redirect lands on the form with \"That sign-in link has expired; sign in again\"."
   },
+  "apisNote": "Declared by hand on 2 October 2026 (CHG-DOOR-002/003): sign-in, SSO, the second factor and its first enrolment, the role prompt, a temporary credential's replacement and the session read for the landing. Nothing that needs a signed-in session to list or end sessions is here.",
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P09 TICVAI Web.dc.html#adm-001"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 8 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "gaps": [
+   {
+    "operation": "forceLogout",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-021): The Console sign-in carried tables of active sessions with Force logout and Revoke all sessions; a person signing in has no session and must see none of that. listSsoProviders was declared with no operation that signs in through a provider (design-notes correction platform-foundation ADM-001).",
+    "source": "screens/P09-platform-admin-console.yaml#ADM-001 | contracts/spine/identity.yaml#startSsoAuthorization"
+   },
+   {
+    "operation": "listActiveSessions",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-021): The Console sign-in carried tables of active sessions with Force logout and Revoke all sessions; a person signing in has no session and must see none of that. listSsoProviders was declared with no operation that signs in through a provider (design-notes correction platform-foundation ADM-001).",
+    "source": "screens/P09-platform-admin-console.yaml#ADM-001 | contracts/spine/identity.yaml#startSsoAuthorization"
+   },
+   {
+    "operation": "revokeAllSessions",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-021): The Console sign-in carried tables of active sessions with Force logout and Revoke all sessions; a person signing in has no session and must see none of that. listSsoProviders was declared with no operation that signs in through a provider (design-notes correction platform-foundation ADM-001).",
+    "source": "screens/P09-platform-admin-console.yaml#ADM-001 | contracts/spine/identity.yaml#startSsoAuthorization"
+   }
+  ],
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -508,7 +350,7 @@
     {
      "to": "ADM-001",
      "trigger": "Platform Login / MFA",
-     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId and ADM-020 holds none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and ADM-001 opens on its own"
+     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId, providerId and ADM-020 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and ADM-001 opens on its own"
     },
     {
      "to": "ADM-002",
@@ -517,11 +359,11 @@
     }
    ]
   },
-  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement.",
+  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement.\n\n**Tenant picker and platform-staff grant added 2 October 2026** (CHG-SBO-001; Chinmay, pre-apply round: console screens get the R098 tenant picker and grant, the ADM-412 pattern). The Console runs outside every cell; `listPrincipals` (USER_MANAGE), `createPrincipal` (USER_MANAGE), `getPrincipal` (USER_MANAGE), `updatePrincipal` (USER_MANAGE) are tenant operations, refused 403 to a platform token until a time-boxed, audited grant into the picked tenant is open. The tenant sees the grant and every action under it.",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listPrincipals` reads the population and `getPrincipal` reads one of them — list, select, act",
-  "purpose": "Find the right one quickly, and act on it without opening it.",
+  "purpose": "Find TICVAI's platform staff and manage their accounts.",
   "layout": {
    "template": "split",
    "regions": [
@@ -529,6 +371,42 @@
      "name": "contentBody",
      "slot": "collection",
      "components": [
+      {
+       "kind": "selectField",
+       "label": "Tenant",
+       "bindsTo": "Tenant.id",
+       "columns": [
+        "Tenant.code",
+        "Tenant.name",
+        "Tenant.status"
+       ],
+       "operation": "listTenants",
+       "notes": "**Pick a tenant first** (audit R098; decided 2 October 2026, Chinmay: console screens get the tenant picker and grant, CHG-SBO-001). This screen's operations run in that tenant's cell, and a platform token carries no tenant permission there until a platform-staff grant into it is open.",
+       "provenance": "contract subscription.yaml GET /tenants"
+      },
+      {
+       "kind": "banner",
+       "label": "Open grant into this tenant",
+       "bindsTo": "PlatformStaffGrant",
+       "columns": [
+        "PlatformStaffGrant.operatorDisplayName",
+        "PlatformStaffGrant.permissions",
+        "PlatformStaffGrant.reason",
+        "PlatformStaffGrant.ticketRef",
+        "PlatformStaffGrant.openedAt",
+        "PlatformStaffGrant.expiresAt"
+       ],
+       "operation": "listOwnPlatformStaffGrants",
+       "notes": "**Always visible while the screen acts on a tenant** (audit R098, the ADM-412 pattern): which tenant, which permissions, why, and the time left to `expiresAt`. At expiry every tenant action is disabled and the screen returns to its grantRequired state; a new need is a new grant. The tenant sees the grant in its own audit log. Found again after a reload with `listOwnPlatformStaffGrants`.",
+       "provenance": "contract identity.yaml GET /platform-staff-grants/mine"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Open access grant",
+       "operation": "openPlatformStaffGrant",
+       "notes": "Shown until a grant into the picked tenant is open; asks for the second factor first (step-up, audit R135).",
+       "provenance": "contract identity.yaml POST /platform-staff-grants"
+      },
       {
        "kind": "textField",
        "label": "Scope path",
@@ -548,13 +426,11 @@
        "label": "Every principal",
        "bindsTo": "Principal",
        "columns": [
-        "Principal.id",
         "Principal.username",
         "Principal.displayName",
         "Principal.isActive",
         "Principal.validFrom",
         "Principal.validTo",
-        "Principal.primaryRoleId",
         "Principal.roles",
         "Principal.lastLoginAt"
        ],
@@ -612,7 +488,8 @@
    "error": "Could not load. Names which read failed and leaves the platform user untouched.",
    "emptyFirstRun": "No platform user yet. Offers Create principal (`createPrincipal`); distinct from a filter that matched nothing.",
    "emptyNoResults": "Nothing matches the filter on scopePath, isActive and the platform user are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `USER_MANAGE`, which `listPrincipals` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `USER_MANAGE`, which `listPrincipals` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "grantRequired": "**No access into this tenant yet.** A tenant is picked and no platform-staff grant into it is open, so every tenant action is disabled and the screen offers **Open access grant** (`openPlatformStaffGrant`: reason, permissions `USER_MANAGE`, expiry). The same state returns when the grant reaches `expiresAt` (audit R098; CHG-SBO-001)."
   },
   "apis": [
    {
@@ -644,6 +521,27 @@
     "invalidates": [
      "listPrincipals"
     ]
+   },
+   {
+    "operationId": "listTenants",
+    "contract": "subscription",
+    "purpose": "The tenant picker: the operator picks a tenant before acting in its cell (audit R098; decided 2 October 2026, CHG-SBO-001)",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listOwnPlatformStaffGrants",
+    "contract": "identity",
+    "purpose": "Find a grant into the picked tenant already open, after a reload (audit R098; CHG-SBO-001)",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "openPlatformStaffGrant",
+    "contract": "identity",
+    "purpose": "Open a time-boxed, audited platform-staff grant into the picked tenant before any tenant-scoped operation here; the tenant sees it (audit R098; decided 2 October 2026, CHG-SBO-001)",
+    "trigger": "onAction",
+    "invalidates": [
+     "listOwnPlatformStaffGrants"
+    ]
    }
   ],
   "entryState": {
@@ -651,6 +549,11 @@
     {
      "name": "principalId",
      "from": "session"
+    },
+    {
+     "name": "tenantId",
+     "from": "navigation",
+     "optional": true
     }
    ],
    "coldEntry": "Resolves from the session; a cold arrival is the ordinary case.",
@@ -711,8 +614,29 @@
      ]
     },
     "provenance": "contract identity.yaml PATCH /principals/{principalId}"
+   },
+   {
+    "id": "formOpenPlatformStaffGrant",
+    "component": "modal",
+    "trigger": "Open access grant",
+    "body": "**Collects what `openPlatformStaffGrant` sends before it is called** (audit R098). Required: `id` (a client UUIDv7, generated silently), `permissions` (tenant permissions only; `USER_MANAGE` preselected for this screen), `reason`, `expiresAt` (at most 8 hours ahead, proposed). Optional: `ticketRef`. Requires step-up: the operator presents a second factor first. The tenant sees the grant and everything done under it. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Open access grant",
+     "operation": "openPlatformStaffGrant"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "permissions",
+      "reason",
+      "ticketRef",
+      "expiresAt"
+     ]
+    },
+    "provenance": "contract identity.yaml POST /platform-staff-grants"
    }
   ],
+  "purposeNote": "Purpose rewritten 2 October 2026 (CHG-WIR-023): The purpose was the generic list template (\"Find the right one quickly, and act on it without opening it\"); say platform staff (design-notes correction platform-foundation ADM-020).",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -763,7 +687,7 @@
     {
      "to": "ADM-001",
      "trigger": "Platform Login / MFA",
-     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId and ADM-021 holds none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and ADM-001 opens on its own"
+     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId, providerId and ADM-021 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and ADM-001 opens on its own"
     },
     {
      "to": "ADM-002",
@@ -772,11 +696,11 @@
     }
    ]
   },
-  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement.",
+  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement.\n\n**Tenant picker and platform-staff grant added 2 October 2026** (CHG-SBO-001; Chinmay, pre-apply round: console screens get the R098 tenant picker and grant, the ADM-412 pattern). The Console runs outside every cell; `listRoles` (ROLE_MANAGE), `createRole` (ROLE_MANAGE) are tenant operations, refused 403 to a platform token until a time-boxed, audited grant into the picked tenant is open. The tenant sees the grant and every action under it.\n\n**No default roles (decided 2 October 2026 by Chinmay, DEC-007; CHG-CSP-003):** roles start from per-module presets (All, Viewer, Mid-level) that fill an editable checklist; the role can be renamed. Created inside the picked tenant under the open grant.",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listRoles` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
-  "purpose": "Find platform role management for this venue.",
+  "purpose": "Define the roles TICVAI's platform staff hold.",
   "layout": {
    "template": "split",
    "regions": [
@@ -785,16 +709,50 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "selectField",
+       "label": "Tenant",
+       "bindsTo": "Tenant.id",
+       "columns": [
+        "Tenant.code",
+        "Tenant.name",
+        "Tenant.status"
+       ],
+       "operation": "listTenants",
+       "notes": "**Pick a tenant first** (audit R098; decided 2 October 2026, Chinmay: console screens get the tenant picker and grant, CHG-SBO-001). This screen's operations run in that tenant's cell, and a platform token carries no tenant permission there until a platform-staff grant into it is open.",
+       "provenance": "contract subscription.yaml GET /tenants"
+      },
+      {
+       "kind": "banner",
+       "label": "Open grant into this tenant",
+       "bindsTo": "PlatformStaffGrant",
+       "columns": [
+        "PlatformStaffGrant.operatorDisplayName",
+        "PlatformStaffGrant.permissions",
+        "PlatformStaffGrant.reason",
+        "PlatformStaffGrant.ticketRef",
+        "PlatformStaffGrant.openedAt",
+        "PlatformStaffGrant.expiresAt"
+       ],
+       "operation": "listOwnPlatformStaffGrants",
+       "notes": "**Always visible while the screen acts on a tenant** (audit R098, the ADM-412 pattern): which tenant, which permissions, why, and the time left to `expiresAt`. At expiry every tenant action is disabled and the screen returns to its grantRequired state; a new need is a new grant. The tenant sees the grant in its own audit log. Found again after a reload with `listOwnPlatformStaffGrants`.",
+       "provenance": "contract identity.yaml GET /platform-staff-grants/mine"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Open access grant",
+       "operation": "openPlatformStaffGrant",
+       "notes": "Shown until a grant into the picked tenant is open; asks for the second factor first (step-up, audit R135).",
+       "provenance": "contract identity.yaml POST /platform-staff-grants"
+      },
+      {
        "kind": "dataTable",
        "label": "Every role",
        "bindsTo": "Role",
        "columns": [
-        "Role.id",
         "Role.code",
         "Role.name",
         "Role.description",
         "Role.permissions",
-        "Role.inheritsFromRoleId",
         "Role.isSystem",
         "Role.principalCount",
         "Role.grantCount"
@@ -847,7 +805,8 @@
    "error": "Could not load. Names which read failed and leaves the platform role untouched.",
    "emptyFirstRun": "No platform role yet. Offers Create role (`createRole`).",
    "emptyNoResults": "Never shown: `listRoles` takes no filter, so an empty list is always the first-run state above.",
-   "emptyNoAccess": "Shown when the caller lacks `ROLE_MANAGE`, which `listRoles` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `ROLE_MANAGE`, which `listRoles` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "grantRequired": "**No access into this tenant yet.** A tenant is picked and no platform-staff grant into it is open, so every tenant action is disabled and the screen offers **Open access grant** (`openPlatformStaffGrant`: reason, permissions `ROLE_MANAGE`, expiry). The same state returns when the grant reaches `expiresAt` (audit R098; CHG-SBO-001)."
   },
   "apis": [
    {
@@ -861,6 +820,27 @@
     "contract": "identity",
     "purpose": "from page inventory",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "listTenants",
+    "contract": "subscription",
+    "purpose": "The tenant picker: the operator picks a tenant before acting in its cell (audit R098; decided 2 October 2026, CHG-SBO-001)",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listOwnPlatformStaffGrants",
+    "contract": "identity",
+    "purpose": "Find a grant into the picked tenant already open, after a reload (audit R098; CHG-SBO-001)",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "openPlatformStaffGrant",
+    "contract": "identity",
+    "purpose": "Open a time-boxed, audited platform-staff grant into the picked tenant before any tenant-scoped operation here; the tenant sees it (audit R098; decided 2 October 2026, CHG-SBO-001)",
+    "trigger": "onAction",
+    "invalidates": [
+     "listOwnPlatformStaffGrants"
+    ]
    }
   ],
   "entryState": {
@@ -870,6 +850,13 @@
     "Role.name",
     "Role.description",
     "Role.permissions"
+   ],
+   "params": [
+    {
+     "name": "tenantId",
+     "from": "navigation",
+     "optional": true
+    }
    ]
   },
   "wireframe": {
@@ -880,10 +867,30 @@
   "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "overlays": [
    {
+    "id": "formOpenPlatformStaffGrant",
+    "component": "modal",
+    "trigger": "Open access grant",
+    "body": "**Collects what `openPlatformStaffGrant` sends before it is called** (audit R098). Required: `id` (a client UUIDv7, generated silently), `permissions` (tenant permissions only; `ROLE_MANAGE` preselected for this screen), `reason`, `expiresAt` (at most 8 hours ahead, proposed). Optional: `ticketRef`. Requires step-up: the operator presents a second factor first. The tenant sees the grant and everything done under it. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Open access grant",
+     "operation": "openPlatformStaffGrant"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "permissions",
+      "reason",
+      "ticketRef",
+      "expiresAt"
+     ]
+    },
+    "provenance": "contract identity.yaml POST /platform-staff-grants"
+   },
+   {
     "id": "formCreateRole",
     "component": "modal",
     "trigger": "Create role",
-    "body": "**Collects what `createRole` sends before it is called.** Required: `code`, `name`. Optional: `description`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `createRole` sends before it is called.** Required: `code`, `name`. Optional: `description`, `presetCodes`, `permissions`. `presetCodes` fills the checklist from the chosen presets; `permissions` is the edited result. Dismissing sends nothing; the screen behind is unchanged.",
     "confirm": {
      "label": "Create role",
      "operation": "createRole"
@@ -893,12 +900,362 @@
      "discards": [
       "code",
       "name",
-      "description"
+      "description",
+      "presetCodes",
+      "permissions"
      ]
     },
     "provenance": "contract identity.yaml POST /roles"
    }
   ],
+  "purposeNote": "Purpose rewritten 2 October 2026 (CHG-WIR-023): The purpose was the generator template (\"Find platform role management for this venue\"); platform roles have no venue (design-notes correction platform-foundation ADM-021).",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-699",
+  "name": "My Account & Security",
+  "module": "Access & Identity",
+  "requiresModule": "core",
+  "wave": 1,
+  "capability": "C35",
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/access-identity/my-account-security",
+   "component": "apps/ticvai-web/src/routes/access-identity/MyAccountSecurity.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-002"
+   ],
+   "exitTo": [
+    "ADM-002",
+    "ADM-001"
+   ],
+   "inferred": false,
+   "transitions": [
+    {
+     "to": "ADM-002",
+     "trigger": "Back to the Platform Dashboard",
+     "back": true,
+     "provenance": "new screen, 2 October 2026 (CHG-SBO-022)"
+    },
+    {
+     "to": "ADM-001",
+     "trigger": "Signing this session out returns to the door",
+     "operation": "endOwnSession",
+     "provenance": "new screen, 2 October 2026 (CHG-SBO-022)",
+     "carries": [
+      "challengeId",
+      "methodId"
+     ]
+    }
+   ]
+  },
+  "notes": "**Added 2 October 2026** (Chinmay, door follow-ups: \"Add 'My account & security'\"; CHG-SBO-022, CHG-CSP-052). A platform operator's own second-factor methods and own sessions. The doors no longer manage them (CHG-DOOR-002, CHG-DOOR-003), and the staff session list (`listActiveSessions`) needs `SESSION_FORCE_LOGOUT`, which an operator should not need to see their own sessions. **Nothing here needs a permission**: every signed-in operator sees only their own account, and ending a session or removing a method asks for the authentication code first. **No tenant picker**: the operator's account is the Control Plane's, not a tenant's (R098 does not apply).",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "Two short lists the operator acts on, their own methods and their own sessions, with the account they are signed in as above them.",
+  "purpose": "Let a platform operator manage their own sign-in: the authentication methods, the password and the sessions they hold, and sign any of those sessions out.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "This session",
+       "bindsTo": "ActiveSession",
+       "columns": [
+        "ActiveSession.principalName",
+        "ActiveSession.roleName",
+        "ActiveSession.startedAt",
+        "ActiveSession.lastSeenAt"
+       ],
+       "operation": "listOwnSessions",
+       "notes": "The operator's own account and the session in use (marked in the list below); never another operator's.",
+       "provenance": "contract identity.yaml GET /auth/sessions/mine"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Authentication methods",
+       "bindsTo": "MfaMethod",
+       "columns": [
+        "MfaMethod.kind",
+        "MfaMethod.label",
+        "MfaMethod.maskedTarget",
+        "MfaMethod.isPrimary",
+        "MfaMethod.enrolledAt",
+        "MfaMethod.lastUsedAt"
+       ],
+       "operation": "listMfaMethods",
+       "notes": "The authenticator app is the method; the emailed code is the fallback. Every platform operator holds a PLATFORM_* permission, so at least one method always stays: removing the last one is refused and the button is disabled with that reason.",
+       "provenance": "contract identity.yaml GET /auth/mfa/methods"
+      },
+      {
+       "kind": "dataTable",
+       "label": "My sessions",
+       "bindsTo": "ActiveSession",
+       "columns": [
+        "ActiveSession.deviceInfo",
+        "ActiveSession.ipAddress",
+        "ActiveSession.startedAt",
+        "ActiveSession.lastSeenAt",
+        "ActiveSession.mfaSatisfied",
+        "ActiveSession.status"
+       ],
+       "operation": "listOwnSessions",
+       "notes": "Every session this operator holds, this one marked \"This session\". Paged (`listOwnSessions`).",
+       "provenance": "contract identity.yaml GET /auth/sessions/mine"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Add a method",
+       "operation": "enrolMfaMethod",
+       "notes": "Starts enrolling an authenticator app or an email fallback; the code is confirmed next.",
+       "provenance": "contract identity.yaml POST /auth/mfa/methods"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Confirm the code",
+       "operation": "verifyMfaEnrolment",
+       "notes": "Finishes enrolment with the six-digit code.",
+       "provenance": "contract identity.yaml POST /auth/mfa/methods/{methodId}"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Remove method",
+       "operation": "removeMfaMethod",
+       "notes": "Asks for the authentication code first; never the last method.",
+       "provenance": "contract identity.yaml DELETE /auth/mfa/methods/{methodId}"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Change password",
+       "operation": "changeOwnCredential",
+       "provenance": "contract identity.yaml POST /auth/credential"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Sign this session out",
+       "operation": "endOwnSession",
+       "notes": "Ends one of the operator's own sessions after a fresh second factor (`endOwnSession` is step-up mfa); ending the current one returns to the door.",
+       "provenance": "contract identity.yaml POST /auth/sessions/mine/{sessionId}/end"
+      }
+     ]
+    }
+   ]
+  },
+  "overlays": [
+   {
+    "id": "formEnrolMfaMethod",
+    "component": "modal",
+    "trigger": "Add a method",
+    "body": "**Collects what `enrolMfaMethod` sends before it is called.** Required: `kind`. Optional: `target`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Add a method",
+     "operation": "enrolMfaMethod"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "kind",
+      "target"
+     ]
+    },
+    "provenance": "contract identity.yaml POST /auth/mfa/methods"
+   },
+   {
+    "id": "formVerifyMfaEnrolment",
+    "component": "modal",
+    "trigger": "Confirm the code",
+    "body": "**Collects what `verifyMfaEnrolment` sends before it is called.** Required: `code`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Confirm the code",
+     "operation": "verifyMfaEnrolment"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "code"
+     ]
+    },
+    "provenance": "contract identity.yaml POST /auth/mfa/methods/{methodId}"
+   },
+   {
+    "id": "formChangeOwnCredential",
+    "component": "modal",
+    "trigger": "Change password",
+    "body": "**Collects what `changeOwnCredential` sends before it is called.** Required: `method`, `currentCredential`, `newCredential`. The current password is asked; the new one meets the password policy (minimum 8). Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Change password",
+     "operation": "changeOwnCredential"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "method",
+      "currentCredential",
+      "newCredential"
+     ]
+    },
+    "provenance": "contract identity.yaml POST /auth/credential"
+   },
+   {
+    "id": "confirmEndOwnSession",
+    "component": "confirmDialog",
+    "trigger": "Sign this session out",
+    "body": "Names the device and when the session started, then asks for the authentication code (`createMfaChallenge`, `verifyMfaChallenge`) before `endOwnSession` is sent. Dismissing sends nothing.",
+    "confirm": {
+     "label": "Verify and sign out",
+     "operation": "verifyMfaChallenge"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "contract identity.yaml POST /auth/sessions/mine/{sessionId}/end"
+   },
+   {
+    "id": "confirmRemoveMfaMethod",
+    "component": "confirmDialog",
+    "trigger": "Remove method",
+    "body": "Names the method, asks for the authentication code first (`createMfaChallenge`), and is refused for the last method.",
+    "confirm": {
+     "label": "Send the code",
+     "operation": "createMfaChallenge"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "contract identity.yaml DELETE /auth/mfa/methods/{methodId}"
+   }
+  ],
+  "states": {
+   "loading": "The account, its methods and its sessions.",
+   "error": "Could not load. Names which read failed (methods or sessions) and leaves the other in place.",
+   "emptyFirstRun": "**Never empty for methods**: the first sign-in enrols one (F104). With one session, the list shows only \"This session\" and says no other session is open.",
+   "emptyNoResults": "Never shown: nothing on this screen filters.",
+   "emptyNoAccess": "Never shown: every signed-in operator sees their own account; nothing here needs a permission.",
+   "stepUp": "Ending a session and removing a method ask for the authentication code in the confirmation (`createMfaChallenge`, `verifyMfaChallenge`); five wrong codes lock step-up for the lockout minutes, never permanently."
+  },
+  "apis": [
+   {
+    "operationId": "listMfaMethods",
+    "contract": "identity",
+    "purpose": "The operator's own authentication methods",
+    "trigger": "onLoad",
+    "provenance": "new screen, 2 October 2026 (CHG-SBO-022)"
+   },
+   {
+    "operationId": "listOwnSessions",
+    "contract": "identity",
+    "purpose": "The operator's own sessions (CHG-CSP-052)",
+    "trigger": "onLoad",
+    "provenance": "new screen, 2 October 2026 (CHG-SBO-022)"
+   },
+   {
+    "operationId": "enrolMfaMethod",
+    "contract": "identity",
+    "purpose": "Start enrolling a method",
+    "trigger": "onAction",
+    "provenance": "new screen, 2 October 2026 (CHG-SBO-022)"
+   },
+   {
+    "operationId": "verifyMfaEnrolment",
+    "contract": "identity",
+    "purpose": "Confirm a method with its code",
+    "trigger": "onAction",
+    "provenance": "new screen, 2 October 2026 (CHG-SBO-022)"
+   },
+   {
+    "operationId": "removeMfaMethod",
+    "contract": "identity",
+    "purpose": "Remove a method, after the second factor",
+    "trigger": "onAction",
+    "provenance": "new screen, 2 October 2026 (CHG-SBO-022)"
+   },
+   {
+    "operationId": "changeOwnCredential",
+    "contract": "identity",
+    "purpose": "Change the operator's own password",
+    "trigger": "onAction",
+    "provenance": "new screen, 2 October 2026 (CHG-SBO-022)"
+   },
+   {
+    "operationId": "endOwnSession",
+    "contract": "identity",
+    "purpose": "Sign one of the operator's own sessions out (step-up mfa)",
+    "trigger": "onAction",
+    "provenance": "new screen, 2 October 2026 (CHG-SBO-022)"
+   },
+   {
+    "operationId": "createMfaChallenge",
+    "contract": "identity",
+    "purpose": "Raise the second factor for a step-up action",
+    "trigger": "onAction",
+    "provenance": "new screen, 2 October 2026 (CHG-SBO-022)"
+   },
+   {
+    "operationId": "verifyMfaChallenge",
+    "contract": "identity",
+    "purpose": "Verify the code for the step-up",
+    "trigger": "onAction",
+    "provenance": "new screen, 2 October 2026 (CHG-SBO-022)"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "challengeId",
+     "from": "navigation"
+    },
+    {
+     "name": "methodId",
+     "from": "navigation"
+    },
+    {
+     "name": "sessionId",
+     "from": "session"
+    }
+   ],
+   "coldEntry": "Resolves from the session; a cold arrival is the ordinary case."
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-699"
+  },
+  "apisNote": "Built 2 October 2026 (CHG-SBO-022) from the self-service identity operations: the MFA methods (already self-service) and the operator's own sessions (`listOwnSessions`, `endOwnSession`, CHG-CSP-052).",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",

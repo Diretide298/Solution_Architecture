@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """The starter repositories a developer is handed, against the package that describes them.
 
-**Audit class A-STARTER (audit/ticvai/ROOT-CLASSES.md), roots R025-R040 and R249.** The setup zip
+**Audit class A-STARTER (docs/active/root-classes.md), roots R025-R040 and R249.** The setup zip
 creates `ticvai-backend` and `ticvai-frontend` from ADAM's `viewer/mcp/setup/starters/`. The pull
 audit found screens naming apps the starter does not have (R249, R037), a back office tagged one
 runtime in the starter and another in the package (R031), standards documents describing types and

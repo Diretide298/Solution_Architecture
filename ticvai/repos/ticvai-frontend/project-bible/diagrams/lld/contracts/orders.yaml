@@ -1,5 +1,5 @@
 id: LLD-orders
-title: orders — 219 operations
+title: orders — 221 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: spine
@@ -28,6 +28,7 @@ operations:
   audience:
   - guest
   - partner
+  - staff
   offline: false
   reads:
   - catalogue.channel_capacity
@@ -779,6 +780,7 @@ operations:
   audience:
   - guest
   - partner
+  - staff
   offline: false
   reads:
   - catalogue.channel_capacity
@@ -2433,6 +2435,16 @@ operations:
   - orders.payment_link
   - orders.reservation
   - orders.sales_order
+- operation: previewProductTickets
+  verb: GET
+  path: /products/{productId}/ticket-previews
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: printTicketProof
   verb: POST
   path: /ticket-templates/{templateId}/proof
@@ -3271,6 +3283,16 @@ operations:
   - access.entitlement
   - cache:idempotency
   - identity.delegated_access
+- operation: simulateRefund
+  verb: POST
+  path: /orders/{orderId}/refund-simulation
+  scope: venue
+  permission: ORDER_REFUND
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: splitOrder
   verb: POST
   path: /orders/{orderId}/split

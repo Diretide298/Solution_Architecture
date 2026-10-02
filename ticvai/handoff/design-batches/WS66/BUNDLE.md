@@ -1,6 +1,6 @@
 # WS66 — Unified BI Reporting and AI Analytics Platform board 1
 
-**9 screens · 11 operations · 25 schemas · 4 permissions**
+**9 screens · 10 operations · 23 schemas · 4 permissions**
 
 Platform P16 Venue Analytics · ships as **venue-management** ·
 staff audience · web ·
@@ -61,6 +61,86 @@ convincingly. It is never a caption.
   and its error; and, element by element, what is shown and in what format, what each action
   produces and where the user goes next. Draw exactly that.
 
+## The processes these screens belong to
+
+Written by the owner of each process (`handoff/design-notes/`). Read before any screen: it says how the process runs end to end and which words the screens must use.
+
+### Finance, Ledger & Tax · Reporting & Analytics
+
+Finance and insights run underneath every sale. A sale at a till (P04), kiosk, web storefront (P01) or guest app (P02) is priced and taxed per line at the moment of sale, recorded in the venue's base currency (AED in the UAE; 2 decimals, or 3 for BHD, KWD and OMR, never rounded away), and posted to an append-only dual ledger through account mappings per money event; anything unmapped lands in suspense. Tax follows the jurisdiction's tax profile: inclusive or exclusive, compound where a tax applies on another, zero-rated or exempt with verified evidence, and computed on the discounted price by default or on the price before discount where the region requires it (Egypt). A guest may select a currency the venue charges and pay in it: the rate is locked on the order, the payment partner is asked in that currency, the ledger keeps the base amount with the rate, and a refund goes back in the currency paid (decided 2 October 2026, Chinmay); a currency shown but not charged is an approximate price. Foreign cash at a till is recorded at its base equivalent and change is given in base currency. A paid order can carry a VAT receipt (simplified tax invoice), a full tax invoice with the buyer's TRN, or a consolidated invoice for a company, each numbered without gaps and never edited; corrections are credit memos. Revenue is recognised by rule: POS-style immediate, tickets on the visit, gift cards and wallet on use, annual passes straight-line or per visit, breakage on expiry; deferred revenue is a balance that ages. Each venue's day is reconciled (POS cash, gateways, bank, wallet against the ledger, provider files matched automatically, only genuine mismatches to a person); chargebacks are defended against the bank's deadline; month end runs seven close checks and goes to a finance approver. Nothing posted is deleted: a correction is a reversal, an approver is never the preparer, and ledger approval needs a second factor. Back-office finance lives in Venue Management (P08: chart of accounts, mapping, FX, journals, recognition, reconciliation, period close, chargebacks); tax profiles, calculation validation and platform reconciliation in the TICVAI Console (P09); partner settlement in P10. Reporting is one consolidated, permission-based area (Analytics, P16): seeded standard dashboards and reports plus no-code builders over a governed business catalogue; the P08 report screens, the POS terminal day view and the kitchen performance view are scoped windows onto the same definitions and must show the same numbers. Every figure is read from a lag-tolerant reporting copy and shows its "as of" time; scope comes from the person's rights, never from a filter; AI explains and recommends but never acts, answers only within the person's role, labels forecasts, and is phase two for finance ledgers.
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Base currency | The venue's region currency; the currency every record and ledger posting is in. A guest may pay in a currency they select (where the venue charges it); the books still hold the base amount and the rate. | Home currency, Local price, Default currency | DI-211 / DI-282 / contracts/spine/orders.yaml#/components/schemas/Order |
+| Pay in USD (a currency the venue charges) | The guest's selected payment currency; the card is charged in it at the rate locked on the order, and refunds go back in it. | Converted price, Approx. (for a charged currency) | contracts/spine/orders.yaml#checkoutCart / … |
+| ≈ (approx.) price in USD / SAR / … | A conversion of a base-currency price for a currency the venue shows but does not charge, always next to the base price. | Converted price, USD price | DI-211 / screens/P02-guest-mobile-app.yaml#GST-044 |
+| Takings | Money received in the period less refunds (cash-basis); the seeded KPI on hubs. | Revenue, Sales, Income | contracts/satellite/reporting.yaml#/components/schemas/ReportingSystemKpi / R283 |
+| Gross sales | Issued sales before discounts and refunds; whether tax is included must be stated on the tile. | Revenue, Turnover | MATRIX 6.1.78 |
+| Net revenue | Gross sales less discounts less refunds, adjusted per finance policy. | Net sales, Revenue, Income | MATRIX 6.1.78 |
+| Recognised revenue / Deferred revenue | Earned under the recognition rules / paid for but not yet earned. Kept distinct from sales. | Realised revenue, Unearned income, Wallet revenue | MATRIX 5.12.6 / DI-260 / contracts/spine/finance.yaml#getDeferredRevenue |
+| VAT receipt | The simplified tax invoice issued on a paid order. | Receipt (when it is a tax document), Bill | contracts/spine/finance.yaml#issueTaxInvoice |
+| Tax invoice / Combined tax invoice | A full invoice with the buyer's details / one invoice for several paid orders of one buyer. | Bill, Statement | contracts/spine/finance.yaml#/components/schemas/FinTaxInvoiceType |
+| Credit memo | The document that corrects an issued invoice after a refund; the invoice itself is never edited. | Credit note (until the client's tax adviser chooses "Tax credit note"), Edit invoice | contracts/spine/finance.yaml#/components/schemas/FinTaxInvoice |
+| VAT (or the jurisdiction's tax name) | Use the tax profile's own name on every surface; "Tax" only where several kinds are summed. | GST in UAE, Service charge for a tax | contracts/spine/catalogue.yaml#setTaxProfileJurisdiction |
+| Price before discount | The taxable base where the jurisdiction taxes the undiscounted price. | Gross price, List tax | DI-598 |
+| Post / Reverse | A journal reaches the ledger when approved and posted; a correction is a reversal, never an edit or delete. | Edit entry, Delete entry, Undo | contracts/spine/finance.yaml#reverseJournalEntry |
+| Period (Open / Closing / Closed) | A fiscal period's state; closing stops postings, closed locks them. | Month locked, Frozen | contracts/spine/finance.yaml#/components/schemas/PeriodStatus |
+| Variance (Over / Short) | The difference between expected and counted or recorded, always saying between which two figures. | Discrepancy, Error, Loss | DI-275 / contracts/spine/finance.yaml#/components/schemas/UnifiedReconciliation |
+| Settlement / Exception / Resolve | A provider's file for a day / a line that did not match / the recorded explanation. | Payout file, Error, Close | contracts/spine/finance.yaml#/components/schemas/SettlementException |
+| Chargeback | A bank-initiated reversal with an evidence deadline; not a refund. | Dispute refund, Reversal | contracts/spine/orders.yaml#/components/schemas/Chargeback |
+| Report / Dashboard / Tile / KPI | A runnable, exportable, schedulable definition / a page of tiles / one visual bound to a report / a company-wide measure defined once. | Widget (outside the builder's library), Board (for a user-facing dashboard) | contracts/satellite/reporting.yaml#/components/schemas/DashboardTile / … |
+| Warning / Critical | KPI status bands set by a target's amber and red thresholds; always words plus colour. | Amber, Red (alone), Bad | contracts/satellite/reporting.yaml#/components/schemas/KpiTarget |
+| As of HH:MM / Updated N sec ago | The freshness of every figure read from the reporting copy; stale shows a warning. | Live (unless refreshed), Real-time | MATRIX 8.7.22 |
+| Forecast | Any projected figure, with its range; never shown as a fact. | Expected, Will be | DI-973 |
+| Outlet / Workstation (till) | A sales point / the device; staff copy may say "till" for the workstation. | Store, POS (in copy), Drawer (for the device) | R156 |
+| Channel | POS, Web, App, Kiosk, B2B, OTA, from one closed list. | Source, Platform | MoM 2026-08-18 4.2 Recipes, Operating Hours & Service Channels / MATRIX 1.4.7 |
+
+### Ticketing & Guest Commerce (guest web, guest app, kiosk, partner portal, POS ticket sale)
+
+A guest finds something to do, picks when and how many, holds capacity, pays, and receives a ticket they can show at the gate, transfer or resell. The same booking engine serves the guest website (P01, WEB-), the guest app (P02, GST-) and, through the same catalogue, cart and order operations, the kiosk (P05), the cashier at the till (P04) and the staff handheld (P06); partners book on credit through the partner portal (P10). Guest surfaces are white-label (venue logo, colours, fonts, card layouts, step indicator style, cart placement) with "Powered by TICVAI" kept; the till and handheld stay TICVAI-branded. The booking runs in a fixed order that the client set on 29 September and confirmed on 30 September: for a dated product, the date first, then the time (hidden until a date), then the tickets (hidden until a time); undated products go straight to the tickets; product-first flows (workshops) pick the product, then the date; seated events with one performance open on the seat map, sections first, zoom into a section, pinch out to compare. Choosing a date, time or session commits nothing; capacity is held only when a quantity is set (a 15-minute basket window, 8 minutes for seats and cabanas, one extension). The guest counters (adult, child, senior, infant, person of determination) belong to the chosen ticket and take its prices, so a basket line is "<ticket> · <guest type> × <n>"; group and school products start from group ticket cards and a typed headcount (minus, plus, and +10 on the app), supervisors free. Help me choose filters the catalogue on the server (never a consent step) with Show everything; consent questions such as "Are you able to swim?" are asked once after the session is picked and never again where the page already asked. Sign-in or the six-digit guest code is asked when the guest leaves Add-ons (or at payment, per venue), only the fields the venue configured; after the code, only the T&Cs tick remains (W1). Payment creates the order first and treats an unknown outcome as "checking with your bank", never a second charge; tickets issue on payment, go to Apple or Google Wallet, and a dynamic-QR event's ticket lives in the app. The guest app is deliberately not a copy of the website (30 September): its structure is Home, Explore, Plan and Tickets tabs with a persistent Buy tickets button, item pages that propose the right product (a restaurant's meal combo that includes admission), ride videos that play with no loader, a visit planner that plans each day at one park from that park's rides, dining and shops only, and in-park walking navigation; the booking flow inside it is functionally identical to the web. Vocabulary in guest copy follows the glossary's recorded exceptions (Booking, Session, QR). source: [F01, F02, F03, F07, F49, F52, F55, F57, F58, F59, MoM 29 Sep 1 (W1-W12), MoM 29 Sep 2, MoM 29 Sep 3, MoM 30 Sep 4.4-4.8, CLIENT-RESPONSE-30SEP 1-6, CLIENT-RESPONSE-REV3-25SEP, REV3-1, REV3-2, REV3-3, REV3-4, REV3-26, DI-1086 …
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Booking | An order or reservation as the guest reads it (Booking Confirmation, Group Booking, My bookings). Code says Order or Reservation. | Order (in guest copy), Purchase record, Transaction | docs/glossary.md (Recorded exceptions, Booking, audit R145) |
+| Session | A dated, timed performance as the guest reads it (Pick a session, Surf sessions). Staff screens (POS, back office) keep Performance. | Slot, Showtime, Performance (in guest copy) | docs/glossary.md (Recorded exceptions, Session, rev 3 CFG-10); DI-1064 |
+| Basket | The guest's unpaid selection with its held capacity (Add to basket, Your basket). Never a paid order. The till and staff screens say Cart. | Cart (in guest copy), Bag, Order (for an unpaid selection) | CLIENT-RESPONSE-REV3-25SEP (Basket, 10) … |
+| Ticket | The issued instrument a guest shows at the gate. Product names from the catalogue keep their own words (Day Pass, Annual pass, 2 park ticket); the interface around them says ticket. | Admission, Voucher (for a ticket), Pass (in interface copy) | docs/glossary.md (Ticket) |
+| Adult, Child, Senior, Infant, Person of determination | The guest types of a ticket, each with its age or height band shown under it (Child 3-12, Under 1.20 m). A companion of a person of determination is its own free type where the product has one. | Disabled, Handicapped, Kid, Pax | DI-686; screens/P01-guest-web-storefront.yaml#WEB-049 (Passengers notes) … |
+| Held for | The countdown on held capacity ("Your seats are held for 7:42"); the release is Release hold. | Lease, Reserved for (a reservation is a different thing), Locked | contracts/spine/orders.yaml#/components/schemas/CartLine (leaseExpiresAt) … |
+| Reservation | Booked and not yet paid; holds capacity and expires (My Reservations). Paid tickets are in Tickets or My Tickets. | Booking (for an unpaid hold in lists), Pending order | docs/glossary.md (Reservation); DI-199 |
+| Help me choose | The venue's questions whose answers filter the products; Show everything clears them. | Quiz, Wizard, Experience builder, Consent | MoM 29 Sep W4; REV3-11 |
+| Info only / Not bookable online | A product listed with full details that cannot be booked online; it shows Contact sales to book with Call sales and Email sales. | Unavailable, Sold out, Coming soon | REV3-14; MoM 29 Sep W3 |
+| Guest code | The six-digit code sent to the guest's email or mobile to prove the contact at guest checkout; the copy says six digits. | OTP, PIN, Token, Verification key | DI-1034; MoM 29 Sep W1 |
+| How many people | The typed headcount of a group or school booking (number box with minus and plus; +10 on the app), with Supervisors listed separately and free. | Group size (the removed dropdown), Pax | DI-1104; DI-1105; CLIENT-RESPONSE-30SEP 1 |
+| Waiting room | The on-sale queue in front of a high-demand performance's sale (WEB-015, GST-046). | Virtual queue (that is the ride queue), Lobby | screens/P01-guest-web-storefront.yaml#WEB-015 notes (ADR-0066) |
+| QR | The code a guest shows, in guest copy only (Dynamic QR). Staff screens say Media code. | Barcode, Serial, Media code (in guest copy) | docs/glossary.md (Recorded exceptions, QR, audit R210) |
+| Not at this park | The planner's per-day notice that the day's park cannot meet a preference, naming the park that can. | Unavailable, No results | DI-1113 |
+| Book this plan | Turns the whole visit plan (tickets, Fast Track, meal combos) into basket lines. | Checkout plan, Buy itinerary | screens/P02-guest-mobile-app.yaml#GST-053 (Book this plan) |
+
+### AI & Intelligence
+
+AI in TICVAI is one governed engine behind many screens. The guest meets it as Sahli, the concierge (WEB-044, GST-031, GST-033), as the planner agent that refines a rules-built day plan by chat (GST-054), and as upsell and cross-sell offers on a separate Extras step (WEB-008, GST-048). Staff meet it as the Staff App's AI tab (EMP-019/020, knowledge EMP-040/041), the kiosk assistant (KSK-015) and the support copilot (SUP-006, SUP-018). Venue managers meet it in Venue Management (BO-091 policy and spend, BO-919/BO-925..932 resource and staffing forecasts, BO-597/598 configuration drafts, BO-772/782 marketing optimisation, BO-793 translations, BO-970/975 seat-map generation, BO-1048 seat upsell, BO-1160 fraud cases) and in Analytics (ANL-010 suggestions, ANL-019 management insights, ANL-055 anomalies, ANL-057 forecasting studio, ANL-059 insight history, ANL-060 governance, ANL-071 AI maturity). The governance, configuration-assistant, forecasting, oversight, audit and monitoring boards sit on the TICVAI Console (P09: ADM-037 providers, ADM-469..498 configuration assistant, ADM-499..518 forecasting, ADM-519..558 governance, ADM-633/637 fraud, ADM-680..697 recommendation governance). Five rules hold on every one of these screens. (1) Baseline first, then it learns per tenant: every data-driven answer (forecast, suggestion, risk score, recommendation) exists from day one, from the venue AI profile, a starting pattern for the venue type, the UAE calendar and the weather, and shifts to the venue's own data as it trades; nothing says "comes later" or refuses for lack of history - a refusal only names a missing setting. (2) Every answer shows its basis and maturity: a "Based on" line, a stage badge (Starting, Learning, Established, Trained on your data), "Limited historical data" while the starting pattern carries more than half the weight, ranges or bands rather than a bare percentage, a confidence only where the producer really has one, a plain-words explanation always. (3) A trained model replaces the baseline only when it beats it in a shadow run of at least six weeks and an admin promotes it; the platform raises "Ready to promote" and never switches by itself. (4) The LLM never reads raw data: numbers come only from query results the platform runs (the answer shows the query), only the masked prompt and retrieved context leave the platform, and AI only drafts - the owning screen applies. (5) One autonomy scale, L0 Disabled to L4 Controlled auto, with first-release ceilings, separate from user permission and from the approval tier; impactful actions route to a person, who sees current against proposed, impact, risk and what is affected, and can approve within a limit, challenge, override or roll back; every decision is traceable (data, model, approver, time) and searchable by customer, venue and capability. In Block A (5 October to 20 November 2026) the guest concierge with retrieval, Help me choose, translations, the planner agent, the gateway and …
+*(source: ADR-0051; ADR-0050; ADR-0020; ADR-0052; ADR-0053; ADR-0054; ADR-0059; ADR-0051 (AI-D01..AI-D20); ADR-0051 (AI functions review 30 Sep §2 §4 §9); MoM 18 Sep 4.1-4.10; MoM 21 Sep 4.1-4.14; MoM 30 Sep 4.1 4.7; ADR-0059 (Block A slice: tasks.csv))*
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Sahli | The guest concierge's name; the entry reads "Ask Sahli" and shows as mascot art when the venue's Concierge mascot setting is on (default), otherwise a plain button. | Chatbot, Bot, AI Concierge (as a visible label), Virtual agent | DI-1069 / screens/P01-guest-web-storefront.yaml#WEB-044 |
+| Based on | The line on every AI answer that says what it was computed from, e.g. "Based on: your venue profile, UAE calendar, weather, 23 days of your sales". Always present. | Data sources, Model inputs, Powered by AI | ADR-0051 Maturity / contracts/satellite/ai.yaml#/components/schemas/AiMaturity |
+| Starting / Learning / Established / Trained on your data | The four maturity stages (enum starting, learning, established, learned), shown as one badge. Moves by itself from Starting to Established as own data arrives; Trained on your data only after an admin promotion. | Beta, Experimental, Low confidence, Cold start (in UI), Not enough data | ADR-0051 / ADR-0051 (AI functions review 30 Sep §2) |
+| Limited historical data | Shown while own data carries less than half the weight (AiMaturity.limitedHistory, ownDataShare < 0.5). An honest qualifier, never a refusal. | Insufficient data, Not available until, Comes later | ADR-0051 / contracts/satellite/ai.yaml#/components/schemas/AiMaturity |
+| Range | The 10th-90th percentile band a forecast or estimate is shown with (e.g. "1,850-3,400 guests, most likely 2,600"). Never a bare accuracy percentage on an answer; measured accuracy (WAPE, bias, coverage) appears only on accuracy screens … | Accuracy 92%, Confidence 0.87 (on a heuristic), Exact | ADR-0051 / contracts/satellite/ai.yaml#getForecast / … |
+| Running in the background | A trained model in shadow next to the live answer (AiRelease.stage shadow); it changes nothing a person sees. | Live, Active model, Testing in production | ADR-0051 Promotion / ADR-0051 (AI functions review 30 Sep §2) |
+| Ready to promote / Promote | A shadow model passed its gate (governance alert promotionReady); an admin promotes it one stage at a time (canary, then production). The only way a model replaces the baseline. | Deploy, Go live, Auto-switch, Activate model, Upgrade AI | ADR-0051 (AI-D16) / contracts/satellite/ai.yaml#promoteAiRelease |
+| L0 Disabled / L1 Advisory / L2 Prepare / L3 Execute with … | The one autonomy scale for every AI capability, shown as "L2 Prepare" etc. with the capability's ceiling beside it. Lower scopes tighten, never raise. | Autopilot, Copilot mode, Level 0-3 (CFG book), Approval level (for autonomy), Manual/Semi/Auto | ADR-0050 / ADR-0050 (AI-D04) / … |
+| Approval tier | How many people must approve a proposed action (ProposedAction.approvalLevel, 1 or 2). Not an autonomy level. | Autonomy level, Approval level (ambiguous) | ADR-0050 |
+| Suggestion / Draft | What AI produces. A suggestion advises; a draft is a ready-to-review change that a person applies in the owning screen. Copy says "Nothing is applied until you approve it." | AI changed, Auto-applied, AI updated your prices | ADR-0020 / ADR-0051 (AI functions review 30 Sep §4 Configuration assistant) / … |
+| Why this? | The link or expander that opens an answer's explanation (Suggestion.explanation, recommendation template reason, decision trace). Plain words; for guests a template reason. | Explainability, SHAP, Feature importance (in operator copy) | ADR-0052 (AI-D09) / contracts/satellite/ai.yaml#/components/schemas/Suggestion |
+| No thanks | The explicit decline on an offer. Only this counts as a decline and it is remembered across channels; scrolling past or closing the step is not a decline. | Dismiss (as a decline), Skip (as a decline), X (as a decline) | ADR-0052 (AI-D07) / DI-962 / … |
+| Hold for review | What a high fraud or risk score does to a payment or order. The transaction goes through; it is held for a person. | Decline, Block, Reject (for a risk score), Fraud detected | ADR-0053 / ADR-0053 (AI-D06) |
+| Hand over to a person | The concierge passes the whole conversation and its own summary to a live agent; the guest does not repeat themselves. | Escalate, Transfer, Contact bot | contracts/satellite/marketing-crm.yaml#handoverToAgent |
+| Not available yet | The analytics assistant's answer to a question outside the semantic model; it records a knowledge gap and never improvises a number. | I cannot answer, Error, Unknown | ADR-0054 |
+
+
 ## The screens
 
 Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs count fields; requirements are matrix rows; meeting inputs are the ones naming the screen (the module and platform ones are below); white label says whether the tenant's brand reaches it (guest) or it sets the brand (configures).
@@ -68,18 +148,18 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `ANL-012` | Live Operations Dashboard | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `ANL-013` | Revenue Pulse | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ANL-013` | Revenue Pulse | B–D | 0 | 36 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `ANL-014` | Attendance & Footfall Intelligence | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `ANL-015` | Capacity & Utilization Monitor | B–D | 0 | 0 | 6 | 0 | 2 | 0 | — | notStarted (—) |
 | `ANL-016` | Sales & Channel Performance | B–D | 0 | 0 | 6 | 0 | 2 | 0 | — | notStarted (—) |
 | `ANL-017` | Customer, Membership & Loyalty Pulse | B–D | 2 | 30 | 6 | 0 | 2 | 2 | — | notStarted (—) |
 | `ANL-018` | Alerts & Exception Center | B–D | 0 | 22 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ANL-019` | AI Management Insights | A | 0 | 0 | 6 | 3 | 2 | 0 | — | notStarted (—) |
+| `ANL-019` | AI Management Insights | A | 11 | 44 | 6 | 3 | 2 | 0 | — | notStarted (—) |
 | `ANL-020` | Multi-Site & Performance Comparison | B–D | 3 | 8 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 
-**ANL-018, ANL-019 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**ANL-018 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ---
 
@@ -103,6 +183,21 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Opens with | nothing: it opens on its own |
 | Route | `/analytics/live-operations-dashboard-anl-012` |
 
+**From the Finance, Ledger & Tax · Reporting & Analytics process.** The operations control room: what is happening right now across every venue the user may see — people on site, entries and exits, occupancy, gate status, active tills, queues, incidents and device exceptions. It implements the client's Operations Control Room board and DI-699, and must stay legible on a wall display. The one thing to get right: freshness — every tile says how old it is, and a stalled feed is shown as stale, not as a low number.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **Gate status, active gates, active POS terminals, queues and device exceptions have no declared source.** Why: The screen reads only getKpiValues (seeded takings and admissions) and listAlerts; gate and occupancy sources exist in access (listLiveAccess, listLiveVenueOccupancy), devices in tenancy (listDevices), queues in queue (getWaitTimes). *(source: screens/P16-venue-analytics.yaml#ANL-012 / contracts/spine/access.yaml#listLiveAccess / contracts/spine/access.yaml#listLiveVenueOccupancy / contracts/satellite/queue.yaml#getWaitTimes; Finance, Ledger & Tax · Reporting & Analytics)*
+- **The states describe "the live operations list" with "Carries the create action".** Why: A live dashboard has no list and nothing to create; first run is "No live data yet — gates and tills will appear once they report". *(source: screens/P16-venue-analytics.yaml#ANL-012; Finance, Ledger & Tax · Reporting & Analytics)*
+- **The Operations preset bookmark (today, all venues, live) is absent.** Why: The client asks for it for the control room; the screen should open in it. *(source: MATRIX 6.1.78; Finance, Ledger & Tax · Reporting & Analytics)*
+- **"Map or venue layout" is asked for on this board.** Why: The map mark cannot bind yet; use the gate status grid meanwhile. *(source: MATRIX 8.7.33 / MATRIX 8.9.1 / contracts/satellite/reporting.yaml#/components/schemas/DashboardTile; Finance, Ledger & Tax · Reporting & Analytics)*
+
+#### Decided on this screen
+
+Answered questions: draw the decision, not the old default. Where a decision and the tables below differ, the decision wins.
+
+- **What is the stale threshold for live tiles (60 s, 2 min)?** → Drawn default accepted: Stale after 2 minutes without a refresh. *(decided by Chinmay, 2026-10-02; DEC-319 / CHG-NOTE-003)* **Reviewable:** a default the lead may still overrule before the block is tasked.
+
 #### Inputs: what the user enters or picks
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
@@ -116,6 +211,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Compare to | radio group | — | Previous period · Same period last year · Target · Benchmark | `getKpiValues` ?compareTo |
 | Interval | radio group | — | Hour · Day · Week · Month | `getKpiValues` ?interval |
 | Group by | text field | — | — | `getKpiValues` ?groupBy |
+| Module | field | — | — | `getKpiValues` ?module |
 | Status | radio group | — | Raised · Acknowledged · Resolved · Expired | `listAlerts` ?status |
 | Severity | segmented control | — | Info · Warning · Critical | `listAlerts` ?severity |
 | Workstation | picker: choose a workstation | — | — | `listAlerts` ?workstationId |
@@ -123,6 +219,10 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Item | picker: choose an item | — | — | `listAlerts` ?itemId |
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+**Rules for these inputs** (from the Finance, Ledger & Tax · Reporting & Analytics process; these refine the tables above and win where they differ)
+
+- **venue**: All venues in scope by default (multi-tenant/multi-venue grid); one venue on a wall display preset. *(source: DI-699)*
 
 #### Outputs: what the screen shows and produces
 
@@ -156,6 +256,19 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **System/device exceptions** (metric tile)
 
+**Rules for what is shown** (from the Finance, Ledger & Tax · Reporting & Analytics process; these refine the tables above and win where they differ)
+
+- **people on site**: On site = entries minus exits today; Occupancy % = on site over configured capacity; Capacity remaining = capacity minus on site. Bands Normal below 80%, Warning from 80%, Critical from 95%. *(source: MATRIX 3.2.65 / MATRIX 8.2.36 / MATRIX 1.1.40 / DI-704 / DI-698)*
+- **gate status**: Status grid per gate — Open, Closed, Offline — with counts; Offline sorts first and is red with an icon and text. *(source: DI-699 / MATRIX 8.7.33 / MATRIX 8.9.1)*
+- **live sales**: Gross sales today and per venue, plus Active POS terminals; same Gross sales definition as the executive board. *(source: DI-699)*
+- **queues and incidents**: Current wait per queue (minutes), open incidents and device exceptions as counts that drill through. *(source: MATRIX 8.9.1 / MATRIX 16.4.18 / contracts/satellite/reporting.yaml#/components/schemas/MetricSource)*
+- **freshness**: "Updated 40 sec ago" per tile; refresh no faster than every 30 seconds; stale warning past the dataset threshold. *(source: contracts/satellite/reporting.yaml#/components/schemas/DashboardTile / MATRIX 8.7.22 / DI-711)*
+
+**What each action does** (from the Finance, Ledger & Tax · Reporting & Analytics process; these refine the tables above and win where they differ)
+
+- **open a gate, occupancy or device tile**: Drill-through to the live access, occupancy or device screen with the venue carried; incidents open the alert centre. *(source: MATRIX 2.12.1 / MATRIX 16.9.58 / MATRIX 8.9.10 / MATRIX 8.7.28)*
+- **Presentation mode**: Full screen, large type, simplified controls, auto-refresh; for the control-room wall. *(source: MATRIX 8.7.23)*
+
 **Data it reads**: `getKpiValues` (onLoad, Live operational KPIs); `listAlerts` (onLoad, What needs attention)
 
 **Where the user goes next**
@@ -174,6 +287,32 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed |
+
+#### Edge cases to draw
+
+- **A venue does not scan exits**: On site and visit duration show "Exit scanning not configured" instead of treating entries as people on site. *(source: MATRIX 3.2.65)*
+- **Occupancy is between 90% and 95%**: Warning (amber); DI-704's example leaves this band undefined, the 80/95 rule applies. *(source: MATRIX 8.2.36 / MATRIX 1.1.40 / DI-704)*
+- **The replica lags by minutes during a spike**: Tiles keep their last values with the stale warning; nothing reads the live transactional database. *(source: MoM 2026-09-08 4.6 Real-Time Reporting Architecture / DI-711)*
+
+#### Consistency with other screens
+
+- Match `ANL-014`: ANL-012 is today and now; ANL-014 is history and trends of the same counts with the same definitions.
+- Match `BO-224`: Gate status words and colours identical to Live Access Operations.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+asOf: Updated 35 sec ago · 14:32
+venues:
+- Aquaventure Waterpark · on site 7,140 of 10,000 (71.4%, Normal) · entries 8,876 · exits 1,736 · gates 11 open,
+  1 offline
+- Dubai Parks — Motiongate · on site 12,050 of 14,000 (86.1%, Warning) · entries 13,402 · exits 1,352
+- House of Wisdom, Sharjah · on site 640 of 1,200 (53.3%) · gates 3 open
+queues: Slither's Slides 35 min · Poseidon's Revenge 20 min
+incidents: 2 open · 1 device exception (Kiosk 4 printer)
+```
 
 #### Permissions
 
@@ -214,6 +353,9 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `ANL-020`, `ANL-001`.
 - [ ] Every gated control is gated: `REPORT_VIEW_VENUE`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 3 edge case(s) from the process notes are drawn.
+- [ ] The 4 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
+- [ ] The 1 decision(s) taken on this screen are drawn as decided, not as the old default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -234,6 +376,25 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | nothing: it opens on its own |
 | Route | `/analytics/revenue-pulse-anl-013` |
 
+**What the spec says about it.** **Measure names, not "Revenue"** (decided 2 October 2026, Chinmay; CHG-FIN-002; BOARDREQ MOM-2758..2761). Takings (money taken less money paid back, a cash-control figure), Gross sales (before discounts, excluding VAT), Net revenue (gross sales less discounts and refunds), Recognised revenue and Deferred revenue are different numbers and never share a label; a tile takes its label from the seeded KPI it is bound to (`ReportingSystemKpi`). Intraday figures are Gross sales (before discounts, excluding VAT) because refunds and recognition settle later; by payment method the figure is Takings, the money taken by tender. Net revenue is shown against target.
+
+**From the Finance, Ledger & Tax · Reporting & Analytics process.** Revenue pulse: intraday revenue tempo with its comparisons and breakdowns, drillable from consolidated revenue to site, business unit, channel, product and transaction. The one thing to get right: every "Revenue" tile the pack draws is relabelled with its real measure — this is an operational sales view (Gross sales / Net revenue), not recognised revenue — and breakdowns are charts, not single-number tiles.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **"Revenue by Site / Attraction / Product / Channel / Business Unit / Payment Method" are drawn as single metric tiles.** Why: They are breakdowns; draw them as bar or donut marks. *(source: screens/P16-venue-analytics.yaml#ANL-013 / MATRIX 8.7.4; Finance, Ledger & Tax · Reporting & Analytics)*
+- **"Revenue vs Same Day Last Week" has no comparison in the KPI read.** Why: compareTo offers previousPeriod, samePeriodLastYear, target and benchmark only; same weekday last week needs a value or a period convention. *(source: contracts/satellite/reporting.yaml#getKpiValues; Finance, Ledger & Tax · Reporting & Analytics)*
+- **No revenue KPI is seeded; only "takings" (payments less refunds).** Why: Binding the revenue tiles to takings would show cash received as revenue; Gross sales and Net revenue KPIs must be defined. *(source: contracts/satellite/reporting.yaml#/components/schemas/ReportingSystemKpi / MoM 2026-08-12 14. Finance Module Walkthrough — Dashboards, Chart of Accounts & Entities; Finance, Ledger & Tax · Reporting & Analytics)*
+
+**Fixed on main** (the package already carries these; draw what it says): Twelve tiles are labelled bare "Revenue ...". (CHG-FIN-002).
+
+#### Decided on this screen
+
+Answered questions: draw the decision, not the old default. Where a decision and the tables below differ, the decision wins.
+
+- **What is a "business unit" in the drill path — department, a tenancy scope node, or a cost centre?** → Drawn default accepted: Treat business unit as department. *(decided by Chinmay, 2026-10-02; DEC-320 / CHG-NOTE-003)* **Reviewable:** a default the lead may still overrule before the block is tasked.
+- **Should a multi-country tenant see a converted group total, and at what rate?** → Drawn default accepted: Per-currency subtotals only. *(decided by Chinmay, 2026-10-02; DEC-321 / CHG-NOTE-003)* **Reviewable:** a default the lead may still overrule before the block is tasked.
+
 #### Inputs: what the user enters or picks
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
@@ -247,36 +408,123 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Compare to | radio group | — | Previous period · Same period last year · Target · Benchmark | `getKpiValues` ?compareTo |
 | Interval | radio group | — | Hour · Day · Week · Month | `getKpiValues` ?interval |
 | Group by | text field | — | — | `getKpiValues` ?groupBy |
+| Module | field | — | — | `getKpiValues` ?module |
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+**Rules for these inputs** (from the Finance, Ledger & Tax · Reporting & Analytics process; these refine the tables above and win where they differ)
+
+- **comparison**: Yesterday, Same day last week, Same period last year, Target — one at a time beside the headline. *(source: screens/P16-venue-analytics.yaml#ANL-013 / contracts/satellite/reporting.yaml#getKpiValues)*
 
 #### Outputs: what the screen shows and produces
 
 **Shown**
 
-**Revenue Today** (metric tile)
+**Gross sales today** (metric tile, from `getKpiValues`): `getKpiValues?kpiCodes=grossSales`, today; shows its as-of time (CHG-FIN-002, CHG-FIN-007).
 
-**Revenue This Hour** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Comparison | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Direction | chip: Up, Down, Flat | — |
 
-**Revenue vs Target** (metric tile)
+**Gross sales this hour** (metric tile, from `getKpiValues`): `getKpiValues?kpiCodes=grossSales`, this hour, interval=hour; shows its as-of time (CHG-FIN-002, CHG-FIN-007).
 
-**Revenue vs Yesterday** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Comparison | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Direction | chip: Up, Down, Flat | — |
 
-**Revenue vs Same Day Last Week** (metric tile)
+**Net revenue vs target** (metric tile, from `getKpiValues`): `getKpiValues?kpiCodes=netRevenue`, today, with its target; shows its as-of time (CHG-FIN-002, CHG-FIN-007).
 
-**Revenue vs Same Period Last Year** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Comparison | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Direction | chip: Up, Down, Flat | — |
 
-**Revenue by Site** (metric tile)
+**Gross sales vs yesterday** (metric tile, from `getKpiValues`): `getKpiValues?kpiCodes=grossSales`, today against yesterday; shows its as-of time (CHG-FIN-002, CHG-FIN-007).
 
-**Revenue by Attraction** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Comparison | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Direction | chip: Up, Down, Flat | — |
 
-**Revenue by Product** (metric tile)
+**Gross sales vs same day last week** (metric tile, from `getKpiValues`): `getKpiValues?kpiCodes=grossSales`, today against the same day last week; shows its as-of time (CHG-FIN-002, CHG-FIN-007).
 
-**Revenue by Channel** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Comparison | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Direction | chip: Up, Down, Flat | — |
 
-**Revenue by Business Unit** (metric tile)
+**Gross sales vs same period last year** (metric tile, from `getKpiValues`): `getKpiValues?kpiCodes=grossSales`, the period against the same period last year; shows its as-of time (CHG-FIN-002, CHG-FIN-007).
 
-**Revenue by Payment Method** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Comparison | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Direction | chip: Up, Down, Flat | — |
+
+**Gross sales by site** (metric tile, from `getKpiValues`): `getKpiValues?kpiCodes=grossSales`, groupBy=venue; shows its as-of time (CHG-FIN-002, CHG-FIN-007).
+
+| Shows | Format | Notes |
+|---|---|---|
+| Value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Comparison | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Direction | chip: Up, Down, Flat | — |
+
+**Gross sales by attraction** (metric tile, from `getKpiValues`): `getKpiValues?kpiCodes=grossSales`, groupBy=attraction; shows its as-of time (CHG-FIN-002, CHG-FIN-007).
+
+| Shows | Format | Notes |
+|---|---|---|
+| Value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Comparison | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Direction | chip: Up, Down, Flat | — |
+
+**Gross sales by product** (metric tile, from `getKpiValues`): `getKpiValues?kpiCodes=grossSales`, groupBy=product; shows its as-of time (CHG-FIN-002, CHG-FIN-007).
+
+| Shows | Format | Notes |
+|---|---|---|
+| Value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Comparison | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Direction | chip: Up, Down, Flat | — |
+
+**Gross sales by channel** (metric tile, from `getKpiValues`): `getKpiValues?kpiCodes=grossSales`, groupBy=channel; shows its as-of time (CHG-FIN-002, CHG-FIN-007).
+
+| Shows | Format | Notes |
+|---|---|---|
+| Value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Comparison | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Direction | chip: Up, Down, Flat | — |
+
+**Gross sales by business unit** (metric tile, from `getKpiValues`): `getKpiValues?kpiCodes=grossSales`, groupBy=businessUnit; shows its as-of time (CHG-FIN-002, CHG-FIN-007).
+
+| Shows | Format | Notes |
+|---|---|---|
+| Value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Comparison | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Direction | chip: Up, Down, Flat | — |
+
+**Takings by payment method** (metric tile, from `getKpiValues`): `getKpiValues?kpiCodes=takings`, groupBy=tender; shows its as-of time (CHG-FIN-002, CHG-FIN-007).
+
+| Shows | Format | Notes |
+|---|---|---|
+| Value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Comparison | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Direction | chip: Up, Down, Flat | — |
+
+**Rules for what is shown** (from the Finance, Ledger & Tax · Reporting & Analytics process; these refine the tables above and win where they differ)
+
+- **headline**: "Net revenue today" and "Net revenue this hour" as number marks with sparkline; Gross sales shown beneath in smaller type. *(source: MATRIX 5.12.6 / MATRIX 8.7.21)*
+- **breakdowns**: By site, attraction, product, business unit: sorted bar (top 10 + Other). By channel: donut with at most six slices plus Other. By payment method: donut labelled "Takings by payment method" (payments, not sales). *(source: MATRIX 8.7.4 / MATRIX 8.7.1 / contracts/satellite/reporting.yaml#/components/schemas/ReportingSystemKpi)*
+- **hourly tempo**: Line of net revenue per hour today against the comparison day's curve (dashed), venue time zone. *(source: MATRIX 8.7.4 / MATRIX 8.7.8 / MATRIX 8.7.25)*
+
+**What each action does** (from the Finance, Ledger & Tax · Reporting & Analytics process; these refine the tables above and win where they differ)
+
+- **drill**: Consolidated → site → business unit → channel → product → transaction, each level only where a real hierarchy exists; transaction detail respects the viewer's permissions. *(source: DI-709 / screens/P16-venue-analytics.yaml#ANL-013)*
 
 **Data it reads**: `getKpiValues` (onLoad, Revenue against target)
 
@@ -296,6 +544,28 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed |
+
+#### Edge cases to draw
+
+- **Tenant spans AED and BHD venues**: Consolidated revenue is shown per base currency; never summed across currencies. *(source: contracts/shared/common.yaml#/components/schemas/Money)*
+- **Today is a partial day being compared to a full day**: "vs yesterday" compares to yesterday up to the same time, labelled "to 14:32". *(source: designer default)*
+
+#### Consistency with other screens
+
+- Match `ANL-001`: Same Net revenue and Gross sales numbers as the executive tiles at the same moment; ANL-013 is their drill target.
+- Match `ANL-016`: Channel split here must equal ANL-016's for the same period.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+venue: All venues in scope (AED)
+headline: Net revenue today AED 2,904,180.25 (vs same day last week AED 2,711,930.00, +7.1%) · this hour AED 312,450.00
+bySite: Aquaventure AED 1,169,690.00 · Motiongate AED 1,402,300.25 · House of Wisdom AED 332,190.00
+byChannel: Web 44% · POS 27% · OTA 18% · B2B 7% · Kiosk 4%
+byPayment: Card AED 1,986,400.00 · Cash AED 402,115.50 · Wallet AED 210,300.00
+```
 
 #### Permissions
 
@@ -327,12 +597,15 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state (400).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (36 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ANL-013?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `ANL-020`, `ANL-001`.
 - [ ] Every gated control is gated: `REPORT_VIEW_VENUE`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 2 edge case(s) from the process notes are drawn.
+- [ ] The 3 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
+- [ ] The 2 decision(s) taken on this screen are drawn as decided, not as the old default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -353,6 +626,14 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | nothing: it opens on its own |
 | Route | `/analytics/attendance-footfall-intelligence-anl-014` |
 
+**From the Finance, Ledger & Tax · Reporting & Analytics process.** Attendance and footfall: how many people came, when, through which gates, on what tickets, and how that compares with what was sold and with the forecast. It implements the admissions half of the client's Admissions & Capacity board and the access-control part of the Operations board. The one thing to get right: attendance is counted by visit date (scans), not by sale date, and ticketed vs actual uses the same visit date.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **The forecast attendance the purpose promises has no declared read.** Why: Forecast visitors come from ai.getForecast (subject attendance); only getKpiValues is declared. *(source: screens/P16-venue-analytics.yaml#ANL-014 / contracts/satellite/ai.yaml#getForecast; Finance, Ledger & Tax · Reporting & Analytics)*
+- **Per-gate (turnstile) breakdown is not among the tiles.** Why: DI-717 asks for per-turnstile breakdowns explicitly. *(source: DI-717; Finance, Ledger & Tax · Reporting & Analytics)*
+- **"Attendance by Site / Attraction / Ticket Type / Product / Timeslot" are single metric tiles.** Why: They are breakdowns; bar or table marks. *(source: screens/P16-venue-analytics.yaml#ANL-014; Finance, Ledger & Tax · Reporting & Analytics)*
+
 #### Inputs: what the user enters or picks
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
@@ -366,8 +647,13 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Compare to | radio group | — | Previous period · Same period last year · Target · Benchmark | `getKpiValues` ?compareTo |
 | Interval | radio group | — | Hour · Day · Week · Month | `getKpiValues` ?interval |
 | Group by | text field | — | — | `getKpiValues` ?groupBy |
+| Module | field | — | — | `getKpiValues` ?module |
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+**Rules for these inputs** (from the Finance, Ledger & Tax · Reporting & Analytics process; these refine the tables above and win where they differ)
+
+- **period**: Visit date range, default Last 7 days; labelled "Visit date" so it is not confused with sale date. *(source: MATRIX 1.1.40 / MATRIX 8.8.3)*
 
 #### Outputs: what the screen shows and produces
 
@@ -403,6 +689,19 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Ticketed vs Actual Attendance** (metric tile)
 
+**Rules for what is shown** (from the Finance, Ledger & Tax · Reporting & Analytics process; these refine the tables above and win where they differ)
+
+- **counts**: Total visitors (admitted entries), Entries, Exits, Current visitors on site, Repeat visits, No-show %. *(source: MATRIX 1.1.40 / MATRIX 6.1.69 / MATRIX 8.1.2 / MATRIX 3.2.65 / contracts/satellite/reporting.yaml#/components/schemas/ReportingSystemKpi)*
+- **admission conversion**: "Ticketed vs actual" = admitted tickets over valid issued tickets for the visit period, as a %, with both counts shown. *(source: MATRIX 1.1.40 / MATRIX 8.7.21)*
+- **hourly footfall**: Heatmap hour × weekday of entries; Peak entry time stated in words ("Peak 10:00–11:00, 1,912 entries"). *(source: MATRIX 6.1.69 / MATRIX 6.1.70)*
+- **by gate**: Entries by gate/turnstile as a sorted bar. *(source: DI-717)*
+- **forecast**: Next 7 days attendance as a dashed Forecast line with its range, after the actuals. *(source: screens/P16-venue-analytics.yaml#ANL-014 / DI-973 / MATRIX 8.2.1)*
+- **average visit duration**: From the time between entry and exit scans; shown only where exits are scanned. *(source: MATRIX 3.2.65)*
+
+**What each action does** (from the Finance, Ledger & Tax · Reporting & Analytics process; these refine the tables above and win where they differ)
+
+- **drill**: Venue → attraction → ticket type → time slot → scan detail. *(source: MATRIX 8.7.28 / DI-709)*
+
 **Data it reads**: `getKpiValues` (onLoad, Attendance and footfall)
 
 **Where the user goes next**
@@ -421,6 +720,30 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed |
+
+#### Edge cases to draw
+
+- **Complimentary tickets**: Counted in attendance; excluded from average ticket value where policy says so; the exclusion is stated. *(source: MATRIX 8.1.3 / MATRIX 6.1.66)*
+- **Daylight-saving or time-zone boundary venue (multi-country tenant)**: Hours are local to each venue; the heatmap never mixes time zones. *(source: MATRIX 6.1.78)*
+
+#### Consistency with other screens
+
+- Match `ANL-012`: Same entry/exit/on-site definitions; ANL-012 is live, ANL-014 is the period view.
+- Match `ANL-015`: ANL-014 owns people counts; ANL-015 owns capacity and utilisation. No-show % appears on both and must match.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+venue: Aquaventure Waterpark
+period: Visit date 23–29 Sep 2026
+counts: Visitors 58,214 · Exits 55,902 · Repeat visits 9,840 · No-show 4.1%
+ticketedVsActual: Admitted 58,214 of 60,705 valid tickets (95.9%)
+peak: Peak 10:00–11:00 Fri, 1,912 entries
+byGate: 'Main Gate 1: 22,410 · Main Gate 2: 19,880 · Beach Gate: 15,924'
+forecast: Forecast Thu 01 Oct 8,900 (likely 8,100 – 9,650)
+```
 
 #### Permissions
 
@@ -460,6 +783,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `ANL-020`, `ANL-001`.
 - [ ] Every gated control is gated: `REPORT_VIEW_VENUE`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 2 edge case(s) from the process notes are drawn.
+- [ ] The 3 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -480,6 +805,20 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | nothing: it opens on its own |
 | Route | `/analytics/capacity-utilization-monitor-anl-015` |
 
+**From the Finance, Ledger & Tax · Reporting & Analytics process.** Capacity and utilisation: where capacity is under-used, filling up or full, by attraction, time slot and inventory item, and what is still available to sell. It implements the capacity half of the Admissions & Capacity board and DI-700's capacity section. The one thing to get right: utilisation's definition (consumed or reserved over sellable) and how holds and blocked inventory are treated must be visible on the screen.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **Two utilisation-like metrics exist (occupancy = sold + leased vs capacity; capacityUtilisation = remaining over the window) and the screen does not say which "Utilization %" is.** Why: Two definitions under one label is the drift the KPI register exists to prevent. *(source: contracts/satellite/reporting.yaml#/components/schemas/MetricSource / MATRIX 8.2.36 / MATRIX 1.1.40 / MATRIX 8.9.2; Finance, Ledger & Tax · Reporting & Analytics)*
+- **Forecast utilisation has no declared read.** Why: It comes from ai.getForecast (subject attractionUtilisation / occupancy). *(source: contracts/satellite/ai.yaml#getForecast / MATRIX 8.2.35 / MATRIX 8.2.36; Finance, Ledger & Tax · Reporting & Analytics)*
+- **DI-704's example leaves 90–95% undefined (80–90 warning, above 95 critical).** Why: The board spec's 80/95 rule closes the gap; DI-704's example should be corrected. *(source: DI-704 / MATRIX 8.2.36 / MATRIX 1.1.40; Finance, Ledger & Tax · Reporting & Analytics)*
+
+#### Decided on this screen
+
+Answered questions: draw the decision, not the old default. Where a decision and the tables below differ, the decision wins.
+
+- **Do holds and blocked inventory count as consumed in utilisation?** → Drawn default accepted: Count holds as reserved (in utilisation), exclude blocked from sellable. *(decided by Chinmay, 2026-10-02; DEC-322 / CHG-NOTE-003)* **Reviewable:** a default the lead may still overrule before the block is tasked.
+
 #### Inputs: what the user enters or picks
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
@@ -493,6 +832,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Compare to | radio group | — | Previous period · Same period last year · Target · Benchmark | `getKpiValues` ?compareTo |
 | Interval | radio group | — | Hour · Day · Week · Month | `getKpiValues` ?interval |
 | Group by | text field | — | — | `getKpiValues` ?groupBy |
+| Module | field | — | — | `getKpiValues` ?module |
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
 
@@ -516,6 +856,17 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Forecast Utilization** (metric tile)
 
+**Rules for what is shown** (from the Finance, Ledger & Tax · Reporting & Analytics process; these refine the tables above and win where they differ)
+
+- **capacity cards**: Sellable capacity, Booked, Held, Used (admitted), Remaining (available to sell), Utilisation %, No-show %, Peak utilisation. *(source: MATRIX 6.1.70 / MATRIX 8.2.36 / MATRIX 1.1.40 / MATRIX 8.9.2 / contracts/satellite/reporting.yaml#/components/schemas/MetricSource)*
+- **utilisation by attraction / slot**: Gauge only for the headline (a target range exists); per attraction a sorted bar with the 80% and 95% reference lines; per time slot a heatmap. *(source: MATRIX 1.1.40 / MATRIX 8.2.36 / MATRIX 8.7.21 / MATRIX 6.1.69)*
+- **status bands**: Normal under 80%, Warning 80–95%, Critical 95% and above; tenant-configurable via KPI targets. *(source: MATRIX 8.2.36 / MATRIX 1.1.40 / contracts/satellite/reporting.yaml#/components/schemas/KpiTarget / DI-704)*
+- **forecast utilisation**: Labelled "Forecast", dashed, with range. *(source: DI-973 / MATRIX 8.2.36)*
+
+**What each action does** (from the Finance, Ledger & Tax · Reporting & Analytics process; these refine the tables above and win where they differ)
+
+- **open a time slot**: Drill-through to capacity configuration for that product and slot (an authorised workflow link, permission-checked). *(source: MATRIX 2.12.1 / MATRIX 16.9.58 / MATRIX 8.9.10)*
+
 **Data it reads**: `getKpiValues` (onLoad, Capacity and utilisation)
 
 **Where the user goes next**
@@ -534,6 +885,29 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed |
+
+#### Edge cases to draw
+
+- **Capacity reduced mid-day (a ride closes)**: Utilisation recomputes against the new sellable capacity; the change is marked on the chart. *(source: designer default)*
+- **Holds exceed 10% of capacity**: Held shown as its own segment so utilisation is not overstated. *(source: MATRIX 8.2.36 / MATRIX 1.1.40)*
+
+#### Consistency with other screens
+
+- Match `ANL-012`: ANL-012's occupancy (people on site now) is not ANL-015's utilisation (sold or reserved over sellable); different labels.
+- Match `ANL-014`: No-show % identical.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+venue: Dubai Parks — Motiongate, Sat 03 Oct 2026
+cards: Sellable 14,000 · Booked 11,620 · Held 480 · Remaining 1,900 · Utilisation 86.4% (Warning)
+slots:
+- 10:00 Dreamworks Tour · 98% · Critical
+- 14:00 Hunger Games Mockingjay · 72% · Normal
+forecast: Forecast utilisation Sat 89% (likely 84% – 93%)
+```
 
 #### Permissions
 
@@ -574,6 +948,9 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `ANL-020`, `ANL-001`.
 - [ ] Every gated control is gated: `REPORT_VIEW_VENUE`.
 - [ ] The 2 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 2 edge case(s) from the process notes are drawn.
+- [ ] The 3 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
+- [ ] The 1 decision(s) taken on this screen are drawn as decided, not as the old default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -594,6 +971,20 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | nothing: it opens on its own |
 | Route | `/analytics/sales-channel-performance-anl-016` |
 
+**From the Finance, Ledger & Tax · Reporting & Analytics process.** Sales and channel performance: one scorecard of commercial performance across POS, B2C (web, app, kiosk), B2B and OTA, with conversion, basket size, discount use and channel mix. It implements the client's Sales & Channel board and DI-700's channel section. The one thing to get right: Net revenue (not "Net Sales") is the headline, commission and discounts are deductions, and clicking a channel filters every visual.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **The tile is labelled "Net Sales".** Why: The agreed measure is Net revenue (gross minus discounts minus refunds); "Sales" must not stand for net. *(source: screens/P16-venue-analytics.yaml#ANL-016; Finance, Ledger & Tax · Reporting & Analytics)*
+- **The board is specified with a funnel and slicers.** Why: Funnel cannot bind yet; slicer is refused as a mark (it is a report parameter). *(source: MATRIX 8.7.4 / MATRIX 8.7.25 / contracts/satellite/reporting.yaml#/components/schemas/DashboardTile; Finance, Ledger & Tax · Reporting & Analytics)*
+- **Gross sales, Net revenue, Discounts, Refunds, Average order value and channel sales have no metric source; only conversion is a named metric.** Why: The scorecard's money tiles cannot bind until these are defined as KPIs (takings is payments, not sales). *(source: contracts/satellite/reporting.yaml#/components/schemas/MetricSource / MoM 2026-08-12 14. Finance Module Walkthrough — Dashboards, Chart of Accounts & Entities; Finance, Ledger & Tax · Reporting & Analytics)*
+
+#### Decided on this screen
+
+Answered questions: draw the decision, not the old default. Where a decision and the tables below differ, the decision wins.
+
+- **Is commission shown as a deduction from net revenue or as a separate cost line?** → Drawn default accepted: Separate line, not deducted from Net revenue. *(decided by Chinmay, 2026-10-02; DEC-323 / CHG-NOTE-003)* **Reviewable:** a default the lead may still overrule before the block is tasked.
+
 #### Inputs: what the user enters or picks
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
@@ -607,8 +998,13 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Compare to | radio group | — | Previous period · Same period last year · Target · Benchmark | `getKpiValues` ?compareTo |
 | Interval | radio group | — | Hour · Day · Week · Month | `getKpiValues` ?interval |
 | Group by | text field | — | — | `getKpiValues` ?groupBy |
+| Module | field | — | — | `getKpiValues` ?module |
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+**Rules for these inputs** (from the Finance, Ledger & Tax · Reporting & Analytics process; these refine the tables above and win where they differ)
+
+- **filter bar**: Venue, channel, product, performance date, customer segment — rendered as filter controls bound to report parameters (a slicer is a control, not a mark); active filters as breadcrumbs with Clear and Reset. *(source: MATRIX 8.7.28 / MATRIX 6.1.50 / MATRIX 6.1.66 / contracts/satellite/reporting.yaml#/components/schemas/DashboardTile)*
 
 #### Outputs: what the screen shows and produces
 
@@ -638,6 +1034,16 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Cross-Sell Revenue** (metric tile)
 
+**Rules for what is shown** (from the Finance, Ledger & Tax · Reporting & Analytics process; these refine the tables above and win where they differ)
+
+- **scorecard**: Gross sales, Discounts, Refunds, Net revenue, Transactions, Tickets sold, Average order value, Conversion, Cancellations, Commission (B2B/OTA), Attributed to upsell, Attributed to cross-sell. Discounts, refunds and commission shown as negatives in brackets. *(source: screens/P16-venue-analytics.yaml#ANL-016 / MATRIX 8.7.4)*
+- **channel mix over time**: Stacked bar of Net revenue by channel by day; trend line for conversion. *(source: MATRIX 8.7.4 / MATRIX 8.7.25)*
+- **channel table**: Per channel Net revenue, transactions, AOV, conversion, discount %, commission; totals row server-side. *(source: MATRIX 8.7.4 / MATRIX 8.7.25)*
+
+**What each action does** (from the Finance, Ledger & Tax · Reporting & Analytics process; these refine the tables above and win where they differ)
+
+- **click B2C in any visual**: KPI tiles and the order table filter to B2C; other visuals highlight its contribution while keeping totals. *(source: MATRIX 8.7.28 / MATRIX 8.9.10)*
+
 **Data it reads**: `getKpiValues` (onLoad, Sales by channel)
 
 **Where the user goes next**
@@ -656,6 +1062,30 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed |
+
+#### Edge cases to draw
+
+- **An OTA booking cancelled after the period**: Counted in the period it was cancelled; the cancellation tile links to the bookings. *(source: MATRIX 6.1.78)*
+
+#### Consistency with other screens
+
+- Match `ANL-002`: ANL-016 owns the channel scorecard; ANL-002 the product-by-channel detail and recognition. Same definitions.
+- Match `PTR-002`: Partner commission must match the partner's own dashboard for the same period.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+venue: All venues in scope (AED)
+period: Last 7 days
+scorecard: Gross sales AED 19,840,200.00 · Discounts (AED 1,284,600.00) · Refunds (AED 212,450.00) · Net revenue
+  AED 18,343,150.00 · Commission (AED 611,300.00)
+channels:
+- Web · AED 8,071,000.00 · 18,410 orders · AOV AED 438.40 · conversion 3.4%
+- OTA · AED 3,301,770.00 · 7,120 orders · commission (AED 495,265.50)
+- POS · AED 4,952,650.00 · 21,800 transactions
+```
 
 #### Permissions
 
@@ -696,6 +1126,9 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `ANL-020`, `ANL-001`.
 - [ ] Every gated control is gated: `REPORT_VIEW_VENUE`.
 - [ ] The 2 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 1 edge case(s) from the process notes are drawn.
+- [ ] The 3 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
+- [ ] The 1 decision(s) taken on this screen are drawn as decided, not as the old default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -718,6 +1151,19 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
 
+**From the Finance, Ledger & Tax · Reporting & Analytics process.** Customer, membership and loyalty pulse: acquisition, renewals, retention, member visits, loyalty activity and points liability, with inactive members flagged for follow-up. It implements the client's Customer & Membership board and the 8 Sep CRM board. The one thing to get right: it is an aggregate view; any list of named customers is permission-gated and masked, and points liability is a finance figure from the ledger.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **The layout is a 15-column table of "Every customer membership loyalty" with no operation and a detail panel per customer.** Why: The board is a pulse of aggregates; a customer-level list is a PII surface that belongs to CRM with permission and masking. *(source: screens/P16-venue-analytics.yaml#ANL-017 / MATRIX 8.3.73; Finance, Ledger & Tax · Reporting & Analytics)*
+- **emptyFirstRun says "Carries the create action".** Why: There is nothing to create on a pulse dashboard; first run is "No members yet". *(source: screens/P16-venue-analytics.yaml#ANL-017; Finance, Ledger & Tax · Reporting & Analytics)*
+
+#### Decided on this screen
+
+Answered questions: draw the decision, not the old default. Where a decision and the tables below differ, the decision wins.
+
+- **Is points liability shown to non-finance roles?** → Drawn default accepted: Shown only with finance or tenant report scope. *(decided by Chinmay, 2026-10-02; DEC-324 / CHG-NOTE-003)* **Reviewable:** a default the lead may still overrule before the block is tasked.
+
 #### Inputs: what the user enters or picks
 
 **On the screen**
@@ -738,7 +1184,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Compare to | radio group | — | Previous period · Same period last year · Target · Benchmark | `getKpiValues` ?compareTo |
 | Interval | radio group | — | Hour · Day · Week · Month | `getKpiValues` ?interval |
 | Group by | text field | — | — | `getKpiValues` ?groupBy |
+| Module | field | — | — | `getKpiValues` ?module |
 | Refresh | toggle | off | — | `getDashboard` ?refresh |
+
+**Rules for these inputs** (from the Finance, Ledger & Tax · Reporting & Analytics process; these refine the tables above and win where they differ)
+
+- **filters**: Customer segment, membership type, geography (country/emirate), acquisition source, visit frequency. *(source: screens/P16-venue-analytics.yaml#ANL-017)*
 
 #### Outputs: what the screen shows and produces
 
@@ -784,6 +1235,14 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Outstanding loyalty liability | text | not in the schema: `Outstanding Loyalty Liability` |
 | Customer satisfaction score | text | not in the schema: `Customer Satisfaction Score` |
 
+**Rules for what is shown** (from the Finance, Ledger & Tax · Reporting & Analytics process; these refine the tables above and win where they differ)
+
+- **membership**: New, Renewed, Expired members (period), Renewal rate, Churn, Member visits; trend line by month. *(source: MATRIX 2.14.17 / MATRIX 6.1.72 / contracts/satellite/reporting.yaml#/components/schemas/MetricSource)*
+- **loyalty**: Active members, Tier distribution (stacked bar), Member retention, Breakage rate, Points liability (AED, from the ledger). *(source: contracts/satellite/reporting.yaml#/components/schemas/MetricSource)*
+- **inactive members**: "No visit last quarter" count per membership type, with Follow up opening the CRM segment. *(source: DI-718)*
+- **retention cohort**: Cohort is refused as a mark; draw a heatmap (join month × months since) of retention %. *(source: contracts/satellite/reporting.yaml#/components/schemas/DashboardTile / MATRIX 8.7.25 / MATRIX 8.7.8)*
+- **customer origin**: Bar by country / emirate (map cannot bind yet; never plot individual addresses). *(source: MATRIX 8.7.8)*
+
 **Data it reads**: `getKpiValues` (onLoad, Membership and loyalty); `getDashboard` (onLoad, Loyalty dashboard (active members, tiers, liability …)
 
 **Where the user goes next**
@@ -802,6 +1261,26 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed |
+
+#### Edge cases to draw
+
+- **A user without personal-data permission drills to members**: Aggregates only; names and contacts masked; export of personal data requires the audited permission. *(source: MATRIX 8.3.73 / contracts/shared/permissions.yaml#/components/schemas/Permission)*
+
+#### Consistency with other screens
+
+- Match `ANL-007`: Same segment names; ANL-007 owns purchase behaviour.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+venue: Aquaventure Waterpark (AED)
+period: September 2026
+membership: New 1,240 · Renewed 2,815 · Expired 612 · Renewal rate 82.1%
+loyalty: Active members 38,450 · Gold 6% / Silver 21% / Blue 73% · Points liability AED 1,842,300.00
+inactive: 'Annual pass holders with no visit last quarter: 1,906'
+```
 
 #### Permissions
 
@@ -844,6 +1323,9 @@ Also apply: 1 for P16 · Analytics, 14 for all of P16, 29 for every app (section
 - [ ] Every transition is wired: `ANL-020`, `ANL-001`.
 - [ ] Every gated control is gated: `REPORT_VIEW_VENUE`.
 - [ ] The 2 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 1 edge case(s) from the process notes are drawn.
+- [ ] The 2 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
+- [ ] The 1 decision(s) taken on this screen are drawn as decided, not as the old default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -865,6 +1347,12 @@ Also apply: 1 for P16 · Analytics, 14 for all of P16, 29 for every app (section
 | Route | `/analytics/alerts-exception-center-anl-018` |
 
 **Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
+
+**From the Ticketing & Guest Commerce (guest web, guest app, kiosk, partner portal, POS ticket sale) process.** The management alerts and exceptions queue; from the ticketing angle, sales exceptions (sold-out sessions, unusual refunds, payment gateway mismatches) belong here. After Block A.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **The screen's operations return no schema, so no column can be bound.** Why: Recorded gap. *(source: screens/P16-venue-analytics.yaml#ANL-018 gaps; Ticketing & Guest Commerce (guest web, guest app, kiosk, partner portal, POS ticket sale))*
 
 #### Inputs: what the user enters or picks
 
@@ -924,6 +1412,14 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+alert: Refunds at Main Gate till 3 are 4× the daily average · Fri 2 Oct
+```
+
 #### Permissions
 
 - `listPromotionAlertException` → `PRICE_VIEW` (read) · staff
@@ -960,6 +1456,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `ANL-020`, `ANL-001`.
 - [ ] Every gated control is gated: `PRICE_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -975,42 +1472,160 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Block | Block A · ticket #20757 (APP-SETUP-ANL-019) |
 | Who uses it | venue staff holding `AI_USE`, `REPORT_VIEW_VENUE` (2 operate); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
-| Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
+| Pattern | listDetail (compact density): `listAiInsights` reads the population and the selected insight is decided or explained — list, select, act (CHG-SOT-011). |
 | Offline | online only |
 | Opens with | `insightId` (navigation) |
 | Route | `/analytics/ai-management-insights-anl-019` |
 
-**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+**Known gaps.** Removed 2 October 2026 (CHG-WIR-012): Two sources of anomalies on one card list show the same situation twice; ADR-0053 and the insight layer make ai.listAiInsights (kind anomaly) the one list … **The explanation carries no query or semantic spec** (design-notes correction ai ANL-019). ADR-0054 says an answer shows the query it ran; `NaturalLanguageAnswer` has `semanticSpec` and …
+
+**From the AI & Intelligence process.** AI management insights: proactive findings for managers - a drop, a spike, a forecast miss, an opportunity - each with why it happened, broken down by channel, product and time, and what to do about it. Every number comes from a query the platform ran, never from the model; the model only words the result. The one thing to get right: an insight is a reviewable item with a lifecycle (new, reviewed, accepted or rejected, actioned, measured), and rejecting one with a reason is how the detector learns what is a false alarm.
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- In Block A only decideAiInsight and explainMetricChange are in the slice; listAiInsights is not. (CHG-SOT-016)
+- AiMetricChangeExplanation carries no query or semantic spec. (CHG-SOT-016)
+
+**Fixed on main** (the package already carries these; draw what it says): The screen declares both reporting.listAnalyticsAnomalies and ai.listAiInsights. (CHG-WIR-012); Layout is an unbound primary button, table and Cancel. (CHG-SOT-011).
 
 #### Inputs: what the user enters or picks
+
+**On the screen**
+
+| Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
+|---|---|---|---|---|---|---|---|
+| Kind | select field | — | — | — | — | Sends `?kind=`: anomaly, forecast deviation, trend, opportunity, executive summary, root cause. | — |
+| Priority | select field | — | — | — | — | Sends `?priority=`. | — |
+| Status | select field | — | — | — | — | Sends `?status=`; new and reviewed first by default. | — |
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
 
 | Filter | Drawn as | Default | Allowed values, rules | Source |
 |---|---|---|---|---|
-| From | date and time picker | — | — | `listAnalyticsAnomalies` ?from |
-| Severity | segmented control | — | Low · Medium · High | `listAnalyticsAnomalies` ?severity |
 | Status | select | — | New · Reviewed · Accepted · Rejected · Actioned · Measured | `listAiInsights` ?status |
 | Kind | select | — | Anomaly · Forecast deviation · Trend · Opportunity · Executive summary · Root cause · Forecast threshold · Marketing recommendation | `listAiInsights` ?kind |
 | Priority | radio group | — | Low · Medium · High · Critical | `listAiInsights` ?priority |
 | From | date and time picker | — | — | `listAiInsights` ?from |
 
-Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+**Form: Accept, Mark actioned or Reject** (modal, opened by *Accept, Mark actioned or Reject*; *Record decision* calls `decideAiInsight`, *Cancel* sends nothing)
+
+**Collects what `decideAiInsight` sends.** Required: `decision` (set by the button: accept, actioned or reject). Optional: `reason` (asked for on Reject), `actionRef` (the work the insight led to, on Mark actioned). Dismissing sends nothing.
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Decision `decision` | radio group | required | — | Review · Accept · Reject · Actioned | — | — | `decideAiInsight` body |
+| Reason `reason` | text area | optional | — | max length 1000 | — | — | `decideAiInsight` body |
+| Action ref `actionRef` | text field | optional | — | — | — | — | `decideAiInsight` body |
+
+Errors to draw in the form: 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 The move is not allowed from the insight's state.
+
+**Form: Why did this change?** (drawer, opened by *Why did this change?*; *Explain* calls `explainMetricChange`, *Cancel* sends nothing)
+
+**Filled from the selected insight**: `metricKey` and `period` come from it; the person picks the `comparison` (previous period or same period last year) and may add dimensions. Dismissing sends nothing.
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Metric key `metricKey` | text field | required | — | — | — | — | `explainMetricChange` body |
+| Period `period` | text field | required | — | — | — | ISO period, e.g. `2026-09-21/2026-09-27`. | `explainMetricChange` body |
+| Comparison `comparison` | segmented control | optional | Previous period | Previous period · Same period last year · Forecast | — | — | `explainMetricChange` body |
+| Dimensions `dimensions` | list of values (chips) | optional | — | — | — | — | `explainMetricChange` body |
+| Keep `keep` | toggle | optional | off | — | — | — | `explainMetricChange` body |
+
+**Rules for these inputs** (from the AI & Intelligence process; these refine the tables above and win where they differ)
+
+- **decision (review / accept / reject / actioned)**: Reject asks a reason (the false-alarm signal); Actioned asks what was done (link to the action, e.g. a promotion or a rota change). *(source: contracts/satellite/ai.yaml#decideAiInsight)*
+- **explain a metric (metric, period, comparison)**: Comparison previous period (default), same period last year, or forecast; year-on-year is offered only when history (own or imported) covers it. *(source: contracts/satellite/ai.yaml#explainMetricChange / ADR-0051 (AI functions review 30 Sep §4 Analytics assistant))*
+- **Ask (askReportingQuestion)**: The free-text question box is behind a flag until Sprint 7 (8-26 February 2027); in Block A the screen shows saved insights and KPI explanations only. *(source: ADR-0054 / ADR-0059)*
 
 #### Outputs: what the screen shows and produces
 
 **Shown**
 
-**Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+**Insights** (card list, from `listAiInsights`): **One list** (ADR-0053): anomalies are insights of kind anomaly, not a second source. Newest first; each card says what moved, by how much and how sure.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Title | text | — |
+| Kind | chip: Anomaly, Forecast deviation, Trend, Opportunity, Executive summary, Root cause… | — |
+| Priority | chip: Low, Medium, High, Critical | — |
+| Metric key | text | — |
+| Magnitude | 1,234.5 | — |
+| Status | chip: New, Reviewed, Accepted, Rejected, Actioned, Measured | — |
+| Detected at | 1 Oct 2026, 14:30 | — |
+
+**Ask about what moved** (assistant panel, from `askReportingQuestion`): Answers through the semantic layer and shows the query it ran (ADR-0054).
+
+| Shows | Format | Notes |
+|---|---|---|
+| Conversation | text | — |
+| Question | text | — |
+| Interpretation | text | What the question was understood to mean, in plain language. When the question is outside the semantic model, the "not available yet" … |
+| Semantic spec | grouped details | What the model returned instead of SQL (design 2.2 E, 5.7): metric, dimensions, filters, period, comparison, as validated against the … |
+| Metric | text | A measure field code in the `SemanticModel`, or a `KpiDefinition.code`. The governed definition the dashboards use, so the number matches … |
+| Dimensions | list or chips (count when long) | Field codes to group by. Each must be reachable from the metric's dataset through a relationship the semantic model declares. |
+| Filters | list or chips (count when long) | — |
+| Field | text | A `SemanticModel` field code. |
+| Operator | chip: Equals, Not equals, Greater than, Less than, Between, In… | — |
+| Values | list or chips (count when long) | Open on purpose; typed by the field. One value for the comparison operators, exactly two (from, to) for `between`, any number for `in` and … |
+| Period | text | ISO 8601 interval in the venue's time zone, e.g. `2026-09-21/2026-09-27`, the form `explainMetricChange` takes. |
+| Comparison | chip: Previous period, Same period last year, Target, Benchmark | As `getKpiValues` `compareTo`. With one, each row carries the metric for the comparison beside the current value. |
+| Semantic model version | 1,234 | The `SemanticModel.version` the spec was validated and compiled against. Set by Reporting. |
+| Generated query | grouped details | The query the spec compiled to: data source, columns, filters, grouping, and the compiled SQL in `compiledSql`. |
+| Data source | chip: Orders, Order lines, Payments, Refunds, Shifts, Scan events… | What a report may be built over. A closed set, and that is the point — a builder that accepts any table will happily produce a report over … |
+| Columns | list or chips (count when long) | — |
+| ID | the name it points at, never the id | Added 20 August. The schema reference derives table columns from API response schemas, and a response is not a table — this one returned … |
+| Field | text | — |
+| Label | text | — |
+| Aggregation | chip: None, Count, Count distinct, Sum, Average, Min… | — |
+
+**The selected insight** (detail panel, from `listAiInsights`): **Explainable and traceable**: the evidence items link to the data behind them.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Title | text | — |
+| Narrative | text | — |
+| Evidence | list or chips (count when long) | The evidence of one decision record, stored with it. |
+| Recommended action | grouped details | For `marketingRecommendation`: `{recommendation, parameters}` as `AiMarketingRecommendation`. |
+| Expected impact | grouped details | A range on a named metric (`metric`, `low`, `high`), never a single number (design 5.6). |
+| Status | chip: New, Reviewed, Accepted, Rejected, Actioned, Measured | — |
+| Decided at | 1 Oct 2026, 14:30 | — |
+| Measured impact | grouped details | — |
+
+**Why it changed** (detail panel, from `explainMetricChange`): The drivers in order of contribution and how reliable the explanation is (grounded, partial, conflicting sources, insufficient evidence).
+
+| Shows | Format | Notes |
+|---|---|---|
+| Metric key | text | — |
+| Period | text | — |
+| Comparison | text | — |
+| Change | 1,234.5 | — |
+| Change percent | 1,234.5 | — |
+| Drivers | list or chips (count when long) | — |
+| Narrative | text | — |
+| Reliability | chip: Grounded, Partial, Conflicting sources, Insufficient evidence | — |
+| Data as of | 1 Oct 2026, 14:30 | — |
 
 **Actions and what each produces**
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-|  (primary button) | navigation or local | — | — | — | — |
-| Cancel (secondary button) | navigation or local | — | — | — | — |
+| Accept (primary button) | `decideAiInsight` POST `/insights/{insightId}/decide` | inline | AiInsight | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 The move is not allowed from the insight's state. | opens modal first |
+| Mark actioned (secondary button) | `decideAiInsight` POST `/insights/{insightId}/decide` | inline | AiInsight | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 The move is not allowed from the insight's state. | opens modal first |
+| Reject (destructive button) | `decideAiInsight` POST `/insights/{insightId}/decide` | inline | AiInsight | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 The move is not allowed from the insight's state. | opens modal first |
+| Why did this change? (secondary button) | `explainMetricChange` POST `/insights/explain-metric-change` | inline | AiMetricChangeExplanation | — | opens drawer first |
 
-**Data it reads**: `listAnalyticsAnomalies` (onLoad, What moved unexpectedly); `listAiInsights` (onLoad, Insights and anomalies)
+**Rules for what is shown** (from the AI & Intelligence process; these refine the tables above and win where they differ)
+
+- **insight card**: Title, kind (anomaly, forecast deviation, trend, opportunity, executive summary), priority, expected impact as a range on a named metric (never a single number), status, detected at. Evidence items labelled "From your data", "Calculated" or "AI inferred". *(source: contracts/satellite/ai.yaml#/components/schemas/AiInsight / contracts/satellite/ai.yaml#/components/schemas/AiEvidenceItem)*
+- **why it changed**: The change and % for the period, drivers as a ranked contribution bar (e.g. Online -AED 18,400, POS +AED 2,100), the narrative, a reliability label (grounded, partial, conflicting sources, insufficient evidence) and "Data as of". No confidence percentage. *(source: contracts/satellite/ai.yaml#explainMetricChange / ADR-0054 / DI-719)*
+- **basis**: For anomalies, the baseline's stage, e.g. "Learning - compared with the same weekday over 5 weeks"; in the first weeks against default thresholds and the forecast's low end. *(source: ADR-0051 (AI functions review 30 Sep §4 Anomaly detection) / ADR-0051)*
+
+**What each action does** (from the AI & Intelligence process; these refine the tables above and win where they differ)
+
+- **Explain**: Runs the decomposition and shows drivers; "Keep" saves it as an insight. *(source: contracts/satellite/ai.yaml#explainMetricChange)*
+- **Accept / Reject / Mark actioned**: Moves the insight along its lifecycle; measured is set later by the job that measures the effect. *(source: contracts/satellite/ai.yaml#decideAiInsight)*
+
+**Data it reads**: `listAiInsights` (onLoad, Insights and anomalies)
 
 **Where the user goes next**
 
@@ -1023,21 +1638,53 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |---|---|
 | Loading (`?state=loading`) | The insights list. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the insights untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No insights yet. Carries the create action; distinct from a filter that matched nothing. |
-| Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the insights are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Empty, first run (`?state=emptyFirstRun`) | No insights yet: nothing has moved enough to report. Good news, not a failure; the ask panel stays available. |
+| Empty, no results (`?state=emptyNoResults`) | Nothing matches the kind, priority or status filter, and the insights are still there. Names the active filter and offers to clear it. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `AI_USE`, which `listAiInsights` requires, and names that permission. **Never an empty list.** |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Question could not be interpreted. (ReportQuestionProblem); 409 The move is not allowed from the insight's state. |
+
+#### Edge cases to draw
+
+- **Question or metric outside the semantic model**: "Not available yet" naming what is not modelled; a knowledge gap is recorded; no improvised number. *(source: ADR-0054)*
+- **Only a few weeks of data**: Comparison against the last 7 days, said explicitly; year-on-year appears once imported or own history covers it. *(source: ADR-0051 (AI functions review 30 Sep §4 Analytics assistant))*
+- **The same situation detected by two detectors**: One insight (one correlation key), not two cards. *(source: contracts/satellite/ai.yaml#listAiInsights)*
+
+#### Consistency with other screens
+
+- Match `ANL-059`: History, evidence and explainability of the same insights.
+- Match `ANL-055`: Anomalies appear here as insights of kind anomaly; same card.
+- Match `ADM-506`: Same driver decomposition component.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+insight:
+  title: Online revenue down 14% last weekend at Coastal Aqua
+  kind: anomaly
+  priority: high
+  expectedImpact: AED 15,000-22,000 below forecast for the next weekend
+  drivers:
+  - Online -AED 18,400 (Family Day Pass)
+  - POS +AED 2,100
+  - 'Weather: 41°C Saturday (outdoor venue)'
+  reliability: grounded
+  dataAsOf: Mon 28 Sep 06:00
+  basis: Learning - compared with the same weekday over 6 weeks
+```
 
 #### Permissions
 
 - `askReportingQuestion` → `REPORT_VIEW_VENUE` (operate) · staff, partner
-- `listAnalyticsAnomalies` → `REPORT_VIEW_VENUE` (operate) · staff
 - `listAiInsights` → `AI_USE` (operate) · staff
 - `decideAiInsight` → `AI_USE` (operate) · staff
 - `explainMetricChange` → `AI_USE` (operate) · staff
 
-**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `AI_USE`, which `listAiInsights` requires, and names that permission. **Never an empty list.**
+
+Screen guard: `AI_USE`
 
 #### Requirements it meets
 
@@ -1069,17 +1716,19 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Workshop pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf board 1
 - Flow F175 *Unified BI Reporting and AI Analytics Platform board 1: Multi-Site & …*, step 16: Works in AI Management Insights → Provide management with proactive AI-generated business intelligence rather than requiring users to manually analyze every dashboard.
 - ADR-0054 *Natural-language analytics goes through the semantic layer* (`docs/adr/0054-natural-language-analytics-goes-through-the-semantic-layer.md`)
+- ADR-0053 *Owners keep their deterministic rules; AI owns cross-entity risk, alerts and cases* (`docs/adr/0053-risk-layer-ownership.md`)
 - ADR-0059 *AI phasing against the six-month plan* (`docs/adr/0059-ai-phasing-against-the-six-month-plan.md`)
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (400, 403, 404, 409).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (11), with its required mark, default, format and its error state (400, 403, 404, 409).
+- [ ] Every output is drawn (44 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ANL-019?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: , Cancel.
+- [ ] Every action is wired with its success and its failure: Accept, Mark actioned, Reject, Why did this change?.
 - [ ] Every transition is wired: `ANL-020`, `ANL-001`.
 - [ ] Every gated control is gated: `AI_USE`, `REPORT_VIEW_VENUE`.
 - [ ] The 2 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 3 edge case(s) from the process notes are drawn.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -1100,6 +1749,23 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | nothing: it opens on its own |
 | Route | `/analytics/multi-site-performance-comparison-anl-020` |
 
+**What the spec says about it.** **Measure names, not "Revenue"** (decided 2 October 2026, Chinmay; CHG-FIN-002; BOARDREQ MOM-2758..2761). Takings (money taken less money paid back, a cash-control figure), Gross sales (before discounts, excluding VAT), Net revenue (gross sales less discounts and refunds), Recognised revenue and Deferred revenue are different numbers and never share a label; a tile takes its label from the seeded KPI it is bound to (`ReportingSystemKpi`).
+
+**From the Finance, Ledger & Tax · Reporting & Analytics process.** Multi-site comparison for enterprise management: compare sites, venues, attractions or business units on like-for-like KPIs, this month against last month or the same period last year, and drill into why they differ. It is also the landing of the client's Board 1. The one thing to get right: the normalisation basis (per visitor, per operating hour, per staffed position, per m²) travels with every comparison.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **The benchmark read has no period or comparison parameter.** Why: DI-701 asks for this month vs last month / same period last year; getAnalyticsBenchmark takes only kpiId, scopePaths and normaliseBy. *(source: contracts/satellite/reporting.yaml#getAnalyticsBenchmark / DI-701; Finance, Ledger & Tax · Reporting & Analytics)*
+- **The board's flow names a venue manager as the actor, but the benchmark needs tenant scope.** Why: A venue manager can never open the comparison; either the actor or the scope is wrong. *(source: F175 step 1 / contracts/satellite/reporting.yaml#getAnalyticsBenchmark; Finance, Ledger & Tax · Reporting & Analytics)*
+- **Filters are "Scope path", "Period from", "Period to" and a normalisation-basis table is listed.** Why: A scope path is a spec leak; the basis table is configuration data owned by ANL-064. *(source: screens/P16-venue-analytics.yaml#ANL-020; Finance, Ledger & Tax · Reporting & Analytics)*
+- **"Customer Satisfaction", "Operational Exceptions", "Revenue", "Revenue Growth", "Refund %" and "Average Transaction Value" have no metric source (only revenuePerVisitor exists).** Why: Draw them only once defined as KPIs; "outlet performance score" is also undefined; bare "Revenue" must become Net revenue. *(source: contracts/satellite/reporting.yaml#/components/schemas/MetricSource / MATRIX 4.5.25 / MATRIX 8.7.1; Finance, Ledger & Tax · Reporting & Analytics)*
+
+#### Decided on this screen
+
+Answered questions: draw the decision, not the old default. Where a decision and the tables below differ, the decision wins.
+
+- **Group comparison across currencies — converted at what rate, or kept per currency?** → Drawn default accepted: Per-currency groups. *(decided by Chinmay, 2026-10-02; DEC-325 / CHG-NOTE-003)* **Reviewable:** a default the lead may still overrule before the block is tasked.
+
 #### Inputs: what the user enters or picks
 
 **On the screen**
@@ -1118,11 +1784,17 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Scope paths | text field | — | — | `getAnalyticsBenchmark` ?scopePaths |
 | Normalise by | radio group | — | None · Per visitor · Per operating hour · Per staffed position · Per square metre | `getAnalyticsBenchmark` ?normaliseBy |
 
+**Rules for these inputs** (from the Finance, Ledger & Tax · Reporting & Analytics process; these refine the tables above and win where they differ)
+
+- **sites**: Multi-select of sites in scope (labelled by name; never a scope path). *(source: contracts/satellite/reporting.yaml#getAnalyticsBenchmark)*
+- **normalise by**: None, Per visitor, Per operating hour, Per staffed position, Per square metre; default Per visitor for money KPIs. *(source: contracts/satellite/reporting.yaml#/components/schemas/BenchmarkNormalisation)*
+- **period and comparison**: This month vs last month (default) or vs same period last year. *(source: DI-701)*
+
 #### Outputs: what the screen shows and produces
 
 **Shown**
 
-**Revenue** (metric tile)
+**Net revenue** (metric tile): (CHG-FIN-002: never a bare "Revenue")
 
 **Revenue Growth** (metric tile)
 
@@ -1163,6 +1835,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Staffed positions | 1,234.5 | `perStaffedPosition`. Average positions staffed over the period. |
 | Area square metres | 1,234.5 | `perSquareMetre`. Operated area. |
 
+**Rules for what is shown** (from the Finance, Ledger & Tax · Reporting & Analytics process; these refine the tables above and win where they differ)
+
+- **comparison table**: Rows = sites, columns = KPIs; each cell shows the normalised value with the raw value beneath, the rank and the change vs the comparison period; the basis is in the column header ("Net revenue per visitor"). *(source: contracts/satellite/reporting.yaml#/components/schemas/BenchmarkRow)*
+- **ranking chart**: Sorted bar per KPI; ribbon (rank over time) cannot bind yet. *(source: MATRIX 8.7.25 / contracts/satellite/reporting.yaml#/components/schemas/DashboardTile)*
+- **AI reasons**: "Possible reasons" panel for the selected gap, opening root-cause analysis. *(source: DI-701)*
+
 **Data it reads**: `getAnalyticsBenchmark` (onLoad, Site against site, normalised); `listSiteNormalisationBases` (onLoad, The denominators each site is benchmarked by)
 
 **Where the user goes next**
@@ -1187,6 +1865,30 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the multi-site performance comparison are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Edge cases to draw
+
+- **A site has no basis for the period (visitors not recorded)**: "No basis for this period" in its cells; it is not ranked. *(source: contracts/satellite/reporting.yaml#/components/schemas/SiteNormalisationBasis)*
+- **Sites in different base currencies**: Money KPIs are not ranked across currencies unless converted; shown per currency group. *(source: contracts/shared/common.yaml#/components/schemas/Money)*
+- **A venue manager opens the board**: The comparison needs tenant scope; the screen says "Site comparison needs group access" rather than showing one site against itself. *(source: contracts/satellite/reporting.yaml#getAnalyticsBenchmark)*
+
+#### Consistency with other screens
+
+- Match `ANL-001`: The single-scope numbers on ANL-001 must equal the same site's raw value here.
+- Match `ANL-064`: Normalisation bases are maintained on ANL-064; ANL-020 only shows them as footnotes per site.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+period: September 2026 vs August 2026
+rows:
+- Aquaventure Waterpark · Net revenue per visitor AED 131.80 (rank 1, +4.2%) · F&B spend per visitor AED 34.20
+- Dubai Parks — Motiongate · AED 97.45 (rank 2, −1.8%) · AED 22.10
+- House of Wisdom, Sharjah · AED 42.10 (rank 3, +0.6%) · AED 8.90
+basis: 'Visitors: Aquaventure 284,100 · Motiongate 402,560 · House of Wisdom 31,780'
+```
 
 #### Permissions
 
@@ -1236,6 +1938,9 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `ANL-001`, `ANL-012`, `ANL-013`, `ANL-014`, `ANL-015`, `ANL-016`, `ANL-017`, `ANL-018`, `ANL-019`.
 - [ ] Every gated control is gated: `REPORT_VIEW_TENANT`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 3 edge case(s) from the process notes are drawn.
+- [ ] The 4 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
+- [ ] The 1 decision(s) taken on this screen are drawn as decided, not as the old default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -1327,10 +2032,9 @@ Method, path, parameters, request and response for every operation these screens
 "explainMetricChange": {"method":"POST","path":"/insights/explain-metric-change","contract":"ai","summary":"Why did this metric change","permission":"AI_USE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"AiMetricChangeExplanation"},
 "getAnalyticsBenchmark": {"method":"GET","path":"/analytics-benchmarks","contract":"reporting","summary":"One site against another, on a like-for-like basis","permission":"REPORT_VIEW_TENANT","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"tenant","parameters":[{"name":"kpiId","in":"query","required":true},{"name":"scopePaths","in":"query","required":null},{"name":"normaliseBy","in":"query","required":null}],"requestBody":null,"responds":"BenchmarkRow"},
 "getDashboard": {"method":"GET","path":"/dashboards/{dashboardId}","contract":"reporting","summary":"Read a dashboard with tile data","permission":"REPORT_VIEW_VENUE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"refresh","in":"query","required":null}],"requestBody":null,"responds":"DashboardData"},
-"getKpiValues": {"method":"GET","path":"/kpi-values","contract":"reporting","summary":"Current values, against target, with movement","permission":"REPORT_VIEW_VENUE","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[{"name":"kpiIds","in":"query","required":null},{"name":"kpiCodes","in":"query","required":null},{"name":"scopePath","in":"query","required":null},{"name":"period","in":"query","required":null},{"name":"compareTo","in":"query","required":null},{"name":"interval","in":"query","required":null},{"name":"groupBy","in":"query","required":null}],"requestBody":null,"responds":"KpiValue"},
+"getKpiValues": {"method":"GET","path":"/kpi-values","contract":"reporting","summary":"Current values, against target, with movement","permission":"REPORT_VIEW_VENUE","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[{"name":"kpiIds","in":"query","required":null},{"name":"kpiCodes","in":"query","required":null},{"name":"scopePath","in":"query","required":null},{"name":"period","in":"query","required":null},{"name":"compareTo","in":"query","required":null},{"name":"interval","in":"query","required":null},{"name":"groupBy","in":"query","required":null},{"name":"module","in":"query","required":null}],"requestBody":null,"responds":"KpiValue"},
 "listAiInsights": {"method":"GET","path":"/insights","contract":"ai","summary":"Insights and anomalies","permission":"AI_USE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"status","in":"query","required":null},{"name":"kind","in":"query","required":null},{"name":"priority","in":"query","required":null},{"name":"from","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listAlerts": {"method":"GET","path":"/alerts","contract":"reporting","summary":"What is currently wrong","permission":"REPORT_VIEW_VENUE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"status","in":"query","required":null},{"name":"severity","in":"query","required":null},{"name":"workstationId","in":"query","required":null},{"name":"shiftId","in":"query","required":null},{"name":"itemId","in":"query","required":null}],"requestBody":null,"responds":"Alert"},
-"listAnalyticsAnomalies": {"method":"GET","path":"/analytics-anomalies","contract":"reporting","summary":"Numbers that moved more than they should have","permission":"REPORT_VIEW_VENUE","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[{"name":"from","in":"query","required":null},{"name":"severity","in":"query","required":null}],"requestBody":null,"responds":"AnalyticsAnomaly"},
 "listPromotionAlertException": {"method":"GET","path":"/promotion-alert-exception","contract":"promotions","summary":"Promotion Alerts & Exception Center","permission":"PRICE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"PromotionAlertsExceptionCenterView"},
 "listSiteNormalisationBases": {"method":"GET","path":"/site-normalisation-bases","contract":"reporting","summary":"The denominators each site is benchmarked by","permission":"REPORT_VIEW_TENANT","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":"scopePath","in":"query","required":null},{"name":"periodFrom","in":"query","required":null},{"name":"periodTo","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"}
 }
@@ -1349,15 +2053,13 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "Alert": {"type":"object","x-ticvai-persistence":"reporting.alert","description":"A raised alert. **Acknowledged rather than dismissed** — CF-134 asked for it markable, and the difference is that an acknowledgement records who saw it.\n","required":["id","ruleId","raisedAt","severity","status"],"properties":{"id":{"type":"string","format":"uuid"},"ruleId":{"type":"string","format":"uuid"},"ruleName":{"type":"string","description":"`AlertRule.name` as it stood when the alert was raised. **The line a person reads** — a list of rule ids is not an alert panel, and a screen should not need `listAlertRules` to label one.\n"},"metric":{"allOf":[{"$ref":"#/components/schemas/MetricSource"}],"description":"The rule's metric, carried so the alert says what went out of range."},"raisedAt":{"type":"string","format":"date-time"},"severity":{"$ref":"#/components/schemas/AlertSeverity"},"status":{"$ref":"#/components/schemas/AlertStatus"},"observedValue":{"$ref":"#/components/schemas/MetricValue"},"threshold":{"$ref":"#/components/schemas/MetricValue"},"scopePath":{"type":"string"},"workstationId":{"type":"string","format":"uuid","nullable":true,"description":"The workstation the reading was taken for, where the metric is measured per workstation (`salesByWorkstation`). Null otherwise. `listAlerts` filters on it."},"shiftId":{"type":"string","format":"uuid","nullable":true,"description":"The till shift (`orders.pos_shift`) the reading belongs to, where it was taken for a workstation with a shift open. Null otherwise. `listAlerts` filters on it."},"itemId":{"type":"string","format":"uuid","nullable":true,"description":"The inventory item the reading is about, where the metric is measured per item (`stockAgeing`, `stockTurnover`, `wastageRate`, `inventoryValuation`). Null otherwise. **What a replenishment screen prefills a requisition from.**\n"},"acknowledgedByPrincipalId":{"type":"string","format":"uuid","nullable":true},"acknowledgedAt":{"type":"string","format":"date-time","nullable":true},"acknowledgementNote":{"type":"string","maxLength":300,"nullable":true,"description":"The `note` given to `acknowledgeAlert`. Kept, because an acknowledgement that says what is being done about it is the one escalation can skip."},"resolvedAt":{"type":"string","format":"date-time","nullable":true,"description":"**Set when the metric returns to range, automatically.** An alert that only a person can close is an alert list that only grows.\n"},"escalatedAt":{"type":"string","format":"date-time","nullable":true,"description":"Where `VenueSettings.alerting.escalateAfterMinutes` passed with no acknowledgement. **A critical alert nobody acknowledged is the case escalation exists for.**\n"}}},
 "AlertSeverity": {"type":"string","description":"How urgent an alert rule's breach is. Shared by `AlertRule`, `Alert` and the `listAlerts` filter.","enum":["info","warning","critical"]},
 "AlertStatus": {"type":"string","description":"Where a raised alert is. Shared by `Alert` and the `listAlerts` filter.","enum":["raised","acknowledged","resolved","expired"]},
-"AnalyticsAnomaly": {"type":"object","x-ticvai-persistence":"reporting.anomaly","description":"BI boards 9.5 and 9.6. **A departure from the series' own behaviour**, which catches what no threshold was set for.\n","properties":{"id":{"type":"string","format":"uuid"},"kpiId":{"type":"string","format":"uuid","nullable":true},"metric":{"type":"string"},"scopePath":{"type":"string"},"detectedAt":{"type":"string","format":"date-time"},"observed":{"$ref":"#/components/schemas/MetricValue"},"expected":{"$ref":"#/components/schemas/MetricValue"},"deviationSigma":{"type":"number","nullable":true},"severity":{"$ref":"#/components/schemas/AnomalySeverity"},"candidateCauses":{"type":"array","description":"**The beginning of the question, not the end of it.**","items":{"type":"object","properties":{"dimension":{"type":"string"},"value":{"type":"string"},"contribution":{"type":"number"}}}},"acknowledgedBy":{"type":"string","format":"uuid","nullable":true},"acknowledgedAt":{"type":"string","format":"date-time","nullable":true}}},
-"AnomalySeverity": {"type":"string","description":"Shared by `AnalyticsAnomaly` and the `listAnalyticsAnomalies` filter.","enum":["low","medium","high"]},
 "BenchmarkNormalisation": {"type":"string","description":"The basis a benchmark is compared on. Shared by `getAnalyticsBenchmark` and `BenchmarkRow`.","enum":["none","perVisitor","perOperatingHour","perStaffedPosition","perSquareMetre"]},
 "BenchmarkRow": {"type":"object","description":"BI board 10.4. **The normalisation travels with the comparison.**","properties":{"scopePath":{"type":"string"},"label":{"type":"string"},"value":{"$ref":"#/components/schemas/MetricValue"},"normalisedValue":{"allOf":[{"$ref":"#/components/schemas/MetricValue"}],"nullable":true},"normaliseBy":{"$ref":"#/components/schemas/BenchmarkNormalisation"},"rank":{"type":"integer"},"percentile":{"type":"number","nullable":true}}},
 "Dashboard": {"x-ticvai-persistence":"reporting.dashboard + reporting.dashboard_tile","allOf":[{"$ref":"#/components/schemas/CreateDashboardRequest"},{"type":"object","required":["id","ownerPrincipalId","aggregateCost","createdAt"],"properties":{"id":{"type":"string","format":"uuid"},"ownerPrincipalId":{"type":"string","format":"uuid"},"aggregateCost":{"type":"string","enum":["low","medium","high"],"description":"Combined refresh load of every tile."},"archivedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true,"description":"**Set by `deleteDashboard`, which archives rather than removes.** A dashboard's tiles carry `visualisation`, `parameters` and `refresh_seconds` that somebody configured, and `reporting.dashboard_tile` cascades — so a hard delete takes an afternoon's work with it and leaves nothing to say what was there.\nArchived dashboards are excluded from `listDashboards` unless asked for with `includeArchived=true`.\n"},"createdAt":{"type":"string","format":"date-time"}}}]},
 "DashboardData": {"x-ticvai-persistence":"none — computed","allOf":[{"$ref":"#/components/schemas/Dashboard"},{"type":"object","properties":{"tileData":{"type":"array","items":{"type":"object","properties":{"tileId":{"type":"string","format":"uuid"},"result":{"$ref":"#/components/schemas/ReportResult"},"isCached":{"type":"boolean"},"error":{"type":"string","nullable":true}}}}}}]},
 "GeneratedQuery": {"x-ticvai-persistence":"none — embedded; stored whole in `reporting.natural_language_query`","type":"object","description":"The structured query a natural-language question produced — data source, columns, filters, grouping. Named on 26 September so the answer and the kept copy are one shape.\n","properties":{"dataSource":{"$ref":"#/components/schemas/DataSource"},"columns":{"type":"array","items":{"$ref":"#/components/schemas/ReportColumn"}},"filters":{"type":"array","items":{"$ref":"#/components/schemas/ReportFilter"}},"groupBy":{"type":"array","items":{"type":"string"}},"compiledSql":{"type":"string","nullable":true,"description":"The SQL the semantic spec compiled to, exactly as run on the analytical replica (29 September, design 5.7). The replica's row-level security applies beneath it, so it does not need to carry the caller's scope. Null on queries kept before the semantic compile.\n"}}},
 "KpiValue": {"type":"object","description":"BI board 10.3. **Value, target, variance, direction and freshness in one read.**","properties":{"kpiId":{"type":"string","format":"uuid"},"code":{"type":"string"},"bucketStart":{"type":"string","format":"date-time","nullable":true,"description":"The start of the bucket this value covers, when `getKpiValues` was asked for an `interval`; null otherwise."},"groupKey":{"type":"string","nullable":true,"description":"The value of the `groupBy` dimension this row is for (a status, a category code, a tier); null when no `groupBy` was asked."},"name":{"type":"string"},"scopePath":{"type":"string"},"period":{"type":"string"},"value":{"$ref":"#/components/schemas/MetricValue"},"target":{"allOf":[{"$ref":"#/components/schemas/MetricValue"}],"nullable":true},"comparison":{"allOf":[{"$ref":"#/components/schemas/MetricValue"}],"nullable":true},"variancePercent":{"type":"number","nullable":true},"direction":{"type":"string","enum":["up","down","flat"]},"status":{"type":"string","enum":["green","amber","red","noTarget"]},"asOf":{"type":"string","format":"date-time"},"stale":{"type":"boolean","description":"**True when the pipeline behind it has not refreshed.** A number nobody flagged as stale is a number somebody will act on.\n"}}},
-"MetricSource": {"type":"string","description":"**A named metric with a verified source.** BL-053, 75 requirement rows.\n`reporting` is a generic builder, and **a generic builder makes every reporting requirement look covered** — it will happily assemble a report over data nobody produces. That is the shape to watch across the whole walk, and this enum is the answer to it: each value below was checked against the schema before being named.\n| Metric | Source | |---|---| | `occupancy` | `catalogue.channel_capacity.sold` and `leased` against `capacity` | | `capacityUtilisation` | `catalogue.channel_capacity.remaining` over the same window | | `admissionRate` | `access.scan_event.outcome`, in-direction | | `noShowRate` | Entitlements issued against scans that never arrived | | `conversion` | `orders.cart` against `orders.sales_order` | | `salesByOperator` | `orders.sales_order.principal_id` | | `salesByWorkstation` | The workstation on the shift that took it | | `waitTime` | `queue.waiting_guest.estimated_call_at` against `called_at` | | `throughput` | `queue.waiting_guest` completions per hour | | `abandonmentRate` | Queue entries that left before being called |\n**`salesByInstructor` was deliberately absent from the first cut** because it needed the staff-assignment link CL-01 covers. It was added on 18 August once `resources.Resource` produced it — see `x-ticvai-extension-note` below. Naming a metric with no source is still the defect this enum exists to prevent.\n**Money-valued metrics are listed in `x-ticvai-money-valued`.** A reading or threshold on one of them is a `Money`, never a float (`MetricValue`).\n","enum":["occupancy","capacityUtilisation","admissionRate","noShowRate","conversion","salesByOperator","salesByWorkstation","waitTime","throughput","abandonmentRate","inventoryValuation","stockTurnover","stockAgeing","wastageRate","resaleVolume","resaleCommission","salesByInstructor","resourceUtilisation","allocationUtilisation","channelAllocationBurn","membershipChurn","membershipRenewalRate","supplierDeliveryPerformance","revenuePerEntitlement","revenuePerVisitor","assetDowntime","meanTimeToRepair","challengeCompletionRate","attributedRevenue","loyaltyActiveMembers","loyaltyTierDistribution","loyaltyPointsLiability","loyaltyBreakageRate","loyaltyMemberRetention","challengeParticipationRate","gamificationLoyaltyImpact","gamificationMembershipImpact","gamificationRetention","accreditationApplications","accreditationTimeToDecision","accreditationCredentialsIssued","accreditationActiveHolders","accreditationRenewalsDue","staffingShortfall"],"x-ticvai-money-valued":["inventoryValuation","resaleCommission","revenuePerEntitlement","revenuePerVisitor","attributedRevenue","loyaltyPointsLiability"],"x-ticvai-extended-29-september":"**Fourteen metrics added 29 September (build pass)**, each checked against the schema of the contract that produces it.\n\n| Metric | Source | Requirement | |---|---|---| | `loyaltyActiveMembers` | `marketing.loyalty_position` members with a `marketing.loyalty_points` movement in the period | 5.4.27 | | `loyaltyTierDistribution` | `marketing.loyalty_position.tier_id` against `marketing.programme_tier`, members per tier | 5.4.27 | | `loyaltyPointsLiability` | the balance of `ledger.journal_line` on each programme's `pointsLiabilityAccountId`, where points post on accrual and release on redemption or expiry | 5.4.27 | | `loyaltyBreakageRate` | `marketing.loyalty_points` expiry movements over points earned, in the period | 5.4.27 | | `loyaltyMemberRetention` | members with a movement in the previous period who also have one in this period | 5.4.27 | | `challengeParticipationRate` | distinct `marketing.challenge_progress.subject_id` over active loyalty members | 22.6.20 | | `gamificationLoyaltyImpact` | points earned per member, challenge participants against non-participants (`marketing.loyalty_points` split by `marketing.challenge_progress`) | 22.6.20 | | `gamificationMembershipImpact` | joins and renewals in `identity.customer_membership`, participants against non-participants | 22.6.20 | | `gamificationRetention` | return visits (`access.scan_event`, in-direction) of participants against non-participants | 22.6.20 | | `accreditationApplications` | `accreditation.application` by `status` | 12.1.50 | | `accreditationTimeToDecision` | `accreditation.application.decided_at` minus `submitted_at` | 12.1.50 | | `accreditationCredentialsIssued` | `accreditation.credential.issued_at` | 12.1.50 | | `accreditationActiveHolders` | `accreditation.holder` `active`, by `category_code` | 12.1.50 | | `accreditationRenewalsDue` | `accreditation.holder.valid_to` inside `accreditation.validity.renewal_window_days` | 12.1.50 |\n\n**`staffingShortfall` added the same evening (build pass, group G2; 8.2.49)**: the largest gap in the window between the staff rostered and the staff the forecast requires, per venue and position, from `workforce.forecast_requirement` (the handed-over AI staff requirement) against `workforce.rota_assignment` and `workforce.open_shift`, computed as `workforce.getStaffingCoverage` with `basis` `forecastRequirement`. An `AlertRule` on it with `comparator` `above` and `threshold` 0 is the staffing shortage alert; `windowMinutes` looks ahead rather than back for this metric (the rota for the coming window), and `cooldownMinutes` stops one short shift alerting every quarter hour.\n\n**Points issued, points redeemed, campaign performance and reward redemption were already served** by the `loyalty` and `campaigns` sources, and challenge completion and revenue attribution by `challengeCompletionRate` and `attributedRevenue`.\n","x-ticvai-money-valued-note":"**`salesByOperator`, `salesByWorkstation` and `resaleVolume` are not listed because the package does not say whether they count sales or sum their value.** Until that is decided, a rule on them carries a plain number.\n","x-ticvai-extended":"18 August 2026","x-ticvai-extension-note":"**Nineteen metrics added when their upstream models landed**, which is how BL-053 was always going to close — not by changing `reporting` but by building the things it wanted to report on.\n`inventoryValuation`, `stockTurnover`, `stockAgeing` and `wastageRate` came from `inventory.StockBatch`; `resaleVolume` and `resaleCommission` from `orders.ResaleListing`; **`salesByInstructor` from `resources.Resource`, which was the one metric this enum deliberately refused to name in the morning** because nothing produced it. `allocationUtilisation` from `PartnerUser` and `ChannelListing`, `membershipChurn` from `Journey`, `supplierDeliveryPerformance` from `ProductionRun`, `assetDowntime` and `meanTimeToRepair` from `WorkOrder.downtimeMinutes`, `challengeCompletionRate` from `ChallengeProgress`, `attributedRevenue` from `AttributionTouch`.\n**Each was checked against the schema before being named.** That rule has not changed — naming a metric with no source is the defect this enum exists to prevent.\n"},
+"MetricSource": {"type":"string","description":"**A named metric with a verified source.** BL-053, 75 requirement rows.\n`reporting` is a generic builder, and **a generic builder makes every reporting requirement look covered** — it will happily assemble a report over data nobody produces. That is the shape to watch across the whole walk, and this enum is the answer to it: each value below was checked against the schema before being named.\n| Metric | Source | |---|---| | `occupancy` | `catalogue.channel_capacity.sold` and `leased` against `capacity` | | `capacityUtilisation` | `catalogue.channel_capacity.remaining` over the same window | | `admissionRate` | `access.scan_event.outcome`, in-direction | | `noShowRate` | Entitlements issued against scans that never arrived | | `conversion` | `orders.cart` against `orders.sales_order` | | `salesByOperator` | `orders.sales_order.principal_id` | | `salesByWorkstation` | The workstation on the shift that took it | | `waitTime` | `queue.waiting_guest.estimated_call_at` against `called_at` | | `throughput` | `queue.waiting_guest` completions per hour | | `abandonmentRate` | Queue entries that left before being called |\n**`salesByInstructor` was deliberately absent from the first cut** because it needed the staff-assignment link CL-01 covers. It was added on 18 August once `resources.Resource` produced it — see `x-ticvai-extension-note` below. Naming a metric with no source is still the defect this enum exists to prevent.\n**Money-valued metrics are listed in `x-ticvai-money-valued`.** A reading or threshold on one of them is a `Money`, never a float (`MetricValue`).\n","enum":["occupancy","capacityUtilisation","admissionRate","noShowRate","conversion","salesByOperator","salesByWorkstation","waitTime","throughput","abandonmentRate","inventoryValuation","stockTurnover","stockAgeing","wastageRate","resaleVolume","resaleCommission","salesByInstructor","resourceUtilisation","allocationUtilisation","channelAllocationBurn","membershipChurn","membershipRenewalRate","supplierDeliveryPerformance","revenuePerEntitlement","revenuePerVisitor","assetDowntime","meanTimeToRepair","challengeCompletionRate","attributedRevenue","loyaltyActiveMembers","loyaltyTierDistribution","loyaltyPointsLiability","loyaltyBreakageRate","loyaltyMemberRetention","challengeParticipationRate","gamificationLoyaltyImpact","gamificationMembershipImpact","gamificationRetention","accreditationApplications","accreditationTimeToDecision","accreditationCredentialsIssued","accreditationActiveHolders","accreditationRenewalsDue","staffingShortfall","grossSales","discounts","refunds","netRevenue","recognisedRevenue","deferredRevenue","taxCollected","takings"],"x-ticvai-money-valued":["grossSales","discounts","refunds","netRevenue","recognisedRevenue","deferredRevenue","taxCollected","takings","inventoryValuation","resaleCommission","revenuePerEntitlement","revenuePerVisitor","attributedRevenue","loyaltyPointsLiability"],"x-ticvai-extended-29-september":"**Fourteen metrics added 29 September (build pass)**, each checked against the schema of the contract that produces it.\n\n| Metric | Source | Requirement | |---|---|---| | `loyaltyActiveMembers` | `marketing.loyalty_position` members with a `marketing.loyalty_points` movement in the period | 5.4.27 | | `loyaltyTierDistribution` | `marketing.loyalty_position.tier_id` against `marketing.programme_tier`, members per tier | 5.4.27 | | `loyaltyPointsLiability` | the balance of `ledger.journal_line` on each programme's `pointsLiabilityAccountId`, where points post on accrual and release on redemption or expiry | 5.4.27 | | `loyaltyBreakageRate` | `marketing.loyalty_points` expiry movements over points earned, in the period | 5.4.27 | | `loyaltyMemberRetention` | members with a movement in the previous period who also have one in this period | 5.4.27 | | `challengeParticipationRate` | distinct `marketing.challenge_progress.subject_id` over active loyalty members | 22.6.20 | | `gamificationLoyaltyImpact` | points earned per member, challenge participants against non-participants (`marketing.loyalty_points` split by `marketing.challenge_progress`) | 22.6.20 | | `gamificationMembershipImpact` | joins and renewals in `identity.customer_membership`, participants against non-participants | 22.6.20 | | `gamificationRetention` | return visits (`access.scan_event`, in-direction) of participants against non-participants | 22.6.20 | | `accreditationApplications` | `accreditation.application` by `status` | 12.1.50 | | `accreditationTimeToDecision` | `accreditation.application.decided_at` minus `submitted_at` | 12.1.50 | | `accreditationCredentialsIssued` | `accreditation.credential.issued_at` | 12.1.50 | | `accreditationActiveHolders` | `accreditation.holder` `active`, by `category_code` | 12.1.50 | | `accreditationRenewalsDue` | `accreditation.holder.valid_to` inside `accreditation.validity.renewal_window_days` | 12.1.50 |\n\n**`staffingShortfall` added the same evening (build pass, group G2; 8.2.49)**: the largest gap in the window between the staff rostered and the staff the forecast requires, per venue and position, from `workforce.forecast_requirement` (the handed-over AI staff requirement) against `workforce.rota_assignment` and `workforce.open_shift`, computed as `workforce.getStaffingCoverage` with `basis` `forecastRequirement`. An `AlertRule` on it with `comparator` `above` and `threshold` 0 is the staffing shortage alert; `windowMinutes` looks ahead rather than back for this metric (the rota for the coming window), and `cooldownMinutes` stops one short shift alerting every quarter hour.\n\n**Points issued, points redeemed, campaign performance and reward redemption were already served** by the `loyalty` and `campaigns` sources, and challenge completion and revenue attribution by `challengeCompletionRate` and `attributedRevenue`.\n","x-ticvai-extended-2-october":"**Eight finance measures added 2 October 2026** (Chinmay; CHG-FIN-007, CHG-FIN-010), each with the source and formula of the seeded KPI of the same code in `ReportingSystemKpi`: `grossSales`, `discounts`, `refunds`, `netRevenue`, `recognisedRevenue`, `deferredRevenue`, `taxCollected` and `takings`, so an alert rule can watch them (a refund spike, takings below a target). Formulas are the D-185 default; client finance sign-off is pending.","x-ticvai-money-valued-note":"**`salesByOperator`, `salesByWorkstation` and `resaleVolume` are not listed because the package does not say whether they count sales or sum their value.** Until that is decided, a rule on them carries a plain number.\n","x-ticvai-extended":"18 August 2026","x-ticvai-extension-note":"**Nineteen metrics added when their upstream models landed**, which is how BL-053 was always going to close — not by changing `reporting` but by building the things it wanted to report on.\n`inventoryValuation`, `stockTurnover`, `stockAgeing` and `wastageRate` came from `inventory.StockBatch`; `resaleVolume` and `resaleCommission` from `orders.ResaleListing`; **`salesByInstructor` from `resources.Resource`, which was the one metric this enum deliberately refused to name in the morning** because nothing produced it. `allocationUtilisation` from `PartnerUser` and `ChannelListing`, `membershipChurn` from `Journey`, `supplierDeliveryPerformance` from `ProductionRun`, `assetDowntime` and `meanTimeToRepair` from `WorkOrder.downtimeMinutes`, `challengeCompletionRate` from `ChallengeProgress`, `attributedRevenue` from `AttributionTouch`.\n**Each was checked against the schema before being named.** That rule has not changed — naming a metric with no source is the defect this enum exists to prevent.\n"},
 "MetricValue": {"x-ticvai-persistence-column":"numeric(18,4)","description":"**A reading of a metric or KPI, or a threshold on one.** A `Money` where the metric is money-valued — `MetricSource` lists those in `x-ticvai-money-valued`, and a KPI is when its `unit` is `currency` — and a plain number otherwise. naming-and-style 5.1: money is never a float, at any layer.\nStored as `numeric(18,4)` either way: a money value stores its amount, and currency and scale resolve from the scope as they do for every `Money`.\n","oneOf":[{"type":"number"},{"$ref":"../shared/common.yaml#/components/schemas/Money"}]},
 "NaturalLanguageAnswer": {"x-ticvai-persistence":"none — computed","type":"object","required":["conversationId","question","interpretation","result","reliability"],"properties":{"conversationId":{"type":"string"},"question":{"type":"string"},"interpretation":{"type":"string","description":"What the question was understood to mean, in plain language. When the question is outside the semantic model, the \"not available yet\" sentence."},"semanticSpec":{"allOf":[{"$ref":"#/components/schemas/ReportingSemanticQuerySpec"}],"nullable":true,"description":"What the model returned instead of SQL (design 2.2 E, 5.7): metric, dimensions, filters, period, comparison, as validated against the semantic model. Null when the question is outside it. **Also kept**, on `NaturalLanguageQuery`, so a follow-up edits it.\n"},"generatedQuery":{"allOf":[{"$ref":"#/components/schemas/GeneratedQuery"}],"nullable":true,"description":"The query the spec compiled to: data source, columns, filters, grouping, and the compiled SQL in `compiledSql`. Returned so the answer can be checked. An answer nobody can verify is worse than no answer. **Also kept, as `NaturalLanguageQuery`**, for `saveNaturalLanguageQuery`. Null when the question is outside the semantic model.\n"},"result":{"allOf":[{"$ref":"#/components/schemas/ReportResult"}],"nullable":true,"description":"Null when the question is outside the semantic model."},"dataAsOf":{"type":"string","format":"date-time","nullable":true,"description":"Replica position the answer was read at, the result's `dataAsOf`, stated beside the answer so a figure that moved is not argued about. Null when nothing was run."},"reliability":{"$ref":"#/components/schemas/ReportingAnswerReliability"},"unavailableReason":{"allOf":[{"$ref":"#/components/schemas/ReportingUnavailableReason"}],"nullable":true,"description":"Set only when `reliability` is `insufficientEvidence` because the question is outside the semantic model (\"not available yet\"); names which part is not modelled."},"confidence":{"type":"number","minimum":0,"maximum":1,"deprecated":true,"description":"Superseded by `reliability` on 29 September (design 5.6, never a bare percentage for analytics). Returned for one release, then removed."},"suggestedFollowUps":{"type":"array","items":{"type":"string"}},"modelVersion":{"type":"string"},"tokensUsed":{"type":"integer"}}},
 "Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}},

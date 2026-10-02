@@ -1306,6 +1306,154 @@
    }
   }
  },
+ "KnowledgeCollection": {
+  "type": "object",
+  "x-ticvai-persistence": "ai.knowledge_collection",
+  "required": [
+   "name",
+   "scopeLevel"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "name": {
+    "type": "string"
+   },
+   "description": {
+    "type": "string"
+   },
+   "scopeLevel": {
+    "type": "string",
+    "enum": [
+     "tenant",
+     "region",
+     "venue"
+    ]
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true
+   },
+   "documentCount": {
+    "type": "integer",
+    "readOnly": true
+   },
+   "shardKey": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The tenant boundary on shared placement** (ADR-0021). A collection is shared by every tenant using the same embedding model, and the shard separates them — set at provisioning from the tenant, never from a request.\nOn dedicated placement there is one shard and this is still populated, because a tenant moving from shared to dedicated moves a shard rather than being re-indexed.\n"
+   },
+   "retrieval": {
+    "type": "string",
+    "enum": [
+     "dense",
+     "hybrid"
+    ],
+    "default": "hybrid",
+    "description": "**Set at creation and not changeable.** A collection created dense-only cannot gain a sparse index without a full rebuild, which is why this is a creation decision rather than a query one.\nHybrid is the default because **a venue corpus is mostly proper nouns** — Yas Waterworld, Bronze Annual Pass, a menu item name. Dense retrieval is good at meaning and poor at exact tokens, and half our queries are exact tokens.\n"
+   },
+   "sparseModel": {
+    "type": "string",
+    "nullable": true,
+    "description": "The sparse signal, where `retrieval` is `hybrid`. BM25 unless a tenant needs otherwise."
+   },
+   "idfScope": {
+    "type": "string",
+    "enum": [
+     "shard",
+     "tenant",
+     "venue"
+    ],
+    "default": "tenant",
+    "description": "**Which population the sparse score measures rarity against** (ADR-0021). Qdrant computes IDF statistics shard-wide by default, so a term common at one venue and rare at another gets one score for both. Shard-per-tenant fixes the cross-tenant case; **inside a dedicated cell the shard is the whole tenant and venues share it**, which is what this narrows.\n"
+   },
+   "embeddingModel": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**This is what decides how many collections exist** (ADR-0021). A collection carries its own vector configuration and a shard cannot, so vectors from two models cannot share one. A tenant that residency forces onto a local model therefore has its own collection — forced by the model, not chosen for isolation.\nRead-only because **changing it invalidates every embedding in the collection**, and a collection silently searched with mismatched vectors returns plausible nonsense.\n"
+   },
+   "isActive": {
+    "type": "boolean"
+   }
+  }
+ },
+ "KnowledgeDocument": {
+  "type": "object",
+  "x-ticvai-persistence": "ai.knowledge_document",
+  "required": [
+   "title",
+   "sourceAssetId"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "collectionId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "title": {
+    "type": "string"
+   },
+   "sourceAssetId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "mimeType": {
+    "type": "string"
+   },
+   "reingestDocumentId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "writeOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "An `indexed` or `failed` document in this collection to process again from `sourceAssetId`. **The same document** returns to `processing` and keeps its id (states/ai-knowledge-document.yaml). A request, not a fact about the row, so it is not stored.\n"
+   },
+   "supersedesDocumentId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The `indexed` document in this collection that this one replaces. It moves to `superseded` when this one reaches `indexed`, and is kept — **a technician who followed version 2 last week needs version 2 to still exist.**\n"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "processing",
+     "indexed",
+     "failed",
+     "superseded"
+    ],
+    "readOnly": true
+   },
+   "chunkCount": {
+    "type": "integer",
+    "readOnly": true
+   },
+   "failureReason": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true
+   },
+   "indexedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**Added 29 September (AI design 3.1):** `ai.knowledge_document` had no policy, so neither did its chunks. Copied from the collection at ingestion, narrowed where the document is venue-specific (\"documents carry the scope they may be retrieved at\"). `ai.chunk_embedding` is scoped through this row.\n"
+   }
+  }
+ },
  "MessageChannel": {
   "type": "string",
   "enum": [

@@ -112,6 +112,30 @@
   "requestBody": "IssueGiftCardRequest",
   "responds": "GiftCard"
  },
+ "listCreditLots": {
+  "method": "GET",
+  "path": "/credit-lots",
+  "contract": "wallet",
+  "summary": "The tranches behind a balance, with their expiry",
+  "permission": "WALLET_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "walletId",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "includeExhausted",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "CreditLot"
+ },
  "listVoucherTypes": {
   "method": "GET",
   "path": "/voucher-types",
@@ -124,6 +148,30 @@
   "parameters": [],
   "requestBody": null,
   "responds": "VoucherType"
+ },
+ "listWalletConfigurationVersions": {
+  "method": "GET",
+  "path": "/wallet-configuration/versions",
+  "contract": "wallet",
+  "summary": "Wallet configuration versions, newest first",
+  "permission": "WALLET_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
  },
  "publishWalletConfiguration": {
   "method": "POST",

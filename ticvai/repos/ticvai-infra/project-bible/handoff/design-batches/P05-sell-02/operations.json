@@ -211,6 +211,25 @@
   "requestBody": null,
   "responds": "ShopAndDrop"
  },
+ "reprintOrder": {
+  "method": "POST",
+  "path": "/orders/{orderId}/reprints",
+  "contract": "orders",
+  "summary": "Reprint or resend tickets",
+  "permission": "ORDER_REPRINT",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
  "reserveMerchandise": {
   "method": "POST",
   "path": "/outlets/{outletId}/reserve",
@@ -229,24 +248,5 @@
   ],
   "requestBody": null,
   "responds": "MerchandiseReservation"
- },
- "transferOrderTickets": {
-  "method": "POST",
-  "path": "/orders/{orderId}/transfer",
-  "contract": "orders",
-  "summary": "Transfer tickets to another guest",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": null
  }
 }

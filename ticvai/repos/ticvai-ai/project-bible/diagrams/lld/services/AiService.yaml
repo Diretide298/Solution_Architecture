@@ -1,5 +1,5 @@
 id: LLD-AiService
-title: AiService — 141 operations, 74 tables
+title: AiService — 144 operations, 75 tables
 generatedBy: tools/derive-diagrams.py
 tier: engagement
 deployable: ticvai-ai
@@ -11,14 +11,14 @@ why: '**Separate at any size, and not because of size.** ADR-0020 makes it a har
 scale: Latency-tolerant, cost-sensitive, token-metered. Different hardware from everything else.
 ifDown: Down degrades suggestions and the concierge. **Nothing that takes money depends on it.**
 coverage:
-  operations: 141
+  operations: 144
   inAFlow: 18
-  percent: 13%
+  percent: 12%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
 - schema: ai
-  tables: 74
+  tables: 75
   stores:
   - postgres
   - postgres-analytical
@@ -29,7 +29,7 @@ schemas:
   largestTable: —
 operationsByContract:
 - contract: ai
-  count: 141
+  count: 144
   operations:
   - operation: addRiskCaseEvidence
     verb: POST
@@ -351,6 +351,14 @@ operationsByContract:
     offline: false
     reads: 1
     writes: 0
+  - operation: getAiSpendCeiling
+    verb: GET
+    path: /policy/spend-ceiling
+    scope: venue
+    permission: AI_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 0
   - operation: getAiUsage
     verb: GET
     path: /usage
@@ -438,6 +446,14 @@ operationsByContract:
     permission: RISK_INVESTIGATE
     offline: false
     reads: 4
+    writes: 0
+  - operation: getTranslationProposals
+    verb: GET
+    path: /ai/translate/{translationJobId}
+    scope: tenant
+    permission: TENANT_CONFIGURE
+    offline: false
+    reads: 0
     writes: 0
   - operation: getVenueHistoryImport
     verb: GET
@@ -1071,6 +1087,14 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 2
+  - operation: setAiSpendCeiling
+    verb: PUT
+    path: /policy/spend-ceiling
+    scope: venue
+    permission: AI_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
   - operation: setAiTool
     verb: PUT
     path: /tools/{toolKey}
@@ -1559,7 +1583,7 @@ tables:
   - ai
   foreignWriters: null
 - table: ai.byok_enablement
-  columns: 10
+  columns: 11
   store: postgres
   parent: null
   writtenBy:
@@ -1675,7 +1699,7 @@ tables:
   writtenBy: []
   foreignWriters: null
 - table: ai.forecast_definition
-  columns: 19
+  columns: 20
   store: postgres
   parent: null
   writtenBy:
@@ -1703,7 +1727,7 @@ tables:
   - ai
   foreignWriters: null
 - table: ai.forecast_version
-  columns: 17
+  columns: 18
   store: postgres
   parent: null
   writtenBy:
@@ -1758,7 +1782,7 @@ tables:
   writtenBy: []
   foreignWriters: null
 - table: ai.incident
-  columns: 16
+  columns: 19
   store: postgres
   parent: null
   writtenBy:
@@ -1841,7 +1865,7 @@ tables:
   - ai
   foreignWriters: null
 - table: ai.model
-  columns: 16
+  columns: 19
   store: postgres
   parent: null
   writtenBy:
@@ -1855,7 +1879,7 @@ tables:
   - ai
   foreignWriters: null
 - table: ai.policy
-  columns: 28
+  columns: 31
   store: postgres
   parent: null
   writtenBy:
@@ -1883,7 +1907,7 @@ tables:
   - ai
   foreignWriters: null
 - table: ai.provider
-  columns: 22
+  columns: 26
   store: postgres
   parent: null
   writtenBy:
@@ -1911,7 +1935,7 @@ tables:
   - ai
   foreignWriters: null
 - table: ai.release
-  columns: 17
+  columns: 18
   store: postgres
   parent: null
   writtenBy:
@@ -1966,6 +1990,13 @@ tables:
   foreignWriters: null
 - table: ai.signal_source
   columns: 10
+  store: postgres
+  parent: null
+  writtenBy:
+  - ai
+  foreignWriters: null
+- table: ai.spend_ceiling
+  columns: 5
   store: postgres
   parent: null
   writtenBy:
@@ -2048,20 +2079,30 @@ screens:
 - P06:EMP-031 Queue monitor
 - P06:EMP-040 Knowledge base
 - P06:EMP-041 Training
+- P08:ADM-047 AI Delivery Optimization & Communication Platform Diagnostics
+- P08:ADM-366 AI Approval Intelligence Center
+- P08:ADM-633 Fraud Alert, Investigation & Case Management
+- P08:ADM-637 AI Fraud, Anomaly & Payment Intelligence Center
+- P08:ADM-638 Payment Executive Intelligence, Risk Simulator & AI Advisor
+- P08:ADM-678 Journey Simulator, Decision Trace & AI Optimization
+- P08:ADM-680 Customer Recommendation Profile
+- P08:ADM-683 Next-Best-Offer Decision Studio
+- P08:ADM-686 Anonymous, Known & Identity-Transition Personalization.123
+- P08:ADM-687 AI Explainability, Confidence & Model Governance
+- P08:ADM-696 AI Risk, Fairness, Explainability & Safety Center
+- P08:ADM-697 Recommendation Audit, Decision Trace & Investigation
 - P08:BO-005 Queue Monitor
 - P08:BO-084 Approval Inbox
-- P08:BO-088 Approval Analytics
 - P08:BO-091 AI Policy & Spend
 - P08:BO-093 Map Import & Labelling
 - P08:BO-102 Sell
 - P08:BO-1048 Seat Upsell Recommendations
-- P08:BO-115 Category, Brand & Merchandise Hierarchy
 - P08:BO-1160 Fraud Alert & Investigation Case Management
 - P08:BO-117 Product Import, Governance & AI Configuration Assistant
 - P08:BO-119 Cross-Sell, Upsell & Recommendation Rules
-- P08:BO-138 Production Execution & Batch Management
 - P08:BO-139 Wastage, Spoilage, Returns & Write-Off
 - P08:BO-367 Approval Request Detail
+- P08:BO-368 AI Decision Support
 - P08:BO-369 High Priority & Risk Queue
 - P08:BO-597 AI Configuration Workspace
 - P08:BO-598 AI Draft Review & Approval
@@ -2091,9 +2132,6 @@ screens:
 - P08:BO-982 Approval, Publish & Rollback
 - P09:ADM-004 Platform Audit Log
 - P09:ADM-037 AI Provider & Credentials
-- P09:ADM-047 AI Delivery Optimization & Communication Platform Diagnostics
-- P09:ADM-249 Unified Approval Inbox & Decision Workspace
-- P09:ADM-366 AI Approval Intelligence Center
 - P09:ADM-469 AI Configuration Home & Start
 - P09:ADM-470 Setup Type & Business Intent Discovery
 - P09:ADM-471 Venue & Business Model Discovery
@@ -2184,21 +2222,12 @@ screens:
 - P09:ADM-556 AI Incident & Remediation Management
 - P09:ADM-557 AI Compliance, Assurance & Governance Reporting
 - P09:ADM-558 AI Governance Review, Action Plan & Continuous Improvement
-- P09:ADM-633 Fraud Alert, Investigation & Case Management\t170
-- P09:ADM-637 AI Fraud, Anomaly & Payment Intelligence Center\t175
-- P09:ADM-638 Payment Executive Intelligence, Risk Simulator & AI Advisor\t176
-- P09:ADM-678 Journey Simulator, Decision Trace & AI Optimization
-- P09:ADM-680 Customer Recommendation Profile
-- P09:ADM-683 Next-Best-Offer Decision Studio
-- P09:ADM-686 Anonymous, Known & Identity-Transition Personalization.123
-- P09:ADM-687 AI Explainability, Confidence & Model Governance
-- P09:ADM-696 AI Risk, Fairness, Explainability & Safety Center
-- P09:ADM-697 Recommendation Audit, Decision Trace & Investigation
 - P12:SUP-006 Knowledge Base Search
 - P12:SUP-018 AI Customer Service Copilot & Knowledge Workspace
 - P13:CMS-007 Page Builder
 - P13:CMS-008 Content Blocks
 - P13:CMS-010 Media Library
+- P13:CMS-011 Translations
 - P13:CMS-062 Central Digital Asset Library
 - P13:CMS-101 Help Me Choose
 - P13:CMS-104 App Build & Store Publishing
@@ -2214,6 +2243,7 @@ screens:
 - P16:ANL-058 AI Recommendation & Next-Best-Action Center
 - P16:ANL-059 AI Insight History, Evidence & Explainability
 - P16:ANL-060 AI Analytics Governance & Model Control
+- P16:ANL-070 Analytics Governance, Security & Audit Center
 - P16:ANL-071 AI Maturity & Learning
 flows:
 - F100 An AI provider is configured, budgeted and audited

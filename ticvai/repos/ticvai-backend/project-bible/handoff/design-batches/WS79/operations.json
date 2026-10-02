@@ -18,24 +18,99 @@
   "requestBody": null,
   "responds": "Reader"
  },
- "enrolDevice": {
-  "method": "POST",
-  "path": "/devices/{deviceId}/enrolment",
+ "getDevice": {
+  "method": "GET",
+  "path": "/devices/{deviceId}",
   "contract": "tenancy",
-  "summary": "Take a registered device through enrolment to activation",
-  "permission": "DEVICE_MANAGE",
+  "summary": "Read one registered device",
+  "permission": "DEVICE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "RegisteredDevice"
+ },
+ "getGamePricing": {
+  "method": "GET",
+  "path": "/game-pricing",
+  "contract": "games",
+  "summary": "The effective price at a reader, and why",
+  "permission": "PRICE_VIEW",
   "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "gameId",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "readerId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "at",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "guestTier",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "GamePriceResolution"
+ },
+ "getGameplayValidationRules": {
+  "method": "GET",
+  "path": "/gameplay-validation-rules",
+  "contract": "games",
+  "summary": "What a tap is checked against, and in what order",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "GameplayValidationRules"
+ },
+ "listDevices": {
+  "method": "GET",
+  "path": "/devices",
+  "contract": "tenancy",
+  "summary": "List registered devices",
+  "permission": "DEVICE_VIEW",
+  "offlineCapable": true,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": "workstationId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "kind",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": null,
     "in": null,
     "required": null
    }
   ],
-  "requestBody": "DeviceEnrolment",
-  "responds": "RegisteredDevice"
+  "requestBody": null,
+  "responds": "Page"
  },
  "listReaders": {
   "method": "GET",

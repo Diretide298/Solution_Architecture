@@ -23554,12 +23554,14 @@
   "path": "/onboarding-applications",
   "reads": [
    "cache:idempotency",
+   "control.billing_entity",
    "control.onboarding_application",
    "control.venue_type_template",
    "subscription.plan"
   ],
   "writes": [
    "cache:idempotency",
+   "control.billing_entity",
    "control.onboarding_application"
   ],
   "routing": "",
@@ -29365,38 +29367,6 @@
    "redis"
   ],
   "lineageNote": "Pauses, resumes, disables or kill-switches one automation with a reason: updates approvals.automation status (states/automation.yaml); returned counts from automation_execution and approved_action_execution. DM2."
- },
- "createBulkProductCatalogue": {
-  "contract": "catalogue",
-  "verb": "POST",
-  "path": "/bulk-product-catalogue",
-  "reads": [
-   "cache:idempotency",
-   "catalogue.import_job",
-   "catalogue.product"
-  ],
-  "writes": [
-   "cache:idempotency",
-   "catalogue.audit_entry",
-   "catalogue.import_job",
-   "catalogue.product",
-   "catalogue.variant"
-  ],
-  "routing": "primary",
-  "scope": "venue",
-  "perm": "PRODUCT_CONFIGURE",
-  "offline": false,
-  "summary": "Bulk Product Creation & Catalogue Import",
-  "source": "hand-mapped 29 September (readiness close-out)",
-  "audience": [
-   "staff"
-  ],
-  "service": "CatalogueService",
-  "stores": [
-   "postgres",
-   "redis"
-  ],
-  "lineageNote": "DM3: import_job (jobKind productImport) as before; created products audited (source bulkImport) | L2: desc: two-phase like CatalogueImportJob (validate then commit creates draft products); mirrors importProductCatalogue + commitCatalogueImport lineage"
  },
  "createCaseClassificationIntelligent": {
   "contract": "marketing-crm",
@@ -41164,95 +41134,6 @@
   ],
   "lineageNote": "DM3: rule rows name their strategy (new dynamicPricingStrategyId on pricing.dynamic_price_rule) | L2: desc: rules persist through the dynamic-rule model (PricingDynamicPriceRule/Condition/Action), as setDynamicPriceRule writes them"
  },
- "setBundleComponent": {
-  "contract": "promotions",
-  "verb": "PUT",
-  "path": "/bundle-component",
-  "reads": [
-   "cache:idempotency",
-   "promotions.bundle",
-   "promotions.bundle_component"
-  ],
-  "writes": [
-   "cache:idempotency",
-   "promotions.bundle_component",
-   "promotions.promotion_audit"
-  ],
-  "routing": "primary",
-  "scope": "venue",
-  "perm": "PRICE_CONFIGURE",
-  "offline": false,
-  "summary": "Bundle Component Builder",
-  "source": "hand-mapped 29 September (readiness close-out)",
-  "audience": [
-   "staff"
-  ],
-  "service": "CatalogueService",
-  "stores": [
-   "postgres",
-   "redis"
-  ],
-  "lineageNote": "Component quantity/optional are promotions.bundle_component (quantity, is_optional), as updateBundle neighbour writes; change in promotion_audit"
- },
- "setBundleDefinition": {
-  "contract": "promotions",
-  "verb": "PUT",
-  "path": "/bundle-definition",
-  "reads": [
-   "cache:idempotency",
-   "promotions.bundle",
-   "promotions.campaign"
-  ],
-  "writes": [
-   "cache:idempotency",
-   "promotions.bundle",
-   "promotions.promotion_audit"
-  ],
-  "routing": "primary",
-  "scope": "venue",
-  "perm": "PRICE_CONFIGURE",
-  "offline": false,
-  "summary": "Bundle Definition & Setup",
-  "source": "hand-mapped 29 September (readiness close-out)",
-  "audience": [
-   "staff"
-  ],
-  "service": "CatalogueService",
-  "stores": [
-   "postgres",
-   "redis"
-  ],
-  "lineageNote": "Bundle name, description, venue_id, kind (bundleType), valid_from/to, is_active, campaign_id, owner_principal_id, category, is_standalone_product, is_recommended_at_checkout, required_variant_ids are promotions.bundle columns (as createBundle/updateBundle); campaign resolved from promotions.campaign; change in promotion_audit"
- },
- "setBuyGetBogo": {
-  "contract": "promotions",
-  "verb": "PUT",
-  "path": "/buy-get-bogo",
-  "reads": [
-   "cache:idempotency",
-   "promotions.promotion"
-  ],
-  "writes": [
-   "cache:idempotency",
-   "promotions.promotion",
-   "promotions.promotion_audit"
-  ],
-  "routing": "primary",
-  "scope": "venue",
-  "perm": "PRICE_CONFIGURE",
-  "offline": false,
-  "summary": "Buy X Get Y / BOGO Rule Builder",
-  "source": "hand-mapped 29 September (readiness close-out)",
-  "audience": [
-   "staff"
-  ],
-  "service": "CatalogueService",
-  "stores": [
-   "postgres",
-   "redis"
-  ],
-  "lineageNote": "BOGO qualifier and reward are the promotion discount (buyXGetY: buyQuantity, getQuantity, getDiscountPercentage, rewardVariantIds for a different reward product) and conditions jsonb that evaluatePromotions reads; written to promotions.promotion like updatePromotion, change in promotion_audit; IdempotencyKey parameter"
- },
  "setCampaignBudgetFinancial": {
   "contract": "promotions",
   "verb": "PUT",
@@ -41564,66 +41445,6 @@
    "redis"
   ],
   "lineageNote": "Upsert of an access.dynamic_policy (contextType, thresholds) with a new access.dynamic_policy_version; x-ticvai-config-change-log: also appends access.configuration_change (writers pass convention); input gains status, validFrom, validTo (access.dynamic_policy)"
- },
- "setCouponPromoCode": {
-  "contract": "promotions",
-  "verb": "PUT",
-  "path": "/coupon-promo-code",
-  "reads": [
-   "cache:idempotency",
-   "promotions.campaign",
-   "promotions.coupon_campaign"
-  ],
-  "writes": [
-   "cache:idempotency",
-   "promotions.coupon_campaign",
-   "promotions.coupon_code",
-   "promotions.promotion_audit"
-  ],
-  "routing": "primary",
-  "scope": "venue",
-  "perm": "PRICE_CONFIGURE",
-  "offline": false,
-  "summary": "Coupon & Promo Code Builder",
-  "source": "hand-mapped 29 September (readiness close-out)",
-  "audience": [
-   "staff"
-  ],
-  "service": "CatalogueService",
-  "stores": [
-   "postgres",
-   "redis"
-  ],
-  "lineageNote": "Coupon/promo code builder: code, benefit (discount jsonb), eligibility (conditions), validFrom/To are coupon_campaign columns, campaign resolves to coupon_campaign.campaign_id (promotions.campaign); a shared code is a coupon_code row, as createCouponCampaign/generateCouponCodes neighbours write; change recorded in promotions.promotion_audit"
- },
- "setCrossCategoryPromotion": {
-  "contract": "promotions",
-  "verb": "PUT",
-  "path": "/cross-category-promotion",
-  "reads": [
-   "cache:idempotency",
-   "promotions.promotion"
-  ],
-  "writes": [
-   "cache:idempotency",
-   "promotions.promotion",
-   "promotions.promotion_audit"
-  ],
-  "routing": "primary",
-  "scope": "venue",
-  "perm": "PRICE_CONFIGURE",
-  "offline": false,
-  "summary": "Cross-Category Promotion Builder",
-  "source": "hand-mapped 29 September (readiness close-out)",
-  "audience": [
-   "staff"
-  ],
-  "service": "CatalogueService",
-  "stores": [
-   "postgres",
-   "redis"
-  ],
-  "lineageNote": "Cross-category qualifier sets are promotion.conditions (categoryIds, productKinds) jsonb; change in promotion_audit"
  },
  "setCustomerGuestAccount": {
   "contract": "orders",
@@ -41970,36 +41791,6 @@
   ],
   "lineageNote": "edgeNodeId is the access.edge_node id; lastHeartbeat is node-set, not written by this op"
  },
- "setEligibilityRule": {
-  "contract": "promotions",
-  "verb": "PUT",
-  "path": "/eligibility-rule",
-  "reads": [
-   "cache:idempotency",
-   "promotions.promotion",
-   "promotions.promotion_rule"
-  ],
-  "writes": [
-   "cache:idempotency",
-   "promotions.promotion_audit",
-   "promotions.promotion_rule"
-  ],
-  "routing": "primary",
-  "scope": "venue",
-  "perm": "PRICE_CONFIGURE",
-  "offline": false,
-  "summary": "Eligibility Rule Builder",
-  "source": "hand-mapped 29 September (readiness close-out)",
-  "audience": [
-   "staff"
-  ],
-  "service": "CatalogueService",
-  "stores": [
-   "postgres",
-   "redis"
-  ],
-  "lineageNote": "Saves a promotions.promotion_rule row of rule_type eligibility (criteria as nested condition groups, ruleEffect as effect, campaign_id; promotion_id null = reusable library rule named in PromotionConditions.eligibilityRuleIds); promotion read where it is attached; change in promotion_audit; IdempotencyKey parameter"
- },
  "setEmbeddedEntitlementPayload": {
   "contract": "access",
   "verb": "PUT",
@@ -42120,35 +41911,6 @@
   ],
   "lineageNote": "DM3: catalogue.fee_rule with ruleKind applicability | L2: persistence: closest channel_allocation 5%, no table; charging rules need pricing.fee_rule referencing pricing.fee (both missing)"
  },
- "setFixedPriceOffer": {
-  "contract": "promotions",
-  "verb": "PUT",
-  "path": "/fixed-price-offer",
-  "reads": [
-   "cache:idempotency",
-   "promotions.promotion"
-  ],
-  "writes": [
-   "cache:idempotency",
-   "promotions.promotion",
-   "promotions.promotion_audit"
-  ],
-  "routing": "primary",
-  "scope": "venue",
-  "perm": "PRICE_CONFIGURE",
-  "offline": false,
-  "summary": "Fixed-Price & “N for X” Offer Builder",
-  "source": "hand-mapped 29 September (readiness close-out)",
-  "audience": [
-   "staff"
-  ],
-  "service": "CatalogueService",
-  "stores": [
-   "postgres",
-   "redis"
-  ],
-  "lineageNote": "N-for-X is discount kind fixedPrice + conditions.minQuantity/variantIds/categoryIds, repetitions in discount.maxApplicationsPerBasket; allocation of the price across lines happens at order time (orders.discount), not here; change in promotion_audit"
- },
  "setGateLane": {
   "contract": "access",
   "verb": "PUT",
@@ -42178,35 +41940,6 @@
    "redis"
   ],
   "lineageNote": "gateId is the access.gate_lane id under accessPointId; type is stored as laneType; live mode stays on access.access_point via setTurnstileMode"
- },
- "setGiftFreeProduct": {
-  "contract": "promotions",
-  "verb": "PUT",
-  "path": "/gift-free-product",
-  "reads": [
-   "cache:idempotency",
-   "promotions.promotion"
-  ],
-  "writes": [
-   "cache:idempotency",
-   "promotions.promotion",
-   "promotions.promotion_audit"
-  ],
-  "routing": "primary",
-  "scope": "venue",
-  "perm": "PRICE_CONFIGURE",
-  "offline": false,
-  "summary": "Gift, Free Product & Added-Value Offer Builder",
-  "source": "hand-mapped 29 September (readiness close-out)",
-  "audience": [
-   "staff"
-  ],
-  "service": "CatalogueService",
-  "stores": [
-   "postgres",
-   "redis"
-  ],
-  "lineageNote": "Gift/free product is discount kind freeItem with the reward in discount.rewardVariantIds and qualifiers in conditions jsonb; stock availability is inventory service by operation; change in promotion_audit"
  },
  "setGoogleWalletPass": {
   "contract": "access",
@@ -42396,38 +42129,6 @@
    "redis"
   ],
   "lineageNote": "saves a quote version: orders.group_quote header (number, version, enquiry, organisation, contact, owner, dates, terms, delivery formats) and its orders.group_quote_line rows; a revision inserts a new version and supersedes the previous one; IdempotencyKey"
- },
- "setGuestChoiceBuild": {
-  "contract": "promotions",
-  "verb": "PUT",
-  "path": "/guest-choice-build",
-  "reads": [
-   "cache:idempotency",
-   "promotions.bundle",
-   "promotions.bundle_choice_group",
-   "promotions.bundle_choice_option"
-  ],
-  "writes": [
-   "cache:idempotency",
-   "promotions.bundle_choice_group",
-   "promotions.bundle_choice_option",
-   "promotions.promotion_audit"
-  ],
-  "routing": "primary",
-  "scope": "venue",
-  "perm": "PRICE_CONFIGURE",
-  "offline": false,
-  "summary": "Guest Choice & Build-Your-Own Bundle Designer",
-  "source": "hand-mapped 29 September (readiness close-out)",
-  "audience": [
-   "staff"
-  ],
-  "service": "CatalogueService",
-  "stores": [
-   "postgres",
-   "redis"
-  ],
-  "lineageNote": "Choice groups (label, choose, allow_duplicates) and options (variant_id, quantity, is_default) are bundle_choice_group/bundle_choice_option, as createBundle writes; change in promotion_audit"
  },
  "setHandheldMobileAccess": {
   "contract": "access",
@@ -43101,38 +42802,6 @@
   ],
   "lineageNote": "DM3: catalogue.price_resolution_policy with policyKind staticHierarchy | L2: persistence: closest price_list at 17%, no table; ordered levels need catalogue.price_hierarchy (missing)"
  },
- "setPriceListMaster": {
-  "contract": "catalogue",
-  "verb": "PUT",
-  "path": "/price-list-master",
-  "reads": [
-   "cache:idempotency",
-   "catalogue.price_category",
-   "catalogue.price_list",
-   "catalogue.price_resolution_policy",
-   "catalogue.rounding_profile"
-  ],
-  "writes": [
-   "cache:idempotency",
-   "catalogue.audit_entry",
-   "catalogue.price_list"
-  ],
-  "routing": "primary",
-  "scope": "venue",
-  "perm": "PRODUCT_CONFIGURE",
-  "offline": false,
-  "summary": "Price List Master Configuration",
-  "source": "hand-mapped 29 September (readiness close-out)",
-  "audience": [
-   "staff"
-  ],
-  "service": "CatalogueService",
-  "stores": [
-   "postgres",
-   "redis"
-  ],
-  "lineageNote": "DM3: master fields are new columns on catalogue.price_list | L2: master container is a price list (code, name, venue, channels, validity, priority, as createPriceList/updatePriceList); type/currency/legal entity/defaults/tags have no columns yet"
- },
  "setPricing": {
   "contract": "catalogue",
   "verb": "PUT",
@@ -43356,36 +43025,6 @@
   ],
   "lineageNote": "DM3: catalogue.price_assignment with objectType/objectIds and categoryRates | L2: products show pricing source rather than a copy of the amount, so no catalogue.price write; assignment needs catalogue.price_assignment (missing)"
  },
- "setPromotionRule": {
-  "contract": "promotions",
-  "verb": "PUT",
-  "path": "/promotion-rule",
-  "reads": [
-   "cache:idempotency",
-   "promotions.promotion",
-   "promotions.promotion_rule"
-  ],
-  "writes": [
-   "cache:idempotency",
-   "promotions.promotion_audit",
-   "promotions.promotion_rule"
-  ],
-  "routing": "primary",
-  "scope": "venue",
-  "perm": "PRICE_CONFIGURE",
-  "offline": false,
-  "summary": "Promotion Rule Builder",
-  "source": "hand-mapped 29 September (readiness close-out)",
-  "audience": [
-   "staff"
-  ],
-  "service": "CatalogueService",
-  "stores": [
-   "postgres",
-   "redis"
-  ],
-  "lineageNote": "Saves a promotions.promotion_rule row (rule_type benefit: name, priority, nested conditions, outcomes, is_active) under the promotion it names; change recorded in promotions.promotion_audit; IdempotencyKey parameter"
- },
  "setPromotionStackingRule": {
   "contract": "promotions",
   "verb": "PUT",
@@ -43415,39 +43054,6 @@
    "redis"
   ],
   "lineageNote": "Upserts a promotions.stacking_rule row (scope, stacking_model, maximum_promotions, promotion_type_a/b, can_stack; the builder input is the row); per-promotion stacking_mode stays on promotion; change in promotion_audit; IdempotencyKey parameter"
- },
- "setRateStructure": {
-  "contract": "catalogue",
-  "verb": "PUT",
-  "path": "/rate-structure",
-  "reads": [
-   "cache:idempotency",
-   "catalogue.price",
-   "catalogue.price_category",
-   "catalogue.price_list",
-   "catalogue.rate",
-   "catalogue.rounding_profile"
-  ],
-  "writes": [
-   "cache:idempotency",
-   "catalogue.audit_entry",
-   "catalogue.rate"
-  ],
-  "routing": "primary",
-  "scope": "venue",
-  "perm": "PRODUCT_CONFIGURE",
-  "offline": false,
-  "summary": "Rate Structure Builder",
-  "source": "hand-mapped 29 September (readiness close-out)",
-  "audience": [
-   "staff"
-  ],
-  "service": "CatalogueService",
-  "stores": [
-   "postgres",
-   "redis"
-  ],
-  "lineageNote": "DM3: catalogue.rate in the price list; derived rates checked for cycles | L2: persistence: closest catalogue.price at 4%, no table; rates per category need catalogue.rate (missing); price list validated from price_list"
  },
  "setReaderScannerPeripheral": {
   "contract": "access",
@@ -69303,6 +68909,7 @@
   ],
   "writes": [
    "cache:idempotency",
+   "marketing.cookie_scan_finding",
    "marketing.cookie_scan_run",
    "marketing.tracking_technology"
   ],
@@ -72909,6 +72516,1654 @@
    "device"
   ],
   "service": "WhiteLabelService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "activateChallenge": {
+  "contract": "marketing-crm",
+  "verb": "POST",
+  "path": "/challenges/{challengeId}/activate",
+  "reads": [
+   "marketing.challenge"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "MARKETING_SEND",
+  "offline": false,
+  "summary": "Publish a draft challenge to guests",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "MarketingService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "applyConfigPackage": {
+  "contract": "platform-ops",
+  "verb": "POST",
+  "path": "/config-packages/{packageId}/apply",
+  "reads": [
+   "control.config_package_application"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "PLATFORM_MIGRATION_APPLY",
+  "offline": false,
+  "summary": "Apply an approved package to the target environment",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "PlatformService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "approveDevice": {
+  "contract": "tenancy",
+  "verb": "POST",
+  "path": "/devices/{deviceId}/approval",
+  "reads": [
+   "platform.device"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "DEVICE_MANAGE",
+  "offline": false,
+  "summary": "Approve a device into production, or reject it",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "TenancyService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "assignApprovalRequest": {
+  "contract": "approvals",
+  "verb": "PUT",
+  "path": "/approval-requests/{requestId}/assignment",
+  "reads": [
+   "approvals.decision",
+   "approvals.request"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "APPROVAL_DECIDE",
+  "offline": false,
+  "summary": "Assign, reassign or claim a request in a shared queue",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "TenancyService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "buildDeepLink": {
+  "contract": "white-label",
+  "verb": "POST",
+  "path": "/deep-links",
+  "reads": [],
+  "writes": [],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "TENANT_CONFIGURE",
+  "offline": false,
+  "summary": "Build a deep link to a target",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "WhiteLabelService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "bulkUpdateCatalogueProducts": {
+  "contract": "catalogue",
+  "verb": "POST",
+  "path": "/products/bulk-update",
+  "reads": [],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "PRODUCT_CONFIGURE",
+  "offline": false,
+  "summary": "Change many products at once, with a preview",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "cancelApprovalRequest": {
+  "contract": "approvals",
+  "verb": "POST",
+  "path": "/approval-requests/{requestId}/cancel",
+  "reads": [
+   "approvals.decision",
+   "approvals.request"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "APPROVAL_CONFIGURE",
+  "offline": false,
+  "summary": "An administrator cancels a request nobody should decide any more",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "TenancyService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "createTableReservationForGuest": {
+  "contract": "fnb",
+  "verb": "POST",
+  "path": "/outlets/{outletId}/table-reservations",
+  "reads": [
+   "fnb.reservation_table",
+   "fnb.table_reservation"
+  ],
+  "writes": [
+   "fnb.reservation_table",
+   "fnb.table_reservation"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "ORDER_CREATE",
+  "offline": false,
+  "summary": "Book a table for a guest (staff)",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "FnbService",
+  "stores": [
+   "derived",
+   "postgres",
+   "postgres-analytical",
+   "redis"
+  ]
+ },
+ "diffConfigPackage": {
+  "contract": "platform-ops",
+  "verb": "POST",
+  "path": "/config-packages/{packageId}/diff",
+  "reads": [
+   "control.config_package_diff"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "PLATFORM_RELEASE_VIEW",
+  "offline": false,
+  "summary": "Compare a package with the target environment",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "PlatformService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "endOwnSession": {
+  "contract": "identity",
+  "verb": "POST",
+  "path": "/auth/sessions/mine/{sessionId}/end",
+  "reads": [],
+  "writes": [],
+  "routing": null,
+  "scope": "tenant",
+  "perm": null,
+  "offline": false,
+  "summary": "Sign one of the caller's own sessions out",
+  "source": "derived",
+  "audience": [
+   "staff",
+   "partner"
+  ],
+  "service": "IdentityService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "exportConfigPackage": {
+  "contract": "platform-ops",
+  "verb": "POST",
+  "path": "/config-packages",
+  "reads": [
+   "control.config_package"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "PLATFORM_RELEASE_MANAGE",
+  "offline": false,
+  "summary": "Export a tenant's configuration as a versioned package",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "PlatformService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "exportSitePackage": {
+  "contract": "white-label",
+  "verb": "POST",
+  "path": "/site-package",
+  "reads": [
+   "whitelabel.site_package"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "TENANT_PUBLISH",
+  "offline": false,
+  "summary": "Generate a site package (self-hosted)",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "WhiteLabelService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getAiSpendCeiling": {
+  "contract": "ai",
+  "verb": "GET",
+  "path": "/policy/spend-ceiling",
+  "reads": [
+   "ai.spend_ceiling"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "AI_CONFIGURE",
+  "offline": false,
+  "summary": "The AI spend ceiling, in money",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ]
+ },
+ "getAnalyticsGovernancePolicy": {
+  "contract": "reporting",
+  "verb": "GET",
+  "path": "/analytics-governance-policy",
+  "reads": [
+   "reporting.analytics_governance_policy"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": "REPORT_VIEW_TENANT",
+  "offline": false,
+  "summary": "The tenant's analytics governance policy",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "ReportingService",
+  "stores": [
+   "derived",
+   "postgres",
+   "postgres-analytical",
+   "redis"
+  ]
+ },
+ "getB2bPaymentTerms": {
+  "contract": "payments",
+  "verb": "GET",
+  "path": "/b2b-credit-accounts/{accountId}/terms",
+  "reads": [
+   "payments.payment_terms"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": "PAYMENT_VIEW",
+  "offline": false,
+  "summary": "An account's limit, terms, billing cycle and limit behaviour",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "OrderService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "getBillingEntity": {
+  "contract": "subscription",
+  "verb": "GET",
+  "path": "/tenants/{tenantId}/billing-entity",
+  "reads": [
+   "control.billing_entity"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": "PLATFORM_BILLING_VIEW",
+  "offline": false,
+  "summary": "The company TICVAI invoices for a tenant",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "PlatformService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "redis"
+  ]
+ },
+ "getChallenge": {
+  "contract": "marketing-crm",
+  "verb": "GET",
+  "path": "/challenges/{challengeId}",
+  "reads": [
+   "marketing.challenge"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "MARKETING_VIEW",
+  "offline": false,
+  "summary": "One challenge",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "MarketingService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getCourseRules": {
+  "contract": "fnb",
+  "verb": "GET",
+  "path": "/outlets/{outletId}/course-rules",
+  "reads": [
+   "fnb.course_rule"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "PRODUCT_VIEW",
+  "offline": true,
+  "summary": "How this outlet courses by default (read)",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "FnbService",
+  "stores": [
+   "derived",
+   "postgres",
+   "postgres-analytical",
+   "redis"
+  ]
+ },
+ "getDeepLinkScheme": {
+  "contract": "white-label",
+  "verb": "GET",
+  "path": "/deep-links",
+  "reads": [],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": "TENANT_CONFIGURE",
+  "offline": false,
+  "summary": "The published deep-link scheme",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "WhiteLabelService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getEventChangeTreatmentPolicy": {
+  "contract": "catalogue",
+  "verb": "GET",
+  "path": "/venues/{venueId}/event-change-treatment-policy",
+  "reads": [
+   "catalogue.event_change_treatment_policy"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "PERFORMANCE_CONFIGURE",
+  "offline": false,
+  "summary": "What happens to tickets, reservations and guests when an event changes, by default",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getFaceReenrolmentImages": {
+  "contract": "access",
+  "verb": "GET",
+  "path": "/face-reenrolment-attempts/{attemptId}/images",
+  "reads": [],
+  "writes": [],
+  "routing": "primary",
+  "scope": "venue",
+  "perm": "BIOMETRIC_IMAGE_VIEW",
+  "offline": false,
+  "summary": "View the images behind a face re-enrolment review (logged)",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AccessService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getHardwareModelCertification": {
+  "contract": "access",
+  "verb": "GET",
+  "path": "/hardware-models/{modelId}/certification",
+  "reads": [
+   "access.hardware_certification"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": "DEVICE_VIEW",
+  "offline": false,
+  "summary": "A reader model's certification and its test results",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AccessService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getKitchenRoutingRules": {
+  "contract": "fnb",
+  "verb": "GET",
+  "path": "/outlets/{outletId}/kitchen-routing",
+  "reads": [
+   "fnb.kitchen_routing_rule"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "PRODUCT_VIEW",
+  "offline": true,
+  "summary": "An outlet's kitchen routing rules",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "FnbService",
+  "stores": [
+   "derived",
+   "postgres",
+   "postgres-analytical",
+   "redis"
+  ]
+ },
+ "getKitchenSla": {
+  "contract": "fnb",
+  "verb": "GET",
+  "path": "/outlets/{outletId}/kitchen-sla",
+  "reads": [],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "PRODUCT_VIEW",
+  "offline": true,
+  "summary": "How long a ticket may sit before it is late (read)",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "FnbService",
+  "stores": [
+   "derived",
+   "postgres",
+   "postgres-analytical",
+   "redis"
+  ]
+ },
+ "getPlatformSubdomain": {
+  "contract": "white-label",
+  "verb": "GET",
+  "path": "/platform-subdomain",
+  "reads": [],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": "TENANT_CONFIGURE",
+  "offline": false,
+  "summary": "The tenant's platform subdomain",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "WhiteLabelService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getPrepSheetTemplate": {
+  "contract": "fnb",
+  "verb": "GET",
+  "path": "/prep-sheet-template",
+  "reads": [
+   "fnb.prep_sheet_template"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "PRODUCT_VIEW",
+  "offline": false,
+  "summary": "The venue's prep-sheet print template",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "FnbService",
+  "stores": [
+   "derived",
+   "postgres",
+   "postgres-analytical",
+   "redis"
+  ]
+ },
+ "getPublishReviewPolicy": {
+  "contract": "white-label",
+  "verb": "GET",
+  "path": "/publish-review-policy",
+  "reads": [
+   "whitelabel.publish_review_policy"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": "TENANT_CONFIGURE",
+  "offline": false,
+  "summary": "Whether publishing needs a review",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "WhiteLabelService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getServiceSummary": {
+  "contract": "reporting",
+  "verb": "GET",
+  "path": "/service-summary",
+  "reads": [],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "REPORT_VIEW_OWN",
+  "offline": false,
+  "summary": "My service summary (a server without a till)",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "ReportingService",
+  "stores": [
+   "derived",
+   "postgres",
+   "postgres-analytical",
+   "redis"
+  ]
+ },
+ "getShiftCountLines": {
+  "contract": "shift",
+  "verb": "GET",
+  "path": "/shifts/{shiftId}/count-lines",
+  "reads": [
+   "orders.cash_count_line"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "REPORT_VIEW_WORKSTATION",
+  "offline": false,
+  "summary": "The denomination breakdown of a shift's counts",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "OrderService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getSitePackage": {
+  "contract": "white-label",
+  "verb": "GET",
+  "path": "/site-package/{packageId}",
+  "reads": [
+   "whitelabel.site_package"
+  ],
+  "writes": [],
+  "routing": "primary",
+  "scope": "tenant",
+  "perm": "TENANT_PUBLISH",
+  "offline": false,
+  "summary": "A site package and its download link",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "WhiteLabelService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getTillShiftPolicy": {
+  "contract": "shift",
+  "verb": "GET",
+  "path": "/venues/{venueId}/till-shift-policy",
+  "reads": [
+   "orders.till_shift_policy"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "SCOPE_VIEW",
+  "offline": true,
+  "summary": "The rules every till in the venue opens and closes to",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "OrderService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getTranslationProposals": {
+  "contract": "ai",
+  "verb": "GET",
+  "path": "/ai/translate/{translationJobId}",
+  "reads": [],
+  "writes": [],
+  "routing": "primary",
+  "scope": "tenant",
+  "perm": "TENANT_CONFIGURE",
+  "offline": false,
+  "summary": "Follow a translation job",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ]
+ },
+ "getWalletMovementSummary": {
+  "contract": "wallet",
+  "verb": "GET",
+  "path": "/wallet-movement-summary",
+  "reads": [],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": "WALLET_VIEW",
+  "offline": false,
+  "summary": "How the stored-value balance moved over a period",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "WalletService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getWalletPreCloseChecks": {
+  "contract": "wallet",
+  "verb": "GET",
+  "path": "/wallet-pre-close-checks",
+  "reads": [],
+  "writes": [],
+  "routing": "primary",
+  "scope": "tenant",
+  "perm": "WALLET_VIEW",
+  "offline": false,
+  "summary": "The wallet's checks before a period closes",
+  "source": "derived",
+  "audience": [
+   "staff",
+   "service"
+  ],
+  "service": "WalletService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getWasteApprovalPolicy": {
+  "contract": "fnb",
+  "verb": "GET",
+  "path": "/waste-approval-policy",
+  "reads": [
+   "fnb.waste_approval_policy"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "PRODUCT_VIEW",
+  "offline": false,
+  "summary": "The venue's waste-approval policy",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "FnbService",
+  "stores": [
+   "derived",
+   "postgres",
+   "postgres-analytical",
+   "redis"
+  ]
+ },
+ "listAutomationExecutions": {
+  "contract": "approvals",
+  "verb": "GET",
+  "path": "/automation-executions",
+  "reads": [
+   "approvals.automation_execution"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "APPROVAL_VIEW",
+  "offline": false,
+  "summary": "What automations ran, when, on whose rule, and the outcome",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "TenancyService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listChallenges": {
+  "contract": "marketing-crm",
+  "verb": "GET",
+  "path": "/challenges",
+  "reads": [
+   "marketing.challenge"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "MARKETING_VIEW",
+  "offline": false,
+  "summary": "The venue's challenges",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "MarketingService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listCookieScanFindings": {
+  "contract": "marketing-crm",
+  "verb": "GET",
+  "path": "/cookie-tracking-digital/scans/{scanRunId}/findings",
+  "reads": [
+   "marketing.cookie_scan_finding"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "GUEST_VIEW",
+  "offline": false,
+  "summary": "What one scan saw, in each consent state",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "MarketingService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listLandingPageTemplates": {
+  "contract": "white-label",
+  "verb": "GET",
+  "path": "/landing-page-templates",
+  "reads": [
+   "whitelabel.homepage_section"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": "TENANT_CONFIGURE",
+  "offline": false,
+  "summary": "The landing-page templates TICVAI provides",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "WhiteLabelService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listMessageDispatches": {
+  "contract": "marketing-crm",
+  "verb": "GET",
+  "path": "/message-dispatches",
+  "reads": [
+   "marketing.message_dispatch"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "MARKETING_VIEW",
+  "offline": false,
+  "summary": "Messages sent, and whether they arrived",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "MarketingService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listOwnSessions": {
+  "contract": "identity",
+  "verb": "GET",
+  "path": "/auth/sessions/mine",
+  "reads": [],
+  "writes": [],
+  "routing": "primary",
+  "scope": "tenant",
+  "perm": null,
+  "offline": false,
+  "summary": "The caller's own signed-in sessions",
+  "source": "derived",
+  "audience": [
+   "staff",
+   "partner"
+  ],
+  "service": "IdentityService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listProductApprovalWorkflows": {
+  "contract": "catalogue",
+  "verb": "GET",
+  "path": "/product-approval-workflows",
+  "reads": [],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "PRODUCT_VIEW",
+  "offline": false,
+  "summary": "The product approval workflows `approveWorkflow` saved",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listSeatPricingRules": {
+  "contract": "catalogue",
+  "verb": "GET",
+  "path": "/seat-pricing-rules",
+  "reads": [
+   "catalogue.seat_pricing_rule"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "PRODUCT_VIEW",
+  "offline": false,
+  "summary": "Seat-level dynamic pricing rules",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listTrackingTechnologyCatalogue": {
+  "contract": "marketing-crm",
+  "verb": "GET",
+  "path": "/cookie-tracking-digital/platform-catalogue",
+  "reads": [
+   "marketing.tracking_technology_catalogue"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "GUEST_VIEW",
+  "offline": false,
+  "summary": "The platform's catalogue of known cookies and trackers",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "MarketingService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "previewProductTickets": {
+  "contract": "orders",
+  "verb": "GET",
+  "path": "/products/{productId}/ticket-previews",
+  "reads": [],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "PRODUCT_VIEW",
+  "offline": false,
+  "summary": "Preview a product's PDF ticket and wallet passes",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "OrderService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "previewSegmentDraft": {
+  "contract": "marketing-crm",
+  "verb": "POST",
+  "path": "/segments/preview",
+  "reads": [],
+  "writes": [
+   "marketing.segment_criterion"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "MARKETING_VIEW",
+  "offline": false,
+  "summary": "Estimate an unsaved segment's size and reachability",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "MarketingService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "printPrepSheet": {
+  "contract": "fnb",
+  "verb": "POST",
+  "path": "/production-plans/{planId}/prep-sheet",
+  "reads": [],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "PRODUCT_VIEW",
+  "offline": false,
+  "summary": "Print a production plan's prep sheet",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "FnbService",
+  "stores": [
+   "derived",
+   "postgres",
+   "postgres-analytical",
+   "redis"
+  ]
+ },
+ "regenerateDomainToken": {
+  "contract": "white-label",
+  "verb": "POST",
+  "path": "/tenant-domains/{domainId}/token",
+  "reads": [
+   "whitelabel.custom_domain"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "TENANT_CONFIGURE",
+  "offline": false,
+  "summary": "Issue a new validation token",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "WhiteLabelService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "rejectShiftVariance": {
+  "contract": "shift",
+  "verb": "POST",
+  "path": "/shifts/{shiftId}/reject-variance",
+  "reads": [
+   "orders.pos_shift",
+   "orders.pos_shift_approval",
+   "orders.pos_shift_incident"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "OVERSHORT_ACCEPT",
+  "offline": false,
+  "summary": "Send a counted shift back for a recount",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "OrderService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "reopenApprovalRequest": {
+  "contract": "approvals",
+  "verb": "POST",
+  "path": "/approval-requests/{requestId}/reopen",
+  "reads": [
+   "approvals.decision",
+   "approvals.request"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "APPROVAL_REQUEST",
+  "offline": false,
+  "summary": "Reopen an expired or cancelled request as a new one",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "TenancyService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setAccessPointDirection": {
+  "contract": "access",
+  "verb": "PUT",
+  "path": "/access-points/{accessPointId}/direction",
+  "reads": [
+   "access.access_point",
+   "access.gate_mode_change"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "ACCESS_DIRECTION_SET",
+  "offline": false,
+  "summary": "Switch a gate's direction live",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AccessService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setAiSpendCeiling": {
+  "contract": "ai",
+  "verb": "PUT",
+  "path": "/policy/spend-ceiling",
+  "reads": [
+   "ai.spend_ceiling"
+  ],
+  "writes": [
+   "ai.spend_ceiling"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "AI_CONFIGURE",
+  "offline": false,
+  "summary": "Set the AI spend ceiling, in money",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ]
+ },
+ "setAnalyticsGovernancePolicy": {
+  "contract": "reporting",
+  "verb": "PUT",
+  "path": "/analytics-governance-policy",
+  "reads": [
+   "reporting.analytics_governance_policy"
+  ],
+  "writes": [
+   "reporting.analytics_governance_policy"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "REPORT_GOVERNANCE_MANAGE",
+  "offline": false,
+  "summary": "Set the analytics governance policy",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "ReportingService",
+  "stores": [
+   "derived",
+   "postgres",
+   "postgres-analytical",
+   "redis"
+  ]
+ },
+ "setBillingEntity": {
+  "contract": "subscription",
+  "verb": "PUT",
+  "path": "/tenants/{tenantId}/billing-entity",
+  "reads": [
+   "control.billing_entity"
+  ],
+  "writes": [
+   "control.billing_entity"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "PLATFORM_BILLING_MANAGE",
+  "offline": false,
+  "summary": "Set the company TICVAI invoices for a tenant",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "PlatformService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "redis"
+  ]
+ },
+ "setEntitlementTemplateBlackoutDates": {
+  "contract": "catalogue",
+  "verb": "PUT",
+  "path": "/entitlement-templates/{templateId}/blackout-dates",
+  "reads": [
+   "catalogue.entitlement_template"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "PRODUCT_CONFIGURE",
+  "offline": false,
+  "summary": "Set the dates a product's entitlement does not admit",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setEventChangeTreatmentPolicy": {
+  "contract": "catalogue",
+  "verb": "PUT",
+  "path": "/venues/{venueId}/event-change-treatment-policy",
+  "reads": [
+   "catalogue.event_change_treatment_policy"
+  ],
+  "writes": [
+   "catalogue.event_change_treatment_policy"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "PERFORMANCE_CONFIGURE",
+  "offline": false,
+  "summary": "Set the default treatment per kind of event change",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setHardwareModelCertification": {
+  "contract": "access",
+  "verb": "PUT",
+  "path": "/hardware-models/{modelId}/certification",
+  "reads": [
+   "access.hardware_certification"
+  ],
+  "writes": [
+   "access.hardware_certification"
+  ],
+  "routing": "primary",
+  "scope": "tenant",
+  "perm": "DEVICE_MANAGE",
+  "offline": false,
+  "summary": "Certify a reader model, or record that it failed",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AccessService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setKitchenRoutingRules": {
+  "contract": "fnb",
+  "verb": "PUT",
+  "path": "/outlets/{outletId}/kitchen-routing",
+  "reads": [
+   "fnb.kitchen_routing_rule"
+  ],
+  "writes": [
+   "fnb.kitchen_routing_rule"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "PRODUCT_CONFIGURE",
+  "offline": false,
+  "summary": "Set an outlet's category rules, default station and fallback station",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "FnbService",
+  "stores": [
+   "derived",
+   "postgres",
+   "postgres-analytical",
+   "redis"
+  ]
+ },
+ "setMenuItemDailyCount": {
+  "contract": "fnb",
+  "verb": "PUT",
+  "path": "/menu-items/{itemId}/daily-count",
+  "reads": [
+   "fnb.menu_item"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "PRODUCT_CONFIGURE",
+  "offline": false,
+  "summary": "Set today's count for a dish",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "FnbService",
+  "stores": [
+   "derived",
+   "postgres",
+   "postgres-analytical",
+   "redis"
+  ]
+ },
+ "setPrepSheetTemplate": {
+  "contract": "fnb",
+  "verb": "PUT",
+  "path": "/prep-sheet-template",
+  "reads": [
+   "fnb.prep_sheet_template"
+  ],
+  "writes": [
+   "fnb.prep_sheet_template"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "PRODUCT_CONFIGURE",
+  "offline": false,
+  "summary": "Set the prep-sheet print template",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "FnbService",
+  "stores": [
+   "derived",
+   "postgres",
+   "postgres-analytical",
+   "redis"
+  ]
+ },
+ "setPrimaryDomain": {
+  "contract": "white-label",
+  "verb": "POST",
+  "path": "/tenant-domains/{domainId}/primary",
+  "reads": [
+   "whitelabel.custom_domain"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "TENANT_CONFIGURE",
+  "offline": false,
+  "summary": "Make a domain the primary one",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "WhiteLabelService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setPublishReviewPolicy": {
+  "contract": "white-label",
+  "verb": "PUT",
+  "path": "/publish-review-policy",
+  "reads": [
+   "whitelabel.publish_review_policy"
+  ],
+  "writes": [
+   "whitelabel.publish_review_policy"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "TENANT_PUBLISH",
+  "offline": false,
+  "summary": "Switch the publish review step on or off",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "WhiteLabelService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setSeatPricingRule": {
+  "contract": "catalogue",
+  "verb": "PUT",
+  "path": "/seat-pricing-rules/{ruleId}",
+  "reads": [
+   "catalogue.seat_pricing_rule"
+  ],
+  "writes": [
+   "catalogue.seat_pricing_rule"
+  ],
+  "routing": "primary",
+  "scope": "venue",
+  "perm": "PRICE_CONFIGURE",
+  "offline": false,
+  "summary": "Create or replace a seat-level dynamic pricing rule",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setTillShiftPolicy": {
+  "contract": "shift",
+  "verb": "PUT",
+  "path": "/venues/{venueId}/till-shift-policy",
+  "reads": [
+   "orders.till_shift_policy"
+  ],
+  "writes": [
+   "orders.till_shift_policy"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "WORKSTATION_CONFIGURE",
+  "offline": false,
+  "summary": "Set the rules every till in the venue opens and closes to",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "OrderService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setTrackingTechnologyCatalogueEntry": {
+  "contract": "marketing-crm",
+  "verb": "PUT",
+  "path": "/cookie-tracking-digital/platform-catalogue/{entryKey}",
+  "reads": [
+   "marketing.tracking_technology_catalogue"
+  ],
+  "writes": [
+   "marketing.tracking_technology_catalogue"
+  ],
+  "routing": null,
+  "scope": "platform",
+  "perm": "PLATFORM_PLAN_MANAGE",
+  "offline": false,
+  "summary": "Add or correct a catalogue entry (platform staff)",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "MarketingService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setWasteApprovalPolicy": {
+  "contract": "fnb",
+  "verb": "PUT",
+  "path": "/waste-approval-policy",
+  "reads": [
+   "fnb.waste_approval_policy"
+  ],
+  "writes": [
+   "fnb.waste_approval_policy"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "PRODUCT_CONFIGURE",
+  "offline": false,
+  "summary": "Switch waste approval on or off, and set its bands",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "FnbService",
+  "stores": [
+   "derived",
+   "postgres",
+   "postgres-analytical",
+   "redis"
+  ]
+ },
+ "simulateRefund": {
+  "contract": "orders",
+  "verb": "POST",
+  "path": "/orders/{orderId}/refund-simulation",
+  "reads": [],
+  "writes": [],
+  "routing": "primary",
+  "scope": "venue",
+  "perm": "ORDER_REFUND",
+  "offline": false,
+  "summary": "What a refund would do, without doing it",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "OrderService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "startProspectSignup": {
+  "contract": "identity",
+  "verb": "POST",
+  "path": "/auth/prospect/signup",
+  "reads": [],
+  "writes": [],
+  "routing": null,
+  "scope": "platform",
+  "perm": null,
+  "offline": false,
+  "summary": "Start (or resume) a TICVAI sign-up with an email and a one-time code",
+  "source": "derived",
+  "audience": [
+   "public",
+   "prospect"
+  ],
+  "service": "IdentityService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "updateRole": {
+  "contract": "identity",
+  "verb": "PATCH",
+  "path": "/roles/{roleId}",
+  "reads": [
+   "identity.role"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "ROLE_MANAGE",
+  "offline": false,
+  "summary": "Rename a role or change its description",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "IdentityService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "verifyProspectSignupCode": {
+  "contract": "identity",
+  "verb": "POST",
+  "path": "/auth/prospect/signup/{challengeId}/verify",
+  "reads": [],
+  "writes": [],
+  "routing": null,
+  "scope": "platform",
+  "perm": null,
+  "offline": false,
+  "summary": "Prove the email with the one-time code and receive the prospect sign-up session",
+  "source": "derived",
+  "audience": [
+   "public",
+   "prospect"
+  ],
+  "service": "IdentityService",
   "stores": [
    "postgres",
    "redis"

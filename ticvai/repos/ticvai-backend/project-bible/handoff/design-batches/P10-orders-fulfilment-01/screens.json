@@ -42,7 +42,10 @@
      "provenance": "flow F10 step 5→6",
      "operation": "listOrders",
      "crossesDevice": true,
-     "back": false
+     "back": false,
+     "carries": [
+      "variantId"
+     ]
     }
    ]
   },
@@ -211,22 +214,10 @@
      "slot": "rowActions",
      "components": [
       {
-       "kind": "primaryButton",
-       "label": "Apply manual discount",
-       "operation": "applyManualDiscount",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/discounts"
-      },
-      {
        "kind": "secondaryButton",
        "label": "Create order",
        "operation": "createOrder",
        "provenance": "contract orders.yaml POST /orders"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Create refund",
-       "operation": "createRefund",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/refunds"
       },
       {
        "kind": "secondaryButton",
@@ -263,50 +254,12 @@
        "label": "Resume order",
        "operation": "resumeOrder",
        "provenance": "contract orders.yaml POST /orders/{orderId}/resume"
-      },
-      {
-       "kind": "destructiveButton",
-       "label": "Void order",
-       "operation": "voidOrder",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/voids"
       }
      ]
     }
    ]
   },
   "overlays": [
-   {
-    "id": "confirmVoidOrder",
-    "component": "confirmDialog",
-    "trigger": "Void order",
-    "body": "**Names what `voidOrder` changes and what it leaves alone**, in the consequence rather than the verb. A order history this affects should be identified in the dialog, not just counted. **Collects what `voidOrder` sends before it is called.** Required: `id`, `reason`, `recordedAt`.",
-    "provenance": "contract orders.yaml POST /orders/{orderId}/voids"
-   },
-   {
-    "id": "formApplyManualDiscount",
-    "component": "modal",
-    "trigger": "Apply manual discount",
-    "body": "**Collects what `applyManualDiscount` sends before it is called.** Required: `id`, `reason`, `recordedAt`. Optional: `lineId`, `amount`, `percentage`, `reasonCode`, `approverPrincipalId`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "ManualDiscountRequest",
-    "confirm": {
-     "label": "Apply manual discount",
-     "operation": "applyManualDiscount"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "id",
-      "reason",
-      "recordedAt",
-      "lineId",
-      "amount",
-      "percentage",
-      "reasonCode",
-      "approverPrincipalId"
-     ]
-    },
-    "provenance": "contract orders.yaml POST /orders/{orderId}/discounts"
-   },
    {
     "id": "formCreateOrder",
     "component": "modal",
@@ -332,31 +285,6 @@
      ]
     },
     "provenance": "contract orders.yaml POST /orders"
-   },
-   {
-    "id": "formCreateRefund",
-    "component": "modal",
-    "trigger": "Create refund",
-    "body": "**Collects what `createRefund` sends before it is called.** Required: `id`, `amount`, `reason`, `recordedAt`. Optional: `lineIds`, `secondaryAuthorisation`, `refundToOriginalTender`, `alternateTender`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "CreateRefundRequest",
-    "confirm": {
-     "label": "Create refund",
-     "operation": "createRefund"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "id",
-      "amount",
-      "reason",
-      "recordedAt",
-      "lineIds",
-      "secondaryAuthorisation",
-      "refundToOriginalTender",
-      "alternateTender"
-     ]
-    },
-    "provenance": "contract orders.yaml POST /orders/{orderId}/refunds"
    },
    {
     "id": "formExchangeOrderLines",
@@ -486,27 +414,9 @@
     "trigger": "onAction"
    },
    {
-    "operationId": "applyManualDiscount",
-    "contract": "orders",
-    "purpose": "Apply a discount a cashier chose",
-    "trigger": "onAction",
-    "invalidates": [
-     "listOrders"
-    ]
-   },
-   {
     "operationId": "createOrder",
     "contract": "orders",
     "purpose": "Create an order",
-    "trigger": "onAction",
-    "invalidates": [
-     "listOrders"
-    ]
-   },
-   {
-    "operationId": "createRefund",
-    "contract": "orders",
-    "purpose": "Refund an order, wholly or in part",
     "trigger": "onAction",
     "invalidates": [
      "listOrders"
@@ -577,15 +487,6 @@
     "invalidates": [
      "listOrders"
     ]
-   },
-   {
-    "operationId": "voidOrder",
-    "contract": "orders",
-    "purpose": "Void an order",
-    "trigger": "onAction",
-    "invalidates": [
-     "listOrders"
-    ]
    }
   ],
   "entryState": {
@@ -610,6 +511,26 @@
    "board": "wireframes/P10 Partner Web.dc.html#ptr-015"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 14 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "gaps": [
+   {
+    "operation": "applyManualDiscount",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-018): Venue-side actions (refund, void, discount) on the partner's history; the partner requests changes and the venue performs them (design-notes correction ticketing-guest PTR-015).",
+    "source": "screens/P10-partner-reseller-portal.yaml#PTR-015"
+   },
+   {
+    "operation": "createRefund",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-018): Venue-side actions (refund, void, discount) on the partner's history; the partner requests changes and the venue performs them (design-notes correction ticketing-guest PTR-015).",
+    "source": "screens/P10-partner-reseller-portal.yaml#PTR-015"
+   },
+   {
+    "operation": "voidOrder",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-018): Venue-side actions (refund, void, discount) on the partner's history; the partner requests changes and the venue performs them (design-notes correction ticketing-guest PTR-015).",
+    "source": "screens/P10-partner-reseller-portal.yaml#PTR-015"
+   }
+  ],
   "_platform": {
    "code": "P10",
    "audience": "partner",
@@ -816,67 +737,12 @@
        "label": "Reprint order",
        "operation": "reprintOrder",
        "provenance": "contract orders.yaml POST /orders/{orderId}/reprints"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Apply manual discount",
-       "operation": "applyManualDiscount",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/discounts"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Create order",
-       "operation": "createOrder",
-       "provenance": "contract orders.yaml POST /orders"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Exchange order lines",
-       "operation": "exchangeOrderLines",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/exchanges"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Hold order",
-       "operation": "holdOrder",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/hold"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Modify order",
-       "operation": "modifyOrder",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/modify"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Reschedule order",
-       "operation": "rescheduleOrder",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/reschedule"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Resume order",
-       "operation": "resumeOrder",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/resume"
-      },
-      {
-       "kind": "destructiveButton",
-       "label": "Void order",
-       "operation": "voidOrder",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/voids"
       }
      ]
     }
    ]
   },
   "overlays": [
-   {
-    "id": "confirmVoidOrder",
-    "component": "confirmDialog",
-    "trigger": "Void order",
-    "body": "**Names what `voidOrder` changes and what it leaves alone**, in the consequence rather than the verb. A voucher ticket download this affects should be identified in the dialog, not just counted. **Collects what `voidOrder` sends before it is called.** Required: `id`, `reason`, `recordedAt`.",
-    "provenance": "contract orders.yaml POST /orders/{orderId}/voids"
-   },
    {
     "id": "formReprintOrder",
     "component": "modal",
@@ -897,148 +763,12 @@
      ]
     },
     "provenance": "contract orders.yaml POST /orders/{orderId}/reprints"
-   },
-   {
-    "id": "formApplyManualDiscount",
-    "component": "modal",
-    "trigger": "Apply manual discount",
-    "body": "**Collects what `applyManualDiscount` sends before it is called.** Required: `id`, `reason`, `recordedAt`. Optional: `lineId`, `amount`, `percentage`, `reasonCode`, `approverPrincipalId`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "ManualDiscountRequest",
-    "confirm": {
-     "label": "Apply manual discount",
-     "operation": "applyManualDiscount"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "id",
-      "reason",
-      "recordedAt",
-      "lineId",
-      "amount",
-      "percentage",
-      "reasonCode",
-      "approverPrincipalId"
-     ]
-    },
-    "provenance": "contract orders.yaml POST /orders/{orderId}/discounts"
-   },
-   {
-    "id": "formCreateOrder",
-    "component": "modal",
-    "trigger": "Create order",
-    "body": "**Collects what `createOrder` sends before it is called.** Required: `id`, `venueId`, `channel`, `lines`, `recordedAt`. Optional: `shiftId`, `subjectId`, `guestLinkId`, `catalogueBundleVersion`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "CreateOrderRequest",
-    "confirm": {
-     "label": "Create order",
-     "operation": "createOrder"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "id",
-      "venueId",
-      "channel",
-      "lines",
-      "recordedAt",
-      "shiftId",
-      "subjectId",
-      "guestLinkId",
-      "catalogueBundleVersion"
-     ]
-    },
-    "provenance": "contract orders.yaml POST /orders"
-   },
-   {
-    "id": "formExchangeOrderLines",
-    "component": "modal",
-    "trigger": "Exchange order lines",
-    "body": "**Collects what `exchangeOrderLines` sends before it is called.** Required: `id`, `outgoingLineIds`, `incomingLines`, `recordedAt`. Optional: `waiveFee`, `reason`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "ExchangeOrderRequest",
-    "confirm": {
-     "label": "Exchange order lines",
-     "operation": "exchangeOrderLines"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "id",
-      "outgoingLineIds",
-      "incomingLines",
-      "recordedAt",
-      "waiveFee",
-      "reason"
-     ]
-    },
-    "provenance": "contract orders.yaml POST /orders/{orderId}/exchanges"
-   },
-   {
-    "id": "formHoldOrder",
-    "component": "modal",
-    "trigger": "Hold order",
-    "body": "**Collects what `holdOrder` sends before it is called.** Required: `recordedAt`. Optional: `label`, `holdUntil`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Hold order",
-     "operation": "holdOrder"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "recordedAt",
-      "label",
-      "holdUntil"
-     ]
-    },
-    "provenance": "contract orders.yaml POST /orders/{orderId}/hold"
-   },
-   {
-    "id": "formModifyOrder",
-    "component": "modal",
-    "trigger": "Modify order",
-    "body": "**Collects what `modifyOrder` sends before it is called.** Required: `id`, `recordedAt`. Optional: `addLines`, `removeLineIds`, `reason`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "ModifyOrderRequest",
-    "confirm": {
-     "label": "Modify order",
-     "operation": "modifyOrder"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "id",
-      "recordedAt",
-      "addLines",
-      "removeLineIds",
-      "reason"
-     ]
-    },
-    "provenance": "contract orders.yaml POST /orders/{orderId}/modify"
-   },
-   {
-    "id": "formRescheduleOrder",
-    "component": "modal",
-    "trigger": "Reschedule order",
-    "body": "**Collects what `rescheduleOrder` sends before it is called.** Required: `targetPerformanceId`, `recordedAt`. Optional: `lineIds`, `waiveFee`, `reason`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Reschedule order",
-     "operation": "rescheduleOrder"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "targetPerformanceId",
-      "recordedAt",
-      "lineIds",
-      "waiveFee",
-      "reason"
-     ]
-    },
-    "provenance": "contract orders.yaml POST /orders/{orderId}/reschedule"
    }
   ],
   "states": {
    "loading": "The voucher ticket download list.",
    "error": "Could not load. Names which read failed and leaves the voucher ticket download untouched.",
-   "emptyFirstRun": "No voucher ticket download yet. Offers Create order (`createOrder`).",
+   "emptyFirstRun": "No voucher ticket download yet. Offers no create action — this screen declares no operation that makes one.",
    "emptyNoResults": "Never shown: `listOrderRefunds` takes no filter, so an empty list is always the first-run state above.",
    "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `getOrder` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -1048,33 +778,6 @@
     "contract": "orders",
     "purpose": "from page inventory",
     "trigger": "onAction"
-   },
-   {
-    "operationId": "applyManualDiscount",
-    "contract": "orders",
-    "purpose": "Apply a discount a cashier chose",
-    "trigger": "onAction",
-    "invalidates": [
-     "listOrderRefunds"
-    ]
-   },
-   {
-    "operationId": "createOrder",
-    "contract": "orders",
-    "purpose": "Create an order",
-    "trigger": "onAction",
-    "invalidates": [
-     "listOrderRefunds"
-    ]
-   },
-   {
-    "operationId": "exchangeOrderLines",
-    "contract": "orders",
-    "purpose": "Exchange lines for different products or dates",
-    "trigger": "onAction",
-    "invalidates": [
-     "listOrderRefunds"
-    ]
    },
    {
     "operationId": "getOrder",
@@ -1089,15 +792,6 @@
     "trigger": "onLoad"
    },
    {
-    "operationId": "holdOrder",
-    "contract": "orders",
-    "purpose": "Park a sale and free the till",
-    "trigger": "onAction",
-    "invalidates": [
-     "listOrderRefunds"
-    ]
-   },
-   {
     "operationId": "listOrderRefunds",
     "contract": "orders",
     "purpose": "List refunds against an order",
@@ -1108,42 +802,6 @@
     "contract": "orders",
     "purpose": "List orders",
     "trigger": "onLoad"
-   },
-   {
-    "operationId": "modifyOrder",
-    "contract": "orders",
-    "purpose": "Add or remove lines on an existing order",
-    "trigger": "onAction",
-    "invalidates": [
-     "listOrderRefunds"
-    ]
-   },
-   {
-    "operationId": "rescheduleOrder",
-    "contract": "orders",
-    "purpose": "Move an order to another performance",
-    "trigger": "onAction",
-    "invalidates": [
-     "listOrderRefunds"
-    ]
-   },
-   {
-    "operationId": "resumeOrder",
-    "contract": "orders",
-    "purpose": "Bring a parked sale back to a till",
-    "trigger": "onAction",
-    "invalidates": [
-     "listOrderRefunds"
-    ]
-   },
-   {
-    "operationId": "voidOrder",
-    "contract": "orders",
-    "purpose": "Void an order",
-    "trigger": "onAction",
-    "invalidates": [
-     "listOrderRefunds"
-    ]
    }
   ],
   "entryState": {
@@ -1168,6 +826,56 @@
    "board": "wireframes/P10 Partner Web.dc.html#ptr-016"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 13 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "gaps": [
+   {
+    "operation": "applyManualDiscount",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-018): Order-changing actions on a download screen; the screen downloads and resends only (design-notes correction ticketing-guest PTR-016).",
+    "source": "screens/P10-partner-reseller-portal.yaml#PTR-016"
+   },
+   {
+    "operation": "createOrder",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-018): Order-changing actions on a download screen; the screen downloads and resends only (design-notes correction ticketing-guest PTR-016).",
+    "source": "screens/P10-partner-reseller-portal.yaml#PTR-016"
+   },
+   {
+    "operation": "exchangeOrderLines",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-018): Order-changing actions on a download screen; the screen downloads and resends only (design-notes correction ticketing-guest PTR-016).",
+    "source": "screens/P10-partner-reseller-portal.yaml#PTR-016"
+   },
+   {
+    "operation": "holdOrder",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-018): Order-changing actions on a download screen; the screen downloads and resends only (design-notes correction ticketing-guest PTR-016).",
+    "source": "screens/P10-partner-reseller-portal.yaml#PTR-016"
+   },
+   {
+    "operation": "modifyOrder",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-018): Order-changing actions on a download screen; the screen downloads and resends only (design-notes correction ticketing-guest PTR-016).",
+    "source": "screens/P10-partner-reseller-portal.yaml#PTR-016"
+   },
+   {
+    "operation": "rescheduleOrder",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-018): Order-changing actions on a download screen; the screen downloads and resends only (design-notes correction ticketing-guest PTR-016).",
+    "source": "screens/P10-partner-reseller-portal.yaml#PTR-016"
+   },
+   {
+    "operation": "resumeOrder",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-018): Order-changing actions on a download screen; the screen downloads and resends only (design-notes correction ticketing-guest PTR-016).",
+    "source": "screens/P10-partner-reseller-portal.yaml#PTR-016"
+   },
+   {
+    "operation": "voidOrder",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-018): Order-changing actions on a download screen; the screen downloads and resends only (design-notes correction ticketing-guest PTR-016).",
+    "source": "screens/P10-partner-reseller-portal.yaml#PTR-016"
+   }
+  ],
   "_platform": {
    "code": "P10",
    "audience": "partner",

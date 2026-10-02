@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI — AI
   version: 1.0.0
-  x-ticvai-screen-count: 127
+  x-ticvai-screen-count: 130
   x-ticvai-module: 8 — Unified Operations Dashboard (AI)
   x-ticvai-platforms:
   - P01 Guest Web
@@ -201,6 +201,8 @@ paths:
         format: uuid
     get:
       operationId: getTranslationProposals
+      x-ticvai-consumed-by:
+        - "P13 CMS-011 Translations"
       x-ticvai-agreed: '2 October: contract gap CHG-WIR-017 (CMS-011: no read follows a proposeTranslations job, which
         answers 202); shape follows proposeTranslations'
       summary: Follow a translation job
@@ -502,12 +504,12 @@ paths:
         - "P02 GST-031 AI Concierge – Home"
         - "P02 GST-054 AI Planner"
         - "P06 EMP-031 Queue monitor"
+        - "P08 ADM-047 AI Delivery Optimization & Communication Platform Diagnostics"
         - "P08 BO-005 Queue Monitor"
         - "P08 BO-139 Wastage, Spoilage, Returns & Write-Off"
         - "P08 BO-772 A/B & AI Optimization"
         - "P08 BO-782 AI Journey Optimization"
         - "P08 BO-925 AI Staff Recommendation & Workforce Matching"
-        - "P08 ADM-047 AI Delivery Optimization & Communication Platform Diagnostics"
         - "P09 ADM-511 Attraction Utilization & Queue Forecast"
         - "P16 ANL-001 Executive Command Center"
         - "P16 ANL-006 Inventory & Waste Intelligence"
@@ -1289,11 +1291,11 @@ paths:
       operationId: listAiConversations
       x-ticvai-consumed-by:
         - "P01 WEB-044 AI Concierge – Home"
+        - "P02 GST-031 AI Concierge – Home"
         - "P02 GST-068 Help & My Cases"
         - "P06 EMP-019 AI assistant — home"
         - "P06 EMP-020 AI assistant — answer"
         - "P08 BO-932 Conversational AI Resource Copilot"
-        - "P02 GST-031 AI Concierge – Home"
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -1338,14 +1340,14 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-044 AI Concierge – Home"
         - "P02 GST-031 AI Concierge – Home"
+        - "P02 GST-033 AI Concierge – Contextual Help"
         - "P02 GST-054 AI Planner"
+        - "P05 KSK-015 Assistant"
         - "P06 EMP-019 AI assistant — home"
         - "P06 EMP-020 AI assistant — answer"
         - "P08 BO-928 AI Conflict Resolution Assistant"
         - "P08 BO-932 Conversational AI Resource Copilot"
         - "P13 CMS-104 App Build & Store Publishing"
-        - "P02 GST-033 AI Concierge – Contextual Help"
-        - "P05 KSK-015 Assistant"
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -2521,6 +2523,8 @@ paths:
   /policy/spend-ceiling:
     get:
       operationId: getAiSpendCeiling
+      x-ticvai-consumed-by:
+        - "P08 BO-091 AI Policy & Spend"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -2548,6 +2552,8 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setAiSpendCeiling
+      x-ticvai-consumed-by:
+        - "P08 BO-091 AI Policy & Spend"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '2 October: Chinmay, workbook Q8 (BO-091); shape follows setAiPolicy'
@@ -3467,10 +3473,10 @@ paths:
     post:
       operationId: pauseAiCapability
       x-ticvai-consumed-by:
+        - "P08 ADM-696 AI Risk, Fairness, Explainability & Safety Center"
         - "P09 ADM-519 AI Governance Command Center"
         - "P09 ADM-536 Human Override & Manual Control Center"
         - "P09 ADM-556 AI Incident & Remediation Management"
-        - "P08 ADM-696 AI Risk, Fairness, Explainability & Safety Center"
       x-ticvai-agreed: '29 September: AI system design 2.3 governance, 3.2 events; our build plan, shape follows
         reindexSource'
       summary: Stop a capability now
@@ -4936,11 +4942,11 @@ paths:
       operationId: recordAnswerFeedback
       x-ticvai-consumed-by:
         - "P01 WEB-044 AI Concierge – Home"
+        - "P02 GST-031 AI Concierge – Home"
         - "P02 GST-032 AI Concierge – Chat"
+        - "P02 GST-033 AI Concierge – Contextual Help"
         - "P05 KSK-015 Assistant"
         - "P06 EMP-020 AI assistant — answer"
-        - "P02 GST-031 AI Concierge – Home"
-        - "P02 GST-033 AI Concierge – Contextual Help"
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -6775,9 +6781,9 @@ paths:
     get:
       operationId: listRiskAlerts
       x-ticvai-consumed-by:
-        - "P08 BO-1160 Fraud Alert & Investigation Case Management"
         - "P08 ADM-633 Fraud Alert, Investigation & Case Management"
         - "P08 ADM-637 AI Fraud, Anomaly & Payment Intelligence Center"
+        - "P08 BO-1160 Fraud Alert & Investigation Case Management"
       x-ticvai-agreed: '29 September: AI system design 2.3 risk; our build plan, shape follows listProposedActions'
       summary: Risk alerts
       description: 'Alerts to work (AIP-109), highest band first. An alert is a signal, not a finding (AIP-163).
@@ -6869,8 +6875,8 @@ paths:
     post:
       operationId: decideRiskAlert
       x-ticvai-consumed-by:
-        - "P08 BO-1160 Fraud Alert & Investigation Case Management"
         - "P08 ADM-633 Fraud Alert, Investigation & Case Management"
+        - "P08 BO-1160 Fraud Alert & Investigation Case Management"
       x-ticvai-agreed: '29 September: AI system design 2.3 risk; our build plan, shape follows decideProposedAction'
       summary: Dismiss, monitor, mark false positive, or escalate
       description: 'An analyst''s disposition. `falsePositive` is a label the next candidate model learns from (design
@@ -6937,8 +6943,8 @@ paths:
     post:
       operationId: createRiskCase
       x-ticvai-consumed-by:
-        - "P08 BO-1160 Fraud Alert & Investigation Case Management"
         - "P08 ADM-633 Fraud Alert, Investigation & Case Management"
+        - "P08 BO-1160 Fraud Alert & Investigation Case Management"
       x-ticvai-agreed: '29 September: AI system design 2.3 risk; our build plan, shape follows createAiConversation'
       summary: Open an investigation
       description: 'A case from one or more alerts or entities (AIP-150). The alerts'' assessments are attached
@@ -7026,8 +7032,8 @@ paths:
     get:
       operationId: getRiskCase
       x-ticvai-consumed-by:
-        - "P08 BO-1160 Fraud Alert & Investigation Case Management"
         - "P08 ADM-633 Fraud Alert, Investigation & Case Management"
+        - "P08 BO-1160 Fraud Alert & Investigation Case Management"
       x-ticvai-agreed: '29 September: AI system design 2.3 risk; our build plan, shape follows getAiPolicy'
       summary: A case with its evidence and actions
       description: 'The case, its evidence (each labelled source, derived or model-inferred), proposed actions and
@@ -7262,8 +7268,8 @@ paths:
     post:
       operationId: closeRiskCase
       x-ticvai-consumed-by:
-        - "P08 BO-1160 Fraud Alert & Investigation Case Management"
         - "P08 ADM-633 Fraud Alert, Investigation & Case Management"
+        - "P08 BO-1160 Fraud Alert & Investigation Case Management"
       x-ticvai-agreed: '29 September: AI system design 2.3 risk, 3.2 events; our build plan, shape follows decideProposedAction'
       summary: Close a case with an outcome
       description: 'Confirmed fraud, not fraud, or inconclusive: **alert, case and confirmed fraud stay distinct**
@@ -7410,11 +7416,11 @@ paths:
     get:
       operationId: getApprovalRequestScore
       x-ticvai-consumed-by:
+        - "P08 ADM-366 AI Approval Intelligence Center"
         - "P08 BO-084 Approval Inbox"
         - "P08 BO-367 Approval Request Detail"
         - "P08 BO-368 AI Decision Support"
         - "P08 BO-369 High Priority & Risk Queue"
-        - "P08 ADM-366 AI Approval Intelligence Center"
       x-ticvai-agreed: '29 September: minutes of 8 September (context only); our build plan, shape follows getEntityRisk'
       summary: The latest context score of an approval request
       description: 'What the reviewer sees beside the request: risk band and score, priority, the suggested escalation
@@ -7694,7 +7700,6 @@ paths:
     get:
       operationId: explainRecommendationDecision
       x-ticvai-consumed-by:
-        - "P09 ADM-543 Candidate, Rule & Decision Path Trace"
         - "P08 ADM-678 Journey Simulator, Decision Trace & AI Optimization"
         - "P08 ADM-680 Customer Recommendation Profile"
         - "P08 ADM-683 Next-Best-Offer Decision Studio"
@@ -7702,6 +7707,7 @@ paths:
         - "P08 ADM-687 AI Explainability, Confidence & Model Governance"
         - "P08 ADM-696 AI Risk, Fairness, Explainability & Safety Center"
         - "P08 ADM-697 Recommendation Audit, Decision Trace & Investigation"
+        - "P09 ADM-543 Candidate, Rule & Decision Path Trace"
       x-ticvai-agreed: '29 September: AI system design 2.3 recommend, 3.9; our build plan, shape follows listAiInteractions'
       summary: Why these recommendations
       description: '**Explanation at three depths, each gated** (AIC-195, AIR-193..202): `business` with `AI_USE`;
@@ -8352,9 +8358,9 @@ paths:
     post:
       operationId: rollbackAiRelease
       x-ticvai-consumed-by:
+        - "P08 ADM-696 AI Risk, Fairness, Explainability & Safety Center"
         - "P09 ADM-554 AI Quality, Behavior & Governance Drift Monitoring"
         - "P09 ADM-556 AI Incident & Remediation Management"
-        - "P08 ADM-696 AI Risk, Fairness, Explainability & Safety Center"
       x-ticvai-agreed: '29 September: AI system design 2.3 models, 3.5; our build plan, shape follows decideProposedAction'
       summary: Roll a release back
       description: '**A pointer switch** (design 3.5): production returns to the previous artefact, or to the rule.

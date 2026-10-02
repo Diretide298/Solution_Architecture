@@ -11,8 +11,8 @@ scale: Mixed. Counting is bursty; procurement is not.
 ifDown: Down blocks receiving and counting; selling continues from the till's cache.
 coverage:
   operations: 58
-  inAFlow: 47
-  percent: 81%
+  inAFlow: 44
+  percent: 76%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
@@ -805,13 +805,13 @@ screens:
 - P06:EMP-062 Store Stock & SKU Availability
 - P06:EMP-063 Requisition & Smart Store Replenishment
 - P06:EMP-064 Store-to-Store & Warehouse Transfers
-- P06:EMP-065 Receiving & Store Put-Away
+- P06:EMP-065 Receiving
 - P06:EMP-066 Stock Count & Cycle Count Management
 - P06:EMP-067 Damage, Loss, Shrinkage & Stock Adjustment
 - P06:EMP-068 Reservation, Allocation & Omnichannel Inventory
 - P06:EMP-069 Barcode, RFID, Serialized Stock & Traceability
 - P06:EMP-070 Inventory Exceptions, AI Replenishment & Action Center
-- P08:BO-007 Product Directory
+- P08:ADM-189 Component Inventory & Availability Matrix
 - P08:BO-049 Stock Levels
 - P08:BO-050 Stock Position & Valuation
 - P08:BO-051 Purchase Orders
@@ -823,33 +823,28 @@ screens:
 - P08:BO-082 Stock Movements
 - P08:BO-083 Suppliers
 - P08:BO-105 Stock & Supply
+- P08:BO-112 Production Planning & Production Sheets
 - P08:BO-114 Variants, Attributes, Barcode & RFID Management
 - P08:BO-137 Recipe Consumption & Theoretical Inventory
-- P08:BO-138 Production Execution & Batch Management
-- P08:BO-140 Product Availability, 86 & Operational Food Safety
 - P08:BO-141 Operational Alerts, AI Replenishment & Action Center
+- P08:BO-451 Prize Inventory Integration
 - P08:BO-452 Direct-Pay / Crane & Prize Machine Configuration
-- P08:BO-504 Rental Inventory Command Center
-- P08:BO-505 Serialized Equipment Registry
 - P08:BO-507 Pooled Inventory Management
 - P08:BO-510 Inventory Location Allocation
 - P08:BO-511 Inventory Transfer Management
 - P08:BO-512 Inventory Adjustment & Exception Management
 - P08:BO-513 Inventory Intelligence & Rebalancing
 - P08:BO-579 Parts, Cost & Maintenance Expense Tracking
-- P09:ADM-189 Component Inventory & Availability Matrix
 - P16:ANL-005 Cost, Margin & Profitability
 - P16:ANL-006 Inventory & Waste Intelligence
 flows:
 - F15 A part is needed and ordered
 - F30 A count is entered, varied and posted
-- F34 A retail sale, from scan to return
 - F35 Stock arrives short and an oversell is resolved
 - F76 Stock is counted, requested, transferred and received
 - F78 A supplier is set up and a catalogue is priced and published
 - F80 A table is configured, reserved, seated and billed
 - F82 A month is analysed from incrementality to a scheduled report
-- F85 Production is planned, costed and released
 - F87 A till handles a return, a collection and a safe drop
 - F92 Store stock is watched, replenished and reconciled
 - F94 A restaurant floor is set up before service

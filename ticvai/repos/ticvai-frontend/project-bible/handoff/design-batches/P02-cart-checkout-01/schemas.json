@@ -1,65 +1,4 @@
 {
- "AddCartLineRequest": {
-  "type": "object",
-  "x-ticvai-persistence": "none — request only",
-  "required": [
-   "variantId",
-   "quantity"
-  ],
-  "properties": {
-   "variantId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "quantity": {
-    "type": "integer",
-    "minimum": 1
-   },
-   "performanceId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "bookedWindow": {
-    "$ref": "#/components/schemas/BookedWindow"
-   },
-   "recommendationId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "The `trackingId` of the ai `decideRecommendations` item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather than guessed. Optional; sent by a page or till that shows the engine's recommendations. Not validated against the engine: an unknown id only fails to attribute.\n"
-   },
-   "tableReservationId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "A table deposit line (decided 29 September, rev 3 REV3-8b): the `fnb.TableReservation` in `awaitingDeposit` this pays for, sent with `variantId` set to the booking's `deposit.variantId` and `quantity` 1. The price is the booking's `deposit.amount`. A booking that is not awaiting a deposit is refused 422 `depositNotDue`.\n"
-   },
-   "seatIds": {
-    "type": "array",
-    "maxItems": 50,
-    "description": "At most `VenueSettings.seating.maxSeatsPerGuestOrder` seats per booking on a guest channel (default 10, bounds 1 to 50, decided 29 September, rev 3 REV3-7); at most 10 per sale on staff and POS (audit R080 (c)). Over the limit is 422 `seatLimitExceeded`.",
-    "items": {
-     "type": "string",
-     "format": "uuid"
-    }
-   },
-   "resourceHoldId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "A `resources.ResourceHold` on a resource the guest picked on a venue map (decided 29 September, rev 3 REV3-15); `variantId` is the placed resource's price-band variant and `quantity` is 1. The hold is the line's capacity; no inventory lease is taken."
-   },
-   "parentLineId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "For an add-on attaching to a ticket already in the cart. **Removing the parent removes the child** — a locker with no admission is not a sale.\n"
-   },
-   "attributes": {
-    "$ref": "#/components/schemas/OrderLineAttributes"
-   }
-  }
- },
  "ApplyCartPromoCodeRequest": {
   "type": "object",
   "x-ticvai-persistence": "none — request only",
@@ -72,27 +11,6 @@
     "minLength": 1,
     "maxLength": 100,
     "description": "The code as the guest typed it."
-   }
-  }
- },
- "BookedWindow": {
-  "type": "object",
-  "nullable": true,
-  "x-ticvai-persistence": "none — embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line",
-  "description": "**The booked time window of an hourly product, such as a meeting room** (decided 29 September, rev 3 REV3-13: meeting rooms by the hour are in scope). The guest picks a date, a length and a start time from `resources.listProductStartTimes`; the length is the product's `length` variant (1 hour, 2 hours, half day, full day), priced per variant, so the price is the variant's. **`endsAt` minus `startsAt` must equal the chosen variant's length** (its `length` dimension value's `durationMinutes`), or the line is refused 422 `windowLengthMismatch`. Required on a product with `catalogue.Product.requiresTimeWindow` true and refused on any other (`windowRequired`, `windowNotAllowed`). The room itself is not named here: the window holds capacity of the room type, and `resources.allocateResources` picks the room at checkout (26 August minute: a guest books a meeting room product, never a raw room).\n",
-  "required": [
-   "startsAt",
-   "endsAt"
-  ],
-  "properties": {
-   "startsAt": {
-    "type": "string",
-    "format": "date-time"
-   },
-   "endsAt": {
-    "type": "string",
-    "format": "date-time",
-    "description": "After `startsAt`, on the same venue day."
    }
   }
  },
@@ -838,7 +756,7 @@
     "type": "string",
     "pattern": "^[A-Z]{3}$",
     "nullable": true,
-    "description": "The currency the guest handed over, where it is not the venue's — becomes `Payment.tenderCurrency`. Omit for a payment in the venue's own currency."
+    "description": "The currency the guest handed over, where it is not the venue's — becomes `Payment.tenderCurrency`. Omit for a payment in the venue's own currency. For a guest-channel card or wallet payment on an order with a `chargeCurrency`, the server sets it from the order (CHG-FIN-001)."
    },
    "tenderAmount": {
     "allOf": [
@@ -888,6 +806,14 @@
   "x-ticvai-persistence-column": "numeric(18,6)",
   "description": "**An exchange rate: a decimal string, never a float**, for the reason `Money.amount` is one — a JavaScript client must not round a rate in transit. **Six decimal places**, the precision `finance.FxRate.rate` asks for, and stored at that precision.\n",
   "pattern": "^\\d+(\\.\\d{1,6})?$"
+ },
+ "LocalisedRichText": {
+  "x-ticvai-persistence": "none — jsonb column",
+  "type": "object",
+  "description": "Keyed by language code. Values are sanitised HTML.",
+  "additionalProperties": {
+   "type": "string"
+  }
  },
  "LocalisedText": {
   "x-ticvai-persistence": "none — jsonb column",
@@ -996,6 +922,46 @@
    },
    "refundedAmount": {
     "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "chargeCurrency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**The currency the guest selected and is charged in** (CHG-FIN-001, 2 October 2026). Null or equal to `currency` for a sale in the base currency. Everything else on the order, and every ledger posting, stays in the base currency `currency`."
+   },
+   "chargeFxRate": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/ExchangeRateDecimal"
+     }
+    ],
+    "nullable": true,
+    "readOnly": true,
+    "description": "Units of `chargeCurrency` per one unit of the base currency, from the region's `tender` rate in force at checkout (`finance.FxRate`), stored on the order so the payment, the receipt, the tax invoice and any refund use the same rate (CHG-FIN-001)."
+   },
+   "chargeFxRateId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The `finance.FxRate` row the rate was taken from, for audit."
+   },
+   "chargeTotal": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "readOnly": true,
+    "description": "`grossAmount` converted at `chargeFxRate` and rounded to the charge currency's scale: what the guest pays and what the payment request to the provider asks for (CHG-FIN-001)."
+   },
+   "chargeRateLockedUntil": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The quote holds until then (the cart lease). After it, the next payment attempt re-quotes at the rate then in force and the guest confirms the new amount (CHG-FIN-001)."
    },
    "droppedPromotions": {
     "type": "array",
@@ -1190,18 +1156,6 @@
    }
   ]
  },
- "OrderLineAttributes": {
-  "type": "object",
-  "nullable": true,
-  "additionalProperties": true,
-  "x-ticvai-persistence": "none — embedded as attributes (jsonb) on orders.cart_line and orders.order_line",
-  "description": "Open attributes of a line, kept from the cart to the order line. **`transport` is the one with a defined shape** (decided 29 September, rev 3 REV3-21); other keys are free.\n",
-  "properties": {
-   "transport": {
-    "$ref": "#/components/schemas/TransportLineAttributes"
-   }
-  }
- },
  "OrderLineDiscount": {
   "type": "object",
   "description": "One discount applied to one order line (SD-008). Rows of `orders.order_line_discount`.",
@@ -1336,7 +1290,7 @@
     "type": "string",
     "pattern": "^[A-Z]{3}$",
     "nullable": true,
-    "description": "4.6.11 is deliberately asymmetric: **accept foreign currency, refund in local.** A till giving change in five currencies needs five floats and five counts, and the variance becomes unattributable.\n"
+    "description": "4.6.11 is deliberately asymmetric: **accept foreign currency, refund in local.** A till giving change in five currencies needs five floats and five counts, and the variance becomes unattributable.\n**Cash at a till only** (CHG-FIN-001, 2 October 2026). A card or wallet payment the guest made in a currency they selected is refunded in that currency (`Refund.tenderCurrency`).\n"
    },
    "amount": {
     "$ref": "../shared/common.yaml#/components/schemas/Money"
@@ -1521,6 +1475,16 @@
    }
   }
  },
+ "PolicyKind": {
+  "type": "string",
+  "enum": [
+   "privacy",
+   "termsAndConditions",
+   "refund",
+   "cookie",
+   "accessibility"
+  ]
+ },
  "ProductVariant": {
   "x-ticvai-persistence": "catalogue.variant",
   "type": "object",
@@ -1578,6 +1542,41 @@
     ],
     "nullable": true,
     "description": "**Who this ticket type is for and what it includes**, shown behind the (i) on each Adult, Child, Senior or Infant row (decided 29 September, 23SEP-6). Each language value at most 300 characters; longer is a `400`. Set with `updateProductVariant`. Whether the guest screen shows it is `BookingFlowConfig.cardInfo` (white-label).\n"
+   }
+  }
+ },
+ "PublishedPolicy": {
+  "x-ticvai-persistence": "none — a public projection of whitelabel.policy",
+  "type": "object",
+  "x-ticvai-agreed": "2 October: decided by Chinmay, fix before Block A starts (GFIX-2)",
+  "description": "The current version of one policy as a guest reads it (`listPublishedPolicies`). Who published it and the partition key stay on `Policy`.",
+  "required": [
+   "kind",
+   "version",
+   "body",
+   "effectiveFrom"
+  ],
+  "properties": {
+   "kind": {
+    "$ref": "#/components/schemas/PolicyKind"
+   },
+   "title": {
+    "type": "string"
+   },
+   "version": {
+    "type": "string",
+    "description": "The version a consent records (a guest who consented to version 3 consented to version 3)."
+   },
+   "body": {
+    "$ref": "#/components/schemas/LocalisedRichText"
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "format": "date"
+   },
+   "requiresReconsent": {
+    "type": "boolean",
+    "description": "True when guests who consented to an earlier version are asked again on next launch."
    }
   }
  },

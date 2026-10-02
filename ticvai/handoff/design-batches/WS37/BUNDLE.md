@@ -1,14 +1,14 @@
 # WS37 — Pricing   Revenue Management board 4
 
-**10 screens · 15 operations · 18 schemas · 4 permissions**
+**10 screens · 16 operations · 21 schemas · 5 permissions**
 
-Platform P09 TICVAI Web · ships as **ticvai-control** ·
-platformAdmin audience · web ·
+Platform P08 Venue Management · ships as **venue-management** ·
+staff audience · web ·
 online only
 
 ## Who this is for
 
-**platformAdmin on web.** Everything below is how you know what is
+**staff on web.** Everything below is how you know what is
 true. **None of it is the subject.** The subject is the person in front of the screen and the one
 thing they came to do.
 
@@ -48,8 +48,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 4 permissions apply here:
-  `PRICE_CONFIGURE, PRODUCT_APPROVE, PRODUCT_CONFIGURE, PRODUCT_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 5 permissions apply here:
+  `APPROVAL_CONFIGURE, PRICE_CONFIGURE, PRODUCT_APPROVE, PRODUCT_CONFIGURE, PRODUCT_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -60,6 +60,45 @@ convincingly. It is never a caption.
   field, the control, whether it is required, its default, its limits and allowed values, its format
   and its error; and, element by element, what is shown and in what format, what each action
   produces and where the user goes next. Draw exactly that.
+
+## The processes these screens belong to
+
+Written by the owner of each process (`handoff/design-notes/`). Read before any screen: it says how the process runs end to end and which words the screens must use.
+
+### Ticketing & Guest Commerce, as the venue and TICVAI configure and run it
+
+WHAT THE PROCESS IS. Everything a guest can buy is set up, priced, promoted and serviced here, on Venue Management (P08, the venue's own back office, served inside the venue's cell) and on the TICVAI Console (P09, TICVAI's control plane, outside every cell). End to end: (1) CATALOGUE. A product has one of twelve kinds (admission, timedAdmission, datedAdmission, openDated, seated, membership, bundle, fnb, retail, rental, addOn, giftCard). Its ticket types (adult, child, senior, resident...) are not typed one by one: they are generated from the product's attributes (components) and each value combination becomes a sellable ticket type with no extra setup (DI-164). What a ticket grants (validity, entries, re-entry, days of week, blackout dates, expiry anchor, fast track, transfer) lives on a reusable entitlement template, not on the product. Who may take part (age, height, supervision, certification) is the eligibility rule; what the guest must answer is the data mask and the consent questions; how the guest sees it is guestListing (bookable, infoOnly, hidden), display tags (at most six), media and the booking flow. Group, family and corporate products and every after-sales policy (reschedule, exchange, refund, cancellation, upgrade, transfer) are configured inside the one product configuration, never on separate screens (DI-465, DI-466). (2) LIFECYCLE AND PUBLICATION. A product moves draft, inReview, approved, live, withdrawn, archived. Approval and publication are two acts with two permissions (PRODUCT_APPROVE, PRODUCT_PUBLISH, R091); every product is authorised before it sells online or on site (DI-438). Approved is still not on a till: a till sells only what is in the signed catalogue release it pulled (publishBundle, ADR-0013), so a saved price is a back-office fact until the venue publishes to tills. Changing something that has sold is preceded by an impact check (assessProductChange: orders affected, entitlements issued, future performances, open carts); restoring a version creates a new version, and sold tickets keep the price and terms they were sold under (restoreProductVersion, DI-938, TRACKER Actions row 145). (3) PRICE. Prices live in price lists: per venue, per channel set, with validity dates and a priority, copied for the next season with an uplift (copyPriceList) and repriced in bulk only after a dry run (bulkChangePrices). Currency and decimal scale are never chosen on a form: they resolve from the venue's region (ADR-0008, ADR-0018; AED 2 places, OMR and BHD 3). When several rules apply, the configured hierarchy decides; there is no "lowest price wins" default (DI-595). Tax on the pre-discount price and three-decimal rounding are regional settings (DI-598). Dynamic rules always show their minimum and maximum price guardrails beside the trigger (getDynamicPriceRule). (4) PROMOTE AND BUNDLE. A promotion is a rule (automatic, or gated by a code) created in draft, made live only by Publish, which first analyses stacking; a …
+*(source: DI-164; DI-171; DI-438; DI-465; DI-466; DI-595; DI-598; DI-387; DI-039; DI-044; DI-474; DI-671; DI-987; DI-019; DI-080; ADR-0008; ADR-0013; ADR-0018; ADR-0019; ADR-0030; R091; R098; R101; R222; REV3-21; contracts/spine/catalogue.yaml#transitionProductLifecycle …)*
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Product | Anything sellable, of one of the twelve kinds. The record that carries names, channels, listing, media and policies. | Item (except on F&B and retail screens), SKU (for tickets), Offering | contracts/spine/catalogue.yaml#/components/schemas/ProductKind |
+| Ticket type | One sellable variant of an admission or event product (Adult, Child, Resident Adult), generated from the product's attributes. For retail and F&B the same record is labelled Variant. | Variant (on ticket screens), Sub-product, Rate (that is a price), Axis value | contracts/spine/catalogue.yaml#updateProductVariant / DI-164 / DI-437 |
+| Attribute | A dimension that generates ticket types (Guest category, Residency, Tier, Length). Each has values; adding a value adds ticket types. | Axis, Component (the client's word; use it only in help text), Option | contracts/spine/catalogue.yaml#setProductAttributes / DI-164 / DI-450 |
+| Entitlement | What a ticket lets the holder do (validity, entries, re-entry, days, blackout dates, expiry, fast track, transfer), defined once on an entitlement template and shared by several products. | Access rights, Ticket rules, Validity profile | contracts/spine/catalogue.yaml#createEntitlementTemplate / DI-171 / DI-451 |
+| Eligibility rule | Who may take part in or buy a product (age, height, supervision, waiver, certification). Distinct from a promotion's eligibility, which decides who gets a discount. | Restriction, Access rule (that is access control) | contracts/spine/catalogue.yaml#setProductEligibilityRule / DI-463 |
+| Price list | A set of prices for one venue and a set of channels, valid between two dates, with a priority. Several coexist (B2C, B2B, season). | Price book, Rate card, Tariff | contracts/spine/catalogue.yaml#createPriceList / DI-140 / DI-163 |
+| Price category | A standard rate type (Adult, Child, Member) reused across lists so venues do not invent "Adult Standard" and "Normal Adult". | Price band (that is a seat-category band), Fare type (transport) | contracts/spine/catalogue.yaml#setPriceCategoryRateType / … |
+| Price band | A priced band on a seat category (code, label, colour, amount, channel, from-date). | Price category, Zone price | contracts/satellite/seating.yaml#/components/schemas/SeatPriceBand |
+| Promotion | A rule that changes a price automatically or when a code is entered; draft until published; declares how it stacks. | Offer (except in guest copy), Deal, Discount rule | contracts/satellite/promotions.yaml#createPromotion / DI-173 / DI-174 |
+| Coupon code | A code issued from a coupon campaign that applies a promotion-style discount; one shared code or many single-use codes. | Voucher, Promo voucher | contracts/satellite/promotions.yaml#createCouponCampaign / DI-173 |
+| Voucher | A code that carries money (face value, balance), sold or issued; a liability until redeemed or expired. | Coupon, Credit note | contracts/satellite/promotions.yaml#listVoucherBatches / … |
+| Bundle | A product sold as one line whose price differs from the sum of its components, with a mandatory revenue allocation. "Package" is acceptable in guest copy. | Combo (that is an F&B meal deal), Catalogue bundle | contracts/satellite/promotions.yaml#createBundle / DI-220 / ADR-0019 |
+| Catalogue release | The signed snapshot of a venue's catalogue, prices, promotions and sale boards that tills, kiosks and devices pull. Its action label is "Publish to tills". | Bundle, Catalogue bundle, Sync, Deploy | contracts/spine/catalogue.yaml#publishBundle / … |
+| Approve / Publish / Save | Save keeps a draft; Approve records that it is authorised (PRODUCT_APPROVE); Publish makes it live for guests and channels (PRODUCT_PUBLISH). Three different buttons, never merged. | Submit, Go live, Activate (except CatalogueConfigStatus active), Deploy | R091 / contracts/spine/catalogue.yaml#transitionProductLifecycle / DI-438 |
+| Product states | Draft, In review, Approved, Live, Withdrawn, Archived (ProductLifecycleState), always as coloured badges with these exact labels. | Published (for a product), Pending, Inactive (for a product) | contracts/spine/catalogue.yaml#/components/schemas/ProductLifecycleState |
+| Channel | Where something is sold. Labels: pos Point of sale; kiosk Kiosk; web and guestWeb Website; mobile and guestApp App; b2b B2B partners; partner Partner; ota Travel agents (OTA); callCentre Call centre; api API; backOffice Back office. | Touchpoint, Outlet (an outlet is a business inside a venue), raw enum values | contracts/spine/catalogue.yaml#/components/schemas/Channel / … |
+| Refund | Money returned after settlement, wholly or for some lines, under the venue's refund policy. | Return (that is retail goods), Reversal, Void | contracts/spine/orders.yaml#createRefund / DI-252 |
+| Void | Cancelling a whole order before settlement, within the same shift, with a reason from the void list. After settlement it is a refund. | Cancel order, Delete | contracts/spine/orders.yaml#voidOrder / R222 |
+| Exchange / Reschedule | Exchange swaps lines for other products or dates and settles only the difference; Reschedule is the same product moved to another date or time. | Rebook, Date change (acceptable only in guest copy), Refund and resell | contracts/spine/orders.yaml#exchangeOrderLines / … |
+| Hold / Capture / Release | A deposit or stored-value amount is held, then partly or fully captured, and the rest released. A held deposit is not a payment. | Charge, Pre-auth (in staff copy), Block funds | contracts/spine/orders.yaml#authoriseStoredValue / … |
+| Wallet (TICVAI wallet) | The guest's stored-value balance on TICVAI, spent by hold and capture. Distinct from the tender "Apple Pay / Google Pay", which the contract also calls wallet. | Digital wallet (for stored value), E-wallet, Credit (without a type) | contracts/spine/orders.yaml#/components/schemas/TenderKind / R080 |
+| Credit lot | One amount of wallet credit of one credit type (cash, bonus, gift) with its own expiry; lots are spent nearest expiry first and the guest sees the breakdown but cannot choose. | Bucket, Batch, Top-up | TRACKER Actions row 171 / contracts/satellite/wallet.yaml#expireCreditLots |
+| Venue map / Seat map | A venue map is the wayfinding map of a park or a floor (points, paths, bookable places); a seat map is the seating layout of an auditorium or stand. Never just "map" where both could be meant. | Layout (alone), Floor plan (unless it is a floor map), Map (alone) | contracts/satellite/venue-map.yaml#createVenueMap / … |
+| Point / Bookable place | A point is a place on a venue map (toilet, ride, restaurant, exit). A bookable place is a cabana, lounger, table or pitch placed on the map and sold through its price band. | Pin, POI, Marker, Resource (in staff copy) | contracts/satellite/venue-map.yaml#setVenuePoint / … |
+| Station / Route / Timetable / Departure / Fare table / Pass … | A route is an ordered list of stations with offsets; a timetable generates departures up to its release horizon; a fare table prices a route per passenger type; a pass type is a multi-trip or unlimited pass sold as a product. | Stop (except in the stop list), Line (except lineCode), Schedule, Trip (except a guest's journey) | contracts/satellite/transport.yaml / REV3-21 |
+| Applies from | The effective date of a change. Every dated change shows it, and sold items keep their old terms. | Effective date (in labels), Start date (for a change) | contracts/satellite/seating.yaml#updateSeatCategory / TRACKER Actions row 194 |
+
 
 ## The screens
 
@@ -72,7 +111,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `ADM-080` | Bulk Pricing Update, Import & Mass Maintenance | B–D | 0 | 8 | 6 | 0 | 1 | 2 | — | notStarted (generated) |
 | `ADM-081` | Pricing Version & Baseline Management | B–D | 0 | 26 | 6 | 1 | 1 | 0 | — | notStarted (generated) |
 | `ADM-082` | Pricing Change Impact Analysis | B–D | 0 | 26 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-083` | Pricing Approval Workflow & Authority Matrix | B–D | 4 | 0 | 5 | 1 | 1 | 3 | — | notStarted (generated) |
+| `ADM-083` | Pricing Approval Workflow & Authority Matrix | B–D | 4 | 20 | 5 | 1 | 1 | 3 | — | notStarted (generated) |
 | `ADM-084` | Pricing Publication & Effective-Date Scheduler | B–D | 1 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-085` | Pricing Distribution, Synchronization & Publication Monitor | B–D | 0 | 14 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-086` | Pricing Rollback & Emergency Control Center | B–D | 22 | 0 | 6 | 1 | 1 | 2 | — | notStarted (generated) |
@@ -94,17 +133,25 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `ticketing` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `PRODUCT_APPROVE`, `PRODUCT_VIEW` (1 operate, 1 read); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `PRODUCT_APPROVE`, `PRODUCT_VIEW` (1 operate, 1 read); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Display) and no metric row |
 | Offline | online only |
 | Opens with | `changeId` (navigation) |
 | Route | `/commercial/pricing-governance-command-center-adm-078` |
 
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
+
 **Known gaps.** **The pack names 7 actions on this screen and the screen declares 1 operation.** Unserved: Create Pricing Change, Bulk Update, Import Changes, Review Impact, Approve, Schedule Publication, View …
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Every pricing change and governance activity in one place: change requests by state, waiting approvals, scheduled publications, rollbacks; approvers decide here.
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- Pack actions with no operation: Create Pricing Change, Bulk Update, Import Changes, Review Impact, Approve, Schedule Publication, View Rollbacks. (CHG-MOV-008)
 
 #### Inputs: what the user enters or picks
 
@@ -483,11 +530,15 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Schedule Publication (secondary button) | navigation or local | — | — | — | — |
 | View Rollbacks (secondary button) | navigation or local | — | — | — | — |
 
+**What each action does** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **Approve / Reject / Return**: Comment required for reject and return; the decision lands on the change request's approval record so the inbox and this screen agree. *(source: contracts/spine/catalogue.yaml#decidePricingChangeRequest)*
+
 **Data it reads**: `listPricingGovernance` (onLoad, Pricing Governance Command Center)
 
 **Where the user goes next**
 
-- → `ADM-002` Platform Dashboard: *Platform Dashboard*
+- → `BO-100` Venue Home: *Back to Venue Home*
 - → `ADM-080` Bulk Pricing Update, Import & Mass Maintenance: *Works in Bulk Pricing Update, Import & Mass Maintenance*; calls `listPricingGovernance`
 - → `ADM-081` Pricing Version & Baseline Management: *Works in Pricing Version & Baseline Management*; calls `listPricingGovernance`
 - → `ADM-082` Pricing Change Impact Analysis: *Works in Pricing Change Impact Analysis*; calls `listPricingGovernance`
@@ -510,6 +561,18 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 The request is not `pendingApproval` (`notPendingApproval`).; 422 `comment` missing on reject or return (`commentRequired`). |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+queue:
+- change: Annual price review 2027
+  state: pendingApproval
+  approver: Finance manager
+  impact: +6.2% avg
+```
+
 #### Permissions
 
 - `listPricingGovernance` → `PRODUCT_VIEW` (read) · staff
@@ -527,7 +590,7 @@ For this screen, newest first. An **Open question** is built to the default it s
 
 - Workshop packs group screens ten to a board, each opened by a command centre; that grouping is the navigation: the nine detail screens are reached from the board's hub and return to it. *(agreed · screen note 4 Sep 2026, BO-144 and the other board hubs · DI-653)*
 
-Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -535,7 +598,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-078` · status **notStarted** · provenance generated
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-078` · status **notStarted** · provenance generated
 - Client workshop board: `wireframes/WS98 Pricing   Revenue Management Board 4.dc.html#adm-078`
 - Workshop pack: Pricing___Revenue_Management_Reference.pdf board 4
 - Flow F146 *Pricing Revenue Management board 4: Pricing Governance Command Center*, step 1: Opens Pricing Governance Command Center → Provide Commercial, Revenue, Finance, and authorized management with one operational view of all pricing changes and governance activities.
@@ -556,7 +619,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every output is drawn (260 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-078?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Create Pricing Change, Bulk Update, Import Changes, Review Impact, Approve, Schedule Publication, View Rollbacks.
-- [ ] Every transition is wired: `ADM-002`, `ADM-080`, `ADM-081`, `ADM-082`, `ADM-083`, `ADM-084`, `ADM-085`, `ADM-086`, `ADM-087`, `ADM-079`.
+- [ ] Every transition is wired: `BO-100`, `ADM-080`, `ADM-081`, `ADM-082`, `ADM-083`, `ADM-084`, `ADM-085`, `ADM-086`, `ADM-087`, `ADM-079`.
 - [ ] Every gated control is gated: `PRODUCT_APPROVE`, `PRODUCT_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
@@ -569,17 +632,26 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `ticketing` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `PRODUCT_APPROVE`, `PRODUCT_CONFIGURE` (1 operate, 1 configure); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `PRODUCT_APPROVE`, `PRODUCT_CONFIGURE` (1 operate, 1 configure); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Capture) and no display directory — it is settings, not a population |
 | Offline | online only |
 | Opens with | `changeId` (navigation) |
 | Route | `/commercial/pricing-change-request-workspace-adm-079` |
 
-**Known gaps.** **The pack names 8 actions on this screen and the screen declares 1 operation.** Unserved: Price Change, Price List Change, Eligibility Rule Change, Tax Change, Fee Change, Formula Change …
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
+
+**Known gaps.** **The pack names 8 actions on this screen and the screen declares 1 operation.** Unserved: Price Change, Price List Change, Eligibility Rule Change, Tax Change, Fee Change, Formula Change … Contract gap recorded 2 October 2026 (CHG-WIR-027): No read of a pricing change request (setPricingChangeRequest, submitPricingChangeRequest and decidePricingChangeRequest have no get or list).
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Where a pricing change is prepared before production is touched: type, reason, effective and expiry dates, priority, lines, attachments; then submitted for validation and approval.
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- No read operation: the screen declares only setPricingChangeRequest, submitPricingChangeRequest, decidePricingChangeRequest and nothing that returns the current configuration. (CHG-WIR-027)
+- Pack actions with no operation: Price Change, Price List Change, Eligibility Rule Change, Tax Change, Fee Change, Formula Change, Currency/Rounding Change, Emergency Change. (CHG-MOV-008)
 
 #### Inputs: what the user enters or picks
 
@@ -627,6 +699,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Submit (primary button) | `submitPricingChangeRequest` POST `/pricing-change-request/{changeId}/submit` | — | PricingChangeRequestWorkspaceView | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 The request is not `draft` or `returnedForModification` (`notSubmittable`).; 422 Validation failed (`noLines` … | — |
 | Approve, reject or return (secondary button) | `decidePricingChangeRequest` POST `/pricing-change-request/{changeId}/decision` | PricingChangeRequestDecisionInput | PricingChangeRequestWorkspaceView | 403 `selfApproval` (the requester cannot approve their own change) or `outsideAuthority` (the change is above the caller's approval tier).; 404 The resource does not exist, or is outside the caller's scope. This … | — |
 
+**What each action does** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **Submit**: Moves a draft to validation; on success to approval; failed checks return it to the author with the reasons. *(source: contracts/spine/catalogue.yaml#submitPricingChangeRequest)*
+
 **Where the user goes next**
 
 - → `ADM-078` Pricing Governance Command Center: *Returns to the board's landing screen*; carries `changeId`; calls `setPricingChangeRequest`
@@ -641,6 +717,19 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 The request is not `draft` or `returnedForModification` (`notSubmittable`).; 409 The request is not `pendingApproval` (`notPendingApproval`).; 422 Validation failed (`noLines`, `retroactiveEffectiveDate`, `unknownObject`); the request stays `draft`.; 422 `comment` missing on reject or return (`commentRequired`). |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+change:
+  name: Annual price review 2027
+  type: priceChange
+  reason: annualPriceReview
+  effective: '2027-01-01'
+  lines: 214
+```
 
 #### Permissions
 
@@ -662,7 +751,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 None names this screen.
 
-Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -670,7 +759,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-079` · status **notStarted** · provenance generated
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-079` · status **notStarted** · provenance generated
 - Client workshop board: `wireframes/WS98 Pricing   Revenue Management Board 4.dc.html#adm-079`
 - Workshop pack: Pricing___Revenue_Management_Reference.pdf board 4
 - Flow F146 *Pricing Revenue Management board 4: Pricing Governance Command Center*, step 2: Works in Pricing Change Request & Workspace → Provide a governed workspace for creating individual or structured pricing changes before modifying production pricing.
@@ -694,17 +783,25 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `ticketing` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `PRODUCT_VIEW` (1 read); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `PRODUCT_VIEW` (1 read); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Show) and no metric row |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/commercial/bulk-pricing-update-import-mass-maintenance-adm-080` |
 
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
+
 **Known gaps.** **The pack names 12 actions on this screen and the screen declares 1 operation.** Unserved: Increase by %, Decrease by %, Increase Fixed Amount, Decrease Fixed Amount, Replace Amount, Copy Rate …
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Update large portfolios at once: percentage across a category, file import, mass maintenance; every bulk change goes through a change request and version control (AED 100 > 110 > 120 as versions 1.0, 1.1, 1.2).
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- Pack actions with no operation: Increase by %, Decrease by %, Increase Fixed Amount, Decrease Fixed Amount, Replace Amount, Copy Rate, Change Currency, Set Effective Dates …. (CHG-MOV-008)
 
 #### Inputs: what the user enters or picks
 
@@ -753,6 +850,10 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Change Currency (secondary button) | navigation or local | — | — | — | — |
 | Set Effective Dates (secondary button) | navigation or local | — | — | — | — |
 
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **bulk jobs**: Job, scope, rows, status, linked change request. *(source: contracts/spine/catalogue.yaml#listBulkPricingUpdate / DI-599)*
+
 **Data it reads**: `listBulkPricingUpdate` (onLoad, Bulk Pricing Update, Import & Mass Maintenance)
 
 **Where the user goes next**
@@ -770,6 +871,18 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+job:
+  scope: All F&B items, Harbour Kitchen
+  change: +5%
+  rows: 128
+  status: pendingApproval
+```
+
 #### Permissions
 
 - `listBulkPricingUpdate` → `PRODUCT_VIEW` (read) · staff
@@ -786,7 +899,7 @@ For this screen, newest first. An **Open question** is built to the default it s
 
 - Price changes go through approval before publishing with version control (AED 100 > 110 > 120 tracked as versions 1.0, 1.1, 1.2); bulk updates (e.g. flat % across all retail or F&B items), bulk import, and rollback with full change history. *(client request · MoM 1 Sep 2026, 4.6 Price Governance · DI-599)*
 
-Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -795,7 +908,7 @@ Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-080` · status **notStarted** · provenance generated
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-080` · status **notStarted** · provenance generated
 - Client workshop board: `wireframes/WS98 Pricing   Revenue Management Board 4.dc.html#adm-080`
 - Workshop pack: Pricing___Revenue_Management_Reference.pdf board 4
 - Flow F146 *Pricing Revenue Management board 4: Pricing Governance Command Center*, step 4: Works in Bulk Pricing Update, Import & Mass Maintenance → Allow large pricing portfolios to be updated efficiently without manually editing hundreds or thousands of records.
@@ -819,15 +932,19 @@ Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the 
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `ticketing` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `PRODUCT_VIEW` (1 read); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `PRODUCT_VIEW` (1 read); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Display; Compare; Show) and no metric row |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/commercial/pricing-version-baseline-management-adm-081` |
+
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Immutable versions of pricing configuration so it is always known what applied at a time; a baseline to compare and roll back to.
 
 #### Inputs: what the user enters or picks
 
@@ -882,6 +999,10 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Modified | 1,234 | Rates modified compared with the compareTo version |
 | Unchanged | 1,234 | Rates unchanged compared with the compareTo version |
 
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **version list**: Version, published, by, effective from, baseline flag; compare two versions. *(source: contracts/spine/catalogue.yaml#listPricingVersionBaseline)*
+
 **Data it reads**: `listPricingVersionBaseline` (onLoad, Pricing Version & Baseline Management)
 
 **Where the user goes next**
@@ -898,6 +1019,20 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the pricing version baseline are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+versions:
+- v: '1.2'
+  effective: '2027-01-01'
+  baseline: false
+- v: '1.1'
+  effective: '2026-06-15'
+  baseline: true
+```
 
 #### Permissions
 
@@ -919,7 +1054,7 @@ For this screen, newest first. An **Open question** is built to the default it s
 
 - Price changes go through approval before publishing with version control (AED 100 > 110 > 120 tracked as versions 1.0, 1.1, 1.2); bulk updates (e.g. flat % across all retail or F&B items), bulk import, and rollback with full change history. *(client request · MoM 1 Sep 2026, 4.6 Price Governance · DI-599)*
 
-Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -927,7 +1062,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-081` · status **notStarted** · provenance generated
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-081` · status **notStarted** · provenance generated
 - Client workshop board: `wireframes/WS98 Pricing   Revenue Management Board 4.dc.html#adm-081`
 - Workshop pack: Pricing___Revenue_Management_Reference.pdf board 4
 - Flow F146 *Pricing Revenue Management board 4: Pricing Governance Command Center*, step 6: Works in Pricing Version & Baseline Management → Maintain immutable versions of pricing configuration so TICVAI always knows what configuration existed at a particular time.
@@ -951,15 +1086,23 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `ticketing` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `PRODUCT_VIEW` (1 read); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `PRODUCT_VIEW` (1 read); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Analyze) and no metric row |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/commercial/pricing-change-impact-analysis-adm-082` |
+
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Consequences of a pricing change before approval: revenue, margin, bookings, reservations and promotions affected.
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- List operation(s) listChangeImpactAnalysis return a bare array, not the paged list envelope (items, nextCursor, hasMore). (CHG-MOV-008)
 
 #### Inputs: what the user enters or picks
 
@@ -1016,6 +1159,10 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Apis | 1,234 | Affected apis (count) |
 | Integrations | 1,234 | Affected integrations (count) |
 
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **impact**: Numbers first (bookings affected, revenue change), then the lists. *(source: contracts/spine/catalogue.yaml#listPricingChangeImpact / contracts/spine/catalogue.yaml#listChangeImpactAnalysis)*
+
 **Data it reads**: `listPricingChangeImpact` (onLoad, Pricing Change Impact Analysis); `listChangeImpactAnalysis` (onLoad, Change Impact Analysis)
 
 **Where the user goes next**
@@ -1033,6 +1180,18 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+impact:
+  change: Annual price review 2027
+  revenue: +AED 1.8m a year
+  bookingsAffected: 0
+  promotionsAffected: 3
+```
+
 #### Permissions
 
 - `listPricingChangeImpact` → `PRODUCT_VIEW` (read) · staff
@@ -1048,7 +1207,7 @@ No matrix row traces to this screen's operations or data.
 
 None names this screen.
 
-Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -1056,7 +1215,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-082` · status **notStarted** · provenance generated
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-082` · status **notStarted** · provenance generated
 - Client workshop board: `wireframes/WS98 Pricing   Revenue Management Board 4.dc.html#adm-082`
 - Workshop pack: Pricing___Revenue_Management_Reference.pdf board 4
 - Flow F146 *Pricing Revenue Management board 4: Pricing Governance Command Center*, step 8: Works in Pricing Change Impact Analysis → Determine the commercial and operational consequences of a pricing change before approval and publication. This is one of the most important screens in Board 4.
@@ -1080,15 +1239,21 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `ticketing` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `PRODUCT_CONFIGURE` (1 configure); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `APPROVAL_CONFIGURE`, `PRODUCT_CONFIGURE` (2 configure); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/commercial/pricing-approval-workflow-authority-matrix-adm-083` |
+
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Who must approve a pricing change by risk and scope: tiers of thresholds to approvers, the creator never giving final approval, expected hours, reminders, escalation.
+
+**Fixed on main** (the package already carries these; draw what it says): No read operation: the screen declares only approvePricingWorkflowAuthority and nothing that returns the current configuration. (CHG-WIR-025).
 
 #### Inputs: what the user enters or picks
 
@@ -1101,13 +1266,53 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Reminder | select field | — | — | — | — | — | — |
 | Alternate Approver | select field | — | — | — | — | — | — |
 
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Kind | select | — | Refund · Price override · Discount override · Complimentary ticket · Membership cancellation · Access permission change · Configuration change · AI recommendation · Release promotion · Requisition · Stock write off · Journal entry …; Each is an existing kind … | `listApprovalMatrices` ?kind |
+| Effective | toggle | off | — | `listApprovalMatrices` ?effective |
+
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **tiers**: Rows of threshold to approver role; "creator cannot give final approval" on by default. *(source: contracts/spine/catalogue.yaml#approvePricingWorkflowAuthority)*
+
 #### Outputs: what the screen shows and produces
+
+**Shown**
+
+**Authority matrix** (data table, from `listApprovalMatrices`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| ID | the name it points at, never the id | — |
+| Kind | chip: Refund, Price override, Discount override, Complimentary ticket, Membership … | 11.1.7 and 11.1.30–11.1.37. The first four already exist as bespoke implementations and this contract is what they collapse into. |
+| Scope level | chip: Tenant, Region, Venue | — |
+| Rules | list or chips (count when long) | — |
+| ID | the name it points at, never the id | Added 20 August. The schema reference derives table columns from API response schemas, and a response is not a table — this one returned … |
+| Order | 1,234 | First match wins. Explicit ordering is what makes a matrix reviewable — an unordered set of overlapping rules is one nobody can reason … |
+| Min amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Max amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Risk score above | 1,234.5 | 11.1.12. Not matched against the AI risk score (29 September, build pass, group G2). |
+| Condition | text | 11.1.13. Evaluated against the attributes the caller supplied. |
+| Approver roles | list or chips (count when long) | Role ids from `identity.listRoles` (`Role.id`), which is where an editor gets the names to show and pick from. |
+| Approver scope level | chip: Venue, Department, Region, Tenant | 11.1.39. Which organisational level the approver must sit at. |
+| Mode | chip: Sequential, Parallel, Consensus, Majority | 11.1.43–11.1.46. Sequential asks one at a time, parallel asks everyone at once, consensus needs all of them, majority needs more than half. |
+| Levels | 1,234 | 11.1.3. Multi-level chains ask each level in turn. |
+| Requires MFA | yes / no (icon or chip) | — |
+| Requires signature | yes / no (icon or chip) | — |
+| Sla minutes | 1,234 | 11.1.14. Null means no SLA, which is different from a long one. |
+| Escalate after minutes | 1,234 | — |
+| Escalate to roles | list or chips (count when long) | Role ids from `identity.listRoles`, as `approverRoleIds`. |
+| Expires after minutes | 1,234 | 11.1.53. An unanswered request eventually stops waiting. |
 
 **Actions and what each produces**
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
 | Approve (primary button) | navigation or local | — | — | — | — |
+
+**Data it reads**: `listApprovalMatrices` (onLoad, What requires approval, and at which authority level)
 
 **Where the user goes next**
 
@@ -1123,9 +1328,21 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+tiers:
+- 'up to 5%: Revenue manager'
+- '5-15%: Commercial director'
+- 'over 15%: CFO'
+```
+
 #### Permissions
 
 - `approvePricingWorkflowAuthority` → `PRODUCT_CONFIGURE` (configure) · staff
+- `listApprovalMatrices` → `APPROVAL_CONFIGURE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -1143,7 +1360,7 @@ For this screen, newest first. An **Open question** is built to the default it s
 
 - Price changes go through approval before publishing with version control (AED 100 > 110 > 120 tracked as versions 1.0, 1.1, 1.2); bulk updates (e.g. flat % across all retail or F&B items), bulk import, and rollback with full change history. *(client request · MoM 1 Sep 2026, 4.6 Price Governance · DI-599)*
 
-Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -1153,19 +1370,20 @@ Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-083` · status **notStarted** · provenance generated
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-083` · status **notStarted** · provenance generated
 - Client workshop board: `wireframes/WS98 Pricing   Revenue Management Board 4.dc.html#adm-083`
 - Workshop pack: Pricing___Revenue_Management_Reference.pdf board 4
 - Flow F146 *Pricing Revenue Management board 4: Pricing Governance Command Center*, step 10: Works in Pricing Approval Workflow & Authority Matrix → Configure who must approve pricing changes based on their commercial risk and scope.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (4), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-083?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Approve.
 - [ ] Every transition is wired: `ADM-078`.
-- [ ] Every gated control is gated: `PRODUCT_CONFIGURE`.
+- [ ] Every gated control is gated: `APPROVAL_CONFIGURE`, `PRODUCT_CONFIGURE`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -1177,17 +1395,26 @@ Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the 
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `ticketing` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `PRODUCT_CONFIGURE` (1 configure); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `PRODUCT_CONFIGURE` (1 configure); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the screen declares a publishing operation over fields the pack configures |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/commercial/pricing-publication-effective-date-scheduler-adm-084` |
 
-**Known gaps.** **The pack names 3 actions on this screen and the screen declares 1 operation.** Unserved: Scheduled Publication, Staged Publication. Each needs an operation, or needs removing from the screen; this …
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
+
+**Known gaps.** **The pack names 3 actions on this screen and the screen declares 1 operation.** Unserved: Scheduled Publication, Staged Publication. Each needs an operation, or needs removing from the screen; this … Contract gap recorded 2 October 2026 (CHG-WIR-027): No read of scheduled pricing publications (publishPricingEffectiveDate has no list).
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** When approved pricing becomes effective: immediately, scheduled, from a future date or staged by market, venue or channel; never retroactive.
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- No read operation: the screen declares only publishPricingEffectiveDate and nothing that returns the current configuration. (CHG-WIR-027)
+- Pack actions with no operation: Scheduled Publication, Staged Publication. (CHG-MOV-008)
 
 #### Inputs: what the user enters or picks
 
@@ -1222,6 +1449,23 @@ Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the 
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 
+#### Consistency with other screens
+
+- Match `BO-443`: Same scheduler and pre-publication checks.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+schedule:
+  version: '1.2'
+  mode: staged
+  stages:
+  - Dune Park 1 Jan
+  - Coastal Aqua 15 Jan
+```
+
 #### Permissions
 
 - `publishPricingEffectiveDate` → `PRODUCT_CONFIGURE` (configure) · staff
@@ -1236,7 +1480,7 @@ No matrix row traces to this screen's operations or data.
 
 None names this screen.
 
-Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -1244,7 +1488,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-084` · status **notStarted** · provenance generated
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-084` · status **notStarted** · provenance generated
 - Client workshop board: `wireframes/WS98 Pricing   Revenue Management Board 4.dc.html#adm-084`
 - Workshop pack: Pricing___Revenue_Management_Reference.pdf board 4
 - Flow F146 *Pricing Revenue Management board 4: Pricing Governance Command Center*, step 12: Works in Pricing Publication & Effective-Date Scheduler → Control exactly when approved pricing becomes commercially effective.
@@ -1268,15 +1512,19 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `ticketing` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `PRODUCT_VIEW` (1 read); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `PRODUCT_VIEW` (1 read); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Monitor; Display) and no metric row |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/commercial/pricing-distribution-synchronization-publication-monitor-adm-085` |
+
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Whether published pricing reached every channel and dependent system: per channel, version received, when, errors.
 
 #### Inputs: what the user enters or picks
 
@@ -1319,6 +1567,10 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Latency | 1,234.5 | Latency in seconds from publication start to confirmation |
 | Target version | text | Pricing version the target currently serves |
 
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **distribution matrix**: Systems as rows, versions and status as cells; tills show the catalogue release that carries the prices. *(source: contracts/spine/catalogue.yaml#listPricingDistributionSynchronization / contracts/spine/catalogue.yaml#publishBundle)*
+
 **Data it reads**: `listPricingDistributionSynchronization` (onLoad, Pricing Distribution, Synchronization & Publication Monitor)
 
 **Where the user goes next**
@@ -1336,6 +1588,17 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+row:
+  channel: Point of sale
+  version: '1.2'
+  status: 38 of 41 tills
+```
+
 #### Permissions
 
 - `listPricingDistributionSynchronization` → `PRODUCT_VIEW` (read) · staff
@@ -1350,7 +1613,7 @@ No matrix row traces to this screen's operations or data.
 
 None names this screen.
 
-Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -1358,7 +1621,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-085` · status **notStarted** · provenance generated
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-085` · status **notStarted** · provenance generated
 - Client workshop board: `wireframes/WS98 Pricing   Revenue Management Board 4.dc.html#adm-085`
 - Workshop pack: Pricing___Revenue_Management_Reference.pdf board 4
 - Flow F146 *Pricing Revenue Management board 4: Pricing Governance Command Center*, step 14: Works in Pricing Distribution, Synchronization & Publication Monitor → Ensure published pricing reaches every TICVAI channel and dependent system consistently.
@@ -1382,17 +1645,21 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `ticketing` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `PRICE_CONFIGURE`, `PRODUCT_VIEW` (1 configure, 1 read); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `PRICE_CONFIGURE`, `PRODUCT_VIEW` (1 configure, 1 read); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
 | Offline | online only |
 | Opens with | `actionId` (navigation) |
 | Route | `/commercial/pricing-rollback-emergency-control-center-adm-086` |
 
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
+
 **Known gaps.** **The pack names 9 actions on this screen; 8 are served since the writers pass (29 September): Previous Version, Selected Version, Previous Price, Commercial Baseline, Selected Products, Selected … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Recovery when published pricing is wrong: roll back to a version, freeze a list, product or venue pricing, stop a scheduled publication or distribution, restore last known good. Recorded first, approved where required.
 
 #### Inputs: what the user enters or picks
 
@@ -1462,6 +1729,11 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 | Request pricing rollback (secondary button) | `requestPricingRollback` POST `/pricing-rollback-emergency` | CatalogueRollbackAction | CatalogueRollbackAction | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 422 `rollbackTargetRequired`, `scheduledAtInPast` or `incidentReferenceRequired`. | gated `PRICE_CONFIGURE`; opens modal first |
 | Cancel pricing rollback (destructive button) | `cancelPricingRollback` POST `/pricing-rollback-emergency/{actionId}/cancel` | inline | CatalogueRollbackAction | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 `alreadyExecuting` or `alreadyFinished`. | gated `PRICE_CONFIGURE` |
 
+**What each action does** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **Request rollback or emergency action**: Action type, scope and target version; creates the action, raises an approval where required, and shows its state. *(source: contracts/spine/catalogue.yaml#requestPricingRollback)*
+- **Cancel**: Only before it runs; one executing cannot be cancelled. *(source: contracts/spine/catalogue.yaml#cancelPricingRollback)*
+
 **Data it reads**: `listPricingRollbackEmergency` (onLoad, Pricing Rollback & Emergency Control Center)
 
 **Where the user goes next**
@@ -1483,6 +1755,19 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 `alreadyExecuting` or `alreadyFinished`.; 422 `rollbackTargetRequired`, `scheduledAtInPast` or `incidentReferenceRequired`. |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+action:
+  type: rollback
+  scope: Dune Park, Website
+  from: '1.2'
+  to: '1.1'
+  reason: Child price published at adult rate
+```
 
 #### Permissions
 
@@ -1506,7 +1791,7 @@ For this screen, newest first. An **Open question** is built to the default it s
 
 - Price changes go through approval before publishing with version control (AED 100 > 110 > 120 tracked as versions 1.0, 1.1, 1.2); bulk updates (e.g. flat % across all retail or F&B items), bulk import, and rollback with full change history. *(client request · MoM 1 Sep 2026, 4.6 Price Governance · DI-599)*
 
-Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -1515,7 +1800,7 @@ Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-086` · status **notStarted** · provenance generated
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-086` · status **notStarted** · provenance generated
 - Client workshop board: `wireframes/WS98 Pricing   Revenue Management Board 4.dc.html#adm-086`
 - Workshop pack: Pricing___Revenue_Management_Reference.pdf board 4
 - Flow F146 *Pricing Revenue Management board 4: Pricing Governance Command Center*, step 16: Works in Pricing Rollback & Emergency Control Center → Provide controlled recovery when a pricing publication is incorrect or creates unacceptable commercial impact.
@@ -1539,17 +1824,25 @@ Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the 
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `ticketing` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `PRODUCT_VIEW` (1 read); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `PRODUCT_VIEW` (1 read); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/commercial/pricing-history-audit-compliance-explorer-adm-087` |
 
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
+
 **Known gaps.** **The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Board 5 — Dynamic Pricing, Revenue. Each needs an operation, or needs removing from the screen; this is the … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Forensic history of every pricing configuration and change: who, what, when, before and after, approval.
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- Pack actions with no operation: Board 5 — Dynamic Pricing, Revenue. (CHG-MOV-008)
 
 #### Inputs: what the user enters or picks
 
@@ -1591,6 +1884,10 @@ Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the 
 |---|---|---|---|---|---|
 | Board 5 — Dynamic Pricing, Revenue (primary button) | navigation or local | — | — | — | — |
 
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **audit explorer**: Filter by object, user, date; before and after side by side. *(source: contracts/spine/catalogue.yaml#listPricingCompliance / DI-599)*
+
 **Data it reads**: `listPricingCompliance` (onLoad, Pricing History, Audit & Compliance Explorer)
 
 **Where the user goes next**
@@ -1607,6 +1904,19 @@ Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the 
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the pricing history audit are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+event:
+  object: Day Pass Adult, B2C
+  from: AED 295.00
+  to: AED 310.00
+  by: Revenue manager
+  approved: CFO, 2026-11-28
+```
 
 #### Permissions
 
@@ -1628,7 +1938,7 @@ For this screen, newest first. An **Open question** is built to the default it s
 
 - Price changes go through approval before publishing with version control (AED 100 > 110 > 120 tracked as versions 1.0, 1.1, 1.2); bulk updates (e.g. flat % across all retail or F&B items), bulk import, and rollback with full change history. *(client request · MoM 1 Sep 2026, 4.6 Price Governance · DI-599)*
 
-Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -1636,7 +1946,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-087` · status **notStarted** · provenance generated
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-087` · status **notStarted** · provenance generated
 - Client workshop board: `wireframes/WS98 Pricing   Revenue Management Board 4.dc.html#adm-087`
 - Workshop pack: Pricing___Revenue_Management_Reference.pdf board 4
 - Flow F146 *Pricing Revenue Management board 4: Pricing Governance Command Center*, step 18: Works in Pricing History, Audit & Compliance Explorer → Provide complete forensic traceability for every pricing configuration and change. Enable TICVAI revenue administrators to configure dynamic-pricing strategies using real-time commercial conditions …
@@ -1658,12 +1968,16 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 ## Reference designs and the trackers for this platform
 
-**P09 reference designs** (from `handoff/design-batches/apps/6-ticvai-controller/README.md`)
+**P08 reference designs** (from `handoff/design-batches/apps/5-venue-management/README.md`)
 
 - `sources/designs/TICVAI_POS_Terminal_client_approved.html`: the client-approved POS, for operator density and components.
 - `sources/designs/TICVAI_Mobile.dc.html`: for finish and motion.
 
-**Design Vision Book rules that apply** (`sources/designs/Ticvai_Design_Vision_Book_v1_1.pdf`): DI-021, DI-022, DI-023, DI-024, DI-025, DI-027, DI-028, DI-029, DI-032, DI-033, DI-034, DI-036, DI-037, DI-038, DI-039, DI-040, DI-041, DI-042, DI-044, DI-045, DI-046, DI-047, DI-048, DI-049, DI-050, DI-051 (each is in the design inputs below).
+**Design Vision Book rules that apply** (`sources/designs/Ticvai_Design_Vision_Book_v1_1.pdf`): DI-021, DI-022, DI-023, DI-024, DI-025, DI-027, DI-028, DI-029, DI-030, DI-032, DI-033, DI-034, DI-036, DI-037, DI-038, DI-039, DI-040, DI-041, DI-042, DI-043, DI-044, DI-045, DI-046, DI-047, DI-048, DI-049, DI-050, DI-051, DI-052 (each is in the design inputs below).
+
+**Workshop tracker rows about P08 as a whole** (1: 1 open, 0 closed). Open first; a closed row says where it went on 30 September.
+
+- **S8** Venue Management back-end configuration wireframes *(Chinmay Parab · In progress · due Fri 2 Oct · 30 Sep 2026 · 30 Sep tracker)*
 
 ## Design inputs from the client meetings
 
@@ -1701,17 +2015,32 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Brand personality: Modern, AI-First, Enterprise, Premium, Reliable, Minimal, Scalable, Human-Centred. Visual essence: intelligent and forward-thinking, clean and minimal, trustworthy and secure, modern and timeless, scalable and flexible. *(agreed · Design Vision Book 29 Jul 2026, 02 Brand Identity (p2) - Brand personality / Visual essence · DI-021)*
 - Arabic is a core requirement, not later localisation: full Arabic RTL across web, mobile, POS, reports, emails, WhatsApp, SMS, notifications, tickets and receipts, and administrative interfaces. *(agreed · MoM 28 Jul 2026, 27. Internationalisation and Arabic Support · DI-019)*
 
-### Across P09 TICVAI Web
+### Across P08 Venue Management
 
-- Portal access exposes TICVAI pricing, so prospects submit contact details and a trade license as proof of a real venue, reviewed and approved by TICVAI before access is granted. *(agreed · MoM 10 Sep 2026, 4.8 Customer Portal Access, Authentication & Verification · DI-827)*
+- Qossai: configuration screens should consolidate related functionality, potentially merging 3-4 previously separate screens into one, rather than the repetitive one-screen-per-concept pattern of the AI-built reference system. *(agreed · MoM 24 Sep 2026, 4.5 Screen Consolidation Philosophy · DI-987)*
+- **Open question.** Open: should AI monitoring live in one centralised AI command dashboard or be distributed as widgets in each functional module's own dashboard? Allam: Softlabs' call; the current proposal is illustrative and Softlabs may propose a better structure. *(open · MoM 18 Sep 2026, 4.4 AI Governance — Risk, Compliance & Continuous Monitoring · DI-936)*
 - Simulation functionality stays embedded within each relevant configuration section rather than being consolidated, since it tests that section's own configuration. *(agreed · MoM 8 Sep 2026, 4.11 Dashboard & Reporting Module Consolidation Strategy · DI-722)*
+- Client boards (POS Frontline, F&B, Retail, Inventory & Procurement) share one architecture: six boards of ten screens per domain, a command centre first and an AI/analytics board last, under the hierarchy Company > Venue > Department > Workstation > Operator/Shift > Transaction > Exception > Reconciliation > Analytics. *(agreed · client-design-boards-audit 20 Aug 2026, Opening / What the boards give us · DI-400)*
+- Decision: RBAC per role, per module, three levels — edit/view, view-only, hidden (e.g. a marketing officer does not see Finance at all) — plus sub-permissions within a module (a CRM role may get Campaigns and Communications but not Journeys). Default role templates, admin-customisable. *(agreed · MoM 20 Aug 2026, 4.7 Role-Based Access Control (RBAC); 5. Key Decisions · DI-387)*
+- **Open question.** Allam: a user's visibility must be restrictable to specific outlets (an F&B manager of one outlet should not see other outlets' items); also relevant for ticketing/event-specific access. Implementation approach still open. *(open · MoM 18 Aug 2026, 4.6 Role-Based & Outlet-Level Access Control — Open Item · DI-331)*
+- Access loads automatically at login on POS and web/admin. A user with one role logs straight in; a user with several roles (e.g. admin, cashier, supervisor, manager) is prompted to choose which role to use. *(agreed · MoM 12 Aug 2026, 4. Multiple Roles per User and Role Switching · DI-249)*
+- Back office is role-driven from any device: a finance user signing in from a workstation, laptop or home sees only finance reports and related information. *(agreed · MoM 12 Aug 2026, 3. Role-Based Access and Workstation-Linked Front-End · DI-248)*
+- Built-in help menu with step-by-step tutorials with screenshots for common tasks (e.g. how to sell a ticket at the POS). *(client request · MoM 7 Aug 2026, 8. Legacy POS Layout Designer & System Logging · DI-160)*
+- Custom data-capture fields ("data mask") at account, event, extended-ticket and product level: field types text, dropdown, radio, true/false; multi-language labels; validation (min/max length, required/optional); reusable value lists (e.g. country list). Standard fields come out of the box. *(agreed · MoM 7 Aug 2026, 6. Data Mask: Flexible Custom Data Capture · DI-155)*
+- Load/traffic dashboards respect the tenancy model: a venue manager sees traffic for their own venue only. *(agreed · MoM 31 Jul 2026, 4. Non-Functional Requirements: Scalability & Availability · DI-061)*
+- Allam: queue management is built into the system (not third-party) so traffic entering the site can be throttled from the back office itself. *(agreed · MoM 31 Jul 2026, 4. Non-Functional Requirements: Scalability & Availability · DI-060)*
 - **Open question.** Proposed tenant hierarchy Tenant > Organization/Brand > Region > Branch > Venue > Department, under review against TICVAI's own organisational hierarchy before finalising. *(open · MoM 30 Jul 2026, 2. Proposed Multi-Tenant Hierarchy · DI-055)*
+- Documentation deliverable includes user guides and help content; the preview shows a TICVAI Help Center with categories (Getting Started, Events, Tickets, Orders, Payments, Memberships, Access Control, Reports, Integrations), a "Welcome to TICVAI" getting-started article and Quick Links (Create an Event, Set Pricing, Manage Access, View Reports). *(agreed · Design Vision Book 29 Jul 2026, 09 Deliverables (p9) - What We Deliver / Key Deliverables Preview · DI-052)*
 - Typeface Inter (Light, Regular, Medium, Semibold, Bold). Scale: H1 32/40 Bold, H2 24/32 Semibold, H3 20/28 Semibold, Body 1 16/24 Regular, Body 2 14/20 Regular, Caption 12/16 Regular. *(agreed · Design Vision Book 29 Jul 2026, 08 Design System (p8) - 2. Typography · DI-047)*
 - Palette ("modern, trustworthy and accessible"): Primary #0D6EFD, #00B8FF, #00D4C4, #0B1324; Neutral #F7F9FC, #E5E7EB, #9CA3AF, #4B5563, #1F2937. *(agreed · Design Vision Book 29 Jul 2026, 08 Design System (p8) - 1. Color Palette · DI-046)*
+- AI Assistant panel: a short framing ("Based on last 30 days, here are 3 actions that can improve your revenue") then actionable recommendations, each with its potential impact (e.g. "Increase pricing for VIP seats, +12%") and a chevron, plus "View all recommendations". *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - AI Panels · DI-043)*
 - Chart cards: title with period dropdown ("This Week"), headline metrics with deltas (Tickets Sold 12,840 +8.7%, Visitors, Conversion). Data visualisations must be easy to read. *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - Charts · DI-041)*
 - Tables: titled card with "View all", columns (e.g. Order ID, Customer, Amount, Status), coloured status badges (Paid, Pending, Refunded) and pagination with "Showing 1 to 5 of 245" and page numbers. *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - Tables · DI-039)*
 - Primary button spec: height 40px, padding 12px 24px, radius 8px, Inter 14 Semibold, colour #0D6EFD, width auto. *(agreed · Design Vision Book 29 Jul 2026, 09 Deliverables (p9) - Developer Handoff preview · DI-037)*
+- Back-office shell: collapsible left sidebar with Overview, Events, Tickets, Orders, Customers, Memberships, Access Control, POS, Reports, Analytics, AI Assistant, Settings, and the signed-in user (name, role) at the bottom; top bar with global search (Cmd+K), current time and date, Notifications with unread dot, and user menu. *(agreed · Design Vision Book 29 Jul 2026, 04 Dashboard Vision (p4) - navigation shell · DI-030)*
 - Dynamic KPIs, forecasts and real-time insights; role-based dashboards, preferences and smart shortcuts for every user (e.g. greeting "Good morning, Ahmed" on the home screen, p2). *(agreed · Design Vision Book 29 Jul 2026, 03 Visual Direction (p3) - Smarter Data / Personalized Experience · DI-028)*
+- Reports and historical searches must still retrieve archived transactions when required; the retention period (e.g. keep 3 of 5+ years live) is configurable per customer, archival manual or automated. *(agreed · MoM 28 Jul 2026, 23. Database Optimisation and Archiving · DI-018)*
+- Back-office controls for the waiting room: configurable maximum active users and admission intervals, set per customer and venue. *(agreed · MoM 28 Jul 2026, 19. Auto-scaling and Virtual Waiting Room · DI-017)*
 
 **6 more name particular screens** and are in each screen's block above (*Client meeting inputs*).
 
@@ -1730,6 +2059,7 @@ Method, path, parameters, request and response for every operation these screens
 "approvePricingWorkflowAuthority": {"method":"PUT","path":"/pricing-workflow-authority","contract":"catalogue","summary":"Pricing Approval Workflow & Authority Matrix","permission":"PRODUCT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"PricingApprovalWorkflowAuthorityMatrixInput","responds":"PricingApprovalWorkflowAuthorityMatrixView"},
 "cancelPricingRollback": {"method":"POST","path":"/pricing-rollback-emergency/{actionId}/cancel","contract":"catalogue","summary":"Cancel a rollback that has not started","permission":"PRICE_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"CatalogueRollbackAction"},
 "decidePricingChangeRequest": {"method":"POST","path":"/pricing-change-request/{changeId}/decision","contract":"catalogue","summary":"Approve, reject or return a pricing change request","permission":"PRODUCT_APPROVE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"PricingChangeRequestDecisionInput","responds":"PricingChangeRequestWorkspaceView"},
+"listApprovalMatrices": {"method":"GET","path":"/approval-matrices","contract":"approvals","summary":"What requires approval here","permission":"APPROVAL_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"kind","in":"query","required":null},{"name":"effective","in":"query","required":null}],"requestBody":null,"responds":"ApprovalMatrix"},
 "listBulkPricingUpdate": {"method":"GET","path":"/bulk-pricing-update","contract":"catalogue","summary":"Bulk Pricing Update, Import & Mass Maintenance","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"jobKind","in":"query","required":false},{"name":"operation","in":"query","required":false},{"name":"status","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listChangeImpactAnalysis": {"method":"GET","path":"/change-impact-analysi","contract":"catalogue","summary":"Change Impact Analysis","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":"changeRequestId","in":"query","required":false},{"name":"productId","in":"query","required":false},{"name":"area","in":"query","required":false},{"name":"minRisk","in":"query","required":false}],"requestBody":null,"responds":"ChangeImpactAnalysisView"},
 "listPricingChangeImpact": {"method":"GET","path":"/pricing-change-impact","contract":"catalogue","summary":"Pricing Change Impact Analysis","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"changeRequestId","in":"query","required":false},{"name":"riskLevel","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
@@ -1751,6 +2081,9 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
+"ApprovalKind": {"type":"string","description":"11.1.7 and 11.1.30–11.1.37. **The first four already exist as bespoke implementations** and this contract is what they collapse into.\n**Which actions route here — decided 28 September, audit R144.** Finance and procurement acts go through this engine to a **finance approver**: closing a fiscal period (`periodClose`), reopening one (`periodReopen`), cancelling a purchase order (`purchaseOrderCancel`) and closing one short (`purchaseOrderShortClose`). The tenant default matrix for each of these names the finance approver role; a venue may tighten it and never loosen it. Starting a release rollout routes through `releasePromotion` to the platform release manager (a holder of `PLATFORM_RELEASE_PROMOTE`). **Not every `requiresApproval` goes here:** reopening a shift, recounting a stock count and a retail return above the venue threshold take a supervisor's step-up on the same device instead, and never raise a request.\n**Catalogue change requests route through `productChange` and `pricingChange`** (decided 29 September, writers pass): a product change and a price or pricing change raised in `catalogue` ask for approval under these two kinds, so a venue can route product edits and price edits to different approvers.\n\n**Optional review steps a venue switches on, decided 2 October 2026** (Chinmay; CHG-CSP-036, CHG-CSP-028, CHG-CSP-031). Each is an existing kind narrowed by the rule's `subjectTypes`, so no kind is added (a new value here would be a breaking change against r1) and each is off until the venue saves an active matrix for it:\n- **Publishing white-label content** (`configurationChange`, subject `whiteLabelPublication`): simulate, then a single publish by a holder of the permission; a review step only where the venue sets one up (batch 1, CMS-014; DEC-156). - **Recording F&B waste above a value** (`stockWriteOff`, subject `fnbWaste`): the venue's waste-approval policy, value bands as `minAmount` and `maxAmount`, photo evidence above a value held by fnb (batch 6 #192, BO-139; DEC-192; R144). - **Publishing an access topology** (`configurationChange`, subject `topologyPublication`): second-person approval when the venue switches it on (batch 6 #230, BO-153; DEC-230). - **A permanent identity lock, a whitelist entry, or releasing a full-identity or permanent lock** (`accessPermissionChange`, subjects `identityLock`, `whitelistEntry`, `identityLockRelease`): always a second approver, never for an until-end-of-day lock (critical set 1, BO-229 and BO-247; DEC-254, DEC-260); the tenant default matrix names the security approver role and a venue may tighten it, never remove it.\n","enum":["refund","priceOverride","discountOverride","complimentaryTicket","membershipCancellation","accessPermissionChange","configurationChange","aiRecommendation","releasePromotion","requisition","stockWriteOff","journalEntry","periodClose","periodReopen","purchaseOrderCancel","purchaseOrderShortClose","tenantMigration","productChange","pricingChange"]},
+"ApprovalMatrix": {"type":"object","x-ticvai-persistence":"approvals.matrix","required":["kind","scopeLevel","rules"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"kind":{"$ref":"#/components/schemas/ApprovalKind"},"scopeLevel":{"type":"string","enum":["tenant","region","venue"]},"scopePath":{"type":"string","readOnly":true},"version":{"type":"integer","readOnly":true,"description":"11.1.80. **A request is decided by the rules it was raised under.** Changing the matrix mid-flight would mean an approver answering a question that changed while they read it.\n**(`kind`, `scopePath`, `version`) is unique**, and a stored version is never edited: a request's `matrixVersion` names exactly one rule set (decided 28 September, audit R129 (2)).\n"},"rules":{"type":"array","items":{"$ref":"#/components/schemas/ApprovalRule"}},"isActive":{"type":"boolean"}}},
+"ApprovalRule": {"type":"object","x-ticvai-persistence":"approvals.rule","required":["order","approverRoleIds","mode"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true,"description":"**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"},"order":{"type":"integer","description":"**First match wins.** Explicit ordering is what makes a matrix reviewable — an unordered set of overlapping rules is one nobody can reason about.\n"},"minAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"maxAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"riskScoreAbove":{"type":"number","nullable":true,"description":"11.1.12. **Not matched against the AI risk score** (29 September, build pass, group G2). The AI assessment on a request (`ApprovalRequest.aiAssessment`, from `ai.scoreApprovalRequest`) is context for the reviewer only (MoM 8 September: AI never influences approve or reject), and routing a request to more approvers because of it would be influence. A rule with this set matches only a `riskScore` the requesting contract passes in `attributes` from its own deterministic rules (a payment's rule score, for example). Using the AI score here needs the client to say so.\n"},"condition":{"type":"string","nullable":true,"description":"11.1.13. Evaluated against the attributes the caller supplied.\n\n**No condition language is defined yet** (pull audit R104, 26 September): the grammar, the attributes it may name and how two conditions are compared for `unreachableRule` are an open decision, not something to infer from this field.\n"},"approverRoleIds":{"type":"array","minItems":1,"description":"Role ids from `identity.listRoles` (`Role.id`), which is where an editor gets the names to show and pick from. This contract stores the ids only.\n","items":{"type":"string","format":"uuid"}},"approverScopeLevel":{"type":"string","enum":["venue","department","region","tenant"],"description":"11.1.39. Which organisational level the approver must sit at."},"mode":{"$ref":"#/components/schemas/ApprovalMode"},"levels":{"type":"integer","default":1,"description":"11.1.3. Multi-level chains ask each level in turn."},"requiresMfa":{"type":"boolean","default":false},"requiresSignature":{"type":"boolean","default":false},"slaMinutes":{"type":"integer","nullable":true,"description":"11.1.14. Null means no SLA, which is different from a long one."},"escalateAfterMinutes":{"type":"integer","nullable":true},"escalateToRoleIds":{"type":"array","description":"Role ids from `identity.listRoles`, as `approverRoleIds`.","items":{"type":"string","format":"uuid"}},"expiresAfterMinutes":{"type":"integer","nullable":true,"description":"11.1.53. An unanswered request eventually stops waiting."},"subjectTypes":{"type":"array","description":"**Which subjects of the kind this rule matches** (decided 2 October 2026, Chinmay; CHG-CSP-028, CHG-CSP-036, CHG-CSP-031): the `CreateApprovalRequest.subjectType` values, for example `topologyPublication` or `whiteLabelPublication` under `configurationChange`. Empty matches every subject of the kind. It is how a venue switches an optional review step on for one kind of act without routing every act of the kind.","items":{"type":"string","maxLength":64}},"signatureMethods":{"type":"array","description":"**The signature methods this level accepts, where `requiresSignature` is true** (design-notes correction on ADM-344, Block B: \"Configuring which stages need a signature is a policy write\"; CHG-CSP-045). Values of `ApprovalSignature.method`. Empty accepts any of them. With `requiresSignature` this makes the rule the signature policy: which levels of which kinds need a signature, and how it is given; `signApprovalDecision` refuses a method the level does not accept.","items":{"type":"string","enum":["platformKey","uaePass","externalCertificate","drawnSignature"]}},"externalProviderId":{"type":"string","format":"uuid","nullable":true,"description":"11.1.65 (29 September). **This level is decided in an external workflow system** (`ApprovalExternalProvider`) rather than by a person in TICVAI. `approverRoleIds` stay required: they are who decides if the provider does not answer in time and its `onTimeout` is `fallBackToRoles`.\n"}}},
 "BulkPricingUpdateImportMassMaintenanceView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over catalogue state, assembled at read time from tables that already exist","description":"**What Bulk Pricing Update, Import & Mass Maintenance displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"selectBy":{"type":"string","enum":["priceList","product","productFamily","category","venue","market","currency","rateType","channel","effectivePeriod"],"description":"Vocabulary listed under Select by."},"recordsRead":{"type":"integer","description":"Records read (import preview)","nullable":true},"validRecords":{"type":"integer","description":"Valid records","nullable":true},"warningCount":{"type":"integer","description":"Records with warnings","nullable":true},"errorCount":{"type":"integer","description":"Records with errors; the job cannot be submitted while above zero","nullable":true},"jobId":{"type":"string","description":"Bulk job ID"},"jobKind":{"type":"string","enum":["bulkOperation","import"],"description":"Bulk operation on selected records, or spreadsheet import (CSV/XLSX)"},"selectionValues":{"type":"array","items":{"type":"string"},"description":"IDs selected under selectBy (e.g. the price lists or products)"},"effectivePeriodFrom":{"type":"string","format":"date","description":"Selection: effective period from","nullable":true},"effectivePeriodTo":{"type":"string","format":"date","description":"Selection: effective period to","nullable":true},"recordsSelected":{"type":"integer","description":"Records selected, e.g. 428 admission rates"},"operation":{"type":"string","enum":["increasePercent","decreasePercent","increaseFixedAmount","decreaseFixedAmount","replaceAmount","copyRate","changeCurrency","applyRounding","setEffectiveDates","activateDeactivate","cloneForNewSeason"],"description":"Bulk Operation (pack p.60)","nullable":true},"adjustmentPercent":{"type":"number","description":"Percent for increasePercent / decreasePercent","nullable":true},"adjustmentAmount":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"description":"Amount for fixed-amount and replace operations","nullable":true},"targetCurrency":{"type":"string","description":"ISO 4217 currency for changeCurrency","nullable":true},"currentPortfolioValue":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"description":"Preview: current portfolio value","nullable":true},"proposedPortfolioValue":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"description":"Preview: proposed portfolio value","nullable":true},"fileName":{"type":"string","description":"Imported file name","nullable":true},"columnMappings":{"type":"array","items":{"type":"object","properties":{"sourceColumn":{"type":"string","description":"Column in the file"},"targetField":{"type":"string","description":"TICVAI field, e.g. rateAmount"},"suggestedByAi":{"type":"boolean","description":"Suggested by AI mapping"},"confirmed":{"type":"boolean","description":"Confirmed by the administrator; unconfirmed mappings block validation"}},"description":"Column mapping"},"description":"Import column mappings"},"validationIssues":{"type":"array","items":{"type":"object","properties":{"code":{"type":"string","enum":["invalidProduct","unknownRateCode","duplicateRecord","unsupportedCurrency","missingMandatoryField","invalidDate","invalidAmount"],"description":"Import Validation check (pack p.61)"},"rowNumber":{"type":"integer","description":"File row","nullable":true},"severity":{"type":"string","enum":["warning","error"],"description":"Errors block submission"},"message":{"type":"string","description":"Message"}},"description":"One issue"},"description":"Validation issues found before commit"},"changeRequestId":{"type":"string","description":"Change request the job was submitted as","nullable":true},"status":{"type":"string","description":"Status: draft, validating, validationFailed, readyToSubmit, submitted or cancelled"},"createdBy":{"type":"string","description":"Created by"},"createdAt":{"type":"string","format":"date-time","description":"Created at"}}},
 "CatalogueRollbackAction": {"type":"object","x-ticvai-persistence":"catalogue.rollback_action","description":"**A rollback or emergency action on a product or on pricing** (29 September, data model DM3). Merges product rollback (ADM-133) and the pricing rollback and emergency centre (ADM-086). A rollback restores an earlier `catalogue.product_version` or `catalogue.price_list_version` as a new version; nothing is edited in place. Emergency actions may run before approval and then need `retrospectiveApprovalRequired`.","required":["id","scopePath","subject","actionType","reason","status","requestedByPrincipalId","requestedAt"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005). Operations write it at `venue` scope."},"subject":{"type":"string","enum":["product","pricing"]},"actionType":{"type":"string","enum":["rollback","freezePriceList","freezeProductPricing","freezeVenuePricing","stopScheduledPublication","stopDistribution","restoreLastKnownGood"],"description":"Product rollbacks are `rollback`."},"productId":{"type":"string","format":"uuid","nullable":true},"priceListId":{"type":"string","format":"uuid","nullable":true},"fromVersion":{"type":"integer","nullable":true},"toVersion":{"type":"integer","nullable":true},"productScope":{"type":"array","items":{"type":"string","enum":["entireProduct","pricingAssociation","channelAssociation","validityConfiguration","media","policy","entitlementConfiguration"]},"description":"Product rollbacks: which parts are restored."},"rollbackTarget":{"type":"string","enum":["previousVersion","selectedVersion","previousPrice","commercialBaseline",null],"nullable":true},"rollbackScope":{"type":"string","enum":["selectedProducts","selectedVenue","selectedMarket","selectedChannel","entirePublication",null],"nullable":true},"scopeIds":{"type":"array","items":{"type":"string","format":"uuid"}},"dependencies":{"type":"array","items":{"type":"string"},"description":"Product rollbacks: the dependent objects reviewed before executing."},"reason":{"type":"string"},"executionMode":{"type":"string","enum":["immediate","scheduled"],"default":"immediate"},"isEmergency":{"type":"boolean","default":false},"scheduledAt":{"type":"string","format":"date-time","nullable":true},"incidentReference":{"type":"string","maxLength":200,"nullable":true},"authorisedRole":{"type":"string","maxLength":100,"nullable":true},"retrospectiveApprovalRequired":{"type":"boolean","default":false},"approvalRequestId":{"type":"string","format":"uuid","nullable":true},"changeRequestId":{"type":"string","format":"uuid","nullable":true,"description":"The change request whose publication is being rolled back."},"status":{"type":"string","enum":["requested","scheduled","executing","completed","failed","cancelled"],"default":"requested"},"requestedByPrincipalId":{"type":"string","format":"uuid","readOnly":true},"requestedAt":{"type":"string","format":"date-time","readOnly":true},"completedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true}}},
 "ChangeImpactAnalysisView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over catalogue state, assembled at read time from tables that already exist","description":"**What Change Impact Analysis displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"area":{"type":"string","enum":["futureOrders","reservations","issuedTickets","capacity","pricing","tax","promotions","membership","entitlements","accessControl","salesChannels","b2bPartners","otas","pos","b2c","kiosk","media","finance","reporting"],"description":"Impact area (pack p.21-22)"},"changeRequestId":{"type":"string","description":"Change request analysed","format":"uuid"},"affectedCount":{"type":"integer","description":"How many items in this area are affected (orders, reservations, agreements, channels...)"},"riskLevel":{"type":"string","enum":["low","medium","high","critical"],"description":"Risk classification"},"explanation":{"type":"string","description":"AI explanation in business language; advisory","nullable":true}}},

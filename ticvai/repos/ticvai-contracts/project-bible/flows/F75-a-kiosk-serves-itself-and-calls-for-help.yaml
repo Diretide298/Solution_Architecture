@@ -29,7 +29,7 @@ steps:
   screen: KSK-002
   action: They pick a language.
   operations:
-  - getTenantConfig
+  - getPublishedTenantConfig
   - getTenantAppStatus
   outcome: '**First choice, before anything else.** A guest who cannot read the first screen cannot
     reach a language button placed later. `getTenantAppStatus` is what shows the out-of-service screen
@@ -64,9 +64,9 @@ steps:
   action: The ticket is issued.
   operations:
   - getOrder
-  - transferOrderTickets
-  outcome: '**Printed, or sent to a phone.** `transferOrderTickets` is how a guest with no printer still
-    leaves with a ticket.'
+  - reprintOrder
+  outcome: '**Printed, or sent to a phone.** `reprintOrder` by email or SMS is how a guest with no printer
+    still leaves with a ticket; nobody else becomes its owner (GFIX-3, 2 October).'
 - step: 7
   screen: KSK-013
   action: Something goes wrong and they call staff.

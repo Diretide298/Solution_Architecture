@@ -260,6 +260,10 @@ screens:
     - to: SGN-003
       trigger: Venue Type & Business Profile
       provenance: structural — the book's own journey, 2.1 "Journey Preview", 11 September 2026
+  entryState:
+    params:
+    - name: challengeId
+      from: navigation
 - id: SGN-003
   name: Venue Type & Business Profile
   module: Onboarding & Assessment

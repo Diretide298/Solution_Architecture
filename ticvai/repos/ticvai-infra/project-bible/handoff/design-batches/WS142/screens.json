@@ -58,7 +58,10 @@
     {
      "to": "BO-808",
      "trigger": "Assignment & Workload",
-     "provenance": "structural — pack board 8 wiring, 19 September 2026"
+     "provenance": "structural — pack board 8 wiring, 19 September 2026",
+     "carries": [
+      "caseId"
+     ]
     },
     {
      "to": "BO-809",
@@ -104,6 +107,12 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 41"
+   },
+   {
+    "operation": "listMyCases",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-005): listMyCases is a guest-audience read of the caller's own cases; a staff command centre reads listCases (declared) (design-notes correction customer-marketing BO-804).",
+    "source": "contracts/satellite/marketing-crm.yaml#listMyCases"
    }
   ],
   "layout": {
@@ -115,7 +124,7 @@
       {
        "kind": "dataTable",
        "derived": true,
-       "impliedBy": "listMyCases",
+       "impliedBy": "listCases",
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
       }
      ]
@@ -125,17 +134,11 @@
   "states": {
    "loading": "The case list.",
    "error": "Could not load. Names which read failed and leaves the case untouched.",
-   "emptyFirstRun": "No case yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No case yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the case are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
-   {
-    "operationId": "listMyCases",
-    "contract": "marketing-crm",
-    "purpose": "The cases this guest raised",
-    "trigger": "onLoad"
-   },
    {
     "operationId": "listCases",
     "contract": "marketing-crm",
@@ -568,6 +571,12 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 42"
+   },
+   {
+    "operation": "setCaseInvestigationResolution",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-005): setCaseInvestigationResolution links a record to a case, a case-workspace act, not taxonomy (design-notes correction customer-marketing BO-807).",
+    "source": "contracts/satellite/marketing-crm.yaml#setCaseInvestigationResolution"
    }
   ],
   "layout": {
@@ -576,20 +585,6 @@
     {
      "name": "contentBody",
      "components": [
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "setCaseInvestigationResolution",
-       "label": "Save",
-       "notes": "The act the screen exists for."
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "setCaseInvestigationResolution"
-      },
       {
        "kind": "textField",
        "label": "Parent category id",
@@ -648,18 +643,11 @@
   "states": {
    "loading": "The classification workflow list.",
    "error": "Could not load. Names which read failed and leaves the classification workflow untouched.",
-   "emptyFirstRun": "No classification workflow yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No classification workflow yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the classification workflow are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
-   {
-    "operationId": "setCaseInvestigationResolution",
-    "contract": "marketing-crm",
-    "purpose": "Classification and workflow",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026"
-   },
    {
     "operationId": "listCaseCategories",
     "contract": "marketing-crm",
@@ -816,6 +804,17 @@
        "provenance": "contract marketing-crm.yaml GET /service-queues"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "components": [
+      {
+       "kind": "secondaryButton",
+       "label": "Reassign",
+       "operation": "updateCase",
+       "provenance": "contract marketing-crm.yaml PATCH /cases/{caseId}; wiring fix, 2 October 2026"
+      }
+     ]
     }
    ]
   },
@@ -839,6 +838,13 @@
     "contract": "marketing-crm",
     "purpose": "List customer-service queues",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "updateCase",
+    "contract": "marketing-crm",
+    "purpose": "Reassign a case to balance the load",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-005)"
    }
   ],
   "wireframe": {
@@ -847,6 +853,30 @@
    "workshopBoard": "wireframes/WS77 Marketing CRM Configuration Reference v1.0 Board 8.dc.html#bo-808"
   },
   "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 42. 0 of 0 labels bound to a contract property; 0 of 8 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formUpdateCase",
+    "component": "modal",
+    "trigger": "Reassign",
+    "body": "**Collects what `updateCase` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Reassign",
+     "operation": "updateCase"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "contract marketing-crm.yaml PATCH /cases/{caseId}; wiring fix, 2 October 2026"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "caseId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -918,6 +948,12 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 42"
+   },
+   {
+    "operation": "setApprovalSlaPolicy",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-005): setApprovalSlaPolicy is the approval workflow SLA (approvals contract), a different object from the case SLA (setSlaPolicy) (design-notes correction customer-marketing BO-809).",
+    "source": "contracts/spine/approvals.yaml#setApprovalSlaPolicy"
    }
   ],
   "layout": {
@@ -935,8 +971,8 @@
       {
        "kind": "primaryButton",
        "derived": true,
-       "impliedBy": "setApprovalSlaPolicy",
-       "label": "Save approval SLA policy",
+       "impliedBy": "setSlaPolicy",
+       "label": "Save SLA policy",
        "notes": "The act the screen exists for."
       },
       {
@@ -944,7 +980,7 @@
        "label": "Cancel",
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
-       "impliedBy": "setApprovalSlaPolicy"
+       "impliedBy": "setSlaPolicy"
       }
      ]
     }
@@ -953,7 +989,7 @@
   "states": {
    "loading": "The sla policy list.",
    "error": "Could not load. Names which read failed and leaves the sla policy untouched.",
-   "emptyFirstRun": "No sla policy yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No sla policy yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the sla policy are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -963,13 +999,6 @@
     "contract": "marketing-crm",
     "purpose": "SLA policies",
     "trigger": "onLoad",
-    "provenance": "board reading, 19 September 2026"
-   },
-   {
-    "operationId": "setApprovalSlaPolicy",
-    "contract": "approvals",
-    "purpose": "Configure a target and its consequence",
-    "trigger": "onAction",
     "provenance": "board reading, 19 September 2026"
    },
    {
@@ -1318,6 +1347,17 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 43"
+   },
+   {
+    "operation": "setRefundCompensationService",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-005): setRefundCompensationService raises one request on a case; the service-recovery configuration (matrix, thresholds) is not it (design-notes correction customer-marketing BO-812).",
+    "source": "contracts/satellite/marketing-crm.yaml#setRefundCompensationService"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-007): No operation configures the service-recovery compensation matrix and thresholds.",
+    "source": "contracts/satellite/marketing-crm.yaml#setRefundCompensationService"
    }
   ],
   "layout": {
@@ -1325,41 +1365,18 @@
    "regions": [
     {
      "name": "contentBody",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "setRefundCompensationService",
-       "label": "Save",
-       "notes": "The act the screen exists for."
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "setRefundCompensationService"
-      }
-     ]
+     "components": []
     }
    ]
   },
   "states": {
    "loading": "The service recovery list.",
    "error": "Could not load. Names which read failed and leaves the service recovery untouched.",
-   "emptyFirstRun": "No service recovery yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No service recovery yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the service recovery are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Not shown: nothing on this screen needs a permission of its own; the app's sign-in decides access."
   },
-  "apis": [
-   {
-    "operationId": "setRefundCompensationService",
-    "contract": "marketing-crm",
-    "purpose": "Service recovery",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026"
-   }
-  ],
+  "apis": [],
   "wireframe": {
    "status": "notStarted",
    "board": "wireframes/P08 Venue Management.dc.html#bo-812",
@@ -1437,6 +1454,12 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 43"
+   },
+   {
+    "operation": "listMyCases",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-005): listMyCases is guest-audience; staff analytics read listCases (declared) (design-notes correction customer-marketing BO-813).",
+    "source": "contracts/satellite/marketing-crm.yaml#listMyCases"
    }
   ],
   "layout": {
@@ -1448,7 +1471,7 @@
       {
        "kind": "dataTable",
        "derived": true,
-       "impliedBy": "listMyCases",
+       "impliedBy": "listCases",
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
       }
      ]
@@ -1458,17 +1481,11 @@
   "states": {
    "loading": "The case analytics audit list.",
    "error": "Could not load. Names which read failed and leaves the case analytics audit untouched.",
-   "emptyFirstRun": "No case analytics audit yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No case analytics audit yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the case analytics audit are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
-   {
-    "operationId": "listMyCases",
-    "contract": "marketing-crm",
-    "purpose": "The cases this guest raised",
-    "trigger": "onLoad"
-   },
    {
     "operationId": "listCases",
     "contract": "marketing-crm",

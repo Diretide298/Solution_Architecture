@@ -61,6 +61,45 @@ convincingly. It is never a caption.
   and its error; and, element by element, what is shown and in what format, what each action
   produces and where the user goes next. Draw exactly that.
 
+## The processes these screens belong to
+
+Written by the owner of each process (`handoff/design-notes/`). Read before any screen: it says how the process runs end to end and which words the screens must use.
+
+### Ticketing & Guest Commerce, as the venue and TICVAI configure and run it
+
+WHAT THE PROCESS IS. Everything a guest can buy is set up, priced, promoted and serviced here, on Venue Management (P08, the venue's own back office, served inside the venue's cell) and on the TICVAI Console (P09, TICVAI's control plane, outside every cell). End to end: (1) CATALOGUE. A product has one of twelve kinds (admission, timedAdmission, datedAdmission, openDated, seated, membership, bundle, fnb, retail, rental, addOn, giftCard). Its ticket types (adult, child, senior, resident...) are not typed one by one: they are generated from the product's attributes (components) and each value combination becomes a sellable ticket type with no extra setup (DI-164). What a ticket grants (validity, entries, re-entry, days of week, blackout dates, expiry anchor, fast track, transfer) lives on a reusable entitlement template, not on the product. Who may take part (age, height, supervision, certification) is the eligibility rule; what the guest must answer is the data mask and the consent questions; how the guest sees it is guestListing (bookable, infoOnly, hidden), display tags (at most six), media and the booking flow. Group, family and corporate products and every after-sales policy (reschedule, exchange, refund, cancellation, upgrade, transfer) are configured inside the one product configuration, never on separate screens (DI-465, DI-466). (2) LIFECYCLE AND PUBLICATION. A product moves draft, inReview, approved, live, withdrawn, archived. Approval and publication are two acts with two permissions (PRODUCT_APPROVE, PRODUCT_PUBLISH, R091); every product is authorised before it sells online or on site (DI-438). Approved is still not on a till: a till sells only what is in the signed catalogue release it pulled (publishBundle, ADR-0013), so a saved price is a back-office fact until the venue publishes to tills. Changing something that has sold is preceded by an impact check (assessProductChange: orders affected, entitlements issued, future performances, open carts); restoring a version creates a new version, and sold tickets keep the price and terms they were sold under (restoreProductVersion, DI-938, TRACKER Actions row 145). (3) PRICE. Prices live in price lists: per venue, per channel set, with validity dates and a priority, copied for the next season with an uplift (copyPriceList) and repriced in bulk only after a dry run (bulkChangePrices). Currency and decimal scale are never chosen on a form: they resolve from the venue's region (ADR-0008, ADR-0018; AED 2 places, OMR and BHD 3). When several rules apply, the configured hierarchy decides; there is no "lowest price wins" default (DI-595). Tax on the pre-discount price and three-decimal rounding are regional settings (DI-598). Dynamic rules always show their minimum and maximum price guardrails beside the trigger (getDynamicPriceRule). (4) PROMOTE AND BUNDLE. A promotion is a rule (automatic, or gated by a code) created in draft, made live only by Publish, which first analyses stacking; a …
+*(source: DI-164; DI-171; DI-438; DI-465; DI-466; DI-595; DI-598; DI-387; DI-039; DI-044; DI-474; DI-671; DI-987; DI-019; DI-080; ADR-0008; ADR-0013; ADR-0018; ADR-0019; ADR-0030; R091; R098; R101; R222; REV3-21; contracts/spine/catalogue.yaml#transitionProductLifecycle …)*
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Product | Anything sellable, of one of the twelve kinds. The record that carries names, channels, listing, media and policies. | Item (except on F&B and retail screens), SKU (for tickets), Offering | contracts/spine/catalogue.yaml#/components/schemas/ProductKind |
+| Ticket type | One sellable variant of an admission or event product (Adult, Child, Resident Adult), generated from the product's attributes. For retail and F&B the same record is labelled Variant. | Variant (on ticket screens), Sub-product, Rate (that is a price), Axis value | contracts/spine/catalogue.yaml#updateProductVariant / DI-164 / DI-437 |
+| Attribute | A dimension that generates ticket types (Guest category, Residency, Tier, Length). Each has values; adding a value adds ticket types. | Axis, Component (the client's word; use it only in help text), Option | contracts/spine/catalogue.yaml#setProductAttributes / DI-164 / DI-450 |
+| Entitlement | What a ticket lets the holder do (validity, entries, re-entry, days, blackout dates, expiry, fast track, transfer), defined once on an entitlement template and shared by several products. | Access rights, Ticket rules, Validity profile | contracts/spine/catalogue.yaml#createEntitlementTemplate / DI-171 / DI-451 |
+| Eligibility rule | Who may take part in or buy a product (age, height, supervision, waiver, certification). Distinct from a promotion's eligibility, which decides who gets a discount. | Restriction, Access rule (that is access control) | contracts/spine/catalogue.yaml#setProductEligibilityRule / DI-463 |
+| Price list | A set of prices for one venue and a set of channels, valid between two dates, with a priority. Several coexist (B2C, B2B, season). | Price book, Rate card, Tariff | contracts/spine/catalogue.yaml#createPriceList / DI-140 / DI-163 |
+| Price category | A standard rate type (Adult, Child, Member) reused across lists so venues do not invent "Adult Standard" and "Normal Adult". | Price band (that is a seat-category band), Fare type (transport) | contracts/spine/catalogue.yaml#setPriceCategoryRateType / … |
+| Price band | A priced band on a seat category (code, label, colour, amount, channel, from-date). | Price category, Zone price | contracts/satellite/seating.yaml#/components/schemas/SeatPriceBand |
+| Promotion | A rule that changes a price automatically or when a code is entered; draft until published; declares how it stacks. | Offer (except in guest copy), Deal, Discount rule | contracts/satellite/promotions.yaml#createPromotion / DI-173 / DI-174 |
+| Coupon code | A code issued from a coupon campaign that applies a promotion-style discount; one shared code or many single-use codes. | Voucher, Promo voucher | contracts/satellite/promotions.yaml#createCouponCampaign / DI-173 |
+| Voucher | A code that carries money (face value, balance), sold or issued; a liability until redeemed or expired. | Coupon, Credit note | contracts/satellite/promotions.yaml#listVoucherBatches / … |
+| Bundle | A product sold as one line whose price differs from the sum of its components, with a mandatory revenue allocation. "Package" is acceptable in guest copy. | Combo (that is an F&B meal deal), Catalogue bundle | contracts/satellite/promotions.yaml#createBundle / DI-220 / ADR-0019 |
+| Catalogue release | The signed snapshot of a venue's catalogue, prices, promotions and sale boards that tills, kiosks and devices pull. Its action label is "Publish to tills". | Bundle, Catalogue bundle, Sync, Deploy | contracts/spine/catalogue.yaml#publishBundle / … |
+| Approve / Publish / Save | Save keeps a draft; Approve records that it is authorised (PRODUCT_APPROVE); Publish makes it live for guests and channels (PRODUCT_PUBLISH). Three different buttons, never merged. | Submit, Go live, Activate (except CatalogueConfigStatus active), Deploy | R091 / contracts/spine/catalogue.yaml#transitionProductLifecycle / DI-438 |
+| Product states | Draft, In review, Approved, Live, Withdrawn, Archived (ProductLifecycleState), always as coloured badges with these exact labels. | Published (for a product), Pending, Inactive (for a product) | contracts/spine/catalogue.yaml#/components/schemas/ProductLifecycleState |
+| Channel | Where something is sold. Labels: pos Point of sale; kiosk Kiosk; web and guestWeb Website; mobile and guestApp App; b2b B2B partners; partner Partner; ota Travel agents (OTA); callCentre Call centre; api API; backOffice Back office. | Touchpoint, Outlet (an outlet is a business inside a venue), raw enum values | contracts/spine/catalogue.yaml#/components/schemas/Channel / … |
+| Refund | Money returned after settlement, wholly or for some lines, under the venue's refund policy. | Return (that is retail goods), Reversal, Void | contracts/spine/orders.yaml#createRefund / DI-252 |
+| Void | Cancelling a whole order before settlement, within the same shift, with a reason from the void list. After settlement it is a refund. | Cancel order, Delete | contracts/spine/orders.yaml#voidOrder / R222 |
+| Exchange / Reschedule | Exchange swaps lines for other products or dates and settles only the difference; Reschedule is the same product moved to another date or time. | Rebook, Date change (acceptable only in guest copy), Refund and resell | contracts/spine/orders.yaml#exchangeOrderLines / … |
+| Hold / Capture / Release | A deposit or stored-value amount is held, then partly or fully captured, and the rest released. A held deposit is not a payment. | Charge, Pre-auth (in staff copy), Block funds | contracts/spine/orders.yaml#authoriseStoredValue / … |
+| Wallet (TICVAI wallet) | The guest's stored-value balance on TICVAI, spent by hold and capture. Distinct from the tender "Apple Pay / Google Pay", which the contract also calls wallet. | Digital wallet (for stored value), E-wallet, Credit (without a type) | contracts/spine/orders.yaml#/components/schemas/TenderKind / R080 |
+| Credit lot | One amount of wallet credit of one credit type (cash, bonus, gift) with its own expiry; lots are spent nearest expiry first and the guest sees the breakdown but cannot choose. | Bucket, Batch, Top-up | TRACKER Actions row 171 / contracts/satellite/wallet.yaml#expireCreditLots |
+| Venue map / Seat map | A venue map is the wayfinding map of a park or a floor (points, paths, bookable places); a seat map is the seating layout of an auditorium or stand. Never just "map" where both could be meant. | Layout (alone), Floor plan (unless it is a floor map), Map (alone) | contracts/satellite/venue-map.yaml#createVenueMap / … |
+| Point / Bookable place | A point is a place on a venue map (toilet, ride, restaurant, exit). A bookable place is a cabana, lounger, table or pitch placed on the map and sold through its price band. | Pin, POI, Marker, Resource (in staff copy) | contracts/satellite/venue-map.yaml#setVenuePoint / … |
+| Station / Route / Timetable / Departure / Fare table / Pass … | A route is an ordered list of stations with offsets; a timetable generates departures up to its release horizon; a fare table prices a route per passenger type; a pass type is a multi-trip or unlimited pass sold as a product. | Stop (except in the stop list), Line (except lineCode), Schedule, Trip (except a guest's journey) | contracts/satellite/transport.yaml / REV3-21 |
+| Applies from | The effective date of a change. Every dated change shows it, and sold items keep their old terms. | Effective date (in labels), Start date (for a change) | contracts/satellite/seating.yaml#updateSeatCategory / TRACKER Actions row 194 |
+
+
 ## The screens
 
 Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs count fields; requirements are matrix rows; meeting inputs are the ones naming the screen (the module and platform ones are below); white label says whether the tenant's brand reaches it (guest) or it sets the brand (configures).
@@ -103,6 +142,12 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/sell/group-booking-operations-command-center-bo-274` |
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Operations' view of confirmed and upcoming groups: arrivals today, deposits outstanding, readiness.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **List operation(s) listGroupBooking, listGroupBookingReconciliation return a bare array, not the paged list envelope (items, nextCursor, hasMore); rows of listGroupBookingReconciliation carry no identifier.** Why: The table cannot page, and a row without an id cannot open, edit or link to the record it summarises. *(source: contracts/spine/orders.yaml#listGroupBooking / contracts/spine/orders.yaml#listGroupBookingReconciliation; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
 
 #### Inputs: what the user enters or picks
 
@@ -174,6 +219,10 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Readiness | 1,234.5 | Readiness % |
 | Operational owner | text | Operational Owner |
 
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **arrivals board**: Today and next 7 days, with deposit flags and staff assigned. *(source: contracts/spine/orders.yaml#listGroupBooking)*
+
 **Data it reads**: `listGroupBooking` (onLoad, Group Booking Operations Command Center); `listGroupBookingReconciliation` (onLoad, Group Booking Reconciliation, Closure & Performance)
 
 **Where the user goes next**
@@ -199,6 +248,18 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the group booking operations are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+arrivals:
+- group: Al Noor Academy
+  at: 09:30
+  size: 31
+  deposit: paid
+```
 
 #### Permissions
 
@@ -255,6 +316,7 @@ Also apply: 4 for P08 · Sell, 24 for all of P08, 29 for every app (section *Des
 - [ ] Every transition is wired: `BO-100`, `BO-275`, `BO-282`, `BO-283`, `BO-276`, `BO-277`, `BO-278`, `BO-279`, `BO-280`, `BO-281`.
 - [ ] Every gated control is gated: `ORDER_VIEW`.
 - [ ] The 2 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -274,6 +336,14 @@ Also apply: 4 for P08 · Sell, 24 for all of P08, 29 for every app (section *Des
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/sell/group-operational-planning-task-workspace-bo-275` |
+
+**Known gaps.** Contract gap recorded 2 October 2026 (CHG-WIR-027): A read (get or list) of the group operational plan and its tasks that setGroupOperationalPlanning writes.
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** The group's operational plan: arrival and departure, meeting point, gate, leaders, ticketing method, tasks.
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- No read operation: the screen declares only setGroupOperationalPlanning and nothing that returns the current configuration. (CHG-WIR-027)
 
 #### Inputs: what the user enters or picks
 
@@ -300,6 +370,10 @@ Also apply: 4 for P08 · Sell, 24 for all of P08, 29 for every app (section *Des
 | Equipment | select field | — | — | — | — | — | — |
 | Special Requirements | select field | — | — | — | — | — | — |
 
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **plan**: Arrival gate picked from access points; leaders from the participant list. *(source: contracts/spine/orders.yaml#setGroupOperationalPlanning)*
+
 #### Outputs: what the screen shows and produces
 
 **Actions and what each produces**
@@ -321,6 +395,17 @@ Also apply: 4 for P08 · Sell, 24 for all of P08, 29 for every app (section *Des
 | Empty, first run (`?state=emptyFirstRun`) | No group operational planning configured yet. Carries the create action and says what the platform does in the meantime. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+plan:
+  arrival: 2026-12-10 09:30
+  gate: Gate 2
+  meetingPoint: Group plaza
+```
 
 #### Permissions
 
@@ -380,6 +465,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | `groupBookingId` (navigation) |
 | Route | `/sell/participants-guest-lists-group-structure-bo-276` |
 
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** The people in a group where names are required: entered, imported from CSV or Excel, uploaded by the customer or by API.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **List operation(s) listParticipantGuestList return a bare array, not the paged list envelope (items, nextCursor, hasMore); rows of listParticipantGuestList carry no identifier.** Why: The table cannot page, and a row without an id cannot open, edit or link to the record it summarises. *(source: contracts/spine/orders.yaml#listParticipantGuestList; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
+
 #### Inputs: what the user enters or picks
 
 **Sent by *Save participant list*** (`setParticipantGuestList`; no form is declared, so these are filled from the screen or collected inline)
@@ -394,6 +485,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Phone `participants[].phone` | phone field | optional | — | max length 30 | +971 5X XXX XXXX (E.164) | — | `setParticipantGuestList` body |
 | Date of birth `participants[].dateOfBirth` | date picker | optional | — | — | 1 Oct 2026 (dd MMM yyyy) | — | `setParticipantGuestList` body |
 | File ref `fileRef` | picker: choose a file ref | optional | — | — | shows names, sends the id | The uploaded file the names came from. Required for `csvExcelImport` and `customerUpload`. | `setParticipantGuestList` body |
+
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **participants**: Import with a preview and errors per row; the list replaces the previous one. *(source: contracts/spine/orders.yaml#setParticipantGuestList)*
 
 #### Outputs: what the screen shows and produces
 
@@ -443,6 +538,18 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 The group is cancelled or complete (`groupClosed`). (GroupBookingProblem); 422 `csvExcelImport` or `customerUpload` with no `fileRef` (`participant-file-missing`). |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+participants:
+- name: Ahmed Saleh
+  age: 10
+- name: Sara Nabil
+  age: 11
+```
+
 #### Permissions
 
 - `listParticipantGuestList` → `ORDER_VIEW` (read) · staff
@@ -482,6 +589,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-274`.
 - [ ] Every gated control is gated: `ORDER_MODIFY`, `ORDER_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -502,6 +610,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | `groupBookingId` (navigation) |
 | Route | `/sell/group-payment-deposit-balance-management-bo-277` |
 
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** A group's payment schedule and status: deposit then balance, milestones or custom, paid and outstanding.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **List operation(s) listGroupPaymentDeposit return a bare array, not the paged list envelope (items, nextCursor, hasMore); rows of listGroupPaymentDeposit carry no identifier.** Why: The table cannot page, and a row without an id cannot open, edit or link to the record it summarises. *(source: contracts/spine/orders.yaml#listGroupPaymentDeposit; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
+
 #### Inputs: what the user enters or picks
 
 **Sent by *Save payment schedule*** (`setGroupPaymentSchedule`; no form is declared, so these are filled from the screen or collected inline)
@@ -513,6 +627,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Due date `milestones[].dueDate` | date picker | required | — | — | 1 Oct 2026 (dd MMM yyyy) | — | `setGroupPaymentSchedule` body |
 | Amount `milestones[].amount` | money field | required | — | A jsonb price cannot be summed in SQL. | AED, 2 decimals shown (up to 4 accepted), currency from the … | On the wire this is three fields; in the database it is one column. 24 August. | `setGroupPaymentSchedule` body |
 | Label `milestones[].label` | text field | optional | — | max length 60 | — | — | `setGroupPaymentSchedule` body |
+
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **schedule**: Type then milestones (date, amount or percent); totals must equal the booking. *(source: contracts/spine/orders.yaml#setGroupPaymentSchedule)*
 
 #### Outputs: what the screen shows and produces
 
@@ -572,6 +690,17 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 The group is cancelled or complete (`groupClosed`). (GroupBookingProblem); 422 The milestones do not sum to the group booking's total (`group-payment-schedule-unbalanced`), or a milestone already paid was removed or changed … |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+schedule:
+  type: depositThenBalance
+  deposit: AED 9,000.00 by 2026-11-25
+  balance: AED 27,000.00 on arrival
+```
+
 #### Permissions
 
 - `listGroupPaymentDeposit` → `ORDER_VIEW` (read) · staff
@@ -612,6 +741,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-274`.
 - [ ] Every gated control is gated: `ORDER_MODIFY`, `ORDER_VIEW`.
 - [ ] The 2 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -632,6 +762,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | `groupBookingId` (navigation) |
 | Route | `/sell/group-ticket-seat-entitlement-allocation-bo-278` |
 
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Allocate the group's inventory: individual, bulk, named, by quantity or by zone; keep together; VIP.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **List operation(s) listGroupTicketSeat return a bare array, not the paged list envelope (items, nextCursor, hasMore); rows of listGroupTicketSeat carry no identifier.** Why: The table cannot page, and a row without an id cannot open, edit or link to the record it summarises. *(source: contracts/spine/orders.yaml#listGroupTicketSeat; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
+
 #### Inputs: what the user enters or picks
 
 **Sent by *Save allocation*** (`setGroupTicketAllocation`; no form is declared, so these are filled from the screen or collected inline)
@@ -646,6 +782,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Quantity `allocations[].quantity` | number field | required | — | min 1 | — | — | `setGroupTicketAllocation` body |
 | Zone `allocations[].zoneId` | picker: choose a zone | optional | — | — | shows names, sends the id | Required for `zoneAllocation`. | `setGroupTicketAllocation` body |
 | Participant `allocations[].participantId` | picker: choose a participant | optional | — | — | shows names, sends the id | The participant a `namedTicket` line is for. Required for `namedTicket`. | `setGroupTicketAllocation` body |
+
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **allocationMode**: Mode first, then the allocation grid. *(source: contracts/spine/orders.yaml#setGroupTicketAllocation)*
 
 #### Outputs: what the screen shows and produces
 
@@ -708,6 +848,17 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 The group is cancelled or complete (`groupClosed`). (GroupBookingProblem); 422 A `namedTicket` line with no `participantId`, or a `zoneAllocation` line with no `zoneId` (`allocation-line-incomplete`). |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+allocation:
+  mode: namedTicket
+  keepTogether: true
+  tickets: 31
+```
+
 #### Permissions
 
 - `listGroupTicketSeat` → `ORDER_VIEW` (read) · staff
@@ -752,6 +903,7 @@ Also apply: 4 for P08 · Sell, 24 for all of P08, 29 for every app (section *Des
 - [ ] Every transition is wired: `BO-274`.
 - [ ] Every gated control is gated: `ORDER_MODIFY`, `ORDER_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -772,6 +924,12 @@ Also apply: 4 for P08 · Sell, 24 for all of P08, 29 for every app (section *Des
 | Opens with | `groupBookingId` (navigation) |
 | Route | `/sell/group-ticket-fulfillment-distribution-bo-279` |
 
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** How the group's tickets are delivered: email, SMS, wallet, bulk PDF, POS print or collection, to the organiser or each participant, and when released.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **List operation(s) listGroupTicketFulfillment return a bare array, not the paged list envelope (items, nextCursor, hasMore); rows of listGroupTicketFulfillment carry no identifier.** Why: The table cannot page, and a row without an id cannot open, edit or link to the record it summarises. *(source: contracts/spine/orders.yaml#listGroupTicketFulfillment; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
+
 #### Inputs: what the user enters or picks
 
 **Sent by *Save fulfilment*** (`setGroupTicketFulfillment`; no form is declared, so these are filled from the screen or collected inline)
@@ -781,6 +939,10 @@ Also apply: 4 for P08 · Sell, 24 for all of P08, 29 for every app (section *Des
 | Method `method` | select | required | — | Email · SMS · Wallet · Bulk pdf · POS print · Physical collection | — | How the tickets are delivered (decided 29 September, readiness close-out). | `setGroupTicketFulfillment` body |
 | Recipients `recipients` | segmented control | required | — | Organiser · Each participant | — | Who receives them (decided 29 September, readiness close-out). | `setGroupTicketFulfillment` body |
 | Release at `releaseAt` | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | Hold the tickets back until then; null releases them when the group is confirmed. | `setGroupTicketFulfillment` body |
+
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **method and recipients**: One method; recipients organiser or each participant; release time optional. *(source: contracts/spine/orders.yaml#setGroupTicketFulfillment)*
 
 #### Outputs: what the screen shows and produces
 
@@ -840,6 +1002,17 @@ Also apply: 4 for P08 · Sell, 24 for all of P08, 29 for every app (section *Des
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 The group is cancelled or complete (`groupClosed`). (GroupBookingProblem) |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+fulfilment:
+  method: bulkPdf
+  recipients: organiser
+  release: 2026-12-08 09:00
+```
+
 #### Permissions
 
 - `listGroupTicketFulfillment` → `ORDER_VIEW` (read) · staff
@@ -879,6 +1052,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-274`.
 - [ ] Every gated control is gated: `ORDER_MODIFY`, `ORDER_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -899,6 +1073,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | `groupBookingId` (navigation) |
 | Route | `/sell/group-arrival-check-in-admission-operations-bo-280` |
 
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** The group's arrival: count arrived, extra guests, leaders, gate, issues; group check-in is distinct from the access scan.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **List operation(s) listGroupArrivalCheck return a bare array, not the paged list envelope (items, nextCursor, hasMore); rows of listGroupArrivalCheck carry no identifier.** Why: The table cannot page, and a row without an id cannot open, edit or link to the record it summarises. *(source: contracts/spine/orders.yaml#listGroupArrivalCheck; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
+
 #### Inputs: what the user enters or picks
 
 **Form: Record group check in** (modal, opened by *Record group check in*; *Record group check in* calls `recordGroupCheckIn`, *Cancel* sends nothing)
@@ -915,6 +1095,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Check in issues `checkInIssues` | multi-select chips | optional | — | Missing guest · Extra guest · Invalid ticket · Wrong date · Late arrival · Payment hold · Missing credential · Accessibility requirement | — | — | `recordGroupCheckIn` body |
 
 Errors to draw in the form: 400 Validation failed; 403 Authenticated but not permitted at the requested scope; 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 The booking is cancelled (`groupClosed`). (GroupBookingProblem)
+
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **arrival**: Arrived count against confirmed, issues as chips (missing guest, extra guest, invalid ticket). *(source: contracts/spine/orders.yaml#recordGroupCheckIn)*
 
 #### Outputs: what the screen shows and produces
 
@@ -974,6 +1158,19 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 The booking is cancelled (`groupClosed`). (GroupBookingProblem) |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+arrival:
+  group: Al Noor Academy
+  arrived: 29
+  confirmed: 31
+  leaders: 3
+  gate: Gate 2
+```
+
 #### Permissions
 
 - `listGroupArrivalCheck` → `ORDER_VIEW` (read) · staff
@@ -1014,6 +1211,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-274`.
 - [ ] Every gated control is gated: `ORDER_MODIFY`, `ORDER_VIEW`.
 - [ ] The 2 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -1036,6 +1234,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Changes after a group is confirmed: numbers, dates, cancellation and refund under policy.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **List operation(s) listGroupAmendmentCancellation return a bare array, not the paged list envelope (items, nextCursor, hasMore); rows of listGroupAmendmentCancellation carry no identifier.** Why: The table cannot page, and a row without an id cannot open, edit or link to the record it summarises. *(source: contracts/spine/orders.yaml#listGroupAmendmentCancellation; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
+
 #### Inputs: what the user enters or picks
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
@@ -1055,6 +1259,10 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Seat Change (secondary button) | navigation or local | — | — | — | — |
 | Catering Change (secondary button) | navigation or local | — | — | — | — |
 
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **amendment list**: Each amendment with financial effect. *(source: contracts/spine/orders.yaml#listGroupAmendmentCancellation)*
+
 **Data it reads**: `listGroupAmendmentCancellation` (onLoad, Group Amendments, Cancellation & Refund Operations)
 
 **Where the user goes next**
@@ -1072,6 +1280,17 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 A targeted line's entitlement has been redeemed (`lineRedeemed`, naming it in `lineIds`), or the order is voided (`orderVoided`). (OrderRefusedProblem); 409 Target performance is unavailable (`targetUnavailable`) or outside the reschedule window (`outsideRescheduleWindow`). (OrderRefusedProblem); 409 The status change goes backwards (`statusBackwards`), or the group is already cancelled or … |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+amendment:
+  group: Gulf Engineering
+  change: 120 to 104 guests
+  refund: AED 4,800.00
+```
 
 #### Permissions
 
@@ -1129,6 +1348,7 @@ Also apply: 4 for P08 · Sell, 24 for all of P08, 29 for every app (section *Des
 - [ ] Every transition is wired: `BO-274`.
 - [ ] Every gated control is gated: `ORDER_MODIFY`, `ORDER_RESCHEDULE`, `ORDER_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -1148,6 +1368,12 @@ Also apply: 4 for P08 · Sell, 24 for all of P08, 29 for every app (section *Des
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/sell/group-booking-reconciliation-closure-performance-bo-282` |
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Close a group after the visit: sold vs used, payments reconciled, performance.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **List operation(s) listGroupBookingReconciliation return a bare array, not the paged list envelope (items, nextCursor, hasMore); rows of listGroupBookingReconciliation carry no identifier.** Why: The table cannot page, and a row without an id cannot open, edit or link to the record it summarises. *(source: contracts/spine/orders.yaml#listGroupBookingReconciliation; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
 
 #### Inputs: what the user enters or picks
 
@@ -1179,6 +1405,10 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Outstanding balance | AED 1,234.50 | Outstanding Balance |
 | Final revenue | AED 1,234.50 | Final Revenue |
 
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **reconciliation**: Booked, arrived, used, paid, outstanding. *(source: contracts/spine/orders.yaml#listGroupBookingReconciliation)*
+
 **Data it reads**: `listGroupBookingReconciliation` (onLoad, Group Booking Reconciliation, Closure & Performance)
 
 **Where the user goes next**
@@ -1195,6 +1425,18 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the group booking reconciliation are still there. The pack's own statuses are Operationally Complete → Financially Complete → Closed — the state names which is selected. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+closure:
+  booked: 31
+  arrived: 29
+  paid: AED 36,000.00
+  outstanding: AED 0.00
+```
 
 #### Permissions
 
@@ -1237,6 +1479,7 @@ Also apply: 4 for P08 · Sell, 24 for all of P08, 29 for every app (section *Des
 - [ ] Every transition is wired: `BO-274`.
 - [ ] Every gated control is gated: `ORDER_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -1256,6 +1499,12 @@ Also apply: 4 for P08 · Sell, 24 for all of P08, 29 for every app (section *Des
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/sell/group-sales-analytics-ai-intelligence-center-bo-283` |
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Management intelligence across group sales: conversion, value, seasonality, AI insights.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **List operation(s) listGroupSale2, listGroupSale return a bare array, not the paged list envelope (items, nextCursor, hasMore); rows of listGroupSale2 carry no identifier.** Why: The table cannot page, and a row without an id cannot open, edit or link to the record it summarises. *(source: contracts/spine/orders.yaml#listGroupSale2 / contracts/spine/orders.yaml#listGroupSale; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
 
 #### Inputs: what the user enters or picks
 
@@ -1323,6 +1572,10 @@ Also apply: 4 for P08 · Sell, 24 for all of P08, 29 for every app (section *Des
 | Outstanding receivables | text | Outstanding Receivables |
 | Repeat customer rate | 12.5% | Repeat Customer Rate |
 
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **analytics**: KPIs with deltas (DI-041) and insight cards (DI-043). *(source: contracts/spine/orders.yaml#listGroupSale2)*
+
 **Data it reads**: `listGroupSale2` (onLoad, Group Sales Analytics & AI Intelligence Center); `listGroupSale` (onLoad, Group Sales Command Center)
 
 #### States
@@ -1335,6 +1588,17 @@ Also apply: 4 for P08 · Sell, 24 for all of P08, 29 for every app (section *Des
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the group sales analytics are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+kpis:
+  conversion: 39%
+  averageGroup: 46
+  value: AED 1.2m YTD
+```
 
 #### Permissions
 
@@ -1373,6 +1637,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] No transition is declared; back returns where the user came from.
 - [ ] Every gated control is gated: `ORDER_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -1526,7 +1791,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "GroupTicketSeatEntitlementAllocationView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over orders state, assembled at read time from tables that already exist","description":"**What Group Ticket, Seat & Entitlement Allocation displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"product":{"type":"string","description":"Product"},"quantityBooked":{"type":"integer","description":"Quantity Booked"},"quantityAllocated":{"type":"integer","description":"Quantity Allocated"},"remaining":{"type":"string","description":"Remaining"},"ticketType":{"type":"string","description":"Ticket Type"},"seatZone":{"type":"string","description":"Seat/Zone"},"guestSubgroup":{"type":"string","description":"Guest/Subgroup"},"credentialStatus":{"type":"integer","description":"Credential Status"},"ticketModel":{"type":"string","enum":["individualTicket","bulkTicket","groupCredential","namedTicket","quantityBasedTicket","reservedSeat","generalAdmission","zoneAllocation"],"description":"How the group is ticketed."},"seatingPreferences":{"type":"array","items":{"type":"string","enum":["keepGroupTogether","accessibleSeats","teacherLeaderAdjacentSeating","vipAllocation","companionSeats"]},"description":"Seating preferences applied."},"associatedAllocations":{"type":"array","items":{"type":"string","enum":["meal","workshop","parking","fastTrack","merchandise","otherPackageComponents"]},"description":"Package items allocated with the tickets."}}},
 "GroupVisitPlan": {"type":"object","x-ticvai-persistence":"orders.group_visit_plan","description":"**The day-of-visit record for one group booking: the operational plan, the sales-to-operations handover, and the group check-in** (DM5, 29 September: data model for the agreed operations; MoM 31 Aug 4.7-4.8 and Key Decisions: group check-in is a status distinct from the access scan).\n**One row per group booking, beside it rather than on it**: operations writes this, sales owns the booking, and the booking's shape stays what its operations already return. Tasks are `orders.group_task` rows against the same booking.\n**Check-in here is the group's arrival, not admission.** Each guest is still admitted by their own entitlement scan; `arrivedCount` is what the group leader and the gate agree on, which is why it can differ from the scans.","required":["id","groupBookingId","checkInStatus","createdAt"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"groupBookingId":{"x-ticvai-references":"orders.group_booking","type":"string","format":"uuid","description":"Unique; one plan per group booking."},"arrivalAt":{"type":"string","format":"date-time","nullable":true},"arrivalLocation":{"type":"string","maxLength":200,"nullable":true},"meetingPoint":{"type":"string","maxLength":200,"nullable":true},"entryGateId":{"type":"string","format":"uuid","nullable":true},"departureAt":{"type":"string","format":"date-time","nullable":true},"groupLeaders":{"type":"string","maxLength":500,"nullable":true},"contactId":{"x-ticvai-references":"orders.group_customer_organization_contact","type":"string","format":"uuid","nullable":true},"ticketingMethod":{"type":"string","maxLength":60,"nullable":true},"requirements":{"type":"object","nullable":true,"description":"Seating, guides, catering, transportation, parking, accessibility, equipment and special requirements, as free text keyed by those names. **Free text on purpose**: each is fulfilled by its own service (resources, F&B, transport), and this is the brief they are fulfilled against, not the booking of them."},"operationalOwnerPrincipalId":{"type":"string","format":"uuid","nullable":true},"handoverNotes":{"type":"string","maxLength":4000,"nullable":true},"handoverAttachmentIds":{"type":"array","items":{"type":"string","format":"uuid"}},"handoverAcknowledgedByPrincipalId":{"type":"string","format":"uuid","nullable":true},"handoverAcknowledgedAt":{"type":"string","format":"date-time","nullable":true},"checkInStatus":{"type":"string","default":"expected","enum":["expected","partiallyArrived","arrived","noShow"]},"actualArrivalAt":{"type":"string","format":"date-time","nullable":true},"arrivalGateId":{"type":"string","format":"uuid","nullable":true},"arrivedCount":{"type":"integer","minimum":0,"default":0},"additionalGuests":{"type":"integer","minimum":0,"default":0},"staffLeadersCount":{"type":"integer","minimum":0,"default":0},"checkInIssues":{"type":"array","items":{"type":"string","enum":["missingGuest","extraGuest","invalidTicket","wrongDate","lateArrival","paymentHold","missingCredential","accessibilityRequirement"]}},"checkedInByPrincipalId":{"type":"string","format":"uuid","nullable":true},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005). Operations write it at `venue` scope."},"createdAt":{"type":"string","format":"date-time","readOnly":true},"updatedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true}}},
 "ModifyOrderRequest": {"type":"object","required":["id","recordedAt"],"properties":{"id":{"type":"string","format":"uuid","description":"Client-generated UUIDv7 **of this modification, not of the order** — the order is the path's `orderId`. It is the modification's idempotency key and must equal the `Idempotency-Key` header.\n"},"addLines":{"type":"array","items":{"$ref":"#/components/schemas/CreateOrderLine"}},"removeLineIds":{"type":"array","items":{"type":"string","format":"uuid"}},"reason":{"type":"string","maxLength":500},"recordedAt":{"type":"string","format":"date-time"}}},
-"Order": {"x-ticvai-persistence":"orders.sales_order + orders.order_line","type":"object","required":["id","venueId","scopePath","channel","status","currency","currencyScale","grossAmount","taxAmount","netAmount","lines","createdAt","recordedAt"],"properties":{"id":{"type":"string","format":"uuid","description":"The client UUIDv7 from `CreateOrderRequest.id`."},"orderNumber":{"type":"string","readOnly":true,"description":"The number a guest reads and a cashier types. **Server-assigned: the venue prefix and a sequence per venue**, for example `DXB1-000123` (decided 28 September, audit R152). A till holds a reserved range of the venue sequence, so an order taken offline gets its number on the till and keeps it through `syncOrders`. **Not gapless**: an unused reserved range leaves a gap, and that is allowed. Only tax invoices are gapless, per legal entity. The receipt carries this number.\n"},"channel":{"allOf":[{"$ref":"#/components/schemas/OrderChannel"}],"description":"Where it came from. Drives revenue attribution, promotion eligibility and the self-service adoption figures the operator will ask for within a month of launch.\n"},"venueId":{"type":"string","format":"uuid"},"scopePath":{"type":"string"},"status":{"$ref":"#/components/schemas/OrderStatus"},"currency":{"type":"string","pattern":"^[A-Z]{3}$","x-ticvai-persisted":false,"description":"**Resolved from the region, not stored** (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and cannot be anything else. **Kept on the wire , removed from the table** — a client should not walk a hierarchy to read a figure, and the  database should not hold nine million copies of AED. Four tables genuinely differ from their\n region and keep a stored currency: `orders.payment.tender_currency`, `inventory.supplier`, \n`ledger.account`, `control.partner_agreement`.\n"},"currencyScale":{"type":"integer","minimum":0,"maximum":4,"x-ticvai-persisted":false,"description":"**Resolved from the region, not stored** (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and cannot be anything else — storing it per ro w is a copy of a fact that cannot differ. **Kept on the wire, removed from the table**: a cl ient reading a figure should not walk a hierarchy to know what it means, and the database sh ould not hold nine million copies of AED. Four tables genuinely differ from their region and\n keep a stored currency — `orders.payment.tender_currency`, `inventory.supplier`, `ledger.ac\ncount`, `control.partner_agreement`. **A guest paying USD at an AED venue is a real row; a w orkstation with its own currency is a misconfiguration.**\n"},"grossAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"taxAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"netAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"refundedAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"droppedPromotions":{"type":"array","readOnly":true,"x-ticvai-persisted":false,"description":"**Promotions left off this order at checkout because their budget cap would have been exceeded** (decided 28 September, audit R101 (8)). Empty when none was dropped. Returned by `checkoutCart` and `createOrder`, not stored.\n","items":{"type":"object","required":["promotionId"],"properties":{"promotionId":{"type":"string","format":"uuid"},"name":{"type":"string"},"reason":{"type":"string","enum":["budgetCapReached"]}}}},"totalPriceVariance":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"description":"Sum across lines. Zero on a normal order."},"lines":{"type":"array","items":{"$ref":"#/components/schemas/OrderLine"}},"payments":{"type":"array","items":{"$ref":"#/components/schemas/Payment"}},"principalId":{"type":"string","format":"uuid"},"workstationId":{"type":"string","format":"uuid"},"shiftId":{"type":"string","format":"uuid","nullable":true},"subjectId":{"type":"string","format":"uuid","nullable":true},"holdLabel":{"type":"string","maxLength":60,"nullable":true,"readOnly":true,"description":"The `label` a cashier gave when parking it with `holdOrder` — how they find it again. Null on an order never held."},"heldUntil":{"type":"string","format":"date-time","nullable":true,"readOnly":true,"description":"When a held order expires and is voided (states/order.yaml), from `holdOrder`'s `holdUntil`. Null on an order not currently held."},"createdAt":{"type":"string","format":"date-time"},"recordedAt":{"type":"string","format":"date-time"},"syncedAt":{"type":"string","format":"date-time","nullable":true}}},
+"Order": {"x-ticvai-persistence":"orders.sales_order + orders.order_line","type":"object","required":["id","venueId","scopePath","channel","status","currency","currencyScale","grossAmount","taxAmount","netAmount","lines","createdAt","recordedAt"],"properties":{"id":{"type":"string","format":"uuid","description":"The client UUIDv7 from `CreateOrderRequest.id`."},"orderNumber":{"type":"string","readOnly":true,"description":"The number a guest reads and a cashier types. **Server-assigned: the venue prefix and a sequence per venue**, for example `DXB1-000123` (decided 28 September, audit R152). A till holds a reserved range of the venue sequence, so an order taken offline gets its number on the till and keeps it through `syncOrders`. **Not gapless**: an unused reserved range leaves a gap, and that is allowed. Only tax invoices are gapless, per legal entity. The receipt carries this number.\n"},"channel":{"allOf":[{"$ref":"#/components/schemas/OrderChannel"}],"description":"Where it came from. Drives revenue attribution, promotion eligibility and the self-service adoption figures the operator will ask for within a month of launch.\n"},"venueId":{"type":"string","format":"uuid"},"scopePath":{"type":"string"},"status":{"$ref":"#/components/schemas/OrderStatus"},"currency":{"type":"string","pattern":"^[A-Z]{3}$","x-ticvai-persisted":false,"description":"**Resolved from the region, not stored** (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and cannot be anything else. **Kept on the wire , removed from the table** — a client should not walk a hierarchy to read a figure, and the  database should not hold nine million copies of AED. Four tables genuinely differ from their\n region and keep a stored currency: `orders.payment.tender_currency`, `inventory.supplier`, \n`ledger.account`, `control.partner_agreement`.\n"},"currencyScale":{"type":"integer","minimum":0,"maximum":4,"x-ticvai-persisted":false,"description":"**Resolved from the region, not stored** (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and cannot be anything else — storing it per ro w is a copy of a fact that cannot differ. **Kept on the wire, removed from the table**: a cl ient reading a figure should not walk a hierarchy to know what it means, and the database sh ould not hold nine million copies of AED. Four tables genuinely differ from their region and\n keep a stored currency — `orders.payment.tender_currency`, `inventory.supplier`, `ledger.ac\ncount`, `control.partner_agreement`. **A guest paying USD at an AED venue is a real row; a w orkstation with its own currency is a misconfiguration.**\n"},"grossAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"taxAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"netAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"refundedAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"chargeCurrency":{"type":"string","pattern":"^[A-Z]{3}$","nullable":true,"readOnly":true,"description":"**The currency the guest selected and is charged in** (CHG-FIN-001, 2 October 2026). Null or equal to `currency` for a sale in the base currency. Everything else on the order, and every ledger posting, stays in the base currency `currency`."},"chargeFxRate":{"allOf":[{"$ref":"#/components/schemas/ExchangeRateDecimal"}],"nullable":true,"readOnly":true,"description":"Units of `chargeCurrency` per one unit of the base currency, from the region's `tender` rate in force at checkout (`finance.FxRate`), stored on the order so the payment, the receipt, the tax invoice and any refund use the same rate (CHG-FIN-001)."},"chargeFxRateId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"The `finance.FxRate` row the rate was taken from, for audit."},"chargeTotal":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"readOnly":true,"description":"`grossAmount` converted at `chargeFxRate` and rounded to the charge currency's scale: what the guest pays and what the payment request to the provider asks for (CHG-FIN-001)."},"chargeRateLockedUntil":{"type":"string","format":"date-time","nullable":true,"readOnly":true,"description":"The quote holds until then (the cart lease). After it, the next payment attempt re-quotes at the rate then in force and the guest confirms the new amount (CHG-FIN-001)."},"droppedPromotions":{"type":"array","readOnly":true,"x-ticvai-persisted":false,"description":"**Promotions left off this order at checkout because their budget cap would have been exceeded** (decided 28 September, audit R101 (8)). Empty when none was dropped. Returned by `checkoutCart` and `createOrder`, not stored.\n","items":{"type":"object","required":["promotionId"],"properties":{"promotionId":{"type":"string","format":"uuid"},"name":{"type":"string"},"reason":{"type":"string","enum":["budgetCapReached"]}}}},"totalPriceVariance":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"description":"Sum across lines. Zero on a normal order."},"lines":{"type":"array","items":{"$ref":"#/components/schemas/OrderLine"}},"payments":{"type":"array","items":{"$ref":"#/components/schemas/Payment"}},"principalId":{"type":"string","format":"uuid"},"workstationId":{"type":"string","format":"uuid"},"shiftId":{"type":"string","format":"uuid","nullable":true},"subjectId":{"type":"string","format":"uuid","nullable":true},"holdLabel":{"type":"string","maxLength":60,"nullable":true,"readOnly":true,"description":"The `label` a cashier gave when parking it with `holdOrder` — how they find it again. Null on an order never held."},"heldUntil":{"type":"string","format":"date-time","nullable":true,"readOnly":true,"description":"When a held order expires and is voided (states/order.yaml), from `holdOrder`'s `holdUntil`. Null on an order not currently held."},"createdAt":{"type":"string","format":"date-time"},"recordedAt":{"type":"string","format":"date-time"},"syncedAt":{"type":"string","format":"date-time","nullable":true}}},
 "OrderExchangeResult": {"x-ticvai-persistence":"none — computed","type":"object","required":["orderId","outgoingValue","incomingValue","difference"],"properties":{"orderId":{"type":"string","format":"uuid"},"outgoingValue":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"incomingValue":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"exchangeFee":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"difference":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"description":"Only the difference settles. The replacement is held before the original is released, never the other way round.\n"},"newLineIds":{"type":"array","items":{"type":"string","format":"uuid"}},"revokedEntitlementIds":{"type":"array","items":{"type":"string","format":"uuid"}},"issuedEntitlementIds":{"type":"array","items":{"type":"string","format":"uuid"}}}},
 "OrderModificationResult": {"x-ticvai-persistence":"none — computed","type":"object","required":["order","balanceDue"],"properties":{"order":{"$ref":"#/components/schemas/Order"},"addedValue":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"removedValue":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"balanceDue":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"description":"Positive means the guest pays; negative means a refund is due."},"refundId":{"type":"string","format":"uuid","nullable":true},"revokedEntitlementIds":{"type":"array","items":{"type":"string","format":"uuid"}},"issuedEntitlementIds":{"type":"array","items":{"type":"string","format":"uuid"}}}},
 "ParticipantGuestListInput": {"type":"object","x-ticvai-persistence":"none — request only","description":"What `setParticipantGuestList` takes. It replaces the whole list (decided 29 September, readiness close-out).","required":["source","participants"],"properties":{"source":{"type":"string","description":"How the names arrived (decided 29 September, readiness close-out).","enum":["manualEntry","csvExcelImport","customerUpload","api"]},"participants":{"type":"array","items":{"type":"object","required":["fullName"],"properties":{"fullName":{"type":"string","maxLength":200},"role":{"type":"string","enum":["participant","leader","supervisor"],"default":"participant"},"email":{"type":"string","format":"email","nullable":true},"phone":{"type":"string","maxLength":30,"nullable":true},"dateOfBirth":{"type":"string","format":"date","nullable":true}}}},"fileRef":{"type":"string","format":"uuid","nullable":true,"description":"The uploaded file the names came from. Required for `csvExcelImport` and `customerUpload`."}}},

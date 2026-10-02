@@ -1,23 +1,4 @@
 {
- "createApiClient": {
-  "method": "POST",
-  "path": "/api-clients",
-  "contract": "public-api",
-  "summary": "Create a client with scopes and an environment",
-  "permission": "DEVELOPER_MANAGE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "ApiClient",
-  "responds": null
- },
  "createApprovalRequest": {
   "method": "POST",
   "path": "/approval-requests",
@@ -55,25 +36,6 @@
   ],
   "requestBody": "WebhookSubscription",
   "responds": "WebhookSubscription"
- },
- "getSeatReconciliation": {
-  "method": "GET",
-  "path": "/seat-reconciliation",
-  "contract": "seating",
-  "summary": "The map against the orders, seat by seat",
-  "permission": "CAPACITY_CONFIGURE",
-  "offlineCapable": null,
-  "conflictPolicy": null,
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "performanceId",
-    "in": "query",
-    "required": true
-   }
-  ],
-  "requestBody": null,
-  "responds": "SeatDiscrepancy"
  },
  "listApiClients": {
   "method": "GET",
@@ -117,18 +79,53 @@
   "requestBody": null,
   "responds": "Page"
  },
- "listProductionAccessRequests": {
+ "listAuditRecords": {
   "method": "GET",
-  "path": "/production-access-requests",
-  "contract": "public-api",
-  "summary": "Production access requests, pending first",
-  "permission": "DEVELOPER_VIEW",
+  "path": "/audit-records",
+  "contract": "tenancy",
+  "summary": "Who did what, where, and when",
+  "permission": "AUDIT_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
+  "scopeLevel": "venue",
   "parameters": [
    {
-    "name": "status",
+    "name": "orgUnitId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "principalId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "workstationId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "action",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "subjectRef",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "platformStaffGrantId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "to",
     "in": "query",
     "required": null
    },
@@ -146,21 +143,16 @@
   "requestBody": null,
   "responds": "Page"
  },
- "listSeatMaps": {
+ "listProductionAccessRequests": {
   "method": "GET",
-  "path": "/seat-maps",
-  "contract": "seating",
-  "summary": "List seat maps",
-  "permission": "PRODUCT_VIEW",
+  "path": "/production-access-requests",
+  "contract": "public-api",
+  "summary": "Production access requests, pending first",
+  "permission": "DEVELOPER_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
+  "scopeLevel": "tenant",
   "parameters": [
-   {
-    "name": "venueId",
-    "in": "query",
-    "required": null
-   },
    {
     "name": "status",
     "in": "query",

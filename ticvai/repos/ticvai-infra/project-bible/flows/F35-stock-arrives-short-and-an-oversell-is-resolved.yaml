@@ -47,18 +47,20 @@ steps:
   - step: 3
     screen: EMP-065
     action: Two cases are damaged in transit. They are rejected at the door.
-    operations: [rejectReceivedGoods, logColdChain]
+    operations: [receiveStockTransfer, logColdChain]
     outcome: >
       **Rejected before the receipt is posted.** Once stock is received it has entered the store,
       and a claim against the sender needs the reading that refused it.
+    note: 'Corrected 2 October (CHG-WIR-008): rejectReceivedGoods reverses a posted supplier receipt; a transfer refused at the door is received short with receiveStockTransfer.'
 
   - step: 4
-    screen: BO-052
+    screen: BO-080
     action: The rest is received and the transfer closes short.
-    operations: [createGoodsReceipt, closeTransferShort]
+    operations: [receiveStockTransfer, closeTransferShort]
     outcome: >
       **Closing short records that the balance will not arrive** — which is the claim. The board
       called it `raiseTransferClaim`; the contract calls it what it is.
+    note: 'Corrected 2 October (CHG-WIR-008): a goods receipt needs a purchase order; the transfer''s remainder is received on BO-080 and closed short there.'
 
   - step: 5
     screen: BO-049
@@ -78,12 +80,13 @@ steps:
       level that hides what happened — the same rule F33 applies to an offline oversell.
 
   - step: 7
-    screen: BO-082
+    screen: BO-080
     action: The four orders are sourced from another store instead.
-    operations: [createStockTransfer, listOrders]
+    operations: [createStockTransfer]
     outcome: >
       **Sourced rather than cancelled.** A guest who ordered and paid does not care which store it
       came from, and **cancelling is the outcome a venue reaches when it cannot see the alternative.**
+    note: 'Repointed 2 October (CHG-WIR-008): sourcing from another store is a transfer (BO-080); the movement ledger BO-082 lost the order table and the transfer button.'
 
   - step: 8
     screen: BO-079

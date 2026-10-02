@@ -1,5 +1,5 @@
 id: LLD-marketing-crm
-title: marketing-crm — 264 operations
+title: marketing-crm — 272 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -52,6 +52,17 @@ operations:
   - marketing.audience_activation
   writes:
   - marketing.audience_activation
+- operation: activateChallenge
+  verb: POST
+  path: /challenges/{challengeId}/activate
+  scope: venue
+  permission: MARKETING_SEND
+  audience:
+  - staff
+  offline: false
+  reads:
+  - marketing.challenge
+  writes: []
 - operation: activateJourney
   verb: POST
   path: /journeys/{journeyId}/activate
@@ -583,6 +594,17 @@ operations:
   offline: false
   reads:
   - marketing.case_linked_record
+  writes: []
+- operation: getChallenge
+  verb: GET
+  path: /challenges/{challengeId}
+  scope: venue
+  permission: MARKETING_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - marketing.challenge
   writes: []
 - operation: getConsentHistory
   verb: GET
@@ -1159,6 +1181,17 @@ operations:
   reads:
   - marketing.case
   writes: []
+- operation: listChallenges
+  verb: GET
+  path: /challenges
+  scope: venue
+  permission: MARKETING_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - marketing.challenge
+  writes: []
 - operation: listCommunicationService
   verb: GET
   path: /communication-service
@@ -1311,6 +1344,17 @@ operations:
   offline: false
   reads:
   - marketing.cookie_banner_design
+  writes: []
+- operation: listCookieScanFindings
+  verb: GET
+  path: /cookie-tracking-digital/scans/{scanRunId}/findings
+  scope: venue
+  permission: GUEST_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - marketing.cookie_scan_finding
   writes: []
 - operation: listCookieScanPolicies
   verb: GET
@@ -1694,6 +1738,17 @@ operations:
   - marketing.points_earning_rule
   - marketing.programme_tier
   writes: []
+- operation: listMessageDispatches
+  verb: GET
+  path: /message-dispatches
+  scope: venue
+  permission: MARKETING_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - marketing.message_dispatch
+  writes: []
 - operation: listMessageTemplates
   verb: GET
   path: /message-templates
@@ -2070,6 +2125,17 @@ operations:
   - marketing.message_template_version
   - marketing.message_trigger
   writes: []
+- operation: listTrackingTechnologyCatalogue
+  verb: GET
+  path: /cookie-tracking-digital/platform-catalogue
+  scope: venue
+  permission: GUEST_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - marketing.tracking_technology_catalogue
+  writes: []
 - operation: listUnifiedInteractionCommunication
   verb: GET
   path: /unified-interaction-communication
@@ -2320,6 +2386,17 @@ operations:
   writes:
   - cache:idempotency
   - marketing.segment
+- operation: previewSegmentDraft
+  verb: POST
+  path: /segments/preview
+  scope: venue
+  permission: MARKETING_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes:
+  - marketing.segment_criterion
 - operation: raiseMyCase
   verb: POST
   path: /my/cases
@@ -2397,6 +2474,7 @@ operations:
   - marketing.tracking_technology
   writes:
   - cache:idempotency
+  - marketing.cookie_scan_finding
   - marketing.cookie_scan_run
   - marketing.tracking_technology
 - operation: recordDeviceConsent
@@ -3351,6 +3429,18 @@ operations:
   - marketing.tracking_technology
   writes:
   - marketing.tracking_technology
+- operation: setTrackingTechnologyCatalogueEntry
+  verb: PUT
+  path: /cookie-tracking-digital/platform-catalogue/{entryKey}
+  scope: platform
+  permission: PLATFORM_PLAN_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - marketing.tracking_technology_catalogue
+  writes:
+  - marketing.tracking_technology_catalogue
 - operation: setWaiverAssociation
   verb: PUT
   path: /product-event-experience

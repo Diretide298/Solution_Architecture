@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Order & Payment
   version: 0.1.0
-  x-ticvai-screen-count: 202
+  x-ticvai-screen-count: 205
   x-ticvai-tier: spine
   x-ticvai-module: 2 — Ticketing Sales
   x-ticvai-requirements: 343
@@ -158,8 +158,13 @@ paths:
     get:
       operationId: listMyOrders
       x-ticvai-consumed-by:
+        - "P01 WEB-017 My Account Dashboard"
         - "P01 WEB-019 Order History"
+        - "P01 WEB-026 Survey & Feedback"
+        - "P01 WEB-030 Ticket Transfer"
+        - "P02 GST-014 Ticket Transfer"
         - "P02 GST-019 Order History"
+        - "P02 GST-035 Feedback & Ratings"
       security:
       - guestAuth: []
       x-ticvai-self-scoped: subject
@@ -214,8 +219,8 @@ paths:
     get:
       operationId: listFraudRules
       x-ticvai-consumed-by:
-        - "P09 ADM-614 Refund Approval & Exception Workflow\t121"
-        - "P09 ADM-630 Payment Risk Rule & Decision Engine\t167"
+        - "P08 ADM-614 Refund Approval & Exception Workflow"
+        - "P08 ADM-630 Payment Risk Rule & Decision Engine"
       summary: The rules evaluated before a charge
       description: 'BL-118. **`orders.fraud_rule` existed with six columns and no operation read or wrote
         it** — found on 20 August by auditing which tables no operation names.
@@ -259,8 +264,8 @@ paths:
     put:
       operationId: setFraudRules
       x-ticvai-consumed-by:
-        - "P09 ADM-614 Refund Approval & Exception Workflow\t121"
-        - "P09 ADM-630 Payment Risk Rule & Decision Engine\t167"
+        - "P08 ADM-614 Refund Approval & Exception Workflow"
+        - "P08 ADM-630 Payment Risk Rule & Decision Engine"
       summary: Change what holds a transaction
       description: '**The whole set in one call**, because a rule set edited one rule at a time spends
         time in states nobody intended — a threshold lowered before its companion is raised.
@@ -519,7 +524,9 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-031 My Reservations"
         - "P02 GST-072 Share & Group Booking"
+        - "P04 POS-031 Reservations & Group Arrivals"
         - "P08 BO-026 Group Bookings"
+        - "P08 BO-273 Group Booking 360° & Handover Workspace"
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -624,7 +631,7 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-014 Pay for a Booking"
         - "P02 GST-009 Review & Payment"
-        - "P09 ADM-593 Payment Link Distribution & Customer Journey Manager\t74"
+        - "P08 ADM-593 Payment Link Distribution & Customer Journey Manager"
       security:
       - guestAuth: []
       - {}
@@ -796,7 +803,7 @@ paths:
     post:
       operationId: resendPaymentLink
       x-ticvai-consumed-by:
-        - "P09 ADM-593 Payment Link Distribution & Customer Journey Manager\t74"
+        - "P08 ADM-593 Payment Link Distribution & Customer Journey Manager"
       summary: Send it again, and retire the old one
       description: '**A resend supersedes.** Two live links against one order is two guests paying for
         one booking, and the second payment is a refund somebody has to make.
@@ -1384,7 +1391,7 @@ paths:
     get:
       operationId: getResaleFeePolicy
       x-ticvai-consumed-by:
-        - "P09 ADM-283 Resale Fees, Commission & Seller Proceeds"
+        - "P08 ADM-283 Resale Fees, Commission & Seller Proceeds"
       summary: The commission and price cap a resale listing is created under
       description: '**`orders.resale_listing` stored `sellerFeePercent`, `buyerFeePercent` and
         `priceCapPercent` on every listing and nothing produced them.** Two listings created a minute
@@ -1421,7 +1428,7 @@ paths:
     put:
       operationId: setResaleFeePolicy
       x-ticvai-consumed-by:
-        - "P09 ADM-283 Resale Fees, Commission & Seller Proceeds"
+        - "P08 ADM-283 Resale Fees, Commission & Seller Proceeds"
       summary: Set resale commission and the price ceiling
       description: '**`priceCapPercent` is regulated in several jurisdictions and the package has said
         so**: the resale backlog entry records that anti-scalping limits bind in some markets and that
@@ -1538,10 +1545,10 @@ paths:
     post:
       operationId: quoteUpgrade
       x-ticvai-consumed-by:
-        - "P09 ADM-652 Upgrade Price Difference & Value Proposition Manager"
-        - "P09 ADM-653 Ticket, Experience & Bundle Upgrade Manager"
-        - "P09 ADM-654 Membership & Pass Upgrade Engine"
-        - "P09 ADM-656 Post-Purchase & In-Journey Upgrade Manager"
+        - "P08 ADM-652 Upgrade Price Difference & Value Proposition Manager"
+        - "P08 ADM-653 Ticket, Experience & Bundle Upgrade Manager"
+        - "P08 ADM-654 Membership & Pass Upgrade Engine"
+        - "P08 ADM-656 Post-Purchase & In-Journey Upgrade Manager"
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -1850,8 +1857,9 @@ paths:
     get:
       operationId: listChargebacks
       x-ticvai-consumed-by:
-        - "P09 ADM-633 Fraud Alert, Investigation & Case Management\t170"
-        - "P09 ADM-634 Chargeback & Dispute Command Center\t172"
+        - "P08 ADM-633 Fraud Alert, Investigation & Case Management"
+        - "P08 ADM-634 Chargeback & Dispute Command Center"
+        - "P08 ADM-635 Chargeback Evidence & Representment Workspace"
       summary: Open disputes, by deadline
       description: '**Sorted by `evidenceDueBy`, not by date received.** A case received yesterday with
         two days left outranks one received last week with twelve.
@@ -1896,7 +1904,7 @@ paths:
     post:
       operationId: respondToChargeback
       x-ticvai-consumed-by:
-        - "P09 ADM-634 Chargeback & Dispute Command Center\t172"
+        - "P08 ADM-634 Chargeback & Dispute Command Center"
       summary: Submit evidence, or accept the loss
       description: '**Accepting is a legitimate outcome and is recorded as a decision.** A 40 AED case
         with a 30 AED fee and two hours of work is one a venue should be able to concede deliberately
@@ -2016,8 +2024,12 @@ paths:
       tags:
       - orders
       x-ticvai-permission: TENANT_CONFIGURE
+      security:
+      - bearerAuth: []
+      - prospectAuth: []
       x-ticvai-audience:
       - staff
+      - prospect
       x-ticvai-scope-level: venue
       x-ticvai-config-scope: venue
       x-ticvai-offline-capable: false
@@ -2171,7 +2183,7 @@ paths:
     post:
       operationId: createPaymentLink
       x-ticvai-consumed-by:
-        - "P09 ADM-592 Payment Link Builder & Configuration\t73"
+        - "P08 ADM-592 Payment Link Builder & Configuration"
       summary: Send a guest a link to pay later
       description: 'BL-072. **A booking taken at POS cannot currently be paid later by the guest**, so
         a phone booking either takes a card over the phone or is not taken.
@@ -2638,8 +2650,17 @@ paths:
       x-ticvai-audience:
       - guest
       - partner
+      - staff
       summary: The cart, priced and checked, right now
-      description: '2.9.2. **Re-prices and re-checks on every read**, because a cart is a claim about
+      description: '**A till''s cart is the session''s own** (decided 2 October 2026, CHG-SEED-013). On the till the cart
+        belongs to the workstation session that opened it; `x-ticvai-self-scoped: subject` means the caller''s
+        own cart, and for a till that is the session''s. A guest identified at the till is attached to
+        the cart, never its owner, and there is no guest-scoped cart operation.
+
+        **Staff since 1 October 2026**: the till reads its own cart (`cartId` from the workstation
+        session) on POS-010; the declaration said guest and partner while P04 called it.
+
+        2.9.2. **Re-prices and re-checks on every read**, because a cart is a claim about
         the future and the future moves. Availability, promotions and lease expiry are all live.
 
         Returns the conflicts (2.9.5) and the leases with their remaining time, so the interface can say
@@ -2738,7 +2759,6 @@ paths:
         - "P01 WEB-049 Transport — Route & Schedule"
         - "P02 GST-007 Select Date & Time"
         - "P02 GST-008 Tickets & Add-ons"
-        - "P02 GST-009 Review & Payment"
         - "P02 GST-026 Retail / Merchandise"
         - "P02 GST-027 Parking – Reserve & Pay"
         - "P02 GST-032 AI Concierge – Chat"
@@ -2753,6 +2773,7 @@ paths:
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-021 Sell — Food & Drink"
         - "P04 POS-023 Sell — Merchandise"
+        - "P04 POS-030 Sales Journal"
         - "P05 KSK-005 Choose a performance"
         - "P05 KSK-006 Review"
         - "P05 KSK-017 Shop"
@@ -2777,8 +2798,18 @@ paths:
       x-ticvai-audience:
       - guest
       - partner
+      - staff
       summary: Add something
-      description: '2.9.4. **Acquiring the lease is the whole reason this is a server operation.** A capacity-bound
+      description: '**A till''s cart is the session''s own** (decided 2 October 2026, CHG-SEED-013). On the till the cart
+        belongs to the workstation session that opened it; `x-ticvai-self-scoped: subject` means the caller''s
+        own cart, and for a till that is the session''s. A guest identified at the till is attached to
+        the cart, never its owner, and there is no guest-scoped cart operation.
+
+        **Staff since 1 October 2026**: the till adds lines to its own cart (`cartId` from the
+        workstation session) on POS-002, POS-021, POS-023 and POS-030; the declaration said guest
+        and partner while P04 called it.
+
+        2.9.4. **Acquiring the lease is the whole reason this is a server operation.** A capacity-bound
         product added to a cart reserves capacity for a configured window, and a cart held in a browser
         cannot reserve anything.
 
@@ -3176,11 +3207,7 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-010 Shopping Cart"
         - "P01 WEB-033 Shop"
-        - "P01 WEB-041 Parking – Reserve & Pay"
-        - "P01 WEB-042 Retail & Shop and Drop"
         - "P02 GST-009 Review & Payment"
-        - "P02 GST-026 Retail / Merchandise"
-        - "P02 GST-027 Parking – Reserve & Pay"
         - "P02 GST-032 AI Concierge – Chat"
         - "P02 GST-041 Checkout Entry"
         - "P05 KSK-006 Review"
@@ -3281,6 +3308,15 @@ paths:
         **A line''s `recommendationId` is carried to the order line** (design 2.2 A step 8), so
         `order.completed` attributes the purchase to the recommendation it came from.
 
+        **The guest may pay in the currency they selected** (decided 2 October 2026, Chinmay;
+        CHG-FIN-001; reverses the display-only rule of 10 August, MoM 10 Aug 2026 4.7 option (a) and
+        DI-211, in favour of its option (b), charging in the guest''s currency at the gateway).
+        `chargeCurrency` names it. The order stays in the venue''s base currency (ADR-0018) and the
+        ledger posts in base currency; the order carries the charge currency, the rate used, its
+        source and the converted total, locked until `chargeRateLockedUntil` (the cart lease,
+        `VenueSettings.cartLeaseSeconds`). A payment started after the lock lapses is re-quoted at
+        the rate then in force and the guest sees the new amount before confirming.
+
         '
       tags:
       - cart
@@ -3303,6 +3339,18 @@ paths:
                   description: The guest the order is for. A guest caller may name only themselves
                     (`guestAuth` never widens to another subject); omitted, the cart's own `subjectId`
                     is used.
+                chargeCurrency:
+                  type: string
+                  pattern: ^[A-Z]{3}$
+                  nullable: true
+                  description: '**The currency the guest selected to pay in** (decided 2 October 2026,
+                    Chinmay; CHG-FIN-001). One of the venue''s `VenueSettings.chargeCurrencies`, or the base
+                    currency. Omitted: the base currency. The order is priced and recorded in the base
+                    currency as always; the server converts the total at the region''s `tender` rate,
+                    locks it on the order (`Order.chargeCurrency`, `chargeFxRate`, `chargeTotal`,
+                    `chargeRateLockedUntil`) and the payment request goes to the provider in this
+                    currency. A currency the venue does not take is refused 400
+                    `currency-not-chargeable`.'
                 marketingConsents:
                   type: array
                   description: '**Marketing opt-ins given at checkout** (29 September, M18-15). Shown unticked beside
@@ -3387,6 +3435,15 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/CartProblem'
+        '400':
+          description: '`chargeCurrency` is not one the venue takes (problem type `currency-not-chargeable`,
+            CHG-FIN-001). The cart is kept.'
+          x-ticvai-problem-types:
+          - currency-not-chargeable
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
           description: 'A required consent question is unanswered (`consentRequired`), or an answer blocks
             the booking (`consentAnswerBlocks`), with the lines in `lineIds` (decided 29 September, rev 3
@@ -3465,8 +3522,8 @@ paths:
     post:
       operationId: voidPayment
       x-ticvai-consumed-by:
+        - "P08 ADM-613 Void, Reversal & Cancellation Manager"
         - "P08 BO-319 Void, Reversal & Same-Day Correction Management"
-        - "P09 ADM-613 Void, Reversal & Cancellation Manager\t120"
       x-ticvai-audience:
       - staff
       summary: Release an authorisation before it is captured
@@ -3661,14 +3718,10 @@ paths:
     get:
       operationId: listOrders
       x-ticvai-consumed-by:
-        - "P01 WEB-019 Order History"
-        - "P01 WEB-030 Ticket Transfer"
-        - "P02 GST-014 Ticket Transfer"
-        - "P02 GST-018 Add to Calendar / Reminders"
-        - "P02 GST-019 Order History"
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-006 Held Orders"
         - "P04 POS-012 Omnichannel Order & Fulfilment Center"
+        - "P04 POS-030 Sales Journal"
         - "P06 EMP-014 Ticket lookup"
         - "P06 EMP-034 Walk-up sale"
         - "P06 EMP-057 Guest Profile & Dining History"
@@ -3676,13 +3729,13 @@ paths:
         - "P08 BO-023 Refunds & Exchanges"
         - "P08 BO-026 Group Bookings"
         - "P08 BO-047 Order Corrections & Exceptions"
-        - "P08 BO-082 Stock Movements"
         - "P08 BO-101 Orders & Money"
         - "P10 PTR-002 Partner Dashboard"
         - "P10 PTR-005 Inventory & Allocation View"
         - "P10 PTR-008 Booking Creation"
         - "P10 PTR-015 Order History"
         - "P10 PTR-016 Voucher / Ticket Download"
+        - "P12 SUP-014 Order, Booking & Ticket Service Workspace"
         - "P16 ANL-009 AI Assistant & Action Center"
       x-ticvai-api-scope: ticketing.read
       security:
@@ -3694,7 +3747,8 @@ paths:
       - partner
       x-ticvai-read-routing: replica
       summary: List orders
-      description: '**The staff list: venue-scoped, filtered by venue, cashier and shift.** A guest''s
+      description: '**The staff list: venue-scoped, filtered by venue, cashier, shift, terminal, customer
+        and tender** (the last three added 1 October 2026, optional). A guest''s
         own history is `listMyOrders`, which is scoped to the caller rather than filtered by a parameter
         (raised 24 August for `WEB-019` and `GST-019`). A guest surface does not load its list from here.
 
@@ -3741,6 +3795,29 @@ paths:
         schema:
           type: string
           format: date-time
+      - name: workstationId
+        in: query
+        description: 'Exact match on the till the order was taken on (`Order.workstationId`). **Added
+          1 October 2026 for the POS Sales Journal (`POS-030`)**, which opens on this terminal; an
+          optional filter, so nothing built against r1 changes. Orders another principal raised still
+          need ORDER_VIEW_OTHER.'
+        schema:
+          type: string
+          format: uuid
+      - name: subjectId
+        in: query
+        description: Exact match on the guest the order belongs to (`Order.subjectId`). **Added 1 October
+          2026**, optional, for the Sales Journal's customer filter.
+        schema:
+          type: string
+          format: uuid
+      - name: tender
+        in: query
+        description: 'Only orders with at least one payment in this tender (`Payment.tender`), so a split
+          order matches each tender it used. **Added 1 October 2026**, optional, for the Sales Journal''s
+          payment-method filter.'
+        schema:
+          $ref: '#/components/schemas/TenderKind'
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
       responses:
@@ -3771,18 +3848,13 @@ paths:
         - "P04 POS-005 Payment"
         - "P04 POS-006 Held Orders"
         - "P04 POS-013 Mobile POS, Event Sales & Offline Operations"
-        - "P06 EMP-014 Ticket lookup"
         - "P06 EMP-034 Walk-up sale"
         - "P08 BO-022 Order Detail"
-        - "P08 BO-023 Refunds & Exchanges"
         - "P08 BO-026 Group Bookings"
         - "P08 BO-047 Order Corrections & Exceptions"
-        - "P08 BO-130 Offline Policy & Rules Configuration"
         - "P10 PTR-002 Partner Dashboard"
-        - "P10 PTR-005 Inventory & Allocation View"
         - "P10 PTR-008 Booking Creation"
         - "P10 PTR-015 Order History"
-        - "P10 PTR-016 Voucher / Ticket Download"
       x-ticvai-api-scope: ticketing.write
       x-ticvai-latency-budget-ms: 400
       security:
@@ -3898,6 +3970,7 @@ paths:
         - "P02 GST-028 Parking – Reservation Confirmed"
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-006 Held Orders"
+        - "P04 POS-030 Sales Journal"
         - "P05 KSK-009 Ticket issued"
         - "P05 KSK-011 Collect a booking"
         - "P06 EMP-014 Ticket lookup"
@@ -3906,6 +3979,9 @@ paths:
         - "P08 BO-023 Refunds & Exchanges"
         - "P08 BO-026 Group Bookings"
         - "P08 BO-047 Order Corrections & Exceptions"
+        - "P08 BO-1147 Refund Routing & Credit Restoration Engine"
+        - "P08 BO-305 Order Detail & Transaction Workspace"
+        - "P08 BO-315 Order Amendment Workspace"
         - "P10 PTR-002 Partner Dashboard"
         - "P10 PTR-005 Inventory & Allocation View"
         - "P10 PTR-008 Booking Creation"
@@ -4096,17 +4172,13 @@ paths:
       x-ticvai-consumed-by:
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-006 Held Orders"
-        - "P06 EMP-014 Ticket lookup"
         - "P06 EMP-034 Walk-up sale"
         - "P08 BO-022 Order Detail"
-        - "P08 BO-023 Refunds & Exchanges"
         - "P08 BO-026 Group Bookings"
         - "P08 BO-047 Order Corrections & Exceptions"
         - "P10 PTR-002 Partner Dashboard"
-        - "P10 PTR-005 Inventory & Allocation View"
         - "P10 PTR-008 Booking Creation"
         - "P10 PTR-015 Order History"
-        - "P10 PTR-016 Voucher / Ticket Download"
       x-ticvai-api-scope: ticketing.write
       x-ticvai-audience:
       - staff
@@ -4197,17 +4269,13 @@ paths:
       x-ticvai-consumed-by:
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-006 Held Orders"
-        - "P06 EMP-014 Ticket lookup"
         - "P06 EMP-034 Walk-up sale"
         - "P08 BO-022 Order Detail"
-        - "P08 BO-023 Refunds & Exchanges"
         - "P08 BO-026 Group Bookings"
         - "P08 BO-047 Order Corrections & Exceptions"
         - "P10 PTR-002 Partner Dashboard"
-        - "P10 PTR-005 Inventory & Allocation View"
         - "P10 PTR-008 Booking Creation"
         - "P10 PTR-015 Order History"
-        - "P10 PTR-016 Voucher / Ticket Download"
       x-ticvai-api-scope: ticketing.write
       x-ticvai-audience:
       - staff
@@ -4271,17 +4339,11 @@ paths:
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-006 Held Orders"
         - "P04 POS-014 Sales Exceptions, Controls & Operational Actions"
-        - "P06 EMP-014 Ticket lookup"
         - "P06 EMP-034 Walk-up sale"
         - "P08 BO-022 Order Detail"
         - "P08 BO-023 Refunds & Exchanges"
         - "P08 BO-026 Group Bookings"
         - "P08 BO-047 Order Corrections & Exceptions"
-        - "P10 PTR-002 Partner Dashboard"
-        - "P10 PTR-005 Inventory & Allocation View"
-        - "P10 PTR-008 Booking Creation"
-        - "P10 PTR-015 Order History"
-        - "P10 PTR-016 Voucher / Ticket Download"
       x-ticvai-api-scope: ticketing.write
       x-ticvai-audience:
       - staff
@@ -4344,21 +4406,14 @@ paths:
     post:
       operationId: voidOrder
       x-ticvai-consumed-by:
-        - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-006 Held Orders"
         - "P04 POS-014 Sales Exceptions, Controls & Operational Actions"
-        - "P06 EMP-014 Ticket lookup"
         - "P06 EMP-034 Walk-up sale"
         - "P08 BO-022 Order Detail"
         - "P08 BO-023 Refunds & Exchanges"
         - "P08 BO-026 Group Bookings"
         - "P08 BO-047 Order Corrections & Exceptions"
         - "P08 BO-319 Void, Reversal & Same-Day Correction Management"
-        - "P10 PTR-002 Partner Dashboard"
-        - "P10 PTR-005 Inventory & Allocation View"
-        - "P10 PTR-008 Booking Creation"
-        - "P10 PTR-015 Order History"
-        - "P10 PTR-016 Voucher / Ticket Download"
       x-ticvai-api-scope: ticketing.write
       x-ticvai-audience:
       - staff
@@ -4446,15 +4501,16 @@ paths:
     get:
       operationId: listOrderRefunds
       x-ticvai-consumed-by:
-        - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-006 Held Orders"
         - "P06 EMP-014 Ticket lookup"
         - "P06 EMP-034 Walk-up sale"
+        - "P08 ADM-609 Refund & Payment Adjustment Command Center"
+        - "P08 ADM-616 Payment Adjustment & Financial Correction Manager"
         - "P08 BO-022 Order Detail"
         - "P08 BO-023 Refunds & Exchanges"
         - "P08 BO-026 Group Bookings"
         - "P08 BO-047 Order Corrections & Exceptions"
-        - "P09 ADM-609 Refund & Payment Adjustment Command Center\t116"
+        - "P08 BO-1147 Refund Routing & Credit Restoration Engine"
         - "P10 PTR-002 Partner Dashboard"
         - "P10 PTR-005 Inventory & Allocation View"
         - "P10 PTR-008 Booking Creation"
@@ -4498,19 +4554,16 @@ paths:
     post:
       operationId: createRefund
       x-ticvai-consumed-by:
-        - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-006 Held Orders"
         - "P04 POS-011 Returns, Refunds & Exchanges"
-        - "P06 EMP-014 Ticket lookup"
         - "P06 EMP-034 Walk-up sale"
+        - "P08 ADM-610 Refund Request & Eligibility Workspace"
+        - "P08 ADM-616 Payment Adjustment & Financial Correction Manager"
         - "P08 BO-022 Order Detail"
         - "P08 BO-023 Refunds & Exchanges"
         - "P08 BO-026 Group Bookings"
         - "P08 BO-047 Order Corrections & Exceptions"
         - "P08 BO-1147 Refund Routing & Credit Restoration Engine"
-        - "P09 ADM-616 Payment Adjustment & Financial Correction Manager\t123"
-        - "P10 PTR-008 Booking Creation"
-        - "P10 PTR-015 Order History"
       x-ticvai-api-scope: ticketing.write
       x-ticvai-audience:
       - staff
@@ -4533,6 +4586,13 @@ paths:
         **Appends to `orders.order_event`** (the order and reservation lifecycle log) one row per state
         change it makes, with the previous and new state, the actor and the correlation id (decided 29
         September, writers pass).
+
+
+        **Store credit is a gift card** (decided 2 October 2026, Chinmay, batch 1, POS-011: "Gift card";
+        DEC-061; CHG-CSP-037; DI-796). A refund settled as store credit (`Refund.settleTo` `storeCredit`, or
+        `alternateTender` `giftCard`) issues a new gift card for the refund amount (wallet `issueGiftCard`) and
+        hands it to the guest; it is not a voucher and not a top-up of the guest''s wallet. POS-011 offers it as
+        "Gift card".
 
         '
       tags:
@@ -4578,6 +4638,143 @@ paths:
                 $ref: '#/components/schemas/RefundPolicyProblem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /orders/{orderId}/refund-simulation:
+    parameters:
+    - name: orderId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: simulateRefund
+      x-ticvai-idempotency-exempt: A simulation writes nothing and calls no provider; repeating it is harmless (CHG-CSP-046).
+      x-ticvai-audience:
+      - staff
+      summary: What a refund would do, without doing it
+      description: '**Simulate a refund before making it** (design-notes correction on ADM-618, Block B: "Refund Simulator
+        declares no operation; a simulator needs a simulate operation"; CHG-CSP-046). For an order, the lines or an
+        amount, a reason and the channel, returns what `createRefund` would do: the refundable balance, whether a second
+        authoriser or an approval would be needed and at which threshold, the tender and provider route (original tender,
+        gift card for store credit, wire), the currency and FX the guest would be refunded in (CHG-FIN-001) and the cash
+        impact on a till. **Nothing is refunded, written or posted**; the answer is computed from the order, the venue''s
+        refund policy and the payments as they stand, and can differ from a later `createRefund` if any of them changes.
+        A POST because the question is a body, not because anything changes.
+
+        '
+      tags:
+      - refund
+      x-ticvai-permission: ORDER_REFUND
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: primary
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                lineIds:
+                  type: array
+                  items:
+                    type: string
+                    format: uuid
+                  description: Omit to simulate refunding the whole order.
+                amount:
+                  allOf:
+                  - $ref: ../shared/common.yaml#/components/schemas/Money
+                  nullable: true
+                  description: Omit to simulate the full refundable amount of the lines.
+                reason:
+                  type: string
+                  maxLength: 500
+                channel:
+                  $ref: ../shared/common.yaml#/components/schemas/SalesChannel
+                settleTo:
+                  type: string
+                  enum:
+                  - originalTender
+                  - advanceBalance
+                  - wireTransfer
+                  - storeCredit
+                  default: originalTender
+      responses:
+        '200':
+          description: What the refund would do
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RefundSimulation'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '409':
+          description: 'The order cannot be refunded at all: nothing is refundable (`exceedsRefundable`) or the refund
+            window has closed (`refundWindowClosed`). The problem names the policy, as `createRefund` would.
+
+            '
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/RefundPolicyProblem'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /products/{productId}/ticket-previews:
+    parameters:
+    - name: productId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    get:
+      operationId: previewProductTickets
+      x-ticvai-consumed-by:
+        - "P08 BO-008 Product Detail & Variants"
+        - "P13 CMS-006 Component Preview"
+      x-ticvai-audience:
+      - staff
+      x-ticvai-read-routing: replica
+      x-ticvai-bounded: one proof per output format the product issues, at most the seven `TicketProof.mediaType` values times the two wallet platforms
+      summary: Preview a product's PDF ticket and wallet passes
+      description: '**Every output format of a product, previewed before it is published** (decided 2 October 2026,
+        Chinmay, batch 4, CMS-006: "the preview of the PDF ticket and the Apple/Google Wallet pass must be in Block A";
+        DEC-151; and the design-notes correction on BO-008, Block A: "No operation renders the PDF ticket or Wallet pass
+        preview for a product; printTicketProof works on a template, not on a product"; DI-444; CHG-CSP-038). For a
+        product, renders a proof of each ticket template it issues through (`TicketTemplate`): the PDF ticket, and the
+        Apple Wallet and Google Wallet passes (`WalletPass`) where the product issues one, each filled with the product''s
+        own data and **marked as a proof on the artefact**, so a preview left on a counter cannot be presented at a gate.
+        Nothing is stored, sold or pushed to a wallet. A product with no template for a format returns no proof for it.
+        Read with `PRODUCT_VIEW`, so the product editor (BO-008) and the white-label preview (CMS-006) can call it;
+        `printTicketProof` stays the till''s sample print.
+
+        '
+      tags:
+      - orders
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - name: locale
+        in: query
+        schema:
+          type: string
+        description: The language to render in; the venue's default when omitted.
+      responses:
+        '200':
+          description: One proof per output format
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TicketProof'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /refunds/{refundId}/approve:
     parameters:
     - name: refundId
@@ -4589,8 +4786,8 @@ paths:
     post:
       operationId: approveRefund
       x-ticvai-consumed-by:
-        - "P08 BO-004 Manual Wait Time Entry"
-        - "P09 ADM-614 Refund Approval & Exception Workflow\t121"
+        - "P08 ADM-614 Refund Approval & Exception Workflow"
+        - "P08 BO-028 Refund Approval Queue"
       x-ticvai-audience:
       - staff
       summary: Approve a refund held for approval
@@ -4656,7 +4853,7 @@ paths:
     post:
       operationId: createBulkRefund
       x-ticvai-consumed-by:
-        - "P08 BO-004 Manual Wait Time Entry"
+        - "P08 BO-023 Refunds & Exchanges"
       x-ticvai-audience:
       - staff
       summary: Refund every order against an event, performance or date
@@ -4739,8 +4936,6 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-019 Order History"
         - "P02 GST-067 Refunds & Resale"
-        - "P08 BO-028 Refund Approval Queue"
-        - "P09 ADM-610 Refund Request & Eligibility Workspace\t117"
       x-ticvai-audience:
       - guest
       security:
@@ -4819,10 +5014,12 @@ paths:
     get:
       operationId: getRefundPolicy
       x-ticvai-consumed-by:
+        - "P08 ADM-610 Refund Request & Eligibility Workspace"
         - "P08 BO-023 Refunds & Exchanges"
         - "P08 BO-062 Venue Profile"
         - "P08 BO-065 Venue Configuration"
-        - "P09 ADM-610 Refund Request & Eligibility Workspace\t117"
+        - "P08 BO-1146 Refund-to-Wallet Policy Configuration"
+        - "P08 BO-318 Refund Policy & Refund Calculation Configuration"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -4855,7 +5052,6 @@ paths:
         - "P08 BO-065 Venue Configuration"
         - "P08 BO-1146 Refund-to-Wallet Policy Configuration"
         - "P08 BO-318 Refund Policy & Refund Calculation Configuration"
-        - "P09 ADM-611 Refund Policy & Rule Configuration\t118"
       x-ticvai-audience:
       - staff
       x-ticvai-config-scope: venue
@@ -4906,18 +5102,13 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-012 Checkout — Payment"
         - "P01 WEB-033 Shop"
-        - "P01 WEB-041 Parking – Reserve & Pay"
-        - "P01 WEB-042 Retail & Shop and Drop"
         - "P02 GST-009 Review & Payment"
-        - "P02 GST-026 Retail / Merchandise"
-        - "P02 GST-027 Parking – Reserve & Pay"
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-004 Sell — Seat Map"
         - "P04 POS-005 Payment"
         - "P05 KSK-007 Payment"
         - "P06 EMP-035 Payment on device"
         - "P06 EMP-059 Table Order, Bill & Payment Management"
-        - "P08 BO-024 Payment Exceptions"
         - "P10 PTR-012 Checkout / Credit Purchase"
       x-ticvai-api-scope: ticketing.write
       x-ticvai-note: >-
@@ -4986,6 +5177,21 @@ paths:
         them. Also appends to `orders.order_event` when the order''s payment state changes (decided 29
         September, writers pass; DM6).
 
+        **A guest-selected currency is what the provider is asked for** (decided 2 October 2026, Chinmay;
+        CHG-FIN-001). Where the order has a `chargeCurrency`, a card or wallet payment from the guest web,
+        app or kiosk is sent to the provider in that currency for `Order.chargeTotal`; the server sets
+        `tenderCurrency`, `tenderAmount` and `fxRate` from the order''s locked quote and ignores different
+        values from the client. `amount` stays the base-currency amount, and that is what the ledger posts.
+        Foreign cash handed over at a till is unchanged: recorded at its base equivalent, change in base.
+
+
+        **No cash on a handheld; cash goes to a till** (decided 2 October 2026, Chinmay, batch 6 #200, EMP-009:
+        "No cash on handhelds; cash goes to a till"; DEC-200; CHG-CSP-039; DI-805). A server taking payment at the
+        table on a staff handheld (EMP-059) offers card, wallet, gift card and voucher only; a `cash` tender from a
+        session with no till (the staff app, a handheld, a browser) is refused `409 cashNotOnHandheld`, and the guest
+        pays cash at a till, where a drawer and a person reconcile it. So a server''s End shift (EMP-009) has no cash
+        count; the till holder''s shift does.
+
         '
       tags:
       - payment
@@ -5022,7 +5228,8 @@ paths:
         '409':
           description: Tender unavailable offline (`tenderUnavailableOffline`), amount exceeds the
             balance due (`exceedsBalanceDue`), or a guest channel sent a tender other than card or wallet
-            (`tenderNotAllowedOnChannel`, audit R080).
+            (`tenderNotAllowedOnChannel`, audit R080), or cash from a session with no till
+            (`cashNotOnHandheld`, DEC-200; CHG-CSP-039).
           content:
             application/problem+json:
               schema:
@@ -5043,10 +5250,10 @@ paths:
         - "P04 POS-005 Payment"
         - "P05 KSK-008 Payment unresolved"
         - "P06 EMP-035 Payment on device"
+        - "P08 ADM-595 Digital Payment Session & Transaction Monitor"
+        - "P08 ADM-597 Digital Payment Exception, Recovery & Expiry Center"
+        - "P08 ADM-615 Refund Processing, Provider Status & Recovery Center"
         - "P08 BO-024 Payment Exceptions"
-        - "P09 ADM-595 Digital Payment Session & Transaction Monitor\t76"
-        - "P09 ADM-597 Digital Payment Exception, Recovery & Expiry Center\t79"
-        - "P09 ADM-615 Refund Processing, Provider Status & Recovery Center\t122"
         - "P10 PTR-012 Checkout / Credit Purchase"
       x-ticvai-api-scope: ticketing.write
       security:
@@ -5109,8 +5316,6 @@ paths:
       x-ticvai-consumed-by:
         - "P04 POS-005 Payment"
         - "P06 EMP-035 Payment on device"
-        - "P08 BO-024 Payment Exceptions"
-        - "P10 PTR-012 Checkout / Credit Purchase"
       x-ticvai-api-scope: ticketing.write
       x-ticvai-audience:
       - staff
@@ -5299,6 +5504,8 @@ paths:
         format: uuid
     post:
       operationId: convertReservation
+      x-ticvai-consumed-by:
+        - "P04 POS-031 Reservations & Group Arrivals"
       x-ticvai-audience:
       - staff
       summary: Convert a reservation into an order
@@ -5337,12 +5544,8 @@ paths:
     post:
       operationId: syncOrders
       x-ticvai-consumed-by:
-        - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-013 Mobile POS, Event Sales & Offline Operations"
-        - "P06 EMP-017 Sync & reconciliation"
-        - "P07 SCN-014 Sync & reconciliation"
         - "P08 BO-037 Offline Package Status"
-        - "P08 BO-130 Offline Policy & Rules Configuration"
         - "P08 BO-132 Offline Transaction Monitor & Sync Queue"
       x-ticvai-note: >-
         **Ingest, per entry** (system-design review SD-028, 29 September; supersedes "stopping at the first entry").
@@ -5417,9 +5620,11 @@ paths:
     get:
       operationId: listSyncRejections
       x-ticvai-consumed-by:
+        - "P04 POS-013 Mobile POS, Event Sales & Offline Operations"
         - "P06 EMP-017 Sync & reconciliation"
         - "P07 SCN-014 Sync & reconciliation"
         - "P08 BO-037 Offline Package Status"
+        - "P08 BO-038 Reconciliation Queue"
         - "P08 BO-130 Offline Policy & Rules Configuration"
         - "P08 BO-132 Offline Transaction Monitor & Sync Queue"
         - "P08 BO-133 Offline Alerts, Limits & Audit"
@@ -5496,6 +5701,10 @@ paths:
         format: uuid
     post:
       operationId: resolveSyncRejection
+      x-ticvai-consumed-by:
+        - "P08 BO-038 Reconciliation Queue"
+        - "P08 BO-130 Offline Policy & Rules Configuration"
+        - "P08 BO-133 Offline Alerts, Limits & Audit"
       x-ticvai-audience:
       - staff
       summary: Record what was done about a refused entry
@@ -5555,20 +5764,17 @@ paths:
     post:
       operationId: modifyOrder
       x-ticvai-consumed-by:
-        - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-006 Held Orders"
-        - "P06 EMP-014 Ticket lookup"
         - "P06 EMP-034 Walk-up sale"
         - "P08 BO-022 Order Detail"
         - "P08 BO-023 Refunds & Exchanges"
         - "P08 BO-026 Group Bookings"
         - "P08 BO-047 Order Corrections & Exceptions"
         - "P08 BO-281 Group Amendments, Cancellation & Refund Operations"
+        - "P08 BO-315 Order Amendment Workspace"
         - "P10 PTR-002 Partner Dashboard"
-        - "P10 PTR-005 Inventory & Allocation View"
         - "P10 PTR-008 Booking Creation"
         - "P10 PTR-015 Order History"
-        - "P10 PTR-016 Voucher / Ticket Download"
       x-ticvai-api-scope: ticketing.write
       x-ticvai-audience:
       - staff
@@ -5634,7 +5840,6 @@ paths:
         - "P04 POS-010 Add to Existing Ticket"
         - "P06 EMP-036 Issue media"
         - "P08 BO-027 Reissue & Media Replacement"
-        - "P13 CMS-010 Media Library"
       x-ticvai-audience:
       - staff
       summary: What is already on this media
@@ -5673,7 +5878,6 @@ paths:
         - "P04 POS-010 Add to Existing Ticket"
         - "P06 EMP-036 Issue media"
         - "P08 BO-027 Reissue & Media Replacement"
-        - "P13 CMS-010 Media Library"
       x-ticvai-audience:
       - staff
       summary: Add something to a ticket the guest already holds
@@ -5746,21 +5950,18 @@ paths:
     post:
       operationId: exchangeOrderLines
       x-ticvai-consumed-by:
-        - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-006 Held Orders"
         - "P04 POS-010 Add to Existing Ticket"
         - "P04 POS-011 Returns, Refunds & Exchanges"
-        - "P06 EMP-014 Ticket lookup"
         - "P06 EMP-034 Walk-up sale"
         - "P08 BO-022 Order Detail"
         - "P08 BO-023 Refunds & Exchanges"
         - "P08 BO-026 Group Bookings"
         - "P08 BO-047 Order Corrections & Exceptions"
+        - "P08 BO-315 Order Amendment Workspace"
         - "P10 PTR-002 Partner Dashboard"
-        - "P10 PTR-005 Inventory & Allocation View"
         - "P10 PTR-008 Booking Creation"
         - "P10 PTR-015 Order History"
-        - "P10 PTR-016 Voucher / Ticket Download"
       x-ticvai-api-scope: ticketing.write
       x-ticvai-audience:
       - staff
@@ -5829,20 +6030,17 @@ paths:
     post:
       operationId: rescheduleOrder
       x-ticvai-consumed-by:
-        - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-006 Held Orders"
-        - "P06 EMP-014 Ticket lookup"
         - "P06 EMP-034 Walk-up sale"
         - "P08 BO-022 Order Detail"
         - "P08 BO-023 Refunds & Exchanges"
         - "P08 BO-026 Group Bookings"
         - "P08 BO-047 Order Corrections & Exceptions"
         - "P08 BO-281 Group Amendments, Cancellation & Refund Operations"
+        - "P08 BO-315 Order Amendment Workspace"
         - "P10 PTR-002 Partner Dashboard"
-        - "P10 PTR-005 Inventory & Allocation View"
         - "P10 PTR-008 Booking Creation"
         - "P10 PTR-015 Order History"
-        - "P10 PTR-016 Voucher / Ticket Download"
       x-ticvai-api-scope: ticketing.write
       x-ticvai-audience:
       - staff
@@ -5938,6 +6136,10 @@ paths:
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-006 Held Orders"
         - "P04 POS-026 Receipt & Reprint"
+        - "P04 POS-030 Sales Journal"
+        - "P05 KSK-009 Ticket issued"
+        - "P05 KSK-010 Print failure"
+        - "P05 KSK-012 Booking found"
         - "P06 EMP-014 Ticket lookup"
         - "P06 EMP-034 Walk-up sale"
         - "P08 BO-022 Order Detail"
@@ -6061,23 +6263,12 @@ paths:
     post:
       operationId: transferOrderTickets
       x-ticvai-consumed-by:
-        - "P01 WEB-012 Checkout — Payment"
-        - "P01 WEB-013 Booking Confirmation"
         - "P01 WEB-018 My Tickets"
-        - "P01 WEB-019 Order History"
-        - "P01 WEB-023 Membership Management"
         - "P01 WEB-030 Ticket Transfer"
-        - "P02 GST-009 Review & Payment"
-        - "P02 GST-010 Booking Confirmation"
         - "P02 GST-012 My Tickets"
         - "P02 GST-013 Ticket Details"
         - "P02 GST-014 Ticket Transfer"
-        - "P02 GST-019 Order History"
         - "P02 GST-045 Ticket Delivery & Sharing"
-        - "P02 GST-055 Dynamic QR Ticket"
-        - "P05 KSK-009 Ticket issued"
-        - "P05 KSK-010 Print failure"
-        - "P05 KSK-012 Booking found"
       x-ticvai-audience:
       - guest
       summary: Transfer tickets to another guest
@@ -6171,7 +6362,6 @@ paths:
     post:
       operationId: claimTicketTransfer
       x-ticvai-consumed-by:
-        - "P01 WEB-030 Ticket Transfer"
         - "P02 GST-014 Ticket Transfer"
       x-ticvai-audience:
       - guest
@@ -6296,7 +6486,6 @@ paths:
     get:
       operationId: getOrderStatement
       x-ticvai-consumed-by:
-        - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-006 Held Orders"
         - "P06 EMP-014 Ticket lookup"
         - "P06 EMP-034 Walk-up sale"
@@ -6304,6 +6493,7 @@ paths:
         - "P08 BO-023 Refunds & Exchanges"
         - "P08 BO-026 Group Bookings"
         - "P08 BO-047 Order Corrections & Exceptions"
+        - "P08 BO-305 Order Detail & Transaction Workspace"
         - "P10 PTR-002 Partner Dashboard"
         - "P10 PTR-005 Inventory & Allocation View"
         - "P10 PTR-008 Booking Creation"
@@ -6342,6 +6532,7 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-031 My Reservations"
         - "P02 GST-016 My Reservations"
+        - "P04 POS-031 Reservations & Group Arrivals"
       x-ticvai-audience:
       - staff
       - guest
@@ -6403,6 +6594,8 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createReservation
+      x-ticvai-consumed-by:
+        - "P04 POS-031 Reservations & Group Arrivals"
       x-ticvai-audience:
       - staff
       summary: Hold without payment
@@ -6460,6 +6653,7 @@ paths:
         - "P01 WEB-031 My Reservations"
         - "P02 GST-016 My Reservations"
         - "P02 GST-017 Reservation Details"
+        - "P04 POS-031 Reservations & Group Arrivals"
       x-ticvai-audience:
       - staff
       - guest
@@ -6492,6 +6686,7 @@ paths:
         - "P01 WEB-031 My Reservations"
         - "P02 GST-016 My Reservations"
         - "P02 GST-017 Reservation Details"
+        - "P04 POS-031 Reservations & Group Arrivals"
       x-ticvai-audience:
       - staff
       - guest
@@ -6538,6 +6733,8 @@ paths:
         format: uuid
     post:
       operationId: extendReservation
+      x-ticvai-consumed-by:
+        - "P04 POS-031 Reservations & Group Arrivals"
       x-ticvai-audience:
       - staff
       summary: Extend a reservation
@@ -6590,7 +6787,6 @@ paths:
     get:
       operationId: getB2bCredit
       x-ticvai-consumed-by:
-        - "P10 PTR-001 Partner Login / MFA"
         - "P10 PTR-002 Partner Dashboard"
         - "P10 PTR-013 Credit Limit & Balance"
       x-ticvai-api-scope: ticketing.read
@@ -6622,10 +6818,6 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setB2bCreditLimit
-      x-ticvai-consumed-by:
-        - "P10 PTR-001 Partner Login / MFA"
-        - "P10 PTR-002 Partner Dashboard"
-        - "P10 PTR-013 Credit Limit & Balance"
       x-ticvai-api-scope: ticketing.write
       x-ticvai-audience:
       - staff
@@ -6690,10 +6882,6 @@ paths:
         format: uuid
     post:
       operationId: overrideCreditLimit
-      x-ticvai-consumed-by:
-        - "P10 PTR-001 Partner Login / MFA"
-        - "P10 PTR-002 Partner Dashboard"
-        - "P10 PTR-013 Credit Limit & Balance"
       x-ticvai-api-scope: ticketing.write
       x-ticvai-audience:
       - staff
@@ -6750,7 +6938,7 @@ paths:
     get:
       operationId: listUpgradeConversion
       x-ticvai-consumed-by:
-        - "P09 ADM-308 Upgrade & Conversion Command Center"
+        - "P08 ADM-308 Upgrade & Conversion Command Center"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Ticket Upgrade, Exchange & Conversion_Reference.pdf p.3; MoM 1 Sep 4.9 (paths, eligibility, pro-rata, guest-app upgrades, group upgrades by request); shape fixed (3 filters to query parameters; 6 non-field properties removed)'
@@ -6844,7 +7032,7 @@ paths:
     put:
       operationId: setUpgradeConversionPath
       x-ticvai-consumed-by:
-        - "P09 ADM-309 Upgrade & Conversion Path Builder"
+        - "P08 ADM-309 Upgrade & Conversion Path Builder"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Ticket Upgrade, Exchange & Conversion_Reference.pdf p.5; MoM 1 Sep 4.9 (paths, eligibility, pro-rata, guest-app upgrades, group upgrades by request); shape fixed (rewritten from the pack page)'
@@ -6902,7 +7090,7 @@ paths:
     get:
       operationId: listUpgradeEligibilityQualification
       x-ticvai-consumed-by:
-        - "P09 ADM-310 Upgrade Eligibility & Qualification Rules"
+        - "P08 ADM-310 Upgrade Eligibility & Qualification Rules"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -6952,7 +7140,7 @@ paths:
     get:
       operationId: listUpgradeTimingUsage
       x-ticvai-consumed-by:
-        - "P09 ADM-311 Upgrade Timing, Usage & Ticket Status Rules"
+        - "P08 ADM-311 Upgrade Timing, Usage & Ticket Status Rules"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -7002,7 +7190,7 @@ paths:
     get:
       operationId: listUpgradeFinancialTreatment
       x-ticvai-consumed-by:
-        - "P09 ADM-312 Upgrade Financial Treatment & Price Difference Rules"
+        - "P08 ADM-312 Upgrade Financial Treatment & Price Difference Rules"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -7052,7 +7240,7 @@ paths:
     put:
       operationId: setProRataResidual
       x-ticvai-consumed-by:
-        - "P09 ADM-313 Pro-Rata, Residual Value & Entitlement Credit Configuration"
+        - "P08 ADM-313 Pro-Rata, Residual Value & Entitlement Credit Configuration"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Ticket Upgrade, Exchange & Conversion_Reference.pdf p.12; MoM 1 Sep 4.9 and Key Decisions (pro-rata credit for memberships and usage-based products); shape fixed (rewritten from the pack page)'
@@ -7109,7 +7297,7 @@ paths:
     get:
       operationId: listPersonTypeProduct
       x-ticvai-consumed-by:
-        - "P09 ADM-314 Person-Type, Product & Entitlement Conversion Rules"
+        - "P08 ADM-314 Person-Type, Product & Entitlement Conversion Rules"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -7159,7 +7347,7 @@ paths:
     get:
       operationId: listBulkGroupAssisted
       x-ticvai-consumed-by:
-        - "P09 ADM-315 Bulk, Group & Assisted Upgrade Operations"
+        - "P08 ADM-315 Bulk, Group & Assisted Upgrade Operations"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Ticket Upgrade, Exchange & Conversion_Reference.pdf p.16; MoM 1 Sep 4.9 (paths, eligibility, pro-rata, guest-app upgrades, group upgrades by request); shape fixed (8 filters to query parameters; 5 non-field properties removed; added bulkAction, selectedCount, eligibleCount, notEligibleCount, ineligibilityReasons, totalOriginalEligibleValue, totalTargetValue, totalUpgradeDifference, fees, taxes, finalCollectionOrRefund, partialProcessing)'
@@ -7259,7 +7447,7 @@ paths:
     post:
       operationId: createUpgradeCredentialRegeneration
       x-ticvai-consumed-by:
-        - "P09 ADM-316 Upgrade Execution, Credential Regeneration & Channel Controls"
+        - "P08 ADM-316 Upgrade Execution, Credential Regeneration & Channel Controls"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Ticket Upgrade, Exchange & Conversion_Reference.pdf p.18; MoM 1 Sep 4.9 (paths, eligibility, pro-rata, guest-app upgrades, group upgrades by request); shape fixed (3 non-field properties removed; enums credentialTreatment, availableChannels, generatedDocuments)'
@@ -7315,7 +7503,7 @@ paths:
     get:
       operationId: listUpgradeException
       x-ticvai-consumed-by:
-        - "P09 ADM-317 Upgrade History, Exception Management & Audit Explorer"
+        - "P08 ADM-317 Upgrade History, Exception Management & Audit Explorer"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Ticket Upgrade, Exchange & Conversion_Reference.pdf p.20; MoM 1 Sep 4.9 (paths, eligibility, pro-rata, guest-app upgrades, group upgrades by request); shape fixed (5 filters to query parameters; 5 non-field properties removed; enums exceptionType)'
@@ -8293,6 +8481,7 @@ paths:
     get:
       operationId: listGroupArrivalCheck
       x-ticvai-consumed-by:
+        - "P04 POS-031 Reservations & Group Arrivals"
         - "P08 BO-280 Group Arrival, Check-In & Admission Operations"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
@@ -8681,8 +8870,6 @@ paths:
   /order-detail-transaction:
     put:
       operationId: setOrderDetailTransaction
-      x-ticvai-consumed-by:
-        - "P08 BO-305 Order Detail & Transaction Workspace"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Order___Reservation_Management_Reference.pdf p.5; MoM 1 Sep 4.11-4.12 (orders, holds, amendments, deposits); shape fixed (13 non-field properties removed; added lines)'
@@ -9259,8 +9446,6 @@ paths:
   /order-amendment:
     put:
       operationId: setOrderAmendment
-      x-ticvai-consumed-by:
-        - "P08 BO-315 Order Amendment Workspace"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Order___Reservation_Management_Reference.pdf p.22; MoM 1 Sep 4.11-4.12 (orders, holds, amendments, deposits); shape fixed (12 non-field properties removed)'
@@ -9440,6 +9625,7 @@ paths:
     get:
       operationId: listVoidReversalSame
       x-ticvai-consumed-by:
+        - "P08 ADM-613 Void, Reversal & Cancellation Manager"
         - "P08 BO-319 Void, Reversal & Same-Day Correction Management"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
@@ -9805,9 +9991,9 @@ paths:
     get:
       operationId: listOrderPaymentDetail
       x-ticvai-consumed-by:
+        - "P08 ADM-607 Mixed Tender Transaction Trace & Allocation Audit"
+        - "P08 ADM-617 Refund Transaction Trace & Audit Investigation"
         - "P08 BO-325 Order Payment Detail & Transaction Ledger"
-        - "P09 ADM-607 Mixed Tender Transaction Trace & Allocation Audit\t100"
-        - "P09 ADM-617 Refund Transaction Trace & Audit Investigation\t124"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -9851,8 +10037,8 @@ paths:
     put:
       operationId: setMultiPaymentSplit
       x-ticvai-consumed-by:
+        - "P08 ADM-601 Split Payment & Tender Allocation Manager"
         - "P08 BO-326 Multi-Payment, Split Tender & Payment Allocation Configuration"
-        - "P09 ADM-601 Split Payment & Tender Allocation Manager\t94"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Order___Reservation_Management_Reference.pdf p.43; MoM 1 Sep 4.11-4.12 (orders, holds, amendments, deposits); shape fixed (4 non-field properties removed; enums allocationLevel)'
@@ -10148,6 +10334,7 @@ paths:
     get:
       operationId: listPaymentReconciliationException
       x-ticvai-consumed-by:
+        - "P08 BO-024 Payment Exceptions"
         - "P08 BO-331 Payment Reconciliation & Exception Management"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
@@ -10349,7 +10536,7 @@ paths:
     get:
       operationId: listResaleMarketplace
       x-ticvai-consumed-by:
-        - "P09 ADM-278 Resale Marketplace Command Center"
+        - "P08 ADM-278 Resale Marketplace Command Center"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Ticket Resale Marketplace_Reference.pdf p.4; MoM 31 Aug 4.12 and MoM 1 Sep 4.14 (three access models, ID preserved through resale); shape fixed (2 filters to query parameters; 1 non-field properties removed)'
@@ -10454,8 +10641,7 @@ paths:
     put:
       operationId: setResaleEligibilityRule
       x-ticvai-consumed-by:
-        - "P09 ADM-199 Eligibility Rule Builder"
-        - "P09 ADM-279 Resale Eligibility Rule Configuration"
+        - "P08 ADM-279 Resale Eligibility Rule Configuration"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Ticket Resale Marketplace_Reference.pdf p.5; MoM 31 Aug 4.12 (eligibility such as minimum time before validity, no expired tickets); MoM 1 Sep 4.14 (Board 1 resale rules); shape fixed (enums requiredConditions)'
@@ -10511,8 +10697,8 @@ paths:
     get:
       operationId: listResalePolicyMarketplace
       x-ticvai-consumed-by:
-        - "P09 ADM-278 Resale Marketplace Command Center"
-        - "P09 ADM-280 Resale Policy & Marketplace Settings"
+        - "P08 ADM-278 Resale Marketplace Command Center"
+        - "P08 ADM-280 Resale Policy & Marketplace Settings"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -10557,7 +10743,7 @@ paths:
     post:
       operationId: createListingSeller
       x-ticvai-consumed-by:
-        - "P09 ADM-281 Listing Creation & Seller Configuration"
+        - "P08 ADM-281 Listing Creation & Seller Configuration"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Ticket Resale Marketplace_Reference.pdf p.9; MoM 31 Aug 4.12 and MoM 1 Sep 4.14 (three access models, ID preserved through resale); shape fixed (11 non-field properties removed; enums listingType)'
@@ -10613,7 +10799,7 @@ paths:
     get:
       operationId: listResalePricingPrice
       x-ticvai-consumed-by:
-        - "P09 ADM-282 Resale Pricing & Price Guardrails"
+        - "P08 ADM-282 Resale Pricing & Price Guardrails"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -10661,7 +10847,7 @@ paths:
     get:
       operationId: listResaleFeeCommission
       x-ticvai-consumed-by:
-        - "P09 ADM-283 Resale Fees, Commission & Seller Proceeds"
+        - "P08 ADM-283 Resale Fees, Commission & Seller Proceeds"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -10710,7 +10896,7 @@ paths:
     put:
       operationId: approveListingModeration
       x-ticvai-consumed-by:
-        - "P09 ADM-284 Listing Approval & Moderation"
+        - "P08 ADM-284 Listing Approval & Moderation"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Ticket Resale Marketplace_Reference.pdf p.13; MoM 31 Aug 4.12 and MoM 1 Sep 4.14 (three access models, ID preserved through resale); shape fixed (1 non-field properties removed; enums reviewReasons; added decision)'
@@ -10769,7 +10955,7 @@ paths:
     get:
       operationId: listResaleInventoryAvailability
       x-ticvai-consumed-by:
-        - "P09 ADM-285 Resale Inventory & Availability Management"
+        - "P08 ADM-285 Resale Inventory & Availability Management"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -10813,7 +10999,7 @@ paths:
     get:
       operationId: listListingLifecycleExpiry
       x-ticvai-consumed-by:
-        - "P09 ADM-286 Listing Lifecycle, Expiry & Cancellation"
+        - "P08 ADM-286 Listing Lifecycle, Expiry & Cancellation"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -10863,7 +11049,7 @@ paths:
     put:
       operationId: setResaleMarketplaceRecommendation
       x-ticvai-consumed-by:
-        - "P09 ADM-287 AI Resale Configuration & Marketplace Recommendations"
+        - "P08 ADM-287 AI Resale Configuration & Marketplace Recommendations"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Ticket Resale Marketplace_Reference.pdf p.18; MoM 14 Aug (AI advisory in phase one); shape fixed (8 non-field properties removed; added decision)'
@@ -10917,8 +11103,8 @@ paths:
     get:
       operationId: listResale
       x-ticvai-consumed-by:
-        - "P09 ADM-288 Resale Operations Command Center"
-        - "P09 ADM-297 Resale Analytics & AI Intelligence"
+        - "P08 ADM-288 Resale Operations Command Center"
+        - "P08 ADM-297 Resale Analytics & AI Intelligence"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -10966,7 +11152,7 @@ paths:
     get:
       operationId: listBuyerPurchaseResale
       x-ticvai-consumed-by:
-        - "P09 ADM-289 Buyer Purchase & Resale Order Management"
+        - "P08 ADM-289 Buyer Purchase & Resale Order Management"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -11010,7 +11196,7 @@ paths:
     get:
       operationId: listTicketOwnershipTransfer
       x-ticvai-consumed-by:
-        - "P09 ADM-290 Ticket Ownership Transfer Management"
+        - "P08 ADM-290 Ticket Ownership Transfer Management"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -11061,7 +11247,7 @@ paths:
     get:
       operationId: listCredentialRevocationRegeneration
       x-ticvai-consumed-by:
-        - "P09 ADM-291 Credential Revocation & Regeneration"
+        - "P08 ADM-291 Credential Revocation & Regeneration"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -11108,7 +11294,7 @@ paths:
     get:
       operationId: listResaleFraudDuplicate
       x-ticvai-consumed-by:
-        - "P09 ADM-292 Resale Fraud & Duplicate Sale Protection"
+        - "P08 ADM-292 Resale Fraud & Duplicate Sale Protection"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -11154,7 +11340,7 @@ paths:
     get:
       operationId: listCapacityInventoryReconciliation
       x-ticvai-consumed-by:
-        - "P09 ADM-293 Capacity & Inventory Reconciliation"
+        - "P08 ADM-293 Capacity & Inventory Reconciliation"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -11202,7 +11388,7 @@ paths:
     get:
       operationId: listSellerSettlementPayout
       x-ticvai-consumed-by:
-        - "P09 ADM-294 Seller Settlement & Payout Management"
+        - "P08 ADM-294 Seller Settlement & Payout Management"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -11246,7 +11432,7 @@ paths:
     get:
       operationId: listRefundDisputeResale
       x-ticvai-consumed-by:
-        - "P09 ADM-295 Refunds, Disputes & Resale Exceptions"
+        - "P08 ADM-295 Refunds, Disputes & Resale Exceptions"
       x-ticvai-audience:
       - staff
       x-ticvai-provisional: true
@@ -11303,7 +11489,7 @@ paths:
     get:
       operationId: listResaleOwnership
       x-ticvai-consumed-by:
-        - "P09 ADM-296 Resale Audit & Ownership History"
+        - "P08 ADM-296 Resale Audit & Ownership History"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Ticket Resale Marketplace_Reference.pdf p.34; MoM 1 Sep 4.14 Decision (ownership change log against a stable ticket ID); shape fixed (10 filters to query parameters; 8 non-field properties removed)'
@@ -11419,8 +11605,8 @@ paths:
     get:
       operationId: listResale2
       x-ticvai-consumed-by:
-        - "P09 ADM-288 Resale Operations Command Center"
-        - "P09 ADM-297 Resale Analytics & AI Intelligence"
+        - "P08 ADM-288 Resale Operations Command Center"
+        - "P08 ADM-297 Resale Analytics & AI Intelligence"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Ticket Resale Marketplace_Reference.pdf p.35; MoM 31 Aug 4.12 and MoM 1 Sep 4.14 (three access models, ID preserved through resale); shape fixed (11 non-field properties removed)'
@@ -11512,8 +11698,8 @@ paths:
     get:
       operationId: listTicketResaleMarketplace
       x-ticvai-consumed-by:
-        - "P09 ADM-278 Resale Marketplace Command Center"
-        - "P09 ADM-298 My Tickets & Resale Marketplace Entry"
+        - "P08 ADM-278 Resale Marketplace Command Center"
+        - "P08 ADM-298 My Tickets & Resale Marketplace Entry"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -11559,7 +11745,7 @@ paths:
     get:
       operationId: listResaleEligibilityTicket
       x-ticvai-consumed-by:
-        - "P09 ADM-299 Resale Eligibility & Ticket Selection"
+        - "P08 ADM-299 Resale Eligibility & Ticket Selection"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -11604,7 +11790,7 @@ paths:
     get:
       operationId: listCreateListingResale
       x-ticvai-consumed-by:
-        - "P09 ADM-300 Create Listing & Resale Price Selection"
+        - "P08 ADM-300 Create Listing & Resale Price Selection"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -11650,8 +11836,8 @@ paths:
     get:
       operationId: listFeeSellerProceed
       x-ticvai-consumed-by:
-        - "P09 ADM-283 Resale Fees, Commission & Seller Proceeds"
-        - "P09 ADM-301 Fees, Seller Proceeds & Listing Confirmation"
+        - "P08 ADM-283 Resale Fees, Commission & Seller Proceeds"
+        - "P08 ADM-301 Fees, Seller Proceeds & Listing Confirmation"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -11696,7 +11882,7 @@ paths:
     get:
       operationId: listResaleListingSeller
       x-ticvai-consumed-by:
-        - "P09 ADM-302 My Resale Listings & Seller Dashboard"
+        - "P08 ADM-302 My Resale Listings & Seller Dashboard"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -11741,8 +11927,8 @@ paths:
     get:
       operationId: listOfficialResaleMarketplace
       x-ticvai-consumed-by:
-        - "P09 ADM-278 Resale Marketplace Command Center"
-        - "P09 ADM-303 Official Resale Marketplace & Buyer Discovery"
+        - "P08 ADM-278 Resale Marketplace Command Center"
+        - "P08 ADM-303 Official Resale Marketplace & Buyer Discovery"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -11787,7 +11973,7 @@ paths:
     get:
       operationId: listResaleTicketDetail
       x-ticvai-consumed-by:
-        - "P09 ADM-304 Resale Ticket Detail, Seat Selection & Primary-vs-Resale Experience"
+        - "P08 ADM-304 Resale Ticket Detail, Seat Selection & Primary-vs-Resale Experience"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -11832,7 +12018,7 @@ paths:
     get:
       operationId: listBuyerCheckoutInventory
       x-ticvai-consumed-by:
-        - "P09 ADM-305 Buyer Checkout, Inventory Hold & Secure Payment"
+        - "P08 ADM-305 Buyer Checkout, Inventory Hold & Secure Payment"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -11877,8 +12063,8 @@ paths:
     get:
       operationId: listResaleConfirmationOwnership
       x-ticvai-consumed-by:
-        - "P09 ADM-296 Resale Audit & Ownership History"
-        - "P09 ADM-306 Resale Confirmation, Ownership Transfer & Ticket Delivery"
+        - "P08 ADM-296 Resale Audit & Ownership History"
+        - "P08 ADM-306 Resale Confirmation, Ownership Transfer & Ticket Delivery"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -11923,7 +12109,7 @@ paths:
     get:
       operationId: listWhiteLabelMarketplace
       x-ticvai-consumed-by:
-        - "P09 ADM-307 White-Label Marketplace Deployment & Experience Architecture"
+        - "P08 ADM-307 White-Label Marketplace Deployment & Experience Architecture"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -12075,6 +12261,8 @@ paths:
   /deposits:
     get:
       operationId: listDeposits
+      x-ticvai-consumed-by:
+        - "P08 BO-024 Payment Exceptions"
       summary: Deposits and their authorisation state
       description: >
         **The authorisation lifecycle, not the accounting one.** `required`, `authorized`,
@@ -12197,6 +12385,8 @@ paths:
   /upgrades:
     get:
       operationId: listUpgrades
+      x-ticvai-consumed-by:
+        - "P08 ADM-316 Upgrade Execution, Credential Regeneration & Channel Controls"
       summary: Upgrade requests and their outcome
       description: >
         **`quoteUpgrade` priced an upgrade and nothing recorded that one happened.** The quote is
@@ -13114,9 +13304,12 @@ paths:
     get:
       operationId: getResaleMarketplaceConfig
       x-ticvai-consumed-by:
-        - "P09 ADM-278 Resale Marketplace Command Center"
-        - "P09 ADM-280 Resale Policy & Marketplace Settings"
-        - "P09 ADM-282 Resale Pricing & Price Guardrails"
+        - "P08 ADM-278 Resale Marketplace Command Center"
+        - "P08 ADM-280 Resale Policy & Marketplace Settings"
+        - "P08 ADM-281 Listing Creation & Seller Configuration"
+        - "P08 ADM-282 Resale Pricing & Price Guardrails"
+        - "P08 ADM-284 Listing Approval & Moderation"
+        - "P08 ADM-287 AI Resale Configuration & Marketplace Recommendations"
       summary: How the venue's resale marketplace runs
       description: '**The one row per venue in `orders.resale_marketplace_config`**: pricing mode and
         guardrails, moderation, listing lifecycle, checkout hold, seller settlement timing and the
@@ -13149,8 +13342,8 @@ paths:
     put:
       operationId: setResaleMarketplaceConfig
       x-ticvai-consumed-by:
-        - "P09 ADM-280 Resale Policy & Marketplace Settings"
-        - "P09 ADM-282 Resale Pricing & Price Guardrails"
+        - "P08 ADM-280 Resale Policy & Marketplace Settings"
+        - "P08 ADM-282 Resale Pricing & Price Guardrails"
       summary: Set how the venue's resale marketplace runs
       description: '**The writer `orders.resale_marketplace_config` lacked** (DM5 open item: nine
         screens showed the row and none wrote it). One row per venue, replaced whole, as
@@ -13216,8 +13409,8 @@ paths:
     post:
       operationId: holdResaleSettlement
       x-ticvai-consumed-by:
-        - "P09 ADM-294 Seller Settlement & Payout Management"
-        - "P09 ADM-295 Refunds, Disputes & Resale Exceptions"
+        - "P08 ADM-294 Seller Settlement & Payout Management"
+        - "P08 ADM-295 Refunds, Disputes & Resale Exceptions"
       summary: Put a seller's resale payout on manual hold
       description: '**A person stops a payout the job would otherwise make** (DM5 open item: the
         settlement job writes `orders.resale_settlement` and no operation could hold or release one).
@@ -13284,8 +13477,8 @@ paths:
     post:
       operationId: releaseResaleSettlementHold
       x-ticvai-consumed-by:
-        - "P09 ADM-294 Seller Settlement & Payout Management"
-        - "P09 ADM-295 Refunds, Disputes & Resale Exceptions"
+        - "P08 ADM-294 Seller Settlement & Payout Management"
+        - "P08 ADM-295 Refunds, Disputes & Resale Exceptions"
       summary: Release a manual or compliance hold on a seller's resale payout
       description: '**The release the settlement state model had no operation for** (DM5 open item).
         Moves an `onHold` settlement back to `scheduled` and clears `holdReason`; `expectedPayoutDate`
@@ -13356,6 +13549,7 @@ paths:
     post:
       operationId: recordGroupCheckIn
       x-ticvai-consumed-by:
+        - "P04 POS-031 Reservations & Group Arrivals"
         - "P08 BO-280 Group Arrival, Check-In & Admission Operations"
       summary: Record a group's arrival at the venue
       description: '**Group check-in is a status distinct from the access scan** (MoM 31 Aug Key
@@ -13603,8 +13797,8 @@ paths:
     get:
       operationId: listPaymentAllocationRules
       x-ticvai-consumed-by:
+        - "P08 ADM-601 Split Payment & Tender Allocation Manager"
         - "P08 BO-326 Multi-Payment, Split Tender & Payment Allocation Configuration"
-        - "P09 ADM-601 Split Payment & Tender Allocation Manager\t94"
       summary: The venue's split-tender allocation rules
       description: '**The rows `setMultiPaymentSplit` writes** in `orders.payment_allocation_rule`: at
         what level a split-tender payment is allocated, per channel, terminal, product, order type and
@@ -13667,8 +13861,8 @@ paths:
     post:
       operationId: recordChargeback
       x-ticvai-consumed-by:
+        - "P08 ADM-634 Chargeback & Dispute Command Center"
         - "P08 BO-025 Chargebacks & Disputes"
-        - "P09 ADM-634 Chargeback & Dispute Command Center\t172"
       x-ticvai-audience:
       - staff
       - service
@@ -13796,9 +13990,9 @@ paths:
     post:
       operationId: assignChargeback
       x-ticvai-consumed-by:
+        - "P08 ADM-633 Fraud Alert, Investigation & Case Management"
+        - "P08 ADM-634 Chargeback & Dispute Command Center"
         - "P08 BO-025 Chargebacks & Disputes"
-        - "P09 ADM-633 Fraud Alert, Investigation & Case Management\t170"
-        - "P09 ADM-634 Chargeback & Dispute Command Center\t172"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: our build plan (retrace 5.7.92 investigation workflow); shape follows respondToChargeback'
@@ -13864,8 +14058,8 @@ paths:
     post:
       operationId: recordChargebackOutcome
       x-ticvai-consumed-by:
+        - "P08 ADM-634 Chargeback & Dispute Command Center"
         - "P08 BO-025 Chargebacks & Disputes"
-        - "P09 ADM-634 Chargeback & Dispute Command Center\t172"
       x-ticvai-audience:
       - staff
       - service
@@ -13940,10 +14134,10 @@ paths:
     get:
       operationId: getChargebackAnalytics
       x-ticvai-consumed-by:
+        - "P08 ADM-633 Fraud Alert, Investigation & Case Management"
+        - "P08 ADM-634 Chargeback & Dispute Command Center"
+        - "P08 ADM-637 AI Fraud, Anomaly & Payment Intelligence Center"
         - "P08 BO-025 Chargebacks & Disputes"
-        - "P09 ADM-633 Fraud Alert, Investigation & Case Management\t170"
-        - "P09 ADM-634 Chargeback & Dispute Command Center\t172"
-        - "P09 ADM-637 AI Fraud, Anomaly & Payment Intelligence Center\t175"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: our build plan (retrace 4.2.21); shape follows getPaymentPerformance'
@@ -20256,6 +20450,16 @@ components:
         Added 17 August. `states/entitlement.yaml` had modelled these six since 14 August and the contract
         had no enum behind it, which the state checker reported correctly for three days.
 
+
+        **The client''s 13 Virtual Ticket statuses map onto these six** (decided 2 October 2026, Chinmay, critical
+        set 2, BO-336: "Map the pack''s 13 names onto the model; add any missing states"; DEC-266; CHG-CSP-033).
+        Every name maps, so no value is added (one would be a breaking change against r1): Active is `issued`,
+        Partially used `partiallyConsumed`, Used `fullyConsumed`, Expired `expired`, Transferred `surrendered`,
+        Suspended and Blocked are `issued` with the suspended flag or an identity lock, and Cancelled, Voided,
+        Refunded and Reissued / superseded are `cancelled` told apart by access `Entitlement.cancellationKind`.
+        Created and Pending fulfilment (DI-670''s Reserved) are the order before an entitlement exists. The table
+        is `states/entitlement-status.yaml` (`pack_status_map`); access `Entitlement.lifecycleLabel` carries the name.
+
         '
       enum:
       - issued
@@ -21572,6 +21776,45 @@ components:
           $ref: ../shared/common.yaml#/components/schemas/Money
         refundedAmount:
           $ref: ../shared/common.yaml#/components/schemas/Money
+        chargeCurrency:
+          type: string
+          pattern: ^[A-Z]{3}$
+          nullable: true
+          readOnly: true
+          description: >-
+            **The currency the guest selected and is charged in** (CHG-FIN-001, 2 October 2026). Null
+            or equal to `currency` for a sale in the base currency. Everything else on the order,
+            and every ledger posting, stays in the base currency `currency`.
+        chargeFxRate:
+          allOf:
+          - $ref: '#/components/schemas/ExchangeRateDecimal'
+          nullable: true
+          readOnly: true
+          description: >-
+            Units of `chargeCurrency` per one unit of the base currency, from the region's `tender`
+            rate in force at checkout (`finance.FxRate`), stored on the order so the payment, the
+            receipt, the tax invoice and any refund use the same rate (CHG-FIN-001).
+        chargeFxRateId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          description: The `finance.FxRate` row the rate was taken from, for audit.
+        chargeTotal:
+          allOf:
+          - $ref: ../shared/common.yaml#/components/schemas/Money
+          readOnly: true
+          description: >-
+            `grossAmount` converted at `chargeFxRate` and rounded to the charge currency's scale:
+            what the guest pays and what the payment request to the provider asks for (CHG-FIN-001).
+        chargeRateLockedUntil:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+          description: >-
+            The quote holds until then (the cart lease). After it, the next payment attempt re-quotes
+            at the rate then in force and the guest confirms the new amount (CHG-FIN-001).
         droppedPromotions:
           type: array
           readOnly: true
@@ -21921,6 +22164,10 @@ components:
             **`originalTender` stays the default** because refunding elsewhere is how money laundering
             works, and anything else needs a reason.
 
+
+            **`storeCredit` is a gift card issued for the refund amount** (decided 2 October 2026, Chinmay,
+            batch 1, POS-011; DEC-061; CHG-CSP-037; DI-796), never a voucher or a wallet top-up.
+
             '
         fxVariance:
           allOf:
@@ -21930,6 +22177,23 @@ components:
             class of movement and this is the same act at a smaller scale.
 
             '
+        tenderCurrency:
+          type: string
+          pattern: ^[A-Z]{3}$
+          nullable: true
+          readOnly: true
+          description: >-
+            **A refund goes back in the currency the guest paid** (decided 2 October 2026, Chinmay;
+            CHG-FIN-001). For a card or wallet payment taken in a guest-selected currency, the refund
+            request to the provider is in that currency, and `tenderAmount` is the refunded share of the
+            original `Payment.tenderAmount` at the sale rate (`fxRate`), so a full refund returns exactly
+            what was charged. `amount` stays in base currency for the ledger. Null for a refund in the
+            base currency. Foreign cash refunded at a till is paid in base currency (DI-282).
+        tenderAmount:
+          allOf:
+          - $ref: ../shared/common.yaml#/components/schemas/Money
+          readOnly: true
+          description: The refund in `tenderCurrency`, at that currency's own scale (CHG-FIN-001).
         amount:
           $ref: ../shared/common.yaml#/components/schemas/Money
         appliedPercentage:
@@ -21997,7 +22261,9 @@ components:
           pattern: ^[A-Z]{3}$
           nullable: true
           description: The currency the guest handed over, where it is not the venue's — becomes
-            `Payment.tenderCurrency`. Omit for a payment in the venue's own currency.
+            `Payment.tenderCurrency`. Omit for a payment in the venue's own currency. For a guest-channel
+            card or wallet payment on an order with a `chargeCurrency`, the server sets it from the order
+            (CHG-FIN-001).
         tenderAmount:
           allOf:
           - $ref: ../shared/common.yaml#/components/schemas/Money
@@ -22095,6 +22361,9 @@ components:
           description: '4.6.11 is deliberately asymmetric: **accept foreign currency, refund in local.**
             A till giving change in five currencies needs five floats and five counts, and the variance
             becomes unattributable.
+
+            **Cash at a till only** (CHG-FIN-001, 2 October 2026). A card or wallet payment the guest made
+            in a currency they selected is refunded in that currency (`Refund.tenderCurrency`).
 
             '
         amount:
@@ -22720,6 +22989,90 @@ components:
           type: string
           format: uri
           description: Where the rendered proof can be fetched or sent to the printer from.
+        walletPlatform:
+          type: string
+          nullable: true
+          enum:
+          - appleWallet
+          - googleWallet
+          description: Which wallet the pass preview is for, where `mediaType` is `walletPass` (DEC-151; CHG-CSP-038).
+    RefundSimulation:
+      type: object
+      x-ticvai-persistence: none — computed, nothing is written
+      description: '**What `createRefund` would do, computed and not done** (CHG-CSP-046; ADM-618).'
+      required:
+      - orderId
+      - refundableAmount
+      - amount
+      properties:
+        orderId:
+          type: string
+          format: uuid
+        refundableAmount:
+          allOf:
+          - $ref: ../shared/common.yaml#/components/schemas/Money
+          description: What remains refundable on the order or lines, before this refund.
+        amount:
+          allOf:
+          - $ref: ../shared/common.yaml#/components/schemas/Money
+          description: What this refund would return, in the base currency.
+        secondAuthorisationRequired:
+          type: boolean
+          description: Above the venue's `requiresSecondUserAbove`, a second person must sign.
+        approvalRequired:
+          type: boolean
+          description: The refund would wait for `approveRefund` under the venue's refund policy.
+        thresholdAmount:
+          allOf:
+          - $ref: ../shared/common.yaml#/components/schemas/Money
+          nullable: true
+          description: The policy threshold that decides either of the two above.
+        settleTo:
+          type: string
+          enum:
+          - originalTender
+          - advanceBalance
+          - wireTransfer
+          - storeCredit
+        tenderRoutes:
+          type: array
+          description: Where the money would go, one row per payment it would refund against.
+          items:
+            type: object
+            required:
+            - tender
+            - amount
+            properties:
+              paymentId:
+                type: string
+                format: uuid
+                nullable: true
+              tender:
+                $ref: '#/components/schemas/TenderKind'
+              provider:
+                type: string
+                nullable: true
+              amount:
+                $ref: ../shared/common.yaml#/components/schemas/Money
+              tenderCurrency:
+                type: string
+                pattern: ^[A-Z]{3}$
+                nullable: true
+                description: The currency the guest paid, which a card or wallet refund goes back in (CHG-FIN-001).
+              tenderAmount:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Money
+                nullable: true
+        cashImpact:
+          allOf:
+          - $ref: ../shared/common.yaml#/components/schemas/Money
+          nullable: true
+          description: Cash a till would pay out, in the base currency; null where nothing is paid in cash.
+        notes:
+          type: array
+          description: Why each figure is what it is, in order, for the simulator's explanation panel.
+          items:
+            type: string
     PaymentProblem:
       x-ticvai-persistence: none — error shape
       allOf:
@@ -22746,6 +23099,7 @@ components:
             - consentNotGiven              # storePaymentToken
             - chargebackClosed             # respondToChargeback
             - paymentNotCleanable          # cleanupFailedPayment: captured, refunded, or the action does not fit the status
+            - cashNotOnHandheld            # createPayment: cash from a session with no till (DEC-200; CHG-CSP-039)
           balanceDue:
             allOf:
             - $ref: ../shared/common.yaml#/components/schemas/Money
@@ -30711,6 +31065,11 @@ components:
             - transactions
           description: Marketplace navigation
   securitySchemes:
+    prospectAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Prospect sign-up session token (common.yaml prospectAuth). Scoped to one onboarding application; DEC-167, CHG-CLN-010.
     guestAuth:
       type: http
       scheme: bearer

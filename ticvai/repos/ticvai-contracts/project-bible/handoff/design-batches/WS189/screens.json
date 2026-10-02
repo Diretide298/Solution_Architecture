@@ -410,6 +410,13 @@
        "kind": "selectField",
        "label": "Applicable credit types",
        "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 39 §Configure"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Family, household and corporate structures",
+       "bindsTo": "SharedWallet",
+       "operation": "listSharedWallets",
+       "provenance": "contract wallet.yaml GET /shared-wallets; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -432,6 +439,13 @@
     "invalidates": [
      "listSharedWallets"
     ]
+   },
+   {
+    "operationId": "listSharedWallets",
+    "contract": "wallet",
+    "purpose": "Family, household and corporate structures",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {
@@ -440,6 +454,14 @@
    "workshopBoard": "wireframes/WS189 Wallet Configuration Backend Structure v1.0 Board 4.dc.html#bo-1114"
   },
   "apisNote": "Regenerated 9 September 2026 from Wallet_Configuration_Backend_Structure_v1.0.pdf page 39. 0 of 0 labels bound to a contract property; 11 of 38 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {},
+  "gaps": [
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-027): A reusable shared-wallet model record with its read and write; createSharedWallet creates a wallet, not a model.",
+    "source": "screens/P08-venue-back-office.yaml#BO-1114"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -566,6 +588,13 @@
        "kind": "selectField",
        "label": "Effective dates",
        "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 40 §Configure"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Family, household and corporate structures",
+       "bindsTo": "SharedWallet",
+       "operation": "listSharedWallets",
+       "provenance": "contract wallet.yaml GET /shared-wallets; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -588,6 +617,13 @@
     "invalidates": [
      "listSharedWallets"
     ]
+   },
+   {
+    "operationId": "listSharedWallets",
+    "contract": "wallet",
+    "purpose": "Family, household and corporate structures",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {
@@ -745,6 +781,20 @@
        "kind": "selectField",
        "label": "Credit-type restriction",
        "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 41 §Configure"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Family, household and corporate structures",
+       "bindsTo": "SharedWallet",
+       "operation": "listSharedWallets",
+       "provenance": "contract wallet.yaml GET /shared-wallets; wiring fix, 2 October 2026"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "A wallet's balance",
+       "bindsTo": "WalletBalance",
+       "operation": "getWalletBalance",
+       "provenance": "contract wallet.yaml GET /wallets/{walletId}/balance; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -778,6 +828,20 @@
      "getWallet",
      "listWalletTransactions"
     ]
+   },
+   {
+    "operationId": "listSharedWallets",
+    "contract": "wallet",
+    "purpose": "Family, household and corporate structures",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
+   },
+   {
+    "operationId": "getWalletBalance",
+    "contract": "wallet",
+    "purpose": "A wallet's balance",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {
@@ -929,6 +993,13 @@
        "kind": "selectField",
        "label": "Funding priority",
        "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 42 §Configure"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Family, household and corporate structures",
+       "bindsTo": "SharedWallet",
+       "operation": "listSharedWallets",
+       "provenance": "contract wallet.yaml GET /shared-wallets; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -951,6 +1022,13 @@
     "invalidates": [
      "listSharedWallets"
     ]
+   },
+   {
+    "operationId": "listSharedWallets",
+    "contract": "wallet",
+    "purpose": "Family, household and corporate structures",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {
@@ -1153,6 +1231,13 @@
        "kind": "selectField",
        "label": "Time restrictions",
        "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 43 §Configure"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Family, household and corporate structures",
+       "bindsTo": "SharedWallet",
+       "operation": "listSharedWallets",
+       "provenance": "contract wallet.yaml GET /shared-wallets; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -1175,6 +1260,13 @@
     "invalidates": [
      "listSharedWallets"
     ]
+   },
+   {
+    "operationId": "listSharedWallets",
+    "contract": "wallet",
+    "purpose": "Family, household and corporate structures",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {
@@ -1470,6 +1562,20 @@
        "kind": "selectField",
        "label": "Spending Policies",
        "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 44 §Configure"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Family, household and corporate structures",
+       "bindsTo": "SharedWallet",
+       "operation": "listSharedWallets",
+       "provenance": "contract wallet.yaml GET /shared-wallets; wiring fix, 2 October 2026"
+      },
+      {
+       "kind": "dataTable",
+       "label": "What requires approval here",
+       "bindsTo": "ApprovalMatrix",
+       "operation": "listApprovalMatrices",
+       "provenance": "contract approvals.yaml GET /approval-matrices; wiring fix, 2 October 2026"
       }
      ]
     },
@@ -1525,6 +1631,20 @@
     "purpose": "Set how corporate wallet spend is approved (levels, mode, thresholds)",
     "trigger": "onAction",
     "provenance": "decided 29 September, VM close-out (venue management and configuration): serves the pack action(s) Post-spend review, Single approval, Multi-level approval, Exception approval"
+   },
+   {
+    "operationId": "listSharedWallets",
+    "contract": "wallet",
+    "purpose": "Family, household and corporate structures",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
+   },
+   {
+    "operationId": "listApprovalMatrices",
+    "contract": "approvals",
+    "purpose": "What requires approval here",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {
@@ -1664,6 +1784,13 @@
        "kind": "selectField",
        "label": "Automatic reallocation",
        "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 45 §Configure"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "A wallet's balance",
+       "bindsTo": "WalletBalance",
+       "operation": "getWalletBalance",
+       "provenance": "contract wallet.yaml GET /wallets/{walletId}/balance; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -1687,6 +1814,13 @@
      "getWallet",
      "listWalletTransactions"
     ]
+   },
+   {
+    "operationId": "getWalletBalance",
+    "contract": "wallet",
+    "purpose": "A wallet's balance",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {

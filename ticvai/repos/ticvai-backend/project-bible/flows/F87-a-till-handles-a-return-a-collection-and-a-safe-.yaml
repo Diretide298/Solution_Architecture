@@ -27,9 +27,7 @@ steps:
   screen: POS-012
   action: Omnichannel Order & Fulfilment Center.
   operations:
-  - adjustDepositBoxFloat
   - getCurrentShift
-  - listDenominations
   - listOrders
   outcome: '**Drawn by the client as POS-2C.** 4 operations on this step.'
   crossesDevice: true
@@ -37,21 +35,16 @@ steps:
   screen: POS-013
   action: Mobile POS, Event Sales & Offline Operations.
   operations:
-  - adjustDepositBoxFloat
-  - createCashMovement
   - createOrder
-  - getOfflinePackage
   outcome: '**Drawn by the client as POS-2D.** 4 operations on this step.'
   crossesDevice: true
 - step: 4
   screen: POS-007
   action: Close Shift.
   operations:
-  - approveShiftOpen
-  - reopenShift
-  - resumeShift
-  - suspendShift
+  - submitShiftCount
   outcome: '**Drawn by the client as POS-2E.** 4 operations on this step.'
+  note: 'The cashier closes with the blind count, submitShiftCount, on POS-007 (CHG-FIN-003); closeShift is the supervisor and back-office path. Was closeShift in the wiring fix (CHG-WIR-008), which was branched before CHG-FIN-003.'
   crossesDevice: true
 branches:
 - at: 1

@@ -37,25 +37,6 @@
   "requestBody": "CreateCaseRequest",
   "responds": "Case"
  },
- "escalateCase": {
-  "method": "POST",
-  "path": "/cases/{caseId}/escalate",
-  "contract": "marketing-crm",
-  "summary": "Escalate a case",
-  "permission": "CASE_MANAGE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Case"
- },
  "getCase": {
   "method": "GET",
   "path": "/cases/{caseId}",
@@ -123,25 +104,6 @@
   "path": "/cases/{caseId}/reopen",
   "contract": "marketing-crm",
   "summary": "Reopen a resolved case",
-  "permission": "CASE_MANAGE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Case"
- },
- "updateCase": {
-  "method": "PATCH",
-  "path": "/cases/{caseId}",
-  "contract": "marketing-crm",
-  "summary": "Assign, reprioritise or resolve a case",
   "permission": "CASE_MANAGE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",

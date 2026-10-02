@@ -455,6 +455,17 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 46"
+   },
+   {
+    "operation": "createForm",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-005): Metric definitions and follow-up thresholds are not forms; createForm does not configure NPS, CSAT or CES (design-notes correction customer-marketing BO-817).",
+    "source": "contracts/satellite/marketing-crm.yaml#createForm"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-007): No operation configures NPS, CSAT and CES metrics and follow-up thresholds.",
+    "source": "contracts/satellite/marketing-crm.yaml#createForm"
    }
   ],
   "layout": {
@@ -462,41 +473,18 @@
    "regions": [
     {
      "name": "contentBody",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "createForm",
-       "label": "Create form",
-       "notes": "The act the screen exists for."
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "createForm"
-      }
-     ]
+     "components": []
     }
    ]
   },
   "states": {
    "loading": "The nps csat ces list.",
    "error": "Could not load. Names which read failed and leaves the nps csat ces untouched.",
-   "emptyFirstRun": "No nps csat ces yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No nps csat ces yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the nps csat ces are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Not shown: nothing on this screen needs a permission of its own; the app's sign-in decides access."
   },
-  "apis": [
-   {
-    "operationId": "createForm",
-    "contract": "marketing-crm",
-    "purpose": "NPS, CSAT and CES configuration",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026"
-   }
-  ],
+  "apis": [],
   "wireframe": {
    "status": "notStarted",
    "board": "wireframes/P08 Venue Management.dc.html#bo-817",
@@ -1033,6 +1021,17 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 47"
+   },
+   {
+    "operation": "setRefundCompensationService",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-005): setRefundCompensationService raises one request; nothing in it defines the automation rules this screen configures (design-notes correction customer-marketing BO-822).",
+    "source": "contracts/satellite/marketing-crm.yaml#setRefundCompensationService"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-007): No operation stores service-recovery automation rules.",
+    "source": "contracts/satellite/marketing-crm.yaml#setRefundCompensationService"
    }
   ],
   "layout": {
@@ -1040,41 +1039,18 @@
    "regions": [
     {
      "name": "contentBody",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "setRefundCompensationService",
-       "label": "Save",
-       "notes": "The act the screen exists for."
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "setRefundCompensationService"
-      }
-     ]
+     "components": []
     }
    ]
   },
   "states": {
    "loading": "The service recovery automation list.",
    "error": "Could not load. Names which read failed and leaves the service recovery automation untouched.",
-   "emptyFirstRun": "No service recovery automation yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No service recovery automation yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the service recovery automation are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Not shown: nothing on this screen needs a permission of its own; the app's sign-in decides access."
   },
-  "apis": [
-   {
-    "operationId": "setRefundCompensationService",
-    "contract": "marketing-crm",
-    "purpose": "Automated service recovery",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026"
-   }
-  ],
+  "apis": [],
   "wireframe": {
    "status": "notStarted",
    "board": "wireframes/P08 Venue Management.dc.html#bo-822",

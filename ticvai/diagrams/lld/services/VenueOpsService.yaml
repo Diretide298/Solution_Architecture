@@ -12,7 +12,7 @@ scale: Low and steady. Queue readings are the only frequent write.
 ifDown: Down degrades venue operations. Selling and admitting continue.
 coverage:
   operations: 285
-  inAFlow: 55
+  inAFlow: 53
   percent: 19%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
@@ -2706,7 +2706,7 @@ tables:
   - games
   foreignWriters: null
 - table: games.entitlement
-  columns: 15
+  columns: 16
   store: postgres
   parent: null
   writtenBy:
@@ -2747,7 +2747,7 @@ tables:
   - games
   foreignWriters: null
 - table: games.pricing
-  columns: 8
+  columns: 9
   store: postgres
   parent: games.game
   writtenBy:
@@ -2795,7 +2795,7 @@ tables:
   - games
   foreignWriters: null
 - table: games.reader_sync_status
-  columns: 8
+  columns: 10
   store: postgres
   parent: games.reader
   writtenBy:
@@ -3526,10 +3526,10 @@ screens:
 - P01:WEB-050 Plan Your Visit
 - P02:GST-003 Buy Tickets
 - P02:GST-004 Item Detail
+- P02:GST-011 Wallet Overview
 - P02:GST-021 Interactive Map
 - P02:GST-022 Attraction Wait Times
 - P02:GST-023 Virtual Queue
-- P02:GST-026 Retail / Merchandise
 - P02:GST-038 At the Venue
 - P02:GST-041 Checkout Entry
 - P02:GST-051 Plan
@@ -3545,11 +3545,11 @@ screens:
 - P02:GST-079 Intercity Trip — Favourite Routes
 - P04:POS-002 Sell — Ticket Catalogue
 - P04:POS-010 Add to Existing Ticket
-- P04:POS-029 Order Queue
 - P06:EMP-003 Home — on duty
 - P06:EMP-004 Task list
 - P06:EMP-005 Task detail
 - P06:EMP-006 Raise a task
+- P06:EMP-007 Handover notes
 - P06:EMP-026 Incident report
 - P06:EMP-027 Incident detail
 - P06:EMP-029 Guest assistance
@@ -3589,6 +3589,7 @@ screens:
 - P06:EMP-098 Late Fees, Damage Fees & Final Settlement
 - P06:EMP-099 Deposit Release, Capture & Customer Confirmation
 - P06:EMP-100 Return Completion & Equipment Disposition
+- P08:ADM-587 Terminal Health, Maintenance & Incident Center
 - P08:BO-001 Queue Directory
 - P08:BO-002 Queue Configuration
 - P08:BO-003 Queue Integration Setup
@@ -3596,10 +3597,7 @@ screens:
 - P08:BO-005 Queue Monitor
 - P08:BO-008 Product Detail & Variants
 - P08:BO-019 Closures & Blackouts
-- P08:BO-027 Reissue & Media Replacement
 - P08:BO-030 Work Order Verification
-- P08:BO-031 Asset Register
-- P08:BO-038 Reconciliation Queue
 - P08:BO-069 Asset Register
 - P08:BO-070 Work Orders
 - P08:BO-071 Planned Maintenance
@@ -3621,7 +3619,6 @@ screens:
 - P08:BO-1187 Transport Departure Board
 - P08:BO-1188 Transport Pass Types
 - P08:BO-1189 Transport Network Import
-- P08:BO-125 Product & Category Button Configuration
 - P08:BO-221 Fast Pass & Attraction Access Journey
 - P08:BO-394 Game & Ride Operations Dashboard
 - P08:BO-395 Game & Ride Directory
@@ -3631,7 +3628,6 @@ screens:
 - P08:BO-400 Attraction / Reader Mapping
 - P08:BO-401 Game Package & Entitlement Association
 - P08:BO-402 Configuration Health & Validation
-- P08:BO-403 Attraction Audit, Dependencies & Governed Actions
 - P08:BO-404 Reader Management Dashboard
 - P08:BO-405 Reader Directory
 - P08:BO-406 Reader Profile & Device Setup
@@ -3651,7 +3647,6 @@ screens:
 - P08:BO-429 Specific Game/Ride Limited Entitlement
 - P08:BO-430 Game Package Builder
 - P08:BO-431 Entitlement Validity & Activation Rules
-- P08:BO-432 Real-Time Gameplay Authorization
 - P08:BO-433 Validation Simulator & Exception Analysis
 - P08:BO-434 Game & Ride Pricing Command Center
 - P08:BO-435 Standard Game & Ride Price Configuration
@@ -3667,12 +3662,12 @@ screens:
 - P08:BO-449 Redemption Counter / Prize Checkout
 - P08:BO-450 Prize Catalogue & Credit Cost Configuration
 - P08:BO-451 Prize Inventory Integration
+- P08:BO-452 Direct-Pay / Crane & Prize Machine Configuration
 - P08:BO-453 Redemption Transaction Ledger, Reconciliation & Audit
 - P08:BO-454 Card Lifecycle Command Center
 - P08:BO-455 Card / Credential Profile
 - P08:BO-456 Card Expiry Rule Configuration
 - P08:BO-457 Last Recharge & Last Activity Tracking
-- P08:BO-458 Expiry Monitoring & Upcoming Expiration
 - P08:BO-459 Card Expiry Runtime Validation
 - P08:BO-460 Card Block, Suspend & Reactivation Control
 - P08:BO-461 Card Replacement & Wallet Relinking
@@ -3687,15 +3682,12 @@ screens:
 - P08:BO-471 Offline, Synchronization & Recovery Monitor
 - P08:BO-473 Operational Analytics & Reconciliation Dashboard
 - P08:BO-474 Reader Integration Command Center
-- P08:BO-475 Reader Manufacturer & Model Profile
 - P08:BO-476 Communication Protocol Configuration
-- P08:BO-477 Reader Command & Event Mapping
 - P08:BO-478 Reader Configuration Deployment & Synchronization
 - P08:BO-479 Game Trigger & I/O Control Mapping
 - P08:BO-480 Reader Screen, LED & Sound Output Mapping
 - P08:BO-481 Edge Cache & Offline Rule Package
 - P08:BO-482 Device Diagnostics & Integration Logs
-- P08:BO-484 Self-Service Experience Command Center
 - P08:BO-485 Self-Service Kiosk Profile & Channel Configuration
 - P08:BO-486 Customer Card / Wallet Identification
 - P08:BO-489 Bonus, Free Game & Benefit View
@@ -3713,6 +3705,7 @@ screens:
 - P08:BO-501 Rental Rules & Operational Policy
 - P08:BO-502 Customer Requirements, Agreement & Waiver
 - P08:BO-503 Product Validation, Approval & Publication
+- P08:BO-504 Rental Inventory Command Center
 - P08:BO-505 Serialized Equipment Registry
 - P08:BO-506 Equipment / Asset Profile
 - P08:BO-508 Equipment Status & Condition Management
@@ -3788,11 +3781,9 @@ screens:
 - P08:BO-583 Maintenance Intelligence & Predictive AI
 - P08:BO-584 Rental Executive Command Center
 - P08:BO-586 Utilization & Capacity Analytics
-- P08:BO-587 Inventory & Equipment Performance Analytics
 - P08:BO-588 Rental Duration, Extension & Return Analytics
 - P08:BO-589 Damage, Loss, Deposit & Exception Analytics
 - P08:BO-592 Audit, Governance & Operational Control
-- P08:BO-838 Content, Media & Forms
 - P08:BO-854 Resource Management Command Center
 - P08:BO-855 Resource Type Configuration
 - P08:BO-856 Resource Category Management
@@ -3850,7 +3841,6 @@ screens:
 - P08:BO-935 Assignment Detail & Operational Brief
 - P08:BO-937 Resource Collection, Handover & Return
 - P08:BO-938 Employee Requests & Resource Support
-- P08:BO-942 Mobile Operations Control & Offline Sync
 - P08:BO-943 Resource Analytics Command Center
 - P08:BO-944 Resource Utilization & Capacity Analytics
 - P08:BO-945 Resource Cost, Revenue & Efficiency Analytics
@@ -3860,8 +3850,7 @@ screens:
 - P08:BO-952 Executive Resource Intelligence & AI Improvement Center
 - P08:BO-955 Sections & Zones
 - P08:BO-990 Maintenance & Out of Service
-- P09:ADM-587 Terminal Health, Maintenance & Incident Center\t57
-- P12:SUP-020 Queue Configuration & Management
+- P12:SUP-013 Case Investigation & Resolution Workspace
 - P13:CMS-002 Brand Kit
 - P13:CMS-010 Media Library
 - P13:CMS-061 Digital Asset Management Command Center
@@ -3906,7 +3895,6 @@ screens:
 flows:
 - F08 Steward works a shift on the employee app
 - F12 Asset fails and closes a queue
-- 'F135 Customer Service board 2: Contact Center Operations Command Center'
 - F15 A part is needed and ordered
 - F18 A guest plays an arcade game
 - F21 A ride queue fills and a guest is redirected

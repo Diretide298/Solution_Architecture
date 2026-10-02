@@ -1,22 +1,27 @@
 {
- "createWebhookSubscription": {
-  "method": "POST",
-  "path": "/webhook-subscriptions",
+ "getApiUsage": {
+  "method": "GET",
+  "path": "/api-usage",
   "contract": "public-api",
-  "summary": "Subscribe to business events",
-  "permission": "DEVELOPER_MANAGE",
+  "summary": "Calls, errors, latency and success rate",
+  "permission": "DEVELOPER_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
   "parameters": [
    {
-    "name": null,
-    "in": null,
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "to",
+    "in": "query",
     "required": null
    }
   ],
-  "requestBody": "WebhookSubscription",
-  "responds": "WebhookSubscription"
+  "requestBody": null,
+  "responds": "ApiUsageSummary"
  },
  "listApiClients": {
   "method": "GET",
@@ -30,6 +35,35 @@
   "parameters": [],
   "requestBody": null,
   "responds": "ApiClient"
+ },
+ "listApiScopes": {
+  "method": "GET",
+  "path": "/api-scopes",
+  "contract": "public-api",
+  "summary": "The scope catalogue, one read and one write scope per module",
+  "permission": "DEVELOPER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "module",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
  },
  "listApprovalExternalDispatches": {
   "method": "GET",
@@ -84,60 +118,6 @@
     "name": "status",
     "in": "query",
     "required": false
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- },
- "listApprovalRequests": {
-  "method": "GET",
-  "path": "/approval-requests",
-  "contract": "approvals",
-  "summary": "Requests awaiting a decision, or already decided",
-  "permission": "APPROVAL_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "assignedToMe",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "raisedByMe",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "status",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "kind",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "breachingWithinMinutes",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "sort",
-    "in": "query",
-    "required": null
    },
    {
     "name": null,
@@ -239,25 +219,6 @@
   ],
   "requestBody": null,
   "responds": "Page"
- },
- "listWebhookSubscriptions": {
-  "method": "GET",
-  "path": "/webhook-subscriptions",
-  "contract": "public-api",
-  "summary": "The tenant's webhook subscriptions, filterable by API client",
-  "permission": "DEVELOPER_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": "clientId",
-    "in": "query",
-    "required": false
-   }
-  ],
-  "requestBody": null,
-  "responds": "WebhookSubscription"
  },
  "listWorkflowExceptionFailure": {
   "method": "GET",
@@ -371,6 +332,25 @@
   ],
   "requestBody": null,
   "responds": "WorkflowAnalyticsProcessPerformanceView"
+ },
+ "setApiClientStatus": {
+  "method": "POST",
+  "path": "/api-clients/{clientId}/status",
+  "contract": "public-api",
+  "summary": "Suspend or reactivate an integration, reversibly",
+  "permission": "DEVELOPER_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ApiClient"
  },
  "setApprovalExternalProvider": {
   "method": "PUT",

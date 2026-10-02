@@ -336,6 +336,13 @@
        "bindsTo": null,
        "operation": null,
        "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 100 §Display"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Everything an event needs, and whether it has been secured",
+       "bindsTo": "EventResourcePlan",
+       "operation": "getEventResourcePlan",
+       "provenance": "contract catalogue.yaml GET /events/{eventId}/resource-plan; wiring fix, 2 October 2026"
       }
      ]
     },
@@ -383,6 +390,13 @@
     "invalidates": [
      "getEventResourcePlan"
     ]
+   },
+   {
+    "operationId": "getEventResourcePlan",
+    "contract": "catalogue",
+    "purpose": "Everything an event needs, and whether it has been secured",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "entryState": {
@@ -1008,6 +1022,17 @@
        "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 106 §Administrators shall configure"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "components": [
+      {
+       "kind": "secondaryButton",
+       "label": "Save template",
+       "operation": "updateResourcePackage",
+       "provenance": "contract resources.yaml PUT /resource-packages/{packageId}; wiring fix, 2 October 2026"
+      }
+     ]
     }
    ]
   },
@@ -1032,6 +1057,13 @@
     "purpose": "Save a template",
     "trigger": "onAction",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "updateResourcePackage",
+    "contract": "resources",
+    "purpose": "Change a template",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-001)"
    }
   ],
   "wireframe": {
@@ -1040,6 +1072,30 @@
    "workshopBoard": "wireframes/WS132 Resource Management Configuration Board 7.dc.html#bo-918"
   },
   "apisNote": "Regenerated 9 September 2026 from Resource_Management_Configuration_Reference.pdf page 106. 0 of 0 labels bound to a contract property; 13 of 38 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formUpdateResourcePackage",
+    "component": "modal",
+    "trigger": "Save template",
+    "body": "**Collects what `updateResourcePackage` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save template",
+     "operation": "updateResourcePackage"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "contract resources.yaml PUT /resource-packages/{packageId}; wiring fix, 2 October 2026"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "packageId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1102,13 +1158,6 @@
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Predict the resources required for an event before final allocation.",
   "purposeNote": "and predicted requirements.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Resource_Management_Configuration_Reference.pdf, page 107 §Display"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -1117,15 +1166,30 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "multiSelect",
+       "label": "Requirement kinds",
+       "bindsTo": "AiOperationalRequirement.kind",
+       "operation": "listOperationalRequirements",
+       "notes": "**Every requirement kind (decided 2 October 2026 by Chinmay, DEC-009; CHG-CSA-005)**: staff, POS, kiosk, gates, F&B, retail, stock, resource, equipment, facility, filtered to what the venue configured.",
+       "provenance": "contract ai.yaml GET /operational-requirements"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every event resource forecasting",
+       "label": "Recommended requirements",
+       "bindsTo": "AiOperationalRequirement",
        "columns": [
-        "Configured",
-        "AI Recommended"
+        "AiOperationalRequirement.kind",
+        "AiOperationalRequirement.subjectRef",
+        "AiOperationalRequirement.periodStart",
+        "AiOperationalRequirement.periodEnd",
+        "AiOperationalRequirement.quantity",
+        "AiOperationalRequirement.quantityP90",
+        "AiOperationalRequirement.unit",
+        "AiOperationalRequirement.status"
        ],
-       "bindsTo": null,
-       "operation": null,
-       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 107 §Display"
+       "operation": "listOperationalRequirements",
+       "notes": "\"Configured\" against \"AI recommended\" from the board is the requirement against what the venue has set up; the board labels were not fields.",
+       "provenance": "contract ai.yaml GET /operational-requirements"
       }
      ]
     },
@@ -1135,14 +1199,44 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected event resource forecasting",
-       "bindsTo": null,
+       "label": "Forecast basis",
+       "bindsTo": "AiForecastPoint",
        "columns": [
-        "Configured",
-        "AI Recommended"
+        "AiForecastPoint.targetStart",
+        "AiForecastPoint.targetEnd",
+        "AiForecastPoint.p10",
+        "AiForecastPoint.p50",
+        "AiForecastPoint.p90",
+        "AiForecastPoint.unit",
+        "AiForecastPoint.drivers"
        ],
-       "notes": "The pack groups this record's detail under its own headings: “Security”, “Reason”.",
-       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 107 §Display"
+       "operation": "getForecast",
+       "provenance": "contract ai.yaml GET /forecasts"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The selected requirement",
+       "bindsTo": "AiOperationalRequirement",
+       "columns": [
+        "AiOperationalRequirement.targetContract",
+        "AiOperationalRequirement.productivityStandard",
+        "AiOperationalRequirement.decisionNote",
+        "AiOperationalRequirement.handoverRef"
+       ],
+       "operation": "listOperationalRequirements",
+       "provenance": "contract ai.yaml GET /operational-requirements"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Run a what-if",
+       "operation": "createForecastScenario",
+       "provenance": "contract ai.yaml POST /forecast-scenarios"
       }
      ]
     }
@@ -1151,8 +1245,8 @@
   "states": {
    "loading": "The event resource forecasting list.",
    "error": "Could not load. Names which read failed and leaves the event resource forecasting untouched.",
-   "emptyFirstRun": "No event resource forecasting yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the event resource forecasting are still there. Names the active filter and offers to clear it.",
+   "emptyFirstRun": "No published forecast for this event yet: the baseline forecast fills the requirements as soon as one is published (ADR-0051). Offers Run a what-if once a base version exists.",
+   "emptyNoResults": "Nothing of the chosen kinds: names the kinds filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
@@ -1178,18 +1272,34 @@
     "provenance": "build, 29 September 2026"
    }
   ],
-  "entryState": {
-   "preloaded": [
-    "Configured",
-    "AI Recommended"
-   ]
-  },
+  "entryState": {},
   "wireframe": {
    "status": "notStarted",
    "board": "wireframes/P08 Venue Management.dc.html#bo-919",
    "workshopBoard": "wireframes/WS132 Resource Management Configuration Board 7.dc.html#bo-919"
   },
   "apisNote": "Regenerated 9 September 2026 from Resource_Management_Configuration_Reference.pdf page 107. 0 of 2 labels bound to a contract property; 2 of 35 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formCreateForecastScenario",
+    "component": "modal",
+    "trigger": "Run a what-if",
+    "body": "**Collects what `createForecastScenario` sends before it is called.** Required: `baseVersionId`, `changes`. Optional: `name`. A scenario starts from a published `baseVersionId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Run a what-if",
+     "operation": "createForecastScenario"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "baseVersionId",
+      "changes",
+      "name"
+     ]
+    },
+    "provenance": "contract ai.yaml POST /forecast-scenarios"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1669,8 +1779,8 @@
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
-  "purpose": "Provide the final governance checkpoint before an event resource plan becomes operational. Provide TICVAI with a centralized AI Resource Intelligence Engine capable of forecasting demand, identifying resource shortages, recommending optimal staff and physical resources, resolving conflicts, optimizing schedules, simulating operational scenarios, and allowing managers to interact with Resource Management through natural language. Board 8 shall consume information from the previous Resource Management boards rather than recreate their configuration.",
-  "purposeNote": "An event cannot be marked operationally ready until mandatory resource requirements, conflicts, qualifications, costs, and approvals have passed configured readiness controls. Board 7 Shared Event Readiness Engine",
+  "purpose": "Provide the final governance checkpoint before an event resource plan becomes operational.",
+  "purposeNote": "An event cannot be marked operationally ready until mandatory resource requirements, conflicts, qualifications, costs, and approvals have passed configured readiness controls. Board 7 Shared Event Readiness Engine Purpose rewritten 2 October 2026 (CHG-WIR-026): Two pack screens' text was merged into one purpose (the second describes an AI resource intelligence engine); the purpose keeps the screen's own sentence (design-notes correction ticketing-backoffice BO-922)",
   "gaps": [
    {
     "operation": null,

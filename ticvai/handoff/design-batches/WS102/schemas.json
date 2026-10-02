@@ -1,4 +1,560 @@
 {
+ "AgreementContractTermsBuilderInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; stored as control.partner_agreement (PartnerAgreement), a new version per amendment; documents are control.partner_document rows with agreementId; legalEntity, commercialOwner and financeOwner land in legalEntityId, commercialOwnerPrincipalId and financeOwnerPrincipalId (data model DM4)",
+  "description": "**What Agreement & Contract Terms Builder submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "agreementId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "Agreement ID; omit to create"
+   },
+   "agreementName": {
+    "type": "string",
+    "description": "Agreement Name"
+   },
+   "partnerId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "Partner"
+   },
+   "agreementType": {
+    "type": "string",
+    "description": "Agreement Type code, seeded with reseller, ota, travelTrade, corporate, wholesale, affiliate, distribution, apiCommercial (pack p.26)"
+   },
+   "contractReference": {
+    "type": "string",
+    "description": "Contract Reference"
+   },
+   "legalEntity": {
+    "type": "string",
+    "description": "Legal Entity"
+   },
+   "brandId": {
+    "type": "string",
+    "description": "Brand id",
+    "nullable": true
+   },
+   "allowedVenueIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    },
+    "description": "Venues the agreement covers"
+   },
+   "territory": {
+    "type": "string",
+    "description": "Territory"
+   },
+   "settlementCurrency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$",
+    "description": "Settlement currency, ISO 4217"
+   },
+   "validFrom": {
+    "type": "string",
+    "format": "date",
+    "description": "Effective From"
+   },
+   "validTo": {
+    "type": "string",
+    "format": "date",
+    "description": "Effective To; empty for open-ended",
+    "nullable": true
+   },
+   "renewalType": {
+    "type": "string",
+    "enum": [
+     "manual",
+     "auto"
+    ],
+    "description": "Renewal Type"
+   },
+   "commercialOwner": {
+    "type": "string",
+    "description": "Commercial Owner: staff principal id"
+   },
+   "financeOwner": {
+    "type": "string",
+    "description": "Finance Owner: staff principal id"
+   },
+   "creditTermDays": {
+    "type": "integer",
+    "description": "Payment Terms in days (0 = due immediately; Net 7/15/30/45 or custom)"
+   },
+   "commissionTerms": {
+    "type": "string",
+    "description": "Commission Terms: summary or reference to the commission rules (listCommissionMarginIncentive)",
+    "nullable": true
+   },
+   "pricingBasis": {
+    "type": "string",
+    "enum": [
+     "retailPrice",
+     "netRate",
+     "discountFromRetail",
+     "markup",
+     "derivedRate"
+    ],
+    "description": "Pricing Basis (pack p.27 pricing models)"
+   },
+   "creditTerms": {
+    "type": "string",
+    "description": "Credit Terms",
+    "nullable": true
+   },
+   "allocationTerms": {
+    "type": "string",
+    "description": "Allocation Terms",
+    "nullable": true
+   },
+   "cancellationConditions": {
+    "type": "string",
+    "description": "Cancellation Conditions",
+    "nullable": true
+   },
+   "bookingRestrictions": {
+    "type": "string",
+    "description": "Booking Restrictions",
+    "nullable": true
+   },
+   "settlementTerms": {
+    "type": "string",
+    "description": "Settlement Terms",
+    "nullable": true
+   },
+   "minimumCommitment": {
+    "type": "integer",
+    "description": "Minimum Commitment: tickets over the agreement term",
+    "nullable": true
+   },
+   "salesTarget": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Sales Target over the agreement term"
+   },
+   "renewalNoticeDays": {
+    "type": "integer",
+    "description": "Renewal Notice Period in days",
+    "nullable": true
+   },
+   "renegotiationRequired": {
+    "type": "boolean",
+    "description": "Renegotiation Required"
+   },
+   "renewalRequiresApproval": {
+    "type": "boolean",
+    "description": "Renewal Approval: renewal needs approval"
+   },
+   "rateMode": {
+    "$ref": "#/components/schemas/PartnerRateMode",
+    "description": "Net rate or commission, as on PartnerAgreement"
+   },
+   "paymentModel": {
+    "type": "string",
+    "enum": [
+     "creditAccount",
+     "prepaid",
+     "payPerTransaction"
+    ],
+    "description": "Payment model, the three confirmed at MoM 5 Aug and MoM 31 Aug 4.4: creditAccount (sells to an approved credit ceiling, invoiced periodically), prepaid (pre-funded wallet drawn down per sale) or payPerTransaction (card at each sale)"
+   },
+   "refundConditions": {
+    "type": "string",
+    "description": "Refund Conditions (pack p.26)",
+    "nullable": true
+   },
+   "agreementValue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Agreement value (MoM 31 Aug 4.4: each agreement captures term/value)"
+   },
+   "documents": {
+    "type": "array",
+    "description": "Document Association",
+    "items": {
+     "type": "object",
+     "properties": {
+      "documentType": {
+       "type": "string",
+       "enum": [
+        "signedContract",
+        "addendum",
+        "rateSheet",
+        "sla",
+        "nda",
+        "commercialAnnex"
+       ]
+      },
+      "documentId": {
+       "type": "string",
+       "format": "uuid"
+      }
+     }
+    }
+   }
+  }
+ },
+ "AgreementContractTermsBuilderView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over control.partner_agreement and control.partner_document and the existing subscription state, assembled at read time (data model DM4)",
+  "description": "**What Agreement & Contract Terms Builder displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "agreementId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "Agreement ID; omit to create"
+   },
+   "agreementName": {
+    "type": "string",
+    "description": "Agreement Name"
+   },
+   "partnerId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "Partner"
+   },
+   "agreementType": {
+    "type": "string",
+    "description": "Agreement Type code, seeded with reseller, ota, travelTrade, corporate, wholesale, affiliate, distribution, apiCommercial (pack p.26)"
+   },
+   "contractReference": {
+    "type": "string",
+    "description": "Contract Reference"
+   },
+   "legalEntity": {
+    "type": "string",
+    "description": "Legal Entity"
+   },
+   "brandId": {
+    "type": "string",
+    "description": "Brand id",
+    "nullable": true
+   },
+   "allowedVenueIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    },
+    "description": "Venues the agreement covers"
+   },
+   "territory": {
+    "type": "string",
+    "description": "Territory"
+   },
+   "settlementCurrency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$",
+    "description": "Settlement currency, ISO 4217"
+   },
+   "validFrom": {
+    "type": "string",
+    "format": "date",
+    "description": "Effective From"
+   },
+   "validTo": {
+    "type": "string",
+    "format": "date",
+    "description": "Effective To; empty for open-ended",
+    "nullable": true
+   },
+   "renewalType": {
+    "type": "string",
+    "enum": [
+     "manual",
+     "auto"
+    ],
+    "description": "Renewal Type"
+   },
+   "commercialOwner": {
+    "type": "string",
+    "description": "Commercial Owner: staff principal id"
+   },
+   "financeOwner": {
+    "type": "string",
+    "description": "Finance Owner: staff principal id"
+   },
+   "creditTermDays": {
+    "type": "integer",
+    "description": "Payment Terms in days (0 = due immediately; Net 7/15/30/45 or custom)"
+   },
+   "commissionTerms": {
+    "type": "string",
+    "description": "Commission Terms: summary or reference to the commission rules (listCommissionMarginIncentive)",
+    "nullable": true
+   },
+   "pricingBasis": {
+    "type": "string",
+    "enum": [
+     "retailPrice",
+     "netRate",
+     "discountFromRetail",
+     "markup",
+     "derivedRate"
+    ],
+    "description": "Pricing Basis (pack p.27 pricing models)"
+   },
+   "creditTerms": {
+    "type": "string",
+    "description": "Credit Terms",
+    "nullable": true
+   },
+   "allocationTerms": {
+    "type": "string",
+    "description": "Allocation Terms",
+    "nullable": true
+   },
+   "cancellationConditions": {
+    "type": "string",
+    "description": "Cancellation Conditions",
+    "nullable": true
+   },
+   "bookingRestrictions": {
+    "type": "string",
+    "description": "Booking Restrictions",
+    "nullable": true
+   },
+   "settlementTerms": {
+    "type": "string",
+    "description": "Settlement Terms",
+    "nullable": true
+   },
+   "minimumCommitment": {
+    "type": "integer",
+    "description": "Minimum Commitment: tickets over the agreement term",
+    "nullable": true
+   },
+   "salesTarget": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Sales Target over the agreement term"
+   },
+   "renewalNoticeDays": {
+    "type": "integer",
+    "description": "Renewal Notice Period in days",
+    "nullable": true
+   },
+   "renegotiationRequired": {
+    "type": "boolean",
+    "description": "Renegotiation Required"
+   },
+   "renewalRequiresApproval": {
+    "type": "boolean",
+    "description": "Renewal Approval: renewal needs approval"
+   },
+   "rateMode": {
+    "$ref": "#/components/schemas/PartnerRateMode",
+    "description": "Net rate or commission, as on PartnerAgreement"
+   },
+   "paymentModel": {
+    "type": "string",
+    "enum": [
+     "creditAccount",
+     "prepaid",
+     "payPerTransaction"
+    ],
+    "description": "Payment model, the three confirmed at MoM 5 Aug and MoM 31 Aug 4.4: creditAccount (sells to an approved credit ceiling, invoiced periodically), prepaid (pre-funded wallet drawn down per sale) or payPerTransaction (card at each sale)"
+   },
+   "refundConditions": {
+    "type": "string",
+    "description": "Refund Conditions (pack p.26)",
+    "nullable": true
+   },
+   "agreementValue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Agreement value (MoM 31 Aug 4.4: each agreement captures term/value)"
+   },
+   "documents": {
+    "type": "array",
+    "description": "Document Association",
+    "items": {
+     "type": "object",
+     "properties": {
+      "documentType": {
+       "type": "string",
+       "enum": [
+        "signedContract",
+        "addendum",
+        "rateSheet",
+        "sla",
+        "nda",
+        "commercialAnnex"
+       ]
+      },
+      "documentId": {
+       "type": "string",
+       "format": "uuid"
+      }
+     }
+    }
+   },
+   "version": {
+    "type": "integer",
+    "description": "Agreement version; amendments create a new one"
+   },
+   "status": {
+    "$ref": "#/components/schemas/PartnerAgreementStatus",
+    "description": "Agreement status"
+   }
+  }
+ },
+ "BillingEntity": {
+  "type": "object",
+  "x-ticvai-persistence": "control.billing_entity",
+  "description": "**The company TICVAI invoices for a tenant, with its trade licence and VAT certificate** (Chinmay, 2 October, workbook Q209: \"a new billing-entity record in the subscription contract\"; DI-830; CHG-CSA-030). One per tenant, mastered in the control plane. `legalName` and `countryCode` are required on save (400 otherwise); they are not marked required here so the record can ride, optional, on an onboarding application. **Documents** (workbook Q210, the default): a trade licence always; a VAT certificate when a `trn` is entered. Which documents a country requires is configurable per country (tenancy `RegionSettings`); the default is that rule.",
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "tenantId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "Null while it rides on an onboarding application."
+   },
+   "legalName": {
+    "type": "string",
+    "maxLength": 300
+   },
+   "tradeLicenceNumber": {
+    "type": "string",
+    "maxLength": 100,
+    "nullable": true
+   },
+   "trn": {
+    "type": "string",
+    "maxLength": 30,
+    "nullable": true,
+    "description": "The tax registration number; entering one makes the VAT certificate required."
+   },
+   "countryCode": {
+    "type": "string",
+    "minLength": 2,
+    "maxLength": 2
+   },
+   "address": {
+    "type": "string",
+    "maxLength": 1000,
+    "nullable": true
+   },
+   "invoiceEmail": {
+    "type": "string",
+    "format": "email",
+    "nullable": true
+   },
+   "documents": {
+    "x-ticvai-persistence-kind": "valueObject",
+    "x-ticvai-persistence-column": "jsonb",
+    "type": "array",
+    "description": "The trade licence and, where a TRN is entered, the VAT certificate, each a stored file with its verification.",
+    "items": {
+     "type": "object",
+     "properties": {
+      "documentType": {
+       "type": "string",
+       "enum": [
+        "tradeLicence",
+        "vatCertificate"
+       ]
+      },
+      "fileRef": {
+       "type": "string",
+       "nullable": true
+      },
+      "expiryDate": {
+       "type": "string",
+       "format": "date",
+       "nullable": true
+      },
+      "verificationStatus": {
+       "type": "string",
+       "enum": [
+        "missing",
+        "uploaded",
+        "verified",
+        "rejected",
+        "expired"
+       ]
+      }
+     }
+    }
+   },
+   "missingDocuments": {
+    "type": "array",
+    "readOnly": true,
+    "description": "The documents the country's rule requires that are not yet uploaded and verified.",
+    "items": {
+     "type": "string"
+    }
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
+ "CellTier": {
+  "type": "string",
+  "enum": [
+   "shared",
+   "dedicated",
+   "isolated",
+   "clientHosted"
+  ]
+ },
+ "DowngradeConflictProblem": {
+  "x-ticvai-persistence": "none — error shape",
+  "allOf": [
+   {
+    "$ref": "../shared/common.yaml#/components/schemas/Problem"
+   },
+   {
+    "type": "object",
+    "properties": {
+     "modulesInUse": {
+      "type": "array",
+      "description": "Enabled by the tenant but not licensed by the target plan.",
+      "items": {
+       "type": "object",
+       "properties": {
+        "moduleKey": {
+         "type": "string"
+        },
+        "displayName": {
+         "type": "string"
+        },
+        "isEnabled": {
+         "type": "boolean"
+        }
+       }
+      }
+     },
+     "limitsExceeded": {
+      "type": "array",
+      "items": {
+       "type": "object",
+       "properties": {
+        "metric": {
+         "$ref": "#/components/schemas/UsageMetric"
+        },
+        "currentUsage": {
+         "type": "integer"
+        },
+        "targetLimit": {
+         "type": "integer"
+        }
+       }
+      }
+     }
+    }
+   }
+  ]
+ },
  "LegalEntity": {
   "x-ticvai-persistence": "ledger.legal_entity",
   "type": "object",
@@ -64,6 +620,218 @@
     "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `tenant` scope.**"
    }
   }
+ },
+ "LocalisedText": {
+  "x-ticvai-persistence": "none — jsonb column",
+  "type": "object",
+  "additionalProperties": {
+   "type": "string"
+  }
+ },
+ "OrgUnit": {
+  "x-ticvai-persistence": "platform.scope",
+  "type": "object",
+  "required": [
+   "id",
+   "level",
+   "path",
+   "code",
+   "name",
+   "isActive"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "level": {
+    "$ref": "#/components/schemas/ScopeLevel"
+   },
+   "parentId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "path": {
+    "type": "string",
+    "description": "Materialised ltree path, e.g. `t_ref.b_alpha.r_north.v_alpha1`.",
+    "pattern": "^[a-z0-9_]+(\\.[a-z0-9_]+)*$"
+   },
+   "code": {
+    "type": "string",
+    "maxLength": 64
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "isActive": {
+    "type": "boolean",
+    "description": "False causes every permission query at or beneath this node to resolve to DENY.\n"
+   },
+   "childCount": {
+    "type": "integer",
+    "minimum": 0
+   }
+  }
+ },
+ "PackageSimulation": {
+  "type": "object",
+  "description": "Boards 3.9 and 4.8. **Refused at quote time rather than at go-live.**",
+  "properties": {
+   "lines": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "kind": {
+       "type": "string",
+       "enum": [
+        "baseTier",
+        "module",
+        "addOn",
+        "capacityPack",
+        "overage",
+        "professionalServices",
+        "discount"
+       ]
+      },
+      "label": {
+       "type": "string"
+      },
+      "quantity": {
+       "type": "number",
+       "nullable": true
+      },
+      "unitPrice": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "amount": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      }
+     }
+    }
+   },
+   "recurringTotal": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "oneOffTotal": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "contractTotal": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "minimumGuarantee": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "findings": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "severity": {
+       "type": "string",
+       "enum": [
+        "blocking",
+        "warning",
+        "advisory"
+       ]
+      },
+      "code": {
+       "type": "string"
+      },
+      "message": {
+       "type": "string"
+      }
+     }
+    }
+   },
+   "provisionable": {
+    "type": "boolean"
+   }
+  }
+ },
+ "PackageSimulationRequest": {
+  "type": "object",
+  "required": [
+   "tierCode"
+  ],
+  "properties": {
+   "tierCode": {
+    "type": "string"
+   },
+   "licensingModelId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "moduleCodes": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "venueCount": {
+    "type": "integer",
+    "default": 1
+   },
+   "projectedVolumes": {
+    "type": "object",
+    "additionalProperties": {
+     "type": "integer"
+    }
+   },
+   "contractMonths": {
+    "type": "integer",
+    "default": 12
+   },
+   "billingCycle": {
+    "type": "string",
+    "nullable": true
+   },
+   "currency": {
+    "type": "string",
+    "nullable": true
+   }
+  }
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ },
+ "PartnerAgreementStatus": {
+  "type": "string",
+  "enum": [
+   "pendingApproval",
+   "active",
+   "expiringSoon",
+   "expired",
+   "suspended",
+   "terminated"
+  ]
+ },
+ "PartnerRateMode": {
+  "type": "string",
+  "description": "**Alternatives, not both.** A partner buys at a net rate and keeps the margin, or sells at face value and is paid commission. Both is being paid twice for the same sale.\n",
+  "enum": [
+   "netRate",
+   "commission"
+  ]
  },
  "PaymentProvider": {
   "type": "object",
@@ -443,7 +1211,27 @@
    "PROCUREMENT_VIEW",
    "PROCUREMENT_REQUEST",
    "PROCUREMENT_MANAGE",
-   "PROCUREMENT_RECEIVE"
+   "PROCUREMENT_RECEIVE",
+   "CORE_AI_PUBLISH",
+   "TICKETING_AI_PUBLISH",
+   "ACCESS_AI_PUBLISH",
+   "FNB_AI_PUBLISH",
+   "RETAIL_AI_PUBLISH",
+   "INVENTORY_AI_PUBLISH",
+   "SEATING_AI_PUBLISH",
+   "MEMBERSHIP_AI_PUBLISH",
+   "MARKETING_AI_PUBLISH",
+   "RESOURCES_AI_PUBLISH",
+   "QUEUE_AI_PUBLISH",
+   "TRANSPORT_AI_PUBLISH",
+   "GAMES_AI_PUBLISH",
+   "MAINTENANCE_AI_PUBLISH",
+   "ACCREDITATION_AI_PUBLISH",
+   "PARTNER_AI_PUBLISH",
+   "ANALYTICS_AI_PUBLISH",
+   "BIOMETRIC_IMAGE_VIEW",
+   "ACCESS_DIRECTION_SET",
+   "REPORT_GOVERNANCE_MANAGE"
   ]
  },
  "PlatformStaffGrant": {
@@ -502,6 +1290,21 @@
    }
   }
  },
+ "ScopeLevel": {
+  "type": "string",
+  "description": "**The eight organisational levels, plus `subject`.** Restored 24 August.\n`tenancy.yaml` holds the authoritative definition of the eight levels and this mirrors them so a contract can reference a level without depending on the whole tenancy surface. **Seven organisational levels plus `outlet`** — a commercial branch beside the organisational one (CF-138, ADR-0018). **A department has requisitions and rotas; an outlet has a menu and stock**, and modelling a restaurant as a department would put it in the staffing tree.\n\n**`subject` is the one value tenancy does not have, and it is not a level.** It is here because `check-package` reads this enum as the closed vocabulary for `x-ticvai-scope-level`, and some operations act on one guest's own resources, which sit in no node of the venue hierarchy. So `subject` is valid as an operation's scope level and never as a `ScopeRef.level`: every `ScopeRef` is a row of `platform.scope`, and those carry one of the eight.\n",
+  "enum": [
+   "tenant",
+   "brand",
+   "region",
+   "venue",
+   "department",
+   "subDepartment",
+   "workstation",
+   "outlet",
+   "subject"
+  ]
+ },
  "SetPaymentProviderRequest": {
   "x-ticvai-persistence": "none — request only; the provider lands in payments.provider and its rules in payments.routing_rule",
   "description": "Request only. **A provider and the rules that route to it**, because `setPaymentProvider` is *\"configure a gateway and its routing\"* and writes both tables — and the provider schema alone carried no routing field, so the routing half had nothing to arrive in.\n",
@@ -522,5 +1325,350 @@
     }
    }
   ]
+ },
+ "SetSubscriptionRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "planId"
+  ],
+  "properties": {
+   "planId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "planVersion": {
+    "type": "string",
+    "description": "Defaults to the current version."
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "format": "date",
+    "description": "Optional, and set by the server if omitted. Today for an upgrade, `renewsAt` for a downgrade; any other date is refused (audit R214 (1))."
+   },
+   "prorate": {
+    "type": "boolean",
+    "default": true,
+    "description": "An upgrade is always prorated and a downgrade, which starts at renewal, never is (audit R214 (1)). Kept so a preview can show the unprorated figure; `setSubscription` applies the rule whatever is sent."
+   },
+   "note": {
+    "type": "string",
+    "maxLength": 500
+   }
+  }
+ },
+ "Subscription": {
+  "x-ticvai-persistence": "subscription.contract",
+  "type": "object",
+  "required": [
+   "tenantId",
+   "planId",
+   "planVersion",
+   "status",
+   "startsAt"
+  ],
+  "properties": {
+   "tenantId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "planId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "planName": {
+    "type": "string"
+   },
+   "planVersion": {
+    "type": "string"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "trial",
+     "active",
+     "pastDue",
+     "cancelled",
+     "expired"
+    ]
+   },
+   "startsAt": {
+    "type": "string",
+    "format": "date"
+   },
+   "renewsAt": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "cancelledAt": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "scheduledChange": {
+    "type": "object",
+    "nullable": true,
+    "readOnly": true,
+    "description": "A downgrade waiting for the next renewal (decided 28 September, audit R214 (1)). Null when none is scheduled.",
+    "properties": {
+     "planId": {
+      "type": "string",
+      "format": "uuid"
+     },
+     "planVersion": {
+      "type": "string"
+     },
+     "effectiveFrom": {
+      "type": "string",
+      "format": "date",
+      "description": "Always the `renewsAt` it was scheduled against."
+     }
+    }
+   },
+   "currentPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "billingPeriod": {
+    "type": "string"
+   }
+  }
+ },
+ "SubscriptionPreview": {
+  "x-ticvai-persistence": "none — computed",
+  "type": "object",
+  "required": [
+   "canApply",
+   "priceChange"
+  ],
+  "properties": {
+   "canApply": {
+    "type": "boolean"
+   },
+   "priceChange": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "proratedAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "modulesGained": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "modulesLost": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "conflicts": {
+    "$ref": "#/components/schemas/DowngradeConflictProblem"
+   },
+   "cellTierChange": {
+    "type": "object",
+    "nullable": true,
+    "properties": {
+     "from": {
+      "$ref": "#/components/schemas/CellTier"
+     },
+     "to": {
+      "$ref": "#/components/schemas/CellTier"
+     },
+     "requiresMigration": {
+      "type": "boolean"
+     }
+    }
+   }
+  }
+ },
+ "SuspensionMode": {
+  "type": "string",
+  "description": "Access validation continues under every mode. A commercial dispute must not strand guests at a gate holding valid tickets.\n",
+  "enum": [
+   "readOnly",
+   "noNewSales",
+   "fullLockout"
+  ]
+ },
+ "Tenant": {
+  "x-ticvai-persistence": "control.tenant",
+  "type": "object",
+  "required": [
+   "id",
+   "code",
+   "name",
+   "status",
+   "createdAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "status": {
+    "$ref": "#/components/schemas/TenantStatus"
+   },
+   "suspensionMode": {
+    "$ref": "#/components/schemas/SuspensionMode"
+   },
+   "suspensionReason": {
+    "type": "string",
+    "nullable": true
+   },
+   "suspensionEffectiveAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "When the suspension takes, or took, effect — `suspendTenant.effectiveAt`. **A future value is a pending suspension**: the tenant stays `active` until then, and this row is the only place that says a suspension is coming."
+   },
+   "suspensionNoticeMessage": {
+    "$ref": "#/components/schemas/LocalisedText",
+    "description": "The notice shown to the tenant's users about the suspension — `suspendTenant.noticeMessage`."
+   },
+   "terminationScheduledAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "When `terminateTenant` started the retention window. Null when no termination is under way."
+   },
+   "terminationRetentionUntil": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "`terminationScheduledAt` plus the request's `retentionDays`. **Stored, not recomputed** — the day count is client-supplied and exists nowhere else, and this is the date the cells are destroyed after."
+   },
+   "terminationReason": {
+    "type": "string",
+    "maxLength": 1000,
+    "nullable": true
+   },
+   "terminationRequestedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "planId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "planName": {
+    "type": "string",
+    "nullable": true
+   },
+   "cellCount": {
+    "type": "integer"
+   },
+   "venueCount": {
+    "type": "integer"
+   },
+   "regionId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The tenant's home region: the `tenancy` region node whose `RegionSettings` govern tenant-wide gates, today `allowedAiResidencies` (decided 28 September, audit R203). Written by the server when the tenant's first region is created; null until then. ADM-037 reads it to show the region's residency restriction, and `ai.setAiProvider` checks against the same region.\n"
+   },
+   "billingEmail": {
+    "type": "string"
+   },
+   "billingAddress": {
+    "type": "string",
+    "maxLength": 500,
+    "nullable": true,
+    "description": "Accepted by `createTenant` and `updateTenant`; stored here so the response can return what was sent."
+   },
+   "accountManagerPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "activatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "TenantStatus": {
+  "type": "string",
+  "enum": [
+   "onboarding",
+   "active",
+   "suspended",
+   "terminating",
+   "terminated"
+  ]
+ },
+ "TrialConfiguration": {
+  "type": "object",
+  "x-ticvai-persistence": "subscription.trial_config",
+  "description": "Board 5.5. **A trial that expires with no conversion path is a tenant full of real data nobody can bill.**\n",
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "tierCode": {
+    "type": "string",
+    "nullable": true
+   },
+   "durationDays": {
+    "type": "integer",
+    "default": 30
+   },
+   "includedModules": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "usageCaps": {
+    "type": "object",
+    "additionalProperties": {
+     "type": "integer"
+    }
+   },
+   "paymentMethodRequiredUpFront": {
+    "type": "boolean",
+    "default": false
+   },
+   "conversionOfferPercent": {
+    "type": "number",
+    "nullable": true
+   },
+   "noticeDaysBeforeExpiry": {
+    "type": "array",
+    "items": {
+     "type": "integer"
+    }
+   },
+   "onExpiry": {
+    "type": "string",
+    "enum": [
+     "suspend",
+     "convert",
+     "decommission"
+    ],
+    "default": "suspend",
+    "description": "**Suspension is the humane default.** Customers routinely let a trial lapse and come back a week later.\n"
+   },
+   "retainDataDays": {
+    "type": "integer",
+    "default": 90
+   }
+  }
  }
 }

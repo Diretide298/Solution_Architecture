@@ -423,15 +423,6 @@
    "burst"
   ]
  },
- "CellTier": {
-  "type": "string",
-  "enum": [
-   "shared",
-   "dedicated",
-   "isolated",
-   "clientHosted"
-  ]
- },
  "Page": {
   "type": "object",
   "required": [

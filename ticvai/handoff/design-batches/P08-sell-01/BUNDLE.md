@@ -1,6 +1,6 @@
 # P08-sell-01 — P08 · Sell (1 of 4)
 
-**10 screens · 87 operations · 99 schemas · 9 permissions**
+**10 screens · 93 operations · 106 schemas · 13 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -48,8 +48,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 9 permissions apply here:
-  `CAPACITY_CONFIGURE, EVENT_CONFIGURE, PERFORMANCE_CONFIGURE, PRICE_CONFIGURE, PRICE_VIEW, PRODUCT_CONFIGURE, PRODUCT_VIEW, REPORT_VIEW_VENUE, TENANT_CONFIGURE`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 13 permissions apply here:
+  `ASSET_LIBRARY_VIEW, CAPACITY_CONFIGURE, EVENT_CONFIGURE, GUEST_VIEW, PARTNER_MANAGE, PARTNER_VIEW, PERFORMANCE_CONFIGURE, PRICE_CONFIGURE, PRICE_VIEW, PRODUCT_CONFIGURE, PRODUCT_VIEW, REPORT_VIEW_VENUE`…. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -61,22 +61,61 @@ convincingly. It is never a caption.
   and its error; and, element by element, what is shown and in what format, what each action
   produces and where the user goes next. Draw exactly that.
 
+## The processes these screens belong to
+
+Written by the owner of each process (`handoff/design-notes/`). Read before any screen: it says how the process runs end to end and which words the screens must use.
+
+### Ticketing & Guest Commerce, as the venue and TICVAI configure and run it
+
+WHAT THE PROCESS IS. Everything a guest can buy is set up, priced, promoted and serviced here, on Venue Management (P08, the venue's own back office, served inside the venue's cell) and on the TICVAI Console (P09, TICVAI's control plane, outside every cell). End to end: (1) CATALOGUE. A product has one of twelve kinds (admission, timedAdmission, datedAdmission, openDated, seated, membership, bundle, fnb, retail, rental, addOn, giftCard). Its ticket types (adult, child, senior, resident...) are not typed one by one: they are generated from the product's attributes (components) and each value combination becomes a sellable ticket type with no extra setup (DI-164). What a ticket grants (validity, entries, re-entry, days of week, blackout dates, expiry anchor, fast track, transfer) lives on a reusable entitlement template, not on the product. Who may take part (age, height, supervision, certification) is the eligibility rule; what the guest must answer is the data mask and the consent questions; how the guest sees it is guestListing (bookable, infoOnly, hidden), display tags (at most six), media and the booking flow. Group, family and corporate products and every after-sales policy (reschedule, exchange, refund, cancellation, upgrade, transfer) are configured inside the one product configuration, never on separate screens (DI-465, DI-466). (2) LIFECYCLE AND PUBLICATION. A product moves draft, inReview, approved, live, withdrawn, archived. Approval and publication are two acts with two permissions (PRODUCT_APPROVE, PRODUCT_PUBLISH, R091); every product is authorised before it sells online or on site (DI-438). Approved is still not on a till: a till sells only what is in the signed catalogue release it pulled (publishBundle, ADR-0013), so a saved price is a back-office fact until the venue publishes to tills. Changing something that has sold is preceded by an impact check (assessProductChange: orders affected, entitlements issued, future performances, open carts); restoring a version creates a new version, and sold tickets keep the price and terms they were sold under (restoreProductVersion, DI-938, TRACKER Actions row 145). (3) PRICE. Prices live in price lists: per venue, per channel set, with validity dates and a priority, copied for the next season with an uplift (copyPriceList) and repriced in bulk only after a dry run (bulkChangePrices). Currency and decimal scale are never chosen on a form: they resolve from the venue's region (ADR-0008, ADR-0018; AED 2 places, OMR and BHD 3). When several rules apply, the configured hierarchy decides; there is no "lowest price wins" default (DI-595). Tax on the pre-discount price and three-decimal rounding are regional settings (DI-598). Dynamic rules always show their minimum and maximum price guardrails beside the trigger (getDynamicPriceRule). (4) PROMOTE AND BUNDLE. A promotion is a rule (automatic, or gated by a code) created in draft, made live only by Publish, which first analyses stacking; a …
+*(source: DI-164; DI-171; DI-438; DI-465; DI-466; DI-595; DI-598; DI-387; DI-039; DI-044; DI-474; DI-671; DI-987; DI-019; DI-080; ADR-0008; ADR-0013; ADR-0018; ADR-0019; ADR-0030; R091; R098; R101; R222; REV3-21; contracts/spine/catalogue.yaml#transitionProductLifecycle …)*
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Product | Anything sellable, of one of the twelve kinds. The record that carries names, channels, listing, media and policies. | Item (except on F&B and retail screens), SKU (for tickets), Offering | contracts/spine/catalogue.yaml#/components/schemas/ProductKind |
+| Ticket type | One sellable variant of an admission or event product (Adult, Child, Resident Adult), generated from the product's attributes. For retail and F&B the same record is labelled Variant. | Variant (on ticket screens), Sub-product, Rate (that is a price), Axis value | contracts/spine/catalogue.yaml#updateProductVariant / DI-164 / DI-437 |
+| Attribute | A dimension that generates ticket types (Guest category, Residency, Tier, Length). Each has values; adding a value adds ticket types. | Axis, Component (the client's word; use it only in help text), Option | contracts/spine/catalogue.yaml#setProductAttributes / DI-164 / DI-450 |
+| Entitlement | What a ticket lets the holder do (validity, entries, re-entry, days, blackout dates, expiry, fast track, transfer), defined once on an entitlement template and shared by several products. | Access rights, Ticket rules, Validity profile | contracts/spine/catalogue.yaml#createEntitlementTemplate / DI-171 / DI-451 |
+| Eligibility rule | Who may take part in or buy a product (age, height, supervision, waiver, certification). Distinct from a promotion's eligibility, which decides who gets a discount. | Restriction, Access rule (that is access control) | contracts/spine/catalogue.yaml#setProductEligibilityRule / DI-463 |
+| Price list | A set of prices for one venue and a set of channels, valid between two dates, with a priority. Several coexist (B2C, B2B, season). | Price book, Rate card, Tariff | contracts/spine/catalogue.yaml#createPriceList / DI-140 / DI-163 |
+| Price category | A standard rate type (Adult, Child, Member) reused across lists so venues do not invent "Adult Standard" and "Normal Adult". | Price band (that is a seat-category band), Fare type (transport) | contracts/spine/catalogue.yaml#setPriceCategoryRateType / … |
+| Price band | A priced band on a seat category (code, label, colour, amount, channel, from-date). | Price category, Zone price | contracts/satellite/seating.yaml#/components/schemas/SeatPriceBand |
+| Promotion | A rule that changes a price automatically or when a code is entered; draft until published; declares how it stacks. | Offer (except in guest copy), Deal, Discount rule | contracts/satellite/promotions.yaml#createPromotion / DI-173 / DI-174 |
+| Coupon code | A code issued from a coupon campaign that applies a promotion-style discount; one shared code or many single-use codes. | Voucher, Promo voucher | contracts/satellite/promotions.yaml#createCouponCampaign / DI-173 |
+| Voucher | A code that carries money (face value, balance), sold or issued; a liability until redeemed or expired. | Coupon, Credit note | contracts/satellite/promotions.yaml#listVoucherBatches / … |
+| Bundle | A product sold as one line whose price differs from the sum of its components, with a mandatory revenue allocation. "Package" is acceptable in guest copy. | Combo (that is an F&B meal deal), Catalogue bundle | contracts/satellite/promotions.yaml#createBundle / DI-220 / ADR-0019 |
+| Catalogue release | The signed snapshot of a venue's catalogue, prices, promotions and sale boards that tills, kiosks and devices pull. Its action label is "Publish to tills". | Bundle, Catalogue bundle, Sync, Deploy | contracts/spine/catalogue.yaml#publishBundle / … |
+| Approve / Publish / Save | Save keeps a draft; Approve records that it is authorised (PRODUCT_APPROVE); Publish makes it live for guests and channels (PRODUCT_PUBLISH). Three different buttons, never merged. | Submit, Go live, Activate (except CatalogueConfigStatus active), Deploy | R091 / contracts/spine/catalogue.yaml#transitionProductLifecycle / DI-438 |
+| Product states | Draft, In review, Approved, Live, Withdrawn, Archived (ProductLifecycleState), always as coloured badges with these exact labels. | Published (for a product), Pending, Inactive (for a product) | contracts/spine/catalogue.yaml#/components/schemas/ProductLifecycleState |
+| Channel | Where something is sold. Labels: pos Point of sale; kiosk Kiosk; web and guestWeb Website; mobile and guestApp App; b2b B2B partners; partner Partner; ota Travel agents (OTA); callCentre Call centre; api API; backOffice Back office. | Touchpoint, Outlet (an outlet is a business inside a venue), raw enum values | contracts/spine/catalogue.yaml#/components/schemas/Channel / … |
+| Refund | Money returned after settlement, wholly or for some lines, under the venue's refund policy. | Return (that is retail goods), Reversal, Void | contracts/spine/orders.yaml#createRefund / DI-252 |
+| Void | Cancelling a whole order before settlement, within the same shift, with a reason from the void list. After settlement it is a refund. | Cancel order, Delete | contracts/spine/orders.yaml#voidOrder / R222 |
+| Exchange / Reschedule | Exchange swaps lines for other products or dates and settles only the difference; Reschedule is the same product moved to another date or time. | Rebook, Date change (acceptable only in guest copy), Refund and resell | contracts/spine/orders.yaml#exchangeOrderLines / … |
+| Hold / Capture / Release | A deposit or stored-value amount is held, then partly or fully captured, and the rest released. A held deposit is not a payment. | Charge, Pre-auth (in staff copy), Block funds | contracts/spine/orders.yaml#authoriseStoredValue / … |
+| Wallet (TICVAI wallet) | The guest's stored-value balance on TICVAI, spent by hold and capture. Distinct from the tender "Apple Pay / Google Pay", which the contract also calls wallet. | Digital wallet (for stored value), E-wallet, Credit (without a type) | contracts/spine/orders.yaml#/components/schemas/TenderKind / R080 |
+| Credit lot | One amount of wallet credit of one credit type (cash, bonus, gift) with its own expiry; lots are spent nearest expiry first and the guest sees the breakdown but cannot choose. | Bucket, Batch, Top-up | TRACKER Actions row 171 / contracts/satellite/wallet.yaml#expireCreditLots |
+| Venue map / Seat map | A venue map is the wayfinding map of a park or a floor (points, paths, bookable places); a seat map is the seating layout of an auditorium or stand. Never just "map" where both could be meant. | Layout (alone), Floor plan (unless it is a floor map), Map (alone) | contracts/satellite/venue-map.yaml#createVenueMap / … |
+| Point / Bookable place | A point is a place on a venue map (toilet, ride, restaurant, exit). A bookable place is a cabana, lounger, table or pitch placed on the map and sold through its price band. | Pin, POI, Marker, Resource (in staff copy) | contracts/satellite/venue-map.yaml#setVenuePoint / … |
+| Station / Route / Timetable / Departure / Fare table / Pass … | A route is an ordered list of stations with offsets; a timetable generates departures up to its release horizon; a fare table prices a route per passenger type; a pass type is a multi-trip or unlimited pass sold as a product. | Stop (except in the stop list), Line (except lineCode), Schedule, Trip (except a guest's journey) | contracts/satellite/transport.yaml / REV3-21 |
+| Applies from | The effective date of a change. Every dated change shows it, and sold items keep their old terms. | Effective date (in labels), Start date (for a change) | contracts/satellite/seating.yaml#updateSeatCategory / TRACKER Actions row 194 |
+
+
 ## The screens
 
 Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs count fields; requirements are matrix rows; meeting inputs are the ones naming the screen (the module and platform ones are below); white label says whether the tenant's brand reaches it (guest) or it sets the brand (configures).
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-007` | Product Directory | A | 86 | 62 | 6 | 75 | 3 | 0 | — | notStarted (generated) |
-| `BO-009` | Pricing Rules | A | 23 | 25 | 6 | 19 | 3 | 0 | — | notStarted (generated) |
+| `BO-007` | Product Directory | A | 97 | 62 | 6 | 75 | 3 | 0 | — | notStarted (generated) |
+| `BO-008` | Product Detail & Variants | A | 41 | 44 | 6 | 37 | 22 | 3 | — | notStarted (generated) |
+| `BO-009` | Pricing Rules | A | 57 | 25 | 6 | 19 | 3 | 0 | — | notStarted (generated) |
 | `BO-010` | Promotions & Coupons | A | 165 | 70 | 6 | 51 | 3 | 2 | — | notStarted (generated) |
-| `BO-011` | Packages & Bundles | A | 75 | 47 | 6 | 12 | 4 | 0 | — | notStarted (generated) |
+| `BO-011` | Packages & Bundles | A | 69 | 47 | 6 | 11 | 4 | 0 | — | notStarted (generated) |
 | `BO-012` | Membership Products | A | 115 | 53 | 6 | 112 | 0 | 0 | — | notStarted (generated) |
-| `BO-013` | Channel & Distribution | B–D | 27 | 54 | 6 | 34 | 2 | 0 | — | notStarted (generated) |
-| `BO-014` | Catalogue Publishing | B–D | 78 | 46 | 6 | 71 | 0 | 6 | — | notStarted (generated) |
+| `BO-013` | Channel & Distribution | B–D | 40 | 54 | 6 | 34 | 2 | 0 | — | notStarted (generated) |
+| `BO-014` | Catalogue Publishing | B–D | 8 | 33 | 6 | 30 | 0 | 6 | — | notStarted (generated) |
 | `BO-015` | Performance Calendar | B–D | 39 | 58 | 6 | 38 | 5 | 0 | — | notStarted (generated) |
 | `BO-016` | Performance Template | B–D | 19 | 15 | 6 | 0 | 5 | 0 | — | notStarted (generated) |
-| `BO-017` | Capacity Management | B–D | 24 | 30 | 6 | 14 | 7 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 
@@ -106,21 +145,33 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 **What the spec says about it.** Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. **Improved 20 August against the client design board.** Answers 5 board screen(s): Menu & Product Command Center; Product / PLU Master; Variants, Modifiers & Special Selling Rules and 2 more. **The board specifies this screen further rather than replacing it** — the id, its flows and its navigation are unchanged, which is what keeps 3,184 traceability rows and every board anchor pointing at something real. **Retail board operations wired 24 August.**
 
+**Known gaps.** Contract gap recorded 2 October 2026 (CHG-WIR-027): A catalogue-contract bulk product write: bulkUpdateProducts lives in the inventory contract while every other product write is catalogue's.
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** The venue's catalogue: every sellable product of every kind in one list, the entry point to product configuration (BO-008), pricing (BO-009), promotions (BO-010) and menus (BO-045). It must answer at a glance "what can we sell, where is each thing in its approval, and is it on sale on which channels", and it is where a new product starts. The one thing to get right is that lifecycle state, channels and "on tills" are three different facts and each needs its own column.
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- bulkUpdateProducts, a catalogue act on products, is declared in the inventory contract. (CHG-WIR-027)
+- List operation(s) listAlternativeCodes return a bare array, not the paged list envelope (items, nextCursor, hasMore). (CHG-SBO-005)
+
+**Fixed on main** (the package already carries these; draw what it says): The generated layout draws "Venue id" and "Kind" as text fields and "Is sellable" as a toggle. (CHG-SBO-010).
+
 #### Inputs: what the user enters or picks
 
 **On the screen**
 
 | Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
 |---|---|---|---|---|---|---|---|
-| Venue id | picker: choose a venue (drawn as a picker, not a text box) | optional | — | — | shows names, sends the id | Sends `?venueId=` to `listProducts`. | `listProducts` ?venueId |
-| Kind | select | optional | — | Admission · Timed admission · Dated admission · Open dated · Seated · Membership · Bundle · Fnb · Retail · Rental · Add on · Gift card | — | Sends `?kind=` to `listProducts`. | `listProducts` ?kind |
-| Is sellable | toggle | optional | — | — | — | Sends `?isSellable=` to `listProducts`. | `listProducts` ?isSellable |
+| Kind | select | optional | — | Admission · Timed admission · Dated admission · Open dated · Seated · Membership · Bundle · Fnb · Retail · Rental · Add on · Gift card | — | Product kinds in words, a closed list; the venue is the session scope (PR-1). | `Product.kind` |
+| Sellable | select field | — | — | — | — | Any, sellable or not sellable: a toggle cannot say "either". | — |
 | Booking flow | picker: choose a booking flow | optional | — | — | shows names, sends the id | The venue's booking flows from CMS-103 (`white-label.listBookingFlows`). Empty means the category's flow, then the venue's flow for the product kind (W8, W12). Saved with `createProduct` or … | `Product.bookingFlowId` |
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
 
 | Filter | Drawn as | Default | Allowed values, rules | Source |
 |---|---|---|---|---|
+| Kind | select | — | Admission · Timed admission · Dated admission · Open dated · Seated · Membership · Bundle · Fnb · Retail · Rental · Add on · Gift card | `listProducts` ?kind |
+| Is sellable | toggle | — | — | `listProducts` ?isSellable |
 | Category | picker: choose a category | — | — | `listProducts` ?categoryId |
 | Segment tag | text field | — | max length 120 | `listProducts` ?segmentTag |
 | Guided answers | multi-picker: choose guided answers | — | at most 10 | `listProducts` ?guidedAnswerIds |
@@ -264,15 +315,35 @@ Errors to draw in the form: 400 `media` with no `isPrimary` item or more than on
 
 Errors to draw in the form: 400 Validation failed; 409 Barcode already in use in this venue. `refusedReason` is `barcodeInUse`. (MerchandiseConflictProblem)
 
-**Form: Bulk update products** (modal, opened by *Bulk update products*; *Bulk update products* calls `bulkUpdateProducts`, *Cancel* sends nothing)
+**Form: Bulk update products** (modal, opened by *Bulk update products*; *Bulk update products* calls `bulkUpdateCatalogueProducts`, *Cancel* sends nothing)
 
-**Collects what `bulkUpdateProducts` sends before it is called.** Required: `selector`, `changes`. Optional: `previewOnly`. Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `bulkUpdateCatalogueProducts` sends before it is called.** Required: `selection`, `changes`. Optional: `previewOnly`. Dismissing sends nothing; the screen behind is unchanged.
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
-| Preview only `previewOnly` | toggle | optional | on | — | — | — | `bulkUpdateProducts` body |
-| Selector `selector` | key and value settings | required | — | — | — | — | `bulkUpdateProducts` body |
-| Changes `changes` | key and value settings | required | — | — | — | — | `bulkUpdateProducts` body |
+| Preview only `previewOnly` | toggle | optional | on | — | — | — | `bulkUpdateCatalogueProducts` body |
+| Selection `selection` | group | required | — | — | — | At least one of these; they narrow together. | `bulkUpdateCatalogueProducts` body |
+| Category `selection.categoryId` | picker: choose a category | optional | — | — | shows names, sends the id | — | `bulkUpdateCatalogueProducts` body |
+| Product kind `selection.productKind` | select | optional | — | Admission · Timed admission · Dated admission · Open dated · Seated · Membership · Bundle · Fnb · Retail · Rental · Add on · Gift card | — | `openDated` added 24 August from the client's *Create Ticket Flow* board, which names six main ticket types and this was the one with no kind: valid on any date within an eligible … | `bulkUpdateCatalogueProducts` body |
+| Lifecycle state `selection.lifecycleState` | select | optional | — | Draft · In review · Approved · Live · Withdrawn · Archived | — | — | `bulkUpdateCatalogueProducts` body |
+| Products `selection.productIds` | multi-picker: choose products | optional | — | at most 500 | — | — | `bulkUpdateCatalogueProducts` body |
+| Changes `changes` | group | required | — | — | — | The fields to set on every matched product; a field left out is untouched. | `bulkUpdateCatalogueProducts` body |
+| Category `changes.categoryId` | picker: choose a category | optional | — | — | shows names, sends the id | — | `bulkUpdateCatalogueProducts` body |
+| Responsible department `changes.responsibleDepartmentId` | picker: choose a responsible department | optional | — | — | shows names, sends the id | — | `bulkUpdateCatalogueProducts` body |
+| On sale from `changes.onSaleFrom` | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `bulkUpdateCatalogueProducts` body |
+| On sale to `changes.onSaleTo` | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | Retires the matched products automatically at that time (retiring a season). | `bulkUpdateCatalogueProducts` body |
+| Channels `changes.channels` | multi-select chips | optional | — | POS · Kiosk · Web · Mobile · B2B · Ota · Call centre | — | Replaces the products' channels. | `bulkUpdateCatalogueProducts` body |
+| Add segment tags `changes.addSegmentTags` | list of values (chips) | optional | — | — | — | — | `bulkUpdateCatalogueProducts` body |
+| Remove segment tags `changes.removeSegmentTags` | list of values (chips) | optional | — | — | — | — | `bulkUpdateCatalogueProducts` body |
+| Tax code `changes.taxCodeId` | picker: choose a tax code | optional | — | Set on every price of the matched products; needs `PRICE_CONFIGURE` as well. | shows names, sends the id | Set on every price of the matched products; needs `PRICE_CONFIGURE` as well. | `bulkUpdateCatalogueProducts` body |
+
+Errors to draw in the form: 400 The selection names nothing (`empty-selection`), or `changes` sets nothing.; 403 `changes` sets `taxCodeId` and the caller lacks `PRICE_CONFIGURE` (`price-permission-required`).
+
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **filters**: Kind is a select of the twelve product kinds with plain labels (Admission, Timed admission, Dated admission, Open-dated, Seated, Membership, Bundle, Food & beverage, Retail, Rental, Add-on, Gift card); "Sellable" is a three-way filter (All, Sellable, Not sellable); add Lifecycle state and Channel filters. Venue comes from the shell (PR-1). *(source: contracts/spine/catalogue.yaml#/components/schemas/ProductKind / contracts/spine/catalogue.yaml#listProducts / DI-438)*
+- **createProduct.code**: Upper-case code, letters, digits, hyphen and underscore, at most 64; unique across the whole tenant, not just this venue, so the inline check says "used by Coastal Aqua" when another venue has it. Suggest it from the name (DUNE-DAYPASS) but let the user edit. *(source: contracts/spine/catalogue.yaml#createProduct / R108)*
+- **createProduct path**: "New product" offers the four creation paths the client asked for: start from scratch, from a saved template, clone an existing product, import a file (BO-117), plus "Describe it to the assistant" (BO-117). Kind is chosen first because it decides which sections the configuration shows. *(source: DI-439 / DI-440 / TRACKER Actions row 124)*
 
 #### Outputs: what the screen shows and produces
 
@@ -381,7 +452,17 @@ Errors to draw in the form: 400 Validation failed; 409 Barcode already in use in
 | Transition product lifecycle (secondary button) | `transitionProductLifecycle` POST `/products/{productId}/lifecycle` | inline | Product | 403 Approval attempted by the principal who submitted it (`approver-is-submitter`). Segregation applies here as it does to journals.; 409 Transition not valid from the current state, or archiving attempted while … | opens modal first |
 | Save product (secondary button) | `updateProduct` PATCH `/products/{productId}` | UpdateProductRequest | Product | 400 `media` with no `isPrimary` item or more than one, or one asset twice.; 403 Authenticated but not permitted at the requested scope; 404 The resource does not exist, or is outside the caller's scope. This includes a … | opens modal first |
 | Create merchandise (secondary button) | `createMerchandise` POST `/merchandise` | CreateMerchandiseRequest | MerchandiseItem | 400 Validation failed; 409 Barcode already in use in this venue. `refusedReason` is `barcodeInUse`. (MerchandiseConflictProblem) | opens modal first |
-| Bulk update products (secondary button) | `bulkUpdateProducts` POST `/products/bulk` | inline | inline | — | opens modal first |
+| Bulk update products (secondary button) | `bulkUpdateCatalogueProducts` POST `/products/bulk-update` | inline | BulkProductUpdateResult | 400 The selection names nothing (`empty-selection`), or `changes` sets nothing.; 403 `changes` sets `taxCodeId` and the caller lacks `PRICE_CONFIGURE` (`price-permission-required`). | opens modal first |
+
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **product table**: Columns in this order: name (English, with the Arabic underneath in RTL), code, kind, lifecycle state badge, channels as small chips, on sale from-to, ticket types count, last changed. Hide the ids, scopePath and principal ids the generated layout lists; they are not for a merchandiser. *(source: contracts/spine/catalogue.yaml#/components/schemas/Product / DI-039 / screens/P08-venue-back-office.yaml#BO-007)*
+- **lifecycle summary strip**: Above the table, counts by state (Draft, In review, Approved, Live, Withdrawn) that act as filters, as the client asked for a lifecycle dashboard filterable by department. *(source: DI-438 / DI-577)*
+
+**What each action does** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **Bulk update**: Select rows (or "all matching the filter"), choose the change, always see the preview count first ("142 products matched, 3 will fail: no price list") and confirm; the result reports succeeded and failed with the reason per failure. *(source: contracts/satellite/inventory.yaml#bulkUpdateProducts)*
+- **Transition (approve, publish, withdraw, archive)**: The picker offers only transitions the user holds (approve needs PRODUCT_APPROVE, publish PRODUCT_PUBLISH); a reason is required; an approved product still shows "Not yet on tills" until the next catalogue release (PR-3). *(source: R091 / contracts/spine/catalogue.yaml#transitionProductLifecycle)*
 
 **Data it reads**: `listProducts` (onLoad, List products); `listMenus` (onLoad, List menus); `listMerchandise` (onLoad, List merchandise)
 
@@ -403,7 +484,62 @@ Errors to draw in the form: 400 Validation failed; 409 Barcode already in use in
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on venueId, kind, isSellable and the product are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 400 A `categoryId` that names no category of the venue, or a `guidedAnswerIds` entry that is not an answer of the venue's published guided choice (W4, 29 …; 400 A `variantId` is not a variant of this product, or the body sends one code twice for the same partner.; 400 Two axes share a code, or one axis repeats a value code.; 400 Validation failed |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 A `categoryId` that names no category of the venue, or a `guidedAnswerIds` entry that is not an answer of the venue's published guided choice (W4, 29 …; 400 A `variantId` is not a variant of this product, or the body sends one code twice for the same partner.; 400 The selection names nothing (`empty-selection`), or `changes` sets nothing.; 400 Two axes share a code, or one axis repeats a … |
+
+#### Edge cases to draw
+
+- **A shared link to a product that has since been retired**: Show the retired product read-only with what replaced it, or the catalogue if nothing did; never a blank page. *(source: screens/P08-venue-back-office.yaml#BO-007 / ADR-0030)*
+- **Code already used at another venue of the tenant**: Refused inline before submit, naming the other venue; the 409 from the server shows the same text. *(source: R108)*
+
+#### Consistency with other screens
+
+- Match `BO-008`: Same product header (name, code, kind, state badge, channels, venue) on the directory's detail pane and on the product configuration (PR-10).
+- Match `BO-045`: F&B and retail products list here too but are configured on the F&B and retail screens (fnb-retail process); the row opens the owning screen.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+products:
+- name: Day Pass
+  nameAr: تذكرة يوم
+  code: DUNE-DAYPASS
+  kind: datedAdmission
+  state: Live
+  channels:
+  - Website
+  - App
+  - Point of sale
+  - Kiosk
+  ticketTypes: 4
+  onSale: 2026-10-01 to 2027-09-30
+- name: Annual Pass Gold
+  nameAr: الاشتراك السنوي الذهبي
+  code: DUNE-ANNUAL-GOLD
+  kind: membership
+  state: In review
+  channels:
+  - Website
+  - App
+  ticketTypes: 2
+- name: Family Fun Bundle
+  nameAr: باقة المرح العائلية
+  code: DUNE-FAMILY-BUNDLE
+  kind: bundle
+  state: Approved
+  channels:
+  - Website
+  ticketTypes: 1
+- name: Cabana B09 half day
+  nameAr: كابانا B09 نصف يوم
+  code: AQUA-CABANA-HALF
+  kind: rental
+  state: Draft
+  channels:
+  - Website
+  - App
+```
 
 #### Permissions
 
@@ -421,7 +557,7 @@ Errors to draw in the form: 400 Validation failed; 409 Barcode already in use in
 - `createMerchandise` → `PRODUCT_CONFIGURE` (configure) · staff
 - `listMenus` → `PRODUCT_VIEW` (read) · staff
 - `listMerchandise` → `PRODUCT_VIEW` (read) · staff, guest
-- `bulkUpdateProducts` → `PRODUCT_CONFIGURE` (configure) · staff
+- `bulkUpdateCatalogueProducts` → `PRODUCT_CONFIGURE` (configure) · staff
 
 **A refused user sees:** Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -472,13 +608,404 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (86), with its required mark, default, format and its error state (400, 403, 404, 409, 422).
+- [ ] Every input above is drawn (97), with its required mark, default, format and its error state (400, 403, 404, 409, 422).
 - [ ] Every output is drawn (62 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-007?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Create product, Resolve product by code, Save alternative codes, Save product attributes, Transition product lifecycle, Save product, Create merchandise, Bulk update products.
 - [ ] Every transition is wired: `BO-112`, `BO-008`, `BO-009`, `BO-010`, `BO-045`.
 - [ ] Every gated control is gated: `PRODUCT_CONFIGURE`, `PRODUCT_VIEW`, `TENANT_CONFIGURE`.
 - [ ] The 3 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 2 edge case(s) from the process notes are drawn.
+- [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
+
+---
+
+### `BO-008` Product Detail & Variants
+
+**Define what is sold and the ticket types under it.**
+
+| | |
+|---|---|
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
+| Module | Sell · wave 1 · needs the `ticketing` module |
+| Block | Block A · ticket #20668 (APP-SETUP-BO-008) |
+| Who uses it | venue staff holding `ASSET_LIBRARY_VIEW`, `GUEST_VIEW`, `PRODUCT_CONFIGURE`, `PRODUCT_VIEW`, `TENANT_CONFIGURE` (3 read, 2 configure); in the flows as partner, supervisor, venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Pattern | listDetail (compact density): `listProductVariants` reads the population and `getProduct` reads one of them — list, select, act |
+| Offline | online only |
+| Opens with | `venueId` (session), `productId` (deepLink), `variantId` (navigation), `version` (navigation) · cold entry: A product opened from the directory or a shared link. Shows what replaced it where it retired. |
+| Route | `/venue-operations/product-detail-variants` |
+
+**What the spec says about it.** Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. **Carried `runFxRevaluation`, `getForeignTenderReport` and `listInterEntityObligations` until 20 August** — a product screen doing foreign-exchange revaluation. Operations were attached from the 14 August wireframe board by a heuristic that matched nothing. **Rewired 20 August.**
+
+**Known gaps.** Contract gap recorded 2 October 2026 (CHG-WIR-027): An operation that renders the PDF ticket and Wallet pass preview of a product (printTicketProof works on a template, not a product).
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** The one product configuration the client asked for (DI-465, DI-466): identity and classification, ticket types, what the guest sees, entitlement, eligibility, policies, channels and versions of one product, organised as sections of one record rather than separate screens. The flow the client described is basic information, ticket types, validation, publish (DI-432). The one thing to get right: a product that has sold must show what a change would affect before it is saved (PR-5).
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- No operation renders the PDF ticket or Wallet pass preview for a product; printTicketProof works on a template, not on a product. (CHG-WIR-027)
+- List operation(s) listProductVersions return a bare array, not the paged list envelope (items, nextCursor, hasMore). (CHG-SBO-005)
+
+**Fixed on main** (the package already carries these; draw what it says): The screen's module is "Orders & Money" while it is the product configuration. (CHG-SBO-003).
+
+#### Decided on this screen
+
+Answered questions: draw the decision, not the old default. Where a decision and the tables below differ, the decision wins.
+
+- **Which sections are visible for each product kind (for example no attributes on a gift card, no entitlement on retail)?** → Drawn default accepted: Show identity, guest view, channels and versions for every kind; ticket types, entitlement, eligibility and policies for admission, timed, dated, open-dated, seated, membership and rental. *(decided by Chinmay, 2026-10-02; DEC-102 / CHG-NOTE-006)*
+
+#### Inputs: what the user enters or picks
+
+**On the screen**
+
+| Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
+|---|---|---|---|---|---|---|---|
+| Photos and videos | repeatable rows | optional | — | at most 20 | — | Picks from the asset library (`searchMedia`); one item is marked primary. Saved with `updateProduct`, which registers the use of each asset (decided 29 September, rev 3 23SEP-4). | `Product.media` |
+| Consent questions this product asks | multi-picker: choose consent questions | optional | — | at most 10; no duplicates | — | Active questions from `listConsentQuestions`, written on CMS-018; ordered as the guest meets them. The guest is asked these together with the booking flow's own, each once (decided 29 September, rev … | `Product.consentQuestionIds` |
+| Booking flow | picker: choose a booking flow | optional | — | — | shows names, sends the id | **Which booking flow sells this product** (decided 29 September, W8 and W12): a flow from CMS-103, e.g. *workshop: product first, then date and time*. Empty means the category's flow, then the … | `Product.bookingFlowId` |
+| Sales phone | phone field | optional | — | max length 32 | +971 5X XXX XXXX (E.164) | **Contact sales to book** (decided 29 September, W3). Shown beside `guestListing`; used only when the product is info only, as *Call sales* on WEB-004 and GST-004. Empty phone and email means the … | `Product.salesContact.phone` |
+| Sales email | email field | optional | — | max length 254 | name@example.ae | — | `Product.salesContact.email` |
+| Note under the contact | text, one per language | optional | — | At most 200 characters per language. | English and Arabic (Arabic right to left) | At most 200 characters per language, e.g. *Group courses are booked by phone*. | `Product.salesContact.note` |
+
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Locale | text field | — | — | `previewProductTickets` ?locale |
+
+**Form: Save product attributes** (modal, opened by *Save product attributes*; *Save product attributes* calls `setProductAttributes`, *Cancel* sends nothing)
+
+**Collects what `setProductAttributes` sends before it is called.** Required: `axes`. **A meeting-room type sells by length**: a `length` axis whose values each carry `durationMinutes` (e.g. 60, 120, 240, 480; minimum 15), one such axis per product, on a product with `requiresTimeWindow` on; each length is a variant priced on its own (decided 29 September, rev 3 REV3-13). Dismissing sends nothing; the screen behind is unchanged.
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Axes `axes` | repeatable rows | required | — | — | — | — | `setProductAttributes` body |
+| Code `axes[].code` | text field | required | — | max length 64 | — | — | `setProductAttributes` body |
+| Name `axes[].name` | text field | required | — | max length 200 | — | — | `setProductAttributes` body |
+| Values `axes[].values` | repeatable rows | required | — | at least 1 | — | — | `setProductAttributes` body |
+| Code `axes[].values[].code` | text field | required | — | max length 64 | — | — | `setProductAttributes` body |
+| Label `axes[].values[].label` | text field | required | — | max length 200 | — | — | `setProductAttributes` body |
+| Price delta `axes[].values[].priceDelta` | money field | optional | — | A jsonb price cannot be summed in SQL. | AED, 2 decimals shown (up to 4 accepted), currency from the … | On the wire this is three fields; in the database it is one column. 24 August. | `setProductAttributes` body |
+| Duration minutes `axes[].values[].durationMinutes` | number field (minutes) | optional | — | min 15; max 1440; One axis per product at most may carry it; a second is a `400`. | — | How long a variant carrying this value books its space for, on a `length` axis of a product with `requiresTimeWindow` (decided 29 September, rev 3 REV3-13). | `setProductAttributes` body |
+
+Errors to draw in the form: 400 Two axes share a code, or one axis repeats a value code.; 403 Authenticated but not permitted at the requested scope; 409 Regeneration would exceed the variant ceiling for this product: `VenueSettings.catalogue.maxVariantsPerProduct`, a venue setting with a tenant default (decided …
+
+**Form: Save product** (modal, opened by *Save product*; *Save product* calls `updateProduct`, *Cancel* sends nothing)
+
+**Collects what `updateProduct` sends before it is called.** Nothing in the body is required. Optional: `name`, `description`, `channels`, `dataMaskValues`, and what the guest sees (decided 29 September, rev 3): `guestListing` and `notBookableLabel` (REV3-14), `displayTags` (at most six, 23SEP-3), `media` (23SEP-4), `consentQuestionIds` (REV3-26) and `requiresTimeWindow` (REV3-13); `salesContact` (W3) and `bookingFlowId` (W8, W12), decided 29 September. Dismissing sends nothing; the screen behind is unchanged.
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Family key `familyKey` | text field | optional | — | max length 64; pattern `^[A-Za-z0-9_-]+$`; At most one product per venue in a family, else `409 duplicate-code`. | — | The product family across the tenant's venues (decided 29 September, rev 3 REV3-18); see `Product.familyKey`. | `updateProduct` body |
+| Name `name` | text field | optional | — | max length 200 | — | — | `updateProduct` body |
+| Description `description` | text area | optional | — | — | — | — | `updateProduct` body |
+| Channels `channels` | multi-select chips | optional | — | POS · Kiosk · Web · Mobile · B2B · Ota · Call centre | — | — | `updateProduct` body |
+| Data mask values `dataMaskValues` | key and value settings | optional | — | — | — | — | `updateProduct` body |
+| Guest listing `guestListing` | segmented control | optional | Bookable | Bookable · Info only · Hidden; `hidden`: never listed or searched for a guest, and reachable only where a staff channel sells it. | — | How a product appears to a guest (decided 29 September, rev 3 REV3-14). `bookable`: listed and searched while it is on sale, and added to the basket. | `updateProduct` body |
+| Not bookable label `notBookableLabel` | text, one per language | optional | — | — | English and Arabic (Arabic right to left) | — | `updateProduct` body |
+| Sales contact `salesContact` | group | optional | — | — | — | See `Product.salesContact` (W3, 29 September). | `updateProduct` body |
+| Phone `salesContact.phone` | phone field | optional | — | max length 32 | +971 5X XXX XXXX (E.164) | — | `updateProduct` body |
+| Email `salesContact.email` | email field | optional | — | max length 254 | name@example.ae | — | `updateProduct` body |
+| Note `salesContact.note` | text, one per language | optional | — | At most 200 characters per language. | English and Arabic (Arabic right to left) | A line shown under the contact, e.g. *Group courses are booked by phone*. | `updateProduct` body |
+| Booking flow `bookingFlowId` | picker: choose a booking flow | optional | — | — | shows names, sends the id | See `Product.bookingFlowId` (W8, W12, 29 September). | `updateProduct` body |
+| Display tags `displayTags` | repeatable rows | optional | — | at most 6 | — | — | `updateProduct` body |
+| Kind `displayTags[].kind` | radio group | required | — | Clock · Height · Free · Calendar · ID | — | `clock` a duration, `height` a height rule, `free` something included free, `calendar` a validity, `id` a document the guest must bring. | `updateProduct` body |
+| Label `displayTags[].label` | text, one per language | required | — | Each language value at most 40 characters. | English and Arabic (Arabic right to left) | What the guest reads, e.g. *2 Hours*. | `updateProduct` body |
+| Media `media` | repeatable rows | optional | — | at most 20 | — | — | `updateProduct` body |
+| Asset `media[].assetId` | upload, or pick from the media library | required | — | — | PNG or SVG ≤ 2 MB for logos; images ≥ 1600 px; video MP4 | A `MediaAsset` of `assets.yaml`, in status `ready`. | `updateProduct` body |
+| Kind `media[].kind` | segmented control | required | — | Image · Video | — | — | `updateProduct` body |
+| Is primary `media[].isPrimary` | toggle | required | off | — | — | The item *Read more* opens on and a listing shows. Exactly one per product. | `updateProduct` body |
+| Display order `media[].displayOrder` | number field | optional | 100 | — | — | — | `updateProduct` body |
+| Alt text `media[].altText` | text, one per language | optional | — | — | English and Arabic (Arabic right to left) | — | `updateProduct` body |
+| Consent questions `consentQuestionIds` | multi-picker: choose consent questions | optional | — | at most 10; no duplicates | — | — | `updateProduct` body |
+| Requires time window `requiresTimeWindow` | toggle | optional | — | — | — | — | `updateProduct` body |
+
+Errors to draw in the form: 400 `media` with no `isPrimary` item or more than one, or one asset twice.; 403 Authenticated but not permitted at the requested scope; 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 A business code the request names is already used within its uniqueness scope (the scope the property's `x-ticvai-unique` names; decided 28 September, audit …; 422 A `media` asset that is not `ready` or whose kind does not match, a `consentQuestionIds` entry that names no active consent question of the tenant, or …
+
+**Form: Save ticket type** (modal, opened by *Save ticket type*; *Save ticket type* calls `updateProductVariant`, *Cancel* sends nothing)
+
+**Collects what `updateProductVariant` sends before it is called.** Nothing in the body is required. Optional: `name`, `description` (who the ticket type is for and what it includes, at most 300 characters per language, shown behind the (i) when the booking flow has `cardInfo` on; decided 29 September, rev 3 23SEP-6), `barcode`, `isDefault` (setting it clears the default on the product's other variants). Dismissing sends nothing; the screen behind is unchanged.
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Name `name` | text field | optional | — | max length 150 | — | — | `updateProductVariant` body |
+| Description `description` | text, one per language | optional | — | — | English and Arabic (Arabic right to left) | — | `updateProductVariant` body |
+| Barcode `barcode` | text field | optional | — | max length 64 | — | — | `updateProductVariant` body |
+| Is default `isDefault` | toggle | optional | — | — | — | — | `updateProductVariant` body |
+
+Errors to draw in the form: 400 A `description` value longer than 300 characters.; 403 Authenticated but not permitted at the requested scope; 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 The variant is retired (`isActive` false), or is not a variant of this product.
+
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **attributes (setProductAttributes)**: An attribute editor (Guest category: Adult, Child, Senior; Residency: Resident, Non-resident) that previews the ticket types it will generate before saving ("6 ticket types: 2 new, 1 retired"). Retired ticket types are never deleted because orders point at them. A time-window product sells by length: a Length attribute whose values carry minutes (60, 120, 240, 480; minimum 15), one per product. *(source: contracts/spine/catalogue.yaml#setProductAttributes / REV3-13 / DI-164 / DI-450)*
+- **ticket type description**: At most 300 characters per language; it is the text behind the (i) on the guest's ticket-type row when the booking flow shows card info. Setting "default" on one clears it on the others, so it is a radio across the ticket-type list, not a checkbox per row. *(source: contracts/spine/catalogue.yaml#updateProductVariant)*
+- **guestListing and notBookableLabel**: Three options with their consequence written under each: Bookable (listed and added to the basket), Information only (listed with details and the not-bookable label, never added to a basket), Hidden (staff channels only). The not-bookable label and the sales contact (phone or email, at least one) appear only for Information only. *(source: contracts/spine/catalogue.yaml#/components/schemas/GuestListing / REV3-14)*
+- **displayTags**: At most six tags; each picks an icon kind (clock, height, free, calendar, id) and a label of at most 40 characters per language. *(source: contracts/spine/catalogue.yaml#/components/schemas/ProductDisplayTag)*
+- **media**: Picked from the asset library (ready assets only), exactly one primary, drag to order; alt text per language. *(source: contracts/spine/catalogue.yaml#/components/schemas/ProductMedia)*
+- **consentQuestionIds and dataMaskValues**: Consent questions are chosen from the venue's list (Are you able to swim?) and are not free text here; the data mask is the venue's custom fields (text, dropdown, radio, yes/no) with per-language labels and validation. Both decide what the guest is asked at booking. *(source: contracts/satellite/marketing-crm.yaml#listConsentQuestions / REV3-26 / DI-155 / DI-434)*
+- **bookingFlowId**: Optional; empty means the category's flow, then the venue's flow for this kind. Show which flow will actually apply. *(source: contracts/spine/catalogue.yaml#createProduct)*
+
+#### Outputs: what the screen shows and produces
+
+**Shown**
+
+**Every product variant** (data table, from `listProductVariants`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| ID | the name it points at, never the id | — |
+| Product | the name it points at, never the id | — |
+| SKU | text | — |
+| Axis values | grouped details | — |
+| Is active | yes / no (icon or chip) | False when retired. Retired variants are never deleted — orders reference them. |
+
+**The selected product variant** (detail panel, from `listProductVariants`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| ID | the name it points at, never the id | — |
+| Product | the name it points at, never the id | — |
+| SKU | text | — |
+| Axis values | grouped details | — |
+| Name | text | Taken from their variant tables, 20 September. `axisValues` gives `{size: L}` and no string a guest can read. |
+| Barcode | text | Taken from their variant tables, 20 September. `catalogue.alternative_code` is a partner's own code for a variant and requires `partnerId` … |
+| Description | in the reader's language | Who this ticket type is for and what it includes, shown behind the (i) on each Adult, Child, Senior or Infant row (decided 29 September … |
+| Is default | yes / no (icon or chip) | Taken from their variant tables. Which variant a product page opens on. |
+| Is active | yes / no (icon or chip) | False when retired. Retired variants are never deleted — orders reference them. |
+
+**The product** (detail panel, from `getProduct`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| ID | the name it points at, never the id | — |
+| Code | text | — |
+| Name | text | — |
+| Description | text | — |
+| Kind | chip: Admission, Timed admission, Dated admission, Open dated, Seated, Membership… | `openDated` added 24 August from the client's *Create Ticket Flow* board, which names six main ticket types and this was the one with no … |
+| Venue | the name it points at, never the id | — |
+| Scope path | text | — |
+| Created by principal | the name it points at, never the id | 1.4.18. The approval gate refuses an approver who is the author, and nothing recorded either. |
+| Approved by principal | the name it points at, never the id | — |
+| Responsible department | the name it points at, never the id | Who owns this product commercially. A scope node at `department` level. |
+| On sale from | 1 Oct 2026, 14:30 | 1.4.8. A seasonal product should not need somebody awake at midnight. |
+| On sale to | 1 Oct 2026, 14:30 | Retires the product automatically. Retirement is not deletion — the product stops selling and every order that referenced it still resolves. |
+| Category | the name it points at, never the id | Taken from their `fnb.product` and `retail.product`, 20 September. `catalogue.product_category` has existed since 20 August with two … |
+| Lifecycle state | chip: Draft, In review, Approved, Live, Withdrawn, Archived | — |
+| Is sellable | yes / no (icon or chip) | True only when live and carried by a published bundle. Approval and publication are different acts. |
+| Is stock tracked | yes / no (icon or chip) | Taken from their `fnb.product`, 20 September. Whether a sale decrements stock, which is not what `isSellable` asks. |
+
+**What the guest sees** (detail panel, from `getProduct`): **What the guest sees of the product** (decided 29 September, rev 3). `guestListing`: bookable (the default), info only, or hidden; an info-only product keeps its details and photo, shows `notBookableLabel` (default "Info only / Not bookable online") and opens details instead of Add to basket, and `addCartLine` refuses it `409` (REV3-14). `displayTags`: up to six, each a kind (clock, height …
+
+| Shows | Format | Notes |
+|---|---|---|
+| Guest listing | chip: Bookable, Info only, Hidden | How a product appears to a guest (decided 29 September, rev 3 REV3-14). `bookable`: listed and searched while it is on sale, and added to … |
+| Not bookable label | in the reader's language | The label a guest reads on an `infoOnly` product, e.g. *Info only* or *Not bookable online; ask at the desk* (decided 29 September, rev 3 … |
+| Display tags | list or chips (count when long) | Short facts a guest reads on the ticket card and under *Read more*: *2 Hours*, *Min 1.10 m*, *Free adult entry*, *Valid 90 days*, *Emirates … |
+| Media | list or chips (count when long) | The product's own photos and video (decided 29 September, 23SEP-4). *Read more* opens on the `isPrimary` item, and a listing shows each … |
+| Consent questions | list or chips (count when long) | The consent questions a guest answers when booking this product, in the order they are asked (decided 29 September, rev 3 REV3-26): *Are … |
+| Requires time window | yes / no (icon or chip) | True for a space sold by the hour, e.g. a meeting room type (decided 29 September, rev 3 REV3-13). |
+| Segment tags | list or chips (count when long) | 7.3.5. A channel and a segment tag are mandatory and nothing required either. |
+| Sales contact | grouped details | Who a guest contacts to book a view-only product (decided 29 September, W3), e.g. |
+| Booking flow | the name it points at, never the id | The booking flow this product is sold through (decided 29 September, W8 and W12): a white-label `BookingFlow` of the venue, which orders … |
+
+**Ticket and wallet pass preview** (live preview, from `previewProductTickets`): **The PDF ticket and the Apple and Google Wallet pass previews are in Block A (decided 2 October 2026 by Chinmay, DEC-151; CHG-CSP-038, CHG-CSA-041)**, rendered for this product where a ticket template and a pass are named.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Template | the name it points at, never the id | — |
+| Media type | chip: Thermal ticket, A4 pdf, Wristband, RFID card, Wallet pass, QR only… | — |
+| Locale | text | — |
+| Content ref | text | Where the rendered proof can be fetched or sent to the printer from. |
+| Wallet platform | chip: Apple wallet, Google wallet | Which wallet the pass preview is for, where `mediaType` is `walletPass` (DEC-151; CHG-CSP-038). |
+
+**Actions and what each produces**
+
+| Action | Calls | Sends | On success returns | Errors to show | Notes |
+|---|---|---|---|---|---|
+| Save product attributes (primary button) | `setProductAttributes` PUT `/products/{productId}/attributes` | inline | inline | 400 Two axes share a code, or one axis repeats a value code.; 403 Authenticated but not permitted at the requested scope; 409 Regeneration would exceed the variant ceiling for this product … | opens modal first |
+| Save product (secondary button) | `updateProduct` PATCH `/products/{productId}` | UpdateProductRequest | Product | 400 `media` with no `isPrimary` item or more than one, or one asset twice.; 403 Authenticated but not permitted at the requested scope; 404 The resource does not exist, or is outside the caller's scope. This includes a … | opens modal first |
+| Save ticket type (secondary button) | `updateProductVariant` PATCH `/products/{productId}/variants/{variantId}` | inline | ProductVariant | 400 A `description` value longer than 300 characters.; 403 Authenticated but not permitted at the requested scope; 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path. | opens modal first |
+
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **change impact panel**: Before Save on a product that has sold: tickets issued, orders affected, future performances, open carts, and whether the change propagates or is blocked (with the blocker named). *(source: contracts/spine/catalogue.yaml#assessProductChange)*
+- **preview before publish**: The client wants the reviewer to see every output: the B2C card, the PDF ticket and the Apple / Google Wallet pass, side by side. *(source: DI-444 / TRACKER Actions row 129)*
+- **version history**: Versions newest first with who, when and what changed; Restore creates a new version and says so. *(source: contracts/spine/catalogue.yaml#listProductVersions / contracts/spine/catalogue.yaml#restoreProductVersion / DI-938)*
+
+**What each action does** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **Clone**: Creates a draft with a new code and its ticket types, never its orders; the user lands on the clone. *(source: contracts/spine/catalogue.yaml#cloneProduct)*
+- **Restore version**: Confirmation states that orders are untouched and that the restored state becomes a new version; tickets already sold keep their terms. *(source: contracts/spine/catalogue.yaml#restoreProductVersion)*
+
+**Data it reads**: `getProduct` (onLoad, Read a product); `listProductVariants` (onLoad, List generated variants); `previewProductTickets` (onLoad, The PDF ticket and the Apple and Google Wallet pass proofs …)
+
+**Where the user goes next**
+
+- → `BO-007` Product Directory: *Product Directory*; carries `productId`
+
+#### States
+
+| State | What it shows |
+|---|---|
+| Loading (`?state=loading`) | The product variants list. |
+| Error (`?state=error`) | Could not load. Names which read failed and leaves the product variants untouched. |
+| Empty, first run (`?state=emptyFirstRun`) | No product variants yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table. |
+| Empty, no results (`?state=emptyNoResults`) | Never shown: `listProductVariants` takes no filter, so an empty list is always the first-run state above. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_VIEW`, which `getProduct` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Offline (`?state=offline`) | online only |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 A `description` value longer than 300 characters.; 400 Two axes share a code, or one axis repeats a value code.; 400 `media` with no `isPrimary` item or more than one, or one asset twice.; 409 A business code the request names is already used within its uniqueness scope (the scope the property's `x-ticvai-unique` names; decided 28 September, audit … |
+
+#### Edge cases to draw
+
+- **Product opened at an old version from a link**: Read-only, labelled "Version 7 of 9, not current", with a link to the current version. *(source: screens/P08-venue-back-office.yaml#BO-008 / ADR-0030)*
+- **Arabic name or description missing at publish**: Publish warns and names the fields (PR-8). *(source: DI-019)*
+
+#### Consistency with other screens
+
+- Match `BO-012`: A membership product is this same configuration with the membership sections expanded; same header and section order.
+- Match `BO-161`: The eligibility section embeds BO-161's age and height rule rather than linking away.
+- Match `BO-346`: The preview uses the ticket template BO-346 would select for this product kind and channel.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+product:
+  name: Day Pass
+  nameAr: تذكرة يوم
+  code: DUNE-DAYPASS
+  kind: datedAdmission
+  state: Live
+  venue: Dune Park
+attributes:
+- name: Guest category
+  values:
+  - Adult
+  - Child
+  - Senior
+- name: Residency
+  values:
+  - UAE resident
+  - Visitor
+ticketTypes:
+- name: Adult, Visitor
+  nameAr: بالغ، زائر
+  sku: DUNE-DAYPASS-AD-VIS
+  default: true
+- name: Child (3-11), UAE resident
+  nameAr: طفل (3-11)، مقيم
+  sku: DUNE-DAYPASS-CH-RES
+displayTags:
+- kind: clock
+  label: Full day
+- kind: height
+  label: Some rides 120 cm+
+- kind: id
+  label: Emirates ID for resident price
+impact:
+  ticketsIssued: 18420
+  ordersAffected: 9310
+  futurePerformances: 212
+  openCarts: 37
+```
+
+#### Permissions
+
+- `listBookingFlows` → `TENANT_CONFIGURE` (configure) · staff
+- `getProduct` → `PRODUCT_VIEW` (read) · staff, guest, partner
+- `listProductVariants` → `PRODUCT_VIEW` (read) · staff, guest, partner
+- `setProductAttributes` → `PRODUCT_CONFIGURE` (configure) · staff
+- `updateProduct` → `PRODUCT_CONFIGURE` (configure) · staff
+- `updateProductVariant` → `PRODUCT_CONFIGURE` (configure) · staff
+- `searchMedia` → `ASSET_LIBRARY_VIEW` (read) · staff
+- `listConsentQuestions` → `GUEST_VIEW` (read) · staff
+- `restoreProductVersion` → `PRODUCT_CONFIGURE` (configure) · staff
+- `assessProductChange` → `PRODUCT_CONFIGURE` (configure) · staff
+- `cloneProduct` → `PRODUCT_CONFIGURE` (configure) · staff
+- `listProductVersions` → `PRODUCT_VIEW` (read) · staff
+- `previewProductTickets` → `PRODUCT_VIEW` (read) · staff
+
+**A refused user sees:** Shown when the caller lacks `PRODUCT_VIEW`, which `getProduct` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+#### Requirements it meets
+
+37 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+
+| Ref | Requirement (shortened) | Domain | Verdict | Via |
+|---|---|---|---|---|
+| 1.1.13 | The system should allow combination of multiple properties for all type of tickets. For example, there can be a VIP child ticket and a normal adult ticket. | Ticketing Catalogue | CONTRACTED | `listProductVariants` |
+| 1.3.32 | Ability to create and book dynamic performances based on the event start time. Dynamic performance to be chosen by customer 2 - 3 - 4 hour (for pods or Spaces) | Ticketing Catalogue | CONTRACTED | `listProductVariants` |
+| 1.3.33 | Book per time slot | Ticketing Catalogue | CONTRACTED | `listProductVariants` |
+| 1.3.34 | Book variable amount of minutes per individual 30 minute session. Can be at different times of the day and different times of the week / month. | Ticketing Catalogue | CONTRACTED | `listProductVariants` |
+| 1.3.37 | As above, If individuals purchase X number of minutes, they want the ability to book varying time slots on varying dates | Ticketing Catalogue | CONTRACTED | `listProductVariants` |
+| 1.3.38 | For example: If a skydiver or first time flyer wishes to “just turn up”.. we need the ability to sell to that individual and enter them onto the system and create a “ There and then” booking. Can be … | Ticketing Catalogue | CONTRACTED | `listProductVariants` |
+| 1.3.39 | Pre purchased number of minutes with variable price based on time slots . Peak, Off Peak, Super Prime etc etc etc . We need the ability to change these periods easily ie , if I wanted to make Prime … | Ticketing Catalogue | CONTRACTED | `listProductVariants` |
+| 1.3.40 | Ability for specific profiles to add minutes to their account. | Ticketing Catalogue | CONTRACTED | `listProductVariants` |
+| 3.6.29 | Attribute-driven product architecture that lets teams add ticket types, add-ons, and bundles without duplicating SKUs (single definition, multi-variant) | Admission and Access | CONTRACTED | `listProductVariants` |
+| 1.1.12 | The system should allow configuration of properties for all type of tickets that define the behavior of the ticket. For example, an open-dated ticket can be available in different tiers such as … | Ticketing Catalogue | CONTRACTED | `setProductAttributes` |
+| 1.1.45 | Configure product attributes and metadata | Ticketing Catalogue | CONTRACTED | `setProductAttributes` |
+| 1.1.46 | Support multilingual product descriptions | Ticketing Catalogue | CONTRACTED | `updateProduct` |
+| … 25 more | | | | `traceability.json` |
+
+#### Client meeting inputs
+
+For this screen, newest first. An **Open question** is built to the default it states. Where an item disagrees with the fields above, the item wins.
+
+- Decision: all policy types — reschedule, exchange, refund, cancellation, upgrade/downgrade, ownership transfer, membership-to-pass conversion — are managed centrally within the unified product configuration, not separate screens. Each product also maps pricing, GL account code, promotions and channel availability. *(agreed · MoM 25 Aug 2026, 4.9 Bundles, Add-Ons, Donations & Policies; 5. Key Decisions · DI-466)*
+- Decision: special product types — group (min/max size, single or multiple QR codes), family (min/max composition) and corporate/allocation tickets — are configured within the same unified product configuration screen, not separate screens. *(agreed · MoM 25 Aug 2026, 4.8 Eligibility Rules, Special Products & Memberships; 5. Key Decisions · DI-465)*
+- Quantity/purchase limits can be set per order, per guest, per account category and per sales channel (e.g. maximum 6 tickets per transaction). *(client request · MoM 25 Aug 2026, 4.8 Eligibility Rules, Special Products & Memberships · DI-464)*
+- Eligibility rules are configurable: residency/nationality/geography (e.g. UAE-resident-only with Emirates ID capture), minimum age (date-of-birth check), guest-profile category (e.g. VIP-only) and minimum loyalty points/spend for a membership tier. *(client request · MoM 25 Aug 2026, 4.8 Eligibility Rules, Special Products & Memberships · DI-463)*
+- Weekday/calendar rules give different validity and pricing to weekday-only vs. all-days products (e.g. Global Village). Blockout dates exclude some ticket types (e.g. memberships) on public holidays/special days, requiring a separate ticket for those dates. *(client request · MoM 25 Aug 2026, 4.5 Validity Management & Expiry Rules · DI-452)*
+- Validity types: fixed date range, rolling (e.g. 90 days from issue) and first-use activation (starts at first scan). Confirmed: first-use tickets need a fallback expiry (e.g. issue date + 30 days) if never scanned. *(agreed · MoM 25 Aug 2026, 4.5 Validity Management & Expiry Rules · DI-451)*
+- Products are classified by configurable components (e.g. resident/non-resident → standard/VIP tier → adult/child/youth), not a fixed structure; components can be added and a simple venue may use only guest category. Tickets can be anonymous or require captured guest details. *(client request · MoM 25 Aug 2026, 4.4 Product Combination Matrix & Ownership · DI-450)*
+- Time-slot (performance) tickets configure early/late entry and an entry window (e.g. from 30 minutes before start until a cut-off). Multi-day tickets are consecutive-day or flexible within a range (e.g. any 3 days within a month). *(client request · MoM 25 Aug 2026, 4.3 Ticket Type Deep-Dive · DI-447)*
+- Decision (raised by Chinmay): date-change/reschedule is a product-level on/off setting with its own policy rules (e.g. allowed up to 24 hours before the visit, denied within 24 hours), not a separate screen. Typically off for special-day tickets (e.g. New Year, 1 January only), on for standard GA. *(agreed · MoM 25 Aug 2026, 4.3 Ticket Type Deep-Dive; 5. Key Decisions · DI-446)*
+- Open-dated ticket: name, description, price and validity period (e.g. 1 day, 1 month, 6 months), with a configurable reservation rule controlling whether customer details (name, email, phone) are captured at point of sale. *(client request · MoM 25 Aug 2026, 4.3 Ticket Type Deep-Dive · DI-445)*
+- The preview/publish step shows how the ticket appears on the B2C front end and — at Chinmay's request — also the PDF ticket layout and Apple Wallet / Google Wallet formats, so the reviewer sees every output format. *(agreed · MoM 25 Aug 2026, 4.2 Ticket Configuration Reference; 5. Key Decisions · DI-444)*
+- Ticket attributes such as minimum age, ID-proof requirements (e.g. Emirates ID for UAE-resident tickets, with format validation or photo upload; passport; handicap/PoD documentation) or an embedded ID-reader for on-site verification are configurable per ticket and region, not fixed. *(agreed · MoM 25 Aug 2026, 4.2 Ticket Configuration Reference; 5. Key Decisions · DI-443)*
+- Content localisation: separate content (images, descriptions) per sales channel (POS vs. B2C/B2B) and per language (e.g. English/Arabic). *(client request · MoM 25 Aug 2026, 4.2 Ticket Configuration Reference · DI-442)*
+- Identity & classification: product name, product ID, main/sub-category, venue (multi-venue), ticket type. A category hierarchy manager groups and sorts packages and ticket types (e.g. admission > general admission > single-day, multi-day, annual pass, packages, vouchers). *(client request · MoM 25 Aug 2026, 4.2 Ticket Configuration Reference · DI-441)*
+- Supporting configuration: ticket variants (adult/child/senior/VIP, configurable), waitlist, on-sale/off-sale timing and cut-offs, entitlement/access rules (single/multi-venue, entries, zones, early entry), fulfilment channels (email, WhatsApp, SMS), after-sales windows (upgrade, reschedule, cancel), dynamic/fixed pricing and promotions. *(client request · MoM 24 Aug 2026, 4.5 Ticketing Configuration Walkthrough · DI-437)*
+- Guest information capture (name, mobile number, nationality, visit survey, etc.) is configurable per ticket type; even an open-dated admission ticket can optionally collect it. *(agreed · MoM 24 Aug 2026, 4.5 Ticketing Configuration Walkthrough; 5. Key Decisions · DI-434)*
+- Six core ticket types: Open-Dated (no fixed date; GA and B2B/travel-agent QR resale), Group & Family (configurable group size, single-scan or multi-scan QR), Membership/Subscription (full details per member; renew/upgrade/cancel), Event (date/time selection, resources, capacity), Gift Voucher, Money Card. *(agreed · MoM 24 Aug 2026, 4.5 Ticketing Configuration Walkthrough; 5. Key Decisions · DI-433)*
+- Ticket configuration flow runs basic information → ticket type configuration → validation → publish. *(client request · MoM 24 Aug 2026, 4.5 Ticketing Configuration Walkthrough · DI-432)*
+- Product master holds price, stock and variant attributes (e.g. size/colour) with a distinct barcode per variant; stock is tracked per variant/size. Decision: size/variant attributes (small/medium/large) are configurable per product type in the admin panel and appear dynamically when products are added. *(agreed · MoM 19 Aug 2026, 4.2 Product Catalog, Variant & Pricing Management; 5. Key Decisions · DI-354)*
+- Entitlement settings: re-entry not allowed / once per day / unlimited; expiry end of week, month, year, variable date, from first use, or by performance date/time; group tickets by fixed price or fixed quantity; one ticket may link to several events. *(agreed · MoM 7 Aug 2026, 16. Entitlement Components: Re-entry, Expiration & Sale Restrictions · DI-171)*
+- Components/attributes model: a component (e.g. "ticket type") has attributes (adult, youth, senior, infant, child) each priced independently; adding an attribute creates a new sellable variant with no extra setup. Who may sell a product is restricted by site, operating area, workstation or role. *(agreed · MoM 7 Aug 2026, 12. Products Configuration: Metric Sheets, Pricing & Components · DI-164)*
+- Product record holds: price (tax inclusive/exclusive), linked print template, system product code, a toggle for capturing reservation details at sale, and entitlements (upgradeable, stored-value load, linked event, re-entry, linked performance). Multiple price lists per channel and season (winter/summer). *(agreed · MoM 7 Aug 2026, 12. Products Configuration: Metric Sheets, Pricing & Components · DI-163)*
+
+Also apply: 4 for P08 · Sell, 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
+
+#### Workshop task tracker
+
+- **A120** Build the product creation wizard with four paths (from scratch · save as reusable template · clone · file upload using a standard tenant data-collection template) *(Softlabs Team · High · Not started → 30 Sep: Closed, Moved to OpenProject (S13: build) · 25 Aug 2026 · workshop tracker · keyword 'product creation wizard')*
+- **A135** Manage group, family and corporate/allocation ticket types inside the unified product screen rather than separate screens *(Softlabs Team · Medium · Not started → 30 Sep: Closed, Rolled into S9 (final UI/UX) · 25 Aug 2026 · workshop tracker · keyword 'ticket type')*
+- **A229** Build turnstile and handheld scanner configuration (connection details, light and sound feedback by ticket type, custom welcome messaging and branding, compatibility testing and deployment) *(Softlabs Team · Medium · Not started → 30 Sep: Closed, Rolled into S7 (HLD/LLD) · 2 Sep 2026 · workshop tracker · keyword 'ticket type')*
+
+#### References
+
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#bo-008` · status **notStarted** · provenance generated · **Drawn by Claude Design on `Retail Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed …
+- Derived from `wireframes/reference/Retail Board 2.dc.html`
+- Drawn by: Claude Design Retail pack, 24 August
+- Client design-board frames: `FnB Board 2.dc.html#fnb-2d`, `Retail Board 2.dc.html#ret-2c`
+- Flow F10 *Partner books, uses and settles*, step 6: Venue reconciles and invoices → Usage becomes money owed
+- Flow F85 *Production is planned, costed and released*, step 3: Product Detail & Variants. → **Drawn by the client as FNB-2D.** 4 operations on this step.
+- Flow F93 *A recipe changes and its allergen claim is re-verified*, step 3: Product Detail & Variants. → **Drawn by the client as FNB-2D.**
+- Flow F10 branch at step 6 (requiresStaff): when Usage disputed at reconciliation, Scan records are the evidence. This is why `scan_event` is retained and why offline scans carry both recordedAt and syncedAt.
+
+#### Acceptance for the design
+
+- [ ] Every input above is drawn (41), with its required mark, default, format and its error state (400, 403, 404, 409, 422).
+- [ ] Every output is drawn (44 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every state opens from `#BO-008?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
+- [ ] Every action is wired with its success and its failure: Save product attributes, Save product, Save ticket type.
+- [ ] Every transition is wired: `BO-007`.
+- [ ] Every gated control is gated: `ASSET_LIBRARY_VIEW`, `GUEST_VIEW`, `PRODUCT_CONFIGURE`, `PRODUCT_VIEW`, `TENANT_CONFIGURE`.
+- [ ] The 22 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 2 edge case(s) from the process notes are drawn.
+- [ ] The 1 decision(s) taken on this screen are drawn as decided, not as the old default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -499,7 +1026,16 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | `priceListId` (deepLink), `ruleId` (navigation) · cold entry: **A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know … |
 | Route | `/venue-operations/pricing-rules` |
 
-**What the spec says about it.** Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. **Improved 20 August against the client design board.** Answers 1 board screen(s): Price Book & Retail Pricing Management. **The board specifies this screen further rather than replacing it** — the id, its flows and its navigation are unchanged, which is what keeps 3,184 traceability rows and every board anchor pointing at something real.
+**What the spec says about it.** Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. **Improved 20 August against the client design board.** Answers 1 board screen(s): Price Book & Retail Pricing Management. **The board specifies this screen further rather than replacing it** — the id, its flows and its navigation are unchanged, which is what keeps 3,184 traceability rows and every board anchor pointing at something real. **Priority direction: the higher number wins** (decided 2 October 2026 by Chinmay, ADM-049 answer "default"; CHG-SBO-010). Price lists, promotions and the rule builders all read priority the same way, and every priority field on this screen says "higher wins".
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Where the venue sets what each ticket type costs, per channel and per period: price lists, the prices in them, next season's copy and the dynamic rules that move prices. It must make the client's central "price matrix" visible: ticket types down, channels across, one price per cell, so each channel picks its price up automatically once published (DI-140).
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- Dynamic rule conditions and actions are free strings (type, ruleOperator, valueJson) and minPrice/maxPrice are plain numbers. (CHG-SBO-005)
+- List operation(s) listDynamicPriceRules return a bare array, not the paged list envelope (items, nextCursor, hasMore). (CHG-SBO-005)
+
+**Fixed on main** (the package already carries these; draw what it says): Price list priority has no stated direction (default 0), while promotions say "higher evaluates first" and the pack rule builders say … (CHG-SBO-010).
 
 #### Inputs: what the user enters or picks
 
@@ -511,7 +1047,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Form: Create price list** (modal, opened by *Create price list*; *Create price list* calls `createPriceList`, *Cancel* sends nothing)
 
-**Collects what `createPriceList` sends before it is called.** Required: `code`, `name`, `venueId`, `channels`. Optional: `validFrom`, `validTo`, `priority`. Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `createPriceList` sends before it is called.** Required: `code`, `name`, `venueId`, `channels`. Optional: `validFrom`, `validTo`, `priority`. `priority` is labelled **"Priority (higher number wins)"** (DEC-101). Dismissing sends nothing; the screen behind is unchanged.
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
@@ -522,6 +1058,23 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Valid from `validFrom` | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `createPriceList` body |
 | Valid to `validTo` | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `createPriceList` body |
 | Priority `priority` | number field | optional | 0 | — | — | — | `createPriceList` body |
+| Description `description` | text area | optional | — | — | — | The price list master fields (data model DM3) are written here since setPriceListMaster was retired in r2 (BC-008, CHG-CLN-001); each is optional and means what it means on … | `createPriceList` body |
+| Price list type `priceListType` | select | optional | — | Standard retail · Venue · Attraction · Event · Membership · Group · Corporate · B2B · Reseller · Ota · Internal · Special market | — | — | `createPriceList` body |
+| Owner principal `ownerPrincipalId` | picker: choose an owner principal | optional | — | — | shows names, sends the id | — | `createPriceList` body |
+| Tags `tags` | list of values (chips) | optional | — | — | — | — | `createPriceList` body |
+| Legal entity `legalEntityId` | picker: choose a legal entity | optional | — | — | shows names, sends the id | — | `createPriceList` body |
+| Brand `brand` | text field | optional | — | max length 100 | — | — | `createPriceList` body |
+| Business unit `businessUnit` | text field | optional | — | max length 100 | — | — | `createPriceList` body |
+| Country code `countryCode` | text field | optional | — | max length 2; pattern `^[A-Z]{2}$` | — | — | `createPriceList` body |
+| Market code `marketCode` | text field | optional | — | max length 40 | — | — | `createPriceList` body |
+| Scope level `scopeLevel` | select | optional | — | Global · Country · Market · Brand · Venue · Event · Business unit | — | — | `createPriceList` body |
+| Default price category `defaultPriceCategoryId` | picker: choose a default price category | optional | — | — | shows names, sends the id | — | `createPriceList` body |
+| Rounding profile `roundingProfileId` | picker: choose a rounding profile | optional | — | — | shows names, sends the id | — | `createPriceList` body |
+| Price resolution policy `priceResolutionPolicyId` | picker: choose a price resolution policy | optional | — | — | shows names, sends the id | — | `createPriceList` body |
+| Allow overrides `allowOverrides` | toggle | optional | — | — | — | — | `createPriceList` body |
+| Allow inheritance `allowInheritance` | toggle | optional | — | — | — | — | `createPriceList` body |
+| Allow multiple currencies `allowMultipleCurrencies` | toggle | optional | — | — | — | — | `createPriceList` body |
+| Allow product specific rates `allowProductSpecificRates` | toggle | optional | — | — | — | — | `createPriceList` body |
 
 Errors to draw in the form: 400 Validation failed
 
@@ -553,7 +1106,7 @@ Errors to draw in the form: 400 Currency or scale mismatch against the region
 
 **Form: Save price list** (modal, opened by *Save price list*; *Save price list* calls `updatePriceList`, *Cancel* sends nothing)
 
-**Collects what `updatePriceList` sends before it is called.** Nothing in the body is required. Optional: `name`, `validFrom`, `validTo`, `priority`, `isActive`. Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `updatePriceList` sends before it is called.** Nothing in the body is required. Optional: `name`, `validFrom`, `validTo`, `priority`, `isActive`. `priority` is labelled **"Priority (higher number wins)"** (DEC-101). Dismissing sends nothing; the screen behind is unchanged.
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
@@ -562,12 +1115,36 @@ Errors to draw in the form: 400 Currency or scale mismatch against the region
 | Valid to `validTo` | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `updatePriceList` body |
 | Priority `priority` | number field | optional | — | — | — | — | `updatePriceList` body |
 | Is active `isActive` | toggle | optional | — | — | — | — | `updatePriceList` body |
+| Description `description` | text area | optional | — | — | — | The price list master fields (data model DM3) are written here since setPriceListMaster was retired in r2 (BC-008, CHG-CLN-001); each is optional and means what it means on … | `updatePriceList` body |
+| Price list type `priceListType` | select | optional | — | Standard retail · Venue · Attraction · Event · Membership · Group · Corporate · B2B · Reseller · Ota · Internal · Special market | — | — | `updatePriceList` body |
+| Owner principal `ownerPrincipalId` | picker: choose an owner principal | optional | — | — | shows names, sends the id | — | `updatePriceList` body |
+| Tags `tags` | list of values (chips) | optional | — | — | — | — | `updatePriceList` body |
+| Legal entity `legalEntityId` | picker: choose a legal entity | optional | — | — | shows names, sends the id | — | `updatePriceList` body |
+| Brand `brand` | text field | optional | — | max length 100 | — | — | `updatePriceList` body |
+| Business unit `businessUnit` | text field | optional | — | max length 100 | — | — | `updatePriceList` body |
+| Country code `countryCode` | text field | optional | — | max length 2; pattern `^[A-Z]{2}$` | — | — | `updatePriceList` body |
+| Market code `marketCode` | text field | optional | — | max length 40 | — | — | `updatePriceList` body |
+| Scope level `scopeLevel` | select | optional | — | Global · Country · Market · Brand · Venue · Event · Business unit | — | — | `updatePriceList` body |
+| Default price category `defaultPriceCategoryId` | picker: choose a default price category | optional | — | — | shows names, sends the id | — | `updatePriceList` body |
+| Rounding profile `roundingProfileId` | picker: choose a rounding profile | optional | — | — | shows names, sends the id | — | `updatePriceList` body |
+| Price resolution policy `priceResolutionPolicyId` | picker: choose a price resolution policy | optional | — | — | shows names, sends the id | — | `updatePriceList` body |
+| Allow overrides `allowOverrides` | toggle | optional | — | — | — | — | `updatePriceList` body |
+| Allow inheritance `allowInheritance` | toggle | optional | — | — | — | — | `updatePriceList` body |
+| Allow multiple currencies `allowMultipleCurrencies` | toggle | optional | — | — | — | — | `updatePriceList` body |
+| Allow product specific rates `allowProductSpecificRates` | toggle | optional | — | — | — | — | `updatePriceList` body |
+
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **price matrix (setPrices)**: Edit as a grid (ticket type rows, price list or channel columns) rather than a list of rows; amounts in the region's currency and scale with no currency picker (PR-2); an empty cell means "not sold on this list", distinct from 0.00, which must be typed and confirmed. *(source: contracts/spine/catalogue.yaml#setPrices / DI-140 / TRACKER Actions row 196 / ADR-0008)*
+- **priority**: Integer with a stated direction; until the contract says which way it runs, label it "Higher number wins when two lists apply" and show the lists that overlap in date and channel. *(source: contracts/spine/catalogue.yaml#createPriceList / DI-595)*
+- **copyPriceList adjustment**: Percentage uplift with a rounding target ("round to 0.50"), and new validity dates; preview two or three example prices before confirming. *(source: contracts/spine/catalogue.yaml#copyPriceList)*
+- **dynamic rule**: Edited whole: conditions (when) and actions (what) on one panel, with the minimum and maximum price of each action shown beside it as the first thing a reviewer reads. *(source: contracts/spine/catalogue.yaml#setDynamicPriceRule / contracts/spine/catalogue.yaml#getDynamicPriceRule)*
 
 #### Outputs: what the screen shows and produces
 
 **Shown**
 
-**Every price list** (data table, from `listPriceLists`)
+**Every price list** (data table, from `listPriceLists`): **Priority: higher number wins** (decided 2 October 2026 by Chinmay, DEC-101); the column header reads "Priority (higher wins)".
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -592,7 +1169,7 @@ Errors to draw in the form: 400 Currency or scale mismatch against the region
 | Amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Tax code | the name it points at, never the id | — |
 
-**The selected price list** (detail panel, from `getPriceList`)
+**The selected price list** (detail panel, from `getPriceList`): **Priority: higher number wins** (decided 2 October 2026 by Chinmay, DEC-101); the column header reads "Priority (higher wins)".
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -616,6 +1193,16 @@ Errors to draw in the form: 400 Currency or scale mismatch against the region
 | Save prices (secondary button) | `setPrices` PUT `/price-lists/{priceListId}/prices` | inline | inline | 400 Currency or scale mismatch against the region | opens modal first |
 | Save price list (secondary button) | `updatePriceList` PATCH `/price-lists/{priceListId}` | inline | PriceList | — | opens modal first |
 
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **price list list**: Code, name, channels as chips, valid from-to, priority, status (Draft, Active, Inactive, Retired), currency read-only. *(source: contracts/spine/catalogue.yaml#/components/schemas/CatalogueConfigStatus / contracts/spine/catalogue.yaml#getPriceList)*
+- **overlap warning**: When two active lists share a channel and dates for the same ticket type, show which one wins under the hierarchy and why (no lowest-price default). *(source: DI-595 / screens/P08-venue-back-office.yaml#BO-441)*
+
+**What each action does** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **Bulk change prices**: Runs as a dry run first ("212 products matched, 640 prices change, 4 skipped"), then applies on confirmation. *(source: contracts/spine/catalogue.yaml#bulkChangePrices)*
+- **Save prices**: Saved to the list; the list shows "Not yet on tills" until the next catalogue release (PR-3). *(source: contracts/spine/catalogue.yaml#publishBundle)*
+
 **Data it reads**: `listPriceLists` (onLoad, List price lists); `listDynamicPriceRules` (onLoad, Dynamic price rules)
 
 **Where the user goes next**
@@ -635,6 +1222,57 @@ Errors to draw in the form: 400 Currency or scale mismatch against the region
 | Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRICE_VIEW`, which `listPriceLists` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Currency or scale mismatch against the region; 400 Validation failed |
+
+#### Edge cases to draw
+
+- **A price in a currency the region does not use**: Cannot be entered, because the currency is not editable; an imported file with another currency is rejected with the rows named. *(source: contracts/spine/catalogue.yaml#setPrices)*
+- **A list valid from a future date**: Shown as scheduled with its start date; today's prices still come from the current list. *(source: DI-357)*
+
+#### Consistency with other screens
+
+- Match `ADM-049`: The TICVAI Console price list master edits the same concept; same columns, status badges and wording (PR-10).
+- Match `BO-441`: Conflicts between rules are resolved on BO-441; this screen links there from the overlap warning.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+priceLists:
+- code: DUNE-B2C-2026
+  name: B2C 2026-27
+  channels:
+  - Website
+  - App
+  - Kiosk
+  - Point of sale
+  valid: 2026-10-01 to 2027-09-30
+  priority: 10
+  status: Active
+- code: DUNE-B2B-2026
+  name: Tour operators 2026-27
+  channels:
+  - B2B partners
+  priority: 20
+  status: Active
+- code: DUNE-SUMMER-27
+  name: Summer 2027
+  channels:
+  - Website
+  - App
+  valid: 2027-06-15 to 2027-08-31
+  status: Draft
+prices:
+  Day Pass, Adult: AED 295.00
+  Day Pass, Child: AED 245.00
+  Day Pass, Adult (B2B): AED 236.00
+dynamicRule:
+  code: WEEKEND-UPLIFT
+  when: Saturday or Friday, occupancy over 70%
+  then: +10%
+  minPrice: AED 295.00
+  maxPrice: AED 349.00
+```
 
 #### Permissions
 
@@ -697,13 +1335,14 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (23), with its required mark, default, format and its error state (400, 404).
+- [ ] Every input above is drawn (57), with its required mark, default, format and its error state (400, 404).
 - [ ] Every output is drawn (25 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-009?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Create price list, Copy price list, Save prices, Save price list.
 - [ ] Every transition is wired: `BO-007`, `BO-010`, `BO-014`.
 - [ ] Every gated control is gated: `PRICE_CONFIGURE`, `PRICE_VIEW`, `PRODUCT_CONFIGURE`.
 - [ ] The 3 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 2 edge case(s) from the process notes are drawn.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -724,7 +1363,11 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | `venueId` (session), `campaignId` (deepLink), `dashboardId` (deepLink), `promotionId` (deepLink), `reportId` (deepLink), `code` (deepLink), `voucherId` (navigation) · cold entry: A dashboard opened from a link or a saved view. A coupon code opened from the list, or scanned at a till. |
 | Route | `/venue-operations/promotions-coupons` |
 
-**What the spec says about it.** Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. **Improved 20 August against the client design board.** Answers 6 board screen(s): Retail Commercial Command Center; Promotion & Offer Builder; Promotion Eligibility, Priority & Conflict Rules and 3 more. **The board specifies this screen further rather than replacing it** — the id, its flows and its navigation are unchanged, which is what keeps 3,184 traceability rows and every board anchor pointing at something real. **Owns POS board frame(s) POS-4E** (client pack, 24 August). **Assigned by board purpose rather than by operation overlap** — three attempts at deriving that mapping produced plausible nonsense, and a reader who trusts a bad table is worse off than one who has none. **Retail board operations wired 24 August.**
+**What the spec says about it.** Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. **Improved 20 August against the client design board.** Answers 6 board screen(s): Retail Commercial Command Center; Promotion & Offer Builder; Promotion Eligibility, Priority & Conflict Rules and 3 more. **The board specifies this screen further rather than replacing it** — the id, its flows and its navigation are unchanged, which is what keeps 3,184 traceability rows and every board anchor pointing at something real. **Owns POS board frame(s) POS-4E** (client pack, 24 August). **Assigned by board purpose rather than by operation overlap** — three attempts at deriving that mapping produced plausible nonsense, and a reader who trusts a bad table is worse off than one who has none. **Retail board operations wired 24 August.** **One desk, four tabs (design-note correction, 2 October 2026; CHG-SBO-010; DI-987):** Promotions (price rules), Coupons (campaigns and codes), Vouchers (batches, a liability, kept apart from price rules) and Campaigns, with Results beside them. Each tab has its own list; nothing is one form. Components carry `tab`.
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** The venue's promotions desk: promotions, coupon campaigns and their codes, voucher batches and the dashboard that says what each is costing. It must keep three different things apart (a promotion changes a price, a coupon code unlocks one, a voucher carries money) and it must never let a promotion go live without the stacking check.
+
+**Fixed on main** (the package already carries these; draw what it says): The screen carries 26 operations (dashboards, reports, A/B tests, vouchers, campaigns) on one page. (CHG-SBO-010).
 
 #### Inputs: what the user enters or picks
 
@@ -767,8 +1410,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Min quantity `discount.tiers[].minQuantity` | number field | required | — | min 1 | — | — | `createCouponCampaign` body |
 | Percentage `discount.tiers[].percentage` | stepper or slider (%) | required | — | min 0; max 100 | — | — | `createCouponCampaign` body |
 | Max discount amount `discount.maxDiscountAmount` | money field | optional | — | — | AED, 2 decimals shown (up to 4 accepted), currency from the … | Cap on a percentage discount. Prevents an unbounded discount on a large basket. | `createCouponCampaign` body |
-| Reward variants `discount.rewardVariantIds` | multi-picker: choose reward variants | optional | — | — | — | The reward products, where the reward is not the qualifying product: the free gift of `freeItem`, the "different product" of a `buyXGetY` (setGiftFreeProduct, setBuyGetBogo). | `createCouponCampaign` body |
-| Max applications per basket `discount.maxApplicationsPerBasket` | number field | optional | — | min 1 | — | How many times the offer repeats in one basket: the "maximum repetitions" of an N-for-X offer (setFixedPriceOffer). | `createCouponCampaign` body |
+| Reward variants `discount.rewardVariantIds` | multi-picker: choose reward variants | optional | — | — | — | The reward products, where the reward is not the qualifying product: the free gift of `freeItem`, the "different product" of a `buyXGetY` (createPromotion; the builders … | `createCouponCampaign` body |
+| Max applications per basket `discount.maxApplicationsPerBasket` | number field | optional | — | min 1 | — | How many times the offer repeats in one basket: the "maximum repetitions" of an N-for-X offer (createPromotion; setFixedPriceOffer was retired in r2, CHG-CLN-001). | `createCouponCampaign` body |
 | Conditions `conditions` | group | optional | — | — | — | All conditions must hold. An empty object matches everything. | `createCouponCampaign` body |
 | Variants `conditions.variantIds` | multi-picker: choose variants | optional | — | — | — | — | `createCouponCampaign` body |
 | Product kinds `conditions.productKinds` | list of values (chips) | optional | — | — | — | — | `createCouponCampaign` body |
@@ -789,7 +1432,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Performances `conditions.performanceIds` | multi-picker: choose performances | optional | — | — | — | — | `createCouponCampaign` body |
 | Advance days min `conditions.advanceDaysMin` | number field | optional | — | — | — | Early-bird — booked at least this many days ahead. | `createCouponCampaign` body |
 | Advance days max `conditions.advanceDaysMax` | number field | optional | — | — | — | Last-minute — booked no more than this many days ahead. | `createCouponCampaign` body |
-| Eligibility rules `conditions.eligibilityRuleIds` | multi-picker: choose eligibility rules | optional | — | — | — | Reusable eligibility rules (`promotions.promotion_rule` rows of `ruleType: eligibility` with no promotion of their own, saved by setEligibilityRule) that must also hold. | `createCouponCampaign` body |
+| Eligibility rules `conditions.eligibilityRuleIds` | multi-picker: choose eligibility rules | optional | — | — | — | Reusable eligibility rules (`promotions.promotion_rule` rows of `ruleType: eligibility` with no promotion of their own) that must also hold. | `createCouponCampaign` body |
 | Is single use `isSingleUse` | toggle | optional | on | — | — | True generates individually redeemable codes. False issues one shared code with a redemption limit. | `createCouponCampaign` body |
 | Max redemptions per code `maxRedemptionsPerCode` | number field | optional | 1 | — | — | — | `createCouponCampaign` body |
 | Valid from `validFrom` | date and time picker | required | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `createCouponCampaign` body |
@@ -818,8 +1461,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Min quantity `discount.tiers[].minQuantity` | number field | required | — | min 1 | — | — | `createPromotion` body |
 | Percentage `discount.tiers[].percentage` | stepper or slider (%) | required | — | min 0; max 100 | — | — | `createPromotion` body |
 | Max discount amount `discount.maxDiscountAmount` | money field | optional | — | — | AED, 2 decimals shown (up to 4 accepted), currency from the … | Cap on a percentage discount. Prevents an unbounded discount on a large basket. | `createPromotion` body |
-| Reward variants `discount.rewardVariantIds` | multi-picker: choose reward variants | optional | — | — | — | The reward products, where the reward is not the qualifying product: the free gift of `freeItem`, the "different product" of a `buyXGetY` (setGiftFreeProduct, setBuyGetBogo). | `createPromotion` body |
-| Max applications per basket `discount.maxApplicationsPerBasket` | number field | optional | — | min 1 | — | How many times the offer repeats in one basket: the "maximum repetitions" of an N-for-X offer (setFixedPriceOffer). | `createPromotion` body |
+| Reward variants `discount.rewardVariantIds` | multi-picker: choose reward variants | optional | — | — | — | The reward products, where the reward is not the qualifying product: the free gift of `freeItem`, the "different product" of a `buyXGetY` (createPromotion; the builders … | `createPromotion` body |
+| Max applications per basket `discount.maxApplicationsPerBasket` | number field | optional | — | min 1 | — | How many times the offer repeats in one basket: the "maximum repetitions" of an N-for-X offer (createPromotion; setFixedPriceOffer was retired in r2, CHG-CLN-001). | `createPromotion` body |
 | Conditions `conditions` | group | optional | — | — | — | All conditions must hold. An empty object matches everything. | `createPromotion` body |
 | Variants `conditions.variantIds` | multi-picker: choose variants | optional | — | — | — | — | `createPromotion` body |
 | Product kinds `conditions.productKinds` | list of values (chips) | optional | — | — | — | — | `createPromotion` body |
@@ -840,7 +1483,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Performances `conditions.performanceIds` | multi-picker: choose performances | optional | — | — | — | — | `createPromotion` body |
 | Advance days min `conditions.advanceDaysMin` | number field | optional | — | — | — | Early-bird — booked at least this many days ahead. | `createPromotion` body |
 | Advance days max `conditions.advanceDaysMax` | number field | optional | — | — | — | Last-minute — booked no more than this many days ahead. | `createPromotion` body |
-| Eligibility rules `conditions.eligibilityRuleIds` | multi-picker: choose eligibility rules | optional | — | — | — | Reusable eligibility rules (`promotions.promotion_rule` rows of `ruleType: eligibility` with no promotion of their own, saved by setEligibilityRule) that must also hold. | `createPromotion` body |
+| Eligibility rules `conditions.eligibilityRuleIds` | multi-picker: choose eligibility rules | optional | — | — | — | Reusable eligibility rules (`promotions.promotion_rule` rows of `ruleType: eligibility` with no promotion of their own) that must also hold. | `createPromotion` body |
 | Stacking mode `stackingMode` | radio group | optional | Best only | Exclusive · Stackable · Best only · Stack with group | — | How this promotion combines with others. Declared, never inferred from creation order — two reasonable promotions can otherwise combine into a free ticket. | `createPromotion` body |
 | Stacking group `stackingGroup` | text field | optional | — | max length 64 | — | — | `createPromotion` body |
 | Precedence `precedence` | number field | optional | 0 | — | — | Higher evaluates first where several could apply. | `createPromotion` body |
@@ -935,7 +1578,7 @@ Errors to draw in the form: 409 Not in a state that permits this
 | Performances `conditions.performanceIds` | multi-picker: choose performances | optional | — | — | — | — | `updatePromotion` body |
 | Advance days min `conditions.advanceDaysMin` | number field | optional | — | — | — | Early-bird — booked at least this many days ahead. | `updatePromotion` body |
 | Advance days max `conditions.advanceDaysMax` | number field | optional | — | — | — | Last-minute — booked no more than this many days ahead. | `updatePromotion` body |
-| Eligibility rules `conditions.eligibilityRuleIds` | multi-picker: choose eligibility rules | optional | — | — | — | Reusable eligibility rules (`promotions.promotion_rule` rows of `ruleType: eligibility` with no promotion of their own, saved by setEligibilityRule) that must also hold. | `updatePromotion` body |
+| Eligibility rules `conditions.eligibilityRuleIds` | multi-picker: choose eligibility rules | optional | — | — | — | Reusable eligibility rules (`promotions.promotion_rule` rows of `ruleType: eligibility` with no promotion of their own) that must also hold. | `updatePromotion` body |
 | Discount `discount` | group | optional | — | — | — | — | `updatePromotion` body |
 | Kind `discount.kind` | select | required | — | Percentage · Fixed amount · Fixed price · Buy x get y · Free item · Tiered percentage | — | — | `updatePromotion` body |
 | Percentage `discount.percentage` | stepper or slider (%) | optional | — | min 0; max 100 | — | — | `updatePromotion` body |
@@ -948,8 +1591,8 @@ Errors to draw in the form: 409 Not in a state that permits this
 | Min quantity `discount.tiers[].minQuantity` | number field | required | — | min 1 | — | — | `updatePromotion` body |
 | Percentage `discount.tiers[].percentage` | stepper or slider (%) | required | — | min 0; max 100 | — | — | `updatePromotion` body |
 | Max discount amount `discount.maxDiscountAmount` | money field | optional | — | — | AED, 2 decimals shown (up to 4 accepted), currency from the … | Cap on a percentage discount. Prevents an unbounded discount on a large basket. | `updatePromotion` body |
-| Reward variants `discount.rewardVariantIds` | multi-picker: choose reward variants | optional | — | — | — | The reward products, where the reward is not the qualifying product: the free gift of `freeItem`, the "different product" of a `buyXGetY` (setGiftFreeProduct, setBuyGetBogo). | `updatePromotion` body |
-| Max applications per basket `discount.maxApplicationsPerBasket` | number field | optional | — | min 1 | — | How many times the offer repeats in one basket: the "maximum repetitions" of an N-for-X offer (setFixedPriceOffer). | `updatePromotion` body |
+| Reward variants `discount.rewardVariantIds` | multi-picker: choose reward variants | optional | — | — | — | The reward products, where the reward is not the qualifying product: the free gift of `freeItem`, the "different product" of a `buyXGetY` (createPromotion; the builders … | `updatePromotion` body |
+| Max applications per basket `discount.maxApplicationsPerBasket` | number field | optional | — | min 1 | — | How many times the offer repeats in one basket: the "maximum repetitions" of an N-for-X offer (createPromotion; setFixedPriceOffer was retired in r2, CHG-CLN-001). | `updatePromotion` body |
 
 Errors to draw in the form: 409 Conditions or discount amended on a live promotion
 
@@ -981,6 +1624,13 @@ Errors to draw in the form: 400 Required parameter missing, or the date range ex
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
 | Reason `reason` | text area | required | — | min length 3; max length 500 | — | — | `voidCouponCode` body |
+
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **discount**: The kind is chosen first (Percentage, Fixed amount off, Fixed price, Buy X get Y, Free item, Tiered percentage) and only that kind's inputs show; Buy X get Y shows "Buy 2, get 1 at 100% off" as a sentence builder. *(source: contracts/satellite/promotions.yaml#/components/schemas/Discount / contracts/satellite/promotions.yaml#/components/schemas/DiscountKind / DI-174 / DI-357)*
+- **stackingMode**: Required, never defaulted silently: Exclusive, Stackable, Best only, Stack within group (group name then required); precedence shown as "evaluated first when several apply". *(source: contracts/satellite/promotions.yaml#/components/schemas/StackingMode)*
+- **coupon campaign type**: One shared code (with a redemption limit, for social media) or a batch of unique single-use codes; generating a batch is asynchronous, up to 50,000 at a time, and produces a file to download. *(source: contracts/satellite/promotions.yaml#createCouponCampaign / contracts/satellite/promotions.yaml#generateCouponCodes / DI-173)*
+- **budgetCap**: Money; explained as "stops the promotion at checkout once this much discount has been given". *(source: contracts/satellite/promotions.yaml#createPromotion / R101)*
 
 #### Outputs: what the screen shows and produces
 
@@ -1112,6 +1762,18 @@ Errors to draw in the form: 400 Required parameter missing, or the date range ex
 | Void coupon code (destructive button) | `voidCouponCode` POST `/coupon-codes/{code}/void` | inline | CouponCode | 409 Already redeemed. | — |
 | What publishing changes (publish gate) | navigation or local | — | — | — | — |
 
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **promotion row**: Status badge (Draft, Scheduled, Live, Paused, Expired, Ended), valid dates, redemptions, discount given against budget as a bar. *(source: contracts/satellite/promotions.yaml#getPromotionUsage)*
+- **conflict analysis**: Before Publish, the overlapping live promotions, the combined worst-case discount and the resulting line price. *(source: contracts/satellite/promotions.yaml#analysePromotionConflicts)*
+- **simulation**: Over a past period, orders that would have qualified, discount total, incremental orders and whether the budget would have been breached. *(source: contracts/satellite/promotions.yaml#simulatePromotion)*
+
+**What each action does** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **Publish**: Runs the conflict analysis; refused when a combination leaves a line at zero or below or under the venue's near-zero setting, naming the promotions; otherwise goes live or scheduled and reaches tills with the next catalogue release. *(source: contracts/satellite/promotions.yaml#publishPromotion / R101 / R096)*
+- **Pause / End / Unschedule**: Pause keeps carts already priced at their price; End is a decision recorded with a reason, distinct from Expired; Unschedule returns a scheduled promotion to draft. *(source: contracts/satellite/promotions.yaml#pausePromotion / contracts/satellite/promotions.yaml#endPromotion / contracts/satellite/promotions.yaml#unschedulePromotion)*
+- **Void code / void voucher**: Reason required; voiding a part-used voucher does not reverse what was already spent, and the dialog says so. *(source: contracts/satellite/promotions.yaml#voidVoucher / contracts/satellite/promotions.yaml#voidCouponCode)*
+
 **Data it reads**: `listPromotions` (onLoad, List promotions); `listCouponCampaigns` (onLoad, List coupon campaigns); `getDashboard` (onLoad, Read a dashboard with tile data); `listVoucherBatches` (onLoad, Voucher batches issued); `listCommercialCampaigns` (onLoad, List commercial campaigns); `recordDashboardView` (background, Record that a dashboard was opened — fired once when the …)
 
 **Where the user goes next**
@@ -1135,6 +1797,47 @@ Errors to draw in the form: 400 Required parameter missing, or the date range ex
 | Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRICE_VIEW`, which `listPromotions` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Conditions are unsatisfiable, or the discount exceeds the configured cap. The cap is `VenueSettings.promotions.maxDiscountPercent`, a venue setting with a …; 400 More guests in `assignToSubjectIds` than `quantity` codes (audit R101); 400 Required parameter missing, or the date range exceeds `maxDateRangeDays` (366 days when the definition sets none, audit R158); 400 The variants' … |
+
+#### Edge cases to draw
+
+- **Editing a live promotion**: Conditions and discount are locked; only pause, extend (end date) or end are offered. *(source: contracts/satellite/promotions.yaml#updatePromotion)*
+- **A/B variants**: Traffic percentages must total exactly 100; a variant at 0 is kept and shown as receiving no traffic. *(source: contracts/satellite/promotions.yaml#setPromotionVariants / R101)*
+
+#### Consistency with other screens
+
+- Match `ADM-148`: The P09 rule builder edits promotions too; same states, stacking vocabulary and conflict panel (PR-10).
+- Match `ADM-159`: Same coupon campaign concepts (shared vs unique) and wording.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+promotions:
+- code: SUMMER-BOGO
+  name: Buy 2 Day Passes, get the 3rd free
+  nameAr: اشترِ تذكرتين واحصل على الثالثة مجاناً
+  kind: buyXGetY
+  status: Live
+  stacking: Exclusive
+  budgetCap: AED 50,000.00
+  given: AED 18,240.00
+- code: RESIDENT-15
+  name: UAE residents 15% off weekdays
+  kind: percentage
+  status: Scheduled
+  validFrom: '2026-11-01'
+couponCampaign:
+  code: INSTA-DUNE
+  type: One shared code
+  maxRedemptions: 500
+  discount: 10%
+voucherBatch:
+  name: Corporate gift vouchers Q4
+  faceValue: AED 200.00
+  quantity: 1000
+  outstandingLiability: AED 164,400.00
+```
 
 #### Permissions
 
@@ -1220,6 +1923,7 @@ Also apply: 4 for P08 · Sell, 24 for all of P08, 29 for every app (section *Des
 - [ ] Every transition is wired: `BO-007`, `BO-009`, `ANL-009`.
 - [ ] Every gated control is gated: `PRICE_CONFIGURE`, `PRICE_VIEW`, `REPORT_VIEW_VENUE`.
 - [ ] The 3 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 2 edge case(s) from the process notes are drawn.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -1241,6 +1945,16 @@ Also apply: 4 for P08 · Sell, 24 for all of P08, 29 for every app (section *Des
 | Route | `/venue-operations/packages-bundles` |
 
 **What the spec says about it.** Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. **Improved 20 August against the client design board.** Answers 2 board screen(s): Combo & Meal Builder; Bundle, Kit & Gift Set Builder. **The board specifies this screen further rather than replacing it** — the id, its flows and its navigation are unchanged, which is what keeps 3,184 traceability rows and every board anchor pointing at something real.
+
+**Known gaps.** Removed 2 October 2026 (CHG-WIR-025): reportBundleApplied is a workstation reporting that it applied a catalogue release, which no person on a back-office screen does, and publishBundle publishes the … Removed 2 October 2026 (CHG-WIR-025): reportBundleApplied is a workstation reporting that it applied a catalogue release, which no person on a back-office screen does, and publishBundle publishes the …
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Where the venue builds what sells as one line: ticket bundles (admission plus meal plus retail), group packages (school trips, birthday parties), F&B meal combos and how each is priced. The thing to get right is the revenue allocation: it is mandatory, it is what the ledger splits, and components cannot change once a bundle has sold.
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- List operation(s) listCatalogueBundles return a bare array, not the paged list envelope (items, nextCursor, hasMore). (CHG-SBO-005)
+
+**Fixed on main** (the package already carries these; draw what it says): "Report bundle applied" (reportBundleApplied) is offered as a form on this screen, and publishBundle publishes the whole catalogue release … (CHG-WIR-025).
 
 #### Inputs: what the user enters or picks
 
@@ -1279,28 +1993,6 @@ Also apply: 4 for P08 · Sell, 24 for all of P08, 29 for every app (section *Des
 Carried, not typed: `productId`
 
 Errors to draw in the form: 400 Validation failed; 403 Authenticated but not permitted at the requested scope; 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.
-
-**Form: Publish bundle** (modal, opened by *Publish bundle*; *Publish bundle* calls `publishBundle`, *Cancel* sends nothing)
-
-**Collects what `publishBundle` sends before it is called.** Required: `venueId`. Optional: `note`, `staleAfterHours`. Dismissing sends nothing; the screen behind is unchanged.
-
-| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
-|---|---|---|---|---|---|---|---|
-| Venue `venueId` | picker: choose a venue | required | — | — | shows names, sends the id | — | `publishBundle` body |
-| Note `note` | text area | optional | — | max length 500 | — | — | `publishBundle` body |
-| Stale after hours `staleAfterHours` | number field (hours) | optional | — | min 1 | — | How long a terminal may trade on this bundle before refusing. Defaults to the venue's configured bound. | `publishBundle` body |
-
-Errors to draw in the form: 403 Authenticated but not permitted at the requested scope; 409 A publish is already in progress for this venue
-
-**Form: Report bundle applied** (modal, opened by *Report bundle applied*; *Report bundle applied* calls `reportBundleApplied`, *Cancel* sends nothing)
-
-**Collects what `reportBundleApplied` sends before it is called.** Required: `appliedAt`, `outcome`. Optional: `error`. Dismissing sends nothing; the screen behind is unchanged.
-
-| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
-|---|---|---|---|---|---|---|---|
-| Applied at `appliedAt` | date and time picker | required | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `reportBundleApplied` body |
-| Outcome `outcome` | segmented control | required | — | Applied · Rolled back · Signature invalid | — | — | `reportBundleApplied` body |
-| Error `error` | text field | optional | — | — | — | — | `reportBundleApplied` body |
 
 **Form: Create bundle** (modal, opened by *Create bundle*; *Create bundle* calls `createBundle`, *Cancel* sends nothing)
 
@@ -1374,6 +2066,13 @@ Errors to draw in the form: 400 Allocation does not sum to 100 per cent, or fixe
 | Status `status` | radio group | required | Draft | Draft · Active · Inactive · Retired | — | The status of a catalogue configuration record (29 September, data model DM3): price lists, rates, fees and fee rules, tax profiles and rules, calculation and rounding profiles … | `setPackagePricingDefinition` body |
 
 Errors to draw in the form: 409 `changeRequestRequired`.; 422 `priceRequired` or `circularComponent`.
+
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **components and choice groups**: Fixed components (ticket type and quantity) and, for a dynamic bundle, choice groups ("choose 3 of 5 attractions") on one canvas; the bundle price is fixed and the guest's choice only changes the allocation. *(source: contracts/satellite/promotions.yaml#createBundle / ADR-0019 / DI-435)*
+- **allocation**: Required before save; default proportional to the components' list prices, shown as amounts and percentages that must total the bundle price exactly (rounding remainder shown on one line). *(source: contracts/satellite/promotions.yaml#createBundle / R101 / ADR-0008)*
+- **group package**: Kind School or Party; maximum participants; duration (minimum 15 minutes); hosts included; priced per participant or per package; free leader ratio for schools (one teacher per 10 pupils by default); payment by invoice (schools), deposit (parties) or full. *(source: contracts/spine/catalogue.yaml#setGroupPackageDefinition)*
+- **package pricing model**: Fixed package price, sum of components, discounted component sum or component override; and whether the guest sees the total only, each component, or the component and the saving. *(source: contracts/spine/catalogue.yaml#setPackagePricingDefinition)*
 
 #### Outputs: what the screen shows and produces
 
@@ -1455,13 +2154,19 @@ Errors to draw in the form: 409 `changeRequestRequired`.; 422 `priceRequired` or
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-|  (publish gate) | navigation or local | — | — | — | — |
-| Publish bundle (primary button) | `publishBundle` POST `/catalogue/bundles` | inline | BundleSummary | 403 Authenticated but not permitted at the requested scope; 409 A publish is already in progress for this venue | opens modal first |
-| Report bundle applied (secondary button) | `reportBundleApplied` POST `/catalogue/bundles/{version}/applied` | inline | — | — | opens modal first |
 | Create bundle (secondary button) | `createBundle` POST `/bundles` | CreateBundleRequest | Bundle | 400 Allocation does not sum to 100 per cent, or fixed amounts do not sum to the bundle price.; 422 A `fnbMenuItem` component with no `menuItemId`, or whose menu item does not sell the component's `variantId` (MOB-4, 29 … | opens modal first |
 | What publishing changes (publish gate) | navigation or local | — | — | — | — |
 | Save group package definition (secondary button) | `setGroupPackageDefinition` PUT `/products/{productId}/group-package` | GroupPackageDefinition | GroupPackageDefinition | 400 Validation failed; 403 Authenticated but not permitted at the requested scope; 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path. | opens modal first |
 | Save package pricing definition (secondary button) | `setPackagePricingDefinition` PUT `/package-pricing` | PackagePricing | PackagePricing | 409 `changeRequestRequired`.; 422 `priceRequired` or `circularComponent`. | gated `PRICE_CONFIGURE`; opens modal first |
+
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **saving**: Savings amount and percentage against the components bought separately, as the guest will see it. *(source: contracts/satellite/promotions.yaml#createBundle)*
+- **visual map of a multi-venue bundle**: Which venues, meal vouchers, parking or upgrades the bundle includes, drawn as a small map or diagram. *(source: DI-469)*
+
+**What each action does** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **Publish to tills**: Publishes the venue's catalogue release (not the bundle alone); the confirmation says every pending catalogue change at the venue goes with it and shows how many workstations have applied the last release. *(source: contracts/spine/catalogue.yaml#publishBundle / contracts/spine/catalogue.yaml#reportBundleApplied)*
 
 **Data it reads**: `listCatalogueBundles` (onLoad, List published bundles); `getLatestBundle` (onLoad, Pull the current bundle for this workstation's venue); `listCommercialCampaigns` (onLoad, List commercial campaigns)
 
@@ -1470,7 +2175,7 @@ Errors to draw in the form: 409 `changeRequestRequired`.; 422 `priceRequired` or
 - → `BO-007` Product Directory: *Product Directory*; carries `productId`
 - → `BO-008` Product Detail & Variants: *Product Detail & Variants*; carries `productId`, `version`
 - → `BO-009` Pricing Rules: *Pricing Rules*; carries `priceListId`
-- → `ANL-009` AI Assistant & Action Center: *AI Assistant & Action Center*
+- → `ANL-009` AI Assistant & Action Center: *AI Assistant & Action Center*; calls `createBundle`
 
 #### States
 
@@ -1482,7 +2187,43 @@ Errors to draw in the form: 409 `changeRequestRequired`.; 422 `priceRequired` or
 | Empty, no results (`?state=emptyNoResults`) | Never shown: `listCatalogueBundles` takes no filter, so an empty list is always the first-run state above. |
 | Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_VIEW`, which `getGroupPackageDefinition` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 400 Allocation does not sum to 100 per cent, or fixed amounts do not sum to the bundle price.; 400 The bundle's allocation is `fixedAmount` and the new price no longer equals the sum of the fixed amounts.; 400 Validation failed; 409 A publish is already in progress for this venue |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 Allocation does not sum to 100 per cent, or fixed amounts do not sum to the bundle price.; 400 The bundle's allocation is `fixedAmount` and the new price no longer equals the sum of the fixed amounts.; 400 Validation failed; 409 `changeRequestRequired`. |
+
+#### Edge cases to draw
+
+- **Editing a bundle that has sold**: Components and allocation are read-only with "sold since 12 Oct"; name, price, end date and on-sale remain editable. *(source: contracts/satellite/promotions.yaml#updateBundle)*
+- **Combo with a slot that has no default**: Warn that every till will need extra taps; a default per slot is expected in practice. *(source: contracts/satellite/fnb.yaml#setComboSlots)*
+
+#### Consistency with other screens
+
+- Match `ADM-179`: Bundle Definition & Setup on P09 edits the same bundle; same type names and sections (PR-10).
+- Match `BO-045`: Meal combos are F&B (fnb-retail process); this screen shows them with the same slot editor.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+bundle:
+  code: DUNE-FAMILY4
+  name: Family Fun Bundle (2 adults, 2 children, lunch)
+  nameAr: باقة المرح العائلية
+  price: AED 899.00
+  saving: AED 181.00 (17%)
+  allocation:
+  - c: Day Pass Adult x2
+    a: AED 491.30
+  - c: Day Pass Child x2
+    a: AED 407.70
+groupPackage:
+  kind: school
+  name: Half-day school trip
+  maxParticipants: 30
+  duration: 240
+  pricing: per pupil
+  freeLeaderRatio: 10
+  payment: invoice
+```
 
 #### Permissions
 
@@ -1491,8 +2232,6 @@ Errors to draw in the form: 409 `changeRequestRequired`.; 422 `priceRequired` or
 - `setGroupPackageDefinition` → `PRODUCT_CONFIGURE` (configure) · staff
 - `listCatalogueBundles` → `PRODUCT_VIEW` (read) · staff, guest
 - `getLatestBundle` → `PRODUCT_VIEW` (read) · staff
-- `publishBundle` → `PRODUCT_CONFIGURE` (configure) · staff
-- `reportBundleApplied` → `PRODUCT_VIEW` (read) · staff
 - `createBundle` → `PRODUCT_CONFIGURE` (configure) · staff
 - `createCombo` → `PRODUCT_CONFIGURE` (configure) · staff
 - `setComboSlots` → `PRODUCT_CONFIGURE` (configure) · staff
@@ -1504,11 +2243,10 @@ Errors to draw in the form: 409 `changeRequestRequired`.; 422 `priceRequired` or
 
 #### Requirements it meets
 
-12 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+11 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
 
 | Ref | Requirement (shortened) | Domain | Verdict | Via |
 |---|---|---|---|---|
-| 1.4.7 | System shall allow publishing products to selected sales channels including Website, Mobile App, POS, API and Reseller channels. | Ticketing Catalogue | CONTRACTED | `publishBundle` |
 | 1.1.17 | System shall support bundled ticket products combining multiple tickets, attractions, products, services, parking, F&B, retail items, memberships or vouchers into a single sellable product. | Ticketing Catalogue | CONTRACTED | `createBundle` |
 | 1.1.43 | Configure ticket hierarchies and product bundles | Ticketing Catalogue | CONTRACTED | `createBundle` |
 | 1.1.53 | F&B entitlement management | Ticketing Catalogue | CONTRACTED | `createBundle` |
@@ -1547,13 +2285,14 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (75), with its required mark, default, format and its error state (400, 403, 404, 409, 412, 422).
+- [ ] Every input above is drawn (69), with its required mark, default, format and its error state (400, 403, 404, 409, 412, 422).
 - [ ] Every output is drawn (47 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-011?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: , Publish bundle, Report bundle applied, Create bundle, What publishing changes, Save group package definition, Save package pricing definition.
+- [ ] Every action is wired with its success and its failure: Create bundle, What publishing changes, Save group package definition, Save package pricing definition.
 - [ ] Every transition is wired: `BO-007`, `BO-008`, `BO-009`, `ANL-009`.
 - [ ] Every gated control is gated: `PRICE_CONFIGURE`, `PRICE_VIEW`, `PRODUCT_CONFIGURE`, `PRODUCT_VIEW`.
 - [ ] The 4 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 2 edge case(s) from the process notes are drawn.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -1575,6 +2314,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Route | `/venue-operations/membership-products` |
 
 **What the spec says about it.** Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Membership products: what an annual pass or membership grants, for how long, and how it renews. It is the product configuration (BO-008) seen through the entitlement: validity anchor, entries, days, blackout dates, fast track, stored value and renewal. The thing to get right is expiry: "ends 31 December" and "a year from purchase" must be distinguishable at a glance.
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- List operation(s) listEntitlementTemplates, listAlternativeCodes return a bare array, not the paged list envelope (items, nextCursor, hasMore). (CHG-SBO-005)
 
 #### Inputs: what the user enters or picks
 
@@ -1758,6 +2503,12 @@ Errors to draw in the form: 403 Approval attempted by the principal who submitte
 
 Errors to draw in the form: 400 `media` with no `isPrimary` item or more than one, or one asset twice.; 403 Authenticated but not permitted at the requested scope; 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 A business code the request names is already used within its uniqueness scope (the scope the property's `x-ticvai-unique` names; decided 28 September, audit …; 422 A `media` asset that is not `ready` or whose kind does not match, a `consentQuestionIds` entry that names no active consent question of the tenant, or …
 
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **entitlement template**: Validity kind first (single use, dated, date range, rolling, unlimited, count limited), then the expiry anchor (days after, end of month, quarter, year, fixed date, season end); blackout dates on a calendar; entries allowed empty means unlimited. *(source: contracts/spine/catalogue.yaml#createEntitlementTemplate / DI-171 / DI-451 / DI-452)*
+- **renewal**: Auto-renew default, renewal term, grace days and the ticket type it renews into, grouped under "Renewal". *(source: contracts/spine/catalogue.yaml#createEntitlementTemplate / TRACKER Actions row 140)*
+- **purchase eligibility**: Residency, age and minimum loyalty tier for buying the membership, distinct from where it admits. *(source: contracts/spine/catalogue.yaml#createEntitlementTemplate / DI-463)*
+
 #### Outputs: what the screen shows and produces
 
 **Shown**
@@ -1852,6 +2603,14 @@ Errors to draw in the form: 400 `media` with no `isPrimary` item or more than on
 | Transition product lifecycle (secondary button) | `transitionProductLifecycle` POST `/products/{productId}/lifecycle` | inline | Product | 403 Approval attempted by the principal who submitted it (`approver-is-submitter`). Segregation applies here as it does to journals.; 409 Transition not valid from the current state, or archiving attempted while … | opens modal first |
 | Save product (secondary button) | `updateProduct` PATCH `/products/{productId}` | UpdateProductRequest | Product | 400 `media` with no `isPrimary` item or more than one, or one asset twice.; 403 Authenticated but not permitted at the requested scope; 404 The resource does not exist, or is outside the caller's scope. This includes a … | opens modal first |
 
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **entitlement summary sentence**: The template rendered as one line a guest could read ("Unlimited entry, every day except public holidays, 12 months from first visit, fast track Express"). *(source: contracts/spine/catalogue.yaml#createEntitlementTemplate)*
+
+**What each action does** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **New entitlement template**: Created and selected on the product; reusable by other products at other prices. *(source: contracts/spine/catalogue.yaml#listEntitlementTemplates)*
+
 **Data it reads**: `listProducts` (onLoad, List products); `listEntitlementTemplates` (onLoad, List entitlement templates)
 
 **Where the user goes next**
@@ -1871,6 +2630,36 @@ Errors to draw in the form: 400 `media` with no `isPrimary` item or more than on
 | Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 A `categoryId` that names no category of the venue, or a `guidedAnswerIds` entry that is not an answer of the venue's published guided choice (W4, 29 …; 400 A `variantId` is not a variant of this product, or the body sends one code twice for the same partner.; 400 Two axes share a code, or one axis repeats a value code.; 400 Validation failed |
+
+#### Edge cases to draw
+
+- **First-use activation never used**: A fallback expiry is required (for example issue date + 30 days) and the form will not save without it. *(source: DI-451)*
+
+#### Consistency with other screens
+
+- Match `BO-008`: Same record and header; this screen is the membership view of it (PR-10).
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+membership:
+  name: Annual Pass Gold
+  nameAr: الاشتراك السنوي الذهبي
+  code: DUNE-ANNUAL-GOLD
+  price: AED 1,450.00
+entitlement:
+  validity: rolling 365 days
+  anchor: from purchase
+  entries: unlimited
+  blackout:
+  - '2026-12-02'
+  - '2026-12-31'
+  fastTrack: express
+  autoRenew: true
+  graceDays: 14
+```
 
 #### Permissions
 
@@ -1933,6 +2722,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-007`, `BO-008`, `BO-009`.
 - [ ] Every gated control is gated: `PRODUCT_CONFIGURE`, `PRODUCT_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 1 edge case(s) from the process notes are drawn.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -1946,7 +2736,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Sell · wave 2 · needs the `ticketing` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `CAPACITY_CONFIGURE`, `PRODUCT_CONFIGURE`, `PRODUCT_VIEW` (2 configure, 1 read); in the flows as marketer |
+| Who uses it | venue staff holding `CAPACITY_CONFIGURE`, `PARTNER_MANAGE`, `PARTNER_VIEW`, `PRODUCT_CONFIGURE`, `PRODUCT_VIEW` (3 configure, 2 read); in the flows as marketer |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listChannelCapacities` reads the population and `getChannelAllocations` reads one of them — list, select, act |
 | Offline | online only |
@@ -1954,6 +2744,13 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Route | `/venue-operations/channel-distribution` |
 
 **What the spec says about it.** Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. **Improved 20 August against the client design board.** Answers 2 board screen(s): Catalog Builder & Store Assortment; Ticketing, Event & Experience Commerce Integration. **The board specifies this screen further rather than replacing it** — the id, its flows and its navigation are unchanged, which is what keeps 3,184 traceability rows and every board anchor pointing at something real. **Improved 20 August against the client design board**, answering 1 board screen(s): Sales Channel Configuration. **The id, flows and navigation are unchanged** — a board specifies a screen further; it does not replace it. **Retail board operations wired 24 August.**
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Where each product may be sold and how much of a performance's capacity each channel may take: channel capacity ("envelopes"), the split across channels with a shared general pool, and OTA listings with their own allocation. The thing to get right: an allocation is a ceiling a channel sells against, and giving an OTA the whole envelope means the OTA sells all of it.
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- setChannelListing (OTA listings) lives in the subscription contract with PARTNER_MANAGE. (CHG-SBO-005)
+- List operation(s) listChannelListings return a bare array, not the paged list envelope (items, nextCursor, hasMore). (CHG-SBO-005)
 
 #### Inputs: what the user enters or picks
 
@@ -2044,7 +2841,26 @@ Errors to draw in the form: 403 Authenticated but not permitted at the requested
 
 **Collects what `setChannelListing` sends before it is called.** Required: `id`, `channelName`, `productId`, `status`. Optional: `externalProductRef`, `allocationUnits`, `priceListId`, `adapter`, `adapterCredentialRef`, `pushIntervalMinutes`, `guestDataScope`, `lastPushedAt`, `scopePath`. Dismissing sends nothing; the screen behind is unchanged.
 
-`setChannelListing` is not in any contract: draw the form greyed and list it in FINDINGS.md.
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| ID `id` | picker: choose an id | required | — | — | shows names, sends the id | — | `setChannelListing` body |
+| Channel name `channelName` | select | required | — | Viator · Klook · Headout · Get your guide · Tiqets · Expedia · Other | — | — | `setChannelListing` body |
+| Product `productId` | picker: choose a product | required | — | — | shows names, sends the id | — | `setChannelListing` body |
+| External product ref `externalProductRef` | text field | optional | — | — | — | — | `setChannelListing` body |
+| Status `status` | radio group | required | — | Draft · Live · Paused · Delisted | — | — | `setChannelListing` body |
+| Allocation units `allocationUnits` | number field | optional | — | — | — | Inventory published to this channel, not the venue's whole capacity. An OTA given the full envelope will sell it, and the venue discovers at the gate. | `setChannelListing` body |
+| Price list `priceListId` | picker: choose a price list | optional | — | — | shows names, sends the id | — | `setChannelListing` body |
+| Adapter `adapter` | select | optional | — | Viator API · Klook API · Headout API · Get your guide API · Tiqets API · Octo standard · Generic | — | BL-067. The commercial model was complete and the wire was not — `PartnerAgreement` carries rates, commission, credit and channels, and `alternative-codes` maps a partner SKU so … | `setChannelListing` body |
+| Adapter credential ref `adapterCredentialRef` | text field | optional | — | — | — | A vault reference. Never the credential, following the rule ADR-0020 set for AI providers. | `setChannelListing` body |
+| Push interval minutes `pushIntervalMinutes` | number field (minutes) | optional | 15 | — | — | How often availability is pushed. The gap between pushes is the oversell window, and a channel selling a high-demand slot needs a shorter one than a channel selling a museum on a … | `setChannelListing` body |
+| Guest data scope `guestDataScope` | radio group | optional | Name only | None · Name only · Name and contact · Full; A ticket arriving with no contact detail cannot be reissued or notified of a cancellation, and the venue should know that at listing time rather than at the gate. | — | What the OTA passes through, and it is usually less than the venue wants. A ticket arriving with no contact detail cannot be reissued or notified of a cancellation, and the venue … | `setChannelListing` body |
+| Last pushed at `lastPushedAt` | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `setChannelListing` body |
+| Scope path `scopePath` | text field | optional | — | — | — | The partition key (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — 49 tables were in that state, so a row … | `setChannelListing` body |
+
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **allocations**: Per channel a number of units, shown as a stacked bar against capacity with the unallocated remainder labelled "General pool, any channel once its own share is used"; the total cannot exceed capacity and a channel cannot go below what it has sold (including units under an unexpired hold). *(source: contracts/spine/catalogue.yaml#setChannelAllocations / DI-170 / R101)*
+- **OTA listing**: Channel (Viator, Klook, Headout, GetYourGuide, Tiqets, Expedia, other), external product reference, allocation units, price list, push interval (default 15 minutes, labelled as the oversell window) and the guest data the OTA passes through. *(source: contracts/satellite/subscription.yaml#setChannelListing)*
 
 #### Outputs: what the screen shows and produces
 
@@ -2071,18 +2887,18 @@ Errors to draw in the form: 403 Authenticated but not permitted at the requested
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | text | not in the schema: `ChannelListing.id` |
-| Channel name | text | not in the schema: `ChannelListing.channelName` |
-| Product ID | text | not in the schema: `ChannelListing.productId` |
-| External product ref | text | not in the schema: `ChannelListing.externalProductRef` |
-| Status | text | not in the schema: `ChannelListing.status` |
-| Allocation units | text | not in the schema: `ChannelListing.allocationUnits` |
-| Price list ID | text | not in the schema: `ChannelListing.priceListId` |
-| Adapter | text | not in the schema: `ChannelListing.adapter` |
-| Adapter credential ref | text | not in the schema: `ChannelListing.adapterCredentialRef` |
-| Push interval minutes | text | not in the schema: `ChannelListing.pushIntervalMinutes` |
-| Guest data scope | text | not in the schema: `ChannelListing.guestDataScope` |
-| Last pushed at | text | not in the schema: `ChannelListing.lastPushedAt` |
+| ID | the name it points at, never the id | — |
+| Channel name | chip: Viator, Klook, Headout, Get your guide, Tiqets, Expedia… | — |
+| Product | the name it points at, never the id | — |
+| External product ref | text | — |
+| Status | chip: Draft, Live, Paused, Delisted | — |
+| Allocation units | 1,234 | Inventory published to this channel, not the venue's whole capacity. An OTA given the full envelope will sell it, and the venue discovers … |
+| Price list | the name it points at, never the id | — |
+| Adapter | chip: Viator API, Klook API, Headout API, Get your guide API, Tiqets API, Octo standard… | BL-067. The commercial model was complete and the wire was not — `PartnerAgreement` carries rates, commission, credit and channels, and … |
+| Adapter credential ref | text | A vault reference. Never the credential, following the rule ADR-0020 set for AI providers. |
+| Push interval minutes | 1,234 | How often availability is pushed. The gap between pushes is the oversell window, and a channel selling a high-demand slot needs a shorter … |
+| Guest data scope | chip: None, Name only, Name and contact, Full | What the OTA passes through, and it is usually less than the venue wants. A ticket arriving with no contact detail cannot be reissued or … |
+| Last pushed at | 1 Oct 2026, 14:30 | — |
 
 **Every product** (data table, from `listProducts`)
 
@@ -2139,8 +2955,16 @@ Errors to draw in the form: 403 Authenticated but not permitted at the requested
 | Release channel allocation (secondary button) | `relinquishChannelAllocation` POST `/channel-capacities/{channelCapacityId}/channel-allocations/release` | inline | ChannelAllocationSet | — | opens modal first |
 | Save channel capacity (secondary button) | `updateChannelCapacity` PATCH `/channel-capacities/{channelCapacityId}` | inline | ChannelCapacity | 409 Capacity reduced below units already sold plus units under an unexpired lease (audit R101) | opens modal first |
 | Publish bundle (secondary button) | `publishBundle` POST `/catalogue/bundles` | inline | BundleSummary | 403 Authenticated but not permitted at the requested scope; 409 A publish is already in progress for this venue | opens modal first |
-| Save channel listing (secondary button) | `setChannelListing` (not in any contract) | — | — | — | — |
+| Save channel listing (secondary button) | `setChannelListing` PUT `/channel-listings` | ChannelListing | ChannelListing | — | opens modal first |
 | What publishing changes (publish gate) | navigation or local | — | — | — | — |
+
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **per-channel sold and remaining**: For each envelope, sold, held, remaining per channel and in the pool; OTA rows show last push time. *(source: contracts/spine/catalogue.yaml#setChannelAllocations)*
+
+**What each action does** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **Release allocation**: Returns a channel's unsold units to the pool with a reason; sold units stay sold. *(source: contracts/spine/catalogue.yaml#relinquishChannelAllocation)*
 
 **Data it reads**: `listChannelCapacities` (onLoad, List capacity envelopes); `listChannelListings` (onLoad, What is listed on which OTA); `listProducts` (onLoad, List products)
 
@@ -2163,6 +2987,37 @@ Errors to draw in the form: 403 Authenticated but not permitted at the requested
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 A `categoryId` that names no category of the venue, or a `guidedAnswerIds` entry that is not an answer of the venue's published guided choice (W4, 29 …; 400 Allocations exceed the channel capacity in total, or a channel appears twice; 409 A publish is already in progress for this venue; 409 An allocation is below what that channel has already sold plus its leased units (audit R101) |
 
+#### Edge cases to draw
+
+- **Reducing a channel below what it has sold**: Refused with the sold count named ("B2B has sold 42; minimum 42"). *(source: contracts/spine/catalogue.yaml#setChannelAllocations)*
+
+#### Consistency with other screens
+
+- Match `BO-017`: Same envelope bar component and the same channel labels (vocabulary Channel).
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+envelope:
+  performance: Dune Nights, Fri 14 Nov 2026 20:00
+  capacity: 1000
+  allocations:
+    Website: 400
+    App: 200
+    B2B partners: 150
+    Travel agents (OTA): 100
+  pool: 150
+otaListing:
+  channel: Klook
+  ref: KLK-88231
+  allocation: 60
+  pushInterval: 10
+  guestData: nameAndContact
+  status: live
+```
+
 #### Permissions
 
 - `getChannelAllocations` → `PRODUCT_VIEW` (read) · staff, partner
@@ -2171,8 +3026,10 @@ Errors to draw in the form: 403 Authenticated but not permitted at the requested
 - `listChannelCapacities` → `PRODUCT_VIEW` (read) · staff, partner
 - `relinquishChannelAllocation` → `CAPACITY_CONFIGURE` (configure) · staff, partner
 - `updateChannelCapacity` → `CAPACITY_CONFIGURE` (configure) · staff
+- `listChannelListings` → `PARTNER_VIEW` (read) · staff
 - `listProducts` → `PRODUCT_VIEW` (read) · staff, guest, partner
 - `publishBundle` → `PRODUCT_CONFIGURE` (configure) · staff
+- `setChannelListing` → `PARTNER_MANAGE` (configure) · staff
 
 **A refused user sees:** Shown when the caller lacks `PRODUCT_VIEW`, which `getChannelAllocations` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -2221,13 +3078,14 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (27), with its required mark, default, format and its error state (400, 403, 404, 409).
+- [ ] Every input above is drawn (40), with its required mark, default, format and its error state (400, 403, 404, 409).
 - [ ] Every output is drawn (54 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-013?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: , Save channel allocations, Create channel capacity, Release channel allocation, Save channel capacity, Publish bundle, Save channel listing, What publishing changes.
 - [ ] Every transition is wired: `BO-007`, `BO-008`, `BO-009`, `BO-011`.
-- [ ] Every gated control is gated: `CAPACITY_CONFIGURE`, `PRODUCT_CONFIGURE`, `PRODUCT_VIEW`.
+- [ ] Every gated control is gated: `CAPACITY_CONFIGURE`, `PARTNER_MANAGE`, `PARTNER_VIEW`, `PRODUCT_CONFIGURE`, `PRODUCT_VIEW`.
 - [ ] The 2 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 1 edge case(s) from the process notes are drawn.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -2250,13 +3108,18 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **What the spec says about it.** Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. **Improved 20 August against the client design board.** Answers 2 board screen(s): Availability, Pricing, Channels & Publishing; Product Availability, Lifecycle & Publishing. **The board specifies this screen further rather than replacing it** — the id, its flows and its navigation are unchanged, which is what keeps 3,184 traceability rows and every board anchor pointing at something real.
 
+**Known gaps.** Removed 2 October 2026 (CHG-WIR-025): The publishing screen repeated the whole product editor of BO-007 and BO-008 (create, attributes, alternative codes, variants, code lookup, update); it keeps the … Removed 2 October 2026 (CHG-WIR-025): The publishing screen repeated the whole product editor of BO-007 and BO-008 (create, attributes, alternative codes, variants, code lookup, update); it keeps the … Removed 2 October 2026 (CHG-WIR-025): The publishing screen repeated the whole product editor of BO-007 and BO-008 (create, attributes, alternative codes, variants, code lookup, update); it keeps the …
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Push catalogue changes to the tills and devices now or on a schedule, and see what is pending: products approved but not released, price lists changed, items marked unavailable. Publishing is what changes what every till charges, so it is its own deliberate step (F78 step 4).
+
+**Fixed on main** (the package already carries these; draw what it says): The screen repeats the whole product editor (create, attributes, alternative codes, lifecycle) of BO-007 and BO-008. (CHG-SBO-017); List operation(s) listAlternativeCodes return a bare array, not the paged list envelope (items, nextCursor, hasMore). (CHG-WIR-025).
+
 #### Inputs: what the user enters or picks
 
 **On the screen**
 
 | Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
 |---|---|---|---|---|---|---|---|
-| Venue id | picker: choose a venue (drawn as a picker, not a text box) | optional | — | — | shows names, sends the id | Sends `?venueId=` to `listProducts`. | `listProducts` ?venueId |
 | Kind | select | optional | — | Admission · Timed admission · Dated admission · Open dated · Seated · Membership · Bundle · Fnb · Retail · Rental · Add on · Gift card | — | Sends `?kind=` to `listProducts`. | `listProducts` ?kind |
 | Is sellable | toggle | optional | — | — | — | Sends `?isSellable=` to `listProducts`. | `listProducts` ?isSellable |
 
@@ -2267,74 +3130,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Category | picker: choose a category | — | — | `listProducts` ?categoryId |
 | Segment tag | text field | — | max length 120 | `listProducts` ?segmentTag |
 | Guided answers | multi-picker: choose guided answers | — | at most 10 | `listProducts` ?guidedAnswerIds |
-
-**Form: Create product** (modal, opened by *Create product*; *Create product* calls `createProduct`, *Cancel* sends nothing)
-
-**Collects what `createProduct` sends before it is called.** Required: `code`, `name`, `kind`, `venueId`. Optional: `description`, `channels`, `entitlementTemplateId`, `dataMaskValues`. Dismissing sends nothing; the screen behind is unchanged.
-
-| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
-|---|---|---|---|---|---|---|---|
-| Code `code` | text field | required | — | max length 64; pattern `^[A-Za-z0-9_-]+$`; A code already used by any product in the tenant, at any venue, is refused with `409 duplicate-code`. | — | Unique per tenant (decided 28 September, audit R108). A code already used by any product in the tenant, at any venue, is refused with `409 duplicate-code`. | `createProduct` body |
-| Family key `familyKey` | text field | optional | — | max length 64; pattern `^[A-Za-z0-9_-]+$`; At most one product per venue in a family, else `409 duplicate-code`. | — | The product family across the tenant's venues (decided 29 September, rev 3 REV3-18); see `Product.familyKey`. | `createProduct` body |
-| Name `name` | text field | required | — | max length 200 | — | — | `createProduct` body |
-| Description `description` | text area | optional | — | — | — | — | `createProduct` body |
-| Kind `kind` | select | required | — | Admission · Timed admission · Dated admission · Open dated · Seated · Membership · Bundle · Fnb · Retail · Rental · Add on · Gift card | — | `openDated` added 24 August from the client's *Create Ticket Flow* board, which names six main ticket types and this was the one with no kind: valid on any date within an eligible … | `createProduct` body |
-| Venue `venueId` | picker: choose a venue | required | — | — | shows names, sends the id | — | `createProduct` body |
-| Channels `channels` | multi-select chips | optional | — | POS · Kiosk · Web · Mobile · B2B · Ota · Call centre | — | — | `createProduct` body |
-| Entitlement template `entitlementTemplateId` | picker: choose an entitlement template | optional | — | — | shows names, sends the id | — | `createProduct` body |
-| Data mask values `dataMaskValues` | key and value settings | optional | — | — | — | — | `createProduct` body |
-| Guest listing `guestListing` | segmented control | optional | Bookable | Bookable · Info only · Hidden; `hidden`: never listed or searched for a guest, and reachable only where a staff channel sells it. | — | How a product appears to a guest (decided 29 September, rev 3 REV3-14). `bookable`: listed and searched while it is on sale, and added to the basket. | `createProduct` body |
-| Not bookable label `notBookableLabel` | text, one per language | optional | — | — | English and Arabic (Arabic right to left) | — | `createProduct` body |
-| Sales contact `salesContact` | group | optional | — | — | — | See `Product.salesContact` (W3, 29 September). | `createProduct` body |
-| Phone `salesContact.phone` | phone field | optional | — | max length 32 | +971 5X XXX XXXX (E.164) | — | `createProduct` body |
-| Email `salesContact.email` | email field | optional | — | max length 254 | name@example.ae | — | `createProduct` body |
-| Note `salesContact.note` | text, one per language | optional | — | At most 200 characters per language. | English and Arabic (Arabic right to left) | A line shown under the contact, e.g. *Group courses are booked by phone*. | `createProduct` body |
-| Booking flow `bookingFlowId` | picker: choose a booking flow | optional | — | — | shows names, sends the id | See `Product.bookingFlowId` (W8, W12, 29 September). | `createProduct` body |
-| Display tags `displayTags` | repeatable rows | optional | — | at most 6 | — | — | `createProduct` body |
-| Kind `displayTags[].kind` | radio group | required | — | Clock · Height · Free · Calendar · ID | — | `clock` a duration, `height` a height rule, `free` something included free, `calendar` a validity, `id` a document the guest must bring. | `createProduct` body |
-| Label `displayTags[].label` | text, one per language | required | — | Each language value at most 40 characters. | English and Arabic (Arabic right to left) | What the guest reads, e.g. *2 Hours*. | `createProduct` body |
-| Media `media` | repeatable rows | optional | — | at most 20 | — | — | `createProduct` body |
-| Asset `media[].assetId` | upload, or pick from the media library | required | — | — | PNG or SVG ≤ 2 MB for logos; images ≥ 1600 px; video MP4 | A `MediaAsset` of `assets.yaml`, in status `ready`. | `createProduct` body |
-| Kind `media[].kind` | segmented control | required | — | Image · Video | — | — | `createProduct` body |
-| Is primary `media[].isPrimary` | toggle | required | off | — | — | The item *Read more* opens on and a listing shows. Exactly one per product. | `createProduct` body |
-| Display order `media[].displayOrder` | number field | optional | 100 | — | — | — | `createProduct` body |
-| Alt text `media[].altText` | text, one per language | optional | — | — | English and Arabic (Arabic right to left) | — | `createProduct` body |
-| Consent questions `consentQuestionIds` | multi-picker: choose consent questions | optional | — | at most 10; no duplicates | — | — | `createProduct` body |
-| Requires time window `requiresTimeWindow` | toggle | optional | — | — | — | — | `createProduct` body |
-
-Errors to draw in the form: 400 Validation failed; 403 Authenticated but not permitted at the requested scope; 409 A business code the request names is already used within its uniqueness scope (the scope the property's `x-ticvai-unique` names; decided 28 September, audit …; 422 A `media` asset that is not `ready` or whose kind does not match, a `consentQuestionIds` entry that names no active consent question of the tenant, or …
-
-**Form: Save alternative codes** (modal, opened by *Save alternative codes*; *Save alternative codes* calls `setAlternativeCodes`, *Cancel* sends nothing)
-
-**Collects what `setAlternativeCodes` sends before it is called.** Required: `codes`. Dismissing sends nothing; the screen behind is unchanged.
-
-| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
-|---|---|---|---|---|---|---|---|
-| Codes `codes` | repeatable rows | required | — | — | — | — | `setAlternativeCodes` body |
-| Code `codes[].code` | text field | required | — | max length 128 | — | — | `setAlternativeCodes` body |
-| Partner `codes[].partnerId` | picker: choose a partner | required | — | — | shows names, sends the id | — | `setAlternativeCodes` body |
-| Partner name `codes[].partnerName` | text field | optional | — | — | — | — | `setAlternativeCodes` body |
-| Variant `codes[].variantId` | picker: choose a variant | optional | — | — | shows names, sends the id | — | `setAlternativeCodes` body |
-| Note `codes[].note` | text area | optional | — | max length 200 | — | — | `setAlternativeCodes` body |
-
-Errors to draw in the form: 400 A `variantId` is not a variant of this product, or the body sends one code twice for the same partner.; 409 Code already mapped to a different product for that partner
-
-**Form: Save product attributes** (modal, opened by *Save product attributes*; *Save product attributes* calls `setProductAttributes`, *Cancel* sends nothing)
-
-**Collects what `setProductAttributes` sends before it is called.** Required: `axes`. Dismissing sends nothing; the screen behind is unchanged.
-
-| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
-|---|---|---|---|---|---|---|---|
-| Axes `axes` | repeatable rows | required | — | — | — | — | `setProductAttributes` body |
-| Code `axes[].code` | text field | required | — | max length 64 | — | — | `setProductAttributes` body |
-| Name `axes[].name` | text field | required | — | max length 200 | — | — | `setProductAttributes` body |
-| Values `axes[].values` | repeatable rows | required | — | at least 1 | — | — | `setProductAttributes` body |
-| Code `axes[].values[].code` | text field | required | — | max length 64 | — | — | `setProductAttributes` body |
-| Label `axes[].values[].label` | text field | required | — | max length 200 | — | — | `setProductAttributes` body |
-| Price delta `axes[].values[].priceDelta` | money field | optional | — | A jsonb price cannot be summed in SQL. | AED, 2 decimals shown (up to 4 accepted), currency from the … | On the wire this is three fields; in the database it is one column. 24 August. | `setProductAttributes` body |
-| Duration minutes `axes[].values[].durationMinutes` | number field (minutes) | optional | — | min 15; max 1440; One axis per product at most may carry it; a second is a `400`. | — | How long a variant carrying this value books its space for, on a `length` axis of a product with `requiresTimeWindow` (decided 29 September, rev 3 REV3-13). | `setProductAttributes` body |
-
-Errors to draw in the form: 400 Two axes share a code, or one axis repeats a value code.; 403 Authenticated but not permitted at the requested scope; 409 Regeneration would exceed the variant ceiling for this product: `VenueSettings.catalogue.maxVariantsPerProduct`, a venue setting with a tenant default (decided …
 
 **Form: Transition product lifecycle** (modal, opened by *Transition product lifecycle*; *Transition product lifecycle* calls `transitionProductLifecycle`, *Cancel* sends nothing)
 
@@ -2348,38 +3143,6 @@ Errors to draw in the form: 400 Two axes share a code, or one axis repeats a val
 
 Errors to draw in the form: 403 Approval attempted by the principal who submitted it (`approver-is-submitter`). Segregation applies here as it does to journals.; 409 Transition not valid from the current state, or archiving attempted while unexpired entitlements exist.
 
-**Form: Save product** (modal, opened by *Save product*; *Save product* calls `updateProduct`, *Cancel* sends nothing)
-
-**Collects what `updateProduct` sends before it is called.** Nothing in the body is required. Optional: `name`, `description`, `channels`, `dataMaskValues`. Dismissing sends nothing; the screen behind is unchanged.
-
-| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
-|---|---|---|---|---|---|---|---|
-| Family key `familyKey` | text field | optional | — | max length 64; pattern `^[A-Za-z0-9_-]+$`; At most one product per venue in a family, else `409 duplicate-code`. | — | The product family across the tenant's venues (decided 29 September, rev 3 REV3-18); see `Product.familyKey`. | `updateProduct` body |
-| Name `name` | text field | optional | — | max length 200 | — | — | `updateProduct` body |
-| Description `description` | text area | optional | — | — | — | — | `updateProduct` body |
-| Channels `channels` | multi-select chips | optional | — | POS · Kiosk · Web · Mobile · B2B · Ota · Call centre | — | — | `updateProduct` body |
-| Data mask values `dataMaskValues` | key and value settings | optional | — | — | — | — | `updateProduct` body |
-| Guest listing `guestListing` | segmented control | optional | Bookable | Bookable · Info only · Hidden; `hidden`: never listed or searched for a guest, and reachable only where a staff channel sells it. | — | How a product appears to a guest (decided 29 September, rev 3 REV3-14). `bookable`: listed and searched while it is on sale, and added to the basket. | `updateProduct` body |
-| Not bookable label `notBookableLabel` | text, one per language | optional | — | — | English and Arabic (Arabic right to left) | — | `updateProduct` body |
-| Sales contact `salesContact` | group | optional | — | — | — | See `Product.salesContact` (W3, 29 September). | `updateProduct` body |
-| Phone `salesContact.phone` | phone field | optional | — | max length 32 | +971 5X XXX XXXX (E.164) | — | `updateProduct` body |
-| Email `salesContact.email` | email field | optional | — | max length 254 | name@example.ae | — | `updateProduct` body |
-| Note `salesContact.note` | text, one per language | optional | — | At most 200 characters per language. | English and Arabic (Arabic right to left) | A line shown under the contact, e.g. *Group courses are booked by phone*. | `updateProduct` body |
-| Booking flow `bookingFlowId` | picker: choose a booking flow | optional | — | — | shows names, sends the id | See `Product.bookingFlowId` (W8, W12, 29 September). | `updateProduct` body |
-| Display tags `displayTags` | repeatable rows | optional | — | at most 6 | — | — | `updateProduct` body |
-| Kind `displayTags[].kind` | radio group | required | — | Clock · Height · Free · Calendar · ID | — | `clock` a duration, `height` a height rule, `free` something included free, `calendar` a validity, `id` a document the guest must bring. | `updateProduct` body |
-| Label `displayTags[].label` | text, one per language | required | — | Each language value at most 40 characters. | English and Arabic (Arabic right to left) | What the guest reads, e.g. *2 Hours*. | `updateProduct` body |
-| Media `media` | repeatable rows | optional | — | at most 20 | — | — | `updateProduct` body |
-| Asset `media[].assetId` | upload, or pick from the media library | required | — | — | PNG or SVG ≤ 2 MB for logos; images ≥ 1600 px; video MP4 | A `MediaAsset` of `assets.yaml`, in status `ready`. | `updateProduct` body |
-| Kind `media[].kind` | segmented control | required | — | Image · Video | — | — | `updateProduct` body |
-| Is primary `media[].isPrimary` | toggle | required | off | — | — | The item *Read more* opens on and a listing shows. Exactly one per product. | `updateProduct` body |
-| Display order `media[].displayOrder` | number field | optional | 100 | — | — | — | `updateProduct` body |
-| Alt text `media[].altText` | text, one per language | optional | — | — | English and Arabic (Arabic right to left) | — | `updateProduct` body |
-| Consent questions `consentQuestionIds` | multi-picker: choose consent questions | optional | — | at most 10; no duplicates | — | — | `updateProduct` body |
-| Requires time window `requiresTimeWindow` | toggle | optional | — | — | — | — | `updateProduct` body |
-
-Errors to draw in the form: 400 `media` with no `isPrimary` item or more than one, or one asset twice.; 403 Authenticated but not permitted at the requested scope; 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 A business code the request names is already used within its uniqueness scope (the scope the property's `x-ticvai-unique` names; decided 28 September, audit …; 422 A `media` asset that is not `ready` or whose kind does not match, a `consentQuestionIds` entry that names no active consent question of the tenant, or …
-
 **Form: Publish bundle** (modal, opened by *Publish bundle*; *Publish bundle* calls `publishBundle`, *Cancel* sends nothing)
 
 **Collects what `publishBundle` sends before it is called.** Required: `venueId`. Optional: `note`, `staleAfterHours`. Dismissing sends nothing; the screen behind is unchanged.
@@ -2392,25 +3155,11 @@ Errors to draw in the form: 400 `media` with no `isPrimary` item or more than on
 
 Errors to draw in the form: 403 Authenticated but not permitted at the requested scope; 409 A publish is already in progress for this venue
 
-**Form: Save item availability** (modal, opened by *Save item availability*; *Save item availability* calls `setItemAvailability`, *Cancel* sends nothing)
-
-**Collects what `setItemAvailability` sends before it is called.** Required: `isAvailable`, `recordedAt`. Optional: `reason`, `restoreAt`. Dismissing sends nothing; the screen behind is unchanged.
-
-| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
-|---|---|---|---|---|---|---|---|
-| Is available `isAvailable` | toggle | required | — | — | — | — | `setItemAvailability` body |
-| Reason `reason` | radio group | optional | — | Sold out · Ingredient unavailable · Equipment down · Seasonal · Other; A reason of `other` with no note is refused `400`, and the notes are reviewed quarterly so the common ones become real reasons. | — | `other` is allowed only with a `note`, which it then requires (decided 28 September, audit R222). | `setItemAvailability` body |
-| Note `note` | text area | optional | — | max length 500 | — | Free text. Required where the reason is `other` (audit R222). | `setItemAvailability` body |
-| Restore at `restoreAt` | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | Automatic restore, typically at next service. Kept as `MenuItem.restoreAt`. | `setItemAvailability` body |
-| Recorded at `recordedAt` | date and time picker | required | — | — | 1 Oct 2026, 14:30 (venue time zone) | Device time of the act (offline-capable; replayed in this order). | `setItemAvailability` body |
-
-Errors to draw in the form: 400 Validation failed; 412 The row changed since the `If-Match` version was read (SD-013). Re-read and retry.
-
 #### Outputs: what the screen shows and produces
 
 **Shown**
 
-**Every product** (data table, from `listProducts`)
+**Waiting to publish** (data table, from `listProducts`): Products with unpublished changes; the release is Publish bundle, and Transition product lifecycle moves a product to published (F78). Editing the product is BO-007 and BO-008.
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -2426,29 +3175,6 @@ Errors to draw in the form: 400 Validation failed; 412 The row changed since the
 | Responsible department | the name it points at, never the id | Who owns this product commercially. A scope node at `department` level. |
 | On sale from | 1 Oct 2026, 14:30 | 1.4.8. A seasonal product should not need somebody awake at midnight. |
 | On sale to | 1 Oct 2026, 14:30 | Retires the product automatically. Retirement is not deletion — the product stops selling and every order that referenced it still resolves. |
-
-**Every alternative code** (data table, from `listAlternativeCodes`)
-
-| Shows | Format | Notes |
-|---|---|---|
-| Code | text | — |
-| Partner | the name it points at, never the id | — |
-| Partner name | text | — |
-| Variant | the name it points at, never the id | — |
-| Note | text | — |
-
-**Every product variant** (data table, from `listProductVariants`)
-
-| Shows | Format | Notes |
-|---|---|---|
-| ID | the name it points at, never the id | — |
-| Product | the name it points at, never the id | — |
-| SKU | text | — |
-| Axis values | grouped details | — |
-| Name | text | Taken from their variant tables, 20 September. `axisValues` gives `{size: L}` and no string a guest can read. |
-| Barcode | text | Taken from their variant tables, 20 September. `catalogue.alternative_code` is a partner's own code for a variant and requires `partnerId` … |
-| Is default | yes / no (icon or chip) | Taken from their variant tables. Which variant a product page opens on. |
-| Is active | yes / no (icon or chip) | False when retired. Retired variants are never deleted — orders reference them. |
 
 **Every price** (data table, from `listPrices`)
 
@@ -2486,15 +3212,18 @@ Errors to draw in the form: 400 Validation failed; 412 The row changed since the
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
 |  (publish gate) | navigation or local | — | — | — | — |
-| Create product (primary button) | `createProduct` POST `/products` | CreateProductRequest | Product | 400 Validation failed; 403 Authenticated but not permitted at the requested scope; 409 A business code the request names is already used within its uniqueness scope (the scope the property's `x-ticvai-unique` names … | opens modal first |
-| Resolve product by code (secondary button) | `resolveProductByCode` GET `/products/resolve` | — | ProductVariant | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path. | — |
-| Save alternative codes (secondary button) | `setAlternativeCodes` PUT `/products/{productId}/alternative-codes` | inline | AlternativeCode[] | 400 A `variantId` is not a variant of this product, or the body sends one code twice for the same partner.; 409 Code already mapped to a different product for that partner | opens modal first |
-| Save product attributes (secondary button) | `setProductAttributes` PUT `/products/{productId}/attributes` | inline | inline | 400 Two axes share a code, or one axis repeats a value code.; 403 Authenticated but not permitted at the requested scope; 409 Regeneration would exceed the variant ceiling for this product … | opens modal first |
 | Transition product lifecycle (secondary button) | `transitionProductLifecycle` POST `/products/{productId}/lifecycle` | inline | Product | 403 Approval attempted by the principal who submitted it (`approver-is-submitter`). Segregation applies here as it does to journals.; 409 Transition not valid from the current state, or archiving attempted while … | opens modal first |
-| Save product (secondary button) | `updateProduct` PATCH `/products/{productId}` | UpdateProductRequest | Product | 400 `media` with no `isPrimary` item or more than one, or one asset twice.; 403 Authenticated but not permitted at the requested scope; 404 The resource does not exist, or is outside the caller's scope. This includes a … | opens modal first |
 | Publish bundle (secondary button) | `publishBundle` POST `/catalogue/bundles` | inline | BundleSummary | 403 Authenticated but not permitted at the requested scope; 409 A publish is already in progress for this venue | opens modal first |
-| Save item availability (secondary button) | `setItemAvailability` PUT `/menu-items/{itemId}/availability` | inline | MenuItem | 400 Validation failed; 412 The row changed since the `If-Match` version was read (SD-013). Re-read and retry. | opens modal first |
 | What publishing changes (publish gate) | navigation or local | — | — | — | — |
+
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **pending changes**: A list of what the next catalogue release will carry (products, prices, promotions, sale boards) grouped by kind with who changed it and when; the current release version and how many workstations have applied it. *(source: F78 step 4 / contracts/spine/catalogue.yaml#publishBundle / contracts/spine/catalogue.yaml#reportBundleApplied)*
+
+**What each action does** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **Publish to tills**: Signs and publishes the venue's release with a note and a staleness bound; terminals pick it up and report; a terminal past its bound refuses to trade, so the staleness hours are shown. *(source: contracts/spine/catalogue.yaml#publishBundle)*
+- **Mark item unavailable**: Immediate on every terminal and guest menu of the outlet, not waiting for a release; optional restore time. *(source: contracts/satellite/fnb.yaml#setItemAvailability / R110)*
 
 **Data it reads**: `listProducts` (onLoad, List products); `listPrices` (onLoad, List prices in a list)
 
@@ -2510,49 +3239,68 @@ Errors to draw in the form: 400 Validation failed; 412 The row changed since the
 |---|---|
 | Loading (`?state=loading`) | The catalogue publishing list. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the catalogue publishing untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No catalogue publishing yet. Offers Create product (`createProduct`); distinct from a filter that matched nothing. |
+| Empty, first run (`?state=emptyFirstRun`) | No catalogue publishing yet. Offers Publish bundle (`publishBundle`); distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on venueId, kind, isSellable and the catalogue publishing are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 400 A `categoryId` that names no category of the venue, or a `guidedAnswerIds` entry that is not an answer of the venue's published guided choice (W4, 29 …; 400 A `variantId` is not a variant of this product, or the body sends one code twice for the same partner.; 400 Two axes share a code, or one axis repeats a value code.; 400 Validation failed |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 A `categoryId` that names no category of the venue, or a `guidedAnswerIds` entry that is not an answer of the venue's published guided choice (W4, 29 …; 409 A publish is already in progress for this venue; 409 Transition not valid from the current state, or archiving attempted while unexpired entitlements exist. |
+
+#### Edge cases to draw
+
+- **Nothing pending**: Publish is disabled with "Tills are up to date (version 2026.11.14-3)". *(source: designer default)*
+
+#### Consistency with other screens
+
+- Match `BO-037`: Same release version identifier and the same "applied by N of M devices" component.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+release:
+  current: 2026.11.14-3
+  published: 14 Nov 09:12 by Layla Hassan
+  applied: 38 of 41 tills
+  staleAfterHours: 48
+pending:
+- kind: price
+  item: Day Pass Adult, B2C list
+  change: AED 295.00 to AED 310.00 from 1 Dec
+- kind: product
+  item: Twilight Ticket
+  change: Approved, not released
+```
 
 #### Permissions
 
 - `listProducts` → `PRODUCT_VIEW` (read) · staff, guest, partner
 - `getProduct` → `PRODUCT_VIEW` (read) · staff, guest, partner
-- `createProduct` → `PRODUCT_CONFIGURE` (configure) · staff
-- `listAlternativeCodes` → `PRODUCT_VIEW` (read) · staff, partner
-- `listProductVariants` → `PRODUCT_VIEW` (read) · staff, guest, partner
-- `resolveProductByCode` → `PRODUCT_VIEW` (read) · staff, partner
-- `setAlternativeCodes` → `PRODUCT_CONFIGURE` (configure) · staff
-- `setProductAttributes` → `PRODUCT_CONFIGURE` (configure) · staff
 - `transitionProductLifecycle` → `PRODUCT_CONFIGURE` (configure) · staff
-- `updateProduct` → `PRODUCT_CONFIGURE` (configure) · staff
 - `listPrices` → `PRICE_VIEW` (read) · staff, partner
 - `publishBundle` → `PRODUCT_CONFIGURE` (configure) · staff
-- `setItemAvailability` → `PRODUCT_CONFIGURE` (configure) · staff
 
 **A refused user sees:** Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
 #### Requirements it meets
 
-71 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+30 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
 
 | Ref | Requirement (shortened) | Domain | Verdict | Via |
 |---|---|---|---|---|
 | 2.6.7 | For BtoC online sales, the following points shall be available online: | Ticketing Sales | CONTRACTED | `listProducts` |
 | 2.6.8 | - All PLUs | Ticketing Sales | CONTRACTED | `listProducts` |
 | 2.13.21 | All PLUs can be sold on the POS (ticketing and non-ticketing) including Packages. | Ticketing Sales | CONTRACTED | `listProducts` |
-| 19.2.21 | VIP Package Purchases - System shall support VIP package purchases. | Guest Mobile App & Branding | CONTRACTED | `createProduct` |
-| 1.1.1 | The system should be able to sell open-dated tickets for attractions. | Ticketing Catalogue | CONTRACTED | `createProduct` |
-| 1.1.6 | The system should be able to sell membership passes for an attraction (e.g. annual pass, monthly pass) for configurable duration. | Ticketing Catalogue | CONTRACTED | `createProduct` |
-| 1.1.8 | The system should be able to sell add-on items for all type of tickets. Add-ons can also be configured as a stand-alone product and able to be purchased on their own. | Ticketing Catalogue | CONTRACTED | `createProduct` |
-| 1.1.42 | Configure unlimited ticket products and categories | Ticketing Catalogue | CONTRACTED | `createProduct` |
-| 1.1.44 | Support admission, membership, voucher, package and pass products | Ticketing Catalogue | CONTRACTED | `createProduct` |
-| 1.1.93 | Membership product management | Ticketing Catalogue | CONTRACTED | `createProduct` |
-| 1.1.124 | Channel-based restrictions | Ticketing Catalogue | CONTRACTED | `createProduct` |
-| 1.3.52 | Wall climbing activities (product management, sales, ticketing, bookings). | Ticketing Catalogue | CONTRACTED | `createProduct` |
-| … 59 more | | | | `traceability.json` |
+| 1.1.14 | System should provide approval process to create a ticket and published onsite / online. The approval can be setup as multiple hierachy | Ticketing Catalogue | CONTRACTED | `transitionProductLifecycle` |
+| 1.1.36 | System shall support ticket lifecycle states including Draft, Pending Approval, Approved, Published, Active, Suspended, Expired and Archived. | Ticketing Catalogue | CONTRACTED | `transitionProductLifecycle` |
+| 1.1.49 | Product lifecycle management | Ticketing Catalogue | CONTRACTED | `transitionProductLifecycle` |
+| 1.1.94 | Membership lifecycle management | Ticketing Catalogue | CONTRACTED | `transitionProductLifecycle` |
+| 1.4.1 | The system should allow configuration of workflows to manage the creation of new tickets and products. The workflow should involve setup of different status values (e.g. disabled, approval pending … | Ticketing Catalogue | CONTRACTED | `transitionProductLifecycle` |
+| 1.4.6 | System shall support configurable approval workflows before products can be published, modified or retired. | Ticketing Catalogue | CONTRACTED | `transitionProductLifecycle` |
+| 1.4.8 | System shall support future publication, activation, deactivation and automatic retirement of products based on configurable dates and times. | Ticketing Catalogue | CONTRACTED | `transitionProductLifecycle` |
+| 1.4.14 | System shall support archiving retired products while preserving historical sales and reporting data. | Ticketing Catalogue | CONTRACTED | `transitionProductLifecycle` |
+| 1.4.15 | System shall allow products to be retired from sale without impacting previously sold tickets, memberships or reservations. | Ticketing Catalogue | CONTRACTED | `transitionProductLifecycle` |
+| … 18 more | | | | `traceability.json` |
 
 #### Client meeting inputs
 
@@ -2580,13 +3328,14 @@ Also apply: 4 for P08 · Sell, 24 for all of P08, 29 for every app (section *Des
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (78), with its required mark, default, format and its error state (400, 403, 404, 409, 412, 422).
-- [ ] Every output is drawn (46 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (8), with its required mark, default, format and its error state (400, 403, 404, 409).
+- [ ] Every output is drawn (33 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-014?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: , Create product, Resolve product by code, Save alternative codes, Save product attributes, Transition product lifecycle, Save product, Publish bundle, Save item availability, What publishing changes.
+- [ ] Every action is wired with its success and its failure: , Transition product lifecycle, Publish bundle, What publishing changes.
 - [ ] Every transition is wired: `BO-007`, `BO-008`, `BO-009`.
 - [ ] Every gated control is gated: `PRICE_VIEW`, `PRODUCT_CONFIGURE`, `PRODUCT_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 1 edge case(s) from the process notes are drawn.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -2600,7 +3349,7 @@ Also apply: 4 for P08 · Sell, 24 for all of P08, 29 for every app (section *Des
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Sell · wave 1 · needs the `ticketing` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `EVENT_CONFIGURE`, `PERFORMANCE_CONFIGURE`, `PRODUCT_VIEW` (2 configure, 1 read) |
+| Who uses it | venue staff holding `EVENT_CONFIGURE`, `PERFORMANCE_CONFIGURE`, `PRODUCT_VIEW` (2 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listPerformances` reads the population and `getPerformance` reads one of them — list, select, act |
 | Offline | online only |
@@ -2608,6 +3357,8 @@ Also apply: 4 for P08 · Sell, 24 for all of P08, 29 for every app (section *Des
 | Route | `/venue-operations/session-calendar` |
 
 **What the spec says about it.** Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. **Drawn 26 August** — `Seat Board 2.dc.html` frame `seat-2a`. **The frame names this screen on its own face**, which is the first pack to do that: the earlier F&B, POS and Retail boards had to be hand-assigned by purpose after three derivation attempts produced nonsense. **A board that says what it draws removes the guess entirely.** **Kept separate from BO-016 (decided 28 September, audit R276)** — this screen lists, creates, changes and cancels performances; the template they are generated from is BO-016 Performance Template.
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** The calendar of performances (time slots, shows, sessions) with how full each is: create them in bulk from a pattern, edit capacity individually or in bulk, suspend, resume or cancel. The client asked that time-slot creation previews the slots before any is created (DI-995).
 
 #### Inputs: what the user enters or picks
 
@@ -2709,6 +3460,11 @@ Errors to draw in the form: 409 A timing change on a performance with sold ticke
 | Supervisor step up `supervisorStepUp` | group | optional | — | — | — | Required unless `dryRun` (audit R144, proposed by the coordinator). | `cancelPerformance` body |
 | Principal `supervisorStepUp.principalId` | picker: choose a principal | required | — | — | shows names, sends the id | The supervisor signing. Recorded against the act. | `cancelPerformance` body |
 | Credential `supervisorStepUp.credential` | text area | required | — | max length 512 | — | The supervisor's staff PIN, as they sign in at a till with it. A PIN, never a password (audit R123 (7)). | `cancelPerformance` body |
+
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **bulk creation**: Start and end date, days of the week, first and last start time, interval between starts, slot length, minutes still sellable after start, entry window, language and format; a preview grid of the slots that will be created before Create. *(source: DI-995 / DI-167 / contracts/spine/catalogue.yaml#createPerformances / REV3-17)*
+- **cancellation**: Reason, guest message, refund percentage, an alternative performance to offer; a dry run first shows affected orders, guests and refund exposure; the real run needs a supervisor PIN on the device. *(source: contracts/spine/catalogue.yaml#cancelPerformance / R144 / F09 step 2)*
 
 #### Outputs: what the screen shows and produces
 
@@ -2814,14 +3570,18 @@ Errors to draw in the form: 409 A timing change on a performance with sold ticke
 | Save event (secondary button) | `updateEvent` PATCH `/events/{eventId}` | inline | Event | — | opens modal first |
 | Save performance (secondary button) | `updatePerformance` PATCH `/performances/{performanceId}` | inline | Performance | 409 A timing change on a performance with sold tickets, or a `status` move the state model does not allow. | opens modal first |
 
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **calendar views**: Day, week, month and agenda; the day view by hour from the venue's day start hour; each slot shows sold of capacity as a fill bar and its status. *(source: DI-919 / DI-907)*
+
 **Data it reads**: `getPerformance` (onLoad, Read a performance); `getSeatAvailability` (onLoad, Seat status for a performance); `listEvents` (onLoad, List events)
 
 **Where the user goes next**
 
-- → `BO-001` Queue Directory: *Queue Directory*; carries `eventId`
 - → `BO-007` Product Directory: *Product Directory*
 - → `BO-009` Pricing Rules: *Pricing Rules*
 - → `BO-099` Performance Manifest: *Performance manifest*; carries `performanceId`
+- → `BO-023` Refunds & Exchanges: *Cancels it and reviews the refund exposure*; calls `cancelPerformance`
 
 **What opens over it**
 
@@ -2838,6 +3598,34 @@ Errors to draw in the form: 409 A timing change on a performance with sold ticke
 | Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_VIEW`, which `listPerformances` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 A business code the request names is already used within its uniqueness scope (the scope the property's `x-ticvai-unique` names; decided 28 September, audit …; 409 A timing change on a performance with sold tickets, or a `status` move the state model does not allow.; 409 The performance is `cancelled`, `completed` or `soldOut`. `states/performance.yaml` cancels only from `scheduled`, `onSale` … |
+
+#### Edge cases to draw
+
+- **Link to a performance that has happened**: Offers the next performance of the same event. *(source: screens/P08-venue-back-office.yaml#BO-015)*
+- **Capacity above remaining venue admission capacity**: Blocked with a validation message; override only for authorised users. *(source: DI-456)*
+
+#### Consistency with other screens
+
+- Match `BO-016`: The template defines the pattern; this calendar generates from it. Same field names (slot length, turnaround).
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+slots:
+- at: Sat 15 Nov 2026 10:00
+  product: Aquarium Tour (English)
+  sold: 38
+  capacity: 40
+- at: '10:30'
+  product: Aquarium Tour (Arabic)
+  sold: 12
+  capacity: 40
+- at: '11:00'
+  status: suspended
+  reason: Tank maintenance
+```
 
 #### Permissions
 
@@ -2896,6 +3684,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Wireframe frame: `wireframes/P08 Venue Management.dc.html#bo-015` · status **notStarted** · provenance generated · **Drawn by Claude Design on `Seat Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once …
 - Derived from `wireframes/reference/Seat Board 2.dc.html`
 - Client design-board frames: `Seat Board 2.dc.html#seat-2a`
+- Flow F09 *Event is cancelled and refunded*, step 1: Finds the performance → Sees what is sold and what it is worth
+- Flow F09 *Event is cancelled and refunded*, step 2: Cancels it and states the reason → Sales stop immediately. Nothing new can be sold
+- Flow F09 branch at step 2 (requiresStaff): when Performance is part of a bundle, The bundle component is cancelled and the rest stands. **A guest who bought ticket plus dinner plus parking loses the ticket, not the evening** — refunding the whole bundle takes money the venue kept …
+- Flow F09 branch at step 2 (recoverable): when Fiscal period has closed over the original sale, The refund posts to the current period with a reference. It cannot post to a closed one — ADR on append-only.
 
 #### Acceptance for the design
 
@@ -2903,9 +3695,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every output is drawn (58 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-015?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Confirm, Create time slots, Cancel performance, Create event, Recommend seats, Save event, Save performance.
-- [ ] Every transition is wired: `BO-001`, `BO-007`, `BO-009`, `BO-099`.
+- [ ] Every transition is wired: `BO-007`, `BO-009`, `BO-099`, `BO-023`.
 - [ ] Every gated control is gated: `EVENT_CONFIGURE`, `PERFORMANCE_CONFIGURE`, `PRODUCT_VIEW`.
 - [ ] The 5 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 2 edge case(s) from the process notes are drawn.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -2927,6 +3720,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Route | `/venue-operations/session-template` |
 
 **What the spec says about it.** Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. **Drawn 26 August** — `Seat Board 2.dc.html` frame `seat-2b`. **The frame names this screen on its own face**, which is the first pack to do that: the earlier F&B, POS and Retail boards had to be hand-assigned by purpose after three derivation attempts produced nonsense. **A board that says what it draws removes the guess entirely.** **Split from BO-015 on 28 September (audit R276)** — the two carried identical performance and event operations; this screen now owns the performance template (`listPerformanceTemplates`, `setPerformanceTemplate`) and BO-015 keeps the calendar of performances.
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** The pattern the calendar is generated from: slot length, turnaround, concurrent capacity, peak bands and the walk-in policy. Kept separate from the calendar (R276): change the template, then regenerate.
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- List operation(s) listPerformanceTemplates return a bare array, not the paged list envelope (items, nextCursor, hasMore). (CHG-SBO-005)
 
 #### Inputs: what the user enters or picks
 
@@ -2955,6 +3754,11 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Held back percent `walkIn.heldBackPercent` | number field | optional | 0 | — | — | — | `setPerformanceTemplate` body |
 | Cutoff minutes before `walkIn.cutoffMinutesBefore` | number field (minutes) | optional | — | — | — | — | `setPerformanceTemplate` body |
 | Scope path `scopePath` | text field | optional | — | — | — | — | `setPerformanceTemplate` body |
+
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **walkIn**: Configured, not assumed; it decides whether a family turning up on a Sunday is turned away. Shown as a clear yes/no with the walk-in share. *(source: contracts/spine/catalogue.yaml#setPerformanceTemplate)*
+- **bands**: Peak and off-peak time bands drawn on a 24-hour bar with capacity per band. *(source: contracts/spine/catalogue.yaml#setPerformanceTemplate / DI-453)*
 
 #### Outputs: what the screen shows and produces
 
@@ -3009,6 +3813,23 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PERFORMANCE_CONFIGURE`, which `listPerformanceTemplates` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+template:
+  code: AQ-TOUR-30
+  name: Aquarium tour every 30 minutes
+  slotMinutes: 25
+  turnaroundMinutes: 5
+  concurrentCapacity: 40
+  bands:
+  - 10:00-14:00 peak
+  - 14:00-20:00 standard
+  walkIn: 10% of each slot
+```
+
 #### Permissions
 
 - `listPerformanceTemplates` → `PERFORMANCE_CONFIGURE` (configure) · staff
@@ -3051,239 +3872,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-007`, `BO-009`.
 - [ ] Every gated control is gated: `PERFORMANCE_CONFIGURE`.
 - [ ] The 5 client meeting input(s) for this screen are applied; open questions are built to their default.
-- [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
-
----
-
-### `BO-017` Capacity Management
-
-**Change how many people a performance can take (renamed from session, decided 28 September, audit R165).**
-
-| | |
-|---|---|
-| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
-| Module | Sell · wave 1 · needs the `ticketing` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `CAPACITY_CONFIGURE`, `PRODUCT_CONFIGURE`, `PRODUCT_VIEW` (2 configure, 1 read) |
-| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
-| Pattern | listDetail (compact density): `listChannelCapacities` reads the population and `getChannelAllocations` reads one of them — list, select, act |
-| Offline | online only |
-| Opens with | `channelCapacityId` (deepLink), `entryId` (navigation) · cold entry: **A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know … |
-| Route | `/venue-operations/capacity-management` |
-
-**What the spec says about it.** Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
-
-#### Inputs: what the user enters or picks
-
-**On the screen**
-
-| Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
-|---|---|---|---|---|---|---|---|
-| Performance id | picker: choose a performance (drawn as a picker, not a text box) | optional | — | — | shows names, sends the id | Sends `?performanceId=` to `listChannelCapacities`. | `listChannelCapacities` ?performanceId |
-
-**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
-
-| Filter | Drawn as | Default | Allowed values, rules | Source |
-|---|---|---|---|---|
-| Performance | picker: choose a performance | — | — | `listWaitlistEntries` ?performanceId |
-
-**Form: Create channel capacity** (modal, opened by *Create channel capacity*; *Create channel capacity* calls `createChannelCapacity`, *Cancel* sends nothing)
-
-**Collects what `createChannelCapacity` sends before it is called.** Required: `performanceId`, `name`, `capacity`. Optional: `seatCategoryId`. Dismissing sends nothing; the screen behind is unchanged.
-
-| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
-|---|---|---|---|---|---|---|---|
-| Performance `performanceId` | picker: choose a performance | required | — | — | shows names, sends the id | — | `createChannelCapacity` body |
-| Name `name` | text field | required | — | max length 200 | — | — | `createChannelCapacity` body |
-| Seat category `seatCategoryId` | picker: choose a seat category | optional | — | — | shows names, sends the id | — | `createChannelCapacity` body |
-| Capacity `capacity` | number field | required | — | min 0 | — | — | `createChannelCapacity` body |
-
-**Form: Release channel allocation** (modal, opened by *Release channel allocation*; *Release channel allocation* calls `relinquishChannelAllocation`, *Cancel* sends nothing)
-
-**Collects what `relinquishChannelAllocation` sends before it is called.** Required: `channels`. Optional: `reason`. Dismissing sends nothing; the screen behind is unchanged.
-
-| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
-|---|---|---|---|---|---|---|---|
-| Channels `channels` | multi-select chips | required | — | POS · Kiosk · Web · Mobile · B2B · Ota · Call centre; at least 1 | — | — | `relinquishChannelAllocation` body |
-| Reason `reason` | text area | optional | — | max length 500 | — | — | `relinquishChannelAllocation` body |
-
-**Form: Save channel allocations** (modal, opened by *Save channel allocations*; *Save channel allocations* calls `setChannelAllocations`, *Cancel* sends nothing)
-
-**Collects what `setChannelAllocations` sends before it is called.** Required: `allocations`. Dismissing sends nothing; the screen behind is unchanged.
-
-| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
-|---|---|---|---|---|---|---|---|
-| Allocations `allocations` | repeatable rows | required | — | at least 1 | — | — | `setChannelAllocations` body |
-| Channel `allocations[].channel` | select | required | — | POS · Kiosk · Web · Mobile · B2B · Ota · Call centre | — | — | `setChannelAllocations` body |
-| Allocated units `allocations[].allocatedUnits` | number field | required | — | min 0 | — | — | `setChannelAllocations` body |
-| Release at `allocations[].releaseAt` | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | Unsold units return to the general pool at this time. How distribution holds are freed close to a performance without someone remembering to do it. | `setChannelAllocations` body |
-| Sales channel `allocations[].salesChannelId` | picker: choose a sales channel | optional | — | — | shows names, sends the id | The channel profile (`catalogue.sales_channel`) this allocation serves (29 September, data model DM3). | `setChannelAllocations` body |
-| Allocation type `allocations[].allocationType` | radio group | optional | Dedicated | Shared pool · Dedicated · Percentage · Dynamic | — | How the allocation is sized (29 September, data model DM3); the allocation rule of ADM-262 lives on this row. | `setChannelAllocations` body |
-| Minimum units `allocations[].minimumUnits` | number field | optional | — | min 0 | — | — | `setChannelAllocations` body |
-| Maximum units `allocations[].maximumUnits` | number field | optional | — | min 0 | — | — | `setChannelAllocations` body |
-| Replenishment rule `allocations[].replenishmentRule` | key and value settings | optional | — | — | — | `{sourceChannelId, trigger, thresholdUnits, sharePercent, units}`. | `setChannelAllocations` body |
-| Waitlist behavior `allocations[].waitlistBehavior` | segmented control | optional | None | None · Join waitlist · Notify on release | — | — | `setChannelAllocations` body |
-| Release threshold units `allocations[].releaseThresholdUnits` | number field | optional | — | min 0 | — | — | `setChannelAllocations` body |
-| Release hours before event `allocations[].releaseHoursBeforeEvent` | number field | optional | — | min 0 | — | Alternative to `releaseAt`, relative to the performance start. | `setChannelAllocations` body |
-| Contractual units `allocations[].contractualUnits` | number field | optional | — | min 0 | — | Units a partner agreement guarantees; rebalancing never goes below it. | `setChannelAllocations` body |
-| Minimum guaranteed units `allocations[].minimumGuaranteedUnits` | number field | optional | — | min 0 | — | — | `setChannelAllocations` body |
-| Is frozen `allocations[].isFrozen` | toggle | optional | off | — | — | Excluded from rebalancing. | `setChannelAllocations` body |
-
-Errors to draw in the form: 400 Allocations exceed the channel capacity in total, or a channel appears twice; 409 An allocation is below what that channel has already sold plus its leased units (audit R101)
-
-**Form: Save channel capacity** (modal, opened by *Save channel capacity*; *Save channel capacity* calls `updateChannelCapacity`, *Cancel* sends nothing)
-
-**Collects what `updateChannelCapacity` sends before it is called.** Nothing in the body is required. Optional: `name`, `capacity`. Dismissing sends nothing; the screen behind is unchanged.
-
-| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
-|---|---|---|---|---|---|---|---|
-| Name `name` | text field | optional | — | max length 200 | — | — | `updateChannelCapacity` body |
-| Capacity `capacity` | number field | optional | — | min 0 | — | — | `updateChannelCapacity` body |
-
-Errors to draw in the form: 409 Capacity reduced below units already sold plus units under an unexpired lease (audit R101)
-
-#### Outputs: what the screen shows and produces
-
-**Shown**
-
-**Every channel capacity** (data table, from `listChannelCapacities`)
-
-| Shows | Format | Notes |
-|---|---|---|
-| ID | the name it points at, never the id | — |
-| Performance | the name it points at, never the id | — |
-| Name | text | — |
-| Seat category | the name it points at, never the id | — |
-| Oversell allowance | 1,234 | BL-046, 1.3.13. The guard existed in one direction — an envelope could be raised freely and refused reduction below what had sold. |
-| Oversell basis | chip: Fixed count, Historic no show rate, Percentage | — |
-| Capacity | 1,234 | — |
-| Sold | 1,234 | Units sold. Maintained on write (decided 29 September, SD-023): raised by `convertInventoryHold` in the order transaction and by … |
-| Leased | 1,234 | Units in `active` holds, not yet sold. Raised at acquire, lowered at conversion, release, force-release and expiry (SD-023). |
-| Remaining | 1,234 | What can still be held. Decremented at the hold with a guarded statement (`remaining >= n`) under the row lock, never at the sale, so two … |
-| Has channel allocations | yes / no (icon or chip) | True where capacity is divided across channels. Leases then draw from a channel allocation rather than from raw capacity. |
-| Is seated | yes / no (icon or chip) | Seated envelopes cannot be leased and are blocked offline. A seat map is not a count. |
-
-**The selected channel capacity** (detail panel, from `listChannelCapacities`)
-
-| Shows | Format | Notes |
-|---|---|---|
-| ID | the name it points at, never the id | — |
-| Performance | the name it points at, never the id | — |
-| Name | text | — |
-| Seat category | the name it points at, never the id | — |
-| Oversell allowance | 1,234 | BL-046, 1.3.13. The guard existed in one direction — an envelope could be raised freely and refused reduction below what had sold. |
-| Oversell basis | chip: Fixed count, Historic no show rate, Percentage | — |
-| Capacity | 1,234 | — |
-| Sold | 1,234 | Units sold. Maintained on write (decided 29 September, SD-023): raised by `convertInventoryHold` in the order transaction and by … |
-| Leased | 1,234 | Units in `active` holds, not yet sold. Raised at acquire, lowered at conversion, release, force-release and expiry (SD-023). |
-| Remaining | 1,234 | What can still be held. Decremented at the hold with a guarded statement (`remaining >= n`) under the row lock, never at the sale, so two … |
-| Has channel allocations | yes / no (icon or chip) | True where capacity is divided across channels. Leases then draw from a channel allocation rather than from raw capacity. |
-| Is seated | yes / no (icon or chip) | Seated envelopes cannot be leased and are blocked offline. A seat map is not a count. |
-
-**The channel allocation set** (detail panel, from `getChannelAllocations`)
-
-| Shows | Format | Notes |
-|---|---|---|
-| Channel capacity | the name it points at, never the id | — |
-| Capacity | 1,234 | — |
-| Allocations | list or chips (count when long) | — |
-| General pool units | 1,234 | Unallocated remainder. Any channel may draw from it once its own allocation is exhausted. |
-| Total sold | 1,234 | — |
-| Total remaining | 1,234 | — |
-
-**Actions and what each produces**
-
-| Action | Calls | Sends | On success returns | Errors to show | Notes |
-|---|---|---|---|---|---|
-| Create channel capacity (primary button) | `createChannelCapacity` POST `/channel-capacities` | CreateEnvelopeRequest | ChannelCapacity | — | opens modal first |
-| Release channel allocation (secondary button) | `relinquishChannelAllocation` POST `/channel-capacities/{channelCapacityId}/channel-allocations/release` | inline | ChannelAllocationSet | — | opens modal first |
-| Save channel allocations (secondary button) | `setChannelAllocations` PUT `/channel-capacities/{channelCapacityId}/channel-allocations` | inline | ChannelAllocationSet | 400 Allocations exceed the channel capacity in total, or a channel appears twice; 409 An allocation is below what that channel has already sold plus its leased units (audit R101) | opens modal first |
-| Save channel capacity (secondary button) | `updateChannelCapacity` PATCH `/channel-capacities/{channelCapacityId}` | inline | ChannelCapacity | 409 Capacity reduced below units already sold plus units under an unexpired lease (audit R101) | opens modal first |
-
-**Data it reads**: `listChannelCapacities` (onLoad, List capacity envelopes); `listWaitlistEntries` (onLoad, Guests waiting for capacity)
-
-**Where the user goes next**
-
-- → `BO-007` Product Directory: *Product Directory*
-- → `BO-009` Pricing Rules: *Pricing Rules*
-
-#### States
-
-| State | What it shows |
-|---|---|
-| Loading (`?state=loading`) | The capacity list. |
-| Error (`?state=error`) | Could not load. Names which read failed and leaves the capacity untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No capacity yet. Offers Create channel capacity (`createChannelCapacity`); distinct from a filter that matched nothing. |
-| Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on performanceId and the capacity are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_VIEW`, which `listChannelCapacities` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 400 Allocations exceed the channel capacity in total, or a channel appears twice; 409 An allocation is below what that channel has already sold plus its leased units (audit R101); 409 Capacity reduced below units already sold plus units under an unexpired lease (audit R101) |
-
-#### Permissions
-
-- `listChannelCapacities` → `PRODUCT_VIEW` (read) · staff, partner
-- `getChannelAllocations` → `PRODUCT_VIEW` (read) · staff, partner
-- `createChannelCapacity` → `CAPACITY_CONFIGURE` (configure) · staff
-- `relinquishChannelAllocation` → `CAPACITY_CONFIGURE` (configure) · staff, partner
-- `setChannelAllocations` → `CAPACITY_CONFIGURE` (configure) · staff
-- `updateChannelCapacity` → `CAPACITY_CONFIGURE` (configure) · staff
-- `listWaitlistEntries` → `PRODUCT_VIEW` (read) · staff
-- `offerWaitlistCapacity` → `PRODUCT_CONFIGURE` (configure) · staff
-
-**A refused user sees:** Shown when the caller lacks `PRODUCT_VIEW`, which `listChannelCapacities` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
-
-#### Requirements it meets
-
-14 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
-
-| Ref | Requirement (shortened) | Domain | Verdict | Via |
-|---|---|---|---|---|
-| 2.13.40 | Capacity Management Visibility | Ticketing Sales | CONTRACTED | `listChannelCapacities` |
-| 8.9.2 | System shall display current attendance, occupancy levels, capacity utilization, and crowd distribution across parks, venues, facilities, and attractions. | Unified Operations Dashboard | CONTRACTED | `listChannelCapacities` |
-| 1.1.3 | The system should be able to sell time-slot based tickets for attractions. The system should support: - Creation of timeslots for a whole day or for a period - Configuration of capacity for each … | Ticketing Catalogue | CONTRACTED | `createChannelCapacity` |
-| 7.3.2 | Allow configure inventory and capacity for parks | F&B POS | CONTRACTED | `createChannelCapacity` |
-| 1.1.10 | The system should allow the capacity for all type of ticket to be configurable. Capacity of a ticket can be configurable at multiple levels: 1) Sales Capacity: Allow only a fixed number of tickets to … | Ticketing Catalogue | CONTRACTED | `setChannelAllocations` |
-| 1.1.127 | Maximum sellable quantity controls | Ticketing Catalogue | CONTRACTED | `setChannelAllocations` |
-| 2.1.1 | The system should have the ability to create as many sales channels as necessary by the system admin. Sales Channels creation should involve capture of all required data such as account assignment … | Ticketing Sales | CONTRACTED | `setChannelAllocations` |
-| 2.1.2 | The system should support the configuration of products, prices, quotas, sales limits and sales schedule for each sales channels. Some sales channels can be configured to be accessible to only … | Ticketing Sales | CONTRACTED | `setChannelAllocations` |
-| 2.1.3 | The system should store and manage all rules for product compatibility, eligibility and pricing that will be applicable to for each sales channel. These rules will be part of the system and not … | Ticketing Sales | CONTRACTED | `setChannelAllocations` |
-| 2.7.5 | For BtoB online sales, the following points shall be available online: | Ticketing Sales | CONTRACTED | `setChannelAllocations` |
-| 2.7.11 | - Only BtoB PLUs | Ticketing Sales | CONTRACTED | `setChannelAllocations` |
-| 2.7.15 | - Quotas can be applied for one Customer or a category of Customers | Ticketing Sales | CONTRACTED | `setChannelAllocations` |
-| … 2 more | | | | `traceability.json` |
-
-#### Client meeting inputs
-
-For this screen, newest first. An **Open question** is built to the default it states. Where an item disagrees with the fields above, the item wins.
-
-- Inventory pools split capacity by ticket type (e.g. 50% GA, 30% child, 20% senior) and/or sales channel (e.g. 50% online, 50% on-site), configurable at venue/event level, under a hierarchy global → attraction → product → variant → time slot. On cancel/refund/reschedule the business chooses whether capacity is released or held. *(agreed · MoM 25 Aug 2026, 4.6 Performances & Capacity Management; 4.11 UX Simplification & Distributed Inventory · DI-457)*
-- Decision: venue-level admission capacity supersedes event-level capacity; a system prompt/validation prevents configuring or selling an event beyond the remaining venue capacity. Overriding is an authorisation-gated (RBAC) action for authorised users only. *(agreed · MoM 25 Aug 2026, 4.6 Performances & Capacity Management; 5. Key Decisions · DI-456)*
-- Two capacity types shown distinctly: sales capacity (tickets sellable per performance) and admission capacity (a real-time, scan-based count of guests inside via entry/exit turnstiles), capping on-site attendance independent of tickets sold. *(client request · MoM 25 Aug 2026, 4.6 Performances & Capacity Management · DI-455)*
-- AI suggestions from sales forecasts: add/remove time slots, merge under-sold adjacent slots (with guest notification of the time change), and dynamic pricing (raise when a slot is >~80% sold, lower when <~20–30%). *(client request · MoM 25 Aug 2026, 4.6 Performances & Capacity Management · DI-454)*
-- Performances are created individually or from a reusable time-slot template (e.g. every 30 minutes between start and end) that auto-generates the schedule. Capacity set at event level is inherited by performances, with per-performance override (e.g. evening slots). *(client request · MoM 25 Aug 2026, 4.6 Performances & Capacity Management · DI-453)*
-- "Envelopes" split a performance's capacity by channel (e.g. of 100: 30 B2C, 40 B2B, 30 on-site); each channel shows only its own share as available. Configured once and applied to all linked performances. *(agreed · MoM 7 Aug 2026, 15. Capacity Splitting via Envelopes · DI-170)*
-- Performance capacity is edited individually or by multi-select bulk edit; a performance can be suspended, resumed (any time before start) or cancelled — a state change, never a delete. *(agreed · MoM 7 Aug 2026, 14. Events, Integrations & Performances (Time Slots) · DI-168)*
-
-Also apply: 4 for P08 · Sell, 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
-
-#### Workshop task tracker
-
-No tracker row concerns this screen; the rows for its platform are listed once, below.
-
-#### References
-
-- Wireframe frame: `wireframes/P08 Venue Management.dc.html#bo-017` · status **notStarted** · provenance generated
-- ADR-0012 *Queue Integration — Adaptor-First, Vendor Deferred* (`docs/adr/0012-queue-integration-adaptor-first.md`)
-
-#### Acceptance for the design
-
-- [ ] Every input above is drawn (24), with its required mark, default, format and its error state (400, 404, 409).
-- [ ] Every output is drawn (30 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
-- [ ] Every state opens from `#BO-017?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: Create channel capacity, Release channel allocation, Save channel allocations, Save channel capacity.
-- [ ] Every transition is wired: `BO-007`, `BO-009`.
-- [ ] Every gated control is gated: `CAPACITY_CONFIGURE`, `PRODUCT_CONFIGURE`, `PRODUCT_VIEW`.
-- [ ] The 7 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -3373,7 +3961,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Retail dashboard gives a consolidated real-time view across outlets — total retail sales, total and average transactions, store performance snapshot, system alerts and out-of-stock indicators — viewable by day, week or month. *(client request · MoM 19 Aug 2026, 4.1 Retail Command Center — Dashboard & Store Setup · DI-349)*
 - Allam/Qossai: the workstation/till/POS wireframes are reference only (partly ChatGPT-generated, with errors) and not to be replicated; Softlabs may consolidate dashboards freely and must cross-check the functionality matrix for missing items. *(agreed · MoM 14 Aug 2026, 11. Wireframe Walkthrough — Workstation, Till & POS Management · DI-312)*
 
-**32 more name particular screens** and are in each screen's block above (*Client meeting inputs*).
+**47 more name particular screens** and are in each screen's block above (*Client meeting inputs*).
 
 ---
 
@@ -3388,10 +3976,12 @@ Method, path, parameters, request and response for every operation these screens
 ```json
 {
 "analysePromotionConflicts": {"method":"GET","path":"/promotions/{promotionId}/conflicts","contract":"promotions","summary":"Analyse stacking against live promotions","permission":"PRICE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"ConflictAnalysis"},
+"assessProductChange": {"method":"POST","path":"/products/{productId}/change-impact","contract":"catalogue","summary":"What a change would touch, before making it","permission":"PRODUCT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"ProductChangeImpact"},
 "assignCoupon": {"method":"POST","path":"/coupon-codes/{code}/assign","contract":"promotions","summary":"Assign a coupon to a named guest","permission":"PRICE_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":null},
 "bulkChangePrices": {"method":"POST","path":"/products/bulk-price","contract":"catalogue","summary":"Reprice a category or a whole catalogue","permission":"PRODUCT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"BulkPriceResult"},
-"bulkUpdateProducts": {"method":"POST","path":"/products/bulk","contract":"inventory","summary":"Change many products at once, with a preview","permission":"PRODUCT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":null},
+"bulkUpdateCatalogueProducts": {"method":"POST","path":"/products/bulk-update","contract":"catalogue","summary":"Change many products at once, with a preview","permission":"PRODUCT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"BulkProductUpdateResult"},
 "cancelPerformance": {"method":"POST","path":"/performances/{performanceId}/cancel","contract":"catalogue","summary":"Cancel a performance","permission":"PERFORMANCE_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"PerformanceCancellationResult"},
+"cloneProduct": {"method":"POST","path":"/products/{productId}/clone","contract":"catalogue","summary":"Copy a product as a new draft","permission":"PRODUCT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Product"},
 "copyPriceList": {"method":"POST","path":"/price-lists/{priceListId}/copy","contract":"catalogue","summary":"Copy a price list, optionally with an adjustment","permission":"PRICE_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":null},
 "createBundle": {"method":"POST","path":"/bundles","contract":"promotions","summary":"Create a bundle","permission":"PRODUCT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"CreateBundleRequest","responds":"Bundle"},
 "createChannelCapacity": {"method":"POST","path":"/channel-capacities","contract":"catalogue","summary":"Create a channel capacity","permission":"CAPACITY_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"CreateEnvelopeRequest","responds":"ChannelCapacity"},
@@ -3424,7 +4014,9 @@ Method, path, parameters, request and response for every operation these screens
 "listBookingFlows": {"method":"GET","path":"/venues/{venueId}/booking-flows","contract":"white-label","summary":"A venue's booking flows, in the working draft","permission":"TENANT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"flowTypeKey","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listCatalogueBundles": {"method":"GET","path":"/catalogue/bundles","contract":"catalogue","summary":"List published catalogue bundles","permission":"PRODUCT_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"BundleSummary"},
 "listChannelCapacities": {"method":"GET","path":"/channel-capacities","contract":"catalogue","summary":"List channel capacities","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"performanceId","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
+"listChannelListings": {"method":"GET","path":"/channel-listings","contract":"subscription","summary":"What is listed on which OTA","permission":"PARTNER_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"ChannelListing"},
 "listCommercialCampaigns": {"method":"GET","path":"/commercial-campaigns","contract":"promotions","summary":"List commercial campaigns","permission":"PRICE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"venueId","in":"query","required":null},{"name":"activeAt","in":"query","required":null},{"name":"ownerPrincipalId","in":"query","required":null},{"name":"q","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
+"listConsentQuestions": {"method":"GET","path":"/consent-questions","contract":"marketing-crm","summary":"The consent questions a venue asks at booking","permission":"GUEST_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"kind","in":"query","required":null},{"name":"status","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listCouponCampaigns": {"method":"GET","path":"/coupon-campaigns","contract":"promotions","summary":"List coupon campaigns","permission":"PRICE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listCouponCodes": {"method":"GET","path":"/coupon-campaigns/{campaignId}/codes","contract":"promotions","summary":"List generated codes","permission":"PRICE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"status","in":"query","required":null},{"name":"batchId","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listDynamicPriceRules": {"method":"GET","path":"/pricing/dynamic-rules","contract":"catalogue","summary":"Dynamic pricing rules","permission":"PRICE_VIEW","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"PricingDynamicPriceRule"},
@@ -3437,26 +4029,27 @@ Method, path, parameters, request and response for every operation these screens
 "listPriceLists": {"method":"GET","path":"/price-lists","contract":"catalogue","summary":"List price lists","permission":"PRICE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"channel","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listPrices": {"method":"GET","path":"/price-lists/{priceListId}/prices","contract":"catalogue","summary":"List prices in a list","permission":"PRICE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listProductVariants": {"method":"GET","path":"/products/{productId}/variants","contract":"catalogue","summary":"List generated variants","permission":"PRODUCT_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
+"listProductVersions": {"method":"GET","path":"/products/{productId}/versions","contract":"catalogue","summary":"What this product used to be","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"ProductVersion"},
 "listProducts": {"method":"GET","path":"/products","contract":"catalogue","summary":"List products","permission":"PRODUCT_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"venueId","in":"query","required":null},{"name":"kind","in":"query","required":null},{"name":"isSellable","in":"query","required":null},{"name":"categoryId","in":"query","required":null},{"name":"segmentTag","in":"query","required":null},{"name":"guidedAnswerIds","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listPromotions": {"method":"GET","path":"/promotions","contract":"promotions","summary":"List promotions","permission":"PRICE_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"venueId","in":"query","required":null},{"name":"status","in":"query","required":null},{"name":"activeAt","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listVoucherBatches": {"method":"GET","path":"/voucher-batches","contract":"promotions","summary":"List voucher batches","permission":"PRICE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
-"listWaitlistEntries": {"method":"GET","path":"/waitlist-entries","contract":"catalogue","summary":"Who is waiting for capacity","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"performanceId","in":"query","required":null}],"requestBody":null,"responds":"WaitlistEntry"},
-"offerWaitlistCapacity": {"method":"POST","path":"/waitlist-entries/{entryId}/offer","contract":"catalogue","summary":"Tell a waiting guest that capacity appeared","permission":"PRODUCT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"WaitlistEntry"},
 "pausePromotion": {"method":"POST","path":"/promotions/{promotionId}/pause","contract":"promotions","summary":"Pause a live promotion","permission":"PRICE_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":null},
+"previewProductTickets": {"method":"GET","path":"/products/{productId}/ticket-previews","contract":"orders","summary":"Preview a product's PDF ticket and wallet passes","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"locale","in":"query","required":null}],"requestBody":null,"responds":"TicketProof"},
 "publishBundle": {"method":"POST","path":"/catalogue/bundles","contract":"catalogue","summary":"Compute, sign and publish a catalogue bundle","permission":"PRODUCT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"BundleSummary"},
 "publishPromotion": {"method":"POST","path":"/promotions/{promotionId}/publish","contract":"promotions","summary":"Publish a promotion","permission":"PRICE_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Promotion"},
 "recommendSeats": {"method":"POST","path":"/performances/{performanceId}/seat-recommendations","contract":"seating","summary":"Recommend seats for a party","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"SeatRecommendationRequest","responds":null},
 "recordDashboardView": {"method":"POST","path":"/dashboards/{dashboardId}/views","contract":"reporting","summary":"Record that a dashboard was opened","permission":"REPORT_VIEW_VENUE","offlineCapable":false,"conflictPolicy":"append","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":null},
 "relinquishChannelAllocation": {"method":"POST","path":"/channel-capacities/{channelCapacityId}/channel-allocations/release","contract":"catalogue","summary":"Return unsold channel allocation to the general pool","permission":"CAPACITY_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"ChannelAllocationSet"},
-"reportBundleApplied": {"method":"POST","path":"/catalogue/bundles/{version}/applied","contract":"catalogue","summary":"Report that a workstation applied a bundle","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"append","scopeLevel":"workstation","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":null},
 "resolveProductByCode": {"method":"GET","path":"/products/resolve","contract":"catalogue","summary":"Resolve a partner code to a product","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"code","in":"query","required":true},{"name":"partnerId","in":"query","required":null}],"requestBody":null,"responds":"ProductVariant"},
+"restoreProductVersion": {"method":"POST","path":"/products/{productId}/versions/{version}/restore","contract":"catalogue","summary":"Put a previous version back","permission":"PRODUCT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Product"},
 "runReport": {"method":"POST","path":"/reports/{reportId}/run","contract":"reporting","summary":"Run a report","permission":"REPORT_VIEW_VENUE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"RunReportRequest","responds":"ReportResult"},
+"searchMedia": {"method":"GET","path":"/media","contract":"assets","summary":"Search the asset library","permission":"ASSET_LIBRARY_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"kind","in":"query","required":null},{"name":"tag","in":"query","required":null},{"name":"collectionId","in":"query","required":null},{"name":"venueId","in":"query","required":null},{"name":"search","in":"query","required":null},{"name":"unusedOnly","in":"query","required":null},{"name":"rightsExpiringWithinDays","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "setAlternativeCodes": {"method":"PUT","path":"/products/{productId}/alternative-codes","contract":"catalogue","summary":"Set external identifiers","permission":"PRODUCT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"AlternativeCode"},
 "setChannelAllocations": {"method":"PUT","path":"/channel-capacities/{channelCapacityId}/channel-allocations","contract":"catalogue","summary":"Allocate a channel capacity across sales channels","permission":"CAPACITY_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"ChannelAllocationSet"},
+"setChannelListing": {"method":"PUT","path":"/channel-listings","contract":"subscription","summary":"List a product on a channel, with its own allocation","permission":"PARTNER_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"ChannelListing","responds":"ChannelListing"},
 "setComboSlots": {"method":"PUT","path":"/combos/{comboId}/slots","contract":"fnb","summary":"What the guest chooses, and what it costs extra","permission":"PRODUCT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Combo"},
 "setDynamicPriceRule": {"method":"PUT","path":"/pricing/dynamic-rules/{ruleId}","contract":"catalogue","summary":"Replace a rule, its conditions and its actions","permission":"PRICE_CONFIGURE","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[{"name":"ruleId","in":"path","required":true},{"name":null,"in":null,"required":null}],"requestBody":"DynamicPriceRuleDetail","responds":"DynamicPriceRuleDetail"},
 "setGroupPackageDefinition": {"method":"PUT","path":"/products/{productId}/group-package","contract":"catalogue","summary":"Define a school-trip format or party package","permission":"PRODUCT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":"productId","in":"path","required":true}],"requestBody":"GroupPackageDefinition","responds":"GroupPackageDefinition"},
-"setItemAvailability": {"method":"PUT","path":"/menu-items/{itemId}/availability","contract":"fnb","summary":"Mark an item available or eighty-sixed","permission":"PRODUCT_CONFIGURE","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"MenuItem"},
 "setPackagePricingDefinition": {"method":"PUT","path":"/package-pricing","contract":"catalogue","summary":"Set how a package, bundle or add-on is priced","permission":"PRICE_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"PackagePricing","responds":"PackagePricing"},
 "setPerformanceTemplate": {"method":"PUT","path":"/performance-templates","contract":"catalogue","summary":"Define slot length, capacity, bands and walk-in policy","permission":"PERFORMANCE_CONFIGURE","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"PerformanceTemplate","responds":"PerformanceTemplate"},
 "setPrices": {"method":"PUT","path":"/price-lists/{priceListId}/prices","contract":"catalogue","summary":"Set prices in bulk","permission":"PRICE_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":null},
@@ -3471,6 +4064,7 @@ Method, path, parameters, request and response for every operation these screens
 "updatePerformance": {"method":"PATCH","path":"/performances/{performanceId}","contract":"catalogue","summary":"Amend a performance","permission":"PERFORMANCE_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Performance"},
 "updatePriceList": {"method":"PATCH","path":"/price-lists/{priceListId}","contract":"catalogue","summary":"Amend a price list","permission":"PRICE_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"PriceList"},
 "updateProduct": {"method":"PATCH","path":"/products/{productId}","contract":"catalogue","summary":"Update a product","permission":"PRODUCT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":"UpdateProductRequest","responds":"Product"},
+"updateProductVariant": {"method":"PATCH","path":"/products/{productId}/variants/{variantId}","contract":"catalogue","summary":"Describe a variant","permission":"PRODUCT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"ProductVariant"},
 "updatePromotion": {"method":"PATCH","path":"/promotions/{promotionId}","contract":"promotions","summary":"Amend a promotion","permission":"PRICE_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Promotion"},
 "voidCouponCode": {"method":"POST","path":"/coupon-codes/{code}/void","contract":"promotions","summary":"Void a code","permission":"PRICE_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"CouponCode"},
 "voidVoucher": {"method":"POST","path":"/vouchers/{voucherId}/void","contract":"promotions","summary":"Cancel a voucher","permission":"PRICE_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Voucher"}
@@ -3483,7 +4077,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
-"AllergenCode": {"type":"string","description":"**The fourteen declarable allergens, as one closed list.** Every allergen field in this contract uses it — the menu claim, the ticket line, a substitution's delta, a modifier option, the label on a bag — so a declared set and an actual set compare without anybody normalising case or synonyms. It was the `Allergen.contains` enum; the other fields were free text.\n","enum":["gluten","crustaceans","eggs","fish","peanuts","soybeans","milk","nuts","celery","mustard","sesame","sulphites","lupin","molluscs"]},
 "AllocationComponent": {"x-ticvai-persistence":"promotions.allocation_component","type":"object","required":["variantId"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true,"description":"**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"},"variantId":{"type":"string","format":"uuid"},"percentage":{"type":"number","minimum":0,"maximum":100},"fixedAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"listPrice":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"description":"For `proRataListPrice` — weights derived from list prices. **The variant's current price when the bundle is created** (decided 28 September, audit R101), then frozen with the allocation."},"revenueAccountId":{"type":"string","format":"uuid"},"legalEntityId":{"type":"string","format":"uuid","nullable":true,"description":"Set where the component is earned by a different legal entity. Cross-currency allocation is deferred pending the FX policy decision.\n"},"venueId":{"type":"string","format":"uuid","nullable":true}}},
 "AllocationMethod": {"type":"string","enum":["percentage","fixedAmount","proRataListPrice"]},
 "AlternativeCode": {"x-ticvai-persistence":"catalogue.alternative_code","type":"object","required":["code","partnerId"],"properties":{"code":{"type":"string","maxLength":128},"partnerId":{"type":"string","format":"uuid"},"partnerName":{"type":"string"},"variantId":{"type":"string","format":"uuid"},"note":{"type":"string","maxLength":200}}},
@@ -3492,6 +4085,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "BookingFlowStep": {"x-ticvai-persistence":"whitelabel.booking_flow_step","type":"object","description":"One step of a venue's flow, in the venue's order (decided 29 September, W12).","required":["stepKey","enabled","sortOrder"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"bookingFlowId":{"type":"string","format":"uuid","readOnly":true},"stepKey":{"$ref":"#/components/schemas/BookingFlowStepKey"},"enabled":{"type":"boolean","description":"A `required` step cannot be off; the flow saves and `isValid` turns false."},"sortOrder":{"type":"integer","minimum":0},"requirement":{"type":"string","enum":["required","optional","conditional"],"readOnly":true,"x-ticvai-derived":"onRead","description":"From the flow type, so the CMS can mark the step without a second read."},"settings":{"type":"object","additionalProperties":true,"default":{},"description":"The step's own settings, by the names the type's `stepSettings` gives for this step (e.g. `languages` on `language`, `minHours` on `duration`). A name the type does not give is refused with 400."}}},
 "BookingFlowTypeKey": {"type":"string","description":"**The flow types the system catalogue offers (decided 29 September, W12; impact.md b).** `seatedFixedPerformance` and `seatedDateTimeSeatMap` are the two seated flows; `cabanaMap` and `cabanaBySize` are the two cabana flows (W6); `experienceWorkshop` puts the product before the date (W8); `multiLocation` opens on the location switcher.\n","enum":["datedDayPass","timedEntry","openDated","seatedFixedPerformance","seatedDateTimeSeatMap","experienceWorkshop","surfSession","meetingRoomHourly","cabanaMap","cabanaBySize","guidedTourByLanguage","transport","tableReservation","membership","giftCard","multiLocation"]},
 "BulkPriceResult": {"type":"object","description":"2.9.9. Dry run or applied — the shape is the same, `applied` says which.","required":["applied","productsMatched"],"properties":{"applied":{"type":"boolean"},"productsMatched":{"type":"integer"},"pricesChanged":{"type":"integer"},"skipped":{"type":"array","description":"**Products the selection matched and the adjustment could not touch** — a fixed-price bundle, a partner net rate, a product in an open period. Named rather than counted, because whoever ran this will be asked why the total is short.\n","items":{"type":"object","properties":{"productId":{"type":"string","format":"uuid"},"reason":{"type":"string"}}}}}},
+"BulkProductUpdateResult": {"type":"object","description":"What `bulkUpdateCatalogueProducts` matched and changed, or would change in a preview (CHG-FUP-011).","required":["applied","matched"],"properties":{"applied":{"type":"boolean","description":"False for a preview."},"matched":{"type":"integer","minimum":0},"succeeded":{"type":"integer","minimum":0},"failed":{"type":"integer","minimum":0},"failures":{"type":"array","description":"One entry per product the change was refused for. Empty on a clean run.","items":{"type":"object","required":["productId","code"],"properties":{"productId":{"type":"string","format":"uuid"},"code":{"type":"string","description":"The validation rule the product failed, as in `Problem.errors[].code`."},"message":{"type":"string"}}}}}},
 "Bundle": {"x-ticvai-persistence":"promotions.bundle + promotions.bundle_component","allOf":[{"$ref":"#/components/schemas/CreateBundleRequest"},{"type":"object","required":["id","savingsAmount","isActive","hasBeenSold"],"properties":{"id":{"type":"string","format":"uuid"},"savingsAmount":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"description":"Sum of component list prices less the bundle price."},"savingsPercentage":{"type":"number"},"hasBeenSold":{"type":"boolean","description":"True locks components and allocation against amendment."},"isActive":{"type":"boolean"}}}]},
 "BundleChoiceGroup": {"type":"object","x-ticvai-persistence":"promotions.bundle_choice_group + promotions.bundle_choice_option","description":"**Pick n from a set** (3.5.10). The shape a dynamic bundle needs and `BundleComponent` could not express — it names specific variants, which describes a fixed bundle with swaps.\nThe bundle price does not move with the choice (ADR-0019). **The allocation does.**\n","required":["label","choose","options"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"label":{"type":"string","description":"What the guest is asked. \"Choose 3 attractions\"."},"choose":{"type":"integer","minimum":1,"description":"How many options the guest picks."},"allowDuplicates":{"type":"boolean","default":false,"description":"Whether the same option may be picked twice. False for attractions, sometimes true for F&B.\n"},"options":{"type":"array","minItems":2,"description":"The rows of `promotions.bundle_choice_option`, one per option, each keyed to its group. A required array with nowhere to be stored was a group whose choices were lost on write.\n","items":{"type":"object","required":["variantId"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"variantId":{"type":"string","format":"uuid"},"quantity":{"type":"integer","default":1},"isDefault":{"type":"boolean","default":false}}}},"unavailableBehaviour":{"type":"string","enum":["hideOption","hideBundle"],"default":"hideOption","description":"An option that has sold out for the chosen date is **not offered**. Where the group can no longer be satisfied at all, the bundle itself becomes unavailable — **it is never sold with a component that cannot be delivered**, because a substitution the guest did not choose is a complaint at the gate.\n"}}},
 "BundleComponent": {"x-ticvai-persistence":"promotions.bundle_component","type":"object","required":["variantId","quantity"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true,"description":"**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"},"variantId":{"type":"string","format":"uuid"},"componentKind":{"$ref":"#/components/schemas/BundleComponentKind"},"menuItemId":{"type":"string","format":"uuid","nullable":true,"description":"**The F&B menu item a `fnbMenuItem` component entitles the guest to** (decided 29 September, MOB-4): the meal of a *meal combo with admission*. `variantId` is still the catalogue variant the menu item sells (fnb `MenuItem.variantId`), which prices and taxes it; this names what the outlet redeems. Required when `componentKind` is `fnbMenuItem`, else ignored; a menu item that does not sell `variantId` is a `422` on `createBundle`.\n"},"redeemAtOutletIds":{"type":"array","maxItems":20,"items":{"type":"string","format":"uuid"},"description":"Outlets that redeem an `fnbMenuItem` component; empty means any outlet of the component's venue that has the menu item on a live menu (MOB-4)."},"quantity":{"type":"integer","minimum":1},"isOptional":{"type":"boolean","default":false},"substituteVariantIds":{"type":"array","items":{"type":"string","format":"uuid"},"description":"For dynamic bundles — guest chooses among these."},"substitutionTriggers":{"type":"array","nullable":true,"items":{"type":"string","enum":["soldOut","capacityExhausted","productSuspended","venueClosed","externalApiUnavailable","inventoryBelowThreshold"]},"description":"When a substitute from `substituteVariantIds` may replace this component (Dynamic Component Substitution Engine). Empty: never substituted. (DM5, 29 September: data model for the agreed operations)"},"substitutionPriceEffect":{"type":"string","enum":["samePrice","surcharge","reducedPrice"],"default":"samePrice","description":"What a substitution does to the bundle price. (DM5, 29 September: data model for the agreed operations)"},"substitutionApproval":{"type":"string","enum":["none","customer","operator"],"default":"customer","description":"Who must accept a substitution before it stands. Customer by default, because a substitution the guest did not choose is a complaint at the gate. (DM5, 29 September: data model for the agreed operations)"},"venueId":{"type":"string","format":"uuid","nullable":true,"description":"Where this component is redeemed. Differs from the selling venue for multi-venue passes, which is why the allocation split exists.\n"}}},
@@ -3504,10 +4098,13 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "ChannelAllocation": {"x-ticvai-persistence":"catalogue.channel_allocation","type":"object","required":["channel","allocatedUnits"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true,"description":"**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"},"channel":{"$ref":"#/components/schemas/Channel"},"allocatedUnits":{"type":"integer","minimum":0},"soldUnits":{"type":"integer","readOnly":true},"leasedUnits":{"type":"integer","readOnly":true,"description":"Held by terminals on this channel but not yet sold."},"remainingUnits":{"type":"integer","readOnly":true},"releaseAt":{"type":"string","format":"date-time","nullable":true,"description":"Unsold units return to the general pool at this time. How distribution holds are freed close to a performance without someone remembering to do it.\n"},"salesChannelId":{"type":"string","format":"uuid","nullable":true,"description":"The channel profile (`catalogue.sales_channel`) this allocation serves (29 September, data model DM3)."},"allocationType":{"type":"string","enum":["sharedPool","dedicated","percentage","dynamic"],"default":"dedicated","description":"How the allocation is sized (29 September, data model DM3); the allocation rule of ADM-262 lives on this row."},"minimumUnits":{"type":"integer","nullable":true,"minimum":0},"maximumUnits":{"type":"integer","nullable":true,"minimum":0},"replenishmentRule":{"type":"object","additionalProperties":true,"nullable":true,"description":"`{sourceChannelId, trigger, thresholdUnits, sharePercent, units}`."},"waitlistBehavior":{"type":"string","enum":["none","joinWaitlist","notifyOnRelease"],"default":"none"},"releaseThresholdUnits":{"type":"integer","nullable":true,"minimum":0},"releaseHoursBeforeEvent":{"type":"integer","nullable":true,"minimum":0,"description":"Alternative to `releaseAt`, relative to the performance start."},"contractualUnits":{"type":"integer","nullable":true,"minimum":0,"description":"Units a partner agreement guarantees; rebalancing never goes below it."},"minimumGuaranteedUnits":{"type":"integer","nullable":true,"minimum":0},"isFrozen":{"type":"boolean","default":false,"description":"Excluded from rebalancing."}}},
 "ChannelAllocationSet": {"x-ticvai-persistence":"none — projection","type":"object","required":["channelCapacityId","capacity","allocations","generalPoolUnits"],"properties":{"channelCapacityId":{"type":"string","format":"uuid"},"capacity":{"type":"integer"},"allocations":{"type":"array","items":{"$ref":"#/components/schemas/ChannelAllocation"}},"generalPoolUnits":{"type":"integer","description":"Unallocated remainder. Any channel may draw from it once its own allocation is exhausted.\n"},"totalSold":{"type":"integer"},"totalRemaining":{"type":"integer"}}},
 "ChannelCapacity": {"x-ticvai-persistence":"catalogue.channel_capacity","type":"object","required":["id","performanceId","capacity","sold","leased","remaining","isSeated"],"properties":{"id":{"type":"string","format":"uuid"},"performanceId":{"type":"string","format":"uuid"},"name":{"type":"string"},"seatCategoryId":{"type":"string","format":"uuid","nullable":true},"oversellAllowance":{"type":"integer","default":0,"description":"BL-046, 1.3.13. **The guard existed in one direction** — an envelope could be raised freely and refused reduction below what had sold.\n**Free events oversell deliberately because no-show rates are known.** An allowance on the envelope rather than an admission policy, because **the gate must still refuse when actual capacity is reached** — overselling is a sales decision and admission is a safety one, and they must not share a number.\n"},"oversellBasis":{"type":"string","nullable":true,"enum":["fixedCount","historicNoShowRate","percentage"]},"capacity":{"type":"integer","minimum":0},"sold":{"type":"integer","readOnly":true,"x-ticvai-derived":"onWrite","description":"Units sold. **Maintained on write** (decided 29 September, SD-023): raised by `convertInventoryHold` in the order transaction and by consumption a workstation reports on `renewInventoryHold` or `relinquishInventoryHold`, lowered when a refund or cancellation returns the units. Always `capacity + oversellAllowance = sold + leased + remaining`.\n"},"leased":{"type":"integer","readOnly":true,"x-ticvai-derived":"onWrite","description":"Units in `active` holds, not yet sold. Raised at acquire, lowered at conversion, release, force-release and expiry (SD-023)."},"remaining":{"type":"integer","readOnly":true,"x-ticvai-derived":"onWrite","description":"What can still be held. **Decremented at the hold with a guarded statement** (`remaining >= n`) under the row lock, never at the sale, so two buyers cannot both take the last unit (SD-023, 29 September).\n"},"hasChannelAllocations":{"type":"boolean","description":"True where capacity is divided across channels. Leases then draw from a channel allocation rather than from raw capacity.\n"},"isSeated":{"type":"boolean","description":"Seated envelopes cannot be leased and are blocked offline. A seat map is not a count.\n"}}},
+"ChannelListing": {"type":"object","x-ticvai-persistence":"control.channel_listing","description":"BL-076. **The integration register marks *Resellers & OTA* as covered, and that is true of the commercial model and not of the integration.** Agreements, allocations and credit exist; the exchange with Viator, Klook, Headout and GetYourGuide does not.\n**An OTA is not a partner portal.** A partner logs in and books; an OTA pulls a feed, caches it, and sells against the cache — **so the failure mode is a sale against stale inventory**, and everything below exists to bound that.\n","required":["id","channelName","productId","status"],"properties":{"id":{"type":"string","format":"uuid"},"channelName":{"type":"string","enum":["viator","klook","headout","getYourGuide","tiqets","expedia","other"]},"productId":{"type":"string","format":"uuid"},"externalProductRef":{"type":"string","nullable":true},"status":{"type":"string","enum":["draft","live","paused","delisted"]},"allocationUnits":{"type":"integer","nullable":true,"description":"**Inventory published to this channel, not the venue's whole capacity.** An OTA given the full envelope will sell it, and the venue discovers at the gate.\n"},"priceListId":{"type":"string","format":"uuid"},"adapter":{"type":"string","nullable":true,"enum":["viatorApi","klookApi","headoutApi","getYourGuideApi","tiqetsApi","octoStandard","generic"],"description":"BL-067. **The commercial model was complete and the wire was not** — `PartnerAgreement` carries rates, commission, credit and channels, and `alternative-codes` maps a partner SKU so an inbound order matches. What was missing is which protocol speaks to whom.\n**`octoStandard` is the one that matters.** OCTo is the open connectivity standard the OTAs converged on, and a venue that implements it once reaches several channels — **a per-OTA adapter is a per-OTA maintenance commitment**, and naming the standard first is what keeps that list from growing.\n"},"adapterCredentialRef":{"type":"string","nullable":true,"description":"A vault reference. **Never the credential**, following the rule ADR-0020 set for AI providers."},"pushIntervalMinutes":{"type":"integer","default":15,"description":"How often availability is pushed. **The gap between pushes is the oversell window**, and a channel selling a high-demand slot needs a shorter one than a channel selling a museum on a Tuesday.\n"},"guestDataScope":{"type":"string","enum":["none","nameOnly","nameAndContact","full"],"default":"nameOnly","description":"**What the OTA passes through, and it is usually less than the venue wants.** A ticket arriving with no contact detail cannot be reissued or notified of a cancellation, and the venue should know that at listing time rather than at the gate.\n"},"lastPushedAt":{"type":"string","format":"date-time","nullable":true},"scopePath":{"type":"string","description":"**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"}}},
 "Combo": {"type":"object","x-ticvai-persistence":"fnb.combo","description":"Board 2G, 24 August. **A meal deal is one product with slots, not a bundle of products.** `listCatalogueBundles` bundles ticketing products — a ticket and a parking pass, both fixed — and **a burger with a choice of side and a choice of drink is a different shape entirely.**\n**The price is on the combo, not the sum of its parts.** That is the whole commercial point: a meal deal is cheaper than its items, and a model that prices by summing cannot express it.\n**Upcharges live on the slot options.** A large drink in a meal deal costs two dirhams more than a regular, and it is not a separate combo.\n","required":["id","name","price","slots"],"properties":{"id":{"type":"string","format":"uuid"},"outletId":{"type":"string","format":"uuid"},"name":{"type":"string"},"nameLocalised":{"type":"object","additionalProperties":{"type":"string"}},"price":{"x-ticvai-column":"list_price","$ref":"../shared/common.yaml#/components/schemas/Money"},"slots":{"type":"array","minItems":1,"items":{"$ref":"#/components/schemas/ComboSlot"}},"availability":{"allOf":[{"$ref":"#/components/schemas/MenuAvailability"}],"nullable":true,"description":"Service periods it sells in, in the same shape as a menu's. **A lunch deal at 9pm is a margin leak** and the venue only notices at month end.\n"},"isActive":{"type":"boolean","default":true}}},
 "ComboSlot": {"type":"object","x-ticvai-persistence":"fnb.combo_slot","description":"One choice within a combo. **`minSelect` and `maxSelect` are what make it a slot rather than a line** — a main is exactly one, a side is one of four, and a sauce might be none or two.\n","required":["id","name","options"],"properties":{"id":{"type":"string","format":"uuid"},"comboId":{"type":"string","format":"uuid"},"name":{"type":"string"},"minSelect":{"type":"integer","default":1},"maxSelect":{"type":"integer","default":1},"sortOrder":{"type":"integer","default":100},"options":{"type":"array","items":{"type":"object","required":["menuItemId"],"properties":{"menuItemId":{"type":"string","format":"uuid"},"upcharge":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"isDefault":{"type":"boolean","default":false,"description":"**The one a cashier gets without asking.** A combo with no default is four taps at every till in the venue.\n"}}}}}},
 "CommercialCampaign": {"x-ticvai-persistence":"promotions.campaign + promotions.campaign_budget","type":"object","description":"A commercial campaign: the grouping of promotions, coupon campaigns and bundles that share an owner, a business entity, dates and a budget. **Not `marketing.campaign`**, which is the CRM send campaign in another service. The header is saved with its budget lines by setCampaignBudgetFinancial (the budget screen is where the pack captures campaign, owner, business entity and effective dates), and on its own by createCommercialCampaign and updateCommercialCampaign; listCommercialCampaigns lists it (decided 29 September, writers pass); promotions, coupon campaigns and bundles point at it by `campaignId`. No status of its own: a campaign is live while its promotions are, and a threshold action that stops it pauses them. (DM5, 29 September: data model for the agreed operations)","required":["id","venueId","name"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"venueId":{"type":"string","format":"uuid"},"code":{"type":"string","maxLength":64,"nullable":true},"name":{"type":"string","maxLength":200},"description":{"type":"string","maxLength":1000,"nullable":true},"ownerPrincipalId":{"type":"string","format":"uuid","nullable":true,"description":"The campaign (and budget) owner."},"legalEntityId":{"type":"string","format":"uuid","nullable":true,"description":"The business entity that funds and books the campaign."},"validFrom":{"type":"string","format":"date-time","nullable":true},"validTo":{"type":"string","format":"date-time","nullable":true},"budgets":{"type":"array","description":"The rows of `promotions.campaign_budget`, one per budget line.","items":{"$ref":"#/components/schemas/CampaignBudget"}}}},
 "ConflictAnalysis": {"x-ticvai-persistence":"none — computed","type":"object","required":["promotionId","conflicts","worstCaseDiscount"],"properties":{"promotionId":{"type":"string","format":"uuid"},"conflicts":{"type":"array","items":{"type":"object","required":["otherPromotionId","otherPromotionCode","overlap","combinedDiscount"],"properties":{"otherPromotionId":{"type":"string","format":"uuid"},"otherPromotionCode":{"type":"string"},"overlap":{"type":"string","enum":["products","period","channel","full"]},"combinedDiscount":{"type":"number","description":"Combined percentage where both apply to the same line."},"isBlocking":{"type":"boolean","description":"True where the combination would produce a line price of zero or below (decided 28 September, audit R101)."},"isNearZero":{"type":"boolean","description":"True where the combination leaves a net line price above zero but below the venue setting `promotions.nearZeroLinePrice` (proposed AED 1.00; decided 28 September, audit R096 (5)). A warning, not a refusal."}}}},"worstCaseDiscount":{"type":"number","description":"Largest combined discount any single line could receive."}}},
+"ConsentQuestion": {"type":"object","x-ticvai-persistence":"marketing.consent_question + marketing.consent_question_version","description":"**A venue-defined consent question asked at booking** (decided 29 September, rev 3 REV3-26). Each version's text is kept in `consent_question_version`, so an answer always points at the exact words the guest saw. Attached to products by the catalogue and to booking flows by the white-label flow configuration; one or several per flow, as the venue chooses.\n","required":["id","kind","text","version","scope","required","blockingAnswer","status"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"kind":{"$ref":"#/components/schemas/ConsentQuestionKind"},"text":{"allOf":[{"$ref":"#/components/schemas/LocalisedText"}],"description":"The question as the guest reads it, per locale."},"helpText":{"allOf":[{"$ref":"#/components/schemas/LocalisedText"}],"nullable":true},"version":{"type":"integer","minimum":1,"readOnly":true,"description":"Raised by one each time the question changes (`updateConsentQuestion`)."},"scope":{"type":"string","enum":["perPerson","perBooking"],"default":"perPerson","description":"Asked for each declared person, or once for the whole booking."},"required":{"type":"boolean","default":true,"description":"Checkout waits until it is answered (`orders.checkoutCart` 422 `consentRequired`)."},"blockingAnswer":{"type":"string","enum":["yes","no","none"],"default":"none","description":"The answer that stops the booking, for the person or the booking it covers. `none` records the answer and blocks nothing."},"status":{"type":"string","enum":["active","retired"],"default":"active"},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005). Operations write it at `venue` scope."},"updatedAt":{"type":"string","format":"date-time","readOnly":true}}},
+"ConsentQuestionKind": {"type":"string","description":"What the question is about (decided 29 September, rev 3 REV3-26). `swim` feeds the derived `confidentSwimmer` on the order line; the others are recorded and checked as the venue set them.","enum":["swim","scuba","risk","custom"]},
 "CouponCampaign": {"x-ticvai-persistence":"promotions.coupon_campaign","allOf":[{"$ref":"#/components/schemas/CreateCouponCampaignRequest"},{"type":"object","required":["id","generatedCount","redeemedCount"],"properties":{"id":{"type":"string","format":"uuid"},"generatedCount":{"type":"integer"},"redeemedCount":{"type":"integer"},"isActive":{"type":"boolean"}}}]},
 "CouponCode": {"x-ticvai-persistence":"promotions.coupon_code","type":"object","required":["code","campaignId","status"],"properties":{"code":{"type":"string"},"campaignId":{"type":"string","format":"uuid"},"batchId":{"type":"string","format":"uuid","nullable":true,"description":"The `generateCouponCodes` batch that issued this code. Null where no batch did."},"status":{"$ref":"#/components/schemas/CouponStatus"},"assignedSubjectId":{"type":"string","format":"uuid","nullable":true},"redemptionCount":{"type":"integer"},"maxRedemptions":{"type":"integer"},"discount":{"$ref":"#/components/schemas/Discount"},"invalidReason":{"type":"string","nullable":true,"description":"Why the code cannot be applied. A cashier reading `expired` to a guest is a very different conversation from reading `already used`.\n","enum":["expired","alreadyRedeemed","voided","notYetValid","wrongVenue","conditionsNotMet","notAssignedToGuest"]},"validFrom":{"type":"string","format":"date-time","nullable":true},"validTo":{"type":"string","format":"date-time","nullable":true},"redeemedAt":{"type":"string","format":"date-time","nullable":true},"redeemedOrderId":{"type":"string","nullable":true},"scopePath":{"type":"string","description":"**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"}}},
 "CouponStatus": {"type":"string","enum":["issued","assigned","redeemed","expired","voided"]},
@@ -3517,13 +4114,13 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "CreateEventRequest": {"type":"object","required":["code","name","venueId"],"properties":{"code":{"type":"string","maxLength":64,"x-ticvai-unique":"tenant","description":"**Unique per tenant** (decided 28 September, audit R108). A code already used by any event in the tenant is refused with `409 duplicate-code`.\n"},"name":{"type":"string","maxLength":200},"venueId":{"type":"string","format":"uuid"},"parentEventId":{"type":"string","format":"uuid"}}},
 "CreateMerchandiseRequest": {"x-ticvai-persistence":"none — request only","type":"object","required":["sku","name","outletId","variantId"],"properties":{"sku":{"type":"string","maxLength":64},"barcode":{"type":"string","maxLength":128},"name":{"type":"string","maxLength":200},"description":{"type":"string","description":"What the item is, in the guest's words. Indexed for guest-app search."},"outletId":{"type":"string","format":"uuid"},"categoryId":{"type":"string","format":"uuid"},"variantId":{"type":"string","format":"uuid"},"inventoryItemId":{"type":"string","format":"uuid"},"isReturnable":{"type":"boolean","default":true},"returnWindowDays":{"type":"integer"},"requiresSerialNumber":{"type":"boolean","default":false},"imageAssetRef":{"type":"string"}}},
 "CreatePerformancesRequest": {"type":"object","required":["startsAt","endsAt"],"properties":{"startsAt":{"type":"string","format":"date-time"},"endsAt":{"type":"string","format":"date-time"},"admissionRulesId":{"type":"string","format":"uuid"},"seatMapId":{"type":"string","format":"uuid"},"language":{"type":"string","nullable":true,"maxLength":35,"pattern":"^[A-Za-z]{2,3}(-[A-Za-z0-9]{1,8})*$","description":"As `Performance.language`; every performance of a generated series takes it (decided 29 September, rev 3 REV3-17)."},"format":{"type":"string","nullable":true,"maxLength":40,"description":"As `Performance.format` (decided 29 September, rev 3 REV3-17)."},"recurrence":{"type":"object","description":"Generate a series rather than a single performance. **Read in the region's time zone**: the Region owns the zone and every venue inherits it without override (tenancy), so `daysOfWeek` are the region's calendar days and `until` is compared on the region's clock.\n","properties":{"intervalMinutes":{"type":"integer","minimum":1},"until":{"type":"string","format":"date-time"},"daysOfWeek":{"type":"array","items":{"type":"integer","minimum":0,"maximum":6}}}}}},
-"CreatePriceListRequest": {"type":"object","required":["code","name","venueId","channels"],"properties":{"code":{"type":"string","maxLength":64},"name":{"type":"string","maxLength":200},"venueId":{"type":"string","format":"uuid"},"channels":{"type":"array","minItems":1,"items":{"$ref":"#/components/schemas/Channel"}},"validFrom":{"type":"string","format":"date-time"},"validTo":{"type":"string","format":"date-time"},"priority":{"type":"integer","default":0}}},
+"CreatePriceListRequest": {"type":"object","required":["code","name","venueId","channels"],"properties":{"code":{"type":"string","maxLength":64},"name":{"type":"string","maxLength":200},"venueId":{"type":"string","format":"uuid"},"channels":{"type":"array","minItems":1,"items":{"$ref":"#/components/schemas/Channel"}},"validFrom":{"type":"string","format":"date-time"},"validTo":{"type":"string","format":"date-time"},"priority":{"type":"integer","default":0},"description":{"type":"string","nullable":true,"description":"**The price list master fields** (data model DM3) are written here since setPriceListMaster was retired in r2 (BC-008, CHG-CLN-001); each is optional and means what it means on `PriceList`."},"priceListType":{"type":"string","enum":["standardRetail","venue","attraction","event","membership","group","corporate","b2b","reseller","ota","internal","specialMarket"]},"ownerPrincipalId":{"type":"string","format":"uuid","nullable":true},"tags":{"type":"array","items":{"type":"string"}},"legalEntityId":{"type":"string","format":"uuid","nullable":true},"brand":{"type":"string","maxLength":100,"nullable":true},"businessUnit":{"type":"string","maxLength":100,"nullable":true},"countryCode":{"type":"string","maxLength":2,"nullable":true,"pattern":"^[A-Z]{2}$"},"marketCode":{"type":"string","maxLength":40,"nullable":true},"scopeLevel":{"type":"string","enum":["global","country","market","brand","venue","event","businessUnit"]},"defaultPriceCategoryId":{"type":"string","format":"uuid","nullable":true},"roundingProfileId":{"type":"string","format":"uuid","nullable":true},"priceResolutionPolicyId":{"type":"string","format":"uuid","nullable":true},"allowOverrides":{"type":"boolean"},"allowInheritance":{"type":"boolean"},"allowMultipleCurrencies":{"type":"boolean"},"allowProductSpecificRates":{"type":"boolean"}}},
 "CreateProductRequest": {"type":"object","required":["code","name","kind","venueId"],"properties":{"code":{"type":"string","maxLength":64,"pattern":"^[A-Za-z0-9_-]+$","x-ticvai-unique":"tenant","description":"**Unique per tenant** (decided 28 September, audit R108). A code already used by any product in the tenant, at any venue, is refused with `409 duplicate-code`.\n"},"familyKey":{"type":"string","maxLength":64,"pattern":"^[A-Za-z0-9_-]+$","nullable":true,"x-ticvai-unique":"venue","description":"The product family across the tenant's venues (decided 29 September, rev 3 REV3-18); see `Product.familyKey`. At most one product per venue in a family, else `409 duplicate-code`."},"name":{"type":"string","maxLength":200},"description":{"type":"string"},"kind":{"$ref":"#/components/schemas/ProductKind"},"venueId":{"type":"string","format":"uuid"},"channels":{"type":"array","items":{"$ref":"#/components/schemas/Channel"}},"entitlementTemplateId":{"type":"string","format":"uuid"},"dataMaskValues":{"type":"object","additionalProperties":true},"guestListing":{"$ref":"#/components/schemas/GuestListing"},"notBookableLabel":{"allOf":[{"$ref":"#/components/schemas/LocalisedText"}],"nullable":true},"salesContact":{"allOf":[{"$ref":"#/components/schemas/ProductSalesContact"}],"nullable":true,"description":"See `Product.salesContact` (W3, 29 September)."},"bookingFlowId":{"type":"string","format":"uuid","nullable":true,"description":"See `Product.bookingFlowId` (W8, W12, 29 September)."},"displayTags":{"type":"array","maxItems":6,"items":{"$ref":"#/components/schemas/ProductDisplayTag"}},"media":{"type":"array","maxItems":20,"items":{"$ref":"#/components/schemas/ProductMedia"}},"consentQuestionIds":{"type":"array","maxItems":10,"uniqueItems":true,"items":{"type":"string","format":"uuid"}},"requiresTimeWindow":{"type":"boolean"}}},
 "CreatePromotionRequest": {"x-ticvai-persistence":"none — request only","type":"object","required":["code","name","venueId","discount","validFrom"],"properties":{"code":{"type":"string","maxLength":64,"pattern":"^[A-Za-z0-9_-]+$"},"name":{"type":"string","maxLength":200},"description":{"type":"string","maxLength":1000},"venueId":{"type":"string","format":"uuid"},"discount":{"$ref":"#/components/schemas/Discount"},"conditions":{"$ref":"#/components/schemas/PromotionConditions"},"stackingMode":{"allOf":[{"$ref":"#/components/schemas/StackingMode"}],"default":"bestOnly"},"stackingGroup":{"type":"string","maxLength":64},"precedence":{"type":"integer","default":0,"description":"Higher evaluates first where several could apply."},"validFrom":{"type":"string","format":"date-time"},"validTo":{"type":"string","format":"date-time"},"maxRedemptions":{"type":"integer","nullable":true},"maxRedemptionsPerGuest":{"type":"integer","nullable":true},"budgetCap":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"description":"Total discount value after which the promotion stops automatically. **Enforced at checkout**, where an order whose discount would take the total past the cap does not receive the promotion (decided 28 September, audit R101)."},"campaignId":{"type":"string","format":"uuid","nullable":true,"description":"The commercial campaign (`promotions.campaign`) this promotion belongs to; null for a promotion run on its own. The directory, calendar and campaign budget screens group by it. (DM5, 29 September: data model for the agreed operations)"},"recommendable":{"type":"boolean","default":false,"description":"**May the recommendation engine show this offer to a guest** (8.6.30 to 8.6.36; 29 September, build pass, group G2, from group G1's handoff). False keeps a promotion to the basket, where `evaluatePromotions` applies it as before. True makes a live promotion a candidate item of kind `offer` in `ai.decideRecommendations` for the guests its conditions and `recommendableSegmentIds` admit: while it is live, `promotions.recommendationStrategyPublished` (kind `offers`) keeps the engine's candidate cache current, and it leaves the cache when it is paused, ends or expires. **The engine shows the offer; the discount is still computed here at the basket**, never by ai."},"recommendableSegmentIds":{"type":"array","nullable":true,"description":"The marketing-crm segments the offer may be recommended to; null means every guest its own conditions admit.","items":{"type":"string","format":"uuid"}}}},
 "CreateVoucherBatchRequest": {"x-ticvai-persistence":"none — request only","type":"object","required":["name","venueId","faceValue","quantity","validTo"],"properties":{"name":{"type":"string","maxLength":200},"venueId":{"type":"string","format":"uuid"},"faceValue":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"quantity":{"type":"integer","minimum":1,"maximum":50000},"allowPartialRedemption":{"type":"boolean","default":true,"description":"False forfeits any unused balance, which is then recognised as breakage.\n"},"validFrom":{"type":"string","format":"date-time"},"validTo":{"type":"string","format":"date-time"},"restrictToVariantIds":{"type":"array","items":{"type":"string","format":"uuid"}}}},
 "Dashboard": {"x-ticvai-persistence":"reporting.dashboard + reporting.dashboard_tile","allOf":[{"$ref":"#/components/schemas/CreateDashboardRequest"},{"type":"object","required":["id","ownerPrincipalId","aggregateCost","createdAt"],"properties":{"id":{"type":"string","format":"uuid"},"ownerPrincipalId":{"type":"string","format":"uuid"},"aggregateCost":{"type":"string","enum":["low","medium","high"],"description":"Combined refresh load of every tile."},"archivedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true,"description":"**Set by `deleteDashboard`, which archives rather than removes.** A dashboard's tiles carry `visualisation`, `parameters` and `refresh_seconds` that somebody configured, and `reporting.dashboard_tile` cascades — so a hard delete takes an afternoon's work with it and leaves nothing to say what was there.\nArchived dashboards are excluded from `listDashboards` unless asked for with `includeArchived=true`.\n"},"createdAt":{"type":"string","format":"date-time"}}}]},
 "DashboardData": {"x-ticvai-persistence":"none — computed","allOf":[{"$ref":"#/components/schemas/Dashboard"},{"type":"object","properties":{"tileData":{"type":"array","items":{"type":"object","properties":{"tileId":{"type":"string","format":"uuid"},"result":{"$ref":"#/components/schemas/ReportResult"},"isCached":{"type":"boolean"},"error":{"type":"string","nullable":true}}}}}}]},
-"Discount": {"x-ticvai-persistence":"none — embedded in promotion","type":"object","required":["kind"],"properties":{"kind":{"$ref":"#/components/schemas/DiscountKind"},"percentage":{"type":"number","minimum":0,"maximum":100},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"fixedPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"buyQuantity":{"type":"integer","minimum":1},"getQuantity":{"type":"integer","minimum":1},"getDiscountPercentage":{"type":"number","minimum":0,"maximum":100,"description":"100 makes the free items actually free; lower values give a partial discount."},"tiers":{"type":"array","description":"For `tieredPercentage` — more units, larger discount.","items":{"type":"object","required":["minQuantity","percentage"],"properties":{"minQuantity":{"type":"integer","minimum":1},"percentage":{"type":"number","minimum":0,"maximum":100}}}},"maxDiscountAmount":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"description":"Cap on a percentage discount. Prevents an unbounded discount on a large basket."},"rewardVariantIds":{"type":"array","nullable":true,"items":{"type":"string","format":"uuid"},"description":"The reward products, where the reward is not the qualifying product: the free gift of `freeItem`, the \"different product\" of a `buyXGetY` (setGiftFreeProduct, setBuyGetBogo). Absent means the reward is taken from the qualifying lines. (DM5, 29 September: data model for the agreed operations)"},"maxApplicationsPerBasket":{"type":"integer","minimum":1,"nullable":true,"description":"How many times the offer repeats in one basket: the \"maximum repetitions\" of an N-for-X offer (setFixedPriceOffer). Null repeats for every complete set. (DM5, 29 September: data model for the agreed operations)"}}},
+"Discount": {"x-ticvai-persistence":"none — embedded in promotion","type":"object","required":["kind"],"properties":{"kind":{"$ref":"#/components/schemas/DiscountKind"},"percentage":{"type":"number","minimum":0,"maximum":100},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"fixedPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"buyQuantity":{"type":"integer","minimum":1},"getQuantity":{"type":"integer","minimum":1},"getDiscountPercentage":{"type":"number","minimum":0,"maximum":100,"description":"100 makes the free items actually free; lower values give a partial discount."},"tiers":{"type":"array","description":"For `tieredPercentage` — more units, larger discount.","items":{"type":"object","required":["minQuantity","percentage"],"properties":{"minQuantity":{"type":"integer","minimum":1},"percentage":{"type":"number","minimum":0,"maximum":100}}}},"maxDiscountAmount":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"description":"Cap on a percentage discount. Prevents an unbounded discount on a large basket."},"rewardVariantIds":{"type":"array","nullable":true,"items":{"type":"string","format":"uuid"},"description":"The reward products, where the reward is not the qualifying product: the free gift of `freeItem`, the \"different product\" of a `buyXGetY` (createPromotion; the builders setGiftFreeProduct and setBuyGetBogo were retired in r2, CHG-CLN-001). Absent means the reward is taken from the qualifying lines. (DM5, 29 September: data model for the agreed operations)"},"maxApplicationsPerBasket":{"type":"integer","minimum":1,"nullable":true,"description":"How many times the offer repeats in one basket: the \"maximum repetitions\" of an N-for-X offer (createPromotion; setFixedPriceOffer was retired in r2, CHG-CLN-001). Null repeats for every complete set. (DM5, 29 September: data model for the agreed operations)"}}},
 "DiscountKind": {"type":"string","enum":["percentage","fixedAmount","fixedPrice","buyXGetY","freeItem","tieredPercentage"]},
 "DynamicPriceRuleDetail": {"type":"object","x-ticvai-persistence":"none — composed from a rule, its conditions and its actions","description":"**A rule is unreadable without both halves.** The conditions say when it fires, the actions say what it does to the price, and `minPrice`/`maxPrice` on the action are the guard rails a reviewer looks for first.\n","required":["rule"],"properties":{"rule":{"$ref":"#/components/schemas/PricingDynamicPriceRule"},"conditions":{"type":"array","items":{"$ref":"#/components/schemas/PricingDynamicPriceCondition"}},"actions":{"type":"array","items":{"$ref":"#/components/schemas/PricingDynamicPriceAction"}}}},
 "EntitlementTemplate": {"x-ticvai-persistence":"catalogue.entitlement_template","type":"object","required":["id","code","name","validityKind"],"properties":{"description":{"type":"string","description":"**Validity, re-entry and transfer rules in prose.** \"Can I leave and come back\" is answered from here, and a name cannot answer it.\n"},"id":{"type":"string","format":"uuid","readOnly":true,"description":"Assigned by the server on create; `createEntitlementTemplate` does not take it."},"code":{"type":"string","maxLength":64},"name":{"type":"string","maxLength":200},"validityKind":{"type":"string","enum":["singleUse","dated","dateRange","rolling","unlimited","countLimited"]},"validFromOffsetDays":{"type":"integer","nullable":true},"validForDays":{"type":"integer","nullable":true},"daysOfWeek":{"type":"array","nullable":true,"description":"1.1.7 and 1.1.82. **A camp ticket admits on Tuesdays and Thursdays for six weeks**, and `validityKind` had six values with no day pattern among them.\nThe shape is settled elsewhere in the package — `fnb.MenuAvailability` and `promotions.PromotionConditions` both carry it. **Null means every day**, which is what every existing entitlement means today.\n","items":{"type":"string","enum":["mon","tue","wed","thu","fri","sat","sun"]}},"expiryAnchor":{"type":"string","nullable":true,"enum":["offsetDays","endOfMonth","endOfQuarter","endOfYear","fixedDate","seasonEnd"],"description":"1.1.90 to 1.1.92. **A pass bought on the 20th and expiring on the 31st cannot be expressed by an offset in days.** `offsetDays` is the existing behaviour and stays the default.\n`seasonEnd` anchors to the venue's own season rather than the calendar — a water park closing in October is not a quarter boundary.\n"},"expiryDate":{"type":"string","format":"date","nullable":true,"description":"Where `expiryAnchor` is `fixedDate`. Every pass expires the same day regardless of purchase."},"expiryNoticeDays":{"type":"integer","minimum":1,"maximum":180,"nullable":true,"description":"**How many days before `validTo` access raises `entitlement.expiringSoon`** for an entitlement of this template still `issued` or `partiallyConsumed` (29 September, build pass, group G2; 5.5.30). What a pre-expiry message or campaign is triggered by. Null, the default, means no notice: a day ticket needs none, an annual pass might want 30. An entitlement bought inside its own notice period raises nothing."},"carriesStoredValue":{"type":"boolean","default":false,"description":"BL-033. **A ticket that is also a wallet** — a resort pass with 200 dirhams of spend on it, deducted at a gate or a till.\n**The value is a `retail.Wallet` bound to the entitlement, not a balance on the ticket.** One balance mechanism (CF-126), so it holds authorisations, expires by credit type and appears in the same reports — a second balance on the entitlement would have been the seventh implementation.\n"},"includedValue":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"validTimeWindows":{"type":"array","nullable":true,"description":"BL-036, 1.1.81 and 1.1.83. **A time-window entitlement needed a performance to express** — valid 09:00 to 13:00 on any day was a thing you built by creating performances.\n**A window is a property of the entitlement and a performance is an occurrence**, and conflating them means a morning pass generates 365 performances a year.\n","items":{"type":"object","properties":{"from":{"type":"string"},"to":{"type":"string"},"daysOfWeek":{"type":"array","items":{"type":"string"}}}}},"blackoutDates":{"type":"array","nullable":true,"description":"**Calendar exceptions on the entitlement.** An annual pass excluding public holidays is the normal case and had nowhere to live.\n","items":{"type":"string","format":"date"}},"fastTrackTier":{"type":"string","nullable":true,"enum":["none","priority","express","unlimited"],"description":"19.2.20, BL-015. **Fast track existed nowhere in the package** — not an enum value, not a description, not a screen.\n**An attribute of the entitlement rather than a queue class or a product kind**, because the same ride serves standby and fast-track guests from one capacity: `queue` already has `isFastPass` on an entry and needed something to read it from.\n"},"entriesAllowed":{"type":"integer","nullable":true,"description":"Null means unlimited. The Fast Pass consumption counter lives here."},"transportRestriction":{"type":"object","nullable":true,"description":"**The journey a transport pass is good for** (decided 29 September, rev 3 REV3-21). Set on the template `transport.createTransportPassType` creates, from the station pair the guest bought the pass for, and copied to the entitlement. `access` refuses a boarding scan whose departure does not serve both stations in a direction the restriction allows, and consumes one of `entriesAllowed` per boarding. Null on every other template.\n","required":["fromStationId","toStationId"],"properties":{"fromStationId":{"type":"string","format":"uuid","description":"A `transport.Station`."},"toStationId":{"type":"string","format":"uuid"},"bothDirections":{"type":"boolean","default":true,"description":"Valid from either station to the other, as the prototype sells it."},"routeIds":{"type":"array","description":"The routes it may be used on. Empty means any active route serving both stations.","items":{"type":"string","format":"uuid"}}}},"reentryAllowed":{"type":"boolean","default":false},"purchaseEligibility":{"type":"object","nullable":true,"description":"1.1.38, 1.1.121, 1.1.125, 1.1.126. **`admissionRulesId` governs where an entitlement admits, not who may buy it**, and `promotions.evaluatePromotions` gates a discount rather than a sale. Neither refuses a purchase.\n**Evaluated at add-to-cart, not at checkout.** A guest told at payment that they cannot buy a resident rate has already entered a card.\n","properties":{"minAgeYears":{"type":"integer","nullable":true},"maxAgeYears":{"type":"integer","nullable":true},"minHeightCm":{"type":"integer","nullable":true,"description":"**Height gates a ride and can gate a sale.** A ticket sold to somebody who cannot ride it is a refund at the gate.\n"},"residencyRequired":{"type":"boolean","default":false},"nationalities":{"type":"array","nullable":true,"items":{"type":"string"}},"minLoyaltyTier":{"type":"string","nullable":true},"requiresVerification":{"type":"boolean","default":false,"description":"**Whether the claim is checked or taken on trust.** A resident rate sold unverified and refused at the gate is worse than one that could not be bought.\n"}}},"personType":{"type":"string","nullable":true,"enum":["adult","child","infant","senior","student","resident","staff"],"description":"2.11.7. **Adult, child and senior existed only as `ProductVariant.axisValues` — a variant axis rather than an attribute of the holder.** So changing a child ticket to an adult one was an exchange to a different product, and an upgrade that should be a price difference became a cancel-and-rebuy.\nRecorded here as well as on the variant, because **the guest ages and the product does not.**\n"},"admissionRulesId":{"type":"string","format":"uuid","nullable":true},"isTransferable":{"type":"boolean","default":true},"canShareMedia":{"type":"boolean","default":true,"description":"Whether this entitlement may be appended to media a guest already holds (CF-58). False for anything surrendered at use — a single-entry ticket taken at the gate is not a claim token for a locker bought afterwards.\n"},"canClaimShopAndDrop":{"type":"boolean","default":false,"description":"Whether this entitlement may be scanned to claim goods left under 4.4.7. False for a single-entry ticket that is surrendered at the gate — a claim token the guest no longer holds is not a claim token.\n"},"isNameBound":{"type":"boolean","default":false,"description":"True requires a holder name at sale. Most entitlements carry none — identity and entitlement are separate concerns.\n"},"autoRenewDefault":{"type":"boolean","default":false,"description":"**Taken from their `membership_plan`, 20 September — the \"take those\" half of the TAKE BODY verdict.** `identity.customer_membership.auto_renew` carries the flag per holder and nothing said what it should start as.\n"},"renewalTermDays":{"type":"integer","nullable":true,"description":"What a renewal extends the membership by. `orders.membership_renewal` records `previousExpiryAt` and `newExpiryAt` and **the number between them lived nowhere**.\n"},"renewalGraceDays":{"type":"integer","default":0,"description":"How long after expiry a membership can still be renewed rather than rejoined. `membership_renewal.failureReason` implies a window and there was none, so a failed card on the expiry date had no defined consequence.\n"},"renewalVariantId":{"type":"string","format":"uuid","nullable":true,"description":"**What a renewal sells, which is usually not what joining sold.** A first-year price and a renewal price are different products, and pointing both at one variant makes a loyalty discount unrepresentable. Null means renewal sells the same thing.\n"},"crossesCells":{"type":"boolean","default":false,"description":"True propagates a redemption right to other cells on issue (ADR-0010).\n"},"isActive":{"type":"boolean"},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.** Set by the server, never taken from a body."}}},
@@ -3535,9 +4132,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "GuestMerchandiseItem": {"x-ticvai-persistence":"none — guest projection of MerchandiseItem","type":"object","description":"**What a guest caller of `listMerchandise` receives.** The fields a shop screen shows and the ids a guest needs to reserve or buy, and nothing else: no inventory link, no catalogue variant, no stock count, no serial-number flag. `additionalProperties: false` is the guarantee: a staff field added to `MerchandiseItem` does not reach a guest by default.\n","additionalProperties":false,"required":["id","name","outletId","price","isAvailable"],"properties":{"id":{"type":"string","format":"uuid"},"sku":{"type":"string"},"name":{"type":"string"},"description":{"type":"string","nullable":true},"outletId":{"type":"string","format":"uuid"},"categoryId":{"type":"string","format":"uuid","nullable":true},"price":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"isAvailable":{"type":"boolean","description":"True when the item is active and in stock at its outlet. An item with no `inventoryItemId` never runs out, so it is available while active.\n"},"isReturnable":{"type":"boolean"},"returnWindowDays":{"type":"integer","nullable":true},"imageAssetRef":{"type":"string","nullable":true}}},
 "GuestPromotion": {"x-ticvai-persistence":"none — guest projection of promotions.promotion","type":"object","description":"**What a guest may see of a promotion.** `Promotion` carries the commercial internals (`budgetCap`, `maxRedemptions`, `redemptionCount`, `discountGiven`, `precedence`, `stackingGroup`), and `listPromotions` and `getPromotion` are guest-audience. A guest caller receives this shape instead. `additionalProperties: false` is the point: a server that adds an internal field to it fails validation instead of publishing the field.\n","additionalProperties":false,"required":["id","code","name","discount","validFrom"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string"},"name":{"type":"string"},"description":{"type":"string"},"discount":{"$ref":"#/components/schemas/Discount"},"conditions":{"$ref":"#/components/schemas/PromotionConditions"},"stackingMode":{"$ref":"#/components/schemas/StackingMode"},"validFrom":{"type":"string","format":"date-time"},"validTo":{"type":"string","format":"date-time"},"maxRedemptionsPerGuest":{"type":"integer","nullable":true}}},
 "LocalisedText": {"x-ticvai-persistence":"none — jsonb column","type":"object","additionalProperties":{"type":"string"}},
+"MediaAsset": {"x-ticvai-persistence":"assets.media_asset","type":"object","required":["id","kind","status","filename","contentType","sizeBytes","referenceCount","createdAt"],"properties":{"id":{"type":"string","format":"uuid"},"kind":{"$ref":"#/components/schemas/MediaKind"},"status":{"$ref":"#/components/schemas/MediaStatus"},"filename":{"type":"string"},"contentType":{"type":"string"},"sizeBytes":{"type":"integer"},"title":{"$ref":"#/components/schemas/LocalisedText"},"description":{"allOf":[{"$ref":"#/components/schemas/LocalisedText"}],"description":"Set by `updateMediaAsset` and matched by `searchMedia`'s `search`. It was accepted and searched on before it had anywhere to be stored.\n"},"altText":{"allOf":[{"$ref":"#/components/schemas/LocalisedText"}],"description":"Required before use in a guest-facing surface. WCAG 2.2 AA."},"width":{"type":"integer","nullable":true},"height":{"type":"integer","nullable":true},"durationSeconds":{"type":"number","nullable":true},"customMetadata":{"type":"object","nullable":true,"additionalProperties":true,"description":"BL-178. **`assets` is a strong contract and its metadata was fixed** — kind, title, alt text, dimensions, rights. A venue photographing four thousand products wants its own fields: shoot date, photographer, model release, season.\n**Free-form and searchable, not a schema.** Every venue would want a different one, and a fixed set would be wrong for all of them.\n"},"sharedWithTenantIds":{"type":"array","items":{"type":"string","format":"uuid"},"description":"BL-178. **Cross-tenant sharing, and it is refused by default for a reason.** A brand operating three venues wants one logo library; two unrelated tenants sharing an asset store is the isolation breach ADR-0011 exists to prevent.\n**Only within one tenant's own scope tree.** A share naming a tenant outside it is refused rather than warned about — this is the one place where a permissive default would be a cross-tenant data leak.\n"},"tags":{"type":"array","items":{"type":"string"}},"categoryId":{"type":"string","format":"uuid","nullable":true,"description":"The asset's category, one of `MediaTaxonomy.categories[].id`; null while unclassified. Set by `bulkUpdateMediaAssets` (`setCategoryId`) (decided 29 September, data model DM4).\n"},"venueId":{"type":"string","format":"uuid","nullable":true},"url":{"type":"string","description":"Signed and expiring for private assets; stable CDN URL for public ones."},"thumbnailUrl":{"type":"string","nullable":true},"referenceCount":{"type":"integer","description":"How many surfaces reference this asset. Non-zero refuses deletion.\n"},"rights":{"$ref":"#/components/schemas/MediaRights"},"isRightsExpired":{"type":"boolean"},"version":{"type":"integer"},"uploadedByPrincipalId":{"type":"string","format":"uuid"},"createdAt":{"type":"string","format":"date-time"}}},
+"MediaKind": {"type":"string","enum":["image","video","audio","document","vector","font","archive"]},
+"MediaRights": {"x-ticvai-persistence":"none — embedded in asset","type":"object","description":"Licensing terms. Tracked because an expired licence on a live surface is a legal exposure, not a housekeeping item.\n","properties":{"licenceKind":{"type":"string","enum":["owned","royaltyFree","rightsManaged","creativeCommons","editorialOnly","unknown"]},"licensor":{"type":"string","nullable":true},"licenceReference":{"type":"string","nullable":true},"validFrom":{"type":"string","format":"date","nullable":true},"validTo":{"type":"string","format":"date","nullable":true},"permittedUses":{"type":"array","items":{"type":"string","enum":["web","print","socialMedia","inVenue","advertising","internal"]}},"attributionRequired":{"type":"boolean","default":false},"attributionText":{"type":"string","nullable":true},"permittedTerritories":{"type":"array","items":{"type":"string"},"description":"ISO country or region codes. **Empty means unrestricted, which is a claim rather than an absence** — an unknown territory and a worldwide licence are not the same thing, and `licenceKind: unknown` is how the second is said.\n"},"permittedChannels":{"type":"array","items":{"type":"string"},"description":"Distribution channel codes, checked by `setMediaDistributionChannels`. Narrower than `permittedUses`, which describes the medium rather than the route.\n"},"modelReleaseHeld":{"type":"boolean","default":false},"renewalOwner":{"type":"string","format":"uuid","nullable":true}}},
+"MediaStatus": {"type":"string","enum":["processing","ready","quarantined","failed","archived"]},
 "Menu": {"x-ticvai-persistence":"fnb.menu","type":"object","required":["id","code","name","outletId","isActive"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string","maxLength":64},"name":{"type":"string","maxLength":200},"outletId":{"type":"string","format":"uuid"},"availability":{"$ref":"#/components/schemas/MenuAvailability"},"sections":{"type":"array","items":{"$ref":"#/components/schemas/MenuSection"}},"isActive":{"type":"boolean"},"publishedVersion":{"type":"integer","nullable":true,"readOnly":true,"description":"The `MenuVersion.version` live now. Null for a menu never published."},"publishedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true}}},
 "MenuAvailability": {"x-ticvai-persistence":"none — embedded in menu","type":"object","description":"When this menu is in force. Absent means always. Days, times and dates are all read in the Region's time zone, not UTC.","properties":{"daysOfWeek":{"type":"array","items":{"type":"integer","minimum":0,"maximum":6}},"startTime":{"type":"string","pattern":"^([01]\\d|2[0-3]):[0-5]\\d$","description":"Wall-clock time, in the Region's time zone."},"endTime":{"type":"string","pattern":"^([01]\\d|2[0-3]):[0-5]\\d$","description":"Wall-clock time, in the Region's time zone."},"validFrom":{"type":"string","format":"date","nullable":true,"description":"Calendar day, in the Region's time zone, not UTC."},"validTo":{"type":"string","format":"date","nullable":true,"description":"Calendar day, in the Region's time zone, not UTC."}}},
-"MenuItem": {"x-ticvai-persistence":"fnb.menu_item","type":"object","required":["id","productVariantId","name","price","isAvailable"],"properties":{"id":{"type":"string","format":"uuid"},"productVariantId":{"type":"string","format":"uuid","description":"The catalogue variant this item sells. Pricing and tax come from there — a menu is a presentation of the catalogue, not a second catalogue.\n"},"name":{"type":"string"},"description":{"type":"string","nullable":true},"price":{"x-ticvai-column":"list_price","$ref":"../shared/common.yaml#/components/schemas/Money"},"sortOrder":{"type":"integer"},"modifierGroupIds":{"type":"array","items":{"type":"string","format":"uuid"}},"stationId":{"type":"string","format":"uuid","nullable":true},"menuSectionId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"The section the item sits in, set by `setMenuSections` and `applyMenuActions` (`moveSection`)."},"isStockTracked":{"type":"boolean","description":"True where a recipe exists. Stock-tracked items cannot be sold offline."},"isAvailable":{"type":"boolean"},"unavailableReason":{"type":"string","nullable":true},"restoreAt":{"type":"string","format":"date-time","nullable":true,"description":"When an unavailable item comes back on its own (`setItemAvailability`). Null means by hand."},"preparationMinutes":{"type":"integer","nullable":true},"allergens":{"type":"array","items":{"$ref":"#/components/schemas/AllergenCode"}}}},
 "MenuSection": {"x-ticvai-persistence":"fnb.menu_section","type":"object","required":["code","name","sortOrder"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"code":{"type":"string"},"name":{"type":"string"},"sortOrder":{"type":"integer"},"items":{"type":"array","description":"The section's items, in sale-board order. An item's membership is `MenuItem.menuSectionId`.","items":{"$ref":"#/components/schemas/MenuItem"}}}},
 "MerchandiseItem": {"x-ticvai-persistence":"retail.merchandise","type":"object","required":["id","sku","name","outletId","variantId","price","onHand","isActive"],"properties":{"description":{"type":"string","description":"What the item is, in the guest's words. Indexed for guest-app search.\n"},"id":{"type":"string","format":"uuid"},"sku":{"type":"string"},"barcode":{"type":"string","nullable":true},"name":{"type":"string"},"outletId":{"type":"string","format":"uuid"},"categoryId":{"type":"string","format":"uuid","nullable":true},"variantId":{"type":"string","format":"uuid","description":"The catalogue variant sold. Price and tax come from there."},"inventoryItemId":{"type":"string","format":"uuid","nullable":true,"description":"The stock item depleted on sale. Null means the item sells but never runs out, which is almost always a configuration error.\n"},"price":{"$ref":"../shared/common.yaml#/components/schemas/Money","x-ticvai-column":"list_price"},"onHand":{"type":"number"},"isReturnable":{"type":"boolean","default":true},"returnWindowDays":{"type":"integer","nullable":true},"requiresSerialNumber":{"type":"boolean","default":false},"imageAssetRef":{"type":"string","nullable":true},"isActive":{"type":"boolean"}}},
 "Money": {"type":"object","x-ticvai-persistence-kind":"valueObject","x-ticvai-persistence-column":"numeric(18,4)","description":"**On the wire this is three fields; in the database it is one column.**\n24 August. Every column typed `Money` was landing as `jsonb` — 129 of them, including `orders.shift.opening_float`, `inventory.purchase_order.total` and `promotions.voucher.balance`. **`orders.cash_movement.amount` was `numeric(18,4)` because somebody hand-typed that one**, and the inconsistency is what made it visible.\n**A jsonb price cannot be summed in SQL.** Every total, variance and reconciliation moves into application code — and a shift variance computed in .NET against a ledger computed in Postgres is two answers to one question. That is F13 month-end and F98 takings-to-ledger, both walked, both assuming the arithmetic is in the database.\n**`currency` and `scale` are not stored per row.** ADR-0018 makes them region-scoped and not overridable below, so they resolve from the scope walk — storing AED against nine million rows in a UAE region is nine million copies of a fact that cannot differ. A row that needed its own currency would be a row in the wrong region.\n**They stay on the wire** because a client reading a figure should not have to walk a hierarchy to know what it means.\n","required":["amount","currency","scale"],"properties":{"amount":{"type":"string","description":"Decimal string, never a float. Up to 4 decimal places. **Persisted as `numeric(18,4)`** — the string is a transport choice, so a JavaScript client cannot round a fare in transit.\n","pattern":"^-?\\d+(\\.\\d{1,4})?$"},"currency":{"type":"string","description":"**Resolved from the region, not stored on the row** (ADR-0018). OMR uses 3 decimal places and AED uses 2 — a venue on a different scale from its region is a ledger that cannot consolidate.\n","pattern":"^[A-Z]{3}$"},"scale":{"type":"integer","description":"Resolved from the region alongside `currency`.","minimum":0,"maximum":4}}},
@@ -3548,19 +4148,21 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "PerformanceTemplate": {"type":"object","x-ticvai-persistence":"catalogue.performance_template","description":"Event board 8. **An activity venue sells time, not seats.** Each slot the template produces is a Performance. Formerly `SessionTemplate` on `catalogue.session_template`: a session is a Performance (decided 28 September, audit R165).","required":["code"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string"},"name":{"type":"string"},"spaceId":{"type":"string","format":"uuid","nullable":true},"slotMinutes":{"type":"integer"},"turnaroundMinutes":{"type":"integer","default":0},"concurrentCapacity":{"type":"integer"},"bands":{"type":"array","items":{"type":"object","properties":{"kind":{"type":"string","enum":["offPeak","standard","peak","superPrime"]},"daysOfWeek":{"type":"array","items":{"type":"string"}},"from":{"type":"string"},"to":{"type":"string"},"priceMultiplier":{"type":"number","nullable":true},"minuteMultiplier":{"type":"number","nullable":true}}}},"walkIn":{"type":"object","description":"**Configured, not assumed.** It decides whether a family turning up on a Sunday is turned away.\n","properties":{"allowed":{"type":"boolean","default":true},"heldBackPercent":{"type":"integer","default":0},"cutoffMinutesBefore":{"type":"integer","nullable":true}}},"scopePath":{"type":"string"}}},
 "Point": {"type":"object","required":["x","y"],"properties":{"x":{"type":"number"},"y":{"type":"number"}}},
 "Price": {"x-ticvai-persistence":"catalogue.price","type":"object","required":["priceListId","variantId","amount"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true,"description":"**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"},"priceListId":{"type":"string","format":"uuid"},"variantId":{"type":"string","format":"uuid"},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"taxCodeId":{"type":"string","format":"uuid","nullable":true}}},
-"PriceList": {"x-ticvai-persistence":"catalogue.price_list","type":"object","required":["id","code","name","venueId","currency","currencyScale","channels"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string"},"name":{"type":"string"},"venueId":{"type":"string","format":"uuid"},"currency":{"type":"string","pattern":"^[A-Z]{3}$","x-ticvai-persisted":false,"description":"**Resolved from the region, not stored** (ADR-0018, 24 August). Region-scoped and not overridable below, so a row in a UAE region is AED and cannot be anything else. **Kept on the wire, removed from the table** — a client should not walk a hierarchy to read a figure, and the database should not hold nine million copies of AED. Four tables genuinely differ from their region and keep a stored currency: `orders.payment.tender_currency`, `inventory.supplier`, `ledger.account`, `control.partner_agreement`.\n"},"currencyScale":{"type":"integer","minimum":0,"maximum":4,"x-ticvai-persisted":false,"description":"**Resolved from the region, not stored** (ADR-0018, 24 August). Region-scoped and not overridable below, so a row in a UAE region is AED and cannot be anything else — storing it per row is a copy of a fact that cannot differ. **Kept on the wire, removed from the table**: a client reading a figure should not walk a hierarchy to know what it means, and the database should not hold nine million copies of AED. Four tables genuinely differ from their region and keep a stored currency — `orders.payment.tender_currency`, `inventory.supplier`, `ledger.account`, `control.partner_agreement`. **A guest paying USD at an AED venue is a real row; a workstation with its own currency is a misconfiguration.**\n"},"channels":{"type":"array","items":{"$ref":"#/components/schemas/Channel"}},"validFrom":{"type":"string","format":"date-time","nullable":true},"validTo":{"type":"string","format":"date-time","nullable":true},"priority":{"type":"integer","description":"Where lists overlap, higher priority wins."},"description":{"type":"string","nullable":true,"description":"Price list master fields (29 September, data model DM3), set with `setPriceListMaster` (ADM-058)."},"priceListType":{"type":"string","enum":["standardRetail","venue","attraction","event","membership","group","corporate","b2b","reseller","ota","internal","specialMarket"],"default":"standardRetail"},"status":{"allOf":[{"$ref":"#/components/schemas/CatalogueConfigStatus"}],"default":"active"},"ownerPrincipalId":{"type":"string","format":"uuid","nullable":true},"tags":{"type":"array","items":{"type":"string"}},"legalEntityId":{"type":"string","format":"uuid","nullable":true},"brand":{"type":"string","maxLength":100,"nullable":true},"businessUnit":{"type":"string","maxLength":100,"nullable":true},"countryCode":{"type":"string","maxLength":2,"nullable":true,"pattern":"^[A-Z]{2}$"},"marketCode":{"type":"string","maxLength":40,"nullable":true},"scopeLevel":{"type":"string","enum":["global","country","market","brand","venue","event","businessUnit"],"default":"venue"},"defaultPriceCategoryId":{"type":"string","format":"uuid","nullable":true},"roundingProfileId":{"type":"string","format":"uuid","nullable":true},"priceResolutionPolicyId":{"type":"string","format":"uuid","nullable":true},"allowOverrides":{"type":"boolean","default":false},"allowInheritance":{"type":"boolean","default":true},"allowMultipleCurrencies":{"type":"boolean","default":false},"allowProductSpecificRates":{"type":"boolean","default":true},"clonedFromPriceListId":{"type":"string","format":"uuid","nullable":true},"currentVersion":{"type":"integer","nullable":true,"readOnly":true,"description":"The active `catalogue.price_list_version`."}}},
+"PriceList": {"x-ticvai-persistence":"catalogue.price_list","type":"object","required":["id","code","name","venueId","currency","currencyScale","channels"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string"},"name":{"type":"string"},"venueId":{"type":"string","format":"uuid"},"currency":{"type":"string","pattern":"^[A-Z]{3}$","x-ticvai-persisted":false,"description":"**Resolved from the region, not stored** (ADR-0018, 24 August). Region-scoped and not overridable below, so a row in a UAE region is AED and cannot be anything else. **Kept on the wire, removed from the table** — a client should not walk a hierarchy to read a figure, and the database should not hold nine million copies of AED. Four tables genuinely differ from their region and keep a stored currency: `orders.payment.tender_currency`, `inventory.supplier`, `ledger.account`, `control.partner_agreement`.\n"},"currencyScale":{"type":"integer","minimum":0,"maximum":4,"x-ticvai-persisted":false,"description":"**Resolved from the region, not stored** (ADR-0018, 24 August). Region-scoped and not overridable below, so a row in a UAE region is AED and cannot be anything else — storing it per row is a copy of a fact that cannot differ. **Kept on the wire, removed from the table**: a client reading a figure should not walk a hierarchy to know what it means, and the database should not hold nine million copies of AED. Four tables genuinely differ from their region and keep a stored currency — `orders.payment.tender_currency`, `inventory.supplier`, `ledger.account`, `control.partner_agreement`. **A guest paying USD at an AED venue is a real row; a workstation with its own currency is a misconfiguration.**\n"},"channels":{"type":"array","items":{"$ref":"#/components/schemas/Channel"}},"validFrom":{"type":"string","format":"date-time","nullable":true},"validTo":{"type":"string","format":"date-time","nullable":true},"priority":{"type":"integer","description":"Where lists overlap, higher priority wins."},"description":{"type":"string","nullable":true,"description":"Price list master fields (29 September, data model DM3), set with `createPriceList` and `updatePriceList` since setPriceListMaster was retired in r2 (BC-008, CHG-CLN-001)."},"priceListType":{"type":"string","enum":["standardRetail","venue","attraction","event","membership","group","corporate","b2b","reseller","ota","internal","specialMarket"],"default":"standardRetail"},"status":{"allOf":[{"$ref":"#/components/schemas/CatalogueConfigStatus"}],"default":"active"},"ownerPrincipalId":{"type":"string","format":"uuid","nullable":true},"tags":{"type":"array","items":{"type":"string"}},"legalEntityId":{"type":"string","format":"uuid","nullable":true},"brand":{"type":"string","maxLength":100,"nullable":true},"businessUnit":{"type":"string","maxLength":100,"nullable":true},"countryCode":{"type":"string","maxLength":2,"nullable":true,"pattern":"^[A-Z]{2}$"},"marketCode":{"type":"string","maxLength":40,"nullable":true},"scopeLevel":{"type":"string","enum":["global","country","market","brand","venue","event","businessUnit"],"default":"venue"},"defaultPriceCategoryId":{"type":"string","format":"uuid","nullable":true},"roundingProfileId":{"type":"string","format":"uuid","nullable":true},"priceResolutionPolicyId":{"type":"string","format":"uuid","nullable":true},"allowOverrides":{"type":"boolean","default":false},"allowInheritance":{"type":"boolean","default":true},"allowMultipleCurrencies":{"type":"boolean","default":false},"allowProductSpecificRates":{"type":"boolean","default":true},"clonedFromPriceListId":{"type":"string","format":"uuid","nullable":true},"currentVersion":{"type":"integer","nullable":true,"readOnly":true,"description":"The active `catalogue.price_list_version`."}}},
 "PricingDynamicPriceAction": {"type":"object","x-ticvai-persistence":"pricing.dynamic_price_action","description":"**Taken from the backend workbook, 20 September.** Configurable dynamic pricing component for dynamic price action.","required":["dynamicPriceRuleId","type","value"],"properties":{"id":{"type":"string","format":"uuid"},"dynamicPriceRuleId":{"type":"string","format":"uuid"},"type":{"type":"string","maxLength":30},"value":{"type":"number"},"minPrice":{"type":"number","nullable":true},"maxPrice":{"type":"number","nullable":true}}},
 "PricingDynamicPriceCondition": {"type":"object","x-ticvai-persistence":"pricing.dynamic_price_condition","description":"**Taken from the backend workbook, 20 September.** Configurable dynamic pricing component for dynamic price rule condition.","required":["actionId","dynamicPriceRuleId","type","ruleOperator","valueJson","sequenceNo"],"properties":{"actionId":{"type":"string","format":"uuid"},"dynamicPriceRuleId":{"type":"string","format":"uuid"},"type":{"type":"string","maxLength":50},"ruleOperator":{"type":"string","maxLength":20},"valueJson":{"type":"string"},"sequenceNo":{"type":"integer"}}},
 "PricingDynamicPriceRule": {"type":"object","x-ticvai-persistence":"pricing.dynamic_price_rule","description":"**Taken from the backend workbook, 20 September.** Configurable dynamic pricing component for dynamic price rule.","required":["pricingRuleCode","name","priority","isActive"],"properties":{"id":{"type":"string","format":"uuid"},"pricingRuleCode":{"type":"string","maxLength":100},"name":{"type":"string","maxLength":200},"productId":{"type":"string","format":"uuid","nullable":true},"priceListId":{"type":"string","format":"uuid","nullable":true},"scopePath":{"type":"string","nullable":true},"channelId":{"type":"string","format":"uuid","nullable":true},"priority":{"type":"integer"},"validFrom":{"type":"string","format":"date-time","nullable":true},"validTo":{"type":"string","format":"date-time","nullable":true},"isActive":{"type":"boolean"},"dynamicPricingStrategyId":{"type":"string","format":"uuid","nullable":true,"description":"The `catalogue.dynamic_pricing_strategy` a dynamic rule belongs to (29 September, data model DM3). Null for a static pricing rule."},"ruleType":{"type":"string","maxLength":40,"nullable":true,"description":"Static rules: `PricingRuleCommandCenterView.ruleType`; dynamic rules: the builder's `ruleKind`."},"inputMetric":{"type":"string","maxLength":40,"nullable":true},"conditionLogic":{"type":"string","enum":["all","any"],"default":"all"},"cooldownMinutes":{"type":"integer","nullable":true,"minimum":0},"minimumDurationMinutes":{"type":"integer","nullable":true,"minimum":0},"exitThresholdOffset":{"type":"number","nullable":true},"rangeMinPercent":{"type":"number","nullable":true},"rangeMaxPercent":{"type":"number","nullable":true},"isProtected":{"type":"boolean","default":false,"description":"A protected segment or channel: dynamic adjustments never apply."}}},
 "Product": {"x-ticvai-persistence":"catalogue.product","type":"object","required":["id","code","name","kind","venueId","scopePath","isSellable","hasVariants"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string","maxLength":64},"familyKey":{"type":"string","maxLength":64,"pattern":"^[A-Za-z0-9_-]+$","nullable":true,"x-ticvai-unique":"venue","description":"**The same product at another location** (decided 29 September, rev 3 REV3-18). Optional. A tenant that sells one attraction at several venues gives each venue's product the same key, e.g. `aquarium-entry`; the key names the family across the tenant and each venue has at most one product in it, so a second product at the same venue with the key is refused with `409 duplicate-code`. **What it is for:** when a guest changes location on the booking screen (the 'Booking at' switcher, `BookingFlowConfig.locationSwitcher`), lines whose product shares a `familyKey` with a product at the new venue are carried over to that product, with times and prices refreshed; every other line is cleared. Null means the product belongs to no family and its lines always clear on a switch. Compared case-insensitively, like `code`.\n"},"name":{"type":"string","maxLength":200},"description":{"type":"string"},"kind":{"$ref":"#/components/schemas/ProductKind"},"venueId":{"type":"string","format":"uuid"},"scopePath":{"type":"string"},"createdByPrincipalId":{"type":"string","format":"uuid","readOnly":true,"description":"1.4.18. **The approval gate refuses an approver who is the author, and nothing recorded either.** `SeatBlock`, `DelegatedAccess` and `ManualDiscountRequest` all carry this and the product passing through approval did not.\n"},"approvedByPrincipalId":{"type":"string","format":"uuid","nullable":true,"readOnly":true},"responsibleDepartmentId":{"type":"string","format":"uuid","nullable":true,"description":"Who owns this product commercially. A scope node at `department` level."},"onSaleFrom":{"type":"string","format":"date-time","nullable":true,"description":"1.4.8. **A seasonal product should not need somebody awake at midnight.** Archiving already runs on a timer in this contract, so the machinery exists; `effectiveFrom` appears on tax codes, FX rates and white-label policies and not here.\n"},"onSaleTo":{"type":"string","format":"date-time","nullable":true,"description":"Retires the product automatically. **Retirement is not deletion** — the product stops selling and every order that referenced it still resolves.\n"},"categoryId":{"type":"string","format":"uuid","nullable":true,"description":"**Taken from their `fnb.product` and `retail.product`, 20 September.** `catalogue.product_category` has existed since 20 August with two operations and nothing could be filed under it — a merchandise hierarchy with a tree and no leaves. Their per-domain product tables both carried this column and ours did not.\n"},"lifecycleState":{"$ref":"#/components/schemas/ProductLifecycleState"},"isSellable":{"type":"boolean","readOnly":true,"description":"True only when live **and** carried by a published bundle. Approval and publication are different acts.\n**Derived, never set.** It changes when `transitionProductLifecycle` moves the product and when `publishBundle` carries it, so `updateProduct` does not take it — `withdraw` is how a product stops selling.\n"},"isStockTracked":{"type":"boolean","default":false,"description":"**Taken from their `fnb.product`, 20 September.** Whether a sale decrements stock, which is not what `isSellable` asks. A ticket is sellable and tracks no stock; a bottle of water is both. Without it, an F&B sale cannot tell inventory whether to move.\n"},"hasVariants":{"type":"boolean"},"variantCount":{"type":"integer"},"segmentTags":{"type":"array","description":"7.3.5. **A channel and a segment tag are mandatory and nothing required either.** A catalogue that cannot be filtered by segment is a catalogue nobody can report on.\n**Hierarchical, not flat** — `family/with-toddlers` narrows `family` without duplicating it, which is how the promotions engine already treats scope.\n**A level is a tag under `level/`** (decided 29 September, rev 3 REV3-19): `level/beginner`, `level/intermediate`, `level/advanced`, `level/expert` (proposed codes, client to correct). A guest screen filters on it with `listProducts` `segmentTag`, and the words a guest reads beside each option come from `ProductCategory.description`, not from the tag.\n","items":{"type":"string"}},"codeSchema":{"type":"string","readOnly":true,"description":"7.3.4 specifies `[ParkCode]-[ProductType]-[Variant]`. **`Product.code` existed and nothing required a format**, so a venue with three thousand products had three thousand conventions.\nThe tenant sets the pattern and the platform generates against it. **Validation is the point, not the string** — a code typed by hand is a code that will not sort.\n"},"channels":{"type":"array","items":{"$ref":"#/components/schemas/Channel"}},"entitlementTemplateId":{"type":"string","format":"uuid","nullable":true,"description":"What the buyer receives. Null for products that grant nothing — F&B and retail. Identity and entitlement are separate concerns.\n"},"blockedOffline":{"type":"boolean","description":"True for seated and retail. Seated because a seat map is not a count; retail because stock depletes in real time.\n"},"dataMaskValues":{"type":"object","additionalProperties":true,"description":"Custom fields. JSONB-backed, defined by the venue's data mask."},"guestListing":{"$ref":"#/components/schemas/GuestListing"},"notBookableLabel":{"allOf":[{"$ref":"#/components/schemas/LocalisedText"}],"nullable":true,"description":"The label a guest reads on an `infoOnly` product, e.g. *Info only* or *Not bookable online; ask at the desk* (decided 29 September, rev 3 REV3-14). Each value at most 60 characters. Null means the guest screen shows its default wording. Ignored unless `guestListing` is `infoOnly`.\n"},"salesContact":{"allOf":[{"$ref":"#/components/schemas/ProductSalesContact"}],"nullable":true,"description":"**Who a guest contacts to book a view-only product** (decided 29 September, W3), e.g. a training course listed with full details and no Book button. Shown as *Call sales* and *Email sales* on an `infoOnly` product. Null means the venue's own contact (white-label `getTenantAppStatus.contact`). Ignored unless `guestListing` is `infoOnly`.\n"},"bookingFlowId":{"type":"string","format":"uuid","nullable":true,"description":"**The booking flow this product is sold through** (decided 29 September, W8 and W12): a white-label `BookingFlow` of the venue, which orders the guest's steps (for a workshop, the product first and then the date and time). Null means the category's flow (`ProductCategory.bookingFlowId`), and failing that the venue's flow for the product's `kind`. Written by `createProduct` and `updateProduct`, which refuse an id that is not a flow of the venue with `422`.\n"},"displayTags":{"type":"array","maxItems":6,"items":{"$ref":"#/components/schemas/ProductDisplayTag"},"description":"**Short facts a guest reads on the ticket card and under *Read more***: *2 Hours*, *Min 1.10 m*, *Free adult entry*, *Valid 90 days*, *Emirates ID* (decided 29 September, 23SEP-3). Not `segmentTags`, which are for reporting and segmentation and which a guest never reads.\n**Derived on read when none are set.** When the venue has written no tags, a read returns tags derived from the product's duration (`clock`), entitlement validity (`calendar`) and the eligibility rule's `minHeightCm` (`height`), each marked `derived: true`; they are never stored. Once the venue writes any tag, only what it wrote is returned. Whether the guest screen shows them is `BookingFlowConfig.ticketTags` (white-label).\n"},"media":{"type":"array","maxItems":20,"items":{"$ref":"#/components/schemas/ProductMedia"},"description":"**The product's own photos and video** (decided 29 September, 23SEP-4). *Read more* opens on the `isPrimary` item, and a listing shows each product's primary image, so two tickets in one category no longer share the category's picture (`ProductCategory.imageAssetId`).\nEvery `assetId` names an asset of the asset library (`assets.yaml` `MediaAsset`) in status `ready` whose kind matches `kind`; anything else is a `422`. **Exactly one item is `isPrimary`** when the list is not empty, and an `assetId` appears once; otherwise `400`. Setting the list records each reference as asset usage (`MediaUsage` with `surface: product`, `referenceId` the product id, `isLive` true while the product is listed to guests), which is what stops a used asset being archived from under the product.\n"},"consentQuestionIds":{"type":"array","maxItems":10,"uniqueItems":true,"items":{"type":"string","format":"uuid"},"description":"**The consent questions a guest answers when booking this product**, in the order they are asked (decided 29 September, rev 3 REV3-26): *Are you able to swim?*, *Do you hold a scuba certification?*, *I accept the risk*. Each id names a consent question defined in marketing-crm (`ConsentQuestion`), which owns the text, its version and whether it is asked per person or once per booking; the answer is stored there as a consent record (question version, answer, who answered, when). **One question or several, as the venue chooses.** A flow can carry its own list too (`white-label.BookingFlow.settings.consentQuestionIds`, on the product's published booking flow as `getPublishedBookingFlow` resolves it: product, then category, then the venue's flow for the kind; moved from `BookingFlowConfig` 29 September, W12); a booking asks the union of the flow's questions and those of every product in the cart, each question once (`orders.Cart.consentQuestions`). An id that names no active consent question of the tenant is a `422`.\n"},"requiresTimeWindow":{"type":"boolean","default":false,"description":"**True for a space sold by the hour**, e.g. a meeting room type (decided 29 September, rev 3 REV3-13). The product is the room type (*focus pod*, *majlis*, *boardroom*, *auditorium*), never a named room; its lengths are a `length` axis (`setProductAttributes`) whose values carry `durationMinutes`, and each length is a variant priced on its own in the price list, so price is the room rate for that length. The cart line carries the booked start and end (orders), the end being the start plus the chosen variant's `durationMinutes`; `resources.listProductStartTimes` supplies the start times for a variant and a date and `allocateResources` picks the room from the product's resource requirements (`setExperienceResourceRequirements`) at checkout. True requires every active variant to have a `durationMinutes`; otherwise `422`.\n"},"productOwnerPrincipalId":{"type":"string","format":"uuid","nullable":true,"description":"The product owner (29 September, data model DM3), set with `setProductContextOwnership`. `responsibleDepartmentId` is the owning department."},"operationalContact":{"type":"string","maxLength":200,"nullable":true,"description":"A principal id or a name, as the context screen takes it."},"businessUnitId":{"type":"string","format":"uuid","nullable":true},"legalEntityId":{"type":"string","format":"uuid","nullable":true,"description":"A `ledger.legal_entity`, read through finance."},"attractionId":{"type":"string","format":"uuid","nullable":true},"siteId":{"type":"string","format":"uuid","nullable":true},"locationId":{"type":"string","format":"uuid","nullable":true},"brandId":{"type":"string","format":"uuid","nullable":true,"description":"The brand, as the context screen names it (a catalogue brand category)."},"marketCode":{"type":"string","maxLength":40,"nullable":true},"salesTerritory":{"type":"string","maxLength":100,"nullable":true}}},
+"ProductChangeImpact": {"type":"object","description":"1.4.4 and 1.4.16. What a proposed change would touch. **Modelled on `PerformanceCancellationResult`**, which does this for a cancellation.\n","required":["entitlementsIssued","ordersAffected","propagates"],"properties":{"entitlementsIssued":{"type":"integer","description":"How many live entitlements came from this product."},"ordersAffected":{"type":"integer"},"futurePerformances":{"type":"integer"},"openCarts":{"type":"integer","description":"**A guest with this product in a cart while its price changes underneath them** is the case nobody thinks about until it happens.\n"},"propagates":{"type":"boolean","description":"Whether the change reaches what has already been sold. **A name correction should; a price change must not**, and the difference is the whole reason this operation exists.\n"},"blockedBy":{"type":"array","description":"Reasons the change would be refused outright.","items":{"type":"string"}}}},
 "ProductDisplayTag": {"x-ticvai-persistence":"none — jsonb column on catalogue.product","type":"object","required":["kind","label"],"description":"One short fact on a ticket card (decided 29 September, 23SEP-3). `kind` picks the icon.","properties":{"kind":{"type":"string","enum":["clock","height","free","calendar","id"],"description":"`clock` a duration, `height` a height rule, `free` something included free, `calendar` a validity, `id` a document the guest must bring."},"label":{"allOf":[{"$ref":"#/components/schemas/LocalisedText"}],"description":"What the guest reads, e.g. *2 Hours*. Each language value at most 40 characters."},"derived":{"type":"boolean","readOnly":true,"default":false,"description":"True on a tag the server derived on read because the venue set none. Never sent."}}},
 "ProductKind": {"type":"string","description":"**`openDated` added 24 August** from the client's *Create Ticket Flow* board, which names six main ticket types and this was the one with no kind: **valid on any date within an eligible range, rather than for a named performance or a fixed date.**\nThe mechanism already existed — `access.entitlement` carries `valid_from`, `valid_to`, `entries_allowed` and `frozen_days`, which is exactly an open-dated pass. **What was missing was the product saying it is one**, so a catalogue could not offer it and a report could not count it.\n**`datedAdmission` is a different thing and the two were being conflated**: dated is *this Tuesday*, open-dated is *any Tuesday between March and June*. A guest buying the second and being sold the first has bought the wrong ticket.\n**Transport uses two existing kinds, not a new one** (decided 29 September, rev 3 REV3-21). A one-way trip is `timedAdmission`: `transport.createTransportRoute` creates the route's product with one variant per passenger type, and each departure is a performance. A multi-trip or unlimited pass is `openDated`: `transport.createTransportPassType` creates it, with `EntitlementTemplate.entriesAllowed` = the pass's trips (null for unlimited), the validity = `validityDays`, and `EntitlementTemplate.transportRestriction` naming the station pair the pass was bought for, so `access` refuses it on another journey. The sale path is unchanged: both are cart lines, priced by `transport.quoteTransportFare` (orders `TransportLineAttributes`).\n","enum":["admission","timedAdmission","datedAdmission","openDated","seated","membership","bundle","fnb","retail","rental","addOn","giftCard"]},
 "ProductLifecycleState": {"type":"string","enum":["draft","inReview","approved","live","withdrawn","archived"]},
 "ProductMedia": {"x-ticvai-persistence":"catalogue.product_media","type":"object","required":["assetId","kind","isPrimary"],"description":"One photo or video of a product, referencing the asset library (decided 29 September, 23SEP-4). One row per product and asset, so the asset library can answer which products use an asset.\n","properties":{"assetId":{"type":"string","format":"uuid","description":"A `MediaAsset` of `assets.yaml`, in status `ready`."},"kind":{"type":"string","enum":["image","video"]},"isPrimary":{"type":"boolean","default":false,"description":"The item *Read more* opens on and a listing shows. Exactly one per product."},"displayOrder":{"type":"integer","default":100},"altText":{"allOf":[{"$ref":"#/components/schemas/LocalisedText"}],"nullable":true}}},
 "ProductSalesContact": {"x-ticvai-persistence":"none — jsonb column on catalogue.product","type":"object","description":"Who to contact to book a view-only product (decided 29 September, W3). At least one of `phone` or `email`.\n","minProperties":1,"properties":{"phone":{"type":"string","maxLength":32,"nullable":true},"email":{"type":"string","format":"email","maxLength":254,"nullable":true},"note":{"allOf":[{"$ref":"#/components/schemas/LocalisedText"}],"nullable":true,"description":"A line shown under the contact, e.g. *Group courses are booked by phone*. At most 200 characters per language."}}},
 "ProductVariant": {"x-ticvai-persistence":"catalogue.variant","type":"object","required":["id","productId","sku","axisValues","isActive"],"properties":{"id":{"type":"string","format":"uuid"},"productId":{"type":"string","format":"uuid"},"sku":{"type":"string"},"axisValues":{"type":"object","additionalProperties":{"type":"string"}},"name":{"type":"string","maxLength":150,"nullable":true,"description":"**Taken from their variant tables, 20 September.** `axisValues` gives `{size: L}` and no string a guest can read. A menu showing *Large* needs somewhere for the word to live.\n"},"barcode":{"type":"string","maxLength":64,"nullable":true,"description":"**Taken from their variant tables, 20 September.** `catalogue.alternative_code` is a partner's own code for a variant and **requires `partnerId`**, so a manufacturer's EAN had nowhere to go. One per variant against many per variant is a different cardinality and belongs in a different place — and a POS scan should be an indexed column lookup, not a join.\n"},"isDefault":{"type":"boolean","default":false,"description":"Taken from their variant tables. Which variant a product page opens on. Ours had no way to say, so a three-size drink opened on whichever row sorted first.\n"},"isActive":{"type":"boolean","description":"False when retired. Retired variants are never deleted — orders reference them."},"description":{"allOf":[{"$ref":"#/components/schemas/LocalisedText"}],"nullable":true,"description":"**Who this ticket type is for and what it includes**, shown behind the (i) on each Adult, Child, Senior or Infant row (decided 29 September, 23SEP-6). Each language value at most 300 characters; longer is a `400`. Set with `updateProductVariant`. Whether the guest screen shows it is `BookingFlowConfig.cardInfo` (white-label).\n"}}},
+"ProductVersion": {"type":"object","x-ticvai-persistence":"catalogue.product_version","description":"1.1.47, 1.4.9 to 1.4.11. **Follows `white-label.ConfigVersion`** — the same pattern for the same reason, and the fourth place this mechanism was asked for.\n","required":["version","publishedAt","publishedByPrincipalId"],"properties":{"version":{"type":"integer"},"productId":{"type":"string","format":"uuid"},"publishedAt":{"type":"string","format":"date-time"},"publishedByPrincipalId":{"type":"string","format":"uuid"},"note":{"type":"string","nullable":true},"isCurrent":{"type":"boolean"},"contentHash":{"type":"string","description":"**Lets a diff be cheap and a no-op change be recognised.** Republishing an unchanged product should not create a version.\n"},"restoredFromVersion":{"type":"integer","nullable":true,"description":"Set where this version was created by a restore. **A restore is a new version, not a rewind** — a price that was wrong for three days stays visible, because a finance query run next quarter has to reproduce what was charged.\n"}}},
 "Promotion": {"x-ticvai-persistence":"promotions.promotion","allOf":[{"$ref":"#/components/schemas/CreatePromotionRequest"},{"type":"object","required":["id","status"],"properties":{"id":{"type":"string","format":"uuid"},"status":{"$ref":"#/components/schemas/PromotionStatus"},"isPaused":{"type":"boolean"},"redemptionCount":{"type":"integer"},"discountGiven":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"publishedAt":{"type":"string","format":"date-time","nullable":true},"version":{"type":"integer","minimum":1,"readOnly":true,"description":"Starts at 1 and goes up by one on every saved change. The version the directory, the audit history (`promotions.promotion_audit`) and the channel publication monitor (`promotions.promotion_channel_publication`) name. (DM5, 29 September: data model for the agreed operations)"}}}]},
-"PromotionConditions": {"x-ticvai-persistence":"none — embedded in promotion","type":"object","description":"All conditions must hold. An empty object matches everything.","properties":{"variantIds":{"type":"array","items":{"type":"string","format":"uuid"}},"productKinds":{"type":"array","items":{"type":"string"}},"categoryIds":{"type":"array","items":{"type":"string","format":"uuid"}},"minQuantity":{"type":"integer","minimum":1},"minBasketValue":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"channels":{"type":"array","description":"Empty or absent matches every channel.","items":{"$ref":"../shared/common.yaml#/components/schemas/SalesChannel"}},"purchaseGate":{"type":"boolean","default":false,"description":"BL-037. **`evaluatePromotions` gates a price and nothing gated a sale.** A non-member could buy a member-only product at the member price refused, which is a discount failure rather than an eligibility one.\nTrue makes these conditions a **precondition of purchase**: fail them and the line cannot be added, not merely charged more. **Evaluated at add-to-cart**, because a guest told at payment has already entered a card.\n"},"paymentMethod":{"type":"array","nullable":true,"description":"BL-113. **Card-issuer and payment-type promotions** — *10% with a Network International card* is a real campaign a bank co-funds, and it was unexpressible.\n**Evaluated at payment, not at cart**, which is the awkward part: the discount appears after the tender is chosen, and the basket total must be allowed to move at that point.\n","items":{"type":"string"}},"issuerBins":{"type":"array","nullable":true,"description":"Card BIN ranges, where the campaign is issuer-specific rather than scheme-specific. **The bank supplies these and they change**, so they are data rather than configuration.\n","items":{"type":"string"}},"componentRedemption":{"type":"string","nullable":true,"enum":["allTogether","independently","sequenced"],"description":"BL-112. **Per-component redemption inside a bundle was unstated.** A park-plus-lunch bundle where lunch may be used another day behaves differently from one where both must be used on the same visit, and **the difference is revenue recognition, not just convenience.**\n"},"daysOfWeek":{"type":"array","items":{"type":"integer","minimum":0,"maximum":6}},"startTime":{"type":"string","pattern":"^([01]\\d|2[0-3]):[0-5]\\d$"},"endTime":{"type":"string","pattern":"^([01]\\d|2[0-3]):[0-5]\\d$"},"membershipTierIds":{"type":"array","items":{"type":"string","format":"uuid"}},"requiresCoupon":{"type":"boolean","default":false},"firstPurchaseOnly":{"type":"boolean","default":false},"performanceIds":{"type":"array","items":{"type":"string","format":"uuid"}},"advanceDaysMin":{"type":"integer","description":"Early-bird — booked at least this many days ahead."},"advanceDaysMax":{"type":"integer","description":"Last-minute — booked no more than this many days ahead."},"eligibilityRuleIds":{"type":"array","nullable":true,"items":{"type":"string","format":"uuid"},"description":"Reusable eligibility rules (`promotions.promotion_rule` rows of `ruleType: eligibility` with no promotion of their own, saved by setEligibilityRule) that must also hold. Each is evaluated with its own `effect`. (DM5, 29 September: data model for the agreed operations)"}}},
+"PromotionConditions": {"x-ticvai-persistence":"none — embedded in promotion","type":"object","description":"All conditions must hold. An empty object matches everything.","properties":{"variantIds":{"type":"array","items":{"type":"string","format":"uuid"}},"productKinds":{"type":"array","items":{"type":"string"}},"categoryIds":{"type":"array","items":{"type":"string","format":"uuid"}},"minQuantity":{"type":"integer","minimum":1},"minBasketValue":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"channels":{"type":"array","description":"Empty or absent matches every channel.","items":{"$ref":"../shared/common.yaml#/components/schemas/SalesChannel"}},"purchaseGate":{"type":"boolean","default":false,"description":"BL-037. **`evaluatePromotions` gates a price and nothing gated a sale.** A non-member could buy a member-only product at the member price refused, which is a discount failure rather than an eligibility one.\nTrue makes these conditions a **precondition of purchase**: fail them and the line cannot be added, not merely charged more. **Evaluated at add-to-cart**, because a guest told at payment has already entered a card.\n"},"paymentMethod":{"type":"array","nullable":true,"description":"BL-113. **Card-issuer and payment-type promotions** — *10% with a Network International card* is a real campaign a bank co-funds, and it was unexpressible.\n**Evaluated at payment, not at cart**, which is the awkward part: the discount appears after the tender is chosen, and the basket total must be allowed to move at that point.\n","items":{"type":"string"}},"issuerBins":{"type":"array","nullable":true,"description":"Card BIN ranges, where the campaign is issuer-specific rather than scheme-specific. **The bank supplies these and they change**, so they are data rather than configuration.\n","items":{"type":"string"}},"componentRedemption":{"type":"string","nullable":true,"enum":["allTogether","independently","sequenced"],"description":"BL-112. **Per-component redemption inside a bundle was unstated.** A park-plus-lunch bundle where lunch may be used another day behaves differently from one where both must be used on the same visit, and **the difference is revenue recognition, not just convenience.**\n"},"daysOfWeek":{"type":"array","items":{"type":"integer","minimum":0,"maximum":6}},"startTime":{"type":"string","pattern":"^([01]\\d|2[0-3]):[0-5]\\d$"},"endTime":{"type":"string","pattern":"^([01]\\d|2[0-3]):[0-5]\\d$"},"membershipTierIds":{"type":"array","items":{"type":"string","format":"uuid"}},"requiresCoupon":{"type":"boolean","default":false},"firstPurchaseOnly":{"type":"boolean","default":false},"performanceIds":{"type":"array","items":{"type":"string","format":"uuid"}},"advanceDaysMin":{"type":"integer","description":"Early-bird — booked at least this many days ahead."},"advanceDaysMax":{"type":"integer","description":"Last-minute — booked no more than this many days ahead."},"eligibilityRuleIds":{"type":"array","nullable":true,"items":{"type":"string","format":"uuid"},"description":"Reusable eligibility rules (`promotions.promotion_rule` rows of `ruleType: eligibility` with no promotion of their own) that must also hold. **Deprecated in r2** (CHG-CLN-001): setEligibilityRule, which saved library rules, was retired (BC-017), so no operation creates one; send the conditions inline. Rules already saved still apply. Each is evaluated with its own `effect`. (DM5, 29 September: data model for the agreed operations)"}}},
 "PromotionEvaluation": {"x-ticvai-persistence":"none — computed","type":"object","required":["totalDiscount","lines","applied","rejected"],"properties":{"totalDiscount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"lines":{"type":"array","items":{"type":"object","required":["lineId","originalPrice","discountedPrice","discount"],"properties":{"lineId":{"type":"string"},"originalPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"discountedPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"discount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"appliedPromotionIds":{"type":"array","items":{"type":"string","format":"uuid"}}}}},"applied":{"type":"array","items":{"type":"object","required":["promotionId","promotionCode","discount"],"properties":{"promotionId":{"type":"string","format":"uuid"},"promotionCode":{"type":"string"},"promotionName":{"type":"string"},"discount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"couponCode":{"type":"string","nullable":true}}}},"rejected":{"type":"array","description":"Promotions that matched the products but did not apply, with the reason. This is what a cashier reads to a guest who expected a discount.\n","items":{"type":"object","required":["promotionCode","reason"],"properties":{"promotionCode":{"type":"string"},"promotionName":{"type":"string"},"reason":{"type":"string","enum":["conditionsNotMet","supersededByBetterOffer","exclusivePromotionApplied","redemptionLimitReached","budgetExhausted","outsideValidPeriod","wrongChannel","membershipRequired","couponRequired"]},"detail":{"type":"string"}}}}}},
 "PromotionStatus": {"type":"string","enum":["draft","scheduled","live","paused","expired","ended"]},
 "PromotionUsage": {"x-ticvai-persistence":"none — aggregated from ledger and orders","type":"object","required":["promotionId","redemptionCount","discountGiven"],"properties":{"promotionId":{"type":"string","format":"uuid"},"redemptionCount":{"type":"integer"},"discountGiven":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"budgetCap":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"budgetRemaining":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"isBudgetExhausted":{"type":"boolean"},"byChannel":{"type":"array","items":{"type":"object","properties":{"channel":{"$ref":"../shared/common.yaml#/components/schemas/SalesChannel"},"redemptionCount":{"type":"integer"},"discountGiven":{"$ref":"../shared/common.yaml#/components/schemas/Money"}}}}}},
@@ -3576,11 +4178,10 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "SetPriceRequest": {"type":"object","required":["variantId","amount"],"properties":{"variantId":{"type":"string","format":"uuid"},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"taxCodeId":{"type":"string","format":"uuid"}}},
 "StackingMode": {"type":"string","description":"How this promotion combines with others. Declared, never inferred from creation order — two reasonable promotions can otherwise combine into a free ticket.\n","enum":["exclusive","stackable","bestOnly","stackWithGroup"]},
 "SupervisorStepUp": {"type":"object","description":"**A supervisor signs the act in place, on the device making the call** (decided 28 September, audit R144). Used where the decision is a same-device step-up rather than an approval request: reopening a shift, recounting a stock count, a retail return above the venue threshold, and (proposed by the coordinator, client to confirm) closing a stock transfer short and cancelling a performance.\n\n**The verification rule, the same on every operation that takes it:** the server checks `credential` against `principalId`; that principal must hold the operation's `x-ticvai-permission` at the operation's scope, must be active at that venue, and must not be the person whose act is being reversed where the operation says so. Any failure is a `403` (`supervisor-step-up-refused`) and nothing is written. **No approval request is raised**, and the operation declares `x-ticvai-step-up: pin`.\n","required":["principalId","credential"],"properties":{"principalId":{"type":"string","format":"uuid","description":"The supervisor signing. Recorded against the act."},"credential":{"type":"string","maxLength":512,"writeOnly":true,"description":"The supervisor's staff PIN, as they sign in at a till with it. **A PIN, never a password** (audit R123 (7)). Never stored or returned."}}},
+"TicketProof": {"type":"object","x-ticvai-persistence":"none — rendered on request, nothing is stored","description":"A sample ticket from a template, **marked as a proof on the artefact itself** so it cannot be presented at a gate.","required":["templateId","mediaType","contentRef"],"properties":{"templateId":{"type":"string","format":"uuid"},"mediaType":{"type":"string","enum":["thermalTicket","a4Pdf","wristband","rfidCard","walletPass","qrOnly","sms"]},"locale":{"type":"string","nullable":true},"contentRef":{"type":"string","format":"uri","description":"Where the rendered proof can be fetched or sent to the printer from."},"walletPlatform":{"type":"string","nullable":true,"enum":["appleWallet","googleWallet"],"description":"Which wallet the pass preview is for, where `mediaType` is `walletPass` (DEC-151; CHG-CSP-038)."}}},
 "UpdateProductRequest": {"type":"object","minProperties":1,"properties":{"familyKey":{"type":"string","maxLength":64,"pattern":"^[A-Za-z0-9_-]+$","nullable":true,"x-ticvai-unique":"venue","description":"The product family across the tenant's venues (decided 29 September, rev 3 REV3-18); see `Product.familyKey`. At most one product per venue in a family, else `409 duplicate-code`."},"name":{"type":"string","maxLength":200},"description":{"type":"string"},"channels":{"type":"array","items":{"$ref":"#/components/schemas/Channel"}},"dataMaskValues":{"type":"object","additionalProperties":true},"guestListing":{"$ref":"#/components/schemas/GuestListing"},"notBookableLabel":{"allOf":[{"$ref":"#/components/schemas/LocalisedText"}],"nullable":true},"salesContact":{"allOf":[{"$ref":"#/components/schemas/ProductSalesContact"}],"nullable":true,"description":"See `Product.salesContact` (W3, 29 September)."},"bookingFlowId":{"type":"string","format":"uuid","nullable":true,"description":"See `Product.bookingFlowId` (W8, W12, 29 September)."},"displayTags":{"type":"array","maxItems":6,"items":{"$ref":"#/components/schemas/ProductDisplayTag"}},"media":{"type":"array","maxItems":20,"items":{"$ref":"#/components/schemas/ProductMedia"}},"consentQuestionIds":{"type":"array","maxItems":10,"uniqueItems":true,"items":{"type":"string","format":"uuid"}},"requiresTimeWindow":{"type":"boolean"}}},
 "VariantDimension": {"x-ticvai-persistence":"catalogue.variant_dimension","type":"object","description":"**A length is an axis like any other** (decided 29 September, rev 3 REV3-13). A meeting room type sold by the hour has an axis `length` with values `1h`, `2h`, `halfDay`, `fullDay`, each carrying `durationMinutes` (proposed 60, 120, 240 and 480, client to correct), and each generated variant is priced on its own, so a half day need not cost four single hours.\n","required":["code","name","values"],"properties":{"code":{"type":"string","maxLength":64},"name":{"type":"string","maxLength":200},"values":{"type":"array","minItems":1,"items":{"type":"object","required":["code","label"],"properties":{"code":{"type":"string","maxLength":64},"label":{"type":"string","maxLength":200},"priceDelta":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"durationMinutes":{"type":"integer","minimum":15,"maximum":1440,"nullable":true,"description":"How long a variant carrying this value books its space for, on a `length` axis of a product with `requiresTimeWindow` (decided 29 September, rev 3 REV3-13). Null on any other axis. One axis per product at most may carry it; a second is a `400`."}}}}}},
 "Voucher": {"x-ticvai-persistence":"promotions.voucher","type":"object","required":["code","batchId","faceValue","balance","status"],"properties":{"code":{"type":"string"},"batchId":{"type":"string","format":"uuid"},"faceValue":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"balance":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"status":{"type":"string","enum":["issued","partiallyRedeemed","redeemed","expired","voided"]},"validTo":{"type":"string","format":"date-time"}}},
-"VoucherBatch": {"x-ticvai-persistence":"promotions.voucher_batch","allOf":[{"$ref":"#/components/schemas/CreateVoucherBatchRequest"},{"type":"object","required":["id","issuedCount","redeemedValue","outstandingLiability"],"properties":{"id":{"type":"string","format":"uuid"},"issuedCount":{"type":"integer"},"redeemedValue":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"outstandingLiability":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"description":"Unredeemed value. A liability until redeemed or expired."}}}]},
-"WaitlistEntry": {"type":"object","x-ticvai-persistence":"catalogue.waitlist_entry","required":["performanceId","partySize"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"performanceId":{"type":"string","format":"uuid"},"variantId":{"type":"string","format":"uuid","nullable":true},"subjectId":{"type":"string","format":"uuid","nullable":true},"contactPoint":{"type":"string","description":"**Where the offer goes.** An entry with no way to reach the guest is an entry that can never be honoured, so this is required even for an anonymous guest.\n"},"partySize":{"type":"integer","minimum":1},"status":{"allOf":[{"$ref":"#/components/schemas/WaitlistStatus"}],"readOnly":true,"description":"Set by the server. `joinWaitlist` does not take it; a new entry is `waiting`."},"position":{"type":"integer","readOnly":true,"description":"First in, first offered. Shown to the guest, because not knowing is worse than waiting."},"offeredAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true},"offerExpiresAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true,"description":"**The offer moves on when this passes.** Notifying everyone at once produces a race the fastest guest wins; holding indefinitely for someone asleep leaves the seat unsold.\n"},"joinedAt":{"type":"string","format":"date-time","readOnly":true}}},
-"WaitlistStatus": {"type":"string","enum":["waiting","offered","converted","expired","left"]}
+"VoucherBatch": {"x-ticvai-persistence":"promotions.voucher_batch","allOf":[{"$ref":"#/components/schemas/CreateVoucherBatchRequest"},{"type":"object","required":["id","issuedCount","redeemedValue","outstandingLiability"],"properties":{"id":{"type":"string","format":"uuid"},"issuedCount":{"type":"integer"},"redeemedValue":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"outstandingLiability":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"description":"Unredeemed value. A liability until redeemed or expired."}}}]}
 }
 ```

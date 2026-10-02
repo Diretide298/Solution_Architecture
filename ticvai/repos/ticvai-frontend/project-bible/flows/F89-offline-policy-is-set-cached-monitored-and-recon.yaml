@@ -24,20 +24,21 @@ steps:
   - setOfflinePolicy
   outcome: What a till may do with no network, and for how long.
 - step: 2
-  screen: BO-129
+  screen: BO-131
   action: The connectivity thresholds are set.
   operations:
   - setConnectivityThresholds
   outcome: When a device counts as offline rather than slow.
   crossesDevice: true
+  note: '**Repointed 2 October (CHG-WIR-021).** The thresholds were set on BO-129, the firmware and profile screen; they are set on BO-131 Connectivity & Auto-Switch Settings, which declares setConnectivityThresholds.'
 - step: 3
   screen: BO-037
   action: Each device's cached package is checked.
   operations:
-  - getOfflinePackage
   - listCatalogueBundles
   outcome: '**What each device is enforcing right now**, not what was configured.'
   crossesDevice: true
+  note: '**Repointed 2 October (CHG-WIR-025, CHG-WIR-027).** getOfflinePackage answers only for the calling workstation, so a back-office screen cannot read another device''s package with it; the venue-scoped read of each device''s package is an open contract gap (CHG-WIR-027).'
 - step: 4
   screen: BO-128
   action: The fleet is monitored.

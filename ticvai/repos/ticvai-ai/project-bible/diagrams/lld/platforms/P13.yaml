@@ -20,33 +20,27 @@ deployment:
 why: null
 modulesUsed:
 - module: core
-  screens: 101
-- module: fnb
-  screens: 1
-- module: ticketing
-  screens: 1
+  screens: 103
 servicesCalled:
 - service: WhiteLabelService
-  operationCalls: 92
-- service: VenueOpsService
-  operationCalls: 71
+  operationCalls: 106
 - service: MarketingService
-  operationCalls: 60
+  operationCalls: 71
+- service: VenueOpsService
+  operationCalls: 70
 - service: AiService
-  operationCalls: 10
+  operationCalls: 11
 - service: CatalogueService
   operationCalls: 7
-- service: FnbService
-  operationCalls: 5
 - service: IdentityService
-  operationCalls: 4
+  operationCalls: 5
 - service: OrderService
-  operationCalls: 2
+  operationCalls: 1
 - service: TenancyService
   operationCalls: 1
 coverage:
   screens: 103
-  inAFlow: 89
+  inAFlow: 90
   drawn: 103
   note: '**A screen in no flow has been specified and never walked.** Every flow written in this package
     has found a defect.'
@@ -60,8 +54,8 @@ screens:
   operations:
   - getFeatureToggles
   - getModuleEnablement
+  - getSiteSetupProgress
   - getTenantAppStatus
-  - getTenantConfig
   - setFeatureToggles
   - setMaintenanceMode
   - setModuleEnablement
@@ -133,20 +127,14 @@ screens:
   density: compact
   operations:
   - getFonts
-  - getTheme
   - setFonts
-  - setTheme
   states:
   - emptyFirstRun
   - emptyNoAccess
   - error
   - loading
   offlineState: false
-  entryParams:
-  - bannerId<-deepLink
-  - pageId<-deepLink
-  - policyKind<-deepLink
-  - version<-deepLink
+  entryParams: []
   goesTo:
   - CMS-001
   - CMS-002
@@ -215,10 +203,11 @@ screens:
   density: compact
   operations:
   - createPreview
-  - diffConfigVersion
-  - listConfigVersions
-  - publishTenantConfig
-  - restoreConfigVersion
+  - getBookingFlowConfig
+  - getBrandIdentity
+  - getFonts
+  - getTheme
+  - previewProductTickets
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -227,10 +216,7 @@ screens:
   - loading
   offlineState: false
   entryParams:
-  - bannerId<-deepLink
-  - pageId<-deepLink
-  - policyKind<-deepLink
-  - version<-deepLink
+  - productId<-CMS-006
   goesTo:
   - CMS-001
   - CMS-002
@@ -246,15 +232,16 @@ screens:
   wave: 2
   density: compact
   operations:
+  - createContentBlock
   - createContentPage
   - decideProposedAction
   - deleteContentPage
   - getHomepageLayout
   - getModuleEnablement
   - listContentPages
+  - listLandingPageTemplates
   - proposeMarketingContent
-  - setFooter
-  - setHeader
+  - publishContentBlock
   - setHomepageLayout
   - updateContentPage
   states:
@@ -313,26 +300,23 @@ screens:
 - screen: CMS-009
   name: Navigation & Menus
   module: White Label
-  requiresModule: fnb
+  requiresModule: core
   wave: 2
   density: compact
   operations:
-  - createMenu
-  - getMenu
+  - buildDeepLink
+  - getDeepLinkScheme
   - getNavigation
-  - listMenus
-  - setMenuSections
+  - setFooter
+  - setHeader
   - setNavigation
-  - updateMenu
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
-  entryParams:
-  - menuId<-deepLink
+  entryParams: []
   goesTo:
   - CMS-001
   - CMS-002
@@ -343,18 +327,16 @@ screens:
 - screen: CMS-010
   name: Media Library
   module: White Label
-  requiresModule: ticketing
+  requiresModule: core
   wave: 2
   density: compact
   operations:
-  - appendEntitlementToMedia
   - completeUpload
   - createCollection
   - createUpload
   - deleteMediaAsset
   - getExpiringRights
   - getMediaAsset
-  - getMediaEntitlements
   - listCollections
   - replaceMediaAsset
   - searchMedia
@@ -368,7 +350,6 @@ screens:
   - loading
   offlineState: false
   entryParams:
-  - mediaCode<-deepLink
   - mediaId<-deepLink
   - uploadId<-deepLink
   goesTo:
@@ -385,6 +366,8 @@ screens:
   wave: 2
   density: compact
   operations:
+  - createUrlRedirect
+  - getSeoMetadata
   - setSeoMetadata
   states:
   - emptyFirstRun
@@ -407,6 +390,8 @@ screens:
   wave: 2
   density: compact
   operations:
+  - getTenantConfig
+  - getTranslationProposals
   - setLanguages
   states:
   - emptyFirstRun
@@ -414,7 +399,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - translationJobId<-CMS-011
   goesTo:
   - CMS-001
   - CMS-002
@@ -429,7 +415,7 @@ screens:
   wave: 2
   density: compact
   operations:
-  - getTenantConfig
+  - createPreview
   - validateTenantConfig
   states:
   - emptyFirstRun
@@ -454,9 +440,15 @@ screens:
   wave: 2
   density: compact
   operations:
+  - createPreview
+  - diffConfigVersion
+  - exportSitePackage
+  - getPublishReviewPolicy
+  - getSitePackage
   - getTenantAppStatus
   - listBookingFlows
   - publishTenantConfig
+  - setPublishReviewPolicy
   - validateTenantConfig
   states:
   - emptyFirstRun
@@ -466,6 +458,7 @@ screens:
   offlineState: false
   entryParams:
   - venueId<-session
+  - version<-navigation
   goesTo:
   - CMS-001
   - CMS-002
@@ -477,6 +470,7 @@ screens:
   boardFrames: null
   wireframe: wireframes/P13 Venue CMS.dc.html#cms-014
   inFlows:
+  - F102 A brand is set, previewed, published and rolled back
   - F22 A tenant rebrands their app
 - screen: CMS-015
   name: Version History
@@ -514,7 +508,6 @@ screens:
   density: compact
   operations:
   - getBookingFlowConfig
-  - getTenantConfig
   - listAnalyticsProviders
   - listOrgUnits
   - setAnalyticsProvider
@@ -547,8 +540,11 @@ screens:
   density: compact
   operations:
   - claimCustomDomain
+  - getPlatformSubdomain
   - listCustomDomains
+  - regenerateDomainToken
   - relinquishCustomDomain
+  - setPrimaryDomain
   - verifyCustomDomain
   states:
   - emptyFirstRun
@@ -565,7 +561,8 @@ screens:
   - CMS-003
   boardFrames: null
   wireframe: wireframes/P13 Venue CMS.dc.html#cms-017
-  inFlows: null
+  inFlows:
+  - F103 A tenant claims a domain and gets a certificate
 - screen: CMS-018
   name: Consent & Legal
   module: White Label
@@ -607,6 +604,7 @@ screens:
   operations:
   - listPrincipals
   - listRoles
+  - updatePrincipal
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -629,7 +627,6 @@ screens:
   wave: 3
   density: compact
   operations:
-  - listCustomerPrivacyConsent
   - listPrivacyConsent
   states:
   - emptyFirstRun
@@ -663,6 +660,7 @@ screens:
   density: compact
   operations:
   - listDataProcessingPurpose
+  - setDataProcessingPurpose
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -729,9 +727,11 @@ screens:
   wave: 3
   density: compact
   operations:
+  - listCookieScanFindings
   - listCookieScanPolicies
   - listCookieScans
   - listCookieTrackingDigital
+  - listTrackingTechnologyCatalogue
   - recordCookieScan
   - setCookieScanPolicy
   - setTrackingTechnology
@@ -1014,6 +1014,8 @@ screens:
   density: compact
   operations:
   - listDataRetentionExpiry
+  - runDataRetention
+  - setLegalHold
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -1035,6 +1037,7 @@ screens:
   wave: 3
   density: compact
   operations:
+  - listPrivacyComplianceExceptions
   - setPrivacyComplianceException
   states:
   - emptyFirstRun
@@ -1133,6 +1136,7 @@ screens:
   wave: 3
   density: compact
   operations:
+  - createForm
   - listWaiverTemplateMaster
   states:
   - emptyFirstRun
@@ -1154,6 +1158,7 @@ screens:
   wave: 3
   density: compact
   operations:
+  - createForm
   - setDigitalWaiverForm
   states:
   - emptyFirstRun
@@ -1282,6 +1287,7 @@ screens:
   wave: 3
   density: compact
   operations:
+  - getLocalizationBrandingCustomer
   - setLocalizationBrandingCustomer
   states:
   - emptyFirstRun
@@ -1422,6 +1428,7 @@ screens:
   wave: 3
   density: compact
   operations:
+  - listWaiverVerificationQueue
   - setWaiverVerificationValidation
   states:
   - emptyFirstRun
@@ -1798,7 +1805,6 @@ screens:
   density: compact
   operations:
   - getMediaUsageAnalytics
-  - listAssets
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -2631,10 +2637,12 @@ screens:
   operations:
   - createAiConversation
   - getAppBuild
+  - getBrandIdentity
   - getStoreAccounts
   - listAppBuilds
   - requestAppBuild
   - sendAiMessage
+  - setBrandIdentity
   - setStoreAccounts
   states:
   - emptyFirstRun

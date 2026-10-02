@@ -1,15 +1,4 @@
 {
- "MessageChannel": {
-  "type": "string",
-  "enum": [
-   "email",
-   "sms",
-   "whatsapp",
-   "push",
-   "inApp",
-   "post"
-  ]
- },
  "RentalAvailability": {
   "type": "object",
   "description": "Board 3. **A pooled product answers with a count, a serialised one with assets.**",
@@ -166,7 +155,8 @@
    "depositAuthorisationId": {
     "type": "string",
     "format": "uuid",
-    "nullable": true
+    "nullable": true,
+    "description": "The card deposit's terminal pre-authorisation, written by `checkOutRental` (workbook Q304; CHG-CSA-029). The hold is kept whole until every unit is back (workbook Q306)."
    },
    "accruedLateFee": {
     "$ref": "../shared/common.yaml#/components/schemas/Money"

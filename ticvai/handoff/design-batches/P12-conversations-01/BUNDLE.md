@@ -61,14 +61,54 @@ convincingly. It is never a caption.
   and its error; and, element by element, what is shown and in what format, what each action
   produces and where the user goes next. Draw exactly that.
 
+## The processes these screens belong to
+
+Written by the owner of each process (`handoff/design-notes/`). Read before any screen: it says how the process runs end to end and which words the screens must use.
+
+### Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers)
+
+Customer & marketing is how a venue knows its guests and talks to them. There is ONE guest profile per person across ticketing, F&B and retail, so a guest who books online and later dines is the same profile (DI-339). A profile needs at least an email or a mobile, never neither (DI-372). Profiles are created by registration, by guest checkout, or by staff at a till or desk. Repeat guest checkouts with the same verified email or phone attach to the same profile automatically (DI-941, R120 default). Two records that might be the same person are NEVER merged automatically: the guest is asked to confirm, and an admin review queue runs alongside (DI-377). Each candidate shows why it matched; the record that loses is superseded, not deleted; consent takes the narrower of the two positions (DI-808). Around the profile sit three things that must never be confused. CONSENT is what the law allows: per purpose and per channel, append-only, with the notice version and the source (recordConsent). It is Given, Withdrawn or Not asked. A SUBSCRIPTION is what the guest asked to receive, e.g. a newsletter list (MarketingSubscription). A PREFERENCE is what they like: table, dietary, accessibility (updateGuestPreferences). An anonymous visitor's cookie decision is recorded against a device key (recordDeviceConsent) and attaches to the guest when they sign in (claimDeviceConsent). Marketing consent at GUEST CHECKOUT is an open client question, and the design follows its default: an unticked opt-in beside the terms, one per channel and purpose. It is recorded with source "checkout" against the order and the verified contact, and nothing is sent without it. Whether that is sufficient consent under PDPL is the client DPO's call (M18-15 (audit R-M18-15), DI-954, DI-940). Marketing reads profiles through SEGMENTS (rules, evaluated when used) and static LISTS (imported). It reaches guests by CAMPAIGNS (one send to an audience) and JOURNEYS (automations started by an event, with waits and branches). Journeys may offer only pre-configured offers, never a free-typed discount (MoM 2026-08-20 4.6). Everything goes through ONE communications module that every other module uses (MoM 2026-08-31 4.6). Consent and suppression are applied at send time, and the number excluded, with the reasons, is reported before anything goes out (launchCampaign). Transactional messages (tickets, receipts, queue calls, case replies) do not need marketing consent and must never carry marketing. LOYALTY pays for spend: points, tiers, rewards and expiry. GAMIFICATION pays for behaviour: challenges, badges, streaks, referrals and leaderboards (createChallenge). A guest reads their own loyalty position (getLoyaltyPosition). A till, the back office or support reads a named guest's (getGuestLoyalty, or identifyGuest at a till). SERVICE: one Case object covers lost property, complaints, questions, accessibility and refund requests (CaseKind). A guest raises one with raiseMyCase, which needs the connection …
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Guest | The person the venue serves, signed in or not. In body copy on every surface. | Customer, User, Subject, Contact, Patron | contracts/satellite/marketing-crm.yaml#/components/schemas/GuestProfile |
+| Guest profile | The CRM record of one person (details, consent, preferences, history). Distinct from the Account, which is how a guest signs in. | Customer record, Contact, Subject | contracts/satellite/marketing-crm.yaml#getGuestProfile |
+| Consent - Given / Withdrawn / Not asked | What the law allows, per purpose (marketing, personalisation, profiling, third-party sharing, AI processing, transactional) and per channel. "Not asked" is not "Withdrawn" and must look different. | Opted in/out as a status, Accepted, Declined, Revoked, Unsubscribed (that is a subscription) | contracts/satellite/marketing-crm.yaml#/components/schemas/ConsentDecision |
+| Subscription | A list the guest asked to receive (a newsletter, event news), per channel. Unsubscribing from a list is not withdrawing consent. | Consent, Opt-in | contracts/satellite/marketing-crm.yaml#/components/schemas/MarketingSubscription |
+| Preferences | What the guest likes or needs (seating, drinks, dietary, accessibility, contact channel). Never grants permission. | Consents, Settings | contracts/satellite/marketing-crm.yaml#updateGuestPreferences |
+| Send me offers and news | The marketing opt-in label beside the terms at checkout, unticked, one per channel and purpose. | I agree to marketing, Pre-ticked boxes, Keep me updated ticked by default | DI-954 |
+| Points / Tier / Points to next tier / Expiring points | The loyalty position. Points are a liability earned per programme; tiers are ranked (Bronze, Silver, Gold, Platinum in the meetings). | Credits, Coins, Balance alone (wallet money is "credit"), Level | DI-382 |
+| Pending points | Points earned on a purchase still inside its refund window; shown apart from spendable points. | Available points for pending ones | contracts/satellite/marketing-crm.yaml#getLoyaltyPosition |
+| Reward | What points can be turned into (rewards catalogue). | Prize (games redemption uses prize), Voucher unless it is one | contracts/satellite/marketing-crm.yaml#listRewards |
+| Challenge / Badge / Streak / Referral | Gamification - rewards for behaviour, not spend. Status badges such as Explorer, Adventurer, Legend. | Mission and Quest used interchangeably on one screen, Loyalty tier for a badge | DI-392 |
+| Case | One service record - lost property, complaint, question, accessibility, refund request or other - with a number (venue prefix plus sequence), a status and an SLA. | Ticket (a ticket is an admission product), Issue, Incident (that is maintenance and safety) | contracts/satellite/marketing-crm.yaml#/components/schemas/CaseKind |
+| Reply to guest / Internal note | The two kinds of case message. The agent always chooses one explicitly; there is no default. | Comment, Message (ambiguous) | F05 step 2 |
+| Conversation | A live chat session (web chat, in-app, WhatsApp, SMS, email, kiosk, voice). With the assistant, then queued, then with an agent. It is not a case. | Ticket, Case (until one is raised from it) | contracts/satellite/marketing-crm.yaml#/components/schemas/ConversationState |
+| Segment / List / Audience | A segment is rules evaluated when used. A list is static, imported or hand-picked. The audience is what a campaign or journey targets. | Group, Cohort, Target list for a segment | DI-381 |
+| Campaign / Journey | A campaign is one send (one-off, scheduled, triggered or recurring) to an audience. A journey is an automation started by an event, with steps, waits and branches. | Flow (booking flows use it), Automation for a one-off send, Blast | R146 |
+| Offer | A pre-configured, system-validated discount or benefit that a campaign or journey references. It is never typed into the builder. | Discount field, Coupon (unless the offer is a coupon code) | MoM 2026-08-20 4.6 |
+| Reachable | How many guests in an audience can actually be sent to on a channel after consent and suppression. Always shown beside the matching count. | Audience size alone | contracts/satellite/marketing-crm.yaml#previewSegment |
+| Possible duplicate / Merge | Two profiles that may be one person. Never called "Duplicate" as a verdict. Merging needs confirmation and stays reversible for 30 days. | Duplicate (as a status), Combine, Auto-merge | DI-808 |
+| Data request | A guest's privacy request - a copy of my data, a correction, erasure, a restriction - with a legal clock. Statuses submitted, in progress, completed. | DSAR on guest screens, Subject data, Ticket | DI-379 |
+| Waiver / Consent question | A waiver is a signed, versioned form. A consent question ("Are you able to swim?", "I accept the risk") is a single question asked per person or per booking and recorded as consent. | Contract, Disclaimer, Form for a waiver in guest copy | DI-1062 |
+| Lost item / Found item / Possible match | The two directions of lost property and the suggested pairing between them. | Lost case, Claim before it is claimed | contracts/satellite/marketing-crm.yaml#/components/schemas/LostItem |
+| Wishlist | Products and dates a guest saved to buy later, including F&B and retail to buy on site. | Favourites (used for transport routes), Saved for later on one surface and Wishlist on another | DI-202 |
+| Notification / Message | A notification is an item in the guest's in-app feed. A message is one send on a channel (email, SMS, WhatsApp, push, in-app). | Alert for marketing content, Inbox for the guest feed | contracts/satellite/marketing-crm.yaml#/components/schemas/GuestNotification |
+| Template | A reusable message body per channel and language with merge fields. Transactional and marketing templates are separate kinds. | Layout, Design | contracts/satellite/marketing-crm.yaml#createMessageTemplate |
+
+
 ## The screens
 
 Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs count fields; requirements are matrix rows; meeting inputs are the ones naming the screen (the module and platform ones are below); white label says whether the tenant's brand reaches it (guest) or it sets the brand (configures).
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `SUP-004` | Conversation Queue | B–D | 35 | 56 | 6 | 20 | 1 | 6 | — | notStarted (generated) |
+| `SUP-004` | Conversation Queue | B–D | 3 | 12 | 6 | 7 | 1 | 6 | — | notStarted (generated) |
 | `SUP-005` | Live Chat Workspace | B–D | 41 | 60 | 6 | 22 | 1 | 0 | — | notStarted (generated) |
+
+## Thin screens in this batch
+
+**SUP-004 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ---
 
@@ -85,101 +125,30 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | App · platform | TICVAI Venue Management · P12 Venue Support (web) |
 | Module | Conversations · wave 2 · needs the `marketing` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `CASE_MANAGE`, `CASE_VIEW` (1 configure, 1 read); in the flows as agent, guest |
+| Who uses it | venue staff holding `CASE_MANAGE`, `CASE_VIEW` (1 configure, 1 read); in the flows as guest |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listCases` reads the population and `getCase` reads one of them — list, select, act |
 | Offline | online only |
-| Opens with | `caseId` (deepLink), `conversationId` (deepLink) · cold entry: A conversation link an agent opens from a notification. Resolves, or says it was closed and by whom. |
+| Opens with | `conversationId` (deepLink) · cold entry: A conversation link an agent opens from a notification. Resolves, or says it was closed and by whom. |
 | Route | `/general/conversation-queue` |
 
 **What the spec says about it.** States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived from the screen name and its operations on 17 August, not from a requirement. Pulled to Wave 2 (CF-101). **The guest concierge is Phase 1 and a handover needs somewhere to land** — the queue and the workspace move; the rest of the console stays Wave 3.
 
+**Known gaps.** Removed 2 October 2026 (CHG-WIR-005): The conversation queue carried the full case toolset; the queue is about conversations and case work happens in SUP-013 and SUP-005. Keep listConversations … Removed 2 October 2026 (CHG-WIR-005): The conversation queue carried the full case toolset; the queue is about conversations and case work happens in SUP-013 and SUP-005. Keep listConversations … Removed 2 October 2026 (CHG-WIR-005): The conversation queue carried the full case toolset; the queue is about conversations and case work happens in SUP-013 and SUP-005. Keep listConversations …
+
+**From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** The conversation queue: people waiting now, oldest first, each with the assistant's summary so the agent opens with context and the guest does not repeat themselves. Claim takes it, Transfer passes it with its context.
+
+**Fixed on main** (the package already carries these; draw what it says): The queue screen carries the full case toolset (case filters as text fields, Create case, Escalate, Reopen, Save case, Add case message). (CHG-WIR-005).
+
 #### Inputs: what the user enters or picks
-
-**On the screen**
-
-| Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
-|---|---|---|---|---|---|---|---|
-| Status | select | optional | — | Open · In progress · Awaiting guest · Escalated · Resolved · Closed | — | Sends `?status=` to `listCases`. | `listCases` ?status |
-| Assigned to principal id | picker: choose an assigned to principal (drawn as a picker, not a text box) | optional | — | — | shows names, sends the id | Sends `?assignedToPrincipalId=` to `listCases`. | `listCases` ?assignedToPrincipalId |
-| Breached sla | toggle | optional | — | — | — | Sends `?breachedSla=` to `listCases`. | `listCases` ?breachedSla |
-| Priority | radio group | optional | — | Low · Normal · High · Urgent | — | Sends `?priority=` to `listCases`. | `listCases` ?priority |
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
 
 | Filter | Drawn as | Default | Allowed values, rules | Source |
 |---|---|---|---|---|
-| Membership | picker: choose a membership | — | — | `listCases` ?membershipId |
 | State | select | — | With assistant · Queued · With agent · Waiting on guest · Resolved · Abandoned · Timed out | `listConversations` ?state |
 | Assigned to me | toggle | — | — | `listConversations` ?assignedToMe |
 | Channel | select | — | Web chat · In app chat · Whatsapp · SMS · Email · Kiosk · Voice | `listConversations` ?channel |
-
-**Form: Add case message** (modal, opened by *Add case message*; *Add case message* calls `addCaseMessage`, *Cancel* sends nothing)
-
-**Collects what `addCaseMessage` sends before it is called.** Required: `id`, `body`, `isInternal`, `recordedAt`. Optional: `channel`, `attachmentRefs`. Dismissing sends nothing; the screen behind is unchanged.
-
-| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
-|---|---|---|---|---|---|---|---|
-| ID `id` | picker: choose an id | required | — | — | shows names, sends the id | — | `addCaseMessage` body |
-| Body `body` | text area | required | — | min length 1; max length 10000 | — | — | `addCaseMessage` body |
-| Is internal `isInternal` | toggle | required | — | — | — | — | `addCaseMessage` body |
-| Channel `channel` | select | optional | — | Email · SMS · Whatsapp · Push · In app · Post | — | — | `addCaseMessage` body |
-| Attachment refs `attachmentRefs` | list of values (chips) | optional | — | — | — | — | `addCaseMessage` body |
-| Recorded at `recordedAt` | date and time picker | required | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `addCaseMessage` body |
-
-**Form: Create case** (modal, opened by *Create case*; *Create case* calls `createCase`, *Cancel* sends nothing)
-
-**Collects what `createCase` sends before it is called.** Required: `id`, `subject`, `description`, `channel`, `recordedAt`. Optional: `subjectId`, `categoryId`, `priority`, `kind`, `venueId`, `relatedOrderId`, `attachmentRefs`. Dismissing sends nothing; the screen behind is unchanged.
-
-| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
-|---|---|---|---|---|---|---|---|
-| ID `id` | picker: choose an id | required | — | — | shows names, sends the id | — | `createCase` body |
-| Subject `subjectId` | picker: choose a subject | optional | — | — | shows names, sends the id | — | `createCase` body |
-| Subject `subject` | text field | required | — | max length 200 | — | — | `createCase` body |
-| Description `description` | text area | required | — | max length 10000 | — | — | `createCase` body |
-| Category `categoryId` | picker: choose a category | optional | — | — | shows names, sends the id | — | `createCase` body |
-| Membership `membershipId` | picker: choose a membership | optional | — | — | shows names, sends the id | The identity membership this case concerns (`identity.customer_membership`); member case notes are cases with this set. | `createCase` body |
-| Priority `priority` | radio group | optional | Normal | Low · Normal · High · Urgent | — | — | `createCase` body |
-| Kind `kind` | select | optional | — | Lost property · Complaint · Question · Accessibility · Refund request · Other; Stored on the case, because a lost-property report that forgets it was one cannot be routed to the lost and found desk.; A case raised as `other` must carry a non-empty `detail` … | — | What the guest says the case is about, in their words rather than the venue's taxonomy — `raiseMyCase` asks for it and `categoryId` is what staff file it under. | `createCase` body |
-| Channel `channel` | select | required | — | Email · SMS · Whatsapp · Push · In app · Post | — | — | `createCase` body |
-| Venue `venueId` | picker: choose a venue | optional | — | — | shows names, sends the id | — | `createCase` body |
-| Related order `relatedOrderId` | text field | optional | — | — | — | — | `createCase` body |
-| Attachment refs `attachmentRefs` | list of values (chips) | optional | — | — | — | Stored on the opening `CaseMessage`, not on the case. | `createCase` body |
-| Recorded at `recordedAt` | date and time picker | required | — | — | 1 Oct 2026, 14:30 (venue time zone) | Device time the case was raised. The server stamps `Case.syncedAt` on arrival. | `createCase` body |
-
-**Form: Escalate case** (modal, opened by *Escalate case*; *Escalate case* calls `escalateCase`, *Cancel* sends nothing)
-
-**Collects what `escalateCase` sends before it is called.** Required: `reason`. Optional: `assignToPrincipalId`, `newPriority`. Dismissing sends nothing; the screen behind is unchanged.
-
-| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
-|---|---|---|---|---|---|---|---|
-| Reason `reason` | text area | required | — | min length 3; max length 500 | — | — | `escalateCase` body |
-| Assign to principal `assignToPrincipalId` | picker: choose an assign to principal | optional | — | — | shows names, sends the id | — | `escalateCase` body |
-| New priority `newPriority` | radio group | optional | — | Low · Normal · High · Urgent | — | — | `escalateCase` body |
-
-**Form: Reopen case** (modal, opened by *Reopen case*; *Reopen case* calls `reopenCase`, *Cancel* sends nothing)
-
-**Collects what `reopenCase` sends before it is called.** Required: `reason`. Dismissing sends nothing; the screen behind is unchanged.
-
-| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
-|---|---|---|---|---|---|---|---|
-| Reason `reason` | text area | required | — | — | — | — | `reopenCase` body |
-
-Errors to draw in the form: 409 The case is not `resolved` — a `closed` case is past its reopen window, and an open one has nothing to reopen. (StateTransitionProblem)
-
-**Form: Save case** (modal, opened by *Save case*; *Save case* calls `updateCase`, *Cancel* sends nothing)
-
-**Collects what `updateCase` sends before it is called.** Nothing in the body is required. Optional: `status`, `priority`, `assignedToPrincipalId`, `categoryId`, `resolutionNote`. Dismissing sends nothing; the screen behind is unchanged.
-
-| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
-|---|---|---|---|---|---|---|---|
-| Status `status` | select | optional | — | Open · In progress · Awaiting guest · Escalated · Resolved · Closed | — | — | `updateCase` body |
-| Priority `priority` | radio group | optional | — | Low · Normal · High · Urgent | — | — | `updateCase` body |
-| Assigned to principal `assignedToPrincipalId` | picker: choose an assigned to principal | optional | — | — | shows names, sends the id | — | `updateCase` body |
-| Category `categoryId` | picker: choose a category | optional | — | — | shows names, sends the id | — | `updateCase` body |
-| Resolution note `resolutionNote` | text area | optional | — | max length 2000 | — | — | `updateCase` body |
-
-Errors to draw in the form: 400 Resolving without a resolution note
 
 **Form: Transfer conversation** (modal, opened by *Transfer conversation*; *Transfer conversation* calls `transferConversation`, *Cancel* sends nothing)
 
@@ -194,23 +163,6 @@ Errors to draw in the form: 400 Resolving without a resolution note
 #### Outputs: what the screen shows and produces
 
 **Shown**
-
-**Every case** (data table, from `listCases`)
-
-| Shows | Format | Notes |
-|---|---|---|
-| ID | the name it points at, never the id | Created on the device (`CreateCaseRequest.id`, `raiseMyCase`), so a UUIDv7. |
-| Case number | text | Server-assigned: the venue prefix plus a sequence per venue (decided 28 September, audit R152). |
-| Subject | the name it points at, never the id | — |
-| Guest name | text | Resolved from `pii.subject` when the case is read, never stored on the case. A name copied onto a case row is personal data outside the … |
-| Subject | text | The case's one-line title, not a person. Stored as `title` so the table does not hold `subject` beside `subject_id`; the wire keeps … |
-| Category | the name it points at, never the id | — |
-| Status | chip: Open, In progress, Awaiting guest, Escalated, Resolved, Closed | — |
-| Priority | chip: Low, Normal, High, Urgent | — |
-| Assigned to principal | the name it points at, never the id | — |
-| Venue | the name it points at, never the id | — |
-| Related order | text | — |
-| Sla due at | 1 Oct 2026, 14:30 | — |
 
 **Every conversation** (data table, from `listConversations`)
 
@@ -229,67 +181,29 @@ Errors to draw in the form: 400 Resolving without a resolution note
 | Estimated wait seconds | 1,234 | From the live agent queue — the conversations ahead divided across that queue's agents online now (audit R149). |
 | Handover reason | chip: Guest requested, Assistant refused, Assistant failed, Out of scope, Negative … | — |
 
-**The selected case** (detail panel, from `listCases`)
-
-| Shows | Format | Notes |
-|---|---|---|
-| ID | the name it points at, never the id | Created on the device (`CreateCaseRequest.id`, `raiseMyCase`), so a UUIDv7. |
-| Case number | text | Server-assigned: the venue prefix plus a sequence per venue (decided 28 September, audit R152). |
-| Subject | the name it points at, never the id | — |
-| Guest name | text | Resolved from `pii.subject` when the case is read, never stored on the case. A name copied onto a case row is personal data outside the … |
-| Subject | text | The case's one-line title, not a person. Stored as `title` so the table does not hold `subject` beside `subject_id`; the wire keeps … |
-| Kind | chip: Lost property, Complaint, Question, Accessibility, Refund request, Other | What the guest said it was about, where the guest raised it. |
-| Channel | chip: Email, SMS, Whatsapp, Push, In app, Post | How the guest reached the venue — `CreateCaseRequest.channel`, or `inApp` for a case raised through `raiseMyCase`. |
-| Recorded at | 1 Oct 2026, 14:30 | Device time the case was raised — the start of the SLA clock. |
-| Synced at | 1 Oct 2026, 14:30 | Server time the case arrived. Equal to `recordedAt` for a case raised online. |
-| Category | the name it points at, never the id | — |
-| Status | chip: Open, In progress, Awaiting guest, Escalated, Resolved, Closed | — |
-| Priority | chip: Low, Normal, High, Urgent | — |
-| Assigned to principal | the name it points at, never the id | — |
-| Venue | the name it points at, never the id | — |
-| Related order | text | — |
-| Sla due at | 1 Oct 2026, 14:30 | — |
-
-**The case** (detail panel, from `getCase`)
-
-| Shows | Format | Notes |
-|---|---|---|
-| ID | the name it points at, never the id | Created on the device (`CreateCaseRequest.id`, `raiseMyCase`), so a UUIDv7. |
-| Case number | text | Server-assigned: the venue prefix plus a sequence per venue (decided 28 September, audit R152). |
-| Subject | the name it points at, never the id | — |
-| Guest name | text | Resolved from `pii.subject` when the case is read, never stored on the case. A name copied onto a case row is personal data outside the … |
-| Subject | text | The case's one-line title, not a person. Stored as `title` so the table does not hold `subject` beside `subject_id`; the wire keeps … |
-| Kind | chip: Lost property, Complaint, Question, Accessibility, Refund request, Other | What the guest said it was about, where the guest raised it. |
-| Channel | chip: Email, SMS, Whatsapp, Push, In app, Post | How the guest reached the venue — `CreateCaseRequest.channel`, or `inApp` for a case raised through `raiseMyCase`. |
-| Recorded at | 1 Oct 2026, 14:30 | Device time the case was raised — the start of the SLA clock. |
-| Synced at | 1 Oct 2026, 14:30 | Server time the case arrived. Equal to `recordedAt` for a case raised online. |
-| Category | the name it points at, never the id | — |
-| Status | chip: Open, In progress, Awaiting guest, Escalated, Resolved, Closed | — |
-| Priority | chip: Low, Normal, High, Urgent | — |
-| Assigned to principal | the name it points at, never the id | — |
-| Venue | the name it points at, never the id | — |
-| Related order | text | — |
-| Sla due at | 1 Oct 2026, 14:30 | — |
-
 **Actions and what each produces**
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Add case message (primary button) | `addCaseMessage` POST `/cases/{caseId}/messages` | inline | CaseMessage | — | opens modal first |
-| Create case (secondary button) | `createCase` POST `/cases` | CreateCaseRequest | Case | — | opens modal first |
-| Escalate case (secondary button) | `escalateCase` POST `/cases/{caseId}/escalate` | inline | Case | — | opens modal first |
-| Reopen case (secondary button) | `reopenCase` POST `/cases/{caseId}/reopen` | inline | Case | 409 The case is not `resolved` — a `closed` case is past its reopen window, and an open one has nothing to reopen. (StateTransitionProblem) | opens modal first |
-| Save case (secondary button) | `updateCase` PATCH `/cases/{caseId}` | inline | Case | 400 Resolving without a resolution note | opens modal first |
 | Claim conversation (secondary button) | `claimConversation` POST `/conversations/{conversationId}/claim` | — | Conversation | 409 Already claimed by another agent | — |
 | Transfer conversation (secondary button) | `transferConversation` POST `/conversations/{conversationId}/transfer` | inline | Conversation | — | opens modal first |
 
-**Data it reads**: `listCases` (onLoad, from page inventory); `listConversations` (onLoad, The omnichannel inbox)
+**Rules for what is shown** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
+
+- **Conversation row**: Channel, guest, state (queued vs with assistant vs with agent), wait in seconds, the assistant's one-line summary, language. *(source: F24 step 3; contracts/satellite/marketing-crm.yaml#listConversations)*
+
+**What each action does** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
+
+- **Claim**: Opens the live chat (SUP-005); stops a second agent answering. *(source: contracts/satellite/marketing-crm.yaml#claimConversation)*
+- **Transfer**: To an agent or queue; context travels. *(source: contracts/satellite/marketing-crm.yaml#transferConversation)*
+
+**Data it reads**: `listConversations` (onLoad, The omnichannel inbox)
 
 **Where the user goes next**
 
 - → `SUP-001` Venue Management Sign In: *Agent Login*
 - → `SUP-002` Agent Dashboard: *Agent Dashboard*; carries `caseId`
-- → `SUP-005` Live Chat Workspace: *Reads the history and replies*; carries `caseId`, `conversationId`
+- → `SUP-005` Live Chat Workspace: *The agent answers*; carries `caseId`, `conversationId`
 
 #### States
 
@@ -297,46 +211,47 @@ Errors to draw in the form: 400 Resolving without a resolution note
 |---|---|
 | Loading (`?state=loading`) | The conversation queue list. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the conversation queue untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No conversation queue yet. Offers Add case message (`addCaseMessage`); distinct from a filter that matched nothing. |
+| Empty, first run (`?state=emptyFirstRun`) | No conversation queue yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on status, assignedToPrincipalId, breachedSla, priority and the conversation queue are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `CASE_VIEW`, which `listCases` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `CASE_VIEW`, which `listConversations` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 400 Resolving without a resolution note; 409 Already claimed by another agent; 409 The case is not `resolved` — a `closed` case is past its reopen window, and an open one has nothing to reopen. (StateTransitionProblem) |
+| Validation and conflict | the form keeps what was entered and marks the problem: 409 Already claimed by another agent |
+
+#### Consistency with other screens
+
+- Match `BO-795`: Same inbox.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+rows:
+- '{channel: WhatsApp, guest: Priya Nair, state: queued, wait: 48s, summary: Wants to move Day Pass to Sunday}'
+- '{channel: Web chat, guest: Unknown visitor, state: with assistant, summary: Asking about prayer rooms}'
+```
 
 #### Permissions
 
-- `listCases` → `CASE_VIEW` (read) · staff, guest, partner
-- `addCaseMessage` → `CASE_MANAGE` (configure) · staff, partner
-- `createCase` → `CASE_MANAGE` (configure) · staff, guest, partner
-- `escalateCase` → `CASE_MANAGE` (configure) · staff, partner
-- `getCase` → `CASE_VIEW` (read) · staff, partner
-- `reopenCase` → `CASE_MANAGE` (configure) · staff, partner
-- `updateCase` → `CASE_MANAGE` (configure) · staff, partner
 - `listConversations` → `CASE_VIEW` (read) · staff
 - `claimConversation` → `CASE_MANAGE` (configure) · staff
 - `transferConversation` → `CASE_MANAGE` (configure) · staff
 
-**A refused user sees:** Shown when the caller lacks `CASE_VIEW`, which `listCases` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `CASE_VIEW`, which `listConversations` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
 #### Requirements it meets
 
-20 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+7 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
 
 | Ref | Requirement (shortened) | Domain | Verdict | Via |
 |---|---|---|---|---|
-| 22.2.17 | Case & Support History | Marketing & CRM | CONTRACTED | `listCases` |
-| 22.3.7 | Agent Notes & Attachments | Marketing & CRM | CONTRACTED | `addCaseMessage` |
-| 19.2.66 | Guest Support - System shall provide guest support channels. | Guest Mobile App & Branding | CONTRACTED | `createCase` |
-| 19.2.70 | Complaint Management - System shall support guest complaints. | Guest Mobile App & Branding | CONTRACTED | `createCase` |
-| 2.8.12 | System shall allow agents to create, assign, escalate, track, and resolve guest cases including complaints, refund requests, service requests, incidents, and operational issues. Cases shall be linked … | Ticketing Sales | CONTRACTED | `createCase` |
-| 5.3.34 | Link guest profiles with customer service cases, complaints, incidents, refunds, investigations, and follow-up activities. | F&B & Guest Management | CONTRACTED | `createCase` |
-| 22.3.1 | Case Creation | Marketing & CRM | CONTRACTED | `createCase` |
-| 22.3.2 | Case Classification | Marketing & CRM | CONTRACTED | `createCase` |
-| 22.3.3 | Case Assignment | Marketing & CRM | CONTRACTED | `createCase` |
-| 22.8.12 | Case Creation & Escalation | Marketing & CRM | CONTRACTED | `createCase` |
-| 22.3.6 | Case Escalation Management | Marketing & CRM | CONTRACTED | `escalateCase` |
-| 22.3.10 | Case Audit Trail | Marketing & CRM | CONTRACTED | `getCase` |
-| … 8 more | | | | `traceability.json` |
+| 22.8.1 | Omnichannel Inbox | Marketing & CRM | CONTRACTED | `listConversations` |
+| 22.8.6 | Agent Workspace | Marketing & CRM | CONTRACTED | `claimConversation` |
+| 22.8.17 | Conversation Routing | Marketing & CRM | CONTRACTED | `claimConversation` |
+| 22.8.18 | Queue Management | Marketing & CRM | CONTRACTED | `claimConversation` |
+| 2.8.11 | System shall support integration with telephony platforms such as Genesys, Avaya, Amazon Connect, Microsoft Teams, 3CX, or equivalent solutions. Features shall include click-to-call, caller … | Ticketing Sales | CONTRACTED | data `Conversation` |
+| 2.13.20 | Users “staff-assist” screen to create, change, or resend tickets on behalf of guests—linked to CRM case ID for traceability | Ticketing Sales | CONTRACTED | data `Conversation` |
+| 22.8.16 | AI Sentiment Analysis | Marketing & CRM | CONTRACTED | data `Conversation` |
 
 #### Client meeting inputs
 
@@ -358,17 +273,16 @@ Also apply: 7 for all of P12, 29 for every app (section *Design inputs from the 
 #### References
 
 - Wireframe frame: `wireframes/P12 Venue Support.dc.html#sup-004` · status **notStarted** · provenance generated
-- Flow F05 *Agent resolves a guest complaint*, step 1: Picks up the case → Sees SLA state and priority, breached first
 - Flow F24 *A guest asks the assistant and ends up with a person*, step 3: The conversation appears in the queue → With the assistant’s own summary, so the agent opens with context
 - Flow F24 branch at step 3 (recoverable): when Two agents claim it at once, `claimConversation` refuses the second. **Two agents answering one guest reads as chaos** from the guest’s side and is common on a busy queue.
 - Flow F24 branch at step 3 (abandonsFlow): when Nobody claims it before the guest gives up, `abandoned` from `queued` — **the number to watch.** A guest who asked for a person and left before getting one is a staffing failure, and it looks identical to a resolved conversation in any report …
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (35), with its required mark, default, format and its error state (400, 404, 409).
-- [ ] Every output is drawn (56 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (3), with its required mark, default, format and its error state (409).
+- [ ] Every output is drawn (12 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#SUP-004?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: Add case message, Create case, Escalate case, Reopen case, Save case, Claim conversation, Transfer conversation.
+- [ ] Every action is wired with its success and its failure: Claim conversation, Transfer conversation.
 - [ ] Every transition is wired: `SUP-001`, `SUP-002`, `SUP-005`.
 - [ ] Every gated control is gated: `CASE_MANAGE`, `CASE_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
@@ -378,7 +292,7 @@ Also apply: 7 for all of P12, 29 for every app (section *Design inputs from the 
 
 ### `SUP-005` Live Chat Workspace
 
-**Work with live chat workspace for this venue.**
+**Serve one live conversation to its end, with the guest's case beside it.**
 
 | | |
 |---|---|
@@ -393,6 +307,10 @@ Also apply: 7 for all of P12, 29 for every app (section *Design inputs from the 
 | Route | `/general/live-chat-workspace` |
 
 **What the spec says about it.** States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived from the screen name and its operations on 17 August, not from a requirement. Pulled to Wave 2 (CF-101) with SUP-004. An agent needs a queue and a place to answer from; canned responses and SLA reporting can wait.
+
+**From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** The live chat with a guest: the whole thread (it came with the handover), guest context, composer with rich messages, and the case beside it. Internal notes and guest replies are distinct and the choice is required. Closing records an outcome that tells resolved from abandoned from a case raised.
+
+**Fixed on main** (the package already carries these; draw what it says): Purpose is "Work with live chat workspace for this venue" and the case filters appear as text fields. (CHG-WIR-006).
 
 #### Inputs: what the user enters or picks
 
@@ -603,6 +521,12 @@ Errors to draw in the form: 409 The case is not `resolved` — a `closed` case i
 | Close conversation (destructive button) | `closeConversation` POST `/conversations/{conversationId}/close` | inline | Conversation | — | — |
 | Transfer conversation (secondary button) | `transferConversation` POST `/conversations/{conversationId}/transfer` | inline | Conversation | — | opens modal first |
 
+**What each action does** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
+
+- **Send**: As the agent; a note is visibly internal. *(source: contracts/satellite/marketing-crm.yaml#sendConversationMessage; F05 step 2)*
+- **Close**: Resolved, abandoned by the guest, or timed out, never merged into one number; or Raise case, which names the case. *(source: contracts/satellite/marketing-crm.yaml#closeConversation; F24 step 5)*
+- **Resolve case**: Requires a resolution note. *(source: F05 step 3)*
+
 **Data it reads**: `getCase` (onLoad, Case with its thread); `listCases` (onLoad, List service cases); `getConversation` (onLoad, One conversation and everything before it)
 
 **Where the user goes next**
@@ -625,6 +549,22 @@ Errors to draw in the form: 409 The case is not `resolved` — a `closed` case i
 | Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `CASE_VIEW`, which `getCase` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Resolving without a resolution note; 409 The case is not `resolved` — a `closed` case is past its reopen window, and an open one has nothing to reopen. (StateTransitionProblem) |
+
+#### Edge cases to draw
+
+- **The guest asks for a refund**: The agent raises a refund request; above the venue threshold it goes to approval. Never a direct refund. *(source: F05 step 2)*
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+thread:
+- 'Guest (WhatsApp, 10:41): Can I move my Day Pass to Sunday?'
+- 'Assistant (10:41): Let me get a colleague.'
+- '"Aisha (10:42): Hi Priya'
+- yes - Sunday 4 Oct is available at no charge."
+```
 
 #### Permissions
 
@@ -677,6 +617,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### References
 
 - Wireframe frame: `wireframes/P12 Venue Support.dc.html#sup-005` · status **notStarted** · provenance generated
+- Flow F05 *Agent resolves a guest complaint*, step 1: Picks up the case → Sees SLA state and priority, breached first
 - Flow F05 *Agent resolves a guest complaint*, step 2: Reads the history and replies → Internal notes and guest replies are distinct, and the distinction is required rather than defaulted
 - Flow F05 *Agent resolves a guest complaint*, step 3: Resolves or escalates → Resolution requires a note. A case closed with no findings is a lesson nobody learned
 - Flow F24 *A guest asks the assistant and ends up with a person*, step 4: The agent answers → **The guest has not repeated themselves.** The whole thread came with the handover
@@ -696,6 +637,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `SUP-001`, `SUP-002`.
 - [ ] Every gated control is gated: `CASE_MANAGE`, `CASE_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 1 edge case(s) from the process notes are drawn.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---

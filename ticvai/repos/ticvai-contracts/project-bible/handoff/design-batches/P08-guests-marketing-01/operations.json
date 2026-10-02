@@ -37,6 +37,19 @@
   "requestBody": "CreateCampaignRequest",
   "responds": "Campaign"
  },
+ "getAiByokEnablement": {
+  "method": "GET",
+  "path": "/tenants/{tenantId}/byok",
+  "contract": "ai",
+  "summary": "Whether a tenant may bring its own key",
+  "permission": "AI_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "AiByokEnablement"
+ },
  "getAiPolicy": {
   "method": "GET",
   "path": "/policy",
@@ -55,6 +68,19 @@
   ],
   "requestBody": null,
   "responds": "AiPolicy"
+ },
+ "getAiSpendCeiling": {
+  "method": "GET",
+  "path": "/policy/spend-ceiling",
+  "contract": "ai",
+  "summary": "The AI spend ceiling, in money",
+  "permission": "AI_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "AiSpendCeiling"
  },
  "getAiUsage": {
   "method": "GET",
@@ -153,10 +179,28 @@
     "name": "groupBy",
     "in": "query",
     "required": null
+   },
+   {
+    "name": "module",
+    "in": "query",
+    "required": null
    }
   ],
   "requestBody": null,
   "responds": "KpiValue"
+ },
+ "getLostItemMatches": {
+  "method": "GET",
+  "path": "/lost-items/{itemId}/matches",
+  "contract": "marketing-crm",
+  "summary": "Candidate matches, scored",
+  "permission": "CASE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "LostItemMatch"
  },
  "getVenueSettings": {
   "method": "GET",
@@ -380,6 +424,45 @@
   "requestBody": null,
   "responds": "Page"
  },
+ "listOrgUnits": {
+  "method": "GET",
+  "path": "/org-units",
+  "contract": "tenancy",
+  "summary": "List scope nodes visible to the session",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "under",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "level",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "includeInactive",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "listPlatformStaffGrants": {
   "method": "GET",
   "path": "/platform-staff-grants",
@@ -392,6 +475,40 @@
   "parameters": [
    {
     "name": "activeOnly",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listWorkstations": {
+  "method": "GET",
+  "path": "/workstations",
+  "contract": "tenancy",
+  "summary": "List workstations",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "saleBoardKind",
     "in": "query",
     "required": null
    },
@@ -447,25 +564,6 @@
   "requestBody": "LostItem",
   "responds": "LostItem"
  },
- "resolvePermissions": {
-  "method": "POST",
-  "path": "/permissions/resolve",
-  "contract": "identity",
-  "summary": "Simulate a principal's effective permissions",
-  "permission": "PERMISSION_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": null
- },
  "setAiPolicy": {
   "method": "PUT",
   "path": "/policy",
@@ -484,5 +582,24 @@
   ],
   "requestBody": "AiPolicy",
   "responds": "AiPolicy"
+ },
+ "setAiSpendCeiling": {
+  "method": "PUT",
+  "path": "/policy/spend-ceiling",
+  "contract": "ai",
+  "summary": "Set the AI spend ceiling, in money",
+  "permission": "AI_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AiSpendCeiling",
+  "responds": "AiSpendCeiling"
  }
 }

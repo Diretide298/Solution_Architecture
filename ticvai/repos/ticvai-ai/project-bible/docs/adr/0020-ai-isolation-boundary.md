@@ -1,6 +1,6 @@
 # ADR-0020 — Where AI runs, and what it is isolated from
 
-**Status:** Accepted · 30 September 2026 · Chinmay Parab — amended by [ADR-0049](0049-vectors-live-in-qdrant-one-collection-per-tenant.md): Qdrant per tenant on every tier (a collection and a scoped token per tenant); the analytical store is the AI log database. Proposed 17 August 2026
+**Status:** Accepted · 30 September 2026 · Chinmay Parab — amended by [ADR-0049](0049-vectors-live-in-qdrant-one-collection-per-tenant.md): Qdrant per tenant on every tier (a collection and a scoped token per tenant); the analytical store is the AI log database. Proposed 17 August 2026 · section 2 amended 2 October 2026 (Chinmay): **every LLM call is scrubbed offline first, and an in-cell guard model reads both ways**, whatever the tenant's residency class
 **Relates to:** ADR-0001 (cells — **superseded in part by ADR-0014**), ADR-0009 (residency),
 ADR-0016 (read routing), CF-64 (retention)
 
@@ -43,6 +43,42 @@ whatever they typed. Putting it beside `pii.subject` is defensible; putting it t
 
 ---
 
+## Amended 2 October 2026: mandatory offline scrubbing, and a guard model both ways
+
+**Decided by Chinmay, 2 October 2026:** *"we may need to scrub personal info no matter what: an offline
+NLP-based scrubber or censorship"* (DEC-542 and DEC-543 in `docs/registers/decisions-2-october.md`; change
+entry CHG-DOC-005). Research: `docs/active/research/ai-ml-model-selection-2-october.md`, tasks T12 and T13.
+
+Section 2 said the prompt is the only thing that leaves, governed by `ai.policy.maskedFields`. Masking by
+field covers the data the platform puts in a prompt; it does not cover what a guest or a member of staff
+types (a phone number in a question, an Emirates ID pasted into a chat). So, **for every LLM call, whatever
+the tenant's residency class** (ADR-0009, amended the same day):
+
+1. **Detection, offline, inside the cell.** Microsoft Presidio, with custom recognisers for Emirates ID
+   numbers, UAE phone numbers, passport numbers, IBANs, Luhn-checked card numbers and email addresses, plus
+   an Arabic named-entity model (for example CAMeL Tools) for Arabic names and places. Field masking from
+   the schema (`maskedFields`) stays the first control; the scrubber is the second, for free text.
+2. **Reversible placeholders.** Detected values are replaced by placeholders (`[GUEST_1]`, `[PHONE_1]`).
+   The map from placeholder to value stays in the cell and never travels with the prompt; the reply is
+   re-filled before it reaches the user.
+3. **A guard model on input and output.** An offline guard model, **Qwen3Guard** (it covers Arabic; Azure
+   AI Content Safety's harm models were not trained on Arabic), checks the prompt before it leaves and the
+   answer before it is shown (the streaming variant for streamed answers).
+4. **Mandatory, not tied to residency.** A UAE-only tenant is scrubbed as well: in-country inference
+   changes where the data goes, not whether the model should see it. A scrubbed prompt is still
+   pseudonymised personal data under PDPL, so scrubbing reduces the transfer, it does not remove the
+   transfer duties of ADR-0009 section 3.
+5. **Fails closed.** If the scrubber or the guard is unavailable, the call is refused, exactly as an unset
+   masking list sends nothing rather than everything. No LLM call is made around them.
+
+**What proves it** (the prevention, CHG-DOC-005, open until it exists): a gateway test corpus in Arabic and
+English with Emirates IDs, phone numbers, IBANs and card numbers, in which no raw value may appear in an
+outbound prompt, and a test that a scrubber or guard outage refuses the call. The AI gateway contract
+(`contracts/satellite/ai.yaml`) states scrubbing as mandatory, and the gateway task carries the scrubber and
+the guard; both are owned outside this ADR.
+
+---
+
 ## Amended 30 September 2026
 
 **Accepted with two corrections from ADR-0049** (and the AI system design, section 8):
@@ -79,7 +115,9 @@ is a residency boundary here and not a tenant one. ADR-0021 carries the tenant b
 
 The provider is called from inside the cell. **What crosses a border is the prompt and the
 retrieved context, never the store**, and `ai.policy.maskedFields` is what governs it — failing
-closed, so an unset masking list sends nothing rather than everything.
+closed, so an unset masking list sends nothing rather than everything. *(Amended 2 October 2026:
+every prompt is also scrubbed offline and checked by an in-cell guard model, both failing closed; see
+the amendment above.)*
 
 `x-ticvai-scope-level: region` on `setAiProvider` is what makes this enforceable: which
 providers a region may use is a residency decision, and a region with no adequacy finding gets a

@@ -76,6 +76,59 @@
   "requestBody": null,
   "responds": "Wallet"
  },
+ "listGameplayTransactions": {
+  "method": "GET",
+  "path": "/gameplay-transactions",
+  "contract": "games",
+  "summary": "Taps, decisions and what they cost",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "readerId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "outcome",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "GameplayTransaction"
+ },
+ "listGames": {
+  "method": "GET",
+  "path": "/games",
+  "contract": "games",
+  "summary": "List games",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Game"
+ },
  "listPrizes": {
   "method": "GET",
   "path": "/prizes",
@@ -110,12 +163,36 @@
   "requestBody": null,
   "responds": "Page"
  },
- "listRedemption": {
+ "listReaders": {
   "method": "GET",
-  "path": "/redemption",
-  "contract": "promotions",
-  "summary": "Redemption Analytics, Audit & AI Optimization",
-  "permission": "PRICE_VIEW",
+  "path": "/readers",
+  "contract": "games",
+  "summary": "Readers, their attractions and their health",
+  "permission": "DEVICE_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Reader"
+ },
+ "listWalletTransactions": {
+  "method": "GET",
+  "path": "/wallets/{subjectId}/transactions",
+  "contract": "wallet",
+  "summary": "Wallet transaction history",
+  "permission": "WALLET_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
@@ -126,48 +203,18 @@
     "required": null
    },
    {
-    "name": "campaign",
-    "in": "query",
-    "required": false
+    "name": null,
+    "in": null,
+    "required": null
    },
    {
-    "name": "code",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "batch",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "product",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "venue",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "channel",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "customerSegment",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "partner",
-    "in": "query",
-    "required": false
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
-  "responds": "RedemptionAnalyticsAuditAiOptimizationView"
+  "responds": "Page"
  },
  "lookupPrize": {
   "method": "GET",
@@ -211,6 +258,25 @@
   ],
   "requestBody": null,
   "responds": "PrizeRedemption"
+ },
+ "setGamePricing": {
+  "method": "PUT",
+  "path": "/game-pricing",
+  "contract": "games",
+  "summary": "Standard, group, peak, VIP, retry and calendar prices",
+  "permission": "PRICE_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "GamePricing",
+  "responds": "GamePricing"
  },
  "setPrizeCost": {
   "method": "PUT",

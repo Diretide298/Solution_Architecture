@@ -1,23 +1,4 @@
 {
- "applyManualDiscount": {
-  "method": "POST",
-  "path": "/orders/{orderId}/discounts",
-  "contract": "orders",
-  "summary": "Apply a discount a cashier chose",
-  "permission": "ORDER_DISCOUNT",
-  "offlineCapable": true,
-  "conflictPolicy": "append",
-  "scopeLevel": "workstation",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "ManualDiscountRequest",
-  "responds": "Order"
- },
  "createOrder": {
   "method": "POST",
   "path": "/orders",
@@ -185,6 +166,21 @@
     "required": null
    },
    {
+    "name": "workstationId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "subjectId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "tender",
+    "in": "query",
+    "required": null
+   },
+   {
     "name": null,
     "in": null,
     "required": null
@@ -216,25 +212,6 @@
   ],
   "requestBody": "ModifyOrderRequest",
   "responds": "OrderModificationResult"
- },
- "overrideCreditLimit": {
-  "method": "POST",
-  "path": "/b2b-accounts/{accountId}/credit/override",
-  "contract": "orders",
-  "summary": "Authorise an order beyond the credit limit",
-  "permission": "CREDIT_OVERRIDE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "CreditPosition"
  },
  "reprintOrder": {
   "method": "POST",
@@ -292,48 +269,5 @@
   ],
   "requestBody": null,
   "responds": "OrderResumeResult"
- },
- "setB2bCreditLimit": {
-  "method": "PUT",
-  "path": "/b2b-accounts/{accountId}/credit",
-  "contract": "orders",
-  "summary": "Set a partner credit limit",
-  "permission": "CREDIT_MANAGE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "CreditPosition"
- },
- "voidOrder": {
-  "method": "POST",
-  "path": "/orders/{orderId}/voids",
-  "contract": "orders",
-  "summary": "Void an order",
-  "permission": "ORDER_VOID",
-  "offlineCapable": true,
-  "conflictPolicy": "append",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Order"
  }
 }

@@ -143,6 +143,116 @@
    }
   }
  },
+ "EvaluatePromotionsRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "venueId",
+   "channel",
+   "lines"
+  ],
+  "properties": {
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "channel": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/SalesChannel"
+     }
+    ],
+    "description": "Where the sale is being made. Matched against `PromotionConditions.channels`, so both sides use the one shared vocabulary.\n"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "membershipTierId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "couponCodes": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "evaluateAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "For back-office testing of a rule before publishing."
+   },
+   "orderId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The order (`orders.sales_order`) being priced for payment. Sent only by the order service when it confirms an order; when present the evaluation writes one `promotions.promotion_evaluation_trace` row for it. (decided 29 September, writers pass)"
+   },
+   "lines": {
+    "type": "array",
+    "minItems": 1,
+    "items": {
+     "type": "object",
+     "required": [
+      "lineId",
+      "variantId",
+      "quantity",
+      "unitPrice"
+     ],
+     "properties": {
+      "lineId": {
+       "type": "string"
+      },
+      "variantId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "performanceId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "quantity": {
+       "type": "integer",
+       "minimum": 1
+      },
+      "unitPrice": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      }
+     }
+    }
+   }
+  }
+ },
+ "Money": {
+  "type": "object",
+  "x-ticvai-persistence-kind": "valueObject",
+  "x-ticvai-persistence-column": "numeric(18,4)",
+  "description": "**On the wire this is three fields; in the database it is one column.**\n24 August. Every column typed `Money` was landing as `jsonb` — 129 of them, including `orders.shift.opening_float`, `inventory.purchase_order.total` and `promotions.voucher.balance`. **`orders.cash_movement.amount` was `numeric(18,4)` because somebody hand-typed that one**, and the inconsistency is what made it visible.\n**A jsonb price cannot be summed in SQL.** Every total, variance and reconciliation moves into application code — and a shift variance computed in .NET against a ledger computed in Postgres is two answers to one question. That is F13 month-end and F98 takings-to-ledger, both walked, both assuming the arithmetic is in the database.\n**`currency` and `scale` are not stored per row.** ADR-0018 makes them region-scoped and not overridable below, so they resolve from the scope walk — storing AED against nine million rows in a UAE region is nine million copies of a fact that cannot differ. A row that needed its own currency would be a row in the wrong region.\n**They stay on the wire** because a client reading a figure should not have to walk a hierarchy to know what it means.\n",
+  "required": [
+   "amount",
+   "currency",
+   "scale"
+  ],
+  "properties": {
+   "amount": {
+    "type": "string",
+    "description": "Decimal string, never a float. Up to 4 decimal places. **Persisted as `numeric(18,4)`** — the string is a transport choice, so a JavaScript client cannot round a fare in transit.\n",
+    "pattern": "^-?\\d+(\\.\\d{1,4})?$"
+   },
+   "currency": {
+    "type": "string",
+    "description": "**Resolved from the region, not stored on the row** (ADR-0018). OMR uses 3 decimal places and AED uses 2 — a venue on a different scale from its region is a ledger that cannot consolidate.\n",
+    "pattern": "^[A-Z]{3}$"
+   },
+   "scale": {
+    "type": "integer",
+    "description": "Resolved from the region alongside `currency`.",
+    "minimum": 0,
+    "maximum": 4
+   }
+  }
+ },
  "PaymentMethodBankPartnerDiscountRulesView": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
@@ -285,179 +395,117 @@
    }
   }
  },
- "PromotionRuleBuilderInput": {
+ "PromotionEvaluation": {
+  "x-ticvai-persistence": "none — computed",
   "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; saved as a `promotions.promotion_rule` row (PromotionRule, ruleType benefit) (DM5, 29 September: data model for the agreed operations)",
-  "description": "**What Promotion Rule Builder submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "required": [
+   "totalDiscount",
+   "lines",
+   "applied",
+   "rejected"
+  ],
   "properties": {
-   "ruleName": {
-    "type": "string",
-    "description": "Rule name"
+   "totalDiscount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
-   "ruleId": {
-    "type": "string",
-    "description": "Rule ID"
+   "lines": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "lineId",
+      "originalPrice",
+      "discountedPrice",
+      "discount"
+     ],
+     "properties": {
+      "lineId": {
+       "type": "string"
+      },
+      "originalPrice": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "discountedPrice": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "discount": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "appliedPromotionIds": {
+       "type": "array",
+       "items": {
+        "type": "string",
+        "format": "uuid"
+       }
+      }
+     }
+    }
    },
-   "promotion": {
-    "type": "string",
-    "description": "Promotion"
+   "applied": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "promotionId",
+      "promotionCode",
+      "discount"
+     ],
+     "properties": {
+      "promotionId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "promotionCode": {
+       "type": "string"
+      },
+      "promotionName": {
+       "type": "string"
+      },
+      "discount": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "couponCode": {
+       "type": "string",
+       "nullable": true
+      }
+     }
+    }
    },
-   "description": {
-    "type": "string",
-    "description": "Description"
-   },
-   "owner": {
-    "type": "string",
-    "description": "Owner"
-   },
-   "businessEntity": {
-    "type": "string",
-    "description": "Business entity"
-   },
-   "venue": {
-    "type": "string",
-    "description": "Venue"
-   },
-   "ruleStatus": {
-    "type": "string",
-    "description": "Rule status"
-   },
-   "priority": {
-    "type": "string",
-    "description": "Priority"
-   },
-   "percentageDiscount": {
-    "type": "number",
-    "description": "Percentage discount"
-   },
-   "fixedDiscount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Fixed discount"
-   },
-   "fixedSellingPrice": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Fixed selling price"
-   },
-   "freeProduct": {
-    "type": "string",
-    "description": "Free product"
-   },
-   "freeTicket": {
-    "type": "string",
-    "description": "Free ticket"
-   },
-   "addedValue": {
-    "type": "string",
-    "description": "Added value"
-   },
-   "voucher": {
-    "type": "string",
-    "description": "Voucher"
-   },
-   "rewardEntitlement": {
-    "type": "string",
-    "description": "Reward entitlement"
-   },
-   "nestedConditionGroups": {
-    "type": "string",
-    "description": "Nested condition groups"
-   },
-   "multipleOutcomes": {
-    "type": "string",
-    "description": "Multiple outcomes"
-   },
-   "ruleOrdering": {
-    "type": "string",
-    "description": "Rule ordering"
-   }
-  }
- },
- "PromotionRuleBuilderView": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
-  "description": "**What Promotion Rule Builder displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
-  "properties": {
-   "ruleName": {
-    "type": "string",
-    "description": "Rule name"
-   },
-   "ruleId": {
-    "type": "string",
-    "description": "Rule ID"
-   },
-   "promotion": {
-    "type": "string",
-    "description": "Promotion"
-   },
-   "description": {
-    "type": "string",
-    "description": "Description"
-   },
-   "owner": {
-    "type": "string",
-    "description": "Owner"
-   },
-   "businessEntity": {
-    "type": "string",
-    "description": "Business entity"
-   },
-   "venue": {
-    "type": "string",
-    "description": "Venue"
-   },
-   "ruleStatus": {
-    "type": "string",
-    "description": "Rule status"
-   },
-   "priority": {
-    "type": "string",
-    "description": "Priority"
-   },
-   "percentageDiscount": {
-    "type": "number",
-    "description": "Percentage discount"
-   },
-   "fixedDiscount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Fixed discount"
-   },
-   "fixedSellingPrice": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Fixed selling price"
-   },
-   "freeProduct": {
-    "type": "string",
-    "description": "Free product"
-   },
-   "freeTicket": {
-    "type": "string",
-    "description": "Free ticket"
-   },
-   "addedValue": {
-    "type": "string",
-    "description": "Added value"
-   },
-   "voucher": {
-    "type": "string",
-    "description": "Voucher"
-   },
-   "rewardEntitlement": {
-    "type": "string",
-    "description": "Reward entitlement"
-   },
-   "nestedConditionGroups": {
-    "type": "string",
-    "description": "Nested condition groups"
-   },
-   "multipleOutcomes": {
-    "type": "string",
-    "description": "Multiple outcomes"
-   },
-   "ruleOrdering": {
-    "type": "string",
-    "description": "Rule ordering"
+   "rejected": {
+    "type": "array",
+    "description": "Promotions that matched the products but did not apply, with the reason. This is what a cashier reads to a guest who expected a discount.\n",
+    "items": {
+     "type": "object",
+     "required": [
+      "promotionCode",
+      "reason"
+     ],
+     "properties": {
+      "promotionCode": {
+       "type": "string"
+      },
+      "promotionName": {
+       "type": "string"
+      },
+      "reason": {
+       "type": "string",
+       "enum": [
+        "conditionsNotMet",
+        "supersededByBetterOffer",
+        "exclusivePromotionApplied",
+        "redemptionLimitReached",
+        "budgetExhausted",
+        "outsideValidPeriod",
+        "wrongChannel",
+        "membershipRequired",
+        "couponRequired"
+       ]
+      },
+      "detail": {
+       "type": "string"
+      }
+     }
+    }
    }
   }
  },
@@ -554,142 +602,6 @@
    "canStack": {
     "type": "boolean",
     "description": "Whether A can stack with B"
-   }
-  }
- },
- "RuleTestSimulationAiRecommendationWorkspaceInput": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table covers these fields** — the closest is promotions.bundle_component at 3%, so this is not an update to anything the package stores today and no new table has been decided",
-  "description": "**What Rule Test, Simulation & AI Recommendation Workspace submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
-  "properties": {
-   "guest": {
-    "type": "string",
-    "description": "Guest"
-   },
-   "segment": {
-    "type": "string",
-    "description": "Segment"
-   },
-   "products": {
-    "type": "string",
-    "description": "Products"
-   },
-   "quantity": {
-    "type": "integer",
-    "description": "Quantity"
-   },
-   "channel": {
-    "type": "string",
-    "description": "Channel"
-   },
-   "date": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Date"
-   },
-   "venue": {
-    "type": "string",
-    "description": "Venue"
-   },
-   "membership": {
-    "type": "string",
-    "description": "Membership"
-   },
-   "loyalty": {
-    "type": "string",
-    "description": "Loyalty"
-   },
-   "paymentType": {
-    "type": "string",
-    "description": "Payment type"
-   },
-   "promoCode": {
-    "type": "string",
-    "description": "Promo code"
-   }
-  }
- },
- "RuleTestSimulationAiRecommendationWorkspaceView": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
-  "description": "**What Rule Test, Simulation & AI Recommendation Workspace displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
-  "properties": {
-   "guest": {
-    "type": "string",
-    "description": "Guest"
-   },
-   "segment": {
-    "type": "string",
-    "description": "Segment"
-   },
-   "products": {
-    "type": "string",
-    "description": "Products"
-   },
-   "quantity": {
-    "type": "integer",
-    "description": "Quantity"
-   },
-   "channel": {
-    "type": "string",
-    "description": "Channel"
-   },
-   "date": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Date"
-   },
-   "venue": {
-    "type": "string",
-    "description": "Venue"
-   },
-   "membership": {
-    "type": "string",
-    "description": "Membership"
-   },
-   "loyalty": {
-    "type": "string",
-    "description": "Loyalty"
-   },
-   "paymentType": {
-    "type": "string",
-    "description": "Payment type"
-   },
-   "promoCode": {
-    "type": "string",
-    "description": "Promo code"
-   },
-   "appliedRules": {
-    "type": "array",
-    "items": {
-     "type": "string"
-    },
-    "description": "Rules that qualified and applied to the sample transaction"
-   },
-   "rejectedRules": {
-    "type": "array",
-    "items": {
-     "type": "string"
-    },
-    "description": "Rules evaluated and not applied, each with its reason"
-   },
-   "discount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Discount granted to the sample transaction"
-   },
-   "finalAmount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Final amount after promotions"
-   },
-   "marginImpact": {
-    "type": "number",
-    "description": "Margin impact of the tested rules, percent"
-   },
-   "aiRecommendation": {
-    "type": "string",
-    "description": "AI recommendation (decision support only; never applied without authorisation)"
    }
   }
  },

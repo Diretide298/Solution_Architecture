@@ -235,7 +235,7 @@
   "states": {
    "loading": "The go-live readiness list.",
    "error": "Could not load. Names which read failed and leaves the go-live readiness untouched.",
-   "emptyFirstRun": "No go-live readiness yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No go-live readiness yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the go-live readiness are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -354,7 +354,7 @@
   "states": {
    "loading": "The automated validation plan list.",
    "error": "Could not load. Names which read failed and leaves the automated validation plan untouched.",
-   "emptyFirstRun": "No automated validation plan yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No automated validation plan yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the automated validation plan are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -476,7 +476,7 @@
   "states": {
    "loading": "The ticketing product validation list.",
    "error": "Could not load. Names which read failed and leaves the ticketing product validation untouched.",
-   "emptyFirstRun": "No ticketing product validation yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No ticketing product validation yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the ticketing product validation are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -598,7 +598,7 @@
   "states": {
    "loading": "The end-to-end sales channel list.",
    "error": "Could not load. Names which read failed and leaves the end-to-end sales channel untouched.",
-   "emptyFirstRun": "No end-to-end sales channel yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No end-to-end sales channel yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the end-to-end sales channel are still there. The pack's own statuses are ✓ Passed — the state names which is selected.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -720,7 +720,7 @@
   "states": {
    "loading": "The payment financial validation list.",
    "error": "Could not load. Names which read failed and leaves the payment financial validation untouched.",
-   "emptyFirstRun": "No payment financial validation yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No payment financial validation yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the payment financial validation are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -842,7 +842,7 @@
   "states": {
    "loading": "The ticket access validation list.",
    "error": "Could not load. Names which read failed and leaves the ticket access validation untouched.",
-   "emptyFirstRun": "No ticket access validation yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No ticket access validation yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the ticket access validation are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -976,7 +976,7 @@
   "states": {
    "loading": "The user security integration list.",
    "error": "Could not load. Names which read failed and leaves the user security integration untouched.",
-   "emptyFirstRun": "No user security integration yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No user security integration yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the user security integration are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -1098,7 +1098,7 @@
   "states": {
    "loading": "The communication customer journey list.",
    "error": "Could not load. Names which read failed and leaves the communication customer journey untouched.",
-   "emptyFirstRun": "No communication customer journey yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No communication customer journey yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the communication customer journey are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -1226,7 +1226,7 @@
   "states": {
    "loading": "The blocker warning resolution configuration as saved.",
    "error": "Could not load. Names which read failed and leaves the blocker warning resolution untouched.",
-   "emptyFirstRun": "No blocker warning resolution configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyFirstRun": "No blocker warning resolution configured yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },
@@ -1442,7 +1442,7 @@
   "states": {
    "loading": "The final go-live approval list.",
    "error": "Could not load. Names which read failed and leaves the final go-live approval untouched.",
-   "emptyFirstRun": "No final go-live approval yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No final go-live approval yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the final go-live approval are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },

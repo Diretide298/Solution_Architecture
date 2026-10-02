@@ -26,7 +26,6 @@ contracts:
 - cross-region
 - identity
 - orders
-- shift
 deployment:
   target: rugged handheld — Android
   distribution: MDM

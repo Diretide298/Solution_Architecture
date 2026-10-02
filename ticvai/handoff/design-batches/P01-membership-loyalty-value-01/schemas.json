@@ -311,6 +311,45 @@
    "transactional"
   ]
  },
+ "ConsentPurposeConfig": {
+  "x-ticvai-persistence": "marketing.consent_purpose + marketing.consent_purpose_channel",
+  "type": "object",
+  "required": [
+   "purpose",
+   "channels",
+   "noticeVersion",
+   "isRequiredForService"
+  ],
+  "properties": {
+   "purpose": {
+    "$ref": "#/components/schemas/ConsentPurpose"
+   },
+   "displayName": {
+    "type": "string"
+   },
+   "description": {
+    "type": "string"
+   },
+   "channels": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/MessageChannel"
+    }
+   },
+   "noticeVersion": {
+    "type": "string",
+    "description": "Current version of the notice. A consent against a superseded version is reported as requiring renewal rather than silently honoured.\n"
+   },
+   "isRequiredForService": {
+    "type": "boolean",
+    "description": "True for transactional. Withdrawing it means the service cannot be delivered, so it is presented differently.\n"
+   },
+   "expiresAfterMonths": {
+    "type": "integer",
+    "nullable": true
+   }
+  }
+ },
  "ConsentSource": {
   "type": "string",
   "enum": [
@@ -1156,13 +1195,13 @@
      "type": "string",
      "format": "uuid"
     },
-    "description": "The reward products, where the reward is not the qualifying product: the free gift of `freeItem`, the \"different product\" of a `buyXGetY` (setGiftFreeProduct, setBuyGetBogo). Absent means the reward is taken from the qualifying lines. (DM5, 29 September: data model for the agreed operations)"
+    "description": "The reward products, where the reward is not the qualifying product: the free gift of `freeItem`, the \"different product\" of a `buyXGetY` (createPromotion; the builders setGiftFreeProduct and setBuyGetBogo were retired in r2, CHG-CLN-001). Absent means the reward is taken from the qualifying lines. (DM5, 29 September: data model for the agreed operations)"
    },
    "maxApplicationsPerBasket": {
     "type": "integer",
     "minimum": 1,
     "nullable": true,
-    "description": "How many times the offer repeats in one basket: the \"maximum repetitions\" of an N-for-X offer (setFixedPriceOffer). Null repeats for every complete set. (DM5, 29 September: data model for the agreed operations)"
+    "description": "How many times the offer repeats in one basket: the \"maximum repetitions\" of an N-for-X offer (createPromotion; setFixedPriceOffer was retired in r2, CHG-CLN-001). Null repeats for every complete set. (DM5, 29 September: data model for the agreed operations)"
    }
   }
  },
@@ -1309,7 +1348,31 @@
      "annualPassCounter",
      "entryGate"
     ],
-    "description": "**`entryGate` is valid for `faceTag` only**, and 3.2.43's omission of it from Face Pass is deliberate: an enduring enrolment is a considered act with consent attached, not something done in a queue. 3.2.44 puts a Face Tag at a gate precisely because it dies the same day.\n"
+    "description": "**`entryGate` is valid for `faceTag` only**, and 3.2.43's omission of it from Face Pass is deliberate: an enduring enrolment is a considered act with consent attached, not something done in a queue. 3.2.44 puts a Face Tag at a gate precisely because it dies the same day.\n**A self-service kiosk enrolment reads `ticketCounter` here** (an on-site enrolment) so the r1 values stand; the precise channel is `enrolmentChannel` (DEC-236; CHG-CSP-021).\n"
+   },
+   "enrolmentChannel": {
+    "type": "string",
+    "readOnly": true,
+    "enum": [
+     "guestApp",
+     "ticketCounter",
+     "annualPassCounter",
+     "selfServiceKiosk",
+     "entryGate"
+    ],
+    "description": "**Where the face was actually captured** (decided 2 October 2026, Chinmay, BO-186; DEC-236; CHG-CSP-021): `source` with `selfServiceKiosk` told apart. `entryGate` for a Face Tag only.\n"
+   },
+   "consentFormId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The venue's consent form the capture was consented on, and its version below (DEC-128; CHG-CSP-018)."
+   },
+   "consentFormVersion": {
+    "type": "integer",
+    "nullable": true,
+    "readOnly": true
    },
    "capturedAt": {
     "type": "string",
@@ -1709,6 +1772,34 @@
    }
   }
  },
+ "LeaderboardEntry": {
+  "x-ticvai-persistence": "none — computed from marketing.loyalty_position",
+  "type": "object",
+  "description": "22.6. **One row of a leaderboard, and deliberately not enough to identify anybody.** There is no `subjectId` here and that is the whole design: a nickname beside a resolvable identifier protects nothing.\n",
+  "required": [
+   "rank",
+   "nickname",
+   "points"
+  ],
+  "properties": {
+   "rank": {
+    "type": "integer",
+    "minimum": 1
+   },
+   "nickname": {
+    "type": "string",
+    "description": "**Always present, and never their real name.** The guest's chosen `leaderboardNickname` where they have set one, and otherwise a generated `Player-4821`.\n**Not nullable, because a rank with no name is a hole on the board.** The first cut of this returned null and left second place reading as a dash, which tells somebody they do not count every time they look — and being on the board is the whole point of the board.\n**Generated from the loyalty position's own id**, not from the subject id and not from a counter: it is stable across months, so the same guest is the same `Player-N` and can be congratulated by it, and it carries nothing — no rank, no join date, and no sequence anybody can count backwards from to learn how many guests a programme has.\n"
+   },
+   "points": {
+    "type": "integer"
+   },
+   "isMe": {
+    "type": "boolean",
+    "default": false,
+    "description": "**How a client highlights the caller's own row without learning who anybody else is.** The alternative — returning identifiers and letting the client match — is the disclosure this schema exists to avoid.\n"
+   }
+  }
+ },
  "LocalisedText": {
   "x-ticvai-persistence": "none — jsonb column",
   "type": "object",
@@ -1859,6 +1950,59 @@
    }
   }
  },
+ "MarketingCustomerBadge": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.customer_badge",
+  "description": "**Taken from the backend workbook, 20 September.** Stores badges actually awarded to customers and the source that generated each award.",
+  "required": [
+   "customerId",
+   "badgeId",
+   "awardedAt",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "customerId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "badgeId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "challengeId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "sourceType": {
+    "type": "string",
+    "maxLength": 30,
+    "nullable": true
+   },
+   "sourceReferenceId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "awardedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "status": {
+    "type": "string",
+    "maxLength": 20
+   }
+  }
+ },
  "MarketingProgrammeTier": {
   "type": "object",
   "x-ticvai-persistence": "marketing.programme_tier",
@@ -1922,6 +2066,60 @@
    "isActive": {
     "type": "boolean",
     "default": true
+   }
+  }
+ },
+ "MarketingReward": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.reward",
+  "description": "**Taken from the backend workbook, 20 September.** Defines a loyalty reward that can be issued to eligible customers.",
+  "required": [
+   "loyaltyProgramId",
+   "code",
+   "name",
+   "type",
+   "isActive"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "loyaltyProgramId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string",
+    "maxLength": 100
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "type": {
+    "type": "string",
+    "maxLength": 30
+   },
+   "productId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "pointsCost": {
+    "type": "number",
+    "nullable": true
+   },
+   "discountValue": {
+    "type": "number",
+    "nullable": true
+   },
+   "validityDays": {
+    "type": "integer",
+    "nullable": true
+   },
+   "isActive": {
+    "type": "boolean"
    }
   }
  },
@@ -2806,7 +3004,7 @@
      "type": "string",
      "format": "uuid"
     },
-    "description": "Reusable eligibility rules (`promotions.promotion_rule` rows of `ruleType: eligibility` with no promotion of their own, saved by setEligibilityRule) that must also hold. Each is evaluated with its own `effect`. (DM5, 29 September: data model for the agreed operations)"
+    "description": "Reusable eligibility rules (`promotions.promotion_rule` rows of `ruleType: eligibility` with no promotion of their own) that must also hold. **Deprecated in r2** (CHG-CLN-001): setEligibilityRule, which saved library rules, was retired (BC-017), so no operation creates one; send the conditions inline. Rules already saved still apply. Each is evaluated with its own `effect`. (DM5, 29 September: data model for the agreed operations)"
    }
   }
  },

@@ -115,7 +115,7 @@
    {
     "operationId": "getVisitPlan",
     "contract": "venue-map",
-    "purpose": "The plan: days, timed items and add-on suggestions, at its current version",
+    "purpose": "The plan: days, timed items and add-on suggestions, at its current version Only when signed in (decided 2 October 2026 by Chinmay, fix before Block A starts (GFIX-6)).",
     "trigger": "onLoad",
     "provenance": "decided 29 September 2026, MOB-6"
    },
@@ -244,101 +244,31 @@
      "slot": "collection",
      "components": [
       {
-       "kind": "textField",
-       "label": "Status",
-       "operation": "listCases",
-       "notes": "Sends `?status=` to `listCases`.",
-       "provenance": "contract marketing-crm.yaml GET /cases"
-      },
-      {
-       "kind": "textField",
-       "label": "Assigned to principal id",
-       "operation": "listCases",
-       "notes": "Sends `?assignedToPrincipalId=` to `listCases`.",
-       "provenance": "contract marketing-crm.yaml GET /cases"
-      },
-      {
-       "kind": "toggle",
-       "label": "Breached sla",
-       "operation": "listCases",
-       "notes": "Sends `?breachedSla=` to `listCases`.",
-       "provenance": "contract marketing-crm.yaml GET /cases"
-      },
-      {
-       "kind": "textField",
-       "label": "Priority",
-       "operation": "listCases",
-       "notes": "Sends `?priority=` to `listCases`.",
-       "provenance": "contract marketing-crm.yaml GET /cases"
-      },
-      {
-       "kind": "dataTable",
-       "label": "Every case",
+       "kind": "cardList",
+       "label": "My cases",
        "bindsTo": "Case",
        "columns": [
-        "Case.id",
         "Case.caseNumber",
-        "Case.subjectId",
-        "Case.guestName",
         "Case.subject",
-        "Case.categoryId",
         "Case.status",
-        "Case.priority",
-        "Case.assignedToPrincipalId",
-        "Case.venueId",
-        "Case.relatedOrderId",
-        "Case.slaDueAt"
+        "Case.createdAt",
+        "Case.resolvedAt"
        ],
-       "operation": "listCases",
-       "provenance": "contract marketing-crm.yaml GET /cases"
+       "operation": "listMyCases",
+       "notes": "The guest's own cases (R148); no staff filters, assignee or SLA.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)"
       },
       {
-       "kind": "dataTable",
-       "label": "Every AI conversation",
+       "kind": "cardList",
+       "label": "My conversations with Sahli",
        "bindsTo": "AiConversation",
        "columns": [
-        "AiConversation.id",
-        "AiConversation.principalId",
-        "AiConversation.scopePath",
-        "AiConversation.module",
-        "AiConversation.locale",
-        "AiConversation.messageCount",
         "AiConversation.startedAt",
         "AiConversation.lastMessageAt"
        ],
        "operation": "listAiConversations",
-       "provenance": "contract ai.yaml GET /conversations"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected case",
-       "bindsTo": "Case",
-       "columns": [
-        "Case.id",
-        "Case.caseNumber",
-        "Case.subjectId",
-        "Case.guestName",
-        "Case.subject",
-        "Case.categoryId",
-        "Case.status",
-        "Case.priority",
-        "Case.assignedToPrincipalId",
-        "Case.venueId",
-        "Case.relatedOrderId",
-        "Case.slaDueAt",
-        "Case.isSlaBreached",
-        "Case.slaPausedSeconds",
-        "Case.escalationCount",
-        "Case.resolvedAt"
-       ],
-       "operation": "listCases",
-       "provenance": "contract marketing-crm.yaml GET /cases"
+       "notes": "The guest's own earlier assistant conversations, so a question already asked is not raised again as a case.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)"
       }
      ]
     },
@@ -348,9 +278,15 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Create case",
-       "operation": "createCase",
-       "provenance": "contract marketing-crm.yaml POST /cases"
+       "label": "Ask for help",
+       "operation": "raiseMyCase",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Reply",
+       "operation": "replyToMyCase",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)"
       }
      ]
     }
@@ -360,32 +296,33 @@
    "loading": "Content loads.",
    "error": "Could not load. **Says what failed and offers one way onward**, never a bare failure.",
    "emptyFirstRun": "**No cases open.** The concierge sits here too — most questions never become a case, and that is the intent.",
-   "emptyNoResults": "**Nothing here yet.** The scope is what narrowed it — naming the scope is what stops somebody concluding the record does not exist.",
-   "emptyNoAccess": "Shown when the caller lacks `CASE_VIEW`, which `listCases` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** Cases already loaded stay read-only with their age, so a guest can see what they raised without believing a reply arrived. **Raising a case and replying are disabled offline** — both need the connection (decided 28 September, audit R148) — and the screen says how to reach staff in person instead: the guest services desk, or any member of staff."
   },
   "apis": [
-   {
-    "operationId": "createCase",
-    "contract": "marketing-crm",
-    "purpose": "Raise a service case",
-    "trigger": "onAction",
-    "offline": false,
-    "invalidates": [
-     "listCases"
-    ]
-   },
-   {
-    "operationId": "listCases",
-    "contract": "marketing-crm",
-    "purpose": "List service cases",
-    "trigger": "onLoad"
-   },
    {
     "operationId": "listAiConversations",
     "contract": "ai",
     "purpose": "A principal's conversation history",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listMyCases",
+    "contract": "marketing-crm",
+    "purpose": "The cases this guest raised",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "raiseMyCase",
+    "contract": "marketing-crm",
+    "purpose": "Raise a case as the guest",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "replyToMyCase",
+    "contract": "marketing-crm",
+    "purpose": "Reply on a case the guest raised",
+    "trigger": "onAction"
    }
   ],
   "entryState": {
@@ -393,6 +330,10 @@
     {
      "name": "subjectId",
      "from": "session"
+    },
+    {
+     "name": "caseId",
+     "from": "navigation"
     }
    ],
    "coldEntry": "**Resolves from the session.** A guest arriving cold is asked to sign in and returned here afterwards — never a 404, and never a screen that silently shows somebody else's data (ADR-0030).",
@@ -420,33 +361,32 @@
   "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "overlays": [
    {
-    "id": "formCreateCase",
+    "id": "formRaiseMyCase",
     "component": "modal",
-    "trigger": "Create case",
-    "body": "**Collects what `createCase` sends before it is called.** Required: `id`, `subject`, `description`, `channel`, `recordedAt`. Optional: `subjectId`, `categoryId`, `priority`, `kind`, `venueId`, `relatedOrderId`, `attachmentRefs`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "CreateCaseRequest",
+    "trigger": "Ask for help",
+    "body": "What it is about (lost property, a complaint, a question), a short summary and the detail; optionally the visit or order it concerns, chosen from the guest's own. Nothing else is asked.",
     "confirm": {
-     "label": "Create case",
-     "operation": "createCase"
+     "label": "Ask for help",
+     "operation": "raiseMyCase"
     },
     "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "id",
-      "subject",
-      "description",
-      "channel",
-      "recordedAt",
-      "subjectId",
-      "categoryId",
-      "priority",
-      "kind",
-      "venueId",
-      "relatedOrderId",
-      "attachmentRefs"
-     ]
+     "label": "Cancel"
     },
-    "provenance": "client-verified"
+    "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)"
+   },
+   {
+    "id": "formReplyToMyCase",
+    "component": "modal",
+    "trigger": "Reply",
+    "body": "The reply text, added to the case thread the guest raised.",
+    "confirm": {
+     "label": "Reply",
+     "operation": "replyToMyCase"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)"
    }
   ],
   "_platform": {

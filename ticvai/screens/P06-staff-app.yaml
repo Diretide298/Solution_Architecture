@@ -511,16 +511,17 @@ screens:
         so the edge carries nothing and EMP-052 opens cold
     - to: EMP-053
       trigger: Table & Seating Configuration
-      provenance: derived — EMP-053 declares entryState.params outletId, tableId and EMP-003 holds none
-        of them, so the edge carries nothing and EMP-053 opens cold
+      provenance: derived — EMP-053 declares entryState.params outletId and EMP-003 holds none of them,
+        so the edge carries nothing and EMP-053 opens cold
     - to: EMP-054
       trigger: Reservation Calendar & Timeline
       provenance: 'derived — EMP-054 declares entryState.params  and EMP-003 holds none of them. The edge
         carries nothing: EMP-054 needs nothing to open'
     - to: EMP-055
       trigger: Create / Edit Reservation
-      provenance: 'derived — EMP-055 declares entryState.params  and EMP-003 holds none of them. The edge
-        carries nothing: EMP-055 needs nothing to open'
+      provenance: 'derived — EMP-055 declares entryState.params outletId, reservationId and EMP-003 holds
+        none of them. The edge carries nothing: EMP-055 finds reservationId (createTableReservationForGuest),
+        outletId (getFnbReservationPolicy) itself, and EMP-055 opens on its own'
     - to: EMP-056
       trigger: Walk-In & Waitlist Management
       provenance: 'derived — EMP-056 declares entryState.params entryId and EMP-003 holds none of them.
@@ -533,10 +534,9 @@ screens:
         own'
     - to: EMP-058
       trigger: Live Table & Service Management
-      provenance: 'derived — EMP-058 declares entryState.params entryId, reservationId, ticketId, visitId
-        and EMP-003 holds none of them. The edge carries nothing: reservationId, entryId, ticketId only
-        pre-select (deep link or optional); EMP-058 finds visitId (openTableVisit) itself, and EMP-058
-        opens on its own'
+      provenance: 'derived — EMP-058 declares entryState.params reservationId, ticketId, visitId and EMP-003
+        holds none of them. The edge carries nothing: reservationId, ticketId only pre-select (deep link
+        or optional); EMP-058 finds visitId (openTableVisit) itself, and EMP-058 opens on its own'
     - to: EMP-059
       trigger: Table Order, Bill & Payment Management
       provenance: derived — EMP-059 declares entryState.params visitId and EMP-003 holds none of them,
@@ -554,9 +554,9 @@ screens:
         edge)'
     - to: EMP-062
       trigger: Store Stock & SKU Availability
-      provenance: 'derived — EMP-062 declares entryState.params itemId and EMP-003 holds none of them.
-        The edge carries nothing: EMP-062 finds itemId (getStockPositions) itself, and EMP-062 opens on
-        its own'
+      provenance: 'derived — EMP-062 declares entryState.params outletId and EMP-003 holds none of them.
+        The edge carries nothing: EMP-062 finds outletId (lookupMerchandise) itself, and EMP-062 opens
+        on its own'
     - to: EMP-063
       trigger: Requisition & Smart Store Replenishment
       provenance: 'derived — EMP-063 declares entryState.params  and EMP-003 holds none of them. The edge
@@ -573,17 +573,17 @@ screens:
     - to: EMP-066
       trigger: Stock Count & Cycle Count Management
       provenance: 'derived — EMP-066 declares entryState.params countId and EMP-003 holds none of them.
-        The edge carries nothing: EMP-066 finds countId (startStockCount) itself, and EMP-066 opens on
-        its own'
+        The edge carries nothing: EMP-066 opens on listStockCounts, and countId has no source on EMP-066
+        yet (a gap in EMP-066, not in this edge)'
     - to: EMP-067
       trigger: Damage, Loss, Shrinkage & Stock Adjustment
       provenance: derived — EMP-067 declares entryState.params actionId, outletId and EMP-003 holds none
         of them, so the edge carries nothing and EMP-067 opens cold
     - to: EMP-068
       trigger: Reservation, Allocation & Omnichannel Inventory
-      provenance: 'derived — EMP-068 declares entryState.params outletId and EMP-003 holds none of them.
-        The edge carries nothing: EMP-068 opens on getStockPositions, and outletId has no source on EMP-068
-        yet (a gap in EMP-068, not in this edge)'
+      provenance: 'derived — EMP-068 declares entryState.params outletId, reservationId and EMP-003 holds
+        none of them. The edge carries nothing: EMP-068 opens on getStockPositions, and outletId, reservationId
+        have no source on EMP-068 yet (a gap in EMP-068, not in this edge)'
     - to: EMP-069
       trigger: Barcode, RFID, Serialized Stock & Traceability
       provenance: 'derived — EMP-069 declares entryState.params  and EMP-003 holds none of them. The edge
@@ -2378,9 +2378,6 @@ screens:
       this screen exited to the hubs and nothing exited to it, so it was outside the navigation graph
       entirely.'
     transitions:
-    - to: EMP-009
-      trigger: The supervisor closes it
-      provenance: flow F72 step 2→3
     - to: EMP-001
       trigger: Sign in
       provenance: 'derived — EMP-001 declares entryState.params challengeId, providerId and EMP-017 holds
@@ -2400,6 +2397,9 @@ screens:
       provenance: 'derived — EMP-018 declares entryState.params version and EMP-017 holds none of them.
         The edge carries nothing: version only pre-selects (deep link or optional), and EMP-018 opens
         on its own'
+    - to: EMP-009
+      trigger: The cashier submits a blind count;
+      provenance: flow F72 step 2→3
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written.
   density: comfortable
@@ -4153,14 +4153,15 @@ screens:
     inferred: true
     fromFlows: true
     transitions:
-    - to: EMP-009
-      trigger: Ends the shift
-      provenance: flow F08 step 7→8
     - to: EMP-003
       trigger: Home — on duty
       provenance: 'derived — EMP-003 declares entryState.params incidentId and EMP-007 holds none of them.
         The edge carries nothing: incidentId only pre-selects (deep link or optional), and EMP-003 opens
         on its own'
+    - to: EMP-009
+      trigger: Ends the shift with a blind count (no expected cash shown;
+      provenance: flow F08 step 7→8
+      operation: listWorkOrders
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written.
   density: comfortable
@@ -8504,6 +8505,7 @@ screens:
     - EMP-001
     - EMP-002
     - EMP-003
+    - EMP-038
     - EMP-050
     inferred: false
     entryFrom:
@@ -8532,6 +8534,10 @@ screens:
       provenance: flow F69 step 2→3
       carries:
       - incidentId
+    - to: EMP-038
+      trigger: If it is a venue-wide event, an announcement goes out
+      provenance: flow F69 step 3→4
+      operation: recordAuthorityNotification
   notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written. **Removed 24 August**: reportIncident. **Bulk-attach residue, found by walking
     a journey.** A device-settings screen does not read guest loyalty, a venue map does not set a refund
@@ -9698,6 +9704,7 @@ screens:
     inferred: false
     entryFrom:
     - EMP-003
+    - EMP-027
     notes: '**Reached from EMP-003** — the screen the device sits on between tasks. Stated on 4 September:
       this screen exited to the hubs and nothing exited to it, so it was outside the navigation graph
       entirely.'
@@ -12922,6 +12929,12 @@ screens:
     notes: '**Returns to EMP-003.** Stated on 4 September: this screen declared where it is reached from
       and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled
       the other way, not a guess about the product.'
+    exitTo:
+    - EMP-061
+    transitions:
+    - to: EMP-061
+      trigger: Retail Inventory Command Center
+      provenance: flow F80 step 3→4, F94 step 2→3
   notes: '**Added 20 August from the client design board.** P06 had no table or stock operations at all
     — **twenty screens of floor work with nothing behind them** — and every operation these need already
     existed. **Named in the board contents and not written up in it.**'
@@ -13081,6 +13094,7 @@ screens:
   navigation:
     entryFrom:
     - EMP-003
+    - EMP-060
     inferred: false
     notes: '**Returns to EMP-003.** Stated on 4 September: this screen declared where it is reached from
       and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled
@@ -13286,6 +13300,8 @@ screens:
     - to: EMP-067
       trigger: They read the unit and record the temperature
       provenance: flow F28 step 1→2
+      carries:
+      - outletId
   notes: '**Added 20 August from the client design board.** P06 had no table or stock operations at all
     — **twenty screens of floor work with nothing behind them** — and every operation these need already
     existed. **Named in the board contents and not written up in it.** **Food-safety operations wired
@@ -13565,6 +13581,8 @@ screens:
     params:
     - name: venueId
       from: session
+    - name: requisitionId
+      from: navigation
     coldEntry: '**Resolves from the session and the shift.** A handheld is signed into at the start of
       a shift, not navigated to.'
     preloaded:
@@ -13753,6 +13771,8 @@ screens:
     params:
     - name: venueId
       from: session
+    - name: transferId
+      from: navigation
     coldEntry: '**Resolves from the session and the shift.** A handheld is signed into at the start of
       a shift, not navigated to.'
     preloaded:
@@ -13832,6 +13852,13 @@ screens:
       carries:
       - purchaseOrderId
       - receiptId
+    - to: BO-080
+      trigger: The rest is received and the transfer closes short
+      provenance: flow F35 step 3→4
+      crossesDevice: true
+      back: false
+      carries:
+      - transferId
   notes: '**Added 20 August from the client design board.** P06 had no table or stock operations at all
     — **twenty screens of floor work with nothing behind them** — and every operation these need already
     existed. **Food-safety operations wired 20 August** — boards 5G and 5J of the client F&B pack, and

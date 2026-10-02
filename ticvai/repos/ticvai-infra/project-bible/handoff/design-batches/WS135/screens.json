@@ -56,7 +56,10 @@
     {
      "to": "BO-737",
      "trigger": "Customer 360 Profile",
-     "provenance": "structural — pack board 1 wiring, 19 September 2026"
+     "provenance": "structural — pack board 1 wiring, 19 September 2026",
+     "carries": [
+      "subjectId"
+     ]
     },
     {
      "to": "BO-738",
@@ -110,6 +113,11 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 6"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-007): No CRM summary operation for the command centre tiles.",
+    "source": "R283 | screens/P08-venue-back-office.yaml#BO-734"
    }
   ],
   "layout": {
@@ -656,6 +664,12 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 7"
+   },
+   {
+    "operation": "listCustomerSegmentProfile",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-005): listCustomerSegmentProfile is catalogue segment pricing rules, not a guest view; the CRM 360 is getGuestProfile, getGuestLoyalty, getGuestTimeline, getGuestConsents and getGuestIntelligence, with the service view kept for the support panel (design-notes correction customer-marketing BO-737).",
+    "source": "contracts/spine/catalogue.yaml#listCustomerSegmentProfile | contracts/satellite/marketing-crm.yaml#getGuestTimeline"
    }
   ],
   "layout": {
@@ -669,6 +683,41 @@
        "derived": true,
        "impliedBy": "listCustomerServiceProfile",
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Profile",
+       "bindsTo": "GuestProfileDetail",
+       "operation": "getGuestProfile",
+       "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}; wiring fix, 2 October 2026"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Loyalty",
+       "bindsTo": "LoyaltyPosition",
+       "operation": "getGuestLoyalty",
+       "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}/loyalty; wiring fix, 2 October 2026"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Timeline",
+       "bindsTo": "GuestTimelineEvent",
+       "operation": "getGuestTimeline",
+       "provenance": "contract marketing-crm.yaml GET /guests/{guestId}/timeline; wiring fix, 2 October 2026"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Consents",
+       "bindsTo": "ConsentState",
+       "operation": "getGuestConsents",
+       "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}/consents; wiring fix, 2 October 2026"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Intelligence",
+       "bindsTo": "GuestIntelligence",
+       "operation": "getGuestIntelligence",
+       "provenance": "contract marketing-crm.yaml GET /guests/{guestId}/intelligence; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -677,7 +726,7 @@
   "states": {
    "loading": "The customer 360 profile list.",
    "error": "Could not load. Names which read failed and leaves the customer 360 profile untouched.",
-   "emptyFirstRun": "No customer 360 profile yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No customer 360 profile yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the customer 360 profile are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -689,10 +738,39 @@
     "trigger": "onLoad"
    },
    {
-    "operationId": "listCustomerSegmentProfile",
-    "contract": "catalogue",
-    "purpose": "Customer Segment & Profile Pricing Rules",
-    "trigger": "onLoad"
+    "operationId": "getGuestProfile",
+    "contract": "marketing-crm",
+    "purpose": "The consolidated profile",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-005)"
+   },
+   {
+    "operationId": "getGuestLoyalty",
+    "contract": "marketing-crm",
+    "purpose": "Points and tier",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-005)"
+   },
+   {
+    "operationId": "getGuestTimeline",
+    "contract": "marketing-crm",
+    "purpose": "Commercial and document history",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-005)"
+   },
+   {
+    "operationId": "getGuestConsents",
+    "contract": "marketing-crm",
+    "purpose": "Consents in force",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-005)"
+   },
+   {
+    "operationId": "getGuestIntelligence",
+    "contract": "marketing-crm",
+    "purpose": "Value, engagement and risk",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-005)"
    }
   ],
   "wireframe": {
@@ -701,6 +779,18 @@
    "workshopBoard": "wireframes/WS70 Marketing CRM Configuration Reference v1.0 Board 1.dc.html#bo-737"
   },
   "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 7. 0 of 0 labels bound to a contract property; 0 of 11 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "subjectId",
+     "from": "navigation"
+    },
+    {
+     "name": "guestId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -772,6 +862,12 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 7"
+   },
+   {
+    "operation": "getGuestIntelligence",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-005): The timeline screen declared getGuestIntelligence (scores) and not getGuestTimeline, while BO-743 AI Guest Intelligence declared the reverse; the two reads were swapped (design-notes correction customer-marketing BO-738).",
+    "source": "contracts/satellite/marketing-crm.yaml#getGuestTimeline | contracts/satellite/marketing-crm.yaml#getGuestIntelligence"
    }
   ],
   "layout": {
@@ -785,6 +881,13 @@
        "derived": true,
        "impliedBy": "getGuestProfile",
        "notes": "One record, read-only."
+      },
+      {
+       "kind": "dataTable",
+       "label": "Activity timeline",
+       "bindsTo": "GuestTimelineEvent",
+       "operation": "getGuestTimeline",
+       "provenance": "contract marketing-crm.yaml GET /guests/{guestId}/timeline; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -793,7 +896,7 @@
   "states": {
    "loading": "The activity timeline list.",
    "error": "Could not load. Names which read failed and leaves the activity timeline untouched.",
-   "emptyFirstRun": "No activity timeline yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No activity timeline yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the activity timeline are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -806,18 +909,18 @@
     "provenance": "board reading, 19 September 2026"
    },
    {
-    "operationId": "getGuestIntelligence",
-    "contract": "marketing-crm",
-    "purpose": "Value, engagement and risk",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026"
-   },
-   {
     "operationId": "getGuestRelationships",
     "contract": "marketing-crm",
     "purpose": "Household and organisation",
     "trigger": "onAction",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "getGuestTimeline",
+    "contract": "marketing-crm",
+    "purpose": "Commercial and document history",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-005)"
    }
   ],
   "wireframe": {
@@ -949,7 +1052,7 @@
   "states": {
    "loading": "The contact preferences list.",
    "error": "Could not load. Names which read failed and leaves the contact preferences untouched.",
-   "emptyFirstRun": "No contact preferences yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No contact preferences yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the contact preferences are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -1092,6 +1195,24 @@
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
        "impliedBy": "updateGuestPreferences"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Family and guardians",
+       "bindsTo": "GuestRelationship",
+       "operation": "getGuestRelationships",
+       "provenance": "contract marketing-crm.yaml GET /guests/{guestId}/relationships; wiring fix, 2 October 2026"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "components": [
+      {
+       "kind": "secondaryButton",
+       "label": "Save links",
+       "operation": "setGuestRelationships",
+       "provenance": "contract marketing-crm.yaml PUT /guests/{guestId}/relationships; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -1121,6 +1242,20 @@
     "purpose": "Verified contacts",
     "trigger": "onAction",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "getGuestRelationships",
+    "contract": "marketing-crm",
+    "purpose": "Household, guardians and dependants",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-005)"
+   },
+   {
+    "operationId": "setGuestRelationships",
+    "contract": "marketing-crm",
+    "purpose": "Link family members without merging",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-005)"
    }
   ],
   "wireframe": {
@@ -1134,9 +1269,29 @@
     {
      "name": "subjectId",
      "from": "navigation"
+    },
+    {
+     "name": "guestId",
+     "from": "navigation"
     }
    ]
   },
+  "overlays": [
+   {
+    "id": "formSetGuestRelationships",
+    "component": "modal",
+    "trigger": "Save links",
+    "body": "**Collects what `setGuestRelationships` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save links",
+     "operation": "setGuestRelationships"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "contract marketing-crm.yaml PUT /guests/{guestId}/relationships; wiring fix, 2 October 2026"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1352,6 +1507,12 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 8"
+   },
+   {
+    "operation": "setGuestRelationships",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-005): A history screen needs reads; its only operation was setGuestRelationships, and relationship editing belongs on BO-740 and BO-741 (design-notes correction customer-marketing BO-742).",
+    "source": "contracts/satellite/marketing-crm.yaml#setGuestRelationships | screens/P08-venue-back-office.yaml#BO-742"
    }
   ],
   "layout": {
@@ -1361,18 +1522,17 @@
      "name": "contentBody",
      "components": [
       {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "setGuestRelationships",
-       "label": "Save guest relationships",
-       "notes": "The act the screen exists for."
+       "kind": "dataTable",
+       "label": "Commerce and documents",
+       "bindsTo": "GuestTimelineEvent",
+       "operation": "getGuestTimeline",
+       "provenance": "contract marketing-crm.yaml GET /guests/{guestId}/timeline; wiring fix, 2 October 2026"
       },
       {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "kind": "detailPanel",
        "derived": true,
-       "impliedBy": "setGuestRelationships"
+       "impliedBy": "getGuestTimeline",
+       "notes": "One record, read-only."
       }
      ]
     }
@@ -1381,21 +1541,17 @@
   "states": {
    "loading": "The commerce documents list.",
    "error": "Could not load. Names which read failed and leaves the commerce documents untouched.",
-   "emptyFirstRun": "No commerce documents yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No commerce documents yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the commerce documents are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
-    "operationId": "setGuestRelationships",
+    "operationId": "getGuestTimeline",
     "contract": "marketing-crm",
-    "purpose": "Corporate, school and group links",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026",
-    "invalidates": [
-     "getGuestRelationships",
-     "getGuestProfile"
-    ]
+    "purpose": "Commercial and document history",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-005)"
    }
   ],
   "wireframe": {
@@ -1483,6 +1639,18 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 9"
+   },
+   {
+    "operation": "getGuestTimeline",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-005): The reads were swapped with BO-738, and uploading documents has nothing to do with AI insight (design-notes corrections customer-marketing BO-738, BO-743).",
+    "source": "contracts/satellite/marketing-crm.yaml#getGuestIntelligence | contracts/satellite/marketing-crm.yaml#uploadGuestDocument"
+   },
+   {
+    "operation": "uploadGuestDocument",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-005): The reads were swapped with BO-738, and uploading documents has nothing to do with AI insight (design-notes corrections customer-marketing BO-738, BO-743).",
+    "source": "contracts/satellite/marketing-crm.yaml#getGuestIntelligence | contracts/satellite/marketing-crm.yaml#uploadGuestDocument"
    }
   ],
   "layout": {
@@ -1493,22 +1661,10 @@
      "components": [
       {
        "kind": "detailPanel",
-       "derived": true,
-       "impliedBy": "getGuestTimeline",
-       "notes": "One record, read-only."
-      },
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "uploadGuestDocument",
-       "notes": "The act the screen exists for."
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "uploadGuestDocument"
+       "label": "Guest intelligence",
+       "bindsTo": "GuestIntelligence",
+       "operation": "getGuestIntelligence",
+       "provenance": "contract marketing-crm.yaml GET /guests/{guestId}/intelligence; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -1517,24 +1673,17 @@
   "states": {
    "loading": "The guest intelligence list.",
    "error": "Could not load. Names which read failed and leaves the guest intelligence untouched.",
-   "emptyFirstRun": "No guest intelligence yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No guest intelligence yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the guest intelligence are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
-    "operationId": "getGuestTimeline",
+    "operationId": "getGuestIntelligence",
     "contract": "marketing-crm",
-    "purpose": "Commercial and document history",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026"
-   },
-   {
-    "operationId": "uploadGuestDocument",
-    "contract": "marketing-crm",
-    "purpose": "Attach a document",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026"
+    "purpose": "Value, engagement and risk",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-005)"
    }
   ],
   "wireframe": {

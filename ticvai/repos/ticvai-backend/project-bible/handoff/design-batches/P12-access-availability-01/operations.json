@@ -1,4 +1,42 @@
 {
+ "changeOwnCredential": {
+  "method": "POST",
+  "path": "/auth/credential",
+  "contract": "identity",
+  "summary": "Change the caller's own password or PIN",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ChangeCredentialRequest",
+  "responds": null
+ },
+ "completeSsoAuthorization": {
+  "method": "POST",
+  "path": "/auth/sso/{providerId}/callback",
+  "contract": "identity",
+  "summary": "Exchange an SSO code for a session",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "LoginResponse"
+ },
  "createMfaChallenge": {
   "method": "POST",
   "path": "/auth/mfa/challenge",
@@ -18,29 +56,24 @@
   "requestBody": null,
   "responds": null
  },
- "forceLogout": {
+ "enrolMfaMethod": {
   "method": "POST",
-  "path": "/auth/sessions/{sessionId}/force-logout",
+  "path": "/auth/mfa/methods",
   "contract": "identity",
-  "summary": "Supervisor termination of an abandoned session",
-  "permission": "SESSION_FORCE_LOGOUT",
+  "summary": "Enrol an MFA method",
+  "permission": null,
   "offlineCapable": false,
-  "conflictPolicy": "append",
-  "scopeLevel": "venue",
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
   "parameters": [
    {
     "name": null,
     "in": null,
     "required": null
-   },
-   {
-    "name": "sessionId",
-    "in": "path",
-    "required": true
    }
   ],
   "requestBody": null,
-  "responds": null
+  "responds": "MfaEnrolment"
  },
  "getCurrentSession": {
   "method": "GET",
@@ -54,58 +87,6 @@
   "parameters": [],
   "requestBody": null,
   "responds": "Session"
- },
- "listActiveSessions": {
-  "method": "GET",
-  "path": "/auth/sessions",
-  "contract": "identity",
-  "summary": "List active sessions",
-  "permission": "SESSION_FORCE_LOGOUT",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "venueId",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "principalId",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "workstationId",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- },
- "listMfaMethods": {
-  "method": "GET",
-  "path": "/auth/mfa/methods",
-  "contract": "identity",
-  "summary": "Enrolled MFA methods",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "MfaMethod"
  },
  "listSsoProviders": {
   "method": "GET",
@@ -139,15 +120,15 @@
   "requestBody": "LoginRequest",
   "responds": "LoginResponse"
  },
- "revokeAllSessions": {
+ "selectRole": {
   "method": "POST",
-  "path": "/auth/sessions/revoke-all",
+  "path": "/auth/select-role",
   "contract": "identity",
-  "summary": "Revoke every session in scope",
-  "permission": "SESSION_FORCE_LOGOUT",
+  "summary": "Choose a role for a multi-role session",
+  "permission": null,
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
+  "scopeLevel": "tenant",
   "parameters": [
    {
     "name": null,
@@ -156,7 +137,7 @@
    }
   ],
   "requestBody": null,
-  "responds": null
+  "responds": "Session"
  },
  "setAgentAvailability": {
   "method": "PUT",
@@ -177,6 +158,25 @@
   "requestBody": null,
   "responds": "AgentAvailability"
  },
+ "startSsoAuthorization": {
+  "method": "GET",
+  "path": "/auth/sso/{providerId}/authorize",
+  "contract": "identity",
+  "summary": "Begin an SSO flow",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "redirectUri",
+    "in": "query",
+    "required": true
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
  "verifyMfaChallenge": {
   "method": "POST",
   "path": "/auth/mfa/challenge/{challengeId}/verify",
@@ -195,5 +195,24 @@
   ],
   "requestBody": null,
   "responds": null
+ },
+ "verifyMfaEnrolment": {
+  "method": "POST",
+  "path": "/auth/mfa/methods/{methodId}",
+  "contract": "identity",
+  "summary": "Complete enrolment",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "MfaMethod"
  }
 }

@@ -1,6 +1,6 @@
 # WS126 — Event Management Configuration Backend Structure v1.0 board 2
 
-**3 screens · 2 operations · 2 schemas · 1 permissions**
+**3 screens · 3 operations · 3 schemas · 2 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -48,8 +48,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 1 permissions apply here:
-  `PERFORMANCE_CONFIGURE`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 2 permissions apply here:
+  `PERFORMANCE_CONFIGURE, PRODUCT_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -61,15 +61,54 @@ convincingly. It is never a caption.
   and its error; and, element by element, what is shown and in what format, what each action
   produces and where the user goes next. Draw exactly that.
 
+## The processes these screens belong to
+
+Written by the owner of each process (`handoff/design-notes/`). Read before any screen: it says how the process runs end to end and which words the screens must use.
+
+### Ticketing & Guest Commerce, as the venue and TICVAI configure and run it
+
+WHAT THE PROCESS IS. Everything a guest can buy is set up, priced, promoted and serviced here, on Venue Management (P08, the venue's own back office, served inside the venue's cell) and on the TICVAI Console (P09, TICVAI's control plane, outside every cell). End to end: (1) CATALOGUE. A product has one of twelve kinds (admission, timedAdmission, datedAdmission, openDated, seated, membership, bundle, fnb, retail, rental, addOn, giftCard). Its ticket types (adult, child, senior, resident...) are not typed one by one: they are generated from the product's attributes (components) and each value combination becomes a sellable ticket type with no extra setup (DI-164). What a ticket grants (validity, entries, re-entry, days of week, blackout dates, expiry anchor, fast track, transfer) lives on a reusable entitlement template, not on the product. Who may take part (age, height, supervision, certification) is the eligibility rule; what the guest must answer is the data mask and the consent questions; how the guest sees it is guestListing (bookable, infoOnly, hidden), display tags (at most six), media and the booking flow. Group, family and corporate products and every after-sales policy (reschedule, exchange, refund, cancellation, upgrade, transfer) are configured inside the one product configuration, never on separate screens (DI-465, DI-466). (2) LIFECYCLE AND PUBLICATION. A product moves draft, inReview, approved, live, withdrawn, archived. Approval and publication are two acts with two permissions (PRODUCT_APPROVE, PRODUCT_PUBLISH, R091); every product is authorised before it sells online or on site (DI-438). Approved is still not on a till: a till sells only what is in the signed catalogue release it pulled (publishBundle, ADR-0013), so a saved price is a back-office fact until the venue publishes to tills. Changing something that has sold is preceded by an impact check (assessProductChange: orders affected, entitlements issued, future performances, open carts); restoring a version creates a new version, and sold tickets keep the price and terms they were sold under (restoreProductVersion, DI-938, TRACKER Actions row 145). (3) PRICE. Prices live in price lists: per venue, per channel set, with validity dates and a priority, copied for the next season with an uplift (copyPriceList) and repriced in bulk only after a dry run (bulkChangePrices). Currency and decimal scale are never chosen on a form: they resolve from the venue's region (ADR-0008, ADR-0018; AED 2 places, OMR and BHD 3). When several rules apply, the configured hierarchy decides; there is no "lowest price wins" default (DI-595). Tax on the pre-discount price and three-decimal rounding are regional settings (DI-598). Dynamic rules always show their minimum and maximum price guardrails beside the trigger (getDynamicPriceRule). (4) PROMOTE AND BUNDLE. A promotion is a rule (automatic, or gated by a code) created in draft, made live only by Publish, which first analyses stacking; a …
+*(source: DI-164; DI-171; DI-438; DI-465; DI-466; DI-595; DI-598; DI-387; DI-039; DI-044; DI-474; DI-671; DI-987; DI-019; DI-080; ADR-0008; ADR-0013; ADR-0018; ADR-0019; ADR-0030; R091; R098; R101; R222; REV3-21; contracts/spine/catalogue.yaml#transitionProductLifecycle …)*
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Product | Anything sellable, of one of the twelve kinds. The record that carries names, channels, listing, media and policies. | Item (except on F&B and retail screens), SKU (for tickets), Offering | contracts/spine/catalogue.yaml#/components/schemas/ProductKind |
+| Ticket type | One sellable variant of an admission or event product (Adult, Child, Resident Adult), generated from the product's attributes. For retail and F&B the same record is labelled Variant. | Variant (on ticket screens), Sub-product, Rate (that is a price), Axis value | contracts/spine/catalogue.yaml#updateProductVariant / DI-164 / DI-437 |
+| Attribute | A dimension that generates ticket types (Guest category, Residency, Tier, Length). Each has values; adding a value adds ticket types. | Axis, Component (the client's word; use it only in help text), Option | contracts/spine/catalogue.yaml#setProductAttributes / DI-164 / DI-450 |
+| Entitlement | What a ticket lets the holder do (validity, entries, re-entry, days, blackout dates, expiry, fast track, transfer), defined once on an entitlement template and shared by several products. | Access rights, Ticket rules, Validity profile | contracts/spine/catalogue.yaml#createEntitlementTemplate / DI-171 / DI-451 |
+| Eligibility rule | Who may take part in or buy a product (age, height, supervision, waiver, certification). Distinct from a promotion's eligibility, which decides who gets a discount. | Restriction, Access rule (that is access control) | contracts/spine/catalogue.yaml#setProductEligibilityRule / DI-463 |
+| Price list | A set of prices for one venue and a set of channels, valid between two dates, with a priority. Several coexist (B2C, B2B, season). | Price book, Rate card, Tariff | contracts/spine/catalogue.yaml#createPriceList / DI-140 / DI-163 |
+| Price category | A standard rate type (Adult, Child, Member) reused across lists so venues do not invent "Adult Standard" and "Normal Adult". | Price band (that is a seat-category band), Fare type (transport) | contracts/spine/catalogue.yaml#setPriceCategoryRateType / … |
+| Price band | A priced band on a seat category (code, label, colour, amount, channel, from-date). | Price category, Zone price | contracts/satellite/seating.yaml#/components/schemas/SeatPriceBand |
+| Promotion | A rule that changes a price automatically or when a code is entered; draft until published; declares how it stacks. | Offer (except in guest copy), Deal, Discount rule | contracts/satellite/promotions.yaml#createPromotion / DI-173 / DI-174 |
+| Coupon code | A code issued from a coupon campaign that applies a promotion-style discount; one shared code or many single-use codes. | Voucher, Promo voucher | contracts/satellite/promotions.yaml#createCouponCampaign / DI-173 |
+| Voucher | A code that carries money (face value, balance), sold or issued; a liability until redeemed or expired. | Coupon, Credit note | contracts/satellite/promotions.yaml#listVoucherBatches / … |
+| Bundle | A product sold as one line whose price differs from the sum of its components, with a mandatory revenue allocation. "Package" is acceptable in guest copy. | Combo (that is an F&B meal deal), Catalogue bundle | contracts/satellite/promotions.yaml#createBundle / DI-220 / ADR-0019 |
+| Catalogue release | The signed snapshot of a venue's catalogue, prices, promotions and sale boards that tills, kiosks and devices pull. Its action label is "Publish to tills". | Bundle, Catalogue bundle, Sync, Deploy | contracts/spine/catalogue.yaml#publishBundle / … |
+| Approve / Publish / Save | Save keeps a draft; Approve records that it is authorised (PRODUCT_APPROVE); Publish makes it live for guests and channels (PRODUCT_PUBLISH). Three different buttons, never merged. | Submit, Go live, Activate (except CatalogueConfigStatus active), Deploy | R091 / contracts/spine/catalogue.yaml#transitionProductLifecycle / DI-438 |
+| Product states | Draft, In review, Approved, Live, Withdrawn, Archived (ProductLifecycleState), always as coloured badges with these exact labels. | Published (for a product), Pending, Inactive (for a product) | contracts/spine/catalogue.yaml#/components/schemas/ProductLifecycleState |
+| Channel | Where something is sold. Labels: pos Point of sale; kiosk Kiosk; web and guestWeb Website; mobile and guestApp App; b2b B2B partners; partner Partner; ota Travel agents (OTA); callCentre Call centre; api API; backOffice Back office. | Touchpoint, Outlet (an outlet is a business inside a venue), raw enum values | contracts/spine/catalogue.yaml#/components/schemas/Channel / … |
+| Refund | Money returned after settlement, wholly or for some lines, under the venue's refund policy. | Return (that is retail goods), Reversal, Void | contracts/spine/orders.yaml#createRefund / DI-252 |
+| Void | Cancelling a whole order before settlement, within the same shift, with a reason from the void list. After settlement it is a refund. | Cancel order, Delete | contracts/spine/orders.yaml#voidOrder / R222 |
+| Exchange / Reschedule | Exchange swaps lines for other products or dates and settles only the difference; Reschedule is the same product moved to another date or time. | Rebook, Date change (acceptable only in guest copy), Refund and resell | contracts/spine/orders.yaml#exchangeOrderLines / … |
+| Hold / Capture / Release | A deposit or stored-value amount is held, then partly or fully captured, and the rest released. A held deposit is not a payment. | Charge, Pre-auth (in staff copy), Block funds | contracts/spine/orders.yaml#authoriseStoredValue / … |
+| Wallet (TICVAI wallet) | The guest's stored-value balance on TICVAI, spent by hold and capture. Distinct from the tender "Apple Pay / Google Pay", which the contract also calls wallet. | Digital wallet (for stored value), E-wallet, Credit (without a type) | contracts/spine/orders.yaml#/components/schemas/TenderKind / R080 |
+| Credit lot | One amount of wallet credit of one credit type (cash, bonus, gift) with its own expiry; lots are spent nearest expiry first and the guest sees the breakdown but cannot choose. | Bucket, Batch, Top-up | TRACKER Actions row 171 / contracts/satellite/wallet.yaml#expireCreditLots |
+| Venue map / Seat map | A venue map is the wayfinding map of a park or a floor (points, paths, bookable places); a seat map is the seating layout of an auditorium or stand. Never just "map" where both could be meant. | Layout (alone), Floor plan (unless it is a floor map), Map (alone) | contracts/satellite/venue-map.yaml#createVenueMap / … |
+| Point / Bookable place | A point is a place on a venue map (toilet, ride, restaurant, exit). A bookable place is a cabana, lounger, table or pitch placed on the map and sold through its price band. | Pin, POI, Marker, Resource (in staff copy) | contracts/satellite/venue-map.yaml#setVenuePoint / … |
+| Station / Route / Timetable / Departure / Fare table / Pass … | A route is an ordered list of stations with offsets; a timetable generates departures up to its release horizon; a fare table prices a route per passenger type; a pass type is a multi-trip or unlimited pass sold as a product. | Stop (except in the stop list), Line (except lineCode), Schedule, Trip (except a guest's journey) | contracts/satellite/transport.yaml / REV3-21 |
+| Applies from | The effective date of a change. Every dated change shows it, and sold items keep their old terms. | Effective date (in labels), Start date (for a change) | contracts/satellite/seating.yaml#updateSeatCategory / TRACKER Actions row 194 |
+
+
 ## The screens
 
 Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs count fields; requirements are matrix rows; meeting inputs are the ones naming the screen (the module and platform ones are below); white label says whether the tenant's brand reaches it (guest) or it sets the brand (configures).
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-697` | Event Schedule Command Center | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-698` | Dynamic Performance Duration Configuration | B–D | 0 | 2 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-699` | Schedule Change & Rescheduling Configuration | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-697` | Event Schedule Command Center | B–D | 0 | 7 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-698` | Dynamic Performance Duration Configuration | B–D | 0 | 9 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-699` | Schedule Change & Rescheduling Configuration | B–D | 0 | 7 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 
@@ -83,14 +122,14 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 ### `BO-697` Event Schedule Command Center
 
-**Provide management with a consolidated backend view of the financial, commercial, sponsorship, attendance and operational performance of events.**
+**Set and review an event's schedule: its dates, sessions and timings.**
 
 | | |
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Sell · wave 3 · needs the `ticketing` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `PERFORMANCE_CONFIGURE` (1 configure); in the flows as venue manager |
+| Who uses it | venue staff holding `PERFORMANCE_CONFIGURE`, `PRODUCT_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
 | Offline | online only |
@@ -99,11 +138,33 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** The event's schedule: performance times, durations and turnaround, and whether an overrun pushes the performances after it.
+
+**Fixed on main** (the package already carries these; draw what it says): No read operation: the screen declares only setEventSchedule and nothing that returns the current configuration. (CHG-WIR-025); The purpose text is shared word for word with BO-694, BO-700, BO-703, BO-706 and others and does not describe this screen (Event Schedule … (CHG-WIR-026).
+
 #### Inputs: what the user enters or picks
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
 
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **cascadeOverrun**: On by default; the help states that a late finish moves everything after it. *(source: contracts/spine/catalogue.yaml#setEventSchedule)*
+
 #### Outputs: what the screen shows and produces
+
+**Shown**
+
+**Read an event** (detail panel, from `getEvent`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| ID | the name it points at, never the id | — |
+| Code | text | — |
+| Name | text | — |
+| Venue | the name it points at, never the id | — |
+| Parent event | the name it points at, never the id | For grouped events. |
+| Performance count | 1,234 | How many performances the event has. Counted by the server; never sent by a client. |
+| Is active | yes / no (icon or chip) | — |
 
 **Actions and what each produces**
 
@@ -111,6 +172,8 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |---|---|---|---|---|---|
 | Save event schedule (primary button) | navigation or local | — | — | — | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
+
+**Data it reads**: `getEvent` (onLoad, Read an event)
 
 **Where the user goes next**
 
@@ -129,9 +192,23 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+schedule:
+  event: Dune Nights Festival 2026
+  performances:
+  - Fri 20:00-22:00
+  - Sat 20:00-22:00
+  maximumOverrunMinutes: 30
+```
+
 #### Permissions
 
 - `setEventSchedule` → `PERFORMANCE_CONFIGURE` (configure) · staff
+- `getEvent` → `PRODUCT_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -163,12 +240,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (404).
+- [ ] Every output is drawn (7 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-697?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save event schedule, Cancel.
 - [ ] Every transition is wired: `BO-100`, `BO-698`, `BO-699`.
-- [ ] Every gated control is gated: `PERFORMANCE_CONFIGURE`.
+- [ ] Every gated control is gated: `PERFORMANCE_CONFIGURE`, `PRODUCT_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -176,14 +253,14 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 ### `BO-698` Dynamic Performance Duration Configuration
 
-**Configure measurable operational KPIs for staff, instructors and activity operators.**
+**Set how long an event's performances last, including durations that vary by day or session.**
 
 | | |
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Sell · wave 3 · needs the `ticketing` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `PERFORMANCE_CONFIGURE` (1 configure); in the flows as venue manager |
+| Who uses it | venue staff holding `PERFORMANCE_CONFIGURE`, `PRODUCT_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Configure KPI by; Display) and no metric row |
 | Offline | online only |
@@ -192,9 +269,17 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
 
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Dynamic performance durations: a performance's length may vary within a maximum overrun, with turnaround protected so the venue never sells a slot it cannot reset.
+
+**Fixed on main** (the package already carries these; draw what it says): No read operation: the screen declares only setEventSchedule and nothing that returns the current configuration. (CHG-WIR-025); The purpose text is shared word for word with BO-715, BO-723 and does not describe this screen (Dynamic Performance Duration Configuration). (CHG-WIR-026).
+
 #### Inputs: what the user enters or picks
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **durationIsDynamic and maximumOverrunMinutes**: Overrun allowed only when dynamic is on; show the effect on the next slot. *(source: contracts/spine/catalogue.yaml#setEventSchedule)*
 
 #### Outputs: what the screen shows and produces
 
@@ -206,11 +291,25 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |---|---|---|
 | Target vs actual | text | not in the schema: `Target vs Actual` |
 
+**Read an event** (detail panel, from `getEvent`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| ID | the name it points at, never the id | — |
+| Code | text | — |
+| Name | text | — |
+| Venue | the name it points at, never the id | — |
+| Parent event | the name it points at, never the id | For grouped events. |
+| Performance count | 1,234 | How many performances the event has. Counted by the server; never sent by a client. |
+| Is active | yes / no (icon or chip) | — |
+
 **The selected dynamic performance duration** (detail panel): The pack groups this record's detail under its own headings: “Set”.
 
 | Shows | Format | Notes |
 |---|---|---|
 | Target vs actual | text | not in the schema: `Target vs Actual` |
+
+**Data it reads**: `getEvent` (onLoad, Read an event)
 
 **Where the user goes next**
 
@@ -227,9 +326,21 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+schedule:
+  durationIsDynamic: true
+  maximumOverrunMinutes: 20
+  turnaround: 15
+```
+
 #### Permissions
 
 - `setEventSchedule` → `PERFORMANCE_CONFIGURE` (configure) · staff
+- `getEvent` → `PRODUCT_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -256,12 +367,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (2 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (404).
+- [ ] Every output is drawn (9 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-698?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-697`.
-- [ ] Every gated control is gated: `PERFORMANCE_CONFIGURE`.
+- [ ] Every gated control is gated: `PERFORMANCE_CONFIGURE`, `PRODUCT_VIEW`.
 - [ ] The module and platform inputs below are applied.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -269,14 +380,14 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 ### `BO-699` Schedule Change & Rescheduling Configuration
 
-**Configure automatic invoice generation for eligible event-related customers and commercial accounts.**
+**Move an event to new dates and decide how its existing bookings follow.**
 
 | | |
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Sell · wave 3 · needs the `ticketing` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `PERFORMANCE_CONFIGURE` (1 configure); in the flows as venue manager |
+| Who uses it | venue staff holding `PERFORMANCE_CONFIGURE`, `PRODUCT_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
 | Offline | online only |
@@ -285,11 +396,33 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Move or cancel performances and decide once what happens to everyone who bought: move automatically, offer a choice, refund, credit to wallet, or honour at any performance; guests are notified as part of the act.
+
+**Fixed on main** (the package already carries these; draw what it says): No read operation: the screen declares only rescheduleEvent and nothing that returns the current configuration. (CHG-WIR-025); The purpose text is shared word for word with BO-696, BO-709, BO-724 and does not describe this screen (Schedule Change & Rescheduling … (CHG-WIR-026).
+
 #### Inputs: what the user enters or picks
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
 
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **ticketTreatment**: Required, with the affected orders and guests counted before confirming; notification on by default with the template chosen. *(source: contracts/spine/catalogue.yaml#rescheduleEvent)*
+
 #### Outputs: what the screen shows and produces
+
+**Shown**
+
+**Read an event** (detail panel, from `getEvent`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| ID | the name it points at, never the id | — |
+| Code | text | — |
+| Name | text | — |
+| Venue | the name it points at, never the id | — |
+| Parent event | the name it points at, never the id | For grouped events. |
+| Performance count | 1,234 | How many performances the event has. Counted by the server; never sent by a client. |
+| Is active | yes / no (icon or chip) | — |
 
 **Actions and what each produces**
 
@@ -297,6 +430,8 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |---|---|---|---|---|---|
 |  (primary button) | navigation or local | — | — | — | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
+
+**Data it reads**: `getEvent` (onLoad, Read an event)
 
 **Where the user goes next**
 
@@ -313,9 +448,28 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 
+#### Edge cases to draw
+
+- **Change above the approval threshold**: Goes to approval; shows the approval request. *(source: contracts/spine/catalogue.yaml#rescheduleEvent)*
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+reschedule:
+  kind: moveDate
+  from: Fri 14 Nov 20:00
+  to: Sat 22 Nov 20:00
+  treatment: offerChoice
+  affectedOrders: 612
+  affectedGuests: 1840
+```
+
 #### Permissions
 
 - `rescheduleEvent` → `PERFORMANCE_CONFIGURE` (configure) · staff
+- `getEvent` → `PRODUCT_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -342,13 +496,14 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (404).
+- [ ] Every output is drawn (7 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-699?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: , Cancel.
 - [ ] Every transition is wired: `BO-697`.
-- [ ] Every gated control is gated: `PERFORMANCE_CONFIGURE`.
+- [ ] Every gated control is gated: `PERFORMANCE_CONFIGURE`, `PRODUCT_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 1 edge case(s) from the process notes are drawn.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -452,6 +607,7 @@ Method, path, parameters, request and response for every operation these screens
 
 ```json
 {
+"getEvent": {"method":"GET","path":"/events/{eventId}","contract":"catalogue","summary":"Read an event","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"Event"},
 "rescheduleEvent": {"method":"POST","path":"/events/{eventId}/reschedule","contract":"catalogue","summary":"Move or cancel, and decide what happens to the people who bought","permission":"PERFORMANCE_CONFIGURE","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"EventReschedule","responds":null},
 "setEventSchedule": {"method":"PUT","path":"/events/{eventId}/schedule","contract":"catalogue","summary":"Performance times, durations and turnaround","permission":"PERFORMANCE_CONFIGURE","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"EventSchedule","responds":"EventSchedule"}
 }
@@ -463,6 +619,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
+"Event": {"x-ticvai-persistence":"catalogue.event","type":"object","required":["id","code","name","venueId","scopePath"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string"},"name":{"type":"string"},"venueId":{"type":"string","format":"uuid"},"scopePath":{"type":"string"},"parentEventId":{"type":"string","format":"uuid","nullable":true,"description":"For grouped events."},"performanceCount":{"type":"integer","readOnly":true,"description":"How many performances the event has. Counted by the server; never sent by a client."},"isActive":{"type":"boolean"}}},
 "EventReschedule": {"type":"object","x-ticvai-persistence":"catalogue.event_reschedule","description":"Event boards 7.4 and 7.5. **The decision that generates every phone call.**","required":["kind","reason"],"properties":{"id":{"type":"string","format":"uuid"},"kind":{"type":"string","enum":["moveTime","moveDate","moveVenue","cancel","abandon"]},"performanceIds":{"type":"array","items":{"type":"string","format":"uuid"}},"newStartsAt":{"type":"string","format":"date-time","nullable":true},"newSpaceId":{"type":"string","format":"uuid","nullable":true},"reason":{"type":"string"},"ticketTreatment":{"type":"string","enum":["moveAutomatically","offerChoice","refund","creditToWallet","honourAtAnyPerformance"],"description":"**Made once and applied consistently**, rather than per guest at a desk."},"refundFees":{"type":"boolean","default":true},"notifyGuests":{"type":"boolean","default":true},"notificationTemplateId":{"type":"string","format":"uuid","nullable":true},"affectedOrders":{"type":"integer","readOnly":true},"affectedGuests":{"type":"integer","readOnly":true},"approvalRequestId":{"type":"string","format":"uuid","nullable":true},"scopePath":{"type":"string"}}},
 "EventSchedule": {"type":"object","x-ticvai-persistence":"catalogue.event_schedule","description":"Event board 2.2. **A performance that overruns pushes the next one.**","properties":{"eventId":{"type":"string","format":"uuid"},"performances":{"type":"array","items":{"type":"object","properties":{"performanceId":{"type":"string","format":"uuid","nullable":true},"startsAt":{"type":"string","format":"date-time"},"plannedMinutes":{"type":"integer"},"turnaroundMinutes":{"type":"integer","default":0},"spaceId":{"type":"string","format":"uuid","nullable":true},"seatMapId":{"type":"string","format":"uuid","nullable":true}}}},"durationIsDynamic":{"type":"boolean","default":false},"maximumOverrunMinutes":{"type":"integer","nullable":true},"cascadeOverrun":{"type":"boolean","default":true,"description":"**Whether a late finish moves everything after it**, which is the honest behaviour and the one venues forget to ask for until the first time it happens.\n"},"scopePath":{"type":"string"}}}
 }

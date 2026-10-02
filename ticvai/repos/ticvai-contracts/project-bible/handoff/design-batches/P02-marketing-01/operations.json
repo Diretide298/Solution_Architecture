@@ -1,4 +1,17 @@
 {
+ "getGuestConsents": {
+  "method": "GET",
+  "path": "/guests/{subjectId}/consents",
+  "contract": "marketing-crm",
+  "summary": "Read a guest's consent state",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ConsentState"
+ },
  "getMarketingSubscription": {
   "method": "GET",
   "path": "/marketing-subscriptions",

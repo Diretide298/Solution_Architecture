@@ -278,7 +278,7 @@
     }
    ]
   },
-  "notes": "Added 17 August for parity with GST-016. **Not on the wireframe board** — needs drawing. CF-93.\n\n**Rev 3 (decided 29 September).** **Table deposit (REV3-8b):** a dining deposit is a venue option, off unless the venue enables it in Venue Management (`DepositPolicy.dining`; amount and basis are the venue's), superseding audit R077 (a). A reservation holding a deposit shows its amount, when it stops being refundable (`refundableUntil`) and the late-cancel and no-show terms. Group booking on the web is this screen (`requestGroupBooking`; GAP-D3, already); school and party requests are unchanged (DG-4).",
+  "notes": "Added 17 August for parity with GST-016. **Not on the wireframe board** — needs drawing. CF-93.\n\n**Rev 3 (decided 29 September).** **Table deposit (REV3-8b):** a dining deposit is a venue option, off unless the venue enables it in Venue Management (`DepositPolicy.dining`; amount and basis are the venue's), superseding audit R077 (a). A reservation holding a deposit shows its amount, when it stops being refundable (`refundableUntil`) and the late-cancel and no-show terms. Group booking on the web is this screen (`requestGroupBooking`; GAP-D3, already); school and party requests are unchanged (DG-4).\n\n**Two jobs, one id (GAP-D3, DI-1078; CHG-SGU-020).** This is My Reservations and the web's group-booking view. The group request form is a flow opened from here and from the booking listing, not a separate screen; the prototype labels that dialog WEB-031.",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listReservations` reads the population and `getReservation` reads one of them — list, select, act",
@@ -673,11 +673,11 @@
     }
    ]
   },
-  "notes": "Added 17 August. **The surface the matrix names** — 2.6.33 *\"website should be able to display multi currency\"* and 2.9.1 *\"in the B2C portal for guests comparison\"*. Wave 1 against the app's Wave 2, because **the website is where an overseas guest compares before booking** and the app is where they check after. **Display only — the sale settles in base currency** (CF-37). Not on the wireframe board; needs drawing. **`getRegionSettings` deliberately not called** — a guest does not need the venue's scope configuration to pick a currency. `listFxRates` is the currency list: a rate exists only for a currency the venue enabled, so the two questions have one answer.\n\n**Rev 3 (decided 29 September, rev 3 GAP-D2).** The web and app waves of this capability differ; they are aligned to one wave once the client picks it (open, client to choose).\n\nRates carry `fetchedAt` (`listFxRates`; GAP-B3, already); the prototype's fixed demo rate is prototype-only (CFG-7, no change).",
+  "notes": "Added 17 August. **The surface the matrix names** — 2.6.33 *\"website should be able to display multi currency\"* and 2.9.1 *\"in the B2C portal for guests comparison\"*. Wave 1 against the app's Wave 2, because **the website is where an overseas guest compares before booking** and the app is where they check after. **Display only — the sale settles in base currency** (CF-37). Not on the wireframe board; needs drawing. **`getRegionSettings` deliberately not called** — a guest does not need the venue's scope configuration to pick a currency. `listFxRates` is the currency list: a rate exists only for a currency the venue enabled, so the two questions have one answer.\n\n**Rev 3 (decided 29 September, rev 3 GAP-D2).** The web and app waves of this capability differ; they are aligned to one wave once the client picks it (open, client to choose).\n\nRates carry `fetchedAt` (`listFxRates`; GAP-B3, already); the prototype's fixed demo rate is prototype-only (CFG-7, no change).\n\n**The guest selects the currency and pays in it** (decided 2 October 2026, Chinmay; CHG-FIN-001; reverses the display-only rule, CF-37 and \"payment will be processed in AED\", in favour of option (b) of MoM 10 Aug 2026 4.7, DI-211). The venue lists the currencies a guest may pay in (`VenueSettings.chargeCurrencies`, a subset of the currencies it shows); `listFxRates` with `chargeable=true` returns them, each marked `chargeable`. The selected currency is sent at checkout (`checkoutCart.chargeCurrency`), the rate is locked on the order (`Order.chargeFxRate`, `chargeTotal`, until `chargeRateLockedUntil`), and the payment request goes to the payment partner in that currency. The ledger stays in the venue's base currency, with the rate recorded on the order, the payment and any refund. **Refunds go back in the currency paid**, at the sale rate, so a full refund returns exactly what was charged. A currency the venue shows but does not charge is still an approximate price, marked \"approx.\", with \"You pay in <base currency>\" beside it.",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listFxRates` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
-  "purpose": "Compare prices in your own currency before you travel.",
+  "purpose": "Choose the currency you see prices in and pay in.",
   "layout": {
    "template": "split",
    "regions": [
@@ -686,16 +686,31 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "selectField",
+       "label": "Pay in",
+       "operation": "listFxRates",
+       "notes": "Sends `?venueId=&chargeable=true` to `listFxRates`: the currencies this venue lets a guest pay in, base currency first. The choice is kept for the session and sent at checkout as `chargeCurrency` (CHG-FIN-001).",
+       "provenance": "contract finance.yaml GET /fx-rates"
+      },
+      {
+       "kind": "banner",
+       "label": "How you pay",
+       "operation": "listFxRates",
+       "notes": "\"You pay in USD. Your card is charged USD 81.72; the venue records AED 300.00 at 3.6710.\" For a currency shown but not chargeable: \"Prices in EUR are approximate. You pay in AED.\" (CHG-FIN-001). The purpose filter is fixed to `tender`, never typed by a guest.",
+       "provenance": "contract finance.yaml GET /fx-rates"
+      },
+      {
        "kind": "cardList",
        "label": "Currencies",
        "bindsTo": "FxRate",
        "columns": [
         "FxRate.toCurrency",
         "FxRate.rate",
-        "FxRate.effectiveFrom"
+        "FxRate.fetchedAt",
+        "FxRate.chargeable"
        ],
        "operation": "listFxRates",
-       "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)",
+       "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3); currency choice CHG-FIN-001",
        "notes": "Fixed by the screen: the venue from Home, as at now, purpose tender. A guest never chooses a purpose: that would let them browse internal treasury rates. Was the generated table 'Every FX rate'; staff and plumbing columns removed (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3))."
       },
       {
@@ -718,13 +733,14 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The rate",
+       "label": "The selected currency",
        "bindsTo": "FxRate",
        "columns": [
         "FxRate.fromCurrency",
         "FxRate.toCurrency",
         "FxRate.rate",
-        "FxRate.effectiveFrom"
+        "FxRate.fetchedAt",
+        "FxRate.chargeable"
        ],
        "operation": "listFxRates",
        "provenance": "contract finance.yaml GET /fx-rates"
@@ -745,7 +761,7 @@
    {
     "operationId": "listFxRates",
     "contract": "finance",
-    "purpose": "The rates in force for the venue's shown currencies — always called with `venueId` (decided 28 September, audit R120 (a))",
+    "purpose": "The currencies the venue shows, each marked chargeable or approximate — called with `venueId` (audit R120 (a)) and `chargeable` (CHG-FIN-001)",
     "trigger": "onLoad"
    },
    {
@@ -774,7 +790,7 @@
     "verified": "2026-09-28",
     "match": "exact",
     "view": "Discover → 'Prices in your currency'",
-    "differences": "Matches the YAML's charged-vs-shown rule. Separately, Config → Currency switches the whole storefront currency, which contradicts 'always charged in AED'."
+    "differences": "Matches the YAML's charged-vs-shown rule. Separately, Config → Currency switches the whole storefront currency, which contradicts 'always charged in AED'. **Resolved 2 October 2026 (CHG-FIN-001):** the guest may pay in the selected currency, so a storefront currency switch is right where the venue charges that currency."
    }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",

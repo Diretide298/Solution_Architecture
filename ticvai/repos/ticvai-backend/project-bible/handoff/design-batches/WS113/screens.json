@@ -356,6 +356,11 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack ACCREDITATION.pdf, page 48"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-004): No read of AccreditationValidity.",
+    "source": "contracts/satellite/accreditation.yaml#setAccreditationValidity"
    }
   ],
   "layout": {
@@ -478,6 +483,12 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack ACCREDITATION.pdf, page 49"
+   },
+   {
+    "operation": "createAccreditationProgramme",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): Assigning scope edits an existing programme (the screen opens with a programmeId); it needs the programme read and updateAccreditationProgramme, not a create (design-notes correction venue-operations BO-667).",
+    "source": "screens/P08-venue-back-office.yaml#BO-667 | contracts/satellite/accreditation.yaml#updateAccreditationProgramme"
    }
   ],
   "layout": {
@@ -487,18 +498,22 @@
      "name": "contentBody",
      "components": [
       {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "createAccreditationProgramme",
-       "label": "Create",
-       "notes": "The act the screen exists for."
-      },
+       "kind": "dataTable",
+       "label": "Programme",
+       "bindsTo": "AccreditationProgramme",
+       "operation": "listAccreditationProgrammes",
+       "provenance": "contract accreditation.yaml GET /accreditation-programmes; wiring fix, 2 October 2026"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "components": [
       {
        "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "createAccreditationProgramme"
+       "label": "Save scope",
+       "operation": "updateAccreditationProgramme",
+       "provenance": "contract accreditation.yaml PUT /accreditation-programmes/{programmeId}; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -513,21 +528,25 @@
   },
   "apis": [
    {
-    "operationId": "createAccreditationProgramme",
-    "contract": "accreditation",
-    "purpose": "Event and venue assignment",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026",
-    "invalidates": [
-     "listAccreditationProgrammes"
-    ]
-   },
-   {
     "operationId": "cloneAccreditationProgramme",
     "contract": "accreditation",
     "purpose": "Assign a programme to a new event by cloning it",
     "trigger": "onAction",
     "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "listAccreditationProgrammes",
+    "contract": "accreditation",
+    "purpose": "The programme and its event and venue scope",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-001)"
+   },
+   {
+    "operationId": "updateAccreditationProgramme",
+    "contract": "accreditation",
+    "purpose": "Save the event and venue scope",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-001)"
    }
   ],
   "wireframe": {
@@ -544,6 +563,22 @@
     }
    ]
   },
+  "overlays": [
+   {
+    "id": "formUpdateAccreditationProgramme",
+    "component": "modal",
+    "trigger": "Save scope",
+    "body": "**Collects what `updateAccreditationProgramme` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save scope",
+     "operation": "updateAccreditationProgramme"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "contract accreditation.yaml PUT /accreditation-programmes/{programmeId}; wiring fix, 2 October 2026"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -636,6 +671,13 @@
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
        "impliedBy": "setAccessProfile"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Access profiles",
+       "bindsTo": "AccessProfile",
+       "operation": "listAccessProfiles",
+       "provenance": "contract accreditation.yaml GET /accreditation-access-profiles; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -658,6 +700,13 @@
     "invalidates": [
      "listAccessProfiles"
     ]
+   },
+   {
+    "operationId": "listAccessProfiles",
+    "contract": "accreditation",
+    "purpose": "Profiles and the venues they cover",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-001)"
    }
   ],
   "wireframe": {
@@ -666,6 +715,7 @@
    "workshopBoard": "wireframes/WS06 ACCREDITATION Board 6.dc.html#bo-668"
   },
   "apisNote": "Regenerated 9 September 2026 from ACCREDITATION.pdf page 49. 0 of 0 labels bound to a contract property; 0 of 16 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {},
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -741,26 +791,6 @@
       },
       {
        "kind": "selectField",
-       "label": "Start/end date",
-       "provenance": "pack ACCREDITATION.pdf, page 50 §Administrators shall configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Events",
-       "provenance": "pack ACCREDITATION.pdf, page 50 §Administrators shall configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Venues",
-       "provenance": "pack ACCREDITATION.pdf, page 50 §Administrators shall configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Access profile",
-       "provenance": "pack ACCREDITATION.pdf, page 50 §Administrators shall configure"
-      },
-      {
-       "kind": "selectField",
        "label": "Automatic expiry",
        "provenance": "pack ACCREDITATION.pdf, page 50 §Administrators shall configure"
       },
@@ -776,28 +806,18 @@
   "states": {
    "loading": "The temporary seasonal accreditation configuration as saved.",
    "error": "Could not load. Names which read failed and leaves the temporary seasonal accreditation untouched.",
-   "emptyFirstRun": "No temporary seasonal accreditation configured yet. Carries the create action and says what the platform does in the meantime.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "No temporary seasonal accreditation configured yet. Offers no create action — this screen declares no operation that makes one and says what the platform does in the meantime.",
+   "emptyNoAccess": "Not shown: nothing on this screen needs a permission of its own; the app's sign-in decides access.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },
-  "apis": [
-   {
-    "operationId": "setAccreditationValidity",
-    "contract": "accreditation",
-    "purpose": "Temporary and seasonal",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026",
-    "invalidates": [
-     "listAccreditationHolders"
-    ]
-   }
-  ],
+  "apis": [],
   "wireframe": {
    "status": "notStarted",
    "board": "wireframes/P08 Venue Management.dc.html#bo-669",
    "workshopBoard": "wireframes/WS06 ACCREDITATION Board 6.dc.html#bo-669"
   },
-  "apisNote": "Regenerated 9 September 2026 from ACCREDITATION.pdf page 50. 0 of 0 labels bound to a contract property; 7 of 25 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "No operations of its own since 2 October 2026 (CHG-WIR-001): merged into BO-666, whose operations it routes to.",
+  "notes": "**Merged into BO-666** (decided 2 October 2026, Chinmay: fix the wrong wiring now; CHG-WIR-001). BO-669 binds the same single operation (setAccreditationValidity) on the same record as BO-666 Validity Period Configuration; temporary and seasonal periods are presets inside the validity editor (VO-R14; DI-671, DI-987; design-notes correction venue-operations BO-669). **One implementation, both ids kept**, as the M24-03 merges do: this id stays for traceability and routes to BO-666, and nothing on it is built separately.\n\nDates follow from the validity kind and the programme; events and venues are the programme's scope (BO-667); access profiles are category defaults (design-note correction).",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1177,6 +1197,12 @@
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
        "impliedBy": "renewAccreditation"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Expiring documents",
+       "operation": "listAccreditationDocuments",
+       "provenance": "contract accreditation.yaml GET /accreditation-documents; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -1203,6 +1229,13 @@
     "purpose": "Renew a holder approaching expiry",
     "trigger": "onAction",
     "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "listAccreditationDocuments",
+    "contract": "accreditation",
+    "purpose": "Documents expiring before the event",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-001)"
    }
   ],
   "wireframe": {
@@ -1290,6 +1323,12 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack ACCREDITATION.pdf, page 53"
+   },
+   {
+    "operation": "setAccreditationValidity",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): setAccreditationValidity is programme-level rule configuration; the screen renews one holder, and the validity rules belong in BO-666 (design-notes correction venue-operations BO-673).",
+    "source": "screens/P08-venue-back-office.yaml#BO-673 | contracts/satellite/accreditation.yaml#setAccreditationValidity"
    }
   ],
   "layout": {
@@ -1299,10 +1338,15 @@
      "name": "contentBody",
      "components": [
       {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listAccreditationHolders",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      },
+      {
        "kind": "primaryButton",
        "derived": true,
-       "impliedBy": "setAccreditationValidity",
-       "label": "Save",
+       "impliedBy": "renewAccreditation",
        "notes": "The act the screen exists for."
       },
       {
@@ -1310,7 +1354,7 @@
        "label": "Cancel",
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
-       "impliedBy": "setAccreditationValidity"
+       "impliedBy": "renewAccreditation"
       }
      ]
     }
@@ -1319,21 +1363,11 @@
   "states": {
    "loading": "The accreditation renewal list.",
    "error": "Could not load. Names which read failed and leaves the accreditation renewal untouched.",
-   "emptyFirstRun": "No accreditation renewal yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No accreditation renewal yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the accreditation renewal are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
-   {
-    "operationId": "setAccreditationValidity",
-    "contract": "accreditation",
-    "purpose": "Expiry and renewal rules",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026",
-    "invalidates": [
-     "listAccreditationHolders"
-    ]
-   },
    {
     "operationId": "listAccreditationHolders",
     "contract": "accreditation",

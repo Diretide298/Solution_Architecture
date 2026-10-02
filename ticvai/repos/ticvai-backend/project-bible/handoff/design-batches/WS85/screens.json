@@ -1210,6 +1210,13 @@
        "kind": "destructiveButton",
        "label": "Block offline operation",
        "provenance": "pack Game_and_Ride_Module.pdf, page 81"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Set maximum offline duration",
+       "operation": "setGateOfflinePolicy",
+       "notes": "**The venue sets a maximum offline duration; past it readers refuse offline taps until they reconnect (decided 2 October 2026 by Chinmay, DEC-426; CHG-CSP-035, CHG-CSA-028).**",
+       "provenance": "contract access.yaml PUT /offline-policies"
       }
      ]
     }
@@ -1229,6 +1236,13 @@
     "purpose": "What is held offline",
     "trigger": "onLoad",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "setGateOfflinePolicy",
+    "contract": "access",
+    "purpose": "Set the offline policy of a venue",
+    "trigger": "onAction",
+    "provenance": "design-note correction, 2 October 2026 (BO-471)"
    }
   ],
   "wireframe": {
@@ -1237,6 +1251,35 @@
    "workshopBoard": "wireframes/WS65 Game and Ride Board 8.dc.html#bo-471"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 80. 0 of 0 labels bound to a contract property; 7 of 29 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Layout drafted 29 September (VM close-out)** from pack Game_and_Ride_Module.pdf p.81; contract games.yaml GET /gameplay-sync-status. Pack labels with no schema field yet (shown as plain labels): Sync states: Offline Transactions Pending, Synchronizing, Synchronized, Conflict, Failed Sync, Offline operation allowed, Maximum offline duration, Maximum offline transaction value.",
+  "overlays": [
+   {
+    "id": "formSetGateOfflinePolicy",
+    "component": "modal",
+    "trigger": "Set maximum offline duration",
+    "body": "**Collects what `setGateOfflinePolicy` sends before it is called.** Required: `venueId`. Optional: `maxOfflineDurationHours`, `offlineChecks`, `afterThresholdBehavior`, `revocationTriggerEvents`, `revocationMaxAllowedAgeMinutes`, `revocationStalenessAction`, `operatingModes`, `centralUnavailableAfterSeconds`, `edgeUnavailableAfterSeconds`, `automaticSwitch`. `id` is a client UUIDv7 generated silently, never asked. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Set maximum offline duration",
+     "operation": "setGateOfflinePolicy"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "venueId",
+      "maxOfflineDurationHours",
+      "offlineChecks",
+      "afterThresholdBehavior",
+      "revocationTriggerEvents",
+      "revocationMaxAllowedAgeMinutes",
+      "revocationStalenessAction",
+      "operatingModes",
+      "centralUnavailableAfterSeconds",
+      "edgeUnavailableAfterSeconds",
+      "automaticSwitch"
+     ]
+    },
+    "provenance": "contract access.yaml PUT /offline-policies"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1304,6 +1347,11 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Game_and_Ride_Module.pdf, page 82"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-004): No games analytics or reconciliation read (plays, rates, revenue, uptime).",
+    "source": "contracts/satellite/games.yaml#getGameplaySyncStatus"
    }
   ],
   "layout": {

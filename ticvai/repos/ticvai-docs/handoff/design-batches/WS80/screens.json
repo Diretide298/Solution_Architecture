@@ -106,6 +106,11 @@
     "operation": null,
     "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
     "source": "pack Game_and_Ride_Module.pdf, page 23 §Show"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-027): A wallet operations dashboard read of aggregates across wallets (getWallet reads one guest wallet).",
+    "source": "screens/P08-venue-back-office.yaml#BO-414"
    }
   ],
   "layout": {
@@ -709,6 +714,13 @@
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
        "impliedBy": "setWalletFundingRules"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "How a wallet may be topped up",
+       "bindsTo": "WalletFundingRules",
+       "operation": "getWalletFundingRules",
+       "provenance": "contract wallet.yaml GET /wallet-funding-rules; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -728,6 +740,13 @@
     "purpose": "Top-up rules",
     "trigger": "onAction",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "getWalletFundingRules",
+    "contract": "wallet",
+    "purpose": "How a wallet may be topped up",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {
@@ -736,6 +755,7 @@
    "workshopBoard": "wireframes/WS60 Game and Ride Board 3.dc.html#bo-417"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 26. 0 of 0 labels bound to a contract property; 0 of 19 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {},
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -830,6 +850,13 @@
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
        "impliedBy": "setWalletFundingRules"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "How a wallet may be topped up",
+       "bindsTo": "WalletFundingRules",
+       "operation": "getWalletFundingRules",
+       "provenance": "contract wallet.yaml GET /wallet-funding-rules; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -849,6 +876,13 @@
     "purpose": "Top-up bonus rules",
     "trigger": "onAction",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "getWalletFundingRules",
+    "contract": "wallet",
+    "purpose": "How a wallet may be topped up",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {
@@ -857,6 +891,7 @@
    "workshopBoard": "wireframes/WS60 Game and Ride Board 3.dc.html#bo-418"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 27. 0 of 0 labels bound to a contract property; 0 of 18 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {},
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -929,6 +964,11 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Game_and_Ride_Module.pdf, page 27"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-027): A read (get or list) of the credit eligibility (where a credit may be spent; CreditType does not carry it) that setCreditEligibilityRules writes.",
+    "source": "contracts/satellite/wallet.yaml#setCreditEligibilityRules | screens/P08-venue-back-office.yaml#BO-419"
    }
   ],
   "layout": {
@@ -1079,6 +1119,13 @@
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
        "impliedBy": "updateCreditType"
+      },
+      {
+       "kind": "dataTable",
+       "label": "The kinds of value that may sit in a wallet",
+       "bindsTo": "CreditType",
+       "operation": "listCreditTypes",
+       "provenance": "contract wallet.yaml GET /credit-types; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -1098,6 +1145,13 @@
     "purpose": "Bonus validity and expiry",
     "trigger": "onAction",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "listCreditTypes",
+    "contract": "wallet",
+    "purpose": "The kinds of value that may sit in a wallet",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {
@@ -1354,6 +1408,13 @@
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
        "impliedBy": "adjustWallet"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Read a guest wallet",
+       "bindsTo": "Wallet",
+       "operation": "getWallet",
+       "provenance": "contract wallet.yaml GET /wallets/{subjectId}; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -1373,6 +1434,13 @@
     "purpose": "Refund, adjust or grant bonus",
     "trigger": "onAction",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "getWallet",
+    "contract": "wallet",
+    "purpose": "Read a guest wallet",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {

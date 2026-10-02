@@ -281,6 +281,30 @@
   "requestBody": null,
   "responds": "UpgradeTimingUsageTicketStatusRulesView"
  },
+ "listUpgrades": {
+  "method": "GET",
+  "path": "/upgrades",
+  "contract": "orders",
+  "summary": "Upgrade requests and their outcome",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "setProRataResidual": {
   "method": "PUT",
   "path": "/pro-rata-residual",

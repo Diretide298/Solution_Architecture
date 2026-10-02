@@ -37,25 +37,6 @@
   "requestBody": "CreateScopeNodeRequest",
   "responds": "OrgUnit"
  },
- "createPartnerAgreement": {
-  "method": "POST",
-  "path": "/partner-agreements",
-  "contract": "subscription",
-  "summary": "Agree commercial terms with a partner",
-  "permission": "PARTNER_MANAGE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "PartnerAgreement",
-  "responds": "PartnerAgreement"
- },
  "createPlan": {
   "method": "POST",
   "path": "/plans",
@@ -416,29 +397,34 @@
   "requestBody": null,
   "responds": "Page"
  },
- "listPartnerAgreements": {
+ "listOwnPlatformStaffGrants": {
   "method": "GET",
-  "path": "/partner-agreements",
-  "contract": "subscription",
-  "summary": "Commercial agreements with B2B partners",
-  "permission": "PARTNER_MANAGE",
+  "path": "/platform-staff-grants/mine",
+  "contract": "identity",
+  "summary": "The calling platform operator's own grants into this tenant",
+  "permission": "PLATFORM_TENANT_ACCESS",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
   "parameters": [
    {
-    "name": "expiringWithinDays",
+    "name": "activeOnly",
     "in": "query",
     "required": null
    },
    {
-    "name": "status",
-    "in": "query",
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
     "required": null
    }
   ],
   "requestBody": null,
-  "responds": "PartnerAgreement"
+  "responds": "Page"
  },
  "listPlans": {
   "method": "GET",
@@ -777,25 +763,6 @@
   ],
   "requestBody": null,
   "responds": null
- },
- "updatePartnerAgreement": {
-  "method": "PATCH",
-  "path": "/partner-agreements/{agreementId}",
-  "contract": "subscription",
-  "summary": "Amend, suspend or terminate",
-  "permission": "PARTNER_MANAGE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "PartnerAgreement",
-  "responds": "PartnerAgreement"
  },
  "updateTenant": {
   "method": "PATCH",

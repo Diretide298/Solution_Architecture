@@ -1,4 +1,36 @@
 {
+ "generateCouponCodes": {
+  "method": "POST",
+  "path": "/coupon-campaigns/{campaignId}/codes",
+  "contract": "promotions",
+  "summary": "Generate codes in bulk",
+  "permission": "PRICE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "getCouponCodeBatch": {
+  "method": "GET",
+  "path": "/coupon-campaigns/{campaignId}/code-batches/{batchId}",
+  "contract": "promotions",
+  "summary": "Progress and export of a code batch",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "CouponCodeBatch"
+ },
  "listCodeEligibilityRestriction": {
   "method": "GET",
   "path": "/code-eligibility-restriction",
@@ -30,6 +62,30 @@
   ],
   "requestBody": null,
   "responds": "CodeSecurityFraudExceptionCenterView"
+ },
+ "listCouponCampaigns": {
+  "method": "GET",
+  "path": "/coupon-campaigns",
+  "contract": "promotions",
+  "summary": "List coupon campaigns",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
  },
  "listCouponCodes": {
   "method": "GET",
@@ -251,24 +307,5 @@
   ],
   "requestBody": "CodeDistributionAssignmentManagerInput",
   "responds": "CodeDistributionAssignmentManagerView"
- },
- "setCouponPromoCode": {
-  "method": "PUT",
-  "path": "/coupon-promo-code",
-  "contract": "promotions",
-  "summary": "Coupon & Promo Code Builder",
-  "permission": "PRICE_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "CouponPromoCodeBuilderInput",
-  "responds": "CouponPromoCodeBuilderView"
  }
 }

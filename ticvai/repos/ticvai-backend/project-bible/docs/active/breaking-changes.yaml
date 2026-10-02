@@ -35,4 +35,323 @@
 #     producer-tickets: [SVC-ORDERS-CHECKOUT-1]
 #     consumer-tickets: [APP-POS-SCN-020, APP-WEB-GST-031]
 
-changes: []
+# BC-001 to BC-005 are one decision (CHG-CSP-002): `Session.saleBoardId` is no longer required, so every
+# operation that returns a Session reports it. Chinmay, 2 October 2026, door follow-ups: "Make it optional;
+# log the breaking change." Only a till session carries a board; a browser or handheld session has none.
+changes:
+  - id: BC-001
+    contract: identity
+    operation: login
+    change: "`session.saleBoardId` is no longer guaranteed"
+    reason: >-
+      A browser door (ADM-001, SUP-001, PTR-001) and the staff handheld (EMP-001) sign in with no workstation
+      since CHG-DOOR-001, and the board is derived from the workstation, so a required saleBoardId forced the
+      server to invent one. Only a till session carries it (CHG-CSP-002).
+    approved-by: Chinmay Parab, 2 October 2026 (door follow-ups)
+    tag: r2
+    producer-tickets: [SVC-IDENTITY-IDENTITY-2]
+    consumer-tickets: [APP-POS-POS-000, APP-STAFF-EMP-001, APP-SCANNER-SCN-001, APP-CONSOLE-ADM-001,
+                       APP-PARTNER-PTR-001, APP-SUPPORT-SUP-001]
+  - id: BC-002
+    contract: identity
+    operation: selectRole
+    change: "`saleBoardId` is no longer guaranteed"
+    reason: As BC-001; the role prompt returns the same Session (CHG-CSP-002).
+    approved-by: Chinmay Parab, 2 October 2026 (door follow-ups)
+    tag: r2
+    producer-tickets: [SVC-IDENTITY-IDENTITY-3]
+    consumer-tickets: [APP-POS-POS-000, APP-POS-POS-001, APP-STAFF-EMP-002, APP-SCANNER-SCN-001,
+                       APP-CONSOLE-ADM-001, APP-PARTNER-PTR-001, APP-SUPPORT-SUP-001]
+  - id: BC-003
+    contract: identity
+    operation: getCurrentSession
+    change: "`saleBoardId` is no longer guaranteed"
+    reason: As BC-001; a session read back from a browser or a handheld has no board (CHG-CSP-002).
+    approved-by: Chinmay Parab, 2 October 2026 (door follow-ups)
+    tag: r2
+    producer-tickets: [SVC-IDENTITY-IDENTITY-1]
+    consumer-tickets: [APP-POS-POS-000, APP-STAFF-EMP-001, APP-STAFF-EMP-002, APP-STAFF-EMP-042,
+                       APP-SCANNER-SCN-001, APP-CONSOLE-ADM-001, APP-PARTNER-PTR-001, APP-SUPPORT-SUP-001]
+  - id: BC-004
+    contract: identity
+    operation: completeSsoAuthorization
+    change: "`session.saleBoardId` is no longer guaranteed"
+    reason: As BC-001; SSO is offered only on browser doors and the staff handheld, none of which has a till
+      (CHG-DOOR-002, CHG-CSP-002).
+    approved-by: Chinmay Parab, 2 October 2026 (door follow-ups)
+    tag: r2
+    producer-tickets: [SVC-IDENTITY-IDENTITY]
+    consumer-tickets: [APP-STAFF-EMP-001, APP-CONSOLE-ADM-001, APP-PARTNER-PTR-001, APP-SUPPORT-SUP-001]
+  - id: BC-005
+    contract: identity
+    operation: verifyMfaChallenge
+    change: "`session.saleBoardId` is no longer guaranteed"
+    reason: As BC-001; the second factor completes the same sign-in and returns the same Session (CHG-CSP-002).
+    approved-by: Chinmay Parab, 2 October 2026 (door follow-ups)
+    tag: r2
+    producer-tickets: [SVC-IDENTITY-MFA-2]
+    consumer-tickets: [APP-POS-POS-000, APP-STAFF-EMP-001, APP-SCANNER-SCN-001, APP-CONSOLE-ADM-001,
+                       APP-PARTNER-PTR-001, APP-SUPPORT-SUP-001, APP-SETUP-BO-053]
+
+# BC-006 and BC-007 are one decision (CHG-FUP-004): publishing a module's AI moves from `AI_APPROVE` to that
+# module's `<MODULE>_AI_PUBLISH`. Chinmay, 2 October 2026, workbook Q3 and Q7 (DEC-003, DEC-007) and the contract
+# follow-ups: "per-module AI publish (replacing AI_APPROVE for model publishing)". No ticket has started (Block A
+# starts Monday 5 October), so producer and consumers move to r2 together before anything is built at r1.
+  - id: BC-006
+    contract: ai
+    operation: publishForecastVersion
+    reason: >-
+      Who publishes a forecast is the holder of that module's AI publish permission, with no default role
+      (DEC-003). A permission that depends on the forecast's module cannot be expressed by keeping AI_APPROVE;
+      the base permission becomes AI_USE (the forecast reads) and the module permission is declared in
+      x-ticvai-permission-by-module (CHG-FUP-004).
+    approved-by: Chinmay Parab, 2 October 2026 (contract follow-ups; workbook Q3)
+    tag: r2
+    producer-tickets: [SVC-AI-FORECAST-2]
+    consumer-tickets: [APP-SETUP-ADM-508]
+  - id: BC-007
+    contract: ai
+    operation: promoteAiRelease
+    reason: >-
+      AI release promotion goes to whoever holds the module's "Publish AI model" permission (DEC-007). As BC-006:
+      the base permission becomes AI_USE and the release's module permission is declared in
+      x-ticvai-permission-by-module; a platform release still needs PLATFORM_AI_MANAGE (CHG-FUP-004).
+    approved-by: Chinmay Parab, 2 October 2026 (contract follow-ups; workbook Q7)
+    tag: r2
+    producer-tickets: [SVC-AI-MODELS-1]
+    consumer-tickets: [APP-SETUP-ADM-554]
+
+# BC-008 to BC-020 are one decision (CHG-CLN-001): the 13 duplicate first-release setup operations the ADM-049 section
+# merges kept (CHG-MOV-002, CHG-MOV-008) are removed in r2. Chinmay, 2 October 2026: "13 dupes would be gone in r2".
+# Each duplicated a typed writer the venue screen already calls; no ticket has started (Block A starts Monday 5
+# October), and the 13 APP-SETUP-ADM tickets are closed as replaced (tools/op-retire.py REPLACED; CHG-CLN-002).
+  - id: BC-008
+    contract: catalogue
+    operation: setPriceListMaster
+    reason: >-
+      setPriceListMaster duplicated a typed writer on the venue screen: the record is written by createPriceList and updatePriceList on BO-009, which now take the price list master fields (additive). Two writers
+      for one record (CHG-MOV-008); removing one cannot be additive.
+    approved-by: Chinmay Parab, 2 October 2026 ("13 dupes would be gone in r2"; CHG-CLN-001)
+    tag: r2
+    producer-tickets: [SVC-CATALOGUE-DRAFTED-4]
+    consumer-tickets: [APP-SETUP-ADM-049]
+  - id: BC-009
+    contract: catalogue
+    operation: setRateStructure
+    reason: >-
+      setRateStructure duplicated a typed writer on the venue screen: the record is written by setPrices on BO-009. Two writers
+      for one record (CHG-MOV-008); removing one cannot be additive.
+    approved-by: Chinmay Parab, 2 October 2026 ("13 dupes would be gone in r2"; CHG-CLN-001)
+    tag: r2
+    producer-tickets: [SVC-CATALOGUE-DRAFTED-5]
+    consumer-tickets: [APP-SETUP-ADM-051]
+  - id: BC-010
+    contract: catalogue
+    operation: createBulkProductCatalogue
+    reason: >-
+      createBulkProductCatalogue duplicated a typed writer on the venue screen: the record is written by importProductCatalogue and commitCatalogueImport on BO-117. Two writers
+      for one record (CHG-MOV-008); removing one cannot be additive.
+    approved-by: Chinmay Parab, 2 October 2026 ("13 dupes would be gone in r2"; CHG-CLN-001)
+    tag: r2
+    producer-tickets: [SVC-CATALOGUE-DRAFTED-1]
+    consumer-tickets: [APP-SETUP-ADM-121]
+  - id: BC-011
+    contract: promotions
+    operation: setPromotionRule
+    reason: >-
+      setPromotionRule duplicated a typed writer on the venue screen: the record is written by createPromotion and updatePromotion on BO-010. Two writers
+      for one record (CHG-MOV-008); removing one cannot be additive.
+    approved-by: Chinmay Parab, 2 October 2026 ("13 dupes would be gone in r2"; CHG-CLN-001)
+    tag: r2
+    producer-tickets: [SVC-CATALOGUE-DRAFTED-5]
+    consumer-tickets: [APP-SETUP-ADM-148]
+  - id: BC-012
+    contract: promotions
+    operation: setCouponPromoCode
+    reason: >-
+      setCouponPromoCode duplicated a typed writer on the venue screen: the record is written by createCouponCampaign and generateCouponCodes on BO-010. Two writers
+      for one record (CHG-MOV-008); removing one cannot be additive.
+    approved-by: Chinmay Parab, 2 October 2026 ("13 dupes would be gone in r2"; CHG-CLN-001)
+    tag: r2
+    producer-tickets: [SVC-CATALOGUE-DRAFTED-2]
+    consumer-tickets: [APP-SETUP-ADM-159]
+  - id: BC-013
+    contract: promotions
+    operation: setBuyGetBogo
+    reason: >-
+      setBuyGetBogo duplicated a typed writer on the venue screen: the record is written by createPromotion with a buyXGetY Discount on BO-010. Two writers
+      for one record (CHG-MOV-008); removing one cannot be additive.
+    approved-by: Chinmay Parab, 2 October 2026 ("13 dupes would be gone in r2"; CHG-CLN-001)
+    tag: r2
+    producer-tickets: [SVC-CATALOGUE-DRAFTED-2]
+    consumer-tickets: [APP-SETUP-ADM-169]
+  - id: BC-014
+    contract: promotions
+    operation: setFixedPriceOffer
+    reason: >-
+      setFixedPriceOffer duplicated a typed writer on the venue screen: the record is written by createPromotion (an N-for-X offer: Discount with maxApplicationsPerBasket) on BO-010. Two writers
+      for one record (CHG-MOV-008); removing one cannot be additive.
+    approved-by: Chinmay Parab, 2 October 2026 ("13 dupes would be gone in r2"; CHG-CLN-001)
+    tag: r2
+    producer-tickets: [SVC-CATALOGUE-DRAFTED-3]
+    consumer-tickets: [APP-SETUP-ADM-172]
+  - id: BC-015
+    contract: promotions
+    operation: setGiftFreeProduct
+    reason: >-
+      setGiftFreeProduct duplicated a typed writer on the venue screen: the record is written by createPromotion with a freeItem Discount and rewardProductIds on BO-010. Two writers
+      for one record (CHG-MOV-008); removing one cannot be additive.
+    approved-by: Chinmay Parab, 2 October 2026 ("13 dupes would be gone in r2"; CHG-CLN-001)
+    tag: r2
+    producer-tickets: [SVC-CATALOGUE-DRAFTED-4]
+    consumer-tickets: [APP-SETUP-ADM-173]
+  - id: BC-016
+    contract: promotions
+    operation: setCrossCategoryPromotion
+    reason: >-
+      setCrossCategoryPromotion duplicated a typed writer on the venue screen: the record is written by createPromotion with PromotionConditions on BO-010. Two writers
+      for one record (CHG-MOV-008); removing one cannot be additive.
+    approved-by: Chinmay Parab, 2 October 2026 ("13 dupes would be gone in r2"; CHG-CLN-001)
+    tag: r2
+    producer-tickets: [SVC-CATALOGUE-DRAFTED-3]
+    consumer-tickets: [APP-SETUP-ADM-174]
+  - id: BC-017
+    contract: promotions
+    operation: setEligibilityRule
+    reason: >-
+      setEligibilityRule duplicated a typed writer on the venue screen: the record is written by createPromotion with PromotionConditions on BO-010 (eligibilityRuleIds is deprecated: no operation creates a library rule). Two writers
+      for one record (CHG-MOV-008); removing one cannot be additive.
+    approved-by: Chinmay Parab, 2 October 2026 ("13 dupes would be gone in r2"; CHG-CLN-001)
+    tag: r2
+    producer-tickets: [SVC-CATALOGUE-DRAFTED-3]
+    consumer-tickets: [APP-SETUP-ADM-199]
+  - id: BC-018
+    contract: promotions
+    operation: setBundleDefinition
+    reason: >-
+      setBundleDefinition duplicated a typed writer on the venue screen: the record is written by createBundle and updateBundle on BO-011. Two writers
+      for one record (CHG-MOV-008); removing one cannot be additive.
+    approved-by: Chinmay Parab, 2 October 2026 ("13 dupes would be gone in r2"; CHG-CLN-001)
+    tag: r2
+    producer-tickets: [SVC-CATALOGUE-DRAFTED-1]
+    consumer-tickets: [APP-SETUP-ADM-179]
+  - id: BC-019
+    contract: promotions
+    operation: setBundleComponent
+    reason: >-
+      setBundleComponent duplicated a typed writer on the venue screen: the record is written by createBundle (BundleComponent) on BO-011. Two writers
+      for one record (CHG-MOV-008); removing one cannot be additive.
+    approved-by: Chinmay Parab, 2 October 2026 ("13 dupes would be gone in r2"; CHG-CLN-001)
+    tag: r2
+    producer-tickets: [SVC-CATALOGUE-DRAFTED-1]
+    consumer-tickets: [APP-SETUP-ADM-180]
+  - id: BC-020
+    contract: promotions
+    operation: setGuestChoiceBuild
+    reason: >-
+      setGuestChoiceBuild duplicated a typed writer on the venue screen: the record is written by createBundle (BundleChoiceGroup) on BO-011. Two writers
+      for one record (CHG-MOV-008); removing one cannot be additive.
+    approved-by: Chinmay Parab, 2 October 2026 ("13 dupes would be gone in r2"; CHG-CLN-001)
+    tag: r2
+    producer-tickets: [SVC-CATALOGUE-DRAFTED-4]
+    consumer-tickets: [APP-SETUP-ADM-181]
+
+# BC-021 to BC-028 are one decision (CHG-CLN-018): the eight partner list reads the partner screens moved to Venue
+# Management call (CHG-CLN-004) take PARTNER_VIEW, a staff permission, instead of PLATFORM_TENANT_VIEW, which no venue
+# role holds. No ticket has started and none of these operations is pushed; producer and consumers are planned keys.
+  - id: BC-021
+    contract: subscription
+    operation: listTerritoryMarketDistribution
+    change: "permission"
+    reason: >-
+      Venue staff read it on PTR-026 in Venue Management since 2 October (CHG-CLN-004); PLATFORM_TENANT_VIEW is a
+      platform permission no venue role holds, so every staff call was refused. PARTNER_VIEW is what a partner
+      administrator holds already (listPartnerUsers). An operation's own permission cannot change additively.
+    approved-by: Chinmay Parab, 2 October 2026 (r2 breaking changes; CHG-CLN-018)
+    tag: r2
+    producer-tickets: [SVC-PLATFORM-DRAFTED-5]
+    consumer-tickets: [VM-PTR-026]
+  - id: BC-022
+    contract: subscription
+    operation: listPartnerAccessRole
+    change: "permission"
+    reason: >-
+      Venue staff read it on PTR-029 in Venue Management since 2 October (CHG-CLN-004); PLATFORM_TENANT_VIEW is a
+      platform permission no venue role holds, so every staff call was refused. PARTNER_VIEW is what a partner
+      administrator holds already (listPartnerUsers). An operation's own permission cannot change additively.
+    approved-by: Chinmay Parab, 2 October 2026 (r2 breaking changes; CHG-CLN-018)
+    tag: r2
+    producer-tickets: [SVC-PLATFORM-DRAFTED-5]
+    consumer-tickets: [VM-PTR-029]
+  - id: BC-023
+    contract: subscription
+    operation: listCommissionMarginIncentive
+    change: "permission"
+    reason: >-
+      Venue staff read it on PTR-035 in Venue Management since 2 October (CHG-CLN-004); PLATFORM_TENANT_VIEW is a
+      platform permission no venue role holds, so every staff call was refused. PARTNER_VIEW is what a partner
+      administrator holds already (listPartnerUsers). An operation's own permission cannot change additively.
+    approved-by: Chinmay Parab, 2 October 2026 (r2 breaking changes; CHG-CLN-018)
+    tag: r2
+    producer-tickets: [SVC-PLATFORM-DRAFTED-3]
+    consumer-tickets: [VM-PTR-035]
+  - id: BC-024
+    contract: subscription
+    operation: listCreditLimitExposure
+    change: "permission"
+    reason: >-
+      Venue staff read it on PTR-036 in Venue Management since 2 October (CHG-CLN-004); PLATFORM_TENANT_VIEW is a
+      platform permission no venue role holds, so every staff call was refused. PARTNER_VIEW is what a partner
+      administrator holds already (listPartnerUsers). An operation's own permission cannot change additively.
+    approved-by: Chinmay Parab, 2 October 2026 (r2 breaking changes; CHG-CLN-018)
+    tag: r2
+    producer-tickets: [SVC-PLATFORM-DRAFTED-3]
+    consumer-tickets: [VM-PTR-036]
+  - id: BC-025
+    contract: subscription
+    operation: listDepositGuaranteeFinancial
+    change: "permission"
+    reason: >-
+      Venue staff read it on PTR-037 in Venue Management since 2 October (CHG-CLN-004); PLATFORM_TENANT_VIEW is a
+      platform permission no venue role holds, so every staff call was refused. PARTNER_VIEW is what a partner
+      administrator holds already (listPartnerUsers). An operation's own permission cannot change additively.
+    approved-by: Chinmay Parab, 2 October 2026 (r2 breaking changes; CHG-CLN-018)
+    tag: r2
+    producer-tickets: [SVC-PLATFORM-DRAFTED-4]
+    consumer-tickets: [VM-PTR-037]
+  - id: BC-026
+    contract: subscription
+    operation: listCommercialAllocationQuota
+    change: "permission"
+    reason: >-
+      Venue staff read it on PTR-039 in Venue Management since 2 October (CHG-CLN-004); PLATFORM_TENANT_VIEW is a
+      platform permission no venue role holds, so every staff call was refused. PARTNER_VIEW is what a partner
+      administrator holds already (listPartnerUsers). An operation's own permission cannot change additively.
+    approved-by: Chinmay Parab, 2 October 2026 (r2 breaking changes; CHG-CLN-018)
+    tag: r2
+    producer-tickets: [SVC-PLATFORM-DRAFTED-3]
+    consumer-tickets: [VM-PTR-039]
+  - id: BC-027
+    contract: subscription
+    operation: listPartnerReconciliationException
+    change: "permission"
+    reason: >-
+      Venue staff read it on PTR-047 in Venue Management since 2 October (CHG-CLN-004); PLATFORM_TENANT_VIEW is a
+      platform permission no venue role holds, so every staff call was refused. PARTNER_VIEW is what a partner
+      administrator holds already (listPartnerUsers). An operation's own permission cannot change additively.
+    approved-by: Chinmay Parab, 2 October 2026 (r2 breaking changes; CHG-CLN-018)
+    tag: r2
+    producer-tickets: [SVC-PLATFORM-DRAFTED-5]
+    consumer-tickets: [VM-PTR-047]
+  - id: BC-028
+    contract: subscription
+    operation: listCommissionCalculationSettlement
+    change: "permission"
+    reason: >-
+      Venue staff read it on PTR-048 in Venue Management since 2 October (CHG-CLN-004); PLATFORM_TENANT_VIEW is a
+      platform permission no venue role holds, so every staff call was refused. PARTNER_VIEW is what a partner
+      administrator holds already (listPartnerUsers). An operation's own permission cannot change additively.
+    approved-by: Chinmay Parab, 2 October 2026 (r2 breaking changes; CHG-CLN-018)
+    tag: r2
+    producer-tickets: [SVC-PLATFORM-DRAFTED-3]
+    consumer-tickets: [VM-PTR-048]

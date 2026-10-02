@@ -4,7 +4,7 @@
 > **Scope:** the complete Staff App (P06), 96 screens in 10 batches, on a handheld (Android, Chainway C66 size). Block A batches first.
 
 ## Link in Claude Design
-Link **one folder: `D:\Chinmaydam	icvai`**. Every path in the prompt is relative to it.
+Link **one folder: `D:\Chinmay\adam\ticvai`**. Every path in the prompt is relative to it.
 
 ## The prompt (paste once)
 
@@ -19,12 +19,15 @@ The app shell (build it first, before any screen):
 
 The screens come from the batch folders in handoff/design-batches. The order is in handoff/design-batches/apps/4-staff-app/README.md: section by section, Block A batches first, then the rest.
 For each screen, open its batch's BUNDLE.md and screens.json. Build:
+- every item in the bundle's "Design inputs from the client meetings" section: the client's own requirements from the meetings, which win over the references where they differ (an open question gets its stated default);
 - its layout, regions and components;
 - every state it lists (loading, empty, error, and the others named);
 - its overlays;
 - its navigation. Every navigation.transitions / exitTo entry becomes a working link or button to the target screen, carrying the values named in "carries". A target not built yet gets a placeholder page naming the screen id, replaced when you reach it.
 
 Match these references in the linked folder: sources/designs/TICVAI_Employee_App_UI_Reference_1.pdf for the staff app look, sources/designs/TICVAI_Mobile.dc.html for finish and motion, and sources/designs/TICVAI_Guest_Booking_v2_single_file.html for how one clickable app with working navigation is built. Keep one design system across every screen: the same components, spacing, tables, forms, filters and empty states.
+
+Before the first screen, read "Design inputs from the client meetings" in handoff/design-batches/apps/4-staff-app/README.md and apply the app-wide inputs to the shell and to every screen.
 
 Work 4 screens at a time:
 1. Build the next 4 screens in the order.

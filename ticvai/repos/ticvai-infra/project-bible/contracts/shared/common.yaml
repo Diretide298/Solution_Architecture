@@ -392,6 +392,68 @@ components:
         on* look identical, and only one of them is a decision.**
 
         '
+    AiResidencyClass:
+      type: string
+      description: '**Where a tenant''s AI inference may run, chosen per tenant** (Chinmay, 2 October: the AI
+        residency decision; amends AI-D02, ADR-0009 and ADR-0020; CHG-CSA-002). Shared because the tenant''s
+        setting (tenancy) and the AI gateway (ai: `AiProvider`, `AiModel`) must use one list, for the reason
+        `ModuleKey` above gives.
+
+        `uaeOnly` is the **default** and is **mandatory for government, bank and health tenants**: inference stays
+        in the UAE. The Small tier is Core42 Compass GPT-4.1 mini (or Seraj, if it wins the Arabic golden set), the
+        Strong tier Compass GPT-5, reached through `AiProviderKind` `openaiCompatible`; the fallback is OpenAI UAE,
+        then the in-cell open-weights model (gpt-oss-120b).
+
+        `globalAllowed`: a private venue that opts in under PDPL Art. 23 (a vendor contract, a DPIA and a notice
+        to guests). Azure gpt-5-mini and gpt-6-sol on Global deployments, or the tenant''s own key (BYOK); the
+        fallback is the `uaeOnly` chain. Every tenant in this class is listed in ADR-0009''s transfer register.
+        BYOK fits this class only: a tenant key outside OpenAI UAE is a cross-border transfer.
+
+        `onPrem`: inference on the tenant''s own hardware (Qwen3.5 or gpt-oss; Strong tier Qwen3.5-122B,
+        Falcon-H1 Arabic or Jais 2), nothing leaves the site.
+
+        **Whatever the class, every prompt is scrubbed first** (mandatory offline PII scrubbing, CHG-CSA-003):
+        the class decides where a scrubbed prompt may go, never whether it is scrubbed.
+
+        '
+      enum:
+      - uaeOnly
+      - globalAllowed
+      - onPrem
+      default: uaeOnly
+    OutletPaymentTiming:
+      type: string
+      description: '**When an F&B order is paid, set per outlet** (Chinmay, 2 October, workbook Q64; refines audit
+        R261 per outlet; CHG-CSA-010). `sendFirst`, the default and R261''s rule: the order goes to the kitchen,
+        then the till charges (table service, and quick service where the venue wants the kitchen started while
+        the guest pays). `payFirst`: the till charges before anything reaches the kitchen; an unpaid order at a
+        `payFirst` outlet is never sent (`fnb.createFnbOrder`, `fnb.fireCourse`). Shared because the outlet
+        (tenancy `Outlet`) holds it and F&B enforces it.
+
+        '
+      enum:
+      - sendFirst
+      - payFirst
+      default: sendFirst
+    OutletSiting:
+      type: string
+      deprecated: true
+      description: '**Deprecated alias** (2 October 2026, CHG-CLN-008): the canonical name is the outlet field
+        `admissionContext`, typed `tenancy.OutletAdmissionContext`, with the same two values; no operation uses
+        this schema and new references must not. Kept so an earlier reference resolves.
+
+        **Whether an outlet is inside the venue''s gates or stands on its own** (Chinmay, 2 October,
+        workbook Q70; amends DI-292 for standalone outlets; CHG-CSA-011). `insideVenue`, the default: a guest
+        ordering online or at a kiosk needs a valid admission ticket for the venue (DI-292; the admission check
+        stays in Access, ADR-0068). `standalone`: a restaurant outside the venue sells takeaway and delivery with
+        no ticket. Shared because the outlet (tenancy `Outlet`) holds it and F&B enforces it
+        (`fnb.createGuestFnbOrder`).
+
+        '
+      enum:
+      - insideVenue
+      - standalone
+      default: insideVenue
     DeviceHardwareType:
       type: string
       description: '**The specific hardware under a device''s `kind`** (ADR-0067, accepted 1 October: one device
@@ -803,6 +865,20 @@ components:
           schema:
             $ref: '#/components/schemas/Problem'
   securitySchemes:
+    prospectAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: '**Prospect sign-up session token** (decided 2 October 2026, Chinmay: DEC-167, "Email +
+        one-time code"; CHG-CLN-010). The audience `prospect`: somebody signing their venue up to TICVAI
+        through the public sign-up journey (P17) before any tenant exists. Issued once the prospect proves
+        their email with a one-time code, and "Continue saved setup" signs back in the same way. **Scoped to
+        one onboarding application**: it reads and writes only that application, its assessment, its package
+        and its subscription choice, carries no tenant and no permission, and an operation''s
+        `x-ticvai-permission` is what a staff caller must hold, never the prospect. Expires with the
+        application''s activation or abandonment.
+
+        '
     bearerAuth:
       type: http
       scheme: bearer

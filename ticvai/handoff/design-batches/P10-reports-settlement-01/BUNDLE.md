@@ -1,6 +1,6 @@
 # P10-reports-settlement-01 — P10 · Reports & Settlement
 
-**3 screens · 14 operations · 22 schemas · 4 permissions**
+**3 screens · 16 operations · 26 schemas · 6 permissions**
 
 Platform P10 Partner Web · ships as **ticvai-control** ·
 partner audience · web ·
@@ -48,8 +48,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 4 permissions apply here:
-  `REPORT_MANAGE, REPORT_VIEW_VENUE, SETTLEMENT_RECONCILE, SETTLEMENT_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 6 permissions apply here:
+  `PARTNER_MANAGE, PARTNER_VIEW, REPORT_MANAGE, REPORT_VIEW_VENUE, SETTLEMENT_RECONCILE, SETTLEMENT_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -61,6 +61,65 @@ convincingly. It is never a caption.
   and its error; and, element by element, what is shown and in what format, what each action
   produces and where the user goes next. Draw exactly that.
 
+## The processes these screens belong to
+
+Written by the owner of each process (`handoff/design-notes/`). Read before any screen: it says how the process runs end to end and which words the screens must use.
+
+### Finance, Ledger & Tax · Reporting & Analytics
+
+Finance and insights run underneath every sale. A sale at a till (P04), kiosk, web storefront (P01) or guest app (P02) is priced and taxed per line at the moment of sale, recorded in the venue's base currency (AED in the UAE; 2 decimals, or 3 for BHD, KWD and OMR, never rounded away), and posted to an append-only dual ledger through account mappings per money event; anything unmapped lands in suspense. Tax follows the jurisdiction's tax profile: inclusive or exclusive, compound where a tax applies on another, zero-rated or exempt with verified evidence, and computed on the discounted price by default or on the price before discount where the region requires it (Egypt). A guest may select a currency the venue charges and pay in it: the rate is locked on the order, the payment partner is asked in that currency, the ledger keeps the base amount with the rate, and a refund goes back in the currency paid (decided 2 October 2026, Chinmay); a currency shown but not charged is an approximate price. Foreign cash at a till is recorded at its base equivalent and change is given in base currency. A paid order can carry a VAT receipt (simplified tax invoice), a full tax invoice with the buyer's TRN, or a consolidated invoice for a company, each numbered without gaps and never edited; corrections are credit memos. Revenue is recognised by rule: POS-style immediate, tickets on the visit, gift cards and wallet on use, annual passes straight-line or per visit, breakage on expiry; deferred revenue is a balance that ages. Each venue's day is reconciled (POS cash, gateways, bank, wallet against the ledger, provider files matched automatically, only genuine mismatches to a person); chargebacks are defended against the bank's deadline; month end runs seven close checks and goes to a finance approver. Nothing posted is deleted: a correction is a reversal, an approver is never the preparer, and ledger approval needs a second factor. Back-office finance lives in Venue Management (P08: chart of accounts, mapping, FX, journals, recognition, reconciliation, period close, chargebacks); tax profiles, calculation validation and platform reconciliation in the TICVAI Console (P09); partner settlement in P10. Reporting is one consolidated, permission-based area (Analytics, P16): seeded standard dashboards and reports plus no-code builders over a governed business catalogue; the P08 report screens, the POS terminal day view and the kitchen performance view are scoped windows onto the same definitions and must show the same numbers. Every figure is read from a lag-tolerant reporting copy and shows its "as of" time; scope comes from the person's rights, never from a filter; AI explains and recommends but never acts, answers only within the person's role, labels forecasts, and is phase two for finance ledgers.
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Base currency | The venue's region currency; the currency every record and ledger posting is in. A guest may pay in a currency they select (where the venue charges it); the books still hold the base amount and the rate. | Home currency, Local price, Default currency | DI-211 / DI-282 / contracts/spine/orders.yaml#/components/schemas/Order |
+| Pay in USD (a currency the venue charges) | The guest's selected payment currency; the card is charged in it at the rate locked on the order, and refunds go back in it. | Converted price, Approx. (for a charged currency) | contracts/spine/orders.yaml#checkoutCart / … |
+| ≈ (approx.) price in USD / SAR / … | A conversion of a base-currency price for a currency the venue shows but does not charge, always next to the base price. | Converted price, USD price | DI-211 / screens/P02-guest-mobile-app.yaml#GST-044 |
+| Takings | Money received in the period less refunds (cash-basis); the seeded KPI on hubs. | Revenue, Sales, Income | contracts/satellite/reporting.yaml#/components/schemas/ReportingSystemKpi / R283 |
+| Gross sales | Issued sales before discounts and refunds; whether tax is included must be stated on the tile. | Revenue, Turnover | MATRIX 6.1.78 |
+| Net revenue | Gross sales less discounts less refunds, adjusted per finance policy. | Net sales, Revenue, Income | MATRIX 6.1.78 |
+| Recognised revenue / Deferred revenue | Earned under the recognition rules / paid for but not yet earned. Kept distinct from sales. | Realised revenue, Unearned income, Wallet revenue | MATRIX 5.12.6 / DI-260 / contracts/spine/finance.yaml#getDeferredRevenue |
+| VAT receipt | The simplified tax invoice issued on a paid order. | Receipt (when it is a tax document), Bill | contracts/spine/finance.yaml#issueTaxInvoice |
+| Tax invoice / Combined tax invoice | A full invoice with the buyer's details / one invoice for several paid orders of one buyer. | Bill, Statement | contracts/spine/finance.yaml#/components/schemas/FinTaxInvoiceType |
+| Credit memo | The document that corrects an issued invoice after a refund; the invoice itself is never edited. | Credit note (until the client's tax adviser chooses "Tax credit note"), Edit invoice | contracts/spine/finance.yaml#/components/schemas/FinTaxInvoice |
+| VAT (or the jurisdiction's tax name) | Use the tax profile's own name on every surface; "Tax" only where several kinds are summed. | GST in UAE, Service charge for a tax | contracts/spine/catalogue.yaml#setTaxProfileJurisdiction |
+| Price before discount | The taxable base where the jurisdiction taxes the undiscounted price. | Gross price, List tax | DI-598 |
+| Post / Reverse | A journal reaches the ledger when approved and posted; a correction is a reversal, never an edit or delete. | Edit entry, Delete entry, Undo | contracts/spine/finance.yaml#reverseJournalEntry |
+| Period (Open / Closing / Closed) | A fiscal period's state; closing stops postings, closed locks them. | Month locked, Frozen | contracts/spine/finance.yaml#/components/schemas/PeriodStatus |
+| Variance (Over / Short) | The difference between expected and counted or recorded, always saying between which two figures. | Discrepancy, Error, Loss | DI-275 / contracts/spine/finance.yaml#/components/schemas/UnifiedReconciliation |
+| Settlement / Exception / Resolve | A provider's file for a day / a line that did not match / the recorded explanation. | Payout file, Error, Close | contracts/spine/finance.yaml#/components/schemas/SettlementException |
+| Chargeback | A bank-initiated reversal with an evidence deadline; not a refund. | Dispute refund, Reversal | contracts/spine/orders.yaml#/components/schemas/Chargeback |
+| Report / Dashboard / Tile / KPI | A runnable, exportable, schedulable definition / a page of tiles / one visual bound to a report / a company-wide measure defined once. | Widget (outside the builder's library), Board (for a user-facing dashboard) | contracts/satellite/reporting.yaml#/components/schemas/DashboardTile / … |
+| Warning / Critical | KPI status bands set by a target's amber and red thresholds; always words plus colour. | Amber, Red (alone), Bad | contracts/satellite/reporting.yaml#/components/schemas/KpiTarget |
+| As of HH:MM / Updated N sec ago | The freshness of every figure read from the reporting copy; stale shows a warning. | Live (unless refreshed), Real-time | MATRIX 8.7.22 |
+| Forecast | Any projected figure, with its range; never shown as a fact. | Expected, Will be | DI-973 |
+| Outlet / Workstation (till) | A sales point / the device; staff copy may say "till" for the workstation. | Store, POS (in copy), Drawer (for the device) | R156 |
+| Channel | POS, Web, App, Kiosk, B2B, OTA, from one closed list. | Source, Platform | MoM 2026-08-18 4.2 Recipes, Operating Hours & Service Channels / MATRIX 1.4.7 |
+
+### Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management)
+
+Platform Foundation is everything the apps stand on. Five apps each have one door: the guest app and website (WEB-016, GST-042: a six-digit code to email or mobile, a password, Apple or Google, UAE Pass; never enterprise SSO), the till (POS-000: employee number and PIN, recent operators as tiles; the kitchen display is the same app), the staff handheld and scanner (EMP-001, SCN-001), Venue Management (SUP-001, the single door for the back office P08, the CMS P13, analytics P16 and the support desk P12) and TICVAI Control (ADM-001 for TICVAI's own platform operators, PTR-001 for partner users; the developer portal P14 and the sign-up P17 belong to this app too). A second factor is required by permission, not by role or device: ROLE_MANAGE, LEDGER_APPROVE and every PLATFORM_* permission, plus any the tenant adds; so a cashier never sees it and a platform operator always does. The factor is an authenticator app with an emailed code as fallback; five wrong codes lock step-up for the lockout minutes, never permanently. Guests get two-step verification only at a venue that switched it on. One person holds one session per workstation: a second sign-in is refused and only a supervisor ends the other session. Several roles mean a role prompt; one role goes straight in. The workstation decides the Sale Board, hardware and till identity, never what a person may do. Sensitive actions (refund approval, journal approval, credential reset, partner credit, commission rules, opening a platform-staff grant and 17 more) demand a fresh step-up on the operation itself, asked in place in the action's confirmation; the tenant may raise the strength, never remove it. Permission outcomes are three, never one word: self-authorised (proceeds, audited), escalated (a supervisor PIN in place), refused (the denied state, naming the permission); a missing permission is never an empty table, and a record outside the person's venues is "not found", indistinguishable from absent. The hierarchy is binding (tenant, brand, region, venue, department, sub-department, workstation; outlet beside department for F&B and retail); region owns currency, decimals, time zone, date format and fiscal year; configuration resolves nearest-ancestor across tenant, region and venue (outlet for F&B and retail), venue is the floor and a workstation is assigned a profile, never configured; every configuration screen says which level it writes and what it inherits. Venue Management is one tenant-level surface filtering across the venues in the session's scope. TICVAI's Console runs outside every cell: a platform operator picks a tenant and opens a time-boxed, audited platform-staff grant (with step-up) before any tenant action, and the tenant sees every action in its audit log (ADM-412 is the reference implementation). Approval workflows record authorisations and never perform the action; the requester cannot approve their own request; a venue may tighten and never loosen a rule from above; in-flight …
+*(source: screens/P12-support-agent-console.yaml#SUP-001; R135; R126; R167; DI-1072; ADR-0002; ADR-0003; ADR-0004; R184; contracts/spine/identity.yaml#createMfaChallenge; contracts/spine/approvals.yaml#setStepUpPolicy; ADR-0011; ADR-0018; ADR-0029; R098; contracts/spine/approvals.yaml#decideApprovalRequest …)*
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Sign in / Sign out | Entering and leaving any app, staff or guest. | Login, Log in, Logon, Logout | screens/P04-point-of-sale.yaml#POS-000 … |
+| Authentication code | The staff second factor from the authenticator app (or the emailed fallback). | OTP, 2FA code, token | screens/P09-platform-admin-console.yaml#ADM-001 |
+| One-time code | The six-digit code a guest receives to sign in or prove a contact. | OTP, PIN, password | DI-1034; R167 |
+| Two-step verification | The guest's optional second factor, asked only at venues that switched it on. | MFA, 2FA | DI-1072 |
+| Tenant / Brand / Region / Venue / Department / Outlet | The binding hierarchy levels; region owns currency and dates; outlet is F&B or retail inside a venue. | Client, Customer, Org (for tenant), Site, Park, Property (for venue), Area, Territory (for region) | ADR-0011; ADR-0018 |
+| Workstation (back office) / till (operator copy) | A configured device; decides Sale Board, hardware and till identity, never authorisation. | Terminal, Station, POS (for the device), till (for the Deposit Box) | ADR-0002; R156 |
+| Sale Board | The configured front end a workstation loads (ticketing, F&B or retail). | Screen, Layout, Menu | ADR-0003 |
+| Role | A named, fully configurable grouping of permissions; the seeded five are editable starting points. | Group, Profile | R229 |
+| Staff member / Partner user / Platform operator | A tenant's staff principal; a partner's user; a TICVAI employee in the Console. | User (alone), Account, Agent (for venue staff) | F104 step 1; F104 step 4; F104 step 5 |
+| Platform-staff grant | The time-boxed, audited access a platform operator opens into one tenant before acting in it. | Impersonation, Support login | R098 |
+| Escalate / Refused | Escalate is supervisor approval captured in place; Refused is the denied state that names the permission. | Denied (for an action that can be escalated) | R197 |
+| Approve / Reject / Return / Request information | The four decisions on an approval request; Withdraw is the requester's own act and never a rejection. | Accept, Decline, Cancel (for withdraw) | contracts/spine/approvals.yaml#decideApprovalRequest … |
+| Subscription / Plan / Module / Licence | TICVAI's commercial relationship with a tenant, its plan, the modules it licenses and the limits. | Membership (that is the guest's pass) | R214 |
+| Membership / Annual pass | A guest's pass product and its holder (BO-284 to BO-303). | Subscription (that is the tenant's TICVAI plan) | screens/P08-venue-back-office.yaml#BO-284 |
+| Sandbox client / Production client | A developer's own test credential; a TICVAI-issued live credential after certification. | Test key, Live key, API key (without environment) | DI-927 |
+| Asset (DAM) / Media (ticket) | A digital file in the library; ticket media is a wristband or card carrying entitlements. Never mix them. | Media (for a library asset) | contracts/satellite/assets.yaml#searchMedia … |
+
+
 ## The screens
 
 Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs count fields; requirements are matrix rows; meeting inputs are the ones naming the screen (the module and platform ones are below); white label says whether the tenant's brand reaches it (guest) or it sets the brand (configures).
@@ -68,8 +127,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `PTR-014` | Settlement & Payment History | B–D | 12 | 39 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `PTR-017` | Commission Statement | B–D | 2 | 39 | 6 | 17 | 0 | 0 | — | notStarted (generated) |
-| `PTR-018` | Reports & Sales Performance | B–D | 64 | 35 | 6 | 93 | 0 | 0 | — | notStarted (generated) |
+| `PTR-017` | Commission Statement | B–D | 2 | 36 | 6 | 17 | 0 | 0 | — | notStarted (generated) |
+| `PTR-018` | Reports & Sales Performance | B–D | 76 | 35 | 6 | 93 | 0 | 0 | — | notStarted (generated) |
 
 ---
 
@@ -94,6 +153,20 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Route | `/general/settlement-and-payment-history` |
 
 **What the spec says about it.** States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+
+**From the Finance, Ledger & Tax · Reporting & Analytics process.** A partner's own money with the venue: how it pays (credit account invoiced monthly, prepaid wallet drawn down per sale, or card per transaction), what it has paid, what is due, and its statement of account. The partner sees only its own records and can download them; it never sees the venue's acquirer settlements.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **The screen binds the payment-provider settlement records and offers "Ingest settlement file" and "Resolve settlement exception"; those operations declare the partner audience and partner write scope.** Why: A settlement there is an acquirer file for a venue's trading day; a partner must neither ingest it nor resolve the venue's acquirer exceptions. Partner settlement is the three payment models and the statement of account. *(source: contracts/spine/finance.yaml#ingestSettlementFile / contracts/spine/finance.yaml#resolveSettlementException / DI-555 / DI-557 / TRACKER Actions row 185; Finance, Ledger & Tax · Reporting & Analytics)*
+- **Flow F99 (a chargeback is defended) routes step 3 through this partner screen.** Why: Chargebacks are defended by finance (BO-025 for the venue; the chargeback operations are consumed by ADM-633 and ADM-634); partners take no part. *(source: F99 step 3 / contracts/spine/orders.yaml#listChargebacks / contracts/spine/orders.yaml#respondToChargeback; Finance, Ledger & Tax · Reporting & Analytics)*
+- **The purpose "Take the money, and be unambiguous about whether it worked" is a checkout purpose.** Why: Derived from the name, not from a requirement. *(source: screens/P10-partner-reseller-portal.yaml#PTR-014; Finance, Ledger & Tax · Reporting & Analytics)*
+
+#### Decided on this screen
+
+Answered questions: draw the decision, not the old default. Where a decision and the tables below differ, the decision wins.
+
+- **Does PTR-014 survive next to PTR-013, PTR-046 and PTR-017, or merge into PTR-046?** → Drawn default stands (answer: "Keep as the partner's Payments summary"): Keep it as the partner's "Payments" summary with links into the statement. *(decided by Chinmay, 2026-10-02; DEC-222 / CHG-NOTE-003)*
 
 #### Inputs: what the user enters or picks
 
@@ -131,6 +204,10 @@ Errors to draw in the form: 400 `fileReference` names no completed upload in the
 | Note `note` | text area | required | — | min length 3; max length 1000 | — | — | `resolveSettlementException` body |
 
 Errors to draw in the form: 400 `matchedManually` without a `matchedPaymentId`, or one that names no payment. `errors[]` names the field.; 404 The settlement, or an exception with this `exceptionId` under it, does not exist or is outside the caller's scope.; 409 The exception is already resolved.
+
+**Rules for these inputs** (from the Finance, Ledger & Tax · Reporting & Analytics process; these refine the tables above and win where they differ)
+
+- **period**: Daily, weekly, monthly or a custom range for the statement. *(source: contracts/satellite/subscription.yaml#listPartnerStatementAccount)*
 
 #### Outputs: what the screen shows and produces
 
@@ -197,6 +274,17 @@ Errors to draw in the form: 400 `matchedManually` without a `matchedPaymentId`, 
 | Ingest settlement file (primary button) | `ingestSettlementFile` POST `/settlements` | inline | Settlement | 400 `fileReference` names no completed upload in the caller's scope, or the period is not a single day (`settlement-period-not-a-day`, audit R110 (b)). | opens modal first |
 | Resolve settlement exception (secondary button) | `resolveSettlementException` POST `/settlements/{settlementId}/exceptions` | inline | SettlementException | 400 `matchedManually` without a `matchedPaymentId`, or one that names no payment. `errors[]` names the field.; 404 The settlement, or an exception with this `exceptionId` under it, does not exist or is outside the … | opens modal first |
 
+**Rules for what is shown** (from the Finance, Ledger & Tax · Reporting & Analytics process; these refine the tables above and win where they differ)
+
+- **payment model card**: One card for the partner's model. Credit: limit, used (including booked but not yet invoiced), available, payment terms, next invoice date. Prepaid: wallet balance and last top-up. Card: "Paid at each booking", last 5 payments. *(source: DI-555 / contracts/satellite/payments.yaml#listB2bCreditAccounts)*
+- **statement of account**: Opening balance, invoices, payments received, credit memos, closing balance, then the dated lines; an ageing summary (current, 30, 60, 90+ days) beside it for credit partners. *(source: DI-557 / contracts/satellite/subscription.yaml#listPartnerStatementAccount)*
+- **payment history**: Date, method (bank transfer, cheque, card, wallet top-up), reference, amount, allocated to which invoices. *(source: DI-555)*
+
+**What each action does** (from the Finance, Ledger & Tax · Reporting & Analytics process; these refine the tables above and win where they differ)
+
+- **Download statement**: PDF or Excel of the statement for the period. *(source: contracts/satellite/subscription.yaml#listPartnerStatementAccount)*
+- **Raise a query on a line**: Opens a dispute case on that line (Partner Disputes, Cases & Service). *(source: DI-557)*
+
 **Data it reads**: `listSettlements` (onLoad, from page inventory)
 
 **Where the user goes next**
@@ -214,6 +302,27 @@ Errors to draw in the form: 400 `matchedManually` without a `matchedPaymentId`, 
 | Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `SETTLEMENT_VIEW`, which `listSettlements` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 `fileReference` names no completed upload in the caller's scope, or the period is not a single day (`settlement-period-not-a-day`, audit R110 (b)).; 400 `matchedManually` without a `matchedPaymentId`, or one that names no payment. `errors[]` names the field.; 409 The exception is already resolved. |
+
+#### Edge cases to draw
+
+- **a link to another partner's settlement**: Refused within the partner's scope; offers the partner's own list. *(source: screens/P10-partner-reseller-portal.yaml#PTR-014)*
+- **credit nearly used up**: Amber at the warning level, with "Bookings above AED 8,500.00 will need prepayment". *(source: contracts/satellite/payments.yaml#listB2bCreditAccounts)*
+
+#### Consistency with other screens
+
+- Match `PTR-013 Credit Limit & Balance, PTR-046 Partner Statement & Account Activity, PTR-017 Commission Statement`: The same balance figures; PTR-014 is the partner's summary of what those screens show in detail.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+partner: Desert Rose Tours LLC · credit account · limit AED 250,000.00 · 30 days
+statement: September 2026 · Opening AED 118,450.00 · Invoiced 96,200.00 · Payments 120,000.00 (bank transfer, 15
+  Sep) · Credit memos 3,150.00 · Closing AED 91,500.00
+ageing: Current 62,300.00 · 31–60 days 29,200.00 · 61–90 0.00 · 90+ 0.00
+prepaidPartner: Al Noor Travel & Tourism · prepaid · balance AED 42,300.00 · last top-up 20,000.00 on 28 Sep
+```
 
 #### Permissions
 
@@ -253,6 +362,9 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `PTR-003`.
 - [ ] Every gated control is gated: `SETTLEMENT_RECONCILE`, `SETTLEMENT_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 2 edge case(s) from the process notes are drawn.
+- [ ] The 3 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
+- [ ] The 1 decision(s) taken on this screen are drawn as decided, not as the old default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -266,7 +378,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | App · platform | TICVAI Control · P10 Partner Web (web) |
 | Module | Reports & Settlement · wave 3 · needs the `partner` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | partner |
+| Who uses it | partner staff holding `PARTNER_MANAGE`, `PARTNER_VIEW` (1 configure, 1 read) |
 | Device and orientation | web · LTR and RTL · light theme |
 | Pattern | listDetail (compact density): `listPartnerAgreements` reads the population and `getCommissionStatement` reads one of them — list, select, act |
 | Offline | online only |
@@ -277,72 +389,73 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Known gaps.**  Open: No contract — commission not modelled
 
+**From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** A partner's commission statement for a period, with each line traceable to the booking it came from.
+
+**Fixed on main** (the package already carries these; draw what it says): Tables show every schema field, plumbing included: 'Every partner agreement' drop id, partnerId, brandingAssetId. (CHG-SOT-015); emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything. (CHG-SOT-015).
+
 #### Inputs: what the user enters or picks
 
 **On the screen**
 
 | Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
 |---|---|---|---|---|---|---|---|
-| Expiring within days | number field | — | — | — | — | Sends `?expiringWithinDays=` to `listPartnerAgreements`. | `listPartnerAgreements` ?expiringWithinDays |
-| Status | text field | — | — | — | — | Sends `?status=` to `listPartnerAgreements`. | `listPartnerAgreements` ?status |
+| Expiring within days | number field (days) | optional | — | — | — | Sends `?expiringWithinDays=` to `listPartnerAgreements`. | `listPartnerAgreements` ?expiringWithinDays |
+| Status | select | optional | — | Pending approval · Active · Expiring soon · Expired · Suspended · Terminated | — | Sends `?status=` to `listPartnerAgreements`. | `listPartnerAgreements` ?status |
 
 #### Outputs: what the screen shows and produces
 
 **Shown**
 
-**Every partner agreement** (data table, from `listPartnerAgreements`)
+**Every partner agreement** (data table, from `listPartnerAgreements`): The partner is shown by name; ids stay in the detail panel with a copy action.
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | text | not in the schema: `PartnerAgreement.id` |
-| Partner ID | text | not in the schema: `PartnerAgreement.partnerId` |
-| Partner name | text | not in the schema: `PartnerAgreement.partnerName` |
-| Status | text | not in the schema: `PartnerAgreement.status` |
-| Rate mode | text | not in the schema: `PartnerAgreement.rateMode` |
-| Commission percent | text | not in the schema: `PartnerAgreement.commissionPercent` |
-| Volume tiers | text | not in the schema: `PartnerAgreement.volumeTiers` |
-| Volume window | text | not in the schema: `PartnerAgreement.volumeWindow` |
-| Seasonal rates | text | not in the schema: `PartnerAgreement.seasonalRates` |
-| Segment tier | text | not in the schema: `PartnerAgreement.segmentTier` |
-| Branding asset ID | text | not in the schema: `PartnerAgreement.brandingAssetId` |
-| Storefront subdomain | text | not in the schema: `PartnerAgreement.storefrontSubdomain` |
+| Partner name | text | The partner's trading name, read from control.partner.trading_name (Partner.tradingName) when the agreement is returned and never stored on … |
+| Status | chip: Pending approval, Active, Expiring soon, Expired, Suspended, Terminated | — |
+| Rate mode | chip: Net rate, Commission | Alternatives, not both. A partner buys at a net rate and keeps the margin, or sells at face value and is paid commission. |
+| Commission percent | 1,234.5 | — |
+| Volume tiers | list or chips (count when long) | Retired: the tiers are rows of control.partner_rate_volume_band (`PartnerRate.volumeBands`, written by setPartnerRateNet), one set per rate … |
+| Volume window | chip: Calendar month, Calendar quarter, Calendar year, Agreement year, Rolling12 months | — |
+| Seasonal rates | list or chips (count when long) | Retired: a seasonal rate is a control.partner_rate row with `seasonalRate: true` and its own `effectiveFrom`/`effectiveTo` (`PartnerRate` … |
+| Segment tier | text | — |
+| Storefront subdomain | text | — |
 
 **The selected partner agreement** (detail panel, from `listPartnerAgreements`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | text | not in the schema: `PartnerAgreement.id` |
-| Partner ID | text | not in the schema: `PartnerAgreement.partnerId` |
-| Partner name | text | not in the schema: `PartnerAgreement.partnerName` |
-| Status | text | not in the schema: `PartnerAgreement.status` |
-| Rate mode | text | not in the schema: `PartnerAgreement.rateMode` |
-| Commission percent | text | not in the schema: `PartnerAgreement.commissionPercent` |
-| Volume tiers | text | not in the schema: `PartnerAgreement.volumeTiers` |
-| Volume window | text | not in the schema: `PartnerAgreement.volumeWindow` |
-| Seasonal rates | text | not in the schema: `PartnerAgreement.seasonalRates` |
-| Segment tier | text | not in the schema: `PartnerAgreement.segmentTier` |
-| Branding asset ID | text | not in the schema: `PartnerAgreement.brandingAssetId` |
-| Storefront subdomain | text | not in the schema: `PartnerAgreement.storefrontSubdomain` |
-| Sponsorship | text | not in the schema: `PartnerAgreement.sponsorship` |
-| Net rates | text | not in the schema: `PartnerAgreement.netRates` |
-| Credit term days | text | not in the schema: `PartnerAgreement.creditTermDays` |
-| Accepted by principal ID | text | not in the schema: `PartnerAgreement.acceptedByPrincipalId` |
+| ID | the name it points at, never the id | — |
+| Partner | the name it points at, never the id | The partner (control.partner) this agreement is with. The agreement carries the terms; control.partner carries who the partner is and … |
+| Partner name | text | The partner's trading name, read from control.partner.trading_name (Partner.tradingName) when the agreement is returned and never stored on … |
+| Status | chip: Pending approval, Active, Expiring soon, Expired, Suspended, Terminated | — |
+| Rate mode | chip: Net rate, Commission | Alternatives, not both. A partner buys at a net rate and keeps the margin, or sells at face value and is paid commission. |
+| Commission percent | 1,234.5 | — |
+| Volume tiers | list or chips (count when long) | Retired: the tiers are rows of control.partner_rate_volume_band (`PartnerRate.volumeBands`, written by setPartnerRateNet), one set per rate … |
+| Volume window | chip: Calendar month, Calendar quarter, Calendar year, Agreement year, Rolling12 months | — |
+| Seasonal rates | list or chips (count when long) | Retired: a seasonal rate is a control.partner_rate row with `seasonalRate: true` and its own `effectiveFrom`/`effectiveTo` (`PartnerRate` … |
+| Segment tier | text | — |
+| Branding image | the image or video | 2.7.x, BL-078. A reseller selling a venue's tickets under their own brand is a second scope level white-label does not have — … |
+| Storefront subdomain | text | — |
+| Sponsorship | grouped details | BL-050. Sponsorship inventory is sellable capacity of a different kind — logo placements, hospitality allocations, naming rights. |
+| Net rates | list or chips (count when long) | Retired: net rates are rows of control.partner_rate (`PartnerRate` with `pricingModel: netRate`, `netRate` and the `maxDiscountPercent` … |
+| Credit term days | 1,234 | 2.7.36. Net 30, net 60. |
+| Accepted by principal | the name it points at, never the id | BL-079. Electronic acceptance against a version, following the `signatureRef` precedent. |
 
 **The commission statement** (detail panel, from `getCommissionStatement`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| Agreement ID | text | not in the schema: `CommissionStatement.agreementId` |
-| Partner name | text | not in the schema: `CommissionStatement.partnerName` |
-| From | text | not in the schema: `CommissionStatement.from` |
-| To | text | not in the schema: `CommissionStatement.to` |
-| Currency | text | not in the schema: `CommissionStatement.currency` |
-| Gross sales | text | not in the schema: `CommissionStatement.grossSales` |
-| Refunds | text | not in the schema: `CommissionStatement.refunds` |
-| Net sales | text | not in the schema: `CommissionStatement.netSales` |
-| Commission earned | text | not in the schema: `CommissionStatement.commissionEarned` |
-| Amount due | text | not in the schema: `CommissionStatement.amountDue` |
-| Lines | text | not in the schema: `CommissionStatement.lines` |
+| Agreement | the name it points at, never the id | — |
+| Partner name | text | — |
+| From | 1 Oct 2026 | — |
+| To | 1 Oct 2026 | — |
+| Currency | text | — |
+| Gross sales | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Refunds | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Net sales | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Commission earned | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Amount due | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Lines | list or chips (count when long) | Reconcilable order by order. A statement a partner cannot check line by line is a statement they will dispute, and the dispute costs more … |
 
 **Data it reads**: `listPartnerAgreements` (onLoad, Commercial agreements with B2B partners)
 
@@ -356,12 +469,27 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | Loading (`?state=loading`) | The commission statement list. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the commission statement untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No commission statement yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table. |
+| Empty, first run (`?state=emptyFirstRun`) | No commission statement for this agreement and period yet: nothing has settled against it. Offers no action; the statement fills as bookings settle. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on expiringWithinDays, status and the commission statement are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PARTNER_VIEW`, which `getCommissionStatement` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+statement:
+  period: September 2026
+  gross: AED 184,300.00
+  commissionRate: 12%
+  commission: AED 22,116.00
+```
+
 #### Permissions
+
+- `getCommissionStatement` → `PARTNER_VIEW` (read) · staff, partner
+- `listPartnerAgreements` → `PARTNER_MANAGE` (configure) · staff, partner
 
 **A refused user sees:** Shown when the caller lacks `PARTNER_VIEW`, which `getCommissionStatement` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -402,11 +530,11 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (2), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (39 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (36 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#PTR-017?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `PTR-003`.
-- [ ] Sign-in is asked only where the spec asks for it.
+- [ ] Every gated control is gated: `PARTNER_MANAGE`, `PARTNER_VIEW`.
 - [ ] The module and platform inputs below are applied.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -429,6 +557,13 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Route | `/general/reports-and-sales-performance` |
 
 **What the spec says about it.** States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+
+**From the Finance, Ledger & Tax · Reporting & Analytics process.** A partner's own sales performance: bookings, tickets, gross sales, commission earned, cancellations, by product and period, in a fixed set of partner reports. The partner sees only what it sold.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **The partner screen loads the venue's financial statements (profit and loss, balance sheet, cash flow), and that operation declares the partner audience.** Why: A partner must never see the venue's financial statements. *(source: contracts/spine/finance.yaml#getFinancialReport / screens/P10-partner-reseller-portal.yaml#PTR-018; Finance, Ledger & Tax · Reporting & Analytics)*
+- **Partners are given create, change and delete of report definitions and saving of natural-language queries.** Why: Definitions run over the tenant's data sources; a partner gets a fixed partner-scoped set. *(source: screens/P10-partner-reseller-portal.yaml#PTR-018 / contracts/satellite/reporting.yaml#createReport; Finance, Ledger & Tax · Reporting & Analytics)*
 
 #### Inputs: what the user enters or picks
 
@@ -491,6 +626,12 @@ Errors to draw in the form: 400 Question could not be interpreted. (ReportQuesti
 | Sort order `columns[].sortOrder` | number field | optional | — | — | — | — | `createReport` body |
 | Sort direction `columns[].sortDirection` | segmented control | optional | — | Asc · Desc | — | — | `createReport` body |
 | Format `columns[].format` | text field | optional | — | — | — | — | `createReport` body |
+| Role `columns[].role` | segmented control | optional | — | Dimension · Measure | — | What the column is to a chart (decided 2 October 2026, Chinmay; CHG-FIN-007). A `dimension` groups (date, venue, channel, product); a `measure` is aggregated (sum of net revenue … | `createReport` body |
+| Encoding `columns[].encoding` | select | optional | — | Category · X · Y · Series · Value · Size · Colour · Location · Stage · Source · Target · Row … | — | Which field well the column fills (CHG-FIN-007), the binding the twenty marks of `DashboardTile.visualisation` need. | `createReport` body |
+| Axis `columns[].axis` | segmented control | optional | — | Primary · Secondary | — | For a measure on a `combo`, the axis it is drawn against. A secondary axis needs its own `unitLabel` (CHG-FIN-007). | `createReport` body |
+| Series type `columns[].seriesType` | segmented control | optional | — | Bar · Line · Area | — | For a measure on a `combo`, how that series is drawn (CHG-FIN-007). | `createReport` body |
+| Hierarchy level `columns[].hierarchyLevel` | number field | optional | — | min 1 | — | For `matrix` rows and columns, `treemap` nesting and `decompositionTree` levels, the depth of this dimension, 1 outermost. | `createReport` body |
+| Unit label `columns[].unitLabel` | text field | optional | — | max length 40 | — | The unit an axis states, for example "AED" or "Admissions". Required on a secondary axis (CHG-FIN-007). | `createReport` body |
 | Filters `filters` | repeatable rows | optional | — | — | — | — | `createReport` body |
 | Field `filters[].field` | text field | required | — | — | — | — | `createReport` body |
 | Operator `filters[].operator` | select | required | — | Equals · Not equals · Greater than · Less than · Between · In · Not in · Contains · Is null · Is not null | — | — | `createReport` body |
@@ -535,6 +676,12 @@ Errors to draw in the form: 400 Unknown field, invalid filter, or estimated cost
 | Sort order `columns[].sortOrder` | number field | optional | — | — | — | — | `updateReport` body |
 | Sort direction `columns[].sortDirection` | segmented control | optional | — | Asc · Desc | — | — | `updateReport` body |
 | Format `columns[].format` | text field | optional | — | — | — | — | `updateReport` body |
+| Role `columns[].role` | segmented control | optional | — | Dimension · Measure | — | What the column is to a chart (decided 2 October 2026, Chinmay; CHG-FIN-007). A `dimension` groups (date, venue, channel, product); a `measure` is aggregated (sum of net revenue … | `updateReport` body |
+| Encoding `columns[].encoding` | select | optional | — | Category · X · Y · Series · Value · Size · Colour · Location · Stage · Source · Target · Row … | — | Which field well the column fills (CHG-FIN-007), the binding the twenty marks of `DashboardTile.visualisation` need. | `updateReport` body |
+| Axis `columns[].axis` | segmented control | optional | — | Primary · Secondary | — | For a measure on a `combo`, the axis it is drawn against. A secondary axis needs its own `unitLabel` (CHG-FIN-007). | `updateReport` body |
+| Series type `columns[].seriesType` | segmented control | optional | — | Bar · Line · Area | — | For a measure on a `combo`, how that series is drawn (CHG-FIN-007). | `updateReport` body |
+| Hierarchy level `columns[].hierarchyLevel` | number field | optional | — | min 1 | — | For `matrix` rows and columns, `treemap` nesting and `decompositionTree` levels, the depth of this dimension, 1 outermost. | `updateReport` body |
+| Unit label `columns[].unitLabel` | text field | optional | — | max length 40 | — | The unit an axis states, for example "AED" or "Admissions". Required on a secondary axis (CHG-FIN-007). | `updateReport` body |
 | Filters `filters` | repeatable rows | optional | — | — | — | — | `updateReport` body |
 | Field `filters[].field` | text field | required | — | — | — | — | `updateReport` body |
 | Operator `filters[].operator` | select | required | — | Equals · Not equals · Greater than · Less than · Between · In · Not in · Contains · Is null · Is not null | — | — | `updateReport` body |
@@ -618,6 +765,10 @@ Errors to draw in the form: 409 The report is a system report, which is clone-on
 | Save natural language query (secondary button) | `saveNaturalLanguageQuery` POST `/reports/ask/{conversationId}/save` | inline | ReportDefinition | — | opens modal first |
 | Save report (secondary button) | `updateReport` PUT `/reports/{reportId}` | CreateReportRequest | ReportDefinition | 409 The report is a system report, which is clone-only (audit R096). | opens modal first |
 
+**Rules for what is shown** (from the Finance, Ledger & Tax · Reporting & Analytics process; these refine the tables above and win where they differ)
+
+- **performance**: Tickets sold, gross sales, commission (from the commission statement), cancellations and refunds, top products; comparison with the previous period. *(source: DI-557 / contracts/satellite/subscription.yaml#getCommissionStatement)*
+
 **Data it reads**: `getFinancialReport` (onLoad, P&L, balance sheet or cash flow); `listReports` (onLoad, List available report definitions)
 
 **Where the user goes next**
@@ -639,6 +790,15 @@ Errors to draw in the form: 409 The report is a system report, which is clone-on
 | Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `REPORT_VIEW_VENUE`, which `getFinancialReport` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Question could not be interpreted. (ReportQuestionProblem); 400 Required parameter missing, or the date range exceeds `maxDateRangeDays` (366 days when the definition sets none, audit R158); 400 Unknown field, invalid filter, or estimated cost beyond the limit; 409 Active schedules reference this report (`report-scheduled`), or it is a system report, which is clone-only (`system-report` … |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+- Desert Rose Tours · September 2026 · 3,420 tickets · gross sales AED 820,800.00 · commission 8% AED 65,664.00
+  · top product Aquaventure Day Pass Adult
+```
 
 #### Permissions
 
@@ -692,13 +852,14 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (64), with its required mark, default, format and its error state (400, 403, 404, 409).
+- [ ] Every input above is drawn (76), with its required mark, default, format and its error state (400, 403, 404, 409).
 - [ ] Every output is drawn (35 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#PTR-018?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Run report, Ask reporting question, Create report, Delete report, Save natural language query, Save report.
 - [ ] Every transition is wired: `PTR-003`.
 - [ ] Every gated control is gated: `REPORT_MANAGE`, `REPORT_VIEW_VENUE`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 2 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -790,10 +951,12 @@ Method, path, parameters, request and response for every operation these screens
 "askReportingQuestion": {"method":"POST","path":"/reports/ask","contract":"reporting","summary":"Natural-language reporting query","permission":"REPORT_VIEW_VENUE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"NaturalLanguageAnswer"},
 "createReport": {"method":"POST","path":"/reports","contract":"reporting","summary":"Create a custom report definition","permission":"REPORT_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"CreateReportRequest","responds":"ReportDefinition"},
 "deleteReport": {"method":"DELETE","path":"/reports/{reportId}","contract":"reporting","summary":"Retire a report definition","permission":"REPORT_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":null},
+"getCommissionStatement": {"method":"GET","path":"/partner-agreements/{agreementId}/commission-statement","contract":"subscription","summary":"What the partner earned and what is owed","permission":"PARTNER_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":"from","in":"query","required":null},{"name":"to","in":"query","required":null}],"requestBody":null,"responds":"CommissionStatement"},
 "getFinancialReport": {"method":"GET","path":"/reports/financial","contract":"finance","summary":"Financial statements, revenue and tax summaries","permission":"REPORT_VIEW_VENUE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"report","in":"query","required":true},{"name":"fiscalPeriodId","in":"query","required":true},{"name":"legalEntityId","in":"query","required":null},{"name":"venueId","in":"query","required":null},{"name":"costCenterId","in":"query","required":null}],"requestBody":null,"responds":"FinancialReport"},
 "getReport": {"method":"GET","path":"/reports/{reportId}","contract":"reporting","summary":"Read a report definition","permission":"REPORT_VIEW_VENUE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"ReportDefinition"},
 "getSettlement": {"method":"GET","path":"/settlements/{settlementId}","contract":"finance","summary":"Settlement detail with match results","permission":"SETTLEMENT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"region","parameters":[],"requestBody":null,"responds":"Settlement"},
 "ingestSettlementFile": {"method":"POST","path":"/settlements","contract":"finance","summary":"Ingest a provider settlement file","permission":"SETTLEMENT_RECONCILE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"region","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":null},
+"listPartnerAgreements": {"method":"GET","path":"/partner-agreements","contract":"subscription","summary":"Commercial agreements with B2B partners","permission":"PARTNER_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":"expiringWithinDays","in":"query","required":null},{"name":"status","in":"query","required":null}],"requestBody":null,"responds":"PartnerAgreement"},
 "listReports": {"method":"GET","path":"/reports","contract":"reporting","summary":"List available report definitions","permission":"REPORT_VIEW_VENUE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"category","in":"query","required":null},{"name":"search","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listSettlementExceptions": {"method":"GET","path":"/settlements/{settlementId}/exceptions","contract":"finance","summary":"Unmatched or mismatched settlement lines","permission":"SETTLEMENT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"region","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listSettlements": {"method":"GET","path":"/settlements","contract":"finance","summary":"List settlement batches","permission":"SETTLEMENT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"region","parameters":[{"name":"providerName","in":"query","required":null},{"name":"venueId","in":"query","required":null},{"name":"status","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
@@ -810,6 +973,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
+"CommissionStatement": {"type":"object","x-ticvai-persistence":"none — aggregated from orders and control.partner_agreement","properties":{"agreementId":{"type":"string","format":"uuid"},"partnerName":{"type":"string"},"from":{"type":"string","format":"date"},"to":{"type":"string","format":"date"},"currency":{"type":"string"},"grossSales":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"refunds":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"netSales":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"commissionEarned":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"amountDue":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"lines":{"type":"array","description":"**Reconcilable order by order.** A statement a partner cannot check line by line is a statement they will dispute, and the dispute costs more than the detail.\n","items":{"type":"object","properties":{"orderId":{"type":"string","format":"uuid"},"orderNumber":{"type":"string"},"soldAt":{"type":"string","format":"date-time"},"agreementVersion":{"type":"integer","description":"The version in force at the time of that sale, not the current one."},"gross":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"commission":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"isRefunded":{"type":"boolean"}}}}}},
 "CreateReportRequest": {"x-ticvai-persistence":"none — request only","type":"object","required":["name","category","dataSource","columns","requiredPermission"],"properties":{"name":{"type":"string","maxLength":200},"description":{"type":"string","maxLength":1000},"category":{"$ref":"#/components/schemas/ReportCategory"},"dataSource":{"$ref":"#/components/schemas/DataSource"},"columns":{"type":"array","minItems":1,"items":{"$ref":"#/components/schemas/ReportColumn"}},"filters":{"type":"array","items":{"$ref":"#/components/schemas/ReportFilter"}},"groupBy":{"type":"array","items":{"type":"string"}},"parameters":{"type":"array","items":{"$ref":"#/components/schemas/ReportParameter"}},"requiredPermission":{"$ref":"../shared/permissions.yaml#/components/schemas/Permission","description":"Permission needed to run this report, from the shared `Permission` vocabulary. **The author cannot assign one they do not hold** — otherwise a venue user could build themselves a tenant-wide view.\n"},"maxDateRangeDays":{"type":"integer","nullable":true,"minimum":1,"default":366,"description":"Guards against a query spanning years of scan events. **When a report sets none, 366 days applies (decided 28 September, audit R158)**, so `runReport`'s date-range 400 always has a limit."}}},
 "DataSource": {"type":"string","description":"What a report may be built over. **A closed set, and that is the point** — a builder that accepts any table will happily produce a report over data nobody maintains.\n**Eight sources added 18 August** (BL-143), each because the matrix asks for a report the builder could not source. `stockCounts` and `waste`: 6.1.21 wants count variance and `stockMovements` records the movement rather than **the count that found the discrepancy**. `workstations`, `devices` and `principals`: 6.1.28 — **who did what at which till** is the question an auditor asks first and it had no source. `loyalty`: 6.1.37, points earned, burned and expiring. `reviews`: 6.1.46. `queueEntries`: **wait times are already measured and nothing could report on them.**\n**Adding a source is a decision, not an omission.** `principals`, `guests`, `loyalty` and `reviews` all name a person, and `REPORT_EXPORT_PII` gates them.\n\n**`forecastPoints` added 29 September** (8.2.55, build pass, group G2): the points of published AI forecast versions; see `x-ticvai-forecast-points`.\n\n**Three accreditation sources added 29 September** (12.1.50, build pass): `accreditationApplications`, `accreditationHolders` and `accreditationCredentials`, over `accreditation.application`, `accreditation.holder` and `accreditation.credential`. They are what the accreditation KPIs and any accreditation report or export (`exportReportResult`, csv or xlsx) are built over. **All three name a person**, and `REPORT_EXPORT_PII` gates them as it gates `guests`.\n","enum":["orders","orderLines","payments","refunds","shifts","scanEvents","entitlements","products","inventory","stockMovements","stockCounts","waste","workstations","devices","principals","loyalty","reviews","queueEntries","guests","campaigns","cases","ledgerEntries","workOrders","approvals","purchaseOrders","receipts","requisitions","stockBatches","resourceBookings","delegations","forms","challenges","wallets","resaleListings","accreditationApplications","accreditationHolders","accreditationCredentials","forecastPoints"],"x-ticvai-forecast-points":"**`forecastPoints` added 29 September (build pass, group G2; 8.2.55)**: one row per forecast point (`ai.forecast_point`) of a **published** forecast version (`ai.forecast_version` status `published`), with the definition it belongs to (`ai.forecast_definition`: subject, grain, unit), the period, the dimension key and the p10, p50 and p90 values. Draft, awaiting-approval and superseded versions are not reachable, and scenario points (`scenarioId` set) only with the scenario named as a filter: **a forecast leaves the platform as the one somebody published**. It is how a forecast is exported (`runReport` then `exportReportResult`, csv or xlsx), scheduled or put on a dashboard. Names no person, so `REPORT_EXPORT` is enough. Read from the reporting replica of the AI log database (design 2.4), never from the model service.\n"},
 "FieldType": {"type":"string","enum":["string","integer","decimal","money","boolean","date","dateTime","uuid","enum"]},
@@ -818,8 +982,11 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "GeneratedQuery": {"x-ticvai-persistence":"none — embedded; stored whole in `reporting.natural_language_query`","type":"object","description":"The structured query a natural-language question produced — data source, columns, filters, grouping. Named on 26 September so the answer and the kept copy are one shape.\n","properties":{"dataSource":{"$ref":"#/components/schemas/DataSource"},"columns":{"type":"array","items":{"$ref":"#/components/schemas/ReportColumn"}},"filters":{"type":"array","items":{"$ref":"#/components/schemas/ReportFilter"}},"groupBy":{"type":"array","items":{"type":"string"}},"compiledSql":{"type":"string","nullable":true,"description":"The SQL the semantic spec compiled to, exactly as run on the analytical replica (29 September, design 5.7). The replica's row-level security applies beneath it, so it does not need to carry the caller's scope. Null on queries kept before the semantic compile.\n"}}},
 "NaturalLanguageAnswer": {"x-ticvai-persistence":"none — computed","type":"object","required":["conversationId","question","interpretation","result","reliability"],"properties":{"conversationId":{"type":"string"},"question":{"type":"string"},"interpretation":{"type":"string","description":"What the question was understood to mean, in plain language. When the question is outside the semantic model, the \"not available yet\" sentence."},"semanticSpec":{"allOf":[{"$ref":"#/components/schemas/ReportingSemanticQuerySpec"}],"nullable":true,"description":"What the model returned instead of SQL (design 2.2 E, 5.7): metric, dimensions, filters, period, comparison, as validated against the semantic model. Null when the question is outside it. **Also kept**, on `NaturalLanguageQuery`, so a follow-up edits it.\n"},"generatedQuery":{"allOf":[{"$ref":"#/components/schemas/GeneratedQuery"}],"nullable":true,"description":"The query the spec compiled to: data source, columns, filters, grouping, and the compiled SQL in `compiledSql`. Returned so the answer can be checked. An answer nobody can verify is worse than no answer. **Also kept, as `NaturalLanguageQuery`**, for `saveNaturalLanguageQuery`. Null when the question is outside the semantic model.\n"},"result":{"allOf":[{"$ref":"#/components/schemas/ReportResult"}],"nullable":true,"description":"Null when the question is outside the semantic model."},"dataAsOf":{"type":"string","format":"date-time","nullable":true,"description":"Replica position the answer was read at, the result's `dataAsOf`, stated beside the answer so a figure that moved is not argued about. Null when nothing was run."},"reliability":{"$ref":"#/components/schemas/ReportingAnswerReliability"},"unavailableReason":{"allOf":[{"$ref":"#/components/schemas/ReportingUnavailableReason"}],"nullable":true,"description":"Set only when `reliability` is `insufficientEvidence` because the question is outside the semantic model (\"not available yet\"); names which part is not modelled."},"confidence":{"type":"number","minimum":0,"maximum":1,"deprecated":true,"description":"Superseded by `reliability` on 29 September (design 5.6, never a bare percentage for analytics). Returned for one release, then removed."},"suggestedFollowUps":{"type":"array","items":{"type":"string"}},"modelVersion":{"type":"string"},"tokensUsed":{"type":"integer"}}},
 "Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}},
+"PartnerAgreement": {"type":"object","x-ticvai-persistence":"control.partner_agreement","x-ticvai-retired-columns":["partner_name"],"required":["partnerId","rateMode","validFrom"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"partnerId":{"x-ticvai-references":"control.partner","type":"string","format":"uuid","description":"The partner (control.partner) this agreement is with. The agreement carries the terms; control.partner carries who the partner is and whether it may trade. **Resolves to control.partner**, not to platform.tenant as the naming convention guessed before the partner master existed (decided 29 September, writers pass; DM4)"},"partnerName":{"type":"string","readOnly":true,"x-ticvai-persisted":false,"description":"The partner's trading name, **read from control.partner.trading_name** (Partner.tradingName) when the agreement is returned and never stored on the agreement, so a renamed partner cannot show two names (decided 29 September, writers pass; DM4)"},"version":{"type":"integer","readOnly":true,"description":"**Amending creates a version.** An order placed last week was placed under last week's rate, and settlement must be able to say which.\n"},"status":{"$ref":"#/components/schemas/PartnerAgreementStatus"},"rateMode":{"$ref":"#/components/schemas/PartnerRateMode"},"commissionPercent":{"type":"number","nullable":true},"volumeTiers":{"type":"array","deprecated":true,"x-ticvai-persisted":false,"description":"**Retired: the tiers are rows of control.partner_rate_volume_band** (`PartnerRate.volumeBands`, written by setPartnerRateNet), one set per rate row, so a tier can differ by product, venue or channel. Accepted and ignored on write; not returned once the bands exist. `volumeWindow` below still says over which window the bands count (decided 29 September, writers pass; DM4).\n\n2.7.57. **A tier that changes at a threshold needs the sale to look back at cumulative volume, and nothing did.** Flat net rates and per-channel price lists cover the simple case and stop there.\n**The window is the argument, not the tier.** A partner who sells 400 in January and 400 in February is either a 400-tier partner twice or an 800-tier partner once, and the two are different money. `volumeWindow` says which.\n","items":{"type":"object","required":["fromUnits","commissionPercent"],"properties":{"fromUnits":{"type":"integer"},"commissionPercent":{"type":"number"},"appliesRetrospectively":{"type":"boolean","default":false,"description":"**Whether crossing a tier reprices what came before it.** Retrospective is what a partner assumes and prospective is what a venue budgets for — it has to be stated.\n"}}}},"volumeWindow":{"type":"string","nullable":true,"enum":["calendarMonth","calendarQuarter","calendarYear","agreementYear","rolling12Months"]},"seasonalRates":{"type":"array","deprecated":true,"x-ticvai-persisted":false,"description":"**Retired: a seasonal rate is a control.partner_rate row** with `seasonalRate: true` and its own `effectiveFrom`/`effectiveTo` (`PartnerRate`, written by setPartnerRateNet); the most specific row in force wins. Accepted and ignored on write (decided 29 September, writers pass; DM4).\n\nRates that change by date range. **Separate from the volume tier because they compound** — a peak-season rate at a high volume tier is both, and a single rate table cannot say so.\n","items":{"type":"object","properties":{"from":{"type":"string","format":"date"},"to":{"type":"string","format":"date"},"commissionPercent":{"type":"number"}}}},"segmentTier":{"type":"string","nullable":true},"brandingAssetId":{"type":"string","format":"uuid","nullable":true,"description":"2.7.x, BL-078. **A reseller selling a venue's tickets under their own brand is a second scope level white-label does not have** — `BrandIdentity` and `setTheme` are tenant-scoped throughout.\n**Co-branding rather than replacement.** The venue's identity stays on the ticket because the ticket admits to the venue; the partner's sits beside it.\n"},"storefrontSubdomain":{"type":"string","nullable":true},"sponsorship":{"type":"object","nullable":true,"description":"BL-050. **Sponsorship inventory is sellable capacity of a different kind** — logo placements, hospitality allocations, naming rights. It is closer to a partner agreement than to a product: **a sponsor buys a relationship for a season, not a ticket for a date.**\nModelled here rather than as a `ProductKind` because the commercial terms — the term, the exclusivity, the settlement — are the agreement's, and duplicating them onto a product would mean two places to disagree.\n","properties":{"placements":{"type":"array","items":{"type":"object","properties":{"surface":{"type":"string","enum":["signage","ticketFace","appBanner","emailFooter","venueNaming","zoneNaming","uniform","printedMap"]},"quantity":{"type":"integer"},"exclusive":{"type":"boolean","default":false,"description":"**Exclusivity is the expensive word.** A sponsor paying for category exclusivity has bought the absence of a competitor, and a second agreement breaching it is a legal problem rather than a scheduling one.\n"}}}},"hospitalityAllocation":{"type":"integer","nullable":true,"description":"Tickets or cabanas included. **Issued as invitations, not sales** — no revenue attaches."},"categoryExclusivity":{"type":"string","nullable":true}}},"netRates":{"type":"array","deprecated":true,"x-ticvai-persisted":false,"description":"**Retired: net rates are rows of control.partner_rate** (`PartnerRate` with `pricingModel: netRate`, `netRate` and the `maxDiscountPercent` guardrail), written by setPartnerRateNet. Per product or category; absent means the commission applies across the catalogue. Accepted and ignored on write (decided 29 September, writers pass; DM4)","items":{"type":"object","properties":{"productId":{"type":"string","format":"uuid","nullable":true},"categoryId":{"type":"string","format":"uuid","nullable":true},"netPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"maxDiscountPercent":{"type":"number","nullable":true,"description":"1.6.10. **What the partner may not undercut.** A reseller selling below the venue's own price damages the direct channel, and the venue usually cares more about that than the margin.\n"}}}},"creditTermDays":{"type":"integer","description":"2.7.36. Net 30, net 60. Drives when an invoice becomes overdue."},"acceptedByPrincipalId":{"type":"string","format":"uuid","nullable":true,"description":"BL-079. **Electronic acceptance against a version**, following the `signatureRef` precedent. An agreement accepted with no version recorded is an agreement nobody can produce in a dispute.\n"},"acceptedVersion":{"type":"integer","nullable":true},"acceptedAt":{"type":"string","format":"date-time","nullable":true},"signatureRef":{"type":"string","nullable":true},"corporateAllocations":{"type":"array","deprecated":true,"x-ticvai-persisted":false,"description":"**Retired: allocations are rows of control.partner_allocation** (`PartnerAllocation`, written by setPartnerAllocations and read by listCommercialAllocationQuota); used quantity is counted from orders against the row, not stored. Accepted and ignored on write (decided 29 September, writers pass; DM4).\n\nBL-035. **`PartnerAgreement` covered commercial terms and not allocations.** A corporate account with fifty places for its staff is the same structure as a reseller with fifty to sell, and **the difference is that a corporate member does not pay.**\n","items":{"type":"object","properties":{"productId":{"type":"string","format":"uuid"},"quantity":{"type":"integer"},"usedQuantity":{"type":"integer","readOnly":true},"perMemberLimit":{"type":"integer","nullable":true},"validTo":{"type":"string","format":"date","nullable":true}}}},"settlementCurrency":{"type":"string","pattern":"^[A-Z]{3}$","description":"**The currency this partner is billed and settles in**, which is often not the venue's. A UK tour operator selling a Dubai attraction is invoiced in GBP against sales booked in AED, and the difference is somebody's exposure.\n**`creditLimit` and `netRates` are expressed in this currency**, not the venue's — a limit in the wrong currency is a limit that moves with the exchange rate.\n"},"fxPolicy":{"type":"string","enum":["rateAtSale","rateAtInvoice","fixedRate"],"default":"rateAtSale","description":"**Which rate converts a sale into the settlement currency, and it is a commercial term.** `rateAtSale` puts the movement on the partner; `rateAtInvoice` puts it on the venue; `fixedRate` puts it on whoever guessed wrong when the agreement was signed.\n**Not a default to leave alone** — on a monthly statement across a moving rate the three produce materially different numbers, and the partner will have assumed one of them.\n"},"fixedRate":{"type":"number","nullable":true,"description":"Where `fxPolicy` is `fixedRate`. **An amendment creates a version** so an old statement stays readable."},"creditLimit":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"allowedChannels":{"type":"array","items":{"$ref":"../shared/common.yaml#/components/schemas/SalesChannel"}},"allowedVenueIds":{"type":"array","items":{"type":"string","format":"uuid"}},"requiresApprovalAboveValue":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"nullable":true,"description":"2.7.39. Routes through `approvals` rather than a second mechanism here."},"validFrom":{"type":"string","format":"date"},"validTo":{"type":"string","format":"date","nullable":true,"description":"2.7.37. **An agreement that lapses silently keeps selling at rates nobody agreed to**, discovered at settlement rather than at sale. Null means open-ended, which should be rare and deliberate.\n"},"expiryAlertDays":{"type":"integer","default":30},"approvalRequestId":{"type":"string","nullable":true,"readOnly":true},"notes":{"type":"string"},"agreementName":{"type":"string","nullable":true,"description":"Agreement name (decided 29 September, data model DM4)"},"agreementType":{"type":"string","nullable":true,"description":"Agreement type code, seeded with reseller, ota, travelTrade, corporate, wholesale, affiliate, distribution, apiCommercial (pack p.26) (decided 29 September, data model DM4)"},"contractReference":{"type":"string","nullable":true,"description":"Contract reference (decided 29 September, data model DM4)"},"legalEntityId":{"type":"string","format":"uuid","nullable":true,"description":"The contracting legal entity (ledger.legal_entity) (decided 29 September, data model DM4)"},"brandId":{"type":"string","format":"uuid","nullable":true,"description":"Brand the agreement covers; empty for every brand of the tenant (decided 29 September, data model DM4)"},"territory":{"type":"string","nullable":true,"description":"Territory (decided 29 September, data model DM4)"},"commercialOwnerPrincipalId":{"type":"string","format":"uuid","nullable":true,"description":"Commercial owner, a staff principal (decided 29 September, data model DM4)"},"financeOwnerPrincipalId":{"type":"string","format":"uuid","nullable":true,"description":"Finance owner, a staff principal (decided 29 September, data model DM4)"},"pricingBasis":{"type":"string","enum":["retailPrice","netRate","discountFromRetail","markup","derivedRate"],"nullable":true,"description":"Pricing basis (pack p.27 pricing models); the rows are `control.partner_rate` (decided 29 September, data model DM4)"},"paymentModel":{"type":"string","enum":["creditAccount","prepaid","payPerTransaction"],"nullable":true,"description":"Payment model, the three confirmed at MoM 5 Aug and MoM 31 Aug 4.4: creditAccount (sells to an approved credit ceiling, invoiced periodically), prepaid (pre-funded wallet drawn down per sale) or payPerTransaction (card at each sale). Held here once; the billing screen reads and sets this column (decided 29 September, data model DM4)"},"renewalType":{"type":"string","enum":["manual","auto"],"nullable":true,"description":"Renewal type (decided 29 September, data model DM4)"},"renewalNoticeDays":{"type":"integer","minimum":0,"nullable":true,"description":"Renewal notice period in days (decided 29 September, data model DM4)"},"renegotiationRequired":{"type":"boolean","default":false,"description":"Renegotiation required before renewal (decided 29 September, data model DM4)"},"renewalRequiresApproval":{"type":"boolean","description":"Renewal needs approval (decided 29 September, data model DM4)"},"minimumCommitment":{"type":"integer","minimum":0,"nullable":true,"description":"Minimum commitment: tickets over the agreement term (decided 29 September, data model DM4)"},"salesTarget":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"nullable":true,"description":"Sales target over the agreement term (decided 29 September, data model DM4)"},"agreementValue":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"nullable":true,"description":"Agreement value (MoM 31 Aug 4.4: each agreement captures term/value) (decided 29 September, data model DM4)"},"commissionTerms":{"type":"string","nullable":true,"description":"Commission terms as written in the contract; the rules that compute it are `control.partner_commission_rule` (decided 29 September, data model DM4)"},"creditTerms":{"type":"string","nullable":true,"description":"Credit terms as written in the contract (decided 29 September, data model DM4)"},"allocationTerms":{"type":"string","nullable":true,"description":"Allocation terms as written in the contract; the allocations are `control.partner_allocation` (decided 29 September, data model DM4)"},"cancellationConditions":{"type":"string","nullable":true,"description":"Cancellation conditions (decided 29 September, data model DM4)"},"refundConditions":{"type":"string","nullable":true,"description":"Refund conditions (pack p.26) (decided 29 September, data model DM4)"},"bookingRestrictions":{"type":"string","nullable":true,"description":"Booking restrictions as written in the contract; the enforced limits are `control.partner_booking_limit` (decided 29 September, data model DM4)"},"settlementTerms":{"type":"string","nullable":true,"description":"Settlement terms (decided 29 September, data model DM4)"},"scopePath":{"type":"string","description":"The partition key (ADR-0005), written at `tenant` scope, as every control.partner_* row carries it, so row-level security scopes the agreement the same way (decided 29 September, writers pass; DM4)"}}},
+"PartnerAgreementStatus": {"type":"string","enum":["pendingApproval","active","expiringSoon","expired","suspended","terminated"]},
+"PartnerRateMode": {"type":"string","description":"**Alternatives, not both.** A partner buys at a net rate and keeps the margin, or sells at face value and is paid commission. Both is being paid twice for the same sale.\n","enum":["netRate","commission"]},
 "ReportCategory": {"type":"string","enum":["sales","admission","financial","inventory","guest","operations","marketing","workforce","compliance","custom"]},
-"ReportColumn": {"x-ticvai-persistence":"reporting.report_column","type":"object","required":["field"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true,"description":"**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"},"field":{"type":"string"},"label":{"type":"string"},"aggregation":{"allOf":[{"$ref":"#/components/schemas/Aggregation"}],"default":"none"},"sortOrder":{"type":"integer"},"sortDirection":{"type":"string","enum":["asc","desc"]},"format":{"type":"string","nullable":true}}},
+"ReportColumn": {"x-ticvai-persistence":"reporting.report_column","type":"object","required":["field"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true,"description":"**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"},"field":{"type":"string"},"label":{"type":"string"},"aggregation":{"allOf":[{"$ref":"#/components/schemas/Aggregation"}],"default":"none"},"sortOrder":{"type":"integer"},"sortDirection":{"type":"string","enum":["asc","desc"]},"format":{"type":"string","nullable":true},"role":{"type":"string","nullable":true,"enum":["dimension","measure"],"description":"**What the column is to a chart** (decided 2 October 2026, Chinmay; CHG-FIN-007). A `dimension` groups (date, venue, channel, product); a `measure` is aggregated (sum of net revenue, count of admissions). Null on a column only a table shows."},"encoding":{"type":"string","nullable":true,"enum":["category","x","y","series","value","size","colour","location","stage","source","target","row","column","hierarchyLevel","label","tooltip"],"description":"**Which field well the column fills** (CHG-FIN-007), the binding the twenty marks of `DashboardTile.visualisation` need. The per-mark rule is on that field."},"axis":{"type":"string","nullable":true,"enum":["primary","secondary"],"description":"For a measure on a `combo`, the axis it is drawn against. A secondary axis needs its own `unitLabel` (CHG-FIN-007)."},"seriesType":{"type":"string","nullable":true,"enum":["bar","line","area"],"description":"For a measure on a `combo`, how that series is drawn (CHG-FIN-007)."},"hierarchyLevel":{"type":"integer","nullable":true,"minimum":1,"description":"For `matrix` rows and columns, `treemap` nesting and `decompositionTree` levels, the depth of this dimension, 1 outermost. Levels must follow a real hierarchy (DI-709), for example year, month, day, or region, venue, outlet (CHG-FIN-007)."},"unitLabel":{"type":"string","nullable":true,"maxLength":40,"description":"The unit an axis states, for example \"AED\" or \"Admissions\". Required on a secondary axis (CHG-FIN-007)."}}},
 "ReportDefinition": {"x-ticvai-persistence":"reporting.report_definition + reporting.report_column + reporting.report_filter","allOf":[{"$ref":"#/components/schemas/CreateReportRequest"},{"type":"object","required":["id","version","isSystem","isRetired","createdAt"],"properties":{"id":{"type":"string","format":"uuid"},"version":{"type":"string","description":"The current version. Assigned by the server on each publish; earlier ones are kept as `ReportDefinitionVersion`."},"isSystem":{"type":"boolean","description":"Shipped with the platform — seeded at provisioning (BL-053, `SeededReport`). **Clone-only (decided 28 September, audit R096)**: `updateReport` and `deleteReport` refuse it with 409 `system-report`; a venue changes a copy made with `createReport`.\n"},"isRetired":{"type":"boolean"},"estimatedCost":{"type":"string","enum":["low","medium","high"],"description":"Informs whether it may run inline or must be queued."},"createdByPrincipalId":{"type":"string","format":"uuid","nullable":true},"createdAt":{"type":"string","format":"date-time"},"lastRunAt":{"type":"string","format":"date-time","nullable":true},"scopePath":{"type":"string","description":"**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"}}}]},
 "ReportFilter": {"x-ticvai-persistence":"reporting.report_filter","type":"object","required":["field","operator"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true,"description":"**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"},"field":{"type":"string"},"operator":{"type":"string","enum":["equals","notEquals","greaterThan","lessThan","between","in","notIn","contains","isNull","isNotNull"]},"value":{"description":"**Open on purpose; its type is the field's.** One value, of the `FieldType` that `listReportFields` gives for `field` — a string, number, boolean, or a date, date-time or uuid as a string. Absent for `in`, `notIn`, `between`, `isNull` and `isNotNull`.\n"},"values":{"type":"array","description":"The values for `in` and `notIn`, or exactly two (from, to) for `between`. Each of the field's `FieldType`, as `value`.","items":{}},"isParameter":{"type":"boolean","default":false,"description":"Prompted at run time rather than fixed. Parameters narrow the result; they never widen scope.\n"}}},
 "ReportParameter": {"x-ticvai-persistence":"reporting.report_parameter","type":"object","required":["key","label","type","isRequired"],"properties":{"key":{"type":"string"},"label":{"type":"string"},"type":{"$ref":"#/components/schemas/FieldType"},"isRequired":{"type":"boolean"},"defaultValue":{"description":"Open on purpose. A value of this parameter's `type`, used when a run supplies none."}}},

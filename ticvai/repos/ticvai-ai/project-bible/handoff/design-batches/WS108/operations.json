@@ -75,6 +75,25 @@
   "requestBody": "FormDefinition",
   "responds": "FormDefinition"
  },
+ "getForm": {
+  "method": "GET",
+  "path": "/forms/{formId}",
+  "contract": "marketing-crm",
+  "summary": "One form, to fill in or to edit",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "version",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "FormDefinition"
+ },
  "listAccreditationApplications": {
   "method": "GET",
   "path": "/accreditation-applications",
@@ -103,6 +122,79 @@
   ],
   "requestBody": null,
   "responds": "AccreditationApplication"
+ },
+ "listAccreditationCredentials": {
+  "method": "GET",
+  "path": "/accreditation-credentials",
+  "contract": "accreditation",
+  "summary": "Badges and digital credentials issued",
+  "permission": "ACCREDITATION_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "holderId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AccreditationCredential"
+ },
+ "listAccreditationDocuments": {
+  "method": "GET",
+  "path": "/accreditation-documents",
+  "contract": "accreditation",
+  "summary": "Documents supplied, by holder, application, requirement or state",
+  "permission": "ACCREDITATION_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "applicationId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "holderId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "requirementCode",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "expiringWithinDays",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
  },
  "listAccreditationHolders": {
   "method": "GET",
@@ -138,6 +230,19 @@
   "requestBody": null,
   "responds": "AccreditationHolder"
  },
+ "listAccreditationIdentityConflicts": {
+  "method": "GET",
+  "path": "/accreditation-identity-conflicts",
+  "contract": "accreditation",
+  "summary": "People who may already be accredited under another record",
+  "permission": "ACCREDITATION_MANAGE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "AccreditationIdentityConflict"
+ },
  "listAccreditationProgrammes": {
   "method": "GET",
   "path": "/accreditation-programmes",
@@ -156,6 +261,35 @@
   ],
   "requestBody": null,
   "responds": "AccreditationProgramme"
+ },
+ "listForms": {
+  "method": "GET",
+  "path": "/forms",
+  "contract": "marketing-crm",
+  "summary": "Waivers, surveys and capture forms",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "kind",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
  },
  "setAccreditationRequirements": {
   "method": "PUT",

@@ -1,4 +1,17 @@
 {
+ "getEvent": {
+  "method": "GET",
+  "path": "/events/{eventId}",
+  "contract": "catalogue",
+  "summary": "Read an event",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "Event"
+ },
  "setEventCapacityProfile": {
   "method": "PUT",
   "path": "/events/{eventId}/capacity-profile",

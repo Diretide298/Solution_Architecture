@@ -70,79 +70,98 @@
    }
   }
  },
- "ApprovalKind": {
-  "type": "string",
-  "description": "11.1.7 and 11.1.30–11.1.37. **The first four already exist as bespoke implementations** and this contract is what they collapse into.\n**Which actions route here — decided 28 September, audit R144.** Finance and procurement acts go through this engine to a **finance approver**: closing a fiscal period (`periodClose`), reopening one (`periodReopen`), cancelling a purchase order (`purchaseOrderCancel`) and closing one short (`purchaseOrderShortClose`). The tenant default matrix for each of these names the finance approver role; a venue may tighten it and never loosen it. Starting a release rollout routes through `releasePromotion` to the platform release manager (a holder of `PLATFORM_RELEASE_PROMOTE`). **Not every `requiresApproval` goes here:** reopening a shift, recounting a stock count and a retail return above the venue threshold take a supervisor's step-up on the same device instead, and never raise a request.\n**Catalogue change requests route through `productChange` and `pricingChange`** (decided 29 September, writers pass): a product change and a price or pricing change raised in `catalogue` ask for approval under these two kinds, so a venue can route product edits and price edits to different approvers.\n",
-  "enum": [
-   "refund",
-   "priceOverride",
-   "discountOverride",
-   "complimentaryTicket",
-   "membershipCancellation",
-   "accessPermissionChange",
-   "configurationChange",
-   "aiRecommendation",
-   "releasePromotion",
-   "requisition",
-   "stockWriteOff",
-   "journalEntry",
-   "periodClose",
-   "periodReopen",
-   "purchaseOrderCancel",
-   "purchaseOrderShortClose",
-   "tenantMigration",
-   "productChange",
-   "pricingChange"
-  ]
- },
- "ApprovalRetentionPolicy": {
+ "AnalyticsGovernancePolicy": {
   "type": "object",
-  "x-ticvai-persistence": "approvals.retention_policy",
-  "description": "Approvals board 6.7. **Approval records outlive what they approved.**",
+  "x-ticvai-persistence": "reporting.analytics_governance_policy",
+  "description": "**What analytics may show and where it may go** (Chinmay, 2 October, workbook Q225; CHG-CSA-021). One row per tenant.",
   "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "appliesToRequestKinds": {
-    "type": "array",
-    "items": {
-     "$ref": "#/components/schemas/ApprovalKind"
+   "masking": {
+    "type": "object",
+    "description": "Masked fields, as `schema.table.column`, and who may see them unmasked.",
+    "properties": {
+     "maskedFields": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      }
+     },
+     "unmaskedForPermissions": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      }
+     }
     }
    },
-   "retainYears": {
-    "type": "integer",
-    "nullable": true,
-    "description": "**Null takes the tenant's `approvalRecord` retention setting** (tenancy `setDataRetentionSetting`; decided 29 September, all data retention is tenant configuration). A value here applies to the request kinds this policy names and may only lengthen what the tenant setting keeps.\n"
+   "export": {
+    "type": "object",
+    "properties": {
+     "allowedFormats": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      }
+     },
+     "personalDataNeedsPermission": {
+      "type": "boolean",
+      "default": true,
+      "description": "An export carrying personal data needs `REPORT_EXPORT_PII`."
+     },
+     "maxRows": {
+      "type": "integer",
+      "nullable": true
+     }
+    }
    },
-   "retainSignatures": {
-    "type": "boolean",
-    "default": true
+   "retention": {
+    "type": "object",
+    "properties": {
+     "resultDays": {
+      "type": "integer",
+      "minimum": 1,
+      "nullable": true,
+      "description": "How long report results and exports are kept."
+     }
+    }
    },
-   "retainAttachments": {
-    "type": "boolean",
-    "default": false
+   "sharing": {
+    "type": "object",
+    "properties": {
+     "externalLinks": {
+      "type": "boolean",
+      "default": false
+     },
+     "allowedDomains": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      }
+     }
+    }
    },
-   "onExpiry": {
-    "type": "string",
-    "enum": [
-     "delete",
-     "anonymise",
-     "archive"
-    ],
-    "default": "archive"
-   },
-   "overridesPrivacyDeletion": {
-    "type": "boolean",
-    "default": true,
-    "description": "**Can extend, never shorten, what privacy retention would delete.** The interaction is decided once here instead of argued per data-subject request.\n"
-   },
-   "legalBasis": {
-    "type": "string",
-    "nullable": true
+   "aiAndApiAccess": {
+    "type": "object",
+    "properties": {
+     "aiAssistant": {
+      "type": "boolean",
+      "default": true,
+      "description": "The AI assistant may answer analytics questions through the semantic layer (ADR-0054)."
+     },
+     "publicApi": {
+      "type": "boolean",
+      "default": false
+     }
+    }
    },
    "scopePath": {
-    "type": "string"
+    "type": "string",
+    "readOnly": true,
+    "description": "The partition key (ADR-0005). Written at `tenant` scope."
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
    }
   }
  },

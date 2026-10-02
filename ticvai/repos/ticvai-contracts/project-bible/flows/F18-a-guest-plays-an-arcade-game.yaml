@@ -33,25 +33,27 @@ steps:
   - loadGameCredits
   outcome: Credits loaded
 - step: 2
-  screen: GST-026
-  action: Checks the balance in the app
+  screen: GST-011
+  action: 'Checks the card''s balance in the app''s wallet'
   operations:
   - getGameCard
   outcome: What is on the card
+  crossesDevice: true
 - step: 3
-  screen: BO-069
+  screen: BO-395
+  crossesDevice: true
   action: Machine records the play
-  operations:
-  - recordGamePlay
-  - syncGamePlays
+  operations: []
   outcome: '**Offline, journalled, synced later**'
+  note: '**Repointed 2 October (CHG-WIR-001).** recordGamePlay and syncGamePlays are device-audience operations: the machine''s reader calls them, and no screen does. The step was on BO-069 Asset Register; the play shows against the game on BO-395.'
 - step: 4
-  screen: BO-069
+  screen: BO-395
   action: Machine goes out of service
   operations:
   - listGames
   - updateGame
   outcome: The asset cascade closes it
+  note: '**Repointed 2 October (CHG-WIR-001).** Game configuration belongs to the games boards (BO-395 Game & Ride Directory), not the asset register BO-069.'
 branches:
 - at: 3
   condition: The card has no credits

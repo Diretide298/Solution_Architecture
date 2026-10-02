@@ -2372,520 +2372,115 @@
    }
   }
  },
- "RulePriorityConflictInput": {
+ "PricingDynamicPriceRule": {
   "type": "object",
-  "x-ticvai-persistence": "none — request only; the saved hierarchy and test cases are the rows listRulePriorityConflict reads",
-  "description": "What `setRulePriorityConflict` takes (decided 29 September, readiness close-out; VM close-out for BO-441 Reorder, Validate, Test, Save).",
+  "x-ticvai-persistence": "pricing.dynamic_price_rule",
+  "description": "**Taken from the backend workbook, 20 September.** Configurable dynamic pricing component for dynamic price rule.",
   "required": [
-   "mode"
+   "pricingRuleCode",
+   "name",
+   "priority",
+   "isActive"
   ],
   "properties": {
-   "orderedRuleIds": {
-    "type": "array",
-    "description": "The rules in priority order, highest first. Reorder is this list.",
-    "items": {
-     "type": "string"
-    }
-   },
-   "resolutionMethod": {
-    "type": "string",
-    "enum": [
-     "highestPriorityWins",
-     "mostSpecificRuleWins",
-     "cumulativeAdjustment",
-     "maximumAdjustmentWins",
-     "minimumAdjustmentWins",
-     "weightedCombination",
-     "stopProcessing",
-     "customGovernedResolution"
-    ],
-    "default": "highestPriorityWins",
-    "description": "How two applicable rules are resolved; the same vocabulary as `RulePriorityConflictResolutionDynamicPricingTestConsSummary.resolutionMethod`. Never lowest-price-wins by default (decided 29 September, readiness close-out)."
-   },
-   "priorityHierarchy": {
-    "type": "array",
-    "description": "The priority matrix, highest first; defaults to the pack's order.",
-    "items": {
-     "type": "string",
-     "enum": [
-      "commercialProtection",
-      "contractMemberProtection",
-      "eventSpecificStrategy",
-      "inventoryOccupancy",
-      "bookingVelocity",
-      "timeToEvent",
-      "seasonDayTimeslot",
-      "basePrice"
-     ]
-    }
-   },
-   "mode": {
-    "type": "string",
-    "enum": [
-     "save",
-     "validate",
-     "test"
-    ],
-    "description": "`validate` checks the order and returns conflicts without saving; `test` runs `testScenario` against the order and saves it as a test case; `save` stores the order and method, refused with `409` while a critical conflict is open."
-   },
-   "testScenario": {
-    "$ref": "#/components/schemas/RulePriorityTestScenario"
-   }
-  }
- },
- "RulePriorityConflictResolutionDynamicPricingTestConsSummary": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection; the headline tiles over the list, computed at read time for the filters in force",
-  "description": "**The headline figures on Rule Priority, Conflict Resolution & Dynamic Pricing Test Console.** The pack's KPI cards, split out of the row (decided 29 September, readiness close-out): a count describes the list, not each item in it.",
-  "properties": {
-   "contradictoryRules": {
-    "type": "integer",
-    "description": "Open contradictoryRules conflicts detected across active and draft rules"
-   },
-   "samePriority": {
-    "type": "integer",
-    "description": "Open samePriority conflicts detected across active and draft rules"
-   },
-   "impossibleCondition": {
-    "type": "integer",
-    "description": "Open impossibleCondition conflicts detected across active and draft rules"
-   },
-   "overlappingStrategy": {
-    "type": "integer",
-    "description": "Open overlappingStrategy conflicts detected across active and draft rules"
-   },
-   "circularDependency": {
-    "type": "integer",
-    "description": "Open circularDependency conflicts detected across active and draft rules"
-   },
-   "missingFallback": {
-    "type": "integer",
-    "description": "Open missingFallback conflicts detected across active and draft rules"
-   },
-   "guardrailConflict": {
-    "type": "integer",
-    "description": "Open guardrailConflict conflicts detected across active and draft rules"
-   },
-   "resolutionMethod": {
-    "type": "string",
-    "enum": [
-     "highestPriorityWins",
-     "mostSpecificRuleWins",
-     "cumulativeAdjustment",
-     "maximumAdjustmentWins",
-     "minimumAdjustmentWins",
-     "weightedCombination",
-     "stopProcessing",
-     "customGovernedResolution"
-    ],
-    "description": "Resolution Method in force (pack p.89); defaults to highestPriorityWins (decided 29 September, readiness close-out)"
-   },
-   "priorityHierarchy": {
-    "type": "array",
-    "items": {
-     "type": "string",
-     "enum": [
-      "commercialProtection",
-      "contractMemberProtection",
-      "eventSpecificStrategy",
-      "inventoryOccupancy",
-      "bookingVelocity",
-      "timeToEvent",
-      "seasonDayTimeslot",
-      "basePrice"
-     ]
-    },
-    "description": "Priority Matrix, highest first; defaults to the pack's order (decided 29 September, readiness close-out)"
-   }
-  }
- },
- "RulePriorityConflictResolutionDynamicPricingTestConsView": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
-  "description": "**What Rule Priority, Conflict Resolution & Dynamic Pricing Test Console displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
-  "properties": {
-   "product": {
-    "type": "string",
-    "description": "Test input: product"
-   },
-   "event": {
-    "type": "string",
-    "description": "Test input: event",
-    "nullable": true
-   },
-   "performance": {
-    "type": "string",
-    "description": "Test input: performance",
-    "nullable": true
-   },
-   "date": {
-    "type": "string",
-    "format": "date",
-    "description": "Test input: visit/event date"
-   },
-   "timeslot": {
-    "type": "string",
-    "description": "Test input: timeslot",
-    "nullable": true
-   },
-   "channel": {
-    "allOf": [
-     {
-      "$ref": "../shared/common.yaml#/components/schemas/SalesChannel"
-     }
-    ],
-    "description": "Test input: channel"
-   },
-   "customerSegment": {
-    "type": "string",
-    "description": "Test input: customer segment"
-   },
-   "basePrice": {
-    "allOf": [
-     {
-      "$ref": "../shared/common.yaml#/components/schemas/Money"
-     }
-    ],
-    "description": "Test input: base price"
-   },
-   "occupancy": {
-    "type": "number",
-    "description": "Test input: occupancy percent"
-   },
-   "inventory": {
-    "type": "integer",
-    "description": "Test input: remaining inventory"
-   },
-   "bookingVelocity": {
-    "type": "number",
-    "description": "Test input: booking velocity, percent against expected pace"
-   },
-   "timeToEvent": {
-    "type": "integer",
-    "description": "Test input: days to event (0 = same day)"
-   },
-   "calculationPath": {
-    "type": "array",
-    "items": {
-     "type": "string"
-    },
-    "description": "Explainability: the complete calculation path, one step per line"
-   },
-   "testCaseId": {
-    "type": "string",
-    "description": "Test case ID"
-   },
-   "caseName": {
-    "type": "string",
-    "description": "Test case name"
-   },
-   "caseType": {
-    "type": "string",
-    "enum": [
-     "lowDemand",
-     "highDemand",
-     "nearSellOut",
-     "earlyBird",
-     "lastMinute",
-     "weekendPeak",
-     "memberPurchase",
-     "b2bContract",
-     "custom"
-    ],
-    "description": "Test case type (pack p.91)"
-   },
-   "rulesMatched": {
-    "type": "array",
-    "items": {
-     "type": "object",
-     "properties": {
-      "ruleId": {
-       "type": "string",
-       "description": "Rule"
-      },
-      "ruleName": {
-       "type": "string",
-       "description": "Rule name"
-      },
-      "priorityLevel": {
-       "type": "string",
-       "enum": [
-        "commercialProtection",
-        "contractMemberProtection",
-        "eventSpecificStrategy",
-        "inventoryOccupancy",
-        "bookingVelocity",
-        "timeToEvent",
-        "seasonDayTimeslot",
-        "basePrice"
-       ],
-       "description": "Hierarchy level"
-      },
-      "adjustmentPercent": {
-       "type": "number",
-       "description": "Adjustment in percent",
-       "nullable": true
-      },
-      "applied": {
-       "type": "boolean",
-       "description": "Applied after resolution"
-      }
-     },
-     "description": "One matched rule"
-    },
-    "description": "Rules matched"
-   },
-   "rawCalculatedPrice": {
-    "allOf": [
-     {
-      "$ref": "../shared/common.yaml#/components/schemas/Money"
-     }
-    ],
-    "description": "Raw calculated price"
-   },
-   "ladderPrice": {
-    "allOf": [
-     {
-      "$ref": "../shared/common.yaml#/components/schemas/Money"
-     }
-    ],
-    "description": "Nearest allowed band"
-   },
-   "guardrailOutcome": {
-    "type": "string",
-    "enum": [
-     "passed",
-     "cappedAtMaximum",
-     "raisedToMinimum",
-     "protectedRateApplied"
-    ],
-    "description": "Guardrail result"
-   },
-   "finalPrice": {
-    "allOf": [
-     {
-      "$ref": "../shared/common.yaml#/components/schemas/Money"
-     }
-    ],
-    "description": "Final dynamic price"
-   },
-   "conflicts": {
-    "type": "array",
-    "items": {
-     "type": "object",
-     "properties": {
-      "code": {
-       "type": "string",
-       "enum": [
-        "contradictoryRules",
-        "samePriority",
-        "impossibleCondition",
-        "overlappingStrategy",
-        "circularDependency",
-        "missingFallback",
-        "guardrailConflict"
-       ],
-       "description": "Conflict type (pack p.90)"
-      },
-      "message": {
-       "type": "string",
-       "description": "Message"
-      },
-      "ruleIds": {
-       "type": "array",
-       "items": {
-        "type": "string"
-       },
-       "description": "Rules involved"
-      }
-     },
-     "description": "One conflict"
-    },
-    "description": "Conflicts met while resolving this case"
-   },
-   "lastRunAt": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Last run"
-   },
-   "passed": {
-    "type": "boolean",
-    "description": "Final price matched the expected price saved with the case",
-    "nullable": true
-   },
-   "expectedPrice": {
-    "allOf": [
-     {
-      "$ref": "../shared/common.yaml#/components/schemas/Money"
-     }
-    ],
-    "description": "Expected final price for regression",
-    "nullable": true
-   }
-  }
- },
- "RulePriorityConflictView": {
-  "type": "object",
-  "x-ticvai-persistence": "none — projection over the saved priority order and test cases",
-  "description": "What `setRulePriorityConflict` returns: the order in force, the conflicts it has and, in `test` mode, the result.",
-  "properties": {
-   "mode": {
-    "type": "string",
-    "enum": [
-     "save",
-     "validate",
-     "test"
-    ]
-   },
-   "saved": {
-    "type": "boolean"
-   },
-   "orderedRuleIds": {
-    "type": "array",
-    "items": {
-     "type": "string"
-    }
-   },
-   "resolutionMethod": {
-    "type": "string"
-   },
-   "priorityHierarchy": {
-    "type": "array",
-    "items": {
-     "type": "string"
-    }
-   },
-   "conflicts": {
-    "type": "array",
-    "items": {
-     "type": "object",
-     "properties": {
-      "code": {
-       "type": "string",
-       "enum": [
-        "contradictoryRules",
-        "samePriority",
-        "impossibleCondition",
-        "overlappingStrategy",
-        "circularDependency",
-        "missingFallback",
-        "guardrailConflict"
-       ]
-      },
-      "severity": {
-       "type": "string",
-       "enum": [
-        "critical",
-        "warning"
-       ]
-      },
-      "ruleIds": {
-       "type": "array",
-       "items": {
-        "type": "string"
-       }
-      },
-      "message": {
-       "type": "string"
-      }
-     }
-    }
-   },
-   "testResult": {
-    "nullable": true,
-    "allOf": [
-     {
-      "$ref": "#/components/schemas/RulePriorityConflictResolutionDynamicPricingTestConsView"
-     }
-    ],
-    "description": "The saved test case with its deterministic result, in `test` mode."
-   },
-   "savedAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   }
-  }
- },
- "RulePriorityTestScenario": {
-  "type": "object",
-  "description": "A sample booking for the conflict test console (pack p.90), the same inputs as a saved test case.",
-  "properties": {
-   "caseName": {
-    "type": "string",
-    "maxLength": 120
-   },
-   "caseType": {
-    "type": "string",
-    "enum": [
-     "lowDemand",
-     "highDemand",
-     "nearSellOut",
-     "earlyBird",
-     "lastMinute",
-     "weekendPeak",
-     "memberPurchase",
-     "b2bContract",
-     "custom"
-    ]
-   },
-   "productId": {
+   "id": {
     "type": "string",
     "format": "uuid"
    },
-   "eventId": {
+   "pricingRuleCode": {
+    "type": "string",
+    "maxLength": 100
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "productId": {
     "type": "string",
     "format": "uuid",
     "nullable": true
    },
-   "performanceId": {
+   "priceListId": {
     "type": "string",
     "format": "uuid",
     "nullable": true
    },
-   "date": {
-    "type": "string",
-    "format": "date"
-   },
-   "timeslot": {
+   "scopePath": {
     "type": "string",
     "nullable": true
    },
-   "channel": {
-    "$ref": "../shared/common.yaml#/components/schemas/SalesChannel"
-   },
-   "customerSegment": {
+   "channelId": {
     "type": "string",
+    "format": "uuid",
     "nullable": true
    },
-   "basePrice": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   "priority": {
+    "type": "integer"
    },
-   "occupancy": {
-    "type": "number",
-    "minimum": 0,
-    "maximum": 100
+   "validFrom": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
    },
-   "inventory": {
-    "type": "integer",
-    "minimum": 0
+   "validTo": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
    },
-   "bookingVelocity": {
-    "type": "number"
+   "isActive": {
+    "type": "boolean"
    },
-   "timeToEvent": {
-    "type": "integer",
-    "minimum": 0
+   "dynamicPricingStrategyId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The `catalogue.dynamic_pricing_strategy` a dynamic rule belongs to (29 September, data model DM3). Null for a static pricing rule."
    },
-   "expectedPrice": {
-    "allOf": [
-     {
-      "$ref": "../shared/common.yaml#/components/schemas/Money"
-     }
+   "ruleType": {
+    "type": "string",
+    "maxLength": 40,
+    "nullable": true,
+    "description": "Static rules: `PricingRuleCommandCenterView.ruleType`; dynamic rules: the builder's `ruleKind`."
+   },
+   "inputMetric": {
+    "type": "string",
+    "maxLength": 40,
+    "nullable": true
+   },
+   "conditionLogic": {
+    "type": "string",
+    "enum": [
+     "all",
+     "any"
     ],
+    "default": "all"
+   },
+   "cooldownMinutes": {
+    "type": "integer",
+    "nullable": true,
+    "minimum": 0
+   },
+   "minimumDurationMinutes": {
+    "type": "integer",
+    "nullable": true,
+    "minimum": 0
+   },
+   "exitThresholdOffset": {
+    "type": "number",
     "nullable": true
+   },
+   "rangeMinPercent": {
+    "type": "number",
+    "nullable": true
+   },
+   "rangeMaxPercent": {
+    "type": "number",
+    "nullable": true
+   },
+   "isProtected": {
+    "type": "boolean",
+    "default": false,
+    "description": "A protected segment or channel: dynamic adjustments never apply."
    }
   }
  },

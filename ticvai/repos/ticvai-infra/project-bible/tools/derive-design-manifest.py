@@ -67,6 +67,26 @@ LOCKED = {
             "clone."),
 }
 
+# **Screens a locked platform's design does not cover, cut into a batch of their own** (1 October
+# 2026). P04 stays locked because the POS v2 build is its design -- but v2 has no view for these
+# seven, and neither has the approved build: their frames were drawn in Claude Design on 29 September
+# in the approved build's style. They are pulled out of their module batches into one batch that is
+# NOT locked, so it is exported and drawn in v2's look; every other P04 screen stays in a locked batch.
+# POS-009 and POS-015 build on v2's shift panel, without its 'Expected in drawer' (POS v2 decision
+# POSV2-3). Status is still read off the disk: these screens have frames, so the batch reads `drawn`
+# until they are redrawn, and `redraw` says why it is on the run sheet anyway.
+UNLOCKED = {
+    "P04": {
+        "id": "P04-not-in-v2-01",
+        "label": "P04 · Screens the v2 build does not draw",
+        "screens": ["POS-009", "POS-010", "POS-015", "POS-017", "POS-018", "POS-019", "POS-024"],
+        "redraw": ("No view in the POS v2 build or the approved build. The frames on disk were drawn in "
+                   "Claude Design on 29 September in the approved build's style; draw them again in v2's "
+                   "look (handoff/design-batches/apps/2-pos/README.md). POS-009 and POS-015 build on v2's "
+                   "shift panel, without 'Expected in drawer' (POS v2 decision POSV2-3)."),
+    },
+}
+
 
 def _utf8_stdout() -> None:
     try:
@@ -135,6 +155,17 @@ def collect() -> tuple[list, dict]:
             "screens": ids,
         })
 
+    # The unlocked screens of a locked platform leave their module batches for a batch of their own.
+    for code, u in sorted(UNLOCKED.items()):
+        ids = sorted(i for i in u["screens"] if i in screens)
+        for key in list(modules):
+            modules[key] = [i for i in modules[key] if i not in ids]
+            if not modules[key]:
+                del modules[key]
+        if ids:
+            batches.append({"id": u["id"], "kind": "unlocked", "label": u["label"], "platform": code,
+                            "screens": ids, "redraw": u["redraw"]})
+
     # **Ten at a time, and the split is by count rather than by anything clever.** `P06 Operations`
     # is 46 screens; one session cannot hold it and a reviewer cannot read it in a pass either.
     for code, mod in sorted(modules):
@@ -165,7 +196,7 @@ def main() -> int:
         b["drawable"] = sum(1 for s in specs if components(s) >= DRAWABLE_AT)
         b["thin"] = len(specs) - b["drawable"]
         b["frames"] = sum(1 for i in b["screens"] if i in drawn_ids)
-        if b["platform"] in LOCKED:
+        if b["platform"] in LOCKED and b["kind"] != "unlocked":
             b["status"] = "locked"
             b["lockedReason"] = LOCKED[b["platform"]]
         elif b["frames"] == len(b["screens"]):
@@ -193,6 +224,7 @@ def main() -> int:
         "batchSize": BATCH_SIZE,
         "drawableAt": DRAWABLE_AT,
         "locked": LOCKED,
+        "unlocked": UNLOCKED,
         "counts": {
             "batches": len(batches),
             "screens": sum(len(b["screens"]) for b in batches),

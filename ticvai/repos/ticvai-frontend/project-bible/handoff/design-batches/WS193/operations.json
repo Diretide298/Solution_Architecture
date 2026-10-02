@@ -357,24 +357,5 @@
   ],
   "requestBody": "WalletRiskRules",
   "responds": "WalletRiskRules"
- },
- "simulateCreditConsumption": {
-  "method": "POST",
-  "path": "/credit-consumption/simulate",
-  "contract": "wallet",
-  "summary": "Which credit this purchase would actually use",
-  "permission": "WALLET_VIEW",
-  "offlineCapable": null,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "CreditAllocation"
  }
 }

@@ -63,6 +63,19 @@
   "requestBody": null,
   "responds": "ImportJob"
  },
+ "getSeatMap": {
+  "method": "GET",
+  "path": "/seat-maps/{seatMapId}",
+  "contract": "seating",
+  "summary": "Read a seat map with its structure",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "SeatMap"
+ },
  "getSeatMapImport": {
   "method": "GET",
   "path": "/seat-map-imports/{importId}",

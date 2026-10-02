@@ -1,22 +1,16 @@
 {
- "appendEntitlementToMedia": {
+ "buildDeepLink": {
   "method": "POST",
-  "path": "/media/{mediaCode}/entitlements",
-  "contract": "orders",
-  "summary": "Add something to a ticket the guest already holds",
-  "permission": "ORDER_CREATE",
+  "path": "/deep-links",
+  "contract": "white-label",
+  "summary": "Build a deep link to a target",
+  "permission": "TENANT_CONFIGURE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
-  "scopeLevel": "workstation",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "AppendEntitlementRequest",
-  "responds": "AppendEntitlementResult"
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": null
  },
  "completeUpload": {
   "method": "POST",
@@ -75,6 +69,25 @@
   "requestBody": null,
   "responds": "Collection"
  },
+ "createContentBlock": {
+  "method": "POST",
+  "path": "/content-blocks",
+  "contract": "white-label",
+  "summary": "Author a block of content",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ContentBlock",
+  "responds": "ContentBlock"
+ },
  "createContentPage": {
   "method": "POST",
   "path": "/tenant-config/pages",
@@ -98,25 +111,6 @@
   ],
   "requestBody": "ContentPage",
   "responds": "ContentPage"
- },
- "createMenu": {
-  "method": "POST",
-  "path": "/menus",
-  "contract": "fnb",
-  "summary": "Create a menu",
-  "permission": "PRODUCT_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "CreateMenuRequest",
-  "responds": "Menu"
  },
  "createPreview": {
   "method": "POST",
@@ -270,25 +264,6 @@
   "requestBody": null,
   "responds": null
  },
- "diffConfigVersion": {
-  "method": "GET",
-  "path": "/tenant-config/versions/{version}/diff",
-  "contract": "white-label",
-  "summary": "Compare a version against the working draft",
-  "permission": "TENANT_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": "against",
-    "in": "query",
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "ConfigDiff"
- },
  "getAppIcons": {
   "method": "GET",
   "path": "/tenant-config/app-icons",
@@ -302,6 +277,25 @@
   "requestBody": null,
   "responds": "AppIcons"
  },
+ "getBookingFlowConfig": {
+  "method": "GET",
+  "path": "/tenant-config/booking-flow",
+  "contract": "white-label",
+  "summary": "How the guest booking flow looks and steps",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "effectiveForVenueId",
+    "in": "query",
+    "required": false
+   }
+  ],
+  "requestBody": null,
+  "responds": "BookingFlowConfig"
+ },
  "getBrandIdentity": {
   "method": "GET",
   "path": "/tenant-config/brand",
@@ -314,6 +308,19 @@
   "parameters": [],
   "requestBody": null,
   "responds": "BrandIdentity"
+ },
+ "getDeepLinkScheme": {
+  "method": "GET",
+  "path": "/deep-links",
+  "contract": "white-label",
+  "summary": "The published deep-link scheme",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "DeepLinkScheme"
  },
  "getExpiringRights": {
   "method": "GET",
@@ -386,32 +393,6 @@
   "requestBody": null,
   "responds": "MediaAssetDetail"
  },
- "getMediaEntitlements": {
-  "method": "GET",
-  "path": "/media/{mediaCode}/entitlements",
-  "contract": "orders",
-  "summary": "What is already on this media",
-  "permission": "ORDER_VIEW",
-  "offlineCapable": true,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "MediaEntitlements"
- },
- "getMenu": {
-  "method": "GET",
-  "path": "/menus/{menuId}",
-  "contract": "fnb",
-  "summary": "Read a menu with sections and items",
-  "permission": "PRODUCT_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "Menu"
- },
  "getModuleEnablement": {
   "method": "GET",
   "path": "/tenant-config/modules",
@@ -438,6 +419,19 @@
   "requestBody": null,
   "responds": "NavigationConfig"
  },
+ "getSiteSetupProgress": {
+  "method": "GET",
+  "path": "/tenant-config/site-setup",
+  "contract": "white-label",
+  "summary": "Where the tenant is in the Site Builder",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "SiteSetupProgress"
+ },
  "getTenantAppStatus": {
   "method": "GET",
   "path": "/tenant-config/status",
@@ -450,25 +444,6 @@
   "parameters": [],
   "requestBody": null,
   "responds": "TenantAppStatus"
- },
- "getTenantConfig": {
-  "method": "GET",
-  "path": "/tenant-config",
-  "contract": "white-label",
-  "summary": "Full working configuration",
-  "permission": "TENANT_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": "version",
-    "in": "query",
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "TenantConfig"
  },
  "getTheme": {
   "method": "GET",
@@ -525,30 +500,6 @@
   "requestBody": null,
   "responds": "Collection"
  },
- "listConfigVersions": {
-  "method": "GET",
-  "path": "/tenant-config/versions",
-  "contract": "white-label",
-  "summary": "Version history",
-  "permission": "TENANT_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- },
  "listContentPages": {
   "method": "GET",
   "path": "/tenant-config/pages",
@@ -588,26 +539,16 @@
   "requestBody": null,
   "responds": "Page"
  },
- "listMenus": {
+ "listLandingPageTemplates": {
   "method": "GET",
-  "path": "/menus",
-  "contract": "fnb",
-  "summary": "List menus",
-  "permission": "PRODUCT_VIEW",
+  "path": "/landing-page-templates",
+  "contract": "white-label",
+  "summary": "The landing-page templates TICVAI provides",
+  "permission": "TENANT_CONFIGURE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
+  "scopeLevel": "tenant",
   "parameters": [
-   {
-    "name": "outletId",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "activeAt",
-    "in": "query",
-    "required": null
-   },
    {
     "name": null,
     "in": null,
@@ -635,6 +576,25 @@
   "requestBody": null,
   "responds": "PromoBlock"
  },
+ "previewProductTickets": {
+  "method": "GET",
+  "path": "/products/{productId}/ticket-previews",
+  "contract": "orders",
+  "summary": "Preview a product's PDF ticket and wallet passes",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "locale",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "TicketProof"
+ },
  "proposeMarketingContent": {
   "method": "POST",
   "path": "/ai/content-drafts",
@@ -654,11 +614,11 @@
   "requestBody": null,
   "responds": null
  },
- "publishTenantConfig": {
+ "publishContentBlock": {
   "method": "POST",
-  "path": "/tenant-config/publish",
+  "path": "/content-blocks/{blockId}/publish",
   "contract": "white-label",
-  "summary": "Publish the working draft",
+  "summary": "Publish now, or schedule it",
   "permission": "TENANT_PUBLISH",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
@@ -671,7 +631,7 @@
    }
   ],
   "requestBody": null,
-  "responds": "ConfigVersion"
+  "responds": "ContentBlock"
  },
  "replaceMediaAsset": {
   "method": "POST",
@@ -691,25 +651,6 @@
   ],
   "requestBody": null,
   "responds": "MediaReplaceResult"
- },
- "restoreConfigVersion": {
-  "method": "POST",
-  "path": "/tenant-config/versions/{version}/restore",
-  "contract": "white-label",
-  "summary": "Restore a previous version",
-  "permission": "TENANT_PUBLISH",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "TenantConfig"
  },
  "searchMedia": {
   "method": "GET",
@@ -956,30 +897,6 @@
   "requestBody": null,
   "responds": "TenantAppStatus"
  },
- "setMenuSections": {
-  "method": "PUT",
-  "path": "/menus/{menuId}/sections",
-  "contract": "fnb",
-  "summary": "Set menu sections and their item ordering",
-  "permission": "PRODUCT_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Menu"
- },
  "setModuleEnablement": {
   "method": "PUT",
   "path": "/tenant-config/modules",
@@ -1103,30 +1020,6 @@
   ],
   "requestBody": null,
   "responds": "MediaAsset"
- },
- "updateMenu": {
-  "method": "PATCH",
-  "path": "/menus/{menuId}",
-  "contract": "fnb",
-  "summary": "Amend a menu",
-  "permission": "PRODUCT_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Menu"
  },
  "updatePromoBlock": {
   "method": "PATCH",

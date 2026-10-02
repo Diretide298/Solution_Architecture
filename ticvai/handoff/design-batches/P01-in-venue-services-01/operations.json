@@ -42,25 +42,6 @@
   "requestBody": null,
   "responds": "LocationSession"
  },
- "claimTableSession": {
-  "method": "POST",
-  "path": "/table-sessions",
-  "contract": "fnb",
-  "summary": "Identify which table a guest is sitting at",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "TableSession"
- },
  "createGuestFnbOrder": {
   "method": "POST",
   "path": "/guest-orders",
@@ -291,25 +272,6 @@
   "requestBody": "RestaurantWaitlist",
   "responds": "RestaurantWaitlist"
  },
- "joinWaitlist": {
-  "method": "POST",
-  "path": "/waitlist-entries",
-  "contract": "catalogue",
-  "summary": "Ask to be told if capacity frees up",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "WaitlistEntry",
-  "responds": "WaitlistEntry"
- },
  "leaveQueue": {
   "method": "DELETE",
   "path": "/waiting-guests/{entryId}",
@@ -347,25 +309,6 @@
   ],
   "requestBody": null,
   "responds": "RestaurantWaitlist"
- },
- "leaveWaitlist": {
-  "method": "DELETE",
-  "path": "/waitlist-entries/{entryId}",
-  "contract": "catalogue",
-  "summary": "Stop waiting",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": null
  },
  "listDeliveryLocations": {
   "method": "GET",
@@ -474,30 +417,6 @@
   "requestBody": null,
   "responds": "Page"
  },
- "listModifierGroups": {
-  "method": "GET",
-  "path": "/modifier-groups",
-  "contract": "fnb",
-  "summary": "List modifier groups",
-  "permission": "PRODUCT_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- },
  "listParkingFacilities": {
   "method": "GET",
   "path": "/parking-facilities",
@@ -579,5 +498,29 @@
   ],
   "requestBody": "UpdateParkingEntitlementRequest",
   "responds": "ParkingEntitlement"
+ },
+ "updateTableReservation": {
+  "method": "PATCH",
+  "path": "/table-reservations/{reservationId}",
+  "contract": "fnb",
+  "summary": "Change or cancel a booking",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "TableReservation",
+  "responds": "TableReservation"
  }
 }

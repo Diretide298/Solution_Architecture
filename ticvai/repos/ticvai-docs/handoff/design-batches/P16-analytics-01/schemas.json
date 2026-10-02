@@ -376,6 +376,15 @@
     "type": "integer",
     "minimum": 1
    },
+   "module": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/ModuleKey"
+     }
+    ],
+    "readOnly": true,
+    "description": "The module of the version's definition (`AiForecastDefinition.module`), copied when the version is produced; the module whose AI publish permission `publishForecastVersion` requires (CHG-FUP-004)."
+   },
    "status": {
     "type": "string",
     "enum": [
@@ -1071,6 +1080,37 @@
      "type": "string",
      "format": "uuid"
     }
+   },
+   "ruleGroups": {
+    "x-ticvai-persistence-kind": "valueObject",
+    "x-ticvai-persistence-column": "jsonb",
+    "type": "array",
+    "description": "**Nested AND / OR / NOT groups** (contract gap CHG-WIR-007, BO-755; CHG-CSA-045). Where present, the segment matches `criteria` (combined by `match`) AND every group here. Absent keeps the flat list.",
+    "items": {
+     "$ref": "#/components/schemas/SegmentRuleGroup"
+    }
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "The segment is evaluated for sends only from this time."
+   },
+   "effectiveTo": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "ownerPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Who answers for the segment; defaults to its creator."
+   },
+   "requiresApproval": {
+    "type": "boolean",
+    "default": false,
+    "description": "Where true, a campaign may use the segment only after an `approvals` request on it is approved."
    }
   }
  },
@@ -1154,6 +1194,15 @@
      }
     }
    }
+  ]
+ },
+ "DeviceApprovalStatus": {
+  "type": "string",
+  "description": "Whether a registered device may go into production (DEC-241, DEC-245; CHG-CSP-011). The model is `states/registered-device-approval.yaml`.\n",
+  "enum": [
+   "pendingApproval",
+   "approved",
+   "rejected"
   ]
  },
  "DeviceCapability": {
@@ -1321,9 +1370,25 @@
    "accreditationCredentialsIssued",
    "accreditationActiveHolders",
    "accreditationRenewalsDue",
-   "staffingShortfall"
+   "staffingShortfall",
+   "grossSales",
+   "discounts",
+   "refunds",
+   "netRevenue",
+   "recognisedRevenue",
+   "deferredRevenue",
+   "taxCollected",
+   "takings"
   ],
   "x-ticvai-money-valued": [
+   "grossSales",
+   "discounts",
+   "refunds",
+   "netRevenue",
+   "recognisedRevenue",
+   "deferredRevenue",
+   "taxCollected",
+   "takings",
    "inventoryValuation",
    "resaleCommission",
    "revenuePerEntitlement",
@@ -1332,6 +1397,7 @@
    "loyaltyPointsLiability"
   ],
   "x-ticvai-extended-29-september": "**Fourteen metrics added 29 September (build pass)**, each checked against the schema of the contract that produces it.\n\n| Metric | Source | Requirement | |---|---|---| | `loyaltyActiveMembers` | `marketing.loyalty_position` members with a `marketing.loyalty_points` movement in the period | 5.4.27 | | `loyaltyTierDistribution` | `marketing.loyalty_position.tier_id` against `marketing.programme_tier`, members per tier | 5.4.27 | | `loyaltyPointsLiability` | the balance of `ledger.journal_line` on each programme's `pointsLiabilityAccountId`, where points post on accrual and release on redemption or expiry | 5.4.27 | | `loyaltyBreakageRate` | `marketing.loyalty_points` expiry movements over points earned, in the period | 5.4.27 | | `loyaltyMemberRetention` | members with a movement in the previous period who also have one in this period | 5.4.27 | | `challengeParticipationRate` | distinct `marketing.challenge_progress.subject_id` over active loyalty members | 22.6.20 | | `gamificationLoyaltyImpact` | points earned per member, challenge participants against non-participants (`marketing.loyalty_points` split by `marketing.challenge_progress`) | 22.6.20 | | `gamificationMembershipImpact` | joins and renewals in `identity.customer_membership`, participants against non-participants | 22.6.20 | | `gamificationRetention` | return visits (`access.scan_event`, in-direction) of participants against non-participants | 22.6.20 | | `accreditationApplications` | `accreditation.application` by `status` | 12.1.50 | | `accreditationTimeToDecision` | `accreditation.application.decided_at` minus `submitted_at` | 12.1.50 | | `accreditationCredentialsIssued` | `accreditation.credential.issued_at` | 12.1.50 | | `accreditationActiveHolders` | `accreditation.holder` `active`, by `category_code` | 12.1.50 | | `accreditationRenewalsDue` | `accreditation.holder.valid_to` inside `accreditation.validity.renewal_window_days` | 12.1.50 |\n\n**`staffingShortfall` added the same evening (build pass, group G2; 8.2.49)**: the largest gap in the window between the staff rostered and the staff the forecast requires, per venue and position, from `workforce.forecast_requirement` (the handed-over AI staff requirement) against `workforce.rota_assignment` and `workforce.open_shift`, computed as `workforce.getStaffingCoverage` with `basis` `forecastRequirement`. An `AlertRule` on it with `comparator` `above` and `threshold` 0 is the staffing shortage alert; `windowMinutes` looks ahead rather than back for this metric (the rota for the coming window), and `cooldownMinutes` stops one short shift alerting every quarter hour.\n\n**Points issued, points redeemed, campaign performance and reward redemption were already served** by the `loyalty` and `campaigns` sources, and challenge completion and revenue attribution by `challengeCompletionRate` and `attributedRevenue`.\n",
+  "x-ticvai-extended-2-october": "**Eight finance measures added 2 October 2026** (Chinmay; CHG-FIN-007, CHG-FIN-010), each with the source and formula of the seeded KPI of the same code in `ReportingSystemKpi`: `grossSales`, `discounts`, `refunds`, `netRevenue`, `recognisedRevenue`, `deferredRevenue`, `taxCollected` and `takings`, so an alert rule can watch them (a refund spike, takings below a target). Formulas are the D-185 default; client finance sign-off is pending.",
   "x-ticvai-money-valued-note": "**`salesByOperator`, `salesByWorkstation` and `resaleVolume` are not listed because the package does not say whether they count sales or sum their value.** Until that is decided, a rule on them carries a plain number.\n",
   "x-ticvai-extended": "18 August 2026",
   "x-ticvai-extension-note": "**Nineteen metrics added when their upstream models landed**, which is how BL-053 was always going to close — not by changing `reporting` but by building the things it wanted to report on.\n`inventoryValuation`, `stockTurnover`, `stockAgeing` and `wastageRate` came from `inventory.StockBatch`; `resaleVolume` and `resaleCommission` from `orders.ResaleListing`; **`salesByInstructor` from `resources.Resource`, which was the one metric this enum deliberately refused to name in the morning** because nothing produced it. `allocationUtilisation` from `PartnerUser` and `ChannelListing`, `membershipChurn` from `Journey`, `supplierDeliveryPerformance` from `ProductionRun`, `assetDowntime` and `meanTimeToRepair` from `WorkOrder.downtimeMinutes`, `challengeCompletionRate` from `ChallengeProgress`, `attributedRevenue` from `AttributionTouch`.\n**Each was checked against the schema before being named.** That rule has not changed — naming a metric with no source is the defect this enum exists to prevent.\n"
@@ -2325,6 +2391,50 @@
     "nullable": true,
     "readOnly": true,
     "description": "**The profile this device was provisioned with.** `enrolDevice` has accepted one since 16.1.3 and there was nowhere to keep it, so the answer to *\"what is this reader configured as\"* lived only in the request that set it.\n"
+   },
+   "approvalStatus": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/DeviceApprovalStatus"
+     }
+    ],
+    "default": "pendingApproval",
+    "readOnly": true,
+    "description": "**A new device waits for approval before it may go live** (decided 2 October 2026, Chinmay, critical set 1, BO-196: \"Secure enrolment code + pending approval\"; DEC-241; CHG-CSP-011; MoM 15 September, DI-892, DI-906). Every device registers `pendingApproval`. It may enrol and be provisioned and tested, but `enrolDevice` refuses `active` until `approveDevice` approves it (`409 device-approval-required`). A separate axis from `enrolmentState`, which keeps its r1 values; the model is `states/registered-device-approval.yaml`.\n"
+   },
+   "enrolmentCode": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "maxLength": 12,
+    "description": "**A one-time code the device must present to enrol** (DEC-241; CHG-CSP-011). Issued by `registerDevice` and returned once, in its response only; every later read returns null. The installer enters it on the device, and `enrolDevice` to `enrolled` must carry the same code before `enrolmentCodeExpiresAt` (`422 enrolment-code-invalid`). A device that never presents it never gets an identity, so a box plugged into the venue network cannot claim to be a reader.\n"
+   },
+   "enrolmentCodeExpiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "When the enrolment code stops working (24 hours after registration, proposed; client to correct)."
+   },
+   "testedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "Who recorded the device's acceptance test (`DeviceEnrolment.testResult` on the move to `provisioned`). The approver must be someone else (DEC-245).\n"
+   },
+   "approvedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**Who approved the device into production, never the person who tested it** (decided 2 October 2026, Chinmay, critical set 1, BO-203: \"Approver must differ from the tester\"; DEC-245; CHG-CSP-011). `approveDevice` refuses the tester with `403 approver-is-tester`.\n"
+   },
+   "approvedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
    }
   }
  },
@@ -2653,6 +2763,35 @@
    "evaluatedAt": {
     "type": "string",
     "format": "date-time"
+   }
+  }
+ },
+ "SegmentRuleGroup": {
+  "x-ticvai-persistence": "none — stored with the segment as jsonb",
+  "type": "object",
+  "description": "One group of a segment's nested rules (CHG-CSA-045). `operator` combines the group's `criteria` and its child `groups`; `not` negates the group (it takes one child, criteria or group).",
+  "properties": {
+   "operator": {
+    "type": "string",
+    "enum": [
+     "and",
+     "or",
+     "not"
+    ]
+   },
+   "criteria": {
+    "type": "array",
+    "description": "Each entry has the shape of `SegmentCriterion` (`attribute`, `operator`, `value`). Typed loosely here so the new optional field adds no required member to `createSegment`'s body for clients built at r1; the server validates each entry as a `SegmentCriterion` (400 otherwise).",
+    "items": {
+     "type": "object",
+     "additionalProperties": true
+    }
+   },
+   "groups": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/SegmentRuleGroup"
+    }
    }
   }
  },

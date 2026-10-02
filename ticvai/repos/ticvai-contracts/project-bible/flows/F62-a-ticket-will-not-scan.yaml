@@ -37,7 +37,6 @@ steps:
   action: It is valid. The guest is admitted.
   operations:
   - validateAccess
-  - listScans
   outcome: Recorded as a manual admission. **The manual rate at a gate is a hardware signal** — one
     lane doing forty a day has a broken reader.
 branches:

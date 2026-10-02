@@ -585,6 +585,55 @@
   "requestBody": null,
   "responds": "AiWaiverComplianceRiskIntelligenceCenterView"
  },
+ "listWaiverVerificationQueue": {
+  "method": "GET",
+  "path": "/waiver-verification-validation",
+  "contract": "marketing-crm",
+  "summary": "The waiver submissions awaiting or given verification",
+  "permission": "GUEST_VIEW_PII",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "risk",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "formId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "performanceId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "orderId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "setWaiverVerificationValidation": {
   "method": "PUT",
   "path": "/waiver-verification-validation",

@@ -140,80 +140,6 @@
    }
   }
  },
- "KnowledgeCollection": {
-  "type": "object",
-  "x-ticvai-persistence": "ai.knowledge_collection",
-  "required": [
-   "name",
-   "scopeLevel"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid",
-    "readOnly": true
-   },
-   "name": {
-    "type": "string"
-   },
-   "description": {
-    "type": "string"
-   },
-   "scopeLevel": {
-    "type": "string",
-    "enum": [
-     "tenant",
-     "region",
-     "venue"
-    ]
-   },
-   "scopePath": {
-    "type": "string",
-    "readOnly": true
-   },
-   "documentCount": {
-    "type": "integer",
-    "readOnly": true
-   },
-   "shardKey": {
-    "type": "string",
-    "readOnly": true,
-    "description": "**The tenant boundary on shared placement** (ADR-0021). A collection is shared by every tenant using the same embedding model, and the shard separates them — set at provisioning from the tenant, never from a request.\nOn dedicated placement there is one shard and this is still populated, because a tenant moving from shared to dedicated moves a shard rather than being re-indexed.\n"
-   },
-   "retrieval": {
-    "type": "string",
-    "enum": [
-     "dense",
-     "hybrid"
-    ],
-    "default": "hybrid",
-    "description": "**Set at creation and not changeable.** A collection created dense-only cannot gain a sparse index without a full rebuild, which is why this is a creation decision rather than a query one.\nHybrid is the default because **a venue corpus is mostly proper nouns** — Yas Waterworld, Bronze Annual Pass, a menu item name. Dense retrieval is good at meaning and poor at exact tokens, and half our queries are exact tokens.\n"
-   },
-   "sparseModel": {
-    "type": "string",
-    "nullable": true,
-    "description": "The sparse signal, where `retrieval` is `hybrid`. BM25 unless a tenant needs otherwise."
-   },
-   "idfScope": {
-    "type": "string",
-    "enum": [
-     "shard",
-     "tenant",
-     "venue"
-    ],
-    "default": "tenant",
-    "description": "**Which population the sparse score measures rarity against** (ADR-0021). Qdrant computes IDF statistics shard-wide by default, so a term common at one venue and rare at another gets one score for both. Shard-per-tenant fixes the cross-tenant case; **inside a dedicated cell the shard is the whole tenant and venues share it**, which is what this narrows.\n"
-   },
-   "embeddingModel": {
-    "type": "string",
-    "readOnly": true,
-    "description": "**This is what decides how many collections exist** (ADR-0021). A collection carries its own vector configuration and a shard cannot, so vectors from two models cannot share one. A tenant that residency forces onto a local model therefore has its own collection — forced by the model, not chosen for isolation.\nRead-only because **changing it invalidates every embedding in the collection**, and a collection silently searched with mismatched vectors returns plausible nonsense.\n"
-   },
-   "isActive": {
-    "type": "boolean"
-   }
-  }
- },
  "LocalisedRichText": {
   "x-ticvai-persistence": "none — jsonb column",
   "type": "object",
@@ -333,6 +259,62 @@
    },
    "hasMore": {
     "type": "boolean"
+   }
+  }
+ },
+ "SearchResult": {
+  "type": "object",
+  "x-ticvai-persistence": "none — computed",
+  "properties": {
+   "kind": {
+    "type": "string"
+   },
+   "id": {
+    "type": "string"
+   },
+   "title": {
+    "type": "string"
+   },
+   "excerpt": {
+    "type": "string"
+   },
+   "relevance": {
+    "type": "number"
+   },
+   "collectionId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "assetId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "For kind `media`, the asset (29 September, build; 23.1.6)."
+   },
+   "mediaType": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "image",
+     "video",
+     "audio",
+     "document"
+    ]
+   },
+   "matchedOn": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "title",
+     "description",
+     "tags",
+     "aiDescription"
+    ],
+    "description": "Which text the match came from, so a wrong hit can be traced to a wrong tag."
    }
   }
  }

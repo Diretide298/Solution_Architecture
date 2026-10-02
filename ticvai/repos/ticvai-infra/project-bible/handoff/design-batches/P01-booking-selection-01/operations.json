@@ -439,19 +439,6 @@
   "requestBody": null,
   "responds": "BookableVenueMaps"
  },
- "listCatalogueBundles": {
-  "method": "GET",
-  "path": "/catalogue/bundles",
-  "contract": "catalogue",
-  "summary": "List published catalogue bundles",
-  "permission": "PRODUCT_VIEW",
-  "offlineCapable": true,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "BundleSummary"
- },
  "listPerformances": {
   "method": "GET",
   "path": "/events/{eventId}/performances",

@@ -1,14 +1,14 @@
 # WS38 — Pricing   Revenue Management board 5
 
-**10 screens · 15 operations · 23 schemas · 3 permissions**
+**10 screens · 14 operations · 19 schemas · 4 permissions**
 
-Platform P09 TICVAI Web · ships as **ticvai-control** ·
-platformAdmin audience · web ·
+Platform P08 Venue Management · ships as **venue-management** ·
+staff audience · web ·
 online only
 
 ## Who this is for
 
-**platformAdmin on web.** Everything below is how you know what is
+**staff on web.** Everything below is how you know what is
 true. **None of it is the subject.** The subject is the person in front of the screen and the one
 thing they came to do.
 
@@ -48,8 +48,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 3 permissions apply here:
-  `PRICE_CONFIGURE, PRODUCT_CONFIGURE, PRODUCT_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 4 permissions apply here:
+  `PRICE_CONFIGURE, PRICE_VIEW, PRODUCT_CONFIGURE, PRODUCT_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -61,6 +61,45 @@ convincingly. It is never a caption.
   and its error; and, element by element, what is shown and in what format, what each action
   produces and where the user goes next. Draw exactly that.
 
+## The processes these screens belong to
+
+Written by the owner of each process (`handoff/design-notes/`). Read before any screen: it says how the process runs end to end and which words the screens must use.
+
+### Ticketing & Guest Commerce, as the venue and TICVAI configure and run it
+
+WHAT THE PROCESS IS. Everything a guest can buy is set up, priced, promoted and serviced here, on Venue Management (P08, the venue's own back office, served inside the venue's cell) and on the TICVAI Console (P09, TICVAI's control plane, outside every cell). End to end: (1) CATALOGUE. A product has one of twelve kinds (admission, timedAdmission, datedAdmission, openDated, seated, membership, bundle, fnb, retail, rental, addOn, giftCard). Its ticket types (adult, child, senior, resident...) are not typed one by one: they are generated from the product's attributes (components) and each value combination becomes a sellable ticket type with no extra setup (DI-164). What a ticket grants (validity, entries, re-entry, days of week, blackout dates, expiry anchor, fast track, transfer) lives on a reusable entitlement template, not on the product. Who may take part (age, height, supervision, certification) is the eligibility rule; what the guest must answer is the data mask and the consent questions; how the guest sees it is guestListing (bookable, infoOnly, hidden), display tags (at most six), media and the booking flow. Group, family and corporate products and every after-sales policy (reschedule, exchange, refund, cancellation, upgrade, transfer) are configured inside the one product configuration, never on separate screens (DI-465, DI-466). (2) LIFECYCLE AND PUBLICATION. A product moves draft, inReview, approved, live, withdrawn, archived. Approval and publication are two acts with two permissions (PRODUCT_APPROVE, PRODUCT_PUBLISH, R091); every product is authorised before it sells online or on site (DI-438). Approved is still not on a till: a till sells only what is in the signed catalogue release it pulled (publishBundle, ADR-0013), so a saved price is a back-office fact until the venue publishes to tills. Changing something that has sold is preceded by an impact check (assessProductChange: orders affected, entitlements issued, future performances, open carts); restoring a version creates a new version, and sold tickets keep the price and terms they were sold under (restoreProductVersion, DI-938, TRACKER Actions row 145). (3) PRICE. Prices live in price lists: per venue, per channel set, with validity dates and a priority, copied for the next season with an uplift (copyPriceList) and repriced in bulk only after a dry run (bulkChangePrices). Currency and decimal scale are never chosen on a form: they resolve from the venue's region (ADR-0008, ADR-0018; AED 2 places, OMR and BHD 3). When several rules apply, the configured hierarchy decides; there is no "lowest price wins" default (DI-595). Tax on the pre-discount price and three-decimal rounding are regional settings (DI-598). Dynamic rules always show their minimum and maximum price guardrails beside the trigger (getDynamicPriceRule). (4) PROMOTE AND BUNDLE. A promotion is a rule (automatic, or gated by a code) created in draft, made live only by Publish, which first analyses stacking; a …
+*(source: DI-164; DI-171; DI-438; DI-465; DI-466; DI-595; DI-598; DI-387; DI-039; DI-044; DI-474; DI-671; DI-987; DI-019; DI-080; ADR-0008; ADR-0013; ADR-0018; ADR-0019; ADR-0030; R091; R098; R101; R222; REV3-21; contracts/spine/catalogue.yaml#transitionProductLifecycle …)*
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Product | Anything sellable, of one of the twelve kinds. The record that carries names, channels, listing, media and policies. | Item (except on F&B and retail screens), SKU (for tickets), Offering | contracts/spine/catalogue.yaml#/components/schemas/ProductKind |
+| Ticket type | One sellable variant of an admission or event product (Adult, Child, Resident Adult), generated from the product's attributes. For retail and F&B the same record is labelled Variant. | Variant (on ticket screens), Sub-product, Rate (that is a price), Axis value | contracts/spine/catalogue.yaml#updateProductVariant / DI-164 / DI-437 |
+| Attribute | A dimension that generates ticket types (Guest category, Residency, Tier, Length). Each has values; adding a value adds ticket types. | Axis, Component (the client's word; use it only in help text), Option | contracts/spine/catalogue.yaml#setProductAttributes / DI-164 / DI-450 |
+| Entitlement | What a ticket lets the holder do (validity, entries, re-entry, days, blackout dates, expiry, fast track, transfer), defined once on an entitlement template and shared by several products. | Access rights, Ticket rules, Validity profile | contracts/spine/catalogue.yaml#createEntitlementTemplate / DI-171 / DI-451 |
+| Eligibility rule | Who may take part in or buy a product (age, height, supervision, waiver, certification). Distinct from a promotion's eligibility, which decides who gets a discount. | Restriction, Access rule (that is access control) | contracts/spine/catalogue.yaml#setProductEligibilityRule / DI-463 |
+| Price list | A set of prices for one venue and a set of channels, valid between two dates, with a priority. Several coexist (B2C, B2B, season). | Price book, Rate card, Tariff | contracts/spine/catalogue.yaml#createPriceList / DI-140 / DI-163 |
+| Price category | A standard rate type (Adult, Child, Member) reused across lists so venues do not invent "Adult Standard" and "Normal Adult". | Price band (that is a seat-category band), Fare type (transport) | contracts/spine/catalogue.yaml#setPriceCategoryRateType / … |
+| Price band | A priced band on a seat category (code, label, colour, amount, channel, from-date). | Price category, Zone price | contracts/satellite/seating.yaml#/components/schemas/SeatPriceBand |
+| Promotion | A rule that changes a price automatically or when a code is entered; draft until published; declares how it stacks. | Offer (except in guest copy), Deal, Discount rule | contracts/satellite/promotions.yaml#createPromotion / DI-173 / DI-174 |
+| Coupon code | A code issued from a coupon campaign that applies a promotion-style discount; one shared code or many single-use codes. | Voucher, Promo voucher | contracts/satellite/promotions.yaml#createCouponCampaign / DI-173 |
+| Voucher | A code that carries money (face value, balance), sold or issued; a liability until redeemed or expired. | Coupon, Credit note | contracts/satellite/promotions.yaml#listVoucherBatches / … |
+| Bundle | A product sold as one line whose price differs from the sum of its components, with a mandatory revenue allocation. "Package" is acceptable in guest copy. | Combo (that is an F&B meal deal), Catalogue bundle | contracts/satellite/promotions.yaml#createBundle / DI-220 / ADR-0019 |
+| Catalogue release | The signed snapshot of a venue's catalogue, prices, promotions and sale boards that tills, kiosks and devices pull. Its action label is "Publish to tills". | Bundle, Catalogue bundle, Sync, Deploy | contracts/spine/catalogue.yaml#publishBundle / … |
+| Approve / Publish / Save | Save keeps a draft; Approve records that it is authorised (PRODUCT_APPROVE); Publish makes it live for guests and channels (PRODUCT_PUBLISH). Three different buttons, never merged. | Submit, Go live, Activate (except CatalogueConfigStatus active), Deploy | R091 / contracts/spine/catalogue.yaml#transitionProductLifecycle / DI-438 |
+| Product states | Draft, In review, Approved, Live, Withdrawn, Archived (ProductLifecycleState), always as coloured badges with these exact labels. | Published (for a product), Pending, Inactive (for a product) | contracts/spine/catalogue.yaml#/components/schemas/ProductLifecycleState |
+| Channel | Where something is sold. Labels: pos Point of sale; kiosk Kiosk; web and guestWeb Website; mobile and guestApp App; b2b B2B partners; partner Partner; ota Travel agents (OTA); callCentre Call centre; api API; backOffice Back office. | Touchpoint, Outlet (an outlet is a business inside a venue), raw enum values | contracts/spine/catalogue.yaml#/components/schemas/Channel / … |
+| Refund | Money returned after settlement, wholly or for some lines, under the venue's refund policy. | Return (that is retail goods), Reversal, Void | contracts/spine/orders.yaml#createRefund / DI-252 |
+| Void | Cancelling a whole order before settlement, within the same shift, with a reason from the void list. After settlement it is a refund. | Cancel order, Delete | contracts/spine/orders.yaml#voidOrder / R222 |
+| Exchange / Reschedule | Exchange swaps lines for other products or dates and settles only the difference; Reschedule is the same product moved to another date or time. | Rebook, Date change (acceptable only in guest copy), Refund and resell | contracts/spine/orders.yaml#exchangeOrderLines / … |
+| Hold / Capture / Release | A deposit or stored-value amount is held, then partly or fully captured, and the rest released. A held deposit is not a payment. | Charge, Pre-auth (in staff copy), Block funds | contracts/spine/orders.yaml#authoriseStoredValue / … |
+| Wallet (TICVAI wallet) | The guest's stored-value balance on TICVAI, spent by hold and capture. Distinct from the tender "Apple Pay / Google Pay", which the contract also calls wallet. | Digital wallet (for stored value), E-wallet, Credit (without a type) | contracts/spine/orders.yaml#/components/schemas/TenderKind / R080 |
+| Credit lot | One amount of wallet credit of one credit type (cash, bonus, gift) with its own expiry; lots are spent nearest expiry first and the guest sees the breakdown but cannot choose. | Bucket, Batch, Top-up | TRACKER Actions row 171 / contracts/satellite/wallet.yaml#expireCreditLots |
+| Venue map / Seat map | A venue map is the wayfinding map of a park or a floor (points, paths, bookable places); a seat map is the seating layout of an auditorium or stand. Never just "map" where both could be meant. | Layout (alone), Floor plan (unless it is a floor map), Map (alone) | contracts/satellite/venue-map.yaml#createVenueMap / … |
+| Point / Bookable place | A point is a place on a venue map (toilet, ride, restaurant, exit). A bookable place is a cabana, lounger, table or pitch placed on the map and sold through its price band. | Pin, POI, Marker, Resource (in staff copy) | contracts/satellite/venue-map.yaml#setVenuePoint / … |
+| Station / Route / Timetable / Departure / Fare table / Pass … | A route is an ordered list of stations with offsets; a timetable generates departures up to its release horizon; a fare table prices a route per passenger type; a pass type is a multi-trip or unlimited pass sold as a product. | Stop (except in the stop list), Line (except lineCode), Schedule, Trip (except a guest's journey) | contracts/satellite/transport.yaml / REV3-21 |
+| Applies from | The effective date of a change. Every dated change shows it, and sold items keep their old terms. | Effective date (in labels), Start date (for a change) | contracts/satellite/seating.yaml#updateSeatCategory / TRACKER Actions row 194 |
+
+
 ## The screens
 
 Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs count fields; requirements are matrix rows; meeting inputs are the ones naming the screen (the module and platform ones are below); white label says whether the tenant's brand reaches it (guest) or it sets the brand (configures).
@@ -68,15 +107,15 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `ADM-088` | Dynamic Pricing Strategy Command Center | B–D | 2 | 26 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `ADM-089` | Dynamic Pricing Strategy Builder | B–D | 24 | 0 | 5 | 2 | 1 | 0 | — | notStarted (generated) |
-| `ADM-090` | Demand, Occupancy & Availability Rule Builder | A | 0 | 0 | 6 | 4 | 0 | 0 | — | notStarted (generated) |
-| `ADM-091` | Booking Velocity & Time-to-Event Rule Builder | A | 0 | 0 | 6 | 0 | 0 | 6 | — | notStarted (generated) |
+| `ADM-089` | Dynamic Pricing Strategy Builder | B–D | 24 | 20 | 5 | 2 | 1 | 0 | — | notStarted (generated) |
+| `ADM-090` | Demand, Occupancy & Availability Rule Builder | A | 0 | 20 | 6 | 5 | 0 | 0 | — | notStarted (generated) |
+| `ADM-091` | Booking Velocity & Time-to-Event Rule Builder | A | 0 | 20 | 6 | 1 | 0 | 6 | — | notStarted (generated) |
 | `ADM-092` | Seasonal, Calendar, Day & Timeslot Dynamic Rules | B–D | 26 | 20 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
 | `ADM-093` | Channel, Customer Segment & Location Dynamic Rules | B–D | 0 | 0 | 6 | 0 | 0 | 6 | — | notStarted (generated) |
 | `ADM-094` | Dynamic Price Bands, Ladders & Adjustment Matrix | B–D | 24 | 0 | 5 | 0 | 2 | 0 | — | notStarted (generated) |
 | `ADM-095` | Dynamic Pricing Guardrails & Commercial Protection | A | 47 | 0 | 5 | 3 | 0 | 0 | — | notStarted (generated) |
 | `ADM-096` | Dynamic Pricing Automation Policy & Control | B–D | 50 | 0 | 5 | 3 | 0 | 0 | — | notStarted (generated) |
-| `ADM-097` | Rule Priority, Conflict Resolution & Dynamic Pricing Test Console | B–D | 20 | 142 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-097` | Rule Priority, Conflict Resolution & Dynamic Pricing Test Console | B–D | 0 | 2 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 
@@ -94,17 +133,25 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `ticketing` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `PRICE_CONFIGURE`, `PRODUCT_VIEW` (1 configure, 1 read); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `PRICE_CONFIGURE`, `PRODUCT_VIEW` (1 configure, 1 read); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | commandCentre (compact density): the pack gives this screen both a metric directory (§Display) and a per-row directory (§Each strategy should show) — counts over a population, then the population |
 | Offline | online only |
 | Opens with | `strategyId` (navigation) |
 | Route | `/commercial/dynamic-pricing-strategy-command-center-adm-088` |
 
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys. **BO-528 Dynamic Pricing & AI Recommendation merged in (2 October 2026, duplicate rule; CHG-SBO-021):** the rental view of dynamic pricing is this strategy list filtered to rental resources; activate, pause, resume and retire come with it.
+
 **Known gaps.** **The pack names 13 actions on this screen and the screen declares 1 operation.** Unserved: Demand Based, Inventory Based, Booking Velocity, Timeslot, Channel, Create Strategy, Duplicate, Open …. …
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** The revenue manager's workspace for dynamic pricing strategies: status, scope, current price movement; activate, pause, resume, retire.
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- Pack actions with no operation: Demand Based, Inventory Based, Booking Velocity, Timeslot, Channel, Create Strategy, Duplicate, Open …. (CHG-MOV-008)
 
 #### Inputs: what the user enters or picks
 
@@ -207,11 +254,15 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 | Open (secondary button) | navigation or local | — | — | — | — |
 | Transition dynamic pricing strategy (secondary button) | `transitionDynamicPricingStrategy` POST `/dynamic-pricing-strategies/{strategyId}/lifecycle` | inline | DynamicPricingStrategy | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 `illegalTransition`.; 422 `strategyIncomplete`. | gated `PRICE_CONFIGURE`; opens modal first |
 
+**What each action does** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **Activate**: Refused while the strategy has no price ladder or rule ("strategy incomplete"), naming what is missing. *(source: contracts/spine/catalogue.yaml#transitionDynamicPricingStrategy)*
+
 **Data it reads**: `listDynamicPricingStrategy` (onLoad, Dynamic Pricing Strategy Command Center)
 
 **Where the user goes next**
 
-- → `ADM-002` Platform Dashboard: *Platform Dashboard*
+- → `BO-100` Venue Home: *Back to Venue Home*
 - → `ADM-090` Demand, Occupancy & Availability Rule Builder: *Works in Demand, Occupancy & Availability Rule Builder*; calls `listDynamicPricingStrategy`
 - → `ADM-091` Booking Velocity & Time-to-Event Rule Builder: *Works in Booking Velocity & Time-to-Event Rule Builder*; calls `listDynamicPricingStrategy`
 - → `ADM-092` Seasonal, Calendar, Day & Timeslot Dynamic Rules: *Works in Seasonal, Calendar, Day & Timeslot Dynamic Rules*; calls `listDynamicPricingStrategy`
@@ -221,6 +272,7 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 - → `ADM-097` Rule Priority, Conflict Resolution & Dynamic Pricing Test Console: *Works in Rule Priority, Conflict Resolution & Dynamic Pricing Test Console*; calls `listDynamicPricingStrategy`
 - → `ADM-089` Dynamic Pricing Strategy Builder: *Works in Dynamic Pricing Strategy Builder*; carries `strategyId`; calls `listDynamicPricingStrategy`
 - → `ADM-094` Dynamic Price Bands, Ladders & Adjustment Matrix: *Works in Dynamic Price Bands, Ladders & Adjustment Matrix*; carries `strategyId`; calls `listDynamicPricingStrategy`
+- → `BO-441` Price Priority & Conflict Rules: *Works in Rule Priority, Conflict Resolution & Dynamic Pricing Test Console*; calls `listDynamicPricingStrategy`
 
 #### States
 
@@ -233,6 +285,18 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 `illegalTransition`.; 422 `strategyIncomplete`. |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+strategies:
+- code: WKND-OCC
+  name: Weekend occupancy
+  type: occupancyBased
+  status: active
+```
 
 #### Permissions
 
@@ -251,7 +315,7 @@ For this screen, newest first. An **Open question** is built to the default it s
 
 - Workshop packs group screens ten to a board, each opened by a command centre; that grouping is the navigation: the nine detail screens are reached from the board's hub and return to it. *(agreed · screen note 4 Sep 2026, BO-144 and the other board hubs · DI-653)*
 
-Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -259,7 +323,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-088` · status **notStarted** · provenance generated
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-088` · status **notStarted** · provenance generated
 - Client workshop board: `wireframes/WS99 Pricing   Revenue Management Board 5.dc.html#adm-088`
 - Workshop pack: Pricing___Revenue_Management_Reference.pdf board 5
 - Flow F147 *Pricing Revenue Management board 5: Dynamic Pricing Strategy Command Center*, step 1: Opens Dynamic Pricing Strategy Command Center → Provide the central backend workspace for creating, monitoring, and managing all dynamic- pricing strategies. This should be the primary operational screen for Revenue Managers.
@@ -280,7 +344,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every output is drawn (26 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-088?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Demand Based, Inventory Based, Booking Velocity, Timeslot, Channel, Create Strategy, Duplicate, Open, Transition dynamic pricing strategy.
-- [ ] Every transition is wired: `ADM-002`, `ADM-090`, `ADM-091`, `ADM-092`, `ADM-093`, `ADM-095`, `ADM-096`, `ADM-097`, `ADM-089`, `ADM-094`.
+- [ ] Every transition is wired: `BO-100`, `ADM-090`, `ADM-091`, `ADM-092`, `ADM-093`, `ADM-095`, `ADM-096`, `ADM-097`, `ADM-089`, `ADM-094`, `BO-441`.
 - [ ] Every gated control is gated: `PRICE_CONFIGURE`, `PRODUCT_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
@@ -293,15 +357,25 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `ticketing` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `PRICE_CONFIGURE`, `PRODUCT_CONFIGURE` (2 configure); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `PRICE_CONFIGURE`, `PRODUCT_CONFIGURE`, `PRODUCT_VIEW` (2 configure, 1 read); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure; Configure whether a strategy) and no display directory — it is settings, not a population |
 | Offline | online only |
 | Opens with | `strategyId` (navigation) |
 | Route | `/commercial/dynamic-pricing-strategy-builder-adm-089` |
+
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Create a dynamic pricing strategy and what it controls: type, scope (product, family, event, performances, venue, slots, price categories), base price source, evaluation frequency, how it combines with others, effective dates.
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- Owner, market, venue, product and event are strings in the builder, while the strategy record carries ids. (CHG-MOV-008)
+
+**Fixed on main** (the package already carries these; draw what it says): No read operation: the screen declares only setDynamicPricingStrategy, transitionDynamicPricingStrategy and nothing that returns the … (CHG-WIR-025).
 
 #### Inputs: what the user enters or picks
 
@@ -332,6 +406,16 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Has Exclusive Control | select field | — | — | — | — | — | — |
 | Acts as Fallback | select field | — | — | — | — | — | — |
 
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Strategy type | select | — | Demand based · Occupancy based · Availability based · Inventory based · Booking velocity · Time to event · Seasonal · Day of week · Timeslot · Channel · Segment · Location … | `listDynamicPricingStrategy` ?strategyType |
+| Status | select | — | Draft · Testing · Ready · Scheduled · Active · Paused · Frozen · Expired · Retired | `listDynamicPricingStrategy` ?status |
+| Automation mode | radio group | — | Monitor · Recommend · Prepare change · Auto execute within guardrails | `listDynamicPricingStrategy` ?automationMode |
+| Venue | text field | — | — | `listDynamicPricingStrategy` ?venue |
+| Search | text field | — | — | `listDynamicPricingStrategy` ?search |
+
 **Form: Transition dynamic pricing strategy** (modal, opened by *Transition dynamic pricing strategy*; *Transition dynamic pricing strategy* calls `transitionDynamicPricingStrategy`, *Cancel* sends nothing)
 
 **Collects what `transitionDynamicPricingStrategy` sends before it is called.** Required: `action`. Optional: `reason`. Dismissing sends nothing; the screen behind is unchanged.
@@ -343,7 +427,38 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 Errors to draw in the form: 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 `illegalTransition`.; 422 `strategyIncomplete`.
 
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **scope**: Scope type first, then the matching picker. *(source: contracts/spine/catalogue.yaml#setDynamicPricingStrategy)*
+
 #### Outputs: what the screen shows and produces
+
+**Shown**
+
+**Strategies** (detail panel, from `listDynamicPricingStrategy`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| Strategy | text | Strategy ID |
+| Strategy name | text | Strategy Name |
+| Strategy type | chip: Demand based, Occupancy based, Availability based, Inventory based, Booking … | Strategy Type (pack pp.75-76) |
+| Product event | text | Product or event the strategy controls |
+| Venue | text | Venue |
+| Base price source | text | Base price source: the Board 1 price list and rate the strategy moves from, e.g. |
+| Current price | AED 1,234.50 | Current resolved dynamic price (for a single-price scope) |
+| Adjustment range | grouped details | Adjustment range allowed by the strategy |
+| Min percent | 1,234.5 | Lowest adjustment from base, percent |
+| Max percent | 1,234.5 | Highest adjustment from base, percent |
+| Rule count | 1,234 | Rule Count |
+| Effective period | grouped details | Effective period |
+| From | 1 Oct 2026, 14:30 | Effective from |
+| To | 1 Oct 2026, 14:30 | Effective to; empty for open-ended |
+| Automation mode | chip: Monitor, Recommend, Prepare change, Auto execute within guardrails | Automation mode from the automation policy (listDynamicPricingAutomation); recommend by default |
+| Status | text | Status: draft, testing, ready, scheduled, active, paused, frozen, expired or retired |
+| Owner | text | Owner |
+| Next cursor | text | — |
+| Has more | yes / no (icon or chip) | — |
 
 **Actions and what each produces**
 
@@ -351,6 +466,8 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 |---|---|---|---|---|---|
 | Save changes (primary button) | navigation or local | — | — | — | — |
 | Transition dynamic pricing strategy (secondary button) | `transitionDynamicPricingStrategy` POST `/dynamic-pricing-strategies/{strategyId}/lifecycle` | inline | DynamicPricingStrategy | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 `illegalTransition`.; 422 `strategyIncomplete`. | gated `PRICE_CONFIGURE`; opens modal first |
+
+**Data it reads**: `listDynamicPricingStrategy` (onLoad, The dynamic pricing strategies, to open one in the builder)
 
 **Where the user goes next**
 
@@ -367,10 +484,24 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 `illegalTransition`.; 422 `strategyIncomplete`. |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+strategy:
+  name: Festival early bird
+  type: timeToEvent
+  scope: event
+  event: Dune Nights Festival 2026
+  frequency: daily
+```
+
 #### Permissions
 
 - `setDynamicPricingStrategy` → `PRODUCT_CONFIGURE` (configure) · staff
 - `transitionDynamicPricingStrategy` → `PRICE_CONFIGURE` (configure) · staff
+- `listDynamicPricingStrategy` → `PRODUCT_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -389,7 +520,7 @@ For this screen, newest first. An **Open question** is built to the default it s
 
 - Dynamic strategies: buy 2 get the 3rd free / BOGO, sibling tiers (first child full price, later children reduced), early-bird phases (e.g. 20% off a AED 200 base for the first 200 of 500, then 10% for the next 100, then full; discount and quota per phase), and price steps as capacity sells (e.g. at 50%). *(client request · MoM 1 Sep 2026, 4.7 Dynamic Pricing Strategies · DI-600)*
 
-Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -397,7 +528,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-089` · status **notStarted** · provenance generated
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-089` · status **notStarted** · provenance generated
 - Client workshop board: `wireframes/WS99 Pricing   Revenue Management Board 5.dc.html#adm-089`
 - Workshop pack: Pricing___Revenue_Management_Reference.pdf board 5
 - Flow F147 *Pricing Revenue Management board 5: Dynamic Pricing Strategy Command Center*, step 2: Works in Dynamic Pricing Strategy Builder → Create the master dynamic-pricing strategy and define what commercial objects it controls.
@@ -405,11 +536,11 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (24), with its required mark, default, format and its error state (404, 409, 422).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-089?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save changes, Transition dynamic pricing strategy.
 - [ ] Every transition is wired: `ADM-088`.
-- [ ] Every gated control is gated: `PRICE_CONFIGURE`, `PRODUCT_CONFIGURE`.
+- [ ] Every gated control is gated: `PRICE_CONFIGURE`, `PRODUCT_CONFIGURE`, `PRODUCT_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -421,23 +552,62 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `ticketing` module |
 | Block | Block A · ticket #20644 (APP-SETUP-ADM-090) |
-| Who uses it | ticvai staff holding `PRODUCT_CONFIGURE` (1 configure); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `PRICE_VIEW`, `PRODUCT_CONFIGURE` (1 read, 1 configure); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/commercial/demand-occupancy-availability-rule-builder-adm-090` |
 
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
+
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Rules that move a price with occupancy, remaining inventory, availability or a demand index, as tiers of a threshold matrix with hysteresis (exit offset), a minimum duration and a cooldown, inside a strategy and within the guardrails of ADM-095.
+
+**Fixed on main** (the package already carries these; draw what it says): No read operation: the screen declares only setDemandOccupancyAvailability and nothing that returns the current configuration. (CHG-WIR-025).
 
 #### Inputs: what the user enters or picks
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
 
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **tiers**: Non-overlapping bands (0-50% no change, 50-75% +10%, 75-90% +20%, over 90% +30%) drawn as a stepped chart above the table. *(source: contracts/spine/catalogue.yaml#setDemandOccupancyAvailability / DI-600)*
+- **demandIndexDefinition**: Required only when the input metric is current demand; the pack requires the formula to be stated. *(source: contracts/spine/catalogue.yaml#setDemandOccupancyAvailability)*
+- **exit offset, minimum duration, cooldown**: Defaults 2, 15 minutes and 60 minutes, shown as such. *(source: contracts/spine/catalogue.yaml#setDemandOccupancyAvailability)*
+
 #### Outputs: what the screen shows and produces
+
+**Shown**
+
+**Dynamic rules** (data table, from `listDynamicPriceRules`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| ID | the name it points at, never the id | — |
+| Pricing rule code | text | — |
+| Name | text | — |
+| Product | the name it points at, never the id | — |
+| Price list | the name it points at, never the id | — |
+| Channel | the name it points at, never the id | — |
+| Priority | 1,234 | — |
+| Valid from | 1 Oct 2026, 14:30 | — |
+| Valid to | 1 Oct 2026, 14:30 | — |
+| Is active | yes / no (icon or chip) | — |
+| Dynamic pricing strategy | the name it points at, never the id | The `catalogue.dynamic_pricing_strategy` a dynamic rule belongs to (29 September, data model DM3). |
+| Rule type | text | Static rules: `PricingRuleCommandCenterView.ruleType`; dynamic rules: the builder's `ruleKind`. |
+| Input metric | text | — |
+| Condition logic | chip: All, Any | — |
+| Cooldown minutes | 1,234 | — |
+| Minimum duration minutes | 1,234 | — |
+| Exit threshold offset | 1,234.5 | — |
+| Range min percent | 1,234.5 | — |
+| Range max percent | 1,234.5 | — |
+| Is protected | yes / no (icon or chip) | A protected segment or channel: dynamic adjustments never apply. |
 
 **Actions and what each produces**
 
@@ -445,6 +615,8 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |---|---|---|---|---|---|
 | Save changes (primary button) | navigation or local | — | — | — | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
+
+**Data it reads**: `listDynamicPriceRules` (onLoad, The dynamic price rules already in force)
 
 **Where the user goes next**
 
@@ -461,15 +633,37 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 
+#### Consistency with other screens
+
+- Match `ADM-095`: Show the guardrails in force for the strategy beside the tiers.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+rule:
+  name: Weekend occupancy uplift
+  kind: occupancy
+  metric: occupancyPercent
+  tiers:
+  - '50-75%: +10%'
+  - '75-90%: +20%'
+  - '90-100%: +30%'
+  cooldownMinutes: 60
+  priority: 2
+```
+
 #### Permissions
 
 - `setDemandOccupancyAvailability` → `PRODUCT_CONFIGURE` (configure) · staff
+- `listDynamicPriceRules` → `PRICE_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
 #### Requirements it meets
 
-4 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+5 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
 
 | Ref | Requirement (shortened) | Domain | Verdict | Via |
 |---|---|---|---|---|
@@ -477,12 +671,13 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | 8.5.3 | System shall support occupancy-based pricing. | Unified Operations Dashboard | CONTRACTED | `setDemandOccupancyAvailability` |
 | 8.5.4 | System shall support availability-based pricing. | Unified Operations Dashboard | CONTRACTED | `setDemandOccupancyAvailability` |
 | 8.5.12 | System shall support inventory-based pricing. | Unified Operations Dashboard | CONTRACTED | `setDemandOccupancyAvailability` |
+| 2.1.23 | POS shall retrieve real-time prices from the Dynamic Pricing Engine based on date, timeslot, demand, capacity, promotions, customer segment, and channel. | Ticketing Sales | CONTRACTED | `listDynamicPriceRules` |
 
 #### Client meeting inputs
 
 None names this screen.
 
-Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -490,7 +685,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-090` · status **notStarted** · provenance generated
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-090` · status **notStarted** · provenance generated
 - Client workshop board: `wireframes/WS99 Pricing   Revenue Management Board 5.dc.html#adm-090`
 - Workshop pack: Pricing___Revenue_Management_Reference.pdf board 5
 - Flow F147 *Pricing Revenue Management board 5: Dynamic Pricing Strategy Command Center*, step 4: Works in Demand, Occupancy & Availability Rule Builder → Configure price movements driven by actual demand and capacity consumption. This directly covers the fundamental matrix requirements for: Demand-Based Pricing Occupancy-Based Pricing …
@@ -498,11 +693,11 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-090?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save changes, Cancel.
 - [ ] Every transition is wired: `ADM-088`.
-- [ ] Every gated control is gated: `PRODUCT_CONFIGURE`.
+- [ ] Every gated control is gated: `PRICE_VIEW`, `PRODUCT_CONFIGURE`.
 - [ ] The module and platform inputs below are applied.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -514,23 +709,66 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `ticketing` module |
 | Block | Block A · ticket #20645 (APP-SETUP-ADM-091) |
-| Who uses it | ticvai staff holding `PRODUCT_CONFIGURE` (1 configure); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `PRICE_VIEW`, `PRODUCT_CONFIGURE` (1 read, 1 configure); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/commercial/booking-velocity-time-to-event-rule-builder-adm-091` |
 
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
+
 **Known gaps.** **The pack names 7 actions on this screen and the screen declares 1 operation.** Unserved: Sales per Hour, Sales per Day, Sales per Week, Current Booking Pace, Expected Booking Pace, Historical … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Price movement from booking pace against expectation and from time remaining before the visit: early-bird phases, last-minute, decay and escalation. Pace is measured against a configured target until a historical booking curve exists.
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- Pack actions with no operation: Sales per Hour, Sales per Day, Sales per Week, Current Booking Pace, Expected Booking Pace, Historical Booking Curve, Remaining Inventory. (CHG-MOV-008)
+
+**Fixed on main** (the package already carries these; draw what it says): No read operation: the screen declares only setBookingVelocityTime and nothing that returns the current configuration. (CHG-WIR-025).
 
 #### Inputs: what the user enters or picks
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
 
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **expectedPaceSource**: Configured target (with expected sales per day) by default; historical curve offered only when one exists. *(source: contracts/spine/catalogue.yaml#setBookingVelocityTime)*
+- **timeToEventSchedule**: A timeline of steps ("more than 60 days: -20% for the first 200; 30-60 days: -10% for the next 100; then base") matching the client's early-bird example with quota per phase. *(source: contracts/spine/catalogue.yaml#setBookingVelocityTime / DI-600)*
+- **conditionLogic**: All by default, Any as the alternative, shown as "when all of" / "when any of". *(source: contracts/spine/catalogue.yaml#setBookingVelocityTime)*
+
 #### Outputs: what the screen shows and produces
+
+**Shown**
+
+**Dynamic rules** (data table, from `listDynamicPriceRules`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| ID | the name it points at, never the id | — |
+| Pricing rule code | text | — |
+| Name | text | — |
+| Product | the name it points at, never the id | — |
+| Price list | the name it points at, never the id | — |
+| Channel | the name it points at, never the id | — |
+| Priority | 1,234 | — |
+| Valid from | 1 Oct 2026, 14:30 | — |
+| Valid to | 1 Oct 2026, 14:30 | — |
+| Is active | yes / no (icon or chip) | — |
+| Dynamic pricing strategy | the name it points at, never the id | The `catalogue.dynamic_pricing_strategy` a dynamic rule belongs to (29 September, data model DM3). |
+| Rule type | text | Static rules: `PricingRuleCommandCenterView.ruleType`; dynamic rules: the builder's `ruleKind`. |
+| Input metric | text | — |
+| Condition logic | chip: All, Any | — |
+| Cooldown minutes | 1,234 | — |
+| Minimum duration minutes | 1,234 | — |
+| Exit threshold offset | 1,234.5 | — |
+| Range min percent | 1,234.5 | — |
+| Range max percent | 1,234.5 | — |
+| Is protected | yes / no (icon or chip) | A protected segment or channel: dynamic adjustments never apply. |
 
 **Actions and what each produces**
 
@@ -543,6 +781,8 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Expected Booking Pace (secondary button) | navigation or local | — | — | — | — |
 | Historical Booking Curve (secondary button) | navigation or local | — | — | — | — |
 | Remaining Inventory (secondary button) | navigation or local | — | — | — | — |
+
+**Data it reads**: `listDynamicPriceRules` (onLoad, The dynamic price rules already in force)
 
 **Where the user goes next**
 
@@ -559,21 +799,41 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+rule:
+  name: Festival early bird
+  kind: earlyBird
+  base: AED 200.00
+  phases:
+  - first 200 of 500 at 20% off
+  - next 100 at 10% off
+  - rest at base
+```
+
 #### Permissions
 
 - `setBookingVelocityTime` → `PRODUCT_CONFIGURE` (configure) · staff
+- `listDynamicPriceRules` → `PRICE_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
 #### Requirements it meets
 
-No matrix row traces to this screen's operations or data.
+1 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+
+| Ref | Requirement (shortened) | Domain | Verdict | Via |
+|---|---|---|---|---|
+| 2.1.23 | POS shall retrieve real-time prices from the Dynamic Pricing Engine based on date, timeslot, demand, capacity, promotions, customer segment, and channel. | Ticketing Sales | CONTRACTED | `listDynamicPriceRules` |
 
 #### Client meeting inputs
 
 None names this screen.
 
-Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -586,7 +846,7 @@ Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-091` · status **notStarted** · provenance generated
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-091` · status **notStarted** · provenance generated
 - Client workshop board: `wireframes/WS99 Pricing   Revenue Management Board 5.dc.html#adm-091`
 - Workshop pack: Pricing___Revenue_Management_Reference.pdf board 5
 - Flow F147 *Pricing Revenue Management board 5: Dynamic Pricing Strategy Command Center*, step 6: Works in Booking Velocity & Time-to-Event Rule Builder → Control price movement based on how quickly inventory is selling and how much time remains before the event or visit date. This is critical because occupancy alone is insufficient for effective …
@@ -594,11 +854,11 @@ Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-091?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Sales per Hour, Sales per Day, Sales per Week, Current Booking Pace, Expected Booking Pace, Historical Booking Curve, Remaining Inventory.
 - [ ] Every transition is wired: `ADM-088`.
-- [ ] Every gated control is gated: `PRODUCT_CONFIGURE`.
+- [ ] Every gated control is gated: `PRICE_VIEW`, `PRODUCT_CONFIGURE`.
 - [ ] The module and platform inputs below are applied.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -610,17 +870,21 @@ Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the 
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `ticketing` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `PRICE_CONFIGURE`, `PRODUCT_VIEW` (1 configure, 1 read); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `PRICE_CONFIGURE`, `PRODUCT_VIEW` (1 configure, 1 read); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
 | Offline | online only |
 | Opens with | `signalId` (navigation) |
 | Route | `/commercial/seasonal-calendar-day-timeslot-dynamic-rules-adm-092` |
 
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
+
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Dynamic pricing by temporal pattern (season, calendar, day, slot) and the calendar signals entered by hand (Ramadan, Eid, school breaks).
 
 #### Inputs: what the user enters or picks
 
@@ -673,6 +937,10 @@ Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the 
 | Observed at `observedAt` | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `setDemandSignalConfiguration` body |
 
 Errors to draw in the form: 409 `feedSignal`.; 422 `invalidPeriod`.
+
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **calendar signal**: Name, period, expected impact range; entered by the tenant. *(source: contracts/spine/catalogue.yaml#setDemandSignalConfiguration / DI-369)*
 
 #### Outputs: what the screen shows and produces
 
@@ -729,6 +997,17 @@ Errors to draw in the form: 409 `feedSignal`.; 422 `invalidPeriod`.
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 `feedSignal`.; 422 `invalidPeriod`. |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+signal:
+  name: Eid Al Adha 2027
+  period: 2027-05-16 to 2027-05-19
+  impact: +15% to +25%
+```
+
 #### Permissions
 
 - `listSeasonalCalendarDay` → `PRODUCT_VIEW` (read) · staff
@@ -747,7 +1026,7 @@ For this screen, newest first. An **Open question** is built to the default it s
 - Every calendar has day, week and month (and agenda) views, and the day view is broken into hours from the venue's day start hour (calendarDayStartHour). *(agreed · MoM 17 Sep 2026, M17-03 · DI-919)*
 - Dynamic pricing in two phases: first rule-based by time and capacity (e.g. +20% once capacity reaches 70%, early-booking discounts); factor-based (weather/AI-driven) later, scoped separately. *(agreed · MoM 19 Aug 2026, 4.10 Workshop Planning & Remaining Scope; 5. Key Decisions · DI-369)*
 
-Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -755,7 +1034,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-092` · status **notStarted** · provenance generated
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-092` · status **notStarted** · provenance generated
 - Client workshop board: `wireframes/WS99 Pricing   Revenue Management Board 5.dc.html#adm-092`
 - Workshop pack: Pricing___Revenue_Management_Reference.pdf board 5
 - Flow F147 *Pricing Revenue Management board 5: Dynamic Pricing Strategy Command Center*, step 8: Works in Seasonal, Calendar, Day & Timeslot Dynamic Rules → Configure dynamic pricing behavior according to temporal commercial patterns.
@@ -779,17 +1058,26 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `ticketing` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `PRODUCT_VIEW` (1 read); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `PRODUCT_VIEW` (1 read); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/commercial/channel-customer-segment-location-dynamic-rules-adm-093` |
 
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
+
 **Known gaps.** **The pack names 3 actions on this screen and the screen declares 1 operation.** Unserved: POS, Call Center, API. Each needs an operation, or needs removing from the screen; this is the Phase 3 … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Dynamic pricing that differs by channel, customer segment and location.
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- Pack actions with no operation: POS, Call Center, API. (CHG-MOV-008)
+- No write operation: a configuration screen (Channel, Customer Segment & Location Dynamic Rules) declares only reads (listChannelCustomerSegment). (CHG-WIR-027)
 
 #### Inputs: what the user enters or picks
 
@@ -815,6 +1103,10 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Call Center (secondary button) | navigation or local | — | — | — | — |
 | API (secondary button) | navigation or local | — | — | — | — |
 
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **context rules**: Rules as rows by context. *(source: contracts/spine/catalogue.yaml#listChannelCustomerSegment)*
+
 **Data it reads**: `listChannelCustomerSegment` (onLoad, Channel, Customer Segment & Location Dynamic Rules)
 
 **Where the user goes next**
@@ -832,6 +1124,16 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+rule:
+  context: App, Gold members
+  effect: dynamic uplift capped at +5%
+```
+
 #### Permissions
 
 - `listChannelCustomerSegment` → `PRODUCT_VIEW` (read) · staff
@@ -846,7 +1148,7 @@ No matrix row traces to this screen's operations or data.
 
 None names this screen.
 
-Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -859,7 +1161,7 @@ Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-093` · status **notStarted** · provenance generated
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-093` · status **notStarted** · provenance generated
 - Client workshop board: `wireframes/WS99 Pricing   Revenue Management Board 5.dc.html#adm-093`
 - Workshop pack: Pricing___Revenue_Management_Reference.pdf board 5
 - Flow F147 *Pricing Revenue Management board 5: Dynamic Pricing Strategy Command Center*, step 10: Works in Channel, Customer Segment & Location Dynamic Rules → Allow dynamic-pricing behavior to differ according to commercial context.
@@ -883,15 +1185,19 @@ Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the 
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `ticketing` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `PRICE_CONFIGURE`, `PRODUCT_VIEW` (1 configure, 1 read); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `PRICE_CONFIGURE`, `PRODUCT_VIEW` (1 configure, 1 read); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population |
 | Offline | online only |
 | Opens with | `strategyId` (navigation) |
 | Route | `/commercial/dynamic-price-bands-ladders-adjustment-matrix-adm-094` |
+
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** The controlled steps a dynamic price moves through: bands or a ladder, base band, minimum and maximum, step size, movement limits, cooldown and reversal rule.
 
 #### Inputs: what the user enters or picks
 
@@ -940,6 +1246,10 @@ Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the 
 
 Errors to draw in the form: 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 `strategyActive`.; 422 `invalidBands` or `guardrailBreached`.
 
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **ladder**: A vertical ladder of bands with the base marked; movement limits beside it. *(source: contracts/spine/catalogue.yaml#setPriceLadderMatrix)*
+
 #### Outputs: what the screen shows and produces
 
 **Actions and what each produces**
@@ -967,6 +1277,22 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 `strategyActive`.; 422 `invalidBands` or `guardrailBreached`. |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+ladder:
+  model: fixedPriceBands
+  bands:
+  - AED 249.00
+  - AED 279.00
+  - AED 295.00 (base)
+  - AED 319.00
+  - AED 349.00
+  cooldownMinutes: 120
+```
+
 #### Permissions
 
 - `listDynamicPriceBand` → `PRODUCT_VIEW` (read) · staff
@@ -985,7 +1311,7 @@ For this screen, newest first. An **Open question** is built to the default it s
 - Dynamic strategies: buy 2 get the 3rd free / BOGO, sibling tiers (first child full price, later children reduced), early-bird phases (e.g. 20% off a AED 200 base for the first 200 of 500, then 10% for the next 100, then full; discount and quota per phase), and price steps as capacity sells (e.g. at 50%). *(client request · MoM 1 Sep 2026, 4.7 Dynamic Pricing Strategies · DI-600)*
 - Dynamic pricing in two phases: first rule-based by time and capacity (e.g. +20% once capacity reaches 70%, early-booking discounts); factor-based (weather/AI-driven) later, scoped separately. *(agreed · MoM 19 Aug 2026, 4.10 Workshop Planning & Remaining Scope; 5. Key Decisions · DI-369)*
 
-Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -993,7 +1319,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-094` · status **notStarted** · provenance generated
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-094` · status **notStarted** · provenance generated
 - Client workshop board: `wireframes/WS99 Pricing   Revenue Management Board 5.dc.html#adm-094`
 - Workshop pack: Pricing___Revenue_Management_Reference.pdf board 5
 - Flow F147 *Pricing Revenue Management board 5: Dynamic Pricing Strategy Command Center*, step 12: Works in Dynamic Price Bands, Ladders & Adjustment Matrix → Define the controlled monetary steps through which prices can move. This is preferable to allowing unrestricted price generation for many products.
@@ -1017,15 +1343,19 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `ticketing` module |
 | Block | Block A · ticket #20629 (APP-SETUP-ADM-095) |
-| Who uses it | ticvai staff holding `PRICE_CONFIGURE`, `PRODUCT_VIEW` (1 configure, 1 read); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `PRICE_CONFIGURE`, `PRODUCT_VIEW` (1 configure, 1 read); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/commercial/dynamic-pricing-guardrails-commercial-protection-adm-095` |
+
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** The non-negotiable boundaries of dynamic pricing at a scope: floor and ceiling, margin, rate-of-change limits, protected rate types, freeze and kill switch, automation level and its authority tiers, circuit breakers and what happens on failure. No strategy may produce a price outside them.
 
 #### Inputs: what the user enters or picks
 
@@ -1097,6 +1427,13 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 Errors to draw in the form: 422 `invalidRange` or `scopeIdRequired`.
 
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **kill switch and freeze**: At the top of the screen, red and separate from the form, each with a confirmation naming the scope; the kill switch stops every automatic change in scope at once. *(source: contracts/spine/catalogue.yaml#setDynamicPricingGuardrailPolicy)*
+- **automationLevel**: Advisory, Human in the loop, Conditionally autonomous, Autonomous, as a stepped scale with what each permits; authority tiers appear for the last two. *(source: contracts/spine/catalogue.yaml#/components/schemas/DynamicPricingControl)*
+- **protectedRateTypes**: Contract, membership, corporate, promotional locked, regulatory and complimentary rates as checkboxes; excluded from automation by default. *(source: contracts/spine/catalogue.yaml#/components/schemas/DynamicPricingControl)*
+- **activeOverride**: Who, why, price, start, expiry and what happens after; shown as a banner while active. *(source: contracts/spine/catalogue.yaml#/components/schemas/DynamicPricingControl)*
+
 #### Outputs: what the screen shows and produces
 
 **Shown**
@@ -1126,6 +1463,21 @@ Errors to draw in the form: 422 `invalidRange` or `scopeIdRequired`.
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 422 `invalidRange` or `scopeIdRequired`. |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+guardrail:
+  scope: 'venue: Dune Park'
+  floor: AED 199.00
+  ceiling: AED 399.00
+  maxSingleChange: 10%
+  maxChangesPerDay: 4
+  automationLevel: humanInTheLoop
+  safeFailure: holdLastPrice
+```
+
 #### Permissions
 
 - `listDynamicPricingGuardrail` → `PRODUCT_VIEW` (read) · staff
@@ -1147,7 +1499,7 @@ Errors to draw in the form: 422 `invalidRange` or `scopeIdRequired`.
 
 None names this screen.
 
-Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -1155,7 +1507,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-095` · status **notStarted** · provenance generated
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-095` · status **notStarted** · provenance generated
 - Client workshop board: `wireframes/WS99 Pricing   Revenue Management Board 5.dc.html#adm-095`
 - Workshop pack: Pricing___Revenue_Management_Reference.pdf board 5
 - Flow F147 *Pricing Revenue Management board 5: Dynamic Pricing Strategy Command Center*, step 14: Works in Dynamic Pricing Guardrails & Commercial Protection → Establish the non-negotiable boundaries for every dynamic-pricing strategy.
@@ -1179,15 +1531,19 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `ticketing` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `PRICE_CONFIGURE`, `PRODUCT_VIEW` (1 configure, 1 read); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `PRICE_CONFIGURE`, `PRODUCT_VIEW` (1 configure, 1 read); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure independently by; Configure; Capture) and no display directory — it is settings, not a population |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/commercial/dynamic-pricing-automation-policy-control-adm-096` |
+
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** How much authority the pricing engine has to act on a calculated price (advisory, human in the loop, conditional, autonomous), as distinct from the approval workflow of governed changes.
 
 #### Inputs: what the user enters or picks
 
@@ -1287,6 +1643,22 @@ Errors to draw in the form: 422 `invalidRange` or `scopeIdRequired`.
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 422 `invalidRange` or `scopeIdRequired`. |
 
+#### Consistency with other screens
+
+- Match `ADM-095`: The same record (setDynamicPricingGuardrailPolicy); automation level and guardrails are two tabs of one form.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+policy:
+  scope: 'venue: Dune Park'
+  automationLevel: conditionalAutonomous
+  maxAdjustment: 8%
+  minAiConfidence: 0.8
+```
+
 #### Permissions
 
 - `listDynamicPricingAutomation` → `PRODUCT_VIEW` (read) · staff
@@ -1308,7 +1680,7 @@ Errors to draw in the form: 422 `invalidRange` or `scopeIdRequired`.
 
 None names this screen.
 
-Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -1316,7 +1688,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-096` · status **notStarted** · provenance generated
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-096` · status **notStarted** · provenance generated
 - Client workshop board: `wireframes/WS99 Pricing   Revenue Management Board 5.dc.html#adm-096`
 - Workshop pack: Pricing___Revenue_Management_Reference.pdf board 5
 - Flow F147 *Pricing Revenue Management board 5: Dynamic Pricing Strategy Command Center*, step 16: Works in Dynamic Pricing Automation Policy & Control → Define how much authority the pricing engine has to act on a calculated dynamic price. This is different from Board 4's approval workflow. Board 5 determines whether the engine may act automatically. …
@@ -1336,235 +1708,47 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 ### `ADM-097` Rule Priority, Conflict Resolution & Dynamic Pricing Test Console
 
-**Determine the final dynamic price when multiple strategies and rules are simultaneously applicable. This is the final and most important control screen of Board 5.**
+**Determine the final dynamic price when multiple strategies and rules are simultaneously applicable. This is the final and most important control screen of Board 5. (merged into BO-441 Price Priority & Conflict Rules).**
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `ticketing` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `PRODUCT_CONFIGURE`, `PRODUCT_VIEW` (1 configure, 1 read); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Identify; Show) and no metric row |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/commercial/rule-priority-conflict-resolution-dynamic-pricing-test-c-adm-097` |
 
+**What the spec says about it.** **Merged into BO-441 Price Priority & Conflict Rules** (decided 2 October 2026, Chinmay: DEC-100 and the pre-apply round, "duplicate screens: merge as proposed"; CHG-MOV-002). On one platform it declared the same operations as BO-441 (check-screen-wiring S-DUP-SCREEN). **One implementation, both ids kept**, as the M24-03 merges do: this id stays for traceability and routes to BO-441, and nothing on it is built separately. **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** The final dynamic price when several strategies apply: priority order, resolution method and a test console.
+
 #### Inputs: what the user enters or picks
 
-**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
-
-| Filter | Drawn as | Default | Allowed values, rules | Source |
-|---|---|---|---|---|
-| Case type | select | — | Low demand · High demand · Near sell out · Early bird · Last minute · Weekend peak · Member purchase · B2B contract · Custom | `listRulePriorityConflict` ?caseType |
-| Conflict code | select | — | Contradictory rules · Same priority · Impossible condition · Overlapping strategy · Circular dependency · Missing fallback · Guardrail conflict | `listRulePriorityConflict` ?conflictCode |
-| Strategy | text field | — | — | `listRulePriorityConflict` ?strategyId |
-
-**Sent by *Most Specific Rule Wins*** (`setRulePriorityConflict`; no form is declared, so these are filled from the screen or collected inline)
-
-| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
-|---|---|---|---|---|---|---|---|
-| Ordered rules `orderedRuleIds` | list of values (chips) | optional | — | — | — | The rules in priority order, highest first. Reorder is this list. | `setRulePriorityConflict` body |
-| Resolution method `resolutionMethod` | select | optional | Highest priority wins | Highest priority wins · Most specific rule wins · Cumulative adjustment · Maximum adjustment wins · Minimum adjustment wins · Weighted combination · Stop processing · Custom governed resolution | — | How two applicable rules are resolved; the same vocabulary as `RulePriorityConflictResolutionDynamicPricingTestConsSummary.resolutionMethod`. | `setRulePriorityConflict` body |
-| Priority hierarchy `priorityHierarchy` | multi-select chips | optional | — | Commercial protection · Contract member protection · Event specific strategy · Inventory occupancy · Booking velocity · Time to event · Season day timeslot · Base price | — | The priority matrix, highest first; defaults to the pack's order. | `setRulePriorityConflict` body |
-| Mode `mode` | segmented control | required | — | Save · Validate · Test | — | `validate` checks the order and returns conflicts without saving; `test` runs `testScenario` against the order and saves it as a test case; `save` stores the order and method … | `setRulePriorityConflict` body |
-| Test scenario `testScenario` | group | optional | — | — | — | A sample booking for the conflict test console (pack p.90), the same inputs as a saved test case. | `setRulePriorityConflict` body |
-| Case name `testScenario.caseName` | text field | optional | — | max length 120 | — | — | `setRulePriorityConflict` body |
-| Case type `testScenario.caseType` | select | optional | — | Low demand · High demand · Near sell out · Early bird · Last minute · Weekend peak · Member purchase · B2B contract · Custom | — | — | `setRulePriorityConflict` body |
-| Product `testScenario.productId` | picker: choose a product | optional | — | — | shows names, sends the id | — | `setRulePriorityConflict` body |
-| Event `testScenario.eventId` | picker: choose an event | optional | — | — | shows names, sends the id | — | `setRulePriorityConflict` body |
-| Performance `testScenario.performanceId` | picker: choose a performance | optional | — | — | shows names, sends the id | — | `setRulePriorityConflict` body |
-| Date `testScenario.date` | date picker | optional | — | — | 1 Oct 2026 (dd MMM yyyy) | — | `setRulePriorityConflict` body |
-| Timeslot `testScenario.timeslot` | text field | optional | — | — | — | — | `setRulePriorityConflict` body |
-| Channel `testScenario.channel` | select | optional | — | POS · Kiosk · Guest app · Guest web · Call centre · Partner · API · Back office · B2B · Ota | — | Where a sale came from. Restored 24 August — this was lost in the `Money` rewrite and nine references across four contracts were pointing at nothing. | `setRulePriorityConflict` body |
-| Customer segment `testScenario.customerSegment` | text field | optional | — | — | — | — | `setRulePriorityConflict` body |
-| Base price `testScenario.basePrice` | money field | optional | — | A jsonb price cannot be summed in SQL. | AED, 2 decimals shown (up to 4 accepted), currency from the … | On the wire this is three fields; in the database it is one column. 24 August. | `setRulePriorityConflict` body |
-| Occupancy `testScenario.occupancy` | stepper or slider | optional | — | min 0; max 100 | — | — | `setRulePriorityConflict` body |
-| Inventory `testScenario.inventory` | number field | optional | — | min 0 | — | — | `setRulePriorityConflict` body |
-| Booking velocity `testScenario.bookingVelocity` | number field | optional | — | — | — | — | `setRulePriorityConflict` body |
-| Time to event `testScenario.timeToEvent` | number field | optional | — | min 0 | — | — | `setRulePriorityConflict` body |
-| Expected price `testScenario.expectedPrice` | money field | optional | — | A jsonb price cannot be summed in SQL. | AED, 2 decimals shown (up to 4 accepted), currency from the … | On the wire this is three fields; in the database it is one column. 24 August. | `setRulePriorityConflict` body |
+Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
 
 #### Outputs: what the screen shows and produces
 
 **Shown**
 
-**Contradictory rules** (metric tile, from `listRulePriorityConflict`)
+**Contradictory rules** (metric tile)
 
-| Shows | Format | Notes |
-|---|---|---|
-| Items | list or chips (count when long) | — |
-| Product | text | Test input: product |
-| Event | text | Test input: event |
-| Performance | text | Test input: performance |
-| Date | 1 Oct 2026 | Test input: visit/event date |
-| Timeslot | text | Test input: timeslot |
-| Channel | chip: POS, Kiosk, Guest app, Guest web, Call centre, Partner… | Test input: channel |
-| Customer segment | text | Test input: customer segment |
-| Base price | AED 1,234.50 | Test input: base price |
-| Occupancy | 1,234.5 | Test input: occupancy percent |
-| Inventory | 1,234 | Test input: remaining inventory |
-| Booking velocity | 1,234.5 | Test input: booking velocity, percent against expected pace |
-| Time to event | 1,234 | Test input: days to event (0 = same day) |
-| Calculation path | list or chips (count when long) | Explainability: the complete calculation path, one step per line |
-| Test case | text | Test case ID |
-| Case name | text | Test case name |
-| Case type | chip: Low demand, High demand, Near sell out, Early bird, Last minute, Weekend peak… | Test case type (pack p.91) |
-| Rules matched | list or chips (count when long) | Rules matched |
-| Rule | text | Rule |
-| Rule name | text | Rule name |
+**Same priority** (metric tile)
 
-**Same priority** (metric tile, from `listRulePriorityConflict`)
+**Impossible condition** (metric tile)
 
-| Shows | Format | Notes |
-|---|---|---|
-| Items | list or chips (count when long) | — |
-| Product | text | Test input: product |
-| Event | text | Test input: event |
-| Performance | text | Test input: performance |
-| Date | 1 Oct 2026 | Test input: visit/event date |
-| Timeslot | text | Test input: timeslot |
-| Channel | chip: POS, Kiosk, Guest app, Guest web, Call centre, Partner… | Test input: channel |
-| Customer segment | text | Test input: customer segment |
-| Base price | AED 1,234.50 | Test input: base price |
-| Occupancy | 1,234.5 | Test input: occupancy percent |
-| Inventory | 1,234 | Test input: remaining inventory |
-| Booking velocity | 1,234.5 | Test input: booking velocity, percent against expected pace |
-| Time to event | 1,234 | Test input: days to event (0 = same day) |
-| Calculation path | list or chips (count when long) | Explainability: the complete calculation path, one step per line |
-| Test case | text | Test case ID |
-| Case name | text | Test case name |
-| Case type | chip: Low demand, High demand, Near sell out, Early bird, Last minute, Weekend peak… | Test case type (pack p.91) |
-| Rules matched | list or chips (count when long) | Rules matched |
-| Rule | text | Rule |
-| Rule name | text | Rule name |
+**Overlapping strategy** (metric tile)
 
-**Impossible condition** (metric tile, from `listRulePriorityConflict`)
+**Circular dependency** (metric tile)
 
-| Shows | Format | Notes |
-|---|---|---|
-| Items | list or chips (count when long) | — |
-| Product | text | Test input: product |
-| Event | text | Test input: event |
-| Performance | text | Test input: performance |
-| Date | 1 Oct 2026 | Test input: visit/event date |
-| Timeslot | text | Test input: timeslot |
-| Channel | chip: POS, Kiosk, Guest app, Guest web, Call centre, Partner… | Test input: channel |
-| Customer segment | text | Test input: customer segment |
-| Base price | AED 1,234.50 | Test input: base price |
-| Occupancy | 1,234.5 | Test input: occupancy percent |
-| Inventory | 1,234 | Test input: remaining inventory |
-| Booking velocity | 1,234.5 | Test input: booking velocity, percent against expected pace |
-| Time to event | 1,234 | Test input: days to event (0 = same day) |
-| Calculation path | list or chips (count when long) | Explainability: the complete calculation path, one step per line |
-| Test case | text | Test case ID |
-| Case name | text | Test case name |
-| Case type | chip: Low demand, High demand, Near sell out, Early bird, Last minute, Weekend peak… | Test case type (pack p.91) |
-| Rules matched | list or chips (count when long) | Rules matched |
-| Rule | text | Rule |
-| Rule name | text | Rule name |
+**Missing fallback** (metric tile)
 
-**Overlapping strategy** (metric tile, from `listRulePriorityConflict`)
+**Guardrail conflict** (metric tile)
 
-| Shows | Format | Notes |
-|---|---|---|
-| Items | list or chips (count when long) | — |
-| Product | text | Test input: product |
-| Event | text | Test input: event |
-| Performance | text | Test input: performance |
-| Date | 1 Oct 2026 | Test input: visit/event date |
-| Timeslot | text | Test input: timeslot |
-| Channel | chip: POS, Kiosk, Guest app, Guest web, Call centre, Partner… | Test input: channel |
-| Customer segment | text | Test input: customer segment |
-| Base price | AED 1,234.50 | Test input: base price |
-| Occupancy | 1,234.5 | Test input: occupancy percent |
-| Inventory | 1,234 | Test input: remaining inventory |
-| Booking velocity | 1,234.5 | Test input: booking velocity, percent against expected pace |
-| Time to event | 1,234 | Test input: days to event (0 = same day) |
-| Calculation path | list or chips (count when long) | Explainability: the complete calculation path, one step per line |
-| Test case | text | Test case ID |
-| Case name | text | Test case name |
-| Case type | chip: Low demand, High demand, Near sell out, Early bird, Last minute, Weekend peak… | Test case type (pack p.91) |
-| Rules matched | list or chips (count when long) | Rules matched |
-| Rule | text | Rule |
-| Rule name | text | Rule name |
-
-**Circular dependency** (metric tile, from `listRulePriorityConflict`)
-
-| Shows | Format | Notes |
-|---|---|---|
-| Items | list or chips (count when long) | — |
-| Product | text | Test input: product |
-| Event | text | Test input: event |
-| Performance | text | Test input: performance |
-| Date | 1 Oct 2026 | Test input: visit/event date |
-| Timeslot | text | Test input: timeslot |
-| Channel | chip: POS, Kiosk, Guest app, Guest web, Call centre, Partner… | Test input: channel |
-| Customer segment | text | Test input: customer segment |
-| Base price | AED 1,234.50 | Test input: base price |
-| Occupancy | 1,234.5 | Test input: occupancy percent |
-| Inventory | 1,234 | Test input: remaining inventory |
-| Booking velocity | 1,234.5 | Test input: booking velocity, percent against expected pace |
-| Time to event | 1,234 | Test input: days to event (0 = same day) |
-| Calculation path | list or chips (count when long) | Explainability: the complete calculation path, one step per line |
-| Test case | text | Test case ID |
-| Case name | text | Test case name |
-| Case type | chip: Low demand, High demand, Near sell out, Early bird, Last minute, Weekend peak… | Test case type (pack p.91) |
-| Rules matched | list or chips (count when long) | Rules matched |
-| Rule | text | Rule |
-| Rule name | text | Rule name |
-
-**Missing fallback** (metric tile, from `listRulePriorityConflict`)
-
-| Shows | Format | Notes |
-|---|---|---|
-| Items | list or chips (count when long) | — |
-| Product | text | Test input: product |
-| Event | text | Test input: event |
-| Performance | text | Test input: performance |
-| Date | 1 Oct 2026 | Test input: visit/event date |
-| Timeslot | text | Test input: timeslot |
-| Channel | chip: POS, Kiosk, Guest app, Guest web, Call centre, Partner… | Test input: channel |
-| Customer segment | text | Test input: customer segment |
-| Base price | AED 1,234.50 | Test input: base price |
-| Occupancy | 1,234.5 | Test input: occupancy percent |
-| Inventory | 1,234 | Test input: remaining inventory |
-| Booking velocity | 1,234.5 | Test input: booking velocity, percent against expected pace |
-| Time to event | 1,234 | Test input: days to event (0 = same day) |
-| Calculation path | list or chips (count when long) | Explainability: the complete calculation path, one step per line |
-| Test case | text | Test case ID |
-| Case name | text | Test case name |
-| Case type | chip: Low demand, High demand, Near sell out, Early bird, Last minute, Weekend peak… | Test case type (pack p.91) |
-| Rules matched | list or chips (count when long) | Rules matched |
-| Rule | text | Rule |
-| Rule name | text | Rule name |
-
-**Guardrail conflict** (metric tile, from `listRulePriorityConflict`)
-
-| Shows | Format | Notes |
-|---|---|---|
-| Items | list or chips (count when long) | — |
-| Product | text | Test input: product |
-| Event | text | Test input: event |
-| Performance | text | Test input: performance |
-| Date | 1 Oct 2026 | Test input: visit/event date |
-| Timeslot | text | Test input: timeslot |
-| Channel | chip: POS, Kiosk, Guest app, Guest web, Call centre, Partner… | Test input: channel |
-| Customer segment | text | Test input: customer segment |
-| Base price | AED 1,234.50 | Test input: base price |
-| Occupancy | 1,234.5 | Test input: occupancy percent |
-| Inventory | 1,234 | Test input: remaining inventory |
-| Booking velocity | 1,234.5 | Test input: booking velocity, percent against expected pace |
-| Time to event | 1,234 | Test input: days to event (0 = same day) |
-| Calculation path | list or chips (count when long) | Explainability: the complete calculation path, one step per line |
-| Test case | text | Test case ID |
-| Case name | text | Test case name |
-| Case type | chip: Low demand, High demand, Near sell out, Early bird, Last minute, Weekend peak… | Test case type (pack p.91) |
-| Rules matched | list or chips (count when long) | Rules matched |
-| Rule | text | Rule |
-| Rule name | text | Rule name |
-
-**Every rule priority conflict** (data table, from `listRulePriorityConflict`)
+**Every rule priority conflict** (data table)
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -1580,16 +1764,15 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Most Specific Rule Wins (primary button) | `setRulePriorityConflict` PUT `/rule-priority-conflict` | RulePriorityConflictInput | RulePriorityConflictView | 409 `save` while a critical conflict is open (`criticalConflictOpen`); the conflicts are named in the problem.; 422 `test` without a `testScenario` (`testScenarioRequired`), or `orderedRuleIds` naming a rule that does … | — |
-| Stop Processing (destructive button) | `setRulePriorityConflict` PUT `/rule-priority-conflict` | RulePriorityConflictInput | RulePriorityConflictView | 409 `save` while a critical conflict is open (`criticalConflictOpen`); the conflicts are named in the problem.; 422 `test` without a `testScenario` (`testScenarioRequired`), or `orderedRuleIds` naming a rule that does … | — |
-| Run Test (primary button) | `setRulePriorityConflict` PUT `/rule-priority-conflict` | RulePriorityConflictInput | RulePriorityConflictView | 409 `save` while a critical conflict is open (`criticalConflictOpen`); the conflicts are named in the problem.; 422 `test` without a `testScenario` (`testScenarioRequired`), or `orderedRuleIds` naming a rule that does … | — |
-| Save Case (secondary button) | `setRulePriorityConflict` PUT `/rule-priority-conflict` | RulePriorityConflictInput | RulePriorityConflictView | 409 `save` while a critical conflict is open (`criticalConflictOpen`); the conflicts are named in the problem.; 422 `test` without a `testScenario` (`testScenarioRequired`), or `orderedRuleIds` naming a rule that does … | — |
-
-**Data it reads**: `listRulePriorityConflict` (onLoad, Rule Priority, Conflict Resolution & Dynamic Pricing Test …)
+| Most Specific Rule Wins (primary button) | navigation or local | — | — | — | — |
+| Stop Processing (destructive button) | navigation or local | — | — | — | — |
+| Run Test (primary button) | navigation or local | — | — | — | — |
+| Save Case (secondary button) | navigation or local | — | — | — | — |
 
 **Where the user goes next**
 
 - → `ADM-088` Dynamic Pricing Strategy Command Center: *Dynamic Pricing Strategy Command Center*
+- → `BO-441` Price Priority & Conflict Rules: *Open Price Priority & Conflict Rules*
 
 **What opens over it**
 
@@ -1603,16 +1786,26 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the rule priority conflict untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No rule priority conflict yet. Carries the create action; distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the rule priority conflict are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks the permission BO-441 Price Priority & Conflict Rules requires; this id has no operation of its own since the merge, so it names that screen's. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 409 `save` while a critical conflict is open (`criticalConflictOpen`); the conflicts are named in the problem.; 422 `test` without a `testScenario` (`testScenarioRequired`), or `orderedRuleIds` naming a rule that does not exist or is archived (`unknownRule`). |
+
+#### Consistency with other screens
+
+- Match `BO-441`: Same operation and component.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+test:
+  scenario: Sat 20:00 slot, 85% sold, 3 days out
+  result: AED 349.00 (occupancy tier capped by ceiling)
+```
 
 #### Permissions
 
-- `listRulePriorityConflict` → `PRODUCT_VIEW` (read) · staff
-- `setRulePriorityConflict` → `PRODUCT_CONFIGURE` (configure) · staff
-
-**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks the permission BO-441 Price Priority & Conflict Rules requires; this id has no operation of its own since the merge, so it names that screen's.
 
 #### Requirements it meets
 
@@ -1622,7 +1815,7 @@ No matrix row traces to this screen's operations or data.
 
 None names this screen.
 
-Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -1630,19 +1823,18 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-097` · status **notStarted** · provenance generated
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-097` · status **notStarted** · provenance generated
 - Client workshop board: `wireframes/WS99 Pricing   Revenue Management Board 5.dc.html#adm-097`
 - Workshop pack: Pricing___Revenue_Management_Reference.pdf board 5
-- Flow F147 *Pricing Revenue Management board 5: Dynamic Pricing Strategy Command Center*, step 18: Works in Rule Priority, Conflict Resolution & Dynamic Pricing Test Console → Determine the final dynamic price when multiple strategies and rules are simultaneously applicable. This is the final and most important control screen of Board 5.
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (20), with its required mark, default, format and its error state (409, 422).
-- [ ] Every output is drawn (142 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
+- [ ] Every output is drawn (2 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-097?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Most Specific Rule Wins, Stop Processing, Run Test, Save Case.
-- [ ] Every transition is wired: `ADM-088`.
-- [ ] Every gated control is gated: `PRODUCT_CONFIGURE`, `PRODUCT_VIEW`.
+- [ ] Every transition is wired: `ADM-088`, `BO-441`.
+- [ ] Sign-in is asked only where the spec asks for it.
 - [ ] The module and platform inputs below are applied.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -1652,12 +1844,16 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 ## Reference designs and the trackers for this platform
 
-**P09 reference designs** (from `handoff/design-batches/apps/6-ticvai-controller/README.md`)
+**P08 reference designs** (from `handoff/design-batches/apps/5-venue-management/README.md`)
 
 - `sources/designs/TICVAI_POS_Terminal_client_approved.html`: the client-approved POS, for operator density and components.
 - `sources/designs/TICVAI_Mobile.dc.html`: for finish and motion.
 
-**Design Vision Book rules that apply** (`sources/designs/Ticvai_Design_Vision_Book_v1_1.pdf`): DI-021, DI-022, DI-023, DI-024, DI-025, DI-027, DI-028, DI-029, DI-032, DI-033, DI-034, DI-036, DI-037, DI-038, DI-039, DI-040, DI-041, DI-042, DI-044, DI-045, DI-046, DI-047, DI-048, DI-049, DI-050, DI-051 (each is in the design inputs below).
+**Design Vision Book rules that apply** (`sources/designs/Ticvai_Design_Vision_Book_v1_1.pdf`): DI-021, DI-022, DI-023, DI-024, DI-025, DI-027, DI-028, DI-029, DI-030, DI-032, DI-033, DI-034, DI-036, DI-037, DI-038, DI-039, DI-040, DI-041, DI-042, DI-043, DI-044, DI-045, DI-046, DI-047, DI-048, DI-049, DI-050, DI-051, DI-052 (each is in the design inputs below).
+
+**Workshop tracker rows about P08 as a whole** (1: 1 open, 0 closed). Open first; a closed row says where it went on 30 September.
+
+- **S8** Venue Management back-end configuration wireframes *(Chinmay Parab · In progress · due Fri 2 Oct · 30 Sep 2026 · 30 Sep tracker)*
 
 ## Design inputs from the client meetings
 
@@ -1695,17 +1891,32 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Brand personality: Modern, AI-First, Enterprise, Premium, Reliable, Minimal, Scalable, Human-Centred. Visual essence: intelligent and forward-thinking, clean and minimal, trustworthy and secure, modern and timeless, scalable and flexible. *(agreed · Design Vision Book 29 Jul 2026, 02 Brand Identity (p2) - Brand personality / Visual essence · DI-021)*
 - Arabic is a core requirement, not later localisation: full Arabic RTL across web, mobile, POS, reports, emails, WhatsApp, SMS, notifications, tickets and receipts, and administrative interfaces. *(agreed · MoM 28 Jul 2026, 27. Internationalisation and Arabic Support · DI-019)*
 
-### Across P09 TICVAI Web
+### Across P08 Venue Management
 
-- Portal access exposes TICVAI pricing, so prospects submit contact details and a trade license as proof of a real venue, reviewed and approved by TICVAI before access is granted. *(agreed · MoM 10 Sep 2026, 4.8 Customer Portal Access, Authentication & Verification · DI-827)*
+- Qossai: configuration screens should consolidate related functionality, potentially merging 3-4 previously separate screens into one, rather than the repetitive one-screen-per-concept pattern of the AI-built reference system. *(agreed · MoM 24 Sep 2026, 4.5 Screen Consolidation Philosophy · DI-987)*
+- **Open question.** Open: should AI monitoring live in one centralised AI command dashboard or be distributed as widgets in each functional module's own dashboard? Allam: Softlabs' call; the current proposal is illustrative and Softlabs may propose a better structure. *(open · MoM 18 Sep 2026, 4.4 AI Governance — Risk, Compliance & Continuous Monitoring · DI-936)*
 - Simulation functionality stays embedded within each relevant configuration section rather than being consolidated, since it tests that section's own configuration. *(agreed · MoM 8 Sep 2026, 4.11 Dashboard & Reporting Module Consolidation Strategy · DI-722)*
+- Client boards (POS Frontline, F&B, Retail, Inventory & Procurement) share one architecture: six boards of ten screens per domain, a command centre first and an AI/analytics board last, under the hierarchy Company > Venue > Department > Workstation > Operator/Shift > Transaction > Exception > Reconciliation > Analytics. *(agreed · client-design-boards-audit 20 Aug 2026, Opening / What the boards give us · DI-400)*
+- Decision: RBAC per role, per module, three levels — edit/view, view-only, hidden (e.g. a marketing officer does not see Finance at all) — plus sub-permissions within a module (a CRM role may get Campaigns and Communications but not Journeys). Default role templates, admin-customisable. *(agreed · MoM 20 Aug 2026, 4.7 Role-Based Access Control (RBAC); 5. Key Decisions · DI-387)*
+- **Open question.** Allam: a user's visibility must be restrictable to specific outlets (an F&B manager of one outlet should not see other outlets' items); also relevant for ticketing/event-specific access. Implementation approach still open. *(open · MoM 18 Aug 2026, 4.6 Role-Based & Outlet-Level Access Control — Open Item · DI-331)*
+- Access loads automatically at login on POS and web/admin. A user with one role logs straight in; a user with several roles (e.g. admin, cashier, supervisor, manager) is prompted to choose which role to use. *(agreed · MoM 12 Aug 2026, 4. Multiple Roles per User and Role Switching · DI-249)*
+- Back office is role-driven from any device: a finance user signing in from a workstation, laptop or home sees only finance reports and related information. *(agreed · MoM 12 Aug 2026, 3. Role-Based Access and Workstation-Linked Front-End · DI-248)*
+- Built-in help menu with step-by-step tutorials with screenshots for common tasks (e.g. how to sell a ticket at the POS). *(client request · MoM 7 Aug 2026, 8. Legacy POS Layout Designer & System Logging · DI-160)*
+- Custom data-capture fields ("data mask") at account, event, extended-ticket and product level: field types text, dropdown, radio, true/false; multi-language labels; validation (min/max length, required/optional); reusable value lists (e.g. country list). Standard fields come out of the box. *(agreed · MoM 7 Aug 2026, 6. Data Mask: Flexible Custom Data Capture · DI-155)*
+- Load/traffic dashboards respect the tenancy model: a venue manager sees traffic for their own venue only. *(agreed · MoM 31 Jul 2026, 4. Non-Functional Requirements: Scalability & Availability · DI-061)*
+- Allam: queue management is built into the system (not third-party) so traffic entering the site can be throttled from the back office itself. *(agreed · MoM 31 Jul 2026, 4. Non-Functional Requirements: Scalability & Availability · DI-060)*
 - **Open question.** Proposed tenant hierarchy Tenant > Organization/Brand > Region > Branch > Venue > Department, under review against TICVAI's own organisational hierarchy before finalising. *(open · MoM 30 Jul 2026, 2. Proposed Multi-Tenant Hierarchy · DI-055)*
+- Documentation deliverable includes user guides and help content; the preview shows a TICVAI Help Center with categories (Getting Started, Events, Tickets, Orders, Payments, Memberships, Access Control, Reports, Integrations), a "Welcome to TICVAI" getting-started article and Quick Links (Create an Event, Set Pricing, Manage Access, View Reports). *(agreed · Design Vision Book 29 Jul 2026, 09 Deliverables (p9) - What We Deliver / Key Deliverables Preview · DI-052)*
 - Typeface Inter (Light, Regular, Medium, Semibold, Bold). Scale: H1 32/40 Bold, H2 24/32 Semibold, H3 20/28 Semibold, Body 1 16/24 Regular, Body 2 14/20 Regular, Caption 12/16 Regular. *(agreed · Design Vision Book 29 Jul 2026, 08 Design System (p8) - 2. Typography · DI-047)*
 - Palette ("modern, trustworthy and accessible"): Primary #0D6EFD, #00B8FF, #00D4C4, #0B1324; Neutral #F7F9FC, #E5E7EB, #9CA3AF, #4B5563, #1F2937. *(agreed · Design Vision Book 29 Jul 2026, 08 Design System (p8) - 1. Color Palette · DI-046)*
+- AI Assistant panel: a short framing ("Based on last 30 days, here are 3 actions that can improve your revenue") then actionable recommendations, each with its potential impact (e.g. "Increase pricing for VIP seats, +12%") and a chevron, plus "View all recommendations". *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - AI Panels · DI-043)*
 - Chart cards: title with period dropdown ("This Week"), headline metrics with deltas (Tickets Sold 12,840 +8.7%, Visitors, Conversion). Data visualisations must be easy to read. *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - Charts · DI-041)*
 - Tables: titled card with "View all", columns (e.g. Order ID, Customer, Amount, Status), coloured status badges (Paid, Pending, Refunded) and pagination with "Showing 1 to 5 of 245" and page numbers. *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - Tables · DI-039)*
 - Primary button spec: height 40px, padding 12px 24px, radius 8px, Inter 14 Semibold, colour #0D6EFD, width auto. *(agreed · Design Vision Book 29 Jul 2026, 09 Deliverables (p9) - Developer Handoff preview · DI-037)*
+- Back-office shell: collapsible left sidebar with Overview, Events, Tickets, Orders, Customers, Memberships, Access Control, POS, Reports, Analytics, AI Assistant, Settings, and the signed-in user (name, role) at the bottom; top bar with global search (Cmd+K), current time and date, Notifications with unread dot, and user menu. *(agreed · Design Vision Book 29 Jul 2026, 04 Dashboard Vision (p4) - navigation shell · DI-030)*
 - Dynamic KPIs, forecasts and real-time insights; role-based dashboards, preferences and smart shortcuts for every user (e.g. greeting "Good morning, Ahmed" on the home screen, p2). *(agreed · Design Vision Book 29 Jul 2026, 03 Visual Direction (p3) - Smarter Data / Personalized Experience · DI-028)*
+- Reports and historical searches must still retrieve archived transactions when required; the retention period (e.g. keep 3 of 5+ years live) is configurable per customer, archival manual or automated. *(agreed · MoM 28 Jul 2026, 23. Database Optimisation and Archiving · DI-018)*
+- Back-office controls for the waiting room: configurable maximum active users and admission intervals, set per customer and venue. *(agreed · MoM 28 Jul 2026, 19. Auto-scaling and Virtual Waiting Room · DI-017)*
 
 **6 more name particular screens** and are in each screen's block above (*Client meeting inputs*).
 
@@ -1723,10 +1934,10 @@ Method, path, parameters, request and response for every operation these screens
 {
 "listChannelCustomerSegment": {"method":"GET","path":"/channel-customer-segment","contract":"catalogue","summary":"Channel, Customer Segment & Location Dynamic Rules","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"dimension","in":"query","required":false},{"name":"strategyId","in":"query","required":false},{"name":"channel","in":"query","required":false},{"name":"customerSegment","in":"query","required":false},{"name":"locationLevel","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listDynamicPriceBand": {"method":"GET","path":"/dynamic-price-band","contract":"catalogue","summary":"Dynamic Price Bands, Ladders & Adjustment Matrix","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"strategyId","in":"query","required":false},{"name":"adjustmentModel","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
+"listDynamicPriceRules": {"method":"GET","path":"/pricing/dynamic-rules","contract":"catalogue","summary":"Dynamic pricing rules","permission":"PRICE_VIEW","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"PricingDynamicPriceRule"},
 "listDynamicPricingAutomation": {"method":"GET","path":"/dynamic-pricing-automation","contract":"catalogue","summary":"Dynamic Pricing Automation Policy & Control","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"scopeLevel","in":"query","required":false},{"name":"automationMode","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listDynamicPricingGuardrail": {"method":"GET","path":"/dynamic-pricing-guardrail","contract":"catalogue","summary":"Dynamic Pricing Guardrails & Commercial Protection","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"scopeLevel","in":"query","required":false},{"name":"scopeId","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listDynamicPricingStrategy": {"method":"GET","path":"/dynamic-pricing-strategy","contract":"catalogue","summary":"Dynamic Pricing Strategy Command Center","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"strategyType","in":"query","required":false},{"name":"status","in":"query","required":false},{"name":"automationMode","in":"query","required":false},{"name":"venue","in":"query","required":false},{"name":"search","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
-"listRulePriorityConflict": {"method":"GET","path":"/rule-priority-conflict","contract":"catalogue","summary":"Rule Priority, Conflict Resolution & Dynamic Pricing Test Console","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"caseType","in":"query","required":false},{"name":"conflictCode","in":"query","required":false},{"name":"strategyId","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listSeasonalCalendarDay": {"method":"GET","path":"/seasonal-calendar-day","contract":"catalogue","summary":"Seasonal, Calendar, Day & Timeslot Dynamic Rules","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"dimension","in":"query","required":false},{"name":"strategyId","in":"query","required":false},{"name":"season","in":"query","required":false},{"name":"from","in":"query","required":false},{"name":"to","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "setBookingVelocityTime": {"method":"PUT","path":"/booking-velocity-time","contract":"catalogue","summary":"Booking Velocity & Time-to-Event Rule Builder","permission":"PRODUCT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"BookingVelocityTimeToEventRuleBuilderInput","responds":"BookingVelocityTimeToEventRuleBuilderView"},
 "setDemandOccupancyAvailability": {"method":"PUT","path":"/demand-occupancy-availability","contract":"catalogue","summary":"Demand, Occupancy & Availability Rule Builder","permission":"PRODUCT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"DemandOccupancyAvailabilityRuleBuilderInput","responds":"DemandOccupancyAvailabilityRuleBuilderView"},
@@ -1734,7 +1945,6 @@ Method, path, parameters, request and response for every operation these screens
 "setDynamicPricingGuardrailPolicy": {"method":"PUT","path":"/dynamic-pricing-controls","contract":"catalogue","summary":"Set the guardrails and automation level of dynamic pricing at one scope","permission":"PRICE_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"DynamicPricingControl","responds":"DynamicPricingControl"},
 "setDynamicPricingStrategy": {"method":"PUT","path":"/dynamic-pricing-strategy-2","contract":"catalogue","summary":"Dynamic Pricing Strategy Builder","permission":"PRODUCT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"DynamicPricingStrategyBuilderInput","responds":"DynamicPricingStrategyBuilderView"},
 "setPriceLadderMatrix": {"method":"PUT","path":"/dynamic-pricing-strategies/{strategyId}/price-ladder","contract":"catalogue","summary":"Set a strategy's price ladder","permission":"PRICE_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"PriceLadder","responds":"PriceLadder"},
-"setRulePriorityConflict": {"method":"PUT","path":"/rule-priority-conflict","contract":"catalogue","summary":"Reorder, validate, test or save the pricing rule priority","permission":"PRODUCT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"RulePriorityConflictInput","responds":"RulePriorityConflictView"},
 "transitionDynamicPricingStrategy": {"method":"POST","path":"/dynamic-pricing-strategies/{strategyId}/lifecycle","contract":"catalogue","summary":"Activate, pause, resume or retire a dynamic pricing strategy","permission":"PRICE_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"DynamicPricingStrategy"}
 }
 ```
@@ -1762,11 +1972,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "DynamicPricingStrategyCommandCenterView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over catalogue state, assembled at read time from tables that already exist","description":"**What Dynamic Pricing Strategy Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"strategyId":{"type":"string","description":"Strategy ID"},"strategyName":{"type":"string","description":"Strategy Name"},"strategyType":{"type":"string","enum":["demandBased","occupancyBased","availabilityBased","inventoryBased","bookingVelocity","timeToEvent","seasonal","dayOfWeek","timeslot","channel","segment","location","hybrid"],"description":"Strategy Type (pack pp.75-76)"},"productEvent":{"type":"string","description":"Product or event the strategy controls"},"venue":{"type":"string","description":"Venue"},"basePriceSource":{"type":"string","description":"Base price source: the Board 1 price list and rate the strategy moves from, e.g. UAE Standard Admission -> Adult"},"currentPrice":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"description":"Current resolved dynamic price (for a single-price scope)","nullable":true},"adjustmentRange":{"type":"object","properties":{"minPercent":{"type":"number","description":"Lowest adjustment from base, percent"},"maxPercent":{"type":"number","description":"Highest adjustment from base, percent"}},"description":"Adjustment range allowed by the strategy"},"ruleCount":{"type":"integer","description":"Rule Count"},"effectivePeriod":{"type":"object","properties":{"from":{"type":"string","format":"date-time","description":"Effective from"},"to":{"type":"string","format":"date-time","description":"Effective to; empty for open-ended","nullable":true}},"description":"Effective period"},"automationMode":{"type":"string","enum":["monitor","recommend","prepareChange","autoExecuteWithinGuardrails"],"description":"Automation mode from the automation policy (listDynamicPricingAutomation); recommend by default"},"status":{"type":"string","description":"Status: draft, testing, ready, scheduled, active, paused, frozen, expired or retired"},"owner":{"type":"string","description":"Owner"}}},
 "Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}},
 "PriceLadder": {"type":"object","x-ticvai-persistence":"catalogue.price_ladder","description":"**The bands a dynamic price may move between, and how fast** (29 September, data model DM3). ADM-092. A strategy's adjustment lands on a band, never between them.","required":["id","scopePath","dynamicPricingStrategyId","adjustmentModel"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005). Operations write it at `venue` scope."},"dynamicPricingStrategyId":{"type":"string","format":"uuid"},"basePriceSource":{"type":"string","maxLength":100,"nullable":true},"adjustmentModel":{"type":"string","enum":["fixedPriceBands","percentageBands","fixedAmountSteps","derivedBands","continuousRange"]},"bands":{"type":"object","additionalProperties":true,"description":"`[{code, price, percent}]`, ascending."},"baseBandCode":{"type":"string","maxLength":40,"nullable":true},"stepAmount":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"nullable":true},"minimumPrice":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"nullable":true},"basePrice":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"nullable":true},"maximumPrice":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"nullable":true},"allowUpward":{"type":"boolean","default":true},"allowDownward":{"type":"boolean","default":true},"maxIncreasePercentPerAdjustment":{"type":"number","nullable":true},"maxDecreasePercentPerAdjustment":{"type":"number","nullable":true},"maximumBandsPerMovement":{"type":"integer","nullable":true,"minimum":1},"minimumMinutesBetweenMovements":{"type":"integer","nullable":true,"minimum":0},"cooldownMinutes":{"type":"integer","nullable":true,"minimum":0},"reversalRule":{"type":"string","enum":["allowed","afterCooldown","notAllowed"],"default":"afterCooldown"},"allowedEndpoints":{"type":"array","items":{"type":"string"},"description":"Psychological price endings, e.g. `.99`, `.00`."},"createdAt":{"type":"string","format":"date-time","readOnly":true},"updatedAt":{"type":"string","format":"date-time","readOnly":true}}},
-"RulePriorityConflictInput": {"type":"object","x-ticvai-persistence":"none — request only; the saved hierarchy and test cases are the rows listRulePriorityConflict reads","description":"What `setRulePriorityConflict` takes (decided 29 September, readiness close-out; VM close-out for BO-441 Reorder, Validate, Test, Save).","required":["mode"],"properties":{"orderedRuleIds":{"type":"array","description":"The rules in priority order, highest first. Reorder is this list.","items":{"type":"string"}},"resolutionMethod":{"type":"string","enum":["highestPriorityWins","mostSpecificRuleWins","cumulativeAdjustment","maximumAdjustmentWins","minimumAdjustmentWins","weightedCombination","stopProcessing","customGovernedResolution"],"default":"highestPriorityWins","description":"How two applicable rules are resolved; the same vocabulary as `RulePriorityConflictResolutionDynamicPricingTestConsSummary.resolutionMethod`. Never lowest-price-wins by default (decided 29 September, readiness close-out)."},"priorityHierarchy":{"type":"array","description":"The priority matrix, highest first; defaults to the pack's order.","items":{"type":"string","enum":["commercialProtection","contractMemberProtection","eventSpecificStrategy","inventoryOccupancy","bookingVelocity","timeToEvent","seasonDayTimeslot","basePrice"]}},"mode":{"type":"string","enum":["save","validate","test"],"description":"`validate` checks the order and returns conflicts without saving; `test` runs `testScenario` against the order and saves it as a test case; `save` stores the order and method, refused with `409` while a critical conflict is open."},"testScenario":{"$ref":"#/components/schemas/RulePriorityTestScenario"}}},
-"RulePriorityConflictResolutionDynamicPricingTestConsSummary": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection; the headline tiles over the list, computed at read time for the filters in force","description":"**The headline figures on Rule Priority, Conflict Resolution & Dynamic Pricing Test Console.** The pack's KPI cards, split out of the row (decided 29 September, readiness close-out): a count describes the list, not each item in it.","properties":{"contradictoryRules":{"type":"integer","description":"Open contradictoryRules conflicts detected across active and draft rules"},"samePriority":{"type":"integer","description":"Open samePriority conflicts detected across active and draft rules"},"impossibleCondition":{"type":"integer","description":"Open impossibleCondition conflicts detected across active and draft rules"},"overlappingStrategy":{"type":"integer","description":"Open overlappingStrategy conflicts detected across active and draft rules"},"circularDependency":{"type":"integer","description":"Open circularDependency conflicts detected across active and draft rules"},"missingFallback":{"type":"integer","description":"Open missingFallback conflicts detected across active and draft rules"},"guardrailConflict":{"type":"integer","description":"Open guardrailConflict conflicts detected across active and draft rules"},"resolutionMethod":{"type":"string","enum":["highestPriorityWins","mostSpecificRuleWins","cumulativeAdjustment","maximumAdjustmentWins","minimumAdjustmentWins","weightedCombination","stopProcessing","customGovernedResolution"],"description":"Resolution Method in force (pack p.89); defaults to highestPriorityWins (decided 29 September, readiness close-out)"},"priorityHierarchy":{"type":"array","items":{"type":"string","enum":["commercialProtection","contractMemberProtection","eventSpecificStrategy","inventoryOccupancy","bookingVelocity","timeToEvent","seasonDayTimeslot","basePrice"]},"description":"Priority Matrix, highest first; defaults to the pack's order (decided 29 September, readiness close-out)"}}},
-"RulePriorityConflictResolutionDynamicPricingTestConsView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over catalogue state, assembled at read time from tables that already exist","description":"**What Rule Priority, Conflict Resolution & Dynamic Pricing Test Console displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"product":{"type":"string","description":"Test input: product"},"event":{"type":"string","description":"Test input: event","nullable":true},"performance":{"type":"string","description":"Test input: performance","nullable":true},"date":{"type":"string","format":"date","description":"Test input: visit/event date"},"timeslot":{"type":"string","description":"Test input: timeslot","nullable":true},"channel":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/SalesChannel"}],"description":"Test input: channel"},"customerSegment":{"type":"string","description":"Test input: customer segment"},"basePrice":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"description":"Test input: base price"},"occupancy":{"type":"number","description":"Test input: occupancy percent"},"inventory":{"type":"integer","description":"Test input: remaining inventory"},"bookingVelocity":{"type":"number","description":"Test input: booking velocity, percent against expected pace"},"timeToEvent":{"type":"integer","description":"Test input: days to event (0 = same day)"},"calculationPath":{"type":"array","items":{"type":"string"},"description":"Explainability: the complete calculation path, one step per line"},"testCaseId":{"type":"string","description":"Test case ID"},"caseName":{"type":"string","description":"Test case name"},"caseType":{"type":"string","enum":["lowDemand","highDemand","nearSellOut","earlyBird","lastMinute","weekendPeak","memberPurchase","b2bContract","custom"],"description":"Test case type (pack p.91)"},"rulesMatched":{"type":"array","items":{"type":"object","properties":{"ruleId":{"type":"string","description":"Rule"},"ruleName":{"type":"string","description":"Rule name"},"priorityLevel":{"type":"string","enum":["commercialProtection","contractMemberProtection","eventSpecificStrategy","inventoryOccupancy","bookingVelocity","timeToEvent","seasonDayTimeslot","basePrice"],"description":"Hierarchy level"},"adjustmentPercent":{"type":"number","description":"Adjustment in percent","nullable":true},"applied":{"type":"boolean","description":"Applied after resolution"}},"description":"One matched rule"},"description":"Rules matched"},"rawCalculatedPrice":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"description":"Raw calculated price"},"ladderPrice":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"description":"Nearest allowed band"},"guardrailOutcome":{"type":"string","enum":["passed","cappedAtMaximum","raisedToMinimum","protectedRateApplied"],"description":"Guardrail result"},"finalPrice":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"description":"Final dynamic price"},"conflicts":{"type":"array","items":{"type":"object","properties":{"code":{"type":"string","enum":["contradictoryRules","samePriority","impossibleCondition","overlappingStrategy","circularDependency","missingFallback","guardrailConflict"],"description":"Conflict type (pack p.90)"},"message":{"type":"string","description":"Message"},"ruleIds":{"type":"array","items":{"type":"string"},"description":"Rules involved"}},"description":"One conflict"},"description":"Conflicts met while resolving this case"},"lastRunAt":{"type":"string","format":"date-time","description":"Last run"},"passed":{"type":"boolean","description":"Final price matched the expected price saved with the case","nullable":true},"expectedPrice":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"description":"Expected final price for regression","nullable":true}}},
-"RulePriorityConflictView": {"type":"object","x-ticvai-persistence":"none — projection over the saved priority order and test cases","description":"What `setRulePriorityConflict` returns: the order in force, the conflicts it has and, in `test` mode, the result.","properties":{"mode":{"type":"string","enum":["save","validate","test"]},"saved":{"type":"boolean"},"orderedRuleIds":{"type":"array","items":{"type":"string"}},"resolutionMethod":{"type":"string"},"priorityHierarchy":{"type":"array","items":{"type":"string"}},"conflicts":{"type":"array","items":{"type":"object","properties":{"code":{"type":"string","enum":["contradictoryRules","samePriority","impossibleCondition","overlappingStrategy","circularDependency","missingFallback","guardrailConflict"]},"severity":{"type":"string","enum":["critical","warning"]},"ruleIds":{"type":"array","items":{"type":"string"}},"message":{"type":"string"}}}},"testResult":{"nullable":true,"allOf":[{"$ref":"#/components/schemas/RulePriorityConflictResolutionDynamicPricingTestConsView"}],"description":"The saved test case with its deterministic result, in `test` mode."},"savedAt":{"type":"string","format":"date-time","nullable":true}}},
-"RulePriorityTestScenario": {"type":"object","description":"A sample booking for the conflict test console (pack p.90), the same inputs as a saved test case.","properties":{"caseName":{"type":"string","maxLength":120},"caseType":{"type":"string","enum":["lowDemand","highDemand","nearSellOut","earlyBird","lastMinute","weekendPeak","memberPurchase","b2bContract","custom"]},"productId":{"type":"string","format":"uuid"},"eventId":{"type":"string","format":"uuid","nullable":true},"performanceId":{"type":"string","format":"uuid","nullable":true},"date":{"type":"string","format":"date"},"timeslot":{"type":"string","nullable":true},"channel":{"$ref":"../shared/common.yaml#/components/schemas/SalesChannel"},"customerSegment":{"type":"string","nullable":true},"basePrice":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"occupancy":{"type":"number","minimum":0,"maximum":100},"inventory":{"type":"integer","minimum":0},"bookingVelocity":{"type":"number"},"timeToEvent":{"type":"integer","minimum":0},"expectedPrice":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"nullable":true}}},
+"PricingDynamicPriceRule": {"type":"object","x-ticvai-persistence":"pricing.dynamic_price_rule","description":"**Taken from the backend workbook, 20 September.** Configurable dynamic pricing component for dynamic price rule.","required":["pricingRuleCode","name","priority","isActive"],"properties":{"id":{"type":"string","format":"uuid"},"pricingRuleCode":{"type":"string","maxLength":100},"name":{"type":"string","maxLength":200},"productId":{"type":"string","format":"uuid","nullable":true},"priceListId":{"type":"string","format":"uuid","nullable":true},"scopePath":{"type":"string","nullable":true},"channelId":{"type":"string","format":"uuid","nullable":true},"priority":{"type":"integer"},"validFrom":{"type":"string","format":"date-time","nullable":true},"validTo":{"type":"string","format":"date-time","nullable":true},"isActive":{"type":"boolean"},"dynamicPricingStrategyId":{"type":"string","format":"uuid","nullable":true,"description":"The `catalogue.dynamic_pricing_strategy` a dynamic rule belongs to (29 September, data model DM3). Null for a static pricing rule."},"ruleType":{"type":"string","maxLength":40,"nullable":true,"description":"Static rules: `PricingRuleCommandCenterView.ruleType`; dynamic rules: the builder's `ruleKind`."},"inputMetric":{"type":"string","maxLength":40,"nullable":true},"conditionLogic":{"type":"string","enum":["all","any"],"default":"all"},"cooldownMinutes":{"type":"integer","nullable":true,"minimum":0},"minimumDurationMinutes":{"type":"integer","nullable":true,"minimum":0},"exitThresholdOffset":{"type":"number","nullable":true},"rangeMinPercent":{"type":"number","nullable":true},"rangeMaxPercent":{"type":"number","nullable":true},"isProtected":{"type":"boolean","default":false,"description":"A protected segment or channel: dynamic adjustments never apply."}}},
 "SeasonalCalendarDayTimeslotDynamicRulesView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over catalogue state, assembled at read time from tables that already exist","description":"**What Seasonal, Calendar, Day & Timeslot Dynamic Rules displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"season":{"type":"string","description":"Season name (e.g. Low Season, Peak Season)","nullable":true},"month":{"type":"integer","description":"Month 1-12","nullable":true},"week":{"type":"integer","description":"ISO week 1-53","nullable":true},"dateRange":{"type":"object","properties":{"from":{"type":"string","format":"date","description":"From"},"to":{"type":"string","format":"date","description":"To"}},"description":"Date range","nullable":true},"daysOfWeek":{"type":"array","items":{"type":"string","enum":["monday","tuesday","wednesday","thursday","friday","saturday","sunday"]},"description":"Days of week; saturday+sunday for weekend"},"timeOfDay":{"type":"object","properties":{"from":{"type":"string","description":"From, HH:mm"},"to":{"type":"string","description":"To, HH:mm"}},"description":"Time-of-day window","nullable":true},"timeslotIds":{"type":"array","items":{"type":"string"},"description":"Timeslot IDs"},"performanceIds":{"type":"array","items":{"type":"string"},"description":"Performance IDs"},"specialCalendarEntry":{"type":"string","description":"Special-calendar entry (public/school holiday, Ramadan, Eid, custom), maintained as tenant data","nullable":true},"ruleId":{"type":"string","description":"Rule ID"},"ruleName":{"type":"string","description":"Rule name"},"strategyId":{"type":"string","description":"Strategy the rule belongs to"},"dimension":{"type":"string","enum":["season","month","week","dateRange","publicHoliday","schoolHoliday","dayOfWeek","weekend","timeOfDay","timeslot","performance","specialDate"],"description":"Supported Dimension (pack p.81)"},"dynamicRangeMinPercent":{"type":"number","description":"Dynamic range low end in percent of base, e.g. -15"},"dynamicRangeMaxPercent":{"type":"number","description":"Dynamic range high end in percent of base, e.g. +20"},"assignedStrategyId":{"type":"string","description":"Strategy applied in this window (Timeslot Rules: 09:00-12:00 -> Off-Peak Strategy)","nullable":true},"overlapsWith":{"type":"array","items":{"type":"string"},"description":"Rule IDs this rule overlaps (Overlap Detection)"},"enabled":{"type":"boolean","description":"Enabled"}}}
 }
 ```

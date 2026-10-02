@@ -35,7 +35,7 @@ steps:
   screen: WEB-001
   action: Lands and orients
   operations:
-  - getTenantConfig
+  - getPublishedTenantConfig
   - getTenantAppStatus
   - listProducts
   outcome: Sees what is on, in the tenant's branding
@@ -77,7 +77,7 @@ steps:
   screen: WEB-011
   action: Answers attendee forms and consent, only where the cart needs them
   operations:
-  - getGuestProfile
+  - getMyProfile
   - listConsentPurposes
   outcome: 'Marketing consent unticked by default. Transactional consent presented as required for service,
     not as a choice dressed up as one. **Skipped for a guest who proved the contact with the code, or is

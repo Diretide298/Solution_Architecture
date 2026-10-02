@@ -5,8 +5,8 @@
 | | |
 |---|---|
 | Screens | 24 |
-| Operations | 14 |
-| Contracts | 4 |
+| Operations | 12 |
+| Contracts | 3 |
 | Modules | 3 |
 | Undrawn | 0 |
 | Operations with no screen | 0 |
@@ -28,11 +28,11 @@
 
 | | Name | Module | Wave | Ops | Drawn |
 |---|---|---|---|---|---|
-| `SGN-001` | Welcome & Start Your TICVAI Journey | Onboarding & Assessment | 3 | 1 | yes |
-| `SGN-002` | Customer & Organization Registration | Onboarding & Assessment | 3 | 1 | yes |
+| `SGN-001` | Welcome & Start Your TICVAI Journey | Onboarding & Assessment | 3 | 0 | yes |
+| `SGN-002` | Customer & Organization Registration | Onboarding & Assessment | 3 | 3 | yes |
 | `SGN-003` | Venue Type & Business Profile | Onboarding & Assessment | 3 | 1 | yes |
 | `SGN-004` | Visitor, Capacity & Operational Scale | Onboarding & Assessment | 3 | 1 | yes |
-| `SGN-005` | Sales Channel Assessment | Onboarding & Assessment | 3 | 2 | yes |
+| `SGN-005` | Sales Channel Assessment | Onboarding & Assessment | 3 | 1 | yes |
 | `SGN-006` | Ticketing & Product Requirements | Onboarding & Assessment | 3 | 1 | yes |
 | `SGN-007` | Access, Queue & Visitor Experience Assessment | Onboarding & Assessment | 3 | 1 | yes |
 | `SGN-008` | Additional Business Module Assessment | Onboarding & Assessment | 3 | 2 | yes |
@@ -43,9 +43,9 @@
 | `SGN-013` | Module Marketplace | Package Builder | 3 | 1 | yes |
 | `SGN-014` | AI Module & Package Recommendations | Package Builder | 3 | 1 | yes |
 | `SGN-015` | Module Detail & Commercial Treatment | Package Builder | 3 | 1 | yes |
-| `SGN-016` | Module Dependency & Compatibility Manager | Package Builder | 3 | 2 | yes |
+| `SGN-016` | Module Dependency & Compatibility Manager | Package Builder | 3 | 1 | yes |
 | `SGN-017` | Add-Ons, Capacity & Commercial Options | Package Builder | 3 | 1 | yes |
-| `SGN-018` | Purchase / Trial Journey Selection | Purchase & Activation | 3 | 1 | yes |
+| `SGN-018` | Purchase / Trial Journey Selection | Purchase & Activation | 3 | 0 | yes |
 | `SGN-019` | Contract & Billing Cycle Selection | Purchase & Activation | 3 | 1 | yes |
 | `SGN-020` | Billing & Legal Entity Information | Purchase & Activation | 3 | 1 | yes |
 | `SGN-021` | Payment Method & Settlement Setup | Purchase & Activation | 3 | 1 | yes |

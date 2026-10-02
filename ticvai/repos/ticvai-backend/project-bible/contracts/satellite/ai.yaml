@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI — AI
   version: 1.0.0
-  x-ticvai-screen-count: 128
+  x-ticvai-screen-count: 130
   x-ticvai-module: 8 — Unified Operations Dashboard (AI)
   x-ticvai-platforms:
   - P01 Guest Web
@@ -189,6 +189,46 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TranslationProposals'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /ai/translate/{translationJobId}:
+    parameters:
+    - name: translationJobId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    get:
+      operationId: getTranslationProposals
+      x-ticvai-consumed-by:
+        - "P13 CMS-011 Translations"
+      x-ticvai-agreed: '2 October: contract gap CHG-WIR-017 (CMS-011: no read follows a proposeTranslations job, which
+        answers 202); shape follows proposeTranslations'
+      summary: Follow a translation job
+      description: 'The drafts a `proposeTranslations` job has written so far, and whether it has finished (contract gap
+        logged in CHG-WIR-017 for CMS-011; built in CHG-CSA-045). The CMS polls it after the 202 to offer machine
+        translation as a first pass for review (DI-081, DI-083); nothing is published from here.
+
+        '
+      tags:
+      - ai
+      x-ticvai-permission: TENANT_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: primary
+      responses:
+        '200':
+          description: The job and its drafts
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TranslationProposals'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /ai/content-drafts:
@@ -464,19 +504,19 @@ paths:
         - "P02 GST-031 AI Concierge – Home"
         - "P02 GST-054 AI Planner"
         - "P06 EMP-031 Queue monitor"
+        - "P08 ADM-047 AI Delivery Optimization & Communication Platform Diagnostics"
         - "P08 BO-005 Queue Monitor"
-        - "P08 BO-115 Category, Brand & Merchandise Hierarchy"
-        - "P08 BO-117 Product Import, Governance & AI Configuration Assistant"
-        - "P08 BO-138 Production Execution & Batch Management"
         - "P08 BO-139 Wastage, Spoilage, Returns & Write-Off"
         - "P08 BO-772 A/B & AI Optimization"
         - "P08 BO-782 AI Journey Optimization"
         - "P08 BO-925 AI Staff Recommendation & Workforce Matching"
-        - "P09 ADM-047 AI Delivery Optimization & Communication Platform Diagnostics"
         - "P09 ADM-511 Attraction Utilization & Queue Forecast"
         - "P16 ANL-001 Executive Command Center"
         - "P16 ANL-006 Inventory & Waste Intelligence"
         - "P16 ANL-010 Suggestions & Advice"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       summary: Ask for an answer, however it is currently produced
       description: '**One operation for thirteen questions, and the reason is the swap.** The client F&B
         boards drew six of these as their own endpoints — `suggestPrice`, `suggestRequisition`, `suggestReplenishment`,
@@ -1083,6 +1123,14 @@ paths:
         once; what is stored is a `credentialRef`, and every read of this provider thereafter returns
         the reference rather than the value.
 
+        **Stored correctly, whatever the provider** (Chinmay, 2 October, contract follow-ups; CHG-FUP-008). The key
+        becomes one secret per tenant and provider in the cell''s Azure Key Vault (the tenant''s own secret, never
+        shared between tenants), encrypted at rest under the vault''s HSM-backed key; only the AI gateway''s workload
+        identity may read it. It is write-only: never returned, never shown again, never logged, never in an audit
+        record or an `ai.interaction`; a reader sees `credentialHint` (the last four characters) and
+        `credentialRotatedAt`. A new key resets `AiProvider.compatibility` to `notTested`; an active provider keeps
+        serving on the previous key through the grace window while `testAiProvider` re-runs.
+
         **No surface ever holds a provider key.** A kiosk, an app and a browser all call TICVAI, and TICVAI
         calls the provider — because a token that reaches a client is a token that bills the tenant from
         somebody else''s machine.
@@ -1170,6 +1218,12 @@ paths:
       summary: Check the key works before anyone relies on it
       description: 'A minimal call against the provider, using the stored credential.
 
+        **And the compatibility test before activation** (Chinmay, 2 October, contract follow-ups; CHG-FUP-008). For a
+        tenant-managed provider the call also runs the probes of `AiProviderCompatibility` for each task it would
+        serve (or the `taskKeys` sent), against the vendor''s equivalent model the curated task-to-tier map picks,
+        and stores the result on `AiProvider.compatibility`. `setAiProvider` activates a tenant-managed provider only
+        after a pass. A TICVAI-managed provider runs the minimal call only.
+
         **Run before activating and on a schedule after.** A key that lapses silently takes the assistant
         down with no error anyone reads — the failure surfaces as an assistant that stopped answering,
         which is diagnosed slowly.
@@ -1186,6 +1240,18 @@ paths:
       x-ticvai-conflict-policy: serverWins
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                taskKeys:
+                  type: array
+                  items:
+                    type: string
+                  description: The tasks to test; absent, every task the provider would serve.
       responses:
         '200':
           headers:
@@ -1216,6 +1282,8 @@ paths:
                   verifiedAt:
                     type: string
                     format: date-time
+                  compatibility:
+                    $ref: '#/components/schemas/AiProviderCompatibility'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /conversations:
@@ -1223,10 +1291,14 @@ paths:
       operationId: listAiConversations
       x-ticvai-consumed-by:
         - "P01 WEB-044 AI Concierge – Home"
+        - "P02 GST-031 AI Concierge – Home"
         - "P02 GST-068 Help & My Cases"
         - "P06 EMP-019 AI assistant — home"
         - "P06 EMP-020 AI assistant — answer"
         - "P08 BO-932 Conversational AI Resource Copilot"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-audience:
       - staff
       - guest
@@ -1268,12 +1340,17 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-044 AI Concierge – Home"
         - "P02 GST-031 AI Concierge – Home"
+        - "P02 GST-033 AI Concierge – Contextual Help"
         - "P02 GST-054 AI Planner"
+        - "P05 KSK-015 Assistant"
         - "P06 EMP-019 AI assistant — home"
         - "P06 EMP-020 AI assistant — answer"
         - "P08 BO-928 AI Conflict Resolution Assistant"
         - "P08 BO-932 Conversational AI Resource Copilot"
         - "P13 CMS-104 App Build & Store Publishing"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-audience:
       - staff
       - guest
@@ -1354,6 +1431,9 @@ paths:
         - "P08 BO-932 Conversational AI Resource Copilot"
         - "P09 ADM-533 Human Review, Challenge & AI Clarification Workspace"
         - "P13 CMS-104 App Build & Store Publishing"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-audience:
       - staff
       - guest
@@ -1372,6 +1452,13 @@ paths:
         **Where the answer proposes an action, it is a draft.** The response carries a `proposedAction`
         the caller may apply through the owning contract, and applying it is a separate, permissioned,
         audited step (8.3.61–8.3.64).
+
+        **Every message is scrubbed before it leaves the cell** (Chinmay, 2 October; ADR-0020 amended;
+        CHG-CSA-003): the offline scrubber replaces personal data with reversible placeholders, the guard model
+        checks the input and the reply, and the reply is re-filled in the cell (`AiPolicy.scrubbing`). It
+        applies whatever the tenant''s residency class. With the scrubber or the guard down the call is refused
+        `503 scrubber-unavailable`, never sent raw; a message or reply the guard blocks is refused
+        `422 guard-refused`.
 
         '
       tags:
@@ -1436,7 +1523,22 @@ paths:
           description: 'Every configured provider failed. **Reported rather than retried indefinitely**
             — an assistant that hangs is worse than one that says it cannot answer.
 
+            Also `scrubber-unavailable`: the offline PII scrubber or the guard model is down, so the call fails
+            closed rather than sending an unscrubbed prompt (CHG-CSA-003).
+
             '
+          x-ticvai-problem-types:
+          - provider-unavailable
+          - scrubber-unavailable
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '422':
+          description: The guard model blocked the message or the reply (`guard-refused`, CHG-CSA-003). Nothing
+            unsafe is returned; the refusal is logged with the decision record.
+          x-ticvai-problem-types:
+          - guard-refused
           content:
             application/problem+json:
               schema:
@@ -1447,6 +1549,7 @@ paths:
       x-ticvai-consumed-by:
         - "P06 EMP-040 Knowledge base"
         - "P06 EMP-041 Training"
+        - "P12 SUP-006 Knowledge Base Search"
         - "P13 CMS-010 Media Library"
         - "P13 CMS-062 Central Digital Asset Library"
       x-ticvai-audience:
@@ -1527,7 +1630,7 @@ paths:
     get:
       operationId: listKnowledgeCollections
       x-ticvai-consumed-by:
-        - "P12 SUP-006 Knowledge Base Search"
+        - "P08 BO-798 Intent & Knowledge Management"
       x-ticvai-audience:
       - staff
       summary: Collections available to this tenant
@@ -1601,6 +1704,8 @@ paths:
         format: uuid
     post:
       operationId: ingestKnowledgeDocument
+      x-ticvai-consumed-by:
+        - "P08 BO-798 Intent & Knowledge Management"
       x-ticvai-audience:
       - staff
       summary: Add a document
@@ -1817,6 +1922,8 @@ paths:
       operationId: listAiInteractions
       x-ticvai-consumed-by:
         - "P09 ADM-004 Platform Audit Log"
+        - "P16 ANL-059 AI Insight History, Evidence & Explainability"
+        - "P16 ANL-070 Analytics Governance, Security & Audit Center"
       x-ticvai-audience:
       - staff
       summary: Every prompt, response and action
@@ -1931,6 +2038,7 @@ paths:
     post:
       operationId: decideProposedAction
       x-ticvai-consumed-by:
+        - "P08 BO-598 AI Draft Review & Approval"
         - "P08 BO-762 Predictive Audiences"
         - "P08 BO-793 AI Content, Translation & Audit"
         - "P08 BO-928 AI Conflict Resolution Assistant"
@@ -2054,6 +2162,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-091 AI Policy & Spend"
         - "P09 ADM-549 AI Governance Monitoring Command Center"
+        - "P16 ANL-070 Analytics Governance, Security & Audit Center"
       x-ticvai-audience:
       - staff
       summary: Usage, cost and performance
@@ -2067,6 +2176,10 @@ paths:
         projection is returned in `forecast`, labelled a forecast, beside the actual spend and never
         mixed into it. Tokens on TICVAI-managed providers are re-billed per token through
         `subscription.settleAiUsage` (decision 2); on a tenant''s own key they are metered for visibility.
+
+        **Money in the tenant''s selected currency, tokens alongside** (Chinmay, 2 October, workbook Q8;
+        CHG-CSA-004). Every cost and the spend ceiling are reported in the tenant''s selected currency (USD by
+        default), with the token counts beside them, never instead of them.
 
         '
       tags:
@@ -2185,8 +2298,34 @@ paths:
 
         **Per agent task, and checked for fitness** (21 September minutes, M21-03 and M21-09). `taskKeys`
         binds the provider to named agent tasks; the response carries `fitnessWarnings` where the model scores
-        outside a task''s band in `AiModel.taskFitness` (underpowered, overpowered or never scored). A warning
-        is shown and kept; it never refuses the write.
+        outside a task''s band in `AiModel.taskFitness` (underpowered, overpowered or never scored).
+
+        **The client cannot change the model; TICVAI curates it** (Chinmay, 2 October, workbook Q2; amends AI-D18
+        "warns, never blocks"; CHG-CSA-001). A cheaper model picked because it is cheap breaks the AI functions,
+        so a `modelId` that is not in TICVAI''s curated range for every task in `taskKeys`
+        (`AiModel.curatedRange`) is refused `422 model-not-curated`, whoever writes it.
+
+        **Bring-your-own-key maps each task to the provider''s equivalent** (Chinmay, 2 October, workbook Q1;
+        closes AI-D20; CHG-CSA-001). With BYOK the tenant names its provider and key; the gateway assigns, per
+        task, that provider''s model from the curated range at the tier the task needs (Small, Strong, Reasoning;
+        `AiByokEnablement.taskModelMap`). Usage is billed to the tenant''s own key. Platform-owned models
+        (embeddings, reranking, moderation, PII detection, OCR, speech) are never BYOK.
+
+        **Any provider, as long as there is an API key** (Chinmay, 2 October, contract follow-ups: "As long as we get
+        an API key it can be any model; we just need to store it correctly"; CHG-FUP-008). A tenant-managed provider
+        names its company in `vendor` (any provider: `mistral`, `cohere`, `deepseek` ...) and is reached through a
+        native adapter (`kind` `openai`, `gemini`, `anthropic` or `azureOpenai`) or, for every other vendor, through
+        `openaiCompatible` with the vendor''s `endpoint`. A vendor that offers neither is refused
+        `422 provider-protocol-unsupported`. The key goes in through `setAiCredential` only (a per-tenant Key Vault
+        secret, write-only). The curated task-to-tier map then picks that vendor''s equivalent model per task
+        (`AiModel.vendor`, `AiModel.curatedRange`), and **a tenant-managed provider is activated only after a
+        compatibility test passes** (`testAiProvider`, `AiProvider.compatibility`): `isActive: true` before then is
+        refused `409 compatibility-test-required`. A task whose test fails stays on the TICVAI-managed model.
+
+        **Residency class** (Chinmay, 2 October: the AI residency decision; CHG-CSA-002). A provider whose
+        `residencyClasses` does not include the tenant''s class is refused `409 residency-class-refused`; BYOK fits
+        the `globalAllowed` class only, because a tenant key outside OpenAI UAE is a cross-border transfer
+        (ADR-0009 section 3).
 
         '
       tags:
@@ -2234,10 +2373,25 @@ paths:
         '409':
           description: The provider's `residency` is not in the tenant's region's `allowedAiResidencies`
             (`residency-refused`, audit R203), or it is tenant-managed (`managedBy` is `tenant`) and bring-your-own-key is not
-            enabled for the tenant (`byok-not-enabled`, decided 29 September).
+            enabled for the tenant (`byok-not-enabled`, decided 29 September), or its `residencyClasses` does not
+            include the tenant's AI residency class (`residency-class-refused`, CHG-CSA-002), or it is tenant-managed,
+            `isActive` is true and its compatibility test has not passed (`compatibility-test-required`, CHG-FUP-008).
           x-ticvai-problem-types:
           - residency-refused
           - byok-not-enabled
+          - residency-class-refused
+          - compatibility-test-required
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '422':
+          description: The `modelId` is outside TICVAI's curated range for a task in `taskKeys` (`model-not-curated`,
+            CHG-CSA-001), or a tenant-managed provider's `kind` is neither a native adapter nor `openaiCompatible` with
+            an `endpoint` (`provider-protocol-unsupported`, CHG-FUP-008).
+          x-ticvai-problem-types:
+          - model-not-curated
+          - provider-protocol-unsupported
           content:
             application/problem+json:
               schema:
@@ -2364,6 +2518,83 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AiPolicy'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /policy/spend-ceiling:
+    get:
+      operationId: getAiSpendCeiling
+      x-ticvai-consumed-by:
+        - "P08 BO-091 AI Policy & Spend"
+      x-ticvai-audience:
+      - staff
+      x-ticvai-read-routing: replica
+      x-ticvai-agreed: '2 October: Chinmay, workbook Q8 (BO-091): the ceiling in the tenant''s selected currency,
+        default USD, with tokens; shape follows getAiPolicy'
+      summary: The AI spend ceiling, in money
+      description: 'The ceiling in force at the caller''s scope, resolved nearest ancestor first as `getAiPolicy`
+        is (CHG-CSA-004), with its token equivalent.
+
+        '
+      tags:
+      - config
+      x-ticvai-permission: AI_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: The ceiling
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AiSpendCeiling'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+    put:
+      operationId: setAiSpendCeiling
+      x-ticvai-consumed-by:
+        - "P08 BO-091 AI Policy & Spend"
+      x-ticvai-audience:
+      - staff
+      x-ticvai-agreed: '2 October: Chinmay, workbook Q8 (BO-091); shape follows setAiPolicy'
+      summary: Set the AI spend ceiling, in money
+      description: '**The AI spend ceiling is shown and set in the tenant''s selected currency (USD by default), with
+        tokens shown alongside** (Chinmay, 2 October, workbook Q8; CHG-CSA-004). `spend.currency` must be the
+        tenant''s selected currency, or 400. The token equivalent at the current blended rate is returned beside it,
+        and `AiPolicy.monthlyTokenCeiling` stays the token limit. Where both are set, the first reached applies the
+        policy''s `ceilingBehaviour` (warn by default). A venue may narrow the tenant''s ceiling and never raise it,
+        as with `setAiPolicy`. A separate operation so the policy body is unchanged for clients built at r1.
+
+        '
+      tags:
+      - config
+      x-ticvai-permission: AI_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: One row per scope node, the caller's tenant or venue as for `setAiPolicy`; there is no
+        key in the path.
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AiSpendCeiling'
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Saved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AiSpendCeiling'
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /index-sources:
@@ -2581,8 +2812,6 @@ paths:
   /index-jobs:
     get:
       operationId: listIndexJobs
-      x-ticvai-consumed-by:
-        - "P08 BO-088 Approval Analytics"
       x-ticvai-audience:
       - staff
       summary: Indexing in flight and recently finished
@@ -2668,6 +2897,7 @@ paths:
         - "P09 ADM-520 AI Capability Registry & Ownership"
         - "P09 ADM-521 AI Risk Classification & Assessment"
         - "P09 ADM-522 AI Autonomy Level Configuration"
+        - "P09 ADM-536 Human Override & Manual Control Center"
         - "P16 ANL-060 AI Analytics Governance & Model Control"
       x-ticvai-agreed: '29 September: AI system design 2.3 governance, 3.1 Registry; our build plan, shape follows
         listAiProviders'
@@ -3243,6 +3473,7 @@ paths:
     post:
       operationId: pauseAiCapability
       x-ticvai-consumed-by:
+        - "P08 ADM-696 AI Risk, Fairness, Explainability & Safety Center"
         - "P09 ADM-519 AI Governance Command Center"
         - "P09 ADM-536 Human Override & Manual Control Center"
         - "P09 ADM-556 AI Incident & Remediation Management"
@@ -3485,6 +3716,7 @@ paths:
         - "P09 ADM-532 Conditional Approval & Approval Conditions"
         - "P09 ADM-534 Escalation, Delegation & Approval SLA Management"
         - "P09 ADM-535 Live AI Execution Oversight & Human Intervention"
+        - "P09 ADM-536 Human Override & Manual Control Center"
         - "P09 ADM-546 Execution & Business Outcome Trace"
         - "P16 ANL-009 AI Assistant & Action Center"
       x-ticvai-agreed: '29 September: AI system design 2.3 actions; our build plan, shape follows listProposedActions'
@@ -4013,8 +4245,6 @@ paths:
         type: string
     put:
       operationId: setAiTool
-      x-ticvai-consumed-by:
-        - "P09 ADM-523 AI Action & Permission Policy Builder"
       x-ticvai-agreed: '29 September: AI system design 2.3 actions, 2.3 permissions (PLATFORM_AI_MANAGE); our build
         plan, shape follows setAiProvider'
       summary: Register or change a tool (platform)
@@ -4712,9 +4942,14 @@ paths:
       operationId: recordAnswerFeedback
       x-ticvai-consumed-by:
         - "P01 WEB-044 AI Concierge – Home"
+        - "P02 GST-031 AI Concierge – Home"
         - "P02 GST-032 AI Concierge – Chat"
+        - "P02 GST-033 AI Concierge – Contextual Help"
         - "P05 KSK-015 Assistant"
         - "P06 EMP-020 AI assistant — answer"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-agreed: '29 September: AI system design 2.3 knowledge; our build plan, shape follows recordSuggestionOutcome'
       summary: Say whether an answer helped
       description: 'One label per message per person (AIC-062): helpful or not, and why. Guests can give it on the
@@ -5670,10 +5905,20 @@ paths:
         gates must pass (completeness, no blocking signal missing, no accuracy regression). The previous published
         version is superseded; operational requirements are derived from the new one. Emits `ai.forecastPublished`.
 
+        **Who publishes: the holder of the module''s AI publish permission, no default role** (Chinmay, 2 October,
+        workbook Q3 and Q7; contract follow-ups: "replacing AI_APPROVE for model publishing"). The caller needs
+        `AI_USE`, which reads forecasts, and the `<MODULE>_AI_PUBLISH` of the version''s `module`
+        (`x-ticvai-permission-by-module`; `contracts/shared/permissions.yaml` `x-ticvai-module-ai-publish`), held at
+        the version''s scope. Without it the call is refused `403 module-ai-publish-required`. `AI_APPROVE` no longer
+        publishes a forecast; the switch is a logged breaking change against r1 (BC-006, CHG-FUP-004).
+
         '
       tags:
       - forecast
-      x-ticvai-permission: AI_APPROVE
+      x-ticvai-permission: AI_USE
+      x-ticvai-permission-by-module:
+        moduleOf: AiForecastVersion.module
+        permissions: ../shared/permissions.yaml#/x-ticvai-module-ai-publish
       x-ticvai-audience:
       - staff
       x-ticvai-scope-level: venue
@@ -5704,12 +5949,23 @@ paths:
                 $ref: '#/components/schemas/AiForecastVersion'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '403':
+          description: The caller does not hold the AI publish permission of the version's module at its scope
+            (`module-ai-publish-required`, CHG-FUP-004).
+          x-ticvai-problem-types:
+          - module-ai-publish-required
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
-          description: 'Not publishable: a quality gate failed (`quality-gate-failed`) or the version is not the
-            latest draft (`version-not-current`).'
+          description: 'Not publishable: a quality gate failed (`quality-gate-failed`), the version is not the
+            latest draft (`version-not-current`), or its definition names no module and none follows from its
+            `subject` (`module-required`, CHG-FUP-004).'
           x-ticvai-problem-types:
           - quality-gate-failed
           - version-not-current
+          - module-required
           content:
             application/problem+json:
               schema:
@@ -6387,8 +6643,8 @@ paths:
     get:
       operationId: getEntityRisk
       x-ticvai-consumed-by:
-        - "P09 ADM-633 Fraud Alert, Investigation & Case Management\t170"
-        - "P09 ADM-637 AI Fraud, Anomaly & Payment Intelligence Center\t175"
+        - "P08 ADM-633 Fraud Alert, Investigation & Case Management"
+        - "P08 ADM-637 AI Fraud, Anomaly & Payment Intelligence Center"
       x-ticvai-agreed: '29 September: AI system design 2.3 risk; our build plan, shape follows getAiPolicy'
       summary: Current risk of an entity
       description: 'A customer, account, device, token, credential, cluster or staff member (design 5.3, AIP-128):
@@ -6419,7 +6675,7 @@ paths:
     put:
       operationId: configureRiskStrategy
       x-ticvai-consumed-by:
-        - "P09 ADM-637 AI Fraud, Anomaly & Payment Intelligence Center\t175"
+        - "P08 ADM-637 AI Fraud, Anomaly & Payment Intelligence Center"
       x-ticvai-agreed: '29 September: AI system design 2.3 risk (setRiskStrategy), 8 decision 6; our build plan,
         shape follows setAiPolicy'
       summary: Set the risk strategy
@@ -6472,7 +6728,7 @@ paths:
     post:
       operationId: backtestRiskStrategy
       x-ticvai-consumed-by:
-        - "P09 ADM-638 Payment Executive Intelligence, Risk Simulator & AI Advisor\t176"
+        - "P08 ADM-638 Payment Executive Intelligence, Risk Simulator & AI Advisor"
       x-ticvai-agreed: '29 September: AI system design 2.3 risk; our build plan, shape follows simulateRecommendationStrategy'
       summary: Backtest a draft strategy
       description: 'What the draft would have done over a past window at the same review rate: recall, precision
@@ -6525,9 +6781,9 @@ paths:
     get:
       operationId: listRiskAlerts
       x-ticvai-consumed-by:
+        - "P08 ADM-633 Fraud Alert, Investigation & Case Management"
+        - "P08 ADM-637 AI Fraud, Anomaly & Payment Intelligence Center"
         - "P08 BO-1160 Fraud Alert & Investigation Case Management"
-        - "P09 ADM-633 Fraud Alert, Investigation & Case Management\t170"
-        - "P09 ADM-637 AI Fraud, Anomaly & Payment Intelligence Center\t175"
       x-ticvai-agreed: '29 September: AI system design 2.3 risk; our build plan, shape follows listProposedActions'
       summary: Risk alerts
       description: 'Alerts to work (AIP-109), highest band first. An alert is a signal, not a finding (AIP-163).
@@ -6619,8 +6875,8 @@ paths:
     post:
       operationId: decideRiskAlert
       x-ticvai-consumed-by:
+        - "P08 ADM-633 Fraud Alert, Investigation & Case Management"
         - "P08 BO-1160 Fraud Alert & Investigation Case Management"
-        - "P09 ADM-633 Fraud Alert, Investigation & Case Management\t170"
       x-ticvai-agreed: '29 September: AI system design 2.3 risk; our build plan, shape follows decideProposedAction'
       summary: Dismiss, monitor, mark false positive, or escalate
       description: 'An analyst''s disposition. `falsePositive` is a label the next candidate model learns from (design
@@ -6687,8 +6943,8 @@ paths:
     post:
       operationId: createRiskCase
       x-ticvai-consumed-by:
+        - "P08 ADM-633 Fraud Alert, Investigation & Case Management"
         - "P08 BO-1160 Fraud Alert & Investigation Case Management"
-        - "P09 ADM-633 Fraud Alert, Investigation & Case Management\t170"
       x-ticvai-agreed: '29 September: AI system design 2.3 risk; our build plan, shape follows createAiConversation'
       summary: Open an investigation
       description: 'A case from one or more alerts or entities (AIP-150). The alerts'' assessments are attached
@@ -6776,8 +7032,8 @@ paths:
     get:
       operationId: getRiskCase
       x-ticvai-consumed-by:
+        - "P08 ADM-633 Fraud Alert, Investigation & Case Management"
         - "P08 BO-1160 Fraud Alert & Investigation Case Management"
-        - "P09 ADM-633 Fraud Alert, Investigation & Case Management\t170"
       x-ticvai-agreed: '29 September: AI system design 2.3 risk; our build plan, shape follows getAiPolicy'
       summary: A case with its evidence and actions
       description: 'The case, its evidence (each labelled source, derived or model-inferred), proposed actions and
@@ -6815,7 +7071,7 @@ paths:
     post:
       operationId: addRiskCaseEvidence
       x-ticvai-consumed-by:
-        - "P09 ADM-633 Fraud Alert, Investigation & Case Management\t170"
+        - "P08 ADM-633 Fraud Alert, Investigation & Case Management"
       x-ticvai-agreed: '29 September: AI system design 2.3 risk; our build plan, shape follows recordSuggestionOutcome'
       summary: Add evidence to a case
       description: 'Stored in `jsonb` and as an immutable Blob copy (AIP-155). Evidence is never edited; a correction
@@ -6864,7 +7120,7 @@ paths:
     get:
       operationId: expandRiskNetwork
       x-ticvai-consumed-by:
-        - "P09 ADM-633 Fraud Alert, Investigation & Case Management\t170"
+        - "P08 ADM-633 Fraud Alert, Investigation & Case Management"
       x-ticvai-agreed: '29 September: AI system design 2.3 risk, 2.4; our build plan, shape follows getAiPolicy'
       summary: Expand the relationship graph around an entity
       description: '**Bounded 1 to 3 hops** over shared devices, tokens and accounts (AIP-111). The result is capped
@@ -6933,7 +7189,7 @@ paths:
     post:
       operationId: proposeRiskAction
       x-ticvai-consumed-by:
-        - "P09 ADM-633 Fraud Alert, Investigation & Case Management\t170"
+        - "P08 ADM-633 Fraud Alert, Investigation & Case Management"
       x-ticvai-agreed: '29 September: AI system design 2.3 risk, 3.8; our build plan, shape follows generateConfiguration'
       summary: Propose a restrictive action from a case
       description: '**Restrictive actions go to the owning module through the action pipeline, never straight from
@@ -7012,8 +7268,8 @@ paths:
     post:
       operationId: closeRiskCase
       x-ticvai-consumed-by:
+        - "P08 ADM-633 Fraud Alert, Investigation & Case Management"
         - "P08 BO-1160 Fraud Alert & Investigation Case Management"
-        - "P09 ADM-633 Fraud Alert, Investigation & Case Management\t170"
       x-ticvai-agreed: '29 September: AI system design 2.3 risk, 3.2 events; our build plan, shape follows decideProposedAction'
       summary: Close a case with an outcome
       description: 'Confirmed fraud, not fraud, or inconclusive: **alert, case and confirmed fraud stay distinct**
@@ -7160,11 +7416,11 @@ paths:
     get:
       operationId: getApprovalRequestScore
       x-ticvai-consumed-by:
+        - "P08 ADM-366 AI Approval Intelligence Center"
         - "P08 BO-084 Approval Inbox"
         - "P08 BO-367 Approval Request Detail"
+        - "P08 BO-368 AI Decision Support"
         - "P08 BO-369 High Priority & Risk Queue"
-        - "P09 ADM-249 Unified Approval Inbox & Decision Workspace"
-        - "P09 ADM-366 AI Approval Intelligence Center"
       x-ticvai-agreed: '29 September: minutes of 8 September (context only); our build plan, shape follows getEntityRisk'
       summary: The latest context score of an approval request
       description: 'What the reviewer sees beside the request: risk band and score, priority, the suggested escalation
@@ -7206,6 +7462,12 @@ paths:
         - "P08 BO-102 Sell"
         - "P08 BO-1048 Seat Upsell Recommendations"
         - "P08 BO-119 Cross-Sell, Upsell & Recommendation Rules"
+      # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
+      # or staff token is still accepted. `{}` makes the credential optional.
+      security:
+      - {}
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-agreed: '29 September: AI system design 2.3 recommend (guest-callable), 2.2 A; our build plan, shape
         follows requestSuggestion (guest-callable)'
       summary: Fill a recommendation slot
@@ -7291,6 +7553,13 @@ paths:
                 sessionRef:
                   type: string
                   nullable: true
+                previewOnly:
+                  type: boolean
+                  default: false
+                  description: '**A staff preview that records nothing** (contract gap CHG-WIR-014, BO-102;
+                    CHG-CSA-045): the slot is filled as a guest would see it, but no impression, tracking id or
+                    decision record is written. Accepted from a staff caller only; ignored from a guest or anonymous
+                    caller.'
                 maxItems:
                   type: integer
                   minimum: 1
@@ -7345,7 +7614,12 @@ paths:
         - "P02 GST-001 Home"
         - "P02 GST-036 Loyalty & Rewards"
         - "P02 GST-048 Upsell / Cross-Sell"
-        - "P08 BO-102 Sell"
+      # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
+      # or staff token is still accepted. `{}` makes the credential optional.
+      security:
+      - {}
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-agreed: '29 September: AI system design 2.3 recommend; our build plan, shape follows recordTouchPoint'
       summary: Report what happened to recommended items
       description: 'Impressions, clicks, add-to-cart, dismissals and explicit declines, batched. A `decline` is
@@ -7426,14 +7700,14 @@ paths:
     get:
       operationId: explainRecommendationDecision
       x-ticvai-consumed-by:
+        - "P08 ADM-678 Journey Simulator, Decision Trace & AI Optimization"
+        - "P08 ADM-680 Customer Recommendation Profile"
+        - "P08 ADM-683 Next-Best-Offer Decision Studio"
+        - "P08 ADM-686 Anonymous, Known & Identity-Transition Personalization.123"
+        - "P08 ADM-687 AI Explainability, Confidence & Model Governance"
+        - "P08 ADM-696 AI Risk, Fairness, Explainability & Safety Center"
+        - "P08 ADM-697 Recommendation Audit, Decision Trace & Investigation"
         - "P09 ADM-543 Candidate, Rule & Decision Path Trace"
-        - "P09 ADM-678 Journey Simulator, Decision Trace & AI Optimization"
-        - "P09 ADM-680 Customer Recommendation Profile"
-        - "P09 ADM-683 Next-Best-Offer Decision Studio"
-        - "P09 ADM-686 Anonymous, Known & Identity-Transition Personalization.123"
-        - "P09 ADM-687 AI Explainability, Confidence & Model Governance"
-        - "P09 ADM-696 AI Risk, Fairness, Explainability & Safety Center"
-        - "P09 ADM-697 Recommendation Audit, Decision Trace & Investigation"
       x-ticvai-agreed: '29 September: AI system design 2.3 recommend, 3.9; our build plan, shape follows listAiInteractions'
       summary: Why these recommendations
       description: '**Explanation at three depths, each gated** (AIC-195, AIR-193..202): `business` with `AI_USE`;
@@ -7483,7 +7757,7 @@ paths:
     get:
       operationId: getCustomerRecommendationProfile
       x-ticvai-consumed-by:
-        - "P09 ADM-680 Customer Recommendation Profile"
+        - "P08 ADM-680 Customer Recommendation Profile"
       x-ticvai-agreed: '29 September: AI system design 2.3 recommend; our build plan, shape follows getAiPolicy'
       summary: What the engine knows about a customer
       description: 'Segment, affinities, explicit declines, consent flags and recent decisions for one customer
@@ -7666,6 +7940,11 @@ paths:
         arrives through `setAiProvider` with `managedBy: tenant` and `modelId`, where bring-your-own-key is enabled.
         Mastered in the control plane and replicated read-only into every tenant database; no configuration scope.
 
+        **This is where TICVAI curates** (Chinmay, 2 October, workbook Q2 and the AI/ML model selection; CHG-CSA-001).
+        `curatedRange` lists the tasks the model is curated for, its tier and its rank (the best-suited model, then
+        three or four alternatives where they exist). A model named in `isDefaultForTasks` for a task its own
+        `curatedRange` does not list is refused `422 model-not-curated`.
+
         '
       tags:
       - models
@@ -7695,6 +7974,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AiModel'
+        '422':
+          description: '`isDefaultForTasks` names a task this model''s `curatedRange` does not list (`model-not-curated`,
+            CHG-CSA-001).'
+          x-ticvai-problem-types:
+          - model-not-curated
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '201':
           headers:
             X-Consistency-Token:
@@ -7777,7 +8065,6 @@ paths:
       operationId: publishPromptTemplate
       x-ticvai-consumed-by:
         - "P09 ADM-037 AI Provider & Credentials"
-        - "P16 ANL-060 AI Analytics Governance & Model Control"
       x-ticvai-agreed: '29 September: AI system design 2.3 models, 3.5; our build plan, shape follows createKnowledgeCollection'
       summary: Publish a prompt template version
       description: '**Immutable once published** (AIC-022): this creates the next version. A tenant variant needs
@@ -7978,14 +8265,22 @@ paths:
       description: '**A trained model goes live only when a person promotes it** (design 3.12, decided 29 September).
         When a shadow run passes its gate the platform raises a `promotionReady` governance alert; nothing switches
         by itself. This moves the release one stage (shadow to canary, canary to production). A tenant release needs
-        `AI_APPROVE`; a platform release needs `PLATFORM_AI_MANAGE`. **Refused to a service caller.** Where the
+        the module''s AI publish permission; a platform release needs `PLATFORM_AI_MANAGE`. **Decided 2 October**
+        (Chinmay, workbook Q7; contract follow-ups: "replacing AI_APPROVE for model publishing"): promotion goes to
+        whoever holds the `<MODULE>_AI_PUBLISH` of the release''s `module` (`x-ticvai-permission-by-module`;
+        `contracts/shared/permissions.yaml` `x-ticvai-module-ai-publish`), on top of `AI_USE`; there is no default
+        role. `AI_APPROVE` no longer promotes; the switch is a logged breaking change against r1 (BC-007,
+        CHG-FUP-004). **Refused to a service caller.** Where the
         capability answers a `requestSuggestion` kind, production rewrites that kind''s assignment in `AiPolicy.suggestionProviders`,
         the only writer besides `setSuggestionProvider`. Resolves the `promotionReady` alert.
 
         '
       tags:
       - models
-      x-ticvai-permission: AI_APPROVE
+      x-ticvai-permission: AI_USE
+      x-ticvai-permission-by-module:
+        moduleOf: AiRelease.module
+        permissions: ../shared/permissions.yaml#/x-ticvai-module-ai-publish
       x-ticvai-permission-escalated: PLATFORM_AI_MANAGE
       x-ticvai-audience:
       - staff
@@ -8027,13 +8322,25 @@ paths:
                 $ref: '#/components/schemas/AiRelease'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '403':
+          description: A tenant release, and the caller does not hold the AI publish permission of its module
+            (`module-ai-publish-required`, CHG-FUP-004); or a platform release, and the caller lacks
+            `PLATFORM_AI_MANAGE`.
+          x-ticvai-problem-types:
+          - module-ai-publish-required
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
           description: 'Not promotable: the gate has not passed (`gate-not-passed`), an isolation case failed (`isolation-cases-failed`),
-            or the stage cannot follow the current one (`stage-out-of-order`).'
+            the stage cannot follow the current one (`stage-out-of-order`), or a tenant release names no module
+            (`module-required`, CHG-FUP-004).'
           x-ticvai-problem-types:
           - gate-not-passed
           - isolation-cases-failed
           - stage-out-of-order
+          - module-required
           content:
             application/problem+json:
               schema:
@@ -8051,6 +8358,7 @@ paths:
     post:
       operationId: rollbackAiRelease
       x-ticvai-consumed-by:
+        - "P08 ADM-696 AI Risk, Fairness, Explainability & Safety Center"
         - "P09 ADM-554 AI Quality, Behavior & Governance Drift Monitoring"
         - "P09 ADM-556 AI Incident & Remediation Management"
       x-ticvai-agreed: '29 September: AI system design 2.3 models, 3.5; our build plan, shape follows decideProposedAction'
@@ -8109,10 +8417,12 @@ paths:
       operationId: searchAiDecisions
       x-ticvai-consumed-by:
         - "P09 ADM-498 AI Configuration Audit & Governance"
+        - "P09 ADM-536 Human Override & Manual Control Center"
         - "P09 ADM-537 Approval & Intervention History / Decision Timeline"
         - "P09 ADM-539 AI Explainability & Audit Command Center"
         - "P09 ADM-540 AI Decision Explorer & Search"
         - "P09 ADM-547 AI Audit Record & Evidence Package"
+        - "P16 ANL-059 AI Insight History, Evidence & Explainability"
       x-ticvai-agreed: '29 September: AI system design 2.3 audit, 3.9; our build plan, shape follows listAiInteractions'
       summary: Find AI decisions
       description: '**"Why did TICVAI do this?" starts here** (ADM-539, ADM-540). Every governed decision by capability,
@@ -8811,6 +9121,20 @@ paths:
                 remediation:
                   type: string
                   maxLength: 4000
+                impact:
+                  type: string
+                  maxLength: 4000
+                  nullable: true
+                  description: Who and what was affected (contract gap CHG-WIR-014, ADM-556; CHG-CSA-045).
+                controlFailure:
+                  type: string
+                  maxLength: 4000
+                  nullable: true
+                  description: Which control failed or was missing.
+                lessonsLearned:
+                  type: string
+                  maxLength: 4000
+                  nullable: true
       responses:
         '200':
           headers:
@@ -9082,6 +9406,11 @@ paths:
         Disabling does not delete the tenant''s providers; `setAiProvider` stops accepting new ones and the gateway
         routes back to TICVAI-managed models.
 
+        **The models are mapped, not chosen** (Chinmay, 2 October, workbook Q1; CHG-CSA-001): once enabled, each task
+        the key serves runs on that provider''s equivalent from TICVAI''s curated range
+        (`AiByokEnablement.taskModelMap`), billed to the tenant''s key. BYOK fits the `globalAllowed` residency class
+        only (CHG-CSA-002).
+
         '
       tags:
       - config
@@ -9125,6 +9454,7 @@ paths:
     get:
       operationId: getAiByokEnablement
       x-ticvai-consumed-by:
+        - "P08 BO-091 AI Policy & Spend"
         - "P09 ADM-037 AI Provider & Credentials"
       x-ticvai-agreed: '29 September: decision on AI design 5.9; shape follows getAiPolicy'
       summary: Whether a tenant may bring its own key
@@ -9289,6 +9619,7 @@ paths:
     get:
       operationId: getAiVenueSettings
       x-ticvai-consumed-by:
+        - "P08 BO-927 AI Staffing Requirement Forecast"
         - "P09 ADM-489 AI Configuration Readiness Center"
         - "P16 ANL-071 AI Maturity & Learning"
       x-ticvai-agreed: '29 September: AI functions review (baseline then learn), packageFindings 7; shape follows getAiPolicy'
@@ -9324,6 +9655,8 @@ paths:
     put:
       operationId: setAiVenueSettings
       x-ticvai-consumed-by:
+        - "P08 BO-927 AI Staffing Requirement Forecast"
+        - "P09 ADM-471 Venue & Business Model Discovery"
         - "P09 ADM-489 AI Configuration Readiness Center"
         - "P16 ANL-071 AI Maturity & Learning"
       x-ticvai-agreed: '29 September: AI functions review (baseline then learn), venue AI profile at onboarding; shape
@@ -10729,6 +11062,14 @@ components:
           allOf:
           - $ref: '#/components/schemas/AiProviderKind'
           nullable: true
+        vendor:
+          type: string
+          nullable: true
+          pattern: ^[a-z0-9][a-z0-9-]{1,49}$
+          description: '**Whose model this is** (CHG-FUP-008): the provider company as `AiProvider.vendor` names it.
+            Bring-your-own-key accepts any vendor, so the curated range carries each vendor''s models with the tier
+            they serve; the task-to-tier map (`AiByokEnablement.taskModelMap`) picks the row whose `vendor` matches
+            the tenant''s provider. TICVAI adds a new vendor''s models after evaluating them (`runAiEvaluation`).'
         producerType:
           type: string
           enum:
@@ -10801,6 +11142,51 @@ components:
           items:
             type: string
           description: Tasks this model is the default for (AIC-010), e.g. `assistant.guest.answer`, `config.extract`.
+        curatedRange:
+          type: array
+          x-ticvai-persistence-kind: valueObject
+          x-ticvai-persistence-column: jsonb
+          description: '**TICVAI''s curated range: the tasks this model may serve** (Chinmay, 2 October, workbook Q1, Q2
+            and Q9; the AI/ML model selection of 2 October; CHG-CSA-001). For each task: the tier it serves at and its
+            rank, 1 being the best-suited model and 2 to 5 the alternatives. **A model may serve a task only where
+            this lists it**: `setAiProvider` refuses any other choice (`422 model-not-curated`), and bring-your-own-key
+            maps each task to the tenant provider''s model at the same tier. `byokEligible` false marks the
+            platform-owned tiers (embeddings, reranking, moderation, PII detection, OCR, speech), never served by a
+            tenant key. Money paths (pricing, fraud scores, settlements) stay on classical models.
+
+            '
+          items:
+            type: object
+            description: Every entry names `taskKey`, `tier` and `rank`.
+            properties:
+              taskKey:
+                type: string
+              tier:
+                type: string
+                enum:
+                - small
+                - strong
+                - reasoning
+                - vision
+                - embedding
+                - reranking
+                - moderation
+                - piiDetection
+                - ocr
+                - speech
+                - classical
+              rank:
+                type: integer
+                minimum: 1
+                maximum: 5
+              byokEligible:
+                type: boolean
+                default: true
+        residencyClasses:
+          type: array
+          items:
+            $ref: ../shared/common.yaml#/components/schemas/AiResidencyClass
+          description: The tenant residency classes whose calls this model may serve (CHG-CSA-002).
         taskFitness:
           type: array
           readOnly: true
@@ -12148,6 +12534,18 @@ components:
           - cashCollection
           - membershipRenewals
           - churn
+        module:
+          allOf:
+          - $ref: ../shared/common.yaml#/components/schemas/ModuleKey
+          description: '**Whose AI this forecast is, and so who publishes it** (Chinmay, 2 October, workbook Q3:
+            "the permission holder for that module''s AI"; CHG-FUP-004). `publishForecastVersion` requires the
+            permission `contracts/shared/permissions.yaml` `x-ticvai-module-ai-publish` names for this module.
+            Absent on a write, the server takes it from `subject`: ticketing for `attendance`, `arrivalPattern`,
+            `productDemand`, `timeslotDemand`, `channelPace`, `occupancy` and `refunds`; access for `entryFlow` and
+            `attractionUtilisation`; queue for `queue`; fnb for `fnbDemand`; retail for `retailDemand`; inventory
+            for `stockDemand`; resources for `resourceDemand`; membership for `membershipRenewals` and `churn`; core
+            for `revenue`, `staffing`, `posDemand` and `cashCollection`. Proposed, client to correct; a venue may
+            name the module itself. Always present on a read.'
         grain:
           type: string
           enum:
@@ -12295,6 +12693,13 @@ components:
         versionNumber:
           type: integer
           minimum: 1
+        module:
+          allOf:
+          - $ref: ../shared/common.yaml#/components/schemas/ModuleKey
+          readOnly: true
+          description: The module of the version's definition (`AiForecastDefinition.module`), copied when the
+            version is produced; the module whose AI publish permission `publishForecastVersion` requires
+            (CHG-FUP-004).
         status:
           type: string
           enum:
@@ -12547,7 +12952,11 @@ components:
       x-ticvai-persistence: ai.operational_requirement
       description: '**A requirement derived from a forecast version** (design 2.2 C step 6, AIP-067): staff, POS,
         gates, F&B, stock or resources, computed with the tenant''s productivity standards. **Autonomy L2 (prepare)**:
-        it is sent to the owning module as a recommendation bound to that version, and a person applies it there.'
+        it is sent to the owning module as a recommendation bound to that version, and a person applies it there.
+
+        **Every kind, from release 1** (Chinmay, 2 October, workbook Q9: "all kinds"; CHG-CSA-005). The event
+        forecast derives requirements of every `kind` below, filtered to what the venue has configured (a venue with
+        no kiosks gets no `kiosk` rows); the models in place improve with the venue''s data.'
       required:
       - versionId
       - kind
@@ -14233,6 +14642,16 @@ components:
         remediation:
           type: string
           nullable: true
+        impact:
+          type: string
+          nullable: true
+          description: The post-incident review's impact (`closeAiIncident`, CHG-CSA-045).
+        controlFailure:
+          type: string
+          nullable: true
+        lessonsLearned:
+          type: string
+          nullable: true
         ownerPrincipalId:
           type: string
           format: uuid
@@ -14621,6 +15040,16 @@ components:
           enum:
           - platform
           - tenant
+        module:
+          allOf:
+          - $ref: ../shared/common.yaml#/components/schemas/ModuleKey
+          nullable: true
+          description: '**Whose AI this release is, and so who promotes it** (Chinmay, 2 October, workbook Q7: "AI
+            release promotion goes to whoever holds it"; CHG-FUP-004). For a tenant release, `promoteAiRelease`
+            requires the permission `contracts/shared/permissions.yaml` `x-ticvai-module-ai-publish` names for this
+            module; a tenant release with no module cannot be promoted (`409 module-required`). Set when the
+            release is registered, from the capability''s module. Null on a platform release, which
+            `PLATFORM_AI_MANAGE` promotes.'
         suggestionKind:
           allOf:
           - $ref: '#/components/schemas/SuggestionKind'
@@ -14713,6 +15142,33 @@ components:
           items:
             type: string
           description: 'Where `coverage` is `perTask`: the gateway tasks a tenant key may serve. Empty means any.'
+        taskModelMap:
+          x-ticvai-persistence-kind: valueObject
+          x-ticvai-persistence-column: jsonb
+          type: array
+          readOnly: true
+          description: '**The provider''s equivalent model for each task, chosen by TICVAI** (Chinmay, 2 October,
+            workbook Q1; closes AI-D20; CHG-CSA-001). For each task the tenant key serves, the model of the tenant''s
+            provider at the tier the task needs, taken from TICVAI''s curated range (`AiModel.curatedRange`). The
+            tenant does not choose it; a task with no curated equivalent at the tenant''s provider stays on the
+            TICVAI-managed model and is listed with `modelId` null.'
+          items:
+            type: object
+            properties:
+              taskKey:
+                type: string
+              tier:
+                type: string
+              modelId:
+                type: string
+                format: uuid
+                nullable: true
+                x-ticvai-references: ai.model
+              compatibilityPassed:
+                type: boolean
+                nullable: true
+                description: Whether the provider's compatibility test passed for this task (`AiProviderCompatibility`,
+                  CHG-FUP-008); a task that has not passed stays on the TICVAI-managed model.
         reason:
           type: string
           maxLength: 1000
@@ -15931,6 +16387,60 @@ components:
           readOnly: true
           description: '**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths`
             (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1).'
+    AiProviderCompatibility:
+      type: object
+      x-ticvai-persistence-kind: valueObject
+      x-ticvai-persistence-column: jsonb
+      description: '**Whether a provider can serve the tasks it would take, before it takes them** (Chinmay, 2 October,
+        contract follow-ups: BYOK accepts any provider, with a compatibility test before activation; CHG-FUP-008). For
+        each task the provider would serve, the gateway calls the vendor''s equivalent model at the task''s tier (the
+        curated task-to-tier map) with TICVAI''s probes: tool calling, structured output against a JSON schema,
+        Arabic, the context window the task needs, the latency band and the residency of the endpoint. A task passes
+        when every probe passes; the provider''s `status` is `passed` when at least one task passes, and only the
+        passing tasks are routed to it.'
+      required:
+      - status
+      properties:
+        status:
+          type: string
+          enum:
+          - notTested
+          - passed
+          - failed
+        testedAt:
+          type: string
+          format: date-time
+          nullable: true
+        tasks:
+          type: array
+          items:
+            type: object
+            required:
+            - taskKey
+            - passed
+            properties:
+              taskKey:
+                type: string
+              tier:
+                type: string
+              modelName:
+                type: string
+                nullable: true
+                description: The vendor's model the curated map picked for this task and tier; null where the vendor
+                  has no curated equivalent, and the task stays on the TICVAI-managed model.
+              passed:
+                type: boolean
+              failedProbes:
+                type: array
+                items:
+                  type: string
+                  enum:
+                  - toolCalling
+                  - structuredOutput
+                  - arabic
+                  - contextWindow
+                  - latency
+                  - residency
     AiProviderKind:
       type: string
       enum:
@@ -15942,6 +16452,19 @@ components:
       - openaiCompatible
       description: '`openaiCompatible` (added 29 September, AI design 3.3): a customer endpoint that speaks
         the OpenAI API, taken with no custom development (AIC-009). Any other protocol needs an adapter.
+
+        **Core42 Compass is reached through `openaiCompatible`** (Chinmay, 2 October: the AI residency decision,
+        amending AI-D02; CHG-CSA-002). Compass is the provider of the `uaeOnly` residency class (common
+        `AiResidencyClass`): Small tier Compass GPT-4.1 mini (or Seraj), Strong tier Compass GPT-5, with OpenAI
+        UAE and then the in-cell open-weights model as the fallback chain. OpenAI UAE is `openai` with a UAE
+        `endpoint`; the in-cell model is `localLlm`.
+
+        **A kind is a protocol, not a vendor** (Chinmay, 2 October, contract follow-ups: BYOK accepts any provider;
+        CHG-FUP-008). Any vendor is accepted, named in `AiProvider.vendor`: Mistral, Cohere or any other is reached
+        through `openaiCompatible` where its API speaks it, which the compatibility test confirms before activation
+        (`AiProviderCompatibility`). A new native adapter is a new value here, a breaking change for a client built
+        earlier that goes out with an approval (`docs/active/breaking-changes.yaml`); until then a vendor without
+        either protocol is refused `422 provider-protocol-unsupported`.
 
         '
     SuggestionKind:
@@ -16251,6 +16774,15 @@ components:
             to create one.
         kind:
           $ref: '#/components/schemas/AiProviderKind'
+        vendor:
+          type: string
+          nullable: true
+          pattern: ^[a-z0-9][a-z0-9-]{1,49}$
+          description: '**The provider company, any provider** (Chinmay, 2 October, contract follow-ups: "As long as
+            we get an API key it can be any model"; CHG-FUP-008), as a lower-case slug: `mistral`, `cohere`,
+            `core42`, `openai`. `kind` says how it is reached (a native adapter, or `openaiCompatible` for every
+            other vendor); `vendor` says whose models the curated task-to-tier map picks from (`AiModel.vendor`).
+            Required for a tenant-managed provider; null on an older row, where `kind` names the vendor.'
         capability:
           $ref: '#/components/schemas/AiCapability'
         model:
@@ -16312,6 +16844,13 @@ components:
           description: 'A key-vault reference, never the key. A key typed into a form ends up in a screenshot.
 
             '
+        credentialHint:
+          type: string
+          nullable: true
+          readOnly: true
+          maxLength: 4
+          description: The last four characters of the stored key, so an operator can tell two keys apart. The key
+            itself is never shown again after `setAiCredential` (CHG-FUP-008).
         credentialRotatedAt:
           type: string
           format: date-time
@@ -16332,6 +16871,12 @@ components:
           nullable: true
           readOnly: true
           description: When `testAiProvider` last confirmed the key works.
+        compatibility:
+          allOf:
+          - $ref: '#/components/schemas/AiProviderCompatibility'
+          readOnly: true
+          description: The last compatibility test of this provider (`testAiProvider`). A tenant-managed provider is
+            activated only once its `status` is `passed` (CHG-FUP-008).
         endpoint:
           type: string
           nullable: true
@@ -16340,6 +16885,17 @@ components:
           description: 'Where inference physically happens. **A prompt reaching a provider hosted elsewhere
             is a cross-border transfer** (ADR-0009), and this field is what makes that auditable rather
             than assumed.
+
+            '
+        residencyClasses:
+          type: array
+          items:
+            $ref: ../shared/common.yaml#/components/schemas/AiResidencyClass
+          description: '**The tenant residency classes this provider may serve** (Chinmay, 2 October: the AI
+            residency decision; CHG-CSA-002). The gateway routes a call for a tenant only to a provider whose list
+            holds the tenant''s class (tenancy, common `AiResidencyClass`, default `uaeOnly`); `setAiProvider`
+            refuses a provider that cannot serve the tenant''s class (`409 residency-class-refused`). A `uaeOnly`
+            call can only resolve to an in-UAE endpoint: Core42 Compass, OpenAI UAE, or the in-cell model.
 
             '
         maxTokens:
@@ -16371,16 +16927,20 @@ components:
             type: string
           description: '**Which agent tasks this provider serves** (21 September minutes, M21-03: different agents
             may use different models chosen for the task). Empty means every task of its `capability`. A task
-            listed on two providers goes to the lower `priority`. **AI-D02 stands:** one managed provider (Azure
-            OpenAI in UAE North) serves every task by default, with a small and a stronger model per task; a second
-            provider or a tenant''s own key is added only where TICVAI enables it for the tenant (AI-D14,
-            `setAiByokEnablement`).'
+            listed on two providers goes to the lower `priority`. **AI-D02 as amended on 2 October** (the AI residency
+            decision, CHG-CSA-002): the managed provider depends on the tenant''s residency class (Core42 Compass for
+            `uaeOnly`, the default), with a Small and a Strong model per task; a second provider or a tenant''s own
+            key is added only where TICVAI enables it for the tenant (AI-D14, `setAiByokEnablement`). **Each task''s
+            model comes from TICVAI''s curated range** (`AiModel.curatedRange`, CHG-CSA-001): the client cannot pick
+            a model outside it.'
         fitnessWarnings:
           type: array
           readOnly: true
           description: '**The model-fitness check at the last write** (21 September minutes, M21-09). For each task
             in `taskKeys` whose model scores outside the task''s band in `AiModel.taskFitness`, or has no score, one
-            warning. A warning never blocks the write; it is shown on ADM-037 and kept so the choice is auditable.'
+            warning, shown on ADM-037 and kept so the choice is auditable. **A model outside TICVAI''s curated range
+            for a task is no longer a warning: it is refused** (`422 model-not-curated`; Chinmay, 2 October, workbook
+            Q2, amending AI-D18; CHG-CSA-001). A warning now only describes a curated model''s fit.'
           items:
             type: object
             properties:
@@ -16476,6 +17036,9 @@ components:
             nobody filled in. An entry naming no column is refused at save rather than silently masking
             nothing.
 
+            **Column masking is in addition to the gateway scrubber, never instead of it** (CHG-CSA-003): free
+            text a guest types is not a column, so every prompt also passes the offline scrubber (`scrubbing`).
+
             '
           items:
             type: string
@@ -16491,6 +17054,37 @@ components:
             - operational
             - financial
             - configuration
+        scrubbing:
+          type: object
+          readOnly: true
+          description: '**Mandatory offline PII scrubbing and moderation on every LLM call** (Chinmay, 2 October: "we
+            may need to scrub personal info no matter what"; ADR-0020 amended; CHG-CSA-003). Not a setting: it applies
+            whatever the tenant''s residency class, and a tenant cannot switch it off. Before a prompt leaves the cell
+            the gateway runs Microsoft Presidio (offline) with UAE recognisers (Emirates ID, UAE phone, passport, IBAN,
+            Luhn-checked card, email) and an Arabic NER model; each value found becomes a reversible placeholder
+            (`[GUEST_1]`) whose map never leaves the cell, and the reply is re-filled before it reaches the user. An
+            offline guard model (Qwen3Guard, which covers Arabic) checks input and output. **Fails closed**: with the
+            scrubber or the guard down, the call is refused (`503 scrubber-unavailable`), never sent raw. This object
+            reports what is in force.
+
+            '
+          properties:
+            mode:
+              type: string
+              enum:
+              - mandatory
+            recognisers:
+              type: array
+              items:
+                type: string
+              description: The recogniser set in force, e.g. `emiratesId`, `uaePhone`, `passport`, `iban`, `card`,
+                `email`, `arabicPersonName`.
+            reversibleTokens:
+              type: boolean
+              description: Always true; the placeholder map stays in the cell.
+            guardModel:
+              type: string
+              description: The input and output guard model in force, e.g. `qwen3guard`.
         monthlyTokenCeiling:
           type: integer
           nullable: true
@@ -17591,10 +18185,58 @@ components:
 
 
             **Operations write it at `venue` scope.**'
+    AiSpendCeiling:
+      type: object
+      x-ticvai-persistence: ai.spend_ceiling
+      description: '**The AI spend ceiling in money** (Chinmay, 2 October, workbook Q8; CHG-CSA-004). One row per
+        `scopePath`, as `AiPolicy`: the tenant''s default and a venue''s narrowing.'
+      required:
+      - spend
+      properties:
+        scopePath:
+          type: string
+          readOnly: true
+          description: The partition key (ADR-0005); the tenant's node or a venue's.
+        spend:
+          allOf:
+          - $ref: ../shared/common.yaml#/components/schemas/Money
+          description: Per month, in the tenant's selected currency (USD by default).
+        tokenEquivalent:
+          type: integer
+          readOnly: true
+          nullable: true
+          description: What `spend` buys at the current blended rate, shown beside it on BO-091.
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
     AiUsageReport:
       type: object
       x-ticvai-persistence: none — aggregated from ai.activity
       properties:
+        currency:
+          type: string
+          minLength: 3
+          maxLength: 3
+          readOnly: true
+          description: '**The tenant''s selected currency, USD by default** (Chinmay, 2 October, workbook Q8;
+            CHG-CSA-004). Every `cost` here is in it; token counts sit beside each cost.'
+        ceiling:
+          type: object
+          nullable: true
+          readOnly: true
+          description: The spend ceiling in force (`getAiSpendCeiling`), with the tokens it equals at
+            the current blended rate and what is used so far (CHG-CSA-004).
+          properties:
+            spend:
+              $ref: ../shared/common.yaml#/components/schemas/Money
+            tokens:
+              type: integer
+              nullable: true
+            usedSpend:
+              $ref: ../shared/common.yaml#/components/schemas/Money
+            usedTokens:
+              type: integer
         from:
           type: string
           format: date
@@ -17766,6 +18408,19 @@ components:
       properties:
         targetLocale:
           type: string
+        translationJobId:
+          type: string
+          format: uuid
+          readOnly: true
+          description: The job to follow with `getTranslationProposals` (contract gap CHG-WIR-017, CMS-011; CHG-CSA-045).
+        status:
+          type: string
+          readOnly: true
+          enum:
+          - running
+          - completed
+          - failed
+          description: '`running` while drafts are still being written; `drafts` then holds those done so far.'
         drafts:
           type: array
           items:

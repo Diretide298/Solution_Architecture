@@ -1,6 +1,6 @@
 # WS189 — Wallet Configuration Backend Structure v1.0 board 4
 
-**10 screens · 6 operations · 9 schemas · 3 permissions**
+**10 screens · 8 operations · 10 schemas · 3 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -61,6 +61,45 @@ convincingly. It is never a caption.
   and its error; and, element by element, what is shown and in what format, what each action
   produces and where the user goes next. Draw exactly that.
 
+## The processes these screens belong to
+
+Written by the owner of each process (`handoff/design-notes/`). Read before any screen: it says how the process runs end to end and which words the screens must use.
+
+### Ticketing & Guest Commerce, as the venue and TICVAI configure and run it
+
+WHAT THE PROCESS IS. Everything a guest can buy is set up, priced, promoted and serviced here, on Venue Management (P08, the venue's own back office, served inside the venue's cell) and on the TICVAI Console (P09, TICVAI's control plane, outside every cell). End to end: (1) CATALOGUE. A product has one of twelve kinds (admission, timedAdmission, datedAdmission, openDated, seated, membership, bundle, fnb, retail, rental, addOn, giftCard). Its ticket types (adult, child, senior, resident...) are not typed one by one: they are generated from the product's attributes (components) and each value combination becomes a sellable ticket type with no extra setup (DI-164). What a ticket grants (validity, entries, re-entry, days of week, blackout dates, expiry anchor, fast track, transfer) lives on a reusable entitlement template, not on the product. Who may take part (age, height, supervision, certification) is the eligibility rule; what the guest must answer is the data mask and the consent questions; how the guest sees it is guestListing (bookable, infoOnly, hidden), display tags (at most six), media and the booking flow. Group, family and corporate products and every after-sales policy (reschedule, exchange, refund, cancellation, upgrade, transfer) are configured inside the one product configuration, never on separate screens (DI-465, DI-466). (2) LIFECYCLE AND PUBLICATION. A product moves draft, inReview, approved, live, withdrawn, archived. Approval and publication are two acts with two permissions (PRODUCT_APPROVE, PRODUCT_PUBLISH, R091); every product is authorised before it sells online or on site (DI-438). Approved is still not on a till: a till sells only what is in the signed catalogue release it pulled (publishBundle, ADR-0013), so a saved price is a back-office fact until the venue publishes to tills. Changing something that has sold is preceded by an impact check (assessProductChange: orders affected, entitlements issued, future performances, open carts); restoring a version creates a new version, and sold tickets keep the price and terms they were sold under (restoreProductVersion, DI-938, TRACKER Actions row 145). (3) PRICE. Prices live in price lists: per venue, per channel set, with validity dates and a priority, copied for the next season with an uplift (copyPriceList) and repriced in bulk only after a dry run (bulkChangePrices). Currency and decimal scale are never chosen on a form: they resolve from the venue's region (ADR-0008, ADR-0018; AED 2 places, OMR and BHD 3). When several rules apply, the configured hierarchy decides; there is no "lowest price wins" default (DI-595). Tax on the pre-discount price and three-decimal rounding are regional settings (DI-598). Dynamic rules always show their minimum and maximum price guardrails beside the trigger (getDynamicPriceRule). (4) PROMOTE AND BUNDLE. A promotion is a rule (automatic, or gated by a code) created in draft, made live only by Publish, which first analyses stacking; a …
+*(source: DI-164; DI-171; DI-438; DI-465; DI-466; DI-595; DI-598; DI-387; DI-039; DI-044; DI-474; DI-671; DI-987; DI-019; DI-080; ADR-0008; ADR-0013; ADR-0018; ADR-0019; ADR-0030; R091; R098; R101; R222; REV3-21; contracts/spine/catalogue.yaml#transitionProductLifecycle …)*
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Product | Anything sellable, of one of the twelve kinds. The record that carries names, channels, listing, media and policies. | Item (except on F&B and retail screens), SKU (for tickets), Offering | contracts/spine/catalogue.yaml#/components/schemas/ProductKind |
+| Ticket type | One sellable variant of an admission or event product (Adult, Child, Resident Adult), generated from the product's attributes. For retail and F&B the same record is labelled Variant. | Variant (on ticket screens), Sub-product, Rate (that is a price), Axis value | contracts/spine/catalogue.yaml#updateProductVariant / DI-164 / DI-437 |
+| Attribute | A dimension that generates ticket types (Guest category, Residency, Tier, Length). Each has values; adding a value adds ticket types. | Axis, Component (the client's word; use it only in help text), Option | contracts/spine/catalogue.yaml#setProductAttributes / DI-164 / DI-450 |
+| Entitlement | What a ticket lets the holder do (validity, entries, re-entry, days, blackout dates, expiry, fast track, transfer), defined once on an entitlement template and shared by several products. | Access rights, Ticket rules, Validity profile | contracts/spine/catalogue.yaml#createEntitlementTemplate / DI-171 / DI-451 |
+| Eligibility rule | Who may take part in or buy a product (age, height, supervision, waiver, certification). Distinct from a promotion's eligibility, which decides who gets a discount. | Restriction, Access rule (that is access control) | contracts/spine/catalogue.yaml#setProductEligibilityRule / DI-463 |
+| Price list | A set of prices for one venue and a set of channels, valid between two dates, with a priority. Several coexist (B2C, B2B, season). | Price book, Rate card, Tariff | contracts/spine/catalogue.yaml#createPriceList / DI-140 / DI-163 |
+| Price category | A standard rate type (Adult, Child, Member) reused across lists so venues do not invent "Adult Standard" and "Normal Adult". | Price band (that is a seat-category band), Fare type (transport) | contracts/spine/catalogue.yaml#setPriceCategoryRateType / … |
+| Price band | A priced band on a seat category (code, label, colour, amount, channel, from-date). | Price category, Zone price | contracts/satellite/seating.yaml#/components/schemas/SeatPriceBand |
+| Promotion | A rule that changes a price automatically or when a code is entered; draft until published; declares how it stacks. | Offer (except in guest copy), Deal, Discount rule | contracts/satellite/promotions.yaml#createPromotion / DI-173 / DI-174 |
+| Coupon code | A code issued from a coupon campaign that applies a promotion-style discount; one shared code or many single-use codes. | Voucher, Promo voucher | contracts/satellite/promotions.yaml#createCouponCampaign / DI-173 |
+| Voucher | A code that carries money (face value, balance), sold or issued; a liability until redeemed or expired. | Coupon, Credit note | contracts/satellite/promotions.yaml#listVoucherBatches / … |
+| Bundle | A product sold as one line whose price differs from the sum of its components, with a mandatory revenue allocation. "Package" is acceptable in guest copy. | Combo (that is an F&B meal deal), Catalogue bundle | contracts/satellite/promotions.yaml#createBundle / DI-220 / ADR-0019 |
+| Catalogue release | The signed snapshot of a venue's catalogue, prices, promotions and sale boards that tills, kiosks and devices pull. Its action label is "Publish to tills". | Bundle, Catalogue bundle, Sync, Deploy | contracts/spine/catalogue.yaml#publishBundle / … |
+| Approve / Publish / Save | Save keeps a draft; Approve records that it is authorised (PRODUCT_APPROVE); Publish makes it live for guests and channels (PRODUCT_PUBLISH). Three different buttons, never merged. | Submit, Go live, Activate (except CatalogueConfigStatus active), Deploy | R091 / contracts/spine/catalogue.yaml#transitionProductLifecycle / DI-438 |
+| Product states | Draft, In review, Approved, Live, Withdrawn, Archived (ProductLifecycleState), always as coloured badges with these exact labels. | Published (for a product), Pending, Inactive (for a product) | contracts/spine/catalogue.yaml#/components/schemas/ProductLifecycleState |
+| Channel | Where something is sold. Labels: pos Point of sale; kiosk Kiosk; web and guestWeb Website; mobile and guestApp App; b2b B2B partners; partner Partner; ota Travel agents (OTA); callCentre Call centre; api API; backOffice Back office. | Touchpoint, Outlet (an outlet is a business inside a venue), raw enum values | contracts/spine/catalogue.yaml#/components/schemas/Channel / … |
+| Refund | Money returned after settlement, wholly or for some lines, under the venue's refund policy. | Return (that is retail goods), Reversal, Void | contracts/spine/orders.yaml#createRefund / DI-252 |
+| Void | Cancelling a whole order before settlement, within the same shift, with a reason from the void list. After settlement it is a refund. | Cancel order, Delete | contracts/spine/orders.yaml#voidOrder / R222 |
+| Exchange / Reschedule | Exchange swaps lines for other products or dates and settles only the difference; Reschedule is the same product moved to another date or time. | Rebook, Date change (acceptable only in guest copy), Refund and resell | contracts/spine/orders.yaml#exchangeOrderLines / … |
+| Hold / Capture / Release | A deposit or stored-value amount is held, then partly or fully captured, and the rest released. A held deposit is not a payment. | Charge, Pre-auth (in staff copy), Block funds | contracts/spine/orders.yaml#authoriseStoredValue / … |
+| Wallet (TICVAI wallet) | The guest's stored-value balance on TICVAI, spent by hold and capture. Distinct from the tender "Apple Pay / Google Pay", which the contract also calls wallet. | Digital wallet (for stored value), E-wallet, Credit (without a type) | contracts/spine/orders.yaml#/components/schemas/TenderKind / R080 |
+| Credit lot | One amount of wallet credit of one credit type (cash, bonus, gift) with its own expiry; lots are spent nearest expiry first and the guest sees the breakdown but cannot choose. | Bucket, Batch, Top-up | TRACKER Actions row 171 / contracts/satellite/wallet.yaml#expireCreditLots |
+| Venue map / Seat map | A venue map is the wayfinding map of a park or a floor (points, paths, bookable places); a seat map is the seating layout of an auditorium or stand. Never just "map" where both could be meant. | Layout (alone), Floor plan (unless it is a floor map), Map (alone) | contracts/satellite/venue-map.yaml#createVenueMap / … |
+| Point / Bookable place | A point is a place on a venue map (toilet, ride, restaurant, exit). A bookable place is a cabana, lounger, table or pitch placed on the map and sold through its price band. | Pin, POI, Marker, Resource (in staff copy) | contracts/satellite/venue-map.yaml#setVenuePoint / … |
+| Station / Route / Timetable / Departure / Fare table / Pass … | A route is an ordered list of stations with offsets; a timetable generates departures up to its release horizon; a fare table prices a route per passenger type; a pass type is a multi-trip or unlimited pass sold as a product. | Stop (except in the stop list), Line (except lineCode), Schedule, Trip (except a guest's journey) | contracts/satellite/transport.yaml / REV3-21 |
+| Applies from | The effective date of a change. Every dated change shows it, and sold items keep their old terms. | Effective date (in labels), Start date (for a change) | contracts/satellite/seating.yaml#updateSeatCategory / TRACKER Actions row 194 |
+
+
 ## The screens
 
 Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs count fields; requirements are matrix rows; meeting inputs are the ones naming the screen (the module and platform ones are below); white label says whether the tenant's brand reaches it (guest) or it sets the brand (configures).
@@ -68,14 +107,14 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-1113` | Shared Wallet Command Center | B–D | 0 | 28 | 6 | 0 | 0 | 6 | — | notStarted (—) |
-| `BO-1114` | Shared Wallet Model Configuration | B–D | 11 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
-| `BO-1115` | Family & Household Structure Configuration | B–D | 11 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-1116` | Parent–Child Stored Value Distribution | B–D | 14 | 0 | 6 | 4 | 2 | 6 | — | notStarted (—) |
-| `BO-1117` | Allowance & Budget Allocation Engine | B–D | 12 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-1118` | Member Spending Controls & Permissions | B–D | 23 | 0 | 6 | 0 | 1 | 5 | — | notStarted (—) |
+| `BO-1114` | Shared Wallet Model Configuration | B–D | 11 | 18 | 6 | 0 | 0 | 6 | — | notStarted (—) |
+| `BO-1115` | Family & Household Structure Configuration | B–D | 11 | 18 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-1116` | Parent–Child Stored Value Distribution | B–D | 14 | 24 | 6 | 4 | 2 | 6 | — | notStarted (—) |
+| `BO-1117` | Allowance & Budget Allocation Engine | B–D | 12 | 18 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-1118` | Member Spending Controls & Permissions | B–D | 23 | 18 | 6 | 0 | 1 | 5 | — | notStarted (—) |
 | `BO-1119` | Corporate Wallet & Organizational Hierarchy | B–D | 11 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
-| `BO-1120` | Corporate Budget, Policy & Approval Rules | B–D | 9 | 0 | 6 | 49 | 1 | 3 | — | notStarted (—) |
-| `BO-1121` | Shared Wallet Transfers & Balance Reallocation | B–D | 11 | 0 | 6 | 4 | 1 | 6 | — | notStarted (—) |
+| `BO-1120` | Corporate Budget, Policy & Approval Rules | B–D | 9 | 38 | 6 | 49 | 1 | 3 | — | notStarted (—) |
+| `BO-1121` | Shared Wallet Transfers & Balance Reallocation | B–D | 11 | 6 | 6 | 4 | 1 | 6 | — | notStarted (—) |
 | `BO-1122` | Shared Wallet Simulator, Monitoring & Audit | B–D | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
 
 ## Thin screens in this batch
@@ -105,6 +144,12 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Route | `/orders-money/shared-wallet-command-center-bo-1113` |
 
 **Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Family, parent-child and corporate wallets: structures, members, allowances.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **List operation(s) listSharedWallets return a bare array, not the paged list envelope (items, nextCursor, hasMore).** Why: The table cannot page, and a row without an id cannot open, edit or link to the record it summarises. *(source: contracts/satellite/wallet.yaml#listSharedWallets; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
 
 #### Inputs: what the user enters or picks
 
@@ -169,6 +214,10 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | View Transactions (secondary button) | navigation or local | — | — | — | — |
 | Investigate Exceptions (secondary button) | navigation or local | — | — | — | — |
 
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **shared wallets**: Structure, owner, members, balance. *(source: contracts/satellite/wallet.yaml#listSharedWallets)*
+
 **Data it reads**: `listSharedWallets` (onLoad, Family and corporate structures)
 
 **Where the user goes next**
@@ -198,6 +247,18 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the shared wallet are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+wallet:
+  type: family
+  owner: Fatima Al Nuaimi
+  members: 3
+  balance: AED 640.00
+```
 
 #### Permissions
 
@@ -252,6 +313,7 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 - [ ] Every transition is wired: `BO-100`, `BO-1114`, `BO-1115`, `BO-1116`, `BO-1117`, `BO-1118`, `BO-1119`, `BO-1120`, `BO-1121`, `BO-1122`.
 - [ ] Every gated control is gated: `WALLET_OPERATE`, `WALLET_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -265,12 +327,22 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Orders & Money · wave 3 · needs the `core` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `WALLET_OPERATE` (1 operate); in the flows as venue manager |
+| Who uses it | venue staff holding `WALLET_OPERATE`, `WALLET_VIEW` (1 operate, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/orders-money/shared-wallet-model-configuration-bo-1114` |
+
+**Known gaps.** Contract gap recorded 2 October 2026 (CHG-WIR-027): A reusable shared-wallet model record with its read and write; createSharedWallet creates a wallet, not a model.
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Reusable shared-wallet models (family, parent-child, corporate, employee, school, tour group).
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- createSharedWallet creates a wallet, not a reusable model. (CHG-WIR-027)
+
+**Fixed on main** (the package already carries these; draw what it says): No read operation: the screen declares only createSharedWallet and nothing that returns the current configuration. (CHG-WIR-025).
 
 #### Inputs: what the user enters or picks
 
@@ -290,7 +362,44 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 | Default spending policy | select field | — | — | — | — | — | — |
 | Applicable credit types | select field | — | — | — | — | — | — |
 
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Kind | text field | — | — | `listSharedWallets` ?kind |
+
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **model**: Model type with its defaults. *(source: contracts/satellite/wallet.yaml#createSharedWallet)*
+
 #### Outputs: what the screen shows and produces
+
+**Shown**
+
+**Family, household and corporate structures** (data table, from `listSharedWallets`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| ID | the name it points at, never the id | — |
+| Wallet | the name it points at, never the id | — |
+| Kind | chip: Family, Household, Corporate, School, Group | — |
+| Owner principal | the name it points at, never the id | — |
+| Organisation | the name it points at, never the id | — |
+| Members | list or chips (count when long) | — |
+| Subject | the name it points at, never the id | — |
+| Role | chip: Owner, Administrator, Spender, Viewer | — |
+| Allowance amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Allowance cadence | chip: Daily, Weekly, Monthly, None | — |
+| Spend cap per transaction | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Allowed categorys | list or chips (count when long) | — |
+| Blocked categorys | list or chips (count when long) | — |
+| Allowed venues | list or chips (count when long) | — |
+| Active from | 1 Oct 2026 | — |
+| Active to | 1 Oct 2026 | — |
+| Total budget | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Approval above amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+
+**Data it reads**: `listSharedWallets` (onLoad, Family, household and corporate structures)
 
 **Where the user goes next**
 
@@ -307,9 +416,20 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 | Empty, no results (`?state=emptyNoResults`) | **Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist |
 | Offline (`?state=offline`) | online only |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+model:
+  name: School trip wallet
+  type: school
+```
+
 #### Permissions
 
 - `createSharedWallet` → `WALLET_OPERATE` (operate) · staff
+- `listSharedWallets` → `WALLET_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -342,11 +462,11 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (11), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (18 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-1114?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, emptyNoResults, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-1113`.
-- [ ] Every gated control is gated: `WALLET_OPERATE`.
+- [ ] Every gated control is gated: `WALLET_OPERATE`, `WALLET_VIEW`.
 - [ ] The module and platform inputs below are applied.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -361,12 +481,16 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Orders & Money · wave 3 · needs the `core` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `WALLET_OPERATE` (1 operate); in the flows as venue manager |
+| Who uses it | venue staff holding `WALLET_OPERATE`, `WALLET_VIEW` (1 operate, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population |
 | Offline | online only |
 | Opens with | `sharedWalletId` (navigation) |
 | Route | `/orders-money/family-household-structure-configuration-bo-1115` |
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Family relationships and who may spend from the family wallet.
+
+**Fixed on main** (the package already carries these; draw what it says): No read operation: the screen declares only setSharedWalletMembers and nothing that returns the current configuration. (CHG-WIR-025).
 
 #### Inputs: what the user enters or picks
 
@@ -386,7 +510,44 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 | Member status | select field | — | — | — | — | — | — |
 | Effective dates | select field | — | — | — | — | — | — |
 
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Kind | text field | — | — | `listSharedWallets` ?kind |
+
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **members**: Members with role and allowance. *(source: contracts/satellite/wallet.yaml#setSharedWalletMembers)*
+
 #### Outputs: what the screen shows and produces
+
+**Shown**
+
+**Family, household and corporate structures** (data table, from `listSharedWallets`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| ID | the name it points at, never the id | — |
+| Wallet | the name it points at, never the id | — |
+| Kind | chip: Family, Household, Corporate, School, Group | — |
+| Owner principal | the name it points at, never the id | — |
+| Organisation | the name it points at, never the id | — |
+| Members | list or chips (count when long) | — |
+| Subject | the name it points at, never the id | — |
+| Role | chip: Owner, Administrator, Spender, Viewer | — |
+| Allowance amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Allowance cadence | chip: Daily, Weekly, Monthly, None | — |
+| Spend cap per transaction | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Allowed categorys | list or chips (count when long) | — |
+| Blocked categorys | list or chips (count when long) | — |
+| Allowed venues | list or chips (count when long) | — |
+| Active from | 1 Oct 2026 | — |
+| Active to | 1 Oct 2026 | — |
+| Total budget | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Approval above amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+
+**Data it reads**: `listSharedWallets` (onLoad, Family, household and corporate structures)
 
 **Where the user goes next**
 
@@ -403,9 +564,21 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 | Empty, no results (`?state=emptyNoResults`) | **Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist |
 | Offline (`?state=offline`) | online only |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+member:
+  name: Ali
+  role: child
+  allowance: AED 50.00 a day
+```
+
 #### Permissions
 
 - `setSharedWalletMembers` → `WALLET_OPERATE` (operate) · staff, guest
+- `listSharedWallets` → `WALLET_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -435,11 +608,11 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (11), with its required mark, default, format and its error state (412).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (18 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-1115?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, emptyNoResults, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-1113`.
-- [ ] Every gated control is gated: `WALLET_OPERATE`.
+- [ ] Every gated control is gated: `WALLET_OPERATE`, `WALLET_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -454,12 +627,16 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Orders & Money · wave 3 · needs the `core` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `WALLET_OPERATE` (1 operate); in the flows as venue manager |
+| Who uses it | venue staff holding `WALLET_OPERATE`, `WALLET_VIEW` (1 operate, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population |
 | Offline | online only |
 | Opens with | `sharedWalletId` (navigation), `walletId` (navigation) |
 | Route | `/orders-money/parent-child-stored-value-distribution-bo-1116` |
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** The parent-card and child-card model: the parent funds, children spend within allowances; an allowance is a cap, not a transfer.
+
+**Fixed on main** (the package already carries these; draw what it says): No read operation: the screen declares only setSharedWalletMembers, transferWalletBalance and nothing that returns the current … (CHG-WIR-025).
 
 #### Inputs: what the user enters or picks
 
@@ -482,7 +659,55 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Time restriction | select field | — | — | — | — | — | — |
 | Credit-type restriction | select field | — | — | — | — | — | — |
 
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Kind | text field | — | — | `listSharedWallets` ?kind |
+
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **allowance**: Cap with a refresh period; transfer offered separately where the venue allows. *(source: contracts/satellite/wallet.yaml#setSharedWalletMembers / contracts/satellite/wallet.yaml#transferWalletBalance)*
+
 #### Outputs: what the screen shows and produces
+
+**Shown**
+
+**Family, household and corporate structures** (data table, from `listSharedWallets`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| ID | the name it points at, never the id | — |
+| Wallet | the name it points at, never the id | — |
+| Kind | chip: Family, Household, Corporate, School, Group | — |
+| Owner principal | the name it points at, never the id | — |
+| Organisation | the name it points at, never the id | — |
+| Members | list or chips (count when long) | — |
+| Subject | the name it points at, never the id | — |
+| Role | chip: Owner, Administrator, Spender, Viewer | — |
+| Allowance amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Allowance cadence | chip: Daily, Weekly, Monthly, None | — |
+| Spend cap per transaction | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Allowed categorys | list or chips (count when long) | — |
+| Blocked categorys | list or chips (count when long) | — |
+| Allowed venues | list or chips (count when long) | — |
+| Active from | 1 Oct 2026 | — |
+| Active to | 1 Oct 2026 | — |
+| Total budget | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Approval above amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+
+**A wallet's balance** (detail panel, from `getWalletBalance`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Wallet balance | the name it points at, never the id | — |
+| Wallet | the name it points at, never the id | — |
+| Available balance | 1,234.5 | — |
+| Hold balance | 1,234.5 | — |
+| Total balance | 1,234.5 | — |
+| Currency code | text | — |
+
+**Data it reads**: `listSharedWallets` (onLoad, Family, household and corporate structures); `getWalletBalance` (onLoad, A wallet's balance)
 
 **Where the user goes next**
 
@@ -500,10 +725,26 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 Insufficient cash credit, distinct from insufficient balance — a guest with 200 of bonus credit and 10 of cash can transfer 10, and telling them they have 200 … (WalletTransferProblem) |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+parent:
+  balance: AED 1,000.00
+  children:
+  - name: Ali
+    cap: AED 100.00 a day
+  - name: Lina
+    cap: AED 60.00 a day
+```
+
 #### Permissions
 
 - `setSharedWalletMembers` → `WALLET_OPERATE` (operate) · staff, guest
 - `transferWalletBalance` → `WALLET_OPERATE` (operate) · staff, guest
+- `listSharedWallets` → `WALLET_VIEW` (read) · staff
+- `getWalletBalance` → `WALLET_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -546,11 +787,11 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (14), with its required mark, default, format and its error state (409, 412).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (24 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-1116?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, emptyNoResults, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-1113`.
-- [ ] Every gated control is gated: `WALLET_OPERATE`.
+- [ ] Every gated control is gated: `WALLET_OPERATE`, `WALLET_VIEW`.
 - [ ] The 2 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -565,12 +806,16 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Orders & Money · wave 3 · needs the `core` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `WALLET_OPERATE` (1 operate); in the flows as venue manager |
+| Who uses it | venue staff holding `WALLET_OPERATE`, `WALLET_VIEW` (1 operate, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population |
 | Offline | online only |
 | Opens with | `sharedWalletId` (navigation) |
 | Route | `/orders-money/allowance-budget-allocation-engine-bo-1117` |
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Allowance types (one-time, daily, weekly, monthly, event, attraction, meal) for linked members.
+
+**Fixed on main** (the package already carries these; draw what it says): No read operation: the screen declares only setSharedWalletMembers and nothing that returns the current configuration. (CHG-WIR-025).
 
 #### Inputs: what the user enters or picks
 
@@ -591,7 +836,44 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 | Reallocation | select field | — | — | — | — | — | — |
 | Funding priority | select field | — | — | — | — | — | — |
 
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Kind | text field | — | — | `listSharedWallets` ?kind |
+
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **allowance type**: Type and amount per member. *(source: contracts/satellite/wallet.yaml#setSharedWalletMembers)*
+
 #### Outputs: what the screen shows and produces
+
+**Shown**
+
+**Family, household and corporate structures** (data table, from `listSharedWallets`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| ID | the name it points at, never the id | — |
+| Wallet | the name it points at, never the id | — |
+| Kind | chip: Family, Household, Corporate, School, Group | — |
+| Owner principal | the name it points at, never the id | — |
+| Organisation | the name it points at, never the id | — |
+| Members | list or chips (count when long) | — |
+| Subject | the name it points at, never the id | — |
+| Role | chip: Owner, Administrator, Spender, Viewer | — |
+| Allowance amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Allowance cadence | chip: Daily, Weekly, Monthly, None | — |
+| Spend cap per transaction | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Allowed categorys | list or chips (count when long) | — |
+| Blocked categorys | list or chips (count when long) | — |
+| Allowed venues | list or chips (count when long) | — |
+| Active from | 1 Oct 2026 | — |
+| Active to | 1 Oct 2026 | — |
+| Total budget | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Approval above amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+
+**Data it reads**: `listSharedWallets` (onLoad, Family, household and corporate structures)
 
 **Where the user goes next**
 
@@ -608,9 +890,20 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 | Empty, no results (`?state=emptyNoResults`) | **Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist |
 | Offline (`?state=offline`) | online only |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+allowance:
+  type: meal
+  amount: AED 40.00 a day
+```
+
 #### Permissions
 
 - `setSharedWalletMembers` → `WALLET_OPERATE` (operate) · staff, guest
+- `listSharedWallets` → `WALLET_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -640,11 +933,11 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (12), with its required mark, default, format and its error state (412).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (18 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-1117?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, emptyNoResults, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-1113`.
-- [ ] Every gated control is gated: `WALLET_OPERATE`.
+- [ ] Every gated control is gated: `WALLET_OPERATE`, `WALLET_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -659,12 +952,16 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Orders & Money · wave 3 · needs the `core` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `WALLET_OPERATE` (1 operate); in the flows as venue manager |
+| Who uses it | venue staff holding `WALLET_OPERATE`, `WALLET_VIEW` (1 operate, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§For each member configure; Configure) and no display directory — it is settings, not a population |
 | Offline | online only |
 | Opens with | `sharedWalletId` (navigation) |
 | Route | `/orders-money/member-spending-controls-permissions-bo-1118` |
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** What each member may do: spend caps, categories, cancel authority at any time.
+
+**Fixed on main** (the package already carries these; draw what it says): No read operation: the screen declares only setSharedWalletMembers and nothing that returns the current configuration. (CHG-WIR-025).
 
 #### Inputs: what the user enters or picks
 
@@ -696,7 +993,44 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Channel restrictions | select field | — | — | — | — | — | — |
 | Time restrictions | select field | — | — | — | — | — | — |
 
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Kind | text field | — | — | `listSharedWallets` ?kind |
+
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **permissions**: Per member switches and caps; owner can revoke instantly. *(source: contracts/satellite/wallet.yaml#setSharedWalletMembers)*
+
 #### Outputs: what the screen shows and produces
+
+**Shown**
+
+**Family, household and corporate structures** (data table, from `listSharedWallets`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| ID | the name it points at, never the id | — |
+| Wallet | the name it points at, never the id | — |
+| Kind | chip: Family, Household, Corporate, School, Group | — |
+| Owner principal | the name it points at, never the id | — |
+| Organisation | the name it points at, never the id | — |
+| Members | list or chips (count when long) | — |
+| Subject | the name it points at, never the id | — |
+| Role | chip: Owner, Administrator, Spender, Viewer | — |
+| Allowance amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Allowance cadence | chip: Daily, Weekly, Monthly, None | — |
+| Spend cap per transaction | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Allowed categorys | list or chips (count when long) | — |
+| Blocked categorys | list or chips (count when long) | — |
+| Allowed venues | list or chips (count when long) | — |
+| Active from | 1 Oct 2026 | — |
+| Active to | 1 Oct 2026 | — |
+| Total budget | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Approval above amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+
+**Data it reads**: `listSharedWallets` (onLoad, Family, household and corporate structures)
 
 **Where the user goes next**
 
@@ -713,9 +1047,23 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Empty, no results (`?state=emptyNoResults`) | **Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist |
 | Offline (`?state=offline`) | online only |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+member:
+  name: Ali
+  categories:
+  - games
+  - F&B
+  cap: AED 100.00
+```
+
 #### Permissions
 
 - `setSharedWalletMembers` → `WALLET_OPERATE` (operate) · staff, guest
+- `listSharedWallets` → `WALLET_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -749,11 +1097,11 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (23), with its required mark, default, format and its error state (412).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (18 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-1118?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, emptyNoResults, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-1113`.
-- [ ] Every gated control is gated: `WALLET_OPERATE`.
+- [ ] Every gated control is gated: `WALLET_OPERATE`, `WALLET_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -774,6 +1122,12 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/orders-money/corporate-wallet-organizational-hierarchy-bo-1119` |
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Corporate wallets with departments, users and limits.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **List operation(s) listSharedWallets return a bare array, not the paged list envelope (items, nextCursor, hasMore).** Why: The table cannot page, and a row without an id cannot open, edit or link to the record it summarises. *(source: contracts/satellite/wallet.yaml#listSharedWallets; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
 
 #### Inputs: what the user enters or picks
 
@@ -801,6 +1155,10 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 
 #### Outputs: what the screen shows and produces
 
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **hierarchy**: Company, departments, users with limits. *(source: contracts/satellite/wallet.yaml#listSharedWallets)*
+
 **Data it reads**: `listSharedWallets` (onLoad, Existing corporate wallets)
 
 **Where the user goes next**
@@ -817,6 +1175,19 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Empty, no results (`?state=emptyNoResults`) | **Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+corporate:
+  company: Gulf Engineering
+  departments:
+  - HR
+  - Sales
+  budget: AED 20,000.00
+```
 
 #### Permissions
 
@@ -862,6 +1233,7 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 - [ ] Every transition is wired: `BO-1113`.
 - [ ] Every gated control is gated: `WALLET_OPERATE`, `WALLET_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -875,12 +1247,18 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Orders & Money · wave 3 · needs the `core` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `APPROVAL_CONFIGURE`, `WALLET_OPERATE` (1 configure, 1 operate); in the flows as venue manager |
+| Who uses it | venue staff holding `APPROVAL_CONFIGURE`, `WALLET_OPERATE`, `WALLET_VIEW` (1 configure, 1 operate, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population |
 | Offline | online only |
 | Opens with | `sharedWalletId` (navigation) |
 | Route | `/orders-money/corporate-budget-policy-approval-rules-bo-1120` |
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** How organisational wallet funds may be spent: budgets per department and approval rules.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **No read operation: the screen declares only setSharedWalletMembers, setApprovalMatrix and nothing that returns the current configuration.** Why: It opens as an empty form even where a configuration exists; it needs a get or list for the same record (PR-9). *(source: contracts/satellite/wallet.yaml#setSharedWalletMembers / contracts/spine/approvals.yaml#setApprovalMatrix / screens/P08-venue-back-office.yaml#BO-1120; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
 
 #### Inputs: what the user enters or picks
 
@@ -898,7 +1276,69 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 | Remaining-budget treatment | select field | — | — | — | — | — | — |
 | Spending Policies | select field | — | — | — | — | — | — |
 
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Kind | text field | — | — | `listSharedWallets` ?kind |
+| Kind | select | — | Refund · Price override · Discount override · Complimentary ticket · Membership cancellation · Access permission change · Configuration change · AI recommendation · Release promotion · Requisition · Stock write off · Journal entry …; Each is an existing kind … | `listApprovalMatrices` ?kind |
+| Effective | toggle | off | — | `listApprovalMatrices` ?effective |
+
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **approval matrix**: Ordered rules, first match wins. *(source: contracts/spine/approvals.yaml#setApprovalMatrix)*
+
 #### Outputs: what the screen shows and produces
+
+**Shown**
+
+**Family, household and corporate structures** (data table, from `listSharedWallets`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| ID | the name it points at, never the id | — |
+| Wallet | the name it points at, never the id | — |
+| Kind | chip: Family, Household, Corporate, School, Group | — |
+| Owner principal | the name it points at, never the id | — |
+| Organisation | the name it points at, never the id | — |
+| Members | list or chips (count when long) | — |
+| Subject | the name it points at, never the id | — |
+| Role | chip: Owner, Administrator, Spender, Viewer | — |
+| Allowance amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Allowance cadence | chip: Daily, Weekly, Monthly, None | — |
+| Spend cap per transaction | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Allowed categorys | list or chips (count when long) | — |
+| Blocked categorys | list or chips (count when long) | — |
+| Allowed venues | list or chips (count when long) | — |
+| Active from | 1 Oct 2026 | — |
+| Active to | 1 Oct 2026 | — |
+| Total budget | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Approval above amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+
+**What requires approval here** (data table, from `listApprovalMatrices`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| ID | the name it points at, never the id | — |
+| Kind | chip: Refund, Price override, Discount override, Complimentary ticket, Membership … | 11.1.7 and 11.1.30–11.1.37. The first four already exist as bespoke implementations and this contract is what they collapse into. |
+| Scope level | chip: Tenant, Region, Venue | — |
+| Rules | list or chips (count when long) | — |
+| ID | the name it points at, never the id | Added 20 August. The schema reference derives table columns from API response schemas, and a response is not a table — this one returned … |
+| Order | 1,234 | First match wins. Explicit ordering is what makes a matrix reviewable — an unordered set of overlapping rules is one nobody can reason … |
+| Min amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Max amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Risk score above | 1,234.5 | 11.1.12. Not matched against the AI risk score (29 September, build pass, group G2). |
+| Condition | text | 11.1.13. Evaluated against the attributes the caller supplied. |
+| Approver roles | list or chips (count when long) | Role ids from `identity.listRoles` (`Role.id`), which is where an editor gets the names to show and pick from. |
+| Approver scope level | chip: Venue, Department, Region, Tenant | 11.1.39. Which organisational level the approver must sit at. |
+| Mode | chip: Sequential, Parallel, Consensus, Majority | 11.1.43–11.1.46. Sequential asks one at a time, parallel asks everyone at once, consensus needs all of them, majority needs more than half. |
+| Levels | 1,234 | 11.1.3. Multi-level chains ask each level in turn. |
+| Requires MFA | yes / no (icon or chip) | — |
+| Requires signature | yes / no (icon or chip) | — |
+| Sla minutes | 1,234 | 11.1.14. Null means no SLA, which is different from a long one. |
+| Escalate after minutes | 1,234 | — |
+| Escalate to roles | list or chips (count when long) | Role ids from `identity.listRoles`, as `approverRoleIds`. |
+| Expires after minutes | 1,234 | 11.1.53. An unanswered request eventually stops waiting. |
 
 **Actions and what each produces**
 
@@ -908,6 +1348,8 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 | Single approval (secondary button) | navigation or local | — | — | — | — |
 | Multi-level approval (secondary button) | navigation or local | — | — | — | — |
 | Exception approval (secondary button) | navigation or local | — | — | — | — |
+
+**Data it reads**: `listSharedWallets` (onLoad, Family, household and corporate structures); `listApprovalMatrices` (onLoad, What requires approval here)
 
 **Where the user goes next**
 
@@ -925,10 +1367,20 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed. Includes a `scopeLevel` that is not the level of the scope node the caller acts at (audit R183); `errors[]` names `scopeLevel`.; 409 Refused, and nothing is stored. `refusedReason` says which: `loosensParentRule` — the matrix would loosen a rule set at a higher scope (a higher threshold … (ApprovalMatrixRefusedProblem) |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+rule: 'Spend over AED 500.00 by any employee: department head approves'
+```
+
 #### Permissions
 
 - `setSharedWalletMembers` → `WALLET_OPERATE` (operate) · staff, guest
 - `setApprovalMatrix` → `APPROVAL_CONFIGURE` (configure) · staff
+- `listSharedWallets` → `WALLET_VIEW` (read) · staff
+- `listApprovalMatrices` → `APPROVAL_CONFIGURE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -972,16 +1424,18 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 - Client workshop board: `wireframes/WS189 Wallet Configuration Backend Structure v1.0 Board 4.dc.html#bo-1120`
 - Workshop pack: Wallet_Configuration_Backend_Structure_v1.0.pdf board 4
 - Flow F296 *Wallet Configuration Backend Structure v1.0 board 4: Shared Wallet Command …*, step 14: Works in Corporate Budget, Policy & Approval Rules → Control how organizational wallet funds may be spent. Budget Configuration
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (9), with its required mark, default, format and its error state (400, 409, 412).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (38 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-1120?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, emptyNoResults, offline.
 - [ ] Every action is wired with its success and its failure: Post-spend review, Single approval, Multi-level approval, Exception approval.
 - [ ] Every transition is wired: `BO-1113`.
-- [ ] Every gated control is gated: `APPROVAL_CONFIGURE`, `WALLET_OPERATE`.
+- [ ] Every gated control is gated: `APPROVAL_CONFIGURE`, `WALLET_OPERATE`, `WALLET_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -995,12 +1449,16 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Orders & Money · wave 3 · needs the `core` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `WALLET_OPERATE` (1 operate); in the flows as venue manager |
+| Who uses it | venue staff holding `WALLET_OPERATE`, `WALLET_VIEW` (1 operate, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population |
 | Offline | online only |
 | Opens with | `walletId` (navigation) |
 | Route | `/orders-money/shared-wallet-transfers-balance-reallocation-bo-1121` |
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Moving value within a family or corporate structure (parent to child, department to department).
+
+**Fixed on main** (the package already carries these; draw what it says): No read operation: the screen declares only transferWalletBalance and nothing that returns the current configuration. (CHG-WIR-025).
 
 #### Inputs: what the user enters or picks
 
@@ -1022,6 +1480,25 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 
 #### Outputs: what the screen shows and produces
 
+**Shown**
+
+**A wallet's balance** (detail panel, from `getWalletBalance`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Wallet balance | the name it points at, never the id | — |
+| Wallet | the name it points at, never the id | — |
+| Available balance | 1,234.5 | — |
+| Hold balance | 1,234.5 | — |
+| Total balance | 1,234.5 | — |
+| Currency code | text | — |
+
+**What each action does** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **Transfer**: Amount and recipient; refused where the structure does not permit the direction. *(source: contracts/satellite/wallet.yaml#transferWalletBalance)*
+
+**Data it reads**: `getWalletBalance` (onLoad, A wallet's balance)
+
 **Where the user goes next**
 
 - → `BO-1113` Shared Wallet Command Center: *Back to Shared Wallet Command Center*
@@ -1038,9 +1515,21 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 Insufficient cash credit, distinct from insufficient balance — a guest with 200 of bonus credit and 10 of cash can transfer 10, and telling them they have 200 … (WalletTransferProblem) |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+transfer:
+  from: Parent
+  to: Lina
+  amount: AED 50.00
+```
+
 #### Permissions
 
 - `transferWalletBalance` → `WALLET_OPERATE` (operate) · staff, guest
+- `getWalletBalance` → `WALLET_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -1082,11 +1571,11 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (11), with its required mark, default, format and its error state (409).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (6 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-1121?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, emptyNoResults, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-1113`.
-- [ ] Every gated control is gated: `WALLET_OPERATE`.
+- [ ] Every gated control is gated: `WALLET_OPERATE`, `WALLET_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -1109,6 +1598,12 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 | Route | `/orders-money/shared-wallet-simulator-monitoring-audit-bo-1122` |
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Test family and corporate policies before publication and trace them after.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **List operation(s) listSharedWallets return a bare array, not the paged list envelope (items, nextCursor, hasMore).** Why: The table cannot page, and a row without an id cannot open, edit or link to the record it summarises. *(source: contracts/satellite/wallet.yaml#listSharedWallets; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
 
 #### Inputs: what the user enters or picks
 
@@ -1133,6 +1628,10 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |  (primary button) | navigation or local | — | — | — | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
 
+**What each action does** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **Simulate**: As BO-1110 with member limits applied. *(source: contracts/satellite/wallet.yaml#simulateCreditConsumption)*
+
 **Data it reads**: `listSharedWallets` (onLoad, Monitor the structures)
 
 **Where the user goes next**
@@ -1149,6 +1648,18 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the shared wallet simulator are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+test:
+  wallet: Family AED 1,500.00
+  child: daily limit AED 100.00
+  purchase: AED 120.00
+  result: 'refused: over daily limit'
+```
 
 #### Permissions
 
@@ -1194,6 +1705,7 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 - [ ] Every transition is wired: `BO-1113`.
 - [ ] Every gated control is gated: `WALLET_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -1299,6 +1811,8 @@ Method, path, parameters, request and response for every operation these screens
 ```json
 {
 "createSharedWallet": {"method":"POST","path":"/shared-wallets","contract":"wallet","summary":"Set up a family, household or corporate wallet","permission":"WALLET_OPERATE","offlineCapable":null,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"SharedWallet","responds":"SharedWallet"},
+"getWalletBalance": {"method":"GET","path":"/wallets/{walletId}/balance","contract":"wallet","summary":"A wallet's balance","permission":"WALLET_VIEW","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":"walletId","in":"path","required":true}],"requestBody":null,"responds":"WalletBalance"},
+"listApprovalMatrices": {"method":"GET","path":"/approval-matrices","contract":"approvals","summary":"What requires approval here","permission":"APPROVAL_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"kind","in":"query","required":null},{"name":"effective","in":"query","required":null}],"requestBody":null,"responds":"ApprovalMatrix"},
 "listSharedWallets": {"method":"GET","path":"/shared-wallets","contract":"wallet","summary":"Family, household and corporate structures","permission":"WALLET_VIEW","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[{"name":"kind","in":"query","required":null}],"requestBody":null,"responds":"SharedWallet"},
 "setApprovalMatrix": {"method":"PUT","path":"/approval-matrices","contract":"approvals","summary":"Configure what requires approval","permission":"APPROVAL_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"ApprovalMatrix","responds":"ApprovalMatrix"},
 "setSharedWalletMembers": {"method":"PUT","path":"/shared-wallets/{sharedWalletId}/members","contract":"wallet","summary":"Allowances, budgets and what each member may spend on","permission":"WALLET_OPERATE","offlineCapable":null,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"SharedWalletMember"},
@@ -1313,13 +1827,14 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
-"ApprovalKind": {"type":"string","description":"11.1.7 and 11.1.30–11.1.37. **The first four already exist as bespoke implementations** and this contract is what they collapse into.\n**Which actions route here — decided 28 September, audit R144.** Finance and procurement acts go through this engine to a **finance approver**: closing a fiscal period (`periodClose`), reopening one (`periodReopen`), cancelling a purchase order (`purchaseOrderCancel`) and closing one short (`purchaseOrderShortClose`). The tenant default matrix for each of these names the finance approver role; a venue may tighten it and never loosen it. Starting a release rollout routes through `releasePromotion` to the platform release manager (a holder of `PLATFORM_RELEASE_PROMOTE`). **Not every `requiresApproval` goes here:** reopening a shift, recounting a stock count and a retail return above the venue threshold take a supervisor's step-up on the same device instead, and never raise a request.\n**Catalogue change requests route through `productChange` and `pricingChange`** (decided 29 September, writers pass): a product change and a price or pricing change raised in `catalogue` ask for approval under these two kinds, so a venue can route product edits and price edits to different approvers.\n","enum":["refund","priceOverride","discountOverride","complimentaryTicket","membershipCancellation","accessPermissionChange","configurationChange","aiRecommendation","releasePromotion","requisition","stockWriteOff","journalEntry","periodClose","periodReopen","purchaseOrderCancel","purchaseOrderShortClose","tenantMigration","productChange","pricingChange"]},
+"ApprovalKind": {"type":"string","description":"11.1.7 and 11.1.30–11.1.37. **The first four already exist as bespoke implementations** and this contract is what they collapse into.\n**Which actions route here — decided 28 September, audit R144.** Finance and procurement acts go through this engine to a **finance approver**: closing a fiscal period (`periodClose`), reopening one (`periodReopen`), cancelling a purchase order (`purchaseOrderCancel`) and closing one short (`purchaseOrderShortClose`). The tenant default matrix for each of these names the finance approver role; a venue may tighten it and never loosen it. Starting a release rollout routes through `releasePromotion` to the platform release manager (a holder of `PLATFORM_RELEASE_PROMOTE`). **Not every `requiresApproval` goes here:** reopening a shift, recounting a stock count and a retail return above the venue threshold take a supervisor's step-up on the same device instead, and never raise a request.\n**Catalogue change requests route through `productChange` and `pricingChange`** (decided 29 September, writers pass): a product change and a price or pricing change raised in `catalogue` ask for approval under these two kinds, so a venue can route product edits and price edits to different approvers.\n\n**Optional review steps a venue switches on, decided 2 October 2026** (Chinmay; CHG-CSP-036, CHG-CSP-028, CHG-CSP-031). Each is an existing kind narrowed by the rule's `subjectTypes`, so no kind is added (a new value here would be a breaking change against r1) and each is off until the venue saves an active matrix for it:\n- **Publishing white-label content** (`configurationChange`, subject `whiteLabelPublication`): simulate, then a single publish by a holder of the permission; a review step only where the venue sets one up (batch 1, CMS-014; DEC-156). - **Recording F&B waste above a value** (`stockWriteOff`, subject `fnbWaste`): the venue's waste-approval policy, value bands as `minAmount` and `maxAmount`, photo evidence above a value held by fnb (batch 6 #192, BO-139; DEC-192; R144). - **Publishing an access topology** (`configurationChange`, subject `topologyPublication`): second-person approval when the venue switches it on (batch 6 #230, BO-153; DEC-230). - **A permanent identity lock, a whitelist entry, or releasing a full-identity or permanent lock** (`accessPermissionChange`, subjects `identityLock`, `whitelistEntry`, `identityLockRelease`): always a second approver, never for an until-end-of-day lock (critical set 1, BO-229 and BO-247; DEC-254, DEC-260); the tenant default matrix names the security approver role and a venue may tighten it, never remove it.\n","enum":["refund","priceOverride","discountOverride","complimentaryTicket","membershipCancellation","accessPermissionChange","configurationChange","aiRecommendation","releasePromotion","requisition","stockWriteOff","journalEntry","periodClose","periodReopen","purchaseOrderCancel","purchaseOrderShortClose","tenantMigration","productChange","pricingChange"]},
 "ApprovalMatrix": {"type":"object","x-ticvai-persistence":"approvals.matrix","required":["kind","scopeLevel","rules"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"kind":{"$ref":"#/components/schemas/ApprovalKind"},"scopeLevel":{"type":"string","enum":["tenant","region","venue"]},"scopePath":{"type":"string","readOnly":true},"version":{"type":"integer","readOnly":true,"description":"11.1.80. **A request is decided by the rules it was raised under.** Changing the matrix mid-flight would mean an approver answering a question that changed while they read it.\n**(`kind`, `scopePath`, `version`) is unique**, and a stored version is never edited: a request's `matrixVersion` names exactly one rule set (decided 28 September, audit R129 (2)).\n"},"rules":{"type":"array","items":{"$ref":"#/components/schemas/ApprovalRule"}},"isActive":{"type":"boolean"}}},
-"ApprovalRule": {"type":"object","x-ticvai-persistence":"approvals.rule","required":["order","approverRoleIds","mode"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true,"description":"**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"},"order":{"type":"integer","description":"**First match wins.** Explicit ordering is what makes a matrix reviewable — an unordered set of overlapping rules is one nobody can reason about.\n"},"minAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"maxAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"riskScoreAbove":{"type":"number","nullable":true,"description":"11.1.12. **Not matched against the AI risk score** (29 September, build pass, group G2). The AI assessment on a request (`ApprovalRequest.aiAssessment`, from `ai.scoreApprovalRequest`) is context for the reviewer only (MoM 8 September: AI never influences approve or reject), and routing a request to more approvers because of it would be influence. A rule with this set matches only a `riskScore` the requesting contract passes in `attributes` from its own deterministic rules (a payment's rule score, for example). Using the AI score here needs the client to say so.\n"},"condition":{"type":"string","nullable":true,"description":"11.1.13. Evaluated against the attributes the caller supplied.\n\n**No condition language is defined yet** (pull audit R104, 26 September): the grammar, the attributes it may name and how two conditions are compared for `unreachableRule` are an open decision, not something to infer from this field.\n"},"approverRoleIds":{"type":"array","minItems":1,"description":"Role ids from `identity.listRoles` (`Role.id`), which is where an editor gets the names to show and pick from. This contract stores the ids only.\n","items":{"type":"string","format":"uuid"}},"approverScopeLevel":{"type":"string","enum":["venue","department","region","tenant"],"description":"11.1.39. Which organisational level the approver must sit at."},"mode":{"$ref":"#/components/schemas/ApprovalMode"},"levels":{"type":"integer","default":1,"description":"11.1.3. Multi-level chains ask each level in turn."},"requiresMfa":{"type":"boolean","default":false},"requiresSignature":{"type":"boolean","default":false},"slaMinutes":{"type":"integer","nullable":true,"description":"11.1.14. Null means no SLA, which is different from a long one."},"escalateAfterMinutes":{"type":"integer","nullable":true},"escalateToRoleIds":{"type":"array","description":"Role ids from `identity.listRoles`, as `approverRoleIds`.","items":{"type":"string","format":"uuid"}},"expiresAfterMinutes":{"type":"integer","nullable":true,"description":"11.1.53. An unanswered request eventually stops waiting."},"externalProviderId":{"type":"string","format":"uuid","nullable":true,"description":"11.1.65 (29 September). **This level is decided in an external workflow system** (`ApprovalExternalProvider`) rather than by a person in TICVAI. `approverRoleIds` stay required: they are who decides if the provider does not answer in time and its `onTimeout` is `fallBackToRoles`.\n"}}},
+"ApprovalRule": {"type":"object","x-ticvai-persistence":"approvals.rule","required":["order","approverRoleIds","mode"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true,"description":"**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"},"order":{"type":"integer","description":"**First match wins.** Explicit ordering is what makes a matrix reviewable — an unordered set of overlapping rules is one nobody can reason about.\n"},"minAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"maxAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"riskScoreAbove":{"type":"number","nullable":true,"description":"11.1.12. **Not matched against the AI risk score** (29 September, build pass, group G2). The AI assessment on a request (`ApprovalRequest.aiAssessment`, from `ai.scoreApprovalRequest`) is context for the reviewer only (MoM 8 September: AI never influences approve or reject), and routing a request to more approvers because of it would be influence. A rule with this set matches only a `riskScore` the requesting contract passes in `attributes` from its own deterministic rules (a payment's rule score, for example). Using the AI score here needs the client to say so.\n"},"condition":{"type":"string","nullable":true,"description":"11.1.13. Evaluated against the attributes the caller supplied.\n\n**No condition language is defined yet** (pull audit R104, 26 September): the grammar, the attributes it may name and how two conditions are compared for `unreachableRule` are an open decision, not something to infer from this field.\n"},"approverRoleIds":{"type":"array","minItems":1,"description":"Role ids from `identity.listRoles` (`Role.id`), which is where an editor gets the names to show and pick from. This contract stores the ids only.\n","items":{"type":"string","format":"uuid"}},"approverScopeLevel":{"type":"string","enum":["venue","department","region","tenant"],"description":"11.1.39. Which organisational level the approver must sit at."},"mode":{"$ref":"#/components/schemas/ApprovalMode"},"levels":{"type":"integer","default":1,"description":"11.1.3. Multi-level chains ask each level in turn."},"requiresMfa":{"type":"boolean","default":false},"requiresSignature":{"type":"boolean","default":false},"slaMinutes":{"type":"integer","nullable":true,"description":"11.1.14. Null means no SLA, which is different from a long one."},"escalateAfterMinutes":{"type":"integer","nullable":true},"escalateToRoleIds":{"type":"array","description":"Role ids from `identity.listRoles`, as `approverRoleIds`.","items":{"type":"string","format":"uuid"}},"expiresAfterMinutes":{"type":"integer","nullable":true,"description":"11.1.53. An unanswered request eventually stops waiting."},"subjectTypes":{"type":"array","description":"**Which subjects of the kind this rule matches** (decided 2 October 2026, Chinmay; CHG-CSP-028, CHG-CSP-036, CHG-CSP-031): the `CreateApprovalRequest.subjectType` values, for example `topologyPublication` or `whiteLabelPublication` under `configurationChange`. Empty matches every subject of the kind. It is how a venue switches an optional review step on for one kind of act without routing every act of the kind.","items":{"type":"string","maxLength":64}},"signatureMethods":{"type":"array","description":"**The signature methods this level accepts, where `requiresSignature` is true** (design-notes correction on ADM-344, Block B: \"Configuring which stages need a signature is a policy write\"; CHG-CSP-045). Values of `ApprovalSignature.method`. Empty accepts any of them. With `requiresSignature` this makes the rule the signature policy: which levels of which kinds need a signature, and how it is given; `signApprovalDecision` refuses a method the level does not accept.","items":{"type":"string","enum":["platformKey","uaePass","externalCertificate","drawnSignature"]}},"externalProviderId":{"type":"string","format":"uuid","nullable":true,"description":"11.1.65 (29 September). **This level is decided in an external workflow system** (`ApprovalExternalProvider`) rather than by a person in TICVAI. `approverRoleIds` stay required: they are who decides if the provider does not answer in time and its `onTimeout` is `fallBackToRoles`.\n"}}},
 "CreditAllocation": {"type":"object","description":"Board 3.10. **Which lots this purchase would draw on**, in order.","properties":{"requested":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"covered":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"shortfall":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"lines":{"type":"array","items":{"type":"object","properties":{"lotId":{"type":"string","format":"uuid"},"creditTypeId":{"type":"string","format":"uuid"},"creditTypeName":{"type":"string"},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"expiresAt":{"type":"string","format":"date-time","nullable":true},"reason":{"type":"string"}}}},"rejected":{"type":"array","items":{"type":"object","properties":{"creditTypeId":{"type":"string","format":"uuid"},"reason":{"type":"string","enum":["notEligibleHere","notEligibleForProduct","expired","basketCapReached","restricted"]}}}}}},
 "Money": {"type":"object","x-ticvai-persistence-kind":"valueObject","x-ticvai-persistence-column":"numeric(18,4)","description":"**On the wire this is three fields; in the database it is one column.**\n24 August. Every column typed `Money` was landing as `jsonb` — 129 of them, including `orders.shift.opening_float`, `inventory.purchase_order.total` and `promotions.voucher.balance`. **`orders.cash_movement.amount` was `numeric(18,4)` because somebody hand-typed that one**, and the inconsistency is what made it visible.\n**A jsonb price cannot be summed in SQL.** Every total, variance and reconciliation moves into application code — and a shift variance computed in .NET against a ledger computed in Postgres is two answers to one question. That is F13 month-end and F98 takings-to-ledger, both walked, both assuming the arithmetic is in the database.\n**`currency` and `scale` are not stored per row.** ADR-0018 makes them region-scoped and not overridable below, so they resolve from the scope walk — storing AED against nine million rows in a UAE region is nine million copies of a fact that cannot differ. A row that needed its own currency would be a row in the wrong region.\n**They stay on the wire** because a client reading a figure should not have to walk a hierarchy to know what it means.\n","required":["amount","currency","scale"],"properties":{"amount":{"type":"string","description":"Decimal string, never a float. Up to 4 decimal places. **Persisted as `numeric(18,4)`** — the string is a transport choice, so a JavaScript client cannot round a fare in transit.\n","pattern":"^-?\\d+(\\.\\d{1,4})?$"},"currency":{"type":"string","description":"**Resolved from the region, not stored on the row** (ADR-0018). OMR uses 3 decimal places and AED uses 2 — a venue on a different scale from its region is a ledger that cannot consolidate.\n","pattern":"^[A-Z]{3}$"},"scale":{"type":"integer","description":"Resolved from the region alongside `currency`.","minimum":0,"maximum":4}}},
 "SharedWallet": {"type":"object","x-ticvai-persistence":"wallet.shared_wallet","description":"Board 4. **One pot, distributed authority.**","required":["kind","walletId"],"properties":{"id":{"type":"string","format":"uuid"},"walletId":{"type":"string","format":"uuid"},"kind":{"type":"string","enum":["family","household","corporate","school","group"]},"ownerPrincipalId":{"type":"string","format":"uuid","nullable":true},"organisationId":{"type":"string","format":"uuid","nullable":true},"members":{"type":"array","items":{"$ref":"#/components/schemas/SharedWalletMember"}},"totalBudget":{"x-ticvai-column":"budget_amount","$ref":"../shared/common.yaml#/components/schemas/Money"},"approvalAboveAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"scopePath":{"type":"string"}}},
 "SharedWalletMember": {"type":"object","x-ticvai-persistence":"wallet.shared_wallet_member","description":"Boards 4.5 and 4.6. **An allowance is a cap with a refresh, not a transfer.**","required":["subjectId"],"properties":{"subjectId":{"type":"string","format":"uuid"},"role":{"type":"string","enum":["owner","administrator","spender","viewer"]},"allowanceAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"allowanceCadence":{"type":"string","enum":["daily","weekly","monthly","none"],"default":"none"},"spendCapPerTransaction":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"allowedCategoryIds":{"type":"array","items":{"type":"string","format":"uuid"}},"blockedCategoryIds":{"type":"array","items":{"type":"string","format":"uuid"}},"allowedVenueIds":{"type":"array","items":{"type":"string","format":"uuid"}},"activeFrom":{"type":"string","format":"date","nullable":true},"activeTo":{"type":"string","format":"date","nullable":true}}},
+"WalletBalance": {"type":"object","x-ticvai-persistence":"wallet.balance","description":"**Taken from the backend workbook, 20 September.** Stores the current wallet balance for fast checkout: available amount, held amount, and total amount.","required":["walletBalanceId","walletId","availableBalance","holdBalance","totalBalance","currencyCode","version","updatedAt"],"properties":{"walletBalanceId":{"type":"string","format":"uuid"},"walletId":{"type":"string","format":"uuid"},"availableBalance":{"type":"number"},"holdBalance":{"type":"number"},"totalBalance":{"x-ticvai-column":"balance_amount","type":"number"},"currencyCode":{"type":"string","maxLength":10},"version":{"type":"integer"},"updatedAt":{"type":"string","format":"date-time"}}},
 "WalletTransaction": {"x-ticvai-persistence":"wallet.wallet_transaction","type":"object","required":["id","kind","amount","balanceAfter","recordedAt"],"properties":{"id":{"type":"string"},"walletId":{"type":"string","format":"uuid","x-ticvai-references":"wallet.wallet","description":"The wallet this movement is on (SD-027, 29 September). A shared wallet has many subjects, so the subject alone cannot say which balance moved."},"walletHoldId":{"type":"string","format":"uuid","nullable":true,"x-ticvai-references":"wallet.hold","description":"The hold a spend settled, where it came through `holdWalletFunds`."},"kind":{"$ref":"#/components/schemas/WalletTransactionKind"},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"balanceAfter":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"orderId":{"type":"string","nullable":true},"venueId":{"type":"string","format":"uuid","nullable":true},"reason":{"type":"string","nullable":true},"principalId":{"type":"string","format":"uuid","nullable":true},"recordedAt":{"type":"string","format":"date-time"}}},
 "WalletTransactionKind": {"type":"string","enum":["topUp","spend","refund","adjustment","bonus","expiry","transfer"]}
 }

@@ -1,6 +1,6 @@
 # WS91 — Rental Management board 4
 
-**10 screens · 11 operations · 14 schemas · 5 permissions**
+**10 screens · 8 operations · 8 schemas · 3 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -48,8 +48,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 5 permissions apply here:
-  `PRICE_CONFIGURE, PRODUCT_VIEW, RENTAL_OVERRIDE, RENTAL_PRICE, RENTAL_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 3 permissions apply here:
+  `RENTAL_OVERRIDE, RENTAL_PRICE, RENTAL_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -61,6 +61,72 @@ convincingly. It is never a caption.
   and its error; and, element by element, what is shown and in what format, what each action
   produces and where the user goes next. Draw exactly that.
 
+## The processes these screens belong to
+
+Written by the owner of each process (`handoff/design-notes/`). Read before any screen: it says how the process runs end to end and which words the screens must use.
+
+### Food, Beverage & Retail
+
+Food & beverage, retail, rentals, inventory and procurement across the till (P04), the kitchen display (P15), the staff app (P06), Venue Management (P08), the guest web and app (P01/P02), the kiosk (P05) and the CMS (P13). COUNTER SERVICE (F108): the cashier takes the order on the Food & Drink board from the outlet's menu in force (sections in the outlet's order, option groups attached to the item), sends it to the kitchen, and only then charges — send to kitchen, then charge, for every POS F&B order (R261, upheld against the v2 frame by POSV2-4). The kitchen ticket is on the rail while the card is in the guest's hand; an unpaid sent order is cancelled while ordered or accepted and voided with a reason after (R125(3), R091(5)); the guest gets an order number, and the customer-facing status board (numbers only) is the kitchen display's KIT-007, mirrored on the till's queue (POSV2-7). TABLE SERVICE (F29, F80, F94): a party is seated with its covers, orders across the visit, courses are fired by the pass (DI-333, DI-407), the bill is printed and settled at the end and split by amount, covers, category, item or seat (DI-106); the client's table statuses are Available → Ordered → Table closed → Reserved with no cleaning status (DI-336); moving and merging tables stay on the staff app until after r2 (POSV2-8). GUEST ORDERING (F11, F48): a guest inside the venue orders in the app or web for pickup or delivery to a seat or a scanned location (DI-288, DI-291); F&B and retail are optional licensed modules completed inside TICVAI (DI-505), kept simple (DI-1091); no food without an admission ticket (DI-292); table reservations and the waitlist do not go through the cart and a dining deposit is a venue option, off by default (DI-1048, DI-1049, R077). KITCHEN (P15, F83, F88): TICVAI's own display on commodity screens (19 September, replacing the 31 July "integration point only", DI-077); one kitchen ticket per preparation station from the outlet's routing rules with a fallback display (DI-323); a fired timer counts up and resets per course, not shown for quick service (DI-334); displays are assigned to stations and filter by course, with no station-load tile in r1 (R277). 86 takes an item off sale on every till and guest menu immediately (R110(c)); guests always see "Sold out", never a missing dish. RETAIL (F17, F34, F51): scan and sell through the same cart, charge and payment as tickets and food (DI-795), one cart, one receipt and one QR per guest (DI-293); system stock per venue gates the sale (DI-294); returns by receipt or order number only in r1 (R139(c)), refund to the original tender with a reason code and note (DI-796, DI-797); Shop & Drop is paid online and collected on the way out (R236), a merchandise reservation lasts to the end of the visit day (R169, R215). TILL MONEY (F32, F73, F74, F87): the float is counted by denomination with note images and typed quantities (DI-775, DI-776, R229) while the hardware checks itself (DI-778); the close is a …
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Send to kitchen | Put the order on the kitchen rail. On the till it always comes before Charge. | Fire, Fire order, Submit order, kitchen fires on payment | R261 / POSV2-4 / F108 step 3 |
+| Charge | The till's single tender step (Payment, POS-005); the button reads "Charge AED 110.25". | Checkout (on staff screens), Pay now | F108 step 4 / screens/P04-point-of-sale.yaml#POS-021 |
+| Fire / Hold (a course) | Kitchen-pass words for releasing or holding the next course of a table, and the "fired" timer. | using "fire" for sending an order from the till | DI-333 / DI-334 / DI-407 |
+| Kitchen ticket | The slip on the kitchen display, one per preparation station. | Order (on the kitchen display), KOT | R210 |
+| Ready · Served · Collected · Delivered | How an order reaches the guest; a server marks Served, a counter Collected, a runner Delivered (with the location). | Done, Complete, Bumped (as a status) | R125 / contracts/satellite/fnb.yaml#recordOrderHandover |
+| Recall (kitchen) / Recall held sale (till) | Bring a mis-bumped kitchen ticket back to the rail; separately, bring a held cart back into a sale. Never "Recall" alone where both could apply. | Undo bump, Restore | contracts/satellite/fnb.yaml#recallKitchenTicket / POSV2-6 |
+| Unavailable (86) / Sold out | Staff screens say "Unavailable" and may add "86"; guest screens say "Sold out". Immediate everywhere. | Out of stock (for food), Disabled, Hidden | R110 / contracts/satellite/fnb.yaml#getGuestMenu |
+| Order type | Dine-in · Quick service · Takeaway · Delivery, chosen in the cart. | Service mode, Fulfilment source (on the till) | DI-789 / contracts/satellite/fnb.yaml#/components/schemas/ServiceMode |
+| Covers | The number of guests at a table, entered when seating; drives split-by-covers. | Pax (except as a small suffix on the floor plan), Heads | DI-104 / contracts/satellite/fnb.yaml#openTableVisit |
+| Vacant · Seated · Ordered · Bill requested · Table closed · … | Table statuses on every floor plan (till and staff app); "Table closed" is the client's word for after payment. | Cleaning, Needs clearing, Dirty | DI-336 / DI-792 |
+| Till · Cash drawer | Staff copy may say "till" for the workstation; the cash drawer is the deposit box. | Terminal id as a heading, Deposit box (on staff screens) | R156 |
+| Float · Count · Blind count · Variance | The opening float; the denomination count; the closing count made without seeing the expected cash; counted minus expected. | Expected in drawer, Discrepancy, Error | R080 / POSV2-3 |
+| Cash out · Cash in · Safe drop | Taking cash out of the drawer mid-shift, adding change, and a supervisor moving cash to the safe with the cashier as witness. | Lift, Withdrawal (as button labels) | DI-274 / contracts/spine/shift.yaml#createCashMovement / … |
+| Menu item · Merchandise item · Inventory item · SKU | The scoped product words; SKU is a variant's code, Product stays the sellable thing. | SKU as the item's name, Article | R131 |
+| Stock on hand · Allocated · Available | Available is on hand minus allocated. | Inventory (as a number), Free stock | R171 / DI-361 |
+| Requisition · Purchase order · Goods receipt · Transfer · … | The procurement and stock words, in that flow. | GRN as the only label, Indent | DI-341 / DI-348 / DI-362 / DI-363 |
+| Shop & Drop | Bought and paid now, collected on the way out. | Click & collect | R236 |
+| Check-out (rental) · Return (rental) | Handing equipment to the guest and taking it back. On the same screens payment is "Charge" or "Pay". | Checkout (for a handover), Check-in (for a return) | DI-758 / DI-765 |
+| Deposit hold · Release · Capture | A refundable deposit held, given back in full, or partly kept for damage with the rest released. | Charge deposit, Refund deposit | DI-752 / R127 |
+| Extension · Swap · Overdue · Late fee | The active-rental words; a quick swap restarts the clock, a late swap earns a free extension. | Renewal, Exchange (for a swap) | DI-761 / DI-762 / DI-764 |
+
+### Ticketing & Guest Commerce, as the venue and TICVAI configure and run it
+
+WHAT THE PROCESS IS. Everything a guest can buy is set up, priced, promoted and serviced here, on Venue Management (P08, the venue's own back office, served inside the venue's cell) and on the TICVAI Console (P09, TICVAI's control plane, outside every cell). End to end: (1) CATALOGUE. A product has one of twelve kinds (admission, timedAdmission, datedAdmission, openDated, seated, membership, bundle, fnb, retail, rental, addOn, giftCard). Its ticket types (adult, child, senior, resident...) are not typed one by one: they are generated from the product's attributes (components) and each value combination becomes a sellable ticket type with no extra setup (DI-164). What a ticket grants (validity, entries, re-entry, days of week, blackout dates, expiry anchor, fast track, transfer) lives on a reusable entitlement template, not on the product. Who may take part (age, height, supervision, certification) is the eligibility rule; what the guest must answer is the data mask and the consent questions; how the guest sees it is guestListing (bookable, infoOnly, hidden), display tags (at most six), media and the booking flow. Group, family and corporate products and every after-sales policy (reschedule, exchange, refund, cancellation, upgrade, transfer) are configured inside the one product configuration, never on separate screens (DI-465, DI-466). (2) LIFECYCLE AND PUBLICATION. A product moves draft, inReview, approved, live, withdrawn, archived. Approval and publication are two acts with two permissions (PRODUCT_APPROVE, PRODUCT_PUBLISH, R091); every product is authorised before it sells online or on site (DI-438). Approved is still not on a till: a till sells only what is in the signed catalogue release it pulled (publishBundle, ADR-0013), so a saved price is a back-office fact until the venue publishes to tills. Changing something that has sold is preceded by an impact check (assessProductChange: orders affected, entitlements issued, future performances, open carts); restoring a version creates a new version, and sold tickets keep the price and terms they were sold under (restoreProductVersion, DI-938, TRACKER Actions row 145). (3) PRICE. Prices live in price lists: per venue, per channel set, with validity dates and a priority, copied for the next season with an uplift (copyPriceList) and repriced in bulk only after a dry run (bulkChangePrices). Currency and decimal scale are never chosen on a form: they resolve from the venue's region (ADR-0008, ADR-0018; AED 2 places, OMR and BHD 3). When several rules apply, the configured hierarchy decides; there is no "lowest price wins" default (DI-595). Tax on the pre-discount price and three-decimal rounding are regional settings (DI-598). Dynamic rules always show their minimum and maximum price guardrails beside the trigger (getDynamicPriceRule). (4) PROMOTE AND BUNDLE. A promotion is a rule (automatic, or gated by a code) created in draft, made live only by Publish, which first analyses stacking; a …
+*(source: DI-164; DI-171; DI-438; DI-465; DI-466; DI-595; DI-598; DI-387; DI-039; DI-044; DI-474; DI-671; DI-987; DI-019; DI-080; ADR-0008; ADR-0013; ADR-0018; ADR-0019; ADR-0030; R091; R098; R101; R222; REV3-21; contracts/spine/catalogue.yaml#transitionProductLifecycle …)*
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Product | Anything sellable, of one of the twelve kinds. The record that carries names, channels, listing, media and policies. | Item (except on F&B and retail screens), SKU (for tickets), Offering | contracts/spine/catalogue.yaml#/components/schemas/ProductKind |
+| Ticket type | One sellable variant of an admission or event product (Adult, Child, Resident Adult), generated from the product's attributes. For retail and F&B the same record is labelled Variant. | Variant (on ticket screens), Sub-product, Rate (that is a price), Axis value | contracts/spine/catalogue.yaml#updateProductVariant / DI-164 / DI-437 |
+| Attribute | A dimension that generates ticket types (Guest category, Residency, Tier, Length). Each has values; adding a value adds ticket types. | Axis, Component (the client's word; use it only in help text), Option | contracts/spine/catalogue.yaml#setProductAttributes / DI-164 / DI-450 |
+| Entitlement | What a ticket lets the holder do (validity, entries, re-entry, days, blackout dates, expiry, fast track, transfer), defined once on an entitlement template and shared by several products. | Access rights, Ticket rules, Validity profile | contracts/spine/catalogue.yaml#createEntitlementTemplate / DI-171 / DI-451 |
+| Eligibility rule | Who may take part in or buy a product (age, height, supervision, waiver, certification). Distinct from a promotion's eligibility, which decides who gets a discount. | Restriction, Access rule (that is access control) | contracts/spine/catalogue.yaml#setProductEligibilityRule / DI-463 |
+| Price list | A set of prices for one venue and a set of channels, valid between two dates, with a priority. Several coexist (B2C, B2B, season). | Price book, Rate card, Tariff | contracts/spine/catalogue.yaml#createPriceList / DI-140 / DI-163 |
+| Price category | A standard rate type (Adult, Child, Member) reused across lists so venues do not invent "Adult Standard" and "Normal Adult". | Price band (that is a seat-category band), Fare type (transport) | contracts/spine/catalogue.yaml#setPriceCategoryRateType / … |
+| Price band | A priced band on a seat category (code, label, colour, amount, channel, from-date). | Price category, Zone price | contracts/satellite/seating.yaml#/components/schemas/SeatPriceBand |
+| Promotion | A rule that changes a price automatically or when a code is entered; draft until published; declares how it stacks. | Offer (except in guest copy), Deal, Discount rule | contracts/satellite/promotions.yaml#createPromotion / DI-173 / DI-174 |
+| Coupon code | A code issued from a coupon campaign that applies a promotion-style discount; one shared code or many single-use codes. | Voucher, Promo voucher | contracts/satellite/promotions.yaml#createCouponCampaign / DI-173 |
+| Voucher | A code that carries money (face value, balance), sold or issued; a liability until redeemed or expired. | Coupon, Credit note | contracts/satellite/promotions.yaml#listVoucherBatches / … |
+| Bundle | A product sold as one line whose price differs from the sum of its components, with a mandatory revenue allocation. "Package" is acceptable in guest copy. | Combo (that is an F&B meal deal), Catalogue bundle | contracts/satellite/promotions.yaml#createBundle / DI-220 / ADR-0019 |
+| Catalogue release | The signed snapshot of a venue's catalogue, prices, promotions and sale boards that tills, kiosks and devices pull. Its action label is "Publish to tills". | Bundle, Catalogue bundle, Sync, Deploy | contracts/spine/catalogue.yaml#publishBundle / … |
+| Approve / Publish / Save | Save keeps a draft; Approve records that it is authorised (PRODUCT_APPROVE); Publish makes it live for guests and channels (PRODUCT_PUBLISH). Three different buttons, never merged. | Submit, Go live, Activate (except CatalogueConfigStatus active), Deploy | R091 / contracts/spine/catalogue.yaml#transitionProductLifecycle / DI-438 |
+| Product states | Draft, In review, Approved, Live, Withdrawn, Archived (ProductLifecycleState), always as coloured badges with these exact labels. | Published (for a product), Pending, Inactive (for a product) | contracts/spine/catalogue.yaml#/components/schemas/ProductLifecycleState |
+| Channel | Where something is sold. Labels: pos Point of sale; kiosk Kiosk; web and guestWeb Website; mobile and guestApp App; b2b B2B partners; partner Partner; ota Travel agents (OTA); callCentre Call centre; api API; backOffice Back office. | Touchpoint, Outlet (an outlet is a business inside a venue), raw enum values | contracts/spine/catalogue.yaml#/components/schemas/Channel / … |
+| Refund | Money returned after settlement, wholly or for some lines, under the venue's refund policy. | Return (that is retail goods), Reversal, Void | contracts/spine/orders.yaml#createRefund / DI-252 |
+| Void | Cancelling a whole order before settlement, within the same shift, with a reason from the void list. After settlement it is a refund. | Cancel order, Delete | contracts/spine/orders.yaml#voidOrder / R222 |
+| Exchange / Reschedule | Exchange swaps lines for other products or dates and settles only the difference; Reschedule is the same product moved to another date or time. | Rebook, Date change (acceptable only in guest copy), Refund and resell | contracts/spine/orders.yaml#exchangeOrderLines / … |
+| Hold / Capture / Release | A deposit or stored-value amount is held, then partly or fully captured, and the rest released. A held deposit is not a payment. | Charge, Pre-auth (in staff copy), Block funds | contracts/spine/orders.yaml#authoriseStoredValue / … |
+| Wallet (TICVAI wallet) | The guest's stored-value balance on TICVAI, spent by hold and capture. Distinct from the tender "Apple Pay / Google Pay", which the contract also calls wallet. | Digital wallet (for stored value), E-wallet, Credit (without a type) | contracts/spine/orders.yaml#/components/schemas/TenderKind / R080 |
+| Credit lot | One amount of wallet credit of one credit type (cash, bonus, gift) with its own expiry; lots are spent nearest expiry first and the guest sees the breakdown but cannot choose. | Bucket, Batch, Top-up | TRACKER Actions row 171 / contracts/satellite/wallet.yaml#expireCreditLots |
+| Venue map / Seat map | A venue map is the wayfinding map of a park or a floor (points, paths, bookable places); a seat map is the seating layout of an auditorium or stand. Never just "map" where both could be meant. | Layout (alone), Floor plan (unless it is a floor map), Map (alone) | contracts/satellite/venue-map.yaml#createVenueMap / … |
+| Point / Bookable place | A point is a place on a venue map (toilet, ride, restaurant, exit). A bookable place is a cabana, lounger, table or pitch placed on the map and sold through its price band. | Pin, POI, Marker, Resource (in staff copy) | contracts/satellite/venue-map.yaml#setVenuePoint / … |
+| Station / Route / Timetable / Departure / Fare table / Pass … | A route is an ordered list of stations with offsets; a timetable generates departures up to its release horizon; a fare table prices a route per passenger type; a pass type is a multi-trip or unlimited pass sold as a product. | Stop (except in the stop list), Line (except lineCode), Schedule, Trip (except a guest's journey) | contracts/satellite/transport.yaml / REV3-21 |
+| Applies from | The effective date of a change. Every dated change shows it, and sold items keep their old terms. | Effective date (in labels), Start date (for a change) | contracts/satellite/seating.yaml#updateSeatCategory / TRACKER Actions row 194 |
+
+
 ## The screens
 
 Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs count fields; requirements are matrix rows; meeting inputs are the ones naming the screen (the module and platform ones are below); white label says whether the tenant's brand reaches it (guest) or it sets the brand (configures).
@@ -71,7 +137,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-525` | Pricing Profile Builder | B–D | 8 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-526` | Duration & Tiered Pricing Configuration | B–D | 7 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-527` | Calendar, Peak & Seasonal Pricing | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-528` | Dynamic Pricing & AI Recommendation | B–D | 2 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-528` | Dynamic Pricing & AI Recommendation | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-529` | Deposit & Security Hold Policy | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-530` | Deposit Lifecycle & Settlement Rules | B–D | 7 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-531` | Late Fee, Grace Period & Extension Pricing | B–D | 7 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
@@ -103,6 +169,12 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/rentals/rental-pricing-command-center-bo-524` |
+
+**From the Food, Beverage & Retail process.** All rental pricing profiles and commercial policies: active profiles, products without pricing, deposit policies, upcoming price changes, approvals pending. The one thing to get right: "products without pricing" is the first thing a manager fixes.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **An "AI Recommendations" tile.** Why: The client limited rental AI to reporting and maintenance recommendations. *(source: DI-772; Food, Beverage & Retail)*
 
 #### Inputs: what the user enters or picks
 
@@ -146,6 +218,10 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|---|---|---|---|
 | + Create Pricing Profile (primary button) | navigation or local | — | — | — | — |
 
+**Rules for what is shown** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
+
+- **Profiles**: Name, product, model, base price, channels, effective dates, status (Draft · Pending approval · Active · Scheduled · Expired). *(source: DI-751 / contracts/satellite/rental.yaml#listRentalPricingProfiles)*
+
 **Data it reads**: `listRentalPricingProfiles` (onLoad, Profiles, and products without one)
 
 **Where the user goes next**
@@ -171,6 +247,14 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the rental pricing are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+profile: Bicycle standard · City Bicycle · Duration tiers · AED 35 / 30 min · Active from 1 Nov
+```
 
 #### Permissions
 
@@ -226,6 +310,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - [ ] Every transition is wired: `BO-100`, `BO-525`, `BO-526`, `BO-527`, `BO-528`, `BO-529`, `BO-530`, `BO-531`, `BO-532`, `BO-533`.
 - [ ] Every gated control is gated: `RENTAL_PRICE`, `RENTAL_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -248,6 +333,12 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 
 **Known gaps.** **Pricing Profile Builder declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write …
 
+**From the Food, Beverage & Retail process.** Build a pricing profile: model (flat, duration-based, tiered, peak/off-peak, weekend, seasonal, dynamic, hybrid), base price, channel, segment, locations, dates. The one thing to get right: one model picked, then only its fields.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **Each model drawn as a separate select field.** Why: The model is one choice. *(source: screens/P08-venue-back-office.yaml#BO-525; Food, Beverage & Retail)*
+
 #### Inputs: what the user enters or picks
 
 **On the screen**
@@ -262,6 +353,10 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | Seasonal | select field | — | — | — | — | — | — |
 | Dynamic / AI-Assisted | select field | — | — | — | — | — | — |
 | Hybrid | select field | — | — | — | — | — | — |
+
+**Rules for these inputs** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
+
+- **Model**: One of the eight models; dynamic shows its maximum increase and decrease percentages. *(source: DI-751 / contracts/satellite/rental.yaml#/components/schemas/RentalPricingProfile)*
 
 #### Outputs: what the screen shows and produces
 
@@ -279,6 +374,14 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Empty, no results (`?state=emptyNoResults`) | **Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+profile: Kayak weekend · tiered · AED 90 first hour · channels online and POS · 1 Nov 2026 – 31 Mar 2027
+```
 
 #### Permissions
 
@@ -319,6 +422,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-524`.
 - [ ] Every gated control is gated: `RENTAL_PRICE`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -339,6 +443,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | `profileId` (navigation) |
 | Route | `/rentals/duration-tiered-pricing-configuration-bo-526` |
 
+**From the Food, Beverage & Retail process.** Duration pricing: tiers (30/60/90 min at falling per-minute rates), minimum charge, billing increment and rounding. The one thing to get right: a worked example price for a sample duration beside the settings.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **Values drawn as labels ("Minimum Charge - AED 40", "Billing Increment - 15 minutes").** Why: Sample values used as labels; fields need labels and inputs. *(source: screens/P08-venue-back-office.yaml#BO-526; Food, Beverage & Retail)*
+
 #### Inputs: what the user enters or picks
 
 **On the screen**
@@ -352,6 +462,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Round up to 15 minutes | text field | — | — | — | — | — | — |
 | Round up to 30 minutes | text field | — | — | — | — | — | — |
 | Full next hour | select field | — | — | — | — | — | — |
+
+**Rules for these inputs** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
+
+- **Tiers and rounding**: Tiers with price; minimum charge; increment; rounding Exact · Up to 15 · Up to 30 · Up to next hour. *(source: DI-751 / contracts/satellite/rental.yaml#/components/schemas/RentalPricingProfile)*
 
 #### Outputs: what the screen shows and produces
 
@@ -369,6 +483,14 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Empty, no results (`?state=emptyNoResults`) | **Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+example: Minimum AED 40 · increment 15 min at AED 10 · 75 min rounds up to 90 → AED 80
+```
 
 #### Permissions
 
@@ -408,6 +530,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-524`.
 - [ ] Every gated control is gated: `RENTAL_PRICE`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -429,6 +552,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Route | `/rentals/calendar-peak-seasonal-pricing-bo-527` |
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+**From the Food, Beverage & Retail process.** Date and time pricing: weekday/weekend, peak hours, seasons, special dates. The one thing to get right: a calendar showing which rule applies on each day.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **Layout is only Save and Cancel.** Why: Nothing to draw. *(source: screens/P08-venue-back-office.yaml#BO-527; Food, Beverage & Retail)*
 
 #### Inputs: what the user enters or picks
 
@@ -457,6 +586,14 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the calendar peak seasonal are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+rules: Weekend +20% · 16:00–18:00 peak +AED 10 · Winter season Nov–Mar
+```
 
 #### Permissions
 
@@ -496,65 +633,40 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-524`.
 - [ ] Every gated control is gated: `RENTAL_PRICE`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
 
 ### `BO-528` Dynamic Pricing & AI Recommendation
 
-**Connect Rental Management to TICVAI's broader Dynamic Pricing capability without duplicating the core Dynamic Pricing module. The original rental requirements explicitly support dynamic pricing.**
+**Connect Rental Management to TICVAI's broader Dynamic Pricing capability without duplicating the core Dynamic Pricing module. The original rental requirements explicitly support dynamic pricing (merged into ADM-088 Dynamic Pricing Strategy Command Center).**
 
 | | |
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Rentals · wave 3 · needs the `resources` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `PRICE_CONFIGURE`, `PRODUCT_VIEW` (1 configure, 1 read); in the flows as venue manager |
+| Who uses it | venue; in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
 | Offline | online only |
 | Opens with | `strategyId` (navigation) |
 | Route | `/rentals/dynamic-pricing-ai-recommendation-bo-528` |
 
-**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+**What the spec says about it.** **Merged into ADM-088** (decided 2 October 2026, Chinmay: duplicate screens merged as proposed; CHG-SBO-021). Rental dynamic pricing is the one dynamic pricing strategy list (ADM-088), filtered to rental resources; BO-528 duplicated it with the same list operation. **One implementation, both ids kept**, as the M24-03 merges do: this id stays for traceability and routes to ADM-088, and nothing on it is built separately.
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Rental pricing's link into the venue's dynamic pricing strategies rather than a second engine: see the strategies that apply to rental products and activate, pause, resume or retire them.
 
 #### Inputs: what the user enters or picks
 
-**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
-
-| Filter | Drawn as | Default | Allowed values, rules | Source |
-|---|---|---|---|---|
-| Strategy type | select | — | Demand based · Occupancy based · Availability based · Inventory based · Booking velocity · Time to event · Seasonal · Day of week · Timeslot · Channel · Segment · Location … | `listDynamicPricingStrategy` ?strategyType |
-| Status | select | — | Draft · Testing · Ready · Scheduled · Active · Paused · Frozen · Expired · Retired | `listDynamicPricingStrategy` ?status |
-| Automation mode | radio group | — | Monitor · Recommend · Prepare change · Auto execute within guardrails | `listDynamicPricingStrategy` ?automationMode |
-| Venue | text field | — | — | `listDynamicPricingStrategy` ?venue |
-| Search | text field | — | — | `listDynamicPricingStrategy` ?search |
-
-**Form: Transition dynamic pricing strategy** (modal, opened by *Transition dynamic pricing strategy*; *Transition dynamic pricing strategy* calls `transitionDynamicPricingStrategy`, *Cancel* sends nothing)
-
-**Collects what `transitionDynamicPricingStrategy` sends before it is called.** Required: `action`. Optional: `reason`. Dismissing sends nothing; the screen behind is unchanged.
-
-| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
-|---|---|---|---|---|---|---|---|
-| Action `action` | radio group | required | — | Activate · Pause · Resume · Retire | — | — | `transitionDynamicPricingStrategy` body |
-| Reason `reason` | text area | optional | — | max length 500 | — | — | `transitionDynamicPricingStrategy` body |
-
-Errors to draw in the form: 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 `illegalTransition`.; 422 `strategyIncomplete`.
+Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
 
 #### Outputs: what the screen shows and produces
 
-**Shown**
+**What each action does** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
 
-**Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
-
-**Actions and what each produces**
-
-| Action | Calls | Sends | On success returns | Errors to show | Notes |
-|---|---|---|---|---|---|
-| Accept / Modify / Reject / Schedule (primary button) | navigation or local | — | — | — | — |
-| Transition dynamic pricing strategy (secondary button) | `transitionDynamicPricingStrategy` POST `/dynamic-pricing-strategies/{strategyId}/lifecycle` | inline | DynamicPricingStrategy | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 `illegalTransition`.; 422 `strategyIncomplete`. | gated `PRICE_CONFIGURE`; opens modal first |
-
-**Data it reads**: `listDynamicPricingStrategy` (onLoad, Dynamic pricing)
+- **Activate / Pause / Resume / Retire**: Activate refuses a strategy without a price ladder and at least one rule ("strategy incomplete"); freeze is not offered here (it lives on the guardrails). *(source: contracts/spine/catalogue.yaml#transitionDynamicPricingStrategy)*
 
 **Where the user goes next**
 
@@ -564,20 +676,29 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 
 | State | What it shows |
 |---|---|
-| Loading (`?state=loading`) | The dynamic pricing recommendation list. |
-| Error (`?state=error`) | Could not load. Names which read failed and leaves the dynamic pricing recommendation untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No dynamic pricing recommendation yet. Carries the create action; distinct from a filter that matched nothing. |
-| Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the dynamic pricing recommendation are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Loading (`?state=loading`) | Routes to ADM-088 while it opens. |
+| Error (`?state=error`) | Could not open ADM-088; says so and offers to retry. |
+| Empty, first run (`?state=emptyFirstRun`) | Never shown: this id routes to ADM-088, whose empty states apply. |
+| Empty, no results (`?state=emptyNoResults`) | Never shown: this id routes to ADM-088. |
+| Permission denied (`?state=emptyNoAccess`) | As ADM-088: shown when the caller lacks the access ADM-088 requires, named in words. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 409 `illegalTransition`.; 422 `strategyIncomplete`. |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+strategy:
+  code: CABANA-WKND
+  name: Cabana weekend demand
+  type: demandBased
+  scope: 'product: Cabana half day'
+  status: active
+```
 
 #### Permissions
 
-- `listDynamicPricingStrategy` → `PRODUCT_VIEW` (read) · staff
-- `transitionDynamicPricingStrategy` → `PRICE_CONFIGURE` (configure) · staff
-
-**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** As ADM-088: shown when the caller lacks the access ADM-088 requires, named in words.
 
 #### Requirements it meets
 
@@ -604,12 +725,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (2), with its required mark, default, format and its error state (404, 409, 422).
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
 - [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-528?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: Accept / Modify / Reject / Schedule, Transition dynamic pricing strategy.
+- [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-524`.
-- [ ] Every gated control is gated: `PRICE_CONFIGURE`, `PRODUCT_VIEW`.
+- [ ] Sign-in is asked only where the spec asks for it.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -633,9 +754,19 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Food, Beverage & Retail process.** The deposit policy: required or not, fixed, percentage or risk-based, minimum and maximum, and accepted methods (card pre-authorisation, card charge, cash, wallet). The one thing to get right: show the guest-facing result ("AED 200 held on your card, released on return").
+
+**Known correction pending (do not draw the wrong version)**
+
+- **Payment methods drawn as three buttons.** Why: Methods are a multi-select setting. *(source: screens/P08-venue-back-office.yaml#BO-529; Food, Beverage & Retail)*
+
 #### Inputs: what the user enters or picks
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+**Rules for these inputs** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
+
+- **Deposit**: Basis Fixed · Percentage · Risk-based; amount or percentage; min/max; methods allowed. *(source: DI-752 / contracts/satellite/rental.yaml#/components/schemas/RentalDepositPolicy)*
 
 #### Outputs: what the screen shows and produces
 
@@ -661,6 +792,14 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the deposit security hold are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+policy: City Bicycle · AED 200 fixed · card hold or cash · released on return after inspection
+```
 
 #### Permissions
 
@@ -700,6 +839,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-524`.
 - [ ] Every gated control is gated: `RENTAL_PRICE`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -720,6 +860,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | nothing: it opens on its own |
 | Route | `/rentals/deposit-lifecycle-settlement-rules-bo-530` |
 
+**From the Food, Beverage & Retail process.** What happens to the deposit after return: automatic release, inspection first, release delay, partial capture, supervisor threshold. The one thing to get right: partial capture always releases the remainder to the guest.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **Shares one setter with BO-529, and lists "Refund method" and "Full capture permitted", which the policy has no field for.** Why: Two screens for one record, and fields without data; consolidate. *(source: contracts/satellite/rental.yaml#/components/schemas/RentalDepositPolicy / DI-671; Food, Beverage & Retail)*
+
 #### Inputs: what the user enters or picks
 
 **On the screen**
@@ -733,6 +879,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Full capture permitted | select field | — | — | — | — | — | — |
 | Auto-release delay | select field | — | — | — | — | — | — |
 | Refund method | select field | — | — | — | — | — | — |
+
+**Rules for these inputs** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
+
+- **Settlement**: Auto-release yes/no, inspection required, delay hours, partial capture allowed, supervisor approval above an amount. *(source: DI-752 / contracts/satellite/rental.yaml#/components/schemas/RentalDepositPolicy / R127)*
 
 #### Outputs: what the screen shows and produces
 
@@ -750,6 +900,14 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Empty, no results (`?state=emptyNoResults`) | **Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+rule: Auto-release 0 h after inspection · partial capture allowed · supervisor above AED 150
+```
 
 #### Permissions
 
@@ -789,6 +947,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-524`.
 - [ ] Every gated control is gated: `RENTAL_PRICE`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -809,6 +968,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | nothing: it opens on its own |
 | Route | `/rentals/late-fee-grace-period-extension-pricing-bo-531` |
 
+**From the Food, Beverage & Retail process.** Late returns and extensions: grace period, late fee basis, tiers, daily cap, extension price, "not returned" after N hours, damage and missing-item fees. The one thing to get right: an example timeline of a late return with its fees.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **Each fee basis drawn as a separate select.** Why: Basis is one choice. *(source: screens/P08-venue-back-office.yaml#BO-531; Food, Beverage & Retail)*
+
 #### Inputs: what the user enters or picks
 
 **On the screen**
@@ -822,6 +987,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Per Hour | select field | — | — | — | — | — | — |
 | Tiered | select field | — | — | — | — | — | — |
 | Maximum Daily Charge | select field | — | — | — | — | — | — |
+
+**Rules for these inputs** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
+
+- **Late fee**: Grace minutes; basis Fixed · Per minute · Per 15 · Per 30 · Per hour · Tiered; daily cap. *(source: DI-753 / contracts/satellite/rental.yaml#/components/schemas/RentalFeePolicy)*
 
 #### Outputs: what the screen shows and produces
 
@@ -839,6 +1008,14 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Empty, no results (`?state=emptyNoResults`) | **Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+example: Grace 10 min · AED 15 per 30 min after · capped AED 150/day · not returned after 6 h
+```
 
 #### Permissions
 
@@ -878,6 +1055,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-524`.
 - [ ] Every gated control is gated: `RENTAL_PRICE`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -900,9 +1078,19 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Food, Beverage & Retail process.** Authorised deviations: price override, complimentary, deposit waiver or reduction, late, damage or extension fee waiver, manual refund, goodwill — each with original and adjusted amount, reason and approver. The one thing to get right: a log of who asked and who approved.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **Primary button has no label and there is no list of overrides.** Why: The screen cannot show history. *(source: screens/P08-venue-back-office.yaml#BO-532; Food, Beverage & Retail)*
+
 #### Inputs: what the user enters or picks
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+**Rules for these inputs** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
+
+- **Override**: Kind, original and adjusted amount (or %), reason; Other needs a note; above threshold goes for approval. *(source: DI-753 / contracts/satellite/rental.yaml#requestRentalCommercialOverride / R222)*
 
 #### Outputs: what the screen shows and produces
 
@@ -927,6 +1115,15 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the commercial exceptions waivers are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+override: Late fee waiver · AED 45 → 0 · 'brake failure, not guest fault' · requested Priya Nair · approved Omar
+  Ziad
+```
 
 #### Permissions
 
@@ -969,6 +1166,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - [ ] Every transition is wired: `BO-524`.
 - [ ] Every gated control is gated: `RENTAL_OVERRIDE`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -982,39 +1180,24 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Rentals · wave 3 · needs the `resources` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `PRODUCT_VIEW`, `RENTAL_PRICE`, `RENTAL_VIEW` (2 read, 1 operate); in the flows as venue manager |
+| Who uses it | venue staff holding `RENTAL_PRICE`, `RENTAL_VIEW` (1 operate, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/rentals/pricing-simulation-validation-ai-commercial-intelligence-bo-533` |
 
-**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built. Removed 2 October 2026 (CHG-WIR-008): listCommercialPricing is ticket catalogue pricing, not rental pricing; bulk-attached (R254; design-notes correction fnb-retail BO-533).
+
+**From the Food, Beverage & Retail process.** Test a commercial configuration before publishing: enter product, station, date, duration and channel, see the price and deposit and the rule-by-rule explanation. The one thing to get right: the explanation lists each rule that applied and its amount.
+
+**Fixed on main** (the package already carries these; draw what it says): listCommercialPricing (ticket catalogue pricing) is attached. (CHG-WIR-008).
 
 #### Inputs: what the user enters or picks
-
-**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
-
-| Filter | Drawn as | Default | Allowed values, rules | Source |
-|---|---|---|---|---|
-| Country | text field | — | — | `listCommercialPricing` ?country |
-| Product type | text field | — | — | `listCommercialPricing` ?productType |
-| Price list type | select | — | Standard retail · Venue · Attraction · Event · Membership · Group · Corporate · B2B · Reseller · Ota · Internal · Special market | `listCommercialPricing` ?priceListType |
-| Venue | text field | — | — | `listCommercialPricing` ?venue |
-| Brand | text field | — | — | `listCommercialPricing` ?brand |
-| Market | text field | — | — | `listCommercialPricing` ?market |
-| Currency | text field | — | pattern `^[A-Z]{3}$` | `listCommercialPricing` ?currency |
-| Owner | text field | — | — | `listCommercialPricing` ?owner |
-| Status | select | — | Draft · Configured · Validated · Active · Inactive · Expired · Archived | `listCommercialPricing` ?status |
-| Search | text field | — | — | `listCommercialPricing` ?search |
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
 
 #### Outputs: what the screen shows and produces
-
-**Shown**
-
-**Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
 
 **Actions and what each produces**
 
@@ -1023,7 +1206,9 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |  (primary button) | navigation or local | — | — | — | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
 
-**Data it reads**: `listCommercialPricing` (onLoad, Commercial Pricing Command Center)
+**Rules for what is shown** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
+
+- **Simulation**: Price, deposit, and each rule applied with its effect. *(source: DI-753 / contracts/satellite/rental.yaml#simulateRentalPricing / contracts/satellite/rental.yaml#explainRentalPrice)*
 
 **Where the user goes next**
 
@@ -1035,14 +1220,21 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |---|---|
 | Loading (`?state=loading`) | The pricing simulation validation list. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the pricing simulation validation untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No pricing simulation validation yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, first run (`?state=emptyFirstRun`) | No pricing simulation validation yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the pricing simulation validation are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+result: Double Kayak · Sat 2 h · online → base AED 90 + 1 h AED 60 + weekend 20% = AED 180 · deposit AED 300
+```
+
 #### Permissions
 
-- `listCommercialPricing` → `PRODUCT_VIEW` (read) · staff
 - `simulateRentalPricing` → `RENTAL_PRICE` (operate) · staff
 - `explainRentalPrice` → `RENTAL_VIEW` (read) · staff
 
@@ -1078,7 +1270,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every state opens from `#BO-533?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: , Cancel.
 - [ ] Every transition is wired: `BO-524`.
-- [ ] Every gated control is gated: `PRODUCT_VIEW`, `RENTAL_PRICE`, `RENTAL_VIEW`.
+- [ ] Every gated control is gated: `RENTAL_PRICE`, `RENTAL_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -1178,14 +1370,11 @@ Method, path, parameters, request and response for every operation these screens
 {
 "createRentalPricingProfile": {"method":"POST","path":"/rental-pricing-profiles","contract":"rental","summary":"Define how a rental is priced","permission":"RENTAL_PRICE","offlineCapable":null,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"RentalPricingProfile","responds":"RentalPricingProfile"},
 "explainRentalPrice": {"method":"POST","path":"/rental-price/explain","contract":"rental","summary":"Why the price is what it is, rule by rule","permission":"RENTAL_VIEW","offlineCapable":null,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"RentalQuoteRequest","responds":"RentalPriceExplanation"},
-"listCommercialPricing": {"method":"GET","path":"/commercial-pricing","contract":"catalogue","summary":"Commercial Pricing Command Center","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"country","in":"query","required":false},{"name":"productType","in":"query","required":false},{"name":"priceListType","in":"query","required":false},{"name":"venue","in":"query","required":false},{"name":"brand","in":"query","required":false},{"name":"market","in":"query","required":false},{"name":"currency","in":"query","required":false},{"name":"owner","in":"query","required":false},{"name":"status","in":"query","required":false},{"name":"search","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
-"listDynamicPricingStrategy": {"method":"GET","path":"/dynamic-pricing-strategy","contract":"catalogue","summary":"Dynamic Pricing Strategy Command Center","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"strategyType","in":"query","required":false},{"name":"status","in":"query","required":false},{"name":"automationMode","in":"query","required":false},{"name":"venue","in":"query","required":false},{"name":"search","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listRentalPricingProfiles": {"method":"GET","path":"/rental-pricing-profiles","contract":"rental","summary":"Pricing profiles, and the products with none","permission":"RENTAL_VIEW","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[{"name":"productId","in":"query","required":null},{"name":"unpricedOnly","in":"query","required":null}],"requestBody":null,"responds":"RentalPricingProfile"},
 "requestRentalCommercialOverride": {"method":"POST","path":"/rental-overrides","contract":"rental","summary":"Deviate from policy, with a reason and an approver","permission":"RENTAL_OVERRIDE","offlineCapable":null,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"RentalOverride","responds":"RentalOverride"},
 "setRentalDepositPolicy": {"method":"PUT","path":"/rental-deposit-policies","contract":"rental","summary":"How much is held, how, and what happens to it","permission":"RENTAL_PRICE","offlineCapable":null,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"RentalDepositPolicy","responds":"RentalDepositPolicy"},
 "setRentalFeePolicy": {"method":"PUT","path":"/rental-fee-policies","contract":"rental","summary":"Grace period, late fees and extension pricing","permission":"RENTAL_PRICE","offlineCapable":null,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"RentalFeePolicy","responds":"RentalFeePolicy"},
 "simulateRentalPricing": {"method":"POST","path":"/rental-price/simulate","contract":"rental","summary":"Test a commercial configuration before publishing it","permission":"RENTAL_PRICE","offlineCapable":null,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"RentalQuoteRequest","responds":null},
-"transitionDynamicPricingStrategy": {"method":"POST","path":"/dynamic-pricing-strategies/{strategyId}/lifecycle","contract":"catalogue","summary":"Activate, pause, resume or retire a dynamic pricing strategy","permission":"PRICE_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"DynamicPricingStrategy"},
 "updateRentalPricingProfile": {"method":"PUT","path":"/rental-pricing-profiles/{profileId}","contract":"rental","summary":"Change a pricing profile","permission":"RENTAL_PRICE","offlineCapable":null,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"RentalPricingProfile","responds":"RentalPricingProfile"}
 }
 ```
@@ -1196,12 +1385,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
-"CommercialPricingCommandCenterSummary": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection; the headline tiles over the list, computed at read time for the filters in force","description":"**The headline figures on Commercial Pricing Command Center.** The pack's KPI cards, split out of the row (decided 29 September, readiness close-out): a count describes the list, not each item in it.","properties":{"totalPriceLists":{"type":"integer","description":"Total Price Lists"},"activePriceLists":{"type":"integer","description":"Active Price Lists"},"draftPriceLists":{"type":"integer","description":"Draft Price Lists"},"priceCategories":{"type":"integer","description":"Price Categories"},"configuredRates":{"type":"integer","description":"Configured Rates"},"productsWithPricing":{"type":"integer","description":"Products with Pricing: sellable products that reference at least one active price list rate"},"productsMissingPricing":{"type":"integer","description":"Products Missing Pricing: active sellable products with no price list rate"},"markets":{"type":"integer","description":"Markets"},"currencies":{"type":"integer","description":"Currencies"},"pricingValidationIssues":{"type":"integer","description":"Pricing Validation Issues"},"recentlyModifiedPriceLists":{"type":"integer","description":"Recently Modified Price Lists: price lists changed in the last 7 days (decided 29 September, readiness close-out)"},"upcomingPriceStructures":{"type":"integer","description":"Upcoming Price Structures: price lists whose effective-from date is in the future"},"aiInsights":{"type":"array","items":{"type":"string"},"description":"AI observations for this screen; advisory only, never applied automatically"}}},
-"CommercialPricingCommandCenterView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over catalogue state, assembled at read time from tables that already exist","description":"**What Commercial Pricing Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"priceListId":{"type":"string","description":"Price List ID"},"name":{"type":"string","description":"Name"},"code":{"type":"string","description":"Code"},"type":{"type":"string","enum":["standardRetail","venue","attraction","event","membership","group","corporate","b2b","reseller","ota","internal","specialMarket"],"description":"Price List Type (the pack's Price List Types, pp.6-7)"},"currency":{"type":"string","description":"Currency: ISO 4217 code of the default currency","pattern":"^[A-Z]{3}$"},"market":{"type":"string","description":"Market"},"venue":{"type":"string","description":"Venue"},"brand":{"type":"string","description":"Brand"},"productCount":{"type":"integer","description":"Product Count"},"rateCount":{"type":"integer","description":"Rate Count"},"version":{"type":"string","description":"Version"},"status":{"type":"string","description":"Status: draft, configured, validated, active, inactive, expired or archived (p.7); approval and publication are Board 4's"},"owner":{"type":"string","description":"Owner"},"effectiveFrom":{"type":"string","format":"date","description":"Effective From (the first half of the pack's Effective Period)"},"effectiveTo":{"type":"string","format":"date","description":"Effective To; empty for open-ended","nullable":true}}},
-"DynamicPricingStrategy": {"type":"object","x-ticvai-persistence":"catalogue.dynamic_pricing_strategy","description":"**A dynamic pricing strategy: what it prices, from which base and how often** (29 September, data model DM3). ADM-088 and ADM-089. Its rules are `pricing.dynamic_price_rule` rows naming it; its ladder `catalogue.price_ladder`; its limits and automation `catalogue.dynamic_pricing_control`. **Rules-based now; AI factors inform, never replace, the rules** (MoM 19 Aug 2026).","required":["id","scopePath","code","name","strategyType","scopeType","status"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005). Operations write it at `venue` scope."},"code":{"type":"string","maxLength":40},"name":{"type":"string","maxLength":200},"description":{"type":"string","nullable":true},"strategyType":{"type":"string","enum":["demandBased","occupancyBased","availabilityBased","inventoryBased","bookingVelocity","timeToEvent","seasonal","dayOfWeek","timeslot","channel","segment","location","hybrid"]},"scopeType":{"type":"string","enum":["singleProduct","productFamily","event","multiplePerformances","venue","selectedTimeslots","selectedPriceCategories"]},"venueId":{"type":"string","format":"uuid","nullable":true},"productId":{"type":"string","format":"uuid","nullable":true},"productFamily":{"type":"string","maxLength":100,"nullable":true},"eventId":{"type":"string","format":"uuid","nullable":true},"performanceIds":{"type":"array","items":{"type":"string","format":"uuid"}},"timeslotIds":{"type":"array","items":{"type":"string","format":"uuid"}},"priceCategoryIds":{"type":"array","items":{"type":"string","format":"uuid"}},"businessUnit":{"type":"string","maxLength":100,"nullable":true},"marketCode":{"type":"string","maxLength":40,"nullable":true},"basePriceSource":{"type":"string","maxLength":100,"description":"The price list or rate the adjustments start from."},"evaluationFrequency":{"type":"string","enum":["every15Minutes","every30Minutes","hourly","daily","onInventoryChange","onThresholdTrigger"],"default":"hourly"},"combinationMode":{"type":"string","enum":["independent","combinable","exclusive","fallback"],"default":"independent"},"effectiveFrom":{"type":"string","format":"date-time","nullable":true},"effectiveTo":{"type":"string","format":"date-time","nullable":true},"clonedFromStrategyId":{"type":"string","format":"uuid","nullable":true},"ownerPrincipalId":{"type":"string","format":"uuid","nullable":true},"status":{"type":"string","enum":["draft","active","paused","frozen","expired","retired"],"default":"draft"},"createdAt":{"type":"string","format":"date-time","readOnly":true},"updatedAt":{"type":"string","format":"date-time","readOnly":true}}},
-"DynamicPricingStrategyCommandCenterSummary": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection; the headline tiles over the list, computed at read time for the filters in force","description":"**The headline figures on Dynamic Pricing Strategy Command Center.** The pack's KPI cards, split out of the row (decided 29 September, readiness close-out): a count describes the list, not each item in it.","properties":{"activeStrategies":{"type":"integer","description":"Active Strategies"},"draftStrategies":{"type":"integer","description":"Draft Strategies"},"productsUnderDynamicPricing":{"type":"integer","description":"Products Under Dynamic Pricing"},"eventsUnderDynamicPricing":{"type":"integer","description":"Events Under Dynamic Pricing"},"performancesUnderDynamicPricing":{"type":"integer","description":"Performances Under Dynamic Pricing"},"rulesActive":{"type":"integer","description":"Rules Active"},"currentPriceAdjustments":{"type":"integer","description":"Current Price Adjustments"},"pricesAtMaximumGuardrail":{"type":"integer","description":"Prices at Maximum Guardrail"},"pricesAtMinimumGuardrail":{"type":"integer","description":"Prices at Minimum Guardrail"},"ruleConflicts":{"type":"integer","description":"Rule Conflicts"},"frozenStrategies":{"type":"integer","description":"Frozen Strategies"},"upcomingActivations":{"type":"integer","description":"Upcoming Activations: strategies scheduled to activate within 7 days (decided 29 September, readiness close-out)"},"operationalAlerts":{"type":"array","items":{"type":"string"},"description":"Operational Alerts (pack p.76), e.g. performances at their upper band, strategies with unresolved conflicts, strategies activating within 48 hours"}}},
-"DynamicPricingStrategyCommandCenterView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over catalogue state, assembled at read time from tables that already exist","description":"**What Dynamic Pricing Strategy Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"strategyId":{"type":"string","description":"Strategy ID"},"strategyName":{"type":"string","description":"Strategy Name"},"strategyType":{"type":"string","enum":["demandBased","occupancyBased","availabilityBased","inventoryBased","bookingVelocity","timeToEvent","seasonal","dayOfWeek","timeslot","channel","segment","location","hybrid"],"description":"Strategy Type (pack pp.75-76)"},"productEvent":{"type":"string","description":"Product or event the strategy controls"},"venue":{"type":"string","description":"Venue"},"basePriceSource":{"type":"string","description":"Base price source: the Board 1 price list and rate the strategy moves from, e.g. UAE Standard Admission -> Adult"},"currentPrice":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"description":"Current resolved dynamic price (for a single-price scope)","nullable":true},"adjustmentRange":{"type":"object","properties":{"minPercent":{"type":"number","description":"Lowest adjustment from base, percent"},"maxPercent":{"type":"number","description":"Highest adjustment from base, percent"}},"description":"Adjustment range allowed by the strategy"},"ruleCount":{"type":"integer","description":"Rule Count"},"effectivePeriod":{"type":"object","properties":{"from":{"type":"string","format":"date-time","description":"Effective from"},"to":{"type":"string","format":"date-time","description":"Effective to; empty for open-ended","nullable":true}},"description":"Effective period"},"automationMode":{"type":"string","enum":["monitor","recommend","prepareChange","autoExecuteWithinGuardrails"],"description":"Automation mode from the automation policy (listDynamicPricingAutomation); recommend by default"},"status":{"type":"string","description":"Status: draft, testing, ready, scheduled, active, paused, frozen, expired or retired"},"owner":{"type":"string","description":"Owner"}}},
-"Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}},
 "RentalConfigurationFinding": {"type":"object","description":"Boards 1.10 and 4.10. **Severity travels with the finding**, so the publish gate can distinguish a missing turnaround buffer from a missing price.\n","properties":{"code":{"type":"string"},"severity":{"type":"string","enum":["blocking","warning","advisory"]},"message":{"type":"string"},"field":{"type":"string","nullable":true},"source":{"type":"string","enum":["validation","ai"],"default":"validation","description":"**AI findings are advisory unless the client configures otherwise** (board 1.10), so the origin is on the record rather than assumed by the reader.\n"}}},
 "RentalDepositPolicy": {"type":"object","x-ticvai-persistence":"rental.deposit_policy","description":"Boards 4.6 and 4.7. **Held, not taken**, and settled against an inspection.","properties":{"id":{"type":"string","format":"uuid"},"productId":{"type":"string","format":"uuid","nullable":true},"categoryId":{"type":"string","format":"uuid","nullable":true},"required":{"type":"boolean","default":true},"basis":{"type":"string","enum":["fixed","percentage","riskBased"]},"fixedAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"percentage":{"type":"number","nullable":true},"minimumAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"maximumAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"instruments":{"type":"array","items":{"type":"string","enum":["cardPreAuthorisation","cardCharge","cash","wallet"]}},"autoRelease":{"type":"boolean","default":true},"inspectionRequiredBeforeRelease":{"type":"boolean","default":false},"autoReleaseDelayHours":{"type":"integer","default":0},"partialCapturePermitted":{"type":"boolean","default":true},"supervisorApprovalThreshold":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"waiverEligible":{"type":"boolean","default":false},"scopePath":{"type":"string"}}},
 "RentalFeePolicy": {"type":"object","x-ticvai-persistence":"rental.fee_policy","description":"Board 4.8. **Extension is priced below late return on purpose** — *\"this encourages customers to extend properly rather than returning late.\"*\n","properties":{"id":{"type":"string","format":"uuid"},"productId":{"type":"string","format":"uuid","nullable":true},"gracePeriodMinutes":{"type":"integer","default":0},"lateFeeBasis":{"type":"string","enum":["fixed","perMinute","per15Minutes","per30Minutes","perHour","tiered"]},"lateFeeAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"lateFeeTiers":{"type":"array","items":{"type":"object","properties":{"afterMinutes":{"type":"integer"},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"}}}},"maximumDailyCharge":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"extensionPricePerIncrement":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"extensionIncrementMinutes":{"type":"integer","default":30},"notReturnedAfterHours":{"type":"integer","nullable":true,"description":"**When a late rental becomes a lost one.** The deposit is captured in full and the asset retired; without a threshold the fee accrues forever and nobody decides.\n"},"damageFeeMaximum":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"**A ceiling, not a rate.** Added 22 September: `rental.settlement.damage_fee` was stored with nothing bounding it. **A dent is assessed, not tabulated** — the amount is entered per incident against the actual damage, so the control is how high an operator may go, the same shape `maximumDailyCharge` already gives the late fee.\n"},"damageFeeApprovalAbove":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"**Above this, a second person signs it off.** A damage fee is the one charge on a settlement that a single operator decides alone, and the one a guest is most likely to dispute. The shape is `orders.RefundPolicy.requiresApprovalAbove`, applied to the other direction of money.\n"},"missingItemFeeBasis":{"type":"string","enum":["replacementCost","fixedAmount"],"description":"**What an unreturned item costs.** `replacementCost` reads the item's own replacement value, which is what the fee usually is; `fixedAmount` uses `missingItemFeeAmount`. Added 22 September — `rental.settlement.missing_item_fee` was stored with no source.\n"},"missingItemFeeAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Used when `missingItemFeeBasis` is `fixedAmount`."},"scopePath":{"type":"string"}}},

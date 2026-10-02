@@ -18,6 +18,19 @@
   "requestBody": "B2bCreditAccount",
   "responds": "B2bCreditAccount"
  },
+ "getB2bPaymentTerms": {
+  "method": "GET",
+  "path": "/b2b-credit-accounts/{accountId}/terms",
+  "contract": "payments",
+  "summary": "An account's limit, terms, billing cycle and limit behaviour",
+  "permission": "PAYMENT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "B2bPaymentTerms"
+ },
  "getCreditConsumptionPolicy": {
   "method": "GET",
   "path": "/credit-consumption-policy",

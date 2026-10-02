@@ -393,129 +393,18 @@
      "slot": "fields",
      "components": [
       {
-       "kind": "selectField",
-       "label": "Available days",
-       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 22 §Administrators shall configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Opening time",
-       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 22 §Administrators shall configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Closing time",
-       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 22 §Administrators shall configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Effective date",
-       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 22 §Administrators shall configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Expiry date",
-       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 22 §Administrators shall configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Time zone",
-       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 22 §Administrators shall configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Seasonal availability",
-       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 22 §Administrators shall configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Venue operating hours",
-       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 22 §Administrators shall configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Resource-specific operating hours",
-       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 22 §Administrators shall configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Public holidays",
-       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 22 §Administrators shall configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Venue closures",
-       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 22 §Administrators shall configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Maintenance periods",
-       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 22 §Administrators shall configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Staff leave",
-       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 22 §Administrators shall configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Training",
-       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 22 §Administrators shall configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Private blocks",
-       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 22 §Administrators shall configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Operational shutdowns",
-       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 22 §Administrators shall configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Special events",
-       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 22 §Administrators shall configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Inheritance",
-       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 22 §Administrators shall configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Standard weekly schedules",
-       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 22 §Availability may be configured using"
-      },
-      {
-       "kind": "selectField",
-       "label": "Specific dates",
-       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 22 §Availability may be configured using"
-      },
-      {
-       "kind": "selectField",
-       "label": "Seasonal schedules",
-       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 22 §Availability may be configured using"
-      },
-      {
-       "kind": "selectField",
-       "label": "Exception dates",
-       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 22 §Availability may be configured using"
-      },
-      {
-       "kind": "selectField",
-       "label": "Imported schedules",
-       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 22 §Availability may be configured using"
-      },
-      {
-       "kind": "selectField",
-       "label": "External workforce schedules",
-       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 22 §Availability may be configured using"
-      },
-      {
-       "kind": "selectField",
-       "label": "Availability Exceptions",
-       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 22 §Availability may be configured using"
+       "kind": "calendarView",
+       "label": "Weekly schedule and exceptions",
+       "bindsTo": "ResourceSchedule",
+       "columns": [
+        "ResourceSchedule.availabilityMode",
+        "ResourceSchedule.windows",
+        "ResourceSchedule.exceptions",
+        "ResourceSchedule.slotMinutes"
+       ],
+       "operation": "getResourceSchedule",
+       "notes": "A week grid of windows with dated exceptions (holidays, closures, maintenance, private blocks): the pack's 25 bullets were headings and examples, not fields. The time zone is the region's (ADR-0011).",
+       "provenance": "contract resources.yaml GET /resources/{resourceId}/schedule"
       }
      ]
     },
@@ -571,6 +460,18 @@
        "operation": "getResourceAvailability",
        "notes": "**A day preview before saving** (W10): bookings, holds and the cleanings the policy places, as `cleaning` blocked windows, so an operator sees what the policy takes out of availability.",
        "provenance": "contract resources.yaml GET /resources/{resourceId}/availability"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save schedule",
+       "operation": "setResourceSchedule",
+       "provenance": "contract resources.yaml PUT /resources/{resourceId}/schedule"
       }
      ]
     }
@@ -634,6 +535,32 @@
     }
    ]
   },
+  "overlays": [
+   {
+    "id": "formSetResourceSchedule",
+    "component": "modal",
+    "trigger": "Save schedule",
+    "body": "**Collects what `setResourceSchedule` sends before it is called.** Nothing in the body is required. Optional: `resourceId`, `availabilityMode`, `windows`, `slotMinutes`, `minimumBookingMinutes`, `maximumBookingMinutes`, `advanceBookingDays`, `exceptions`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save schedule",
+     "operation": "setResourceSchedule"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "resourceId",
+      "availabilityMode",
+      "windows",
+      "slotMinutes",
+      "minimumBookingMinutes",
+      "maximumBookingMinutes",
+      "advanceBookingDays",
+      "exceptions"
+     ]
+    },
+    "provenance": "contract resources.yaml PUT /resources/{resourceId}/schedule"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1324,70 +1251,50 @@
      "slot": "fields",
      "components": [
       {
-       "kind": "selectField",
-       "label": "Setup",
-       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 28 §Users shall configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Teardown",
-       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 28 §Users shall configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Cleaning",
-       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 28 §Users shall configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Maintenance",
-       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 28 §Users shall configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Inspection",
-       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 28 §Users shall configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Travel",
-       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 28 §Users shall configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Break",
-       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 28 §Users shall configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Training",
-       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 28 §Users shall configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Private use",
-       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 28 §Users shall configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Venue closure",
-       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 28 §Users shall configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Operational hold",
-       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 28 §Users shall configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Custom block",
-       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 28 §Users shall configure"
+       "kind": "dataTable",
+       "label": "Blocks in force",
+       "bindsTo": "ResourceBlock",
+       "columns": [
+        "ResourceBlock.resourceId",
+        "ResourceBlock.from",
+        "ResourceBlock.to",
+        "ResourceBlock.reason",
+        "ResourceBlock.note"
+       ],
+       "operation": "listResourceBlocks",
+       "provenance": "contract resources.yaml GET /resource-blocks"
       },
       {
        "kind": "publishGate",
        "label": "What publishing changes",
        "notes": "**Names what goes live, where, and from when.** A publish with no stated consequence is one somebody presses meaning to save.",
        "provenance": "authored — required by check-screens, 19 September 2026"
+      },
+      {
+       "kind": "selectField",
+       "label": "Block type",
+       "bindsTo": "ResourceBlock.reason",
+       "operation": "createResourceBlock",
+       "notes": "One choice per block.",
+       "provenance": "contract resources.yaml POST /resource-blocks"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Block a window",
+       "operation": "createResourceBlock",
+       "provenance": "contract resources.yaml POST /resource-blocks"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Release block",
+       "operation": "releaseResourceBlock",
+       "provenance": "contract resources.yaml DELETE /resource-blocks/{blockId}"
       }
      ]
     }
@@ -1445,6 +1352,30 @@
     }
    ]
   },
+  "overlays": [
+   {
+    "id": "formCreateResourceBlock",
+    "component": "modal",
+    "trigger": "Block a window",
+    "body": "**Collects what `createResourceBlock` sends before it is called.** Required: `resourceId`, `from`, `to`, `reason`. Optional: `note`, `createdBy`. `id` is a client UUIDv7 generated silently, never asked. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Block a window",
+     "operation": "createResourceBlock"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "resourceId",
+      "from",
+      "to",
+      "reason",
+      "note",
+      "createdBy"
+     ]
+    },
+    "provenance": "contract resources.yaml POST /resource-blocks"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1670,8 +1601,8 @@
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
-  "purpose": "Provide the fast, visual assignment experience that operational users and cashiers can use when assigning or changing resources. This should become one of the signature TICVAI Resource Management experiences. Provide TICVAI with a centralized backend configuration environment for treating employees, instructors, contractors, technicians, security personnel, event staff, and other personnel as intelligent operational resources.",
-  "purposeNote": "Authorized users can assign or reassign resources visually through drag-and-drop or AI Smart Assign, with real-time validation preventing invalid allocations and all changes recorded in audit history.",
+  "purpose": "Provide the fast, visual assignment experience that operational users and cashiers use when assigning or changing resources.",
+  "purposeNote": "Authorized users can assign or reassign resources visually through drag-and-drop or AI Smart Assign, with real-time validation preventing invalid allocations and all changes recorded in audit history. Purpose rewritten 2 October 2026 (CHG-WIR-003): The purpose carried the board 3 introduction (\"Provide TICVAI with a centralized backend configuration environment for treating employees ... as operational resources\") pasted after the screen's own sentences.",
   "gaps": [
    {
     "operation": null,

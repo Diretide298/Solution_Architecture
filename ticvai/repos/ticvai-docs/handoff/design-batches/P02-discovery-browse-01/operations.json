@@ -114,18 +114,18 @@
   "requestBody": null,
   "responds": "CookieConsentRuntime"
  },
- "getGuestProfile": {
+ "getMyProfile": {
   "method": "GET",
-  "path": "/guests/{subjectId}",
+  "path": "/guests/me/profile",
   "contract": "marketing-crm",
-  "summary": "Read a guest profile",
+  "summary": "A guest reading their own details",
   "permission": "GUEST_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
+  "scopeLevel": "subject",
   "parameters": [],
   "requestBody": null,
-  "responds": "GuestProfileDetail"
+  "responds": null
  },
  "getPerformance": {
   "method": "GET",
@@ -185,6 +185,25 @@
   "requestBody": null,
   "responds": "GuidedChoice"
  },
+ "getPublishedTenantConfig": {
+  "method": "GET",
+  "path": "/storefront/tenant-config",
+  "contract": "white-label",
+  "summary": "The published guest-facing configuration, before anyone signs in",
+  "permission": null,
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": false
+   }
+  ],
+  "requestBody": null,
+  "responds": "PublishedTenantConfig"
+ },
  "getTenantAppStatus": {
   "method": "GET",
   "path": "/tenant-config/status",
@@ -197,25 +216,6 @@
   "parameters": [],
   "requestBody": null,
   "responds": "TenantAppStatus"
- },
- "getTenantConfig": {
-  "method": "GET",
-  "path": "/tenant-config",
-  "contract": "white-label",
-  "summary": "Full working configuration",
-  "permission": "TENANT_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": "version",
-    "in": "query",
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "TenantConfig"
  },
  "getVenueMap": {
   "method": "GET",
@@ -279,45 +279,6 @@
     "name": "venueId",
     "in": "query",
     "required": false
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- },
- "listContentPages": {
-  "method": "GET",
-  "path": "/tenant-config/pages",
-  "contract": "white-label",
-  "summary": "List custom content pages",
-  "permission": "TENANT_CONFIGURE",
-  "offlineCapable": true,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": "status",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "categoryCode",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "slug",
-    "in": "query",
-    "required": null
    },
    {
     "name": null,
@@ -468,6 +429,40 @@
     "name": "guidedAnswerIds",
     "in": "query",
     "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listPublishedContentPages": {
+  "method": "GET",
+  "path": "/storefront/pages",
+  "contract": "white-label",
+  "summary": "The live content pages, readable before sign-in",
+  "permission": null,
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "categoryCode",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "slug",
+    "in": "query",
+    "required": false
    },
    {
     "name": null,

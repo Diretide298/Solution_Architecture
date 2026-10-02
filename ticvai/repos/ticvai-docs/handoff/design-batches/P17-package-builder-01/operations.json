@@ -55,25 +55,6 @@
   "requestBody": null,
   "responds": "Plan"
  },
- "setModuleListing": {
-  "method": "PUT",
-  "path": "/module-catalogue",
-  "contract": "subscription",
-  "summary": "Define a module's dependencies, incompatibilities and price",
-  "permission": "PLATFORM_PLAN_MANAGE",
-  "offlineCapable": null,
-  "conflictPolicy": null,
-  "scopeLevel": "platform",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "ModuleListing",
-  "responds": "ModuleListing"
- },
  "simulateCommercialPackage": {
   "method": "POST",
   "path": "/package-simulations",

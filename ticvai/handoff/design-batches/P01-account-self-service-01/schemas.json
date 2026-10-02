@@ -579,6 +579,57 @@
     "x-ticvai-derived": "onWrite",
     "description": "`recordedAt` of the latest admission counted in `entriesUsed`, written by the same writes. A scan replayed late with an earlier `recordedAt` does not move it back.\n"
    },
+   "firstEntryAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-derived": "onWrite",
+    "description": "`recordedAt` of the first admission, written by the same writes as `lastEntryAt`; it starts a time-bound entitlement's window (DEC-232; CHG-CSP-030). A replayed earlier scan moves it back."
+   },
+   "timeBoundUntil": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-derived": "onWrite",
+    "description": "**Where the template is time-bound, when its window closes**: `firstEntryAt` plus the validity rule's `minutesAfterFirstScan` (decided 2 October 2026, Chinmay, BO-159; DEC-232; CHG-CSP-030). Null until the first scan and on an entitlement with no time bound. A scan after it is denied (`timeBoundWindowElapsed`); it never extends `validTo`, and the earlier of the two wins."
+   },
+   "lifecycleLabel": {
+    "type": "string",
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "x-ticvai-derived": "onRead",
+    "enum": [
+     "created",
+     "pendingFulfillment",
+     "active",
+     "partiallyUsed",
+     "used",
+     "expired",
+     "suspended",
+     "cancelled",
+     "voided",
+     "reissuedSuperseded",
+     "refunded",
+     "transferred",
+     "blocked"
+    ],
+    "description": "**The Virtual Ticket status in the client's 13 names, mapped onto the entitlement model** (decided 2 October 2026, Chinmay, critical set 2, BO-336: \"Map the pack's 13 names onto the model; add any missing states\", and BO-336/DI-670: \"Reserved maps to Pending fulfilment\"; DEC-266; CHG-CSP-033). Computed on read from `status` (orders `EntitlementStatus`), `suspendedReason`, `cancellationKind`, `issuedVia` and an active identity lock; the mapping is in `states/entitlement-status.yaml`. It is what BO-334, BO-336 and the ticket status transition matrix (`AccessTicketStatusTransition`) show; logic still reads `status`."
+   },
+   "cancellationKind": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-derived": "onWrite",
+    "enum": [
+     "voided",
+     "refunded",
+     "performanceCancelled",
+     "superseded"
+    ],
+    "description": "**Which act cancelled the entitlement**, so the pack's Voided, Refunded and Reissued / superseded are told apart while `status` keeps the one r1 value `cancelled` (DEC-266; CHG-CSP-033). Written with the cancelling transition: `voidEntitlement`, `createRefund`, `cancelPerformance`, or a reissue that supersedes it (`supersedesEntitlementId` on the new one). Null unless `cancelled`."
+   },
    "frozenDays": {
     "type": "integer",
     "default": 0,
@@ -709,6 +760,13 @@
    }
   }
  },
+ "ExchangeRateDecimal": {
+  "type": "string",
+  "x-ticvai-persistence-kind": "valueObject",
+  "x-ticvai-persistence-column": "numeric(18,6)",
+  "description": "**An exchange rate: a decimal string, never a float**, for the reason `Money.amount` is one — a JavaScript client must not round a rate in transit. **Six decimal places**, the precision `finance.FxRate.rate` asks for, and stored at that precision.\n",
+  "pattern": "^\\d+(\\.\\d{1,6})?$"
+ },
  "FinCreditMemo": {
   "x-ticvai-persistence": "ledger.credit_memo + ledger.credit_memo_line",
   "type": "object",
@@ -803,9 +861,69 @@
    "taxAmountInLegalCurrency": {
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
+   "legalFxRate": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/FxRateValue"
+     }
+    ],
+    "nullable": true,
+    "readOnly": true,
+    "description": "The invoice's own `legalFxRate`, never today's (CHG-FIN-011)."
+   },
+   "invoiceSupplyValue": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "readOnly": true,
+    "description": "**The value of the supply shown on the tax invoice** (Executive Regulation Art. 60(1)(e)), adjusted by any earlier credit note on the same invoice. With `correctedSupplyValue` and `netAmount` (the difference) and `taxAmountInLegalCurrency` (the tax on the difference in AED), the four figures the law requires (CHG-FIN-011)."
+   },
+   "correctedSupplyValue": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "readOnly": true,
+    "description": "The correct value of the supply after this credit note (Art. 60(1)(e))."
+   },
+   "supplierName": {
+    "type": "string",
+    "readOnly": true,
+    "description": "Snapshot of the legal entity at issue, as on the invoice (Art. 60(1)(b))."
+   },
+   "supplierAddress": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true
+   },
+   "supplierTaxRegistrationNumber": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true
+   },
+   "buyerName": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The recipient as on the invoice; name, address and TRN where they are registered (Art. 60(1)(c))."
+   },
+   "buyerAddress": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true
+   },
+   "buyerTaxRegistrationNumber": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true
+   },
    "note": {
     "type": "string",
-    "nullable": true
+    "nullable": true,
+    "description": "The brief explanation of why the credit note was issued, printed on it (Art. 60(1)(f)); the reason's own wording when no note is given (CHG-FIN-011)."
    },
    "renditionAssetId": {
     "type": "string",
@@ -1104,7 +1222,64 @@
    },
    "taxAmountInLegalCurrency": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "The tax in the legal entity's currency (AED in the UAE) where the invoice currency differs, at the rate the orders were stored at."
+    "description": "The tax in the legal entity's currency (AED in the UAE) where the invoice currency differs. **In the UAE the converted amounts use the UAE Central Bank rate at the date of supply** (Decree-Law Art. 69) and the rate is printed (`legalFxRate`, Executive Regulation Art. 59(1)(k)); CHG-FIN-011."
+   },
+   "legalCurrency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$",
+    "readOnly": true,
+    "description": "The legal entity's currency (AED in the UAE), in which the law requires the tax and the gross amount (CHG-FIN-011)."
+   },
+   "grossAmountInLegalCurrency": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "readOnly": true,
+    "description": "The gross amount payable in the legal currency (Executive Regulation Art. 59(1)(j); for a simplified invoice the total consideration, Art. 59(2)(e)). Equal to `grossAmount` when the invoice is in the legal currency (CHG-FIN-011)."
+   },
+   "legalFxRate": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/FxRateValue"
+     }
+    ],
+    "nullable": true,
+    "readOnly": true,
+    "description": "Units of the legal currency per one unit of `currency`, printed with the tax where the invoice is not in the legal currency (Art. 59(1)(k)). Null when it is (CHG-FIN-011)."
+   },
+   "legalFxRateSource": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/FxRateSource"
+     }
+    ],
+    "nullable": true,
+    "readOnly": true,
+    "description": "`uaeCentralBank` for a UAE legal entity (Decree-Law Art. 69)."
+   },
+   "paidCurrency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$",
+    "nullable": true,
+    "readOnly": true,
+    "description": "Where the guest paid in a currency they selected (`orders.Order.chargeCurrency`, CHG-FIN-001), printed as payment information with `paidAmount` and the charge rate. The invoice itself is in the base currency, so the AED amounts the law requires are the invoice's own figures (CHG-FIN-011)."
+   },
+   "paidAmount": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "readOnly": true,
+    "description": "What the guest paid in `paidCurrency` (`orders.Order.chargeTotal`)."
+   },
+   "reverseChargeStatement": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "Where the recipient must account for the tax, the statement saying so and the Decree-Law provision (Art. 59(1)(l), Art. 48). Null otherwise (CHG-FIN-011)."
    },
    "creditedAmount": {
     "$ref": "../shared/common.yaml#/components/schemas/Money"
@@ -1235,6 +1410,15 @@
    },
    "creditedAmount": {
     "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "grossAmountInLegalCurrency": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "readOnly": true,
+    "description": "The amount payable for the line in the legal currency (AED), Executive Regulation Art. 59(1)(h); equal to `grossAmount` on an invoice in the legal currency (CHG-FIN-011)."
    }
   }
  },
@@ -1286,92 +1470,30 @@
  },
  "FinTaxInvoiceType": {
   "type": "string",
-  "description": "5.7.93. `simplified` for one order with no recipient details, `full` for one order with them, `consolidated` for several paid orders of one buyer on one invoice.",
+  "description": "5.7.93. `simplified` for one order with no recipient details, `full` for one order with them, `consolidated` for several paid orders of one buyer on one invoice.\n**When a simplified tax invoice is allowed in the UAE** (research 2 October 2026, CHG-FIN-011; Executive Regulation, Cabinet Decision 52 of 2017 as amended, Art. 59(5)): the recipient is not VAT-registered, or is registered and the consideration does not exceed AED 10,000, and the reverse charge does not apply. Otherwise the invoice is `full`. Both kinds carry the title \"Tax Invoice\" (Art. 59(1)(a), 59(2)(a)); a simplified one is issued on the date of supply (Art. 59(13)(1)), a full one within 14 days (Decree-Law Art. 67(1)).",
   "enum": [
    "simplified",
    "full",
    "consolidated"
   ]
  },
- "GuestDevice": {
-  "type": "object",
-  "x-ticvai-persistence": "marketing.guest_device",
-  "required": [
-   "id",
-   "subjectId",
-   "platform",
-   "status",
-   "registeredAt"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "subjectId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "platform": {
-    "type": "string",
-    "enum": [
-     "ios",
-     "android",
-     "web"
-    ]
-   },
-   "tokenFingerprint": {
-    "type": "string",
-    "description": "Hash of the token, not the token. The token itself is write-only — returning it would put a push credential in every response a support agent can read.\n"
-   },
-   "tokenRef": {
-    "type": "string",
-    "writeOnly": true,
-    "description": "**A vault reference to the push token**, written by the server from `registerGuestDevice.token` — the same pattern as `PaymentProvider.credentialRef`. Never the token and never returned; the sender resolves it at send time. Without it a registered device could not be sent to.\n"
-   },
-   "appVersion": {
-    "type": "string",
-    "nullable": true
-   },
-   "osVersion": {
-    "type": "string",
-    "nullable": true
-   },
-   "deviceModel": {
-    "type": "string",
-    "nullable": true
-   },
-   "locale": {
-    "type": "string",
-    "nullable": true
-   },
-   "status": {
-    "type": "string",
-    "enum": [
-     "active",
-     "revoked",
-     "failed"
-    ]
-   },
-   "failureCount": {
-    "type": "integer",
-    "description": "Consecutive delivery failures. Past the threshold the device is marked failed and stops being targeted — a dead token retried forever is wasted quota and a misleading delivery rate.\n"
-   },
-   "registeredAt": {
-    "type": "string",
-    "format": "date-time"
-   },
-   "lastSeenAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "revokedAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   }
-  }
+ "FxRateSource": {
+  "type": "string",
+  "description": "**Where the rate came from, and which provider specifically.** `source: provider` said a feed set it and not which one — two tenants on different feeds were indistinguishable in the ledger, and a rate cannot be defended in an audit without naming its origin.\n\n**`uaeCentralBank` is the default for AED pairs.** The UAE Central Bank publishes an official daily rate and it is what a UAE auditor expects to see — a commercial feed is defensible for tender and awkward for statutory reporting.\n\n**`openExchangeRates` and `ecb` are the commercial and reference options.** ECB publishes daily reference rates free and is the usual fallback for non-AED pairs; Open Exchange Rates is the common commercial feed with intraday granularity. **The choice is per purpose, not per platform** — a tender rate wants intraday, a reporting rate wants the official daily close.",
+  "enum": [
+   "manual",
+   "uaeCentralBank",
+   "ecb",
+   "openExchangeRates",
+   "cardScheme",
+   "provider"
+  ]
+ },
+ "FxRateValue": {
+  "x-ticvai-persistence-column": "numeric(18,6)",
+  "type": "string",
+  "pattern": "^\\d+(\\.\\d{1,6})?$",
+  "description": "**An exchange rate: a decimal string, never a float**, for the reason `Money.amount` is one (naming-and-style 5.1). Up to six decimal places — a two-place rate on a three-place currency loses money on every transaction, quietly — and stored as `numeric(18,6)` so the six places the wire carries survive the database.\n"
  },
  "GuestPreferences": {
   "type": "object",
@@ -1526,51 +1648,6 @@
     "readOnly": true
    }
   }
- },
- "GuestProfileDetail": {
-  "x-ticvai-persistence": "marketing.guest_profile",
-  "allOf": [
-   {
-    "$ref": "#/components/schemas/GuestProfile"
-   },
-   {
-    "type": "object",
-    "properties": {
-     "id": {
-      "type": "string",
-      "format": "uuid",
-      "readOnly": true,
-      "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
-     },
-     "consents": {
-      "$ref": "#/components/schemas/ConsentState"
-     },
-     "loyalty": {
-      "$ref": "#/components/schemas/LoyaltyPosition"
-     },
-     "openCaseCount": {
-      "type": "integer"
-     },
-     "recentOrderIds": {
-      "type": "array",
-      "items": {
-       "type": "string"
-      }
-     },
-     "membershipIds": {
-      "type": "array",
-      "items": {
-       "type": "string",
-       "format": "uuid"
-      }
-     },
-     "notes": {
-      "type": "string",
-      "nullable": true
-     }
-    }
-   }
-  ]
  },
  "GuestSession": {
   "x-ticvai-persistence": "none — Redis session registry",
@@ -1874,63 +1951,6 @@
    }
   }
  },
- "LoyaltyPosition": {
-  "x-ticvai-persistence": "marketing.loyalty_position",
-  "type": "object",
-  "required": [
-   "subjectId",
-   "programmeId",
-   "pointsBalance",
-   "tierCode"
-  ],
-  "properties": {
-   "leaderboardNickname": {
-    "type": "string",
-    "nullable": true,
-    "maxLength": 24,
-    "description": "BL-173. **The name shown on a leaderboard, chosen by the guest.** Offered whenever they reach the board and changeable afterwards; `setLeaderboardNickname` is the only thing that writes it.\n**Null means the guest has not chosen one yet, and the board shows a generated `Player-4821` in its place** — never `pii.subject.display_name`, which would disclose silently on the day a guest first placed and is the case this field exists to prevent.\n**The generated name is computed at read time and not stored here.** Writing it would make *\"has this guest chosen a name\"* unanswerable, and that flag is what the prompt-on-reaching-the-board depends on.\n"
-   },
-   "subjectId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "programmeId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "pointsBalance": {
-    "type": "integer"
-   },
-   "lifetimePoints": {
-    "type": "integer"
-   },
-   "tierId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "**The tier this row's `tierCode` and `tierName` are a copy of.** Added 20 September with `marketing.programme_tier`: the two strings were a cache of something that did not exist, and a cache with no source cannot be rebuilt or audited.\n"
-   },
-   "tierCode": {
-    "type": "string"
-   },
-   "tierName": {
-    "type": "string"
-   },
-   "pointsToNextTier": {
-    "type": "integer",
-    "nullable": true
-   },
-   "nextExpiryPoints": {
-    "type": "integer",
-    "nullable": true
-   },
-   "nextExpiryAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   }
-  }
- },
  "MessageChannel": {
   "type": "string",
   "enum": [
@@ -2056,6 +2076,46 @@
    },
    "refundedAmount": {
     "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "chargeCurrency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**The currency the guest selected and is charged in** (CHG-FIN-001, 2 October 2026). Null or equal to `currency` for a sale in the base currency. Everything else on the order, and every ledger posting, stays in the base currency `currency`."
+   },
+   "chargeFxRate": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/ExchangeRateDecimal"
+     }
+    ],
+    "nullable": true,
+    "readOnly": true,
+    "description": "Units of `chargeCurrency` per one unit of the base currency, from the region's `tender` rate in force at checkout (`finance.FxRate`), stored on the order so the payment, the receipt, the tax invoice and any refund use the same rate (CHG-FIN-001)."
+   },
+   "chargeFxRateId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The `finance.FxRate` row the rate was taken from, for audit."
+   },
+   "chargeTotal": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "readOnly": true,
+    "description": "`grossAmount` converted at `chargeFxRate` and rounded to the charge currency's scale: what the guest pays and what the payment request to the provider asks for (CHG-FIN-001)."
+   },
+   "chargeRateLockedUntil": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The quote holds until then (the cart lease). After it, the next payment attempt re-quotes at the rate then in force and the guest confirms the new amount (CHG-FIN-001)."
    },
    "droppedPromotions": {
     "type": "array",
@@ -2343,7 +2403,7 @@
     "type": "string",
     "pattern": "^[A-Z]{3}$",
     "nullable": true,
-    "description": "4.6.11 is deliberately asymmetric: **accept foreign currency, refund in local.** A till giving change in five currencies needs five floats and five counts, and the variance becomes unattributable.\n"
+    "description": "4.6.11 is deliberately asymmetric: **accept foreign currency, refund in local.** A till giving change in five currencies needs five floats and five counts, and the variance becomes unattributable.\n**Cash at a till only** (CHG-FIN-001, 2 October 2026). A card or wallet payment the guest made in a currency they selected is refunded in that currency (`Refund.tenderCurrency`).\n"
    },
    "amount": {
     "$ref": "../shared/common.yaml#/components/schemas/Money"
@@ -2523,8 +2583,7 @@
    "principalId",
    "roleId",
    "scope",
-   "effectivePermissions",
-   "saleBoardId"
+   "effectivePermissions"
   ],
   "properties": {
    "sessionId": {
@@ -2567,7 +2626,7 @@
    "saleBoardId": {
     "type": "string",
     "format": "uuid",
-    "description": "Landing surface, derived from the WORKSTATION, not the role (12 Aug 2026 §3). Ticketing, F&B or Retail board.\n"
+    "description": "Landing surface, derived from the WORKSTATION, not the role (12 Aug 2026 §3). Ticketing, F&B or Retail board.\n\n**Optional since 2 October 2026: only a till session carries it** (Chinmay, door follow-ups; CHG-CSP-002; breaking change against r1 approved as BC-001 to BC-005 in `docs/active/breaking-changes.yaml`). A browser door (ADM-001, SUP-001, PTR-001) and a staff handheld (EMP-001) sign in with no workstation since CHG-DOOR-001, so they have no board to land on and the field is absent. On a till it is the workstation's effective board: the outlet's board unless the till overrides it (`tenancy.Workstation.saleBoardSource`; CHG-CSP-006). A client reads its landing from this field when present and from its own platform otherwise.\n"
    },
    "workstation": {
     "$ref": "#/components/schemas/WorkstationContext"
@@ -2601,6 +2660,111 @@
    "expiresIn": {
     "type": "integer",
     "description": "Seconds"
+   }
+  }
+ },
+ "Wallet": {
+  "x-ticvai-persistence": "wallet.wallet + wallet.credit_lot",
+  "type": "object",
+  "required": [
+   "subjectId",
+   "balance",
+   "currency",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "balance": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "credits": {
+    "type": "array",
+    "description": "4.3.5 and 4.3.19. **One balance and one bonus balance with one expiry could not express what the requirement asks for** — cash, bonus and redemption credit, each with its own expiry.\n**The expiries are the reason this is a list.** Cash a guest paid for should outlive a promotional credit they were given, and a single `expiresAt` either expires the money they paid or never expires the promotion.\n**Consumed first-expiry-first-out across all three** (4.3.19), which is also the order that is fairest to the guest — spend what is about to die before what is not.\n**One entry per `active` lot in `wallet.credit_lot`** for this wallet: `amount` is the lot's `remaining_amount`, `expiresAt` its `expires_at`, `sourceRef` its `source_reference`. `kind` and `isRefundable` are not stored on the lot; they come from the lot's credit type (`listCreditLots` returns the lots themselves).\n",
+    "items": {
+     "type": "object",
+     "required": [
+      "kind",
+      "amount"
+     ],
+     "properties": {
+      "kind": {
+       "type": "string",
+       "enum": [
+        "cash",
+        "bonus",
+        "redemption",
+        "refund",
+        "goodwill"
+       ],
+       "description": "**`cash` is money the guest paid and the others are not.** That distinction decides what is refundable, what expires, and what shows as a liability.\n",
+       "x-ticvai-persisted": false
+      },
+      "amount": {
+       "x-ticvai-column": "remaining_amount",
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "expiresAt": {
+       "type": "string",
+       "format": "date-time",
+       "nullable": true
+      },
+      "sourceRef": {
+       "type": "string",
+       "nullable": true,
+       "x-ticvai-column": "source_reference"
+      },
+      "isRefundable": {
+       "type": "boolean",
+       "default": false,
+       "x-ticvai-persisted": false,
+       "description": "**True only for `cash`.** A guest cannot cash out a promotional credit, and a wallet that lets them has given away the promotion twice.\n"
+      }
+     }
+    }
+   },
+   "bonusBalance": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "Promotional value. Typically non-refundable and spent first."
+   },
+   "currency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "active",
+     "suspended",
+     "closed"
+    ]
+   },
+   "homeCellName": {
+    "type": "string",
+    "nullable": true,
+    "description": "Where the authoritative balance lives. Present when the guest is linked across cells.\n"
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "lastActivityAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
    }
   }
  },

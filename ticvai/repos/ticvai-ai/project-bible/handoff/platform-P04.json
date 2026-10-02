@@ -7,24 +7,24 @@
  "audience": "staff",
  "formFactor": "posTerminal",
  "offlineCapable": true,
- "generated": "2026-10-01",
+ "generated": "2026-10-02",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
-  "screens": 30,
-  "operations": 148,
-  "contracts": 20,
+  "screens": 32,
+  "operations": 151,
+  "contracts": 19,
   "modules": 4,
   "undrawn": 0,
-  "operationsWithNoScreen": 155
+  "operationsWithNoScreen": 158
  },
  "waves": {
-  "wave1": 27,
+  "wave1": 29,
   "wave2": 3
  },
  "modules": [
   {
    "module": "Sell",
-   "screens": 24,
+   "screens": 26,
    "waves": [
     1,
     2
@@ -56,66 +56,62 @@
  "contracts": [
   {
    "contract": "orders",
-   "operations": 24
+   "operations": 34
   },
   {
    "contract": "fnb",
-   "operations": 20
+   "operations": 24
   },
   {
    "contract": "shift",
-   "operations": 19
-  },
-  {
-   "contract": "catalogue",
-   "operations": 13
+   "operations": 22
   },
   {
    "contract": "retail",
-   "operations": 10
+   "operations": 13
   },
   {
-   "contract": "tenancy",
+   "contract": "catalogue",
    "operations": 10
   },
   {
    "contract": "identity",
-   "operations": 9
-  },
-  {
-   "contract": "reporting",
-   "operations": 7
-  },
-  {
-   "contract": "seating",
-   "operations": 6
+   "operations": 8
   },
   {
    "contract": "promotions",
    "operations": 5
   },
   {
-   "contract": "finance",
+   "contract": "reporting",
+   "operations": 5
+  },
+  {
+   "contract": "tenancy",
    "operations": 5
   },
   {
    "contract": "marketing-crm",
+   "operations": 5
+  },
+  {
+   "contract": "finance",
    "operations": 4
   },
   {
-   "contract": "queue",
-   "operations": 3
+   "contract": "seating",
+   "operations": 4
   },
   {
    "contract": "approvals",
    "operations": 3
   },
   {
-   "contract": "access",
-   "operations": 3
+   "contract": "wallet",
+   "operations": 2
   },
   {
-   "contract": "games",
+   "contract": "access",
    "operations": 2
   },
   {
@@ -123,7 +119,7 @@
    "operations": 2
   },
   {
-   "contract": "wallet",
+   "contract": "games",
    "operations": 1
   },
   {
@@ -151,7 +147,7 @@
    "module": "Shift",
    "wave": 1,
    "route": "/shift/begin-shift",
-   "operations": 17,
+   "operations": 7,
    "drawn": true
   },
   {
@@ -160,7 +156,7 @@
    "module": "Sell",
    "wave": 1,
    "route": "/sell/sell-ticket-catalogue",
-   "operations": 42,
+   "operations": 32,
    "drawn": true
   },
   {
@@ -169,7 +165,7 @@
    "module": "Sell",
    "wave": 1,
    "route": "/sell/sell-timed-entry",
-   "operations": 10,
+   "operations": 8,
    "drawn": true
   },
   {
@@ -178,7 +174,7 @@
    "module": "Sell",
    "wave": 2,
    "route": "/sell/sell-seat-map",
-   "operations": 11,
+   "operations": 7,
    "drawn": true
   },
   {
@@ -187,7 +183,7 @@
    "module": "Payment",
    "wave": 1,
    "route": "/payment/payment",
-   "operations": 12,
+   "operations": 13,
    "drawn": true
   },
   {
@@ -205,7 +201,7 @@
    "module": "Shift",
    "wave": 1,
    "route": "/shift/close-shift",
-   "operations": 17,
+   "operations": 8,
    "drawn": true
   },
   {
@@ -214,7 +210,7 @@
    "module": "Reports",
    "wave": 2,
    "route": "/reports/reports",
-   "operations": 7,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -223,7 +219,7 @@
    "module": "Shift",
    "wave": 2,
    "route": "/sell/staff-roster",
-   "operations": 16,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -241,7 +237,7 @@
    "module": "Sell",
    "wave": 1,
    "route": "/sell/returns-refunds-exchanges",
-   "operations": 10,
+   "operations": 7,
    "drawn": true
   },
   {
@@ -250,7 +246,7 @@
    "module": "Sell",
    "wave": 1,
    "route": "/sell/omnichannel-order-fulfilment-center",
-   "operations": 7,
+   "operations": 6,
    "drawn": true
   },
   {
@@ -259,7 +255,7 @@
    "module": "Sell",
    "wave": 1,
    "route": "/sell/mobile-pos-event-sales-offline-operations",
-   "operations": 8,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -286,7 +282,7 @@
    "module": "Sell",
    "wave": 1,
    "route": "/sell/till-configuration",
-   "operations": 5,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -304,7 +300,7 @@
    "module": "Sell",
    "wave": 1,
    "route": "/sell/safe-drop-cash-transfer-management",
-   "operations": 5,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -331,7 +327,7 @@
    "module": "Sell",
    "wave": 1,
    "route": "/sell/sell---food-and-drink",
-   "operations": 6,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -340,7 +336,7 @@
    "module": "Sell",
    "wave": 1,
    "route": "/sell/send-to-kitchen",
-   "operations": 4,
+   "operations": 5,
    "drawn": true
   },
   {
@@ -349,7 +345,7 @@
    "module": "Sell",
    "wave": 1,
    "route": "/sell/sell---merchandise",
-   "operations": 5,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -358,7 +354,7 @@
    "module": "Sell",
    "wave": 1,
    "route": "/sell/outlet-setup",
-   "operations": 5,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -367,7 +363,7 @@
    "module": "Sell",
    "wave": 1,
    "route": "/home",
-   "operations": 5,
+   "operations": 7,
    "drawn": true
   },
   {
@@ -385,7 +381,7 @@
    "module": "Sell",
    "wave": 1,
    "route": "/sell/guests",
-   "operations": 2,
+   "operations": 5,
    "drawn": true
   },
   {
@@ -394,7 +390,7 @@
    "module": "Sell",
    "wave": 1,
    "route": "/sell/tables",
-   "operations": 8,
+   "operations": 13,
    "drawn": true
   },
   {
@@ -403,7 +399,25 @@
    "module": "Sell",
    "wave": 1,
    "route": "/sell/queue",
-   "operations": 4,
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "POS-030",
+   "name": "Sales Journal",
+   "module": "Sell",
+   "wave": 1,
+   "route": "/sell/journal",
+   "operations": 8,
+   "drawn": true
+  },
+  {
+   "id": "POS-031",
+   "name": "Reservations & Group Arrivals",
+   "module": "Sell",
+   "wave": 1,
+   "route": "/sell/reservations",
+   "operations": 9,
    "drawn": true
   }
  ],
@@ -416,16 +430,46 @@
     "summary": "Manual Override & Supervisor Approval"
    },
    {
+    "operation": "getHardwareModelCertification",
+    "contract": "access",
+    "verb": "GET",
+    "summary": "A reader model's certification and its test results"
+   },
+   {
     "operation": "listAccessChanges",
     "contract": "access",
     "verb": "GET",
     "summary": "Changes made to an entitlement's access"
    },
    {
+    "operation": "listEntryExitRule",
+    "contract": "access",
+    "verb": "GET",
+    "summary": "Entry, Exit & Re-entry Rules"
+   },
+   {
     "operation": "listEntryRulePoints",
     "contract": "access",
     "verb": "GET",
     "summary": "Which access points an admission rule covers"
+   },
+   {
+    "operation": "listEntryTemporaryExit",
+    "contract": "access",
+    "verb": "GET",
+    "summary": "Re-entry & Temporary Exit Journey"
+   },
+   {
+    "operation": "setHardwareModelCertification",
+    "contract": "access",
+    "verb": "PUT",
+    "summary": "Certify a reader model, or record that it failed"
+   },
+   {
+    "operation": "setVirtualTicketCredential",
+    "contract": "access",
+    "verb": "PUT",
+    "summary": "Virtual Ticket & Credential 360\u00b0 Workspace"
    },
    {
     "operation": "verifyIdentity",
@@ -452,6 +496,18 @@
     "summary": "Unified Approval Inbox & Decision Workspace"
    },
    {
+    "operation": "assignApprovalRequest",
+    "contract": "approvals",
+    "verb": "PUT",
+    "summary": "Assign, reassign or claim a request in a shared queue"
+   },
+   {
+    "operation": "cancelApprovalRequest",
+    "contract": "approvals",
+    "verb": "POST",
+    "summary": "An administrator cancels a request nobody should decide any more"
+   },
+   {
     "operation": "issueAccreditationBadge",
     "contract": "approvals",
     "verb": "POST",
@@ -462,6 +518,18 @@
     "contract": "approvals",
     "verb": "GET",
     "summary": "Badges issued and their state"
+   },
+   {
+    "operation": "listAutomationExecutions",
+    "contract": "approvals",
+    "verb": "GET",
+    "summary": "What automations ran, when, on whose rule, and the outcome"
+   },
+   {
+    "operation": "reopenApprovalRequest",
+    "contract": "approvals",
+    "verb": "POST",
+    "summary": "Reopen an expired or cancelled request as a new one"
    },
    {
     "operation": "submitApprovalRequest",
@@ -476,6 +544,12 @@
     "summary": "Progress and findings of a catalogue import"
    },
    {
+    "operation": "getEventChangeTreatmentPolicy",
+    "contract": "catalogue",
+    "verb": "GET",
+    "summary": "What happens to tickets, reservations and guests when an event changes, by default"
+   },
+   {
     "operation": "getPlanBenefits",
     "contract": "catalogue",
     "verb": "GET",
@@ -488,6 +562,12 @@
     "summary": "A performance's waiting room, its setting and how it is moving"
    },
    {
+    "operation": "listGuestMemberships",
+    "contract": "catalogue",
+    "verb": "GET",
+    "summary": "A guest's memberships, benefits and history"
+   },
+   {
     "operation": "listMembershipBenefits",
     "contract": "catalogue",
     "verb": "GET",
@@ -498,6 +578,48 @@
     "contract": "catalogue",
     "verb": "GET",
     "summary": "Membership schemes, the level above a plan"
+   },
+   {
+    "operation": "listProductApprovalWorkflows",
+    "contract": "catalogue",
+    "verb": "GET",
+    "summary": "The product approval workflows `approveWorkflow` saved"
+   },
+   {
+    "operation": "listSeatPricingRules",
+    "contract": "catalogue",
+    "verb": "GET",
+    "summary": "Seat-level dynamic pricing rules"
+   },
+   {
+    "operation": "relinquishInventoryHold",
+    "contract": "catalogue",
+    "verb": "DELETE",
+    "summary": "Return unsold units"
+   },
+   {
+    "operation": "renewInventoryHold",
+    "contract": "catalogue",
+    "verb": "POST",
+    "summary": "Extend a lease TTL"
+   },
+   {
+    "operation": "setEntitlementTemplateBlackoutDates",
+    "contract": "catalogue",
+    "verb": "PUT",
+    "summary": "Set the dates a product's entitlement does not admit"
+   },
+   {
+    "operation": "setEventChangeTreatmentPolicy",
+    "contract": "catalogue",
+    "verb": "PUT",
+    "summary": "Set the default treatment per kind of event change"
+   },
+   {
+    "operation": "setSeatPricingRule",
+    "contract": "catalogue",
+    "verb": "PUT",
+    "summary": "Create or replace a seat-level dynamic pricing rule"
    },
    {
     "operation": "setWaitingRoomSetting",
@@ -554,22 +676,16 @@
     "summary": "Which provider serves which purpose"
    },
    {
-    "operation": "getAllergenVerification",
+    "operation": "createTable",
     "contract": "fnb",
-    "verb": "GET",
-    "summary": "The last allergen verdict recorded for a dish"
+    "verb": "POST",
+    "summary": "A table as a thing, not an inference"
    },
    {
-    "operation": "getFnbReservationPolicy",
+    "operation": "getPrepSheetTemplate",
     "contract": "fnb",
     "verb": "GET",
-    "summary": "How long a table is held, by party size"
-   },
-   {
-    "operation": "getFnbServiceChargePolicy",
-    "contract": "fnb",
-    "verb": "GET",
-    "summary": "The service charge a venue applies, and on what"
+    "summary": "The venue's prep-sheet print template"
    },
    {
     "operation": "listFnbRecommendations",
@@ -584,40 +700,46 @@
     "summary": "Approved substitutions for a recipe's ingredients"
    },
    {
-    "operation": "listMenuSchedules",
-    "contract": "fnb",
-    "verb": "GET",
-    "summary": "What is scheduled to go live, and when"
-   },
-   {
-    "operation": "listMenuVersions",
-    "contract": "fnb",
-    "verb": "GET",
-    "summary": "Every published version of a menu"
-   },
-   {
-    "operation": "listTemperatureCheckpoints",
-    "contract": "fnb",
-    "verb": "GET",
-    "summary": "The units that get read, and the range each must hold"
-   },
-   {
-    "operation": "resolveBookingConflict",
-    "contract": "fnb",
-    "verb": "GET",
-    "summary": "Two bookings, one table \u2014 and what to do about it"
-   },
-   {
-    "operation": "sendBookingConfirmation",
-    "contract": "fnb",
-    "verb": "POST",
-    "summary": "Confirm a booking, and ask them to confirm back"
-   },
-   {
     "operation": "sendOrderNotification",
     "contract": "fnb",
     "verb": "POST",
     "summary": "Tell the guest where their order is"
+   },
+   {
+    "operation": "setFnbReservationPolicy",
+    "contract": "fnb",
+    "verb": "PUT",
+    "summary": "Set turn times and seating buffers"
+   },
+   {
+    "operation": "setPrepSheetTemplate",
+    "contract": "fnb",
+    "verb": "PUT",
+    "summary": "Set the prep-sheet print template"
+   },
+   {
+    "operation": "updateTable",
+    "contract": "fnb",
+    "verb": "PUT",
+    "summary": "Change what a table is"
+   },
+   {
+    "operation": "authoriseGameplay",
+    "contract": "games",
+    "verb": "POST",
+    "summary": "Decide a tap, now"
+   },
+   {
+    "operation": "recordGamePlay",
+    "contract": "games",
+    "verb": "POST",
+    "summary": "Record a play"
+   },
+   {
+    "operation": "transferGameCard",
+    "contract": "games",
+    "verb": "POST",
+    "summary": "Move balances to another card"
    },
    {
     "operation": "evaluateAccess",
@@ -644,12 +766,6 @@
     "summary": "A membership with its history, usage and renewals"
    },
    {
-    "operation": "getPasswordPolicy",
-    "contract": "identity",
-    "verb": "GET",
-    "summary": "Read the password and MFA policy in force"
-   },
-   {
     "operation": "getPrincipalModuleAccess",
     "contract": "identity",
     "verb": "GET",
@@ -666,12 +782,6 @@
     "contract": "identity",
     "verb": "GET",
     "summary": "Reusable policy shapes"
-   },
-   {
-    "operation": "listCapabilityTemplates",
-    "contract": "identity",
-    "verb": "GET",
-    "summary": "Saved tick-sets"
    },
    {
     "operation": "listCustomerMemberships",
@@ -716,10 +826,28 @@
     "summary": "Tick what they may do"
    },
    {
+    "operation": "updateRole",
+    "contract": "identity",
+    "verb": "PATCH",
+    "summary": "Rename a role or change its description"
+   },
+   {
+    "operation": "bulkUpdateProducts",
+    "contract": "inventory",
+    "verb": "POST",
+    "summary": "Change many products at once, with a preview"
+   },
+   {
     "operation": "actOnWaiverRequirements",
     "contract": "marketing-crm",
     "verb": "POST",
     "summary": "Send, resend or correct participant waiver requirements, one or in bulk"
+   },
+   {
+    "operation": "createInvitationCampaign",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "A quota-bounded, addressed invitation"
    },
    {
     "operation": "getCaseInvestigationResolution",
@@ -734,46 +862,10 @@
     "summary": "Load the layout of a waiver version"
    },
    {
-    "operation": "getForm",
-    "contract": "marketing-crm",
-    "verb": "GET",
-    "summary": "One form, to fill in or to edit"
-   },
-   {
     "operation": "getGuestExtraValues",
     "contract": "marketing-crm",
     "verb": "GET",
     "summary": "What a guest answered"
-   },
-   {
-    "operation": "getLocalizationBrandingCustomer",
-    "contract": "marketing-crm",
-    "verb": "GET",
-    "summary": "Load a waiver version's languages, branding and channels"
-   },
-   {
-    "operation": "getLostItemMatches",
-    "contract": "marketing-crm",
-    "verb": "GET",
-    "summary": "Candidate matches, scored"
-   },
-   {
-    "operation": "getLoyaltyRules",
-    "contract": "marketing-crm",
-    "verb": "GET",
-    "summary": "Every rule a loyalty programme runs on"
-   },
-   {
-    "operation": "getSeoMetadata",
-    "contract": "marketing-crm",
-    "verb": "GET",
-    "summary": "The metadata in force for one page"
-   },
-   {
-    "operation": "getSignatorySignatureGuardian",
-    "contract": "marketing-crm",
-    "verb": "GET",
-    "summary": "Load the signatory rules of a waiver version"
    },
    {
     "operation": "getSuppressionList",
@@ -792,24 +884,6 @@
     "contract": "marketing-crm",
     "verb": "POST",
     "summary": "Issue a reward to a guest"
-   },
-   {
-    "operation": "listBadges",
-    "contract": "marketing-crm",
-    "verb": "GET",
-    "summary": "Badges a guest can be awarded"
-   },
-   {
-    "operation": "listCustomerBadges",
-    "contract": "marketing-crm",
-    "verb": "GET",
-    "summary": "Badges a guest holds"
-   },
-   {
-    "operation": "listForms",
-    "contract": "marketing-crm",
-    "verb": "GET",
-    "summary": "Waivers, surveys and capture forms"
    },
    {
     "operation": "listGuestExtraFields",
@@ -836,22 +910,16 @@
     "summary": "The ledger behind a points balance"
    },
    {
-    "operation": "listPrivacyComplianceExceptions",
+    "operation": "listMessageDispatches",
     "contract": "marketing-crm",
     "verb": "GET",
-    "summary": "The privacy exception queue"
+    "summary": "Messages sent, and whether they arrived"
    },
    {
     "operation": "listRewardAssignments",
     "contract": "marketing-crm",
     "verb": "GET",
     "summary": "Rewards issued to guests, and whether they were used"
-   },
-   {
-    "operation": "listRewards",
-    "contract": "marketing-crm",
-    "verb": "GET",
-    "summary": "What points can be turned into"
    },
    {
     "operation": "listSegmentMembers",
@@ -872,10 +940,10 @@
     "summary": "Signed waivers"
    },
    {
-    "operation": "listWaiverVerificationQueue",
+    "operation": "pauseCampaign",
     "contract": "marketing-crm",
-    "verb": "GET",
-    "summary": "The waiver submissions awaiting or given verification"
+    "verb": "POST",
+    "summary": "Pause a campaign mid-send"
    },
    {
     "operation": "setAgentServiceProfile",
@@ -914,10 +982,10 @@
     "summary": "Create or change a governed contact-centre automation"
    },
    {
-    "operation": "setDataProcessingPurpose",
+    "operation": "setDataRetentionPolicy",
     "contract": "marketing-crm",
     "verb": "PUT",
-    "summary": "Create or change a processing purpose"
+    "summary": "How long guest data is kept, and what happens at expiry"
    },
    {
     "operation": "setDynamicFieldQuestion",
@@ -932,22 +1000,10 @@
     "summary": "Record a guest's answers"
    },
    {
-    "operation": "setLegalHold",
-    "contract": "marketing-crm",
-    "verb": "PUT",
-    "summary": "Place, approve or release a legal or operational hold"
-   },
-   {
     "operation": "setPrivacyAction",
     "contract": "marketing-crm",
     "verb": "PUT",
     "summary": "Plan, approve or cancel a privacy action"
-   },
-   {
-    "operation": "setPrivacyRequest",
-    "contract": "marketing-crm",
-    "verb": "PUT",
-    "summary": "Raise or progress a privacy request"
    },
    {
     "operation": "setPrivacyRequestTypes",
@@ -960,6 +1016,12 @@
     "contract": "marketing-crm",
     "verb": "PUT",
     "summary": "Record or advance a quality evaluation"
+   },
+   {
+    "operation": "setTrackingTechnologyCatalogueEntry",
+    "contract": "marketing-crm",
+    "verb": "PUT",
+    "summary": "Add or correct a catalogue entry (platform staff)"
    },
    {
     "operation": "setWaiverAssociation",
@@ -986,16 +1048,22 @@
     "summary": "Create or change a waiver trigger rule"
    },
    {
-    "operation": "submitForm",
+    "operation": "stopCampaign",
     "contract": "marketing-crm",
     "verb": "POST",
-    "summary": "Sign a waiver, answer a survey, capture details"
+    "summary": "Stop a campaign mid-send"
    },
    {
-    "operation": "convertReservation",
-    "contract": "orders",
+    "operation": "unscheduleCampaign",
+    "contract": "marketing-crm",
     "verb": "POST",
-    "summary": "Convert a reservation into an order"
+    "summary": "Pull a scheduled campaign before it sends"
+   },
+   {
+    "operation": "uploadGuestDocument",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "Store a guest photo, ID or signed document"
    },
    {
     "operation": "convertToTermProduct",
@@ -1004,28 +1072,10 @@
     "summary": "Turn a visit into a membership or season pass"
    },
    {
-    "operation": "createReservation",
-    "contract": "orders",
-    "verb": "POST",
-    "summary": "Hold without payment"
-   },
-   {
-    "operation": "extendReservation",
-    "contract": "orders",
-    "verb": "POST",
-    "summary": "Extend a reservation"
-   },
-   {
     "operation": "issueInvitation",
     "contract": "orders",
     "verb": "POST",
     "summary": "Issue a complimentary entitlement, with no payment expected"
-   },
-   {
-    "operation": "listDeposits",
-    "contract": "orders",
-    "verb": "GET",
-    "summary": "Deposits and their authorisation state"
    },
    {
     "operation": "listInvitationAllowances",
@@ -1058,16 +1108,16 @@
     "summary": "Gateways configured for this scope"
    },
    {
-    "operation": "listUpgrades",
-    "contract": "orders",
-    "verb": "GET",
-    "summary": "Upgrade requests and their outcome"
-   },
-   {
     "operation": "openGuestCreditAccount",
     "contract": "orders",
     "verb": "POST",
     "summary": "A credit limit for an individual booking ahead"
+   },
+   {
+    "operation": "overrideCreditLimit",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "Authorise an order beyond the credit limit"
    },
    {
     "operation": "pushWalletPassUpdate",
@@ -1076,28 +1126,40 @@
     "summary": "Push a change to every device holding it"
    },
    {
-    "operation": "resolveSyncRejection",
-    "contract": "orders",
-    "verb": "POST",
-    "summary": "Record what was done about a refused entry"
-   },
-   {
     "operation": "revokeEntitlementShare",
     "contract": "orders",
     "verb": "POST",
     "summary": "Take back a share"
    },
    {
+    "operation": "setB2bCreditLimit",
+    "contract": "orders",
+    "verb": "PUT",
+    "summary": "Set a partner credit limit"
+   },
+   {
+    "operation": "setOrderAmendment",
+    "contract": "orders",
+    "verb": "PUT",
+    "summary": "Order Amendment Workspace"
+   },
+   {
+    "operation": "setOrderDetailTransaction",
+    "contract": "orders",
+    "verb": "PUT",
+    "summary": "Order Detail & Transaction Workspace"
+   },
+   {
+    "operation": "simulateRefund",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "What a refund would do, without doing it"
+   },
+   {
     "operation": "explainRecommendation",
     "contract": "promotions",
     "verb": "POST",
     "summary": "Why this was offered, and what was suppressed"
-   },
-   {
-    "operation": "getCouponCodeBatch",
-    "contract": "promotions",
-    "verb": "GET",
-    "summary": "Progress and export of a code batch"
    },
    {
     "operation": "getRecommendations",
@@ -1142,16 +1204,10 @@
     "summary": "Redeem voucher value against an order"
    },
    {
-    "operation": "overrideWaitingGuest",
-    "contract": "queue",
-    "verb": "POST",
-    "summary": "Admit against a failed redemption"
-   },
-   {
-    "operation": "redeemWaitingGuest",
-    "contract": "queue",
-    "verb": "POST",
-    "summary": "Admit a party at the ride"
+    "operation": "setRuleTestRecommendation",
+    "contract": "promotions",
+    "verb": "PUT",
+    "summary": "Rule Test, Simulation & AI Recommendation Workspace"
    },
    {
     "operation": "listAlertRules",
@@ -1160,34 +1216,10 @@
     "summary": "What raises an alert, and when"
    },
    {
-    "operation": "cancelMerchandiseReservation",
-    "contract": "retail",
-    "verb": "POST",
-    "summary": "Release a reservation"
-   },
-   {
-    "operation": "collectMerchandiseReservation",
-    "contract": "retail",
-    "verb": "POST",
-    "summary": "The guest picked it up"
-   },
-   {
-    "operation": "collectShopAndDrop",
-    "contract": "retail",
-    "verb": "POST",
-    "summary": "Hand the goods over"
-   },
-   {
     "operation": "createRetailExchange",
     "contract": "retail",
     "verb": "POST",
     "summary": "Exchange one item for another"
-   },
-   {
-    "operation": "createShopAndDrop",
-    "contract": "retail",
-    "verb": "POST",
-    "summary": "Buy now, collect on the way out"
    },
    {
     "operation": "listRetailRecommendations",
@@ -1200,6 +1232,18 @@
     "contract": "retail",
     "verb": "GET",
     "summary": "List returns"
+   },
+   {
+    "operation": "extendSeatHold",
+    "contract": "seating",
+    "verb": "POST",
+    "summary": "Extend a hold"
+   },
+   {
+    "operation": "adjustDepositBoxFloat",
+    "contract": "shift",
+    "verb": "POST",
+    "summary": "Change the initial fund"
    },
    {
     "operation": "approveShiftClose",
@@ -1220,12 +1264,6 @@
     "summary": "The connectivity thresholds saved at one scope node"
    },
    {
-    "operation": "getDevice",
-    "contract": "tenancy",
-    "verb": "GET",
-    "summary": "Read one registered device"
-   },
-   {
     "operation": "getOfflinePolicy",
     "contract": "tenancy",
     "verb": "GET",
@@ -1242,12 +1280,6 @@
     "contract": "tenancy",
     "verb": "GET",
     "summary": "Where each service answers inside a cell"
-   },
-   {
-    "operation": "listConfigurationProfiles",
-    "contract": "tenancy",
-    "verb": "GET",
-    "summary": "Every configuration profile, at its current version"
    },
    {
     "operation": "listDeviceAuditRecords",
@@ -1298,12 +1330,6 @@
     "summary": "Close a wallet"
    },
    {
-    "operation": "getWalletBalance",
-    "contract": "wallet",
-    "verb": "GET",
-    "summary": "A wallet's balance"
-   },
-   {
     "operation": "holdWalletFunds",
     "contract": "wallet",
     "verb": "POST",
@@ -1332,6 +1358,12 @@
     "contract": "workforce",
     "verb": "POST",
     "summary": ""
+   },
+   {
+    "operation": "claimOpenShift",
+    "contract": "workforce",
+    "verb": "POST",
+    "summary": "Pick up a released shift"
    },
    {
     "operation": "listEmployees",

@@ -64,6 +64,163 @@
    }
   }
  },
+ "Point": {
+  "type": "object",
+  "required": [
+   "x",
+   "y"
+  ],
+  "properties": {
+   "x": {
+    "type": "number"
+   },
+   "y": {
+    "type": "number"
+   }
+  }
+ },
+ "SeatAvailability": {
+  "x-ticvai-persistence": "none — computed from seat, hold and block",
+  "type": "object",
+  "required": [
+   "performanceId",
+   "seatMapId",
+   "renderMode",
+   "totals",
+   "seats"
+  ],
+  "properties": {
+   "performanceId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "seatMapId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "renderMode": {
+    "type": "string",
+    "enum": [
+     "graphical",
+     "list"
+    ],
+    "description": "The mode the server actually used. With `mode=auto` this is how a client knows what it got: `list` means the map has no geometry (the seat map's `noGeometry` state), so the client sells from categories and best-available groups and does not draw a plan. `graphical` means every seat carries `position`.\n"
+   },
+   "totals": {
+    "type": "object",
+    "properties": {
+     "total": {
+      "type": "integer"
+     },
+     "available": {
+      "type": "integer"
+     },
+     "held": {
+      "type": "integer"
+     },
+     "sold": {
+      "type": "integer"
+     },
+     "blocked": {
+      "type": "integer"
+     },
+     "buffered": {
+      "type": "integer"
+     }
+    }
+   },
+   "byCategory": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "categoryId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "available": {
+       "type": "integer"
+      },
+      "sold": {
+       "type": "integer"
+      },
+      "price": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      }
+     }
+    }
+   },
+   "sections": {
+    "type": "array",
+    "description": "The map's sections with what a guest screen needs to show the view from each (decided 29 September, rev 3 23SEP-14): the photo where the venue supplied one, otherwise null and the client renders the view from `boundary` and the seat positions. In this response so WEB-007 and GST-049 need no second call.\n",
+    "items": {
+     "type": "object",
+     "required": [
+      "code",
+      "name"
+     ],
+     "properties": {
+      "code": {
+       "type": "string"
+      },
+      "name": {
+       "type": "string"
+      },
+      "viewAssetId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true,
+       "description": "As `Section.viewAssetId`. Null means render the view from geometry."
+      },
+      "boundary": {
+       "type": "array",
+       "nullable": true,
+       "items": {
+        "$ref": "#/components/schemas/Point"
+       },
+       "description": "As `Section.boundary`. Null when `renderMode` is `list`."
+      }
+     }
+    }
+   },
+   "seats": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "seatId",
+      "status"
+     ],
+     "properties": {
+      "seatId": {
+       "type": "string"
+      },
+      "status": {
+       "$ref": "#/components/schemas/SeatStatus"
+      },
+      "categoryId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true
+      },
+      "displayLabel": {
+       "type": "string",
+       "description": "What the guest sees, e.g. `A2-7-11`, as on `Seat`."
+      },
+      "position": {
+       "allOf": [
+        {
+         "$ref": "#/components/schemas/Point"
+        }
+       ],
+       "nullable": true,
+       "description": "The seat's coordinates on the map, as on `Seat`. Present when `renderMode` is `graphical`; null when it is `list`."
+      }
+     }
+    }
+   }
+  }
+ },
  "SeatReassignment": {
   "type": "object",
   "x-ticvai-persistence": "seating.reassignment",
@@ -281,6 +438,17 @@
    "closestToStage",
    "accessible",
    "contiguous"
+  ]
+ },
+ "SeatStatus": {
+  "type": "string",
+  "enum": [
+   "available",
+   "held",
+   "sold",
+   "blocked",
+   "buffered",
+   "unavailable"
   ]
  }
 }

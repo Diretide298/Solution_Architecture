@@ -38,9 +38,9 @@ steps:
   action: Audit Log.
   operations:
   - listAuditRecords
-  - resolvePermissions
   outcome: 2 operations, 0 of them previously unwalked.
   crossesDevice: true
+  note: '**Repointed 2 October (CHG-WIR-021).** The permission simulator (resolvePermissions) moved from the audit log to BO-054 Role Assignment; the tenant reads the audit trail here.'
 branches:
 - at: 1
   condition: The acting principal lacks the permission at this scope.

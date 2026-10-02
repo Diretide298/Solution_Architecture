@@ -228,7 +228,7 @@
   "states": {
    "loading": "The asset distribution delivery list.",
    "error": "Could not load. Names which read failed and leaves the asset distribution delivery untouched.",
-   "emptyFirstRun": "No asset distribution delivery yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "Nothing here yet for Asset Distribution & Delivery Command Center. This screen only reads, so it offers no create action and says where the records come from.",
    "emptyNoResults": "The filter narrowed it and the asset distribution delivery are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -379,7 +379,7 @@
   "states": {
    "loading": "The asset usage distribution list.",
    "error": "Could not load. Names which read failed and leaves the asset usage distribution untouched.",
-   "emptyFirstRun": "No asset usage distribution yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "Nothing here yet for Asset Usage & Distribution Map. This screen only reads, so it offers no create action and says where the records come from.",
    "emptyNoResults": "The filter narrowed it and the asset usage distribution are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -850,7 +850,7 @@
   "states": {
    "loading": "The asset replacement propagation list.",
    "error": "Could not load. Names which read failed and leaves the asset replacement propagation untouched.",
-   "emptyFirstRun": "No asset replacement propagation yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "Nothing here yet for Asset Replacement & Propagation Management. This screen only reads, so it offers no create action and says where the records come from.",
    "emptyNoResults": "The filter narrowed it and the asset replacement propagation are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -965,8 +965,10 @@
      "components": [
       {
        "kind": "textField",
-       "label": "DAM-IMG-009211 — Default Dubai Park Hero",
-       "provenance": "pack Digital Asset Management DAM.pdf, page 68 §Configured Fallback"
+       "label": "Default fallback asset",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-023, design-notes correction)",
+       "notes": "Picked from the library (e.g. DAM-IMG-009211, \"Default Dubai Park Hero\").",
+       "bindsTo": "MediaAsset.id"
       }
      ]
     },
@@ -1149,7 +1151,7 @@
   "states": {
    "loading": "The dam api integration list.",
    "error": "Could not load. Names which read failed and leaves the dam api integration untouched.",
-   "emptyFirstRun": "No dam api integration yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "Nothing here yet for DAM API & Integration Hub. This screen only reads, so it offers no create action and says where the records come from.",
    "emptyNoResults": "The filter narrowed it and the dam api integration are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -1321,7 +1323,7 @@
   "states": {
    "loading": "The delivery monitoring integration list; the counts above it resolve separately.",
    "error": "Could not load. Names which read failed and leaves the delivery monitoring integration untouched.",
-   "emptyFirstRun": "No delivery monitoring integration yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "Nothing here yet for Delivery Monitoring & Integration Health. This screen only reads, so it offers no create action and says where the records come from.",
    "emptyNoResults": "The filter narrowed it and the delivery monitoring integration are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -1483,7 +1485,7 @@
   "states": {
    "loading": "The asset usage performance list; the counts above it resolve separately.",
    "error": "Could not load. Names which read failed and leaves the asset usage performance untouched.",
-   "emptyFirstRun": "No asset usage performance yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "Nothing here yet for Asset Usage & Performance Analytics. This screen only reads, so it offers no create action and says where the records come from.",
    "emptyNoResults": "The filter narrowed it and the asset usage performance are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -1592,7 +1594,7 @@
   "states": {
    "loading": "The distribution intelligence insights configuration as saved.",
    "error": "Could not load. Names which read failed and leaves the distribution intelligence insights untouched.",
-   "emptyFirstRun": "No distribution intelligence insights configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyFirstRun": "Nothing here yet for Distribution Intelligence, AI Insights & Optimization. This screen only reads, so it offers no create action and says where the records come from.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },

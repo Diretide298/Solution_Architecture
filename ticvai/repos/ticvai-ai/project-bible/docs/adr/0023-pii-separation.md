@@ -1,7 +1,7 @@
 # ADR-0023 — Personal data lives apart from the append-only ledger
 
 **Status:** Accepted · 17 August 2026, recording a decision already implemented
-**Relates to:** ADR-0013 (local-first POS), CF-35 (biometrics under PDPL), CF-64 (retention)
+**Relates to:** ADR-0013 (local-first POS), CF-35 (biometrics under PDPL), CF-64 (retention), ADR-0020 (as amended 2 October 2026: personal data typed into an AI prompt is scrubbed offline in the cell before any model reads it)
 
 ---
 

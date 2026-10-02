@@ -33,45 +33,45 @@
   }
  ],
  "stores": {
-  "postgres": 122,
+  "postgres": 123,
   "postgres-analytical": 5,
   "redis": 9,
   "qdrant": 1
  },
- "generated": "2026-10-01",
+ "generated": "2026-10-02",
  "note": "Derived by closure from the contract, not listed. See handoff/README.md \u2014 the hand-maintained version of this drifted four times in one day.",
  "counts": {
-  "operations": 143,
-  "schemas": 122,
+  "operations": 146,
+  "schemas": 125,
   "states": 42,
   "events": 47,
-  "tables": 137,
-  "screens": 195,
+  "tables": 138,
+  "screens": 194,
   "flows": 11,
-  "documents": 64,
+  "documents": 66,
   "openConflicts": 1
  },
  "metrics": {
   "design": [
    {
     "name": "Operations in the contract",
-    "done": 141,
-    "total": 141,
+    "done": 144,
+    "total": 144,
     "percent": 100,
     "note": "The seed of the closure."
    },
    {
     "name": "Lifecycles modelled",
     "done": 19,
-    "total": 34,
-    "percent": 56,
+    "total": 36,
+    "percent": 53,
     "note": "Status enums in the domain contract with a state model."
    },
    {
     "name": "Operations reaching a screen",
-    "done": 128,
-    "total": 141,
-    "percent": 91,
+    "done": 130,
+    "total": 144,
+    "percent": 90,
     "note": "This domain's own operations that a screen calls. Jobs and internal operations legitimately reach none."
    },
    {
@@ -93,12 +93,12 @@
   ]
  },
  "headline": {
-  "design": 88,
+  "design": 87,
   "build": 0
  },
  "waves": {
   "wave1": 13,
-  "wave2": 27,
+  "wave2": 26,
   "wave3": 155
  },
  "reachedOutsideTheContract": [
@@ -278,7 +278,7 @@
   "operations": []
  },
  "storage": {
-  "postgres": 122,
+  "postgres": 123,
   "postgres-analytical": 5,
   "redis": 9,
   "qdrant": 1
@@ -306,7 +306,9 @@
   "AiRiskRegisterEntry.status",
   "AiConfigurationSource.status",
   "AiMarketingRecommendation.status",
-  "AiForecastExport.status"
+  "AiForecastExport.status",
+  "AiProviderCompatibility.status",
+  "TranslationProposals.status"
  ],
  "documents": [
   {
@@ -440,6 +442,11 @@
    "status": ""
   },
   {
+   "file": "docs\\active\\root-classes.md",
+   "title": "Root issues by class, and the guard that closes each",
+   "status": ""
+  },
+  {
    "file": "docs\\active\\schema-merge-decision-log.md",
    "title": "Schema merge \u2014 the decision log",
    "status": ""
@@ -498,6 +505,11 @@
    "file": "docs\\adr\\0007-hybrid-repository-topology.md",
    "title": "ADR-0007: Hybrid repository topology",
    "status": "Accepted"
+  },
+  {
+   "file": "docs\\adr\\0009-ai-data-residency.md",
+   "title": "ADR-0009: AI Data Residency",
+   "status": "Accepted \u00b7 section 2 amended by [ADR-0049](0049-vectors-live"
   },
   {
    "file": "docs\\adr\\0020-ai-isolation-boundary.md",
@@ -602,7 +614,7 @@
   {
    "file": "docs\\adr\\0063-encryption-keys-and-biometric-templates.md",
    "title": "ADR-0063: Encryption and keys, and biometric templates stay with the biometric vendor",
-   "status": "Proposed \u00b7 waiting on the client's data protection officer ("
+   "status": "Accepted in part \u00b7 2 October 2026: the biometric consent, en"
   },
   {
    "file": "docs\\adr\\0064-per-tenant-limits.md",

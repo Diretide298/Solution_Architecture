@@ -47,30 +47,6 @@
   "requestBody": null,
   "responds": "BenchmarkRow"
  },
- "getAssetHistory": {
-  "method": "GET",
-  "path": "/assets/{assetId}/history",
-  "contract": "maintenance",
-  "summary": "Service history",
-  "permission": "ASSET_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- },
  "getKpiValues": {
   "method": "GET",
   "path": "/kpi-values",
@@ -113,6 +89,11 @@
    },
    {
     "name": "groupBy",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "module",
     "in": "query",
     "required": null
    }

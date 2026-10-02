@@ -36,24 +36,24 @@ steps:
     cannot be relied on.'
   crossesDevice: true
 - step: 3
-  screen: EMP-050
+  screen: EMP-027
   action: Where required, the authorities are notified.
   operations:
   - recordAuthorityNotification
-  - listIncidents
   outcome: '**The notification is itself a record.** *We told the police* with no time and no name is
     not evidence.'
   crossesDevice: true
+  note: '**Repointed 2 October (CHG-WIR-001).** Notifying the authorities is part of following up the incident (EMP-027), not of restoring the venue (EMP-050); the operation moved with it.'
 - step: 4
-  screen: EMP-047
+  screen: EMP-038
   action: If it is a venue-wide event, an announcement goes out.
   operations:
   - publishAnnouncement
-  - acknowledgeAnnouncement
   - getAnnouncementReach
   outcome: '**Reach is measured.** An evacuation announcement nobody acknowledged is an evacuation nobody
     heard.'
   crossesDevice: true
+  note: '**Repointed 2 October (CHG-WIR-001).** The venue-wide announcement is declared from Broadcast to team (EMP-038); Emergency mode (EMP-047) is the recipients'' full-screen takeover with acknowledge as its one action.'
 branches:
 - at: 2
   condition: It involves a guest and becomes a case.

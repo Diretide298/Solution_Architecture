@@ -6,6 +6,7 @@ frequency: routine
 criticality: operational
 platforms:
 - P09 TICVAI Web
+- P08 Venue Management
 provenance: derived-from-board
 offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
   not guess.

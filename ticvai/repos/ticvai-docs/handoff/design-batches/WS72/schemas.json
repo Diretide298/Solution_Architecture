@@ -393,6 +393,209 @@
    }
   }
  },
+ "FormDefinition": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.form_definition + marketing.form_definition_field",
+  "description": "CF-129, CL-04. **A waiver, a survey and a data-capture form are one mechanism.**\nA waiver is this form with a signature. A survey is this form with a scale. A demographic capture is this form at the point of sale. They were raised as three separate gaps and share every part: field configuration, conditional display, versioning, an acceptance record and a stored artefact.\n**Three implementations would drift on the version rule first.** A waiver signed against version 3 must stay bound to version 3, and that is the same requirement a survey has when question wording changes mid-campaign — **an NPS score means nothing if you cannot say which question produced it.**\n",
+  "required": [
+   "id",
+   "name",
+   "kind",
+   "version",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "readOnly": true,
+    "type": "string",
+    "format": "uuid"
+   },
+   "name": {
+    "type": "string"
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "waiver",
+     "survey",
+     "dataCapture",
+     "consentForm",
+     "incidentReport",
+     "registration"
+    ]
+   },
+   "consentPurposes": {
+    "type": "array",
+    "description": "**What a `consentForm` consents to** (Chinmay, 2 October, batch 4; follows BO-188: biometric capture needs consent on the venue's own form; CHG-CSA-026). A guardian-signed form for a minor carries the guardian fields of the waiver builder (workbook Q237: guardian consent, configurable per country). Empty for any other kind.",
+    "items": {
+     "type": "string",
+     "enum": [
+      "facePass",
+      "faceTag",
+      "marketing",
+      "photography",
+      "waiver"
+     ]
+    }
+   },
+   "version": {
+    "readOnly": true,
+    "type": "integer",
+    "description": "**Set by the server** — 1 on `createForm`, the next number on every change. **Immutable once anything is submitted against it.** A change creates a new version, and the old one stays readable forever — 2.15.13 requires the exact accepted version retained, which is legal evidence rather than a nicety.\n"
+   },
+   "fields": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/FormField"
+    }
+   },
+   "requiresSignature": {
+    "type": "boolean",
+    "default": false,
+    "description": "**What makes it a waiver.** And 2.15.9 makes ticket issuance conditional on one, which puts this in the purchase path rather than beside it.\n"
+   },
+   "signatureKind": {
+    "type": "string",
+    "enum": [
+     "drawn",
+     "typed",
+     "checkbox",
+     "none"
+    ],
+    "default": "none"
+   },
+   "scoreScale": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "nps",
+     "csat",
+     "ces",
+     "likert5",
+     "likert7",
+     "stars"
+    ],
+    "description": "**What makes it a survey.** Named rather than free-form because a score whose scale is unknown cannot be compared to last quarter's.\n"
+   },
+   "appliesToProductIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "validForMonths": {
+    "type": "integer",
+    "nullable": true,
+    "description": "**How long an acceptance lasts.** A waiver signed last summer may or may not still hold, and 2.15.x asks for a returning participant not to sign again — which only works if the expiry is stated.\n"
+   },
+   "minimumAge": {
+    "type": "integer",
+    "nullable": true
+   },
+   "requiresGuardianForMinors": {
+    "type": "boolean",
+    "default": true,
+    "description": "**A minor cannot waive their own rights.** A guardian signs, and the record has to name them — an unsigned or self-signed minor waiver is worth nothing at the moment it matters.\n"
+   },
+   "status": {
+    "readOnly": true,
+    "type": "string",
+    "enum": [
+     "draft",
+     "published",
+     "superseded",
+     "retired"
+    ]
+   },
+   "legalReviewedBy": {
+    "type": "string",
+    "nullable": true
+   },
+   "legalReviewedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "scopePath": {
+    "readOnly": true,
+    "type": "string",
+    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"
+   }
+  }
+ },
+ "FormField": {
+  "type": "object",
+  "description": "One field. **Conditional display is the shared requirement** — a survey branching on an answer and a waiver revealing a medical question on a yes are the same mechanism.\n",
+  "required": [
+   "key",
+   "label",
+   "type"
+  ],
+  "properties": {
+   "key": {
+    "type": "string"
+   },
+   "label": {
+    "type": "string"
+   },
+   "labelLocalised": {
+    "type": "object",
+    "additionalProperties": {
+     "type": "string"
+    }
+   },
+   "type": {
+    "type": "string",
+    "enum": [
+     "text",
+     "longText",
+     "number",
+     "date",
+     "select",
+     "multiSelect",
+     "boolean",
+     "scale",
+     "signature",
+     "file",
+     "phone",
+     "email"
+    ]
+   },
+   "options": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "isRequired": {
+    "type": "boolean",
+    "default": false
+   },
+   "isPersonalData": {
+    "type": "boolean",
+    "default": false,
+    "description": "**Marked at the field, because retention is decided at the field.** A survey answer and a medical condition on the same form have different lifetimes, and a form-level flag makes the whole thing as sensitive as its most sensitive field.\n"
+   },
+   "consentPurposeId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "showWhen": {
+    "type": "object",
+    "nullable": true,
+    "properties": {
+     "field": {
+      "type": "string"
+     },
+     "equals": {
+      "type": "string"
+     }
+    }
+   }
+  }
+ },
  "LocalisedText": {
   "x-ticvai-persistence": "none — jsonb column",
   "type": "object",

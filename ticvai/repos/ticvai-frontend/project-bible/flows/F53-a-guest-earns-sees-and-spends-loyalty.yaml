@@ -34,7 +34,6 @@ steps:
   action: They see rewards and manage their devices.
   operations:
   - getWishlist
-  - addToWishlist
   - recordConsent
   - listGuestDevices
   outcome: '**Consent sits here deliberately.** A rewards screen is where a guest is most willing to

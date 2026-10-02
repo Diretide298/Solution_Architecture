@@ -37,38 +37,6 @@
   "requestBody": "Game",
   "responds": "Game"
  },
- "createGameEntitlement": {
-  "method": "POST",
-  "path": "/game-entitlements",
-  "contract": "games",
-  "summary": "Define a pass, package or per-game entitlement",
-  "permission": "PRODUCT_CONFIGURE",
-  "offlineCapable": null,
-  "conflictPolicy": null,
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "GameEntitlement",
-  "responds": "GameEntitlement"
- },
- "getGameCard": {
-  "method": "GET",
-  "path": "/game-cards/{cardCode}",
-  "contract": "games",
-  "summary": "Read a card's balances",
-  "permission": null,
-  "offlineCapable": true,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "GameCard"
- },
  "listAttractionTypes": {
   "method": "GET",
   "path": "/attraction-types",

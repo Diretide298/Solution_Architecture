@@ -148,6 +148,11 @@
     "name": "groupBy",
     "in": "query",
     "required": null
+   },
+   {
+    "name": "module",
+    "in": "query",
+    "required": null
    }
   ],
   "requestBody": null,
@@ -235,30 +240,6 @@
   ],
   "requestBody": null,
   "responds": "Alert"
- },
- "listAnalyticsAnomalies": {
-  "method": "GET",
-  "path": "/analytics-anomalies",
-  "contract": "reporting",
-  "summary": "Numbers that moved more than they should have",
-  "permission": "REPORT_VIEW_VENUE",
-  "offlineCapable": null,
-  "conflictPolicy": null,
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "from",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "severity",
-    "in": "query",
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "AnalyticsAnomaly"
  },
  "listPromotionAlertException": {
   "method": "GET",

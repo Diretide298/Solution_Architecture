@@ -514,6 +514,13 @@
        "kind": "secondaryButton",
        "label": "Cancel",
        "notes": "**A screen that can submit must be leaveable without submitting.**"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Available units",
+       "bindsTo": "RentalAvailability",
+       "operation": "getRentalAvailability",
+       "provenance": "contract rental.yaml GET /rental-availability; wiring fix, 2 October 2026"
       }
      ],
      "name": "contentBody"
@@ -551,6 +558,13 @@
     "provenance": "board reading, 19 September 2026",
     "purpose": "Bind the assets",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "getRentalAvailability",
+    "contract": "rental",
+    "purpose": "Units available to assign",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-008)"
    }
   ],
   "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 67. 0 of 0 labels bound to a contract property; 0 of 18 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
@@ -1038,7 +1052,7 @@
    "status": "notStarted"
   },
   "density": "comfortable",
-  "notes": "The staff-app form of `BO-551`, for the attendant at the rental counter. Decided 11 September 2026 that Rental boards 6–8 live on both platforms; `tools/applied/apply-rental-staff-app.py` keeps the two in step.",
+  "notes": "The staff-app form of `BO-551`, for the attendant at the rental counter. Decided 11 September 2026 that Rental boards 6–8 live on both platforms; `tools/applied/apply-rental-staff-app.py` keeps the two in step.\n\n**The card hold is a pre-authorisation on the payment terminal** (decided 2 October 2026, Chinmay, batch 6, EMP-078; DEC-304; CHG-CSA-029). The terminal returns the authorisation reference, the check-out carries it (`RentalCheckOut.depositAuthorisationId`) and the booking stores it; **check-out is blocked until the pre-authorisation succeeds** (`checkOutRental` answers 409 `deposit-not-authorised`), and the screen says so rather than offering to continue.",
   "purpose": "Give the rental operator a clear commercial status without requiring them to enter the Finance module.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",

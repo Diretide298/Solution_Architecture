@@ -37,6 +37,38 @@
   "requestBody": null,
   "responds": "ApprovalRequest"
  },
+ "endPromotion": {
+  "method": "POST",
+  "path": "/promotions/{promotionId}/end",
+  "contract": "promotions",
+  "summary": "End a promotion early",
+  "permission": "PRICE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "getPromotion": {
+  "method": "GET",
+  "path": "/promotions/{promotionId}",
+  "contract": "promotions",
+  "summary": "Read a promotion",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "Promotion"
+ },
  "getPromotionUsage": {
   "method": "GET",
   "path": "/promotions/{promotionId}/usage",
@@ -534,6 +566,63 @@
   ],
   "requestBody": null,
   "responds": "Page"
+ },
+ "pausePromotion": {
+  "method": "POST",
+  "path": "/promotions/{promotionId}/pause",
+  "contract": "promotions",
+  "summary": "Pause a live promotion",
+  "permission": "PRICE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "publishPromotion": {
+  "method": "POST",
+  "path": "/promotions/{promotionId}/publish",
+  "contract": "promotions",
+  "summary": "Publish a promotion",
+  "permission": "PRICE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Promotion"
+ },
+ "unschedulePromotion": {
+  "method": "POST",
+  "path": "/promotions/{promotionId}/unschedule",
+  "contract": "promotions",
+  "summary": "Pull a scheduled promotion before it starts",
+  "permission": "PRICE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
  },
  "updateCommercialCampaign": {
   "method": "PATCH",

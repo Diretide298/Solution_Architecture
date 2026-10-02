@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """Whether every screen has a design a developer can open, and whether drawn frames are linked.
 
-**Audit class A-WIREFRAME (audit/ticvai/ROOT-CLASSES.md), roots R252, R258, R272.** On 26
+**Audit class A-WIREFRAME (docs/active/root-classes.md), roots R252, R258, R272.** On 26
 September most screen tickets said "no wireframe": generated frames `notStarted`, the Claude
 Design and client frames archived to the git-ignored `_dump/` and the screens repointed away from
 them (R258), redrawn frames sitting in `wireframes/incoming/` that no screen record named, and pack

@@ -263,6 +263,37 @@
    }
   }
  },
+ "CouponCampaign": {
+  "x-ticvai-persistence": "promotions.coupon_campaign",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/CreateCouponCampaignRequest"
+   },
+   {
+    "type": "object",
+    "required": [
+     "id",
+     "generatedCount",
+     "redeemedCount"
+    ],
+    "properties": {
+     "id": {
+      "type": "string",
+      "format": "uuid"
+     },
+     "generatedCount": {
+      "type": "integer"
+     },
+     "redeemedCount": {
+      "type": "integer"
+     },
+     "isActive": {
+      "type": "boolean"
+     }
+    }
+   }
+  ]
+ },
  "CouponCode": {
   "x-ticvai-persistence": "promotions.coupon_code",
   "type": "object",
@@ -341,163 +372,75 @@
    }
   }
  },
- "CouponPromoCodeBuilderInput": {
+ "CouponCodeBatch": {
+  "x-ticvai-persistence": "promotions.coupon_code_batch",
   "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
-  "description": "**What Coupon & Promo Code Builder submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "description": "One run of `generateCouponCodes`. **The batch is a row** because its status is read after the request that queued it has returned, and its codes point back at it.\n",
+  "required": [
+   "id",
+   "campaignId",
+   "quantity",
+   "status"
+  ],
   "properties": {
-   "codeType": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "The `batchId` that `generateCouponCodes` returned."
+   },
+   "campaignId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "quantity": {
+    "type": "integer",
+    "description": "Codes requested."
+   },
+   "generatedCount": {
+    "type": "integer",
+    "description": "Codes generated so far."
+   },
+   "prefix": {
+    "type": "string",
+    "maxLength": 16,
+    "nullable": true
+   },
+   "length": {
+    "type": "integer"
+   },
+   "status": {
     "type": "string",
     "enum": [
-     "commonPromoCode",
-     "uniquePromoCode",
-     "coupon",
-     "promotionalVoucher",
-     "freeTicketCode",
-     "discountVoucher",
-     "partnerCode",
-     "employeeCode",
-     "influencerAffiliateCode",
-     "compensationServiceRecoveryCode",
-     "bulkCampaignCode"
-    ],
-    "description": "Kind of code."
+     "queued",
+     "generating",
+     "complete",
+     "failed"
+    ]
    },
-   "benefitType": {
+   "failureReason": {
     "type": "string",
-    "enum": [
-     "percentageDiscount",
-     "fixedValueDiscount",
-     "fixedPromotionalPrice",
-     "freeProduct",
-     "freeTicket",
-     "freeAddOn",
-     "upgrade",
-     "bundleBenefit",
-     "addedValue"
-    ],
-    "description": "What the code grants; the discount itself is calculated by the promotion rule engine rather than duplicated here."
+    "nullable": true,
+    "description": "Present only where status is `failed`."
    },
-   "benefitValue": {
-    "type": "number",
-    "description": "Benefit value: the percentage, or the amount in the promotion's currency"
-   },
-   "campaign": {
+   "requestedByPrincipalId": {
     "type": "string",
-    "description": "Campaign"
+    "format": "uuid"
    },
-   "code": {
+   "requestedAt": {
     "type": "string",
-    "description": "Code text for a common code, or the batch pattern for unique codes"
+    "format": "date-time"
    },
-   "maximumDiscount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Maximum discount"
-   },
-   "eligibleProducts": {
-    "type": "array",
-    "items": {
-     "type": "string"
-    },
-    "description": "Eligible products"
-   },
-   "channels": {
-    "type": "array",
-    "items": {
-     "type": "string"
-    },
-    "description": "Channels the code works on"
-   },
-   "validFrom": {
+   "completedAt": {
     "type": "string",
     "format": "date-time",
-    "description": "Valid from"
+    "nullable": true
    },
-   "validTo": {
+   "downloadUrl": {
     "type": "string",
-    "format": "date-time",
-    "description": "Valid to"
-   }
-  }
- },
- "CouponPromoCodeBuilderView": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
-  "description": "**What Coupon & Promo Code Builder displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
-  "properties": {
-   "codeType": {
-    "type": "string",
-    "enum": [
-     "commonPromoCode",
-     "uniquePromoCode",
-     "coupon",
-     "promotionalVoucher",
-     "freeTicketCode",
-     "discountVoucher",
-     "partnerCode",
-     "employeeCode",
-     "influencerAffiliateCode",
-     "compensationServiceRecoveryCode",
-     "bulkCampaignCode"
-    ],
-    "description": "Kind of code."
-   },
-   "benefitType": {
-    "type": "string",
-    "enum": [
-     "percentageDiscount",
-     "fixedValueDiscount",
-     "fixedPromotionalPrice",
-     "freeProduct",
-     "freeTicket",
-     "freeAddOn",
-     "upgrade",
-     "bundleBenefit",
-     "addedValue"
-    ],
-    "description": "What the code grants; the discount itself is calculated by the promotion rule engine rather than duplicated here."
-   },
-   "benefitValue": {
-    "type": "number",
-    "description": "Benefit value: the percentage, or the amount in the promotion's currency"
-   },
-   "campaign": {
-    "type": "string",
-    "description": "Campaign"
-   },
-   "code": {
-    "type": "string",
-    "description": "Code text for a common code, or the batch pattern for unique codes"
-   },
-   "maximumDiscount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Maximum discount"
-   },
-   "eligibleProducts": {
-    "type": "array",
-    "items": {
-     "type": "string"
-    },
-    "description": "Eligible products"
-   },
-   "channels": {
-    "type": "array",
-    "items": {
-     "type": "string"
-    },
-    "description": "Channels the code works on"
-   },
-   "validFrom": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Valid from"
-   },
-   "validTo": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Valid to"
+    "nullable": true,
+    "x-ticvai-persisted": false,
+    "description": "The exported file of the batch's codes. Signed and expiring, issued on each read, so it is not stored. Present only while status is `complete`."
    }
   }
  },
@@ -510,6 +453,60 @@
    "expired",
    "voided"
   ]
+ },
+ "CreateCouponCampaignRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "code",
+   "name",
+   "venueId",
+   "discount",
+   "validFrom"
+  ],
+  "properties": {
+   "code": {
+    "type": "string",
+    "maxLength": 64
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "discount": {
+    "$ref": "#/components/schemas/Discount"
+   },
+   "conditions": {
+    "$ref": "#/components/schemas/PromotionConditions"
+   },
+   "isSingleUse": {
+    "type": "boolean",
+    "default": true,
+    "description": "True generates individually redeemable codes. False issues one shared code with a redemption limit.\n"
+   },
+   "maxRedemptionsPerCode": {
+    "type": "integer",
+    "default": 1
+   },
+   "validFrom": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "validTo": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "campaignId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The commercial campaign (`promotions.campaign`) the codes are issued under, as the Coupon & Promo Code Builder names it. (DM5, 29 September: data model for the agreed operations)"
+   }
+  }
  },
  "Discount": {
   "x-ticvai-persistence": "none — embedded in promotion",
@@ -583,13 +580,13 @@
      "type": "string",
      "format": "uuid"
     },
-    "description": "The reward products, where the reward is not the qualifying product: the free gift of `freeItem`, the \"different product\" of a `buyXGetY` (setGiftFreeProduct, setBuyGetBogo). Absent means the reward is taken from the qualifying lines. (DM5, 29 September: data model for the agreed operations)"
+    "description": "The reward products, where the reward is not the qualifying product: the free gift of `freeItem`, the \"different product\" of a `buyXGetY` (createPromotion; the builders setGiftFreeProduct and setBuyGetBogo were retired in r2, CHG-CLN-001). Absent means the reward is taken from the qualifying lines. (DM5, 29 September: data model for the agreed operations)"
    },
    "maxApplicationsPerBasket": {
     "type": "integer",
     "minimum": 1,
     "nullable": true,
-    "description": "How many times the offer repeats in one basket: the \"maximum repetitions\" of an N-for-X offer (setFixedPriceOffer). Null repeats for every complete set. (DM5, 29 September: data model for the agreed operations)"
+    "description": "How many times the offer repeats in one basket: the \"maximum repetitions\" of an N-for-X offer (createPromotion; setFixedPriceOffer was retired in r2, CHG-CLN-001). Null repeats for every complete set. (DM5, 29 September: data model for the agreed operations)"
    }
   }
  },

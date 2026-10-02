@@ -105,12 +105,11 @@ paths:
     get:
       operationId: listAssets
       x-ticvai-consumed-by:
-        - "P08 BO-031 Asset Register"
         - "P08 BO-069 Asset Register"
         - "P08 BO-108 Venue Operations"
+        - "P08 BO-504 Rental Inventory Command Center"
         - "P08 BO-505 Serialized Equipment Registry"
         - "P08 BO-903 Equipment & Asset Command Center"
-        - "P13 CMS-071 AI Asset Intelligence Command Center"
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: List assets
@@ -155,7 +154,6 @@ paths:
     post:
       operationId: createAsset
       x-ticvai-consumed-by:
-        - "P08 BO-031 Asset Register"
         - "P08 BO-069 Asset Register"
       x-ticvai-audience: [staff]
       summary: Register an asset
@@ -198,7 +196,6 @@ paths:
     get:
       operationId: getAsset
       x-ticvai-consumed-by:
-        - "P08 BO-031 Asset Register"
         - "P08 BO-069 Asset Register"
         - "P08 BO-506 Equipment / Asset Profile"
         - "P08 BO-508 Equipment Status & Condition Management"
@@ -226,7 +223,6 @@ paths:
     patch:
       operationId: updateAsset
       x-ticvai-consumed-by:
-        - "P08 BO-031 Asset Register"
         - "P08 BO-069 Asset Register"
         - "P08 BO-506 Equipment / Asset Profile"
       x-ticvai-audience: [staff]
@@ -283,7 +279,6 @@ paths:
       operationId: lookupAsset
       x-ticvai-consumed-by:
         - "P06 EMP-075 Equipment Scan & Validation"
-        - "P08 BO-031 Asset Register"
         - "P08 BO-069 Asset Register"
         - "P08 BO-509 QR / Barcode Equipment Identification"
         - "P08 BO-548 Equipment Scan & Validation"
@@ -324,11 +319,9 @@ paths:
     put:
       operationId: setAssetStatus
       x-ticvai-consumed-by:
-        - "P06 EMP-100 Return Completion & Equipment Disposition"
-        - "P08 BO-031 Asset Register"
         - "P08 BO-069 Asset Register"
         - "P08 BO-508 Equipment Status & Condition Management"
-        - "P08 BO-573 Return Completion & Equipment Disposition"
+        - "P08 BO-581 Return-to-Service Inspection & Approval"
         - "P08 BO-582 Asset Retirement, Write-Off & Replacement Recommendation"
       x-ticvai-audience: [staff]
       summary: Take an asset out of service or return it
@@ -381,11 +374,9 @@ paths:
     get:
       operationId: getAssetHistory
       x-ticvai-consumed-by:
-        - "P08 BO-031 Asset Register"
         - "P08 BO-069 Asset Register"
         - "P08 BO-580 Asset Maintenance History & Lifecycle"
         - "P08 BO-582 Asset Retirement, Write-Off & Replacement Recommendation"
-        - "P08 BO-587 Inventory & Equipment Performance Analytics"
         - "P08 BO-912 Asset Lifecycle, Depreciation & Retirement"
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: analytical
@@ -425,10 +416,12 @@ paths:
         - "P06 EMP-004 Task list"
         - "P06 EMP-005 Task detail"
         - "P06 EMP-006 Raise a task"
+        - "P06 EMP-007 Handover notes"
         - "P08 BO-030 Work Order Verification"
         - "P08 BO-070 Work Orders"
         - "P08 BO-108 Venue Operations"
         - "P08 BO-574 Maintenance Command Center"
+        - "P08 BO-576 Maintenance Calendar & Scheduling"
         - "P08 BO-577 Maintenance Work Order"
       x-ticvai-agreed: '29 September: 17 September minutes M17-03 (calendar views: day/week/month/agenda, category filter, venue day start)'
       x-ticvai-audience: [staff]
@@ -494,13 +487,12 @@ paths:
       operationId: createWorkOrder
       x-ticvai-consumed-by:
         - "P06 EMP-006 Raise a task"
-        - "P08 BO-030 Work Order Verification"
+        - "P08 ADM-587 Terminal Health, Maintenance & Incident Center"
         - "P08 BO-070 Work Orders"
         - "P08 BO-576 Maintenance Calendar & Scheduling"
         - "P08 BO-577 Maintenance Work Order"
         - "P08 BO-910 Maintenance & Resource Blocking"
         - "P08 BO-990 Maintenance & Out of Service"
-        - "P09 ADM-587 Terminal Health, Maintenance & Incident Center\t57"
       x-ticvai-audience: [staff]
       summary: Raise a work order
       description: >
@@ -577,8 +569,6 @@ paths:
     patch:
       operationId: updateWorkOrder
       x-ticvai-consumed-by:
-        - "P06 EMP-004 Task list"
-        - "P06 EMP-005 Task detail"
         - "P06 EMP-006 Raise a task"
         - "P08 BO-070 Work Orders"
         - "P08 BO-577 Maintenance Work Order"
@@ -632,7 +622,6 @@ paths:
     post:
       operationId: recordWorkOrderTime
       x-ticvai-consumed-by:
-        - "P06 EMP-004 Task list"
         - "P06 EMP-005 Task detail"
         - "P06 EMP-006 Raise a task"
         - "P08 BO-578 Technician Repair Workspace"
@@ -702,7 +691,6 @@ paths:
     post:
       operationId: recordWorkOrderParts
       x-ticvai-consumed-by:
-        - "P06 EMP-004 Task list"
         - "P06 EMP-005 Task detail"
         - "P06 EMP-006 Raise a task"
         - "P08 BO-579 Parts, Cost & Maintenance Expense Tracking"
@@ -769,10 +757,7 @@ paths:
     post:
       operationId: cancelWorkOrder
       x-ticvai-consumed-by:
-        - "P06 EMP-004 Task list"
-        - "P06 EMP-005 Task detail"
         - "P06 EMP-006 Raise a task"
-        - "P08 BO-030 Work Order Verification"
         - "P08 BO-070 Work Orders"
       x-ticvai-audience: [staff]
       summary: Cancel a work order
@@ -828,10 +813,8 @@ paths:
     post:
       operationId: completeWorkOrder
       x-ticvai-consumed-by:
-        - "P06 EMP-004 Task list"
         - "P06 EMP-005 Task detail"
         - "P06 EMP-006 Raise a task"
-        - "P08 BO-030 Work Order Verification"
         - "P08 BO-070 Work Orders"
         - "P08 BO-578 Technician Repair Workspace"
       x-ticvai-audience: [staff]
@@ -891,8 +874,6 @@ paths:
     post:
       operationId: verifyWorkOrder
       x-ticvai-consumed-by:
-        - "P06 EMP-004 Task list"
-        - "P06 EMP-005 Task detail"
         - "P06 EMP-006 Raise a task"
         - "P08 BO-030 Work Order Verification"
         - "P08 BO-581 Return-to-Service Inspection & Approval"
@@ -955,7 +936,6 @@ paths:
         - "P06 EMP-004 Task list"
         - "P06 EMP-005 Task detail"
         - "P06 EMP-006 Raise a task"
-        - "P08 BO-030 Work Order Verification"
       x-ticvai-audience: [staff]
       summary: The assignee takes the job
       description: >
@@ -1056,7 +1036,6 @@ paths:
     post:
       operationId: startWorkOrder
       x-ticvai-consumed-by:
-        - "P06 EMP-004 Task list"
         - "P06 EMP-005 Task detail"
         - "P06 EMP-006 Raise a task"
         - "P08 BO-578 Technician Repair Workspace"
@@ -1108,10 +1087,10 @@ paths:
     post:
       operationId: pauseWorkOrder
       x-ticvai-consumed-by:
-        - "P06 EMP-004 Task list"
         - "P06 EMP-005 Task detail"
         - "P06 EMP-006 Raise a task"
         - "P08 BO-070 Work Orders"
+        - "P08 BO-578 Technician Repair Workspace"
       x-ticvai-audience: [staff]
       summary: Stopped, and why
       description: >
@@ -1172,9 +1151,9 @@ paths:
     post:
       operationId: resumeWorkOrder
       x-ticvai-consumed-by:
-        - "P06 EMP-004 Task list"
         - "P06 EMP-005 Task detail"
         - "P06 EMP-006 Raise a task"
+        - "P08 BO-578 Technician Repair Workspace"
       x-ticvai-audience: [staff]
       summary: Back to work
       description: 18.2.4 again, from the other side. Returns to `inProgress` from either paused state.
@@ -1206,10 +1185,7 @@ paths:
     post:
       operationId: closeWorkOrder
       x-ticvai-consumed-by:
-        - "P06 EMP-004 Task list"
-        - "P06 EMP-005 Task detail"
         - "P06 EMP-006 Raise a task"
-        - "P08 BO-030 Work Order Verification"
         - "P08 BO-070 Work Orders"
       x-ticvai-audience: [staff]
       summary: Administratively closed
@@ -1264,11 +1240,10 @@ paths:
     post:
       operationId: attachWorkOrderEvidence
       x-ticvai-consumed-by:
-        - "P06 EMP-004 Task list"
         - "P06 EMP-005 Task detail"
         - "P06 EMP-006 Raise a task"
-        - "P08 BO-030 Work Order Verification"
         - "P08 BO-577 Maintenance Work Order"
+        - "P08 BO-578 Technician Repair Workspace"
       x-ticvai-audience: [staff]
       summary: Photo, video, document, note or signature
       description: >
@@ -1650,6 +1625,7 @@ paths:
     patch:
       operationId: updateMaintenancePlan
       x-ticvai-consumed-by:
+        - "P08 BO-071 Planned Maintenance"
         - "P08 BO-575 Maintenance Rule & Service Plan Configuration"
       x-ticvai-audience: [staff]
       summary: Amend or suspend a plan
@@ -1744,6 +1720,7 @@ paths:
       operationId: listInspectionTemplates
       x-ticvai-consumed-by:
         - "P06 EMP-048 Opening checklist"
+        - "P08 BO-911 Inspection, Condition & Compliance Management"
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: List inspection templates
@@ -1768,7 +1745,7 @@ paths:
     post:
       operationId: createInspectionTemplate
       x-ticvai-consumed-by:
-        - "P06 EMP-048 Opening checklist"
+        - "P08 BO-911 Inspection, Condition & Compliance Management"
       x-ticvai-audience: [staff]
       x-ticvai-config-scope: tenant
       summary: Create an inspection template
@@ -1949,7 +1926,6 @@ paths:
         - "P06 EMP-026 Incident report"
         - "P06 EMP-029 Guest assistance"
         - "P08 BO-072 Incident Log"
-        - "P08 BO-125 Product & Category Button Configuration"
         - "P08 BO-935 Assignment Detail & Operational Brief"
       x-ticvai-audience: [staff]
       summary: Report an incident
@@ -2027,7 +2003,6 @@ paths:
       operationId: updateIncident
       x-ticvai-consumed-by:
         - "P06 EMP-003 Home — on duty"
-        - "P06 EMP-026 Incident report"
         - "P06 EMP-027 Incident detail"
         - "P06 EMP-029 Guest assistance"
         - "P06 EMP-050 Post-incident restore"
@@ -2043,6 +2018,12 @@ paths:
         **Investigation notes are a history, not a field** (decided 28 September, audit R106 (5)).
         Each `investigationNote` sent appends one row to `IncidentDetail.investigationNotes`, with
         who wrote it and when; nothing overwrites or deletes an earlier note.
+
+        **A critical incident is closed by another supervisor** (Chinmay, 2 October, workbook Q530,
+        the default; segregation of duties; CHG-CSA-033). Closing an incident of severity `critical`
+        is refused `403 closer-completed-action` when the caller completed its corrective action (the
+        linked work order, or the corrective actions recorded on it); another holder of
+        `INCIDENT_MANAGE` closes it.
       tags: [incident]
       x-ticvai-permission: INCIDENT_MANAGE
       x-ticvai-scope-level: venue
@@ -2087,6 +2068,14 @@ paths:
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '403':
+          description: A critical incident closed by the person who completed its corrective action
+            (`closer-completed-action`; workbook Q530; CHG-CSA-033). Another supervisor must close it.
+          x-ticvai-problem-types:
+          - closer-completed-action
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
@@ -2100,9 +2089,8 @@ paths:
       operationId: recordAuthorityNotification
       x-ticvai-consumed-by:
         - "P06 EMP-003 Home — on duty"
-        - "P06 EMP-026 Incident report"
+        - "P06 EMP-027 Incident detail"
         - "P06 EMP-029 Guest assistance"
-        - "P06 EMP-050 Post-incident restore"
         - "P08 BO-072 Incident Log"
       x-ticvai-audience: [staff]
       summary: Record notification to an external authority

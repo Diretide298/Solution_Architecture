@@ -377,82 +377,6 @@
    "expired"
   ]
  },
- "AnalyticsAnomaly": {
-  "type": "object",
-  "x-ticvai-persistence": "reporting.anomaly",
-  "description": "BI boards 9.5 and 9.6. **A departure from the series' own behaviour**, which catches what no threshold was set for.\n",
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "kpiId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "metric": {
-    "type": "string"
-   },
-   "scopePath": {
-    "type": "string"
-   },
-   "detectedAt": {
-    "type": "string",
-    "format": "date-time"
-   },
-   "observed": {
-    "$ref": "#/components/schemas/MetricValue"
-   },
-   "expected": {
-    "$ref": "#/components/schemas/MetricValue"
-   },
-   "deviationSigma": {
-    "type": "number",
-    "nullable": true
-   },
-   "severity": {
-    "$ref": "#/components/schemas/AnomalySeverity"
-   },
-   "candidateCauses": {
-    "type": "array",
-    "description": "**The beginning of the question, not the end of it.**",
-    "items": {
-     "type": "object",
-     "properties": {
-      "dimension": {
-       "type": "string"
-      },
-      "value": {
-       "type": "string"
-      },
-      "contribution": {
-       "type": "number"
-      }
-     }
-    }
-   },
-   "acknowledgedBy": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "acknowledgedAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   }
-  }
- },
- "AnomalySeverity": {
-  "type": "string",
-  "description": "Shared by `AnalyticsAnomaly` and the `listAnalyticsAnomalies` filter.",
-  "enum": [
-   "low",
-   "medium",
-   "high"
-  ]
- },
  "BenchmarkNormalisation": {
   "type": "string",
   "description": "The basis a benchmark is compared on. Shared by `getAnalyticsBenchmark` and `BenchmarkRow`.",
@@ -740,9 +664,25 @@
    "accreditationCredentialsIssued",
    "accreditationActiveHolders",
    "accreditationRenewalsDue",
-   "staffingShortfall"
+   "staffingShortfall",
+   "grossSales",
+   "discounts",
+   "refunds",
+   "netRevenue",
+   "recognisedRevenue",
+   "deferredRevenue",
+   "taxCollected",
+   "takings"
   ],
   "x-ticvai-money-valued": [
+   "grossSales",
+   "discounts",
+   "refunds",
+   "netRevenue",
+   "recognisedRevenue",
+   "deferredRevenue",
+   "taxCollected",
+   "takings",
    "inventoryValuation",
    "resaleCommission",
    "revenuePerEntitlement",
@@ -751,6 +691,7 @@
    "loyaltyPointsLiability"
   ],
   "x-ticvai-extended-29-september": "**Fourteen metrics added 29 September (build pass)**, each checked against the schema of the contract that produces it.\n\n| Metric | Source | Requirement | |---|---|---| | `loyaltyActiveMembers` | `marketing.loyalty_position` members with a `marketing.loyalty_points` movement in the period | 5.4.27 | | `loyaltyTierDistribution` | `marketing.loyalty_position.tier_id` against `marketing.programme_tier`, members per tier | 5.4.27 | | `loyaltyPointsLiability` | the balance of `ledger.journal_line` on each programme's `pointsLiabilityAccountId`, where points post on accrual and release on redemption or expiry | 5.4.27 | | `loyaltyBreakageRate` | `marketing.loyalty_points` expiry movements over points earned, in the period | 5.4.27 | | `loyaltyMemberRetention` | members with a movement in the previous period who also have one in this period | 5.4.27 | | `challengeParticipationRate` | distinct `marketing.challenge_progress.subject_id` over active loyalty members | 22.6.20 | | `gamificationLoyaltyImpact` | points earned per member, challenge participants against non-participants (`marketing.loyalty_points` split by `marketing.challenge_progress`) | 22.6.20 | | `gamificationMembershipImpact` | joins and renewals in `identity.customer_membership`, participants against non-participants | 22.6.20 | | `gamificationRetention` | return visits (`access.scan_event`, in-direction) of participants against non-participants | 22.6.20 | | `accreditationApplications` | `accreditation.application` by `status` | 12.1.50 | | `accreditationTimeToDecision` | `accreditation.application.decided_at` minus `submitted_at` | 12.1.50 | | `accreditationCredentialsIssued` | `accreditation.credential.issued_at` | 12.1.50 | | `accreditationActiveHolders` | `accreditation.holder` `active`, by `category_code` | 12.1.50 | | `accreditationRenewalsDue` | `accreditation.holder.valid_to` inside `accreditation.validity.renewal_window_days` | 12.1.50 |\n\n**`staffingShortfall` added the same evening (build pass, group G2; 8.2.49)**: the largest gap in the window between the staff rostered and the staff the forecast requires, per venue and position, from `workforce.forecast_requirement` (the handed-over AI staff requirement) against `workforce.rota_assignment` and `workforce.open_shift`, computed as `workforce.getStaffingCoverage` with `basis` `forecastRequirement`. An `AlertRule` on it with `comparator` `above` and `threshold` 0 is the staffing shortage alert; `windowMinutes` looks ahead rather than back for this metric (the rota for the coming window), and `cooldownMinutes` stops one short shift alerting every quarter hour.\n\n**Points issued, points redeemed, campaign performance and reward redemption were already served** by the `loyalty` and `campaigns` sources, and challenge completion and revenue attribution by `challengeCompletionRate` and `attributedRevenue`.\n",
+  "x-ticvai-extended-2-october": "**Eight finance measures added 2 October 2026** (Chinmay; CHG-FIN-007, CHG-FIN-010), each with the source and formula of the seeded KPI of the same code in `ReportingSystemKpi`: `grossSales`, `discounts`, `refunds`, `netRevenue`, `recognisedRevenue`, `deferredRevenue`, `taxCollected` and `takings`, so an alert rule can watch them (a refund spike, takings below a target). Formulas are the D-185 default; client finance sign-off is pending.",
   "x-ticvai-money-valued-note": "**`salesByOperator`, `salesByWorkstation` and `resaleVolume` are not listed because the package does not say whether they count sales or sum their value.** Until that is decided, a rule on them carries a plain number.\n",
   "x-ticvai-extended": "18 August 2026",
   "x-ticvai-extension-note": "**Nineteen metrics added when their upstream models landed**, which is how BL-053 was always going to close — not by changing `reporting` but by building the things it wanted to report on.\n`inventoryValuation`, `stockTurnover`, `stockAgeing` and `wastageRate` came from `inventory.StockBatch`; `resaleVolume` and `resaleCommission` from `orders.ResaleListing`; **`salesByInstructor` from `resources.Resource`, which was the one metric this enum deliberately refused to name in the morning** because nothing produced it. `allocationUtilisation` from `PartnerUser` and `ChannelListing`, `membershipChurn` from `Journey`, `supplierDeliveryPerformance` from `ProductionRun`, `assetDowntime` and `meanTimeToRepair` from `WorkOrder.downtimeMinutes`, `challengeCompletionRate` from `ChallengeProgress`, `attributedRevenue` from `AttributionTouch`.\n**Each was checked against the schema before being named.** That rule has not changed — naming a metric with no source is the defect this enum exists to prevent.\n"

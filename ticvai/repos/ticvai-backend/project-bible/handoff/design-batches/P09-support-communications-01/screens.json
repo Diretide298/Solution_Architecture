@@ -24,7 +24,7 @@
     {
      "to": "ADM-001",
      "trigger": "Platform Login / MFA",
-     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId and ADM-035 holds none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and ADM-001 opens on its own"
+     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId, providerId and ADM-035 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and ADM-001 opens on its own"
     },
     {
      "to": "ADM-002",
@@ -40,7 +40,7 @@
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listSupportNotices` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
-  "purpose": "Answer a question without needing a person.",
+  "purpose": "Work the support escalations that reach TICVAI, and tell tenants what is known.",
   "layout": {
    "template": "split",
    "regions": [
@@ -53,13 +53,9 @@
        "label": "Every support notice",
        "bindsTo": "SupportNotice",
        "columns": [
-        "SupportNotice.id",
         "SupportNotice.supportEndsAt",
         "SupportNotice.message",
-        "SupportNotice.affectedTenantIds",
-        "SupportNotice.publishedByPrincipalId",
-        "SupportNotice.publishedAt",
-        "SupportNotice.scopePath"
+        "SupportNotice.publishedAt"
        ],
        "operation": "listSupportNotices",
        "provenance": "contract platform-ops.yaml GET /support-notices"
@@ -117,7 +113,7 @@
   "states": {
    "loading": "The support escalation console list.",
    "error": "Could not load. Names which read failed and leaves the support escalation console untouched.",
-   "emptyFirstRun": "No support escalation console yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyFirstRun": "No support escalation console yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "Never shown: `listSupportNotices` takes no filter, so an empty list is always the first-run state above.",
    "emptyNoAccess": "Shown when the caller lacks `PLATFORM_RELEASE_VIEW`, which `listSupportNotices` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -158,7 +154,7 @@
     "id": "formPublishSupportNotice",
     "component": "modal",
     "trigger": "Publish support notice",
-    "body": "**Collects what `publishSupportNotice` sends before it is called.** Required: `id`, `supportEndsAt`, `publishedAt`. Optional: `message`, `affectedTenantIds`, `publishedByPrincipalId`, `scopePath`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `publishSupportNotice` sends before it is called.** Required: `supportEndsAt`. Optional: `message`, `affectedTenantIds`, `publishedByPrincipalId`, `scopePath`. **Not asked:** `id` is a client UUIDv7 generated silently; `publishedAt` is set by the server (design-note correction, 2 October 2026). Dismissing sends nothing; the screen behind is unchanged.",
     "bindsTo": "SupportNotice",
     "confirm": {
      "label": "Publish support notice",
@@ -167,9 +163,7 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "id",
       "supportEndsAt",
-      "publishedAt",
       "message",
       "affectedTenantIds",
       "publishedByPrincipalId",
@@ -177,6 +171,14 @@
      ]
     },
     "provenance": "contract platform-ops.yaml POST /support-notices"
+   }
+  ],
+  "purposeNote": "Purpose rewritten 2 October 2026 (CHG-WIR-023): The purpose \"Answer a question without needing a person\" was copied from a help screen; an escalation console works the escalation queue (design-notes correction platform-foundation ADM-035).",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-024): No operation lists or works the support escalations that reach TICVAI.",
+    "source": "screens/P09-platform-admin-console.yaml#ADM-035"
    }
   ],
   "_platform": {
@@ -229,7 +231,7 @@
     {
      "to": "ADM-001",
      "trigger": "Platform Login / MFA",
-     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId and ADM-036 holds none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and ADM-001 opens on its own"
+     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId, providerId and ADM-036 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and ADM-001 opens on its own"
     },
     {
      "to": "ADM-002",
@@ -245,7 +247,7 @@
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listSupportNotices` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
-  "purpose": "Push live platform notification broadcast for this venue.",
+  "purpose": "Broadcast a notice to every tenant, or to some of them.",
   "layout": {
    "template": "split",
    "regions": [
@@ -268,27 +270,6 @@
        ],
        "operation": "listSupportNotices",
        "provenance": "contract platform-ops.yaml GET /support-notices"
-      },
-      {
-       "kind": "dataTable",
-       "label": "Every announcement",
-       "bindsTo": "Announcement",
-       "columns": [
-        "Announcement.id",
-        "Announcement.title",
-        "Announcement.body",
-        "Announcement.kind",
-        "Announcement.venueIds",
-        "Announcement.departmentIds",
-        "Announcement.roleIds",
-        "Announcement.requiresAcknowledgement",
-        "Announcement.expiresAt",
-        "Announcement.publishedByPrincipalId",
-        "Announcement.publishedAt",
-        "Announcement.locale"
-       ],
-       "operation": "listAnnouncements",
-       "provenance": "contract workforce.yaml GET /announcements"
       },
       {
        "kind": "publishGate",
@@ -331,12 +312,6 @@
        "provenance": "contract platform-ops.yaml POST /support-notices"
       },
       {
-       "kind": "secondaryButton",
-       "label": "Publish announcement",
-       "operation": "publishAnnouncement",
-       "provenance": "contract workforce.yaml POST /announcements"
-      },
-      {
        "kind": "publishGate",
        "label": "What publishing changes",
        "notes": "**Names what goes live, where, and from when.** A publish with no stated consequence is one somebody presses meaning to save.",
@@ -349,7 +324,7 @@
   "states": {
    "loading": "The platform notification broadcast list.",
    "error": "Could not load. Names which read failed and leaves the platform notification broadcast untouched.",
-   "emptyFirstRun": "No platform notification broadcast yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyFirstRun": "No platform notification broadcast yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "Never shown: `listSupportNotices` takes no filter, so an empty list is always the first-run state above.",
    "emptyNoAccess": "Shown when the caller lacks `PLATFORM_RELEASE_VIEW`, which `listSupportNotices` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -368,21 +343,6 @@
     "contract": "platform-ops",
     "purpose": "End-of-support notices",
     "trigger": "onLoad"
-   },
-   {
-    "operationId": "listAnnouncements",
-    "contract": "workforce",
-    "purpose": "What has been broadcast",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "publishAnnouncement",
-    "contract": "workforce",
-    "purpose": "Broadcast to the platform",
-    "trigger": "onAction",
-    "invalidates": [
-     "listSupportNotices"
-    ]
    }
   ],
   "entryState": {
@@ -405,7 +365,7 @@
     "id": "formPublishSupportNotice",
     "component": "modal",
     "trigger": "Publish support notice",
-    "body": "**Collects what `publishSupportNotice` sends before it is called.** Required: `id`, `supportEndsAt`, `publishedAt`. Optional: `message`, `affectedTenantIds`, `publishedByPrincipalId`, `scopePath`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `publishSupportNotice` sends before it is called.** Required: `supportEndsAt`. Optional: `message`, `affectedTenantIds`, `publishedByPrincipalId`, `scopePath`. **Not asked:** `id` is a client UUIDv7 generated silently; `publishedAt` is set by the server (design-note correction, 2 October 2026). Dismissing sends nothing; the screen behind is unchanged.",
     "bindsTo": "SupportNotice",
     "confirm": {
      "label": "Publish support notice",
@@ -414,9 +374,7 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "id",
       "supportEndsAt",
-      "publishedAt",
       "message",
       "affectedTenantIds",
       "publishedByPrincipalId",
@@ -424,37 +382,23 @@
      ]
     },
     "provenance": "contract platform-ops.yaml POST /support-notices"
-   },
-   {
-    "id": "formPublishAnnouncement",
-    "component": "modal",
-    "trigger": "Publish announcement",
-    "body": "**Collects what `publishAnnouncement` sends before it is called.** Required: `title`, `body`, `kind`, `publishedAt`. Optional: `id`, `venueIds`, `departmentIds`, `roleIds`, `requiresAcknowledgement`, `expiresAt`, `publishedByPrincipalId`, `locale`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "Announcement",
-    "confirm": {
-     "label": "Publish announcement",
-     "operation": "publishAnnouncement"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "title",
-      "body",
-      "kind",
-      "publishedAt",
-      "id",
-      "venueIds",
-      "departmentIds",
-      "roleIds",
-      "requiresAcknowledgement",
-      "expiresAt",
-      "publishedByPrincipalId",
-      "locale"
-     ]
-    },
-    "provenance": "contract workforce.yaml POST /announcements"
    }
   ],
+  "gaps": [
+   {
+    "operation": "listAnnouncements",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-021): listAnnouncements and publishAnnouncement are the tenant's staff announcements (WORKFORCE_VIEW, ANNOUNCEMENT_PUBLISH); a platform broadcast is a support notice, already declared (design-notes correction platform-foundation ADM-036).",
+    "source": "contracts/satellite/workforce.yaml#publishAnnouncement"
+   },
+   {
+    "operation": "publishAnnouncement",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-021): listAnnouncements and publishAnnouncement are the tenant's staff announcements (WORKFORCE_VIEW, ANNOUNCEMENT_PUBLISH); a platform broadcast is a support notice, already declared (design-notes correction platform-foundation ADM-036).",
+    "source": "contracts/satellite/workforce.yaml#publishAnnouncement"
+   }
+  ],
+  "purposeNote": "Purpose rewritten 2 October 2026 (CHG-WIR-023): The purpose was the generator template (\"Push live platform notification broadcast for this venue\").",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",

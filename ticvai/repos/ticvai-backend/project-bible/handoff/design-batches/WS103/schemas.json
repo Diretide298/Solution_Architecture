@@ -1,4 +1,73 @@
 {
+ "CellJob": {
+  "x-ticvai-persistence": "control.cell_job",
+  "type": "object",
+  "required": [
+   "id",
+   "cellId",
+   "kind",
+   "status",
+   "createdAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "cellId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "provision",
+     "tierMigration",
+     "schemaMigration",
+     "backup",
+     "restore",
+     "decommission"
+    ]
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "queued",
+     "running",
+     "completed",
+     "failed",
+     "rolledBack"
+    ]
+   },
+   "progressPercent": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 100
+   },
+   "message": {
+    "type": "string",
+    "nullable": true
+   },
+   "error": {
+    "type": "string",
+    "nullable": true
+   },
+   "scheduledFor": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "completedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
  "CreatePrincipalRequest": {
   "type": "object",
   "required": [
@@ -275,6 +344,12 @@
    "limits"
   ],
   "properties": {
+   "poweredByRemovable": {
+    "type": "boolean",
+    "readOnly": true,
+    "default": false,
+    "description": "**Whether the tenant's licence lets it switch \"Powered by TICVAI\" off** (Chinmay, 2 October, workbook Q160 and the pre-apply round; CHG-CSA-036). False by default; true where TICVAI sold the tenant the add-on keyed `poweredByRemoval` (`addLicenceAddOn`). White label's `setBrandIdentity` refuses `showPoweredBy` false while this is false."
+   },
    "tenantId": {
     "type": "string",
     "format": "uuid"
@@ -329,6 +404,42 @@
   "additionalProperties": {
    "type": "string"
   }
+ },
+ "ModuleEnablement": {
+  "x-ticvai-persistence": "whitelabel.module_enablement",
+  "type": "object",
+  "required": [
+   "moduleKey",
+   "isLicensed",
+   "isEnabled"
+  ],
+  "properties": {
+   "moduleKey": {
+    "$ref": "#/components/schemas/ModuleKey"
+   },
+   "displayName": {
+    "type": "string"
+   },
+   "isLicensed": {
+    "type": "boolean",
+    "description": "From the tenant's subscription. False makes enablement impossible."
+   },
+   "isEnabled": {
+    "type": "boolean"
+   },
+   "referencedBy": {
+    "type": "array",
+    "readOnly": true,
+    "x-ticvai-derived": "onWrite",
+    "description": "Navigation items and homepage sections pointing at this module. Maintained by `setNavigation` and `setHomepageLayout` in the same transaction as the links they write.",
+    "items": {
+     "type": "string"
+    }
+   }
+  }
+ },
+ "ModuleKey": {
+  "$ref": "../shared/common.yaml#/components/schemas/ModuleKey"
  },
  "ModuleListing": {
   "type": "object",
@@ -806,7 +917,27 @@
    "PROCUREMENT_VIEW",
    "PROCUREMENT_REQUEST",
    "PROCUREMENT_MANAGE",
-   "PROCUREMENT_RECEIVE"
+   "PROCUREMENT_RECEIVE",
+   "CORE_AI_PUBLISH",
+   "TICKETING_AI_PUBLISH",
+   "ACCESS_AI_PUBLISH",
+   "FNB_AI_PUBLISH",
+   "RETAIL_AI_PUBLISH",
+   "INVENTORY_AI_PUBLISH",
+   "SEATING_AI_PUBLISH",
+   "MEMBERSHIP_AI_PUBLISH",
+   "MARKETING_AI_PUBLISH",
+   "RESOURCES_AI_PUBLISH",
+   "QUEUE_AI_PUBLISH",
+   "TRANSPORT_AI_PUBLISH",
+   "GAMES_AI_PUBLISH",
+   "MAINTENANCE_AI_PUBLISH",
+   "ACCREDITATION_AI_PUBLISH",
+   "PARTNER_AI_PUBLISH",
+   "ANALYTICS_AI_PUBLISH",
+   "BIOMETRIC_IMAGE_VIEW",
+   "ACCESS_DIRECTION_SET",
+   "REPORT_GOVERNANCE_MANAGE"
   ]
  },
  "Placement": {
@@ -990,11 +1121,105 @@
    },
    "allowedAiResidencies": {
     "type": "array",
-    "description": "**The region's compliance gate on AI providers** (decided 28 September, audit R203; ADR-0009). The `AiProvider.residency` values a tenant in this region may use; empty means no restriction. `ai.setAiProvider` refuses any other residency with `409 residency-refused`. A prompt carrying guest data that reaches a provider hosted elsewhere is a cross-border transfer, and this is where a region says which it allows.\n",
+    "description": "**The region's compliance gate on AI providers** (decided 28 September, audit R203; ADR-0009). The `AiProvider.residency` values a tenant in this region may use; empty means no restriction. `ai.setAiProvider` refuses any other residency with `409 residency-refused`. A prompt carrying guest data that reaches a provider hosted elsewhere is a cross-border transfer, and this is where a region says which it allows.\n**Derived from `aiResidencyClass` since 2 October 2026** (CHG-CSP-009): the class names the residencies, and this list narrows them further where a region needs it; it never widens them.\n",
     "default": [],
     "items": {
      "type": "string"
     }
+   },
+   "aiResidencyClass": {
+    "type": "string",
+    "enum": [
+     "uaeOnly",
+     "globalAllowed",
+     "onPrem"
+    ],
+    "default": "uaeOnly",
+    "description": "**The tenant's AI residency class** (decided 2 October 2026, Chinmay, \"AI residency: per-tenant residency class\"; DEC-539; CHG-CSP-009; amends AI-D02 and ADR-0009 section 1). Which AI endpoints the AI engine may route this tenant's calls to:\n- `uaeOnly` (the default, and mandatory for government, bank and health tenants): the small tier\n  is Core42 Compass GPT-4.1 mini (or Seraj if it wins the Arabic golden set), the strong tier\n  Compass GPT-5, reached through `AiProviderKind` `openaiCompatible`; fallback OpenAI UAE, then\n  the in-cell gpt-oss-120b. No call leaves the UAE.\n- `globalAllowed`: a private venue that opts in under PDPL Article 23, with a vendor contract, a\n  DPIA and a notice to guests (`aiResidencyOptIn`). Azure gpt-5-mini and gpt-6-sol Global, or\n  the tenant's BYOK provider; fallback the `uaeOnly` chain. The tenant is listed in ADR-0009's\n  transfer register.\n- `onPrem`: models in the tenant's own estate (Qwen3.5 or gpt-oss; strong tier Qwen3.5-122B,\n  Falcon-H1 Arabic or Jais 2).\n\n**Every LLM call is scrubbed of personal data in-cell first, whatever the class** (DEC-542): the class decides where a call may go, never whether personal data may travel. Moving from `uaeOnly` to `globalAllowed` without `aiResidencyOptIn` is refused `422 residency-opt-in-required`; on a tenant `aiResidencyClassLocked` holds, any change is refused `409 residency-class-locked`. The model choice per class is the AI engine's (ai `AiProvider`, ai-system-design 3.3), not a setting here.\n"
+   },
+   "aiResidencyClassLocked": {
+    "type": "boolean",
+    "readOnly": true,
+    "default": false,
+    "description": "**Set by TICVAI at onboarding for a government, bank or health tenant** (DEC-539), which must stay `uaeOnly`. Read-only to the tenant.\n"
+   },
+   "aiResidencyOptIn": {
+    "type": "object",
+    "nullable": true,
+    "description": "**The evidence a `globalAllowed` opt-in needs under PDPL Article 23** (DEC-539; CHG-CSP-009): the tenant's references to its vendor contract, its DPIA and the notice guests see. The platform records that they were named, by whom and when; it does not hold or judge the documents. Null while the class is `uaeOnly` or `onPrem`.\n",
+    "properties": {
+     "vendorContractReference": {
+      "type": "string",
+      "maxLength": 200
+     },
+     "dpiaReference": {
+      "type": "string",
+      "maxLength": 200
+     },
+     "guestNoticeReference": {
+      "type": "string",
+      "maxLength": 200
+     },
+     "confirmedByPrincipalId": {
+      "type": "string",
+      "format": "uuid",
+      "readOnly": true
+     },
+     "confirmedAt": {
+      "type": "string",
+      "format": "date-time",
+      "readOnly": true
+     }
+    }
+   },
+   "localLanguageNameLocales": {
+    "type": "array",
+    "default": [],
+    "description": "**The languages an outlet name must also be given in, in this country** (decided 2 October 2026, Chinmay, batch 2 #26: \"English plus the local language where the country needs it\"; DEC-031; CHG-CSP-005). ISO 639-1 codes; `[ar]` in the UAE. Empty asks for English only. `createOutlet` and `updateOutlet` refuse an outlet whose `nameTranslations` lacks one of them (`422 local-name-required`).\n",
+    "items": {
+     "type": "string",
+     "pattern": "^[a-z]{2}$"
+    }
+   },
+   "requiredBillingDocuments": {
+    "x-ticvai-persistence-kind": "valueObject",
+    "x-ticvai-persistence-column": "jsonb",
+    "type": "array",
+    "description": "**Which documents a TICVAI customer's billing entity must upload, in this country** (decided 2 October 2026, Chinmay, batch 6 set 7, ADM-411: \"Trade licence always; VAT certificate when a TRN is entered; configurable per country\"; DEC-210; CHG-CSP-008). The default for every country is the two rows below; TICVAI staff change them per country. The subscription contract's billing entity and `PartnerDocument` read this list; a missing required document holds the entity in verification.\n",
+    "default": [
+     {
+      "documentType": "tradeLicence",
+      "requiredWhen": "always"
+     },
+     {
+      "documentType": "vatCertificate",
+      "requiredWhen": "trnEntered"
+     }
+    ],
+    "items": {
+     "type": "object",
+     "properties": {
+      "documentType": {
+       "type": "string",
+       "maxLength": 64,
+       "description": "The document kind, as the subscription contract's `PartnerDocument` names it (`tradeLicence`, `vatCertificate`, ...)."
+      },
+      "requiredWhen": {
+       "type": "string",
+       "enum": [
+        "always",
+        "trnEntered"
+       ]
+      }
+     }
+    }
+   },
+   "minorAgeThreshold": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 21,
+    "default": 18,
+    "description": "**The age below which a guest is a minor here, set per country** (decided 2 October 2026, Chinmay, critical set 1, BO-187: \"Guardian consent on the venue's form; minor age per country\"; DEC-237; CHG-CSP-019). A minor's biometric enrolment needs a guardian's consent on the venue's consent form (access `enrolFacePass`, `consent.guardianSubjectId`); a subject with no date of birth is treated as a minor (audit R126). The default 18 is the UAE's age of majority and is marked for counsel to confirm per country (R205); whether minors may enrol at all is the venue's switch (`VenueSettings.biometrics.allowMinors`).\n"
    },
    "placement": {
     "$ref": "#/components/schemas/Placement"
@@ -1188,6 +1413,647 @@
    "transactions",
    "guestProfiles"
   ]
+ },
+ "VenueSettings": {
+  "type": "object",
+  "x-ticvai-persistence": "platform.venue_settings",
+  "description": "**Venue-level operational configuration that no other level can answer.**\nRegion owns currency, tax regime and fiscal year (ADR-0011). Venue owns the things that vary between two venues in one region — **opening hours, support hours, and what the local law requires of the gate.**\n**And the configured limits** (decided 28 September, audit R094): every limit the contracts call *configured* is a field here, from `displayCurrencies` and `cartLeaseSeconds` down to the grouped `catalogue`, `inventory`, `seating`, `promotions`, `fnb`, `queue`, `reporting`, `marketing` and `identity` settings. **Each has a tenant-level default**: the tenant sets it once with `setVenueSettingsDefaults`, a venue overrides it within the field's bounds, and a null field here inherits it. Each field's `default` is the proposed tenant default, marked proposed, client to correct (audit R094); `docs/active/configured-limits-proposal.md` is the sheet the client corrects, and where the two differ this contract is what runs.\n",
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "From the path of `setVenueSettings`."
+   },
+   "calendarDayStartHour": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 23,
+    "nullable": true,
+    "default": 6,
+    "description": "**Where the venue's calendar day starts** (17 September minutes M17-03, added 30 September): the first hour row of every day and week calendar view (`calendarView` in `screens/_components.yaml`), so a venue open 06:00 to 02:00 sees its night on the day it belongs to. Display only: it moves no booking, slot or business date. Null inherits the tenant default (proposed 6, client to correct).\n"
+   },
+   "currencyCode": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**`readOnly` is the freeze.** `setVenueSettings` takes this whole schema as its request body, so without it any settings save could rewrite the currency of a venue that had already traded — which is the one thing ADR-0018's amendment forbids. It is set when the venue is provisioned, defaulted from the region, and changed only by an operation whose precondition is that the venue has not yet traded.\n**The venue's trading currency, defaulted from its region and frozen once the venue has traded** (ADR-0018, amended 20 September). Currency was a region-only fact, grouped with tax rates on the reasoning that *\"a venue cannot choose its VAT\"* -- true of tax and over-applied to currency, because a free-zone unit, a duty-free shop and a cruise terminal genuinely trade in a currency their region does not.\n**This column exists because the freeze needs somewhere to live.** A venue that resolved purely from its region would silently follow a region currency change after it had already traded, and every dated artefact beneath it -- a price list is a `validFrom`/`validTo` range -- would render retrospectively wrong. Null means \"resolve from the region\", which is the answer for every venue that has not overridden.\n"
+   },
+   "currencyScale": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 4,
+    "nullable": true,
+    "readOnly": true,
+    "description": "**Scale travels with currency** (ADR-0008), and so does the freeze. OMR is three decimal places because Oman says so; overriding the currency without the scale gets rounding wrong. Set together or not at all.\n"
+   },
+   "supportHours": {
+    "type": "object",
+    "description": "CF-100. **A venue decides whether its support desk is 24/7 or bounded, and the platform does not.** This was recorded as an open question for eleven days and was never one — the code is identical either way, and what was missing was somewhere to put the answer.\n",
+    "properties": {
+     "mode": {
+      "type": "string",
+      "enum": [
+       "alwaysOn",
+       "businessHours",
+       "custom",
+       "none"
+      ]
+     },
+     "timezone": {
+      "type": "string",
+      "description": "IANA zone the `windows` are read in. Absent, they are read in the region's `timeZone`, like every other wall-clock time in this contract.\n"
+     },
+     "windows": {
+      "type": "array",
+      "items": {
+       "type": "object",
+       "properties": {
+        "day": {
+         "type": "string",
+         "enum": [
+          "mon",
+          "tue",
+          "wed",
+          "thu",
+          "fri",
+          "sat",
+          "sun"
+         ]
+        },
+        "from": {
+         "type": "string",
+         "description": "Wall-clock time the desk opens."
+        },
+        "to": {
+         "type": "string",
+         "description": "Wall-clock time the desk closes."
+        }
+       }
+      }
+     },
+     "outOfHoursMessage": {
+      "type": "string",
+      "nullable": true
+     }
+    }
+   },
+   "quietHours": {
+    "type": "object",
+    "nullable": true,
+    "description": "**When the platform does not send.** A wallet low-balance alert at 3am is a complaint, and journeys and message triggers both respect this.\n**Operational messages ignore it** — a queue-turn alert is why a guest is holding the phone.\n",
+    "properties": {
+     "from": {
+      "type": "string",
+      "description": "Wall-clock time sending stops",
+      "in the region's time zone.": null
+     },
+     "to": {
+      "type": "string",
+      "description": "Wall-clock time sending resumes",
+      "in the region's time zone.": null
+     }
+    }
+   },
+   "biometrics": {
+    "type": "object",
+    "nullable": true,
+    "description": "CF-35, BL-096, BL-105, BL-106. **The venue-level master switch, and the one place a person is asked whether the paperwork exists.** Biometric data is sensitive under PDPL (Federal Decree-Law 45/2021) — heightened protection, explicit consent, and an Article 21 assessment before the processing rather than after it.\n**Nothing below this switch operates while it is off.** `AdmissionRules` may carry a `biometricPolicy` per ticket type and those rules are inert until a venue enables biometrics here, which means a profile copied between venues cannot start capturing faces at the destination.\n**Venue level because that is where the assessment is filed.** Region owns tax and currency; the DPIA, the consent notice and the hardware are a venue's.\n",
+    "properties": {
+     "isEnabled": {
+      "type": "boolean",
+      "default": false,
+      "description": "**Off by default, and turning it on is refused without the two fields below.** `setVenueSettings` answers 422 rather than accepting an enable it cannot evidence — **a DPIA nobody can name is a DPIA nobody did**, and the point of the refusal is that the person switching this on is asked at the moment they switch it on rather than by an auditor a year later.\n"
+     },
+     "dpiaReference": {
+      "type": "string",
+      "nullable": true,
+      "maxLength": 200,
+      "description": "**The venue's own reference for its Article 21 assessment.** The platform does not hold the document and does not judge it; it records that one was named, by whom, and when — which is what an audit asks for and what the venue can produce.\n"
+     },
+     "consentNoticeAcknowledgedAt": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true,
+      "description": "**When somebody confirmed the consent forms are in place at the point of capture.** A guest consenting in an app is a record; a guest consenting at a ticket counter is a notice somebody has to have printed and a question somebody has to have asked.\n"
+     },
+     "acknowledgedByPrincipalId": {
+      "type": "string",
+      "format": "uuid",
+      "nullable": true,
+      "readOnly": true,
+      "description": "**Who confirmed it.** An acknowledgement with no name behind it cannot be followed up, and this is the field that makes the switch an act rather than a setting. Recorded by the server as the caller whose save carried the acknowledgement, so it cannot name somebody else.\n"
+     },
+     "faceTagPurgeMinutesAfterClose": {
+      "type": "integer",
+      "nullable": true,
+      "default": 0,
+      "description": "BL-106. **How long a same-visit Face Tag survives past the close of the operating day**, and zero is the default because that is what 3.2.44 describes. A non-zero value is an operational allowance for a late reconciliation, not a retention period — **`facePass` ignores this entirely** and is bounded by its entitlement.\n"
+     },
+     "consentFormId": {
+      "type": "string",
+      "format": "uuid",
+      "nullable": true,
+      "description": "**The venue's own consent form, which every biometric capture is taken on** (decided 2 October 2026, Chinmay, batch 4, BO-188: \"Consent first, on the venue's consent form\"; DEC-128, DEC-549; CHG-CSP-018). A form from the venue's consent-form builder in Venue Management (the one builder Face Pass, Face Tag, marketing and waivers share; marketing-crm `setDigitalWaiverForm`). Turning `isEnabled` on without one is refused `422 consent-form-required`, as a missing DPIA is; each Face Pass and Face Tag capture records the form and its version it was consented on (access `enrolFacePass`, `enrolFaceTag`).\n"
+     },
+     "templatesHeldByTicvai": {
+      "type": "boolean",
+      "readOnly": true,
+      "description": "**True where TICVAI's platform stores this venue's biometric templates** (rather than the venue's own on-premises reader estate). Derived from the venue's access deployment. While true, Venue Management shows the venue a standing warning that every guest must accept the venue's consent form before capture, because the data sits with TICVAI as the venue's processor (decided 2 October 2026, Chinmay, batch 4, BO-188: \"If we store the data, highlight or notify the venue that the client must accept a consent form\"; DEC-128; CHG-CSP-018).\n"
+     },
+     "allowMinors": {
+      "type": "boolean",
+      "default": true,
+      "description": "**Whether this venue enrols minors at all** (decided 2 October 2026, Chinmay, critical set 1, BO-187 and CMS-029: \"Guardian consent on the venue's form; minor age per country; the venue can switch minors off\"; supersedes the GST-069 default; DEC-237; CHG-CSP-019). On: a minor (below `RegionSettings.minorAgeThreshold`) is enrolled only with a guardian's consent on the venue's consent form. Off: a minor's enrolment is refused (`422 minors-not-enrolled`) and the guest uses another verification method.\n"
+     },
+     "accreditationFaceMatching": {
+      "type": "object",
+      "nullable": true,
+      "description": "**Face matching to find duplicate accreditation applicants, off unless the venue enables it** (decided 2 October 2026, Chinmay, critical set 3, BO-631: \"Only where the venue enables it, with applicant consent and the venue's legal sign-off; off by default\"; DEC-461; CHG-CSP-022). Enabling it is refused without `legalSignOffReference` (`422 legal-sign-off-required`); each applicant matched must have consented on the application (accreditation's own record). Null is off.\n",
+      "properties": {
+       "isEnabled": {
+        "type": "boolean",
+        "default": false
+       },
+       "legalSignOffReference": {
+        "type": "string",
+        "nullable": true,
+        "maxLength": 200,
+        "description": "The venue's own reference for its legal sign-off; the platform records that one was named, by whom and when."
+       },
+       "signedOffByPrincipalId": {
+        "type": "string",
+        "format": "uuid",
+        "nullable": true,
+        "readOnly": true
+       },
+       "signedOffAt": {
+        "type": "string",
+        "format": "date-time",
+        "nullable": true,
+        "readOnly": true
+       }
+      }
+     }
+    }
+   },
+   "segregatedAccess": {
+    "type": "object",
+    "nullable": true,
+    "description": "CF-130. **Configured at venue level because it changes by region and the venue is where it is known** — a Ladies Night, a family session, a prayer-time closure.\n**The platform does not infer gender.** 3.2.45 asks for automatic gender recognition and 3.2.46 for rule-based facial recognition validation, and neither is built. Two reasons, and the second is the one that decided it:\n**A Ladies Night ticket is already gendered at the point of sale**, so the gate checks the entitlement the platform issued rather than the face in front of it — deterministic, auditable, and already contracted through `admissionRules`.\n**And these events are staffed.** A steward at the entrance is making the judgment anyway, and a classifier that overrules a person who can see more than it can is a machine and a human disagreeing while a guest waits.\n**`genderVerification` is a switch, not an implementation.** Where a venue's access hardware offers the capability and the venue chooses to use it, this turns it on — following ADR-0015's standards-first driver model, where the device does what the device does. **Not everything needs to be built.**\n",
+    "properties": {
+     "isEnabled": {
+      "type": "boolean",
+      "default": false
+     },
+     "appliesToAccessPointIds": {
+      "type": "array",
+      "items": {
+       "type": "string",
+       "format": "uuid"
+      }
+     },
+     "schedule": {
+      "type": "array",
+      "items": {
+       "type": "object",
+       "properties": {
+        "day": {
+         "type": "string",
+         "enum": [
+          "mon",
+          "tue",
+          "wed",
+          "thu",
+          "fri",
+          "sat",
+          "sun"
+         ]
+        },
+        "from": {
+         "type": "string",
+         "description": "Wall-clock time",
+         "in the region's time zone.": null
+        },
+        "to": {
+         "type": "string",
+         "description": "Wall-clock time",
+         "in the region's time zone.": null
+        },
+        "admits": {
+         "type": "string",
+         "enum": [
+          "all",
+          "women",
+          "womenAndChildren",
+          "families",
+          "members"
+         ]
+        }
+       }
+      }
+     },
+     "entitlementGated": {
+      "type": "boolean",
+      "default": true,
+      "readOnly": true,
+      "description": "**Always true, and stated rather than assumed.** The gate admits on the entitlement. Everything below is advisory on top of that, and nothing replaces it.\n"
+     },
+     "genderVerification": {
+      "type": "string",
+      "enum": [
+       "off",
+       "staffAssisted",
+       "deviceAssisted"
+      ],
+      "default": "off",
+      "description": "`off` — the entitlement decides and a steward handles exceptions. **The default, and what is contracted.**\n`staffAssisted` — the steward's screen shows the ticket type so they can ask. No inference anywhere.\n`deviceAssisted` — **the venue's access hardware performs the check, not the platform.** Available only where the driver reports the capability, and the result is **advisory to the steward rather than decisive at the turnstile** (3.2.45 asks for rejection; this deviates deliberately).\n"
+     },
+     "overrideRateAlertThreshold": {
+      "type": "number",
+      "nullable": true,
+      "description": "Where `deviceAssisted` is on. **An override rate near zero means the steward has stopped deciding**, and that is the number that says whether the human safeguard is working or decorative.\n"
+     }
+    }
+   },
+   "alerting": {
+    "type": "object",
+    "description": "CF-134. **On-platform notification, marked as read.** Six contracts detect their own trouble and none told a person.\n**The panel is the default and email or WhatsApp only where the matrix names them** — an operational alert that arrives by email is an alert nobody sees in time.\n",
+    "properties": {
+     "channel": {
+      "type": "string",
+      "enum": [
+       "dashboardPanel",
+       "dashboardAndEmail",
+       "dashboardAndWhatsapp"
+      ],
+      "default": "dashboardPanel"
+     },
+     "acknowledgementRequired": {
+      "type": "boolean",
+      "default": true
+     },
+     "escalateAfterMinutes": {
+      "type": "integer",
+      "nullable": true
+     }
+    }
+   },
+   "displayCurrencies": {
+    "type": "array",
+    "nullable": true,
+    "description": "**Which currencies this venue shows guests** (decided 28 September, audit R120 (a)). ISO 4217 codes, each one its region holds an `FxRate` for; the rate itself stays per region and is never set here. `finance.listFxRates` with `venueId` narrows the region's rates to these. Null or empty shows the trading currency only. A code the region has no rate for is refused `400`.\n",
+    "items": {
+     "type": "string",
+     "pattern": "^[A-Z]{3}$"
+    }
+   },
+   "chargeCurrencies": {
+    "type": "array",
+    "nullable": true,
+    "description": "**Which currencies a guest may select and pay in** (decided 2 October 2026, Chinmay; CHG-FIN-001; MoM 10 Aug 2026 4.7 option (b), DI-211). A subset of `displayCurrencies`: each code must also be one the venue's payment provider can charge (`orders.PaymentProvider.presentmentCurrencies`) and one the region holds a `tender` rate for; anything else is refused `400`. Null or empty: guests pay in the trading (base) currency only and the other display currencies stay approximate. The ledger is always in the base currency, with the rate recorded on every payment and refund.\n",
+    "items": {
+     "type": "string",
+     "pattern": "^[A-Z]{3}$"
+    }
+   },
+   "cartLeaseSeconds": {
+    "type": "integer",
+    "nullable": true,
+    "minimum": 30,
+    "maximum": 3600,
+    "default": 900,
+    "description": "**How long a cart holds capacity** (decided 28 September, audit R169): 15 minutes, the default `catalogue.acquireInventoryHold` takes for `ttlSeconds`. Proposed, client to correct (audit R094).\n"
+   },
+   "cartHoldExtensionMinutes": {
+    "type": "integer",
+    "nullable": true,
+    "minimum": 1,
+    "maximum": 30,
+    "default": 5,
+    "description": "How long one `orders.extendCart` extension adds. Proposed, client to correct (audit R094)."
+   },
+   "cartMaxExtensions": {
+    "type": "integer",
+    "nullable": true,
+    "minimum": 0,
+    "maximum": 5,
+    "default": 1,
+    "description": "How many extensions a cart may take before `extensionCapReached` (`Cart.maxExtensions`). Proposed, client to correct (audit R094)."
+   },
+   "resaleCutoffHours": {
+    "type": "integer",
+    "nullable": true,
+    "minimum": 0,
+    "maximum": 168,
+    "default": 24,
+    "description": "Hours before the performance after which a ticket can no longer be listed for resale (`orders.createResaleListing`). Proposed, client to correct (audit R094)."
+   },
+   "exchangeCutoffHours": {
+    "type": "integer",
+    "nullable": true,
+    "minimum": 0,
+    "maximum": 720,
+    "default": 24,
+    "description": "Hours before the original performance after which lines can no longer be exchanged (`orders.exchangeOrderLines`, `outsideExchangeWindow`). Proposed, client to correct (audit R094)."
+   },
+   "rescheduleCutoffHours": {
+    "type": "integer",
+    "nullable": true,
+    "minimum": 0,
+    "maximum": 720,
+    "default": 24,
+    "description": "Hours before the original performance after which an order can no longer be rescheduled (`orders.rescheduleOrder`, `outsideRescheduleWindow`). Proposed, client to correct (audit R094)."
+   },
+   "reservationMaxExtensions": {
+    "type": "integer",
+    "nullable": true,
+    "minimum": 0,
+    "maximum": 5,
+    "default": 1,
+    "description": "How many times `orders.extendReservation` may extend one reservation. Proposed, client to correct (audit R094)."
+   },
+   "shiftVarianceThreshold": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true,
+    "description": "Over or short at shift close beyond which the shift waits in `pendingVariance` for `shift.acceptShiftVariance`. **Proposed tenant default AED 20.00, bounds 0 to 1,000 in the venue currency; client finance to correct (audit R094).**\n"
+   },
+   "cashDrawerLimit": {
+    "oneOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true,
+    "description": "**The most cash a till drawer should hold before some is lifted to the safe** (decided 2 October 2026, Chinmay, batch 6 set 3, BO-042: \"Add drawer limit setting (warn + offer cash lift)\"; DEC-179; CHG-CSP-016; DI-274: on a busy day the cashier unloads excess cash mid-shift and it is reconciled at close). The venue default; a till may set its own (`Workstation.cashDrawerLimit`). When the cash a till has taken since its last count takes the drawer over it, the till warns and offers a cash lift (`shift.createCashMovement` kind `lift`) and BO-042 flags the box (`shift.DepositBox.overDrawerLimit`). A warning, never a block: a sale is not refused because the drawer is full. Null sets no limit. **No proposed default: the client's finance team sets it.**\n"
+   },
+   "catalogue": {
+    "type": "object",
+    "nullable": true,
+    "properties": {
+     "maxVariantsPerProduct": {
+      "type": "integer",
+      "nullable": true,
+      "minimum": 1,
+      "maximum": 2000,
+      "default": 200,
+      "description": "Variants one product may generate from its attributes (`setProductAttributes` refuses above it). Proposed, client to correct (audit R094)."
+     },
+     "waitlistOfferHoldMinutes": {
+      "type": "integer",
+      "nullable": true,
+      "minimum": 1,
+      "maximum": 1440,
+      "default": 30,
+      "description": "How long a waitlist offer holds the released capacity for the guest it was offered to. Proposed, client to correct (audit R094)."
+     },
+     "bulkPriceChangeEscalationPercent": {
+      "type": "number",
+      "nullable": true,
+      "minimum": 0,
+      "maximum": 100,
+      "default": 10,
+      "description": "A `bulkChangePrices` run changing any price by more than this percentage needs `PRICE_CONFIGURE` (audit R197). Proposed, client to correct (audit R094)."
+     },
+     "bulkPriceChangeEscalationCount": {
+      "type": "integer",
+      "nullable": true,
+      "minimum": 1,
+      "default": 50,
+      "description": "A `bulkChangePrices` run touching more prices than this needs `PRICE_CONFIGURE` (audit R197). Proposed, client to correct (audit R094)."
+     }
+    }
+   },
+   "inventory": {
+    "type": "object",
+    "nullable": true,
+    "properties": {
+     "overReceiptTolerancePercent": {
+      "type": "number",
+      "nullable": true,
+      "minimum": 0,
+      "maximum": 25,
+      "default": 5,
+      "description": "Percent above the outstanding ordered quantity a goods receipt line may record (`createGoodsReceipt`). Proposed, client to correct (audit R094)."
+     },
+     "countVarianceTolerancePercent": {
+      "type": "number",
+      "nullable": true,
+      "minimum": 0,
+      "maximum": 25,
+      "default": 2,
+      "description": "Percent difference between counted and expected quantity before a count line is an exception (`getCountVariance`). Proposed, client to correct (audit R094)."
+     },
+     "countVarianceApprovalAmount": {
+      "allOf": [
+       {
+        "$ref": "../shared/common.yaml#/components/schemas/Money"
+       }
+      ],
+      "nullable": true,
+      "description": "Total variance value of a count above which posting it needs approval (`postStockCount`). **Proposed tenant default 1,000.00 in the venue currency, client finance to correct (audit R094).**\n"
+     }
+    }
+   },
+   "seating": {
+    "type": "object",
+    "nullable": true,
+    "properties": {
+     "seatHoldExtensionSeconds": {
+      "type": "integer",
+      "nullable": true,
+      "minimum": 60,
+      "maximum": 1800,
+      "default": 300,
+      "description": "What one `extendSeatHold` adds. No hold outlives 30 minutes in all (audit R169). Proposed, client to correct (audit R094)."
+     },
+     "seatHoldMaxExtensions": {
+      "type": "integer",
+      "nullable": true,
+      "minimum": 0,
+      "maximum": 5,
+      "default": 2,
+      "description": "How many times a seat hold may be extended. Proposed, client to correct (audit R094). A resource hold on a venue map (`resources.extendResourceHold`) uses the same two bounds (decided 29 September, rev 3 REV3-15)."
+     },
+     "maxSeatsPerGuestOrder": {
+      "type": "integer",
+      "nullable": true,
+      "minimum": 1,
+      "maximum": 50,
+      "default": 10,
+      "description": "**Seats one guest may take in one booking on a guest channel** (Guest Web, Guest App), decided 29 September, rev 3 REV3-7. `seating.createSeatHold` counts the seats in the request plus the seats the same guest already holds on the same performance, and refuses above this with `422` `seat-limit-exceeded`, naming the limit. Default 10, bounds 1 to 50; a venue sets its own in Venue Management. Staff and POS sales keep 10 per sale (audit R080 (c)) and do not read this field.\n"
+     }
+    }
+   },
+   "promotions": {
+    "type": "object",
+    "nullable": true,
+    "properties": {
+     "maxDiscountPercent": {
+      "type": "number",
+      "nullable": true,
+      "minimum": 0,
+      "maximum": 100,
+      "default": 30,
+      "description": "The largest discount one promotion may give (`createPromotion` refuses above it). Proposed, client to correct (audit R094)."
+     },
+     "nearZeroLinePrice": {
+      "allOf": [
+       {
+        "$ref": "../shared/common.yaml#/components/schemas/Money"
+       }
+      ],
+      "nullable": true,
+      "description": "Net line price below which a stacked combination is flagged near-zero in `analysePromotionConflicts` (audit R096 (5)); a warning, not a refusal. **Proposed tenant default AED 1.00, client to correct (audit R094).**\n"
+     }
+    }
+   },
+   "fnb": {
+    "type": "object",
+    "nullable": true,
+    "properties": {
+     "recallWindowMinutes": {
+      "type": "integer",
+      "nullable": true,
+      "minimum": 0,
+      "maximum": 60,
+      "default": 10,
+      "description": "Minutes after a bump during which `recallKitchenTicket` still recalls; after it the act is a refire. Proposed, client to correct (audit R094)."
+     },
+     "tableReservedLeadMinutes": {
+      "type": "integer",
+      "nullable": true,
+      "minimum": 0,
+      "maximum": 240,
+      "default": 30,
+      "deprecated": true,
+      "description": "**Deprecated (2 October 2026, CHG-CLN-009): `fnb.FnbReservationPolicy.reservedLeadMinutes` is canonical.** The table state model reads the reservation policy (`states/table.yaml`); this venue setting is kept for compatibility, never read, and not drawn. Its former meaning: **How long before a pre-allocated booking its table shows Reserved** (decided 2 October 2026, Chinmay, batch 6 set 6b, EMP-052: \"Reserved when a booking names the table, or N minutes (venue-set) before a pre-allocated booking\"; DEC-202; CHG-CSP-017; DI-689, DI-336). A booking that names its table holds it as Reserved for the booking's whole slot; a booking the host pre-allocated shows its table Reserved from this many minutes before it. Zero shows Reserved only once the booking is due. The fnb table state model applies it (`states/table.yaml`, owned by fnb). Proposed default 30 minutes, client to correct.\n"
+     },
+     "compEscalationAmount": {
+      "allOf": [
+       {
+        "$ref": "../shared/common.yaml#/components/schemas/Money"
+       }
+      ],
+      "nullable": true,
+      "description": "Line value above which `compItem` needs `ORDER_DISCOUNT` (audit R197). **Proposed tenant default AED 100.00, client to correct (audit R094).**\n"
+     },
+     "foodSafetyLeadPrincipalId": {
+      "type": "string",
+      "format": "uuid",
+      "nullable": true,
+      "description": "**The venue's food-safety lead**, to whom `escalateCorrectiveAction` sends every escalation (decided 28 September, audit R096 (9)). A venue fact, so it has no tenant default; while it is null an escalation is refused `409 no-food-safety-lead`.\n"
+     }
+    }
+   },
+   "queue": {
+    "type": "object",
+    "nullable": true,
+    "properties": {
+     "crossQueueLimit": {
+      "type": "integer",
+      "nullable": true,
+      "minimum": 1,
+      "maximum": 10,
+      "default": 2,
+      "description": "Virtual queues one guest party may wait in at once (`joinQueue`, `crossQueueLimitReached`). Proposed, client to correct (audit R094)."
+     }
+    }
+   },
+   "reporting": {
+    "type": "object",
+    "nullable": true,
+    "properties": {
+     "inlineRunRowLimit": {
+      "type": "integer",
+      "nullable": true,
+      "minimum": 1000,
+      "maximum": 100000,
+      "default": 5000,
+      "description": "Estimated rows above which `runReport` answers `202` and runs in the background. Proposed, client to correct (audit R094)."
+     },
+     "dashboardRefreshBudgetPerMinute": {
+      "type": "integer",
+      "nullable": true,
+      "minimum": 1,
+      "default": 24,
+      "description": "Tile refreshes per minute, summed over a dashboard's tiles, that `createDashboard` allows. Proposed, client to correct (audit R094)."
+     }
+    }
+   },
+   "marketing": {
+    "type": "object",
+    "nullable": true,
+    "properties": {
+     "attributionWindowDays": {
+      "type": "integer",
+      "nullable": true,
+      "minimum": 1,
+      "maximum": 30,
+      "default": 7,
+      "description": "Days after a campaign touch within which a booking is attributed to it (`getCampaignPerformance`). Proposed, client to correct (audit R094)."
+     }
+    }
+   },
+   "identity": {
+    "type": "object",
+    "nullable": true,
+    "properties": {
+     "guestOtpMaxAttempts": {
+      "type": "integer",
+      "nullable": true,
+      "minimum": 3,
+      "maximum": 10,
+      "default": 5,
+      "description": "Wrong entries allowed per guest one-time code before `verifyGuestOtp` invalidates it. A guest code is tenant-scoped, so the tenant default is the value used. Proposed, client to correct (audit R094).\n"
+     },
+     "guestTwoStep": {
+      "type": "object",
+      "nullable": true,
+      "description": "**Guest two-step verification: a venue option, off unless the venue enables it in Venue Management** (decided 29 September, rev 3 GAP-B1, per venue, superseding the second part of audit R167, \"no guest MFA\"; an earlier draft of the same day put it on the tenant's `PasswordPolicy`, which no longer carries it). **The guest's enrolment stays tenant-wide**: one guest account across the tenant's venues, so a method enrolled once is used in every venue that has this on, and is never asked in a venue that has it off. Identity learns the venue from `venueId` on the guest sign-in (`verifyGuestOtp`, `guestPasswordLogin`, `guestSocialLogin`, `guestUaePassLogin`) and on `createMfaChallenge`: the venue the guest app or booking is in; with no venue given, an enrolled guest is asked when any venue of the tenant has it on. Guests may enrol `totp` with `emailOtp` as the fallback, as staff do (audit R126 (5)); it is never forced. Guests still never use enterprise SSO (R167, first part). A null inherits the tenant default set with `setVenueSettingsDefaults`.\n",
+      "properties": {
+       "enabled": {
+        "type": "boolean",
+        "default": false,
+        "description": "Off unless the venue enables it. While no venue of the tenant has it on, guests cannot enrol (`enrolMfaMethod` answers 403 `guest-two-step-disabled`)."
+       },
+       "stepUpActions": {
+        "type": "array",
+        "uniqueItems": true,
+        "description": "The guest actions in this venue that ask an enrolled guest for the factor again, whatever the age of the session. The service performing the action passes this venue to `createMfaChallenge`. Proposed, client to correct (rev 3 GAP-B1).\n",
+        "items": {
+         "type": "string",
+         "enum": [
+          "changeContactDetails",
+          "changePassword",
+          "managePaymentMethods",
+          "transferTickets",
+          "deleteAccount"
+         ]
+        },
+        "default": [
+         "changeContactDetails",
+         "changePassword",
+         "managePaymentMethods",
+         "deleteAccount"
+        ]
+       }
+      }
+     }
+    }
+   }
+  }
  },
  "VenueTypeTemplate": {
   "type": "object",

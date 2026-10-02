@@ -101,6 +101,18 @@
     "operation": null,
     "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
     "source": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 115 §Each integration displays"
+   },
+   {
+    "operation": "createApiClient",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-021): createApiClient and setApiClientStatus on the tenant's wallet integration screen, as BO-067: API clients are issued and suspended in the developer programme, not from a wallet screen (DI-927; design-notes correction platform-foundation BO-1173).",
+    "source": "DI-927 | contracts/satellite/public-api.yaml#createApiClient"
+   },
+   {
+    "operation": "setApiClientStatus",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-021): createApiClient and setApiClientStatus on the tenant's wallet integration screen, as BO-067: API clients are issued and suspended in the developer programme, not from a wallet screen (DI-927; design-notes correction platform-foundation BO-1173).",
+    "source": "DI-927 | contracts/satellite/public-api.yaml#createApiClient"
    }
   ],
   "layout": {
@@ -277,12 +289,6 @@
        "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 115 §Quick Actions"
       },
       {
-       "kind": "destructiveButton",
-       "label": "Suspend Integration",
-       "operation": "setApiClientStatus",
-       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 115 §Quick Actions"
-      },
-      {
        "kind": "secondaryButton",
        "label": "Test Connection",
        "operation": "testWebhookSubscription",
@@ -321,13 +327,6 @@
     ]
    },
    {
-    "operationId": "createApiClient",
-    "contract": "public-api",
-    "purpose": "Register a new wallet integration with its scopes",
-    "trigger": "onAction",
-    "provenance": "decided 29 September, VM close-out (venue management and configuration): serves the pack action(s) Create Integration; Retry Failed Event"
-   },
-   {
     "operationId": "replayEvents",
     "contract": "public-api",
     "purpose": "Re-deliver failed wallet events",
@@ -339,12 +338,6 @@
     "contract": "public-api",
     "purpose": "The webhook subscriptions to test or replay",
     "trigger": "onLoad"
-   },
-   {
-    "operationId": "setApiClientStatus",
-    "contract": "public-api",
-    "purpose": "Suspend integration",
-    "trigger": "onAction"
    },
    {
     "operationId": "testWebhookSubscription",
@@ -597,25 +590,30 @@
   "states": {
    "loading": "The wallet api catalogue configuration as saved.",
    "error": "Could not load. Names which read failed and leaves the wallet api catalogue untouched.",
-   "emptyFirstRun": "No wallet api catalogue configured yet. Carries the create action and says what the platform does in the meantime.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "No wallet api catalogue configured yet. Offers no create action — this screen declares no operation that makes one and says what the platform does in the meantime.",
+   "emptyNoAccess": "Not shown: nothing on this screen needs a permission of its own; the app's sign-in decides access.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },
-  "apis": [
-   {
-    "operationId": "listWalletTypes",
-    "contract": "wallet",
-    "purpose": "What the API exposes",
-    "trigger": "onLoad",
-    "provenance": "board reading, 19 September 2026"
-   }
-  ],
+  "apis": [],
   "wireframe": {
    "status": "notStarted",
    "board": "wireframes/P08 Venue Management.dc.html#bo-1174",
    "workshopBoard": "wireframes/WS195 Wallet Configuration Backend Structure v1.0 Board 10.dc.html#bo-1174"
   },
   "apisNote": "Regenerated 9 September 2026 from Wallet_Configuration_Backend_Structure_v1.0.pdf page 117. 0 of 0 labels bound to a contract property; 46 of 52 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "gaps": [
+   {
+    "operation": "listWalletTypes",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-025): The wallet API catalogue read wallet types (listWalletTypes); the operation does not serve the purpose, and the API definitions have no staff read (recorded as a contract gap) (design-notes correction ticketing-backoffice BO-1174)",
+    "source": "contracts/satellite/wallet.yaml#listWalletTypes"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-027): A staff read of the published wallet API definitions (endpoints, versions, scopes) and a write for their exposure.",
+    "source": "contracts/satellite/wallet.yaml#listWalletTypes"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -832,6 +830,13 @@
    "workshopBoard": "wireframes/WS195 Wallet Configuration Backend Structure v1.0 Board 10.dc.html#bo-1175"
   },
   "apisNote": "Regenerated 9 September 2026 from Wallet_Configuration_Backend_Structure_v1.0.pdf page 118. 0 of 0 labels bound to a contract property; 20 of 45 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** still owed by a contract change: `setWalletIntegrationMapping`.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-027): A read (get or list) of the wallet channel rules and integration mappings that setWalletChannelRules and setWalletIntegrationMapping writes.",
+    "source": "contracts/satellite/wallet.yaml#setWalletChannelRules | contracts/satellite/wallet.yaml#setWalletIntegrationMapping | screens/P08-venue-back-office.yaml#BO-1175"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -958,6 +963,13 @@
        "kind": "selectField",
        "label": "Failure behavior",
        "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 119 §For each subscriber configure"
+      },
+      {
+       "kind": "dataTable",
+       "label": "The tenant's webhook subscriptions, filterable by API client",
+       "bindsTo": "WebhookSubscription",
+       "operation": "listWebhookSubscriptions",
+       "provenance": "contract public-api.yaml GET /webhook-subscriptions; wiring fix, 2 October 2026"
       }
      ]
     },
@@ -1030,6 +1042,13 @@
     "purpose": "Subscribe an integration to the chosen wallet events",
     "trigger": "onAction",
     "provenance": "decided 29 September, VM close-out (venue management and configuration): serves the pack action(s) Wallet Created, Wallet Activated, Wallet Blocked, Wallet Unblocked, Balance Changed, Top-Up Failed, Payment Completed, Payment Declined …"
+   },
+   {
+    "operationId": "listWebhookSubscriptions",
+    "contract": "public-api",
+    "purpose": "The tenant's webhook subscriptions, filterable by API client",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {
@@ -1038,6 +1057,7 @@
    "workshopBoard": "wireframes/WS195 Wallet Configuration Backend Structure v1.0 Board 10.dc.html#bo-1176"
   },
   "apisNote": "Regenerated 9 September 2026 from Wallet_Configuration_Backend_Structure_v1.0.pdf page 119. 0 of 0 labels bound to a contract property; 29 of 40 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Wallet Created, Wallet Activated, Wallet Blocked, Wallet Unblocked, Balance Changed, Top-Up Failed, Payment Completed, Payment Declined …: `createWebhookSubscription`.",
+  "entryState": {},
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1192,56 +1212,16 @@
       },
       {
        "kind": "selectField",
-       "label": "Access Models",
-       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 120 §Configure"
+       "label": "Access model",
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 120 §Configure",
+       "notes": "A preset to start from (read only, finance, partner, internal service, high-risk operations, balance adjustment, wallet block, high-value refund), filling the scopes below; the board drew them as buttons."
       }
      ]
     },
     {
      "name": "actionBar",
      "slot": "publish",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Read Only",
-       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 120 §Support"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Finance",
-       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 120 §Support"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Partner",
-       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 120 §Support"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Internal Service",
-       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 120 §Support"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "High-Risk Operations",
-       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 120 §Support"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Balance Adjustment",
-       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 120 §Operations such as"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Wallet Block",
-       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 120 §Operations such as"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "High-Value Refund",
-       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 120 §Operations such as"
-      }
-     ]
+     "components": []
     }
    ]
   },
@@ -1443,6 +1423,13 @@
    "workshopBoard": "wireframes/WS195 Wallet Configuration Backend Structure v1.0 Board 10.dc.html#bo-1178"
   },
   "apisNote": "Regenerated 9 September 2026 from Wallet_Configuration_Backend_Structure_v1.0.pdf page 121. 0 of 0 labels bound to a contract property; 12 of 35 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-027): A write and read for wallet synchronisation, retry and resilience settings.",
+    "source": "contracts/satellite/wallet.yaml#getWalletReconciliation"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1821,6 +1808,12 @@
        "label": "What publishing changes",
        "notes": "**Takes effect at every till and reader immediately.** Credit types, consumption order and funding rules change for balances that already exist, not only for new ones.",
        "provenance": "authored — required by check-screens, 19 September 2026"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Wallet configuration versions, newest first",
+       "operation": "listWalletConfigurationVersions",
+       "provenance": "contract wallet.yaml GET /wallet-configuration/versions; wiring fix, 2 October 2026"
       }
      ]
     },
@@ -1863,6 +1856,13 @@
      "listWalletTypes",
      "listCreditTypes"
     ]
+   },
+   {
+    "operationId": "listWalletConfigurationVersions",
+    "contract": "wallet",
+    "purpose": "Wallet configuration versions, newest first",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "entryState": {
@@ -1988,6 +1988,18 @@
        "label": "What publishing changes",
        "notes": "**Takes effect at every till and reader immediately.** Credit types, consumption order and funding rules change for balances that already exist, not only for new ones.",
        "provenance": "authored — required by check-screens, 19 September 2026"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Wallet configuration versions, newest first",
+       "operation": "listWalletConfigurationVersions",
+       "provenance": "contract wallet.yaml GET /wallet-configuration/versions; wiring fix, 2 October 2026"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Requests awaiting a decision, or already decided",
+       "operation": "listApprovalRequests",
+       "provenance": "contract approvals.yaml GET /approval-requests; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -2018,6 +2030,20 @@
     "purpose": "Send for approval",
     "trigger": "onAction",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "listWalletConfigurationVersions",
+    "contract": "wallet",
+    "purpose": "Wallet configuration versions, newest first",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
+   },
+   {
+    "operationId": "listApprovalRequests",
+    "contract": "approvals",
+    "purpose": "Requests awaiting a decision, or already decided",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {
@@ -2026,6 +2052,7 @@
    "workshopBoard": "wireframes/WS195 Wallet Configuration Backend Structure v1.0 Board 10.dc.html#bo-1181"
   },
   "apisNote": "Regenerated 9 September 2026 from Wallet_Configuration_Backend_Structure_v1.0.pdf page 124. 0 of 0 labels bound to a contract property; 17 of 42 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {},
   "_platform": {
    "code": "P08",
    "audience": "staff",

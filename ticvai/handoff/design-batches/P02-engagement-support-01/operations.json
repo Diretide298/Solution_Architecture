@@ -61,25 +61,6 @@
   "requestBody": null,
   "responds": "Order"
  },
- "claimLocationSession": {
-  "method": "POST",
-  "path": "/location-sessions",
-  "contract": "fnb",
-  "summary": "Tell the platform where the guest is",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "LocationSession"
- },
  "createAiConversation": {
   "method": "POST",
   "path": "/conversations",
@@ -155,6 +136,25 @@
   ],
   "requestBody": null,
   "responds": "Cart"
+ },
+ "getForm": {
+  "method": "GET",
+  "path": "/forms/{formId}",
+  "contract": "marketing-crm",
+  "summary": "One form, to fill in or to edit",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "version",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "FormDefinition"
  },
  "getGuestMenu": {
   "method": "GET",
@@ -268,6 +268,30 @@
   "requestBody": null,
   "responds": "Conversation"
  },
+ "listAiConversations": {
+  "method": "GET",
+  "path": "/conversations",
+  "contract": "ai",
+  "summary": "A principal's conversation history",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "listCatalogueBundles": {
   "method": "GET",
   "path": "/catalogue/bundles",
@@ -333,6 +357,40 @@
    {
     "name": "venueId",
     "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listMyOrders": {
+  "method": "GET",
+  "path": "/my/orders",
+  "contract": "orders",
+  "summary": "The orders this guest placed",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": "since",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
     "required": null
    }
   ],
@@ -620,6 +678,25 @@
   ],
   "requestBody": null,
   "responds": "ConversationMessage"
+ },
+ "submitForm": {
+  "method": "POST",
+  "path": "/form-submissions",
+  "contract": "marketing-crm",
+  "summary": "Sign a waiver, answer a survey, capture details",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "FormSubmission",
+  "responds": "FormSubmission"
  },
  "submitReview": {
   "method": "POST",

@@ -28,7 +28,7 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-031 holds none of them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-031 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
@@ -415,7 +415,7 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-032 holds none of them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-032 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
@@ -451,87 +451,12 @@
     {
      "name": "contentBody",
      "slot": "collection",
-     "components": [
-      {
-       "kind": "textField",
-       "label": "Status",
-       "operation": "listQueueEntries",
-       "notes": "Sends `?status=` to `listQueueEntries`.",
-       "provenance": "contract queue.yaml GET /queues/{queueId}/entries"
-      },
-      {
-       "kind": "dataTable",
-       "label": "Every waiting guest",
-       "bindsTo": "WaitingGuest",
-       "columns": [
-        "WaitingGuest.id",
-        "WaitingGuest.queueId",
-        "WaitingGuest.queueName",
-        "WaitingGuest.subjectId",
-        "WaitingGuest.partyNumber",
-        "WaitingGuest.partySize",
-        "WaitingGuest.status",
-        "WaitingGuest.positionInQueue",
-        "WaitingGuest.partiesAhead",
-        "WaitingGuest.estimatedCallAt",
-        "WaitingGuest.isFastPass",
-        "WaitingGuest.entitlementId"
-       ],
-       "operation": "listQueueEntries",
-       "provenance": "contract queue.yaml GET /queues/{queueId}/entries"
-      },
-      {
-       "kind": "dataTable",
-       "label": "Every queue",
-       "bindsTo": "Queue",
-       "columns": [
-        "Queue.code",
-        "Queue.name",
-        "Queue.venueId",
-        "Queue.attractionProductId",
-        "Queue.assetId",
-        "Queue.accessPointId",
-        "Queue.kind",
-        "Queue.operatingWindows",
-        "Queue.parentQueueId",
-        "Queue.loadBalanceWithQueueIds",
-        "Queue.inQueueOfferEnabled",
-        "Queue.notifyBeforeCallMinutes"
-       ],
-       "operation": "listQueues",
-       "provenance": "contract queue.yaml GET /queues"
-      }
-     ]
+     "components": []
     },
     {
      "name": "contextPanel",
      "slot": "selection",
      "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected waiting guest",
-       "bindsTo": "WaitingGuest",
-       "columns": [
-        "WaitingGuest.id",
-        "WaitingGuest.queueId",
-        "WaitingGuest.queueName",
-        "WaitingGuest.subjectId",
-        "WaitingGuest.partyNumber",
-        "WaitingGuest.partySize",
-        "WaitingGuest.status",
-        "WaitingGuest.positionInQueue",
-        "WaitingGuest.partiesAhead",
-        "WaitingGuest.estimatedCallAt",
-        "WaitingGuest.isFastPass",
-        "WaitingGuest.entitlementId",
-        "WaitingGuest.calledAt",
-        "WaitingGuest.returnWindowEndsAt",
-        "WaitingGuest.redeemedAt",
-        "WaitingGuest.admittedCount"
-       ],
-       "operation": "listQueueEntries",
-       "provenance": "contract queue.yaml GET /queues/{queueId}/entries"
-      },
       {
        "kind": "detailPanel",
        "label": "The queue",
@@ -595,10 +520,7 @@
     "operationId": "setWaitTime",
     "contract": "queue",
     "purpose": "Manually set a wait time",
-    "trigger": "onAction",
-    "invalidates": [
-     "listQueueEntries"
-    ]
+    "trigger": "onAction"
    },
    {
     "operationId": "getWaitTimes",
@@ -611,18 +533,6 @@
     "contract": "queue",
     "purpose": "Read a queue with live position",
     "trigger": "onAction"
-   },
-   {
-    "operationId": "listQueueEntries",
-    "contract": "queue",
-    "purpose": "List entries in a queue",
-    "trigger": "onAction"
-   },
-   {
-    "operationId": "listQueues",
-    "contract": "queue",
-    "purpose": "List queues",
-    "trigger": "onLoad"
    }
   ],
   "entryState": {
@@ -666,6 +576,20 @@
      ]
     },
     "provenance": "contract queue.yaml PUT /queues/{queueId}/wait-time"
+   }
+  ],
+  "gaps": [
+   {
+    "operation": "listQueueEntries",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): The waiting-guest table and queue list do not serve manual wait entry; only the chosen ride's wait and its source are needed (design-notes correction venue-operations EMP-032).",
+    "source": "screens/P06-staff-app.yaml#EMP-032 | R254"
+   },
+   {
+    "operation": "listQueues",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): The waiting-guest table and queue list do not serve manual wait entry; only the chosen ride's wait and its source are needed (design-notes correction venue-operations EMP-032).",
+    "source": "screens/P06-staff-app.yaml#EMP-032 | R254"
    }
   ],
   "_platform": {
@@ -718,7 +642,7 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-033 holds none of them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-033 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
@@ -821,28 +745,10 @@
      "slot": "rowActions",
      "components": [
       {
-       "kind": "primaryButton",
-       "label": "Create channel capacity",
-       "operation": "createChannelCapacity",
-       "provenance": "contract catalogue.yaml POST /channel-capacities"
-      },
-      {
        "kind": "secondaryButton",
        "label": "Release channel allocation",
        "operation": "relinquishChannelAllocation",
        "provenance": "contract catalogue.yaml POST /channel-capacities/{channelCapacityId}/channel-allocations/release"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Save channel allocations",
-       "operation": "setChannelAllocations",
-       "provenance": "contract catalogue.yaml PUT /channel-capacities/{channelCapacityId}/channel-allocations"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Save channel capacity",
-       "operation": "updateChannelCapacity",
-       "provenance": "contract catalogue.yaml PATCH /channel-capacities/{channelCapacityId}"
       }
      ]
     }
@@ -851,7 +757,7 @@
   "states": {
    "loading": "The capacity list.",
    "error": "Could not load. Names which read failed and leaves the capacity untouched.",
-   "emptyFirstRun": "No capacity yet. Offers Create channel capacity (`createChannelCapacity`); distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No capacity yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "Nothing matches the filter on performanceId and the capacity are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listChannelCapacities` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "Last synced, with age"
@@ -870,36 +776,9 @@
     "trigger": "onAction"
    },
    {
-    "operationId": "createChannelCapacity",
-    "contract": "catalogue",
-    "purpose": "Create a capacity envelope",
-    "trigger": "onAction",
-    "invalidates": [
-     "listChannelCapacities"
-    ]
-   },
-   {
     "operationId": "relinquishChannelAllocation",
     "contract": "catalogue",
     "purpose": "Return unsold channel allocation to the general pool",
-    "trigger": "onAction",
-    "invalidates": [
-     "listChannelCapacities"
-    ]
-   },
-   {
-    "operationId": "setChannelAllocations",
-    "contract": "catalogue",
-    "purpose": "Allocate envelope capacity across channels",
-    "trigger": "onAction",
-    "invalidates": [
-     "listChannelCapacities"
-    ]
-   },
-   {
-    "operationId": "updateChannelCapacity",
-    "contract": "catalogue",
-    "purpose": "Amend an envelope",
     "trigger": "onAction",
     "invalidates": [
      "listChannelCapacities"
@@ -930,27 +809,6 @@
   "apisNote": "Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "overlays": [
    {
-    "id": "formCreateChannelCapacity",
-    "component": "modal",
-    "trigger": "Create channel capacity",
-    "body": "**Collects what `createChannelCapacity` sends before it is called.** Required: `performanceId`, `name`, `capacity`. Optional: `seatCategoryId`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "CreateEnvelopeRequest",
-    "confirm": {
-     "label": "Create channel capacity",
-     "operation": "createChannelCapacity"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "performanceId",
-      "name",
-      "capacity",
-      "seatCategoryId"
-     ]
-    },
-    "provenance": "contract catalogue.yaml POST /channel-capacities"
-   },
-   {
     "id": "formRelinquishChannelAllocation",
     "component": "modal",
     "trigger": "Release channel allocation",
@@ -967,41 +825,26 @@
      ]
     },
     "provenance": "contract catalogue.yaml POST /channel-capacities/{channelCapacityId}/channel-allocations/release"
+   }
+  ],
+  "gaps": [
+   {
+    "operation": "createChannelCapacity",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-018): Capacity authoring (create envelope, save allocations, save capacity) is a back-office job; the handheld's purpose is to read (design-notes correction ticketing-guest EMP-033).",
+    "source": "screens/P06-staff-app.yaml#EMP-033"
    },
    {
-    "id": "formSetChannelAllocations",
-    "component": "modal",
-    "trigger": "Save channel allocations",
-    "body": "**Collects what `setChannelAllocations` sends before it is called.** Required: `allocations`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Save channel allocations",
-     "operation": "setChannelAllocations"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "allocations"
-     ]
-    },
-    "provenance": "contract catalogue.yaml PUT /channel-capacities/{channelCapacityId}/channel-allocations"
+    "operation": "setChannelAllocations",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-018): Capacity authoring (create envelope, save allocations, save capacity) is a back-office job; the handheld's purpose is to read (design-notes correction ticketing-guest EMP-033).",
+    "source": "screens/P06-staff-app.yaml#EMP-033"
    },
    {
-    "id": "formUpdateChannelCapacity",
-    "component": "modal",
-    "trigger": "Save channel capacity",
-    "body": "**Collects what `updateChannelCapacity` sends before it is called.** Nothing in the body is required. Optional: `name`, `capacity`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Save channel capacity",
-     "operation": "updateChannelCapacity"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "name",
-      "capacity"
-     ]
-    },
-    "provenance": "contract catalogue.yaml PATCH /channel-capacities/{channelCapacityId}"
+    "operation": "updateChannelCapacity",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-018): Capacity authoring (create envelope, save allocations, save capacity) is a back-office job; the handheld's purpose is to read (design-notes correction ticketing-guest EMP-033).",
+    "source": "screens/P06-staff-app.yaml#EMP-033"
    }
   ],
   "_platform": {
@@ -1055,7 +898,7 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-034 holds none of them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-034 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
@@ -1354,24 +1197,6 @@
        "provenance": "contract orders.yaml POST /orders/{orderId}/resume"
       },
       {
-       "kind": "secondaryButton",
-       "label": "Save alternative codes",
-       "operation": "setAlternativeCodes",
-       "provenance": "contract catalogue.yaml PUT /products/{productId}/alternative-codes"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Save product attributes",
-       "operation": "setProductAttributes",
-       "provenance": "contract catalogue.yaml PUT /products/{productId}/attributes"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Transition product lifecycle",
-       "operation": "transitionProductLifecycle",
-       "provenance": "contract catalogue.yaml POST /products/{productId}/lifecycle"
-      },
-      {
        "kind": "destructiveButton",
        "label": "Void order",
        "operation": "voidOrder",
@@ -1593,59 +1418,6 @@
      ]
     },
     "provenance": "contract orders.yaml POST /orders/{orderId}/reschedule"
-   },
-   {
-    "id": "formSetAlternativeCodes",
-    "component": "modal",
-    "trigger": "Save alternative codes",
-    "body": "**Collects what `setAlternativeCodes` sends before it is called.** Required: `codes`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Save alternative codes",
-     "operation": "setAlternativeCodes"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "codes"
-     ]
-    },
-    "provenance": "contract catalogue.yaml PUT /products/{productId}/alternative-codes"
-   },
-   {
-    "id": "formSetProductAttributes",
-    "component": "modal",
-    "trigger": "Save product attributes",
-    "body": "**Collects what `setProductAttributes` sends before it is called.** Required: `axes`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Save product attributes",
-     "operation": "setProductAttributes"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "axes"
-     ]
-    },
-    "provenance": "contract catalogue.yaml PUT /products/{productId}/attributes"
-   },
-   {
-    "id": "formTransitionProductLifecycle",
-    "component": "modal",
-    "trigger": "Transition product lifecycle",
-    "body": "**Collects what `transitionProductLifecycle` sends before it is called.** Required: `transition`, `reason`. Optional: `effectiveAt`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Transition product lifecycle",
-     "operation": "transitionProductLifecycle"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "transition",
-      "reason",
-      "effectiveAt"
-     ]
-    },
-    "provenance": "contract catalogue.yaml POST /products/{productId}/lifecycle"
    }
   ],
   "states": {
@@ -1793,33 +1565,6 @@
     ]
    },
    {
-    "operationId": "setAlternativeCodes",
-    "contract": "catalogue",
-    "purpose": "Set external identifiers",
-    "trigger": "onAction",
-    "invalidates": [
-     "listProducts"
-    ]
-   },
-   {
-    "operationId": "setProductAttributes",
-    "contract": "catalogue",
-    "purpose": "Set the attribute axes for a product",
-    "trigger": "onAction",
-    "invalidates": [
-     "listProducts"
-    ]
-   },
-   {
-    "operationId": "transitionProductLifecycle",
-    "contract": "catalogue",
-    "purpose": "Move a product through its lifecycle",
-    "trigger": "onAction",
-    "invalidates": [
-     "listProducts"
-    ]
-   },
-   {
     "operationId": "voidOrder",
     "contract": "orders",
     "purpose": "Void an order",
@@ -1865,6 +1610,26 @@
    "board": "wireframes/P06 Venue Staff App.dc.html#emp-034"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 22 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "gaps": [
+   {
+    "operation": "setAlternativeCodes",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-018): Product authoring (alternative codes, attributes, lifecycle) on a walk-up sale; a seller does not author the catalogue (design-notes correction ticketing-guest EMP-034).",
+    "source": "screens/P06-staff-app.yaml#EMP-034"
+   },
+   {
+    "operation": "setProductAttributes",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-018): Product authoring (alternative codes, attributes, lifecycle) on a walk-up sale; a seller does not author the catalogue (design-notes correction ticketing-guest EMP-034).",
+    "source": "screens/P06-staff-app.yaml#EMP-034"
+   },
+   {
+    "operation": "transitionProductLifecycle",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-018): Product authoring (alternative codes, attributes, lifecycle) on a walk-up sale; a seller does not author the catalogue (design-notes correction ticketing-guest EMP-034).",
+    "source": "screens/P06-staff-app.yaml#EMP-034"
+   }
+  ],
   "_platform": {
    "code": "P06",
    "audience": "staff",
@@ -1915,7 +1680,7 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-025 holds none of them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-025 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
@@ -2158,7 +1923,7 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-026 holds none of them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-026 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
@@ -2305,18 +2070,6 @@
        "label": "Report incident",
        "operation": "reportIncident",
        "provenance": "contract maintenance.yaml POST /incidents"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Record authority notification",
-       "operation": "recordAuthorityNotification",
-       "provenance": "contract maintenance.yaml POST /incidents/{incidentId}/notify-authority"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Save incident",
-       "operation": "updateIncident",
-       "provenance": "contract maintenance.yaml PATCH /incidents/{incidentId}"
       }
      ]
     }
@@ -2325,7 +2078,7 @@
   "states": {
    "loading": "The incident report list.",
    "error": "Could not load. Names which read failed and leaves the incident report untouched.",
-   "emptyFirstRun": "No incident report yet. Offers Record authority notification (`recordAuthorityNotification`); distinct from a filter that matched nothing.",
+   "emptyFirstRun": "Nothing reported yet by you today. Offers Report incident.",
    "emptyNoResults": "Nothing matches the filter on severity, status, isReportable and the incident report are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Shown when the caller lacks `INCIDENT_VIEW`, which `getIncident` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "Queues locally with the highest sync priority"
@@ -2348,24 +2101,6 @@
     "contract": "maintenance",
     "purpose": "List incidents",
     "trigger": "onLoad"
-   },
-   {
-    "operationId": "recordAuthorityNotification",
-    "contract": "maintenance",
-    "purpose": "Record notification to an external authority",
-    "trigger": "onAction",
-    "invalidates": [
-     "listIncidents"
-    ]
-   },
-   {
-    "operationId": "updateIncident",
-    "contract": "maintenance",
-    "purpose": "Investigate, escalate or close an incident",
-    "trigger": "onAction",
-    "invalidates": [
-     "listIncidents"
-    ]
    }
   ],
   "entryState": {
@@ -2422,51 +2157,20 @@
      ]
     },
     "provenance": "contract maintenance.yaml POST /incidents"
+   }
+  ],
+  "gaps": [
+   {
+    "operation": "recordAuthorityNotification",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-SPO-018): a supervisor act (INCIDENT_MANAGE) on EMP-027 and BO-072; the reporter needs reportIncident only (F69 step 2; design-notes correction venue-operations EMP-026).",
+    "source": "F69 step 2 | contracts/satellite/maintenance.yaml#recordAuthorityNotification"
    },
    {
-    "id": "formRecordAuthorityNotification",
-    "component": "modal",
-    "trigger": "Record authority notification",
-    "body": "**Collects what `recordAuthorityNotification` sends before it is called.** Required: `authority`, `notifiedAt`. Optional: `reference`, `notifiedByPrincipalId`, `attachmentRefs`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Record authority notification",
-     "operation": "recordAuthorityNotification"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "authority",
-      "notifiedAt",
-      "reference",
-      "notifiedByPrincipalId",
-      "attachmentRefs"
-     ]
-    },
-    "provenance": "contract maintenance.yaml POST /incidents/{incidentId}/notify-authority"
-   },
-   {
-    "id": "formUpdateIncident",
-    "component": "modal",
-    "trigger": "Save incident",
-    "body": "**Collects what `updateIncident` sends before it is called.** Nothing in the body is required. Optional: `status`, `severity`, `assignedToPrincipalId`, `investigationNote`, `rootCause`, `correctiveActions`, `correctiveWorkOrderId`, `attachmentRefs`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Save incident",
-     "operation": "updateIncident"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "status",
-      "severity",
-      "assignedToPrincipalId",
-      "investigationNote",
-      "rootCause",
-      "correctiveActions",
-      "correctiveWorkOrderId",
-      "attachmentRefs"
-     ]
-    },
-    "provenance": "contract maintenance.yaml PATCH /incidents/{incidentId}"
+    "operation": "updateIncident",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-SPO-018): a supervisor act (INCIDENT_MANAGE) on EMP-027 and BO-072; the reporter needs reportIncident only (F69 step 2; design-notes correction venue-operations EMP-026).",
+    "source": "F69 step 2 | contracts/satellite/maintenance.yaml#recordAuthorityNotification"
    }
   ],
   "_platform": {
@@ -2508,6 +2212,7 @@
     "EMP-001",
     "EMP-002",
     "EMP-003",
+    "EMP-038",
     "EMP-050"
    ],
    "inferred": false,
@@ -2519,7 +2224,7 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-027 holds none of them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-027 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
@@ -2541,6 +2246,12 @@
      "carries": [
       "incidentId"
      ]
+    },
+    {
+     "to": "EMP-038",
+     "trigger": "If it is a venue-wide event, an announcement goes out",
+     "provenance": "flow F69 step 3→4",
+     "operation": "recordAuthorityNotification"
     }
    ]
   },
@@ -2664,7 +2375,14 @@
        "kind": "primaryButton",
        "label": "Save incident",
        "operation": "updateIncident",
-       "provenance": "contract maintenance.yaml PATCH /incidents/{incidentId}"
+       "provenance": "contract maintenance.yaml PATCH /incidents/{incidentId}",
+       "notes": "**A critical incident is closed by another supervisor** (decided 2 October 2026, Chinmay, batch 6, EMP-027; DEC-530; CHG-CSA-033): the person who completed the corrective action cannot close it, and `updateIncident` refuses them 403 `closer-completed-action`. Close is hidden for them, with \"Another supervisor closes this incident\"."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Record authority notification",
+       "operation": "recordAuthorityNotification",
+       "provenance": "contract maintenance.yaml POST /incidents/{incidentId}/notify-authority; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -2676,7 +2394,8 @@
    "emptyFirstRun": "No incident yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
    "emptyNoResults": "Nothing matches the filter on severity, status, isReportable and the incident are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Shown when the caller lacks `INCIDENT_VIEW`, which `getIncident` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "Cached; updates queue"
+   "offline": "Cached; updates queue",
+   "denied": "Closing was refused: you completed the corrective action on this critical incident, so another supervisor closes it (403 closer-completed-action; DEC-530)."
   },
   "apis": [
    {
@@ -2696,6 +2415,13 @@
     "contract": "maintenance",
     "purpose": "List incidents",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "recordAuthorityNotification",
+    "contract": "maintenance",
+    "purpose": "Record that an external authority was notified, where required",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-001)"
    }
   ],
   "entryState": {
@@ -2744,6 +2470,20 @@
      ]
     },
     "provenance": "contract maintenance.yaml PATCH /incidents/{incidentId}"
+   },
+   {
+    "id": "formRecordAuthorityNotification",
+    "component": "modal",
+    "trigger": "Record authority notification",
+    "body": "**Collects what `recordAuthorityNotification` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Record authority notification",
+     "operation": "recordAuthorityNotification"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "contract maintenance.yaml POST /incidents/{incidentId}/notify-authority; wiring fix, 2 October 2026"
    }
   ],
   "_platform": {
@@ -2796,7 +2536,7 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-028 holds none of them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-028 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
@@ -3221,7 +2961,7 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-029 holds none of them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-029 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
@@ -3834,7 +3574,7 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-030 holds none of them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-030 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
@@ -3861,6 +3601,23 @@
     "operation": "getVenueMapLive",
     "why": "**1 declared operation reach no component on this screen**: getVenueMapLive. Either the screen is missing what calls them, or the declaration is residue.",
     "source": "the screen's own declarations"
+   },
+   {
+    "operation": "listDeliveryLocations",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-008): listDiningOutlets and listDeliveryLocations are guest-audience operations with no permission; a staff screen calling them bypasses the staff permission model (design-notes correction fnb-retail EMP-030).",
+    "source": "contracts/satellite/fnb.yaml#listDiningOutlets | contracts/satellite/fnb.yaml#listDeliveryLocations"
+   },
+   {
+    "operation": "listDiningOutlets",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-008): listDiningOutlets and listDeliveryLocations are guest-audience operations with no permission; a staff screen calling them bypasses the staff permission model (design-notes correction fnb-retail EMP-030).",
+    "source": "contracts/satellite/fnb.yaml#listDiningOutlets | contracts/satellite/fnb.yaml#listDeliveryLocations"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-011): No staff-audience read of dining outlets and delivery locations (or the venue-map live state must carry them).",
+    "source": "contracts/satellite/fnb.yaml#listDiningOutlets"
    }
   ],
   "layout": {
@@ -3869,89 +3626,12 @@
     {
      "name": "contentBody",
      "slot": "collection",
-     "components": [
-      {
-       "kind": "toggle",
-       "label": "Open now",
-       "operation": "listDiningOutlets",
-       "notes": "Sends `?openNow=` to `listDiningOutlets`.",
-       "provenance": "contract fnb.yaml GET /venues/{venueId}/dining"
-      },
-      {
-       "kind": "textField",
-       "label": "Ordering method",
-       "operation": "listDiningOutlets",
-       "notes": "Sends `?orderingMethod=` to `listDiningOutlets`.",
-       "provenance": "contract fnb.yaml GET /venues/{venueId}/dining"
-      },
-      {
-       "kind": "dataTable",
-       "label": "Every dining outlet",
-       "bindsTo": "DiningOutlet",
-       "columns": [
-        "DiningOutlet.outletId",
-        "DiningOutlet.name",
-        "DiningOutlet.kind",
-        "DiningOutlet.zone",
-        "DiningOutlet.cuisine",
-        "DiningOutlet.isOpenNow",
-        "DiningOutlet.opensAt",
-        "DiningOutlet.closesAt",
-        "DiningOutlet.orderingMethod",
-        "DiningOutlet.estimatedWaitMinutes",
-        "DiningOutlet.imageAssetRef",
-        "DiningOutlet.menuId"
-       ],
-       "operation": "listDiningOutlets",
-       "provenance": "contract fnb.yaml GET /venues/{venueId}/dining"
-      },
-      {
-       "kind": "dataTable",
-       "label": "Every delivery location",
-       "bindsTo": "DeliveryLocation",
-       "columns": [
-        "DeliveryLocation.id",
-        "DeliveryLocation.venueId",
-        "DeliveryLocation.kind",
-        "DeliveryLocation.label",
-        "DeliveryLocation.zone",
-        "DeliveryLocation.tableId",
-        "DeliveryLocation.seatId",
-        "DeliveryLocation.servingOutletIds",
-        "DeliveryLocation.isServiceable",
-        "DeliveryLocation.unserviceableReason",
-        "DeliveryLocation.walkTimeMinutes"
-       ],
-       "operation": "listDeliveryLocations",
-       "provenance": "contract fnb.yaml GET /venues/{venueId}/delivery-locations"
-      }
-     ]
+     "components": []
     },
     {
      "name": "contextPanel",
      "slot": "selection",
      "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected dining outlet",
-       "bindsTo": "DiningOutlet",
-       "columns": [
-        "DiningOutlet.outletId",
-        "DiningOutlet.name",
-        "DiningOutlet.kind",
-        "DiningOutlet.zone",
-        "DiningOutlet.cuisine",
-        "DiningOutlet.isOpenNow",
-        "DiningOutlet.opensAt",
-        "DiningOutlet.closesAt",
-        "DiningOutlet.orderingMethod",
-        "DiningOutlet.estimatedWaitMinutes",
-        "DiningOutlet.imageAssetRef",
-        "DiningOutlet.menuId"
-       ],
-       "operation": "listDiningOutlets",
-       "provenance": "contract fnb.yaml GET /venues/{venueId}/dining"
-      },
       {
        "kind": "detailPanel",
        "label": "The venue map",
@@ -3977,18 +3657,6 @@
    "offline": "Cached map. **The zone list always works** because it is text"
   },
   "apis": [
-   {
-    "operationId": "listDiningOutlets",
-    "contract": "fnb",
-    "purpose": "Where a guest can eat, right now",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "listDeliveryLocations",
-    "contract": "fnb",
-    "purpose": "Where an order can be delivered",
-    "trigger": "onLoad"
-   },
    {
     "operationId": "getVenueMap",
     "contract": "venue-map",

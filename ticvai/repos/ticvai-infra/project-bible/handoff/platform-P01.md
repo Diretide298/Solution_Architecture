@@ -5,16 +5,16 @@
 | | |
 |---|---|
 | Screens | 50 |
-| Operations | 216 |
+| Operations | 211 |
 | Contracts | 19 |
 | Modules | 14 |
 | Undrawn | 0 |
-| Operations with no screen | 19 |
+| Operations with no screen | 17 |
 | Waves | wave1 22 · wave2 21 · wave3 7 |
 
 ## Gaps
 
-### 19 operations with no screen here
+### 17 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -22,18 +22,16 @@
 |---|---|---|---|
 | `createParkingEntitlement` | access | POST | A guest bought parking |
 | `getPlanBenefits` | catalogue | GET | Which benefits a plan grants, and how much of each |
+| `joinWaitlist` | catalogue | POST | Ask to be told if capacity frees up |
+| `leaveWaitlist` | catalogue | DELETE | Stop waiting |
+| `listGuestMemberships` | catalogue | GET | A guest's memberships, benefits and history |
 | `listMembershipBenefits` | catalogue | GET | Benefits a plan can grant |
 | `listMembershipProgrammes` | catalogue | GET | Membership schemes, the level above a plan |
+| `claimTableSession` | fnb | POST | Identify which table a guest is sitting at |
 | `listCustomerMemberships` | identity | GET | Memberships a customer holds |
 | `checkGuestCheckoutMatch` | marketing-crm | POST | Does this contact already have a profile here |
 | `decideGuestCheckoutMatch` | marketing-crm | POST | Use the existing profile or keep this booking separate |
-| `getForm` | marketing-crm | GET | One form, to fill in or to edit |
-| `getMyProfile` | marketing-crm | GET | A guest reading their own details |
-| `listBadges` | marketing-crm | GET | Badges a guest can be awarded |
-| `listCustomerBadges` | marketing-crm | GET | Badges a guest holds |
-| `listLeaderboard` | marketing-crm | GET | Standings, by nickname |
-| `listRewards` | marketing-crm | GET | What points can be turned into |
-| `setLeaderboardNickname` | marketing-crm | PUT | Choose the name shown on the board |
+| `uploadGuestDocument` | marketing-crm | POST | Store a guest photo, ID or signed document |
 | `listTicketTransfers` | orders | GET | The ticket transfers this guest sent or received |
 | `revokeEntitlementShare` | orders | POST | Take back a share |
 | `getUpsellSuggestions` | promotions | POST | Suggestions for a cart |
@@ -80,45 +78,45 @@
 | `WEB-005` | Ticket Type Selection | Booking & Selection | 1 | 6 | yes |
 | `WEB-006` | Date & Performance Selection | Booking & Selection | 1 | 8 | yes |
 | `WEB-007` | Interactive Seat Selection | Booking & Selection | 2 | 6 | yes |
-| `WEB-008` | Add-ons & Upsell | Booking & Selection | 2 | 6 | yes |
+| `WEB-008` | Add-ons & Upsell | Booking & Selection | 2 | 5 | yes |
 | `WEB-009` | Wishlist | Booking & Selection | 3 | 3 | yes |
 | `WEB-010` | Shopping Cart | Cart & Checkout | 1 | 14 | yes |
-| `WEB-011` | Guest Details & Attendee Forms | Cart & Checkout | 1 | 14 | yes |
+| `WEB-011` | Guest Details & Attendee Forms | Cart & Checkout | 1 | 6 | yes |
 | `WEB-012` | Checkout — Payment | Cart & Checkout | 1 | 6 | yes |
 | `WEB-013` | Booking Confirmation | Cart & Checkout | 1 | 3 | yes |
 | `WEB-014` | Pay for a Booking | Cart & Checkout | 1 | 2 | yes |
 | `WEB-015` | Branded Queue / Waiting Room | High-Demand Access | 2 | 2 | yes |
 | `WEB-016` | Login / Register | Account & Self-Service | 1 | 14 | yes |
-| `WEB-017` | My Account Dashboard | Account & Self-Service | 1 | 9 | yes |
+| `WEB-017` | My Account Dashboard | Account & Self-Service | 1 | 7 | yes |
 | `WEB-018` | My Tickets | Account & Self-Service | 1 | 8 | yes |
-| `WEB-019` | Order History | Account & Self-Service | 1 | 10 | yes |
-| `WEB-020` | Profile & Preferences | Account & Self-Service | 1 | 8 | yes |
+| `WEB-019` | Order History | Account & Self-Service | 1 | 8 | yes |
+| `WEB-020` | Profile & Preferences | Account & Self-Service | 1 | 9 | yes |
 | `WEB-021` | Wallet & Gift Cards | Membership, Loyalty & Value | 2 | 11 | yes |
-| `WEB-022` | Membership Plans | Membership, Loyalty & Value | 2 | 4 | yes |
-| `WEB-023` | Membership Management | Membership, Loyalty & Value | 2 | 9 | yes |
-| `WEB-024` | Devices, Wishlist & Consent | Membership, Loyalty & Value | 3 | 23 | yes |
-| `WEB-025` | Help Centre / FAQ | Engagement & Support | 1 | 3 | yes |
-| `WEB-026` | Survey & Feedback | Engagement & Support | 3 | 1 | yes |
-| `WEB-027` | Newsletter Subscription | Engagement & Support | 2 | 9 | yes |
+| `WEB-022` | Membership Plans | Membership, Loyalty & Value | 2 | 3 | yes |
+| `WEB-023` | Membership Management | Membership, Loyalty & Value | 2 | 7 | yes |
+| `WEB-024` | Devices, Wishlist & Consent | Membership, Loyalty & Value | 3 | 20 | yes |
+| `WEB-025` | Help Centre / FAQ | Engagement & Support | 1 | 5 | yes |
+| `WEB-026` | Survey & Feedback | Engagement & Support | 3 | 5 | yes |
+| `WEB-027` | Newsletter Subscription | Engagement & Support | 2 | 5 | yes |
 | `WEB-028` | Contact & Venue Information | Engagement & Support | 1 | 1 | yes |
-| `WEB-029` | Error / Sold Out / Maintenance | System States | 1 | 1 | yes |
-| `WEB-030` | Ticket Transfer | Ticketing | 1 | 4 | yes |
+| `WEB-029` | Error / Sold Out / Maintenance | System States | 1 | 2 | yes |
+| `WEB-030` | Ticket Transfer | Ticketing | 1 | 3 | yes |
 | `WEB-031` | My Reservations | Ticketing | 2 | 9 | yes |
 | `WEB-032` | Offers & Promotions | Promotions | 2 | 2 | yes |
 | `WEB-033` | Shop | Retail | 2 | 5 | yes |
-| `WEB-034` | Lost & Found | Support | 3 | 3 | yes |
+| `WEB-034` | Lost & Found | Support | 3 | 4 | yes |
 | `WEB-035` | Multi-Currency & Pricing | Ticketing | 1 | 2 | yes |
-| `WEB-036` | F&B – Browse & Order | In-venue Services | 2 | 14 | yes |
-| `WEB-037` | Menu Item Detail | In-venue Services | 2 | 2 | yes |
-| `WEB-038` | F&B – Order Tracking | In-venue Services | 2 | 3 | yes |
+| `WEB-036` | F&B – Browse & Order | In-venue Services | 2 | 13 | yes |
+| `WEB-037` | Menu Item Detail | In-venue Services | 2 | 1 | yes |
+| `WEB-038` | F&B – Order Tracking | In-venue Services | 2 | 2 | yes |
 | `WEB-039` | Venue Map & Wait Times | In-venue Services | 2 | 4 | yes |
-| `WEB-040` | Virtual Queue | In-venue Services | 2 | 6 | yes |
-| `WEB-041` | Parking – Reserve & Pay | In-venue Services | 2 | 5 | yes |
-| `WEB-042` | Retail & Shop and Drop | Retail | 2 | 6 | yes |
-| `WEB-043` | Loyalty & Rewards | Membership, Loyalty & Value | 2 | 7 | yes |
+| `WEB-040` | Virtual Queue | In-venue Services | 2 | 4 | yes |
+| `WEB-041` | Parking – Reserve & Pay | In-venue Services | 2 | 3 | yes |
+| `WEB-042` | Retail & Shop and Drop | Retail | 2 | 3 | yes |
+| `WEB-043` | Loyalty & Rewards | Membership, Loyalty & Value | 2 | 11 | yes |
 | `WEB-044` | AI Concierge – Home | Engagement & Support | 2 | 8 | yes |
-| `WEB-045` | Help Centre & Accessibility | Support | 2 | 3 | yes |
-| `WEB-046` | In-Venue Notifications | Engagement & Support | 2 | 3 | yes |
+| `WEB-045` | Help Centre & Accessibility | Support | 2 | 4 | yes |
+| `WEB-046` | In-Venue Notifications | Engagement & Support | 2 | 2 | yes |
 | `WEB-047` | Map Booking — Cabanas & Spots | Booking & Selection | 3 | 8 | yes |
 | `WEB-048` | Book a Space by the Hour | Booking & Selection | 3 | 4 | yes |
 | `WEB-049` | Transport — Route & Schedule | Transport | 3 | 13 | yes |

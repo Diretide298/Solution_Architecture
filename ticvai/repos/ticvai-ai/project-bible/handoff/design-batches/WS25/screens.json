@@ -39,7 +39,7 @@
     {
      "to": "SUP-001",
      "trigger": "Agent Login",
-     "provenance": "derived — SUP-001 declares entryState.params challengeId and SUP-009 holds none of them. The edge carries nothing: SUP-009 is opened from SUP-001, so this edge is the way back and SUP-001 keeps its own state"
+     "provenance": "derived — SUP-001 declares entryState.params challengeId, methodId, providerId and SUP-009 holds none of them. The edge carries nothing: SUP-009 is opened from SUP-001, so this edge is the way back and SUP-001 keeps its own state"
     },
     {
      "to": "SUP-010",
@@ -63,7 +63,10 @@
      "to": "SUP-013",
      "trigger": "Works in Case Investigation & Resolution Workspace",
      "provenance": "flow F134 step 7→8",
-     "operation": "listCustomerService"
+     "operation": "listCustomerService",
+     "carries": [
+      "caseId"
+     ]
     },
     {
      "to": "SUP-014",
@@ -87,7 +90,10 @@
      "to": "SUP-017",
      "trigger": "Works in Case Resolution, Closure & Customer Feedback",
      "provenance": "flow F134 step 15→16",
-     "operation": "listCustomerService"
+     "operation": "listCustomerService",
+     "carries": [
+      "caseId"
+     ]
     },
     {
      "to": "SUP-018",
@@ -786,6 +792,12 @@
        "kind": "primaryButton",
        "label": "Create",
        "provenance": "contract operation createCaseClassificationIntelligent"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Create case",
+       "operation": "createCase",
+       "provenance": "contract marketing-crm.yaml POST /cases; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -809,6 +821,13 @@
     "contract": "marketing-crm",
     "purpose": "List case categories and subcategories",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "createCase",
+    "contract": "marketing-crm",
+    "purpose": "Raise the classified case",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-005)"
    }
   ],
   "wireframe": {
@@ -818,6 +837,23 @@
    "workshopBoard": "wireframes/WS42 Customer Service Board 1.dc.html#sup-012"
   },
   "apisNote": "Regenerated 9 September 2026 from Customer Service_Reference.pdf page 9. 0 of 0 labels bound to a contract property; 14 of 48 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formCreateCase",
+    "component": "modal",
+    "trigger": "Create case",
+    "body": "**Collects what `createCase` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Create case",
+     "operation": "createCase"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "contract marketing-crm.yaml POST /cases; wiring fix, 2 October 2026"
+   }
+  ],
+  "entryState": {},
   "_platform": {
    "code": "P12",
    "audience": "staff",
@@ -915,6 +951,13 @@
        "bindsTo": "CaseInvestigationResolutionWorkspaceView",
        "operation": "setCaseInvestigationResolution",
        "provenance": "pack Customer Service_Reference.pdf, page 11 §Display"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The case",
+       "bindsTo": "CaseDetail",
+       "operation": "getCase",
+       "provenance": "contract marketing-crm.yaml GET /cases/{caseId}; wiring fix, 2 October 2026"
       }
      ]
     },
@@ -952,6 +995,30 @@
        "kind": "primaryButton",
        "label": "Action history",
        "provenance": "pack Customer Service_Reference.pdf, page 11 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Add message",
+       "operation": "addCaseMessage",
+       "provenance": "contract marketing-crm.yaml POST /cases/{caseId}/messages; wiring fix, 2 October 2026"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save case",
+       "operation": "updateCase",
+       "provenance": "contract marketing-crm.yaml PATCH /cases/{caseId}; wiring fix, 2 October 2026"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Attach file",
+       "operation": "createUpload",
+       "provenance": "contract assets.yaml POST /media/uploads; wiring fix, 2 October 2026"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Confirm attachment",
+       "operation": "completeUpload",
+       "provenance": "contract assets.yaml POST /media/uploads/{uploadId}/complete; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -970,6 +1037,41 @@
     "contract": "marketing-crm",
     "purpose": "Case Investigation & Resolution Workspace",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "getCase",
+    "contract": "marketing-crm",
+    "purpose": "The case with its thread",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-005)"
+   },
+   {
+    "operationId": "addCaseMessage",
+    "contract": "marketing-crm",
+    "purpose": "Reply or add an internal note",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-005)"
+   },
+   {
+    "operationId": "updateCase",
+    "contract": "marketing-crm",
+    "purpose": "Resolve or reprioritise the case",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-005)"
+   },
+   {
+    "operationId": "createUpload",
+    "contract": "assets",
+    "purpose": "Get a signed URL for an attachment",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-005)"
+   },
+   {
+    "operationId": "completeUpload",
+    "contract": "assets",
+    "purpose": "Confirm the attachment",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-005)"
    }
   ],
   "entryState": {
@@ -980,6 +1082,16 @@
     "CaseInvestigationResolutionWorkspaceView.category",
     "CaseInvestigationResolutionWorkspaceView.priority",
     "CaseInvestigationResolutionWorkspaceView.status"
+   ],
+   "params": [
+    {
+     "name": "caseId",
+     "from": "navigation"
+    },
+    {
+     "name": "uploadId",
+     "from": "navigation"
+    }
    ]
   },
   "wireframe": {
@@ -989,6 +1101,50 @@
    "workshopBoard": "wireframes/WS42 Customer Service Board 1.dc.html#sup-013"
   },
   "apisNote": "Regenerated 9 September 2026 from Customer Service_Reference.pdf page 11. 11 of 11 labels bound to a contract property; 12 of 48 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formAddCaseMessage",
+    "component": "modal",
+    "trigger": "Add message",
+    "body": "**Collects what `addCaseMessage` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Add message",
+     "operation": "addCaseMessage"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "contract marketing-crm.yaml POST /cases/{caseId}/messages; wiring fix, 2 October 2026"
+   },
+   {
+    "id": "formUpdateCase",
+    "component": "modal",
+    "trigger": "Save case",
+    "body": "**Collects what `updateCase` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save case",
+     "operation": "updateCase"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "contract marketing-crm.yaml PATCH /cases/{caseId}; wiring fix, 2 October 2026"
+   },
+   {
+    "id": "formCreateUpload",
+    "component": "modal",
+    "trigger": "Attach file",
+    "body": "**Collects what `createUpload` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Attach file",
+     "operation": "createUpload"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "contract assets.yaml POST /media/uploads; wiring fix, 2 October 2026"
+   }
+  ],
   "_platform": {
    "code": "P12",
    "audience": "staff",
@@ -1081,6 +1237,12 @@
        ],
        "notes": "The pack filters this screen by order number, ticket number, booking reference, customer, email, mobile and 3 more — which are present is a decision the pack already made.",
        "provenance": "pack Customer Service_Reference.pdf, page 13 §Search by"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Orders",
+       "operation": "listOrders",
+       "provenance": "contract orders.yaml GET /orders; wiring fix, 2 October 2026"
       }
      ]
     },
@@ -1164,6 +1326,13 @@
     "contract": "marketing-crm",
     "purpose": "Order, Booking & Ticket Service Workspace",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "listOrders",
+    "contract": "orders",
+    "purpose": "Find the guest's order",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-005)"
    }
   ],
   "entryState": {
@@ -1519,6 +1688,13 @@
    "workshopBoard": "wireframes/WS42 Customer Service Board 1.dc.html#sup-016"
   },
   "apisNote": "Regenerated 9 September 2026 from Customer Service_Reference.pdf page 16. 0 of 0 labels bound to a contract property; 8 of 36 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-007): No operation raises an internal collaboration request on a case.",
+    "source": "contracts/satellite/marketing-crm.yaml#listEscalationCollaborationInternal"
+   }
+  ],
   "_platform": {
    "code": "P12",
    "audience": "staff",
@@ -1701,6 +1877,17 @@
        "provenance": "pack Customer Service_Reference.pdf, page 17 §Where configured, send"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "components": [
+      {
+       "kind": "secondaryButton",
+       "label": "Close case",
+       "operation": "updateCase",
+       "provenance": "contract marketing-crm.yaml PATCH /cases/{caseId}; wiring fix, 2 October 2026"
+      }
+     ]
     }
    ]
   },
@@ -1716,6 +1903,13 @@
     "contract": "marketing-crm",
     "purpose": "Case Resolution, Closure & Customer Feedback",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "updateCase",
+    "contract": "marketing-crm",
+    "purpose": "Resolve and close a case with its note",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-005)"
    }
   ],
   "wireframe": {
@@ -1725,6 +1919,30 @@
    "workshopBoard": "wireframes/WS42 Customer Service Board 1.dc.html#sup-017"
   },
   "apisNote": "Regenerated 9 September 2026 from Customer Service_Reference.pdf page 17. 0 of 0 labels bound to a contract property; 22 of 45 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formUpdateCase",
+    "component": "modal",
+    "trigger": "Close case",
+    "body": "**Collects what `updateCase` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Close case",
+     "operation": "updateCase"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "contract marketing-crm.yaml PATCH /cases/{caseId}; wiring fix, 2 October 2026"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "caseId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P12",
    "audience": "staff",
@@ -1777,10 +1995,10 @@
    "notes": "**Reached from SUP-009, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
   },
   "density": "compact",
-  "purposeNote": "Agents receive explainable, context-aware AI assistance that reduces handling time and improves consistency without bypassing TICVAI's policies, permissions or transactional systems. Board 1 — Final Screen Register",
+  "purposeNote": "Agents receive explainable, context-aware AI assistance that reduces handling time and improves consistency without bypassing TICVAI's policies, permissions or transactional systems. Board 1 — Final Screen Register Purpose rewritten 2 October 2026 (CHG-WIR-013): The purpose was a pasted board description (design-notes correction ai SUP-018).",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
-  "purpose": "Create the AI intelligence layer assisting agents throughout the service journey. This should not be a simple chatbot added to the side of the screen. It should understand the customer + transaction + policy + case context. Board 1 focused on the individual customer-service agent and individual customer case. Board 2 moves one level higher and provides the supervisor, contact-center manager, operations manager and service leadership layer.",
+  "purpose": "Configure the agent copilot and the assistant profile it answers with.",
   "gaps": [
    {
     "operation": null,

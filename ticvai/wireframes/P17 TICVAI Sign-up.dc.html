@@ -158,7 +158,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; scoreVsiAssessment</div>
+          <div><b>OPERATIONS</b> &middot; none declared</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess · emptyNoResults</span></div>
           
           <div><b>GOES TO</b> &middot; entry point · <a href="#sgn-002">SGN-002</a>  &mdash; <i>Customer &amp; Organization Registration</i></div>
@@ -183,14 +183,14 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><b>Submit</b><div class="chip cta">Submit</div><span class="why">The act the screen exists for.</span></div><div class="panel"><b>Cancel</b><div class="chip">Cancel</div><span class="why">**A screen that can submit must be leaveable without submitting.**</span></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Work email</b><div class="chip">Work email</div><span class="why">Step one of the prospect sign-up session (DEC-167, &quot;Email + one-time code&quot;): the code goes to this address; &quot;Continue saved setup&quot; is the same field (</span></div><div class="panel"><b>Send code</b><div class="chip">Send code</div><span class="why">Sends the one-time code; the answer is the same whether or not the email has a saved setup.</span></div><div class="panel"><b>One-time code</b><div class="chip">One-time code</div><span class="why">Six digits from the email; a right code opens the sign-up session (prospectAuth) the rest of the journey runs on and resumes a saved setup (CHG-CLN-019).</span></div></div><div class="side"><div class="panel"><b>Verify code</b><div class="chip">Verify code</div><span class="why">A wrong code says so and counts against the challenge; after five, Send code again.</span></div><div class="panel"><b>Submit</b><div class="chip cta">Submit</div><span class="why">The act the screen exists for.</span></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; submitOnboardingApplication</div>
+          <div><b>OPERATIONS</b> &middot; submitOnboardingApplication · startProspectSignup · verifyProspectSignupCode</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; challengeId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#sgn-001">SGN-001</a>  &mdash; <i>Back to Welcome &amp; Start Your TICVAI Journey</i><br><a href="#sgn-003">SGN-003</a>  &mdash; <i>Venue Type &amp; Business Profile</i></div>
           
           
@@ -213,7 +213,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><b>Every venue type business</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Venue type</b><div class="chip">Venue type</div><span class="why">The venue types the prospect chooses from (Museum, Attraction, Theme Park, Waterpark, Stadium, Theatre, Exhibition / Event Venue, Zoo / Aquarium, Tour Operator, Entertain</span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the split template — not declared on the screen.</span></div></div></div>
             </div>
           </div>
         </div>
@@ -278,8 +278,8 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listSaleChannel · scoreVsiAssessment</div>
-          <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess · emptyNoResults</span></div>
+          <div><b>OPERATIONS</b> &middot; scoreVsiAssessment</div>
+          <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#sgn-004">SGN-004</a>  &mdash; <i>Back to Visitor, Capacity &amp; Operational Scal</i><br><a href="#sgn-006">SGN-006</a>  &mdash; <i>Ticketing &amp; Product Requirements</i></div>
           
@@ -603,12 +603,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><b>Save module listing</b><div class="chip cta">Save module listing</div><span class="why">The act the screen exists for.</span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue&#x27;s busiest hour is a list that skips rows.</span></div><div class="panel"><b>Cancel</b><div class="chip">Cancel</div><span class="why">**A screen that can submit must be leaveable without submitting.**</span></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue&#x27;s busiest hour is a list that skips rows.</span></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; setModuleListing · listModuleCatalogue</div>
+          <div><b>OPERATIONS</b> &middot; listModuleCatalogue</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#sgn-011">SGN-011</a>  &mdash; <i>Back to Recommended Package Overview</i></div>
@@ -663,12 +663,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><b>Save trial configuration</b><div class="chip cta">Save trial configuration</div><span class="why">The act the screen exists for.</span></div><div class="panel"><b>Cancel</b><div class="chip">Cancel</div><span class="why">**A screen that can submit must be leaveable without submitting.**</span></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the split template — not declared on the screen.</span></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; setTrialConfiguration</div>
+          <div><b>OPERATIONS</b> &middot; none declared</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#sgn-011">SGN-011</a>  &mdash; <i>Back to Recommended Package Overview</i><br><a href="#sgn-019">SGN-019</a>  &mdash; <i>Contract &amp; Billing Cycle Selection</i></div>
@@ -710,7 +710,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
         <div>
           <div class="hdr"><span class="code">SGN-020</span>
             <span class="ttl">Billing &amp; Legal Entity Information</span></div>
-          <div class="pur">Capture the legally correct customer and billing information.</div>
+          <div class="pur">Capture the company TICVAI will invoice and its trade licence and tax registration, in plain language, saved on the application.</div>
         </div>
         <div class="frame">
           <aside class="rail"><div class="brand"><b>TICVAI</b><span>Purchase &amp; Activation</span></div><nav class="nav"><i class="">Apply</i><i class="on">My application</i><i class="">Help</i></nav></aside>
@@ -723,13 +723,13 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the split template — not declared on the screen.</span></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Company to be invoiced (legal name)</b><div class="chip">Company to be invoiced (legal name)</div><span class="why">Prints on the tax invoice exactly as entered. **The commercial customer may differ from the operating venue** (the pack&#x27;s &quot;Commercial Customer ≠ Operating Venue</span></div><div class="panel"><b>Country</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Decides which documents are required (tenancy `RegionSettings`).</span></div><div class="panel"><b>Trade licence number</b><div class="chip">Trade licence number</div></div></div><div class="side"><div class="panel"><b>Tax registration number (TRN)</b><div class="chip">Tax registration number (TRN)</div><span class="why">Optional. Entering one makes the VAT certificate required (decided 2 October 2026, workbook Q210, DEC-210).</span></div><div class="panel"><b>Billing address</b><div class="chip">Billing address</div></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; createLegalEntity</div>
-          <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
+          <div><b>OPERATIONS</b> &middot; submitOnboardingApplication</div>
+          <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#sgn-019">SGN-019</a>  &mdash; <i>Back to Contract &amp; Billing Cycle Selection</i><br><a href="#sgn-021">SGN-021</a>  &mdash; <i>Payment Method &amp; Settlement Setup</i></div>
           

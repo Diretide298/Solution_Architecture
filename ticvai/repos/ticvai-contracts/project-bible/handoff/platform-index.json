@@ -5,11 +5,11 @@
   "operator": "guest",
   "counts": {
    "screens": 50,
-   "operations": 216,
+   "operations": 211,
    "contracts": 19,
    "modules": 14,
    "undrawn": 0,
-   "operationsWithNoScreen": 19
+   "operationsWithNoScreen": 17
   },
   "waves": {
    "wave1": 22,
@@ -23,16 +23,16 @@
   "operator": "guest",
   "counts": {
    "screens": 77,
-   "operations": 219,
+   "operations": 213,
    "contracts": 19,
    "modules": 17,
    "undrawn": 0,
-   "operationsWithNoScreen": 19
+   "operationsWithNoScreen": 17
   },
   "waves": {
    "wave1": 25,
-   "wave2": 35,
-   "wave3": 17
+   "wave2": 36,
+   "wave3": 16
   }
  },
  "P04": {
@@ -40,15 +40,15 @@
   "app": "venue-pos",
   "operator": "venue",
   "counts": {
-   "screens": 30,
-   "operations": 148,
-   "contracts": 20,
+   "screens": 32,
+   "operations": 151,
+   "contracts": 19,
    "modules": 4,
    "undrawn": 0,
-   "operationsWithNoScreen": 155
+   "operationsWithNoScreen": 158
   },
   "waves": {
-   "wave1": 27,
+   "wave1": 29,
    "wave2": 3
   }
  },
@@ -58,11 +58,11 @@
   "operator": "guest",
   "counts": {
    "screens": 17,
-   "operations": 23,
+   "operations": 24,
    "contracts": 8,
    "modules": 2,
    "undrawn": 0,
-   "operationsWithNoScreen": 16
+   "operationsWithNoScreen": 14
   },
   "waves": {
    "wave2": 17
@@ -74,11 +74,11 @@
   "operator": "venue",
   "counts": {
    "screens": 96,
-   "operations": 224,
-   "contracts": 19,
+   "operations": 217,
+   "contracts": 21,
    "modules": 4,
    "undrawn": 0,
-   "operationsWithNoScreen": 136
+   "operationsWithNoScreen": 144
   },
   "waves": {
    "wave1": 25,
@@ -92,11 +92,11 @@
   "operator": "venue",
   "counts": {
    "screens": 11,
-   "operations": 28,
-   "contracts": 6,
+   "operations": 24,
+   "contracts": 5,
    "modules": 1,
    "undrawn": 0,
-   "operationsWithNoScreen": 43
+   "operationsWithNoScreen": 46
   },
   "waves": {
    "wave1": 11
@@ -107,17 +107,17 @@
   "app": "venue-management-web",
   "operator": "venue",
   "counts": {
-   "screens": 1186,
-   "operations": 1460,
-   "contracts": 32,
-   "modules": 14,
+   "screens": 1661,
+   "operations": 1839,
+   "contracts": 31,
+   "modules": 19,
    "undrawn": 0,
-   "operationsWithNoScreen": 188
+   "operationsWithNoScreen": 195
   },
   "waves": {
-   "wave1": 60,
-   "wave2": 86,
-   "wave3": 1040
+   "wave1": 61,
+   "wave2": 85,
+   "wave3": 1515
   }
  },
  "P09": {
@@ -125,17 +125,17 @@
   "app": "ticvai-web",
   "operator": "ticvai",
   "counts": {
-   "screens": 676,
-   "operations": 722,
-   "contracts": 20,
-   "modules": 14,
+   "screens": 211,
+   "operations": 269,
+   "contracts": 14,
+   "modules": 13,
    "undrawn": 0,
-   "operationsWithNoScreen": 164
+   "operationsWithNoScreen": 109
   },
   "waves": {
-   "wave1": 12,
-   "wave2": 16,
-   "wave3": 648
+   "wave1": 13,
+   "wave2": 17,
+   "wave3": 181
   }
  },
  "P10": {
@@ -143,16 +143,16 @@
   "app": "partner-web",
   "operator": "partner",
   "counts": {
-   "screens": 51,
-   "operations": 142,
+   "screens": 43,
+   "operations": 118,
    "contracts": 10,
    "modules": 9,
    "undrawn": 0,
-   "operationsWithNoScreen": 2
+   "operationsWithNoScreen": 4
   },
   "waves": {
    "wave2": 11,
-   "wave3": 40
+   "wave3": 32
   }
  },
  "P11": {
@@ -161,7 +161,7 @@
   "operator": "public",
   "counts": {
    "screens": 8,
-   "operations": 16,
+   "operations": 17,
    "contracts": 1,
    "modules": 2,
    "undrawn": 0,
@@ -177,11 +177,11 @@
   "operator": "venue",
   "counts": {
    "screens": 28,
-   "operations": 62,
-   "contracts": 7,
+   "operations": 67,
+   "contracts": 8,
    "modules": 5,
    "undrawn": 0,
-   "operationsWithNoScreen": 83
+   "operationsWithNoScreen": 88
   },
   "waves": {
    "wave2": 2,
@@ -194,11 +194,11 @@
   "operator": "venue",
   "counts": {
    "screens": 103,
-   "operations": 176,
-   "contracts": 10,
+   "operations": 194,
+   "contracts": 8,
    "modules": 3,
    "undrawn": 0,
-   "operationsWithNoScreen": 116
+   "operationsWithNoScreen": 103
   },
   "waves": {
    "wave1": 3,
@@ -229,11 +229,11 @@
   "operator": "venue",
   "counts": {
    "screens": 10,
-   "operations": 27,
-   "contracts": 3,
+   "operations": 26,
+   "contracts": 2,
    "modules": 1,
    "undrawn": 0,
-   "operationsWithNoScreen": 23
+   "operationsWithNoScreen": 9
   },
   "waves": {
    "wave2": 10
@@ -244,15 +244,15 @@
   "app": "venue-management-web",
   "operator": "venue",
   "counts": {
-   "screens": 70,
-   "operations": 84,
-   "contracts": 11,
+   "screens": 71,
+   "operations": 94,
+   "contracts": 10,
    "modules": 1,
    "undrawn": 0,
-   "operationsWithNoScreen": 124
+   "operationsWithNoScreen": 121
   },
   "waves": {
-   "wave3": 70
+   "wave3": 71
   }
  },
  "P17": {
@@ -261,8 +261,8 @@
   "operator": "public",
   "counts": {
    "screens": 24,
-   "operations": 14,
-   "contracts": 4,
+   "operations": 12,
+   "contracts": 3,
    "modules": 3,
    "undrawn": 0,
    "operationsWithNoScreen": 0

@@ -133,38 +133,6 @@
   "requestBody": null,
   "responds": "GuestSession"
  },
- "getMyIdentityVerification": {
-  "method": "GET",
-  "path": "/auth/guest/identity-verifications/current",
-  "contract": "identity",
-  "summary": "The guest's own latest identity verification",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "IdentityGuestVerification"
- },
- "getWaiverStatus": {
-  "method": "GET",
-  "path": "/guests/{subjectId}/waiver-status",
-  "contract": "marketing-crm",
-  "summary": "Whether this guest may be issued a ticket that requires a waiver",
-  "permission": "GUEST_VIEW",
-  "offlineCapable": true,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "productId",
-    "in": "query",
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": null
- },
  "guestLogout": {
   "method": "DELETE",
   "path": "/auth/guest/session",
@@ -387,25 +355,6 @@
   ],
   "requestBody": null,
   "responds": "PaymentToken"
- },
- "submitGuestIdentityDocument": {
-  "method": "POST",
-  "path": "/auth/guest/identity-verifications",
-  "contract": "identity",
-  "summary": "Submit an identity document for verification",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "IdentityGuestDocumentSubmission",
-  "responds": "IdentityGuestVerification"
  },
  "transferWalletBalance": {
   "method": "POST",

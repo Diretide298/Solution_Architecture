@@ -1,42 +1,4 @@
 {
- "addToWishlist": {
-  "method": "POST",
-  "path": "/guests/{subjectId}/wishlist",
-  "contract": "marketing-crm",
-  "summary": "Save an item",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "subject",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Wishlist"
- },
- "claimLocationSession": {
-  "method": "POST",
-  "path": "/location-sessions",
-  "contract": "fnb",
-  "summary": "Tell the platform where the guest is",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "LocationSession"
- },
  "createAiConversation": {
   "method": "POST",
   "path": "/conversations",
@@ -56,24 +18,37 @@
   "requestBody": null,
   "responds": "AiConversation"
  },
- "createCase": {
-  "method": "POST",
-  "path": "/cases",
+ "getForm": {
+  "method": "GET",
+  "path": "/forms/{formId}",
   "contract": "marketing-crm",
-  "summary": "Raise a service case",
-  "permission": "CASE_MANAGE",
-  "offlineCapable": true,
-  "conflictPolicy": "append",
+  "summary": "One form, to fill in or to edit",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
-    "name": null,
-    "in": null,
+    "name": "version",
+    "in": "query",
     "required": null
    }
   ],
-  "requestBody": "CreateCaseRequest",
-  "responds": "Case"
+  "requestBody": null,
+  "responds": "FormDefinition"
+ },
+ "getGuestConsents": {
+  "method": "GET",
+  "path": "/guests/{subjectId}/consents",
+  "contract": "marketing-crm",
+  "summary": "Read a guest's consent state",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ConsentState"
  },
  "getGuestMenu": {
   "method": "GET",
@@ -112,6 +87,25 @@
   "requestBody": null,
   "responds": "MarketingSubscription"
  },
+ "getPublishedTenantConfig": {
+  "method": "GET",
+  "path": "/storefront/tenant-config",
+  "contract": "white-label",
+  "summary": "The published guest-facing configuration, before anyone signs in",
+  "permission": null,
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": false
+   }
+  ],
+  "requestBody": null,
+  "responds": "PublishedTenantConfig"
+ },
  "getTenantAppStatus": {
   "method": "GET",
   "path": "/tenant-config/status",
@@ -124,19 +118,6 @@
   "parameters": [],
   "requestBody": null,
   "responds": "TenantAppStatus"
- },
- "getWishlist": {
-  "method": "GET",
-  "path": "/guests/{subjectId}/wishlist",
-  "contract": "marketing-crm",
-  "summary": "Read a guest's saved items",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "subject",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "Wishlist"
  },
  "handoverToAgent": {
   "method": "POST",
@@ -181,41 +162,16 @@
   "requestBody": null,
   "responds": "Page"
  },
- "listCases": {
+ "listConsentPurposes": {
   "method": "GET",
-  "path": "/cases",
+  "path": "/consent-purposes",
   "contract": "marketing-crm",
-  "summary": "List service cases",
-  "permission": "CASE_VIEW",
-  "offlineCapable": false,
+  "summary": "Configured consent purposes",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": true,
   "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
+  "scopeLevel": "tenant",
   "parameters": [
-   {
-    "name": "status",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "assignedToPrincipalId",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "breachedSla",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "priority",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "membershipId",
-    "in": "query",
-    "required": null
-   },
    {
     "name": null,
     "in": null,
@@ -230,15 +186,15 @@
   "requestBody": null,
   "responds": "Page"
  },
- "listGuestDevices": {
+ "listMyCases": {
   "method": "GET",
-  "path": "/guests/{subjectId}/devices",
+  "path": "/my/cases",
   "contract": "marketing-crm",
-  "summary": "A guest's registered devices",
+  "summary": "The cases this guest raised",
   "permission": null,
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
-  "scopeLevel": "subject",
+  "scopeLevel": "tenant",
   "parameters": [
    {
     "name": null,
@@ -288,6 +244,53 @@
   "requestBody": null,
   "responds": "Page"
  },
+ "listMyOrders": {
+  "method": "GET",
+  "path": "/my/orders",
+  "contract": "orders",
+  "summary": "The orders this guest placed",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": "since",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listPublishedFaqs": {
+  "method": "GET",
+  "path": "/storefront/faqs",
+  "contract": "white-label",
+  "summary": "The published FAQs, readable before sign-in",
+  "permission": null,
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "PublishedFaqCategory"
+ },
  "markMyNotificationsRead": {
   "method": "POST",
   "path": "/me/notifications/read",
@@ -306,6 +309,25 @@
   ],
   "requestBody": null,
   "responds": null
+ },
+ "raiseMyCase": {
+  "method": "POST",
+  "path": "/my/cases",
+  "contract": "marketing-crm",
+  "summary": "Report something — lost property, a complaint, a question",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "append",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Case"
  },
  "recordAnswerFeedback": {
   "method": "POST",
@@ -345,15 +367,15 @@
   "requestBody": "RecordConsentRequest",
   "responds": "ConsentState"
  },
- "registerGuestDevice": {
+ "replyToMyCase": {
   "method": "POST",
-  "path": "/guests/{subjectId}/devices",
+  "path": "/my/cases/{caseId}/messages",
   "contract": "marketing-crm",
-  "summary": "Register a device for push",
+  "summary": "Reply on a case the guest raised",
   "permission": null,
   "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "subject",
+  "conflictPolicy": "append",
+  "scopeLevel": "tenant",
   "parameters": [
    {
     "name": null,
@@ -362,26 +384,7 @@
    }
   ],
   "requestBody": null,
-  "responds": "GuestDevice"
- },
- "removeFromWishlist": {
-  "method": "DELETE",
-  "path": "/guests/{subjectId}/wishlist/{itemId}",
-  "contract": "marketing-crm",
-  "summary": "Remove a saved item",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "subject",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": null
+  "responds": "CaseDetail"
  },
  "requestSuggestion": {
   "method": "POST",
@@ -401,25 +404,6 @@
   ],
   "requestBody": null,
   "responds": "Suggestion"
- },
- "revokeGuestDevice": {
-  "method": "DELETE",
-  "path": "/guests/{subjectId}/devices/{deviceId}",
-  "contract": "marketing-crm",
-  "summary": "Revoke a device registration",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "subject",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": null
  },
  "sendAiMessage": {
   "method": "POST",
@@ -477,6 +461,25 @@
   ],
   "requestBody": "MarketingSubscription",
   "responds": "MarketingSubscription"
+ },
+ "submitForm": {
+  "method": "POST",
+  "path": "/form-submissions",
+  "contract": "marketing-crm",
+  "summary": "Sign a waiver, answer a survey, capture details",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "FormSubmission",
+  "responds": "FormSubmission"
  },
  "submitReview": {
   "method": "POST",

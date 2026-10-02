@@ -1,5 +1,5 @@
 id: LLD-reporting
-title: reporting — 48 operations
+title: reporting — 51 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -209,6 +209,17 @@ operations:
   - reporting.semantic_model
   - reporting.site_normalisation_basis
   writes: []
+- operation: getAnalyticsGovernancePolicy
+  verb: GET
+  path: /analytics-governance-policy
+  scope: tenant
+  permission: REPORT_VIEW_TENANT
+  audience:
+  - staff
+  offline: false
+  reads:
+  - reporting.analytics_governance_policy
+  writes: []
 - operation: getAnalyticsUsage
   verb: GET
   path: /analytics-usage
@@ -323,6 +334,16 @@ operations:
   offline: false
   reads:
   - reporting.semantic_model
+  writes: []
+- operation: getServiceSummary
+  verb: GET
+  path: /service-summary
+  scope: venue
+  permission: REPORT_VIEW_OWN
+  audience:
+  - staff
+  offline: false
+  reads: []
   writes: []
 - operation: getSupplierPerformance
   verb: GET
@@ -587,6 +608,18 @@ operations:
   writes:
   - cache:idempotency
   - reporting.alert_rule
+- operation: setAnalyticsGovernancePolicy
+  verb: PUT
+  path: /analytics-governance-policy
+  scope: tenant
+  permission: REPORT_GOVERNANCE_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - reporting.analytics_governance_policy
+  writes:
+  - reporting.analytics_governance_policy
 - operation: setKpiTargets
   verb: PUT
   path: /kpis/{kpiId}/targets

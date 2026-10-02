@@ -7,15 +7,15 @@
  "audience": "staff",
  "formFactor": "web",
  "offlineCapable": false,
- "generated": "2026-10-01",
+ "generated": "2026-10-02",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 28,
-  "operations": 62,
-  "contracts": 7,
+  "operations": 67,
+  "contracts": 8,
   "modules": 5,
   "undrawn": 0,
-  "operationsWithNoScreen": 83
+  "operationsWithNoScreen": 88
  },
  "waves": {
   "wave2": 2,
@@ -61,11 +61,11 @@
  "contracts": [
   {
    "contract": "marketing-crm",
-   "operations": 38
+   "operations": 39
   },
   {
    "contract": "identity",
-   "operations": 9
+   "operations": 11
   },
   {
    "contract": "reporting",
@@ -76,15 +76,19 @@
    "operations": 4
   },
   {
-   "contract": "finance",
-   "operations": 1
-  },
-  {
-   "contract": "queue",
-   "operations": 1
+   "contract": "assets",
+   "operations": 2
   },
   {
    "contract": "white-label",
+   "operations": 1
+  },
+  {
+   "contract": "orders",
+   "operations": 1
+  },
+  {
+   "contract": "finance",
    "operations": 1
   }
  ],
@@ -95,7 +99,7 @@
    "module": "Access & Availability",
    "wave": 3,
    "route": "/general/agent-login",
-   "operations": 9,
+   "operations": 11,
    "drawn": true
   },
   {
@@ -122,7 +126,7 @@
    "module": "Conversations",
    "wave": 2,
    "route": "/general/conversation-queue",
-   "operations": 10,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -194,7 +198,7 @@
    "module": "Support",
    "wave": 3,
    "route": "/support/case-creation-classification-intelligent-routing-sup-012",
-   "operations": 2,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -203,7 +207,7 @@
    "module": "Support",
    "wave": 3,
    "route": "/support/case-investigation-resolution-workspace-sup-013",
-   "operations": 1,
+   "operations": 6,
    "drawn": true
   },
   {
@@ -212,7 +216,7 @@
    "module": "Support",
    "wave": 3,
    "route": "/support/order-booking-ticket-service-workspace-sup-014",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -239,7 +243,7 @@
    "module": "Support",
    "wave": 3,
    "route": "/support/case-resolution-closure-customer-feedback-sup-017",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -266,7 +270,7 @@
    "module": "Support",
    "wave": 3,
    "route": "/support/queue-configuration-management-sup-020",
-   "operations": 3,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -284,7 +288,7 @@
    "module": "Support",
    "wave": 3,
    "route": "/support/sla-policy-service-level-management-sup-022",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -293,7 +297,7 @@
    "module": "Support",
    "wave": 3,
    "route": "/support/agent-workload-availability-workforce-control-sup-023",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -357,10 +361,10 @@
     "summary": "Draft a seat map from an uploaded plan"
    },
    {
-    "operation": "ingestKnowledgeDocument",
+    "operation": "listIndexJobs",
     "contract": "ai",
-    "verb": "POST",
-    "summary": "Add a document"
+    "verb": "GET",
+    "summary": "Indexing in flight and recently finished"
    },
    {
     "operation": "listIndexSources",
@@ -385,6 +389,12 @@
     "contract": "ai",
     "verb": "DELETE",
     "summary": "Remove one record from the index"
+   },
+   {
+    "operation": "setAiTool",
+    "contract": "ai",
+    "verb": "PUT",
+    "summary": "Register or change a tool (platform)"
    },
    {
     "operation": "setIndexSource",
@@ -471,12 +481,6 @@
     "summary": "A membership with its history, usage and renewals"
    },
    {
-    "operation": "getPasswordPolicy",
-    "contract": "identity",
-    "verb": "GET",
-    "summary": "Read the password and MFA policy in force"
-   },
-   {
     "operation": "getPrincipalModuleAccess",
     "contract": "identity",
     "verb": "GET",
@@ -493,12 +497,6 @@
     "contract": "identity",
     "verb": "GET",
     "summary": "Reusable policy shapes"
-   },
-   {
-    "operation": "listCapabilityTemplates",
-    "contract": "identity",
-    "verb": "GET",
-    "summary": "Saved tick-sets"
    },
    {
     "operation": "listCustomerMemberships",
@@ -543,10 +541,22 @@
     "summary": "Tick what they may do"
    },
    {
+    "operation": "updateRole",
+    "contract": "identity",
+    "verb": "PATCH",
+    "summary": "Rename a role or change its description"
+   },
+   {
     "operation": "actOnWaiverRequirements",
     "contract": "marketing-crm",
     "verb": "POST",
     "summary": "Send, resend or correct participant waiver requirements, one or in bulk"
+   },
+   {
+    "operation": "createInvitationCampaign",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "A quota-bounded, addressed invitation"
    },
    {
     "operation": "getCaseInvestigationResolution",
@@ -561,46 +571,10 @@
     "summary": "Load the layout of a waiver version"
    },
    {
-    "operation": "getForm",
-    "contract": "marketing-crm",
-    "verb": "GET",
-    "summary": "One form, to fill in or to edit"
-   },
-   {
     "operation": "getGuestExtraValues",
     "contract": "marketing-crm",
     "verb": "GET",
     "summary": "What a guest answered"
-   },
-   {
-    "operation": "getLocalizationBrandingCustomer",
-    "contract": "marketing-crm",
-    "verb": "GET",
-    "summary": "Load a waiver version's languages, branding and channels"
-   },
-   {
-    "operation": "getLostItemMatches",
-    "contract": "marketing-crm",
-    "verb": "GET",
-    "summary": "Candidate matches, scored"
-   },
-   {
-    "operation": "getLoyaltyRules",
-    "contract": "marketing-crm",
-    "verb": "GET",
-    "summary": "Every rule a loyalty programme runs on"
-   },
-   {
-    "operation": "getSeoMetadata",
-    "contract": "marketing-crm",
-    "verb": "GET",
-    "summary": "The metadata in force for one page"
-   },
-   {
-    "operation": "getSignatorySignatureGuardian",
-    "contract": "marketing-crm",
-    "verb": "GET",
-    "summary": "Load the signatory rules of a waiver version"
    },
    {
     "operation": "getSuppressionList",
@@ -619,24 +593,6 @@
     "contract": "marketing-crm",
     "verb": "POST",
     "summary": "Issue a reward to a guest"
-   },
-   {
-    "operation": "listBadges",
-    "contract": "marketing-crm",
-    "verb": "GET",
-    "summary": "Badges a guest can be awarded"
-   },
-   {
-    "operation": "listCustomerBadges",
-    "contract": "marketing-crm",
-    "verb": "GET",
-    "summary": "Badges a guest holds"
-   },
-   {
-    "operation": "listForms",
-    "contract": "marketing-crm",
-    "verb": "GET",
-    "summary": "Waivers, surveys and capture forms"
    },
    {
     "operation": "listGuestExtraFields",
@@ -663,22 +619,16 @@
     "summary": "The ledger behind a points balance"
    },
    {
-    "operation": "listPrivacyComplianceExceptions",
+    "operation": "listMessageDispatches",
     "contract": "marketing-crm",
     "verb": "GET",
-    "summary": "The privacy exception queue"
+    "summary": "Messages sent, and whether they arrived"
    },
    {
     "operation": "listRewardAssignments",
     "contract": "marketing-crm",
     "verb": "GET",
     "summary": "Rewards issued to guests, and whether they were used"
-   },
-   {
-    "operation": "listRewards",
-    "contract": "marketing-crm",
-    "verb": "GET",
-    "summary": "What points can be turned into"
    },
    {
     "operation": "listSegmentMembers",
@@ -699,10 +649,10 @@
     "summary": "Signed waivers"
    },
    {
-    "operation": "listWaiverVerificationQueue",
+    "operation": "pauseCampaign",
     "contract": "marketing-crm",
-    "verb": "GET",
-    "summary": "The waiver submissions awaiting or given verification"
+    "verb": "POST",
+    "summary": "Pause a campaign mid-send"
    },
    {
     "operation": "setAgentServiceProfile",
@@ -741,10 +691,10 @@
     "summary": "Create or change a governed contact-centre automation"
    },
    {
-    "operation": "setDataProcessingPurpose",
+    "operation": "setDataRetentionPolicy",
     "contract": "marketing-crm",
     "verb": "PUT",
-    "summary": "Create or change a processing purpose"
+    "summary": "How long guest data is kept, and what happens at expiry"
    },
    {
     "operation": "setDynamicFieldQuestion",
@@ -759,22 +709,10 @@
     "summary": "Record a guest's answers"
    },
    {
-    "operation": "setLegalHold",
-    "contract": "marketing-crm",
-    "verb": "PUT",
-    "summary": "Place, approve or release a legal or operational hold"
-   },
-   {
     "operation": "setPrivacyAction",
     "contract": "marketing-crm",
     "verb": "PUT",
     "summary": "Plan, approve or cancel a privacy action"
-   },
-   {
-    "operation": "setPrivacyRequest",
-    "contract": "marketing-crm",
-    "verb": "PUT",
-    "summary": "Raise or progress a privacy request"
    },
    {
     "operation": "setPrivacyRequestTypes",
@@ -787,6 +725,12 @@
     "contract": "marketing-crm",
     "verb": "PUT",
     "summary": "Record or advance a quality evaluation"
+   },
+   {
+    "operation": "setTrackingTechnologyCatalogueEntry",
+    "contract": "marketing-crm",
+    "verb": "PUT",
+    "summary": "Add or correct a catalogue entry (platform staff)"
    },
    {
     "operation": "setWaiverAssociation",
@@ -813,22 +757,112 @@
     "summary": "Create or change a waiver trigger rule"
    },
    {
-    "operation": "submitForm",
+    "operation": "stopCampaign",
     "contract": "marketing-crm",
     "verb": "POST",
-    "summary": "Sign a waiver, answer a survey, capture details"
+    "summary": "Stop a campaign mid-send"
    },
    {
-    "operation": "overrideWaitingGuest",
-    "contract": "queue",
+    "operation": "unscheduleCampaign",
+    "contract": "marketing-crm",
     "verb": "POST",
-    "summary": "Admit against a failed redemption"
+    "summary": "Pull a scheduled campaign before it sends"
    },
    {
-    "operation": "redeemWaitingGuest",
-    "contract": "queue",
+    "operation": "uploadGuestDocument",
+    "contract": "marketing-crm",
     "verb": "POST",
-    "summary": "Admit a party at the ride"
+    "summary": "Store a guest photo, ID or signed document"
+   },
+   {
+    "operation": "convertToTermProduct",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "Turn a visit into a membership or season pass"
+   },
+   {
+    "operation": "issueInvitation",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "Issue a complimentary entitlement, with no payment expected"
+   },
+   {
+    "operation": "listInvitationAllowances",
+    "contract": "orders",
+    "verb": "GET",
+    "summary": "Who may issue comps, and how many are left"
+   },
+   {
+    "operation": "listMembershipRenewals",
+    "contract": "orders",
+    "verb": "GET",
+    "summary": "Renewal attempts and why they failed"
+   },
+   {
+    "operation": "listOrderDiscounts",
+    "contract": "orders",
+    "verb": "GET",
+    "summary": "Discounts applied to orders"
+   },
+   {
+    "operation": "listOrderFees",
+    "contract": "orders",
+    "verb": "GET",
+    "summary": "Fees charged on an order"
+   },
+   {
+    "operation": "listPaymentProviders",
+    "contract": "orders",
+    "verb": "GET",
+    "summary": "Gateways configured for this scope"
+   },
+   {
+    "operation": "openGuestCreditAccount",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "A credit limit for an individual booking ahead"
+   },
+   {
+    "operation": "overrideCreditLimit",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "Authorise an order beyond the credit limit"
+   },
+   {
+    "operation": "pushWalletPassUpdate",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "Push a change to every device holding it"
+   },
+   {
+    "operation": "revokeEntitlementShare",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "Take back a share"
+   },
+   {
+    "operation": "setB2bCreditLimit",
+    "contract": "orders",
+    "verb": "PUT",
+    "summary": "Set a partner credit limit"
+   },
+   {
+    "operation": "setOrderAmendment",
+    "contract": "orders",
+    "verb": "PUT",
+    "summary": "Order Amendment Workspace"
+   },
+   {
+    "operation": "setOrderDetailTransaction",
+    "contract": "orders",
+    "verb": "PUT",
+    "summary": "Order Detail & Transaction Workspace"
+   },
+   {
+    "operation": "simulateRefund",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "What a refund would do, without doing it"
    },
    {
     "operation": "listAlertRules",
@@ -837,10 +871,10 @@
     "summary": "What raises an alert, and when"
    },
    {
-    "operation": "publishContentBlock",
+    "operation": "setFaqs",
     "contract": "white-label",
-    "verb": "POST",
-    "summary": "Publish now, or schedule it"
+    "verb": "PUT",
+    "summary": "Set FAQ categories and entries"
    }
   ],
   "modulesSplitAcrossWaves": [],

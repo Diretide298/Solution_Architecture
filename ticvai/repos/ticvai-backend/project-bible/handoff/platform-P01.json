@@ -7,15 +7,15 @@
  "audience": "guest",
  "formFactor": "web",
  "offlineCapable": false,
- "generated": "2026-10-01",
+ "generated": "2026-10-02",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 50,
-  "operations": 216,
+  "operations": 211,
   "contracts": 19,
   "modules": 14,
   "undrawn": 0,
-  "operationsWithNoScreen": 19
+  "operationsWithNoScreen": 17
  },
  "waves": {
   "wave1": 22,
@@ -132,23 +132,23 @@
  "contracts": [
   {
    "contract": "marketing-crm",
-   "operations": 38
+   "operations": 41
   },
   {
    "contract": "orders",
-   "operations": 34
+   "operations": 32
   },
   {
    "contract": "identity",
-   "operations": 23
+   "operations": 22
   },
   {
    "contract": "catalogue",
-   "operations": 19
+   "operations": 15
   },
   {
    "contract": "fnb",
-   "operations": 15
+   "operations": 13
   },
   {
    "contract": "transport",
@@ -159,15 +159,15 @@
    "operations": 9
   },
   {
+   "contract": "white-label",
+   "operations": 9
+  },
+  {
    "contract": "wallet",
    "operations": 8
   },
   {
    "contract": "venue-map",
-   "operations": 8
-  },
-  {
-   "contract": "white-label",
    "operations": 8
   },
   {
@@ -183,19 +183,19 @@
    "operations": 6
   },
   {
-   "contract": "promotions",
-   "operations": 5
-  },
-  {
    "contract": "queue",
    "operations": 5
   },
   {
-   "contract": "seating",
-   "operations": 4
+   "contract": "promotions",
+   "operations": 5
   },
   {
    "contract": "payments",
+   "operations": 4
+  },
+  {
+   "contract": "seating",
    "operations": 4
   },
   {
@@ -277,7 +277,7 @@
    "module": "Booking & Selection",
    "wave": 2,
    "route": "/booking-and-selection/add-ons-and-upsell",
-   "operations": 6,
+   "operations": 5,
    "drawn": true
   },
   {
@@ -304,7 +304,7 @@
    "module": "Cart & Checkout",
    "wave": 1,
    "route": "/cart-and-checkout/guest-details-and-attendee-forms",
-   "operations": 14,
+   "operations": 6,
    "drawn": true
   },
   {
@@ -358,7 +358,7 @@
    "module": "Account & Self-Service",
    "wave": 1,
    "route": "/account-and-self-service/my-account-dashboard",
-   "operations": 9,
+   "operations": 7,
    "drawn": true
   },
   {
@@ -376,7 +376,7 @@
    "module": "Account & Self-Service",
    "wave": 1,
    "route": "/account-and-self-service/order-history",
-   "operations": 10,
+   "operations": 8,
    "drawn": true
   },
   {
@@ -385,7 +385,7 @@
    "module": "Account & Self-Service",
    "wave": 1,
    "route": "/account-and-self-service/profile-and-preferences",
-   "operations": 8,
+   "operations": 9,
    "drawn": true
   },
   {
@@ -403,7 +403,7 @@
    "module": "Membership, Loyalty & Value",
    "wave": 2,
    "route": "/membership-loyalty-and-value/membership-plans",
-   "operations": 4,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -412,7 +412,7 @@
    "module": "Membership, Loyalty & Value",
    "wave": 2,
    "route": "/membership-loyalty-and-value/membership-management",
-   "operations": 9,
+   "operations": 7,
    "drawn": true
   },
   {
@@ -421,7 +421,7 @@
    "module": "Membership, Loyalty & Value",
    "wave": 3,
    "route": "/membership-loyalty-and-value/loyalty-and-rewards",
-   "operations": 23,
+   "operations": 20,
    "drawn": true
   },
   {
@@ -430,7 +430,7 @@
    "module": "Engagement & Support",
    "wave": 1,
    "route": "/engagement-and-support/help-centre-faq",
-   "operations": 3,
+   "operations": 5,
    "drawn": true
   },
   {
@@ -439,7 +439,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-and-support/survey-and-feedback",
-   "operations": 1,
+   "operations": 5,
    "drawn": true
   },
   {
@@ -448,7 +448,7 @@
    "module": "Engagement & Support",
    "wave": 2,
    "route": "/engagement-and-support/newsletter-subscription",
-   "operations": 9,
+   "operations": 5,
    "drawn": true
   },
   {
@@ -466,7 +466,7 @@
    "module": "System States",
    "wave": 1,
    "route": "/system-states/error-sold-out-maintenance",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -475,7 +475,7 @@
    "module": "Ticketing",
    "wave": 1,
    "route": "/ticket-transfer",
-   "operations": 4,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -511,7 +511,7 @@
    "module": "Support",
    "wave": 3,
    "route": "/lost-found",
-   "operations": 3,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -529,7 +529,7 @@
    "module": "In-venue Services",
    "wave": 2,
    "route": "/fandb--browse-and-order",
-   "operations": 14,
+   "operations": 13,
    "drawn": true
   },
   {
@@ -538,7 +538,7 @@
    "module": "In-venue Services",
    "wave": 2,
    "route": "/menu-item-detail",
-   "operations": 2,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -547,7 +547,7 @@
    "module": "In-venue Services",
    "wave": 2,
    "route": "/fandb--order-tracking",
-   "operations": 3,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -565,7 +565,7 @@
    "module": "In-venue Services",
    "wave": 2,
    "route": "/virtual-queue",
-   "operations": 6,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -574,7 +574,7 @@
    "module": "In-venue Services",
    "wave": 2,
    "route": "/parking--reserve-and-pay",
-   "operations": 5,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -583,7 +583,7 @@
    "module": "Retail",
    "wave": 2,
    "route": "/retail-and-shop-and-drop",
-   "operations": 6,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -592,7 +592,7 @@
    "module": "Membership, Loyalty & Value",
    "wave": 2,
    "route": "/loyalty-and-rewards",
-   "operations": 7,
+   "operations": 11,
    "drawn": true
   },
   {
@@ -610,7 +610,7 @@
    "module": "Support",
    "wave": 2,
    "route": "/help-centre-and-accessibility",
-   "operations": 3,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -619,7 +619,7 @@
    "module": "Engagement & Support",
    "wave": 2,
    "route": "/in-venue-notifications",
-   "operations": 3,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -674,6 +674,24 @@
     "summary": "Which benefits a plan grants, and how much of each"
    },
    {
+    "operation": "joinWaitlist",
+    "contract": "catalogue",
+    "verb": "POST",
+    "summary": "Ask to be told if capacity frees up"
+   },
+   {
+    "operation": "leaveWaitlist",
+    "contract": "catalogue",
+    "verb": "DELETE",
+    "summary": "Stop waiting"
+   },
+   {
+    "operation": "listGuestMemberships",
+    "contract": "catalogue",
+    "verb": "GET",
+    "summary": "A guest's memberships, benefits and history"
+   },
+   {
     "operation": "listMembershipBenefits",
     "contract": "catalogue",
     "verb": "GET",
@@ -684,6 +702,12 @@
     "contract": "catalogue",
     "verb": "GET",
     "summary": "Membership schemes, the level above a plan"
+   },
+   {
+    "operation": "claimTableSession",
+    "contract": "fnb",
+    "verb": "POST",
+    "summary": "Identify which table a guest is sitting at"
    },
    {
     "operation": "listCustomerMemberships",
@@ -704,46 +728,10 @@
     "summary": "Use the existing profile or keep this booking separate"
    },
    {
-    "operation": "getForm",
+    "operation": "uploadGuestDocument",
     "contract": "marketing-crm",
-    "verb": "GET",
-    "summary": "One form, to fill in or to edit"
-   },
-   {
-    "operation": "getMyProfile",
-    "contract": "marketing-crm",
-    "verb": "GET",
-    "summary": "A guest reading their own details"
-   },
-   {
-    "operation": "listBadges",
-    "contract": "marketing-crm",
-    "verb": "GET",
-    "summary": "Badges a guest can be awarded"
-   },
-   {
-    "operation": "listCustomerBadges",
-    "contract": "marketing-crm",
-    "verb": "GET",
-    "summary": "Badges a guest holds"
-   },
-   {
-    "operation": "listLeaderboard",
-    "contract": "marketing-crm",
-    "verb": "GET",
-    "summary": "Standings, by nickname"
-   },
-   {
-    "operation": "listRewards",
-    "contract": "marketing-crm",
-    "verb": "GET",
-    "summary": "What points can be turned into"
-   },
-   {
-    "operation": "setLeaderboardNickname",
-    "contract": "marketing-crm",
-    "verb": "PUT",
-    "summary": "Choose the name shown on the board"
+    "verb": "POST",
+    "summary": "Store a guest photo, ID or signed document"
    },
    {
     "operation": "listTicketTransfers",

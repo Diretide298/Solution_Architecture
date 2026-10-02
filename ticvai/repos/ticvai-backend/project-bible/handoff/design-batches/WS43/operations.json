@@ -1,23 +1,4 @@
 {
- "createBulkProductCatalogue": {
-  "method": "POST",
-  "path": "/bulk-product-catalogue",
-  "contract": "catalogue",
-  "summary": "Bulk Product Creation & Catalogue Import",
-  "permission": "PRODUCT_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "BulkProductCreationCatalogueImportInput",
-  "responds": "BulkProductCreationCatalogueImportView"
- },
  "createProduct": {
   "method": "POST",
   "path": "/products",

@@ -61,25 +61,6 @@
   "requestBody": "ContentPage",
   "responds": "ContentPage"
  },
- "createForm": {
-  "method": "POST",
-  "path": "/forms",
-  "contract": "marketing-crm",
-  "summary": "Define a waiver, survey or capture form",
-  "permission": "MARKETING_MANAGE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "FormDefinition",
-  "responds": "FormDefinition"
- },
  "createUrlRedirect": {
   "method": "POST",
   "path": "/seo-redirects",
@@ -215,65 +196,6 @@
   "requestBody": null,
   "responds": "ConfigVersion"
  },
- "searchMedia": {
-  "method": "GET",
-  "path": "/media",
-  "contract": "assets",
-  "summary": "Search the asset library",
-  "permission": "ASSET_LIBRARY_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "kind",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "tag",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "collectionId",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "venueId",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "search",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "unusedOnly",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "rightsExpiringWithinDays",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- },
  "setBrandIdentity": {
   "method": "PUT",
   "path": "/tenant-config/brand",
@@ -316,25 +238,6 @@
   ],
   "requestBody": "HomepageLayout",
   "responds": "HomepageLayout"
- },
- "setLocalizationBrandingCustomer": {
-  "method": "PUT",
-  "path": "/localization-branding-customer",
-  "contract": "marketing-crm",
-  "summary": "Set a waiver version's languages, branding and channels",
-  "permission": "GUEST_MANAGE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "LocalizationBrandingCustomerExperienceConfigurationInput",
-  "responds": "LocalizationBrandingCustomerExperienceConfigurationView"
  },
  "setSeoMetadata": {
   "method": "PUT",

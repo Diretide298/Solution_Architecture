@@ -101,6 +101,18 @@
     "operation": null,
     "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
     "source": "pack Resource_Management_Configuration_Reference.pdf, page 82 §Display"
+   },
+   {
+    "operation": "createResourceCost",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): A resource cost table and a primary \"Create resource cost\" button sat on the command centre; cost entry belongs on cost analytics (BO-945, which declares both) (design-notes correction venue-operations BO-903).",
+    "source": "screens/P08-venue-back-office.yaml#BO-903 | screens/P08-venue-back-office.yaml#BO-945"
+   },
+   {
+    "operation": "listResourceCosts",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): A resource cost table and a primary \"Create resource cost\" button sat on the command centre; cost entry belongs on cost analytics (BO-945, which declares both) (design-notes correction venue-operations BO-903).",
+    "source": "screens/P08-venue-back-office.yaml#BO-903 | screens/P08-venue-back-office.yaml#BO-945"
    }
   ],
   "layout": {
@@ -131,52 +143,6 @@
        "bindsTo": null,
        "operation": null,
        "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 82 §Display"
-      },
-      {
-       "kind": "textField",
-       "label": "Resource id",
-       "operation": "listResourceCosts",
-       "notes": "Sends `?resourceId=` to `listResourceCosts`.",
-       "provenance": "contract resources.yaml GET /resource-costs"
-      },
-      {
-       "kind": "selectField",
-       "label": "Kind",
-       "operation": "listResourceCosts",
-       "notes": "Sends `?kind=` to `listResourceCosts`.",
-       "provenance": "contract resources.yaml GET /resource-costs"
-      },
-      {
-       "kind": "datePicker",
-       "label": "From",
-       "operation": "listResourceCosts",
-       "notes": "Sends `?from=` to `listResourceCosts`.",
-       "provenance": "contract resources.yaml GET /resource-costs"
-      },
-      {
-       "kind": "datePicker",
-       "label": "To",
-       "operation": "listResourceCosts",
-       "notes": "Sends `?to=` to `listResourceCosts`.",
-       "provenance": "contract resources.yaml GET /resource-costs"
-      },
-      {
-       "kind": "dataTable",
-       "label": "Every resource cost entry",
-       "bindsTo": "ResourceCostEntry",
-       "columns": [
-        "ResourceCostEntry.id",
-        "ResourceCostEntry.resourceId",
-        "ResourceCostEntry.kind",
-        "ResourceCostEntry.amount",
-        "ResourceCostEntry.incurredOn",
-        "ResourceCostEntry.fromVenueId",
-        "ResourceCostEntry.toVenueId",
-        "ResourceCostEntry.note",
-        "ResourceCostEntry.scopePath"
-       ],
-       "operation": "listResourceCosts",
-       "provenance": "contract resources.yaml GET /resource-costs"
       }
      ]
     },
@@ -217,14 +183,6 @@
        "label": "Permissions this screen separates",
        "notes": "**The pack separates these permissions and no action on the screen claims them yet:** Total asset value, Replacement value, Depreciated value, Maintenance cost, Lost/damaged value. Each needs attaching to the control it gates, or the screen needs the control.",
        "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 82 §Where financial permissions allow"
-      },
-      {
-       "kind": "primaryButton",
-       "label": "Create resource cost",
-       "operation": "createResourceCost",
-       "permission": "RESOURCE_MANAGE",
-       "notes": "**The writer of `resources.resource_cost`** (decided 29 September, writers pass).",
-       "provenance": "contract resources.yaml POST /resource-costs"
       }
      ]
     }
@@ -233,8 +191,8 @@
   "states": {
    "loading": "The equipment asset list.",
    "error": "Could not load. Names which read failed and leaves the equipment asset untouched.",
-   "emptyFirstRun": "No equipment asset yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the equipment asset are still there. Names the active filter and offers to clear it.",
+   "emptyFirstRun": "No equipment asset yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
+   "emptyNoResults": "Never shown: nothing on this screen filters its list.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
@@ -251,23 +209,6 @@
     "purpose": "The asset register",
     "trigger": "onLoad",
     "provenance": "board reading, 19 September 2026"
-   },
-   {
-    "operationId": "listResourceCosts",
-    "contract": "resources",
-    "purpose": "Cost entries booked against resources",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "createResourceCost",
-    "contract": "resources",
-    "purpose": "Book a transfer, operating or replacement cost against a resource",
-    "trigger": "onAction",
-    "invalidates": [
-     "listResources",
-     "listAssets",
-     "listResourceCosts"
-    ]
    }
   ],
   "entryState": {
@@ -286,34 +227,6 @@
    "workshopBoard": "wireframes/WS131 Resource Management Configuration Board 6.dc.html#bo-903"
   },
   "apisNote": "Regenerated 9 September 2026 from Resource_Management_Configuration_Reference.pdf page 82. 0 of 13 labels bound to a contract property; 18 of 41 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "overlays": [
-   {
-    "id": "formCreateResourceCost",
-    "component": "modal",
-    "trigger": "Create resource cost",
-    "body": "**Collects what `createResourceCost` sends before it is called.** Required: `id`, `resourceId`, `kind`, `amount`, `incurredOn`. Optional: `fromVenueId`, `toVenueId`, `note`, `scopePath`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "ResourceCostEntry",
-    "confirm": {
-     "label": "Create resource cost",
-     "operation": "createResourceCost"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "id",
-      "resourceId",
-      "kind",
-      "amount",
-      "incurredOn",
-      "fromVenueId",
-      "toVenueId",
-      "note",
-      "scopePath"
-     ]
-    },
-    "provenance": "contract resources.yaml POST /resource-costs"
-   }
-  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1567,6 +1480,12 @@
        "permission": "RESOURCE_MANAGE",
        "notes": "**The writer of `resources.resource_cost`** (decided 29 September, writers pass).",
        "provenance": "contract resources.yaml POST /resource-costs"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Release block",
+       "operation": "releaseResourceBlock",
+       "provenance": "contract resources.yaml DELETE /resource-blocks/{blockId}; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -1617,6 +1536,13 @@
     "invalidates": [
      "getDueMaintenance"
     ]
+   },
+   {
+    "operationId": "releaseResourceBlock",
+    "contract": "resources",
+    "purpose": "Put the resource back into service",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-001)"
    }
   ],
   "wireframe": {
@@ -1653,6 +1579,14 @@
     "provenance": "contract resources.yaml POST /resource-costs"
    }
   ],
+  "entryState": {
+   "params": [
+    {
+     "name": "blockId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1717,9 +1651,10 @@
   "purposeNote": "resources from operational use.",
   "gaps": [
    {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Resource_Management_Configuration_Reference.pdf, page 92 §Track"
+    "operation": "recordRentalInspection",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): recordRentalInspection records a rental booking's pre- or post-rental condition; a compliance inspection of a resource is not tied to a booking. submitInspection and listInspections fit, with the inspection templates (design-notes correction venue-operations BO-911).",
+    "source": "contracts/satellite/rental.yaml#recordRentalInspection | contracts/satellite/maintenance.yaml#submitInspection"
    }
   ],
   "layout": {
@@ -1731,60 +1666,48 @@
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every inspection condition compliance",
+       "label": "Inspections",
+       "bindsTo": "Inspection",
        "columns": [
-        "Last inspection",
-        "Next inspection",
-        "Inspection frequency",
-        "Responsible person",
-        "Compliance status",
-        "Automatic Status"
+        "Inspection.templateName",
+        "Inspection.assetId",
+        "Inspection.outcome",
+        "Inspection.failedItemCount",
+        "Inspection.failedSafetyCriticalCount",
+        "Inspection.performedAt"
        ],
-       "bindsTo": null,
-       "operation": null,
-       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 92 §Track"
+       "operation": "listInspections",
+       "provenance": "contract maintenance.yaml GET /inspections"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Inspection templates",
+       "bindsTo": "InspectionTemplate",
+       "operation": "listInspectionTemplates",
+       "provenance": "contract maintenance.yaml GET /inspection-templates; wiring fix, 2 October 2026"
       }
      ]
     },
     {
      "name": "contextPanel",
      "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected inspection condition compliance",
-       "bindsTo": null,
-       "columns": [
-        "Last inspection",
-        "Next inspection",
-        "Inspection frequency",
-        "Responsible person",
-        "Compliance status",
-        "Automatic Status"
-       ],
-       "notes": "The pack groups this record's detail under its own headings: “Inspection Templates”, “Stroller Return Inspection”, “AV Equipment Inspection”, “Users may attach”.",
-       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 92 §Track"
-      }
-     ]
+     "components": []
     },
     {
      "name": "actionBar",
      "slot": "rowActions",
      "components": [
       {
+       "kind": "secondaryButton",
+       "label": "New template",
+       "operation": "createInspectionTemplate",
+       "provenance": "contract maintenance.yaml POST /inspection-templates; wiring fix, 2 October 2026"
+      },
+      {
        "kind": "primaryButton",
-       "label": "Passed with Observation",
-       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 92 §Support"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Failed",
-       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 92 §Support"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Evidence",
-       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 92 §Support"
+       "label": "Record inspection",
+       "operation": "submitInspection",
+       "provenance": "contract maintenance.yaml POST /inspections"
       }
      ]
     }
@@ -1799,16 +1722,6 @@
   },
   "apis": [
    {
-    "operationId": "recordRentalInspection",
-    "contract": "rental",
-    "purpose": "Condition, with evidence",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026",
-    "invalidates": [
-     "getRentalBooking"
-    ]
-   },
-   {
     "operationId": "submitInspection",
     "contract": "maintenance",
     "purpose": "The maintenance inspection",
@@ -1821,30 +1734,67 @@
     "purpose": "Inspections so far",
     "trigger": "onLoad",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "listInspectionTemplates",
+    "contract": "maintenance",
+    "purpose": "The compliance inspection templates",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-001)"
+   },
+   {
+    "operationId": "createInspectionTemplate",
+    "contract": "maintenance",
+    "purpose": "Define a compliance inspection",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-001)"
    }
   ],
-  "entryState": {
-   "preloaded": [
-    "Last inspection",
-    "Next inspection",
-    "Inspection frequency",
-    "Responsible person",
-    "Compliance status",
-    "Automatic Status"
-   ],
-   "params": [
-    {
-     "name": "bookingId",
-     "from": "navigation"
-    }
-   ]
-  },
+  "entryState": {},
   "wireframe": {
    "status": "notStarted",
    "board": "wireframes/P08 Venue Management.dc.html#bo-911",
    "workshopBoard": "wireframes/WS131 Resource Management Configuration Board 6.dc.html#bo-911"
   },
   "apisNote": "Regenerated 9 September 2026 from Resource_Management_Configuration_Reference.pdf page 92. 0 of 6 labels bound to a contract property; 9 of 39 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Passed with Observation, Failed, Evidence are choices sent by `submitInspection` (responses[].passed + note (passed with observation / failed), attachmentRefs (evidence)).",
+  "overlays": [
+   {
+    "id": "formCreateInspectionTemplate",
+    "component": "modal",
+    "trigger": "New template",
+    "body": "**Collects what `createInspectionTemplate` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "New template",
+     "operation": "createInspectionTemplate"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "contract maintenance.yaml POST /inspection-templates; wiring fix, 2 October 2026"
+   },
+   {
+    "id": "formSubmitInspection",
+    "component": "modal",
+    "trigger": "Record inspection",
+    "body": "**Collects what `submitInspection` sends before it is called.** Required: `templateId`, `venueId`, `responses`, `recordedAt`. Optional: `assetId`, `signatureRef`. `id` is a client UUIDv7 generated silently, never asked. The result (passed, passed with observations, failed) is a choice inside the inspection; evidence is a section of it, not a button. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Record inspection",
+     "operation": "submitInspection"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "templateId",
+      "venueId",
+      "responses",
+      "recordedAt",
+      "assetId",
+      "signatureRef"
+     ]
+    },
+    "provenance": "contract maintenance.yaml POST /inspections"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1905,8 +1855,8 @@
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Track) and no metric row",
-  "purpose": "Manage the physical resource from acquisition through operational use to final retirement. Provide TICVAI with a centralized Event Resource Planning Engine that allows event managers and operations teams to define everything required to deliver an event and convert those requirements into actual resource reservations and assignments. The board shall manage event requirements across: Venues Auditoriums Halls Rooms Stages Breakout areas Outdoor areas AV systems Lighting Sound systems Projectors Screens Chairs Tables Booths Operational equipment Event managers Ushers Security Technical crew Hosts Performers Mascots Temporary staff Other configurable resources",
-  "purposeNote": "retirement, including operational history, maintenance, condition, value references, and governance. Board 6 Shared Digital Resource Journey A physical resource should have a complete digital operational history.",
+  "purpose": "Manage the physical resource from acquisition through operational use to final retirement.",
+  "purposeNote": "retirement, including operational history, maintenance, condition, value references, and governance. Board 6 Shared Digital Resource Journey A physical resource should have a complete digital operational history. Purpose rewritten 2 October 2026 (CHG-WIR-003): The purpose carried the board 7 introduction (\"Provide TICVAI with a centralized Event Resource Planning Engine ... The board shall manage event requirements across ...\") after the screen's own sentence.",
   "gaps": [
    {
     "operation": null,

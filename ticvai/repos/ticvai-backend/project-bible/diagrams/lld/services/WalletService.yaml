@@ -1,5 +1,5 @@
 id: LLD-WalletService
-title: WalletService — 66 operations, 31 tables
+title: WalletService — 68 operations, 31 tables
 generatedBy: tools/derive-diagrams.py
 tier: commerce
 deployable: commerce
@@ -18,9 +18,9 @@ ifDown: '**It holds a liability owed to a customer.** A wallet that double-spend
   not a bug report. Deduction order across credit lots is FEFO and is decided here, once, rather than
   per caller.'
 coverage:
-  operations: 66
+  operations: 68
   inAFlow: 3
-  percent: 5%
+  percent: 4%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
@@ -31,7 +31,7 @@ schemas:
   largestTable: wallet.wallet_type
 operationsByContract:
 - contract: wallet
-  count: 66
+  count: 68
   operations:
   - operation: activateGiftCard
     verb: POST
@@ -192,6 +192,22 @@ operationsByContract:
     permission: WALLET_VIEW
     offline: false
     reads: 3
+    writes: 0
+  - operation: getWalletMovementSummary
+    verb: GET
+    path: /wallet-movement-summary
+    scope: tenant
+    permission: WALLET_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: getWalletPreCloseChecks
+    verb: GET
+    path: /wallet-pre-close-checks
+    scope: tenant
+    permission: WALLET_VIEW
+    offline: false
+    reads: 0
     writes: 0
   - operation: getWalletReconciliation
     verb: GET
@@ -776,7 +792,7 @@ tables:
   - wallet
   foreignWriters: null
 - table: wallet.refund_policy
-  columns: 7
+  columns: 8
   store: postgres
   parent: null
   writtenBy:
@@ -841,7 +857,7 @@ tables:
   foreignWriters:
   - orders
 - table: wallet.wallet_type
-  columns: 24
+  columns: 25
   store: postgres
   parent: null
   writtenBy:
@@ -905,10 +921,14 @@ writesOutside:
     - orders.payment
     - orders.refund
 screens:
+- P01:WEB-017 My Account Dashboard
 - P01:WEB-021 Wallet & Gift Cards
 - P02:GST-011 Wallet Overview
 - P02:GST-071 Payment Methods
 - P04:POS-002 Sell — Ticket Catalogue
+- P04:POS-027 Guest Lookup
+- P08:ADM-604 Stored Value, Gift Card & Voucher Tender Controls
+- P08:ADM-612 Refund Allocation & Original Tender Manager
 - P08:BO-1083 Wallet Command Center
 - P08:BO-1084 Wallet Type Library
 - P08:BO-1085 Wallet Creation & Provisioning Rules
@@ -959,7 +979,6 @@ screens:
 - P08:BO-1130 Gift Card & Voucher Expiry Management
 - P08:BO-1131 Gift Card Balance, Liability & Breakage Control
 - P08:BO-1132 Gift Card & Voucher Simulator, Validation & Publication
-- P08:BO-1133 Wallet Usage & Channel Command Center
 - P08:BO-1134 Wallet Channel Configuration
 - P08:BO-1135 Wallet Payment & Redemption Policy
 - P08:BO-1136 Wearable & Credential Type Configuration
@@ -987,7 +1006,6 @@ screens:
 - P08:BO-1158 AI Fraud & Anomaly Detection Studio
 - P08:BO-1159 Automated Security Action Orchestration
 - P08:BO-1160 Fraud Alert & Investigation Case Management
-- P08:BO-1161 Security Rules Testing, Simulation & AI Sandbox
 - P08:BO-1162 Security Governance, Audit & Rule Publication
 - P08:BO-1163 Wallet Finance & Liability Command Center
 - P08:BO-1164 Wallet Financial Classification & Accounting Mapping
@@ -1000,7 +1018,6 @@ screens:
 - P08:BO-1171 Wallet Analytics & Management Reporting
 - P08:BO-1172 Finance Validation, Reporting & Audit Center
 - P08:BO-1173 Wallet Integration Command Center
-- P08:BO-1174 Wallet API Catalogue & Endpoint Configuration
 - P08:BO-1175 Integration Profile & System Mapping
 - P08:BO-1176 Wallet Events, Webhooks & Notification Orchestration
 - P08:BO-1178 Synchronization, Retry & Resilience Configuration
@@ -1019,13 +1036,12 @@ screens:
 - P08:BO-422 Refund, Adjustment & Manual Bonus Control
 - P08:BO-423 Wallet Credit Transaction Ledger & Audit
 - P08:BO-448 Redemption Wallet & Balance View
+- P08:BO-453 Redemption Transaction Ledger, Reconciliation & Audit
 - P08:BO-461 Card Replacement & Wallet Relinking
 - P08:BO-469 Wallet & Deduction Transaction Monitor
 - P08:BO-487 Customer Wallet & Balance Summary
 - P08:BO-488 Self-Service Wallet Top-Up
 - P08:BO-722 Prepaid Minute Package & Customer Balance Configuration
-- P09:ADM-604 Stored Value, Gift Card & Voucher Tender Controls\t97
-- P09:ADM-612 Refund Allocation & Original Tender Manager\t119
 flows:
 - F18 A guest plays an arcade game
 - F53 A guest earns, sees and spends loyalty

@@ -3,7 +3,7 @@
   "id": "WEB-016",
   "name": "Login / Register",
   "module": "Account & Self-Service",
-  "requiresModule": "ticketing",
+  "requiresModule": "core",
   "wave": 1,
   "capability": "C36",
   "implementation": {
@@ -35,7 +35,10 @@
     {
      "to": "WEB-017",
      "trigger": "My Account Dashboard",
-     "provenance": "derived — WEB-017 declares entryState.params deviceId, itemId, token and WEB-016 holds none of them. The edge carries nothing: deviceId, itemId, token only pre-select (deep link or optional), and WEB-017 opens on its own"
+     "carries": [
+      "token"
+     ],
+     "provenance": "derived — WEB-017 declares entryState.params token and WEB-016 holds token, so an edge into it carries them"
     },
     {
      "to": "WEB-018",
@@ -59,7 +62,7 @@
     {
      "to": "WEB-011",
      "trigger": "Guest Details & Attendee Forms",
-     "provenance": "derived — WEB-011 declares entryState.params deviceId, itemId and WEB-016 holds none of them. The edge carries nothing: deviceId, itemId only pre-select (deep link or optional), and WEB-011 opens on its own"
+     "provenance": "derived — WEB-011 declares entryState.params  and WEB-016 holds none of them. The edge carries nothing: WEB-011 needs nothing to open"
     },
     {
      "to": "WEB-012",
@@ -132,12 +135,14 @@
       {
        "kind": "secondaryButton",
        "label": "Continue with Apple or Google",
+       "notes": "**Nothing is typed.** The Apple or Google sheet returns the `idToken` and the client sends it with `provider` and the device's `deviceId` straight to `guestSocialLogin`; there is no form (CHG-DOOR-006: the overlay that asked the guest for an idToken was removed).",
        "operation": "guestSocialLogin",
        "provenance": "contract identity.yaml POST /auth/guest/social"
       },
       {
        "kind": "secondaryButton",
        "label": "Continue with UAE Pass",
+       "notes": "**Nothing is typed.** The UAE Pass app or web flow redirects back with `code` and `state`, and the client sends them with its own `redirectUri` to `guestUaePassLogin`; there is no form (CHG-DOOR-006: the overlay that asked the guest for a code and redirect URI was removed).",
        "operation": "guestUaePassLogin",
        "provenance": "contract identity.yaml POST /auth/guest/uae-pass"
       },
@@ -194,13 +199,6 @@
        "operation": "claimCart",
        "notes": "Called after sign-in when the guest arrived from the cart, so the anonymous cart becomes theirs.",
        "provenance": "contract orders.yaml POST /carts/{cartId}/claim"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Refresh token",
-       "operation": "refreshToken",
-       "notes": "Not a button the guest sees; the client rotates the access token before it expires.",
-       "provenance": "contract identity.yaml POST /auth/refresh"
       }
      ]
     }
@@ -250,45 +248,6 @@
     "provenance": "client-verified"
    },
    {
-    "id": "formGuestSocialLogin",
-    "component": "modal",
-    "trigger": "Continue with Apple or Google",
-    "body": "**Collects what `guestSocialLogin` sends before it is called.** Required: `provider`, `idToken`. Optional: `deviceId`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Guest social login",
-     "operation": "guestSocialLogin"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "provider",
-      "idToken",
-      "deviceId"
-     ]
-    },
-    "provenance": "client-verified"
-   },
-   {
-    "id": "formGuestUaePassLogin",
-    "component": "modal",
-    "trigger": "Continue with UAE Pass",
-    "body": "**Collects what `guestUaePassLogin` sends before it is called.** Required: `code`, `redirectUri`. Optional: `state`, `deviceId`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Guest uae pass login",
-     "operation": "guestUaePassLogin"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "code",
-      "redirectUri",
-      "state",
-      "deviceId"
-     ]
-    },
-    "provenance": "client-verified"
-   },
-   {
     "id": "formLinkGuestCheckout",
     "component": "modal",
     "trigger": "Link an order I placed as a guest",
@@ -307,27 +266,10 @@
     "provenance": "client-verified"
    },
    {
-    "id": "formRefreshToken",
-    "component": "modal",
-    "trigger": "Refresh token",
-    "body": "**Collects what `refreshToken` sends before it is called.** Required: `refreshToken`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Refresh token",
-     "operation": "refreshToken"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "refreshToken"
-     ]
-    },
-    "provenance": "client-verified"
-   },
-   {
     "id": "formRequestGuestOtp",
     "component": "modal",
     "trigger": "Send me a code",
-    "body": "**Collects what `requestGuestOtp` sends before it is called.** Required: `identifier`, `channel`. Optional: `purpose`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects only the email or mobile number.** The channel follows from the identifier and the tenant's configured delivery (WhatsApp, SMS or email, DI-209); the guest is never asked to pick one. Dismissing sends nothing.",
     "confirm": {
      "label": "Request guest OTP",
      "operation": "requestGuestOtp"
@@ -340,7 +282,7 @@
       "purpose"
      ]
     },
-    "provenance": "client-verified"
+    "provenance": "corrected 2 October 2026 (CHG-SGU-019, design-notes correction)"
    },
    {
     "id": "formVerifyGuestOtp",
@@ -383,7 +325,7 @@
    {
     "operationId": "getGuestSession",
     "contract": "identity",
-    "purpose": "Read the current guest session",
+    "purpose": "Read the current guest session Only when signed in (decided 2 October 2026 by Chinmay, fix before Block A starts (GFIX-6)).",
     "trigger": "onLoad"
    },
    {
@@ -432,7 +374,7 @@
     "operationId": "refreshToken",
     "contract": "identity",
     "purpose": "Rotate the access token",
-    "trigger": "onAction"
+    "trigger": "background"
    },
    {
     "operationId": "requestGuestOtp",
@@ -577,12 +519,19 @@
     {
      "to": "WEB-018",
      "trigger": "My Tickets",
-     "provenance": "derived — WEB-018 declares entryState.params entitlementId, orderId and WEB-017 holds none of them. The edge carries nothing: entitlementId, orderId only pre-select (deep link or optional), and WEB-018 opens on its own"
+     "carries": [
+      "entitlementId",
+      "orderId"
+     ],
+     "provenance": "derived — WEB-018 declares entryState.params entitlementId, orderId and WEB-017 holds entitlementId, orderId, so an edge into it carries them"
     },
     {
      "to": "WEB-019",
      "trigger": "Order History",
-     "provenance": "derived — WEB-019 declares entryState.params documentId, invoiceId, orderId and WEB-017 holds none of them. The edge carries nothing: orderId only pre-selects (deep link or optional); WEB-019 finds invoiceId (listTaxInvoices) itself; WEB-019 opens on listMyOrders, and documentId has no source on WEB-019 yet (a gap in WEB-019, not in this edge)"
+     "carries": [
+      "orderId"
+     ],
+     "provenance": "derived — WEB-019 declares entryState.params documentId, invoiceId, orderId and WEB-017 holds orderId, so an edge into it carries them"
     }
    ]
   },
@@ -593,7 +542,7 @@
   ],
   "pattern": "listDetail",
   "patternReason": "`listGuestDevices` reads the population and `getWishlist` reads one of them — list, select, act",
-  "purpose": "The screen this app sits on. Everything else is entered from here and returns to it.",
+  "purpose": "Everything I have with this venue at a glance: bookings, wallet, loyalty, challenges and invitations, each opening its own pane.",
   "layout": {
    "template": "split",
    "regions": [
@@ -602,25 +551,33 @@
      "slot": "collection",
      "components": [
       {
-       "kind": "dataTable",
-       "label": "Every guest device",
-       "bindsTo": "GuestDevice",
-       "columns": [
-        "GuestDevice.id",
-        "GuestDevice.subjectId",
-        "GuestDevice.platform",
-        "GuestDevice.tokenFingerprint",
-        "GuestDevice.appVersion",
-        "GuestDevice.osVersion",
-        "GuestDevice.deviceModel",
-        "GuestDevice.locale",
-        "GuestDevice.status",
-        "GuestDevice.failureCount",
-        "GuestDevice.registeredAt",
-        "GuestDevice.lastSeenAt"
-       ],
-       "operation": "listGuestDevices",
-       "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}/devices"
+       "kind": "metricTile",
+       "label": "Upcoming bookings",
+       "operation": "listMyEntitlements",
+       "notes": "Next visits; opens WEB-018.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Orders",
+       "operation": "listMyOrders",
+       "notes": "Recent orders; opens WEB-019.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Wallet",
+       "bindsTo": "Wallet",
+       "operation": "getWallet",
+       "notes": "Balance; opens WEB-021.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Loyalty",
+       "operation": "getLoyaltyPosition",
+       "notes": "Tier, points and points to the next tier; expiring points within 30 days; opens WEB-043.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)"
       }
      ]
     },
@@ -628,29 +585,6 @@
      "name": "contextPanel",
      "slot": "selection",
      "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected guest device",
-       "bindsTo": "GuestDevice",
-       "columns": [
-        "GuestDevice.id",
-        "GuestDevice.subjectId",
-        "GuestDevice.platform",
-        "GuestDevice.tokenFingerprint",
-        "GuestDevice.tokenRef",
-        "GuestDevice.appVersion",
-        "GuestDevice.osVersion",
-        "GuestDevice.deviceModel",
-        "GuestDevice.locale",
-        "GuestDevice.status",
-        "GuestDevice.failureCount",
-        "GuestDevice.registeredAt",
-        "GuestDevice.lastSeenAt",
-        "GuestDevice.revokedAt"
-       ],
-       "operation": "listGuestDevices",
-       "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}/devices"
-      },
       {
        "kind": "detailPanel",
        "label": "The challenge",
@@ -683,7 +617,8 @@
         "Wishlist.items"
        ],
        "operation": "getWishlist",
-       "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}/wishlist"
+       "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}/wishlist",
+       "notes": "A shortcut tile with the count; opens WEB-009."
       }
      ]
     },
@@ -691,36 +626,6 @@
      "name": "actionBar",
      "slot": "rowActions",
      "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Add to wishlist",
-       "operation": "addToWishlist",
-       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/wishlist"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Record consent",
-       "operation": "recordConsent",
-       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/consents"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Register guest device",
-       "operation": "registerGuestDevice",
-       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/devices"
-      },
-      {
-       "kind": "destructiveButton",
-       "label": "Remove from wishlist",
-       "operation": "removeFromWishlist",
-       "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/wishlist/{itemId}"
-      },
-      {
-       "kind": "destructiveButton",
-       "label": "Revoke guest device",
-       "operation": "revokeGuestDevice",
-       "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/devices/{deviceId}"
-      },
       {
        "kind": "secondaryButton",
        "label": "Respond to invitation",
@@ -732,20 +637,6 @@
    ]
   },
   "overlays": [
-   {
-    "id": "confirmRemoveFromWishlist",
-    "component": "confirmDialog",
-    "trigger": "Remove from wishlist",
-    "body": "**Names what `removeFromWishlist` changes and what it leaves alone**, in the consequence rather than the verb. A account this affects should be identified in the dialog, not just counted.",
-    "provenance": "client-verified"
-   },
-   {
-    "id": "confirmRevokeGuestDevice",
-    "component": "confirmDialog",
-    "trigger": "Revoke guest device",
-    "body": "**Names what `revokeGuestDevice` changes and what it leaves alone**, in the consequence rather than the verb. A account this affects should be identified in the dialog, not just counted.",
-    "provenance": "client-verified"
-   },
    {
     "id": "formRespondToInvitation",
     "component": "modal",
@@ -763,70 +654,6 @@
      ]
     },
     "provenance": "client-verified"
-   },
-   {
-    "id": "formAddToWishlist",
-    "component": "modal",
-    "trigger": "Add to wishlist",
-    "body": "**Collects what `addToWishlist` sends before it is called.** Required: `variantId`. Optional: `performanceId`, `note`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Add to wishlist",
-     "operation": "addToWishlist"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "variantId",
-      "performanceId",
-      "note"
-     ]
-    },
-    "provenance": "client-verified"
-   },
-   {
-    "id": "formRecordConsent",
-    "component": "modal",
-    "trigger": "Record consent",
-    "body": "**Collects what `recordConsent` sends before it is called.** Required: `purpose`, `decision`, `noticeVersion`, `source`, `recordedAt`. Optional: `channels`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "RecordConsentRequest",
-    "confirm": {
-     "label": "Record consent",
-     "operation": "recordConsent"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "purpose",
-      "decision",
-      "noticeVersion",
-      "source",
-      "recordedAt",
-      "channels"
-     ]
-    },
-    "provenance": "client-verified"
-   },
-   {
-    "id": "formRegisterGuestDevice",
-    "component": "modal",
-    "trigger": "Register guest device",
-    "body": "**Collects what `registerGuestDevice` sends before it is called.** Required: `platform`, `token`. Optional: `appVersion`, `osVersion`, `deviceModel`, `locale`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Register guest device",
-     "operation": "registerGuestDevice"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "platform",
-      "token",
-      "appVersion",
-      "osVersion",
-      "deviceModel",
-      "locale"
-     ]
-    },
-    "provenance": "client-verified"
    }
   ],
   "states": {
@@ -839,61 +666,10 @@
   },
   "apis": [
    {
-    "operationId": "addToWishlist",
-    "contract": "marketing-crm",
-    "purpose": "Save an item",
-    "trigger": "onAction",
-    "invalidates": [
-     "listGuestDevices"
-    ]
-   },
-   {
     "operationId": "getWishlist",
     "contract": "marketing-crm",
     "purpose": "Read a guest's saved items",
     "trigger": "onLoad"
-   },
-   {
-    "operationId": "listGuestDevices",
-    "contract": "marketing-crm",
-    "purpose": "A guest's registered devices",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "recordConsent",
-    "contract": "marketing-crm",
-    "purpose": "Record a consent decision",
-    "trigger": "onAction",
-    "invalidates": [
-     "listGuestDevices"
-    ]
-   },
-   {
-    "operationId": "registerGuestDevice",
-    "contract": "marketing-crm",
-    "purpose": "Register a device for push",
-    "trigger": "onAction",
-    "invalidates": [
-     "listGuestDevices"
-    ]
-   },
-   {
-    "operationId": "removeFromWishlist",
-    "contract": "marketing-crm",
-    "purpose": "Remove a saved item",
-    "trigger": "onAction",
-    "invalidates": [
-     "listGuestDevices"
-    ]
-   },
-   {
-    "operationId": "revokeGuestDevice",
-    "contract": "marketing-crm",
-    "purpose": "Revoke a device registration",
-    "trigger": "onAction",
-    "invalidates": [
-     "listGuestDevices"
-    ]
    },
    {
     "operationId": "getMyChallenges",
@@ -906,18 +682,34 @@
     "contract": "marketing-crm",
     "purpose": "Accept or decline an invitation",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "listMyEntitlements",
+    "contract": "access",
+    "purpose": "Upcoming bookings tile",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listMyOrders",
+    "contract": "orders",
+    "purpose": "Orders tile",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getWallet",
+    "contract": "wallet",
+    "purpose": "Wallet tile",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getLoyaltyPosition",
+    "contract": "marketing-crm",
+    "purpose": "Loyalty tile",
+    "trigger": "onLoad"
    }
   ],
   "entryState": {
    "params": [
-    {
-     "name": "deviceId",
-     "from": "deepLink"
-    },
-    {
-     "name": "itemId",
-     "from": "deepLink"
-    },
     {
      "name": "subjectId",
      "from": "session"
@@ -1011,12 +803,15 @@
     {
      "to": "WEB-016",
      "trigger": "Login / Register",
-     "provenance": "derived — WEB-016 declares entryState.params challengeId, subjectId and WEB-018 holds none of them. The edge carries nothing: WEB-016 finds challengeId (createMfaChallenge), subjectId (registerGuest) itself, and WEB-016 opens on its own"
+     "carries": [
+      "subjectId"
+     ],
+     "provenance": "derived — WEB-016 declares entryState.params challengeId, subjectId and WEB-018 holds subjectId, so an edge into it carries them"
     },
     {
      "to": "WEB-017",
      "trigger": "My Account Dashboard",
-     "provenance": "derived — WEB-017 declares entryState.params deviceId, itemId, token and WEB-018 holds none of them. The edge carries nothing: deviceId, itemId, token only pre-select (deep link or optional), and WEB-017 opens on its own"
+     "provenance": "derived — WEB-017 declares entryState.params token and WEB-018 holds none of them. The edge carries nothing: token only pre-selects (deep link or optional), and WEB-017 opens on its own"
     },
     {
      "to": "WEB-019",
@@ -1067,25 +862,21 @@
        "provenance": "contract access.yaml GET /guests/me/entitlements"
       },
       {
-       "kind": "dataTable",
-       "label": "Every entitlement",
+       "kind": "cardList",
+       "label": "My tickets",
        "bindsTo": "Entitlement",
        "columns": [
-        "Entitlement.id",
-        "Entitlement.templateId",
         "Entitlement.productId",
-        "Entitlement.orderId",
-        "Entitlement.orderLineId",
-        "Entitlement.subjectId",
-        "Entitlement.venueId",
-        "Entitlement.scopePath",
-        "Entitlement.mediaCode",
-        "Entitlement.status",
-        "Entitlement.statusNote",
-        "Entitlement.validFrom"
+        "Entitlement.validFrom",
+        "Entitlement.validTo",
+        "Entitlement.lifecycleLabel",
+        "Entitlement.entriesUsed",
+        "Entitlement.entriesAllowed",
+        "Entitlement.holderName"
        ],
        "operation": "listMyEntitlements",
-       "provenance": "contract access.yaml GET /guests/me/entitlements"
+       "provenance": "corrected 2 October 2026 (CHG-SGU-021, design-notes correction)",
+       "notes": "One list with tabs, Upcoming and Past: the product, the date, the status in plain words, entries left and the code on opening. No ids, scope, template or order line."
       },
       {
        "kind": "dataTable",
@@ -1095,25 +886,21 @@
        "provenance": "contract access.yaml GET /entitlements/{entitlementId}/history"
       },
       {
-       "kind": "dataTable",
-       "label": "Every entitlement",
+       "kind": "cardList",
+       "label": "Past",
        "bindsTo": "Entitlement",
        "columns": [
-        "Entitlement.id",
-        "Entitlement.templateId",
         "Entitlement.productId",
-        "Entitlement.orderId",
-        "Entitlement.orderLineId",
-        "Entitlement.subjectId",
-        "Entitlement.venueId",
-        "Entitlement.scopePath",
-        "Entitlement.mediaCode",
-        "Entitlement.status",
-        "Entitlement.statusNote",
-        "Entitlement.validFrom"
+        "Entitlement.validFrom",
+        "Entitlement.validTo",
+        "Entitlement.lifecycleLabel",
+        "Entitlement.entriesUsed",
+        "Entitlement.entriesAllowed",
+        "Entitlement.holderName"
        ],
        "operation": "listEntitlements",
-       "provenance": "contract access.yaml GET /my/entitlements/all"
+       "provenance": "corrected 2 October 2026 (CHG-SGU-021, design-notes correction)",
+       "notes": "The Past tab of the same list."
       }
      ]
     },
@@ -1244,6 +1031,10 @@
   ],
   "entryState": {
    "params": [
+    {
+     "name": "subjectId",
+     "from": "session"
+    },
     {
      "name": "entitlementId",
      "from": "deepLink"
@@ -1400,7 +1191,7 @@
     {
      "to": "WEB-017",
      "trigger": "My Account Dashboard",
-     "provenance": "derived — WEB-017 declares entryState.params deviceId, itemId, token and WEB-019 holds none of them. The edge carries nothing: deviceId, itemId, token only pre-select (deep link or optional), and WEB-017 opens on its own"
+     "provenance": "derived — WEB-017 declares entryState.params token and WEB-019 holds none of them. The edge carries nothing: token only pre-selects (deep link or optional), and WEB-017 opens on its own"
     },
     {
      "to": "WEB-018",
@@ -1412,7 +1203,7 @@
     }
    ]
   },
-  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement. **`listMyOrders` wired 24 August, raised in review.** The staff-scoped list was on this guest screen — **a guest-facing list must be scoped to the caller, not filtered by a subject parameter**, or a guest is one parameter away from somebody else’s. **Cross-surface parity, 31 August**: added getOrder, listOrders. **A guest does not know which surface they are on** — the same named screen on web and app now calls the same guest-callable operations.",
+  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement. **`listMyOrders` wired 24 August, raised in review.** The staff-scoped list was on this guest screen — **a guest-facing list must be scoped to the caller, not filtered by a subject parameter**, or a guest is one parameter away from somebody else’s. **Cross-surface parity, 31 August**: added getOrder, listOrders. **A guest does not know which surface they are on** — the same named screen on web and app now calls the same guest-callable operations.\n\n**Tax documents, as the UAE requires them** (research 2 October 2026, CHG-FIN-011; Executive Regulation Art. 59-60): the document a paid order gets is titled \"Tax Invoice\" (a simplified tax invoice for a guest, a full one with the buyer's name, address and TRN on request), never \"Receipt\" or \"VAT receipt\" as the title, and a correction is a \"Tax Credit Note\" (the contract calls it a credit memo). A simplified tax invoice is issued automatically when the order is paid; a full one is offered for a VAT-registered buyer and is the only kind above AED 10,000 for them. Amounts and VAT are in AED; a guest who paid in another currency sees the amount paid, the currency and the rate as payment information (CHG-FIN-001). A refund shows where the money went and in which currency: \"USD 81.72 back to your Visa ending 4417\" (CHG-FIN-001).",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listMyOrders` reads the population and `getOrder` reads one of them — list, select, act",
@@ -1432,44 +1223,48 @@
        "provenance": "contract orders.yaml GET /my/orders"
       },
       {
-       "kind": "dataTable",
-       "label": "Every order",
+       "kind": "cardList",
+       "label": "Your orders",
        "bindsTo": "Order",
        "columns": [
-        "Order.id",
         "Order.orderNumber",
-        "Order.channel",
-        "Order.venueId",
-        "Order.scopePath",
         "Order.status",
-        "Order.currency",
-        "Order.currencyScale",
         "Order.grossAmount",
-        "Order.taxAmount",
-        "Order.netAmount",
-        "Order.refundedAmount"
+        "Order.currency",
+        "Order.lines",
+        "Order.createdAt"
        ],
        "operation": "listMyOrders",
-       "provenance": "contract orders.yaml GET /my/orders"
+       "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)",
+       "notes": "Was the generated table 'Every order'; staff and plumbing columns removed (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3))."
       },
       {
-       "kind": "dataTable",
-       "label": "Every order",
-       "bindsTo": "OrderSummary",
-       "columns": [
-        "OrderSummary.id",
-        "OrderSummary.orderNumber",
-        "OrderSummary.status",
-        "OrderSummary.grossAmount",
-        "OrderSummary.refundedAmount",
-        "OrderSummary.channel",
-        "OrderSummary.lineCount",
-        "OrderSummary.principalId",
-        "OrderSummary.holdLabel",
-        "OrderSummary.heldUntil"
-       ],
-       "operation": "listOrders",
-       "provenance": "contract orders.yaml GET /orders"
+       "kind": "cardList",
+       "label": "Tax invoices",
+       "operation": "listTaxInvoices",
+       "notes": "The VAT receipt (simplified tax invoice) and any full tax invoice for the order, with its number.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction finance-insights GST-019)"
+      },
+      {
+       "kind": "cardList",
+       "label": "Tax credit notes",
+       "operation": "listCreditMemos",
+       "notes": "Any tax credit note issued after a refund (DEC-086).",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction finance-insights GST-019)"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The tax invoice",
+       "bindsTo": "FinTaxInvoice",
+       "operation": "getTaxInvoice",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction finance-insights GST-019)"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Download or email the PDF",
+       "operation": "getTaxDocumentRendition",
+       "notes": "Opens or sends the PDF in the template's languages.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction finance-insights GST-019)"
       }
      ]
     },
@@ -1482,22 +1277,19 @@
        "label": "The selected order",
        "bindsTo": "Order",
        "columns": [
-        "Order.id",
         "Order.orderNumber",
         "Order.channel",
-        "Order.venueId",
-        "Order.scopePath",
         "Order.status",
         "Order.currency",
-        "Order.currencyScale",
         "Order.grossAmount",
         "Order.taxAmount",
         "Order.netAmount",
         "Order.refundedAmount",
-        "Order.totalPriceVariance",
         "Order.lines",
         "Order.payments",
-        "Order.principalId"
+        "Order.chargeCurrency",
+        "Order.chargeTotal",
+        "Order.chargeFxRate"
        ],
        "operation": "getOrder",
        "provenance": "contract orders.yaml GET /orders/{orderId}"
@@ -1509,16 +1301,17 @@
      "slot": "rowActions",
      "components": [
       {
-       "kind": "primaryButton",
-       "label": "Transfer order tickets",
-       "operation": "transferOrderTickets",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
+       "kind": "secondaryButton",
+       "label": "Ask for a refund",
+       "operation": "createRefundRequest",
+       "provenance": "contract orders.yaml POST /refund-requests"
       },
       {
        "kind": "secondaryButton",
-       "label": "Create refund request",
-       "operation": "createRefundRequest",
-       "provenance": "contract orders.yaml POST /refund-requests"
+       "label": "Get a tax invoice",
+       "operation": "issueTaxInvoice",
+       "notes": "Issues a full invoice and shows its number; if the order is already on an invoice, says so and shows it rather than an error.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction finance-insights GST-019)"
       }
      ]
     }
@@ -1534,15 +1327,6 @@
   },
   "apis": [
    {
-    "operationId": "transferOrderTickets",
-    "contract": "orders",
-    "purpose": "Transfer tickets to another guest",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMyOrders"
-    ]
-   },
-   {
     "operationId": "listMyOrders",
     "contract": "orders",
     "purpose": "The orders this guest placed",
@@ -1555,12 +1339,6 @@
     "trigger": "onAction"
    },
    {
-    "operationId": "listOrders",
-    "contract": "orders",
-    "purpose": "List orders",
-    "trigger": "onLoad"
-   },
-   {
     "operationId": "createRefundRequest",
     "contract": "orders",
     "purpose": "Ask for a refund",
@@ -1571,13 +1349,6 @@
     "contract": "finance",
     "purpose": "List tax invoices",
     "trigger": "onLoad",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "issueTaxInvoice",
-    "contract": "finance",
-    "purpose": "Issue a tax invoice",
-    "trigger": "onAction",
     "provenance": "build, 29 September 2026"
    },
    {
@@ -1600,10 +1371,20 @@
     "purpose": "Download the invoice / credit memo PDF",
     "trigger": "onLoad",
     "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "issueTaxInvoice",
+    "contract": "finance",
+    "purpose": "Get a full tax invoice with a company name and TRN for one of my orders (DEC-085, CHG-FIN-011)",
+    "trigger": "onAction"
    }
   ],
   "entryState": {
    "params": [
+    {
+     "name": "subjectId",
+     "from": "session"
+    },
     {
      "name": "orderId",
      "from": "deepLink"
@@ -1644,7 +1425,7 @@
    {
     "id": "formCreateRefundRequest",
     "component": "modal",
-    "trigger": "Create refund request",
+    "trigger": "Ask for a refund",
     "body": "**Collects what `createRefundRequest` sends before it is called.** Required: `orderId`, `reason`. Optional: `lineIds`. Dismissing sends nothing; the screen behind is unchanged.",
     "confirm": {
      "label": "Create refund request",
@@ -1661,23 +1442,32 @@
     "provenance": "client-verified"
    },
    {
-    "id": "formTransferOrderTickets",
+    "id": "formIssueTaxInvoice",
     "component": "modal",
-    "trigger": "Transfer order tickets",
-    "body": "**Collects what `transferOrderTickets` sends before it is called.** Required: `ticketIds`, `recipient`. Optional: `message`. Dismissing sends nothing; the screen behind is unchanged.",
+    "trigger": "Get a tax invoice",
+    "body": "The company name and TRN to put on the invoice, and where to email it; the order is the one selected and the invoice type is full.",
     "confirm": {
-     "label": "Transfer order tickets",
-     "operation": "transferOrderTickets"
+     "label": "Get a tax invoice",
+     "operation": "issueTaxInvoice"
     },
     "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "ticketIds",
-      "recipient",
-      "message"
-     ]
+     "label": "Cancel"
     },
-    "provenance": "client-verified"
+    "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction finance-insights GST-019)"
+   }
+  ],
+  "gaps": [
+   {
+    "operation": "listOrders",
+    "removed": true,
+    "why": "The staff-scoped order list; a guest screen lists the caller's own orders with `listMyOrders` (removed from guest screens on 24 August, back with the 31 August parity pass).",
+    "source": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
+   },
+   {
+    "operation": "transferOrderTickets",
+    "removed": true,
+    "why": "Transfer is WEB-030's; order history views, downloads and refunds.",
+    "source": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
    }
   ],
   "_platform": {
@@ -1747,7 +1537,7 @@
     {
      "to": "WEB-017",
      "trigger": "My Account Dashboard",
-     "provenance": "derived — WEB-017 declares entryState.params deviceId, itemId, token and WEB-020 holds none of them. The edge carries nothing: deviceId, itemId, token only pre-select (deep link or optional), and WEB-017 opens on its own"
+     "provenance": "derived — WEB-017 declares entryState.params token and WEB-020 holds none of them. The edge carries nothing: token only pre-selects (deep link or optional), and WEB-017 opens on its own"
     },
     {
      "to": "WEB-018",
@@ -1760,7 +1550,7 @@
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listConsentPurposes` reads the population and `getGuestProfile` reads one of them — list, select, act",
-  "purpose": "Change how profile behaves here, and see which level the current value came from.",
+  "purpose": "Correct your details, choose what we may send you, and record your needs.",
   "layout": {
    "template": "split",
    "regions": [
@@ -1769,27 +1559,34 @@
      "slot": "collection",
      "components": [
       {
-       "kind": "dataTable",
-       "label": "Every consent purpose config",
-       "bindsTo": "ConsentPurposeConfig",
-       "columns": [
-        "ConsentPurposeConfig.purpose",
-        "ConsentPurposeConfig.displayName",
-        "ConsentPurposeConfig.description",
-        "ConsentPurposeConfig.channels",
-        "ConsentPurposeConfig.noticeVersion",
-        "ConsentPurposeConfig.isRequiredForService",
-        "ConsentPurposeConfig.expiresAfterMonths"
-       ],
-       "operation": "listConsentPurposes",
-       "provenance": "contract marketing-crm.yaml GET /consent-purposes"
-      },
-      {
        "kind": "banner",
        "label": "Complete your details",
        "operation": "updateMyProfile",
        "notes": "For a profile created by guest checkout (W1): asks for what the pop-up did not; never blocks.",
        "provenance": "decided 29 September 2026, W1"
+      },
+      {
+       "kind": "consentBlock",
+       "label": "What we may send you",
+       "bindsTo": "ConsentState.purposes",
+       "operation": "getGuestConsents",
+       "notes": "One row per configured purpose (`listConsentPurposes`), its channels as toggles, its plain-language description and the notice version in force; the current position from `getGuestConsents` (Given with date, Withdrawn with date, Not asked, Needs renewing). A change is recorded at once with `recordConsent` (source and notice version set by the app; the guest never types a purpose, decision, source or time). Withdrawing is as easy as giving.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)"
+      },
+      {
+       "kind": "cardList",
+       "label": "Purposes and notices",
+       "operation": "listConsentPurposes",
+       "notes": "The configured purposes with their plain-language description, channels and the notice version in force.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)"
+      },
+      {
+       "kind": "toggle",
+       "label": "Consent toggle",
+       "operation": "recordConsent",
+       "notes": "Per purpose and channel; recorded at once on change, append-only.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)",
+       "bindsTo": "ConsentState.purposes"
       }
      ]
     },
@@ -1799,44 +1596,10 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected consent purpose config",
-       "bindsTo": "ConsentPurposeConfig",
-       "columns": [
-        "ConsentPurposeConfig.purpose",
-        "ConsentPurposeConfig.displayName",
-        "ConsentPurposeConfig.description",
-        "ConsentPurposeConfig.channels",
-        "ConsentPurposeConfig.noticeVersion",
-        "ConsentPurposeConfig.isRequiredForService",
-        "ConsentPurposeConfig.expiresAfterMonths"
-       ],
-       "operation": "listConsentPurposes",
-       "provenance": "contract marketing-crm.yaml GET /consent-purposes"
-      },
-      {
-       "kind": "detailPanel",
-       "label": "The guest profile",
-       "bindsTo": "GuestProfileDetail",
-       "columns": [
-        "GuestProfileDetail.id",
-        "GuestProfileDetail.subjectId",
-        "GuestProfileDetail.displayName",
-        "GuestProfileDetail.email",
-        "GuestProfileDetail.phone",
-        "GuestProfileDetail.preferredLanguage",
-        "GuestProfileDetail.preferredChannel",
-        "GuestProfileDetail.guestLinkId",
-        "GuestProfileDetail.tags",
-        "GuestProfileDetail.engagementScore",
-        "GuestProfileDetail.engagementTier",
-        "GuestProfileDetail.lifetimeValue",
-        "GuestProfileDetail.visitCount",
-        "GuestProfileDetail.lastVisitAt",
-        "GuestProfileDetail.isActive",
-        "GuestProfileDetail.mergedIntoSubjectId"
-       ],
-       "operation": "getGuestProfile",
-       "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}"
+       "label": "My details",
+       "operation": "getMyProfile",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)",
+       "notes": "Read by session (`getMyProfile`), matching `updateMyProfile`; it cannot be pointed at another guest."
       }
      ]
     },
@@ -1849,12 +1612,6 @@
        "label": "Save my profile",
        "operation": "updateMyProfile",
        "provenance": "contract marketing-crm.yaml PATCH /guests/me/profile"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Record consent",
-       "operation": "recordConsent",
-       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/consents"
       },
       {
        "kind": "secondaryButton",
@@ -1882,12 +1639,6 @@
   },
   "apis": [
    {
-    "operationId": "getGuestProfile",
-    "contract": "marketing-crm",
-    "purpose": "Read a guest profile",
-    "trigger": "onLoad"
-   },
-   {
     "operationId": "updateMyProfile",
     "contract": "marketing-crm",
     "purpose": "A guest correcting their own details",
@@ -1908,7 +1659,7 @@
    {
     "operationId": "listConsentPurposes",
     "contract": "marketing-crm",
-    "purpose": "Configured consent purposes",
+    "purpose": "The purposes the consent rows show",
     "trigger": "onLoad"
    },
    {
@@ -1939,6 +1690,18 @@
     "purpose": "Upload an ID document for verification",
     "trigger": "onAction",
     "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "getMyProfile",
+    "contract": "marketing-crm",
+    "purpose": "The guest's own details, read by session",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getGuestConsents",
+    "contract": "marketing-crm",
+    "purpose": "The current consent position the toggles change",
+    "trigger": "onLoad"
    }
   ],
   "entryState": {
@@ -2015,29 +1778,6 @@
       "preferredChannel",
       "dietary",
       "accessibility"
-     ]
-    },
-    "provenance": "client-verified"
-   },
-   {
-    "id": "formRecordConsent",
-    "component": "modal",
-    "trigger": "Record consent",
-    "body": "**Collects what `recordConsent` sends before it is called.** Required: `purpose`, `decision`, `noticeVersion`, `source`, `recordedAt`. Optional: `channels`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "RecordConsentRequest",
-    "confirm": {
-     "label": "Record consent",
-     "operation": "recordConsent"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "purpose",
-      "decision",
-      "noticeVersion",
-      "source",
-      "recordedAt",
-      "channels"
      ]
     },
     "provenance": "client-verified"

@@ -27,9 +27,11 @@ steps:
   screen: BO-315
   action: Works in Order Amendment Workspace
   operations:
-  - setOrderAmendment
+  - getOrder
+  - modifyOrder
   outcome: Provide agents with a controlled workspace for modifying an existing order without directly
     editing historical transaction records. The original order must always remain reconstructable.
+  note: '**Repointed 2 October (CHG-WIR-025).** The amendment workspace reads the order and amends it through modifyOrder (exchangeOrderLines and rescheduleOrder beside it); setOrderAmendment duplicated them without their rules.'
 - step: 3
   screen: BO-314
   action: Returns to the board's landing screen

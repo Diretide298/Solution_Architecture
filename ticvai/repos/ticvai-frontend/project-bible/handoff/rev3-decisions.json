@@ -30,7 +30,7 @@
   "needsClient": "",
   "decision": "Our proposal adopted (29 September): Reorder the dated flow to WEB-006 (date, then time) before WEB-005 (tickets), or fold both into one staged step, and state the reveal rule on the screens. Add BookingFlowConfig.performanceReveal enum [dateTimeTicket, allAtOnce] default dateTimeTicket.",
   "decided": "2026-09-29",
-  "superseded": "Setting moved per flow 29 September (W12): `performanceReveal` is now `BookingFlow.settings.performanceReveal` on each booking flow (white-label, CMS-103), read by the guest screens through getPublishedBookingFlow; the decision itself stands."
+  "superseded": "Setting moved per flow 29 September (W12): `performanceReveal` is now `BookingFlow.settings.performanceReveal` on each booking flow (white-label, CMS-103), read by the guest screens through getPublishedBookingFlow; the decision itself stands. Kiosk exception, 2 October (Chinmay, DEC-170; CHG-DOC-017): the kiosk keeps tickets first, then date and time (KSK-004, flow F07); web and app keep date, time, then tickets."
  },
  {
   "ref": "REV3-3",

@@ -1209,11 +1209,105 @@
    },
    "allowedAiResidencies": {
     "type": "array",
-    "description": "**The region's compliance gate on AI providers** (decided 28 September, audit R203; ADR-0009). The `AiProvider.residency` values a tenant in this region may use; empty means no restriction. `ai.setAiProvider` refuses any other residency with `409 residency-refused`. A prompt carrying guest data that reaches a provider hosted elsewhere is a cross-border transfer, and this is where a region says which it allows.\n",
+    "description": "**The region's compliance gate on AI providers** (decided 28 September, audit R203; ADR-0009). The `AiProvider.residency` values a tenant in this region may use; empty means no restriction. `ai.setAiProvider` refuses any other residency with `409 residency-refused`. A prompt carrying guest data that reaches a provider hosted elsewhere is a cross-border transfer, and this is where a region says which it allows.\n**Derived from `aiResidencyClass` since 2 October 2026** (CHG-CSP-009): the class names the residencies, and this list narrows them further where a region needs it; it never widens them.\n",
     "default": [],
     "items": {
      "type": "string"
     }
+   },
+   "aiResidencyClass": {
+    "type": "string",
+    "enum": [
+     "uaeOnly",
+     "globalAllowed",
+     "onPrem"
+    ],
+    "default": "uaeOnly",
+    "description": "**The tenant's AI residency class** (decided 2 October 2026, Chinmay, \"AI residency: per-tenant residency class\"; DEC-539; CHG-CSP-009; amends AI-D02 and ADR-0009 section 1). Which AI endpoints the AI engine may route this tenant's calls to:\n- `uaeOnly` (the default, and mandatory for government, bank and health tenants): the small tier\n  is Core42 Compass GPT-4.1 mini (or Seraj if it wins the Arabic golden set), the strong tier\n  Compass GPT-5, reached through `AiProviderKind` `openaiCompatible`; fallback OpenAI UAE, then\n  the in-cell gpt-oss-120b. No call leaves the UAE.\n- `globalAllowed`: a private venue that opts in under PDPL Article 23, with a vendor contract, a\n  DPIA and a notice to guests (`aiResidencyOptIn`). Azure gpt-5-mini and gpt-6-sol Global, or\n  the tenant's BYOK provider; fallback the `uaeOnly` chain. The tenant is listed in ADR-0009's\n  transfer register.\n- `onPrem`: models in the tenant's own estate (Qwen3.5 or gpt-oss; strong tier Qwen3.5-122B,\n  Falcon-H1 Arabic or Jais 2).\n\n**Every LLM call is scrubbed of personal data in-cell first, whatever the class** (DEC-542): the class decides where a call may go, never whether personal data may travel. Moving from `uaeOnly` to `globalAllowed` without `aiResidencyOptIn` is refused `422 residency-opt-in-required`; on a tenant `aiResidencyClassLocked` holds, any change is refused `409 residency-class-locked`. The model choice per class is the AI engine's (ai `AiProvider`, ai-system-design 3.3), not a setting here.\n"
+   },
+   "aiResidencyClassLocked": {
+    "type": "boolean",
+    "readOnly": true,
+    "default": false,
+    "description": "**Set by TICVAI at onboarding for a government, bank or health tenant** (DEC-539), which must stay `uaeOnly`. Read-only to the tenant.\n"
+   },
+   "aiResidencyOptIn": {
+    "type": "object",
+    "nullable": true,
+    "description": "**The evidence a `globalAllowed` opt-in needs under PDPL Article 23** (DEC-539; CHG-CSP-009): the tenant's references to its vendor contract, its DPIA and the notice guests see. The platform records that they were named, by whom and when; it does not hold or judge the documents. Null while the class is `uaeOnly` or `onPrem`.\n",
+    "properties": {
+     "vendorContractReference": {
+      "type": "string",
+      "maxLength": 200
+     },
+     "dpiaReference": {
+      "type": "string",
+      "maxLength": 200
+     },
+     "guestNoticeReference": {
+      "type": "string",
+      "maxLength": 200
+     },
+     "confirmedByPrincipalId": {
+      "type": "string",
+      "format": "uuid",
+      "readOnly": true
+     },
+     "confirmedAt": {
+      "type": "string",
+      "format": "date-time",
+      "readOnly": true
+     }
+    }
+   },
+   "localLanguageNameLocales": {
+    "type": "array",
+    "default": [],
+    "description": "**The languages an outlet name must also be given in, in this country** (decided 2 October 2026, Chinmay, batch 2 #26: \"English plus the local language where the country needs it\"; DEC-031; CHG-CSP-005). ISO 639-1 codes; `[ar]` in the UAE. Empty asks for English only. `createOutlet` and `updateOutlet` refuse an outlet whose `nameTranslations` lacks one of them (`422 local-name-required`).\n",
+    "items": {
+     "type": "string",
+     "pattern": "^[a-z]{2}$"
+    }
+   },
+   "requiredBillingDocuments": {
+    "x-ticvai-persistence-kind": "valueObject",
+    "x-ticvai-persistence-column": "jsonb",
+    "type": "array",
+    "description": "**Which documents a TICVAI customer's billing entity must upload, in this country** (decided 2 October 2026, Chinmay, batch 6 set 7, ADM-411: \"Trade licence always; VAT certificate when a TRN is entered; configurable per country\"; DEC-210; CHG-CSP-008). The default for every country is the two rows below; TICVAI staff change them per country. The subscription contract's billing entity and `PartnerDocument` read this list; a missing required document holds the entity in verification.\n",
+    "default": [
+     {
+      "documentType": "tradeLicence",
+      "requiredWhen": "always"
+     },
+     {
+      "documentType": "vatCertificate",
+      "requiredWhen": "trnEntered"
+     }
+    ],
+    "items": {
+     "type": "object",
+     "properties": {
+      "documentType": {
+       "type": "string",
+       "maxLength": 64,
+       "description": "The document kind, as the subscription contract's `PartnerDocument` names it (`tradeLicence`, `vatCertificate`, ...)."
+      },
+      "requiredWhen": {
+       "type": "string",
+       "enum": [
+        "always",
+        "trnEntered"
+       ]
+      }
+     }
+    }
+   },
+   "minorAgeThreshold": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 21,
+    "default": 18,
+    "description": "**The age below which a guest is a minor here, set per country** (decided 2 October 2026, Chinmay, critical set 1, BO-187: \"Guardian consent on the venue's form; minor age per country\"; DEC-237; CHG-CSP-019). A minor's biometric enrolment needs a guardian's consent on the venue's consent form (access `enrolFacePass`, `consent.guardianSubjectId`); a subject with no date of birth is treated as a minor (audit R126). The default 18 is the UAE's age of majority and is marked for counsel to confirm per country (R205); whether minors may enrol at all is the venue's switch (`VenueSettings.biometrics.allowMinors`).\n"
    },
    "placement": {
     "$ref": "#/components/schemas/Placement"
@@ -1762,6 +1856,51 @@
       "nullable": true,
       "default": 0,
       "description": "BL-106. **How long a same-visit Face Tag survives past the close of the operating day**, and zero is the default because that is what 3.2.44 describes. A non-zero value is an operational allowance for a late reconciliation, not a retention period — **`facePass` ignores this entirely** and is bounded by its entitlement.\n"
+     },
+     "consentFormId": {
+      "type": "string",
+      "format": "uuid",
+      "nullable": true,
+      "description": "**The venue's own consent form, which every biometric capture is taken on** (decided 2 October 2026, Chinmay, batch 4, BO-188: \"Consent first, on the venue's consent form\"; DEC-128, DEC-549; CHG-CSP-018). A form from the venue's consent-form builder in Venue Management (the one builder Face Pass, Face Tag, marketing and waivers share; marketing-crm `setDigitalWaiverForm`). Turning `isEnabled` on without one is refused `422 consent-form-required`, as a missing DPIA is; each Face Pass and Face Tag capture records the form and its version it was consented on (access `enrolFacePass`, `enrolFaceTag`).\n"
+     },
+     "templatesHeldByTicvai": {
+      "type": "boolean",
+      "readOnly": true,
+      "description": "**True where TICVAI's platform stores this venue's biometric templates** (rather than the venue's own on-premises reader estate). Derived from the venue's access deployment. While true, Venue Management shows the venue a standing warning that every guest must accept the venue's consent form before capture, because the data sits with TICVAI as the venue's processor (decided 2 October 2026, Chinmay, batch 4, BO-188: \"If we store the data, highlight or notify the venue that the client must accept a consent form\"; DEC-128; CHG-CSP-018).\n"
+     },
+     "allowMinors": {
+      "type": "boolean",
+      "default": true,
+      "description": "**Whether this venue enrols minors at all** (decided 2 October 2026, Chinmay, critical set 1, BO-187 and CMS-029: \"Guardian consent on the venue's form; minor age per country; the venue can switch minors off\"; supersedes the GST-069 default; DEC-237; CHG-CSP-019). On: a minor (below `RegionSettings.minorAgeThreshold`) is enrolled only with a guardian's consent on the venue's consent form. Off: a minor's enrolment is refused (`422 minors-not-enrolled`) and the guest uses another verification method.\n"
+     },
+     "accreditationFaceMatching": {
+      "type": "object",
+      "nullable": true,
+      "description": "**Face matching to find duplicate accreditation applicants, off unless the venue enables it** (decided 2 October 2026, Chinmay, critical set 3, BO-631: \"Only where the venue enables it, with applicant consent and the venue's legal sign-off; off by default\"; DEC-461; CHG-CSP-022). Enabling it is refused without `legalSignOffReference` (`422 legal-sign-off-required`); each applicant matched must have consented on the application (accreditation's own record). Null is off.\n",
+      "properties": {
+       "isEnabled": {
+        "type": "boolean",
+        "default": false
+       },
+       "legalSignOffReference": {
+        "type": "string",
+        "nullable": true,
+        "maxLength": 200,
+        "description": "The venue's own reference for its legal sign-off; the platform records that one was named, by whom and when."
+       },
+       "signedOffByPrincipalId": {
+        "type": "string",
+        "format": "uuid",
+        "nullable": true,
+        "readOnly": true
+       },
+       "signedOffAt": {
+        "type": "string",
+        "format": "date-time",
+        "nullable": true,
+        "readOnly": true
+       }
+      }
      }
     }
    },
@@ -1876,6 +2015,15 @@
      "pattern": "^[A-Z]{3}$"
     }
    },
+   "chargeCurrencies": {
+    "type": "array",
+    "nullable": true,
+    "description": "**Which currencies a guest may select and pay in** (decided 2 October 2026, Chinmay; CHG-FIN-001; MoM 10 Aug 2026 4.7 option (b), DI-211). A subset of `displayCurrencies`: each code must also be one the venue's payment provider can charge (`orders.PaymentProvider.presentmentCurrencies`) and one the region holds a `tender` rate for; anything else is refused `400`. Null or empty: guests pay in the trading (base) currency only and the other display currencies stay approximate. The ledger is always in the base currency, with the rate recorded on every payment and refund.\n",
+    "items": {
+     "type": "string",
+     "pattern": "^[A-Z]{3}$"
+    }
+   },
    "cartLeaseSeconds": {
     "type": "integer",
     "nullable": true,
@@ -1940,6 +2088,15 @@
     ],
     "nullable": true,
     "description": "Over or short at shift close beyond which the shift waits in `pendingVariance` for `shift.acceptShiftVariance`. **Proposed tenant default AED 20.00, bounds 0 to 1,000 in the venue currency; client finance to correct (audit R094).**\n"
+   },
+   "cashDrawerLimit": {
+    "oneOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true,
+    "description": "**The most cash a till drawer should hold before some is lifted to the safe** (decided 2 October 2026, Chinmay, batch 6 set 3, BO-042: \"Add drawer limit setting (warn + offer cash lift)\"; DEC-179; CHG-CSP-016; DI-274: on a busy day the cashier unloads excess cash mid-shift and it is reconciled at close). The venue default; a till may set its own (`Workstation.cashDrawerLimit`). When the cash a till has taken since its last count takes the drawer over it, the till warns and offers a cash lift (`shift.createCashMovement` kind `lift`) and BO-042 flags the box (`shift.DepositBox.overDrawerLimit`). A warning, never a block: a sale is not refused because the drawer is full. Null sets no limit. **No proposed default: the client's finance team sets it.**\n"
    },
    "catalogue": {
     "type": "object",
@@ -2073,6 +2230,15 @@
       "maximum": 60,
       "default": 10,
       "description": "Minutes after a bump during which `recallKitchenTicket` still recalls; after it the act is a refire. Proposed, client to correct (audit R094)."
+     },
+     "tableReservedLeadMinutes": {
+      "type": "integer",
+      "nullable": true,
+      "minimum": 0,
+      "maximum": 240,
+      "default": 30,
+      "deprecated": true,
+      "description": "**Deprecated (2 October 2026, CHG-CLN-009): `fnb.FnbReservationPolicy.reservedLeadMinutes` is canonical.** The table state model reads the reservation policy (`states/table.yaml`); this venue setting is kept for compatibility, never read, and not drawn. Its former meaning: **How long before a pre-allocated booking its table shows Reserved** (decided 2 October 2026, Chinmay, batch 6 set 6b, EMP-052: \"Reserved when a booking names the table, or N minutes (venue-set) before a pre-allocated booking\"; DEC-202; CHG-CSP-017; DI-689, DI-336). A booking that names its table holds it as Reserved for the booking's whole slot; a booking the host pre-allocated shows its table Reserved from this many minutes before it. Zero shows Reserved only once the booking is due. The fnb table state model applies it (`states/table.yaml`, owned by fnb). Proposed default 30 minutes, client to correct.\n"
      },
      "compEscalationAmount": {
       "allOf": [

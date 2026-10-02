@@ -1,23 +1,4 @@
 {
- "authoriseGameplay": {
-  "method": "POST",
-  "path": "/gameplay-authorisations",
-  "contract": "games",
-  "summary": "Decide a tap, now",
-  "permission": "ACCESS_VALIDATE",
-  "offlineCapable": true,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "GameplayAuthorisationRequest",
-  "responds": "GameplayAuthorisation"
- },
  "createGameEntitlement": {
   "method": "POST",
   "path": "/game-entitlements",

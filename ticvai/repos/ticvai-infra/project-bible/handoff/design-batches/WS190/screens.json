@@ -370,6 +370,11 @@
     "operation": null,
     "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
     "source": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 50 §For each gift card define"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-027): A read (get or list) of the gift card products that setGiftCardProduct writes.",
+    "source": "contracts/satellite/wallet.yaml#setGiftCardProduct | screens/P08-venue-back-office.yaml#BO-1124"
    }
   ],
   "layout": {
@@ -675,6 +680,13 @@
        "label": "What publishing changes",
        "notes": "**Names what goes live, where, and from when.** A publish with no stated consequence is one somebody presses meaning to save.",
        "provenance": "authored — required by check-screens, 19 September 2026"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Check a gift card balance",
+       "bindsTo": "GiftCard",
+       "operation": "getGiftCard",
+       "provenance": "contract wallet.yaml GET /gift-cards/{cardCode}; wiring fix, 2 October 2026"
       }
      ]
     },
@@ -757,6 +769,13 @@
     "invalidates": [
      "getGiftCard"
     ]
+   },
+   {
+    "operationId": "getGiftCard",
+    "contract": "wallet",
+    "purpose": "Check a gift card balance",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {
@@ -769,6 +788,10 @@
    "params": [
     {
      "name": "giftCardId",
+     "from": "navigation"
+    },
+    {
+     "name": "cardCode",
      "from": "navigation"
     }
    ]
@@ -1213,6 +1236,13 @@
        "kind": "selectField",
        "label": "Season",
        "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 54 §Configure by"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Voucher, coupon and benefit definitions",
+       "bindsTo": "VoucherType",
+       "operation": "listVoucherTypes",
+       "provenance": "contract wallet.yaml GET /voucher-types; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -1235,6 +1265,13 @@
     "invalidates": [
      "listVoucherTypes"
     ]
+   },
+   {
+    "operationId": "listVoucherTypes",
+    "contract": "wallet",
+    "purpose": "Voucher, coupon and benefit definitions",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {
@@ -1243,6 +1280,7 @@
    "workshopBoard": "wireframes/WS190 Wallet Configuration Backend Structure v1.0 Board 5.dc.html#bo-1127"
   },
   "apisNote": "Regenerated 9 September 2026 from Wallet_Configuration_Backend_Structure_v1.0.pdf page 54. 0 of 0 labels bound to a contract property; 43 of 55 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {},
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1648,6 +1686,13 @@
    "workshopBoard": "wireframes/WS190 Wallet Configuration Backend Structure v1.0 Board 5.dc.html#bo-1129"
   },
   "apisNote": "Regenerated 9 September 2026 from Wallet_Configuration_Backend_Structure_v1.0.pdf page 56. 0 of 0 labels bound to a contract property; 21 of 42 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-027): A write and read for wallet presentation (sections, order, labels).",
+    "source": "screens/P08-venue-back-office.yaml#BO-1129"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1766,6 +1811,13 @@
        "kind": "selectField",
        "label": "Notification Schedule",
        "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 57 §Configure"
+      },
+      {
+       "kind": "dataTable",
+       "label": "The tranches behind a balance, with their expiry",
+       "bindsTo": "CreditLot",
+       "operation": "listCreditLots",
+       "provenance": "contract wallet.yaml GET /credit-lots; wiring fix, 2 October 2026"
       }
      ]
     },
@@ -1801,6 +1853,13 @@
      "listCreditLots",
      "getWalletLiability"
     ]
+   },
+   {
+    "operationId": "listCreditLots",
+    "contract": "wallet",
+    "purpose": "The tranches behind a balance, with their expiry",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {
@@ -1809,6 +1868,7 @@
    "workshopBoard": "wireframes/WS190 Wallet Configuration Backend Structure v1.0 Board 5.dc.html#bo-1130"
   },
   "apisNote": "Regenerated 9 September 2026 from Wallet_Configuration_Backend_Structure_v1.0.pdf page 57. 0 of 0 labels bound to a contract property; 16 of 40 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {},
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -2064,6 +2124,12 @@
        "label": "What publishing changes",
        "notes": "**Takes effect at every till and reader immediately.** Credit types, consumption order and funding rules change for balances that already exist, not only for new ones.",
        "provenance": "authored — required by check-screens, 19 September 2026"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Wallet configuration versions, newest first",
+       "operation": "listWalletConfigurationVersions",
+       "provenance": "contract wallet.yaml GET /wallet-configuration/versions; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -2087,6 +2153,13 @@
      "listWalletTypes",
      "listCreditTypes"
     ]
+   },
+   {
+    "operationId": "listWalletConfigurationVersions",
+    "contract": "wallet",
+    "purpose": "Wallet configuration versions, newest first",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {
@@ -2095,6 +2168,7 @@
    "workshopBoard": "wireframes/WS190 Wallet Configuration Backend Structure v1.0 Board 5.dc.html#bo-1132"
   },
   "apisNote": "Regenerated 9 September 2026 from Wallet_Configuration_Backend_Structure_v1.0.pdf page 59. 0 of 0 labels bound to a contract property; 0 of 82 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {},
   "_platform": {
    "code": "P08",
    "audience": "staff",

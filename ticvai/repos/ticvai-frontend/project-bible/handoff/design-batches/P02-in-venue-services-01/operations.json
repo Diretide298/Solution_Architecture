@@ -23,25 +23,6 @@
   "requestBody": "AddCartLineRequest",
   "responds": "Cart"
  },
- "checkoutCart": {
-  "method": "POST",
-  "path": "/carts/{cartId}/checkout",
-  "contract": "orders",
-  "summary": "Turn the cart into an order",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Order"
- },
  "claimLocationSession": {
   "method": "POST",
   "path": "/location-sessions",
@@ -61,25 +42,6 @@
   "requestBody": null,
   "responds": "LocationSession"
  },
- "claimTableSession": {
-  "method": "POST",
-  "path": "/table-sessions",
-  "contract": "fnb",
-  "summary": "Identify which table a guest is sitting at",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "TableSession"
- },
  "createGuestFnbOrder": {
   "method": "POST",
   "path": "/guest-orders",
@@ -98,25 +60,6 @@
   ],
   "requestBody": "CreateGuestOrderRequest",
   "responds": "GuestOrderResult"
- },
- "createPayment": {
-  "method": "POST",
-  "path": "/payments",
-  "contract": "orders",
-  "summary": "Take a payment against an order",
-  "permission": "ORDER_CREATE",
-  "offlineCapable": true,
-  "conflictPolicy": "append",
-  "scopeLevel": "workstation",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "CreatePaymentRequest",
-  "responds": "Payment"
  },
  "createTableReservation": {
   "method": "POST",
@@ -361,25 +304,6 @@
   "requestBody": "RestaurantWaitlist",
   "responds": "RestaurantWaitlist"
  },
- "joinWaitlist": {
-  "method": "POST",
-  "path": "/waitlist-entries",
-  "contract": "catalogue",
-  "summary": "Ask to be told if capacity frees up",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "WaitlistEntry",
-  "responds": "WaitlistEntry"
- },
  "leaveQueue": {
   "method": "DELETE",
   "path": "/waiting-guests/{entryId}",
@@ -417,25 +341,6 @@
   ],
   "requestBody": null,
   "responds": "RestaurantWaitlist"
- },
- "leaveWaitlist": {
-  "method": "DELETE",
-  "path": "/waitlist-entries/{entryId}",
-  "contract": "catalogue",
-  "summary": "Stop waiting",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": null
  },
  "listDeliveryLocations": {
   "method": "GET",
@@ -530,30 +435,6 @@
     "in": "query",
     "required": false
    },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- },
- "listModifierGroups": {
-  "method": "GET",
-  "path": "/modifier-groups",
-  "contract": "fnb",
-  "summary": "List modifier groups",
-  "permission": "PRODUCT_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
    {
     "name": null,
     "in": null,

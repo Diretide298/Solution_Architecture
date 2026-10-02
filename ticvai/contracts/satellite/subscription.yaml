@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Subscription & Licensing
   version: 0.1.0
-  x-ticvai-screen-count: 126
+  x-ticvai-screen-count: 128
   x-ticvai-tier: satellite
   x-ticvai-module: 20 — Subscription & Licensing Management
   x-ticvai-requirements: 59
@@ -850,7 +850,7 @@ paths:
         - "P09 ADM-015 API Rate Limit & Quota Management"
         - "P09 ADM-016 White-Label Branding Management"
         - "P09 ADM-017 Domain & Certificate Management"
-        - "P09 ADM-018 Localisation & Language Pack"
+        - "P09 ADM-018 Interface Languages"
         - "P09 ADM-019 Global Configuration & Defaults"
         - "P09 ADM-020 Platform User Directory"
         - "P09 ADM-021 Platform Role Management"
@@ -2971,6 +2971,8 @@ paths:
         format: uuid
     get:
       operationId: getBillingEntity
+      x-ticvai-consumed-by:
+        - "P09 ADM-411 Billing & Legal Entity Information"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -2998,6 +3000,8 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setBillingEntity
+      x-ticvai-consumed-by:
+        - "P09 ADM-411 Billing & Legal Entity Information"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '2 October: Chinmay, workbook Q209 and Q210 (ADM-411); shape follows the billing operations'

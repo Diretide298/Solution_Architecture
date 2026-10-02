@@ -15,8 +15,9 @@ terminal:
 transitions:
 - from: draft
   to: active
+  operation: activateChallenge
   trigger: operation
-  guard: Published to guests
+  guard: Published to guests (`activateChallenge`, CHG-CSA-045)
 - from: active
   to: paused
   trigger: operation

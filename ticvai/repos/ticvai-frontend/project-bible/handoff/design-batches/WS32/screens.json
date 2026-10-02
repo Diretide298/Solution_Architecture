@@ -50,7 +50,10 @@
      "to": "BO-315",
      "trigger": "Works in Order Amendment Workspace",
      "provenance": "flow F141 step 1→2",
-     "operation": "listAmendmentAfterSale"
+     "operation": "listAmendmentAfterSale",
+     "carries": [
+      "orderId"
+     ]
     },
     {
      "to": "BO-316",
@@ -354,8 +357,7 @@
     {
      "to": "BO-314",
      "trigger": "Returns to the board's landing screen",
-     "provenance": "flow F141 step 2→3",
-     "operation": "setOrderAmendment"
+     "provenance": "flow F141 step 2→3"
     }
    ]
   },
@@ -372,23 +374,11 @@
      "slot": "collection",
      "components": [
       {
-       "kind": "dataTable",
-       "label": "Every order amendment",
-       "columns": [
-        "OrderAmendmentWorkspaceView.orderId",
-        "OrderAmendmentWorkspaceView.customer",
-        "OrderAmendmentWorkspaceView.originalChannel",
-        "OrderAmendmentWorkspaceView.venue",
-        "OrderAmendmentWorkspaceView.orderDate",
-        "OrderAmendmentWorkspaceView.paymentStatus",
-        "OrderAmendmentWorkspaceView.fulfillmentStatus",
-        "OrderAmendmentWorkspaceView.total",
-        "OrderAmendmentWorkspaceView.tickets",
-        "OrderAmendmentWorkspaceView.currentReservation"
-       ],
-       "bindsTo": "OrderAmendmentWorkspaceView",
-       "operation": "setOrderAmendment",
-       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 22 §Display"
+       "kind": "detailPanel",
+       "label": "Order",
+       "bindsTo": "Order",
+       "operation": "getOrder",
+       "provenance": "contract orders.yaml GET /orders/{orderId}; wiring fix, 2 October 2026"
       }
      ]
     },
@@ -460,6 +450,24 @@
        "kind": "secondaryButton",
        "label": "Save Draft",
        "provenance": "pack Order___Reservation_Management_Reference.pdf, page 22 §Actions"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Modify order",
+       "operation": "modifyOrder",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/modify; wiring fix, 2 October 2026"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Exchange lines",
+       "operation": "exchangeOrderLines",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/exchanges; wiring fix, 2 October 2026"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Reschedule",
+       "operation": "rescheduleOrder",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/reschedule; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -468,16 +476,38 @@
   "states": {
    "loading": "The order amendment list.",
    "error": "Could not load. Names which read failed and leaves the order amendment untouched.",
-   "emptyFirstRun": "No order amendment yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No order amendment yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the order amendment are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
-    "operationId": "setOrderAmendment",
+    "operationId": "getOrder",
     "contract": "orders",
-    "purpose": "Order Amendment Workspace",
-    "trigger": "onAction"
+    "purpose": "The order being amended, as it stands",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
+   },
+   {
+    "operationId": "modifyOrder",
+    "contract": "orders",
+    "purpose": "Add or remove lines on the order",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
+   },
+   {
+    "operationId": "exchangeOrderLines",
+    "contract": "orders",
+    "purpose": "Exchange lines for different products or dates",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
+   },
+   {
+    "operationId": "rescheduleOrder",
+    "contract": "orders",
+    "purpose": "Move the order to another performance",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "entryState": {
@@ -488,6 +518,12 @@
     "OrderAmendmentWorkspaceView.venue",
     "OrderAmendmentWorkspaceView.orderDate",
     "OrderAmendmentWorkspaceView.paymentStatus"
+   ],
+   "params": [
+    {
+     "name": "orderId",
+     "from": "navigation"
+    }
    ]
   },
   "wireframe": {
@@ -497,6 +533,58 @@
    "workshopBoard": "wireframes/WS85 Order   Reservation Management Board 2.dc.html#bo-315"
   },
   "apisNote": "Regenerated 9 September 2026 from Order___Reservation_Management_Reference.pdf page 22. 10 of 10 labels bound to a contract property; 23 of 43 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Timeslot, Quantity, Ticket Holder, Customer Details, Delivery Method, Eligible Product Attributes, Seat where applicable, Save Draft … are choices sent by `setOrderAmendment`.",
+  "overlays": [
+   {
+    "id": "formModifyOrder",
+    "component": "modal",
+    "trigger": "Modify order",
+    "body": "**Collects what `modifyOrder` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Modify order",
+     "operation": "modifyOrder"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "contract orders.yaml POST /orders/{orderId}/modify; wiring fix, 2 October 2026"
+   },
+   {
+    "id": "formExchangeOrderLines",
+    "component": "modal",
+    "trigger": "Exchange lines",
+    "body": "**Collects what `exchangeOrderLines` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Exchange lines",
+     "operation": "exchangeOrderLines"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "contract orders.yaml POST /orders/{orderId}/exchanges; wiring fix, 2 October 2026"
+   },
+   {
+    "id": "formRescheduleOrder",
+    "component": "modal",
+    "trigger": "Reschedule",
+    "body": "**Collects what `rescheduleOrder` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Reschedule",
+     "operation": "rescheduleOrder"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "contract orders.yaml POST /orders/{orderId}/reschedule; wiring fix, 2 October 2026"
+   }
+  ],
+  "gaps": [
+   {
+    "operation": "setOrderAmendment",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-025): setOrderAmendment takes the new values as loose strings with no order id and duplicates modify, exchange and reschedule without their rules; the workspace reads the order (getOrder) and amends it through modifyOrder, exchangeOrderLines and rescheduleOrder. F141 step 2 is repointed (design-notes correction ticketing-backoffice BO-315)",
+    "source": "contracts/spine/orders.yaml#setOrderAmendment | screens/P08-venue-back-office.yaml#BO-315 | F141 step 2"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -714,6 +802,13 @@
    "workshopBoard": "wireframes/WS85 Order   Reservation Management Board 2.dc.html#bo-316"
   },
   "apisNote": "Regenerated 9 September 2026 from Order___Reservation_Management_Reference.pdf page 24. 0 of 0 labels bound to a contract property; 23 of 40 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Date Change, Timeslot Change, Performance Change, Quantity Increase, Quantity Reduction, Seat Change, Attendee Change, Delivery Change are choices sent by `setAmendmentEligibilityPolicy`.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-027): A read (get or list) of the amendment eligibility policy that setAmendmentEligibilityPolicy writes.",
+    "source": "contracts/spine/orders.yaml#setAmendmentEligibilityPolicy | screens/P08-venue-back-office.yaml#BO-316"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -787,6 +882,11 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Order___Reservation_Management_Reference.pdf, page 26"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-027): A read (get or list) of the cancellation and partial cancellation policy that setCancellationPartialPolicy writes.",
+    "source": "contracts/spine/orders.yaml#setCancellationPartialPolicy | screens/P08-venue-back-office.yaml#BO-317"
    }
   ],
   "layout": {
@@ -976,6 +1076,13 @@
        "kind": "selectField",
        "label": "Convenience Fee",
        "provenance": "pack Order___Reservation_Management_Reference.pdf, page 27 §Configure separately"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Read a venue's refund policy",
+       "bindsTo": "RefundPolicy",
+       "operation": "getRefundPolicy",
+       "provenance": "contract orders.yaml GET /venues/{venueId}/refund-policy; wiring fix, 2 October 2026"
       }
      ]
     },
@@ -1046,6 +1153,13 @@
     "contract": "orders",
     "purpose": "Save refund policy",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "getRefundPolicy",
+    "contract": "orders",
+    "purpose": "Read a venue's refund policy",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "entryState": {
@@ -1445,6 +1559,13 @@
    "workshopBoard": "wireframes/WS85 Order   Reservation Management Board 2.dc.html#bo-321"
   },
   "apisNote": "Regenerated 9 September 2026 from Order___Reservation_Management_Reference.pdf page 32. 14 of 17 labels bound to a contract property; 17 of 40 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-027): A read (get or list) of the after-sales financial settlements and adjustments that setAfterSaleFinancial writes.",
+    "source": "contracts/spine/orders.yaml#setAfterSaleFinancial | screens/P08-venue-back-office.yaml#BO-321"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1617,6 +1738,13 @@
    "workshopBoard": "wireframes/WS85 Order   Reservation Management Board 2.dc.html#bo-322"
   },
   "apisNote": "Regenerated 9 September 2026 from Order___Reservation_Management_Reference.pdf page 33. 0 of 0 labels bound to a contract property; 14 of 41 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Fee Waiver, Partial Refund, Voucher, Wallet Credit, Alternative Event are choices sent by `approveExceptionServiceRecovery`.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-027): A read (get or list) of the after-sales exceptions awaiting approval that approveExceptionServiceRecovery writes.",
+    "source": "contracts/spine/orders.yaml#approveExceptionServiceRecovery | screens/P08-venue-back-office.yaml#BO-322"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",

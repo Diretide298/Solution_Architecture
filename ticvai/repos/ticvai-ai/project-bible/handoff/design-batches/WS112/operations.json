@@ -12,6 +12,40 @@
   "requestBody": null,
   "responds": "AccessProfile"
  },
+ "listAccreditationHolders": {
+  "method": "GET",
+  "path": "/accreditation-holders",
+  "contract": "accreditation",
+  "summary": "Everybody accredited, and what state they are in",
+  "permission": "ACCREDITATION_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "programmeId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "organisationId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "expiringWithinDays",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AccreditationHolder"
+ },
  "previewAccessImpact": {
   "method": "POST",
   "path": "/accreditation-access-profiles/preview",

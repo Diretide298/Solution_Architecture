@@ -167,8 +167,9 @@
       },
       {
        "kind": "metricTile",
-       "label": "Revenue Today",
-       "provenance": "pack Rental_Management.pdf, page 51 §KPI Cards"
+       "label": "Gross sales today",
+       "provenance": "pack Rental_Management.pdf, page 51 §KPI Cards",
+       "notes": "(CHG-FIN-002: never a bare \"Revenue\")"
       },
       {
        "kind": "metricTile",
@@ -211,6 +212,7 @@
    "workshopBoard": "wireframes/WS120 Rental Management Board 5.dc.html#bo-534"
   },
   "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 51. 0 of 8 labels bound to a contract property; 18 of 34 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "notes": "**Measure names, not \"Revenue\"** (decided 2 October 2026, Chinmay; CHG-FIN-002; BOARDREQ MOM-2758..2761). Takings (money taken less money paid back, a cash-control figure), Gross sales (before discounts, excluding VAT), Net revenue (gross sales less discounts and refunds), Recognised revenue and Deferred revenue are different numbers and never share a label; a tile takes its label from the seeded KPI it is bound to (`ReportingSystemKpi`).",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1285,6 +1287,12 @@
     "operation": null,
     "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
     "source": "pack Rental_Management.pdf, page 58 §Display"
+   },
+   {
+    "operation": "createRentalBooking",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-008): Modifying is updateRentalBooking; a second booking (createRentalBooking) is not a change (R254; design-notes correction fnb-retail BO-542).",
+    "source": "R254 | screens/P08-venue-back-office.yaml#BO-542"
    }
   ],
   "layout": {
@@ -1351,7 +1359,7 @@
   "states": {
    "loading": "The reservation modification cancellation list.",
    "error": "Could not load. Names which read failed and leaves the reservation modification cancellation untouched.",
-   "emptyFirstRun": "No reservation modification cancellation yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No reservation modification cancellation yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the reservation modification cancellation are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -1366,13 +1374,6 @@
      "getRentalBooking",
      "listRentalBookings"
     ]
-   },
-   {
-    "operationId": "createRentalBooking",
-    "contract": "rental",
-    "purpose": "Rebook on a different product (cancel the old booking via updateRentalBooking)",
-    "trigger": "onAction",
-    "provenance": "decided 29 September, VM close-out (venue management and configuration): serves the pack action(s) Product"
    }
   ],
   "entryState": {

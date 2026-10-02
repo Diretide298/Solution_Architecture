@@ -14,8 +14,8 @@ scale: Low volume, high scrutiny.
 ifDown: Down blocks cross-region entitlements. Each region continues alone.
 coverage:
   operations: 18
-  inAFlow: 4
-  percent: 22%
+  inAFlow: 1
+  percent: 6%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
@@ -282,6 +282,5 @@ writesOutside:
 screens:
 - P07:SCN-003 Ready to scan
 - P07:SCN-011 Delegated right
-- P09:ADM-003 Cross-Tenant Health Dashboard
 flows:
 - F19 A membership works in another country

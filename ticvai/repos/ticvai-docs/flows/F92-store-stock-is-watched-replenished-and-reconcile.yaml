@@ -45,12 +45,11 @@ steps:
   action: Stock Transfers.
   operations:
   - closeTransferShort
-  - createGoodsReceipt
   - createStockTransfer
   - getStockTransfer
   outcome: '**Drawn by the client as RET-4D.**'
 - step: 5
-  screen: BO-052
+  screen: BO-051
   action: Goods Receipt.
   operations:
   - sendPurchaseOrder

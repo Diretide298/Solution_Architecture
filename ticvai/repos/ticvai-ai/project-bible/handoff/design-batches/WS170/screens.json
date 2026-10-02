@@ -373,6 +373,13 @@
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
        "impliedBy": "createSeatHoldPool"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Held seats, by pool, with what is left and when it releases",
+       "bindsTo": "SeatHoldPool",
+       "operation": "listSeatHoldPools",
+       "provenance": "contract seating.yaml GET /seat-hold-pools; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -397,6 +404,13 @@
      "getSeatInventory",
      "getSeatAvailability"
     ]
+   },
+   {
+    "operationId": "listSeatHoldPools",
+    "contract": "seating",
+    "purpose": "Held seats, by pool, with what is left and when it releases",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {
@@ -405,6 +419,7 @@
    "workshopBoard": "wireframes/WS145 Seat Management Venue Mapping Reference v1.0 Board 6.dc.html#bo-1005"
   },
   "apisNote": "Regenerated 9 September 2026 from Seat_Management_Venue_Mapping_Reference v1.0.pdf page 26. 0 of 0 labels bound to a contract property; 0 of 9 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {},
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -497,6 +512,13 @@
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
        "impliedBy": "setSeatHoldType"
+      },
+      {
+       "kind": "dataTable",
+       "label": "The kinds of hold a venue places, and who may release them",
+       "bindsTo": "SeatHoldType",
+       "operation": "listSeatHoldTypes",
+       "provenance": "contract seating.yaml GET /seat-hold-types; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -519,6 +541,13 @@
     "invalidates": [
      "listSeatHoldTypes"
     ]
+   },
+   {
+    "operationId": "listSeatHoldTypes",
+    "contract": "seating",
+    "purpose": "The kinds of hold a venue places, and who may release them",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {
@@ -527,6 +556,7 @@
    "workshopBoard": "wireframes/WS145 Seat Management Venue Mapping Reference v1.0 Board 6.dc.html#bo-1006"
   },
   "apisNote": "Regenerated 9 September 2026 from Seat_Management_Venue_Mapping_Reference v1.0.pdf page 27. 0 of 0 labels bound to a contract property; 0 of 8 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {},
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -619,6 +649,13 @@
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
        "impliedBy": "setSeatHoldType"
+      },
+      {
+       "kind": "dataTable",
+       "label": "The kinds of hold a venue places, and who may release them",
+       "bindsTo": "SeatHoldType",
+       "operation": "listSeatHoldTypes",
+       "provenance": "contract seating.yaml GET /seat-hold-types; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -641,6 +678,13 @@
     "invalidates": [
      "listSeatHoldTypes"
     ]
+   },
+   {
+    "operationId": "listSeatHoldTypes",
+    "contract": "seating",
+    "purpose": "The kinds of hold a venue places, and who may release them",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {
@@ -649,6 +693,7 @@
    "workshopBoard": "wireframes/WS145 Seat Management Venue Mapping Reference v1.0 Board 6.dc.html#bo-1007"
   },
   "apisNote": "Regenerated 9 September 2026 from Seat_Management_Venue_Mapping_Reference v1.0.pdf page 27. 0 of 0 labels bound to a contract property; 0 of 8 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {},
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -747,6 +792,13 @@
        "label": "What publishing changes",
        "notes": "**Names what goes live, where, and from when.** A publish with no stated consequence is one somebody presses meaning to save.",
        "provenance": "authored — required by check-screens, 19 September 2026"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Held seats, by pool, with what is left and when it releases",
+       "bindsTo": "SeatHoldPool",
+       "operation": "listSeatHoldPools",
+       "provenance": "contract seating.yaml GET /seat-hold-pools; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -771,6 +823,13 @@
      "getSeatInventory",
      "getSeatAvailability"
     ]
+   },
+   {
+    "operationId": "listSeatHoldPools",
+    "contract": "seating",
+    "purpose": "Held seats, by pool, with what is left and when it releases",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {
@@ -885,6 +944,13 @@
        "label": "What publishing changes",
        "notes": "**Names what goes live, where, and from when.** A publish with no stated consequence is one somebody presses meaning to save.",
        "provenance": "authored — required by check-screens, 19 September 2026"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Held seats, by pool, with what is left and when it releases",
+       "bindsTo": "SeatHoldPool",
+       "operation": "listSeatHoldPools",
+       "provenance": "contract seating.yaml GET /seat-hold-pools; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -909,6 +975,13 @@
      "getSeatInventory",
      "getSeatAvailability"
     ]
+   },
+   {
+    "operationId": "listSeatHoldPools",
+    "contract": "seating",
+    "purpose": "Held seats, by pool, with what is left and when it releases",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {

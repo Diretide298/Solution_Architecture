@@ -22,35 +22,30 @@ steps:
   operations:
   - getCellCapacity
   - getEntitlementUsage
-  - getSsoConfig
   outcome: 16 operations, 16 of them previously unwalked.
-  note: '**Corrected 24 August**: addLicenceAddOn, generateInvoice, getSubscription removed. **This
-    step was written against a screen carrying bulk-attached operations** — 121 were stripped from P09
-    the same day, and a flow that depended on them was depending on a defect.'
+  note: '**Repointed 2 October (CHG-WIR-021).** getSsoConfig was bulk-attached to the Console''s tenant screens; tenant SSO is read and set on ADM-005.'
 - step: 2
   screen: ADM-013
   action: Tenant Performance Monitor.
   operations:
-  - cancelDecommission
-  - decommissionCell
   - getCell
   - getCellCapacity
   - getCellHealth
   - listCellJobs
   outcome: 7 operations, 7 of them previously unwalked.
   crossesDevice: true
+  note: '**Repointed 2 October (CHG-WIR-021).** Decommission is offered on ADM-003 only; the performance monitor reads.'
 - step: 3
   screen: ADM-014
   action: Auto-Scaling Configuration.
   operations:
-  - cancelDecommission
-  - decommissionCell
   - getCell
   - getCellCapacity
   - getCellHealth
   - listCellJobs
   outcome: 7 operations, 7 of them previously unwalked.
   crossesDevice: true
+  note: '**Repointed 2 October (CHG-WIR-021).** Decommission is offered on ADM-003 only; the scaling screen reads the cell and its scaling policy.'
 branches:
 - at: 1
   condition: The acting principal lacks the permission at this scope.

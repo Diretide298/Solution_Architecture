@@ -172,30 +172,6 @@
   "requestBody": null,
   "responds": "IdentityMembershipAccreditationPoliciesView"
  },
- "listPolicies": {
-  "method": "GET",
-  "path": "/tenant-config/policies",
-  "contract": "white-label",
-  "summary": "List legal policies",
-  "permission": "TENANT_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": "includeHistory",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "kind",
-    "in": "query",
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Policy"
- },
  "listPolicyEvaluationArchitecture": {
   "method": "GET",
   "path": "/policy-evaluation-architecture",
@@ -309,44 +285,6 @@
   ],
   "requestBody": "ContextTimeEventCapacityPolicyBuilderInput",
   "responds": "ContextTimeEventCapacityPolicyBuilderView"
- },
- "setEdgeNodeLocal": {
-  "method": "PUT",
-  "path": "/edge-node-local",
-  "contract": "access",
-  "summary": "Edge Node & Local Processing Configuration",
-  "permission": "ACCESS_POINT_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "EdgeNodeLocalProcessingConfigurationInput",
-  "responds": "EdgeNodeLocalProcessingConfigurationView"
- },
- "setOfflinePolicy": {
-  "method": "PUT",
-  "path": "/offline-policy",
-  "contract": "tenancy",
-  "summary": "What a workstation may do with no network, and for how long",
-  "permission": "TENANT_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "OfflinePolicy",
-  "responds": "OfflinePolicy"
  },
  "setPolicyEvaluationSetting": {
   "method": "PUT",

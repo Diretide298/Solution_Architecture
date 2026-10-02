@@ -1,6 +1,6 @@
 # WS190 — Wallet Configuration Backend Structure v1.0 board 5
 
-**10 screens · 10 operations · 8 schemas · 3 permissions**
+**10 screens · 12 operations · 10 schemas · 3 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -61,6 +61,45 @@ convincingly. It is never a caption.
   and its error; and, element by element, what is shown and in what format, what each action
   produces and where the user goes next. Draw exactly that.
 
+## The processes these screens belong to
+
+Written by the owner of each process (`handoff/design-notes/`). Read before any screen: it says how the process runs end to end and which words the screens must use.
+
+### Ticketing & Guest Commerce, as the venue and TICVAI configure and run it
+
+WHAT THE PROCESS IS. Everything a guest can buy is set up, priced, promoted and serviced here, on Venue Management (P08, the venue's own back office, served inside the venue's cell) and on the TICVAI Console (P09, TICVAI's control plane, outside every cell). End to end: (1) CATALOGUE. A product has one of twelve kinds (admission, timedAdmission, datedAdmission, openDated, seated, membership, bundle, fnb, retail, rental, addOn, giftCard). Its ticket types (adult, child, senior, resident...) are not typed one by one: they are generated from the product's attributes (components) and each value combination becomes a sellable ticket type with no extra setup (DI-164). What a ticket grants (validity, entries, re-entry, days of week, blackout dates, expiry anchor, fast track, transfer) lives on a reusable entitlement template, not on the product. Who may take part (age, height, supervision, certification) is the eligibility rule; what the guest must answer is the data mask and the consent questions; how the guest sees it is guestListing (bookable, infoOnly, hidden), display tags (at most six), media and the booking flow. Group, family and corporate products and every after-sales policy (reschedule, exchange, refund, cancellation, upgrade, transfer) are configured inside the one product configuration, never on separate screens (DI-465, DI-466). (2) LIFECYCLE AND PUBLICATION. A product moves draft, inReview, approved, live, withdrawn, archived. Approval and publication are two acts with two permissions (PRODUCT_APPROVE, PRODUCT_PUBLISH, R091); every product is authorised before it sells online or on site (DI-438). Approved is still not on a till: a till sells only what is in the signed catalogue release it pulled (publishBundle, ADR-0013), so a saved price is a back-office fact until the venue publishes to tills. Changing something that has sold is preceded by an impact check (assessProductChange: orders affected, entitlements issued, future performances, open carts); restoring a version creates a new version, and sold tickets keep the price and terms they were sold under (restoreProductVersion, DI-938, TRACKER Actions row 145). (3) PRICE. Prices live in price lists: per venue, per channel set, with validity dates and a priority, copied for the next season with an uplift (copyPriceList) and repriced in bulk only after a dry run (bulkChangePrices). Currency and decimal scale are never chosen on a form: they resolve from the venue's region (ADR-0008, ADR-0018; AED 2 places, OMR and BHD 3). When several rules apply, the configured hierarchy decides; there is no "lowest price wins" default (DI-595). Tax on the pre-discount price and three-decimal rounding are regional settings (DI-598). Dynamic rules always show their minimum and maximum price guardrails beside the trigger (getDynamicPriceRule). (4) PROMOTE AND BUNDLE. A promotion is a rule (automatic, or gated by a code) created in draft, made live only by Publish, which first analyses stacking; a …
+*(source: DI-164; DI-171; DI-438; DI-465; DI-466; DI-595; DI-598; DI-387; DI-039; DI-044; DI-474; DI-671; DI-987; DI-019; DI-080; ADR-0008; ADR-0013; ADR-0018; ADR-0019; ADR-0030; R091; R098; R101; R222; REV3-21; contracts/spine/catalogue.yaml#transitionProductLifecycle …)*
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Product | Anything sellable, of one of the twelve kinds. The record that carries names, channels, listing, media and policies. | Item (except on F&B and retail screens), SKU (for tickets), Offering | contracts/spine/catalogue.yaml#/components/schemas/ProductKind |
+| Ticket type | One sellable variant of an admission or event product (Adult, Child, Resident Adult), generated from the product's attributes. For retail and F&B the same record is labelled Variant. | Variant (on ticket screens), Sub-product, Rate (that is a price), Axis value | contracts/spine/catalogue.yaml#updateProductVariant / DI-164 / DI-437 |
+| Attribute | A dimension that generates ticket types (Guest category, Residency, Tier, Length). Each has values; adding a value adds ticket types. | Axis, Component (the client's word; use it only in help text), Option | contracts/spine/catalogue.yaml#setProductAttributes / DI-164 / DI-450 |
+| Entitlement | What a ticket lets the holder do (validity, entries, re-entry, days, blackout dates, expiry, fast track, transfer), defined once on an entitlement template and shared by several products. | Access rights, Ticket rules, Validity profile | contracts/spine/catalogue.yaml#createEntitlementTemplate / DI-171 / DI-451 |
+| Eligibility rule | Who may take part in or buy a product (age, height, supervision, waiver, certification). Distinct from a promotion's eligibility, which decides who gets a discount. | Restriction, Access rule (that is access control) | contracts/spine/catalogue.yaml#setProductEligibilityRule / DI-463 |
+| Price list | A set of prices for one venue and a set of channels, valid between two dates, with a priority. Several coexist (B2C, B2B, season). | Price book, Rate card, Tariff | contracts/spine/catalogue.yaml#createPriceList / DI-140 / DI-163 |
+| Price category | A standard rate type (Adult, Child, Member) reused across lists so venues do not invent "Adult Standard" and "Normal Adult". | Price band (that is a seat-category band), Fare type (transport) | contracts/spine/catalogue.yaml#setPriceCategoryRateType / … |
+| Price band | A priced band on a seat category (code, label, colour, amount, channel, from-date). | Price category, Zone price | contracts/satellite/seating.yaml#/components/schemas/SeatPriceBand |
+| Promotion | A rule that changes a price automatically or when a code is entered; draft until published; declares how it stacks. | Offer (except in guest copy), Deal, Discount rule | contracts/satellite/promotions.yaml#createPromotion / DI-173 / DI-174 |
+| Coupon code | A code issued from a coupon campaign that applies a promotion-style discount; one shared code or many single-use codes. | Voucher, Promo voucher | contracts/satellite/promotions.yaml#createCouponCampaign / DI-173 |
+| Voucher | A code that carries money (face value, balance), sold or issued; a liability until redeemed or expired. | Coupon, Credit note | contracts/satellite/promotions.yaml#listVoucherBatches / … |
+| Bundle | A product sold as one line whose price differs from the sum of its components, with a mandatory revenue allocation. "Package" is acceptable in guest copy. | Combo (that is an F&B meal deal), Catalogue bundle | contracts/satellite/promotions.yaml#createBundle / DI-220 / ADR-0019 |
+| Catalogue release | The signed snapshot of a venue's catalogue, prices, promotions and sale boards that tills, kiosks and devices pull. Its action label is "Publish to tills". | Bundle, Catalogue bundle, Sync, Deploy | contracts/spine/catalogue.yaml#publishBundle / … |
+| Approve / Publish / Save | Save keeps a draft; Approve records that it is authorised (PRODUCT_APPROVE); Publish makes it live for guests and channels (PRODUCT_PUBLISH). Three different buttons, never merged. | Submit, Go live, Activate (except CatalogueConfigStatus active), Deploy | R091 / contracts/spine/catalogue.yaml#transitionProductLifecycle / DI-438 |
+| Product states | Draft, In review, Approved, Live, Withdrawn, Archived (ProductLifecycleState), always as coloured badges with these exact labels. | Published (for a product), Pending, Inactive (for a product) | contracts/spine/catalogue.yaml#/components/schemas/ProductLifecycleState |
+| Channel | Where something is sold. Labels: pos Point of sale; kiosk Kiosk; web and guestWeb Website; mobile and guestApp App; b2b B2B partners; partner Partner; ota Travel agents (OTA); callCentre Call centre; api API; backOffice Back office. | Touchpoint, Outlet (an outlet is a business inside a venue), raw enum values | contracts/spine/catalogue.yaml#/components/schemas/Channel / … |
+| Refund | Money returned after settlement, wholly or for some lines, under the venue's refund policy. | Return (that is retail goods), Reversal, Void | contracts/spine/orders.yaml#createRefund / DI-252 |
+| Void | Cancelling a whole order before settlement, within the same shift, with a reason from the void list. After settlement it is a refund. | Cancel order, Delete | contracts/spine/orders.yaml#voidOrder / R222 |
+| Exchange / Reschedule | Exchange swaps lines for other products or dates and settles only the difference; Reschedule is the same product moved to another date or time. | Rebook, Date change (acceptable only in guest copy), Refund and resell | contracts/spine/orders.yaml#exchangeOrderLines / … |
+| Hold / Capture / Release | A deposit or stored-value amount is held, then partly or fully captured, and the rest released. A held deposit is not a payment. | Charge, Pre-auth (in staff copy), Block funds | contracts/spine/orders.yaml#authoriseStoredValue / … |
+| Wallet (TICVAI wallet) | The guest's stored-value balance on TICVAI, spent by hold and capture. Distinct from the tender "Apple Pay / Google Pay", which the contract also calls wallet. | Digital wallet (for stored value), E-wallet, Credit (without a type) | contracts/spine/orders.yaml#/components/schemas/TenderKind / R080 |
+| Credit lot | One amount of wallet credit of one credit type (cash, bonus, gift) with its own expiry; lots are spent nearest expiry first and the guest sees the breakdown but cannot choose. | Bucket, Batch, Top-up | TRACKER Actions row 171 / contracts/satellite/wallet.yaml#expireCreditLots |
+| Venue map / Seat map | A venue map is the wayfinding map of a park or a floor (points, paths, bookable places); a seat map is the seating layout of an auditorium or stand. Never just "map" where both could be meant. | Layout (alone), Floor plan (unless it is a floor map), Map (alone) | contracts/satellite/venue-map.yaml#createVenueMap / … |
+| Point / Bookable place | A point is a place on a venue map (toilet, ride, restaurant, exit). A bookable place is a cabana, lounger, table or pitch placed on the map and sold through its price band. | Pin, POI, Marker, Resource (in staff copy) | contracts/satellite/venue-map.yaml#setVenuePoint / … |
+| Station / Route / Timetable / Departure / Fare table / Pass … | A route is an ordered list of stations with offsets; a timetable generates departures up to its release horizon; a fare table prices a route per passenger type; a pass type is a multi-trip or unlimited pass sold as a product. | Stop (except in the stop list), Line (except lineCode), Schedule, Trip (except a guest's journey) | contracts/satellite/transport.yaml / REV3-21 |
+| Applies from | The effective date of a change. Every dated change shows it, and sold items keep their old terms. | Effective date (in labels), Start date (for a change) | contracts/satellite/seating.yaml#updateSeatCategory / TRACKER Actions row 194 |
+
+
 ## The screens
 
 Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs count fields; requirements are matrix rows; meeting inputs are the ones naming the screen (the module and platform ones are below); white label says whether the tenant's brand reaches it (guest) or it sets the brand (configures).
@@ -69,18 +108,18 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-1123` | Gift Card & Digital Benefit Command Center | B–D | 0 | 48 | 6 | 2 | 0 | 6 | — | notStarted (—) |
 | `BO-1124` | Gift Card Product Configuration | B–D | 0 | 50 | 6 | 0 | 1 | 6 | — | notStarted (—) |
-| `BO-1125` | Gift Card Issuance, Activation & Distribution | B–D | 12 | 0 | 6 | 1 | 0 | 6 | — | notStarted (—) |
+| `BO-1125` | Gift Card Issuance, Activation & Distribution | B–D | 12 | 9 | 6 | 2 | 0 | 6 | — | notStarted (—) |
 | `BO-1126` | Voucher & Coupon Type Configuration | B–D | 22 | 0 | 6 | 0 | 2 | 2 | — | notStarted (—) |
-| `BO-1127` | Voucher Eligibility & Redemption Rule Studio | B–D | 30 | 0 | 6 | 0 | 2 | 2 | — | notStarted (—) |
+| `BO-1127` | Voucher Eligibility & Redemption Rule Studio | B–D | 30 | 11 | 6 | 0 | 2 | 2 | — | notStarted (—) |
 | `BO-1128` | Membership Benefits & Entitlement Mapping | B–D | 22 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-1129` | Benefit Packaging & Digital Wallet Presentation | B–D | 21 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
-| `BO-1130` | Gift Card & Voucher Expiry Management | B–D | 10 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
+| `BO-1130` | Gift Card & Voucher Expiry Management | B–D | 10 | 11 | 6 | 0 | 0 | 6 | — | notStarted (—) |
 | `BO-1131` | Gift Card Balance, Liability & Breakage Control | B–D | 0 | 20 | 6 | 0 | 0 | 6 | — | notStarted (—) |
-| `BO-1132` | Gift Card & Voucher Simulator, Validation & Publication | B–D | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
+| `BO-1132` | Gift Card & Voucher Simulator, Validation & Publication | B–D | 0 | 10 | 6 | 0 | 1 | 6 | — | notStarted (—) |
 
 ## Thin screens in this batch
 
-**BO-1131, BO-1132 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**BO-1131 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ---
 
@@ -106,6 +145,13 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 **Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
 
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Gift cards, vouchers and digital benefits: denominations, validity, activation, distribution; issue and check balance; outstanding liability.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **Vouchers are defined here (createVoucherType, wallet) and issued as batches in promotions (createVoucherBatch).** Why: Two voucher models; one must own the voucher. *(source: contracts/satellite/wallet.yaml#createVoucherType / contracts/satellite/promotions.yaml#createVoucherBatch; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
+- **List operation(s) getWalletLiability return a bare array, not the paged list envelope (items, nextCursor, hasMore); rows of getWalletLiability carry no identifier.** Why: The table cannot page, and a row without an id cannot open, edit or link to the record it summarises. *(source: contracts/satellite/wallet.yaml#getWalletLiability; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
+
 #### Inputs: what the user enters or picks
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
@@ -116,6 +162,10 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Group by | radio group | — | Credit type · Wallet type · Venue · Age band | `getWalletLiability` ?groupBy |
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **gift card product**: Denominations, validity, activation (on sale or on first use), distribution channels. *(source: contracts/satellite/wallet.yaml#setGiftCardProduct)*
 
 #### Outputs: what the screen shows and produces
 
@@ -192,6 +242,10 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Investigate Redemption (secondary button) | navigation or local | — | — | — | — |
 | View Liability (secondary button) | navigation or local | — | — | — | — |
 
+**What each action does** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **Issue**: A bearer instrument; whoever holds it holds the value. *(source: contracts/satellite/wallet.yaml#issueGiftCard)*
+
 **Data it reads**: `getWalletLiability` (onLoad, Gift card liability)
 
 **Where the user goes next**
@@ -218,6 +272,20 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 Card already activated, or the code is unknown |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+giftCard:
+  product: Dune Park Gift Card
+  denominations:
+  - AED 100.00
+  - AED 250.00
+  - AED 500.00
+  validity: 36 months
+```
 
 #### Permissions
 
@@ -279,6 +347,7 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 - [ ] Every transition is wired: `BO-100`, `BO-1124`, `BO-1125`, `BO-1126`, `BO-1127`, `BO-1128`, `BO-1129`, `BO-1130`, `BO-1131`, `BO-1132`.
 - [ ] Every gated control is gated: `WALLET_CONFIGURE`, `WALLET_OPERATE`, `WALLET_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 2 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -299,11 +368,21 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 | Opens with | nothing: it opens on its own |
 | Route | `/orders-money/gift-card-product-configuration-bo-1124` |
 
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
+**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape … Contract gap recorded 2 October 2026 (CHG-WIR-027): A read (get or list) of the gift card products that setGiftCardProduct writes.
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Gift card products: denominations (fixed or open), validity, activation, partial use, distribution.
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- No read operation: the screen declares only setGiftCardProduct and nothing that returns the current configuration. (CHG-WIR-027)
 
 #### Inputs: what the user enters or picks
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **denominations**: Fixed amounts as chips, or an open amount with minimum and maximum (PR-2). *(source: contracts/satellite/wallet.yaml#setGiftCardProduct / TRACKER Actions row 114)*
 
 #### Outputs: what the screen shows and produces
 
@@ -397,6 +476,25 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 
+#### Consistency with other screens
+
+- Match `BO-1123`: Same gift card product record.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+product:
+  name: Dune Park Gift Card
+  nameAr: بطاقة هدايا دون بارك
+  denominations:
+  - AED 100.00
+  - AED 250.00
+  - AED 500.00
+  validity: 36 months from activation
+```
+
 #### Permissions
 
 - `setGiftCardProduct` → `WALLET_CONFIGURE` (configure) · staff
@@ -453,12 +551,16 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Orders & Money · wave 3 · needs the `core` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `WALLET_OPERATE` (1 operate); in the flows as venue manager |
+| Who uses it | venue staff holding `WALLET_OPERATE`, `WALLET_VIEW` (1 operate, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population |
 | Offline | online only |
-| Opens with | `giftCardId` (navigation) |
+| Opens with | `giftCardId` (navigation), `cardCode` (navigation) |
 | Route | `/orders-money/gift-card-issuance-activation-distribution-bo-1125` |
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** How gift cards are issued, activated (at the till, not at print) and redeemed (partial use leaves the balance on the card).
+
+**Fixed on main** (the package already carries these; draw what it says): No read operation: the screen declares only issueGiftCard, activateGiftCard, redeemGiftCard and nothing that returns the current … (CHG-WIR-025).
 
 #### Inputs: what the user enters or picks
 
@@ -481,6 +583,22 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 
 #### Outputs: what the screen shows and produces
 
+**Shown**
+
+**Check a gift card balance** (detail panel, from `getGiftCard`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Card code | text | — |
+| Kind | text | — |
+| Face value | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Balance | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Status | chip: Issued, Active, Partially redeemed, Redeemed, Expired, Blocked | — |
+| Blocked reason | text | — |
+| Issued at | 1 Oct 2026, 14:30 | — |
+| Activated at | 1 Oct 2026, 14:30 | — |
+| Expires at | 1 Oct 2026, 14:30 | — |
+
 **Actions and what each produces**
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
@@ -494,6 +612,13 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 | Distribution (secondary button) | navigation or local | — | — | — | — |
 | Expiry (secondary button) | navigation or local | — | — | — | — |
 | Cost center (secondary button) | navigation or local | — | — | — | — |
+
+**What each action does** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **Activate**: Only at sale; an unsold card is worthless, so a rack of cards is not cash on a shelf. *(source: contracts/satellite/wallet.yaml#activateGiftCard)*
+- **Redeem**: Partial redemption keeps the remainder on the card, never as change. *(source: contracts/satellite/wallet.yaml#redeemGiftCard)*
+
+**Data it reads**: `getGiftCard` (onLoad, Check a gift card balance)
 
 **Where the user goes next**
 
@@ -511,21 +636,34 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 Card already activated, or the code is unknown; 409 The card cannot be spent, or cannot cover the amount. Only an `active` or `partiallyRedeemed` card is spent against; a card not yet activated, blocked, expired … (GiftCardProblem); 409 The card is fully redeemed or expired. Activation moves an `issued` card, or a `blocked` one that was found, to `active`; it does not revive a card whose … |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+card:
+  number: GC •••• 4471
+  value: AED 250.00
+  activatedAt: Main Gate shop, 14 Nov
+```
+
 #### Permissions
 
 - `issueGiftCard` → `WALLET_OPERATE` (operate) · staff
 - `activateGiftCard` → `WALLET_OPERATE` (operate) · staff
 - `redeemGiftCard` → `WALLET_OPERATE` (operate) · staff
+- `getGiftCard` → `WALLET_VIEW` (read) · staff, guest
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
 #### Requirements it meets
 
-1 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+2 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
 
 | Ref | Requirement (shortened) | Domain | Verdict | Via |
 |---|---|---|---|---|
 | 2.6.35 | Website should have the ability to purchase Gift Vouchers such as Money card where the customer will be able to load money on their wallet using their credit card. Customer should be able to use … | Ticketing Sales | CONTRACTED | `issueGiftCard` |
+| 19.2.40 | Gift Card Wallet - System shall support gift card storage. | Guest Mobile App & Branding | CONTRACTED | `getGiftCard` |
 
 #### Client meeting inputs
 
@@ -551,12 +689,12 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (12), with its required mark, default, format and its error state (409).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (12), with its required mark, default, format and its error state (404, 409).
+- [ ] Every output is drawn (9 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-1125?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, emptyNoResults, offline.
 - [ ] Every action is wired with its success and its failure: What publishing changes, Digital delivery, Physical card, RFID/NFC card, Wallet, Printable voucher, Distribution, Expiry, Cost center.
 - [ ] Every transition is wired: `BO-1123`.
-- [ ] Every gated control is gated: `WALLET_OPERATE`.
+- [ ] Every gated control is gated: `WALLET_OPERATE`, `WALLET_VIEW`.
 - [ ] The module and platform inputs below are applied.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -577,6 +715,13 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/orders-money/voucher-coupon-type-configuration-bo-1126` |
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Vouchers and non-cash instruments (meal, parking, attraction, coupon): an entitlement with conditions, distinct from a gift card's balance.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **Two voucher models, wallet (createVoucherType) and promotions (createVoucherBatch, which carries money).** Why: Same correction as BO-1123. *(source: contracts/satellite/wallet.yaml#createVoucherType / contracts/satellite/promotions.yaml#createVoucherBatch; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
+- **List operation(s) listVoucherTypes return a bare array, not the paged list envelope (items, nextCursor, hasMore).** Why: The table cannot page, and a row without an id cannot open, edit or link to the record it summarises. *(source: contracts/satellite/wallet.yaml#listVoucherTypes; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
 
 #### Inputs: what the user enters or picks
 
@@ -607,6 +752,10 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 | Barcode / QR | select field | — | — | — | — | — | — |
 | Status | select field | — | — | — | — | — | — |
 
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **voucher type**: What it grants, where, conditions, validity. *(source: contracts/satellite/wallet.yaml#createVoucherType)*
+
 #### Outputs: what the screen shows and produces
 
 **Data it reads**: `listVoucherTypes` (onLoad, Voucher and coupon types)
@@ -625,6 +774,17 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Empty, no results (`?state=emptyNoResults`) | **Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+voucher:
+  name: Meal voucher Harbour Kitchen
+  grants: 1 kids meal
+  validity: same day
+```
 
 #### Permissions
 
@@ -667,6 +827,7 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 - [ ] Every transition is wired: `BO-1123`.
 - [ ] Every gated control is gated: `WALLET_CONFIGURE`, `WALLET_VIEW`.
 - [ ] The 2 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 2 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -680,7 +841,7 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Orders & Money · wave 3 · needs the `core` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `WALLET_CONFIGURE` (1 configure); in the flows as venue manager |
+| Who uses it | venue staff holding `WALLET_CONFIGURE`, `WALLET_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure by; Configure) and no display directory — it is settings, not a population |
 | Offline | online only |
@@ -688,6 +849,10 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 | Route | `/orders-money/voucher-eligibility-redemption-rule-studio-bo-1127` |
 
 **Known gaps.** **Voucher Eligibility & Redemption Rule Studio declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so …
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** When, where and by whom a voucher may be redeemed.
+
+**Fixed on main** (the package already carries these; draw what it says): No read operation: the screen declares only createVoucherType and nothing that returns the current configuration. (CHG-WIR-025).
 
 #### Inputs: what the user enters or picks
 
@@ -726,7 +891,31 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 | Time window | select field | — | — | — | — | — | — |
 | Season | select field | — | — | — | — | — | — |
 
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **eligibility**: Venue, outlet, product, guest, time conditions on the voucher type. *(source: contracts/satellite/wallet.yaml#createVoucherType)*
+
 #### Outputs: what the screen shows and produces
+
+**Shown**
+
+**Voucher, coupon and benefit definitions** (data table, from `listVoucherTypes`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| ID | the name it points at, never the id | — |
+| Code | text | — |
+| Name | text | — |
+| Benefit kind | chip: Free item, Percent discount, Fixed discount, Upgrade, Access entitlement, Companion … | — |
+| Benefit value | 1,234.5 | — |
+| Conditions | grouped details | — |
+| Single use | yes / no (icon or chip) | — |
+| Combinable | yes / no (icon or chip) | — |
+| Valid from | 1 Oct 2026 | — |
+| Valid to | 1 Oct 2026 | — |
+| Issue limit | 1,234 | — |
+
+**Data it reads**: `listVoucherTypes` (onLoad, Voucher, coupon and benefit definitions)
 
 **Where the user goes next**
 
@@ -743,9 +932,18 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 | Empty, no results (`?state=emptyNoResults`) | **Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist |
 | Offline (`?state=offline`) | online only |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+rule: 'Parking voucher: Dune Park car park, valid on the visit date only'
+```
+
 #### Permissions
 
 - `createVoucherType` → `WALLET_CONFIGURE` (configure) · staff
+- `listVoucherTypes` → `WALLET_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -777,11 +975,11 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (30), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (11 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-1127?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, emptyNoResults, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-1123`.
-- [ ] Every gated control is gated: `WALLET_CONFIGURE`.
+- [ ] Every gated control is gated: `WALLET_CONFIGURE`, `WALLET_VIEW`.
 - [ ] The 2 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -802,6 +1000,12 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/orders-money/membership-benefits-entitlement-mapping-bo-1128` |
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Membership benefits that appear in the wallet (guest passes, credits) without the wallet owning membership logic.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **List operation(s) listVoucherTypes return a bare array, not the paged list envelope (items, nextCursor, hasMore).** Why: The table cannot page, and a row without an id cannot open, edit or link to the record it summarises. *(source: contracts/satellite/wallet.yaml#listVoucherTypes; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
 
 #### Inputs: what the user enters or picks
 
@@ -834,6 +1038,10 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 
 #### Outputs: what the screen shows and produces
 
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **mapped benefits**: Benefit, voucher type, quantity per period. *(source: contracts/satellite/wallet.yaml#listVoucherTypes)*
+
 **Data it reads**: `listVoucherTypes` (onLoad, Benefits mapped to memberships)
 
 **Where the user goes next**
@@ -850,6 +1058,21 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Empty, no results (`?state=emptyNoResults`) | **Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist |
 | Offline (`?state=offline`) | online only |
+
+#### Consistency with other screens
+
+- Match `BO-288`: Benefits defined on the membership; this only maps them into the wallet.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+mapping:
+  membership: Annual Pass Gold
+  benefit: 4 guest passes a year
+  voucherType: Guest pass
+```
 
 #### Permissions
 
@@ -887,6 +1110,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-1123`.
 - [ ] Every gated control is gated: `WALLET_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -906,6 +1130,18 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/orders-money/benefit-packaging-digital-wallet-presentation-bo-1129` |
+
+**Known gaps.** Contract gap recorded 2 October 2026 (CHG-WIR-027): A write and read for wallet presentation (sections, order, labels).
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** How instruments appear to guests in the wallet: sections (money, gift cards, vouchers, passes), order, labels.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **List operation(s) listVoucherTypes return a bare array, not the paged list envelope (items, nextCursor, hasMore).** Why: The table cannot page, and a row without an id cannot open, edit or link to the record it summarises. *(source: contracts/satellite/wallet.yaml#listVoucherTypes; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- No operation stores presentation (sections, order, labels). (CHG-WIR-027)
 
 #### Inputs: what the user enters or picks
 
@@ -937,6 +1173,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Outputs: what the screen shows and produces
 
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **guest preview**: Phone preview of the wallet sections in English and Arabic. *(source: contracts/satellite/wallet.yaml#listVoucherTypes / DI-019)*
+
 **Data it reads**: `listVoucherTypes` (onLoad, How benefits are presented)
 
 **Where the user goes next**
@@ -953,6 +1193,18 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Empty, no results (`?state=emptyNoResults`) | **Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+sections:
+- Money
+- Gift cards
+- Vouchers
+- Points
+```
 
 #### Permissions
 
@@ -995,6 +1247,7 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 - [ ] Every transition is wired: `BO-1123`.
 - [ ] Every gated control is gated: `WALLET_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -1008,12 +1261,16 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Orders & Money · wave 3 · needs the `core` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `WALLET_OPERATE` (1 operate); in the flows as venue manager |
+| Who uses it | venue staff holding `WALLET_OPERATE`, `WALLET_VIEW` (1 operate, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/orders-money/gift-card-voucher-expiry-management-bo-1130` |
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Expiry of gift cards and vouchers (never, fixed date, days after purchase, activation or issue) and extension, with guest notification.
+
+**Fixed on main** (the package already carries these; draw what it says): No read operation: the screen declares only expireCreditLots and nothing that returns the current configuration. (CHG-WIR-025).
 
 #### Inputs: what the user enters or picks
 
@@ -1032,11 +1289,40 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 | Expired-value treatment | select field | — | — | — | — | — | — |
 | Notification Schedule | select field | — | — | — | — | — | — |
 
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Wallet | picker: choose a wallet | — | — | `listCreditLots` ?walletId |
+| Include exhausted | toggle | off | — | `listCreditLots` ?includeExhausted |
+
 #### Outputs: what the screen shows and produces
 
 **Shown**
 
+**The tranches behind a balance, with their expiry** (data table, from `listCreditLots`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| ID | the name it points at, never the id | — |
+| Wallet | the name it points at, never the id | — |
+| Credit type | the name it points at, never the id | — |
+| Issued amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Remaining amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Issued at | 1 Oct 2026, 14:30 | — |
+| Expires at | 1 Oct 2026, 14:30 | — |
+| Source kind | chip: Top up, Refund, Promotion, Gift card, Membership benefit, Loyalty conversion… | — |
+| Source reference | text | — |
+| Terms snapshot | grouped details | The credit type's terms as they stood at issue. Changing a credit type must not retro-expire credit already given, so the lot carries its … |
+| Status | chip: Active, Exhausted, Expired, Forfeited, Reversed | — |
+
 **Permissions this screen separates** (banner): **The pack separates these permissions and no action on the screen claims them yet:** Extend, Reinstate, Suspend, Cancel, Replace, Reissue. Each needs attaching to the control it gates, or the screen needs the control.
+
+**What each action does** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **Expire or extend**: Preview lots and breakage before applying. *(source: contracts/satellite/wallet.yaml#expireCreditLots)*
+
+**Data it reads**: `listCreditLots` (onLoad, The tranches behind a balance, with their expiry)
 
 **Where the user goes next**
 
@@ -1053,9 +1339,21 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 | Empty, no results (`?state=emptyNoResults`) | **Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist |
 | Offline (`?state=offline`) | online only |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+run:
+  instrument: Gift cards issued 2023
+  outstanding: AED 18,400.00
+  action: extend 6 months (park closure)
+```
+
 #### Permissions
 
 - `expireCreditLots` → `WALLET_OPERATE` (operate) · staff
+- `listCreditLots` → `WALLET_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -1088,11 +1386,11 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (10), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (11 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-1130?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, emptyNoResults, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-1123`.
-- [ ] Every gated control is gated: `WALLET_OPERATE`.
+- [ ] Every gated control is gated: `WALLET_OPERATE`, `WALLET_VIEW`.
 - [ ] The module and platform inputs below are applied.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -1115,6 +1413,13 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 | Route | `/orders-money/gift-card-balance-liability-breakage-control-bo-1131` |
 
 **Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Gift card balances as a liability and breakage: outstanding, redeemed, expired, recognised.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **List operation(s) getWalletLiability return a bare array, not the paged list envelope (items, nextCursor, hasMore); rows of getWalletLiability carry no identifier.** Why: The table cannot page, and a row without an id cannot open, edit or link to the record it summarises. *(source: contracts/satellite/wallet.yaml#getWalletLiability; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
+- **No write operation: a configuration screen (Gift Card Balance, Liability & Breakage Control) declares only reads (getWalletLiability).** Why: Nothing it shows can be changed from it; either it is a view (and its edits happen on the record editor, which it should link to) or a write is missing. *(source: contracts/satellite/wallet.yaml#getWalletLiability; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
 
 #### Inputs: what the user enters or picks
 
@@ -1161,6 +1466,10 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Recognized revenue | text | not in the schema: `Recognized revenue` |
 | Deferred liability | text | not in the schema: `Deferred liability` |
 
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **liability**: Outstanding by issue month (ageing) and breakage recognised. *(source: contracts/satellite/wallet.yaml#getWalletLiability)*
+
 **Data it reads**: `getWalletLiability` (onLoad, Balance, liability and breakage)
 
 **Where the user goes next**
@@ -1177,6 +1486,16 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the gift card balance are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+liability:
+  outstanding: AED 612,000.00
+  breakageYTD: AED 48,200.00
+```
 
 #### Permissions
 
@@ -1219,6 +1538,7 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 - [ ] Every transition is wired: `BO-1123`.
 - [ ] Every gated control is gated: `WALLET_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 2 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -1232,7 +1552,7 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Orders & Money · wave 3 · needs the `core` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `WALLET_CONFIGURE` (1 configure); in the flows as venue manager |
+| Who uses it | venue staff holding `WALLET_CONFIGURE`, `WALLET_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
 | Offline | online only |
@@ -1241,11 +1561,32 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Test gift card, voucher and benefit configuration on scenarios before publishing.
+
+**Fixed on main** (the package already carries these; draw what it says): No read operation: the screen declares only publishWalletConfiguration and nothing that returns the current configuration. (CHG-WIR-025).
+
 #### Inputs: what the user enters or picks
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
 
 #### Outputs: what the screen shows and produces
+
+**Shown**
+
+**Wallet configuration versions, newest first** (data table, from `listWalletConfigurationVersions`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| Published at | 1 Oct 2026, 14:30 | — |
+| Published by | the name it points at, never the id | — |
+| Note | text | — |
+| Findings | list or chips (count when long) | — |
+| Severity | chip: Blocking, Warning | — |
+| Code | text | — |
+| Message | text | — |
+| Next cursor | text | — |
+| Has more | yes / no (icon or chip) | — |
 
 **Actions and what each produces**
 
@@ -1254,6 +1595,12 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Publish wallet configuration (primary button) | navigation or local | — | — | — | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
 | What publishing changes (publish gate) | navigation or local | — | — | — | — |
+
+**What each action does** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **Publish**: Validation findings first. *(source: contracts/satellite/wallet.yaml#publishWalletConfiguration)*
+
+**Data it reads**: `listWalletConfigurationVersions` (onLoad, Wallet configuration versions, newest first)
 
 **Where the user goes next**
 
@@ -1270,9 +1617,22 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+scenario:
+  guest: Gold member
+  venue: Dune Park
+  instrument: Meal voucher
+  result: redeemable at Harbour Kitchen
+```
+
 #### Permissions
 
 - `publishWalletConfiguration` → `WALLET_CONFIGURE` (configure) · staff
+- `listWalletConfigurationVersions` → `WALLET_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -1307,11 +1667,11 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (10 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-1132?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Publish wallet configuration, Cancel, What publishing changes.
 - [ ] Every transition is wired: `BO-1123`.
-- [ ] Every gated control is gated: `WALLET_CONFIGURE`.
+- [ ] Every gated control is gated: `WALLET_CONFIGURE`, `WALLET_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -1423,7 +1783,9 @@ Method, path, parameters, request and response for every operation these screens
 "getGiftCard": {"method":"GET","path":"/gift-cards/{cardCode}","contract":"wallet","summary":"Check a gift card balance","permission":"WALLET_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"GiftCard"},
 "getWalletLiability": {"method":"GET","path":"/wallet-liability","contract":"wallet","summary":"What is outstanding, and what is breakage","permission":"WALLET_VIEW","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"tenant","parameters":[{"name":"asOf","in":"query","required":null},{"name":"groupBy","in":"query","required":null}],"requestBody":null,"responds":"WalletLiabilityRow"},
 "issueGiftCard": {"method":"POST","path":"/gift-cards","contract":"wallet","summary":"Issue or activate a gift card","permission":"WALLET_OPERATE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"workstation","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"IssueGiftCardRequest","responds":"GiftCard"},
+"listCreditLots": {"method":"GET","path":"/credit-lots","contract":"wallet","summary":"The tranches behind a balance, with their expiry","permission":"WALLET_VIEW","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[{"name":"walletId","in":"query","required":true},{"name":"includeExhausted","in":"query","required":null}],"requestBody":null,"responds":"CreditLot"},
 "listVoucherTypes": {"method":"GET","path":"/voucher-types","contract":"wallet","summary":"Voucher, coupon and benefit definitions","permission":"WALLET_VIEW","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"VoucherType"},
+"listWalletConfigurationVersions": {"method":"GET","path":"/wallet-configuration/versions","contract":"wallet","summary":"Wallet configuration versions, newest first","permission":"WALLET_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "publishWalletConfiguration": {"method":"POST","path":"/wallet-configuration/publish","contract":"wallet","summary":"Validate and publish the wallet configuration as a version","permission":"WALLET_CONFIGURE","offlineCapable":null,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"WalletConfigurationVersion"},
 "redeemGiftCard": {"method":"POST","path":"/gift-cards/{giftCardId}/redeem","contract":"wallet","summary":"Spend against a card","permission":"WALLET_OPERATE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"GiftCard"},
 "setGiftCardProduct": {"method":"PUT","path":"/gift-card-products","contract":"wallet","summary":"Denominations, validity, activation and distribution","permission":"WALLET_CONFIGURE","offlineCapable":null,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":"GiftCardProduct","responds":"GiftCardProduct"}
@@ -1437,10 +1799,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 ```json
 {
 "CreditExpiryResult": {"type":"object","description":"Board 3.9. **Expiry has an accounting consequence**, so the preview carries it.","properties":{"lotsAffected":{"type":"integer"},"totalAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"breakageAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"walletsAffected":{"type":"integer"},"applied":{"type":"boolean"},"asOf":{"type":"string","format":"date"}}},
+"CreditLot": {"type":"object","x-ticvai-persistence":"wallet.credit_lot","description":"Board 3.7. **The tranche behind a balance.** Expiry belongs here, not on the wallet.","required":["id","walletId","creditTypeId"],"properties":{"id":{"type":"string","format":"uuid"},"walletId":{"type":"string","format":"uuid"},"creditTypeId":{"type":"string","format":"uuid"},"issuedAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"remainingAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"issuedAt":{"type":"string","format":"date-time"},"expiresAt":{"type":"string","format":"date-time","nullable":true},"sourceKind":{"type":"string","enum":["topUp","refund","promotion","giftCard","membershipBenefit","loyaltyConversion","transfer","adjustment"]},"sourceReference":{"type":"string","nullable":true},"termsSnapshot":{"type":"object","additionalProperties":true,"description":"**The credit type's terms as they stood at issue.** Changing a credit type must not retro-expire credit already given, so the lot carries its own terms.\n**Open on purpose, and its shape lives in `CreditType`**: the snapshot is that credit type's properties copied at issue, so it follows `CreditType` as it stood then rather than as it stands now.\n"},"status":{"type":"string","enum":["active","exhausted","expired","forfeited","reversed"]},"scopePath":{"type":"string"}}},
 "GiftCard": {"x-ticvai-persistence":"wallet.gift_card","type":"object","required":["cardCode","faceValue","balance","status","issuedAt"],"properties":{"cardCode":{"type":"string"},"kind":{"type":"string"},"faceValue":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"balance":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"status":{"type":"string","enum":["issued","active","partiallyRedeemed","redeemed","expired","blocked"]},"blockedReason":{"type":"string","nullable":true},"issuedAt":{"type":"string","format":"date-time"},"activatedAt":{"type":"string","format":"date-time","nullable":true},"expiresAt":{"type":"string","format":"date-time","nullable":true}}},
 "GiftCardProduct": {"type":"object","x-ticvai-persistence":"wallet.gift_card_product","description":"Boards 5.2 and 5.3. **Activation separate from issuance is a theft control.**","properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string"},"name":{"type":"string"},"denominations":{"type":"array","items":{"$ref":"../shared/common.yaml#/components/schemas/Money"}},"openAmountAllowed":{"type":"boolean","default":false},"minimumAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"maximumAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"reloadable":{"type":"boolean","default":false},"validityMonths":{"type":"integer","nullable":true},"activationRequired":{"type":"boolean","default":true},"creditTypeId":{"type":"string","format":"uuid"},"physical":{"type":"boolean","default":false},"scopePath":{"type":"string"}}},
 "IssueGiftCardRequest": {"x-ticvai-persistence":"none — request only","type":"object","required":["id","faceValue","kind"],"properties":{"id":{"type":"string","format":"uuid"},"kind":{"type":"string","enum":["physical","digital"]},"cardCode":{"type":"string","description":"Required for physical cards, which are pre-printed. Generated for digital."},"faceValue":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"recipientEmail":{"type":"string","nullable":true},"recipientPhone":{"type":"string","nullable":true},"message":{"type":"string","maxLength":500},"validMonths":{"type":"integer","minimum":1}}},
 "Money": {"type":"object","x-ticvai-persistence-kind":"valueObject","x-ticvai-persistence-column":"numeric(18,4)","description":"**On the wire this is three fields; in the database it is one column.**\n24 August. Every column typed `Money` was landing as `jsonb` — 129 of them, including `orders.shift.opening_float`, `inventory.purchase_order.total` and `promotions.voucher.balance`. **`orders.cash_movement.amount` was `numeric(18,4)` because somebody hand-typed that one**, and the inconsistency is what made it visible.\n**A jsonb price cannot be summed in SQL.** Every total, variance and reconciliation moves into application code — and a shift variance computed in .NET against a ledger computed in Postgres is two answers to one question. That is F13 month-end and F98 takings-to-ledger, both walked, both assuming the arithmetic is in the database.\n**`currency` and `scale` are not stored per row.** ADR-0018 makes them region-scoped and not overridable below, so they resolve from the scope walk — storing AED against nine million rows in a UAE region is nine million copies of a fact that cannot differ. A row that needed its own currency would be a row in the wrong region.\n**They stay on the wire** because a client reading a figure should not have to walk a hierarchy to know what it means.\n","required":["amount","currency","scale"],"properties":{"amount":{"type":"string","description":"Decimal string, never a float. Up to 4 decimal places. **Persisted as `numeric(18,4)`** — the string is a transport choice, so a JavaScript client cannot round a fare in transit.\n","pattern":"^-?\\d+(\\.\\d{1,4})?$"},"currency":{"type":"string","description":"**Resolved from the region, not stored on the row** (ADR-0018). OMR uses 3 decimal places and AED uses 2 — a venue on a different scale from its region is a ledger that cannot consolidate.\n","pattern":"^[A-Z]{3}$"},"scale":{"type":"integer","description":"Resolved from the region alongside `currency`.","minimum":0,"maximum":4}}},
+"Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}},
 "VoucherType": {"type":"object","x-ticvai-persistence":"wallet.voucher_type","description":"Board 5.4. **An entitlement with conditions, not a balance.**","required":["code","name"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string"},"name":{"type":"string"},"benefitKind":{"type":"string","enum":["freeItem","percentDiscount","fixedDiscount","upgrade","accessEntitlement","companionEntry"]},"benefitValue":{"type":"number","nullable":true},"conditions":{"type":"object","additionalProperties":true},"singleUse":{"type":"boolean","default":true},"combinable":{"type":"boolean","default":false},"validFrom":{"type":"string","format":"date","nullable":true},"validTo":{"type":"string","format":"date","nullable":true},"issueLimit":{"type":"integer","nullable":true},"scopePath":{"type":"string"}}},
 "WalletConfigurationVersion": {"type":"object","x-ticvai-persistence":"wallet.configuration_version","description":"Boards 1.10 and 10.8. **Ten boards of configuration that interact.**","properties":{"version":{"type":"integer"},"publishedAt":{"type":"string","format":"date-time","nullable":true},"publishedBy":{"type":"string","format":"uuid","nullable":true},"note":{"type":"string","nullable":true},"findings":{"type":"array","items":{"type":"object","properties":{"severity":{"type":"string","enum":["blocking","warning"]},"code":{"type":"string"},"message":{"type":"string"}}}},"scopePath":{"type":"string"}}},
 "WalletLiabilityRow": {"type":"object","description":"Boards 9.5 and 9.6. **The number the finance director asks for.**","properties":{"key":{"type":"string"},"label":{"type":"string"},"outstanding":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"expiringThisPeriod":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"breakageRecognised":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"walletCount":{"type":"integer"},"oldestLotAt":{"type":"string","format":"date","nullable":true}}}

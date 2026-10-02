@@ -104,6 +104,54 @@
   "requestBody": null,
   "responds": "WalletLiabilityRow"
  },
+ "getWalletMovementSummary": {
+  "method": "GET",
+  "path": "/wallet-movement-summary",
+  "contract": "wallet",
+  "summary": "How the stored-value balance moved over a period",
+  "permission": "WALLET_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "from",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "groupBy",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "WalletMovementSummary"
+ },
+ "getWalletPreCloseChecks": {
+  "method": "GET",
+  "path": "/wallet-pre-close-checks",
+  "contract": "wallet",
+  "summary": "The wallet's checks before a period closes",
+  "permission": "WALLET_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "periodEnd",
+    "in": "query",
+    "required": true
+   }
+  ],
+  "requestBody": null,
+  "responds": "WalletPreCloseCheck"
+ },
  "getWalletReconciliation": {
   "method": "GET",
   "path": "/wallet-reconciliation",

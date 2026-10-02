@@ -121,6 +121,25 @@
   "requestBody": null,
   "responds": "Case"
  },
+ "recordLostItem": {
+  "method": "POST",
+  "path": "/lost-items",
+  "contract": "marketing-crm",
+  "summary": "Report something lost, or hand something in",
+  "permission": "CASE_MANAGE",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "LostItem",
+  "responds": "LostItem"
+ },
  "replyToMyCase": {
   "method": "POST",
   "path": "/my/cases/{caseId}/messages",

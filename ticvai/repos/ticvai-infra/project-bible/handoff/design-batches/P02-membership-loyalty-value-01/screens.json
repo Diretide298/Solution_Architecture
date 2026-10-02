@@ -32,10 +32,15 @@
     {
      "to": "GST-020",
      "trigger": "Saved items carry across sessions",
-     "provenance": "flow F53 step 4→5",
-     "carries": [
-      "subjectId"
-     ]
+     "provenance": "flow F53 step 4→5"
+    },
+    {
+     "to": "BO-395",
+     "trigger": "Machine records the play",
+     "provenance": "flow F18 step 2→3",
+     "operation": "getGameCard",
+     "crossesDevice": true,
+     "back": false
     }
    ]
   },
@@ -43,7 +48,7 @@
   "density": "comfortable",
   "pattern": "listDetail",
   "patternReason": "`listWalletTransactions` reads the population and `getWallet` reads one of them — list, select, act",
-  "purpose": "The screen this app sits on. Everything else is entered from here and returns to it.",
+  "purpose": "My wallet: balance, activity and auto top-up, and what is due or refundable at exit.",
   "layout": {
    "template": "split",
    "regions": [
@@ -52,22 +57,19 @@
      "slot": "collection",
      "components": [
       {
-       "kind": "dataTable",
-       "label": "Every wallet transaction",
+       "kind": "cardList",
+       "label": "Activity",
        "bindsTo": "WalletTransaction",
        "columns": [
-        "WalletTransaction.id",
         "WalletTransaction.kind",
         "WalletTransaction.amount",
         "WalletTransaction.balanceAfter",
-        "WalletTransaction.orderId",
-        "WalletTransaction.venueId",
         "WalletTransaction.reason",
-        "WalletTransaction.principalId",
         "WalletTransaction.recordedAt"
        ],
        "operation": "listWalletTransactions",
-       "provenance": "contract retail.yaml GET /wallets/{subjectId}/transactions"
+       "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)",
+       "notes": "Was the generated table 'Every wallet transaction'; staff and plumbing columns removed (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)). From `wallet.yaml` `listWalletTransactions`."
       }
      ]
     },
@@ -77,29 +79,9 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected wallet transaction",
-       "bindsTo": "WalletTransaction",
-       "columns": [
-        "WalletTransaction.id",
-        "WalletTransaction.kind",
-        "WalletTransaction.amount",
-        "WalletTransaction.balanceAfter",
-        "WalletTransaction.orderId",
-        "WalletTransaction.venueId",
-        "WalletTransaction.reason",
-        "WalletTransaction.principalId",
-        "WalletTransaction.recordedAt"
-       ],
-       "operation": "listWalletTransactions",
-       "provenance": "contract wallet.yaml GET /wallets/{subjectId}/transactions"
-      },
-      {
-       "kind": "detailPanel",
        "label": "The wallet",
        "bindsTo": "Wallet",
        "columns": [
-        "Wallet.id",
-        "Wallet.subjectId",
         "Wallet.balance",
         "Wallet.credits",
         "Wallet.bonusBalance",
@@ -111,6 +93,25 @@
        ],
        "operation": "getWallet",
        "provenance": "contract wallet.yaml GET /wallets/{subjectId}"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The game card",
+       "bindsTo": "GameCard",
+       "columns": [
+        "GameCard.cardCode",
+        "GameCard.kind",
+        "GameCard.credits",
+        "GameCard.bonusCredits",
+        "GameCard.points",
+        "GameCard.status",
+        "GameCard.blockedReason",
+        "GameCard.lastPlayedAt",
+        "GameCard.expiresAt"
+       ],
+       "operation": "getGameCard",
+       "notes": "An arcade card's balance, read by its code, as the web wallet WEB-021 shows it (flow F18 step 2; CHG-CLN-006).",
+       "provenance": "contract games.yaml GET /game-cards/{cardCode}"
       }
      ]
     }
@@ -121,7 +122,7 @@
    "error": "Could not load. Names which read failed and leaves the wallet overview untouched.",
    "emptyFirstRun": "No wallet overview yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
    "emptyNoResults": "Never shown: `listWalletTransactions` takes no filter, so an empty list is always the first-run state above.",
-   "emptyNoAccess": "Shown when the caller lacks `WALLET_VIEW`, which `getWallet` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** Balances and stored cards already loaded stay visible with their age, cards masked. Storing a card and transferring value need the server."
   },
   "apis": [
@@ -164,13 +165,24 @@
     "purpose": "Settle the wallet at exit",
     "trigger": "onAction",
     "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "getGameCard",
+    "contract": "games",
+    "purpose": "Balance on a game card",
+    "trigger": "onAction",
+    "provenance": "flow F18 step 2, 2 October 2026 (CHG-CLN-006)"
    }
   ],
   "entryState": {
    "params": [
     {
+     "name": "cardCode",
+     "from": "deepLink"
+    },
+    {
      "name": "subjectId",
-     "from": "GST-001"
+     "from": "session"
     },
     {
      "name": "walletId",
@@ -282,25 +294,22 @@
      "slot": "collection",
      "components": [
       {
-       "kind": "dataTable",
-       "label": "Every memberships",
+       "kind": "cardList",
+       "label": "Family and who may use it",
        "bindsTo": "DelegatedAccess",
        "columns": [
-        "DelegatedAccess.id",
-        "DelegatedAccess.principalId",
         "DelegatedAccess.roleId",
         "DelegatedAccess.permission",
-        "DelegatedAccess.subjectId",
         "DelegatedAccess.overSubjectId",
         "DelegatedAccess.overObjectRef",
         "DelegatedAccess.delegationKind",
         "DelegatedAccess.quota",
         "DelegatedAccess.isRevocableBySubject",
-        "DelegatedAccess.scopePath",
         "DelegatedAccess.effect"
        ],
        "operation": "listDelegations",
-       "provenance": "contract identity.yaml GET /guests/{subjectId}/delegations"
+       "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)",
+       "notes": "Was the generated table 'Every memberships'; staff and plumbing columns removed (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3))."
       },
       {
        "kind": "datePicker",
@@ -317,12 +326,10 @@
        "provenance": "contract orders.yaml GET /billing-statements"
       },
       {
-       "kind": "dataTable",
-       "label": "Every billing statement",
+       "kind": "cardList",
+       "label": "Statements",
        "bindsTo": "BillingStatement",
        "columns": [
-        "BillingStatement.id",
-        "BillingStatement.subjectId",
         "BillingStatement.periodStart",
         "BillingStatement.periodEnd",
         "BillingStatement.lines",
@@ -330,15 +337,14 @@
         "BillingStatement.isTaxInvoice"
        ],
        "operation": "listBillingStatements",
-       "provenance": "contract orders.yaml GET /billing-statements"
+       "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)",
+       "notes": "Was the generated table 'Every billing statement'; staff and plumbing columns removed (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3))."
       },
       {
-       "kind": "dataTable",
-       "label": "Every dunning case",
+       "kind": "cardList",
+       "label": "Payments that need you",
        "bindsTo": "DunningCase",
        "columns": [
-        "DunningCase.id",
-        "DunningCase.subjectId",
         "DunningCase.orderId",
         "DunningCase.amount",
         "DunningCase.state",
@@ -351,48 +357,21 @@
         "DunningCase.resolutionNote"
        ],
        "operation": "listMyPaymentIssues",
-       "provenance": "contract payments.yaml GET /guests/me/payment-issues"
+       "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)",
+       "notes": "Was the generated table 'Every dunning case'; staff and plumbing columns removed (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3))."
       },
       {
-       "kind": "dataTable",
-       "label": "Every product",
+       "kind": "cardList",
+       "label": "Membership plans",
        "bindsTo": "Product",
        "columns": [
-        "Product.id",
-        "Product.code",
         "Product.name",
         "Product.description",
-        "Product.kind",
-        "Product.venueId",
-        "Product.scopePath",
-        "Product.createdByPrincipalId",
-        "Product.approvedByPrincipalId",
-        "Product.responsibleDepartmentId",
-        "Product.onSaleFrom",
-        "Product.onSaleTo"
+        "Product.media"
        ],
        "operation": "listProducts",
-       "provenance": "contract catalogue.yaml GET /products"
-      },
-      {
-       "kind": "dataTable",
-       "label": "Every guest membership",
-       "bindsTo": "GuestMembership",
-       "columns": [
-        "GuestMembership.entitlementId",
-        "GuestMembership.productId",
-        "GuestMembership.name",
-        "GuestMembership.tier",
-        "GuestMembership.status",
-        "GuestMembership.validFrom",
-        "GuestMembership.validTo",
-        "GuestMembership.frozenDays",
-        "GuestMembership.benefits",
-        "GuestMembership.renewsOn",
-        "GuestMembership.previousTerms"
-       ],
-       "operation": "listGuestMemberships",
-       "provenance": "contract catalogue.yaml GET /guest/memberships"
+       "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)",
+       "notes": "The venue's membership plans, to join or upgrade. The venue is the one the guest picked on Home (`venueId` from the session, audit R267), never typed. Was the generated table 'Every product'; staff and plumbing columns removed (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3))."
       }
      ]
     },
@@ -405,8 +384,6 @@
        "label": "The selected billing statement",
        "bindsTo": "BillingStatement",
        "columns": [
-        "BillingStatement.id",
-        "BillingStatement.subjectId",
         "BillingStatement.periodStart",
         "BillingStatement.periodEnd",
         "BillingStatement.lines",
@@ -418,7 +395,7 @@
       },
       {
        "kind": "detailPanel",
-       "label": "The guest membership",
+       "label": "Your membership",
        "bindsTo": "GuestMembership",
        "columns": [
         "GuestMembership.entitlementId",
@@ -444,13 +421,13 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Grant delegation",
+       "label": "Let a family member use it",
        "operation": "grantDelegation",
        "provenance": "contract identity.yaml POST /guests/{subjectId}/delegations"
       },
       {
        "kind": "secondaryButton",
-       "label": "Retry my dunning payment",
+       "label": "Retry the payment",
        "operation": "retryMyDunningPayment",
        "provenance": "contract payments.yaml POST /dunning-cases/{caseId}/retry"
       }
@@ -463,7 +440,7 @@
    "error": "Could not load. Names which read failed and leaves the memberships untouched.",
    "emptyFirstRun": "No memberships yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
    "emptyNoResults": "Nothing matches the filter on from, to and the memberships are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `getMyMemberships` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "apis": [
@@ -519,12 +496,6 @@
     "trigger": "onLoad"
    },
    {
-    "operationId": "listGuestMemberships",
-    "contract": "catalogue",
-    "purpose": "A guest's memberships, benefits and history",
-    "trigger": "onLoad"
-   },
-   {
     "operationId": "listInstalmentPlans",
     "contract": "payments",
     "purpose": "Instalment plans and schedule",
@@ -547,7 +518,7 @@
     },
     {
      "name": "subjectId",
-     "from": "GST-001"
+     "from": "session"
     },
     {
      "name": "caseId",
@@ -585,7 +556,7 @@
    {
     "id": "formRetryMyDunningPayment",
     "component": "modal",
-    "trigger": "Retry my dunning payment",
+    "trigger": "Retry the payment",
     "body": "**Collects what `retryMyDunningPayment` sends before it is called.** Nothing in the body is required. Optional: `paymentTokenId`. Dismissing sends nothing; the screen behind is unchanged.",
     "bindsTo": "RetryDunningPaymentRequest",
     "confirm": {
@@ -603,10 +574,10 @@
    {
     "id": "formGrantDelegation",
     "component": "modal",
-    "trigger": "Grant delegation",
-    "body": "**Collects what `grantDelegation` sends before it is called.** Required: `overSubjectId`, `delegationKind`, `permission`. Optional: `overObjectRef`, `quota`, `validTo`, `isRevocableBySubject`. Dismissing sends nothing; the screen behind is unchanged.",
+    "trigger": "Let a family member use it",
+    "body": "**In plain words:** pick a family member and what they may do with this membership (\"use it to get in\", \"book with it\", \"spend up to AED 200\"). The delegation kind, the permission and the quota are set from those choices; no subject ids are shown.",
     "confirm": {
-     "label": "Grant delegation",
+     "label": "Allow",
      "operation": "grantDelegation"
     },
     "dismiss": {
@@ -621,7 +592,15 @@
       "isRevocableBySubject"
      ]
     },
-    "provenance": "client-verified"
+    "provenance": "corrected 2 October 2026 (CHG-SGU-020, design-notes correction)"
+   }
+  ],
+  "gaps": [
+   {
+    "operation": "listGuestMemberships",
+    "removed": true,
+    "why": "The staff-shaped membership list; the guest's own are `getMyMemberships`.",
+    "source": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
    }
   ],
   "_platform": {
@@ -749,6 +728,27 @@
        ],
        "operation": "listPromotions",
        "provenance": "contract promotions.yaml GET /promotions"
+      },
+      {
+       "kind": "cardList",
+       "label": "Rewards",
+       "operation": "listRewards",
+       "notes": "What points can be turned into, with the points each needs; Redeem on a reward the guest can afford.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)"
+      },
+      {
+       "kind": "cardList",
+       "label": "My badges",
+       "operation": "listCustomerBadges",
+       "notes": "Status badges the guest holds (DI-392).",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)"
+      },
+      {
+       "kind": "cardList",
+       "label": "Leaderboard",
+       "operation": "listLeaderboard",
+       "notes": "Standings by nickname; the guest sets theirs with Choose my name.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)"
       }
      ]
     },
@@ -764,6 +764,30 @@
        "provenance": "contract marketing-crm.yaml GET /loyalty/position"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "secondaryButton",
+       "label": "Redeem",
+       "operation": "redeemLoyaltyPoints",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Invite a friend",
+       "operation": "createReferral",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Choose my name",
+       "operation": "setLeaderboardNickname",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)"
+      }
+     ]
     }
    ]
   },
@@ -772,7 +796,7 @@
    "error": "Could not load. Names which read failed and leaves the loyalty rewards untouched.",
    "emptyFirstRun": "No loyalty rewards yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
    "emptyNoResults": "Never shown: `listLoyaltyProgrammes` takes no filter, so an empty list is always the first-run state above.",
-   "emptyNoAccess": "Shown when the caller lacks `MARKETING_VIEW`, which `listLoyaltyProgrammes` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** The last known balance stays with its age, and **points earned since are not shown** — and that is said. Redeeming and referring need the connection."
   },
   "apis": [
@@ -807,6 +831,42 @@
     "purpose": "Report impressions, clicks and declines of recommended items",
     "trigger": "onAction",
     "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "listRewards",
+    "contract": "marketing-crm",
+    "purpose": "What points can be turned into",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listCustomerBadges",
+    "contract": "marketing-crm",
+    "purpose": "Badges the guest holds",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listLeaderboard",
+    "contract": "marketing-crm",
+    "purpose": "Standings, by nickname",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "setLeaderboardNickname",
+    "contract": "marketing-crm",
+    "purpose": "Choose the name shown on the board",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "redeemLoyaltyPoints",
+    "contract": "marketing-crm",
+    "purpose": "Spend points on a reward",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "createReferral",
+    "contract": "marketing-crm",
+    "purpose": "Issue my referral code",
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
@@ -823,6 +883,62 @@
    "note": "**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified, awaiting the client's design reviewer.** `provenance: designed` because the accepted vocabulary has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md."
   },
   "apisNote": "Rebuilt 9 September 2026 from the operations this screen declares (4 then; evaluatePromotions removed 27 September), not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "entryState": {
+   "params": [
+    {
+     "name": "subjectId",
+     "from": "session"
+    },
+    {
+     "name": "customerId",
+     "from": "session"
+    }
+   ]
+  },
+  "overlays": [
+   {
+    "id": "confirmCreateReferral",
+    "component": "confirmDialog",
+    "trigger": "Invite a friend",
+    "body": "One tap: the code that comes back is shown with Share. Code, status, qualifying action, rewards and expiry are set by the platform; the guest types nothing.",
+    "confirm": {
+     "label": "Invite a friend",
+     "operation": "createReferral"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)"
+   },
+   {
+    "id": "formRedeemLoyaltyPoints",
+    "component": "modal",
+    "trigger": "Redeem",
+    "body": "The reward chosen from the list and its points; the guest is the caller, so no subject or programme is asked.",
+    "confirm": {
+     "label": "Redeem",
+     "operation": "redeemLoyaltyPoints"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)"
+   },
+   {
+    "id": "formSetLeaderboardNickname",
+    "component": "modal",
+    "trigger": "Choose my name",
+    "body": "The nickname shown on the leaderboard.",
+    "confirm": {
+     "label": "Choose my name",
+     "operation": "setLeaderboardNickname"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)"
+   }
+  ],
   "_platform": {
    "code": "P02",
    "audience": "guest",

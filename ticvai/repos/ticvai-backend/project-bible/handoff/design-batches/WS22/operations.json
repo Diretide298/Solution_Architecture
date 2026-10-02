@@ -18,6 +18,25 @@
   "requestBody": "BookingLimitsCommercialExceptionsApprovalInput",
   "responds": "BookingLimitsCommercialExceptionsApprovalView"
  },
+ "createMfaChallenge": {
+  "method": "POST",
+  "path": "/auth/mfa/challenge",
+  "contract": "identity",
+  "summary": "Second factor at staff sign-in, and step-up for a sensitive action",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
  "listCommercialAgreement": {
   "method": "GET",
   "path": "/commercial-agreement",
@@ -141,167 +160,6 @@
   "requestBody": null,
   "responds": "Page"
  },
- "listCommercialAllocationQuota": {
-  "method": "GET",
-  "path": "/commercial-allocation-quota",
-  "contract": "subscription",
-  "summary": "Commercial Allocation, Quota & Commitment Management",
-  "permission": "PLATFORM_TENANT_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": "partnerId",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "eventId",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "allocationModel",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- },
- "listCommissionMarginIncentive": {
-  "method": "GET",
-  "path": "/commission-margin-incentive",
-  "contract": "subscription",
-  "summary": "Commission, Margin & Incentive Management",
-  "permission": "PLATFORM_TENANT_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": "partnerId",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "agreementId",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "commissionModel",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- },
- "listCreditLimitExposure": {
-  "method": "GET",
-  "path": "/credit-limit-exposure",
-  "contract": "subscription",
-  "summary": "Credit Limit & Exposure Management",
-  "permission": "PLATFORM_TENANT_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": "partnerId",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "creditStatus",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "riskClassification",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- },
- "listDepositGuaranteeFinancial": {
-  "method": "GET",
-  "path": "/deposit-guarantee-financial",
-  "contract": "subscription",
-  "summary": "Deposit, Guarantee & Financial Security Management",
-  "permission": "PLATFORM_TENANT_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": "partnerId",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "securityType",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "verificationStatus",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "expiringWithinDays",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- },
  "setAgreementContractTerm": {
   "method": "PUT",
   "path": "/agreement-contract-term",
@@ -320,63 +178,6 @@
   ],
   "requestBody": "AgreementContractTermsBuilderInput",
   "responds": "AgreementContractTermsBuilderView"
- },
- "setPartnerAllocations": {
-  "method": "PUT",
-  "path": "/partner-agreements/{agreementId}/allocations",
-  "contract": "subscription",
-  "summary": "Replace the allocations of an agreement",
-  "permission": "PARTNER_MANAGE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "PartnerApprovalRoutedResult"
- },
- "setPartnerCommissionRules": {
-  "method": "PUT",
-  "path": "/partner-agreements/{agreementId}/commission-rules",
-  "contract": "subscription",
-  "summary": "Replace the commission and incentive rules of an agreement",
-  "permission": "PARTNER_MANAGE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "PartnerApprovalRoutedResult"
- },
- "setPartnerCreditProfile": {
-  "method": "PUT",
-  "path": "/partner-agreements/{agreementId}/credit-profile",
-  "contract": "subscription",
-  "summary": "Set the credit controls of an agreement",
-  "permission": "CREDIT_MANAGE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "PartnerCreditProfile",
-  "responds": "PartnerApprovalRoutedResult"
  },
  "setPartnerRateNet": {
   "method": "PUT",
@@ -397,25 +198,6 @@
   "requestBody": "PartnerRateNetPricingConfigurationInput",
   "responds": "PartnerRateNetPricingConfigurationView"
  },
- "setPartnerSecurity": {
-  "method": "PUT",
-  "path": "/partners/{partnerId}/securities",
-  "contract": "subscription",
-  "summary": "Record, amend, verify or reject a partner's deposit or guarantee",
-  "permission": "CREDIT_MANAGE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "PartnerSecurity",
-  "responds": "PartnerSecurity"
- },
  "setPaymentTermBilling": {
   "method": "PUT",
   "path": "/payment-term-billing",
@@ -434,5 +216,24 @@
   ],
   "requestBody": "PaymentTermsBillingAccountConfigurationInput",
   "responds": "PaymentTermsBillingAccountConfigurationView"
+ },
+ "verifyMfaChallenge": {
+  "method": "POST",
+  "path": "/auth/mfa/challenge/{challengeId}/verify",
+  "contract": "identity",
+  "summary": "Complete a sign-in or step-up challenge",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
  }
 }

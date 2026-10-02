@@ -131,6 +131,30 @@
   "requestBody": null,
   "responds": "SharedWallet"
  },
+ "listWalletConfigurationVersions": {
+  "method": "GET",
+  "path": "/wallet-configuration/versions",
+  "contract": "wallet",
+  "summary": "Wallet configuration versions, newest first",
+  "permission": "WALLET_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "listWalletTypes": {
   "method": "GET",
   "path": "/wallet-types",

@@ -18,63 +18,6 @@
   "requestBody": null,
   "responds": "PartnerCase"
  },
- "actOnPartnerCommissionLine": {
-  "method": "POST",
-  "path": "/partner-commission-lines/{lineId}/actions",
-  "contract": "subscription",
-  "summary": "Hold, release, dispute or reverse a single commission line",
-  "permission": "SETTLEMENT_RECONCILE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "PartnerCommissionLine"
- },
- "actOnPartnerReconciliationException": {
-  "method": "POST",
-  "path": "/partner-reconciliation-exceptions/{exceptionId}/actions",
-  "contract": "subscription",
-  "summary": "Work a partner reconciliation exception",
-  "permission": "SETTLEMENT_RECONCILE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "PartnerReconciliationException"
- },
- "actOnPartnerSettlementBatch": {
-  "method": "POST",
-  "path": "/partner-settlement-batches/{batchId}/actions",
-  "contract": "subscription",
-  "summary": "Move a commission settlement batch through Finance",
-  "permission": "SETTLEMENT_RECONCILE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "PartnerSettlementBatch"
- },
  "createPartnerCase": {
   "method": "POST",
   "path": "/partner-cases",
@@ -117,50 +60,6 @@
   ],
   "requestBody": "PartnerChangeRequestInput",
   "responds": "PartnerChangeRequest"
- },
- "listCommissionCalculationSettlement": {
-  "method": "GET",
-  "path": "/commission-calculation-settlement",
-  "contract": "subscription",
-  "summary": "Commission Calculation & Settlement Management",
-  "permission": "PLATFORM_TENANT_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": "partnerId",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "status",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "period",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "settlementBatchId",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
  },
  "listPartner": {
   "method": "GET",
@@ -544,45 +443,6 @@
    },
    {
     "name": "period",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- },
- "listPartnerReconciliationException": {
-  "method": "GET",
-  "path": "/partner-reconciliation-exception",
-  "contract": "subscription",
-  "summary": "Partner Reconciliation & Exception Management",
-  "permission": "PLATFORM_TENANT_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": "partnerId",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "mismatchType",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "status",
     "in": "query",
     "required": false
    },

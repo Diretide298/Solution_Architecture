@@ -870,6 +870,14 @@
     "type": "string",
     "format": "uuid",
     "nullable": true
+   },
+   "admissionContext": {
+    "allOf": [
+     {
+      "$ref": "../spine/tenancy.yaml#/components/schemas/OutletAdmissionContext"
+     }
+    ],
+    "description": "**Inside the venue or standalone** (decided 2 October 2026, Chinmay: DEC-070, workbook Q70; CHG-CLN-008): the outlet's `tenancy.Outlet.admissionContext`, so the guest sees before ordering whether an admission ticket for today is needed (`insideVenue`, refused `403 entry-ticket-required` without one) or not (`standalone`, takeaway and delivery). The canonical name; \"siting\" is its deprecated alias."
    }
   }
  },
@@ -2076,9 +2084,32 @@
    },
    "notes": {
     "type": "string",
-    "description": "Allergies",
-    "occasion": null,
-    "accessibility.": null
+    "description": "Allergies, accessibility needs and other requests, as the guest wrote them."
+   },
+   "seatingPreference": {
+    "type": "string",
+    "maxLength": 64,
+    "nullable": true,
+    "description": "**The seating area the guest asked for**, e.g. indoor, terrace, majlis (Chinmay, 2 October, workbook Q204; DI-791; CHG-CSA-018). The outlet's own area names, as the waitlist's `RestaurantWaitlist.seatingPreference` takes them. A preference, not a table: the host seats the party on the night."
+   },
+   "occasion": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "birthday",
+     "anniversary",
+     "business",
+     "celebration",
+     "other"
+    ],
+    "description": "The occasion the guest named (workbook Q204, DI-337; CHG-CSA-018). Shown to the host and the server; never a price."
+   },
+   "takenByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The staff member who took the booking (`createTableReservationForGuest`); null for a guest's own booking (CHG-CSA-045)."
    },
    "actualPartySize": {
     "type": "integer",
@@ -2166,55 +2197,6 @@
    "cancelled",
    "noShow"
   ]
- },
- "TableSession": {
-  "type": "object",
-  "x-ticvai-persistence": "fnb.table_session",
-  "required": [
-   "id",
-   "outletId",
-   "tableId",
-   "tableLabel",
-   "visitId",
-   "expiresAt"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "outletId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "outletName": {
-    "type": "string"
-   },
-   "tableId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "tableLabel": {
-    "type": "string"
-   },
-   "visitId": {
-    "type": "string",
-    "format": "uuid",
-    "description": "The table visit this session orders onto. An existing open visit is joined rather than duplicated — a guest seated by a server and then ordering by app is one party, one bill.\n"
-   },
-   "joinedExistingVisit": {
-    "type": "boolean"
-   },
-   "subjectId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "expiresAt": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Sessions expire so a guest who leaves cannot order to a table now occupied by someone else.\n"
-   }
-  }
  },
  "UpdateParkingEntitlementRequest": {
   "type": "object",
@@ -2989,84 +2971,5 @@
     "nullable": true
    }
   }
- },
- "WaitlistEntry": {
-  "type": "object",
-  "x-ticvai-persistence": "catalogue.waitlist_entry",
-  "required": [
-   "performanceId",
-   "partySize"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid",
-    "readOnly": true
-   },
-   "performanceId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "variantId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "subjectId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "contactPoint": {
-    "type": "string",
-    "description": "**Where the offer goes.** An entry with no way to reach the guest is an entry that can never be honoured, so this is required even for an anonymous guest.\n"
-   },
-   "partySize": {
-    "type": "integer",
-    "minimum": 1
-   },
-   "status": {
-    "allOf": [
-     {
-      "$ref": "#/components/schemas/WaitlistStatus"
-     }
-    ],
-    "readOnly": true,
-    "description": "Set by the server. `joinWaitlist` does not take it; a new entry is `waiting`."
-   },
-   "position": {
-    "type": "integer",
-    "readOnly": true,
-    "description": "First in, first offered. Shown to the guest, because not knowing is worse than waiting."
-   },
-   "offeredAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true,
-    "readOnly": true
-   },
-   "offerExpiresAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true,
-    "readOnly": true,
-    "description": "**The offer moves on when this passes.** Notifying everyone at once produces a race the fastest guest wins; holding indefinitely for someone asleep leaves the seat unsold.\n"
-   },
-   "joinedAt": {
-    "type": "string",
-    "format": "date-time",
-    "readOnly": true
-   }
-  }
- },
- "WaitlistStatus": {
-  "type": "string",
-  "enum": [
-   "waiting",
-   "offered",
-   "converted",
-   "expired",
-   "left"
-  ]
  }
 }

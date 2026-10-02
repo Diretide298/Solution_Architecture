@@ -51,41 +51,35 @@
      "slot": "collection",
      "components": [
       {
-       "kind": "textField",
-       "label": "Outlet id",
-       "operation": "listFnbOrders",
-       "notes": "Sends `?outletId=` to `listFnbOrders`.",
-       "provenance": "contract fnb.yaml GET /fnb-orders"
+       "kind": "selectField",
+       "label": "Outlet",
+       "operation": "listOutlets",
+       "notes": "A pick list in words, never a typed id (design-note correction, 2 October 2026).",
+       "provenance": "contract fnb.yaml GET /fnb-orders",
+       "bindsTo": "Outlet.id",
+       "columns": [
+        "Outlet.name"
+       ]
       },
       {
-       "kind": "textField",
-       "label": "Table visit id",
-       "operation": "listFnbOrders",
-       "notes": "Sends `?tableVisitId=` to `listFnbOrders`.",
-       "provenance": "contract fnb.yaml GET /fnb-orders"
-      },
-      {
-       "kind": "textField",
+       "kind": "multiSelect",
        "label": "Status",
        "operation": "listFnbOrders",
-       "notes": "Sends `?status=` to `listFnbOrders`.",
-       "provenance": "contract fnb.yaml GET /fnb-orders"
+       "notes": "The order statuses in words, as chips; free text matched nothing.",
+       "provenance": "contract fnb.yaml GET /fnb-orders",
+       "bindsTo": "FnbOrder.status"
       },
       {
        "kind": "dataTable",
-       "label": "Every F&B order",
+       "label": "Orders",
        "bindsTo": "FnbOrder",
        "columns": [
-        "FnbOrder.id",
         "FnbOrder.orderNumber",
-        "FnbOrder.outletId",
         "FnbOrder.serviceMode",
-        "FnbOrder.tableVisitId",
         "FnbOrder.status",
         "FnbOrder.lines",
         "FnbOrder.grossAmount",
         "FnbOrder.taxAmount",
-        "FnbOrder.kitchenTicketId",
         "FnbOrder.estimatedReadyAt",
         "FnbOrder.recordedAt"
        ],
@@ -94,36 +88,16 @@
       },
       {
        "kind": "dataTable",
-       "label": "Every kitchen station",
-       "bindsTo": "KitchenStation",
-       "columns": [
-        "KitchenStation.id",
-        "KitchenStation.code",
-        "KitchenStation.name",
-        "KitchenStation.outletId",
-        "KitchenStation.menuItemIds",
-        "KitchenStation.displayEndpoint",
-        "KitchenStation.isActive"
-       ],
-       "operation": "listKitchenStations",
-       "provenance": "contract fnb.yaml GET /kitchen/stations"
-      },
-      {
-       "kind": "dataTable",
-       "label": "Every kitchen ticket",
+       "label": "Kitchen tickets",
        "bindsTo": "KitchenTicket",
        "columns": [
-        "KitchenTicket.id",
-        "KitchenTicket.orderId",
         "KitchenTicket.orderNumber",
-        "KitchenTicket.outletId",
         "KitchenTicket.tableLabel",
         "KitchenTicket.serviceMode",
         "KitchenTicket.coursing",
         "KitchenTicket.buzzerCode",
         "KitchenTicket.status",
         "KitchenTicket.priority",
-        "KitchenTicket.prioritisedByPrincipalId",
         "KitchenTicket.prioritiseReason"
        ],
        "operation": "listKitchenTickets",
@@ -147,16 +121,12 @@
        "label": "The selected F&B order",
        "bindsTo": "FnbOrder",
        "columns": [
-        "FnbOrder.id",
         "FnbOrder.orderNumber",
-        "FnbOrder.outletId",
         "FnbOrder.serviceMode",
-        "FnbOrder.tableVisitId",
         "FnbOrder.status",
         "FnbOrder.lines",
         "FnbOrder.grossAmount",
         "FnbOrder.taxAmount",
-        "FnbOrder.kitchenTicketId",
         "FnbOrder.estimatedReadyAt",
         "FnbOrder.recordedAt",
         "FnbOrder.syncedAt"
@@ -197,21 +167,9 @@
       },
       {
        "kind": "secondaryButton",
-       "label": "Create F&B order",
-       "operation": "createFnbOrder",
-       "provenance": "contract fnb.yaml POST /fnb-orders"
-      },
-      {
-       "kind": "secondaryButton",
        "label": "Prioritise kitchen ticket",
        "operation": "prioritiseKitchenTicket",
        "provenance": "contract fnb.yaml POST /kitchen/tickets/{ticketId}/prioritise"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Save kitchen stations",
-       "operation": "setKitchenStations",
-       "provenance": "contract fnb.yaml PUT /kitchen/stations"
       }
      ]
     }
@@ -222,7 +180,7 @@
     "id": "confirmCancelFnbOrder",
     "component": "confirmDialog",
     "trigger": "Cancel F&B order",
-    "body": "**Names what `cancelFnbOrder` changes and what it leaves alone**, in the consequence rather than the verb. A order this affects should be identified in the dialog, not just counted. **Collects what `cancelFnbOrder` sends before it is called.** Required: `recordedAt`, `reason`. Optional: `note`, `recordWaste`. Once the order is accepted the reason comes from the void reason list (guestChangedMind, enteredInError, itemUnavailable, qualityIssue, duplicate, other), **Other makes the note required**, and the act needs `ORDER_VOID` (decided 28 September, audit R125 (4), R091 (5), R222).",
+    "body": "**Names what `cancelFnbOrder` changes and what it leaves alone**, in the consequence rather than the verb. A order this affects should be identified in the dialog, not just counted. **Collects what `cancelFnbOrder` sends before it is called.** Required: `recordedAt`, `reason`. Optional: `note`, `recordWaste`. **The reason is the contract's list** (`cancelFnbOrder.reason`: outletRefused, guestCancelled, itemUnavailable, tooLong, error), drawn as words. The void reason list (guestChangedMind ... other) belongs to amend-after-send, a void (audit R125 (4)), not to cancel; the lead decides whether cancel gains \"other\" (design-note correction, 2 October 2026).",
     "provenance": "contract fnb.yaml POST /fnb-orders/{orderId}/cancel"
    },
    {
@@ -283,29 +241,6 @@
     "provenance": "contract fnb.yaml PATCH /fnb-orders/{orderId}"
    },
    {
-    "id": "formCreateFnbOrder",
-    "component": "modal",
-    "trigger": "Create F&B order",
-    "body": "**Collects what `createFnbOrder` sends before it is called.** Required: `id`, `outletId`, `serviceMode`, `lines`, `recordedAt`. Optional: `tableVisitId`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "CreateFnbOrderRequest",
-    "confirm": {
-     "label": "Create F&B order",
-     "operation": "createFnbOrder"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "id",
-      "outletId",
-      "serviceMode",
-      "lines",
-      "recordedAt",
-      "tableVisitId"
-     ]
-    },
-    "provenance": "contract fnb.yaml POST /fnb-orders"
-   },
-   {
     "id": "formPrioritiseKitchenTicket",
     "component": "modal",
     "trigger": "Prioritise kitchen ticket",
@@ -322,31 +257,14 @@
      ]
     },
     "provenance": "contract fnb.yaml POST /kitchen/tickets/{ticketId}/prioritise"
-   },
-   {
-    "id": "formSetKitchenStations",
-    "component": "modal",
-    "trigger": "Save kitchen stations",
-    "body": "**Collects what `setKitchenStations` sends before it is called.** Required: `stations`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Save kitchen stations",
-     "operation": "setKitchenStations"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "stations"
-     ]
-    },
-    "provenance": "contract fnb.yaml PUT /kitchen/stations"
    }
   ],
   "states": {
    "loading": "The order list.",
    "error": "Could not load. Names which read failed and leaves the order untouched.",
-   "emptyFirstRun": "No order yet. Offers Create F&B order (`createFnbOrder`); distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No order yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "Nothing matches the filter on outletId, tableVisitId, status and the order are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `getFnbOrder` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "You don't have access to F&B orders — ask your venue manager. Permission keys are never shown to the user; the screen names the access in words. **Never an empty table** — that reads as *there is no data*."
   },
   "apis": [
    {
@@ -386,15 +304,6 @@
     ]
    },
    {
-    "operationId": "createFnbOrder",
-    "contract": "fnb",
-    "purpose": "Place an F&B order",
-    "trigger": "onAction",
-    "invalidates": [
-     "listFnbOrders"
-    ]
-   },
-   {
     "operationId": "getFnbOrder",
     "contract": "fnb",
     "purpose": "Read an F&B order",
@@ -404,12 +313,6 @@
     "operationId": "listFnbOrders",
     "contract": "fnb",
     "purpose": "List F&B orders",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "listKitchenStations",
-    "contract": "fnb",
-    "purpose": "List preparation stations and their routing",
     "trigger": "onLoad"
    },
    {
@@ -428,13 +331,11 @@
     ]
    },
    {
-    "operationId": "setKitchenStations",
-    "contract": "fnb",
-    "purpose": "Configure stations and item routing",
-    "trigger": "onAction",
-    "invalidates": [
-     "listFnbOrders"
-    ]
+    "operationId": "listOutlets",
+    "contract": "tenancy",
+    "purpose": "List outlets (the pick list)",
+    "trigger": "onLoad",
+    "provenance": "design-note correction, 2 October 2026 (BO-020)"
    }
   ],
   "entryState": {
@@ -467,6 +368,26 @@
    "board": "wireframes/P08 Venue Management.dc.html#bo-020"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 11 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "gaps": [
+   {
+    "operation": "createFnbOrder",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-008): Station set-up and item routing are configuration owned by Kitchen & Preparation Stations, and the back office has no tender step, so a quick-service order created here is unpaid; F&B orders are sent to the kitchen and then charged on the till (R254, R261, POSV2-4, DI-323; design-notes corrections fnb-retail BO-020).",
+    "source": "R254 | R261 | POSV2-4 | DI-323"
+   },
+   {
+    "operation": "listKitchenStations",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-008): Station set-up and item routing are configuration owned by Kitchen & Preparation Stations, and the back office has no tender step, so a quick-service order created here is unpaid; F&B orders are sent to the kitchen and then charged on the till (R254, R261, POSV2-4, DI-323; design-notes corrections fnb-retail BO-020).",
+    "source": "R254 | R261 | POSV2-4 | DI-323"
+   },
+   {
+    "operation": "setKitchenStations",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-008): Station set-up and item routing are configuration owned by Kitchen & Preparation Stations, and the back office has no tender step, so a quick-service order created here is unpaid; F&B orders are sent to the kitchen and then charged on the till (R254, R261, POSV2-4, DI-323; design-notes corrections fnb-retail BO-020).",
+    "source": "R254 | R261 | POSV2-4 | DI-323"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -516,24 +437,11 @@
      "to": "BO-104",
      "trigger": "Food & Beverage",
      "provenance": "derived — BO-104 declares entryState.params  and BO-021 holds none of them. The edge carries nothing: BO-021 is opened from BO-104, so this edge is the way back and BO-104 keeps its own state"
-    },
-    {
-     "to": "POS-002",
-     "trigger": "Sell — Ticket Catalogue",
-     "provenance": "flow F81 step 1→2",
-     "crossesDevice": true,
-     "back": false,
-     "carries": [
-      "orderId"
-     ]
     }
    ]
   },
-  "notes": "Restored 20 August when the P15 build was rolled back.",
+  "notes": "Restored 20 August when the P15 build was rolled back.\n\n**Board frame RET-3A removed 2 October 2026** (CHG-SBO-008): Retail Board 3 RET-3A is the Retail Sales & POS Command Center, a cross-store dashboard, not this order search; the designer must not draw it here.",
   "density": "compact",
-  "boardFrames": [
-   "Retail Board 3.dc.html#ret-3a"
-  ],
   "pattern": "statusTracker",
   "patternReason": "`getGuestOrderStatus` reads one record and nothing reads a population — the screen is about that one thing",
   "purpose": "Find any order taken at this venue.",
@@ -545,19 +453,16 @@
      "slot": "record",
      "components": [
       {
+       "kind": "dataTable",
+       "label": "F&B orders",
+       "operation": "listFnbOrders",
+       "provenance": "contract fnb.yaml GET /fnb-orders; wiring fix, 2 October 2026"
+      },
+      {
        "kind": "detailPanel",
-       "label": "The guest order status",
-       "bindsTo": "GuestOrderStatus",
-       "columns": [
-        "GuestOrderStatus.orderId",
-        "GuestOrderStatus.orderNumber",
-        "GuestOrderStatus.status",
-        "GuestOrderStatus.estimatedReadyAt",
-        "GuestOrderStatus.isReadyForCollection",
-        "GuestOrderStatus.lines"
-       ],
-       "operation": "getGuestOrderStatus",
-       "provenance": "contract fnb.yaml GET /guest-orders/{orderId}"
+       "label": "Find by receipt",
+       "operation": "lookupRetailSale",
+       "provenance": "contract retail.yaml GET /retail-sales/lookup; wiring fix, 2 October 2026"
       }
      ]
     },
@@ -576,7 +481,7 @@
    ]
   },
   "states": {
-   "loading": "The order search, read by `getGuestOrderStatus`.",
+   "loading": "The order search, read by `listFnbOrders`.",
    "error": "Could not load. Names which read failed and leaves the order search untouched.",
    "emptyFirstRun": "No order search yet. Offers Record order handover (`recordOrderHandover`).",
    "emptyNoAccess": "Shown when the caller lacks `ORDER_MODIFY`, which `recordOrderHandover` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
@@ -589,10 +494,18 @@
     "trigger": "onAction"
    },
    {
-    "operationId": "getGuestOrderStatus",
+    "operationId": "listFnbOrders",
     "contract": "fnb",
-    "purpose": "Track an order",
-    "trigger": "onLoad"
+    "purpose": "Find an F&B order taken at this venue",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-008)"
+   },
+   {
+    "operationId": "lookupRetailSale",
+    "contract": "retail",
+    "purpose": "Find a retail sale from its receipt",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-008)"
    }
   ],
   "entryState": {
@@ -640,6 +553,14 @@
     "provenance": "contract fnb.yaml POST /guest-orders/{orderId}/delivery"
    }
   ],
+  "gaps": [
+   {
+    "operation": "getGuestOrderStatus",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-008): Order Search bound only getGuestOrderStatus, a guest-audience read of one order by id, and had no search; a staff lookup is listFnbOrders (F&B) and lookupRetailSale (retail receipt) (R254; design-notes correction fnb-retail BO-021).",
+    "source": "contracts/satellite/fnb.yaml#getGuestOrderStatus | R254"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -683,7 +604,8 @@
    "exitTo": [
     "BO-008",
     "BO-104",
-    "BO-111"
+    "BO-111",
+    "BO-109"
    ],
    "inferred": false,
    "notes": "**Returns to BO-104.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product. **flow F31 — the manager re-verifies allergens from the menu being drafted.** The flow is the authority on the journey and the navigation has to agree with it; marking this block non-inferred is what turned the disagreement from a warning into a failure.",
@@ -707,6 +629,14 @@
      "back": false
     },
     {
+     "to": "BO-109",
+     "trigger": "Open in builder",
+     "carries": [
+      "menuId"
+     ],
+     "provenance": "design-note correction fnb-retail BO-045, 2 October 2026 (CHG-SBO-008)"
+    },
+    {
      "to": "BO-111",
      "trigger": "An item's recipe changed, so its allergens are re-verified",
      "provenance": "flow F31 step 2→3",
@@ -718,7 +648,7 @@
     }
    ]
   },
-  "notes": "Restored 20 August when the P15 build was rolled back. **Operations from the 24 August F&B build wired here** — the contract grew and the screens had not caught up, which is how 92 operations reached 49% of screens.",
+  "notes": "Restored 20 August when the P15 build was rolled back. **Operations from the 24 August F&B build wired here** — the contract grew and the screens had not caught up, which is how 92 operations reached 49% of screens.\n\n**BO-045 is the menu home; BO-109 is its arranging canvas (2 October 2026, CHG-SBO-008; Chinmay: duplicate screens merged as proposed).** Menu list, versions, publish, schedule, rollback, modifiers, bulk changes and allergen verdicts live here (frames fnb-2a, 2e, 2j, 2k); \"Open in builder\" opens BO-109 on the picked menu, which has no menu list of its own.\n\n**F&B owns its prices (decided 2 October 2026 by Chinmay, DEC-034; CHG-CSA-009):** `MenuItem.price` is F&B's own catalogue price, set per outlet, so ticketing scales on its own; the central catalogue prices tickets and single-price booths only. This screen reads F&B's catalogue, never the central one.",
   "density": "compact",
   "boardFrames": [
    "FnB Board 2.dc.html#fnb-2a",
@@ -738,30 +668,31 @@
      "slot": "collection",
      "components": [
       {
-       "kind": "textField",
-       "label": "Outlet id",
-       "operation": "listMenus",
-       "notes": "Sends `?outletId=` to `listMenus`.",
-       "provenance": "contract fnb.yaml GET /menus"
+       "kind": "selectField",
+       "label": "Outlet",
+       "operation": "listOutlets",
+       "notes": "A pick list in words, never a typed id (design-note correction, 2 October 2026).",
+       "provenance": "contract fnb.yaml GET /menus",
+       "bindsTo": "Outlet.id",
+       "columns": [
+        "Outlet.name"
+       ]
       },
       {
        "kind": "datePicker",
-       "label": "Active at",
+       "label": "In force on",
        "operation": "listMenus",
-       "notes": "Sends `?activeAt=` to `listMenus`.",
+       "notes": "Shows the menu as it stands on the chosen date: today by default, a later date to see a scheduled publish.",
        "provenance": "contract fnb.yaml GET /menus"
       },
       {
        "kind": "dataTable",
-       "label": "Every menu",
+       "label": "Menus",
        "bindsTo": "Menu",
        "columns": [
-        "Menu.id",
         "Menu.code",
         "Menu.name",
-        "Menu.outletId",
         "Menu.availability",
-        "Menu.sections",
         "Menu.isActive"
        ],
        "operation": "listMenus",
@@ -772,6 +703,31 @@
        "impliedBy": "publishMenu",
        "notes": "Declares `publishMenu`. **The gate names what the publish will affect before it happens** — a disabled Publish with no reason is the state operators escalate.\n",
        "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Last allergen verdict",
+       "bindsTo": "AllergenVerdict",
+       "operation": "getAllergenVerification",
+       "provenance": "contract fnb.yaml GET /menu-items/{menuItemId}/allergen-verification; wiring fix, 2 October 2026"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Versions",
+       "operation": "listMenuVersions",
+       "provenance": "contract fnb.yaml GET /menus/{menuId}/versions; wiring fix, 2 October 2026"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Scheduled publishes",
+       "operation": "listMenuSchedules",
+       "provenance": "contract fnb.yaml GET /menus/{menuId}/schedule; wiring fix, 2 October 2026"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Option groups",
+       "operation": "listModifierGroups",
+       "provenance": "contract fnb.yaml GET /modifier-groups; wiring fix, 2 October 2026"
       }
      ]
     },
@@ -784,10 +740,8 @@
        "label": "The selected menu",
        "bindsTo": "Menu",
        "columns": [
-        "Menu.id",
         "Menu.code",
         "Menu.name",
-        "Menu.outletId",
         "Menu.availability",
         "Menu.sections",
         "Menu.isActive"
@@ -862,6 +816,12 @@
        "label": "What publishing changes",
        "notes": "**Names what goes live, where, and from when.** A publish with no stated consequence is one somebody presses meaning to save.",
        "provenance": "authored — required by check-screens"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Request approval",
+       "operation": "createApprovalRequest",
+       "provenance": "contract approvals.yaml POST /approval-requests; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -980,6 +940,48 @@
      "listMenus",
      "getMenu"
     ]
+   },
+   {
+    "operationId": "getAllergenVerification",
+    "contract": "fnb",
+    "purpose": "The last automatic allergen verdict for the dish",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-008)"
+   },
+   {
+    "operationId": "listMenuVersions",
+    "contract": "fnb",
+    "purpose": "Versions to roll back to",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-008)"
+   },
+   {
+    "operationId": "listMenuSchedules",
+    "contract": "fnb",
+    "purpose": "Scheduled publishes to cancel",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-008)"
+   },
+   {
+    "operationId": "listModifierGroups",
+    "contract": "fnb",
+    "purpose": "Existing option groups to attach",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-008)"
+   },
+   {
+    "operationId": "createApprovalRequest",
+    "contract": "approvals",
+    "purpose": "Ask approval for a repricing above threshold",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-008)"
+   },
+   {
+    "operationId": "listOutlets",
+    "contract": "tenancy",
+    "purpose": "List outlets (the pick list)",
+    "trigger": "onLoad",
+    "provenance": "design-note correction, 2 October 2026 (BO-045)"
    }
   ],
   "entryState": {
@@ -1144,6 +1146,20 @@
      ]
     },
     "provenance": "contract fnb.yaml POST /menus/{menuId}/actions"
+   },
+   {
+    "id": "formCreateApprovalRequest",
+    "component": "modal",
+    "trigger": "Request approval",
+    "body": "**Collects what `createApprovalRequest` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Request approval",
+     "operation": "createApprovalRequest"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "contract approvals.yaml POST /approval-requests; wiring fix, 2 October 2026"
    }
   ],
   "_platform": {
@@ -1244,23 +1260,6 @@
        ],
        "operation": "listKitchenTickets",
        "provenance": "contract fnb.yaml GET /kitchen/tickets"
-      },
-      {
-       "kind": "dataTable",
-       "label": "Every kitchen station",
-       "bindsTo": "KitchenStation",
-       "columns": [
-        "KitchenStation.id",
-        "KitchenStation.code",
-        "KitchenStation.name",
-        "KitchenStation.outletId",
-        "KitchenStation.menuItemIds",
-        "KitchenStation.displayEndpoint",
-        "KitchenStation.displayWorkstationIds",
-        "KitchenStation.isActive"
-       ],
-       "operation": "listKitchenStations",
-       "provenance": "contract fnb.yaml GET /kitchen/stations"
       }
      ]
     },
@@ -1309,12 +1308,6 @@
        "label": "Prioritise kitchen ticket",
        "operation": "prioritiseKitchenTicket",
        "provenance": "contract fnb.yaml POST /kitchen/tickets/{ticketId}/prioritise"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Save kitchen stations",
-       "operation": "setKitchenStations",
-       "provenance": "contract fnb.yaml PUT /kitchen/stations"
       }
      ]
     }
@@ -1344,24 +1337,9 @@
     ]
    },
    {
-    "operationId": "listKitchenStations",
-    "contract": "fnb",
-    "purpose": "List preparation stations and their routing",
-    "trigger": "onLoad"
-   },
-   {
     "operationId": "prioritiseKitchenTicket",
     "contract": "fnb",
     "purpose": "Move a ticket up the queue",
-    "trigger": "onAction",
-    "invalidates": [
-     "listKitchenTickets"
-    ]
-   },
-   {
-    "operationId": "setKitchenStations",
-    "contract": "fnb",
-    "purpose": "Configure stations and item routing",
     "trigger": "onAction",
     "invalidates": [
      "listKitchenTickets"
@@ -1432,23 +1410,20 @@
      ]
     },
     "provenance": "contract fnb.yaml POST /kitchen/tickets/{ticketId}/prioritise"
+   }
+  ],
+  "gaps": [
+   {
+    "operation": "listKitchenStations",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-008): Station configuration (the station table and Save kitchen stations) sat on a monitoring screen; configuration lives on BO-134 (R254; design-notes correction fnb-retail BO-046).",
+    "source": "R254 | screens/P08-venue-back-office.yaml#BO-134"
    },
    {
-    "id": "formSetKitchenStations",
-    "component": "modal",
-    "trigger": "Save kitchen stations",
-    "body": "**Collects what `setKitchenStations` sends before it is called.** Required: `stations`. **Each station carries its display assignment**, `displayWorkstationIds` — the kitchen displays that show this station's rail. A display belongs to one station; assigning it to a second is refused 400. The kitchen display takes its station from this assignment rather than from a picker on the display (decided 28 September, audit R277). Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Save kitchen stations",
-     "operation": "setKitchenStations"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "stations"
-     ]
-    },
-    "provenance": "contract fnb.yaml PUT /kitchen/stations"
+    "operation": "setKitchenStations",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-008): Station configuration (the station table and Save kitchen stations) sat on a monitoring screen; configuration lives on BO-134 (R254; design-notes correction fnb-retail BO-046).",
+    "source": "R254 | screens/P08-venue-back-office.yaml#BO-134"
    }
   ],
   "_platform": {
@@ -1513,11 +1488,7 @@
     {
      "to": "BO-045",
      "trigger": "Menu Management",
-     "carries": [
-      "menuId",
-      "menuItemId"
-     ],
-     "provenance": "derived — BO-045 declares entryState.params menuId, menuItemId and BO-104 holds menuId, menuItemId, so an edge into it carries them"
+     "provenance": "derived — BO-045 declares entryState.params menuId, menuItemId and BO-104 holds none of them. The edge carries nothing: menuId, menuItemId only pre-select (deep link or optional), and BO-045 opens on its own"
     },
     {
      "to": "BO-046",
@@ -1527,17 +1498,17 @@
     {
      "to": "BO-134",
      "trigger": "Kitchen & Preparation Stations",
-     "provenance": "derived — BO-134 declares entryState.params  and BO-104 holds none of them. The edge carries nothing: BO-134 needs nothing to open"
+     "provenance": "derived — BO-134 declares entryState.params planId and BO-104 holds none of them. The edge carries nothing: planId only pre-selects (deep link or optional), and BO-134 opens on its own"
     },
     {
      "to": "BO-135",
      "trigger": "Order Routing & KDS/Printer Rules",
-     "provenance": "derived — BO-135 declares entryState.params  and BO-104 holds none of them. The edge carries nothing: BO-135 needs nothing to open"
+     "provenance": "derived — BO-135 declares entryState.params outletId and BO-104 holds none of them. The edge carries nothing: outletId only pre-selects (deep link or optional), and BO-135 opens on its own"
     },
     {
      "to": "BO-136",
      "trigger": "F&B Global Settings & Controls",
-     "provenance": "derived — BO-136 declares entryState.params planId and BO-104 holds none of them. The edge carries nothing: planId only pre-selects (deep link or optional), and BO-136 opens on its own"
+     "provenance": "derived — BO-136 declares entryState.params outletId and BO-104 holds none of them. The edge carries nothing: BO-104 is the Food & Beverage hub and this is its menu entry; BO-136 has no source yet for outletId"
     }
    ]
   },
@@ -1554,34 +1525,12 @@
      "slot": "collection",
      "components": [
       {
-       "kind": "textField",
-       "label": "Outlet id",
-       "operation": "listMenus",
-       "notes": "Sends `?outletId=` to `listMenus`.",
-       "provenance": "contract fnb.yaml GET /menus"
-      },
-      {
-       "kind": "datePicker",
-       "label": "Active at",
-       "operation": "listMenus",
-       "notes": "Sends `?activeAt=` to `listMenus`.",
-       "provenance": "contract fnb.yaml GET /menus"
-      },
-      {
-       "kind": "dataTable",
-       "label": "Every menu",
-       "bindsTo": "Menu",
-       "columns": [
-        "Menu.id",
-        "Menu.code",
-        "Menu.name",
-        "Menu.outletId",
-        "Menu.availability",
-        "Menu.sections",
-        "Menu.isActive"
-       ],
-       "operation": "listMenus",
-       "provenance": "contract fnb.yaml GET /menus"
+       "kind": "detailPanel",
+       "label": "F&B takings",
+       "bindsTo": "ServiceSummary",
+       "operation": "getServiceSummary",
+       "notes": "**The F&B hub shows F&B takings; admissions are dropped from it (decided 2 October 2026 by Chinmay, DEC-181).** BO-104 is the F&B landing; the F&B Command Center (BO-727) is a card on it (DEC-182).",
+       "provenance": "contract reporting.yaml GET /service-summary"
       },
       {
        "kind": "metricTile",
@@ -1615,56 +1564,12 @@
     {
      "name": "contextPanel",
      "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected menu",
-       "bindsTo": "Menu",
-       "columns": [
-        "Menu.id",
-        "Menu.code",
-        "Menu.name",
-        "Menu.outletId",
-        "Menu.availability",
-        "Menu.sections",
-        "Menu.isActive",
-        "Menu.publishedVersion",
-        "Menu.publishedAt"
-       ],
-       "operation": "listMenus",
-       "provenance": "contract fnb.yaml GET /menus"
-      },
-      {
-       "kind": "detailPanel",
-       "label": "The venue settings",
-       "bindsTo": "VenueSettings",
-       "columns": [
-        "VenueSettings.id",
-        "VenueSettings.venueId",
-        "VenueSettings.currencyCode",
-        "VenueSettings.currencyScale",
-        "VenueSettings.supportHours",
-        "VenueSettings.quietHours",
-        "VenueSettings.biometrics",
-        "VenueSettings.segregatedAccess",
-        "VenueSettings.alerting"
-       ],
-       "operation": "getVenueSettings",
-       "provenance": "contract tenancy.yaml GET /venues/{venueId}/settings"
-      }
-     ]
+     "components": []
     },
     {
      "name": "actionBar",
      "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Create menu",
-       "operation": "createMenu",
-       "provenance": "contract fnb.yaml POST /menus"
-      }
-     ]
+     "components": []
     }
    ]
   },
@@ -1683,25 +1588,11 @@
     "trigger": "onLoad"
    },
    {
-    "operationId": "getVenueSettings",
-    "contract": "tenancy",
-    "purpose": "What is enabled here",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "listMenus",
-    "contract": "fnb",
-    "purpose": "Menus and their state",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "createMenu",
-    "contract": "fnb",
-    "purpose": "Start a menu",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMenus"
-    ]
+    "operationId": "getServiceSummary",
+    "contract": "reporting",
+    "purpose": "F&B takings and service figures for the hub (DEC-181, CHG-CSA-020)",
+    "trigger": "onLoad",
+    "provenance": "design-note correction, 2 October 2026 (BO-104)"
    }
   ],
   "entryState": {
@@ -1726,27 +1617,24 @@
    "board": "wireframes/P08 Venue Management.dc.html#bo-104"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
-  "overlays": [
+  "gaps": [
    {
-    "id": "formCreateMenu",
-    "component": "modal",
-    "trigger": "Create menu",
-    "body": "**Collects what `createMenu` sends before it is called.** Required: `code`, `name`, `outletId`. Optional: `availability`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "CreateMenuRequest",
-    "confirm": {
-     "label": "Create menu",
-     "operation": "createMenu"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "code",
-      "name",
-      "outletId",
-      "availability"
-     ]
-    },
-    "provenance": "contract fnb.yaml POST /menus"
+    "operation": "createMenu",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-008): Menu management (the menu table and Start a menu) belongs to BO-045, and getVenueSettings carries no module enablement (R279), so \"What is enabled here\" cannot come from it (design-notes corrections fnb-retail BO-104).",
+    "source": "contracts/spine/tenancy.yaml#getVenueSettings | R279 | screens/P08-venue-back-office.yaml#BO-045"
+   },
+   {
+    "operation": "getVenueSettings",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-008): Menu management (the menu table and Start a menu) belongs to BO-045, and getVenueSettings carries no module enablement (R279), so \"What is enabled here\" cannot come from it (design-notes corrections fnb-retail BO-104).",
+    "source": "contracts/spine/tenancy.yaml#getVenueSettings | R279 | screens/P08-venue-back-office.yaml#BO-045"
+   },
+   {
+    "operation": "listMenus",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-008): Menu management (the menu table and Start a menu) belongs to BO-045, and getVenueSettings carries no module enablement (R279), so \"What is enabled here\" cannot come from it (design-notes corrections fnb-retail BO-104).",
+    "source": "contracts/spine/tenancy.yaml#getVenueSettings | R279 | screens/P08-venue-back-office.yaml#BO-045"
    }
   ],
   "_platform": {
@@ -1801,7 +1689,7 @@
     }
    ]
   },
-  "notes": "**Added 20 August from the client design board.** The operations existed and no screen called them. **Named in the board contents and not written up in it** — the operations are real, the layout is not. **Drawn 31 August** — `FnB Board 1.dc.html` frame `fnb-1h`. **Matched on frame title against screen name, constrained to this board’s platforms.** These packs label by board position (`GM-6C`) rather than naming the screen, so the title is the only join — *Kitchen &amp; Preparation Stations* matched at 1.0. **A cross-platform title match was refused**: `Outlet Management` scored 0.85 against a partner-portal screen, which is how a mapping goes wrong quietly.",
+  "notes": "**Added 20 August from the client design board.** The operations existed and no screen called them. **Named in the board contents and not written up in it** — the operations are real, the layout is not. **Drawn 31 August** — `FnB Board 1.dc.html` frame `fnb-1h`. **Matched on frame title against screen name, constrained to this board’s platforms.** These packs label by board position (`GM-6C`) rather than naming the screen, so the title is the only join — *Kitchen &amp; Preparation Stations* matched at 1.0. **A cross-platform title match was refused**: `Outlet Management` scored 0.85 against a partner-portal screen, which is how a mapping goes wrong quietly.\n\n**One kitchen serves several outlets through a producing outlet (decided 2 October 2026 by Chinmay, DEC-188; CHG-CSA-015):** a station of a producing outlet can serve the outlets it produces for. Stations carry their printers.",
   "density": "compact",
   "boardFrames": [
    "FnB Board 1.dc.html#fnb-1h"
@@ -1879,6 +1767,13 @@
        "label": "Save kitchen stations",
        "operation": "setKitchenStations",
        "provenance": "contract fnb.yaml PUT /kitchen/stations"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Print prep sheet",
+       "operation": "printPrepSheet",
+       "notes": "**Kitchen printers are in release 1 (decided 2 October 2026 by Chinmay, DEC-187)**, assigned per station; prep sheets print from the venue template (DEC-185).",
+       "provenance": "contract fnb.yaml POST /production-plans/{planId}/prep-sheet"
       }
      ]
     }
@@ -1922,6 +1817,13 @@
     "contract": "tenancy",
     "purpose": "The outlets whose kitchen SLA is set (setKitchenSla is per outlet)",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "printPrepSheet",
+    "contract": "fnb",
+    "purpose": "Print a production plan's prep sheet",
+    "trigger": "onAction",
+    "provenance": "design-note correction, 2 October 2026 (BO-134)"
    }
   ],
   "entryState": {
@@ -1933,6 +1835,11 @@
     {
      "name": "outletId",
      "from": "session"
+    },
+    {
+     "name": "planId",
+     "from": "navigation",
+     "optional": true
     }
    ],
    "coldEntry": "Resolves from the session. A principal with more than one venue is asked which first.",
@@ -1969,6 +1876,24 @@
      ]
     },
     "provenance": "contract fnb.yaml PUT /kitchen/stations"
+   },
+   {
+    "id": "formPrintPrepSheet",
+    "component": "modal",
+    "trigger": "Print prep sheet",
+    "body": "**Collects what `printPrepSheet` sends before it is called.** Required: `target`. Optional: `stationIds`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Print prep sheet",
+     "operation": "printPrepSheet"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "target",
+      "stationIds"
+     ]
+    },
+    "provenance": "contract fnb.yaml POST /production-plans/{planId}/prep-sheet"
    }
   ],
   "_platform": {
@@ -2023,7 +1948,7 @@
     }
    ]
   },
-  "notes": "**Added 20 August from the client design board.** The operations existed and no screen called them. **Named in the board contents and not written up in it** — the operations are real, the layout is not. **Drawn 31 August** — `FnB Board 1.dc.html` frame `fnb-1j`. **Matched on frame title against screen name, constrained to this board’s platforms.** These packs label by board position (`GM-6C`) rather than naming the screen, so the title is the only join — *Order Routing &amp; KDS / Printer Rules* matched at 1.0. **A cross-platform title match was refused**: `Outlet Management` scored 0.85 against a partner-portal screen, which is how a mapping goes wrong quietly.",
+  "notes": "**Merged into BO-134** (decided 2 October 2026, Chinmay: fix the wrong wiring now; CHG-WIR-008). BO-134 and BO-135 both save stations (setKitchenStations) and the client board draws them as two tabs of one area (\"Kitchens & Stations | Routing Rules\"); merged into one \"Kitchen stations & routing\" screen, BO-134 (DI-987, DI-671; design-notes corrections fnb-retail BO-134, BO-135). **One implementation, both ids kept**, as the M24-03 merges do: this id stays for traceability and routes to BO-134, and nothing on it is built separately.\n\n**Added 20 August from the client design board.** The operations existed and no screen called them. **Named in the board contents and not written up in it** — the operations are real, the layout is not. **Drawn 31 August** — `FnB Board 1.dc.html` frame `fnb-1j`. **Matched on frame title against screen name, constrained to this board’s platforms.** These packs label by board position (`GM-6C`) rather than naming the screen, so the title is the only join — *Order Routing &amp; KDS / Printer Rules* matched at 1.0. **A cross-platform title match was refused**: `Outlet Management` scored 0.85 against a partner-portal screen, which is how a mapping goes wrong quietly.",
   "density": "compact",
   "boardFrames": [
    "FnB Board 1.dc.html#fnb-1j"
@@ -2039,77 +1964,24 @@
      "slot": "collection",
      "components": [
       {
-       "kind": "textField",
-       "label": "Venue id",
-       "operation": "listWorkstations",
-       "notes": "Sends `?venueId=` to `listWorkstations`.",
-       "provenance": "contract tenancy.yaml GET /workstations"
-      },
-      {
-       "kind": "textField",
-       "label": "Sale board kind",
-       "operation": "listWorkstations",
-       "notes": "Sends `?saleBoardKind=` to `listWorkstations`.",
-       "provenance": "contract tenancy.yaml GET /workstations"
-      },
-      {
-       "kind": "dataTable",
-       "label": "Every workstation",
-       "bindsTo": "Workstation",
-       "columns": [
-        "Workstation.id",
-        "Workstation.code",
-        "Workstation.name",
-        "Workstation.venueId",
-        "Workstation.regionId",
-        "Workstation.departmentId",
-        "Workstation.scopePath",
-        "Workstation.saleBoard",
-        "Workstation.accessPointId",
-        "Workstation.devices",
-        "Workstation.currency",
-        "Workstation.currencyScale"
-       ],
-       "operation": "listWorkstations",
-       "provenance": "contract tenancy.yaml GET /workstations"
-      },
-      {
        "kind": "searchField",
        "label": "Search order routing",
        "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Routing rules",
+       "bindsTo": "KitchenRoutingRules",
+       "operation": "getKitchenRoutingRules",
+       "notes": "**Item routing, then category rules, then the default station, with a fallback station when one is down (decided 2 October 2026 by Chinmay, DEC-189, DI-323; DEC-190: a default station named per outlet).**",
+       "provenance": "contract fnb.yaml GET /outlets/{outletId}/kitchen-routing"
       }
      ]
     },
     {
      "name": "contextPanel",
      "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected workstation",
-       "bindsTo": "Workstation",
-       "columns": [
-        "Workstation.id",
-        "Workstation.code",
-        "Workstation.name",
-        "Workstation.venueId",
-        "Workstation.regionId",
-        "Workstation.departmentId",
-        "Workstation.scopePath",
-        "Workstation.saleBoard",
-        "Workstation.accessPointId",
-        "Workstation.devices",
-        "Workstation.currency",
-        "Workstation.currencyScale",
-        "Workstation.timeZone",
-        "Workstation.deploymentProfile",
-        "Workstation.edgeNodeId",
-        "Workstation.healthScore"
-       ],
-       "operation": "listWorkstations",
-       "provenance": "contract tenancy.yaml GET /workstations"
-      }
-     ]
+     "components": []
     },
     {
      "name": "actionBar",
@@ -2117,9 +1989,9 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Save kitchen stations",
-       "operation": "setKitchenStations",
-       "provenance": "contract fnb.yaml PUT /kitchen/stations"
+       "label": "Save routing rules",
+       "operation": "setKitchenRoutingRules",
+       "provenance": "contract fnb.yaml PUT /outlets/{outletId}/kitchen-routing"
       }
      ]
     }
@@ -2130,23 +2002,22 @@
    "error": "Could not load. Names which read failed and leaves the order routing kds untouched.",
    "emptyFirstRun": "No order routing kds yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
    "emptyNoResults": "Nothing matches the filter on venueId, saleBoardKind and the order routing kds are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `SCOPE_VIEW`, which `listWorkstations` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks the permission the screen requires, and names it. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
-    "operationId": "setKitchenStations",
+    "operationId": "getKitchenRoutingRules",
     "contract": "fnb",
-    "purpose": "Configure stations and item routing",
-    "trigger": "onAction",
-    "invalidates": [
-     "listWorkstations"
-    ]
+    "purpose": "The routing rules in force (DEC-189)",
+    "trigger": "onLoad",
+    "provenance": "design-note correction, 2 October 2026 (BO-135)"
    },
    {
-    "operationId": "listWorkstations",
-    "contract": "tenancy",
-    "purpose": "List workstations",
-    "trigger": "onLoad"
+    "operationId": "setKitchenRoutingRules",
+    "contract": "fnb",
+    "purpose": "Set an outlet's category rules, default station and fallback station",
+    "trigger": "onAction",
+    "provenance": "design-note correction, 2 October 2026 (BO-135)"
    }
   ],
   "entryState": {
@@ -2154,6 +2025,11 @@
     {
      "name": "venueId",
      "from": "session"
+    },
+    {
+     "name": "outletId",
+     "from": "navigation",
+     "optional": true
     }
    ],
    "coldEntry": "Resolves from the session. A principal with more than one venue is asked which first.",
@@ -2172,24 +2048,26 @@
    "derivedFrom": "wireframes/reference/FnB Board 1.dc.html",
    "note": "**Drawn by Claude Design on `FnB Board 1.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "No operations of its own since 2 October 2026 (CHG-WIR-008): merged into BO-134, whose operations it routes to.",
   "overlays": [
    {
-    "id": "formSetKitchenStations",
+    "id": "formSetKitchenRoutingRules",
     "component": "modal",
-    "trigger": "Save kitchen stations",
-    "body": "**Collects what `setKitchenStations` sends before it is called.** Required: `stations`. Dismissing sends nothing; the screen behind is unchanged.",
+    "trigger": "Save routing rules",
+    "body": "**Collects what `setKitchenRoutingRules` sends before it is called.** Required: `defaultStationId`. Optional: `categoryRules`, `fallbackStationId`. Dismissing sends nothing; the screen behind is unchanged.",
     "confirm": {
-     "label": "Save kitchen stations",
-     "operation": "setKitchenStations"
+     "label": "Save routing rules",
+     "operation": "setKitchenRoutingRules"
     },
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "stations"
+      "defaultStationId",
+      "categoryRules",
+      "fallbackStationId"
      ]
     },
-    "provenance": "contract fnb.yaml PUT /kitchen/stations"
+    "provenance": "contract fnb.yaml PUT /outlets/{outletId}/kitchen-routing"
    }
   ],
   "_platform": {
@@ -2219,7 +2097,7 @@
   "id": "BO-136",
   "name": "F&B Global Settings & Controls",
   "module": "Food & Beverage",
-  "requiresModule": "core",
+  "requiresModule": "fnb",
   "wave": 2,
   "implementation": {
    "app": "venue-management-web",
@@ -2253,9 +2131,7 @@
   "notes": "**Added 20 August from the client design board.** The operations existed and no screen called them. **Named in the board contents and not written up in it** — the operations are real, the layout is not.",
   "density": "compact",
   "boardFrames": [
-   "FnB Board 2.dc.html#fnb-2m",
-   "FnB Board 2.dc.html#fnb-2n",
-   "FnB Board 5.dc.html#fnb-5d"
+   "FnB Board 1.dc.html#fnb-1k"
   ],
   "pattern": "listDetail",
   "patternReason": "`listProductionRuns` reads the population and `getVenueSettings` reads one of them — list, select, act",
@@ -2268,53 +2144,8 @@
      "slot": "collection",
      "components": [
       {
-       "kind": "selectField",
-       "label": "Status",
-       "operation": "listProductionRuns",
-       "notes": "Sends `?status=` to `listProductionRuns`.",
-       "provenance": "contract fnb.yaml GET /production-runs"
-      },
-      {
-       "kind": "selectField",
-       "label": "Location kind",
-       "operation": "listProductionRuns",
-       "notes": "Sends `?locationKind=` to `listProductionRuns`.",
-       "provenance": "contract fnb.yaml GET /production-runs"
-      },
-      {
-       "kind": "datePicker",
-       "label": "From",
-       "operation": "listProductionRuns",
-       "notes": "Sends `?from=` to `listProductionRuns`.",
-       "provenance": "contract fnb.yaml GET /production-runs"
-      },
-      {
-       "kind": "dataTable",
-       "label": "Every production run",
-       "bindsTo": "ProductionRun",
-       "columns": [
-        "ProductionRun.id",
-        "ProductionRun.recipeId",
-        "ProductionRun.producingOutletId",
-        "ProductionRun.forOutletIds",
-        "ProductionRun.plannedQuantity",
-        "ProductionRun.actualQuantity",
-        "ProductionRun.scheduledFor",
-        "ProductionRun.status",
-        "ProductionRun.varianceReason"
-       ],
-       "operation": "listProductionRuns",
-       "provenance": "contract fnb.yaml GET /production-runs"
-      },
-      {
        "kind": "searchField",
        "label": "Search f",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "publishGate",
-       "impliedBy": "releaseProductionPlan",
-       "notes": "Declares `releaseProductionPlan`. **The gate names what the publish will affect before it happens** — a disabled Publish with no reason is the state operators escalate.\n",
        "provenance": "carried from the previous definition"
       }
      ]
@@ -2325,37 +2156,9 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected production run",
-       "bindsTo": "ProductionRun",
-       "columns": [
-        "ProductionRun.id",
-        "ProductionRun.recipeId",
-        "ProductionRun.productionPlanId",
-        "ProductionRun.producingOutletId",
-        "ProductionRun.forOutletIds",
-        "ProductionRun.plannedQuantity",
-        "ProductionRun.actualQuantity",
-        "ProductionRun.scheduledFor",
-        "ProductionRun.status",
-        "ProductionRun.varianceReason"
-       ],
-       "operation": "listProductionRuns",
-       "provenance": "contract fnb.yaml GET /production-runs"
-      },
-      {
-       "kind": "detailPanel",
        "label": "The venue settings",
        "bindsTo": "VenueSettings",
        "columns": [
-        "VenueSettings.id",
-        "VenueSettings.venueId",
-        "VenueSettings.currencyCode",
-        "VenueSettings.currencyScale",
-        "VenueSettings.supportHours",
-        "VenueSettings.quietHours",
-        "VenueSettings.biometrics",
-        "VenueSettings.segregatedAccess",
-        "VenueSettings.alerting",
         "VenueSettings.fnb"
        ],
        "operation": "getVenueSettings",
@@ -2375,15 +2178,9 @@
       },
       {
        "kind": "secondaryButton",
-       "label": "Build production plan",
-       "operation": "buildProductionPlan",
-       "provenance": "contract fnb.yaml POST /production-plans"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Release production plan",
-       "operation": "releaseProductionPlan",
-       "provenance": "contract fnb.yaml POST /production-plans/{planId}/release"
+       "label": "Save course rules",
+       "operation": "setCourseRules",
+       "provenance": "contract fnb.yaml PUT /outlets/{outletId}/course-rules; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -2407,34 +2204,14 @@
     "operationId": "setVenueSettings",
     "contract": "tenancy",
     "purpose": "Set support hours, quiet hours, segregated access and alerti",
-    "trigger": "onAction",
-    "invalidates": [
-     "listProductionRuns"
-    ]
+    "trigger": "onAction"
    },
    {
-    "operationId": "buildProductionPlan",
+    "operationId": "setCourseRules",
     "contract": "fnb",
-    "purpose": "Turn a forecast into a prep list",
+    "purpose": "How each outlet courses by default",
     "trigger": "onAction",
-    "invalidates": [
-     "listProductionRuns"
-    ]
-   },
-   {
-    "operationId": "releaseProductionPlan",
-    "contract": "fnb",
-    "purpose": "Make the plan real",
-    "trigger": "onAction",
-    "invalidates": [
-     "listProductionRuns"
-    ]
-   },
-   {
-    "operationId": "listProductionRuns",
-    "contract": "fnb",
-    "purpose": "What is being made, and what was",
-    "trigger": "onLoad"
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-008)"
    }
   ],
   "entryState": {
@@ -2444,8 +2221,8 @@
      "from": "session"
     },
     {
-     "name": "planId",
-     "from": "deepLink"
+     "name": "outletId",
+     "from": "navigation"
     }
    ],
    "coldEntry": "Resolves from the session. A principal with more than one venue is asked which first. A plan opened from the list.",
@@ -2468,11 +2245,24 @@
   "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "overlays": [
    {
+    "id": "formSetCourseRules",
+    "component": "modal",
+    "trigger": "Save course rules",
+    "body": "**Collects what `setCourseRules` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save course rules",
+     "operation": "setCourseRules"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "contract fnb.yaml PUT /outlets/{outletId}/course-rules; wiring fix, 2 October 2026"
+   },
+   {
     "id": "formSetVenueSettings",
     "component": "modal",
     "trigger": "Save venue settings",
-    "body": "**Collects what `setVenueSettings` sends before it is called.** Nothing in the body is required. Optional: `id`, `venueId`, `currencyCode`, `currencyScale`, `supportHours`, `quietHours`, `biometrics`, `segregatedAccess`, `alerting`, and **the configured limits** — `displayCurrencies`, the cart, resale, exchange, reschedule and reservation limits, `shiftVarianceThreshold`, and the `catalogue`, `inventory`, `seating`, `promotions`, `fnb`, `queue` and `reporting` groups (decided 28 September, audit R094). **A limit left empty inherits the tenant default** (null = inherit); each field shows the default it would inherit. **`fnb.foodSafetyLeadPrincipalId` is settable here** — until a food-safety lead is named, escalating a corrective action is refused 409 no-food-safety-lead, and the screen says so (decided 28 September, audit R096 (9)). Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "VenueSettings",
+    "body": "**Collects what `setVenueSettings` sends before it is called.** Nothing in the body is required. Optional: `fnb`. Only the F&B group (recall window, comp escalation, table reserved lead, food-safety lead); the other venue settings are other screens'. Dismissing sends nothing; the screen behind is unchanged.",
     "confirm": {
      "label": "Save venue settings",
      "operation": "setVenueSettings"
@@ -2480,50 +2270,30 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "id",
-      "venueId",
-      "currencyCode",
-      "currencyScale",
-      "supportHours",
-      "quietHours",
-      "biometrics",
-      "segregatedAccess",
-      "alerting",
-      "displayCurrencies",
-      "catalogue",
-      "inventory",
-      "seating",
-      "promotions",
-      "fnb",
-      "queue",
-      "reporting"
+      "fnb"
      ]
     },
     "provenance": "contract tenancy.yaml PUT /venues/{venueId}/settings"
+   }
+  ],
+  "gaps": [
+   {
+    "operation": "buildProductionPlan",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-008): Production operations (build and release plan, the run list) and F85 step 1 belong to BO-112; their frames (fnb-2m, 2n, 5d) were attached to this settings screen by mistake. Course rules are set before service, here (KIT-003 correction), not on the live pass (R254; design-notes corrections fnb-retail BO-136, KIT-003).",
+    "source": "F85 step 1 | R254 | screens/P08-venue-back-office.yaml#BO-112"
    },
    {
-    "id": "formBuildProductionPlan",
-    "component": "modal",
-    "trigger": "Build production plan",
-    "body": "**Collects what `buildProductionPlan` sends before it is called.** Required: `id`, `forDate`, `status`, `lines`. Optional: `outletId`, `basedOnSuggestionId`, `releasedRunIds`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "ProductionPlan",
-    "confirm": {
-     "label": "Build production plan",
-     "operation": "buildProductionPlan"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "id",
-      "forDate",
-      "status",
-      "lines",
-      "outletId",
-      "basedOnSuggestionId",
-      "releasedRunIds"
-     ]
-    },
-    "provenance": "contract fnb.yaml POST /production-plans"
+    "operation": "listProductionRuns",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-008): Production operations (build and release plan, the run list) and F85 step 1 belong to BO-112; their frames (fnb-2m, 2n, 5d) were attached to this settings screen by mistake. Course rules are set before service, here (KIT-003 correction), not on the live pass (R254; design-notes corrections fnb-retail BO-136, KIT-003).",
+    "source": "F85 step 1 | R254 | screens/P08-venue-back-office.yaml#BO-112"
+   },
+   {
+    "operation": "releaseProductionPlan",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-008): Production operations (build and release plan, the run list) and F85 step 1 belong to BO-112; their frames (fnb-2m, 2n, 5d) were attached to this settings screen by mistake. Course rules are set before service, here (KIT-003 correction), not on the live pass (R254; design-notes corrections fnb-retail BO-136, KIT-003).",
+    "source": "F85 step 1 | R254 | screens/P08-venue-back-office.yaml#BO-112"
    }
   ],
   "_platform": {

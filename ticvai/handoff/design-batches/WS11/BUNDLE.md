@@ -1,6 +1,6 @@
 # WS11 — Access Control board 11
 
-**10 screens · 18 operations · 23 schemas · 5 permissions**
+**10 screens · 19 operations · 23 schemas · 6 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -48,8 +48,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 5 permissions apply here:
-  `ACCESS_POINT_CONFIGURE, GUEST_MANAGE, INCIDENT_MANAGE, REPORT_VIEW_VENUE, SCOPE_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 6 permissions apply here:
+  `ACCESS_POINT_CONFIGURE, BIOMETRIC_IMAGE_VIEW, GUEST_MANAGE, INCIDENT_MANAGE, REPORT_VIEW_VENUE, SCOPE_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -60,6 +60,36 @@ convincingly. It is never a caption.
   field, the control, whether it is required, its default, its limits and allowed values, its format
   and its error; and, element by element, what is shown and in what format, what each action
   produces and where the user goes next. Draw exactly that.
+
+## The processes these screens belong to
+
+Written by the owner of each process (`handoff/design-notes/`). Read before any screen: it says how the process runs end to end and which words the screens must use.
+
+### Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue)
+
+Venue operations is everything that happens after a sale and inside the gates. A guest's ticket is one virtual ticket with interchangeable media (QR, dynamic QR, RFID wristband, NFC, Face Pass or Face Tag); at an access point a scanner (P07, or the scan function inside the Staff App P06) validates the media against the admission profile and the guest admission policy, offline if it must, and every deny carries a reason and a next action. The back office (Venue Management P08) configures that estate: the venue topology (venue, park, zone, attraction, access point, gate and lane, device placement), admission profiles and rules (entry, exit, re-entry, anti-passback, validity, crossover, companions), credential security (dynamic QR, device binding, beacons), biometrics, gate modes, and the live operations, fraud and monitoring views. Accreditation (P08 setup and review, P11 web portal for applicants, web first) takes an applicant from a configurable form through document checks, OCR, duplicate blocking and multi-level approval to a credential with zone rights. Resources and capacity manage bookable resources (rooms, vehicles, equipment, cabanas, instructors) that are booked as a consequence of selling a product, never sold directly. Workforce covers shift templates, rosters, attendance, swaps and breaks, mirrored on the Staff App. Maintenance and safety cover the asset register, preventive calendars, work orders with scored priority, inspections and incidents, with technicians working from the Staff App. Games and rides configure readers, credit types and consumption priority, play entitlements, game pricing, retry pricing, redemption and the card lifecycle. The virtual queue (Q1) gives a guest a live wait time and a return window for a ride; it is not the on-sale waiting room (Q2). Every calendar has day, week and month views. Configuration resolves tenant, region, venue (outlet only for F&B and retail), and a user's permissions, never the device, decide what they may do. The guest apps (P01, P02) show the guest's side of this: My Tickets, the scan code, Face Pass, wait times, the virtual queue, map booking of cabanas and the visit planner.
+*(source: F06 step 1 / F112 step 1 / F111 step 1 / ADR-0002 / ADR-0012 / ADR-0018 / ADR-0041 / ADR-0066 / ADR-0067 / ADR-0068 / DI-652 / DI-627 / DI-640 / DI-654 / DI-666 / DI-482 / DI-483 / DI-907 / DI-919 / DI-923 / DI-865 / DI-678 / TRACKER Actions row 160 / MoM 2026-09-02 AccessControl / MoM 2026-09-07 …)*
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Ticket | The one virtual record a guest owns (ticket number, product, validity, entries). Its number never changes, whatever media carries it or whoever it is transferred or resold to. | Pass (unless the product is a pass), Booking, Order line | DI-652 / DI-620 / contracts/spine/access.yaml#/components/schemas/TicketStatus |
+| Media | What the ticket is presented by at a gate (QR code, dynamic QR, wristband/RFID card, NFC, Face Pass, Face Tag). One ticket can carry several media as fallbacks; a media code can also cover several tickets scanned as one group. Show one … | Credential (for guest media; keep Credential for accreditation badges and staff), Ticket code | DI-180 / DI-608 / DI-652 |
+| Access point | A place where a scan is judged, with a fixed direction (entry, exit, re-entry, crossover). Hierarchy shown to users is Venue > Park > Zone > Attraction > Access point > Gate/lane > Device. | Scanner (that is the device), Door | screens/P08-venue-back-office.yaml#BO-144 / … |
+| Admission profile | The named set of rules an access point enforces (opening window, entries, exit scan, re-entry, validity, crossover). Products point at a profile; tiers such as Bronze/Silver/Gold are profiles with gate allow and deny lists. | Admission rules (as a screen title), Access rule set | DI-185 / contracts/spine/access.yaml#/components/schemas/AdmissionRules |
+| Admitted / Denied / Overridden | The three scan outcomes. A denial is always shown with its reason in plain words and a next action; an override is a supervisor admitting despite a denial, and is always attributed and reasoned. | Valid/Invalid, Success/Fail, Error | contracts/spine/access.yaml#/components/schemas/ScanOutcome / … |
+| Used | A ticket entry is used the moment a scan succeeds, whether or not the guest physically passed. Mistakes are resolved from the scan history, not by un-scanning. | Redeemed (for admission), Checked in (that is group check-in, a different step) | DI-627 / TRACKER Actions row 221 / TRACKER Actions row 189 |
+| Gate mode | What a lane is doing now, set live by the podium or supervisor - Normal, Free flow (counts, does not validate), Drop arm (everybody through, evacuation), Closed (nobody through), Podium (staff validating by eye), Maintenance. Direction is … | Turnstile mode (as a label for direction), Open/Locked | contracts/spine/access.yaml#/components/schemas/AccessPointOperatingMode / R221 |
+| Offline package | What a scanner holds to validate with no network - entitlements, blacklist, admission profiles and the active guest admission policy version - with its age always visible. | Cache, Local DB | F06 step 3 / ADR-0068 |
+| Sync and reconciliation | Sending the offline scan journal to the server, and the duty manager's review of scans the server rejected after the device had already admitted the guest. | Upload, Retry | F06 step 6 / DI-065 |
+| Face Pass / Face Tag | Face Pass is the long-lived face credential for members and season-pass holders (renewable); Face Tag is short-lived, for one day or event. Retention is set per tier by the venue. | Face ID, Biometric login | DI-640 / ADR-0063 |
+| Accreditation / Credential (accreditation) | Accreditation is the application and approval of a person (media, contractor, corporate, staff of a partner) for an event or season; the credential is what is issued after approval (photo badge, QR or RFID) with zone access rights. | Registration (for the whole process), Ticket | DI-654 / DI-662 |
+| Resource | A bookable thing or person a product needs (room, vehicle, cabana, equipment set, instructor). Guests buy products; resources are assigned to the booking, pre-assigned or dynamically. | Asset (that is maintenance), Inventory (that is stock) | DI-475 / DI-482 / TRACKER Actions row 160 |
+| Asset | A physical item maintained by the venue (ride, turnstile, printer, pump) with a register record, documents, warranty and maintenance history. | Resource, Device (unless it is an IT device in the device register) | DI-910 / ADR-0067 |
+| Work order | A unit of maintenance work, lifecycle Created > Assigned > In progress > Review > Closed, with a resolution timer. | Ticket (reserved for guest tickets), Job card | DI-231 |
+| Game / attraction (games module) | In the games and rides module an attraction is an individual game or ride (roller coaster, racing game, bumper cars), not a venue. | Venue, Park | DI-863 |
+| Virtual queue / Return window | A guest's place in a ride's queue held without standing in line, with a return window (for example 4:50 to 5:00 PM) that recalculates live. Distinct from the walk-in line and the VIP/express lane, and from the on-sale waiting room. | Waiting room, Fast pass (that is the express product), Booking | DI-675 / DI-678 / DI-679 / ADR-0066 |
+| Wait time source | Where a ride's wait time comes from - Sensor, Throughput, Manual, or Unavailable - always shown beside the number. | Live (when the source is manual) | contracts/satellite/queue.yaml#/components/schemas/WaitTimeSource / DI-315 |
+
 
 ## The screens
 
@@ -103,6 +133,20 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Offline | online only |
 | Opens with | `alertId` (navigation) |
 | Route | `/access-venue/access-security-fraud-command-center-bo-244` |
+
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** Board 11 command centre for access fraud: a credential can be technically valid while its use is suspicious. Ten KPI tiles, today's risk distribution (low, medium, high, critical share of validations), a live security feed by severity, a venue map of incidents drilling venue > park > zone > gate, and an AI security summary. The one thing to get right: critical alerts come first and each one opens straight into its evidence (why this credential is high risk) and the action that stops it.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **Duplicate access attempts drawn as the only data table column; four risk shares drawn as four tiles** Why: Duplicate attempts is a KPI tile (VO-R02); the table is the security feed (severity, description, ticket, place, time); the shares are one distribution. *(source: screens/P08-venue-back-office.yaml#BO-244 / contracts/spine/access.yaml#listAccessSecurityFraud; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **Lock identity as a primary action-bar button on the command centre** Why: A command centre carries no free-standing writes (VO-R02); locking starts from an alert or on BO-247. *(source: ADR-0041; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **Labels "Every access security fraud" and "The selected access security fraud"** Why: Generated placeholders; "Live security feed" (VO-R12). *(source: screens/P08-venue-back-office.yaml#BO-156 / DI-039; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+
+#### Decided on this screen
+
+Answered questions: draw the decision, not the old default. Where a decision and the tables below differ, the decision wins.
+
+- **The pack says "across all venues"; the read is venue-scoped with venue/park/zone/gate filters. Is the security command centre tenant-wide for the security team?** → Drawn default accepted: Venue from the top bar, with an "All my venues" option for users whose role spans venues. *(decided by Chinmay, 2026-10-02; DEC-259 / CHG-NOTE-008)* **Reviewable:** a default the lead may still overrule before the block is tasked.
 
 #### Inputs: what the user enters or picks
 
@@ -492,6 +536,20 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | Lock identity (primary button) | `lockIdentity` POST `/identity-locks` | IdentityLockInput | AccessIdentityLock | 400 Validation failed; 403 Authenticated but not permitted at the requested scope; 409 `already-locked`: an active lock covers this subject at this scope. | gated `INCIDENT_MANAGE`; opens modal first |
 | Save security alert (secondary button) | `updateSecurityAlert` POST `/security-alerts/{alertId}/status` | inline | AccessSecurityAlert | 400 Validation failed; 403 Authenticated but not permitted at the requested scope; 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path. | gated `INCIDENT_MANAGE`; opens modal first |
 
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **KPI tiles**: The ten pack tiles per VO-R02 (Active security alerts, High-risk credentials, Credentials locked today, Suspicious QR activity, Device-sharing alerts, Biometric alerts, Duplicate access attempts, Blacklisted credentials, Active investigations, Fraud attempts prevented today); alert tiles open their screens (BO-246, BO-248, BO-247, BO-252). *(source: screens/P08-venue-back-office.yaml#BO-244 / contracts/spine/access.yaml#listAccessSecurityFraud)*
+- **Risk distribution**: One stacked bar, not four tiles: "1.84M validations today - Low 98.2%, Medium 1.2%, High 0.5%, Critical 0.1%", with the band colours used on BO-250. *(source: screens/P08-venue-back-office.yaml#BO-245 / contracts/spine/access.yaml#listAccessSecurityFraud)*
+- **Live security feed**: Severity badge, plain description ("VT0512 attempted simultaneous entry at two different gates"), ticket, place, time; critical first, then newest. Selecting one opens the alert drawer with the risk score breakdown. *(source: screens/P08-venue-back-office.yaml#BO-245 / contracts/spine/access.yaml#listAccessSecurityFraud / contracts/spine/access.yaml#getAccessRiskScore)*
+- **Security venue map**: Incidents placed on the map; drilling Venue > Park > Zone > Gate filters the feed and tiles. *(source: screens/P08-venue-back-office.yaml#BO-245 / contracts/spine/access.yaml#listAccessSecurityFraud)*
+- **AI security summary**: A sentence with its numbers ("68% of high-risk events in the last hour came from credentials issued through Partner Channel X"), advisory. *(source: screens/P08-venue-back-office.yaml#BO-245)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Alert drawer - Acknowledge / Resolve / Dismiss**: Moves the alert with a note (max 1,000); a resolved or dismissed alert cannot move again; Link to investigation attaches it to BO-252. *(source: contracts/spine/access.yaml#updateSecurityAlert)*
+- **Lock identity (from an alert)**: Opens the lock dialog of BO-247 prefilled with the alert's identity and reason; confirmation per VO-R16. *(source: contracts/spine/access.yaml#lockIdentity)*
+- **Why high risk**: Shows the score and every contributing signal and factor for the alert's person, credential or device. *(source: contracts/spine/access.yaml#getAccessRiskScore / DI-969)*
+
 **Data it reads**: `listAccessSecurityFraud` (onLoad, Access Security & Fraud Command Center)
 
 **Where the user goes next**
@@ -518,6 +576,53 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 The alert is already resolved or dismissed.; 409 `already-locked`: an active lock covers this subject at this scope.; 422 Not exactly one of subjectId, entitlementId and deviceId |
+
+#### Edge cases to draw
+
+- **Alert about a credential at an offline gate**: The feed notes "Raised from offline scans, synced 11:05" and any lock shows offline propagation pending. *(source: DI-065 / contracts/spine/access.yaml#lockIdentity)*
+
+#### Consistency with other screens
+
+- Match `BO-250`: Risk bands and colours are the ones configured there.
+- Match `BO-213`: Same alert drawer and statuses.
+- Match `BO-035`: Override counts used in fraud views match the override audit.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+tiles:
+  activeAlerts: 14
+  highRiskCredentials: 37
+  lockedToday: 6
+  suspiciousQr: 9
+  deviceSharing: 5
+  biometric: 2
+  duplicateAttempts: 11
+  blacklisted: 128
+  investigations: 3
+  prevented: 22
+distribution:
+  validations: 1.84M
+  low: 98.2%
+  medium: 1.2%
+  high: 0.5%
+  critical: 0.1%
+feed:
+- severity: Critical
+  text: VT0512 attempted simultaneous entry at Main Plaza Gate 1 and North Entry
+  time: '10:03'
+- severity: High
+  text: Dynamic QR for VT0733 activated from four devices within 12 minutes
+  time: 09:58
+- severity: High
+  text: Face verification changed after previous successful admission (Annual pass, Khalid Al Zaabi)
+  time: 09:41
+- severity: Medium
+  text: Unusually high re-entry attempts at Re-entry Gate 03
+  time: 09:30
+```
 
 #### Permissions
 
@@ -576,6 +681,9 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-100`, `BO-245`, `BO-247`, `BO-249`, `BO-250`, `BO-251`, `BO-252`, `BO-246`, `BO-248`, `BO-253`.
 - [ ] Every gated control is gated: `INCIDENT_MANAGE`, `SCOPE_VIEW`.
 - [ ] The 3 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 1 edge case(s) from the process notes are drawn.
+- [ ] The 3 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
+- [ ] The 1 decision(s) taken on this screen are drawn as decided, not as the old default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -598,6 +706,14 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** The library of fraud signals TICVAI watches - credential signals (excessive QR activations, multiple sessions, copied credential, screenshot replay ...), device signals (new device, multiple devices, binding mismatch, rooted device, impossible device movement ...), access signals (duplicate entry, simultaneous use, anti-passback, unusual re-entry or crossover, wrong-gate attempts, abnormal Fast Pass use) and identity signals (face mismatch, unusual face change, companion anomalies), plus excessive refunds - each with severity, weight, threshold, time window, scope, credential types, venues, offline availability and response. The one thing to get right: a new rule starts as Alert only, so switching one on can never lock guests out before someone has seen what it fires on.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **Content is an empty unbound table; Save button carries no permission** Why: Bind listFraudDetectionRule; Save needs access configuration rights (VO-R08). *(source: contracts/spine/access.yaml#listFraudDetectionRule / contracts/spine/access.yaml#setFraudDetectionRule; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **The pack's fifth group, Location signals (impossible travel), has no category and no data to compute it** Why: signalCategory has four values; impossible travel needs gate-to-gate travel times. *(source: screens/P08-venue-back-office.yaml#BO-245 / contracts/spine/access.yaml#setFraudDetectionRule; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **scope and applicableCredentialTypes are free strings** Why: They must be a scope node and the closed media type list. *(source: contracts/spine/access.yaml#setFraudDetectionRule; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+
 #### Inputs: what the user enters or picks
 
 **Sent by *Save fraud rule*** (`setFraudDetectionRule`; no form is declared, so these are filled from the screen or collected inline)
@@ -618,6 +734,15 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Response `response` | select | required | Alert only | Alert only · Increase risk score · Require additional verification · Require supervisor · Temporarily lock · Full identity lock · Blacklist | — | — | `setFraudDetectionRule` body |
 | Enabled `enabled` | toggle | optional | on | — | — | — | `setFraudDetectionRule` body |
 
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **signal / signalCategory**: Pick the signal from the list grouped by category (Credential, Device, Access, Identity); the category follows from the signal, not chosen separately. *(source: screens/P08-venue-back-office.yaml#BO-245 / contracts/spine/access.yaml#setFraudDetectionRule)*
+- **threshold / timeWindow**: "Fires when it happens [3] times within [10] minutes" - both whole numbers, at least 1. *(source: contracts/spine/access.yaml#setFraudDetectionRule)*
+- **severity / weight**: Severity Low to Critical; weight 0-100 as "adds [20] points to the risk score", with the current band thresholds shown beside it. *(source: contracts/spine/access.yaml#setFraudDetectionRule / contracts/spine/access.yaml#listAccessRiskScoring)*
+- **response**: Seven responses in rising strength (Alert only, Increase risk score, Require additional verification, Require supervisor, Temporarily lock, Full identity lock, Blacklist); default Alert only; the three locking responses ask for confirmation naming how many guests fired the rule in the last 7 days. *(source: contracts/spine/access.yaml#setFraudDetectionRule)*
+- **scope / applicableVenues / applicableCredentialTypes**: Scope and venues from the hierarchy (empty = whole tenant, said in words); credential types from the media type list (QR, dynamic QR, RFID, NFC, wallet, Face Pass). *(source: contracts/spine/access.yaml#setFraudDetectionRule)*
+- **offlineAvailability**: "Also evaluated at offline gates" toggle; signals that need central data (simultaneous use across gates) are disabled with the reason. *(source: screens/P08-venue-back-office.yaml#BO-246 / contracts/spine/access.yaml#setFraudDetectionRule)*
+
 #### Outputs: what the screen shows and produces
 
 **Shown**
@@ -629,6 +754,14 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
 | Save fraud rule (primary button) | `setFraudDetectionRule` PUT `/fraud-detection-rule` | FraudDetectionRuleSignalLibraryInput | FraudDetectionRuleSignalLibraryView | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path. | — |
+
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Signal library**: Grouped by category - signal, enabled, severity, weight, threshold / window, response, fired last 7 days. *(source: contracts/spine/access.yaml#listFraudDetectionRule)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Save fraud rule**: Upsert by ruleId (no id creates); whole rule (VO-R04); unknown id 404. *(source: contracts/spine/access.yaml#setFraudDetectionRule)*
 
 **Data it reads**: `listFraudDetectionRule` (onLoad, Fraud Detection Rule & Signal Library)
 
@@ -646,6 +779,49 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the fraud detection rule are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Edge cases to draw
+
+- **Impossible travel (Gate A 10:02, Gate B 10:03, 18 minutes apart)**: Needs the walking time between gates; until the topology holds it, the signal shows "Needs gate travel times". *(source: screens/P08-venue-back-office.yaml#BO-245)*
+
+#### Consistency with other screens
+
+- Match `BO-249`: Relationship fraud rules are stored in the same rule table with their own screen; same severity and response words.
+- Match `BO-250`: Weights add up to the score configured there.
+- Match `BO-251`: Playbooks are triggered by these signals.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+rules:
+- category: Access
+  signal: Simultaneous use
+  threshold: 1 in 5 min
+  severity: Critical
+  weight: 25
+  response: Temporarily lock
+  offline: false
+- category: Credential
+  signal: Excessive QR activations
+  threshold: 4 in 12 min
+  severity: High
+  weight: 20
+  response: Require additional verification
+- category: Device
+  signal: New device
+  threshold: 1 in 60 min
+  severity: Low
+  weight: 10
+  response: Increase risk score
+- category: Identity
+  signal: Face mismatch
+  threshold: 2 in 30 min
+  severity: High
+  weight: 15
+  response: Require supervisor
+```
 
 #### Permissions
 
@@ -697,6 +873,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-244`.
 - [ ] Every gated control is gated: `ACCESS_POINT_CONFIGURE`, `SCOPE_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 1 edge case(s) from the process notes are drawn.
+- [ ] The 3 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -718,6 +896,14 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Route | `/access-venue/credential-sharing-concurrent-usage-detection-bo-246` |
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** One valid ticket shared by several people or devices: for each flagged ticket, the primary device, the session, additional devices and a timeline (09:02 QR activated on device A, 09:04 main gate entry, 09:07 QR requested on device B, 09:08 device C, 09:09 Gate 07 attempt with device B), against the detection policy (maximum active devices 1, maximum device changes 2 per visit, concurrent QR sessions not allowed, simultaneous gate use blocked) and the responses applied. The one thing to get right: the timeline makes the sharing obvious, with each device's trust label.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **Content is an empty unbound table** Why: Bind listCredentialSharingConcurrent. *(source: contracts/spine/access.yaml#listCredentialSharingConcurrent; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **The read has no timeline of device events and no device trust labels** Why: The pack's session view is the evidence of sharing. *(source: screens/P08-venue-back-office.yaml#BO-246 / screens/P08-venue-back-office.yaml#BO-247; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **Detection limits (maximum devices, changes per visit) are repeated on each flagged row and have no write here** Why: They are one policy (device binding, BO-167), not per-detection data. *(source: contracts/spine/access.yaml#listCredentialSharingConcurrent / contracts/spine/access.yaml#setDeviceBindingPolicy; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
 
 #### Inputs: what the user enters or picks
 
@@ -745,6 +931,17 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 |---|---|---|---|---|---|
 | Save security alert (primary button) | `updateSecurityAlert` POST `/security-alerts/{alertId}/status` | inline | AccessSecurityAlert | 400 Validation failed; 403 Authenticated but not permitted at the requested scope; 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path. | gated `INCIDENT_MANAGE`; opens modal first |
 
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Flagged credentials**: Ticket number, primary device, additional devices count, limit exceeded ("3 devices, limit 1"), responses applied, detected at; newest first, cursor paging. *(source: contracts/spine/access.yaml#listCredentialSharingConcurrent)*
+- **Credential session view**: A timeline of activations, QR requests and gate attempts, each tagged with its device and trust label (Trusted, New, Unrecognised, Blocked). *(source: screens/P08-venue-back-office.yaml#BO-246 / screens/P08-venue-back-office.yaml#BO-247)*
+- **Detection policy (read-only)**: Maximum active devices, maximum device changes per visit, concurrent QR sessions, simultaneous gate usage - with a link to where they are set. *(source: screens/P08-venue-back-office.yaml#BO-246)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Alert drawer - Acknowledge / Resolve / Dismiss**: As on BO-244 (opened with alertId). *(source: contracts/spine/access.yaml#updateSecurityAlert)*
+- **Lock secondary device / Lock credential**: Opens the lock dialog (BO-247) for the device or ticket; confirmation names the guest impact. *(source: contracts/spine/access.yaml#lockIdentity)*
+
 **Data it reads**: `listCredentialSharingConcurrent` (onLoad, Credential Sharing & Concurrent Usage Detection)
 
 **Where the user goes next**
@@ -762,6 +959,34 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 The alert is already resolved or dismissed. |
+
+#### Edge cases to draw
+
+- **Family legitimately sharing a group ticket on two phones**: Shown as Trusted where the devices are bound to the booking; dismissing the alert records "false positive". *(source: contracts/spine/access.yaml#updateSecurityAlert / DI-636)*
+
+#### Consistency with other screens
+
+- Match `BO-167`: Device binding and session security (board 3) sets the one-approved-device rule; the detection policy shown here must be that setting.
+- Match `BO-245`: The sharing signals (multiple devices, multiple sessions, simultaneous use) and responses come from the signal library.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+credential:
+  ticket: VT0733
+  primaryDevice: iPhone - Device A
+  session: Active
+  additionalDevices: 3
+  limit: 1
+timeline:
+- 09:02 QR activated - Device A (Trusted)
+- 09:04 Main Plaza Gate 1 entry - Device A
+- 09:07 QR requested - Device B (New)
+- 09:08 QR requested - Device C (Unrecognised)
+- 09:09 North Entry attempt - Device B, denied
+```
 
 #### Permissions
 
@@ -804,6 +1029,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-244`.
 - [ ] Every gated control is gated: `INCIDENT_MANAGE`, `SCOPE_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 1 edge case(s) from the process notes are drawn.
+- [ ] The 3 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -823,6 +1050,22 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Offline | online only |
 | Opens with | `lockId` (navigation) |
 | Route | `/access-venue/unified-identity-credential-lock-manager-bo-247` |
+
+**What the spec says about it.** **Releasing an identity or permanent lock needs a second approver, as BO-229 (decided 2 October 2026 by Chinmay, DEC-260; CHG-CSP-031).**
+
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** One action that stops everything tied to a suspicious identity - ticket, RFID wristband, dynamic QR, wallet credential, Face Pass, membership, Fast Pass - at a chosen scope (credential, media, entitlement, venue, all venues, full identity), for a duration and a reason, with the lock propagating to the central platform, venue edge, online gates, the offline revocation package and mobile devices. The one thing to get right: the propagation ticks, and that unlocking is harder than locking.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **The locks table binds only the propagatedTo column** Why: Guest, scope, duration, reason, status and who/when are in the read and are the list. *(source: contracts/spine/access.yaml#listUnifiedIdentityCredential; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **lockedBy and identityId are ids** Why: Show names. *(source: contracts/spine/access.yaml#listUnifiedIdentityCredential; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **Labels "Every unified identity credential" and "The selected unified identity credential"** Why: Generated placeholders; "Identity locks" (VO-R12). *(source: screens/P08-venue-back-office.yaml#BO-156 / DI-039; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+
+#### Decided on this screen
+
+Answered questions: draw the decision, not the old default. Where a decision and the tables below differ, the decision wins.
+
+- **Which locks need dual authorisation to release (the pack says "potentially" for high-risk locks)?** → Dual authorisation to release locks: as BO-229. *(decided by Chinmay, 2026-10-02; DEC-260 / CHG-NOTE-008)*
 
 #### Inputs: what the user enters or picks
 
@@ -853,6 +1096,14 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 
 Errors to draw in the form: 400 Validation failed; 403 Authenticated but not permitted at the requested scope; 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 `investigation-open` or `lock-released`.
 
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **subjectId**: Person search (name, ticket number, media code, membership); shows every linked credential before locking. *(source: screens/P08-venue-back-office.yaml#BO-247 / contracts/spine/access.yaml#lockIdentity)*
+- **lockScope**: Six options from narrow to wide; Venue needs the venue (the top-bar venue by default); All venue access and Full identity say "every venue of Yas Leisure Group". *(source: screens/P08-venue-back-office.yaml#BO-247 / screens/P08-venue-back-office.yaml#BO-248 / contracts/spine/access.yaml#lockIdentity)*
+- **associatedEntitlementIds**: For the Entitlement scope, tick the entitlements (Fast Pass, meal voucher) to lock. *(source: contracts/spine/access.yaml#lockIdentity)*
+- **lockDuration / lockHours**: Until manually released, End of day, N hours (1-720, required then), Until investigation complete (requires a linked investigation), Permanent. *(source: contracts/spine/access.yaml#lockIdentity)*
+- **lockReason**: Single choice of six (credential sharing, fraud suspected, security incident, identity mismatch, stolen credential, guest removal). *(source: screens/P08-venue-back-office.yaml#BO-248 / contracts/spine/access.yaml#lockIdentity)*
+
 #### Outputs: what the screen shows and produces
 
 **Shown**
@@ -876,6 +1127,16 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | Lock identity (primary button) | `lockIdentity` POST `/identity-locks` | IdentityLockInput | AccessIdentityLock | 400 Validation failed; 403 Authenticated but not permitted at the requested scope; 409 `already-locked`: an active lock covers this subject at this scope. | gated `INCIDENT_MANAGE`; opens modal first |
 | Release identity lock (secondary button) | `releaseIdentityLock` POST `/identity-locks/{lockId}/release` | inline | AccessIdentityLock | 400 Validation failed; 403 Authenticated but not permitted at the requested scope; 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path. | gated `INCIDENT_MANAGE`; opens modal first |
 
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Locks list**: Guest, scope, duration (with time remaining), reason, locked by and when, status, and five propagation ticks; Active first. *(source: screens/P08-venue-back-office.yaml#BO-248 / contracts/spine/access.yaml#listUnifiedIdentityCredential)*
+- **Identity panel**: The guest and every associated credential with type icon, each shown as locked or not under the current scope. *(source: screens/P08-venue-back-office.yaml#BO-247)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Lock identity**: Confirmation: "Lock all venue access for Khalid Al Zaabi - 7 credentials - until investigation complete"; the lock propagates and the ticks fill in. A fraud rule with a locking response writes the same kind of lock automatically. *(source: contracts/spine/access.yaml#lockIdentity)*
+- **Release lock**: Reason required (max 500); refused while its investigation is open ("Close investigation SEC-2026-00418 first") or if already released. *(source: contracts/spine/access.yaml#releaseIdentityLock)*
+
 **Data it reads**: `listUnifiedIdentityCredential` (onLoad, Unified Identity & Credential Lock Manager)
 
 **Where the user goes next**
@@ -893,6 +1154,33 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 `already-locked`: an active lock covers this subject at this scope.; 409 `investigation-open` or `lock-released`.; 422 `lockHours` missing for an nHours lock. |
+
+#### Edge cases to draw
+
+- **Lock not yet in the offline revocation package**: Amber tick with "Pending - next urgent distribution"; offline gates may still admit until then. *(source: screens/P08-venue-back-office.yaml#BO-248 / contracts/spine/access.yaml#setGateOfflinePolicy)*
+- **High-risk lock release**: Releasing a permanent or full-identity lock needs the release permission and a second approver (as BO-229); a lock until end of day needs none. *(source: screens/P08-venue-back-office.yaml#BO-248 / decided 2 October 2026 by Chinmay (CHG-NOTE-008))*
+
+#### Consistency with other screens
+
+- Match `BO-229`: Disabling one credential there and locking an identity here use the same reasons and propagation ticks; a guest's restrictions should be visible in both.
+- Match `BO-252`: Locks tied to an investigation link to it.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+lock:
+  guest: Khalid Al Zaabi
+  credentials: VT0512 ticket, RFID-77812 wristband, dynamic QR, Apple Wallet pass, Face Pass, Gold membership, Silver
+    Fast Pass
+  scope: All venue access
+  duration: Until investigation complete
+  reason: Credential sharing
+  by: Omar Haddad
+  at: 01 Oct 2026 10:12
+  propagated: Central, Edge, Online gates, Mobile devices; offline package pending
+```
 
 #### Permissions
 
@@ -932,6 +1220,9 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-244`.
 - [ ] Every gated control is gated: `INCIDENT_MANAGE`, `SCOPE_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 2 edge case(s) from the process notes are drawn.
+- [ ] The 3 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
+- [ ] The 1 decision(s) taken on this screen are drawn as decided, not as the old default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -945,14 +1236,34 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 3 · needs the `access` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `ACCESS_POINT_CONFIGURE`, `GUEST_MANAGE`, `INCIDENT_MANAGE`, `SCOPE_VIEW` (3 configure, 1 read); in the flows as venue manager |
+| Who uses it | venue staff holding `ACCESS_POINT_CONFIGURE`, `BIOMETRIC_IMAGE_VIEW`, `GUEST_MANAGE`, `INCIDENT_MANAGE`, `SCOPE_VIEW` (3 configure, 1 ?, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Monitor) and no metric row |
 | Offline | online only |
 | Opens with | `alertId` (navigation), `attemptId` (navigation) |
 | Route | `/access-venue/biometric-identity-integrity-monitoring-bo-248` |
 
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** Watches biometric identity risk without configuring biometrics (that is board 5): face changed, re-enrolment, repeated face mismatch, several faces on one credential, one face on several credentials, suspicious enrolment frequency, unusual verification failures. Example: an annual pass enrolled 12 Jan, 28 successful visits, face changed 01 Sep - risk alert. The one thing to get right: the reviewer can judge the change from the audit (old and new reference, date, location, operator, process, reason, approval) without ever seeing a raw template.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **Table columns named after enum values ("multiple faces associated with one credential", "one face associated with multiple credentials")** Why: These are anomaly types, values of one column. *(source: screens/P08-venue-back-office.yaml#BO-248 / contracts/spine/access.yaml#listBiometricIdentityIntegrity; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **Opening an investigation (setSecurityInvestigationEvidence) needs ACCESS_POINT_CONFIGURE** Why: An investigation is incident work (INCIDENT_MANAGE like the alert moves), not access point configuration. *(source: contracts/spine/access.yaml#setSecurityInvestigationEvidence / contracts/spine/access.yaml#updateSecurityAlert; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **Labels "Every biometric identity integrity" and "The selected biometric identity integrity"** Why: Generated placeholders; "Biometric anomalies" (VO-R12). *(source: screens/P08-venue-back-office.yaml#BO-156 / DI-039; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+
+#### Decided on this screen
+
+Answered questions: draw the decision, not the old default. Where a decision and the tables below differ, the decision wins.
+
+- **May a security reviewer see the enrolment photos for a face change, or only match scores and references?** → Security reviewer and face-change photos: as BO-190 (behind 'View images (logged)', permission needed). *(decided by Chinmay, 2026-10-02; DEC-261 / CHG-NOTE-008)*
+
 #### Inputs: what the user enters or picks
+
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Reason | text area | — | min length 3; max length 300 | `getFaceReenrolmentImages` ?reason |
 
 **Form: Save security alert** (modal, opened by *Save security alert*; *Save security alert* calls `updateSecurityAlert`, *Cancel* sends nothing)
 
@@ -1001,10 +1312,23 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
+| View images (logged) (secondary button) | `getFaceReenrolmentImages` GET `/face-reenrolment-attempts/{attemptId}/images` | — | inline | 403 Authenticated but not permitted at the requested scope; 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 The attempt is no longer pending review and its … | step-up: mfa (Opens a guest's face images, special-category data under PDPL; every look is logged (DEC-239).) |
 | Save security alert (primary button) | `updateSecurityAlert` POST `/security-alerts/{alertId}/status` | inline | AccessSecurityAlert | 400 Validation failed; 403 Authenticated but not permitted at the requested scope; 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path. | gated `INCIDENT_MANAGE`; opens modal first |
 | Review face reenrolment (secondary button) | `reviewFaceReenrolment` POST `/face-reenrolment-attempts/{attemptId}/review` | inline | AccessFaceReenrolmentAttempt | 400 Validation failed; 403 Authenticated but not permitted at the requested scope; 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path. | gated `GUEST_MANAGE`; opens modal first |
 
-**Data it reads**: `listBiometricIdentityIntegrity` (onLoad, Biometric & Identity Integrity Monitoring)
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Anomaly list**: Anomaly type, ticket or Face Pass, successful visits before the change, change date, location, status; one list with a type filter. *(source: contracts/spine/access.yaml#listBiometricIdentityIntegrity)*
+- **Historical comparison**: Enrolment 1, Enrolment 2 and the current verification side by side as dated references with match results; images behind "View images (logged)", which needs its own permission (as BO-190). *(source: screens/P08-venue-back-office.yaml#BO-248 / ADR-0063 / decided 2 October 2026 by Chinmay (CHG-NOTE-008))*
+- **Face change audit**: Old and new biometric reference (opaque ids), change date, location, operator, verification process, reason, approval. *(source: screens/P08-venue-back-office.yaml#BO-248 / contracts/spine/access.yaml#listBiometricIdentityIntegrity)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Review re-enrolment (Approve / Block)**: Only for an attempt pending review; Approve replaces the enrolled face, Block keeps the old one and raises a biometric security alert; a note up to 1,000 characters; the reviewer is recorded. *(source: contracts/spine/access.yaml#reviewFaceReenrolment)*
+- **Respond**: Allow, Require ID, Supervisor review, Security investigation (opens BO-252 with the anomaly attached), Lock credential (BO-247). *(source: screens/P08-venue-back-office.yaml#BO-249 / contracts/spine/access.yaml#setSecurityInvestigationEvidence)*
+- **Alert drawer - Acknowledge / Resolve / Dismiss**: As on BO-244. *(source: contracts/spine/access.yaml#updateSecurityAlert)*
+
+**Data it reads**: `listBiometricIdentityIntegrity` (onLoad, Biometric & Identity Integrity Monitoring); `getFaceReenrolmentImages` (onLoad, The enrolled and new images, behind a logged view (DEC-239))
 
 **Where the user goes next**
 
@@ -1020,7 +1344,33 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the biometric identity integrity are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 The alert is already resolved or dismissed.; 409 `not-pending`: the attempt is not awaiting review. |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 The alert is already resolved or dismissed.; 409 The attempt is no longer pending review and its images are purged (`images-purged`).; 409 `not-pending`: the attempt is not awaiting review. |
+
+#### Edge cases to draw
+
+- **Attempt already reviewed by someone else**: Refused with "Already reviewed by Maria Santos at 10:20". *(source: contracts/spine/access.yaml#reviewFaceReenrolment)*
+
+#### Consistency with other screens
+
+- Match `BO-190`: Face change, re-enrolment and identity protection (board 5) raises the pending reviews handled here; same outcome words.
+- Match `BO-250`: Biometric anomalies feed the risk score as identity signals.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+anomaly:
+  type: Face changed
+  credential: Annual pass VT0187 - Face Pass FP-20931
+  guest: Khalid Al Zaabi
+  enrolled: 12 Jan 2026
+  visits: 28
+  changed: 01 Sep 2026
+  location: Aqua Park Guest Services kiosk 2
+  operator: Maria Santos
+  reason: Significant identity change after established usage history
+```
 
 #### Permissions
 
@@ -1028,6 +1378,7 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 - `setSecurityInvestigationEvidence` → `ACCESS_POINT_CONFIGURE` (configure) · staff
 - `updateSecurityAlert` → `INCIDENT_MANAGE` (configure) · staff
 - `reviewFaceReenrolment` → `GUEST_MANAGE` (configure) · staff
+- `getFaceReenrolmentImages` → `BIOMETRIC_IMAGE_VIEW` (tier not set) · staff · step-up mfa
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -1056,16 +1407,20 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 - Client workshop board: `wireframes/WS28 Access Control Board 11.dc.html#bo-248`
 - Workshop pack: Access Control Module_Reference.pdf board 11
 - Flow F121 *Access Control board 11: Access Security & Fraud Command Center*, step 8: Works in Biometric & Identity Integrity Monitoring → Detect suspicious biometric and identity-related changes without duplicating Board 5's biometric configuration. Board 5 configures biometrics. Board 11 monitors biometric security risk.
+- ADR-0063 *Encryption and keys, and biometric templates stay with the biometric vendor* (`docs/adr/0063-encryption-keys-and-biometric-templates.md`)
 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (5), with its required mark, default, format and its error state (400, 403, 404, 409).
 - [ ] Every output is drawn (6 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-248?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: Save security alert, Review face reenrolment.
+- [ ] Every action is wired with its success and its failure: View images (logged), Save security alert, Review face reenrolment.
 - [ ] Every transition is wired: `BO-244`.
-- [ ] Every gated control is gated: `ACCESS_POINT_CONFIGURE`, `GUEST_MANAGE`, `INCIDENT_MANAGE`, `SCOPE_VIEW`.
+- [ ] Every gated control is gated: `ACCESS_POINT_CONFIGURE`, `BIOMETRIC_IMAGE_VIEW`, `GUEST_MANAGE`, `INCIDENT_MANAGE`, `SCOPE_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 1 edge case(s) from the process notes are drawn.
+- [ ] The 3 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
+- [ ] The 1 decision(s) taken on this screen are drawn as decided, not as the old default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -1085,6 +1440,13 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/access-venue/relationship-companion-fraud-monitoring-bo-249` |
+
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** Rules that watch linked guests over a visit: companion changed during the visit, nanny credential used without the primary guest, child entering or exiting with an unauthorised adult, one companion linked to several primaries, excessive relationship changes, a group leader across unrelated groups; with severity and responses (yellow intervention, supervisor, ID, biometric, security escalation, access denial). The one thing to get right: child exit with the wrong adult is always a high-priority alert, and the relationship timeline shows who came in with whom.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **The six scenarios drawn as text fields and a select named after the scenarios** Why: They are values of one scenario choice. *(source: screens/P08-venue-back-office.yaml#BO-249; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **The read has no weight and no alert timeline; read and write name the same fields differently (ruleType / relationshipRuleType, responses / relationshipResponses)** Why: The form cannot open pre-filled and the pack's relationship timeline has no source. *(source: contracts/spine/access.yaml#listRelationshipCompanionFraud / contracts/spine/access.yaml#setRelationshipFraudRule; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
 
 #### Inputs: what the user enters or picks
 
@@ -1114,6 +1476,13 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 
 Errors to draw in the form: 400 Validation failed; 403 Authenticated but not permitted at the requested scope; 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 `wrong-rule-kind`: the ruleId names a signal rule.; 422 `accessDenial` without a person in the loop.
 
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **relationshipRuleType / relationshipType**: Pick the scenario (six) and the relationship it applies to (child-adult, POD-companion, guest-nanny, group leader-group, membership dependent). *(source: screens/P08-venue-back-office.yaml#BO-249 / contracts/spine/access.yaml#setRelationshipFraudRule)*
+- **severity / weight**: Severity Low to Critical; "Child enters/exits with unauthorised adult" is fixed at Critical and cannot be lowered. Weight 0-100 into the risk score. *(source: screens/P08-venue-back-office.yaml#BO-250 / contracts/spine/access.yaml#setRelationshipFraudRule)*
+- **relationshipResponses**: Multi-select of the six responses, at least one; Access denial shows the deny reason the steward will see. *(source: contracts/spine/access.yaml#setRelationshipFraudRule)*
+- **applicableVenues / enabled**: Venues (empty = all); enabled switch. *(source: contracts/spine/access.yaml#setRelationshipFraudRule)*
+
 #### Outputs: what the screen shows and produces
 
 **Actions and what each produces**
@@ -1121,6 +1490,15 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
 | Save relationship fraud rule (primary button) | `setRelationshipFraudRule` PUT `/relationship-fraud-rules` | RelationshipFraudRuleInput | AccessFraudRule | 400 Validation failed; 403 Authenticated but not permitted at the requested scope; 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path. | gated `ACCESS_POINT_CONFIGURE`; opens modal first |
+
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Rule list**: Scenario, relationship, severity, responses, enabled, alerts in the last 7 days. *(source: contracts/spine/access.yaml#listRelationshipCompanionFraud)*
+- **Relationship timeline**: For an alert - primary guest, assigned companion, entries, exits and the change attempt on one time axis (e.g. Companion A entered with primary; later Companion B attempted entry). *(source: screens/P08-venue-back-office.yaml#BO-249 / screens/P08-venue-back-office.yaml#BO-250)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Save relationship rule**: Upsert by ruleId; whole rule (VO-R04). *(source: contracts/spine/access.yaml#setRelationshipFraudRule)*
 
 **Data it reads**: `listRelationshipCompanionFraud` (onLoad, Relationship & Companion Fraud Monitoring)
 
@@ -1138,6 +1516,34 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 `wrong-rule-kind`: the ruleId names a signal rule.; 422 `accessDenial` without a person in the loop. |
+
+#### Consistency with other screens
+
+- Match `BO-218`: The companion rules these monitor are configured on BO-218; same relationship names.
+- Match `BO-245`: Same rule table and severity/response words as the signal library.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+rules:
+- scenario: Companion changed during visit
+  relationship: POD-companion
+  severity: High
+  responses: Supervisor verification, ID verification
+- scenario: Child exits with unauthorised adult
+  relationship: Child-adult
+  severity: Critical
+  responses: Access denial, Security escalation
+- scenario: Nanny credential used without primary guest
+  relationship: Guest-nanny
+  severity: Medium
+  responses: Yellow intervention
+timeline:
+- 09:40 POD guest Priya Nair + companion A entered
+- 13:15 Companion B attempted entry with VT-POD companion ticket - alert
+```
 
 #### Permissions
 
@@ -1176,6 +1582,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-244`.
 - [ ] Every gated control is gated: `ACCESS_POINT_CONFIGURE`, `SCOPE_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 2 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -1198,6 +1605,14 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** Turns many signals into one explainable risk score (0-100): contributing signals with their points (new device +10, multiple sessions +20, impossible travel +25, failed attempts +12, face mismatch +15), bands Low / Medium / High / Critical with configurable thresholds, a response per band, and context that changes the decision (score 65 - require verification at park entry, deny at restricted backstage). AI may find patterns, but never blocks on its own. The one thing to get right: every score is shown with its contributing signals, never as a bare number.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **The pack's example labels 82 / 100 as HIGH RISK while its own bands make 80-100 Critical** Why: The example contradicts the bands; mock-ups must follow the bands (82 is Critical). *(source: screens/P08-venue-back-office.yaml#BO-250; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **No field for the response per band or for context-specific decisions (score 65 - verify at park entry, deny at backstage)** Why: The pack's response matrix and contextual risk examples cannot be configured. *(source: screens/P08-venue-back-office.yaml#BO-250 / contracts/spine/access.yaml#setRiskScoringConfig; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **Content is an empty unbound table** Why: This is a form plus a lookup; bind listAccessRiskScoring to the scale and getAccessRiskScore to the lookup. *(source: contracts/spine/access.yaml#listAccessRiskScoring / contracts/spine/access.yaml#getAccessRiskScore; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+
 #### Inputs: what the user enters or picks
 
 **Form: Save risk scoring config** (modal, opened by *Save risk scoring config*; *Save risk scoring config* calls `setRiskScoringConfig`, *Cancel* sends nothing)
@@ -1215,6 +1630,13 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 Errors to draw in the form: 400 Validation failed; 403 Authenticated but not permitted at the requested scope; 422 Thresholds not rising, or out of 0 to 100.
 
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **mediumThreshold / highThreshold / criticalThreshold**: A 0-100 scale with three draggable edges (defaults 30, 60, 80); each must be higher than the last. *(source: screens/P08-venue-back-office.yaml#BO-250 / contracts/spine/access.yaml#setRiskScoringConfig)*
+- **riskFactors**: Checkboxes for the eight context factors (venue, product, ticket value, event, access zone, time, credential type, historical behaviour). *(source: screens/P08-venue-back-office.yaml#BO-250 / contracts/spine/access.yaml#setRiskScoringConfig)*
+- **Response matrix**: Per band the action (Low normal validation, Medium enhanced monitoring, High additional verification, Critical lock and security review); drawn greyed, no field. *(source: screens/P08-venue-back-office.yaml#BO-250)*
+- **id / scopePath**: Never inputs; the configuration is the top-bar venue's (VO-R03). *(source: contracts/spine/access.yaml#setJourneySequenceRule)*
+
 #### Outputs: what the screen shows and produces
 
 **Shown**
@@ -1226,6 +1648,14 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
 | Save risk scoring config (primary button) | `setRiskScoringConfig` PUT `/risk-scoring-config` | AccessRiskScoringConfig | AccessRiskScoringConfig | 400 Validation failed; 403 Authenticated but not permitted at the requested scope; 422 Thresholds not rising, or out of 0 to 100. | gated `ACCESS_POINT_CONFIGURE`; opens modal first |
+
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Score lookup**: Search a guest, ticket or device to see "82 / 100" with its band and the contributing signals table (signal, points, when), plus context factors applied. *(source: screens/P08-venue-back-office.yaml#BO-250 / contracts/spine/access.yaml#getAccessRiskScore / DI-969)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Save scoring configuration**: Replaces the venue's configuration whole; 422 if thresholds do not rise, shown on the scale. *(source: contracts/spine/access.yaml#setRiskScoringConfig)*
 
 **Data it reads**: `listAccessRiskScoring` (onLoad, Access Risk Scoring & Decision Engine)
 
@@ -1244,6 +1674,39 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 422 Not exactly one of subjectId, entitlementId and deviceId; 422 Thresholds not rising, or out of 0 to 100. |
+
+#### Edge cases to draw
+
+- **AI suggests a block**: Shown as a recommendation with reasons; a person applies it or a configured rule does - never the model alone. *(source: screens/P08-venue-back-office.yaml#BO-251)*
+
+#### Consistency with other screens
+
+- Match `BO-244`: The command centre's risk distribution uses these bands and colours.
+- Match `BO-245`: Signal points are the weights set on the fraud rules.
+- Match `BO-241`: Live risk score offline falls back to a cached score per the evaluation settings.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+bands:
+  low: 0-29
+  medium: 30-59
+  high: 60-79
+  critical: 80-100
+score:
+  guest: Khalid Al Zaabi
+  ticket: VT0512
+  score: 82
+  band: Critical
+  signals:
+  - New device +10
+  - Multiple sessions +20
+  - Impossible travel +25
+  - Previous failed attempts +12
+  - Face mismatch +15
+```
 
 #### Permissions
 
@@ -1289,6 +1752,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-244`.
 - [ ] Every gated control is gated: `ACCESS_POINT_CONFIGURE`, `SCOPE_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 1 edge case(s) from the process notes are drawn.
+- [ ] The 3 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -1309,11 +1774,31 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | nothing: it opens on its own |
 | Route | `/access-venue/real-time-security-response-playbook-builder-bo-251` |
 
-**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built. Contract gap recorded 2 October 2026 (CHG-WIR-004): No read of security response playbooks (setRealTimeSecurity has no list or get).
+
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** Security playbooks: when a trigger fires (concurrent device usage AND risk score above 75), run ordered steps - temporarily lock the credential, push the lock to the edge, show red at the gate, notify the access supervisor, create a security incident, require ID or biometric verification - with a severity and an escalation chain (not acknowledged in 3 minutes, notify the security supervisor; after 5, the venue operations manager). The one thing to get right: steps are an ordered list and escalation is a chain with times, so the response is the same at every venue.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **The eight actions drawn as action-bar buttons (Alert Only ... Notify Security)** Why: They are the values of a step's action, not buttons. *(source: screens/P08-venue-back-office.yaml#BO-251; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **triggerCondition is free text ("Risk Score > 75 AND signal = simultaneousUse")** Why: A free-text condition cannot be evaluated reliably; build it from signals and the score, as ADR-0068 did for admission rules. *(source: contracts/spine/access.yaml#setRealTimeSecurity / ADR-0068; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- responseActions is an unordered set; only one escalation step; no severity; write-only with no read (CHG-WIR-004)
 
 #### Inputs: what the user enters or picks
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **name**: Required (e.g. Suspected credential sharing). *(source: contracts/spine/access.yaml#setRealTimeSecurity)*
+- **triggerCondition**: Built from signals (BO-245) and a risk score comparison with All / Any, not typed (see corrections). *(source: screens/P08-venue-back-office.yaml#BO-251 / contracts/spine/access.yaml#setRealTimeSecurity / ADR-0068)*
+- **responseActions**: An ordered step list; each step picks one of the eleven actions (Alert only, Increase risk score, Require additional verification, Require supervisor, Temporarily lock, Full identity lock, Blacklist, Notify security, Create incident, Notify guest services, Trigger edge distribution); drag to reorder. *(source: screens/P08-venue-back-office.yaml#BO-251 / screens/P08-venue-back-office.yaml#BO-252 / contracts/spine/access.yaml#setRealTimeSecurity)*
+- **acknowledgeWithinMinutes / escalateToRole / escalateAfterMinutes**: An escalation chain of steps "If not acknowledged within [3] min, notify [Security supervisor]"; roles from the role list. *(source: screens/P08-venue-back-office.yaml#BO-252 / contracts/spine/access.yaml#setRealTimeSecurity)*
+- **Severity**: Informational, Low, Medium, High, Critical; drawn greyed (no field). *(source: screens/P08-venue-back-office.yaml#BO-252)*
+- **enabled / playbookId**: Enabled switch (new playbooks start disabled); the id is the server's (VO-R03). *(source: contracts/spine/access.yaml#setRealTimeSecurity)*
 
 #### Outputs: what the screen shows and produces
 
@@ -1330,6 +1815,15 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Blacklist (secondary button) | navigation or local | — | — | — | — |
 | Notify Security (secondary button) | navigation or local | — | — | — | — |
 
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Playbook list**: Name, trigger in words, number of steps, severity, enabled, last fired. *(source: designer default)*
+- **Playbook preview**: The trigger and numbered steps as a vertical flow, with the gate outcome ("Red at gate - Credential locked, see supervisor"). *(source: screens/P08-venue-back-office.yaml#BO-251)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Save playbook**: Whole-row upsert (VO-R04); enabling a playbook with a lock or blacklist step asks for confirmation and follows the security approval lifecycle (BO-253). *(source: contracts/spine/access.yaml#setRealTimeSecurity)*
+
 **Where the user goes next**
 
 - → `BO-244` Access Security & Fraud Command Center: *Returns to the board's landing screen*; calls `setRealTimeSecurity`
@@ -1344,6 +1838,32 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the real-time security response are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Consistency with other screens
+
+- Match `BO-245`: Same action words as the fraud rule responses.
+- Match `BO-253`: Playbook changes are audited and approved there.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+playbook:
+  name: Suspected credential sharing
+  trigger: Concurrent device usage AND risk score above 75
+  steps:
+  - Temporarily lock credential
+  - Trigger edge distribution
+  - Show red at gate
+  - Notify access supervisor
+  - Create security incident
+  - Require ID / biometric verification
+  escalation:
+  - 3 min - Security supervisor (Omar Haddad on duty)
+  - 5 min - Venue operations manager
+  severity: High
+```
 
 #### Permissions
 
@@ -1381,6 +1901,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-244`.
 - [ ] Every gated control is gated: `ACCESS_POINT_CONFIGURE`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 2 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -1401,11 +1922,27 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | nothing: it opens on its own |
 | Route | `/access-venue/security-investigation-evidence-workspace-bo-252` |
 
-**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built. Contract gap recorded 2 October 2026 (CHG-WIR-004): No read lists or opens security investigations.
+
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** The security specialist's case file, deeper than board 9's incident workspace: is this part of fraud or a larger pattern? Case SEC-2026-00418 on a ticket with risk CRITICAL 91, a unified timeline (purchased, activated, device bound, entry, second device activation, duplicate scan, face mismatch, lock, operator intervention), evidence correlated from thirteen sources, related entities (five credentials sharing one device) as a graph, investigator actions and a case status from Open to Closed. The one thing to get right: one timeline across every source, so the investigator reconstructs what happened without opening other screens.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **Write-only; no read lists or opens investigations, and Save changes has no operation** Why: A case workspace must load its cases, timeline and evidence. *(source: contracts/spine/access.yaml#setSecurityInvestigationEvidence / screens/P08-venue-back-office.yaml#BO-252; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **investigationId, riskScore and riskLevel are inputs** Why: The case number is server-owned (VO-R03) and the risk is calculated, not typed. *(source: contracts/spine/access.yaml#setSecurityInvestigationEvidence / contracts/spine/access.yaml#getAccessRiskScore; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **notes is one string; permission is ACCESS_POINT_CONFIGURE** Why: Investigator notes are dated, attributed entries; case work is incident management (INCIDENT_MANAGE). *(source: contracts/spine/access.yaml#setSecurityInvestigationEvidence; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
 
 #### Inputs: what the user enters or picks
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **subjectCredentialId**: Ticket number or media code search; arrives prefilled from an alert, incident or anomaly. *(source: contracts/spine/access.yaml#setSecurityInvestigationEvidence)*
+- **evidenceSources**: The thirteen sources as chips, all on by default; turning one off hides it from the timeline, it is not deleted. *(source: screens/P08-venue-back-office.yaml#BO-252 / contracts/spine/access.yaml#setSecurityInvestigationEvidence)*
+- **status**: Open > Investigating > Action taken > Resolved > Closed as a stepper; Closed needs a summary note. *(source: screens/P08-venue-back-office.yaml#BO-253 / contracts/spine/access.yaml#setSecurityInvestigationEvidence)*
+- **notes / linkedIncidentId**: Notes are added as dated entries by the signed-in person, not one overwritten text; link an access incident (BO-232) by its number. *(source: screens/P08-venue-back-office.yaml#BO-253 / contracts/spine/access.yaml#setSecurityInvestigationEvidence)*
+- **investigationId / riskScore / riskLevel**: Not inputs - the case number is the server's (VO-R03) and the risk is the calculated score (getAccessRiskScore), shown read-only. *(source: contracts/spine/access.yaml#getAccessRiskScore)*
 
 #### Outputs: what the screen shows and produces
 
@@ -1415,6 +1952,17 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |---|---|---|---|---|---|
 | Save changes (primary button) | navigation or local | — | — | — | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
+
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Case header**: Case number, subject ticket and guest, risk "CRITICAL - 91" in the band colour, status, investigator, opened at. *(source: screens/P08-venue-back-office.yaml#BO-252)*
+- **Unified timeline**: Every event from the chosen sources on one time axis with source icons; filters by source. *(source: screens/P08-venue-back-office.yaml#BO-252)*
+- **Investigation graph**: Device A linked to credentials 1, 2, 3 (and guests); AI-found related entities marked as suggestions. *(source: screens/P08-venue-back-office.yaml#BO-253)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Investigator actions**: Add note, Add evidence, Link incident, Lock identity (BO-247), Blacklist (BO-229), Clear risk, Escalate, Close investigation; each recorded in the case history; destructive ones confirmed (VO-R16). *(source: screens/P08-venue-back-office.yaml#BO-253)*
+- **Save changes / Cancel**: Saves status and links; Cancel discards. *(source: contracts/spine/access.yaml#setSecurityInvestigationEvidence)*
 
 **Where the user goes next**
 
@@ -1430,6 +1978,34 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the security investigation evidence are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Consistency with other screens
+
+- Match `BO-232`: Board 9 resolves today's guest problem; this asks whether it is a pattern. Cases link both ways.
+- Match `BO-247`: A lock "until investigation complete" cannot be released while this case is open.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+case:
+  number: SEC-2026-00418
+  subject: VT0733 - Sara Al Nuaimi
+  risk: CRITICAL - 91
+  status: Investigating
+  investigator: Omar Haddad
+timeline:
+- 28 Sep 19:14 Ticket purchased (web)
+- 01 Oct 09:02 Credential activated - Device A
+- 09:03 Device bound
+- 09:04 Entry Main Plaza Gate 1
+- 09:07 Second device activation - Device B
+- 09:09 Duplicate scan North Entry
+- 09:12 Credential locked
+- 09:20 Operator intervention - Fatima Al Hashimi
+related: 5 credentials activated on the same device (Reseller X batch)
+```
 
 #### Permissions
 
@@ -1467,6 +2043,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-244`.
 - [ ] Every gated control is gated: `ACCESS_POINT_CONFIGURE`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 3 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -1486,6 +2063,14 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Offline | online only |
 | Opens with | `alertId` (navigation) |
 | Route | `/access-venue/security-analytics-ai-detection-governance-bo-253` |
+
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** Long-term security intelligence: fraud attempts, prevented fraud, sharing, duplicate usage, biometric alerts, device-binding and companion violations, blacklist hits, identity locks, security overrides; trends by venue, park, event, product, channel, reseller, credential type, media, device, gate and time; AI pattern detection and recommendations; effectiveness (detection rate, false positives, override rate, investigation and response times, recurring fraud, financial exposure and fraud prevented in AED); and governance of security configuration changes. The one thing to get right: breakdowns that point at a cause ("Reseller X: 41% of fraud attempts"), with each AI recommendation tied to the evidence.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **Sixteen KPIs drawn as columns of a data table** Why: They are tiles and charts (VO-R02); the read returns one set of totals. *(source: contracts/spine/access.yaml#listSecurityDetectionGovernance; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **The read returns totals only - no breakdown by the chosen dimension, no time series, no AI patterns** Why: The pack's "by sales channel" chart, trends and pattern detection have nothing to draw from. *(source: screens/P08-venue-back-office.yaml#BO-253 / contracts/spine/access.yaml#listSecurityDetectionGovernance; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **Filter drawn as a multi-select of ten dimensions; Time/day missing** Why: The read takes eleven filters including timeDay. *(source: contracts/spine/access.yaml#listSecurityDetectionGovernance; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
 
 #### Inputs: what the user enters or picks
 
@@ -1523,6 +2108,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Security investigation `securityInvestigationId` | picker: choose a security investigation | optional | — | — | shows names, sends the id | — | `updateSecurityAlert` body |
 
 Errors to draw in the form: 400 Validation failed; 403 Authenticated but not permitted at the requested scope; 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 The alert is already resolved or dismissed.
+
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Analyse by**: Eleven dimensions (Time/day included) as a single "Break down by" choice plus filters; date range default last 30 days. *(source: screens/P08-venue-back-office.yaml#BO-253 / contracts/spine/access.yaml#listSecurityDetectionGovernance)*
 
 #### Outputs: what the screen shows and produces
 
@@ -1576,6 +2165,18 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 |---|---|---|---|---|---|
 | Save security alert (primary button) | `updateSecurityAlert` POST `/security-alerts/{alertId}/status` | inline | AccessSecurityAlert | 400 Validation failed; 403 Authenticated but not permitted at the requested scope; 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path. | gated `INCIDENT_MANAGE`; opens modal first |
 
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Fraud KPIs**: Tiles with deltas against the previous period (VO-R02), not table columns. *(source: contracts/spine/access.yaml#listSecurityDetectionGovernance)*
+- **Breakdown chart**: "Fraud attempts by sales channel - Web 8%, POS 3%, B2B 12%, Reseller X 41%, Reseller Y 7%" as a sorted bar chart for the chosen dimension; a trend line over time. *(source: screens/P08-venue-back-office.yaml#BO-253)*
+- **Effectiveness**: Detection rate, false positive indicator, operator override rate, average investigation and response time (minutes), recurring fraud rate, financial exposure and estimated fraud prevented as AED amounts. *(source: contracts/spine/access.yaml#listSecurityDetectionGovernance)*
+- **AI patterns and recommendations**: Each pattern with its numbers ("37 credentials from one reseller activated on 64 devices, 112 duplicate-use attempts in 7 days") and recommendations with an Open action to the screen that would change it (BO-245, BO-167); never applied automatically. *(source: screens/P08-venue-back-office.yaml#BO-253)*
+- **Governance**: Security configuration lifecycle Draft > Test > Security approval > Publish > Monitor > Review, and the audit of changes to fraud rules, thresholds, risk models, playbooks, blacklist and lock policies, and AI recommendations. *(source: screens/P08-venue-back-office.yaml#BO-253 / contracts/spine/tenancy.yaml#listAuditRecords)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Open alert (when entered with alertId)**: The alert drawer as on BO-244. *(source: contracts/spine/access.yaml#updateSecurityAlert)*
+
 **Data it reads**: `listSecurityDetectionGovernance` (onLoad, Security Analytics, AI Detection & Governance)
 
 **Where the user goes next**
@@ -1593,6 +2194,44 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 The alert is already resolved or dismissed. |
+
+#### Consistency with other screens
+
+- Match `BO-244`: Same counts for the same period.
+- Match `BO-263`: Executive AI insights reuse these security effectiveness figures.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+kpis:
+  fraudAttempts: 1240
+  prevented: 1102
+  sharing: 318
+  duplicateUsage: 211
+  biometric: 19
+  bindingViolations: 96
+  companionViolations: 14
+  blacklistHits: 402
+  locks: 61
+  overrides: 33
+effectiveness:
+  detectionRate: 88.9%
+  falsePositive: 4.1%
+  overrideRate: 2.7%
+  investigation: 46 min
+  response: 3 min
+  recurring: 6.2%
+  exposure: AED 184,500.00
+  prevented: AED 162,300.00
+byChannel:
+  Web: 8%
+  POS: 3%
+  B2B: 12%
+  Reseller X: 41%
+  Reseller Y: 7%
+```
 
 #### Permissions
 
@@ -1631,6 +2270,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-244`.
 - [ ] Every gated control is gated: `INCIDENT_MANAGE`, `REPORT_VIEW_VENUE`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 3 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -1732,6 +2372,7 @@ Method, path, parameters, request and response for every operation these screens
 ```json
 {
 "getAccessRiskScore": {"method":"GET","path":"/access-risk-scores","contract":"access","summary":"The current access risk score of a person, credential or device, with its signals","permission":"SCOPE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"subjectId","in":"query","required":null},{"name":"entitlementId","in":"query","required":null},{"name":"deviceId","in":"query","required":null},{"name":"venueId","in":"query","required":null}],"requestBody":null,"responds":"AccessRiskScore"},
+"getFaceReenrolmentImages": {"method":"GET","path":"/face-reenrolment-attempts/{attemptId}/images","contract":"access","summary":"View the images behind a face re-enrolment review (logged)","permission":"BIOMETRIC_IMAGE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"reason","in":"query","required":true}],"requestBody":null,"responds":null},
 "listAccessRiskScoring": {"method":"GET","path":"/access-risk-scoring","contract":"access","summary":"Access Risk Scoring & Decision Engine","permission":"SCOPE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"AccessRiskScoringDecisionEngineView"},
 "listAccessSecurityFraud": {"method":"GET","path":"/access-security-fraud","contract":"access","summary":"Access Security & Fraud Command Center","permission":"SCOPE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"venue","in":"query","required":false},{"name":"park","in":"query","required":false},{"name":"zone","in":"query","required":false},{"name":"gate","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listBiometricIdentityIntegrity": {"method":"GET","path":"/biometric-identity-integrity","contract":"access","summary":"Biometric & Identity Integrity Monitoring","permission":"SCOPE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},

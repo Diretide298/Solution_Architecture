@@ -907,6 +907,7 @@
     "provenance": "contract access.yaml POST /identity-locks/{lockId}/release"
    }
   ],
+  "notes": "**Releasing an identity or permanent lock needs a second approver, as BO-229 (decided 2 October 2026 by Chinmay, DEC-260; CHG-CSP-031).**",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1010,6 +1011,13 @@
        ],
        "notes": "The pack groups this record's detail under its own headings: “Original Face Enrollment”, “Successful Visits”, “Face Changed”, “Reason”, “Enrollment 1”, “Enrollment 2”.",
        "provenance": "pack Access Control Module_Reference.pdf, page 156 §Monitor"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "View images (logged)",
+       "operation": "getFaceReenrolmentImages",
+       "notes": "**Images only behind \"View images (logged)\", needing `BIOMETRIC_IMAGE_VIEW` and a fresh second factor (decided 2 October 2026 by Chinmay, DEC-261; CHG-CSP-023, CHG-FUP-004); the match score and references are always visible.** The reason is asked and the view is audited.",
+       "provenance": "contract access.yaml GET /face-reenrolment-attempts/{attemptId}/images"
       }
      ]
     },
@@ -1077,6 +1085,13 @@
     "invalidates": [
      "listBiometricIdentityIntegrity"
     ]
+   },
+   {
+    "operationId": "getFaceReenrolmentImages",
+    "contract": "access",
+    "purpose": "The enrolled and new images, behind a logged view (DEC-239)",
+    "trigger": "onLoad",
+    "provenance": "design-note correction, 2 October 2026 (BO-248)"
    }
   ],
   "entryState": {
@@ -1556,6 +1571,11 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Access Control Module_Reference.pdf, page 161"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-004): No read of security response playbooks (setRealTimeSecurity has no list or get).",
+    "source": "contracts/spine/access.yaml#setRealTimeSecurity"
    }
   ],
   "layout": {
@@ -1709,6 +1729,11 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Access Control Module_Reference.pdf, page 162"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-004): No read lists or opens security investigations.",
+    "source": "contracts/spine/access.yaml#setSecurityInvestigationEvidence"
    }
   ],
   "layout": {

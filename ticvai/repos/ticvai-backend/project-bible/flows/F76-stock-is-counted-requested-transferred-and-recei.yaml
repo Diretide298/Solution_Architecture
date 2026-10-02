@@ -56,7 +56,7 @@ steps:
   - receiveStockTransfer
   outcome: '**Drawn by the client as RET-4D.** 2 operations on this step.'
 - step: 5
-  screen: BO-052
+  screen: BO-051
   action: Goods Receipt.
   operations:
   - acknowledgePurchaseOrder
@@ -64,7 +64,6 @@ steps:
   - closePurchaseOrderShort
   - createPurchaseOrder
   - getPurchaseOrder
-  - listGoodsReceipts
   outcome: '**Drawn by the client as RET-4E.** 7 operations on this step.'
   crossesDevice: true
 branches:

@@ -42,58 +42,48 @@
      "slot": "collection",
      "components": [
       {
-       "kind": "dataTable",
-       "label": "Every consent purpose config",
-       "bindsTo": "ConsentPurposeConfig",
-       "columns": [
-        "ConsentPurposeConfig.purpose",
-        "ConsentPurposeConfig.displayName",
-        "ConsentPurposeConfig.description",
-        "ConsentPurposeConfig.channels",
-        "ConsentPurposeConfig.noticeVersion",
-        "ConsentPurposeConfig.isRequiredForService",
-        "ConsentPurposeConfig.expiresAfterMonths"
-       ],
-       "operation": "listConsentPurposes",
-       "provenance": "contract marketing-crm.yaml GET /consent-purposes"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected consent purpose config",
-       "bindsTo": "ConsentPurposeConfig",
-       "columns": [
-        "ConsentPurposeConfig.purpose",
-        "ConsentPurposeConfig.displayName",
-        "ConsentPurposeConfig.description",
-        "ConsentPurposeConfig.channels",
-        "ConsentPurposeConfig.noticeVersion",
-        "ConsentPurposeConfig.isRequiredForService",
-        "ConsentPurposeConfig.expiresAfterMonths"
-       ],
-       "operation": "listConsentPurposes",
-       "provenance": "contract marketing-crm.yaml GET /consent-purposes"
+       "kind": "consentBlock",
+       "label": "What we may send you",
+       "bindsTo": "ConsentState.purposes",
+       "operation": "getGuestConsents",
+       "notes": "One row per configured purpose (`listConsentPurposes`), its channels as toggles, its plain-language description and the notice version in force; the current position from `getGuestConsents` (Given with date, Withdrawn with date, Not asked, Needs renewing). A change is recorded at once with `recordConsent` (source and notice version set by the app; the guest never types a purpose, decision, source or time). Withdrawing is as easy as giving.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)"
       },
       {
-       "kind": "detailPanel",
-       "label": "The marketing subscription",
+       "kind": "cardList",
+       "label": "Purposes and notices",
+       "operation": "listConsentPurposes",
+       "notes": "The configured purposes with their plain-language description, channels and the notice version in force.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)"
+      },
+      {
+       "kind": "toggle",
+       "label": "Consent toggle",
+       "operation": "recordConsent",
+       "notes": "Per purpose and channel; recorded at once on change, append-only.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)",
+       "bindsTo": "ConsentState.purposes"
+      },
+      {
+       "kind": "cardList",
+       "label": "Lists I receive",
        "bindsTo": "MarketingSubscription",
        "columns": [
-        "MarketingSubscription.id",
-        "MarketingSubscription.subjectId",
-        "MarketingSubscription.channel",
         "MarketingSubscription.listName",
-        "MarketingSubscription.isSubscribed",
-        "MarketingSubscription.source",
-        "MarketingSubscription.unsubscribeToken"
+        "MarketingSubscription.channel",
+        "MarketingSubscription.isSubscribed"
        ],
        "operation": "getMarketingSubscription",
-       "provenance": "contract marketing-crm.yaml GET /marketing-subscriptions"
+       "notes": "One row per list with a toggle per channel; a channel can be switched on only where marketing consent for it is given, otherwise the toggle asks \"Allow offers by email?\" first and records the consent in the same act. The guest never types an id, a subject, a token or a list name.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)"
+      },
+      {
+       "kind": "textField",
+       "label": "Channel toggle",
+       "operation": "setMarketingSubscription",
+       "notes": "The per-list, per-channel toggle; saved on change.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)",
+       "bindsTo": "MarketingSubscription.isSubscribed"
       }
      ]
     },
@@ -102,16 +92,11 @@
      "slot": "rowActions",
      "components": [
       {
-       "kind": "primaryButton",
-       "label": "Record consent",
+       "kind": "destructiveButton",
+       "label": "Stop all marketing",
        "operation": "recordConsent",
-       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/consents"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Save marketing subscription",
-       "operation": "setMarketingSubscription",
-       "provenance": "contract marketing-crm.yaml PUT /marketing-subscriptions"
+       "notes": "Records withdrawn for the marketing purpose on every channel; every list shows paused; tickets and receipts still arrive.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)"
       }
      ]
     }
@@ -122,7 +107,7 @@
    "error": "Could not load. Names which read failed and leaves the newsletter preferences untouched.",
    "emptyFirstRun": "No newsletter preferences yet. Offers Record consent (`recordConsent`).",
    "emptyNoResults": "Never shown: `listConsentPurposes` takes no filter, so an empty list is always the first-run state above.",
-   "emptyNoAccess": "Shown when the caller lacks `GUEST_VIEW`, which `listConsentPurposes` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**Not available, and the offline banner says why.** A consent change must reach the server to mean anything."
   },
   "apis": [
@@ -152,6 +137,12 @@
     "contract": "marketing-crm",
     "purpose": "Change it",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "getGuestConsents",
+    "contract": "marketing-crm",
+    "purpose": "Where each opt-in came from and the current position",
+    "trigger": "onLoad"
    }
   ],
   "entryState": {
@@ -183,55 +174,6 @@
    }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
-  "overlays": [
-   {
-    "id": "formSetMarketingSubscription",
-    "component": "modal",
-    "trigger": "Save marketing subscription",
-    "body": "**Collects what `setMarketingSubscription` sends before it is called.** Required: `id`, `subjectId`, `channel`, `listName`, `isSubscribed`. Optional: `source`, `unsubscribeToken`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "MarketingSubscription",
-    "confirm": {
-     "label": "Save marketing subscription",
-     "operation": "setMarketingSubscription"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "id",
-      "subjectId",
-      "channel",
-      "listName",
-      "isSubscribed",
-      "source",
-      "unsubscribeToken"
-     ]
-    },
-    "provenance": "client-verified"
-   },
-   {
-    "id": "formRecordConsent",
-    "component": "modal",
-    "trigger": "Record consent",
-    "body": "**Collects what `recordConsent` sends before it is called.** Required: `purpose`, `decision`, `noticeVersion`, `source`, `recordedAt`. Optional: `channels`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "RecordConsentRequest",
-    "confirm": {
-     "label": "Record consent",
-     "operation": "recordConsent"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "purpose",
-      "decision",
-      "noticeVersion",
-      "source",
-      "recordedAt",
-      "channels"
-     ]
-    },
-    "provenance": "client-verified"
-   }
-  ],
   "_platform": {
    "code": "P02",
    "audience": "guest",

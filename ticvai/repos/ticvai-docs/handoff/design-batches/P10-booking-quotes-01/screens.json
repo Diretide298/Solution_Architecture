@@ -15,7 +15,8 @@
   "navigation": {
    "entryFrom": [
     "PTR-001",
-    "PTR-007"
+    "PTR-007",
+    "PTR-002"
    ],
    "inferred": true,
    "exitTo": [
@@ -230,18 +231,6 @@
       },
       {
        "kind": "secondaryButton",
-       "label": "Apply manual discount",
-       "operation": "applyManualDiscount",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/discounts"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Create refund",
-       "operation": "createRefund",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/refunds"
-      },
-      {
-       "kind": "secondaryButton",
        "label": "Exchange order lines",
        "operation": "exchangeOrderLines",
        "provenance": "contract orders.yaml POST /orders/{orderId}/exchanges"
@@ -275,25 +264,12 @@
        "label": "Resume order",
        "operation": "resumeOrder",
        "provenance": "contract orders.yaml POST /orders/{orderId}/resume"
-      },
-      {
-       "kind": "destructiveButton",
-       "label": "Void order",
-       "operation": "voidOrder",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/voids"
       }
      ]
     }
    ]
   },
   "overlays": [
-   {
-    "id": "confirmVoidOrder",
-    "component": "confirmDialog",
-    "trigger": "Void order",
-    "body": "**Names what `voidOrder` changes and what it leaves alone**, in the consequence rather than the verb. A booking creation this affects should be identified in the dialog, not just counted. **Collects what `voidOrder` sends before it is called.** Required: `id`, `reason`, `recordedAt`.",
-    "provenance": "contract orders.yaml POST /orders/{orderId}/voids"
-   },
    {
     "id": "formCreateOrder",
     "component": "modal",
@@ -319,56 +295,6 @@
      ]
     },
     "provenance": "contract orders.yaml POST /orders"
-   },
-   {
-    "id": "formApplyManualDiscount",
-    "component": "modal",
-    "trigger": "Apply manual discount",
-    "body": "**Collects what `applyManualDiscount` sends before it is called.** Required: `id`, `reason`, `recordedAt`. Optional: `lineId`, `amount`, `percentage`, `reasonCode`, `approverPrincipalId`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "ManualDiscountRequest",
-    "confirm": {
-     "label": "Apply manual discount",
-     "operation": "applyManualDiscount"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "id",
-      "reason",
-      "recordedAt",
-      "lineId",
-      "amount",
-      "percentage",
-      "reasonCode",
-      "approverPrincipalId"
-     ]
-    },
-    "provenance": "contract orders.yaml POST /orders/{orderId}/discounts"
-   },
-   {
-    "id": "formCreateRefund",
-    "component": "modal",
-    "trigger": "Create refund",
-    "body": "**Collects what `createRefund` sends before it is called.** Required: `id`, `amount`, `reason`, `recordedAt`. Optional: `lineIds`, `secondaryAuthorisation`, `refundToOriginalTender`, `alternateTender`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "CreateRefundRequest",
-    "confirm": {
-     "label": "Create refund",
-     "operation": "createRefund"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "id",
-      "amount",
-      "reason",
-      "recordedAt",
-      "lineIds",
-      "secondaryAuthorisation",
-      "refundToOriginalTender",
-      "alternateTender"
-     ]
-    },
-    "provenance": "contract orders.yaml POST /orders/{orderId}/refunds"
    },
    {
     "id": "formExchangeOrderLines",
@@ -498,24 +424,6 @@
     "trigger": "onLoad"
    },
    {
-    "operationId": "applyManualDiscount",
-    "contract": "orders",
-    "purpose": "Apply a discount a cashier chose",
-    "trigger": "onAction",
-    "invalidates": [
-     "listOrders"
-    ]
-   },
-   {
-    "operationId": "createRefund",
-    "contract": "orders",
-    "purpose": "Refund an order, wholly or in part",
-    "trigger": "onAction",
-    "invalidates": [
-     "listOrders"
-    ]
-   },
-   {
     "operationId": "exchangeOrderLines",
     "contract": "orders",
     "purpose": "Exchange lines for different products or dates",
@@ -586,15 +494,6 @@
     "invalidates": [
      "listOrders"
     ]
-   },
-   {
-    "operationId": "voidOrder",
-    "contract": "orders",
-    "purpose": "Void an order",
-    "trigger": "onAction",
-    "invalidates": [
-     "listOrders"
-    ]
    }
   ],
   "entryState": {
@@ -619,6 +518,26 @@
    "board": "wireframes/P10 Partner Web.dc.html#ptr-008"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 14 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "gaps": [
+   {
+    "operation": "applyManualDiscount",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-018): The partner creates a booking; refund, void and discount are venue-side (design-notes correction ticketing-guest PTR-008).",
+    "source": "screens/P10-partner-reseller-portal.yaml#PTR-008"
+   },
+   {
+    "operation": "createRefund",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-018): The partner creates a booking; refund, void and discount are venue-side (design-notes correction ticketing-guest PTR-008).",
+    "source": "screens/P10-partner-reseller-portal.yaml#PTR-008"
+   },
+   {
+    "operation": "voidOrder",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-018): The partner creates a booking; refund, void and discount are venue-side (design-notes correction ticketing-guest PTR-008).",
+    "source": "screens/P10-partner-reseller-portal.yaml#PTR-008"
+   }
+  ],
   "_platform": {
    "code": "P10",
    "audience": "partner",
@@ -1110,12 +1029,6 @@
       },
       {
        "kind": "secondaryButton",
-       "label": "Analyse promotion conflicts",
-       "operation": "analysePromotionConflicts",
-       "provenance": "contract promotions.yaml GET /promotions/{promotionId}/conflicts"
-      },
-      {
-       "kind": "secondaryButton",
        "label": "Add cart line",
        "operation": "addCartLine",
        "provenance": "contract orders.yaml POST /carts/{cartId}/lines"
@@ -1248,12 +1161,6 @@
     "trigger": "onLoad"
    },
    {
-    "operationId": "analysePromotionConflicts",
-    "contract": "promotions",
-    "purpose": "Analyse stacking against live promotions",
-    "trigger": "onAction"
-   },
-   {
     "operationId": "getPromotion",
     "contract": "promotions",
     "purpose": "Read a promotion",
@@ -1344,6 +1251,14 @@
    "board": "wireframes/P10 Partner Web.dc.html#ptr-010"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 10 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "gaps": [
+   {
+    "operation": "analysePromotionConflicts",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-018): Promotion analysis (analysePromotionConflicts) is a venue tool, not a partner's cart action (design-notes correction ticketing-guest PTR-010).",
+    "source": "screens/P10-partner-reseller-portal.yaml#PTR-010"
+   }
+  ],
   "_platform": {
    "code": "P10",
    "audience": "partner",
@@ -1403,7 +1318,7 @@
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listPartnerAgreements` reads the population and `getCommissionStatement` reads one of them — list, select, act",
-  "purpose": "Find quote management for this venue.",
+  "purpose": "Raise quotes and follow the ones offered to this partner.",
   "layout": {
    "template": "split",
    "regions": [
@@ -1430,8 +1345,6 @@
        "label": "Every partner agreement",
        "bindsTo": "PartnerAgreement",
        "columns": [
-        "PartnerAgreement.id",
-        "PartnerAgreement.partnerId",
         "PartnerAgreement.partnerName",
         "PartnerAgreement.status",
         "PartnerAgreement.rateMode",
@@ -1440,27 +1353,25 @@
         "PartnerAgreement.volumeWindow",
         "PartnerAgreement.seasonalRates",
         "PartnerAgreement.segmentTier",
-        "PartnerAgreement.brandingAssetId",
         "PartnerAgreement.storefrontSubdomain"
        ],
        "operation": "listPartnerAgreements",
-       "provenance": "contract subscription.yaml GET /partner-agreements"
+       "provenance": "contract subscription.yaml GET /partner-agreements",
+       "notes": "The partner and agreement are shown by name; ids stay in the detail panel with a copy action."
       },
       {
        "kind": "dataTable",
        "label": "Every partner quote",
        "bindsTo": "PartnerQuote",
        "columns": [
-        "PartnerQuote.id",
-        "PartnerQuote.partnerId",
-        "PartnerQuote.agreementId",
         "PartnerQuote.currency",
         "PartnerQuote.totalMinor",
         "PartnerQuote.state",
         "PartnerQuote.validUntil"
        ],
        "operation": "listPartnerQuotes",
-       "provenance": "contract subscription.yaml GET /partner-quotes"
+       "provenance": "contract subscription.yaml GET /partner-quotes",
+       "notes": "The partner and agreement are shown by name; ids stay in the detail panel with a copy action."
       }
      ]
     },
@@ -1592,7 +1503,7 @@
     "id": "formCreatePartnerQuote",
     "component": "modal",
     "trigger": "Create partner quote",
-    "body": "**Collects what `createPartnerQuote` sends before it is called.** Required: `id`. Optional: `partnerId`, `agreementId`, `currency`, `totalMinor`, `state`, `validUntil`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `createPartnerQuote` sends before it is called.** The person picks the agreement and enters the amount, currency and validity; `partnerId` comes from the session. Never `id` or `status`: an id is a client UUIDv7 generated silently and the status and timestamps are the server's (design-notes correction, CHG-SOT-015). Dismissing sends nothing; the screen behind is unchanged.",
     "bindsTo": "PartnerQuote",
     "confirm": {
      "label": "Create partner quote",
@@ -1601,18 +1512,16 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "id",
-      "partnerId",
       "agreementId",
       "currency",
       "totalMinor",
-      "state",
       "validUntil"
      ]
     },
     "provenance": "contract subscription.yaml POST /partner-quotes"
    }
   ],
+  "purposeNote": "Purpose rewritten 2 October 2026 (CHG-WIR-023): The purpose (\"Find quote management for this venue\") was the generic template; quotes belong to the partner, not a venue (design-notes correction platform-foundation PTR-011).",
   "_platform": {
    "code": "P10",
    "audience": "partner",

@@ -966,6 +966,69 @@
    "format": {
     "type": "string",
     "nullable": true
+   },
+   "role": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "dimension",
+     "measure"
+    ],
+    "description": "**What the column is to a chart** (decided 2 October 2026, Chinmay; CHG-FIN-007). A `dimension` groups (date, venue, channel, product); a `measure` is aggregated (sum of net revenue, count of admissions). Null on a column only a table shows."
+   },
+   "encoding": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "category",
+     "x",
+     "y",
+     "series",
+     "value",
+     "size",
+     "colour",
+     "location",
+     "stage",
+     "source",
+     "target",
+     "row",
+     "column",
+     "hierarchyLevel",
+     "label",
+     "tooltip"
+    ],
+    "description": "**Which field well the column fills** (CHG-FIN-007), the binding the twenty marks of `DashboardTile.visualisation` need. The per-mark rule is on that field."
+   },
+   "axis": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "primary",
+     "secondary"
+    ],
+    "description": "For a measure on a `combo`, the axis it is drawn against. A secondary axis needs its own `unitLabel` (CHG-FIN-007)."
+   },
+   "seriesType": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "bar",
+     "line",
+     "area"
+    ],
+    "description": "For a measure on a `combo`, how that series is drawn (CHG-FIN-007)."
+   },
+   "hierarchyLevel": {
+    "type": "integer",
+    "nullable": true,
+    "minimum": 1,
+    "description": "For `matrix` rows and columns, `treemap` nesting and `decompositionTree` levels, the depth of this dimension, 1 outermost. Levels must follow a real hierarchy (DI-709), for example year, month, day, or region, venue, outlet (CHG-FIN-007)."
+   },
+   "unitLabel": {
+    "type": "string",
+    "nullable": true,
+    "maxLength": 40,
+    "description": "The unit an axis states, for example \"AED\" or \"Admissions\". Required on a secondary axis (CHG-FIN-007)."
    }
   }
  },

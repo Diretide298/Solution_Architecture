@@ -45,7 +45,7 @@ steps:
   screen: WEB-011
   action: Enters contact details and answers consent
   operations:
-  - getGuestProfile
+  - getMyProfile
   - listConsentPurposes
   outcome: The hold is still counting down. The countdown stays visible through this step
 - step: 5

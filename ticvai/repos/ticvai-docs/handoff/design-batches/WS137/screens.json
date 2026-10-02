@@ -230,6 +230,17 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 16"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-007): No preview of unsaved criteria; CreateSegmentRequest has no nested rule groups, effective dates, owner or approval.",
+    "source": "contracts/satellite/marketing-crm.yaml#previewSegment | contracts/satellite/marketing-crm.yaml#createSegment"
+   },
+   {
+    "operation": "previewSegment",
+    "removed": true,
+    "why": "previewSegment works only on a saved segment; the builder previews unsaved criteria with previewSegmentDraft (CHG-CSA-045).",
+    "source": "contracts/satellite/marketing-crm.yaml#previewSegmentDraft"
    }
   ],
   "layout": {
@@ -239,18 +250,29 @@
      "name": "contentBody",
      "components": [
       {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "createSegment",
-       "label": "Create segment",
-       "notes": "The act the screen exists for."
+       "kind": "dataTable",
+       "label": "Segments",
+       "operation": "listSegments",
+       "provenance": "contract marketing-crm.yaml GET /segments; wiring fix, 2 October 2026"
       },
       {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "createSegment"
+       "kind": "metricTile",
+       "label": "Matching guests",
+       "operation": "previewSegmentDraft",
+       "notes": "Counts on the rules as edited, before anything is saved.",
+       "provenance": "contract marketing-crm.yaml POST /segments/preview"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Create segment",
+       "operation": "createSegment",
+       "provenance": "contract marketing-crm.yaml POST /segments"
       }
      ]
     }
@@ -276,11 +298,18 @@
     ]
    },
    {
-    "operationId": "previewSegment",
+    "operationId": "listSegments",
     "contract": "marketing-crm",
-    "purpose": "Live count while editing",
+    "purpose": "The segments to open and edit",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-005)"
+   },
+   {
+    "operationId": "previewSegmentDraft",
+    "contract": "marketing-crm",
+    "purpose": "Live count on the unsaved criteria while the rules are edited (CHG-CSA-045)",
     "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026"
+    "provenance": "design-note correction, 2 October 2026 (BO-755)"
    }
   ],
   "wireframe": {
@@ -297,6 +326,35 @@
     }
    ]
   },
+  "overlays": [
+   {
+    "id": "formCreateSegment",
+    "component": "modal",
+    "trigger": "Create segment",
+    "body": "**Collects what `createSegment` sends before it is called.** Required: `name`, `criteria`. Optional: `description`, `venueId`, `match`, `excludeSegmentIds`, `ruleGroups`, `effectiveFrom`, `effectiveTo`, `ownerPrincipalId`, `requiresApproval`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Create segment",
+     "operation": "createSegment"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "name",
+      "criteria",
+      "description",
+      "venueId",
+      "match",
+      "excludeSegmentIds",
+      "ruleGroups",
+      "effectiveFrom",
+      "effectiveTo",
+      "ownerPrincipalId",
+      "requiresApproval"
+     ]
+    },
+    "provenance": "contract marketing-crm.yaml POST /segments"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -525,6 +583,23 @@
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
        "impliedBy": "createSegment"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Segments",
+       "operation": "listSegments",
+       "provenance": "contract marketing-crm.yaml GET /segments; wiring fix, 2 October 2026"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "components": [
+      {
+       "kind": "secondaryButton",
+       "label": "Preview",
+       "operation": "previewSegment",
+       "provenance": "contract marketing-crm.yaml POST /segments/{segmentId}/preview; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -548,6 +623,20 @@
      "listSegments",
      "getAudienceOverlap"
     ]
+   },
+   {
+    "operationId": "listSegments",
+    "contract": "marketing-crm",
+    "purpose": "The behavioural segments to open",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-005)"
+   },
+   {
+    "operationId": "previewSegment",
+    "contract": "marketing-crm",
+    "purpose": "Preview who the conditions reach",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-005)"
    }
   ],
   "wireframe": {
@@ -556,6 +645,14 @@
    "workshopBoard": "wireframes/WS72 Marketing CRM Configuration Reference v1.0 Board 3.dc.html#bo-757"
   },
   "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 17. 0 of 0 labels bound to a contract property; 0 of 9 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "segmentId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -650,6 +747,17 @@
        "impliedBy": "createSegment"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "components": [
+      {
+       "kind": "secondaryButton",
+       "label": "Preview",
+       "operation": "previewSegment",
+       "provenance": "contract marketing-crm.yaml POST /segments/{segmentId}/preview; wiring fix, 2 October 2026"
+      }
+     ]
     }
    ]
   },
@@ -671,6 +779,13 @@
      "listSegments",
      "getAudienceOverlap"
     ]
+   },
+   {
+    "operationId": "previewSegment",
+    "contract": "marketing-crm",
+    "purpose": "Preview who the conditions reach",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-005)"
    }
   ],
   "wireframe": {
@@ -679,6 +794,14 @@
    "workshopBoard": "wireframes/WS72 Marketing CRM Configuration Reference v1.0 Board 3.dc.html#bo-758"
   },
   "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 17. 0 of 0 labels bound to a contract property; 0 of 9 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "segmentId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -896,6 +1019,17 @@
        "impliedBy": "createSegment"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "components": [
+      {
+       "kind": "secondaryButton",
+       "label": "Preview",
+       "operation": "previewSegment",
+       "provenance": "contract marketing-crm.yaml POST /segments/{segmentId}/preview; wiring fix, 2 October 2026"
+      }
+     ]
     }
    ]
   },
@@ -917,6 +1051,13 @@
      "listSegments",
      "getAudienceOverlap"
     ]
+   },
+   {
+    "operationId": "previewSegment",
+    "contract": "marketing-crm",
+    "purpose": "Preview the value and engagement distribution",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-005)"
    }
   ],
   "wireframe": {
@@ -925,6 +1066,14 @@
    "workshopBoard": "wireframes/WS72 Marketing CRM Configuration Reference v1.0 Board 3.dc.html#bo-760"
   },
   "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 17. 0 of 0 labels bound to a contract property; 0 of 11 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "segmentId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",

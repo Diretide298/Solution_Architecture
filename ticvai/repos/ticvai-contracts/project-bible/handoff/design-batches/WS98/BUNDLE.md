@@ -1,6 +1,6 @@
 # WS98 — Subscription Licensing AI Self Service board 1
 
-**10 screens · 11 operations · 21 schemas · 3 permissions**
+**10 screens · 8 operations · 16 schemas · 3 permissions**
 
 Platform P09 TICVAI Web · ships as **ticvai-control** ·
 platformAdmin audience · web ·
@@ -41,7 +41,8 @@ convincingly. It is never a caption.
 
 | file | what it is |
 |---|---|
-| `screens.json` | Every field of every screen in the batch. `machine` is what a screen is *in the middle of*; `overlays` is what opens over it and what closing it does; `navigation.transitions` is how you leave, with `carries` naming the state that travels. |
+| `BUNDLE.md` | **The one file to hand a design session.** This brief; then **Screen by screen**, a full specification of each screen (what the user enters and picks, what it shows and produces, every state, who may do what, the requirements it meets, what the client said about it in the meetings, the tracker items, what the tenant configures, the references and an acceptance checklist); then what applies to the whole batch; then the raw data. |
+| `screens.json` | Every field of every screen in the batch, as the package holds it. `machine` is what a screen is *in the middle of*; `overlays` is what opens over it and what closing it does; `navigation.transitions` is how you leave, with `carries` naming the state that travels. |
 | `operations.json` | Method, path, parameters, request and response schema for every operation these screens call. Write fetches against these; do not invent endpoints. |
 | `schemas.json` | The data those operations carry, resolved one level deep. **Seed from these.** The prototype hardcodes 57 models and every one corresponds to a schema here — a build that invents its own will disagree with the backend on day one. |
 
@@ -55,21 +56,56 @@ convincingly. It is never a caption.
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
   the empty-state bug, not the happy path.
+- **How input should be, how output should be.** Each screen's block in `BUNDLE.md` says, field by
+  field, the control, whether it is required, its default, its limits and allowed values, its format
+  and its error; and, element by element, what is shown and in what format, what each action
+  produces and where the user goes next. Draw exactly that.
+
+## The processes these screens belong to
+
+Written by the owner of each process (`handoff/design-notes/`). Read before any screen: it says how the process runs end to end and which words the screens must use.
+
+### Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management)
+
+Platform Foundation is everything the apps stand on. Five apps each have one door: the guest app and website (WEB-016, GST-042: a six-digit code to email or mobile, a password, Apple or Google, UAE Pass; never enterprise SSO), the till (POS-000: employee number and PIN, recent operators as tiles; the kitchen display is the same app), the staff handheld and scanner (EMP-001, SCN-001), Venue Management (SUP-001, the single door for the back office P08, the CMS P13, analytics P16 and the support desk P12) and TICVAI Control (ADM-001 for TICVAI's own platform operators, PTR-001 for partner users; the developer portal P14 and the sign-up P17 belong to this app too). A second factor is required by permission, not by role or device: ROLE_MANAGE, LEDGER_APPROVE and every PLATFORM_* permission, plus any the tenant adds; so a cashier never sees it and a platform operator always does. The factor is an authenticator app with an emailed code as fallback; five wrong codes lock step-up for the lockout minutes, never permanently. Guests get two-step verification only at a venue that switched it on. One person holds one session per workstation: a second sign-in is refused and only a supervisor ends the other session. Several roles mean a role prompt; one role goes straight in. The workstation decides the Sale Board, hardware and till identity, never what a person may do. Sensitive actions (refund approval, journal approval, credential reset, partner credit, commission rules, opening a platform-staff grant and 17 more) demand a fresh step-up on the operation itself, asked in place in the action's confirmation; the tenant may raise the strength, never remove it. Permission outcomes are three, never one word: self-authorised (proceeds, audited), escalated (a supervisor PIN in place), refused (the denied state, naming the permission); a missing permission is never an empty table, and a record outside the person's venues is "not found", indistinguishable from absent. The hierarchy is binding (tenant, brand, region, venue, department, sub-department, workstation; outlet beside department for F&B and retail); region owns currency, decimals, time zone, date format and fiscal year; configuration resolves nearest-ancestor across tenant, region and venue (outlet for F&B and retail), venue is the floor and a workstation is assigned a profile, never configured; every configuration screen says which level it writes and what it inherits. Venue Management is one tenant-level surface filtering across the venues in the session's scope. TICVAI's Console runs outside every cell: a platform operator picks a tenant and opens a time-boxed, audited platform-staff grant (with step-up) before any tenant action, and the tenant sees every action in its audit log (ADM-412 is the reference implementation). Approval workflows record authorisations and never perform the action; the requester cannot approve their own request; a venue may tighten and never loosen a rule from above; in-flight …
+*(source: screens/P12-support-agent-console.yaml#SUP-001; R135; R126; R167; DI-1072; ADR-0002; ADR-0003; ADR-0004; R184; contracts/spine/identity.yaml#createMfaChallenge; contracts/spine/approvals.yaml#setStepUpPolicy; ADR-0011; ADR-0018; ADR-0029; R098; contracts/spine/approvals.yaml#decideApprovalRequest …)*
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Sign in / Sign out | Entering and leaving any app, staff or guest. | Login, Log in, Logon, Logout | screens/P04-point-of-sale.yaml#POS-000 … |
+| Authentication code | The staff second factor from the authenticator app (or the emailed fallback). | OTP, 2FA code, token | screens/P09-platform-admin-console.yaml#ADM-001 |
+| One-time code | The six-digit code a guest receives to sign in or prove a contact. | OTP, PIN, password | DI-1034; R167 |
+| Two-step verification | The guest's optional second factor, asked only at venues that switched it on. | MFA, 2FA | DI-1072 |
+| Tenant / Brand / Region / Venue / Department / Outlet | The binding hierarchy levels; region owns currency and dates; outlet is F&B or retail inside a venue. | Client, Customer, Org (for tenant), Site, Park, Property (for venue), Area, Territory (for region) | ADR-0011; ADR-0018 |
+| Workstation (back office) / till (operator copy) | A configured device; decides Sale Board, hardware and till identity, never authorisation. | Terminal, Station, POS (for the device), till (for the Deposit Box) | ADR-0002; R156 |
+| Sale Board | The configured front end a workstation loads (ticketing, F&B or retail). | Screen, Layout, Menu | ADR-0003 |
+| Role | A named, fully configurable grouping of permissions; the seeded five are editable starting points. | Group, Profile | R229 |
+| Staff member / Partner user / Platform operator | A tenant's staff principal; a partner's user; a TICVAI employee in the Console. | User (alone), Account, Agent (for venue staff) | F104 step 1; F104 step 4; F104 step 5 |
+| Platform-staff grant | The time-boxed, audited access a platform operator opens into one tenant before acting in it. | Impersonation, Support login | R098 |
+| Escalate / Refused | Escalate is supervisor approval captured in place; Refused is the denied state that names the permission. | Denied (for an action that can be escalated) | R197 |
+| Approve / Reject / Return / Request information | The four decisions on an approval request; Withdraw is the requester's own act and never a rejection. | Accept, Decline, Cancel (for withdraw) | contracts/spine/approvals.yaml#decideApprovalRequest … |
+| Subscription / Plan / Module / Licence | TICVAI's commercial relationship with a tenant, its plan, the modules it licenses and the limits. | Membership (that is the guest's pass) | R214 |
+| Membership / Annual pass | A guest's pass product and its holder (BO-284 to BO-303). | Subscription (that is the tenant's TICVAI plan) | screens/P08-venue-back-office.yaml#BO-284 |
+| Sandbox client / Production client | A developer's own test credential; a TICVAI-issued live credential after certification. | Test key, Live key, API key (without environment) | DI-927 |
+| Asset (DAM) / Media (ticket) | A digital file in the library; ticket media is a wristband or card carrying entitlements. Never mix them. | Media (for a library asset) | contracts/satellite/assets.yaml#searchMedia … |
+
 
 ## The screens
 
-| id | name | pattern | ops | overlays | machine |
-|---|---|---|---|---|---|
-| `ADM-369` | Commercial Command Center | commandCentre | 2 | 0 | — |
-| `ADM-370` | Customer Subscription & Commercial Portfolio | listDetail | 1 | 0 | — |
-| `ADM-371` | Customer Commercial 360° | listDetail | 2 | 0 | — |
-| `ADM-372` | Operational Profile, VSI & Commercial Model Intelligence | commandCentre | 1 | 0 | — |
-| `ADM-373` | Revenue & Commercial Model Analytics | commandCentre | 1 | 0 | — |
-| `ADM-374` | Trial & Conversion Monitor | commandCentre | 2 | 0 | — |
-| `ADM-375` | Renewal & Retention Center | commandCentre | 1 | 0 | — |
-| `ADM-376` | Commercial Optimization & Expansion Opportunities | commandCentre | 1 | 0 | — |
-| `ADM-377` | Subscription Exceptions & Commercial Alerts | listDetail | 1 | 0 | — |
-| `ADM-378` | Executive AI Commercial Intelligence | commandCentre | 2 | 0 | — |
+Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs count fields; requirements are matrix rows; meeting inputs are the ones naming the screen (the module and platform ones are below); white label says whether the tenant's brand reaches it (guest) or it sets the brand (configures).
+
+| id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
+|---|---|---|---|---|---|---|---|---|---|---|
+| `ADM-369` | Commercial Command Center | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `ADM-370` | Customer Subscription & Commercial Portfolio | B–D | 2 | 34 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-371` | Customer Commercial 360° | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `ADM-372` | Operational Profile, VSI & Commercial Model Intelligence | B–D | 0 | 0 | 6 | 2 | 2 | 0 | — | notStarted (—) |
+| `ADM-373` | Revenue & Commercial Model Analytics | B–D | 0 | 10 | 6 | 0 | 2 | 0 | — | notStarted (—) |
+| `ADM-374` | Trial & Conversion Monitor | B–D | 0 | 0 | 6 | 0 | 2 | 0 | — | notStarted (—) |
+| `ADM-375` | Renewal & Retention Center | B–D | 0 | 22 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `ADM-376` | Commercial Optimization & Expansion Opportunities | B–D | 0 | 12 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `ADM-377` | Subscription Exceptions & Commercial Alerts | B–D | 0 | 12 | 6 | 1 | 0 | 0 | — | notStarted (—) |
+| `ADM-378` | Executive AI Commercial Intelligence | B–D | 0 | 0 | 6 | 3 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 
@@ -77,3391 +113,1681 @@ convincingly. It is never a caption.
 
 ---
 
-## `screens.json`
+## Screen by screen
 
-Every field of every screen in this batch. **`machine` is what a screen is in the middle of**, `overlays` is what opens over it and what closing it does, and `navigation.transitions` is how you leave, with `carries` naming the state that travels.
+**One block per screen, in the order to build them.** Each says what the user enters (every control, with its rules), what the screen shows and produces (every field, with its format; every action, with what it returns and the errors to draw), every state, who may do what, the requirements it meets, what the client said about it, the tracker items, what the tenant configures, the references, and an acceptance checklist. **Everything in a block is for you, never for the screen**: no id, field name, operation or permission key may appear as text.
 
-```json
-[
- {
-  "id": "ADM-369",
-  "name": "Commercial Command Center",
-  "module": "Tenants & Licensing",
-  "requiresModule": "core",
-  "wave": 3,
-  "source": {
-   "pack": "Subscription_Licensing_AI_Self_Service.pdf",
-   "board": "1",
-   "number": "1",
-   "page": 6
-  },
-  "implementation": {
-   "app": "ticvai-web",
-   "route": "/tenants-licensing/commercial-command-center-adm-369",
-   "component": "apps/ticvai-web/src/routes/tenants-licensing/CommercialCommandCenter.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "ADM-002"
-   ],
-   "exitTo": [
-    "ADM-002",
-    "ADM-370",
-    "ADM-371",
-    "ADM-372",
-    "ADM-373",
-    "ADM-374",
-    "ADM-375",
-    "ADM-376",
-    "ADM-377",
-    "ADM-378"
-   ],
-   "transitions": [
-    {
-     "to": "ADM-002",
-     "trigger": "Back to Platform Dashboard",
-     "provenance": "structural — pack board 1 wiring, 11 September 2026",
-     "back": true
-    },
-    {
-     "to": "ADM-370",
-     "trigger": "Customer Subscription & Commercial Portfolio",
-     "provenance": "structural — pack board 1 wiring, 11 September 2026"
-    },
-    {
-     "to": "ADM-371",
-     "trigger": "Customer Commercial 360°",
-     "provenance": "structural — pack board 1 wiring, 11 September 2026"
-    },
-    {
-     "to": "ADM-372",
-     "trigger": "Operational Profile, VSI & Commercial Model Intelligence",
-     "provenance": "structural — pack board 1 wiring, 11 September 2026"
-    },
-    {
-     "to": "ADM-373",
-     "trigger": "Revenue & Commercial Model Analytics",
-     "provenance": "structural — pack board 1 wiring, 11 September 2026"
-    },
-    {
-     "to": "ADM-374",
-     "trigger": "Trial & Conversion Monitor",
-     "provenance": "structural — pack board 1 wiring, 11 September 2026"
-    },
-    {
-     "to": "ADM-375",
-     "trigger": "Renewal & Retention Center",
-     "provenance": "structural — pack board 1 wiring, 11 September 2026"
-    },
-    {
-     "to": "ADM-376",
-     "trigger": "Commercial Optimization & Expansion Opportunities",
-     "provenance": "structural — pack board 1 wiring, 11 September 2026"
-    },
-    {
-     "to": "ADM-377",
-     "trigger": "Subscription Exceptions & Commercial Alerts",
-     "provenance": "structural — pack board 1 wiring, 11 September 2026"
-    },
-    {
-     "to": "ADM-378",
-     "trigger": "Executive AI Commercial Intelligence",
-     "provenance": "structural — pack board 1 wiring, 11 September 2026"
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "commandCentre",
-  "patternReason": "the pack gives this screen a metric directory (§Primary KPIs) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's",
-  "purpose": "Provide TICVAI management with a real-time executive overview of the entire subscription and commercial business.",
-  "layout": {
-   "template": "dashboard",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "headline",
-     "components": [
-      {
-       "kind": "metricTile",
-       "label": "Total Active Customers",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 6 §Primary KPIs"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Active Subscriptions",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 6 §Primary KPIs"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Active Trials",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 6 §Primary KPIs"
-      },
-      {
-       "kind": "metricTile",
-       "label": "MRR / Monthly Equivalent Revenue",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 6 §Primary KPIs"
-      },
-      {
-       "kind": "metricTile",
-       "label": "ARR / Annualized Contract Value",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 6 §Primary KPIs"
-      },
-      {
-       "kind": "metricTile",
-       "label": "New Revenue",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 6 §Primary KPIs"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Expansion Revenue",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 6 §Primary KPIs"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Contraction Revenue",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 6 §Primary KPIs"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Churned Revenue",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 6 §Primary KPIs"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Renewal Rate",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 6 §Primary KPIs"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Trial-to-Paid Conversion",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 6 §Primary KPIs"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Average Revenue per Customer",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 6 §Primary KPIs"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The commercial list; the counts above it resolve separately.",
-   "error": "Could not load. Names which read failed and leaves the commercial untouched.",
-   "emptyFirstRun": "No commercial yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the commercial are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "listTenants",
-    "contract": "subscription",
-    "purpose": "The commercial portfolio",
-    "trigger": "onLoad",
-    "provenance": "board reading, 19 September 2026"
-   },
-   {
-    "operationId": "getSubscription",
-    "contract": "subscription",
-    "purpose": "One customer",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026"
-   }
-  ],
-  "wireframe": {
-   "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-369",
-   "workshopBoard": "wireframes/WS153 Subscription Licensing AI Self Service Board 1.dc.html#adm-369"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 6. 0 of 0 labels bound to a contract property; 12 of 36 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "entryState": {
-   "params": [
-    {
-     "name": "tenantId",
-     "from": "session"
-    }
-   ]
-  },
-  "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
-   "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
-   "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
-   "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
-    "shell": "web",
-    "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
-    ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "ADM-370",
-  "name": "Customer Subscription & Commercial Portfolio",
-  "module": "Tenants & Licensing",
-  "requiresModule": "core",
-  "wave": 3,
-  "source": {
-   "pack": "Subscription_Licensing_AI_Self_Service.pdf",
-   "board": "1",
-   "number": "2",
-   "page": 8
-  },
-  "implementation": {
-   "app": "ticvai-web",
-   "route": "/tenants-licensing/customer-subscription-commercial-portfolio-adm-370",
-   "component": "apps/ticvai-web/src/routes/tenants-licensing/CustomerSubscriptionCommercialPortfolio.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "ADM-369"
-   ],
-   "exitTo": [
-    "ADM-369"
-   ],
-   "transitions": [
-    {
-     "to": "ADM-369",
-     "trigger": "Back to Commercial Command Center",
-     "provenance": "structural — pack board 1 wiring, 11 September 2026",
-     "back": true
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "the pack gives this screen a display directory (§Table Columns) and no metric row",
-  "purpose": "Provide a central portfolio of every TICVAI customer and their current commercial position.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Subscription_Licensing_AI_Self_Service.pdf, page 8 §Table Columns"
-   }
-  ],
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "filters",
-     "components": [
-      {
-       "kind": "searchField",
-       "label": "Search customer subscription commercial",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 8 §Filter by"
-      },
-      {
-       "kind": "multiSelect",
-       "label": "Filter by",
-       "columns": [
-        "Commercial Model",
-        "Operational Profile",
-        "Tier",
-        "Country",
-        "Venue",
-        "Status",
-        "Renewal Period",
-        "VSI",
-        "Minimum Guarantee",
-        "Usage",
-        "Revenue",
-        "Opportunity Type"
-       ],
-       "notes": "The pack filters this screen by commercial model, operational profile, tier, country, venue, status and 6 more — which are present is a decision the pack already made.",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 8 §Filter by"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "collection",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every customer subscription commercial",
-       "columns": [
-        "Customer",
-        "Venue / Group",
-        "Country",
-        "VSI",
-        "Operational Profile",
-        "Commercial Model",
-        "Tier where applicable",
-        "Contracted Rate",
-        "Minimum Guarantee",
-        "Active Modules",
-        "Monthly Equivalent Revenue",
-        "Billable Volume",
-        "Usage %",
-        "Contract Start",
-        "Renewal Date",
-        "Subscription Status",
-        "Commercial Health"
-       ],
-       "bindsTo": null,
-       "operation": null,
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 8 §Table Columns"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected customer subscription commercial",
-       "bindsTo": null,
-       "columns": [
-        "Customer",
-        "Venue / Group",
-        "Country",
-        "VSI",
-        "Operational Profile",
-        "Commercial Model",
-        "Tier where applicable",
-        "Contracted Rate",
-        "Minimum Guarantee",
-        "Active Modules",
-        "Monthly Equivalent Revenue",
-        "Billable Volume",
-        "Usage %",
-        "Contract Start",
-        "Renewal Date",
-        "Subscription Status",
-        "Commercial Health"
-       ],
-       "notes": "The pack groups this record's detail under its own headings: “Enterprise Operational Profile”, “AED 20K/month minimum”, “Commercial Health Indicators”.",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 8 §Table Columns"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The customer subscription commercial list.",
-   "error": "Could not load. Names which read failed and leaves the customer subscription commercial untouched.",
-   "emptyFirstRun": "No customer subscription commercial yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the customer subscription commercial are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "listTenants",
-    "contract": "subscription",
-    "purpose": "Subscriptions by tier",
-    "trigger": "onLoad",
-    "provenance": "board reading, 19 September 2026"
-   }
-  ],
-  "entryState": {
-   "preloaded": [
-    "Customer",
-    "Venue / Group",
-    "Country",
-    "VSI",
-    "Operational Profile",
-    "Commercial Model"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-370",
-   "workshopBoard": "wireframes/WS153 Subscription Licensing AI Self Service Board 1.dc.html#adm-370"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 8. 0 of 29 labels bound to a contract property; 29 of 41 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
-   "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
-   "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
-   "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
-    "shell": "web",
-    "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
-    ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "ADM-371",
-  "name": "Customer Commercial 360°",
-  "module": "Tenants & Licensing",
-  "requiresModule": "core",
-  "wave": 3,
-  "source": {
-   "pack": "Subscription_Licensing_AI_Self_Service.pdf",
-   "board": "1",
-   "number": "3",
-   "page": 9
-  },
-  "implementation": {
-   "app": "ticvai-web",
-   "route": "/tenants-licensing/customer-commercial-360-adm-371",
-   "component": "apps/ticvai-web/src/routes/tenants-licensing/CustomerCommercial360.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "ADM-369"
-   ],
-   "exitTo": [
-    "ADM-369"
-   ],
-   "transitions": [
-    {
-     "to": "ADM-369",
-     "trigger": "Back to Commercial Command Center",
-     "provenance": "structural — pack board 1 wiring, 11 September 2026",
-     "back": true
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
-  "purpose": "Provide the complete commercial, operational and subscription profile for one customer. This screen must clearly separate commercial charging from technical/operational classification.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
-    "source": "pack Subscription_Licensing_AI_Self_Service.pdf, page 9"
-   },
-   {
-    "operation": null,
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
-    "source": "pack Subscription_Licensing_AI_Self_Service.pdf, page 9"
-   }
-  ],
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "derived": true,
-       "impliedBy": "getSubscription",
-       "notes": "One record, read-only."
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The customer commercial 360° list.",
-   "error": "Could not load. Names which read failed and leaves the customer commercial 360° untouched.",
-   "emptyFirstRun": "No customer commercial 360° yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the customer commercial 360° are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "getSubscription",
-    "contract": "subscription",
-    "purpose": "Commercial 360",
-    "trigger": "onLoad",
-    "provenance": "board reading, 19 September 2026"
-   },
-   {
-    "operationId": "getEntitlementUsage",
-    "contract": "subscription",
-    "purpose": "What they consume",
-    "trigger": "onLoad",
-    "provenance": "board reading, 19 September 2026"
-   }
-  ],
-  "wireframe": {
-   "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-371",
-   "workshopBoard": "wireframes/WS153 Subscription Licensing AI Self Service Board 1.dc.html#adm-371"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 9. 0 of 0 labels bound to a contract property; 0 of 43 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "entryState": {
-   "params": [
-    {
-     "name": "tenantId",
-     "from": "session"
-    }
-   ]
-  },
-  "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
-   "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
-   "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
-   "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
-    "shell": "web",
-    "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
-    ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "ADM-372",
-  "name": "Operational Profile, VSI & Commercial Model Intelligence",
-  "module": "Tenants & Licensing",
-  "requiresModule": "core",
-  "wave": 3,
-  "source": {
-   "pack": "Subscription_Licensing_AI_Self_Service.pdf",
-   "board": "1",
-   "number": "4",
-   "page": 10
-  },
-  "implementation": {
-   "app": "ticvai-web",
-   "route": "/tenants-licensing/operational-profile-vsi-commercial-model-intelligence-adm-372",
-   "component": "apps/ticvai-web/src/routes/tenants-licensing/OperationalProfileVsiCommercialModelIntelligence.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "ADM-369"
-   ],
-   "exitTo": [
-    "ADM-369"
-   ],
-   "transitions": [
-    {
-     "to": "ADM-369",
-     "trigger": "Back to Commercial Command Center",
-     "provenance": "structural — pack board 1 wiring, 11 September 2026",
-     "back": true
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "commandCentre",
-  "patternReason": "the pack gives this screen a metric directory (§KPIs) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's",
-  "purpose": "Analyze whether customers' operational profiles and commercial structures remain appropriate. This replaces the previous focus only on Tier Distribution & VSI.",
-  "layout": {
-   "template": "dashboard",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "headline",
-     "components": [
-      {
-       "kind": "metricTile",
-       "label": "Customers by VSI",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 10 §KPIs"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Customers by Operational Profile",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 10 §KPIs"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Customers by Commercial Model",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 10 §KPIs"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Average VSI",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 10 §KPIs"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Profile Misalignment",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 10 §KPIs"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Commercial Model Optimization Candidates",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 10 §KPIs"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Upgrade Candidates",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 10 §KPIs"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Downgrade Candidates",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 10 §KPIs"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The operational profile vsi list; the counts above it resolve separately.",
-   "error": "Could not load. Names which read failed and leaves the operational profile vsi untouched.",
-   "emptyFirstRun": "No operational profile vsi yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the operational profile vsi are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "scoreVsiAssessment",
-    "contract": "subscription",
-    "purpose": "Their VSI and model",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026"
-   }
-  ],
-  "entryState": {
-   "preloaded": [
-    "Customers by VSI",
-    "Customers by Operational Profile",
-    "Customers by Commercial Model",
-    "Average VSI",
-    "Profile Misalignment",
-    "Commercial Model Optimization Candidates"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-372",
-   "workshopBoard": "wireframes/WS153 Subscription Licensing AI Self Service Board 1.dc.html#adm-372"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 10. 0 of 0 labels bound to a contract property; 8 of 19 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
-   "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
-   "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
-   "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
-    "shell": "web",
-    "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
-    ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "ADM-373",
-  "name": "Revenue & Commercial Model Analytics",
-  "module": "Tenants & Licensing",
-  "requiresModule": "core",
-  "wave": 3,
-  "source": {
-   "pack": "Subscription_Licensing_AI_Self_Service.pdf",
-   "board": "1",
-   "number": "5",
-   "page": 11
-  },
-  "implementation": {
-   "app": "ticvai-web",
-   "route": "/tenants-licensing/revenue-commercial-model-analytics-adm-373",
-   "component": "apps/ticvai-web/src/routes/tenants-licensing/RevenueCommercialModelAnalytics.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "ADM-369"
-   ],
-   "exitTo": [
-    "ADM-369"
-   ],
-   "transitions": [
-    {
-     "to": "ADM-369",
-     "trigger": "Back to Commercial Command Center",
-     "provenance": "structural — pack board 1 wiring, 11 September 2026",
-     "back": true
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "commandCentre",
-  "patternReason": "the pack gives this screen both a metric directory (§KPIs) and a per-row directory (§Show) — counts over a population, then the population",
-  "purpose": "Analyze TICVAI revenue across all commercial structures.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Subscription_Licensing_AI_Self_Service.pdf, page 11 §Show"
-   }
-  ],
-  "layout": {
-   "template": "dashboard",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "headline",
-     "components": [
-      {
-       "kind": "metricTile",
-       "label": "MRR / Monthly Equivalent",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 11 §KPIs"
-      },
-      {
-       "kind": "metricTile",
-       "label": "ARR / ACV",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 11 §KPIs"
-      },
-      {
-       "kind": "metricTile",
-       "label": "New Revenue",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 11 §KPIs"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Expansion Revenue",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 11 §KPIs"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Contraction Revenue",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 11 §KPIs"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Churned Revenue",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 11 §KPIs"
-      },
-      {
-       "kind": "metricTile",
-       "label": "NRR",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 11 §KPIs"
-      },
-      {
-       "kind": "metricTile",
-       "label": "ARPC",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 11 §KPIs"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Growth %",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 11 §KPIs"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "moduleTiles",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every revenue commercial model",
-       "columns": [
-        "Guaranteed Revenue",
-        "Actual Variable Revenue",
-        "Guarantee Shortfall Protection",
-        "Contracts Above Guarantee",
-        "Contracts at Guarantee"
-       ],
-       "bindsTo": null,
-       "operation": null,
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 11 §Show"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected revenue commercial model",
-       "bindsTo": null,
-       "columns": [
-        "Guaranteed Revenue",
-        "Actual Variable Revenue",
-        "Guarantee Shortfall Protection",
-        "Contracts Above Guarantee",
-        "Contracts at Guarantee"
-       ],
-       "notes": "The pack groups this record's detail under its own headings: “Break down”, “Revenue by”.",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 11 §Show"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The revenue commercial model list; the counts above it resolve separately.",
-   "error": "Could not load. Names which read failed and leaves the revenue commercial model untouched.",
-   "emptyFirstRun": "No revenue commercial model yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the revenue commercial model are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "getBillingReconciliation",
-    "contract": "subscription",
-    "purpose": "Revenue against metering",
-    "trigger": "onLoad",
-    "provenance": "board reading, 19 September 2026"
-   }
-  ],
-  "entryState": {
-   "preloaded": [
-    "MRR / Monthly Equivalent",
-    "ARR / ACV",
-    "New Revenue",
-    "Expansion Revenue",
-    "Contraction Revenue",
-    "Churned Revenue"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-373",
-   "workshopBoard": "wireframes/WS153 Subscription Licensing AI Self Service Board 1.dc.html#adm-373"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 11. 0 of 5 labels bound to a contract property; 14 of 38 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
-   "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
-   "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
-   "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
-    "shell": "web",
-    "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
-    ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "ADM-374",
-  "name": "Trial & Conversion Monitor",
-  "module": "Tenants & Licensing",
-  "requiresModule": "core",
-  "wave": 3,
-  "source": {
-   "pack": "Subscription_Licensing_AI_Self_Service.pdf",
-   "board": "1",
-   "number": "6",
-   "page": 12
-  },
-  "implementation": {
-   "app": "ticvai-web",
-   "route": "/tenants-licensing/trial-conversion-monitor-adm-374",
-   "component": "apps/ticvai-web/src/routes/tenants-licensing/TrialConversionMonitor.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "ADM-369"
-   ],
-   "exitTo": [
-    "ADM-369"
-   ],
-   "transitions": [
-    {
-     "to": "ADM-369",
-     "trigger": "Back to Commercial Command Center",
-     "provenance": "structural — pack board 1 wiring, 11 September 2026",
-     "back": true
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "commandCentre",
-  "patternReason": "the pack gives this screen a metric directory (§KPIs) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's",
-  "purpose": "Monitor trial customers and their expected transition into paid commercial agreements.",
-  "layout": {
-   "template": "dashboard",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "headline",
-     "components": [
-      {
-       "kind": "metricTile",
-       "label": "Active Trials",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 12 §KPIs"
-      },
-      {
-       "kind": "metricTile",
-       "label": "New Trials",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 12 §KPIs"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Expiring Trials",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 12 §KPIs"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Trial-to-Paid %",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 12 §KPIs"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Average Trial Duration",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 12 §KPIs"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Setup Completion",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 12 §KPIs"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Go-Live Readiness",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 12 §KPIs"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Estimated Conversion Value",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 12 §KPIs"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The trial conversion list; the counts above it resolve separately.",
-   "error": "Could not load. Names which read failed and leaves the trial conversion untouched.",
-   "emptyFirstRun": "No trial conversion yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the trial conversion are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "setTrialConfiguration",
-    "contract": "subscription",
-    "purpose": "Trial rules",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026"
-   },
-   {
-    "operationId": "listTenants",
-    "contract": "subscription",
-    "purpose": "Trials running",
-    "trigger": "onLoad",
-    "provenance": "board reading, 19 September 2026"
-   }
-  ],
-  "wireframe": {
-   "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-374",
-   "workshopBoard": "wireframes/WS153 Subscription Licensing AI Self Service Board 1.dc.html#adm-374"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 12. 0 of 0 labels bound to a contract property; 8 of 27 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
-   "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
-   "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
-   "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
-    "shell": "web",
-    "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
-    ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "ADM-375",
-  "name": "Renewal & Retention Center",
-  "module": "Tenants & Licensing",
-  "requiresModule": "core",
-  "wave": 3,
-  "source": {
-   "pack": "Subscription_Licensing_AI_Self_Service.pdf",
-   "board": "1",
-   "number": "7",
-   "page": 13
-  },
-  "implementation": {
-   "app": "ticvai-web",
-   "route": "/tenants-licensing/renewal-retention-center-adm-375",
-   "component": "apps/ticvai-web/src/routes/tenants-licensing/RenewalRetentionCenter.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "ADM-369"
-   ],
-   "exitTo": [
-    "ADM-369"
-   ],
-   "transitions": [
-    {
-     "to": "ADM-369",
-     "trigger": "Back to Commercial Command Center",
-     "provenance": "structural — pack board 1 wiring, 11 September 2026",
-     "back": true
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "commandCentre",
-  "patternReason": "the pack gives this screen both a metric directory (§KPIs) and a per-row directory (§Columns) — counts over a population, then the population",
-  "purpose": "Manage upcoming renewals and identify retention or commercial restructuring requirements.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Subscription_Licensing_AI_Self_Service.pdf, page 13 §Columns"
-   }
-  ],
-  "layout": {
-   "template": "dashboard",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "headline",
-     "components": [
-      {
-       "kind": "metricTile",
-       "label": "Renewals Next 30 Days",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 13 §KPIs"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Next 60 Days",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 13 §KPIs"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Next 90 Days",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 13 §KPIs"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Renewal Value",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 13 §KPIs"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Renewal Rate",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 13 §KPIs"
-      },
-      {
-       "kind": "metricTile",
-       "label": "At-Risk Revenue",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 13 §KPIs"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Auto-Renew Value",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 13 §KPIs"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Expansion Opportunity",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 13 §KPIs"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Optimization Opportunity",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 13 §KPIs"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "moduleTiles",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every renewal retention",
-       "columns": [
-        "Customer",
-        "Commercial Model",
-        "Current Rate",
-        "Minimum Guarantee",
-        "Monthly Equivalent",
-        "Contract Value",
-        "Renewal Date",
-        "Usage Trend",
-        "Payment Health",
-        "Risk",
-        "AI Recommendation"
-       ],
-       "bindsTo": null,
-       "operation": null,
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 13 §Columns"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected renewal retention",
-       "bindsTo": null,
-       "columns": [
-        "Customer",
-        "Commercial Model",
-        "Current Rate",
-        "Minimum Guarantee",
-        "Monthly Equivalent",
-        "Contract Value",
-        "Renewal Date",
-        "Usage Trend",
-        "Payment Health",
-        "Risk",
-        "AI Recommendation"
-       ],
-       "notes": "The pack groups this record's detail under its own headings: “Retention Signals”.",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 13 §Columns"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The renewal retention list; the counts above it resolve separately.",
-   "error": "Could not load. Names which read failed and leaves the renewal retention untouched.",
-   "emptyFirstRun": "No renewal retention yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the renewal retention are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "listMembershipRenewalRetention",
-    "contract": "subscription",
-    "purpose": "Membership Analytics, Renewal Intelligence & AI Retention Center",
-    "trigger": "onLoad"
-   }
-  ],
-  "wireframe": {
-   "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-375",
-   "workshopBoard": "wireframes/WS153 Subscription Licensing AI Self Service Board 1.dc.html#adm-375"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 13. 0 of 11 labels bound to a contract property; 20 of 36 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
-   "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
-   "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
-   "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
-    "shell": "web",
-    "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
-    ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "ADM-376",
-  "name": "Commercial Optimization & Expansion Opportunities",
-  "module": "Tenants & Licensing",
-  "requiresModule": "core",
-  "wave": 3,
-  "source": {
-   "pack": "Subscription_Licensing_AI_Self_Service.pdf",
-   "board": "1",
-   "number": "8",
-   "page": 14
-  },
-  "implementation": {
-   "app": "ticvai-web",
-   "route": "/tenants-licensing/commercial-optimization-expansion-opportunities-adm-376",
-   "component": "apps/ticvai-web/src/routes/tenants-licensing/CommercialOptimizationExpansionOpportunities.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "ADM-369"
-   ],
-   "exitTo": [
-    "ADM-369"
-   ],
-   "transitions": [
-    {
-     "to": "ADM-369",
-     "trigger": "Back to Commercial Command Center",
-     "provenance": "structural — pack board 1 wiring, 11 September 2026",
-     "back": true
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "commandCentre",
-  "patternReason": "the pack gives this screen both a metric directory (§Opportunity KPIs) and a per-row directory (§Show) — counts over a population, then the population",
-  "purpose": "Identify opportunities beyond traditional tier upgrades. This is a key revision from the original Upgrade, Downgrade & Expansion Opportunities screen.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Subscription_Licensing_AI_Self_Service.pdf, page 14 §Show"
-   }
-  ],
-  "layout": {
-   "template": "dashboard",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "headline",
-     "components": [
-      {
-       "kind": "metricTile",
-       "label": "Total Opportunities",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 14 §Opportunity KPIs"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Potential Expansion Revenue",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 14 §Opportunity KPIs"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Potential Retention Value",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 14 §Opportunity KPIs"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Model Optimization Opportunities",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 14 §Opportunity KPIs"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Module Opportunities",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 14 §Opportunity KPIs"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Cost Optimization Opportunities",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 14 §Opportunity KPIs"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "moduleTiles",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every commercial optimization expansion",
-       "columns": [
-        "Current Customer Cost",
-        "Proposed Customer Cost",
-        "TICVAI Revenue Impact",
-        "Minimum Revenue Protection",
-        "Customer Saving/Increase",
-        "Confidence"
-       ],
-       "bindsTo": null,
-       "operation": null,
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 14 §Show"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected commercial optimization expansion",
-       "bindsTo": null,
-       "columns": [
-        "Current Customer Cost",
-        "Proposed Customer Cost",
-        "TICVAI Revenue Impact",
-        "Minimum Revenue Protection",
-        "Customer Saving/Increase",
-        "Confidence"
-       ],
-       "notes": "The pack groups this record's detail under its own headings: “Opportunity Types”, “Current”, “Projected Volume”.",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 14 §Show"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The commercial optimization expansion list; the counts above it resolve separately.",
-   "error": "Could not load. Names which read failed and leaves the commercial optimization expansion untouched.",
-   "emptyFirstRun": "No commercial optimization expansion yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the commercial optimization expansion are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "listRenewalAuto",
-    "contract": "subscription",
-    "purpose": "Renewals due",
-    "trigger": "onLoad",
-    "provenance": "board reading, 19 September 2026"
-   }
-  ],
-  "entryState": {
-   "preloaded": [
-    "Total Opportunities",
-    "Potential Expansion Revenue",
-    "Potential Retention Value",
-    "Model Optimization Opportunities",
-    "Module Opportunities",
-    "Cost Optimization Opportunities"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-376",
-   "workshopBoard": "wireframes/WS153 Subscription Licensing AI Self Service Board 1.dc.html#adm-376"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 14. 0 of 6 labels bound to a contract property; 12 of 32 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
-   "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
-   "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
-   "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
-    "shell": "web",
-    "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
-    ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "ADM-377",
-  "name": "Subscription Exceptions & Commercial Alerts",
-  "module": "Tenants & Licensing",
-  "requiresModule": "core",
-  "wave": 3,
-  "source": {
-   "pack": "Subscription_Licensing_AI_Self_Service.pdf",
-   "board": "1",
-   "number": "9",
-   "page": 16
-  },
-  "implementation": {
-   "app": "ticvai-web",
-   "route": "/tenants-licensing/subscription-exceptions-commercial-alerts-adm-377",
-   "component": "apps/ticvai-web/src/routes/tenants-licensing/SubscriptionExceptionsCommercialAlerts.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "ADM-369"
-   ],
-   "exitTo": [
-    "ADM-369"
-   ],
-   "transitions": [
-    {
-     "to": "ADM-369",
-     "trigger": "Back to Commercial Command Center",
-     "provenance": "structural — pack board 1 wiring, 11 September 2026",
-     "back": true
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
-  "purpose": "Provide management with one consolidated view of subscription, licensing, commercial, billing and metering exceptions.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
-    "source": "pack Subscription_Licensing_AI_Self_Service.pdf, page 16"
-   },
-   {
-    "operation": null,
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
-    "source": "pack Subscription_Licensing_AI_Self_Service.pdf, page 16"
-   }
-  ],
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "simulateCommercialPackage",
-       "notes": "The act the screen exists for."
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "simulateCommercialPackage"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The subscription exceptions commercial list.",
-   "error": "Could not load. Names which read failed and leaves the subscription exceptions commercial untouched.",
-   "emptyFirstRun": "No subscription exceptions commercial yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the subscription exceptions commercial are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "simulateCommercialPackage",
-    "contract": "subscription",
-    "purpose": "Expansion options",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026"
-   }
-  ],
-  "wireframe": {
-   "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-377",
-   "workshopBoard": "wireframes/WS153 Subscription Licensing AI Self Service Board 1.dc.html#adm-377"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 16. 0 of 0 labels bound to a contract property; 0 of 29 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
-   "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
-   "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
-   "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
-    "shell": "web",
-    "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
-    ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
-    "decided": "10 September 2026"
-   }
-  }
- },
- {
-  "id": "ADM-378",
-  "name": "Executive AI Commercial Intelligence",
-  "module": "Tenants & Licensing",
-  "requiresModule": "core",
-  "wave": 3,
-  "source": {
-   "pack": "Subscription_Licensing_AI_Self_Service.pdf",
-   "board": "1",
-   "number": "10",
-   "page": 17
-  },
-  "implementation": {
-   "app": "ticvai-web",
-   "route": "/tenants-licensing/executive-ai-commercial-intelligence-adm-378",
-   "component": "apps/ticvai-web/src/routes/tenants-licensing/ExecutiveAiCommercialIntelligence.tsx",
-   "status": "notStarted"
-  },
-  "navigation": {
-   "entryFrom": [
-    "ADM-369"
-   ],
-   "exitTo": [
-    "ADM-369"
-   ],
-   "transitions": [
-    {
-     "to": "ADM-369",
-     "trigger": "Back to Commercial Command Center",
-     "provenance": "structural — pack board 1 wiring, 11 September 2026",
-     "back": true
-    }
-   ]
-  },
-  "density": "compact",
-  "pattern": "commandCentre",
-  "patternReason": "the pack gives this screen a metric directory (§Customer Metrics; Revenue Metrics; Variable Commercial Metrics) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's",
-  "purpose": "Provide TICVAI leadership with an AI-powered executive commercial intelligence layer. Allow a new customer to register, describe their venue/business, and let TICVAI intelligently determine their operational requirements before calculating the VSI, recommending a subscription tier, and suggesting modules.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack names 1 actions on this screen and the screen declares 0 operations.** Unserved: Board 1 — Standardized Commercial Metrics. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Subscription_Licensing_AI_Self_Service.pdf, page 17 §Actions"
-   }
-  ],
-  "layout": {
-   "template": "dashboard",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "headline",
-     "components": [
-      {
-       "kind": "metricTile",
-       "label": "Active Customers",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 17 §Customer Metrics"
-      },
-      {
-       "kind": "metricTile",
-       "label": "New Customers",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 17 §Customer Metrics"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Churned Customers",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 17 §Customer Metrics"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Trials",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 17 §Customer Metrics"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Conversion",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 17 §Customer Metrics"
-      },
-      {
-       "kind": "metricTile",
-       "label": "MRR / Monthly Equivalent Revenue",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 17 §Revenue Metrics"
-      },
-      {
-       "kind": "metricTile",
-       "label": "ARR / ACV",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 17 §Revenue Metrics"
-      },
-      {
-       "kind": "metricTile",
-       "label": "New Revenue",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 17 §Revenue Metrics"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Expansion",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 17 §Revenue Metrics"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Contraction",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 17 §Revenue Metrics"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Churn",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 17 §Revenue Metrics"
-      },
-      {
-       "kind": "metricTile",
-       "label": "NRR",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 17 §Revenue Metrics"
-      },
-      {
-       "kind": "metricTile",
-       "label": "ARPC",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 17 §Revenue Metrics"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Billable Tickets",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 17 §Variable Commercial Metrics"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Billable Transactions",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 17 §Variable Commercial Metrics"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Eligible Transaction Value",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 17 §Variable Commercial Metrics"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Variable Revenue",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 17 §Variable Commercial Metrics"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Minimum Guaranteed Revenue",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 17 §Variable Commercial Metrics"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Guarantee Utilization",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 17 §Variable Commercial Metrics"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Revenue Above Guarantee",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 17 §Variable Commercial Metrics"
-      },
-      {
-       "kind": "metricTile",
-       "label": "VSI",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 17 §Operational Metrics"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Operational Profile",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 17 §Operational Metrics"
-      },
-      {
-       "kind": "metricTile",
-       "label": "POS Utilization",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 17 §Operational Metrics"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Access Utilization",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 17 §Operational Metrics"
-      },
-      {
-       "kind": "metricTile",
-       "label": "User Utilization",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 17 §Operational Metrics"
-      },
-      {
-       "kind": "metricTile",
-       "label": "API",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 17 §Operational Metrics"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Storage",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 17 §Operational Metrics"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Admissions",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 17 §Operational Metrics"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Renewal Risk",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 17 §Commercial Intelligence Metrics"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Expansion Probability",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 17 §Commercial Intelligence Metrics"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Model Optimization Opportunity",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 17 §Commercial Intelligence Metrics"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Cost Optimization",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 17 §Commercial Intelligence Metrics"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Upgrade/Downgrade Probability",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 17 §Commercial Intelligence Metrics"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Commercial Health",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 17 §Commercial Intelligence Metrics"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Board 1 — Standardized Commercial Metrics",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 17 §Actions"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The executive commercial intelligence list; the counts above it resolve separately.",
-   "error": "Could not load. Names which read failed and leaves the executive commercial intelligence untouched.",
-   "emptyFirstRun": "No executive commercial intelligence yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the executive commercial intelligence are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [
-   {
-    "operationId": "getLicenceEnforcement",
-    "contract": "subscription",
-    "purpose": "Exceptions and overage",
-    "trigger": "onLoad",
-    "provenance": "board reading, 19 September 2026"
-   },
-   {
-    "operationId": "getPlanRecommendations",
-    "contract": "subscription",
-    "purpose": "Commercial recommendations beside the enforcement position",
-    "trigger": "onLoad",
-    "provenance": "build, 29 September 2026"
-   }
-  ],
-  "entryState": {
-   "preloaded": [
-    "Active Customers",
-    "New Customers",
-    "Churned Customers",
-    "Trials",
-    "Conversion",
-    "MRR / Monthly Equivalent Revenue"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-378",
-   "workshopBoard": "wireframes/WS153 Subscription Licensing AI Self Service Board 1.dc.html#adm-378"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 17. 0 of 0 labels bound to a contract property; 35 of 95 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
-   "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
-   "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
-   "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
-    "shell": "web",
-    "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
-    ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
-    "decided": "10 September 2026"
-   }
-  }
- }
-]
+### `ADM-369` Commercial Command Center
+
+**Provide TICVAI management with a real-time executive overview of the entire subscription and commercial business.**
+
+| | |
+|---|---|
+| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| Module | Tenants & Licensing · wave 3 · needs the `core` module |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Who uses it | ticvai staff holding `PLATFORM_TENANT_VIEW` (1 read); in the flows as platform admin |
+| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Pattern | commandCentre (compact density): the pack gives this screen a metric directory (§Primary KPIs) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's |
+| Offline | online only |
+| Opens with | `tenantId` (session) |
+| Route | `/tenants-licensing/commercial-command-center-adm-369` |
+
+**From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** TICVAI's commercial overview: customers, subscriptions, trials, MRR, ARR, expansion, churn, renewal and conversion.
+
+**Fixed on main** (the package already carries these; draw what it says): emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything. (CHG-SBO-002).
+
+#### Inputs: what the user enters or picks
+
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Status | radio group | — | Onboarding · Active · Suspended · Terminating · Terminated | `listTenants` ?status |
+| Plan | picker: choose a plan | — | — | `listTenants` ?planId |
+
+Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+#### Outputs: what the screen shows and produces
+
+**Shown**
+
+**Total Active Customers** (metric tile)
+
+**Active Subscriptions** (metric tile)
+
+**Active Trials** (metric tile)
+
+**MRR / Monthly Equivalent Revenue** (metric tile)
+
+**ARR / Annualized Contract Value** (metric tile)
+
+**New Revenue** (metric tile)
+
+**Expansion Revenue** (metric tile)
+
+**Contraction Revenue** (metric tile)
+
+**Churned Revenue** (metric tile)
+
+**Renewal Rate** (metric tile)
+
+**Trial-to-Paid Conversion** (metric tile)
+
+**Average Revenue per Customer** (metric tile)
+
+**Rules for what is shown** (from the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process; these refine the tables above and win where they differ)
+
+- **Revenue tiles**: In TICVAI's reporting currency with the conversion date stated; per-currency breakdown on hover. *(source: ADR-0008)*
+
+**Data it reads**: `listTenants` (onLoad, The commercial portfolio)
+
+**Where the user goes next**
+
+- → `ADM-002` Platform Dashboard: *Back to Platform Dashboard*
+- → `ADM-370` Customer Subscription & Commercial Portfolio: *Customer Subscription & Commercial Portfolio*
+- → `ADM-371` Customer Commercial 360°: *Customer Commercial 360°*
+- → `ADM-372` Operational Profile, VSI & Commercial Model Intelligence: *Operational Profile, VSI & Commercial Model Intelligence*
+- → `ADM-373` Revenue & Commercial Model Analytics: *Revenue & Commercial Model Analytics*
+- → `ADM-374` Trial & Conversion Monitor: *Trial & Conversion Monitor*
+- → `ADM-375` Renewal & Retention Center: *Renewal & Retention Center*
+- → `ADM-376` Commercial Optimization & Expansion Opportunities: *Commercial Optimization & Expansion Opportunities*
+- → `ADM-377` Subscription Exceptions & Commercial Alerts: *Subscription Exceptions & Commercial Alerts*
+- → `ADM-378` Executive AI Commercial Intelligence: *Executive AI Commercial Intelligence*
+
+#### States
+
+| State | What it shows |
+|---|---|
+| Loading (`?state=loading`) | The commercial list; the counts above it resolve separately. |
+| Error (`?state=error`) | Could not load. Names which read failed and leaves the commercial untouched. |
+| Empty, first run (`?state=emptyFirstRun`) | **Nothing to show yet**: the figures fill as activity is recorded. Offers no create action — a monitor creates nothing — and says so rather than showing empty tiles. |
+| Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the commercial are still there. Names the active filter and offers to clear it. |
+| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+metric tiles:
+  Total Active Customers: 128
+  Active Subscriptions: 46
+  Active Trials: 312
+  MRR / Monthly Equivalent Revenue: AED 482,300.00
+  ARR / Annualized Contract Value: AED 96,750.00
+  New Revenue: AED 12,400.00
+  Expansion Revenue: AED 482,300.00
+  Contraction Revenue: AED 96,750.00
+  Churned Revenue: AED 12,400.00
+  Renewal Rate: 94%
 ```
 
-## `operations.json`
+#### Permissions
+
+- `listTenants` → `PLATFORM_TENANT_VIEW` (read) · staff
+- `getSubscription` → `PLATFORM_TENANT_VIEW` (read) · staff
+
+**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+#### Requirements it meets
+
+No matrix row traces to this screen's operations or data.
+
+#### Client meeting inputs
+
+For this screen, newest first. An **Open question** is built to the default it states. Where an item disagrees with the fields above, the item wins.
+
+- Licensing command centre: total customers, active subscriptions/tiers, MRR broken down by pricing model (tier-based, tier-plus-usage, per-ticket, per-transaction, hybrid, fixed, custom). *(client request · MoM 10 Sep 2026, 4.17 Licensing Command Center Overview · DI-838)*
+
+Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+
+#### Workshop task tracker
+
+No tracker row concerns this screen; the rows for its platform are listed once, below.
+
+#### References
+
+- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-369` · status **notStarted** · provenance —
+- Client workshop board: `wireframes/WS153 Subscription Licensing AI Self Service Board 1.dc.html#adm-369`
+- Workshop pack: Subscription_Licensing_AI_Self_Service.pdf board 1
+- Flow F207 *Subscription Licensing AI Self Service board 1: Commercial Command Center*, step 1: Opens Commercial Command Center → Provide TICVAI management with a real-time executive overview of the entire subscription and commercial business.
+- Flow F207 *Subscription Licensing AI Self Service board 1: Commercial Command Center*, step 3: Returns to the board's landing screen → Ready for the next screen on this board
+- Flow F207 *Subscription Licensing AI Self Service board 1: Commercial Command Center*, step 5: Returns to the board's landing screen → Ready for the next screen on this board
+- Flow F207 *Subscription Licensing AI Self Service board 1: Commercial Command Center*, step 7: Returns to the board's landing screen → Ready for the next screen on this board
+- Flow F207 *Subscription Licensing AI Self Service board 1: Commercial Command Center*, step 9: Returns to the board's landing screen → Ready for the next screen on this board
+- Flow F207 *Subscription Licensing AI Self Service board 1: Commercial Command Center*, step 11: Returns to the board's landing screen → Ready for the next screen on this board
+- Flow F207 *Subscription Licensing AI Self Service board 1: Commercial Command Center*, step 13: Returns to the board's landing screen → Ready for the next screen on this board
+- Flow F207 *Subscription Licensing AI Self Service board 1: Commercial Command Center*, step 15: Returns to the board's landing screen → Ready for the next screen on this board
+- … and 1 more flow steps (`flows/`)
+- Flow F207 branch at step 1 (expected): when Nothing has been set up on Commercial Command Center yet, The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and it is a different situation from an empty result on an established one.
+- Flow F207 branch at step 1 (requiresStaff): when The operator does not hold the permission this screen requires, The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**, which is the right shape -- but the permission that would satisfy it is not granted by any role in …
+
+#### Acceptance for the design
+
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (403, 404).
+- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every state opens from `#ADM-369?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
+- [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
+- [ ] Every transition is wired: `ADM-002`, `ADM-370`, `ADM-371`, `ADM-372`, `ADM-373`, `ADM-374`, `ADM-375`, `ADM-376`, `ADM-377`, `ADM-378`.
+- [ ] Every gated control is gated: `PLATFORM_TENANT_VIEW`.
+- [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
+
+---
+
+### `ADM-370` Customer Subscription & Commercial Portfolio
+
+**Provide a central portfolio of every TICVAI customer and their current commercial position.**
+
+| | |
+|---|---|
+| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| Module | Tenants & Licensing · wave 3 · needs the `core` module |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Who uses it | ticvai staff holding `PLATFORM_TENANT_VIEW` (1 read); in the flows as platform admin |
+| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Pattern | listDetail (compact density): the pack gives this screen a display directory (§Table Columns) and no metric row |
+| Offline | online only |
+| Opens with | nothing: it opens on its own |
+| Route | `/tenants-licensing/customer-subscription-commercial-portfolio-adm-370` |
+
+**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
+
+**From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** Every TICVAI customer and its commercial position: model, tier, contracted rate, minimum guarantee, modules.
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- The table's columns are the workshop pack's labels with no bound response field (0 of 29 labels bound). (CHG-SBO-005)
+
+**Fixed on main** (the package already carries these; draw what it says): emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything. (CHG-SBO-002).
+
+#### Inputs: what the user enters or picks
+
+**On the screen**
+
+| Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
+|---|---|---|---|---|---|---|---|
+| Search customer subscription commercial | search field | — | — | — | — | — | — |
+| Filter by | multi select | — | — | — | — | The pack filters this screen by commercial model, operational profile, tier, country, venue, status and 6 more — which are present is a decision the pack already made. | — |
+
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Status | radio group | — | Onboarding · Active · Suspended · Terminating · Terminated | `listTenants` ?status |
+| Plan | picker: choose a plan | — | — | `listTenants` ?planId |
+
+#### Outputs: what the screen shows and produces
+
+**Shown**
+
+**Every customer subscription commercial** (data table)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Customer | text | not in the schema: `Customer` |
+| Venue / group | text | not in the schema: `Venue / Group` |
+| Country | text | not in the schema: `Country` |
+| VSI | text | not in the schema: `VSI` |
+| Operational profile | text | not in the schema: `Operational Profile` |
+| Commercial model | text | not in the schema: `Commercial Model` |
+| Tier where applicable | text | not in the schema: `Tier where applicable` |
+| Contracted rate | text | not in the schema: `Contracted Rate` |
+| Minimum guarantee | text | not in the schema: `Minimum Guarantee` |
+| Active modules | text | not in the schema: `Active Modules` |
+| Monthly equivalent revenue | text | not in the schema: `Monthly Equivalent Revenue` |
+| Billable volume | text | not in the schema: `Billable Volume` |
+| Usage % | text | not in the schema: `Usage %` |
+| Contract start | text | not in the schema: `Contract Start` |
+| Renewal date | text | not in the schema: `Renewal Date` |
+| Subscription status | text | not in the schema: `Subscription Status` |
+| Commercial health | text | not in the schema: `Commercial Health` |
+
+**The selected customer subscription commercial** (detail panel): The pack groups this record's detail under its own headings: “Enterprise Operational Profile”, “AED 20K/month minimum”, “Commercial Health Indicators”.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Customer | text | not in the schema: `Customer` |
+| Venue / group | text | not in the schema: `Venue / Group` |
+| Country | text | not in the schema: `Country` |
+| VSI | text | not in the schema: `VSI` |
+| Operational profile | text | not in the schema: `Operational Profile` |
+| Commercial model | text | not in the schema: `Commercial Model` |
+| Tier where applicable | text | not in the schema: `Tier where applicable` |
+| Contracted rate | text | not in the schema: `Contracted Rate` |
+| Minimum guarantee | text | not in the schema: `Minimum Guarantee` |
+| Active modules | text | not in the schema: `Active Modules` |
+| Monthly equivalent revenue | text | not in the schema: `Monthly Equivalent Revenue` |
+| Billable volume | text | not in the schema: `Billable Volume` |
+| Usage % | text | not in the schema: `Usage %` |
+| Contract start | text | not in the schema: `Contract Start` |
+| Renewal date | text | not in the schema: `Renewal Date` |
+| Subscription status | text | not in the schema: `Subscription Status` |
+| Commercial health | text | not in the schema: `Commercial Health` |
+
+**Rules for what is shown** (from the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process; these refine the tables above and win where they differ)
+
+- **Money columns (Monthly Equivalent Revenue, Revenue)**: Money in the region's currency and scale, never a bare number: AED to 2 decimals, OMR/BHD/KWD to 3, the third decimal never rounded away (2.013 stays 2.013); the currency code is shown with the figure. Across tenants or regions figures in different currencies are never summed into one total; group by currency, or label the converted figure with its rate and time. *(source: ADR-0008; ADR-0011; DI-306)*
+
+**Data it reads**: `listTenants` (onLoad, Subscriptions by tier)
+
+**Where the user goes next**
+
+- → `ADM-369` Commercial Command Center: *Back to Commercial Command Center*
+
+#### States
+
+| State | What it shows |
+|---|---|
+| Loading (`?state=loading`) | The customer subscription commercial list. |
+| Error (`?state=error`) | Could not load. Names which read failed and leaves the customer subscription commercial untouched. |
+| Empty, first run (`?state=emptyFirstRun`) | No customer subscription commercial yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing. |
+| Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the customer subscription commercial are still there. Names the active filter and offers to clear it. |
+| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+Every customer subscription commercial:
+- Customer: Marina Leisure Group
+  Venue / Group: AquaCove Abu Dhabi
+  Country: 11
+  VSI: 74
+  Operational Profile: 74
+  Commercial Model: 128
+  Tier where applicable: 233
+  Contracted Rate: 94%
+- Customer: Desert Gate Tours LLC
+  Venue / Group: AquaCove Dubai
+  Country: 128
+  VSI: 19
+  Operational Profile: 19
+  Commercial Model: 46
+  Tier where applicable: 57
+  Contracted Rate: 87%
+- Customer: Arabian Trails
+  Venue / Group: AquaCove Muscat
+  Country: 46
+  VSI: 233
+  Operational Profile: 233
+  Commercial Model: 312
+  Tier where applicable: 11
+  Contracted Rate: 71%
+```
+
+#### Permissions
+
+- `listTenants` → `PLATFORM_TENANT_VIEW` (read) · staff
+
+**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+#### Requirements it meets
+
+No matrix row traces to this screen's operations or data.
+
+#### Client meeting inputs
+
+None names this screen.
+
+Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+
+#### Workshop task tracker
+
+No tracker row concerns this screen; the rows for its platform are listed once, below.
+
+#### References
+
+- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-370` · status **notStarted** · provenance —
+- Client workshop board: `wireframes/WS153 Subscription Licensing AI Self Service Board 1.dc.html#adm-370`
+- Workshop pack: Subscription_Licensing_AI_Self_Service.pdf board 1
+- Flow F207 *Subscription Licensing AI Self Service board 1: Commercial Command Center*, step 2: Works in Customer Subscription & Commercial Portfolio → Provide a central portfolio of every TICVAI customer and their current commercial position.
+
+#### Acceptance for the design
+
+- [ ] Every input above is drawn (2), with its required mark, default, format and its error state (403).
+- [ ] Every output is drawn (34 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every state opens from `#ADM-370?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
+- [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
+- [ ] Every transition is wired: `ADM-369`.
+- [ ] Every gated control is gated: `PLATFORM_TENANT_VIEW`.
+- [ ] The module and platform inputs below are applied.
+- [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
+
+---
+
+### `ADM-371` Customer Commercial 360°
+
+**Provide the complete commercial, operational and subscription profile for one customer. This screen must clearly separate commercial charging from technical/operational classification.**
+
+| | |
+|---|---|
+| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| Module | Tenants & Licensing · wave 3 · needs the `core` module |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Who uses it | ticvai staff holding `PLATFORM_TENANT_VIEW` (1 read); in the flows as platform admin |
+| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
+| Offline | online only |
+| Opens with | `tenantId` (session) |
+| Route | `/tenants-licensing/customer-commercial-360-adm-371` |
+
+**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+**From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** One customer's commercial, operational and subscription profile, keeping commercial charging separate from technical classification.
+
+**Fixed on main** (the package already carries these; draw what it says): emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything. (CHG-SBO-002).
+
+#### Inputs: what the user enters or picks
+
+Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+#### Outputs: what the screen shows and produces
+
+**Shown**
+
+**Detail panel** (detail panel): One record, read-only.
+
+**Data it reads**: `getSubscription` (onLoad, Commercial 360); `getEntitlementUsage` (onLoad, What they consume)
+
+**Where the user goes next**
+
+- → `ADM-369` Commercial Command Center: *Back to Commercial Command Center*
+
+#### States
+
+| State | What it shows |
+|---|---|
+| Loading (`?state=loading`) | The customer commercial 360° list. |
+| Error (`?state=error`) | Could not load. Names which read failed and leaves the customer commercial 360° untouched. |
+| Empty, first run (`?state=emptyFirstRun`) | No customer commercial 360° yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing. |
+| Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the customer commercial 360° are still there. Names the active filter and offers to clear it. |
+| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+getSubscription (Subscription):
+- planName: Growth
+  status: active
+  startsAt: 01/10/2026 09:14
+  renewsAt: 31/12/2026 23:59
+  cancelledAt: 01/10/2026 09:14
+  currentPrice: AED 1,250.00
+- planName: Enterprise
+  status: pending
+  startsAt: 30/09/2026 18:02
+  renewsAt: 15/10/2026 00:00
+  cancelledAt: 30/09/2026 18:02
+  currentPrice: AED 48,000.00
+```
+
+#### Permissions
+
+- `getSubscription` → `PLATFORM_TENANT_VIEW` (read) · staff
+- `getEntitlementUsage` → `PLATFORM_TENANT_VIEW` (read) · staff
+
+**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+#### Requirements it meets
+
+No matrix row traces to this screen's operations or data.
+
+#### Client meeting inputs
+
+For this screen, newest first. An **Open question** is built to the default it states. Where an item disagrees with the fields above, the item wins.
+
+- Per-customer billing view shows minimum billable volume (month-to-date) and variable/overage revenue; a customer profile consolidates all commercial and licensing information per client. *(client request · MoM 10 Sep 2026, 4.17 Licensing Command Center Overview · DI-839)*
+
+Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+
+#### Workshop task tracker
+
+No tracker row concerns this screen; the rows for its platform are listed once, below.
+
+#### References
+
+- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-371` · status **notStarted** · provenance —
+- Client workshop board: `wireframes/WS153 Subscription Licensing AI Self Service Board 1.dc.html#adm-371`
+- Workshop pack: Subscription_Licensing_AI_Self_Service.pdf board 1
+- Flow F207 *Subscription Licensing AI Self Service board 1: Commercial Command Center*, step 4: Works in Customer Commercial 360° → Provide the complete commercial, operational and subscription profile for one customer. This screen must clearly separate commercial charging from technical/operational classification.
+
+#### Acceptance for the design
+
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (404).
+- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every state opens from `#ADM-371?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
+- [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
+- [ ] Every transition is wired: `ADM-369`.
+- [ ] Every gated control is gated: `PLATFORM_TENANT_VIEW`.
+- [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
+
+---
+
+### `ADM-372` Operational Profile, VSI & Commercial Model Intelligence
+
+**Analyze whether customers' operational profiles and commercial structures remain appropriate. This replaces the previous focus only on Tier Distribution & VSI.**
+
+| | |
+|---|---|
+| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| Module | Tenants & Licensing · wave 3 · needs the `core` module |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Who uses it | ticvai staff holding `PLATFORM_PLAN_MANAGE` (1 configure); in the flows as platform admin |
+| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Pattern | commandCentre (compact density): the pack gives this screen a metric directory (§KPIs) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's |
+| Offline | online only |
+| Opens with | nothing: it opens on its own |
+| Route | `/tenants-licensing/operational-profile-vsi-commercial-model-intelligence-adm-372` |
+
+**From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** Whether customers' operational profiles and commercial models still fit (VSI, misalignment, upgrade and downgrade candidates).
+
+**Fixed on main** (the package already carries these; draw what it says): emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything. (CHG-SBO-002).
+
+#### Inputs: what the user enters or picks
+
+Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+#### Outputs: what the screen shows and produces
+
+**Shown**
+
+**Customers by VSI** (metric tile)
+
+**Customers by Operational Profile** (metric tile)
+
+**Customers by Commercial Model** (metric tile)
+
+**Average VSI** (metric tile)
+
+**Profile Misalignment** (metric tile)
+
+**Commercial Model Optimization Candidates** (metric tile)
+
+**Upgrade Candidates** (metric tile)
+
+**Downgrade Candidates** (metric tile)
+
+**Where the user goes next**
+
+- → `ADM-369` Commercial Command Center: *Back to Commercial Command Center*
+
+#### States
+
+| State | What it shows |
+|---|---|
+| Loading (`?state=loading`) | The operational profile vsi list; the counts above it resolve separately. |
+| Error (`?state=error`) | Could not load. Names which read failed and leaves the operational profile vsi untouched. |
+| Empty, first run (`?state=emptyFirstRun`) | **Nothing to show yet**: the figures fill as activity is recorded. Offers no create action — a monitor creates nothing — and says so rather than showing empty tiles. |
+| Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the operational profile vsi are still there. Names the active filter and offers to clear it. |
+| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+metric tiles:
+  Customers by VSI: 128
+  Customers by Operational Profile: 46
+  Customers by Commercial Model: 312
+  Average VSI: 3 h 20 min
+  Profile Misalignment: 19
+  Commercial Model Optimization Candidates: 233
+  Upgrade Candidates: 57
+  Downgrade Candidates: 11
+```
+
+#### Permissions
+
+- `scoreVsiAssessment` → `PLATFORM_PLAN_MANAGE` (configure) · staff, guest, prospect
+
+**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+#### Requirements it meets
+
+2 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+
+| Ref | Requirement (shortened) | Domain | Verdict | Via |
+|---|---|---|---|---|
+| 20.8.1 | AI Subscription Recommendations - System shall recommend optimal subscription plans. | Subscription & Licensing Management | CONTRACTED | `scoreVsiAssessment` |
+| 20.8.2 | AI Module Recommendations - System shall recommend marketplace modules. | Subscription & Licensing Management | CONTRACTED | `scoreVsiAssessment` |
+
+#### Client meeting inputs
+
+For this screen, newest first. An **Open question** is built to the default it states. Where an item disagrees with the fields above, the item wins.
+
+- Further views: tier distribution (customers per tier), subscription revenue by tier, tier/conversion trends, and a renewal & retention centre flagging upcoming renewals, at-risk accounts and optimisation opportunities. *(client request · MoM 10 Sep 2026, 4.17 Licensing Command Center Overview · DI-840)*
+- Tier thresholds map VSI ranges to tiers (0-30 Essential, 31-60 Professional, 61-80 Enterprise, 81-100 Enterprise Plus) with per-factor sub-thresholds (attendance 100-100,000 = 10 pts; 100,000-500,000 = 40); the system calculates the score and recommends the tier automatically. *(agreed · MoM 10 Sep 2026, 4.2 Venue Size Index (VSI) Model & Tier Threshold Configuration · DI-818)*
+
+Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+
+#### Workshop task tracker
+
+No tracker row concerns this screen; the rows for its platform are listed once, below.
+
+#### References
+
+- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-372` · status **notStarted** · provenance —
+- Client workshop board: `wireframes/WS153 Subscription Licensing AI Self Service Board 1.dc.html#adm-372`
+- Workshop pack: Subscription_Licensing_AI_Self_Service.pdf board 1
+- Flow F207 *Subscription Licensing AI Self Service board 1: Commercial Command Center*, step 6: Works in Operational Profile, VSI & Commercial Model Intelligence → Analyze whether customers' operational profiles and commercial structures remain appropriate. This replaces the previous focus only on Tier Distribution & VSI.
+
+#### Acceptance for the design
+
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
+- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every state opens from `#ADM-372?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
+- [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
+- [ ] Every transition is wired: `ADM-369`.
+- [ ] Every gated control is gated: `PLATFORM_PLAN_MANAGE`.
+- [ ] The 2 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
+
+---
+
+### `ADM-373` Revenue & Commercial Model Analytics
+
+**Analyze TICVAI revenue across all commercial structures.**
+
+| | |
+|---|---|
+| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| Module | Tenants & Licensing · wave 3 · needs the `core` module |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Who uses it | ticvai staff holding `PLATFORM_BILLING_VIEW` (1 read); in the flows as platform admin |
+| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Pattern | commandCentre (compact density): the pack gives this screen both a metric directory (§KPIs) and a per-row directory (§Show) — counts over a population, then the population |
+| Offline | online only |
+| Opens with | nothing: it opens on its own |
+| Route | `/tenants-licensing/revenue-commercial-model-analytics-adm-373` |
+
+**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
+
+**From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** TICVAI revenue by commercial structure: guaranteed versus variable, shortfall protection.
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- The table's columns are the workshop pack's labels with no bound response field (0 of 5 labels bound). (CHG-SBO-005)
+
+**Fixed on main** (the package already carries these; draw what it says): emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything. (CHG-SBO-002).
+
+#### Inputs: what the user enters or picks
+
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Period | text field | — | — | `getBillingReconciliation` ?period |
+
+Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+#### Outputs: what the screen shows and produces
+
+**Shown**
+
+**MRR / Monthly Equivalent** (metric tile)
+
+**ARR / ACV** (metric tile)
+
+**New Revenue** (metric tile)
+
+**Expansion Revenue** (metric tile)
+
+**Contraction Revenue** (metric tile)
+
+**Churned Revenue** (metric tile)
+
+**NRR** (metric tile)
+
+**ARPC** (metric tile)
+
+**Growth %** (metric tile)
+
+**Every revenue commercial model** (data table)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Guaranteed revenue | text | not in the schema: `Guaranteed Revenue` |
+| Actual variable revenue | text | not in the schema: `Actual Variable Revenue` |
+| Guarantee shortfall protection | text | not in the schema: `Guarantee Shortfall Protection` |
+| Contracts above guarantee | text | not in the schema: `Contracts Above Guarantee` |
+| Contracts at guarantee | text | not in the schema: `Contracts at Guarantee` |
+
+**The selected revenue commercial model** (detail panel): The pack groups this record's detail under its own headings: “Break down”, “Revenue by”.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Guaranteed revenue | text | not in the schema: `Guaranteed Revenue` |
+| Actual variable revenue | text | not in the schema: `Actual Variable Revenue` |
+| Guarantee shortfall protection | text | not in the schema: `Guarantee Shortfall Protection` |
+| Contracts above guarantee | text | not in the schema: `Contracts Above Guarantee` |
+| Contracts at guarantee | text | not in the schema: `Contracts at Guarantee` |
+
+**Rules for what is shown** (from the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process; these refine the tables above and win where they differ)
+
+- **Money columns (Actual Variable Revenue, Guaranteed Revenue)**: Money in the region's currency and scale, never a bare number: AED to 2 decimals, OMR/BHD/KWD to 3, the third decimal never rounded away (2.013 stays 2.013); the currency code is shown with the figure. Across tenants or regions figures in different currencies are never summed into one total; group by currency, or label the converted figure with its rate and time. *(source: ADR-0008; ADR-0011; DI-306)*
+
+**Data it reads**: `getBillingReconciliation` (onLoad, Revenue against metering)
+
+**Where the user goes next**
+
+- → `ADM-369` Commercial Command Center: *Back to Commercial Command Center*
+
+#### States
+
+| State | What it shows |
+|---|---|
+| Loading (`?state=loading`) | The revenue commercial model list; the counts above it resolve separately. |
+| Error (`?state=error`) | Could not load. Names which read failed and leaves the revenue commercial model untouched. |
+| Empty, first run (`?state=emptyFirstRun`) | **Nothing to show yet**: the figures fill as activity is recorded. Offers no create action — a monitor creates nothing — and says so rather than showing empty tiles. |
+| Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the revenue commercial model are still there. Names the active filter and offers to clear it. |
+| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+metric tiles:
+  MRR / Monthly Equivalent: AED 482,300.00
+  ARR / ACV: AED 96,750.00
+  New Revenue: AED 12,400.00
+  Expansion Revenue: AED 482,300.00
+  Contraction Revenue: AED 96,750.00
+  Churned Revenue: AED 12,400.00
+  NRR: 57
+  ARPC: 11
+  Growth %: 71%
+Every revenue commercial model:
+- Guaranteed Revenue: AED 482,300.00
+  Actual Variable Revenue: AED 12,400.00
+  Guarantee Shortfall Protection: AED 482,300.00
+  Contracts Above Guarantee: AED 96,750.00
+  Contracts at Guarantee: AED 96,750.00
+- Guaranteed Revenue: AED 96,750.00
+  Actual Variable Revenue: AED 482,300.00
+  Guarantee Shortfall Protection: AED 96,750.00
+  Contracts Above Guarantee: AED 12,400.00
+  Contracts at Guarantee: AED 12,400.00
+- Guaranteed Revenue: AED 12,400.00
+  Actual Variable Revenue: AED 96,750.00
+  Guarantee Shortfall Protection: AED 12,400.00
+  Contracts Above Guarantee: AED 482,300.00
+  Contracts at Guarantee: AED 482,300.00
+```
+
+#### Permissions
+
+- `getBillingReconciliation` → `PLATFORM_BILLING_VIEW` (read) · staff
+
+**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+#### Requirements it meets
+
+No matrix row traces to this screen's operations or data.
+
+#### Client meeting inputs
+
+For this screen, newest first. An **Open question** is built to the default it states. Where an item disagrees with the fields above, the item wins.
+
+- Further views: tier distribution (customers per tier), subscription revenue by tier, tier/conversion trends, and a renewal & retention centre flagging upcoming renewals, at-risk accounts and optimisation opportunities. *(client request · MoM 10 Sep 2026, 4.17 Licensing Command Center Overview · DI-840)*
+- Licensing command centre: total customers, active subscriptions/tiers, MRR broken down by pricing model (tier-based, tier-plus-usage, per-ticket, per-transaction, hybrid, fixed, custom). *(client request · MoM 10 Sep 2026, 4.17 Licensing Command Center Overview · DI-838)*
+
+Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+
+#### Workshop task tracker
+
+No tracker row concerns this screen; the rows for its platform are listed once, below.
+
+#### References
+
+- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-373` · status **notStarted** · provenance —
+- Client workshop board: `wireframes/WS153 Subscription Licensing AI Self Service Board 1.dc.html#adm-373`
+- Workshop pack: Subscription_Licensing_AI_Self_Service.pdf board 1
+- Flow F207 *Subscription Licensing AI Self Service board 1: Commercial Command Center*, step 8: Works in Revenue & Commercial Model Analytics → Analyze TICVAI revenue across all commercial structures.
+
+#### Acceptance for the design
+
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
+- [ ] Every output is drawn (10 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every state opens from `#ADM-373?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
+- [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
+- [ ] Every transition is wired: `ADM-369`.
+- [ ] Every gated control is gated: `PLATFORM_BILLING_VIEW`.
+- [ ] The 2 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
+
+---
+
+### `ADM-374` Trial & Conversion Monitor
+
+**Monitor trial customers and their expected transition into paid commercial agreements.**
+
+| | |
+|---|---|
+| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| Module | Tenants & Licensing · wave 3 · needs the `core` module |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Who uses it | ticvai staff holding `PLATFORM_TENANT_VIEW` (1 read); in the flows as platform admin |
+| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Pattern | commandCentre (compact density): the pack gives this screen a metric directory (§KPIs) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's |
+| Offline | online only |
+| Opens with | nothing: it opens on its own |
+| Route | `/tenants-licensing/trial-conversion-monitor-adm-374` |
+
+**Known gaps.** Removed 2 October 2026 (CHG-WIR-021): setTrialConfiguration on a monitor; trial rules are configured on ADM-413 and the monitor links there (design-notes correction platform-foundation ADM-374).
+
+**From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** Trials and their conversion to paid: setup completion, readiness, expiring trials.
+
+**Fixed on main** (the package already carries these; draw what it says): setTrialConfiguration on a monitor. (CHG-WIR-021).
+
+#### Inputs: what the user enters or picks
+
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Status | radio group | — | Onboarding · Active · Suspended · Terminating · Terminated | `listTenants` ?status |
+| Plan | picker: choose a plan | — | — | `listTenants` ?planId |
+
+Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+**Rules for these inputs** (from the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process; these refine the tables above and win where they differ)
+
+- **Scope this applies at**: Not a free choice; each write has one level and the selector says it: setTrialConfiguration: tenant-wide only, no region or venue override is offered. Nearest ancestor wins; a workstation is assigned a profile, never configured. *(source: ADR-0018; ADR-0029; screens/_patterns.yaml#configEditor; contracts/satellite/subscription.yaml#setTrialConfiguration)*
+
+#### Outputs: what the screen shows and produces
+
+**Shown**
+
+**Active Trials** (metric tile)
+
+**New Trials** (metric tile)
+
+**Expiring Trials** (metric tile)
+
+**Trial-to-Paid %** (metric tile)
+
+**Average Trial Duration** (metric tile)
+
+**Setup Completion** (metric tile)
+
+**Go-Live Readiness** (metric tile)
+
+**Estimated Conversion Value** (metric tile)
+
+**Data it reads**: `listTenants` (onLoad, Trials running)
+
+**Where the user goes next**
+
+- → `ADM-369` Commercial Command Center: *Back to Commercial Command Center*
+
+#### States
+
+| State | What it shows |
+|---|---|
+| Loading (`?state=loading`) | The trial conversion list; the counts above it resolve separately. |
+| Error (`?state=error`) | Could not load. Names which read failed and leaves the trial conversion untouched. |
+| Empty, first run (`?state=emptyFirstRun`) | No trial conversion yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing. |
+| Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the trial conversion are still there. Names the active filter and offers to clear it. |
+| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Offline (`?state=offline`) | online only |
+
+#### Edge cases to draw
+
+- **Can read but not change (holds PLATFORM_TENANT_VIEW only)**: Everything reads; the actions needing another permission are not offered as live buttons: PLATFORM_PLAN_MANAGE for setTrialConfiguration. Where the person would reasonably expect the action, it shows disabled with the permission named. The server refuses with 403 forbidden regardless. *(source: contracts/satellite/subscription.yaml#setTrialConfiguration)*
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+metric tiles:
+  Active Trials: 128
+  New Trials: 46
+  Expiring Trials: 312
+  Trial-to-Paid %: 94%
+  Average Trial Duration: 42 min
+  Setup Completion: 233
+  Go-Live Readiness: 94%
+  Estimated Conversion Value: AED 96,750.00
+```
+
+#### Permissions
+
+- `listTenants` → `PLATFORM_TENANT_VIEW` (read) · staff
+
+**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+#### Requirements it meets
+
+No matrix row traces to this screen's operations or data.
+
+#### Client meeting inputs
+
+For this screen, newest first. An **Open question** is built to the default it states. Where an item disagrees with the fields above, the item wins.
+
+- Back-end configuration access can optionally be added to the demo for qualified prospects at TICVAI's discretion; demo credentials can be scoped and time-limited (auto-expire after an evaluation period). *(agreed · MoM 10 Sep 2026, 4.11 Demo Environment Scope · DI-832)*
+- "Try it" is a single shared, pre-configured demo (sample products, working POS/admin sales flow, reporting) entered with shared credentials - evaluation only, cannot sell real tickets; not a per-prospect trial tenant. *(agreed · MoM 10 Sep 2026, 4.11 Demo Environment Scope · DI-831)*
+
+Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+
+#### Workshop task tracker
+
+No tracker row concerns this screen; the rows for its platform are listed once, below.
+
+#### References
+
+- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-374` · status **notStarted** · provenance —
+- Client workshop board: `wireframes/WS153 Subscription Licensing AI Self Service Board 1.dc.html#adm-374`
+- Workshop pack: Subscription_Licensing_AI_Self_Service.pdf board 1
+- Flow F207 *Subscription Licensing AI Self Service board 1: Commercial Command Center*, step 10: Works in Trial & Conversion Monitor → Monitor trial customers and their expected transition into paid commercial agreements.
+
+#### Acceptance for the design
+
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (403).
+- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every state opens from `#ADM-374?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
+- [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
+- [ ] Every transition is wired: `ADM-369`.
+- [ ] Every gated control is gated: `PLATFORM_TENANT_VIEW`.
+- [ ] The 2 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 1 edge case(s) from the process notes are drawn.
+- [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
+
+---
+
+### `ADM-375` Renewal & Retention Center
+
+**Manage upcoming renewals and identify retention or commercial restructuring requirements.**
+
+| | |
+|---|---|
+| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| Module | Tenants & Licensing · wave 3 · needs the `core` module |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Who uses it | ticvai; in the flows as platform admin |
+| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Pattern | commandCentre (compact density): the pack gives this screen both a metric directory (§KPIs) and a per-row directory (§Columns) — counts over a population, then the population |
+| Offline | online only |
+| Opens with | nothing: it opens on its own |
+| Route | `/tenants-licensing/renewal-retention-center-adm-375` |
+
+**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape … Removed 2 October 2026 (CHG-WIR-021): listMembershipRenewalRetention is the guest membership renewal and retention read (BO-303); TICVAI's customer renewals are tenant subscriptions, not guest … Contract gap recorded 2 October 2026 (CHG-WIR-024): A cross-tenant read of subscriptions approaching renewal (term end, auto-renew, value, retention risk), paged; getSubscription reads one tenant …
+
+**From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** TICVAI customer renewals in the next 30/60/90 days with value, usage trend, payment health and risk.
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- The table's columns are the workshop pack's labels with no bound response field (0 of 11 labels bound). (CHG-SBO-005)
+
+**Fixed on main** (the package already carries these; draw what it says): Uses listMembershipRenewalRetention, the guest membership read. (CHG-WIR-021); emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything. (CHG-SBO-002).
+
+#### Inputs: what the user enters or picks
+
+Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+#### Outputs: what the screen shows and produces
+
+**Shown**
+
+**Renewals Next 30 Days** (metric tile)
+
+**Next 60 Days** (metric tile)
+
+**Next 90 Days** (metric tile)
+
+**Renewal Value** (metric tile)
+
+**Renewal Rate** (metric tile)
+
+**At-Risk Revenue** (metric tile)
+
+**Auto-Renew Value** (metric tile)
+
+**Expansion Opportunity** (metric tile)
+
+**Optimization Opportunity** (metric tile)
+
+**Every renewal retention** (data table)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Customer | text | not in the schema: `Customer` |
+| Commercial model | text | not in the schema: `Commercial Model` |
+| Current rate | text | not in the schema: `Current Rate` |
+| Minimum guarantee | text | not in the schema: `Minimum Guarantee` |
+| Monthly equivalent | text | not in the schema: `Monthly Equivalent` |
+| Contract value | text | not in the schema: `Contract Value` |
+| Renewal date | text | not in the schema: `Renewal Date` |
+| Usage trend | text | not in the schema: `Usage Trend` |
+| Payment health | text | not in the schema: `Payment Health` |
+| Risk | text | not in the schema: `Risk` |
+| AI recommendation | text | not in the schema: `AI Recommendation` |
+
+**The selected renewal retention** (detail panel): The pack groups this record's detail under its own headings: “Retention Signals”.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Customer | text | not in the schema: `Customer` |
+| Commercial model | text | not in the schema: `Commercial Model` |
+| Current rate | text | not in the schema: `Current Rate` |
+| Minimum guarantee | text | not in the schema: `Minimum Guarantee` |
+| Monthly equivalent | text | not in the schema: `Monthly Equivalent` |
+| Contract value | text | not in the schema: `Contract Value` |
+| Renewal date | text | not in the schema: `Renewal Date` |
+| Usage trend | text | not in the schema: `Usage Trend` |
+| Payment health | text | not in the schema: `Payment Health` |
+| Risk | text | not in the schema: `Risk` |
+| AI recommendation | text | not in the schema: `AI Recommendation` |
+
+**Rules for what is shown** (from the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process; these refine the tables above and win where they differ)
+
+- **Money columns (Contract Value)**: Money in the region's currency and scale, never a bare number: AED to 2 decimals, OMR/BHD/KWD to 3, the third decimal never rounded away (2.013 stays 2.013); the currency code is shown with the figure. Across tenants or regions figures in different currencies are never summed into one total; group by currency, or label the converted figure with its rate and time. *(source: ADR-0008; ADR-0011; DI-306)*
+
+**Where the user goes next**
+
+- → `ADM-369` Commercial Command Center: *Back to Commercial Command Center*
+
+#### States
+
+| State | What it shows |
+|---|---|
+| Loading (`?state=loading`) | The renewal retention list; the counts above it resolve separately. |
+| Error (`?state=error`) | Could not load. Names which read failed and leaves the renewal retention untouched. |
+| Empty, first run (`?state=emptyFirstRun`) | **Nothing to show yet**: the figures fill as activity is recorded. Offers no create action — a monitor creates nothing — and says so rather than showing empty tiles. |
+| Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the renewal retention are still there. Names the active filter and offers to clear it. |
+| Permission denied (`?state=emptyNoAccess`) | Not shown: nothing on this screen needs a permission of its own; the app's sign-in decides access. |
+| Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+metric tiles:
+  Renewals Next 30 Days: 128
+  Next 60 Days: 46
+  Next 90 Days: 312
+  Renewal Value: AED 482,300.00
+  Renewal Rate: 87%
+  At-Risk Revenue: AED 12,400.00
+  Auto-Renew Value: AED 482,300.00
+  Expansion Opportunity: 11
+  Optimization Opportunity: 128
+Every renewal retention:
+- Customer: Marina Leisure Group
+  Commercial Model: 128
+  Current Rate: 94%
+  Minimum Guarantee: AED 12,400.00
+  Monthly Equivalent: 312
+  Contract Value: AED 12,400.00
+  Renewal Date: 01/10/2026 09:14
+  Usage Trend: +6.2%
+- Customer: Desert Gate Tours LLC
+  Commercial Model: 46
+  Current Rate: 87%
+  Minimum Guarantee: AED 482,300.00
+  Monthly Equivalent: 74
+  Contract Value: AED 482,300.00
+  Renewal Date: 30/09/2026 18:02
+  Usage Trend: -1.4%
+- Customer: Arabian Trails
+  Commercial Model: 312
+  Current Rate: 71%
+  Minimum Guarantee: AED 96,750.00
+  Monthly Equivalent: 19
+  Contract Value: AED 96,750.00
+  Renewal Date: 28/09/2026 11:45
+  Usage Trend: +12.0%
+```
+
+#### Permissions
+
+**A refused user sees:** Not shown: nothing on this screen needs a permission of its own; the app's sign-in decides access.
+
+#### Requirements it meets
+
+No matrix row traces to this screen's operations or data.
+
+#### Client meeting inputs
+
+For this screen, newest first. An **Open question** is built to the default it states. Where an item disagrees with the fields above, the item wins.
+
+- Further views: tier distribution (customers per tier), subscription revenue by tier, tier/conversion trends, and a renewal & retention centre flagging upcoming renewals, at-risk accounts and optimisation opportunities. *(client request · MoM 10 Sep 2026, 4.17 Licensing Command Center Overview · DI-840)*
+
+Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+
+#### Workshop task tracker
+
+No tracker row concerns this screen; the rows for its platform are listed once, below.
+
+#### References
+
+- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-375` · status **notStarted** · provenance —
+- Client workshop board: `wireframes/WS153 Subscription Licensing AI Self Service Board 1.dc.html#adm-375`
+- Workshop pack: Subscription_Licensing_AI_Self_Service.pdf board 1
+- Flow F207 *Subscription Licensing AI Self Service board 1: Commercial Command Center*, step 12: Works in Renewal & Retention Center → Manage upcoming renewals and identify retention or commercial restructuring requirements.
+
+#### Acceptance for the design
+
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
+- [ ] Every output is drawn (22 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every state opens from `#ADM-375?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
+- [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
+- [ ] Every transition is wired: `ADM-369`.
+- [ ] Sign-in is asked only where the spec asks for it.
+- [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
+
+---
+
+### `ADM-376` Commercial Optimization & Expansion Opportunities
+
+**Identify opportunities beyond traditional tier upgrades. This is a key revision from the original Upgrade, Downgrade & Expansion Opportunities screen.**
+
+| | |
+|---|---|
+| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| Module | Tenants & Licensing · wave 3 · needs the `core` module |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Who uses it | ticvai; in the flows as platform admin |
+| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Pattern | commandCentre (compact density): the pack gives this screen both a metric directory (§Opportunity KPIs) and a per-row directory (§Show) — counts over a population, then the population |
+| Offline | online only |
+| Opens with | nothing: it opens on its own |
+| Route | `/tenants-licensing/commercial-optimization-expansion-opportunities-adm-376` |
+
+**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape … Removed 2 October 2026 (CHG-WIR-021): listRenewalAuto is the guest membership renewal queue (memberships approaching expiry, BO-300); a TICVAI commercial optimisation and expansion screen is about … Contract gap recorded 2 October 2026 (CHG-WIR-024): A cross-tenant read of commercial opportunities (expansion, module, model and cost optimisation, retention value), paged.
+
+**From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** Commercial optimisation and expansion opportunities with cost and revenue impact.
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- The table's columns are the workshop pack's labels with no bound response field (0 of 6 labels bound). (CHG-SBO-005)
+
+**Fixed on main** (the package already carries these; draw what it says): Uses listRenewalAuto (guest membership renewals). (CHG-WIR-021); emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything. (CHG-SBO-002).
+
+#### Inputs: what the user enters or picks
+
+Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+#### Outputs: what the screen shows and produces
+
+**Shown**
+
+**Total Opportunities** (metric tile)
+
+**Potential Expansion Revenue** (metric tile)
+
+**Potential Retention Value** (metric tile)
+
+**Model Optimization Opportunities** (metric tile)
+
+**Module Opportunities** (metric tile)
+
+**Cost Optimization Opportunities** (metric tile)
+
+**Every commercial optimization expansion** (data table)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Current customer cost | text | not in the schema: `Current Customer Cost` |
+| Proposed customer cost | text | not in the schema: `Proposed Customer Cost` |
+| TICVAI revenue impact | text | not in the schema: `TICVAI Revenue Impact` |
+| Minimum revenue protection | text | not in the schema: `Minimum Revenue Protection` |
+| Customer saving/increase | text | not in the schema: `Customer Saving/Increase` |
+| Confidence | text | not in the schema: `Confidence` |
+
+**The selected commercial optimization expansion** (detail panel): The pack groups this record's detail under its own headings: “Opportunity Types”, “Current”, “Projected Volume”.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Current customer cost | text | not in the schema: `Current Customer Cost` |
+| Proposed customer cost | text | not in the schema: `Proposed Customer Cost` |
+| TICVAI revenue impact | text | not in the schema: `TICVAI Revenue Impact` |
+| Minimum revenue protection | text | not in the schema: `Minimum Revenue Protection` |
+| Customer saving/increase | text | not in the schema: `Customer Saving/Increase` |
+| Confidence | text | not in the schema: `Confidence` |
+
+**Rules for what is shown** (from the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process; these refine the tables above and win where they differ)
+
+- **Money columns (Current Customer Cost, Proposed Customer Cost)**: Money in the region's currency and scale, never a bare number: AED to 2 decimals, OMR/BHD/KWD to 3, the third decimal never rounded away (2.013 stays 2.013); the currency code is shown with the figure. Across tenants or regions figures in different currencies are never summed into one total; group by currency, or label the converted figure with its rate and time. *(source: ADR-0008; ADR-0011; DI-306)*
+
+**Where the user goes next**
+
+- → `ADM-369` Commercial Command Center: *Back to Commercial Command Center*
+
+#### States
+
+| State | What it shows |
+|---|---|
+| Loading (`?state=loading`) | The commercial optimization expansion list; the counts above it resolve separately. |
+| Error (`?state=error`) | Could not load. Names which read failed and leaves the commercial optimization expansion untouched. |
+| Empty, first run (`?state=emptyFirstRun`) | **Nothing to show yet**: the figures fill as activity is recorded. Offers no create action — a monitor creates nothing — and says so rather than showing empty tiles. |
+| Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the commercial optimization expansion are still there. Names the active filter and offers to clear it. |
+| Permission denied (`?state=emptyNoAccess`) | Not shown: nothing on this screen needs a permission of its own; the app's sign-in decides access. |
+| Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+metric tiles:
+  Total Opportunities: 128
+  Potential Expansion Revenue: AED 96,750.00
+  Potential Retention Value: AED 12,400.00
+  Model Optimization Opportunities: 74
+  Module Opportunities: 19
+  Cost Optimization Opportunities: AED 12,400.00
+Every commercial optimization expansion:
+- Current Customer Cost: Marina Leisure Group
+  Proposed Customer Cost: Marina Leisure Group
+  TICVAI Revenue Impact: AED 482,300.00
+  Minimum Revenue Protection: AED 12,400.00
+  Customer Saving/Increase: Marina Leisure Group
+  Confidence: 92%
+- Current Customer Cost: Desert Gate Tours LLC
+  Proposed Customer Cost: Desert Gate Tours LLC
+  TICVAI Revenue Impact: AED 96,750.00
+  Minimum Revenue Protection: AED 482,300.00
+  Customer Saving/Increase: Desert Gate Tours LLC
+  Confidence: 78%
+- Current Customer Cost: Arabian Trails
+  Proposed Customer Cost: Arabian Trails
+  TICVAI Revenue Impact: AED 12,400.00
+  Minimum Revenue Protection: AED 96,750.00
+  Customer Saving/Increase: Arabian Trails
+  Confidence: 64%
+```
+
+#### Permissions
+
+**A refused user sees:** Not shown: nothing on this screen needs a permission of its own; the app's sign-in decides access.
+
+#### Requirements it meets
+
+No matrix row traces to this screen's operations or data.
+
+#### Client meeting inputs
+
+For this screen, newest first. An **Open question** is built to the default it states. Where an item disagrees with the fields above, the item wins.
+
+- Further views: tier distribution (customers per tier), subscription revenue by tier, tier/conversion trends, and a renewal & retention centre flagging upcoming renewals, at-risk accounts and optimisation opportunities. *(client request · MoM 10 Sep 2026, 4.17 Licensing Command Center Overview · DI-840)*
+
+Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+
+#### Workshop task tracker
+
+No tracker row concerns this screen; the rows for its platform are listed once, below.
+
+#### References
+
+- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-376` · status **notStarted** · provenance —
+- Client workshop board: `wireframes/WS153 Subscription Licensing AI Self Service Board 1.dc.html#adm-376`
+- Workshop pack: Subscription_Licensing_AI_Self_Service.pdf board 1
+- Flow F207 *Subscription Licensing AI Self Service board 1: Commercial Command Center*, step 14: Works in Commercial Optimization & Expansion Opportunities → Identify opportunities beyond traditional tier upgrades. This is a key revision from the original Upgrade, Downgrade & Expansion Opportunities screen.
+
+#### Acceptance for the design
+
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
+- [ ] Every output is drawn (12 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every state opens from `#ADM-376?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
+- [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
+- [ ] Every transition is wired: `ADM-369`.
+- [ ] Sign-in is asked only where the spec asks for it.
+- [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
+
+---
+
+### `ADM-377` Subscription Exceptions & Commercial Alerts
+
+**Provide management with one consolidated view of subscription, licensing, commercial, billing and metering exceptions.**
+
+| | |
+|---|---|
+| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| Module | Tenants & Licensing · wave 3 · needs the `core` module |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Who uses it | ticvai staff holding `PLATFORM_BILLING_VIEW`, `PLATFORM_PLAN_MANAGE` (1 read, 1 configure); in the flows as platform admin |
+| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
+| Offline | online only |
+| Opens with | nothing: it opens on its own |
+| Route | `/tenants-licensing/subscription-exceptions-commercial-alerts-adm-377` |
+
+**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+**From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** Subscription, licensing, billing and metering exceptions in one list.
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- Only simulateCommercialPackage. (CHG-SBO-005)
+
+**Fixed on main** (the package already carries these; draw what it says): emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything. (CHG-SBO-002).
+
+#### Inputs: what the user enters or picks
+
+Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+#### Outputs: what the screen shows and produces
+
+**Shown**
+
+**Licence and usage alerts** (detail panel, from `getLicenceEnforcement`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| Units | list or chips (count when long) | — |
+| Unit | text | — |
+| Allowance | 1,234 | — |
+| Consumed | 1,234 | — |
+| Percent used | 12.5% | — |
+| Projected at period end | 1,234 | — |
+| State | chip: Within allowance, Approaching, At limit, Overage | — |
+| Next action | text | — |
+| Overage charge | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Minimum guarantee met | yes / no (icon or chip) | — |
+| Alerts raised | 1,234 | — |
+
+**Actions and what each produces**
+
+| Action | Calls | Sends | On success returns | Errors to show | Notes |
+|---|---|---|---|---|---|
+|  (primary button) | navigation or local | — | — | — | — |
+| Cancel (secondary button) | navigation or local | — | — | — | — |
+
+**Data it reads**: `getLicenceEnforcement` (onLoad, Tenants approaching, at or over their entitlements, and the …)
+
+**Where the user goes next**
+
+- → `ADM-369` Commercial Command Center: *Back to Commercial Command Center*
+
+#### States
+
+| State | What it shows |
+|---|---|
+| Loading (`?state=loading`) | The subscription exceptions commercial list. |
+| Error (`?state=error`) | Could not load. Names which read failed and leaves the subscription exceptions commercial untouched. |
+| Empty, first run (`?state=emptyFirstRun`) | No subscription exceptions commercial yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing. |
+| Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the subscription exceptions commercial are still there. Names the active filter and offers to clear it. |
+| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+exceptions:
+- customer: Gulf Fun Parks LLC
+  type: Metering gap
+  detail: No ticket events for 6 h
+- customer: Marina Leisure Group
+  type: Invoice disputed
+```
+
+#### Permissions
+
+- `simulateCommercialPackage` → `PLATFORM_PLAN_MANAGE` (configure) · staff, guest, prospect
+- `getLicenceEnforcement` → `PLATFORM_BILLING_VIEW` (read) · staff
+
+**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+#### Requirements it meets
+
+1 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+
+| Ref | Requirement (shortened) | Domain | Verdict | Via |
+|---|---|---|---|---|
+| 20.8.3 | AI Usage Forecasting - System shall forecast future platform consumption. | Subscription & Licensing Management | CONTRACTED | `getLicenceEnforcement` |
+
+#### Client meeting inputs
+
+None names this screen.
+
+Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+
+#### Workshop task tracker
+
+No tracker row concerns this screen; the rows for its platform are listed once, below.
+
+#### References
+
+- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-377` · status **notStarted** · provenance —
+- Client workshop board: `wireframes/WS153 Subscription Licensing AI Self Service Board 1.dc.html#adm-377`
+- Workshop pack: Subscription_Licensing_AI_Self_Service.pdf board 1
+- Flow F207 *Subscription Licensing AI Self Service board 1: Commercial Command Center*, step 16: Works in Subscription Exceptions & Commercial Alerts → Provide management with one consolidated view of subscription, licensing, commercial, billing and metering exceptions.
+
+#### Acceptance for the design
+
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
+- [ ] Every output is drawn (12 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every state opens from `#ADM-377?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
+- [ ] Every action is wired with its success and its failure: , Cancel.
+- [ ] Every transition is wired: `ADM-369`.
+- [ ] Every gated control is gated: `PLATFORM_BILLING_VIEW`, `PLATFORM_PLAN_MANAGE`.
+- [ ] The module and platform inputs below are applied.
+- [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
+
+---
+
+### `ADM-378` Executive AI Commercial Intelligence
+
+**Provide TICVAI leadership with an AI-powered executive commercial intelligence layer. Allow a new customer to register, describe their venue/business, and let TICVAI intelligently determine their operational requirements before calculating the VSI, recommending a subscription tier, and suggesting modules.**
+
+| | |
+|---|---|
+| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| Module | Tenants & Licensing · wave 3 · needs the `core` module |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Who uses it | ticvai staff holding `PLATFORM_BILLING_VIEW` (1 read); in the flows as platform admin |
+| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Pattern | commandCentre (compact density): the pack gives this screen a metric directory (§Customer Metrics; Revenue Metrics; Variable Commercial Metrics) and no per-row directory — measures over a population the screen does not itself list. … |
+| Offline | online only |
+| Opens with | nothing: it opens on its own |
+| Route | `/tenants-licensing/executive-ai-commercial-intelligence-adm-378` |
+
+**Known gaps.** **The pack names 1 actions on this screen and the screen declares 0 operations.** Unserved: Board 1 — Standardized Commercial Metrics. Each needs an operation, or needs removing from the screen; this …
+
+**From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** AI commercial intelligence for TICVAI leadership, with licence enforcement positions and plan recommendations.
+
+**Fixed on main** (the package already carries these; draw what it says): emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything. (CHG-SBO-002).
+
+#### Inputs: what the user enters or picks
+
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Horizon months | stepper or slider | 3 | min 1; max 12 | `getPlanRecommendations` ?horizonMonths |
+| Kind | select | — | Upgrade · Downgrade · Add module · Remove module · Remove add on · Capacity pack | `getPlanRecommendations` ?kind |
+
+Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+#### Outputs: what the screen shows and produces
+
+**Shown**
+
+**Active Customers** (metric tile)
+
+**New Customers** (metric tile)
+
+**Churned Customers** (metric tile)
+
+**Trials** (metric tile)
+
+**Conversion** (metric tile)
+
+**MRR / Monthly Equivalent Revenue** (metric tile)
+
+**ARR / ACV** (metric tile)
+
+**New Revenue** (metric tile)
+
+**Expansion** (metric tile)
+
+**Contraction** (metric tile)
+
+**Churn** (metric tile)
+
+**NRR** (metric tile)
+
+**ARPC** (metric tile)
+
+**Billable Tickets** (metric tile)
+
+**Billable Transactions** (metric tile)
+
+**Eligible Transaction Value** (metric tile)
+
+**Variable Revenue** (metric tile)
+
+**Minimum Guaranteed Revenue** (metric tile)
+
+**Guarantee Utilization** (metric tile)
+
+**Revenue Above Guarantee** (metric tile)
+
+**VSI** (metric tile)
+
+**Operational Profile** (metric tile)
+
+**POS Utilization** (metric tile)
+
+**Access Utilization** (metric tile)
+
+**User Utilization** (metric tile)
+
+**API** (metric tile)
+
+**Storage** (metric tile)
+
+**Admissions** (metric tile)
+
+**Renewal Risk** (metric tile)
+
+**Expansion Probability** (metric tile)
+
+**Model Optimization Opportunity** (metric tile)
+
+**Cost Optimization** (metric tile)
+
+**Upgrade/Downgrade Probability** (metric tile)
+
+**Commercial Health** (metric tile)
+
+**Actions and what each produces**
+
+| Action | Calls | Sends | On success returns | Errors to show | Notes |
+|---|---|---|---|---|---|
+| Board 1 — Standardized Commercial Metrics (primary button) | navigation or local | — | — | — | — |
+
+**Rules for what is shown** (from the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process; these refine the tables above and win where they differ)
+
+- **Enforcement**: Approaching, at and over a limit are three states; hard stop is off by default and every enforcement action is alerted. *(source: contracts/satellite/subscription.yaml#getLicenceEnforcement)*
+
+**Data it reads**: `getLicenceEnforcement` (onLoad, Exceptions and overage); `getPlanRecommendations` (onLoad, Commercial recommendations beside the enforcement position)
+
+**Where the user goes next**
+
+- → `ADM-369` Commercial Command Center: *Back to Commercial Command Center*
+
+#### States
+
+| State | What it shows |
+|---|---|
+| Loading (`?state=loading`) | The executive commercial intelligence list; the counts above it resolve separately. |
+| Error (`?state=error`) | Could not load. Names which read failed and leaves the executive commercial intelligence untouched. |
+| Empty, first run (`?state=emptyFirstRun`) | **Nothing to show yet**: the figures fill as activity is recorded. Offers no create action — a monitor creates nothing — and says so rather than showing empty tiles. |
+| Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the executive commercial intelligence are still there. Names the active filter and offers to clear it. |
+| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+metric tiles:
+  Active Customers: 128
+  New Customers: 46
+  Churned Customers: 5
+  Trials: 74
+  Conversion: 19
+  MRR / Monthly Equivalent Revenue: AED 12,400.00
+  ARR / ACV: AED 482,300.00
+  New Revenue: AED 96,750.00
+  Expansion: 128
+  Contraction: 46
+```
+
+#### Permissions
+
+- `getLicenceEnforcement` → `PLATFORM_BILLING_VIEW` (read) · staff
+- `getPlanRecommendations` → `PLATFORM_BILLING_VIEW` (read) · staff
+
+**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+#### Requirements it meets
+
+3 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+
+| Ref | Requirement (shortened) | Domain | Verdict | Via |
+|---|---|---|---|---|
+| 20.8.3 | AI Usage Forecasting - System shall forecast future platform consumption. | Subscription & Licensing Management | CONTRACTED | `getLicenceEnforcement` |
+| 20.8.4 | AI Upgrade Recommendations - System shall recommend subscription upgrades. | Subscription & Licensing Management | CONTRACTED | `getPlanRecommendations` |
+| 20.8.5 | AI Cost Optimization - System shall recommend cost optimization opportunities. | Subscription & Licensing Management | CONTRACTED | `getPlanRecommendations` |
+
+#### Client meeting inputs
+
+None names this screen.
+
+Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+
+#### Workshop task tracker
+
+No tracker row concerns this screen; the rows for its platform are listed once, below.
+
+#### References
+
+- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-378` · status **notStarted** · provenance —
+- Client workshop board: `wireframes/WS153 Subscription Licensing AI Self Service Board 1.dc.html#adm-378`
+- Workshop pack: Subscription_Licensing_AI_Self_Service.pdf board 1
+- Flow F207 *Subscription Licensing AI Self Service board 1: Commercial Command Center*, step 18: Works in Executive AI Commercial Intelligence → Provide TICVAI leadership with an AI-powered executive commercial intelligence layer.
+
+#### Acceptance for the design
+
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (403, 404).
+- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every state opens from `#ADM-378?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
+- [ ] Every action is wired with its success and its failure: Board 1 — Standardized Commercial ….
+- [ ] Every transition is wired: `ADM-369`.
+- [ ] Every gated control is gated: `PLATFORM_BILLING_VIEW`.
+- [ ] The module and platform inputs below are applied.
+- [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
+
+---
+
+
+
+## Reference designs and the trackers for this platform
+
+**P09 reference designs** (from `handoff/design-batches/apps/6-ticvai-controller/README.md`)
+
+- `sources/designs/TICVAI_POS_Terminal_client_approved.html`: the client-approved POS, for operator density and components.
+- `sources/designs/TICVAI_Mobile.dc.html`: for finish and motion.
+
+**Design Vision Book rules that apply** (`sources/designs/Ticvai_Design_Vision_Book_v1_1.pdf`): DI-021, DI-022, DI-023, DI-024, DI-025, DI-027, DI-028, DI-029, DI-032, DI-033, DI-034, DI-036, DI-037, DI-038, DI-039, DI-040, DI-041, DI-042, DI-044, DI-045, DI-046, DI-047, DI-048, DI-049, DI-050, DI-051 (each is in the design inputs below).
+
+## Design inputs from the client meetings
+
+**What the client asked for in the meetings and design reviews, for these screens.** Apply every item. They are the client's own requirements and they are later than the reference files: where a reference design or a screen's fields disagree with an item here, the item wins. Newest first; where two items disagree, the newer one wins (anything a later meeting replaced is already left out). An **Open question** is not settled: build the default it states and keep it easy to change. The text in brackets is for traceability and, like everything else in this bundle, never appears on a screen.
+
+### Everywhere, on every app
+
+- Allam (platform-wide requirement): every calendar throughout the platform, not just maintenance, must support day, week and month views, with the day view further broken down by hour from a defined start hour through the day. *(agreed · MoM 17 Sep 2026, 4.2 Preventive Maintenance Planning · DI-907)*
+- Minimise the number of separate screens an end user navigates: consolidate related information wherever it can reasonably be shown together, rather than mirroring every workshop board as its own screen. *(agreed · MoM 7 Sep 2026, 4.10 Screen consolidation / 5. Key Decisions · DI-671)*
+- Region-configurable tax on pre-discount price (e.g. Egypt: AED 100 ticket with 20% off is paid at AED 80 but taxed on AED 100). Rounding must support up to three decimal places without dropping the third decimal where the currency requires it. *(agreed · MoM 1 Sep 2026, 4.5 Taxes, Fees & Price Calculation · DI-598)*
+- "Powered by TICVAI" is shown consistently across staff and guest-facing surfaces. *(agreed · MoM 14 Aug 2026, 8. POS / Kiosk Branding · DI-297)*
+- Full multi-language support (Arabic and others such as Chinese) consistent with the agreed i18n/RTL architecture. *(agreed · MoM 10 Aug 2026, 4.7 Account Creation, Localisation & Multi-Currency · DI-210)*
+- The reference system is a functional reference only: its dated UI/UX is not to be replicated; TICVAI delivers equivalent depth with a modern, AI-friendly, easy-to-configure experience. *(agreed · MoM 7 Aug 2026, 23. Reference System Access & Documentation · DI-186)*
+- Direction: modern, minimalistic, spacious, cross-device designs that still convey a sense of place (venue or park); Softlabs proposes two to three enhanced visual concepts for TICVAI to steer. *(agreed · MoM 3 Aug 2026, 11. Design Alignment & Team Input · DI-126)*
+- Languages: English and Arabic at minimum, with Russian, Spanish and Mandarin. *(agreed · MoM 31 Jul 2026, 13. Internationalization & Localization · DI-080)*
+- Clarity first; reduce cognitive load (simple layouts, familiar patterns); consistency ("Use the system. Do not recreate."); accessibility; hierarchy (guide attention with contrast, spacing and visual weight); feedback (every action has a clear response). *(agreed · Design Vision Book 29 Jul 2026, 08 Design System (p8) - Design Principles in Action · DI-051)*
+- Standard components: search bar with Cmd+K; tabs (Overview, Events, Sales, Reports); pagination; badges (New, Pending, Sold Out, Completed); toggle (Off/On); dropdown; removable chip ("VIP x"). *(agreed · Design Vision Book 29 Jul 2026, 08 Design System (p8) - Example UI Components · DI-050)*
+- Spacing on an 8px base grid: 4, 8, 12, 16, 24, 32, 40, 48, 64, 80. Border radius scale 4, 8, 12, 16, 24px, consistent across the platform. Soft shadows: sm 0 1px 2px rgba(0,0,0,.05); md 0 4px 6px rgba(0,0,0,.08); lg 0 10px 15px rgba(0,0,0,.10); xl 0 20px 40px rgba(0,0,0,.14). *(agreed · Design Vision Book 29 Jul 2026, 08 Design System (p8) - 6. Spacing / 7. Border Radius / 8. Shadows · DI-049)*
+- Icons: line style, outline, 2px stroke, round corners, clean and consistent. *(agreed · Design Vision Book 29 Jul 2026, 08 Design System (p8) - 5. Icons · DI-048)*
+- Component principles: clarity first; consistent spacing on an 8px grid; meaningful colour (colours communicate status and guide the user); accessible by design; mobile ready (components adapt across all screen sizes). Components are consistent, flexible, accessible and composable. *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - Component principles · DI-045)*
+- Empty states have a title, one explanatory line and one action: "No events yet / Create your first event to get started / Create Event"; "No data available / We couldn't find anything to show here / Refresh". *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - Empty States · DI-044)*
+- Notification list: status icon, title, one-line detail and relative time (e.g. "Payment received ... 2m ago", "High demand detected ... 10m ago"), with "View all notifications". *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - Notifications · DI-042)*
+- Forms: label above field; text input, select ("Choose an option"), date picker, toggle, checkbox. Input states: Default, Focused, Filled, Disabled and Error with inline message (e.g. "This field is required"). *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - Forms; 08 Design System (p8) - 4. Inputs · DI-040)*
+- Card types: event card (title, date and time, venue, "From 120.00 AED"); KPI card (label, value, delta, "vs last 7 days"); onboarding checklist card ("3 of 6 completed": Create Event, Add Staff, Configure Seating, Connect Payment). *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - Cards · DI-038)*
+- Button hierarchy Primary, Secondary, Tertiary (text) and Icon buttons, each with Default, Hover, Pressed and Disabled states. *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - Buttons; 08 Design System (p8) - 3. Buttons · DI-036)*
+- Regardless of the module a user is working in, the experience should feel like one product, not a collection of separate applications. *(agreed · Design Vision Book 29 Jul 2026, 07 Modules Overview (p7) · DI-034)*
+- DO: focus on clarity and hierarchy, use clear simple interactive elements, give relevant information at a glance (card example: "Annual Membership / All Venues / 4.4 (388) / BESTSELLER"). DON'T: clutter and overload (e.g. "-10% NEW PROMO AED 450.00 !!! BOOK NOW!!!"), complex forms and flows, hard-to-read data visualisations. *(agreed · Design Vision Book 29 Jul 2026, 05 Design Principles (p5) - DO / DON'T · DI-033)*
+- Eight principles on every screen: User-Centric, AI-First, Simple & Clear (clean layouts, clear hierarchy, minimal noise), Fast & Efficient (optimised for quick actions), Reliable & Secure (permissions, data protection), Data-Driven (data visual, actionable, easy to understand), Scalable, Consistent (same patterns, components and interactions across the ecosystem). *(agreed · Design Vision Book 29 Jul 2026, 05 Design Principles (p5) - Our Design Principles · DI-032)*
+- Accessibility: high contrast, readable text, keyboard navigation and inclusive components throughout; WCAG AA standards minimum ("Design for everyone"). *(agreed · Design Vision Book 29 Jul 2026, 03 Visual Direction (p3) - Better Accessibility; 06 Component principles (p6); 08 Design principles in action (p8) · DI-029)*
+- AI everywhere: AI insights, recommendations and smart assistance are embedded across the platform, not hidden. AI is not an add-on: it assists, predicts, recommends and automates. *(agreed · Design Vision Book 29 Jul 2026, 03 Visual Direction (p3) - How TICVAI improves this concept; 05 Design Principles (p5) - 2. AI-First · DI-027)*
+- Global Search: prominent, AI-powered search that finds anything, in the top bar with a Cmd+K shortcut (placeholder e.g. "Search events, customers, orders, venues or ask AI..."). *(agreed · Design Vision Book 29 Jul 2026, 03 Visual Direction (p3) - UI inspiration reference, item 1; 08 Design System (p8) - Search Bar · DI-025)*
+- Visual direction: Purposeful (every element has a clear purpose), Consistent (one visual system across all modules and devices), Clear (easy to scan, understand and act on), Modern. Key takeaway: clean, modern, product-first layout with clear hierarchy and minimal visual noise; deep, modern, trustworthy; built for enterprise scale. *(agreed · Design Vision Book 29 Jul 2026, 03 Visual Direction (p3) · DI-024)*
+- The brand is presented consistently across Web Platform, Mobile App and Admin Portal (and print). Ticvai identity, colours and typography are applied consistently across all screens and devices. *(agreed · Design Vision Book 29 Jul 2026, 02 Brand Identity (p2) - Brand in action; 03 Visual Direction (p3) - Consistent Branding · DI-023)*
+- Copy is Professional, Friendly, Clear, Confident, Concise and Helpful. Avoid jargon, overly technical language, clutter, outdated language and complexity. *(agreed · Design Vision Book 29 Jul 2026, 02 Brand Identity (p2) - Brand voice · DI-022)*
+- Brand personality: Modern, AI-First, Enterprise, Premium, Reliable, Minimal, Scalable, Human-Centred. Visual essence: intelligent and forward-thinking, clean and minimal, trustworthy and secure, modern and timeless, scalable and flexible. *(agreed · Design Vision Book 29 Jul 2026, 02 Brand Identity (p2) - Brand personality / Visual essence · DI-021)*
+- Arabic is a core requirement, not later localisation: full Arabic RTL across web, mobile, POS, reports, emails, WhatsApp, SMS, notifications, tickets and receipts, and administrative interfaces. *(agreed · MoM 28 Jul 2026, 27. Internationalisation and Arabic Support · DI-019)*
+
+### Across P09 TICVAI Web
+
+- Portal access exposes TICVAI pricing, so prospects submit contact details and a trade license as proof of a real venue, reviewed and approved by TICVAI before access is granted. *(agreed · MoM 10 Sep 2026, 4.8 Customer Portal Access, Authentication & Verification · DI-827)*
+- Simulation functionality stays embedded within each relevant configuration section rather than being consolidated, since it tests that section's own configuration. *(agreed · MoM 8 Sep 2026, 4.11 Dashboard & Reporting Module Consolidation Strategy · DI-722)*
+- **Open question.** Proposed tenant hierarchy Tenant > Organization/Brand > Region > Branch > Venue > Department, under review against TICVAI's own organisational hierarchy before finalising. *(open · MoM 30 Jul 2026, 2. Proposed Multi-Tenant Hierarchy · DI-055)*
+- Typeface Inter (Light, Regular, Medium, Semibold, Bold). Scale: H1 32/40 Bold, H2 24/32 Semibold, H3 20/28 Semibold, Body 1 16/24 Regular, Body 2 14/20 Regular, Caption 12/16 Regular. *(agreed · Design Vision Book 29 Jul 2026, 08 Design System (p8) - 2. Typography · DI-047)*
+- Palette ("modern, trustworthy and accessible"): Primary #0D6EFD, #00B8FF, #00D4C4, #0B1324; Neutral #F7F9FC, #E5E7EB, #9CA3AF, #4B5563, #1F2937. *(agreed · Design Vision Book 29 Jul 2026, 08 Design System (p8) - 1. Color Palette · DI-046)*
+- Chart cards: title with period dropdown ("This Week"), headline metrics with deltas (Tickets Sold 12,840 +8.7%, Visitors, Conversion). Data visualisations must be easy to read. *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - Charts · DI-041)*
+- Tables: titled card with "View all", columns (e.g. Order ID, Customer, Amount, Status), coloured status badges (Paid, Pending, Refunded) and pagination with "Showing 1 to 5 of 245" and page numbers. *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - Tables · DI-039)*
+- Primary button spec: height 40px, padding 12px 24px, radius 8px, Inter 14 Semibold, colour #0D6EFD, width auto. *(agreed · Design Vision Book 29 Jul 2026, 09 Deliverables (p9) - Developer Handoff preview · DI-037)*
+- Dynamic KPIs, forecasts and real-time insights; role-based dashboards, preferences and smart shortcuts for every user (e.g. greeting "Good morning, Ahmed" on the home screen, p2). *(agreed · Design Vision Book 29 Jul 2026, 03 Visual Direction (p3) - Smarter Data / Personalized Experience · DI-028)*
+
+**10 more name particular screens** and are in each screen's block above (*Client meeting inputs*).
+
+---
+
+## Raw data
+
+The same package data the blocks above are built from. `screens.json` is in the folder and not repeated here: every field of it is in the blocks.
+
+### `operations.json`
 
 Method, path, parameters, request and response for every operation these screens call. **Write fetches against these and do not invent an endpoint** — a screen needing something absent here is a finding worth reporting, not a gap to fill with a plausible URL.
 
 ```json
 {
- "getBillingReconciliation": {
-  "method": "GET",
-  "path": "/billing-reconciliation",
-  "contract": "subscription",
-  "summary": "Metered consumption against what was invoiced",
-  "permission": "PLATFORM_BILLING_VIEW",
-  "offlineCapable": null,
-  "conflictPolicy": null,
-  "scopeLevel": "platform",
-  "parameters": [
-   {
-    "name": "tenantId",
-    "in": "query",
-    "required": true
-   },
-   {
-    "name": "period",
-    "in": "query",
-    "required": true
-   }
-  ],
-  "requestBody": null,
-  "responds": "BillingReconciliation"
- },
- "getEntitlementUsage": {
-  "method": "GET",
-  "path": "/tenants/{tenantId}/entitlement-usage",
-  "contract": "subscription",
-  "summary": "Usage against licensed limits",
-  "permission": "PLATFORM_TENANT_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "EntitlementUsage"
- },
- "getLicenceEnforcement": {
-  "method": "GET",
-  "path": "/licence-enforcement",
-  "contract": "subscription",
-  "summary": "Where a tenant stands against its entitlements, and what happens next",
-  "permission": "PLATFORM_BILLING_VIEW",
-  "offlineCapable": null,
-  "conflictPolicy": null,
-  "scopeLevel": "platform",
-  "parameters": [
-   {
-    "name": "tenantId",
-    "in": "query",
-    "required": true
-   }
-  ],
-  "requestBody": null,
-  "responds": "LicenceEnforcement"
- },
- "getPlanRecommendations": {
-  "method": "GET",
-  "path": "/plan-recommendations",
-  "contract": "subscription",
-  "summary": "Which plan, module or pack would fit this tenant better, and what it would cost or save",
-  "permission": "PLATFORM_BILLING_VIEW",
-  "offlineCapable": null,
-  "conflictPolicy": null,
-  "scopeLevel": "platform",
-  "parameters": [
-   {
-    "name": "tenantId",
-    "in": "query",
-    "required": true
-   },
-   {
-    "name": "horizonMonths",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "kind",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- },
- "getSubscription": {
-  "method": "GET",
-  "path": "/tenants/{tenantId}/subscription",
-  "contract": "subscription",
-  "summary": "Read the current subscription",
-  "permission": "PLATFORM_TENANT_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "Subscription"
- },
- "listMembershipRenewalRetention": {
-  "method": "GET",
-  "path": "/membership-renewal-retention",
-  "contract": "subscription",
-  "summary": "Membership Analytics, Renewal Intelligence & AI Retention Center",
-  "permission": "PLATFORM_TENANT_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": "membershipProduct",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "tier",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "venue",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "customerSegment",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "geography",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "renewalCohort",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "purchaseMonth",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "acquisitionChannel",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "churnFlag",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "maxRenewalProbability",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- },
- "listRenewalAuto": {
-  "method": "GET",
-  "path": "/renewal-auto",
-  "contract": "subscription",
-  "summary": "Renewal Operations & Auto-Renewal Management",
-  "permission": "PLATFORM_TENANT_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": "renewalStatus",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "membershipProduct",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "tier",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "autoRenew",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "expiringFrom",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "expiringTo",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- },
- "listTenants": {
-  "method": "GET",
-  "path": "/tenants",
-  "contract": "subscription",
-  "summary": "List tenants",
-  "permission": "PLATFORM_TENANT_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": "status",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "planId",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- },
- "scoreVsiAssessment": {
-  "method": "POST",
-  "path": "/vsi-assessments",
-  "contract": "subscription",
-  "summary": "Score a prospect's answers into a tier and a package",
-  "permission": "PLATFORM_PLAN_MANAGE",
-  "offlineCapable": null,
-  "conflictPolicy": null,
-  "scopeLevel": "platform",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "VsiAssessment",
-  "responds": "VsiResult"
- },
- "setTrialConfiguration": {
-  "method": "PUT",
-  "path": "/trial-configurations",
-  "contract": "subscription",
-  "summary": "What a trial includes, how long it lasts and how it converts",
-  "permission": "PLATFORM_PLAN_MANAGE",
-  "offlineCapable": null,
-  "conflictPolicy": null,
-  "scopeLevel": "platform",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "TrialConfiguration",
-  "responds": "TrialConfiguration"
- },
- "simulateCommercialPackage": {
-  "method": "POST",
-  "path": "/package-simulations",
-  "contract": "subscription",
-  "summary": "What this package would cost, and what it would provision",
-  "permission": "PLATFORM_PLAN_MANAGE",
-  "offlineCapable": null,
-  "conflictPolicy": null,
-  "scopeLevel": "platform",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "PackageSimulationRequest",
-  "responds": "PackageSimulation"
- }
+"getBillingReconciliation": {"method":"GET","path":"/billing-reconciliation","contract":"subscription","summary":"Metered consumption against what was invoiced","permission":"PLATFORM_BILLING_VIEW","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"platform","parameters":[{"name":"tenantId","in":"query","required":true},{"name":"period","in":"query","required":true}],"requestBody":null,"responds":"BillingReconciliation"},
+"getEntitlementUsage": {"method":"GET","path":"/tenants/{tenantId}/entitlement-usage","contract":"subscription","summary":"Usage against licensed limits","permission":"PLATFORM_TENANT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[],"requestBody":null,"responds":"EntitlementUsage"},
+"getLicenceEnforcement": {"method":"GET","path":"/licence-enforcement","contract":"subscription","summary":"Where a tenant stands against its entitlements, and what happens next","permission":"PLATFORM_BILLING_VIEW","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"platform","parameters":[{"name":"tenantId","in":"query","required":true}],"requestBody":null,"responds":"LicenceEnforcement"},
+"getPlanRecommendations": {"method":"GET","path":"/plan-recommendations","contract":"subscription","summary":"Which plan, module or pack would fit this tenant better, and what it would cost or save","permission":"PLATFORM_BILLING_VIEW","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"platform","parameters":[{"name":"tenantId","in":"query","required":true},{"name":"horizonMonths","in":"query","required":null},{"name":"kind","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
+"getSubscription": {"method":"GET","path":"/tenants/{tenantId}/subscription","contract":"subscription","summary":"Read the current subscription","permission":"PLATFORM_TENANT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[],"requestBody":null,"responds":"Subscription"},
+"listTenants": {"method":"GET","path":"/tenants","contract":"subscription","summary":"List tenants","permission":"PLATFORM_TENANT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":"status","in":"query","required":null},{"name":"planId","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
+"scoreVsiAssessment": {"method":"POST","path":"/vsi-assessments","contract":"subscription","summary":"Score a prospect's answers into a tier and a package","permission":"PLATFORM_PLAN_MANAGE","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"platform","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"VsiAssessment","responds":"VsiResult"},
+"simulateCommercialPackage": {"method":"POST","path":"/package-simulations","contract":"subscription","summary":"What this package would cost, and what it would provision","permission":"PLATFORM_PLAN_MANAGE","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"platform","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"PackageSimulationRequest","responds":"PackageSimulation"}
 }
 ```
 
-## `schemas.json`
+### `schemas.json`
 
 The data those operations carry, resolved one level deep. **Seed from these.** The reference prototype hardcodes 57 models and every one corresponds to a schema here; a build that invents its own will disagree with the backend on day one.
 
 ```json
 {
- "BillingReconciliation": {
-  "type": "object",
-  "description": "Boards 10.2 and 10.3. **The first invoice sets the tone for the relationship.**",
-  "properties": {
-   "tenantId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "period": {
-    "type": "string"
-   },
-   "lines": {
-    "type": "array",
-    "items": {
-     "type": "object",
-     "properties": {
-      "unit": {
-       "type": "string"
-      },
-      "meteredQuantity": {
-       "type": "integer"
-      },
-      "billedQuantity": {
-       "type": "integer"
-      },
-      "unitPrice": {
-       "$ref": "../shared/common.yaml#/components/schemas/Money"
-      },
-      "amount": {
-       "$ref": "../shared/common.yaml#/components/schemas/Money"
-      },
-      "variance": {
-       "type": "integer"
-      }
-     }
-    }
-   },
-   "meteredNotBilled": {
-    "type": "integer"
-   },
-   "billedNotMetered": {
-    "type": "integer"
-   },
-   "invoiceId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "approvedBy": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   }
-  }
- },
- "EntitlementUsage": {
-  "x-ticvai-persistence": "none — aggregated from usage_record",
-  "type": "object",
-  "required": [
-   "tenantId",
-   "metrics"
-  ],
-  "properties": {
-   "tenantId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "metrics": {
-    "type": "array",
-    "items": {
-     "type": "object",
-     "required": [
-      "metric",
-      "current",
-      "isNearLimit"
-     ],
-     "properties": {
-      "metric": {
-       "$ref": "#/components/schemas/UsageMetric"
-      },
-      "current": {
-       "type": "integer"
-      },
-      "limit": {
-       "type": "integer",
-       "nullable": true
-      },
-      "percentUsed": {
-       "type": "number",
-       "nullable": true
-      },
-      "isNearLimit": {
-       "type": "boolean",
-       "description": "Approaching a limit is an account conversation. Hitting one silently at a gate is an incident.\n"
-      },
-      "isExceeded": {
-       "type": "boolean"
-      }
-     }
-    }
-   },
-   "asAt": {
-    "type": "string",
-    "format": "date-time"
-   }
-  }
- },
- "LicenceEnforcement": {
-  "type": "object",
-  "description": "Board 9.5. **Three states, three responses.**",
-  "properties": {
-   "tenantId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "period": {
-    "type": "string"
-   },
-   "units": {
-    "type": "array",
-    "items": {
-     "type": "object",
-     "properties": {
-      "unit": {
-       "type": "string"
-      },
-      "allowance": {
-       "type": "integer"
-      },
-      "consumed": {
-       "type": "integer"
-      },
-      "percentUsed": {
-       "type": "number"
-      },
-      "projectedAtPeriodEnd": {
-       "type": "integer",
-       "nullable": true
-      },
-      "state": {
-       "type": "string",
-       "enum": [
-        "withinAllowance",
-        "approaching",
-        "atLimit",
-        "overage"
-       ]
-      },
-      "nextAction": {
-       "type": "string",
-       "nullable": true
-      },
-      "overageCharge": {
-       "$ref": "../shared/common.yaml#/components/schemas/Money"
-      }
-     }
-    }
-   },
-   "minimumGuaranteeMet": {
-    "type": "boolean"
-   },
-   "alertsRaised": {
-    "type": "integer"
-   }
-  }
- },
- "LocalisedText": {
-  "x-ticvai-persistence": "none — jsonb column",
-  "type": "object",
-  "additionalProperties": {
-   "type": "string"
-  }
- },
- "MembershipAnalyticsRenewalIntelligenceAiRetentionCenSummary": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection; the headline tiles over the list, computed at read time for the filters in force",
-  "description": "**The headline figures on Membership Analytics, Renewal Intelligence & AI Retention Center.** The pack's KPI cards, split out of the row (decided 29 September, readiness close-out): a count describes the list, not each item in it.",
-  "properties": {
-   "activeMembers": {
-    "type": "integer",
-    "description": "Active Members"
-   },
-   "newMemberships": {
-    "type": "integer",
-    "description": "New Memberships"
-   },
-   "renewalRate": {
-    "type": "number",
-    "description": "Renewal Rate"
-   },
-   "churnRate": {
-    "type": "number",
-    "description": "Churn Rate"
-   },
-   "autoRenewSuccess": {
-    "type": "number",
-    "description": "Auto-Renew Success: percentage of auto-renew attempts that succeeded"
-   },
-   "averageMembershipTenure": {
-    "type": "number",
-    "description": "Average Membership Tenure in months"
-   },
-   "averageVisitsPerMember": {
-    "type": "number",
-    "description": "Average Visits per Member"
-   },
-   "revenuePerMember": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Revenue per Member"
-   },
-   "membershipUtilization": {
-    "type": "number",
-    "description": "Membership Utilization"
-   },
-   "benefitUtilization": {
-    "type": "number",
-    "description": "Benefit Utilization"
-   },
-   "freezeSuspensionRate": {
-    "type": "number",
-    "description": "Freeze/Suspension Rate"
-   },
-   "expectedRenewals": {
-    "type": "integer",
-    "description": "Expected Renewals in the forecast period"
-   },
-   "expectedChurn": {
-    "type": "integer",
-    "description": "Expected Churn in the forecast period"
-   },
-   "renewalRevenue": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Renewal Revenue"
-   },
-   "membershipBaseGrowth": {
-    "type": "number",
-    "description": "Membership Base Growth, percent"
-   },
-   "upgradeRate": {
-    "type": "number",
-    "description": "Upgrade Rate, percent (pack p.35)"
-   },
-   "upgradeRevenue": {
-    "allOf": [
-     {
-      "$ref": "../shared/common.yaml#/components/schemas/Money"
-     }
-    ],
-    "description": "Upgrade Revenue forecast (pack p.37)"
-   },
-   "renewalFunnel": {
-    "type": "object",
-    "description": "Renewal Funnel (pack p.36)",
-    "properties": {
-     "eligibleForRenewal": {
-      "type": "integer"
-     },
-     "contacted": {
-      "type": "integer"
-     },
-     "renewalStarted": {
-      "type": "integer"
-     },
-     "paymentAttempted": {
-      "type": "integer"
-     },
-     "renewed": {
-      "type": "integer"
-     },
-     "failed": {
-      "type": "integer"
-     },
-     "expired": {
-      "type": "integer"
-     }
-    }
-   }
-  }
- },
- "MembershipAnalyticsRenewalIntelligenceAiRetentionCenView": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
-  "description": "**What Membership Analytics, Renewal Intelligence & AI Retention Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
-  "properties": {
-   "visits": {
-    "type": "integer",
-    "description": "Visits in the current term"
-   },
-   "benefitUsage": {
-    "type": "number",
-    "description": "Benefit usage, percent of allocation used"
-   },
-   "guestTicketUsage": {
-    "type": "integer",
-    "description": "Guest tickets used this term"
-   },
-   "complaintsExceptions": {
-    "type": "integer",
-    "description": "Complaints/Exceptions this term"
-   },
-   "confidence": {
-    "type": "number",
-    "description": "Confidence of the prediction, 0-1"
-   },
-   "keyDrivers": {
-    "type": "array",
-    "items": {
-     "type": "string"
-    },
-    "description": "Key Drivers, e.g. visits down 58%, no visits in 90 days"
-   },
-   "modelVersion": {
-    "type": "string",
-    "description": "Model Version"
-   },
-   "dataFreshness": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Data Freshness: when the inputs were last refreshed"
-   },
-   "membershipId": {
-    "type": "string",
-    "description": "Membership ID"
-   },
-   "memberName": {
-    "type": "string",
-    "description": "Member name"
-   },
-   "membershipProduct": {
-    "type": "string",
-    "description": "Membership product"
-   },
-   "tier": {
-    "type": "string",
-    "description": "Tier",
-    "nullable": true
-   },
-   "expiryDate": {
-    "type": "string",
-    "format": "date",
-    "description": "Expiry date"
-   },
-   "lastVisitDate": {
-    "type": "string",
-    "format": "date",
-    "description": "Last visit",
-    "nullable": true
-   },
-   "renewalProbability": {
-    "type": "number",
-    "description": "Member Renewal Probability, 0-1 (advisory)"
-   },
-   "churnFlag": {
-    "type": "boolean",
-    "description": "No visit in the last 90 days: flagged for churn follow-up (MoM 8 Sep)"
-   },
-   "recommendedActions": {
-    "type": "array",
-    "items": {
-     "type": "string",
-     "enum": [
-      "renewalReminder",
-      "benefitReminder",
-      "membershipEducation",
-      "upgradeOffer",
-      "retentionOffer",
-      "serviceFollowUp"
-     ]
-    },
-    "description": "Recommended Actions (pack p.36), advisory"
-   }
-  }
- },
- "Money": {
-  "type": "object",
-  "x-ticvai-persistence-kind": "valueObject",
-  "x-ticvai-persistence-column": "numeric(18,4)",
-  "description": "**On the wire this is three fields; in the database it is one column.**\n24 August. Every column typed `Money` was landing as `jsonb` — 129 of them, including `orders.shift.opening_float`, `inventory.purchase_order.total` and `promotions.voucher.balance`. **`orders.cash_movement.amount` was `numeric(18,4)` because somebody hand-typed that one**, and the inconsistency is what made it visible.\n**A jsonb price cannot be summed in SQL.** Every total, variance and reconciliation moves into application code — and a shift variance computed in .NET against a ledger computed in Postgres is two answers to one question. That is F13 month-end and F98 takings-to-ledger, both walked, both assuming the arithmetic is in the database.\n**`currency` and `scale` are not stored per row.** ADR-0018 makes them region-scoped and not overridable below, so they resolve from the scope walk — storing AED against nine million rows in a UAE region is nine million copies of a fact that cannot differ. A row that needed its own currency would be a row in the wrong region.\n**They stay on the wire** because a client reading a figure should not have to walk a hierarchy to know what it means.\n",
-  "required": [
-   "amount",
-   "currency",
-   "scale"
-  ],
-  "properties": {
-   "amount": {
-    "type": "string",
-    "description": "Decimal string, never a float. Up to 4 decimal places. **Persisted as `numeric(18,4)`** — the string is a transport choice, so a JavaScript client cannot round a fare in transit.\n",
-    "pattern": "^-?\\d+(\\.\\d{1,4})?$"
-   },
-   "currency": {
-    "type": "string",
-    "description": "**Resolved from the region, not stored on the row** (ADR-0018). OMR uses 3 decimal places and AED uses 2 — a venue on a different scale from its region is a ledger that cannot consolidate.\n",
-    "pattern": "^[A-Z]{3}$"
-   },
-   "scale": {
-    "type": "integer",
-    "description": "Resolved from the region alongside `currency`.",
-    "minimum": 0,
-    "maximum": 4
-   }
-  }
- },
- "PackageSimulation": {
-  "type": "object",
-  "description": "Boards 3.9 and 4.8. **Refused at quote time rather than at go-live.**",
-  "properties": {
-   "lines": {
-    "type": "array",
-    "items": {
-     "type": "object",
-     "properties": {
-      "kind": {
-       "type": "string",
-       "enum": [
-        "baseTier",
-        "module",
-        "addOn",
-        "capacityPack",
-        "overage",
-        "professionalServices",
-        "discount"
-       ]
-      },
-      "label": {
-       "type": "string"
-      },
-      "quantity": {
-       "type": "number",
-       "nullable": true
-      },
-      "unitPrice": {
-       "$ref": "../shared/common.yaml#/components/schemas/Money"
-      },
-      "amount": {
-       "$ref": "../shared/common.yaml#/components/schemas/Money"
-      }
-     }
-    }
-   },
-   "recurringTotal": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "oneOffTotal": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "contractTotal": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "minimumGuarantee": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "findings": {
-    "type": "array",
-    "items": {
-     "type": "object",
-     "properties": {
-      "severity": {
-       "type": "string",
-       "enum": [
-        "blocking",
-        "warning",
-        "advisory"
-       ]
-      },
-      "code": {
-       "type": "string"
-      },
-      "message": {
-       "type": "string"
-      }
-     }
-    }
-   },
-   "provisionable": {
-    "type": "boolean"
-   }
-  }
- },
- "PackageSimulationRequest": {
-  "type": "object",
-  "required": [
-   "tierCode"
-  ],
-  "properties": {
-   "tierCode": {
-    "type": "string"
-   },
-   "licensingModelId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "moduleCodes": {
-    "type": "array",
-    "items": {
-     "type": "string"
-    }
-   },
-   "venueCount": {
-    "type": "integer",
-    "default": 1
-   },
-   "projectedVolumes": {
-    "type": "object",
-    "additionalProperties": {
-     "type": "integer"
-    }
-   },
-   "contractMonths": {
-    "type": "integer",
-    "default": 12
-   },
-   "billingCycle": {
-    "type": "string",
-    "nullable": true
-   },
-   "currency": {
-    "type": "string",
-    "nullable": true
-   }
-  }
- },
- "Page": {
-  "type": "object",
-  "required": [
-   "items",
-   "hasMore"
-  ],
-  "properties": {
-   "items": {
-    "type": "array",
-    "items": {}
-   },
-   "nextCursor": {
-    "type": "string"
-   },
-   "hasMore": {
-    "type": "boolean"
-   }
-  }
- },
- "RenewalOperationsAutoRenewalManagementSummary": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection; the headline tiles over the list, computed at read time for the filters in force",
-  "description": "**The headline figures on Renewal Operations & Auto-Renewal Management.** The pack's KPI cards, split out of the row (decided 29 September, readiness close-out): a count describes the list, not each item in it.",
-  "properties": {
-   "renewalNotOpen": {
-    "type": "integer",
-    "description": "Renewal Not Open"
-   },
-   "renewalEligible": {
-    "type": "integer",
-    "description": "Renewal Eligible"
-   },
-   "renewalInvitationSent": {
-    "type": "integer",
-    "description": "Renewal Invitation Sent"
-   },
-   "renewalStarted": {
-    "type": "integer",
-    "description": "Renewal Started"
-   },
-   "paymentPending": {
-    "type": "integer",
-    "description": "Payment Pending"
-   },
-   "renewed": {
-    "type": "integer",
-    "description": "Renewed"
-   },
-   "autoRenewScheduled": {
-    "type": "integer",
-    "description": "Auto-Renew Scheduled"
-   },
-   "autoRenewFailed": {
-    "type": "integer",
-    "description": "Auto-Renew Failed"
-   },
-   "gracePeriod": {
-    "type": "integer",
-    "description": "Grace Period"
-   },
-   "expiredWithoutRenewal": {
-    "type": "integer",
-    "description": "Expired Without Renewal"
-   }
-  }
- },
- "RenewalOperationsAutoRenewalManagementView": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
-  "description": "**What Renewal Operations & Auto-Renewal Management displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
-  "properties": {
-   "member": {
-    "type": "string",
-    "description": "Member"
-   },
-   "membership": {
-    "type": "string",
-    "description": "Membership"
-   },
-   "tier": {
-    "type": "string",
-    "description": "Tier"
-   },
-   "expiry": {
-    "type": "string",
-    "format": "date",
-    "description": "Expiry"
-   },
-   "renewalWindow": {
-    "type": "object",
-    "description": "Renewal Window",
-    "properties": {
-     "opens": {
-      "type": "string",
-      "format": "date"
-     },
-     "closes": {
-      "type": "string",
-      "format": "date"
-     }
-    }
-   },
-   "renewalPrice": {
-    "allOf": [
-     {
-      "$ref": "../shared/common.yaml#/components/schemas/Money"
-     }
-    ],
-    "nullable": true,
-    "description": "Renewal Price from pricing (Area 10)"
-   },
-   "autoRenew": {
-    "type": "boolean",
-    "description": "Auto-Renew: the member has explicitly opted in"
-   },
-   "paymentMethodStatus": {
-    "type": "string",
-    "description": "Payment Method Status: none, valid, expiringSoon, expired or failed"
-   },
-   "eligibility": {
-    "type": "string",
-    "enum": [
-     "eligible",
-     "notEligible",
-     "reviewRequired"
-    ],
-    "description": "Eligibility for renewal"
-   },
-   "renewalStatus": {
-    "type": "string",
-    "description": "Renewal Status: renewalNotOpen, renewalEligible, renewalInvitationSent, renewalStarted, paymentPending, renewed, autoRenewScheduled, autoRenewFailed, gracePeriod or expiredWithoutRenewal (pack p.30 Renewal Pipeline)"
-   },
-   "membershipStatus": {
-    "type": "string",
-    "description": "Current membership status: one of the membership lifecycle values active, frozen, suspended, expired or cancelled (shape follows catalogue GuestMembership.status; states/guest-membership-status.yaml): frozen is the member's pause and extends validity, suspended is a sanction and does not"
-   },
-   "outstandingIssues": {
-    "type": "string",
-    "description": "Outstanding Issues",
-    "nullable": true
-   },
-   "autoRenewConsentAt": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Consent: when the member accepted the auto-renewal terms; empty means no consent and auto-renew will not run",
-    "nullable": true
-   },
-   "membershipVersion": {
-    "type": "integer",
-    "description": "Membership Version the renewal will be on"
-   },
-   "membershipId": {
-    "type": "string",
-    "description": "Membership ID"
-   },
-   "preNotificationSentAt": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Pre-renewal reminder sent",
-    "nullable": true
-   },
-   "paymentAttempts": {
-    "type": "integer",
-    "description": "Auto-renew payment attempts so far"
-   },
-   "nextAttemptAt": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Next scheduled payment attempt",
-    "nullable": true
-   }
-  }
- },
- "Subscription": {
-  "x-ticvai-persistence": "subscription.contract",
-  "type": "object",
-  "required": [
-   "tenantId",
-   "planId",
-   "planVersion",
-   "status",
-   "startsAt"
-  ],
-  "properties": {
-   "tenantId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "planId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "planName": {
-    "type": "string"
-   },
-   "planVersion": {
-    "type": "string"
-   },
-   "status": {
-    "type": "string",
-    "enum": [
-     "trial",
-     "active",
-     "pastDue",
-     "cancelled",
-     "expired"
-    ]
-   },
-   "startsAt": {
-    "type": "string",
-    "format": "date"
-   },
-   "renewsAt": {
-    "type": "string",
-    "format": "date",
-    "nullable": true
-   },
-   "cancelledAt": {
-    "type": "string",
-    "format": "date",
-    "nullable": true
-   },
-   "scheduledChange": {
-    "type": "object",
-    "nullable": true,
-    "readOnly": true,
-    "description": "A downgrade waiting for the next renewal (decided 28 September, audit R214 (1)). Null when none is scheduled.",
-    "properties": {
-     "planId": {
-      "type": "string",
-      "format": "uuid"
-     },
-     "planVersion": {
-      "type": "string"
-     },
-     "effectiveFrom": {
-      "type": "string",
-      "format": "date",
-      "description": "Always the `renewsAt` it was scheduled against."
-     }
-    }
-   },
-   "currentPrice": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "billingPeriod": {
-    "type": "string"
-   }
-  }
- },
- "SubscriptionPlanRecommendation": {
-  "type": "object",
-  "x-ticvai-persistence": "none — computed from control.usage_record, the plan, tier and add-on limits and capacity packs, priced as simulateCommercialPackage prices",
-  "description": "One plan-fit move for a tenant, priced against staying as it is (20.8.4, 20.8.5; decided 29 September, build pass, group G2).",
-  "required": [
-   "kind",
-   "reason",
-   "projectedMonthlyCost"
-  ],
-  "properties": {
-   "kind": {
-    "type": "string",
-    "enum": [
-     "upgrade",
-     "downgrade",
-     "addModule",
-     "removeModule",
-     "removeAddOn",
-     "capacityPack"
-    ]
-   },
-   "targetPlanId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "The tier to move to, for `upgrade` and `downgrade`."
-   },
-   "moduleCode": {
-    "type": "string",
-    "nullable": true,
-    "description": "For `addModule` and `removeModule`."
-   },
-   "addOnCode": {
-    "type": "string",
-    "nullable": true,
-    "description": "For `removeAddOn`."
-   },
-   "billableUnit": {
-    "type": "string",
-    "nullable": true,
-    "description": "The unit that drives it (for `upgrade`, `downgrade` and `capacityPack`), as `getLicenceEnforcement` names it."
-   },
-   "capacityPackSize": {
-    "type": "integer",
-    "nullable": true,
-    "description": "For `capacityPack`, the pack size that covers the projected overage."
-   },
-   "projectedMonthlyCost": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "projectedSaving": {
-    "allOf": [
-     {
-      "$ref": "../shared/common.yaml#/components/schemas/Money"
-     }
-    ],
-    "nullable": true,
-    "description": "Against staying as it is over the horizon, monthly. Set where the move saves money."
-   },
-   "projectedAddedCost": {
-    "allOf": [
-     {
-      "$ref": "../shared/common.yaml#/components/schemas/Money"
-     }
-    ],
-    "nullable": true,
-    "description": "Where the move costs more than today but less than the alternative named in `comparedWith`."
-   },
-   "comparedWith": {
-    "type": "string",
-    "enum": [
-     "currentPackage",
-     "projectedOverage",
-     "nextTier",
-     "capacityPack"
-    ],
-    "description": "What the move is cheaper than. An `upgrade` is compared with paying the projected overage; a `capacityPack` with the next tier."
-   },
-   "reason": {
-    "type": "string",
-    "maxLength": 500,
-    "description": "One sentence a person can repeat to the customer."
-   },
-   "basis": {
-    "type": "object",
-    "description": "The numbers it rests on.",
-    "properties": {
-     "usageWindowDays": {
-      "type": "integer"
-     },
-     "usedAverage": {
-      "type": "number",
-      "nullable": true
-     },
-     "usedPeak": {
-      "type": "number",
-      "nullable": true
-     },
-     "projectedPeak": {
-      "type": "number",
-      "nullable": true
-     },
-     "currentLimit": {
-      "type": "number",
-      "nullable": true
-     },
-     "targetLimit": {
-      "type": "number",
-      "nullable": true
-     },
-     "lastUsedAt": {
-      "type": "string",
-      "format": "date-time",
-      "nullable": true,
-      "description": "For `removeModule` and `removeAddOn`, the last metered use; null for never."
-     }
-    }
-   },
-   "applyWith": {
-    "type": "string",
-    "enum": [
-     "setSubscription",
-     "addCapacityPack"
-    ],
-    "description": "The operation a person uses to carry it out (after `previewSubscriptionChange` for `setSubscription`)."
-   }
-  }
- },
- "SuspensionMode": {
-  "type": "string",
-  "description": "Access validation continues under every mode. A commercial dispute must not strand guests at a gate holding valid tickets.\n",
-  "enum": [
-   "readOnly",
-   "noNewSales",
-   "fullLockout"
-  ]
- },
- "Tenant": {
-  "x-ticvai-persistence": "control.tenant",
-  "type": "object",
-  "required": [
-   "id",
-   "code",
-   "name",
-   "status",
-   "createdAt"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "code": {
-    "type": "string"
-   },
-   "name": {
-    "type": "string"
-   },
-   "status": {
-    "$ref": "#/components/schemas/TenantStatus"
-   },
-   "suspensionMode": {
-    "$ref": "#/components/schemas/SuspensionMode"
-   },
-   "suspensionReason": {
-    "type": "string",
-    "nullable": true
-   },
-   "suspensionEffectiveAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true,
-    "description": "When the suspension takes, or took, effect — `suspendTenant.effectiveAt`. **A future value is a pending suspension**: the tenant stays `active` until then, and this row is the only place that says a suspension is coming."
-   },
-   "suspensionNoticeMessage": {
-    "$ref": "#/components/schemas/LocalisedText",
-    "description": "The notice shown to the tenant's users about the suspension — `suspendTenant.noticeMessage`."
-   },
-   "terminationScheduledAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true,
-    "description": "When `terminateTenant` started the retention window. Null when no termination is under way."
-   },
-   "terminationRetentionUntil": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true,
-    "description": "`terminationScheduledAt` plus the request's `retentionDays`. **Stored, not recomputed** — the day count is client-supplied and exists nowhere else, and this is the date the cells are destroyed after."
-   },
-   "terminationReason": {
-    "type": "string",
-    "maxLength": 1000,
-    "nullable": true
-   },
-   "terminationRequestedByPrincipalId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "planId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "planName": {
-    "type": "string",
-    "nullable": true
-   },
-   "cellCount": {
-    "type": "integer"
-   },
-   "venueCount": {
-    "type": "integer"
-   },
-   "regionId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "readOnly": true,
-    "description": "The tenant's home region: the `tenancy` region node whose `RegionSettings` govern tenant-wide gates, today `allowedAiResidencies` (decided 28 September, audit R203). Written by the server when the tenant's first region is created; null until then. ADM-037 reads it to show the region's residency restriction, and `ai.setAiProvider` checks against the same region.\n"
-   },
-   "billingEmail": {
-    "type": "string"
-   },
-   "billingAddress": {
-    "type": "string",
-    "maxLength": 500,
-    "nullable": true,
-    "description": "Accepted by `createTenant` and `updateTenant`; stored here so the response can return what was sent."
-   },
-   "accountManagerPrincipalId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "createdAt": {
-    "type": "string",
-    "format": "date-time"
-   },
-   "activatedAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   }
-  }
- },
- "TenantStatus": {
-  "type": "string",
-  "enum": [
-   "onboarding",
-   "active",
-   "suspended",
-   "terminating",
-   "terminated"
-  ]
- },
- "TrialConfiguration": {
-  "type": "object",
-  "x-ticvai-persistence": "subscription.trial_config",
-  "description": "Board 5.5. **A trial that expires with no conversion path is a tenant full of real data nobody can bill.**\n",
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "tierCode": {
-    "type": "string",
-    "nullable": true
-   },
-   "durationDays": {
-    "type": "integer",
-    "default": 30
-   },
-   "includedModules": {
-    "type": "array",
-    "items": {
-     "type": "string"
-    }
-   },
-   "usageCaps": {
-    "type": "object",
-    "additionalProperties": {
-     "type": "integer"
-    }
-   },
-   "paymentMethodRequiredUpFront": {
-    "type": "boolean",
-    "default": false
-   },
-   "conversionOfferPercent": {
-    "type": "number",
-    "nullable": true
-   },
-   "noticeDaysBeforeExpiry": {
-    "type": "array",
-    "items": {
-     "type": "integer"
-    }
-   },
-   "onExpiry": {
-    "type": "string",
-    "enum": [
-     "suspend",
-     "convert",
-     "decommission"
-    ],
-    "default": "suspend",
-    "description": "**Suspension is the humane default.** Customers routinely let a trial lapse and come back a week later.\n"
-   },
-   "retainDataDays": {
-    "type": "integer",
-    "default": 90
-   }
-  }
- },
- "UsageMetric": {
-  "type": "string",
-  "enum": [
-   "venues",
-   "workstations",
-   "activeUsers",
-   "devices",
-   "brandedApps",
-   "aiTokens",
-   "apiCalls",
-   "storageGb",
-   "transactions",
-   "guestProfiles"
-  ]
- },
- "VsiAssessment": {
-  "type": "object",
-  "x-ticvai-persistence": "subscription.vsi_assessment",
-  "description": "Board 2 — the ten-screen questionnaire, as data.",
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "organisationName": {
-    "type": "string",
-    "nullable": true
-   },
-   "contactEmail": {
-    "type": "string",
-    "nullable": true
-   },
-   "venueType": {
-    "type": "string",
-    "nullable": true
-   },
-   "answers": {
-    "type": "object",
-    "additionalProperties": true
-   },
-   "requestedModules": {
-    "type": "array",
-    "items": {
-     "type": "string"
-    }
-   },
-   "submittedAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   }
-  }
- },
- "VsiResult": {
-  "type": "object",
-  "description": "Board 2.10. **A prospect told only their price has been told nothing they can argue with.**\n",
-  "properties": {
-   "assessmentId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "score": {
-    "type": "number"
-   },
-   "tierCode": {
-    "type": "string"
-   },
-   "tierName": {
-    "type": "string"
-   },
-   "factors": {
-    "type": "array",
-    "items": {
-     "type": "object",
-     "properties": {
-      "code": {
-       "type": "string"
-      },
-      "label": {
-       "type": "string"
-      },
-      "answer": {
-       "type": "string"
-      },
-      "points": {
-       "type": "number"
-      }
-     }
-    }
-   },
-   "recommendedModules": {
-    "type": "array",
-    "items": {
-     "type": "string"
-    }
-   },
-   "recommendedPlanId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "indicativePrice": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   }
-  }
- }
+"BillingReconciliation": {"type":"object","description":"Boards 10.2 and 10.3. **The first invoice sets the tone for the relationship.**","properties":{"tenantId":{"type":"string","format":"uuid"},"period":{"type":"string"},"lines":{"type":"array","items":{"type":"object","properties":{"unit":{"type":"string"},"meteredQuantity":{"type":"integer"},"billedQuantity":{"type":"integer"},"unitPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"variance":{"type":"integer"}}}},"meteredNotBilled":{"type":"integer"},"billedNotMetered":{"type":"integer"},"invoiceId":{"type":"string","format":"uuid","nullable":true},"approvedBy":{"type":"string","format":"uuid","nullable":true}}},
+"EntitlementUsage": {"x-ticvai-persistence":"none — aggregated from usage_record","type":"object","required":["tenantId","metrics"],"properties":{"tenantId":{"type":"string","format":"uuid"},"metrics":{"type":"array","items":{"type":"object","required":["metric","current","isNearLimit"],"properties":{"metric":{"$ref":"#/components/schemas/UsageMetric"},"current":{"type":"integer"},"limit":{"type":"integer","nullable":true},"percentUsed":{"type":"number","nullable":true},"isNearLimit":{"type":"boolean","description":"Approaching a limit is an account conversation. Hitting one silently at a gate is an incident.\n"},"isExceeded":{"type":"boolean"}}}},"asAt":{"type":"string","format":"date-time"}}},
+"LicenceEnforcement": {"type":"object","description":"Board 9.5. **Three states, three responses.**","properties":{"tenantId":{"type":"string","format":"uuid"},"period":{"type":"string"},"units":{"type":"array","items":{"type":"object","properties":{"unit":{"type":"string"},"allowance":{"type":"integer"},"consumed":{"type":"integer"},"percentUsed":{"type":"number"},"projectedAtPeriodEnd":{"type":"integer","nullable":true},"state":{"type":"string","enum":["withinAllowance","approaching","atLimit","overage"]},"nextAction":{"type":"string","nullable":true},"overageCharge":{"$ref":"../shared/common.yaml#/components/schemas/Money"}}}},"minimumGuaranteeMet":{"type":"boolean"},"alertsRaised":{"type":"integer"}}},
+"LocalisedText": {"x-ticvai-persistence":"none — jsonb column","type":"object","additionalProperties":{"type":"string"}},
+"Money": {"type":"object","x-ticvai-persistence-kind":"valueObject","x-ticvai-persistence-column":"numeric(18,4)","description":"**On the wire this is three fields; in the database it is one column.**\n24 August. Every column typed `Money` was landing as `jsonb` — 129 of them, including `orders.shift.opening_float`, `inventory.purchase_order.total` and `promotions.voucher.balance`. **`orders.cash_movement.amount` was `numeric(18,4)` because somebody hand-typed that one**, and the inconsistency is what made it visible.\n**A jsonb price cannot be summed in SQL.** Every total, variance and reconciliation moves into application code — and a shift variance computed in .NET against a ledger computed in Postgres is two answers to one question. That is F13 month-end and F98 takings-to-ledger, both walked, both assuming the arithmetic is in the database.\n**`currency` and `scale` are not stored per row.** ADR-0018 makes them region-scoped and not overridable below, so they resolve from the scope walk — storing AED against nine million rows in a UAE region is nine million copies of a fact that cannot differ. A row that needed its own currency would be a row in the wrong region.\n**They stay on the wire** because a client reading a figure should not have to walk a hierarchy to know what it means.\n","required":["amount","currency","scale"],"properties":{"amount":{"type":"string","description":"Decimal string, never a float. Up to 4 decimal places. **Persisted as `numeric(18,4)`** — the string is a transport choice, so a JavaScript client cannot round a fare in transit.\n","pattern":"^-?\\d+(\\.\\d{1,4})?$"},"currency":{"type":"string","description":"**Resolved from the region, not stored on the row** (ADR-0018). OMR uses 3 decimal places and AED uses 2 — a venue on a different scale from its region is a ledger that cannot consolidate.\n","pattern":"^[A-Z]{3}$"},"scale":{"type":"integer","description":"Resolved from the region alongside `currency`.","minimum":0,"maximum":4}}},
+"PackageSimulation": {"type":"object","description":"Boards 3.9 and 4.8. **Refused at quote time rather than at go-live.**","properties":{"lines":{"type":"array","items":{"type":"object","properties":{"kind":{"type":"string","enum":["baseTier","module","addOn","capacityPack","overage","professionalServices","discount"]},"label":{"type":"string"},"quantity":{"type":"number","nullable":true},"unitPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"}}}},"recurringTotal":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"oneOffTotal":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"contractTotal":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"minimumGuarantee":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"findings":{"type":"array","items":{"type":"object","properties":{"severity":{"type":"string","enum":["blocking","warning","advisory"]},"code":{"type":"string"},"message":{"type":"string"}}}},"provisionable":{"type":"boolean"}}},
+"PackageSimulationRequest": {"type":"object","required":["tierCode"],"properties":{"tierCode":{"type":"string"},"licensingModelId":{"type":"string","format":"uuid","nullable":true},"moduleCodes":{"type":"array","items":{"type":"string"}},"venueCount":{"type":"integer","default":1},"projectedVolumes":{"type":"object","additionalProperties":{"type":"integer"}},"contractMonths":{"type":"integer","default":12},"billingCycle":{"type":"string","nullable":true},"currency":{"type":"string","nullable":true}}},
+"Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}},
+"Subscription": {"x-ticvai-persistence":"subscription.contract","type":"object","required":["tenantId","planId","planVersion","status","startsAt"],"properties":{"tenantId":{"type":"string","format":"uuid"},"planId":{"type":"string","format":"uuid"},"planName":{"type":"string"},"planVersion":{"type":"string"},"status":{"type":"string","enum":["trial","active","pastDue","cancelled","expired"]},"startsAt":{"type":"string","format":"date"},"renewsAt":{"type":"string","format":"date","nullable":true},"cancelledAt":{"type":"string","format":"date","nullable":true},"scheduledChange":{"type":"object","nullable":true,"readOnly":true,"description":"A downgrade waiting for the next renewal (decided 28 September, audit R214 (1)). Null when none is scheduled.","properties":{"planId":{"type":"string","format":"uuid"},"planVersion":{"type":"string"},"effectiveFrom":{"type":"string","format":"date","description":"Always the `renewsAt` it was scheduled against."}}},"currentPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"billingPeriod":{"type":"string"}}},
+"SubscriptionPlanRecommendation": {"type":"object","x-ticvai-persistence":"none — computed from control.usage_record, the plan, tier and add-on limits and capacity packs, priced as simulateCommercialPackage prices","description":"One plan-fit move for a tenant, priced against staying as it is (20.8.4, 20.8.5; decided 29 September, build pass, group G2).","required":["kind","reason","projectedMonthlyCost"],"properties":{"kind":{"type":"string","enum":["upgrade","downgrade","addModule","removeModule","removeAddOn","capacityPack"]},"targetPlanId":{"type":"string","format":"uuid","nullable":true,"description":"The tier to move to, for `upgrade` and `downgrade`."},"moduleCode":{"type":"string","nullable":true,"description":"For `addModule` and `removeModule`."},"addOnCode":{"type":"string","nullable":true,"description":"For `removeAddOn`."},"billableUnit":{"type":"string","nullable":true,"description":"The unit that drives it (for `upgrade`, `downgrade` and `capacityPack`), as `getLicenceEnforcement` names it."},"capacityPackSize":{"type":"integer","nullable":true,"description":"For `capacityPack`, the pack size that covers the projected overage."},"projectedMonthlyCost":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"projectedSaving":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"nullable":true,"description":"Against staying as it is over the horizon, monthly. Set where the move saves money."},"projectedAddedCost":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"nullable":true,"description":"Where the move costs more than today but less than the alternative named in `comparedWith`."},"comparedWith":{"type":"string","enum":["currentPackage","projectedOverage","nextTier","capacityPack"],"description":"What the move is cheaper than. An `upgrade` is compared with paying the projected overage; a `capacityPack` with the next tier."},"reason":{"type":"string","maxLength":500,"description":"One sentence a person can repeat to the customer."},"basis":{"type":"object","description":"The numbers it rests on.","properties":{"usageWindowDays":{"type":"integer"},"usedAverage":{"type":"number","nullable":true},"usedPeak":{"type":"number","nullable":true},"projectedPeak":{"type":"number","nullable":true},"currentLimit":{"type":"number","nullable":true},"targetLimit":{"type":"number","nullable":true},"lastUsedAt":{"type":"string","format":"date-time","nullable":true,"description":"For `removeModule` and `removeAddOn`, the last metered use; null for never."}}},"applyWith":{"type":"string","enum":["setSubscription","addCapacityPack"],"description":"The operation a person uses to carry it out (after `previewSubscriptionChange` for `setSubscription`)."}}},
+"SuspensionMode": {"type":"string","description":"Access validation continues under every mode. A commercial dispute must not strand guests at a gate holding valid tickets.\n","enum":["readOnly","noNewSales","fullLockout"]},
+"Tenant": {"x-ticvai-persistence":"control.tenant","type":"object","required":["id","code","name","status","createdAt"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string"},"name":{"type":"string"},"status":{"$ref":"#/components/schemas/TenantStatus"},"suspensionMode":{"$ref":"#/components/schemas/SuspensionMode"},"suspensionReason":{"type":"string","nullable":true},"suspensionEffectiveAt":{"type":"string","format":"date-time","nullable":true,"description":"When the suspension takes, or took, effect — `suspendTenant.effectiveAt`. **A future value is a pending suspension**: the tenant stays `active` until then, and this row is the only place that says a suspension is coming."},"suspensionNoticeMessage":{"$ref":"#/components/schemas/LocalisedText","description":"The notice shown to the tenant's users about the suspension — `suspendTenant.noticeMessage`."},"terminationScheduledAt":{"type":"string","format":"date-time","nullable":true,"description":"When `terminateTenant` started the retention window. Null when no termination is under way."},"terminationRetentionUntil":{"type":"string","format":"date-time","nullable":true,"description":"`terminationScheduledAt` plus the request's `retentionDays`. **Stored, not recomputed** — the day count is client-supplied and exists nowhere else, and this is the date the cells are destroyed after."},"terminationReason":{"type":"string","maxLength":1000,"nullable":true},"terminationRequestedByPrincipalId":{"type":"string","format":"uuid","nullable":true},"planId":{"type":"string","format":"uuid","nullable":true},"planName":{"type":"string","nullable":true},"cellCount":{"type":"integer"},"venueCount":{"type":"integer"},"regionId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"The tenant's home region: the `tenancy` region node whose `RegionSettings` govern tenant-wide gates, today `allowedAiResidencies` (decided 28 September, audit R203). Written by the server when the tenant's first region is created; null until then. ADM-037 reads it to show the region's residency restriction, and `ai.setAiProvider` checks against the same region.\n"},"billingEmail":{"type":"string"},"billingAddress":{"type":"string","maxLength":500,"nullable":true,"description":"Accepted by `createTenant` and `updateTenant`; stored here so the response can return what was sent."},"accountManagerPrincipalId":{"type":"string","format":"uuid","nullable":true},"createdAt":{"type":"string","format":"date-time"},"activatedAt":{"type":"string","format":"date-time","nullable":true}}},
+"TenantStatus": {"type":"string","enum":["onboarding","active","suspended","terminating","terminated"]},
+"UsageMetric": {"type":"string","enum":["venues","workstations","activeUsers","devices","brandedApps","aiTokens","apiCalls","storageGb","transactions","guestProfiles"]},
+"VsiAssessment": {"type":"object","x-ticvai-persistence":"subscription.vsi_assessment","description":"Board 2 — the ten-screen questionnaire, as data.","properties":{"id":{"type":"string","format":"uuid"},"organisationName":{"type":"string","nullable":true},"contactEmail":{"type":"string","nullable":true},"venueType":{"type":"string","nullable":true},"answers":{"type":"object","additionalProperties":true},"requestedModules":{"type":"array","items":{"type":"string"}},"submittedAt":{"type":"string","format":"date-time","nullable":true}}},
+"VsiResult": {"type":"object","description":"Board 2.10. **A prospect told only their price has been told nothing they can argue with.**\n","properties":{"assessmentId":{"type":"string","format":"uuid"},"score":{"type":"number"},"tierCode":{"type":"string"},"tierName":{"type":"string"},"factors":{"type":"array","items":{"type":"object","properties":{"code":{"type":"string"},"label":{"type":"string"},"answer":{"type":"string"},"points":{"type":"number"}}}},"recommendedModules":{"type":"array","items":{"type":"string"}},"recommendedPlanId":{"type":"string","format":"uuid","nullable":true},"indicativePrice":{"$ref":"../shared/common.yaml#/components/schemas/Money"}}}
 }
 ```

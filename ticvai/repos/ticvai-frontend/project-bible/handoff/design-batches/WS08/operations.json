@@ -42,25 +42,6 @@
   "requestBody": null,
   "responds": "Page"
  },
- "listEntryTemporaryExit": {
-  "method": "GET",
-  "path": "/entry-temporary-exit",
-  "contract": "access",
-  "summary": "Re-entry & Temporary Exit Journey",
-  "permission": "SCOPE_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "ReEntryTemporaryExitJourneyView"
- },
  "listFamilyChildPod": {
   "method": "GET",
   "path": "/family-child-pod",
@@ -153,30 +134,6 @@
   "contract": "access",
   "summary": "Guest Journey Command Center",
   "permission": "SCOPE_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- },
- "listJourneys": {
-  "method": "GET",
-  "path": "/journeys",
-  "contract": "marketing-crm",
-  "summary": "Automated journeys",
-  "permission": "MARKETING_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
@@ -290,25 +247,6 @@
   ],
   "requestBody": null,
   "responds": "SpecialEventFreeViewAlternativeAdmissionView"
- },
- "setContextTimeEvent": {
-  "method": "PUT",
-  "path": "/context-time-event",
-  "contract": "access",
-  "summary": "Context, Time, Event & Capacity Policy Builder",
-  "permission": "ACCESS_POINT_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "ContextTimeEventCapacityPolicyBuilderInput",
-  "responds": "ContextTimeEventCapacityPolicyBuilderView"
  },
  "setFastPassProfile": {
   "method": "PUT",

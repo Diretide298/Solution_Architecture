@@ -256,6 +256,15 @@ def resolve_type(spec: dict, schemas: dict, persisted: dict) -> tuple[str, str |
     if isinstance(t, list):          # OpenAPI 3.1: ["string", "null"] — nullability is separate
         t = next((x for x in t if x != "null"), None)
     if t == "array":
+        # **A value-object array that says what it stores as is that column** (2 October, CHG-GTB-010).
+        # An inline array of objects is a child table's rows unless told otherwise -- the rule above
+        # exists so a nested array never *silently* becomes jsonb. `x-ticvai-persistence-column` on the
+        # property is not silent: `AiModel.curatedRange`, `KitchenRoutingRules.categoryRules` and
+        # `WasteApprovalPolicy.bands` declared `jsonb` and still got no column, so the r2 refresh failed
+        # check-contract-storage (ST-FIELD-NO-COLUMN) on a store the contract had already decided.
+        col = spec.get("x-ticvai-persistence-column")
+        if isinstance(col, str) and col.strip():
+            return col.strip(), None
         return _array_type(spec.get("items") or {}, schemas, persisted), None
     if "enum" in spec:
         return "text", None

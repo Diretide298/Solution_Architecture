@@ -1,6 +1,6 @@
 # WS161 — Resource Management Configuration board 7
 
-**10 screens · 14 operations · 24 schemas · 7 permissions**
+**10 screens · 15 operations · 24 schemas · 7 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -61,6 +61,93 @@ convincingly. It is never a caption.
   and its error; and, element by element, what is shown and in what format, what each action
   produces and where the user goes next. Draw exactly that.
 
+## The processes these screens belong to
+
+Written by the owner of each process (`handoff/design-notes/`). Read before any screen: it says how the process runs end to end and which words the screens must use.
+
+### Ticketing & Guest Commerce, as the venue and TICVAI configure and run it
+
+WHAT THE PROCESS IS. Everything a guest can buy is set up, priced, promoted and serviced here, on Venue Management (P08, the venue's own back office, served inside the venue's cell) and on the TICVAI Console (P09, TICVAI's control plane, outside every cell). End to end: (1) CATALOGUE. A product has one of twelve kinds (admission, timedAdmission, datedAdmission, openDated, seated, membership, bundle, fnb, retail, rental, addOn, giftCard). Its ticket types (adult, child, senior, resident...) are not typed one by one: they are generated from the product's attributes (components) and each value combination becomes a sellable ticket type with no extra setup (DI-164). What a ticket grants (validity, entries, re-entry, days of week, blackout dates, expiry anchor, fast track, transfer) lives on a reusable entitlement template, not on the product. Who may take part (age, height, supervision, certification) is the eligibility rule; what the guest must answer is the data mask and the consent questions; how the guest sees it is guestListing (bookable, infoOnly, hidden), display tags (at most six), media and the booking flow. Group, family and corporate products and every after-sales policy (reschedule, exchange, refund, cancellation, upgrade, transfer) are configured inside the one product configuration, never on separate screens (DI-465, DI-466). (2) LIFECYCLE AND PUBLICATION. A product moves draft, inReview, approved, live, withdrawn, archived. Approval and publication are two acts with two permissions (PRODUCT_APPROVE, PRODUCT_PUBLISH, R091); every product is authorised before it sells online or on site (DI-438). Approved is still not on a till: a till sells only what is in the signed catalogue release it pulled (publishBundle, ADR-0013), so a saved price is a back-office fact until the venue publishes to tills. Changing something that has sold is preceded by an impact check (assessProductChange: orders affected, entitlements issued, future performances, open carts); restoring a version creates a new version, and sold tickets keep the price and terms they were sold under (restoreProductVersion, DI-938, TRACKER Actions row 145). (3) PRICE. Prices live in price lists: per venue, per channel set, with validity dates and a priority, copied for the next season with an uplift (copyPriceList) and repriced in bulk only after a dry run (bulkChangePrices). Currency and decimal scale are never chosen on a form: they resolve from the venue's region (ADR-0008, ADR-0018; AED 2 places, OMR and BHD 3). When several rules apply, the configured hierarchy decides; there is no "lowest price wins" default (DI-595). Tax on the pre-discount price and three-decimal rounding are regional settings (DI-598). Dynamic rules always show their minimum and maximum price guardrails beside the trigger (getDynamicPriceRule). (4) PROMOTE AND BUNDLE. A promotion is a rule (automatic, or gated by a code) created in draft, made live only by Publish, which first analyses stacking; a …
+*(source: DI-164; DI-171; DI-438; DI-465; DI-466; DI-595; DI-598; DI-387; DI-039; DI-044; DI-474; DI-671; DI-987; DI-019; DI-080; ADR-0008; ADR-0013; ADR-0018; ADR-0019; ADR-0030; R091; R098; R101; R222; REV3-21; contracts/spine/catalogue.yaml#transitionProductLifecycle …)*
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Product | Anything sellable, of one of the twelve kinds. The record that carries names, channels, listing, media and policies. | Item (except on F&B and retail screens), SKU (for tickets), Offering | contracts/spine/catalogue.yaml#/components/schemas/ProductKind |
+| Ticket type | One sellable variant of an admission or event product (Adult, Child, Resident Adult), generated from the product's attributes. For retail and F&B the same record is labelled Variant. | Variant (on ticket screens), Sub-product, Rate (that is a price), Axis value | contracts/spine/catalogue.yaml#updateProductVariant / DI-164 / DI-437 |
+| Attribute | A dimension that generates ticket types (Guest category, Residency, Tier, Length). Each has values; adding a value adds ticket types. | Axis, Component (the client's word; use it only in help text), Option | contracts/spine/catalogue.yaml#setProductAttributes / DI-164 / DI-450 |
+| Entitlement | What a ticket lets the holder do (validity, entries, re-entry, days, blackout dates, expiry, fast track, transfer), defined once on an entitlement template and shared by several products. | Access rights, Ticket rules, Validity profile | contracts/spine/catalogue.yaml#createEntitlementTemplate / DI-171 / DI-451 |
+| Eligibility rule | Who may take part in or buy a product (age, height, supervision, waiver, certification). Distinct from a promotion's eligibility, which decides who gets a discount. | Restriction, Access rule (that is access control) | contracts/spine/catalogue.yaml#setProductEligibilityRule / DI-463 |
+| Price list | A set of prices for one venue and a set of channels, valid between two dates, with a priority. Several coexist (B2C, B2B, season). | Price book, Rate card, Tariff | contracts/spine/catalogue.yaml#createPriceList / DI-140 / DI-163 |
+| Price category | A standard rate type (Adult, Child, Member) reused across lists so venues do not invent "Adult Standard" and "Normal Adult". | Price band (that is a seat-category band), Fare type (transport) | contracts/spine/catalogue.yaml#setPriceCategoryRateType / … |
+| Price band | A priced band on a seat category (code, label, colour, amount, channel, from-date). | Price category, Zone price | contracts/satellite/seating.yaml#/components/schemas/SeatPriceBand |
+| Promotion | A rule that changes a price automatically or when a code is entered; draft until published; declares how it stacks. | Offer (except in guest copy), Deal, Discount rule | contracts/satellite/promotions.yaml#createPromotion / DI-173 / DI-174 |
+| Coupon code | A code issued from a coupon campaign that applies a promotion-style discount; one shared code or many single-use codes. | Voucher, Promo voucher | contracts/satellite/promotions.yaml#createCouponCampaign / DI-173 |
+| Voucher | A code that carries money (face value, balance), sold or issued; a liability until redeemed or expired. | Coupon, Credit note | contracts/satellite/promotions.yaml#listVoucherBatches / … |
+| Bundle | A product sold as one line whose price differs from the sum of its components, with a mandatory revenue allocation. "Package" is acceptable in guest copy. | Combo (that is an F&B meal deal), Catalogue bundle | contracts/satellite/promotions.yaml#createBundle / DI-220 / ADR-0019 |
+| Catalogue release | The signed snapshot of a venue's catalogue, prices, promotions and sale boards that tills, kiosks and devices pull. Its action label is "Publish to tills". | Bundle, Catalogue bundle, Sync, Deploy | contracts/spine/catalogue.yaml#publishBundle / … |
+| Approve / Publish / Save | Save keeps a draft; Approve records that it is authorised (PRODUCT_APPROVE); Publish makes it live for guests and channels (PRODUCT_PUBLISH). Three different buttons, never merged. | Submit, Go live, Activate (except CatalogueConfigStatus active), Deploy | R091 / contracts/spine/catalogue.yaml#transitionProductLifecycle / DI-438 |
+| Product states | Draft, In review, Approved, Live, Withdrawn, Archived (ProductLifecycleState), always as coloured badges with these exact labels. | Published (for a product), Pending, Inactive (for a product) | contracts/spine/catalogue.yaml#/components/schemas/ProductLifecycleState |
+| Channel | Where something is sold. Labels: pos Point of sale; kiosk Kiosk; web and guestWeb Website; mobile and guestApp App; b2b B2B partners; partner Partner; ota Travel agents (OTA); callCentre Call centre; api API; backOffice Back office. | Touchpoint, Outlet (an outlet is a business inside a venue), raw enum values | contracts/spine/catalogue.yaml#/components/schemas/Channel / … |
+| Refund | Money returned after settlement, wholly or for some lines, under the venue's refund policy. | Return (that is retail goods), Reversal, Void | contracts/spine/orders.yaml#createRefund / DI-252 |
+| Void | Cancelling a whole order before settlement, within the same shift, with a reason from the void list. After settlement it is a refund. | Cancel order, Delete | contracts/spine/orders.yaml#voidOrder / R222 |
+| Exchange / Reschedule | Exchange swaps lines for other products or dates and settles only the difference; Reschedule is the same product moved to another date or time. | Rebook, Date change (acceptable only in guest copy), Refund and resell | contracts/spine/orders.yaml#exchangeOrderLines / … |
+| Hold / Capture / Release | A deposit or stored-value amount is held, then partly or fully captured, and the rest released. A held deposit is not a payment. | Charge, Pre-auth (in staff copy), Block funds | contracts/spine/orders.yaml#authoriseStoredValue / … |
+| Wallet (TICVAI wallet) | The guest's stored-value balance on TICVAI, spent by hold and capture. Distinct from the tender "Apple Pay / Google Pay", which the contract also calls wallet. | Digital wallet (for stored value), E-wallet, Credit (without a type) | contracts/spine/orders.yaml#/components/schemas/TenderKind / R080 |
+| Credit lot | One amount of wallet credit of one credit type (cash, bonus, gift) with its own expiry; lots are spent nearest expiry first and the guest sees the breakdown but cannot choose. | Bucket, Batch, Top-up | TRACKER Actions row 171 / contracts/satellite/wallet.yaml#expireCreditLots |
+| Venue map / Seat map | A venue map is the wayfinding map of a park or a floor (points, paths, bookable places); a seat map is the seating layout of an auditorium or stand. Never just "map" where both could be meant. | Layout (alone), Floor plan (unless it is a floor map), Map (alone) | contracts/satellite/venue-map.yaml#createVenueMap / … |
+| Point / Bookable place | A point is a place on a venue map (toilet, ride, restaurant, exit). A bookable place is a cabana, lounger, table or pitch placed on the map and sold through its price band. | Pin, POI, Marker, Resource (in staff copy) | contracts/satellite/venue-map.yaml#setVenuePoint / … |
+| Station / Route / Timetable / Departure / Fare table / Pass … | A route is an ordered list of stations with offsets; a timetable generates departures up to its release horizon; a fare table prices a route per passenger type; a pass type is a multi-trip or unlimited pass sold as a product. | Stop (except in the stop list), Line (except lineCode), Schedule, Trip (except a guest's journey) | contracts/satellite/transport.yaml / REV3-21 |
+| Applies from | The effective date of a change. Every dated change shows it, and sold items keep their old terms. | Effective date (in labels), Start date (for a change) | contracts/satellite/seating.yaml#updateSeatCategory / TRACKER Actions row 194 |
+
+### Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue)
+
+Venue operations is everything that happens after a sale and inside the gates. A guest's ticket is one virtual ticket with interchangeable media (QR, dynamic QR, RFID wristband, NFC, Face Pass or Face Tag); at an access point a scanner (P07, or the scan function inside the Staff App P06) validates the media against the admission profile and the guest admission policy, offline if it must, and every deny carries a reason and a next action. The back office (Venue Management P08) configures that estate: the venue topology (venue, park, zone, attraction, access point, gate and lane, device placement), admission profiles and rules (entry, exit, re-entry, anti-passback, validity, crossover, companions), credential security (dynamic QR, device binding, beacons), biometrics, gate modes, and the live operations, fraud and monitoring views. Accreditation (P08 setup and review, P11 web portal for applicants, web first) takes an applicant from a configurable form through document checks, OCR, duplicate blocking and multi-level approval to a credential with zone rights. Resources and capacity manage bookable resources (rooms, vehicles, equipment, cabanas, instructors) that are booked as a consequence of selling a product, never sold directly. Workforce covers shift templates, rosters, attendance, swaps and breaks, mirrored on the Staff App. Maintenance and safety cover the asset register, preventive calendars, work orders with scored priority, inspections and incidents, with technicians working from the Staff App. Games and rides configure readers, credit types and consumption priority, play entitlements, game pricing, retry pricing, redemption and the card lifecycle. The virtual queue (Q1) gives a guest a live wait time and a return window for a ride; it is not the on-sale waiting room (Q2). Every calendar has day, week and month views. Configuration resolves tenant, region, venue (outlet only for F&B and retail), and a user's permissions, never the device, decide what they may do. The guest apps (P01, P02) show the guest's side of this: My Tickets, the scan code, Face Pass, wait times, the virtual queue, map booking of cabanas and the visit planner.
+*(source: F06 step 1 / F112 step 1 / F111 step 1 / ADR-0002 / ADR-0012 / ADR-0018 / ADR-0041 / ADR-0066 / ADR-0067 / ADR-0068 / DI-652 / DI-627 / DI-640 / DI-654 / DI-666 / DI-482 / DI-483 / DI-907 / DI-919 / DI-923 / DI-865 / DI-678 / TRACKER Actions row 160 / MoM 2026-09-02 AccessControl / MoM 2026-09-07 …)*
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Ticket | The one virtual record a guest owns (ticket number, product, validity, entries). Its number never changes, whatever media carries it or whoever it is transferred or resold to. | Pass (unless the product is a pass), Booking, Order line | DI-652 / DI-620 / contracts/spine/access.yaml#/components/schemas/TicketStatus |
+| Media | What the ticket is presented by at a gate (QR code, dynamic QR, wristband/RFID card, NFC, Face Pass, Face Tag). One ticket can carry several media as fallbacks; a media code can also cover several tickets scanned as one group. Show one … | Credential (for guest media; keep Credential for accreditation badges and staff), Ticket code | DI-180 / DI-608 / DI-652 |
+| Access point | A place where a scan is judged, with a fixed direction (entry, exit, re-entry, crossover). Hierarchy shown to users is Venue > Park > Zone > Attraction > Access point > Gate/lane > Device. | Scanner (that is the device), Door | screens/P08-venue-back-office.yaml#BO-144 / … |
+| Admission profile | The named set of rules an access point enforces (opening window, entries, exit scan, re-entry, validity, crossover). Products point at a profile; tiers such as Bronze/Silver/Gold are profiles with gate allow and deny lists. | Admission rules (as a screen title), Access rule set | DI-185 / contracts/spine/access.yaml#/components/schemas/AdmissionRules |
+| Admitted / Denied / Overridden | The three scan outcomes. A denial is always shown with its reason in plain words and a next action; an override is a supervisor admitting despite a denial, and is always attributed and reasoned. | Valid/Invalid, Success/Fail, Error | contracts/spine/access.yaml#/components/schemas/ScanOutcome / … |
+| Used | A ticket entry is used the moment a scan succeeds, whether or not the guest physically passed. Mistakes are resolved from the scan history, not by un-scanning. | Redeemed (for admission), Checked in (that is group check-in, a different step) | DI-627 / TRACKER Actions row 221 / TRACKER Actions row 189 |
+| Gate mode | What a lane is doing now, set live by the podium or supervisor - Normal, Free flow (counts, does not validate), Drop arm (everybody through, evacuation), Closed (nobody through), Podium (staff validating by eye), Maintenance. Direction is … | Turnstile mode (as a label for direction), Open/Locked | contracts/spine/access.yaml#/components/schemas/AccessPointOperatingMode / R221 |
+| Offline package | What a scanner holds to validate with no network - entitlements, blacklist, admission profiles and the active guest admission policy version - with its age always visible. | Cache, Local DB | F06 step 3 / ADR-0068 |
+| Sync and reconciliation | Sending the offline scan journal to the server, and the duty manager's review of scans the server rejected after the device had already admitted the guest. | Upload, Retry | F06 step 6 / DI-065 |
+| Face Pass / Face Tag | Face Pass is the long-lived face credential for members and season-pass holders (renewable); Face Tag is short-lived, for one day or event. Retention is set per tier by the venue. | Face ID, Biometric login | DI-640 / ADR-0063 |
+| Accreditation / Credential (accreditation) | Accreditation is the application and approval of a person (media, contractor, corporate, staff of a partner) for an event or season; the credential is what is issued after approval (photo badge, QR or RFID) with zone access rights. | Registration (for the whole process), Ticket | DI-654 / DI-662 |
+| Resource | A bookable thing or person a product needs (room, vehicle, cabana, equipment set, instructor). Guests buy products; resources are assigned to the booking, pre-assigned or dynamically. | Asset (that is maintenance), Inventory (that is stock) | DI-475 / DI-482 / TRACKER Actions row 160 |
+| Asset | A physical item maintained by the venue (ride, turnstile, printer, pump) with a register record, documents, warranty and maintenance history. | Resource, Device (unless it is an IT device in the device register) | DI-910 / ADR-0067 |
+| Work order | A unit of maintenance work, lifecycle Created > Assigned > In progress > Review > Closed, with a resolution timer. | Ticket (reserved for guest tickets), Job card | DI-231 |
+| Game / attraction (games module) | In the games and rides module an attraction is an individual game or ride (roller coaster, racing game, bumper cars), not a venue. | Venue, Park | DI-863 |
+| Virtual queue / Return window | A guest's place in a ride's queue held without standing in line, with a return window (for example 4:50 to 5:00 PM) that recalculates live. Distinct from the walk-in line and the VIP/express lane, and from the on-sale waiting room. | Waiting room, Fast pass (that is the express product), Booking | DI-675 / DI-678 / DI-679 / ADR-0066 |
+| Wait time source | Where a ride's wait time comes from - Sensor, Throughput, Manual, or Unavailable - always shown beside the number. | Live (when the source is manual) | contracts/satellite/queue.yaml#/components/schemas/WaitTimeSource / DI-315 |
+
+### AI & Intelligence
+
+AI in TICVAI is one governed engine behind many screens. The guest meets it as Sahli, the concierge (WEB-044, GST-031, GST-033), as the planner agent that refines a rules-built day plan by chat (GST-054), and as upsell and cross-sell offers on a separate Extras step (WEB-008, GST-048). Staff meet it as the Staff App's AI tab (EMP-019/020, knowledge EMP-040/041), the kiosk assistant (KSK-015) and the support copilot (SUP-006, SUP-018). Venue managers meet it in Venue Management (BO-091 policy and spend, BO-919/BO-925..932 resource and staffing forecasts, BO-597/598 configuration drafts, BO-772/782 marketing optimisation, BO-793 translations, BO-970/975 seat-map generation, BO-1048 seat upsell, BO-1160 fraud cases) and in Analytics (ANL-010 suggestions, ANL-019 management insights, ANL-055 anomalies, ANL-057 forecasting studio, ANL-059 insight history, ANL-060 governance, ANL-071 AI maturity). The governance, configuration-assistant, forecasting, oversight, audit and monitoring boards sit on the TICVAI Console (P09: ADM-037 providers, ADM-469..498 configuration assistant, ADM-499..518 forecasting, ADM-519..558 governance, ADM-633/637 fraud, ADM-680..697 recommendation governance). Five rules hold on every one of these screens. (1) Baseline first, then it learns per tenant: every data-driven answer (forecast, suggestion, risk score, recommendation) exists from day one, from the venue AI profile, a starting pattern for the venue type, the UAE calendar and the weather, and shifts to the venue's own data as it trades; nothing says "comes later" or refuses for lack of history - a refusal only names a missing setting. (2) Every answer shows its basis and maturity: a "Based on" line, a stage badge (Starting, Learning, Established, Trained on your data), "Limited historical data" while the starting pattern carries more than half the weight, ranges or bands rather than a bare percentage, a confidence only where the producer really has one, a plain-words explanation always. (3) A trained model replaces the baseline only when it beats it in a shadow run of at least six weeks and an admin promotes it; the platform raises "Ready to promote" and never switches by itself. (4) The LLM never reads raw data: numbers come only from query results the platform runs (the answer shows the query), only the masked prompt and retrieved context leave the platform, and AI only drafts - the owning screen applies. (5) One autonomy scale, L0 Disabled to L4 Controlled auto, with first-release ceilings, separate from user permission and from the approval tier; impactful actions route to a person, who sees current against proposed, impact, risk and what is affected, and can approve within a limit, challenge, override or roll back; every decision is traceable (data, model, approver, time) and searchable by customer, venue and capability. In Block A (5 October to 20 November 2026) the guest concierge with retrieval, Help me choose, translations, the planner agent, the gateway and …
+*(source: ADR-0051; ADR-0050; ADR-0020; ADR-0052; ADR-0053; ADR-0054; ADR-0059; ADR-0051 (AI-D01..AI-D20); ADR-0051 (AI functions review 30 Sep §2 §4 §9); MoM 18 Sep 4.1-4.10; MoM 21 Sep 4.1-4.14; MoM 30 Sep 4.1 4.7; ADR-0059 (Block A slice: tasks.csv))*
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Sahli | The guest concierge's name; the entry reads "Ask Sahli" and shows as mascot art when the venue's Concierge mascot setting is on (default), otherwise a plain button. | Chatbot, Bot, AI Concierge (as a visible label), Virtual agent | DI-1069 / screens/P01-guest-web-storefront.yaml#WEB-044 |
+| Based on | The line on every AI answer that says what it was computed from, e.g. "Based on: your venue profile, UAE calendar, weather, 23 days of your sales". Always present. | Data sources, Model inputs, Powered by AI | ADR-0051 Maturity / contracts/satellite/ai.yaml#/components/schemas/AiMaturity |
+| Starting / Learning / Established / Trained on your data | The four maturity stages (enum starting, learning, established, learned), shown as one badge. Moves by itself from Starting to Established as own data arrives; Trained on your data only after an admin promotion. | Beta, Experimental, Low confidence, Cold start (in UI), Not enough data | ADR-0051 / ADR-0051 (AI functions review 30 Sep §2) |
+| Limited historical data | Shown while own data carries less than half the weight (AiMaturity.limitedHistory, ownDataShare < 0.5). An honest qualifier, never a refusal. | Insufficient data, Not available until, Comes later | ADR-0051 / contracts/satellite/ai.yaml#/components/schemas/AiMaturity |
+| Range | The 10th-90th percentile band a forecast or estimate is shown with (e.g. "1,850-3,400 guests, most likely 2,600"). Never a bare accuracy percentage on an answer; measured accuracy (WAPE, bias, coverage) appears only on accuracy screens … | Accuracy 92%, Confidence 0.87 (on a heuristic), Exact | ADR-0051 / contracts/satellite/ai.yaml#getForecast / … |
+| Running in the background | A trained model in shadow next to the live answer (AiRelease.stage shadow); it changes nothing a person sees. | Live, Active model, Testing in production | ADR-0051 Promotion / ADR-0051 (AI functions review 30 Sep §2) |
+| Ready to promote / Promote | A shadow model passed its gate (governance alert promotionReady); an admin promotes it one stage at a time (canary, then production). The only way a model replaces the baseline. | Deploy, Go live, Auto-switch, Activate model, Upgrade AI | ADR-0051 (AI-D16) / contracts/satellite/ai.yaml#promoteAiRelease |
+| L0 Disabled / L1 Advisory / L2 Prepare / L3 Execute with … | The one autonomy scale for every AI capability, shown as "L2 Prepare" etc. with the capability's ceiling beside it. Lower scopes tighten, never raise. | Autopilot, Copilot mode, Level 0-3 (CFG book), Approval level (for autonomy), Manual/Semi/Auto | ADR-0050 / ADR-0050 (AI-D04) / … |
+| Approval tier | How many people must approve a proposed action (ProposedAction.approvalLevel, 1 or 2). Not an autonomy level. | Autonomy level, Approval level (ambiguous) | ADR-0050 |
+| Suggestion / Draft | What AI produces. A suggestion advises; a draft is a ready-to-review change that a person applies in the owning screen. Copy says "Nothing is applied until you approve it." | AI changed, Auto-applied, AI updated your prices | ADR-0020 / ADR-0051 (AI functions review 30 Sep §4 Configuration assistant) / … |
+| Why this? | The link or expander that opens an answer's explanation (Suggestion.explanation, recommendation template reason, decision trace). Plain words; for guests a template reason. | Explainability, SHAP, Feature importance (in operator copy) | ADR-0052 (AI-D09) / contracts/satellite/ai.yaml#/components/schemas/Suggestion |
+| No thanks | The explicit decline on an offer. Only this counts as a decline and it is remembered across channels; scrolling past or closing the step is not a decline. | Dismiss (as a decline), Skip (as a decline), X (as a decline) | ADR-0052 (AI-D07) / DI-962 / … |
+| Hold for review | What a high fraud or risk score does to a payment or order. The transaction goes through; it is held for a person. | Decline, Block, Reject (for a risk score), Fraud detected | ADR-0053 / ADR-0053 (AI-D06) |
+| Hand over to a person | The concierge passes the whole conversation and its own summary to a live agent; the guest does not repeat themselves. | Escalate, Transfer, Contact bot | contracts/satellite/marketing-crm.yaml#handoverToAgent |
+| Not available yet | The analytics assistant's answer to a question outside the semantic model; it records a knowledge gap and never improvises a number. | I cannot answer, Error, Unknown | ADR-0054 |
+
+
 ## The screens
 
 Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs count fields; requirements are matrix rows; meeting inputs are the ones naming the screen (the module and platform ones are below); white label says whether the tenant's brand reaches it (guest) or it sets the brand (configures).
@@ -68,19 +155,19 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-913` | Event Resource Planning Command Center | B–D | 2 | 24 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-914` | Event Resource Requirement Builder | B–D | 0 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-914` | Event Resource Requirement Builder | B–D | 0 | 40 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-915` | Venue & Space Allocation | B–D | 0 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-916` | Equipment & Asset Allocation | B–D | 0 | 0 | 6 | 1 | 0 | 0 | — | notStarted (—) |
 | `BO-917` | Event Staff & Personnel Allocation | B–D | 0 | 18 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-918` | Event Resource Template Library | B–D | 13 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-919` | AI Event Resource Forecasting | A | 0 | 4 | 6 | 47 | 1 | 0 | — | notStarted (—) |
+| `BO-918` | Event Resource Template Library | B–D | 37 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-919` | AI Event Resource Forecasting | A | 7 | 19 | 6 | 47 | 0 | 0 | — | notStarted (—) |
 | `BO-920` | Event Resource Cost Estimator | B–D | 2 | 10 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-921` | Multi-Event Allocation & Conflict Optimizer | B–D | 4 | 15 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-922` | Event Resource Approval & Readiness Gate | B–D | 0 | 0 | 6 | 5 | 0 | 3 | — | notStarted (—) |
 
 ## Thin screens in this batch
 
-**BO-914, BO-915, BO-916, BO-919, BO-922 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**BO-914, BO-915, BO-916, BO-922 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ---
 
@@ -105,6 +192,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Route | `/rentals/event-resource-planning-command-center-bo-913` |
 
 **Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Resource readiness of upcoming events in one workspace for event and operations managers.
 
 #### Inputs: what the user enters or picks
 
@@ -153,6 +242,10 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Forecast resource cost | text | not in the schema: `Forecast resource cost` |
 | Event readiness | text | not in the schema: `Event Readiness` |
 
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **readiness**: Same readiness badge and unsecured count as BO-710. *(source: contracts/spine/catalogue.yaml#getEventResourcePlan)*
+
 **Where the user goes next**
 
 - → `BO-100` Venue Home: *Back to Venue Home*
@@ -176,6 +269,20 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the event resource planning are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Consistency with other screens
+
+- Match `BO-710`: The same view on two boards; draw one component.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+events:
+- event: Desert Symphony
+  readiness: ready
+```
 
 #### Permissions
 
@@ -245,6 +352,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape … **Event Resource Requirement Builder declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the …
 
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Define every resource a specific event needs, by kind and quantity, as BO-711.
+
+**Fixed on main** (the package already carries these; draw what it says): No read operation: the screen declares only setEventResourcePlan and nothing that returns the current configuration. (CHG-WIR-025).
+
 #### Inputs: what the user enters or picks
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
@@ -268,6 +379,31 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Resource requirement sections | text | not in the schema: `Resource Requirement Sections` |
 | Spaces | text | not in the schema: `Spaces` |
 
+**Everything an event needs, and whether it has been secured** (detail panel, from `getEventResourcePlan`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Event | the name it points at, never the id | — |
+| Requirements | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
+| Kind | chip: Space, Equipment, Staff, Contractor, Vehicle, Service | — |
+| Resource type | the name it points at, never the id | — |
+| Role code | text | — |
+| Quantity | 1,234 | — |
+| From | 1 Oct 2026, 14:30 | — |
+| To | 1 Oct 2026, 14:30 | — |
+| Location scope path | text | — |
+| Secured count | 1,234 | — |
+| Status | chip: Required, Partially secured, Secured, At risk | — |
+| Bookings | list or chips (count when long) | — |
+| Contractors | list or chips (count when long) | — |
+| Organisation | the name it points at, never the id | — |
+| Role | text | — |
+| Headcount | 1,234 | — |
+| Accreditation programme | the name it points at, never the id | — |
+| Insurance verified | yes / no (icon or chip) | — |
+| Readiness | chip: Not planned, Planning, At risk, Ready | — |
+
 **The selected event resource requirement** (detail panel): The pack groups this record's detail under its own headings: “Event Selection”, “For each requirement”, “Requirements may change according to”.
 
 | Shows | Format | Notes |
@@ -282,6 +418,8 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Event manager | text | not in the schema: `Event manager` |
 | Resource requirement sections | text | not in the schema: `Resource Requirement Sections` |
 | Spaces | text | not in the schema: `Spaces` |
+
+**Data it reads**: `getEventResourcePlan` (onLoad, Everything an event needs, and whether it has been secured)
 
 **Where the user goes next**
 
@@ -298,9 +436,25 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 
+#### Consistency with other screens
+
+- Match `BO-711`: Same editor and record (setEventResourcePlan); keep one design.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+requirements:
+- kind: equipment
+  item: LED wall 6x3 m
+  quantity: 1
+```
+
 #### Permissions
 
 - `setEventResourcePlan` → `EVENT_CONFIGURE` (configure) · staff
+- `getEventResourcePlan` → `EVENT_CONFIGURE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -328,7 +482,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (40 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-914?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-913`.
@@ -355,6 +509,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Route | `/rentals/venue-space-allocation-bo-915` |
 
 **Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Assign spaces to an event and its parts, and book them so the space's calendar shows the event including set-up and tear-down.
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- List operation(s) listSpaces return a bare array, not the paged list envelope (items, nextCursor, hasMore). (CHG-SBO-005)
 
 #### Inputs: what the user enters or picks
 
@@ -394,6 +554,10 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Associated resources | text | not in the schema: `Associated resources` |
 | Operational restrictions | text | not in the schema: `Operational restrictions` |
 
+**What each action does** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **Book space**: Refused on conflict including set-up and tear-down, naming the clashing booking. *(source: contracts/satellite/resources.yaml#bookResource)*
+
 **Data it reads**: `listSpaces` (onLoad, Venue and space allocation)
 
 **Where the user goes next**
@@ -411,6 +575,18 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 Conflicts, and the response names them with times. *"Not available"* on a resource a guest can see in front of them is not an answer. (ResourceConflictProblem) |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+allocation:
+  event: Gulf Attractions Summit
+  space: Hall B
+  from: 13 Nov 08:00
+  to: 15 Nov 20:00
+```
 
 #### Permissions
 
@@ -471,9 +647,21 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** Turns an event's equipment needs into real allocated items: per line (projectors, wireless microphones, LED screens, lighting rigs, furniture, barriers) required, allocated, available and gap, with each item checked for availability, maintenance, inspection, location, existing reservations, setup and dependencies before it is allocated. The one thing to get right: the gap column and the reason an item was not allocated ("P-17 under maintenance") are visible per line.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **The screen has an unlabelled primary button and Cancel, and the gap note says nothing is drawable** Why: The pack gives the Required / Allocated / Available / Gap table, validation checks and specific vs dynamic assignment. *(source: screens/P08-venue-back-office.yaml#BO-916; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **No read of the event's equipment requirements or its current allocations, and no event id on an allocation** Why: allocateResources takes requirements, a window, a subject and an order; it cannot say which event an item serves, so the table cannot be reloaded. *(source: contracts/satellite/resources.yaml#allocateResources; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+
 #### Inputs: what the user enters or picks
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Event**: The event opened from the event command centre (its id carried in), with its date, time and venue shown in the header. *(source: screens/P08-venue-back-office.yaml#BO-916)*
+- **Requirement line**: Either a specific asset (Projector P-01) or a type and quantity (2 x 4K projector) - a radio per line; quantity whole number; category tabs All, Audio, Lighting, Video, Furniture, Other. *(source: screens/P08-venue-back-office.yaml#BO-916)*
 
 #### Outputs: what the screen shows and produces
 
@@ -483,6 +671,16 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |---|---|---|---|---|---|
 |  (primary button) | navigation or local | — | — | — | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
+
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Allocation table**: Resource, Required, Allocated, Available, Gap, Status (tick, amber partial, red shortage); sorted by gap descending; allocated items listed under each line with their codes. *(source: screens/P08-venue-back-office.yaml#BO-916)*
+- **Summary tiles**: Total required, Allocated (with %), Shortage - metric tiles above the table. *(source: screens/P08-venue-back-office.yaml#BO-916)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Allocate**: Fills each line from the pool (rotation by default) for the event's whole occupancy window including setup and teardown; a line that cannot be fully met is refused by name with the available count, not half-filled. *(source: contracts/satellite/resources.yaml#allocateResources / contracts/satellite/resources.yaml#/components/schemas/ResourceAllocationProblem)*
+- **Swap item**: Replace an allocated item with another eligible one (keeps the event booking). *(source: contracts/satellite/resources.yaml#updateResourceBooking)*
 
 **Where the user goes next**
 
@@ -499,6 +697,46 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 Nothing available, or a dependency is missing. Both are named — "no instructor free" and "the stage has no sound system" need different actions from the person … (ResourceAllocationProblem) |
+
+#### Edge cases to draw
+
+- **An item fails inspection after allocation**: Line turns red "LED Screen S-04 failed inspection - replace"; recovery offered. *(source: screens/P08-venue-back-office.yaml#BO-916 / contracts/satellite/maintenance.yaml#submitInspection)*
+- **Required dependency missing (stage without sound system)**: Allocation refused naming the missing dependency. *(source: contracts/satellite/resources.yaml#allocateResources)*
+
+#### Consistency with other screens
+
+- Match `BO-921`: Shortages here roll up into the multi-event optimiser.
+- Match `BO-861`: A line may request a package (Event Stage Package).
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+event: Corporate Gala - Fri 16 Oct 2026 18:00-23:00 (setup from 14:00) - Summit Peaks Grand Hall
+lines:
+- resource: Projectors
+  required: 4
+  allocated: 4
+  available: 6
+  gap: 0
+- resource: Wireless microphones
+  required: 12
+  allocated: 10
+  available: 10
+  gap: 2
+- resource: LED screens
+  required: 3
+  allocated: 3
+  available: 3
+  gap: 0
+- resource: Lighting rigs
+  required: 4
+  allocated: 3
+  available: 3
+  gap: 1
+  reason: Rig 4 under maintenance until 18 Oct
+```
 
 #### Permissions
 
@@ -540,6 +778,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-913`.
 - [ ] Every gated control is gated: `RESOURCE_BOOK`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 2 edge case(s) from the process notes are drawn.
+- [ ] The 2 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -562,9 +802,28 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
 
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** Event staff and personnel allocation: for an event, the roles it needs (event manager, supervisor, ushers, security, technical crew, AV operators, hosts, performers, mascots, registration, customer service, custom), how many of each with what skill, certification, shift and venue, and the qualified candidates to fill them. The one thing to get right: each role row shows required versus allocated and its gap, and candidates are ranked with explained, rule-based matches - nobody failing a mandatory requirement is offered.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **"Event manager", "Supervisor", "Security", "Customer service" are drawn as action buttons** Why: They are event role values (rows of the role table). *(source: screens/P08-venue-back-office.yaml#BO-917; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **Only createRotaAssignment is bound and a rota assignment cannot record the event or role requirement it fills** Why: Write with no read (no role requirements, no candidates) and no event link on RotaAssignment. *(source: contracts/satellite/workforce.yaml#/components/schemas/RotaAssignment; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **Candidate "AI match" percentages** Why: Staff matching was agreed as attribute matching; label it "Match" and show its reasons. *(source: contracts/satellite/resources.yaml#suggestResources; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+
+#### Decided on this screen
+
+Answered questions: draw the decision, not the old default. Where a decision and the tables below differ, the decision wins.
+
+- **Where are event role requirements stored (quantity, skill, certification, shift per role)?** → Drawn default accepted: Draw the role table editable; mark storage as pending under the event resource plan. *(decided by Chinmay, 2026-10-02; DEC-514 / CHG-NOTE-008)* **Reviewable:** a default the lead may still overrule before the block is tasked.
+
 #### Inputs: what the user enters or picks
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Role requirement**: Per role - required quantity, minimum skill level, certification, shift, start-end, break requirement, venue, priority (High, Medium, Low). *(source: screens/P08-venue-back-office.yaml#BO-917)*
+- **Allocate**: Pick a candidate for a role slot; creates a rota assignment for the shift. Refusals (overlap, missing role) shown on the slot. *(source: contracts/satellite/workforce.yaml#createRotaAssignment)*
 
 #### Outputs: what the screen shows and produces
 
@@ -607,6 +866,15 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Security (secondary button) | navigation or local | — | — | — | — |
 | Customer service (secondary button) | navigation or local | — | — | — | — |
 
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Role table**: Role, required, allocated, gap, shift; roles as rows (the event roles are values, not buttons). *(source: screens/P08-venue-back-office.yaml#BO-917)*
+- **Candidates**: Name, role, skill, certification, availability, existing workload ("3 assignments this week"), venue, overtime impact, match with reasons ("Sanjay Pillai - 97% - AV Level 3, available, same venue, no overtime"). *(source: screens/P08-venue-back-office.yaml#BO-917 / screens/P08-venue-back-office.yaml#BO-918 / contracts/satellite/resources.yaml#suggestResources)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Smart assign**: Proposes the best candidate per open slot with reasons; applied by the event manager. *(source: screens/P08-venue-back-office.yaml#BO-918)*
+
 **Where the user goes next**
 
 - → `BO-913` Event Resource Planning Command Center: *Back to Event Resource Planning Command Center*
@@ -622,6 +890,44 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 Overlaps an existing assignment, or the person lacks the required role |
+
+#### Edge cases to draw
+
+- **Best candidate is at another venue**: Shown lower with "Different venue - 30-minute transfer"; never hidden. *(source: screens/P08-venue-back-office.yaml#BO-882)*
+- **Role needs a certification nobody available holds**: Gap stays with "No qualified person available"; offer "Request external resource" where configured. *(source: screens/P08-venue-back-office.yaml#BO-887)*
+
+#### Consistency with other screens
+
+- Match `BO-714`: Event shifts and this allocation are one roster; draw this as the role and candidate panel of BO-714 (per VO-R14).
+- Match `BO-884`: Same candidate card.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+event: Corporate Gala - Summit Peaks Grand Hall - 1,200 guests - Fri 20 Nov 2026
+roles:
+- role: Security
+  required: 18
+  allocated: 12
+  gap: 6
+- role: Ushers
+  required: 24
+  allocated: 24
+  gap: 0
+- role: AV operators
+  required: 4
+  allocated: 3
+  gap: 1
+candidates:
+- name: Sanjay Pillai
+  match: 97%
+  why: AV Level 3, available, same venue, no overtime
+- name: Hessa Al Marzooqi
+  match: 86%
+  why: AV Level 3, available, different venue
+```
 
 #### Permissions
 
@@ -659,6 +965,9 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-913`.
 - [ ] Every gated control is gated: `WORKFORCE_MANAGE`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 2 edge case(s) from the process notes are drawn.
+- [ ] The 3 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
+- [ ] The 1 decision(s) taken on this screen are drawn as decided, not as the old default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -676,8 +985,17 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Administrators shall configure) and no display directory — it is settings, not a population |
 | Offline | online only |
-| Opens with | nothing: it opens on its own |
+| Opens with | `packageId` (navigation) |
 | Route | `/rentals/event-resource-template-library-bo-918` |
+
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** Reusable resource plans for common events (Corporate Conference 500 guests - main hall, 3 breakout rooms, stage, 2 LED screens, 8 wireless mics, sound, lighting, event manager, 8 ushers, 6 security, 4 technical crew), applied when a new event is created and then adjusted. The one thing to get right: templates are versioned - changing one never silently changes an event plan already approved.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **Every template setting, and "Template Application", is a selectField** Why: Text, ranges, durations and a line table need their own controls; application is an action from an event. *(source: screens/P08-venue-back-office.yaml#BO-918; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **Event type, attendance range, setup and teardown duration, versioning and an apply operation have no field or operation** Why: The library is bound to resource packages, which have none of these; nothing applies a template to an event. *(source: screens/P08-venue-back-office.yaml#BO-919 / contracts/satellite/resources.yaml#/components/schemas/ResourcePackage; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+
+**Fixed on main** (the package already carries these; draw what it says): No update operation bound (CHG-WIR-001).
 
 #### Inputs: what the user enters or picks
 
@@ -699,7 +1017,58 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Effective dates | select field | — | — | — | — | — | — |
 | Template Application | select field | — | — | — | — | — | — |
 
+**Form: Save template** (modal, opened by *Save template*; *Save template* calls `updateResourcePackage`, *Cancel* sends nothing)
+
+**Collects what `updateResourcePackage` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| ID `id` | picker: choose an id | optional | — | — | shows names, sends the id | — | `updateResourcePackage` body |
+| Code `code` | text field | required | — | — | — | — | `updateResourcePackage` body |
+| Name `name` | text field | required | — | — | — | — | `updateResourcePackage` body |
+| Description `description` | text area | optional | — | — | — | — | `updateResourcePackage` body |
+| Applicable venues `applicableVenueIds` | multi-picker: choose applicable venues | optional | — | — | — | — | `updateResourcePackage` body |
+| Components `components` | repeatable rows | optional | — | — | — | — | `updateResourcePackage` body |
+| ID `components[].id` | picker: choose an id | optional | — | — | shows names, sends the id | — | `updateResourcePackage` body |
+| Resource type `components[].resourceTypeId` | picker: choose a resource type | optional | — | — | shows names, sends the id | — | `updateResourcePackage` body |
+| Category `components[].categoryId` | picker: choose a category | optional | — | — | shows names, sends the id | — | `updateResourcePackage` body |
+| Resource `components[].resourceId` | picker: choose a resource | optional | — | — | shows names, sends the id | A fixed component, and the exception rather than the rule. Meeting Room A really is Meeting Room A; the technician is not. | `updateResourcePackage` body |
+| Quantity `components[].quantity` | number field | required | 1 | — | — | — | `updateResourcePackage` body |
+| Mandatory `components[].mandatory` | toggle | optional | on | — | — | — | `updateResourcePackage` body |
+| Required qualifications `components[].requiredQualifications` | list of values (chips) | optional | — | — | — | — | `updateResourcePackage` body |
+| Required attributes `components[].requiredAttributes` | key and value settings | optional | — | — | — | — | `updateResourcePackage` body |
+| Substitute resources `components[].substituteResourceIds` | multi-picker: choose substitute resources | optional | — | — | — | — | `updateResourcePackage` body |
+| Scope path `components[].scopePath` | text field | optional | — | — | — | — | `updateResourcePackage` body |
+| Allocation priority `allocationPriority` | number field | optional | 0 | — | — | — | `updateResourcePackage` body |
+| Effective from `effectiveFrom` | date picker | optional | — | — | 1 Oct 2026 (dd MMM yyyy) | — | `updateResourcePackage` body |
+| Effective to `effectiveTo` | date picker | optional | — | — | 1 Oct 2026 (dd MMM yyyy) | — | `updateResourcePackage` body |
+| Minimum minutes `minimumMinutes` | number field (minutes) | optional | — | — | — | — | `updateResourcePackage` body |
+| Maximum minutes `maximumMinutes` | number field (minutes) | optional | — | — | — | — | `updateResourcePackage` body |
+| Requires approval `requiresApproval` | toggle | optional | off | — | — | — | `updateResourcePackage` body |
+| Internal cost `internalCost` | money field | optional | — | A jsonb price cannot be summed in SQL. | AED, 2 decimals shown (up to 4 accepted), currency from the … | On the wire this is three fields; in the database it is one column. 24 August. | `updateResourcePackage` body |
+| Scope path `scopePath` | text field | optional | — | — | — | — | `updateResourcePackage` body |
+
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Template header**: Template code, name, event type (Conference, Concert, Gala, Wedding, Product launch, VIP dinner), attendance range (from-to guests), applicable venues, effective dates. *(source: screens/P08-venue-back-office.yaml#BO-919)*
+- **Resource lines**: Grouped Spaces / Equipment / Staff - each line a resource, type or package with quantity; staff by role; setup and teardown durations for the template; dependencies picked from rules. *(source: screens/P08-venue-back-office.yaml#BO-918 / screens/P08-venue-back-office.yaml#BO-919)*
+
 #### Outputs: what the screen shows and produces
+
+**Actions and what each produces**
+
+| Action | Calls | Sends | On success returns | Errors to show | Notes |
+|---|---|---|---|---|---|
+| Save template (secondary button) | `updateResourcePackage` PUT `/resource-packages/{packageId}` | ResourcePackage | ResourcePackage | — | opens modal first |
+
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Template cards**: Name, attendance range, counts (Spaces 5, Equipment 14, Staff 8), version and Active badge; filter by event type; search. *(source: screens/P08-venue-back-office.yaml#BO-918)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Create template / Save as new version**: Saves a new version; events planned from an earlier version keep theirs and show "Template v3 available". *(source: screens/P08-venue-back-office.yaml#BO-919 / contracts/satellite/resources.yaml#createResourcePackage)*
+- **Apply to event**: From an event, populates its resource plan from the template; the user then edits the event's own plan. *(source: screens/P08-venue-back-office.yaml#BO-919)*
 
 **Data it reads**: `listResourcePackages` (onLoad, Template library)
 
@@ -718,10 +1087,41 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Empty, no results (`?state=emptyNoResults`) | **Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist |
 | Offline (`?state=offline`) | online only |
 
+#### Edge cases to draw
+
+- **Template applied to a venue it is not valid for**: Lines naming resources of another venue shown as "Not at this venue - choose a substitute". *(source: screens/P08-venue-back-office.yaml#BO-919)*
+
+#### Consistency with other screens
+
+- Match `BO-861`: Templates and packages are the same object family; draw this as the event view of the package library (VO-R14) with event-only fields.
+- Match `BO-916`: Applying a template fills that screen's lines.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+templates:
+- code: TPL-CONF-500
+  name: Corporate Conference - 500
+  type: Conference
+  attendance: 300-600
+  lines: 1 Main hall, 3 Breakout rooms, 1 Stage, 2 LED screens, 8 Wireless mics, 1 Sound system, 1 Lighting package,
+    1 Event manager, 8 Ushers, 6 Security, 4 Technical crew
+  setup: 4 h
+  teardown: 2 h
+  version: v2
+- code: TPL-CONCERT-M
+  name: Concert - Medium
+  type: Concert
+  lines: Main stage, Backstage, Lighting package, Sound package, 12 Security, 15 Ushers, 8 Technical crew
+```
+
 #### Permissions
 
 - `listResourcePackages` → `RESOURCE_VIEW` (read) · staff
 - `createResourcePackage` → `RESOURCE_CONFIGURE` (configure) · staff
+- `updateResourcePackage` → `RESOURCE_CONFIGURE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -748,13 +1148,15 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (13), with its required mark, default, format and its error state.
+- [ ] Every input above is drawn (37), with its required mark, default, format and its error state.
 - [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-918?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, emptyNoResults, offline.
-- [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
+- [ ] Every action is wired with its success and its failure: Save template.
 - [ ] Every transition is wired: `BO-913`.
 - [ ] Every gated control is gated: `RESOURCE_CONFIGURE`, `RESOURCE_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 1 edge case(s) from the process notes are drawn.
+- [ ] The 2 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -775,9 +1177,27 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | nothing: it opens on its own |
 | Route | `/rentals/ai-event-resource-forecasting-bo-919` |
 
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
+**From the AI & Intelligence process.** Event resource forecast: before resources are finally allocated for an event or a busy day, the manager sees, per resource type, what is configured against what the forecast says will be needed, with the busy-case figure, and can test a what-if (a bigger crowd, an extra show, rain). The forecast exists from day one on the venue's starting pattern and says so. The one thing to get right: "AI recommended" is a range from a published forecast version, shown next to the configured figure - never a silent overwrite of the allocation.
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- The dataTable and detail panel bind no operation (columns "Configured", "AI Recommended" with op None), and in Block A only createForecastScenario is in the slice. (CHG-SBO-006)
+
+**Fixed on main** (the package already carries these; draw what it says): DI-280 (14 August) says data-dependent forecasting cannot be delivered in phase one for lack of history. (CHG-CLN-012).
+
+#### Decided on this screen
+
+Answered questions: draw the decision, not the old default. Where a decision and the tables below differ, the decision wins.
+
+- **Which resource types does the event forecast cover in release 1 (staff, gates, F&B tills, rentable equipment)?** → The event forecast covers every requirement kind (staff, pos, kiosk, gates, fnb, retail, stock, resource, equipment, facility), filtered to what the venue configured. Action: a curated model per AI/ML task with 3-4 alternatives (done as research; see the curated-range decision). *(decided by Chinmay, 2026-10-02; DEC-009 / CHG-NOTE-001)*
 
 #### Inputs: what the user enters or picks
+
+**On the screen**
+
+| Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
+|---|---|---|---|---|---|---|---|
+| Requirement kinds | select | optional | — | Staff · POS · Kiosk · Gates · Fnb · Retail · Stock · Resource · Equipment · Facility | — | **Every requirement kind (decided 2 October 2026 by Chinmay, DEC-009; CHG-CSA-005)**: staff, POS, kiosk, gates, F&B, retail, stock, resource, equipment, facility, filtered to what the venue … | `AiOperationalRequirement.kind` |
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
 
@@ -795,25 +1215,78 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | To | date and time picker | — | — | `listOperationalRequirements` ?to |
 | Version | picker: choose a version | — | — | `listOperationalRequirements` ?versionId |
 
-Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+**Form: Run a what-if** (modal, opened by *Run a what-if*; *Run a what-if* calls `createForecastScenario`, *Cancel* sends nothing)
+
+**Collects what `createForecastScenario` sends before it is called.** Required: `baseVersionId`, `changes`. Optional: `name`. A scenario starts from a published `baseVersionId`. Dismissing sends nothing; the screen behind is unchanged.
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Name `name` | text field | optional | — | — | — | — | `createForecastScenario` body |
+| Base version `baseVersionId` | picker: choose a base version | required | — | — | shows names, sends the id | — | `createForecastScenario` body |
+| Changes `changes` | repeatable rows | required | — | at least 1 | — | — | `createForecastScenario` body |
+| Lever `changes[].lever` | select | required | — | Price · Capacity · Opening hours · Weather · Event · Marketing · Staffing · Closure | — | — | `createForecastScenario` body |
+| Target `changes[].target` | text field | optional | — | — | — | — | `createForecastScenario` body |
+| Value `changes[].value` | key and value settings | optional | — | — | — | — | `createForecastScenario` body |
+
+**Rules for these inputs** (from the AI & Intelligence process; these refine the tables above and win where they differ)
+
+- **what-if changes (createForecastScenario)**: A scenario is built on a published forecast version (baseVersionId, chosen from the event's date) with typed changes: expected attendance, opening hours, an added performance, weather, a closure, staffing. Name optional; default "What-if: <event> <date>". It never changes production. *(source: contracts/satellite/ai.yaml#createForecastScenario / MoM 18 Sep 4.10)*
 
 #### Outputs: what the screen shows and produces
 
 **Shown**
 
-**Every event resource forecasting** (data table)
+**Recommended requirements** (data table, from `listOperationalRequirements`): "Configured" against "AI recommended" from the board is the requirement against what the venue has set up; the board labels were not fields.
 
 | Shows | Format | Notes |
 |---|---|---|
-| Configured | text | not in the schema: `Configured` |
-| AI recommended | text | not in the schema: `AI Recommended` |
+| Kind | chip: Staff, POS, Kiosk, Gates, Fnb, Retail… | — |
+| Subject ref | text | A role, outlet, gate, item or resource type. |
+| Period start | 1 Oct 2026, 14:30 | — |
+| Period end | 1 Oct 2026, 14:30 | — |
+| Quantity | 1,234.5 | — |
+| Quantity P90 | 1,234.5 | The requirement at the forecast's 90th percentile, for planning to the busy case. |
+| Unit | text | — |
+| Status | chip: Issued, Accepted, Modified, Rejected, Handed over, Expired | — |
 
-**The selected event resource forecasting** (detail panel): The pack groups this record's detail under its own headings: “Security”, “Reason”.
+**Forecast basis** (detail panel, from `getForecast`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| Configured | text | not in the schema: `Configured` |
-| AI recommended | text | not in the schema: `AI Recommended` |
+| Target start | 1 Oct 2026, 14:30 | — |
+| Target end | 1 Oct 2026, 14:30 | — |
+| P10 | 1,234.5 | — |
+| P50 | 1,234.5 | — |
+| P90 | 1,234.5 | — |
+| Unit | text | — |
+| Drivers | grouped details | Component decomposition or SHAP contributions, largest first (ADM-506). |
+
+**The selected requirement** (detail panel, from `listOperationalRequirements`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Target contract | text | The owning module that applies it: `workforce`, `fnb`, `inventory`, `resources`, `access`. |
+| Productivity standard | grouped details | The standard used, e.g. covers per staff hour, scans per gate per hour. |
+| Decision note | text | — |
+| Handover ref | text | The owning module's record once handed over. |
+
+**Actions and what each produces**
+
+| Action | Calls | Sends | On success returns | Errors to show | Notes |
+|---|---|---|---|---|---|
+| Run a what-if (primary button) | `createForecastScenario` POST `/forecast-scenarios` | AiForecastScenario | AiForecastScenario | — | opens modal first |
+
+**Rules for what is shown** (from the AI & Intelligence process; these refine the tables above and win where they differ)
+
+- **Configured vs AI recommended**: Two columns per resource (lifeguards, cashiers, gate lanes, golf carts, cabanas): configured quantity, and the recommended quantity at the most-likely forecast with the busy case (P90) beside it, e.g. "14 (busy case 17)". A difference is highlighted, not corrected. *(source: contracts/satellite/ai.yaml#/components/schemas/AiOperationalRequirement (quantity, quantityP90) / screens/P08-venue-back-office.yaml#BO-919)*
+- **basis and maturity**: The forecast's "Based on" line and stage badge above the table, e.g. "Starting - Based on: your venue profile, water-park pattern, UAE calendar, weather. Limited historical data." The forecast range is shown, not a single number. *(source: ADR-0051 / contracts/satellite/ai.yaml#/components/schemas/AiForecastVersion (maturity))*
+- **scenario result**: The scenario's figures beside the base version's, clearly labelled "What-if", with the changes listed. *(source: contracts/satellite/ai.yaml#createForecastScenario)*
+- **Requirement kinds covered**: Every requirement kind (staff, pos, kiosk, gates, fnb, retail, stock, resource, equipment, facility), filtered to what the venue has configured. The model behind each task comes from TICVAI's curated range (the best-suited model plus 3-4 alternatives). *(source: decided 2 October 2026 by Chinmay (CHG-NOTE-001))*
+
+**What each action does** (from the AI & Intelligence process; these refine the tables above and win where they differ)
+
+- **Run what-if**: Creates the scenario and shows its requirements next to the base; nothing is allocated. *(source: contracts/satellite/ai.yaml#createForecastScenario)*
+- **Open in staffing requirements**: Opens BO-927 for the staff rows, where a requirement is accepted, modified or rejected. *(source: screens/P08-venue-back-office.yaml#BO-927)*
 
 **Data it reads**: `getForecast` (onLoad, Forecast values); `listOperationalRequirements` (onLoad, Requirements derived from the forecast)
 
@@ -827,10 +1300,45 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |---|---|
 | Loading (`?state=loading`) | The event resource forecasting list. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the event resource forecasting untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No event resource forecasting yet. Carries the create action; distinct from a filter that matched nothing. |
-| Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the event resource forecasting are still there. Names the active filter and offers to clear it. |
+| Empty, first run (`?state=emptyFirstRun`) | No published forecast for this event yet: the baseline forecast fills the requirements as soon as one is published (ADR-0051). Offers Run a what-if once a base version exists. |
+| Empty, no results (`?state=emptyNoResults`) | Nothing of the chosen kinds: names the kinds filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Edge cases to draw
+
+- **No published forecast for the date yet**: Says so and offers to run one (or that the nightly run will publish it); never shows a blank recommended column. The day-one forecast exists from the starting pattern, so this happens only before the first run. *(source: ADR-0051 / contracts/satellite/ai.yaml#getForecast)*
+- **Forecast stale (more than 36 hours since the last publication)**: A "Forecast is out of date" marker on the recommended column with the publication time. *(source: contracts/satellite/ai.yaml#getForecast (stale))*
+- **Venue profile missing a setting the requirement needs (e.g. no productivity standard for a role)**: The row says which setting is missing and links to the AI venue profile; other rows still show. *(source: ADR-0051 (Contract change) / contracts/satellite/ai.yaml#/components/schemas/AiVenueSettings (staffProductivity))*
+
+#### Consistency with other screens
+
+- Match `BO-927`: Same requirement rows for staff; the decision is taken there.
+- Match `ADM-507`: Same what-if model as the console simulator; same labels for changes.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+event: Ladies' Night, Coastal Aqua, Thu 15 Oct 2026, 18:00-23:00
+forecast:
+  mostLikely: 2600
+  range: 1,850-3,400 guests
+  stage: Starting
+  basedOn: your venue profile, water-park pattern, UAE calendar, weather (31°C, clear)
+rows:
+- resource: Lifeguards
+  configured: 12
+  recommended: 14 (busy case 17)
+- resource: F&B cashiers
+  configured: 6
+  recommended: 6 (busy case 8)
+- resource: Gate lanes
+  configured: 4
+  recommended: 3 (busy case 4)
+whatIf: +600 guests (DJ announced)
+```
 
 #### Permissions
 
@@ -862,9 +1370,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 #### Client meeting inputs
 
-For this screen, newest first. An **Open question** is built to the default it states. Where an item disagrees with the fields above, the item wins.
-
-- Data-dependent forecasting (demand/revenue) cannot be delivered in phase one for lack of history, though its front end, back end and data components can be built. *(agreed · MoM 14 Aug 2026, 1. AI Configuration Assistant — Phase-One Scope · DI-280)*
+None names this screen.
 
 Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
@@ -878,16 +1384,19 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS132 Resource Management Configuration Board 7.dc.html#bo-919`
 - Workshop pack: Resource_Management_Configuration_Reference.pdf board 7
 - Flow F270 *Resource Management Configuration board 7: Event Resource Planning Command …*, step 12: Works in AI Event Resource Forecasting → Predict the resources required for an event before final allocation.
+- ADR-0051 *Every AI function ships on a baseline and learns per tenant; a model goes live only on evidence* (`docs/adr/0051-ai-ships-on-a-baseline-and-learns-per-tenant.md`)
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (4 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (7), with its required mark, default, format and its error state.
+- [ ] Every output is drawn (19 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-919?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
+- [ ] Every action is wired with its success and its failure: Run a what-if.
 - [ ] Every transition is wired: `BO-913`.
 - [ ] Every gated control is gated: `AI_USE`.
-- [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The module and platform inputs below are applied.
+- [ ] The 3 edge case(s) from the process notes are drawn.
+- [ ] The 1 decision(s) taken on this screen are drawn as decided, not as the old default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -909,6 +1418,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Route | `/rentals/event-resource-cost-estimator-bo-920` |
 
 **Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** What an event's resource plan will cost, by kind, with the requirements that have no price yet listed so the total is not mistaken for complete.
 
 #### Inputs: what the user enters or picks
 
@@ -957,6 +1468,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Equipment cost (secondary button) | navigation or local | — | — | — | — |
 | External resource cost (secondary button) | navigation or local | — | — | — | — |
 
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **estimate**: Lines per requirement, totals by kind, grand total, and "unpriced: 3 requirements" as a warning. *(source: contracts/spine/catalogue.yaml#estimateEventResourceCost)*
+
 **Data it reads**: `estimateEventResourceCost` (onLoad, What the event's resource plan costs, by kind)
 
 **Where the user goes next**
@@ -973,6 +1488,20 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the event resource cost are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+estimate:
+  total: AED 184,500.00
+  byKind:
+    staff: AED 62,000.00
+    equipment: AED 96,500.00
+    contractors: AED 26,000.00
+  unpriced: 2
+```
 
 #### Permissions
 
@@ -1033,6 +1562,19 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Known gaps.** **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** Scarce resources across overlapping events on one view: a shared timeline of the week's events, a resource summary (Security Level 2+ required 50, available 43, gap 7; LED screens 9 vs 7), priority rules, and AI-proposed redistributions compared against the current allocation before anyone applies them. The one thing to get right: a proposal shows its effect (gaps, conflicts, cost, transfers) next to the current plan, and a person applies it.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **Total required and Gap tiles and the event, priority and proposed resolution fields have no source** Why: getResourceCalendar returns resource states; nothing returns demand per event, event priority or optimisation proposals. *(source: contracts/satellite/resources.yaml#getResourceCalendar / screens/P08-venue-back-office.yaml#BO-921; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **The View filter is a selectField and the shared timeline a data table of segments** Why: The timeline is the calendar component with Day/Week views (VO-R01). *(source: DI-907 / DI-919; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+
+#### Decided on this screen
+
+Answered questions: draw the decision, not the old default. Where a decision and the tables below differ, the decision wins.
+
+- **Do optimisation proposals come through the AI proposed-actions queue (listProposedActions / decideProposedAction) like BO-928 and BO-929?** → Drawn default accepted: Draw proposals as AI proposed actions with Accept / Reject and an audit line. *(decided by Chinmay, 2026-10-02; DEC-515 / CHG-NOTE-008)* **Reviewable:** a default the lead may still overrule before the block is tasked.
+
 #### Inputs: what the user enters or picks
 
 **On the screen**
@@ -1053,6 +1595,11 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Resource type | picker: choose a resource type | — | — | `getResourceCalendar` ?resourceTypeId |
 | Category | picker: choose a category | — | — | `getResourceCalendar` ?categoryId |
 | Granularity | radio group | — | Day · Week · Month · Agenda | `getResourceCalendar` ?granularity |
+
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Window and scope**: Week or day window with the calendar navigator (VO-R01), venue scope, resource type filter. *(source: contracts/satellite/resources.yaml#getResourceCalendar)*
+- **Priority rules**: Ordered list - event priority, SLA, customer tier, revenue, contractual commitment, resource suitability, operational risk - used to break shortages. *(source: screens/P08-venue-back-office.yaml#BO-921)*
 
 #### Outputs: what the screen shows and produces
 
@@ -1098,6 +1645,17 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Event priority | text | not in the schema: `Event priority` |
 | Proposed resolution | text | not in the schema: `Proposed resolution` |
 
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Resource summary**: Resource, total required, total available, gap, severity chip (Critical, High, Medium, OK); gap red when negative. *(source: screens/P08-venue-back-office.yaml#BO-921)*
+- **Event timeline**: Events as bars across the days (Corporate Gala, Concert A, Conference B, VIP Dinner) coloured Confirmed, Needs attention, Conflict, Optimised. *(source: screens/P08-venue-back-office.yaml#BO-921)*
+- **Proposals and comparison**: Each proposal as a sentence with its saving or gap closed ("Move 4 security staff from Conference B after 18:00 to Concert A - closes 4 of 7"); Current vs Optimised table for gaps, conflicts, cost (AED), transfers and utilisation. *(source: screens/P08-venue-back-office.yaml#BO-921 / screens/P08-venue-back-office.yaml#BO-922)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Apply selected / Apply all**: Shows the list of changes and their effect, then applies on confirm; each change re-runs conflict detection and is recorded as an AI recommendation approved by the user. *(source: screens/P08-venue-back-office.yaml#BO-932 / contracts/satellite/resources.yaml#updateResourceBooking)*
+- **Click a conflict**: Detail with the event, its priority and the proposed resolution. *(source: screens/P08-venue-back-office.yaml#BO-921)*
+
 **Data it reads**: `getResourceCalendar` (onLoad, Conflicts across events)
 
 **Where the user goes next**
@@ -1114,6 +1672,46 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the multi-event allocation conflict are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Edge cases to draw
+
+- **A proposal would break a mandatory rule (unqualified security staff)**: Not shown as available (VO-R11); listed under "Rejected by rules" with the rule. *(source: screens/P08-venue-back-office.yaml#BO-932)*
+
+#### Consistency with other screens
+
+- Match `BO-871`: Same planner component (VO-R14); this entry adds cost and scenario comparison for events.
+- Match `BO-928`: AI conflict resolution proposals use the same proposal card.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+window: Sun 18 - Sat 24 Oct 2026
+summary:
+- resource: Security Level 2+
+  required: 50
+  available: 43
+  gap: -7
+  severity: Critical
+- resource: LED screens
+  required: 9
+  available: 7
+  gap: -2
+  severity: High
+- resource: Wireless mics
+  required: 26
+  available: 24
+  gap: -2
+  severity: Medium
+- resource: Technical crew
+  required: 28
+  available: 28
+  gap: 0
+  severity: OK
+proposal: Move 4 security staff from Conference B after 18:00 to Concert A; use projector package at VIP Dinner
+  instead of 2 LED screens
+```
 
 #### Permissions
 
@@ -1153,13 +1751,16 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-913`.
 - [ ] Every gated control is gated: `RESOURCE_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 1 edge case(s) from the process notes are drawn.
+- [ ] The 2 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
+- [ ] The 1 decision(s) taken on this screen are drawn as decided, not as the old default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
 
 ### `BO-922` Event Resource Approval & Readiness Gate
 
-**Provide the final governance checkpoint before an event resource plan becomes operational. Provide TICVAI with a centralized AI Resource Intelligence Engine capable of forecasting demand, identifying resource shortages, recommending optimal staff and physical resources, resolving conflicts, optimizing schedules, simulating operational scenarios, and allowing managers to interact with Resource Management through natural language. Board 8 shall consume information from the previous Resource Management boards rather than recreate their configuration.**
+**Provide the final governance checkpoint before an event resource plan becomes operational.**
 
 | | |
 |---|---|
@@ -1174,6 +1775,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Route | `/rentals/event-resource-approval-readiness-gate-bo-922` |
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** The last check before an event's resource plan becomes operational: readiness, unsecured items and the approval request that signs it off.
+
+**Fixed on main** (the package already carries these; draw what it says): The purpose also describes an AI resource intelligence engine. (CHG-WIR-026).
 
 #### Inputs: what the user enters or picks
 
@@ -1192,6 +1797,10 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Create approval request (primary button) | navigation or local | — | — | — | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
 
+**What each action does** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **Submit for approval**: Raises an approval request of kind configuration change for the plan; the gate shows pending until decided. *(source: contracts/spine/approvals.yaml#createApprovalRequest)*
+
 **Where the user goes next**
 
 - → `BO-913` Event Resource Planning Command Center: *Back to Event Resource Planning Command Center*; carries `eventId`
@@ -1207,6 +1816,17 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 An open request already exists for this subject. Two approvals for one refund is how a refund gets paid twice. (ApprovalStateProblem) |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+gate:
+  event: Gulf Attractions Summit
+  readiness: ready
+  approval: pending, Operations director
+```
 
 #### Permissions
 
@@ -1337,7 +1957,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - Reports and historical searches must still retrieve archived transactions when required; the retention period (e.g. keep 3 of 5+ years live) is configurable per customer, archival manual or automated. *(agreed · MoM 28 Jul 2026, 23. Database Optimisation and Archiving · DI-018)*
 - Back-office controls for the waiting room: configurable maximum active users and admission intervals, set per customer and venue. *(agreed · MoM 28 Jul 2026, 19. Auto-scaling and Virtual Waiting Room · DI-017)*
 
-**2 more name particular screens** and are in each screen's block above (*Client meeting inputs*).
+**1 more name particular screens** and are in each screen's block above (*Client meeting inputs*).
 
 ---
 
@@ -1364,7 +1984,8 @@ Method, path, parameters, request and response for every operation these screens
 "listOperationalRequirements": {"method":"GET","path":"/operational-requirements","contract":"ai","summary":"Requirements derived from the forecast","permission":"AI_USE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"kind","in":"query","required":null},{"name":"status","in":"query","required":null},{"name":"from","in":"query","required":null},{"name":"to","in":"query","required":null},{"name":"versionId","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listResourcePackages": {"method":"GET","path":"/resource-packages","contract":"resources","summary":"Predefined combinations assigned as one","permission":"RESOURCE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"ResourcePackage"},
 "listSpaces": {"method":"GET","path":"/spaces","contract":"catalogue","summary":"Halls, rooms and areas an event can occupy","permission":"EVENT_CONFIGURE","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"Space"},
-"setEventResourcePlan": {"method":"PUT","path":"/events/{eventId}/resource-plan","contract":"catalogue","summary":"State what the event needs, by role and by kind","permission":"EVENT_CONFIGURE","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"EventResourcePlan","responds":"EventResourcePlan"}
+"setEventResourcePlan": {"method":"PUT","path":"/events/{eventId}/resource-plan","contract":"catalogue","summary":"State what the event needs, by role and by kind","permission":"EVENT_CONFIGURE","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"EventResourcePlan","responds":"EventResourcePlan"},
+"updateResourcePackage": {"method":"PUT","path":"/resource-packages/{packageId}","contract":"resources","summary":"Change a combination","permission":"RESOURCE_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"ResourcePackage","responds":"ResourcePackage"}
 }
 ```
 
@@ -1376,13 +1997,13 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 {
 "AiForecastPoint": {"type":"object","x-ticvai-persistence":"ai.forecast_point","description":"One forecast value with its interval: 10th, 50th and 90th percentile (design 5.6: a range, never a bare percentage). Partitioned by target month. **AI log database** (design 2.4): append-only, partitioned by month, one Postgres database per tenant on the regional AI log server. The table name stays `ai.<table>`; which server holds it is a deployment matter, not a contract one.","required":["versionId","targetStart","p50"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"versionId":{"type":"string","format":"uuid","x-ticvai-references":"ai.forecast_version"},"scenarioId":{"type":"string","format":"uuid","nullable":true,"x-ticvai-references":"ai.forecast_scenario","description":"Set where the point belongs to a what-if scenario rather than the version itself."},"targetStart":{"type":"string","format":"date-time"},"targetEnd":{"type":"string","format":"date-time"},"dimensionKey":{"type":"string","nullable":true,"description":"Canonical key of the breakdown, e.g. `product=…;channel=web`."},"p10":{"type":"number","nullable":true},"p50":{"type":"number"},"p90":{"type":"number","nullable":true},"unit":{"type":"string"},"drivers":{"type":"object","additionalProperties":true,"nullable":true,"description":"Component decomposition or SHAP contributions, largest first (ADM-506)."},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."}}},
 "AiForecastScenario": {"type":"object","x-ticvai-persistence":"ai.forecast_scenario","description":"**A what-if against a published version** (ADM-507, ADM-517, BO-931). Changes nothing in production; its points are written with `scenarioId`.","required":["baseVersionId","changes"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"name":{"type":"string"},"baseVersionId":{"type":"string","format":"uuid","x-ticvai-references":"ai.forecast_version"},"changes":{"type":"array","items":{"type":"object","required":["lever"],"properties":{"lever":{"type":"string","enum":["price","capacity","openingHours","weather","event","marketing","staffing","closure"]},"target":{"type":"string","nullable":true},"value":{"type":"object","additionalProperties":true,"nullable":true}}},"minItems":1},"status":{"type":"string","enum":["computing","ready","failed"],"readOnly":true},"result":{"type":"object","additionalProperties":true,"nullable":true,"readOnly":true,"description":"Deltas against the base version by subject and period."},"createdByPrincipalId":{"type":"string","format":"uuid","readOnly":true,"x-ticvai-references":"identity.principal"},"createdAt":{"type":"string","format":"date-time","readOnly":true},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."}}},
-"AiForecastVersion": {"type":"object","x-ticvai-persistence":"ai.forecast_version","description":"**An immutable forecast version** (AIP-032): producer, model version, data cut-off, horizon and status. Nothing is overwritten; yesterday's actuals are scored against every earlier version.","required":["definitionId","versionNumber","status","basis"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"definitionId":{"type":"string","format":"uuid","x-ticvai-references":"ai.forecast_definition"},"versionNumber":{"type":"integer","minimum":1},"status":{"type":"string","enum":["running","draft","awaitingApproval","published","superseded","rejected","failed"],"readOnly":true},"basis":{"$ref":"#/components/schemas/SuggestionBasis"},"maturity":{"$ref":"#/components/schemas/AiMaturity"},"producerRef":{"type":"string"},"modelVersion":{"type":"string","nullable":true},"dataCutoffAt":{"type":"string","format":"date-time","description":"The analytical replica watermark the snapshot was taken at."},"horizonStart":{"type":"string","format":"date-time"},"horizonEnd":{"type":"string","format":"date-time"},"qualityChecks":{"type":"object","additionalProperties":true,"readOnly":true,"description":"Each gate and whether it passed."},"publishedByPrincipalId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"x-ticvai-references":"identity.principal","description":"Null where the definition auto-published."},"publishedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true},"decisionRecordId":{"type":"string","format":"uuid","nullable":true,"readOnly":true},"createdAt":{"type":"string","format":"date-time","readOnly":true},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."}}},
+"AiForecastVersion": {"type":"object","x-ticvai-persistence":"ai.forecast_version","description":"**An immutable forecast version** (AIP-032): producer, model version, data cut-off, horizon and status. Nothing is overwritten; yesterday's actuals are scored against every earlier version.","required":["definitionId","versionNumber","status","basis"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"definitionId":{"type":"string","format":"uuid","x-ticvai-references":"ai.forecast_definition"},"versionNumber":{"type":"integer","minimum":1},"module":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/ModuleKey"}],"readOnly":true,"description":"The module of the version's definition (`AiForecastDefinition.module`), copied when the version is produced; the module whose AI publish permission `publishForecastVersion` requires (CHG-FUP-004)."},"status":{"type":"string","enum":["running","draft","awaitingApproval","published","superseded","rejected","failed"],"readOnly":true},"basis":{"$ref":"#/components/schemas/SuggestionBasis"},"maturity":{"$ref":"#/components/schemas/AiMaturity"},"producerRef":{"type":"string"},"modelVersion":{"type":"string","nullable":true},"dataCutoffAt":{"type":"string","format":"date-time","description":"The analytical replica watermark the snapshot was taken at."},"horizonStart":{"type":"string","format":"date-time"},"horizonEnd":{"type":"string","format":"date-time"},"qualityChecks":{"type":"object","additionalProperties":true,"readOnly":true,"description":"Each gate and whether it passed."},"publishedByPrincipalId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"x-ticvai-references":"identity.principal","description":"Null where the definition auto-published."},"publishedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true},"decisionRecordId":{"type":"string","format":"uuid","nullable":true,"readOnly":true},"createdAt":{"type":"string","format":"date-time","readOnly":true},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."}}},
 "AiMaturity": {"type":"object","x-ticvai-persistence":"none — embedded as jsonb on ai.suggestion and ai.forecast_version","description":"**Where an answer stands, on every answer** (29 September, AI functions review; baseline then learn). The customer sees a stage badge and a \"Based on\" chip, never a bare percentage (design 5.6), and \"Limited historical data\" while the starting pattern carries more than half the weight.","required":["stage","basedOn"],"properties":{"stage":{"type":"string","enum":["starting","learning","established","learned"],"description":"`starting`: the baseline (venue AI settings, the starting pattern for the venue type, the UAE calendar, weather). `learning`: own data carries short-range patterns (about 4 weeks). `established`: own level and trend lead, the baseline fills gaps such as a holiday not yet seen (about 3 months, or at once with 12+ months imported). `learned`: a model trained on this tenant's data, promoted by an admin (AI-D16)."},"basedOn":{"type":"string","description":"The \"Based on\" line, in words, e.g. *Based on: your venue profile, UAE calendar, weather, 23 days of your sales*. Always present."},"sources":{"type":"array","items":{"type":"object","required":["source"],"properties":{"source":{"type":"string","enum":["venueSettings","startingPattern","calendar","weather","bookingsOnHand","ownHistory","importedHistory","configuration","trainedModel"]},"detail":{"type":"string","nullable":true,"description":"e.g. *23 days*, *water park pattern v3*, *Eid al-Adha 2027*."},"observations":{"type":"integer","nullable":true}}}},"ownDataShare":{"type":"number","minimum":0,"maximum":1,"description":"The weight own data carries, `n / (k + n)`. Below 0.5 the answer is marked \"Limited historical data\"."},"limitedHistory":{"type":"boolean"},"nextStage":{"type":"object","nullable":true,"description":"What the next stage needs, e.g. *8 more Saturdays of sales*, or *an admin promotion*.","properties":{"stage":{"type":"string","enum":["learning","established","learned"]},"needs":{"type":"string"},"expectedBy":{"type":"string","format":"date","nullable":true}}}}},
-"AiOperationalRequirement": {"type":"object","x-ticvai-persistence":"ai.operational_requirement","description":"**A requirement derived from a forecast version** (design 2.2 C step 6, AIP-067): staff, POS, gates, F&B, stock or resources, computed with the tenant's productivity standards. **Autonomy L2 (prepare)**: it is sent to the owning module as a recommendation bound to that version, and a person applies it there.","required":["versionId","kind","periodStart","quantity"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"versionId":{"type":"string","format":"uuid","x-ticvai-references":"ai.forecast_version"},"kind":{"type":"string","enum":["staff","pos","kiosk","gates","fnb","retail","stock","resource","equipment","facility"]},"targetContract":{"type":"string","description":"The owning module that applies it: `workforce`, `fnb`, `inventory`, `resources`, `access`."},"subjectRef":{"type":"string","nullable":true,"description":"A role, outlet, gate, item or resource type."},"periodStart":{"type":"string","format":"date-time"},"periodEnd":{"type":"string","format":"date-time"},"quantity":{"type":"number"},"quantityP90":{"type":"number","nullable":true,"description":"The requirement at the forecast's 90th percentile, for planning to the busy case."},"unit":{"type":"string"},"productivityStandard":{"type":"object","additionalProperties":true,"nullable":true,"description":"The standard used, e.g. covers per staff hour, scans per gate per hour."},"status":{"type":"string","enum":["issued","accepted","modified","rejected","handedOver","expired"],"readOnly":true},"decidedByPrincipalId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"x-ticvai-references":"identity.principal"},"decidedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true},"decisionNote":{"type":"string","nullable":true},"handoverRef":{"type":"string","nullable":true,"readOnly":true,"description":"The owning module's record once handed over."},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."}}},
+"AiOperationalRequirement": {"type":"object","x-ticvai-persistence":"ai.operational_requirement","description":"**A requirement derived from a forecast version** (design 2.2 C step 6, AIP-067): staff, POS, gates, F&B, stock or resources, computed with the tenant's productivity standards. **Autonomy L2 (prepare)**: it is sent to the owning module as a recommendation bound to that version, and a person applies it there.\n**Every kind, from release 1** (Chinmay, 2 October, workbook Q9: \"all kinds\"; CHG-CSA-005). The event forecast derives requirements of every `kind` below, filtered to what the venue has configured (a venue with no kiosks gets no `kiosk` rows); the models in place improve with the venue's data.","required":["versionId","kind","periodStart","quantity"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"versionId":{"type":"string","format":"uuid","x-ticvai-references":"ai.forecast_version"},"kind":{"type":"string","enum":["staff","pos","kiosk","gates","fnb","retail","stock","resource","equipment","facility"]},"targetContract":{"type":"string","description":"The owning module that applies it: `workforce`, `fnb`, `inventory`, `resources`, `access`."},"subjectRef":{"type":"string","nullable":true,"description":"A role, outlet, gate, item or resource type."},"periodStart":{"type":"string","format":"date-time"},"periodEnd":{"type":"string","format":"date-time"},"quantity":{"type":"number"},"quantityP90":{"type":"number","nullable":true,"description":"The requirement at the forecast's 90th percentile, for planning to the busy case."},"unit":{"type":"string"},"productivityStandard":{"type":"object","additionalProperties":true,"nullable":true,"description":"The standard used, e.g. covers per staff hour, scans per gate per hour."},"status":{"type":"string","enum":["issued","accepted","modified","rejected","handedOver","expired"],"readOnly":true},"decidedByPrincipalId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"x-ticvai-references":"identity.principal"},"decidedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true},"decisionNote":{"type":"string","nullable":true},"handoverRef":{"type":"string","nullable":true,"readOnly":true,"description":"The owning module's record once handed over."},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."}}},
 "ApprovalDecision": {"type":"object","x-ticvai-persistence":"approvals.decision","required":["level","principalId","decision","decidedAt"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true,"description":"**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"},"level":{"type":"integer"},"principalId":{"type":"string","format":"uuid"},"displayName":{"type":"string"},"isDelegate":{"type":"boolean"},"delegatedFrom":{"type":"string","format":"uuid","nullable":true},"decision":{"type":"string","enum":["approve","reject"]},"comment":{"type":"string","nullable":true},"reason":{"type":"string","nullable":true},"usedMfa":{"type":"boolean"},"signatureRef":{"type":"string","nullable":true},"decidedAt":{"type":"string","format":"date-time"}}},
-"ApprovalKind": {"type":"string","description":"11.1.7 and 11.1.30–11.1.37. **The first four already exist as bespoke implementations** and this contract is what they collapse into.\n**Which actions route here — decided 28 September, audit R144.** Finance and procurement acts go through this engine to a **finance approver**: closing a fiscal period (`periodClose`), reopening one (`periodReopen`), cancelling a purchase order (`purchaseOrderCancel`) and closing one short (`purchaseOrderShortClose`). The tenant default matrix for each of these names the finance approver role; a venue may tighten it and never loosen it. Starting a release rollout routes through `releasePromotion` to the platform release manager (a holder of `PLATFORM_RELEASE_PROMOTE`). **Not every `requiresApproval` goes here:** reopening a shift, recounting a stock count and a retail return above the venue threshold take a supervisor's step-up on the same device instead, and never raise a request.\n**Catalogue change requests route through `productChange` and `pricingChange`** (decided 29 September, writers pass): a product change and a price or pricing change raised in `catalogue` ask for approval under these two kinds, so a venue can route product edits and price edits to different approvers.\n","enum":["refund","priceOverride","discountOverride","complimentaryTicket","membershipCancellation","accessPermissionChange","configurationChange","aiRecommendation","releasePromotion","requisition","stockWriteOff","journalEntry","periodClose","periodReopen","purchaseOrderCancel","purchaseOrderShortClose","tenantMigration","productChange","pricingChange"]},
+"ApprovalKind": {"type":"string","description":"11.1.7 and 11.1.30–11.1.37. **The first four already exist as bespoke implementations** and this contract is what they collapse into.\n**Which actions route here — decided 28 September, audit R144.** Finance and procurement acts go through this engine to a **finance approver**: closing a fiscal period (`periodClose`), reopening one (`periodReopen`), cancelling a purchase order (`purchaseOrderCancel`) and closing one short (`purchaseOrderShortClose`). The tenant default matrix for each of these names the finance approver role; a venue may tighten it and never loosen it. Starting a release rollout routes through `releasePromotion` to the platform release manager (a holder of `PLATFORM_RELEASE_PROMOTE`). **Not every `requiresApproval` goes here:** reopening a shift, recounting a stock count and a retail return above the venue threshold take a supervisor's step-up on the same device instead, and never raise a request.\n**Catalogue change requests route through `productChange` and `pricingChange`** (decided 29 September, writers pass): a product change and a price or pricing change raised in `catalogue` ask for approval under these two kinds, so a venue can route product edits and price edits to different approvers.\n\n**Optional review steps a venue switches on, decided 2 October 2026** (Chinmay; CHG-CSP-036, CHG-CSP-028, CHG-CSP-031). Each is an existing kind narrowed by the rule's `subjectTypes`, so no kind is added (a new value here would be a breaking change against r1) and each is off until the venue saves an active matrix for it:\n- **Publishing white-label content** (`configurationChange`, subject `whiteLabelPublication`): simulate, then a single publish by a holder of the permission; a review step only where the venue sets one up (batch 1, CMS-014; DEC-156). - **Recording F&B waste above a value** (`stockWriteOff`, subject `fnbWaste`): the venue's waste-approval policy, value bands as `minAmount` and `maxAmount`, photo evidence above a value held by fnb (batch 6 #192, BO-139; DEC-192; R144). - **Publishing an access topology** (`configurationChange`, subject `topologyPublication`): second-person approval when the venue switches it on (batch 6 #230, BO-153; DEC-230). - **A permanent identity lock, a whitelist entry, or releasing a full-identity or permanent lock** (`accessPermissionChange`, subjects `identityLock`, `whitelistEntry`, `identityLockRelease`): always a second approver, never for an until-end-of-day lock (critical set 1, BO-229 and BO-247; DEC-254, DEC-260); the tenant default matrix names the security approver role and a venue may tighten it, never remove it.\n","enum":["refund","priceOverride","discountOverride","complimentaryTicket","membershipCancellation","accessPermissionChange","configurationChange","aiRecommendation","releasePromotion","requisition","stockWriteOff","journalEntry","periodClose","periodReopen","purchaseOrderCancel","purchaseOrderShortClose","tenantMigration","productChange","pricingChange"]},
 "ApprovalMode": {"type":"string","description":"11.1.43–11.1.46. **Sequential** asks one at a time, **parallel** asks everyone at once, **consensus** needs all of them, **majority** needs more than half.\nParallel and consensus differ in when it completes: parallel completes on the first approval, consensus waits for all. Conflating them is how a four-eyes rule turns into a one-eye rule.\n","enum":["sequential","parallel","consensus","majority"]},
-"ApprovalRequest": {"type":"object","x-ticvai-persistence":"approvals.request","required":["id","kind","status","requestedByPrincipalId","requestedAt"],"properties":{"id":{"type":"string"},"kind":{"$ref":"#/components/schemas/ApprovalKind"},"rerouteOnNoApprover":{"type":"boolean","default":true,"description":"BL-154. **An approver on leave is an approval that waits for them to come back.** Reroutes to the next in the chain rather than stalling — `workforce` already knows who is on leave, and an approval queue nobody is watching is the thing that stops a venue.\n"},"outOfOfficeDelegateId":{"type":"string","format":"uuid","nullable":true},"allowEmailApproval":{"type":"boolean","default":false,"description":"**Approving from an email link with no second factor is the weakest path in the system**, so it is off by default and available only below a configured value.\n"},"reopenedFrom":{"type":"string","format":"uuid","nullable":true,"description":"**Reopening a decided approval creates a new one that points back.** Editing a decision in place destroys the record of what was originally approved, which is the only thing an audit wants.\n"},"status":{"$ref":"#/components/schemas/ApprovalStatus"},"subjectContract":{"type":"string"},"subjectType":{"type":"string"},"subjectId":{"type":"string"},"scopePath":{"type":"string"},"summary":{"type":"string"},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"justification":{"type":"string","nullable":true},"requestedByPrincipalId":{"type":"string","format":"uuid"},"matrixVersion":{"type":"integer"},"mode":{"$ref":"#/components/schemas/ApprovalMode"},"currentLevel":{"type":"integer"},"totalLevels":{"type":"integer"},"pendingApprovers":{"type":"array","items":{"type":"object","properties":{"principalId":{"type":"string","format":"uuid"},"displayName":{"type":"string"},"isDelegate":{"type":"boolean"}}}},"decisions":{"type":"array","description":"Every decision at every level, in order. **Immutable once the request completes** (11.1.56) — an approval is evidence, and amending one is a different fact.\n","items":{"$ref":"#/components/schemas/ApprovalDecision"}},"escalations":{"type":"array","description":"11.1.48. Who was asked, when, and why it moved up. **Escalation adds an approver rather than replacing one**, so the original stays in the record.\n","items":{"type":"object","properties":{"at":{"type":"string","format":"date-time"},"reason":{"type":"string"},"fromLevel":{"type":"integer"},"toLevel":{"type":"integer"},"wasAutomatic":{"type":"boolean"}}}},"resubmittedFromId":{"type":"string","nullable":true},"reopenedFromId":{"type":"string","nullable":true},"slaDueAt":{"type":"string","format":"date-time","nullable":true},"slaBreached":{"type":"boolean"},"expiresAt":{"type":"string","format":"date-time","nullable":true},"requestedAt":{"type":"string","format":"date-time"},"completedAt":{"type":"string","format":"date-time","nullable":true},"aiAssessment":{"type":"object","nullable":true,"readOnly":true,"description":"**AI context for the reviewer, never an input to the decision** (11.1.73 to 11.1.75; MoM 8 September; 29 September, build pass, group G2). Written by approvals from `ai.scoreApprovalRequest` on submit and on each SLA tick; null where AI is off or has not answered. Shown on the request labelled as AI; orders the inbox only when `sort=aiPriority` is asked for.","properties":{"riskScore":{"type":"integer","minimum":0,"maximum":100},"riskBand":{"type":"string","enum":["low","medium","high","critical"]},"priorityScore":{"type":"integer","minimum":0,"maximum":100},"escalationSuggestion":{"type":"object","description":"A suggestion a person may act on through `escalateApprovalRequest`, or the tenant's own SLA policy may; nothing escalates because of it.","properties":{"action":{"type":"string","enum":["escalate","addBackupApprover","none"]},"reason":{"type":"string","nullable":true}}},"signals":{"type":"array","maxItems":10,"description":"The signals behind the scores, largest first, as `ai.AiApprovalRequestScore.signals`.","items":{"type":"object","properties":{"code":{"type":"string"},"contribution":{"type":"number"},"detail":{"type":"string","nullable":true}}}},"scoreId":{"type":"string","format":"uuid","description":"The `ai.approval_request_score` row it was copied from; `ai.getApprovalRequestScore` gives the full context. Not a foreign key (the score lives in the AI service)."},"decisionRecordId":{"type":"string","description":"The ai decision record, for the audit of what the AI said and why."},"assessedAt":{"type":"string","format":"date-time"}}}}},
+"ApprovalRequest": {"type":"object","x-ticvai-persistence":"approvals.request","required":["id","kind","status","requestedByPrincipalId","requestedAt"],"properties":{"id":{"type":"string"},"kind":{"$ref":"#/components/schemas/ApprovalKind"},"rerouteOnNoApprover":{"type":"boolean","default":true,"description":"BL-154. **An approver on leave is an approval that waits for them to come back.** Reroutes to the next in the chain rather than stalling — `workforce` already knows who is on leave, and an approval queue nobody is watching is the thing that stops a venue.\n"},"outOfOfficeDelegateId":{"type":"string","format":"uuid","nullable":true},"allowEmailApproval":{"type":"boolean","default":false,"description":"**Approving from an email link with no second factor is the weakest path in the system**, so it is off by default and available only below a configured value.\n"},"reopenedFrom":{"type":"string","format":"uuid","nullable":true,"description":"**Reopening a decided approval creates a new one that points back.** Editing a decision in place destroys the record of what was originally approved, which is the only thing an audit wants.\n"},"status":{"$ref":"#/components/schemas/ApprovalStatus"},"subjectContract":{"type":"string"},"subjectType":{"type":"string"},"subjectId":{"type":"string"},"scopePath":{"type":"string"},"summary":{"type":"string"},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"justification":{"type":"string","nullable":true},"requestedByPrincipalId":{"type":"string","format":"uuid"},"matrixVersion":{"type":"integer"},"mode":{"$ref":"#/components/schemas/ApprovalMode"},"currentLevel":{"type":"integer"},"totalLevels":{"type":"integer"},"pendingApprovers":{"type":"array","items":{"type":"object","properties":{"principalId":{"type":"string","format":"uuid"},"displayName":{"type":"string"},"isDelegate":{"type":"boolean"}}}},"decisions":{"type":"array","description":"Every decision at every level, in order. **Immutable once the request completes** (11.1.56) — an approval is evidence, and amending one is a different fact.\n","items":{"$ref":"#/components/schemas/ApprovalDecision"}},"escalations":{"type":"array","description":"11.1.48. Who was asked, when, and why it moved up. **Escalation adds an approver rather than replacing one**, so the original stays in the record.\n","items":{"type":"object","properties":{"at":{"type":"string","format":"date-time"},"reason":{"type":"string"},"fromLevel":{"type":"integer"},"toLevel":{"type":"integer"},"wasAutomatic":{"type":"boolean"}}}},"resubmittedFromId":{"type":"string","nullable":true},"reopenedFromId":{"type":"string","nullable":true},"slaDueAt":{"type":"string","format":"date-time","nullable":true},"slaBreached":{"type":"boolean"},"expiresAt":{"type":"string","format":"date-time","nullable":true},"assignedToPrincipalId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"Who claimed or was assigned the request in a shared queue (`assignApprovalRequest`; DI-723; CHG-CSP-042). Null while it sits in the queue."},"assignedToDepartmentId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"The department queue it was assigned to, where it went to a department rather than a person (CHG-CSP-042)."},"assignedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true},"requestedAt":{"type":"string","format":"date-time"},"completedAt":{"type":"string","format":"date-time","nullable":true},"aiAssessment":{"type":"object","nullable":true,"readOnly":true,"description":"**AI context for the reviewer, never an input to the decision** (11.1.73 to 11.1.75; MoM 8 September; 29 September, build pass, group G2). Written by approvals from `ai.scoreApprovalRequest` on submit and on each SLA tick; null where AI is off or has not answered. Shown on the request labelled as AI; orders the inbox only when `sort=aiPriority` is asked for.","properties":{"riskScore":{"type":"integer","minimum":0,"maximum":100},"riskBand":{"type":"string","enum":["low","medium","high","critical"]},"priorityScore":{"type":"integer","minimum":0,"maximum":100},"escalationSuggestion":{"type":"object","description":"A suggestion a person may act on through `escalateApprovalRequest`, or the tenant's own SLA policy may; nothing escalates because of it.","properties":{"action":{"type":"string","enum":["escalate","addBackupApprover","none"]},"reason":{"type":"string","nullable":true}}},"signals":{"type":"array","maxItems":10,"description":"The signals behind the scores, largest first, as `ai.AiApprovalRequestScore.signals`.","items":{"type":"object","properties":{"code":{"type":"string"},"contribution":{"type":"number"},"detail":{"type":"string","nullable":true}}}},"scoreId":{"type":"string","format":"uuid","description":"The `ai.approval_request_score` row it was copied from; `ai.getApprovalRequestScore` gives the full context. Not a foreign key (the score lives in the AI service)."},"decisionRecordId":{"type":"string","description":"The ai decision record, for the audit of what the AI said and why."},"assessedAt":{"type":"string","format":"date-time"}}}}},
 "ApprovalStatus": {"type":"string","enum":["draft","pending","escalated","returned","informationRequested","approved","rejected","withdrawn","expired","cancelled"]},
 "CreateApprovalRequest": {"type":"object","x-ticvai-persistence":"none — request only","required":["id","kind","subjectContract","subjectType","subjectId","scopePath","summary"],"properties":{"id":{"type":"string","format":"uuid"},"kind":{"$ref":"#/components/schemas/ApprovalKind"},"subjectContract":{"type":"string","description":"Which contract owns the thing being approved."},"subjectType":{"type":"string"},"subjectId":{"type":"string","description":"**A reference, never a copy.** A copy goes stale between raising and deciding, and an approver reading a stale copy approves something that no longer exists.\n"},"scopePath":{"type":"string"},"summary":{"type":"string","maxLength":300,"description":"What the approver sees in their queue before opening it."},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"attributes":{"type":"object","additionalProperties":true},"justification":{"type":"string","maxLength":1000},"isDraft":{"type":"boolean","default":false,"description":"True saves the request at `draft` without routing it; `submitApprovalRequest` sends it later (decided 28 September, audit R129).\n"}}},
 "EventResourceCostEstimate": {"type":"object","x-ticvai-persistence":"none — projection over the event resource plan and the rates in resources and workforce, computed at read time","description":"What `estimateEventResourceCost` returns (decided 29 September, readiness close-out): the event's resource plan priced, one line per requirement or contractor, with the total by kind.","required":["eventId","lines","total"],"properties":{"eventId":{"type":"string","format":"uuid"},"lines":{"type":"array","items":{"type":"object","required":["kind","quantity","total"],"properties":{"kind":{"type":"string","enum":["venue","equipment","staff","external","transport"],"description":"The cost heading on BO-920. Mapped from the requirement kind: space -> venue, equipment and service -> equipment, staff -> staff, contractor -> external, vehicle -> transport."},"requirementId":{"type":"string","format":"uuid","nullable":true,"description":"The `EventResourcePlan.requirements[].id` priced; null on a contractor line."},"organisationId":{"type":"string","format":"uuid","nullable":true,"description":"The contractor organisation, on an `external` line."},"label":{"type":"string"},"quantity":{"type":"integer","minimum":0},"hours":{"type":"number","nullable":true,"description":"Booked hours the unit cost applies to, where the rate is per hour."},"unitCost":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"total":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"costSource":{"type":"string","enum":["resourceRate","workforceRate","contractorQuote","manual"]}}}},"totalsByKind":{"type":"object","description":"The sum of `lines[].total` for each kind, keyed by `kind`.","additionalProperties":{"$ref":"../shared/common.yaml#/components/schemas/Money"}},"total":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"unpricedRequirementIds":{"type":"array","description":"Requirements with no rate to price them; left out of `total` rather than guessed.","items":{"type":"string","format":"uuid"}}}},

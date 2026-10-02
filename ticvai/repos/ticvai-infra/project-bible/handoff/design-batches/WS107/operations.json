@@ -167,60 +167,6 @@
   "requestBody": null,
   "responds": "Page"
  },
- "listRenewalAuto": {
-  "method": "GET",
-  "path": "/renewal-auto",
-  "contract": "subscription",
-  "summary": "Renewal Operations & Auto-Renewal Management",
-  "permission": "PLATFORM_TENANT_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": "renewalStatus",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "membershipProduct",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "tier",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "autoRenew",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "expiringFrom",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "expiringTo",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- },
  "listSubscriptionInvoices": {
   "method": "GET",
   "path": "/tenants/{tenantId}/invoices",
@@ -287,25 +233,6 @@
   ],
   "requestBody": null,
   "responds": null
- },
- "setRenewalAutoMembership": {
-  "method": "PUT",
-  "path": "/renewal-auto-membership",
-  "contract": "subscription",
-  "summary": "Renewal, Auto-Renewal & Membership Continuity Configuration",
-  "permission": "PLATFORM_CELL_MANAGE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "RenewalAutoRenewalMembershipContinuityConfigurationInput",
-  "responds": "RenewalAutoRenewalMembershipContinuityConfigurationView"
  },
  "setSubscription": {
   "method": "PUT",

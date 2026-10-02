@@ -31,7 +31,8 @@
     "ANL-027",
     "ANL-028",
     "ANL-029",
-    "ANL-030"
+    "ANL-030",
+    "ANL-072"
    ],
    "transitions": [
     {
@@ -103,6 +104,11 @@
      "carries": [
       "dashboardId"
      ]
+    },
+    {
+     "to": "ANL-072",
+     "trigger": "Finance Dashboard",
+     "provenance": "decided 2 October 2026 (DEC-219, CHG-SOT-008): the Finance standard dashboard is one of the library's system dashboards"
     }
    ]
   },
@@ -535,57 +541,168 @@
   },
   "density": "compact",
   "purposeNote": "A business analyst can visually construct a dashboard without coding.",
-  "pattern": "listDetail",
-  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "pattern": "configEditor",
+  "patternReason": "A canvas edited and saved as a whole (`updateDashboard` replaces the tiles), drawn 2 October 2026 from the client's dashboard specification (MATRIX 8.7.12: grid, gallery, data pane, field wells, formatting); CHG-SOT-010.",
   "purpose": "Provide the main visual workspace for dashboard construction.",
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
-    "source": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 16"
-   },
-   {
-    "operation": null,
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
-    "source": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 16"
+    "why": "**No draft, preview-publish or rollback for a dashboard** (design-notes correction ANL-023, MATRIX 7.1.46). Every save overwrites the live dashboard; the contract has no dashboard version or publish operation. Undo and redo are drawn as session-only. Logged as a contract gap 2 October 2026 (CHG-SOT-016).",
+    "source": "contracts/satellite/reporting.yaml#updateDashboard"
    }
   ],
   "layout": {
    "template": "split",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "toolbar",
+     "slot": "publish",
      "components": [
       {
        "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "updateDashboard",
        "label": "Save dashboard",
-       "notes": "The act the screen exists for."
+       "operation": "updateDashboard",
+       "notes": "Saves the whole dashboard (tiles replace tiles); the confirmation names tiles that will be removed. Refused 422 `tile-encoding-missing` for a tile whose report lacks a well its mark requires, naming the tile and the well.",
+       "provenance": "contract reporting.yaml PUT /dashboards/{dashboardId}"
       },
       {
-       "kind": "detailPanel",
-       "derived": true,
-       "impliedBy": "getDashboard",
-       "notes": "One record, read-only."
+       "kind": "iconButton",
+       "label": "Undo",
+       "notes": "Undo the last change on the canvas, in this editing session only. Nothing is saved until Save dashboard.",
+       "provenance": "design-notes correction ANL-023 (MATRIX 7.1.46), 2 October 2026"
+      },
+      {
+       "kind": "iconButton",
+       "label": "Redo",
+       "notes": "Redo, in this editing session only.",
+       "provenance": "design-notes correction ANL-023 (MATRIX 7.1.46), 2 October 2026"
       },
       {
        "kind": "secondaryButton",
        "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "updateDashboard"
+       "notes": "**A screen that can submit must be leaveable without submitting.** Discards unsaved changes after saying how many.",
+       "provenance": "derived from updateDashboard"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Archive dashboard",
+       "operation": "deleteDashboard",
+       "notes": "Archives rather than removes (`archivedAt`); the confirmation names the dashboard and its tile count.",
+       "provenance": "contract reporting.yaml DELETE /dashboards/{dashboardId}"
+      }
+     ]
+    },
+    {
+     "name": "gallery",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "cardList",
+       "label": "Visuals",
+       "notes": "**All twenty marks of `DashboardTile.visualisation`, the nine complex ones included** (decided 2 October 2026, Chinmay: \"Build all chart types, including the nine complex ones\"; DEC-080, CHG-FIN-007): number, line, area, bar, stackedBar, stackedBar100, combo, pie, donut, table, matrix, gauge, heatmap, funnel, waterfall, treemap, scatter, map, ribbon and decompositionTree. Each card names the wells its mark requires (the binding table in the contract): combo an x dimension and two or more measures with axis and series type; matrix rows, optional columns and values; funnel ordered stages and a value; waterfall ordered steps and a value, total last; treemap categories with levels and a size; scatter x, y and a label; map a location and a value; ribbon a period, a series and a value; decomposition tree a value and two or more levels. Slicers and narrative text are not marks (`x-ticvai-refuses`).",
+       "provenance": "contract reporting.yaml DashboardTile.visualisation (CHG-FIN-007)"
+      }
+     ]
+    },
+    {
+     "name": "dataPane",
+     "slot": "filters",
+     "components": [
+      {
+       "kind": "searchField",
+       "label": "Find a report",
+       "operation": "listReports",
+       "notes": "Sends `?search=`; the data pane lists the reports a tile may bind, by category.",
+       "provenance": "contract reporting.yaml GET /reports"
+      },
+      {
+       "kind": "treeNav",
+       "label": "Reports and their columns",
+       "bindsTo": "ReportDefinition",
+       "operation": "getReport",
+       "notes": "Each report opens to its columns with `role`, `encoding`, `axis`, `seriesType`, `hierarchyLevel` and `unitLabel` (CHG-FIN-007); a column is dragged into a well.",
+       "provenance": "contract reporting.yaml GET /reports/{reportId}"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "canvas",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "Canvas",
+       "bindsTo": "Dashboard",
+       "columns": [
+        "Dashboard.name",
+        "Dashboard.module",
+        "Dashboard.venueId",
+        "Dashboard.isShared",
+        "Dashboard.tiles"
+       ],
+       "operation": "getDashboard",
+       "notes": "A grid; each tile sits at `position` (row, column, width, height). **At most 24 tiles.** Every tile renders its mark with live data, shows its as-of time and a stale warning past its refresh (BOARDREQ MOM-2713/2714).",
+       "provenance": "contract reporting.yaml GET /dashboards/{dashboardId}"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "Field wells",
+       "bindsTo": "ReportColumn",
+       "columns": [
+        "ReportColumn.label",
+        "ReportColumn.role",
+        "ReportColumn.encoding",
+        "ReportColumn.axis",
+        "ReportColumn.seriesType",
+        "ReportColumn.hierarchyLevel",
+        "ReportColumn.unitLabel"
+       ],
+       "operation": "getReport",
+       "notes": "The wells of the selected tile's mark, filled from its report's columns. A required well left empty is named in red, and Save is refused for it rather than drawing an empty chart.",
+       "provenance": "contract reporting.yaml ReportColumn (CHG-FIN-007)"
+      },
+      {
+       "kind": "textField",
+       "label": "Tile title",
+       "bindsTo": "DashboardTile.title",
+       "operation": "updateDashboard",
+       "provenance": "contract reporting.yaml DashboardTile"
+      },
+      {
+       "kind": "numberField",
+       "label": "Refresh every (seconds)",
+       "bindsTo": "DashboardTile.refreshSeconds",
+       "operation": "updateDashboard",
+       "notes": "Minimum 30.",
+       "provenance": "contract reporting.yaml DashboardTile"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Formatting",
+       "bindsTo": "DashboardTile",
+       "columns": [
+        "DashboardTile.parameters"
+       ],
+       "operation": "updateDashboard",
+       "notes": "The tile's run parameters and display settings (for `number`: comparison, variance, sparkline and status icon).",
+       "provenance": "contract reporting.yaml DashboardTile.parameters"
       }
      ]
     }
    ]
   },
   "states": {
-   "loading": "The drag-and-drop canvas list.",
-   "error": "Could not load. Names which read failed and leaves the drag-and-drop canvas untouched.",
-   "emptyFirstRun": "No drag-and-drop canvas yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the drag-and-drop canvas are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "loading": "The dashboard and its tiles.",
+   "error": "Could not load. Names which read failed (the dashboard or a report) and leaves the canvas as it was.",
+   "emptyFirstRun": "A new dashboard with no tiles yet. The gallery is open and says \"Drag a visual onto the grid\"; nothing is created until Save dashboard.",
+   "emptyNoResults": "The report search matched nothing. Names the search and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `REPORT_MANAGE`, which saving requires; the dashboard opens read-only and names that permission."
   },
   "apis": [
    {
@@ -618,6 +735,20 @@
     "contract": "reporting",
     "purpose": "Record that a dashboard was opened — fired once when the dashboard renders; nothing on the screen waits for it.",
     "trigger": "background"
+   },
+   {
+    "operationId": "listReports",
+    "contract": "reporting",
+    "purpose": "The reports a tile may bind, for the data pane",
+    "trigger": "onLoad",
+    "provenance": "2 October 2026 (CHG-SOT-010): the canvas binds tiles to reports"
+   },
+   {
+    "operationId": "getReport",
+    "contract": "reporting",
+    "purpose": "A report's columns and their encodings, for the field wells",
+    "trigger": "onAction",
+    "provenance": "2 October 2026 (CHG-SOT-010): the wells come from ReportColumn (CHG-FIN-007)"
    }
   ],
   "wireframe": {
@@ -631,9 +762,47 @@
     {
      "name": "dashboardId",
      "from": "navigation"
+    },
+    {
+     "name": "reportId",
+     "from": "navigation"
     }
    ]
   },
+  "notes": "**The nine new marks bind** (decided 2 October 2026, Chinmay; CHG-FIN-007). The canvas offers all twenty marks of `DashboardTile.visualisation` and, for each, field wells filled from the report's columns (`ReportColumn.role`, `encoding`, `axis`, `seriesType`, `hierarchyLevel`, `unitLabel`): combo (x, bars and lines, primary and secondary axis with units), matrix (rows, columns, values, with drill levels), funnel (ordered stages, value), waterfall (ordered steps of a measure set, total last), treemap (nested categories, size, colour), scatter (x, y, label, size, colour), map (venue, zone or map point, value), ribbon (period, series, value) and decomposition tree (value, levels). A tile whose report lacks a required well cannot be saved (422 `tile-encoding-missing`). At most 24 tiles; every tile shows its as-of time and a stale warning past its refresh (BOARDREQ MOM-2713/2714).",
+  "permission": "REPORT_MANAGE",
+  "overlays": [
+   {
+    "id": "confirmUpdateDashboard",
+    "component": "confirmDialog",
+    "trigger": "Save dashboard",
+    "body": "**Names what the save removes**, because the tiles are replaced as a whole (\"Save and remove 2 tiles: Refunds by channel, Queue time\"). Dismissing keeps editing.",
+    "confirm": {
+     "label": "Save dashboard",
+     "operation": "updateDashboard"
+    },
+    "dismiss": {
+     "label": "Keep editing",
+     "discards": []
+    },
+    "provenance": "contract reporting.yaml PUT /dashboards/{dashboardId}"
+   },
+   {
+    "id": "confirmDeleteDashboard",
+    "component": "confirmDialog",
+    "trigger": "Archive dashboard",
+    "body": "Names the dashboard and its tile count; archived dashboards leave the library unless asked for. Dismissing sends nothing.",
+    "confirm": {
+     "label": "Archive dashboard",
+     "operation": "deleteDashboard"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": []
+    },
+    "provenance": "contract reporting.yaml DELETE /dashboards/{dashboardId}"
+   }
+  ],
   "_platform": {
    "code": "P16",
    "formFactor": "web",
@@ -847,8 +1016,8 @@
   "gaps": [
    {
     "operation": null,
-    "why": "**KPI Builder declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
-    "source": "contract — the screen's declared operations"
+    "why": "**No update or retire operation for a KPI** (design-notes correction ANL-025). `createKpi` writes one; nothing corrects or retires it, so a mistake cannot be put right. Logged as a contract gap 2 October 2026 (CHG-SOT-016). The earlier gap (\"declares no operation that writes anything\") was stale: the screen declares `createKpi`.",
+    "source": "contracts/satellite/reporting.yaml#createKpi"
    }
   ],
   "layout": {
@@ -859,119 +1028,110 @@
      "slot": "fields",
      "components": [
       {
-       "kind": "selectField",
-       "label": "KPI Name",
-       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 18 §Configure"
+       "kind": "textField",
+       "label": "KPI name",
+       "bindsTo": "KpiDefinition.name",
+       "provenance": "contract reporting.yaml KpiDefinition"
       },
       {
-       "kind": "selectField",
-       "label": "KPI Code",
-       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 18 §Configure"
+       "kind": "textField",
+       "label": "KPI code",
+       "bindsTo": "KpiDefinition.code",
+       "notes": "Unique in the tenant; the seeded codes (`takings`, `admissions`, the finance measures) are taken.",
+       "provenance": "contract reporting.yaml KpiDefinition"
       },
       {
-       "kind": "selectField",
+       "kind": "textField",
        "label": "Description",
-       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 18 §Configure"
+       "bindsTo": "KpiDefinition.description",
+       "provenance": "contract reporting.yaml KpiDefinition"
       },
       {
        "kind": "selectField",
-       "label": "Business Domain",
-       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 18 §Configure"
+       "label": "Business domain",
+       "bindsTo": "KpiDefinition.domain",
+       "notes": "The semantic model's domains.",
+       "provenance": "contract reporting.yaml KpiDefinition"
       },
       {
-       "kind": "selectField",
+       "kind": "textField",
        "label": "Owner",
-       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 18 §Configure"
+       "bindsTo": "KpiDefinition.owner",
+       "provenance": "contract reporting.yaml KpiDefinition"
       },
       {
-       "kind": "selectField",
-       "label": "Data Source",
-       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 18 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Measure",
-       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 18 §Configure"
-      },
-      {
-       "kind": "selectField",
+       "kind": "textField",
        "label": "Formula",
-       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 18 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Aggregation",
-       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 18 §Configure"
+       "bindsTo": "KpiDefinition.formula",
+       "notes": "**Against the semantic model, not tables.** The measure, the aggregation and the data source are all in the formula; there are no separate fields for them.",
+       "provenance": "contract reporting.yaml KpiDefinition.formula"
       },
       {
        "kind": "selectField",
        "label": "Unit",
-       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 18 §Configure"
+       "bindsTo": "KpiDefinition.unit",
+       "notes": "Currency, count, percentage, duration, ratio or score. Currency and decimal places follow the region (AED 2, BHD/KWD/OMR 3), not the KPI.",
+       "provenance": "contract reporting.yaml KpiDefinition.unit"
+      },
+      {
+       "kind": "toggle",
+       "label": "Higher is better",
+       "bindsTo": "KpiDefinition.higherIsBetter",
+       "notes": "One yes/no. Examples, not fields: revenue and conversion up is better; refund rate, gate rejection rate and queue time down is better.",
+       "provenance": "contract reporting.yaml KpiDefinition.higherIsBetter"
       },
       {
        "kind": "selectField",
-       "label": "Currency",
-       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 18 §Configure"
+       "label": "Default period",
+       "bindsTo": "KpiDefinition.defaultPeriod",
+       "provenance": "contract reporting.yaml KpiDefinition"
       },
       {
-       "kind": "selectField",
-       "label": "Decimal Precision",
-       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 18 §Configure"
+       "kind": "toggle",
+       "label": "Active",
+       "bindsTo": "KpiDefinition.isActive",
+       "notes": "The KPI's status: inactive KPIs are kept and not offered on dashboards.",
+       "provenance": "contract reporting.yaml KpiDefinition.isActive"
       },
       {
-       "kind": "selectField",
-       "label": "Effective Date",
-       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 18 §Configure"
-      },
+       "kind": "dataTable",
+       "label": "KPIs already defined",
+       "bindsTo": "KpiDefinition",
+       "columns": [
+        "KpiDefinition.code",
+        "KpiDefinition.name",
+        "KpiDefinition.domain",
+        "KpiDefinition.unit",
+        "KpiDefinition.higherIsBetter",
+        "KpiDefinition.owner",
+        "KpiDefinition.isActive"
+       ],
+       "operation": "listKpis",
+       "notes": "The seeded KPIs first (takings, admissions and the finance measures, CHG-FIN-007), then the tenant's own.",
+       "provenance": "contract reporting.yaml GET /kpis"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
       {
-       "kind": "selectField",
-       "label": "Status",
-       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 18 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Higher = Better",
-       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 18 §Define whether"
-      },
-      {
-       "kind": "selectField",
-       "label": "Lower = Better",
-       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 18 §Define whether"
-      },
-      {
-       "kind": "selectField",
-       "label": "Revenue ↑",
-       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 18 §Define whether"
-      },
-      {
-       "kind": "selectField",
-       "label": "Conversion ↑",
-       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 18 §Define whether"
-      },
-      {
-       "kind": "selectField",
-       "label": "Refund Rate ↓",
-       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 18 §Define whether"
-      },
-      {
-       "kind": "textField",
-       "label": "Gate Rejection Rate ↓",
-       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 18 §Define whether"
-      },
-      {
-       "kind": "selectField",
-       "label": "Queue Time ↓",
-       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 18 §Define whether"
+       "kind": "primaryButton",
+       "label": "Create KPI",
+       "operation": "createKpi",
+       "notes": "Defines it once, for every dashboard and report.",
+       "provenance": "contract reporting.yaml POST /kpis"
       }
      ]
     }
    ]
   },
   "states": {
-   "loading": "The kpi configuration as saved.",
-   "error": "Could not load. Names which read failed and leaves the kpi untouched.",
-   "emptyFirstRun": "No kpi configured yet. Carries the create action and says what the platform does in the meantime.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "loading": "The KPIs already defined.",
+   "error": "Could not load. Names which read failed and leaves the form untouched.",
+   "emptyFirstRun": "Only the seeded KPIs exist (takings, admissions and the finance measures). Offers Create KPI (`createKpi`) for the tenant's first own KPI.",
+   "emptyNoAccess": "Shown when the caller lacks `REPORT_MANAGE`, which `createKpi` requires; the KPI list stays readable and the form names that permission."
   },
   "apis": [
    {
@@ -999,6 +1159,7 @@
    "workshopBoard": "wireframes/WS173 Unified BI Reporting and AI Analytics Platform Board 2.dc.html#anl-025"
   },
   "apisNote": "Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf page 18. 0 of 0 labels bound to a contract property; 21 of 35 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "permission": "REPORT_VIEW_TENANT",
   "_platform": {
    "code": "P16",
    "formFactor": "web",

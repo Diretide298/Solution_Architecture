@@ -177,6 +177,32 @@
    }
   }
  },
+ "CaseDetail": {
+  "x-ticvai-persistence": "marketing.case",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/Case"
+   },
+   {
+    "type": "object",
+    "properties": {
+     "description": {
+      "type": "string"
+     },
+     "resolutionNote": {
+      "type": "string",
+      "nullable": true
+     },
+     "messages": {
+      "type": "array",
+      "items": {
+       "$ref": "#/components/schemas/CaseMessage"
+      }
+     }
+    }
+   }
+  ]
+ },
  "CaseKind": {
   "type": "string",
   "description": "**What the guest says the case is about**, in their words rather than the venue's taxonomy — `raiseMyCase` asks for it and `categoryId` is what staff file it under. Stored on the case, because a lost-property report that forgets it was one cannot be routed to the lost and found desk.\n**`other` only with a note (decided 28 September, audit R222).** A case raised as `other` must carry a non-empty `detail` (`raiseMyCase`), or it is refused with 400; the notes are reviewed quarterly to add the real kinds they reveal.\n",
@@ -188,6 +214,66 @@
    "refundRequest",
    "other"
   ]
+ },
+ "CaseMessage": {
+  "x-ticvai-persistence": "marketing.case_message",
+  "type": "object",
+  "required": [
+   "id",
+   "body",
+   "isInternal",
+   "authorKind",
+   "recordedAt"
+  ],
+  "properties": {
+   "resolution": {
+    "type": "string",
+    "description": "**What was actually done about it.** Indexed for retrieval: an agent facing a complaint benefits more from how the last one was resolved than from a policy. Without this column `marketing.case` can only embed its subject line.\n"
+   },
+   "id": {
+    "type": "string"
+   },
+   "body": {
+    "type": "string"
+   },
+   "isInternal": {
+    "type": "boolean"
+   },
+   "authorKind": {
+    "type": "string",
+    "enum": [
+     "agent",
+     "guest",
+     "system",
+     "ai"
+    ]
+   },
+   "authorPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "channel": {
+    "$ref": "#/components/schemas/MessageChannel"
+   },
+   "attachmentRefs": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Device time — `addCaseMessage` is offline-capable."
+   },
+   "syncedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true,
+    "description": "Server time the message arrived."
+   }
+  }
  },
  "CasePriority": {
   "type": "string",
@@ -208,78 +294,6 @@
    "resolved",
    "closed"
   ]
- },
- "CreateCaseRequest": {
-  "x-ticvai-persistence": "none — request only",
-  "type": "object",
-  "required": [
-   "id",
-   "subject",
-   "description",
-   "channel",
-   "recordedAt"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "subjectId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "subject": {
-    "type": "string",
-    "maxLength": 200
-   },
-   "description": {
-    "type": "string",
-    "maxLength": 10000
-   },
-   "categoryId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "membershipId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "The identity membership this case concerns (`identity.customer_membership`); member case notes are cases with this set. Must belong to `subjectId` when both are given (422). (decided 29 September, coordinator decision DM4, writers pass)"
-   },
-   "priority": {
-    "allOf": [
-     {
-      "$ref": "#/components/schemas/CasePriority"
-     }
-    ],
-    "default": "normal"
-   },
-   "kind": {
-    "$ref": "#/components/schemas/CaseKind"
-   },
-   "channel": {
-    "$ref": "#/components/schemas/MessageChannel"
-   },
-   "venueId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "relatedOrderId": {
-    "type": "string"
-   },
-   "attachmentRefs": {
-    "type": "array",
-    "description": "Stored on the opening `CaseMessage`, not on the case.",
-    "items": {
-     "type": "string"
-    }
-   },
-   "recordedAt": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Device time the case was raised. The server stamps `Case.syncedAt` on arrival."
-   }
-  }
  },
  "LocalisedText": {
   "x-ticvai-persistence": "none — jsonb column",

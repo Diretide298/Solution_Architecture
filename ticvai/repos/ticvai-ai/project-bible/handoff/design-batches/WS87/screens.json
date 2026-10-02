@@ -155,19 +155,11 @@
   "states": {
    "loading": "The self-service experience list; the counts above it resolve separately.",
    "error": "Could not load. Names which read failed and leaves the self-service experience untouched.",
-   "emptyFirstRun": "No self-service experience yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No self-service experience yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the self-service experience are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Not shown: nothing on this screen needs a permission of its own; the app's sign-in decides access."
   },
-  "apis": [
-   {
-    "operationId": "getGameEligibility",
-    "contract": "games",
-    "purpose": "Self-service overview",
-    "trigger": "onLoad",
-    "provenance": "board reading, 19 September 2026"
-   }
-  ],
+  "apis": [],
   "entryState": {
    "preloaded": [
     "Total Self-Service Devices",
@@ -183,6 +175,19 @@
    "workshopBoard": "wireframes/WS67 Game and Ride Board 10.dc.html#bo-484"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 96. 0 of 5 labels bound to a contract property; 10 of 21 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "gaps": [
+   {
+    "operation": "getGameEligibility",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): getGameEligibility answers what one card can play; the overview needs the kiosk devices and session counts, which have no read yet (contract gap CHG-WIR-004) (design-notes correction venue-operations BO-484).",
+    "source": "contracts/satellite/games.yaml#getGameEligibility"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-004): No read of game kiosks and their session counts.",
+    "source": "contracts/satellite/games.yaml#getGameEligibility"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -255,6 +260,11 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Game_and_Ride_Module.pdf, page 97"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-004): No read of the game kiosk configuration.",
+    "source": "contracts/satellite/games.yaml#setGameKioskConfiguration"
    }
   ],
   "layout": {
@@ -700,6 +710,13 @@
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
        "impliedBy": "topUpWallet"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Read a guest wallet",
+       "bindsTo": "Wallet",
+       "operation": "getWallet",
+       "provenance": "contract wallet.yaml GET /wallets/{subjectId}; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -719,6 +736,13 @@
     "purpose": "Self-service top-up",
     "trigger": "onAction",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "getWallet",
+    "contract": "wallet",
+    "purpose": "Read a guest wallet",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {

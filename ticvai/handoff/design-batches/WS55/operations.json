@@ -37,6 +37,25 @@
   "requestBody": "ApprovalDelegation",
   "responds": "ApprovalDelegation"
  },
+ "createMfaChallenge": {
+  "method": "POST",
+  "path": "/auth/mfa/challenge",
+  "contract": "identity",
+  "summary": "Second factor at staff sign-in, and step-up for a sensitive action",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
  "listApprovalDelegations": {
   "method": "GET",
   "path": "/delegations",
@@ -49,30 +68,6 @@
   "parameters": [],
   "requestBody": null,
   "responds": "ApprovalDelegation"
- },
- "listApprovalMatrices": {
-  "method": "GET",
-  "path": "/approval-matrices",
-  "contract": "approvals",
-  "summary": "What requires approval here",
-  "permission": "APPROVAL_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "kind",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "effective",
-    "in": "query",
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "ApprovalMatrix"
  },
  "listConditionDecisionLogic": {
   "method": "GET",
@@ -158,6 +153,25 @@
   "requestBody": "ApprovalMatrix",
   "responds": "ApprovalMatrix"
  },
+ "setApprovalSlaPolicy": {
+  "method": "PUT",
+  "path": "/approval-sla-policies",
+  "contract": "approvals",
+  "summary": "How long a decision may take, and what happens when it does not",
+  "permission": "APPROVAL_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ApprovalSlaPolicy",
+  "responds": "ApprovalSlaPolicy"
+ },
  "setTriggerActionCross": {
   "method": "PUT",
   "path": "/trigger-action-cross",
@@ -233,5 +247,24 @@
   ],
   "requestBody": "WorkflowTestingSimulationImpactAnalysisInput",
   "responds": "WorkflowTestingSimulationImpactAnalysisView"
+ },
+ "verifyMfaChallenge": {
+  "method": "POST",
+  "path": "/auth/mfa/challenge/{challengeId}/verify",
+  "contract": "identity",
+  "summary": "Complete a sign-in or step-up challenge",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
  }
 }

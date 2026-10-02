@@ -7,7 +7,7 @@
 | Tier | platform: Provisioning, publishing, reporting, and the one cross-region path. |
 | Contracts | `subscription`, `platform-ops`, `public-api` |
 | Schemas owned | `control`, `subscription` |
-| Operations in the slice | 18 of 216 |
+| Operations in the slice | 21 of 221 |
 | Scale | Low volume, high consequence. Tenant provisioning and licensing. |
 | If it is down | Down blocks provisioning and the developer API. Trading is unaffected. |
 
@@ -28,19 +28,22 @@ Splitting them would give three services writing one schema, which is the arrang
 | Group | Operation | Method | Path | Part | Wave | Called by |
 |---|---|---|---|---|---|---|
 | licensing | [`addLicenceAddOn`](#addlicenceaddon) | POST | `/tenants/{tenantId}/licences/add-ons` | setup | 2 | ADM-005, ADM-007, ADM-011, ADM-422 |
-| plan | [`createPlan`](#createplan) | POST | `/plans` | setup | 2 | ADM-008, ADM-019, ADM-392 |
-| plan | [`createPlanVersion`](#createplanversion) | POST | `/plans/{planId}` | setup | 2 | ADM-008, ADM-019, ADM-398 |
-| publicApi | [`certifyIntegration`](#certifyintegration) | POST | `/listings/{listingId}/certify` | setup | 1 | BO-483, DEV-008 |
-| publicApi | [`createApiClient`](#createapiclient) | POST | `/api-clients` | setup | 1 | BO-067, BO-1073, BO-1173, BO-1177, DEV-003, PTR-019 |
+| licensing | [`getTenantLicences`](#gettenantlicences) | GET | `/tenants/{tenantId}/licences` | core | 3 | ADM-002, ADM-005, ADM-006, ADM-007, ADM-008, ADM-009 … |
+| plan | [`createPlan`](#createplan) | POST | `/plans` | setup | 2 | ADM-008, ADM-392 |
+| plan | [`createPlanVersion`](#createplanversion) | POST | `/plans/{planId}` | setup | 2 | ADM-008, ADM-398 |
+| publicApi | [`certifyIntegration`](#certifyintegration) | POST | `/listings/{listingId}/certify` | setup | 1 | DEV-008 |
+| publicApi | [`createApiClient`](#createapiclient) | POST | `/api-clients` | setup | 1 | BO-1177, DEV-003, PTR-019 |
 | publicApi | [`decideProductionAccess`](#decideproductionaccess) | POST | `/production-access-requests/{requestId}/decide` | setup | 1 | ADM-015, DEV-008 |
 | publicApi | [`deprecateApiVersion`](#deprecateapiversion) | POST | `/api-versions/{version}/deprecate` | setup | 1 | ADM-026, DEV-008 |
 | publicApi | [`registerDeveloper`](#registerdeveloper) | POST | `/developers` | setup | 1 | DEV-002 |
 | publicApi | [`rotateApiCredential`](#rotateapicredential) | POST | `/api-clients/{clientId}/credentials` | setup | 1 | DEV-003, PTR-019 |
 | publicApi | [`setApiLicensing`](#setapilicensing) | PUT | `/api-licensing` | setup | 1 | DEV-008 |
 | publicApi | [`setDeveloperMembers`](#setdevelopermembers) | PUT | `/developers/{developerId}/members` | setup | 1 | DEV-002 |
-| subscription | [`setSubscription`](#setsubscription) | PUT | `/tenants/{tenantId}/subscription` | setup | 2 | ADM-008, ADM-011, ADM-410, ADM-417, ADM-463, SGN-019 … |
-| tenant | [`createTenant`](#createtenant) | POST | `/tenants` | setup | 2 | ADM-005, ADM-419 |
-| tenant | [`listTenants`](#listtenants) | GET | `/tenants` | core | 2 | ADM-002, ADM-005, ADM-006, ADM-007, ADM-008, ADM-009 … |
+| subscription | [`listModuleCatalogue`](#listmodulecatalogue) | GET | `/module-catalogue` | core | 3 | ADM-386, ADM-401, ADM-402, ADM-403, ADM-404, ADM-423 … |
+| subscription | [`setModuleListing`](#setmodulelisting) | PUT | `/module-catalogue` | setup | 3 |  |
+| subscription | [`setSubscription`](#setsubscription) | PUT | `/tenants/{tenantId}/subscription` | setup | 2 | ADM-008, ADM-410, ADM-417, ADM-463, SGN-019, SGN-024 |
+| tenant | [`createTenant`](#createtenant) | POST | `/tenants` | setup | 2 | ADM-005, ADM-419, ADM-420 |
+| tenant | [`listTenants`](#listtenants) | GET | `/tenants` | core | 2 | ADM-002, ADM-004, ADM-005, ADM-006, ADM-007, ADM-008 … |
 | tenant | [`reactivateTenant`](#reactivatetenant) | POST | `/tenants/{tenantId}/reactivate` | setup | 2 | ADM-005 |
 | tenant | [`suspendTenant`](#suspendtenant) | POST | `/tenants/{tenantId}/suspend` | setup | 2 | ADM-005 |
 | tenant | [`terminateTenant`](#terminatetenant) | POST | `/tenants/{tenantId}/terminate` | setup | 2 | ADM-005 |
@@ -99,6 +102,7 @@ A module or limit increase sold separately. Add-ons survive a plan change unless
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
+| poweredByRemovable | boolean |  | Whether the tenant's licence lets it switch "Powered by TICVAI" off (Chinmay, 2 October, workbook Q160 and the pre-apply round; CHG-CSA-036). (default False; read-only) |
 | tenantId | string (uuid) | yes |  |
 | planId | string (uuid) |  | (nullable) |
 | licensedModules | array of object | yes | Union of plan modules and add-ons. |
@@ -122,6 +126,60 @@ A module or limit increase sold separately. Add-ons survive a plan change unless
 | 201 |  | Added |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
+### getTenantLicences
+
+**`GET /tenants/{tenantId}/licences`**: What a tenant is licensed to use
+
+**The authoritative source for module enablement.** The White Label Builder reads this and cannot enable what is not licensed here. Two places deciding what a tenant may use is one place too many.
+
+|  |  |
+|---|---|
+| Permission | `PLATFORM_TENANT_VIEW` |
+| Scope level | tenant |
+| Part of slice | core |
+| Wave | 3 |
+| Offline | yes |
+| Conflict policy | serverWins |
+| Read routing | primary |
+| Reads | `control.licence_add_on`, `subscription.contract`, `subscription.plan` |
+| Writes | - |
+| Called by | ADM-002, ADM-005, ADM-006, ADM-007, ADM-008, ADM-009, ADM-010, ADM-011, ADM-012, ADM-015, ADM-422, ADM-424, ADM-450 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| tenantId | path | yes | string (uuid) |  |
+
+**Response**: `LicencePosition`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| poweredByRemovable | boolean |  | Whether the tenant's licence lets it switch "Powered by TICVAI" off (Chinmay, 2 October, workbook Q160 and the pre-apply round; CHG-CSA-036). (default False; read-only) |
+| tenantId | string (uuid) | yes |  |
+| planId | string (uuid) |  | (nullable) |
+| licensedModules | array of object | yes | Union of plan modules and add-ons. |
+| licensedModules[].moduleKey | string | yes |  |
+| licensedModules[].displayName | string |  |  |
+| licensedModules[].source | enum (plan, addOn) | yes |  |
+| licensedModules[].validTo | string (date) |  | (nullable) |
+| limits | array of EntitlementLimit | yes |  |
+| limits[].metric | UsageMetric: enum (venues, workstations, activeUsers, devices, brandedApps, aiTokens, apiCalls, storageGb, …) | yes |  |
+| limits[].limit | integer | yes | Null means unlimited. (nullable) |
+| limits[].overageAllowed | boolean |  | (default False) |
+| limits[].overageUnitPrice | Money |  | On the wire this is three fields; in the database it is one column. |
+| limits[].overageUnitPrice.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| limits[].overageUnitPrice.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| limits[].overageUnitPrice.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Licence position |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
 
 ## Group: plan
 
@@ -142,7 +200,7 @@ A plan bundles licensed modules, entitlement limits and a cell tier. Plans are v
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `control.tenant`, `subscription.plan`, `subscription.plan_limit`, `subscription.plan_module` |
 | Writes | `cache:idempotency`, `subscription.plan`, `subscription.plan_limit` |
-| Called by | ADM-008, ADM-019, ADM-392 |
+| Called by | ADM-008, ADM-392 |
 
 **Parameters**
 
@@ -271,7 +329,7 @@ Existing subscribers remain on their version until migrated deliberately. A pric
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `control.tenant`, `subscription.plan`, `subscription.plan_limit`, `subscription.plan_module` |
 | Writes | `cache:idempotency`, `subscription.plan`, `subscription.plan_limit` |
-| Called by | ADM-008, ADM-019, ADM-398 |
+| Called by | ADM-008, ADM-398 |
 
 **Parameters**
 
@@ -405,7 +463,7 @@ Existing subscribers remain on their version until migrated deliberately. A pric
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `control.api_version`, `control.integration_listing` |
 | Writes | `cache:idempotency`, `control.integration_listing` |
-| Called by | BO-483, DEV-008 |
+| Called by | DEV-008 |
 | State model | Integration listing ([states/integration-listing.yaml](../../../states/integration-listing.yaml)): moves `submitted` -> `inReview`, `inReview` -> `certified`, `inReview` -> `rejected`, `certified` -> `revoked`, `revoked` -> `delisted` |
 
 **Parameters**
@@ -466,7 +524,7 @@ Existing subscribers remain on their version until migrated deliberately. A pric
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `control.api_client`, `control.api_licence`, `control.developer_account`, `control.integration_listing` |
 | Writes | `cache:idempotency`, `control.api_client` |
-| Called by | BO-067, BO-1073, BO-1173, BO-1177, DEV-003, PTR-019 |
+| Called by | BO-1177, DEV-003, PTR-019 |
 
 **Parameters**
 
@@ -868,6 +926,104 @@ A developer account is **not a tenant and not a partner.** A partner resells tic
 
 ## Group: subscription
 
+### listModuleCatalogue
+
+**`GET /module-catalogue`**: Modules, their dependencies and their commercial treatment
+
+Boards 4.3 and 4.6. **A module marketplace without a dependency graph sells combinations that cannot be provisioned.** F&B needs inventory; seating needs the venue map; redemption needs wallet — and a customer who buys the first of each pair and not the second discovers it during go-live.
+
+|  |  |
+|---|---|
+| Permission | `PLATFORM_PLAN_MANAGE` |
+| Scope level | platform |
+| Part of slice | core |
+| Wave | 3 |
+| Offline | no |
+| Read routing | replica |
+| Guest callable | True |
+| Reads | `subscription.module_listing` |
+| Writes | - |
+| Called by | ADM-386, ADM-401, ADM-402, ADM-403, ADM-404, ADM-423, ADM-424, SGN-008, SGN-013, SGN-014, SGN-015, SGN-016 |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Modules |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
+### setModuleListing
+
+**`PUT /module-catalogue`**: Define a module's dependencies, incompatibilities and price
+
+|  |  |
+|---|---|
+| Permission | `PLATFORM_PLAN_MANAGE` |
+| Scope level | platform |
+| Part of slice | setup, makes `subscription.module_listing` non-empty |
+| Wave | 3 |
+| Offline | no |
+| Reads | `subscription.module_listing` |
+| Writes | `subscription.module_listing` |
+| Called by | **no screen**: no screen lists it in its apis, so it is reachable only by API or import until one does (README, Known gaps) |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
+
+**Request body**: `ModuleListing`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| moduleCode | string | yes |  |
+| name | string |  |  |
+| description | string |  | (nullable) |
+| category | string |  | (nullable) |
+| requiresModules | array of string |  |  |
+| incompatibleWithModules | array of string |  |  |
+| includedInTiers | array of string |  |  |
+| price | Money |  | On the wire this is three fields; in the database it is one column. |
+| price.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| price.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| price.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| pricingBasis | enum (included, flatFee, perVenue, perUnit, revenueShare, metered) |  |  |
+| meteredMetric | object |  | For metered, what is counted (aiTokens for the AI module). (nullable) |
+| meteredUnitSize | integer |  | For metered, how many units price buys (e.g. (min 1; nullable) |
+| provisioningMinutes | integer |  | (nullable) |
+| requiresProfessionalServices | boolean |  | (default False) |
+| status | enum (available, beta, deprecated, withdrawn) |  |  |
+
+**Response**: `ModuleListing`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| moduleCode | string | yes |  |
+| name | string |  |  |
+| description | string |  | (nullable) |
+| category | string |  | (nullable) |
+| requiresModules | array of string |  |  |
+| incompatibleWithModules | array of string |  |  |
+| includedInTiers | array of string |  |  |
+| price | Money |  | On the wire this is three fields; in the database it is one column. |
+| price.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| price.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| price.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| pricingBasis | enum (included, flatFee, perVenue, perUnit, revenueShare, metered) |  |  |
+| meteredMetric | object |  | For metered, what is counted (aiTokens for the AI module). (nullable) |
+| meteredUnitSize | integer |  | For metered, how many units price buys (e.g. (min 1; nullable) |
+| provisioningMinutes | integer |  | (nullable) |
+| requiresProfessionalServices | boolean |  | (default False) |
+| status | enum (available, beta, deprecated, withdrawn) |  |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Set |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
 ### setSubscription
 
 **`PUT /tenants/{tenantId}/subscription`**: Assign or change a subscription
@@ -888,7 +1044,7 @@ Silently switching off a module a venue is trading on is not an acceptable conse
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `subscription.contract`, `subscription.plan` |
 | Writes | `cache:idempotency`, `subscription.contract` |
-| Called by | ADM-008, ADM-011, ADM-410, ADM-417, ADM-463, SGN-019, SGN-024 |
+| Called by | ADM-008, ADM-410, ADM-417, ADM-463, SGN-019, SGN-024 |
 | State model | Tenant subscription ([states/subscription.yaml](../../../states/subscription.yaml)): moves `trial` -> `active`, `pastDue` -> `active`, `cancelled` -> `active` |
 
 **Parameters**
@@ -958,7 +1114,7 @@ Creates the record only. **No cell exists until a region is provisioned** — a 
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `control.tenant` |
 | Writes | `cache:idempotency`, `control.tenant` |
-| Called by | ADM-005, ADM-419 |
+| Called by | ADM-005, ADM-419, ADM-420 |
 | State model | Tenant ([states/tenant.yaml](../../../states/tenant.yaml)): created as `onboarding` |
 
 **Parameters**
@@ -1028,7 +1184,7 @@ Creates the record only. **No cell exists until a region is provisioned** — a 
 | Read routing | replica |
 | Reads | `control.tenant` |
 | Writes | - |
-| Called by | ADM-002, ADM-005, ADM-006, ADM-007, ADM-008, ADM-009, ADM-010, ADM-011, ADM-012, ADM-015, ADM-016, ADM-017, ADM-018, ADM-019, ADM-031, ADM-037, ADM-369, ADM-370, ADM-374, ADM-412, ADM-421, BO-594 |
+| Called by | ADM-002, ADM-004, ADM-005, ADM-006, ADM-007, ADM-008, ADM-009, ADM-010, ADM-011, ADM-012, ADM-015, ADM-016, ADM-017, ADM-018, ADM-019, ADM-020, ADM-021, ADM-026, ADM-031, ADM-037, ADM-068, ADM-369, ADM-370, ADM-374, ADM-411, ADM-412, ADM-420, ADM-421, ADM-422, ADM-424, ADM-425, ADM-426, ADM-469, ADM-470, ADM-471, ADM-472, ADM-473, ADM-474, ADM-475, ADM-476, ADM-477, ADM-478, ADM-479, ADM-480, ADM-481, ADM-482, ADM-483, ADM-484, ADM-485, ADM-486, ADM-487, ADM-488, ADM-489, ADM-490, ADM-491, ADM-492, ADM-493, ADM-494, ADM-495, ADM-496, ADM-497, ADM-498, ADM-499, ADM-500, ADM-501, ADM-502, ADM-503, ADM-504, ADM-505, ADM-506, ADM-507, ADM-508, ADM-509, ADM-510, ADM-511, ADM-512, ADM-513, ADM-514, ADM-515, ADM-516, ADM-517, ADM-518, ADM-519, ADM-520, ADM-521, ADM-522, ADM-523, ADM-524, ADM-525, ADM-526, ADM-527, ADM-528, ADM-529, ADM-530, ADM-531, ADM-532, ADM-533, ADM-534, ADM-535, ADM-536, ADM-537, ADM-538, ADM-539, ADM-540, ADM-541, ADM-542, ADM-543, ADM-544, ADM-545, ADM-546, ADM-547, ADM-548, ADM-549, ADM-550, ADM-551, ADM-552, ADM-553, ADM-554, ADM-555, ADM-556, ADM-557, ADM-558, ADM-619, BO-594 |
 
 **Parameters**
 
@@ -1147,7 +1303,7 @@ Graceful and reversible. Data is retained, cells stay provisioned, and the behav
 |---|---|
 | Permission | `PLATFORM_TENANT_MANAGE` |
 | Scope level | tenant |
-| Part of slice | setup, makes `control.tenant` non-empty |
+| Part of slice | setup, changes rows of `control.tenant` that another operation creates |
 | Wave | 2 |
 | Offline | no |
 | Conflict policy | serverWins |
@@ -1271,7 +1427,7 @@ A tenant with unsettled ledger balances cannot be terminated — the money has t
 |---|---|
 | Permission | `PLATFORM_TENANT_MANAGE` |
 | Scope level | tenant |
-| Part of slice | setup, makes `control.tenant` non-empty |
+| Part of slice | setup, changes rows of `control.tenant` that another operation creates |
 | Wave | 2 |
 | Offline | no |
 | Conflict policy | serverWins |
@@ -1499,6 +1655,26 @@ Every table this service owns that the slice reads or writes, with its columns a
 | billing_period | text | no |  |
 | id | uuid | yes | Synthesised key. |
 
+### `subscription.module_listing`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| module_code | text | yes |  |
+| name | text | no |  |
+| description | text | no |  |
+| category | text | no |  |
+| requires_modules | text[] | no |  |
+| incompatible_with_modules | text[] | no |  |
+| included_in_tiers | text[] | no |  |
+| list_price | numeric(18,4) | no |  |
+| pricing_basis | text | no |  |
+| metered_metric | text | no | For metered, what is counted (aiTokens for the AI module). |
+| metered_unit_size | integer | no | For metered, how many units price buys (e.g. |
+| provisioning_minutes | integer | no |  |
+| requires_professional_services | boolean | no |  |
+| status | text | no |  |
+| id | uuid | yes | Synthesised key. |
+
 ### `subscription.plan`
 
 | Column | Type | Required | Notes |
@@ -1541,17 +1717,17 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-198 operations, added to this service in later releases without changing any of the above.
+200 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
-| billing | `cancelInvoice`, `disputeInvoice`, `generateInvoice`, `issueCreditNote`, `listCreditNotes`, `listSubscriptionInvoices`, `recordInvoicePayment`, `resolveInvoiceDispute` |
+| billing | `cancelInvoice`, `disputeInvoice`, `generateInvoice`, `getBillingEntity`, `issueCreditNote`, `listCreditNotes`, `listSubscriptionInvoices`, `recordInvoicePayment`, `resolveInvoiceDispute`, `setBillingEntity` |
 | cell | `cancelDecommission`, `decommissionCell`, `executeTenantMigration`, `getCell`, `getCellCapacity`, `getCellHealth`, `launchCellCluster`, `listCellClusters`, `listCellJobs`, `listTenantCells`, `listTenantMigrations`, `planTenantMigration`, `provisionCell`, `rollbackTenantMigration`, `updateCellTier` |
 | drafted | `approveBookingLimitCommercial`, `approveMembershipProductValidation`, `approvePartnerStatuLifecycle`, `listCommercialAgreement`, `listCommercialAgreementHealth`, `listCommercialAllocationQuota`, `listCommissionCalculationSettlement`, `listCommissionMarginIncentive`, `listCreditLimitExposure`, `listDepositGuaranteeFinancial`, `listMember`, `listMemberExceptionOverride`, `listMemberLifecycleCase`, `listMembershipActivationCredential`, `listMembershipAnnualPass`, `listMembershipCommercialPricing`, `listMembershipFreezeSuspension`, `listMembershipRenewalRetention`, `listMembershipUpgradeDowngrade`, `listMembershipUsageVisit`, `listPartner`, `listPartner2`, `listPartnerAccessRole`, `listPartnerCancellationRefund`, `listPartnerContactUser`, `listPartnerDisputeCase`, `listPartnerDocumentationCompliance`, `listPartnerOnboardingApplication`, `listPartnerOrderBooking`, `listPartnerPerformanceScorecard`, `listPartnerProfileReadiness`, `listPartnerReconciliationException`, `listPartnerRelationship`, `listPartnerStatementAccount`, `listRenewalAuto`, `listReservationHoldRelease`, `listTerritoryMarketDistribution`, `listVisitAdmissionEntitlement`, `setAgreementContractTerm`, `setFamilyHouseholdDependent`, `setMemberMembershipAccount`, `setMembershipEligibilityQualification`, `setMembershipEntitlementAdmission`, `setMembershipProductTier`, `setPartnerBrandVenue`, `setPartnerProfileOrganization`, `setPartnerRateNet`, `setPaymentTermBilling`, `setRenewalAutoMembership`, `setValidityActivationExpiry` |
 | environment | `listEnvironments`, `registerEnvironment` |
-| licensing | `getEntitlementUsage`, `getTenantLicences`, `removeLicenceAddOn` |
+| licensing | `getEntitlementUsage`, `removeLicenceAddOn` |
 | metering | `getUsageMetering`, `recordUsage` |
-| migration | `applyMigration`, `getMigrationRun`, `getVersionSkew`, `listMigrations`, `planMigration`, `rollbackMigrationRun` |
+| migration | `applyConfigPackage`, `applyMigration`, `diffConfigPackage`, `exportConfigPackage`, `getMigrationRun`, `getVersionSkew`, `listMigrations`, `planMigration`, `rollbackMigrationRun` |
 | notice | `listSupportNotices`, `listUpgradeSchedules`, `publishSupportNotice`, `scheduleTenantUpgrade` |
 | partner | `createPartnerQuote`, `listPartnerQuotes` |
 | plan | `getPlan`, `listPlans` |
@@ -1560,5 +1736,5 @@ Every table this service owns that the slice reads or writes, with its columns a
 | publicApi | `createSandbox`, `createWebhookSubscription`, `getApiUsage`, `issueApiToken`, `listApiAnomalies`, `listApiClients`, `listApiScopes`, `listApiVersions`, `listIntegrationListings`, `listProductionAccessRequests`, `listSandboxes`, `listWebhookDeliveries`, `listWebhookEventTypes`, `listWebhookSubscriptions`, `replayEvents`, `requestProductionAccess`, `resetSandbox`, `revokeApiCredential`, `setApiAnomalyRule`, `setApiClientStatus`, `setApiQuota`, `submitIntegrationListing`, `testWebhookSubscription` |
 | release | `createRelease`, `getRelease`, `getReleaseReadiness`, `listReleases`, `promoteRelease`, `rejectRelease`, `withdrawRelease` |
 | rollout | `getRollout`, `listRollouts`, `pauseRollout`, `rollbackRollout`, `startRollout` |
-| subscription | `actOnPartnerApplicationReview`, `actOnPartnerCase`, `actOnPartnerCommissionLine`, `actOnPartnerReconciliationException`, `actOnPartnerSettlementBatch`, `addCapacityPack`, `cancelSubscription`, `createPartnerAgreement`, `createPartnerCase`, `createPartnerChangeRequest`, `createPartnerUser`, `decommissionBurstEnvironment`, `drainBurstEnvironment`, `exportPartnerInvoice`, `getBillingReconciliation`, `getCommissionStatement`, `getGoLiveReadiness`, `getLicenceEnforcement`, `getPlanRecommendations`, `getPlanTiers`, `getSubscription`, `getVsiModel`, `listBurstEnvironments`, `listChannelListings`, `listLicensingModels`, `listModuleCatalogue`, `listPartnerAgreements`, `listPartnerUsers`, `listVenueTypeTemplates`, `previewSubscriptionChange`, `reconcileBurstEnvironment`, `registerPartner`, `requestBurstEnvironment`, `runGoLiveValidation`, `scoreVsiAssessment`, `setChannelListing`, `setLicenceEnforcementPolicy`, `setLicensingModel`, `setMembershipCommercialConfig`, `setMembershipUsagePolicy`, `setModuleListing`, `setPartnerAllocations`, `setPartnerCapabilityGrants`, `setPartnerCommissionRules`, `setPartnerContact`, `setPartnerCreditProfile`, `setPartnerDistributionRights`, `setPartnerSecurity`, `setPlanTiers`, `setTrialConfiguration`, `setVsiModel`, `settleAiUsage`, `simulateCommercialPackage`, `submitOnboardingApplication`, `updatePartnerAgreement` |
+| subscription | `actOnPartnerApplicationReview`, `actOnPartnerCase`, `actOnPartnerCommissionLine`, `actOnPartnerReconciliationException`, `actOnPartnerSettlementBatch`, `addCapacityPack`, `cancelSubscription`, `createPartnerAgreement`, `createPartnerCase`, `createPartnerChangeRequest`, `createPartnerUser`, `decommissionBurstEnvironment`, `drainBurstEnvironment`, `exportPartnerInvoice`, `getBillingReconciliation`, `getCommissionStatement`, `getGoLiveReadiness`, `getLicenceEnforcement`, `getPlanRecommendations`, `getPlanTiers`, `getSubscription`, `getVsiModel`, `listBurstEnvironments`, `listChannelListings`, `listLicensingModels`, `listPartnerAgreements`, `listPartnerUsers`, `listVenueTypeTemplates`, `previewSubscriptionChange`, `reconcileBurstEnvironment`, `registerPartner`, `requestBurstEnvironment`, `runGoLiveValidation`, `scoreVsiAssessment`, `setChannelListing`, `setLicenceEnforcementPolicy`, `setLicensingModel`, `setMembershipCommercialConfig`, `setMembershipUsagePolicy`, `setPartnerAllocations`, `setPartnerCapabilityGrants`, `setPartnerCommissionRules`, `setPartnerContact`, `setPartnerCreditProfile`, `setPartnerDistributionRights`, `setPartnerSecurity`, `setPlanTiers`, `setTrialConfiguration`, `setVsiModel`, `settleAiUsage`, `simulateCommercialPackage`, `submitOnboardingApplication`, `updatePartnerAgreement` |
 | tenant | `getTenant` |

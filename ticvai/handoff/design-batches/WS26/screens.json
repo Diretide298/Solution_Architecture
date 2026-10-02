@@ -39,7 +39,7 @@
     {
      "to": "SUP-001",
      "trigger": "Agent Login",
-     "provenance": "derived — SUP-001 declares entryState.params challengeId and SUP-019 holds none of them. The edge carries nothing: SUP-019 is opened from SUP-001, so this edge is the way back and SUP-001 keeps its own state"
+     "provenance": "derived — SUP-001 declares entryState.params challengeId, methodId, providerId and SUP-019 holds none of them. The edge carries nothing: SUP-019 is opened from SUP-001, so this edge is the way back and SUP-001 keeps its own state"
     },
     {
      "to": "SUP-020",
@@ -303,7 +303,7 @@
      "to": "SUP-019",
      "trigger": "Returns to the board's landing screen",
      "provenance": "flow F135 step 2→3",
-     "operation": "listQueues"
+     "operation": "listServiceQueues"
     }
    ]
   },
@@ -317,6 +317,12 @@
     "operation": null,
     "why": "**The pack names 5 actions on this screen and the screen declares 1 operation.** Unserved: Payments, Membership, Wallet, Group Sales Support, Access Control. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Customer Service_Reference.pdf, page 25 §Support configurable queues such as"
+   },
+   {
+    "operation": "listQueues",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-005): listQueues reads ride and attraction virtual queues (queue contract); customer-service queues are listServiceQueues (declared) (design-notes correction customer-marketing SUP-020).",
+    "source": "contracts/satellite/queue.yaml#listQueues"
    }
   ],
   "layout": {
@@ -494,16 +500,10 @@
   "states": {
    "loading": "The queue configuration as saved.",
    "error": "Could not load. Names which read failed and leaves the queue untouched.",
-   "emptyFirstRun": "No queue configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyFirstRun": "No queue configured yet. Offers no create action — this screen declares no operation that makes one and says what the platform does in the meantime.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
-   {
-    "operationId": "listQueues",
-    "contract": "queue",
-    "purpose": "List queues",
-    "trigger": "onLoad"
-   },
    {
     "operationId": "listServiceQueues",
     "contract": "marketing-crm",
@@ -516,7 +516,6 @@
     "purpose": "Create or change a customer-service queue",
     "trigger": "onAction",
     "invalidates": [
-     "listQueues",
      "listServiceQueues"
     ]
    }
@@ -868,6 +867,12 @@
        "kind": "primaryButton",
        "label": "Venue operating hours",
        "provenance": "pack Customer Service_Reference.pdf, page 29 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save SLA policy",
+       "operation": "setSlaPolicy",
+       "provenance": "contract marketing-crm.yaml PUT /sla-policies; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -885,6 +890,13 @@
     "contract": "marketing-crm",
     "purpose": "SLA Policy & Service-Level Management",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setSlaPolicy",
+    "contract": "marketing-crm",
+    "purpose": "Define a case SLA policy",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-005)"
    }
   ],
   "entryState": {
@@ -901,6 +913,22 @@
    "workshopBoard": "wireframes/WS43 Customer Service Board 2.dc.html#sup-022"
   },
   "apisNote": "Regenerated 9 September 2026 from Customer Service_Reference.pdf page 29. 0 of 0 labels bound to a contract property; 13 of 41 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetSlaPolicy",
+    "component": "modal",
+    "trigger": "Save SLA policy",
+    "body": "**Collects what `setSlaPolicy` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save SLA policy",
+     "operation": "setSlaPolicy"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "contract marketing-crm.yaml PUT /sla-policies; wiring fix, 2 October 2026"
+   }
+  ],
   "_platform": {
    "code": "P12",
    "audience": "staff",
@@ -1023,6 +1051,17 @@
        "provenance": "pack Customer Service_Reference.pdf, page 31 §Display"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "components": [
+      {
+       "kind": "secondaryButton",
+       "label": "Reassign",
+       "operation": "updateCase",
+       "provenance": "contract marketing-crm.yaml PATCH /cases/{caseId}; wiring fix, 2 October 2026"
+      }
+     ]
     }
    ]
   },
@@ -1039,6 +1078,13 @@
     "contract": "marketing-crm",
     "purpose": "Agent Workload, Availability & Workforce Control",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "updateCase",
+    "contract": "marketing-crm",
+    "purpose": "Reassign a case to balance load",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-005)"
    }
   ],
   "entryState": {
@@ -1049,6 +1095,12 @@
     "AgentWorkloadAvailabilityWorkforceControlView.languages",
     "AgentWorkloadAvailabilityWorkforceControlView.status",
     "AgentWorkloadAvailabilityWorkforceControlView.activeCases"
+   ],
+   "params": [
+    {
+     "name": "caseId",
+     "from": "navigation"
+    }
    ]
   },
   "wireframe": {
@@ -1058,6 +1110,22 @@
    "workshopBoard": "wireframes/WS43 Customer Service Board 2.dc.html#sup-023"
   },
   "apisNote": "Regenerated 9 September 2026 from Customer Service_Reference.pdf page 31. 13 of 13 labels bound to a contract property; 13 of 37 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formUpdateCase",
+    "component": "modal",
+    "trigger": "Reassign",
+    "body": "**Collects what `updateCase` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Reassign",
+     "operation": "updateCase"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "contract marketing-crm.yaml PATCH /cases/{caseId}; wiring fix, 2 October 2026"
+   }
+  ],
   "_platform": {
    "code": "P12",
    "audience": "staff",

@@ -18,6 +18,40 @@
   "requestBody": null,
   "responds": "AccessibleSeating"
  },
+ "getSeatAvailability": {
+  "method": "GET",
+  "path": "/performances/{performanceId}/seat-availability",
+  "contract": "seating",
+  "summary": "Seat status for a performance",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "sectionCode",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "categoryId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "availableOnly",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "mode",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "SeatAvailability"
+ },
  "getSeatRecommendationRules": {
   "method": "GET",
   "path": "/seat-recommendation-rules",

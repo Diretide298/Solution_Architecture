@@ -397,6 +397,13 @@
    "workshopBoard": "wireframes/WS24 Access Control Board 7.dc.html#bo-205"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 87. 0 of 0 labels bound to a contract property; 10 of 26 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-004): No read lists edge nodes (setEdgeNodeLocal has no list or get).",
+    "source": "contracts/spine/access.yaml#setEdgeNodeLocal"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -452,7 +459,7 @@
      "to": "BO-204",
      "trigger": "Returns to the board's landing screen",
      "provenance": "flow F117 step 4→5",
-     "operation": "setOfflinePolicy"
+     "operation": "setGateOfflinePolicy"
     }
    ]
   },
@@ -471,6 +478,12 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Access Control Module_Reference.pdf, page 88"
+   },
+   {
+    "operation": "setOfflinePolicy",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): The gate offline validation policy is written by setGateOfflinePolicy (access, ACCESS_POINT_CONFIGURE); setOfflinePolicy is the tenancy POS till policy (sales, refunds, value ceilings). Same fault as BO-171, BO-208 and BO-210 (design-notes corrections venue-operations BO-171, BO-208).",
+    "source": "contracts/spine/access.yaml#setGateOfflinePolicy | contracts/spine/tenancy.yaml#setOfflinePolicy"
    }
   ],
   "layout": {
@@ -484,36 +497,35 @@
        "kind": "primaryButton",
        "label": "Save changes",
        "provenance": "contract operation setOfflinePolicy"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save offline validation policy",
+       "operation": "setGateOfflinePolicy",
+       "provenance": "contract access.yaml PUT /offline-policies; wiring fix, 2 October 2026"
       }
      ]
     },
     {
      "name": "contentBody",
-     "components": [
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "setOfflinePolicy"
-      }
-     ]
+     "components": []
     }
    ]
   },
   "states": {
    "loading": "The offline validation policy list.",
    "error": "Could not load. Names which read failed and leaves the offline validation policy untouched.",
-   "emptyFirstRun": "No offline validation policy yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No offline validation policy yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the offline validation policy are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
-    "operationId": "setOfflinePolicy",
-    "contract": "tenancy",
-    "purpose": "setOfflinePolicy",
-    "trigger": "onAction"
+    "operationId": "setGateOfflinePolicy",
+    "contract": "access",
+    "purpose": "Save the gate offline validation policy",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-001)"
    }
   ],
   "wireframe": {
@@ -523,6 +535,23 @@
    "workshopBoard": "wireframes/WS24 Access Control Board 7.dc.html#bo-206"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 88. 0 of 0 labels bound to a contract property; 0 of 27 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetGateOfflinePolicy",
+    "component": "modal",
+    "trigger": "Save offline validation policy",
+    "body": "**Collects what `setGateOfflinePolicy` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save offline validation policy",
+     "operation": "setGateOfflinePolicy"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "contract access.yaml PUT /offline-policies; wiring fix, 2 October 2026"
+   }
+  ],
+  "entryState": {},
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -665,13 +694,6 @@
     "trigger": "onLoad"
    },
    {
-    "operationId": "getOfflinePackage",
-    "contract": "access",
-    "purpose": "The access package an edge node holds, with its version",
-    "trigger": "onLoad",
-    "provenance": "decided 29 September, VM close-out (venue management and configuration)"
-   },
-   {
     "operationId": "publishHardwareDeployment",
     "contract": "access",
     "purpose": "Publish a new offline package to the edge nodes: deploys the access configuration version, which devices pick up at their next package refresh (replaces publishBundle, a catalogue bundle, bound in error on 29 September)",
@@ -685,6 +707,14 @@
    "workshopBoard": "wireframes/WS24 Access Control Board 7.dc.html#bo-207"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 89. 0 of 0 labels bound to a contract property; 8 of 28 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "gaps": [
+   {
+    "operation": "getOfflinePackage",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): getOfflinePackage is workstation-scoped (ACCESS_VALIDATE) and refuses a back-office browser with 403; the screen reads listEdgePackageData (design-notes correction venue-operations BO-207).",
+    "source": "contracts/spine/access.yaml#getOfflinePackage"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -759,6 +789,17 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Access Control Module_Reference.pdf, page 90"
+   },
+   {
+    "operation": "setOfflinePolicy",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): Save was bound to setOfflinePolicy (tenancy, the POS till policy) with TENANT_CONFIGURE; the gate revocation policy is written by setGateOfflinePolicy, already declared here (design-notes correction venue-operations BO-208).",
+    "source": "contracts/spine/tenancy.yaml#setOfflinePolicy | contracts/spine/access.yaml#setGateOfflinePolicy"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-004): No read returns the whole gate offline policy row (setGateOfflinePolicy has no get).",
+    "source": "contracts/spine/access.yaml#setGateOfflinePolicy"
    }
   ],
   "layout": {
@@ -772,29 +813,34 @@
        "derived": true,
        "impliedBy": "listOfflineCredentialRevocation",
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setGateOfflinePolicy",
+       "label": "Save gate offline policy",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setGateOfflinePolicy"
       }
      ]
     },
     {
      "name": "actionBar",
      "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Save offline policy",
-       "operation": "setOfflinePolicy",
-       "permission": "TENANT_CONFIGURE",
-       "notes": "Board 5 of the client's POS set, and **one of only two things in 36 board screens the package could not do.** ADR-0013 makes the POS local-first and nothing configured the policy.",
-       "provenance": "contract tenancy.yaml PUT /offline-policy"
-      }
-     ]
+     "components": []
     }
    ]
   },
   "states": {
    "loading": "The offline credential revocation list.",
    "error": "Could not load. Names which read failed and leaves the offline credential revocation untouched.",
-   "emptyFirstRun": "No offline credential revocation yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No offline credential revocation yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the offline credential revocation are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -809,15 +855,6 @@
     "contract": "access",
     "purpose": "Offline Credential & Revocation Cache",
     "trigger": "onLoad"
-   },
-   {
-    "operationId": "setOfflinePolicy",
-    "contract": "tenancy",
-    "purpose": "What a workstation may do with no network, and for how long",
-    "trigger": "onAction",
-    "invalidates": [
-     "listOfflineCredentialRevocation"
-    ]
    }
   ],
   "entryState": {
@@ -832,33 +869,6 @@
    "workshopBoard": "wireframes/WS24 Access Control Board 7.dc.html#bo-208"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 90. 0 of 0 labels bound to a contract property; 0 of 23 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "overlays": [
-   {
-    "id": "formSetOfflinePolicy",
-    "component": "modal",
-    "trigger": "Save offline policy",
-    "body": "**Collects what `setOfflinePolicy` sends before it is called.** Required: `scopePath`. Optional: `id`, `maxOfflineHours`, `allowedOffline`, `offlineValueCeiling`, `offlineTransactionCeiling`, `onCeilingBreach`, `requiresManagerToExtend`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "OfflinePolicy",
-    "confirm": {
-     "label": "Save offline policy",
-     "operation": "setOfflinePolicy"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "scopePath",
-      "id",
-      "maxOfflineHours",
-      "allowedOffline",
-      "offlineValueCeiling",
-      "offlineTransactionCeiling",
-      "onCeilingBreach",
-      "requiresManagerToExtend"
-     ]
-    },
-    "provenance": "contract tenancy.yaml PUT /offline-policy"
-   }
-  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1053,6 +1063,18 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Access Control Module_Reference.pdf, page 93"
+   },
+   {
+    "operation": "setConnectivityThresholds",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): The gate degraded-mode policy is setGateOfflinePolicy; setOfflinePolicy and setConnectivityThresholds are tenancy policies for POS workstations, keyed by scopePath (design-notes correction venue-operations BO-210).",
+    "source": "contracts/spine/access.yaml#setGateOfflinePolicy | contracts/spine/tenancy.yaml#setOfflinePolicy | contracts/spine/tenancy.yaml#setConnectivityThresholds"
+   },
+   {
+    "operation": "setOfflinePolicy",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): The gate degraded-mode policy is setGateOfflinePolicy; setOfflinePolicy and setConnectivityThresholds are tenancy policies for POS workstations, keyed by scopePath (design-notes correction venue-operations BO-210).",
+    "source": "contracts/spine/access.yaml#setGateOfflinePolicy | contracts/spine/tenancy.yaml#setOfflinePolicy | contracts/spine/tenancy.yaml#setConnectivityThresholds"
    }
   ],
   "layout": {
@@ -1070,8 +1092,8 @@
       {
        "kind": "primaryButton",
        "derived": true,
-       "impliedBy": "setOfflinePolicy",
-       "label": "Save offline policy",
+       "impliedBy": "setGateOfflinePolicy",
+       "label": "Save gate offline policy",
        "notes": "The act the screen exists for."
       },
       {
@@ -1079,7 +1101,7 @@
        "label": "Cancel",
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
-       "impliedBy": "setOfflinePolicy"
+       "impliedBy": "setGateOfflinePolicy"
       }
      ]
     }
@@ -1088,7 +1110,7 @@
   "states": {
    "loading": "The connectivity failure degraded list.",
    "error": "Could not load. Names which read failed and leaves the connectivity failure degraded untouched.",
-   "emptyFirstRun": "No connectivity failure degraded yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No connectivity failure degraded yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the connectivity failure degraded are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -1103,20 +1125,6 @@
     "contract": "access",
     "purpose": "Connectivity Failure & Degraded Mode Policy",
     "trigger": "onLoad"
-   },
-   {
-    "operationId": "setOfflinePolicy",
-    "contract": "tenancy",
-    "purpose": "Save what a device may do with no network, and for how long",
-    "trigger": "onAction",
-    "provenance": "decided 29 September, VM close-out (venue management and configuration)"
-   },
-   {
-    "operationId": "setConnectivityThresholds",
-    "contract": "tenancy",
-    "purpose": "Save when a device switches to degraded mode",
-    "trigger": "onAction",
-    "provenance": "decided 29 September, VM close-out (venue management and configuration)"
    }
   ],
   "entryState": {
@@ -1598,6 +1606,13 @@
      ]
     },
     "provenance": "contract access.yaml POST /security-alerts/{alertId}/status"
+   }
+  ],
+  "gaps": [
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-004): No operation rolls back an edge policy version or runs the four edge emergency actions.",
+    "source": "screens/P08-venue-back-office.yaml#BO-213"
    }
   ],
   "_platform": {

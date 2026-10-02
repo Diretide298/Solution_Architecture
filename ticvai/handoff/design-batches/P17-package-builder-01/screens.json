@@ -53,7 +53,7 @@
   "states": {
    "loading": "The recommended package overview list.",
    "error": "Could not load. Names which read failed and leaves the recommended package overview untouched.",
-   "emptyFirstRun": "No recommended package overview yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No recommended package overview yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the recommended package overview are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "TODO — not decided. A prospect is signed out and holds no permission, so the operator wording on the P09 twin does not apply. The book offers *Continue Saved Setup* and *Sign In* on 2.1, which is where somebody without access to a saved setup would be sent; no minute has decided it."
   },
@@ -228,7 +228,7 @@
   "states": {
    "loading": "The commercial model tier list.",
    "error": "Could not load. Names which read failed and leaves the commercial model tier untouched.",
-   "emptyFirstRun": "No commercial model tier yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No commercial model tier yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the commercial model tier are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "TODO — not decided. A prospect is signed out and holds no permission, so the operator wording on the P09 twin does not apply. The book offers *Continue Saved Setup* and *Sign In* on 2.1, which is where somebody without access to a saved setup would be sent; no minute has decided it."
   },
@@ -385,7 +385,7 @@
   "states": {
    "loading": "The module marketplace list.",
    "error": "Could not load. Names which read failed and leaves the module marketplace untouched.",
-   "emptyFirstRun": "No module marketplace yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No module marketplace yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the module marketplace are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "TODO — not decided. A prospect is signed out and holds no permission, so the operator wording on the P09 twin does not apply. The book offers *Continue Saved Setup* and *Sign In* on 2.1, which is where somebody without access to a saved setup would be sent; no minute has decided it."
   },
@@ -536,7 +536,7 @@
   "states": {
    "loading": "The module package recommendations list.",
    "error": "Could not load. Names which read failed and leaves the module package recommendations untouched.",
-   "emptyFirstRun": "No module package recommendations yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No module package recommendations yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the module package recommendations are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "TODO — not decided. A prospect is signed out and holds no permission, so the operator wording on the P09 twin does not apply. The book offers *Continue Saved Setup* and *Sign In* on 2.1, which is where somebody without access to a saved setup would be sent; no minute has decided it."
   },
@@ -654,7 +654,7 @@
   "states": {
    "loading": "The module detail commercial list.",
    "error": "Could not load. Names which read failed and leaves the module detail commercial untouched.",
-   "emptyFirstRun": "No module detail commercial yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No module detail commercial yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the module detail commercial are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "TODO — not decided. A prospect is signed out and holds no permission, so the operator wording on the P09 twin does not apply. The book offers *Continue Saved Setup* and *Sign In* on 2.1, which is where somebody without access to a saved setup would be sent; no minute has decided it."
   },
@@ -755,24 +755,10 @@
      "name": "contentBody",
      "components": [
       {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "setModuleListing",
-       "label": "Save module listing",
-       "notes": "The act the screen exists for."
-      },
-      {
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listModuleCatalogue",
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "setModuleListing"
       }
      ]
     }
@@ -781,7 +767,7 @@
   "states": {
    "loading": "The module dependency compatibility list.",
    "error": "Could not load. Names which read failed and leaves the module dependency compatibility untouched.",
-   "emptyFirstRun": "No module dependency compatibility yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No module dependency compatibility yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the module dependency compatibility are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "TODO — not decided. A prospect is signed out and holds no permission, so the operator wording on the P09 twin does not apply. The book offers *Continue Saved Setup* and *Sign In* on 2.1, which is where somebody without access to a saved setup would be sent; no minute has decided it."
   },
@@ -800,19 +786,15 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Subscription_Licensing_AI_Self_Service.pdf, page 49"
+   },
+   {
+    "operation": "setModuleListing",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-021): setModuleListing edits TICVAI's module catalogue and was offered to a prospect; ADM-404 keeps it (design-notes correction platform-foundation SGN-016).",
+    "source": "contracts/satellite/subscription.yaml#setModuleListing"
    }
   ],
   "apis": [
-   {
-    "operationId": "setModuleListing",
-    "contract": "subscription",
-    "purpose": "Dependencies and compatibility",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026",
-    "invalidates": [
-     "listModuleCatalogue"
-    ]
-   },
    {
     "operationId": "listModuleCatalogue",
     "contract": "subscription",

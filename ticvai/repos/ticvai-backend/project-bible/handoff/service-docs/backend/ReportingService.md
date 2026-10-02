@@ -7,7 +7,7 @@
 | Tier | platform: Provisioning, publishing, reporting, and the one cross-region path. |
 | Contracts | `reporting` |
 | Schemas owned | `reporting` |
-| Operations in the slice | 17 of 48 |
+| Operations in the slice | 17 of 51 |
 | Scale | Analytical. Runs against the replica and the analytical store. |
 | If it is down | Down stops dashboards. Nothing operational depends on it. |
 
@@ -26,21 +26,21 @@
 
 | Group | Operation | Method | Path | Part | Wave | Called by |
 |---|---|---|---|---|---|---|
-| catalogue | [`createReport`](#createreport) | POST | `/reports` | setup | 2 | ANL-032, ANL-054, BO-029, BO-058, BO-059, BO-060 … |
-| catalogue | [`deleteReport`](#deletereport) | DELETE | `/reports/{reportId}` | core | 2 | BO-029, BO-058, BO-059, BO-060, POS-008, PTR-018 … |
-| catalogue | [`getReport`](#getreport) | GET | `/reports/{reportId}` | core | 2 | BO-029, BO-058, BO-059, BO-060, POS-008, PTR-018 … |
-| catalogue | [`listReports`](#listreports) | GET | `/reports` | core | 2 | ANL-031, BO-029, BO-058, BO-059, BO-060, BO-262 … |
-| catalogue | [`updateReport`](#updatereport) | PUT | `/reports/{reportId}` | setup | 2 | ANL-035, ANL-036, ANL-037, ANL-038, BO-029, BO-058 … |
+| catalogue | [`createReport`](#createreport) | POST | `/reports` | setup | 1 | ANL-032, ANL-054, BO-029, BO-058, BO-059, BO-060 … |
+| catalogue | [`deleteReport`](#deletereport) | DELETE | `/reports/{reportId}` | setup | 1 | BO-029, BO-058, BO-059, BO-060, PTR-018, SUP-008 |
+| catalogue | [`getReport`](#getreport) | GET | `/reports/{reportId}` | core | 2 | ANL-023, BO-029, BO-058, BO-059, BO-060, POS-008 … |
+| catalogue | [`listReports`](#listreports) | GET | `/reports` | core | 2 | ANL-023, ANL-031, BO-029, BO-058, BO-059, BO-060 … |
+| catalogue | [`updateReport`](#updatereport) | PUT | `/reports/{reportId}` | setup | 1 | ANL-035, ANL-036, ANL-037, ANL-038, BO-029, BO-058 … |
 | dashboard | [`createDashboard`](#createdashboard) | POST | `/dashboards` | setup | 2 | ADM-031, ANL-021, ANL-022, ANL-053 |
 | dashboard | [`getDashboard`](#getdashboard) | GET | `/dashboards/{dashboardId}` | core | 2 | ADM-031, ANL-001, ANL-002, ANL-003, ANL-004, ANL-005 … |
 | dashboard | [`recordDashboardView`](#recorddashboardview) | POST | `/dashboards/{dashboardId}/views` | core | 2 | ADM-031, ANL-001, ANL-002, ANL-003, ANL-004, ANL-005 … |
 | dashboard | [`updateDashboard`](#updatedashboard) | PUT | `/dashboards/{dashboardId}` | setup | 2 | ADM-031, ANL-023, ANL-027, ANL-028, ANL-029 |
 | execution | [`runReport`](#runreport) | POST | `/reports/{reportId}/run` | core | 1 | ANL-001, ANL-002, ANL-003, ANL-004, ANL-005, ANL-006 … |
 | naturalLanguage | [`askReportingQuestion`](#askreportingquestion) | POST | `/reports/ask` | core | 2 | ANL-008, ANL-009, ANL-019, ANL-052, ANL-056, BO-029 … |
-| naturalLanguage | [`saveNaturalLanguageQuery`](#savenaturallanguagequery) | POST | `/reports/ask/{conversationId}/save` | core | 2 | ANL-052, BO-029, BO-058, BO-059, BO-060, POS-008 … |
+| naturalLanguage | [`saveNaturalLanguageQuery`](#savenaturallanguagequery) | POST | `/reports/ask/{conversationId}/save` | setup | 1 | ANL-052, BO-029, BO-058, BO-059, BO-060, PTR-018 … |
 | reporting | [`createKpi`](#createkpi) | POST | `/kpis` | setup | 2 | ANL-025, ANL-062 |
 | reporting | [`deleteDashboard`](#deletedashboard) | DELETE | `/dashboards/{dashboardId}` | setup | 2 | ANL-023 |
-| reporting | [`listAlerts`](#listalerts) | GET | `/alerts` | core | 1 | ANL-001, ANL-003, ANL-009, ANL-012, BO-036, BO-125 … |
+| reporting | [`listAlerts`](#listalerts) | GET | `/alerts` | core | 1 | ANL-001, ANL-003, ANL-009, ANL-012, BO-036, BO-133 … |
 | reporting | [`setAlertRule`](#setalertrule) | PUT | `/alert-rules` | setup | 1 | ANL-009, BO-133, BO-886 |
 | reporting | [`setSemanticModel`](#setsemanticmodel) | PUT | `/semantic-model` | setup | 2 | ANL-066 |
 
@@ -57,8 +57,8 @@ The self-service builder. A definition names its data source, columns, filters, 
 |---|---|
 | Permission | `REPORT_MANAGE` |
 | Scope level | venue |
-| Part of slice | setup, makes `reporting.report_definition_version` non-empty |
-| Wave | 2 |
+| Part of slice | setup, makes `reporting.report_definition`, `reporting.report_definition_version`, `reporting.report_parameter` non-empty |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `reporting.report_column`, `reporting.report_definition`, `reporting.report_filter`, `reporting.report_parameter` |
@@ -87,6 +87,12 @@ The self-service builder. A definition names its data source, columns, filters, 
 | columns[].sortOrder | integer |  |  |
 | columns[].sortDirection | enum (asc, desc) |  |  |
 | columns[].format | string |  | (nullable) |
+| columns[].role | enum (dimension, measure) |  | What the column is to a chart (decided 2 October 2026, Chinmay; CHG-FIN-007). (nullable) |
+| columns[].encoding | enum (category, x, y, series, value, size, colour, location, …) |  | Which field well the column fills (CHG-FIN-007), the binding the twenty marks of DashboardTile.visualisation need. (nullable) |
+| columns[].axis | enum (primary, secondary) |  | For a measure on a combo, the axis it is drawn against. (nullable) |
+| columns[].seriesType | enum (bar, line, area) |  | For a measure on a combo, how that series is drawn (CHG-FIN-007). (nullable) |
+| columns[].hierarchyLevel | integer |  | For matrix rows and columns, treemap nesting and decompositionTree levels, the depth of this dimension, 1 outermost. (min 1; nullable) |
+| columns[].unitLabel | string |  | The unit an axis states, for example "AED" or "Admissions". (max length 40; nullable) |
 | filters | array of ReportFilter |  |  |
 | filters[].id | string (uuid) |  | Added 20 August. (read-only) |
 | filters[].field | string | yes |  |
@@ -120,6 +126,12 @@ The self-service builder. A definition names its data source, columns, filters, 
 | columns[].sortOrder | integer |  |  |
 | columns[].sortDirection | enum (asc, desc) |  |  |
 | columns[].format | string |  | (nullable) |
+| columns[].role | enum (dimension, measure) |  | What the column is to a chart (decided 2 October 2026, Chinmay; CHG-FIN-007). (nullable) |
+| columns[].encoding | enum (category, x, y, series, value, size, colour, location, …) |  | Which field well the column fills (CHG-FIN-007), the binding the twenty marks of DashboardTile.visualisation need. (nullable) |
+| columns[].axis | enum (primary, secondary) |  | For a measure on a combo, the axis it is drawn against. (nullable) |
+| columns[].seriesType | enum (bar, line, area) |  | For a measure on a combo, how that series is drawn (CHG-FIN-007). (nullable) |
+| columns[].hierarchyLevel | integer |  | For matrix rows and columns, treemap nesting and decompositionTree levels, the depth of this dimension, 1 outermost. (min 1; nullable) |
+| columns[].unitLabel | string |  | The unit an axis states, for example "AED" or "Admissions". (max length 40; nullable) |
 | filters | array of ReportFilter |  |  |
 | filters[].id | string (uuid) |  | Added 20 August. (read-only) |
 | filters[].field | string | yes |  |
@@ -166,13 +178,13 @@ Retired rather than deleted where executions or paused schedules reference it �
 |---|---|
 | Permission | `REPORT_MANAGE` |
 | Scope level | venue |
-| Part of slice | core |
-| Wave | 2 |
+| Part of slice | setup, changes rows of `reporting.report_definition` that another operation creates |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `reporting.report_definition` |
 | Writes | `cache:idempotency`, `reporting.report_definition` |
-| Called by | BO-029, BO-058, BO-059, BO-060, POS-008, PTR-018, SUP-008 |
+| Called by | BO-029, BO-058, BO-059, BO-060, PTR-018, SUP-008 |
 
 **Parameters**
 
@@ -204,7 +216,7 @@ Retired rather than deleted where executions or paused schedules reference it �
 | Read routing | analytical |
 | Reads | `reporting.report_column`, `reporting.report_definition`, `reporting.report_definition_version`, `reporting.report_filter`, `reporting.report_parameter` |
 | Writes | - |
-| Called by | BO-029, BO-058, BO-059, BO-060, POS-008, PTR-018, SUP-008 |
+| Called by | ANL-023, BO-029, BO-058, BO-059, BO-060, POS-008, PTR-018, SUP-008 |
 
 **Parameters**
 
@@ -228,6 +240,12 @@ Retired rather than deleted where executions or paused schedules reference it �
 | columns[].sortOrder | integer |  |  |
 | columns[].sortDirection | enum (asc, desc) |  |  |
 | columns[].format | string |  | (nullable) |
+| columns[].role | enum (dimension, measure) |  | What the column is to a chart (decided 2 October 2026, Chinmay; CHG-FIN-007). (nullable) |
+| columns[].encoding | enum (category, x, y, series, value, size, colour, location, …) |  | Which field well the column fills (CHG-FIN-007), the binding the twenty marks of DashboardTile.visualisation need. (nullable) |
+| columns[].axis | enum (primary, secondary) |  | For a measure on a combo, the axis it is drawn against. (nullable) |
+| columns[].seriesType | enum (bar, line, area) |  | For a measure on a combo, how that series is drawn (CHG-FIN-007). (nullable) |
+| columns[].hierarchyLevel | integer |  | For matrix rows and columns, treemap nesting and decompositionTree levels, the depth of this dimension, 1 outermost. (min 1; nullable) |
+| columns[].unitLabel | string |  | The unit an axis states, for example "AED" or "Admissions". (max length 40; nullable) |
 | filters | array of ReportFilter |  |  |
 | filters[].id | string (uuid) |  | Added 20 August. (read-only) |
 | filters[].field | string | yes |  |
@@ -279,7 +297,7 @@ Only definitions the caller may run. A report requiring `REPORT_VIEW_TENANT` doe
 | Read routing | analytical |
 | Reads | `reporting.report_column`, `reporting.report_definition`, `reporting.report_filter`, `reporting.report_parameter` |
 | Writes | - |
-| Called by | ANL-031, BO-029, BO-058, BO-059, BO-060, BO-262, POS-008, PTR-018, SUP-008 |
+| Called by | ANL-023, ANL-031, BO-029, BO-058, BO-059, BO-060, BO-262, POS-008, PTR-018, SUP-008 |
 
 **Parameters**
 
@@ -307,6 +325,12 @@ Only definitions the caller may run. A report requiring `REPORT_VIEW_TENANT` doe
 | items[].columns[].sortOrder | integer |  |  |
 | items[].columns[].sortDirection | enum (asc, desc) |  |  |
 | items[].columns[].format | string |  | (nullable) |
+| items[].columns[].role | enum (dimension, measure) |  | What the column is to a chart (decided 2 October 2026, Chinmay; CHG-FIN-007). (nullable) |
+| items[].columns[].encoding | enum (category, x, y, series, value, size, colour, location, …) |  | Which field well the column fills (CHG-FIN-007), the binding the twenty marks of DashboardTile.visualisation need. (nullable) |
+| items[].columns[].axis | enum (primary, secondary) |  | For a measure on a combo, the axis it is drawn against. (nullable) |
+| items[].columns[].seriesType | enum (bar, line, area) |  | For a measure on a combo, how that series is drawn (CHG-FIN-007). (nullable) |
+| items[].columns[].hierarchyLevel | integer |  | For matrix rows and columns, treemap nesting and decompositionTree levels, the depth of this dimension, 1 outermost. (min 1; nullable) |
+| items[].columns[].unitLabel | string |  | The unit an axis states, for example "AED" or "Admissions". (max length 40; nullable) |
 | items[].filters | array of ReportFilter |  |  |
 | items[].filters[].id | string (uuid) |  | Added 20 August. (read-only) |
 | items[].filters[].field | string | yes |  |
@@ -356,8 +380,8 @@ Definitions are versioned. Historic executions keep the version they ran against
 |---|---|
 | Permission | `REPORT_MANAGE` |
 | Scope level | venue |
-| Part of slice | setup, makes `reporting.report_definition_version` non-empty |
-| Wave | 2 |
+| Part of slice | setup, changes rows of `reporting.report_definition`, `reporting.report_definition_version`, `reporting.report_parameter` that another operation creates |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `reporting.report_column`, `reporting.report_definition`, `reporting.report_filter`, `reporting.report_parameter` |
@@ -387,6 +411,12 @@ Definitions are versioned. Historic executions keep the version they ran against
 | columns[].sortOrder | integer |  |  |
 | columns[].sortDirection | enum (asc, desc) |  |  |
 | columns[].format | string |  | (nullable) |
+| columns[].role | enum (dimension, measure) |  | What the column is to a chart (decided 2 October 2026, Chinmay; CHG-FIN-007). (nullable) |
+| columns[].encoding | enum (category, x, y, series, value, size, colour, location, …) |  | Which field well the column fills (CHG-FIN-007), the binding the twenty marks of DashboardTile.visualisation need. (nullable) |
+| columns[].axis | enum (primary, secondary) |  | For a measure on a combo, the axis it is drawn against. (nullable) |
+| columns[].seriesType | enum (bar, line, area) |  | For a measure on a combo, how that series is drawn (CHG-FIN-007). (nullable) |
+| columns[].hierarchyLevel | integer |  | For matrix rows and columns, treemap nesting and decompositionTree levels, the depth of this dimension, 1 outermost. (min 1; nullable) |
+| columns[].unitLabel | string |  | The unit an axis states, for example "AED" or "Admissions". (max length 40; nullable) |
 | filters | array of ReportFilter |  |  |
 | filters[].id | string (uuid) |  | Added 20 August. (read-only) |
 | filters[].field | string | yes |  |
@@ -420,6 +450,12 @@ Definitions are versioned. Historic executions keep the version they ran against
 | columns[].sortOrder | integer |  |  |
 | columns[].sortDirection | enum (asc, desc) |  |  |
 | columns[].format | string |  | (nullable) |
+| columns[].role | enum (dimension, measure) |  | What the column is to a chart (decided 2 October 2026, Chinmay; CHG-FIN-007). (nullable) |
+| columns[].encoding | enum (category, x, y, series, value, size, colour, location, …) |  | Which field well the column fills (CHG-FIN-007), the binding the twenty marks of DashboardTile.visualisation need. (nullable) |
+| columns[].axis | enum (primary, secondary) |  | For a measure on a combo, the axis it is drawn against. (nullable) |
+| columns[].seriesType | enum (bar, line, area) |  | For a measure on a combo, how that series is drawn (CHG-FIN-007). (nullable) |
+| columns[].hierarchyLevel | integer |  | For matrix rows and columns, treemap nesting and decompositionTree levels, the depth of this dimension, 1 outermost. (min 1; nullable) |
+| columns[].unitLabel | string |  | The unit an axis states, for example "AED" or "Admissions". (max length 40; nullable) |
 | filters | array of ReportFilter |  |  |
 | filters[].id | string (uuid) |  | Added 20 August. (read-only) |
 | filters[].field | string | yes |  |
@@ -539,6 +575,7 @@ Tiles reference report definitions. Each tile carries its own refresh interval, 
 | 201 |  | Created |
 | 400 |  | The tiles' refreshes per minute exceed VenueSettings.reporting.dashboardRefreshBudgetPerMinute (proposed default 24, audit R094) |
 | 409 |  | The caller is not entitled to the dashboard's module — the tenant has not licensed it, or the principal holds no permission in it. |
+| 422 |  | A tile's report lacks the column encodings its visualisation needs (problem type tile-encoding-missing, CHG-FIN-007; the rule is on DashboardTile.visualisation). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### getDashboard
@@ -663,7 +700,7 @@ Tiles reference report definitions. Each tile carries its own refresh interval, 
 |---|---|
 | Permission | `REPORT_MANAGE` |
 | Scope level | tenant |
-| Part of slice | setup, makes `reporting.dashboard`, `reporting.dashboard_tile` non-empty |
+| Part of slice | setup, changes rows of `reporting.dashboard`, `reporting.dashboard_tile` that another operation creates |
 | Wave | 2 |
 | Offline | no |
 | Config scope | tenant |
@@ -734,6 +771,7 @@ Tiles reference report definitions. Each tile carries its own refresh interval, 
 |---|---|---|
 | 200 |  | Updated |
 | 409 |  | Moving a dashboard to a module the caller is not entitled to. |
+| 422 |  | A tile's report lacks the column encodings its visualisation needs (problem type tile-encoding-missing, CHG-FIN-007), as createDashboard. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
@@ -758,7 +796,7 @@ Scope is applied from the caller's resolved permissions. Parameters narrow; they
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `reporting.execution`, `reporting.report_definition`, `reporting.report_parameter` |
 | Writes | `cache:idempotency`, `reporting.execution` |
-| Called by | ANL-001, ANL-002, ANL-003, ANL-004, ANL-005, ANL-006, ANL-007, ANL-009, ANL-039, ANL-040, BO-010, BO-029, BO-058, BO-059, BO-060, BO-1059, BO-1082, BO-115, BO-118, BO-126, BO-133, BO-262, BO-682, POS-008, POS-020, PTR-018, SUP-008 |
+| Called by | ANL-001, ANL-002, ANL-003, ANL-004, ANL-005, ANL-006, ANL-007, ANL-009, ANL-039, ANL-040, BO-010, BO-029, BO-058, BO-059, BO-060, BO-1059, BO-1082, BO-118, BO-133, BO-262, POS-008, POS-020, PTR-018, SUP-008 |
 
 **Parameters**
 
@@ -830,7 +868,7 @@ Runs under the caller's resolved permissions. The generated query cannot widen s
 | Conflict policy | serverWins |
 | Reads | `ai.policy`, `ai.provider`, `cache:idempotency`, `reporting.kpi_definition`, `reporting.natural_language_query`, `reporting.report_column`, `reporting.report_filter`, `reporting.semantic_model` |
 | Writes | `ai.activity`, `cache:idempotency`, `reporting.natural_language_query`, `reporting.report_column`, `reporting.report_filter` |
-| Called by | ANL-008, ANL-009, ANL-019, ANL-052, ANL-056, BO-029, BO-058, BO-059, BO-060, BO-593, KIT-010, POS-008, PTR-018, SUP-008 |
+| Called by | ANL-008, ANL-009, ANL-019, ANL-052, ANL-056, BO-029, BO-058, BO-059, BO-060, BO-593, EMP-020, KIT-010, POS-008, PTR-018, SUP-008 |
 
 **Parameters**
 
@@ -873,6 +911,12 @@ Runs under the caller's resolved permissions. The generated query cannot widen s
 | generatedQuery.columns[].sortOrder | integer |  |  |
 | generatedQuery.columns[].sortDirection | enum (asc, desc) |  |  |
 | generatedQuery.columns[].format | string |  | (nullable) |
+| generatedQuery.columns[].role | enum (dimension, measure) |  | What the column is to a chart (decided 2 October 2026, Chinmay; CHG-FIN-007). (nullable) |
+| generatedQuery.columns[].encoding | enum (category, x, y, series, value, size, colour, location, …) |  | Which field well the column fills (CHG-FIN-007), the binding the twenty marks of DashboardTile.visualisation need. (nullable) |
+| generatedQuery.columns[].axis | enum (primary, secondary) |  | For a measure on a combo, the axis it is drawn against. (nullable) |
+| generatedQuery.columns[].seriesType | enum (bar, line, area) |  | For a measure on a combo, how that series is drawn (CHG-FIN-007). (nullable) |
+| generatedQuery.columns[].hierarchyLevel | integer |  | For matrix rows and columns, treemap nesting and decompositionTree levels, the depth of this dimension, 1 outermost. (min 1; nullable) |
+| generatedQuery.columns[].unitLabel | string |  | The unit an axis states, for example "AED" or "Admissions". (max length 40; nullable) |
 | generatedQuery.filters | array of ReportFilter |  |  |
 | generatedQuery.filters[].id | string (uuid) |  | Added 20 August. (read-only) |
 | generatedQuery.filters[].field | string | yes |  |
@@ -922,13 +966,13 @@ Turns a one-off question into something schedulable. The generated query becomes
 |---|---|
 | Permission | `REPORT_MANAGE` |
 | Scope level | venue |
-| Part of slice | core |
-| Wave | 2 |
+| Part of slice | setup, makes `reporting.report_definition`, `reporting.report_parameter` non-empty |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `ai.policy`, `ai.provider`, `cache:idempotency`, `reporting.report_column`, `reporting.report_definition`, `reporting.report_filter`, `reporting.report_parameter` |
 | Writes | `ai.activity`, `cache:idempotency`, `reporting.natural_language_query`, `reporting.report_column`, `reporting.report_definition`, `reporting.report_filter`, `reporting.report_parameter` |
-| Called by | ANL-052, BO-029, BO-058, BO-059, BO-060, POS-008, PTR-018, SUP-008 |
+| Called by | ANL-052, BO-029, BO-058, BO-059, BO-060, PTR-018, SUP-008 |
 
 **Parameters**
 
@@ -960,6 +1004,12 @@ Turns a one-off question into something schedulable. The generated query becomes
 | columns[].sortOrder | integer |  |  |
 | columns[].sortDirection | enum (asc, desc) |  |  |
 | columns[].format | string |  | (nullable) |
+| columns[].role | enum (dimension, measure) |  | What the column is to a chart (decided 2 October 2026, Chinmay; CHG-FIN-007). (nullable) |
+| columns[].encoding | enum (category, x, y, series, value, size, colour, location, …) |  | Which field well the column fills (CHG-FIN-007), the binding the twenty marks of DashboardTile.visualisation need. (nullable) |
+| columns[].axis | enum (primary, secondary) |  | For a measure on a combo, the axis it is drawn against. (nullable) |
+| columns[].seriesType | enum (bar, line, area) |  | For a measure on a combo, how that series is drawn (CHG-FIN-007). (nullable) |
+| columns[].hierarchyLevel | integer |  | For matrix rows and columns, treemap nesting and decompositionTree levels, the depth of this dimension, 1 outermost. (min 1; nullable) |
+| columns[].unitLabel | string |  | The unit an axis states, for example "AED" or "Admissions". (max length 40; nullable) |
 | filters | array of ReportFilter |  |  |
 | filters[].id | string (uuid) |  | Added 20 August. (read-only) |
 | filters[].field | string | yes |  |
@@ -1071,7 +1121,7 @@ The tiles go with it and come back with it. `reporting.dashboard_tile` carries `
 |---|---|
 | Permission | `REPORT_MANAGE` |
 | Scope level | tenant |
-| Part of slice | setup, makes `reporting.dashboard` non-empty |
+| Part of slice | setup, changes rows of `reporting.dashboard` that another operation creates |
 | Wave | 2 |
 | Offline | no |
 | Reads | `cache:idempotency`, `reporting.dashboard`, `reporting.dashboard_tile` |
@@ -1111,7 +1161,7 @@ The tiles go with it and come back with it. `reporting.dashboard_tile` carries `
 | Read routing | replica |
 | Reads | `reporting.alert`, `reporting.alert_rule` |
 | Writes | - |
-| Called by | ANL-001, ANL-003, ANL-009, ANL-012, BO-036, BO-125, BO-133, BO-141, BO-886, EMP-061, EMP-070, POS-009, POS-020, POS-025 |
+| Called by | ANL-001, ANL-003, ANL-009, ANL-012, BO-036, BO-133, BO-141, BO-886, EMP-061, EMP-070, POS-020, POS-025 |
 
 **Parameters**
 
@@ -1421,6 +1471,12 @@ Every table this service owns that the slice reads or writes, with its columns a
 | sort_order | integer | no |  |
 | sort_direction | text | no |  |
 | format | text | no |  |
+| role | text | no | What the column is to a chart (decided 2 October 2026, Chinmay; CHG-FIN-007). |
+| encoding | text | no | Which field well the column fills (CHG-FIN-007), the binding the twenty marks of DashboardTile.visualisation need. |
+| axis | text | no | For a measure on a combo, the axis it is drawn against. |
+| series_type | text | no | For a measure on a combo, how that series is drawn (CHG-FIN-007). |
+| hierarchy_level | integer | no | For matrix rows and columns, treemap nesting and decompositionTree levels, the depth of this dimension, 1 outermost. |
+| unit_label | text | no | The unit an axis states, for example "AED" or "Admissions". |
 
 ### `reporting.report_definition`
 
@@ -1490,7 +1546,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-31 operations, added to this service in later releases without changing any of the above.
+34 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
@@ -1499,5 +1555,5 @@ Every table this service owns that the slice reads or writes, with its columns a
 | execution | `cancelReportExecution`, `getReportExecution`, `getReportResult`, `listReportExecutions` |
 | export | `exportReportResult`, `getReportExport` |
 | naturalLanguage | `runSemanticQuery` |
-| reporting | `acknowledgeAlert`, `createReportSubscription`, `getAnalyticsBenchmark`, `getAnalyticsUsage`, `getKpiValues`, `getSemanticModel`, `getSupplierPerformance`, `listAlertRules`, `listAnalyticsAnomalies`, `listAnalyticsPipelines`, `listKpis`, `listReportDeliveries`, `listReportSubscriptions`, `listSeededReports`, `listSiteNormalisationBases`, `setKpiTargets`, `setSiteNormalisationBasis` |
+| reporting | `acknowledgeAlert`, `createReportSubscription`, `getAnalyticsBenchmark`, `getAnalyticsGovernancePolicy`, `getAnalyticsUsage`, `getKpiValues`, `getSemanticModel`, `getServiceSummary`, `getSupplierPerformance`, `listAlertRules`, `listAnalyticsAnomalies`, `listAnalyticsPipelines`, `listKpis`, `listReportDeliveries`, `listReportSubscriptions`, `listSeededReports`, `listSiteNormalisationBases`, `setAnalyticsGovernancePolicy`, `setKpiTargets`, `setSiteNormalisationBasis` |
 | schedule | `createReportSchedule`, `deleteReportSchedule`, `listReportSchedules`, `updateReportSchedule` |

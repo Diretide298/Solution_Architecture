@@ -57,6 +57,40 @@
   "requestBody": null,
   "responds": "Page"
  },
+ "listCookieScanFindings": {
+  "method": "GET",
+  "path": "/cookie-tracking-digital/scans/{scanRunId}/findings",
+  "contract": "marketing-crm",
+  "summary": "What one scan saw, in each consent state",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "consentState",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "preConsentOnly",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "listCookieScanPolicies": {
   "method": "GET",
   "path": "/cookie-scan-policy",
@@ -158,30 +192,6 @@
   ],
   "requestBody": null,
   "responds": "Page"
- },
- "listCustomerPrivacyConsent": {
-  "method": "GET",
-  "path": "/customer-privacy-consent",
-  "contract": "marketing-crm",
-  "summary": "Customer Privacy, Consent & Preference 360°",
-  "permission": "GUEST_VIEW_PII",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": "subjectId",
-    "in": "query",
-    "required": true
-   }
-  ],
-  "requestBody": null,
-  "responds": "CustomerPrivacyConsentPreference360View"
  },
  "listDataProcessingPurpose": {
   "method": "GET",
@@ -330,6 +340,40 @@
   "requestBody": null,
   "responds": "Page"
  },
+ "listTrackingTechnologyCatalogue": {
+  "method": "GET",
+  "path": "/cookie-tracking-digital/platform-catalogue",
+  "contract": "marketing-crm",
+  "summary": "The platform's catalogue of known cookies and trackers",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "search",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "category",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "recordCookieScan": {
   "method": "POST",
   "path": "/cookie-tracking-digital/scans",
@@ -443,6 +487,25 @@
   ],
   "requestBody": "CookieScanPolicy",
   "responds": "CookieScanPolicy"
+ },
+ "setDataProcessingPurpose": {
+  "method": "PUT",
+  "path": "/data-processing-purpose",
+  "contract": "marketing-crm",
+  "summary": "Create or change a processing purpose",
+  "permission": "GUEST_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "DataProcessingPurposeLawfulBasisRegistryView",
+  "responds": "DataProcessingPurposeLawfulBasisRegistryView"
  },
  "setMinorGuardianAge": {
   "method": "PUT",

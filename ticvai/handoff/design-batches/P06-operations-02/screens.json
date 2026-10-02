@@ -27,7 +27,7 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-014 holds none of them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-014 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
@@ -213,217 +213,16 @@
      "slot": "rowActions",
      "components": [
       {
-       "kind": "primaryButton",
-       "label": "Create order",
-       "operation": "createOrder",
-       "provenance": "contract orders.yaml POST /orders"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Apply manual discount",
-       "operation": "applyManualDiscount",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/discounts"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Create refund",
-       "operation": "createRefund",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/refunds"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Exchange order lines",
-       "operation": "exchangeOrderLines",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/exchanges"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Hold order",
-       "operation": "holdOrder",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/hold"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Modify order",
-       "operation": "modifyOrder",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/modify"
-      },
-      {
        "kind": "secondaryButton",
        "label": "Reprint order",
        "operation": "reprintOrder",
        "provenance": "contract orders.yaml POST /orders/{orderId}/reprints"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Reschedule order",
-       "operation": "rescheduleOrder",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/reschedule"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Resume order",
-       "operation": "resumeOrder",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/resume"
-      },
-      {
-       "kind": "destructiveButton",
-       "label": "Void order",
-       "operation": "voidOrder",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/voids"
       }
      ]
     }
    ]
   },
   "overlays": [
-   {
-    "id": "confirmVoidOrder",
-    "component": "confirmDialog",
-    "trigger": "Void order",
-    "body": "**Names what `voidOrder` changes and what it leaves alone**, in the consequence rather than the verb. A ticket lookup this affects should be identified in the dialog, not just counted. **Collects what `voidOrder` sends before it is called.** Required: `id`, `reason`, `recordedAt`. `reason` is picked from the void reason list (guestChangedMind, enteredInError, itemUnavailable, qualityIssue, duplicate, other); **`note` is required when the reason is other**, refused 400 without it (decided 28 September, audit R125 (4), R222).",
-    "provenance": "contract orders.yaml POST /orders/{orderId}/voids"
-   },
-   {
-    "id": "formCreateOrder",
-    "component": "modal",
-    "trigger": "Create order",
-    "body": "**Collects what `createOrder` sends before it is called.** Required: `id`, `venueId`, `channel`, `lines`, `recordedAt`. Optional: `shiftId`, `subjectId`, `guestLinkId`, `catalogueBundleVersion`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "CreateOrderRequest",
-    "confirm": {
-     "label": "Create order",
-     "operation": "createOrder"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "id",
-      "venueId",
-      "channel",
-      "lines",
-      "recordedAt",
-      "shiftId",
-      "subjectId",
-      "guestLinkId",
-      "catalogueBundleVersion"
-     ]
-    },
-    "provenance": "contract orders.yaml POST /orders"
-   },
-   {
-    "id": "formApplyManualDiscount",
-    "component": "modal",
-    "trigger": "Apply manual discount",
-    "body": "**Collects what `applyManualDiscount` sends before it is called.** Required: `id`, `reason`, `recordedAt`. Optional: `lineId`, `amount`, `percentage`, `reasonCode`, `approverPrincipalId`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "ManualDiscountRequest",
-    "confirm": {
-     "label": "Apply manual discount",
-     "operation": "applyManualDiscount"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "id",
-      "reason",
-      "recordedAt",
-      "lineId",
-      "amount",
-      "percentage",
-      "reasonCode",
-      "approverPrincipalId"
-     ]
-    },
-    "provenance": "contract orders.yaml POST /orders/{orderId}/discounts"
-   },
-   {
-    "id": "formCreateRefund",
-    "component": "modal",
-    "trigger": "Create refund",
-    "body": "**Collects what `createRefund` sends before it is called.** Required: `id`, `amount`, `reason`, `recordedAt`. Optional: `lineIds`, `secondaryAuthorisation`, `refundToOriginalTender`, `alternateTender`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "CreateRefundRequest",
-    "confirm": {
-     "label": "Create refund",
-     "operation": "createRefund"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "id",
-      "amount",
-      "reason",
-      "recordedAt",
-      "lineIds",
-      "secondaryAuthorisation",
-      "refundToOriginalTender",
-      "alternateTender"
-     ]
-    },
-    "provenance": "contract orders.yaml POST /orders/{orderId}/refunds"
-   },
-   {
-    "id": "formExchangeOrderLines",
-    "component": "modal",
-    "trigger": "Exchange order lines",
-    "body": "**Collects what `exchangeOrderLines` sends before it is called.** Required: `id`, `outgoingLineIds`, `incomingLines`, `recordedAt`. Optional: `waiveFee`, `reason`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "ExchangeOrderRequest",
-    "confirm": {
-     "label": "Exchange order lines",
-     "operation": "exchangeOrderLines"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "id",
-      "outgoingLineIds",
-      "incomingLines",
-      "recordedAt",
-      "waiveFee",
-      "reason"
-     ]
-    },
-    "provenance": "contract orders.yaml POST /orders/{orderId}/exchanges"
-   },
-   {
-    "id": "formHoldOrder",
-    "component": "modal",
-    "trigger": "Hold order",
-    "body": "**Collects what `holdOrder` sends before it is called.** Required: `recordedAt`. Optional: `label`, `holdUntil`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Hold order",
-     "operation": "holdOrder"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "recordedAt",
-      "label",
-      "holdUntil"
-     ]
-    },
-    "provenance": "contract orders.yaml POST /orders/{orderId}/hold"
-   },
-   {
-    "id": "formModifyOrder",
-    "component": "modal",
-    "trigger": "Modify order",
-    "body": "**Collects what `modifyOrder` sends before it is called.** Required: `id`, `recordedAt`. Optional: `addLines`, `removeLineIds`, `reason`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "ModifyOrderRequest",
-    "confirm": {
-     "label": "Modify order",
-     "operation": "modifyOrder"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "id",
-      "recordedAt",
-      "addLines",
-      "removeLineIds",
-      "reason"
-     ]
-    },
-    "provenance": "contract orders.yaml POST /orders/{orderId}/modify"
-   },
    {
     "id": "formReprintOrder",
     "component": "modal",
@@ -444,33 +243,12 @@
      ]
     },
     "provenance": "contract orders.yaml POST /orders/{orderId}/reprints"
-   },
-   {
-    "id": "formRescheduleOrder",
-    "component": "modal",
-    "trigger": "Reschedule order",
-    "body": "**Collects what `rescheduleOrder` sends before it is called.** Required: `targetPerformanceId`, `recordedAt`. Optional: `lineIds`, `waiveFee`, `reason`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Reschedule order",
-     "operation": "rescheduleOrder"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "targetPerformanceId",
-      "recordedAt",
-      "lineIds",
-      "waiveFee",
-      "reason"
-     ]
-    },
-    "provenance": "contract orders.yaml POST /orders/{orderId}/reschedule"
    }
   ],
   "states": {
    "loading": "The ticket lookup list.",
    "error": "Could not load. Names which read failed and leaves the ticket lookup untouched.",
-   "emptyFirstRun": "No ticket lookup yet. Offers Create order (`createOrder`); distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No ticket lookup yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "Nothing matches the filter on venueId, principalId, shiftId, status, createdFrom, createdTo and the ticket lookup are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `listOrders` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "Searches the bundle only. A ticket issued after the last sync will not be found, and the screen says so"
@@ -489,55 +267,10 @@
     "trigger": "onAction"
    },
    {
-    "operationId": "createOrder",
-    "contract": "orders",
-    "purpose": "Create an order",
-    "trigger": "onAction",
-    "invalidates": [
-     "listOrders"
-    ]
-   },
-   {
-    "operationId": "applyManualDiscount",
-    "contract": "orders",
-    "purpose": "Apply a discount a cashier chose",
-    "trigger": "onAction",
-    "invalidates": [
-     "listOrders"
-    ]
-   },
-   {
-    "operationId": "createRefund",
-    "contract": "orders",
-    "purpose": "Refund an order, wholly or in part",
-    "trigger": "onAction",
-    "invalidates": [
-     "listOrders"
-    ]
-   },
-   {
-    "operationId": "exchangeOrderLines",
-    "contract": "orders",
-    "purpose": "Exchange lines for different products or dates",
-    "trigger": "onAction",
-    "invalidates": [
-     "listOrders"
-    ]
-   },
-   {
     "operationId": "getOrderStatement",
     "contract": "orders",
     "purpose": "Full financial history of an order",
     "trigger": "onAction"
-   },
-   {
-    "operationId": "holdOrder",
-    "contract": "orders",
-    "purpose": "Park a sale and free the till",
-    "trigger": "onAction",
-    "invalidates": [
-     "listOrders"
-    ]
    },
    {
     "operationId": "listOrderRefunds",
@@ -546,45 +279,9 @@
     "trigger": "onAction"
    },
    {
-    "operationId": "modifyOrder",
-    "contract": "orders",
-    "purpose": "Add or remove lines on an existing order",
-    "trigger": "onAction",
-    "invalidates": [
-     "listOrders"
-    ]
-   },
-   {
     "operationId": "reprintOrder",
     "contract": "orders",
     "purpose": "Reprint or resend tickets",
-    "trigger": "onAction",
-    "invalidates": [
-     "listOrders"
-    ]
-   },
-   {
-    "operationId": "rescheduleOrder",
-    "contract": "orders",
-    "purpose": "Move an order to another performance",
-    "trigger": "onAction",
-    "invalidates": [
-     "listOrders"
-    ]
-   },
-   {
-    "operationId": "resumeOrder",
-    "contract": "orders",
-    "purpose": "Bring a parked sale back to a till",
-    "trigger": "onAction",
-    "invalidates": [
-     "listOrders"
-    ]
-   },
-   {
-    "operationId": "voidOrder",
-    "contract": "orders",
-    "purpose": "Void an order",
     "trigger": "onAction",
     "invalidates": [
      "listOrders"
@@ -613,6 +310,62 @@
    "board": "wireframes/P06 Venue Staff App.dc.html#emp-014"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 14 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "gaps": [
+   {
+    "operation": "applyManualDiscount",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-018): Ten order-changing actions on a lookup screen whose purpose is to answer a question without acting; the employee app has a basic validity lookup, not sales (DI-128; design-notes correction ticketing-guest EMP-014).",
+    "source": "screens/P06-staff-app.yaml#EMP-014 | DI-128"
+   },
+   {
+    "operation": "createOrder",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-018): Ten order-changing actions on a lookup screen whose purpose is to answer a question without acting; the employee app has a basic validity lookup, not sales (DI-128; design-notes correction ticketing-guest EMP-014).",
+    "source": "screens/P06-staff-app.yaml#EMP-014 | DI-128"
+   },
+   {
+    "operation": "createRefund",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-018): Ten order-changing actions on a lookup screen whose purpose is to answer a question without acting; the employee app has a basic validity lookup, not sales (DI-128; design-notes correction ticketing-guest EMP-014).",
+    "source": "screens/P06-staff-app.yaml#EMP-014 | DI-128"
+   },
+   {
+    "operation": "exchangeOrderLines",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-018): Ten order-changing actions on a lookup screen whose purpose is to answer a question without acting; the employee app has a basic validity lookup, not sales (DI-128; design-notes correction ticketing-guest EMP-014).",
+    "source": "screens/P06-staff-app.yaml#EMP-014 | DI-128"
+   },
+   {
+    "operation": "holdOrder",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-018): Ten order-changing actions on a lookup screen whose purpose is to answer a question without acting; the employee app has a basic validity lookup, not sales (DI-128; design-notes correction ticketing-guest EMP-014).",
+    "source": "screens/P06-staff-app.yaml#EMP-014 | DI-128"
+   },
+   {
+    "operation": "modifyOrder",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-018): Ten order-changing actions on a lookup screen whose purpose is to answer a question without acting; the employee app has a basic validity lookup, not sales (DI-128; design-notes correction ticketing-guest EMP-014).",
+    "source": "screens/P06-staff-app.yaml#EMP-014 | DI-128"
+   },
+   {
+    "operation": "rescheduleOrder",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-018): Ten order-changing actions on a lookup screen whose purpose is to answer a question without acting; the employee app has a basic validity lookup, not sales (DI-128; design-notes correction ticketing-guest EMP-014).",
+    "source": "screens/P06-staff-app.yaml#EMP-014 | DI-128"
+   },
+   {
+    "operation": "resumeOrder",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-018): Ten order-changing actions on a lookup screen whose purpose is to answer a question without acting; the employee app has a basic validity lookup, not sales (DI-128; design-notes correction ticketing-guest EMP-014).",
+    "source": "screens/P06-staff-app.yaml#EMP-014 | DI-128"
+   },
+   {
+    "operation": "voidOrder",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-018): Ten order-changing actions on a lookup screen whose purpose is to answer a question without acting; the employee app has a basic validity lookup, not sales (DI-128; design-notes correction ticketing-guest EMP-014).",
+    "source": "screens/P06-staff-app.yaml#EMP-014 | DI-128"
+   }
+  ],
   "_platform": {
    "code": "P06",
    "audience": "staff",
@@ -662,7 +415,7 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-015 holds none of them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-015 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
@@ -1047,14 +800,9 @@
    "notes": "**Reached from EMP-003** — the screen the device sits on between tasks. Stated on 4 September: this screen exited to the hubs and nothing exited to it, so it was outside the navigation graph entirely.",
    "transitions": [
     {
-     "to": "EMP-009",
-     "trigger": "The supervisor closes it",
-     "provenance": "flow F72 step 2→3"
-    },
-    {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-017 holds none of them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-017 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
@@ -1070,6 +818,11 @@
      "to": "EMP-018",
      "trigger": "Offline package",
      "provenance": "derived — EMP-018 declares entryState.params version and EMP-017 holds none of them. The edge carries nothing: version only pre-selects (deep link or optional), and EMP-018 opens on its own"
+    },
+    {
+     "to": "EMP-009",
+     "trigger": "The cashier submits a blind count;",
+     "provenance": "flow F72 step 2→3"
     }
    ]
   },
@@ -1229,12 +982,6 @@
       },
       {
        "kind": "secondaryButton",
-       "label": "Sync orders",
-       "operation": "syncOrders",
-       "provenance": "contract orders.yaml POST /sync/orders"
-      },
-      {
-       "kind": "secondaryButton",
        "label": "Validate access",
        "operation": "validateAccess",
        "provenance": "contract access.yaml POST /access/validate"
@@ -1274,24 +1021,6 @@
      ]
     },
     "provenance": "contract access.yaml POST /access/scans"
-   },
-   {
-    "id": "formSyncOrders",
-    "component": "modal",
-    "trigger": "Sync orders",
-    "body": "**Collects what `syncOrders` sends before it is called.** Required: `deviceId`, `orders`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Sync orders",
-     "operation": "syncOrders"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "deviceId",
-      "orders"
-     ]
-    },
-    "provenance": "contract orders.yaml POST /sync/orders"
    },
    {
     "id": "formValidateAccess",
@@ -1391,15 +1120,6 @@
     ]
    },
    {
-    "operationId": "syncOrders",
-    "contract": "orders",
-    "purpose": "Replay orders recorded offline",
-    "trigger": "onAction",
-    "invalidates": [
-     "listSyncRejections"
-    ]
-   },
-   {
     "operationId": "validateAccess",
     "contract": "access",
     "purpose": "Validate media at an access point and admit or deny",
@@ -1433,6 +1153,14 @@
    "board": "wireframes/P06 Venue Staff App.dc.html#emp-017"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "gaps": [
+   {
+    "operation": "syncOrders",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): syncOrders replays till sales; a staff phone replays scans, and till order sync is POS work (design-notes correction venue-operations EMP-017).",
+    "source": "contracts/spine/orders.yaml#syncOrders | R254"
+   }
+  ],
   "_platform": {
    "code": "P06",
    "audience": "staff",
@@ -1489,7 +1217,7 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-018 holds none of them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-018 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
@@ -1714,7 +1442,7 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-019 holds none of them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-019 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
@@ -1740,7 +1468,7 @@
   "density": "comfortable",
   "pattern": "listDetail",
   "patternReason": "`listAiConversations` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
-  "purpose": "The tab that is already in the shell.",
+  "purpose": "Ask and be answered within your role, with the source.",
   "layout": {
    "template": "split",
    "regions": [
@@ -1904,6 +1632,7 @@
     "provenance": "contract ai.yaml POST /conversations/{conversationId}/messages"
    }
   ],
+  "purposeNote": "Purpose rewritten 2 October 2026 (CHG-WIR-013): \"The tab that is already in the shell\" is not a purpose (DI-964; design-notes correction ai EMP-019).",
   "_platform": {
    "code": "P06",
    "audience": "staff",
@@ -1960,7 +1689,7 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-020 holds none of them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-020 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
@@ -2054,6 +1783,12 @@
        "label": "Create AI conversation",
        "operation": "createAiConversation",
        "provenance": "contract ai.yaml POST /conversations"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Ask a number",
+       "operation": "askReportingQuestion",
+       "provenance": "contract reporting.yaml POST /reports/ask; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -2098,6 +1833,13 @@
     "purpose": "Say whether an answer helped",
     "trigger": "onAction",
     "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "askReportingQuestion",
+    "contract": "reporting",
+    "purpose": "Answer a numeric question from the semantic layer",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-012)"
    }
   ],
   "entryState": {
@@ -2162,6 +1904,20 @@
      ]
     },
     "provenance": "contract ai.yaml POST /conversations"
+   },
+   {
+    "id": "formAskReportingQuestion",
+    "component": "modal",
+    "trigger": "Ask a number",
+    "body": "**Collects what `askReportingQuestion` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Ask a number",
+     "operation": "askReportingQuestion"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "contract reporting.yaml POST /reports/ask; wiring fix, 2 October 2026"
    }
   ],
   "_platform": {
@@ -2214,7 +1970,7 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-021 holds none of them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-021 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
@@ -2463,7 +2219,7 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-022 holds none of them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-022 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
@@ -2577,31 +2333,6 @@
        ],
        "operation": "listRotaAssignments",
        "provenance": "contract workforce.yaml GET /rota-assignments"
-      },
-      {
-       "kind": "detailPanel",
-       "label": "The shift",
-       "bindsTo": "Shift",
-       "columns": [
-        "Shift.id",
-        "Shift.workstationId",
-        "Shift.venueId",
-        "Shift.scopePath",
-        "Shift.principalId",
-        "Shift.principalDisplayName",
-        "Shift.incidents",
-        "Shift.status",
-        "Shift.currency",
-        "Shift.currencyScale",
-        "Shift.depositBoxCode",
-        "Shift.bagNumber",
-        "Shift.openingFloat",
-        "Shift.salesTotal",
-        "Shift.refundsTotal",
-        "Shift.liftsTotal"
-       ],
-       "operation": "getCurrentShift",
-       "provenance": "contract shift.yaml GET /shifts/current"
       }
      ]
     },
@@ -2642,12 +2373,6 @@
     "invalidates": [
      "listRotaAssignments"
     ]
-   },
-   {
-    "operationId": "getCurrentShift",
-    "contract": "shift",
-    "purpose": "The shift this person is on now",
-    "trigger": "onLoad"
    }
   ],
   "entryState": {
@@ -2690,6 +2415,14 @@
      ]
     },
     "provenance": "contract workforce.yaml POST /rota-assignments/{assignmentId}/swap"
+   }
+  ],
+  "gaps": [
+   {
+    "operation": "getCurrentShift",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): getCurrentShift reads the till session (SHIFT_OPEN, workstation scope); a rota assignment is not a cash shift and most positions never touch a till (design-notes correction venue-operations EMP-022).",
+    "source": "contracts/satellite/workforce.yaml#/components/schemas/RotaAssignment | contracts/spine/shift.yaml#getCurrentShift"
    }
   ],
   "_platform": {
@@ -2748,7 +2481,7 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-023 holds none of them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-023 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
@@ -3011,7 +2744,7 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-024 holds none of them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-024 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
@@ -3142,12 +2875,6 @@
        "label": "Record attendance",
        "operation": "recordAttendance",
        "provenance": "contract workforce.yaml POST /attendance/clock"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Amend attendance",
-       "operation": "amendAttendance",
-       "provenance": "contract workforce.yaml POST /attendance/{recordId}/amend"
       }
      ]
     }
@@ -3176,15 +2903,6 @@
     "contract": "workforce",
     "purpose": "Who was here",
     "trigger": "onLoad"
-   },
-   {
-    "operationId": "amendAttendance",
-    "contract": "workforce",
-    "purpose": "A supervisor corrects a record",
-    "trigger": "onAction",
-    "invalidates": [
-     "listAttendance"
-    ]
    }
   ],
   "entryState": {
@@ -3231,24 +2949,19 @@
      ]
     },
     "provenance": "contract workforce.yaml POST /attendance/clock"
+   }
+  ],
+  "gaps": [
+   {
+    "operation": "amendAttendance",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): Amending attendance is a supervisor act (WORKFORCE_MANAGE); it was removed from EMP-025 for that reason and goes from the staff member's own clock screen too (design-notes correction venue-operations EMP-024).",
+    "source": "screens/P06-staff-app.yaml#EMP-024 | contracts/satellite/workforce.yaml#amendAttendance"
    },
    {
-    "id": "formAmendAttendance",
-    "component": "modal",
-    "trigger": "Amend attendance",
-    "body": "**Collects what `amendAttendance` sends before it is called.** Required: `correctedAt`, `reason`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Amend attendance",
-     "operation": "amendAttendance"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "correctedAt",
-      "reason"
-     ]
-    },
-    "provenance": "contract workforce.yaml POST /attendance/{recordId}/amend"
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-004): No read returns the caller's own attendance records without WORKFORCE_VIEW.",
+    "source": "screens/P06-staff-app.yaml#EMP-024 | contracts/satellite/workforce.yaml#listAttendance"
    }
   ],
   "_platform": {

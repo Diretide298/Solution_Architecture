@@ -408,14 +408,14 @@
     }
    ]
   },
-  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written.",
+  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written.\n\n**Tickets first, then date and time (decided by Chinmay, 2 October 2026; DEC-170).** The kiosk differs from the web and the app, which pick the date and time first (REV3-2); REV3-2 is superseded for the kiosk only. The order is KSK-003, KSK-004 (tickets), KSK-005 (session), as F07 already walks it (CHG-SGU-015).",
   "density": "touchLarge",
   "boardFrames": [
    "Kiosk Board 1.dc.html#KSK-004"
   ],
   "pattern": "listDetail",
   "patternReason": "`listProductVariants` reads the population and `getAvailability` reads one of them — list, select, act",
-  "purpose": "Quantities, with targets a gloved hand can hit.",
+  "purpose": "Choose the tickets first, then the date and time: quantities, with targets a gloved hand can hit.",
   "gaps": [
    {
     "operation": "getAvailability",
@@ -439,7 +439,7 @@
         "ProductVariant.description"
        ],
        "operation": "listProductVariants",
-       "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-015, decided by Chinmay 2 October 2026, DEC-170)",
        "notes": "Large counters per ticket type; inactive variants never shown. Was the generated table 'Every product variant'; staff and plumbing columns removed (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3))."
       },
       {
@@ -866,7 +866,7 @@
     }
    ]
   },
-  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. **Card only. No foreign cash** — a kiosk accepting foreign notes needs a note reader and a per-currency float, and neither is specified. A guest paying by card in a foreign currency is converted by their own issuer, which is not our rate. **Card only. No foreign cash** — a kiosk accepting notes needs a note reader and a per-currency float, and neither is specified. Dynamic currency conversion by the terminal is recorded as `fxRateSource: cardScheme`, because that rate is the scheme's rather than ours.",
+  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. **Card only. No foreign cash** — a kiosk accepting foreign notes needs a note reader and a per-currency float, and neither is specified. A guest paying by card in a foreign currency is converted by their own issuer, which is not our rate. **Card only. No foreign cash** — a kiosk accepting notes needs a note reader and a per-currency float, and neither is specified. Dynamic currency conversion by the terminal is recorded as `fxRateSource: cardScheme`, because that rate is the scheme's rather than ours.\n\n**The guest selects the currency and pays in it** (decided 2 October 2026, Chinmay; CHG-FIN-001; reverses the display-only rule, CF-37 and \"payment will be processed in AED\", in favour of option (b) of MoM 10 Aug 2026 4.7, DI-211). The venue lists the currencies a guest may pay in (`VenueSettings.chargeCurrencies`, a subset of the currencies it shows); `listFxRates` with `chargeable=true` returns them, each marked `chargeable`. The selected currency is sent at checkout (`checkoutCart.chargeCurrency`), the rate is locked on the order (`Order.chargeFxRate`, `chargeTotal`, until `chargeRateLockedUntil`), and the payment request goes to the payment partner in that currency. The ledger stays in the venue's base currency, with the rate recorded on the order, the payment and any refund. **Refunds go back in the currency paid**, at the sale rate, so a full refund returns exactly what was charged. A currency the venue shows but does not charge is still an approximate price, marked \"approx.\", with \"You pay in <base currency>\" beside it. **At the kiosk:** the guest may pick a chargeable currency before paying by card.",
   "density": "touchLarge",
   "boardFrames": [
    "Kiosk Board 1.dc.html#KSK-007"
@@ -886,6 +886,20 @@
        "operation": "createPayment",
        "notes": "The amount due and the card terminal's prompt. The kiosk and the terminal fill the payment (`createPayment`): order, tender, amount and device are never typed. Card only (F75 step 5).",
        "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "createPayment",
+       "label": "Create payment",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "createPayment"
       }
      ]
     }

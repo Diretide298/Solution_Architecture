@@ -1,4 +1,84 @@
 {
+ "Account": {
+  "x-ticvai-persistence": "ledger.account",
+  "type": "object",
+  "required": [
+   "id",
+   "code",
+   "name",
+   "type",
+   "legalEntityId",
+   "isPostable",
+   "isActive"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string",
+    "maxLength": 64
+   },
+   "externalCode": {
+    "type": "string",
+    "nullable": true,
+    "description": "Code in the client's own chart. Used on export so their team sees their codes."
+   },
+   "isSuspense": {
+    "type": "boolean",
+    "default": false,
+    "description": "5.7.x. **Where a posting with no account mapping goes.** Today it has no destination, and a posting event that cannot be booked is a posting event that is silently dropped.\n**A suspense balance is a work queue, not a resting place.** It should trend to zero, and a balance that grows is the signal that a mapping is missing — which is the whole reason for having one rather than refusing the posting.\n"
+   },
+   "subType": {
+    "type": "string",
+    "nullable": true,
+    "description": "5.7.27. **`AccountType` stays a closed enum of asset, liability, equity, revenue and expense because that is correct accounting**, and a venue wanting *Deferred Revenue — Annual Pass* is asking for a sub-type rather than a sixth type.\n"
+   },
+   "tags": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "How a venue groups accounts for its own reporting. Free-form, and outside the type."
+   },
+   "notes": {
+    "type": "string",
+    "nullable": true,
+    "description": "5.7.27. Annotations on the account, which an auditor reads before the balance."
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "type": {
+    "$ref": "#/components/schemas/AccountType"
+   },
+   "parentId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "legalEntityId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "currency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$"
+   },
+   "isPostable": {
+    "type": "boolean",
+    "description": "False for parent accounts, which aggregate only."
+   },
+   "isActive": {
+    "type": "boolean"
+   },
+   "balance": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   }
+  }
+ },
  "AccountType": {
   "type": "string",
   "enum": [
@@ -46,6 +126,76 @@
     "type": "string",
     "readOnly": true,
     "description": "Always the venue's time zone (decided 28 September, audit R158), returned so a reader knows which. Not taken on a write."
+   }
+  }
+ },
+ "CashCountLine": {
+  "x-ticvai-persistence": "orders.cash_count_line",
+  "type": "object",
+  "description": "**One denomination, counted once, against one shift.** Raised in review on 24 August: the table was a stub.\n**The denomination is referenced rather than described** — `platform.denomination` already holds the note and coin definitions per currency, and a count line that repeats the face value is a count line that can disagree with the till it was counted on.\n**`countedQuantity` is a quantity and `expectedQuantity` is derived**, not stored: the expectation is the opening float plus every movement, and a stored expectation that drifts from the movements is a variance nobody can explain.\n",
+  "required": [
+   "shiftId",
+   "denominationId",
+   "countedQuantity"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "shiftId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "A UUIDv7, as `Shift.id` and `orders.pos_shift.id` are."
+   },
+   "depositBoxId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "countKind": {
+    "type": "string",
+    "enum": [
+     "openingFloat",
+     "close",
+     "movement"
+    ],
+    "description": "Which count this line belongs to — the opening float (`openShift`), the close (`closeShift`) or a lift or add (`createCashMovement`). **Until 26 September the three were indistinguishable on one shift** (pull audit R099). Set by the server from the operation that wrote the line.\n"
+   },
+   "cashMovementId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The movement this line counts, where `countKind` is `movement`. How `listCashMovements` rebuilds each movement's `denominations`.\n"
+   },
+   "denominationId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "References `platform.denomination` — face value, kind and sort order live there."
+   },
+   "countedQuantity": {
+    "type": "integer",
+    "minimum": 0,
+    "description": "**How many of this note or coin were in the drawer.**"
+   },
+   "countedValue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "**Quantity times face value, stored.** Derivable, and stored anyway: a denomination revalued or deactivated later would silently rewrite a historical count.\n"
+   },
+   "countedBy": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "countedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "recountOf": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**A recount points at what it replaces rather than overwriting it.** `requestRecount` exists because a variance is a question before it is a fact.\n"
    }
   }
  },
@@ -162,7 +312,19 @@
    },
    "notes": {
     "type": "string",
-    "maxLength": 1000
+    "maxLength": 1000,
+    "description": "The cashier's note on the count. Asked of every cashier on a blind count, never only after a variance is shown (CHG-FIN-003, DI-803).\n"
+   },
+   "cashierReason": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "tillError",
+     "unrecordedRefund",
+     "miscount",
+     "other"
+    ],
+    "description": "Anything the cashier knows went wrong in the shift (DI-803: till error, unrecorded refund, miscount, other). Optional and given without seeing the variance (CHG-FIN-003); the supervisor reads it beside the variance on BO-040.\n"
    },
    "releaseHeldLeases": {
     "type": "boolean",
@@ -172,6 +334,40 @@
    "recordedAt": {
     "type": "string",
     "format": "date-time"
+   }
+  }
+ },
+ "CostCenter": {
+  "x-ticvai-persistence": "ledger.cost_center",
+  "type": "object",
+  "required": [
+   "id",
+   "code",
+   "name"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "parentId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "isActive": {
+    "type": "boolean"
    }
   }
  },
@@ -202,6 +398,67 @@
      }
     ],
     "description": "`count` times the face value, in the denomination's currency. Optional on the way in (the server computes it) and checked when sent.\n"
+   }
+  }
+ },
+ "CreateAccountRequest": {
+  "type": "object",
+  "required": [
+   "code",
+   "name",
+   "type",
+   "legalEntityId"
+  ],
+  "properties": {
+   "code": {
+    "type": "string",
+    "maxLength": 64,
+    "pattern": "^[A-Za-z0-9._-]+$"
+   },
+   "externalCode": {
+    "type": "string",
+    "maxLength": 64
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "type": {
+    "$ref": "#/components/schemas/AccountType"
+   },
+   "parentId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "legalEntityId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "isPostable": {
+    "type": "boolean",
+    "default": true
+   },
+   "isSuspense": {
+    "type": "boolean",
+    "default": false,
+    "description": "See `Account.isSuspense`."
+   },
+   "subType": {
+    "type": "string",
+    "nullable": true,
+    "description": "See `Account.subType`."
+   },
+   "tags": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "See `Account.tags`."
+   },
+   "notes": {
+    "type": "string",
+    "nullable": true,
+    "description": "See `Account.notes`."
    }
   }
  },
@@ -854,6 +1111,14 @@
     "readOnly": true,
     "description": "**Reduces the expected close figure.** Cash skimmed for banking is not a shortfall, and a system that treats it as one makes every busy cashier look short.\n"
    },
+   "overDrawerLimit": {
+    "type": "boolean",
+    "readOnly": true,
+    "default": false,
+    "x-ticvai-persisted": false,
+    "x-ticvai-derived": "onRead",
+    "description": "**The box holds more than its till's drawer limit** (decided 2 October 2026, Chinmay, BO-042; DEC-179; CHG-CSP-016): computed on read from the box's expected cash against `tenancy.Workstation.cashDrawerLimit` or the venue's `cashDrawerLimit`. BO-042 flags the box and offers a lift; false where no limit is set. A flag, not a figure: it tells the cashier nothing about the expected cash (CHG-FIN-003).\n"
+   },
    "foreignHoldings": {
     "type": "array",
     "description": "4.6.11 and 6.1.10. **Foreign cash accepted at this till, counted separately by currency.** A till taking USD and EUR alongside AED has three counts and three variances — collapsing them into a base-currency total makes a variance unattributable to the currency that caused it.\n**No opening float in a foreign currency and no change given in one.** Foreign cash only ever comes in, which is what keeps this to one number per currency rather than a full reconciliation each.\n",
@@ -931,69 +1196,6 @@
    "closed",
    "reconciled"
   ]
- },
- "DiningOutlet": {
-  "type": "object",
-  "x-ticvai-persistence": "none — projection over outlet, menu and table state",
-  "required": [
-   "outletId",
-   "name",
-   "kind",
-   "isOpenNow",
-   "orderingMethod"
-  ],
-  "properties": {
-   "outletId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "name": {
-    "type": "string"
-   },
-   "kind": {
-    "type": "string"
-   },
-   "zone": {
-    "type": "string",
-    "nullable": true
-   },
-   "cuisine": {
-    "type": "array",
-    "items": {
-     "type": "string"
-    }
-   },
-   "isOpenNow": {
-    "type": "boolean"
-   },
-   "opensAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "closesAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "orderingMethod": {
-    "$ref": "#/components/schemas/GuestOrderingMethod"
-   },
-   "estimatedWaitMinutes": {
-    "type": "integer",
-    "nullable": true,
-    "description": "From current kitchen ticket volume, not a fixed figure. Null where the outlet has no kitchen display reporting ticket status — an invented wait time is worse than none.\n"
-   },
-   "imageAssetRef": {
-    "type": "string",
-    "nullable": true
-   },
-   "menuId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   }
-  }
  },
  "ExchangeOrderRequest": {
   "type": "object",
@@ -1261,18 +1463,6 @@
    }
   }
  },
- "GuestOrderingMethod": {
-  "x-ticvai-persistence": "none — enum",
-  "type": "string",
-  "description": "How a guest may order at this outlet. Varies within one venue, so it is per outlet rather than a venue setting.\n",
-  "enum": [
-   "tableService",
-   "appToTable",
-   "appToCollect",
-   "counterOnly",
-   "notAvailable"
-  ]
- },
  "JournalSource": {
   "type": "string",
   "enum": [
@@ -1288,6 +1478,72 @@
    "writeOff",
    "chargeback"
   ]
+ },
+ "LegalEntity": {
+  "x-ticvai-persistence": "ledger.legal_entity",
+  "type": "object",
+  "description": "Also the `createLegalEntity` body. **`id` and `scopePath` are server-owned** (`readOnly`) and ignored if sent.\n",
+  "required": [
+   "id",
+   "code",
+   "name",
+   "countryCode",
+   "currency",
+   "currencyScale",
+   "fiscalYearStartMonth"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "code": {
+    "type": "string",
+    "maxLength": 64
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "countryCode": {
+    "type": "string",
+    "pattern": "^[A-Z]{2}$"
+   },
+   "currency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$"
+   },
+   "currencyScale": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 4
+   },
+   "taxRegistrationNumber": {
+    "type": "string",
+    "nullable": true
+   },
+   "fiscalYearStartMonth": {
+    "type": "integer",
+    "minimum": 1,
+    "maximum": 12
+   },
+   "regionIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "isActive": {
+    "type": "boolean"
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `tenant` scope.**"
+   }
+  }
  },
  "ManualDiscountRequest": {
   "type": "object",
@@ -1571,78 +1827,41 @@
    }
   }
  },
- "NoSaleEvent": {
+ "OpeningHoursWindow": {
   "type": "object",
-  "x-ticvai-persistence": "orders.no_sale_event",
+  "description": "26 September, pull audit R088. **One weekly window an outlet is open.** `Outlet.openingHours` was an array of untyped objects. The shape is the one `supportHours.windows` already uses — a day and a from/to — with the times as local `HH:MM` in the region's time zone. Several windows on one day are a split shift, such as lunch and dinner.\n",
   "required": [
-   "id",
-   "shiftId",
-   "reason",
-   "principalId",
-   "recordedAt"
+   "day",
+   "from",
+   "to"
   ],
   "properties": {
-   "id": {
+   "day": {
     "type": "string",
-    "format": "uuid"
+    "enum": [
+     "mon",
+     "tue",
+     "wed",
+     "thu",
+     "fri",
+     "sat",
+     "sun"
+    ]
    },
-   "shiftId": {
+   "from": {
     "type": "string",
-    "format": "uuid"
+    "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$",
+    "description": "Local time, 24-hour `HH:MM`, when the outlet opens."
    },
-   "workstationId": {
+   "to": {
     "type": "string",
-    "format": "uuid"
+    "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$",
+    "description": "Local time, 24-hour `HH:MM`, when the outlet closes."
    },
-   "reason": {
-    "type": "string"
-   },
-   "note": {
-    "type": "string",
-    "nullable": true
-   },
-   "principalId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "recordedAt": {
-    "type": "string",
-    "format": "date-time"
-   },
-   "countThisShift": {
-    "type": "integer",
-    "description": "Running count. Returned so the terminal can show it — a cashier who can see they are on their ninth no-sale behaves differently from one who cannot.\n"
-   }
-  }
- },
- "OpenShiftRequest": {
-  "type": "object",
-  "required": [
-   "workstationId",
-   "openingFloat"
-  ],
-  "properties": {
-   "workstationId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "openingFloat": {
-    "$ref": "#/components/schemas/DenominationCount"
-   },
-   "depositBoxCode": {
-    "type": "string",
-    "maxLength": 64,
-    "description": "Physical container assigned to this shift. Required where the venue configures deposit box allocation.\n"
-   },
-   "bagNumber": {
-    "type": "string",
-    "maxLength": 64,
-    "description": "Required where the venue configures bag numbers as mandatory."
-   },
-   "recordedAt": {
-    "type": "string",
-    "format": "date-time",
-    "description": "When the device recorded it. `openShift` is online-only (F32), so this differs from server receipt time only by transit; it is kept because the shift's other device writes are ordered against it.\n"
+   "endsNextDay": {
+    "type": "boolean",
+    "default": false,
+    "description": "**A late-night window is one window past midnight** (decided 2 October 2026, Chinmay, batch 6 set 6a, BO-731; DEC-197; CHG-CSP-007). A bar open 23:00 to 01:00 on Friday is `day: fri`, `from: '23:00'`, `to: '01:00'`, `endsNextDay: true`: one service period, and its takings belong to Friday's trading day, not split across two days. With `endsNextDay` false, `to` must be later than `from` (`422 window-ends-before-start`); with it true, `to` must be earlier than or equal to `from`, so a window never spans more than 24 hours.\n"
    }
   }
  },
@@ -1717,6 +1936,46 @@
    },
    "refundedAmount": {
     "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "chargeCurrency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**The currency the guest selected and is charged in** (CHG-FIN-001, 2 October 2026). Null or equal to `currency` for a sale in the base currency. Everything else on the order, and every ledger posting, stays in the base currency `currency`."
+   },
+   "chargeFxRate": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/ExchangeRateDecimal"
+     }
+    ],
+    "nullable": true,
+    "readOnly": true,
+    "description": "Units of `chargeCurrency` per one unit of the base currency, from the region's `tender` rate in force at checkout (`finance.FxRate`), stored on the order so the payment, the receipt, the tax invoice and any refund use the same rate (CHG-FIN-001)."
+   },
+   "chargeFxRateId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The `finance.FxRate` row the rate was taken from, for audit."
+   },
+   "chargeTotal": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "readOnly": true,
+    "description": "`grossAmount` converted at `chargeFxRate` and rounded to the charge currency's scale: what the guest pays and what the payment request to the provider asks for (CHG-FIN-001)."
+   },
+   "chargeRateLockedUntil": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The quote holds until then (the cart lease). After it, the next payment attempt re-quotes at the rate then in force and the guest confirms the new amount (CHG-FIN-001)."
    },
    "droppedPromotions": {
     "type": "array",
@@ -2231,6 +2490,171 @@
    }
   }
  },
+ "Outlet": {
+  "type": "object",
+  "x-ticvai-persistence": "platform.outlet",
+  "required": [
+   "id",
+   "code",
+   "name",
+   "venueId",
+   "kind"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "code": {
+    "type": "string",
+    "maxLength": 64
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200,
+    "description": "The outlet's name in English. Other languages are `nameTranslations` (CHG-CSP-005)."
+   },
+   "nameTranslations": {
+    "$ref": "#/components/schemas/OutletNameTranslations"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "kind": {
+    "$ref": "#/components/schemas/OutletKind"
+   },
+   "outletType": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/OutletType"
+     }
+    ],
+    "nullable": true,
+    "description": "The service model (DI-319; DEC-196; CHG-CSP-005). Null on an outlet that is not F&B or retail."
+   },
+   "departmentId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**The department the outlet belongs to** (DI-319: department, sub-department, cost centre and status; DEC-196; CHG-CSP-005): an `OrgUnit` of kind department, as `Workstation.departmentId`. The outlet itself is the sub-department, so it needs no second field.\n"
+   },
+   "zone": {
+    "type": "string",
+    "nullable": true
+   },
+   "stockLocationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Where this outlet draws stock from. A shop and its stockroom are one location; a bar drawing from a central cellar is not.\n"
+   },
+   "costCenterId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Revenue and cost attribution. Outlet is the natural grain for both."
+   },
+   "paymentTiming": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/OutletPaymentTiming"
+     }
+    ],
+    "default": "sendFirst",
+    "description": "Pay first, or send to the kitchen first then pay (DEC-064; CHG-CSP-004)."
+   },
+   "admissionContext": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/OutletAdmissionContext"
+     }
+    ],
+    "default": "insideVenue",
+    "description": "Inside the venue (needs an admission ticket) or standalone (no ticket) (DEC-070; CHG-CSP-004)."
+   },
+   "producesForOutletIds": {
+    "type": "array",
+    "default": [],
+    "description": "**One kitchen serving several outlets is a producing outlet** (decided 2 October 2026, Chinmay, batch 6 set 5, BO-134: \"Yes: via a producing outlet (one kitchen outlet produces for several)\"; DEC-188; CHG-CSP-005). The outlets this one prepares food for, in the same venue. The model stays per outlet (DI-330): each outlet keeps its own menu and stations, and an order at a listed outlet may route to this outlet's kitchen stations (fnb `KitchenStation`). Empty on an outlet that only produces for itself. An outlet may not list itself, an outlet of another venue (`422 outlet-not-in-venue`), or one that lists it back.\n",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "saleBoardId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**The till layout every till in this outlet uses, unless a till overrides it** (decided 2 October 2026, Chinmay, batch 6 set 4, BO-109: \"Per outlet, with a till override\"; DEC-183; CHG-CSP-006). DI-326 puts the layout at the outlet; MATRIX 2.1.9 binds a board to a workstation. Both hold: a workstation with no board of its own (`ConfigureWorkstationRequest.saleBoardId` absent or null) uses this one, and `Workstation.saleBoardSource` says which applied.\n"
+   },
+   "openingHours": {
+    "type": "array",
+    "description": "The weekly pattern, one entry per window. Several windows on a day are allowed.",
+    "items": {
+     "$ref": "#/components/schemas/OpeningHoursWindow"
+    }
+   },
+   "isActive": {
+    "type": "boolean"
+   }
+  }
+ },
+ "OutletAdmissionContext": {
+  "type": "string",
+  "description": "**Whether an outlet sits behind the admission gate** (decided 2 October 2026, Chinmay, batch 1, WEB-036: \"Inside the venue, a ticket is needed. A restaurant outside the venue (standalone) can sell without one\"; DEC-070; CHG-CSP-004). `insideVenue` (the default): a guest ordering food needs an admission ticket or a place inside, as DI-292 (14 August) decided. `standalone`: a restaurant outside the gate, which may sell takeaway and delivery (DI-1039) with no ticket. DI-292 is amended for standalone outlets only. The admission check itself stays in Access (ADR-0068). F&B keeps its own payment and its own receipt either way. **The canonical name** (2 October 2026, CHG-CLN-008): the field is `admissionContext` on the outlet and on F&B's guest `DiningOutlet`; common `OutletSiting` and the word \"siting\" are deprecated aliases of this.\n",
+  "enum": [
+   "insideVenue",
+   "standalone"
+  ]
+ },
+ "OutletKind": {
+  "type": "string",
+  "enum": [
+   "shop",
+   "restaurant",
+   "bar",
+   "cafe",
+   "kiosk",
+   "gameFloor",
+   "ticketOffice",
+   "mobile"
+  ]
+ },
+ "OutletNameTranslations": {
+  "type": "object",
+  "x-ticvai-persistence": "none — jsonb column on platform.outlet",
+  "description": "**The outlet's name in other languages, keyed by ISO 639-1 code** (decided 2 October 2026, Chinmay, batch 2 #26, BO-044: \"Yes, where a country needs it: the local language plus English\"; DEC-031; CHG-CSP-005). `Outlet.name` stays the English name. Where the region requires a local name (`RegionSettings.localLanguageNameLocales`, Arabic in the UAE), creating or amending an outlet without it is refused `422 local-name-required`. The same shape as catalogue's `LocalisedText` (DI-210).\n",
+  "additionalProperties": {
+   "type": "string",
+   "maxLength": 200
+  }
+ },
+ "OutletPaymentTiming": {
+  "type": "string",
+  "description": "**When an F&B order is paid, set per outlet** (Chinmay, 2 October, workbook Q64; refines audit R261 per outlet; CHG-CSA-010). `sendFirst`, the default and R261's rule: the order goes to the kitchen, then the till charges (table service, and quick service where the venue wants the kitchen started while the guest pays). `payFirst`: the till charges before anything reaches the kitchen; an unpaid order at a `payFirst` outlet is never sent (`fnb.createFnbOrder`, `fnb.fireCourse`). Shared because the outlet (tenancy `Outlet`) holds it and F&B enforces it.\n",
+  "enum": [
+   "sendFirst",
+   "payFirst"
+  ],
+  "default": "sendFirst"
+ },
+ "OutletType": {
+  "type": "string",
+  "description": "**How an F&B or retail outlet trades, which switches features on or off** (decided 2 October 2026, Chinmay, batch 6 set 6a, BO-729: \"Add both fields: outlet type and department (DI-319)\"; DEC-196; CHG-CSP-005). DI-319: a quick-service outlet needs no table booking, a fine-dining outlet needs a table layout. `kind` stays the physical place (a shop, a restaurant, a kiosk); this is the service model inside it. `commissary` is a producing kitchen (DEC-186, DEC-188).\n",
+  "enum": [
+   "fineDining",
+   "casualDining",
+   "quickService",
+   "coffeeShop",
+   "barLounge",
+   "foodCourt",
+   "buffet",
+   "commissary",
+   "retail"
+  ]
+ },
  "Page": {
   "type": "object",
   "required": [
@@ -2309,7 +2733,7 @@
     "type": "string",
     "pattern": "^[A-Z]{3}$",
     "nullable": true,
-    "description": "4.6.11 is deliberately asymmetric: **accept foreign currency, refund in local.** A till giving change in five currencies needs five floats and five counts, and the variance becomes unattributable.\n"
+    "description": "4.6.11 is deliberately asymmetric: **accept foreign currency, refund in local.** A till giving change in five currencies needs five floats and five counts, and the variance becomes unattributable.\n**Cash at a till only** (CHG-FIN-001, 2 October 2026). A card or wallet payment the guest made in a currency they selected is refunded in that currency (`Refund.tenderCurrency`).\n"
    },
    "amount": {
     "$ref": "../shared/common.yaml#/components/schemas/Money"
@@ -2449,74 +2873,6 @@
    }
   }
  },
- "PriceCheck": {
-  "x-ticvai-persistence": "none — computed",
-  "type": "object",
-  "required": [
-   "merchandiseId",
-   "name",
-   "listPrice",
-   "effectivePrice",
-   "onHand"
-  ],
-  "properties": {
-   "merchandiseId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "outletId": {
-    "type": "string",
-    "format": "uuid",
-    "description": "The outlet whose price and stock this is: the asking workstation's outlet, or `outletId` for a caller with none (decided 28 September, audit R215).\n"
-   },
-   "sku": {
-    "type": "string"
-   },
-   "name": {
-    "type": "string"
-   },
-   "listPrice": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "effectivePrice": {
-    "allOf": [
-     {
-      "$ref": "../shared/common.yaml#/components/schemas/Money"
-     }
-    ],
-    "description": "After any live promotion."
-   },
-   "appliedPromotionCode": {
-    "type": "string",
-    "nullable": true
-   },
-   "onHand": {
-    "type": "number"
-   },
-   "isAvailable": {
-    "type": "boolean"
-   },
-   "siblingOutlets": {
-    "type": "array",
-    "description": "Stock elsewhere in the venue, so a colleague can be sent.",
-    "items": {
-     "type": "object",
-     "properties": {
-      "outletId": {
-       "type": "string",
-       "format": "uuid"
-      },
-      "outletName": {
-       "type": "string"
-      },
-      "onHand": {
-       "type": "number"
-      }
-     }
-    }
-   }
-  }
- },
  "Recipient": {
   "x-ticvai-persistence": "reporting.schedule_recipient",
   "type": "object",
@@ -2596,7 +2952,7 @@
      "storeCredit"
     ],
     "default": "originalTender",
-    "description": "BL-086. **A refund could only go back the way it came.** A guest whose card has expired, a partner settling by wire, a guest who would rather have the credit — three real cases with one answer.\n**`originalTender` stays the default** because refunding elsewhere is how money laundering works, and anything else needs a reason.\n"
+    "description": "BL-086. **A refund could only go back the way it came.** A guest whose card has expired, a partner settling by wire, a guest who would rather have the credit — three real cases with one answer.\n**`originalTender` stays the default** because refunding elsewhere is how money laundering works, and anything else needs a reason.\n\n**`storeCredit` is a gift card issued for the refund amount** (decided 2 October 2026, Chinmay, batch 1, POS-011; DEC-061; CHG-CSP-037; DI-796), never a voucher or a wallet top-up.\n"
    },
    "fxVariance": {
     "allOf": [
@@ -2605,6 +2961,22 @@
      }
     ],
     "description": "Where the sale rate and the current rate differ, **the difference is booked as an FX variance rather than hidden in the refund**. `runFxRevaluation` already handles this class of movement and this is the same act at a smaller scale.\n"
+   },
+   "tenderCurrency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**A refund goes back in the currency the guest paid** (decided 2 October 2026, Chinmay; CHG-FIN-001). For a card or wallet payment taken in a guest-selected currency, the refund request to the provider is in that currency, and `tenderAmount` is the refunded share of the original `Payment.tenderAmount` at the sale rate (`fxRate`), so a full refund returns exactly what was charged. `amount` stays in base currency for the ledger. Null for a refund in the base currency. Foreign cash refunded at a till is paid in base currency (DI-282)."
+   },
+   "tenderAmount": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "readOnly": true,
+    "description": "The refund in `tenderCurrency`, at that currency's own scale (CHG-FIN-001)."
    },
    "amount": {
     "$ref": "../shared/common.yaml#/components/schemas/Money"
@@ -2804,6 +3176,69 @@
    "format": {
     "type": "string",
     "nullable": true
+   },
+   "role": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "dimension",
+     "measure"
+    ],
+    "description": "**What the column is to a chart** (decided 2 October 2026, Chinmay; CHG-FIN-007). A `dimension` groups (date, venue, channel, product); a `measure` is aggregated (sum of net revenue, count of admissions). Null on a column only a table shows."
+   },
+   "encoding": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "category",
+     "x",
+     "y",
+     "series",
+     "value",
+     "size",
+     "colour",
+     "location",
+     "stage",
+     "source",
+     "target",
+     "row",
+     "column",
+     "hierarchyLevel",
+     "label",
+     "tooltip"
+    ],
+    "description": "**Which field well the column fills** (CHG-FIN-007), the binding the twenty marks of `DashboardTile.visualisation` need. The per-mark rule is on that field."
+   },
+   "axis": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "primary",
+     "secondary"
+    ],
+    "description": "For a measure on a `combo`, the axis it is drawn against. A secondary axis needs its own `unitLabel` (CHG-FIN-007)."
+   },
+   "seriesType": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "bar",
+     "line",
+     "area"
+    ],
+    "description": "For a measure on a `combo`, how that series is drawn (CHG-FIN-007)."
+   },
+   "hierarchyLevel": {
+    "type": "integer",
+    "nullable": true,
+    "minimum": 1,
+    "description": "For `matrix` rows and columns, `treemap` nesting and `decompositionTree` levels, the depth of this dimension, 1 outermost. Levels must follow a real hierarchy (DI-709), for example year, month, day, or region, venue, outlet (CHG-FIN-007)."
+   },
+   "unitLabel": {
+    "type": "string",
+    "nullable": true,
+    "maxLength": 40,
+    "description": "The unit an axis states, for example \"AED\" or \"Admissions\". Required on a secondary axis (CHG-FIN-007)."
    }
   }
  },
@@ -3559,7 +3994,7 @@
    "salesTotal": {
     "x-ticvai-column": "gross_sales_amount",
     "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "What the till took in sales, as the guest paid it — tax included."
+    "description": "What the till took in sales, as the guest paid it — tax included: the shift's takings, not Gross sales (CHG-FIN-002, CHG-FIN-010). **Never shown to the shift's own cashier before the count is in** (CHG-FIN-003): with the float and the lifts it gives away the expected cash.\n"
    },
    "refundsTotal": {
     "x-ticvai-column": "gross_refunded_amount",
@@ -3580,7 +4015,7 @@
     ],
     "readOnly": true,
     "nullable": true,
-    "description": "26 September, pull audit R207. **The figure the blind count was measured against**, revealed once the count is in — null until then. Until this date only `ShiftCloseResult` carried it, returned once by `closeShift`, so BO-040 could not show the over/short it exists to accept.\n"
+    "description": "26 September, pull audit R207. **The figure the blind count was measured against**, revealed once the count is in — null until then. Until this date only `ShiftCloseResult` carried it, returned once by `closeShift`, so BO-040 could not show the over/short it exists to accept. **Null to the shift's own cashier on every read** (CHG-FIN-003, 2 October): returned only to a caller holding OVERSHORT_ACCEPT or SHIFT_CLOSE_OTHER at the venue.\n"
    },
    "countedCash": {
     "x-ticvai-column": "counted_cash_amount",
@@ -3602,7 +4037,26 @@
     ],
     "readOnly": true,
     "nullable": true,
-    "description": "Counted minus expected, as `ShiftCloseResult.variance`. Negative is short."
+    "description": "Counted minus expected, as `ShiftCloseResult.variance`. Negative is short. Null to the shift's own cashier, as `expectedCash` (CHG-FIN-003)."
+   },
+   "cashierReason": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "enum": [
+     "tillError",
+     "unrecordedRefund",
+     "miscount",
+     "other"
+    ],
+    "description": "What the cashier said went wrong, given with the blind count (`CloseShiftRequest.cashierReason`, DI-803) without seeing the variance; the supervisor reads it beside the variance on BO-040 (CHG-FIN-003).\n"
+   },
+   "cashierNote": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "maxLength": 1000,
+    "description": "The cashier's note with the count (`CloseShiftRequest.notes`; CHG-FIN-003)."
    },
    "heldLeaseCount": {
     "type": "integer",
@@ -3638,6 +4092,33 @@
     "format": "uuid",
     "nullable": true,
     "description": "Who submitted the close count. `reopenShift` refuses an approver who is this principal, and until 26 September there was nothing to compare against (pull audit R099).\n"
+   },
+   "recountRequestedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**Set by `rejectShiftVariance`, cleared by the cashier's recount** (decided 2 October 2026, Chinmay; DEC-175; CHG-CSP-013; DI-804). While set, the shift is `pendingVariance` waiting for the cashier rather than the supervisor: the cashier's view says \"Recount requested\" instead of \"Under review\".\n"
+   },
+   "recountRequestedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The supervisor who sent the count back (CHG-CSP-013)."
+   },
+   "recountReason": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "maxLength": 500,
+    "description": "The supervisor's reason, shown to the cashier; never an amount (CHG-CSP-013, CHG-FIN-003)."
+   },
+   "countNumber": {
+    "type": "integer",
+    "minimum": 0,
+    "readOnly": true,
+    "description": "How many close counts the shift has had: 0 before the first, 1 after it, 2 after a recount (CHG-CSP-013). The latest is the one measured.\n"
    },
    "syncedAt": {
     "type": "string",
@@ -3752,27 +4233,6 @@
    "autoClosed"
   ]
  },
- "SupervisorStepUp": {
-  "type": "object",
-  "description": "**A supervisor signs the act in place, on the device making the call** (decided 28 September, audit R144). Used where the decision is a same-device step-up rather than an approval request: reopening a shift, recounting a stock count, a retail return above the venue threshold, and (proposed by the coordinator, client to confirm) closing a stock transfer short and cancelling a performance.\n\n**The verification rule, the same on every operation that takes it:** the server checks `credential` against `principalId`; that principal must hold the operation's `x-ticvai-permission` at the operation's scope, must be active at that venue, and must not be the person whose act is being reversed where the operation says so. Any failure is a `403` (`supervisor-step-up-refused`) and nothing is written. **No approval request is raised**, and the operation declares `x-ticvai-step-up: pin`.\n",
-  "required": [
-   "principalId",
-   "credential"
-  ],
-  "properties": {
-   "principalId": {
-    "type": "string",
-    "format": "uuid",
-    "description": "The supervisor signing. Recorded against the act."
-   },
-   "credential": {
-    "type": "string",
-    "maxLength": 512,
-    "writeOnly": true,
-    "description": "The supervisor's staff PIN, as they sign in at a till with it. **A PIN, never a password** (audit R123 (7)). Never stored or returned."
-   }
-  }
- },
  "TenderKind": {
   "type": "string",
   "description": "`wallet` is a **digital wallet** (Apple Pay, Google Pay and the like, taken through the gateway), the value the guest channels accept beside `card` (decided 28 September, audit R080 (a)). **The stored-value TICVAI wallet is a separate tender**: it is spent through `authoriseStoredValue` and `captureStoredValue` (`StoredValueKind` `wallet`), never as this value, so the client can see which of the two the decision meant.\n",
@@ -3787,6 +4247,78 @@
    "giftCard",
    "complimentary"
   ]
+ },
+ "TillShiftPolicy": {
+  "x-ticvai-persistence": "orders.till_shift_policy",
+  "type": "object",
+  "description": "**The venue's opening, closing and exception rules for every till** (CHG-CSP-020; POS-019; DI-309). One per venue. Proposed defaults are ours, client to correct.\n",
+  "required": [
+   "venueId"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true
+   },
+   "requireOpenApproval": {
+    "type": "boolean",
+    "default": false,
+    "description": "Every shift opens `pendingApproval` and waits for `approveShiftOpen` (SHIFT_APPROVE_OPEN). Off by default: only a float outside `openingFloatTolerance` waits.\n"
+   },
+   "openingFloatTolerance": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true,
+    "description": "How far a declared opening float may differ from the box's allocated float before the shift waits for approval (`states/shift.yaml`, pendingApproval). Null: any difference waits.\n"
+   },
+   "depositBoxRequired": {
+    "type": "boolean",
+    "default": true,
+    "description": "A shift cannot open without a deposit box (`OpenShiftRequest.depositBoxCode`); refused `400` otherwise."
+   },
+   "bagNumberRequired": {
+    "type": "boolean",
+    "default": false,
+    "description": "A shift cannot open without a bag number (`OpenShiftRequest.bagNumber`)."
+   },
+   "requireCloseApproval": {
+    "type": "boolean",
+    "default": false,
+    "description": "Every counted shift waits in `pendingClosure` for `approveShiftClose` (SHIFT_APPROVE_CLOSE), even within the variance threshold.\n"
+   },
+   "autoCloseAfterHours": {
+    "type": "integer",
+    "nullable": true,
+    "minimum": 1,
+    "maximum": 48,
+    "default": 14,
+    "description": "Hours after which an open or suspended shift nobody closed is closed by the inactivity job as `autoClosed` and the supervisors are told (`states/shift.yaml`). Null never auto-closes.\n"
+   },
+   "noSaleAlertCount": {
+    "type": "integer",
+    "nullable": true,
+    "minimum": 1,
+    "default": 10,
+    "description": "No-sales in one shift (`recordNoSale`) at which the supervisors are alerted on the venue's alerting channel; the count is on POS-020. Null sends no alert.\n"
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
  },
  "TrialBalance": {
   "x-ticvai-persistence": "none — computed",
@@ -3995,6 +4527,51 @@
       "nullable": true,
       "default": 0,
       "description": "BL-106. **How long a same-visit Face Tag survives past the close of the operating day**, and zero is the default because that is what 3.2.44 describes. A non-zero value is an operational allowance for a late reconciliation, not a retention period — **`facePass` ignores this entirely** and is bounded by its entitlement.\n"
+     },
+     "consentFormId": {
+      "type": "string",
+      "format": "uuid",
+      "nullable": true,
+      "description": "**The venue's own consent form, which every biometric capture is taken on** (decided 2 October 2026, Chinmay, batch 4, BO-188: \"Consent first, on the venue's consent form\"; DEC-128, DEC-549; CHG-CSP-018). A form from the venue's consent-form builder in Venue Management (the one builder Face Pass, Face Tag, marketing and waivers share; marketing-crm `setDigitalWaiverForm`). Turning `isEnabled` on without one is refused `422 consent-form-required`, as a missing DPIA is; each Face Pass and Face Tag capture records the form and its version it was consented on (access `enrolFacePass`, `enrolFaceTag`).\n"
+     },
+     "templatesHeldByTicvai": {
+      "type": "boolean",
+      "readOnly": true,
+      "description": "**True where TICVAI's platform stores this venue's biometric templates** (rather than the venue's own on-premises reader estate). Derived from the venue's access deployment. While true, Venue Management shows the venue a standing warning that every guest must accept the venue's consent form before capture, because the data sits with TICVAI as the venue's processor (decided 2 October 2026, Chinmay, batch 4, BO-188: \"If we store the data, highlight or notify the venue that the client must accept a consent form\"; DEC-128; CHG-CSP-018).\n"
+     },
+     "allowMinors": {
+      "type": "boolean",
+      "default": true,
+      "description": "**Whether this venue enrols minors at all** (decided 2 October 2026, Chinmay, critical set 1, BO-187 and CMS-029: \"Guardian consent on the venue's form; minor age per country; the venue can switch minors off\"; supersedes the GST-069 default; DEC-237; CHG-CSP-019). On: a minor (below `RegionSettings.minorAgeThreshold`) is enrolled only with a guardian's consent on the venue's consent form. Off: a minor's enrolment is refused (`422 minors-not-enrolled`) and the guest uses another verification method.\n"
+     },
+     "accreditationFaceMatching": {
+      "type": "object",
+      "nullable": true,
+      "description": "**Face matching to find duplicate accreditation applicants, off unless the venue enables it** (decided 2 October 2026, Chinmay, critical set 3, BO-631: \"Only where the venue enables it, with applicant consent and the venue's legal sign-off; off by default\"; DEC-461; CHG-CSP-022). Enabling it is refused without `legalSignOffReference` (`422 legal-sign-off-required`); each applicant matched must have consented on the application (accreditation's own record). Null is off.\n",
+      "properties": {
+       "isEnabled": {
+        "type": "boolean",
+        "default": false
+       },
+       "legalSignOffReference": {
+        "type": "string",
+        "nullable": true,
+        "maxLength": 200,
+        "description": "The venue's own reference for its legal sign-off; the platform records that one was named, by whom and when."
+       },
+       "signedOffByPrincipalId": {
+        "type": "string",
+        "format": "uuid",
+        "nullable": true,
+        "readOnly": true
+       },
+       "signedOffAt": {
+        "type": "string",
+        "format": "date-time",
+        "nullable": true,
+        "readOnly": true
+       }
+      }
      }
     }
    },
@@ -4109,6 +4686,15 @@
      "pattern": "^[A-Z]{3}$"
     }
    },
+   "chargeCurrencies": {
+    "type": "array",
+    "nullable": true,
+    "description": "**Which currencies a guest may select and pay in** (decided 2 October 2026, Chinmay; CHG-FIN-001; MoM 10 Aug 2026 4.7 option (b), DI-211). A subset of `displayCurrencies`: each code must also be one the venue's payment provider can charge (`orders.PaymentProvider.presentmentCurrencies`) and one the region holds a `tender` rate for; anything else is refused `400`. Null or empty: guests pay in the trading (base) currency only and the other display currencies stay approximate. The ledger is always in the base currency, with the rate recorded on every payment and refund.\n",
+    "items": {
+     "type": "string",
+     "pattern": "^[A-Z]{3}$"
+    }
+   },
    "cartLeaseSeconds": {
     "type": "integer",
     "nullable": true,
@@ -4173,6 +4759,15 @@
     ],
     "nullable": true,
     "description": "Over or short at shift close beyond which the shift waits in `pendingVariance` for `shift.acceptShiftVariance`. **Proposed tenant default AED 20.00, bounds 0 to 1,000 in the venue currency; client finance to correct (audit R094).**\n"
+   },
+   "cashDrawerLimit": {
+    "oneOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true,
+    "description": "**The most cash a till drawer should hold before some is lifted to the safe** (decided 2 October 2026, Chinmay, batch 6 set 3, BO-042: \"Add drawer limit setting (warn + offer cash lift)\"; DEC-179; CHG-CSP-016; DI-274: on a busy day the cashier unloads excess cash mid-shift and it is reconciled at close). The venue default; a till may set its own (`Workstation.cashDrawerLimit`). When the cash a till has taken since its last count takes the drawer over it, the till warns and offers a cash lift (`shift.createCashMovement` kind `lift`) and BO-042 flags the box (`shift.DepositBox.overDrawerLimit`). A warning, never a block: a sale is not refused because the drawer is full. Null sets no limit. **No proposed default: the client's finance team sets it.**\n"
    },
    "catalogue": {
     "type": "object",
@@ -4306,6 +4901,15 @@
       "maximum": 60,
       "default": 10,
       "description": "Minutes after a bump during which `recallKitchenTicket` still recalls; after it the act is a refire. Proposed, client to correct (audit R094)."
+     },
+     "tableReservedLeadMinutes": {
+      "type": "integer",
+      "nullable": true,
+      "minimum": 0,
+      "maximum": 240,
+      "default": 30,
+      "deprecated": true,
+      "description": "**Deprecated (2 October 2026, CHG-CLN-009): `fnb.FnbReservationPolicy.reservedLeadMinutes` is canonical.** The table state model reads the reservation policy (`states/table.yaml`); this venue setting is kept for compatibility, never read, and not drawn. Its former meaning: **How long before a pre-allocated booking its table shows Reserved** (decided 2 October 2026, Chinmay, batch 6 set 6b, EMP-052: \"Reserved when a booking names the table, or N minutes (venue-set) before a pre-allocated booking\"; DEC-202; CHG-CSP-017; DI-689, DI-336). A booking that names its table holds it as Reserved for the booking's whole slot; a booking the host pre-allocated shows its table Reserved from this many minutes before it. Zero shows Reserved only once the booking is due. The fnb table state model applies it (`states/table.yaml`, owned by fnb). Proposed default 30 minutes, client to correct.\n"
      },
      "compEscalationAmount": {
       "allOf": [

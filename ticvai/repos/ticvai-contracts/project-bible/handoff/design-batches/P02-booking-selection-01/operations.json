@@ -42,25 +42,6 @@
   "requestBody": "EligibilityCheckRequest",
   "responds": "EligibilityCheckResult"
  },
- "createReferral": {
-  "method": "POST",
-  "path": "/referrals",
-  "contract": "marketing-crm",
-  "summary": "Issue a referral code",
-  "permission": "MARKETING_MANAGE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "Referral",
-  "responds": "Referral"
- },
  "createResourceHold": {
   "method": "POST",
   "path": "/resource-holds",
@@ -284,19 +265,6 @@
   "requestBody": null,
   "responds": "MapResourceAvailability"
  },
- "getMyChallenges": {
-  "method": "GET",
-  "path": "/guests/me/challenges",
-  "contract": "marketing-crm",
-  "summary": "Active challenges and how far along I am",
-  "permission": "MARKETING_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [],
-  "requestBody": null,
-  "responds": null
- },
  "getPublishedBookingFlow": {
   "method": "GET",
   "path": "/venues/{venueId}/booking-flow",
@@ -438,19 +406,6 @@
   ],
   "requestBody": null,
   "responds": "BookableVenueMaps"
- },
- "listCatalogueBundles": {
-  "method": "GET",
-  "path": "/catalogue/bundles",
-  "contract": "catalogue",
-  "summary": "List published catalogue bundles",
-  "permission": "PRODUCT_VIEW",
-  "offlineCapable": true,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "BundleSummary"
  },
  "listGroupPackages": {
   "method": "GET",

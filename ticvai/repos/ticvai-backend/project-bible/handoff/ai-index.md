@@ -6,14 +6,14 @@
 
 | | |
 |---|---|
-| **Operations** | 143 |
-| **Schemas** | 122 |
+| **Operations** | 146 |
+| **Schemas** | 125 |
 | **States** | 42 |
 | **Events** | 47 |
-| **Tables** | 137 |
-| **Screens** | 195 |
+| **Tables** | 138 |
+| **Screens** | 194 |
 | **Flows** | 11 |
-| **Documents** | 64 |
+| **Documents** | 66 |
 | **Open conflicts** | 1 |
 
 ## Reached outside the contract
@@ -58,11 +58,11 @@
 | **Every model call leaves an audit record** — 17 operations write an `ai.interaction` (8.3.55). | yes | tools/check-package.py — a model-calling operation with no interaction fails |
 | **Only governed operations outside the domain may write to it** — 2 operations in other contracts write an `ai.*` table: ['askReportingQuestion', 'saveNaturalLanguageQuery']. Each is a governance record, not a bypass. | yes | tools/check-package.py allowlist, stated in ADR-0020 |
 
-**Storage tiers** — `postgres` 122 · `postgres-analytical` 5 · `qdrant` 1 · `redis` 9
+**Storage tiers** — `postgres` 123 · `postgres-analytical` 5 · `qdrant` 1 · `redis` 9
 
 ## Operations
 
-**141 in the contract.**
+**144 in the contract.**
 
 | Operation | Verb | Guest | Scope |
 |---|---|---|---|
@@ -106,6 +106,7 @@
 | `getAiByokEnablement` | GET |  | tenant |
 | `getAiDecisionTrace` | GET |  | venue |
 | `getAiPolicy` | GET |  | venue |
+| `getAiSpendCeiling` | GET |  | venue |
 | `getAiUsage` | GET |  | tenant |
 | `getAiVenueSettings` | GET |  | venue |
 | `getApprovalRequestScore` | GET |  | venue |
@@ -117,6 +118,7 @@
 | `getForecastAccuracy` | GET |  | venue |
 | `getGuidedChoiceSuggestion` | GET |  | venue |
 | `getRiskCase` | GET |  | venue |
+| `getTranslationProposals` | GET |  | tenant |
 | `getVenueHistoryImport` | GET |  | venue |
 | `importVenueHistory` | POST |  | venue |
 | `ingestKnowledgeDocument` | POST |  | tenant |
@@ -196,6 +198,7 @@
 | `setAiPolicy` | PUT |  | venue |
 | `setAiProvider` | PUT |  | tenant |
 | `setAiRiskRegisterEntry` | PUT |  | tenant |
+| `setAiSpendCeiling` | PUT |  | venue |
 | `setAiTool` | PUT |  | platform |
 | `setAiVenueSettings` | PUT |  | venue |
 | `setForecastDefinition` | PUT |  | venue |
@@ -314,9 +317,9 @@
 
 ## Storage
 
-**`postgres`** — 122
+**`postgres`** — 123
 
-`ai.action_plan` · `ai.action_step` · `ai.anomaly_detector` · `ai.answer_feedback` · `ai.approval_request_score` · `ai.assistant_profile` · `ai.blueprint` · `ai.blueprint_decision` · `ai.byok_enablement` · `ai.capability` · `ai.capability_maturity` · `ai.case_action` · `ai.case_evidence` · `ai.chunk_embedding` · `ai.config_session` · `ai.config_source` · `ai.control` · `ai.control_test` · `ai.decision_record` · `ai.entity_risk` · `ai.eval_run` · `ai.eval_suite` · `ai.evidence_package` · `ai.forecast_accuracy` · `ai.forecast_definition` · `ai.forecast_export` · `ai.forecast_point` · `ai.forecast_scenario` · `ai.forecast_version` · `ai.governance_alert` · `ai.governance_policy` · `ai.governance_policy_version` · `ai.guided_choice_suggestion` · `ai.history_import` · `ai.history_observation` · `ai.incident` · `ai.index_entry` · `ai.index_failure` · `ai.index_job` · `ai.index_source` · `ai.insight` · `ai.intervention` · `ai.knowledge_collection` · `ai.knowledge_document` · `ai.knowledge_gap` · `ai.layout_draft` · `ai.model` · `ai.operational_requirement` · `ai.policy` · `ai.policy_exception` · `ai.prompt_template` · `ai.proposed_action` · `ai.provider` · `ai.rec_decision` · `ai.rec_decline` · `ai.rec_event` · `ai.release` · `ai.risk_alert` · `ai.risk_assessment` · `ai.risk_case` · `ai.risk_edge` · `ai.risk_register` · `ai.risk_strategy` · `ai.signal_source` · `ai.tool` · `ai.training_run` · `ai.venue_settings` · `approvals.request` · `approvals.sla_policy` · `assets.media_asset` · `catalogue.channel_capacity` · `catalogue.entitlement_template` · `catalogue.event` · `catalogue.performance` · `catalogue.price` · `catalogue.price_list` · `catalogue.product` · `catalogue.variant_dimension` · `control.content_block` · `fnb.menu_item` · `fnb.production_plan` · `inventory.movement` · `inventory.stock_batch` · `maintenance.inspection_template` · `marketing.attribution_touch` · `marketing.audience_list` · `marketing.campaign` · `marketing.case` · `marketing.consent_record` · `marketing.guest_profile` · `marketing.loyalty_position` · `marketing.loyalty_programme` · `marketing.message_template` · `marketing.message_template_version` · `marketing.segment` · `marketing.segment_criterion` · `orders.order_line` · `platform.region_settings` · `platform.scope` · `promotions.promotion` · `queue.queue` · `queue.reading` · `reporting.report_definition` · `retail.merchandise` · `seating.accessible` · `seating.seat` · `seating.seat_category` · `seating.seat_map` · `seating.seating_rules` · `seating.section` · `seating.zone` · `venuemap.import_job` · `venuemap.map` · `venuemap.point` · `venuemap.visit_plan` · `venuemap.visit_plan_item` · `whitelabel.banner` · `whitelabel.content_page` · `whitelabel.faq_entry` · `whitelabel.homepage_section` · `whitelabel.policy` · `whitelabel.promo_block`
+`ai.action_plan` · `ai.action_step` · `ai.anomaly_detector` · `ai.answer_feedback` · `ai.approval_request_score` · `ai.assistant_profile` · `ai.blueprint` · `ai.blueprint_decision` · `ai.byok_enablement` · `ai.capability` · `ai.capability_maturity` · `ai.case_action` · `ai.case_evidence` · `ai.chunk_embedding` · `ai.config_session` · `ai.config_source` · `ai.control` · `ai.control_test` · `ai.decision_record` · `ai.entity_risk` · `ai.eval_run` · `ai.eval_suite` · `ai.evidence_package` · `ai.forecast_accuracy` · `ai.forecast_definition` · `ai.forecast_export` · `ai.forecast_point` · `ai.forecast_scenario` · `ai.forecast_version` · `ai.governance_alert` · `ai.governance_policy` · `ai.governance_policy_version` · `ai.guided_choice_suggestion` · `ai.history_import` · `ai.history_observation` · `ai.incident` · `ai.index_entry` · `ai.index_failure` · `ai.index_job` · `ai.index_source` · `ai.insight` · `ai.intervention` · `ai.knowledge_collection` · `ai.knowledge_document` · `ai.knowledge_gap` · `ai.layout_draft` · `ai.model` · `ai.operational_requirement` · `ai.policy` · `ai.policy_exception` · `ai.prompt_template` · `ai.proposed_action` · `ai.provider` · `ai.rec_decision` · `ai.rec_decline` · `ai.rec_event` · `ai.release` · `ai.risk_alert` · `ai.risk_assessment` · `ai.risk_case` · `ai.risk_edge` · `ai.risk_register` · `ai.risk_strategy` · `ai.signal_source` · `ai.spend_ceiling` · `ai.tool` · `ai.training_run` · `ai.venue_settings` · `approvals.request` · `approvals.sla_policy` · `assets.media_asset` · `catalogue.channel_capacity` · `catalogue.entitlement_template` · `catalogue.event` · `catalogue.performance` · `catalogue.price` · `catalogue.price_list` · `catalogue.product` · `catalogue.variant_dimension` · `control.content_block` · `fnb.menu_item` · `fnb.production_plan` · `inventory.movement` · `inventory.stock_batch` · `maintenance.inspection_template` · `marketing.attribution_touch` · `marketing.audience_list` · `marketing.campaign` · `marketing.case` · `marketing.consent_record` · `marketing.guest_profile` · `marketing.loyalty_position` · `marketing.loyalty_programme` · `marketing.message_template` · `marketing.message_template_version` · `marketing.segment` · `marketing.segment_criterion` · `orders.order_line` · `platform.region_settings` · `platform.scope` · `promotions.promotion` · `queue.queue` · `queue.reading` · `reporting.report_definition` · `retail.merchandise` · `seating.accessible` · `seating.seat` · `seating.seat_category` · `seating.seat_map` · `seating.seating_rules` · `seating.section` · `seating.zone` · `venuemap.import_job` · `venuemap.map` · `venuemap.point` · `venuemap.visit_plan` · `venuemap.visit_plan_item` · `whitelabel.banner` · `whitelabel.content_page` · `whitelabel.faq_entry` · `whitelabel.homepage_section` · `whitelabel.policy` · `whitelabel.promo_block`
 
 **`postgres-analytical`** — 5
 
@@ -342,9 +345,9 @@
 **P02 Guest App**
 
 - `GST-001` Home — wave 1, 2 operations
-- `GST-031` AI Concierge – Home — wave 2, 3 operations
+- `GST-031` AI Concierge – Home — wave 2, 5 operations
 - `GST-032` AI Concierge – Chat — wave 2, 2 operations
-- `GST-033` AI Concierge – Contextual Help — wave 2, 1 operation
+- `GST-033` AI Concierge – Contextual Help — wave 2, 3 operations
 - `GST-036` Loyalty & Rewards — wave 2, 2 operations
 - `GST-048` Upsell / Cross-Sell — wave 2, 2 operations
 - `GST-054` AI Planner — wave 1, 3 operations
@@ -352,44 +355,54 @@
 
 **P04 Venue POS**
 
-- `POS-008` Reports — wave 2, 2 operations
+- `POS-008` Reports — wave 2, 1 operation
 
 **P05 Guest Kiosk**
 
-- `KSK-015` Assistant — wave 2, 2 operations
+- `KSK-015` Assistant — wave 2, 3 operations
 
 **P06 Venue Staff App**
 
 - `EMP-019` AI assistant — home — wave 1, 3 operations
-- `EMP-020` AI assistant — answer — wave 1, 4 operations
+- `EMP-020` AI assistant — answer — wave 1, 5 operations
 - `EMP-031` Queue monitor — wave 2, 1 operation
 - `EMP-040` Knowledge base — wave 2, 1 operation
 - `EMP-041` Training — wave 3, 1 operation
 
 **P08 Venue Management**
 
+- `ADM-047` AI Delivery Optimization & Communication Platform Diagnostics — wave 3, 1 operation
+- `ADM-366` AI Approval Intelligence Center — wave 3, 1 operation
+- `ADM-633` Fraud Alert, Investigation & Case Management — wave 3, 9 operations
+- `ADM-637` AI Fraud, Anomaly & Payment Intelligence Center — wave 3, 3 operations
+- `ADM-638` Payment Executive Intelligence, Risk Simulator & AI Advisor — wave 3, 1 operation
+- `ADM-678` Journey Simulator, Decision Trace & AI Optimization — wave 3, 1 operation
+- `ADM-680` Customer Recommendation Profile — wave 3, 2 operations
+- `ADM-683` Next-Best-Offer Decision Studio — wave 3, 1 operation
+- `ADM-686` Anonymous, Known & Identity-Transition Personalization.123 — wave 3, 1 operation
+- `ADM-687` AI Explainability, Confidence & Model Governance — wave 3, 1 operation
+- `ADM-696` AI Risk, Fairness, Explainability & Safety Center — wave 3, 3 operations
+- `ADM-697` Recommendation Audit, Decision Trace & Investigation — wave 3, 1 operation
 - `BO-005` Queue Monitor — wave 1, 1 operation
 - `BO-029` Report Builder — wave 2, 2 operations
 - `BO-058` Reporting Home — wave 1, 2 operations
 - `BO-059` Sales Reports — wave 1, 2 operations
 - `BO-060` Attendance & Footfall — wave 2, 2 operations
 - `BO-084` Approval Inbox — wave 1, 1 operation
-- `BO-088` Approval Analytics — wave 3, 1 operation
-- `BO-091` AI Policy & Spend — wave 1, 8 operations
+- `BO-091` AI Policy & Spend — wave 1, 11 operations
 - `BO-093` Map Import & Labelling — wave 2, 1 operation
-- `BO-102` Sell — wave 1, 2 operations
+- `BO-102` Sell — wave 1, 1 operation
 - `BO-1048` Seat Upsell Recommendations — wave 3, 1 operation
-- `BO-115` Category, Brand & Merchandise Hierarchy — wave 2, 1 operation
 - `BO-1160` Fraud Alert & Investigation Case Management — wave 3, 5 operations
-- `BO-117` Product Import, Governance & AI Configuration Assistant — wave 2, 2 operations
+- `BO-117` Product Import, Governance & AI Configuration Assistant — wave 2, 1 operation
 - `BO-119` Cross-Sell, Upsell & Recommendation Rules — wave 2, 1 operation
-- `BO-138` Production Execution & Batch Management — wave 2, 1 operation
 - `BO-139` Wastage, Spoilage, Returns & Write-Off — wave 2, 1 operation
 - `BO-367` Approval Request Detail — wave 3, 1 operation
+- `BO-368` AI Decision Support — wave 3, 1 operation
 - `BO-369` High Priority & Risk Queue — wave 3, 1 operation
 - `BO-593` AI Rental Management Copilot & Action Center — wave 3, 1 operation
 - `BO-597` AI Configuration Workspace — wave 3, 2 operations
-- `BO-598` AI Draft Review & Approval — wave 3, 2 operations
+- `BO-598` AI Draft Review & Approval — wave 3, 3 operations
 - `BO-761` AI Audience Discovery — wave 3, 1 operation
 - `BO-762` Predictive Audiences — wave 3, 2 operations
 - `BO-764` Campaign Command Center — wave 3, 1 operation
@@ -401,11 +414,11 @@
 - `BO-787` Content Blocks & Product Feed — wave 3, 1 operation
 - `BO-789` Transactional Notification Rules — wave 3, 1 operation
 - `BO-793` AI Content, Translation & Audit — wave 3, 3 operations
-- `BO-798` Intent & Knowledge Management — wave 3, 1 operation
+- `BO-798` Intent & Knowledge Management — wave 3, 3 operations
 - `BO-919` AI Event Resource Forecasting — wave 3, 3 operations
 - `BO-925` AI Staff Recommendation & Workforce Matching — wave 3, 2 operations
 - `BO-926` Resource Demand Forecasting — wave 3, 2 operations
-- `BO-927` AI Staffing Requirement Forecast — wave 3, 3 operations
+- `BO-927` AI Staffing Requirement Forecast — wave 3, 5 operations
 - `BO-928` AI Conflict Resolution Assistant — wave 3, 4 operations
 - `BO-929` Automatic Schedule Optimization — wave 3, 3 operations
 - `BO-931` Operational Scenario Simulator & Digital Twin — wave 3, 2 operations
@@ -419,12 +432,9 @@
 
 - `ADM-004` Platform Audit Log — wave 2, 2 operations
 - `ADM-037` AI Provider & Credentials — wave 1, 10 operations
-- `ADM-047` AI Delivery Optimization & Communication Platform Diagnostics — wave 3, 1 operation
-- `ADM-249` Unified Approval Inbox & Decision Workspace — wave 3, 1 operation
-- `ADM-366` AI Approval Intelligence Center — wave 3, 1 operation
 - `ADM-469` AI Configuration Home & Start — wave 3, 3 operations
 - `ADM-470` Setup Type & Business Intent Discovery — wave 3, 4 operations
-- `ADM-471` Venue & Business Model Discovery — wave 3, 2 operations
+- `ADM-471` Venue & Business Model Discovery — wave 3, 3 operations
 - `ADM-472` Guided Question & Answer Workspace — wave 3, 2 operations
 - `ADM-473` Product & Admission Model Discovery — wave 3, 2 operations
 - `ADM-474` Operational Requirement Discovery — wave 3, 2 operations
@@ -476,7 +486,7 @@
 - `ADM-520` AI Capability Registry & Ownership — wave 3, 2 operations
 - `ADM-521` AI Risk Classification & Assessment — wave 3, 2 operations
 - `ADM-522` AI Autonomy Level Configuration — wave 3, 3 operations
-- `ADM-523` AI Action & Permission Policy Builder — wave 3, 4 operations
+- `ADM-523` AI Action & Permission Policy Builder — wave 3, 3 operations
 - `ADM-524` AI Data Access & Usage Policy — wave 3, 2 operations
 - `ADM-525` Environment, Tenant & Scope Governance — wave 3, 2 operations
 - `ADM-526` AI Policy Conflict, Exception & Override Management — wave 3, 4 operations
@@ -489,7 +499,7 @@
 - `ADM-533` Human Review, Challenge & AI Clarification Workspace — wave 3, 3 operations
 - `ADM-534` Escalation, Delegation & Approval SLA Management — wave 3, 2 operations
 - `ADM-535` Live AI Execution Oversight & Human Intervention — wave 3, 5 operations
-- `ADM-536` Human Override & Manual Control Center — wave 3, 4 operations
+- `ADM-536` Human Override & Manual Control Center — wave 3, 7 operations
 - `ADM-537` Approval & Intervention History / Decision Timeline — wave 3, 2 operations
 - `ADM-538` Human Oversight Workflow Simulator & Readiness Center — wave 3, 2 operations
 - `ADM-539` AI Explainability & Audit Command Center — wave 3, 1 operation
@@ -512,16 +522,6 @@
 - `ADM-556` AI Incident & Remediation Management — wave 3, 6 operations
 - `ADM-557` AI Compliance, Assurance & Governance Reporting — wave 3, 3 operations
 - `ADM-558` AI Governance Review, Action Plan & Continuous Improvement — wave 3, 2 operations
-- `ADM-633` Fraud Alert, Investigation & Case Management\t170 — wave 3, 9 operations
-- `ADM-637` AI Fraud, Anomaly & Payment Intelligence Center\t175 — wave 3, 3 operations
-- `ADM-638` Payment Executive Intelligence, Risk Simulator & AI Advisor\t176 — wave 3, 1 operation
-- `ADM-678` Journey Simulator, Decision Trace & AI Optimization — wave 3, 1 operation
-- `ADM-680` Customer Recommendation Profile — wave 3, 2 operations
-- `ADM-683` Next-Best-Offer Decision Studio — wave 3, 1 operation
-- `ADM-686` Anonymous, Known & Identity-Transition Personalization.123 — wave 3, 1 operation
-- `ADM-687` AI Explainability, Confidence & Model Governance — wave 3, 1 operation
-- `ADM-696` AI Risk, Fairness, Explainability & Safety Center — wave 3, 1 operation
-- `ADM-697` Recommendation Audit, Decision Trace & Investigation — wave 3, 1 operation
 
 **P10 Partner Web**
 
@@ -538,6 +538,7 @@
 - `CMS-007` Page Builder — wave 2, 2 operations
 - `CMS-008` Content Blocks — wave 2, 2 operations
 - `CMS-010` Media Library — wave 2, 1 operation
+- `CMS-011` Translations — wave 2, 1 operation
 - `CMS-062` Central Digital Asset Library — wave 3, 1 operation
 - `CMS-101` Help Me Choose — wave 2, 2 operations
 - `CMS-104` App Build & Store Publishing — wave 1, 2 operations
@@ -559,8 +560,9 @@
 - `ANL-056` Root-Cause Analysis Explorer — wave 3, 2 operations
 - `ANL-057` Forecasting & Predictive Analytics Studio — wave 3, 4 operations
 - `ANL-058` AI Recommendation & Next-Best-Action Center — wave 3, 1 operation
-- `ANL-059` AI Insight History, Evidence & Explainability — wave 3, 2 operations
-- `ANL-060` AI Analytics Governance & Model Control — wave 3, 8 operations
+- `ANL-059` AI Insight History, Evidence & Explainability — wave 3, 4 operations
+- `ANL-060` AI Analytics Governance & Model Control — wave 3, 7 operations
+- `ANL-070` Analytics Governance, Security & Audit Center — wave 3, 2 operations
 - `ANL-071` AI Maturity & Learning — wave 3, 6 operations
 
 ## Flows
@@ -607,6 +609,7 @@
 | [Phase 0 — identity pass, all clusters](..\docs\active\phase0-identity-pass-all-clusters.md) |  | 2 |
 | [Active](..\docs\active\README.md) |  | 1 |
 | [> **SUPERSEDED, 20 September.** Written when 151 of 223 were reviewed and the review was](..\docs\active\rename-worklist-20-september.md) |  | 2 |
+| [Root issues by class, and the guard that closes each](..\docs\active\root-classes.md) |  | 4 |
 | [Schema merge — the decision log](..\docs\active\schema-merge-decision-log.md) |  | 2 |
 | [Schema merge — final report](..\docs\active\schema-merge-final-report-20-september.md) |  | 2 |
 | [Identical operation sets — what each cluster actually is](..\docs\active\screen-duplicate-triage.md) |  | 5 |
@@ -619,6 +622,7 @@
 | [Viewer — what changed in the package on 20 August](..\docs\active\viewer-update-brief-20aug.md) |  | 1 |
 | [Workshop pack — what was done, and how to re-verify it](..\docs\active\workshop-pack-log.md) |  | 3 |
 | [ADR-0007: Hybrid repository topology](..\docs\adr\0007-hybrid-repository-topology.md) | Accepted | 1 |
+| [ADR-0009: AI Data Residency](..\docs\adr\0009-ai-data-residency.md) | Accepted · section 2 amended by [ADR-0049](0049-vectors-live | 1 |
 | [ADR-0020 — Where AI runs, and what it is isolated from](..\docs\adr\0020-ai-isolation-boundary.md) | Accepted · 30 September 2026 · Chinmay Parab — amended by [A | 20 |
 | [ADR-0021 — Qdrant: one collection per embedding model, tenant is the shard, scope is the filter](..\docs\adr\0021-qdrant-partitioning.md) | Accepted in part · amended by [ADR-0049](0049-vectors-live-i | 4 |
 | [ADR-0023 — Personal data lives apart from the append-only ledger](..\docs\adr\0023-pii-separation.md) | Accepted · 17 August 2026, recording a decision already impl | 2 |
@@ -639,7 +643,7 @@
 | [ADR-0059: AI phasing against the six-month plan](..\docs\adr\0059-ai-phasing-against-the-six-month-plan.md) | Accepted · 30 September 2026 · Chinmay Parab | 6 |
 | [ADR-0060: Availability targets per tier, and how they are met](..\docs\adr\0060-availability-targets-high-availability-and-disaster-recovery.md) | Proposed · waiting on the client (which services the 99.99%  | 1 |
 | [ADR-0061: Replica floors are set per deployable and per zone](..\docs\adr\0061-replica-floors-per-deployable.md) | Accepted · 1 October 2026 · Chinmay Parab | 1 |
-| [ADR-0063: Encryption and keys, and biometric templates stay with the biometric vendor](..\docs\adr\0063-encryption-keys-and-biometric-templates.md) | Proposed · waiting on the client's data protection officer ( | 1 |
+| [ADR-0063: Encryption and keys, and biometric templates stay with the biometric vendor](..\docs\adr\0063-encryption-keys-and-biometric-templates.md) | Accepted in part · 2 October 2026: the biometric consent, en | 1 |
 | [ADR-0064: Every tenant has a request budget, and a busy tenant cannot starve the others](..\docs\adr\0064-per-tenant-limits.md) | Accepted · 1 October 2026 · Chinmay Parab | 1 |
 | [AI provider credentials — where the key lives and who can reach it](..\docs\architecture\ai-credentials.md) |  | 3 |
 | [TICVAI AI subsystem: system design](..\docs\architecture\ai-system-design.md) |  | 162 |

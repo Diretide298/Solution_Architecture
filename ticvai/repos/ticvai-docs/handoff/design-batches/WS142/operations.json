@@ -241,30 +241,6 @@
   "requestBody": null,
   "responds": "Page"
  },
- "listMyCases": {
-  "method": "GET",
-  "path": "/my/cases",
-  "contract": "marketing-crm",
-  "summary": "The cases this guest raised",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- },
  "listServiceQueues": {
   "method": "GET",
   "path": "/service-queues",
@@ -353,25 +329,6 @@
   "requestBody": null,
   "responds": "SlaPolicyServiceLevelManagementView"
  },
- "setApprovalSlaPolicy": {
-  "method": "PUT",
-  "path": "/approval-sla-policies",
-  "contract": "approvals",
-  "summary": "How long a decision may take, and what happens when it does not",
-  "permission": "APPROVAL_CONFIGURE",
-  "offlineCapable": null,
-  "conflictPolicy": null,
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "ApprovalSlaPolicy",
-  "responds": "ApprovalSlaPolicy"
- },
  "setCaseCategoryDefinition": {
   "method": "PUT",
   "path": "/case-categories",
@@ -390,44 +347,6 @@
   ],
   "requestBody": "CaseCategory",
   "responds": "CaseCategory"
- },
- "setCaseInvestigationResolution": {
-  "method": "PUT",
-  "path": "/case-investigation-resolution",
-  "contract": "marketing-crm",
-  "summary": "Link a record to a case",
-  "permission": "CASE_MANAGE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "CaseInvestigationResolutionWorkspaceInput",
-  "responds": "CaseInvestigationResolutionWorkspaceView"
- },
- "setRefundCompensationService": {
-  "method": "PUT",
-  "path": "/refund-compensation-service",
-  "contract": "marketing-crm",
-  "summary": "Raise or change a refund, compensation or policy-exception request on a case",
-  "permission": "ORDER_REFUND",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "RefundCompensationServiceExceptionWorkspaceInput",
-  "responds": "RefundCompensationServiceExceptionWorkspaceView"
  },
  "setSlaPolicy": {
   "method": "PUT",

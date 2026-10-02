@@ -46,7 +46,7 @@
     {
      "to": "WEB-008",
      "trigger": "Add-ons & Upsell",
-     "provenance": "derived — WEB-008 declares entryState.params bundleId and WEB-005 holds none of them. The edge carries nothing: WEB-008 opens on listCatalogueBundles, and bundleId has no source on WEB-008 yet (a gap in WEB-008, not in this edge)"
+     "provenance": "derived — WEB-008 declares entryState.params bundleId and WEB-005 holds none of them, so the edge carries nothing and WEB-008 opens cold"
     },
     {
      "to": "WEB-010",
@@ -151,7 +151,7 @@
         "BookingFlow.steps"
        ],
        "operation": "getPublishedBookingFlow",
-       "notes": "The steps of the published flow in their `sortOrder`, this one (tickets) highlighted. A step the flow has turned off is not shown and is skipped by Continue and Back.",
+       "notes": "The steps of the published flow in their `sortOrder`, this one (tickets) highlighted. A step the flow has turned off is not shown and is skipped by Continue and Back. Drawn in the venue's `BookingFlowSettings.stepIndicator` style; `embedMode` and `singleEventPage` come from the same published settings (CMS-016) (CHG-SGU-022).",
        "provenance": "decided 29 September 2026, W12; CMS-103 Booking Flows"
       },
       {
@@ -256,7 +256,7 @@
     "verified": "2026-10-01",
     "match": "partial",
     "view": "Engine controls → Theme park → Multi-park combo → Book → Fri → 2 park ticket → three adults (the counters take the 2 park ticket's price; one cart line)",
-    "differences": "Ticket choice is on the same step as date and time and comes last: 'Date → time → ticket' (Config 'Performance reveal', Rev 3 item 2), whereas YAML goes WEB-005 → WEB-006. Prototype adds category → subcategory browsing, info-only (not bookable) products, 'Help me choose' questions, location switcher ('Booking at' bar), quick tour. Promo codes are entered in the cart, not on this step (YAML keeps evaluatePromotions here). 30 September: the guest counters take their price from the ticket chosen (2 park ticket, three adults: one line, AED 1,425), and Group / school booking starts from four group tickets with a typed headcount. The same flow's Read more panel still prices guests at single-park rates (Adult AED 325, Infant AED 475): a prototype defect; the counters on the page are the reference."
+    "differences": "Ticket choice is on the same step as date and time and comes last: 'Date → time → ticket' (Config 'Performance reveal', Rev 3 item 2), whereas YAML goes WEB-005 → WEB-006. Prototype adds category → subcategory browsing, info-only (not bookable) products, 'Help me choose' questions, location switcher ('Booking at' bar), quick tour. Promo codes are entered in the cart, not on this step (YAML keeps evaluatePromotions here). 30 September: the guest counters take their price from the ticket chosen (2 park ticket, three adults: one line, AED 1,425), and Group / school booking starts from four group tickets with a typed headcount. The same flow's Read more panel still prices guests at single-park rates (Adult AED 325, Infant AED 475): a prototype defect; the counters on the page are the reference. **Do not copy the Read more panel's prices on the multi-park flow** (Adult AED 325, Infant AED 475 are single-park rates): a prototype defect; the counters on the page are the reference (CHG-SGU-020)."
    }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
@@ -360,7 +360,7 @@
     {
      "to": "WEB-008",
      "trigger": "Add-ons & Upsell",
-     "provenance": "derived — WEB-008 declares entryState.params bundleId and WEB-006 holds none of them. The edge carries nothing: WEB-008 opens on listCatalogueBundles, and bundleId has no source on WEB-008 yet (a gap in WEB-008, not in this edge)"
+     "provenance": "derived — WEB-008 declares entryState.params bundleId and WEB-006 holds none of them, so the edge carries nothing and WEB-008 opens cold"
     },
     {
      "to": "WEB-010",
@@ -491,7 +491,7 @@
         "BookingFlow.steps"
        ],
        "operation": "getPublishedBookingFlow",
-       "notes": "The steps of the published flow in their `sortOrder`, this one (date and time) highlighted. A step the flow has turned off is not shown and is skipped by Continue and Back.",
+       "notes": "The steps of the published flow in their `sortOrder`, this one (date and time) highlighted. A step the flow has turned off is not shown and is skipped by Continue and Back. Drawn in the venue's `BookingFlowSettings.stepIndicator` style; `embedMode` and `singleEventPage` come from the same published settings (CMS-016) (CHG-SGU-022).",
        "provenance": "decided 29 September 2026, W12; CMS-103 Booking Flows"
       }
      ]
@@ -697,7 +697,7 @@
     {
      "to": "WEB-008",
      "trigger": "Add-ons & Upsell",
-     "provenance": "derived — WEB-008 declares entryState.params bundleId and WEB-007 holds none of them. The edge carries nothing: WEB-008 opens on listCatalogueBundles, and bundleId has no source on WEB-008 yet (a gap in WEB-008, not in this edge)"
+     "provenance": "derived — WEB-008 declares entryState.params bundleId and WEB-007 holds none of them, so the edge carries nothing and WEB-008 opens cold"
     },
     {
      "to": "WEB-006",
@@ -749,7 +749,7 @@
       },
       {
        "kind": "banner",
-       "notes": "Hold countdown, always visible. A selection that expires silently while a guest enters card details is the worst outcome in this flow",
+       "notes": "**One countdown: `Cart.expiresAt`** (the earliest lease in the cart), always visible. The 8-minute seat hold and the 15-minute cart lease are never shown as two clocks; a selection that expires silently while a guest enters card details is the worst outcome in this flow (CHG-SGU-020).",
        "provenance": "carried from the previous definition"
       },
       {
@@ -789,7 +789,7 @@
         "BookingFlow.steps"
        ],
        "operation": "getPublishedBookingFlow",
-       "notes": "The steps of the published flow in their `sortOrder`, this one (seats) highlighted. A step the flow has turned off is not shown and is skipped by Continue and Back.",
+       "notes": "The steps of the published flow in their `sortOrder`, this one (seats) highlighted. A step the flow has turned off is not shown and is skipped by Continue and Back. Drawn in the venue's `BookingFlowSettings.stepIndicator` style; `embedMode` and `singleEventPage` come from the same published settings (CMS-016) (CHG-SGU-022).",
        "provenance": "decided 29 September 2026, W12; CMS-103 Booking Flows"
       }
      ]
@@ -1046,22 +1046,19 @@
      "slot": "record",
      "components": [
       {
-       "kind": "detailPanel",
-       "label": "The upsell suggestion",
-       "bindsTo": "UpsellSuggestion",
+       "kind": "cardList",
+       "label": "Suggested for you",
+       "bindsTo": "AiRecommendationItem",
        "columns": [
-        "UpsellSuggestion.variantId",
-        "UpsellSuggestion.bundleId",
-        "UpsellSuggestion.name",
-        "UpsellSuggestion.price",
-        "UpsellSuggestion.discountedPrice",
-        "UpsellSuggestion.source",
-        "UpsellSuggestion.ruleId",
-        "UpsellSuggestion.rank",
-        "UpsellSuggestion.rationale"
+        "AiRecommendationItem.productId",
+        "AiRecommendationItem.kind",
+        "AiRecommendationItem.priceRef",
+        "AiRecommendationItem.reasonText",
+        "AiRecommendationItem.rank"
        ],
-       "operation": "getUpsellSuggestions",
-       "provenance": "contract promotions.yaml POST /upsell-suggestions"
+       "operation": "decideRecommendations",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-016, design-notes correction)",
+       "notes": "The engine's slot (`decideRecommendations`, placement cart, maxItems 3: the client set at most three, DI-959), answered in Block A from the Promotions relationship map (ADR-0052). Each card shows the price from Pricing and the template reason; impressions and clicks go to `recordRecommendationEvents`."
       },
       {
        "kind": "detailPanel",
@@ -1086,25 +1083,8 @@
         "Bundle.isActive"
        ],
        "operation": "getBundle",
-       "provenance": "contract promotions.yaml GET /bundles/{bundleId}"
-      },
-      {
-       "kind": "dataTable",
-       "label": "Every bundle",
-       "bindsTo": "BundleSummary",
-       "columns": [
-        "BundleSummary.venueId",
-        "BundleSummary.publishedAt",
-        "BundleSummary.publishedBy",
-        "BundleSummary.contentHash",
-        "BundleSummary.signatureKeyId",
-        "BundleSummary.staleAfter",
-        "BundleSummary.sizeBytes",
-        "BundleSummary.note",
-        "BundleSummary.appliedByWorkstations"
-       ],
-       "operation": "listCatalogueBundles",
-       "provenance": "contract catalogue.yaml GET /catalogue/bundles"
+       "provenance": "contract promotions.yaml GET /bundles/{bundleId}",
+       "notes": "A bundle the recommendation slot names (`kind` bundle), opened from its card; signed catalogue snapshots (`listCatalogueBundles`) are the tills', not the guest's (R269)."
       },
       {
        "kind": "progressIndicator",
@@ -1114,7 +1094,7 @@
         "BookingFlow.steps"
        ],
        "operation": "getPublishedBookingFlow",
-       "notes": "The steps of the published flow in their `sortOrder`, this one (extras) highlighted. A step the flow has turned off is not shown and is skipped by Continue and Back.",
+       "notes": "The steps of the published flow in their `sortOrder`, this one (extras) highlighted. A step the flow has turned off is not shown and is skipped by Continue and Back. Drawn in the venue's `BookingFlowSettings.stepIndicator` style; `embedMode` and `singleEventPage` come from the same published settings (CMS-016) (CHG-SGU-022).",
        "provenance": "decided 29 September 2026, W12; CMS-103 Booking Flows"
       }
      ]
@@ -1134,10 +1114,9 @@
    ]
   },
   "states": {
-   "loading": "The add-ons upsell, read by `getUpsellSuggestions`.",
+   "loading": "The add-ons, read by `decideRecommendations`.",
    "error": "Could not load. Names which read failed and leaves the add-ons upsell untouched.",
-   "emptyFirstRun": "No add-ons upsell yet. Offers Add cart line (`addCartLine`).",
-   "emptyNoResults": "Never shown: `listCatalogueBundles` takes no filter, so an empty list is always the first-run state above.",
+   "emptyFirstRun": "No add-ons for this booking: the step is skipped and Continue goes on to sign-in.",
    "emptyNoAccess": "**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
@@ -1155,15 +1134,9 @@
     "trigger": "onAction"
    },
    {
-    "operationId": "listCatalogueBundles",
-    "contract": "catalogue",
-    "purpose": "Which bundles apply here",
-    "trigger": "onLoad"
-   },
-   {
     "operationId": "decideRecommendations",
     "contract": "ai",
-    "purpose": "Fill a recommendation slot",
+    "purpose": "Fill the cart slot, maxItems 3 (DI-959)",
     "trigger": "onLoad",
     "provenance": "build, 29 September 2026"
    },
@@ -1337,6 +1310,12 @@
        "label": "Confirm",
        "notes": "**The consequence goes in the body, not the title.** *Cancel 3 orders worth AED 480* is a confirmation; *are you sure* is not — and a dialog that cannot name what it destroys is a dialog somebody dismisses.\n\n**Added 31 August.** `confirmDialog` and `modal` were both in the component library and used **zero times across 492 screens**, while `destructiveButton` was used 39 times and its own entry reads *always requires confirmation*.",
        "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Browse",
+       "notes": "Shown when the list is empty: saving is done with the heart on the product and date cards (WEB-005, WEB-006, GST-004), never by typing an id here.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)"
       }
      ]
     },
@@ -1345,16 +1324,17 @@
      "slot": "rowActions",
      "components": [
       {
-       "kind": "primaryButton",
-       "label": "Add to wishlist",
-       "operation": "addToWishlist",
-       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/wishlist"
-      },
-      {
        "kind": "destructiveButton",
        "label": "Remove from wishlist",
        "operation": "removeFromWishlist",
        "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/wishlist/{itemId}"
+      },
+      {
+       "kind": "toast",
+       "label": "Removed. Undo",
+       "operation": "addToWishlist",
+       "notes": "The 5-second Undo after Remove; re-saves the same entry.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)"
       }
      ]
     }
@@ -1366,25 +1346,6 @@
     "component": "confirmDialog",
     "trigger": "Remove from wishlist",
     "body": "**Names what `removeFromWishlist` changes and what it leaves alone**, in the consequence rather than the verb. A wishlist this affects should be identified in the dialog, not just counted.",
-    "provenance": "client-verified"
-   },
-   {
-    "id": "formAddToWishlist",
-    "component": "modal",
-    "trigger": "Add to wishlist",
-    "body": "**Collects what `addToWishlist` sends before it is called.** Required: `variantId`. Optional: `performanceId`, `note`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Add to wishlist",
-     "operation": "addToWishlist"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "variantId",
-      "performanceId",
-      "note"
-     ]
-    },
     "provenance": "client-verified"
    }
   ],
@@ -1405,7 +1366,7 @@
    {
     "operationId": "addToWishlist",
     "contract": "marketing-crm",
-    "purpose": "Save an item",
+    "purpose": "Undo after a remove re-saves the same variant and date (idempotent); saving itself happens on the product and date cards",
     "trigger": "onAction"
    },
    {

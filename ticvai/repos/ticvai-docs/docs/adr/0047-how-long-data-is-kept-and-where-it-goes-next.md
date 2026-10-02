@@ -191,6 +191,15 @@ reproduced by hand when somebody disputes one.
 **The guest-profile ceiling**, proposed at seven years. Five is the default and a tenant may extend;
 the question is how far before the platform refuses.
 
+**Retention per data category and region: research first (2 October 2026, open).** Asked on BO-192
+(biometric lifecycle and retention) what the lawful periods are per data category and region, Chinmay
+decided: *research UAE and GCC law and propose defaults per category, marked "pending counsel"* (DEC-240;
+rejected and superseded accreditation document files follow the same research, DEC-459; both in
+`docs/registers/decisions-2-october.md`, change entry CHG-DOC-008). **Nothing in the table above changes
+until that research lands**: the rows stay as they are, and a category the table does not name has no
+default yet. When the research arrives, each proposed default enters the table with "pending counsel"
+beside it, and a seeded retention setting carries the same flag until the client's DPO signs it off.
+
 **~~The RPO floor~~ — decided 21 September, Chinmay, and the recommendation was taken.**
 
     asynchronous    several-minute RPO -- the default, and what every tenant gets

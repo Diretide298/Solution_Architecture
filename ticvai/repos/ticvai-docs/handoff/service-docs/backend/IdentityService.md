@@ -7,7 +7,7 @@
 | Tier | foundation: Read by everything, reads nothing above. Deploys first and alone. |
 | Contracts | `identity` |
 | Schemas owned | `identity`, `pii` |
-| Operations in the slice | 37 of 89 |
+| Operations in the slice | 37 of 94 |
 | Scale | Read-heavy, latency-critical, cached hard. Every request resolves a principal. |
 | If it is down | A restart is an outage everywhere. Deploys go out first and alone. |
 
@@ -28,109 +28,51 @@
 
 | Group | Operation | Method | Path | Part | Wave | Called by |
 |---|---|---|---|---|---|---|
-| administration | [`createPrincipal`](#createprincipal) | POST | `/principals` | setup | 1 | ADM-020, ADM-421, BO-053, PTR-003 |
 | administration | [`createRole`](#createrole) | POST | `/roles` | setup | 1 | ADM-021, BO-054 |
-| administration | [`listPrincipals`](#listprincipals) | GET | `/principals` | core | 1 | ADM-020, ANL-003, BO-053, BO-057, BO-873, CMS-019 … |
-| administration | [`listRoles`](#listroles) | GET | `/roles` | core | 2 | ADM-021, BO-054, BO-106, BO-142, CMS-019, EMP-002 |
-| administration | [`openPlatformStaffGrant`](#openplatformstaffgrant) | POST | `/platform-staff-grants` | core | 2 | ADM-005, ADM-016, ADM-017, ADM-018, ADM-019, ADM-031 … |
-| administration | [`updatePrincipal`](#updateprincipal) | PATCH | `/principals/{principalId}` | setup | 1 | ADM-020, BO-053, PTR-003 |
+| administration | [`listOwnPlatformStaffGrants`](#listownplatformstaffgrants) | GET | `/platform-staff-grants/mine` | core | 2 | ADM-004, ADM-005, ADM-006, ADM-015, ADM-016, ADM-017 … |
+| administration | [`listPrincipals`](#listprincipals) | GET | `/principals` | core | 2 | ADM-020, ANL-003, BO-053, BO-057, BO-873, CMS-019 … |
+| administration | [`listRoles`](#listroles) | GET | `/roles` | core | 2 | ADM-021, BO-054, BO-106, CMS-019 |
+| administration | [`openPlatformStaffGrant`](#openplatformstaffgrant) | POST | `/platform-staff-grants` | core | 2 | ADM-004, ADM-005, ADM-006, ADM-015, ADM-016, ADM-017 … |
+| administration | [`updatePrincipal`](#updateprincipal) | PATCH | `/principals/{principalId}` | core | 2 | ADM-020, BO-053, BO-054, CMS-019, PTR-003 |
 | guestAuth | [`deleteGuestAccount`](#deleteguestaccount) | DELETE | `/auth/guest/account` | core | 2 | GST-066, WEB-024 |
 | guestAuth | [`getGuestSession`](#getguestsession) | GET | `/auth/guest/session` | core | 1 | GST-042, GST-073, WEB-016 |
-| guestAuth | [`getMyIdentityVerification`](#getmyidentityverification) | GET | `/auth/guest/identity-verifications/current` | core | 1 | GST-073, WEB-020 |
+| guestAuth | [`getMyIdentityVerification`](#getmyidentityverification) | GET | `/auth/guest/identity-verifications/current` | core | 1 | WEB-020 |
 | guestAuth | [`guestLogout`](#guestlogout) | DELETE | `/auth/guest/session` | core | 1 | GST-042, GST-073, WEB-016 |
 | guestAuth | [`guestPasswordLogin`](#guestpasswordlogin) | POST | `/auth/guest/password` | core | 1 | GST-042, WEB-016 |
 | guestAuth | [`guestSocialLogin`](#guestsociallogin) | POST | `/auth/guest/social` | core | 1 | GST-042, WEB-016 |
 | guestAuth | [`guestUaePassLogin`](#guestuaepasslogin) | POST | `/auth/guest/uae-pass` | core | 1 | GST-042, WEB-016 |
-| guestAuth | [`linkGuestCheckout`](#linkguestcheckout) | POST | `/auth/guest/link-checkout` | core | 1 | GST-042, WEB-016 |
+| guestAuth | [`linkGuestCheckout`](#linkguestcheckout) | POST | `/auth/guest/link-checkout` | core | 1 | GST-010, GST-042, WEB-013, WEB-016 |
 | guestAuth | [`registerGuest`](#registerguest) | POST | `/auth/guest/register` | core | 1 | GST-042, WEB-016 |
 | guestAuth | [`requestGuestOtp`](#requestguestotp) | POST | `/auth/guest/otp` | core | 1 | GST-042, WEB-016 |
-| guestAuth | [`submitGuestIdentityDocument`](#submitguestidentitydocument) | POST | `/auth/guest/identity-verifications` | core | 1 | GST-073, WEB-020 |
+| guestAuth | [`submitGuestIdentityDocument`](#submitguestidentitydocument) | POST | `/auth/guest/identity-verifications` | core | 1 | WEB-020 |
 | guestAuth | [`verifyGuestOtp`](#verifyguestotp) | POST | `/auth/guest/otp/verify` | core | 1 | GST-042, WEB-016 |
-| identity | [`changeOwnCredential`](#changeowncredential) | POST | `/auth/credential` | core | 1 | POS-000 |
+| identity | [`changeOwnCredential`](#changeowncredential) | POST | `/auth/credential` | core | 1 | ADM-001, ADM-699, EMP-001, POS-000, PTR-001, SCN-001 … |
 | identity | [`exportSubjectData`](#exportsubjectdata) | POST | `/guests/{subjectId}/data-export` | core | 2 | GST-066, WEB-024 |
-| identity | [`forceLogout`](#forcelogout) | POST | `/auth/sessions/{sessionId}/force-logout` | core | 1 | ADM-001, POS-000, PTR-001, SUP-001 |
+| identity | [`forceLogout`](#forcelogout) | POST | `/auth/sessions/{sessionId}/force-logout` | core | 1 | BO-053, POS-000 |
 | identity | [`getCurrentSession`](#getcurrentsession) | GET | `/auth/session` | core | 1 | ADM-001, EMP-001, EMP-002, EMP-042, POS-000, PTR-001 … |
-| identity | [`grantDelegation`](#grantdelegation) | POST | `/guests/{subjectId}/delegations` | core | 2 | GST-015, WEB-024 |
-| identity | [`listDelegations`](#listdelegations) | GET | `/guests/{subjectId}/delegations` | core | 2 | BO-385, GST-015, GST-069, WEB-024 |
+| identity | [`grantDelegation`](#grantdelegation) | POST | `/guests/{subjectId}/delegations` | core | 2 | GST-015 |
+| identity | [`listDelegations`](#listdelegations) | GET | `/guests/{subjectId}/delegations` | core | 2 | GST-015, GST-069, WEB-024 |
 | identity | [`login`](#login) | POST | `/auth/login` | core | 1 | ADM-001, EMP-001, POS-000, PTR-001, SCN-001, SUP-001 |
 | identity | [`refreshToken`](#refreshtoken) | POST | `/auth/refresh` | core | 1 | GST-042, WEB-016 |
-| identity | [`selectRole`](#selectrole) | POST | `/auth/select-role` | core | 1 | EMP-002, POS-000, POS-001, SCN-001 |
+| identity | [`selectRole`](#selectrole) | POST | `/auth/select-role` | core | 1 | ADM-001, EMP-001, EMP-002, POS-000, POS-001, PTR-001 … |
 | identity | [`setGuestVerificationPolicy`](#setguestverificationpolicy) | PUT | `/guest-verification-policy` | setup | 1 | ADM-342 |
-| identity | [`setPasswordPolicy`](#setpasswordpolicy) | PUT | `/password-policy` | setup | 1 | ADM-342, ADM-421 |
+| identity | [`setPasswordPolicy`](#setpasswordpolicy) | PUT | `/password-policy` | setup | 1 | ADM-342, ADM-422 |
 | identity | [`verifyGuestEmail`](#verifyguestemail) | POST | `/auth/guest/verify-email` | core | 1 | GST-073, WEB-020 |
-| mfa | [`createMfaChallenge`](#createmfachallenge) | POST | `/auth/mfa/challenge` | core | 1 | ADM-001, EMP-001, GST-042, GST-073, POS-000, PTR-001 … |
-| mfa | [`enrolMfaMethod`](#enrolmfamethod) | POST | `/auth/mfa/methods` | core | 2 | ADM-001, EMP-042, GST-073, WEB-024 |
-| mfa | [`listMfaMethods`](#listmfamethods) | GET | `/auth/mfa/methods` | core | 2 | ADM-001, ADM-342, EMP-001, EMP-002, EMP-042, GST-073 … |
-| mfa | [`removeMfaMethod`](#removemfamethod) | DELETE | `/auth/mfa/methods/{methodId}` | core | 2 | ADM-001, EMP-042, GST-073, WEB-024 |
-| mfa | [`verifyMfaChallenge`](#verifymfachallenge) | POST | `/auth/mfa/challenge/{challengeId}/verify` | core | 1 | ADM-001, EMP-001, GST-042, GST-073, POS-000, PTR-001 … |
-| mfa | [`verifyMfaEnrolment`](#verifymfaenrolment) | POST | `/auth/mfa/methods/{methodId}` | core | 2 | ADM-001, EMP-042, GST-073, WEB-024 |
-| session | [`listActiveSessions`](#listactivesessions) | GET | `/auth/sessions` | core | 1 | ADM-001, POS-000, PTR-001, SUP-001 |
+| mfa | [`createMfaChallenge`](#createmfachallenge) | POST | `/auth/mfa/challenge` | core | 1 | ADM-001, ADM-247, ADM-699, ADM-700, BO-053, BO-284 … |
+| mfa | [`enrolMfaMethod`](#enrolmfamethod) | POST | `/auth/mfa/methods` | core | 2 | ADM-001, ADM-699, EMP-042, GST-073, PTR-001, SUP-001 … |
+| mfa | [`listMfaMethods`](#listmfamethods) | GET | `/auth/mfa/methods` | core | 2 | ADM-342, ADM-699, EMP-042, GST-073, WEB-024 |
+| mfa | [`removeMfaMethod`](#removemfamethod) | DELETE | `/auth/mfa/methods/{methodId}` | core | 2 | ADM-699, EMP-042, GST-073, WEB-024 |
+| mfa | [`verifyMfaChallenge`](#verifymfachallenge) | POST | `/auth/mfa/challenge/{challengeId}/verify` | core | 1 | ADM-001, ADM-247, ADM-699, ADM-700, BO-053, BO-284 … |
+| mfa | [`verifyMfaEnrolment`](#verifymfaenrolment) | POST | `/auth/mfa/methods/{methodId}` | core | 2 | ADM-001, ADM-699, EMP-042, GST-073, PTR-001, SUP-001 … |
+| session | [`listActiveSessions`](#listactivesessions) | GET | `/auth/sessions` | core | 1 | BO-053, POS-000 |
 
 ## Group: administration
-
-### createPrincipal
-
-**`POST /principals`**: Create a principal
-
-|  |  |
-|---|---|
-| Permission | `USER_MANAGE` |
-| Scope level | venue |
-| Part of slice | setup, makes `identity.principal` non-empty |
-| Wave | 1 |
-| Offline | no |
-| Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `identity.principal` |
-| Writes | `cache:idempotency`, `identity.principal`, `identity.principal_credential` |
-| Called by | ADM-020, ADM-421, BO-053, PTR-003 |
-
-**Parameters**
-
-| Name | In | Required | Type | Notes |
-|---|---|---|---|---|
-| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
-
-**Request body**: `CreatePrincipalRequest`
-
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| username | string | yes | (max length 256) |
-| displayName | string | yes | (max length 200) |
-| initialCredential | string |  | (max length 512) |
-| mustChangeCredential | boolean |  | (default True) |
-| validTo | string (date-time) |  |  |
-| roleIds | array of string (uuid) |  |  |
-
-**Response**: `Principal`
-
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| id | string (uuid) | yes |  |
-| username | string | yes |  |
-| displayName | string | yes |  |
-| isActive | boolean | yes |  |
-| validFrom | string (date-time) |  | (nullable) |
-| validTo | string (date-time) |  | Past this, resolution returns DENY regardless of grants. (nullable) |
-| primaryRoleId | string (uuid) |  | Determines the landing screen when the principal holds several roles and picks one at login. (nullable) |
-| roles | array of RoleSummary |  |  |
-| roles[].id | string (uuid) | yes |  |
-| roles[].code | string | yes |  |
-| roles[].name | string | yes |  |
-| roles[].isPrimary | boolean |  |  |
-| lastLoginAt | string (date-time) |  | (nullable) |
-
-**Responses**
-
-| Code | Shape | Meaning |
-|---|---|---|
-| 201 |  | Created. |
-| 400 | BadRequest | Validation failed |
-| 409 |  | Username already in use within this cell |
-| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### createRole
 
 **`POST /roles`**: Create a role
+
+**Start from a preset, then edit the checklist** (decided 2 October 2026, Chinmay; DEC-007; CHG-CSP-003). `presetCodes` names one or more presets (`listCapabilityTemplates`); their permissions are copied into the new role, unioned with any `permissions` sent, and the copy binds to nothing: changing a preset later never widens a role made from it. With neither, the role starts empty and the checklist is ticked by hand. The initial set is checked as `setRolePermissions` checks it: a set that breaches a `SegregationRule` is refused `422 segregation-breach`, naming the rule. An unknown preset code is `422 unknown-preset`.
 
 |  |  |
 |---|---|
@@ -157,6 +99,8 @@
 | code | string | yes | Unique within the tenant, compared case-insensitively (decided 28 September, audit R108). (max length 64; pattern ^[A-Za-z0-9_-]+$) |
 | name | string | yes | (max length 200) |
 | description | string |  | (max length 500) |
+| presetCodes | array of string |  | Presets (CapabilityTemplate.code) whose permissions fill the new role's checklist; copied, never bound (CHG-CSP-003). |
+| permissions | array of Permission: enum (SESSION_FORCE_LOGOUT, USER_MANAGE, ROLE_MANAGE, PERMISSION_GRANT, PERMISSION_VIEW, PERMISSION_MANAGE, PLATFORM_TENANT_VIEW, PLATFORM_TENANT_MANAGE, …) |  | Permissions ticked on the checklist beyond the presets. |
 
 **Response**: `Role`
 
@@ -169,6 +113,7 @@
 | permissions | array of Permission: enum (SESSION_FORCE_LOGOUT, USER_MANAGE, ROLE_MANAGE, PERMISSION_GRANT, PERMISSION_VIEW, PERMISSION_MANAGE, PLATFORM_TENANT_VIEW, PLATFORM_TENANT_MANAGE, …) |  | A role that grants no permissions is not a role. |
 | inheritsFromRoleId | string (uuid) |  | Role composition, one level deep and no deeper. (nullable) |
 | isSystem | boolean |  | Seeded roles ship and are editable; deleting one is refused. (default False) |
+| presetCode | string |  | The preset this role was started from, for the record only (decided 2 October 2026, Chinmay; DEC-007; CHG-CSP-003): the first of createRole.presetCodes, or null for a role ticked by hand. (max length 64; read-only; nullable) |
 | principalCount | integer |  |  |
 | grantCount | integer |  |  |
 
@@ -178,6 +123,59 @@
 |---|---|---|
 | 201 |  | Created |
 | 409 | DuplicateCode | A business code the request names is already used within its uniqueness scope (the scope the property's x-ticvai-unique names; decided 28 September, audit R108). |
+| 422 |  | A preset code that does not exist (unknown-preset), or an initial permission set that breaches a segregation rule (segregation-breach, naming the rule and both permissions). |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
+### listOwnPlatformStaffGrants
+
+**`GET /platform-staff-grants/mine`**: The calling platform operator's own grants into this tenant
+
+**How a P09 screen finds a grant already open after a reload** (decided 28 September, audit R098). Callable with `PLATFORM_TENANT_ACCESS`, the permission that opens a grant, so the operator needs no tenant grant to read it; `listPlatformStaffGrants` needs `AUDIT_VIEW`, which the operator only has if a grant carries it. Returns only grants whose `operatorPrincipalId` is the caller, most recent first.
+
+|  |  |
+|---|---|
+| Permission | `PLATFORM_TENANT_ACCESS` |
+| Scope level | tenant |
+| Part of slice | core |
+| Wave | 2 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | replica |
+| Reads | `identity.platform_staff_grant` |
+| Writes | - |
+| Called by | ADM-004, ADM-005, ADM-006, ADM-015, ADM-016, ADM-017, ADM-018, ADM-019, ADM-020, ADM-021, ADM-026, ADM-031, ADM-037, ADM-068, ADM-411, ADM-412, ADM-420, ADM-421, ADM-422, ADM-424, ADM-425, ADM-426, ADM-469, ADM-470, ADM-471, ADM-472, ADM-473, ADM-474, ADM-475, ADM-476, ADM-477, ADM-478, ADM-479, ADM-480, ADM-481, ADM-482, ADM-483, ADM-484, ADM-485, ADM-486, ADM-487, ADM-488, ADM-489, ADM-490, ADM-491, ADM-492, ADM-493, ADM-494, ADM-495, ADM-496, ADM-497, ADM-498, ADM-499, ADM-500, ADM-501, ADM-502, ADM-503, ADM-504, ADM-505, ADM-506, ADM-507, ADM-508, ADM-509, ADM-510, ADM-511, ADM-512, ADM-513, ADM-514, ADM-515, ADM-516, ADM-517, ADM-518, ADM-519, ADM-520, ADM-521, ADM-522, ADM-523, ADM-524, ADM-525, ADM-526, ADM-527, ADM-528, ADM-529, ADM-530, ADM-531, ADM-532, ADM-533, ADM-534, ADM-535, ADM-536, ADM-537, ADM-538, ADM-539, ADM-540, ADM-541, ADM-542, ADM-543, ADM-544, ADM-545, ADM-546, ADM-547, ADM-548, ADM-549, ADM-550, ADM-551, ADM-552, ADM-553, ADM-554, ADM-555, ADM-556, ADM-557, ADM-558, ADM-619 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| activeOnly | query |  | boolean | True returns only grants whose window is open now. |
+| pageSize | query |  | integer |  |
+| cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
+
+**Response**: `object`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| items | array of PlatformStaffGrant | yes |  |
+| items[].id | string (uuid) | yes |  |
+| items[].operatorPrincipalId | string (uuid) | yes | The platform operator, from the Control Plane token. (read-only) |
+| items[].operatorDisplayName | string |  | (read-only) |
+| items[].permissions | array of Permission: enum (SESSION_FORCE_LOGOUT, USER_MANAGE, ROLE_MANAGE, PERMISSION_GRANT, PERMISSION_VIEW, PERMISSION_MANAGE, PLATFORM_TENANT_VIEW, PLATFORM_TENANT_MANAGE, …) | yes |  |
+| items[].reason | string | yes |  |
+| items[].ticketRef | string |  | (nullable) |
+| items[].openedAt | string (date-time) | yes | (read-only) |
+| items[].expiresAt | string (date-time) | yes |  |
+| items[].scopePath | string |  | The tenant root. (read-only) |
+| nextCursor | string |  |  |
+| hasMore | boolean | yes |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | The caller's grants |
+| 403 | Forbidden | Authenticated but not permitted at the requested scope |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### listPrincipals
@@ -189,13 +187,13 @@
 | Permission | `USER_MANAGE` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 1 |
+| Wave | 2 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | replica |
 | Reads | `identity.principal` |
 | Writes | - |
-| Called by | ADM-020, ANL-003, BO-053, BO-057, BO-873, CMS-019, POS-018, PTR-003 |
+| Called by | ADM-020, ANL-003, BO-053, BO-057, BO-873, CMS-019, PTR-003 |
 
 **Parameters**
 
@@ -239,7 +237,11 @@
 
 **`GET /roles`**: List roles
 
-A role is a grouping for permission management — code, name, description and the permissions it carries (`Role.permissions`). **Seeded system roles ship with the tenant** (`Role.isSystem`: editable, not deletable); every other role is created with `createRole`. The seeded set is Cashier, Supervisor, Venue Manager, Finance and Tenant Admin, with the permissions `docs/active/seed-data-proposal.md` section 2 drafts (proposed, client to correct; audit R229). Grants (`createDelegatedAccess`) attach a role or a single permission to a principal at a scope.
+A role is a grouping for permission management — code, name, description and the permissions it carries (`Role.permissions`). Grants (`createDelegatedAccess`) attach a role or a single permission to a principal at a scope.
+
+**No fixed default roles: the seeded sets are presets** (decided 2 October 2026, Chinmay, batch 1 ADM-554 and the pre-apply round; DEC-007; CHG-CSP-003). Chinmay: *"Default permission configs, so to speak. We still have checklists: if they select Viewer, for example, they can still give that viewer more permissions and rename it."* A new tenant starts with no roles. Creating one shows the per-module permission checklist (`listModuleCapabilities`) and the presets (`listCapabilityTemplates`: All, Viewer and Mid-level for each module, and the five starting configurations Cashier, Supervisor, Venue Manager, Finance and Tenant Admin that `docs/active/seed-data-proposal.md` section 2 drafted as roles, audit R229). **Picking a preset fills the checklist and binds nothing**: every tick stays editable (`setRolePermissions`), the role is renamed with `updateRole`, and `Role.presetCode` only records where it started. Who may promote or publish an AI model is whichever role holds that module's permission (ADR-0051, AI-D16).
+
+`Role.isSystem` stays on the wire for clients built at r1 and is false on every role a tenant creates from 2 October.
 
 |  |  |
 |---|---|
@@ -253,7 +255,7 @@ A role is a grouping for permission management — code, name, description and t
 | Offline note | 24 August: servable from a local cache. |
 | Reads | `identity.role` |
 | Writes | - |
-| Called by | ADM-021, BO-054, BO-106, BO-142, CMS-019, EMP-002 |
+| Called by | ADM-021, BO-054, BO-106, CMS-019 |
 
 **Parameters**
 
@@ -274,6 +276,7 @@ A role is a grouping for permission management — code, name, description and t
 | items[].permissions | array of Permission: enum (SESSION_FORCE_LOGOUT, USER_MANAGE, ROLE_MANAGE, PERMISSION_GRANT, PERMISSION_VIEW, PERMISSION_MANAGE, PLATFORM_TENANT_VIEW, PLATFORM_TENANT_MANAGE, …) |  | A role that grants no permissions is not a role. |
 | items[].inheritsFromRoleId | string (uuid) |  | Role composition, one level deep and no deeper. (nullable) |
 | items[].isSystem | boolean |  | Seeded roles ship and are editable; deleting one is refused. (default False) |
+| items[].presetCode | string |  | The preset this role was started from, for the record only (decided 2 October 2026, Chinmay; DEC-007; CHG-CSP-003): the first of createRole.presetCodes, or null for a role ticked by hand. (max length 64; read-only; nullable) |
 | items[].principalCount | integer |  |  |
 | items[].grantCount | integer |  |  |
 | nextCursor | string |  |  |
@@ -306,7 +309,7 @@ Requires step-up: the operator holds `PLATFORM_*` permissions, which require MFA
 | Step-up auth | mfa |
 | Reads | `identity.platform_staff_grant` |
 | Writes | - |
-| Called by | ADM-005, ADM-016, ADM-017, ADM-018, ADM-019, ADM-031, ADM-037, ADM-412, ADM-421 |
+| Called by | ADM-004, ADM-005, ADM-006, ADM-015, ADM-016, ADM-017, ADM-018, ADM-019, ADM-020, ADM-021, ADM-026, ADM-031, ADM-037, ADM-068, ADM-411, ADM-412, ADM-420, ADM-421, ADM-422, ADM-424, ADM-425, ADM-426, ADM-469, ADM-470, ADM-471, ADM-472, ADM-473, ADM-474, ADM-475, ADM-476, ADM-477, ADM-478, ADM-479, ADM-480, ADM-481, ADM-482, ADM-483, ADM-484, ADM-485, ADM-486, ADM-487, ADM-488, ADM-489, ADM-490, ADM-491, ADM-492, ADM-493, ADM-494, ADM-495, ADM-496, ADM-497, ADM-498, ADM-499, ADM-500, ADM-501, ADM-502, ADM-503, ADM-504, ADM-505, ADM-506, ADM-507, ADM-508, ADM-509, ADM-510, ADM-511, ADM-512, ADM-513, ADM-514, ADM-515, ADM-516, ADM-517, ADM-518, ADM-519, ADM-520, ADM-521, ADM-522, ADM-523, ADM-524, ADM-525, ADM-526, ADM-527, ADM-528, ADM-529, ADM-530, ADM-531, ADM-532, ADM-533, ADM-534, ADM-535, ADM-536, ADM-537, ADM-538, ADM-539, ADM-540, ADM-541, ADM-542, ADM-543, ADM-544, ADM-545, ADM-546, ADM-547, ADM-548, ADM-549, ADM-550, ADM-551, ADM-552, ADM-553, ADM-554, ADM-555, ADM-556, ADM-557, ADM-558, ADM-619 |
 
 **Parameters**
 
@@ -357,13 +360,13 @@ Deactivation invalidates any live session immediately. **A change to `validTo`, 
 |---|---|
 | Permission | `USER_MANAGE` |
 | Scope level | venue |
-| Part of slice | setup, makes `identity.principal` non-empty |
-| Wave | 1 |
+| Part of slice | core |
+| Wave | 2 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `identity.principal` |
 | Writes | `cache:idempotency`, `identity.principal` |
-| Called by | ADM-020, BO-053, PTR-003 |
+| Called by | ADM-020, BO-053, BO-054, CMS-019, PTR-003 |
 
 **Parameters**
 
@@ -518,7 +521,7 @@ Status, outcome and, where it was refused or needs resubmission, the reason the 
 | Read routing | primary |
 | Reads | `identity.guest_identity_verification` |
 | Writes | - |
-| Called by | GST-073, WEB-020 |
+| Called by | WEB-020 |
 
 **Response**: `IdentityGuestVerification`
 
@@ -726,6 +729,8 @@ Where the provider's verified email matches an existing account, the identities 
 OAuth authorisation-code exchange. Returns a verified identity, so an account created this way needs no further verification.
 Government onboarding has lead time and should be started before it becomes the critical path.
 
+**UAE Pass is integrated in release 1, and so is the ICP identity check** (decided 2 October 2026, Chinmay, critical set 2, BO-627; DEC-457; CHG-CSP-034). Both need the client's access to the providers (UAE Pass onboarding and an ICP service agreement), which is an external dependency the client owns. A UAE Pass identity counts as ID-verified (`IdentityGuestVerificationPolicy.uaePassSatisfiesIdDocument`); the ICP check is a document verification, not a sign-in (`IdentityGuestVerificationPolicy.verificationProvider` `icp`). Each venue's own redirect URI is part of its domain setup (white-label `CustomDomain`; DEC-547).
+
 |  |  |
 |---|---|
 | Permission | `None` |
@@ -806,7 +811,7 @@ A guest who bought without an account, then registered. **The guest names one bo
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `orders.sales_order`, `pii.subject_contact` |
 | Writes | `cache:idempotency`, `orders.sales_order`, `pii.subject` |
-| Called by | GST-042, WEB-016 |
+| Called by | GST-010, GST-042, WEB-013, WEB-016 |
 
 **Parameters**
 
@@ -976,7 +981,7 @@ Creates a `pending` verification. `409` while another is pending for this guest;
 | Conflict policy | serverWins |
 | Reads | `assets.media_asset`, `cache:idempotency`, `identity.guest_identity_verification`, `identity.guest_verification_policy` |
 | Writes | `cache:idempotency`, `identity.guest_identity_verification`, `pii.subject_document` |
-| Called by | GST-073, WEB-020 |
+| Called by | WEB-020 |
 
 **Parameters**
 
@@ -1111,7 +1116,7 @@ Held to `setPasswordPolicy` (length, breach check); a PIN is held to the length 
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `identity.password_policy`, `identity.principal`, `identity.principal_credential` |
 | Writes | `cache:idempotency`, `identity.principal_credential`, `identity.session` |
-| Called by | POS-000 |
+| Called by | ADM-001, ADM-699, EMP-001, POS-000, PTR-001, SCN-001, SUP-001 |
 
 **Parameters**
 
@@ -1202,7 +1207,7 @@ Requires SESSION_FORCE_LOGOUT. Exists because §3.1.3 rejects rather than displa
 | Conflict policy | append |
 | Reads | `cache:idempotency`, `identity.session` |
 | Writes | `cache:idempotency`, `identity.session` |
-| Called by | ADM-001, POS-000, PTR-001, SUP-001 |
+| Called by | BO-053, POS-000 |
 | State model | Operator session ([states/operator-session.yaml](../../../states/operator-session.yaml)): moves `active` -> `terminated` |
 
 **Parameters**
@@ -1261,7 +1266,7 @@ Requires SESSION_FORCE_LOGOUT. Exists because §3.1.3 rejects rather than displa
 | permissionsByScope | array of ScopedPermissions |  | Permissions effective at each granted scope path. |
 | permissionsByScope[].scopePath | string | yes | (pattern ^[a-z0-9_]+(\.[a-z0-9_]+)*$) |
 | permissionsByScope[].permissions | array of Permission: enum (SESSION_FORCE_LOGOUT, USER_MANAGE, ROLE_MANAGE, PERMISSION_GRANT, PERMISSION_VIEW, PERMISSION_MANAGE, PLATFORM_TENANT_VIEW, PLATFORM_TENANT_MANAGE, …) | yes |  |
-| saleBoardId | string (uuid) | yes | Landing surface, derived from the WORKSTATION, not the role (12 Aug 2026 §3). |
+| saleBoardId | string (uuid) |  | Landing surface, derived from the WORKSTATION, not the role (12 Aug 2026 §3). |
 | workstation | WorkstationContext |  |  |
 | workstation.id | string (uuid) | yes |  |
 | workstation.code | string | yes |  |
@@ -1310,7 +1315,7 @@ Covers a primary holder assigning entitlements, a group leader holding tickets, 
 | Guest callable | True |
 | Reads | `cache:idempotency`, `identity.delegated_access`, `pii.subject` |
 | Writes | `cache:idempotency`, `identity.delegated_access` |
-| Called by | GST-015, WEB-024 |
+| Called by | GST-015 |
 
 **Parameters**
 
@@ -1380,7 +1385,7 @@ CF-132. **Both directions, because a guest is usually in both.** A parent holds 
 | Guest callable | True |
 | Reads | `identity.delegated_access`, `marketing.guest_profile`, `pii.subject` |
 | Writes | - |
-| Called by | BO-385, GST-015, GST-069, WEB-024 |
+| Called by | GST-015, GST-069, WEB-024 |
 
 **Parameters**
 
@@ -1447,6 +1452,8 @@ CF-132. **Both directions, because a guest is usually in both.** A parent holds 
 
 **`POST /auth/login`**: Authenticate and open a session
 
+One sign-in for every staff and partner door. **A browser door sends no `workstationId`** (the TICVAI Console ADM-001, Venue Management SUP-001, the partner portal PTR-001): a desk browser is not a registered device, and requiring one locked every web door out (CHG-DOOR-001, Chinmay, 2 October 2026: fix the Block A blockers now). **A device door sends it** (the till POS-000, the staff handheld EMP-001, the scanner SCN-001), and a device-bound `method` (`pin`, `card`, `rfid`) without it is refused 400 (problem type `workstation-required`), because the device is what bounds a PIN. Nothing else about the sign-in changes: the second factor is asked by permission (audit R135), five wrong codes lock step-up (R126), a second sign-in is refused 409 (R184), and several roles mean a role prompt (ADR-0003). Where the tenant has SSO, the same doors offer `startSsoAuthorization` / `completeSsoAuthorization`, which return the same `LoginResponse`.
+
 |  |  |
 |---|---|
 | Permission | `None` |
@@ -1472,7 +1479,7 @@ CF-132. **Both directions, because a guest is usually in both.** A parent holds 
 | username | string | yes | (max length 256) |
 | credential | string | yes | Password, PIN, card token or RFID token depending on method. (max length 512) |
 | method | enum (password, pin, card, rfid, sso) |  | pin is how a till is actually used. (default password) |
-| workstationId | string (uuid) | yes | Identifies the device. |
+| workstationId | string (uuid) |  | Identifies the device. |
 | deviceFingerprint | string |  | (max length 256) |
 
 **Response**: `LoginResponse`
@@ -1514,7 +1521,7 @@ CF-132. **Both directions, because a guest is usually in both.** A parent holds 
 | session.permissionsByScope | array of ScopedPermissions |  | Permissions effective at each granted scope path. |
 | session.permissionsByScope[].scopePath | string | yes | (pattern ^[a-z0-9_]+(\.[a-z0-9_]+)*$) |
 | session.permissionsByScope[].permissions | array of Permission: enum (SESSION_FORCE_LOGOUT, USER_MANAGE, ROLE_MANAGE, PERMISSION_GRANT, PERMISSION_VIEW, PERMISSION_MANAGE, PLATFORM_TENANT_VIEW, PLATFORM_TENANT_MANAGE, …) | yes |  |
-| session.saleBoardId | string (uuid) | yes | Landing surface, derived from the WORKSTATION, not the role (12 Aug 2026 §3). |
+| session.saleBoardId | string (uuid) |  | Landing surface, derived from the WORKSTATION, not the role (12 Aug 2026 §3). |
 | session.workstation | WorkstationContext |  |  |
 | session.workstation.id | string (uuid) | yes |  |
 | session.workstation.code | string | yes |  |
@@ -1590,6 +1597,10 @@ CF-132. **Both directions, because a guest is usually in both.** A parent holds 
 
 Per 12 Aug 2026 §4 — a user with one role logs in directly; a user with several is prompted to choose. Resolves the effective permission set.
 
+**A partner chooses a role the same way** (decided 2 October 2026, Chinmay, door follow-ups; CHG-CSP-001). PTR-001 Partner Login / MFA already called this operation while its audience named staff only, so a partner user with two partner roles was refused at the door. `partner` joins the audience; the operation, its request and its response are unchanged, and `login` already admits partners.
+
+**`Session.saleBoardId` is present only on a till session** (decided 2 October 2026, Chinmay; CHG-CSP-002, breaking change BC-001 to BC-005): a session opened from a browser or a handheld has no workstation and no board, and the field is absent rather than invented.
+
 |  |  |
 |---|---|
 | Permission | `None` |
@@ -1600,7 +1611,7 @@ Per 12 Aug 2026 §4 — a user with one role logs in directly; a user with sever
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `identity.delegated_access`, `identity.role`, `identity.session` |
 | Writes | `cache:idempotency`, `identity.session` |
-| Called by | EMP-002, POS-000, POS-001, SCN-001 |
+| Called by | ADM-001, EMP-001, EMP-002, POS-000, POS-001, PTR-001, SCN-001, SUP-001 |
 
 **Parameters**
 
@@ -1632,7 +1643,7 @@ Per 12 Aug 2026 §4 — a user with one role logs in directly; a user with sever
 | permissionsByScope | array of ScopedPermissions |  | Permissions effective at each granted scope path. |
 | permissionsByScope[].scopePath | string | yes | (pattern ^[a-z0-9_]+(\.[a-z0-9_]+)*$) |
 | permissionsByScope[].permissions | array of Permission: enum (SESSION_FORCE_LOGOUT, USER_MANAGE, ROLE_MANAGE, PERMISSION_GRANT, PERMISSION_VIEW, PERMISSION_MANAGE, PLATFORM_TENANT_VIEW, PLATFORM_TENANT_MANAGE, …) | yes |  |
-| saleBoardId | string (uuid) | yes | Landing surface, derived from the WORKSTATION, not the role (12 Aug 2026 §3). |
+| saleBoardId | string (uuid) |  | Landing surface, derived from the WORKSTATION, not the role (12 Aug 2026 §3). |
 | workstation | WorkstationContext |  |  |
 | workstation.id | string (uuid) | yes |  |
 | workstation.code | string | yes |  |
@@ -1664,6 +1675,8 @@ Per 12 Aug 2026 §4 — a user with one role logs in directly; a user with sever
 **`PUT /guest-verification-policy`**: Set which verifications a guest must pass, and when
 
 5.3.21 (decided 29 September, build pass). **The configurable identity workflow**: which verifications registration requires, which moments require a verified ID document, which documents are accepted, who reviews them, and how long the scan is kept. One policy per tenant (identity is tenant-level under ADR-0018); PUT replaces it whole.
+
+**UAE Pass and ICP are both in release 1** (decided 2 October 2026, Chinmay, critical set 2, BO-627; DEC-457; CHG-CSP-034): `verificationProvider` `icp` is the government check behind `reviewMode` `provider` and `providerThenManual`, and a UAE Pass sign-in satisfies the document requirement. Both need the client's access to the providers; until it exists a policy naming `icp` is refused `422 provider-not-connected` and manual review is what runs.
 
 |  |  |
 |---|---|
@@ -1701,6 +1714,7 @@ Per 12 Aug 2026 §4 — a user with one role logs in directly; a user with sever
 | socialLoginCountsAsEmailVerified | boolean |  | (default True) |
 | selfieRequired | boolean |  | (default False) |
 | reviewMode | enum (manual, provider, providerThenManual) |  | Who checks a document. (default manual) |
+| verificationProvider | enum (icp) |  | The government verification service behind reviewMode provider (decided 2 October 2026, Chinmay; DEC-457; CHG-CSP-034): the UAE Federal Authority for Identity, Citizenship, Customs and Port Security… (nullable) |
 | documentImageRetention | enum (deleteOnDecision, keepUntilDocumentExpiry) |  | How long the scan is kept. (default deleteOnDecision) |
 | maxResubmissions | integer |  | (min 0; max 10; default 3) |
 | updatedAt | string (date-time) |  | (read-only) |
@@ -1722,6 +1736,7 @@ Per 12 Aug 2026 §4 — a user with one role logs in directly; a user with sever
 | socialLoginCountsAsEmailVerified | boolean |  | (default True) |
 | selfieRequired | boolean |  | (default False) |
 | reviewMode | enum (manual, provider, providerThenManual) |  | Who checks a document. (default manual) |
+| verificationProvider | enum (icp) |  | The government verification service behind reviewMode provider (decided 2 October 2026, Chinmay; DEC-457; CHG-CSP-034): the UAE Federal Authority for Identity, Citizenship, Customs and Port Security… (nullable) |
 | documentImageRetention | enum (deleteOnDecision, keepUntilDocumentExpiry) |  | How long the scan is kept. (default deleteOnDecision) |
 | maxResubmissions | integer |  | (min 0; max 10; default 3) |
 | updatedAt | string (date-time) |  | (read-only) |
@@ -1731,6 +1746,7 @@ Per 12 Aug 2026 §4 — a user with one role logs in directly; a user with sever
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Set |
+| 422 |  | verificationProvider names a provider the tenant has no connection to yet (provider-not-connected; CHG-CSP-034). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setPasswordPolicy
@@ -1751,7 +1767,7 @@ BL-144. **Modelled on NIST SP 800-63B rather than on habit.** Length beats compo
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `identity.password_policy` |
 | Writes | `cache:idempotency`, `identity.password_policy` |
-| Called by | ADM-342, ADM-421 |
+| Called by | ADM-342, ADM-422 |
 
 **Parameters**
 
@@ -1888,7 +1904,7 @@ A session that authenticated hours ago is not the same as a person present at th
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `identity.mfa_method` |
 | Writes | `cache:idempotency`, `identity.mfa_challenge` |
-| Called by | ADM-001, EMP-001, GST-042, GST-073, POS-000, PTR-001, SCN-001, SUP-001, WEB-016 |
+| Called by | ADM-001, ADM-247, ADM-699, ADM-700, BO-053, BO-284, BO-293, EMP-001, GST-042, GST-073, POS-000, PTR-001, PTR-029, PTR-030, PTR-035, PTR-036, PTR-040, PTR-048, SCN-001, SUP-001, WEB-016 |
 
 **Parameters**
 
@@ -1936,7 +1952,7 @@ Returns a secret or challenge to complete enrolment. **The method is not active 
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `identity.mfa_recovery_code`, `identity.principal` |
 | Writes | `cache:idempotency`, `identity.mfa_method`, `identity.mfa_recovery_code` |
-| Called by | ADM-001, EMP-042, GST-073, WEB-024 |
+| Called by | ADM-001, ADM-699, EMP-042, GST-073, PTR-001, SUP-001, WEB-024 |
 
 **Parameters**
 
@@ -1987,7 +2003,7 @@ Returns a secret or challenge to complete enrolment. **The method is not active 
 | Read routing | replica |
 | Reads | `identity.mfa_method` |
 | Writes | - |
-| Called by | ADM-001, ADM-342, EMP-001, EMP-002, EMP-042, GST-073, PTR-001, SCN-001, SUP-001, WEB-024 |
+| Called by | ADM-342, ADM-699, EMP-042, GST-073, WEB-024 |
 
 **Responses**
 
@@ -2012,7 +2028,7 @@ Refused where it is the only active method and the principal holds a permission 
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `identity.mfa_method` |
 | Writes | `cache:idempotency`, `identity.mfa_method` |
-| Called by | ADM-001, EMP-042, GST-073, WEB-024 |
+| Called by | ADM-699, EMP-042, GST-073, WEB-024 |
 
 **Parameters**
 
@@ -2045,7 +2061,7 @@ For a `signIn` challenge (decided 28 September, audit R135) a correct code compl
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `identity.mfa_challenge`, `identity.mfa_recovery_code` |
 | Writes | `cache:idempotency`, `identity.mfa_challenge`, `identity.mfa_recovery_code`, `identity.session`, `platform.outbox` |
-| Called by | ADM-001, EMP-001, GST-042, GST-073, POS-000, PTR-001, SCN-001, SUP-001, WEB-016 |
+| Called by | ADM-001, ADM-247, ADM-699, ADM-700, BO-053, BO-284, BO-293, EMP-001, GST-042, GST-073, POS-000, PTR-001, PTR-029, PTR-030, PTR-035, PTR-036, PTR-040, PTR-048, SCN-001, SUP-001, WEB-016 |
 
 **Parameters**
 
@@ -2081,7 +2097,7 @@ For a `signIn` challenge (decided 28 September, audit R135) a correct code compl
 | session.permissionsByScope | array of ScopedPermissions |  | Permissions effective at each granted scope path. |
 | session.permissionsByScope[].scopePath | string | yes | (pattern ^[a-z0-9_]+(\.[a-z0-9_]+)*$) |
 | session.permissionsByScope[].permissions | array of Permission: enum (SESSION_FORCE_LOGOUT, USER_MANAGE, ROLE_MANAGE, PERMISSION_GRANT, PERMISSION_VIEW, PERMISSION_MANAGE, PLATFORM_TENANT_VIEW, PLATFORM_TENANT_MANAGE, …) | yes |  |
-| session.saleBoardId | string (uuid) | yes | Landing surface, derived from the WORKSTATION, not the role (12 Aug 2026 §3). |
+| session.saleBoardId | string (uuid) |  | Landing surface, derived from the WORKSTATION, not the role (12 Aug 2026 §3). |
 | session.workstation | WorkstationContext |  |  |
 | session.workstation.id | string (uuid) | yes |  |
 | session.workstation.code | string | yes |  |
@@ -2119,7 +2135,7 @@ For a `signIn` challenge (decided 28 September, audit R135) a correct code compl
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `identity.mfa_method` |
 | Writes | `cache:idempotency`, `identity.mfa_method` |
-| Called by | ADM-001, EMP-042, GST-073, WEB-024 |
+| Called by | ADM-001, ADM-699, EMP-042, GST-073, PTR-001, SUP-001, WEB-024 |
 
 **Parameters**
 
@@ -2175,7 +2191,7 @@ Who is logged in, on which workstation, since when. There was previously no way 
 | Read routing | primary |
 | Reads | `identity.principal`, `identity.session` |
 | Writes | - |
-| Called by | ADM-001, POS-000, PTR-001, SUP-001 |
+| Called by | BO-053, POS-000 |
 
 **Parameters**
 
@@ -2286,6 +2302,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | is_social_login_counts_as_email_verified | boolean | no |  |
 | is_selfie_required | boolean | no |  |
 | review_mode | text | no | Who checks a document. |
+| verification_provider | text | no | The government verification service behind reviewMode provider (decided 2 October 2026, Chinmay; DEC-457; CHG-CSP-034): the UAE Federal Authority for Identity, Citizenship, Customs and Port Security… |
 | document_image_retention | text | no | How long the scan is kept. |
 | max_resubmissions | integer | no |  |
 | updated_at | timestamptz | no |  |
@@ -2403,6 +2420,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | description | text | no |  |
 | inherits_from_role_id | uuid | no | Role composition, one level deep and no deeper. |
 | is_system | boolean | no | Seeded roles ship and are editable; deleting one is refused. |
+| preset_code | text | no | The preset this role was started from, for the record only (decided 2 October 2026, Chinmay; DEC-007; CHG-CSP-003): the first of createRole.presetCodes, or null for a role ticked by hand. |
 | principal_count | integer | no |  |
 | grant_count | integer | no |  |
 
@@ -2463,11 +2481,12 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-52 operations, added to this service in later releases without changing any of the above.
+57 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
-| administration | `createAccessReviewCampaign`, `createAuthorisationPolicy`, `createDelegatedAccess`, `createEmergencyAccessOverride`, `decideAccessReviewItem`, `deleteDelegatedAccess`, `evaluateAccess`, `getAuthorisationPolicy`, `getAuthorisationPolicyBundle`, `getPrincipal`, `getPrincipalModuleAccess`, `listAccessDecisions`, `listAccessReviewCampaigns`, `listAccessReviewItems`, `listAuthorisationPolicies`, `listAuthorisationPolicyEffectiveness`, `listAuthorisationPolicyHistory`, `listAuthorisationPolicyTemplates`, `listCapabilityTemplates`, `listDelegatedAccess`, `listModuleCapabilities`, `listOwnPlatformStaffGrants`, `listPermissionFindings`, `listPlatformStaffGrants`, `resetPrincipalCredential`, `resolvePermissions`, `restoreAuthorisationPolicyVersion`, `setAuthorisationPolicyState`, `setCapabilityTemplate`, `setPrincipalModuleAccess`, `simulateAuthorisationPolicy`, `suggestRoleAssignment`, `updateAuthorisationPolicy` |
+| administration | `createAccessReviewCampaign`, `createAuthorisationPolicy`, `createDelegatedAccess`, `createEmergencyAccessOverride`, `createPrincipal`, `decideAccessReviewItem`, `deleteDelegatedAccess`, `evaluateAccess`, `getAuthorisationPolicy`, `getAuthorisationPolicyBundle`, `getPrincipal`, `getPrincipalModuleAccess`, `listAccessDecisions`, `listAccessReviewCampaigns`, `listAccessReviewItems`, `listAuthorisationPolicies`, `listAuthorisationPolicyEffectiveness`, `listAuthorisationPolicyHistory`, `listAuthorisationPolicyTemplates`, `listCapabilityTemplates`, `listDelegatedAccess`, `listModuleCapabilities`, `listPermissionFindings`, `listPlatformStaffGrants`, `resetPrincipalCredential`, `resolvePermissions`, `restoreAuthorisationPolicyVersion`, `setAuthorisationPolicyState`, `setCapabilityTemplate`, `setPrincipalModuleAccess`, `simulateAuthorisationPolicy`, `suggestRoleAssignment`, `updateAuthorisationPolicy`, `updateRole` |
 | identity | `decideGuestIdentityVerification`, `getGuestVerificationPolicy`, `getMembership`, `getPasswordPolicy`, `listCustomerMemberships`, `listGuestIdentityVerifications`, `listModules`, `listPermissions`, `listSegregationRules`, `listSegregationViolations`, `logout`, `recordBenefitUsage`, `setSegregationRules` |
-| session | `revokeAllSessions` |
+| prospectAuth | `startProspectSignup`, `verifyProspectSignupCode` |
+| session | `endOwnSession`, `listOwnSessions`, `revokeAllSessions` |
 | sso | `completeSsoAuthorization`, `getSsoConfig`, `listSsoProviders`, `setSsoConfig`, `startSsoAuthorization` |

@@ -1,36 +1,4 @@
 {
- "AccessibilitySettings": {
-  "type": "object",
-  "description": "BL-065, 2.1.27. **POS and kiosk accessibility, which is a legal obligation in most jurisdictions and was unstated.**\n**A kiosk is the hard case.** A guest with low vision using a website brings their own assistive technology; a guest at a kiosk gets whatever the kiosk offers, so the settings have to be on the device rather than in the browser.\n",
-  "properties": {
-   "largeTextAvailable": {
-    "type": "boolean",
-    "default": true
-   },
-   "highContrastAvailable": {
-    "type": "boolean",
-    "default": true
-   },
-   "simplifiedNavigationAvailable": {
-    "type": "boolean",
-    "default": true
-   },
-   "screenReaderSupported": {
-    "type": "boolean",
-    "default": true
-   },
-   "reachableHeightModeAvailable": {
-    "type": "boolean",
-    "default": false,
-    "description": "**Moves the interface to the lower half of the screen** for a guest using a wheelchair. A kiosk mounted at standing height is unusable otherwise, and no software setting fixes the mounting — this is the mitigation.\n"
-   },
-   "sessionTimeoutMultiplier": {
-    "type": "number",
-    "default": 1,
-    "description": "**Timeouts are an accessibility barrier nobody counts.** A guest who needs three times as long to read a screen should not lose their basket to a 90-second inactivity timer.\n"
-   }
-  }
- },
  "AppAvailability": {
   "type": "string",
   "description": "**The sold-out or closed signal (decided 28 September, audit R073).** `open` is the normal state. `soldOut` shows WEB-029's sold-out state across the app while browsing still works; `closed` shows the closed state (a weather closure, a private event). Neither refuses a request on its own: it is what the guest is told, and a sale is still refused by availability where it applies. Set with `setMaintenanceMode`.\n",
@@ -103,99 +71,6 @@
    }
   }
  },
- "AppendEntitlementRequest": {
-  "type": "object",
-  "x-ticvai-persistence": "none — request only",
-  "required": [
-   "id",
-   "lines",
-   "recordedAt"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid",
-    "description": "Client-generated UUIDv7 of the new order this creates, and its idempotency key — it must equal the `Idempotency-Key` header."
-   },
-   "lines": {
-    "type": "array",
-    "minItems": 1,
-    "items": {
-     "type": "object",
-     "required": [
-      "variantId",
-      "quantity"
-     ],
-     "properties": {
-      "variantId": {
-       "type": "string",
-       "format": "uuid"
-      },
-      "quantity": {
-       "type": "integer",
-       "minimum": 1
-      },
-      "performanceId": {
-       "type": "string",
-       "format": "uuid",
-       "nullable": true
-      }
-     }
-    }
-   },
-   "paymentMethod": {
-    "type": "string",
-    "enum": [
-     "card",
-     "cash",
-     "wallet",
-     "giftCard",
-     "chargeToAccount"
-    ]
-   },
-   "note": {
-    "type": "string",
-    "maxLength": 300
-   },
-   "recordedAt": {
-    "type": "string",
-    "format": "date-time"
-   }
-  }
- },
- "AppendEntitlementResult": {
-  "type": "object",
-  "x-ticvai-persistence": "none — computed",
-  "required": [
-   "order",
-   "media"
-  ],
-  "properties": {
-   "order": {
-    "allOf": [
-     {
-      "$ref": "#/components/schemas/Order"
-     }
-    ],
-    "description": "A **new** order. The original is untouched — it was paid, receipted and possibly reported on, and editing it would move yesterday's revenue.\n"
-   },
-   "media": {
-    "allOf": [
-     {
-      "$ref": "#/components/schemas/MediaEntitlements"
-     }
-    ],
-    "description": "The full set now on the media, so the cashier can say what the QR does."
-   },
-   "addedEntitlementIds": {
-    "type": "array",
-    "items": {
-     "type": "string",
-     "format": "uuid"
-    }
-   }
-  }
- },
  "Banner": {
   "x-ticvai-persistence": "whitelabel.banner",
   "type": "object",
@@ -261,73 +136,6 @@
    }
   }
  },
- "BookingFlow": {
-  "x-ticvai-persistence": "whitelabel.booking_flow",
-  "type": "object",
-  "description": "**A venue's booking flow (decided 29 September, W12: operators pick their flows, see which steps are required, set their own order).** Made from a `BookingFlowType`; lives in the working draft and reaches guests with `publishTenantConfig`, which copies the venue's flows into the version's snapshot. A product or category names its flow (catalogue `bookingFlowId`); otherwise the venue's default for the type serving its kind applies.\n",
-  "required": [
-   "flowTypeKey",
-   "name"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid",
-    "readOnly": true
-   },
-   "venueId": {
-    "type": "string",
-    "format": "uuid",
-    "readOnly": true,
-    "description": "From the path of `createBookingFlowDefinition`."
-   },
-   "flowTypeKey": {
-    "$ref": "#/components/schemas/BookingFlowTypeKey"
-   },
-   "name": {
-    "type": "string",
-    "maxLength": 80,
-    "description": "Staff-facing, e.g. \"Day pass, date first\". Not shown to guests."
-   },
-   "isDefaultForType": {
-    "type": "boolean",
-    "default": false,
-    "description": "At most one per venue and type; setting it takes it from the previous default."
-   },
-   "isEnabled": {
-    "type": "boolean",
-    "default": true,
-    "description": "A disabled flow is kept and not published; products naming it fall back to the default."
-   },
-   "steps": {
-    "type": "array",
-    "maxItems": 30,
-    "description": "Every step of the type, in the venue's order. Filled from the type when left out on create.",
-    "items": {
-     "$ref": "#/components/schemas/BookingFlowStep"
-    }
-   },
-   "settings": {
-    "$ref": "#/components/schemas/BookingFlowLevelSettings"
-   },
-   "isValid": {
-    "type": "boolean",
-    "readOnly": true,
-    "x-ticvai-derived": "onWrite",
-    "description": "Whether the flow passes `validateBookingFlow`; worked out in the same transaction as each write. `publishTenantConfig` refuses a draft holding an invalid enabled flow."
-   },
-   "scopePath": {
-    "type": "string",
-    "readOnly": true,
-    "description": "The partition key (ADR-0005). Written at `venue` scope."
-   },
-   "updatedAt": {
-    "type": "string",
-    "format": "date-time",
-    "readOnly": true
-   }
-  }
- },
  "BookingFlowConfig": {
   "x-ticvai-persistence": "none — embedded in tenant_config",
   "description": "**Set per tenant, with a per-venue override (decided 29 September, rev 3 CFG-11).** One tenant with several venues (the Kids Club branches, Coastal Aqua beside Union Arena) needs them to differ. The settings in force at a venue are the tenant's, with that venue's entry in `venueOverrides` laid over them field by field. The guest app resolves them for the venue the guest picked (audit R267); `effectiveForVenueId` on `getBookingFlowConfig` returns them resolved.\n",
@@ -350,6 +158,272 @@
     }
    }
   ]
+ },
+ "BookingFlowSettings": {
+  "type": "object",
+  "x-ticvai-persistence": "none — embedded in tenant_config",
+  "description": "**Every guest booking-flow setting, once.** `BookingFlowConfig` is these at tenant level plus `venueOverrides`; a `BookingFlowVenueOverride` carries any subset of them for one venue (decided 29 September, rev 3 CFG-11). The Rev 3 settings (`timesPerPage` onwards) are the options the client's rev 3 prototype shows under Config → Booking rules and Build your experience.\n**Venue-wide only (decided 29 September, W12).** The settings that belong to one flow moved to `BookingFlowLevelSettings` on each `BookingFlow`; `categoryDisplay` was removed (W7).\n",
+  "properties": {
+   "preset": {
+    "type": "string",
+    "enum": [
+     "auto",
+     "ticketBox",
+     "playCentre",
+     "venueSite",
+     "marketplace",
+     "singleEvent",
+     "season",
+     "custom"
+    ],
+    "default": "auto",
+    "description": "L1 Ticket box … L6 Season. `auto` picks by venue type; `custom` applies none. The UI preset of the prototype's drawer (rev 3 CFG-1, no change)."
+   },
+   "stepIndicator": {
+    "type": "string",
+    "enum": [
+     "bar",
+     "numbered",
+     "dots",
+     "segmented",
+     "breadcrumb",
+     "pills",
+     "ticks",
+     "none"
+    ],
+    "default": "bar"
+   },
+   "cartLayout": {
+    "type": "string",
+    "enum": [
+     "sidebarRight",
+     "sidebarLeft",
+     "slideInRight",
+     "slideUpBottom",
+     "singleColumn",
+     "floatingIcon"
+    ],
+    "default": "sidebarRight",
+    "description": "`floatingIcon` is a round basket button with the item count that opens the cart (decided 29 September, rev 3 REV3-10). Which side a sidebar or the icon sits on in a right-to-left language is `cartSideInRtl`."
+   },
+   "cartSideInRtl": {
+    "type": "string",
+    "enum": [
+     "keepRight",
+     "mirror"
+    ],
+    "default": "keepRight",
+    "description": "**The cart side when the guest reads Arabic or another right-to-left language (decided 29 September, rev 3 REV3-10).** `keepRight` keeps the cart (and the floating icon) on the right, as the client confirmed; `mirror` flips it to the left with the rest of the layout.\n"
+   },
+   "cardLayout": {
+    "type": "string",
+    "enum": [
+     "stackedRows",
+     "splitRows",
+     "cardsAcross",
+     "posterCards"
+    ],
+    "default": "stackedRows",
+    "description": "How ticket and product cards are laid out (decided 29 September, rev 3 DG-6). Was a free string; the four values are the design's Stacked rows, Split rows, Cards across and Poster cards."
+   },
+   "cardSize": {
+    "type": "string",
+    "enum": [
+     "compact",
+     "standard",
+     "large",
+     "extraLarge"
+    ],
+    "default": "compact",
+    "description": "Labels Compact, Standard, Large, Extra large (decided 29 September, rev 3 DG-6). `standard` replaces `regular`."
+   },
+   "seatPicker": {
+    "type": "string",
+    "enum": [
+     "bowl",
+     "zonesThenSeats",
+     "zonesOnly",
+     "seatsOnly"
+    ],
+    "default": "bowl",
+    "description": "Default `bowl`, as the prototype has it (decided 29 September, rev 3 CFG-6). Read only for a seated event."
+   },
+   "mapView": {
+    "type": "string",
+    "enum": [
+     "2d",
+     "3d"
+    ],
+    "default": "3d"
+   },
+   "density": {
+    "type": "string",
+    "enum": [
+     "compact",
+     "standard",
+     "roomy"
+    ],
+    "default": "compact",
+    "description": "Labels Compact, Standard, Roomy, default Compact as the design has it (decided 29 September, rev 3 DG-6). `standard` and `roomy` replace `comfortable` and `airy`."
+   },
+   "embedMode": {
+    "type": "string",
+    "enum": [
+     "fullPage",
+     "embedded"
+    ],
+    "default": "fullPage",
+    "description": "`embedded` hides the hero banner, event page and venue header, for a flow placed inside the venue's own site."
+   },
+   "heroBanner": {
+    "type": "boolean",
+    "default": true
+   },
+   "searchInBanner": {
+    "type": "boolean",
+    "default": false,
+    "description": "Off by default, as the prototype has it (decided 29 September, rev 3 CFG-6)."
+   },
+   "eventBannerDates": {
+    "type": "boolean",
+    "default": false,
+    "description": "**Dates in event banner (decided 29 September, rev 3 23SEP-19).** On, the event banner lists the next dates; off by default. Either way the date picker sits at the top of the booking step.\n"
+   },
+   "singleEventPage": {
+    "type": "boolean",
+    "default": false
+   },
+   "quantitiesOnAddOns": {
+    "type": "boolean",
+    "default": true
+   },
+   "timesPerPage": {
+    "type": "string",
+    "enum": [
+     "8",
+     "12",
+     "24",
+     "all"
+    ],
+    "default": "24",
+    "description": "**Times per page (decided 29 September, rev 3 REV3-1).** When an event has more performances on the chosen day than fit, WEB-006 and GST-007 show them as compact tiles paged this many at a time with Earlier and Later; `all` shows every one. A string because `all` is one of the values.\n"
+   },
+   "dayPartFilter": {
+    "type": "boolean",
+    "default": true,
+    "description": "**Morning, afternoon and evening chips with counts above the times (decided 29 September, rev 3 REV3-1).** Where each part begins is `dayPartBoundaries`.\n"
+   },
+   "dayPartBoundaries": {
+    "type": "object",
+    "description": "**Where the day parts divide, in the venue's time zone (decided 29 September, rev 3 REV3-1).** Morning is before `afternoonStartsAt`, afternoon runs to `eveningStartsAt`, evening is from `eveningStartsAt`. A venue sets its own through `venueOverrides`. `afternoonStartsAt` must be earlier than `eveningStartsAt`, or 400.\n",
+    "properties": {
+     "afternoonStartsAt": {
+      "type": "string",
+      "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$",
+      "default": "12:00"
+     },
+     "eveningStartsAt": {
+      "type": "string",
+      "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$",
+      "default": "17:00"
+     }
+    }
+   },
+   "seatViewPosition": {
+    "type": "string",
+    "enum": [
+     "bottom",
+     "right",
+     "left",
+     "top"
+    ],
+    "default": "bottom",
+    "description": "**Where the view-from-your-seat box sits around the seat map (decided 29 September, rev 3 REV3-5).** Web only; on mobile and on a narrow screen it is always below the map.\n"
+   },
+   "seatTimeBar": {
+    "type": "boolean",
+    "default": true,
+    "description": "**Time bar above the seat map (decided 29 September, rev 3 REV3-6).** Shows the chosen performance and lets the guest switch performance or change the date; switching releases the seats held for the previous one.\n"
+   },
+   "ticketCategories": {
+    "type": "string",
+    "enum": [
+     "categoryThenSubcategory",
+     "flatList"
+    ],
+    "default": "categoryThenSubcategory",
+    "description": "**How tickets are grouped (decided 29 September, rev 3 REV3-16).** `categoryThenSubcategory` shows the venue's top product categories as tiles, then the tickets in the chosen one; `flatList` lists every ticket at once.\n"
+   },
+   "ticketTags": {
+    "type": "boolean",
+    "default": true,
+    "description": "**Tags on tickets (decided 29 September, rev 3 23SEP-3).** Shows a product's display tags (such as \"2 Hours\", \"Min 1.10 m\", \"Valid 90 days\") on its card.\n"
+   },
+   "cardInfo": {
+    "type": "boolean",
+    "default": true,
+    "description": "**Extra info on cards (decided 29 September, rev 3 23SEP-6).** Shows each ticket type's description, who it is for and what it includes, under its name.\n"
+   },
+   "conciergeMascot": {
+    "type": "boolean",
+    "default": true,
+    "description": "**The concierge as mascot art or a plain button (decided 29 September, rev 3 CFG-5).** Read only where the `aiConciergeChat` feature is on.\n"
+   },
+   "showInfoOnly": {
+    "type": "boolean",
+    "default": true,
+    "description": "**Show info-only products (decided 29 September, rev 3 REV3-14).** On, a product with `guestListing` `infoOnly` (catalogue) is listed with its not-bookable label and opens its details; off, guests are not shown it.\n"
+   },
+   "locationSwitcher": {
+    "type": "boolean",
+    "default": false,
+    "description": "**Location switcher (decided 29 September, rev 3 REV3-18).** On, the booking screens carry a \"Booking at\" bar with Change location, reusing the guest's venue choice (audit R267). Off unless the tenant or venue enables it; it has no effect for a tenant with one venue.\n"
+   },
+   "guestContactFields": {
+    "type": "array",
+    "minItems": 1,
+    "maxItems": 3,
+    "uniqueItems": true,
+    "default": [
+     "email"
+    ],
+    "items": {
+     "type": "string",
+     "enum": [
+      "email",
+      "mobile",
+      "name"
+     ]
+    },
+    "description": "**What the guest-checkout pop-up asks, and nothing else (decided 29 September, W1).** The prototype's Email only, + name and + mobile. Must include the contact the guest's code is sent to and matched on (identity `GuestMatchPolicy.matchBy`), or 400. After the code is verified the guest is not asked for these again: the flow goes to the terms and payment, and the profile is completed later (WEB-020, GST-039). Read only where the `guestCheckout` feature is on.\n"
+   },
+   "dateStripDays": {
+    "type": "integer",
+    "minimum": 3,
+    "maximum": 31,
+    "default": 7,
+    "description": "**The date strip (decided 17 September, M17-08).** How many days from today the date step shows as a strip before the calendar icon that opens the full month; later dates are picked from the calendar.\n"
+   }
+  }
+ },
+ "BookingFlowVenueOverride": {
+  "type": "object",
+  "x-ticvai-persistence": "none — embedded in tenant_config",
+  "description": "**One venue's booking-flow settings where they differ from the tenant's (decided 29 September, rev 3 CFG-11).** `settings` carries only the fields the venue changes; a field left out inherits the tenant value, and the schema defaults do not apply inside an override.\n",
+  "required": [
+   "venueId",
+   "settings"
+  ],
+  "properties": {
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "One of the tenant's active venues. At most one override per venue."
+   },
+   "settings": {
+    "$ref": "#/components/schemas/BookingFlowSettings"
+   }
+  }
  },
  "BrandIdentity": {
   "x-ticvai-persistence": "none — embedded in tenant_config",
@@ -432,6 +506,11 @@
     ],
     "default": "off",
     "description": "When GST-001 plays it full screen. \"Skip introduction\" is always shown. Anything but `off` needs `introVideoAssetRef`, or 400."
+   },
+   "showPoweredBy": {
+    "type": "boolean",
+    "default": true,
+    "description": "**\"Powered by TICVAI\", a configuration toggle, on by default** (Chinmay, 2 October, workbook Q160 and the pre-apply round; consistent with DI-297; CHG-CSA-036). Shown on the launch screen and at the foot of Account and the web footer while true. **Switching it off needs the tenant's licence to allow it**: `setBrandIdentity` refuses `false` with `403 powered-by-locked` unless the tenant's plan carries the `poweredByRemoval` add-on (subscription `LicencePosition.poweredByRemovable`)."
    }
   }
  },
@@ -485,131 +564,89 @@
    }
   }
  },
- "ConfigDiff": {
-  "x-ticvai-persistence": "none — computed",
+ "ContentBlock": {
   "type": "object",
+  "x-ticvai-persistence": "control.content_block",
+  "description": "BL-172. **`white-label` is excellent as a configuration model and is not an authoring surface.** `HomepageLayout` with ordered sections, `Banner`, `PromoBlock` and `ContentPage` describe what a venue has chosen; **none of them lets a marketer write something new without a developer.**\nA block is a piece of authored content with a type, a body and a schedule. **The page builder is a frontend over this**, the same way the venue map's canvas is a frontend over its graph.\n",
   "required": [
-   "fromVersion",
-   "toVersion",
-   "changes"
+   "id",
+   "kind",
+   "status"
   ],
   "properties": {
-   "fromVersion": {
-    "type": "string"
-   },
-   "toVersion": {
-    "type": "string"
-   },
-   "changes": {
-    "type": "array",
-    "items": {
-     "type": "object",
-     "required": [
-      "area",
-      "path",
-      "changeKind"
-     ],
-     "properties": {
-      "area": {
-       "type": "string"
-      },
-      "path": {
-       "type": "string"
-      },
-      "changeKind": {
-       "type": "string",
-       "enum": [
-        "added",
-        "removed",
-        "modified"
-       ]
-      },
-      "before": {
-       "type": "string",
-       "nullable": true
-      },
-      "after": {
-       "type": "string",
-       "nullable": true
-      },
-      "changeScope": {
-       "$ref": "#/components/schemas/ChangeScope"
-      }
-     }
-    }
-   }
-  }
- },
- "ConfigVersion": {
-  "x-ticvai-persistence": "whitelabel.config_version",
-  "type": "object",
-  "required": [
-   "version",
-   "publishedAt",
-   "publishedByPrincipalId",
-   "note",
-   "isCurrent"
-  ],
-  "properties": {
-   "version": {
-    "type": "string"
-   },
-   "publishedAt": {
+   "id": {
     "type": "string",
-    "format": "date-time"
+    "format": "uuid",
+    "readOnly": true
    },
-   "publishedByPrincipalId": {
+   "pageId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "nullable": true
    },
-   "publishedByName": {
-    "type": "string"
+   "kind": {
+    "type": "string",
+    "enum": [
+     "richText",
+     "image",
+     "video",
+     "gallery",
+     "cta",
+     "faq",
+     "form",
+     "embed",
+     "productGrid",
+     "countdown",
+     "testimonial"
+    ]
    },
-   "note": {
-    "type": "string"
+   "position": {
+    "type": "integer"
    },
-   "isCurrent": {
-    "type": "boolean"
+   "body": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "Typed by `kind`, and validated against the block's own schema at save."
    },
-   "scheduledFor": {
+   "localeVariants": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "**Per-locale bodies, not per-locale pages.** A venue running Arabic and English should not maintain two page trees that drift — the structure is shared and the words are not.\n"
+   },
+   "status": {
+    "type": "string",
+    "readOnly": true,
+    "description": "Created as `draft`; moved by `publishContentBlock` and the `publishAt`/`expireAt` timer (`states/content-block.yaml`), never by the body of a create.",
+    "enum": [
+     "draft",
+     "scheduled",
+     "published",
+     "expired",
+     "archived"
+    ]
+   },
+   "publishAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "**Content scheduling, which the configuration model had no room for.** A seasonal banner that needs somebody awake at midnight is the same defect `Product.onSaleFrom` fixed.\n"
+   },
+   "expireAt": {
     "type": "string",
     "format": "date-time",
     "nullable": true
    },
-   "contentHash": {
-    "type": "string"
+   "audienceSegmentId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**Personalisation, evaluated at render.** A block shown only to members, or only to first-time visitors. Null shows it to everybody, which is what every block does today.\n"
    },
-   "pendingBuildTimeChanges": {
-    "type": "array",
-    "description": "Changes in this version that will not reach guests until the next store release. Surfaced at publish so nobody expects a new icon tomorrow.\n",
-    "items": {
-     "type": "object",
-     "properties": {
-      "area": {
-       "type": "string"
-      },
-      "description": {
-       "type": "string"
-      },
-      "platforms": {
-       "type": "array",
-       "items": {
-        "type": "string",
-        "enum": [
-         "ios",
-         "android",
-         "web"
-        ]
-       }
-      }
-     }
-    }
-   },
-   "snapshot": {
-    "type": "object",
-    "additionalProperties": true,
-    "readOnly": true,
-    "description": "**What this version contained.** The working draft exactly as published, in the shape `getTenantConfig` returns (`TenantConfig`) — so `restoreConfigVersion` has something to copy back and `diffConfigVersion` something to compare. Deliberately an open object here: its shape is `TenantConfig`, and a `$ref` would make it a key to a `tenant_config` row rather than a copy. Written once by `publishTenantConfig` and never changed. Left out of `listConfigVersions` items; a version's content is read with `getTenantConfig?version=`.\n"
+   "approvedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true
    },
    "scopePath": {
     "type": "string",
@@ -691,43 +728,43 @@
    "archived"
   ]
  },
- "CreateMenuRequest": {
-  "x-ticvai-persistence": "none — request only",
+ "DeepLinkScheme": {
+  "x-ticvai-persistence": "none — derived from the primary domain and the published configuration",
   "type": "object",
+  "description": "The URL patterns a tenant's own site uses to link into the storefront and the app (CHG-CSA-037).",
   "required": [
-   "code",
-   "name",
-   "outletId"
+   "baseUrl",
+   "patterns"
   ],
   "properties": {
-   "code": {
+   "baseUrl": {
     "type": "string",
-    "maxLength": 64
+    "description": "The primary domain, or the platform subdomain where none is primary."
    },
-   "name": {
-    "type": "string",
-    "maxLength": 200
+   "patterns": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "kind",
+      "pattern"
+     ],
+     "properties": {
+      "kind": {
+       "type": "string",
+       "description": "A `LinkTarget.kind`, or `bookingFlow`."
+      },
+      "pattern": {
+       "type": "string",
+       "description": "e.g. `/p/{productId}`, `/e/{eventId}`, `/book/{flowKey}`."
+      }
+     }
+    }
    },
-   "outletId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "availability": {
-    "$ref": "#/components/schemas/MenuAvailability"
+   "appLinksEnabled": {
+    "type": "boolean"
    }
   }
- },
- "EntitlementStatus": {
-  "type": "string",
-  "description": "**What the storage layer holds, and what a guest is shown.** `MediaEntitlements` carried only `isValid` and a reason string — a boolean cannot distinguish a ticket that was used from one that expired, was refunded, or was transferred to somebody else, and those are four different conversations at a gate.\nAdded 17 August. `states/entitlement.yaml` had modelled these six since 14 August and the contract had no enum behind it, which the state checker reported correctly for three days.\n",
-  "enum": [
-   "issued",
-   "partiallyConsumed",
-   "fullyConsumed",
-   "expired",
-   "cancelled",
-   "surrendered"
-  ]
  },
  "ExpiringMedia": {
   "x-ticvai-persistence": "none — computed",
@@ -998,10 +1035,25 @@
  "HomepageLayout": {
   "x-ticvai-persistence": "whitelabel.homepage_section",
   "type": "object",
+  "description": "**The client-approved web and app wireframes are the layout** (Chinmay, 2 October, workbook Q163; CHG-CSA-040): sections, their order and their options follow the approved wireframes and change only where the spec breaks. **Landing-page templates** (workbook Q41 batch 2; CHG-CSA-037): a tenant with no landing page of its own starts from a TICVAI template (`templateKey`, `listLandingPageTemplates`); a tenant with its own site links into the storefront with deep links (`getDeepLinkScheme`, `buildDeepLink`).",
   "required": [
    "sections"
   ],
   "properties": {
+   "templateKey": {
+    "type": "string",
+    "nullable": true,
+    "description": "The landing-page template this layout started from (`listLandingPageTemplates`), or null for a layout composed from scratch (CHG-CSA-037)."
+   },
+   "landingSource": {
+    "type": "string",
+    "enum": [
+     "storefront",
+     "ownSite"
+    ],
+    "default": "storefront",
+    "description": "`storefront`: this home is the tenant's landing page. `ownSite`: the tenant's own website is the landing page and links in with deep links; this home is still served at the storefront address."
+   },
    "id": {
     "type": "string",
     "format": "uuid",
@@ -1044,7 +1096,19 @@
       "maxItems": {
        "type": "integer",
        "nullable": true,
-       "description": "How many items the section shows. On the mobile Home, `attractions`, `dining`, `whatsOn` and `shop` show 1 or 2 highlights (decided 29 September, MOB-3)."
+       "description": "**How many cards the section shows, the venue's choice** (Chinmay, 2 October, workbook Q152: every customisation option of the approved wireframe, including the card count per section; CHG-CSA-040). Replaces the fixed 1 or 2 highlights of MOB-3: the CMS offers the counts the approved wireframe offers."
+      },
+      "scrollAnimation": {
+       "type": "string",
+       "enum": [
+        "rise",
+        "scale",
+        "slide",
+        "blur",
+        "none"
+       ],
+       "default": "rise",
+       "description": "**How the section enters as the guest scrolls** (Chinmay, 2 October, workbook Q153: \"must be there\"; DI-1088; CHG-CSA-040). Rise, Scale, Slide, Blur or None, as the v4 prototype offers; `none` for guests who asked the device for reduced motion is applied whatever is set."
       },
       "heroStyle": {
        "type": "string",
@@ -1082,56 +1146,33 @@
    "spacer"
   ]
  },
- "LanguageConfig": {
-  "x-ticvai-persistence": "none — embedded in tenant_config",
+ "LandingPageTemplate": {
+  "x-ticvai-persistence": "none — TICVAI's template catalogue, read-only",
   "type": "object",
+  "description": "A home page TICVAI provides for a tenant with no landing page of its own (CHG-CSA-037).",
   "required": [
-   "languages",
-   "defaultLanguage"
+   "templateKey",
+   "name",
+   "layout"
   ],
   "properties": {
-   "languages": {
-    "type": "array",
-    "items": {
-     "type": "string",
-     "pattern": "^[a-z]{2}$"
-    }
+   "templateKey": {
+    "type": "string"
    },
-   "defaultLanguage": {
+   "name": {
+    "type": "string"
+   },
+   "presetKey": {
     "type": "string",
-    "pattern": "^[a-z]{2}$"
+    "nullable": true,
+    "description": "The Site Builder preset it belongs to (`SiteSetupProgress.presetKey`)."
    },
-   "rtlLanguages": {
-    "type": "array",
-    "readOnly": true,
-    "x-ticvai-derived": "onRead",
-    "description": "The enabled languages written right to left — those whose Unicode CLDR character order is `right-to-left` (Arabic, `ar`, among them). Not configured; it follows from `languages`.",
-    "items": {
-     "type": "string",
-     "pattern": "^[a-z]{2}$"
-    }
+   "thumbnailUrl": {
+    "type": "string",
+    "nullable": true
    },
-   "translationGaps": {
-    "type": "array",
-    "readOnly": true,
-    "description": "Content lacking a version in an enabled language.",
-    "items": {
-     "type": "object",
-     "properties": {
-      "language": {
-       "type": "string"
-      },
-      "missingCount": {
-       "type": "integer"
-      },
-      "areas": {
-       "type": "array",
-       "items": {
-        "type": "string"
-       }
-      }
-     }
-    }
+   "layout": {
+    "$ref": "#/components/schemas/HomepageLayout"
    }
   }
  },
@@ -1407,112 +1448,6 @@
    }
   ]
  },
- "MediaEntitlements": {
-  "type": "object",
-  "x-ticvai-persistence": "none — projection over entitlement and scan history",
-  "required": [
-   "mediaCode",
-   "isValid",
-   "entitlements"
-  ],
-  "properties": {
-   "mediaCode": {
-    "type": "string"
-   },
-   "mediaKind": {
-    "type": "string",
-    "enum": [
-     "qr",
-     "wristband",
-     "card",
-     "nfc",
-     "mobilePass"
-    ]
-   },
-   "subjectId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "isValid": {
-    "type": "boolean"
-   },
-   "invalidReason": {
-    "type": "string",
-    "nullable": true
-   },
-   "canAcceptMore": {
-    "type": "boolean",
-    "description": "False where the media has been surrendered, expired or blocked. A cashier should know before taking money, not after.\n"
-   },
-   "entitlements": {
-    "type": "array",
-    "items": {
-     "type": "object",
-     "properties": {
-      "entitlementId": {
-       "type": "string",
-       "format": "uuid"
-      },
-      "name": {
-       "type": "string"
-      },
-      "kind": {
-       "type": "string",
-       "enum": [
-        "admission",
-        "locker",
-        "fnb",
-        "retail",
-        "parking",
-        "rental",
-        "experience",
-        "membership"
-       ]
-      },
-      "orderId": {
-       "type": "string",
-       "format": "uuid"
-      },
-      "addedAt": {
-       "type": "string",
-       "format": "date-time"
-      },
-      "status": {
-       "allOf": [
-        {
-         "$ref": "#/components/schemas/EntitlementStatus"
-        }
-       ],
-       "description": "**Replaced `isRedeemed` on 17 August.** A boolean could not distinguish a ticket that was used from one that expired, was refunded, or was transferred — four different conversations at a gate, and the steward could see only \"not valid\".\n"
-      },
-      "entriesUsed": {
-       "type": "integer"
-      },
-      "entriesAllowed": {
-       "type": "integer",
-       "nullable": true
-      },
-      "redeemedAt": {
-       "type": "string",
-       "format": "date-time",
-       "nullable": true
-      },
-      "transferredToSubjectId": {
-       "type": "string",
-       "format": "uuid",
-       "nullable": true
-      },
-      "validTo": {
-       "type": "string",
-       "format": "date-time",
-       "nullable": true
-      }
-     }
-    }
-   }
-  }
- },
  "MediaKind": {
   "type": "string",
   "enum": [
@@ -1688,210 +1623,6 @@
    }
   }
  },
- "Menu": {
-  "x-ticvai-persistence": "fnb.menu",
-  "type": "object",
-  "required": [
-   "id",
-   "code",
-   "name",
-   "outletId",
-   "isActive"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "code": {
-    "type": "string",
-    "maxLength": 64
-   },
-   "name": {
-    "type": "string",
-    "maxLength": 200
-   },
-   "outletId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "availability": {
-    "$ref": "#/components/schemas/MenuAvailability"
-   },
-   "sections": {
-    "type": "array",
-    "items": {
-     "$ref": "#/components/schemas/MenuSection"
-    }
-   },
-   "isActive": {
-    "type": "boolean"
-   },
-   "publishedVersion": {
-    "type": "integer",
-    "nullable": true,
-    "readOnly": true,
-    "description": "The `MenuVersion.version` live now. Null for a menu never published."
-   },
-   "publishedAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true,
-    "readOnly": true
-   }
-  }
- },
- "MenuAvailability": {
-  "x-ticvai-persistence": "none — embedded in menu",
-  "type": "object",
-  "description": "When this menu is in force. Absent means always. Days, times and dates are all read in the Region's time zone, not UTC.",
-  "properties": {
-   "daysOfWeek": {
-    "type": "array",
-    "items": {
-     "type": "integer",
-     "minimum": 0,
-     "maximum": 6
-    }
-   },
-   "startTime": {
-    "type": "string",
-    "pattern": "^([01]\\d|2[0-3]):[0-5]\\d$",
-    "description": "Wall-clock time, in the Region's time zone."
-   },
-   "endTime": {
-    "type": "string",
-    "pattern": "^([01]\\d|2[0-3]):[0-5]\\d$",
-    "description": "Wall-clock time, in the Region's time zone."
-   },
-   "validFrom": {
-    "type": "string",
-    "format": "date",
-    "nullable": true,
-    "description": "Calendar day, in the Region's time zone, not UTC."
-   },
-   "validTo": {
-    "type": "string",
-    "format": "date",
-    "nullable": true,
-    "description": "Calendar day, in the Region's time zone, not UTC."
-   }
-  }
- },
- "MenuItem": {
-  "x-ticvai-persistence": "fnb.menu_item",
-  "type": "object",
-  "required": [
-   "id",
-   "productVariantId",
-   "name",
-   "price",
-   "isAvailable"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "productVariantId": {
-    "type": "string",
-    "format": "uuid",
-    "description": "The catalogue variant this item sells. Pricing and tax come from there — a menu is a presentation of the catalogue, not a second catalogue.\n"
-   },
-   "name": {
-    "type": "string"
-   },
-   "description": {
-    "type": "string",
-    "nullable": true
-   },
-   "price": {
-    "x-ticvai-column": "list_price",
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "sortOrder": {
-    "type": "integer"
-   },
-   "modifierGroupIds": {
-    "type": "array",
-    "items": {
-     "type": "string",
-     "format": "uuid"
-    }
-   },
-   "stationId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "menuSectionId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "readOnly": true,
-    "description": "The section the item sits in, set by `setMenuSections` and `applyMenuActions` (`moveSection`)."
-   },
-   "isStockTracked": {
-    "type": "boolean",
-    "description": "True where a recipe exists. Stock-tracked items cannot be sold offline."
-   },
-   "isAvailable": {
-    "type": "boolean"
-   },
-   "unavailableReason": {
-    "type": "string",
-    "nullable": true
-   },
-   "restoreAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true,
-    "description": "When an unavailable item comes back on its own (`setItemAvailability`). Null means by hand."
-   },
-   "preparationMinutes": {
-    "type": "integer",
-    "nullable": true
-   },
-   "allergens": {
-    "type": "array",
-    "items": {
-     "$ref": "#/components/schemas/AllergenCode"
-    }
-   }
-  }
- },
- "MenuSection": {
-  "x-ticvai-persistence": "fnb.menu_section",
-  "type": "object",
-  "required": [
-   "code",
-   "name",
-   "sortOrder"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid",
-    "readOnly": true
-   },
-   "code": {
-    "type": "string"
-   },
-   "name": {
-    "type": "string"
-   },
-   "sortOrder": {
-    "type": "integer"
-   },
-   "items": {
-    "type": "array",
-    "description": "The section's items, in sale-board order. An item's membership is `MenuItem.menuSectionId`.",
-    "items": {
-     "$ref": "#/components/schemas/MenuItem"
-    }
-   }
-  }
- },
  "MinimumAppVersion": {
   "x-ticvai-persistence": "none — embedded in tenant_config",
   "type": "object",
@@ -2029,172 +1760,6 @@
    }
   }
  },
- "Order": {
-  "x-ticvai-persistence": "orders.sales_order + orders.order_line",
-  "type": "object",
-  "required": [
-   "id",
-   "venueId",
-   "scopePath",
-   "channel",
-   "status",
-   "currency",
-   "currencyScale",
-   "grossAmount",
-   "taxAmount",
-   "netAmount",
-   "lines",
-   "createdAt",
-   "recordedAt"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid",
-    "description": "The client UUIDv7 from `CreateOrderRequest.id`."
-   },
-   "orderNumber": {
-    "type": "string",
-    "readOnly": true,
-    "description": "The number a guest reads and a cashier types. **Server-assigned: the venue prefix and a sequence per venue**, for example `DXB1-000123` (decided 28 September, audit R152). A till holds a reserved range of the venue sequence, so an order taken offline gets its number on the till and keeps it through `syncOrders`. **Not gapless**: an unused reserved range leaves a gap, and that is allowed. Only tax invoices are gapless, per legal entity. The receipt carries this number.\n"
-   },
-   "channel": {
-    "allOf": [
-     {
-      "$ref": "#/components/schemas/OrderChannel"
-     }
-    ],
-    "description": "Where it came from. Drives revenue attribution, promotion eligibility and the self-service adoption figures the operator will ask for within a month of launch.\n"
-   },
-   "venueId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "scopePath": {
-    "type": "string"
-   },
-   "status": {
-    "$ref": "#/components/schemas/OrderStatus"
-   },
-   "currency": {
-    "type": "string",
-    "pattern": "^[A-Z]{3}$",
-    "x-ticvai-persisted": false,
-    "description": "**Resolved from the region, not stored** (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and cannot be anything else. **Kept on the wire , removed from the table** — a client should not walk a hierarchy to read a figure, and the  database should not hold nine million copies of AED. Four tables genuinely differ from their\n region and keep a stored currency: `orders.payment.tender_currency`, `inventory.supplier`, \n`ledger.account`, `control.partner_agreement`.\n"
-   },
-   "currencyScale": {
-    "type": "integer",
-    "minimum": 0,
-    "maximum": 4,
-    "x-ticvai-persisted": false,
-    "description": "**Resolved from the region, not stored** (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and cannot be anything else — storing it per ro w is a copy of a fact that cannot differ. **Kept on the wire, removed from the table**: a cl ient reading a figure should not walk a hierarchy to know what it means, and the database sh ould not hold nine million copies of AED. Four tables genuinely differ from their region and\n keep a stored currency — `orders.payment.tender_currency`, `inventory.supplier`, `ledger.ac\ncount`, `control.partner_agreement`. **A guest paying USD at an AED venue is a real row; a w orkstation with its own currency is a misconfiguration.**\n"
-   },
-   "grossAmount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "taxAmount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "netAmount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "refundedAmount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "droppedPromotions": {
-    "type": "array",
-    "readOnly": true,
-    "x-ticvai-persisted": false,
-    "description": "**Promotions left off this order at checkout because their budget cap would have been exceeded** (decided 28 September, audit R101 (8)). Empty when none was dropped. Returned by `checkoutCart` and `createOrder`, not stored.\n",
-    "items": {
-     "type": "object",
-     "required": [
-      "promotionId"
-     ],
-     "properties": {
-      "promotionId": {
-       "type": "string",
-       "format": "uuid"
-      },
-      "name": {
-       "type": "string"
-      },
-      "reason": {
-       "type": "string",
-       "enum": [
-        "budgetCapReached"
-       ]
-      }
-     }
-    }
-   },
-   "totalPriceVariance": {
-    "allOf": [
-     {
-      "$ref": "../shared/common.yaml#/components/schemas/Money"
-     }
-    ],
-    "description": "Sum across lines. Zero on a normal order."
-   },
-   "lines": {
-    "type": "array",
-    "items": {
-     "$ref": "#/components/schemas/OrderLine"
-    }
-   },
-   "payments": {
-    "type": "array",
-    "items": {
-     "$ref": "#/components/schemas/Payment"
-    }
-   },
-   "principalId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "workstationId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "shiftId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "subjectId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "holdLabel": {
-    "type": "string",
-    "maxLength": 60,
-    "nullable": true,
-    "readOnly": true,
-    "description": "The `label` a cashier gave when parking it with `holdOrder` — how they find it again. Null on an order never held."
-   },
-   "heldUntil": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true,
-    "readOnly": true,
-    "description": "When a held order expires and is voided (states/order.yaml), from `holdOrder`'s `holdUntil`. Null on an order not currently held."
-   },
-   "createdAt": {
-    "type": "string",
-    "format": "date-time"
-   },
-   "recordedAt": {
-    "type": "string",
-    "format": "date-time"
-   },
-   "syncedAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   }
-  }
- },
  "Page": {
   "type": "object",
   "required": [
@@ -2240,14 +1805,43 @@
    },
    "theme": {
     "type": "string",
+    "deprecated": true,
     "enum": [
      "light",
      "dark"
-    ]
+    ],
+    "description": "Deprecated with `Theme.darkMode` (CHG-CSA-035); the preview always renders the venue's theme."
    },
    "language": {
     "type": "string",
     "pattern": "^[a-z]{2}$"
+   },
+   "outputPreviews": {
+    "type": "array",
+    "readOnly": true,
+    "description": "**The PDF ticket and the Apple and Google Wallet passes, previewed with the app** (Chinmay, 2 October, workbook Q151: in Block A; CHG-CSA-041). One entry per output asked for in `outputs`.",
+    "items": {
+     "type": "object",
+     "required": [
+      "output",
+      "url"
+     ],
+     "properties": {
+      "output": {
+       "type": "string",
+       "enum": [
+        "app",
+        "pdfTicket",
+        "appleWalletPass",
+        "googleWalletPass"
+       ]
+      },
+      "url": {
+       "type": "string",
+       "description": "A short-lived link to the rendered output (the PDF, the `.pkpass`, or the Google pass preview), expiring with the preview."
+      }
+     }
+    }
    },
    "expiresAt": {
     "type": "string",
@@ -2504,6 +2098,101 @@
    }
   }
  },
+ "SiteSetupProgress": {
+  "x-ticvai-persistence": "whitelabel.site_setup_progress",
+  "type": "object",
+  "description": "**The Site Builder's saved progress, one row per tenant (decided 29 September, W12 and M24-05).** Not configuration and not published. `presetKey` is the starting point the operator picked; the builder pre-fills each step from it, which is what keeps the minimum path to a working site at about 30 minutes.\n",
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "presetKey": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "themePark",
+     "waterPark",
+     "museum",
+     "theatreAndArena",
+     "singleAttraction",
+     "playCentre",
+     "multiVenue",
+     null
+    ],
+    "description": "The starting point. Each preset proposes the modules, the booking flow types (with their default step order), the homepage sections, the mobile tabs and a booking-flow `preset`; nothing is written until the operator accepts a step."
+   },
+   "currentStep": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/SiteSetupStepKey"
+     }
+    ],
+    "nullable": true
+   },
+   "steps": {
+    "type": "object",
+    "description": "One entry per `SiteSetupStepKey`.",
+    "additionalProperties": {
+     "type": "object",
+     "required": [
+      "status"
+     ],
+     "properties": {
+      "status": {
+       "type": "string",
+       "enum": [
+        "notStarted",
+        "inProgress",
+        "done",
+        "skipped"
+       ]
+      },
+      "completedAt": {
+       "type": "string",
+       "format": "date-time",
+       "nullable": true
+      },
+      "completedByPrincipalId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true
+      }
+     }
+    }
+   },
+   "minimumPathDone": {
+    "type": "boolean",
+    "readOnly": true,
+    "x-ticvai-derived": "onRead",
+    "description": "True once the minimum path is done: a logo, the four theme colours, at least one enabled valid booking flow and a published version. Everything else keeps its preset or schema default."
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "The partition key (ADR-0005). Written at `tenant` scope."
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
+ "SiteSetupStepKey": {
+  "type": "string",
+  "description": "The seven Site Builder steps, in order (decided 29 September, W12): venue and modules (CMS-001), ticketing flows (CMS-103), compose steps (CMS-103), Help me choose (CMS-101), look and feel (CMS-007, CMS-009, CMS-002, CMS-004, CMS-008, CMS-005, CMS-003), mobile app (CMS-009, CMS-004, CMS-007), preview and publish (CMS-006, CMS-012, CMS-014).\n",
+  "enum": [
+   "venueAndModules",
+   "ticketingFlows",
+   "composeSteps",
+   "helpMeChoose",
+   "lookAndFeel",
+   "mobileApp",
+   "previewAndPublish"
+  ]
+ },
  "TenantAppStatus": {
   "x-ticvai-persistence": "none — computed",
   "type": "object",
@@ -2684,209 +2373,6 @@
    }
   }
  },
- "TenantConfig": {
-  "x-ticvai-persistence": "whitelabel.tenant_config",
-  "type": "object",
-  "description": "**The tenant's working draft**, one row per tenant (see the header). Published versions are `ConfigVersion.snapshot`, not further rows here.\n**Only `tenantId` and `version` are required**, because the draft is built one part at a time: the first `set*` call creates the row with that part alone. A part that is still unset is what `validateTenantConfig` reports (`missingRequiredAsset` and the like) and what blocks `publishTenantConfig` — a storage rule that every part exist would stop the first save.\n",
-  "required": [
-   "tenantId",
-   "version"
-  ],
-  "properties": {
-   "tenantId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "version": {
-    "type": "string",
-    "description": "The draft's working version label; the published one is `ConfigVersion.version`."
-   },
-   "isDraft": {
-    "type": "boolean",
-    "readOnly": true,
-    "description": "True for the working draft, which is the only row."
-   },
-   "brand": {
-    "$ref": "#/components/schemas/BrandIdentity"
-   },
-   "appIcons": {
-    "$ref": "#/components/schemas/AppIcons"
-   },
-   "bookingFlow": {
-    "$ref": "#/components/schemas/BookingFlowConfig"
-   },
-   "bookingFlows": {
-    "type": "array",
-    "readOnly": true,
-    "x-ticvai-derived": "onRead",
-    "description": "Every venue's booking flows in the draft (`whitelabel.booking_flow`), so a publish snapshots them with the rest (decided 29 September, W12).",
-    "items": {
-     "$ref": "#/components/schemas/BookingFlow"
-    }
-   },
-   "theme": {
-    "$ref": "#/components/schemas/Theme"
-   },
-   "fonts": {
-    "$ref": "#/components/schemas/FontConfig"
-   },
-   "footer": {
-    "$ref": "#/components/schemas/FooterConfig"
-   },
-   "notificationBranding": {
-    "type": "object",
-    "nullable": true,
-    "description": "BL-003. **`marketing-crm` holds the templates and nothing said whose identity they wear.** A message sent on behalf of a venue carries that venue's sender name, reply-to and logo — **an operational alert arriving from `noreply@ticvai.com` is one a guest marks as spam.**\nResolved on the template at send time rather than duplicated per template.\n",
-    "properties": {
-     "senderName": {
-      "type": "string"
-     },
-     "replyToEmail": {
-      "type": "string",
-      "format": "email"
-     },
-     "smsSenderId": {
-      "type": "string",
-      "nullable": true
-     },
-     "whatsappBusinessId": {
-      "type": "string",
-      "nullable": true
-     },
-     "logoAssetId": {
-      "type": "string",
-      "format": "uuid",
-      "nullable": true
-     }
-    }
-   },
-   "enabledPaymentMethods": {
-    "type": "array",
-    "nullable": true,
-    "description": "BL-004. **`FeatureToggle` could turn Apple Pay on and could not say which cards a tenant accepts.** Resolved against `orders.PaymentProvider.supportedMethods` — the tenant's choice within what the gateway offers, and **a tenant enabling a method their provider does not support should fail here rather than at checkout.**\n",
-    "items": {
-     "type": "string"
-    }
-   },
-   "accessibility": {
-    "$ref": "#/components/schemas/AccessibilitySettings"
-   },
-   "header": {
-    "$ref": "#/components/schemas/HeaderConfig"
-   },
-   "navigation": {
-    "$ref": "#/components/schemas/NavigationConfig"
-   },
-   "homepage": {
-    "$ref": "#/components/schemas/HomepageLayout"
-   },
-   "modules": {
-    "type": "array",
-    "items": {
-     "$ref": "#/components/schemas/ModuleEnablement"
-    }
-   },
-   "features": {
-    "type": "array",
-    "items": {
-     "$ref": "#/components/schemas/FeatureToggle"
-    }
-   },
-   "languages": {
-    "$ref": "#/components/schemas/LanguageConfig"
-   },
-   "updatedAt": {
-    "type": "string",
-    "format": "date-time"
-   },
-   "isInMaintenance": {
-    "type": "boolean",
-    "default": false,
-    "description": "Written by `setMaintenanceMode`; read by `getTenantAppStatus`."
-   },
-   "maintenanceMessage": {
-    "allOf": [
-     {
-      "$ref": "#/components/schemas/LocalisedText"
-     }
-    ],
-    "nullable": true,
-    "description": "The message on the branded maintenance screen."
-   },
-   "expectedBackAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "minimumAppVersion": {
-    "allOf": [
-     {
-      "$ref": "#/components/schemas/MinimumAppVersion"
-     }
-    ],
-    "description": "Live state, written by `setMaintenanceMode` (audit R073)."
-   },
-   "contact": {
-    "allOf": [
-     {
-      "$ref": "#/components/schemas/VenueContact"
-     }
-    ],
-    "description": "Live state, written by `setMaintenanceMode` (audit R073)."
-   },
-   "availability": {
-    "allOf": [
-     {
-      "$ref": "#/components/schemas/AppAvailability"
-     }
-    ],
-    "description": "Live state, written by `setMaintenanceMode` (audit R073)."
-   },
-   "availabilityMessage": {
-    "allOf": [
-     {
-      "$ref": "#/components/schemas/LocalisedText"
-     }
-    ],
-    "nullable": true,
-    "description": "Live state, written by `setMaintenanceMode` (audit R073)."
-   },
-   "venues": {
-    "type": "array",
-    "x-ticvai-derived": "onRead",
-    "description": "The tenant's active venues, for the guest venue picker on WEB-001 and GST-001 (decided 28 September, audit R267). Public: returned without a session and cached with the rest of the response. Read from `tenancy` venues; a closed or archived venue is left out.\n",
-    "items": {
-     "type": "object",
-     "required": [
-      "venueId",
-      "name"
-     ],
-     "properties": {
-      "venueId": {
-       "type": "string",
-       "format": "uuid"
-      },
-      "name": {
-       "$ref": "#/components/schemas/LocalisedText"
-      },
-      "city": {
-       "type": "string",
-       "nullable": true
-      },
-      "openingHours": {
-       "allOf": [
-        {
-         "$ref": "#/components/schemas/LocalisedText"
-        }
-       ],
-       "nullable": true,
-       "description": "Today's hours as shown to a guest, e.g. \"10:00 to 22:00\"."
-      }
-     }
-    }
-   }
-  }
- },
  "Theme": {
   "x-ticvai-persistence": "none — embedded in tenant_config",
   "type": "object",
@@ -2919,7 +2405,8 @@
    },
    "darkMode": {
     "type": "object",
-    "description": "Optional dark variant. Derived from the light theme when absent.",
+    "deprecated": true,
+    "description": "**Deprecated and ignored** (Chinmay, 2 October, workbook Q150 and the pre-apply round; CHG-CSA-035). White label has no dark or light mode: the venue's chosen theme is applied, on every device setting. The field is kept so a client built at r1 still parses, is accepted on `setTheme` and returned as stored, and **is never used to render anything or drawn on any screen**; the guest app has no Light/Dark switch.",
     "properties": {
      "primaryColour": {
       "type": "string",
@@ -2997,6 +2484,52 @@
    "text": {
     "type": "string",
     "pattern": "^#[0-9A-Fa-f]{6}$"
+   }
+  }
+ },
+ "TicketProof": {
+  "type": "object",
+  "x-ticvai-persistence": "none — rendered on request, nothing is stored",
+  "description": "A sample ticket from a template, **marked as a proof on the artefact itself** so it cannot be presented at a gate.",
+  "required": [
+   "templateId",
+   "mediaType",
+   "contentRef"
+  ],
+  "properties": {
+   "templateId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "mediaType": {
+    "type": "string",
+    "enum": [
+     "thermalTicket",
+     "a4Pdf",
+     "wristband",
+     "rfidCard",
+     "walletPass",
+     "qrOnly",
+     "sms"
+    ]
+   },
+   "locale": {
+    "type": "string",
+    "nullable": true
+   },
+   "contentRef": {
+    "type": "string",
+    "format": "uri",
+    "description": "Where the rendered proof can be fetched or sent to the printer from."
+   },
+   "walletPlatform": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "appleWallet",
+     "googleWallet"
+    ],
+    "description": "Which wallet the pass preview is for, where `mediaType` is `walletPass` (DEC-151; CHG-CSP-038)."
    }
   }
  },

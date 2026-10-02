@@ -24,11 +24,9 @@ modulesUsed:
   screens: 24
 servicesCalled:
 - service: PlatformService
-  operationCalls: 25
-- service: CatalogueService
-  operationCalls: 1
-- service: LedgerService
-  operationCalls: 1
+  operationCalls: 23
+- service: IdentityService
+  operationCalls: 2
 - service: OrderService
   operationCalls: 1
 coverage:
@@ -44,8 +42,7 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations:
-  - scoreVsiAssessment
+  operations: []
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -66,7 +63,9 @@ screens:
   wave: 3
   density: compact
   operations:
+  - startProspectSignup
   - submitOnboardingApplication
+  - verifyProspectSignupCode
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -132,7 +131,6 @@ screens:
   wave: 3
   density: compact
   operations:
-  - listSaleChannel
   - scoreVsiAssessment
   states:
   - emptyFirstRun
@@ -380,7 +378,6 @@ screens:
   density: compact
   operations:
   - listModuleCatalogue
-  - setModuleListing
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -421,8 +418,7 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations:
-  - setTrialConfiguration
+  operations: []
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -467,11 +463,10 @@ screens:
   wave: 3
   density: compact
   operations:
-  - createLegalEntity
+  - submitOnboardingApplication
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false

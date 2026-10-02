@@ -15,12 +15,23 @@ which records its operations and field shapes in `contracts/frozen/<contract>.js
 while the major version is unchanged:
 
   allowed   a new operation, a new optional request field or parameter, a new response field,
-            a new enum value on a request field
+            a new enum value on a request field, a `security` list that only gained alternatives
+            (every scheme a client used still admits it; 2 October, GFIX-5), **a value added to the
+            `Permission` vocabulary** wherever it appears (Chinmay, 2 October, contract follow-ups;
+            CHG-FUP-001), and the required fields inside a **new optional request object** (a client
+            built before it never sends the object, so it never meets them; CHG-FUP-002)
   refused   an operation removed or moved (method or path), a parameter or field removed, a type
             changed, anything newly required in a request, a response field no longer required,
-            an enum value removed, **a value added to a response enum**, and a change to what the
-            operation means: its `x-ticvai-permission`, `x-ticvai-conflict-policy`,
-            `x-ticvai-read-routing`, `security` or `x-ticvai-emits`
+            an enum value removed, **a value added to a response enum** (other than `Permission`),
+            and a change to what the operation means: its `x-ticvai-permission`,
+            `x-ticvai-permission-by-module`, `x-ticvai-conflict-policy`, `x-ticvai-read-routing`,
+            `security` (an alternative removed or changed) or `x-ticvai-emits`
+
+**Why a new permission is additive** (Chinmay, 2 October: "count as additive", as `security_widened` was).
+`Permission` is a vocabulary, not a state a client branches on: session, grant and role responses carry
+it so a client can filter navigation on the values it knows. A value it does not know names a permission
+no screen it was built with checks, so it is ignored, never mis-handled. What still breaks a client is an
+operation's **own** permission changing under it (`x-ticvai-permission`), and that stays refused.
 
 **Semantics count, not only shapes** (system-design review SD-050 and 17 September minutes M17-14,
 added 30 September). A client built against a frozen contract switches on the enum values it was
@@ -35,6 +46,12 @@ changelog DEV-001 shows (ADR-0026).
 
 A breaking change goes out as a new major version: bump `info.version`, and the check says the
 baseline needs re-freezing instead of failing.
+
+**The vocabulary stays a checklist** (CHG-FUP-003). Because a new `Permission` value is additive, the check also
+fails on a value in no module group of `x-ticvai-permission-modules` (or in two), a preset ticking a value outside
+its module, an `x-ticvai-module-ai-publish` entry that is not a `ModuleKey` mapped to that module's own value, and
+an `x-ticvai-permission-by-module` that names no known map or no field of its contract, and a code in the seed's
+starting configurations (`docs/active/seed-data-proposal.md` section 2) that is not a `Permission` value (CHG-FUP-012).
 
 **Every contract against the release `r1`** (plan item 1C, council of 1 October). Once the git tag
 `r1` exists, every contract is compared with its own text at r1, whether or not it was frozen with
@@ -56,6 +73,7 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import re
 import shutil
 import sys
 import tempfile
@@ -125,8 +143,50 @@ def fields(node, base: Path, prefix="", depth=0, seen=frozenset()) -> dict:
     return out
 
 
-SEMANTIC_KEYS = ("x-ticvai-permission", "x-ticvai-conflict-policy", "x-ticvai-read-routing", "security",
-                 "x-ticvai-emits")
+SEMANTIC_KEYS = ("x-ticvai-permission", "x-ticvai-permission-by-module", "x-ticvai-conflict-policy",
+                 "x-ticvai-read-routing", "security", "x-ticvai-emits")
+
+# **Vocabularies whose growth is additive** (Chinmay, 2 October, contract follow-ups; CHG-FUP-001). A new value
+# is a new name a client was never asked to act on; see the module docstring.
+VOCABULARY_ENUMS = ("Permission",)
+
+
+def vocabulary(t: str) -> bool:
+    """True where a field's type is one of VOCABULARY_ENUMS, alone or as the items of (nested) arrays."""
+    while t.startswith("array<") and t.endswith(">"):
+        t = t[len("array<"):-1]
+    return t in {f"enum:{n}" for n in VOCABULARY_ENUMS}
+
+
+def parents(k: str) -> list[str]:
+    """The field keys that contain `k`: `a.b[].c` is inside `a` and `a.b`."""
+    parts = k.split(".")
+    return [".".join(parts[:i]).removesuffix("[]") for i in range(1, len(parts))]
+
+
+def newly_required(k: str, y: dict, fa: dict) -> bool:
+    """**A new required field breaks a client only where the client already sends its parent** (CHG-FUP-002).
+    A required field inside an object that is itself new is met only by a client that chose to send the new
+    object; if that object is required, the object is reported, once, as the newly required thing."""
+    return k not in fa and y["required"] and all(p in fa for p in parents(k))
+
+
+def security_widened(old: str | None, new: str | None) -> bool:
+    """**A security list that only gained alternatives is additive** (2 October, GFIX-5). OpenAPI security is
+    a list of alternatives, any one of which admits the caller: a client built against r1 presents one the
+    old list accepted, and the new list still accepts it. Adding `guestAuth` or `{}` (credential optional)
+    widens who may call; dropping or changing an alternative is still breaking. 84 guest-audience operations
+    admitted only a staff bearer token (check-audience-match AM-GUEST-SECURITY); letting guests in must not
+    read as a breaking change to the staff clients that keep working."""
+    try:
+        a = json.loads(old) if old else None
+        b = json.loads(new) if new else None
+    except (TypeError, ValueError):
+        return False
+    if not isinstance(a, list) or not isinstance(b, list) or not a:
+        return False
+    alts = lambda xs: {json.dumps(x, sort_keys=True) for x in xs}
+    return alts(a) <= alts(b)
 
 
 def semantics(op: dict, c: dict) -> dict:
@@ -208,18 +268,20 @@ def compare(old: dict, new: dict) -> list[str]:
                 if gone:
                     bad.append(f"{o}: {where} `{k}` lost enum value(s) {sorted(gone)}")
                 added_values = set(y["enum"]) - set(x["enum"])
-                if not inbound and added_values:
+                if not inbound and added_values and not vocabulary(y["type"]):
                     # SD-050: breaking. A client switches on the values it was given; a new one falls
                     # into its default branch, which is a behaviour change nobody reviewed.
                     bad.append(f"{o}: response `{k}` gained enum value(s) {sorted(added_values)}")
             if inbound:
                 for k, y in fb.items():
-                    if k not in fa and y["required"]:
+                    if newly_required(k, y, fa):
                         bad.append(f"{o}: new required {where} `{k}`")
         sa, sb = a.get("semantics"), b.get("semantics") or {}
         if sa is not None:  # baselines frozen before SD-050 carry none
             for k in SEMANTIC_KEYS:
                 if sa.get(k) != sb.get(k):
+                    if k == "security" and security_widened(sa.get(k), sb.get(k)):
+                        continue
                     bad.append(f"{o}: {k} changed {sa.get(k)} -> {sb.get(k)}")
     return bad
 
@@ -253,11 +315,18 @@ def additive(old: dict, new: dict) -> list[str]:
             for k, y in sorted(fb.items()):
                 x = fa.get(k)
                 if x is None:
-                    if not (inbound and y["required"]):
-                        out.append(f"{o}: new {'optional ' if inbound else ''}{where} `{k}`")
+                    if not inbound:
+                        out.append(f"{o}: new {where} `{k}`")
+                    elif not y["required"]:
+                        out.append(f"{o}: new optional {where} `{k}`")
+                    elif not newly_required(k, y, fa):
+                        out.append(f"{o}: new {where} `{k}`, required only inside a new optional object")
                     continue
                 if inbound and set(y["enum"]) - set(x["enum"]):
                     out.append(f"{o}: {where} `{k}` accepts new value(s) {sorted(set(y['enum']) - set(x['enum']))}")
+                if not inbound and vocabulary(y["type"]) and set(y["enum"]) - set(x["enum"]):
+                    out.append(f"{o}: response `{k}` names new {y['type'].split(':')[-1].rstrip('>')} value(s) "
+                               f"{sorted(set(y['enum']) - set(x['enum']))} (a vocabulary; additive)")
                 if inbound and x["required"] and not y["required"]:
                     out.append(f"{o}: {where} `{k}` is no longer required")
                 if not inbound and y["required"] and not x["required"]:
@@ -375,6 +444,87 @@ def against_release(ref: str | None) -> int | None:
           + (f", {len(entry_errors)} incomplete approval(s)" if entry_errors else ""))
     return failures
 
+PERMISSIONS = ROOT / "contracts" / "shared" / "permissions.yaml"
+COMMON = ROOT / "contracts" / "shared" / "common.yaml"
+SEED = ROOT / "docs" / "active" / "seed-data-proposal.md"
+
+
+def seed_preset_tokens() -> list[str]:
+    """The permission names the seed's starting configurations tick: every `UPPER_CASE` code in section 2 of
+    `docs/active/seed-data-proposal.md` (CHG-FUP-012). The five starting configurations are presets as much as
+    All, Viewer and Mid-level are, and the seed loads them as written."""
+    if not SEED.exists():
+        return []
+    text = SEED.read_text(encoding="utf-8")
+    m = re.search(r"(?ms)^## 2\. .*?(?=^## (?!2\.\d))", text)
+    return re.findall(r"`([A-Z][A-Z0-9]*(?:_[A-Z0-9]+)+)`", m.group(0)) if m else []
+
+
+def vocabulary_problems() -> list[str]:
+    """**A new permission is additive only if it lands on the role checklist** (CHG-FUP-001, CHG-FUP-003; the
+    planned check of CHG-CSP-003). Once a `Permission` value may be added freely, nothing else stops one being
+    added to the enum and to no module group, which is a permission no role builder can tick. So every value
+    sits in exactly one group of `x-ticvai-permission-modules`, every preset ticks only its own module's values,
+    `x-ticvai-module-ai-publish` maps `ModuleKey` values to enum values, and an operation's
+    `x-ticvai-permission-by-module` points at that map and at a target field that exists."""
+    if not PERMISSIONS.exists():
+        return []
+    doc = yaml.safe_load(PERMISSIONS.read_text(encoding="utf-8")) or {}
+    enum = list(((doc.get("components") or {}).get("schemas") or {}).get("Permission", {}).get("enum") or [])
+    out = [f"Permission value {v} is listed twice" for v in sorted({v for v in enum if enum.count(v) > 1})]
+    values = set(enum)
+    groups = (doc.get("x-ticvai-permission-modules") or {}).get("modules") or {}
+    where: dict = {}
+    for g, perms in groups.items():
+        for v in perms or []:
+            where.setdefault(v, []).append(g)
+            if v not in values:
+                out.append(f"module group {g} lists {v}, which is not a Permission value")
+    for v in enum:
+        if v not in where:
+            out.append(f"Permission value {v} is in no module group of x-ticvai-permission-modules: no role can tick it")
+        elif len(where[v]) > 1:
+            out.append(f"Permission value {v} is in more than one module group ({', '.join(where[v])})")
+    presets = (doc.get("x-ticvai-permission-presets") or {}).get("presets") or {}
+    for name, per_module in presets.items():
+        if not isinstance(per_module, dict):
+            continue
+        for g, perms in per_module.items():
+            for v in perms or []:
+                if v not in (groups.get(g) or []):
+                    out.append(f"preset {name} ticks {v} under {g}, which is not a permission of that module")
+    for v in sorted(set(seed_preset_tokens()) - values):
+        out.append(f"docs/active/seed-data-proposal.md section 2 ticks {v}, which is not a Permission value")
+    modules = set()
+    if COMMON.exists():
+        common = yaml.safe_load(COMMON.read_text(encoding="utf-8")) or {}
+        modules = set(((common.get("components") or {}).get("schemas") or {}).get("ModuleKey", {}).get("enum") or [])
+    ai_map = (doc.get("x-ticvai-module-ai-publish") or {}).get("modules") or {}
+    for m, v in ai_map.items():
+        if modules and m not in modules:
+            out.append(f"x-ticvai-module-ai-publish names module {m}, which is not a ModuleKey")
+        if v not in values:
+            out.append(f"x-ticvai-module-ai-publish maps {m} to {v}, which is not a Permission value")
+        elif m not in where.get(v, []):
+            out.append(f"x-ticvai-module-ai-publish maps {m} to {v}, which sits in module group "
+                       f"{', '.join(where.get(v, [])) or 'none'}")
+    for f in sorted(ROOT.glob("contracts/*/*.yaml")):
+        c = sd.contract(f)
+        schemas = ((c.get("components") or {}).get("schemas") or {})
+        for item in (c.get("paths") or {}).values():
+            for op in (item or {}).values():
+                if not isinstance(op, dict) or "x-ticvai-permission-by-module" not in op:
+                    continue
+                spec, oid = op["x-ticvai-permission-by-module"] or {}, op.get("operationId")
+                if not str(spec.get("permissions", "")).endswith("permissions.yaml#/x-ticvai-module-ai-publish"):
+                    out.append(f"{f.stem}.{oid}: x-ticvai-permission-by-module.permissions names no known module map")
+                schema, _, field = str(spec.get("moduleOf", "")).partition(".")
+                if field not in ((schemas.get(schema) or {}).get("properties") or {}):
+                    out.append(f"{f.stem}.{oid}: x-ticvai-permission-by-module.moduleOf {spec.get('moduleOf')!r} "
+                               "is not a field of a schema in this contract")
+    return out
+
+
 def main() -> int:
     argv = sys.argv[1:]
     ref = None
@@ -402,13 +552,18 @@ def main() -> int:
         print(json.dumps(rows, indent=1))
         return 0
 
+    vocab = vocabulary_problems()
+    for v in vocab:
+        print(f"  FAIL  {PERMISSIONS.relative_to(ROOT).as_posix()}: {v}")
+    if not vocab:
+        print("  ok    the Permission vocabulary: every value in one module group, presets and module maps consistent")
     release = against_release(ref)          # None: no r1 tag
     baselines = sorted(FROZEN.glob("*.json")) if FROZEN.exists() else []
-    if not baselines and release is None:
+    if not baselines and release is None and not vocab:
         print(f"PASS - no baseline: no {ref or 'r1'} tag and no contract frozen yet "
               "(freeze one with --freeze <contract>)")
         return 0
-    failures, refreeze = release or 0, []
+    failures, refreeze = (release or 0) + len(vocab), []
     for f in baselines:
         old = json.loads(f.read_text(encoding="utf-8"))
         new = shape(old["contract"])
@@ -427,10 +582,12 @@ def main() -> int:
     for r in refreeze:
         print(f"  NOTE  {r}: new major version, re-freeze with --freeze")
     if failures:
-        print(f"FAIL - {failures} breaking change(s) or incomplete approval(s): make a change additive, or list it in "
-              f"{BREAKING.relative_to(ROOT).as_posix()} with its approval and the tag producer and consumer move to")
+        print(f"FAIL - {failures} breaking change(s), incomplete approval(s) or vocabulary problem(s): make a change "
+              f"additive, or list it in {BREAKING.relative_to(ROOT).as_posix()} with its approval and the tag producer "
+              "and consumer move to; put every Permission value in exactly one module group")
         return 1
     what = [f"{len(baselines)} frozen contract(s) changed additively or not at all"] if baselines else []
+    what.append("the Permission vocabulary consistent")
     if release is not None:
         what.insert(0, f"every contract compatible with {ref or 'r1'} or its breaking changes approved")
     print("PASS - " + "; ".join(what))

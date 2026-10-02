@@ -1,6 +1,6 @@
 # P08-access-venue-02 — P08 · Access & Venue (2 of 3)
 
-**10 screens · 56 operations · 83 schemas · 21 permissions**
+**10 screens · 40 operations · 62 schemas · 17 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -48,8 +48,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 21 permissions apply here:
-  `ACCESS_OVERRIDE, ACCESS_VALIDATE, ASSET_LIBRARY_VIEW, ASSET_MANAGE, ASSET_VIEW, AUDIT_VIEW, INCIDENT_MANAGE, INCIDENT_REPORT, INCIDENT_VIEW, PRODUCT_CONFIGURE, PRODUCT_VIEW, QUEUE_MANAGE`…. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 17 permissions apply here:
+  `ASSET_LIBRARY_VIEW, ASSET_MANAGE, ASSET_VIEW, AUDIT_VIEW, INCIDENT_MANAGE, INCIDENT_REPORT, INCIDENT_VIEW, ORDER_MODIFY, ORDER_VIEW, PRODUCT_VIEW, REPORT_VIEW_VENUE, RESOURCE_MANAGE`…. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -61,17 +61,81 @@ convincingly. It is never a caption.
   and its error; and, element by element, what is shown and in what format, what each action
   produces and where the user goes next. Draw exactly that.
 
+## The processes these screens belong to
+
+Written by the owner of each process (`handoff/design-notes/`). Read before any screen: it says how the process runs end to end and which words the screens must use.
+
+### Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue)
+
+Venue operations is everything that happens after a sale and inside the gates. A guest's ticket is one virtual ticket with interchangeable media (QR, dynamic QR, RFID wristband, NFC, Face Pass or Face Tag); at an access point a scanner (P07, or the scan function inside the Staff App P06) validates the media against the admission profile and the guest admission policy, offline if it must, and every deny carries a reason and a next action. The back office (Venue Management P08) configures that estate: the venue topology (venue, park, zone, attraction, access point, gate and lane, device placement), admission profiles and rules (entry, exit, re-entry, anti-passback, validity, crossover, companions), credential security (dynamic QR, device binding, beacons), biometrics, gate modes, and the live operations, fraud and monitoring views. Accreditation (P08 setup and review, P11 web portal for applicants, web first) takes an applicant from a configurable form through document checks, OCR, duplicate blocking and multi-level approval to a credential with zone rights. Resources and capacity manage bookable resources (rooms, vehicles, equipment, cabanas, instructors) that are booked as a consequence of selling a product, never sold directly. Workforce covers shift templates, rosters, attendance, swaps and breaks, mirrored on the Staff App. Maintenance and safety cover the asset register, preventive calendars, work orders with scored priority, inspections and incidents, with technicians working from the Staff App. Games and rides configure readers, credit types and consumption priority, play entitlements, game pricing, retry pricing, redemption and the card lifecycle. The virtual queue (Q1) gives a guest a live wait time and a return window for a ride; it is not the on-sale waiting room (Q2). Every calendar has day, week and month views. Configuration resolves tenant, region, venue (outlet only for F&B and retail), and a user's permissions, never the device, decide what they may do. The guest apps (P01, P02) show the guest's side of this: My Tickets, the scan code, Face Pass, wait times, the virtual queue, map booking of cabanas and the visit planner.
+*(source: F06 step 1 / F112 step 1 / F111 step 1 / ADR-0002 / ADR-0012 / ADR-0018 / ADR-0041 / ADR-0066 / ADR-0067 / ADR-0068 / DI-652 / DI-627 / DI-640 / DI-654 / DI-666 / DI-482 / DI-483 / DI-907 / DI-919 / DI-923 / DI-865 / DI-678 / TRACKER Actions row 160 / MoM 2026-09-02 AccessControl / MoM 2026-09-07 …)*
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Ticket | The one virtual record a guest owns (ticket number, product, validity, entries). Its number never changes, whatever media carries it or whoever it is transferred or resold to. | Pass (unless the product is a pass), Booking, Order line | DI-652 / DI-620 / contracts/spine/access.yaml#/components/schemas/TicketStatus |
+| Media | What the ticket is presented by at a gate (QR code, dynamic QR, wristband/RFID card, NFC, Face Pass, Face Tag). One ticket can carry several media as fallbacks; a media code can also cover several tickets scanned as one group. Show one … | Credential (for guest media; keep Credential for accreditation badges and staff), Ticket code | DI-180 / DI-608 / DI-652 |
+| Access point | A place where a scan is judged, with a fixed direction (entry, exit, re-entry, crossover). Hierarchy shown to users is Venue > Park > Zone > Attraction > Access point > Gate/lane > Device. | Scanner (that is the device), Door | screens/P08-venue-back-office.yaml#BO-144 / … |
+| Admission profile | The named set of rules an access point enforces (opening window, entries, exit scan, re-entry, validity, crossover). Products point at a profile; tiers such as Bronze/Silver/Gold are profiles with gate allow and deny lists. | Admission rules (as a screen title), Access rule set | DI-185 / contracts/spine/access.yaml#/components/schemas/AdmissionRules |
+| Admitted / Denied / Overridden | The three scan outcomes. A denial is always shown with its reason in plain words and a next action; an override is a supervisor admitting despite a denial, and is always attributed and reasoned. | Valid/Invalid, Success/Fail, Error | contracts/spine/access.yaml#/components/schemas/ScanOutcome / … |
+| Used | A ticket entry is used the moment a scan succeeds, whether or not the guest physically passed. Mistakes are resolved from the scan history, not by un-scanning. | Redeemed (for admission), Checked in (that is group check-in, a different step) | DI-627 / TRACKER Actions row 221 / TRACKER Actions row 189 |
+| Gate mode | What a lane is doing now, set live by the podium or supervisor - Normal, Free flow (counts, does not validate), Drop arm (everybody through, evacuation), Closed (nobody through), Podium (staff validating by eye), Maintenance. Direction is … | Turnstile mode (as a label for direction), Open/Locked | contracts/spine/access.yaml#/components/schemas/AccessPointOperatingMode / R221 |
+| Offline package | What a scanner holds to validate with no network - entitlements, blacklist, admission profiles and the active guest admission policy version - with its age always visible. | Cache, Local DB | F06 step 3 / ADR-0068 |
+| Sync and reconciliation | Sending the offline scan journal to the server, and the duty manager's review of scans the server rejected after the device had already admitted the guest. | Upload, Retry | F06 step 6 / DI-065 |
+| Face Pass / Face Tag | Face Pass is the long-lived face credential for members and season-pass holders (renewable); Face Tag is short-lived, for one day or event. Retention is set per tier by the venue. | Face ID, Biometric login | DI-640 / ADR-0063 |
+| Accreditation / Credential (accreditation) | Accreditation is the application and approval of a person (media, contractor, corporate, staff of a partner) for an event or season; the credential is what is issued after approval (photo badge, QR or RFID) with zone access rights. | Registration (for the whole process), Ticket | DI-654 / DI-662 |
+| Resource | A bookable thing or person a product needs (room, vehicle, cabana, equipment set, instructor). Guests buy products; resources are assigned to the booking, pre-assigned or dynamically. | Asset (that is maintenance), Inventory (that is stock) | DI-475 / DI-482 / TRACKER Actions row 160 |
+| Asset | A physical item maintained by the venue (ride, turnstile, printer, pump) with a register record, documents, warranty and maintenance history. | Resource, Device (unless it is an IT device in the device register) | DI-910 / ADR-0067 |
+| Work order | A unit of maintenance work, lifecycle Created > Assigned > In progress > Review > Closed, with a resolution timer. | Ticket (reserved for guest tickets), Job card | DI-231 |
+| Game / attraction (games module) | In the games and rides module an attraction is an individual game or ride (roller coaster, racing game, bumper cars), not a venue. | Venue, Park | DI-863 |
+| Virtual queue / Return window | A guest's place in a ride's queue held without standing in line, with a return window (for example 4:50 to 5:00 PM) that recalculates live. Distinct from the walk-in line and the VIP/express lane, and from the on-sale waiting room. | Waiting room, Fast pass (that is the express product), Booking | DI-675 / DI-678 / DI-679 / ADR-0066 |
+| Wait time source | Where a ride's wait time comes from - Sensor, Throughput, Manual, or Unavailable - always shown beside the number. | Live (when the source is manual) | contracts/satellite/queue.yaml#/components/schemas/WaitTimeSource / DI-315 |
+
+### Ticketing & Guest Commerce, as the venue and TICVAI configure and run it
+
+WHAT THE PROCESS IS. Everything a guest can buy is set up, priced, promoted and serviced here, on Venue Management (P08, the venue's own back office, served inside the venue's cell) and on the TICVAI Console (P09, TICVAI's control plane, outside every cell). End to end: (1) CATALOGUE. A product has one of twelve kinds (admission, timedAdmission, datedAdmission, openDated, seated, membership, bundle, fnb, retail, rental, addOn, giftCard). Its ticket types (adult, child, senior, resident...) are not typed one by one: they are generated from the product's attributes (components) and each value combination becomes a sellable ticket type with no extra setup (DI-164). What a ticket grants (validity, entries, re-entry, days of week, blackout dates, expiry anchor, fast track, transfer) lives on a reusable entitlement template, not on the product. Who may take part (age, height, supervision, certification) is the eligibility rule; what the guest must answer is the data mask and the consent questions; how the guest sees it is guestListing (bookable, infoOnly, hidden), display tags (at most six), media and the booking flow. Group, family and corporate products and every after-sales policy (reschedule, exchange, refund, cancellation, upgrade, transfer) are configured inside the one product configuration, never on separate screens (DI-465, DI-466). (2) LIFECYCLE AND PUBLICATION. A product moves draft, inReview, approved, live, withdrawn, archived. Approval and publication are two acts with two permissions (PRODUCT_APPROVE, PRODUCT_PUBLISH, R091); every product is authorised before it sells online or on site (DI-438). Approved is still not on a till: a till sells only what is in the signed catalogue release it pulled (publishBundle, ADR-0013), so a saved price is a back-office fact until the venue publishes to tills. Changing something that has sold is preceded by an impact check (assessProductChange: orders affected, entitlements issued, future performances, open carts); restoring a version creates a new version, and sold tickets keep the price and terms they were sold under (restoreProductVersion, DI-938, TRACKER Actions row 145). (3) PRICE. Prices live in price lists: per venue, per channel set, with validity dates and a priority, copied for the next season with an uplift (copyPriceList) and repriced in bulk only after a dry run (bulkChangePrices). Currency and decimal scale are never chosen on a form: they resolve from the venue's region (ADR-0008, ADR-0018; AED 2 places, OMR and BHD 3). When several rules apply, the configured hierarchy decides; there is no "lowest price wins" default (DI-595). Tax on the pre-discount price and three-decimal rounding are regional settings (DI-598). Dynamic rules always show their minimum and maximum price guardrails beside the trigger (getDynamicPriceRule). (4) PROMOTE AND BUNDLE. A promotion is a rule (automatic, or gated by a code) created in draft, made live only by Publish, which first analyses stacking; a …
+*(source: DI-164; DI-171; DI-438; DI-465; DI-466; DI-595; DI-598; DI-387; DI-039; DI-044; DI-474; DI-671; DI-987; DI-019; DI-080; ADR-0008; ADR-0013; ADR-0018; ADR-0019; ADR-0030; R091; R098; R101; R222; REV3-21; contracts/spine/catalogue.yaml#transitionProductLifecycle …)*
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Product | Anything sellable, of one of the twelve kinds. The record that carries names, channels, listing, media and policies. | Item (except on F&B and retail screens), SKU (for tickets), Offering | contracts/spine/catalogue.yaml#/components/schemas/ProductKind |
+| Ticket type | One sellable variant of an admission or event product (Adult, Child, Resident Adult), generated from the product's attributes. For retail and F&B the same record is labelled Variant. | Variant (on ticket screens), Sub-product, Rate (that is a price), Axis value | contracts/spine/catalogue.yaml#updateProductVariant / DI-164 / DI-437 |
+| Attribute | A dimension that generates ticket types (Guest category, Residency, Tier, Length). Each has values; adding a value adds ticket types. | Axis, Component (the client's word; use it only in help text), Option | contracts/spine/catalogue.yaml#setProductAttributes / DI-164 / DI-450 |
+| Entitlement | What a ticket lets the holder do (validity, entries, re-entry, days, blackout dates, expiry, fast track, transfer), defined once on an entitlement template and shared by several products. | Access rights, Ticket rules, Validity profile | contracts/spine/catalogue.yaml#createEntitlementTemplate / DI-171 / DI-451 |
+| Eligibility rule | Who may take part in or buy a product (age, height, supervision, waiver, certification). Distinct from a promotion's eligibility, which decides who gets a discount. | Restriction, Access rule (that is access control) | contracts/spine/catalogue.yaml#setProductEligibilityRule / DI-463 |
+| Price list | A set of prices for one venue and a set of channels, valid between two dates, with a priority. Several coexist (B2C, B2B, season). | Price book, Rate card, Tariff | contracts/spine/catalogue.yaml#createPriceList / DI-140 / DI-163 |
+| Price category | A standard rate type (Adult, Child, Member) reused across lists so venues do not invent "Adult Standard" and "Normal Adult". | Price band (that is a seat-category band), Fare type (transport) | contracts/spine/catalogue.yaml#setPriceCategoryRateType / … |
+| Price band | A priced band on a seat category (code, label, colour, amount, channel, from-date). | Price category, Zone price | contracts/satellite/seating.yaml#/components/schemas/SeatPriceBand |
+| Promotion | A rule that changes a price automatically or when a code is entered; draft until published; declares how it stacks. | Offer (except in guest copy), Deal, Discount rule | contracts/satellite/promotions.yaml#createPromotion / DI-173 / DI-174 |
+| Coupon code | A code issued from a coupon campaign that applies a promotion-style discount; one shared code or many single-use codes. | Voucher, Promo voucher | contracts/satellite/promotions.yaml#createCouponCampaign / DI-173 |
+| Voucher | A code that carries money (face value, balance), sold or issued; a liability until redeemed or expired. | Coupon, Credit note | contracts/satellite/promotions.yaml#listVoucherBatches / … |
+| Bundle | A product sold as one line whose price differs from the sum of its components, with a mandatory revenue allocation. "Package" is acceptable in guest copy. | Combo (that is an F&B meal deal), Catalogue bundle | contracts/satellite/promotions.yaml#createBundle / DI-220 / ADR-0019 |
+| Catalogue release | The signed snapshot of a venue's catalogue, prices, promotions and sale boards that tills, kiosks and devices pull. Its action label is "Publish to tills". | Bundle, Catalogue bundle, Sync, Deploy | contracts/spine/catalogue.yaml#publishBundle / … |
+| Approve / Publish / Save | Save keeps a draft; Approve records that it is authorised (PRODUCT_APPROVE); Publish makes it live for guests and channels (PRODUCT_PUBLISH). Three different buttons, never merged. | Submit, Go live, Activate (except CatalogueConfigStatus active), Deploy | R091 / contracts/spine/catalogue.yaml#transitionProductLifecycle / DI-438 |
+| Product states | Draft, In review, Approved, Live, Withdrawn, Archived (ProductLifecycleState), always as coloured badges with these exact labels. | Published (for a product), Pending, Inactive (for a product) | contracts/spine/catalogue.yaml#/components/schemas/ProductLifecycleState |
+| Channel | Where something is sold. Labels: pos Point of sale; kiosk Kiosk; web and guestWeb Website; mobile and guestApp App; b2b B2B partners; partner Partner; ota Travel agents (OTA); callCentre Call centre; api API; backOffice Back office. | Touchpoint, Outlet (an outlet is a business inside a venue), raw enum values | contracts/spine/catalogue.yaml#/components/schemas/Channel / … |
+| Refund | Money returned after settlement, wholly or for some lines, under the venue's refund policy. | Return (that is retail goods), Reversal, Void | contracts/spine/orders.yaml#createRefund / DI-252 |
+| Void | Cancelling a whole order before settlement, within the same shift, with a reason from the void list. After settlement it is a refund. | Cancel order, Delete | contracts/spine/orders.yaml#voidOrder / R222 |
+| Exchange / Reschedule | Exchange swaps lines for other products or dates and settles only the difference; Reschedule is the same product moved to another date or time. | Rebook, Date change (acceptable only in guest copy), Refund and resell | contracts/spine/orders.yaml#exchangeOrderLines / … |
+| Hold / Capture / Release | A deposit or stored-value amount is held, then partly or fully captured, and the rest released. A held deposit is not a payment. | Charge, Pre-auth (in staff copy), Block funds | contracts/spine/orders.yaml#authoriseStoredValue / … |
+| Wallet (TICVAI wallet) | The guest's stored-value balance on TICVAI, spent by hold and capture. Distinct from the tender "Apple Pay / Google Pay", which the contract also calls wallet. | Digital wallet (for stored value), E-wallet, Credit (without a type) | contracts/spine/orders.yaml#/components/schemas/TenderKind / R080 |
+| Credit lot | One amount of wallet credit of one credit type (cash, bonus, gift) with its own expiry; lots are spent nearest expiry first and the guest sees the breakdown but cannot choose. | Bucket, Batch, Top-up | TRACKER Actions row 171 / contracts/satellite/wallet.yaml#expireCreditLots |
+| Venue map / Seat map | A venue map is the wayfinding map of a park or a floor (points, paths, bookable places); a seat map is the seating layout of an auditorium or stand. Never just "map" where both could be meant. | Layout (alone), Floor plan (unless it is a floor map), Map (alone) | contracts/satellite/venue-map.yaml#createVenueMap / … |
+| Point / Bookable place | A point is a place on a venue map (toilet, ride, restaurant, exit). A bookable place is a cabana, lounger, table or pitch placed on the map and sold through its price band. | Pin, POI, Marker, Resource (in staff copy) | contracts/satellite/venue-map.yaml#setVenuePoint / … |
+| Station / Route / Timetable / Departure / Fare table / Pass … | A route is an ordered list of stations with offsets; a timetable generates departures up to its release horizon; a fare table prices a route per passenger type; a pass type is a multi-trip or unlimited pass sold as a product. | Stop (except in the stop list), Line (except lineCode), Schedule, Trip (except a guest's journey) | contracts/satellite/transport.yaml / REV3-21 |
+| Applies from | The effective date of a change. Every dated change shows it, and sold items keep their old terms. | Effective date (in labels), Start date (for a change) | contracts/satellite/seating.yaml#updateSeatCategory / TRACKER Actions row 194 |
+
+
 ## The screens
 
 Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs count fields; requirements are matrix rows; meeting inputs are the ones naming the screen (the module and platform ones are below); white label says whether the tenant's brand reaches it (guest) or it sets the brand (configures).
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-034` | Scan Activity | B–D | 37 | 35 | 6 | 60 | 0 | 0 | — | notStarted (generated) |
-| `BO-035` | Override Audit | B–D | 37 | 42 | 6 | 60 | 0 | 0 | — | notStarted (generated) |
-| `BO-038` | Reconciliation Queue | B–D | 56 | 56 | 6 | 23 | 0 | 6 | — | notStarted (generated) |
-| `BO-069` | Asset Register | B–D | 67 | 48 | 6 | 24 | 3 | 0 | — | notStarted (generated) |
-| `BO-071` | Planned Maintenance | B–D | 19 | 32 | 6 | 5 | 2 | 2 | — | notStarted (generated) |
+| `BO-034` | Scan Activity | B–D | 7 | 27 | 6 | 8 | 0 | 0 | — | notStarted (generated) |
+| `BO-035` | Override Audit | B–D | 7 | 34 | 6 | 8 | 0 | 0 | — | notStarted (generated) |
+| `BO-038` | Reconciliation Queue | B–D | 3 | 20 | 6 | 0 | 0 | 6 | — | notStarted (generated) |
+| `BO-069` | Asset Register | B–D | 42 | 36 | 6 | 23 | 3 | 0 | — | notStarted (generated) |
+| `BO-071` | Planned Maintenance | B–D | 21 | 32 | 6 | 5 | 2 | 2 | — | notStarted (generated) |
 | `BO-072` | Incident Log | B–D | 31 | 44 | 6 | 10 | 0 | 0 | — | notStarted (generated) |
 | `BO-092` | Venue Maps | A | 14 | 26 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
 | `BO-093` | Map Import & Labelling | A | 66 | 27 | 6 | 4 | 3 | 0 | — | notStarted (generated) |
@@ -80,7 +144,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 ## Thin screens in this batch
 
-**BO-092 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**BO-038, BO-092 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ---
 
@@ -97,7 +161,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 1 · needs the `access` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `ACCESS_OVERRIDE`, `ACCESS_VALIDATE`, `REPORT_VIEW_VENUE`, `TICKET_LOOKUP` (4 operate) |
+| Who uses it | venue staff holding `REPORT_VIEW_VENUE`, `TICKET_LOOKUP` (2 operate) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listScans` reads the population and `getOfflinePackage` reads one of them — list, select, act |
 | Offline | online only |
@@ -105,6 +169,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Route | `/venue-operations/scan-activity` |
 
 **What the spec says about it.** Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
+
+**Known gaps.** Removed 2 October 2026 (CHG-WIR-001): Sync, validate, group-validate, override and the offline package are workstation-scoped scanner operations the contract refuses (403) for a back-office browser … Removed 2 October 2026 (CHG-WIR-001): Sync, validate, group-validate, override and the offline package are workstation-scoped scanner operations the contract refuses (403) for a back-office browser … Removed 2 October 2026 (CHG-WIR-001): Sync, validate, group-validate, override and the offline package are workstation-scoped scanner operations the contract refuses (403) for a back-office browser …
+
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** The gate log for the venue: every scan with when, where, what was presented, the outcome and the reason, and overrides as their own rows linked to the denial they overrode. A duty manager uses it to answer "what happened at Gate 3 at 10:40" and "show me every scan of this ticket". The one thing to get right: it is a read-only investigation screen; it never scans, validates or syncs.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **Filters are free-text id fields (Access point id, Ticket id, Outcome)** Why: Ids are not typed by people; outcome is a closed set. *(source: contracts/spine/access.yaml#/components/schemas/ScanOutcome; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+
+**Fixed on main** (the package already carries these; draw what it says): Action bar carries Sync scans, Validate access, Validate group access, Override access and a scanTarget, plus getOfflinePackage (CHG-WIR-001); Navigation exit to BO-001 Queue Directory (inferred) (CHG-WIR-002).
 
 #### Inputs: what the user enters or picks
 
@@ -120,75 +194,9 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |  | scan target | — | — | — | — | **A screen that validates a credential needs somewhere to point the camera.** `denied` and `hardwareError` look different because an operator facing a guest needs to know whether to try again or … | — |
 | Search | search field | — | — | — | — | A search that returns nothing must say so differently from a search not yet run. | — |
 
-**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
 
-| Filter | Drawn as | Default | Allowed values, rules | Source |
-|---|---|---|---|---|
-| Since version | number field | — | — | `getOfflinePackage` ?sinceVersion |
-| Valid from | date and time picker | — | — | `getOfflinePackage` ?validFrom |
-| Valid to | date and time picker | — | — | `getOfflinePackage` ?validTo |
-
-**Form: Sync scans** (modal, opened by *Sync scans*; *Sync scans* calls `syncScans`, *Cancel* sends nothing)
-
-**Collects what `syncScans` sends before it is called.** Required: `deviceId`, `scans`. Dismissing sends nothing; the screen behind is unchanged.
-
-| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
-|---|---|---|---|---|---|---|---|
-| Device `deviceId` | picker: choose a device | required | — | — | shows names, sends the id | Sequence numbers are monotonic per device, not globally. | `syncScans` body |
-| Scans `scans` | repeatable rows | required | — | at least 1; at most 500 | — | — | `syncScans` body |
-| ID `scans[].id` | picker: choose an id | required | — | — | shows names, sends the id | Client-generated UUIDv7. Also the idempotency key and dedupe key. | `syncScans` body |
-| Media code `scans[].mediaCode` | text area | required | — | max length 256 | — | What was read from the media. NOT the ticket id — media can be re-linked over a ticket's life. | `syncScans` body |
-| Media kind `scans[].mediaKind` | select | required | — | Image · Video · Audio · Document · Vector · Font · Archive | — | — | `syncScans` body |
-| Direction `scans[].direction` | radio group | required | — | Entry · Exit · Reentry · Crossover | — | — | `syncScans` body |
-| Group size `scans[].groupSize` | number field | optional | — | min 1 | — | For group media admitting several holders on one read. | `syncScans` body |
-| Proximity token `scans[].proximityToken` | text field | optional | — | — | — | BLE proximity assertion where the venue requires the operator to be physically at the gate. | `syncScans` body |
-| Recorded at `scans[].recordedAt` | date and time picker | required | — | — | 1 Oct 2026, 14:30 (venue time zone) | Device time of the read. Authoritative for ordering, not for validity. | `syncScans` body |
-| Sequence `scans[].sequence` | number field | required | — | min 1 | — | Monotonic per device. The server processes in this order. | `syncScans` body |
-| Local outcome `scans[].localOutcome` | segmented control | required | — | Admitted · Denied · Overridden | — | What the device decided offline. The server is authoritative and may disagree; disagreements are returned for reconciliation, not discarded. | `syncScans` body |
-| Local deny reason `scans[].localDenyReason` | select | optional | — | Not found · Not yet valid · Expired · Already used · Reentry limit reached · Exit required before reentry · Wrong access point · Wrong performance · Outside admission window · Entitlement suspended · Blacklisted · Capacity reached … | — | Enumerated so the client can render an appropriate operator prompt. A gate operator facing a queue needs a reason and a next action, not a boolean. | `syncScans` body |
-| Overridden by principal `scans[].overriddenByPrincipalId` | picker: choose an overridden by principal | optional | — | — | shows names, sends the id | — | `syncScans` body |
-| Override reason `scans[].overrideReason` | text field | optional | — | — | — | — | `syncScans` body |
-
-Errors to draw in the form: 400 Validation failed; 403 Authenticated but not permitted at the requested scope
-
-**Form: Validate access** (modal, opened by *Validate access*; *Validate access* calls `validateAccess`, *Cancel* sends nothing)
-
-**Collects what `validateAccess` sends before it is called.** Required: `id`, `mediaCode`, `mediaKind`, `direction`, `recordedAt`. Optional: `groupSize`, `proximityToken`. Dismissing sends nothing; the screen behind is unchanged.
-
-| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
-|---|---|---|---|---|---|---|---|
-| ID `id` | picker: choose an id | required | — | — | shows names, sends the id | Client-generated UUIDv7. Also the idempotency key and dedupe key. | `validateAccess` body |
-| Media code `mediaCode` | text area | required | — | max length 256 | — | What was read from the media. NOT the ticket id — media can be re-linked over a ticket's life. | `validateAccess` body |
-| Media kind `mediaKind` | select | required | — | Image · Video · Audio · Document · Vector · Font · Archive | — | — | `validateAccess` body |
-| Direction `direction` | radio group | required | — | Entry · Exit · Reentry · Crossover | — | — | `validateAccess` body |
-| Group size `groupSize` | number field | optional | — | min 1 | — | For group media admitting several holders on one read. | `validateAccess` body |
-| Proximity token `proximityToken` | text field | optional | — | — | — | BLE proximity assertion where the venue requires the operator to be physically at the gate. | `validateAccess` body |
-| Recorded at `recordedAt` | date and time picker | required | — | — | 1 Oct 2026, 14:30 (venue time zone) | Device time of the read. Authoritative for ordering, not for validity. | `validateAccess` body |
-
-Errors to draw in the form: 400 Validation failed; 403 Authenticated but not permitted at the requested scope; 404 Media not recognised in this cell
-
-**Form: Validate group access** (modal, opened by *Validate group access*; *Validate group access* calls `validateGroupAccess`, *Cancel* sends nothing)
-
-**Collects what `validateGroupAccess` sends before it is called.** Required: `id`, `mediaCode`, `admitCount`, `recordedAt`. Optional: `direction`. Dismissing sends nothing; the screen behind is unchanged.
-
-| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
-|---|---|---|---|---|---|---|---|
-| ID `id` | picker: choose an id | required | — | — | shows names, sends the id | — | `validateGroupAccess` body |
-| Media code `mediaCode` | text area | required | — | max length 256 | — | — | `validateGroupAccess` body |
-| Admit count `admitCount` | number field | required | — | min 1 | — | — | `validateGroupAccess` body |
-| Direction `direction` | radio group | optional | — | Entry · Exit · Reentry · Crossover | — | — | `validateGroupAccess` body |
-| Recorded at `recordedAt` | date and time picker | required | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `validateGroupAccess` body |
-
-Errors to draw in the form: 403 Authenticated but not permitted at the requested scope; 409 Requested count exceeds the remaining group allowance
-
-**Sent by *Override access*** (`overrideAccess`; no form is declared, so these are filled from the screen or collected inline)
-
-| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
-|---|---|---|---|---|---|---|---|
-| ID `id` | picker: choose an id | required | — | — | shows names, sends the id | — | `overrideAccess` body |
-| Scan `scanId` | picker: choose a scan | required | — | — | shows names, sends the id | The denied scan being overridden. | `overrideAccess` body |
-| Reason `reason` | text area | required | — | min length 3; max length 500 | — | — | `overrideAccess` body |
-| Recorded at `recordedAt` | date and time picker | required | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `overrideAccess` body |
+- **Filters**: Access point picker (tree by park and zone, not an id text box), ticket number or media code search (also by scanning with a handheld into the field), outcome chips Admitted / Denied / Overridden, deny reason multi-select with VO-R06 labels, direction, date-time range defaulting to today in venue time. *(source: contracts/spine/access.yaml#listScans)*
 
 #### Outputs: what the screen shows and produces
 
@@ -231,38 +239,24 @@ Errors to draw in the form: 403 Authenticated but not permitted at the requested
 | Recorded at | 1 Oct 2026, 14:30 | — |
 | Synced at | 1 Oct 2026, 14:30 | Null while pending. Differs from recordedAt for offline scans. |
 
-**The offline package** (detail panel, from `getOfflinePackage`)
-
-| Shows | Format | Notes |
-|---|---|---|
-| Generated at | 1 Oct 2026, 14:30 | — |
-| Valid from | 1 Oct 2026, 14:30 | — |
-| Valid to | 1 Oct 2026, 14:30 | — |
-| Access point | the name it points at, never the id | — |
-| Entitlements | list or chips (count when long) | Read from `access.entitlement` (SD-052). With `sinceVersion`, only the rows changed after it, including ones now void or used, so a device … |
-| Delegated rights | list or chips (count when long) | Redemption rights issued by other cells and valid at this access point. Included in the package so a cross-region entitlement still admits … |
-| Blacklist | list or chips (count when long) | Media codes to deny outright regardless of entitlement state. |
-| Admission rules | list or chips (count when long) | — |
-
 **Actions and what each produces**
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Sync scans (primary button) | `syncScans` POST `/access/scans` | inline | ScanSyncResult | 400 Validation failed; 403 Authenticated but not permitted at the requested scope | opens modal first |
 | Lookup ticket (secondary button) | `lookupTicket` GET `/access/lookup` | — | TicketStatus | 400 Neither mediaCode nor ticketId supplied; 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path. | produces a document or message: Read-only validity check without admitting |
-| Override access (destructive button) | `overrideAccess` POST `/access/override` | inline | ValidationResult | 403 Authenticated but not permitted at the requested scope; 409 The scan was not a denial, or has already been overridden | — |
-| Validate access (secondary button) | `validateAccess` POST `/access/validate` | ValidateRequest | ValidationResult | 400 Validation failed; 403 Authenticated but not permitted at the requested scope; 404 Media not recognised in this cell | opens modal first |
-| Validate group access (secondary button) | `validateGroupAccess` POST `/access/group-validate` | inline | ValidationResult | 403 Authenticated but not permitted at the requested scope; 409 Requested count exceeds the remaining group allowance | opens modal first |
 
-**Data it reads**: `listScans` (onLoad, List scan events); `getOfflinePackage` (onLoad, Entitlement and rule set for offline validation)
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
 
-**Where the user goes next**
+- **Scan table**: Time (to the second), access point and direction, ticket number and product, media type icon, outcome badge (green Admitted, red Denied, amber Overridden), reason label, operator name, device name, Recorded offline flag with sync time where the scan was journalled. Live-updating at the top with cursor paging (VO-R12). *(source: contracts/spine/access.yaml#listScans / MATRIX 3.1.6 / DI-065)*
+- **Selected scan**: Detail with the ticket's other scans that day as a mini timeline; an override row shows "Overrode denial at 10:41 - Already used" with the supervisor and reason, and the denial row links to its override. *(source: contracts/spine/access.yaml#overrideAccess)*
+- **Totals strip**: Admitted, denied, overridden counts for the filter, and admitted guests (sum of admitted counts, since one group scan admits several). *(source: MATRIX 3.2.54 / contracts/spine/access.yaml#/components/schemas/ValidationResult)*
 
-- → `BO-001` Queue Directory: *Queue Directory*
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
 
-**What opens over it**
+- **Look up ticket**: Opens the ticket's validity and full history read-only (no scan created). *(source: contracts/spine/access.yaml#lookupTicket)*
+- **Export**: CSV of the filtered rows; not in the contract, draw greyed unless reporting export is bound. *(source: designer default)*
 
-- confirmDialog *Override access*: **Names what `overrideAccess` changes and what it leaves alone**, in the consequence rather than the verb. A scan activity this affects should be identified in the dialog, not just counted. **Collects what `overrideAccess` sends before it is called.** Required: `id`, `scanId`, `reason` …
+**Data it reads**: `listScans` (onLoad, List scan events)
 
 #### States
 
@@ -274,23 +268,55 @@ Errors to draw in the form: 403 Authenticated but not permitted at the requested
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on accessPointId, ticketId, outcome, recordedFrom, recordedTo and the scan activity are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `REPORT_VIEW_VENUE`, which `listScans` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 400 Neither mediaCode nor ticketId supplied; 400 Validation failed; 409 Requested count exceeds the remaining group allowance; 409 The scan was not a denial, or has already been overridden |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 Neither mediaCode nor ticketId supplied |
+
+#### Edge cases to draw
+
+- **Late offline sync**: Rows arrive with an old time; mark them "Synced 14:02, scanned 10:40" so the order is understood. *(source: DI-065 / F06 step 6)*
+- **Viewer without venue report permission**: No-access state naming it (VO-R08). *(source: contracts/spine/access.yaml#listScans)*
+
+#### Consistency with other screens
+
+- Match `BO-035`: Same table; BO-035 is this screen filtered to overrides (consolidate per VO-R14).
+- Match `BO-226`: Ticket lookup on the back office shows the same history.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+scans:
+- time: '10:40:12'
+  point: Main Plaza Gate 2 - Entry
+  ticket: VT0010 Aqua Park Day Pass
+  media: QR
+  outcome: Denied
+  reason: Already used (09:58, Gate 1)
+  operator: Rahul Menon
+- time: '10:41:03'
+  point: Main Plaza Gate 2 - Entry
+  ticket: VT0010
+  outcome: Overridden
+  reason: Guest had stroller, turnstile re-locked
+  operator: Fatima Al Hashimi
+- time: '10:42:55'
+  point: North Entry
+  ticket: VT0512 School Group (30)
+  outcome: Admitted
+  admitted: 28
+  operator: Maria Santos
+```
 
 #### Permissions
 
 - `listScans` → `REPORT_VIEW_VENUE` (operate) · staff
-- `syncScans` → `ACCESS_VALIDATE` (operate) · staff
-- `getOfflinePackage` → `ACCESS_VALIDATE` (operate) · staff
 - `lookupTicket` → `TICKET_LOOKUP` (operate) · staff
-- `overrideAccess` → `ACCESS_OVERRIDE` (operate) · staff
-- `validateAccess` → `ACCESS_VALIDATE` (operate) · staff
-- `validateGroupAccess` → `ACCESS_VALIDATE` (operate) · staff
 
 **A refused user sees:** Shown when the caller lacks `REPORT_VIEW_VENUE`, which `listScans` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
 #### Requirements it meets
 
-60 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+8 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
 
 | Ref | Requirement (shortened) | Domain | Verdict | Via |
 |---|---|---|---|---|
@@ -301,12 +327,7 @@ Errors to draw in the form: 403 Authenticated but not permitted at the requested
 | 3.2.55 | All Guests are invited use the turnstiles when leaving the park. It is expected that the system counts the number of exits. Scan can be required at exit. | Admission and Access | CONTRACTED | `listScans` |
 | 3.2.58 | In park attendance figure per ticket time is calculated in real time. | Admission and Access | CONTRACTED | `listScans` |
 | 5.3.28 | Maintain detailed access validation history including gate entries, exits, attraction validations, RFID scans, QR scans, and turnstile events. | F&B & Guest Management | CONTRACTED | `listScans` |
-| 18.1.4 | Synchronization - System shall synchronize data when connectivity is restored. | Employee Mobile App & AI Assistant | CONTRACTED | `syncScans` |
-| 2.13.38 | Offline Access Validation | Ticketing Sales | CONTRACTED | `getOfflinePackage` |
-| 3.1.5 | Access control devices shall validate dynamic QR codes using secure offline cryptographic validation without requiring continuous connectivity to the central platform. | Admission and Access | CONTRACTED | `getOfflinePackage` |
-| 3.1.10 | System shall support embedding entitlement information within secure QR, RFID, NFC, mobile wallet, and digital credential tokens. Embedded information may include ticket type, seat assignment, event … | Admission and Access | CONTRACTED | `getOfflinePackage` |
-| 3.2.49 | The validity check logic allows offline validity check. | Admission and Access | CONTRACTED | `getOfflinePackage` |
-| … 48 more | | | | `traceability.json` |
+| 3.2.17 | The system should have the ability to scan a ticket into a POS terminal and display record of ticket’s history: transaction time, clerk, payment method, etc. | Admission and Access | CONTRACTED | `lookupTicket` |
 
 #### Client meeting inputs
 
@@ -321,17 +342,18 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### References
 
 - Wireframe frame: `wireframes/P08 Venue Management.dc.html#bo-034` · status **notStarted** · provenance generated
-- ADR-0068 *Guest admission policy lives in Access only, and the offline package carries it* (`docs/adr/0068-guest-admission-policy-lives-in-access-only.md`)
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (37), with its required mark, default, format and its error state (400, 403, 404, 409).
-- [ ] Every output is drawn (35 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (7), with its required mark, default, format and its error state (400, 403, 404).
+- [ ] Every output is drawn (27 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-034?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: Sync scans, Lookup ticket, Override access, Validate access, Validate group access.
-- [ ] Every transition is wired: `BO-001`.
-- [ ] Every gated control is gated: `ACCESS_OVERRIDE`, `ACCESS_VALIDATE`, `REPORT_VIEW_VENUE`, `TICKET_LOOKUP`.
+- [ ] Every action is wired with its success and its failure: Lookup ticket.
+- [ ] No transition is declared; back returns where the user came from.
+- [ ] Every gated control is gated: `REPORT_VIEW_VENUE`, `TICKET_LOOKUP`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 2 edge case(s) from the process notes are drawn.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -345,7 +367,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 1 · needs the `access` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `ACCESS_OVERRIDE`, `ACCESS_VALIDATE`, `AUDIT_VIEW`, `REPORT_VIEW_VENUE`, `TICKET_LOOKUP` (4 operate, 1 read) |
+| Who uses it | venue staff holding `AUDIT_VIEW`, `REPORT_VIEW_VENUE`, `TICKET_LOOKUP` (1 read, 2 operate) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listScans` reads the population and `getOfflinePackage` reads one of them — list, select, act |
 | Offline | online only |
@@ -353,6 +375,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Route | `/venue-operations/override-audit` |
 
 **What the spec says about it.** Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
+
+**Known gaps.** Removed 2 October 2026 (CHG-WIR-001): An audit screen performs none of override, validate, group-validate or sync; the scanner operations are refused for a back-office session, and overriding belongs … Removed 2 October 2026 (CHG-WIR-001): An audit screen performs none of override, validate, group-validate or sync; the scanner operations are refused for a back-office session, and overriding belongs … Removed 2 October 2026 (CHG-WIR-001): An audit screen performs none of override, validate, group-validate or sync; the scanner operations are refused for a back-office session, and overriding belongs …
+
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** Every admission that broke a rule: each override with the denial it overrode, who overrode it, the justification and the gate, for the duty manager and auditors after an incident. The one thing to get right: the denial and the override are two rows that must be read together, and patterns (one supervisor, one gate, one reason) must stand out.
+
+**Fixed on main** (the package already carries these; draw what it says): Override access, Validate access, Validate group access and Sync scans buttons, scanTarget and the offline package panel (CHG-WIR-001); Navigation exit to BO-001 Queue Directory (inferred) (CHG-WIR-002).
 
 #### Inputs: what the user enters or picks
 
@@ -372,9 +400,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | Filter | Drawn as | Default | Allowed values, rules | Source |
 |---|---|---|---|---|
-| Since version | number field | — | — | `getOfflinePackage` ?sinceVersion |
-| Valid from | date and time picker | — | — | `getOfflinePackage` ?validFrom |
-| Valid to | date and time picker | — | — | `getOfflinePackage` ?validTo |
 | Org unit | picker: choose an org unit | — | — | `listAuditRecords` ?orgUnitId |
 | Principal | picker: choose a principal | — | — | `listAuditRecords` ?principalId |
 | Workstation | picker: choose a workstation | — | — | `listAuditRecords` ?workstationId |
@@ -384,67 +409,9 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | From | date and time picker | — | — | `listAuditRecords` ?from |
 | To | date and time picker | — | — | `listAuditRecords` ?to |
 
-**Form: Sync scans** (modal, opened by *Sync scans*; *Sync scans* calls `syncScans`, *Cancel* sends nothing)
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
 
-**Collects what `syncScans` sends before it is called.** Required: `deviceId`, `scans`. Dismissing sends nothing; the screen behind is unchanged.
-
-| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
-|---|---|---|---|---|---|---|---|
-| Device `deviceId` | picker: choose a device | required | — | — | shows names, sends the id | Sequence numbers are monotonic per device, not globally. | `syncScans` body |
-| Scans `scans` | repeatable rows | required | — | at least 1; at most 500 | — | — | `syncScans` body |
-| ID `scans[].id` | picker: choose an id | required | — | — | shows names, sends the id | Client-generated UUIDv7. Also the idempotency key and dedupe key. | `syncScans` body |
-| Media code `scans[].mediaCode` | text area | required | — | max length 256 | — | What was read from the media. NOT the ticket id — media can be re-linked over a ticket's life. | `syncScans` body |
-| Media kind `scans[].mediaKind` | select | required | — | Image · Video · Audio · Document · Vector · Font · Archive | — | — | `syncScans` body |
-| Direction `scans[].direction` | radio group | required | — | Entry · Exit · Reentry · Crossover | — | — | `syncScans` body |
-| Group size `scans[].groupSize` | number field | optional | — | min 1 | — | For group media admitting several holders on one read. | `syncScans` body |
-| Proximity token `scans[].proximityToken` | text field | optional | — | — | — | BLE proximity assertion where the venue requires the operator to be physically at the gate. | `syncScans` body |
-| Recorded at `scans[].recordedAt` | date and time picker | required | — | — | 1 Oct 2026, 14:30 (venue time zone) | Device time of the read. Authoritative for ordering, not for validity. | `syncScans` body |
-| Sequence `scans[].sequence` | number field | required | — | min 1 | — | Monotonic per device. The server processes in this order. | `syncScans` body |
-| Local outcome `scans[].localOutcome` | segmented control | required | — | Admitted · Denied · Overridden | — | What the device decided offline. The server is authoritative and may disagree; disagreements are returned for reconciliation, not discarded. | `syncScans` body |
-| Local deny reason `scans[].localDenyReason` | select | optional | — | Not found · Not yet valid · Expired · Already used · Reentry limit reached · Exit required before reentry · Wrong access point · Wrong performance · Outside admission window · Entitlement suspended · Blacklisted · Capacity reached … | — | Enumerated so the client can render an appropriate operator prompt. A gate operator facing a queue needs a reason and a next action, not a boolean. | `syncScans` body |
-| Overridden by principal `scans[].overriddenByPrincipalId` | picker: choose an overridden by principal | optional | — | — | shows names, sends the id | — | `syncScans` body |
-| Override reason `scans[].overrideReason` | text field | optional | — | — | — | — | `syncScans` body |
-
-Errors to draw in the form: 400 Validation failed; 403 Authenticated but not permitted at the requested scope
-
-**Form: Validate access** (modal, opened by *Validate access*; *Validate access* calls `validateAccess`, *Cancel* sends nothing)
-
-**Collects what `validateAccess` sends before it is called.** Required: `id`, `mediaCode`, `mediaKind`, `direction`, `recordedAt`. Optional: `groupSize`, `proximityToken`. Dismissing sends nothing; the screen behind is unchanged.
-
-| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
-|---|---|---|---|---|---|---|---|
-| ID `id` | picker: choose an id | required | — | — | shows names, sends the id | Client-generated UUIDv7. Also the idempotency key and dedupe key. | `validateAccess` body |
-| Media code `mediaCode` | text area | required | — | max length 256 | — | What was read from the media. NOT the ticket id — media can be re-linked over a ticket's life. | `validateAccess` body |
-| Media kind `mediaKind` | select | required | — | Image · Video · Audio · Document · Vector · Font · Archive | — | — | `validateAccess` body |
-| Direction `direction` | radio group | required | — | Entry · Exit · Reentry · Crossover | — | — | `validateAccess` body |
-| Group size `groupSize` | number field | optional | — | min 1 | — | For group media admitting several holders on one read. | `validateAccess` body |
-| Proximity token `proximityToken` | text field | optional | — | — | — | BLE proximity assertion where the venue requires the operator to be physically at the gate. | `validateAccess` body |
-| Recorded at `recordedAt` | date and time picker | required | — | — | 1 Oct 2026, 14:30 (venue time zone) | Device time of the read. Authoritative for ordering, not for validity. | `validateAccess` body |
-
-Errors to draw in the form: 400 Validation failed; 403 Authenticated but not permitted at the requested scope; 404 Media not recognised in this cell
-
-**Form: Validate group access** (modal, opened by *Validate group access*; *Validate group access* calls `validateGroupAccess`, *Cancel* sends nothing)
-
-**Collects what `validateGroupAccess` sends before it is called.** Required: `id`, `mediaCode`, `admitCount`, `recordedAt`. Optional: `direction`. Dismissing sends nothing; the screen behind is unchanged.
-
-| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
-|---|---|---|---|---|---|---|---|
-| ID `id` | picker: choose an id | required | — | — | shows names, sends the id | — | `validateGroupAccess` body |
-| Media code `mediaCode` | text area | required | — | max length 256 | — | — | `validateGroupAccess` body |
-| Admit count `admitCount` | number field | required | — | min 1 | — | — | `validateGroupAccess` body |
-| Direction `direction` | radio group | optional | — | Entry · Exit · Reentry · Crossover | — | — | `validateGroupAccess` body |
-| Recorded at `recordedAt` | date and time picker | required | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `validateGroupAccess` body |
-
-Errors to draw in the form: 403 Authenticated but not permitted at the requested scope; 409 Requested count exceeds the remaining group allowance
-
-**Sent by *Override access*** (`overrideAccess`; no form is declared, so these are filled from the screen or collected inline)
-
-| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
-|---|---|---|---|---|---|---|---|
-| ID `id` | picker: choose an id | required | — | — | shows names, sends the id | — | `overrideAccess` body |
-| Scan `scanId` | picker: choose a scan | required | — | — | shows names, sends the id | The denied scan being overridden. | `overrideAccess` body |
-| Reason `reason` | text area | required | — | min length 3; max length 500 | — | — | `overrideAccess` body |
-| Recorded at `recordedAt` | date and time picker | required | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `overrideAccess` body |
+- **Filters**: Date range (default last 7 days), supervisor, access point, original deny reason; outcome is fixed to Overridden. *(source: contracts/spine/access.yaml#listScans)*
 
 #### Outputs: what the screen shows and produces
 
@@ -499,38 +466,22 @@ Errors to draw in the form: 403 Authenticated but not permitted at the requested
 | Recorded at | 1 Oct 2026, 14:30 | — |
 | Synced at | 1 Oct 2026, 14:30 | Null while pending. Differs from recordedAt for offline scans. |
 
-**The offline package** (detail panel, from `getOfflinePackage`)
-
-| Shows | Format | Notes |
-|---|---|---|
-| Generated at | 1 Oct 2026, 14:30 | — |
-| Valid from | 1 Oct 2026, 14:30 | — |
-| Valid to | 1 Oct 2026, 14:30 | — |
-| Access point | the name it points at, never the id | — |
-| Entitlements | list or chips (count when long) | Read from `access.entitlement` (SD-052). With `sinceVersion`, only the rows changed after it, including ones now void or used, so a device … |
-| Delegated rights | list or chips (count when long) | Redemption rights issued by other cells and valid at this access point. Included in the package so a cross-region entitlement still admits … |
-| Blacklist | list or chips (count when long) | Media codes to deny outright regardless of entitlement state. |
-| Admission rules | list or chips (count when long) | — |
-
 **Actions and what each produces**
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
 | Lookup ticket (primary button) | `lookupTicket` GET `/access/lookup` | — | TicketStatus | 400 Neither mediaCode nor ticketId supplied; 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path. | produces a document or message: Read-only validity check without admitting |
-| Override access (destructive button) | `overrideAccess` POST `/access/override` | inline | ValidationResult | 403 Authenticated but not permitted at the requested scope; 409 The scan was not a denial, or has already been overridden | — |
-| Sync scans (secondary button) | `syncScans` POST `/access/scans` | inline | ScanSyncResult | 400 Validation failed; 403 Authenticated but not permitted at the requested scope | opens modal first |
-| Validate access (secondary button) | `validateAccess` POST `/access/validate` | ValidateRequest | ValidationResult | 400 Validation failed; 403 Authenticated but not permitted at the requested scope; 404 Media not recognised in this cell | opens modal first |
-| Validate group access (secondary button) | `validateGroupAccess` POST `/access/group-validate` | inline | ValidationResult | 403 Authenticated but not permitted at the requested scope; 409 Requested count exceeds the remaining group allowance | opens modal first |
 
-**Data it reads**: `listScans` (onLoad, List scan events); `getOfflinePackage` (onLoad, Entitlement and rule set for offline validation); `listAuditRecords` (onLoad, Who did what, where, and when)
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
 
-**Where the user goes next**
+- **Override list**: One line per override: time, gate, ticket, original denial reason (VO-R06 label), overriding supervisor, justification text, minutes between denial and override. Group-by toggle for supervisor or gate with counts. *(source: contracts/spine/access.yaml#overrideAccess / DI-649)*
+- **Audit trail**: The audit records for the same override (who viewed, who exported) appear in the detail, read-only. *(source: contracts/spine/tenancy.yaml#listAuditRecords)*
 
-- → `BO-001` Queue Directory: *Queue Directory*
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
 
-**What opens over it**
+- **Open ticket history**: Read-only lookup of the ticket. *(source: contracts/spine/access.yaml#lookupTicket)*
 
-- confirmDialog *Override access*: **Names what `overrideAccess` changes and what it leaves alone**, in the consequence rather than the verb. A override audit this affects should be identified in the dialog, not just counted. **Collects what `overrideAccess` sends before it is called.** Required: `id`, `scanId`, `reason` …
+**Data it reads**: `listScans` (onLoad, List scan events); `listAuditRecords` (onLoad, Who did what, where, and when)
 
 #### States
 
@@ -542,24 +493,48 @@ Errors to draw in the form: 403 Authenticated but not permitted at the requested
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on accessPointId, ticketId, outcome, recordedFrom, recordedTo and the override audit are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `REPORT_VIEW_VENUE`, which `listScans` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 400 Neither mediaCode nor ticketId supplied; 400 Validation failed; 409 Requested count exceeds the remaining group allowance; 409 The scan was not a denial, or has already been overridden |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 Neither mediaCode nor ticketId supplied |
+
+#### Edge cases to draw
+
+- **Override recorded offline**: Shows "Recorded offline at 10:41, synced 11:05". *(source: contracts/spine/access.yaml#overrideAccess / DI-065)*
+
+#### Consistency with other screens
+
+- Match `BO-034`: Same row design and labels; consider one screen with an Overrides tab (VO-R14).
+- Match `BO-244`: Fraud board uses the same override counts.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+overrides:
+- time: 1 Oct 2026 10:41
+  gate: Main Plaza Gate 2
+  ticket: VT0010
+  denial: Already used
+  by: Fatima Al Hashimi
+  why: Stroller, turnstile re-locked; scan history shows no entry
+- time: 1 Oct 2026 15:12
+  gate: North Entry
+  ticket: VT0933
+  denial: Wrong gate
+  by: Omar Haddad
+  why: North Entry used for accessible access
+```
 
 #### Permissions
 
 - `listScans` → `REPORT_VIEW_VENUE` (operate) · staff
-- `getOfflinePackage` → `ACCESS_VALIDATE` (operate) · staff
 - `lookupTicket` → `TICKET_LOOKUP` (operate) · staff
-- `overrideAccess` → `ACCESS_OVERRIDE` (operate) · staff
-- `syncScans` → `ACCESS_VALIDATE` (operate) · staff
-- `validateAccess` → `ACCESS_VALIDATE` (operate) · staff
-- `validateGroupAccess` → `ACCESS_VALIDATE` (operate) · staff
 - `listAuditRecords` → `AUDIT_VIEW` (read) · staff
 
 **A refused user sees:** Shown when the caller lacks `REPORT_VIEW_VENUE`, which `listScans` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
 #### Requirements it meets
 
-60 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+8 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
 
 | Ref | Requirement (shortened) | Domain | Verdict | Via |
 |---|---|---|---|---|
@@ -570,12 +545,7 @@ Errors to draw in the form: 403 Authenticated but not permitted at the requested
 | 3.2.55 | All Guests are invited use the turnstiles when leaving the park. It is expected that the system counts the number of exits. Scan can be required at exit. | Admission and Access | CONTRACTED | `listScans` |
 | 3.2.58 | In park attendance figure per ticket time is calculated in real time. | Admission and Access | CONTRACTED | `listScans` |
 | 5.3.28 | Maintain detailed access validation history including gate entries, exits, attraction validations, RFID scans, QR scans, and turnstile events. | F&B & Guest Management | CONTRACTED | `listScans` |
-| 2.13.38 | Offline Access Validation | Ticketing Sales | CONTRACTED | `getOfflinePackage` |
-| 3.1.5 | Access control devices shall validate dynamic QR codes using secure offline cryptographic validation without requiring continuous connectivity to the central platform. | Admission and Access | CONTRACTED | `getOfflinePackage` |
-| 3.1.10 | System shall support embedding entitlement information within secure QR, RFID, NFC, mobile wallet, and digital credential tokens. Embedded information may include ticket type, seat assignment, event … | Admission and Access | CONTRACTED | `getOfflinePackage` |
-| 3.2.49 | The validity check logic allows offline validity check. | Admission and Access | CONTRACTED | `getOfflinePackage` |
-| 3.2.75 | The access control can be operated in offline mode. Turnstiles can perform access control in absence of database access (database unavailable or not reachable). Key access control criteria can be … | Admission and Access | CONTRACTED | `getOfflinePackage` |
-| … 48 more | | | | `traceability.json` |
+| 3.2.17 | The system should have the ability to scan a ticket into a POS terminal and display record of ticket’s history: transaction time, clerk, payment method, etc. | Admission and Access | CONTRACTED | `lookupTicket` |
 
 #### Client meeting inputs
 
@@ -590,17 +560,17 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### References
 
 - Wireframe frame: `wireframes/P08 Venue Management.dc.html#bo-035` · status **notStarted** · provenance generated
-- ADR-0068 *Guest admission policy lives in Access only, and the offline package carries it* (`docs/adr/0068-guest-admission-policy-lives-in-access-only.md`)
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (37), with its required mark, default, format and its error state (400, 403, 404, 409).
-- [ ] Every output is drawn (42 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (7), with its required mark, default, format and its error state (400, 403, 404).
+- [ ] Every output is drawn (34 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-035?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: Lookup ticket, Override access, Sync scans, Validate access, Validate group access.
-- [ ] Every transition is wired: `BO-001`.
-- [ ] Every gated control is gated: `ACCESS_OVERRIDE`, `ACCESS_VALIDATE`, `AUDIT_VIEW`, `REPORT_VIEW_VENUE`, `TICKET_LOOKUP`.
+- [ ] Every action is wired with its success and its failure: Lookup ticket.
+- [ ] No transition is declared; back returns where the user came from.
+- [ ] Every gated control is gated: `AUDIT_VIEW`, `REPORT_VIEW_VENUE`, `TICKET_LOOKUP`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 1 edge case(s) from the process notes are drawn.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -612,227 +582,89 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | | |
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
-| Module | Access & Venue · wave 1 · needs the `queue` module |
+| Module | Access & Venue · wave 1 · needs the `access` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `QUEUE_MANAGE`, `QUEUE_VIEW` (1 configure, 1 read) |
+| Who uses it | venue staff holding `ORDER_MODIFY`, `ORDER_VIEW` (1 operate, 1 read) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listQueues` reads the population and `getQueue` reads one of them — list, select, act |
 | Offline | online only |
-| Opens with | `queueId` (deepLink) · cold entry: **A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know … |
+| Opens with | `rejectionId` (navigation) · cold entry: **A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know … |
 | Route | `/venue-operations/reconciliation-queue` |
 
 **What the spec says about it.** Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
 
+**Known gaps.** Removed 2 October 2026 (CHG-WIR-001): Every operation bound was a ride virtual-queue operation while the purpose is scan reconciliation; the sync-rejection read and resolve action named by F06 step 6 … Removed 2 October 2026 (CHG-WIR-001): Every operation bound was a ride virtual-queue operation while the purpose is scan reconciliation; the sync-rejection read and resolve action named by F06 step 6 … Removed 2 October 2026 (CHG-WIR-001): Every operation bound was a ride virtual-queue operation while the purpose is scan reconciliation; the sync-rejection read and resolve action named by F06 step 6 …
+
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** The duty manager's queue of offline scans the server rejected after a device had already admitted the guest (sync and reconciliation): what was admitted, where and when offline, why the server disagreed, and the decision taken. It is a revenue and audit task, not a gate event. The one thing to get right: each rejection is resolved with a recorded outcome, and the list empties.
+
+**Fixed on main** (the package already carries these; draw what it says): Every operation bound is a ride virtual-queue operation (listQueues, createQueue, callNextParties, setWaitTime, listQueueEntries) (CHG-WIR-001); listSyncRejections and resolveSyncRejection live in the orders contract (till sales), while F06 step 6 names them for scans (CHG-WIR-001); Screen sits under the Virtual Queue module (CHG-WIR-002).
+
 #### Inputs: what the user enters or picks
-
-**On the screen**
-
-| Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
-|---|---|---|---|---|---|---|---|
-| Venue id | picker: choose a venue (drawn as a picker, not a text box) | optional | — | — | shows names, sends the id | Sends `?venueId=` to `listQueues`. | `listQueues` ?venueId |
-| Open only | toggle | optional | off | — | — | Sends `?openOnly=` to `listQueues`. | `listQueues` ?openOnly |
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
 
 | Filter | Drawn as | Default | Allowed values, rules | Source |
 |---|---|---|---|---|
-| Category | picker: choose a category | — | — | `getWaitTimes` ?category |
+| Workstation | picker: choose a workstation | — | — | `listSyncRejections` ?workstationId |
+| Kind | radio group | — | Order · Payment · Refund · Void · Scan | `listSyncRejections` ?kind |
+| Resolved | toggle | — | — | `listSyncRejections` ?resolved |
 
-**Form: Create queue** (modal, opened by *Create queue*; *Create queue* calls `createQueue`, *Cancel* sends nothing)
+**Form: Mark resolved** (modal, opened by *Mark resolved*; *Mark resolved* calls `resolveSyncRejection`, *Cancel* sends nothing)
 
-**Collects what `createQueue` sends before it is called.** Required: `code`, `name`, `venueId`, `capacityPerCycle`, `cycleMinutes`. Optional: `attractionProductId`, `assetId`, `accessPointId`, `kind`, `operatingWindows`, `parentQueueId`, `loadBalanceWithQueueIds`, `inQueueOfferEnabled`, `notifyBeforeCallMinutes`, `maxPartySize`, `returnWindowMinutes`, `heightRequirementCm` and 2 more. Dismissing sends nothing; the screen behind is unchanged.
-
-| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
-|---|---|---|---|---|---|---|---|
-| Code `code` | text field | required | — | max length 64 | — | — | `createQueue` body |
-| Name `name` | text, one per language | required | — | — | English and Arabic (Arabic right to left) | — | `createQueue` body |
-| Venue `venueId` | picker: choose a venue | required | — | — | shows names, sends the id | — | `createQueue` body |
-| Attraction product `attractionProductId` | picker: choose an attraction product | optional | — | — | shows names, sends the id | — | `createQueue` body |
-| Asset `assetId` | upload, or pick from the media library | optional | — | — | PNG or SVG ≤ 2 MB for logos; images ≥ 1600 px; video MP4 | The ride. Taking it out of service closes this queue rather than leaving guests holding positions for something that is not running. | `createQueue` body |
-| Access point `accessPointId` | picker: choose an access point | optional | — | — | shows names, sends the id | — | `createQueue` body |
-| Kind `kind` | select | optional | Standby | Standby · Single rider · Fast pass · Virtual · Accessible · Group only · Staff only | — | 5.6.x. A ride has several queues and the model had one. | `createQueue` body |
-| Operating windows `operatingWindows` | repeatable rows | optional | — | — | — | When the queue runs, which is not when the venue is open. A ride closing an hour early for maintenance leaves a queue accepting guests for a cycle that will not happen. | `createQueue` body |
-| Day `operatingWindows[].day` | select | required | — | Mon · Tue · Wed · Thu · Fri · Sat · Sun | — | — | `createQueue` body |
-| From `operatingWindows[].from` | time picker | required | — | — | HH:mm, 24-hour | Venue local time, 24-hour `HH:MM`, when the queue starts running. | `createQueue` body |
-| To `operatingWindows[].to` | time picker | required | — | — | HH:mm, 24-hour | Venue local time, 24-hour `HH:MM`, when the queue stops running. | `createQueue` body |
-| Last entry minutes before `operatingWindows[].lastEntryMinutesBefore` | number field (minutes) | optional | 0 | — | — | When the queue stops accepting, which is before it stops running. A guest joining two minutes before close waits twenty and is turned away at the front. | `createQueue` body |
-| Parent queue `parentQueueId` | picker: choose a parent queue | optional | — | — | shows names, sends the id | Where several queues share one capacity. The standby and single-rider lines at one ride draw from the same cycles, and a parent is how that is expressed without either queue … | `createQueue` body |
-| Load balance with queues `loadBalanceWithQueueIds` | multi-picker: choose load balance with queues | optional | — | — | — | BL-137. Two rides with the same theme and different waits, and nothing directed a guest to the shorter one. | `createQueue` body |
-| In queue offer enabled `inQueueOfferEnabled` | toggle | optional | off | — | — | A guest with twenty minutes to wait is a guest with twenty minutes to buy something. | `createQueue` body |
-| Notify before call minutes `notifyBeforeCallMinutes` | number field (minutes) | optional | 5 | — | — | BL-017, 19.2.61. A guest was not told their turn was approaching, which makes a virtual queue worse than a physical one — at least a line is visible. | `createQueue` body |
-| Capacity per cycle `capacityPerCycle` | number field | required | — | min 1 | — | — | `createQueue` body |
-| Cycle minutes `cycleMinutes` | number field (minutes) | required | — | min 0 | — | — | `createQueue` body |
-| Max party size `maxPartySize` | number field | optional | 6 | — | — | — | `createQueue` body |
-| Return window minutes `returnWindowMinutes` | number field (minutes) | optional | 15 | — | — | How long a called party has to arrive before the entry expires. | `createQueue` body |
-| Height requirement cm `heightRequirementCm` | number field | optional | — | — | — | — | `createQueue` body |
-| Fast pass allocation percent `fastPassAllocationPercent` | stepper or slider | optional | 0 | min 0; max 100 | — | Share of each cycle reserved for Fast Pass holders. | `createQueue` body |
-| Zone `zone` | text field | optional | — | — | — | — | `createQueue` body |
-| Fast pass `fastPass` | group | optional | — | — | — | The lane's Fast Pass block (decided 29 September, VM close-out). Null on a queue that takes no Fast Pass. | `createQueue` body |
-| Entitlement products `fastPass.entitlementProductIds` | multi-picker: choose entitlement products | required | — | — | — | Catalogue products whose entitlement admits to this lane. May be empty where priority comes only from a tier, a promotion or an accessibility need. | `createQueue` body |
-| Loyalty tiers `fastPass.loyaltyTierIds` | multi-picker: choose loyalty tiers | optional | — | — | — | 5.6.7 and 5.6.34 (decided 29 September, build pass). Loyalty programme tiers (`marketing.programme_tier`) whose members join this lane as priority. | `createQueue` body |
-| Promotions `fastPass.promotionIds` | multi-picker: choose promotions | optional | — | — | — | 5.6.34 (decided 29 September, build pass). Promotions that grant queue privilege on this lane while they are live. | `createQueue` body |
-| Accessibility priority `fastPass.accessibilityPriority` | toggle | optional | off | — | — | 5.6.7 (decided 29 September, build pass). A party that declares an accessibility need (`JoinQueueRequest.accessibilityNeedDeclared`) joins as priority. | `createQueue` body |
-| Return window minutes `fastPass.returnWindowMinutes` | number field (minutes) | optional | 60 | min 1; max 240 | — | How long after the booked return time a Fast Pass holder may still enter. Proposed, our build plan. | `createQueue` body |
-| Max per guest per day `fastPass.maxPerGuestPerDay` | number field | optional | — | min 1 | — | Fast Pass redemptions one guest may make on this lane per day; null is no cap. | `createQueue` body |
-| Allowed access points `fastPass.allowedAccessPointIds` | multi-picker: choose allowed access points | optional | — | — | — | Access points that redeem Fast Pass for this lane; empty is the queue's own. | `createQueue` body |
-
-Errors to draw in the form: 400 Validation failed
-
-**Form: Call next parties** (modal, opened by *Call next parties*; *Call next parties* calls `callNextParties`, *Cancel* sends nothing)
-
-**Collects what `callNextParties` sends before it is called.** Nothing in the body is required. Optional: `partyCount`. Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `resolveSyncRejection` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
-| Party count `partyCount` | number field | optional | — | min 1 | — | Defaults to the queue's capacity per cycle. | `callNextParties` body |
+| Resolution `resolution` | segmented control | required | — | Posted · Voided · Refunded | — | `posted` — the sale was entered with `createOrder` (F33 step 8); `voided` — with `voidOrder`; `refunded` — with `createRefund`. | `resolveSyncRejection` body |
+| Resolved record `resolvedRecordId` | picker: choose a resolved record | required | — | — | shows names, sends the id | The id of the order, void or refund that resolution produced. | `resolveSyncRejection` body |
+| Note `note` | text area | optional | — | max length 500 | — | — | `resolveSyncRejection` body |
 
-**Form: Save queue status** (modal, opened by *Save queue status*; *Save queue status* calls `setQueueStatus`, *Cancel* sends nothing)
-
-**Collects what `setQueueStatus` sends before it is called.** Required: `status`, `reason`. Optional: `guestMessage`, `expectedReopenAt`. Dismissing sends nothing; the screen behind is unchanged.
-
-| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
-|---|---|---|---|---|---|---|---|
-| Status `status` | radio group | required | — | Open · Paused · Closed · At capacity | — | — | `setQueueStatus` body |
-| Reason `reason` | text area | required | — | min length 3; max length 500 | — | — | `setQueueStatus` body |
-| Guest message `guestMessage` | text, one per language | optional | — | — | English and Arabic (Arabic right to left) | — | `setQueueStatus` body |
-| Expected reopen at `expectedReopenAt` | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `setQueueStatus` body |
-
-Errors to draw in the form: 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.
-
-**Form: Save wait time** (modal, opened by *Save wait time*; *Save wait time* calls `setWaitTime`, *Cancel* sends nothing)
-
-**Collects what `setWaitTime` sends before it is called.** Required: `waitMinutes`. Optional: `expiresInMinutes`, `note`. Dismissing sends nothing; the screen behind is unchanged.
-
-| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
-|---|---|---|---|---|---|---|---|
-| Wait minutes `waitMinutes` | number field (minutes) | required | — | min 0 | — | — | `setWaitTime` body |
-| Expires in minutes `expiresInMinutes` | number field (minutes) | optional | 30 | min 1 | — | How long this manual figure stands before the queue reverts. | `setWaitTime` body |
-| Note `note` | text area | optional | — | max length 200 | — | — | `setWaitTime` body |
-
-Errors to draw in the form: 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.
-
-**Form: Save queue** (modal, opened by *Save queue*; *Save queue* calls `updateQueue`, *Cancel* sends nothing)
-
-**Collects what `updateQueue` sends before it is called.** Nothing in the body is required. Optional: `name`, `capacityPerCycle`, `cycleMinutes`, `maxPartySize`, `returnWindowMinutes`, `heightRequirementCm`, `fastPassAllocationPercent`. Dismissing sends nothing; the screen behind is unchanged.
-
-| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
-|---|---|---|---|---|---|---|---|
-| Name `name` | text, one per language | optional | — | — | English and Arabic (Arabic right to left) | The same locale-to-text map `createQueue` takes and `Queue` returns, so an edit form round-trips the name. | `updateQueue` body |
-| Capacity per cycle `capacityPerCycle` | number field | optional | — | min 1 | — | — | `updateQueue` body |
-| Cycle minutes `cycleMinutes` | number field (minutes) | optional | — | min 0 | — | — | `updateQueue` body |
-| Max party size `maxPartySize` | number field | optional | — | min 1 | — | — | `updateQueue` body |
-| Return window minutes `returnWindowMinutes` | number field (minutes) | optional | — | min 1 | — | — | `updateQueue` body |
-| Height requirement cm `heightRequirementCm` | number field | optional | — | — | — | — | `updateQueue` body |
-| Fast pass allocation percent `fastPassAllocationPercent` | stepper or slider | optional | — | min 0; max 100 | — | — | `updateQueue` body |
-| Fast pass `fastPass` | group | optional | — | — | — | The lane's Fast Pass block (decided 29 September, VM close-out). Replaces the whole block; null removes it. | `updateQueue` body |
-| Entitlement products `fastPass.entitlementProductIds` | multi-picker: choose entitlement products | required | — | — | — | Catalogue products whose entitlement admits to this lane. May be empty where priority comes only from a tier, a promotion or an accessibility need. | `updateQueue` body |
-| Loyalty tiers `fastPass.loyaltyTierIds` | multi-picker: choose loyalty tiers | optional | — | — | — | 5.6.7 and 5.6.34 (decided 29 September, build pass). Loyalty programme tiers (`marketing.programme_tier`) whose members join this lane as priority. | `updateQueue` body |
-| Promotions `fastPass.promotionIds` | multi-picker: choose promotions | optional | — | — | — | 5.6.34 (decided 29 September, build pass). Promotions that grant queue privilege on this lane while they are live. | `updateQueue` body |
-| Accessibility priority `fastPass.accessibilityPriority` | toggle | optional | off | — | — | 5.6.7 (decided 29 September, build pass). A party that declares an accessibility need (`JoinQueueRequest.accessibilityNeedDeclared`) joins as priority. | `updateQueue` body |
-| Return window minutes `fastPass.returnWindowMinutes` | number field (minutes) | optional | 60 | min 1; max 240 | — | How long after the booked return time a Fast Pass holder may still enter. Proposed, our build plan. | `updateQueue` body |
-| Max per guest per day `fastPass.maxPerGuestPerDay` | number field | optional | — | min 1 | — | Fast Pass redemptions one guest may make on this lane per day; null is no cap. | `updateQueue` body |
-| Allowed access points `fastPass.allowedAccessPointIds` | multi-picker: choose allowed access points | optional | — | — | — | Access points that redeem Fast Pass for this lane; empty is the queue's own. | `updateQueue` body |
+Errors to draw in the form: 409 Already resolved, differently (`alreadyResolved`). (OrderRefusedProblem)
 
 #### Outputs: what the screen shows and produces
 
 **Shown**
 
-**Every queue** (data table, from `listQueues`)
+**Refused on replay** (data table, from `listSyncRejections`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| Code | text | — |
-| Name | in the reader's language | — |
-| Venue | the name it points at, never the id | — |
-| Attraction product | the name it points at, never the id | — |
-| Asset | the image or video | The ride. Taking it out of service closes this queue rather than leaving guests holding positions for something that is not running. |
-| Access point | the name it points at, never the id | — |
-| Kind | chip: Standby, Single rider, Fast pass, Virtual, Accessible, Group only… | 5.6.x. A ride has several queues and the model had one. |
-| Operating windows | list or chips (count when long) | When the queue runs, which is not when the venue is open. A ride closing an hour early for maintenance leaves a queue accepting guests for … |
-| Parent queue | the name it points at, never the id | Where several queues share one capacity. The standby and single-rider lines at one ride draw from the same cycles, and a parent is how that … |
-| Load balance with queues | list or chips (count when long) | BL-137. Two rides with the same theme and different waits, and nothing directed a guest to the shorter one. |
-| In queue offer enabled | yes / no (icon or chip) | A guest with twenty minutes to wait is a guest with twenty minutes to buy something. |
-| Notify before call minutes | 1,234 | BL-017, 19.2.61. A guest was not told their turn was approaching, which makes a virtual queue worse than a physical one — at least a line … |
-
-**Every waiting guest** (data table, from `listQueueEntries`)
-
-| Shows | Format | Notes |
-|---|---|---|
-| ID | the name it points at, never the id | The client-generated UUIDv7 from `JoinQueueRequest.id`, and the `entryId` every entry path takes. |
-| Queue | the name it points at, never the id | — |
-| Queue name | in the reader's language | — |
-| Subject | the name it points at, never the id | — |
-| Party number | 1,234 | What the guest sees and what appears on signage. |
-| Party size | 1,234 | — |
-| Status | chip: Waiting, Called, Redeemed, Expired, No show, Cancelled… | — |
-| Position in queue | 1,234 | — |
-| Parties ahead | 1,234 | — |
-| Estimated call at | 1 Oct 2026, 14:30 | — |
-| Is fast pass | yes / no (icon or chip) | — |
-| Entitlement | text | — |
-
-**The selected queue** (detail panel, from `listQueues`)
-
-| Shows | Format | Notes |
-|---|---|---|
-| Code | text | — |
-| Name | in the reader's language | — |
-| Venue | the name it points at, never the id | — |
-| Attraction product | the name it points at, never the id | — |
-| Asset | the image or video | The ride. Taking it out of service closes this queue rather than leaving guests holding positions for something that is not running. |
-| Access point | the name it points at, never the id | — |
-| Kind | chip: Standby, Single rider, Fast pass, Virtual, Accessible, Group only… | 5.6.x. A ride has several queues and the model had one. |
-| Operating windows | list or chips (count when long) | When the queue runs, which is not when the venue is open. A ride closing an hour early for maintenance leaves a queue accepting guests for … |
-| Parent queue | the name it points at, never the id | Where several queues share one capacity. The standby and single-rider lines at one ride draw from the same cycles, and a parent is how that … |
-| Load balance with queues | list or chips (count when long) | BL-137. Two rides with the same theme and different waits, and nothing directed a guest to the shorter one. |
-| In queue offer enabled | yes / no (icon or chip) | A guest with twenty minutes to wait is a guest with twenty minutes to buy something. |
-| Notify before call minutes | 1,234 | BL-017, 19.2.61. A guest was not told their turn was approaching, which makes a virtual queue worse than a physical one — at least a line … |
-| Capacity per cycle | 1,234 | — |
-| Cycle minutes | 1,234.5 | — |
-| Max party size | 1,234 | — |
-| Return window minutes | 1,234 | How long a called party has to arrive before the entry expires. |
-
-**The wait time** (detail panel, from `getWaitTimes`)
-
-| Shows | Format | Notes |
-|---|---|---|
-| Queue | the name it points at, never the id | — |
-| Queue name | in the reader's language | — |
-| Attraction product | the name it points at, never the id | — |
-| Attraction category | the name it points at, never the id | The catalogue `ProductCategory` the attraction product is filed under — the value the `category` filter on `getWaitTimes` matches. |
-| Status | chip: Open, Paused, Closed, At capacity | — |
-| Wait minutes | 1,234 | Null where the queue is closed or no estimate is available. |
-| Source | chip: Sensor, Throughput, Manual, Unavailable | Where the estimate came from. Surfaced so an operator knows whether a figure is measured or guessed. |
-| Is stale | yes / no (icon or chip) | The underlying feed has gone quiet past its expected interval. The figure is shown with a caveat rather than frozen and presented as … |
-| Height requirement cm | 1,234 | — |
-| Zone | text | — |
-| As of | 1 Oct 2026, 14:30 | When the figure was produced — the queue's `waitTimeAsOf`. |
-
-**The queue** (detail panel, from `getQueue`)
-
-| Shows | Format | Notes |
-|---|---|---|
-| Now serving party number | 1,234 | — |
-| Last called at | 1 Oct 2026, 14:30 | — |
-| Throughput last hour | 1,234 | — |
-| No show rate percent | 1,234.5 | — |
-| Feed | grouped details | — |
+| Items | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
+| Workstation | the name it points at, never the id | — |
+| Kind | chip: Order, Payment, Refund, Void, Scan | — |
+| Recorded at | 1 Oct 2026, 14:30 | — |
+| Rejected at | 1 Oct 2026, 14:30 | — |
+| Problem | grouped details | RFC 9457 problem details. Every error response uses this shape. |
+| Type | text | The problem type URI, `https://api.ticvai.com/problems/<slug>`. The slug is one of the shared types in `x-ticvai-problem-types` on this … |
+| Title | text | — |
+| Status | 1,234 | — |
+| Detail | text | — |
+| Instance | text | — |
+| Trace | text | — |
+| Errors | list or chips (count when long) | — |
+| Payload | grouped details | Deliberately open: the journal entry exactly as the till sent it. Its shape is the request schema for `kind` — an `OfflineOrder` for … |
+| Resolved at | 1 Oct 2026, 14:30 | — |
+| Resolved by principal | the name it points at, never the id | — |
+| Resolution | chip: Posted, Voided, Refunded | What `resolveSyncRejection` recorded. Null while the rejection waits. |
+| Resolved record | the name it points at, never the id | The order, void or refund the resolution produced — what stops the entry being posted twice. |
+| Next cursor | text | — |
 
 **Actions and what each produces**
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Create queue (primary button) | `createQueue` POST `/queues` | CreateQueueRequest | Queue | 400 Validation failed | opens modal first |
-| Call next parties (secondary button) | `callNextParties` POST `/queues/{queueId}/call-next` | inline | inline | — | opens modal first |
-| Save queue status (secondary button) | `setQueueStatus` PUT `/queues/{queueId}/status` | inline | QueueStatusResult | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path. | opens modal first |
-| Save wait time (secondary button) | `setWaitTime` PUT `/queues/{queueId}/wait-time` | inline | WaitTime | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path. | opens modal first |
-| Save queue (secondary button) | `updateQueue` PATCH `/queues/{queueId}` | inline | Queue | — | opens modal first |
+| Mark resolved (secondary button) | `resolveSyncRejection` POST `/sync/rejections/{rejectionId}/resolve` | ResolveSyncRejectionRequest | SyncRejection | 409 Already resolved, differently (`alreadyResolved`). (OrderRefusedProblem) | opens modal first |
 
-**Data it reads**: `listQueues` (onLoad, List queues); `getWaitTimes` (onLoad, Wait times across a venue)
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
 
-**Where the user goes next**
+- **Rejections**: Device, access point, scanned at (offline, device time) and synced at, ticket, the server's reason (VO-R06 labels, e.g. Already used at 09:58 Gate 1), age; oldest first. *(source: F06 step 6 / DI-065)*
 
-- → `BO-001` Queue Directory: *Queue Directory*; carries `feedId`, `queueId`
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Resolve**: Record the outcome (e.g. accepted as genuine, guest charged, fraud suspected, blacklisted) with a note. *(source: contracts/spine/orders.yaml#resolveSyncRejection / F06 step 6)*
+
+**Data it reads**: `listSyncRejections` (onLoad, Entries the server refused on replay)
 
 #### States
 
@@ -840,45 +672,45 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 |---|---|
 | Loading (`?state=loading`) | The reconciliation queue list. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the reconciliation queue untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No reconciliation queue yet. Offers Create queue (`createQueue`); distinct from a filter that matched nothing. |
+| Empty, first run (`?state=emptyFirstRun`) | No reconciliation queue yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on venueId, openOnly and the reconciliation queue are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `QUEUE_VIEW`, which `listQueues` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `ORDER_VIEW`, which `listSyncRejections` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed |
+| Validation and conflict | the form keeps what was entered and marks the problem: 409 Already resolved, differently (`alreadyResolved`). (OrderRefusedProblem) |
+
+#### Edge cases to draw
+
+- **Same ticket rejected at several gates**: Grouped under the ticket with a fraud hint. *(source: designer default)*
+
+#### Consistency with other screens
+
+- Match `SCN-014`: The scanner shows the same rejections after sync; the manager resolves them here.
+- Match `BO-034`: Resolved rows link to the scan in Scan Activity.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+rejections:
+- device: Handheld HH-07
+  point: North Entry
+  scanned: 10:12 (offline)
+  synced: '10:40'
+  ticket: VT0933
+  reason: Already used at 09:58, Main Plaza Gate 1
+```
 
 #### Permissions
 
-- `listQueues` → `QUEUE_VIEW` (read) · staff, guest
-- `getQueue` → `QUEUE_VIEW` (read) · staff
-- `createQueue` → `QUEUE_MANAGE` (configure) · staff
-- `callNextParties` → `QUEUE_MANAGE` (configure) · staff
-- `getWaitTimes` → no permission · guest, public
-- `listQueueEntries` → `QUEUE_VIEW` (read) · staff
-- `setQueueStatus` → `QUEUE_MANAGE` (configure) · staff
-- `setWaitTime` → `QUEUE_MANAGE` (configure) · staff
-- `updateQueue` → `QUEUE_MANAGE` (configure) · staff
+- `listSyncRejections` → `ORDER_VIEW` (read) · staff
+- `resolveSyncRejection` → `ORDER_MODIFY` (operate) · staff
 
-**A refused user sees:** Shown when the caller lacks `QUEUE_VIEW`, which `listQueues` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `ORDER_VIEW`, which `listSyncRejections` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
 #### Requirements it meets
 
-23 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
-
-| Ref | Requirement (shortened) | Domain | Verdict | Via |
-|---|---|---|---|---|
-| 5.6.4 | VIP / Priority Handling: Separate or fast-track queues for premium guests. | F&B & Guest Management | CONTRACTED | `createQueue` |
-| 5.6.7 | Support priority queueing for VIP guests, annual pass holders, premium packages, loyalty tiers, and accessibility requirements. | F&B & Guest Management | CONTRACTED_PARTIAL | `createQueue` |
-| 5.6.12 | Automatically expire queue reservations after configurable grace periods. | F&B & Guest Management | CONTRACTED | `createQueue` |
-| 19.2.37 | Estimated Waiting Time - System shall provide estimated waiting times. | Guest Mobile App & Branding | CONTRACTED | `getWaitTimes` |
-| 5.6.3 | Display queue lengths, wait times, throughput, capacity utilization, occupancy, and customer flow metrics. | F&B & Guest Management | CONTRACTED | `getWaitTimes` |
-| 5.6.15 | Continuously calculate and display estimated waiting times. | F&B & Guest Management | CONTRACTED | `getWaitTimes` |
-| 5.6.16 | Allow guests to view their live queue position and estimated service time. | F&B & Guest Management | CONTRACTED | `getWaitTimes` |
-| 5.6.2 | Real-time Queue Dashboard: Staff view of queue lengths, wait times, and customer flow. | F&B & Guest Management | CONTRACTED | `listQueueEntries` |
-| 5.6.29 | Maintain complete audit logs for reservations, transfers, modifications, cancellations, and check-ins. | F&B & Guest Management | CONTRACTED | `listQueueEntries` |
-| 5.6.24 | Automatically recover queue reservations after operational disruptions. | F&B & Guest Management | CONTRACTED | `setQueueStatus` |
-| 5.6.25 | Support automatic queue suspension and guest reallocation when attractions become unavailable. | F&B & Guest Management | CONTRACTED | `setQueueStatus` |
-| 19.2.38 | Queue Notifications - System shall provide queue notifications. | Guest Mobile App & Branding | CONTRACTED | data `CreateQueueRequest` |
-| … 11 more | | | | `traceability.json` |
+No matrix row traces to this screen's operations or data.
 
 #### Client meeting inputs
 
@@ -901,13 +733,14 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (56), with its required mark, default, format and its error state (400, 403, 404).
-- [ ] Every output is drawn (56 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (3), with its required mark, default, format and its error state (409).
+- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-038?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: Create queue, Call next parties, Save queue status, Save wait time, Save queue.
-- [ ] Every transition is wired: `BO-001`.
-- [ ] Every gated control is gated: `QUEUE_MANAGE`, `QUEUE_VIEW`.
+- [ ] Every action is wired with its success and its failure: Mark resolved.
+- [ ] No transition is declared; back returns where the user came from.
+- [ ] Every gated control is gated: `ORDER_MODIFY`, `ORDER_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 1 edge case(s) from the process notes are drawn.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -921,14 +754,20 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 2 · needs the `maintenance` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `ASSET_MANAGE`, `ASSET_VIEW`, `PRODUCT_CONFIGURE`, `PRODUCT_VIEW` (2 configure, 2 read); in the flows as guest |
+| Who uses it | venue staff holding `ASSET_MANAGE`, `ASSET_VIEW` (1 configure, 1 read); in the flows as technician |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listAssets` reads the population and `getAsset` reads one of them — list, select, act |
 | Offline | online only |
-| Opens with | `assetId` (deepLink), `gameId` (deepLink) · cold entry: **A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know … |
+| Opens with | `assetId` (deepLink) · cold entry: **A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know … |
 | Route | `/venue-operations/asset-register` |
 
 **What the spec says about it.** Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
+
+**Known gaps.** Removed 2 October 2026 (CHG-WIR-001): recordGamePlay and syncGamePlays are device-audience operations and game configuration belongs to the games boards (BO-395); keep only the asset register … Removed 2 October 2026 (CHG-WIR-001): recordGamePlay and syncGamePlays are device-audience operations and game configuration belongs to the games boards (BO-395); keep only the asset register … Removed 2 October 2026 (CHG-WIR-001): recordGamePlay and syncGamePlays are device-audience operations and game configuration belongs to the games boards (BO-395); keep only the asset register …
+
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** The venue's asset register: every ride, turnstile, plant item, vehicle and IT device with its criticality, status, warranty, documents and full history, and the fault priority override that says "if this goes down, raise this priority". Taking an asset out of service closes the loop into operations (ride shown closed, access point blocked, product stops selling). The one thing to get right: status changes are deliberate, reasoned acts, and return to service requires a completed inspection where the asset demands it.
+
+**Fixed on main** (the package already carries these; draw what it says): Games operations (listGames, updateGame, recordGamePlay, syncGamePlays) bound on the asset register (CHG-WIR-001); Filters are id text fields (Venue id, Category id, Status) (CHG-SBO-009); Duplicate of BO-031 (CHG-WIR-002).
 
 #### Inputs: what the user enters or picks
 
@@ -936,9 +775,8 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 
 | Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
 |---|---|---|---|---|---|---|---|
-| Venue id | picker: choose a venue (drawn as a picker, not a text box) | optional | — | — | shows names, sends the id | Sends `?venueId=` to `listAssets`. | `listAssets` ?venueId |
-| Category id | picker: choose a category (drawn as a picker, not a text box) | optional | — | — | shows names, sends the id | Sends `?categoryId=` to `listAssets`. | `listAssets` ?categoryId |
-| Status | select | optional | — | In service · Out of service · Under maintenance · Awaiting parts · Retired · Disposed | — | Sends `?status=` to `listAssets`. | `listAssets` ?status |
+| Category | picker: choose a category | optional | — | — | shows names, sends the id | Asset categories by name. | `Asset.categoryId` |
+| Status | select | optional | — | In service · Out of service · Under maintenance · Awaiting parts · Retired · Disposed | — | Asset statuses in words. | `Asset.status` |
 | Maintenance due | toggle | optional | — | — | — | Sends `?maintenanceDue=` to `listAssets`. | `listAssets` ?maintenanceDue |
 | Search | search field | — | — | — | — | A search that returns nothing must say so differently from a search not yet run. | — |
 | Fault priority override | radio group | optional | — | Low · Normal · High · Urgent · Emergency | — | **"If this goes down, raise this priority"** (decided 17 September, M17-01). A fault raised on this asset takes this priority instead of the venue's score. Empty means the score decides. | `Asset.priorityOverride` |
@@ -947,7 +785,8 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 
 | Filter | Drawn as | Default | Allowed values, rules | Source |
 |---|---|---|---|---|
-| Status | radio group | — | In service · Out of service · Maintenance · Retired | `listGames` ?status |
+| Category | picker: choose a category | — | — | `listAssets` ?categoryId |
+| Status | select | — | In service · Out of service · Under maintenance · Awaiting parts · Retired · Disposed | `listAssets` ?status |
 
 **Form: Create asset** (modal, opened by *Create asset*; *Create asset* calls `createAsset`, *Cancel* sends nothing)
 
@@ -1011,54 +850,14 @@ Errors to draw in the form: 409 Return to service attempted without the inspecti
 | Kind `documents[].kind` | select | required | — | Manual · Sop · Certificate · Warranty · Drawing · Risk assessment | — | — | `updateAsset` body |
 | Document refs `documentRefs` | list of values (chips) | optional | — | — | — | The refs alone, kept for callers that predate `documents`. Each becomes a document with no name and no kind. | `updateAsset` body |
 
-**Form: Save game** (modal, opened by *Save game*; *Save game* calls `updateGame`, *Cancel* sends nothing)
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
 
-**Collects what `updateGame` sends before it is called.** Nothing in the body is required. Optional: `name`, `creditCost`, `minPointsAwarded`, `maxPointsAwarded`, `status`, `heightRequirementCm`. Dismissing sends nothing; the screen behind is unchanged.
-
-| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
-|---|---|---|---|---|---|---|---|
-| Name `name` | text field | optional | — | max length 200 | — | — | `updateGame` body |
-| Credit cost `creditCost` | number field | optional | — | min 1 | — | — | `updateGame` body |
-| Min points awarded `minPointsAwarded` | number field | optional | — | min 0 | — | — | `updateGame` body |
-| Max points awarded `maxPointsAwarded` | number field | optional | — | min 0 | — | — | `updateGame` body |
-| Status `status` | radio group | optional | — | In service · Out of service · Maintenance · Retired | — | — | `updateGame` body |
-| Height requirement cm `heightRequirementCm` | number field | optional | — | — | — | — | `updateGame` body |
-
-Errors to draw in the form: 409 Refused. Either `creditCost`, `minPointsAwarded` or `maxPointsAwarded` changed while plays on this game are in flight, or `status` asks for a move …
-
-**Form: Record game play** (modal, opened by *Record game play*; *Record game play* calls `recordGamePlay`, *Cancel* sends nothing)
-
-**Collects what `recordGamePlay` sends before it is called.** Required: `id`, `cardCode`, `gameId`, `recordedAt`. Optional: `creditsUsed`, `pointsAwarded`, `sequence`. Dismissing sends nothing; the screen behind is unchanged.
-
-| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
-|---|---|---|---|---|---|---|---|
-| ID `id` | picker: choose an id | required | — | — | shows names, sends the id | The play ID, generated on the reader, and returned as `PlayResult.playId`. Also the idempotency key: on `recordGamePlay` it must equal the `Idempotency-Key` header (a mismatch is … | `recordGamePlay` body |
-| Card code `cardCode` | text field | required | — | — | — | — | `recordGamePlay` body |
-| Game `gameId` | picker: choose a game | required | — | — | shows names, sends the id | — | `recordGamePlay` body |
-| Credits used `creditsUsed` | number field | optional | — | min 1 | — | — | `recordGamePlay` body |
-| Points awarded `pointsAwarded` | number field | optional | — | min 0 | — | — | `recordGamePlay` body |
-| Sequence `sequence` | number field | optional | — | — | — | Monotonic per reader. Preserves order across an offline batch. | `recordGamePlay` body |
-| Played offline `playedOffline` | toggle | optional | off | Such a play is accepted even against too few credits and reported for reconciliation; a live play (false) is refused instead (decided 28 September, audit R106 (3)). | — | True where the reader recorded the play while offline and is replaying it. Such a play is accepted even against too few credits and reported for reconciliation; a live play … | `recordGamePlay` body |
-| Recorded at `recordedAt` | date and time picker | required | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `recordGamePlay` body |
-
-Errors to draw in the form: 409 Insufficient credits on a live play (never on an offline one, audit R106 (3)), card blocked, or the game is out of service.
-
-**Form: Sync game plays** (modal, opened by *Sync game plays*; *Sync game plays* calls `syncGamePlays`, *Cancel* sends nothing)
-
-**Collects what `syncGamePlays` sends before it is called.** Required: `readerId`, `plays`. Dismissing sends nothing; the screen behind is unchanged.
-
-| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
-|---|---|---|---|---|---|---|---|
-| Reader `readerId` | picker: choose a reader | required | — | — | shows names, sends the id | — | `syncGamePlays` body |
-| Plays `plays` | repeatable rows | required | — | at least 1; at most 500 | — | — | `syncGamePlays` body |
-| ID `plays[].id` | picker: choose an id | required | — | — | shows names, sends the id | The play ID, generated on the reader, and returned as `PlayResult.playId`. Also the idempotency key: on `recordGamePlay` it must equal the `Idempotency-Key` header (a mismatch is … | `syncGamePlays` body |
-| Card code `plays[].cardCode` | text field | required | — | — | — | — | `syncGamePlays` body |
-| Game `plays[].gameId` | picker: choose a game | required | — | — | shows names, sends the id | — | `syncGamePlays` body |
-| Credits used `plays[].creditsUsed` | number field | optional | — | min 1 | — | — | `syncGamePlays` body |
-| Points awarded `plays[].pointsAwarded` | number field | optional | — | min 0 | — | — | `syncGamePlays` body |
-| Sequence `plays[].sequence` | number field | optional | — | — | — | Monotonic per reader. Preserves order across an offline batch. | `syncGamePlays` body |
-| Played offline `plays[].playedOffline` | toggle | optional | off | Such a play is accepted even against too few credits and reported for reconciliation; a live play (false) is refused instead (decided 28 September, audit R106 (3)). | — | True where the reader recorded the play while offline and is replaying it. Such a play is accepted even against too few credits and reported for reconciliation; a live play … | `syncGamePlays` body |
-| Recorded at `plays[].recordedAt` | date and time picker | required | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `syncGamePlays` body |
+- **assetTag**: Unique per venue (max 64); duplicate refused with the existing asset named; printed as a QR label. *(source: contracts/satellite/maintenance.yaml#createAsset)*
+- **criticality**: Safety critical / Revenue critical / Standard / Low, as a coloured select; Safety critical defaults "Inspection required to return to service" on. *(source: contracts/satellite/maintenance.yaml#createAsset)*
+- **Fault priority override**: Optional select of the work-order priorities (Low, Normal, High, Urgent, Emergency) with the hint "If this asset goes down, raise this priority"; empty means the venue's scoring applies. *(source: DI-909 / DI-923 / contracts/satellite/maintenance.yaml#updateAsset)*
+- **Links**: Linked products (a fault can stop them selling) and linked access point (out of service blocks it), as pickers. *(source: contracts/satellite/maintenance.yaml#createAsset)*
+- **Documents**: Upload with a name and kind (Manual, SOP, Certificate, Warranty, Drawing, Risk assessment); replaces the list as a whole on save. *(source: contracts/satellite/maintenance.yaml#updateAsset / MATRIX 17.1.6)*
+- **Status change**: In service / Out of service / Under maintenance / Awaiting parts / Retired / Disposed with a required reason; returning to In service asks for the inspection when the asset requires one; optional "Raise a work order". *(source: contracts/satellite/maintenance.yaml#setAssetStatus)*
 
 #### Outputs: what the screen shows and produces
 
@@ -1080,23 +879,6 @@ Errors to draw in the form: 409 Insufficient credits on a live play (never on an
 | Commissioned at | 1 Oct 2026 | — |
 | Warranty expires at | 1 Oct 2026 | — |
 | Supplier | the name it points at, never the id | — |
-
-**Every game** (data table, from `listGames`)
-
-| Shows | Format | Notes |
-|---|---|---|
-| ID | the name it points at, never the id | — |
-| Code | text | — |
-| Name | text | — |
-| Venue | the name it points at, never the id | — |
-| Zone | text | — |
-| Asset | the image or video | The machine. Taken out of service by maintenance, the game stops accepting play rather than swallowing credits. |
-| Reader | the name it points at, never the id | — |
-| Credit cost | 1,234 | — |
-| Min points awarded | 1,234 | — |
-| Max points awarded | 1,234 | — |
-| Height requirement cm | 1,234 | — |
-| Status | chip: In service, Out of service, Maintenance, Retired | — |
 
 **The selected asset** (detail panel, from `listAssets`)
 
@@ -1145,11 +927,18 @@ Errors to draw in the form: 409 Insufficient credits on a live play (never on an
 | Lookup asset (secondary button) | `lookupAsset` GET `/assets/lookup` | — | AssetDetail | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path. | — |
 | Save asset status (secondary button) | `setAssetStatus` PUT `/assets/{assetId}/status` | SetAssetStatusRequest | AssetStatusResult | 409 Return to service attempted without the inspection this asset category requires. | opens modal first |
 | Save asset (secondary button) | `updateAsset` PATCH `/assets/{assetId}` | inline | Asset | — | opens modal first |
-| Save game (secondary button) | `updateGame` PATCH `/games/{gameId}` | inline | Game | 409 Refused. Either `creditCost`, `minPointsAwarded` or `maxPointsAwarded` changed while plays on this game are in flight, or `status` asks for a move … | opens modal first |
-| Record game play (secondary button) | `recordGamePlay` POST `/game-plays` | RecordPlayRequest | PlayResult | 409 Insufficient credits on a live play (never on an offline one, audit R106 (3)), card blocked, or the game is out of service. | opens modal first |
-| Sync game plays (secondary button) | `syncGamePlays` POST `/game-plays/sync` | inline | inline | — | opens modal first |
 
-**Data it reads**: `listAssets` (onLoad, List assets); `listGames` (onLoad, List games)
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Register**: Tag, name, category, location, criticality, status chip, warranty expiry (amber within 60 days), maintenance due flag, open work orders count; filter by category per team (DI-908). *(source: contracts/satellite/maintenance.yaml#listAssets / DI-908)*
+- **Asset 360**: As BO-031 summary - documents, warranty, lifecycle history in sequence, location view. *(source: DI-910)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Scan tag**: Opens the asset directly (lookup by tag or serial). *(source: contracts/satellite/maintenance.yaml#lookupAsset)*
+- **Take out of service**: Confirm names what it stops (ride on the map, Gate 2 access point, 3 products) - per VO-R16. *(source: contracts/satellite/maintenance.yaml#setAssetStatus)*
+
+**Data it reads**: `listAssets` (onLoad, List assets)
 
 **Where the user goes next**
 
@@ -1165,7 +954,44 @@ Errors to draw in the form: 409 Insufficient credits on a live play (never on an
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on venueId, categoryId, status, maintenanceDue and the asset register are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `ASSET_VIEW`, which `listAssets` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 409 A business code the request names is already used within its uniqueness scope (the scope the property's `x-ticvai-unique` names; decided 28 September, audit …; 409 Insufficient credits on a live play (never on an offline one, audit R106 (3)), card blocked, or the game is out of service.; 409 Refused. Either `creditCost`, `minPointsAwarded` or `maxPointsAwarded` changed while plays on this … |
+| Validation and conflict | the form keeps what was entered and marks the problem: 409 A business code the request names is already used within its uniqueness scope (the scope the property's `x-ticvai-unique` names; decided 28 September, audit …; 409 Return to service attempted without the inspection this asset category requires. |
+
+#### Edge cases to draw
+
+- **Return to service without an inspection on an asset that needs one**: Refused with "Complete the inspection first" and a link to start it. *(source: contracts/satellite/maintenance.yaml#setAssetStatus)*
+- **Asset retired with open work orders**: Warn and list them. *(source: designer default)*
+
+#### Consistency with other screens
+
+- Match `BO-070`: Priority source shown on work orders (Scored / Asset override / Manual) refers back to this override.
+- Match `BO-394`: Games link to assets (assetId); game configuration stays in the games module.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+assets:
+- tag: AP-RIDE-0007
+  name: Falcon Coaster
+  category: Rides
+  location: Adventure Zone, Bay 3
+  criticality: Safety critical
+  override: Emergency
+  status: In service
+  warranty: 31 Mar 2027
+- tag: AP-GATE-0102
+  name: Main Plaza Gate 2 turnstile
+  category: Access control
+  criticality: Revenue critical
+  status: Under maintenance
+  linkedAccessPoint: Main Plaza Gate 2
+- tag: AP-IT-0331
+  name: Receipt printer TM-T88VII (Retail 1)
+  category: IT
+  criticality: Standard
+  status: In service
+```
 
 #### Permissions
 
@@ -1176,16 +1002,12 @@ Errors to draw in the form: 409 Insufficient credits on a live play (never on an
 - `lookupAsset` → `ASSET_VIEW` (read) · staff
 - `setAssetStatus` → `ASSET_MANAGE` (configure) · staff
 - `updateAsset` → `ASSET_MANAGE` (configure) · staff
-- `listGames` → `PRODUCT_VIEW` (read) · staff
-- `updateGame` → `PRODUCT_CONFIGURE` (configure) · staff
-- `recordGamePlay` → no permission · device
-- `syncGamePlays` → no permission · device
 
 **A refused user sees:** Shown when the caller lacks `ASSET_VIEW`, which `listAssets` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
 #### Requirements it meets
 
-24 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+23 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
 
 | Ref | Requirement (shortened) | Domain | Verdict | Via |
 |---|---|---|---|---|
@@ -1201,7 +1023,7 @@ Errors to draw in the form: 409 Insufficient credits on a live play (never on an
 | 18.3.4 | Asset History - Users shall view maintenance history. | Employee Mobile App & AI Assistant | CONTRACTED | `getAssetHistory` |
 | 18.3.5 | Asset Documentation - Users shall access manuals and documents. | Employee Mobile App & AI Assistant | CONTRACTED | `getAssetHistory` |
 | 18.3.1 | QR Asset Scanning - Users shall scan asset QR codes. | Employee Mobile App & AI Assistant | CONTRACTED | `lookupAsset` |
-| … 12 more | | | | `traceability.json` |
+| … 11 more | | | | `traceability.json` |
 
 #### Client meeting inputs
 
@@ -1220,21 +1042,19 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### References
 
 - Wireframe frame: `wireframes/P08 Venue Management.dc.html#bo-069` · status **notStarted** · provenance generated
-- Flow F18 *A guest plays an arcade game*, step 3: Machine records the play → **Offline, journalled, synced later**
-- Flow F18 *A guest plays an arcade game*, step 4: Machine goes out of service → The asset cascade closes it
-- Flow F18 branch at step 3 (recoverable): when The card has no credits, Refused at the machine. **Offline, so the machine must know the balance** — which means the balance is on the card as well as the server, and they will disagree.
-- Flow F18 branch at step 3 (requiresStaff): when The card balance and the server disagree after sync, **The card wins for plays already taken** — the guest played, and reversing it is not possible. The difference is a reconciliation item.
-- Flow F18 branch at step 4 (requiresStaff): when The machine fails mid-play, A credit was taken and no play happened. **Refund or replay is a policy nobody has stated**, and it happens often enough to matter.
+- Flow F12 *Asset fails and closes a queue*, step 5: Asset returns to service → The queue reopens and the guest app offers it again
+- Flow F12 branch at step 5 (requiresStaff): when Queue does not reopen after the asset returns, The cascade failed. `maintenance.assetReturnedToService` has two critical consumers for this reason — a ride verified and back in service whose queue never reopened is a closed attraction nobody …
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (67), with its required mark, default, format and its error state (403, 404, 409).
-- [ ] Every output is drawn (48 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (42), with its required mark, default, format and its error state (403, 404, 409).
+- [ ] Every output is drawn (36 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-069?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: Create asset, Lookup asset, Save asset status, Save asset, Save game, Record game play, Sync game plays.
+- [ ] Every action is wired with its success and its failure: Create asset, Lookup asset, Save asset status, Save asset.
 - [ ] Every transition is wired: `BO-070`.
-- [ ] Every gated control is gated: `ASSET_MANAGE`, `ASSET_VIEW`, `PRODUCT_CONFIGURE`, `PRODUCT_VIEW`.
+- [ ] Every gated control is gated: `ASSET_MANAGE`, `ASSET_VIEW`.
 - [ ] The 3 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 2 edge case(s) from the process notes are drawn.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -1248,14 +1068,34 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 3 · needs the `maintenance` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `ASSET_MANAGE`, `ASSET_VIEW`, `ROLE_MANAGE` (2 configure, 1 read) |
+| Who uses it | venue staff holding `ASSET_MANAGE`, `ASSET_VIEW` (1 configure, 1 read) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listMaintenancePlans` reads the population and `getDueMaintenance` reads one of them — list, select, act |
 | Offline | online only |
-| Opens with | `roleId` (deepLink) · cold entry: A role opened from the directory. **Permissions are set per role, not per person** — ADR-0002 makes authorisation user-driven through roles. |
+| Opens with | `planId` (navigation) · cold entry: A role opened from the directory. **Permissions are set per role, not per person** — ADR-0002 makes authorisation user-driven through roles. |
 | Route | `/venue-operations/planned-maintenance` |
 
 **What the spec says about it.** Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
+
+**Known gaps.** Removed 2 October 2026 (CHG-WIR-001): Bulk-attach residue: role permissions are tenant identity administration and have nothing to do with maintenance plans. Only createMaintenancePlan was bound …
+
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** The venue's planned (preventive) maintenance: the library of plans that say "service this every 90 days or every 500 operating hours, whichever comes first", and the due list that turns them into work orders a week ahead. A maintenance supervisor maintains plans for rides, gates, plant and IT devices, and opens each morning on what is due and overdue. The one thing to get right: plans are shown in time - a calendar of due dates with day, week and month views filtered by asset category - not only as a table of interval numbers, and overdue safety-critical work is on top.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **No calendar although the screen places plans in time** Why: getDueMaintenance was given from, to and categoryId for calendars (M17-03); every calendar has day, week and month (per VO-R01). *(source: contracts/satellite/maintenance.yaml#getDueMaintenance / DI-919; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **MaintenancePlan requires assetId while assetCategoryId "applies to every asset in the category"** Why: A category-wide plan cannot be created if one asset is mandatory; assetId should be required only when no category is given. *(source: contracts/satellite/maintenance.yaml#/components/schemas/MaintenancePlan; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **Table and detail show id, assetId, assetCategoryId and the raw taskTemplate object; titles "Every maintenance plan", "The selected maintenance plan"** Why: Server values and placeholders (per VO-R03, VO-R12); show names and a readable interval. *(source: screens/P08-venue-back-office.yaml#BO-071; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **No entry into the screen (entryFrom empty) and an inferred exit only** Why: It should be reached from the Venue Operations hub (BO-108) and the work order desk (BO-070). *(source: screens/P08-venue-back-office.yaml#BO-071 / screens/P08-venue-back-office.yaml#BO-108; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+
+**Fixed on main** (the package already carries these; draw what it says): "Save role permissions" (setRolePermissions) bound and entry parameter roleId (CHG-WIR-001); Only createMaintenancePlan is bound; no edit or suspend (CHG-WIR-001).
+
+#### Decided on this screen
+
+Answered questions: draw the decision, not the old default. Where a decision and the tables below differ, the decision wins.
+
+- **The pack asks for fixed-date plans (every 1 Jan and 1 Jul), a grace window (due 15 Sep plus or minus 3 days) and plan approval (Draft, Pending approval, Active, Suspended, Archived). None is in the plan. In scope?** → Drawn default accepted: Draw Active/Suspended only; show "Fixed dates" and "Grace window" greyed with "Not yet available". *(decided by Chinmay, 2026-10-02; DEC-372 / CHG-NOTE-008)* **Reviewable:** a default the lead may still overrule before the block is tasked.
+- **Is there a "Raise now" for a plan whose job is needed early (before an event), or must the supervisor raise a separate work order?** → Drawn default accepted: Not drawn; the due row links to New work order pre-filled from the plan. *(decided by Chinmay, 2026-10-02; DEC-373 / CHG-NOTE-008)* **Reviewable:** a default the lead may still overrule before the block is tasked.
 
 #### Inputs: what the user enters or picks
 
@@ -1294,16 +1134,24 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 Errors to draw in the form: 400 Neither an interval nor a usage trigger supplied
 
-**Form: Save role permissions** (modal, opened by *Save role permissions*; *Save role permissions* calls `setRolePermissions`, *Cancel* sends nothing)
+**Form: Change plan** (modal, opened by *Change plan*; *Change plan* calls `updateMaintenancePlan`, *Cancel* sends nothing)
 
-**Collects what `setRolePermissions` sends before it is called.** Required: `permissions`. Optional: `inheritsFromRoleId`. Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `updateMaintenancePlan` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
-| Permissions `permissions` | multi-select chips | required | — | SESSION FORCE LOGOUT · USER MANAGE · ROLE MANAGE · PERMISSION GRANT · PERMISSION VIEW · PERMISSION MANAGE · PLATFORM TENANT VIEW · PLATFORM TENANT MANAGE · PLATFORM TENANT TERMINATE · PLATFORM PLAN MANAGE · PLATFORM CELL VIEW · PLATFORM CELL MANAGE … | — | — | `setRolePermissions` body |
-| Inherits from role `inheritsFromRoleId` | picker: choose an inherits from role | optional | — | — | shows names, sends the id | — | `setRolePermissions` body |
+| Interval days `intervalDays` | number field (days) | optional | — | min 1 | — | — | `updateMaintenancePlan` body |
+| Usage interval `usageInterval` | number field | optional | — | min 0 | — | — | `updateMaintenancePlan` body |
+| Lead time days `leadTimeDays` | number field (days) | optional | — | min 0 | — | — | `updateMaintenancePlan` body |
+| Is active `isActive` | toggle | optional | — | — | — | — | `updateMaintenancePlan` body |
 
-Errors to draw in the form: 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 Breaches a segregation rule. Names the rule and both permissions.
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Applies to**: Either one asset (asset picker with tag search) or a whole category ("All turnstiles - 96 assets"), chosen with a two-way switch; the count of assets covered is shown live. *(source: screens/P08-venue-back-office.yaml#BO-071 / contracts/satellite/maintenance.yaml#/components/schemas/MaintenancePlan)*
+- **Every (interval and usage)**: A sentence builder - "Every [90] days" with presets Daily, Weekly, Monthly (30), Quarterly (90), Half-yearly (182), Annual (365), Custom; "or every [500] [operating hours]" where the unit follows the asset's usage counter; "whichever comes first" appears when both are set. At least one of the two is required; interval minimum 1, usage minimum 0 exclusive. *(source: contracts/satellite/maintenance.yaml#createMaintenancePlan / contracts/satellite/maintenance.yaml#updateMaintenancePlan / DI-902)*
+- **Raise the work order ahead by**: "[7] days before it is due, so parts can be ordered" - whole days, 0 allowed, default 7. *(source: screens/P08-venue-back-office.yaml#BO-071 / contracts/satellite/maintenance.yaml#/components/schemas/MaintenancePlan)*
+- **The job (task template)**: Work order title (required), description, priority (planned work takes this priority; it is not scored), estimated duration in minutes, checklist (picker of inspection templates for the category, "Create a checklist" link to the template builder), parts usually needed (inventory item picker) - shown as the work order the plan will raise. *(source: contracts/satellite/maintenance.yaml#/components/schemas/MaintenancePlan / DI-923)*
+- **Active**: A Suspend switch with a reason, not a bare checkbox; a suspended plan raises nothing and is greyed in the list and calendar. *(source: screens/P08-venue-back-office.yaml#BO-071 / contracts/satellite/maintenance.yaml#updateMaintenancePlan)*
 
 #### Outputs: what the screen shows and produces
 
@@ -1361,7 +1209,19 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
 | Create maintenance plan (primary button) | `createMaintenancePlan` POST `/maintenance-plans` | MaintenancePlan | MaintenancePlan | 400 Neither an interval nor a usage trigger supplied | opens modal first |
-| Save role permissions (secondary button) | `setRolePermissions` PUT `/roles/{roleId}/permissions` | inline | inline | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 Breaches a segregation rule. Names the rule and both permissions. | opens modal first |
+| Change plan (secondary button) | `updateMaintenancePlan` PATCH `/maintenance-plans/{planId}` | inline | MaintenancePlan | — | opens modal first |
+
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Plan library**: Columns - Plan, Applies to ("Falcon Coaster" or "All turnstiles (96)"), Every ("90 days or 500 h"), Lead time, Last done, Next due (amber inside the lead time, red overdue), Status. Never id, assetId, assetCategoryId or a raw taskTemplate object. *(source: contracts/satellite/maintenance.yaml#listMaintenancePlans)*
+- **Due and overdue**: The morning view - overdue safety-critical first, then by due date; each row "Due 15 Oct - triggered by usage" with the generated work order number and its status, or "No work order yet". *(source: contracts/satellite/maintenance.yaml#getDueMaintenance / MATRIX 17.2.4)*
+- **Calendar**: A List / Calendar toggle. Calendar has Day (hours from the venue day start), Week, Month and Agenda views, an asset-category filter so the IT team sees turnstiles, printers and POS only, and cards coloured Scheduled, Due soon, Overdue, Completed, Suspended. *(source: DI-907 / DI-908 / contracts/satellite/maintenance.yaml#getDueMaintenance)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **New plan**: Opens the editor empty with lead time 7 and Active on; no id field. Saving a plan whose first due date is inside the lead time says "A work order will be raised today". *(source: contracts/satellite/maintenance.yaml#createMaintenancePlan)*
+- **Save changes**: Sends only the changed fields (PATCH); the confirm says how many assets and future occurrences are affected. *(source: contracts/satellite/maintenance.yaml#updateMaintenancePlan)*
+- **Open work order**: From a due row, opens BO-070 at that work order. *(source: screens/P08-venue-back-office.yaml#BO-071)*
 
 **Data it reads**: `listMaintenancePlans` (onLoad, List planned maintenance schedules); `getDueMaintenance` (onLoad, Planned tasks due or overdue)
 
@@ -1379,14 +1239,54 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 | Empty, no results (`?state=emptyNoResults`) | Never shown: `listMaintenancePlans` takes no filter, so an empty list is always the first-run state above. |
 | Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `ASSET_VIEW`, which `listMaintenancePlans` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 400 Neither an interval nor a usage trigger supplied; 409 Breaches a segregation rule. Names the rule and both permissions. |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 Neither an interval nor a usage trigger supplied |
+
+#### Edge cases to draw
+
+- **Usage-based plan on an asset that has no usage counter**: Warn "Falcon Coaster has no cycle counter - this plan will only trigger by days" before save. *(source: contracts/satellite/maintenance.yaml#/components/schemas/Asset / designer default)*
+- **Category plan and a new asset added to the category**: The asset is covered from its commissioning date; the plan's asset count rises. *(source: contracts/satellite/maintenance.yaml#/components/schemas/MaintenancePlan)*
+- **Viewer without ASSET_MANAGE**: Library and calendar read-only; New plan and Save disabled with "Needs asset management rights" (per VO-R08). *(source: contracts/satellite/maintenance.yaml#createMaintenancePlan)*
+
+#### Consistency with other screens
+
+- Match `BO-575`: The rental board's service-plan configuration edits the same MaintenancePlan; one editor, rental products shown as a category (per VO-R14).
+- Match `BO-576`: Same calendar component, views and category filter.
+- Match `BO-070`: Generated work orders appear there with kind Planned and the plan named as source.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+plans:
+- plan: Turnstile quarterly service
+  appliesTo: All turnstiles - Main Plaza (12)
+  every: 90 days
+  leadTime: 7 days
+  nextDue: 15 Oct 2026
+  status: Active
+- plan: Falcon Coaster wheel assembly check
+  appliesTo: Falcon Coaster
+  every: 30 days or 10,000 cycles, whichever first
+  lastDone: 12 Sep 2026
+  nextDue: 9 Oct 2026 (8,420 cycles used)
+  status: Active
+- plan: Receipt printer clean and test
+  appliesTo: All IT - receipt printers (15)
+  every: Half-yearly
+  status: Active
+- plan: Wave Rider pump seasonal overhaul
+  appliesTo: Wave Rider pump P-08
+  every: Annual
+  status: Suspended (pump replaced Aug 2026)
+```
 
 #### Permissions
 
 - `listMaintenancePlans` → `ASSET_VIEW` (read) · staff
 - `createMaintenancePlan` → `ASSET_MANAGE` (configure) · staff
 - `getDueMaintenance` → `ASSET_VIEW` (read) · staff
-- `setRolePermissions` → `ROLE_MANAGE` (configure) · staff
+- `updateMaintenancePlan` → `ASSET_MANAGE` (configure) · staff
 
 **A refused user sees:** Shown when the caller lacks `ASSET_VIEW`, which `listMaintenancePlans` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -1423,13 +1323,16 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (19), with its required mark, default, format and its error state (400, 404, 409).
+- [ ] Every input above is drawn (21), with its required mark, default, format and its error state (400).
 - [ ] Every output is drawn (32 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-071?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: Create maintenance plan, Save role permissions.
+- [ ] Every action is wired with its success and its failure: Create maintenance plan, Change plan.
 - [ ] Every transition is wired: `BO-070`.
-- [ ] Every gated control is gated: `ASSET_MANAGE`, `ASSET_VIEW`, `ROLE_MANAGE`.
+- [ ] Every gated control is gated: `ASSET_MANAGE`, `ASSET_VIEW`.
 - [ ] The 2 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 3 edge case(s) from the process notes are drawn.
+- [ ] The 4 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
+- [ ] The 2 decision(s) taken on this screen are drawn as decided, not as the old default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -1451,6 +1354,13 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 | Route | `/venue-operations/incident-log` |
 
 **What the spec says about it.** Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
+
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** The incident log: anything that happened to a person or a place (guest or staff injury, near miss, property damage, equipment failure, security, fire or evacuation, food safety, environmental), reported by any staff member while it is fresh, investigated, escalated and closed with findings. An incident is not a work order; it may raise one. The one thing to get right: reportable incidents show their statutory notification deadline as a countdown until the authority notification is recorded.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **Filters Severity and Status are free text fields** Why: Both are closed sets. *(source: contracts/satellite/maintenance.yaml#listIncidents; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **Navigation exit to BO-070 is inferred and carries nothing** Why: Raise-a-work-order from an incident should carry the incident and asset. *(source: screens/P08-venue-back-office.yaml#BO-072; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
 
 #### Inputs: what the user enters or picks
 
@@ -1515,7 +1425,13 @@ Errors to draw in the form: 409 The incident is not reportable (`isReportable` f
 | Corrective work order `correctiveWorkOrderId` | picker: choose a corrective work order | optional | — | — | shows names, sends the id | — | `updateIncident` body |
 | Attachment refs `attachmentRefs` | list of values (chips) | optional | — | — | — | — | `updateIncident` body |
 
-Errors to draw in the form: 400 Closure attempted without findings or a corrective action
+Errors to draw in the form: 400 Closure attempted without findings or a corrective action; 403 A critical incident closed by the person who completed its corrective action (`closer-completed-action`; workbook Q530; CHG-CSA-033).
+
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Report**: Kind and severity (Near miss, Minor, Moderate, Major, Critical) as chips; when it happened (venue time, defaults now); where (asset or location); description; first aid given, emergency services called, witnesses; photos first. People involved are referenced, not typed as personal details here. *(source: contracts/satellite/maintenance.yaml#reportIncident)*
+- **Investigation**: Status (Reported, Under investigation, Action required, Closed), assignee, an investigation note that appends to the history (never overwrites), root cause, corrective actions. *(source: contracts/satellite/maintenance.yaml#updateIncident)*
+- **Authority notification**: Authority, reference, notified at, by whom, attachments; each notification is a new row. *(source: contracts/satellite/maintenance.yaml#recordAuthorityNotification)*
 
 #### Outputs: what the screen shows and produces
 
@@ -1586,7 +1502,17 @@ Errors to draw in the form: 400 Closure attempted without findings or a correcti
 |---|---|---|---|---|---|
 | Report incident (primary button) | `reportIncident` POST `/incidents` | ReportIncidentRequest | Incident | 400 Validation failed | opens modal first |
 | Record authority notification (secondary button) | `recordAuthorityNotification` POST `/incidents/{incidentId}/notify-authority` | inline | Incident | 409 The incident is not reportable (`isReportable` false, audit R106 (6)). | opens modal first |
-| Save incident (secondary button) | `updateIncident` PATCH `/incidents/{incidentId}` | inline | Incident | 400 Closure attempted without findings or a corrective action | opens modal first |
+| Save incident (secondary button) | `updateIncident` PATCH `/incidents/{incidentId}` | inline | Incident | 400 Closure attempted without findings or a corrective action; 403 A critical incident closed by the person who completed its corrective action (`closer-completed-action`; workbook Q530; CHG-CSA-033). | opens modal first |
+
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Log**: Incident number, kind, severity badge, status, location, reported at, and for reportable ones "Notify authority by 14:30 (2 h 05 min left)" in red until notified. *(source: contracts/satellite/maintenance.yaml#listIncidents)*
+- **Original report**: Shown read-only at the top; investigation entries below as a timeline. *(source: contracts/satellite/maintenance.yaml#updateIncident)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Close incident**: Requires findings and, where a corrective action was identified, a linked work order. *(source: contracts/satellite/maintenance.yaml#updateIncident)*
+- **Raise work order from incident**: Opens the work-order form pre-filled with the asset and location. *(source: contracts/satellite/maintenance.yaml#reportIncident)*
 
 **Data it reads**: `listIncidents` (onLoad, List incidents)
 
@@ -1605,6 +1531,34 @@ Errors to draw in the form: 400 Closure attempted without findings or a correcti
 | Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `INCIDENT_VIEW`, which `listIncidents` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Closure attempted without findings or a corrective action; 400 Validation failed; 409 The incident is not reportable (`isReportable` false, audit R106 (6)). |
+
+#### Edge cases to draw
+
+- **Notification attempted on a non-reportable incident**: Refused; the action is hidden unless the incident is reportable. *(source: contracts/satellite/maintenance.yaml#recordAuthorityNotification)*
+
+#### Consistency with other screens
+
+- Match `EMP-026`: Staff App incident report uses the same kinds and severities.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+incidents:
+- false: INC-2026-0213
+  kind: Guest injury
+  severity: Moderate
+  where: Wave Rider exit stairs
+  reported: 1 Oct 2026 11:05
+  reportable: true
+  notifyBy: 1 Oct 2026 14:05
+- false: INC-2026-0214
+  kind: Near miss
+  severity: Near miss
+  where: Main Plaza Gate 3
+  status: Under investigation
+```
 
 #### Permissions
 
@@ -1650,13 +1604,15 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (31), with its required mark, default, format and its error state (400, 404, 409).
+- [ ] Every input above is drawn (31), with its required mark, default, format and its error state (400, 403, 404, 409).
 - [ ] Every output is drawn (44 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-072?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Report incident, Record authority notification, Save incident.
 - [ ] Every transition is wired: `BO-070`.
 - [ ] Every gated control is gated: `INCIDENT_MANAGE`, `INCIDENT_REPORT`, `INCIDENT_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 1 edge case(s) from the process notes are drawn.
+- [ ] The 2 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -1679,11 +1635,25 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **What the spec says about it.** CF-123. **A venue may have several maps** — a park map and a floor plan per building are different maps, not layers of one, because a guest on the second floor should not be shown the ground floor toilets. **Drawn 26 August** — `Seat Board 2.dc.html` frame `seat-2e`. **The frame names this screen on its own face**, which is the first pack to do that: the earlier F&B, POS and Retail boards had to be hand-assigned by purpose after three derivation attempts produced nonsense. **A board that says what it draws removes the guess entirely.**
 
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Every venue map of the venue (park map, a floor per building, zones, parking) and which version guests see. A park map and a building floor are separate maps, never layers of one. The list must make draft and published, and whether a map is navigable, obvious.
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- List operation(s) listVenueMaps return a bare array, not the paged list envelope (items, nextCursor, hasMore). (CHG-SBO-005)
+
+**Fixed on main** (the package already carries these; draw what it says): The create form asks for id and status as required fields. (CHG-SBO-010).
+
+#### Decided on this screen
+
+Answered questions: draw the decision, not the old default. Where a decision and the tables below differ, the decision wins.
+
+- **What image formats and sizes may tenants upload for the illustrated base map (benchmark an interactive 3D-style map)?** → Drawn default accepted: Accept PDF, SVG, DWG, DXF and raster for geometry; show a guidance panel with a placeholder recommendation until agreed. *(decided by Chinmay, 2026-10-02; DEC-103 / CHG-NOTE-006)*
+
 #### Inputs: what the user enters or picks
 
 **Form: Create venue map** (modal, opened by *Create venue map*; *Create venue map* calls `createVenueMap`, *Cancel* sends nothing)
 
-**Collects what `createVenueMap` sends before it is called.** Required: `id`, `name`, `venueId`, `status`. Optional: `scopePath`, `kind`, `floorLevel`, `publishedVersion`, `graphVersion`, `isGeoreferenced`, `baseAssetId`, `baseImageAlignment`, `tileSetRef`, `boundsGeoJson`, `graphStatus`. Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `createVenueMap` sends before it is called.** Required: `name`, `venueId`. Optional: `kind`, `floorLevel`, `baseAssetId`, `baseImageAlignment`, `boundsGeoJson`. `id`, `status` (draft) and scope are the server's; the form asks only for the map's own fields. Dismissing sends nothing; the screen behind is unchanged.
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
@@ -1701,6 +1671,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Image x `baseImageAlignment.anchors[].imageX` | number field | optional | — | — | — | — | `createVenueMap` body |
 | Image y `baseImageAlignment.anchors[].imageY` | number field | optional | — | — | — | — | `createVenueMap` body |
 | Bounds geo json `boundsGeoJson` | text field | optional | — | — | — | — | `createVenueMap` body |
+
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **new map**: Only name, kind and floor level are asked; id, status and scope are the server's. The upload happens next on BO-093. *(source: contracts/satellite/venue-map.yaml#createVenueMap / F26 step 1)*
 
 #### Outputs: what the screen shows and produces
 
@@ -1748,6 +1722,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|---|---|---|---|
 | Create venue map (primary button) | `createVenueMap` POST `/venue-maps` | VenueMap | VenueMap | — | opens modal first |
 
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **map list**: Name, kind (Park, Floor and level, Zone, Parking), status, published version, graph status (Connected, Partial, Disconnected, Not built) and whether it is georeferenced ("guests can be located"). *(source: contracts/satellite/venue-map.yaml#createVenueMap / screens/P08-venue-back-office.yaml#BO-092)*
+
 **Data it reads**: `listVenueMaps` (onLoad, Maps)
 
 **Where the user goes next**
@@ -1765,6 +1743,29 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Empty, no results (`?state=emptyNoResults`) | Never shown: `listVenueMaps` takes no filter, so an empty list is always the first-run state above. |
 | Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `VENUE_MAP_VIEW`, which `listVenueMaps` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Consistency with other screens
+
+- Match `BO-093`: Creating a map continues straight into import and labelling.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+maps:
+- name: Dune Park, park map
+  kind: park
+  status: published
+  version: 7
+  graph: connected
+  georeferenced: true
+- name: Main Building, level 1
+  kind: floor
+  floorLevel: 1
+  status: draft
+  graph: notBuilt
+```
 
 #### Permissions
 
@@ -1808,6 +1809,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-093`, `BO-094`.
 - [ ] Every gated control is gated: `VENUE_MAP_MANAGE`, `VENUE_MAP_VIEW`.
 - [ ] The 2 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 1 decision(s) taken on this screen are drawn as decided, not as the old default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -1829,6 +1831,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Route | `/venue-mapping/map-import` |
 
 **What the spec says about it.** CF-123. **Two failure modes on one screen, kept visually apart.** Extraction is deterministic and reports which layers it found; labelling is a proposal with a confidence. **A mis-parsed layer and a bad suggestion look identical if the screen blurs them**, and the operator is left saying only that the map is wrong. **Low-confidence proposals are shown, not filtered** — the shape the assistant is unsure about is the one most worth a human looking at. **Drawn 26 August** — `Seat Board 1.dc.html` frame `seat-1a`. **The frame names this screen on its own face**, which is the first pack to do that: the earlier F&B, POS and Retail boards had to be hand-assigned by purpose after three derivation attempts produced nonsense. **A board that says what it draws removes the guess entirely.**
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Upload a drawing, see what was read, then review what the assistant suggests each shape is. Two failure modes must stay visually apart: extraction (deterministic, reports layers found and unmapped) and labelling (a proposal with a confidence). On a map with bookable places, also read cabanas, loungers and tables and join them to what they sell as.
 
 #### Inputs: what the user enters or picks
 
@@ -1915,6 +1919,11 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Variant `priceBands[].variantId` | picker: choose a variant | required | — | — | shows names, sends the id | — | `importVenueGeometry` body |
 | Create missing resources `createMissingResources` | toggle | optional | off | — | — | Where a manifest label has no `resources.Resource` with that `code` at this venue, create one through `resources.createResource` (kind, capacity and zone as attributes) instead of … | `importVenueGeometry` body |
 
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **decisions**: Per proposal Accept, Edit (move the point or change the kind) or Reject; never all-or-nothing, though "accept all above 90%" is allowed as a bulk selection that still lists what it accepts. *(source: contracts/satellite/venue-map.yaml#acceptVenueLabelProposals / R275)*
+- **import file**: Native CAD (DWG, DXF) preferred because PDF loses layer names; PDF and raster accepted with a note that results will be weaker. *(source: contracts/satellite/venue-map.yaml#importVenueGeometry / DI-145)*
+
 #### Outputs: what the screen shows and produces
 
 **Shown**
@@ -1966,6 +1975,11 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Propose venue labels (secondary button) | `proposeVenueLabels` POST `/ai/venue-map/{mapId}/propose-labels` | — | VenueLabelProposal[] | — | — |
 | Accept venue label proposals (secondary button) | `acceptVenueLabelProposals` POST `/venue-maps/{mapId}/proposals` | inline | VenuePoint[] | — | opens modal first |
 
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **extraction report**: Outcome (parsed, parsed with findings, nothing found, no layers matched, unreadable), shapes found, layers found and unmapped layers as chips, manifest rows read and joined. *(source: contracts/satellite/venue-map.yaml#getVenueMapImportJob / F26 step 2)*
+- **proposals**: Each with the proposed kind and its confidence; low-confidence proposals are shown, not filtered, sorted to the top. *(source: screens/P08-venue-back-office.yaml#BO-093 / F26 step 3)*
+
 **Where the user goes next**
 
 - → `BO-094` Map Editor & Publish: *The operator places what the drawing did not carry and links each point to what it is*; carries `mapId`
@@ -1980,6 +1994,36 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Empty, first run (`?state=emptyFirstRun`) | No map import labelling configured. The form opens empty and `importVenueGeometry` saves the first one; it says what the platform does in the meantime. |
 | Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `VENUE_MAP_MANAGE`, which `importVenueGeometry` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Edge cases to draw
+
+- **File yields nothing**: Says "nothing found" or "no layers matched" with the layers it did see, not an empty success. *(source: contracts/satellite/venue-map.yaml#importVenueGeometry)*
+- **Walkway proposals**: A stricter gate than labels; accepted walkways are validated as paths immediately and any unreachable point is reported. *(source: contracts/satellite/venue-map.yaml#acceptWalkwayProposals)*
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+job:
+  file: coastal-aqua-site-plan.dwg
+  outcome: parsedWithFindings
+  shapes: 412
+  layers:
+  - WALKWAYS
+  - TOILETS
+  - F&B
+  - RIDES
+  - CABANAS
+  unmapped:
+  - LANDSCAPE-TREES
+  resourcesFound: 38
+  resourcesJoined: 36
+proposal:
+  shape: polygon near Gate 1
+  proposed: toilet
+  confidence: 0.64
+```
 
 #### Permissions
 
@@ -2035,6 +2079,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-094`.
 - [ ] Every gated control is gated: `VENUE_MAP_MANAGE`, `VENUE_MAP_VIEW`.
 - [ ] The 3 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 2 edge case(s) from the process notes are drawn.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -2056,6 +2101,18 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Route | `/venue-mapping/map-editor` |
 
 **What the spec says about it.** CF-123. **Publishing is a separate act from saving**, and the screen makes that visible — editing a live map under a guest standing in front of it is how a route ends at a wall. **Refuses to publish a point linked to a closed outlet**, naming which one: a restaurant point pointing nowhere is worse than no point, because a guest walks there. **`isStepFree` on a path is the field to get right** — a wheelchair user routed up a staircase was failed by the map, not the venue. **Graph validation runs before publish and on demand.** The screen separates two findings that read the same and are not: **an unreachable point is a defect, and a point reachable only by steps is a map that works until a wheelchair user opens it.** **Critical points — first aid, emergency exits, assembly points — are listed apart**, because an unreachable gift shop and an unreachable assembly point should not sit in one list of two hundred. **Drawn 26 August** — `Seat Board 1.dc.html` frame `seat-1b`. **The frame names this screen on its own face**, which is the first pack to do that: the earlier F&B, POS and Retail boards had to be hand-assigned by purpose after three derivation attempts produced nonsense. **A board that says what it draws removes the guess entirely.**
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Place and link what the drawing did not carry (toilets, exits, rides, restaurants, shops, prayer rooms, first aid) and the cabanas, loungers and tables guests book, then validate and publish. Publishing is separate from saving and the screen must make that visible; a closure of a path is an operational act that takes effect in seconds without republishing.
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- List operation(s) listCatalogueBundles return a bare array, not the paged list envelope (items, nextCursor, hasMore). (CHG-SBO-005)
+
+#### Decided on this screen
+
+Answered questions: draw the decision, not the old default. Where a decision and the tables below differ, the decision wins.
+
+- **Do rental booths and stations appear on the live map as points, or does the map builder need a booth/station kind?** → Drawn default accepted: Draw them as kiosk points linked to the rental outlet until decided. *(decided by Chinmay, 2026-10-02; DEC-104 / CHG-NOTE-006)*
 
 #### Inputs: what the user enters or picks
 
@@ -2166,6 +2223,14 @@ Errors to draw in the form: 400 Validation failed; 409 Closing this strands a po
 
 Errors to draw in the form: 400 Validation failed; 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 A business code the request names is already used within its uniqueness scope (the scope the property's `x-ticvai-unique` names; decided 28 September, audit …
 
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **point link**: The link field depends on the kind (outlet for restaurant, cafe, shop, kiosk; product for ride and show; access point for entrance and exit); a featured offer (product or bundle) can be set on any kind. *(source: contracts/satellite/venue-map.yaml#setVenuePoint / F26 step 4)*
+- **point name**: Unique per venue across all its maps, compared without case; English and Arabic. *(source: contracts/satellite/venue-map.yaml#setVenuePoint / R108)*
+- **isStepFree**: The field to get right; default yes, and the validator reports points reachable only by steps. *(source: contracts/satellite/venue-map.yaml#validateVenueMapGraph)*
+- **bookable place**: Label unique on the map (B09), kind, zone, capacity 1 to 500, price band from the import's bands; "not bookable" keeps it on the map greyed. The map holds no price. *(source: contracts/satellite/venue-map.yaml#setPlacedResource / REV3-15)*
+- **path closure reason**: Maintenance, incident, event, weather, crowding, other (note required); expected reopen time. *(source: contracts/satellite/venue-map.yaml#setPathClosure / R222)*
+
 #### Outputs: what the screen shows and produces
 
 **Shown**
@@ -2206,6 +2271,16 @@ Errors to draw in the form: 400 Validation failed; 404 The resource does not exi
 | What publishing changes (publish gate) | navigation or local | — | — | — | — |
 | Place resource (secondary button) | `setPlacedResource` POST `/venue-maps/{mapId}/resources` | SetPlacedResourceRequest | PlacedResource | 400 Validation failed; 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 A business code the request names is already used within its uniqueness scope (the scope … | opens modal first |
 
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **validation**: Unreachable points, points reachable only by steps, dead-end paths and critical unreachable points (exits, first aid) listed with "show on map". *(source: contracts/satellite/venue-map.yaml#validateVenueMapGraph / F26 step 5)*
+- **draft vs published**: A persistent banner "Editing draft. Guests see version 7 (published 2 Oct)" with the number of unpublished changes. *(source: contracts/satellite/venue-map.yaml#publishVenueMap)*
+
+**What each action does** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **Publish**: Runs validation; refuses a point linked to a closed outlet, naming it; creates a new version while guests mid-route finish on theirs. *(source: contracts/satellite/venue-map.yaml#publishVenueMap / F26 step 6)*
+- **Close path**: Immediate, no republish; reports the points it strands. *(source: contracts/satellite/venue-map.yaml#setPathClosure)*
+
 **Data it reads**: `getVenueMap` (onLoad, The draft); `getVenueMapGraph` (onLoad, The navigation graph, ready to route over)
 
 **Where the user goes next**
@@ -2222,6 +2297,34 @@ Errors to draw in the form: 400 Validation failed; 404 The resource does not exi
 | Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `VENUE_MAP_VIEW`, which `getVenueMap` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 A `categoryId` that names no category of the venue, or a `guidedAnswerIds` entry that is not an answer of the venue's published guided choice (W4, 29 …; 400 Validation failed; 409 A business code the request names is already used within its uniqueness scope (the scope the property's `x-ticvai-unique` names; decided 28 September, audit …; 409 Closing this strands a point, and the response … |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+points:
+- kind: toilet
+  name: Toilets near Splash Zone
+  nameAr: دورات مياه قرب منطقة الرذاذ
+  stepFree: true
+- kind: restaurant
+  name: Harbour Kitchen
+  outlet: Harbour Kitchen
+  featuredOffer: Family Fun Bundle
+- kind: emergencyExit
+  name: Emergency exit East 3
+bookable:
+  label: B09
+  kind: cabana
+  zone: Beach
+  capacity: 6
+  priceBand: Large
+closure:
+  path: Riverwalk 4 to 5
+  reason: maintenance
+  reopens: 2026-11-15 09:00
+```
 
 #### Permissions
 
@@ -2294,6 +2397,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `GST-021`.
 - [ ] Every gated control is gated: `ASSET_LIBRARY_VIEW`, `PRODUCT_VIEW`, `VENUE_MAP_MANAGE`, `VENUE_MAP_PUBLISH`, `VENUE_MAP_VIEW`.
 - [ ] The 3 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 1 decision(s) taken on this screen are drawn as decided, not as the old default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -2315,6 +2419,13 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Route | `/resources/directory` |
 
 **What the spec says about it.** CF-125. **A resource is a specific object, not a quantity** — forty identical strollers are forty rows, because guest twelve returned stroller twelve.
+
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** The register of bookable resources at the venue - each a specific object (forty strollers are forty rows, because guest twelve returned stroller twelve), of a kind (cabana, lounger, locker, wheelchair, stroller, equipment, room, vehicle, instructor, staff, table, pitch, studio), with its status and the reason. The one thing to get right: status carries its reason - booked and under repair need different responses from someone looking for something free.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **Kind filter appears twice (a textField and a multiSelect) and an unlabelled empty table** Why: One kind filter (closed enum); the status-with-reason table is the main list. *(source: contracts/satellite/resources.yaml#listResources; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **Columns include id, venueId, scopePath, principalId and raw attributes** Why: Spec leakage (VO-R12). *(source: screens/P08-venue-back-office.yaml#BO-156 / DI-039; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
 
 #### Inputs: what the user enters or picks
 
@@ -2357,6 +2468,11 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Is active `isActive` | toggle | optional | on | — | — | — | `createResource` body |
 
 Errors to draw in the form: 422 A `cleaningPolicy` with `timesPerDay` and no `cleaningsPerDay`, or whose window ends before it starts (W10, 29 September).
+
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Filters**: Kind as chips (multi), availability window (from-to date-time), search by name or code; no free-text kind field. *(source: contracts/satellite/resources.yaml#listResources)*
+- **New resource**: Kind first (it decides the attribute fields: capacity, size, shade, power, poolside), code and name, parent (a cabana under its pool area), setup and teardown minutes, cleaning policy, required qualifications (for instructor/staff kinds, with the staff member picked), deposit in AED. No id or scopePath fields (VO-R03). *(source: contracts/satellite/resources.yaml#createResource)*
 
 #### Outputs: what the screen shows and produces
 
@@ -2407,6 +2523,14 @@ Errors to draw in the form: 422 A `cleaningPolicy` with `timesPerDay` and no `cl
 |---|---|---|---|---|---|
 | Create resource (primary button) | `createResource` POST `/resources` | Resource | Resource | 422 A `cleaningPolicy` with `timesPerDay` and no `cleaningsPerDay`, or whose window ends before it starts (W10, 29 September). | opens modal first |
 
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Resource list**: Code, name, kind icon, parent, status with reason (Available, Booked until 16:00, Checked out to guest, Maintenance - pump fault, Retired), next booking. *(source: contracts/satellite/resources.yaml#listResources / screens/P08-venue-back-office.yaml#BO-095)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Open calendar / qualifications / check-out**: Goes to BO-096, BO-098 or BO-097 with the resource selected. *(source: screens/P08-venue-back-office.yaml#BO-095)*
+
 **Data it reads**: `listResources` (onLoad, Resources with status)
 
 **Where the user goes next**
@@ -2426,6 +2550,38 @@ Errors to draw in the form: 422 A `cleaningPolicy` with `timesPerDay` and no `cl
 | Permission denied (`?state=emptyNoAccess`) | You do not have RESOURCE_VIEW. The list is not empty. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 422 A `cleaningPolicy` with `timesPerDay` and no `cleaningsPerDay`, or whose window ends before it starts (W10, 29 September). |
+
+#### Consistency with other screens
+
+- Match `BO-855`: Resource types, categories and profiles on the resource board must use the same kinds and attributes.
+- Match `BO-069`: An asset is maintenance's view of a physical item; a resource is what is booked. Link, do not duplicate.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+resources:
+- code: CAB-B09
+  name: Cabana B09
+  kind: Cabana
+  parent: Beach
+  status: Booked until 17:00
+  next: Sat 10 Oct 10:00
+- code: STR-012
+  name: Stroller 12
+  kind: Stroller
+  status: Checked out to Sara Al Nuaimi
+- code: INS-SKI-04
+  name: Maria Santos
+  kind: Instructor
+  status: Available
+  quals: Ski L3, First aid
+- code: VEH-SUV-02
+  name: SUV 2 (Dubai 45821)
+  kind: Vehicle
+  status: Maintenance - tyre
+```
 
 #### Permissions
 
@@ -2479,6 +2635,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-096`, `BO-097`, `BO-098`.
 - [ ] Every gated control is gated: `RESOURCE_MANAGE`, `RESOURCE_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 2 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -2581,59 +2738,43 @@ Method, path, parameters, request and response for every operation these screens
 {
 "acceptVenueLabelProposals": {"method":"POST","path":"/venue-maps/{mapId}/proposals","contract":"venue-map","summary":"Accept, edit or reject what the assistant suggested","permission":"VENUE_MAP_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"VenuePoint"},
 "acceptWalkwayProposals": {"method":"POST","path":"/venue-maps/{mapId}/walkway-proposals","contract":"venue-map","summary":"Accept or reject proposed walkways","permission":"VENUE_MAP_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"GraphValidation"},
-"callNextParties": {"method":"POST","path":"/queues/{queueId}/call-next","contract":"queue","summary":"Call the next parties forward","permission":"QUEUE_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":null},
 "createAsset": {"method":"POST","path":"/assets","contract":"maintenance","summary":"Register an asset","permission":"ASSET_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"CreateAssetRequest","responds":"Asset"},
 "createMaintenancePlan": {"method":"POST","path":"/maintenance-plans","contract":"maintenance","summary":"Create a planned maintenance schedule","permission":"ASSET_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"MaintenancePlan","responds":"MaintenancePlan"},
-"createQueue": {"method":"POST","path":"/queues","contract":"queue","summary":"Create a queue","permission":"QUEUE_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"CreateQueueRequest","responds":"Queue"},
 "createResource": {"method":"POST","path":"/resources","contract":"resources","summary":"Define a bookable resource","permission":"RESOURCE_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"Resource","responds":"Resource"},
 "createVenueMap": {"method":"POST","path":"/venue-maps","contract":"venue-map","summary":"Start a map","permission":"VENUE_MAP_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"VenueMap","responds":"VenueMap"},
 "getAsset": {"method":"GET","path":"/assets/{assetId}","contract":"maintenance","summary":"Read an asset with history and documents","permission":"ASSET_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"AssetDetail"},
 "getAssetHistory": {"method":"GET","path":"/assets/{assetId}/history","contract":"maintenance","summary":"Service history","permission":"ASSET_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "getDueMaintenance": {"method":"GET","path":"/maintenance-plans/due","contract":"maintenance","summary":"Planned tasks due or overdue","permission":"ASSET_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"venueId","in":"query","required":null},{"name":"withinDays","in":"query","required":null},{"name":"from","in":"query","required":null},{"name":"to","in":"query","required":null},{"name":"categoryId","in":"query","required":null}],"requestBody":null,"responds":"DueMaintenanceTask"},
 "getIncident": {"method":"GET","path":"/incidents/{incidentId}","contract":"maintenance","summary":"Read an incident","permission":"INCIDENT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"IncidentDetail"},
-"getOfflinePackage": {"method":"GET","path":"/access/offline-package","contract":"access","summary":"Entitlement and rule set for offline validation","permission":"ACCESS_VALIDATE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"workstation","parameters":[{"name":"sinceVersion","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":"validFrom","in":"query","required":true},{"name":"validTo","in":"query","required":true},{"name":"If-None-Match","in":"header","required":null}],"requestBody":null,"responds":"OfflinePackage"},
-"getQueue": {"method":"GET","path":"/queues/{queueId}","contract":"queue","summary":"Read a queue with live position","permission":"QUEUE_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"QueueDetail"},
 "getVenueMap": {"method":"GET","path":"/venue-maps/{mapId}","contract":"venue-map","summary":"A map with its points and paths","permission":"VENUE_MAP_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"version","in":"query","required":null},{"name":"draft","in":"query","required":null}],"requestBody":null,"responds":"VenueMapDetail"},
 "getVenueMapGraph": {"method":"GET","path":"/venue-maps/{mapId}/graph","contract":"venue-map","summary":"The navigation graph, ready to route over","permission":"VENUE_MAP_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"draft","in":"query","required":null},{"name":"stepFreeOnly","in":"query","required":null}],"requestBody":null,"responds":"VenueMapGraph"},
 "getVenueMapImportJob": {"method":"GET","path":"/venue-maps/{mapId}/import/{jobId}","contract":"venue-map","summary":"Import progress and findings","permission":"VENUE_MAP_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"VenueMapImportJob"},
-"getWaitTimes": {"method":"GET","path":"/queues/wait-times","contract":"queue","summary":"Wait times across a venue","permission":null,"offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"venueId","in":"query","required":true},{"name":"category","in":"query","required":null}],"requestBody":null,"responds":"WaitTime"},
 "importVenueGeometry": {"method":"POST","path":"/venue-maps/{mapId}/import","contract":"venue-map","summary":"Read a drawing into shapes","permission":"VENUE_MAP_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":null},
 "listAssets": {"method":"GET","path":"/assets","contract":"maintenance","summary":"List assets","permission":"ASSET_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"venueId","in":"query","required":null},{"name":"categoryId","in":"query","required":null},{"name":"status","in":"query","required":null},{"name":"maintenanceDue","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listAuditRecords": {"method":"GET","path":"/audit-records","contract":"tenancy","summary":"Who did what, where, and when","permission":"AUDIT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"orgUnitId","in":"query","required":null},{"name":"principalId","in":"query","required":null},{"name":"workstationId","in":"query","required":null},{"name":"action","in":"query","required":null},{"name":"subjectRef","in":"query","required":null},{"name":"platformStaffGrantId","in":"query","required":null},{"name":"from","in":"query","required":null},{"name":"to","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listCatalogueBundles": {"method":"GET","path":"/catalogue/bundles","contract":"catalogue","summary":"List published catalogue bundles","permission":"PRODUCT_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"BundleSummary"},
-"listGames": {"method":"GET","path":"/games","contract":"games","summary":"List games","permission":"PRODUCT_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"venueId","in":"query","required":null},{"name":"status","in":"query","required":null}],"requestBody":null,"responds":"Game"},
 "listIncidents": {"method":"GET","path":"/incidents","contract":"maintenance","summary":"List incidents","permission":"INCIDENT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"severity","in":"query","required":null},{"name":"status","in":"query","required":null},{"name":"isReportable","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listMaintenancePlans": {"method":"GET","path":"/maintenance-plans","contract":"maintenance","summary":"List planned maintenance schedules","permission":"ASSET_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listProducts": {"method":"GET","path":"/products","contract":"catalogue","summary":"List products","permission":"PRODUCT_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"venueId","in":"query","required":null},{"name":"kind","in":"query","required":null},{"name":"isSellable","in":"query","required":null},{"name":"categoryId","in":"query","required":null},{"name":"segmentTag","in":"query","required":null},{"name":"guidedAnswerIds","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
-"listQueueEntries": {"method":"GET","path":"/queues/{queueId}/entries","contract":"queue","summary":"List entries in a queue","permission":"QUEUE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"status","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
-"listQueues": {"method":"GET","path":"/queues","contract":"queue","summary":"List queues","permission":"QUEUE_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"venueId","in":"query","required":null},{"name":"openOnly","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listResources": {"method":"GET","path":"/resources","contract":"resources","summary":"Resources at this venue","permission":"RESOURCE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"kind","in":"query","required":null},{"name":"availableFrom","in":"query","required":null},{"name":"availableTo","in":"query","required":null}],"requestBody":null,"responds":"Resource"},
 "listScans": {"method":"GET","path":"/access/scans","contract":"access","summary":"List scan events","permission":"REPORT_VIEW_VENUE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"accessPointId","in":"query","required":null},{"name":"ticketId","in":"query","required":null},{"name":"outcome","in":"query","required":null},{"name":"recordedFrom","in":"query","required":null},{"name":"recordedTo","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
+"listSyncRejections": {"method":"GET","path":"/sync/rejections","contract":"orders","summary":"Entries the server refused","permission":"ORDER_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"workstationId","in":"query","required":null},{"name":"kind","in":"query","required":null},{"name":"resolved","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listVenueMaps": {"method":"GET","path":"/venue-maps","contract":"venue-map","summary":"Maps for this venue","permission":"VENUE_MAP_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"VenueMap"},
 "lookupAsset": {"method":"GET","path":"/assets/lookup","contract":"maintenance","summary":"Find an asset by tag or QR","permission":"ASSET_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"assetTag","in":"query","required":null},{"name":"serialNumber","in":"query","required":null}],"requestBody":null,"responds":"AssetDetail"},
 "lookupTicket": {"method":"GET","path":"/access/lookup","contract":"access","summary":"Read-only validity check without admitting","permission":"TICKET_LOOKUP","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"mediaCode","in":"query","required":null},{"name":"ticketId","in":"query","required":null}],"requestBody":null,"responds":"TicketStatus"},
-"overrideAccess": {"method":"POST","path":"/access/override","contract":"access","summary":"Admit against a failed validation","permission":"ACCESS_OVERRIDE","offlineCapable":true,"conflictPolicy":"append","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"ValidationResult"},
 "proposeVenueLabels": {"method":"POST","path":"/ai/venue-map/{mapId}/propose-labels","contract":"ai","summary":"Suggest what each extracted shape is","permission":"VENUE_MAP_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":null},
 "publishVenueMap": {"method":"POST","path":"/venue-maps/{mapId}/publish","contract":"venue-map","summary":"Make the draft the one guests see","permission":"VENUE_MAP_PUBLISH","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"VenueMap"},
 "recordAuthorityNotification": {"method":"POST","path":"/incidents/{incidentId}/notify-authority","contract":"maintenance","summary":"Record notification to an external authority","permission":"INCIDENT_MANAGE","offlineCapable":false,"conflictPolicy":"append","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Incident"},
-"recordGamePlay": {"method":"POST","path":"/game-plays","contract":"games","summary":"Record a play","permission":null,"offlineCapable":true,"conflictPolicy":"append","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"RecordPlayRequest","responds":"PlayResult"},
 "reportIncident": {"method":"POST","path":"/incidents","contract":"maintenance","summary":"Report an incident","permission":"INCIDENT_REPORT","offlineCapable":true,"conflictPolicy":"append","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"ReportIncidentRequest","responds":"Incident"},
+"resolveSyncRejection": {"method":"POST","path":"/sync/rejections/{rejectionId}/resolve","contract":"orders","summary":"Record what was done about a refused entry","permission":"ORDER_MODIFY","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"ResolveSyncRejectionRequest","responds":"SyncRejection"},
 "searchMedia": {"method":"GET","path":"/media","contract":"assets","summary":"Search the asset library","permission":"ASSET_LIBRARY_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"kind","in":"query","required":null},{"name":"tag","in":"query","required":null},{"name":"collectionId","in":"query","required":null},{"name":"venueId","in":"query","required":null},{"name":"search","in":"query","required":null},{"name":"unusedOnly","in":"query","required":null},{"name":"rightsExpiringWithinDays","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "setAssetStatus": {"method":"PUT","path":"/assets/{assetId}/status","contract":"maintenance","summary":"Take an asset out of service or return it","permission":"ASSET_MANAGE","offlineCapable":true,"conflictPolicy":"append","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"SetAssetStatusRequest","responds":"AssetStatusResult"},
 "setPathClosure": {"method":"POST","path":"/venue-maps/{mapId}/paths/{pathId}/closure","contract":"venue-map","summary":"Close a route during works or an incident","permission":"VENUE_MAP_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"PathClosureResult"},
 "setPlacedResource": {"method":"POST","path":"/venue-maps/{mapId}/resources","contract":"venue-map","summary":"Place or amend a bookable resource on the map","permission":"VENUE_MAP_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"SetPlacedResourceRequest","responds":"PlacedResource"},
-"setQueueStatus": {"method":"PUT","path":"/queues/{queueId}/status","contract":"queue","summary":"Open, pause or close a queue","permission":"QUEUE_MANAGE","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"QueueStatusResult"},
-"setRolePermissions": {"method":"PUT","path":"/roles/{roleId}/permissions","contract":"tenancy","summary":"What this role may do","permission":"ROLE_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":null},
 "setVenuePoint": {"method":"POST","path":"/venue-maps/{mapId}/points","contract":"venue-map","summary":"Place or amend a point of interest","permission":"VENUE_MAP_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"SetVenuePointRequest","responds":"VenuePoint"},
-"setWaitTime": {"method":"PUT","path":"/queues/{queueId}/wait-time","contract":"queue","summary":"Manually set a wait time","permission":"QUEUE_MANAGE","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"WaitTime"},
-"syncGamePlays": {"method":"POST","path":"/game-plays/sync","contract":"games","summary":"Replay plays recorded offline","permission":null,"offlineCapable":false,"conflictPolicy":"append","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":null},
-"syncScans": {"method":"POST","path":"/access/scans","contract":"access","summary":"Replay scans recorded offline","permission":"ACCESS_VALIDATE","offlineCapable":false,"conflictPolicy":"append","scopeLevel":"workstation","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"ScanSyncResult"},
 "updateAsset": {"method":"PATCH","path":"/assets/{assetId}","contract":"maintenance","summary":"Amend an asset","permission":"ASSET_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Asset"},
-"updateGame": {"method":"PATCH","path":"/games/{gameId}","contract":"games","summary":"Amend a game","permission":"PRODUCT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Game"},
 "updateIncident": {"method":"PATCH","path":"/incidents/{incidentId}","contract":"maintenance","summary":"Investigate, escalate or close an incident","permission":"INCIDENT_MANAGE","offlineCapable":false,"conflictPolicy":"append","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Incident"},
-"updateQueue": {"method":"PATCH","path":"/queues/{queueId}","contract":"queue","summary":"Amend queue configuration","permission":"QUEUE_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Queue"},
-"validateAccess": {"method":"POST","path":"/access/validate","contract":"access","summary":"Validate media at an access point and admit or deny","permission":"ACCESS_VALIDATE","offlineCapable":true,"conflictPolicy":"append","scopeLevel":"workstation","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"ValidateRequest","responds":"ValidationResult"},
-"validateGroupAccess": {"method":"POST","path":"/access/group-validate","contract":"access","summary":"Admit a group on one read","permission":"ACCESS_VALIDATE","offlineCapable":true,"conflictPolicy":"append","scopeLevel":"workstation","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"ValidationResult"},
+"updateMaintenancePlan": {"method":"PATCH","path":"/maintenance-plans/{planId}","contract":"maintenance","summary":"Amend or suspend a plan","permission":"ASSET_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"MaintenancePlan"},
 "validateVenueMapGraph": {"method":"POST","path":"/venue-maps/{mapId}/validate-graph","contract":"venue-map","summary":"What is unreachable, before anyone publishes it","permission":"VENUE_MAP_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"GraphValidation"}
 }
 ```
@@ -2644,8 +2785,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
-"AccessAccreditationCredential": {"type":"object","x-ticvai-persistence":"access.accreditation_credential","x-ticvai-agreed":"29 September: build pass (group OWN, from group RA's handoff; BL-181); the events accreditation.credentialIssued and accreditation.holderStatusChanged name access as their critical consumer","description":"**What a gate needs to admit an accredited person, kept by `access`** (29 September, build). Written only by the consumers of `accreditation.credentialIssued` (a row per credential; a replacement sets the replaced row's `admits` false) and `accreditation.holderStatusChanged` (every credential of the holder: `admits` false unless the holder is `active`, validity taken from the event). Read by `validateAccess` and shipped in the offline package. The record of truth stays in `accreditation`; this is a copy shaped for the gate, never edited by a person.","required":["id","holderId","encodedIdentifier","admits","scopePath"],"properties":{"id":{"type":"string","format":"uuid","description":"The accreditation credential's id (`credentialId` on the events)."},"holderId":{"type":"string","format":"uuid"},"programmeId":{"type":"string","format":"uuid","nullable":true},"kind":{"type":"string","description":"printedBadge, mobileCredential, qr, nfcCard, rfidCard or wristband, as issued."},"encodedIdentifier":{"type":"string","x-ticvai-unique":"tenant","description":"What the gate reads from the credential. Never sent to webhook subscribers."},"validFrom":{"type":"string","format":"date","nullable":true},"validTo":{"type":"string","format":"date","nullable":true},"zoneIds":{"type":"array","description":"The holder's effective zones, from the event (`effectiveZones`).","items":{"type":"string","format":"uuid"}},"holderStatus":{"type":"string","enum":["active","suspended","revoked","expired","archived"],"description":"The holder's status as last published; only `active` admits."},"admits":{"type":"boolean","description":"False once the credential is replaced or the holder is not active."},"sourceChangedAt":{"type":"string","format":"date-time","description":"The `issuedAt` or `changedAt` of the event last applied; an older event arriving late is ignored."},"scopePath":{"type":"string","description":"**The partition key** (ADR-0005), the accreditation programme's scope."}}},
-"AccessDynamicPolicy": {"type":"object","x-ticvai-persistence":"access.dynamic_policy","description":"One guest-admission dynamic (attribute-based) policy with its current content - type, context or identity it tests, condition expression, result, priority, zones, validity, status and current version. Not identity.authorisation_policy, which is staff permission (declared 29 September, data-model close-out DM1).\n\n**Guest admission lives here and nowhere else** (ADR-0068, accepted 1 October). `validateAccess` online and the gate offline evaluate the same active version: `getOfflinePackage` carries it, and every `scan_event` records the policy and version that decided it (`dynamicPolicyId`, `dynamicPolicyVersion`) and the set it was decided under (`policySetVersion`). The condition is `conditionRule`, a closed JSON format (`AdmissionRule`), not free text. Identity's staff-permission engine was renamed `AuthorisationPolicy` on the same day, so \"access policy\" means this.\n\n**Which of the two policy engines this is** (stated 29 September, build pass). **This one governs who may pass which gate**: admission of a guest, pass holder, accreditation holder or employee at an access point, decided in validation with results a gate acts on (allow, deny, review, requireId, requireBiometric, requireCompanion, requireSupervisor). **identity `AuthorisationPolicy` governs who may do what in the software**: a principal's permissions on operations and screens, decided by identity `evaluateAccess`. An employee's badge opening a staff door is decided here; the same employee approving a refund is decided in identity. Effectiveness is reported per engine: `listDynamicPolicyEffectiveness` here, `listAuthorisationPolicyEffectiveness` in identity.","required":["id","scopePath","name","policyType","conditionRule","result","status","currentVersion"],"properties":{"id":{"type":"string","format":"uuid","description":"The policyId"},"venueId":{"type":"string","format":"uuid","nullable":true},"scopePath":{"type":"string","description":"ltree of the owning scope node; where it applies further is access.policy_scope_assignment"},"name":{"type":"string","maxLength":200},"policyType":{"type":"string","enum":["guestAttribute","accreditation","occupancy","employee","risk","membership","timeEvent"]},"contextType":{"type":"string","enum":["date","day","time","season","event","performance","specialEvent","holiday","operatingCalendar","occupancy","attractionStatus"],"nullable":true,"description":"Context/time/event policies (setContextTimeEvent)"},"identityType":{"type":"string","enum":["guest","member","annualPassHolder","employee","contractor","vendor","performer","media","vip","security","emergencyServices","eventStaff"],"nullable":true,"description":"Identity-based policies (listIdentityMembershipAccreditation)"},"conditionRule":{"$ref":"#/components/schemas/AdmissionRule","description":"The condition, in the closed JSON rule format evaluated the same way online and at the gate (ADR-0068; replaces the free-text `conditionExpression`)."},"result":{"type":"string","enum":["allow","deny","review","requireId","requireBiometric","requireCompanion","requireSupervisor"]},"priority":{"type":"integer","nullable":true},"allowedZoneIds":{"type":"array","items":{"type":"string","format":"uuid"}},"deniedZoneIds":{"type":"array","items":{"type":"string","format":"uuid"}},"monitorThresholdPercent":{"type":"integer","minimum":0,"maximum":100,"nullable":true,"description":"Occupancy policies. Percent at which the band becomes Monitor"},"restrictThresholdPercent":{"type":"integer","minimum":0,"maximum":100,"nullable":true,"description":"Occupancy policies. Percent at which the band becomes Restrict"},"validFrom":{"type":"string","format":"date-time","nullable":true},"validTo":{"type":"string","format":"date-time","nullable":true,"description":"The grant expires automatically at validTo"},"status":{"type":"string","enum":["draft","pendingApproval","active","inactive","expired"],"default":"draft"},"currentVersion":{"type":"integer","minimum":1,"description":"The version in force (access.dynamic_policy_version)"},"createdAt":{"type":"string","format":"date-time","readOnly":true},"updatedAt":{"type":"string","format":"date-time","readOnly":true}}},
 "Asset": {"x-ticvai-persistence":"maintenance.asset","allOf":[{"$ref":"#/components/schemas/CreateAssetRequest"},{"type":"object","x-ticvai-retired-columns":["is_maintenance_overdue","document_refs"],"required":["id","status"],"properties":{"id":{"type":"string","format":"uuid"},"resourceId":{"type":"string","format":"uuid","nullable":true,"description":"1.2.x. **Where this asset is also bookable.** An AV rig is an asset to maintain and a resource to allocate, and they are the same object seen from two sides.\n**`resources` owns the calendar and this owns the condition.** An asset out of service makes its resource unbookable, which is one link rather than two models of availability.\n"},"deviceId":{"type":"string","format":"uuid","nullable":true,"description":"BL-160. **Where this asset is also a registered device.** A turnstile is an asset to maintain and a device to operate, and — exactly as with `resourceId` above — they are the same object seen from two sides.\n**Nothing joined them before this.** A turnstile controller reporting `needsAttention` could not raise a work order against itself, and an engineer closing one had no way back to the device whose firmware caused it.\n**Null for most assets and for most devices.** A chiller is not a device and a signature pad is not on the asset register; the link is sparse, and it lives here rather than on `platform.device` because `platform` is the foundation tier and a foreign key pointing from it into `maintenance` would invert the tiers — every cell running a spine would carry a column for a satellite it may not deploy.\n"},"acquisitionCost":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"acquiredOn":{"type":"string","format":"date","nullable":true},"depreciation":{"type":"object","nullable":true,"description":"**Recorded here and posted by `finance`.** Depreciation is an accounting act and the asset register is where the useful life is actually known — an engineer knows a chiller lasts fifteen years and an accountant knows what to do about it.\n","properties":{"method":{"type":"string","enum":["straightLine","reducingBalance","unitsOfProduction","none"]},"usefulLifeMonths":{"type":"integer"},"residualValue":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"accumulatedDepreciation":{"$ref":"../shared/common.yaml#/components/schemas/Money"}}},"retiredOn":{"type":"string","format":"date","nullable":true,"description":"**Retirement is not deletion.** A work order from three years ago still names this asset, and an inspection record with no asset is an inspection of nothing.\n"},"disposalProceeds":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"status":{"$ref":"#/components/schemas/AssetStatus"},"statusReason":{"type":"string","nullable":true},"openWorkOrderCount":{"type":"integer","readOnly":true,"x-ticvai-derived":"onWrite","description":"Work orders on this asset whose status is `open`, `assigned`, `inProgress`, `paused` or `awaitingParts` — the same set `AssetDetail.openWorkOrders` returns. **Maintained on write**: `createWorkOrder` and every transition into or out of that set (complete, cancel, close, reject back to open) adjust it in the same transaction as the work-order row.\n"},"nextMaintenanceDueAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true,"x-ticvai-derived":"onWrite","description":"The earliest `nextDueAt` among this asset's active maintenance plans; null when none has one. **Maintained on write**: recomputed whenever one of those plans is created, amended, suspended or has its `nextDueAt` moved by a completed work order. `listAssets?maintenanceDue` filters on this column against the clock.\n"},"isMaintenanceOverdue":{"type":"boolean","readOnly":true,"x-ticvai-persisted":false,"x-ticvai-derived":"onRead","description":"`nextMaintenanceDueAt` is in the past at the moment of the read. **Computed on read and not stored** — it depends on the clock, so a stored copy is stale the minute after it is written.\n"},"lastInspectionAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true,"x-ticvai-derived":"onWrite","description":"`performedAt` of the latest inspection submitted against this asset. **Maintained on write** by `submitInspection`, in the same transaction as the inspection row; an inspection synced late with an earlier `performedAt` does not move it back.\n"},"usageCounter":{"type":"number","nullable":true,"description":"Cycles, hours or kilometres. Drives usage-based maintenance."}}}]},
 "AssetCriticality": {"type":"string","enum":["safetyCritical","revenueCritical","standard","low"]},
 "AssetDetail": {"x-ticvai-persistence":"maintenance.asset","allOf":[{"$ref":"#/components/schemas/Asset"},{"type":"object","properties":{"openWorkOrders":{"type":"array","items":{"$ref":"#/components/schemas/WorkOrder"}},"maintenancePlans":{"type":"array","items":{"$ref":"#/components/schemas/MaintenancePlan"}},"documents":{"type":"array","description":"Manuals, procedures, certificates. What a technician needs on site. Read from `maintenance.asset_document`.\n","items":{"$ref":"#/components/schemas/AssetDocument"}}}}]},
@@ -2659,12 +2798,9 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "BundleSummary": {"x-ticvai-persistence":"none — projection over bundle","type":"object","description":"One published catalogue bundle — the signed snapshot terminals pull (ADR-0013). Not `promotions.Bundle`, which is a sellable product made of other products.","required":["version","venueId","publishedAt","publishedBy","contentHash","staleAfter","sizeBytes"],"properties":{"version":{"type":"string"},"venueId":{"type":"string","format":"uuid"},"publishedAt":{"type":"string","format":"date-time"},"publishedBy":{"type":"string","format":"uuid"},"contentHash":{"type":"string"},"signatureKeyId":{"type":"string","description":"Key that signed this bundle. A terminal offline across a key rotation needs a grace window, or it cannot verify the next bundle.\n"},"staleAfter":{"type":"string","format":"date-time"},"sizeBytes":{"type":"integer"},"note":{"type":"string"},"appliedByWorkstations":{"type":"integer"}}},
 "Channel": {"type":"string","enum":["pos","kiosk","web","mobile","b2b","ota","callCentre"]},
 "CreateAssetRequest": {"x-ticvai-persistence":"none — request only","type":"object","required":["assetTag","name","venueId","criticality"],"properties":{"assetTag":{"type":"string","maxLength":64,"x-ticvai-unique":"venue","description":"**Unique per venue** (decided 28 September, audit R108). Two assets in one venue never share a tag; `createAsset` refuses a duplicate with `409` `duplicate-code`. Two venues may each have an `A-001`.\n"},"name":{"type":"string","maxLength":200},"venueId":{"type":"string","format":"uuid"},"categoryId":{"type":"string","format":"uuid"},"locationDescription":{"type":"string","maxLength":500},"criticality":{"$ref":"#/components/schemas/AssetCriticality"},"priorityOverride":{"allOf":[{"$ref":"#/components/schemas/WorkOrderPriority"}],"nullable":true,"description":"**\"If this device goes down, raise this priority\"** (decided 17 September, M17-01). A corrective work order raised on this asset takes this priority instead of the score. Null means the score decides.\n"},"manufacturer":{"type":"string","maxLength":200},"model":{"type":"string","maxLength":200},"serialNumber":{"type":"string","maxLength":128},"commissionedAt":{"type":"string","format":"date"},"warrantyExpiresAt":{"type":"string","format":"date"},"supplierId":{"type":"string","format":"uuid"},"linkedProductIds":{"type":"array","description":"Products this asset delivers. A fault here can stop them selling.\n","items":{"type":"string","format":"uuid"}},"linkedAccessPointId":{"type":"string","format":"uuid","nullable":true,"description":"Access point this asset controls. Out of service blocks it."},"requiresInspectionToReturn":{"type":"boolean","default":false,"description":"True means a completed inspection is required before return to service. A technician cannot simply declare a ride safe.\n"},"documents":{"type":"array","description":"Manuals, procedures, certificates, each with its name and kind. Stored one row per document in `maintenance.asset_document`, which is where `AssetDetail.documents` reads them from.\n","items":{"$ref":"#/components/schemas/AssetDocumentInput"}},"documentRefs":{"type":"array","x-ticvai-persisted":false,"description":"**The refs alone, kept for callers that predate `documents`.** Each ref sent here is stored as an `asset_document` row with no name and no kind. Returned as the refs of `documents`, computed on read — there is no second copy to fall out of step.\n","items":{"type":"string"}}}},
-"CreateQueueRequest": {"x-ticvai-persistence":"none — request only","type":"object","required":["code","name","venueId","capacityPerCycle","cycleMinutes"],"properties":{"code":{"type":"string","maxLength":64},"name":{"$ref":"#/components/schemas/LocalisedText"},"venueId":{"type":"string","format":"uuid"},"attractionProductId":{"type":"string","format":"uuid"},"assetId":{"type":"string","format":"uuid","nullable":true,"description":"The ride. Taking it out of service closes this queue rather than leaving guests holding positions for something that is not running.\n"},"accessPointId":{"type":"string","format":"uuid","nullable":true},"kind":{"type":"string","enum":["standby","singleRider","fastPass","virtual","accessible","groupOnly","staffOnly"],"default":"standby","description":"5.6.x. **A ride has several queues and the model had one.** A single-rider line and a standby line at the same attraction draw from one capacity and fill at different rates, and modelling them as one queue makes both wait estimates wrong.\n**`accessible` is not a courtesy lane.** It has its own capacity because a guest who cannot stand in a switchback needs a place to wait, not priority.\n"},"operatingWindows":{"type":"array","description":"**When the queue runs, which is not when the venue is open.** A ride closing an hour early for maintenance leaves a queue accepting guests for a cycle that will not happen.\nStored one row per window in `queue.queue_operating_window` (see `Queue`), not as a column on the queue.\n","items":{"type":"object","required":["day","from","to"],"properties":{"day":{"type":"string","enum":["mon","tue","wed","thu","fri","sat","sun"]},"from":{"type":"string","pattern":"^([01][0-9]|2[0-3]):[0-5][0-9]$","description":"Venue local time, 24-hour `HH:MM`, when the queue starts running."},"to":{"type":"string","pattern":"^([01][0-9]|2[0-3]):[0-5][0-9]$","description":"Venue local time, 24-hour `HH:MM`, when the queue stops running."},"lastEntryMinutesBefore":{"type":"integer","default":0,"description":"**When the queue stops accepting, which is before it stops running.** A guest joining two minutes before close waits twenty and is turned away at the front.\n"}}}},"parentQueueId":{"type":"string","format":"uuid","nullable":true,"description":"Where several queues share one capacity. **The standby and single-rider lines at one ride draw from the same cycles**, and a parent is how that is expressed without either queue owning the other.\n"},"loadBalanceWithQueueIds":{"type":"array","description":"BL-137. **Two rides with the same theme and different waits**, and nothing directed a guest to the shorter one. Load balancing is an offer, not an assignment — **a guest sent to a ride they did not choose is a guest who feels managed.**\n","items":{"type":"string","format":"uuid"}},"inQueueOfferEnabled":{"type":"boolean","default":false,"description":"**A guest with twenty minutes to wait is a guest with twenty minutes to buy something.** Offers surface in the wait screen and are the only reason a virtual queue earns its infrastructure.\n"},"notifyBeforeCallMinutes":{"type":"integer","default":5,"description":"BL-017, 19.2.61. **A guest was not told their turn was approaching**, which makes a virtual queue worse than a physical one — at least a line is visible.\n"},"capacityPerCycle":{"type":"integer","minimum":1},"cycleMinutes":{"type":"number","minimum":0},"maxPartySize":{"type":"integer","default":6},"returnWindowMinutes":{"type":"integer","default":15,"description":"How long a called party has to arrive before the entry expires."},"heightRequirementCm":{"type":"integer","nullable":true},"fastPassAllocationPercent":{"type":"number","minimum":0,"maximum":100,"default":0,"description":"Share of each cycle reserved for Fast Pass holders."},"zone":{"type":"string","nullable":true},"fastPass":{"allOf":[{"$ref":"#/components/schemas/QueueFastPass"}],"nullable":true,"description":"The lane's Fast Pass block (decided 29 September, VM close-out). Null on a queue that takes no Fast Pass.\n"}}},
 "DenyReason": {"type":"string","description":"Enumerated so the client can render an appropriate operator prompt. A gate operator facing a queue needs a reason and a next action, not a boolean.\n","enum":["notFound","notYetValid","expired","alreadyUsed","reentryLimitReached","exitRequiredBeforeReentry","wrongAccessPoint","wrongPerformance","outsideAdmissionWindow","entitlementSuspended","blacklisted","capacityReached","waiverRequired","accompanimentRequired","mediaDeactivated","unpaid","delegatedRightExhausted","delegatedRightRevoked","journeyNotCovered"]},
 "Direction": {"type":"string","enum":["entry","exit","reentry","crossover"]},
 "DueMaintenanceTask": {"x-ticvai-persistence":"none — computed","type":"object","required":["planId","assetId","assetName","dueAt","isOverdue","criticality"],"properties":{"planId":{"type":"string","format":"uuid"},"planName":{"type":"string"},"assetId":{"type":"string","format":"uuid"},"assetName":{"type":"string"},"criticality":{"$ref":"#/components/schemas/AssetCriticality"},"dueAt":{"type":"string","format":"date-time"},"isOverdue":{"type":"boolean"},"daysOverdue":{"type":"integer"},"triggeredBy":{"type":"string","enum":["interval","usage"]},"workOrderId":{"type":"string","format":"uuid","nullable":true}}},
-"Game": {"x-ticvai-persistence":"games.game","type":"object","required":["id","code","name","venueId","creditCost","status"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string","maxLength":64},"name":{"type":"string","maxLength":200},"venueId":{"type":"string","format":"uuid"},"zone":{"type":"string","nullable":true},"assetId":{"type":"string","format":"uuid","nullable":true,"description":"The machine. Taken out of service by maintenance, the game stops accepting play rather than swallowing credits.\n"},"readerId":{"type":"string","format":"uuid","nullable":true},"creditCost":{"type":"integer","minimum":1},"minPointsAwarded":{"type":"integer"},"maxPointsAwarded":{"type":"integer"},"heightRequirementCm":{"type":"integer","nullable":true},"status":{"$ref":"#/components/schemas/GameStatus"},"playsToday":{"type":"integer"},"creditsTakenToday":{"type":"integer"},"pointsAwardedToday":{"type":"integer"}}},
-"GameStatus": {"type":"string","enum":["inService","outOfService","maintenance","retired"]},
 "GraphValidation": {"type":"object","description":"**What breaks before a guest finds it.** Run at publish and on demand.\n","required":["isValid","components"],"properties":{"isValid":{"type":"boolean"},"components":{"type":"integer"},"unreachablePoints":{"type":"array","description":"No path at all. **Usually a point placed after the paths were drawn.**","items":{"type":"object","properties":{"pointId":{"type":"string","format":"uuid"},"name":{"type":"string"},"kind":{"type":"string"}}}},"stepOnlyPoints":{"type":"array","description":"Reachable, and only by steps. **The map works perfectly until a wheelchair user opens it**, and nothing in the drawing makes this visible — which is the whole reason for this list.\n","items":{"type":"object","properties":{"pointId":{"type":"string","format":"uuid"},"name":{"type":"string"}}}},"deadEndPaths":{"type":"array","items":{"type":"string","format":"uuid"}},"criticalUnreachable":{"type":"array","description":"**First aid, emergency exits and assembly points that cannot be reached.** Separated from the rest because an unreachable gift shop is a defect and an unreachable assembly point is a safety finding, and a single list of two hundred items buries it.\n","items":{"type":"object","properties":{"pointId":{"type":"string","format":"uuid"},"name":{"type":"string"},"kind":{"type":"string"}}}},"resourceFindings":{"type":"array","description":"**Placed resources a guest could not buy** (rev 3 REV3-15), named by label. Any entry here makes `isValid` false, and `publishVenueMap` refuses with the matching blocker.\n","items":{"type":"object","required":["placedResourceId","label","reason"],"properties":{"placedResourceId":{"type":"string","format":"uuid"},"label":{"type":"string"},"reason":{"type":"string","enum":["resourceUnlinked","resourcePriceBandMissing","duplicateResourceLabel"]}}}}}},
 "GuestListing": {"type":"string","enum":["bookable","infoOnly","hidden"],"default":"bookable","description":"**How a product appears to a guest** (decided 29 September, rev 3 REV3-14). `bookable`: listed and searched while it is on sale, and added to the basket. `infoOnly`: listed and searched with its details, photo and `notBookableLabel` whether or not it is on sale, and **never added to a basket** (`addCartLine` refuses it with `409`); the screen opens its details instead. `hidden`: never listed or searched for a guest, and reachable only where a staff channel sells it. Independent of `isSellable`, which says whether a channel may sell it at all.\n"},
 "Incident": {"x-ticvai-persistence":"maintenance.incident","type":"object","required":["id","incidentNumber","kind","severity","status","venueId","occurredAt","reportedByPrincipalId"],"properties":{"id":{"type":"string","format":"uuid"},"incidentNumber":{"type":"string","readOnly":true,"description":"**Server-assigned: the venue prefix plus a sequence per venue** (decided 28 September, audit R152). Not gapless; only tax invoices are gapless, per legal entity.\n"},"kind":{"$ref":"#/components/schemas/IncidentKind"},"severity":{"$ref":"#/components/schemas/IncidentSeverity"},"status":{"$ref":"#/components/schemas/IncidentStatus"},"venueId":{"type":"string","format":"uuid"},"assetId":{"type":"string","format":"uuid","nullable":true},"locationDescription":{"type":"string","nullable":true},"isReportable":{"type":"boolean","description":"Requires notification to an external authority within a statutory window."},"notificationDueAt":{"type":"string","format":"date-time","nullable":true},"notifiedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true,"x-ticvai-derived":"onWrite","description":"The earliest `notifiedAt` among this incident's authority notifications. **Maintained on write** by `recordAuthorityNotification`; each notification itself is a row of `maintenance.incident_authority_notification`.\n"},"assignedToPrincipalId":{"type":"string","format":"uuid","nullable":true},"reportedByPrincipalId":{"type":"string","format":"uuid"},"correctiveWorkOrderId":{"type":"string","format":"uuid","nullable":true},"occurredAt":{"type":"string","format":"date-time"},"recordedAt":{"type":"string","format":"date-time"},"closedAt":{"type":"string","format":"date-time","nullable":true},"syncedAt":{"type":"string","format":"date-time","nullable":true}}},
@@ -2681,50 +2817,34 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "MediaKind": {"type":"string","enum":["image","video","audio","document","vector","font","archive"]},
 "MediaRights": {"x-ticvai-persistence":"none — embedded in asset","type":"object","description":"Licensing terms. Tracked because an expired licence on a live surface is a legal exposure, not a housekeeping item.\n","properties":{"licenceKind":{"type":"string","enum":["owned","royaltyFree","rightsManaged","creativeCommons","editorialOnly","unknown"]},"licensor":{"type":"string","nullable":true},"licenceReference":{"type":"string","nullable":true},"validFrom":{"type":"string","format":"date","nullable":true},"validTo":{"type":"string","format":"date","nullable":true},"permittedUses":{"type":"array","items":{"type":"string","enum":["web","print","socialMedia","inVenue","advertising","internal"]}},"attributionRequired":{"type":"boolean","default":false},"attributionText":{"type":"string","nullable":true},"permittedTerritories":{"type":"array","items":{"type":"string"},"description":"ISO country or region codes. **Empty means unrestricted, which is a claim rather than an absence** — an unknown territory and a worldwide licence are not the same thing, and `licenceKind: unknown` is how the second is said.\n"},"permittedChannels":{"type":"array","items":{"type":"string"},"description":"Distribution channel codes, checked by `setMediaDistributionChannels`. Narrower than `permittedUses`, which describes the medium rather than the route.\n"},"modelReleaseHeld":{"type":"boolean","default":false},"renewalOwner":{"type":"string","format":"uuid","nullable":true}}},
 "MediaStatus": {"type":"string","enum":["processing","ready","quarantined","failed","archived"]},
-"OfflinePackage": {"x-ticvai-persistence":"none — generated artefact in object storage","type":"object","required":["etag","generatedAt","validFrom","validTo","accessPointId","entitlements"],"properties":{"etag":{"type":"string"},"generatedAt":{"type":"string","format":"date-time"},"validFrom":{"type":"string","format":"date-time"},"validTo":{"type":"string","format":"date-time"},"accessPointId":{"type":"string","format":"uuid"},"entitlementsVersion":{"type":"integer","description":"The highest `access.entitlement` change included (SD-052, 29 September). A refresh sends it as `sinceVersion` and receives only what changed after it, so a 60,000-guest venue is not re-sent whole."},"policySetVersion":{"type":"string","description":"**The active admission policy version the package carries** (ADR-0068, 1 October): a fingerprint of the `(id, currentVersion)` of every policy in `dynamicPolicies`, computed the same way by `validateAccess` online. Every scan the gate records carries it (`ScanEvent.policySetVersion`), so a scan decided offline under a set that has since changed is visible at sync rather than assumed equal."},"dynamicPolicies":{"type":"array","description":"The active guest-admission dynamic policies for this access point's zones (SD-052), each at its active version with its `conditionRule` (ADR-0068), so an offline gate applies the same rules as an online one.","items":{"$ref":"#/components/schemas/AccessDynamicPolicy"}},"entitlements":{"type":"array","description":"Read from `access.entitlement` (SD-052). With `sinceVersion`, only the rows changed after it, including ones now void or used, so a device removes them.","items":{"type":"object","required":["ticketId","mediaCodes","validFrom","validTo","entriesAllowed","reentryAllowed"],"properties":{"ticketId":{"type":"string","format":"uuid","description":"The `Entitlement.id`."},"mediaCodes":{"type":"array","items":{"type":"string"},"description":"A ticket may carry several media over its life."},"validFrom":{"type":"string","format":"date-time"},"validTo":{"type":"string","format":"date-time"},"performanceId":{"type":"string","format":"uuid","nullable":true},"entriesAllowed":{"type":"integer","nullable":true},"entriesUsed":{"type":"integer"},"reentryAllowed":{"type":"boolean"},"admissionRulesId":{"type":"string","format":"uuid"}}}},"delegatedRights":{"type":"array","description":"Redemption rights issued by other cells and valid at this access point. Included in the package so a cross-region entitlement still admits when the inter-cell link is down — the same reason locally issued entitlements are included.\n","items":{"type":"object","required":["rightId","ticketId","issuingCellId","validFrom","validTo","entriesAllowed","entriesConsumed"],"properties":{"rightId":{"type":"string"},"ticketId":{"type":"string","format":"uuid","description":"The `Entitlement.id` in the issuing cell."},"issuingCellId":{"type":"string"},"guestLinkId":{"type":"string","nullable":true},"mediaCodes":{"type":"array","items":{"type":"string"}},"validFrom":{"type":"string","format":"date-time"},"validTo":{"type":"string","format":"date-time"},"entriesAllowed":{"type":"integer","nullable":true},"entriesConsumed":{"type":"integer"},"admissionRulesId":{"type":"string","format":"uuid"}}}},"blacklist":{"type":"array","items":{"type":"string"},"description":"Media codes to deny outright regardless of entitlement state."},"admissionRules":{"type":"array","items":{"type":"object","required":["id","openMinutesBefore","closeMinutesAfter"],"properties":{"id":{"type":"string","format":"uuid"},"openMinutesBefore":{"type":"integer"},"closeMinutesAfter":{"type":"integer"},"maxDurationMinutes":{"type":"integer","nullable":true},"requiresExitBeforeReentry":{"type":"boolean"}}}},"accreditationCredentials":{"type":"array","description":"Accreditation credentials that admit at this access point, from access.accreditation_credential (29 September, build; BL-181). Only rows that admit are included; a credential dropped from one package to the next no longer admits.","items":{"$ref":"#/components/schemas/AccessAccreditationCredential"}}}},
-"OfflineScan": {"x-ticvai-persistence":"none — client-side journal","allOf":[{"$ref":"#/components/schemas/ValidateRequest"},{"type":"object","required":["sequence","localOutcome"],"properties":{"sequence":{"type":"integer","minimum":1,"description":"Monotonic per device. The server processes in this order."},"localOutcome":{"allOf":[{"$ref":"#/components/schemas/ScanOutcome"}],"description":"What the device decided offline. The server is authoritative and may disagree; disagreements are returned for reconciliation, not discarded.\n"},"localDenyReason":{"$ref":"#/components/schemas/DenyReason"},"overriddenByPrincipalId":{"type":"string","format":"uuid","nullable":true},"overrideReason":{"type":"string","nullable":true}}}]},
 "Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}},
 "PathClosureResult": {"description":"What `setPathClosure` returns: the path, and **what a forced closure cut off**, named.\n","allOf":[{"$ref":"#/components/schemas/VenuePath"},{"type":"object","properties":{"strandedPoints":{"type":"array","readOnly":true,"description":"Points no longer reachable because of this closure. Empty unless `force` was used.\n","items":{"$ref":"#/components/schemas/StrandedPoint"}}}}]},
-"Permission": {"type":"string","enum":["SESSION_FORCE_LOGOUT","USER_MANAGE","ROLE_MANAGE","PERMISSION_GRANT","PERMISSION_VIEW","PERMISSION_MANAGE","PLATFORM_TENANT_VIEW","PLATFORM_TENANT_MANAGE","PLATFORM_TENANT_TERMINATE","PLATFORM_PLAN_MANAGE","PLATFORM_CELL_VIEW","PLATFORM_CELL_MANAGE","PLATFORM_BILLING_VIEW","PLATFORM_AI_MANAGE","PLATFORM_BILLING_MANAGE","PLATFORM_RELEASE_VIEW","PLATFORM_RELEASE_MANAGE","PLATFORM_RELEASE_PROMOTE","PLATFORM_MIGRATION_VIEW","PLATFORM_MIGRATION_APPLY","PLATFORM_TENANT_ACCESS","TENANT_CONFIGURE","TENANT_VIEW","TENANT_PUBLISH","SCOPE_VIEW","SCOPE_MANAGE","REGION_CONFIGURE","WORKSTATION_CONFIGURE","PRODUCT_VIEW","PRODUCT_CONFIGURE","PRODUCT_APPROVE","PRODUCT_PUBLISH","PRICE_VIEW","PRICE_CONFIGURE","EVENT_CONFIGURE","PERFORMANCE_CONFIGURE","CAPACITY_CONFIGURE","ORDER_VIEW","ORDER_VIEW_OTHER","ORDER_CREATE","ORDER_MODIFY","ORDER_DISCOUNT","ORDER_CANCEL","ORDER_VOID","ORDER_REFUND","ORDER_REFUND_APPROVE","ORDER_REFUND_BULK","ORDER_EXCHANGE","ORDER_RESCHEDULE","ORDER_REPRINT","PRICE_OVERRIDE","DISCOUNT_APPLY","CREDIT_MANAGE","CREDIT_OVERRIDE","WALLET_VIEW","WALLET_OPERATE","WALLET_CONFIGURE","PAYMENT_VIEW","PAYMENT_CONFIGURE","PAYMENT_PROVIDER_MANAGE","PAYMENT_DISPUTE","SHIFT_OPEN","SHIFT_CLOSE","SHIFT_SUSPEND","SHIFT_CLOSE_OTHER","SHIFT_APPROVE_OPEN","SHIFT_APPROVE_CLOSE","SHIFT_REOPEN","CASH_LIFT","CASH_ADD","CASH_NO_SALE","DEPOSIT_BOX_MODIFY_OWN","DEPOSIT_BOX_MODIFY_OTHER","OVERSHORT_ACCEPT","ACCESS_VALIDATE","ACCESS_OVERRIDE","ACCESS_POINT_CONFIGURE","TURNSTILE_MODE_SET","TICKET_LOOKUP","ACCREDITATION_VIEW","ACCREDITATION_APPLY","ACCREDITATION_APPROVE","ACCREDITATION_ISSUE","ACCREDITATION_MANAGE","ACCREDITATION_CONFIGURE","REPORT_VIEW_OWN","REPORT_VIEW_WORKSTATION","REPORT_VIEW_VENUE","REPORT_VIEW_REGION","REPORT_VIEW_TENANT","REPORT_EXPORT","REPORT_EXPORT_PII","REPORT_MANAGE","REPORT_SCHEDULE","LEDGER_VIEW","LEDGER_POST","LEDGER_APPROVE","TAX_CONFIGURE","ACCOUNT_CONFIGURE","SETTLEMENT_VIEW","SETTLEMENT_RECONCILE","GUEST_VIEW","GUEST_VIEW_PII","GUEST_MANAGE","VENUE_MAP_VIEW","VENUE_MAP_MANAGE","VENUE_MAP_PUBLISH","RESOURCE_VIEW","RESOURCE_BOOK","RESOURCE_MANAGE","RESOURCE_CONFIGURE","RENTAL_VIEW","RENTAL_BOOK","RENTAL_OPERATE","RENTAL_MANAGE","RENTAL_CONFIGURE","RENTAL_PRICE","RENTAL_APPROVE","RENTAL_OVERRIDE","DEVELOPER_VIEW","DEVELOPER_MANAGE","DEVELOPER_ADMIN","LOYALTY_ACCRUE","LOYALTY_REDEEM","LOYALTY_ADJUST","MARKETING_VIEW","MARKETING_MANAGE","MARKETING_SEND","CASE_VIEW","CASE_MANAGE","ASSET_LIBRARY_VIEW","ASSET_LIBRARY_MANAGE","ASSET_LIBRARY_APPROVE","ASSET_LIBRARY_SHARE","QUEUE_VIEW","QUEUE_MANAGE","QUEUE_REDEEM","QUEUE_OVERRIDE","TRANSPORT_VIEW","TRANSPORT_MANAGE","TRANSPORT_PRICE","ASSET_VIEW","ASSET_MANAGE","WORK_ORDER_VIEW","WORK_ORDER_MANAGE","WORK_ORDER_VERIFY","INSPECTION_VIEW","INSPECTION_SUBMIT","INSPECTION_MANAGE","INCIDENT_REPORT","INCIDENT_VIEW","INCIDENT_MANAGE","KIOSK_ATTEND","DEVICE_VIEW","DEVICE_CONFIGURE","DEVICE_MANAGE","APPROVAL_ACT","APPROVAL_DELEGATE","AI_USE","AI_CONFIGURE","AI_APPROVE","AI_AUDIT_VIEW","RISK_REVIEW","RISK_INVESTIGATE","AUDIT_VIEW","APPROVAL_VIEW","APPROVAL_REQUEST","APPROVAL_DECIDE","APPROVAL_CONFIGURE","MAINTENANCE_EXECUTE","MAINTENANCE_APPROVE","WORKFORCE_VIEW","WORKFORCE_MANAGE","ATTENDANCE_RECORD","ANNOUNCEMENT_PUBLISH","ANNOUNCEMENT_EMERGENCY","PARTNER_VIEW","PARTNER_MANAGE","PARKING_CONFIGURE","PAYMENT_VOID","PROCUREMENT_VIEW","PROCUREMENT_REQUEST","PROCUREMENT_MANAGE","PROCUREMENT_RECEIVE"]},
 "PlacedResource": {"type":"object","x-ticvai-persistence":"venuemap.placed_resource","description":"**A bookable resource where it stands on the map** (decided 29 September, rev 3 REV3-15 and GAP-C2): cabana B09 on the Beach, 15 guests, Large. The resource itself, its bookings and its holds live in `resources`; this row says where it is drawn and what the guest sees. Written into the working draft by `importVenueGeometry` or `setPlacedResource`, copied into the `VenueMapVersion` snapshot at publish. A guest picks one on the published map, holds it with `resources.createResourceHold` and buys it. **Supersedes audit R073 (c) and the 26 August minute for resources on an ingested map.**\n","required":["id","mapId","resourceId","label","kind","zone","capacity","priceBandCode","position"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"mapId":{"type":"string","format":"uuid","readOnly":true,"description":"From the path of the operation that writes it."},"resourceId":{"type":"string","format":"uuid","x-ticvai-references":"resources.Resource","description":"The `resources.Resource` this is. **Availability, holds and bookings are keyed by this**, so a republished map with the cabana moved keeps its bookings.\n"},"label":{"type":"string","maxLength":40,"x-ticvai-unique":"map","description":"What the guest sees and taps, e.g. `B09`. **Unique on the map**, compared without case after digit normalisation; normally the resource's `code`.\n"},"kind":{"type":"string","enum":["cabana","lounger","table","pitch","other"],"description":"A subset of `resources.ResourceKind`, the kinds a guest books from a map. A `table` here is a non-dining spot (a beach or event table) sold like a cabana; restaurant tables stay `fnb` table reservations (decided 29 September, rev 3 GAP-C2)."},"zone":{"type":"string","maxLength":80,"description":"The area the guest reads it by, e.g. `Beach`, `River`, `Terrace`."},"capacity":{"type":"integer","minimum":1,"maximum":500,"description":"Guests it takes, e.g. 15. Shown on the map and checked against the party at hold."},"priceBandCode":{"type":"string","maxLength":40,"description":"The band it sells in, e.g. `Large`, one of the `priceBands` given at import. The band's `variantId` prices it; the map holds no price.\n"},"variantId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"x-ticvai-references":"catalogue.ProductVariant","description":"Resolved from the price band. What a cart line for this resource names."},"position":{"type":"object","required":["x","y"],"description":"Drawing coordinates of its label anchor, as on `VenuePoint`.","properties":{"x":{"type":"number"},"y":{"type":"number"}}},"boundary":{"type":"array","nullable":true,"description":"The shape drawn, as a polygon in drawing coordinates. Null for a pin.","items":{"type":"object","properties":{"x":{"type":"number"},"y":{"type":"number"}}}},"isBookable":{"type":"boolean","default":true,"description":"False keeps it on the map and off sale, e.g. a cabana kept for staff use. Shown greyed.\n"}}},
-"PlayResult": {"x-ticvai-persistence":"games.play","type":"object","required":["playId","creditsUsed","pointsAwarded","creditsRemaining","pointsBalance"],"properties":{"playId":{"type":"string"},"cardCode":{"type":"string"},"gameId":{"type":"string","format":"uuid"},"creditsUsed":{"type":"integer"},"pointsAwarded":{"type":"integer"},"creditsRemaining":{"type":"integer"},"pointsBalance":{"type":"integer"},"recordedAt":{"type":"string","format":"date-time"},"syncedAt":{"type":"string","format":"date-time","nullable":true}}},
 "Product": {"x-ticvai-persistence":"catalogue.product","type":"object","required":["id","code","name","kind","venueId","scopePath","isSellable","hasVariants"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string","maxLength":64},"familyKey":{"type":"string","maxLength":64,"pattern":"^[A-Za-z0-9_-]+$","nullable":true,"x-ticvai-unique":"venue","description":"**The same product at another location** (decided 29 September, rev 3 REV3-18). Optional. A tenant that sells one attraction at several venues gives each venue's product the same key, e.g. `aquarium-entry`; the key names the family across the tenant and each venue has at most one product in it, so a second product at the same venue with the key is refused with `409 duplicate-code`. **What it is for:** when a guest changes location on the booking screen (the 'Booking at' switcher, `BookingFlowConfig.locationSwitcher`), lines whose product shares a `familyKey` with a product at the new venue are carried over to that product, with times and prices refreshed; every other line is cleared. Null means the product belongs to no family and its lines always clear on a switch. Compared case-insensitively, like `code`.\n"},"name":{"type":"string","maxLength":200},"description":{"type":"string"},"kind":{"$ref":"#/components/schemas/ProductKind"},"venueId":{"type":"string","format":"uuid"},"scopePath":{"type":"string"},"createdByPrincipalId":{"type":"string","format":"uuid","readOnly":true,"description":"1.4.18. **The approval gate refuses an approver who is the author, and nothing recorded either.** `SeatBlock`, `DelegatedAccess` and `ManualDiscountRequest` all carry this and the product passing through approval did not.\n"},"approvedByPrincipalId":{"type":"string","format":"uuid","nullable":true,"readOnly":true},"responsibleDepartmentId":{"type":"string","format":"uuid","nullable":true,"description":"Who owns this product commercially. A scope node at `department` level."},"onSaleFrom":{"type":"string","format":"date-time","nullable":true,"description":"1.4.8. **A seasonal product should not need somebody awake at midnight.** Archiving already runs on a timer in this contract, so the machinery exists; `effectiveFrom` appears on tax codes, FX rates and white-label policies and not here.\n"},"onSaleTo":{"type":"string","format":"date-time","nullable":true,"description":"Retires the product automatically. **Retirement is not deletion** — the product stops selling and every order that referenced it still resolves.\n"},"categoryId":{"type":"string","format":"uuid","nullable":true,"description":"**Taken from their `fnb.product` and `retail.product`, 20 September.** `catalogue.product_category` has existed since 20 August with two operations and nothing could be filed under it — a merchandise hierarchy with a tree and no leaves. Their per-domain product tables both carried this column and ours did not.\n"},"lifecycleState":{"$ref":"#/components/schemas/ProductLifecycleState"},"isSellable":{"type":"boolean","readOnly":true,"description":"True only when live **and** carried by a published bundle. Approval and publication are different acts.\n**Derived, never set.** It changes when `transitionProductLifecycle` moves the product and when `publishBundle` carries it, so `updateProduct` does not take it — `withdraw` is how a product stops selling.\n"},"isStockTracked":{"type":"boolean","default":false,"description":"**Taken from their `fnb.product`, 20 September.** Whether a sale decrements stock, which is not what `isSellable` asks. A ticket is sellable and tracks no stock; a bottle of water is both. Without it, an F&B sale cannot tell inventory whether to move.\n"},"hasVariants":{"type":"boolean"},"variantCount":{"type":"integer"},"segmentTags":{"type":"array","description":"7.3.5. **A channel and a segment tag are mandatory and nothing required either.** A catalogue that cannot be filtered by segment is a catalogue nobody can report on.\n**Hierarchical, not flat** — `family/with-toddlers` narrows `family` without duplicating it, which is how the promotions engine already treats scope.\n**A level is a tag under `level/`** (decided 29 September, rev 3 REV3-19): `level/beginner`, `level/intermediate`, `level/advanced`, `level/expert` (proposed codes, client to correct). A guest screen filters on it with `listProducts` `segmentTag`, and the words a guest reads beside each option come from `ProductCategory.description`, not from the tag.\n","items":{"type":"string"}},"codeSchema":{"type":"string","readOnly":true,"description":"7.3.4 specifies `[ParkCode]-[ProductType]-[Variant]`. **`Product.code` existed and nothing required a format**, so a venue with three thousand products had three thousand conventions.\nThe tenant sets the pattern and the platform generates against it. **Validation is the point, not the string** — a code typed by hand is a code that will not sort.\n"},"channels":{"type":"array","items":{"$ref":"#/components/schemas/Channel"}},"entitlementTemplateId":{"type":"string","format":"uuid","nullable":true,"description":"What the buyer receives. Null for products that grant nothing — F&B and retail. Identity and entitlement are separate concerns.\n"},"blockedOffline":{"type":"boolean","description":"True for seated and retail. Seated because a seat map is not a count; retail because stock depletes in real time.\n"},"dataMaskValues":{"type":"object","additionalProperties":true,"description":"Custom fields. JSONB-backed, defined by the venue's data mask."},"guestListing":{"$ref":"#/components/schemas/GuestListing"},"notBookableLabel":{"allOf":[{"$ref":"#/components/schemas/LocalisedText"}],"nullable":true,"description":"The label a guest reads on an `infoOnly` product, e.g. *Info only* or *Not bookable online; ask at the desk* (decided 29 September, rev 3 REV3-14). Each value at most 60 characters. Null means the guest screen shows its default wording. Ignored unless `guestListing` is `infoOnly`.\n"},"salesContact":{"allOf":[{"$ref":"#/components/schemas/ProductSalesContact"}],"nullable":true,"description":"**Who a guest contacts to book a view-only product** (decided 29 September, W3), e.g. a training course listed with full details and no Book button. Shown as *Call sales* and *Email sales* on an `infoOnly` product. Null means the venue's own contact (white-label `getTenantAppStatus.contact`). Ignored unless `guestListing` is `infoOnly`.\n"},"bookingFlowId":{"type":"string","format":"uuid","nullable":true,"description":"**The booking flow this product is sold through** (decided 29 September, W8 and W12): a white-label `BookingFlow` of the venue, which orders the guest's steps (for a workshop, the product first and then the date and time). Null means the category's flow (`ProductCategory.bookingFlowId`), and failing that the venue's flow for the product's `kind`. Written by `createProduct` and `updateProduct`, which refuse an id that is not a flow of the venue with `422`.\n"},"displayTags":{"type":"array","maxItems":6,"items":{"$ref":"#/components/schemas/ProductDisplayTag"},"description":"**Short facts a guest reads on the ticket card and under *Read more***: *2 Hours*, *Min 1.10 m*, *Free adult entry*, *Valid 90 days*, *Emirates ID* (decided 29 September, 23SEP-3). Not `segmentTags`, which are for reporting and segmentation and which a guest never reads.\n**Derived on read when none are set.** When the venue has written no tags, a read returns tags derived from the product's duration (`clock`), entitlement validity (`calendar`) and the eligibility rule's `minHeightCm` (`height`), each marked `derived: true`; they are never stored. Once the venue writes any tag, only what it wrote is returned. Whether the guest screen shows them is `BookingFlowConfig.ticketTags` (white-label).\n"},"media":{"type":"array","maxItems":20,"items":{"$ref":"#/components/schemas/ProductMedia"},"description":"**The product's own photos and video** (decided 29 September, 23SEP-4). *Read more* opens on the `isPrimary` item, and a listing shows each product's primary image, so two tickets in one category no longer share the category's picture (`ProductCategory.imageAssetId`).\nEvery `assetId` names an asset of the asset library (`assets.yaml` `MediaAsset`) in status `ready` whose kind matches `kind`; anything else is a `422`. **Exactly one item is `isPrimary`** when the list is not empty, and an `assetId` appears once; otherwise `400`. Setting the list records each reference as asset usage (`MediaUsage` with `surface: product`, `referenceId` the product id, `isLive` true while the product is listed to guests), which is what stops a used asset being archived from under the product.\n"},"consentQuestionIds":{"type":"array","maxItems":10,"uniqueItems":true,"items":{"type":"string","format":"uuid"},"description":"**The consent questions a guest answers when booking this product**, in the order they are asked (decided 29 September, rev 3 REV3-26): *Are you able to swim?*, *Do you hold a scuba certification?*, *I accept the risk*. Each id names a consent question defined in marketing-crm (`ConsentQuestion`), which owns the text, its version and whether it is asked per person or once per booking; the answer is stored there as a consent record (question version, answer, who answered, when). **One question or several, as the venue chooses.** A flow can carry its own list too (`white-label.BookingFlow.settings.consentQuestionIds`, on the product's published booking flow as `getPublishedBookingFlow` resolves it: product, then category, then the venue's flow for the kind; moved from `BookingFlowConfig` 29 September, W12); a booking asks the union of the flow's questions and those of every product in the cart, each question once (`orders.Cart.consentQuestions`). An id that names no active consent question of the tenant is a `422`.\n"},"requiresTimeWindow":{"type":"boolean","default":false,"description":"**True for a space sold by the hour**, e.g. a meeting room type (decided 29 September, rev 3 REV3-13). The product is the room type (*focus pod*, *majlis*, *boardroom*, *auditorium*), never a named room; its lengths are a `length` axis (`setProductAttributes`) whose values carry `durationMinutes`, and each length is a variant priced on its own in the price list, so price is the room rate for that length. The cart line carries the booked start and end (orders), the end being the start plus the chosen variant's `durationMinutes`; `resources.listProductStartTimes` supplies the start times for a variant and a date and `allocateResources` picks the room from the product's resource requirements (`setExperienceResourceRequirements`) at checkout. True requires every active variant to have a `durationMinutes`; otherwise `422`.\n"},"productOwnerPrincipalId":{"type":"string","format":"uuid","nullable":true,"description":"The product owner (29 September, data model DM3), set with `setProductContextOwnership`. `responsibleDepartmentId` is the owning department."},"operationalContact":{"type":"string","maxLength":200,"nullable":true,"description":"A principal id or a name, as the context screen takes it."},"businessUnitId":{"type":"string","format":"uuid","nullable":true},"legalEntityId":{"type":"string","format":"uuid","nullable":true,"description":"A `ledger.legal_entity`, read through finance."},"attractionId":{"type":"string","format":"uuid","nullable":true},"siteId":{"type":"string","format":"uuid","nullable":true},"locationId":{"type":"string","format":"uuid","nullable":true},"brandId":{"type":"string","format":"uuid","nullable":true,"description":"The brand, as the context screen names it (a catalogue brand category)."},"marketCode":{"type":"string","maxLength":40,"nullable":true},"salesTerritory":{"type":"string","maxLength":100,"nullable":true}}},
 "ProductDisplayTag": {"x-ticvai-persistence":"none — jsonb column on catalogue.product","type":"object","required":["kind","label"],"description":"One short fact on a ticket card (decided 29 September, 23SEP-3). `kind` picks the icon.","properties":{"kind":{"type":"string","enum":["clock","height","free","calendar","id"],"description":"`clock` a duration, `height` a height rule, `free` something included free, `calendar` a validity, `id` a document the guest must bring."},"label":{"allOf":[{"$ref":"#/components/schemas/LocalisedText"}],"description":"What the guest reads, e.g. *2 Hours*. Each language value at most 40 characters."},"derived":{"type":"boolean","readOnly":true,"default":false,"description":"True on a tag the server derived on read because the venue set none. Never sent."}}},
 "ProductKind": {"type":"string","description":"**`openDated` added 24 August** from the client's *Create Ticket Flow* board, which names six main ticket types and this was the one with no kind: **valid on any date within an eligible range, rather than for a named performance or a fixed date.**\nThe mechanism already existed — `access.entitlement` carries `valid_from`, `valid_to`, `entries_allowed` and `frozen_days`, which is exactly an open-dated pass. **What was missing was the product saying it is one**, so a catalogue could not offer it and a report could not count it.\n**`datedAdmission` is a different thing and the two were being conflated**: dated is *this Tuesday*, open-dated is *any Tuesday between March and June*. A guest buying the second and being sold the first has bought the wrong ticket.\n**Transport uses two existing kinds, not a new one** (decided 29 September, rev 3 REV3-21). A one-way trip is `timedAdmission`: `transport.createTransportRoute` creates the route's product with one variant per passenger type, and each departure is a performance. A multi-trip or unlimited pass is `openDated`: `transport.createTransportPassType` creates it, with `EntitlementTemplate.entriesAllowed` = the pass's trips (null for unlimited), the validity = `validityDays`, and `EntitlementTemplate.transportRestriction` naming the station pair the pass was bought for, so `access` refuses it on another journey. The sale path is unchanged: both are cart lines, priced by `transport.quoteTransportFare` (orders `TransportLineAttributes`).\n","enum":["admission","timedAdmission","datedAdmission","openDated","seated","membership","bundle","fnb","retail","rental","addOn","giftCard"]},
 "ProductLifecycleState": {"type":"string","enum":["draft","inReview","approved","live","withdrawn","archived"]},
 "ProductMedia": {"x-ticvai-persistence":"catalogue.product_media","type":"object","required":["assetId","kind","isPrimary"],"description":"One photo or video of a product, referencing the asset library (decided 29 September, 23SEP-4). One row per product and asset, so the asset library can answer which products use an asset.\n","properties":{"assetId":{"type":"string","format":"uuid","description":"A `MediaAsset` of `assets.yaml`, in status `ready`."},"kind":{"type":"string","enum":["image","video"]},"isPrimary":{"type":"boolean","default":false,"description":"The item *Read more* opens on and a listing shows. Exactly one per product."},"displayOrder":{"type":"integer","default":100},"altText":{"allOf":[{"$ref":"#/components/schemas/LocalisedText"}],"nullable":true}}},
 "ProductSalesContact": {"x-ticvai-persistence":"none — jsonb column on catalogue.product","type":"object","description":"Who to contact to book a view-only product (decided 29 September, W3). At least one of `phone` or `email`.\n","minProperties":1,"properties":{"phone":{"type":"string","maxLength":32,"nullable":true},"email":{"type":"string","format":"email","maxLength":254,"nullable":true},"note":{"allOf":[{"$ref":"#/components/schemas/LocalisedText"}],"nullable":true,"description":"A line shown under the contact, e.g. *Group courses are booked by phone*. At most 200 characters per language."}}},
-"Queue": {"x-ticvai-persistence":"queue.queue + queue.queue_operating_window","allOf":[{"$ref":"#/components/schemas/CreateQueueRequest"},{"type":"object","required":["id","status","waitingPartyCount"],"properties":{"id":{"type":"string","format":"uuid"},"status":{"$ref":"#/components/schemas/QueueStatus"},"statusReason":{"type":"string","nullable":true},"waitingPartyCount":{"type":"integer"},"waitingGuestCount":{"type":"integer"},"currentWaitMinutes":{"type":"integer","nullable":true},"waitTimeSource":{"$ref":"#/components/schemas/WaitTimeSource"},"waitTimeAsOf":{"type":"string","format":"date-time","nullable":true,"readOnly":true,"description":"When `currentWaitMinutes` was last set, by whichever source set it. `WaitTime.asOf` reads this.\n"},"manualWaitExpiresAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true,"description":"Set by `setWaitTime` as now plus `expiresInMinutes`. Past it, the manual figure is dropped and the queue reverts to its sensor or throughput estimate. Null when the current figure is not manual.\n"},"manualWaitNote":{"type":"string","maxLength":200,"nullable":true,"readOnly":true,"description":"The `note` given with the current manual figure. Cleared when it expires."},"expectedReopenAt":{"type":"string","format":"date-time","nullable":true}}}]},
-"QueueDetail": {"x-ticvai-persistence":"queue.queue","allOf":[{"$ref":"#/components/schemas/Queue"},{"type":"object","properties":{"nowServingPartyNumber":{"type":"integer","nullable":true},"lastCalledAt":{"type":"string","format":"date-time","nullable":true},"throughputLastHour":{"type":"integer"},"noShowRatePercent":{"type":"number"},"feed":{"$ref":"#/components/schemas/QueueFeedHealth"}}}]},
-"QueueEntryStatus": {"type":"string","enum":["waiting","called","redeemed","expired","noShow","cancelled","released"]},
-"QueueFastPass": {"x-ticvai-persistence":"queue.queue","type":"object","description":"**Which Fast Pass entitlements this lane accepts, and how** (decided 29 September, VM close-out; pack 'Access Control Module' p.109, BO-221 Fast Pass & Attraction Access Journey). Fast Pass stays an entitlement owned by Product & Entitlement; this block is the lane's side of it: which products it honours, the return window, a per-guest daily cap and the access points that redeem it. Stored on the queue row. Only meaningful where `kind` is `fastPass` or `fastPassAllocationPercent` is above 0.\n**Four ways into priority, not one** (decided 29 September, build pass; 5.6.7 and 5.6.34). A guest joins this lane as priority when they hold an entitlement from `entitlementProductIds` (VIP, annual pass, premium package), are a member of a tier in `loyaltyTierIds`, qualify for a live promotion in `promotionIds`, or declare an accessibility need where `accessibilityPriority` is on. The first criterion met is recorded on the entry as `WaitingGuest.priorityBasis`. Every criterion is resolved by the server at join time; nothing the request asserts about a tier or a promotion is trusted. All four draw on the same reserved `fastPassAllocationPercent`, so widening who qualifies never widens the share of the ride they take.\n","required":["entitlementProductIds"],"properties":{"entitlementProductIds":{"type":"array","description":"Catalogue products whose entitlement admits to this lane. May be empty where priority comes only from a tier, a promotion or an accessibility need.\n","items":{"type":"string","format":"uuid"}},"loyaltyTierIds":{"type":"array","description":"5.6.7 and 5.6.34 (decided 29 September, build pass). Loyalty programme tiers (`marketing.programme_tier`) whose members join this lane as priority. Read from the guest's own loyalty position at join time, never from the request, so a guest cannot claim a tier they do not hold. Empty: tier grants nothing on this lane.\n","items":{"type":"string","format":"uuid"}},"promotionIds":{"type":"array","description":"5.6.34 (decided 29 September, build pass). Promotions that grant queue privilege on this lane while they are live. A guest qualifies when the promotion's conditions hold for them at join (the evaluation `promotions` already makes for a price), or by presenting its code in `JoinQueueRequest.promotionCode`. A paused or expired promotion grants nothing.\n","items":{"type":"string","format":"uuid"}},"accessibilityPriority":{"type":"boolean","default":false,"description":"5.6.7 (decided 29 September, build pass). A party that declares an accessibility need (`JoinQueueRequest.accessibilityNeedDeclared`) joins as priority. **Taken on trust**, because asking for proof at a ride entrance is worse than the occasional abuse; the declaration is on the entry, so the operator at the front sees it (`listQueueEntries`). A venue that wants proof sells or issues an accessibility pass and lists it in `entitlementProductIds` instead. **Not the `accessible` lane**: that is where a guest who cannot stand in a switchback waits; this moves them ahead in the lane they chose.\n"},"returnWindowMinutes":{"type":"integer","minimum":1,"maximum":240,"default":60,"description":"How long after the booked return time a Fast Pass holder may still enter. Proposed, our build plan.\n"},"maxPerGuestPerDay":{"type":"integer","minimum":1,"nullable":true,"description":"Fast Pass redemptions one guest may make on this lane per day; null is no cap."},"allowedAccessPointIds":{"type":"array","description":"Access points that redeem Fast Pass for this lane; empty is the queue's own.","items":{"type":"string","format":"uuid"}}}},
-"QueueFeedHealth": {"x-ticvai-persistence":"none — computed","type":"object","required":["feedId","isHealthy","isQuiet"],"properties":{"feedId":{"type":"string","format":"uuid"},"adaptor":{"$ref":"#/components/schemas/QueueFeedAdaptor"},"isHealthy":{"type":"boolean","description":"**Healthy means the last reading arrived within the feed's expected interval** (decided 28 September, audit R106 (1)): `lastReadingAt` is no older than `expectedIntervalSeconds`. It is the opposite of `isQuiet`, and nothing else (latency, discards) makes a reporting feed unhealthy.\n"},"isQuiet":{"type":"boolean","description":"No reading within the expected interval. The wait time falls back to throughput-derived and is marked stale rather than freezing at the last value.\n"},"lastReadingAt":{"type":"string","format":"date-time","nullable":true},"expectedIntervalSeconds":{"type":"integer","description":"The feed's `expectedIntervalSeconds` — the interval `isQuiet` is judged against, returned here so a health panel does not need the feed row as well.\n"},"readingsLastHour":{"type":"integer"},"discardedLastHour":{"type":"integer","description":"Out-of-order readings rejected in the last hour — rows of `queue.reading` for this feed with `disposition: discardedOutOfOrder`. Duplicates are not counted here: a duplicate has no row, and `submitQueueReading` reports it in its own `duplicates`.\n"}}},
-"QueueStatus": {"type":"string","enum":["open","paused","closed","atCapacity"]},
-"QueueStatusResult": {"x-ticvai-persistence":"none — computed","type":"object","required":["queue","affectedEntries"],"properties":{"queue":{"$ref":"#/components/schemas/Queue"},"affectedEntries":{"type":"object","description":"What happened to guests already waiting. Closing releases and notifies them — a guest holding a position for a ride that will not run should be told.\n","properties":{"released":{"type":"integer"},"held":{"type":"integer"},"notified":{"type":"integer"}}}}},
-"RecordPlayRequest": {"x-ticvai-persistence":"none — request only","type":"object","required":["id","cardCode","gameId","recordedAt"],"properties":{"id":{"type":"string","format":"uuid","description":"The play ID, generated on the reader, and returned as `PlayResult.playId`. Also the idempotency key: on `recordGamePlay` it must equal the `Idempotency-Key` header (a mismatch is the shared 409 `Conflict`); in a `syncGamePlays` batch it is the key on its own.\n"},"cardCode":{"type":"string"},"gameId":{"type":"string","format":"uuid"},"creditsUsed":{"type":"integer","minimum":1},"pointsAwarded":{"type":"integer","minimum":0},"sequence":{"type":"integer","description":"Monotonic per reader. Preserves order across an offline batch."},"playedOffline":{"type":"boolean","default":false,"description":"**True where the reader recorded the play while offline** and is replaying it. Such a play is accepted even against too few credits and reported for reconciliation; a live play (false) is refused instead (decided 28 September, audit R106 (3)). Every play in a `syncGamePlays` batch is treated as offline.\n"},"recordedAt":{"type":"string","format":"date-time"}}},
 "ReportIncidentRequest": {"x-ticvai-persistence":"none — request only","type":"object","required":["id","kind","severity","venueId","description","occurredAt","recordedAt"],"properties":{"id":{"type":"string","format":"uuid"},"kind":{"$ref":"#/components/schemas/IncidentKind"},"severity":{"$ref":"#/components/schemas/IncidentSeverity"},"venueId":{"type":"string","format":"uuid"},"assetId":{"type":"string","format":"uuid"},"locationDescription":{"type":"string","maxLength":500},"description":{"type":"string","minLength":3,"maxLength":10000},"involvedSubjectIds":{"type":"array","description":"Opaque references. Personal details live in the erasable store, so the incident record survives an erasure request intact.\n","items":{"type":"string","format":"uuid"}},"involvedStaffPrincipalIds":{"type":"array","items":{"type":"string","format":"uuid"}},"witnessCount":{"type":"integer"},"firstAidGiven":{"type":"boolean","default":false},"emergencyServicesCalled":{"type":"boolean","default":false},"attachmentRefs":{"type":"array","items":{"type":"string"}},"occurredAt":{"type":"string","format":"date-time"},"recordedAt":{"type":"string","format":"date-time"}}},
+"ResolveSyncRejectionRequest": {"type":"object","x-ticvai-persistence":"none — request only; lands on sync.rejection","required":["resolution","resolvedRecordId"],"properties":{"resolution":{"type":"string","enum":["posted","voided","refunded"],"description":"`posted` — the sale was entered with `createOrder` (F33 step 8); `voided` — with `voidOrder`; `refunded` — with `createRefund`.\n"},"resolvedRecordId":{"type":"string","format":"uuid","description":"The id of the order, void or refund that resolution produced."},"note":{"type":"string","maxLength":500,"nullable":true}}},
 "Resource": {"type":"object","x-ticvai-persistence":"resources.resource","description":"**A specific object, not a quantity of interchangeable ones.** A venue with forty identical strollers has forty resources, because guest number twelve returned stroller number twelve.\n","required":["id","code","name","kind","venueId"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string"},"name":{"type":"string"},"kind":{"$ref":"#/components/schemas/ResourceKind"},"venueId":{"type":"string","format":"uuid"},"scopePath":{"type":"string"},"parentResourceId":{"type":"string","format":"uuid","nullable":true,"description":"**A pool cabana belongs to the pool area; a seat belongs to an auditorium.** Booking a parent takes its children with it, which is the behaviour a venue expects and would otherwise have to enforce by hand.\n"},"principalId":{"type":"string","format":"uuid","nullable":true,"description":"For a resource of kind `instructor` or `staff`. **`workforce` still owns their rota** — this says whether they are qualified and whether they are already committed.\n"},"attributes":{"type":"object","additionalProperties":true,"description":"Configurable per kind — capacity, size, shade, power, poolside."},"setupMinutes":{"type":"integer","default":0,"description":"**Before the booking, not inside it.** An auditorium booked 14:00–16:00 is unavailable from 13:30 with a 30-minute setup, and a calendar that cannot express that double-books every time.\n"},"teardownMinutes":{"type":"integer","default":0,"description":"After the booking. **Kept as it is** (decided 29 September, W10): with a `cleaningPolicy` of `afterEveryBooking` the cleaning buffer is added after the teardown, so a room with no teardown and a 15-minute clean is free 15 minutes after each booking ends.\n"},"cleaningPolicy":{"allOf":[{"$ref":"#/components/schemas/ResourceCleaningPolicy"}],"nullable":true,"description":"How the resource is cleaned between uses (decided 29 September, W10). Null means no cleaning is scheduled beyond `teardownMinutes`."},"requiresQualification":{"type":"array","items":{"type":"string"},"description":"Qualification codes a person must hold to be assigned to this."},"depositAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"status":{"type":"string","enum":["available","booked","checkedOut","maintenance","retired"]},"isActive":{"type":"boolean","default":true}}},
 "ResourceCleaningPolicy": {"x-ticvai-persistence":"none — columns on resources.resource","type":"object","description":"**When the resource is cleaned, and what that takes out of availability** (decided 29 September, W10; the meeting-room case from the 29 September website review).\n- `afterEveryBooking` (option A): `bufferMinutes` blocked after every booking, after its teardown. - `timesPerDay` (option B): `cleaningsPerDay` cleanings of `bufferMinutes` each, between `windowStart` and `windowEnd`, **placed by the system**. The targets are spread evenly across the window; each is put in the free gap nearest its target that is long enough, and never on a booking, a hold or a block. **A confirmed booking is never moved for a cleaning.** Placement is computed on read from the day's bookings, so it moves when bookings change, and a start time is offered only if every cleaning of that day can still be placed after it is booked.\n`createResource` and `updateResource` refuse a policy with `timesPerDay` and no `cleaningsPerDay`, or a window that ends before it starts, with `422`.\n","required":["mode","bufferMinutes"],"properties":{"mode":{"type":"string","enum":["afterEveryBooking","timesPerDay"]},"bufferMinutes":{"type":"integer","minimum":5,"maximum":240,"description":"Minutes one cleaning takes. The prototype uses 15 (proposed default, client to correct)."},"cleaningsPerDay":{"type":"integer","minimum":1,"maximum":24,"nullable":true,"description":"Required for `timesPerDay`; ignored for `afterEveryBooking`."},"windowStart":{"type":"string","pattern":"^([01][0-9]|2[0-3]):[0-5][0-9]$","nullable":true,"description":"Venue-local time the cleaning window opens. Null means the resource's opening time."},"windowEnd":{"type":"string","pattern":"^([01][0-9]|2[0-3]):[0-5][0-9]$","nullable":true,"description":"Venue-local time the cleaning window closes. Null means the resource's closing time."}}},
 "ResourceKind": {"type":"string","description":"BL-135. **`locker` was an entitlement kind in `orders` and nothing issued, assigned or released one.** A locker is a specific object checked out to a named guest and returned — which is this context exactly, and modelling it as an entitlement would have needed a second check-out mechanism.\nA seed for `ResourceType` rather than the law (board 1.02): a customer adding a class does it with `createResourceType`, not by waiting for this list to grow.\n**`table` is a non-dining spot** (decided 29 September, rev 3 GAP-C2, confirmed by Chinmay): a beach or event table placed on a venue map, picked and sold like a cabana (`createResourceHold`, then the order). **A dining table is not this**: restaurant tables stay `fnb` tables, booked with `fnb.createTableReservation` and the waitlist (audit R073 (d)).\n","enum":["cabana","lounger","locker","wheelchair","stroller","equipment","room","auditorium","vehicle","instructor","staff","table","pitch","studio","other"],"x-ticvai-refuses":{"mealPlan":"**Listed by 5.5.8b and deliberately not a kind.** 5.5.8b groups meal plans with lockers and parking, but a meal plan is a balance rather than an object. It resolves to `retail.Wallet` with a `mealPlan` credit kind (CF-126), not to a resource — so it is not offered here, and a form built from this enum cannot offer it either."}},
 "ScanEvent": {"x-ticvai-append-only":"recordedAt","x-ticvai-persistence":"access.scan_event","type":"object","required":["id","accessPointId","venueId","outcome","direction","recordedAt"],"properties":{"id":{"type":"string","format":"uuid","description":"The scan's client-generated UUIDv7, the key offline replay deduplicates on."},"accessPointId":{"type":"string","format":"uuid"},"venueId":{"type":"string","format":"uuid"},"scopePath":{"type":"string"},"ticketId":{"type":"string","format":"uuid","nullable":true,"description":"The `Entitlement.id` scanned; null where the media resolved to nothing."},"mediaCode":{"type":"string","nullable":true},"outcome":{"$ref":"#/components/schemas/ScanOutcome"},"denyReason":{"$ref":"#/components/schemas/DenyReason"},"direction":{"$ref":"#/components/schemas/Direction"},"operatorPrincipalId":{"type":"string","format":"uuid","nullable":true},"deviceId":{"type":"string","format":"uuid","nullable":true},"overridesScanId":{"type":"string","format":"uuid","nullable":true,"description":"**Set only on an override row**, naming the denied scan it admits against (decided 28 September, audit R228). The denied scan itself is never updated: the denial and the override are two rows, and at most one override row names any scan. Null on every other scan.\n"},"overrideReason":{"type":"string","nullable":true,"description":"The supervisor's justification, on the override row only. The overriding principal is that row's `operatorPrincipalId`."},"dynamicPolicyId":{"type":"string","format":"uuid","nullable":true,"description":"The dynamic access policy (`access.dynamic_policy`) whose result decided this scan; null when no dynamic policy matched and the entitlement alone decided (added 29 September, build pass, 3.3.48). `listDynamicPolicyEffectiveness` counts from it."},"dynamicPolicyVersion":{"type":"integer","minimum":1,"nullable":true,"description":"The version of that policy in force at the scan, so a report spanning a change counts each version apart."},"dynamicPolicyResult":{"type":"string","enum":["allow","deny","review","requireId","requireBiometric","requireCompanion","requireSupervisor"],"nullable":true,"description":"What the policy decided, which for a step-up is not the same as the scan's outcome."},"quantity":{"type":"integer","minimum":1,"default":1,"description":"Admissions this scan counted. More than one only for a group wave (`validateGroupAccess`) or a quantity entitlement consumed in one pass (added 29 September, data-model close-out DM1)."},"localSequence":{"type":"integer","nullable":true,"description":"The device-local sequence number of a scan recorded offline; null for an online scan (added 29 September, data-model close-out DM1)."},"policySetVersion":{"type":"string","nullable":true,"description":"The admission policy set the scan was decided under (`OfflinePackage.policySetVersion`, or the same fingerprint computed online by `validateAccess`), beside the one policy and version that decided it (`dynamicPolicyId`, `dynamicPolicyVersion`). ADR-0068, 1 October."},"packageVersion":{"type":"string","nullable":true,"description":"The offline package (`access.edge_package`) the device validated against; null for an online scan (added 29 September, data-model close-out DM1)."},"recordedAt":{"type":"string","format":"date-time"},"syncedAt":{"type":"string","format":"date-time","nullable":true,"description":"Null while pending. Differs from recordedAt for offline scans."}}},
 "ScanOutcome": {"type":"string","enum":["admitted","denied","overridden"]},
-"ScanSyncResult": {"x-ticvai-persistence":"none — computed","type":"object","required":["accepted","results"],"properties":{"accepted":{"type":"integer","description":"Entries processed before any stop."},"stoppedAtSequence":{"type":"integer","nullable":true,"description":"Sequence of the first entry that could not be processed. Null when the whole batch succeeded. The client retries from here — never past it.\n"},"results":{"type":"array","items":{"type":"object","required":["id","sequence","status"],"properties":{"id":{"type":"string"},"sequence":{"type":"integer"},"status":{"type":"string","enum":["accepted","duplicate","reconciled","rejected"]},"serverOutcome":{"$ref":"#/components/schemas/ScanOutcome"},"divergence":{"type":"string","nullable":true,"description":"Present when `reconciled` — the device admitted and the server would have denied, or vice versa. Surfaced to the operator, not swallowed.\n"},"error":{"$ref":"../shared/common.yaml#/components/schemas/Problem"}}}}}},
 "SetAssetStatusRequest": {"x-ticvai-persistence":"none — request only","type":"object","required":["status","reason","recordedAt"],"properties":{"status":{"$ref":"#/components/schemas/AssetStatus"},"reason":{"type":"string","minLength":3,"maxLength":1000},"inspectionId":{"type":"string","format":"uuid","nullable":true,"description":"Required for return to service where the asset demands it."},"raiseWorkOrder":{"type":"boolean","default":false},"recordedAt":{"type":"string","format":"date-time"}}},
 "SetPlacedResourceRequest": {"description":"What `setPlacedResource` takes: a `PlacedResource` without its server-owned fields. **`placedResourceId` absent places a new one; present amends that one**, as `setVenuePoint`.\n","allOf":[{"$ref":"#/components/schemas/PlacedResource"},{"type":"object","properties":{"placedResourceId":{"type":"string","format":"uuid","nullable":true,"description":"The placed resource to amend. Absent or null places a new one."}}}]},
 "SetVenuePointRequest": {"description":"What `setVenuePoint` takes: a `VenuePoint` without its server-owned fields, plus the point to amend. **`pointId` absent places a new point; present amends that one**, and it must be a point on the map in the path.\n","allOf":[{"$ref":"#/components/schemas/VenuePoint"},{"type":"object","properties":{"pointId":{"type":"string","format":"uuid","nullable":true,"description":"The point to amend. Absent or null places a new point."}}}]},
 "StrandedPoint": {"type":"object","x-ticvai-persistence":"none — computed from the graph","required":["pointId","name","kind","isCritical"],"properties":{"pointId":{"type":"string","format":"uuid"},"name":{"type":"string"},"kind":{"type":"string"},"isCritical":{"type":"boolean","description":"First aid, an emergency exit or an assembly point, the same set as `GraphValidation.criticalUnreachable`. **The one the operator must read first.**\n"}}},
+"SyncRejection": {"x-ticvai-persistence":"sync.rejection","type":"object","required":["id","workstationId","kind","rejectedAt","problem"],"properties":{"id":{"type":"string","format":"uuid"},"workstationId":{"type":"string","format":"uuid"},"kind":{"type":"string","enum":["order","payment","refund","void","scan"]},"recordedAt":{"type":"string","format":"date-time"},"rejectedAt":{"type":"string","format":"date-time"},"problem":{"$ref":"../shared/common.yaml#/components/schemas/Problem"},"payload":{"type":"object","additionalProperties":true,"description":"**Deliberately open: the journal entry exactly as the till sent it.** Its shape is the request schema for `kind` — an `OfflineOrder` for `order`, a `CreatePaymentRequest` for `payment` — kept verbatim so the supervisor resolves what was actually recorded, not a re-typed copy.\n"},"resolvedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true},"resolvedByPrincipalId":{"type":"string","format":"uuid","nullable":true,"readOnly":true},"resolution":{"type":"string","nullable":true,"readOnly":true,"enum":["posted","voided","refunded"],"description":"What `resolveSyncRejection` recorded. Null while the rejection waits."},"resolvedRecordId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"The order, void or refund the resolution produced — what stops the entry being posted twice."}}},
 "TicketStatus": {"x-ticvai-persistence":"none — computed from entitlement and scans","description":"**A validation result, not a lifecycle**, despite the name. Computed at scan time from the entitlement and its scan history — `isValid`, `entriesUsed`, `isInsideVenue`.\n**The name misled a state model into anchoring on it** (`states/entitlement.yaml`, removed 18 August): six lifecycle states were checked against an object with no values, and `check-states` warned about it for a day before anyone read the schema.\nThe entitlement's lifecycle is `orders.EntitlementStatus`. **This is what a gate learns when it scans**, which is a different question with a similar name.\n","type":"object","required":["ticketId","isValid"],"properties":{"ticketId":{"type":"string","format":"uuid","description":"Stable for the life of the ticket, independent of the media carrying it."},"mediaCode":{"type":"string","nullable":true},"productName":{"type":"string"},"holderName":{"type":"string","nullable":true,"description":"Present only where the entitlement is name-bound. Identity and entitlement are separate concerns; most entitlements carry no holder.\n"},"isValid":{"type":"boolean"},"validFrom":{"type":"string","format":"date-time","nullable":true},"validTo":{"type":"string","format":"date-time","nullable":true},"performanceId":{"type":"string","format":"uuid","nullable":true},"entriesUsed":{"type":"integer"},"entriesAllowed":{"type":"integer","nullable":true,"description":"Null means unlimited."},"reentryAllowed":{"type":"boolean"},"isInsideVenue":{"type":"boolean","description":"Derived from the last scan. Drives anti-passback evaluation."},"issuingCellId":{"type":"string","nullable":true,"description":"Present when this entitlement was issued in a different cell and is being redeemed here as a delegated right (ADR-0010). Null for locally issued tickets.\n"},"guestLinkId":{"type":"string","nullable":true,"description":"Pseudonymous cross-region guest reference. Present only on delegated rights. Carries no personal data.\n"},"admissionRulesId":{"type":"string","format":"uuid"},"denyReason":{"$ref":"#/components/schemas/DenyReason"}}},
-"ValidateRequest": {"type":"object","required":["id","mediaCode","mediaKind","direction","recordedAt"],"properties":{"id":{"type":"string","format":"uuid","description":"Client-generated UUIDv7. Also the idempotency key and dedupe key."},"mediaCode":{"type":"string","maxLength":256,"description":"What was read from the media. NOT the ticket id — media can be re-linked over a ticket's life.\n"},"mediaKind":{"$ref":"#/components/schemas/MediaKind"},"direction":{"$ref":"#/components/schemas/Direction"},"groupSize":{"type":"integer","minimum":1,"description":"For group media admitting several holders on one read."},"proximityToken":{"type":"string","description":"BLE proximity assertion where the venue requires the operator to be physically at the gate. Absent where not configured.\n"},"recordedAt":{"type":"string","format":"date-time","description":"Device time of the read. Authoritative for ordering, not for validity."}}},
-"ValidationResult": {"x-ticvai-persistence":"none — computed, persisted as scan_event","type":"object","required":["scanId","outcome","accessPointId","recordedAt"],"properties":{"scanId":{"type":"string","format":"uuid"},"outcome":{"$ref":"#/components/schemas/ScanOutcome"},"denyReason":{"$ref":"#/components/schemas/DenyReason"},"denyDetail":{"type":"string","description":"Human-readable, localised. For operator display, never for logic."},"accessPointId":{"type":"string","format":"uuid"},"ticket":{"$ref":"#/components/schemas/TicketStatus"},"admittedCount":{"type":"integer","description":"Holders admitted on this read. Differs from groupSize on partial admission."},"recordedAt":{"type":"string","format":"date-time"},"serverEvaluatedAt":{"type":"string","format":"date-time"},"advisory":{"type":"object","nullable":true,"description":"BL-179, CF-130. **What a device observed, for the steward, never for the gate.** Present only where an access point's device reports the matching `DeviceCapability` and the venue has turned the corresponding setting on.\n**Never persisted.** This schema is computed and stored as `access.scan_event`, and the advisory is deliberately not part of what is stored: an inferred classification kept against a guest is sensitive personal data with no consent behind it. **A guest agreed to be admitted, not to be classified** — Face Pass and Face Tag carry `consent_purpose_id` and `consent_given_at` because somebody enrolled, and nobody enrols in being looked at by a turnstile. `scan_event` records that an override happened and never what the device thought, which keeps `overrideRateAlertThreshold` working without building a register nobody agreed to.\n**It cannot reach `outcome` or `denyReason`.** Those are decisive and `entitlementGated` is `true` and read-only: the gate admits on the entitlement, and everything here sits on top of that without replacing any of it.\n","properties":{"genderClassification":{"type":"string","enum":["women","men","undetermined"],"description":"**`undetermined` is a real answer and the most common one to design for.** A classifier that never returns it is one that has been tuned to look confident.\n"},"confidence":{"type":"number","minimum":0,"maximum":1,"description":"**Required reading for the steward, not decoration.** An advisory with no confidence is read as a fact, and `overrideRateAlertThreshold` exists to catch exactly the failure that produces — *an override rate near zero means the steward has stopped deciding.* That number only means anything if the steward could see how sure the device was.\n"},"reportedByDeviceId":{"type":"string","format":"uuid","description":"**Which device said it.** A classifier that degrades is one camera, not a venue, and an advisory nobody can trace to hardware cannot be investigated or switched off alone.\n"}}}}},
 "VenueMap": {"type":"object","x-ticvai-persistence":"venuemap.map","description":"A park map, or a floor plan. **Several per venue** — a guest on the second floor should not be shown the ground floor's toilets.\n","required":["id","name","venueId","status"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"name":{"type":"string"},"venueId":{"type":"string","format":"uuid"},"scopePath":{"type":"string","readOnly":true,"description":"Derived from `venueId`. Not sent by a client."},"kind":{"type":"string","enum":["park","floor","zone","parking"]},"floorLevel":{"type":"integer","nullable":true},"status":{"type":"string","enum":["draft","published","archived"],"readOnly":true,"description":"`draft` on create. Moves through `publishVenueMap` (`states/venue-map.yaml`), never by sending a value.\n"},"publishedVersion":{"type":"integer","nullable":true,"readOnly":true,"description":"The `VenueMapVersion.version` guests are served. Null until the first publish.\n"},"graphVersion":{"type":"integer","readOnly":true,"description":"**Bumped by a publish or a closure**, and returned as `VenueMapGraph.version`. Separate from `publishedVersion` because a closure changes the routes without creating a map version, and a closure that looked like a publish would lie about what changed.\n"},"isGeoreferenced":{"type":"boolean","readOnly":true,"description":"**Whether a guest can be located on it.** Without a georeference the map is a picture — useful, and not navigable.\n"},"baseAssetId":{"type":"string","format":"uuid","nullable":true,"description":"**The illustrated map a guest actually sees**, held in `assets` like any other media.\n**This is not the CAD drawing.** The drawing gives geometry — where things are, and how they connect. The base image is a designed illustration with the venue's own styling, and the two are different artefacts that happen to describe the same place. A park hands you an architect's plan and a beautiful painted map, and **the guest wants the second while the platform needs the first.**\nNull is valid. A map with geometry and no illustration renders as shapes — plain, and navigable.\n","x-ticvai-references":"assets.MediaAsset"},"baseImageAlignment":{"type":"object","nullable":true,"description":"**How the illustration lines up with the geometry.** They are drawn at different scales by different people, and a point placed on the plan lands in the wrong place on the painting unless something reconciles them.\nTwo known points is enough. **Without this the illustration is a picture behind the map rather than the map itself.**\n","properties":{"imageWidthPx":{"type":"integer"},"imageHeightPx":{"type":"integer"},"anchors":{"type":"array","minItems":2,"maxItems":4,"items":{"type":"object","properties":{"planX":{"type":"number"},"planY":{"type":"number"},"imageX":{"type":"number"},"imageY":{"type":"number"}}}}}},"tileSetRef":{"type":"string","nullable":true,"readOnly":true,"description":"Where a base image is large enough to need zoom levels. **A 12,000-pixel park map is not something a phone downloads on arrival**, and a guest opening the map on venue wifi at the gate is the worst moment to send twenty megabytes.\nGenerated from the base asset. Null means the image is small enough to serve whole.\n"},"boundsGeoJson":{"type":"string","nullable":true},"graphStatus":{"type":"string","readOnly":true,"enum":["notBuilt","connected","disconnected","partial"],"description":"**Whether every public point can actually be reached.** Computed at publish.\n`disconnected` means a point has no path to it at all — a toilet nobody can walk to is a toilet that does not exist. `partial` means every point is reachable and at least one only by steps, which is a different and quieter failure: **the map works until a wheelchair user opens it.**\n"}}},
 "VenueMapDetail": {"type":"object","description":"19.2.55. **The whole map in one call**, so a client caches it and filters locally.","properties":{"version":{"type":"integer","nullable":true,"readOnly":true,"description":"**The published version these points and paths belong to**, which is the number a client caches and sends back as `version`. It can differ from `map.publishedVersion` when an older version was asked for. Null when the draft was read.\n"},"map":{"$ref":"#/components/schemas/VenueMap"},"points":{"type":"array","items":{"$ref":"#/components/schemas/VenuePoint"}},"paths":{"type":"array","items":{"$ref":"#/components/schemas/VenuePath"}},"resources":{"type":"array","description":"The bookable resources placed on this version of the map (rev 3 REV3-15). Empty on a map that carries none.\n","items":{"$ref":"#/components/schemas/PlacedResource"}}}},
 "VenueMapGraph": {"type":"object","description":"19.2.56. **What a client needs to route, and nothing more.** Small enough to cache, versioned so a stale route is detectable.\n","required":["mapId","version","nodes","edges"],"properties":{"mapId":{"type":"string","format":"uuid"},"version":{"type":"integer","description":"**Bumped by a publish or a closure**, and stored as `VenueMap.graphVersion`. A client holding an older version knows its route may cross something that closed, and asking for the graph is cheaper than asking whether the graph changed.\n"},"generatedAt":{"type":"string","format":"date-time"},"nodes":{"type":"array","items":{"type":"object","properties":{"pointId":{"type":"string","format":"uuid"},"x":{"type":"number"},"y":{"type":"number"},"kind":{"type":"string"},"isStepFree":{"type":"boolean"}}}},"edges":{"type":"array","items":{"type":"object","properties":{"from":{"type":"string","format":"uuid"},"to":{"type":"string","format":"uuid"},"distanceMetres":{"type":"number"},"isStepFree":{"type":"boolean"},"throughPointId":{"type":"string","nullable":true,"description":"Where an access point restricts this edge. **The direction lives on that point**, not here, so a gate reconfigured to bidirectional changes routing without a map edit.\n"},"isClosed":{"type":"boolean"}}}},"components":{"type":"integer","description":"How many disconnected parts. **One is the answer for a park.** More than one on a map that should be a single site means something is unreachable and the client can say so without walking the graph.\n"}}},
 "VenueMapImportJob": {"type":"object","x-ticvai-persistence":"venuemap.import_job","description":"**Two-phase, following `seating.ImportJob`**, and carrying its lesson: a job that finds nothing is not a successful job.\n","required":["id","status","outcome"],"properties":{"id":{"type":"string","format":"uuid"},"mapId":{"type":"string","format":"uuid"},"status":{"type":"string","enum":["parsing","previewReady","committed","failed"]},"outcome":{"type":"string","enum":["parsed","parsedWithFindings","nothingFound","noLayersMatched","unreadable"]},"shapesFound":{"type":"integer"},"layersFound":{"type":"array","description":"**Every layer name in the source, decoded.** Shown whether or not extraction worked, so an operator maps a role by reading rather than guessing.\n","items":{"type":"string"}},"unmappedLayers":{"type":"array","items":{"type":"string"}},"manifestRowsRead":{"type":"integer","nullable":true},"resourcesFound":{"type":"integer","nullable":true,"description":"Bookable resource shapes found on the resource layer (rev 3 REV3-15). Null where the map has none.\n"},"resourceRowsJoined":{"type":"integer","nullable":true,"description":"Resource manifest rows that joined a shape and a `resources.Resource`. **The number to check against your own count**, as `manifestRowsJoined` is for seats: 34 cabanas on the plan and 30 joined is four labels that differ.\n"},"manifestRowsJoined":{"type":"integer","nullable":true,"description":"**The number to check against your own count.** A manifest of 396 seats that joins 220 is the digit problem in §4, or a section code that differs by a space — and both look like success without this figure.\n"},"findings":{"type":"array","description":"**Named against the spec**, so a finding maps to a section of `handoff/venue-map-input-spec.md` rather than to a stack trace.\n","items":{"type":"object","required":["code","severity","message"],"properties":{"code":{"type":"string","enum":["duplicateLayerName","geometryOnLayerZero","unmappedLayer","mixedLayerContent","sectionCodeMismatch","digitScriptMismatch","mergedCells","totalRowDetected","manifestSectionMissingFromPlan","planSectionMissingFromManifest","exitLayerNotSplit","noGeoreference","layerNameUndecodable","rasterOnly","resourceLabelMissing","resourceLabelDuplicate","resourceManifestMissingFromPlan","resourcePlanMissingFromManifest","resourceCodeUnmatched","resourcePriceBandUnknown"],"description":"**A closed set, and each one names a rule in the spec.** Free-text findings are findings a drawing office cannot act on. The six `resource*` codes check placed resources (rev 3 REV3-15): a shape with no label, two with one label, a manifest row with no shape or the reverse, a label with no `resources.Resource`, and a price band not in `priceBands`.\n"},"severity":{"type":"string","enum":["error","warning","info"],"description":"**`warning` is the important level here.** `rasterOnly` and `noGeoreference` are warnings — the map still works, with less — and treating them as errors would refuse a venue that sent everything it had.\n"},"message":{"type":"string"},"specSection":{"type":"string","nullable":true,"description":"Which part of the spec covers it — `§2 Layers`, `§4 Digits`."},"affected":{"type":"array","description":"The layers, sections or rows involved. **Named, not counted.**","items":{"type":"string"}}}}}}},
 "VenuePath": {"type":"object","x-ticvai-persistence":"venuemap.path","description":"19.2.56. **The navigation graph.** The map supplies it; routing over it is a client concern, because a phone with the map cached routes offline and a server round-trip per step does not.\n","required":["id","mapId","fromPointId","toPointId"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"mapId":{"type":"string","format":"uuid","readOnly":true,"description":"From the path of the operation that writes the path."},"fromPointId":{"type":"string","format":"uuid"},"toPointId":{"type":"string","format":"uuid"},"geometry":{"type":"string","nullable":true,"description":"The centreline this edge follows, as an encoded polyline. **A walkway in a drawing is a polygon and a route is a line down the middle of it**, so extraction thins the polygon to a centreline and splits it at every fork.\nNull where the path was drawn on screen as a straight connection, which is normal for a venue with no walkway layer.\n"},"distanceMetres":{"type":"number","nullable":true,"readOnly":true,"description":"Computed by the server from `geometry` and the georeference. **Along the centreline, not point to point.** A path that curves round a lake is longer than the distance between its ends, and a guest told 80 metres who walks 200 stops trusting the map.\nRequires a georeference for real units; without one, distances are in drawing units and routing still works because **only the ratios matter to a shortest path.**\n"},"isStepFree":{"type":"boolean","default":true,"description":"**The single most important attribute on this object.** A wheelchair user routed up a staircase has been failed by the map, not by the venue.\n"},"isIndoor":{"type":"boolean","default":false},"restrictedByPointId":{"type":"string","format":"uuid","nullable":true,"description":"**Where a path is one-way, it is because of a thing on it — not because of the path.** Removed `isOneWay` on 18 August: a pedestrian walkway has no direction, and the three cases that look one-way are all a gate or a queue.\nA turnstile is one-way and `access.AccessPoint.direction` already says so. A queue line is one-way and `queue` owns it. **Putting the restriction on the path duplicated both and would have drifted from them** — a gate reconfigured to bidirectional would leave a path still marked one-way, and nothing would have noticed.\nSet where a path passes through an access point. The router reads the direction from the point.\n"},"closedReason":{"type":"string","nullable":true,"readOnly":true,"description":"Set by `setPathClosure` during works or an incident, never by sending it here. **A closed path removes routes rather than hiding the path**, so a guest sees why rather than wondering where it went.\n"}}},
 "VenuePoint": {"type":"object","x-ticvai-persistence":"venuemap.point","description":"19.2.57 to 19.2.60. **What a venue places on the map**, and what a guest taps.\n","required":["id","mapId","kind","name","position"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"mapId":{"type":"string","format":"uuid","readOnly":true,"description":"From the path of the operation that writes the point."},"kind":{"type":"string","enum":["ride","attraction","show","restaurant","cafe","shop","kiosk","toilet","babyCare","prayerRoom","firstAid","atm","lockers","entrance","exit","emergencyExit","assemblyPoint","parking","guestServices","smokingArea","waterFountain","chargingPoint","photoSpot","junction","other"],"description":"**A closed set, and `emergencyExit` is separate from `exit` on purpose.** An exit is where a guest leaves; an emergency exit is where they are sent, and a map that cannot tell them apart is a map that routes a normal departure through a fire door.\n**`junction` is the one that is not a point of interest.** A path connects two points, so a fork in a walkway with nothing at it still needs a node — otherwise every bend has to be named as a destination, and a guest browsing the map sees forty entries called *Path junction 12*.\n**Junctions are hidden from guests and present in the graph.** Generated by extraction where paths meet; a venue never places one by hand.\n"},"name":{"type":"string","x-ticvai-unique":"venue","description":"**Unique per venue** (decided 28 September, audit R108). Two points on a venue's maps never share a name, compared without case, so *Toilets North* names one place; `setVenuePoint` refuses a duplicate with `409` `duplicate-code`. Junctions are named by extraction and are exempt.\n"},"nameLocalised":{"type":"object","nullable":true,"additionalProperties":{"type":"string"}},"position":{"type":"object","required":["x","y"],"description":"Drawing coordinates. **Latitude and longitude are derived from the georeference**, not stored, so a map that is re-georeferenced does not need every point moved.\n","properties":{"x":{"type":"number"},"y":{"type":"number"}}},"outletId":{"type":"string","format":"uuid","nullable":true,"description":"For a restaurant, cafe, shop or kiosk. **Tapping it should open the menu**, and that only works if the map knows which outlet it is.\n"},"productId":{"type":"string","format":"uuid","nullable":true,"description":"For a ride or show — links to wait times and to booking. **What a guest is offered from any point, including a restaurant or a shop, is `featuredOffer`** (29 September, MOB-4); this link stays for wait times.\n"},"accessPointId":{"type":"string","format":"uuid","nullable":true,"description":"For an entrance or exit. **This is what makes 3.2.64 work** — live admission statistics drawn on the point they came from.\n"},"isStepFree":{"type":"boolean","default":true,"description":"Whether the point itself can be reached without steps. **The same name as `VenuePath.isStepFree`, because it is the same concept** (it was `isAccessible` until the 26 September audit). **Placed on the point rather than inferred from the path**, because a step-free route to a building with steps at the door is not a step-free route.\n"},"openingHours":{"type":"string","nullable":true},"iconRef":{"type":"string","nullable":true},"isActive":{"type":"boolean","default":true},"isNavigable":{"type":"boolean","default":true,"description":"Whether a route may pass through it. **False for a point that marks a place without being reachable** — a stage a guest cannot walk onto, a zone label.\n"},"isDestination":{"type":"boolean","default":true,"description":"**Whether a guest may be routed *to* it, and whether it appears in a list of places.** False for a `junction`, which exists in the graph and nowhere else.\nSeparate from `isNavigable` because the two differ: a junction is navigable and not a destination, and a fenced landmark is a destination you can be shown but not walked into.\n"},"description":{"type":"object","nullable":true,"additionalProperties":{"type":"string","maxLength":1000},"description":"**What the guest reads on Item Detail** (29 September, MOB-4). Keyed by locale, like `nameLocalised`. One screen now serves rides, shows, restaurants and shops (GST-004 and GST-006 merged), and it opens from the map pin, so the point carries the words rather than each kind borrowing them from a different module. Set on BO-094.\n"},"media":{"type":"array","maxItems":12,"description":"**The gallery on Item Detail** (29 September, MOB-4): images and short clips from the asset library, first `isPrimary` shown on the map card. Assets are referenced, never copied, so a replaced photo changes everywhere.\n","items":{"type":"object","required":["assetId","kind"],"properties":{"assetId":{"type":"string","format":"uuid","x-ticvai-references":"assets.media_asset"},"kind":{"type":"string","enum":["image","video"]},"isPrimary":{"type":"boolean","default":false},"altText":{"type":"string","nullable":true,"maxLength":200}}}},"featuredOffer":{"type":"object","nullable":true,"required":["kind","id"],"description":"**The product card on Item Detail, for every kind of point** (29 September, MOB-4). `productId` above links a ride or show to its wait times; this is what the guest is offered from the point, and it may be a bundle: a restaurant offers *meal combo with admission* (`promotions` bundle with an admission and a meal component), which checks out in about three steps (GST-004 → GST-056 → GST-041). A point with none shows no card. **Referenced, not priced here**: the card reads `catalogue.getProduct` or `promotions.getBundle` for the live price and availability.\n","properties":{"kind":{"type":"string","enum":["product","bundle"]},"id":{"type":"string","format":"uuid","description":"The `catalogue.product` id or the `promotions.bundle` id, by `kind`."},"label":{"type":"string","nullable":true,"maxLength":40,"description":"The button text, e.g. *Buy meal combo*. Null uses the product's own call to action."}}},"typicalDurationMinutes":{"type":"integer","nullable":true,"minimum":1,"maximum":600,"description":"**How long a visit to this point usually takes**, ride time and queue excluded (29 September, MOB-6). The visit planner lays out a day with it; the queue comes from `queue.getWaitTimes` on the day. Null for a point the planner never places (a toilet).\n"},"interestTags":{"type":"array","maxItems":12,"description":"**What a guest who says they like this would like here** (29 September, MOB-6): the planner matches the guest's interests against these. A closed list so that the Plan tab's interest chips and the venue's tags are the same words.\n","items":{"type":"string","enum":["thrill","family","kids","water","animals","shows","culture","shopping","dining","relaxing","photo","adventure","sport","nightlife","indoor"]}},"cuisineTags":{"type":"array","maxItems":8,"description":"**For dining points** (restaurant, cafe, kiosk; 29 September, MOB-6). The planner places meals at points whose cuisine the party chose, at meal times. Free text codes such as `arabic`, `indian`, `italian`, `fastFood`, `vegetarian`, `halal` — cuisines are too many to close, and a wrong enum is worse than an unmatched tag. **Read per venue**: the planner matches a guest's cuisine only against the points of the venue that day is at (30 September, MoM 4.7).\n","items":{"type":"string","maxLength":30}},"retailTags":{"type":"array","maxItems":8,"description":"**For retail points** (shop, and a kiosk that sells goods rather than food; 30 September client meeting, MoM 4.7: retail and kiosk shops join F&B as venue-linked planner options). The planner places a shop stop at points whose tags the party chose, on the day of this point's venue only. Free text codes such as `souvenirs`, `toys`, `apparel`, `photo`, `essentials`, for the same reason as `cuisineTags`. A kiosk may carry both lists.\n","items":{"type":"string","maxLength":30}}}},
-"WaitTime": {"x-ticvai-persistence":"none — computed from readings and throughput","type":"object","required":["queueId","waitMinutes","source","asOf","isStale"],"properties":{"queueId":{"type":"string","format":"uuid"},"queueName":{"$ref":"#/components/schemas/LocalisedText"},"attractionProductId":{"type":"string","format":"uuid","nullable":true},"attractionCategoryId":{"type":"string","format":"uuid","nullable":true,"description":"The catalogue `ProductCategory` the attraction product is filed under — the value the `category` filter on `getWaitTimes` matches. Read from catalogue, not stored here.\n"},"status":{"$ref":"#/components/schemas/QueueStatus"},"waitMinutes":{"type":"integer","nullable":true,"description":"Null where the queue is closed or no estimate is available."},"source":{"$ref":"#/components/schemas/WaitTimeSource"},"isStale":{"type":"boolean","description":"The underlying feed has gone quiet past its expected interval. The figure is shown with a caveat rather than frozen and presented as current, and it is not hidden (decided 28 September, audit R080 (b)): the screen shows `waitMinutes` with its `asOf` and a stale marker.\n"},"heightRequirementCm":{"type":"integer","nullable":true},"zone":{"type":"string","nullable":true},"asOf":{"type":"string","format":"date-time","description":"When the figure was produced — the queue's `waitTimeAsOf`."}}},
-"WaitTimeSource": {"type":"string","description":"Where the estimate came from. Surfaced so an operator knows whether a figure is measured or guessed.\n","enum":["sensor","throughput","manual","unavailable"]},
-"WaitingGuest": {"x-ticvai-persistence":"queue.entry","type":"object","required":["id","queueId","partyNumber","partySize","status","joinedAt"],"properties":{"id":{"type":"string","format":"uuid","description":"The client-generated UUIDv7 from `JoinQueueRequest.id`, and the `entryId` every entry path takes. `listMyWaitingGuests` gives it back to a guest who has lost it.\n"},"queueId":{"type":"string","format":"uuid"},"queueName":{"$ref":"#/components/schemas/LocalisedText"},"subjectId":{"type":"string","format":"uuid","nullable":true},"partyNumber":{"type":"integer","description":"What the guest sees and what appears on signage."},"partySize":{"type":"integer"},"status":{"$ref":"#/components/schemas/QueueEntryStatus"},"positionInQueue":{"type":"integer","nullable":true},"partiesAhead":{"type":"integer","nullable":true},"estimatedCallAt":{"type":"string","format":"date-time","nullable":true},"isFastPass":{"type":"boolean"},"priorityBasis":{"type":"string","enum":["none","entitlement","loyaltyTier","promotion","accessibility"],"default":"none","description":"Why this party is priority, when it is (decided 29 September, build pass; 5.6.7, 5.6.34): the first `QueueFastPass` criterion met at join, in the order entitlement, loyalty tier, promotion, accessibility. `isFastPass` is true whenever this is not `none`. Kept on the entry so a disputed priority can be explained afterwards.\n"},"priorityTierId":{"type":"string","format":"uuid","nullable":true,"description":"The loyalty tier that granted priority, where `priorityBasis` is `loyaltyTier`."},"priorityPromotionId":{"type":"string","format":"uuid","nullable":true,"description":"The promotion that granted priority, where `priorityBasis` is `promotion`."},"accessibilityNeedDeclared":{"type":"boolean","default":false,"description":"What the party declared at join, shown to the operator at the front."},"entitlementId":{"type":"string","nullable":true},"calledAt":{"type":"string","format":"date-time","nullable":true},"returnWindowEndsAt":{"type":"string","format":"date-time","nullable":true},"redeemedAt":{"type":"string","format":"date-time","nullable":true},"admittedCount":{"type":"integer","nullable":true},"joinedAt":{"type":"string","format":"date-time"},"syncedAt":{"type":"string","format":"date-time","nullable":true}}},
 "WorkOrder": {"x-ticvai-persistence":"maintenance.work_order","x-ticvai-retired-columns":["is_overdue"],"type":"object","required":["id","workOrderNumber","title","venueId","status","priority","kind","createdAt"],"properties":{"downtimeMinutes":{"type":"integer","nullable":true,"readOnly":true,"x-ticvai-derived":"onWrite","description":"**Measured from out-of-service to back-in-service, not from work start to work end.** A ride down for six hours of which two were spent working is down six hours, and the gap between the two numbers is the thing worth managing.\n**Maintained on write**: set when the asset returns to service, as the minutes from the `maintenance.asset_status_change` row that took it out carrying this work order's id to the asset's next change back to `inService`. Null while the asset is still out, and for a work order that never took it out.\n"},"rootCause":{"type":"string","nullable":true,"enum":["wearAndTear","operatorError","guestDamage","manufacturingDefect","environmental","softwareFault","powerFailure","deferredMaintenance","unknown"],"description":"**Structured, because free text cannot be counted.** *Deferred maintenance* is the value a venue least wants to see and most needs to — a fault caused by work that was postponed is an argument for a budget.\n"},"rootCauseNote":{"type":"string","nullable":true},"escalatedAt":{"type":"string","format":"date-time","nullable":true},"escalationLevel":{"type":"integer","default":0,"description":"**Escalation is a clock, not a decision.** A work order on a ride nobody has accepted after twenty minutes escalates itself, because the alternative is somebody noticing.\n"},"id":{"type":"string","format":"uuid"},"workOrderNumber":{"type":"string","readOnly":true,"description":"**Server-assigned: the venue prefix plus a sequence per venue** (decided 28 September, audit R152). Not gapless; only tax invoices are gapless, per legal entity.\n"},"title":{"type":"string"},"venueId":{"type":"string","format":"uuid"},"assetId":{"type":"string","format":"uuid","nullable":true},"assetName":{"type":"string","nullable":true,"readOnly":true,"x-ticvai-derived":"onWrite","description":"The asset's name, copied when the work order is raised or its asset changes, and not updated when the asset is later renamed — the record reads as it was raised.\n"},"status":{"$ref":"#/components/schemas/WorkOrderStatus"},"priority":{"$ref":"#/components/schemas/WorkOrderPriority"},"priorityScore":{"type":"integer","minimum":0,"maximum":100,"nullable":true,"readOnly":true,"description":"The score the venue's policy gave the fault when raised; null when a person or the asset set the priority (M17-01)."},"prioritySource":{"type":"string","enum":["scored","assetOverride","manual"],"readOnly":true,"description":"Where `priority` came from (M17-01). A change through `updateWorkOrder` makes it `manual`."},"faultAssessment":{"$ref":"#/components/schemas/WorkOrderFaultAssessment"},"requiredQualificationCodes":{"type":"array","items":{"type":"string"},"description":"Skills the job needs (M17-13)."},"kind":{"$ref":"#/components/schemas/WorkOrderKind"},"assignedToPrincipalId":{"type":"string","format":"uuid","nullable":true},"raisedByPrincipalId":{"type":"string","format":"uuid"},"categoryId":{"type":"string","format":"uuid","nullable":true,"description":"As raised in `CreateWorkOrderRequest.categoryId`, amendable by `updateWorkOrder`. The category is what `completeWorkOrder` reads to decide whether completion photographs are required.\n"},"locationDescription":{"type":"string","maxLength":500,"nullable":true,"description":"Where the fault is, as raised. Needed where there is no asset — a broken tile, a leak in a corridor.\n"},"elapsedMinutes":{"type":"integer","readOnly":true,"x-ticvai-derived":"onWrite","description":"Labour minutes accumulated up to the last pause or stop. **Maintained on write** by `recordWorkOrderTime`, `pauseWorkOrder` and `completeWorkOrder`; while `isTimerRunning` is true the interval since the last start is not yet included.\n"},"isTimerRunning":{"type":"boolean","readOnly":true,"x-ticvai-derived":"onWrite","description":"Maintained on write by `startWorkOrder`, `resumeWorkOrder`, `recordWorkOrderTime`, `pauseWorkOrder` and `completeWorkOrder`.\n"},"dueAt":{"type":"string","format":"date-time","nullable":true},"isOverdue":{"type":"boolean","readOnly":true,"x-ticvai-persisted":false,"x-ticvai-derived":"onRead","description":"`dueAt` is in the past and the status is still `open`, `assigned`, `inProgress`, `paused` or `awaitingParts`. **Computed on read and not stored** — it depends on the clock. `listWorkOrders?overdueOnly` applies the same test to `due_at`.\n"},"requiresVerification":{"type":"boolean"},"sourcePlanId":{"type":"string","format":"uuid","nullable":true},"sourceInspectionId":{"type":"string","format":"uuid","nullable":true},"sourceIncidentId":{"type":"string","format":"uuid","nullable":true},"createdAt":{"type":"string","format":"date-time"},"recordedAt":{"type":"string","format":"date-time"},"completedAt":{"type":"string","format":"date-time","nullable":true},"syncedAt":{"type":"string","format":"date-time","nullable":true}}},
 "WorkOrderPriority": {"type":"string","enum":["low","normal","high","urgent","emergency"]}
 }

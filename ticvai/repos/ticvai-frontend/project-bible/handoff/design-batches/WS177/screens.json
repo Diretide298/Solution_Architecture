@@ -122,7 +122,7 @@
   "states": {
    "loading": "The integration list.",
    "error": "Could not load. Names which read failed and leaves the integration untouched.",
-   "emptyFirstRun": "No integration yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No integration yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the integration are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -212,6 +212,17 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 54"
+   },
+   {
+    "operation": "listSeatMaps",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-025): An API catalogue read seat maps (listSeatMaps); the operation does not serve the purpose, and the published API definitions have no staff read (recorded as a contract gap) (design-notes correction ticketing-backoffice BO-1072)",
+    "source": "contracts/satellite/seating.yaml#listSeatMaps"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-027): A staff read of the published API definitions (endpoints, versions, scopes) for the seat management API catalogue; listApiVersions declares only the public and partner audiences.",
+    "source": "contracts/satellite/seating.yaml#listSeatMaps"
    }
   ],
   "layout": {
@@ -219,33 +230,18 @@
    "regions": [
     {
      "name": "contentBody",
-     "components": [
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listSeatMaps",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
-      }
-     ]
+     "components": []
     }
    ]
   },
   "states": {
    "loading": "The seat apis list.",
    "error": "Could not load. Names which read failed and leaves the seat apis untouched.",
-   "emptyFirstRun": "No seat apis yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No seat apis yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the seat apis are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Not shown: nothing on this screen needs a permission of its own; the app's sign-in decides access."
   },
-  "apis": [
-   {
-    "operationId": "listSeatMaps",
-    "contract": "seating",
-    "purpose": "What the seat API exposes",
-    "trigger": "onLoad",
-    "provenance": "board reading, 19 September 2026"
-   }
-  ],
+  "apis": [],
   "wireframe": {
    "status": "notStarted",
    "board": "wireframes/P08 Venue Management.dc.html#bo-1072",
@@ -323,6 +319,12 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 54"
+   },
+   {
+    "operation": "createApiClient",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-021): createApiClient on a tenant screen, as BO-067: clients are issued by TICVAI or created by developers (DI-927; design-notes correction platform-foundation BO-1073).",
+    "source": "DI-927 | contracts/satellite/public-api.yaml#createApiClient"
    }
   ],
   "layout": {
@@ -352,20 +354,6 @@
        "derived": true,
        "impliedBy": "listApiClients",
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
-      },
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "createApiClient",
-       "label": "Create API client",
-       "notes": "The act the screen exists for."
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "createApiClient"
       }
      ]
     }
@@ -374,7 +362,7 @@
   "states": {
    "loading": "The api access oauth list.",
    "error": "Could not load. Names which read failed and leaves the api access oauth untouched.",
-   "emptyFirstRun": "No api access oauth yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No api access oauth yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the api access oauth are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -398,13 +386,6 @@
     "contract": "public-api",
     "purpose": "Access and OAuth",
     "trigger": "onLoad",
-    "provenance": "board reading, 19 September 2026"
-   },
-   {
-    "operationId": "createApiClient",
-    "contract": "public-api",
-    "purpose": "Issue credentials",
-    "trigger": "onAction",
     "provenance": "board reading, 19 September 2026"
    }
   ],
@@ -645,7 +626,7 @@
   "states": {
    "loading": "The seat event catalog list.",
    "error": "Could not load. Names which read failed and leaves the seat event catalog untouched.",
-   "emptyFirstRun": "No seat event catalog yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No seat event catalog yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the seat event catalog are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -724,7 +705,7 @@
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
-  "purpose": "Configure technical controls that prevent duplicate or conflicting inventory actions. Define expected version/ETag, lock token, conflict response and retry boundary for write operations. Require idempotency key, retention window and duplicate-response behavior for supported commands. Set rate, burst, connection, read/write timeout and payload limits by client, endpoint and environment. All writes require authenticated, authorized, idempotent and concurrency-safe requests; events and audit records carry tenant, version and correlation context and are retained under approved policy. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.",
+  "purpose": "See the integrations calling this tenant and the platform limits and idempotency rules they run under (ADR-0064).",
   "gaps": [
    {
     "operation": null,
@@ -745,9 +726,11 @@
      "components": [
       {
        "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listApiClients",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "label": "Integrations and their limits",
+       "bindsTo": "ApiClient",
+       "operation": "listApiClients",
+       "notes": "Read-only: idempotency retention and limits are platform rules (ADR-0064), not tenant configuration.",
+       "provenance": "contract public-api.yaml GET /api-clients"
       }
      ]
     }
@@ -756,7 +739,7 @@
   "states": {
    "loading": "The concurrency idempotency limits list.",
    "error": "Could not load. Names which read failed and leaves the concurrency idempotency limits untouched.",
-   "emptyFirstRun": "No concurrency idempotency limits yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No concurrency idempotency limits yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the concurrency idempotency limits are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -867,7 +850,7 @@
   "states": {
    "loading": "The mapping transformation list.",
    "error": "Could not load. Names which read failed and leaves the mapping transformation untouched.",
-   "emptyFirstRun": "No mapping transformation yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No mapping transformation yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the mapping transformation are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -978,7 +961,7 @@
   "states": {
    "loading": "The monitoring retry reconciliation list.",
    "error": "Could not load. Names which read failed and leaves the monitoring retry reconciliation untouched.",
-   "emptyFirstRun": "No monitoring retry reconciliation yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No monitoring retry reconciliation yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the monitoring retry reconciliation are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -1071,6 +1054,12 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 56"
+   },
+   {
+    "operation": "getSeatReconciliation",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-025): The only read was the seat reconciliation, not an audit log; the audit view reads listAuditRecords (design-notes correction ticketing-backoffice BO-1079)",
+    "source": "contracts/spine/tenancy.yaml#listAuditRecords"
    }
   ],
   "layout": {
@@ -1080,13 +1069,6 @@
      "name": "filters",
      "slot": "filters",
      "components": [
-      {
-       "kind": "selectField",
-       "label": "Performance",
-       "operation": "getSeatReconciliation",
-       "notes": "Sends `?performanceId=` (required) to the one bound read, which returns discrepancies, not audit entries.",
-       "provenance": "contract seating.yaml GET /seat-reconciliation"
-      },
       {
        "kind": "searchField",
        "label": "Search the audit log",
@@ -1121,31 +1103,19 @@
        ],
        "notes": "The pack's record; no operation returns it.",
        "provenance": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 56"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Audit records",
+       "operation": "listAuditRecords",
+       "provenance": "contract tenancy.yaml GET /audit-records; wiring fix, 2 October 2026"
       }
      ]
     },
     {
      "name": "contextPanel",
      "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "Related discrepancy",
-       "bindsTo": "SeatDiscrepancy",
-       "columns": [
-        "SeatDiscrepancy.seatId",
-        "SeatDiscrepancy.label",
-        "SeatDiscrepancy.kind",
-        "SeatDiscrepancy.mapState",
-        "SeatDiscrepancy.orderState",
-        "SeatDiscrepancy.orderIds",
-        "SeatDiscrepancy.detectedAt"
-       ],
-       "operation": "getSeatReconciliation",
-       "notes": "The only thing the bound read offers: a discrepancy linked to the audited seat.",
-       "provenance": "contract seating.yaml GET /seat-reconciliation"
-      }
-     ]
+     "components": []
     },
     {
      "name": "actionBar",
@@ -1164,17 +1134,17 @@
   "states": {
    "loading": "The immutable seat audit list.",
    "error": "Could not load. Names which read failed and leaves the immutable seat audit untouched.",
-   "emptyFirstRun": "No immutable seat audit yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No immutable seat audit yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the immutable seat audit are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
-    "operationId": "getSeatReconciliation",
-    "contract": "seating",
-    "purpose": "Seat audit",
+    "operationId": "listAuditRecords",
+    "contract": "tenancy",
+    "purpose": "Who did what to seat data, where and when",
     "trigger": "onLoad",
-    "provenance": "board reading, 19 September 2026"
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {
@@ -1183,6 +1153,7 @@
    "workshopBoard": "wireframes/WS152 Seat Management Venue Mapping Reference v1.0 Board 13.dc.html#bo-1079"
   },
   "apisNote": "Regenerated 9 September 2026 from Seat_Management_Venue_Mapping_Reference v1.0.pdf page 56. 0 of 0 labels bound to a contract property; 0 of 9 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Layout drafted 29 September (VM close-out)** from pack Seat_Management_Venue_Mapping_Reference v1.0.pdf p.56; contract seating.yaml GET /seat-reconciliation. Pack labels with no schema field yet (shown as plain labels): Seat audit-log read (bound op is getSeatReconciliation), Actor / client, Entity, Action, Before / after, Reason, Source IP / device, Correlation ID, Rule / version, Approval, Outcome, Integrity verification status.",
+  "entryState": {},
   "_platform": {
    "code": "P08",
    "audience": "staff",

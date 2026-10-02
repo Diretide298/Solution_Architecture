@@ -1,6 +1,6 @@
 # P01-booking-selection-01 — P01 · Booking & Selection
 
-**7 screens · 32 operations · 65 schemas · 7 permissions**
+**7 screens · 31 operations · 64 schemas · 7 permissions**
 
 Platform P01 Guest Web · ships as **guest** ·
 guest audience · web ·
@@ -62,6 +62,112 @@ convincingly. It is never a caption.
   and its error; and, element by element, what is shown and in what format, what each action
   produces and where the user goes next. Draw exactly that.
 
+## The processes these screens belong to
+
+Written by the owner of each process (`handoff/design-notes/`). Read before any screen: it says how the process runs end to end and which words the screens must use.
+
+### Ticketing & Guest Commerce (guest web, guest app, kiosk, partner portal, POS ticket sale)
+
+A guest finds something to do, picks when and how many, holds capacity, pays, and receives a ticket they can show at the gate, transfer or resell. The same booking engine serves the guest website (P01, WEB-), the guest app (P02, GST-) and, through the same catalogue, cart and order operations, the kiosk (P05), the cashier at the till (P04) and the staff handheld (P06); partners book on credit through the partner portal (P10). Guest surfaces are white-label (venue logo, colours, fonts, card layouts, step indicator style, cart placement) with "Powered by TICVAI" kept; the till and handheld stay TICVAI-branded. The booking runs in a fixed order that the client set on 29 September and confirmed on 30 September: for a dated product, the date first, then the time (hidden until a date), then the tickets (hidden until a time); undated products go straight to the tickets; product-first flows (workshops) pick the product, then the date; seated events with one performance open on the seat map, sections first, zoom into a section, pinch out to compare. Choosing a date, time or session commits nothing; capacity is held only when a quantity is set (a 15-minute basket window, 8 minutes for seats and cabanas, one extension). The guest counters (adult, child, senior, infant, person of determination) belong to the chosen ticket and take its prices, so a basket line is "<ticket> · <guest type> × <n>"; group and school products start from group ticket cards and a typed headcount (minus, plus, and +10 on the app), supervisors free. Help me choose filters the catalogue on the server (never a consent step) with Show everything; consent questions such as "Are you able to swim?" are asked once after the session is picked and never again where the page already asked. Sign-in or the six-digit guest code is asked when the guest leaves Add-ons (or at payment, per venue), only the fields the venue configured; after the code, only the T&Cs tick remains (W1). Payment creates the order first and treats an unknown outcome as "checking with your bank", never a second charge; tickets issue on payment, go to Apple or Google Wallet, and a dynamic-QR event's ticket lives in the app. The guest app is deliberately not a copy of the website (30 September): its structure is Home, Explore, Plan and Tickets tabs with a persistent Buy tickets button, item pages that propose the right product (a restaurant's meal combo that includes admission), ride videos that play with no loader, a visit planner that plans each day at one park from that park's rides, dining and shops only, and in-park walking navigation; the booking flow inside it is functionally identical to the web. Vocabulary in guest copy follows the glossary's recorded exceptions (Booking, Session, QR). source: [F01, F02, F03, F07, F49, F52, F55, F57, F58, F59, MoM 29 Sep 1 (W1-W12), MoM 29 Sep 2, MoM 29 Sep 3, MoM 30 Sep 4.4-4.8, CLIENT-RESPONSE-30SEP 1-6, CLIENT-RESPONSE-REV3-25SEP, REV3-1, REV3-2, REV3-3, REV3-4, REV3-26, DI-1086 …
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Booking | An order or reservation as the guest reads it (Booking Confirmation, Group Booking, My bookings). Code says Order or Reservation. | Order (in guest copy), Purchase record, Transaction | docs/glossary.md (Recorded exceptions, Booking, audit R145) |
+| Session | A dated, timed performance as the guest reads it (Pick a session, Surf sessions). Staff screens (POS, back office) keep Performance. | Slot, Showtime, Performance (in guest copy) | docs/glossary.md (Recorded exceptions, Session, rev 3 CFG-10); DI-1064 |
+| Basket | The guest's unpaid selection with its held capacity (Add to basket, Your basket). Never a paid order. The till and staff screens say Cart. | Cart (in guest copy), Bag, Order (for an unpaid selection) | CLIENT-RESPONSE-REV3-25SEP (Basket, 10) … |
+| Ticket | The issued instrument a guest shows at the gate. Product names from the catalogue keep their own words (Day Pass, Annual pass, 2 park ticket); the interface around them says ticket. | Admission, Voucher (for a ticket), Pass (in interface copy) | docs/glossary.md (Ticket) |
+| Adult, Child, Senior, Infant, Person of determination | The guest types of a ticket, each with its age or height band shown under it (Child 3-12, Under 1.20 m). A companion of a person of determination is its own free type where the product has one. | Disabled, Handicapped, Kid, Pax | DI-686; screens/P01-guest-web-storefront.yaml#WEB-049 (Passengers notes) … |
+| Held for | The countdown on held capacity ("Your seats are held for 7:42"); the release is Release hold. | Lease, Reserved for (a reservation is a different thing), Locked | contracts/spine/orders.yaml#/components/schemas/CartLine (leaseExpiresAt) … |
+| Reservation | Booked and not yet paid; holds capacity and expires (My Reservations). Paid tickets are in Tickets or My Tickets. | Booking (for an unpaid hold in lists), Pending order | docs/glossary.md (Reservation); DI-199 |
+| Help me choose | The venue's questions whose answers filter the products; Show everything clears them. | Quiz, Wizard, Experience builder, Consent | MoM 29 Sep W4; REV3-11 |
+| Info only / Not bookable online | A product listed with full details that cannot be booked online; it shows Contact sales to book with Call sales and Email sales. | Unavailable, Sold out, Coming soon | REV3-14; MoM 29 Sep W3 |
+| Guest code | The six-digit code sent to the guest's email or mobile to prove the contact at guest checkout; the copy says six digits. | OTP, PIN, Token, Verification key | DI-1034; MoM 29 Sep W1 |
+| How many people | The typed headcount of a group or school booking (number box with minus and plus; +10 on the app), with Supervisors listed separately and free. | Group size (the removed dropdown), Pax | DI-1104; DI-1105; CLIENT-RESPONSE-30SEP 1 |
+| Waiting room | The on-sale queue in front of a high-demand performance's sale (WEB-015, GST-046). | Virtual queue (that is the ride queue), Lobby | screens/P01-guest-web-storefront.yaml#WEB-015 notes (ADR-0066) |
+| QR | The code a guest shows, in guest copy only (Dynamic QR). Staff screens say Media code. | Barcode, Serial, Media code (in guest copy) | docs/glossary.md (Recorded exceptions, QR, audit R210) |
+| Not at this park | The planner's per-day notice that the day's park cannot meet a preference, naming the park that can. | Unavailable, No results | DI-1113 |
+| Book this plan | Turns the whole visit plan (tickets, Fast Track, meal combos) into basket lines. | Checkout plan, Buy itinerary | screens/P02-guest-mobile-app.yaml#GST-053 (Book this plan) |
+
+### AI & Intelligence
+
+AI in TICVAI is one governed engine behind many screens. The guest meets it as Sahli, the concierge (WEB-044, GST-031, GST-033), as the planner agent that refines a rules-built day plan by chat (GST-054), and as upsell and cross-sell offers on a separate Extras step (WEB-008, GST-048). Staff meet it as the Staff App's AI tab (EMP-019/020, knowledge EMP-040/041), the kiosk assistant (KSK-015) and the support copilot (SUP-006, SUP-018). Venue managers meet it in Venue Management (BO-091 policy and spend, BO-919/BO-925..932 resource and staffing forecasts, BO-597/598 configuration drafts, BO-772/782 marketing optimisation, BO-793 translations, BO-970/975 seat-map generation, BO-1048 seat upsell, BO-1160 fraud cases) and in Analytics (ANL-010 suggestions, ANL-019 management insights, ANL-055 anomalies, ANL-057 forecasting studio, ANL-059 insight history, ANL-060 governance, ANL-071 AI maturity). The governance, configuration-assistant, forecasting, oversight, audit and monitoring boards sit on the TICVAI Console (P09: ADM-037 providers, ADM-469..498 configuration assistant, ADM-499..518 forecasting, ADM-519..558 governance, ADM-633/637 fraud, ADM-680..697 recommendation governance). Five rules hold on every one of these screens. (1) Baseline first, then it learns per tenant: every data-driven answer (forecast, suggestion, risk score, recommendation) exists from day one, from the venue AI profile, a starting pattern for the venue type, the UAE calendar and the weather, and shifts to the venue's own data as it trades; nothing says "comes later" or refuses for lack of history - a refusal only names a missing setting. (2) Every answer shows its basis and maturity: a "Based on" line, a stage badge (Starting, Learning, Established, Trained on your data), "Limited historical data" while the starting pattern carries more than half the weight, ranges or bands rather than a bare percentage, a confidence only where the producer really has one, a plain-words explanation always. (3) A trained model replaces the baseline only when it beats it in a shadow run of at least six weeks and an admin promotes it; the platform raises "Ready to promote" and never switches by itself. (4) The LLM never reads raw data: numbers come only from query results the platform runs (the answer shows the query), only the masked prompt and retrieved context leave the platform, and AI only drafts - the owning screen applies. (5) One autonomy scale, L0 Disabled to L4 Controlled auto, with first-release ceilings, separate from user permission and from the approval tier; impactful actions route to a person, who sees current against proposed, impact, risk and what is affected, and can approve within a limit, challenge, override or roll back; every decision is traceable (data, model, approver, time) and searchable by customer, venue and capability. In Block A (5 October to 20 November 2026) the guest concierge with retrieval, Help me choose, translations, the planner agent, the gateway and …
+*(source: ADR-0051; ADR-0050; ADR-0020; ADR-0052; ADR-0053; ADR-0054; ADR-0059; ADR-0051 (AI-D01..AI-D20); ADR-0051 (AI functions review 30 Sep §2 §4 §9); MoM 18 Sep 4.1-4.10; MoM 21 Sep 4.1-4.14; MoM 30 Sep 4.1 4.7; ADR-0059 (Block A slice: tasks.csv))*
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Sahli | The guest concierge's name; the entry reads "Ask Sahli" and shows as mascot art when the venue's Concierge mascot setting is on (default), otherwise a plain button. | Chatbot, Bot, AI Concierge (as a visible label), Virtual agent | DI-1069 / screens/P01-guest-web-storefront.yaml#WEB-044 |
+| Based on | The line on every AI answer that says what it was computed from, e.g. "Based on: your venue profile, UAE calendar, weather, 23 days of your sales". Always present. | Data sources, Model inputs, Powered by AI | ADR-0051 Maturity / contracts/satellite/ai.yaml#/components/schemas/AiMaturity |
+| Starting / Learning / Established / Trained on your data | The four maturity stages (enum starting, learning, established, learned), shown as one badge. Moves by itself from Starting to Established as own data arrives; Trained on your data only after an admin promotion. | Beta, Experimental, Low confidence, Cold start (in UI), Not enough data | ADR-0051 / ADR-0051 (AI functions review 30 Sep §2) |
+| Limited historical data | Shown while own data carries less than half the weight (AiMaturity.limitedHistory, ownDataShare < 0.5). An honest qualifier, never a refusal. | Insufficient data, Not available until, Comes later | ADR-0051 / contracts/satellite/ai.yaml#/components/schemas/AiMaturity |
+| Range | The 10th-90th percentile band a forecast or estimate is shown with (e.g. "1,850-3,400 guests, most likely 2,600"). Never a bare accuracy percentage on an answer; measured accuracy (WAPE, bias, coverage) appears only on accuracy screens … | Accuracy 92%, Confidence 0.87 (on a heuristic), Exact | ADR-0051 / contracts/satellite/ai.yaml#getForecast / … |
+| Running in the background | A trained model in shadow next to the live answer (AiRelease.stage shadow); it changes nothing a person sees. | Live, Active model, Testing in production | ADR-0051 Promotion / ADR-0051 (AI functions review 30 Sep §2) |
+| Ready to promote / Promote | A shadow model passed its gate (governance alert promotionReady); an admin promotes it one stage at a time (canary, then production). The only way a model replaces the baseline. | Deploy, Go live, Auto-switch, Activate model, Upgrade AI | ADR-0051 (AI-D16) / contracts/satellite/ai.yaml#promoteAiRelease |
+| L0 Disabled / L1 Advisory / L2 Prepare / L3 Execute with … | The one autonomy scale for every AI capability, shown as "L2 Prepare" etc. with the capability's ceiling beside it. Lower scopes tighten, never raise. | Autopilot, Copilot mode, Level 0-3 (CFG book), Approval level (for autonomy), Manual/Semi/Auto | ADR-0050 / ADR-0050 (AI-D04) / … |
+| Approval tier | How many people must approve a proposed action (ProposedAction.approvalLevel, 1 or 2). Not an autonomy level. | Autonomy level, Approval level (ambiguous) | ADR-0050 |
+| Suggestion / Draft | What AI produces. A suggestion advises; a draft is a ready-to-review change that a person applies in the owning screen. Copy says "Nothing is applied until you approve it." | AI changed, Auto-applied, AI updated your prices | ADR-0020 / ADR-0051 (AI functions review 30 Sep §4 Configuration assistant) / … |
+| Why this? | The link or expander that opens an answer's explanation (Suggestion.explanation, recommendation template reason, decision trace). Plain words; for guests a template reason. | Explainability, SHAP, Feature importance (in operator copy) | ADR-0052 (AI-D09) / contracts/satellite/ai.yaml#/components/schemas/Suggestion |
+| No thanks | The explicit decline on an offer. Only this counts as a decline and it is remembered across channels; scrolling past or closing the step is not a decline. | Dismiss (as a decline), Skip (as a decline), X (as a decline) | ADR-0052 (AI-D07) / DI-962 / … |
+| Hold for review | What a high fraud or risk score does to a payment or order. The transaction goes through; it is held for a person. | Decline, Block, Reject (for a risk score), Fraud detected | ADR-0053 / ADR-0053 (AI-D06) |
+| Hand over to a person | The concierge passes the whole conversation and its own summary to a live agent; the guest does not repeat themselves. | Escalate, Transfer, Contact bot | contracts/satellite/marketing-crm.yaml#handoverToAgent |
+| Not available yet | The analytics assistant's answer to a question outside the semantic model; it records a knowledge gap and never improvises a number. | I cannot answer, Error, Unknown | ADR-0054 |
+
+### Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers)
+
+Customer & marketing is how a venue knows its guests and talks to them. There is ONE guest profile per person across ticketing, F&B and retail, so a guest who books online and later dines is the same profile (DI-339). A profile needs at least an email or a mobile, never neither (DI-372). Profiles are created by registration, by guest checkout, or by staff at a till or desk. Repeat guest checkouts with the same verified email or phone attach to the same profile automatically (DI-941, R120 default). Two records that might be the same person are NEVER merged automatically: the guest is asked to confirm, and an admin review queue runs alongside (DI-377). Each candidate shows why it matched; the record that loses is superseded, not deleted; consent takes the narrower of the two positions (DI-808). Around the profile sit three things that must never be confused. CONSENT is what the law allows: per purpose and per channel, append-only, with the notice version and the source (recordConsent). It is Given, Withdrawn or Not asked. A SUBSCRIPTION is what the guest asked to receive, e.g. a newsletter list (MarketingSubscription). A PREFERENCE is what they like: table, dietary, accessibility (updateGuestPreferences). An anonymous visitor's cookie decision is recorded against a device key (recordDeviceConsent) and attaches to the guest when they sign in (claimDeviceConsent). Marketing consent at GUEST CHECKOUT is an open client question, and the design follows its default: an unticked opt-in beside the terms, one per channel and purpose. It is recorded with source "checkout" against the order and the verified contact, and nothing is sent without it. Whether that is sufficient consent under PDPL is the client DPO's call (M18-15 (audit R-M18-15), DI-954, DI-940). Marketing reads profiles through SEGMENTS (rules, evaluated when used) and static LISTS (imported). It reaches guests by CAMPAIGNS (one send to an audience) and JOURNEYS (automations started by an event, with waits and branches). Journeys may offer only pre-configured offers, never a free-typed discount (MoM 2026-08-20 4.6). Everything goes through ONE communications module that every other module uses (MoM 2026-08-31 4.6). Consent and suppression are applied at send time, and the number excluded, with the reasons, is reported before anything goes out (launchCampaign). Transactional messages (tickets, receipts, queue calls, case replies) do not need marketing consent and must never carry marketing. LOYALTY pays for spend: points, tiers, rewards and expiry. GAMIFICATION pays for behaviour: challenges, badges, streaks, referrals and leaderboards (createChallenge). A guest reads their own loyalty position (getLoyaltyPosition). A till, the back office or support reads a named guest's (getGuestLoyalty, or identifyGuest at a till). SERVICE: one Case object covers lost property, complaints, questions, accessibility and refund requests (CaseKind). A guest raises one with raiseMyCase, which needs the connection …
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Guest | The person the venue serves, signed in or not. In body copy on every surface. | Customer, User, Subject, Contact, Patron | contracts/satellite/marketing-crm.yaml#/components/schemas/GuestProfile |
+| Guest profile | The CRM record of one person (details, consent, preferences, history). Distinct from the Account, which is how a guest signs in. | Customer record, Contact, Subject | contracts/satellite/marketing-crm.yaml#getGuestProfile |
+| Consent - Given / Withdrawn / Not asked | What the law allows, per purpose (marketing, personalisation, profiling, third-party sharing, AI processing, transactional) and per channel. "Not asked" is not "Withdrawn" and must look different. | Opted in/out as a status, Accepted, Declined, Revoked, Unsubscribed (that is a subscription) | contracts/satellite/marketing-crm.yaml#/components/schemas/ConsentDecision |
+| Subscription | A list the guest asked to receive (a newsletter, event news), per channel. Unsubscribing from a list is not withdrawing consent. | Consent, Opt-in | contracts/satellite/marketing-crm.yaml#/components/schemas/MarketingSubscription |
+| Preferences | What the guest likes or needs (seating, drinks, dietary, accessibility, contact channel). Never grants permission. | Consents, Settings | contracts/satellite/marketing-crm.yaml#updateGuestPreferences |
+| Send me offers and news | The marketing opt-in label beside the terms at checkout, unticked, one per channel and purpose. | I agree to marketing, Pre-ticked boxes, Keep me updated ticked by default | DI-954 |
+| Points / Tier / Points to next tier / Expiring points | The loyalty position. Points are a liability earned per programme; tiers are ranked (Bronze, Silver, Gold, Platinum in the meetings). | Credits, Coins, Balance alone (wallet money is "credit"), Level | DI-382 |
+| Pending points | Points earned on a purchase still inside its refund window; shown apart from spendable points. | Available points for pending ones | contracts/satellite/marketing-crm.yaml#getLoyaltyPosition |
+| Reward | What points can be turned into (rewards catalogue). | Prize (games redemption uses prize), Voucher unless it is one | contracts/satellite/marketing-crm.yaml#listRewards |
+| Challenge / Badge / Streak / Referral | Gamification - rewards for behaviour, not spend. Status badges such as Explorer, Adventurer, Legend. | Mission and Quest used interchangeably on one screen, Loyalty tier for a badge | DI-392 |
+| Case | One service record - lost property, complaint, question, accessibility, refund request or other - with a number (venue prefix plus sequence), a status and an SLA. | Ticket (a ticket is an admission product), Issue, Incident (that is maintenance and safety) | contracts/satellite/marketing-crm.yaml#/components/schemas/CaseKind |
+| Reply to guest / Internal note | The two kinds of case message. The agent always chooses one explicitly; there is no default. | Comment, Message (ambiguous) | F05 step 2 |
+| Conversation | A live chat session (web chat, in-app, WhatsApp, SMS, email, kiosk, voice). With the assistant, then queued, then with an agent. It is not a case. | Ticket, Case (until one is raised from it) | contracts/satellite/marketing-crm.yaml#/components/schemas/ConversationState |
+| Segment / List / Audience | A segment is rules evaluated when used. A list is static, imported or hand-picked. The audience is what a campaign or journey targets. | Group, Cohort, Target list for a segment | DI-381 |
+| Campaign / Journey | A campaign is one send (one-off, scheduled, triggered or recurring) to an audience. A journey is an automation started by an event, with steps, waits and branches. | Flow (booking flows use it), Automation for a one-off send, Blast | R146 |
+| Offer | A pre-configured, system-validated discount or benefit that a campaign or journey references. It is never typed into the builder. | Discount field, Coupon (unless the offer is a coupon code) | MoM 2026-08-20 4.6 |
+| Reachable | How many guests in an audience can actually be sent to on a channel after consent and suppression. Always shown beside the matching count. | Audience size alone | contracts/satellite/marketing-crm.yaml#previewSegment |
+| Possible duplicate / Merge | Two profiles that may be one person. Never called "Duplicate" as a verdict. Merging needs confirmation and stays reversible for 30 days. | Duplicate (as a status), Combine, Auto-merge | DI-808 |
+| Data request | A guest's privacy request - a copy of my data, a correction, erasure, a restriction - with a legal clock. Statuses submitted, in progress, completed. | DSAR on guest screens, Subject data, Ticket | DI-379 |
+| Waiver / Consent question | A waiver is a signed, versioned form. A consent question ("Are you able to swim?", "I accept the risk") is a single question asked per person or per booking and recorded as consent. | Contract, Disclaimer, Form for a waiver in guest copy | DI-1062 |
+| Lost item / Found item / Possible match | The two directions of lost property and the suggested pairing between them. | Lost case, Claim before it is claimed | contracts/satellite/marketing-crm.yaml#/components/schemas/LostItem |
+| Wishlist | Products and dates a guest saved to buy later, including F&B and retail to buy on site. | Favourites (used for transport routes), Saved for later on one surface and Wishlist on another | DI-202 |
+| Notification / Message | A notification is an item in the guest's in-app feed. A message is one send on a channel (email, SMS, WhatsApp, push, in-app). | Alert for marketing content, Inbox for the guest feed | contracts/satellite/marketing-crm.yaml#/components/schemas/GuestNotification |
+| Template | A reusable message body per channel and language with merge fields. Transactional and marketing templates are separate kinds. | Layout, Design | contracts/satellite/marketing-crm.yaml#createMessageTemplate |
+
+### Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue)
+
+Venue operations is everything that happens after a sale and inside the gates. A guest's ticket is one virtual ticket with interchangeable media (QR, dynamic QR, RFID wristband, NFC, Face Pass or Face Tag); at an access point a scanner (P07, or the scan function inside the Staff App P06) validates the media against the admission profile and the guest admission policy, offline if it must, and every deny carries a reason and a next action. The back office (Venue Management P08) configures that estate: the venue topology (venue, park, zone, attraction, access point, gate and lane, device placement), admission profiles and rules (entry, exit, re-entry, anti-passback, validity, crossover, companions), credential security (dynamic QR, device binding, beacons), biometrics, gate modes, and the live operations, fraud and monitoring views. Accreditation (P08 setup and review, P11 web portal for applicants, web first) takes an applicant from a configurable form through document checks, OCR, duplicate blocking and multi-level approval to a credential with zone rights. Resources and capacity manage bookable resources (rooms, vehicles, equipment, cabanas, instructors) that are booked as a consequence of selling a product, never sold directly. Workforce covers shift templates, rosters, attendance, swaps and breaks, mirrored on the Staff App. Maintenance and safety cover the asset register, preventive calendars, work orders with scored priority, inspections and incidents, with technicians working from the Staff App. Games and rides configure readers, credit types and consumption priority, play entitlements, game pricing, retry pricing, redemption and the card lifecycle. The virtual queue (Q1) gives a guest a live wait time and a return window for a ride; it is not the on-sale waiting room (Q2). Every calendar has day, week and month views. Configuration resolves tenant, region, venue (outlet only for F&B and retail), and a user's permissions, never the device, decide what they may do. The guest apps (P01, P02) show the guest's side of this: My Tickets, the scan code, Face Pass, wait times, the virtual queue, map booking of cabanas and the visit planner.
+*(source: F06 step 1 / F112 step 1 / F111 step 1 / ADR-0002 / ADR-0012 / ADR-0018 / ADR-0041 / ADR-0066 / ADR-0067 / ADR-0068 / DI-652 / DI-627 / DI-640 / DI-654 / DI-666 / DI-482 / DI-483 / DI-907 / DI-919 / DI-923 / DI-865 / DI-678 / TRACKER Actions row 160 / MoM 2026-09-02 AccessControl / MoM 2026-09-07 …)*
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Ticket | The one virtual record a guest owns (ticket number, product, validity, entries). Its number never changes, whatever media carries it or whoever it is transferred or resold to. | Pass (unless the product is a pass), Booking, Order line | DI-652 / DI-620 / contracts/spine/access.yaml#/components/schemas/TicketStatus |
+| Media | What the ticket is presented by at a gate (QR code, dynamic QR, wristband/RFID card, NFC, Face Pass, Face Tag). One ticket can carry several media as fallbacks; a media code can also cover several tickets scanned as one group. Show one … | Credential (for guest media; keep Credential for accreditation badges and staff), Ticket code | DI-180 / DI-608 / DI-652 |
+| Access point | A place where a scan is judged, with a fixed direction (entry, exit, re-entry, crossover). Hierarchy shown to users is Venue > Park > Zone > Attraction > Access point > Gate/lane > Device. | Scanner (that is the device), Door | screens/P08-venue-back-office.yaml#BO-144 / … |
+| Admission profile | The named set of rules an access point enforces (opening window, entries, exit scan, re-entry, validity, crossover). Products point at a profile; tiers such as Bronze/Silver/Gold are profiles with gate allow and deny lists. | Admission rules (as a screen title), Access rule set | DI-185 / contracts/spine/access.yaml#/components/schemas/AdmissionRules |
+| Admitted / Denied / Overridden | The three scan outcomes. A denial is always shown with its reason in plain words and a next action; an override is a supervisor admitting despite a denial, and is always attributed and reasoned. | Valid/Invalid, Success/Fail, Error | contracts/spine/access.yaml#/components/schemas/ScanOutcome / … |
+| Used | A ticket entry is used the moment a scan succeeds, whether or not the guest physically passed. Mistakes are resolved from the scan history, not by un-scanning. | Redeemed (for admission), Checked in (that is group check-in, a different step) | DI-627 / TRACKER Actions row 221 / TRACKER Actions row 189 |
+| Gate mode | What a lane is doing now, set live by the podium or supervisor - Normal, Free flow (counts, does not validate), Drop arm (everybody through, evacuation), Closed (nobody through), Podium (staff validating by eye), Maintenance. Direction is … | Turnstile mode (as a label for direction), Open/Locked | contracts/spine/access.yaml#/components/schemas/AccessPointOperatingMode / R221 |
+| Offline package | What a scanner holds to validate with no network - entitlements, blacklist, admission profiles and the active guest admission policy version - with its age always visible. | Cache, Local DB | F06 step 3 / ADR-0068 |
+| Sync and reconciliation | Sending the offline scan journal to the server, and the duty manager's review of scans the server rejected after the device had already admitted the guest. | Upload, Retry | F06 step 6 / DI-065 |
+| Face Pass / Face Tag | Face Pass is the long-lived face credential for members and season-pass holders (renewable); Face Tag is short-lived, for one day or event. Retention is set per tier by the venue. | Face ID, Biometric login | DI-640 / ADR-0063 |
+| Accreditation / Credential (accreditation) | Accreditation is the application and approval of a person (media, contractor, corporate, staff of a partner) for an event or season; the credential is what is issued after approval (photo badge, QR or RFID) with zone access rights. | Registration (for the whole process), Ticket | DI-654 / DI-662 |
+| Resource | A bookable thing or person a product needs (room, vehicle, cabana, equipment set, instructor). Guests buy products; resources are assigned to the booking, pre-assigned or dynamically. | Asset (that is maintenance), Inventory (that is stock) | DI-475 / DI-482 / TRACKER Actions row 160 |
+| Asset | A physical item maintained by the venue (ride, turnstile, printer, pump) with a register record, documents, warranty and maintenance history. | Resource, Device (unless it is an IT device in the device register) | DI-910 / ADR-0067 |
+| Work order | A unit of maintenance work, lifecycle Created > Assigned > In progress > Review > Closed, with a resolution timer. | Ticket (reserved for guest tickets), Job card | DI-231 |
+| Game / attraction (games module) | In the games and rides module an attraction is an individual game or ride (roller coaster, racing game, bumper cars), not a venue. | Venue, Park | DI-863 |
+| Virtual queue / Return window | A guest's place in a ride's queue held without standing in line, with a return window (for example 4:50 to 5:00 PM) that recalculates live. Distinct from the walk-in line and the VIP/express lane, and from the on-sale waiting room. | Waiting room, Fast pass (that is the express product), Booking | DI-675 / DI-678 / DI-679 / ADR-0066 |
+| Wait time source | Where a ride's wait time comes from - Sensor, Throughput, Manual, or Unavailable - always shown beside the number. | Live (when the source is manual) | contracts/satellite/queue.yaml#/components/schemas/WaitTimeSource / DI-315 |
+
+
 ## The screens
 
 Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs count fields; requirements are matrix rows; meeting inputs are the ones naming the screen (the module and platform ones are below); white label says whether the tenant's brand reaches it (guest) or it sets the brand (configures).
@@ -69,10 +175,10 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `WEB-005` | Ticket Type Selection | A | 2 | 71 | 6 | 27 | 31 | 6 | guest | review (client-verified) |
-| `WEB-006` | Date & Performance Selection | A | 41 | 19 | 6 | 17 | 32 | 6 | guest | review (client-verified) |
+| `WEB-006` | Date & Performance Selection | A | 40 | 19 | 6 | 17 | 32 | 6 | guest | review (client-verified) |
 | `WEB-007` | Interactive Seat Selection | A | 8 | 39 | 6 | 30 | 22 | 6 | guest | review (client-verified) |
-| `WEB-008` | Add-ons & Upsell | A | 19 | 35 | 6 | 56 | 16 | 0 | guest | review (client-verified) |
-| `WEB-009` | Wishlist | A | 3 | 2 | 5 | 1 | 2 | 0 | guest | review (client-verified) |
+| `WEB-008` | Add-ons & Upsell | A | 19 | 22 | 5 | 47 | 16 | 0 | guest | review (client-verified) |
+| `WEB-009` | Wishlist | A | 0 | 15 | 5 | 1 | 2 | 0 | guest | review (client-verified) |
 | `WEB-047` | Map Booking — Cabanas & Spots | A | 24 | 38 | 6 | 5 | 4 | 6 | guest | notStarted (client-verified) |
 | `WEB-048` | Book a Space by the Hour | A | 23 | 40 | 6 | 25 | 7 | 0 | guest | notStarted (client-verified) |
 
@@ -92,13 +198,29 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Module | Booking & Selection · wave 1 · needs the `ticketing` module |
 | Block | Block A · ticket #18013 (APP-WEB-WEB-005) |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025); in the flows as guest |
-| Device and orientation | This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. · LTR and RTL · light theme |
+| Device and orientation | This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. · LTR and RTL · the venue's theme |
 | Pattern | listDetail (compact density): `listProductVariants` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
 | Offline | **The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
 | Opens with | `productId` (WEB-004), `venueId` (session) · cold entry: Resolves from the session; a cold arrival is the ordinary case. |
 | Route | `/booking-and-selection/ticket-type-selection` |
 
 **What the spec says about it.** **Rev 3 (decided 29 September).** **Order (REV3-2):** in the dated flow the guest picks the date, then the time (WEB-006), then tickets here: tickets stay hidden until a time is picked and Continue stays off until both are chosen, per `BookingFlowConfig.performanceReveal` (`dateTimeTicket` default, `allAtOnce` shows all). The two steps may render as one staged page. This screen may also render as a side panel on WEB-002 and WEB-004 (23SEP-5). **Sign-in (REV3-3):** with `signInAt` `afterAddOns` (default) the sign-in or guest code is asked when the guest leaves Add-ons (WEB-008), or on Continue here when the booking has no add-ons step; `atPayment` asks at WEB-012. The basket is kept either way. **Filters:** categories (REV3-16), experience and level (REV3-19). **Info-only** products show their label and open details (REV3-14). **Help me choose** (REV3-11) is a region and a pop-up of this step, not a screen of its own: the prototype draws it as a dialog over the booking step with a banner under the products. **Quick tour** (REV3-20). **Cart (REV3-10):** `cartLayout` may be `floatingIcon`, a round basket button with the count that opens the cart; the cart stays on the right in Arabic unless `cartSideInRtl` is `mirror`. Card layout, size and density are enums (DG-6). Every booking-flow setting named here is read from `getTenantConfig` `bookingFlow`, resolved for the venue the guest picked (audit R267): the tenant's values with that venue's `venueOverrides` entry laid over field by field (decided 29 September, rev 3 CFG-11). **The step order comes from the published booking …
+
+**From the Ticketing & Guest Commerce (guest web, guest app, kiosk, partner portal, POS ticket sale) process.** The ticket counters: which ticket and how many of each guest type. Block A. In the dated flow it is the last stage of one staged step (date, then time, then tickets) and in the prototype it is the same page; on a listing it opens as a side panel. Get right the pricing model the client corrected on 30 September: the guest counters belong to the chosen ticket and take its prices, so a multi-park ticket with three adults is ONE basket line.
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- Supervisors (free, one per N guests) and a water-park group choosing a session are not in the contract. (CHG-SGU-024)
+
+**Fixed on main** (the package already carries these; draw what it says): The action bar has a primary "Evaluate promotions" button and a modal that collects venueId, channel and lines. (CHG-GST-003); A raw "Every product variant" table (id, sku, axisValues, isActive) and a selected-variant detail panel. (CHG-GST-003); The prototype's Read more panel on the multi-park flow still prices guests at single-park rates (Adult AED 325, Infant AED 475). (CHG-SGU-020).
+
+#### Decided on this screen
+
+Answered questions: draw the decision, not the old default. Where a decision and the tables below differ, the decision wins.
+
+- **How many supervisors are free per group, and is it per group ticket?** → Drawn default accepted: A separate free guest type, up to 1 per 10 guests. *(decided by Chinmay, 2026-10-02; DEC-115 / CHG-NOTE-007)*
+- **Is each group card's minimum set per group ticket?** → Drawn default accepted: Each group ticket carries its own minimum, default 10. *(decided by Chinmay, 2026-10-02; DEC-116 / CHG-NOTE-007)*
+- **Is the swim vest an add-on product and the splash and river pass a separate product?** → Drawn default accepted: The vest is an add-on; the splash and river pass is its own product filtered by the swim answer. *(decided by Chinmay, 2026-10-02; DEC-117 / CHG-NOTE-007)*
 
 #### Inputs: what the user enters or picks
 
@@ -119,6 +241,14 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Product | picker: choose a product | — | — | `getPublishedBookingFlow` ?productId |
 | Product category | picker: choose a product category | — | — | `getPublishedBookingFlow` ?productCategoryId |
 | Flow type key | select | — | Dated day pass · Timed entry · Open dated · Seated fixed performance · Seated date time seat map · Experience workshop · Surf session · Meeting room hourly · Cabana map · Cabana by size · Guided tour by language · Transport … | `getPublishedBookingFlow` ?flowTypeKey |
+
+**Rules for these inputs** (from the Ticketing & Guest Commerce (guest web, guest app, kiosk, partner portal, POS ticket sale) process; these refine the tables above and win where they differ)
+
+- **ticket choice**: Ticket cards first (e.g. 1 park, 2 park, 3 park ticket), then the guest counters for the chosen ticket. Before a ticket (or, in a session product, a session) is chosen the counter area shows the hint "Choose a ticket above, then set how many of each guest." and no counters. *(source: DI-1106; CLIENT-RESPONSE-30SEP 2; sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html (waitText))*
+- **guest counters (Adult, Child, Senior, Infant, Person of determination)**: Each counter is a variant of the chosen ticket and is priced from it (listProductVariants), so child and senior scale from the chosen ticket and infant stays free where the ticket says so. Steppers start at 0, minus disabled at 0, plus disabled at the purchase limit with the reason ("Up to 6 tickets per booking"). Each row has an (i) with who it is for and what it includes (up to 300 characters) when cardInfo is on. *(source: DI-1106; DI-464; DI-172; REV3 23SEP-6)*
+- **group headcount (Group and school booking)**: Group products start from group ticket cards (School group, Corporate group, Tour operator group, Community group), each with a per-person price and its minimum group size. Then "How many people" is a number box the guest can type into (e.g. 45) with minus and plus; there is no Group size dropdown. Supervisors are a separate, free row ("One free for every 10 guests"). Values below the card's minimum are refused inline ("School groups start at 10 guests"). *(source: DI-1104; DI-1105; DI-1114; DI-1116; CLIENT-RESPONSE-30SEP 1)*
+- **experience and level filters**: "Choose your experience" and "Select level" dropdowns where the venue uses them (surf, lessons, swim, sauna; beginner to expert), each option with its one-line description, and Reset. They narrow the products, they are not answers stored on the booking. *(source: REV3-19)*
+- **promotion code**: Not entered here. The guest enters codes in the basket (WEB-010); this step only shows near-miss offers ("Add one more child for the family rate") from the promotion evaluation. *(source: screens/P01-guest-web-storefront.yaml#WEB-005 wireframe.prototype.differences; F01 step 5)*
 
 #### Outputs: what the screen shows and produces
 
@@ -216,7 +346,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Reason | chip: Conditions not met, Superseded by better offer, Exclusive promotion applied … | — |
 | Detail | text | — |
 
-**Booking steps** (progress indicator, from `getPublishedBookingFlow`): The steps of the published flow in their `sortOrder`, this one (tickets) highlighted. A step the flow has turned off is not shown and is skipped by Continue and Back.
+**Booking steps** (progress indicator, from `getPublishedBookingFlow`): The steps of the published flow in their `sortOrder`, this one (tickets) highlighted. A step the flow has turned off is not shown and is skipped by Continue and Back. Drawn in the venue's `BookingFlowSettings.stepIndicator` style; `embedMode` and `singleEventPage` come from the same published settings (CMS-016) (CHG-SGU-022).
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -229,6 +359,19 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Quick tour (icon button) | navigation or local | — | — | — | — |
 | Show everything (secondary button) | `listProducts` GET `/products` | — | Product (paged) | 400 A `categoryId` that names no category of the venue, or a `guidedAnswerIds` entry that is not an answer of the venue's published guided choice (W4, 29 …; 403 Authenticated but not permitted at the requested scope | — |
 | Continue (primary button) | navigation or local | — | — | — | — |
+
+**Rules for what is shown** (from the Ticketing & Guest Commerce (guest web, guest app, kiosk, partner portal, POS ticket sale) process; these refine the tables above and win where they differ)
+
+- **running total and basket line preview**: One line per ticket per guest type, written "<ticket> · <guest type> × <n> = AED <total>", e.g. "2 park ticket · Adult × 3 = AED 1,425". Never a ticket line plus a separate guest line. AED with a thousands separator and no decimals for whole amounts. *(source: DI-1106; CLIENT-RESPONSE-30SEP 2)*
+- **session tickets**: For a session product the panel title names the session ("Tickets for Intermediate surf · 19:30") with its own guest types (Surfer at the session price, Junior surfer 10-15 with a paying adult, Spectator AED 35). Choosing the session adds nothing to the basket; a line appears only when a quantity is set. *(source: DI-1107; CLIENT-RESPONSE-30SEP 3; MoM 29 Sep W5)*
+- **group estimate**: The enquiry panel reads "<group ticket> · Guests × <n>" with the per-person price and the estimate; supervisors are listed with "Free". A group booking is a request (requestGroupBooking with the group ticket and the headcount), so the button says Send request, not Pay. *(source: DI-1105; screens/P01-guest-web-storefront.yaml#WEB-005 notes (30 September))*
+- **step indicator**: The published flow's steps in their order with this one highlighted, drawn in the venue's style (Bars, Dots, Counter "Step 2 of 4", Step names). A step the flow turned off is not drawn and is skipped. *(source: DI-1093; MoM 30 Sep 4.6; screens/P01-guest-web-storefront.yaml#WEB-005 (progressIndicator))*
+
+**What each action does** (from the Ticketing & Guest Commerce (guest web, guest app, kiosk, partner portal, POS ticket sale) process; these refine the tables above and win where they differ)
+
+- **Continue**: Off until a ticket and at least one guest are set (and, in the dated flow, a date and time). Goes to Add-ons (WEB-008) when the flow has an Extras step; otherwise to sign-in or the guest code (WEB-016) when signInAt is afterAddOns and the guest is anonymous; otherwise the basket. The basket is kept through sign-in. *(source: REV3-2; REV3-3; F01 branch at step 4)*
+- **Help me choose**: Pop-up of one to four questions, three answers each; the answers filter the products in place (behaviour filter) or end on one result card (behaviour recommend). Show everything clears it. A swimmer answer pre-fills the swim consent, which the guest still confirms once. *(source: MoM 29 Sep W4; contracts/satellite/white-label.yaml#/components/schemas/GuidedChoice; REV3-26)*
+- **Change location (Booking at bar)**: Shown only when locationSwitcher is on. Switching venue clears the selection except lines whose product shares a familyKey at the new venue, which move; times and prices refresh. Confirm first when it would clear lines ("Changing to Mirdif clears 2 tickets"). *(source: REV3-18; DI-1058)*
 
 **Data it reads**: `listProductVariants` (onLoad, List generated variants); `listProductCategories` (onLoad, Category tiles and the experience filter, with descriptions); `listProducts` (onLoad, The tickets of a category or level (`categoryId` …); `getPublishedGuidedChoice` (onLoad, The venue's published Help me choose (404 = none)); `getPublishedBookingFlow` (onLoad, The published booking flow for this product: which steps it …)
 
@@ -258,6 +401,50 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Offline (`?state=offline`) | **The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 A `categoryId` that names no category of the venue, or a `guidedAnswerIds` entry that is not an answer of the venue's published guided choice (W4, 29 …; 400 Validation failed |
 
+#### Edge cases to draw
+
+- **Water park swim answer**: "All of us" keeps the full ride list at standard prices; "Some of us" changes the ride notes and shows a "Swim vests needed" counter; "None of us" switches the tickets to the splash and river pass (Adult AED 175, Junior AED 135, Child AED 125, Senior AED 135) and removes slides from the ride notes. The swim pop-up is not shown again where the question is on the page. *(source: DI-1108; CLIENT-RESPONSE-30SEP 4; DI-1118)*
+- **An info-only product is chosen**: Its details open with "Contact sales to book"; it can never reach the basket (the server refuses it with 409). *(source: REV3-14)*
+- **The guest raises a quantity past what is left**: The plus button stops at the remaining count with "Only 4 left for 19:30"; the line is refused rather than added and removed later. *(source: contracts/spine/orders.yaml#addCartLine ("Refused rather than added where capacity has gone"))*
+
+#### Consistency with other screens
+
+- Match `GST-008`: Same pricing model, same one-line-per-ticket rule, same group headcount box. The app adds a +10 button to the headcount stepper; the web does not.
+- Match `WEB-006`: In the dated flow this is the third stage of the same staged page; the time hint and this hint use the same component.
+- Match `KSK-004`: The kiosk counters follow the same ticket-then-guest-type rule and the same purchase limits.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+flow: Summit Peaks, Multi-park combo, Friday
+tickets:
+- name: 1 park ticket
+  price: AED 325
+- name: 2 park ticket
+  price: AED 475
+  sub: Valid 6 days
+  badge: Popular
+counters: Adult × 3 (AED 475 each), Child × 0, Senior × 0, Infant × 0 (free)
+basketLine: 2 park ticket · Adult × 3 = AED 1,425
+groupCards:
+- name: School group
+  sub: Ages 5-18 · minimum 10
+  price: AED 145 per person
+  note: One teacher free for every 10 students
+- name: Corporate group
+  sub: Adults · minimum 15
+  price: AED 225 per person
+- name: Tour operator group
+  sub: Any age · minimum 20
+  price: AED 195 per person
+- name: Community group
+  sub: Charities and clubs · minimum 10
+  price: AED 125 per person
+groupEstimate: School group · Guests × 45 = AED 6,525; Supervisors × 4 Free
+```
+
 #### Permissions
 
 - `evaluatePromotions` → `PRICE_VIEW` (read) · staff, guest, partner
@@ -265,7 +452,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 - `listProductCategories` → `PRODUCT_VIEW` (read) · staff, guest
 - `listProducts` → `PRODUCT_VIEW` (read) · staff, guest, partner
 - `getPublishedGuidedChoice` → no permission · guest
-- `getPublishedBookingFlow` → no permission · guest
+- `getPublishedBookingFlow` → no permission · guest, staff
 
 **A refused user sees:** **There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the …
 
@@ -338,9 +525,9 @@ Also apply: 7 for P01 · Booking & Selection, 39 for all of P01, 29 for every ap
 
 #### Configurable by the tenant
 
-This is a white-label guest screen: it is drawn in the venue's brand, never TICVAI's (except the fixed *Powered by TICVAI* credit). Draw it with the **default theme**, and on the key screens one **alternate tenant theme** (`handoff/design-batches/apps/1-guest-app/WHITE-LABEL.md`).
+This is a white-label guest screen: it is drawn in the venue's brand, never TICVAI's (except the *Powered by TICVAI* credit, a tenant toggle that is on by default: `brand.showPoweredBy`). It has no dark or light mode: the venue's theme applies on every device setting. Draw it with the **default theme**, and on the key screens one **alternate tenant theme** (`handoff/design-batches/apps/1-guest-app/WHITE-LABEL.md`).
 
-**Shell-wide, on every guest screen:** Brand (10, CMS-002, CMS-004, ADM-016); Theme (31, CMS-005, CMS-003, ADM-016); Fonts (5, CMS-003); Header (5, CMS-007); Navigation (17, CMS-009); Footer (website) (15, CMS-007); Languages and right-to-left (2, CMS-011, ADM-018); Modules shown to guests (3, CMS-001); Features (3, CMS-001); Custom domain (website) (3, CMS-017, ADM-017); SEO metadata (website) (13, CMS-013). Each element, its CMS field, allowed values and default: `handoff/design-batches/apps/1-guest-app/WHITE-LABEL.md`.
+**Shell-wide, on every guest screen:** Brand (11, CMS-002, CMS-004, CMS-104); Theme (27, CMS-005, ADM-016); Fonts (5, CMS-003); Header (5, CMS-009); Navigation (17, CMS-009); Footer (website) (15, CMS-009); Languages and right-to-left (2, CMS-011, ADM-018); Modules shown to guests (3, CMS-001, ADM-424); Features (3, CMS-001); Custom domain (website) (3, CMS-017, ADM-017); SEO metadata (website) (13, CMS-013). Each element, its CMS field, allowed values and default: `handoff/design-batches/apps/1-guest-app/WHITE-LABEL.md`.
 
 **Specific to this screen** (the tenant's setting is the input; the right column is what it changes here). Draw each with its default, and the alternate where the alternate theme sets one.
 
@@ -440,6 +627,8 @@ Also set there, as content the tenant writes: answers: target, answers: filter, 
 - [ ] Sign-in is asked only where the spec asks for it.
 - [ ] The 31 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] Drawn in the default theme; on a key screen also in the alternate tenant theme; nothing hard-codes a brand colour, logo or font.
+- [ ] The 3 edge case(s) from the process notes are drawn.
+- [ ] The 3 decision(s) taken on this screen are drawn as decided, not as the old default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -454,13 +643,27 @@ Also set there, as content the tenant writes: answers: target, answers: filter, 
 | Module | Booking & Selection · wave 1 · needs the `ticketing` module |
 | Block | Block A · ticket #17870 (APP-WEB-WEB-006) |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025); in the flows as guest |
-| Device and orientation | This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. · LTR and RTL · light theme |
+| Device and orientation | This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. · LTR and RTL · the venue's theme |
 | Pattern | statusTracker (compact density): `getAvailability` reads one record and nothing reads a population — the screen is about that one thing |
 | Offline | **The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
 | Opens with | `performanceId` (navigation), `cartId` (navigation), `eventId` (WEB-004), `venueId` (session) |
 | Route | `/booking-and-selection/date-and-session-selection` |
 
 **What the spec says about it.** Availability is read live and never cached beyond a few seconds. A guest selecting a session that filled while they were reading is a worse outcome than a slightly slower screen. **Wired 24 August from review**: acquireInventoryHold. **The operations existed and this screen could not call them** — reviewers reported them as missing APIs, which is what an unreachable operation looks like from a wireframe. **Rev 3 (decided 29 September).** **Date → time → ticket (REV3-2):** this step now comes before the ticket choice (WEB-005); the time sits right after the date and stays hidden until a date is picked, and tickets stay hidden until a time is picked (`BookingFlowConfig.performanceReveal`, default `dateTimeTicket`; `allAtOnce` shows everything). **Times (REV3-1):** compact tiles paged `timesPerPage` at a time, with Morning / Afternoon / Evening chips and counts (`dayPartFilter`, boundaries per venue, default before 12:00, 12:00-17:00, from 17:00, venue time zone). **Seated events (REV3-4, REV3-7):** `seatEventDateMode` `inlineStep` keeps this step before the seat map; `popupOnSeatMap` asks the date and time in a pop-up over WEB-007 instead. **This step is skipped when the event has exactly one on-sale performance.** For a seated event this step and WEB-007 may render as one page (date, time, show — plus language and format for cinema — and the seat map). **Language (REV3-17)**, **experience and level with a four-day calendar (REV3-19)**, **Booking at (REV3-18)**, **Quick tour (REV3-20)**. **Consent questions (REV3-26)** pop up once after the session or date is picked; the …
+
+**From the Ticketing & Guest Commerce (guest web, guest app, kiosk, partner portal, POS ticket sale) process.** Pick a date and then a time that has capacity. Block A. It comes BEFORE the tickets in every dated flow (date, then time, then tickets), and in the prototype the three stages are one staged page where each stage stays hidden until the previous one is chosen. Get right that choosing a time or session commits nothing: capacity is held only when a quantity is set.
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- The 30 September swim answer is three options for the party (All of us, Some of us, None of us) changing the products and prices, while REV3-26 models swim as a Yes/No consent per person or per booking. (CHG-SGU-024)
+
+**Fixed on main** (the package already carries these; draw what it says): The primary action is labelled "Acquire inventory hold" with a modal collecting variantId, quantity, seatIds. (CHG-GST-003); "Check booking eligibility" is a secondary button with a modal collecting productIds and party. (CHG-GST-003).
+
+#### Decided on this screen
+
+Answered questions: draw the decision, not the old default. Where a decision and the tables below differ, the decision wins.
+
+- **Is the swim question a party-level three-way answer (filter) or a per-person consent, or both?** → Drawn default accepted: Draw the on-page three-way question (All, Some, None of us) as the filter, and record the consent once per booking from it; no second pop-up. *(decided by Chinmay, 2026-10-02; DEC-118 / CHG-NOTE-007)*
 
 #### Inputs: what the user enters or picks
 
@@ -501,7 +704,6 @@ Also set there, as content the tenant writes: answers: target, answers: filter, 
 | Age band `party[].ageBand` | radio group | optional | — | Infant · Child · Junior · Adult · Senior | — | Infant under 3, child 3–12, junior 13–17, adult 18–59, senior 60+. | `checkBookingEligibility` body |
 | Age years `party[].ageYears` | number field | optional | — | — | — | — | `checkBookingEligibility` body |
 | Height band index `party[].heightBandIndex` | number field | optional | — | — | — | Which band of the rule's `heightBandsCm`, counting from 0. | `checkBookingEligibility` body |
-| Confident swimmer `party[].confidentSwimmer` | toggle | optional | — | — | — | Superseded by the consent record for the product's swim consent question (decided 29 September, rev 3 REV3-26); see `ProductEligibilityRule.swimAbility`. | `checkBookingEligibility` body |
 | Guardian signed `party[].guardianSigned` | toggle | optional | off | — | — | — | `checkBookingEligibility` body |
 
 **Form: Once, after the session or date is picked, when the cart has consent questions** (modal, opened by *Once, after the session or date is picked, when the cart has consent questions*; *Next* calls `recordConsentAnswers`, *Back* sends nothing)
@@ -548,6 +750,13 @@ Errors to draw in the form: 409 The question has changed since the cart was read
 | Pass type `attributes.transport.passTypeId` | picker: choose a pass type | optional | — | — | shows names, sends the id | Pass purchase only. The `transport.PassType` bought for this station pair. | `addCartLine` body |
 | Pass entitlement `attributes.transport.passEntitlementId` | picker: choose a pass entitlement | optional | — | — | shows names, sends the id | A seat reserved with a pass already owned. The line is zero-priced and validated against the pass (stations covered, an entry left, within validity). | `addCartLine` body |
 
+**Rules for these inputs** (from the Ticketing & Guest Commerce (guest web, guest app, kiosk, partner portal, POS ticket sale) process; these refine the tables above and win where they differ)
+
+- **date**: A strip of the next dateStripDays days (default 7) with a calendar icon for the full month. Days with no performance or sold out online are disabled with the reason, not hidden. Days outside the channel's sales window are disabled ("Online booking closes the day before" for a next-day-minimum product). *(source: DI-920; DI-583; screens/P01-guest-web-storefront.yaml#WEB-006 (datePicker notes))*
+- **time**: Hidden until a date is picked, with the hint "Choose a date to see times". Up to 8 times as large tiles; more than 8 as compact tiles paged timesPerPage at a time (default 24) with Earlier and Later, and Morning, Afternoon, Evening chips with counts (venue time zone, default split at 12:00 and 17:00). Tapping a selected chip again shows all times. Sold-out times are greyed, not removed. *(source: REV3-1; REV3-2; DI-1041)*
+- **tour language**: For guided tours the order is date, then language, then time slot; only tours in that language are listed. Languages are shown in their own script (English, العربية, Français, Deutsch, 中文, Русский). Cinema times show language and format (2D, 3D, subtitled). *(source: REV3-17; MoM 29 Sep W11; DI-1057)*
+- **party ages and heights**: Asked once, on leaving selection, only for products with an age or height rule: each person declares an age band and a height band. A person who does not qualify is flagged "Can't take part, too short" with Remove this guest or Choose another activity; Continue stays off until everyone qualifies. Height bands already chosen on a water-park day pass are the check and are not asked again. *(source: DI-1037; REV3 DG-3; DI-1000)*
+
 #### Outputs: what the screen shows and produces
 
 **Shown**
@@ -584,7 +793,7 @@ Errors to draw in the form: 409 The question has changed since the cart was read
 | Ends at | 1 Oct 2026, 14:30 | — |
 | Status | chip: Scheduled, On sale, Sold out, Suspended, Cancelled, Completed | — |
 
-**Booking steps** (progress indicator, from `getPublishedBookingFlow`): The steps of the published flow in their `sortOrder`, this one (date and time) highlighted. A step the flow has turned off is not shown and is skipped by Continue and Back.
+**Booking steps** (progress indicator, from `getPublishedBookingFlow`): The steps of the published flow in their `sortOrder`, this one (date and time) highlighted. A step the flow has turned off is not shown and is skipped by Continue and Back. Drawn in the venue's `BookingFlowSettings.stepIndicator` style; `embedMode` and `singleEventPage` come from the same published settings (CMS-016) (CHG-SGU-022).
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -596,6 +805,16 @@ Errors to draw in the form: 409 The question has changed since the cart was read
 |---|---|---|---|---|---|
 | Continue (primary button) | `addCartLine` POST `/carts/{cartId}/lines` | AddCartLineRequest | Cart | 403 The performance's on-sale waiting room is on and the request has no valid admission token (ADR-0066).; 409 No capacity, or the product is not sellable on this channel (`notSellableOnChannel`). (CartProblem); 422 The … | — |
 | Quick tour (icon button) | navigation or local | — | — | — | — |
+
+**Rules for what is shown** (from the Ticketing & Guest Commerce (guest web, guest app, kiosk, partner portal, POS ticket sale) process; these refine the tables above and win where they differ)
+
+- **time tile**: Start time in 24-hour venue time (19:30), places left when low ("6 left"), price per person when it differs by time; a surf-style four-day calendar shows sessions stacked by time in each day column with places left and price per surfer. *(source: REV3-19; DI-1041)*
+- **hint in place of the next stage**: Until a session is chosen the ticket area says "Choose a session above to see its tickets and prices." Continue is off until date and time are both chosen. *(source: DI-1107; REV3-2)*
+
+**What each action does** (from the Ticketing & Guest Commerce (guest web, guest app, kiosk, partner portal, POS ticket sale) process; these refine the tables above and win where they differ)
+
+- **Choose a time or session**: Reveals that session's tickets (WEB-005 stage). Adds nothing to the basket and holds nothing. If the cart's products ask consent questions they pop up once now, in the venue's theme, unless the page already asked the same question. *(source: DI-1107; F01 step 3; REV3-26; CLIENT-RESPONSE-30SEP 4)*
+- **Set a quantity**: addCartLine takes the capacity for the cart's 15-minute window; the basket shows the line and the countdown. Refused with the next available time offered if the session filled meanwhile. *(source: contracts/spine/orders.yaml#addCartLine ("the window is 15 minutes"); F01 branch at step 3)*
 
 **Data it reads**: `getAvailability` (onLoad, Live remaining capacity); `listPerformances` (onLoad, The times of the event for the picked date or range …); `getPublishedBookingFlow` (onLoad, The published booking flow for this product: which steps it …)
 
@@ -619,6 +838,52 @@ Errors to draw in the form: 409 The question has changed since the cart was read
 | Empty, no results (`?state=emptyNoResults`) | No time matches the part of the day or the language picked, and the other times are still there. Names the filter and offers to clear it. |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 No capacity, or the product is not sellable on this channel (`notSellableOnChannel`). (CartProblem); 409 The question has changed since the cart was read (`questionVersionSuperseded`); the client re-reads the cart and asks the current version. (ConsentAnswerProblem); 422 A `perPerson` question answered without a person (`personRequired`), a question this cart does not … |
 
+#### Edge cases to draw
+
+- **The session sells out between loading and choosing**: "19:30 has just sold out" with the next available time pre-selected; nothing in the basket changes. *(source: F01 branch at step 3)*
+- **Online share sold out while the gate still sells**: "Sold out online" on the tile; correct per-channel behaviour, worth showing so it is not reported as a bug. *(source: F01 branch at step 3)*
+- **The event has exactly one on-sale performance**: This step is skipped; a seated event opens straight on the seat map. *(source: REV3-4)*
+- **The performance has a branded waiting room on**: Adding tickets routes through WEB-015 before the line is taken. *(source: screens/P01-guest-web-storefront.yaml#WEB-006 transitions (ADR-0066))*
+
+#### Consistency with other screens
+
+- Match `GST-007`: Same reveal order, same day-part chips and the same consent pop-up. The app's own setting has times per page default 12 in the v4 build against 24 on the contract; use the contract default until the client says otherwise.
+- Match `WEB-007`: For seated events this step and the seat map may render as one page; the time bar on the map is this step's time list.
+- Match `KSK-005`: The kiosk's performance picker uses the same tiles and sold-out treatment.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+venue: Coastal Aqua (water park), Surf sessions with filters
+dates: Fri 2 Oct to Thu 8 Oct, calendar for later
+dayParts: Morning 6 · Afternoon 8 · Evening 4
+sessions:
+- time: 09:00
+  name: Beginner surf
+  place: Bay 1 · 55 min
+  price: AED 295
+  left: 12
+- time: '19:30'
+  name: Intermediate surf
+  place: Bay 2 · 55 min
+  price: AED 345
+  left: 6
+- time: '17:00'
+  name: Expert barrels
+  place: Reef · 55 min
+  price: AED 495
+  left: 0
+tourLanguages:
+- English
+- العربية
+- Français
+- Deutsch
+- 中文
+- Русский
+```
+
 #### Permissions
 
 - `checkBookingEligibility` → `PRODUCT_VIEW` (read) · guest, staff
@@ -628,7 +893,7 @@ Errors to draw in the form: 409 The question has changed since the cart was read
 - `listPerformances` → `PRODUCT_VIEW` (read) · staff, guest
 - `getCart` → no permission · guest, partner, staff
 - `recordConsentAnswers` → `ORDER_CREATE` (operate) · guest, staff
-- `getPublishedBookingFlow` → no permission · guest
+- `getPublishedBookingFlow` → no permission · guest, staff
 
 **A refused user sees:** **There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the …
 
@@ -702,9 +967,9 @@ Also apply: 7 for P01 · Booking & Selection, 39 for all of P01, 29 for every ap
 
 #### Configurable by the tenant
 
-This is a white-label guest screen: it is drawn in the venue's brand, never TICVAI's (except the fixed *Powered by TICVAI* credit). Draw it with the **default theme**, and on the key screens one **alternate tenant theme** (`handoff/design-batches/apps/1-guest-app/WHITE-LABEL.md`).
+This is a white-label guest screen: it is drawn in the venue's brand, never TICVAI's (except the *Powered by TICVAI* credit, a tenant toggle that is on by default: `brand.showPoweredBy`). It has no dark or light mode: the venue's theme applies on every device setting. Draw it with the **default theme**, and on the key screens one **alternate tenant theme** (`handoff/design-batches/apps/1-guest-app/WHITE-LABEL.md`).
 
-**Shell-wide, on every guest screen:** Brand (10, CMS-002, CMS-004, ADM-016); Theme (31, CMS-005, CMS-003, ADM-016); Fonts (5, CMS-003); Header (5, CMS-007); Navigation (17, CMS-009); Footer (website) (15, CMS-007); Languages and right-to-left (2, CMS-011, ADM-018); Modules shown to guests (3, CMS-001); Features (3, CMS-001); Custom domain (website) (3, CMS-017, ADM-017); SEO metadata (website) (13, CMS-013). Each element, its CMS field, allowed values and default: `handoff/design-batches/apps/1-guest-app/WHITE-LABEL.md`.
+**Shell-wide, on every guest screen:** Brand (11, CMS-002, CMS-004, CMS-104); Theme (27, CMS-005, ADM-016); Fonts (5, CMS-003); Header (5, CMS-009); Navigation (17, CMS-009); Footer (website) (15, CMS-009); Languages and right-to-left (2, CMS-011, ADM-018); Modules shown to guests (3, CMS-001, ADM-424); Features (3, CMS-001); Custom domain (website) (3, CMS-017, ADM-017); SEO metadata (website) (13, CMS-013). Each element, its CMS field, allowed values and default: `handoff/design-batches/apps/1-guest-app/WHITE-LABEL.md`.
 
 **Specific to this screen** (the tenant's setting is the input; the right column is what it changes here). Draw each with its default, and the alternate where the alternate theme sets one.
 
@@ -778,7 +1043,7 @@ Also set there, as content the tenant writes: settings.
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (41), with its required mark, default, format and its error state (400, 403, 404, 409, 410, 422).
+- [ ] Every input above is drawn (40), with its required mark, default, format and its error state (400, 403, 404, 409, 410, 422).
 - [ ] Every output is drawn (19 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#WEB-006?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline, emptyNoResults.
 - [ ] Every action is wired with its success and its failure: Continue, Quick tour.
@@ -786,6 +1051,8 @@ Also set there, as content the tenant writes: settings.
 - [ ] Sign-in is asked only where the spec asks for it.
 - [ ] The 32 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] Drawn in the default theme; on a key screen also in the alternate tenant theme; nothing hard-codes a brand colour, logo or font.
+- [ ] The 4 edge case(s) from the process notes are drawn.
+- [ ] The 1 decision(s) taken on this screen are drawn as decided, not as the old default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -800,13 +1067,17 @@ Also set there, as content the tenant writes: settings.
 | Module | Booking & Selection · wave 2 · needs the `seating` module |
 | Block | Block A · ticket #18132 (APP-WEB-WEB-007) |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025); in the flows as guest |
-| Device and orientation | This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. · LTR and RTL · light theme |
+| Device and orientation | This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. · LTR and RTL · the venue's theme |
 | Pattern | statusTracker (compact density): `getSeatAvailability` reads one record and nothing reads a population — the screen is about that one thing |
 | Offline | **The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
 | Opens with | `performanceId` (deepLink), `eventId` (WEB-006), `holdId` (navigation), `venueId` (session) · cold entry: **A link to a performance that has happened.** Offers the next performance of the same event. |
 | Route | `/booking-and-selection/seat-map-selection` |
 
 **What the spec says about it.** A map with no geometry falls back to category and best-available selection. Availability returns renderMode: list, and the screen renders groups rather than a plan. Never refuses the seated flow. **Drawn 26 August** — `Seat Board 3.dc.html` frame `seat-3b`. **The frame names this screen on its own face**, which is the first pack to do that: the earlier F&B, POS and Retail boards had to be hand-assigned by purpose after three derivation attempts produced nonsense. **A board that says what it draws removes the guess entirely.** **Renamed 31 August** from *Seat Map Selection*. **A guest surface is one product with two renderings** — a screen named differently on web and app is two screens to a developer and one journey to a guest. **Cross-surface parity, 31 August**: added recommendSeats. **A guest does not know which surface they are on** — the same named screen on web and app now calls the same guest-callable operations. **Rev 3 (decided 29 September).** Date and time on seated events: an inline step before this map, or a pop-up over it, per `BookingFlowConfig.seatEventDateMode` (REV3-4); a single-performance event opens straight here. Time bar with performance switcher (REV3-6, `seatTimeBar`). View-from-your-seat box placed per `seatViewPosition` (REV3-5) and fed by a section photo or the geometry (23SEP-14). Fixture strip and a direct WEB-004 → WEB-007 path (23SEP-16). With WEB-006 this may render as one step (REV3-7). Seat picker defaults to the bowl (`seatPicker` default `bowl`, CFG-6). **The cabana map is no longer this screen:** a cabana, lounger or other spot placed …
+
+**From the Ticketing & Guest Commerce (guest web, guest app, kiosk, partner portal, POS ticket sale) process.** Choose seats on the stadium or theatre map. Block A. The client's rule is sections first: the map opens with every section coloured by its price band, a tap zooms into that section on the same map to show its seats, and pinch or scroll out (or Whole map) returns to compare sections. Get right that each tapped seat is held at once and goes into the basket with section, row, seat and price.
+
+**Fixed on main** (the package already carries these; draw what it says): The action bar shows "Create seat hold" as a primary button with a modal collecting id, performanceId, seatIds and ttlSeconds. (CHG-GST-003); The seat hold lasts 8 minutes but the cart's lease window is 15 minutes, and the screens show both as a countdown. (CHG-SGU-020).
 
 #### Inputs: what the user enters or picks
 
@@ -848,6 +1119,12 @@ Also set there, as content the tenant writes: settings.
 
 Errors to draw in the form: 404 No selection satisfies the constraints
 
+**Rules for these inputs** (from the Ticketing & Guest Commerce (guest web, guest app, kiosk, partner portal, POS ticket sale) process; these refine the tables above and win where they differ)
+
+- **section**: Colour-coded by price band with the price on the map itself (no separate tier list). Tap zooms in place, never a modal or a new page. Mixed maps show standing sections ("fan pit") as a block with a quantity stepper instead of seats. *(source: MoM 29 Sep W2; DI-916; DI-950; DI-411)*
+- **seat**: Zoomed in, every nearby section shows equal-size dots: available in the section's price colour, taken in grey, picked highlighted. Tap picks and holds; tap again releases. At most maxSeatsPerGuestOrder seats (default 10); the 11th tap says "Up to 10 seats per booking". Zoom in, Zoom out and Whole map buttons sit under the map. *(source: DI-983; DI-982; REV3-7; contracts/satellite/seating.yaml#/components/schemas/CreateSeatHoldRequest)*
+- **performance (time bar)**: Above the map when seatTimeBar is on (default): the chosen performance, the event's other times and Change date. Switching shows a confirmation when seats are held ("Changing the show releases your 4 seats") and then releases them. *(source: REV3-6; DI-1046)*
+
 #### Outputs: what the screen shows and produces
 
 **Shown**
@@ -861,7 +1138,7 @@ Errors to draw in the form: 404 No selection satisfies the constraints
 | By category | list or chips (count when long) | — |
 | Seats | list or chips (count when long) | — |
 
-**Banner** (banner): Hold countdown, always visible. A selection that expires silently while a guest enters card details is the worst outcome in this flow
+**Banner** (banner): **One countdown: `Cart.expiresAt`** (the earliest lease in the cart), always visible. The 8-minute seat hold and the 15-minute cart lease are never shown as two clocks; a selection that expires silently while a guest enters card details is the worst outcome in this flow (CHG-SGU-020).
 
 **Fixture strip** (card list, from `listPerformances`): The fixture (teams, date, kick-off) as a strip at the top of the seat step, so a single-performance fixture opens straight on the map.
 
@@ -907,7 +1184,7 @@ Errors to draw in the form: 404 No selection satisfies the constraints
 | View image | the image or video | As `Section.viewAssetId`. Null means render the view from geometry. |
 | Boundary | list or chips (count when long) | As `Section.boundary`. Null when `renderMode` is `list`. |
 
-**Booking steps** (progress indicator, from `getPublishedBookingFlow`): The steps of the published flow in their `sortOrder`, this one (seats) highlighted. A step the flow has turned off is not shown and is skipped by Continue and Back.
+**Booking steps** (progress indicator, from `getPublishedBookingFlow`): The steps of the published flow in their `sortOrder`, this one (seats) highlighted. A step the flow has turned off is not shown and is skipped by Continue and Back. Drawn in the venue's `BookingFlowSettings.stepIndicator` style; `embedMode` and `singleEventPage` come from the same published settings (CMS-016) (CHG-SGU-022).
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -919,6 +1196,18 @@ Errors to draw in the form: 404 No selection satisfies the constraints
 |---|---|---|---|---|---|
 | Recommend seats (secondary button) | `recommendSeats` POST `/performances/{performanceId}/seat-recommendations` | SeatRecommendationRequest | inline | 404 No selection satisfies the constraints | opens modal first |
 | Continue to checkout (primary button) | navigation or local | — | — | — | — |
+
+**Rules for what is shown** (from the Ticketing & Guest Commerce (guest web, guest app, kiosk, partner portal, POS ticket sale) process; these refine the tables above and win where they differ)
+
+- **view from this section**: The section's photo if supplied, else a render from the geometry (closer sections see a larger stage and fewer rows ahead). Placed bottom (default), right, left or top on wide screens; always below the map on narrow screens. *(source: REV3 23SEP-14; REV3-5; DI-1030)*
+- **hold countdown**: Always visible once a seat is held: "Your seats are held for 7:42". Seats are held 8 minutes by default (extendable to 30 minutes in all); the basket shows the earliest expiry. Turns amber under 2 minutes. *(source: contracts/satellite/seating.yaml#/components/schemas/CreateSeatHoldRequest (ttlSeconds default 480, max 1800); contracts/spine/orders.yaml#/components/schemas/CartLine (leaseExpiresAt); AUDIT-29SEP …)*
+- **basket line per seat**: One line per seat with section, row, seat and price, e.g. "Section 101 · Row A, Seat 4 · AED 165" or, at the theatre, "Stalls · Row F, Seat 9". *(source: DI-982; DI-1047)*
+- **fixture strip**: The fixture (teams, date, kick-off) as a strip at the top, so a single-performance fixture opens straight on the map. *(source: REV3 23SEP-16)*
+
+**What each action does** (from the Ticketing & Guest Commerce (guest web, guest app, kiosk, partner portal, POS ticket sale) process; these refine the tables above and win where they differ)
+
+- **Best available**: The guest picks a section and a party size and the system proposes seats together (accessible count and maximum price optional); accepting holds them like taps do. Shown as a link above the map, not a primary button. *(source: contracts/satellite/seating.yaml#recommendSeats; DI-410)*
+- **Continue**: Off until at least one seat is held; goes to Add-ons, sign-in or the basket as the flow says. *(source: F02 step 2; REV3-3)*
 
 **Data it reads**: `getSeatAvailability` (onLoad, Seat status for a performance); `listPerformances` (onLoad, The event's other times, for the time bar and the date and …); `getPublishedBookingFlow` (onLoad, The published booking flow for this product: which steps it …)
 
@@ -945,6 +1234,38 @@ Errors to draw in the form: 404 No selection satisfies the constraints
 | Empty, no results (`?state=emptyNoResults`) | The event has no other time to switch to on the time bar; the chosen performance stays. |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 One or more seats are no longer available, or the selection breaks a seating rule. (SeatConflictProblem); 409 The hold is no longer active (`holdNotActive`) - converted to an order, already released or expired.; 422 More seats than one booking may take: above `VenueSettings.seating.maxSeatsPerGuestOrder` on a guest channel (decided 29 September, rev 3 REV3-7), or above 10 … (SeatLimitProblem) |
 
+#### Edge cases to draw
+
+- **The map has no geometry (imported from a manifest only)**: The step sells from price categories and best-available groups as a list, saying so; it never shows an empty frame or refuses the seated flow. *(source: contracts/satellite/seating.yaml#/components/schemas/SeatAvailability (renderMode list); screens/P01-guest-web-storefront.yaml#WEB-007 notes)*
+- **A seat is taken by someone else between drawing and tapping**: "Seat A4 was just taken" and the dot turns grey; other held seats are kept. *(source: contracts/satellite/seating.yaml#createSeatHold)*
+- **The hold expires**: Seats return to the map, the basket lines are removed with a notice, and the guest can pick again. *(source: DI-422)*
+- **A seating rule would leave a single empty seat**: The tap is refused with the reason ("Please don't leave a single seat between bookings"). *(source: DI-416)*
+- **Date and time asked as a pop-up (seatEventDateMode popupOnSeatMap)**: The map opens with a dialog for date then time; closing it keeps the performance already shown. *(source: REV3-4)*
+
+#### Consistency with other screens
+
+- Match `GST-049`: Same section-first zoom and the same pinch in and out behaviour (agreed 30 September); the app always puts the view box below the map.
+- Match `POS-004`: The till uses the same seat statuses and colours; the guest hold and the cashier hold are the same hold kinds.
+- Match `WEB-049`: Transport seat selection (RTA layout, step 2 of 3) enters this screen; its map is a coach plan, not a bowl.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+venue: Union Arena (stadium), Desert Nights concert, Sat 10 Oct 20:00
+priceBands:
+- VIP Box AED 650
+- Lower Tier AED 245
+- Upper Tier AED 165
+- Accessible bay AED 130 + companion free
+picked:
+- Section 101 · Row A, Seat 4 · AED 165
+- Section 101 · Row A, Seat 5 · AED 165
+theatre: Grand Playhouse, Stalls rows A-K AED 245, Circle A-E AED 165, Balcony A-D AED 95
+countdown: Your seats are held for 7:42
+```
+
 #### Permissions
 
 - `createSeatHold` → `ORDER_CREATE` (operate) · staff, guest
@@ -952,7 +1273,7 @@ Errors to draw in the form: 404 No selection satisfies the constraints
 - `recommendSeats` → `PRODUCT_VIEW` (read) · staff, guest
 - `listPerformances` → `PRODUCT_VIEW` (read) · staff, guest
 - `relinquishSeatHold` → `ORDER_CREATE` (operate) · staff, guest
-- `getPublishedBookingFlow` → no permission · guest
+- `getPublishedBookingFlow` → no permission · guest, staff
 
 **A refused user sees:** **There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the …
 
@@ -1016,9 +1337,9 @@ Also apply: 7 for P01 · Booking & Selection, 39 for all of P01, 29 for every ap
 
 #### Configurable by the tenant
 
-This is a white-label guest screen: it is drawn in the venue's brand, never TICVAI's (except the fixed *Powered by TICVAI* credit). Draw it with the **default theme**, and on the key screens one **alternate tenant theme** (`handoff/design-batches/apps/1-guest-app/WHITE-LABEL.md`).
+This is a white-label guest screen: it is drawn in the venue's brand, never TICVAI's (except the *Powered by TICVAI* credit, a tenant toggle that is on by default: `brand.showPoweredBy`). It has no dark or light mode: the venue's theme applies on every device setting. Draw it with the **default theme**, and on the key screens one **alternate tenant theme** (`handoff/design-batches/apps/1-guest-app/WHITE-LABEL.md`).
 
-**Shell-wide, on every guest screen:** Brand (10, CMS-002, CMS-004, ADM-016); Theme (31, CMS-005, CMS-003, ADM-016); Fonts (5, CMS-003); Header (5, CMS-007); Navigation (17, CMS-009); Footer (website) (15, CMS-007); Languages and right-to-left (2, CMS-011, ADM-018); Modules shown to guests (3, CMS-001); Features (3, CMS-001); Custom domain (website) (3, CMS-017, ADM-017); SEO metadata (website) (13, CMS-013). Each element, its CMS field, allowed values and default: `handoff/design-batches/apps/1-guest-app/WHITE-LABEL.md`.
+**Shell-wide, on every guest screen:** Brand (11, CMS-002, CMS-004, CMS-104); Theme (27, CMS-005, ADM-016); Fonts (5, CMS-003); Header (5, CMS-009); Navigation (17, CMS-009); Footer (website) (15, CMS-009); Languages and right-to-left (2, CMS-011, ADM-018); Modules shown to guests (3, CMS-001, ADM-424); Features (3, CMS-001); Custom domain (website) (3, CMS-017, ADM-017); SEO metadata (website) (13, CMS-013). Each element, its CMS field, allowed values and default: `handoff/design-batches/apps/1-guest-app/WHITE-LABEL.md`.
 
 **Specific to this screen** (the tenant's setting is the input; the right column is what it changes here). Draw each with its default, and the alternate where the alternate theme sets one.
 
@@ -1100,6 +1421,7 @@ Also set there, as content the tenant writes: settings.
 - [ ] Sign-in is asked only where the spec asks for it.
 - [ ] The 22 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] Drawn in the default theme; on a key screen also in the alternate tenant theme; nothing hard-codes a brand colour, logo or font.
+- [ ] The 5 edge case(s) from the process notes are drawn.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -1114,13 +1436,23 @@ Also set there, as content the tenant writes: settings.
 | Module | Booking & Selection · wave 2 · needs the `ticketing` module |
 | Block | Block A · ticket #18204 (APP-WEB-WEB-008) |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025) |
-| Device and orientation | This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. · LTR and RTL · light theme |
+| Device and orientation | This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. · LTR and RTL · the venue's theme |
 | Pattern | statusTracker (compact density): `getUpsellSuggestions` reads one record and nothing reads a population — the screen is about that one thing |
 | Offline | **The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
 | Opens with | `cartId` (session), `bundleId` (navigation), `venueId` (session) · cold entry: Resolves from the session; a cold arrival is the ordinary case. |
 | Route | `/booking-and-selection/add-ons-and-upsell` |
 
 **What the spec says about it.** Purpose derived from the screen name and its operations on 17 August, not from a requirement. Add-ons. Sanket noted on the 20 August review that the screen shows individual add-ons rather than bundles, and it does. **Rewired on that review.** **Corrected 1 October (audit R269):** these notes said `listCatalogueBundles` had gone from this screen then; it never left `apis`, and it is still bound to the *Every bundle* table. It lists the signed catalogue snapshots terminals pull (ADR-0013), not the sellable bundles `promotions.listBundles` returns, so unbinding it is still owed; GST-056, in the same add-ons pair, calls it too, and the two change together. **Rev 3 (decided 29 September).** **Sign-in gate (REV3-3):** with `BookingFlowConfig.signInAt` `afterAddOns` (default), leaving this step asks the guest to sign in, or for a guest code when guest checkout is on (WEB-016); the basket is kept. With `atPayment` the gate is at WEB-012. Floating basket icon and cart side (REV3-10). Every booking-flow setting named here is read from `getTenantConfig` `bookingFlow`, resolved for the venue the guest picked (audit R267): the tenant's values with that venue's `venueOverrides` entry laid over field by field (decided 29 September, rev 3 CFG-11). **The step order comes from the published booking flow** (W12, 29 September): `getPublishedBookingFlow` returns the flow the product (or its category, else the venue default for its kind) uses, with its enabled steps in `sortOrder`; this screen renders when that flow has its step and in the order the flow gives. Flow-level settings …
+
+**From the AI & Intelligence process.** The web Extras step ("Add-ons & Upsell"): the distinct step after ticket selection where up to three upgrades, add-ons and bundles are offered, before sign-in (with "Ask to sign in: After add-ons", the default) and the cart. Block A offers come from the Promotions relationship map through the recommendation slot; Block B swaps in the engine. The one thing to get right: offers must look like helpful extras the guest can ignore, never like a required step, and the add-ons live only here.
+
+**Fixed on main** (the package already carries these; draw what it says): dataTable "Every bundle" bound to listCatalogueBundles (signed terminal snapshots, with publishedBy, contentHash, signatureKeyId columns). (CHG-SGU-016); The suggestion panel binds getUpsellSuggestions, which is not in the screen's apis (decideRecommendations is). (CHG-SGU-016); The WEB-008 to WEB-016 transition (sign-in after add-ons) is missing from navigation. (CHG-SGU-016).
+
+#### Decided on this screen
+
+Answered questions: draw the decision, not the old default. Where a decision and the tables below differ, the decision wins.
+
+- **Is the swim-vest add-on offered here for non-swimmers (Help me choose answer), and is the splash-and-river pass a separate product?** → Drawn default stands (answer: "Default / recommended accepted"): The vest is an add-on on this step; the splash-and-river pass is its own product (as built). *(decided by Chinmay, 2026-10-02; DEC-015 / CHG-NOTE-001)*
 
 #### Inputs: what the user enters or picks
 
@@ -1160,25 +1492,26 @@ Also set there, as content the tenant writes: settings.
 
 Errors to draw in the form: 403 The performance's on-sale waiting room is on and the request has no valid admission token (ADR-0066).; 409 No capacity, or the product is not sellable on this channel (`notSellableOnChannel`). (CartProblem); 422 The booked window is missing, not allowed or the wrong length for the variant (`windowRequired`, `windowNotAllowed`, `windowLengthMismatch`; rev 3 REV3-13), or … (CartProblem)
 
+**Rules for these inputs** (from the AI & Intelligence process; these refine the tables above and win where they differ)
+
+- **add-on quantity**: -/+ stepper, minimum 0, price multiplies (setting "Quantities on add-ons"); mandatory add-ons attached to a product are pre-selected and cannot be removed here. *(source: DI-1070 / DI-470)*
+- **No thanks**: As GST-048 - an explicit decline per card; ignoring is not a decline. *(source: ADR-0052 (AI-D07) / contracts/satellite/ai.yaml#recordRecommendationEvents)*
+
 #### Outputs: what the screen shows and produces
 
 **Shown**
 
-**The upsell suggestion** (detail panel, from `getUpsellSuggestions`)
+**Suggested for you** (card list, from `decideRecommendations`): The engine's slot (`decideRecommendations`, placement cart, maxItems 3: the client set at most three, DI-959), answered in Block A from the Promotions relationship map (ADR-0052). Each card shows the price from Pricing and the template reason; impressions and clicks go to `recordRecommendationEvents`.
 
 | Shows | Format | Notes |
 |---|---|---|
-| Variant | the name it points at, never the id | — |
-| Bundle | the name it points at, never the id | — |
-| Name | text | — |
-| Price | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Discounted price | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Source | chip: Rule, Recommendation | A configured rule always outranks a model. |
-| Rule | the name it points at, never the id | — |
+| Product | the name it points at, never the id | The product recommended. Exactly one of `productId`, `promotionId` or `couponRef`, `rewardId` or `challengeId` is set, by `kind` (29 … |
+| Kind | chip: Upsell, Cross sell, Upgrade, Bundle, Add on, Membership… | — |
+| Price ref | text | The Pricing reference the channel resolves to a price. AI never computes a price. |
+| Reason text | text | The rendered template in the session locale, where the channel shows reasons. |
 | Rank | 1,234 | — |
-| Rationale | text | — |
 
-**The bundle** (detail panel, from `getBundle`)
+**The bundle** (detail panel, from `getBundle`): A bundle the recommendation slot names (`kind` bundle), opened from its card; signed catalogue snapshots (`listCatalogueBundles`) are the tills', not the guest's (R269).
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -1199,21 +1532,7 @@ Errors to draw in the form: 403 The performance's on-sale waiting room is on and
 | Has been sold | yes / no (icon or chip) | True locks components and allocation against amendment. |
 | Is active | yes / no (icon or chip) | — |
 
-**Every bundle** (data table, from `listCatalogueBundles`)
-
-| Shows | Format | Notes |
-|---|---|---|
-| Venue | the name it points at, never the id | — |
-| Published at | 1 Oct 2026, 14:30 | — |
-| Published by | the name it points at, never the id | — |
-| Content hash | text | — |
-| Signature key | text | Key that signed this bundle. A terminal offline across a key rotation needs a grace window, or it cannot verify the next bundle. |
-| Stale after | 1 Oct 2026, 14:30 | — |
-| Size bytes | 1,234 | — |
-| Note | text | — |
-| Applied by workstations | 1,234 | — |
-
-**Booking steps** (progress indicator, from `getPublishedBookingFlow`): The steps of the published flow in their `sortOrder`, this one (extras) highlighted. A step the flow has turned off is not shown and is skipped by Continue and Back.
+**Booking steps** (progress indicator, from `getPublishedBookingFlow`): The steps of the published flow in their `sortOrder`, this one (extras) highlighted. A step the flow has turned off is not shown and is skipped by Continue and Back. Drawn in the venue's `BookingFlowSettings.stepIndicator` style; `embedMode` and `singleEventPage` come from the same published settings (CMS-016) (CHG-SGU-022).
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -1225,7 +1544,17 @@ Errors to draw in the form: 403 The performance's on-sale waiting room is on and
 |---|---|---|---|---|---|
 | Add cart line (primary button) | `addCartLine` POST `/carts/{cartId}/lines` | AddCartLineRequest | Cart | 403 The performance's on-sale waiting room is on and the request has no valid admission token (ADR-0066).; 409 No capacity, or the product is not sellable on this channel (`notSellableOnChannel`). (CartProblem); 422 The … | opens modal first |
 
-**Data it reads**: `listCatalogueBundles` (onLoad, Which bundles apply here); `decideRecommendations` (onLoad, Fill a recommendation slot); `getPublishedBookingFlow` (onLoad, The published booking flow for this product: which steps it …)
+**Rules for what is shown** (from the AI & Intelligence process; these refine the tables above and win where they differ)
+
+- **offer cards**: Max three, ranked, image + name + price + template reason; bundles show savings with the original struck through (savingsAmount / savingsPercentage from the bundle). Reasons from templates only, in the page language. *(source: DI-959 / DI-586 / contracts/satellite/promotions.yaml#getBundle / ADR-0052 (AI-D09))*
+- **booking step indicator**: The Extras step is one step of the venue's published booking flow; when the flow has no Extras step or nothing qualifies, the step disappears from the indicator. *(source: contracts/satellite/white-label.yaml#getPublishedBookingFlow / DI-428)*
+
+**What each action does** (from the AI & Intelligence process; these refine the tables above and win where they differ)
+
+- **Continue**: With signInAt afterAddOns (default) opens sign-in (WEB-016), or the guest code when guest checkout is on; the basket is kept. With atPayment goes straight to the cart. *(source: DI-1043 / screens/P01-guest-web-storefront.yaml#WEB-008 (notes, REV3-3))*
+- **Add / No thanks**: As GST-048. *(source: contracts/spine/orders.yaml#addCartLine / contracts/satellite/ai.yaml#recordRecommendationEvents)*
+
+**Data it reads**: `decideRecommendations` (onLoad, Fill the cart slot, maxItems 3 (DI-959)); `getPublishedBookingFlow` (onLoad, The published booking flow for this product: which steps it …)
 
 **Where the user goes next**
 
@@ -1238,29 +1567,58 @@ Errors to draw in the form: 403 The performance's on-sale waiting room is on and
 
 | State | What it shows |
 |---|---|
-| Loading (`?state=loading`) | The add-ons upsell, read by `getUpsellSuggestions`. |
+| Loading (`?state=loading`) | The add-ons, read by `decideRecommendations`. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the add-ons upsell untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No add-ons upsell yet. Offers Add cart line (`addCartLine`). |
-| Empty, no results (`?state=emptyNoResults`) | Never shown: `listCatalogueBundles` takes no filter, so an empty list is always the first-run state above. |
+| Empty, first run (`?state=emptyFirstRun`) | No add-ons for this booking: the step is skipped and Continue goes on to sign-in. |
 | Permission denied (`?state=emptyNoAccess`) | **There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the … |
 | Offline (`?state=offline`) | **The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 No capacity, or the product is not sellable on this channel (`notSellableOnChannel`). (CartProblem); 422 The booked window is missing, not allowed or the wrong length for the variant (`windowRequired`, `windowNotAllowed`, `windowLengthMismatch`; rev 3 REV3-13), or … (CartProblem) |
+
+#### Edge cases to draw
+
+- **Recommendation slot times out (200 ms) or recommendations are paused**: Rules answer or no offers; the step renders the venue's configured add-ons for the product and never blocks Continue. *(source: ADR-0052 / contracts/satellite/ai.yaml#pauseAiCapability)*
+- **Guest is a member**: No membership offer; F&B or retail add-ons instead. An expiring membership shows a renewal. *(source: DI-960)*
+- **Arabic**: Cards mirror; the cart stays on the right by default ("Cart side in Arabic"). *(source: DI-1051)*
+
+#### Consistency with other screens
+
+- Match `GST-048`: Same step, same limits and wording.
+- Match `GST-056`: The app's add-ons screen shares the catalogue-bundle binding that must be removed (R269); change both together.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+venue: Coastal Aqua
+cart: 2 Adult + 2 Child Day Pass, Sat 10 Oct
+offers:
+- name: Family Day Pass (2+2)
+  price: AED 540.00
+  was: AED 600.00
+  reason: Saves AED 60 for your family
+- name: Cabana - Family
+  price: AED 350.00
+  reason: Shade and seating for up to 6
+- name: Lunch combo
+  price: AED 45.00 each
+  reason: Burger, fries and a drink
+  stepper: true
+```
 
 #### Permissions
 
 - `addCartLine` → no permission · guest, partner, staff
 - `getBundle` → `PRODUCT_VIEW` (read) · staff, guest
-- `listCatalogueBundles` → `PRODUCT_VIEW` (read) · staff, guest
 - `decideRecommendations` → `AI_USE` (operate) · staff, guest, anonymous
 - `recordRecommendationEvents` → `AI_USE` (operate) · staff, guest, anonymous
-- `getPublishedBookingFlow` → no permission · guest
-- `getUpsellSuggestions` → `PRODUCT_VIEW` (read) · staff, guest
+- `getPublishedBookingFlow` → no permission · guest, staff
 
 **A refused user sees:** **There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the …
 
 #### Requirements it meets
 
-56 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+47 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
 
 | Ref | Requirement (shortened) | Domain | Verdict | Via |
 |---|---|---|---|---|
@@ -1276,7 +1634,7 @@ Errors to draw in the form: 403 The performance's on-sale waiting room is on and
 | 2.13.45 | AI Assisted Recommendations | Ticketing Sales | CONTRACTED | `decideRecommendations` |
 | 2.14.18 | AI recommends upgrades, renewals and offers. | Ticketing Sales | CONTRACTED | `decideRecommendations` |
 | 3.7.9 | System shall generate personalized recommendations for attractions, experiences, memberships, annual passes, F&B products, retail products, upgrades, and add-ons using AI and behavioral analytics. | Admission and Access | CONTRACTED | `decideRecommendations` |
-| … 44 more | | | | `traceability.json` |
+| … 35 more | | | | `traceability.json` |
 
 #### Client meeting inputs
 
@@ -1307,9 +1665,9 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Configurable by the tenant
 
-This is a white-label guest screen: it is drawn in the venue's brand, never TICVAI's (except the fixed *Powered by TICVAI* credit). Draw it with the **default theme**, and on the key screens one **alternate tenant theme** (`handoff/design-batches/apps/1-guest-app/WHITE-LABEL.md`).
+This is a white-label guest screen: it is drawn in the venue's brand, never TICVAI's (except the *Powered by TICVAI* credit, a tenant toggle that is on by default: `brand.showPoweredBy`). It has no dark or light mode: the venue's theme applies on every device setting. Draw it with the **default theme**, and on the key screens one **alternate tenant theme** (`handoff/design-batches/apps/1-guest-app/WHITE-LABEL.md`).
 
-**Shell-wide, on every guest screen:** Brand (10, CMS-002, CMS-004, ADM-016); Theme (31, CMS-005, CMS-003, ADM-016); Fonts (5, CMS-003); Header (5, CMS-007); Navigation (17, CMS-009); Footer (website) (15, CMS-007); Languages and right-to-left (2, CMS-011, ADM-018); Modules shown to guests (3, CMS-001); Features (3, CMS-001); Custom domain (website) (3, CMS-017, ADM-017); SEO metadata (website) (13, CMS-013). Each element, its CMS field, allowed values and default: `handoff/design-batches/apps/1-guest-app/WHITE-LABEL.md`.
+**Shell-wide, on every guest screen:** Brand (11, CMS-002, CMS-004, CMS-104); Theme (27, CMS-005, ADM-016); Fonts (5, CMS-003); Header (5, CMS-009); Navigation (17, CMS-009); Footer (website) (15, CMS-009); Languages and right-to-left (2, CMS-011, ADM-018); Modules shown to guests (3, CMS-001, ADM-424); Features (3, CMS-001); Custom domain (website) (3, CMS-017, ADM-017); SEO metadata (website) (13, CMS-013). Each element, its CMS field, allowed values and default: `handoff/design-batches/apps/1-guest-app/WHITE-LABEL.md`.
 
 **Specific to this screen** (the tenant's setting is the input; the right column is what it changes here). Draw each with its default, and the alternate where the alternate theme sets one.
 
@@ -1372,21 +1730,23 @@ Also set there, as content the tenant writes: settings.
 - Wireframe frame: `wireframes/P01 Guest Web.dc.html#web-008` · status **review** · provenance client-verified
 - Prototype (rev 3, verified 2026-09-28, match exact): `sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html`, view *Book → 'Extras' step (e.g. Summit Peaks → Dated day pass → Continue)*. Differences: Sign-in is asked when leaving Add-ons (Config 'Ask to sign in: After add-ons', Rev 3 item 3), so WEB-008 → WEB-016 is a transition YAML does not have. Add-ons also appear on the payment step (combo) and confirmation (upsells). 28 Sep flow review: all add-ons live here only.
 - ADR-0013 *Local-First Point of Sale* (`docs/adr/0013-local-first-point-of-sale.md`)
+- ADR-0052 *One recommendation engine; runtime in AI, configuration in Promotions* (`docs/adr/0052-one-recommendation-engine.md`)
 - ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 - ADR-0037 *A lock holds one statement, not a transaction* (`docs/adr/0037-what-may-be-inside-a-lock.md`)
 - ADR-0066 *The on-sale waiting room sits at the edge, apart from the ride queue* (`docs/adr/0066-the-on-sale-waiting-room-is-separate-from-the-ride-queue.md`)
-- ADR-0052 *One recommendation engine; runtime in AI, configuration in Promotions* (`docs/adr/0052-one-recommendation-engine.md`)
 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (19), with its required mark, default, format and its error state (403, 404, 409, 422).
-- [ ] Every output is drawn (35 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
-- [ ] Every state opens from `#WEB-008?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
+- [ ] Every output is drawn (22 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every state opens from `#WEB-008?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Add cart line.
 - [ ] Every transition is wired: `WEB-005`, `WEB-006`, `WEB-010`, `WEB-016`.
 - [ ] Sign-in is asked only where the spec asks for it.
 - [ ] The 16 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] Drawn in the default theme; on a key screen also in the alternate tenant theme; nothing hard-codes a brand colour, logo or font.
+- [ ] The 3 edge case(s) from the process notes are drawn.
+- [ ] The 1 decision(s) taken on this screen are drawn as decided, not as the old default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -1401,7 +1761,7 @@ Also set there, as content the tenant writes: settings.
 | Module | Booking & Selection · wave 3 · needs the `marketing` module |
 | Block | Block A · ticket #18224 (APP-WEB-WEB-009) |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025) |
-| Device and orientation | This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. · LTR and RTL · light theme |
+| Device and orientation | This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. · LTR and RTL · the venue's theme |
 | Pattern | statusTracker (compact density): `getWishlist` reads one record and nothing reads a population — the screen is about that one thing |
 | Offline | **The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
 | Opens with | `itemId` (deepLink), `subjectId` (session) · cold entry: **A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared ticket, a forwarded confirmation … |
@@ -1409,19 +1769,24 @@ Also set there, as content the tenant writes: settings.
 
 **What the spec says about it.** Withdrawn products stay in the list marked unavailable. A guest who saved something and finds it silently gone assumes the feature is broken. Purpose derived from the screen name and its operations on 17 August, not from a requirement. Wishlist. **Device operations removed** — Sanket flagged that no device management appears on this screen, and he was right. **Rewired on the 20 August review.** **Rev 3 (decided 29 September, rev 3 GAP-D3).** Built as one implementation with WEB-024 (the account's devices, wishlist and consent); both ids are kept.
 
+**From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** The guest's wishlist on the web: products, and specific dates, saved to book later, including F&B and retail items to buy on site. It is built as one implementation with WEB-024 (account) and keeps both ids. The one thing to get right: nothing silently disappears. A withdrawn product stays on the list marked as no longer available, because a guest who finds a saved item gone assumes the feature is broken.
+
+**Fixed on main** (the package already carries these; draw what it says): The "Add to wishlist" modal on this screen asks the guest to supply a variantId (and optionally a performanceId). (CHG-SGU-017).
+
+#### Decided on this screen
+
+Answered questions: draw the decision, not the old default. Where a decision and the tables below differ, the decision wins.
+
+- **Does a wishlist entry for a performance that has passed stay, or should the platform drop it, and should a guest be told when a saved date is about to sell out?** → Drawn default stands (answer: "Default / recommended accepted"): Keep it under "Past dates" (no deletion); no sell-out alert until a journey for it is configured. *(decided by Chinmay, 2026-10-02; DEC-022 / CHG-NOTE-002)*
+
 #### Inputs: what the user enters or picks
 
-**Form: Add to wishlist** (modal, opened by *Add to wishlist*; *Add to wishlist* calls `addToWishlist`, *Cancel* sends nothing)
+Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
 
-**Collects what `addToWishlist` sends before it is called.** Required: `variantId`. Optional: `performanceId`, `note`. Dismissing sends nothing; the screen behind is unchanged.
+**Rules for these inputs** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
 
-| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
-|---|---|---|---|---|---|---|---|
-| Variant `variantId` | picker: choose a variant | required | — | — | shows names, sends the id | — | `addToWishlist` body |
-| Performance `performanceId` | picker: choose a performance | optional | — | — | shows names, sends the id | Saving a specific date rather than the product generally. | `addToWishlist` body |
-| Note `note` | text area | optional | — | max length 200 | — | — | `addToWishlist` body |
-
-Errors to draw in the form: 404 Variant not found or not sellable in this venue
+- **Saving an item (heart on a product or date card)**: Saving happens on the product and date screens (WEB-005, WEB-006), not by typing on this screen. The entry key is the variant plus the performance. The same product for two different dates is two entries; a save with no date is a third, date-less entry for the product generally. Saving twice is one entry, so a double tap never inflates the count. *(source: contracts/satellite/marketing-crm.yaml#addToWishlist; R149)*
+- **Note**: Optional free text the guest keeps for themselves ("for Omar's birthday"). Shown under the item, editable only by removing and saving again (there is no update operation). *(source: contracts/satellite/marketing-crm.yaml#addToWishlist)*
 
 #### Outputs: what the screen shows and produces
 
@@ -1434,13 +1799,42 @@ Errors to draw in the form: 404 Variant not found or not sellable in this venue
 | Subject | the name it points at, never the id | — |
 | Items | list or chips (count when long) | — |
 
+**Removed. Undo** (toast, from `addToWishlist`): The 5-second Undo after Remove; re-saves the same entry.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Subject | the name it points at, never the id | — |
+| Items | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
+| Variant | the name it points at, never the id | — |
+| Product name | text | — |
+| Performance | the name it points at, never the id | — |
+| Performance starts at | 1 Oct 2026, 14:30 | — |
+| Price | AED 1,234.50 | The variant's current list price when the wishlist is read. Stored as `list_price` (naming-and-style 5.1 bans a bare `price` column); the … |
+| Image | the image or video | — |
+| Is available | yes / no (icon or chip) | False where the product has been withdrawn or the performance has passed. Returned rather than dropped — a guest who saved something and … |
+| Unavailable reason | text | — |
+| Note | text | — |
+| Added at | 1 Oct 2026, 14:30 | — |
+
 **Actions and what each produces**
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
 | Confirm (confirm dialog) | navigation or local | — | — | — | — |
-| Add to wishlist (primary button) | `addToWishlist` POST `/guests/{subjectId}/wishlist` | inline | Wishlist | 404 Variant not found or not sellable in this venue | opens modal first |
+| Browse (secondary button) | navigation or local | — | — | — | — |
 | Remove from wishlist (destructive button) | `removeFromWishlist` DELETE `/guests/{subjectId}/wishlist/{itemId}` | — | — | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path. | — |
+
+**Rules for what is shown** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
+
+- **Each saved item**: Photo, product name, ticket type, the saved date and time or "Any date", and the current price from the catalogue in AED. Items whose product was withdrawn come back with isAvailable false: show them greyed with "No longer available" and offer only Remove, never Book. *(source: contracts/satellite/marketing-crm.yaml#getWishlist)*
+- **Order of the list**: Dated items soonest first, then "Any date" items, then unavailable items last. Group F&B and retail items to buy on site under their own heading, because they are bought at the venue, not online. *(source: designer default; DI-202)*
+- **Header count**: The count of saved items in the account menu equals the list length. Idempotent saves keep it honest. *(source: contracts/satellite/marketing-crm.yaml#addToWishlist)*
+
+**What each action does** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
+
+- **Book**: Opens ticket selection (WEB-005) or the date step (WEB-006) with the product, and the date where one was saved, pre-selected. If that date has sold out, the date step opens with the date shown as sold out rather than silently moving to another date. *(source: screens/P01-guest-web-storefront.yaml#WEB-009)*
+- **Remove**: Removes the one entry (removeFromWishlist). No confirmation dialog for a single item. Show an Undo toast for 5 seconds; Undo re-saves the same variant and date, which is idempotent. *(source: contracts/satellite/marketing-crm.yaml#removeFromWishlist; designer default)*
 
 **Data it reads**: `getWishlist` (onLoad, Read a guest's saved items)
 
@@ -1462,6 +1856,31 @@ Errors to draw in the form: 404 Variant not found or not sellable in this venue
 | Empty, first run (`?state=emptyFirstRun`) | Nothing saved — explains what the list is for |
 | Permission denied (`?state=emptyNoAccess`) | **There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the … |
 | Offline (`?state=offline`) | **The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
+
+#### Edge cases to draw
+
+- **The saved date is in the past**: Shown under "Past dates" with "This date has passed" and a Book another date action that opens the date step for the product. The contract only flags withdrawn products, so this state is read from the performance date on the client. *(source: contracts/satellite/marketing-crm.yaml#getWishlist)*
+- **Guest not signed in**: Sign in and come back here. The wishlist is the guest's own and has no anonymous version. *(source: screens/P01-guest-web-storefront.yaml#WEB-009)*
+- **Offline or the connection drops**: The list already loaded stays, marked with its age. Remove and Book wait for the connection and say so. *(source: screens/P01-guest-web-storefront.yaml#WEB-009)*
+
+#### Consistency with other screens
+
+- Match `GST-020`: Same list, same item card, same "No longer available" treatment, same wording "Wishlist".
+- Match `WEB-024`: One implementation with two ids (GAP-D3); the account's wishlist pane is this screen.
+- Match `BO-757`: A saved item is a behavioural signal segments read (wishlist-based audiences); the guest never sees that wording.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+items:
+- Coastal Aqua Day Pass - Adult, Sat 17 Oct 2026, AED 295.00
+- Kids Club Explorer Pass - Child (any date), AED 120.00
+- Tidewater Museum Pearl Diving Heritage Tour, Fri 23 Oct 2026 14:30, AED 85.00 (No longer available)
+- On site - Karak chai and luqaimat, AED 18.00
+noteExample: For Omar's birthday
+```
 
 #### Permissions
 
@@ -1494,9 +1913,9 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Configurable by the tenant
 
-This is a white-label guest screen: it is drawn in the venue's brand, never TICVAI's (except the fixed *Powered by TICVAI* credit). Draw it with the **default theme**, and on the key screens one **alternate tenant theme** (`handoff/design-batches/apps/1-guest-app/WHITE-LABEL.md`).
+This is a white-label guest screen: it is drawn in the venue's brand, never TICVAI's (except the *Powered by TICVAI* credit, a tenant toggle that is on by default: `brand.showPoweredBy`). It has no dark or light mode: the venue's theme applies on every device setting. Draw it with the **default theme**, and on the key screens one **alternate tenant theme** (`handoff/design-batches/apps/1-guest-app/WHITE-LABEL.md`).
 
-**Shell-wide, on every guest screen:** Brand (10, CMS-002, CMS-004, ADM-016); Theme (31, CMS-005, CMS-003, ADM-016); Fonts (5, CMS-003); Header (5, CMS-007); Navigation (17, CMS-009); Footer (website) (15, CMS-007); Languages and right-to-left (2, CMS-011, ADM-018); Modules shown to guests (3, CMS-001); Features (3, CMS-001); Custom domain (website) (3, CMS-017, ADM-017); SEO metadata (website) (13, CMS-013). Each element, its CMS field, allowed values and default: `handoff/design-batches/apps/1-guest-app/WHITE-LABEL.md`.
+**Shell-wide, on every guest screen:** Brand (11, CMS-002, CMS-004, CMS-104); Theme (27, CMS-005, ADM-016); Fonts (5, CMS-003); Header (5, CMS-009); Navigation (17, CMS-009); Footer (website) (15, CMS-009); Languages and right-to-left (2, CMS-011, ADM-018); Modules shown to guests (3, CMS-001, ADM-424); Features (3, CMS-001); Custom domain (website) (3, CMS-017, ADM-017); SEO metadata (website) (13, CMS-013). Each element, its CMS field, allowed values and default: `handoff/design-batches/apps/1-guest-app/WHITE-LABEL.md`.
 
 #### References
 
@@ -1506,14 +1925,16 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (3), with its required mark, default, format and its error state (404).
-- [ ] Every output is drawn (2 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (404).
+- [ ] Every output is drawn (15 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#WEB-009?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: Confirm, Add to wishlist, Remove from wishlist.
+- [ ] Every action is wired with its success and its failure: Confirm, Browse, Remove from wishlist.
 - [ ] Every transition is wired: `WEB-005`, `WEB-006`.
 - [ ] Sign-in is asked only where the spec asks for it.
 - [ ] The 2 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] Drawn in the default theme; on a key screen also in the alternate tenant theme; nothing hard-codes a brand colour, logo or font.
+- [ ] The 3 edge case(s) from the process notes are drawn.
+- [ ] The 1 decision(s) taken on this screen are drawn as decided, not as the old default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -1528,13 +1949,21 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 | Module | Booking & Selection · wave 3 · needs the `resources` module |
 | Block | Block A · ticket #20736 (APP-WEB-WEB-047) |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025) |
-| Device and orientation | This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. · LTR and RTL · light theme |
+| Device and orientation | This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. · LTR and RTL · the venue's theme |
 | Pattern | listDetail (compact density): `getMapResourceAvailability` reads the population of spots and a tap holds one of them — list (as a map), select, act |
 | Offline | **The offline banner shows.** The map and the spots already loaded stay on screen with their age, never shown as free now. Holding a spot and adding it to the basket need the connection — a cabana held offline is a cabana two people think they have. |
 | Opens with | `mapId` (WEB-004), `productId` (WEB-004), `cartId` (session), `venueId` (session), `holdId` (navigation) · cold entry: **A link to a map that is no longer published, or a day that has passed,** says which and offers today on the current map. Nothing is held on arrival. |
 | Route | `/booking-and-selection/map-booking` |
 
 **What the spec says about it.** **New 29 September** (decided 29 September, rev 3 REV3-15 and GAP-C2). **Cabana maps work like the stadium seat map:** the venue's map is ingested with its cabanas, loungers and other bookable spots (number, zone, capacity, price band), and the guest picks a specific one on the map and buys it. This supersedes audit R073 (c) (*cabanas stay staff-booked*) for resources placed on an ingested map. **Tables on the map are non-dining spots sold like cabanas** (decided 29 September by the user); a restaurant table stays the F&B reservation flow (WEB-036 / GST-070). The map comes from `getVenueMap` (its `resources`: label, kind, zone, capacity, price band, boundary) and the status of every spot for the chosen day from one `getMapResourceAvailability` call, joined on `resourceId`; held, booked and unavailable spots are greyed. Tapping a free spot calls `createResourceHold` and starts the *Remaining time* counter from the hold's `expiresAt` (8 minutes, extendable to 30 in all, audit R169); Add to basket sends `addCartLine` with the spot's price-band `variantId` and the `resourceHoldId`, e.g. *Cabana B09 · Large cabana · Beach, AED 1,855*. Picking another spot releases the first hold (`relinquishResourceHold`). **29 September (W6).** Map booking of cabanas stays **optional per flow**: the venue picks *Cabana: pick on map* (WEB-047) or *Cabana: by size* (capacity) as its booking flow (CMS-103), and the resource selection policy (`guestMayChoose`, REV3-15) decides whether the guest chooses the unit. Same venue-map back end as F&B and locations.
+
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** The guest picks a specific cabana, lounger, beach table or other spot on the venue's ingested map, like a stadium seat: numbered spots by zone, free ones tappable, held/booked ones greyed, a list alternative, and a remaining-time counter once a spot is held. The one thing to get right: the hold countdown is always visible and the spot is released (and the guest told) when it runs out.
+
+#### Decided on this screen
+
+Answered questions: draw the decision, not the old default. Where a decision and the tables below differ, the decision wins.
+
+- **Should cabana categories (premium, VIP, luxury, private, family, couples) be a filter on the map?** → Drawn default accepted: Show category as a filter chip row above the zones when the venue sets categories. *(decided by Chinmay, 2026-10-02; DEC-143 / CHG-NOTE-008)*
 
 #### Inputs: what the user enters or picks
 
@@ -1592,6 +2021,12 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 | Passenger type code `attributes.transport.passengerTypeCode` | text field | optional | — | pattern `^[a-z][a-zA-Z0-9]{0,31}$` | — | The fare table's passenger type (`adult`, `child`, ...). Required on a one-way trip. | `addCartLine` body |
 | Pass type `attributes.transport.passTypeId` | picker: choose a pass type | optional | — | — | shows names, sends the id | Pass purchase only. The `transport.PassType` bought for this station pair. | `addCartLine` body |
 | Pass entitlement `attributes.transport.passEntitlementId` | picker: choose a pass entitlement | optional | — | — | shows names, sends the id | A seat reserved with a pass already owned. The line is zero-priced and validated against the pass (stations covered, an entry left, within validity). | `addCartLine` body |
+
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Date (and slot)**: Short date strip plus calendar; the day's window is the venue opening, or a slot where the product is slotted. *(source: contracts/satellite/resources.yaml#getMapResourceAvailability / TRACKER Actions row 312)*
+- **Who is coming**: Party size stepper (adults and children); spots smaller than the party are shown but not tappable, with "Seats 4". *(source: contracts/satellite/resources.yaml#createResourceHold)*
+- **Area / Map**: Zone chips (Beach, Tower, Riverside, Splash zone) filter the map; a map selector only when the venue has more than one bookable map. *(source: contracts/satellite/venue-map.yaml#listBookableVenueMaps)*
 
 #### Outputs: what the screen shows and produces
 
@@ -1658,6 +2093,18 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 | Keep it longer (secondary button) | `extendResourceHold` POST `/resource-holds/{holdId}/extend` | — | ResourceHold | 409 Already expired or converted, or the extension limit is reached. `refusedReason` says which. (ResourceHoldExtendProblem) | — |
 | Pick another (secondary button) | `relinquishResourceHold` DELETE `/resource-holds/{holdId}` | — | — | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path. | opens confirmDialog first |
 
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Map**: Spots drawn at their boundaries and numbered by zone (R01-R10, T01-T08, S01-S06, B01-B10); free in the brand colour, held or booked greyed and marked, unavailable struck; the selected spot outlined. Map on the first screen, not behind a button. *(source: DI-1055 / contracts/satellite/venue-map.yaml#getVenueMap)*
+- **Spot card**: "Cabana B09 - Large cabana - Beach - seats 6 - AED 1,855" with amenities where the product carries them. *(source: DI-1055 / DI-687)*
+- **Remaining time**: Banner counting down from the hold's expiry; at zero, "Your hold on B09 has ended" and the spot frees. *(source: contracts/satellite/resources.yaml#getResourceHold / DI-1055)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Tap a free spot**: Places a hold for the window and starts the counter; tapping a second spot asks to release the first. *(source: contracts/satellite/resources.yaml#createResourceHold / F52 step 2)*
+- **Keep it longer**: Extends the hold where allowed; disabled when the maximum extensions are used, with the reason. *(source: contracts/satellite/resources.yaml#extendResourceHold)*
+- **Add to basket**: Adds the spot's price band and the hold to the cart; continue to add-ons (towels, rentals) or checkout. *(source: contracts/spine/orders.yaml#addCartLine)*
+
 **Data it reads**: `getVenueMap` (onLoad, The map with its placed spots (label, kind, zone, capacity …); `getMapResourceAvailability` (onLoad, Every spot's status for the day in one call); `getResourceHold` (onInterval, The hold's countdown With the guest session the device …); `listBookableVenueMaps` (onLoad, Find the venue's published map with bookable spots (with …)
 
 **Where the user goes next**
@@ -1677,6 +2124,47 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 | Permission denied (`?state=emptyNoAccess`) | **There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the … |
 | Offline (`?state=offline`) | **The offline banner shows.** The map and the spots already loaded stay on screen with their age, never shown as free now. Holding a spot and adding it to the basket need the connection — a cabana held offline is a cabana two people think they have. |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 Already expired or converted, or the extension limit is reached. `refusedReason` says which. (ResourceHoldExtendProblem); 409 No capacity, or the product is not sellable on this channel (`notSellableOnChannel`). (CartProblem); 409 Taken for some of the window, held by someone else, not placed on the published map, or marked not bookable. (ResourceConflictProblem); 422 The booked window is … |
+
+#### Edge cases to draw
+
+- **Spot taken between seeing and tapping**: "B09 was just taken - pick another" and the map refreshes; no silent failure. *(source: contracts/satellite/resources.yaml#createResourceHold)*
+- **Offline**: Loaded map stays with its age and nothing shows as free now; holding needs the connection. *(source: screens/P01-guest-web-storefront.yaml#WEB-047)*
+- **Venue does not use map booking**: The screen is not offered; the product books without a map (configurable per operator). *(source: DI-1008)*
+
+#### Consistency with other screens
+
+- Match `GST-074`: Same map, numbering, colours and countdown on the app.
+- Match `BO-096`: A booked spot appears on the resource calendar with setup, teardown and cleaning bands.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+map: Coastal Aqua beach map
+spots:
+- spot: B09
+  kind: Large cabana
+  zone: Beach
+  seats: 6
+  price: AED 1,855
+  status: Free
+- spot: T03
+  kind: Tower cabana
+  zone: Tower
+  seats: 4
+  price: AED 1,250
+  status: Booked
+- spot: R07
+  kind: Lounger pair
+  zone: Riverside
+  seats: 2
+  price: AED 220
+  status: Held
+hold:
+  spot: B09
+  remaining: 09:42
+```
 
 #### Permissions
 
@@ -1725,9 +2213,9 @@ Also apply: 7 for P01 · Booking & Selection, 39 for all of P01, 29 for every ap
 
 #### Configurable by the tenant
 
-This is a white-label guest screen: it is drawn in the venue's brand, never TICVAI's (except the fixed *Powered by TICVAI* credit). Draw it with the **default theme**, and on the key screens one **alternate tenant theme** (`handoff/design-batches/apps/1-guest-app/WHITE-LABEL.md`).
+This is a white-label guest screen: it is drawn in the venue's brand, never TICVAI's (except the *Powered by TICVAI* credit, a tenant toggle that is on by default: `brand.showPoweredBy`). It has no dark or light mode: the venue's theme applies on every device setting. Draw it with the **default theme**, and on the key screens one **alternate tenant theme** (`handoff/design-batches/apps/1-guest-app/WHITE-LABEL.md`).
 
-**Shell-wide, on every guest screen:** Brand (10, CMS-002, CMS-004, ADM-016); Theme (31, CMS-005, CMS-003, ADM-016); Fonts (5, CMS-003); Header (5, CMS-007); Navigation (17, CMS-009); Footer (website) (15, CMS-007); Languages and right-to-left (2, CMS-011, ADM-018); Modules shown to guests (3, CMS-001); Features (3, CMS-001); Custom domain (website) (3, CMS-017, ADM-017); SEO metadata (website) (13, CMS-013). Each element, its CMS field, allowed values and default: `handoff/design-batches/apps/1-guest-app/WHITE-LABEL.md`.
+**Shell-wide, on every guest screen:** Brand (11, CMS-002, CMS-004, CMS-104); Theme (27, CMS-005, ADM-016); Fonts (5, CMS-003); Header (5, CMS-009); Navigation (17, CMS-009); Footer (website) (15, CMS-009); Languages and right-to-left (2, CMS-011, ADM-018); Modules shown to guests (3, CMS-001, ADM-424); Features (3, CMS-001); Custom domain (website) (3, CMS-017, ADM-017); SEO metadata (website) (13, CMS-013). Each element, its CMS field, allowed values and default: `handoff/design-batches/apps/1-guest-app/WHITE-LABEL.md`.
 
 #### References
 
@@ -1749,6 +2237,8 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 - [ ] Sign-in is asked only where the spec asks for it.
 - [ ] The 4 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] Drawn in the default theme; on a key screen also in the alternate tenant theme; nothing hard-codes a brand colour, logo or font.
+- [ ] The 3 edge case(s) from the process notes are drawn.
+- [ ] The 1 decision(s) taken on this screen are drawn as decided, not as the old default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -1763,13 +2253,19 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 | Module | Booking & Selection · wave 3 · needs the `resources` module |
 | Block | Block A · ticket #20706 (APP-WEB-WEB-048) |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025) |
-| Device and orientation | This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. · LTR and RTL · light theme |
+| Device and orientation | This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. · LTR and RTL · the venue's theme |
 | Pattern | multiStepForm (compact density): A staged booking — date, start time, length, room type, attendees, add-ons — ending in one `addCartLine`; the prototype draws it as one step revealing each choice in turn |
 | Offline | **The offline banner shows.** Rooms and times already loaded stay on screen with their age. Picking a start time and adding the booking need the connection — a room held offline is a room two people think they have. |
 | Opens with | `productId` (WEB-004), `cartId` (session) · cold entry: Resolves the venue from the site and lists its room types; nothing is booked on arrival. |
 | Route | `/booking-and-selection/space-by-the-hour` |
 
 **What the spec says about it.** **New 29 September** (decided 29 September, rev 3 REV3-13: meeting rooms by the hour are in scope). A staged booking: date → start time → length (1 hour, 2 hours, half day, full day) → room type (focus pod, majlis, boardroom, auditorium) → attendees → add-ons (coffee break, working lunch, AV technician). **A room type is a product with `requiresTimeWindow`; a length is one of its variants** (the `length` axis, each value with `durationMinutes`), priced on its own, so the price is the variant's — the room rate for that length. The guest never names a room: `addCartLine` carries `bookedWindow` {startsAt, endsAt}, `endsAt` being the start plus the length, and `allocateResources` picks the room at checkout (26 August minute). Add-ons are lines with `parentLineId`. `422 windowLengthMismatch`, `windowRequired` and `windowNotAllowed` are programming errors; `409 windowUnavailable` says the time filled and offers the next free start. **29 September (W9).** Availability is checked against date, start time and length together (`listProductStartTimes` with `variantId` = length); changing any of the three re-checks every room, and a busy room shows *free from*. Starts every 15 minutes where the venue sets `stepMinutes` 15.
+
+**From the Ticketing & Guest Commerce (guest web, guest app, kiosk, partner portal, POS ticket sale) process.** Book a meeting room or other space by the hour (House of Pages). Block A. A staged booking: date, start time, length, room type, attendees, add-ons. The guest picks a room type, never a specific room; availability is checked on date, start and length together.
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- No wireframe frame yet (status notStarted), though the prototype covers it. (CHG-SGU-026)
 
 #### Inputs: what the user enters or picks
 
@@ -1815,6 +2311,12 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 | Passenger type code `attributes.transport.passengerTypeCode` | text field | optional | — | pattern `^[a-z][a-zA-Z0-9]{0,31}$` | — | The fare table's passenger type (`adult`, `child`, ...). Required on a one-way trip. | `addCartLine` body |
 | Pass type `attributes.transport.passTypeId` | picker: choose a pass type | optional | — | — | shows names, sends the id | Pass purchase only. The `transport.PassType` bought for this station pair. | `addCartLine` body |
 | Pass entitlement `attributes.transport.passEntitlementId` | picker: choose a pass entitlement | optional | — | — | shows names, sends the id | A seat reserved with a pass already owned. The line is zero-priced and validated against the pass (stations covered, an entry left, within validity). | `addCartLine` body |
+
+**Rules for these inputs** (from the Ticketing & Guest Commerce (guest web, guest app, kiosk, partner portal, POS ticket sale) process; these refine the tables above and win where they differ)
+
+- **start time**: Starts every 15 minutes where the venue sets it, between the venue's hours; each shows how many rooms of the type are left. Changing date, start or length re-checks every room; a busy room type says "free from 11:15". *(source: MoM 29 Sep W9; DI-1011; screens/P01-guest-web-storefront.yaml#WEB-048 notes)*
+- **how long**: 1 hour, 2 hours, half day (4 h), full day (8 h), each priced on its own with the saving shown (Save 10%, Save 15%). *(source: REV3-13; screens/P01-guest-web-storefront.yaml#WEB-048 (selectField How long))*
+- **attendees**: A number; room types smaller than the party are not offered. *(source: screens/P01-guest-web-storefront.yaml#WEB-048 (numberField Attendees))*
 
 #### Outputs: what the screen shows and produces
 
@@ -1876,6 +2378,11 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 |---|---|---|---|---|---|
 | Add to basket (primary button) | `addCartLine` POST `/carts/{cartId}/lines` | AddCartLineRequest | Cart | 403 The performance's on-sale waiting room is on and the request has no valid admission token (ADR-0066).; 409 No capacity, or the product is not sellable on this channel (`notSellableOnChannel`). (CartProblem); 422 The … | — |
 
+**Rules for what is shown** (from the Ticketing & Guest Commerce (guest web, guest app, kiosk, partner portal, POS ticket sale) process; these refine the tables above and win where they differ)
+
+- **cleaning buffer**: Not shown as a separate slot; it shapes availability. Fixed buffer after each booking (e.g. 15 minutes) or N cleanings a day placed by the system. *(source: MoM 29 Sep W10; DI-1012)*
+- **basket line**: "Boardroom · Tue 6 Oct 10:00-12:00 · 2 hours · AED 600" with add-ons under it. *(source: DI-1053)*
+
 **Data it reads**: `listProducts` (onLoad, Room types sold by the hour (`requiresTimeWindow`) and …); `listProductVariants` (onLoad, The lengths of a room type, each with its price)
 
 **Where the user goes next**
@@ -1894,6 +2401,36 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 | Permission denied (`?state=emptyNoAccess`) | **There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the … |
 | Offline (`?state=offline`) | **The offline banner shows.** Rooms and times already loaded stay on screen with their age. Picking a start time and adding the booking need the connection — a room held offline is a room two people think they have. |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 A `categoryId` that names no category of the venue, or a `guidedAnswerIds` entry that is not an answer of the venue's published guided choice (W4, 29 …; 409 No capacity, or the product is not sellable on this channel (`notSellableOnChannel`). (CartProblem); 422 The booked window is missing, not allowed or the wrong length for the variant (`windowRequired`, `windowNotAllowed` … |
+
+#### Edge cases to draw
+
+- **The time fills while the guest is choosing**: "10:00 has just been taken" with the next free start offered. *(source: screens/P01-guest-web-storefront.yaml#WEB-048 notes (409 windowUnavailable))*
+
+#### Consistency with other screens
+
+- Match `GST-075`: Same staged order and the same "free from" wording on the app.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+venue: House of Pages (library and rooms), Sharjah
+roomTypes:
+- Focus pod · 1-2 people
+- Majlis room · up to 8
+- Boardroom · up to 12
+- Auditorium · up to 80
+lengths:
+- 1 hour AED 300
+- 2 hours AED 540 (Save 10%)
+- Half day AED 1,020 (Save 15%)
+- Full day
+addOns:
+- Coffee break AED 35 pp
+- Working lunch AED 85 pp
+- AV technician AED 250
+```
 
 #### Permissions
 
@@ -1944,9 +2481,9 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Configurable by the tenant
 
-This is a white-label guest screen: it is drawn in the venue's brand, never TICVAI's (except the fixed *Powered by TICVAI* credit). Draw it with the **default theme**, and on the key screens one **alternate tenant theme** (`handoff/design-batches/apps/1-guest-app/WHITE-LABEL.md`).
+This is a white-label guest screen: it is drawn in the venue's brand, never TICVAI's (except the *Powered by TICVAI* credit, a tenant toggle that is on by default: `brand.showPoweredBy`). It has no dark or light mode: the venue's theme applies on every device setting. Draw it with the **default theme**, and on the key screens one **alternate tenant theme** (`handoff/design-batches/apps/1-guest-app/WHITE-LABEL.md`).
 
-**Shell-wide, on every guest screen:** Brand (10, CMS-002, CMS-004, ADM-016); Theme (31, CMS-005, CMS-003, ADM-016); Fonts (5, CMS-003); Header (5, CMS-007); Navigation (17, CMS-009); Footer (website) (15, CMS-007); Languages and right-to-left (2, CMS-011, ADM-018); Modules shown to guests (3, CMS-001); Features (3, CMS-001); Custom domain (website) (3, CMS-017, ADM-017); SEO metadata (website) (13, CMS-013). Each element, its CMS field, allowed values and default: `handoff/design-batches/apps/1-guest-app/WHITE-LABEL.md`.
+**Shell-wide, on every guest screen:** Brand (11, CMS-002, CMS-004, CMS-104); Theme (27, CMS-005, ADM-016); Fonts (5, CMS-003); Header (5, CMS-009); Navigation (17, CMS-009); Footer (website) (15, CMS-009); Languages and right-to-left (2, CMS-011, ADM-018); Modules shown to guests (3, CMS-001, ADM-424); Features (3, CMS-001); Custom domain (website) (3, CMS-017, ADM-017); SEO metadata (website) (13, CMS-013). Each element, its CMS field, allowed values and default: `handoff/design-batches/apps/1-guest-app/WHITE-LABEL.md`.
 
 #### References
 
@@ -1967,6 +2504,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 - [ ] Sign-in is asked only where the spec asks for it.
 - [ ] The 7 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] Drawn in the default theme; on a key screen also in the alternate tenant theme; nothing hard-codes a brand colour, logo or font.
+- [ ] The 1 edge case(s) from the process notes are drawn.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -1977,46 +2515,46 @@ Every guest screen in this batch is white-label. These elements are set by the t
 
 | Element | Configured in | Allowed values | Default | What it changes |
 |---|---|---|---|---|
-| Logo (`brand.logoAssetRef`) | `CMS-002`, `CMS-004`, `ADM-016` | PNG or SVG ≤ 2 MB for logos; images ≥ 1600 px; video MP4 | — | the logo in the header or nav bar, the splash and the footer |
-| Logo dark image (`brand.logoDarkAssetRef`) | `CMS-002`, `CMS-004`, `ADM-016` | PNG or SVG ≤ 2 MB for logos; images ≥ 1600 px; video MP4 | — | the logo on dark backgrounds (falls back to the primary logo) |
-| Logo variant (`brand.logoVariant`) | `CMS-002`, `CMS-004`, `ADM-016` | Light · Dark · Duotone | Light | which logo lockup sits in the nav bar, and whose colours drive the theme |
-| Favicon (`brand.faviconAssetRef`) | `CMS-002`, `CMS-004`, `ADM-016` | PNG or SVG ≤ 2 MB for logos; images ≥ 1600 px; video MP4 | — | the browser tab icon (website only) |
-| Splash image (`brand.splashImageAssetRefs`) | `CMS-002`, `CMS-004`, `ADM-016` | PNG, JPG, SVG or MP4 from the media library | — | Splash images, shown in order. Build-time on the native apps (`splashChangeScope`); immediate on web, reaching guests with the publish (audit R163). |
-| Splash duration seconds (`brand.splashDurationSeconds`) | `CMS-002`, `CMS-004`, `ADM-016` | min 0; max 10 | 3 | — |
-| Splash background colour (`brand.splashBackgroundColour`) | `CMS-002`, `CMS-004`, `ADM-016` | #RRGGBB | — | — |
-| Show loading indicator (`brand.showLoadingIndicator`) | `CMS-002`, `CMS-004`, `ADM-016` | — | on | — |
-| Intro video (`brand.introVideoAssetRef`) | `CMS-002`, `CMS-004`, `ADM-016` | PNG or SVG ≤ 2 MB for logos; images ≥ 1600 px; video MP4 | — | The optional intro video (decided 29 September, MOB-5). A video `MediaAsset` from the media library (CMS-010). |
-| Intro video mode (`brand.introVideoMode`) | `CMS-002`, `CMS-004`, `ADM-016` | Off · First launch · Every launch; Anything but `off` needs `introVideoAssetRef`, or 400. | Off | When GST-001 plays it full screen. "Skip introduction" is always shown. |
-| Primary colour (`theme.primaryColour`) | `CMS-005`, `CMS-003`, `ADM-016` | #RRGGBB | — | the brand colour (the `accentSolid` token): primary buttons (Book, Continue, Add to cart, Pay), the active step of the step indicator, selected date and time chips, focus rings |
-| Secondary colour (`theme.secondaryColour`) | `CMS-005`, `CMS-003`, `ADM-016` | #RRGGBB | — | secondary buttons and secondary emphasis: unselected chips, secondary tabs |
-| Accent colour (`theme.accentColour`) | `CMS-005`, `CMS-003`, `ADM-016` | #RRGGBB | — | highlights: badges (LIMITED, NEW, BESTSELLER), availability counts, sale prices |
-| Background colour (`theme.backgroundColour`) | `CMS-005`, `CMS-003`, `ADM-016` | #RRGGBB | — | the page background behind every screen (the `ground` token) |
-| Text colour (`theme.textColour`) | `CMS-005`, `CMS-003`, `ADM-016` | #RRGGBB | — | body text on the background |
-| Dark mode (`theme.darkMode`) | `CMS-005`, `CMS-003`, `ADM-016` | — | — | the dark variant on a device in dark mode (mobile app); derived from the light theme when absent |
-| Corner radius (`theme.cornerRadius`) | `CMS-005`, `CMS-003`, `ADM-016` | min 0; max 32 | — | the corners of cards, buttons, inputs, sheets and the cart (0 square to 22 the prototype's roundest) |
-| Surface style (`theme.surfaceStyle`) | `CMS-005`, `CMS-003`, `ADM-016` | Glass · Solid | Glass | cards and panels: frosted glass (default) or opaque (the `surfaceRaised` token) |
-| Button style (`theme.buttonStyle`) | `CMS-005`, `CMS-003`, `ADM-016` | Solid · Outline · Pill | Solid | every button's shape: solid fill, outline, or pill |
-| Component colours (`theme.componentColours`) | `CMS-005`, `CMS-003`, `ADM-016` | — | — | Colours for single interactive elements (decided 17 September, M17-11). Each is optional and falls back to the theme colours. |
+| Logo (`brand.logoAssetRef`) | `CMS-002`, `CMS-004`, `CMS-104`, `ADM-016` | PNG or SVG ≤ 2 MB for logos; images ≥ 1600 px; video MP4 | — | the logo in the header or nav bar, the splash and the footer |
+| Logo dark image (`brand.logoDarkAssetRef`) | `CMS-002`, `CMS-004`, `CMS-104`, `ADM-016` | PNG or SVG ≤ 2 MB for logos; images ≥ 1600 px; video MP4 | — | the logo on dark backgrounds (falls back to the primary logo) |
+| Logo variant (`brand.logoVariant`) | `CMS-002`, `CMS-004`, `CMS-104`, `ADM-016` | Light · Dark · Duotone | Light | which logo lockup sits in the nav bar, and whose colours drive the theme |
+| Favicon (`brand.faviconAssetRef`) | `CMS-002`, `CMS-004`, `CMS-104`, `ADM-016` | PNG or SVG ≤ 2 MB for logos; images ≥ 1600 px; video MP4 | — | the browser tab icon (website only) |
+| Splash image (`brand.splashImageAssetRefs`) | `CMS-002`, `CMS-004`, `CMS-104`, `ADM-016` | PNG, JPG, SVG or MP4 from the media library | — | Splash images, shown in order. Build-time on the native apps (`splashChangeScope`); immediate on web, reaching guests with the publish (audit R163). |
+| Splash duration seconds (`brand.splashDurationSeconds`) | `CMS-002`, `CMS-004`, `CMS-104`, `ADM-016` | min 0; max 10 | 3 | — |
+| Splash background colour (`brand.splashBackgroundColour`) | `CMS-002`, `CMS-004`, `CMS-104`, `ADM-016` | #RRGGBB | — | — |
+| Show loading indicator (`brand.showLoadingIndicator`) | `CMS-002`, `CMS-004`, `CMS-104`, `ADM-016` | — | on | — |
+| Intro video (`brand.introVideoAssetRef`) | `CMS-002`, `CMS-004`, `CMS-104`, `ADM-016` | PNG or SVG ≤ 2 MB for logos; images ≥ 1600 px; video MP4 | — | The optional intro video (decided 29 September, MOB-5). A video `MediaAsset` from the media library (CMS-010). |
+| Intro video mode (`brand.introVideoMode`) | `CMS-002`, `CMS-004`, `CMS-104`, `ADM-016` | Off · First launch · Every launch; Anything but `off` needs `introVideoAssetRef`, or 400. | Off | When GST-001 plays it full screen. "Skip introduction" is always shown. |
+| Powered by TICVAI credit (`brand.showPoweredBy`) | `CMS-002`, `CMS-004`, `CMS-104`, `ADM-016` | — | on | the *Powered by TICVAI* credit on the launch screen, at the foot of Account and in the web footer; on by default, and switching it off needs the licence add-on (403 … |
+| Primary colour (`theme.primaryColour`) | `CMS-005`, `ADM-016` | #RRGGBB | — | the brand colour (the `accentSolid` token): primary buttons (Book, Continue, Add to cart, Pay), the active step of the step indicator, selected date and time chips, focus rings |
+| Secondary colour (`theme.secondaryColour`) | `CMS-005`, `ADM-016` | #RRGGBB | — | secondary buttons and secondary emphasis: unselected chips, secondary tabs |
+| Accent colour (`theme.accentColour`) | `CMS-005`, `ADM-016` | #RRGGBB | — | highlights: badges (LIMITED, NEW, BESTSELLER), availability counts, sale prices |
+| Background colour (`theme.backgroundColour`) | `CMS-005`, `ADM-016` | #RRGGBB | — | the page background behind every screen (the `ground` token) |
+| Text colour (`theme.textColour`) | `CMS-005`, `ADM-016` | #RRGGBB | — | body text on the background |
+| Corner radius (`theme.cornerRadius`) | `CMS-005`, `ADM-016` | min 0; max 32 | — | the corners of cards, buttons, inputs, sheets and the cart (0 square to 22 the prototype's roundest) |
+| Surface style (`theme.surfaceStyle`) | `CMS-005`, `ADM-016` | Glass · Solid | Glass | cards and panels: frosted glass (default) or opaque (the `surfaceRaised` token) |
+| Button style (`theme.buttonStyle`) | `CMS-005`, `ADM-016` | Solid · Outline · Pill | Solid | every button's shape: solid fill, outline, or pill |
+| Component colours (`theme.componentColours`) | `CMS-005`, `ADM-016` | — | — | Colours for single interactive elements (decided 17 September, M17-11). Each is optional and falls back to the theme colours. |
 | Primary latin (`fonts.primaryLatin`) | `CMS-003` | — | — | headings and body text in English |
 | Primary arabic (`fonts.primaryArabic`) | `CMS-003` | Required when `ar` is among the tenant's languages (audit R163). | — | headings and body text in Arabic |
 | Secondary latin (`fonts.secondaryLatin`) | `CMS-003` | — | — | the secondary face (eyebrows, numbers) in English |
 | Secondary arabic (`fonts.secondaryArabic`) | `CMS-003` | Required whenever `secondaryLatin` is set and `ar` is among the tenant's languages (decided 28 September, audit R163). | — | the secondary face in Arabic |
 | Custom font images (`fonts.customFontAssetRefs`) | `CMS-003` | PNG, JPG, SVG or MP4 from the media library | — | Uploaded font files, as `MediaAsset` ids. |
-| Header layout (`header.layout`) | `CMS-007` | Logo left · Logo centre · Logo with menu | — | the header: logo left, logo centred, or logo with the menu |
-| Show logo (`header.showLogo`) | `CMS-007` | — | on | — |
-| Show menu (`header.showMenu`) | `CMS-007` | — | on | — |
-| Show notifications (`header.showNotifications`) | `CMS-007` | — | on | — |
-| Background colour (`header.backgroundColour`) | `CMS-007` | #RRGGBB | — | — |
+| Header layout (`header.layout`) | `CMS-009` | Logo left · Logo centre · Logo with menu | — | the header: logo left, logo centred, or logo with the menu |
+| Show logo (`header.showLogo`) | `CMS-009` | — | on | — |
+| Show menu (`header.showMenu`) | `CMS-009` | — | on | — |
+| Show notifications (`header.showNotifications`) | `CMS-009` | — | on | — |
+| Background colour (`header.backgroundColour`) | `CMS-009` | #RRGGBB | — | — |
 | Navigation kind (`navigation.kind`) | `CMS-009` | Bottom navigation · Drawer · Tabs | — | the main navigation: bottom tab bar, drawer, or tabs |
 | Navigation items (`navigation.items`) | `CMS-009` | at most 12 | — | — |
 | Buy button (`navigation.buyButton`) | `CMS-009` | — | — | The persistent Buy tickets button (decided 29 September, MOB-2). On every screen of the mobile app except the booking and checkout steps; it opens GST-003. |
-| Footer columns (`footer.columns`) | `CMS-007` | — | — | — |
-| Legal links (`footer.legalLinks`) | `CMS-007` | — | — | Required links, held separately from the free-form columns — a tenant reorganising their footer must not be able to remove the privacy notice by accident. |
-| Copyright text (`footer.copyrightText`) | `CMS-007` | — | — | — |
-| Social links (`footer.socialLinks`) | `CMS-007` | — | — | — |
+| Footer columns (`footer.columns`) | `CMS-009` | — | — | — |
+| Legal links (`footer.legalLinks`) | `CMS-009` | — | — | Required links, held separately from the free-form columns — a tenant reorganising their footer must not be able to remove the privacy notice by accident. |
+| Copyright text (`footer.copyrightText`) | `CMS-009` | — | — | — |
+| Social links (`footer.socialLinks`) | `CMS-009` | — | — | — |
 | Languages (`languages.languages`) | `CMS-011`, `ADM-018` | at least 1 | — | the language button in the header; Arabic flips every screen right to left |
 | Default language (`languages.defaultLanguage`) | `CMS-011`, `ADM-018` | ISO 639-1 code, shown as the language name | — | the language a first visit opens in |
-| Modules (`modules.modules`) | `CMS-001` | — | — | — |
+| Modules (`modules.modules`) | `CMS-001`, `ADM-424` | — | — | — |
 | Features (`features.features`) | `CMS-001` | — | — | — |
 | Custom domain hostname (`domains.hostname`) | `CMS-017`, `ADM-017` | — | — | — |
 | Custom domain kind (`domains.kind`) | `CMS-017`, `ADM-017` | Guest web · Guest app · Partner portal · Developer portal | — | — |
@@ -2034,15 +2572,17 @@ Every guest screen in this batch is white-label. These elements are set by the t
 | Open graph (`seo.openGraph`) | `CMS-013` | — | — | — |
 | Is auto generated (`seo.isAutoGenerated`) | `CMS-013` | — | on | 22.11.2. Generated by default and overridable. |
 | No index (`seo.noIndex`) | `CMS-013` | — | off | — |
-| Favicon (`brand.faviconAssetRef`) | `CMS-002`, `CMS-004`, `ADM-016` | PNG or SVG ≤ 2 MB for logos; images ≥ 1600 px; video MP4 | — | the browser tab icon (website only) |
-| Component colours: primary CTA (`theme.componentColours.primaryCta`) | `CMS-005`, `CMS-003`, `ADM-016` | — | — | the one main call to action on each screen, when it should differ from the brand colour |
-| Component colours: pay button (`theme.componentColours.payButton`) | `CMS-005`, `CMS-003`, `ADM-016` | — | — | the Pay button at checkout |
+| Favicon (`brand.faviconAssetRef`) | `CMS-002`, `CMS-004`, `CMS-104`, `ADM-016` | PNG or SVG ≤ 2 MB for logos; images ≥ 1600 px; video MP4 | — | the browser tab icon (website only) |
+| Component colours: primary CTA (`theme.componentColours.primaryCta`) | `CMS-005`, `ADM-016` | — | — | the one main call to action on each screen, when it should differ from the brand colour |
+| Component colours: pay button (`theme.componentColours.payButton`) | `CMS-005`, `ADM-016` | — | — | the Pay button at checkout |
 | Buy button: style (`navigation.buyButton.style`) | `CMS-009` | Raised · Floating · Flat · Hidden | Raised | the Buy tickets button in the tab bar: raised (default), floating, flat, or hidden |
 
 **The alternate tenant theme (Coastal Aqua)**: Primary colour #0077B6; Secondary colour #023E8A; Accent colour #FFB703; Background colour #F5FAFC; Text colour #0B1324; Corner radius 18; Surface style Solid; Button style Pill; Logo variant Duotone; Header layout Logo centre; Step indicator Dots; Card layout Cards across; Card size Standard; Cart layout Floating icon; Fonts Poppins / Tajawal.
 **Key screens to show in it:** `WEB-001`, `WEB-005`, `WEB-006`, `WEB-010`, `WEB-012`, `GST-001`, `GST-007`, `GST-041`, `KSK-002`, `KSK-003`.
 
-**Never configurable:** The *Powered by TICVAI* credit in the footer is fixed and never client-editable (MoM 3 Aug, DI-111; MoM 12 Aug, DI-250). Semantic colour pairs (success, warning, danger, neutral) are not overridable: a tenant who recolours danger to their brand green has made a destructive confirmation look like a success (`screens/_design-tokens.yaml` whiteLabel). Site structure and the navigation flow are fixed and adapt to the product configuration (MoM 3 Aug, DI-119); a guest always books a product or package, never a resource (DI-502). A colour pair that fails 4.5:1 contrast is refused by the CMS, not warned (setTheme 400 ContrastProblem, audit R139).
+**Decided for every guest screen:** **No dark or light mode.** The venue's chosen theme applies on every device setting; `Theme.darkMode` is deprecated and ignored, never drawn, and the guest app has no Light/Dark switch (Chinmay, 2 October, Q150; CHG-CSA-035). ***Powered by TICVAI* is a tenant toggle, on by default** (`brand.showPoweredBy`): shown on the launch screen, at the foot of Account and in the web footer; switching it off needs the licence add-on, or 403 `powered-by-locked` (Chinmay, 2 October, Q160; DI-297; CHG-CSA-036). **Each homepage section sets its card count and its scroll animation** (`maxItems`; `scrollAnimation` rise, scale, slide, blur or none, default rise): every customisation option of the approved wireframe (Chinmay, 2 October, Q152 and Q153; DI-1088; CHG-CSA-040). **Landing-page templates.** A tenant with no landing page of its own starts from a TICVAI template (`listLandingPageTemplates`, kept as `HomepageLayout.templateKey`); one with its own site links in with deep links (`landingSource` ownSite) (Chinmay, 2 October, batch 2 #41; CHG-CSA-037).
+
+**Never configurable:** A dark or light mode: the guest surfaces have one theme, the venue's (Chinmay, 2 October; CHG-CSA-035). Semantic colour pairs (success, warning, danger, neutral) are not overridable: a tenant who recolours danger to their brand green has made a destructive confirmation look like a success (`screens/_design-tokens.yaml` whiteLabel). Site structure and the navigation flow are fixed and adapt to the product configuration (MoM 3 Aug, DI-119); a guest always books a product or package, never a resource (DI-502). A colour pair that fails 4.5:1 contrast is refused by the CMS, not warned (setTheme 400 ContrastProblem, audit R139).
 
 ## Reference designs and the trackers for this platform
 
@@ -2193,7 +2733,6 @@ Method, path, parameters, request and response for every operation these screens
 "getVenueMap": {"method":"GET","path":"/venue-maps/{mapId}","contract":"venue-map","summary":"A map with its points and paths","permission":"VENUE_MAP_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"version","in":"query","required":null},{"name":"draft","in":"query","required":null}],"requestBody":null,"responds":"VenueMapDetail"},
 "getWishlist": {"method":"GET","path":"/guests/{subjectId}/wishlist","contract":"marketing-crm","summary":"Read a guest's saved items","permission":null,"offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"subject","parameters":[],"requestBody":null,"responds":"Wishlist"},
 "listBookableVenueMaps": {"method":"GET","path":"/bookable-venue-maps","contract":"venue-map","summary":"The published maps of a venue that carry bookable spots","permission":"VENUE_MAP_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"venueId","in":"query","required":true},{"name":"productId","in":"query","required":false},{"name":"kind","in":"query","required":false}],"requestBody":null,"responds":"BookableVenueMaps"},
-"listCatalogueBundles": {"method":"GET","path":"/catalogue/bundles","contract":"catalogue","summary":"List published catalogue bundles","permission":"PRODUCT_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"BundleSummary"},
 "listPerformances": {"method":"GET","path":"/events/{eventId}/performances","contract":"catalogue","summary":"List performances of an event","permission":"PRODUCT_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"from","in":"query","required":null},{"name":"to","in":"query","required":null},{"name":"categoryId","in":"query","required":null},{"name":"language","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listProductCategories": {"method":"GET","path":"/product-categories","contract":"catalogue","summary":"The merchandise hierarchy — categories, brands, collections","permission":"PRODUCT_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"ProductCategoryNode"},
 "listProductStartTimes": {"method":"GET","path":"/resource-start-times","contract":"resources","summary":"Start times a space sold by the hour can be booked at, for one length on one day","permission":"RESOURCE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"productId","in":"query","required":true},{"name":"variantId","in":"query","required":true},{"name":"date","in":"query","required":true},{"name":"stepMinutes","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
@@ -2226,7 +2765,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "BookingFlowStep": {"x-ticvai-persistence":"whitelabel.booking_flow_step","type":"object","description":"One step of a venue's flow, in the venue's order (decided 29 September, W12).","required":["stepKey","enabled","sortOrder"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"bookingFlowId":{"type":"string","format":"uuid","readOnly":true},"stepKey":{"$ref":"#/components/schemas/BookingFlowStepKey"},"enabled":{"type":"boolean","description":"A `required` step cannot be off; the flow saves and `isValid` turns false."},"sortOrder":{"type":"integer","minimum":0},"requirement":{"type":"string","enum":["required","optional","conditional"],"readOnly":true,"x-ticvai-derived":"onRead","description":"From the flow type, so the CMS can mark the step without a second read."},"settings":{"type":"object","additionalProperties":true,"default":{},"description":"The step's own settings, by the names the type's `stepSettings` gives for this step (e.g. `languages` on `language`, `minHours` on `duration`). A name the type does not give is refused with 400."}}},
 "BookingFlowTypeKey": {"type":"string","description":"**The flow types the system catalogue offers (decided 29 September, W12; impact.md b).** `seatedFixedPerformance` and `seatedDateTimeSeatMap` are the two seated flows; `cabanaMap` and `cabanaBySize` are the two cabana flows (W6); `experienceWorkshop` puts the product before the date (W8); `multiLocation` opens on the location switcher.\n","enum":["datedDayPass","timedEntry","openDated","seatedFixedPerformance","seatedDateTimeSeatMap","experienceWorkshop","surfSession","meetingRoomHourly","cabanaMap","cabanaBySize","guidedTourByLanguage","transport","tableReservation","membership","giftCard","multiLocation"]},
 "Bundle": {"x-ticvai-persistence":"promotions.bundle + promotions.bundle_component","allOf":[{"$ref":"#/components/schemas/CreateBundleRequest"},{"type":"object","required":["id","savingsAmount","isActive","hasBeenSold"],"properties":{"id":{"type":"string","format":"uuid"},"savingsAmount":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"description":"Sum of component list prices less the bundle price."},"savingsPercentage":{"type":"number"},"hasBeenSold":{"type":"boolean","description":"True locks components and allocation against amendment."},"isActive":{"type":"boolean"}}}]},
-"BundleSummary": {"x-ticvai-persistence":"none — projection over bundle","type":"object","description":"One published catalogue bundle — the signed snapshot terminals pull (ADR-0013). Not `promotions.Bundle`, which is a sellable product made of other products.","required":["version","venueId","publishedAt","publishedBy","contentHash","staleAfter","sizeBytes"],"properties":{"version":{"type":"string"},"venueId":{"type":"string","format":"uuid"},"publishedAt":{"type":"string","format":"date-time"},"publishedBy":{"type":"string","format":"uuid"},"contentHash":{"type":"string"},"signatureKeyId":{"type":"string","description":"Key that signed this bundle. A terminal offline across a key rotation needs a grace window, or it cannot verify the next bundle.\n"},"staleAfter":{"type":"string","format":"date-time"},"sizeBytes":{"type":"integer"},"note":{"type":"string"},"appliedByWorkstations":{"type":"integer"}}},
 "Cart": {"type":"object","x-ticvai-persistence":"orders.cart","required":["id","venueId","channel","status","lines"],"properties":{"id":{"type":"string","format":"uuid"},"token":{"type":"string","readOnly":true,"description":"**How an anonymous guest returns to their cart**, including from a recovery email. Rotated on claim, so a link shared before signing in does not reach the account after.\n"},"venueId":{"type":"string","format":"uuid"},"channel":{"$ref":"../shared/common.yaml#/components/schemas/SalesChannel"},"subjectId":{"type":"string","format":"uuid","nullable":true,"description":"Null while anonymous. Set by `claimCart`."},"status":{"$ref":"#/components/schemas/CartStatus"},"lines":{"type":"array","items":{"$ref":"#/components/schemas/CartLine"}},"conflicts":{"type":"array","items":{"$ref":"#/components/schemas/CartConflict"}},"consentQuestions":{"type":"array","readOnly":true,"description":"**The consent questions this cart's products and flow ask** (decided 29 September, rev 3 REV3-26), computed on read at their current version as **the union of each line's published booking flow's `white-label.BookingFlow.settings.consentQuestionIds`** (the flow `getPublishedBookingFlow` resolves for the line's product: product, then category, then the venue's flow for the kind; moved from `BookingFlowConfig`, 29 September W12) **and every line's `catalogue.Product.consentQuestionIds`, each question once**: the flow's first, in its order, then each product's in cart-line order, a question already listed not repeated (its `lineIds` gain the line). The client asks them, in the order given, and sends the answers to `marketing.recordConsentAnswers`; `answered` then turns true. One or several, as the venue chose. `checkoutCart` refuses while a required one is unanswered.\n","items":{"allOf":[{"$ref":"../satellite/marketing-crm.yaml#/components/schemas/ConsentQuestion"},{"type":"object","properties":{"lineIds":{"type":"array","description":"The cart lines that ask it. Empty for a question the flow asks.","items":{"type":"string","format":"uuid"}},"answered":{"type":"boolean","description":"Every person (for `perPerson`) or the booking (for `perBooking`) has an answer."}}}]}},"subtotal":{"x-ticvai-column":"net_amount","$ref":"../shared/common.yaml#/components/schemas/Money"},"discountTotal":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"taxTotal":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"total":{"x-ticvai-column":"gross_amount","$ref":"../shared/common.yaml#/components/schemas/Money"},"appliedPromotionIds":{"type":"array","description":"**Re-evaluated on every read.** A promotion that expired while the cart sat must not still be applied at checkout, and a promotion that became applicable should be.\n","items":{"type":"string","format":"uuid"}},"couponCodes":{"type":"array","readOnly":true,"description":"The promo codes the guest entered through `applyCartPromoCode` (decided 28 September, audit R073 (e)). **Sent as `couponCodes` on every promotions evaluation of this cart**, so a code is re-checked on each read like any promotion; a code that stops qualifying stays listed here and its promotion drops out of `appliedPromotionIds`.\n","items":{"type":"string","maxLength":100}},"expiresAt":{"type":"string","format":"date-time","description":"The earliest lease expiry in the cart, or the cart's own window where it holds none."},"extensionsUsed":{"type":"integer","readOnly":true},"maxExtensions":{"type":"integer","readOnly":true},"locale":{"type":"string"},"createdAt":{"type":"string","format":"date-time"},"updatedAt":{"type":"string","format":"date-time"}}},
 "CartConflict": {"type":"object","x-ticvai-persistence":"none — computed on read","description":"2.9.5. Golf at 13:00 and karting at 13:00 for the same guest. **A prompt, not a refusal** — a party of four may legitimately split, and refusing would be wrong more often than right.\n","properties":{"kind":{"type":"string","enum":["overlappingTime","sameSessionDifferentVenue","exceedsPartySize","requiresPrerequisite","consentBlocksBooking"]},"lineIds":{"type":"array","items":{"type":"string","format":"uuid"}},"message":{"type":"string"},"isBlocking":{"type":"boolean","description":"Most are not. `requiresPrerequisite` is — an add-on with no ticket to attach to cannot be sold. So is `consentBlocksBooking`: a consent question answered with the answer the venue set to block the booking (decided 29 September, rev 3 REV3-26).\n"}}},
 "CartLine": {"type":"object","x-ticvai-persistence":"orders.cart_line","required":["id","variantId","quantity"],"properties":{"id":{"type":"string","format":"uuid"},"variantId":{"type":"string","format":"uuid"},"productName":{"type":"string","readOnly":true},"quantity":{"type":"integer","minimum":1},"performanceId":{"type":"string","format":"uuid","nullable":true},"bookedWindow":{"$ref":"#/components/schemas/BookedWindow"},"recommendationId":{"type":"string","format":"uuid","nullable":true,"description":"The `trackingId` of the ai `decideRecommendations` item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather than guessed. Set from `addCartLine`; checkout copies it to the order line.\n"},"tableReservationId":{"type":"string","format":"uuid","nullable":true,"description":"Set on a table deposit line only (decided 29 September, rev 3 REV3-8b): the `fnb.TableReservation` this line secures. Priced from the deposit the booking snapshotted, not from the variant. Becomes an `orders.deposit` row at checkout, not revenue. A table booking with no deposit never has a line (rev 3 REV3-8).\n"},"seatIds":{"type":"array","maxItems":50,"items":{"type":"string","format":"uuid"}},"resourceHoldId":{"type":"string","format":"uuid","nullable":true,"description":"The `resources.ResourceHold` this line buys (decided 29 September, rev 3 REV3-15). While set, `leaseExpiresAt` is the hold's `expiresAt` and `inventoryHoldId` is null."},"attributes":{"$ref":"#/components/schemas/OrderLineAttributes"},"parentLineId":{"type":"string","format":"uuid","nullable":true,"description":"The line this add-on is attached to, from `AddCartLineRequest.parentLineId`. Kept on the line because **removing the parent removes the child**, and `removeCartLine` has to be able to find the children.\n"},"overridePrice":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"overrideReason":{"type":"string","nullable":true,"enum":["priceMatch","serviceRecovery","negotiated","damagedGoods","staffSale","error"],"description":"BL-085. **An operator could apply an approved discount and not enter a price.** A price match against a competitor and a service-recovery gesture are not discounts off a list — they are a number somebody decided.\n**Escalated above a configured threshold, and the reason is a closed set**: a free-text override reason is an override nobody can report on, and this is the field an auditor reads first.\n"},"feeKind":{"type":"string","nullable":true,"enum":["booking","transaction","service","delivery","convenience","cancellation"],"description":"**A fee is a line, not an adjustment.** `orders` already separates a service charge from a tip for the reason that applies here: **a guest is entitled to see what they are being charged for**, and a fee folded into the ticket price is a fee nobody can question.\nItemised at checkout, taxed on its own code, and refundable separately — **a cancellation fee is usually the one thing not refunded**, which only works if it is its own line.\n"},"unitPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"lineTotal":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"inventoryHoldId":{"type":"string","nullable":true,"description":"The capacity held for this line — a `catalogue.InventoryHold.id`, typed as that id is. **Null for a product with no capacity** — a t-shirt needs stock, not a lease.\n"},"leaseExpiresAt":{"type":"string","format":"date-time","nullable":true,"description":"Shown to the guest. *\"Your seats are held for 6 minutes\"* is better than discovering it at checkout.\n"},"isAvailable":{"type":"boolean","readOnly":true,"description":"Re-checked on every read. **A line can become unavailable while the cart sits** — a lease expiring is not the same as the product selling out, and both land here.\n"}}},

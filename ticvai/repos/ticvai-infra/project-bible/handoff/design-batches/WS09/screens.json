@@ -373,14 +373,6 @@
       },
       {
        "kind": "secondaryButton",
-       "label": "Start podium shift",
-       "operation": "startPodiumShift",
-       "permission": "TURNSTILE_MODE_SET",
-       "notes": "**The operator signs in to a podium** (BO-225; P07 SCN-002 where the scanner picks its access point).",
-       "provenance": "contract access.yaml POST /podiums/{podiumId}/shifts"
-      },
-      {
-       "kind": "secondaryButton",
        "label": "End podium shift",
        "operation": "endPodiumShift",
        "permission": "TURNSTILE_MODE_SET",
@@ -394,7 +386,7 @@
   "states": {
    "loading": "The podium operations console list.",
    "error": "Could not load. Names which read failed and leaves the podium operations console untouched.",
-   "emptyFirstRun": "No podium operations console yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No podium operations console yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the podium operations console are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -418,15 +410,6 @@
     "operationId": "deletePodium",
     "contract": "access",
     "purpose": "Delete a podium",
-    "trigger": "onAction",
-    "invalidates": [
-     "listPodiumConsole"
-    ]
-   },
-   {
-    "operationId": "startPodiumShift",
-    "contract": "access",
-    "purpose": "Start an operator shift on a podium",
     "trigger": "onAction",
     "invalidates": [
      "listPodiumConsole"
@@ -495,24 +478,6 @@
     "provenance": "contract access.yaml DELETE /podiums/{podiumId}"
    },
    {
-    "id": "formStartPodiumShift",
-    "component": "modal",
-    "trigger": "Start podium shift",
-    "body": "**Collects what `startPodiumShift` sends before it is called.** Nothing in the body is required. Optional: `role`, `accessDeviceId`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Start podium shift",
-     "operation": "startPodiumShift"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "role",
-      "accessDeviceId"
-     ]
-    },
-    "provenance": "contract access.yaml POST /podiums/{podiumId}/shifts"
-   },
-   {
     "id": "formEndPodiumShift",
     "component": "modal",
     "trigger": "End podium shift",
@@ -528,6 +493,14 @@
      ]
     },
     "provenance": "contract access.yaml POST /podium-shifts/{shiftId}/end"
+   }
+  ],
+  "gaps": [
+   {
+    "operation": "startPodiumShift",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): Starting a shift signs the caller onto a podium they stand at; it belongs on the podium device (P07 SCN-002, which declares it). The back office ends shifts and supervises (design-notes correction venue-operations BO-225).",
+    "source": "contracts/spine/access.yaml#startPodiumShift | screens/P07-staff-scanner.yaml#SCN-002"
    }
   ],
   "_platform": {
@@ -1092,6 +1065,25 @@
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "destructiveButton",
+       "label": "Lock identity",
+       "operation": "lockIdentity",
+       "notes": "**A permanent lock, a whitelist entry and releasing an identity or permanent lock wait for a second approver; \"until end of day\" does not (decided 2 October 2026 by Chinmay, DEC-254; CHG-CSP-031).** A request waiting shows \"Waiting for a second approver\".",
+       "provenance": "contract access.yaml POST /identity-locks"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Release lock",
+       "operation": "releaseIdentityLock",
+       "provenance": "contract access.yaml POST /identity-locks/{lockId}/release"
+      }
+     ]
     }
    ]
   },
@@ -1108,12 +1100,32 @@
     "contract": "access",
     "purpose": "Credential Disable, Blacklist & Whitelist Operations",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "lockIdentity",
+    "contract": "access",
+    "purpose": "Lock an identity",
+    "trigger": "onAction",
+    "provenance": "design-note correction, 2 October 2026 (BO-229)"
+   },
+   {
+    "operationId": "releaseIdentityLock",
+    "contract": "access",
+    "purpose": "Release an identity lock",
+    "trigger": "onAction",
+    "provenance": "design-note correction, 2 October 2026 (BO-229)"
    }
   ],
   "entryState": {
    "preloaded": [
     "CredentialDisableBlacklistWhitelistOperationsView.reason",
     "CredentialDisableBlacklistWhitelistOperationsView.disableScope"
+   ],
+   "params": [
+    {
+     "name": "lockId",
+     "from": "navigation"
+    }
    ]
   },
   "wireframe": {
@@ -1123,6 +1135,49 @@
    "workshopBoard": "wireframes/WS26 Access Control Board 9.dc.html#bo-229"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 122. 0 of 0 labels bound to a contract property; 0 of 31 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formLockIdentity",
+    "component": "modal",
+    "trigger": "Lock identity",
+    "body": "**Collects what `lockIdentity` sends before it is called.** Required: `subjectId`, `lockScope`, `lockDuration`, `lockReason`. Optional: `venueId`, `lockHours`, `associatedEntitlementIds`, `securityInvestigationId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Lock identity",
+     "operation": "lockIdentity"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "subjectId",
+      "lockScope",
+      "lockDuration",
+      "lockReason",
+      "venueId",
+      "lockHours",
+      "associatedEntitlementIds",
+      "securityInvestigationId"
+     ]
+    },
+    "provenance": "contract access.yaml POST /identity-locks"
+   },
+   {
+    "id": "formReleaseIdentityLock",
+    "component": "modal",
+    "trigger": "Release lock",
+    "body": "**Collects what `releaseIdentityLock` sends before it is called.** Required: `reason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Release lock",
+     "operation": "releaseIdentityLock"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "reason"
+     ]
+    },
+    "provenance": "contract access.yaml POST /identity-locks/{lockId}/release"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1239,6 +1294,21 @@
        "permission": "TURNSTILE_MODE_SET",
        "notes": "Cancels a `pending` gate mode change, one `setTurnstileMode` scheduled with a future `effectiveAt`.",
        "provenance": "contract access.yaml POST /gate-mode-changes/{changeId}/cancel"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Switch direction",
+       "operation": "setAccessPointDirection",
+       "permission": "ACCESS_DIRECTION_SET",
+       "notes": "**A gate's direction can be switched live (Entry to Exit) by a holder of the right, and the switch is logged (decided 2 October 2026 by Chinmay, DEC-255; R221 amended; CHG-CSP-032).** Needs `ACCESS_DIRECTION_SET` (CHG-FUP-004); without it the button is disabled and names the access in words.",
+       "provenance": "contract access.yaml PUT /access-points/{accessPointId}/direction"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Change mode",
+       "operation": "setTurnstileMode",
+       "notes": "The mode list is the six operating modes of R221; Group, Fast Pass, Re-entry and Crossover from the pack are lane types or directions, not modes.",
+       "provenance": "contract access.yaml PUT /access-points/{accessPointId}/mode"
       }
      ]
     }
@@ -1283,6 +1353,13 @@
      "listLiveGateMode",
      "listAccessPoints"
     ]
+   },
+   {
+    "operationId": "setAccessPointDirection",
+    "contract": "access",
+    "purpose": "Switch a gate's direction live",
+    "trigger": "onAction",
+    "provenance": "design-note correction, 2 October 2026 (BO-230)"
    }
   ],
   "entryState": {
@@ -1318,6 +1395,52 @@
     "trigger": "Cancel gate mode change",
     "body": "**Names what `cancelGateModeChange` changes and what it leaves alone**, in the consequence rather than the verb. A access gate mode change this affects should be identified in the dialog, not just counted. **Collects what `cancelGateModeChange` sends before it is called.** Nothing in the body is required. Optional: `reason`.",
     "provenance": "contract access.yaml POST /gate-mode-changes/{changeId}/cancel"
+   },
+   {
+    "id": "formSetAccessPointDirection",
+    "component": "modal",
+    "trigger": "Switch direction",
+    "body": "**Collects what `setAccessPointDirection` sends before it is called.** Required: `direction`, `reason`. Optional: `effectiveAt`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Switch direction",
+     "operation": "setAccessPointDirection"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "direction",
+      "reason",
+      "effectiveAt"
+     ]
+    },
+    "provenance": "contract access.yaml PUT /access-points/{accessPointId}/direction"
+   },
+   {
+    "id": "formSetTurnstileMode",
+    "component": "modal",
+    "trigger": "Change mode",
+    "body": "**Collects what `setTurnstileMode` sends before it is called.** Required: `operatingMode`. Optional: `mode`, `reason`, `effectiveAt`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Change mode",
+     "operation": "setTurnstileMode"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "operatingMode",
+      "mode",
+      "reason",
+      "effectiveAt"
+     ]
+    },
+    "provenance": "contract access.yaml PUT /access-points/{accessPointId}/mode"
+   }
+  ],
+  "gaps": [
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-004): No operation switches a gate's direction live, and no bulk gate-mode command.",
+    "source": "R221 | DI-648 | contracts/spine/access.yaml#setTurnstileMode"
    }
   ],
   "_platform": {
@@ -1522,6 +1645,11 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Access Control Module_Reference.pdf, page 127"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-004): No read lists or loads access operational incidents.",
+    "source": "contracts/spine/access.yaml#setOperationalIncidentException"
    }
   ],
   "layout": {

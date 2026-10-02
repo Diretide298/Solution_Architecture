@@ -475,7 +475,17 @@ def main() -> int:
         return 0
     _bad = sum(1 for v in stored.values() for k in ("reads", "writes") for t in (v.get(k) or [])
                if ":" not in t and not _VALID_TABLE.match(t))
-    if not missing and not repaired and not moved and not rehomed and not followed and not _bad:
+    # **An operation an approved breaking change removed leaves the lineage** (2 October 2026, CHG-CLN-001). The rule
+    # "nothing is ever removed" protects judgements about an operation's reads and writes; an operation that no contract
+    # declares any more, and that docs/active/breaking-changes.yaml names, is no judgement. Kept, it stayed a writer
+    # in every derivation downstream: derive-delivery-slice pulled the 13 retired duplicate writers back into the
+    # first-release slice as setup. Only orphans the breaking-changes file names are removed; any other orphan is
+    # still reported above and left alone.
+    retired = sorted(set(orphan) & approved_removals())
+    for o in retired:
+        del stored[o]
+        print("     retired %-26s (approved breaking change)" % o)
+    if not missing and not repaired and not moved and not rehomed and not followed and not _bad and not retired:
         print("  nothing to add")
         return 0
     for o in missing:
@@ -494,6 +504,16 @@ def main() -> int:
     print("  added %d · %d operations total -> handoff/%s" % (len(missing), len(stored),
                                                               LINEAGE.name))
     return 0
+
+
+def approved_removals() -> set:
+    """The operations docs/active/breaking-changes.yaml names: the approved breaking changes (CHG-CLN-001)."""
+    path = ROOT / "docs" / "active" / "breaking-changes.yaml"
+    if not path.exists():
+        return set()
+    import yaml
+    doc = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+    return {str(e.get("operation")) for e in doc.get("changes") or [] if isinstance(e, dict) and e.get("operation")}
 
 
 if __name__ == "__main__":

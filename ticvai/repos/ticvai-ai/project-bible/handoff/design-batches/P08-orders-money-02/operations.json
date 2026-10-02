@@ -37,25 +37,6 @@
   "requestBody": "ManualDiscountRequest",
   "responds": "Order"
  },
- "approveShiftOpen": {
-  "method": "POST",
-  "path": "/shifts/{shiftId}/approve-open",
-  "contract": "shift",
-  "summary": "Approve a shift opening outside tolerance",
-  "permission": "SHIFT_APPROVE_OPEN",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Shift"
- },
  "askReportingQuestion": {
   "method": "POST",
   "path": "/reports/ask",
@@ -83,7 +64,7 @@
   "permission": "SHIFT_CLOSE",
   "offlineCapable": false,
   "conflictPolicy": "append",
-  "scopeLevel": "workstation",
+  "scopeLevel": "venue",
   "parameters": [
    {
     "name": null,
@@ -93,6 +74,25 @@
   ],
   "requestBody": "CloseShiftRequest",
   "responds": "ShiftCloseResult"
+ },
+ "createAccount": {
+  "method": "POST",
+  "path": "/accounts",
+  "contract": "finance",
+  "summary": "Create an account",
+  "permission": "ACCOUNT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "region",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateAccountRequest",
+  "responds": "Account"
  },
  "createCashMovement": {
   "method": "POST",
@@ -113,6 +113,25 @@
   "requestBody": "CreateCashMovementRequest",
   "responds": "CashMovement"
  },
+ "createCostCenter": {
+  "method": "POST",
+  "path": "/cost-centers",
+  "contract": "finance",
+  "summary": "Create a cost centre",
+  "permission": "ACCOUNT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "region",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "CostCenter"
+ },
  "createDeliveryLocation": {
   "method": "POST",
   "path": "/delivery-locations",
@@ -131,6 +150,25 @@
   ],
   "requestBody": null,
   "responds": "DeliveryLocation"
+ },
+ "createLegalEntity": {
+  "method": "POST",
+  "path": "/legal-entities",
+  "contract": "finance",
+  "summary": "Create a legal entity",
+  "permission": "ACCOUNT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "LegalEntity",
+  "responds": "LegalEntity"
  },
  "createMerchandise": {
   "method": "POST",
@@ -284,18 +322,18 @@
   "requestBody": "ExchangeOrderRequest",
   "responds": "OrderExchangeResult"
  },
- "getCurrentShift": {
+ "getAccount": {
   "method": "GET",
-  "path": "/shifts/current",
-  "contract": "shift",
-  "summary": "The open or suspended shift on the session's workstation",
-  "permission": "SHIFT_OPEN",
-  "offlineCapable": true,
+  "path": "/accounts/{accountId}",
+  "contract": "finance",
+  "summary": "Read an account",
+  "permission": "LEDGER_VIEW",
+  "offlineCapable": false,
   "conflictPolicy": "serverWins",
-  "scopeLevel": "workstation",
+  "scopeLevel": "region",
   "parameters": [],
   "requestBody": null,
-  "responds": "Shift"
+  "responds": "Account"
  },
  "getFinancialReport": {
   "method": "GET",
@@ -420,6 +458,48 @@
   "requestBody": null,
   "responds": "Shift"
  },
+ "getShiftCountLines": {
+  "method": "GET",
+  "path": "/shifts/{shiftId}/count-lines",
+  "contract": "shift",
+  "summary": "The denomination breakdown of a shift's counts",
+  "permission": "REPORT_VIEW_WORKSTATION",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "countKind",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "getTillShiftPolicy": {
+  "method": "GET",
+  "path": "/venues/{venueId}/till-shift-policy",
+  "contract": "shift",
+  "summary": "The rules every till in the venue opens and closes to",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "TillShiftPolicy"
+ },
  "getTrialBalance": {
   "method": "GET",
   "path": "/ledger/trial-balance",
@@ -495,6 +575,45 @@
   "requestBody": null,
   "responds": null
  },
+ "listAccounts": {
+  "method": "GET",
+  "path": "/accounts",
+  "contract": "finance",
+  "summary": "List the chart of accounts",
+  "permission": "LEDGER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "region",
+  "parameters": [
+   {
+    "name": "legalEntityId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "type",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "isPostable",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "listCashMovements": {
   "method": "GET",
   "path": "/shifts/{shiftId}/cash-movements",
@@ -519,26 +638,16 @@
   "requestBody": null,
   "responds": "Page"
  },
- "listDeliveryLocations": {
+ "listCostCenters": {
   "method": "GET",
-  "path": "/venues/{venueId}/delivery-locations",
-  "contract": "fnb",
-  "summary": "Where an order can be delivered",
-  "permission": null,
+  "path": "/cost-centers",
+  "contract": "finance",
+  "summary": "List cost centres",
+  "permission": "LEDGER_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
+  "scopeLevel": "region",
   "parameters": [
-   {
-    "name": "kind",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "servingOutletId",
-    "in": "query",
-    "required": null
-   },
    {
     "name": null,
     "in": null,
@@ -565,40 +674,6 @@
   "parameters": [
    {
     "name": "openOnly",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- },
- "listDiningOutlets": {
-  "method": "GET",
-  "path": "/venues/{venueId}/dining",
-  "contract": "fnb",
-  "summary": "Where a guest can eat, right now",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "openNow",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "orderingMethod",
     "in": "query",
     "required": null
    },
@@ -661,6 +736,30 @@
     "in": "query",
     "required": null
    },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listLegalEntities": {
+  "method": "GET",
+  "path": "/legal-entities",
+  "contract": "finance",
+  "summary": "List legal entities",
+  "permission": "LEDGER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
    {
     "name": null,
     "in": null,
@@ -784,6 +883,21 @@
     "required": null
    },
    {
+    "name": "workstationId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "subjectId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "tender",
+    "in": "query",
+    "required": null
+   },
+   {
     "name": null,
     "in": null,
     "required": null
@@ -796,6 +910,30 @@
   ],
   "requestBody": null,
   "responds": "Page"
+ },
+ "listOutlets": {
+  "method": "GET",
+  "path": "/outlets",
+  "contract": "tenancy",
+  "summary": "List outlets",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "kind",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Outlet"
  },
  "listReportExecutions": {
   "method": "GET",
@@ -1001,40 +1139,6 @@
   "requestBody": null,
   "responds": "Page"
  },
- "lookupMerchandise": {
-  "method": "GET",
-  "path": "/merchandise/lookup",
-  "contract": "retail",
-  "summary": "Price and stock check by barcode",
-  "permission": "PRODUCT_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "barcode",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "sku",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "includeSiblingOutlets",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "outletId",
-    "in": "query",
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "PriceCheck"
- },
  "modifyOrder": {
   "method": "POST",
   "path": "/orders/{orderId}/modify",
@@ -1054,52 +1158,14 @@
   "requestBody": "ModifyOrderRequest",
   "responds": "OrderModificationResult"
  },
- "openShift": {
+ "rejectShiftVariance": {
   "method": "POST",
-  "path": "/shifts",
+  "path": "/shifts/{shiftId}/reject-variance",
   "contract": "shift",
-  "summary": "Open a shift",
-  "permission": "SHIFT_OPEN",
+  "summary": "Send a counted shift back for a recount",
+  "permission": "OVERSHORT_ACCEPT",
   "offlineCapable": false,
   "conflictPolicy": "append",
-  "scopeLevel": "workstation",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "OpenShiftRequest",
-  "responds": "Shift"
- },
- "recordNoSale": {
-  "method": "POST",
-  "path": "/shifts/{shiftId}/no-sale",
-  "contract": "shift",
-  "summary": "Open the Deposit Box without a sale",
-  "permission": "CASH_NO_SALE",
-  "offlineCapable": true,
-  "conflictPolicy": "append",
-  "scopeLevel": "workstation",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "NoSaleEvent"
- },
- "reopenShift": {
-  "method": "POST",
-  "path": "/shifts/{shiftId}/reopen",
-  "contract": "shift",
-  "summary": "Reopen a shift closed in error",
-  "permission": "SHIFT_REOPEN",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -1187,25 +1253,6 @@
   "requestBody": null,
   "responds": "OrderResumeResult"
  },
- "resumeShift": {
-  "method": "POST",
-  "path": "/shifts/{shiftId}/resume",
-  "contract": "shift",
-  "summary": "Resume a suspended shift",
-  "permission": "SHIFT_OPEN",
-  "offlineCapable": true,
-  "conflictPolicy": "append",
-  "scopeLevel": "workstation",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Shift"
- },
  "runReport": {
   "method": "POST",
   "path": "/reports/{reportId}/run",
@@ -1292,6 +1339,25 @@
   "requestBody": "RefundPolicy",
   "responds": "RefundPolicy"
  },
+ "setTillShiftPolicy": {
+  "method": "PUT",
+  "path": "/venues/{venueId}/till-shift-policy",
+  "contract": "shift",
+  "summary": "Set the rules every till in the venue opens and closes to",
+  "permission": "WORKSTATION_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "TillShiftPolicy",
+  "responds": "TillShiftPolicy"
+ },
  "setVenueSettings": {
   "method": "PUT",
   "path": "/venues/{venueId}/settings",
@@ -1311,15 +1377,15 @@
   "requestBody": "VenueSettings",
   "responds": "VenueSettings"
  },
- "suspendShift": {
-  "method": "POST",
-  "path": "/shifts/{shiftId}/suspend",
-  "contract": "shift",
-  "summary": "Suspend a shift so another user can log in",
-  "permission": "SHIFT_SUSPEND",
-  "offlineCapable": true,
-  "conflictPolicy": "append",
-  "scopeLevel": "workstation",
+ "updateAccount": {
+  "method": "PATCH",
+  "path": "/accounts/{accountId}",
+  "contract": "finance",
+  "summary": "Rename, remap or deactivate an account",
+  "permission": "ACCOUNT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "region",
   "parameters": [
    {
     "name": null,
@@ -1328,7 +1394,7 @@
    }
   ],
   "requestBody": null,
-  "responds": "Shift"
+  "responds": "Account"
  },
  "updateDeliveryLocation": {
   "method": "PATCH",

@@ -36,6 +36,35 @@
     },
     "description": "Where `coverage` is `perTask`: the gateway tasks a tenant key may serve. Empty means any."
    },
+   "taskModelMap": {
+    "x-ticvai-persistence-kind": "valueObject",
+    "x-ticvai-persistence-column": "jsonb",
+    "type": "array",
+    "readOnly": true,
+    "description": "**The provider's equivalent model for each task, chosen by TICVAI** (Chinmay, 2 October, workbook Q1; closes AI-D20; CHG-CSA-001). For each task the tenant key serves, the model of the tenant's provider at the tier the task needs, taken from TICVAI's curated range (`AiModel.curatedRange`). The tenant does not choose it; a task with no curated equivalent at the tenant's provider stays on the TICVAI-managed model and is listed with `modelId` null.",
+    "items": {
+     "type": "object",
+     "properties": {
+      "taskKey": {
+       "type": "string"
+      },
+      "tier": {
+       "type": "string"
+      },
+      "modelId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true,
+       "x-ticvai-references": "ai.model"
+      },
+      "compatibilityPassed": {
+       "type": "boolean",
+       "nullable": true,
+       "description": "Whether the provider's compatibility test passed for this task (`AiProviderCompatibility`, CHG-FUP-008); a task that has not passed stays on the TICVAI-managed model."
+      }
+     }
+    }
+   },
    "reason": {
     "type": "string",
     "maxLength": 1000
@@ -104,6 +133,12 @@
      }
     ],
     "nullable": true
+   },
+   "vendor": {
+    "type": "string",
+    "nullable": true,
+    "pattern": "^[a-z0-9][a-z0-9-]{1,49}$",
+    "description": "**Whose model this is** (CHG-FUP-008): the provider company as `AiProvider.vendor` names it. Bring-your-own-key accepts any vendor, so the curated range carries each vendor's models with the tier they serve; the task-to-tier map (`AiByokEnablement.taskModelMap`) picks the row whose `vendor` matches the tenant's provider. TICVAI adds a new vendor's models after evaluating them (`runAiEvaluation`)."
    },
    "producerType": {
     "type": "string",
@@ -203,6 +238,53 @@
      "type": "string"
     },
     "description": "Tasks this model is the default for (AIC-010), e.g. `assistant.guest.answer`, `config.extract`."
+   },
+   "curatedRange": {
+    "type": "array",
+    "x-ticvai-persistence-kind": "valueObject",
+    "x-ticvai-persistence-column": "jsonb",
+    "description": "**TICVAI's curated range: the tasks this model may serve** (Chinmay, 2 October, workbook Q1, Q2 and Q9; the AI/ML model selection of 2 October; CHG-CSA-001). For each task: the tier it serves at and its rank, 1 being the best-suited model and 2 to 5 the alternatives. **A model may serve a task only where this lists it**: `setAiProvider` refuses any other choice (`422 model-not-curated`), and bring-your-own-key maps each task to the tenant provider's model at the same tier. `byokEligible` false marks the platform-owned tiers (embeddings, reranking, moderation, PII detection, OCR, speech), never served by a tenant key. Money paths (pricing, fraud scores, settlements) stay on classical models.\n",
+    "items": {
+     "type": "object",
+     "description": "Every entry names `taskKey`, `tier` and `rank`.",
+     "properties": {
+      "taskKey": {
+       "type": "string"
+      },
+      "tier": {
+       "type": "string",
+       "enum": [
+        "small",
+        "strong",
+        "reasoning",
+        "vision",
+        "embedding",
+        "reranking",
+        "moderation",
+        "piiDetection",
+        "ocr",
+        "speech",
+        "classical"
+       ]
+      },
+      "rank": {
+       "type": "integer",
+       "minimum": 1,
+       "maximum": 5
+      },
+      "byokEligible": {
+       "type": "boolean",
+       "default": true
+      }
+     }
+    }
+   },
+   "residencyClasses": {
+    "type": "array",
+    "items": {
+     "$ref": "../shared/common.yaml#/components/schemas/AiResidencyClass"
+    },
+    "description": "The tenant residency classes whose calls this model may serve (CHG-CSA-002)."
    },
    "taskFitness": {
     "type": "array",
@@ -354,6 +436,12 @@
    "kind": {
     "$ref": "#/components/schemas/AiProviderKind"
    },
+   "vendor": {
+    "type": "string",
+    "nullable": true,
+    "pattern": "^[a-z0-9][a-z0-9-]{1,49}$",
+    "description": "**The provider company, any provider** (Chinmay, 2 October, contract follow-ups: \"As long as we get an API key it can be any model\"; CHG-FUP-008), as a lower-case slug: `mistral`, `cohere`, `core42`, `openai`. `kind` says how it is reached (a native adapter, or `openaiCompatible` for every other vendor); `vendor` says whose models the curated task-to-tier map picks from (`AiModel.vendor`). Required for a tenant-managed provider; null on an older row, where `kind` names the vendor."
+   },
    "capability": {
     "$ref": "#/components/schemas/AiCapability"
    },
@@ -398,6 +486,13 @@
     "type": "string",
     "description": "A key-vault reference, never the key. A key typed into a form ends up in a screenshot.\n"
    },
+   "credentialHint": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "maxLength": 4,
+    "description": "The last four characters of the stored key, so an operator can tell two keys apart. The key itself is never shown again after `setAiCredential` (CHG-FUP-008)."
+   },
    "credentialRotatedAt": {
     "type": "string",
     "format": "date-time",
@@ -417,6 +512,15 @@
     "readOnly": true,
     "description": "When `testAiProvider` last confirmed the key works."
    },
+   "compatibility": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/AiProviderCompatibility"
+     }
+    ],
+    "readOnly": true,
+    "description": "The last compatibility test of this provider (`testAiProvider`). A tenant-managed provider is activated only once its `status` is `passed` (CHG-FUP-008)."
+   },
    "endpoint": {
     "type": "string",
     "nullable": true
@@ -424,6 +528,13 @@
    "residency": {
     "type": "string",
     "description": "Where inference physically happens. **A prompt reaching a provider hosted elsewhere is a cross-border transfer** (ADR-0009), and this field is what makes that auditable rather than assumed.\n"
+   },
+   "residencyClasses": {
+    "type": "array",
+    "items": {
+     "$ref": "../shared/common.yaml#/components/schemas/AiResidencyClass"
+    },
+    "description": "**The tenant residency classes this provider may serve** (Chinmay, 2 October: the AI residency decision; CHG-CSA-002). The gateway routes a call for a tenant only to a provider whose list holds the tenant's class (tenancy, common `AiResidencyClass`, default `uaeOnly`); `setAiProvider` refuses a provider that cannot serve the tenant's class (`409 residency-class-refused`). A `uaeOnly` call can only resolve to an in-UAE endpoint: Core42 Compass, OpenAI UAE, or the in-cell model.\n"
    },
    "maxTokens": {
     "type": "integer"
@@ -452,12 +563,12 @@
     "items": {
      "type": "string"
     },
-    "description": "**Which agent tasks this provider serves** (21 September minutes, M21-03: different agents may use different models chosen for the task). Empty means every task of its `capability`. A task listed on two providers goes to the lower `priority`. **AI-D02 stands:** one managed provider (Azure OpenAI in UAE North) serves every task by default, with a small and a stronger model per task; a second provider or a tenant's own key is added only where TICVAI enables it for the tenant (AI-D14, `setAiByokEnablement`)."
+    "description": "**Which agent tasks this provider serves** (21 September minutes, M21-03: different agents may use different models chosen for the task). Empty means every task of its `capability`. A task listed on two providers goes to the lower `priority`. **AI-D02 as amended on 2 October** (the AI residency decision, CHG-CSA-002): the managed provider depends on the tenant's residency class (Core42 Compass for `uaeOnly`, the default), with a Small and a Strong model per task; a second provider or a tenant's own key is added only where TICVAI enables it for the tenant (AI-D14, `setAiByokEnablement`). **Each task's model comes from TICVAI's curated range** (`AiModel.curatedRange`, CHG-CSA-001): the client cannot pick a model outside it."
    },
    "fitnessWarnings": {
     "type": "array",
     "readOnly": true,
-    "description": "**The model-fitness check at the last write** (21 September minutes, M21-09). For each task in `taskKeys` whose model scores outside the task's band in `AiModel.taskFitness`, or has no score, one warning. A warning never blocks the write; it is shown on ADM-037 and kept so the choice is auditable.",
+    "description": "**The model-fitness check at the last write** (21 September minutes, M21-09). For each task in `taskKeys` whose model scores outside the task's band in `AiModel.taskFitness`, or has no score, one warning, shown on ADM-037 and kept so the choice is auditable. **A model outside TICVAI's curated range for a task is no longer a warning: it is refused** (`422 model-not-curated`; Chinmay, 2 October, workbook Q2, amending AI-D18; CHG-CSA-001). A warning now only describes a curated model's fit.",
     "items": {
      "type": "object",
      "properties": {
@@ -484,6 +595,70 @@
    }
   }
  },
+ "AiProviderCompatibility": {
+  "type": "object",
+  "x-ticvai-persistence-kind": "valueObject",
+  "x-ticvai-persistence-column": "jsonb",
+  "description": "**Whether a provider can serve the tasks it would take, before it takes them** (Chinmay, 2 October, contract follow-ups: BYOK accepts any provider, with a compatibility test before activation; CHG-FUP-008). For each task the provider would serve, the gateway calls the vendor's equivalent model at the task's tier (the curated task-to-tier map) with TICVAI's probes: tool calling, structured output against a JSON schema, Arabic, the context window the task needs, the latency band and the residency of the endpoint. A task passes when every probe passes; the provider's `status` is `passed` when at least one task passes, and only the passing tasks are routed to it.",
+  "required": [
+   "status"
+  ],
+  "properties": {
+   "status": {
+    "type": "string",
+    "enum": [
+     "notTested",
+     "passed",
+     "failed"
+    ]
+   },
+   "testedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "tasks": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "taskKey",
+      "passed"
+     ],
+     "properties": {
+      "taskKey": {
+       "type": "string"
+      },
+      "tier": {
+       "type": "string"
+      },
+      "modelName": {
+       "type": "string",
+       "nullable": true,
+       "description": "The vendor's model the curated map picked for this task and tier; null where the vendor has no curated equivalent, and the task stays on the TICVAI-managed model."
+      },
+      "passed": {
+       "type": "boolean"
+      },
+      "failedProbes": {
+       "type": "array",
+       "items": {
+        "type": "string",
+        "enum": [
+         "toolCalling",
+         "structuredOutput",
+         "arabic",
+         "contextWindow",
+         "latency",
+         "residency"
+        ]
+       }
+      }
+     }
+    }
+   }
+  }
+ },
  "AiProviderKind": {
   "type": "string",
   "enum": [
@@ -494,7 +669,14 @@
    "localLlm",
    "openaiCompatible"
   ],
-  "description": "`openaiCompatible` (added 29 September, AI design 3.3): a customer endpoint that speaks the OpenAI API, taken with no custom development (AIC-009). Any other protocol needs an adapter.\n"
+  "description": "`openaiCompatible` (added 29 September, AI design 3.3): a customer endpoint that speaks the OpenAI API, taken with no custom development (AIC-009). Any other protocol needs an adapter.\n**Core42 Compass is reached through `openaiCompatible`** (Chinmay, 2 October: the AI residency decision, amending AI-D02; CHG-CSA-002). Compass is the provider of the `uaeOnly` residency class (common `AiResidencyClass`): Small tier Compass GPT-4.1 mini (or Seraj), Strong tier Compass GPT-5, with OpenAI UAE and then the in-cell open-weights model as the fallback chain. OpenAI UAE is `openai` with a UAE `endpoint`; the in-cell model is `localLlm`.\n**A kind is a protocol, not a vendor** (Chinmay, 2 October, contract follow-ups: BYOK accepts any provider; CHG-FUP-008). Any vendor is accepted, named in `AiProvider.vendor`: Mistral, Cohere or any other is reached through `openaiCompatible` where its API speaks it, which the compatibility test confirms before activation (`AiProviderCompatibility`). A new native adapter is a new value here, a breaking change for a client built earlier that goes out with an approval (`docs/active/breaking-changes.yaml`); until then a vendor without either protocol is refused `422 provider-protocol-unsupported`.\n"
+ },
+ "LocalisedText": {
+  "x-ticvai-persistence": "none — jsonb column",
+  "type": "object",
+  "additionalProperties": {
+   "type": "string"
+  }
  },
  "Page": {
   "type": "object",
@@ -701,7 +883,27 @@
    "PROCUREMENT_VIEW",
    "PROCUREMENT_REQUEST",
    "PROCUREMENT_MANAGE",
-   "PROCUREMENT_RECEIVE"
+   "PROCUREMENT_RECEIVE",
+   "CORE_AI_PUBLISH",
+   "TICKETING_AI_PUBLISH",
+   "ACCESS_AI_PUBLISH",
+   "FNB_AI_PUBLISH",
+   "RETAIL_AI_PUBLISH",
+   "INVENTORY_AI_PUBLISH",
+   "SEATING_AI_PUBLISH",
+   "MEMBERSHIP_AI_PUBLISH",
+   "MARKETING_AI_PUBLISH",
+   "RESOURCES_AI_PUBLISH",
+   "QUEUE_AI_PUBLISH",
+   "TRANSPORT_AI_PUBLISH",
+   "GAMES_AI_PUBLISH",
+   "MAINTENANCE_AI_PUBLISH",
+   "ACCREDITATION_AI_PUBLISH",
+   "PARTNER_AI_PUBLISH",
+   "ANALYTICS_AI_PUBLISH",
+   "BIOMETRIC_IMAGE_VIEW",
+   "ACCESS_DIRECTION_SET",
+   "REPORT_GOVERNANCE_MANAGE"
   ]
  },
  "Placement": {
@@ -832,11 +1034,105 @@
    },
    "allowedAiResidencies": {
     "type": "array",
-    "description": "**The region's compliance gate on AI providers** (decided 28 September, audit R203; ADR-0009). The `AiProvider.residency` values a tenant in this region may use; empty means no restriction. `ai.setAiProvider` refuses any other residency with `409 residency-refused`. A prompt carrying guest data that reaches a provider hosted elsewhere is a cross-border transfer, and this is where a region says which it allows.\n",
+    "description": "**The region's compliance gate on AI providers** (decided 28 September, audit R203; ADR-0009). The `AiProvider.residency` values a tenant in this region may use; empty means no restriction. `ai.setAiProvider` refuses any other residency with `409 residency-refused`. A prompt carrying guest data that reaches a provider hosted elsewhere is a cross-border transfer, and this is where a region says which it allows.\n**Derived from `aiResidencyClass` since 2 October 2026** (CHG-CSP-009): the class names the residencies, and this list narrows them further where a region needs it; it never widens them.\n",
     "default": [],
     "items": {
      "type": "string"
     }
+   },
+   "aiResidencyClass": {
+    "type": "string",
+    "enum": [
+     "uaeOnly",
+     "globalAllowed",
+     "onPrem"
+    ],
+    "default": "uaeOnly",
+    "description": "**The tenant's AI residency class** (decided 2 October 2026, Chinmay, \"AI residency: per-tenant residency class\"; DEC-539; CHG-CSP-009; amends AI-D02 and ADR-0009 section 1). Which AI endpoints the AI engine may route this tenant's calls to:\n- `uaeOnly` (the default, and mandatory for government, bank and health tenants): the small tier\n  is Core42 Compass GPT-4.1 mini (or Seraj if it wins the Arabic golden set), the strong tier\n  Compass GPT-5, reached through `AiProviderKind` `openaiCompatible`; fallback OpenAI UAE, then\n  the in-cell gpt-oss-120b. No call leaves the UAE.\n- `globalAllowed`: a private venue that opts in under PDPL Article 23, with a vendor contract, a\n  DPIA and a notice to guests (`aiResidencyOptIn`). Azure gpt-5-mini and gpt-6-sol Global, or\n  the tenant's BYOK provider; fallback the `uaeOnly` chain. The tenant is listed in ADR-0009's\n  transfer register.\n- `onPrem`: models in the tenant's own estate (Qwen3.5 or gpt-oss; strong tier Qwen3.5-122B,\n  Falcon-H1 Arabic or Jais 2).\n\n**Every LLM call is scrubbed of personal data in-cell first, whatever the class** (DEC-542): the class decides where a call may go, never whether personal data may travel. Moving from `uaeOnly` to `globalAllowed` without `aiResidencyOptIn` is refused `422 residency-opt-in-required`; on a tenant `aiResidencyClassLocked` holds, any change is refused `409 residency-class-locked`. The model choice per class is the AI engine's (ai `AiProvider`, ai-system-design 3.3), not a setting here.\n"
+   },
+   "aiResidencyClassLocked": {
+    "type": "boolean",
+    "readOnly": true,
+    "default": false,
+    "description": "**Set by TICVAI at onboarding for a government, bank or health tenant** (DEC-539), which must stay `uaeOnly`. Read-only to the tenant.\n"
+   },
+   "aiResidencyOptIn": {
+    "type": "object",
+    "nullable": true,
+    "description": "**The evidence a `globalAllowed` opt-in needs under PDPL Article 23** (DEC-539; CHG-CSP-009): the tenant's references to its vendor contract, its DPIA and the notice guests see. The platform records that they were named, by whom and when; it does not hold or judge the documents. Null while the class is `uaeOnly` or `onPrem`.\n",
+    "properties": {
+     "vendorContractReference": {
+      "type": "string",
+      "maxLength": 200
+     },
+     "dpiaReference": {
+      "type": "string",
+      "maxLength": 200
+     },
+     "guestNoticeReference": {
+      "type": "string",
+      "maxLength": 200
+     },
+     "confirmedByPrincipalId": {
+      "type": "string",
+      "format": "uuid",
+      "readOnly": true
+     },
+     "confirmedAt": {
+      "type": "string",
+      "format": "date-time",
+      "readOnly": true
+     }
+    }
+   },
+   "localLanguageNameLocales": {
+    "type": "array",
+    "default": [],
+    "description": "**The languages an outlet name must also be given in, in this country** (decided 2 October 2026, Chinmay, batch 2 #26: \"English plus the local language where the country needs it\"; DEC-031; CHG-CSP-005). ISO 639-1 codes; `[ar]` in the UAE. Empty asks for English only. `createOutlet` and `updateOutlet` refuse an outlet whose `nameTranslations` lacks one of them (`422 local-name-required`).\n",
+    "items": {
+     "type": "string",
+     "pattern": "^[a-z]{2}$"
+    }
+   },
+   "requiredBillingDocuments": {
+    "x-ticvai-persistence-kind": "valueObject",
+    "x-ticvai-persistence-column": "jsonb",
+    "type": "array",
+    "description": "**Which documents a TICVAI customer's billing entity must upload, in this country** (decided 2 October 2026, Chinmay, batch 6 set 7, ADM-411: \"Trade licence always; VAT certificate when a TRN is entered; configurable per country\"; DEC-210; CHG-CSP-008). The default for every country is the two rows below; TICVAI staff change them per country. The subscription contract's billing entity and `PartnerDocument` read this list; a missing required document holds the entity in verification.\n",
+    "default": [
+     {
+      "documentType": "tradeLicence",
+      "requiredWhen": "always"
+     },
+     {
+      "documentType": "vatCertificate",
+      "requiredWhen": "trnEntered"
+     }
+    ],
+    "items": {
+     "type": "object",
+     "properties": {
+      "documentType": {
+       "type": "string",
+       "maxLength": 64,
+       "description": "The document kind, as the subscription contract's `PartnerDocument` names it (`tradeLicence`, `vatCertificate`, ...)."
+      },
+      "requiredWhen": {
+       "type": "string",
+       "enum": [
+        "always",
+        "trnEntered"
+       ]
+      }
+     }
+    }
+   },
+   "minorAgeThreshold": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 21,
+    "default": 18,
+    "description": "**The age below which a guest is a minor here, set per country** (decided 2 October 2026, Chinmay, critical set 1, BO-187: \"Guardian consent on the venue's form; minor age per country\"; DEC-237; CHG-CSP-019). A minor's biometric enrolment needs a guardian's consent on the venue's consent form (access `enrolFacePass`, `consent.guardianSubjectId`); a subject with no date of birth is treated as a minor (audit R126). The default 18 is the UAE's age of majority and is marked for counsel to confirm per country (R205); whether minors may enrol at all is the venue's switch (`VenueSettings.biometrics.allowMinors`).\n"
    },
    "placement": {
     "$ref": "#/components/schemas/Placement"
@@ -847,5 +1143,134 @@
     "description": "The cell serving this region. One cell per tenant per region (ADR-0014).\n"
    }
   }
+ },
+ "SuspensionMode": {
+  "type": "string",
+  "description": "Access validation continues under every mode. A commercial dispute must not strand guests at a gate holding valid tickets.\n",
+  "enum": [
+   "readOnly",
+   "noNewSales",
+   "fullLockout"
+  ]
+ },
+ "Tenant": {
+  "x-ticvai-persistence": "control.tenant",
+  "type": "object",
+  "required": [
+   "id",
+   "code",
+   "name",
+   "status",
+   "createdAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "status": {
+    "$ref": "#/components/schemas/TenantStatus"
+   },
+   "suspensionMode": {
+    "$ref": "#/components/schemas/SuspensionMode"
+   },
+   "suspensionReason": {
+    "type": "string",
+    "nullable": true
+   },
+   "suspensionEffectiveAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "When the suspension takes, or took, effect — `suspendTenant.effectiveAt`. **A future value is a pending suspension**: the tenant stays `active` until then, and this row is the only place that says a suspension is coming."
+   },
+   "suspensionNoticeMessage": {
+    "$ref": "#/components/schemas/LocalisedText",
+    "description": "The notice shown to the tenant's users about the suspension — `suspendTenant.noticeMessage`."
+   },
+   "terminationScheduledAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "When `terminateTenant` started the retention window. Null when no termination is under way."
+   },
+   "terminationRetentionUntil": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "`terminationScheduledAt` plus the request's `retentionDays`. **Stored, not recomputed** — the day count is client-supplied and exists nowhere else, and this is the date the cells are destroyed after."
+   },
+   "terminationReason": {
+    "type": "string",
+    "maxLength": 1000,
+    "nullable": true
+   },
+   "terminationRequestedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "planId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "planName": {
+    "type": "string",
+    "nullable": true
+   },
+   "cellCount": {
+    "type": "integer"
+   },
+   "venueCount": {
+    "type": "integer"
+   },
+   "regionId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The tenant's home region: the `tenancy` region node whose `RegionSettings` govern tenant-wide gates, today `allowedAiResidencies` (decided 28 September, audit R203). Written by the server when the tenant's first region is created; null until then. ADM-037 reads it to show the region's residency restriction, and `ai.setAiProvider` checks against the same region.\n"
+   },
+   "billingEmail": {
+    "type": "string"
+   },
+   "billingAddress": {
+    "type": "string",
+    "maxLength": 500,
+    "nullable": true,
+    "description": "Accepted by `createTenant` and `updateTenant`; stored here so the response can return what was sent."
+   },
+   "accountManagerPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "activatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "TenantStatus": {
+  "type": "string",
+  "enum": [
+   "onboarding",
+   "active",
+   "suspended",
+   "terminating",
+   "terminated"
+  ]
  }
 }

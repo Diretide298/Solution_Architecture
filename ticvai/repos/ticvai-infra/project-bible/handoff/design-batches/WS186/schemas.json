@@ -85,6 +85,25 @@
    }
   }
  },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ },
  "SharedWallet": {
   "type": "object",
   "x-ticvai-persistence": "wallet.shared_wallet",
@@ -463,6 +482,11 @@
    "name"
   ],
   "properties": {
+   "autoReloadAllowed": {
+    "type": "boolean",
+    "default": true,
+    "description": "**Auto-reload is optional per wallet type** (Chinmay, 2 October, workbook Q105, default accepted; CHG-CSA-027). Where false, a holder of this type cannot set an auto top-up (`setWalletAutoReloadSetting` refuses it) whatever the venue's `WalletFundingRules.autoReload` says."
+   },
    "id": {
     "type": "string",
     "format": "uuid"

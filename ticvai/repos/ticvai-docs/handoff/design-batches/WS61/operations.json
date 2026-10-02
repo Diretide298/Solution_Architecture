@@ -31,6 +31,51 @@
   "requestBody": null,
   "responds": "CredentialIssuanceRetryPolicyView"
  },
+ "getEntitlement": {
+  "method": "GET",
+  "path": "/entitlements/{entitlementId}",
+  "contract": "access",
+  "summary": "One entitlement, with what remains on it",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "Entitlement"
+ },
+ "getEntitlementCredential": {
+  "method": "GET",
+  "path": "/entitlements/{entitlementId}/credential",
+  "contract": "access",
+  "summary": "The thing that gets scanned",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "rotate",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "getEntitlementHistory": {
+  "method": "GET",
+  "path": "/entitlements/{entitlementId}/history",
+  "contract": "access",
+  "summary": "Every scan, freeze, share and reissue against it",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": null
+ },
  "listCredential": {
   "method": "GET",
   "path": "/credential",
@@ -383,6 +428,30 @@
   "requestBody": null,
   "responds": "TicketMediaAnalyticsAiOperationsIntelligenceView"
  },
+ "lookupTicket": {
+  "method": "GET",
+  "path": "/access/lookup",
+  "contract": "access",
+  "summary": "Read-only validity check without admitting",
+  "permission": "TICKET_LOOKUP",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "mediaCode",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "ticketId",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "TicketStatus"
+ },
  "replaceCredential": {
   "method": "POST",
   "path": "/credentials/{credentialId}/replace",
@@ -477,24 +546,5 @@
   ],
   "requestBody": "MediaBindingActivationAssignmentOperationsInput",
   "responds": "MediaBindingActivationAssignmentOperationsView"
- },
- "setVirtualTicketCredential": {
-  "method": "PUT",
-  "path": "/virtual-ticket-credential",
-  "contract": "access",
-  "summary": "Virtual Ticket & Credential 360° Workspace",
-  "permission": "ACCESS_POINT_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "VirtualTicketCredential360WorkspaceInput",
-  "responds": "VirtualTicketCredential360WorkspaceView"
  }
 }

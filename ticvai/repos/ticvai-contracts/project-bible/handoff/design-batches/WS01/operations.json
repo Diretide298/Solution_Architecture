@@ -371,6 +371,25 @@
   "requestBody": "AccessOperatingCalendarEntry",
   "responds": "AccessOperatingCalendarEntry"
  },
+ "updateAccessPoint": {
+  "method": "PATCH",
+  "path": "/access-points/{accessPointId}",
+  "contract": "access",
+  "summary": "Update an access point",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AccessPoint"
+ },
  "updateOrgUnit": {
   "method": "PATCH",
   "path": "/org-units/{orgUnitId}",

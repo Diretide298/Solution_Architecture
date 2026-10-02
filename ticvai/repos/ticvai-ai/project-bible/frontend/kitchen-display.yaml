@@ -21,7 +21,6 @@ packages:
 contracts:
 - fnb
 - reporting
-- tenancy
 deployment:
   target: browser
   distribution: served from the cell

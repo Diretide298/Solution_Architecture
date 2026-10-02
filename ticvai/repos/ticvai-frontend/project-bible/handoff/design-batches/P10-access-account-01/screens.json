@@ -45,11 +45,7 @@
     {
      "to": "PTR-002",
      "trigger": "Partner Dashboard",
-     "provenance": "structural — PTR-001 is P10's home screen and its exits are its launcher",
-     "carries": [
-      "accountId",
-      "orderId"
-     ]
+     "provenance": "structural — PTR-001 is P10's home screen and its exits are its launcher"
     },
     {
      "to": "PTR-003",
@@ -74,10 +70,7 @@
     {
      "to": "PTR-008",
      "trigger": "Booking Creation",
-     "carries": [
-      "orderId"
-     ],
-     "provenance": "derived — PTR-008 declares entryState.params orderId and PTR-001 holds orderId, so an edge into it carries them"
+     "provenance": "derived; the door holds no record id since CHG-DOOR-002/003 made it a sign-in form, so the edge carries nothing and PTR-008 opens on its own"
     },
     {
      "to": "PTR-009",
@@ -102,10 +95,7 @@
     {
      "to": "PTR-013",
      "trigger": "Credit Limit & Balance",
-     "carries": [
-      "accountId"
-     ],
-     "provenance": "derived — PTR-013 declares entryState.params accountId and PTR-001 holds accountId, so an edge into it carries them"
+     "provenance": "derived; the door holds no record id since CHG-DOOR-002/003 made it a sign-in form, so the edge carries nothing and PTR-013 opens on its own"
     },
     {
      "to": "PTR-014",
@@ -115,18 +105,12 @@
     {
      "to": "PTR-015",
      "trigger": "Order History",
-     "carries": [
-      "orderId"
-     ],
-     "provenance": "derived — PTR-015 declares entryState.params orderId and PTR-001 holds orderId, so an edge into it carries them"
+     "provenance": "derived; the door holds no record id since CHG-DOOR-002/003 made it a sign-in form, so the edge carries nothing and PTR-015 opens on its own"
     },
     {
      "to": "PTR-016",
      "trigger": "Voucher / Ticket Download",
-     "carries": [
-      "orderId"
-     ],
-     "provenance": "derived — PTR-016 declares entryState.params orderId and PTR-001 holds orderId, so an edge into it carries them"
+     "provenance": "derived; the door holds no record id since CHG-DOOR-002/003 made it a sign-in form, so the edge carries nothing and PTR-016 opens on its own"
     },
     {
      "to": "PTR-017",
@@ -172,10 +156,7 @@
      "to": "PTR-005",
      "trigger": "Books against the allocation",
      "provenance": "flow F10 step 1→2",
-     "operation": "getB2bCredit",
-     "carries": [
-      "orderId"
-     ]
+     "operation": "login"
     },
     {
      "to": "SUP-001",
@@ -184,189 +165,109 @@
      "crossesDevice": true,
      "back": false,
      "carries": [
-      "challengeId"
+      "challengeId",
+      "methodId",
+      "providerId"
      ]
     }
    ]
   },
-  "notes": "States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived from the screen name and its operations on 17 August, not from a requirement.",
+  "notes": "**Rebuilt as a sign-in form on 2 October 2026 (CHG-DOOR-002/003; Chinmay, 2 October 2026: fix the Block A blockers now).** It was generated as a list over active sessions, MFA methods and SSO providers with Force logout and Revoke all sessions on the door, which a person who is not yet signed in can never use (platform-foundation process notes). The sequence is the same on every staff and partner door: credentials (or the organisation's SSO) -> the authentication code only when a permission demands it (R135) -> the role prompt when several roles are held (ADR-0003) -> the landing. Managing sessions moved to the staff directory (BO-053); managing MFA methods stays on each app's own security or profile screen. **The credit operations left the door** (getB2bCredit, setB2bCreditLimit, overrideCreditLimit, listPartnerAgreements): the partner reads credit on PTR-002 and PTR-013, and setting or overriding a limit is the tenant's act, not the partner's.",
   "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "`listActiveSessions` reads the population and `getB2bCredit` reads one of them — list, select, act",
-  "purpose": "Get someone into the app, fast, on a device that may be shared.",
+  "pattern": "form",
+  "patternReason": "A sign-in: two fields, the organisation's SSO where configured, and the second-factor and role steps in place - a form, not a list to browse.",
+  "purpose": "Get a partner user (reseller, OTA, developer) into the partner portal: username and password or the tenant's SSO, the second factor only for a listed permission, then the partner home with the allocation and credit.",
   "layout": {
-   "template": "split",
+   "template": "form",
    "regions": [
     {
      "name": "contentBody",
-     "slot": "collection",
+     "slot": "form",
      "components": [
       {
        "kind": "textField",
-       "label": "Venue id",
-       "operation": "listActiveSessions",
-       "notes": "Sends `?venueId=` to `listActiveSessions`.",
-       "provenance": "contract identity.yaml GET /auth/sessions"
+       "label": "Email or username",
+       "notes": "Goes into `LoginRequest.username`."
       },
       {
        "kind": "textField",
-       "label": "Principal id",
-       "operation": "listActiveSessions",
-       "notes": "Sends `?principalId=` to `listActiveSessions`.",
-       "provenance": "contract identity.yaml GET /auth/sessions"
+       "label": "Password",
+       "notes": "Goes into `LoginRequest.credential` with `method: password`. Minimum 8, show/hide. **No workstation is sent: a browser is not a registered device** (CHG-DOOR-001), and no PIN is offered, because a PIN is bounded by a device this door does not have."
       },
       {
-       "kind": "textField",
-       "label": "Workstation id",
-       "operation": "listActiveSessions",
-       "notes": "Sends `?workstationId=` to `listActiveSessions`.",
-       "provenance": "contract identity.yaml GET /auth/sessions"
+       "kind": "primaryButton",
+       "label": "Sign in",
+       "operation": "login",
+       "notes": "Sends `LoginRequest`. 409 means this person already holds a session elsewhere (audit R184): the screen says where and since when, and that only a holder of SESSION_FORCE_LOGOUT can end it; signing in never ends the other session.",
+       "provenance": "contract identity.yaml POST /auth/login"
       },
       {
-       "kind": "dataTable",
-       "label": "Every active session",
-       "bindsTo": "ActiveSession",
-       "columns": [
-        "ActiveSession.sessionId",
-        "ActiveSession.principalId",
-        "ActiveSession.principalName",
-        "ActiveSession.roleId",
-        "ActiveSession.roleName",
-        "ActiveSession.workstationId",
-        "ActiveSession.workstationName",
-        "ActiveSession.venueId",
-        "ActiveSession.ipAddress",
-        "ActiveSession.deviceInfo",
-        "ActiveSession.hasOpenShift",
-        "ActiveSession.mfaSatisfied"
-       ],
-       "operation": "listActiveSessions",
-       "provenance": "contract identity.yaml GET /auth/sessions"
-      },
-      {
-       "kind": "dataTable",
-       "label": "Every MFA method",
-       "bindsTo": "MfaMethod",
-       "columns": [
-        "MfaMethod.id",
-        "MfaMethod.kind",
-        "MfaMethod.label",
-        "MfaMethod.maskedTarget",
-        "MfaMethod.isActive",
-        "MfaMethod.isPrimary",
-        "MfaMethod.enrolledAt",
-        "MfaMethod.lastUsedAt"
-       ],
-       "operation": "listMfaMethods",
-       "provenance": "contract identity.yaml GET /auth/mfa/methods"
-      },
-      {
-       "kind": "dataTable",
-       "label": "Every SSO provider",
+       "kind": "cardList",
+       "label": "Sign in with your organisation",
        "bindsTo": "SsoProvider",
        "columns": [
-        "SsoProvider.id",
         "SsoProvider.displayName",
         "SsoProvider.protocol",
-        "SsoProvider.iconAssetRef",
-        "SsoProvider.isEnforced",
-        "SsoProvider.scopePath"
+        "SsoProvider.isEnforced"
        ],
        "operation": "listSsoProviders",
+       "notes": "One button per identity provider the tenant configured for partners; **absent, not disabled, when there is none.** Read before sign-in, unauthenticated. When a provider `isEnforced` for this person, the password field is hidden and only this remains.",
        "provenance": "contract identity.yaml GET /auth/sso/providers"
       },
       {
-       "kind": "dataTable",
-       "label": "Every partner agreement",
-       "bindsTo": "PartnerAgreement",
-       "columns": [
-        "PartnerAgreement.id",
-        "PartnerAgreement.partnerId",
-        "PartnerAgreement.partnerName",
-        "PartnerAgreement.status",
-        "PartnerAgreement.rateMode",
-        "PartnerAgreement.commissionPercent",
-        "PartnerAgreement.volumeTiers",
-        "PartnerAgreement.volumeWindow",
-        "PartnerAgreement.seasonalRates",
-        "PartnerAgreement.segmentTier",
-        "PartnerAgreement.brandingAssetId",
-        "PartnerAgreement.storefrontSubdomain"
-       ],
-       "operation": "listPartnerAgreements",
-       "provenance": "contract subscription.yaml GET /partner-agreements"
+       "kind": "secondaryButton",
+       "label": "Continue with your organisation",
+       "operation": "startSsoAuthorization",
+       "notes": "Hands off to the identity provider with this door's `redirectUri`; nothing is typed here. Staff and partner doors only, never a guest door (audit R167).",
+       "provenance": "contract identity.yaml GET /auth/sso/{providerId}/authorize"
+      },
+      {
+       "kind": "progressIndicator",
+       "label": "Finishing sign-in with your organisation",
+       "operation": "completeSsoAuthorization",
+       "notes": "On the provider's redirect back (`code` and `state` from the redirect, never typed). Returns the same `LoginResponse` as `login`, so the second factor and the role prompt follow exactly as below. 403: the provider proved who this is and no group maps to a role in this tenant, which grants nothing.",
+       "provenance": "contract identity.yaml POST /auth/sso/{providerId}/callback"
       }
      ]
     },
     {
-     "name": "contextPanel",
-     "slot": "selection",
+     "name": "secondFactor",
+     "slot": "form",
      "components": [
       {
-       "kind": "detailPanel",
-       "label": "The selected active session",
-       "bindsTo": "ActiveSession",
-       "columns": [
-        "ActiveSession.status",
-        "ActiveSession.sessionId",
-        "ActiveSession.principalId",
-        "ActiveSession.principalName",
-        "ActiveSession.roleId",
-        "ActiveSession.roleName",
-        "ActiveSession.workstationId",
-        "ActiveSession.workstationName",
-        "ActiveSession.venueId",
-        "ActiveSession.ipAddress",
-        "ActiveSession.deviceInfo",
-        "ActiveSession.hasOpenShift",
-        "ActiveSession.mfaSatisfied",
-        "ActiveSession.startedAt",
-        "ActiveSession.lastSeenAt"
-       ],
-       "operation": "listActiveSessions",
-       "provenance": "contract identity.yaml GET /auth/sessions"
+       "kind": "textField",
+       "label": "Authentication code",
+       "operation": "verifyMfaChallenge",
+       "notes": "Shown only when the sign-in comes back `requiresMfa`: the person holds a permission in `PasswordPolicy.mfaRequiredForPermissions` (ROLE_MANAGE, LEDGER_APPROVE, every PLATFORM_* permission, or one the tenant added; audit R135). Six digits from the authenticator app.",
+       "provenance": "contract identity.yaml POST /auth/mfa/challenge/{challengeId}/verify"
       },
       {
-       "kind": "detailPanel",
-       "label": "The session",
-       "bindsTo": "Session",
-       "columns": [
-        "Session.sessionId",
-        "Session.principalId",
-        "Session.roleId",
-        "Session.displayName",
-        "Session.scope",
-        "Session.effectivePermissions",
-        "Session.permissionsByScope",
-        "Session.saleBoardId",
-        "Session.workstation",
-        "Session.openedAt",
-        "Session.expiresAt"
-       ],
-       "operation": "getCurrentSession",
-       "provenance": "contract identity.yaml GET /auth/session"
+       "kind": "primaryButton",
+       "label": "Verify",
+       "operation": "verifyMfaChallenge",
+       "notes": "Completes the sign-in; the session is usable only after it. Five wrong codes lock step-up for the policy's lockout minutes, never permanently (audit R126 (6)), and the screen says until when.",
+       "provenance": "contract identity.yaml POST /auth/mfa/challenge/{challengeId}/verify"
       },
       {
-       "kind": "detailPanel",
-       "label": "The credit position",
-       "bindsTo": "CreditPosition",
-       "columns": [
-        "CreditPosition.id",
-        "CreditPosition.accountId",
-        "CreditPosition.accountName",
-        "CreditPosition.creditLimit",
-        "CreditPosition.used",
-        "CreditPosition.available",
-        "CreditPosition.isOverLimit",
-        "CreditPosition.isSuspended",
-        "CreditPosition.paymentTermsDays",
-        "CreditPosition.oldestUnpaidInvoiceAt",
-        "CreditPosition.daysOverdue",
-        "CreditPosition.activeOverrides",
-        "CreditPosition.scopePath"
-       ],
-       "operation": "getB2bCredit",
-       "provenance": "contract orders.yaml GET /b2b-accounts/{accountId}/credit"
+       "kind": "secondaryButton",
+       "label": "Email me a code instead",
+       "operation": "createMfaChallenge",
+       "notes": "`action: signIn`. The authenticator app is the primary method and an emailed code the fallback (audit R126 (5)).",
+       "provenance": "contract identity.yaml POST /auth/mfa/challenge"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Set up the authenticator app",
+       "operation": "enrolMfaMethod",
+       "notes": "Only when the sign-in comes back `requiresMfa` with `hasMfaMethod: false`: the first method is enrolled here before anything else (audit R135). Authenticator app (`totp`) or email (`emailOtp`) only; the secret as QR and text.",
+       "provenance": "contract identity.yaml POST /auth/mfa/methods"
+      },
+      {
+       "kind": "credentialDisplay",
+       "label": "Recovery codes",
+       "operation": "verifyMfaEnrolment",
+       "notes": "The method is active once its first code is verified. Recovery codes are shown once, with copy and download, and never again.",
+       "provenance": "contract identity.yaml POST /auth/mfa/methods/{methodId}"
       }
      ]
     },
@@ -375,138 +276,71 @@
      "slot": "rowActions",
      "components": [
       {
-       "kind": "primaryButton",
-       "label": "Login",
-       "operation": "login",
-       "provenance": "contract identity.yaml POST /auth/login"
+       "kind": "banner",
+       "label": "Signed in as",
+       "operation": "getCurrentSession",
+       "notes": "Read once the sign-in is complete (after the code and the role, where asked): the person's name and role, then straight on. A partner user lands on the partner home (PTR-002), which shows the allocation and credit; credit details live on PTR-013.",
+       "provenance": "contract identity.yaml GET /auth/session"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Choose role",
+       "operation": "selectRole",
+       "notes": "Only when `LoginResponse.requiresRoleSelection` is true: large role buttons, one per role the person holds (ADR-0003). One role goes straight in. A partner user lands on the partner home (PTR-002), which shows the allocation and credit; credit details live on PTR-013.",
+       "provenance": "contract identity.yaml POST /auth/select-role"
       },
       {
        "kind": "textField",
-       "label": "Authentication code",
-       "operation": "verifyMfaChallenge",
-       "notes": "Shown only in the mfaRequired state, after `login`, for the authenticator-app code or the emailed code (decided 28 September, audit R135, R126 (5)).",
-       "provenance": "contract identity.yaml POST /auth/mfa/challenge/{challengeId}/verify"
-      },
-      {
-       "kind": "primaryButton",
-       "label": "Verify",
-       "operation": "verifyMfaChallenge",
-       "notes": "Completes sign-in; the session is usable only after it. Five wrong codes lock step-up (429 step-up-locked, audit R126 (6)).",
-       "provenance": "contract identity.yaml POST /auth/mfa/challenge/{challengeId}/verify"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Email me a code instead",
-       "operation": "createMfaChallenge",
-       "notes": "The fallback: a new challenge with the email method (`emailOtp`) instead of the authenticator app (decided 28 September, audit R126 (5)).",
-       "provenance": "contract identity.yaml POST /auth/mfa/challenge"
-      },
-      {
-       "kind": "destructiveButton",
-       "label": "Force logout",
-       "operation": "forceLogout",
-       "provenance": "contract identity.yaml POST /auth/sessions/{sessionId}/force-logout"
-      },
-      {
-       "kind": "destructiveButton",
-       "label": "Override credit limit",
-       "operation": "overrideCreditLimit",
-       "provenance": "contract orders.yaml POST /b2b-accounts/{accountId}/credit/override"
-      },
-      {
-       "kind": "destructiveButton",
-       "label": "Revoke all sessions",
-       "operation": "revokeAllSessions",
-       "provenance": "contract identity.yaml POST /auth/sessions/revoke-all"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Save b2b credit limit",
-       "operation": "setB2bCreditLimit",
-       "provenance": "contract orders.yaml PUT /b2b-accounts/{accountId}/credit"
+       "label": "New password",
+       "operation": "changeOwnCredential",
+       "notes": "Only when the credential was reset and is temporary: a new one is set before anything else, twice, and the last five cannot be reused (audit R132).",
+       "provenance": "contract identity.yaml POST /auth/credential"
       }
      ]
     }
    ]
   },
-  "overlays": [
-   {
-    "id": "confirmForceLogout",
-    "component": "confirmDialog",
-    "trigger": "Force logout",
-    "body": "**Names what `forceLogout` changes and what it leaves alone**, in the consequence rather than the verb. A partner login mfa this affects should be identified in the dialog, not just counted. **Collects what `forceLogout` sends before it is called.** Required: `reason`.",
-    "provenance": "contract identity.yaml POST /auth/sessions/{sessionId}/force-logout"
-   },
-   {
-    "id": "confirmOverrideCreditLimit",
-    "component": "confirmDialog",
-    "trigger": "Override credit limit",
-    "body": "**Names what `overrideCreditLimit` changes and what it leaves alone**, in the consequence rather than the verb. A partner login mfa this affects should be identified in the dialog, not just counted. **Collects what `overrideCreditLimit` sends before it is called.** Required: `orderId`, `amount`, `reason`. Optional: `expiresAt`.",
-    "provenance": "contract orders.yaml POST /b2b-accounts/{accountId}/credit/override"
-   },
-   {
-    "id": "confirmRevokeAllSessions",
-    "component": "confirmDialog",
-    "trigger": "Revoke all sessions",
-    "body": "**Names what `revokeAllSessions` changes and what it leaves alone**, in the consequence rather than the verb. A partner login mfa this affects should be identified in the dialog, not just counted. **Collects what `revokeAllSessions` sends before it is called.** Required: `reason`, `stepUpToken`. Optional: `venueId`, `excludeSelf`.",
-    "provenance": "contract identity.yaml POST /auth/sessions/revoke-all"
-   },
-   {
-    "id": "formLogin",
-    "component": "modal",
-    "trigger": "Login",
-    "body": "**Collects what `login` sends before it is called.** Required: `username`, `credential`, `workstationId`. Optional: `method`, `deviceFingerprint`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "LoginRequest",
-    "confirm": {
-     "label": "Login",
-     "operation": "login"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "username",
-      "credential",
-      "workstationId",
-      "method",
-      "deviceFingerprint"
-     ]
-    },
-    "provenance": "contract identity.yaml POST /auth/login"
-   },
-   {
-    "id": "formSetB2bCreditLimit",
-    "component": "modal",
-    "trigger": "Save b2b credit limit",
-    "body": "**Collects what `setB2bCreditLimit` sends before it is called.** Required: `creditLimit`, `reason`. Optional: `paymentTermsDays`, `isSuspended`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Save b2b credit limit",
-     "operation": "setB2bCreditLimit"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "creditLimit",
-      "reason",
-      "paymentTermsDays",
-      "isSuspended"
-     ]
-    },
-    "provenance": "contract orders.yaml PUT /b2b-accounts/{accountId}/credit"
-   }
-  ],
   "states": {
-   "loading": "The partner login mfa list.",
-   "error": "Could not load. Names which read failed and leaves the partner login mfa untouched.",
-   "emptyFirstRun": "No partner login mfa yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
-   "emptyNoResults": "Nothing matches the filter on venueId, principalId, workstationId and the partner login mfa are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `getB2bCredit` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "mfaRequired": "**Signed in, not yet through.** The principal holds a permission that requires MFA (ROLE_MANAGE, LEDGER_APPROVE, any platform-staff permission, or one the tenant added), so after `login` the screen calls `createMfaChallenge` and asks for the authenticator code; `verifyMfaChallenge` completes the sign-in. **Email me a code instead** is the fallback. Five wrong codes lock step-up for the policy's lockout minutes and the screen says so. A principal with no enrolled method is sent to enrol first (decided 28 September, audit R135, R126)."
+   "loading": "Checking the credential. The form stays visible and disabled.",
+   "emptyFirstRun": "**Nobody signed in** - the normal state of a door. The form offers username and password and, where the tenant configured one for partners, its SSO.",
+   "error": "Identity could not be reached. **Says so rather than saying the password is wrong**, and keeps what was typed.",
+   "denied": "The credential does not match, or the account is locked. One message for both, with the attempts left before the lock; a locked account says when to try again.",
+   "emptyNoAccess": "Signed in, and the person holds no role in this app. Says who at the tenant grants access; distinct from a wrong password. A door has no permission of its own to name, because the person is not signed in until it succeeds.",
+   "emptyNoResults": "Never shown: `listSsoProviders` takes no filter; a tenant with no identity provider shows no SSO buttons at all, and the form is the whole door.",
+   "sessionHeld": "`login` answered 409: this person already holds a session elsewhere (audit R184, ADR-0004). Says where and since when; only a holder of SESSION_FORCE_LOGOUT ends it, on the staff directory (BO-053), and signing in never ends it by itself.",
+   "mfaRequired": "**Signed in, not yet through.** The principal holds a permission that requires MFA (ROLE_MANAGE, LEDGER_APPROVE, any PLATFORM_* permission, or one the tenant added), so the screen calls `createMfaChallenge` (`action: signIn`) and asks for the authentication code; `verifyMfaChallenge` completes the sign-in. **Email me a code instead** is the fallback. Five wrong codes lock step-up for the policy's lockout minutes and the screen says until when (audit R135, R126). A person without such a permission never reaches this state.",
+   "mfaEnrolmentRequired": "**First sign-in, no method yet.** A person who requires MFA and has no active method enrols the authenticator app (email as the fallback) with `enrolMfaMethod`, confirms it with the first code (`verifyMfaEnrolment`), sees the recovery codes once, then continues to the code step (audit R135, R126 (5)).",
+   "offline": "Not available, and the offline banner says why: signing in needs a connection."
   },
   "apis": [
    {
+    "operationId": "login",
+    "contract": "identity",
+    "purpose": "Authenticate from a browser, with no workstation (CHG-DOOR-001)",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "listSsoProviders",
+    "contract": "identity",
+    "purpose": "Which identity providers this door offers; unauthenticated, read before sign-in",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "startSsoAuthorization",
+    "contract": "identity",
+    "purpose": "Hand off to the identity provider where the tenant has SSO",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "completeSsoAuthorization",
+    "contract": "identity",
+    "purpose": "Exchange the provider's code for the same LoginResponse as login, on the redirect back",
+    "trigger": "background"
+   },
+   {
     "operationId": "createMfaChallenge",
     "contract": "identity",
-    "purpose": "Second factor after login when the principal holds a permission in mfaRequiredForPermissions; action `signIn`, the primary method (authenticator app), or the email method as the fallback (decided 28 September, audit R135, R126 (5))",
+    "purpose": "Second factor after sign-in when the principal holds a permission in mfaRequiredForPermissions; action `signIn`, the authenticator app, or the email method as the fallback (audit R135, R126 (5))",
     "trigger": "onAction"
    },
    {
@@ -516,110 +350,86 @@
     "trigger": "onAction"
    },
    {
-    "operationId": "login",
+    "operationId": "enrolMfaMethod",
     "contract": "identity",
-    "purpose": "from page inventory",
+    "purpose": "The first method, at a first sign-in that requires one: authenticator app, or email as the fallback (audit R135, R126 (5))",
     "trigger": "onAction"
    },
    {
-    "operationId": "getB2bCredit",
-    "contract": "orders",
-    "purpose": "From the flow it appears in",
-    "trigger": "onLoad"
+    "operationId": "verifyMfaEnrolment",
+    "contract": "identity",
+    "purpose": "Activates the enrolled method with its first code; recovery codes shown once",
+    "trigger": "onAction"
    },
    {
-    "operationId": "forceLogout",
+    "operationId": "selectRole",
     "contract": "identity",
-    "purpose": "Supervisor termination of an abandoned session",
-    "trigger": "onAction",
-    "invalidates": [
-     "listActiveSessions"
-    ]
+    "purpose": "Choose which role to work as when sign-in returns more than one (ADR-0003)",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "changeOwnCredential",
+    "contract": "identity",
+    "purpose": "Replace a temporary password or PIN at the first sign-in after a reset (audit R132)",
+    "trigger": "onAction"
    },
    {
     "operationId": "getCurrentSession",
     "contract": "identity",
-    "purpose": "Current session and effective permissions",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "listActiveSessions",
-    "contract": "identity",
-    "purpose": "List active sessions",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "listMfaMethods",
-    "contract": "identity",
-    "purpose": "Enrolled MFA methods",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "listSsoProviders",
-    "contract": "identity",
-    "purpose": "Identity providers configured for this tenant",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "overrideCreditLimit",
-    "contract": "orders",
-    "purpose": "Authorise an order beyond the credit limit",
-    "trigger": "onAction",
-    "invalidates": [
-     "listActiveSessions"
-    ]
-   },
-   {
-    "operationId": "revokeAllSessions",
-    "contract": "identity",
-    "purpose": "Revoke every session in scope",
-    "trigger": "onAction",
-    "invalidates": [
-     "listActiveSessions"
-    ]
-   },
-   {
-    "operationId": "setB2bCreditLimit",
-    "contract": "orders",
-    "purpose": "Set a partner credit limit",
-    "trigger": "onAction",
-    "invalidates": [
-     "listActiveSessions"
-    ]
-   },
-   {
-    "operationId": "listPartnerAgreements",
-    "contract": "subscription",
-    "purpose": "Commercial agreements with B2B partners",
-    "trigger": "onLoad"
+    "purpose": "Read the session the sign-in just opened, for the landing",
+    "trigger": "onAction"
    }
   ],
   "entryState": {
    "params": [
     {
-     "name": "accountId",
-     "from": "deepLink"
+     "name": "challengeId",
+     "from": "navigation"
     },
     {
-     "name": "challengeId",
+     "name": "providerId",
+     "from": "deepLink",
+     "optional": true
+    },
+    {
+     "name": "methodId",
      "from": "navigation"
     }
    ],
-   "coldEntry": "**A partner link resolves within that partner's own scope and refuses outside it.** A forwarded link between partners must not open another partner's record. If the target is gone the screen says so and offers the partner's own list. Arrives with `accountId`.",
-   "preloaded": [
-    "ActiveSession.status",
-    "ActiveSession.sessionId",
-    "ActiveSession.principalId",
-    "ActiveSession.principalName",
-    "ActiveSession.roleId"
-   ]
+   "coldEntry": "**Needs nothing; that is what makes it the door.** No workstation travels with a browser sign-in (CHG-DOOR-001). `providerId` arrives only on the identity provider's redirect back, with the `code` and `state` that `completeSsoAuthorization` exchanges; an expired or replayed redirect lands on the form with \"That sign-in link has expired; sign in again\"."
   },
+  "apisNote": "Declared by hand on 2 October 2026 (CHG-DOOR-002/003): sign-in, SSO, the second factor and its first enrolment, the role prompt, a temporary credential's replacement and the session read for the landing. Nothing that needs a signed-in session to list or end sessions is here.",
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P10 Partner Web.dc.html#ptr-001"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 12 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "gaps": [
+   {
+    "operation": "getB2bCredit",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-021): A sign-in door shows no credit and no agreements: the credit read and the limit writes (getB2bCredit, setB2bCreditLimit, overrideCreditLimit) belong to the partner's credit screens (PTR-002, PTR-013), and setting or overriding a limit is the tenant's act, not the partner's; partner agreements live on the agreement screens. The accountId entry parameter existed only for the credit calls. F10 step 1 now reads credit on the dashboard (design-notes correction platform-foundation PTR-001).",
+    "source": "screens/P10-partner-reseller-portal.yaml#PTR-001; contracts/spine/orders.yaml#overrideCreditLimit"
+   },
+   {
+    "operation": "listPartnerAgreements",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-021): A sign-in door shows no credit and no agreements: the credit read and the limit writes (getB2bCredit, setB2bCreditLimit, overrideCreditLimit) belong to the partner's credit screens (PTR-002, PTR-013), and setting or overriding a limit is the tenant's act, not the partner's; partner agreements live on the agreement screens. The accountId entry parameter existed only for the credit calls. F10 step 1 now reads credit on the dashboard (design-notes correction platform-foundation PTR-001).",
+    "source": "screens/P10-partner-reseller-portal.yaml#PTR-001; contracts/spine/orders.yaml#overrideCreditLimit"
+   },
+   {
+    "operation": "overrideCreditLimit",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-021): A sign-in door shows no credit and no agreements: the credit read and the limit writes (getB2bCredit, setB2bCreditLimit, overrideCreditLimit) belong to the partner's credit screens (PTR-002, PTR-013), and setting or overriding a limit is the tenant's act, not the partner's; partner agreements live on the agreement screens. The accountId entry parameter existed only for the credit calls. F10 step 1 now reads credit on the dashboard (design-notes correction platform-foundation PTR-001).",
+    "source": "screens/P10-partner-reseller-portal.yaml#PTR-001; contracts/spine/orders.yaml#overrideCreditLimit"
+   },
+   {
+    "operation": "setB2bCreditLimit",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-021): A sign-in door shows no credit and no agreements: the credit read and the limit writes (getB2bCredit, setB2bCreditLimit, overrideCreditLimit) belong to the partner's credit screens (PTR-002, PTR-013), and setting or overriding a limit is the tenant's act, not the partner's; partner agreements live on the agreement screens. The accountId entry parameter existed only for the credit calls. F10 step 1 now reads credit on the dashboard (design-notes correction platform-foundation PTR-001).",
+    "source": "screens/P10-partner-reseller-portal.yaml#PTR-001; contracts/spine/orders.yaml#overrideCreditLimit"
+   }
+  ],
   "_platform": {
    "code": "P10",
    "audience": "partner",
@@ -670,7 +480,7 @@
     {
      "to": "PTR-001",
      "trigger": "Partner Login / MFA",
-     "provenance": "derived — PTR-001 declares entryState.params accountId, challengeId and PTR-003 holds none of them. The edge carries nothing: PTR-003 is opened from PTR-001, so this edge is the way back and PTR-001 keeps its own state"
+     "provenance": "derived — PTR-001 declares entryState.params challengeId, methodId, providerId and PTR-003 holds none of them. The edge carries nothing: PTR-003 is opened from PTR-001, so this edge is the way back and PTR-001 keeps its own state"
     },
     {
      "to": "PTR-004",
@@ -683,7 +493,7 @@
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listPrincipals` reads the population and `getPrincipal` reads one of them — list, select, act",
-  "purpose": "What we hold about staff, and what they can change.",
+  "purpose": "The partner's company details and its users, and what each may change.",
   "layout": {
    "template": "split",
    "regions": [
@@ -710,18 +520,17 @@
        "label": "Every principal",
        "bindsTo": "Principal",
        "columns": [
-        "Principal.id",
         "Principal.username",
         "Principal.displayName",
         "Principal.isActive",
         "Principal.validFrom",
         "Principal.validTo",
-        "Principal.primaryRoleId",
         "Principal.roles",
         "Principal.lastLoginAt"
        ],
        "operation": "listPrincipals",
-       "provenance": "contract identity.yaml GET /principals"
+       "provenance": "contract identity.yaml GET /principals",
+       "notes": "The role is shown by name (from `roles`); the principal id is in the detail panel with a copy action."
       }
      ]
     },
@@ -875,6 +684,7 @@
     "provenance": "contract identity.yaml PATCH /principals/{principalId}"
    }
   ],
+  "purposeNote": "Purpose rewritten 2 October 2026 (CHG-WIR-023): The purpose \"What we hold about staff\" was copied from a staff screen; these are the partner's own users (design-notes correction platform-foundation PTR-003).",
   "_platform": {
    "code": "P10",
    "audience": "partner",
@@ -925,7 +735,7 @@
     {
      "to": "PTR-001",
      "trigger": "Partner Login / MFA",
-     "provenance": "derived — PTR-001 declares entryState.params accountId, challengeId and PTR-004 holds none of them. The edge carries nothing: PTR-004 is opened from PTR-001, so this edge is the way back and PTR-001 keeps its own state"
+     "provenance": "derived — PTR-001 declares entryState.params challengeId, methodId, providerId and PTR-004 holds none of them. The edge carries nothing: PTR-004 is opened from PTR-001, so this edge is the way back and PTR-001 keeps its own state"
     },
     {
      "to": "PTR-003",
@@ -938,7 +748,7 @@
   "density": "compact",
   "pattern": "statusTracker",
   "patternReason": "`getMessageStatus` reads one record and nothing reads a population — the screen is about that one thing",
-  "purpose": "Work with notifications for this venue.",
+  "purpose": "See the messages sent to this partner and whether each was delivered.",
   "layout": {
    "template": "detail",
    "regions": [
@@ -1038,6 +848,7 @@
     "provenance": "contract marketing-crm.yaml POST /messages"
    }
   ],
+  "purposeNote": "Purpose rewritten 2 October 2026 (CHG-WIR-006): The purpose (\"Work with notifications for this venue\") was the generic template; a partner portal's notifications page is a feed of messages to the partner (design-notes correction customer-marketing PTR-004).",
   "_platform": {
    "code": "P10",
    "audience": "partner",
@@ -1087,7 +898,7 @@
     {
      "to": "PTR-001",
      "trigger": "Partner Login / MFA",
-     "provenance": "derived — PTR-001 declares entryState.params accountId, challengeId and PTR-019 holds none of them. The edge carries nothing: PTR-019 is opened from PTR-001, so this edge is the way back and PTR-001 keeps its own state"
+     "provenance": "derived — PTR-001 declares entryState.params challengeId, methodId, providerId and PTR-019 holds none of them. The edge carries nothing: PTR-019 is opened from PTR-001, so this edge is the way back and PTR-001 keeps its own state"
     },
     {
      "to": "PTR-003",
@@ -1132,19 +943,16 @@
        "label": "Every API client",
        "bindsTo": "ApiClient",
        "columns": [
-        "ApiClient.id",
-        "ApiClient.developerId",
         "ApiClient.name",
-        "ApiClient.clientId",
         "ApiClient.environment",
         "ApiClient.scopes",
-        "ApiClient.allowedTenantIds",
         "ApiClient.ipAllowList",
         "ApiClient.status",
         "ApiClient.lastUsedAt"
        ],
        "operation": "listApiClients",
-       "provenance": "contract public-api.yaml GET /api-clients"
+       "provenance": "contract public-api.yaml GET /api-clients",
+       "notes": "Name, environment, scopes, IP allow-list, status and last used; the client id is in the detail panel with a copy action, allowed tenants by venue name."
       }
      ]
     },
@@ -1239,7 +1047,7 @@
     "id": "formCreateApiClient",
     "component": "modal",
     "trigger": "Create API client",
-    "body": "**Collects what `createApiClient` sends before it is called.** Required: `id`, `developerId`, `name`, `environment`, `scopes`, `status`. Optional: `clientId`, `allowedTenantIds`, `ipAllowList`, `lastUsedAt`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `createApiClient` sends before it is called.** The person enters `name`, picks `scopes` and an optional `ipAllowList`. **The environment is sandbox**: production clients are issued by TICVAI after certification (DI-927); `developerId` comes from the session; `clientId` and `lastUsedAt` are the server's. Never `id` or `status`: an id is a client UUIDv7 generated silently and the status and timestamps are the server's (design-notes correction, CHG-SOT-015). Dismissing sends nothing; the screen behind is unchanged.",
     "bindsTo": "ApiClient",
     "confirm": {
      "label": "Create API client",
@@ -1248,16 +1056,9 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "id",
-      "developerId",
       "name",
-      "environment",
       "scopes",
-      "status",
-      "clientId",
-      "allowedTenantIds",
-      "ipAllowList",
-      "lastUsedAt"
+      "ipAllowList"
      ]
     },
     "provenance": "contract public-api.yaml POST /api-clients"
@@ -1415,7 +1216,7 @@
     {
      "to": "PTR-001",
      "trigger": "Partner Login / MFA",
-     "provenance": "derived — PTR-001 declares entryState.params accountId, challengeId and PTR-020 holds none of them. The edge carries nothing: PTR-020 is opened from PTR-001, so this edge is the way back and PTR-001 keeps its own state"
+     "provenance": "derived — PTR-001 declares entryState.params challengeId, methodId, providerId and PTR-020 holds none of them. The edge carries nothing: PTR-020 is opened from PTR-001, so this edge is the way back and PTR-001 keeps its own state"
     },
     {
      "to": "PTR-003",
@@ -1428,7 +1229,7 @@
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listDelegatedAccess` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
-  "purpose": "Add sub-agent management for this venue.",
+  "purpose": "Give the partner's own sub-agents access, and take it back.",
   "layout": {
    "template": "split",
    "regions": [
@@ -1455,21 +1256,16 @@
        "label": "Every delegated access",
        "bindsTo": "DelegatedAccess",
        "columns": [
-        "DelegatedAccess.id",
-        "DelegatedAccess.principalId",
-        "DelegatedAccess.roleId",
         "DelegatedAccess.permission",
-        "DelegatedAccess.subjectId",
-        "DelegatedAccess.overSubjectId",
         "DelegatedAccess.overObjectRef",
         "DelegatedAccess.delegationKind",
         "DelegatedAccess.quota",
         "DelegatedAccess.isRevocableBySubject",
-        "DelegatedAccess.scopePath",
         "DelegatedAccess.effect"
        ],
        "operation": "listDelegatedAccess",
-       "provenance": "contract identity.yaml GET /delegated-access"
+       "provenance": "contract identity.yaml GET /delegated-access",
+       "notes": "The sub-agent, the role and the subject are shown by name; the scope as the venue or branch it names; ids stay in the detail panel."
       }
      ]
     },
@@ -1608,6 +1404,7 @@
    "board": "wireframes/P10 Partner Web.dc.html#ptr-020"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "purposeNote": "Purpose rewritten 2 October 2026 (CHG-WIR-023): The purpose (\"Add sub-agent management for this venue\") was the generic template; sub-agents belong to the partner, not a venue (design-notes correction platform-foundation PTR-020).",
   "_platform": {
    "code": "P10",
    "audience": "partner",

@@ -247,6 +247,19 @@
   "requestBody": null,
   "responds": "GuestSession"
  },
+ "getMyProfile": {
+  "method": "GET",
+  "path": "/guests/me/profile",
+  "contract": "marketing-crm",
+  "summary": "A guest reading their own details",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "subject",
+  "parameters": [],
+  "requestBody": null,
+  "responds": null
+ },
  "getOrder": {
   "method": "GET",
   "path": "/orders/{orderId}",
@@ -474,6 +487,30 @@
   ],
   "requestBody": null,
   "responds": null
+ },
+ "listConsentPurposes": {
+  "method": "GET",
+  "path": "/consent-purposes",
+  "contract": "marketing-crm",
+  "summary": "Configured consent purposes",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
  },
  "listCreditMemos": {
   "method": "GET",
@@ -876,25 +913,6 @@
   "requestBody": null,
   "responds": null
  },
- "updateGuestPreferences": {
-  "method": "PUT",
-  "path": "/guests/{subjectId}/preferences",
-  "contract": "marketing-crm",
-  "summary": "The things a regular should not have to say twice",
-  "permission": "GUEST_MANAGE",
-  "offlineCapable": false,
-  "conflictPolicy": "lastWriterWins",
-  "scopeLevel": "subject",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "GuestPreferences",
-  "responds": "GuestPreferences"
- },
  "updateMyProfile": {
   "method": "PATCH",
   "path": "/guests/me/profile",
@@ -913,25 +931,6 @@
   ],
   "requestBody": null,
   "responds": "GuestProfile"
- },
- "uploadGuestDocument": {
-  "method": "POST",
-  "path": "/guest-documents",
-  "contract": "marketing-crm",
-  "summary": "Store a guest photo, ID or signed document",
-  "permission": "GUEST_VIEW_PII",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "GuestDocument",
-  "responds": "GuestDocument"
  },
  "verifyGuestOtp": {
   "method": "POST",

@@ -75,25 +75,6 @@
   "requestBody": "CreateCaseRequest",
   "responds": "Case"
  },
- "createChannelCapacity": {
-  "method": "POST",
-  "path": "/channel-capacities",
-  "contract": "catalogue",
-  "summary": "Create a channel capacity",
-  "permission": "CAPACITY_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "CreateEnvelopeRequest",
-  "responds": "ChannelCapacity"
- },
  "createOrder": {
   "method": "POST",
   "path": "/orders",
@@ -450,74 +431,6 @@
   "parameters": [
    {
     "name": "performanceId",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- },
- "listDeliveryLocations": {
-  "method": "GET",
-  "path": "/venues/{venueId}/delivery-locations",
-  "contract": "fnb",
-  "summary": "Where an order can be delivered",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "kind",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "servingOutletId",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- },
- "listDiningOutlets": {
-  "method": "GET",
-  "path": "/venues/{venueId}/dining",
-  "contract": "fnb",
-  "summary": "Where a guest can eat, right now",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "openNow",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "orderingMethod",
     "in": "query",
     "required": null
    },
@@ -1022,63 +935,6 @@
   "requestBody": null,
   "responds": "OrderResumeResult"
  },
- "setAlternativeCodes": {
-  "method": "PUT",
-  "path": "/products/{productId}/alternative-codes",
-  "contract": "catalogue",
-  "summary": "Set external identifiers",
-  "permission": "PRODUCT_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "AlternativeCode"
- },
- "setChannelAllocations": {
-  "method": "PUT",
-  "path": "/channel-capacities/{channelCapacityId}/channel-allocations",
-  "contract": "catalogue",
-  "summary": "Allocate a channel capacity across sales channels",
-  "permission": "CAPACITY_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "ChannelAllocationSet"
- },
- "setProductAttributes": {
-  "method": "PUT",
-  "path": "/products/{productId}/attributes",
-  "contract": "catalogue",
-  "summary": "Set the attribute axes for a product",
-  "permission": "PRODUCT_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": null
- },
  "setQueueStatus": {
   "method": "PUT",
   "path": "/queues/{queueId}/status",
@@ -1136,25 +992,6 @@
   "requestBody": null,
   "responds": null
  },
- "transitionProductLifecycle": {
-  "method": "POST",
-  "path": "/products/{productId}/lifecycle",
-  "contract": "catalogue",
-  "summary": "Move a product through its lifecycle",
-  "permission": "PRODUCT_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Product"
- },
  "updateCase": {
   "method": "PATCH",
   "path": "/cases/{caseId}",
@@ -1173,25 +1010,6 @@
   ],
   "requestBody": null,
   "responds": "Case"
- },
- "updateChannelCapacity": {
-  "method": "PATCH",
-  "path": "/channel-capacities/{channelCapacityId}",
-  "contract": "catalogue",
-  "summary": "Amend a channel capacity",
-  "permission": "CAPACITY_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "ChannelCapacity"
  },
  "updateIncident": {
   "method": "PATCH",

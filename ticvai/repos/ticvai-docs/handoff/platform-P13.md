@@ -5,16 +5,16 @@
 | | |
 |---|---|
 | Screens | 103 |
-| Operations | 176 |
-| Contracts | 10 |
+| Operations | 194 |
+| Contracts | 8 |
 | Modules | 3 |
 | Undrawn | 0 |
-| Operations with no screen | 116 |
+| Operations with no screen | 103 |
 | Waves | wave1 3 · wave2 20 · wave3 80 |
 
 ## Gaps
 
-### 116 operations with no screen here
+### 103 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -22,45 +22,45 @@
 |---|---|---|---|
 | `createKnowledgeCollection` | ai | POST | Create a collection |
 | `generateVenueLayout` | ai | POST | Draft a seat map from an uploaded plan |
-| `ingestKnowledgeDocument` | ai | POST | Add a document |
+| `listIndexJobs` | ai | GET | Indexing in flight and recently finished |
 | `listIndexSources` | ai | GET | What is indexed, and how current it is |
 | `proposeWalkways` | ai | POST | Find walkable space in a drawing that has no vectors |
 | `reindexSource` | ai | POST | Rebuild a source |
 | `removeIndexEntry` | ai | DELETE | Remove one record from the index |
+| `setAiTool` | ai | PUT | Register or change a tool (platform) |
 | `setIndexSource` | ai | PUT | Declare a source indexed |
 | `setSuggestionProvider` | ai | PUT |  |
 | `getCatalogueImportJob` | catalogue | GET | Progress and findings of a catalogue import |
+| `getEventChangeTreatmentPolicy` | catalogue | GET | What happens to tickets, reservations and guests when an event changes, by default |
 | `getPlanBenefits` | catalogue | GET | Which benefits a plan grants, and how much of each |
 | `getWaitingRoomStatus` | catalogue | GET | A performance's waiting room, its setting and how it is moving |
+| `listGuestMemberships` | catalogue | GET | A guest's memberships, benefits and history |
 | `listMembershipBenefits` | catalogue | GET | Benefits a plan can grant |
 | `listMembershipProgrammes` | catalogue | GET | Membership schemes, the level above a plan |
+| `listProductApprovalWorkflows` | catalogue | GET | The product approval workflows `approveWorkflow` saved |
+| `listSeatPricingRules` | catalogue | GET | Seat-level dynamic pricing rules |
+| `relinquishInventoryHold` | catalogue | DELETE | Return unsold units |
+| `renewInventoryHold` | catalogue | POST | Extend a lease TTL |
+| `setEntitlementTemplateBlackoutDates` | catalogue | PUT | Set the dates a product's entitlement does not admit |
+| `setEventChangeTreatmentPolicy` | catalogue | PUT | Set the default treatment per kind of event change |
+| `setSeatPricingRule` | catalogue | PUT | Create or replace a seat-level dynamic pricing rule |
 | `setWaitingRoomSetting` | catalogue | PUT | Switch a performance's waiting room on or off, and set how fast it releases |
-| `getAllergenVerification` | fnb | GET | The last allergen verdict recorded for a dish |
-| `getFnbReservationPolicy` | fnb | GET | How long a table is held, by party size |
-| `getFnbServiceChargePolicy` | fnb | GET | The service charge a venue applies, and on what |
-| `listFnbRecommendations` | fnb | GET | Upsell and pairing suggestions for F&B |
-| `listIngredientSubstitutes` | fnb | GET | Approved substitutions for a recipe's ingredients |
-| `listMenuSchedules` | fnb | GET | What is scheduled to go live, and when |
-| `listMenuVersions` | fnb | GET | Every published version of a menu |
-| `listTemperatureCheckpoints` | fnb | GET | The units that get read, and the range each must hold |
-| `resolveBookingConflict` | fnb | GET | Two bookings, one table — and what to do about it |
-| `sendBookingConfirmation` | fnb | POST | Confirm a booking, and ask them to confirm back |
-| `sendOrderNotification` | fnb | POST | Tell the guest where their order is |
 | `evaluateAccess` | identity | POST | Decide, now, and say why |
 | `getAuthorisationPolicy` | identity | GET | One policy, at a version |
 | `getAuthorisationPolicyBundle` | identity | GET | The policies a device needs to decide for itself |
 | `getMembership` | identity | GET | A membership with its history, usage and renewals |
-| `getPasswordPolicy` | identity | GET | Read the password and MFA policy in force |
 | `getPrincipalModuleAccess` | identity | GET | What this person may do, as ticks |
 | `listAccessDecisions` | identity | GET | What was decided, for whom, where and why |
 | `listAuthorisationPolicyTemplates` | identity | GET | Reusable policy shapes |
-| `listCapabilityTemplates` | identity | GET | Saved tick-sets |
 | `listCustomerMemberships` | identity | GET | Memberships a customer holds |
 | `listModuleCapabilities` | identity | GET | What a person can be allowed to do, per module |
 | `listModules` | identity | GET | The module tree permissions are grouped under |
 | `listPermissions` | identity | GET | Every permission key the contracts enforce |
 | `listSegregationRules` | identity | GET | Read the conflicting-permission rules back |
-| … | | | 76 more |
+| `listSegregationViolations` | identity | GET | Who already holds a conflicting pair |
+| `setPrincipalModuleAccess` | identity | PUT | Tick what they may do |
+| `updateRole` | identity | PATCH | Rename a role or change its description |
+| … | | | 63 more |
 
 ### 1 modules split across waves
 
@@ -82,28 +82,28 @@
 |---|---|---|---|---|---|
 | `CMS-001` | Tenant Workspace | White Label | 2 | 7 | yes |
 | `CMS-002` | Brand Kit | White Label | 2 | 4 | yes |
-| `CMS-003` | Typography | White Label | 2 | 4 | yes |
+| `CMS-003` | Typography | White Label | 2 | 2 | yes |
 | `CMS-004` | Logo & Assets | White Label | 2 | 4 | yes |
 | `CMS-005` | Theme Editor | White Label | 2 | 2 | yes |
-| `CMS-006` | Component Preview | White Label | 2 | 5 | yes |
-| `CMS-007` | Page Builder | White Label | 2 | 11 | yes |
+| `CMS-006` | Component Preview | White Label | 2 | 6 | yes |
+| `CMS-007` | Page Builder | White Label | 2 | 12 | yes |
 | `CMS-008` | Content Blocks | White Label | 2 | 10 | yes |
-| `CMS-009` | Navigation & Menus | White Label | 2 | 7 | yes |
-| `CMS-010` | Media Library | White Label | 2 | 13 | yes |
-| `CMS-011` | Translations | White Label | 2 | 1 | yes |
+| `CMS-009` | Navigation & Menus | White Label | 2 | 6 | yes |
+| `CMS-010` | Media Library | White Label | 2 | 11 | yes |
+| `CMS-011` | Translations | White Label | 2 | 3 | yes |
 | `CMS-012` | RTL Preview | White Label | 2 | 2 | yes |
-| `CMS-013` | SEO & Metadata | White Label | 2 | 1 | yes |
-| `CMS-014` | Publishing Workflow | White Label | 2 | 4 | yes |
+| `CMS-013` | SEO & Metadata | White Label | 2 | 3 | yes |
+| `CMS-014` | Publishing Workflow | White Label | 2 | 10 | yes |
 | `CMS-015` | Version History | White Label | 2 | 3 | yes |
-| `CMS-016` | Site Settings | White Label | 2 | 6 | yes |
-| `CMS-017` | Domain & Certificate | White Label | 2 | 4 | yes |
+| `CMS-016` | Site Settings | White Label | 2 | 5 | yes |
+| `CMS-017` | Domain & Certificate | White Label | 2 | 7 | yes |
 | `CMS-018` | Consent & Legal | White Label | 2 | 8 | yes |
-| `CMS-019` | User Access | White Label | 2 | 2 | yes |
-| `CMS-021` | Privacy & Consent Configuration Command Center | Policy | 3 | 2 | yes |
-| `CMS-022` | Data Processing Purpose & Lawful Basis Registry | Policy | 3 | 1 | yes |
+| `CMS-019` | User Access | White Label | 2 | 3 | yes |
+| `CMS-021` | Privacy & Consent Configuration Command Center | Policy | 3 | 1 | yes |
+| `CMS-022` | Data Processing Purpose & Lawful Basis Registry | Policy | 3 | 2 | yes |
 | `CMS-023` | Consent Purpose & Consent Type Builder | Policy | 3 | 1 | yes |
 | `CMS-024` | Communication Preference & Marketing Permission Configuration | Policy | 3 | 1 | yes |
-| `CMS-025` | Cookie, Tracking & Digital Technology Registry | Policy | 3 | 6 | yes |
+| `CMS-025` | Cookie, Tracking & Digital Technology Registry | Policy | 3 | 8 | yes |
 | `CMS-026` | Cookie Banner & Preference Center Designer | Policy | 3 | 2 | yes |
 | `CMS-027` | Consent Capture Point & Customer Journey Configuration | Policy | 3 | 1 | yes |
 | `CMS-028` | Privacy Notice, Policy & Terms Version Management | Policy | 3 | 2 | yes |
@@ -115,25 +115,25 @@
 | `CMS-034` | Data Subject / Customer Privacy Request Management | Policy | 3 | 1 | yes |
 | `CMS-035` | Data Discovery, Access, Export & Correction Workspace | Policy | 3 | 1 | yes |
 | `CMS-036` | Deletion, Anonymization & Restriction Operations | Policy | 3 | 1 | yes |
-| `CMS-037` | Data Retention, Expiry & Legal Hold Operations | Policy | 3 | 1 | yes |
-| `CMS-038` | Privacy Compliance, Exception & Investigation Workspace | Policy | 3 | 1 | yes |
+| `CMS-037` | Data Retention, Expiry & Legal Hold Operations | Policy | 3 | 3 | yes |
+| `CMS-038` | Privacy Compliance, Exception & Investigation Workspace | Policy | 3 | 2 | yes |
 | `CMS-039` | Privacy Audit, Evidence & Compliance Reporting | Policy | 3 | 2 | yes |
 | `CMS-040` | Privacy Analytics & AI Compliance Intelligence | Policy | 3 | 2 | yes |
 | `CMS-041` | Waiver & Consent Command Center | Policy | 3 | 1 | yes |
-| `CMS-042` | Waiver Template Library & Master Setup | Policy | 3 | 1 | yes |
-| `CMS-043` | Digital Waiver & Form Builder | Policy | 3 | 1 | yes |
+| `CMS-042` | Waiver Template Library & Master Setup | Policy | 3 | 2 | yes |
+| `CMS-043` | Digital Waiver & Form Builder | Policy | 3 | 2 | yes |
 | `CMS-044` | Dynamic Fields, Questions & Conditional Logic | Policy | 3 | 1 | yes |
 | `CMS-045` | Signatory, Signature & Guardian Rule Configuration | Policy | 3 | 1 | yes |
 | `CMS-046` | Product, Event & Experience Association | Policy | 3 | 1 | yes |
 | `CMS-047` | Waiver Trigger, Eligibility & Completion Rules | Policy | 3 | 1 | yes |
 | `CMS-048` | Versioning, Effective Dates & Legal Change Control | Policy | 3 | 1 | yes |
-| `CMS-049` | Localization, Branding & Customer Experience Configuration | Policy | 3 | 1 | yes |
+| `CMS-049` | Localization, Branding & Customer Experience Configuration | Policy | 3 | 2 | yes |
 | `CMS-050` | Waiver Approval, Testing & Publication Workspace | Policy | 3 | 1 | yes |
 | `CMS-051` | Waiver Operations Command Center | Policy | 3 | 1 | yes |
 | `CMS-052` | Participant Waiver Status & Tracking | Policy | 3 | 1 | yes |
 | `CMS-053` | Digital Signing & Collection Operations | Policy | 3 | 1 | yes |
 | `CMS-054` | Minor, Guardian & Group Consent Management | Policy | 3 | 1 | yes |
-| `CMS-055` | Waiver Verification & Validation Workspace | Policy | 3 | 1 | yes |
+| `CMS-055` | Waiver Verification & Validation Workspace | Policy | 3 | 2 | yes |
 | `CMS-056` | Missing, Expired & Invalid Waiver Management | Policy | 3 | 1 | yes |
 | `CMS-057` | On-Site Waiver & Exception Handling | Policy | 3 | 1 | yes |
 | `CMS-058` | Compliance Evidence, Audit & Waiver Repository | Policy | 3 | 1 | yes |
@@ -149,7 +149,7 @@
 | `CMS-068` | Digital Asset 360° Profile | Media Library | 3 | 3 | yes |
 | `CMS-069` | Bulk Asset Management Workspace | Media Library | 3 | 1 | yes |
 | `CMS-070` | Asset Activity, Recent Assets & Library Health | Media Library | 3 | 1 | yes |
-| `CMS-071` | AI Asset Intelligence Command Center | Media Library | 3 | 2 | yes |
+| `CMS-071` | AI Asset Intelligence Command Center | Media Library | 3 | 1 | yes |
 | `CMS-072` | AI Auto-Tagging & Content Understanding | Media Library | 3 | 2 | yes |
 | `CMS-073` | Semantic & Natural-Language Asset Search | Media Library | 3 | 1 | yes |
 | `CMS-074` | Visual Similarity & Related Asset Discovery | Media Library | 3 | 1 | yes |
@@ -182,5 +182,5 @@
 | `CMS-101` | Help Me Choose | White Label | 2 | 12 | yes |
 | `CMS-102` | Site Builder | White Label | 1 | 7 | yes |
 | `CMS-103` | Booking Flows | White Label | 1 | 14 | yes |
-| `CMS-104` | App Build & Store Publishing | White Label | 1 | 7 | yes |
+| `CMS-104` | App Build & Store Publishing | White Label | 1 | 9 | yes |
 

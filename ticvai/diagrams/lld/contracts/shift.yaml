@@ -1,5 +1,5 @@
 id: LLD-shift
-title: shift — 21 operations
+title: shift — 27 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: spine
@@ -174,6 +174,41 @@ operations:
   - orders.pos_shift_approval
   - orders.pos_shift_incident
   writes: []
+- operation: getShiftCountLines
+  verb: GET
+  path: /shifts/{shiftId}/count-lines
+  scope: venue
+  permission: REPORT_VIEW_WORKSTATION
+  audience:
+  - staff
+  offline: false
+  reads:
+  - orders.cash_count_line
+  writes: []
+- operation: getTillShiftPolicy
+  verb: GET
+  path: /venues/{venueId}/till-shift-policy
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: true
+  reads:
+  - orders.till_shift_policy
+  writes: []
+- operation: getWorkstationShift
+  verb: GET
+  path: /shifts/current/overview
+  scope: workstation
+  permission: REPORT_VIEW_WORKSTATION
+  audience:
+  - staff
+  offline: true
+  reads:
+  - orders.pos_shift
+  - orders.pos_shift_approval
+  - orders.pos_shift_incident
+  writes: []
 - operation: listCashMovements
   verb: GET
   path: /shifts/{shiftId}/cash-movements
@@ -260,6 +295,19 @@ operations:
   writes:
   - cache:idempotency
   - orders.no_sale_event
+- operation: rejectShiftVariance
+  verb: POST
+  path: /shifts/{shiftId}/reject-variance
+  scope: venue
+  permission: OVERSHORT_ACCEPT
+  audience:
+  - staff
+  offline: false
+  reads:
+  - orders.pos_shift
+  - orders.pos_shift_approval
+  - orders.pos_shift_incident
+  writes: []
 - operation: reopenShift
   verb: POST
   path: /shifts/{shiftId}/reopen
@@ -306,6 +354,41 @@ operations:
   writes:
   - cache:idempotency
   - platform.denomination
+- operation: setTillShiftPolicy
+  verb: PUT
+  path: /venues/{venueId}/till-shift-policy
+  scope: venue
+  permission: WORKSTATION_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - orders.till_shift_policy
+  writes:
+  - orders.till_shift_policy
+- operation: submitShiftCount
+  verb: POST
+  path: /shifts/{shiftId}/count
+  scope: workstation
+  permission: SHIFT_CLOSE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - ledger.fx_rate
+  - orders.cash_count_line
+  - orders.cash_movement
+  - orders.payment
+  - orders.pos_shift
+  - orders.pos_shift_approval
+  - orders.pos_shift_incident
+  - platform.venue_settings
+  writes:
+  - cache:idempotency
+  - ledger.journal_entry
+  - orders.cash_count_line
+  - orders.pos_shift
 - operation: suspendShift
   verb: POST
   path: /shifts/{shiftId}/suspend

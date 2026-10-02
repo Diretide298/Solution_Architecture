@@ -15,6 +15,13 @@
     "purpose": "Applications awaiting review, oldest first",
     "trigger": "onLoad",
     "provenance": "readiness close-out, 29 September 2026"
+   },
+   {
+    "operationId": "decideAccreditationApplication",
+    "contract": "accreditation",
+    "purpose": "Approve a straightforward application from the queue",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-001)"
    }
   ],
   "gaps": [
@@ -85,6 +92,12 @@
        "kind": "primaryButton",
        "label": "Approve",
        "permission": "APPROVAL_DECIDE"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Approve",
+       "operation": "decideAccreditationApplication",
+       "provenance": "contract accreditation.yaml POST /accreditation-applications/{applicationId}/decide; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -102,6 +115,10 @@
     {
      "name": "programmeId",
      "from": "session"
+    },
+    {
+     "name": "applicationId",
+     "from": "navigation"
     }
    ],
    "preloaded": [],
@@ -120,9 +137,10 @@
      "to": "ACC-007",
      "trigger": "Reviewer Application Detail",
      "carries": [
+      "applicationId",
       "documentId"
      ],
-     "provenance": "derived — ACC-007 declares entryState.params applicationId, documentId and ACC-006 holds documentId, so an edge into it carries them"
+     "provenance": "derived — ACC-007 declares entryState.params applicationId, documentId and ACC-006 holds applicationId, documentId, so an edge into it carries them"
     },
     {
      "to": "ACC-008",
@@ -145,6 +163,23 @@
   "resolvedQuestions": [
    "Unblocked by the 7 September workshop (TICVAI_MoM_2026-09-07_Accreditation_Entitlements_VirtualQueue), which this question said did not exist. Decided there - identity documents are OCR'd to auto-populate the form, and the extracted data is stored as structured fields rather than only the image, because expiry tracking and renewal prompts cannot read a scan; uniqueness is enforced on passport and Emirates ID and a duplicate submission is blocked; the web portal is primary with the mobile app a secondary route for individual applicants. And one decision removes screens rather than adding them - accreditation- holder monitoring is to be a filtered view inside general entitlement monitoring, not a separate system. Capability and API mapping can now be done; 74 pages of ACCREDITATION.pdf are also in the design corpus and no operation has been drafted from them yet."
   ],
+  "overlays": [
+   {
+    "id": "formDecideAccreditationApplication",
+    "component": "modal",
+    "trigger": "Approve",
+    "body": "**Collects what `decideAccreditationApplication` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Approve",
+     "operation": "decideAccreditationApplication"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "contract accreditation.yaml POST /accreditation-applications/{applicationId}/decide; wiring fix, 2 October 2026"
+   }
+  ],
+  "notes": "**One queue component, shared with P08 BO-635** (decided 2 October 2026, Chinmay, workbook Q368; DEC-368, CHG-SOT-018). This screen and BO-635 render the shared `accreditationReview` queue (`screens/_components.yaml`, patterns) against the same operations; build it once and keep the two screens the same.",
   "_platform": {
    "code": "P11",
    "audience": "public",
@@ -348,6 +383,7 @@
   "resolvedQuestions": [
    "Unblocked by the 7 September workshop (TICVAI_MoM_2026-09-07_Accreditation_Entitlements_VirtualQueue), which this question said did not exist. Decided there - identity documents are OCR'd to auto-populate the form, and the extracted data is stored as structured fields rather than only the image, because expiry tracking and renewal prompts cannot read a scan; uniqueness is enforced on passport and Emirates ID and a duplicate submission is blocked; the web portal is primary with the mobile app a secondary route for individual applicants. And one decision removes screens rather than adding them - accreditation- holder monitoring is to be a filtered view inside general entitlement monitoring, not a separate system. Capability and API mapping can now be done; 74 pages of ACCREDITATION.pdf are also in the design corpus and no operation has been drafted from them yet."
   ],
+  "notes": "**One workspace component, shared with P08 BO-636** (decided 2 October 2026, Chinmay, workbook Q368; DEC-368, CHG-SOT-018). This screen and BO-636 render the shared `accreditationReview` workspace (`screens/_components.yaml`, patterns) against the same operations; build it once and keep the two screens the same.",
   "_platform": {
    "code": "P11",
    "audience": "public",
@@ -389,6 +425,13 @@
     "purpose": "Every credential issued, with its validity",
     "trigger": "onLoad",
     "provenance": "readiness close-out, 29 September 2026"
+   },
+   {
+    "operationId": "listAccreditationAccessActivity",
+    "contract": "accreditation",
+    "purpose": "Where and when a credential was last used",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-001)"
    }
   ],
   "gaps": [
@@ -419,6 +462,13 @@
        "label": "Season",
        "notes": "Defaults to the current season. **A register scoped to all time is a register nobody reads.**",
        "provenance": "frame claude-design/Accreditation Board.dc.html#acc-008"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Last used",
+       "bindsTo": "AccreditationAccessEvent",
+       "operation": "listAccreditationAccessActivity",
+       "provenance": "contract accreditation.yaml GET /accreditation-access-activity; wiring fix, 2 October 2026"
       }
      ]
     },

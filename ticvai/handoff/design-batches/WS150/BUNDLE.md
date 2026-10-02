@@ -1,14 +1,14 @@
 # WS150 — Payment Payment Orchestration board 4
 
-**10 screens · 10 operations · 15 schemas · 5 permissions**
+**10 screens · 11 operations · 19 schemas · 5 permissions**
 
-Platform P09 TICVAI Web · ships as **ticvai-control** ·
-platformAdmin audience · web ·
+Platform P08 Venue Management · ships as **venue-management** ·
+staff audience · web ·
 online only
 
 ## Who this is for
 
-**platformAdmin on web.** Everything below is how you know what is
+**staff on web.** Everything below is how you know what is
 true. **None of it is the subject.** The subject is the person in front of the screen and the one
 thing they came to do.
 
@@ -61,22 +61,61 @@ convincingly. It is never a caption.
   and its error; and, element by element, what is shown and in what format, what each action
   produces and where the user goes next. Draw exactly that.
 
+## The processes these screens belong to
+
+Written by the owner of each process (`handoff/design-notes/`). Read before any screen: it says how the process runs end to end and which words the screens must use.
+
+### Ticketing & Guest Commerce, as the venue and TICVAI configure and run it
+
+WHAT THE PROCESS IS. Everything a guest can buy is set up, priced, promoted and serviced here, on Venue Management (P08, the venue's own back office, served inside the venue's cell) and on the TICVAI Console (P09, TICVAI's control plane, outside every cell). End to end: (1) CATALOGUE. A product has one of twelve kinds (admission, timedAdmission, datedAdmission, openDated, seated, membership, bundle, fnb, retail, rental, addOn, giftCard). Its ticket types (adult, child, senior, resident...) are not typed one by one: they are generated from the product's attributes (components) and each value combination becomes a sellable ticket type with no extra setup (DI-164). What a ticket grants (validity, entries, re-entry, days of week, blackout dates, expiry anchor, fast track, transfer) lives on a reusable entitlement template, not on the product. Who may take part (age, height, supervision, certification) is the eligibility rule; what the guest must answer is the data mask and the consent questions; how the guest sees it is guestListing (bookable, infoOnly, hidden), display tags (at most six), media and the booking flow. Group, family and corporate products and every after-sales policy (reschedule, exchange, refund, cancellation, upgrade, transfer) are configured inside the one product configuration, never on separate screens (DI-465, DI-466). (2) LIFECYCLE AND PUBLICATION. A product moves draft, inReview, approved, live, withdrawn, archived. Approval and publication are two acts with two permissions (PRODUCT_APPROVE, PRODUCT_PUBLISH, R091); every product is authorised before it sells online or on site (DI-438). Approved is still not on a till: a till sells only what is in the signed catalogue release it pulled (publishBundle, ADR-0013), so a saved price is a back-office fact until the venue publishes to tills. Changing something that has sold is preceded by an impact check (assessProductChange: orders affected, entitlements issued, future performances, open carts); restoring a version creates a new version, and sold tickets keep the price and terms they were sold under (restoreProductVersion, DI-938, TRACKER Actions row 145). (3) PRICE. Prices live in price lists: per venue, per channel set, with validity dates and a priority, copied for the next season with an uplift (copyPriceList) and repriced in bulk only after a dry run (bulkChangePrices). Currency and decimal scale are never chosen on a form: they resolve from the venue's region (ADR-0008, ADR-0018; AED 2 places, OMR and BHD 3). When several rules apply, the configured hierarchy decides; there is no "lowest price wins" default (DI-595). Tax on the pre-discount price and three-decimal rounding are regional settings (DI-598). Dynamic rules always show their minimum and maximum price guardrails beside the trigger (getDynamicPriceRule). (4) PROMOTE AND BUNDLE. A promotion is a rule (automatic, or gated by a code) created in draft, made live only by Publish, which first analyses stacking; a …
+*(source: DI-164; DI-171; DI-438; DI-465; DI-466; DI-595; DI-598; DI-387; DI-039; DI-044; DI-474; DI-671; DI-987; DI-019; DI-080; ADR-0008; ADR-0013; ADR-0018; ADR-0019; ADR-0030; R091; R098; R101; R222; REV3-21; contracts/spine/catalogue.yaml#transitionProductLifecycle …)*
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Product | Anything sellable, of one of the twelve kinds. The record that carries names, channels, listing, media and policies. | Item (except on F&B and retail screens), SKU (for tickets), Offering | contracts/spine/catalogue.yaml#/components/schemas/ProductKind |
+| Ticket type | One sellable variant of an admission or event product (Adult, Child, Resident Adult), generated from the product's attributes. For retail and F&B the same record is labelled Variant. | Variant (on ticket screens), Sub-product, Rate (that is a price), Axis value | contracts/spine/catalogue.yaml#updateProductVariant / DI-164 / DI-437 |
+| Attribute | A dimension that generates ticket types (Guest category, Residency, Tier, Length). Each has values; adding a value adds ticket types. | Axis, Component (the client's word; use it only in help text), Option | contracts/spine/catalogue.yaml#setProductAttributes / DI-164 / DI-450 |
+| Entitlement | What a ticket lets the holder do (validity, entries, re-entry, days, blackout dates, expiry, fast track, transfer), defined once on an entitlement template and shared by several products. | Access rights, Ticket rules, Validity profile | contracts/spine/catalogue.yaml#createEntitlementTemplate / DI-171 / DI-451 |
+| Eligibility rule | Who may take part in or buy a product (age, height, supervision, waiver, certification). Distinct from a promotion's eligibility, which decides who gets a discount. | Restriction, Access rule (that is access control) | contracts/spine/catalogue.yaml#setProductEligibilityRule / DI-463 |
+| Price list | A set of prices for one venue and a set of channels, valid between two dates, with a priority. Several coexist (B2C, B2B, season). | Price book, Rate card, Tariff | contracts/spine/catalogue.yaml#createPriceList / DI-140 / DI-163 |
+| Price category | A standard rate type (Adult, Child, Member) reused across lists so venues do not invent "Adult Standard" and "Normal Adult". | Price band (that is a seat-category band), Fare type (transport) | contracts/spine/catalogue.yaml#setPriceCategoryRateType / … |
+| Price band | A priced band on a seat category (code, label, colour, amount, channel, from-date). | Price category, Zone price | contracts/satellite/seating.yaml#/components/schemas/SeatPriceBand |
+| Promotion | A rule that changes a price automatically or when a code is entered; draft until published; declares how it stacks. | Offer (except in guest copy), Deal, Discount rule | contracts/satellite/promotions.yaml#createPromotion / DI-173 / DI-174 |
+| Coupon code | A code issued from a coupon campaign that applies a promotion-style discount; one shared code or many single-use codes. | Voucher, Promo voucher | contracts/satellite/promotions.yaml#createCouponCampaign / DI-173 |
+| Voucher | A code that carries money (face value, balance), sold or issued; a liability until redeemed or expired. | Coupon, Credit note | contracts/satellite/promotions.yaml#listVoucherBatches / … |
+| Bundle | A product sold as one line whose price differs from the sum of its components, with a mandatory revenue allocation. "Package" is acceptable in guest copy. | Combo (that is an F&B meal deal), Catalogue bundle | contracts/satellite/promotions.yaml#createBundle / DI-220 / ADR-0019 |
+| Catalogue release | The signed snapshot of a venue's catalogue, prices, promotions and sale boards that tills, kiosks and devices pull. Its action label is "Publish to tills". | Bundle, Catalogue bundle, Sync, Deploy | contracts/spine/catalogue.yaml#publishBundle / … |
+| Approve / Publish / Save | Save keeps a draft; Approve records that it is authorised (PRODUCT_APPROVE); Publish makes it live for guests and channels (PRODUCT_PUBLISH). Three different buttons, never merged. | Submit, Go live, Activate (except CatalogueConfigStatus active), Deploy | R091 / contracts/spine/catalogue.yaml#transitionProductLifecycle / DI-438 |
+| Product states | Draft, In review, Approved, Live, Withdrawn, Archived (ProductLifecycleState), always as coloured badges with these exact labels. | Published (for a product), Pending, Inactive (for a product) | contracts/spine/catalogue.yaml#/components/schemas/ProductLifecycleState |
+| Channel | Where something is sold. Labels: pos Point of sale; kiosk Kiosk; web and guestWeb Website; mobile and guestApp App; b2b B2B partners; partner Partner; ota Travel agents (OTA); callCentre Call centre; api API; backOffice Back office. | Touchpoint, Outlet (an outlet is a business inside a venue), raw enum values | contracts/spine/catalogue.yaml#/components/schemas/Channel / … |
+| Refund | Money returned after settlement, wholly or for some lines, under the venue's refund policy. | Return (that is retail goods), Reversal, Void | contracts/spine/orders.yaml#createRefund / DI-252 |
+| Void | Cancelling a whole order before settlement, within the same shift, with a reason from the void list. After settlement it is a refund. | Cancel order, Delete | contracts/spine/orders.yaml#voidOrder / R222 |
+| Exchange / Reschedule | Exchange swaps lines for other products or dates and settles only the difference; Reschedule is the same product moved to another date or time. | Rebook, Date change (acceptable only in guest copy), Refund and resell | contracts/spine/orders.yaml#exchangeOrderLines / … |
+| Hold / Capture / Release | A deposit or stored-value amount is held, then partly or fully captured, and the rest released. A held deposit is not a payment. | Charge, Pre-auth (in staff copy), Block funds | contracts/spine/orders.yaml#authoriseStoredValue / … |
+| Wallet (TICVAI wallet) | The guest's stored-value balance on TICVAI, spent by hold and capture. Distinct from the tender "Apple Pay / Google Pay", which the contract also calls wallet. | Digital wallet (for stored value), E-wallet, Credit (without a type) | contracts/spine/orders.yaml#/components/schemas/TenderKind / R080 |
+| Credit lot | One amount of wallet credit of one credit type (cash, bonus, gift) with its own expiry; lots are spent nearest expiry first and the guest sees the breakdown but cannot choose. | Bucket, Batch, Top-up | TRACKER Actions row 171 / contracts/satellite/wallet.yaml#expireCreditLots |
+| Venue map / Seat map | A venue map is the wayfinding map of a park or a floor (points, paths, bookable places); a seat map is the seating layout of an auditorium or stand. Never just "map" where both could be meant. | Layout (alone), Floor plan (unless it is a floor map), Map (alone) | contracts/satellite/venue-map.yaml#createVenueMap / … |
+| Point / Bookable place | A point is a place on a venue map (toilet, ride, restaurant, exit). A bookable place is a cabana, lounger, table or pitch placed on the map and sold through its price band. | Pin, POI, Marker, Resource (in staff copy) | contracts/satellite/venue-map.yaml#setVenuePoint / … |
+| Station / Route / Timetable / Departure / Fare table / Pass … | A route is an ordered list of stations with offsets; a timetable generates departures up to its release horizon; a fare table prices a route per passenger type; a pass type is a multi-trip or unlimited pass sold as a product. | Stop (except in the stop list), Line (except lineCode), Schedule, Trip (except a guest's journey) | contracts/satellite/transport.yaml / REV3-21 |
+| Applies from | The effective date of a change. Every dated change shows it, and sold items keep their old terms. | Effective date (in labels), Start date (for a change) | contracts/satellite/seating.yaml#updateSeatCategory / TRACKER Actions row 194 |
+
+
 ## The screens
 
 Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs count fields; requirements are matrix rows; meeting inputs are the ones naming the screen (the module and platform ones are below); white label says whether the tenant's brand reaches it (guest) or it sets the brand (configures).
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-589` | Digital Payments Command Center\t71 | B–D | 0 | 12 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-590` | Digital & Alternative Payment Method Manager\t71 | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-591` | Digital Wallet & Mobile Payment Configuration\t72 | B–D | 0 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
-| `ADM-592` | Payment Link Builder & Configuration\t73 | B–D | 13 | 0 | 6 | 4 | 0 | 0 | — | notStarted (—) |
-| `ADM-593` | Payment Link Distribution & Customer Journey Manager\t74 | B–D | 0 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
-| `ADM-594` | Hosted Checkout, Redirect & Return Flow Configuration\t75 | B–D | 10 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
-| `ADM-595` | Digital Payment Session & Transaction Monitor\t76 | B–D | 2 | 24 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-596` | Authentication, Tokenization & Recurring Payment Controls\t78 | B–D | 0 | 18 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-597` | Digital Payment Exception, Recovery & Expiry Center\t79 | B–D | 0 | 10 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-598` | Digital Payment Simulator, Conversion & AI Advisor\t80 | B–D | 13 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-589` | Digital Payments Command Center | B–D | 0 | 12 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-590` | Digital & Alternative Payment Method Manager | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-591` | Digital Wallet & Mobile Payment Configuration | B–D | 0 | 18 | 6 | 0 | 0 | 6 | — | notStarted (—) |
+| `ADM-592` | Payment Link Builder & Configuration | B–D | 13 | 0 | 6 | 4 | 0 | 0 | — | notStarted (—) |
+| `ADM-593` | Payment Link Distribution & Customer Journey Manager | B–D | 0 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
+| `ADM-594` | Hosted Checkout, Redirect & Return Flow Configuration | B–D | 10 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
+| `ADM-595` | Digital Payment Session & Transaction Monitor | B–D | 2 | 24 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-596` | Authentication, Tokenization & Recurring Payment Controls | B–D | 0 | 18 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-597` | Digital Payment Exception, Recovery & Expiry Center | B–D | 0 | 10 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-598` | Digital Payment Simulator, Conversion & AI Advisor | B–D | 13 | 31 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 
@@ -88,23 +127,32 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 **One block per screen, in the order to build them.** Each says what the user enters (every control, with its rules), what the screen shows and produces (every field, with its format; every action, with what it returns and the errors to draw), every state, who may do what, the requirements it meets, what the client said about it, the tracker items, what the tenant configures, the references, and an acceptance checklist. **Everything in a block is for you, never for the screen**: no id, field name, operation or permission key may appear as text.
 
-### `ADM-589` Digital Payments Command Center\t71
+### `ADM-589` Digital Payments Command Center
 
 **Provide centralized operational visibility across all digital and alternative payment journeys.**
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `core` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `PAYMENT_VIEW` (1 read); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `PAYMENT_VIEW` (1 read); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | commandCentre (compact density): the pack gives this screen both a metric directory (§KPI Cards) and a per-row directory (§Compare) — counts over a population, then the population |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/commercial/digital-payments-command-center-t71-adm-589` |
 
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
+
 **Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Digital and alternative payment journeys: conversion and drop-off.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **The screen name ends in an escaped tab and the pack page number: "Digital Payments Command Center\t71".** Why: The pack page number leaked into the name; it would print on the screen title and the navigation. *(source: screens/P08-venue-back-office.yaml#ADM-589; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
+- **List operation(s) getPaymentPerformance return a bare array, not the paged list envelope (items, nextCursor, hasMore); rows of getPaymentPerformance carry no identifier.** Why: The table cannot page, and a row without an id cannot open, edit or link to the record it summarises. *(source: contracts/satellite/payments.yaml#getPaymentPerformance; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
 
 #### Inputs: what the user enters or picks
 
@@ -167,20 +215,24 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | POS payment link | text | not in the schema: `POS Payment Link` |
 | Partner/api | text | not in the schema: `Partner/API` |
 
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **digital performance**: By method and channel. *(source: contracts/satellite/payments.yaml#getPaymentPerformance)*
+
 **Data it reads**: `getPaymentPerformance` (onLoad, Digital payment performance)
 
 **Where the user goes next**
 
-- → `ADM-002` Platform Dashboard: *Back to Platform Dashboard*
-- → `ADM-590` Digital & Alternative Payment Method Manager\t71: *Digital & Alternative Payment Method Manager\t71*
-- → `ADM-591` Digital Wallet & Mobile Payment Configuration\t72: *Digital Wallet & Mobile Payment Configuration\t72*
-- → `ADM-592` Payment Link Builder & Configuration\t73: *Payment Link Builder & Configuration\t73*
-- → `ADM-593` Payment Link Distribution & Customer Journey Manager\t74: *Payment Link Distribution & Customer Journey Manager\t74*
-- → `ADM-594` Hosted Checkout, Redirect & Return Flow Configuration\t75: *Hosted Checkout, Redirect & Return Flow Configuration\t75*
-- → `ADM-595` Digital Payment Session & Transaction Monitor\t76: *Digital Payment Session & Transaction Monitor\t76*
-- → `ADM-596` Authentication, Tokenization & Recurring Payment Controls\t78: *Authentication, Tokenization & Recurring Payment Controls\t78*
-- → `ADM-597` Digital Payment Exception, Recovery & Expiry Center\t79: *Digital Payment Exception, Recovery & Expiry Center\t79*
-- → `ADM-598` Digital Payment Simulator, Conversion & AI Advisor\t80: *Digital Payment Simulator, Conversion & AI Advisor\t80*
+- → `BO-100` Venue Home: *Back to Venue Home*
+- → `ADM-590` Digital & Alternative Payment Method Manager: *Digital & Alternative Payment Method Manager\t71*
+- → `ADM-591` Digital Wallet & Mobile Payment Configuration: *Digital Wallet & Mobile Payment Configuration\t72*
+- → `ADM-592` Payment Link Builder & Configuration: *Payment Link Builder & Configuration\t73*
+- → `ADM-593` Payment Link Distribution & Customer Journey Manager: *Payment Link Distribution & Customer Journey Manager\t74*
+- → `ADM-594` Hosted Checkout, Redirect & Return Flow Configuration: *Hosted Checkout, Redirect & Return Flow Configuration\t75*
+- → `ADM-595` Digital Payment Session & Transaction Monitor: *Digital Payment Session & Transaction Monitor\t76*
+- → `ADM-596` Authentication, Tokenization & Recurring Payment Controls: *Authentication, Tokenization & Recurring Payment Controls\t78*
+- → `ADM-597` Digital Payment Exception, Recovery & Expiry Center: *Digital Payment Exception, Recovery & Expiry Center\t79*
+- → `ADM-598` Digital Payment Simulator, Conversion & AI Advisor: *Digital Payment Simulator, Conversion & AI Advisor\t80*
 
 #### States
 
@@ -192,6 +244,16 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the digital payments \t71 are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+kpis:
+  applePayConversion: 93%
+  cardConversion: 86%
+```
 
 #### Permissions
 
@@ -207,7 +269,7 @@ No matrix row traces to this screen's operations or data.
 
 None names this screen.
 
-Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -215,7 +277,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-589` · status **notStarted** · provenance —
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-589` · status **notStarted** · provenance —
 - Client workshop board: `wireframes/WS90 Payment Payment Orchestration Board 4.dc.html#adm-589`
 - Workshop pack: Payment_Payment_Orchestration.pdf board 4
 - Flow F259 *Payment Payment Orchestration board 4: Digital Payments Command Center\t71*, step 1: Opens Digital Payments Command Center\t71 → Provide centralized operational visibility across all digital and alternative payment journeys.
@@ -236,30 +298,41 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every output is drawn (12 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-589?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
-- [ ] Every transition is wired: `ADM-002`, `ADM-590`, `ADM-591`, `ADM-592`, `ADM-593`, `ADM-594`, `ADM-595`, `ADM-596`, `ADM-597`, `ADM-598`.
+- [ ] Every transition is wired: `BO-100`, `ADM-590`, `ADM-591`, `ADM-592`, `ADM-593`, `ADM-594`, `ADM-595`, `ADM-596`, `ADM-597`, `ADM-598`.
 - [ ] Every gated control is gated: `PAYMENT_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 2 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
 
-### `ADM-590` Digital & Alternative Payment Method Manager\t71
+### `ADM-590` Digital & Alternative Payment Method Manager
 
 **Configure the digital payment experiences available through TICVAI.**
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `core` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `PAYMENT_CONFIGURE`, `PAYMENT_VIEW` (1 configure, 1 read); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `PAYMENT_CONFIGURE`, `PAYMENT_VIEW` (1 configure, 1 read); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
 | Offline | online only |
 | Opens with | `methodId` (navigation) |
 | Route | `/commercial/digital-alternative-payment-method-manager-t71-adm-590` |
 
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
+
 **Known gaps.** **The pack names 5 actions on this screen and the screen declares 0 operations.** Unserved: Online card, Mobile/digital wallets, Redirect payments, Stored-value wallet, Future payment methods through … **Digital & Alternative Payment Method Manager\t71 declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. …
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Digital payment methods available through TICVAI.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **The screen name ends in an escaped tab and the pack page number: "Digital & Alternative Payment Method Manager\t71".** Why: The pack page number leaked into the name; it would print on the screen title and the navigation. *(source: screens/P08-venue-back-office.yaml#ADM-590; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
+- **Pack actions with no operation: Online card, Mobile/digital wallets, Redirect payments, Stored-value wallet, Future payment methods through adapters.** Why: The workshop pack names them on this screen and no operation serves them; each needs an operation or removal from the screen. *(source: screens/P08-venue-back-office.yaml#ADM-590; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
+- **List operation(s) listPaymentMethods return a bare array, not the paged list envelope (items, nextCursor, hasMore).** Why: The table cannot page, and a row without an id cannot open, edit or link to the record it summarises. *(source: contracts/satellite/payments.yaml#listPaymentMethods; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
 
 #### Inputs: what the user enters or picks
 
@@ -287,7 +360,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Where the user goes next**
 
-- → `ADM-589` Digital Payments Command Center\t71: *Back to Digital Payments Command Center\t71*
+- → `ADM-589` Digital Payments Command Center: *Back to Digital Payments Command Center\t71*
 
 #### States
 
@@ -299,6 +372,21 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the digital alternative payment are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Consistency with other screens
+
+- Match `ADM-561`: Same method record.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+method:
+  name: Google Pay
+  channels:
+  - App
+```
 
 #### Permissions
 
@@ -315,7 +403,7 @@ No matrix row traces to this screen's operations or data.
 
 None names this screen.
 
-Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -323,7 +411,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-590` · status **notStarted** · provenance —
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-590` · status **notStarted** · provenance —
 - Client workshop board: `wireframes/WS90 Payment Payment Orchestration Board 4.dc.html#adm-590`
 - Workshop pack: Payment_Payment_Orchestration.pdf board 4
 - Flow F259 *Payment Payment Orchestration board 4: Digital Payments Command Center\t71*, step 2: Works in Digital & Alternative Payment Method Manager\t71 → Configure the digital payment experiences available through TICVAI.
@@ -337,33 +425,79 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `ADM-589`.
 - [ ] Every gated control is gated: `PAYMENT_CONFIGURE`, `PAYMENT_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 3 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
 
-### `ADM-591` Digital Wallet & Mobile Payment Configuration\t72
+### `ADM-591` Digital Wallet & Mobile Payment Configuration
 
 **Manage wallet-based and mobile digital payment methods.**
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `core` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `PAYMENT_CONFIGURE` (1 configure); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `PAYMENT_CONFIGURE`, `PAYMENT_VIEW` (1 configure, 1 read); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
 | Offline | online only |
 | Opens with | `methodId` (navigation) |
 | Route | `/commercial/digital-wallet-mobile-payment-configuration-t72-adm-591` |
 
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
+
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Wallet-based mobile payment methods (Apple Pay, Google Pay), not the TICVAI stored-value wallet.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **The screen name ends in an escaped tab and the pack page number: "Digital Wallet & Mobile Payment Configuration\t72".** Why: The pack page number leaked into the name; it would print on the screen title and the navigation. *(source: screens/P08-venue-back-office.yaml#ADM-591; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
+
+**Fixed on main** (the package already carries these; draw what it says): No read operation: the screen declares only updatePaymentMethod and nothing that returns the current configuration. (CHG-WIR-025).
 
 #### Inputs: what the user enters or picks
 
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Channel | text field | — | — | `listPaymentMethods` ?channel |
+
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
 
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **digital wallet**: Label explicitly "Apple Pay / Google Pay (digital wallet tender)". *(source: contracts/satellite/payments.yaml#updatePaymentMethod / contracts/spine/orders.yaml#/components/schemas/TenderKind)*
+
 #### Outputs: what the screen shows and produces
+
+**Shown**
+
+**Wallet methods** (data table, from `listPaymentMethods`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| ID | the name it points at, never the id | — |
+| Code | text | — |
+| Name | text | — |
+| Kind | chip: Card, Digital wallet, Bank transfer, Cash, Stored value, Gift card… | — |
+| Card schemes | list or chips (count when long) | — |
+| Currencies | list or chips (count when long) | — |
+| Channels | list or chips (count when long) | — |
+| Venues | list or chips (count when long) | — |
+| Minimum amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Maximum amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Surcharge | grouped details | — |
+| Percent | 12.5% | — |
+| Fixed | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Disclosed to guest | yes / no (icon or chip) | Undisclosed surcharging is illegal in several of the markets this platform sells into. |
+| Refundable | yes / no (icon or chip) | — |
+| Partial refund supported | yes / no (icon or chip) | — |
+| Display order | 1,234 | — |
+| Is active | yes / no (icon or chip) | — |
 
 **Actions and what each produces**
 
@@ -372,9 +506,11 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Save payment method (primary button) | navigation or local | — | — | — | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
 
+**Data it reads**: `listPaymentMethods` (onLoad, The methods this tenant can offer, and where)
+
 **Where the user goes next**
 
-- → `ADM-589` Digital Payments Command Center\t71: *Back to Digital Payments Command Center\t71*
+- → `ADM-589` Digital Payments Command Center: *Back to Digital Payments Command Center\t71*
 
 #### States
 
@@ -387,9 +523,20 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+method:
+  name: Apple Pay
+  merchantId: merchant.ae.dunepark
+```
+
 #### Permissions
 
 - `updatePaymentMethod` → `PAYMENT_CONFIGURE` (configure) · staff
+- `listPaymentMethods` → `PAYMENT_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -401,7 +548,7 @@ No matrix row traces to this screen's operations or data.
 
 None names this screen.
 
-Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -414,7 +561,7 @@ Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-591` · status **notStarted** · provenance —
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-591` · status **notStarted** · provenance —
 - Client workshop board: `wireframes/WS90 Payment Payment Orchestration Board 4.dc.html#adm-591`
 - Workshop pack: Payment_Payment_Orchestration.pdf board 4
 - Flow F259 *Payment Payment Orchestration board 4: Digital Payments Command Center\t71*, step 4: Works in Digital Wallet & Mobile Payment Configuration\t72 → Manage wallet-based and mobile digital payment methods.
@@ -422,33 +569,46 @@ Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state (412).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (18 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-591?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save payment method, Cancel.
 - [ ] Every transition is wired: `ADM-589`.
-- [ ] Every gated control is gated: `PAYMENT_CONFIGURE`.
+- [ ] Every gated control is gated: `PAYMENT_CONFIGURE`, `PAYMENT_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
 
-### `ADM-592` Payment Link Builder & Configuration\t73
+### `ADM-592` Payment Link Builder & Configuration
 
 **Allow authorized users and systems to generate secure payment requests without requiring the customer to be physically present at a POS.**
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `core` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `ORDER_CREATE` (1 operate); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `ORDER_CREATE` (1 operate); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/commercial/payment-link-builder-configuration-t73-adm-592` |
 
-**Known gaps.** **Payment Link Builder & Configuration\t73 declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either …
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
+
+**Known gaps.** **Payment Link Builder & Configuration\t73 declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either … Contract gap recorded 2 October 2026 (CHG-WIR-027): No staff read of payment links (getPaymentLink is guest/anonymous by token; there is no list).
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Generate a payment link for a booking taken without the guest present, with expiry and automatic release of unpaid bookings.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **The screen name ends in an escaped tab and the pack page number: "Payment Link Builder & Configuration\t73".** Why: The pack page number leaked into the name; it would print on the screen title and the navigation. *(source: screens/P08-venue-back-office.yaml#ADM-592; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- No read operation: the screen declares only createPaymentLink and nothing that returns the current configuration. (CHG-WIR-027)
 
 #### Inputs: what the user enters or picks
 
@@ -470,11 +630,15 @@ Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the 
 | Venue | select field | — | — | — | — | — | — |
 | Channel/source | select field | — | — | — | — | — | — |
 
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **link**: Order, amount, expiry; unpaid bookings release at expiry. *(source: contracts/spine/orders.yaml#createPaymentLink / TRACKER Actions row 127 / ADR-0027)*
+
 #### Outputs: what the screen shows and produces
 
 **Where the user goes next**
 
-- → `ADM-589` Digital Payments Command Center\t71: *Back to Digital Payments Command Center\t71*
+- → `ADM-589` Digital Payments Command Center: *Back to Digital Payments Command Center\t71*
 
 #### States
 
@@ -486,6 +650,17 @@ Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the 
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Empty, no results (`?state=emptyNoResults`) | **Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+link:
+  order: GB-2026-0077
+  amount: AED 9,000.00
+  expires: 48 h
+```
 
 #### Permissions
 
@@ -508,7 +683,7 @@ Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the 
 
 None names this screen.
 
-Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -516,7 +691,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-592` · status **notStarted** · provenance —
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-592` · status **notStarted** · provenance —
 - Client workshop board: `wireframes/WS90 Payment Payment Orchestration Board 4.dc.html#adm-592`
 - Workshop pack: Payment_Payment_Orchestration.pdf board 4
 - Flow F259 *Payment Payment Orchestration board 4: Digital Payments Command Center\t71*, step 6: Works in Payment Link Builder & Configuration\t73 → Allow authorized users and systems to generate secure payment requests without requiring the customer to be physically present at a POS.
@@ -530,27 +705,36 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `ADM-589`.
 - [ ] Every gated control is gated: `ORDER_CREATE`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
 
-### `ADM-593` Payment Link Distribution & Customer Journey Manager\t74
+### `ADM-593` Payment Link Distribution & Customer Journey Manager
 
 **Manage how a generated payment request is delivered and how its lifecycle progresses.**
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `core` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `ORDER_MODIFY`, `ORDER_VIEW` (1 operate, 1 read); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `ORDER_MODIFY`, `ORDER_VIEW` (1 operate, 1 read); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
 | Offline | online only |
 | Opens with | `linkId` (navigation), `token` (deepLink) |
 | Route | `/commercial/payment-link-distribution-customer-journey-manager-t74-adm-593` |
 
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
+
 **Known gaps.** **Payment Link Distribution & Customer Journey Manager\t74 declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** How a payment link is delivered and its life (sent, opened, paid, expired); a resend retires the old link.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **The screen name ends in an escaped tab and the pack page number: "Payment Link Distribution & Customer Journey Manager\t74".** Why: The pack page number leaked into the name; it would print on the screen title and the navigation. *(source: screens/P08-venue-back-office.yaml#ADM-593; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
 
 #### Inputs: what the user enters or picks
 
@@ -571,11 +755,15 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |  (primary button) | navigation or local | — | — | — | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
 
+**What each action does** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **Resend**: The previous link stops working; the guest is told the new one replaces it. *(source: contracts/spine/orders.yaml#resendPaymentLink)*
+
 **Data it reads**: `getPaymentLink` (onLoad, Its state)
 
 **Where the user goes next**
 
-- → `ADM-589` Digital Payments Command Center\t71: *Back to Digital Payments Command Center\t71*
+- → `ADM-589` Digital Payments Command Center: *Back to Digital Payments Command Center\t71*
 
 #### States
 
@@ -587,6 +775,16 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the payment link distribution are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+link:
+  state: opened
+  resent: 1
+```
 
 #### Permissions
 
@@ -603,7 +801,7 @@ No matrix row traces to this screen's operations or data.
 
 None names this screen.
 
-Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -616,7 +814,7 @@ Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-593` · status **notStarted** · provenance —
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-593` · status **notStarted** · provenance —
 - Client workshop board: `wireframes/WS90 Payment Payment Orchestration Board 4.dc.html#adm-593`
 - Workshop pack: Payment_Payment_Orchestration.pdf board 4
 - Flow F259 *Payment Payment Orchestration board 4: Digital Payments Command Center\t71*, step 8: Works in Payment Link Distribution & Customer Journey Manager\t74 → Manage how a generated payment request is delivered and how its lifecycle progresses.
@@ -630,27 +828,41 @@ Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the 
 - [ ] Every transition is wired: `ADM-589`.
 - [ ] Every gated control is gated: `ORDER_MODIFY`, `ORDER_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
 
-### `ADM-594` Hosted Checkout, Redirect & Return Flow Configuration\t75
+### `ADM-594` Hosted Checkout, Redirect & Return Flow Configuration
 
 **Configure digital payment flows that require provider-hosted payment pages, redirects, SDKs, or asynchronous customer journeys.**
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `core` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `PAYMENT_CONFIGURE` (1 configure); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `PAYMENT_CONFIGURE` (1 configure); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/commercial/hosted-checkout-redirect-return-flow-configuration-t75-adm-594` |
 
-**Known gaps.** **The pack names 2 actions on this screen and the screen declares 0 operations.** Unserved: Hosted checkout, External payment authorization. Each needs an operation, or needs removing from the …
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
+
+**Known gaps.** **The pack names 2 actions on this screen and the screen declares 0 operations.** Unserved: Hosted checkout, External payment authorization. Each needs an operation, or needs removing from the … Contract gap recorded 2 October 2026 (CHG-WIR-027): No read of the hosted checkout configuration (setHostedCheckoutConfiguration has no get).
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Hosted checkout, redirect and the journey back; the return leg is where it goes wrong.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **The screen name ends in an escaped tab and the pack page number: "Hosted Checkout, Redirect & Return Flow Configuration\t75".** Why: The pack page number leaked into the name; it would print on the screen title and the navigation. *(source: screens/P08-venue-back-office.yaml#ADM-594; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
+- **Pack actions with no operation: Hosted checkout, External payment authorization.** Why: The workshop pack names them on this screen and no operation serves them; each needs an operation or removal from the screen. *(source: screens/P08-venue-back-office.yaml#ADM-594; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- No read operation: the screen declares only setHostedCheckoutConfiguration and nothing that returns the current configuration. (CHG-WIR-027)
 
 #### Inputs: what the user enters or picks
 
@@ -669,6 +881,10 @@ Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the 
 | Allowed domains/apps | select field | — | — | — | — | — | — |
 | Branding profile reference | select field | — | — | — | — | — | — |
 
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **return handling**: Return URL and what the guest sees if they close the provider page. *(source: contracts/satellite/payments.yaml#setHostedCheckoutConfiguration / TRACKER Actions row 134)*
+
 #### Outputs: what the screen shows and produces
 
 **Actions and what each produces**
@@ -680,7 +896,7 @@ Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the 
 
 **Where the user goes next**
 
-- → `ADM-589` Digital Payments Command Center\t71: *Back to Digital Payments Command Center\t71*
+- → `ADM-589` Digital Payments Command Center: *Back to Digital Payments Command Center\t71*
 
 #### States
 
@@ -692,6 +908,16 @@ Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the 
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Empty, no results (`?state=emptyNoResults`) | **Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+config:
+  mode: redirect
+  returnTimeout: 15 min
+```
 
 #### Permissions
 
@@ -707,7 +933,7 @@ No matrix row traces to this screen's operations or data.
 
 None names this screen.
 
-Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -720,7 +946,7 @@ Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-594` · status **notStarted** · provenance —
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-594` · status **notStarted** · provenance —
 - Client workshop board: `wireframes/WS90 Payment Payment Orchestration Board 4.dc.html#adm-594`
 - Workshop pack: Payment_Payment_Orchestration.pdf board 4
 - Flow F259 *Payment Payment Orchestration board 4: Digital Payments Command Center\t71*, step 10: Works in Hosted Checkout, Redirect & Return Flow Configuration\t75 → Configure digital payment flows that require provider-hosted payment pages, redirects, SDKs, or asynchronous customer journeys.
@@ -734,27 +960,41 @@ Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the 
 - [ ] Every transition is wired: `ADM-589`.
 - [ ] Every gated control is gated: `PAYMENT_CONFIGURE`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 2 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
 
-### `ADM-595` Digital Payment Session & Transaction Monitor\t76
+### `ADM-595` Digital Payment Session & Transaction Monitor
 
 **Provide operational teams with real-time visibility into digital payment sessions.**
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `core` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `ORDER_CREATE` (1 operate); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `ORDER_CREATE` (1 operate); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Show) and no metric row |
 | Offline | online only |
 | Opens with | `paymentId` (navigation) |
 | Route | `/commercial/digital-payment-session-transaction-monitor-t76-adm-595` |
 
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
+
+**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape … Contract gap recorded 2 October 2026 (CHG-WIR-027): No read lists digital payment sessions and their state.
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Digital payment sessions in real time and recovery of uncertain ones.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **No read operation: the screen declares only inquirePaymentStatus and nothing that returns the current configuration.** Why: It opens as an empty form even where a configuration exists; it needs a get or list for the same record (PR-9). *(source: contracts/spine/orders.yaml#inquirePaymentStatus / screens/P08-venue-back-office.yaml#ADM-595; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
+- **The screen name ends in an escaped tab and the pack page number: "Digital Payment Session & Transaction Monitor\t76".** Why: The pack page number leaked into the name; it would print on the screen title and the navigation. *(source: screens/P08-venue-back-office.yaml#ADM-595; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- A monitor without a list of sessions. (CHG-WIR-027)
 
 #### Inputs: what the user enters or picks
 
@@ -805,9 +1045,13 @@ Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the 
 
 **Permissions this screen separates** (banner): **The pack separates these permissions and no action on the screen claims them yet:** Check Status, Cancel Session, Regenerate Link, View Provider Events, View Decision Trace. Each needs attaching to the control it gates, or the screen needs the control.
 
+**What each action does** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **Ask the provider**: As on BO-024. *(source: contracts/spine/orders.yaml#inquirePaymentStatus)*
+
 **Where the user goes next**
 
-- → `ADM-589` Digital Payments Command Center\t71: *Back to Digital Payments Command Center\t71*
+- → `ADM-589` Digital Payments Command Center: *Back to Digital Payments Command Center\t71*
 
 #### States
 
@@ -819,6 +1063,16 @@ Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the 
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the digital payment session are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+session:
+  state: pendingConfirmation
+  age: 6 min
+```
 
 #### Permissions
 
@@ -834,7 +1088,7 @@ No matrix row traces to this screen's operations or data.
 
 None names this screen.
 
-Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -842,7 +1096,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-595` · status **notStarted** · provenance —
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-595` · status **notStarted** · provenance —
 - Client workshop board: `wireframes/WS90 Payment Payment Orchestration Board 4.dc.html#adm-595`
 - Workshop pack: Payment_Payment_Orchestration.pdf board 4
 - Flow F259 *Payment Payment Orchestration board 4: Digital Payments Command Center\t71*, step 12: Works in Digital Payment Session & Transaction Monitor\t76 → Provide operational teams with real-time visibility into digital payment sessions.
@@ -856,31 +1110,49 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `ADM-589`.
 - [ ] Every gated control is gated: `ORDER_CREATE`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 2 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
 
-### `ADM-596` Authentication, Tokenization & Recurring Payment Controls\t78
+### `ADM-596` Authentication, Tokenization & Recurring Payment Controls
 
 **Manage digital-payment security capabilities and reusable payment references without turning TICVAI into a card vault.**
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `core` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `PAYMENT_CONFIGURE` (1 configure); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `PAYMENT_CONFIGURE` (1 configure); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Display) and no metric row |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/commercial/authentication-tokenization-recurring-payment-controls-t-adm-596` |
 
-**Known gaps.** **The pack names 3 actions on this screen and the screen declares 0 operations.** Unserved: 3-D Secure, Strong Customer Authentication where applicable, Provider risk authentication. Each needs an … **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
+
+**Known gaps.** **The pack names 3 actions on this screen and the screen declares 0 operations.** Unserved: 3-D Secure, Strong Customer Authentication where applicable, Provider risk authentication. Each needs an … **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape … Contract gap recorded 2 October 2026 (CHG-WIR-027): No read of the payment authentication policy (setPaymentAuthenticationPolicy has no get).
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** 3-D Secure, tokenisation and recurring mandates without TICVAI becoming a card vault.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **The screen name ends in an escaped tab and the pack page number: "Authentication, Tokenization & Recurring Payment Controls\t78".** Why: The pack page number leaked into the name; it would print on the screen title and the navigation. *(source: screens/P08-venue-back-office.yaml#ADM-596; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
+- **Pack actions with no operation: 3-D Secure, Strong Customer Authentication where applicable, Provider risk authentication.** Why: The workshop pack names them on this screen and no operation serves them; each needs an operation or removal from the screen. *(source: screens/P08-venue-back-office.yaml#ADM-596; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- No read operation: the screen declares only setPaymentAuthenticationPolicy and nothing that returns the current configuration. (CHG-WIR-027)
 
 #### Inputs: what the user enters or picks
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **challenge policy**: When to challenge (amount, risk), as a trade between conversion and risk. *(source: contracts/satellite/payments.yaml#setPaymentAuthenticationPolicy)*
 
 #### Outputs: what the screen shows and produces
 
@@ -924,7 +1196,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Where the user goes next**
 
-- → `ADM-589` Digital Payments Command Center\t71: *Back to Digital Payments Command Center\t71*
+- → `ADM-589` Digital Payments Command Center: *Back to Digital Payments Command Center\t71*
 
 #### States
 
@@ -936,6 +1208,16 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the authentication tokenization recurring are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+policy:
+  challengeAbove: AED 1,000.00
+  tokenise: true
+```
 
 #### Permissions
 
@@ -951,7 +1233,7 @@ No matrix row traces to this screen's operations or data.
 
 None names this screen.
 
-Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -959,7 +1241,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-596` · status **notStarted** · provenance —
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-596` · status **notStarted** · provenance —
 - Client workshop board: `wireframes/WS90 Payment Payment Orchestration Board 4.dc.html#adm-596`
 - Workshop pack: Payment_Payment_Orchestration.pdf board 4
 - Flow F259 *Payment Payment Orchestration board 4: Digital Payments Command Center\t71*, step 14: Works in Authentication, Tokenization & Recurring Payment Controls\t78 → Manage digital-payment security capabilities and reusable payment references without turning TICVAI into a card vault.
@@ -973,27 +1255,40 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `ADM-589`.
 - [ ] Every gated control is gated: `PAYMENT_CONFIGURE`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 2 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
 
-### `ADM-597` Digital Payment Exception, Recovery & Expiry Center\t79
+### `ADM-597` Digital Payment Exception, Recovery & Expiry Center
 
 **Centralize operational handling of incomplete or abnormal digital-payment journeys.**
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `core` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `ORDER_CREATE`, `PAYMENT_CONFIGURE` (1 operate, 1 configure); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `ORDER_CREATE`, `PAYMENT_CONFIGURE` (1 operate, 1 configure); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Show) and no metric row |
 | Offline | online only |
 | Opens with | `paymentId` (navigation) |
 | Route | `/commercial/digital-payment-exception-recovery-expiry-center-t79-adm-597` |
 
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
+
+**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape … Contract gap recorded 2 October 2026 (CHG-WIR-027): No read lists digital payment exceptions (failed, abandoned, expired sessions).
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Incomplete or abnormal digital payments and their recovery.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **The screen name ends in an escaped tab and the pack page number: "Digital Payment Exception, Recovery & Expiry Center\t79".** Why: The pack page number leaked into the name; it would print on the screen title and the navigation. *(source: screens/P08-venue-back-office.yaml#ADM-597; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- No read operation: the screen declares only setHostedCheckoutConfiguration, inquirePaymentStatus and nothing that returns the current configuration. (CHG-WIR-027)
 
 #### Inputs: what the user enters or picks
 
@@ -1023,9 +1318,13 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Status | text | not in the schema: `Status` |
 | Resolution | text | not in the schema: `Resolution` |
 
+**What each action does** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **Ask the provider**: As on BO-024. *(source: contracts/spine/orders.yaml#inquirePaymentStatus)*
+
 **Where the user goes next**
 
-- → `ADM-589` Digital Payments Command Center\t71: *Back to Digital Payments Command Center\t71*
+- → `ADM-589` Digital Payments Command Center: *Back to Digital Payments Command Center\t71*
 
 #### States
 
@@ -1037,6 +1336,16 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the digital payment exception are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+exception:
+  session: HC-2026-55120
+  state: returned without result
+```
 
 #### Permissions
 
@@ -1053,7 +1362,7 @@ No matrix row traces to this screen's operations or data.
 
 None names this screen.
 
-Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -1061,7 +1370,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-597` · status **notStarted** · provenance —
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-597` · status **notStarted** · provenance —
 - Client workshop board: `wireframes/WS90 Payment Payment Orchestration Board 4.dc.html#adm-597`
 - Workshop pack: Payment_Payment_Orchestration.pdf board 4
 - Flow F259 *Payment Payment Orchestration board 4: Digital Payments Command Center\t71*, step 16: Works in Digital Payment Exception, Recovery & Expiry Center\t79 → Centralize operational handling of incomplete or abnormal digital-payment journeys.
@@ -1075,25 +1384,36 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `ADM-589`.
 - [ ] Every gated control is gated: `ORDER_CREATE`, `PAYMENT_CONFIGURE`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
 
-### `ADM-598` Digital Payment Simulator, Conversion & AI Advisor\t80
+### `ADM-598` Digital Payment Simulator, Conversion & AI Advisor
 
 **Allow administrators to validate digital payment journeys and identify conversion opportunities before deploying configuration changes.**
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P09 TICVAI Web (web) |
+| App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `core` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | ticvai staff holding `PAYMENT_CONFIGURE` (1 configure); in the flows as platform admin |
-| Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
+| Who uses it | venue staff holding `PAYMENT_CONFIGURE`, `PAYMENT_VIEW` (1 configure, 1 read); in the flows as venue manager |
+| Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Select; Merchant Configuration; Captured) and no display directory — it is settings, not a population |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/commercial/digital-payment-simulator-conversion-ai-advisor-t80-adm-598` |
+
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Validate digital journeys and find conversion opportunities before deploying changes.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **The screen name ends in an escaped tab and the pack page number: "Digital Payment Simulator, Conversion & AI Advisor\t80".** Why: The pack page number leaked into the name; it would print on the screen title and the navigation. *(source: screens/P08-venue-back-office.yaml#ADM-598; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
+
+**Fixed on main** (the package already carries these; draw what it says): No read operation: the screen declares only simulatePaymentConfiguration and nothing that returns the current configuration. (CHG-WIR-025).
 
 #### Inputs: what the user enters or picks
 
@@ -1115,11 +1435,67 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | ✓ | select field | — | — | — | — | — | — |
 | ↓ | select field | — | — | — | — | — | — |
 
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| From | date and time picker | — | — | `getPaymentPerformance` ?from |
+| Group by | select | — | Method · Provider · Card type · Channel · Authentication outcome · Venue | `getPaymentPerformance` ?groupBy |
+
 #### Outputs: what the screen shows and produces
+
+**Shown**
+
+**Current rules** (detail panel, from `getPaymentRules`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Currency rules | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
+| Payment policy | the name it points at, never the id | — |
+| Channel | the name it points at, never the id | — |
+| Code | text | — |
+| Settlement currency code | text | — |
+| Min payment amount | 1,234.5 | — |
+| Max payment amount | 1,234.5 | — |
+| Rounding increment | 1,234.5 | — |
+| Is active | yes / no (icon or chip) | — |
+| Eligibility rules | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
+| Payment policy | the name it points at, never the id | — |
+| Payment method | the name it points at, never the id | — |
+| Channel | the name it points at, never the id | — |
+| Business area | text | — |
+| Currency code | text | — |
+| Min order amount | 1,234.5 | — |
+| Max order amount | 1,234.5 | — |
+| Effect | text | — |
+
+**Conversion** (data table, from `getPaymentPerformance`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Key | text | — |
+| Label | text | — |
+| Attempts | 1,234 | — |
+| Authorised | 1,234 | — |
+| Declined | 1,234 | — |
+| Errored | 1,234 | — |
+| Abandoned | 1,234 | — |
+| Authorisation rate | 12.5% | — |
+| Conversion rate | 12.5% | — |
+| Average value | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Top decline reason | text | — |
+
+**What each action does** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **Simulate**: As ADM-568. *(source: contracts/satellite/payments.yaml#simulatePaymentConfiguration)*
+
+**Data it reads**: `getPaymentRules` (onLoad, The rule set the simulation runs against); `getPaymentPerformance` (onLoad, Conversion at the payment step today)
 
 **Where the user goes next**
 
-- → `ADM-589` Digital Payments Command Center\t71: *Back to Digital Payments Command Center\t71*
+- → `ADM-589` Digital Payments Command Center: *Back to Digital Payments Command Center\t71*
 
 #### States
 
@@ -1132,9 +1508,23 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Empty, no results (`?state=emptyNoResults`) | **Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist |
 | Offline (`?state=offline`) | online only |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+result:
+  channel: App
+  offered:
+  - Apple Pay
+  - Card
+```
+
 #### Permissions
 
 - `simulatePaymentConfiguration` → `PAYMENT_CONFIGURE` (configure) · staff
+- `getPaymentRules` → `PAYMENT_VIEW` (read) · staff
+- `getPaymentPerformance` → `PAYMENT_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -1146,7 +1536,7 @@ No matrix row traces to this screen's operations or data.
 
 None names this screen.
 
-Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -1154,7 +1544,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### References
 
-- Wireframe frame: `wireframes/P09 TICVAI Web.dc.html#adm-598` · status **notStarted** · provenance —
+- Wireframe frame: `wireframes/P08 Venue Management.dc.html#adm-598` · status **notStarted** · provenance —
 - Client workshop board: `wireframes/WS90 Payment Payment Orchestration Board 4.dc.html#adm-598`
 - Workshop pack: Payment_Payment_Orchestration.pdf board 4
 - Flow F259 *Payment Payment Orchestration board 4: Digital Payments Command Center\t71*, step 18: Works in Digital Payment Simulator, Conversion & AI Advisor\t80 → Allow administrators to validate digital payment journeys and identify conversion opportunities before deploying configuration changes.
@@ -1162,12 +1552,13 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (13), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (31 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-598?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, emptyNoResults, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `ADM-589`.
-- [ ] Every gated control is gated: `PAYMENT_CONFIGURE`.
+- [ ] Every gated control is gated: `PAYMENT_CONFIGURE`, `PAYMENT_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -1176,12 +1567,16 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 ## Reference designs and the trackers for this platform
 
-**P09 reference designs** (from `handoff/design-batches/apps/6-ticvai-controller/README.md`)
+**P08 reference designs** (from `handoff/design-batches/apps/5-venue-management/README.md`)
 
 - `sources/designs/TICVAI_POS_Terminal_client_approved.html`: the client-approved POS, for operator density and components.
 - `sources/designs/TICVAI_Mobile.dc.html`: for finish and motion.
 
-**Design Vision Book rules that apply** (`sources/designs/Ticvai_Design_Vision_Book_v1_1.pdf`): DI-021, DI-022, DI-023, DI-024, DI-025, DI-027, DI-028, DI-029, DI-032, DI-033, DI-034, DI-036, DI-037, DI-038, DI-039, DI-040, DI-041, DI-042, DI-044, DI-045, DI-046, DI-047, DI-048, DI-049, DI-050, DI-051 (each is in the design inputs below).
+**Design Vision Book rules that apply** (`sources/designs/Ticvai_Design_Vision_Book_v1_1.pdf`): DI-021, DI-022, DI-023, DI-024, DI-025, DI-027, DI-028, DI-029, DI-030, DI-032, DI-033, DI-034, DI-036, DI-037, DI-038, DI-039, DI-040, DI-041, DI-042, DI-043, DI-044, DI-045, DI-046, DI-047, DI-048, DI-049, DI-050, DI-051, DI-052 (each is in the design inputs below).
+
+**Workshop tracker rows about P08 as a whole** (1: 1 open, 0 closed). Open first; a closed row says where it went on 30 September.
+
+- **S8** Venue Management back-end configuration wireframes *(Chinmay Parab · In progress · due Fri 2 Oct · 30 Sep 2026 · 30 Sep tracker)*
 
 ## Design inputs from the client meetings
 
@@ -1219,17 +1614,32 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Brand personality: Modern, AI-First, Enterprise, Premium, Reliable, Minimal, Scalable, Human-Centred. Visual essence: intelligent and forward-thinking, clean and minimal, trustworthy and secure, modern and timeless, scalable and flexible. *(agreed · Design Vision Book 29 Jul 2026, 02 Brand Identity (p2) - Brand personality / Visual essence · DI-021)*
 - Arabic is a core requirement, not later localisation: full Arabic RTL across web, mobile, POS, reports, emails, WhatsApp, SMS, notifications, tickets and receipts, and administrative interfaces. *(agreed · MoM 28 Jul 2026, 27. Internationalisation and Arabic Support · DI-019)*
 
-### Across P09 TICVAI Web
+### Across P08 Venue Management
 
-- Portal access exposes TICVAI pricing, so prospects submit contact details and a trade license as proof of a real venue, reviewed and approved by TICVAI before access is granted. *(agreed · MoM 10 Sep 2026, 4.8 Customer Portal Access, Authentication & Verification · DI-827)*
+- Qossai: configuration screens should consolidate related functionality, potentially merging 3-4 previously separate screens into one, rather than the repetitive one-screen-per-concept pattern of the AI-built reference system. *(agreed · MoM 24 Sep 2026, 4.5 Screen Consolidation Philosophy · DI-987)*
+- **Open question.** Open: should AI monitoring live in one centralised AI command dashboard or be distributed as widgets in each functional module's own dashboard? Allam: Softlabs' call; the current proposal is illustrative and Softlabs may propose a better structure. *(open · MoM 18 Sep 2026, 4.4 AI Governance — Risk, Compliance & Continuous Monitoring · DI-936)*
 - Simulation functionality stays embedded within each relevant configuration section rather than being consolidated, since it tests that section's own configuration. *(agreed · MoM 8 Sep 2026, 4.11 Dashboard & Reporting Module Consolidation Strategy · DI-722)*
+- Client boards (POS Frontline, F&B, Retail, Inventory & Procurement) share one architecture: six boards of ten screens per domain, a command centre first and an AI/analytics board last, under the hierarchy Company > Venue > Department > Workstation > Operator/Shift > Transaction > Exception > Reconciliation > Analytics. *(agreed · client-design-boards-audit 20 Aug 2026, Opening / What the boards give us · DI-400)*
+- Decision: RBAC per role, per module, three levels — edit/view, view-only, hidden (e.g. a marketing officer does not see Finance at all) — plus sub-permissions within a module (a CRM role may get Campaigns and Communications but not Journeys). Default role templates, admin-customisable. *(agreed · MoM 20 Aug 2026, 4.7 Role-Based Access Control (RBAC); 5. Key Decisions · DI-387)*
+- **Open question.** Allam: a user's visibility must be restrictable to specific outlets (an F&B manager of one outlet should not see other outlets' items); also relevant for ticketing/event-specific access. Implementation approach still open. *(open · MoM 18 Aug 2026, 4.6 Role-Based & Outlet-Level Access Control — Open Item · DI-331)*
+- Access loads automatically at login on POS and web/admin. A user with one role logs straight in; a user with several roles (e.g. admin, cashier, supervisor, manager) is prompted to choose which role to use. *(agreed · MoM 12 Aug 2026, 4. Multiple Roles per User and Role Switching · DI-249)*
+- Back office is role-driven from any device: a finance user signing in from a workstation, laptop or home sees only finance reports and related information. *(agreed · MoM 12 Aug 2026, 3. Role-Based Access and Workstation-Linked Front-End · DI-248)*
+- Built-in help menu with step-by-step tutorials with screenshots for common tasks (e.g. how to sell a ticket at the POS). *(client request · MoM 7 Aug 2026, 8. Legacy POS Layout Designer & System Logging · DI-160)*
+- Custom data-capture fields ("data mask") at account, event, extended-ticket and product level: field types text, dropdown, radio, true/false; multi-language labels; validation (min/max length, required/optional); reusable value lists (e.g. country list). Standard fields come out of the box. *(agreed · MoM 7 Aug 2026, 6. Data Mask: Flexible Custom Data Capture · DI-155)*
+- Load/traffic dashboards respect the tenancy model: a venue manager sees traffic for their own venue only. *(agreed · MoM 31 Jul 2026, 4. Non-Functional Requirements: Scalability & Availability · DI-061)*
+- Allam: queue management is built into the system (not third-party) so traffic entering the site can be throttled from the back office itself. *(agreed · MoM 31 Jul 2026, 4. Non-Functional Requirements: Scalability & Availability · DI-060)*
 - **Open question.** Proposed tenant hierarchy Tenant > Organization/Brand > Region > Branch > Venue > Department, under review against TICVAI's own organisational hierarchy before finalising. *(open · MoM 30 Jul 2026, 2. Proposed Multi-Tenant Hierarchy · DI-055)*
+- Documentation deliverable includes user guides and help content; the preview shows a TICVAI Help Center with categories (Getting Started, Events, Tickets, Orders, Payments, Memberships, Access Control, Reports, Integrations), a "Welcome to TICVAI" getting-started article and Quick Links (Create an Event, Set Pricing, Manage Access, View Reports). *(agreed · Design Vision Book 29 Jul 2026, 09 Deliverables (p9) - What We Deliver / Key Deliverables Preview · DI-052)*
 - Typeface Inter (Light, Regular, Medium, Semibold, Bold). Scale: H1 32/40 Bold, H2 24/32 Semibold, H3 20/28 Semibold, Body 1 16/24 Regular, Body 2 14/20 Regular, Caption 12/16 Regular. *(agreed · Design Vision Book 29 Jul 2026, 08 Design System (p8) - 2. Typography · DI-047)*
 - Palette ("modern, trustworthy and accessible"): Primary #0D6EFD, #00B8FF, #00D4C4, #0B1324; Neutral #F7F9FC, #E5E7EB, #9CA3AF, #4B5563, #1F2937. *(agreed · Design Vision Book 29 Jul 2026, 08 Design System (p8) - 1. Color Palette · DI-046)*
+- AI Assistant panel: a short framing ("Based on last 30 days, here are 3 actions that can improve your revenue") then actionable recommendations, each with its potential impact (e.g. "Increase pricing for VIP seats, +12%") and a chevron, plus "View all recommendations". *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - AI Panels · DI-043)*
 - Chart cards: title with period dropdown ("This Week"), headline metrics with deltas (Tickets Sold 12,840 +8.7%, Visitors, Conversion). Data visualisations must be easy to read. *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - Charts · DI-041)*
 - Tables: titled card with "View all", columns (e.g. Order ID, Customer, Amount, Status), coloured status badges (Paid, Pending, Refunded) and pagination with "Showing 1 to 5 of 245" and page numbers. *(agreed · Design Vision Book 29 Jul 2026, 06 Component Direction (p6) - Tables · DI-039)*
 - Primary button spec: height 40px, padding 12px 24px, radius 8px, Inter 14 Semibold, colour #0D6EFD, width auto. *(agreed · Design Vision Book 29 Jul 2026, 09 Deliverables (p9) - Developer Handoff preview · DI-037)*
+- Back-office shell: collapsible left sidebar with Overview, Events, Tickets, Orders, Customers, Memberships, Access Control, POS, Reports, Analytics, AI Assistant, Settings, and the signed-in user (name, role) at the bottom; top bar with global search (Cmd+K), current time and date, Notifications with unread dot, and user menu. *(agreed · Design Vision Book 29 Jul 2026, 04 Dashboard Vision (p4) - navigation shell · DI-030)*
 - Dynamic KPIs, forecasts and real-time insights; role-based dashboards, preferences and smart shortcuts for every user (e.g. greeting "Good morning, Ahmed" on the home screen, p2). *(agreed · Design Vision Book 29 Jul 2026, 03 Visual Direction (p3) - Smarter Data / Personalized Experience · DI-028)*
+- Reports and historical searches must still retrieve archived transactions when required; the retention period (e.g. keep 3 of 5+ years live) is configurable per customer, archival manual or automated. *(agreed · MoM 28 Jul 2026, 23. Database Optimisation and Archiving · DI-018)*
+- Back-office controls for the waiting room: configurable maximum active users and admission intervals, set per customer and venue. *(agreed · MoM 28 Jul 2026, 19. Auto-scaling and Virtual Waiting Room · DI-017)*
 
 ---
 
@@ -1246,6 +1656,7 @@ Method, path, parameters, request and response for every operation these screens
 "createPaymentLink": {"method":"POST","path":"/payment-links","contract":"orders","summary":"Send a guest a link to pay later","permission":"ORDER_CREATE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"PaymentLink"},
 "getPaymentLink": {"method":"GET","path":"/payment-links/{token}","contract":"orders","summary":"What a guest holding a link is being asked to pay for","permission":"ORDER_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":null},
 "getPaymentPerformance": {"method":"GET","path":"/payment-performance","contract":"payments","summary":"Authorisation rate, conversion and where payments are lost","permission":"PAYMENT_VIEW","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"tenant","parameters":[{"name":"from","in":"query","required":null},{"name":"groupBy","in":"query","required":null}],"requestBody":null,"responds":"PaymentPerformanceRow"},
+"getPaymentRules": {"method":"GET","path":"/payments/rules","contract":"payments","summary":"Currency, eligibility and fee rules as one set","permission":"PAYMENT_VIEW","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"PaymentRuleSet"},
 "inquirePaymentStatus": {"method":"POST","path":"/payments/{paymentId}/inquiry","contract":"orders","summary":"Ask the provider what actually happened","permission":"ORDER_CREATE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"workstation","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Payment"},
 "listPaymentMethods": {"method":"GET","path":"/payment-methods","contract":"payments","summary":"The methods this tenant can offer, and where","permission":"PAYMENT_VIEW","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"tenant","parameters":[{"name":"venueId","in":"query","required":null},{"name":"channel","in":"query","required":null}],"requestBody":null,"responds":"PaymentMethod"},
 "resendPaymentLink": {"method":"POST","path":"/payment-links/{linkId}/resend","contract":"orders","summary":"Send it again, and retire the old one","permission":"ORDER_MODIFY","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"PaymentLink"},
@@ -1268,13 +1679,17 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "Money": {"type":"object","x-ticvai-persistence-kind":"valueObject","x-ticvai-persistence-column":"numeric(18,4)","description":"**On the wire this is three fields; in the database it is one column.**\n24 August. Every column typed `Money` was landing as `jsonb` — 129 of them, including `orders.shift.opening_float`, `inventory.purchase_order.total` and `promotions.voucher.balance`. **`orders.cash_movement.amount` was `numeric(18,4)` because somebody hand-typed that one**, and the inconsistency is what made it visible.\n**A jsonb price cannot be summed in SQL.** Every total, variance and reconciliation moves into application code — and a shift variance computed in .NET against a ledger computed in Postgres is two answers to one question. That is F13 month-end and F98 takings-to-ledger, both walked, both assuming the arithmetic is in the database.\n**`currency` and `scale` are not stored per row.** ADR-0018 makes them region-scoped and not overridable below, so they resolve from the scope walk — storing AED against nine million rows in a UAE region is nine million copies of a fact that cannot differ. A row that needed its own currency would be a row in the wrong region.\n**They stay on the wire** because a client reading a figure should not have to walk a hierarchy to know what it means.\n","required":["amount","currency","scale"],"properties":{"amount":{"type":"string","description":"Decimal string, never a float. Up to 4 decimal places. **Persisted as `numeric(18,4)`** — the string is a transport choice, so a JavaScript client cannot round a fare in transit.\n","pattern":"^-?\\d+(\\.\\d{1,4})?$"},"currency":{"type":"string","description":"**Resolved from the region, not stored on the row** (ADR-0018). OMR uses 3 decimal places and AED uses 2 — a venue on a different scale from its region is a ledger that cannot consolidate.\n","pattern":"^[A-Z]{3}$"},"scale":{"type":"integer","description":"Resolved from the region alongside `currency`.","minimum":0,"maximum":4}}},
 "OrderLine": {"x-ticvai-persistence":"orders.order_line + orders.order_line_eligibility + orders.order_line_discount","x-ticvai-retired-columns":["promotion_id","name","reason"],"allOf":[{"$ref":"#/components/schemas/CreateOrderLine"},{"type":"object","required":["serverUnitPrice","taxAmount","netAmount","grossAmount"],"properties":{"serverUnitPrice":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"description":"What the server computed on ingest."},"priceVariance":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"description":"Server minus quoted. Non-zero means the quoted price was honoured and the difference posted to the variance account.\n"},"taxAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"netAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"grossAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"entitlementIds":{"type":"array","description":"The entitlements this line issued. **These are the ticket ids** — `transferOrderTickets.ticketIds` and `reprintOrder.reissuedTicketIds` take and return them.","items":{"type":"string","format":"uuid"}},"crossRegionRightIds":{"type":"array","items":{"type":"string"},"description":"Redemption rights propagated to other cells for this line."},"reprintCount":{"type":"integer","minimum":0,"default":0,"readOnly":true,"description":"How many times this line's tickets were reprinted or resent. `reprintOrder` increments it; repeated reprints are the signal worth surfacing."},"venueId":{"type":"string","format":"uuid","readOnly":true,"description":"The order's venue, copied onto the line (ADR-0044's own example; system-design review SD-008, 29 September) so a line is scoped and partitionable without its order."},"discounts":{"type":"array","readOnly":true,"description":"**The discounts applied to this line, one row each** (system-design review SD-008, 29 September). Until then a discount object was flattened into the line as `promotion_id NOT NULL`, so a line with no promotion could not be inserted. A line with no discount has none.","items":{"$ref":"#/components/schemas/OrderLineDiscount"}}}}]},
 "OrderLineDiscount": {"type":"object","description":"One discount applied to one order line (SD-008). Rows of `orders.order_line_discount`.","required":["id","amount","source"],"properties":{"id":{"type":"string","format":"uuid"},"promotionId":{"type":"string","format":"uuid","nullable":true,"x-ticvai-references":"promotions.promotion","description":"The promotion that gave it. Null for a manual discount."},"source":{"type":"string","enum":["promotion","promoCode","manual","bundle","member"]},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"reason":{"type":"string","maxLength":200,"nullable":true,"description":"A cashier's reason for a manual discount."}}},
-"Payment": {"x-ticvai-persistence":"orders.payment","type":"object","required":["id","orderId","tender","amount","status","recordedAt"],"properties":{"id":{"type":"string","format":"uuid"},"orderId":{"type":"string","format":"uuid"},"tender":{"$ref":"#/components/schemas/TenderKind"},"tenderCurrency":{"type":"string","pattern":"^[A-Z]{3}$","description":"4.6.11. **What the guest actually handed over**, which is not always what the venue books. A tourist paying USD cash at a till is a foreign tender; the sale is still recorded in base currency.\nEqual to the base currency for almost every payment. **Present on all of them so the foreign-tender report has a source** — `getForeignTenderReport` promised *what was taken in which currency* and nothing recorded it until 18 August.\n"},"tenderAmount":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"description":"The amount in `tenderCurrency`, at that currency's own scale."},"fxRate":{"allOf":[{"$ref":"#/components/schemas/ExchangeRateDecimal"}],"nullable":true,"description":"The rate applied, **stored on the payment rather than looked up later** (CF-37). A payment reconciled next month is reconciled at the rate of the day it was taken.\n"},"fxRateSource":{"type":"string","nullable":true,"enum":["manual","feed","cardScheme"],"description":"4.2.8. Manual or fed on a schedule. **`cardScheme` is where the terminal did the conversion and told us** — dynamic currency conversion, the scheme's rate rather than ours.\n"},"changeCurrency":{"type":"string","pattern":"^[A-Z]{3}$","nullable":true,"description":"4.6.11 is deliberately asymmetric: **accept foreign currency, refund in local.** A till giving change in five currencies needs five floats and five counts, and the variance becomes unattributable.\n"},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"changeAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"status":{"type":"string","enum":["authorised","captured","pendingConfirmation","declined","failed","voided","refunded"]},"providerName":{"type":"string","nullable":true},"providerReference":{"type":"string","nullable":true,"description":"The provider's own id for the charge (Stripe PaymentIntent, NI order reference). What `payments.receivePaymentProviderWebhook` matches an incoming event on (SD-034)."},"providerIdempotencyKey":{"type":"string","nullable":true,"readOnly":true,"description":"The idempotency key sent to the provider, which is this payment's `id` (SD-034, 29 September). A retried provider call cannot charge twice."},"terminalId":{"type":"string","format":"uuid","nullable":true,"description":"The card terminal a till payment ran on (ECR flow, SD-034)."},"nextAction":{"type":"object","nullable":true,"x-ticvai-persisted":false,"description":"**What the caller does while the payment is `pendingConfirmation`** (SD-034, 29 September). `redirect`: send the browser to `url` (3-D Secure challenge or hosted page); the provider returns the guest to `returnUrl` and the result arrives by webhook. `terminal`: the card terminal has been instructed; wait for its result. Null once the payment has an outcome.","properties":{"kind":{"type":"string","enum":["redirect","terminal"]},"url":{"type":"string","format":"uri","nullable":true},"expiresAt":{"type":"string","format":"date-time","nullable":true}}},"lastInquiryAt":{"type":"string","format":"date-time","nullable":true},"recordedAt":{"type":"string","format":"date-time"},"syncedAt":{"type":"string","format":"date-time","nullable":true}}},
+"Payment": {"x-ticvai-persistence":"orders.payment","type":"object","required":["id","orderId","tender","amount","status","recordedAt"],"properties":{"id":{"type":"string","format":"uuid"},"orderId":{"type":"string","format":"uuid"},"tender":{"$ref":"#/components/schemas/TenderKind"},"tenderCurrency":{"type":"string","pattern":"^[A-Z]{3}$","description":"4.6.11. **What the guest actually handed over**, which is not always what the venue books. A tourist paying USD cash at a till is a foreign tender; the sale is still recorded in base currency.\nEqual to the base currency for almost every payment. **Present on all of them so the foreign-tender report has a source** — `getForeignTenderReport` promised *what was taken in which currency* and nothing recorded it until 18 August.\n"},"tenderAmount":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"description":"The amount in `tenderCurrency`, at that currency's own scale."},"fxRate":{"allOf":[{"$ref":"#/components/schemas/ExchangeRateDecimal"}],"nullable":true,"description":"The rate applied, **stored on the payment rather than looked up later** (CF-37). A payment reconciled next month is reconciled at the rate of the day it was taken.\n"},"fxRateSource":{"type":"string","nullable":true,"enum":["manual","feed","cardScheme"],"description":"4.2.8. Manual or fed on a schedule. **`cardScheme` is where the terminal did the conversion and told us** — dynamic currency conversion, the scheme's rate rather than ours.\n"},"changeCurrency":{"type":"string","pattern":"^[A-Z]{3}$","nullable":true,"description":"4.6.11 is deliberately asymmetric: **accept foreign currency, refund in local.** A till giving change in five currencies needs five floats and five counts, and the variance becomes unattributable.\n**Cash at a till only** (CHG-FIN-001, 2 October 2026). A card or wallet payment the guest made in a currency they selected is refunded in that currency (`Refund.tenderCurrency`).\n"},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"changeAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"status":{"type":"string","enum":["authorised","captured","pendingConfirmation","declined","failed","voided","refunded"]},"providerName":{"type":"string","nullable":true},"providerReference":{"type":"string","nullable":true,"description":"The provider's own id for the charge (Stripe PaymentIntent, NI order reference). What `payments.receivePaymentProviderWebhook` matches an incoming event on (SD-034)."},"providerIdempotencyKey":{"type":"string","nullable":true,"readOnly":true,"description":"The idempotency key sent to the provider, which is this payment's `id` (SD-034, 29 September). A retried provider call cannot charge twice."},"terminalId":{"type":"string","format":"uuid","nullable":true,"description":"The card terminal a till payment ran on (ECR flow, SD-034)."},"nextAction":{"type":"object","nullable":true,"x-ticvai-persisted":false,"description":"**What the caller does while the payment is `pendingConfirmation`** (SD-034, 29 September). `redirect`: send the browser to `url` (3-D Secure challenge or hosted page); the provider returns the guest to `returnUrl` and the result arrives by webhook. `terminal`: the card terminal has been instructed; wait for its result. Null once the payment has an outcome.","properties":{"kind":{"type":"string","enum":["redirect","terminal"]},"url":{"type":"string","format":"uri","nullable":true},"expiresAt":{"type":"string","format":"date-time","nullable":true}}},"lastInquiryAt":{"type":"string","format":"date-time","nullable":true},"recordedAt":{"type":"string","format":"date-time"},"syncedAt":{"type":"string","format":"date-time","nullable":true}}},
 "PaymentAuthenticationPolicy": {"type":"object","x-ticvai-persistence":"payments.authentication_policy","description":"Board 4.8. **A commercial trade as much as a security one.**","properties":{"threeDSecureMode":{"type":"string","enum":["never","whenRequired","aboveThreshold","always"],"default":"whenRequired"},"threeDSecureThreshold":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"claimedExemptions":{"type":"array","items":{"type":"string","enum":["lowValue","trustedBeneficiary","transactionRiskAnalysis","recurring","merchantInitiated"]}},"tokenisationEnabled":{"type":"boolean","default":false},"tokenRetentionMonths":{"type":"integer","nullable":true},"recurringMandateRequired":{"type":"boolean","default":true,"description":"**A card stored for a renewal without a mandate is a renewal the venue cannot defend.**\n"},"mandateTextAssetId":{"type":"string","format":"uuid","nullable":true},"scopePath":{"type":"string"}}},
 "PaymentConfigurationSimulation": {"type":"object","description":"Boards 1.10 and 5.10. **Eight boards of configuration that compose, silently.**","properties":{"offeredMethods":{"type":"array","items":{"type":"object","properties":{"methodId":{"type":"string","format":"uuid"},"name":{"type":"string"},"routesTo":{"type":"string","nullable":true},"estimatedCost":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"surcharge":{"$ref":"../shared/common.yaml#/components/schemas/Money"}}}},"suppressedMethods":{"type":"array","items":{"type":"object","properties":{"methodId":{"type":"string","format":"uuid"},"reason":{"type":"string"}}}},"findings":{"type":"array","items":{"type":"object","properties":{"severity":{"type":"string","enum":["blocking","warning"]},"message":{"type":"string"}}}}}},
 "PaymentLink": {"type":"object","x-ticvai-persistence":"orders.payment_link","description":"BL-072. **A booking taken at POS could not be paid later by the guest**, so a phone booking either took a card over the phone or was not taken.\n`createPaymentLink` was contracted on 18 August with no schema behind it and no guest-facing path. **The link existed and nobody could open it** — found on 20 August by walking the journey rather than the contract.\n**The link is the credential.** A guest holding one is anonymous: not signed in, and quite possibly without an account, because a phone booking is exactly the case where they have not registered. The token grants read of one order and payment against it, and nothing else.\n","required":["id","orderId","token","status","expiresAt"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"orderId":{"type":"string","format":"uuid"},"reservationId":{"type":"string","format":"uuid","nullable":true,"description":"Where the link was issued against a reservation rather than an order. **A reservation holds inventory and carries no money**, which is the whole reason a link is needed.\n"},"token":{"type":"string","format":"password","writeOnly":true,"description":"**Write-only, single purpose, and it is the only thing the guest presents.** Long enough not to be guessed and scoped to one order — **a token that can read a second order is a token that read somebody else's booking.**\n"},"status":{"type":"string","enum":["issued","viewed","paid","expired","cancelled","superseded"]},"channel":{"type":"string","enum":["email","sms","whatsapp","printed"]},"sentTo":{"type":"string","nullable":true,"description":"Masked. **The address it went to is how an operator answers *I never got it*** — and it is personal data, so it is masked here and resolved from `pii` when somebody with permission asks.\n"},"expiresAt":{"type":"string","format":"date-time","description":"**The expiry releases the hold, not just the link.** An unpaid link holding inventory is inventory nobody can sell, and a link that outlives its hold sells a seat twice.\n"},"releaseHoldOnExpiry":{"type":"boolean","default":true},"viewedAt":{"type":"string","format":"date-time","nullable":true},"paidAt":{"type":"string","format":"date-time","nullable":true},"resendCount":{"type":"integer","default":0,"description":"**A resend supersedes rather than duplicates.** Two live links against one order is two guests paying for the same booking, and the second payment is a refund somebody has to make.\n"},"issuedByPrincipalId":{"type":"string","format":"uuid"},"scopePath":{"type":"string","description":"**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"}}},
 "PaymentLinkView": {"type":"object","x-ticvai-persistence":"none — projection of orders.payment_link for its holder","description":"What an anonymous holder of a payment link is shown about the link itself.","required":["status","expiresAt"],"properties":{"status":{"type":"string","enum":["issued","viewed","paid","expired","cancelled","superseded"]},"expiresAt":{"type":"string","format":"date-time"},"releaseHoldOnExpiry":{"type":"boolean"}}},
 "PaymentMethod": {"type":"object","x-ticvai-persistence":"payments.method","description":"Board 1.2. **A method is not a provider.**","required":["code","name","kind"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string"},"name":{"type":"string"},"kind":{"type":"string","enum":["card","digitalWallet","bankTransfer","cash","storedValue","giftCard","voucher","onAccount","buyNowPayLater","paymentLink"]},"cardSchemes":{"type":"array","items":{"type":"string"}},"currencies":{"type":"array","items":{"type":"string"}},"channels":{"type":"array","items":{"type":"string"}},"venueIds":{"type":"array","items":{"type":"string","format":"uuid"}},"minimumAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"maximumAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"surcharge":{"type":"object","nullable":true,"properties":{"percent":{"type":"number","nullable":true},"fixed":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"disclosedToGuest":{"type":"boolean","default":true,"description":"**Undisclosed surcharging is illegal in several of the markets this platform sells into.** The flag exists so the answer is a configuration somebody chose rather than a template nobody read.\n"}}},"refundable":{"type":"boolean","default":true},"partialRefundSupported":{"type":"boolean","default":true},"displayOrder":{"type":"integer","default":0},"scopePath":{"type":"string"},"isActive":{"type":"boolean","default":true}}},
 "PaymentPerformanceRow": {"type":"object","description":"Board 8.8. **The last and most expensive place a venue loses a sale.**","properties":{"key":{"type":"string"},"label":{"type":"string"},"attempts":{"type":"integer"},"authorised":{"type":"integer"},"declined":{"type":"integer"},"errored":{"type":"integer"},"abandoned":{"type":"integer"},"authorisationRate":{"type":"number"},"conversionRate":{"type":"number"},"averageValue":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"topDeclineReason":{"type":"string","nullable":true}}},
+"PaymentRuleSet": {"type":"object","x-ticvai-persistence":"none — composed from the three payment rule tables","description":"**Three tables, one decision.** Whether a guest may pay with this method, in this currency, and what it costs the venue are evaluated together at checkout. An administrator changing one without seeing the others is how a method becomes eligible in a currency it cannot settle.\n","properties":{"currencyRules":{"type":"array","items":{"$ref":"#/components/schemas/PaymentsCurrencyRule"}},"eligibilityRules":{"type":"array","items":{"$ref":"#/components/schemas/PaymentsEligibilityRule"}},"feeRules":{"type":"array","items":{"$ref":"#/components/schemas/PaymentsFeeRule"}}}},
+"PaymentsCurrencyRule": {"type":"object","x-ticvai-persistence":"payments.currency_rule","description":"**Taken from the backend workbook, 20 September.** NEW TABLE. Defines payment-level currency rules such as accepted/settlement currency, min/max payment amount and rounding.","required":["paymentPolicyId","code","isActive","createdAt"],"properties":{"id":{"type":"string","format":"uuid"},"paymentPolicyId":{"type":"string","format":"uuid"},"scopePath":{"type":"string","nullable":true},"channelId":{"type":"string","format":"uuid","nullable":true},"code":{"type":"string","maxLength":10},"settlementCurrencyCode":{"type":"string","maxLength":10,"nullable":true},"minPaymentAmount":{"type":"number","nullable":true},"maxPaymentAmount":{"type":"number","nullable":true},"roundingIncrement":{"type":"number","nullable":true},"isActive":{"type":"boolean"},"createdAt":{"type":"string","format":"date-time"},"updatedAt":{"type":"string","format":"date-time","nullable":true}}},
+"PaymentsEligibilityRule": {"type":"object","x-ticvai-persistence":"payments.eligibility_rule","description":"**Taken from the backend workbook, 20 September.** NEW TABLE. Defines when a payment method is allowed or denied for a transaction.","required":["paymentPolicyId","paymentMethodId","effect","priority","isActive","createdAt"],"properties":{"id":{"type":"string","format":"uuid"},"paymentPolicyId":{"type":"string","format":"uuid"},"paymentMethodId":{"type":"string","format":"uuid"},"scopePath":{"type":"string","nullable":true},"channelId":{"type":"string","format":"uuid","nullable":true},"businessArea":{"type":"string","maxLength":30,"nullable":true},"currencyCode":{"type":"string","maxLength":10,"nullable":true},"minOrderAmount":{"type":"number","nullable":true},"maxOrderAmount":{"type":"number","nullable":true},"effect":{"type":"string","maxLength":10},"priority":{"type":"integer"},"isActive":{"type":"boolean"},"createdAt":{"type":"string","format":"date-time"},"updatedAt":{"type":"string","format":"date-time","nullable":true}}},
+"PaymentsFeeRule": {"type":"object","x-ticvai-persistence":"payments.fee_rule","description":"**Taken from the backend workbook, 20 September.** NEW TABLE. Defines payment-related fees or surcharges that may be applied to an order.","required":["paymentPolicyId","name","category","calculationType","value","isActive","createdAt"],"properties":{"id":{"type":"string","format":"uuid"},"paymentPolicyId":{"type":"string","format":"uuid"},"paymentMethodId":{"type":"string","format":"uuid","nullable":true},"providerId":{"type":"string","format":"uuid","nullable":true},"channelId":{"type":"string","format":"uuid","nullable":true},"businessArea":{"type":"string","maxLength":30,"nullable":true},"currencyCode":{"type":"string","maxLength":10,"nullable":true},"name":{"type":"string","maxLength":150},"category":{"type":"string","maxLength":20},"calculationType":{"type":"string","maxLength":20},"value":{"type":"number"},"minFee":{"type":"number","nullable":true},"maxFee":{"type":"number","nullable":true},"isActive":{"type":"boolean"},"createdAt":{"type":"string","format":"date-time"},"updatedAt":{"type":"string","format":"date-time","nullable":true}}},
 "RoutingContext": {"type":"object","required":["amount"],"properties":{"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"methodId":{"type":"string","format":"uuid","nullable":true},"venueId":{"type":"string","format":"uuid","nullable":true},"channel":{"type":"string","nullable":true},"cardScheme":{"type":"string","nullable":true},"cardIssuerCountry":{"type":"string","nullable":true},"cardPresent":{"type":"boolean","default":false},"customerId":{"type":"string","format":"uuid","nullable":true}}},
 "TenderKind": {"type":"string","description":"`wallet` is a **digital wallet** (Apple Pay, Google Pay and the like, taken through the gateway), the value the guest channels accept beside `card` (decided 28 September, audit R080 (a)). **The stored-value TICVAI wallet is a separate tender**: it is spent through `authoriseStoredValue` and `captureStoredValue` (`StoredValueKind` `wallet`), never as this value, so the client can see which of the two the decision meant.\n","enum":["cash","card","wallet","voucher","bankTransfer","hotelCharge","installment","giftCard","complimentary"]}
 }

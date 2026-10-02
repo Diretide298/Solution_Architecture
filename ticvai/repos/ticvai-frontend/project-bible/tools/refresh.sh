@@ -141,6 +141,16 @@ python3 tools/index-boards.py
 # The Claude Design work list, and what each shipped app demands of a signed-in user.
 # Both are derived from the screens and both go stale the moment a screen changes.
 python3 tools/derive-design-manifest.py
+# **The client's design inputs from the meetings, checked before any batch carries them** (1 October).
+# `handoff/design-inputs/mom-design-inputs.yaml` is authored; this validates every scope against the
+# screens (a retired screen id fails here, not silently in a bundle), writes its README and fills the
+# app guides' generated blocks. export-design-batch imports the same file, so it runs first.
+python3 tools/build-design-inputs.py
+# **The white-label map, before the batches that render it** (1 October). Every configuring operation's
+# request fields, the CMS screen that sets each and the guest screens it reaches, derived from the
+# contracts and the screens: handoff/design-inputs/white-label-map.json (read per screen by
+# export-design-batch through tools/design_spec.py) and apps/1-guest-app/WHITE-LABEL.md.
+python3 tools/build-white-label-map.py
 # **Every design-batch folder rebuilt from today's package** (30 September). Claude Design reads a batch
 # folder and nothing else; one exported before a contract changed hands a design session yesterday's
 # fields and data. Existing folders only, never a locked batch; the special folders are not batches.
@@ -178,7 +188,20 @@ python3 tools/build-api-list.py
 python3 tools/build-service-docs.py
 # **The Block A schedule is derived, not patched** (30 September): build order, dependencies and each
 # person's pace give every task a start day. op-descriptions.py reads it when ticket text is written.
+# Since the replan of 1 October it schedules every block (A-D) in two-week sprints from plan-tasks.csv, with the
+# calendar, app-modules and scheduler shared with build-service-docs.py (tools/sprint_plan.py). The deck and
+# "TICVAI - Sprint Plan.xlsx" (tools/build-plan-deck.py) are still run by hand after a refresh.
 python3 tools/derive-block-a-schedule.py
+# **The ticket text, from the tasks and the schedule just written** (2 October). check-ticket-text and
+# check-ddl-conventions (D-MIG-TABLES) read handoff/service-docs/op-descriptions.json against the screens,
+# the contracts and backend/MIGRATIONS.md -- all of them rebuilt above -- and nothing in this script rebuilt
+# it: the tool passed the coverage block below only because its name is inside fix-audit-op-descriptions.
+# So every screen or slice change failed the gate on text nobody had regenerated: on 1 October the POS v2
+# screens (POS-028/030/031) left 15 ticket-text findings, and the slice's new tables (orders' group and
+# reservation tables, workforce.attendance) left MIG-ORDERS and MIG-WORKFORCE listing fewer tables than
+# MIGRATIONS.md. The r1 run earlier that day had failed the same way and was fixed by running this by hand.
+# Writes the local file only; tools/op-descriptions.rb applies it on the OpenProject server, per release.
+python3 tools/op-descriptions.py --schedule handoff/service-docs/block-a-schedule.json
 # How the tickets are linked: layers, services, module builds, reports (handoff/service-docs/TICKET-LINKS.md).
 python3 tools/build-ticket-links.py
 # **The client questions, flagged by what the first release needs** (23 September). Reads the
@@ -330,6 +353,9 @@ echo
 # **The answer to "one failure stops the report" is to collect failures, not to drop them.**
 # `tools/run-checks.py` runs every checker, keeps each exit code, prints the same table, and exits
 # non-zero at the end if a gating checker failed. The report survives; the gate comes back.
+# **The change log's index is derived** (council of 2 October): one entry file per change in changes/entries/,
+# so parallel branches never conflict, and the index is written here rather than committed from a branch.
+python3 tools/build-changelog-index.py
 python3 tools/run-checks.py
 
 # **Coverage is a number that can quietly go down.** A regeneration that dropped transitions would
@@ -366,8 +392,13 @@ build-provisional-review                                           # its sheets 
 bench derive-services render-screens                               # deliberate, not a rebuild
 refresh-manifest                                                   # traces this script (C13); run by refresh-safe.sh, never inside it
 build-plan-deck                                                    # the presentation plan, run by hand after a refresh
+build-plan-doc                                                     # the Word build plan for the PM, run by hand after build-plan-deck (1 October)
 build-mom-digest build-review-responses scan-domain-drift find-capability
 audit_guard release_baseline ddl_forward                           # imported by checkers and derive-ddl, no main (1 October)
+sprint_plan                                                        # imported by build-service-docs, derive-block-a-schedule and build-plan-deck, no main (1 October)
+design_spec                                                        # imported by export-design-batch and build-white-label-map, no main (1 October)
+typed_props                                                        # imported by check-audience-match, check-preauth-session and check-subject, no main (2 October)
+build-tracker-index                                                # intake: reads the two task-tracker workbooks at the repository root, outside git, once per tracker drop (1 October)
 push-openproject op-release op-retire op-check op-assign-sync op-order-sync op-bulk-links op-created-merge op-recent op-review adam-links   # distribution: run per release (docs/active/release-runbook.md), never on a rebuild
 release-notes                                                      # per release, between two tags
 build-decisions-workbook build-hld-lld build-readiness-page build-readiness-questions build-client-readiness build-closeout-register build-audit-decisions   # hand-run documents for people; each carries dated content a rebuild must not churn

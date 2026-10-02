@@ -12,14 +12,17 @@ The bundle holds:
   ids          every pushed key -> its OpenProject id, straight from pms-map.json. It is authoritative: a key
                in it is never made again or given another id; a key not in it is new.
   tickets      every plan ticket (epics, features, tasks, then sub-tasks; parents first) with its parent key,
-               subject, type, wave priority, Priority_No. (build order), assignee, accountable, Block A week,
-               the artefact ids it builds and its pointer body (C7)
+               subject, type, wave priority, Priority_No. (build order), assignee, accountable, its sprint (the
+               OpenProject version "Sprint n"), the artefact ids it builds and its pointer body (C7)
+  sprint_versions  "Sprint 1" ... "Sprint 13" with their dates and ids (made on the server when missing; the
+               old "Block A · Week n" versions stay as they are and are no longer set)
   create       the plan keys with no ticket yet, parents before children
   links        the "follows" links to have (a longer chain's implied links left out, as op-bulk-links.py does)
   edges        every plan wait, unreduced: a direct link the plan no longer orders, even through a chain, is
                pruned (as op-order-sync.py does)
   retire       pushed tickets that left the plan, with op-retire.py's action (defer: on hold, merge: rejected)
-               and its comment
+               and its comment; and (1 October) the service and app epics and features the sprint plan replaced
+               with Block epics and app-module features (regroup: rejected once nothing is under them)
   unexplained  pushed tickets that left the plan with no reason in op-retire.py: listed, never touched
 
 **Pointer bodies (C7).** OpenProject holds who, when, state and order; the package, served by ADAM at a release
@@ -62,7 +65,9 @@ TAG = re.compile(r"^r\d+$")
 POINTER_PREFIX = "Pull via ADAM:"               # a description holding this line is already a pointer
 RELEASE_PREFIX = "- Written at release "        # the one pointer line that may differ without a rewrite
 COMMENT_MARKER = "The spec for this ticket lives in ADAM"   # the one comment a started ticket gets, found by it
+REOPEN_MARKER = "Back in the plan"              # an On hold plan ticket set back to New, with one comment
 MAX_BUILDS = 60
+LAST_SPRINT = 13                                # Sprint 13 ends 2 April 2027; later work is planned into it
 INPUTS = ("tasks.csv", "pms-map.json", "block-a-schedule.json")    # in handoff/service-docs; checked at the tag
 
 
@@ -177,11 +182,20 @@ def build(rows, mp, sched, lineage, retire_plan, unexplained, release):
         errors.append(f"id #{i} is mapped to {len(ks)} keys: {', '.join(ks)} (repair pms-map.json first)")
     by_key = {r["key"]: r for r in rows}
     who = sched["assign"]
-    week = {k: min(int(v // 5), 6) + 1 for k, v in sched["start"].items()}   # versions exist for weeks 1-7
+    # **Two-week sprints** (1 October): a ticket's version is the sprint it starts in, "Sprint 1" to "Sprint 13"
+    # (a later start is planned into Sprint 13, past 2 April); the schedule gives it (sprint), else its start day.
+    sprint_of = {k: max(1, min(int(v), LAST_SPRINT)) for k, v in (sched.get("sprint") or {}).items()}
+    for k, v in sched["start"].items():
+        sprint_of.setdefault(k, max(1, min(int(v // 10) + 1, LAST_SPRINT)))
+    cal = {int(s["n"]): s for s in sched.get("sprints") or []}
+    sprint_versions = [{"key": f"VERSION-S{n}", "name": f"Sprint {n}", "id": mp.get(f"VERSION-S{n}"),
+                        "start": (cal.get(n) or {}).get("start"), "end": (cal.get(n) or {}).get("end")}
+                       for n in range(1, LAST_SPRINT + 1)]
     svc_owner = {r["service"]: r["assignee"] for r in rows if r["type"] == "Epic" and r["key"].startswith("SVC-")}
-    versions = {str(n): mp.get(f"VERSION-W{n}") for n in range(1, 8)}
 
     def accountable(r):
+        if r.get("accountable"):                 # the sprint plan writes it on the row (1 October)
+            return r["accountable"]
         if r["track"] in ("Backend", "Database"):
             return svc_owner.get(r["service"]) or push.LEAD["devops"]
         return push.LEAD.get(r["area"]) or r["assignee"]
@@ -196,9 +210,9 @@ def build(rows, mp, sched, lineage, retire_plan, unexplained, release):
         base = r["key"]
         if task:
             assignee = who.get(base) or r["assignee"] or None
-            wk = week.get(base)
+            n = sprint_of.get(base)
         else:
-            assignee, wk = r["assignee"] or None, None
+            assignee, n = r["assignee"] or None, None
         summ = summary_line(subject)
         builds = builds_of(r, part, lineage)
         tickets.append({
@@ -206,7 +220,8 @@ def build(rows, mp, sched, lineage, retire_plan, unexplained, release):
             "subject": subject[:255], "priority_id": push.PRIORITY.get(r["wave"] or "2", 8),
             "sequence": int(r["sequence"]) if r["sequence"] else None,
             "assignee": name(assignee), "responsible": name(accountable(r)),
-            "week": wk, "version": versions.get(str(wk)) if wk else None, "set_version": task,
+            "sprint": n, "version_key": f"VERSION-S{n}" if n else None,
+            "version": mp.get(f"VERSION-S{n}") if n else None, "set_version": task,
             "summary": summ, "builds": builds, "pointer": pointer(key, summ, builds, release)})
 
     for r in rows:
@@ -263,10 +278,11 @@ def build(rows, mp, sched, lineage, retire_plan, unexplained, release):
     bundle = {
         "release": release, "project": push.PROJECT, "field": push.PRIORITY_NO,
         "statuses": {"new": 1, "on_hold": 13, "rejected": 14},
+        "reopen_marker": REOPEN_MARKER,
         "author": "Chinmay Parab", "aliases": OP_NAME,
         "markers": {"pointer": POINTER_PREFIX, "release": RELEASE_PREFIX, "comment": COMMENT_MARKER},
         "comment": comment(release),
-        "versions": versions,
+        "sprint_versions": sprint_versions,
         "ids": dict(sorted(ids.items())),
         "tickets": tickets, "create": create, "tasks": task_keys,
         "links": [list(e) for e in links], "edges": [list(e) for e in edges],
@@ -302,6 +318,36 @@ def git(*args):
         return ""
 
 
+def previous_structure(release):
+    """The epics and features of the last release before `release` (its tasks.csv at the tag), and its tests."""
+    tags = sorted((t for t in git("tag", "--list", "r*").split() if TAG.match(t)), key=lambda t: int(t[1:]))
+    prev = [t for t in tags if int(t[1:]) < int(release[1:])]
+    if not prev:
+        return set()
+    prefix = git("rev-parse", "--show-prefix")
+    text = git("show", f"{prev[-1]}:{prefix}handoff/service-docs/tasks.csv")
+    if not text:
+        return set()
+    return {r["key"] for r in csv.DictReader(text.splitlines()) if r["type"] in ("Epic", "Feature")
+            or r["key"].startswith("TEST-")}
+
+
+def regroup(rows, mp, retire_plan, unexplained, release, structure=None):
+    """**The hierarchy of 1 October** (Epic = Block, Feature = app-module): the epics and features of the previous
+    release that left the plan grouped tickets by service and app; their tickets move under the new parents in the
+    same push, and they are closed (Rejected) with a comment once nothing is under them (op-release.rb checks).
+    A module or block test whose app-module or block was renamed goes the same way. Returns the retire plan and the
+    unexplained list without them."""
+    structure = previous_structure(release) if structure is None else structure
+    planned = {r["key"] for r in rows}
+    gone = [k for k in unexplained if k in structure and k not in planned]
+    note = ("**Replaced by the sprint plan** (release " + release + ", decided 1 October): tickets are grouped by "
+            "Block (epic) and app-module (feature, e.g. Ticketing · Guest Web) now. Every ticket that was under this "
+            "one has moved under its app-module, so this one is closed.")
+    return (list(retire_plan) + [(k, "regroup", note) for k in gone],
+            [k for k in unexplained if k not in set(gone)])
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--release", help="the tag the pointers are written at (r1, r2, ...); default: the tag on HEAD")
@@ -319,6 +365,7 @@ def main() -> int:
     sched = json.loads((DOCS / "block-a-schedule.json").read_text(encoding="utf-8"))
     lineage = json.loads((ROOT / "handoff" / "api-data-lineage.json").read_text(encoding="utf-8"))
     _, retire_plan, unexplained = _load("op_retire", "op-retire.py").build_plan()
+    retire_plan, unexplained = regroup(rows, mp, retire_plan, unexplained, release)
 
     bundle, errors = build(rows, mp, sched, lineage, retire_plan, unexplained, release)
     if not a.no_key_check:

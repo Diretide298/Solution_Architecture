@@ -61,6 +61,19 @@
   "requestBody": "GroupEnquiryInput",
   "responds": "GroupEnquiryOpportunityView"
  },
+ "getGroupBooking": {
+  "method": "GET",
+  "path": "/group-bookings/{groupBookingId}",
+  "contract": "orders",
+  "summary": "A group, its leader and its name-capture duty",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "GroupBooking"
+ },
  "listGroupCustomerOrganization": {
   "method": "GET",
   "path": "/group-customer-organization",
@@ -98,6 +111,35 @@
   ],
   "requestBody": null,
   "responds": "GroupEnquiryOpportunityCaptureView"
+ },
+ "listGroupPackages": {
+  "method": "GET",
+  "path": "/group-packages",
+  "contract": "catalogue",
+  "summary": "The school-trip formats or party packages on offer",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "kind",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
  },
  "listGroupRequirementAvailability": {
   "method": "GET",

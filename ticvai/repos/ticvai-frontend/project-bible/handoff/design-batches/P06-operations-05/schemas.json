@@ -95,44 +95,6 @@
    "celebration"
   ]
  },
- "AnnouncementReach": {
-  "type": "object",
-  "x-ticvai-persistence": "none — computed from workforce.announcement_receipt",
-  "properties": {
-   "announcementId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "targeted": {
-    "type": "integer"
-   },
-   "delivered": {
-    "type": "integer"
-   },
-   "acknowledged": {
-    "type": "integer"
-   },
-   "outstanding": {
-    "type": "array",
-    "description": "**The list that matters.** For an operational notice it measures whether anyone read it; during an emergency it is the roll call.\n",
-    "items": {
-     "type": "object",
-     "properties": {
-      "principalId": {
-       "type": "string",
-       "format": "uuid"
-      },
-      "displayName": {
-       "type": "string"
-      },
-      "onShift": {
-       "type": "boolean"
-      }
-     }
-    }
-   }
-  }
- },
  "DenyReason": {
   "type": "string",
   "description": "Enumerated so the client can render an appropriate operator prompt. A gate operator facing a queue needs a reason and a next action, not a boolean.\n",

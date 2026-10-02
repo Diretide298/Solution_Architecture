@@ -61,6 +61,45 @@ convincingly. It is never a caption.
   and its error; and, element by element, what is shown and in what format, what each action
   produces and where the user goes next. Draw exactly that.
 
+## The processes these screens belong to
+
+Written by the owner of each process (`handoff/design-notes/`). Read before any screen: it says how the process runs end to end and which words the screens must use.
+
+### Ticketing & Guest Commerce, as the venue and TICVAI configure and run it
+
+WHAT THE PROCESS IS. Everything a guest can buy is set up, priced, promoted and serviced here, on Venue Management (P08, the venue's own back office, served inside the venue's cell) and on the TICVAI Console (P09, TICVAI's control plane, outside every cell). End to end: (1) CATALOGUE. A product has one of twelve kinds (admission, timedAdmission, datedAdmission, openDated, seated, membership, bundle, fnb, retail, rental, addOn, giftCard). Its ticket types (adult, child, senior, resident...) are not typed one by one: they are generated from the product's attributes (components) and each value combination becomes a sellable ticket type with no extra setup (DI-164). What a ticket grants (validity, entries, re-entry, days of week, blackout dates, expiry anchor, fast track, transfer) lives on a reusable entitlement template, not on the product. Who may take part (age, height, supervision, certification) is the eligibility rule; what the guest must answer is the data mask and the consent questions; how the guest sees it is guestListing (bookable, infoOnly, hidden), display tags (at most six), media and the booking flow. Group, family and corporate products and every after-sales policy (reschedule, exchange, refund, cancellation, upgrade, transfer) are configured inside the one product configuration, never on separate screens (DI-465, DI-466). (2) LIFECYCLE AND PUBLICATION. A product moves draft, inReview, approved, live, withdrawn, archived. Approval and publication are two acts with two permissions (PRODUCT_APPROVE, PRODUCT_PUBLISH, R091); every product is authorised before it sells online or on site (DI-438). Approved is still not on a till: a till sells only what is in the signed catalogue release it pulled (publishBundle, ADR-0013), so a saved price is a back-office fact until the venue publishes to tills. Changing something that has sold is preceded by an impact check (assessProductChange: orders affected, entitlements issued, future performances, open carts); restoring a version creates a new version, and sold tickets keep the price and terms they were sold under (restoreProductVersion, DI-938, TRACKER Actions row 145). (3) PRICE. Prices live in price lists: per venue, per channel set, with validity dates and a priority, copied for the next season with an uplift (copyPriceList) and repriced in bulk only after a dry run (bulkChangePrices). Currency and decimal scale are never chosen on a form: they resolve from the venue's region (ADR-0008, ADR-0018; AED 2 places, OMR and BHD 3). When several rules apply, the configured hierarchy decides; there is no "lowest price wins" default (DI-595). Tax on the pre-discount price and three-decimal rounding are regional settings (DI-598). Dynamic rules always show their minimum and maximum price guardrails beside the trigger (getDynamicPriceRule). (4) PROMOTE AND BUNDLE. A promotion is a rule (automatic, or gated by a code) created in draft, made live only by Publish, which first analyses stacking; a …
+*(source: DI-164; DI-171; DI-438; DI-465; DI-466; DI-595; DI-598; DI-387; DI-039; DI-044; DI-474; DI-671; DI-987; DI-019; DI-080; ADR-0008; ADR-0013; ADR-0018; ADR-0019; ADR-0030; R091; R098; R101; R222; REV3-21; contracts/spine/catalogue.yaml#transitionProductLifecycle …)*
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Product | Anything sellable, of one of the twelve kinds. The record that carries names, channels, listing, media and policies. | Item (except on F&B and retail screens), SKU (for tickets), Offering | contracts/spine/catalogue.yaml#/components/schemas/ProductKind |
+| Ticket type | One sellable variant of an admission or event product (Adult, Child, Resident Adult), generated from the product's attributes. For retail and F&B the same record is labelled Variant. | Variant (on ticket screens), Sub-product, Rate (that is a price), Axis value | contracts/spine/catalogue.yaml#updateProductVariant / DI-164 / DI-437 |
+| Attribute | A dimension that generates ticket types (Guest category, Residency, Tier, Length). Each has values; adding a value adds ticket types. | Axis, Component (the client's word; use it only in help text), Option | contracts/spine/catalogue.yaml#setProductAttributes / DI-164 / DI-450 |
+| Entitlement | What a ticket lets the holder do (validity, entries, re-entry, days, blackout dates, expiry, fast track, transfer), defined once on an entitlement template and shared by several products. | Access rights, Ticket rules, Validity profile | contracts/spine/catalogue.yaml#createEntitlementTemplate / DI-171 / DI-451 |
+| Eligibility rule | Who may take part in or buy a product (age, height, supervision, waiver, certification). Distinct from a promotion's eligibility, which decides who gets a discount. | Restriction, Access rule (that is access control) | contracts/spine/catalogue.yaml#setProductEligibilityRule / DI-463 |
+| Price list | A set of prices for one venue and a set of channels, valid between two dates, with a priority. Several coexist (B2C, B2B, season). | Price book, Rate card, Tariff | contracts/spine/catalogue.yaml#createPriceList / DI-140 / DI-163 |
+| Price category | A standard rate type (Adult, Child, Member) reused across lists so venues do not invent "Adult Standard" and "Normal Adult". | Price band (that is a seat-category band), Fare type (transport) | contracts/spine/catalogue.yaml#setPriceCategoryRateType / … |
+| Price band | A priced band on a seat category (code, label, colour, amount, channel, from-date). | Price category, Zone price | contracts/satellite/seating.yaml#/components/schemas/SeatPriceBand |
+| Promotion | A rule that changes a price automatically or when a code is entered; draft until published; declares how it stacks. | Offer (except in guest copy), Deal, Discount rule | contracts/satellite/promotions.yaml#createPromotion / DI-173 / DI-174 |
+| Coupon code | A code issued from a coupon campaign that applies a promotion-style discount; one shared code or many single-use codes. | Voucher, Promo voucher | contracts/satellite/promotions.yaml#createCouponCampaign / DI-173 |
+| Voucher | A code that carries money (face value, balance), sold or issued; a liability until redeemed or expired. | Coupon, Credit note | contracts/satellite/promotions.yaml#listVoucherBatches / … |
+| Bundle | A product sold as one line whose price differs from the sum of its components, with a mandatory revenue allocation. "Package" is acceptable in guest copy. | Combo (that is an F&B meal deal), Catalogue bundle | contracts/satellite/promotions.yaml#createBundle / DI-220 / ADR-0019 |
+| Catalogue release | The signed snapshot of a venue's catalogue, prices, promotions and sale boards that tills, kiosks and devices pull. Its action label is "Publish to tills". | Bundle, Catalogue bundle, Sync, Deploy | contracts/spine/catalogue.yaml#publishBundle / … |
+| Approve / Publish / Save | Save keeps a draft; Approve records that it is authorised (PRODUCT_APPROVE); Publish makes it live for guests and channels (PRODUCT_PUBLISH). Three different buttons, never merged. | Submit, Go live, Activate (except CatalogueConfigStatus active), Deploy | R091 / contracts/spine/catalogue.yaml#transitionProductLifecycle / DI-438 |
+| Product states | Draft, In review, Approved, Live, Withdrawn, Archived (ProductLifecycleState), always as coloured badges with these exact labels. | Published (for a product), Pending, Inactive (for a product) | contracts/spine/catalogue.yaml#/components/schemas/ProductLifecycleState |
+| Channel | Where something is sold. Labels: pos Point of sale; kiosk Kiosk; web and guestWeb Website; mobile and guestApp App; b2b B2B partners; partner Partner; ota Travel agents (OTA); callCentre Call centre; api API; backOffice Back office. | Touchpoint, Outlet (an outlet is a business inside a venue), raw enum values | contracts/spine/catalogue.yaml#/components/schemas/Channel / … |
+| Refund | Money returned after settlement, wholly or for some lines, under the venue's refund policy. | Return (that is retail goods), Reversal, Void | contracts/spine/orders.yaml#createRefund / DI-252 |
+| Void | Cancelling a whole order before settlement, within the same shift, with a reason from the void list. After settlement it is a refund. | Cancel order, Delete | contracts/spine/orders.yaml#voidOrder / R222 |
+| Exchange / Reschedule | Exchange swaps lines for other products or dates and settles only the difference; Reschedule is the same product moved to another date or time. | Rebook, Date change (acceptable only in guest copy), Refund and resell | contracts/spine/orders.yaml#exchangeOrderLines / … |
+| Hold / Capture / Release | A deposit or stored-value amount is held, then partly or fully captured, and the rest released. A held deposit is not a payment. | Charge, Pre-auth (in staff copy), Block funds | contracts/spine/orders.yaml#authoriseStoredValue / … |
+| Wallet (TICVAI wallet) | The guest's stored-value balance on TICVAI, spent by hold and capture. Distinct from the tender "Apple Pay / Google Pay", which the contract also calls wallet. | Digital wallet (for stored value), E-wallet, Credit (without a type) | contracts/spine/orders.yaml#/components/schemas/TenderKind / R080 |
+| Credit lot | One amount of wallet credit of one credit type (cash, bonus, gift) with its own expiry; lots are spent nearest expiry first and the guest sees the breakdown but cannot choose. | Bucket, Batch, Top-up | TRACKER Actions row 171 / contracts/satellite/wallet.yaml#expireCreditLots |
+| Venue map / Seat map | A venue map is the wayfinding map of a park or a floor (points, paths, bookable places); a seat map is the seating layout of an auditorium or stand. Never just "map" where both could be meant. | Layout (alone), Floor plan (unless it is a floor map), Map (alone) | contracts/satellite/venue-map.yaml#createVenueMap / … |
+| Point / Bookable place | A point is a place on a venue map (toilet, ride, restaurant, exit). A bookable place is a cabana, lounger, table or pitch placed on the map and sold through its price band. | Pin, POI, Marker, Resource (in staff copy) | contracts/satellite/venue-map.yaml#setVenuePoint / … |
+| Station / Route / Timetable / Departure / Fare table / Pass … | A route is an ordered list of stations with offsets; a timetable generates departures up to its release horizon; a fare table prices a route per passenger type; a pass type is a multi-trip or unlimited pass sold as a product. | Stop (except in the stop list), Line (except lineCode), Schedule, Trip (except a guest's journey) | contracts/satellite/transport.yaml / REV3-21 |
+| Applies from | The effective date of a change. Every dated change shows it, and sold items keep their old terms. | Effective date (in labels), Start date (for a change) | contracts/satellite/seating.yaml#updateSeatCategory / TRACKER Actions row 194 |
+
+
 ## The screens
 
 Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs count fields; requirements are matrix rows; meeting inputs are the ones naming the screen (the module and platform ones are below); white label says whether the tenant's brand reaches it (guest) or it sets the brand (configures).
@@ -68,14 +107,14 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-1013` | Rules Command Center | B–D | 1 | 17 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-1014` | Seat Kill Rules | B–D | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
-| `BO-1015` | Buffer Seat Rules | B–D | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
-| `BO-1016` | Companion Seat Rules | B–D | 0 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
+| `BO-1014` | Seat Kill Rules | B–D | 0 | 18 | 6 | 0 | 1 | 6 | — | notStarted (—) |
+| `BO-1015` | Buffer Seat Rules | B–D | 0 | 18 | 6 | 0 | 1 | 6 | — | notStarted (—) |
+| `BO-1016` | Companion Seat Rules | B–D | 0 | 18 | 6 | 0 | 0 | 6 | — | notStarted (—) |
 | `BO-1017` | Wheelchair Companion Rules | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-1018` | Accessible Seating Master | B–D | 0 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
-| `BO-1019` | Accessible Route Mapping | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-1020` | Accessible Filters & Eligibility | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-1021` | Flexible Spacing Rules | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-1019` | Accessible Route Mapping | B–D | 0 | 9 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-1020` | Accessible Filters & Eligibility | B–D | 0 | 9 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-1021` | Flexible Spacing Rules | B–D | 0 | 18 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-1022` | Compliance Validation & Audit | B–D | 1 | 19 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
@@ -105,6 +144,12 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Route | `/access-venue/rules-command-center-bo-1013` |
 
 **Known gaps.** **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Seating rule coverage and violations across venues: kill, buffer, companion and accessibility rules.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **No write operation: a configuration screen (Rules Command Center) declares only reads (getSeatRules).** Why: Nothing it shows can be changed from it; either it is a view (and its edits happen on the record editor, which it should link to) or a write is missing. *(source: contracts/satellite/seating.yaml#getSeatRules; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
 
 #### Inputs: what the user enters or picks
 
@@ -176,6 +221,10 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Density percent | 1,234 | — |
 | Per performance override | yes / no (icon or chip) | — |
 
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **rule summary**: Rules by kind, seats affected, open violations. *(source: contracts/satellite/seating.yaml#getSeatRules)*
+
 **Data it reads**: `getSeatRules` (onLoad, Rules in force)
 
 **Where the user goes next**
@@ -201,6 +250,18 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the rules are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+summary:
+  killed: 18
+  buffered: 0
+  companionPairs: 16
+  violations: 1
+```
 
 #### Permissions
 
@@ -250,6 +311,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-100`, `BO-1014`, `BO-1015`, `BO-1016`, `BO-1017`, `BO-1018`, `BO-1019`, `BO-1020`, `BO-1021`, `BO-1022`.
 - [ ] Every gated control is gated: `CAPACITY_CONFIGURE`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -272,11 +334,50 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Seats taken out of sale permanently or conditionally (sightline, stage, production, obstruction, safety).
+
+**Fixed on main** (the package already carries these; draw what it says): No read operation: the screen declares only setSeatRules and nothing that returns the current configuration. (CHG-WIR-025).
+
 #### Inputs: what the user enters or picks
+
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Seat map | picker: choose a seat map | — | — | `getSeatRules` ?seatMapId |
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
 
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **kill rule**: Reason and seats; conditional kills tied to a stage configuration. *(source: contracts/satellite/seating.yaml#setSeatRules)*
+
 #### Outputs: what the screen shows and produces
+
+**Shown**
+
+**Kill, buffer, companion and accessibility rules** (detail panel, from `getSeatRules`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Seat map | the name it points at, never the id | — |
+| Killed seats | list or chips (count when long) | — |
+| Kill reasons | grouped details | — |
+| Buffer rule | grouped details | — |
+| Enabled | yes / no (icon or chip) | — |
+| Seats either side | 1,234 | — |
+| Rows either side | 1,234 | — |
+| Avoid single gaps | yes / no (icon or chip) | The commercial case for buffers. A map leaving one empty seat between every party has lost those seats without anybody deciding to. |
+| Companion rule | grouped details | The one with legal weight. Selling the companion seat separately strands a carer. |
+| Enabled | yes / no (icon or chip) | — |
+| Pairs | list or chips (count when long) | — |
+| Wheelchair space | the name it points at, never the id | — |
+| Companion seats | list or chips (count when long) | — |
+| Release companion hours before | 1,234 | — |
+| Flexible spacing | grouped details | — |
+| Enabled | yes / no (icon or chip) | — |
+| Density percent | 1,234 | — |
+| Per performance override | yes / no (icon or chip) | — |
 
 **Actions and what each produces**
 
@@ -284,6 +385,8 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |---|---|---|---|---|---|
 | Save seat rules (primary button) | navigation or local | — | — | — | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
+
+**Data it reads**: `getSeatRules` (onLoad, Kill, buffer, companion and accessibility rules)
 
 **Where the user goes next**
 
@@ -300,9 +403,20 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+kill:
+  seats: Lower 104 K-7..9
+  reason: obstruction
+```
+
 #### Permissions
 
 - `setSeatRules` → `CAPACITY_CONFIGURE` (configure) · staff
+- `getSeatRules` → `CAPACITY_CONFIGURE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -337,7 +451,7 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (18 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-1014?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save seat rules, Cancel.
 - [ ] Every transition is wired: `BO-1013`.
@@ -365,11 +479,50 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Unsold spacing around seats, zones or production objects (left and right, row, perimeter, alternating).
+
+**Fixed on main** (the package already carries these; draw what it says): No read operation: the screen declares only setSeatRules and nothing that returns the current configuration. (CHG-WIR-025).
+
 #### Inputs: what the user enters or picks
+
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Seat map | picker: choose a seat map | — | — | `getSeatRules` ?seatMapId |
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
 
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **buffer pattern**: Pattern and distance, previewed on the map. *(source: contracts/satellite/seating.yaml#setSeatRules)*
+
 #### Outputs: what the screen shows and produces
+
+**Shown**
+
+**Kill, buffer, companion and accessibility rules** (detail panel, from `getSeatRules`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Seat map | the name it points at, never the id | — |
+| Killed seats | list or chips (count when long) | — |
+| Kill reasons | grouped details | — |
+| Buffer rule | grouped details | — |
+| Enabled | yes / no (icon or chip) | — |
+| Seats either side | 1,234 | — |
+| Rows either side | 1,234 | — |
+| Avoid single gaps | yes / no (icon or chip) | The commercial case for buffers. A map leaving one empty seat between every party has lost those seats without anybody deciding to. |
+| Companion rule | grouped details | The one with legal weight. Selling the companion seat separately strands a carer. |
+| Enabled | yes / no (icon or chip) | — |
+| Pairs | list or chips (count when long) | — |
+| Wheelchair space | the name it points at, never the id | — |
+| Companion seats | list or chips (count when long) | — |
+| Release companion hours before | 1,234 | — |
+| Flexible spacing | grouped details | — |
+| Enabled | yes / no (icon or chip) | — |
+| Density percent | 1,234 | — |
+| Per performance override | yes / no (icon or chip) | — |
 
 **Actions and what each produces**
 
@@ -377,6 +530,8 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |---|---|---|---|---|---|
 | Save seat rules (primary button) | navigation or local | — | — | — | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
+
+**Data it reads**: `getSeatRules` (onLoad, Kill, buffer, companion and accessibility rules)
 
 **Where the user goes next**
 
@@ -393,9 +548,21 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+buffer:
+  around: camera platform
+  pattern: perimeter
+  seats: 1
+```
+
 #### Permissions
 
 - `setSeatRules` → `CAPACITY_CONFIGURE` (configure) · staff
+- `getSeatRules` → `CAPACITY_CONFIGURE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -430,7 +597,7 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (18 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-1015?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save seat rules, Cancel.
 - [ ] Every transition is wired: `BO-1013`.
@@ -458,11 +625,50 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Companion inventory linked to designated seats: eligible seat types, adjacency, ratio, maximum companions.
+
+**Fixed on main** (the package already carries these; draw what it says): No read operation: the screen declares only setSeatRules and nothing that returns the current configuration. (CHG-WIR-025).
+
 #### Inputs: what the user enters or picks
+
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Seat map | picker: choose a seat map | — | — | `getSeatRules` ?seatMapId |
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
 
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **companion rule**: Ratio and adjacency (same row, next seat). *(source: contracts/satellite/seating.yaml#setSeatRules)*
+
 #### Outputs: what the screen shows and produces
+
+**Shown**
+
+**Kill, buffer, companion and accessibility rules** (detail panel, from `getSeatRules`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Seat map | the name it points at, never the id | — |
+| Killed seats | list or chips (count when long) | — |
+| Kill reasons | grouped details | — |
+| Buffer rule | grouped details | — |
+| Enabled | yes / no (icon or chip) | — |
+| Seats either side | 1,234 | — |
+| Rows either side | 1,234 | — |
+| Avoid single gaps | yes / no (icon or chip) | The commercial case for buffers. A map leaving one empty seat between every party has lost those seats without anybody deciding to. |
+| Companion rule | grouped details | The one with legal weight. Selling the companion seat separately strands a carer. |
+| Enabled | yes / no (icon or chip) | — |
+| Pairs | list or chips (count when long) | — |
+| Wheelchair space | the name it points at, never the id | — |
+| Companion seats | list or chips (count when long) | — |
+| Release companion hours before | 1,234 | — |
+| Flexible spacing | grouped details | — |
+| Enabled | yes / no (icon or chip) | — |
+| Density percent | 1,234 | — |
+| Per performance override | yes / no (icon or chip) | — |
 
 **Actions and what each produces**
 
@@ -470,6 +676,8 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |---|---|---|---|---|---|
 | Save seat rules (primary button) | navigation or local | — | — | — | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
+
+**Data it reads**: `getSeatRules` (onLoad, Kill, buffer, companion and accessibility rules)
 
 **Where the user goes next**
 
@@ -486,9 +694,20 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+rule:
+  ratio: '1:1'
+  adjacency: same row, next seat
+```
+
 #### Permissions
 
 - `setSeatRules` → `CAPACITY_CONFIGURE` (configure) · staff
+- `getSeatRules` → `CAPACITY_CONFIGURE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -521,7 +740,7 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (18 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-1016?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save seat rules, Cancel.
 - [ ] Every transition is wired: `BO-1013`.
@@ -549,6 +768,8 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Wheelchair spaces paired with companion seats, transfer seats and alternatives.
+
 #### Inputs: what the user enters or picks
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
@@ -558,6 +779,10 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 | Seat map | picker: choose a seat map | — | — | `getAccessibleSeating` ?seatMapId |
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **pairing**: Pairs drawn on the map; a wheelchair space without a companion is a validation error. *(source: contracts/satellite/seating.yaml#setSeatRules / contracts/satellite/seating.yaml#validateSeatMap)*
 
 #### Outputs: what the screen shows and produces
 
@@ -584,6 +809,16 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the wheelchair companion rules are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+pair:
+  space: Lower 101 W-1
+  companion: W-2
+```
 
 #### Permissions
 
@@ -644,6 +879,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** The catalogue of accessible seat and space types (wheelchair, companion, ambulatory, transfer, hearing, vision, service animal) and which seats carry them.
+
 #### Inputs: what the user enters or picks
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
@@ -653,6 +890,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Seat map | picker: choose a seat map | — | — | `getAccessibleSeating` ?seatMapId |
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **accessible seats**: Type, dimensions, route, eligibility. *(source: contracts/satellite/seating.yaml#setAccessibleSeating)*
 
 #### Outputs: what the screen shows and produces
 
@@ -679,6 +920,17 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the accessible seating master are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+seat:
+  id: Lower 101 W-1
+  type: wheelchair
+  width: 90 cm
+```
 
 #### Permissions
 
@@ -744,11 +996,41 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Accessible routes from entry to seats and facilities; an accessible seat without an accessible route is not accessible.
+
+**Fixed on main** (the package already carries these; draw what it says): No read operation: the screen declares only setAccessibleSeating and nothing that returns the current configuration. (CHG-WIR-025).
+
 #### Inputs: what the user enters or picks
+
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Seat map | picker: choose a seat map | — | — | `getAccessibleSeating` ?seatMapId |
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
 
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **route**: Entrance, lifts, ramps, concourses to the seat, with distance and level changes. *(source: contracts/satellite/seating.yaml#setAccessibleSeating)*
+
 #### Outputs: what the screen shows and produces
+
+**Shown**
+
+**Accessible seats, their routes and who may buy them** (detail panel, from `getAccessibleSeating`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Seat map | the name it points at, never the id | — |
+| Spaces | list or chips (count when long) | — |
+| Seat | the name it points at, never the id | — |
+| Kind | chip: Wheelchair space, Transfer seat, Ambulant, Easy access, Assistance dog, Hearing … | — |
+| Route description | text | — |
+| Step free | yes / no (icon or chip) | — |
+| Nearest accessible wc | text | — |
+| Eligibility | chip: Open, Self declared, Verified once, Verified each time | Contested in both directions. Open sale leaves none for the guests who need them; hard gating turns people away at the door. |
+| Minimum provision percent | 1,234.5 | — |
 
 **Actions and what each produces**
 
@@ -756,6 +1038,8 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |---|---|---|---|---|---|
 | Save accessible seating (primary button) | navigation or local | — | — | — | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
+
+**Data it reads**: `getAccessibleSeating` (onLoad, Accessible seats, their routes and who may buy them)
 
 **Where the user goes next**
 
@@ -772,9 +1056,24 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+route:
+  from: Gate 2
+  via:
+  - Lift L1
+  - Concourse 1
+  to: Lower 101 W-1
+  distance: 140 m
+```
+
 #### Permissions
 
 - `setAccessibleSeating` → `CAPACITY_CONFIGURE` (configure) · staff
+- `getAccessibleSeating` → `CAPACITY_CONFIGURE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -802,7 +1101,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (9 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-1019?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save accessible seating, Cancel.
 - [ ] Every transition is wired: `BO-1013`.
@@ -830,11 +1129,41 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** How accessible seats are found and who may buy them, without exposing sensitive guest information.
+
+**Fixed on main** (the package already carries these; draw what it says): No read operation: the screen declares only setAccessibleSeating and nothing that returns the current configuration. (CHG-WIR-025).
+
 #### Inputs: what the user enters or picks
+
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Seat map | picker: choose a seat map | — | — | `getAccessibleSeating` ?seatMapId |
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
 
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **eligibility**: Filters and labels; proof required (for example Sanad card) shown, the guest's condition never stored on the seat. *(source: contracts/satellite/seating.yaml#setAccessibleSeating)*
+
 #### Outputs: what the screen shows and produces
+
+**Shown**
+
+**Accessible seats, their routes and who may buy them** (detail panel, from `getAccessibleSeating`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Seat map | the name it points at, never the id | — |
+| Spaces | list or chips (count when long) | — |
+| Seat | the name it points at, never the id | — |
+| Kind | chip: Wheelchair space, Transfer seat, Ambulant, Easy access, Assistance dog, Hearing … | — |
+| Route description | text | — |
+| Step free | yes / no (icon or chip) | — |
+| Nearest accessible wc | text | — |
+| Eligibility | chip: Open, Self declared, Verified once, Verified each time | Contested in both directions. Open sale leaves none for the guests who need them; hard gating turns people away at the door. |
+| Minimum provision percent | 1,234.5 | — |
 
 **Actions and what each produces**
 
@@ -842,6 +1171,8 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |---|---|---|---|---|---|
 | Save accessible seating (primary button) | navigation or local | — | — | — | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
+
+**Data it reads**: `getAccessibleSeating` (onLoad, Accessible seats, their routes and who may buy them)
 
 **Where the user goes next**
 
@@ -858,9 +1189,20 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+eligibility:
+  seatType: wheelchair
+  proof: Sanad card
+```
+
 #### Permissions
 
 - `setAccessibleSeating` → `CAPACITY_CONFIGURE` (configure) · staff
+- `getAccessibleSeating` → `CAPACITY_CONFIGURE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -888,7 +1230,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (9 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-1020?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save accessible seating, Cancel.
 - [ ] Every transition is wired: `BO-1013`.
@@ -916,11 +1258,50 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Temporary spacing (distance, checkerboard, blocked rows, household groups) applied by event, venue or zone.
+
+**Fixed on main** (the package already carries these; draw what it says): No read operation: the screen declares only setSeatRules and nothing that returns the current configuration. (CHG-WIR-025).
+
 #### Inputs: what the user enters or picks
+
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Seat map | picker: choose a seat map | — | — | `getSeatRules` ?seatMapId |
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
 
+**Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **spacing pattern**: Pattern with the capacity it leaves. *(source: contracts/satellite/seating.yaml#setSeatRules / TRACKER Actions row 64)*
+
 #### Outputs: what the screen shows and produces
+
+**Shown**
+
+**Kill, buffer, companion and accessibility rules** (detail panel, from `getSeatRules`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Seat map | the name it points at, never the id | — |
+| Killed seats | list or chips (count when long) | — |
+| Kill reasons | grouped details | — |
+| Buffer rule | grouped details | — |
+| Enabled | yes / no (icon or chip) | — |
+| Seats either side | 1,234 | — |
+| Rows either side | 1,234 | — |
+| Avoid single gaps | yes / no (icon or chip) | The commercial case for buffers. A map leaving one empty seat between every party has lost those seats without anybody deciding to. |
+| Companion rule | grouped details | The one with legal weight. Selling the companion seat separately strands a carer. |
+| Enabled | yes / no (icon or chip) | — |
+| Pairs | list or chips (count when long) | — |
+| Wheelchair space | the name it points at, never the id | — |
+| Companion seats | list or chips (count when long) | — |
+| Release companion hours before | 1,234 | — |
+| Flexible spacing | grouped details | — |
+| Enabled | yes / no (icon or chip) | — |
+| Density percent | 1,234 | — |
+| Per performance override | yes / no (icon or chip) | — |
 
 **Actions and what each produces**
 
@@ -928,6 +1309,8 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |---|---|---|---|---|---|
 | Save seat rules (primary button) | navigation or local | — | — | — | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
+
+**Data it reads**: `getSeatRules` (onLoad, Kill, buffer, companion and accessibility rules)
 
 **Where the user goes next**
 
@@ -944,9 +1327,20 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+spacing:
+  pattern: checkerboard
+  capacityLeft: 52%
+```
+
 #### Permissions
 
 - `setSeatRules` → `CAPACITY_CONFIGURE` (configure) · staff
+- `getSeatRules` → `CAPACITY_CONFIGURE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -976,7 +1370,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (18 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-1021?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save seat rules, Cancel.
 - [ ] Every transition is wired: `BO-1013`.
@@ -1003,6 +1397,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Route | `/access-venue/compliance-validation-audit-bo-1022` |
 
 **Known gaps.** **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Whether the map still meets its obligations: accessible quantities against the legal ratio, companion ratios, route continuity, conflicts.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **List operation(s) validateSeatCompliance return a bare array, not the paged list envelope (items, nextCursor, hasMore); rows of validateSeatCompliance carry no identifier.** Why: The table cannot page, and a row without an id cannot open, edit or link to the record it summarises. *(source: contracts/satellite/seating.yaml#validateSeatCompliance; Ticketing & Guest Commerce, as the venue and TICVAI configure and run it)*
 
 #### Inputs: what the user enters or picks
 
@@ -1068,6 +1468,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Run validation (secondary button) | `validateSeatCompliance` GET `/seat-compliance` | — | SeatComplianceFinding[] | — | — |
 | Export compliance evidence (secondary button) | navigation or local | — | — | — | — |
 
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **compliance checks**: Each check passed or failed with the required and actual numbers. *(source: contracts/satellite/seating.yaml#validateSeatCompliance)*
+
 **Data it reads**: `validateSeatCompliance` (onLoad, Whether the map still complies)
 
 **Where the user goes next**
@@ -1084,6 +1488,18 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the compliance validation audit are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+check:
+  rule: Wheelchair spaces 0.5% of capacity
+  required: 16
+  actual: 16
+  result: passed
+```
 
 #### Permissions
 
@@ -1121,6 +1537,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-1013`.
 - [ ] Every gated control is gated: `CAPACITY_CONFIGURE`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---

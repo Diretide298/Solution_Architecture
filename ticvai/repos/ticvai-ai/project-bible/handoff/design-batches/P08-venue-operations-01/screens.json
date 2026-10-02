@@ -31,8 +31,7 @@
      "trigger": "Layout & Journey Builder",
      "provenance": "flow F79 step 2→3, F95 step 1→2",
      "carries": [
-      "deviceId",
-      "profileId"
+      "deviceId"
      ]
     },
     {
@@ -45,7 +44,6 @@
      "trigger": "A configuration profile is set for it",
      "provenance": "flow F79 step 1→2",
      "carries": [
-      "profileId",
       "workstationId"
      ]
     }
@@ -66,6 +64,24 @@
     "operation": "getWorkstationHealth",
     "why": "**`getWorkstationHealth` declares its response inline**, so the component that shows it names fields but binds to no schema. The contract should name the shape.",
     "source": "contract tenancy.yaml GET /workstations/{workstationId}/health"
+   },
+   {
+    "operation": "recordDeviceHeartbeat",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-021): recordDeviceHeartbeat is a device-audience operation the device sends itself; a back-office browser is not the device (device operations on staff screens are wrong wiring; R254).",
+    "source": "contracts/spine/tenancy.yaml#recordDeviceHeartbeat | R254"
+   },
+   {
+    "operation": "deployConfigurationProfile",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-021): The device register carried profile deployment (deployConfigurationProfile) and the audit log (listAuditRecords); deployment is BO-126's and the audit log BO-068's. Keep devices, credentials and assignment. configureWorkstation and listAlerts stay because F79 step 1 and F95 step 2 use them here (design-notes correction platform-foundation BO-036).",
+    "source": "screens/P08-venue-back-office.yaml#BO-036 | F79 step 1 | F95 step 2"
+   },
+   {
+    "operation": "listAuditRecords",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-021): The device register carried profile deployment (deployConfigurationProfile) and the audit log (listAuditRecords); deployment is BO-126's and the audit log BO-068's. Keep devices, credentials and assignment. configureWorkstation and listAlerts stay because F79 step 1 and F95 step 2 use them here (design-notes correction platform-foundation BO-036).",
+    "source": "screens/P08-venue-back-office.yaml#BO-036 | F79 step 1 | F95 step 2"
    }
   ],
   "layout": {
@@ -94,15 +110,9 @@
        "label": "Every registered device",
        "bindsTo": "RegisteredDevice",
        "columns": [
-        "RegisteredDevice.id",
         "RegisteredDevice.kind",
-        "RegisteredDevice.driver",
         "RegisteredDevice.identifier",
-        "RegisteredDevice.workstationId",
         "RegisteredDevice.model",
-        "RegisteredDevice.pushToken",
-        "RegisteredDevice.pushPlatform",
-        "RegisteredDevice.pushFailureCount",
         "RegisteredDevice.offlineScope",
         "RegisteredDevice.firmwareVersion",
         "RegisteredDevice.isRequired"
@@ -115,15 +125,9 @@
        "label": "Every workstation",
        "bindsTo": "Workstation",
        "columns": [
-        "Workstation.id",
         "Workstation.code",
         "Workstation.name",
-        "Workstation.venueId",
-        "Workstation.regionId",
-        "Workstation.departmentId",
-        "Workstation.scopePath",
         "Workstation.saleBoard",
-        "Workstation.accessPointId",
         "Workstation.devices",
         "Workstation.currency",
         "Workstation.currencyScale"
@@ -136,43 +140,16 @@
        "label": "Every alert",
        "bindsTo": "Alert",
        "columns": [
-        "Alert.id",
-        "Alert.ruleId",
         "Alert.ruleName",
         "Alert.metric",
         "Alert.raisedAt",
         "Alert.severity",
         "Alert.status",
         "Alert.observedValue",
-        "Alert.threshold",
-        "Alert.scopePath",
-        "Alert.workstationId",
-        "Alert.shiftId"
+        "Alert.threshold"
        ],
        "operation": "listAlerts",
        "provenance": "contract reporting.yaml GET /alerts"
-      },
-      {
-       "kind": "dataTable",
-       "label": "Every audit",
-       "bindsTo": "AuditRecord",
-       "columns": [
-        "AuditRecord.id",
-        "AuditRecord.principalId",
-        "AuditRecord.orgUnitId",
-        "AuditRecord.workstationId",
-        "AuditRecord.action",
-        "AuditRecord.subjectRef",
-        "AuditRecord.occurredAt"
-       ],
-       "operation": "listAuditRecords",
-       "provenance": "contract tenancy.yaml GET /audit-records"
-      },
-      {
-       "kind": "publishGate",
-       "impliedBy": "deployConfigurationProfile",
-       "notes": "Declares `deployConfigurationProfile`. **The gate names what the publish will affect before it happens** — a disabled Publish with no reason is the state operators escalate.\n",
-       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -256,18 +233,6 @@
        "provenance": "contract tenancy.yaml PUT /workstations/{workstationId}"
       },
       {
-       "kind": "secondaryButton",
-       "label": "Deploy configuration profile",
-       "operation": "deployConfigurationProfile",
-       "provenance": "contract tenancy.yaml POST /configuration-profiles/{profileId}/deploy"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Record device heartbeat",
-       "operation": "recordDeviceHeartbeat",
-       "provenance": "contract tenancy.yaml POST /devices/{deviceId}/heartbeat"
-      },
-      {
        "kind": "publishGate",
        "label": "What publishing changes",
        "notes": "**Names what goes live, where, and from when.** A publish with no stated consequence is one somebody presses meaning to save.",
@@ -282,7 +247,7 @@
     "id": "formRegisterDevice",
     "component": "modal",
     "trigger": "Register device",
-    "body": "**Collects what `registerDevice` sends before it is called.** Required: `id`, `kind`, `driver`, `workstationId`. Optional: `identifier`, `model`, `pushToken`, `pushPlatform`, `pushFailureCount`, `offlineScope`, `firmwareVersion`, `isRequired`, `status`, `batteryPercent`, `lastCheckedAt`, `health` and 5 more. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `registerDevice` sends before it is called.** Required: `kind`, `driver`, `workstationId`. Optional: `identifier`, `model`, `pushToken`, `pushPlatform`, `pushFailureCount`, `offlineScope`, `firmwareVersion`, `isRequired`, `status`, `batteryPercent`, `lastCheckedAt`, `health` and 5 more. **Not asked:** `id` is a client UUIDv7 generated silently (design-note correction, 2 October 2026). Dismissing sends nothing; the screen behind is unchanged.",
     "bindsTo": "RegisteredDevice",
     "confirm": {
      "label": "Register device",
@@ -291,7 +256,6 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "id",
       "kind",
       "driver",
       "workstationId",
@@ -341,54 +305,6 @@
      ]
     },
     "provenance": "contract tenancy.yaml PUT /workstations/{workstationId}"
-   },
-   {
-    "id": "formDeployConfigurationProfile",
-    "component": "modal",
-    "trigger": "Deploy configuration profile",
-    "body": "**Collects what `deployConfigurationProfile` sends before it is called.** Required: `id`, `profileId`, `status`. Optional: `targetWorkstationIds`, `targetFilter`, `strategy`, `succeededCount`, `failedCount`, `failureReasons`, `startedAt`, `completedAt`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "ProfileDeployment",
-    "confirm": {
-     "label": "Deploy configuration profile",
-     "operation": "deployConfigurationProfile"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "id",
-      "profileId",
-      "status",
-      "targetWorkstationIds",
-      "targetFilter",
-      "strategy",
-      "succeededCount",
-      "failedCount",
-      "failureReasons",
-      "startedAt",
-      "completedAt"
-     ]
-    },
-    "provenance": "contract tenancy.yaml POST /configuration-profiles/{profileId}/deploy"
-   },
-   {
-    "id": "formRecordDeviceHeartbeat",
-    "component": "modal",
-    "trigger": "Record device heartbeat",
-    "body": "**Collects what `recordDeviceHeartbeat` sends before it is called.** Required: `status`, `recordedAt`. Optional: `detail`, `firmwareVersion`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Record device heartbeat",
-     "operation": "recordDeviceHeartbeat"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "status",
-      "recordedAt",
-      "detail",
-      "firmwareVersion"
-     ]
-    },
-    "provenance": "contract tenancy.yaml POST /devices/{deviceId}/heartbeat"
    }
   ],
   "states": {
@@ -442,34 +358,10 @@
     "trigger": "onLoad"
    },
    {
-    "operationId": "deployConfigurationProfile",
-    "contract": "tenancy",
-    "purpose": "deployConfigurationProfile",
-    "trigger": "onAction",
-    "invalidates": [
-     "listDevices"
-    ]
-   },
-   {
     "operationId": "listAlerts",
     "contract": "reporting",
     "purpose": "What is currently raised",
     "trigger": "onLoad"
-   },
-   {
-    "operationId": "listAuditRecords",
-    "contract": "tenancy",
-    "purpose": "Who did what, where, and when",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "recordDeviceHeartbeat",
-    "contract": "tenancy",
-    "purpose": "Device heartbeat and status",
-    "trigger": "onAction",
-    "invalidates": [
-     "listDevices"
-    ]
    },
    {
     "operationId": "issueDeviceCredential",
@@ -510,10 +402,6 @@
     },
     {
      "name": "deviceId",
-     "from": "deepLink"
-    },
-    {
-     "name": "profileId",
      "from": "deepLink"
     }
    ],
@@ -607,6 +495,42 @@
     "operation": "getHaccpStatus",
     "why": "**`getHaccpStatus` declares its response inline**, so the component that shows it names fields but binds to no schema. The contract should name the shape.",
     "source": "contract fnb.yaml GET /food-safety/status"
+   },
+   {
+    "operation": "getGuestMenu",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-008): Reserve merchandise (a guest or till act), Record waste (a stock act), the F&B order and merchandise tables, and the outlet stock and guest menu panels were attached by resemblance; the outlet register's purpose does not need them (R254, R236, R215; design-notes correction fnb-retail BO-044).",
+    "source": "R254 | R236 | R215"
+   },
+   {
+    "operation": "getOutletStock",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-008): Reserve merchandise (a guest or till act), Record waste (a stock act), the F&B order and merchandise tables, and the outlet stock and guest menu panels were attached by resemblance; the outlet register's purpose does not need them (R254, R236, R215; design-notes correction fnb-retail BO-044).",
+    "source": "R254 | R236 | R215"
+   },
+   {
+    "operation": "listFnbOrders",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-008): Reserve merchandise (a guest or till act), Record waste (a stock act), the F&B order and merchandise tables, and the outlet stock and guest menu panels were attached by resemblance; the outlet register's purpose does not need them (R254, R236, R215; design-notes correction fnb-retail BO-044).",
+    "source": "R254 | R236 | R215"
+   },
+   {
+    "operation": "listMerchandise",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-008): Reserve merchandise (a guest or till act), Record waste (a stock act), the F&B order and merchandise tables, and the outlet stock and guest menu panels were attached by resemblance; the outlet register's purpose does not need them (R254, R236, R215; design-notes correction fnb-retail BO-044).",
+    "source": "R254 | R236 | R215"
+   },
+   {
+    "operation": "recordWaste",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-008): Reserve merchandise (a guest or till act), Record waste (a stock act), the F&B order and merchandise tables, and the outlet stock and guest menu panels were attached by resemblance; the outlet register's purpose does not need them (R254, R236, R215; design-notes correction fnb-retail BO-044).",
+    "source": "R254 | R236 | R215"
+   },
+   {
+    "operation": "reserveMerchandise",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-008): Reserve merchandise (a guest or till act), Record waste (a stock act), the F&B order and merchandise tables, and the outlet stock and guest menu panels were attached by resemblance; the outlet register's purpose does not need them (R254, R236, R215; design-notes correction fnb-retail BO-044).",
+    "source": "R254 | R236 | R215"
    }
   ],
   "layout": {
@@ -617,79 +541,30 @@
      "slot": "collection",
      "components": [
       {
-       "kind": "textField",
-       "label": "Venue id",
-       "operation": "listOutlets",
-       "notes": "Sends `?venueId=` to `listOutlets`.",
-       "provenance": "contract tenancy.yaml GET /outlets"
-      },
-      {
-       "kind": "textField",
+       "kind": "multiSelect",
        "label": "Kind",
        "operation": "listOutlets",
-       "notes": "Sends `?kind=` to `listOutlets`.",
-       "provenance": "contract tenancy.yaml GET /outlets"
+       "notes": "Outlet kinds in words (restaurant, bar, cafe, kiosk ...); the venue comes from the session.",
+       "provenance": "contract tenancy.yaml GET /outlets",
+       "bindsTo": "Outlet.kind"
       },
       {
        "kind": "dataTable",
-       "label": "Every outlet",
+       "label": "Outlets",
        "bindsTo": "Outlet",
        "columns": [
-        "Outlet.id",
         "Outlet.code",
         "Outlet.name",
-        "Outlet.venueId",
         "Outlet.kind",
+        "Outlet.outletType",
         "Outlet.zone",
-        "Outlet.stockLocationId",
-        "Outlet.costCenterId",
+        "Outlet.paymentTiming",
+        "Outlet.admissionContext",
         "Outlet.openingHours",
         "Outlet.isActive"
        ],
        "operation": "listOutlets",
        "provenance": "contract tenancy.yaml GET /outlets"
-      },
-      {
-       "kind": "dataTable",
-       "label": "Every F&B order",
-       "bindsTo": "FnbOrder",
-       "columns": [
-        "FnbOrder.id",
-        "FnbOrder.orderNumber",
-        "FnbOrder.outletId",
-        "FnbOrder.serviceMode",
-        "FnbOrder.tableVisitId",
-        "FnbOrder.status",
-        "FnbOrder.lines",
-        "FnbOrder.salesOrderId",
-        "FnbOrder.grossAmount",
-        "FnbOrder.taxAmount",
-        "FnbOrder.kitchenTicketId",
-        "FnbOrder.estimatedReadyAt"
-       ],
-       "operation": "listFnbOrders",
-       "provenance": "contract fnb.yaml GET /fnb-orders"
-      },
-      {
-       "kind": "dataTable",
-       "label": "Every merchandise",
-       "bindsTo": "MerchandiseItem",
-       "columns": [
-        "MerchandiseItem.description",
-        "MerchandiseItem.id",
-        "MerchandiseItem.sku",
-        "MerchandiseItem.barcode",
-        "MerchandiseItem.name",
-        "MerchandiseItem.outletId",
-        "MerchandiseItem.categoryId",
-        "MerchandiseItem.variantId",
-        "MerchandiseItem.inventoryItemId",
-        "MerchandiseItem.price",
-        "MerchandiseItem.onHand",
-        "MerchandiseItem.isReturnable"
-       ],
-       "operation": "listMerchandise",
-       "provenance": "contract retail.yaml GET /merchandise"
       }
      ]
     },
@@ -702,19 +577,25 @@
        "label": "The selected outlet",
        "bindsTo": "Outlet",
        "columns": [
-        "Outlet.id",
         "Outlet.code",
         "Outlet.name",
-        "Outlet.venueId",
+        "Outlet.nameTranslations",
         "Outlet.kind",
+        "Outlet.outletType",
+        "Outlet.departmentId",
         "Outlet.zone",
         "Outlet.stockLocationId",
         "Outlet.costCenterId",
+        "Outlet.paymentTiming",
+        "Outlet.admissionContext",
+        "Outlet.producesForOutletIds",
+        "Outlet.saleBoardId",
         "Outlet.openingHours",
         "Outlet.isActive"
        ],
        "operation": "listOutlets",
-       "provenance": "contract tenancy.yaml GET /outlets"
+       "provenance": "contract tenancy.yaml GET /outlets",
+       "notes": "Stock location, cost centre and department show their names; the ids stay for the copy action only. **Decided 2 October 2026 by Chinmay:** the name in English plus the local language where the region requires it (`nameTranslations`, `RegionSettings.localLanguageNameLocales`; DEC-031), the payment timing (pay first, or send to the kitchen first then pay; DEC-064), inside the venue (needs an admission ticket) or standalone (no ticket; DEC-070), the outlet type and department (DEC-196, DI-319), a producing outlet (`producesForOutletIds`, DEC-188) and the till layout (`saleBoardId`, a till may override it; DEC-183)."
       },
       {
        "kind": "detailPanel",
@@ -740,24 +621,6 @@
        ],
        "operation": "getFnbDeliveryPolicy",
        "provenance": "contract fnb.yaml GET /fnb-delivery-policy"
-      },
-      {
-       "kind": "detailPanel",
-       "label": "The outlet stock line",
-       "bindsTo": "OutletStockLine",
-       "columns": [
-        "OutletStockLine.merchandiseId",
-        "OutletStockLine.sku",
-        "OutletStockLine.name",
-        "OutletStockLine.categoryName",
-        "OutletStockLine.onHand",
-        "OutletStockLine.allocated",
-        "OutletStockLine.available",
-        "OutletStockLine.isBelowReorderPoint",
-        "OutletStockLine.lastSoldAt"
-       ],
-       "operation": "getOutletStock",
-       "provenance": "contract retail.yaml GET /outlets/{outletId}/stock-check"
       },
       {
        "kind": "detailPanel",
@@ -796,22 +659,6 @@
        "operation": "getHaccpStatus",
        "notes": "Shows `checksDue`, `checksMissed`, `openActions`, `unsignedActions`, `oldestOpenActionAgeHours`, `lastInspectionAt` from `getHaccpStatus`'s inline response. **The response has no named schema**, so this cannot bind until the contract names one.",
        "provenance": "contract fnb.yaml GET /food-safety/status"
-      },
-      {
-       "kind": "detailPanel",
-       "label": "The guest menu",
-       "bindsTo": "GuestMenu",
-       "columns": [
-        "GuestMenu.outletId",
-        "GuestMenu.menuId",
-        "GuestMenu.name",
-        "GuestMenu.inForceUntil",
-        "GuestMenu.currency",
-        "GuestMenu.currencyScale",
-        "GuestMenu.sections"
-       ],
-       "operation": "getGuestMenu",
-       "provenance": "contract fnb.yaml GET /outlets/{outletId}/guest-menu"
       }
      ]
     },
@@ -824,18 +671,6 @@
        "label": "Create outlet",
        "operation": "createOutlet",
        "provenance": "contract tenancy.yaml POST /outlets"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Record waste",
-       "operation": "recordWaste",
-       "provenance": "contract fnb.yaml POST /outlets/{outletId}/waste"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Reserve merchandise",
-       "operation": "reserveMerchandise",
-       "provenance": "contract retail.yaml POST /outlets/{outletId}/reserve"
       },
       {
        "kind": "secondaryButton",
@@ -876,7 +711,7 @@
    "error": "Could not load. Names which read failed and leaves the outlets untouched.",
    "emptyFirstRun": "No outlets yet. Offers Create outlet (`createOutlet`); distinct from a filter that matched nothing.",
    "emptyNoResults": "Nothing matches the filter on venueId, kind and the outlets are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `getFnbDeliveryPolicy` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "You don't have access to outlets — ask your venue manager. Permission keys are never shown to the user; the screen names the access in words. **Never an empty table** — that reads as *there is no data*."
   },
   "apis": [
    {
@@ -898,12 +733,6 @@
     "trigger": "onLoad"
    },
    {
-    "operationId": "getGuestMenu",
-    "contract": "fnb",
-    "purpose": "The menu a guest sees",
-    "trigger": "onAction"
-   },
-   {
     "operationId": "createOutlet",
     "contract": "tenancy",
     "purpose": "Create an outlet",
@@ -911,12 +740,6 @@
     "invalidates": [
      "listOutlets"
     ]
-   },
-   {
-    "operationId": "getOutletStock",
-    "contract": "retail",
-    "purpose": "Stock across an outlet",
-    "trigger": "onAction"
    },
    {
     "operationId": "getReturnPolicy",
@@ -929,24 +752,6 @@
     "contract": "fnb",
     "purpose": "Table map with live state",
     "trigger": "onAction"
-   },
-   {
-    "operationId": "recordWaste",
-    "contract": "fnb",
-    "purpose": "Record waste",
-    "trigger": "onAction",
-    "invalidates": [
-     "listOutlets"
-    ]
-   },
-   {
-    "operationId": "reserveMerchandise",
-    "contract": "retail",
-    "purpose": "Reserve an item for collection",
-    "trigger": "onAction",
-    "invalidates": [
-     "listOutlets"
-    ]
    },
    {
     "operationId": "setReturnPolicy",
@@ -976,18 +781,6 @@
     ]
    },
    {
-    "operationId": "listFnbOrders",
-    "contract": "fnb",
-    "purpose": "List F&B orders",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "listMerchandise",
-    "contract": "retail",
-    "purpose": "List merchandise",
-    "trigger": "onLoad"
-   },
-   {
     "operationId": "getHaccpStatus",
     "contract": "fnb",
     "purpose": "getHaccpStatus",
@@ -1010,9 +803,7 @@
     "provenance": "decided 29 September, VM close-out (venue management and configuration)",
     "invalidates": [
      "getFnbDeliveryPolicy",
-     "getGuestMenu",
-     "getTableMap",
-     "listFnbOrders"
+     "getTableMap"
     ]
    },
    {
@@ -1023,9 +814,7 @@
     "provenance": "decided 29 September, VM close-out (venue management and configuration)",
     "invalidates": [
      "getFnbDeliveryPolicy",
-     "getGuestMenu",
-     "getTableMap",
-     "listFnbOrders"
+     "getTableMap"
     ]
    },
    {
@@ -1036,9 +825,7 @@
     "provenance": "decided 29 September, VM close-out (venue management and configuration)",
     "invalidates": [
      "getFnbDeliveryPolicy",
-     "getGuestMenu",
-     "getTableMap",
-     "listFnbOrders"
+     "getTableMap"
     ]
    },
    {
@@ -1118,75 +905,6 @@
     "provenance": "contract fnb.yaml PUT /fnb-delivery-policy"
    },
    {
-    "id": "formCreateOutlet",
-    "component": "modal",
-    "trigger": "Create outlet",
-    "body": "**Collects what `createOutlet` sends before it is called.** Required: `id`, `code`, `name`, `venueId`, `kind`. Optional: `zone`, `stockLocationId`, `costCenterId`, `openingHours`, `isActive`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "Outlet",
-    "confirm": {
-     "label": "Create outlet",
-     "operation": "createOutlet"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "id",
-      "code",
-      "name",
-      "venueId",
-      "kind",
-      "zone",
-      "stockLocationId",
-      "costCenterId",
-      "openingHours",
-      "isActive"
-     ]
-    },
-    "provenance": "contract tenancy.yaml POST /outlets"
-   },
-   {
-    "id": "formRecordWaste",
-    "component": "modal",
-    "trigger": "Record waste",
-    "body": "**Collects what `recordWaste` sends before it is called.** Required: `id`, `lines`, `reason`, `recordedAt`. Optional: `note`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Record waste",
-     "operation": "recordWaste"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "id",
-      "lines",
-      "reason",
-      "recordedAt",
-      "note"
-     ]
-    },
-    "provenance": "contract fnb.yaml POST /outlets/{outletId}/waste"
-   },
-   {
-    "id": "formReserveMerchandise",
-    "component": "modal",
-    "trigger": "Reserve merchandise",
-    "body": "**Collects what `reserveMerchandise` sends before it is called.** Required: `id`, `lines`. Optional: `expiresAt`, `subjectId`, `collectionNote`. **The expiry picker allows from 15 minutes ahead up to the close of the venue's operating day** and offers nothing outside that window (the server refuses it 400); left empty, the reservation holds until the end of the visit day (decided 28 September, audit R215, R169). Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Reserve merchandise",
-     "operation": "reserveMerchandise"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "id",
-      "lines",
-      "expiresAt",
-      "subjectId",
-      "collectionNote"
-     ]
-    },
-    "provenance": "contract retail.yaml POST /outlets/{outletId}/reserve"
-   },
-   {
     "id": "formSetReturnPolicy",
     "component": "modal",
     "trigger": "Save return policy",
@@ -1231,27 +949,6 @@
     "provenance": "contract fnb.yaml PUT /outlets/{outletId}/tables"
    },
    {
-    "id": "formUpdateOutlet",
-    "component": "modal",
-    "trigger": "Save outlet",
-    "body": "**Collects what `updateOutlet` sends before it is called.** Nothing in the body is required. Optional: `name`, `stockLocationId`, `costCenterId`, `openingHours`, `isActive`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Save outlet",
-     "operation": "updateOutlet"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "name",
-      "stockLocationId",
-      "costCenterId",
-      "openingHours",
-      "isActive"
-     ]
-    },
-    "provenance": "contract tenancy.yaml PATCH /outlets/{outletId}"
-   },
-   {
     "id": "formSignCorrectiveAction",
     "component": "modal",
     "trigger": "Sign corrective action",
@@ -1268,6 +965,66 @@
      ]
     },
     "provenance": "contract fnb.yaml POST /food-safety/corrective-actions/{actionId}/sign"
+   },
+   {
+    "id": "formCreateOutlet",
+    "component": "modal",
+    "trigger": "Create outlet",
+    "body": "**Collects what `createOutlet` sends before it is called.** Required: `code`, `name`, `venueId`, `kind`. Optional: `nameTranslations`, `outletType`, `departmentId`, `zone`, `stockLocationId`, `costCenterId`, `paymentTiming`, `admissionContext`, `producesForOutletIds`, `saleBoardId`, `openingHours`, `isActive`. `venueId` comes from the session, never typed. **Name** in English, plus each locale the region lists in `localLanguageNameLocales` (DEC-031). **Payment timing**: Send first, then pay (the default, R261) or Pay first (DEC-064). **Admission context**: Inside the venue (a guest order needs an admission ticket) or Standalone (no ticket; DEC-070). **Outlet type** and **department** (DEC-196, DI-319). **Produces for** other outlets, for a commissary (DEC-188). **Till layout** (`saleBoardId`; a till may override it, DEC-183). Stock location and cost centre are pickers by name. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Create outlet",
+     "operation": "createOutlet"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "code",
+      "name",
+      "venueId",
+      "kind",
+      "nameTranslations",
+      "outletType",
+      "departmentId",
+      "zone",
+      "stockLocationId",
+      "costCenterId",
+      "paymentTiming",
+      "admissionContext",
+      "producesForOutletIds",
+      "saleBoardId",
+      "openingHours",
+      "isActive"
+     ]
+    },
+    "provenance": "contract tenancy.yaml POST /outlets"
+   },
+   {
+    "id": "formUpdateOutlet",
+    "component": "modal",
+    "trigger": "Save outlet",
+    "body": "**Collects what `updateOutlet` sends before it is called.** Nothing in the body is required. Optional: `name`, `nameTranslations`, `stockLocationId`, `costCenterId`, `departmentId`, `outletType`, `paymentTiming`, `admissionContext`, `producesForOutletIds`, `saleBoardId`, `openingHours`, `isActive`. `venueId` comes from the session, never typed. **Name** in English, plus each locale the region lists in `localLanguageNameLocales` (DEC-031). **Payment timing**: Send first, then pay (the default, R261) or Pay first (DEC-064). **Admission context**: Inside the venue (a guest order needs an admission ticket) or Standalone (no ticket; DEC-070). **Outlet type** and **department** (DEC-196, DI-319). **Produces for** other outlets, for a commissary (DEC-188). **Till layout** (`saleBoardId`; a till may override it, DEC-183). Stock location and cost centre are pickers by name. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save outlet",
+     "operation": "updateOutlet"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "name",
+      "nameTranslations",
+      "stockLocationId",
+      "costCenterId",
+      "departmentId",
+      "outletType",
+      "paymentTiming",
+      "admissionContext",
+      "producesForOutletIds",
+      "saleBoardId",
+      "openingHours",
+      "isActive"
+     ]
+    },
+    "provenance": "contract tenancy.yaml PATCH /outlets/{outletId}"
    }
   ],
   "_platform": {
@@ -1337,7 +1094,7 @@
     }
    ]
   },
-  "notes": "Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. **Retail board operations wired 24 August.** **Cross-platform navigation removed 24 August**: EMP-020. **A till does not navigate to a back office and a guest app does not navigate to either** — those are device handovers, and a flow declares them with `crossesDevice` rather than a screen pretending there is a link.",
+  "notes": "Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. **Retail board operations wired 24 August.** **Cross-platform navigation removed 24 August**: EMP-020. **A till does not navigate to a back office and a guest app does not navigate to either** — those are device handovers, and a flow declares them with `crossesDevice` rather than a screen pretending there is a link.\n\n**One reporting area, one set of numbers** (decided 2 October 2026, Chinmay; CHG-FIN-006; DI-721, DI-702). This screen is a scoped window onto the reporting area (Analytics, P16): it runs the same seeded report definitions and reads the same seeded KPIs, so its figures equal what Analytics shows for the same scope, period and as-of time. It computes no total of its own and shows the as-of time on every figure.",
   "density": "compact",
   "boardFrames": [
    "Retail Board 6.dc.html#ret-6h"
@@ -1829,7 +1586,7 @@
     "BO-108"
    ]
   },
-  "notes": "Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.",
+  "notes": "Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.\n\n**One reporting area, one set of numbers** (decided 2 October 2026, Chinmay; CHG-FIN-006; DI-721, DI-702). This screen is a scoped window onto the reporting area (Analytics, P16): it runs the same seeded report definitions and reads the same seeded KPIs, so its figures equal what Analytics shows for the same scope, period and as-of time. It computes no total of its own and shows the as-of time on every figure.",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listScans` reads the population and `getFinancialReport` reads one of them — list, select, act",
@@ -2514,18 +2271,12 @@
      "slot": "collection",
      "components": [
       {
-       "kind": "textField",
-       "label": "Under",
-       "operation": "listOrgUnits",
-       "notes": "Sends `?under=` to `listOrgUnits`.",
-       "provenance": "contract tenancy.yaml GET /org-units"
-      },
-      {
-       "kind": "textField",
+       "kind": "selectField",
        "label": "Level",
        "operation": "listOrgUnits",
-       "notes": "Sends `?level=` to `listOrgUnits`.",
-       "provenance": "contract tenancy.yaml GET /org-units"
+       "notes": "Level in words (brand, region, venue, department ...); the units are a tree, not ids typed by hand.",
+       "provenance": "contract tenancy.yaml GET /org-units",
+       "bindsTo": "OrgUnit.level"
       },
       {
        "kind": "toggle",
@@ -2535,14 +2286,11 @@
        "provenance": "contract tenancy.yaml GET /org-units"
       },
       {
-       "kind": "dataTable",
-       "label": "Every org unit",
+       "kind": "treeNav",
+       "label": "Zones and areas",
        "bindsTo": "OrgUnit",
        "columns": [
-        "OrgUnit.id",
         "OrgUnit.level",
-        "OrgUnit.parentId",
-        "OrgUnit.path",
         "OrgUnit.code",
         "OrgUnit.name",
         "OrgUnit.isActive",
@@ -2646,12 +2394,6 @@
       },
       {
        "kind": "secondaryButton",
-       "label": "Save turnstile mode",
-       "operation": "setTurnstileMode",
-       "provenance": "contract access.yaml PUT /access-points/{accessPointId}/mode"
-      },
-      {
-       "kind": "secondaryButton",
        "label": "Save access point",
        "operation": "updateAccessPoint",
        "provenance": "contract access.yaml PATCH /access-points/{accessPointId}"
@@ -2726,15 +2468,6 @@
     ]
    },
    {
-    "operationId": "setTurnstileMode",
-    "contract": "access",
-    "purpose": "Set the operating mode of an access point",
-    "trigger": "onAction",
-    "invalidates": [
-     "listOrgUnits"
-    ]
-   },
-   {
     "operationId": "updateAccessPoint",
     "contract": "access",
     "purpose": "Update an access point",
@@ -2781,30 +2514,6 @@
   "apisNote": "Rebuilt 9 September 2026 from the 10 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "overlays": [
    {
-    "id": "formCreateAccessPoint",
-    "component": "modal",
-    "trigger": "Create access point",
-    "body": "**Collects what `createAccessPoint` sends before it is called.** Required: `code`, `name`, `venueId`, `direction`. Optional: `antiPassbackEnabled`, `requiresExitBeforeReentry`, `driver`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "CreateAccessPointRequest",
-    "confirm": {
-     "label": "Create access point",
-     "operation": "createAccessPoint"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "code",
-      "name",
-      "venueId",
-      "direction",
-      "antiPassbackEnabled",
-      "requiresExitBeforeReentry",
-      "driver"
-     ]
-    },
-    "provenance": "contract access.yaml POST /access-points"
-   },
-   {
     "id": "formCreateOrgUnit",
     "component": "modal",
     "trigger": "Create org unit",
@@ -2848,25 +2557,6 @@
     "provenance": "contract access.yaml PUT /access-points/{accessPointId}/geofence"
    },
    {
-    "id": "formSetTurnstileMode",
-    "component": "modal",
-    "trigger": "Save turnstile mode",
-    "body": "**Collects what `setTurnstileMode` sends before it is called.** Required: `operatingMode` (normal, freeFlow, dropArm, closed, podium, maintenance). Optional: `mode` (freeRotation or closed), offered only when the operating mode is normal or podium — the server refuses it with any other operating mode (400); `reason`. **Direction is not set here**: it is fixed per access point and changed only through Create/Save access point on this screen (decided 28 September, audit R221). Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Save turnstile mode",
-     "operation": "setTurnstileMode"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "operatingMode",
-      "mode",
-      "reason"
-     ]
-    },
-    "provenance": "contract access.yaml PUT /access-points/{accessPointId}/mode"
-   },
-   {
     "id": "formUpdateAccessPoint",
     "component": "modal",
     "trigger": "Save access point",
@@ -2905,6 +2595,36 @@
      ]
     },
     "provenance": "contract tenancy.yaml PATCH /org-units/{orgUnitId}"
+   },
+   {
+    "id": "formCreateAccessPoint",
+    "component": "modal",
+    "trigger": "Create access point",
+    "body": "**Collects what `createAccessPoint` sends before it is called.** Required: `code`, `name`, `direction`. Optional: `antiPassbackEnabled`, `requiresExitBeforeReentry`, `driver`. `venueId` comes from the session (VO-R03, VO-R09), never asked. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Create access point",
+     "operation": "createAccessPoint"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "code",
+      "name",
+      "direction",
+      "antiPassbackEnabled",
+      "requiresExitBeforeReentry",
+      "driver"
+     ]
+    },
+    "provenance": "contract access.yaml POST /access-points"
+   }
+  ],
+  "gaps": [
+   {
+    "operation": "setTurnstileMode",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): The operating mode is a live podium action (R221) that belongs on BO-201 and SCN-016; on this configuration screen it invites changing a gate's live state from a setup form (design-notes correction venue-operations BO-064).",
+    "source": "contracts/spine/access.yaml#setTurnstileMode | R221"
    }
   ],
   "_platform": {
@@ -2991,13 +2711,9 @@
        "label": "Every API client",
        "bindsTo": "ApiClient",
        "columns": [
-        "ApiClient.id",
-        "ApiClient.developerId",
         "ApiClient.name",
-        "ApiClient.clientId",
         "ApiClient.environment",
         "ApiClient.scopes",
-        "ApiClient.allowedTenantIds",
         "ApiClient.ipAllowList",
         "ApiClient.status",
         "ApiClient.lastUsedAt"
@@ -3011,12 +2727,6 @@
      "name": "actionBar",
      "slot": "rowActions",
      "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Create API client",
-       "operation": "createApiClient",
-       "provenance": "contract public-api.yaml POST /api-clients"
-      },
       {
        "kind": "secondaryButton",
        "label": "Create webhook subscription",
@@ -3054,15 +2764,6 @@
     "trigger": "onAction"
    },
    {
-    "operationId": "createApiClient",
-    "contract": "public-api",
-    "purpose": "Issue a client",
-    "trigger": "onAction",
-    "invalidates": [
-     "listApiClients"
-    ]
-   },
-   {
     "operationId": "createWebhookSubscription",
     "contract": "public-api",
     "purpose": "Subscribe an endpoint",
@@ -3091,37 +2792,10 @@
   "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "overlays": [
    {
-    "id": "formCreateApiClient",
-    "component": "modal",
-    "trigger": "Create API client",
-    "body": "**Collects what `createApiClient` sends before it is called.** Required: `id`, `developerId`, `name`, `environment`, `scopes`, `status`. Optional: `clientId`, `allowedTenantIds`, `ipAllowList`, `lastUsedAt`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "ApiClient",
-    "confirm": {
-     "label": "Create API client",
-     "operation": "createApiClient"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "id",
-      "developerId",
-      "name",
-      "environment",
-      "scopes",
-      "status",
-      "clientId",
-      "allowedTenantIds",
-      "ipAllowList",
-      "lastUsedAt"
-     ]
-    },
-    "provenance": "contract public-api.yaml POST /api-clients"
-   },
-   {
     "id": "formCreateWebhookSubscription",
     "component": "modal",
     "trigger": "Create webhook subscription",
-    "body": "**Collects what `createWebhookSubscription` sends before it is called.** Required: `id`, `clientId`, `endpointUrl`, `eventTypes`, `status`. Optional: `filters`, `signingSecret`, `consecutiveFailures`, `disabledReason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `createWebhookSubscription` sends before it is called.** Required: `clientId`, `endpointUrl`, `eventTypes`. Optional: `filters`, `signingSecret`, `consecutiveFailures`, `disabledReason`. **Not asked:** `id` is a client UUIDv7 generated silently; `status` is set by the server (design-note correction, 2 October 2026). Dismissing sends nothing; the screen behind is unchanged.",
     "bindsTo": "WebhookSubscription",
     "confirm": {
      "label": "Create webhook subscription",
@@ -3130,11 +2804,9 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "id",
       "clientId",
       "endpointUrl",
       "eventTypes",
-      "status",
       "filters",
       "signingSecret",
       "consecutiveFailures",
@@ -3142,6 +2814,14 @@
      ]
     },
     "provenance": "contract public-api.yaml POST /webhook-subscriptions"
+   }
+  ],
+  "gaps": [
+   {
+    "operation": "createApiClient",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-021): createApiClient on the tenant's integrations screen; production clients are issued by TICVAI on an approved request and sandbox clients belong to developers (DEV-003), so a tenant creating clients bypasses certification (DI-927; design-notes correction platform-foundation BO-067).",
+    "source": "DI-927 | contracts/satellite/public-api.yaml#createApiClient"
    }
   ],
   "_platform": {
@@ -3193,9 +2873,9 @@
     "BO-108",
     "BO-036",
     "BO-030",
-    "BO-031",
     "BO-071",
-    "BO-072"
+    "BO-072",
+    "BO-069"
    ],
    "transitions": [
     {
@@ -3218,14 +2898,6 @@
      "provenance": "VM close-out 29 September: maintenance home"
     },
     {
-     "to": "BO-031",
-     "trigger": "Open the asset",
-     "carries": [
-      "assetId"
-     ],
-     "provenance": "VM close-out 29 September: maintenance home"
-    },
-    {
      "to": "BO-071",
      "trigger": "Planned maintenance",
      "provenance": "VM close-out 29 September: maintenance home"
@@ -3234,6 +2906,14 @@
      "to": "BO-072",
      "trigger": "Incident log",
      "provenance": "VM close-out 29 September: maintenance home"
+    },
+    {
+     "to": "BO-069",
+     "trigger": "Open the asset",
+     "provenance": "wiring fix, 2 October 2026 (CHG-WIR-002): VM close-out 29 September maintenance home",
+     "carries": [
+      "assetId"
+     ]
     }
    ],
    "notes": "**The maintenance home (29 September, VM close-out).** Reached from BO-108 Venue Operations, which already reads `listWorkOrders`; the cold link from BO-101 Orders & Money is removed. Planned maintenance, the incident log and verification lead back here instead of to the queue directory."
@@ -3889,7 +3569,78 @@
     "BO-963",
     "BO-973",
     "BO-983",
-    "BO-993"
+    "BO-993",
+    "ADM-048",
+    "ADM-058",
+    "ADM-078",
+    "ADM-088",
+    "ADM-098",
+    "ADM-108",
+    "ADM-118",
+    "ADM-128",
+    "ADM-138",
+    "ADM-148",
+    "ADM-158",
+    "ADM-168",
+    "ADM-178",
+    "ADM-188",
+    "ADM-198",
+    "ADM-208",
+    "ADM-218",
+    "ADM-228",
+    "ADM-238",
+    "ADM-248",
+    "ADM-258",
+    "ADM-268",
+    "ADM-278",
+    "ADM-288",
+    "ADM-298",
+    "ADM-308",
+    "ADM-559",
+    "ADM-569",
+    "ADM-579",
+    "ADM-589",
+    "ADM-599",
+    "ADM-609",
+    "ADM-629",
+    "ADM-639",
+    "ADM-649",
+    "ADM-659",
+    "ADM-669",
+    "ADM-679",
+    "ADM-689",
+    "ADM-069",
+    "ADM-070",
+    "ADM-071",
+    "ADM-072",
+    "ADM-073",
+    "ADM-074",
+    "ADM-075",
+    "ADM-076",
+    "ADM-077",
+    "ADM-620",
+    "ADM-621",
+    "ADM-622",
+    "ADM-623",
+    "ADM-624",
+    "ADM-625",
+    "ADM-626",
+    "ADM-627",
+    "ADM-628",
+    "ADM-038",
+    "ADM-319",
+    "ADM-329",
+    "ADM-339",
+    "ADM-349",
+    "ADM-359",
+    "PTR-026",
+    "PTR-029",
+    "PTR-035",
+    "PTR-036",
+    "PTR-037",
+    "PTR-039",
+    "PTR-047",
+    "PTR-048"
    ],
    "entryFrom": [
     "BO-108",
@@ -4502,10 +4253,365 @@
      "to": "BO-354",
      "trigger": "Credential Operations Command Center",
      "provenance": "structural — BO-100 is P08's home screen and its exits are its launcher"
+    },
+    {
+     "to": "ADM-048",
+     "trigger": "Commercial Pricing Command Center",
+     "provenance": "moved to Venue Management 2 October 2026 (CHG-MOV-001); its workshop board's hub"
+    },
+    {
+     "to": "ADM-058",
+     "trigger": "Pricing Rule Command Center",
+     "provenance": "moved to Venue Management 2 October 2026 (CHG-MOV-001); its workshop board's hub"
+    },
+    {
+     "to": "ADM-078",
+     "trigger": "Pricing Governance Command Center",
+     "provenance": "moved to Venue Management 2 October 2026 (CHG-MOV-001); its workshop board's hub"
+    },
+    {
+     "to": "ADM-088",
+     "trigger": "Dynamic Pricing Strategy Command Center",
+     "provenance": "moved to Venue Management 2 October 2026 (CHG-MOV-001); its workshop board's hub"
+    },
+    {
+     "to": "ADM-098",
+     "trigger": "AI Pricing Intelligence Command Center",
+     "provenance": "moved to Venue Management 2 October 2026 (CHG-MOV-001); its workshop board's hub"
+    },
+    {
+     "to": "ADM-108",
+     "trigger": "Revenue Optimization Command Center",
+     "provenance": "moved to Venue Management 2 October 2026 (CHG-MOV-001); its workshop board's hub"
+    },
+    {
+     "to": "ADM-118",
+     "trigger": "Product Lifecycle Command Center",
+     "provenance": "moved to Venue Management 2 October 2026 (CHG-MOV-001); its workshop board's hub"
+    },
+    {
+     "to": "ADM-128",
+     "trigger": "Product Governance Command Center",
+     "provenance": "moved to Venue Management 2 October 2026 (CHG-MOV-001); its workshop board's hub"
+    },
+    {
+     "to": "ADM-138",
+     "trigger": "Promotion Command Center Dashboard",
+     "provenance": "moved to Venue Management 2 October 2026 (CHG-MOV-001); its workshop board's hub"
+    },
+    {
+     "to": "ADM-148",
+     "trigger": "Promotion Rule Builder",
+     "provenance": "moved to Venue Management 2 October 2026 (CHG-MOV-001); its workshop board's hub"
+    },
+    {
+     "to": "ADM-158",
+     "trigger": "Coupon & Promo Code Command Center",
+     "provenance": "moved to Venue Management 2 October 2026 (CHG-MOV-001); its workshop board's hub"
+    },
+    {
+     "to": "ADM-168",
+     "trigger": "Advanced Offer Command Center",
+     "provenance": "moved to Venue Management 2 October 2026 (CHG-MOV-001); its workshop board's hub"
+    },
+    {
+     "to": "ADM-178",
+     "trigger": "Bundle & Combo Command Center",
+     "provenance": "moved to Venue Management 2 October 2026 (CHG-MOV-001); its workshop board's hub"
+    },
+    {
+     "to": "ADM-188",
+     "trigger": "Dynamic Bundle Operations Command Center",
+     "provenance": "moved to Venue Management 2 October 2026 (CHG-MOV-001); its workshop board's hub"
+    },
+    {
+     "to": "ADM-198",
+     "trigger": "Targeting & Eligibility Command Center",
+     "provenance": "moved to Venue Management 2 October 2026 (CHG-MOV-001); its workshop board's hub"
+    },
+    {
+     "to": "ADM-208",
+     "trigger": "Stacking & Conflict Command Center",
+     "provenance": "moved to Venue Management 2 October 2026 (CHG-MOV-001); its workshop board's hub"
+    },
+    {
+     "to": "ADM-218",
+     "trigger": "Campaign Governance & Budget Command Center",
+     "provenance": "moved to Venue Management 2 October 2026 (CHG-MOV-001); its workshop board's hub"
+    },
+    {
+     "to": "ADM-228",
+     "trigger": "Promotion Performance Command Center",
+     "provenance": "moved to Venue Management 2 October 2026 (CHG-MOV-001); its workshop board's hub"
+    },
+    {
+     "to": "ADM-238",
+     "trigger": "Rules & Workflow Command Center",
+     "provenance": "moved to Venue Management 2 October 2026 (CHG-MOV-001); its workshop board's hub"
+    },
+    {
+     "to": "ADM-248",
+     "trigger": "Workflow Operations Command Center",
+     "provenance": "moved to Venue Management 2 October 2026 (CHG-MOV-001); its workshop board's hub"
+    },
+    {
+     "to": "ADM-258",
+     "trigger": "Sales Channel Command Center",
+     "provenance": "moved to Venue Management 2 October 2026 (CHG-MOV-001); its workshop board's hub"
+    },
+    {
+     "to": "ADM-268",
+     "trigger": "Channel Operations Command Center",
+     "provenance": "moved to Venue Management 2 October 2026 (CHG-MOV-001); its workshop board's hub"
+    },
+    {
+     "to": "ADM-278",
+     "trigger": "Resale Marketplace Command Center",
+     "provenance": "moved to Venue Management 2 October 2026 (CHG-MOV-001); its workshop board's hub"
+    },
+    {
+     "to": "ADM-288",
+     "trigger": "Resale Operations Command Center",
+     "provenance": "moved to Venue Management 2 October 2026 (CHG-MOV-001); its workshop board's hub"
+    },
+    {
+     "to": "ADM-298",
+     "trigger": "My Tickets & Resale Marketplace Entry",
+     "provenance": "moved to Venue Management 2 October 2026 (CHG-MOV-001); its workshop board's hub"
+    },
+    {
+     "to": "ADM-308",
+     "trigger": "Upgrade & Conversion Command Center",
+     "provenance": "moved to Venue Management 2 October 2026 (CHG-MOV-001); its workshop board's hub"
+    },
+    {
+     "to": "ADM-559",
+     "trigger": "Payment Command Center",
+     "provenance": "moved to Venue Management 2 October 2026 (CHG-MOV-001); its workshop board's hub"
+    },
+    {
+     "to": "ADM-569",
+     "trigger": "Payment Orchestration Command Center",
+     "provenance": "moved to Venue Management 2 October 2026 (CHG-MOV-001); its workshop board's hub"
+    },
+    {
+     "to": "ADM-579",
+     "trigger": "Terminal & Card-Present Command Center",
+     "provenance": "moved to Venue Management 2 October 2026 (CHG-MOV-001); its workshop board's hub"
+    },
+    {
+     "to": "ADM-589",
+     "trigger": "Digital Payments Command Center",
+     "provenance": "moved to Venue Management 2 October 2026 (CHG-MOV-001); its workshop board's hub"
+    },
+    {
+     "to": "ADM-599",
+     "trigger": "Mixed Tender & Credit Command Center",
+     "provenance": "moved to Venue Management 2 October 2026 (CHG-MOV-001); its workshop board's hub"
+    },
+    {
+     "to": "ADM-609",
+     "trigger": "Refund & Payment Adjustment Command Center",
+     "provenance": "moved to Venue Management 2 October 2026 (CHG-MOV-001); its workshop board's hub"
+    },
+    {
+     "to": "ADM-629",
+     "trigger": "Payment Risk & Fraud Command Center",
+     "provenance": "moved to Venue Management 2 October 2026 (CHG-MOV-001); its workshop board's hub"
+    },
+    {
+     "to": "ADM-639",
+     "trigger": "Recommendation Command Center",
+     "provenance": "moved to Venue Management 2 October 2026 (CHG-MOV-001); its workshop board's hub"
+    },
+    {
+     "to": "ADM-649",
+     "trigger": "Upsell & Upgrade Command Center",
+     "provenance": "moved to Venue Management 2 October 2026 (CHG-MOV-001); its workshop board's hub"
+    },
+    {
+     "to": "ADM-659",
+     "trigger": "Cross-Sell Command Center",
+     "provenance": "moved to Venue Management 2 October 2026 (CHG-MOV-001); its workshop board's hub"
+    },
+    {
+     "to": "ADM-669",
+     "trigger": "Journey & Context Command Center",
+     "provenance": "moved to Venue Management 2 October 2026 (CHG-MOV-001); its workshop board's hub"
+    },
+    {
+     "to": "ADM-679",
+     "trigger": "Personalization & NBO Command Center",
+     "provenance": "moved to Venue Management 2 October 2026 (CHG-MOV-001); its workshop board's hub"
+    },
+    {
+     "to": "ADM-689",
+     "trigger": "Recommendation Performance Command Center",
+     "provenance": "moved to Venue Management 2 October 2026 (CHG-MOV-001); its workshop board's hub"
+    },
+    {
+     "to": "ADM-069",
+     "trigger": "Tax Profile & Jurisdiction Configuration",
+     "provenance": "moved to Venue Management 2 October 2026 (CHG-MOV-001); its board's hub stays on the console"
+    },
+    {
+     "to": "ADM-070",
+     "trigger": "Tax Rule & Treatment Builder",
+     "provenance": "moved to Venue Management 2 October 2026 (CHG-MOV-001); its board's hub stays on the console"
+    },
+    {
+     "to": "ADM-071",
+     "trigger": "Fee & Surcharge Library",
+     "provenance": "moved to Venue Management 2 October 2026 (CHG-MOV-001); its board's hub stays on the console"
+    },
+    {
+     "to": "ADM-072",
+     "trigger": "Fee Applicability & Charging Rule Builder",
+     "provenance": "moved to Venue Management 2 October 2026 (CHG-MOV-001); its board's hub stays on the console"
+    },
+    {
+     "to": "ADM-073",
+     "trigger": "Fee Waiver, Tax Exemption & Exception Rules",
+     "provenance": "moved to Venue Management 2 October 2026 (CHG-MOV-001); its board's hub stays on the console"
+    },
+    {
+     "to": "ADM-074",
+     "trigger": "Price Calculation Sequence & Formula Engine",
+     "provenance": "moved to Venue Management 2 October 2026 (CHG-MOV-001); its board's hub stays on the console"
+    },
+    {
+     "to": "ADM-075",
+     "trigger": "Currency Precision, Rounding & Monetary Rules",
+     "provenance": "moved to Venue Management 2 October 2026 (CHG-MOV-001); its board's hub stays on the console"
+    },
+    {
+     "to": "ADM-076",
+     "trigger": "Price Breakdown, Calculation Simulation & Explainability",
+     "provenance": "moved to Venue Management 2 October 2026 (CHG-MOV-001); its board's hub stays on the console"
+    },
+    {
+     "to": "ADM-077",
+     "trigger": "Calculation Validation, Reconciliation & Service Interface",
+     "provenance": "moved to Venue Management 2 October 2026 (CHG-MOV-001); its board's hub stays on the console"
+    },
+    {
+     "to": "ADM-620",
+     "trigger": "Reconciliation Source & Import Manager",
+     "provenance": "moved to Venue Management 2 October 2026 (CHG-MOV-001); its board's hub stays on the console"
+    },
+    {
+     "to": "ADM-621",
+     "trigger": "Transaction Matching & Reconciliation Engine",
+     "provenance": "moved to Venue Management 2 October 2026 (CHG-MOV-001); its board's hub stays on the console"
+    },
+    {
+     "to": "ADM-622",
+     "trigger": "Reconciliation Exception & Investigation Center",
+     "provenance": "moved to Venue Management 2 October 2026 (CHG-MOV-001); its board's hub stays on the console"
+    },
+    {
+     "to": "ADM-623",
+     "trigger": "Settlement & Payout Manager",
+     "provenance": "moved to Venue Management 2 October 2026 (CHG-MOV-001); its board's hub stays on the console"
+    },
+    {
+     "to": "ADM-624",
+     "trigger": "Fees, Commission, FX & Settlement Economics",
+     "provenance": "moved to Venue Management 2 October 2026 (CHG-MOV-001); its board's hub stays on the console"
+    },
+    {
+     "to": "ADM-625",
+     "trigger": "Merchant Account & Settlement Calendar Manager",
+     "provenance": "moved to Venue Management 2 October 2026 (CHG-MOV-001); its board's hub stays on the console"
+    },
+    {
+     "to": "ADM-626",
+     "trigger": "Settlement Posting, Finance Handoff & Close Manager",
+     "provenance": "moved to Venue Management 2 October 2026 (CHG-MOV-001); its board's hub stays on the console"
+    },
+    {
+     "to": "ADM-627",
+     "trigger": "Reconciliation Audit, Trace & Evidence Center",
+     "provenance": "moved to Venue Management 2 October 2026 (CHG-MOV-001); its board's hub stays on the console"
+    },
+    {
+     "to": "ADM-628",
+     "trigger": "Reconciliation Simulator, Forecast & AI Operations Advisor",
+     "provenance": "moved to Venue Management 2 October 2026 (CHG-MOV-001); its board's hub stays on the console"
+    },
+    {
+     "to": "ADM-038",
+     "trigger": "Communication Service Command Center",
+     "provenance": "moved to Venue Management 2 October 2026 (CHG-CLN-003); its workshop board's hub"
+    },
+    {
+     "to": "ADM-319",
+     "trigger": "Approval Workflow Library",
+     "provenance": "moved to Venue Management 2 October 2026 (CHG-CLN-003); its workshop board's hub"
+    },
+    {
+     "to": "ADM-329",
+     "trigger": "Approval Matrix Command Center",
+     "provenance": "moved to Venue Management 2 October 2026 (CHG-CLN-003); its workshop board's hub"
+    },
+    {
+     "to": "ADM-339",
+     "trigger": "Governance & Compliance Command Center",
+     "provenance": "moved to Venue Management 2 October 2026 (CHG-CLN-003); its workshop board's hub"
+    },
+    {
+     "to": "ADM-349",
+     "trigger": "Approval Integration Command Center",
+     "provenance": "moved to Venue Management 2 October 2026 (CHG-CLN-003); its workshop board's hub"
+    },
+    {
+     "to": "ADM-359",
+     "trigger": "Approval Executive KPI Dashboard",
+     "provenance": "moved to Venue Management 2 October 2026 (CHG-CLN-003); its workshop board's hub"
+    },
+    {
+     "to": "PTR-026",
+     "trigger": "Territory, Market & Distribution Rights",
+     "provenance": "moved to Venue Management 2 October 2026 (CHG-CLN-004); its board's hub PTR-022 stays on the partner portal"
+    },
+    {
+     "to": "PTR-029",
+     "trigger": "Partner Access, Roles & Permission Profile",
+     "provenance": "moved to Venue Management 2 October 2026 (CHG-CLN-004); its board's hub PTR-022 stays on the partner portal"
+    },
+    {
+     "to": "PTR-035",
+     "trigger": "Commission, Margin & Incentive Management",
+     "provenance": "moved to Venue Management 2 October 2026 (CHG-CLN-004); its board's hub PTR-032 stays on the partner portal"
+    },
+    {
+     "to": "PTR-036",
+     "trigger": "Credit Limit & Exposure Management",
+     "provenance": "moved to Venue Management 2 October 2026 (CHG-CLN-004); its board's hub PTR-032 stays on the partner portal"
+    },
+    {
+     "to": "PTR-037",
+     "trigger": "Deposit, Guarantee & Financial Security Management",
+     "provenance": "moved to Venue Management 2 October 2026 (CHG-CLN-004); its board's hub PTR-032 stays on the partner portal"
+    },
+    {
+     "to": "PTR-039",
+     "trigger": "Commercial Allocation, Quota & Commitment Management",
+     "provenance": "moved to Venue Management 2 October 2026 (CHG-CLN-004); its board's hub PTR-032 stays on the partner portal"
+    },
+    {
+     "to": "PTR-047",
+     "trigger": "Partner Reconciliation & Exception Management",
+     "provenance": "moved to Venue Management 2 October 2026 (CHG-CLN-004); its board's hub PTR-042 stays on the partner portal"
+    },
+    {
+     "to": "PTR-048",
+     "trigger": "Commission Calculation & Settlement Management",
+     "provenance": "moved to Venue Management 2 October 2026 (CHG-CLN-004); its board's hub PTR-042 stays on the partner portal"
     }
    ]
   },
-  "notes": "**Built 20 August because P08 had none.** `BO-001 Queue Directory` was the declared entry point to a 99-screen back office — it exits to four queue screens, and **93 screens hung off nothing.** A back office entered through a queue list. **The module was also one bucket holding 72 of 99 screens**, so there was nothing for a home screen to point at; sections were derived from the contract each screen principally calls.",
+  "notes": "**Built 20 August because P08 had none.** `BO-001 Queue Directory` was the declared entry point to a 99-screen back office — it exits to four queue screens, and **93 screens hung off nothing.** A back office entered through a queue list. **The module was also one bucket holding 72 of 99 screens**, so there was nothing for a home screen to point at; sections were derived from the contract each screen principally calls.\n\n**Takings, defined** (decided 2 October 2026, Chinmay; CHG-FIN-010; resolves the contradiction \"gross value of payments\" against \"payments less refunds\"). Takings is the money taken through the tills and channels less the money paid back, by tender, VAT included: a cash-control figure, not revenue. It is what a drawer and a settlement are reconciled against, and for a till shift it is the hidden half of the blind count: float plus cash takings is the expected cash, which the cashier never sees (CHG-FIN-003; MoM 9 Sep 2026 4.18). On this hub the tile reads \"Takings today\" from the seeded `takings` KPI and is never labelled revenue.",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listShifts` reads the population and `getVenueSettings` reads one of them — list, select, act",
@@ -4579,7 +4685,7 @@
         "KpiValue.direction"
        ],
        "operation": "getKpiValues",
-       "notes": "**Takings and admissions**, from `getKpiValues?kpiCodes=takings,admissions`; with no `period` the period is today in the venue's time zone (decided 28 September, audit R283).",
+       "notes": "`getKpiValues?kpiCodes=takings,admissions`. Takings: money taken less money paid back, VAT included, a cash-control figure and not revenue (CHG-FIN-010).",
        "provenance": "contract reporting.yaml GET /kpi-values"
       },
       {
@@ -4774,7 +4880,7 @@
     {
      "to": "BO-036",
      "trigger": "Device Registry",
-     "provenance": "derived — BO-036 declares entryState.params deviceId, profileId, workstationId and BO-108 holds none of them. The edge carries nothing: workstationId, deviceId, profileId only pre-select (deep link or optional), and BO-036 opens on its own"
+     "provenance": "derived — BO-036 declares entryState.params deviceId, workstationId and BO-108 holds none of them. The edge carries nothing: workstationId, deviceId only pre-select (deep link or optional), and BO-036 opens on its own"
     },
     {
      "to": "BO-044",
@@ -5023,24 +5129,6 @@
        ],
        "operation": "listWorkOrders",
        "provenance": "contract maintenance.yaml GET /work-orders"
-      },
-      {
-       "kind": "detailPanel",
-       "label": "The venue settings",
-       "bindsTo": "VenueSettings",
-       "columns": [
-        "VenueSettings.id",
-        "VenueSettings.venueId",
-        "VenueSettings.currencyCode",
-        "VenueSettings.currencyScale",
-        "VenueSettings.supportHours",
-        "VenueSettings.quietHours",
-        "VenueSettings.biometrics",
-        "VenueSettings.segregatedAccess",
-        "VenueSettings.alerting"
-       ],
-       "operation": "getVenueSettings",
-       "provenance": "contract tenancy.yaml GET /venues/{venueId}/settings"
       }
      ]
     }
@@ -5058,12 +5146,6 @@
     "operationId": "getKpiValues",
     "contract": "reporting",
     "purpose": "Today's takings and admissions tiles — `kpiCodes=takings,admissions`, period defaulting to today (decided 28 September, audit R283)",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "getVenueSettings",
-    "contract": "tenancy",
-    "purpose": "What is enabled here",
     "trigger": "onLoad"
    },
    {
@@ -5107,6 +5189,14 @@
    "board": "wireframes/P08 Venue Management.dc.html#bo-108"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "gaps": [
+   {
+    "operation": "getVenueSettings",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): A hub shows state and links; the venue settings panel does not belong on it and getVenueSettings carries no module enablement (R279) (design-notes correction venue-operations BO-108).",
+    "source": "contracts/spine/tenancy.yaml#getVenueSettings | R279 | R254"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -5165,7 +5255,6 @@
      "to": "BO-129",
      "trigger": "Software, Configuration & Version Management",
      "provenance": "flow F89 step 2→3",
-     "operation": "setOfflinePolicy",
      "carries": [
       "workstationId"
      ]
@@ -5192,12 +5281,18 @@
   ],
   "pattern": "listDetail",
   "patternReason": "`listWorkstations` reads the population and `getWorkstationHealth` reads one of them — list, select, act",
-  "purpose": "Live Workstation Health Monitor — from the client design board, 20 August.",
+  "purpose": "Watch every workstation's health live and open the worst first.",
   "gaps": [
    {
     "operation": "getWorkstationHealth",
     "why": "**`getWorkstationHealth` declares its response inline**, so the component that shows it names fields but binds to no schema. The contract should name the shape.",
     "source": "contract tenancy.yaml GET /workstations/{workstationId}/health"
+   },
+   {
+    "operation": "setOfflinePolicy",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-021): Save offline policy (setOfflinePolicy) on a live monitor; offline policy is configuration, set on BO-130 and BO-206, and the monitor links there (design-notes correction platform-foundation BO-128).",
+    "source": "screens/P08-venue-back-office.yaml#BO-130 | contracts/spine/tenancy.yaml#setOfflinePolicy"
    }
   ],
   "layout": {
@@ -5226,15 +5321,9 @@
        "label": "Every workstation",
        "bindsTo": "Workstation",
        "columns": [
-        "Workstation.id",
         "Workstation.code",
         "Workstation.name",
-        "Workstation.venueId",
-        "Workstation.regionId",
-        "Workstation.departmentId",
-        "Workstation.scopePath",
         "Workstation.saleBoard",
-        "Workstation.accessPointId",
         "Workstation.devices",
         "Workstation.currency",
         "Workstation.currencyScale"
@@ -5252,14 +5341,7 @@
     {
      "name": "actionBar",
      "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Save offline policy",
-       "operation": "setOfflinePolicy",
-       "provenance": "contract tenancy.yaml PUT /offline-policy"
-      }
-     ]
+     "components": []
     },
     {
      "name": "contextPanel",
@@ -5295,15 +5377,6 @@
     "contract": "tenancy",
     "purpose": "List workstations",
     "trigger": "onLoad"
-   },
-   {
-    "operationId": "setOfflinePolicy",
-    "contract": "tenancy",
-    "purpose": "setOfflinePolicy",
-    "trigger": "onAction",
-    "invalidates": [
-     "listWorkstations"
-    ]
    }
   ],
   "entryState": {
@@ -5328,33 +5401,7 @@
    "note": "**Drawn by Claude Design on `POS Board 5.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
-  "overlays": [
-   {
-    "id": "formSetOfflinePolicy",
-    "component": "modal",
-    "trigger": "Save offline policy",
-    "body": "**Collects what `setOfflinePolicy` sends before it is called.** Required: `scopePath`. Optional: `id`, `maxOfflineHours`, `allowedOffline`, `offlineValueCeiling`, `offlineTransactionCeiling`, `onCeilingBreach`, `requiresManagerToExtend`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "OfflinePolicy",
-    "confirm": {
-     "label": "Save offline policy",
-     "operation": "setOfflinePolicy"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "scopePath",
-      "id",
-      "maxOfflineHours",
-      "allowedOffline",
-      "offlineValueCeiling",
-      "offlineTransactionCeiling",
-      "onCeilingBreach",
-      "requiresManagerToExtend"
-     ]
-    },
-    "provenance": "contract tenancy.yaml PUT /offline-policy"
-   }
-  ],
+  "purposeNote": "Purpose rewritten 2 October 2026 (CHG-WIR-023): The purpose was the pasted board placeholder \"Live Workstation Health Monitor — from the client design board, 20 August\".",
   "_platform": {
    "code": "P08",
    "audience": "staff",

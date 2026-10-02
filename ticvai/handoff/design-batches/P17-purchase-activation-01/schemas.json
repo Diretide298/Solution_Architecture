@@ -1,69 +1,650 @@
 {
- "LegalEntity": {
-  "x-ticvai-persistence": "ledger.legal_entity",
+ "AgreementContractTermsBuilderInput": {
   "type": "object",
-  "description": "Also the `createLegalEntity` body. **`id` and `scopePath` are server-owned** (`readOnly`) and ignored if sent.\n",
-  "required": [
-   "id",
-   "code",
-   "name",
-   "countryCode",
-   "currency",
-   "currencyScale",
-   "fiscalYearStartMonth"
-  ],
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; stored as control.partner_agreement (PartnerAgreement), a new version per amendment; documents are control.partner_document rows with agreementId; legalEntity, commercialOwner and financeOwner land in legalEntityId, commercialOwnerPrincipalId and financeOwnerPrincipalId (data model DM4)",
+  "description": "**What Agreement & Contract Terms Builder submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "agreementId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "Agreement ID; omit to create"
+   },
+   "agreementName": {
+    "type": "string",
+    "description": "Agreement Name"
+   },
+   "partnerId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "Partner"
+   },
+   "agreementType": {
+    "type": "string",
+    "description": "Agreement Type code, seeded with reseller, ota, travelTrade, corporate, wholesale, affiliate, distribution, apiCommercial (pack p.26)"
+   },
+   "contractReference": {
+    "type": "string",
+    "description": "Contract Reference"
+   },
+   "legalEntity": {
+    "type": "string",
+    "description": "Legal Entity"
+   },
+   "brandId": {
+    "type": "string",
+    "description": "Brand id",
+    "nullable": true
+   },
+   "allowedVenueIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    },
+    "description": "Venues the agreement covers"
+   },
+   "territory": {
+    "type": "string",
+    "description": "Territory"
+   },
+   "settlementCurrency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$",
+    "description": "Settlement currency, ISO 4217"
+   },
+   "validFrom": {
+    "type": "string",
+    "format": "date",
+    "description": "Effective From"
+   },
+   "validTo": {
+    "type": "string",
+    "format": "date",
+    "description": "Effective To; empty for open-ended",
+    "nullable": true
+   },
+   "renewalType": {
+    "type": "string",
+    "enum": [
+     "manual",
+     "auto"
+    ],
+    "description": "Renewal Type"
+   },
+   "commercialOwner": {
+    "type": "string",
+    "description": "Commercial Owner: staff principal id"
+   },
+   "financeOwner": {
+    "type": "string",
+    "description": "Finance Owner: staff principal id"
+   },
+   "creditTermDays": {
+    "type": "integer",
+    "description": "Payment Terms in days (0 = due immediately; Net 7/15/30/45 or custom)"
+   },
+   "commissionTerms": {
+    "type": "string",
+    "description": "Commission Terms: summary or reference to the commission rules (listCommissionMarginIncentive)",
+    "nullable": true
+   },
+   "pricingBasis": {
+    "type": "string",
+    "enum": [
+     "retailPrice",
+     "netRate",
+     "discountFromRetail",
+     "markup",
+     "derivedRate"
+    ],
+    "description": "Pricing Basis (pack p.27 pricing models)"
+   },
+   "creditTerms": {
+    "type": "string",
+    "description": "Credit Terms",
+    "nullable": true
+   },
+   "allocationTerms": {
+    "type": "string",
+    "description": "Allocation Terms",
+    "nullable": true
+   },
+   "cancellationConditions": {
+    "type": "string",
+    "description": "Cancellation Conditions",
+    "nullable": true
+   },
+   "bookingRestrictions": {
+    "type": "string",
+    "description": "Booking Restrictions",
+    "nullable": true
+   },
+   "settlementTerms": {
+    "type": "string",
+    "description": "Settlement Terms",
+    "nullable": true
+   },
+   "minimumCommitment": {
+    "type": "integer",
+    "description": "Minimum Commitment: tickets over the agreement term",
+    "nullable": true
+   },
+   "salesTarget": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Sales Target over the agreement term"
+   },
+   "renewalNoticeDays": {
+    "type": "integer",
+    "description": "Renewal Notice Period in days",
+    "nullable": true
+   },
+   "renegotiationRequired": {
+    "type": "boolean",
+    "description": "Renegotiation Required"
+   },
+   "renewalRequiresApproval": {
+    "type": "boolean",
+    "description": "Renewal Approval: renewal needs approval"
+   },
+   "rateMode": {
+    "$ref": "#/components/schemas/PartnerRateMode",
+    "description": "Net rate or commission, as on PartnerAgreement"
+   },
+   "paymentModel": {
+    "type": "string",
+    "enum": [
+     "creditAccount",
+     "prepaid",
+     "payPerTransaction"
+    ],
+    "description": "Payment model, the three confirmed at MoM 5 Aug and MoM 31 Aug 4.4: creditAccount (sells to an approved credit ceiling, invoiced periodically), prepaid (pre-funded wallet drawn down per sale) or payPerTransaction (card at each sale)"
+   },
+   "refundConditions": {
+    "type": "string",
+    "description": "Refund Conditions (pack p.26)",
+    "nullable": true
+   },
+   "agreementValue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Agreement value (MoM 31 Aug 4.4: each agreement captures term/value)"
+   },
+   "documents": {
+    "type": "array",
+    "description": "Document Association",
+    "items": {
+     "type": "object",
+     "properties": {
+      "documentType": {
+       "type": "string",
+       "enum": [
+        "signedContract",
+        "addendum",
+        "rateSheet",
+        "sla",
+        "nda",
+        "commercialAnnex"
+       ]
+      },
+      "documentId": {
+       "type": "string",
+       "format": "uuid"
+      }
+     }
+    }
+   }
+  }
+ },
+ "AgreementContractTermsBuilderView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over control.partner_agreement and control.partner_document and the existing subscription state, assembled at read time (data model DM4)",
+  "description": "**What Agreement & Contract Terms Builder displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "agreementId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "Agreement ID; omit to create"
+   },
+   "agreementName": {
+    "type": "string",
+    "description": "Agreement Name"
+   },
+   "partnerId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "Partner"
+   },
+   "agreementType": {
+    "type": "string",
+    "description": "Agreement Type code, seeded with reseller, ota, travelTrade, corporate, wholesale, affiliate, distribution, apiCommercial (pack p.26)"
+   },
+   "contractReference": {
+    "type": "string",
+    "description": "Contract Reference"
+   },
+   "legalEntity": {
+    "type": "string",
+    "description": "Legal Entity"
+   },
+   "brandId": {
+    "type": "string",
+    "description": "Brand id",
+    "nullable": true
+   },
+   "allowedVenueIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    },
+    "description": "Venues the agreement covers"
+   },
+   "territory": {
+    "type": "string",
+    "description": "Territory"
+   },
+   "settlementCurrency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$",
+    "description": "Settlement currency, ISO 4217"
+   },
+   "validFrom": {
+    "type": "string",
+    "format": "date",
+    "description": "Effective From"
+   },
+   "validTo": {
+    "type": "string",
+    "format": "date",
+    "description": "Effective To; empty for open-ended",
+    "nullable": true
+   },
+   "renewalType": {
+    "type": "string",
+    "enum": [
+     "manual",
+     "auto"
+    ],
+    "description": "Renewal Type"
+   },
+   "commercialOwner": {
+    "type": "string",
+    "description": "Commercial Owner: staff principal id"
+   },
+   "financeOwner": {
+    "type": "string",
+    "description": "Finance Owner: staff principal id"
+   },
+   "creditTermDays": {
+    "type": "integer",
+    "description": "Payment Terms in days (0 = due immediately; Net 7/15/30/45 or custom)"
+   },
+   "commissionTerms": {
+    "type": "string",
+    "description": "Commission Terms: summary or reference to the commission rules (listCommissionMarginIncentive)",
+    "nullable": true
+   },
+   "pricingBasis": {
+    "type": "string",
+    "enum": [
+     "retailPrice",
+     "netRate",
+     "discountFromRetail",
+     "markup",
+     "derivedRate"
+    ],
+    "description": "Pricing Basis (pack p.27 pricing models)"
+   },
+   "creditTerms": {
+    "type": "string",
+    "description": "Credit Terms",
+    "nullable": true
+   },
+   "allocationTerms": {
+    "type": "string",
+    "description": "Allocation Terms",
+    "nullable": true
+   },
+   "cancellationConditions": {
+    "type": "string",
+    "description": "Cancellation Conditions",
+    "nullable": true
+   },
+   "bookingRestrictions": {
+    "type": "string",
+    "description": "Booking Restrictions",
+    "nullable": true
+   },
+   "settlementTerms": {
+    "type": "string",
+    "description": "Settlement Terms",
+    "nullable": true
+   },
+   "minimumCommitment": {
+    "type": "integer",
+    "description": "Minimum Commitment: tickets over the agreement term",
+    "nullable": true
+   },
+   "salesTarget": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Sales Target over the agreement term"
+   },
+   "renewalNoticeDays": {
+    "type": "integer",
+    "description": "Renewal Notice Period in days",
+    "nullable": true
+   },
+   "renegotiationRequired": {
+    "type": "boolean",
+    "description": "Renegotiation Required"
+   },
+   "renewalRequiresApproval": {
+    "type": "boolean",
+    "description": "Renewal Approval: renewal needs approval"
+   },
+   "rateMode": {
+    "$ref": "#/components/schemas/PartnerRateMode",
+    "description": "Net rate or commission, as on PartnerAgreement"
+   },
+   "paymentModel": {
+    "type": "string",
+    "enum": [
+     "creditAccount",
+     "prepaid",
+     "payPerTransaction"
+    ],
+    "description": "Payment model, the three confirmed at MoM 5 Aug and MoM 31 Aug 4.4: creditAccount (sells to an approved credit ceiling, invoiced periodically), prepaid (pre-funded wallet drawn down per sale) or payPerTransaction (card at each sale)"
+   },
+   "refundConditions": {
+    "type": "string",
+    "description": "Refund Conditions (pack p.26)",
+    "nullable": true
+   },
+   "agreementValue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Agreement value (MoM 31 Aug 4.4: each agreement captures term/value)"
+   },
+   "documents": {
+    "type": "array",
+    "description": "Document Association",
+    "items": {
+     "type": "object",
+     "properties": {
+      "documentType": {
+       "type": "string",
+       "enum": [
+        "signedContract",
+        "addendum",
+        "rateSheet",
+        "sla",
+        "nda",
+        "commercialAnnex"
+       ]
+      },
+      "documentId": {
+       "type": "string",
+       "format": "uuid"
+      }
+     }
+    }
+   },
+   "version": {
+    "type": "integer",
+    "description": "Agreement version; amendments create a new one"
+   },
+   "status": {
+    "$ref": "#/components/schemas/PartnerAgreementStatus",
+    "description": "Agreement status"
+   }
+  }
+ },
+ "BillingEntity": {
+  "type": "object",
+  "x-ticvai-persistence": "control.billing_entity",
+  "description": "**The company TICVAI invoices for a tenant, with its trade licence and VAT certificate** (Chinmay, 2 October, workbook Q209: \"a new billing-entity record in the subscription contract\"; DI-830; CHG-CSA-030). One per tenant, mastered in the control plane. `legalName` and `countryCode` are required on save (400 otherwise); they are not marked required here so the record can ride, optional, on an onboarding application. **Documents** (workbook Q210, the default): a trade licence always; a VAT certificate when a `trn` is entered. Which documents a country requires is configurable per country (tenancy `RegionSettings`); the default is that rule.",
   "properties": {
    "id": {
     "type": "string",
     "format": "uuid",
     "readOnly": true
    },
-   "code": {
+   "tenantId": {
     "type": "string",
-    "maxLength": 64
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "Null while it rides on an onboarding application."
    },
-   "name": {
+   "legalName": {
     "type": "string",
-    "maxLength": 200
+    "maxLength": 300
+   },
+   "tradeLicenceNumber": {
+    "type": "string",
+    "maxLength": 100,
+    "nullable": true
+   },
+   "trn": {
+    "type": "string",
+    "maxLength": 30,
+    "nullable": true,
+    "description": "The tax registration number; entering one makes the VAT certificate required."
    },
    "countryCode": {
     "type": "string",
-    "pattern": "^[A-Z]{2}$"
+    "minLength": 2,
+    "maxLength": 2
    },
-   "currency": {
+   "address": {
     "type": "string",
-    "pattern": "^[A-Z]{3}$"
+    "maxLength": 1000,
+    "nullable": true
    },
-   "currencyScale": {
-    "type": "integer",
-    "minimum": 0,
-    "maximum": 4
+   "invoiceEmail": {
+    "type": "string",
+    "format": "email",
+    "nullable": true
    },
-   "taxRegistrationNumber": {
+   "documents": {
+    "x-ticvai-persistence-kind": "valueObject",
+    "x-ticvai-persistence-column": "jsonb",
+    "type": "array",
+    "description": "The trade licence and, where a TRN is entered, the VAT certificate, each a stored file with its verification.",
+    "items": {
+     "type": "object",
+     "properties": {
+      "documentType": {
+       "type": "string",
+       "enum": [
+        "tradeLicence",
+        "vatCertificate"
+       ]
+      },
+      "fileRef": {
+       "type": "string",
+       "nullable": true
+      },
+      "expiryDate": {
+       "type": "string",
+       "format": "date",
+       "nullable": true
+      },
+      "verificationStatus": {
+       "type": "string",
+       "enum": [
+        "missing",
+        "uploaded",
+        "verified",
+        "rejected",
+        "expired"
+       ]
+      }
+     }
+    }
+   },
+   "missingDocuments": {
+    "type": "array",
+    "readOnly": true,
+    "description": "The documents the country's rule requires that are not yet uploaded and verified.",
+    "items": {
+     "type": "string"
+    }
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
+ "CellTier": {
+  "type": "string",
+  "enum": [
+   "shared",
+   "dedicated",
+   "isolated",
+   "clientHosted"
+  ]
+ },
+ "DowngradeConflictProblem": {
+  "x-ticvai-persistence": "none — error shape",
+  "allOf": [
+   {
+    "$ref": "../shared/common.yaml#/components/schemas/Problem"
+   },
+   {
+    "type": "object",
+    "properties": {
+     "modulesInUse": {
+      "type": "array",
+      "description": "Enabled by the tenant but not licensed by the target plan.",
+      "items": {
+       "type": "object",
+       "properties": {
+        "moduleKey": {
+         "type": "string"
+        },
+        "displayName": {
+         "type": "string"
+        },
+        "isEnabled": {
+         "type": "boolean"
+        }
+       }
+      }
+     },
+     "limitsExceeded": {
+      "type": "array",
+      "items": {
+       "type": "object",
+       "properties": {
+        "metric": {
+         "$ref": "#/components/schemas/UsageMetric"
+        },
+        "currentUsage": {
+         "type": "integer"
+        },
+        "targetLimit": {
+         "type": "integer"
+        }
+       }
+      }
+     }
+    }
+   }
+  ]
+ },
+ "OnboardingApplication": {
+  "type": "object",
+  "x-ticvai-persistence": "control.onboarding_application",
+  "description": "BL-165. **`subscription` handles the operator-led path well and has no prospect-led one.** `createTenant` and `provisionCell` assume somebody at Softlabs decided this tenant exists.\nA prospect signing themselves up is a different shape: **nothing is provisioned until they are verified**, because an unverified application that provisions a cell is a cell somebody has to clean up.\n",
+  "required": [
+   "id",
+   "companyName",
+   "contactEmail",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "companyName": {
+    "type": "string"
+   },
+   "contactEmail": {
+    "type": "string",
+    "format": "email"
+   },
+   "contactPhone": {
     "type": "string",
     "nullable": true
    },
-   "fiscalYearStartMonth": {
-    "type": "integer",
-    "minimum": 1,
-    "maximum": 12
+   "countryCode": {
+    "type": "string"
    },
-   "regionIds": {
-    "type": "array",
-    "items": {
-     "type": "string",
-     "format": "uuid"
-    }
-   },
-   "isActive": {
-    "type": "boolean"
-   },
-   "scopePath": {
+   "venueTypeTemplateId": {
     "type": "string",
-    "readOnly": true,
-    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `tenant` scope.**"
+    "format": "uuid",
+    "nullable": true,
+    "description": "**A water park and a theatre need different defaults**, and asking a prospect to configure 300 settings from empty is asking them to leave.\n"
+   },
+   "requestedPlanId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "submitted",
+     "verifying",
+     "approved",
+     "provisioning",
+     "active",
+     "rejected",
+     "abandoned"
+    ]
+   },
+   "trialEndsAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "**Trial is a state, not a plan.** A tenant on trial has the plan they will pay for and a date by which they must — modelling it as a separate plan means migrating them at conversion, which is the moment least worth adding risk to.\n"
+   },
+   "rejectionReason": {
+    "type": "string",
+    "nullable": true
+   },
+   "provisionedTenantId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "billingEntity": {
+    "$ref": "#/components/schemas/BillingEntity",
+    "description": "**The company to be invoiced, saved on the application before verification** (Chinmay, 2 October, workbook Q209 and Q223; CHG-CSA-030). Nothing is provisioned until the application is verified; on provisioning it becomes the tenant's billing entity (`getBillingEntity`)."
    }
   }
+ },
+ "PartnerAgreementStatus": {
+  "type": "string",
+  "enum": [
+   "pendingApproval",
+   "active",
+   "expiringSoon",
+   "expired",
+   "suspended",
+   "terminated"
+  ]
+ },
+ "PartnerRateMode": {
+  "type": "string",
+  "description": "**Alternatives, not both.** A partner buys at a net rate and keeps the margin, or sells at face value and is paid commission. Both is being paid twice for the same sale.\n",
+  "enum": [
+   "netRate",
+   "commission"
+  ]
  },
  "PaymentProvider": {
   "type": "object",
@@ -277,5 +858,162 @@
     }
    }
   ]
+ },
+ "SetSubscriptionRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "planId"
+  ],
+  "properties": {
+   "planId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "planVersion": {
+    "type": "string",
+    "description": "Defaults to the current version."
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "format": "date",
+    "description": "Optional, and set by the server if omitted. Today for an upgrade, `renewsAt` for a downgrade; any other date is refused (audit R214 (1))."
+   },
+   "prorate": {
+    "type": "boolean",
+    "default": true,
+    "description": "An upgrade is always prorated and a downgrade, which starts at renewal, never is (audit R214 (1)). Kept so a preview can show the unprorated figure; `setSubscription` applies the rule whatever is sent."
+   },
+   "note": {
+    "type": "string",
+    "maxLength": 500
+   }
+  }
+ },
+ "Subscription": {
+  "x-ticvai-persistence": "subscription.contract",
+  "type": "object",
+  "required": [
+   "tenantId",
+   "planId",
+   "planVersion",
+   "status",
+   "startsAt"
+  ],
+  "properties": {
+   "tenantId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "planId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "planName": {
+    "type": "string"
+   },
+   "planVersion": {
+    "type": "string"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "trial",
+     "active",
+     "pastDue",
+     "cancelled",
+     "expired"
+    ]
+   },
+   "startsAt": {
+    "type": "string",
+    "format": "date"
+   },
+   "renewsAt": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "cancelledAt": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "scheduledChange": {
+    "type": "object",
+    "nullable": true,
+    "readOnly": true,
+    "description": "A downgrade waiting for the next renewal (decided 28 September, audit R214 (1)). Null when none is scheduled.",
+    "properties": {
+     "planId": {
+      "type": "string",
+      "format": "uuid"
+     },
+     "planVersion": {
+      "type": "string"
+     },
+     "effectiveFrom": {
+      "type": "string",
+      "format": "date",
+      "description": "Always the `renewsAt` it was scheduled against."
+     }
+    }
+   },
+   "currentPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "billingPeriod": {
+    "type": "string"
+   }
+  }
+ },
+ "SubscriptionPreview": {
+  "x-ticvai-persistence": "none — computed",
+  "type": "object",
+  "required": [
+   "canApply",
+   "priceChange"
+  ],
+  "properties": {
+   "canApply": {
+    "type": "boolean"
+   },
+   "priceChange": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "proratedAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "modulesGained": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "modulesLost": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "conflicts": {
+    "$ref": "#/components/schemas/DowngradeConflictProblem"
+   },
+   "cellTierChange": {
+    "type": "object",
+    "nullable": true,
+    "properties": {
+     "from": {
+      "$ref": "#/components/schemas/CellTier"
+     },
+     "to": {
+      "$ref": "#/components/schemas/CellTier"
+     },
+     "requiresMigration": {
+      "type": "boolean"
+     }
+    }
+   }
+  }
  }
 }

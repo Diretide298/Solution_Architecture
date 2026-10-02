@@ -262,6 +262,129 @@
    }
   }
  },
+ "Channel": {
+  "type": "string",
+  "enum": [
+   "pos",
+   "kiosk",
+   "web",
+   "mobile",
+   "b2b",
+   "ota",
+   "callCentre"
+  ]
+ },
+ "ChannelAllocation": {
+  "x-ticvai-persistence": "catalogue.channel_allocation",
+  "type": "object",
+  "required": [
+   "channel",
+   "allocatedUnits"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
+   },
+   "channel": {
+    "$ref": "#/components/schemas/Channel"
+   },
+   "allocatedUnits": {
+    "type": "integer",
+    "minimum": 0
+   },
+   "soldUnits": {
+    "type": "integer",
+    "readOnly": true
+   },
+   "leasedUnits": {
+    "type": "integer",
+    "readOnly": true,
+    "description": "Held by terminals on this channel but not yet sold."
+   },
+   "remainingUnits": {
+    "type": "integer",
+    "readOnly": true
+   },
+   "releaseAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "Unsold units return to the general pool at this time. How distribution holds are freed close to a performance without someone remembering to do it.\n"
+   },
+   "salesChannelId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The channel profile (`catalogue.sales_channel`) this allocation serves (29 September, data model DM3)."
+   },
+   "allocationType": {
+    "type": "string",
+    "enum": [
+     "sharedPool",
+     "dedicated",
+     "percentage",
+     "dynamic"
+    ],
+    "default": "dedicated",
+    "description": "How the allocation is sized (29 September, data model DM3); the allocation rule of ADM-262 lives on this row."
+   },
+   "minimumUnits": {
+    "type": "integer",
+    "nullable": true,
+    "minimum": 0
+   },
+   "maximumUnits": {
+    "type": "integer",
+    "nullable": true,
+    "minimum": 0
+   },
+   "replenishmentRule": {
+    "type": "object",
+    "additionalProperties": true,
+    "nullable": true,
+    "description": "`{sourceChannelId, trigger, thresholdUnits, sharePercent, units}`."
+   },
+   "waitlistBehavior": {
+    "type": "string",
+    "enum": [
+     "none",
+     "joinWaitlist",
+     "notifyOnRelease"
+    ],
+    "default": "none"
+   },
+   "releaseThresholdUnits": {
+    "type": "integer",
+    "nullable": true,
+    "minimum": 0
+   },
+   "releaseHoursBeforeEvent": {
+    "type": "integer",
+    "nullable": true,
+    "minimum": 0,
+    "description": "Alternative to `releaseAt`, relative to the performance start."
+   },
+   "contractualUnits": {
+    "type": "integer",
+    "nullable": true,
+    "minimum": 0,
+    "description": "Units a partner agreement guarantees; rebalancing never goes below it."
+   },
+   "minimumGuaranteedUnits": {
+    "type": "integer",
+    "nullable": true,
+    "minimum": 0
+   },
+   "isFrozen": {
+    "type": "boolean",
+    "default": false,
+    "description": "Excluded from rebalancing."
+   }
+  }
+ },
  "ChannelAllocationRebalancingOperationsView": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
@@ -336,6 +459,41 @@
      "type": "string"
     },
     "description": "AI allocation recommendations (pack p.27, e.g. transfer 500 units from OTA to B2C). Advisory only: nothing is changed until a user acts."
+   }
+  }
+ },
+ "ChannelAllocationSet": {
+  "x-ticvai-persistence": "none — projection",
+  "type": "object",
+  "required": [
+   "channelCapacityId",
+   "capacity",
+   "allocations",
+   "generalPoolUnits"
+  ],
+  "properties": {
+   "channelCapacityId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "capacity": {
+    "type": "integer"
+   },
+   "allocations": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/ChannelAllocation"
+    }
+   },
+   "generalPoolUnits": {
+    "type": "integer",
+    "description": "Unallocated remainder. Any channel may draw from it once its own allocation is exhausted.\n"
+   },
+   "totalSold": {
+    "type": "integer"
+   },
+   "totalRemaining": {
+    "type": "integer"
    }
   }
  },

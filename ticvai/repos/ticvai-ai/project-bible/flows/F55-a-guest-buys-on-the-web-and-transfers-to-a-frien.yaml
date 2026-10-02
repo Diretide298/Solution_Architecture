@@ -36,11 +36,9 @@ steps:
   screen: WEB-011
   action: Attendee details are captured.
   operations:
-  - getGuestProfile
+  - getMyProfile
   - listConsentPurposes
-  - recordConsent
-  outcome: '**Consent per attendee, not per purchase.** A guest buying for three friends cannot consent
-    on their behalf — CF-160 again, and this is where it bites.'
+  outcome: '**Consent per attendee, not per purchase.** A guest buying for three friends cannot consent on their behalf (CF-160 again, and this is where it bites). The marketing opt-ins ticked here travel with `checkoutCart` and are recorded by `recordCheckoutConsents`, the `order.created` consumer, never by the screen (CHG-CSA-025; CHG-CLN-005).'
 - step: 3
   screen: WEB-010
   action: They check out.
@@ -52,7 +50,7 @@ steps:
   action: They transfer three tickets.
   operations:
   - transferOrderTickets
-  - listOrders
+  - listMyOrders
   outcome: '**Transferred, not forwarded.** A PDF sent by WhatsApp is a ticket sold four times.'
   crossesDevice: true
 - step: 5

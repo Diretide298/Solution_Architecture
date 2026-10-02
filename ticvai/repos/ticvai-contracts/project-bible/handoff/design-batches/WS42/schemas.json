@@ -2573,5 +2573,76 @@
     "format": "date-time"
    }
   }
+ },
+ "RetentionRunResult": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.retention_run",
+  "description": "Board 2.8. **Completion evidence is the half that gets forgotten until an audit.**",
+  "properties": {
+   "runId": {
+    "type": "string",
+    "format": "uuid",
+    "x-ticvai-column": "id",
+    "description": "The run, stored as `marketing.retention_run`; `PrivacyAction.retentionRunId` points here. Preview runs are stored too, so an executed pass can be compared with what it previewed."
+   },
+   "policyId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "mode": {
+    "type": "string",
+    "enum": [
+     "preview",
+     "execute"
+    ]
+   },
+   "recordsAffected": {
+    "type": "integer"
+   },
+   "byAction": {
+    "type": "object",
+    "additionalProperties": {
+     "type": "integer"
+    }
+   },
+   "heldBack": {
+    "type": "integer"
+   },
+   "heldBackReasons": {
+    "type": "object",
+    "additionalProperties": {
+     "type": "integer"
+    }
+   },
+   "dependencies": {
+    "type": "array",
+    "x-ticvai-persisted": false,
+    "description": "Computed for the response; the executed run's detail is in the evidence asset.",
+    "items": {
+     "type": "object",
+     "properties": {
+      "surface": {
+       "type": "string"
+      },
+      "count": {
+       "type": "integer"
+      },
+      "consequence": {
+       "type": "string"
+      }
+     }
+    }
+   },
+   "evidenceAssetId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "completedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
  }
 }

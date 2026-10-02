@@ -565,6 +565,25 @@
   "requestBody": null,
   "responds": null
  },
+ "setChannelAllocations": {
+  "method": "PUT",
+  "path": "/channel-capacities/{channelCapacityId}/channel-allocations",
+  "contract": "catalogue",
+  "summary": "Allocate a channel capacity across sales channels",
+  "permission": "CAPACITY_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ChannelAllocationSet"
+ },
  "setChannelConnectionConfiguration": {
   "method": "PUT",
   "path": "/channel-connections",

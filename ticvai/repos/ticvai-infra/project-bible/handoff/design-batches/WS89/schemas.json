@@ -373,84 +373,6 @@
    }
   }
  },
- "CreateInventoryItemRequest": {
-  "x-ticvai-persistence": "none — request only",
-  "type": "object",
-  "required": [
-   "sku",
-   "name",
-   "venueId",
-   "baseUnit",
-   "costingMethod"
-  ],
-  "properties": {
-   "sku": {
-    "type": "string",
-    "maxLength": 64
-   },
-   "barcode": {
-    "type": "string",
-    "maxLength": 128
-   },
-   "name": {
-    "type": "string",
-    "maxLength": 200
-   },
-   "venueId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "categoryId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "baseUnit": {
-    "type": "string",
-    "description": "The unit stock is held in. Immutable once movements exist."
-   },
-   "purchaseUnit": {
-    "type": "string",
-    "description": "How the supplier sells it — a case of 24 against a base unit of one."
-   },
-   "purchaseUnitFactor": {
-    "type": "number",
-    "minimum": 0,
-    "default": 1
-   },
-   "costingMethod": {
-    "$ref": "#/components/schemas/CostingMethod"
-   },
-   "reorderPoint": {
-    "type": "number",
-    "minimum": 0
-   },
-   "reorderQuantity": {
-    "type": "number",
-    "minimum": 0
-   },
-   "parLevel": {
-    "type": "number",
-    "minimum": 0
-   },
-   "preferredSupplierId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "allowNegativeStock": {
-    "type": "boolean",
-    "default": false,
-    "description": "True permits issue beyond on-hand. Occasionally needed at a bar mid-service; dangerous everywhere else.\n"
-   },
-   "isPerishable": {
-    "type": "boolean",
-    "default": false
-   },
-   "shelfLifeDays": {
-    "type": "integer",
-    "nullable": true
-   }
-  }
- },
  "CreateStockMovementRequest": {
   "x-ticvai-persistence": "none — request only",
   "type": "object",
@@ -557,58 +479,6 @@
     "format": "date-time"
    }
   }
- },
- "InventoryItem": {
-  "x-ticvai-persistence": "inventory.item",
-  "allOf": [
-   {
-    "$ref": "#/components/schemas/CreateInventoryItemRequest"
-   },
-   {
-    "type": "object",
-    "required": [
-     "id",
-     "onHand",
-     "isActive"
-    ],
-    "properties": {
-     "id": {
-      "type": "string",
-      "format": "uuid"
-     },
-     "onHand": {
-      "type": "number",
-      "description": "Derived from movements. Not directly editable."
-     },
-     "onOrder": {
-      "type": "number"
-     },
-     "inTransit": {
-      "type": "number"
-     },
-     "available": {
-      "type": "number",
-      "description": "On-hand minus allocated, where allocated is stock reserved for orders (decided 28 September, audit R171)."
-     },
-     "averageCost": {
-      "$ref": "../shared/common.yaml#/components/schemas/Money"
-     },
-     "lastPurchasePrice": {
-      "$ref": "../shared/common.yaml#/components/schemas/Money"
-     },
-     "isBelowReorderPoint": {
-      "type": "boolean"
-     },
-     "hasMovements": {
-      "type": "boolean",
-      "description": "True locks costing method and base unit."
-     },
-     "isActive": {
-      "type": "boolean"
-     }
-    }
-   }
-  ]
  },
  "LocationKind": {
   "type": "string",
@@ -749,63 +619,15 @@
    }
   }
  },
- "RequisitionSuggestion": {
-  "x-ticvai-persistence": "none — computed",
+ "RentalBooking": {
   "type": "object",
-  "required": [
-   "itemId",
-   "onHand",
-   "reorderPoint",
-   "suggestedQuantity"
-  ],
-  "properties": {
-   "itemId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "itemName": {
-    "type": "string"
-   },
-   "sku": {
-    "type": "string"
-   },
-   "onHand": {
-    "type": "number"
-   },
-   "reorderPoint": {
-    "type": "number"
-   },
-   "parLevel": {
-    "type": "number"
-   },
-   "suggestedQuantity": {
-    "type": "number"
-   },
-   "averageDailyConsumption": {
-    "type": "number"
-   },
-   "daysOfCoverRemaining": {
-    "type": "number"
-   },
-   "preferredSupplierId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "leadTimeDays": {
-    "type": "integer",
-    "nullable": true
-   }
-  }
- },
- "SerialisedItem": {
-  "type": "object",
-  "x-ticvai-persistence": "inventory.serialised_item",
-  "description": "Retail Board 4 of the client's design set, 20 August. **`StockBatch` was added on 18 August with a lot number, and serialisation to the individual item is a step beyond it.**\nA lot answers *which delivery did this come from*. A serial answers *where is this exact one* — which is what a jewellery counter, a phone, a ticketed collectible or anything with a warranty needs.\n**Most stock is not serialised and should not be.** Turning it on for a 2 AED keyring creates a row per keyring, so it is a per-item decision rather than a policy.\n",
+  "x-ticvai-persistence": "rental.booking",
+  "description": "Board 5. **The booking outlives the order** — an order completes at payment and the rental is still out.\n",
   "required": [
    "id",
-   "itemId",
-   "serial",
+   "productId",
+   "from",
+   "to",
    "status"
   ],
   "properties": {
@@ -813,51 +635,154 @@
     "type": "string",
     "format": "uuid"
    },
-   "itemId": {
+   "reference": {
+    "type": "string"
+   },
+   "productId": {
     "type": "string",
     "format": "uuid"
-   },
-   "batchId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "The batch it arrived in, where the item is both lotted and serialised."
-   },
-   "serial": {
-    "type": "string",
-    "description": "**Unique within the item, not globally.** Two manufacturers reuse serial numbers and a global constraint would refuse the second one.\n"
    },
    "locationId": {
     "type": "string",
     "format": "uuid"
    },
+   "returnLocationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "customerId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "orderId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "from": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "to": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "quantity": {
+    "type": "integer"
+   },
    "status": {
     "type": "string",
     "enum": [
-     "inStock",
-     "reserved",
-     "sold",
-     "returned",
-     "damaged",
-     "lost",
-     "inTransit",
-     "warranty"
+     "draft",
+     "confirmed",
+     "awaitingArrival",
+     "checkedOut",
+     "overdue",
+     "partiallyReturned",
+     "completed",
+     "completedWithDamage",
+     "notReturned",
+     "cancelled",
+     "noShow"
     ]
    },
-   "soldOnOrderLineId": {
+   "checkedOutAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "dueBackAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "returnedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "depositAuthorisationId": {
     "type": "string",
     "format": "uuid",
     "nullable": true,
-    "description": "**The link that makes serialisation worth having.** A warranty claim, a recall and a proof of purchase all start with *which sale was this exact item*.\n"
+    "description": "The card deposit's terminal pre-authorisation, written by `checkOutRental` (workbook Q304; CHG-CSA-029). The hold is kept whole until every unit is back (workbook Q306)."
    },
-   "warrantyUntil": {
+   "accruedLateFee": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "readiness": {
+    "type": "array",
+    "readOnly": true,
+    "description": "**Computed, not stored** — agreement, requirements, deposit, equipment.",
+    "items": {
+     "type": "object",
+     "properties": {
+      "check": {
+       "type": "string"
+      },
+      "satisfied": {
+       "type": "boolean"
+      },
+      "detail": {
+       "type": "string",
+       "nullable": true
+      }
+     }
+    }
+   },
+   "participants": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/RentalParticipant"
+    }
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "RentalParticipant": {
+  "type": "object",
+  "x-ticvai-persistence": "rental.participant",
+  "description": "Board 5.5. **A group rental is one booking with participants**, because the agreement, the deposit and the return are handled together.\n",
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "name": {
+    "type": "string"
+   },
+   "isPrimaryRenter": {
+    "type": "boolean",
+    "default": false
+   },
+   "dateOfBirth": {
     "type": "string",
     "format": "date",
     "nullable": true
    },
-   "receivedAt": {
+   "idNumber": {
     "type": "string",
-    "format": "date-time"
+    "nullable": true
+   },
+   "guardianName": {
+    "type": "string",
+    "nullable": true
+   },
+   "emergencyContact": {
+    "type": "string",
+    "nullable": true
+   },
+   "hasSignedWaiver": {
+    "type": "boolean",
+    "readOnly": true
+   },
+   "customFields": {
+    "type": "object",
+    "additionalProperties": true
    }
   }
  },

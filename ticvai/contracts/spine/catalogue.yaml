@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Catalogue & Entitlement
   version: 0.1.0
-  x-ticvai-screen-count: 231
+  x-ticvai-screen-count: 227
   x-ticvai-tier: spine
   x-ticvai-module: 1 — Ticketing Catalogue
   x-ticvai-requirements: 312
@@ -505,8 +505,8 @@ paths:
     get:
       operationId: listProductVersions
       x-ticvai-consumed-by:
-        - "P08 BO-008 Product Detail & Variants"
         - "P08 ADM-131 Product Version Management"
+        - "P08 BO-008 Product Detail & Variants"
       summary: What this product used to be
       description: '1.1.47, 1.4.9. **The fourth appearance of one mechanism** — product versioning at
         1.1, event templates at 1.3, version-restore at 1.4, and `white-label` already implements the
@@ -664,6 +664,8 @@ paths:
   /products/bulk-update:
     post:
       operationId: bulkUpdateCatalogueProducts
+      x-ticvai-consumed-by:
+        - "P08 BO-007 Product Directory"
       x-ticvai-agreed: '2 October: Chinmay, contract follow-ups ("BO-007 bulk edit: a new catalogue operation"); the
         BO-007 correction of CHG-WIR-027; shape follows bulkChangePrices and inventory bulkUpdateProducts'
       summary: Change many products at once, with a preview
@@ -1743,9 +1745,9 @@ paths:
     post:
       operationId: createProduct
       x-ticvai-consumed-by:
+        - "P08 ADM-119 Product Creation Workspace"
         - "P08 BO-007 Product Directory"
         - "P08 BO-012 Membership Products"
-        - "P08 ADM-119 Product Creation Workspace"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: M17-04 (MoM 17 September): partners never create products, prices
@@ -2487,9 +2489,9 @@ paths:
     get:
       operationId: listPriceLists
       x-ticvai-consumed-by:
+        - "P08 ADM-049 Price List Master Configuration"
         - "P08 BO-009 Pricing Rules"
         - "P08 BO-291 Membership Commercial, Pricing & Channel Association"
-        - "P08 ADM-049 Price List Master Configuration"
         - "P10 PTR-006 Product Catalog (B2B Pricing)"
       x-ticvai-api-scope: ticketing.read
       x-ticvai-audience:
@@ -2587,10 +2589,10 @@ paths:
     get:
       operationId: listPrices
       x-ticvai-consumed-by:
+        - "P08 ADM-051 Rate Structure Builder"
         - "P08 BO-009 Pricing Rules"
         - "P08 BO-014 Catalogue Publishing"
         - "P08 BO-601 Product, Pricing & Sales Channel Setup"
-        - "P08 ADM-051 Rate Structure Builder"
         - "P10 PTR-006 Product Catalog (B2B Pricing)"
       x-ticvai-api-scope: ticketing.read
       x-ticvai-audience:
@@ -3047,9 +3049,9 @@ paths:
     put:
       operationId: setChannelAllocations
       x-ticvai-consumed-by:
+        - "P08 ADM-272 Channel Allocation & Rebalancing Operations"
         - "P08 BO-013 Channel & Distribution"
         - "P08 BO-017 Capacity Management"
-        - "P08 ADM-272 Channel Allocation & Rebalancing Operations"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: M17-04 (MoM 17 September): partners never create products, prices
@@ -5313,9 +5315,9 @@ paths:
     put:
       operationId: publishChannelAvailability
       x-ticvai-consumed-by:
+        - "P08 ADM-124 Channel Publication & Availability"
         - "P08 BO-291 Membership Commercial, Pricing & Channel Association"
         - "P08 BO-601 Product, Pricing & Sales Channel Setup"
-        - "P08 ADM-124 Channel Publication & Availability"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Product_Lifecycle___Catalogue_Governance_Reference.pdf'' pp.9-10
@@ -5825,9 +5827,9 @@ paths:
     put:
       operationId: approveWorkflow
       x-ticvai-consumed-by:
-        - "P08 BO-637 Approval Workflow Builder"
         - "P08 ADM-129 Approval Workflow Designer"
         - "P08 ADM-319 Approval Workflow Library"
+        - "P08 BO-637 Approval Workflow Builder"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Product_Lifecycle___Catalogue_Governance_Reference.pdf'' pp.17-18
@@ -10204,8 +10206,8 @@ paths:
     put:
       operationId: simulatePriceBreakdownCalculation
       x-ticvai-consumed-by:
-        - "P08 BO-1049 Scenario & What-If Planning"
         - "P08 ADM-076 Price Breakdown, Calculation Simulation & Explainability"
+        - "P08 BO-1049 Scenario & What-If Planning"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.50-51 (10.3.9 Simulation
@@ -10845,8 +10847,8 @@ paths:
     put:
       operationId: publishPricingEffectiveDate
       x-ticvai-consumed-by:
-        - "P08 BO-443 Pricing Audit, Approval & Publication"
         - "P08 ADM-084 Pricing Publication & Effective-Date Scheduler"
+        - "P08 BO-443 Pricing Audit, Approval & Publication"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.66-67 (Publication
@@ -11416,9 +11418,9 @@ paths:
     get:
       operationId: listDynamicPricingStrategy
       x-ticvai-consumed-by:
-        - "P08 BO-1044 Dynamic Seat Pricing"
         - "P08 ADM-088 Dynamic Pricing Strategy Command Center"
         - "P08 ADM-089 Dynamic Pricing Strategy Builder"
+        - "P08 BO-1044 Dynamic Seat Pricing"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.75-76 (KPI Cards,
@@ -12833,12 +12835,12 @@ paths:
     get:
       operationId: listDemandBookingCurve
       x-ticvai-consumed-by:
+        - "P08 ADM-104 AI Demand Forecasting & Booking Curve Studio"
         - "P08 BO-1046 Inventory Forecasting"
         - "P08 BO-1047 Section Revenue Forecast"
         - "P08 BO-1058 Sales Pace & Pick Curves"
         - "P08 BO-591 Rental Forecasting & Demand Intelligence"
         - "P08 BO-946 Demand Forecast Accuracy & Planning Performance"
-        - "P08 ADM-104 AI Demand Forecasting & Booking Curve Studio"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.103-105 (10.6.7
@@ -13288,9 +13290,9 @@ paths:
     get:
       operationId: listRevenue
       x-ticvai-consumed-by:
+        - "P08 ADM-108 Revenue Optimization Command Center"
         - "P08 BO-1043 Revenue Command Center"
         - "P08 BO-1050 Revenue Analytics & Audit"
-        - "P08 ADM-108 Revenue Optimization Command Center"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.114-115 (10.7.1
@@ -15428,10 +15430,10 @@ paths:
     get:
       operationId: listDynamicPriceRules
       x-ticvai-consumed-by:
-        - "P08 BO-009 Pricing Rules"
-        - "P08 BO-443 Pricing Audit, Approval & Publication"
         - "P08 ADM-090 Demand, Occupancy & Availability Rule Builder"
         - "P08 ADM-091 Booking Velocity & Time-to-Event Rule Builder"
+        - "P08 BO-009 Pricing Rules"
+        - "P08 BO-443 Pricing Audit, Approval & Publication"
       summary: Dynamic pricing rules
       description: >
         Decision 5 of the schema merge took all three `pricing` tables and said the schema needed an
@@ -16633,8 +16635,8 @@ paths:
     put:
       operationId: setPackagePricingDefinition
       x-ticvai-consumed-by:
-        - "P08 BO-011 Packages & Bundles"
         - "P08 ADM-053 Package, Bundle & Add-On Pricing"
+        - "P08 BO-011 Packages & Bundles"
       summary: Set how a package, bundle or add-on is priced
       description: '**The pricing model of a package, bundle or add-on** (29 September, writers pass). Creates or
         updates the `catalogue.package_pricing` row for a `productId` and `priceListId`: the model

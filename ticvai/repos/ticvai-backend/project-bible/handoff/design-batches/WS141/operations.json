@@ -79,12 +79,12 @@
   "requestBody": null,
   "responds": "GuestTimelineEvent"
  },
- "handoverToAgent": {
+ "ingestKnowledgeDocument": {
   "method": "POST",
-  "path": "/conversations/{conversationId}/handover",
-  "contract": "marketing-crm",
-  "summary": "Pass an assistant conversation to a person",
-  "permission": null,
+  "path": "/collections/{collectionId}/documents",
+  "contract": "ai",
+  "summary": "Add a document",
+  "permission": "AI_CONFIGURE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
@@ -95,8 +95,8 @@
     "required": null
    }
   ],
-  "requestBody": null,
-  "responds": "Conversation"
+  "requestBody": "KnowledgeDocument",
+  "responds": null
  },
  "listAgentWorkloadAvailability": {
   "method": "GET",
@@ -229,6 +229,19 @@
   ],
   "requestBody": null,
   "responds": "Page"
+ },
+ "listKnowledgeCollections": {
+  "method": "GET",
+  "path": "/collections",
+  "contract": "ai",
+  "summary": "Collections available to this tenant",
+  "permission": "AI_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "KnowledgeCollection"
  },
  "listKnowledgeGaps": {
   "method": "GET",

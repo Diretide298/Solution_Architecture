@@ -737,12 +737,14 @@ paths:
     get:
       operationId: getRentalAvailability
       x-ticvai-consumed-by:
+        - "P06 EMP-074 Equipment Assignment Workspace"
         - "P06 EMP-083 Rental Extension Request"
         - "P08 BO-514 Availability Command Center"
         - "P08 BO-518 Real-Time Availability Calendar"
         - "P08 BO-521 Overlap & Conflict Engine"
         - "P08 BO-523 Availability Intelligence & AI Forecasting"
         - "P08 BO-536 Availability Selection & Alternative Options"
+        - "P08 BO-547 Equipment Assignment Workspace"
         - "P08 BO-556 Rental Extension Request"
         - "P08 BO-905 Rental Inventory & Availability Control"
       security:
@@ -1294,6 +1296,7 @@ paths:
         - "P06 EMP-071 Rental Checkout Command Center"
         - "P06 EMP-081 Active Rental Operations Command Center"
         - "P06 EMP-091 Rental Return Command Center"
+        - "P08 BO-504 Rental Inventory Command Center"
         - "P08 BO-534 Rental Booking Command Center"
         - "P08 BO-544 Rental Checkout Command Center"
         - "P08 BO-554 Active Rental Operations Command Center"
@@ -1350,7 +1353,6 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-535 New Rental Booking Wizard"
         - "P08 BO-538 Group Rental & Participant Management"
-        - "P08 BO-542 Reservation Modification, Cancellation & No-Show"
       x-ticvai-conflict-policy: serverWins
       security:
       - guestAuth: []
@@ -1421,6 +1423,7 @@ paths:
         - "P06 EMP-082 Active Rental Detail & Live Timeline"
         - "P06 EMP-089 Active Group Rental Management"
         - "P06 EMP-092 Return Scan & Rental Retrieval"
+        - "P08 BO-097 Check Out & Check In"
         - "P08 BO-541 Reservation Confirmation & QR Voucher"
         - "P08 BO-543 Reservation Detail, Timeline & Readiness"
         - "P08 BO-545 Voucher Scan & Reservation Retrieval"
@@ -1588,6 +1591,13 @@ paths:
         way back** (board 6.5), so the operational rules decide whether they are required and this
         refuses without them when they are.
 
+        **The card hold is a pre-authorisation on the payment terminal** (Chinmay, 2 October, workbook Q304;
+        CHG-CSA-029). Where the deposit is taken on a card, the counter presents the card on the terminal
+        (payments), and the authorisation reference comes back in `depositAuthorisationId`; this stores it on the
+        booking (`RentalBooking.depositAuthorisationId`, whose writer this is) and **refuses the check-out with
+        409 `deposit-not-authorised` until the pre-authorisation has succeeded**. A cash deposit, or a supervisor
+        override (`overrideId`), is the only other way through.
+
         '
       tags:
       - rental
@@ -1614,9 +1624,12 @@ paths:
                 $ref: '#/components/schemas/RentalBooking'
         '409':
           description: '**A required precondition is not met**, and the response names which — the
-            counter needs to know whether to fetch a signature or a supervisor.
+            counter needs to know whether to fetch a signature or a supervisor. `deposit-not-authorised`: the
+            card deposit''s pre-authorisation has not succeeded (CHG-CSA-029).
 
             '
+          x-ticvai-problem-types:
+          - deposit-not-authorised
           content:
             application/problem+json:
               schema:
@@ -1857,7 +1870,12 @@ paths:
       description: 'Board 8, and **this is the operation the whole contract is shaped around.**
 
         Actual return time decides the late fee against the grace period; condition decides the damage
-        charge; partial return decides what is still missing. **All three land on one deposit**, and
+        charge; partial return decides what is still missing.
+
+        **Usage beyond the paid time is charged at the normal rate** (Chinmay, 2 October, workbook Q307; DI-499;
+        CHG-CSA-029): a wheelchair paid for one hour and used for three is charged two extra hours at its normal
+        hourly price, on one settlement line, "Extra time", with the rate shown, not at the fee policy''s late-fee
+        rate. **All three land on one deposit**, and
         settling them as three separate acts means three authorisations against one hold and a guest
         charged twice for one dispute.
 
@@ -1912,7 +1930,6 @@ paths:
         - "P08 BO-549 Pre-Rental Condition Inspection"
         - "P08 BO-567 Post-Rental Condition Inspection"
         - "P08 BO-568 Before vs After Condition Comparison"
-        - "P08 BO-911 Inspection, Condition & Compliance Management"
       x-ticvai-conflict-policy: append
       summary: Condition before or after, with evidence
       description: 'Boards 6.5 and 8.4. **Before and after are the same record with a different phase**,
@@ -3557,6 +3574,8 @@ components:
           type: string
           format: uuid
           nullable: true
+          description: The card deposit's terminal pre-authorisation, written by `checkOutRental` (workbook Q304;
+            CHG-CSA-029). The hold is kept whole until every unit is back (workbook Q306).
         accruedLateFee:
           $ref: ../shared/common.yaml#/components/schemas/Money
         readiness:
@@ -3663,6 +3682,12 @@ components:
         depositInstrument:
           type: string
           nullable: true
+        depositAuthorisationId:
+          type: string
+          format: uuid
+          nullable: true
+          description: '**The terminal pre-authorisation of a card deposit** (workbook Q304; CHG-CSA-029), as the
+            payments terminal returned it. Required where the deposit is on a card; stored on the booking.'
         conditionNote:
           type: string
           nullable: true

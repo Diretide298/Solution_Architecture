@@ -31,6 +31,25 @@
   "requestBody": null,
   "responds": "RentalBooking"
  },
+ "listDepositActivity": {
+  "method": "GET",
+  "path": "/deposits/{depositId}/activity",
+  "contract": "payments",
+  "summary": "Movements on a deposit",
+  "permission": "PAYMENT_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "depositId",
+    "in": "path",
+    "required": true
+   }
+  ],
+  "requestBody": null,
+  "responds": "PaymentsDepositActivity"
+ },
  "listRentalBookings": {
   "method": "GET",
   "path": "/rental-bookings",
@@ -102,24 +121,5 @@
   ],
   "requestBody": "RentalReturn",
   "responds": "RentalSettlement"
- },
- "setAssetStatus": {
-  "method": "PUT",
-  "path": "/assets/{assetId}/status",
-  "contract": "maintenance",
-  "summary": "Take an asset out of service or return it",
-  "permission": "ASSET_MANAGE",
-  "offlineCapable": true,
-  "conflictPolicy": "append",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "SetAssetStatusRequest",
-  "responds": "AssetStatusResult"
  }
 }

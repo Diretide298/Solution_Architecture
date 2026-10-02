@@ -1,6 +1,6 @@
 # P08-stock-supply-02 — P08 · Stock & Supply (2 of 2)
 
-**6 screens · 19 operations · 28 schemas · 8 permissions**
+**6 screens · 20 operations · 29 schemas · 7 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -48,8 +48,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 8 permissions apply here:
-  `AI_USE, ORDER_MODIFY, PROCUREMENT_REQUEST, PROCUREMENT_VIEW, PRODUCT_CONFIGURE, PRODUCT_VIEW, REPORT_VIEW_VENUE, TENANT_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 7 permissions apply here:
+  `AI_USE, INCIDENT_VIEW, ORDER_MODIFY, PROCUREMENT_REQUEST, PRODUCT_CONFIGURE, PRODUCT_VIEW, REPORT_VIEW_VENUE`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -61,18 +61,84 @@ convincingly. It is never a caption.
   and its error; and, element by element, what is shown and in what format, what each action
   produces and where the user goes next. Draw exactly that.
 
+## The processes these screens belong to
+
+Written by the owner of each process (`handoff/design-notes/`). Read before any screen: it says how the process runs end to end and which words the screens must use.
+
+### Food, Beverage & Retail
+
+Food & beverage, retail, rentals, inventory and procurement across the till (P04), the kitchen display (P15), the staff app (P06), Venue Management (P08), the guest web and app (P01/P02), the kiosk (P05) and the CMS (P13). COUNTER SERVICE (F108): the cashier takes the order on the Food & Drink board from the outlet's menu in force (sections in the outlet's order, option groups attached to the item), sends it to the kitchen, and only then charges — send to kitchen, then charge, for every POS F&B order (R261, upheld against the v2 frame by POSV2-4). The kitchen ticket is on the rail while the card is in the guest's hand; an unpaid sent order is cancelled while ordered or accepted and voided with a reason after (R125(3), R091(5)); the guest gets an order number, and the customer-facing status board (numbers only) is the kitchen display's KIT-007, mirrored on the till's queue (POSV2-7). TABLE SERVICE (F29, F80, F94): a party is seated with its covers, orders across the visit, courses are fired by the pass (DI-333, DI-407), the bill is printed and settled at the end and split by amount, covers, category, item or seat (DI-106); the client's table statuses are Available → Ordered → Table closed → Reserved with no cleaning status (DI-336); moving and merging tables stay on the staff app until after r2 (POSV2-8). GUEST ORDERING (F11, F48): a guest inside the venue orders in the app or web for pickup or delivery to a seat or a scanned location (DI-288, DI-291); F&B and retail are optional licensed modules completed inside TICVAI (DI-505), kept simple (DI-1091); no food without an admission ticket (DI-292); table reservations and the waitlist do not go through the cart and a dining deposit is a venue option, off by default (DI-1048, DI-1049, R077). KITCHEN (P15, F83, F88): TICVAI's own display on commodity screens (19 September, replacing the 31 July "integration point only", DI-077); one kitchen ticket per preparation station from the outlet's routing rules with a fallback display (DI-323); a fired timer counts up and resets per course, not shown for quick service (DI-334); displays are assigned to stations and filter by course, with no station-load tile in r1 (R277). 86 takes an item off sale on every till and guest menu immediately (R110(c)); guests always see "Sold out", never a missing dish. RETAIL (F17, F34, F51): scan and sell through the same cart, charge and payment as tickets and food (DI-795), one cart, one receipt and one QR per guest (DI-293); system stock per venue gates the sale (DI-294); returns by receipt or order number only in r1 (R139(c)), refund to the original tender with a reason code and note (DI-796, DI-797); Shop & Drop is paid online and collected on the way out (R236), a merchandise reservation lasts to the end of the visit day (R169, R215). TILL MONEY (F32, F73, F74, F87): the float is counted by denomination with note images and typed quantities (DI-775, DI-776, R229) while the hardware checks itself (DI-778); the close is a …
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Send to kitchen | Put the order on the kitchen rail. On the till it always comes before Charge. | Fire, Fire order, Submit order, kitchen fires on payment | R261 / POSV2-4 / F108 step 3 |
+| Charge | The till's single tender step (Payment, POS-005); the button reads "Charge AED 110.25". | Checkout (on staff screens), Pay now | F108 step 4 / screens/P04-point-of-sale.yaml#POS-021 |
+| Fire / Hold (a course) | Kitchen-pass words for releasing or holding the next course of a table, and the "fired" timer. | using "fire" for sending an order from the till | DI-333 / DI-334 / DI-407 |
+| Kitchen ticket | The slip on the kitchen display, one per preparation station. | Order (on the kitchen display), KOT | R210 |
+| Ready · Served · Collected · Delivered | How an order reaches the guest; a server marks Served, a counter Collected, a runner Delivered (with the location). | Done, Complete, Bumped (as a status) | R125 / contracts/satellite/fnb.yaml#recordOrderHandover |
+| Recall (kitchen) / Recall held sale (till) | Bring a mis-bumped kitchen ticket back to the rail; separately, bring a held cart back into a sale. Never "Recall" alone where both could apply. | Undo bump, Restore | contracts/satellite/fnb.yaml#recallKitchenTicket / POSV2-6 |
+| Unavailable (86) / Sold out | Staff screens say "Unavailable" and may add "86"; guest screens say "Sold out". Immediate everywhere. | Out of stock (for food), Disabled, Hidden | R110 / contracts/satellite/fnb.yaml#getGuestMenu |
+| Order type | Dine-in · Quick service · Takeaway · Delivery, chosen in the cart. | Service mode, Fulfilment source (on the till) | DI-789 / contracts/satellite/fnb.yaml#/components/schemas/ServiceMode |
+| Covers | The number of guests at a table, entered when seating; drives split-by-covers. | Pax (except as a small suffix on the floor plan), Heads | DI-104 / contracts/satellite/fnb.yaml#openTableVisit |
+| Vacant · Seated · Ordered · Bill requested · Table closed · … | Table statuses on every floor plan (till and staff app); "Table closed" is the client's word for after payment. | Cleaning, Needs clearing, Dirty | DI-336 / DI-792 |
+| Till · Cash drawer | Staff copy may say "till" for the workstation; the cash drawer is the deposit box. | Terminal id as a heading, Deposit box (on staff screens) | R156 |
+| Float · Count · Blind count · Variance | The opening float; the denomination count; the closing count made without seeing the expected cash; counted minus expected. | Expected in drawer, Discrepancy, Error | R080 / POSV2-3 |
+| Cash out · Cash in · Safe drop | Taking cash out of the drawer mid-shift, adding change, and a supervisor moving cash to the safe with the cashier as witness. | Lift, Withdrawal (as button labels) | DI-274 / contracts/spine/shift.yaml#createCashMovement / … |
+| Menu item · Merchandise item · Inventory item · SKU | The scoped product words; SKU is a variant's code, Product stays the sellable thing. | SKU as the item's name, Article | R131 |
+| Stock on hand · Allocated · Available | Available is on hand minus allocated. | Inventory (as a number), Free stock | R171 / DI-361 |
+| Requisition · Purchase order · Goods receipt · Transfer · … | The procurement and stock words, in that flow. | GRN as the only label, Indent | DI-341 / DI-348 / DI-362 / DI-363 |
+| Shop & Drop | Bought and paid now, collected on the way out. | Click & collect | R236 |
+| Check-out (rental) · Return (rental) | Handing equipment to the guest and taking it back. On the same screens payment is "Charge" or "Pay". | Checkout (for a handover), Check-in (for a return) | DI-758 / DI-765 |
+| Deposit hold · Release · Capture | A refundable deposit held, given back in full, or partly kept for damage with the rest released. | Charge deposit, Refund deposit | DI-752 / R127 |
+| Extension · Swap · Overdue · Late fee | The active-rental words; a quick swap restarts the clock, a late swap earns a free extension. | Renewal, Exchange (for a swap) | DI-761 / DI-762 / DI-764 |
+
+### Finance, Ledger & Tax · Reporting & Analytics
+
+Finance and insights run underneath every sale. A sale at a till (P04), kiosk, web storefront (P01) or guest app (P02) is priced and taxed per line at the moment of sale, recorded in the venue's base currency (AED in the UAE; 2 decimals, or 3 for BHD, KWD and OMR, never rounded away), and posted to an append-only dual ledger through account mappings per money event; anything unmapped lands in suspense. Tax follows the jurisdiction's tax profile: inclusive or exclusive, compound where a tax applies on another, zero-rated or exempt with verified evidence, and computed on the discounted price by default or on the price before discount where the region requires it (Egypt). A guest may select a currency the venue charges and pay in it: the rate is locked on the order, the payment partner is asked in that currency, the ledger keeps the base amount with the rate, and a refund goes back in the currency paid (decided 2 October 2026, Chinmay); a currency shown but not charged is an approximate price. Foreign cash at a till is recorded at its base equivalent and change is given in base currency. A paid order can carry a VAT receipt (simplified tax invoice), a full tax invoice with the buyer's TRN, or a consolidated invoice for a company, each numbered without gaps and never edited; corrections are credit memos. Revenue is recognised by rule: POS-style immediate, tickets on the visit, gift cards and wallet on use, annual passes straight-line or per visit, breakage on expiry; deferred revenue is a balance that ages. Each venue's day is reconciled (POS cash, gateways, bank, wallet against the ledger, provider files matched automatically, only genuine mismatches to a person); chargebacks are defended against the bank's deadline; month end runs seven close checks and goes to a finance approver. Nothing posted is deleted: a correction is a reversal, an approver is never the preparer, and ledger approval needs a second factor. Back-office finance lives in Venue Management (P08: chart of accounts, mapping, FX, journals, recognition, reconciliation, period close, chargebacks); tax profiles, calculation validation and platform reconciliation in the TICVAI Console (P09); partner settlement in P10. Reporting is one consolidated, permission-based area (Analytics, P16): seeded standard dashboards and reports plus no-code builders over a governed business catalogue; the P08 report screens, the POS terminal day view and the kitchen performance view are scoped windows onto the same definitions and must show the same numbers. Every figure is read from a lag-tolerant reporting copy and shows its "as of" time; scope comes from the person's rights, never from a filter; AI explains and recommends but never acts, answers only within the person's role, labels forecasts, and is phase two for finance ledgers.
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Base currency | The venue's region currency; the currency every record and ledger posting is in. A guest may pay in a currency they select (where the venue charges it); the books still hold the base amount and the rate. | Home currency, Local price, Default currency | DI-211 / DI-282 / contracts/spine/orders.yaml#/components/schemas/Order |
+| Pay in USD (a currency the venue charges) | The guest's selected payment currency; the card is charged in it at the rate locked on the order, and refunds go back in it. | Converted price, Approx. (for a charged currency) | contracts/spine/orders.yaml#checkoutCart / … |
+| ≈ (approx.) price in USD / SAR / … | A conversion of a base-currency price for a currency the venue shows but does not charge, always next to the base price. | Converted price, USD price | DI-211 / screens/P02-guest-mobile-app.yaml#GST-044 |
+| Takings | Money received in the period less refunds (cash-basis); the seeded KPI on hubs. | Revenue, Sales, Income | contracts/satellite/reporting.yaml#/components/schemas/ReportingSystemKpi / R283 |
+| Gross sales | Issued sales before discounts and refunds; whether tax is included must be stated on the tile. | Revenue, Turnover | MATRIX 6.1.78 |
+| Net revenue | Gross sales less discounts less refunds, adjusted per finance policy. | Net sales, Revenue, Income | MATRIX 6.1.78 |
+| Recognised revenue / Deferred revenue | Earned under the recognition rules / paid for but not yet earned. Kept distinct from sales. | Realised revenue, Unearned income, Wallet revenue | MATRIX 5.12.6 / DI-260 / contracts/spine/finance.yaml#getDeferredRevenue |
+| VAT receipt | The simplified tax invoice issued on a paid order. | Receipt (when it is a tax document), Bill | contracts/spine/finance.yaml#issueTaxInvoice |
+| Tax invoice / Combined tax invoice | A full invoice with the buyer's details / one invoice for several paid orders of one buyer. | Bill, Statement | contracts/spine/finance.yaml#/components/schemas/FinTaxInvoiceType |
+| Credit memo | The document that corrects an issued invoice after a refund; the invoice itself is never edited. | Credit note (until the client's tax adviser chooses "Tax credit note"), Edit invoice | contracts/spine/finance.yaml#/components/schemas/FinTaxInvoice |
+| VAT (or the jurisdiction's tax name) | Use the tax profile's own name on every surface; "Tax" only where several kinds are summed. | GST in UAE, Service charge for a tax | contracts/spine/catalogue.yaml#setTaxProfileJurisdiction |
+| Price before discount | The taxable base where the jurisdiction taxes the undiscounted price. | Gross price, List tax | DI-598 |
+| Post / Reverse | A journal reaches the ledger when approved and posted; a correction is a reversal, never an edit or delete. | Edit entry, Delete entry, Undo | contracts/spine/finance.yaml#reverseJournalEntry |
+| Period (Open / Closing / Closed) | A fiscal period's state; closing stops postings, closed locks them. | Month locked, Frozen | contracts/spine/finance.yaml#/components/schemas/PeriodStatus |
+| Variance (Over / Short) | The difference between expected and counted or recorded, always saying between which two figures. | Discrepancy, Error, Loss | DI-275 / contracts/spine/finance.yaml#/components/schemas/UnifiedReconciliation |
+| Settlement / Exception / Resolve | A provider's file for a day / a line that did not match / the recorded explanation. | Payout file, Error, Close | contracts/spine/finance.yaml#/components/schemas/SettlementException |
+| Chargeback | A bank-initiated reversal with an evidence deadline; not a refund. | Dispute refund, Reversal | contracts/spine/orders.yaml#/components/schemas/Chargeback |
+| Report / Dashboard / Tile / KPI | A runnable, exportable, schedulable definition / a page of tiles / one visual bound to a report / a company-wide measure defined once. | Widget (outside the builder's library), Board (for a user-facing dashboard) | contracts/satellite/reporting.yaml#/components/schemas/DashboardTile / … |
+| Warning / Critical | KPI status bands set by a target's amber and red thresholds; always words plus colour. | Amber, Red (alone), Bad | contracts/satellite/reporting.yaml#/components/schemas/KpiTarget |
+| As of HH:MM / Updated N sec ago | The freshness of every figure read from the reporting copy; stale shows a warning. | Live (unless refreshed), Real-time | MATRIX 8.7.22 |
+| Forecast | Any projected figure, with its range; never shown as a fact. | Expected, Will be | DI-973 |
+| Outlet / Workstation (till) | A sales point / the device; staff copy may say "till" for the workstation. | Store, POS (in copy), Drawer (for the device) | R156 |
+| Channel | POS, Web, App, Kiosk, B2B, OTA, from one closed list. | Source, Platform | MoM 2026-08-18 4.2 Recipes, Operating Hours & Service Channels / MATRIX 1.4.7 |
+
+
 ## The screens
 
 Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs count fields; requirements are matrix rows; meeting inputs are the ones naming the screen (the module and platform ones are below); white label says whether the tenant's brand reaches it (guest) or it sets the brand (configures).
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-105` | Stock & Supply | B–D | 21 | 55 | 6 | 43 | 1 | 4 | — | notStarted (generated) |
+| `BO-105` | Stock & Supply | B–D | 17 | 6 | 6 | 18 | 1 | 4 | — | notStarted (generated) |
 | `BO-137` | Recipe Consumption & Theoretical Inventory | B–D | 3 | 32 | 6 | 10 | 1 | 6 | — | notStarted (generated) |
-| `BO-138` | Production Execution & Batch Management | B–D | 15 | 20 | 6 | 26 | 1 | 0 | — | notStarted (generated) |
-| `BO-139` | Wastage, Spoilage, Returns & Write-Off | B–D | 14 | 0 | 5 | 15 | 1 | 0 | — | notStarted (generated) |
-| `BO-140` | Product Availability, 86 & Operational Food Safety | B–D | 8 | 20 | 6 | 7 | 0 | 0 | — | notStarted (generated) |
+| `BO-138` | Production Execution & Batch Management | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `BO-139` | Wastage, Spoilage, Returns & Write-Off | B–D | 21 | 6 | 5 | 15 | 1 | 0 | — | notStarted (generated) |
+| `BO-140` | Product Availability, 86 & Operational Food Safety | B–D | 8 | 51 | 6 | 4 | 0 | 0 | — | notStarted (generated) |
 | `BO-141` | Operational Alerts, AI Replenishment & Action Center | B–D | 18 | 24 | 6 | 6 | 0 | 0 | — | notStarted (generated) |
+
+## Thin screens in this batch
+
+**BO-138 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ---
 
@@ -89,7 +155,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Stock & Supply · wave 1 · needs the `core` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `PROCUREMENT_VIEW`, `PRODUCT_CONFIGURE`, `PRODUCT_VIEW`, `REPORT_VIEW_VENUE`, `TENANT_VIEW` (3 read, 1 configure, 1 operate) |
+| Who uses it | venue staff holding `PRODUCT_CONFIGURE`, `REPORT_VIEW_VENUE` (1 configure, 1 operate) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listInventoryItems` reads the population and `getVenueSettings` reads one of them — list, select, act |
 | Offline | online only |
@@ -98,16 +164,18 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 **What the spec says about it.** Section landing. **9 screens reach the entry point through here** — before 20 August they reached it through nothing.
 
+**Known gaps.** Removed 2 October 2026 (CHG-WIR-008): The hub bound an inventory-item table, a purchase-order table and a venue-settings panel, duplicating BO-081 and BO-051; a hub's operations are the KPI read plus … Removed 2 October 2026 (CHG-WIR-008): The hub bound an inventory-item table, a purchase-order table and a venue-settings panel, duplicating BO-081 and BO-051; a hub's operations are the KPI read plus … Removed 2 October 2026 (CHG-WIR-008): The hub bound an inventory-item table, a purchase-order table and a venue-settings panel, duplicating BO-081 and BO-051; a hub's operations are the KPI read plus …
+
+**From the Food, Beverage & Retail process.** The Stock & Supply landing page in Venue Management. It is a hub: one card per stock and procurement screen, the two seeded KPI tiles, and nothing else. The one thing to get right is that it stays a launcher. It must not become a second item list and a second purchase-order list, which is what the generated definition shows.
+
+**Fixed on main** (the package already carries these; draw what it says): The hub binds an inventory-item table, a purchase-order table and a venue-settings detail panel (biometrics, quiet hours, segregated … (CHG-WIR-008); The hub declares getVenueSettings for "What is enabled here". The contract says it carries no module enablement and no retail setting. (CHG-WIR-008).
+
 #### Inputs: what the user enters or picks
 
 **On the screen**
 
 | Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
 |---|---|---|---|---|---|---|---|
-| Venue id | picker: choose a venue (drawn as a picker, not a text box) | optional | — | — | shows names, sends the id | Sends `?venueId=` to `listInventoryItems`. | `listInventoryItems` ?venueId |
-| Category id | picker: choose a category (drawn as a picker, not a text box) | optional | — | — | shows names, sends the id | Sends `?categoryId=` to `listInventoryItems`. | `listInventoryItems` ?categoryId |
-| Below reorder point | toggle | optional | — | — | — | Sends `?belowReorderPoint=` to `listInventoryItems`. | `listInventoryItems` ?belowReorderPoint |
-| Search | text field | optional | — | min length 1; max length 200 | — | Sends `?search=` to `listInventoryItems`. | `listInventoryItems` ?search |
 | Search stock & supply | search field | — | — | — | — | — | — |
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
@@ -121,8 +189,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Compare to | radio group | — | Previous period · Same period last year · Target · Benchmark | `getKpiValues` ?compareTo |
 | Interval | radio group | — | Hour · Day · Week · Month | `getKpiValues` ?interval |
 | Group by | text field | — | — | `getKpiValues` ?groupBy |
-| Status | select | — | Raised · Sent · Acknowledged · Partially received · Received · Closed short · Cancelled | `listPurchaseOrders` ?status |
-| Supplier | picker: choose a supplier | — | — | `listPurchaseOrders` ?supplierId |
+| Module | field | — | — | `getKpiValues` ?module |
 
 **Form: Create inventory item** (modal, opened by *Create inventory item*; *Create inventory item* calls `createInventoryItem`, *Cancel* sends nothing)
 
@@ -153,40 +220,6 @@ Errors to draw in the form: 400 Validation failed; 409 SKU already in use in thi
 
 **Shown**
 
-**Every inventory** (data table, from `listInventoryItems`)
-
-| Shows | Format | Notes |
-|---|---|---|
-| SKU | text | — |
-| Barcode | text | — |
-| Name | text | — |
-| Venue | the name it points at, never the id | — |
-| Category | the name it points at, never the id | — |
-| Base unit | text | The unit stock is held in. Immutable once movements exist. |
-| Purchase unit | text | How the supplier sells it — a case of 24 against a base unit of one. |
-| Purchase unit factor | 1,234.5 | — |
-| Costing method | chip: Weighted average, Fifo, Standard cost, Last purchase price | Fixed at item creation. Immutable once movements exist. |
-| Reorder point | 1,234.5 | — |
-| Reorder quantity | 1,234.5 | — |
-| Par level | 1,234.5 | — |
-
-**Every purchase order** (data table, from `listPurchaseOrders`)
-
-| Shows | Format | Notes |
-|---|---|---|
-| ID | the name it points at, never the id | — |
-| Purchase order number | text | Per venue, in sequence (decided 28 September, audit R171). Assigned by the server from the venue's gap-free sequence, or the tenant's for … |
-| Requisition | the name it points at, never the id | Null on a blanket order or an RFQ award, which are raised without one. |
-| Quotation | the name it points at, never the id | The quotation selected when the order was raised (`createPurchaseOrder` requires it). |
-| Supplier | the name it points at, never the id | — |
-| Supplier name | text | — |
-| Kind | chip: Standard, Blanket, Release, Rfq award | BL-159. A blanket order is a price and a commitment, not a delivery. |
-| Blanket parent | the name it points at, never the id | The blanket order this release draws against — another purchase order, so the same id type. |
-| Contract price valid until | 1 Oct 2026 | — |
-| Rfq | the name it points at, never the id | Where this order came from a quotation round. Keeping the link is what lets a venue show it took the best of three, which is usually the … |
-| Supplier invoice ref | text | BL-123. Purchase orders and goods receipts both existed — the third leg did not. |
-| Match status | chip: Unmatched, Matched, Price variance, Quantity variance, Both variance | The variance kinds are separated because they have different owners — a price variance is a buyer's problem and a quantity variance is a … |
-
 **Takings and admissions today** (metric tile, from `getKpiValues`): **Takings and admissions**, from `getKpiValues?kpiCodes=takings,admissions`; with no `period` the period is today in the venue's time zone (decided 28 September, audit R283).
 
 | Shows | Format | Notes |
@@ -200,64 +233,38 @@ Errors to draw in the form: 400 Validation failed; 409 SKU already in use in thi
 
 **Card list** (card list): 9 screens. **No attention counts** until a summary operation exists to supply them (decided 28 September, audit R283).
 
-**The selected inventory** (detail panel, from `listInventoryItems`)
-
-| Shows | Format | Notes |
-|---|---|---|
-| SKU | text | — |
-| Barcode | text | — |
-| Name | text | — |
-| Venue | the name it points at, never the id | — |
-| Category | the name it points at, never the id | — |
-| Base unit | text | The unit stock is held in. Immutable once movements exist. |
-| Purchase unit | text | How the supplier sells it — a case of 24 against a base unit of one. |
-| Purchase unit factor | 1,234.5 | — |
-| Costing method | chip: Weighted average, Fifo, Standard cost, Last purchase price | Fixed at item creation. Immutable once movements exist. |
-| Reorder point | 1,234.5 | — |
-| Reorder quantity | 1,234.5 | — |
-| Par level | 1,234.5 | — |
-| Preferred supplier | the name it points at, never the id | — |
-| Allow negative stock | yes / no (icon or chip) | True permits issue beyond on-hand. Occasionally needed at a bar mid-service; dangerous everywhere else. |
-| Is perishable | yes / no (icon or chip) | — |
-| Shelf life days | 1,234 | — |
-
-**The venue settings** (detail panel, from `getVenueSettings`)
-
-| Shows | Format | Notes |
-|---|---|---|
-| ID | the name it points at, never the id | Added 20 August. The schema reference derives table columns from API response schemas, and a response is not a table — this one returned … |
-| Venue | the name it points at, never the id | From the path of `setVenueSettings`. |
-| Currency code | text | `readOnly` is the freeze. `setVenueSettings` takes this whole schema as its request body, so without it any settings save could rewrite the … |
-| Currency scale | 1,234 | Scale travels with currency (ADR-0008), and so does the freeze. OMR is three decimal places because Oman says so; overriding the currency … |
-| Support hours | grouped details | CF-100. A venue decides whether its support desk is 24/7 or bounded, and the platform does not. |
-| Quiet hours | grouped details | When the platform does not send. A wallet low-balance alert at 3am is a complaint, and journeys and message triggers both respect this. |
-| Biometrics | grouped details | CF-35, BL-096, BL-105, BL-106. The venue-level master switch, and the one place a person is asked whether the paperwork exists. |
-| Segregated access | grouped details | CF-130. Configured at venue level because it changes by region and the venue is where it is known — a Ladies Night, a family session, a … |
-| Alerting | grouped details | CF-134. On-platform notification, marked as read. |
-
 **Actions and what each produces**
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
 | Create inventory item (primary button) | `createInventoryItem` POST `/inventory-items` | CreateInventoryItemRequest | InventoryItem | 400 Validation failed; 409 SKU already in use in this venue | opens modal first |
 
-**Data it reads**: `getKpiValues` (onLoad, Today's takings and admissions tiles — …); `getVenueSettings` (onLoad, What is enabled here); `listInventoryItems` (onLoad, Stock on hand); `listPurchaseOrders` (onLoad, Orders placed with suppliers)
+**Rules for what is shown** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
+
+- **KPI tiles**: Two tiles only, "Takings today" and "Admissions today", read for today in the venue's time zone. Show no attention counts on the cards (for example "3 requisitions waiting") until a summary operation exists. *(source: R283 / contracts/satellite/reporting.yaml#getKpiValues)*
+- **Screen cards**: Cards in the order a storekeeper works: Stock Levels, Inventory Items, Stock Count, Stock Movements, Requisitions, Purchase Orders, Goods Receipt, Stock Transfers, Suppliers, then the F&B stock screens (Recipe Consumption, Production, Wastage, Product Availability & 86, Alerts). Each card has a one-line plain purpose. A card whose module is not licensed for the tenant is not shown. The journey gets shorter; it does not look broken. *(source: F76 step 1 / F92 step 1 / DI-342)*
+
+**What each action does** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
+
+- **Add inventory item**: A shortcut that opens the same create form as Inventory Items (BO-081). Not a separate form. *(source: contracts/satellite/inventory.yaml#createInventoryItem)*
+
+**Data it reads**: `getKpiValues` (onLoad, Today's takings and admissions tiles — …)
 
 **Where the user goes next**
 
-- → `BO-049` Stock Levels: *Stock Levels*; carries `itemId`
-- → `BO-052` Goods Receipt: *Goods Receipt*; carries `purchaseOrderId`
-- → `BO-078` Requisitions: *Requisitions*; carries `requisitionId`
+- → `BO-049` Stock Levels: *Stock Levels*
+- → `BO-052` Goods Receipt: *Goods Receipt*
+- → `BO-078` Requisitions: *Requisitions*
 - → `BO-079` Stock Count: *Stock Count*
 - → `BO-080` Stock Transfers: *Stock Transfers*
-- → `BO-081` Inventory Items: *Inventory Items*; carries `itemId`
-- → `BO-083` Suppliers: *Suppliers*; carries `supplierId`
+- → `BO-081` Inventory Items: *Inventory Items*
+- → `BO-083` Suppliers: *Suppliers*
 - → `BO-137` Recipe Consumption & Theoretical Inventory: *Recipe Consumption & Theoretical Inventory*
 - → `BO-138` Production Execution & Batch Management: *Production Execution & Batch Management*
 - → `BO-139` Wastage, Spoilage, Returns & Write-Off: *Wastage, Spoilage, Returns & Write-Off*
-- → `BO-140` Product Availability, 86 & Operational Food Safety: *Product Availability, 86 & Operational Food Safety*; carries `itemId`
+- → `BO-140` Product Availability, 86 & Operational Food Safety: *Product Availability, 86 & Operational Food Safety*
 - → `BO-141` Operational Alerts, AI Replenishment & Action Center: *Operational Alerts, AI Replenishment & Action Center*
-- → `BO-051` Purchase Orders: *Purchase Orders*; carries `purchaseOrderId`
+- → `BO-051` Purchase Orders: *Purchase Orders*
 
 #### States
 
@@ -271,25 +278,54 @@ Errors to draw in the form: 400 Validation failed; 409 SKU already in use in thi
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 SKU already in use in this venue |
 
+#### Edge cases to draw
+
+- **Principal holds more than one venue**: Ask which venue before the page renders. Never show the first venue by default. *(source: screens/P08-venue-back-office.yaml#BO-105)*
+- **No permission for any stock screen**: Say in plain words that this account has no access to Stock & Supply. Do not show an empty grid of cards. *(source: screens/P08-venue-back-office.yaml#BO-105)*
+
+#### Consistency with other screens
+
+- Match `BO-081`: The add-item form is the BO-081 form, field for field.
+- Match `BO-102`: Same hub pattern as the Sell landing (two KPI tiles, cards, no attention counts).
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+venue: Aqua Park (AQP)
+kpis:
+- label: Takings today
+  value: AED 184,320.50
+  comparison: +6.2% vs yesterday
+- label: Admissions today
+  value: 7,412
+  comparison: -1.8% vs yesterday
+cards:
+- Stock Levels
+- Inventory Items
+- Stock Count
+- Stock Movements
+- Requisitions
+- Purchase Orders
+- Goods Receipt
+- Stock Transfers
+- Suppliers
+```
+
 #### Permissions
 
 - `getKpiValues` → `REPORT_VIEW_VENUE` (operate) · staff
-- `getVenueSettings` → `TENANT_VIEW` (read) · staff
-- `listInventoryItems` → `PRODUCT_VIEW` (read) · staff
-- `listPurchaseOrders` → `PROCUREMENT_VIEW` (read) · staff
 - `createInventoryItem` → `PRODUCT_CONFIGURE` (configure) · staff
 
 **A refused user sees:** You do not have permission for stock & supply. **Said plainly** — an empty section reads as broken.
 
 #### Requirements it meets
 
-43 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+18 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
 
 | Ref | Requirement (shortened) | Domain | Verdict | Via |
 |---|---|---|---|---|
-| 15.5.9 | Inventory APIs - System shall expose inventory APIs. | Inventory Management | CONTRACTED | `listInventoryItems` |
-| 15.5.10 | Procurement APIs - System shall expose procurement APIs. | Inventory Management | CONTRACTED | `listInventoryItems` |
-| 15.5.11 | Warehouse APIs - System shall expose warehouse APIs. | Inventory Management | CONTRACTED | `listInventoryItems` |
 | 4.5.35 | FIFO, LIFO, and Weighted Average costing methods. | Bundles and Promotions | CONTRACTED | `createInventoryItem` |
 | 7.4.33 | It is expected that the software can sell PLUs considered as simple items which could possibly be inventory managed. | F&B POS | CONTRACTED | `createInventoryItem` |
 | 7.4.34 | Food and Beverage PLUs can be managed by the system (sales and inventory) | F&B POS | CONTRACTED | `createInventoryItem` |
@@ -299,7 +335,10 @@ Errors to draw in the form: 400 Validation failed; 409 SKU already in use in thi
 | 15.1.1 | Inventory Item Master - System shall support centralized inventory item management. | Inventory Management | CONTRACTED | `createInventoryItem` |
 | 15.1.2 | Item Categories - System shall support inventory item categorization. | Inventory Management | CONTRACTED | `createInventoryItem` |
 | 15.1.3 | SKU Management - System shall support SKU management. | Inventory Management | CONTRACTED | `createInventoryItem` |
-| … 31 more | | | | `traceability.json` |
+| 15.1.4 | Barcode Management - System shall support barcode management. | Inventory Management | CONTRACTED | `createInventoryItem` |
+| 15.1.5 | Product Attributes - System shall support configurable product attributes. | Inventory Management | CONTRACTED | `createInventoryItem` |
+| 15.1.6 | Product Variants - System shall support product variants. | Inventory Management | CONTRACTED | `createInventoryItem` |
+| … 6 more | | | | `traceability.json` |
 
 #### Client meeting inputs
 
@@ -323,13 +362,14 @@ Also apply: 2 for P08 · Stock & Supply, 24 for all of P08, 29 for every app (se
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (21), with its required mark, default, format and its error state (400, 403, 404, 409).
-- [ ] Every output is drawn (55 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (17), with its required mark, default, format and its error state (400, 409).
+- [ ] Every output is drawn (6 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-105?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Create inventory item.
 - [ ] Every transition is wired: `BO-049`, `BO-052`, `BO-078`, `BO-079`, `BO-080`, `BO-081`, `BO-083`, `BO-137`, `BO-138`, `BO-139`, `BO-140`, `BO-141`, `BO-051`.
-- [ ] Every gated control is gated: `PROCUREMENT_VIEW`, `PRODUCT_CONFIGURE`, `PRODUCT_VIEW`, `REPORT_VIEW_VENUE`, `TENANT_VIEW`.
+- [ ] Every gated control is gated: `PRODUCT_CONFIGURE`, `REPORT_VIEW_VENUE`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 2 edge case(s) from the process notes are drawn.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -352,6 +392,20 @@ Also apply: 2 for P08 · Stock & Supply, 24 for all of P08, 29 for every app (se
 
 **What the spec says about it.** **Added 20 August from the client design board.** The operations existed and no screen called them.
 
+**From the Food, Beverage & Retail process.** What the recipes say should have been used against what the count found, per outlet and count period (FNB-5C, F30 step 8): theoretical, actual, variance %, its value, and the lines beyond the venue's tolerance. The client asked for recipe-based ingredient consumption in the F&B stock view. The one thing to get right is that the variance is only shown once the count is submitted, never while counting.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **The board frame fnb-2f ("Recipe & BOM Costing") is attached here.** Why: It is BO-110's frame; this screen's frame is fnb-5c. *(source: screens/P08-venue-back-office.yaml#BO-137; Food, Beverage & Retail)*
+- **The main population is "Every recipe" (listRecipes) with a "Menu item id" field and raw recipe columns, plus a raw production-run table with ids.** Why: The population is the count's variance lines; recipes are context, not the list. *(source: screens/P08-venue-back-office.yaml#BO-137 / R254; Food, Beverage & Retail)*
+- **No read returns theoretical and actual use over a period, or a probable cause per line (FNB-5C); the variance read is per count (on-hand expected against counted).** Why: The frame's period totals and "probable cause" column have no source; draw per-count variance until one exists. *(source: contracts/satellite/inventory.yaml#getCountVariance / screens/P08-venue-back-office.yaml#BO-137; Food, Beverage & Retail)*
+
+#### Decided on this screen
+
+Answered questions: draw the decision, not the old default. Where a decision and the tables below differ, the decision wins.
+
+- **Is "probable cause" (re-fires logged, trim yield, breakage) wanted in r1, and from which data?** → Drawn default stands (answer: "No cause column; link to waste and production for the period"): Omit the column; link to waste and production for the same period. *(decided by Chinmay, 2026-10-02; DEC-191 / CHG-NOTE-004)*
+
 #### Inputs: what the user enters or picks
 
 **On the screen**
@@ -369,6 +423,11 @@ Also apply: 2 for P08 · Stock & Supply, 24 for all of P08, 29 for every app (se
 | Status | radio group | — | Planned · In progress · Completed · Cancelled | `listProductionRuns` ?status |
 | Location kind | segmented control | — | Outlet · Commissary | `listProductionRuns` ?locationKind |
 | From | date picker | — | — | `listProductionRuns` ?from |
+
+**Rules for these inputs** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
+
+- **Outlet and count**: Outlet picker, then a submitted count (by date, "Count 24 Oct 2026, Oasis Bistro kitchen"); not an id. *(source: contracts/satellite/inventory.yaml#getCountVariance / F30 step 8)*
+- **Filter**: All items / Over tolerance; sort by value (default) or by variance %. *(source: screens/P08-venue-back-office.yaml#BO-137)*
 
 #### Outputs: what the screen shows and produces
 
@@ -431,6 +490,15 @@ Also apply: 2 for P08 · Stock & Supply, 24 for all of P08, 29 for every app (se
 | Exception count | 1,234 | Lines beyond `VenueSettings.inventory.countVarianceTolerancePercent` (proposed default 2 per cent, audit R094), requiring review before … |
 | Lines | list or chips (count when long) | — |
 
+**Rules for what is shown** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
+
+- **Variance table**: Per ingredient - expected, counted, variance % (signed, one decimal), value in AED; lines beyond the tolerance (proposed 2%, venue setting) highlighted and counted in the header. *(source: contracts/satellite/inventory.yaml#getCountVariance / R094)*
+- **Production yield**: Runs in the period with planned, made and yield %, since a low batch yield explains part of the gap. *(source: contracts/satellite/fnb.yaml#listProductionRuns / F85 step 2)*
+
+**What each action does** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
+
+- **Open the item**: Goes to the ingredient's product detail to fix a unit, a recipe line or a cost. *(source: screens/P08-venue-back-office.yaml#BO-137)*
+
 **Data it reads**: `listRecipes` (onLoad, List recipes); `getCountVariance` (onLoad, Variance between counted and expected); `listProductionRuns` (onLoad, What is being made, and what was)
 
 **Where the user goes next**
@@ -449,6 +517,42 @@ Also apply: 2 for P08 · Stock & Supply, 24 for all of P08, 29 for every app (se
 | Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_VIEW`, which `listRecipes` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 Count is still open. |
+
+#### Edge cases to draw
+
+- **The count is still open or being counted**: "Variance appears when the count is submitted" - never partial figures (409 from the read). *(source: R110 / contracts/satellite/inventory.yaml#getCountVariance)*
+- **A cancelled production run in the period**: Its ingredients count as used; the run shows as cancelled with its consumption. *(source: contracts/satellite/fnb.yaml#planProductionRun)*
+
+#### Consistency with other screens
+
+- Match `BO-079`: The count is entered on Stock Count; this screen only reads its variance.
+- Match `BO-110`: Same units as the recipe lines.
+- Match `BO-049`: DI-340 scopes both; the F&B stock command centre links here.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+outlet: Oasis Bistro kitchen
+count: Submitted 25 Oct 2026, 07:40 GST by Daniel Brooks
+lines:
+- item: Beef Patty 150g
+  expected: 1,842 pc
+  counted: 1,914 pc
+  variance: +3.9%
+  value: AED 461.00
+- item: Fresh Sea Bass
+  expected: 42.6 kg
+  counted: 48.2 kg
+  variance: +13.1%
+  value: AED 728.00
+- item: Tomato
+  expected: 73.6 kg
+  counted: 74.4 kg
+  variance: +1.1%
+  value: AED 7.00
+```
 
 #### Permissions
 
@@ -498,7 +602,7 @@ Also apply: 2 for P08 · Stock & Supply, 24 for all of P08, 29 for every app (se
 - Wireframe frame: `wireframes/P08 Venue Management.dc.html#bo-137` · status **notStarted** · provenance generated · **Drawn by Claude Design on `FnB Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once …
 - Derived from `wireframes/reference/FnB Board 2.dc.html`
 - Drawn by: Claude Design F&B pack, 24 August
-- Client design-board frames: `FnB Board 2.dc.html#fnb-2f`, `FnB Board 5.dc.html#fnb-5c`
+- Client design-board frames: `FnB Board 5.dc.html#fnb-5c`
 - Flow F30 *A count is entered, varied and posted*, step 8: The variance feeds theoretical-against-actual. → **Recipes say 400 portions; the count says 380.** The gap is waste, theft or a wrong recipe, and this is the only place a venue finds out which.
 - Flow F85 *Production is planned, costed and released*, step 2: Recipe Consumption & Theoretical Inventory. → **Drawn by the client as FNB-2F.** 2 operations on this step.
 
@@ -511,108 +615,62 @@ Also apply: 2 for P08 · Stock & Supply, 24 for all of P08, 29 for every app (se
 - [ ] Every transition is wired: `BO-008`, `BO-105`.
 - [ ] Every gated control is gated: `PRODUCT_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 2 edge case(s) from the process notes are drawn.
+- [ ] The 3 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
+- [ ] The 1 decision(s) taken on this screen are drawn as decided, not as the old default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
 
 ### `BO-138` Production Execution & Batch Management
 
-**Production Execution & Batch Management — from the client design board, 20 August.**
+**Production Execution & Batch Management — from the client design board, 20 August (merged into BO-112 Production Planning & Production Sheets).**
 
 | | |
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Stock & Supply · wave 2 · needs the `fnb` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `AI_USE`, `PRODUCT_CONFIGURE`, `PRODUCT_VIEW` (1 operate, 1 configure, 1 read) |
+| Who uses it | venue |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listExpiringBatches` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
 | Offline | online only |
 | Opens with | `venueId` (session), `runId` (deepLink) · cold entry: Resolves from the session. A principal with more than one venue is asked which first. |
 | Route | `/stock-supply/production-execution-batch-management` |
 
-**What the spec says about it.** **Added 20 August from the client design board.** The operations existed and no screen called them.
+**What the spec says about it.** **Merged into BO-112** (decided 2 October 2026, Chinmay: duplicate screens merged as proposed; CHG-SBO-021). Batch execution is a tab of the one Production screen (design-note correction fnb-retail BO-112). **One implementation, both ids kept**, as the M24-03 merges do: this id stays for traceability and routes to BO-112, and nothing on it is built separately. **Added 20 August from the client design board.** The operations existed and no screen called them.
+
+**From the Food, Beverage & Retail process.** Today's production batches being made: planned against made, yield, state, and the components issued (FNB-5D). The client asked for planned versus actual versus yield and batch losses. A batch that under-yields shows here before it shows up as stock variance. The one thing to get right is that yield is derived from made over planned, never typed or stored, and that ingredients left stock when the batch started.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **No board frame; the client's frame FNB-5D ("Production Execution & Batch") is listed on BO-136.** Why: The designer would draw this screen from nothing. *(source: screens/P08-venue-back-office.yaml#BO-138; Food, Beverage & Retail)*
+- **The "Plan production run" modal requires id and status and offers actualQuantity, varianceReason and productionPlanId.** Why: Id and status are plumbing, the plan link is read-only, actual and variance belong to completion. *(source: contracts/satellite/fnb.yaml#planProductionRun / R254; Food, Beverage & Retail)*
+- **No start or cancel operation for a batch (see BO-113).** Why: "Start" is when ingredients leave stock (R125 (8)) and cannot be drawn honestly. *(source: R125; Food, Beverage & Retail)*
+- **Overlap with BO-113 and BO-112 (same plan and complete operations).** Why: One Production screen with tabs (see BO-112). *(source: DI-987; Food, Beverage & Retail)*
+
+**Fixed on main** (the package already carries these; draw what it says): The population is listExpiringBatches - supplier stock batches with lot numbers and expiry - not production batches; the "Within days" … (CHG-WIR-008).
 
 #### Inputs: what the user enters or picks
 
-**On the screen**
+Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
 
-| Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
-|---|---|---|---|---|---|---|---|
-| Within days | number field (days) | optional | 7 | — | — | Sends `?withinDays=` to `listExpiringBatches`. | `listExpiringBatches` ?withinDays |
-| Search production execution | search field | — | — | — | — | — | — |
+**Rules for these inputs** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
 
-**Form: Plan production run** (modal, opened by *Plan production run*; *Plan production run* calls `planProductionRun`, *Cancel* sends nothing)
-
-**Collects what `planProductionRun` sends before it is called.** Required: `id`, `recipeId`, `plannedQuantity`, `status`. Optional: `productionPlanId`, `producingOutletId`, `forOutletIds`, `actualQuantity`, `scheduledFor`, `varianceReason`. Dismissing sends nothing; the screen behind is unchanged.
-
-| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
-|---|---|---|---|---|---|---|---|
-| ID `id` | picker: choose an id | required | — | — | shows names, sends the id | — | `planProductionRun` body |
-| Recipe `recipeId` | picker: choose a recipe | required | — | — | shows names, sends the id | — | `planProductionRun` body |
-| Station `stationId` | picker: choose a station | optional | — | — | shows names, sends the id | The station whose prep list this run is on. Copied from the plan line on release, where runs are grouped by station (audit R125 (7)). | `planProductionRun` body |
-| Producing outlet `producingOutletId` | picker: choose a producing outlet | optional | — | — | shows names, sends the id | — | `planProductionRun` body |
-| For outlets `forOutletIds` | multi-picker: choose for outlets | optional | — | — | — | Where it goes. A central kitchen produces for outlets that did not make it. | `planProductionRun` body |
-| Planned quantity `plannedQuantity` | number field | required | — | — | — | — | `planProductionRun` body |
-| Actual quantity `actualQuantity` | number field | optional | — | — | — | BL-126. Theoretical against actual is the whole point of recording this. | `planProductionRun` body |
-| Scheduled for `scheduledFor` | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `planProductionRun` body |
-| Status `status` | radio group | required | — | Planned · In progress · Completed · Cancelled | — | — | `planProductionRun` body |
-| Variance reason `varianceReason` | text field | optional | — | — | — | — | `planProductionRun` body |
-
-**Form: Complete production run** (modal, opened by *Complete production run*; *Complete production run* calls `completeProductionRun`, *Cancel* sends nothing)
-
-**Collects what `completeProductionRun` sends before it is called.** Required: `actualQuantity`, `recordedAt`. Optional: `varianceReason`. Dismissing sends nothing; the screen behind is unchanged.
-
-| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
-|---|---|---|---|---|---|---|---|
-| Actual quantity `actualQuantity` | number field | required | — | — | — | — | `completeProductionRun` body |
-| Variance reason `varianceReason` | text field | optional | — | — | — | — | `completeProductionRun` body |
-| Recorded at `recordedAt` | date and time picker | required | — | — | 1 Oct 2026, 14:30 (venue time zone) | Device time of the act (offline-capable; replayed in this order). | `completeProductionRun` body |
-
-Errors to draw in the form: 409 The run is not `inProgress` (states/production-run.yaml). Names its current status.
+- **Kitchen and day**: Kitchen or commissary picker and the day (today by default). *(source: contracts/satellite/fnb.yaml#listProductionRuns)*
+- **Complete batch**: Made quantity in the item's unit; a reason when made is below planned (optional in the contract); the time is the device's. *(source: contracts/satellite/fnb.yaml#completeProductionRun / designer default)*
 
 #### Outputs: what the screen shows and produces
 
-**Shown**
+**Rules for what is shown** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
 
-**Every stock batch** (data table, from `listExpiringBatches`)
+- **Batch list**: Item, planned, made, yield % (one decimal), state - Planned, Running, Complete, Cancelled - with a "Low yield" highlight on a complete batch well below plan; running batches show who started them and when. *(source: contracts/satellite/fnb.yaml#getProductionRun / screens/P08-venue-back-office.yaml#BO-138)*
+- **Waste-risk suggestion**: Items at risk with quantity, value and a recommended action (reduce prep, promote, transfer, use in a recipe), with its maturity badge and plain explanation; a person applies it elsewhere. *(source: MATRIX 4.8.15 / MATRIX 4.1.19 / contracts/satellite/ai.yaml#requestSuggestion)*
 
-| Shows | Format | Notes |
-|---|---|---|
-| ID | the name it points at, never the id | — |
-| Item | the name it points at, never the id | — |
-| Location | the name it points at, never the id | — |
-| Batch code | text | — |
-| Lot number | text | The supplier's own reference. A recall names a lot number, and an inventory that cannot resolve one has to discard everything. |
-| Quantity | 1,234.5 | — |
-| Received at | 1 Oct 2026, 14:30 | — |
-| Expires at | 1 Oct 2026 | — |
-| Supplier | the name it points at, never the id | — |
-| Status | chip: Available, Quarantined, Expired, Recalled, Consumed, Written off | — |
+**What each action does** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
 
-**The selected stock batch** (detail panel, from `listExpiringBatches`)
-
-| Shows | Format | Notes |
-|---|---|---|
-| ID | the name it points at, never the id | — |
-| Item | the name it points at, never the id | — |
-| Location | the name it points at, never the id | — |
-| Batch code | text | — |
-| Lot number | text | The supplier's own reference. A recall names a lot number, and an inventory that cannot resolve one has to discard everything. |
-| Quantity | 1,234.5 | — |
-| Received at | 1 Oct 2026, 14:30 | — |
-| Expires at | 1 Oct 2026 | — |
-| Supplier | the name it points at, never the id | — |
-| Status | chip: Available, Quarantined, Expired, Recalled, Consumed, Written off | — |
-
-**Actions and what each produces**
-
-| Action | Calls | Sends | On success returns | Errors to show | Notes |
-|---|---|---|---|---|---|
-| Plan production run (primary button) | `planProductionRun` POST `/production-runs` | ProductionRun | ProductionRun | — | opens modal first |
-| Complete production run (secondary button) | `completeProductionRun` POST `/production-runs/{runId}/complete` | inline | ProductionRun | 409 The run is not `inProgress` (states/production-run.yaml). Names its current status. | opens modal first |
-
-**Data it reads**: `listExpiringBatches` (onLoad, What is about to go out of date)
+- **Complete batch**: Moves the made quantity into stock; refused if the batch is not running, with its state named; works offline. *(source: contracts/satellite/fnb.yaml#completeProductionRun)*
+- **New batch**: Plans a batch outside the day's plan. *(source: contracts/satellite/fnb.yaml#planProductionRun)*
 
 **Where the user goes next**
 
@@ -622,42 +680,57 @@ Errors to draw in the form: 409 The run is not `inProgress` (states/production-r
 
 | State | What it shows |
 |---|---|
-| Loading (`?state=loading`) | The production execution batch list. |
-| Error (`?state=error`) | Could not load. Names which read failed and leaves the production execution batch untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No production execution batch yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table. |
-| Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on withinDays and the production execution batch are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_VIEW`, which `listExpiringBatches` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Loading (`?state=loading`) | Routes to BO-112 while it opens. |
+| Error (`?state=error`) | Could not open BO-112; says so and offers to retry. |
+| Empty, first run (`?state=emptyFirstRun`) | Never shown: this id routes to BO-112, whose empty states apply. |
+| Empty, no results (`?state=emptyNoResults`) | Never shown: this id routes to BO-112. |
+| Permission denied (`?state=emptyNoAccess`) | As BO-112: shown when the caller lacks the access BO-112 requires, named in words. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 409 The run is not `inProgress` (states/production-run.yaml). Names its current status.; 422 A setting the answer cannot do without is missing (29 September, AI functions review). (AiMissingSettingProblem) |
+
+#### Edge cases to draw
+
+- **Completed offline**: Shows "Saved on this device, will sync" and replays in order when back online. *(source: contracts/satellite/fnb.yaml#completeProductionRun)*
+- **A correction to the made quantity later**: Yield recomputes from the corrected figure (it is never stored). *(source: contracts/satellite/fnb.yaml#getProductionRun)*
+
+#### Consistency with other screens
+
+- Match `BO-113`: Commissary batches are the same list filtered to the commissary.
+- Match `BO-139`: Batch losses recorded as waste use the reason Over-production or Preparation error.
+- Match `BO-137`: Low yields here explain variance there.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+kitchen: Central Commissary - Tue 3 Nov 2026
+batches:
+- batch: BAT-118
+  item: Burger Sauce (SUB-0071)
+  planned: 12.0 kg
+  made: '-'
+  state: Running - started 14:20 by Priya Nair
+- batch: BAT-116
+  item: Beef Patty 150g (ITM-1042)
+  planned: 400 pc
+  made: 386 pc
+  yield: 96.5%
+  state: Complete
+- batch: BAT-115
+  item: Sea Bass Fillets
+  planned: 28.0 kg
+  made: 16.8 kg
+  yield: 60.0%
+  state: Complete - low yield
+```
 
 #### Permissions
 
-- `planProductionRun` → `PRODUCT_CONFIGURE` (configure) · staff
-- `completeProductionRun` → `PRODUCT_CONFIGURE` (configure) · staff
-- `listExpiringBatches` → `PRODUCT_VIEW` (read) · staff
-- `requestSuggestion` → `AI_USE` (operate) · staff, guest
-
-**A refused user sees:** Shown when the caller lacks `PRODUCT_VIEW`, which `listExpiringBatches` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** As BO-112: shown when the caller lacks the access BO-112 requires, named in words.
 
 #### Requirements it meets
 
-26 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
-
-| Ref | Requirement (shortened) | Domain | Verdict | Via |
-|---|---|---|---|---|
-| 2.1.28 | Kiosks shall provide an AI assistant to guide guests through ticket selection, promotions, FAQs, recommendations, and checkout. | Ticketing Sales | CONTRACTED | `requestSuggestion` |
-| 4.1.16 | Analyze menu performance and profitability. | Bundles and Promotions | CONTRACTED | `requestSuggestion` |
-| 4.1.19 | Recommend actions to reduce waste and spoilage. | Bundles and Promotions | CONTRACTED | `requestSuggestion` |
-| 4.1.20 | Recommend pricing and promotion strategies. | Bundles and Promotions | CONTRACTED | `requestSuggestion` |
-| 4.8.15 | AI predicts potential food waste and recommends actions. | Bundles and Promotions | CONTRACTED | `requestSuggestion` |
-| 5.4.24 | Segment customers automatically. | F&B & Guest Management | CONTRACTED | `requestSuggestion` |
-| 5.6.27 | Recommend staffing adjustments, ride allocation, and queue balancing. | F&B & Guest Management | CONTRACTED | `requestSuggestion` |
-| 5.6.36 | The system shall estimate queue wait times using historical and real-time operational data. | F&B & Guest Management | CONTRACTED | `requestSuggestion` |
-| 8.9.9 | AI shall identify operational risks, anomalies, congestion, capacity issues, device failures, staffing shortages, and service disruptions and provide recommendations. | Unified Operations Dashboard | CONTRACTED | `requestSuggestion` |
-| 15.4.7 | Inventory Optimization - System shall optimize inventory levels. | Inventory Management | CONTRACTED_PARTIAL | `requestSuggestion` |
-| 22.2.25 | AI Audience Classification | Marketing & CRM | CONTRACTED | `requestSuggestion` |
-| 4.6.36 | Compare theoretical recipe cost versus actual inventory consumption and wastage, highlighting variances and operational inefficiencies. | Bundles and Promotions | CONTRACTED | data `ProductionRun` |
-| … 14 more | | | | `traceability.json` |
+No matrix row traces to this screen's operations or data.
 
 #### Client meeting inputs
 
@@ -674,17 +747,18 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### References
 
 - Wireframe frame: `wireframes/P08 Venue Management.dc.html#bo-138` · status **notStarted** · provenance generated
-- ADR-0020 *— Where AI runs, and what it is isolated from* (`docs/adr/0020-ai-isolation-boundary.md`)
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (15), with its required mark, default, format and its error state (409, 422).
-- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
+- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-138?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: Plan production run, Complete production run.
+- [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-105`.
-- [ ] Every gated control is gated: `AI_USE`, `PRODUCT_CONFIGURE`, `PRODUCT_VIEW`.
+- [ ] Sign-in is asked only where the spec asks for it.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 2 edge case(s) from the process notes are drawn.
+- [ ] The 4 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -698,7 +772,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Stock & Supply · wave 2 · needs the `fnb` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `AI_USE`, `ORDER_MODIFY` (2 operate) |
+| Who uses it | venue staff holding `AI_USE`, `ORDER_MODIFY`, `PRODUCT_CONFIGURE`, `PRODUCT_VIEW` (2 operate, 1 configure, 1 read) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the screen declares only writes (`recordWaste`) and no read of a population — it is settings, not a list |
 | Offline | online only |
@@ -706,6 +780,25 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Route | `/stock-supply/wastage-spoilage-returns-write-off` |
 
 **What the spec says about it.** **Added 20 August from the client design board.** The operations existed and no screen called them.
+
+**Known gaps.** Contract gap recorded 2 October 2026 (CHG-WIR-011): No read lists recorded waste per item, with value and reason.
+
+**From the Food, Beverage & Retail process.** Logging waste where it happens - item, quantity, reason - and seeing what was wasted, where, and what it cost (FNB-5E). Waste depletes stock without a sale and is the ground truth for waste prediction, so the reason code matters more than it looks. The client asked for wastage and spoilage recorded per item. The one thing to get right is a fast entry (item, quantity, reason) that works offline and shows its value at current cost.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **The form shows an "Id" text field and a "Recorded at" date picker.** Why: The id is generated by the device (idempotency) and the time is the device's own; neither is typed. *(source: contracts/satellite/fnb.yaml#recordWaste / R254; Food, Beverage & Retail)*
+- **"Lines" is a multi-select.** Why: A waste line is item plus quantity plus unit; a multi-select cannot carry quantities. *(source: contracts/satellite/fnb.yaml#recordWaste; Food, Beverage & Retail)*
+- **No read of recorded waste exists, so the screen is a lone form (configEditor) with no list, history or totals.** Why: FNB-5E and DI-341 need the list of waste per item; MATRIX 6.1.38 promises count, value and a split by reason. *(source: screens/P08-venue-back-office.yaml#BO-139 / MATRIX 6.1.38 / DI-341; Food, Beverage & Retail)*
+- **The attached frames are Inventory Board 3 inv-3g (Adjustment & Write-Off) and inv-3j (Shrinkage & Accuracy); the F&B frame FNB-5E (Wastage, Spoilage & Write-Off) is mapped to EMP-067.** Why: The inventory frames are adjustments across warehouses; the F&B waste frame is this screen's. *(source: screens/P08-venue-back-office.yaml#BO-139; Food, Beverage & Retail)*
+- **The reasons the frames use (Trim, Re-fire, Equipment failure) are not in the reason list, and there is no "Other" with a note.** Why: Staff will pick the nearest wrong reason, which poisons the waste-prediction ground truth the contract warns about. *(source: contracts/satellite/fnb.yaml#recordWaste / screens/P08-venue-back-office.yaml#BO-139 / R222; Food, Beverage & Retail)*
+- **The name says "Returns" but the screen records only food waste; retail returns are elsewhere.** Why: Rename to "Wastage, Spoilage & Write-Off" to avoid a cashier looking here for a refund. *(source: R139 / screens/P08-venue-back-office.yaml#BO-139; Food, Beverage & Retail)*
+
+#### Decided on this screen
+
+Answered questions: draw the decision, not the old default. Where a decision and the tables below differ, the decision wins.
+
+- **Does waste above a value need approval (FNB-5E draws AED 100 / 500 / 2,000 bands and photo evidence above AED 500)? R144 lists recounts and retail returns, not waste, and no setting or approval call exists.** → A waste-approval policy the venue can switch on or off; when on, value bands and a photo above a value. *(decided by Chinmay, 2026-10-02; DEC-192 / CHG-NOTE-004)*
 
 #### Inputs: what the user enters or picks
 
@@ -720,6 +813,21 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Recorded at | date picker | — | — | — | — | Required. | — |
 | Note | text field | — | — | — | — | — | — |
 
+**Form: Save waste approval policy** (modal, opened by *Save waste approval policy*; *Save waste approval policy* calls `setWasteApprovalPolicy`, *Cancel* sends nothing)
+
+**Collects what `setWasteApprovalPolicy` sends before it is called.** Required: `enabled`. Optional: `bands`, `photoRequiredAbove`. Dismissing sends nothing; the screen behind is unchanged.
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Enabled `enabled` | toggle | required | off | — | — | — | `setWasteApprovalPolicy` body |
+| Bands `bands` | repeatable rows | optional | — | — | — | Value bands in ascending `fromValue`; a record's value falls in the last band it reaches. | `setWasteApprovalPolicy` body |
+| From value `bands[].fromValue` | money field | required | — | A jsonb price cannot be summed in SQL. | AED, 2 decimals shown (up to 4 accepted), currency from the … | On the wire this is three fields; in the database it is one column. 24 August. | `setWasteApprovalPolicy` body |
+| Requires approval `bands[].requiresApproval` | toggle | required | — | — | — | — | `setWasteApprovalPolicy` body |
+| Approver permission `bands[].approverPermission` | text field | optional | — | — | — | The permission an approver in this band holds (a value of the permission vocabulary, e.g. | `setWasteApprovalPolicy` body |
+| Photo required above `photoRequiredAbove` | money field | optional | — | — | AED, 2 decimals shown (up to 4 accepted), currency from the … | At or above this value a photo is required (`recordWaste.photoAssetId`). Null means never. | `setWasteApprovalPolicy` body |
+
+Errors to draw in the form: 400 Validation failed; 412 The row changed since the `If-Match` version was read (SD-013). Re-read and retry.
+
 **Sent by *Record waste*** (`recordWaste`; no form is declared, so these are filled from the screen or collected inline)
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
@@ -732,14 +840,47 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Reason `reason` | select | required | — | Spoilage · Preparation error · Customer return · Breakage · Over production · Expired | — | — | `recordWaste` body |
 | Note `note` | text area | optional | — | max length 500 | — | — | `recordWaste` body |
 | Recorded at `recordedAt` | date and time picker | required | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `recordWaste` body |
+| Photo image `photoAssetId` | upload, or pick from the media library | optional | — | — | PNG or SVG ≤ 2 MB for logos; images ≥ 1600 px; video MP4 | Photo evidence (an `assets` media id). Required where the venue's waste-approval policy is on and the value is at or above its `photoRequiredAbove` (CHG-CSA-016); refused `422 … | `recordWaste` body |
+
+**Rules for these inputs** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
+
+- **Outlet**: Outlet picker (the user's outlet by default); never an id. *(source: contracts/satellite/fnb.yaml#recordWaste)*
+- **Lines**: One or more lines, each an item (search by name), quantity and unit; not a multi-select. Value at current cost is shown per line as it is typed. *(source: contracts/satellite/fnb.yaml#recordWaste / DI-341)*
+- **Reason**: Spoilage, Preparation error, Customer return, Breakage, Over-production, Expired. One reason per entry; mixed reasons are separate entries. *(source: contracts/satellite/fnb.yaml#recordWaste / MATRIX 4.6.31)*
+- **Note**: Optional, up to 500 characters. *(source: contracts/satellite/fnb.yaml#recordWaste)*
 
 #### Outputs: what the screen shows and produces
+
+**Shown**
+
+**Waste approval policy** (detail panel, from `getWasteApprovalPolicy`): **A policy the venue switches on or off (decided 2 October 2026 by Chinmay, DEC-192; CHG-CSA-016):** off by default; when on, value bands decide approval and a photo is required above a value.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Enabled | yes / no (icon or chip) | — |
+| Bands | list or chips (count when long) | Value bands in ascending `fromValue`; a record's value falls in the last band it reaches. |
+| From value | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Requires approval | yes / no (icon or chip) | — |
+| Approver permission | text | The permission an approver in this band holds (a value of the permission vocabulary, e.g. |
+| Photo required above | AED 1,234.50 | At or above this value a photo is required (`recordWaste.photoAssetId`). Null means never. |
 
 **Actions and what each produces**
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Record waste (primary button) | `recordWaste` POST `/outlets/{outletId}/waste` | inline | inline | — | — |
+| Record waste (primary button) | `recordWaste` POST `/outlets/{outletId}/waste` | inline | inline | 422 The waste-approval policy is on and the value needs photo evidence that was not sent (`photo-required`, CHG-CSA-016). | — |
+| Save waste approval policy (secondary button) | `setWasteApprovalPolicy` PUT `/waste-approval-policy` | WasteApprovalPolicy | WasteApprovalPolicy | 400 Validation failed; 412 The row changed since the `If-Match` version was read (SD-013). Re-read and retry. | opens modal first |
+
+**Rules for what is shown** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
+
+- **Recorded**: "Recorded - value AED 1,456.00 at current cost" after save, with the entry added to the list. *(source: contracts/satellite/fnb.yaml#recordWaste)*
+- **Waste list**: Date, outlet, item, reason, quantity, value, logged by; filter by reason and period; value by reason as a split. *(source: screens/P08-venue-back-office.yaml#BO-139 / MATRIX 6.1.38)*
+
+**What each action does** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
+
+- **Record waste**: Depletes stock for each line and records the value; offline it is kept on the device and sent in order. *(source: contracts/satellite/fnb.yaml#recordWaste)*
+
+**Data it reads**: `getWasteApprovalPolicy` (onLoad, The waste-approval policy in force (DEC-192))
 
 **Where the user goes next**
 
@@ -754,12 +895,55 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Empty, first run (`?state=emptyFirstRun`) | No wastage spoilage returns configured. The form opens empty and `recordWaste` saves the first one; it says what the platform does in the meantime. |
 | Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `ORDER_MODIFY`, which `recordWaste` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 422 A setting the answer cannot do without is missing (29 September, AI functions review). (AiMissingSettingProblem) |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 422 A setting the answer cannot do without is missing (29 September, AI functions review). (AiMissingSettingProblem); 422 The waste-approval policy is on and the value needs photo evidence that was not sent (`photo-required`, CHG-CSA-016). |
+
+#### Edge cases to draw
+
+- **Offline**: Recorded on the device with "Will sync"; the time recorded is when it was logged, not when it synced. *(source: contracts/satellite/fnb.yaml#recordWaste)*
+- **A large write-off**: Where the venue has switched its waste-approval policy on, an entry above a value band waits for approval and needs a photo above the photo threshold (FNB-5E: AED 100 / 500 / 2,000); with the policy off, no approval step is drawn. *(source: screens/P08-venue-back-office.yaml#BO-139 / decided 2 October 2026 by Chinmay (CHG-NOTE-004))*
+- **A retail customer return**: Not here - retail returns go through the till by receipt or order number; "Customer return" here is food sent back. *(source: R139 / contracts/satellite/fnb.yaml#recordWaste)*
+
+#### Consistency with other screens
+
+- Match `EMP-067`: The same waste entry on the staff app (FNB-5E is mapped to EMP-067); same reasons, same fields.
+- Match `BO-044`: F&B Outlets also records waste; one entry component.
+- Match `BO-138`: Batch losses use Over-production or Preparation error.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+entries:
+- date: 24 Oct 2026 21:40
+  outlet: Oasis Bistro
+  item: Fresh Sea Bass
+  qty: 11.2 kg
+  reason: Preparation error
+  value: AED 1,456.00
+  by: Priya Nair
+- date: 23 Oct 2026 09:15
+  outlet: Bite & Go
+  item: Brioche Bun
+  qty: 104 pc
+  reason: Breakage
+  value: AED 218.40
+  by: Omar Ziad
+- date: 22 Oct 2026 16:05
+  outlet: Beach Hut kiosk
+  item: Milk full fat
+  qty: 12 L
+  reason: Expired
+  value: AED 86.00
+  by: Aisha Rahman
+```
 
 #### Permissions
 
 - `recordWaste` → `ORDER_MODIFY` (operate) · staff
 - `requestSuggestion` → `AI_USE` (operate) · staff, guest
+- `getWasteApprovalPolicy` → `PRODUCT_VIEW` (read) · staff
+- `setWasteApprovalPolicy` → `PRODUCT_CONFIGURE` (configure) · staff
 
 **A refused user sees:** Shown when the caller lacks `ORDER_MODIFY`, which `recordWaste` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -803,13 +987,16 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (14), with its required mark, default, format and its error state (422).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (21), with its required mark, default, format and its error state (400, 412, 422).
+- [ ] Every output is drawn (6 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-139?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: Record waste.
+- [ ] Every action is wired with its success and its failure: Record waste, Save waste approval policy.
 - [ ] Every transition is wired: `BO-105`.
-- [ ] Every gated control is gated: `AI_USE`, `ORDER_MODIFY`.
+- [ ] Every gated control is gated: `AI_USE`, `ORDER_MODIFY`, `PRODUCT_CONFIGURE`, `PRODUCT_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 3 edge case(s) from the process notes are drawn.
+- [ ] The 6 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
+- [ ] The 1 decision(s) taken on this screen are drawn as decided, not as the old default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -823,14 +1010,33 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Stock & Supply · wave 2 · needs the `fnb` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `PRODUCT_CONFIGURE`, `PRODUCT_VIEW` (1 configure, 1 read) |
+| Who uses it | venue staff holding `INCIDENT_VIEW`, `PRODUCT_CONFIGURE`, `PRODUCT_VIEW` (2 read, 1 configure) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listExpiringBatches` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
 | Offline | online only |
-| Opens with | `venueId` (session), `itemId` (deepLink) · cold entry: Resolves from the session. A principal with more than one venue is asked which first. |
+| Opens with | `venueId` (session), `itemId` (deepLink), `menuId` (navigation), `outletId` (navigation) · cold entry: Resolves from the session. A principal with more than one venue is asked which first. |
 | Route | `/stock-supply/product-availability-86-operational-food-safet` |
 
 **What the spec says about it.** **Added 20 August from the client design board.** The operations existed and no screen called them. **Named in the board contents and not written up in it** — the operations are real, the layout is not. **Availability is immediate (decided 28 September, audit R110)** — the 86 toggle calls `setItemAvailability` at once; the Save changes step is gone. Reason Other needs a note (audit R222).
+
+**Known gaps.** Removed 2 October 2026 (CHG-WIR-008): The population was listExpiringBatches (stock batches), so the Available toggle had no menu item to bind; the list is the outlet's menu items with availability …
+
+**From the Food, Beverage & Retail process.** What is sellable right now at an outlet, and the kitchen's food-safety state beside it (FNB-5J, FNB-2H). Staff switch a dish off (86) with a reason and an optional automatic return time, and on again; the change is live on every till and guest menu of the outlet the moment it returns - there is no Save step. The HACCP side shows checks due and missed, open corrective actions and the temperature checkpoints. The one thing to get right is the immediacy of the toggle and the "Other needs a note" rule.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **No board frame; FNB-5J ("Availability, 86 & Food Safety") is mapped to EMP-062 and FNB-2H ("Availability & 86 Management") to nothing.** Why: Attach both so the designer starts from the client's drawing. *(source: screens/P08-venue-back-office.yaml#BO-140; Food, Beverage & Retail)*
+- **Marking an item unavailable is on seven screens (POS-021, POS-024, EMP-062, BO-014, BO-049, BO-140, KIT-008) and HACCP status on three (EMP-062, BO-044, KIT-008).** Why: Make BO-140 the back-office home for F&B availability and food safety; the others are shortcuts with the same behaviour (DI-671). *(source: DI-671 / contracts/satellite/fnb.yaml#setItemAvailability; Food, Beverage & Retail)*
+- **FNB-5J says a safety 86 cannot be cleared until its corrective action is signed, and FNB-2H distinguishes stock-driven 86s that clear on receipt; the contract has no link between an 86 and a corrective action, and no stock-driven 86.** Why: The frame promises behaviour nothing implements; draw only manual 86 until decided. *(source: screens/P08-venue-back-office.yaml#BO-140 / contracts/satellite/fnb.yaml#setItemAvailability; Food, Beverage & Retail)*
+
+**Fixed on main** (the package already carries these; draw what it says): The population is listExpiringBatches (stock batches, lot numbers, supplier, "Within days") - the Available toggle has no menu item to bind … (CHG-WIR-008); list86Events, getHaccpStatus and listTemperatureCheckpoints are not declared; setTemperatureCheckpoint is, with no list to edit from. (CHG-WIR-008).
+
+#### Decided on this screen
+
+Answered questions: draw the decision, not the old default. Where a decision and the tables below differ, the decision wins.
+
+- **Should a temperature breach automatically 86 the dishes that depend on that unit (FNB-5J "auto-86 on safety breach")?** → Drawn default stands (answer: "Suggest, don't auto: the breach banner offers '86 affected items'"): No automatic 86; the breach banner suggests "86 affected items". *(decided by Chinmay, 2026-10-02; DEC-193 / CHG-NOTE-004)*
+- **Are daily counts ("6 left") with automatic 86 at zero in scope (FNB-2H "Count set")? No operation sets a count.** → Daily counts ('6 left') on menu items; an item goes sold out automatically at zero. *(decided by Chinmay, 2026-10-02; DEC-194 / CHG-NOTE-004)*
 
 #### Inputs: what the user enters or picks
 
@@ -838,7 +1044,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
 |---|---|---|---|---|---|---|---|
-| Within days | number field (days) | optional | 7 | — | — | Sends `?withinDays=` to `listExpiringBatches`. | `listExpiringBatches` ?withinDays |
 | Search product availability, 86 | search field | — | — | — | — | — | — |
 | Available | toggle | — | — | — | — | **Takes effect immediately** (decided 28 September, audit R110) — switching an item off (86) or back on calls `setItemAvailability` at once and every terminal in the outlet follows; there is no Save … | — |
 
@@ -856,41 +1061,118 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 Errors to draw in the form: 400 Validation failed; 412 The row changed since the `If-Match` version was read (SD-013). Re-read and retry.
 
+**Form: Set daily count** (modal, opened by *Set daily count*; *Set daily count* calls `setMenuItemDailyCount`, *Cancel* sends nothing)
+
+**Collects what `setMenuItemDailyCount` sends before it is called.** Required: `count`. Dismissing sends nothing; the screen behind is unchanged.
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Count `count` | number field | required | — | min 0 | — | Portions for today. Null stops counting the item. | `setMenuItemDailyCount` body |
+
+Errors to draw in the form: 400 Validation failed; 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 412 The row changed since the `If-Match` version was read (SD-013). Re-read and retry.
+
+**Rules for these inputs** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
+
+- **Outlet**: Outlet picker by name; the list is that outlet's menu items grouped by section, with search. *(source: contracts/satellite/fnb.yaml#getMenu / DI-330)*
+- **Available toggle**: Off opens a short prompt - reason (Sold out, Ingredient unavailable, Equipment down, Seasonal, Other), note, and "Back on" (Next service, End of day, a chosen time, or By hand). Choosing Other makes the note required and the confirm button stays disabled until it is filled. On sends at once with no prompt. *(source: R110 / R222 / contracts/satellite/fnb.yaml#setItemAvailability)*
+- **Temperature checkpoint**: Label as staff call it (Walk-in 2, Dessert counter), kind (Fridge, Freezer, Holding cabinet, Blast chiller, Core probe, Delivery, Display counter, Ambient), safe range in degrees C (either end may be empty, not both), how often it must be read (minutes), whether a breach needs a corrective action, active. *(source: contracts/satellite/fnb.yaml#setTemperatureCheckpoint)*
+
 #### Outputs: what the screen shows and produces
 
 **Shown**
 
-**Every stock batch** (data table, from `listExpiringBatches`)
+**Menu items** (detail panel, from `getMenu`)
 
 | Shows | Format | Notes |
 |---|---|---|
 | ID | the name it points at, never the id | — |
-| Item | the name it points at, never the id | — |
-| Location | the name it points at, never the id | — |
-| Batch code | text | — |
-| Lot number | text | The supplier's own reference. A recall names a lot number, and an inventory that cannot resolve one has to discard everything. |
-| Quantity | 1,234.5 | — |
-| Received at | 1 Oct 2026, 14:30 | — |
-| Expires at | 1 Oct 2026 | — |
-| Supplier | the name it points at, never the id | — |
-| Status | chip: Available, Quarantined, Expired, Recalled, Consumed, Written off | — |
+| Code | text | — |
+| Name | text | — |
+| Outlet | the name it points at, never the id | — |
+| Availability | grouped details | When this menu is in force. Absent means always. |
+| Days of week | list or chips (count when long) | — |
+| Start time | text | Wall-clock time, in the Region's time zone. |
+| End time | text | Wall-clock time, in the Region's time zone. |
+| Valid from | 1 Oct 2026 | Calendar day, in the Region's time zone, not UTC. |
+| Valid to | 1 Oct 2026 | Calendar day, in the Region's time zone, not UTC. |
+| Sections | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
+| Code | text | — |
+| Name | text | — |
+| Sort order | 1,234 | — |
+| Items | list or chips (count when long) | The section's items, in sale-board order. An item's membership is `MenuItem.menuSectionId`. |
+| ID | the name it points at, never the id | — |
+| Product variant | the name it points at, never the id | The catalogue variant this item links to, for reporting, stock and tax class only. |
+| Name | text | — |
+| Description | text | — |
 
-**The selected stock batch** (detail panel, from `listExpiringBatches`)
+**86 history** (data table, from `list86Events`)
 
 | Shows | Format | Notes |
 |---|---|---|
+| Items | list or chips (count when long) | — |
 | ID | the name it points at, never the id | — |
-| Item | the name it points at, never the id | — |
-| Location | the name it points at, never the id | — |
-| Batch code | text | — |
-| Lot number | text | The supplier's own reference. A recall names a lot number, and an inventory that cannot resolve one has to discard everything. |
-| Quantity | 1,234.5 | — |
-| Received at | 1 Oct 2026, 14:30 | — |
-| Expires at | 1 Oct 2026 | — |
-| Supplier | the name it points at, never the id | — |
-| Status | chip: Available, Quarantined, Expired, Recalled, Consumed, Written off | — |
+| Outlet | the name it points at, never the id | — |
+| Menu item | the name it points at, never the id | — |
+| Off at | 1 Oct 2026, 14:30 | — |
+| Back at | 1 Oct 2026, 14:30 | — |
+| Reason | chip: Ran out, Quality issue, Equipment down, Supplier failure, Seasonal, Other | `other` always carries a `note` (audit R222). |
+| Note | text | The note given with the 86. Required where the reason is `other` (audit R222). |
+| Called by principal | the name it points at, never the id | — |
+| Source | chip: Manual, Daily count | Who took the item off (CHG-CSA-017). `manual`: a person, through `setItemAvailability`. |
+| Refused order count | 1,234 | — |
+| Next cursor | text | — |
+| Has more | yes / no (icon or chip) | — |
 
-**Data it reads**: `listExpiringBatches` (onLoad, What is about to go out of date)
+**Food safety** (detail panel, from `getHaccpStatus`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Checks due | 1,234 | — |
+| Checks missed | 1,234 | — |
+| Open actions | 1,234 | — |
+| Unsigned actions | 1,234 | — |
+| Oldest open action age hours | 1,234 | — |
+| Last inspection at | 1 Oct 2026, 14:30 | — |
+
+**Checkpoints** (data table, from `listTemperatureCheckpoints`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
+| Outlet | the name it points at, never the id | — |
+| Kind | chip: Fridge, Freezer, Holding cabinet, Blast chiller, Core probe, Delivery… | The same closed set `TemperatureLog.checkPointKind` records. |
+| Label | text | What the person reading it calls it — *Walk-in 2*, *Dessert counter*. A checkpoint identified only by a uuid is one somebody will read the … |
+| Min celsius | 1,234.5 | — |
+| Max celsius | 1,234.5 | Null at either end is legitimate — a core probe has a floor and no ceiling. Both null is not, and is what an unconfigured checkpoint looks … |
+| Check frequency minutes | 1,234 | How often it must be read. The gap this leaves open otherwise is the one an inspector finds: not a bad reading, but a missing one. |
+| Requires corrective action on breach | yes / no (icon or chip) | — |
+| Is active | yes / no (icon or chip) | — |
+| Next cursor | text | — |
+| Has more | yes / no (icon or chip) | — |
+
+**Actions and what each produces**
+
+| Action | Calls | Sends | On success returns | Errors to show | Notes |
+|---|---|---|---|---|---|
+| Set daily count (secondary button) | `setMenuItemDailyCount` PUT `/menu-items/{itemId}/daily-count` | inline | MenuItem | 400 Validation failed; 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 412 The row changed since the `If-Match` version was read (SD-013). Re-read and retry. | opens modal first |
+
+**Rules for what is shown** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
+
+- **Item status**: Available, or "86" with reason, since when, who, and "back at 18:00" when a return time is set; guests see the same item as "Sold out". *(source: contracts/satellite/fnb.yaml#/components/schemas/MenuItem / contracts/satellite/fnb.yaml#getGuestMenu)*
+- **86 history**: Time off, time back, who called it and refused orders, per item and outlet, for the day and 30 days. *(source: contracts/satellite/fnb.yaml#list86Events / screens/P08-venue-back-office.yaml#BO-140)*
+- **Food-safety status**: Checks due, checks missed, open corrective actions and unsigned findings; a missed check counts the same as a failed one. An open breach shows the unit, peak reading, limit and duration. *(source: contracts/satellite/fnb.yaml#getHaccpStatus / F28 step 1 / F28 step 6)*
+- **Temperatures**: Degrees Celsius with one decimal; a reading outside the range in danger colour, near the limit in warning. *(source: contracts/satellite/fnb.yaml#/components/schemas/TemperatureLog)*
+- **Daily counts**: An item can carry a daily count ("6 left"); at zero it goes Sold out automatically, until the next count. *(source: decided 2 October 2026 by Chinmay (CHG-NOTE-004))*
+
+**What each action does** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
+
+- **86 now**: Live on every till and guest menu of the outlet when it returns; the row flips at once and the history adds the event. Other without a note is refused (400) and the prompt says why. *(source: R110 / R222 / contracts/satellite/fnb.yaml#setItemAvailability)*
+- **Back on**: Immediate, no prompt. *(source: R110 / contracts/satellite/fnb.yaml#setItemAvailability)*
+- **Save checkpoint**: Saves the unit and its range; past readings keep the range they were judged against (a range revised now does not re-judge January). *(source: contracts/satellite/fnb.yaml#setTemperatureCheckpoint)*
+
+**Data it reads**: `getMenu` (onLoad, The outlet's menu items with their availability); `getHaccpStatus` (onLoad, Food-safety status); `listTemperatureCheckpoints` (onLoad, The temperature checkpoints to edit)
 
 **Where the user goes next**
 
@@ -904,31 +1186,86 @@ Errors to draw in the form: 400 Validation failed; 412 The row changed since the
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the product availability operational untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No product availability operational yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on withinDays and the product availability operational are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_VIEW`, which `listExpiringBatches` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_VIEW`, which `getMenu` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed |
+
+#### Edge cases to draw
+
+- **The device is offline when an item is 86'd**: The toggle shows "Saved on this device - tills will update when it reconnects"; offline tills keep selling from the cached menu and the kitchen refuses an 86'd item before the guest pays. *(source: contracts/satellite/fnb.yaml#setItemAvailability / F108 step 3)*
+- **Someone else changed the same item first**: The row refreshes to the current state with "Changed by Omar Ziad at 19:42" (412). *(source: contracts/satellite/fnb.yaml#setItemAvailability)*
+- **A checkpoint is not read in time**: A minor corrective action opens on its own (missed check) and appears in the open list. *(source: R125 / contracts/satellite/fnb.yaml#logTemperature)*
+- **Escalating a critical finding with no food-safety lead**: Refused; the message links to F&B settings to name the lead. *(source: R096 / contracts/satellite/fnb.yaml#escalateCorrectiveAction)*
+
+#### Consistency with other screens
+
+- Match `KIT-008`: The kitchen's unavailable-items view; same reasons, same "86" wording, same history.
+- Match `POS-021`: The till greys the item with "86" the moment this returns.
+- Match `EMP-062`: The staff app's availability and HACCP entry; same toggle behaviour and prompt.
+- Match `BO-136`: The food-safety lead is named on F&B settings.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+outlet: Bite & Go (Aqua Park)
+unavailable:
+- item: Chicken Machboos
+  reason: Ingredient unavailable
+  since: '11:05'
+  by: Priya Nair
+  backOn: Next service 18:00
+- item: Mango Lassi
+  reason: Other
+  note: Blender down, engineer called
+  since: '12:20'
+  by: Omar Ziad
+  backOn: By hand
+breach:
+  unit: Chiller 2 - Bite & Go
+  peak: 8.4 C
+  limit: 5.0 C
+  duration: 40 min
+  action: Open - assigned to Fatima Al Suwaidi
+haccp:
+  roundsDone: 3 of 4
+  missed: 1
+  openActions: 2
+  unsigned: 1
+checkpoints:
+- label: Walk-in 2
+  kind: Fridge
+  range: 0.0 to 5.0 C
+  every: 120 min
+- label: Hot hold - pass
+  kind: Holding cabinet
+  range: 63.0 C and above
+  every: 60 min
+```
 
 #### Permissions
 
 - `setItemAvailability` → `PRODUCT_CONFIGURE` (configure) · staff
-- `listExpiringBatches` → `PRODUCT_VIEW` (read) · staff
 - `setTemperatureCheckpoint` → `PRODUCT_CONFIGURE` (configure) · staff
+- `getMenu` → `PRODUCT_VIEW` (read) · staff
+- `list86Events` → `PRODUCT_VIEW` (read) · staff
+- `getHaccpStatus` → `INCIDENT_VIEW` (read) · staff
+- `listTemperatureCheckpoints` → `PRODUCT_VIEW` (read) · staff
+- `setMenuItemDailyCount` → `PRODUCT_CONFIGURE` (configure) · staff
 
-**A refused user sees:** Shown when the caller lacks `PRODUCT_VIEW`, which `listExpiringBatches` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `PRODUCT_VIEW`, which `getMenu` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
 #### Requirements it meets
 
-7 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+4 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
 
 | Ref | Requirement (shortened) | Domain | Verdict | Via |
 |---|---|---|---|---|
 | 4.6.9 | The system should be able to allow the back office to limit the sale of a particular item per day or per timeslot.(example: Happy hour time slot based sales). | Bundles and Promotions | CONTRACTED | `setItemAvailability` |
-| 4.5.17 | Track expiration dates and generate alerts. | Bundles and Promotions | CONTRACTED | data `StockBatch` |
-| 4.5.18 | Track inventory by batch and lot numbers. | Bundles and Promotions | CONTRACTED | data `StockBatch` |
-| 6.1.39 | The system should be able to report on aging stocks (comparison against defined/Expiry vs actual). | Retail POS | CONTRACTED | data `StockBatch` |
-| 15.1.35 | Batch Number Tracking - System shall support batch tracking. | Inventory Management | CONTRACTED | data `StockBatch` |
-| 15.1.36 | Lot Tracking - System shall support lot tracking. | Inventory Management | CONTRACTED | data `StockBatch` |
-| 15.1.38 | Expiry Date Tracking - System shall support expiry date tracking. | Inventory Management | CONTRACTED | data `StockBatch` |
+| 2.1.32 | System shall allow guests to purchase food and beverage items through self-service kiosks. The kiosk shall support menu browsing, product customization, combo meals, upsell recommendations … | Ticketing Sales | CONTRACTED | data `Menu` |
+| 2.1.33 | System shall allow guests to purchase retail merchandise through self-service kiosks. The kiosk shall support product browsing, inventory validation, variant selection (size, color, style) … | Ticketing Sales | CONTRACTED | data `Menu` |
+| 4.6.13 | The system should have a interface for kiosks where the guest should be able to place order via the self service option all the way till completing payments. | Bundles and Promotions | CONTRACTED | data `Menu` |
 
 #### Client meeting inputs
 
@@ -946,13 +1283,16 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (8), with its required mark, default, format and its error state (400, 412).
-- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (8), with its required mark, default, format and its error state (400, 404, 412).
+- [ ] Every output is drawn (51 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-140?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
+- [ ] Every action is wired with its success and its failure: Set daily count.
 - [ ] Every transition is wired: `BO-105`.
-- [ ] Every gated control is gated: `PRODUCT_CONFIGURE`, `PRODUCT_VIEW`.
+- [ ] Every gated control is gated: `INCIDENT_VIEW`, `PRODUCT_CONFIGURE`, `PRODUCT_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 4 edge case(s) from the process notes are drawn.
+- [ ] The 3 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
+- [ ] The 2 decision(s) taken on this screen are drawn as decided, not as the old default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -974,6 +1314,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Route | `/stock-supply/operational-alerts-ai-replenishment-action-cen` |
 
 **What the spec says about it.** **Added 20 August from the client design board.** The operations existed and no screen called them. **Named in the board contents and not written up in it** — the operations are real, the layout is not. **Absorbed BO-472 on 28 September (audit R276)**: Operational Alerts & Exception Center (Games & Rides board 8) called only `listAlerts`, already here; it is retired and BO-464 now opens this screen for the operational exception queue.
+
+**From the Finance, Ledger & Tax · Reporting & Analytics process.** One queue for operational problems, including stock alerts that should become a requisition. From the reporting angle: each alert says what left its range, by how much, where, and since when, and is acknowledged by a named person rather than dismissed. The one thing to get right: an alert resolves itself when the figure is back in range; acknowledging means "I am on it", not "make it go away".
+
+**Known correction pending (do not draw the wrong version)**
+
+- **The screen is named "AI Replenishment" but declares no AI suggestion operation.** Why: The replenishment recommendation has no source; only alerts and requisitions are wired. *(source: screens/P08-venue-back-office.yaml#BO-141; Finance, Ledger & Tax · Reporting & Analytics)*
 
 #### Inputs: what the user enters or picks
 
@@ -1015,6 +1361,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Justification `justification` | text area | optional | — | max length 1000 | — | — | `createRequisition` body |
 
 Errors to draw in the form: 400 Validation failed
+
+**Rules for these inputs** (from the Finance, Ledger & Tax · Reporting & Analytics process; these refine the tables above and win where they differ)
+
+- **Acknowledge note**: Up to 300 characters saying what is being done. *(source: contracts/satellite/reporting.yaml#/components/schemas/Alert)*
+- **Requisition from an alert**: Item prefilled from the alert, quantity, required-by date, cost centre, justification. *(source: contracts/satellite/reporting.yaml#/components/schemas/Alert / contracts/satellite/inventory.yaml#createRequisition)*
+- **Filters**: Severity, status (raised, acknowledged, resolved, expired); outlet and item as pick lists, not ids. *(source: contracts/satellite/reporting.yaml#/components/schemas/AlertStatus)*
 
 #### Outputs: what the screen shows and produces
 
@@ -1061,6 +1413,15 @@ Errors to draw in the form: 400 Validation failed
 | Acknowledge alert (primary button) | `acknowledgeAlert` POST `/alerts/{alertId}/acknowledge` | inline | Alert | — | opens modal first |
 | Create requisition (secondary button) | `createRequisition` POST `/requisitions` | CreateRequisitionRequest | Requisition | 400 Validation failed | gated `PROCUREMENT_REQUEST`; opens modal first |
 
+**Rules for what is shown** (from the Finance, Ledger & Tax · Reporting & Analytics process; these refine the tables above and win where they differ)
+
+- **Alert row**: Rule name, observed value against threshold, item or workstation, raised time, escalated flag; critical first. *(source: contracts/satellite/reporting.yaml#/components/schemas/Alert)*
+
+**What each action does** (from the Finance, Ledger & Tax · Reporting & Analytics process; these refine the tables above and win where they differ)
+
+- **Acknowledge**: Records who and the note; escalation stops. *(source: contracts/satellite/reporting.yaml#acknowledgeAlert)*
+- **Raise requisition**: Creates the requisition and links it to the alert. *(source: contracts/satellite/inventory.yaml#createRequisition)*
+
 **Data it reads**: `listAlerts` (onLoad, What is currently raised)
 
 **Where the user goes next**
@@ -1079,6 +1440,24 @@ Errors to draw in the form: 400 Validation failed
 | Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `REPORT_VIEW_VENUE`, which `listAlerts` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed |
+
+#### Edge cases to draw
+
+- **Nobody acknowledges a critical alert**: It escalates after the venue's set minutes; the row shows "Escalated". *(source: contracts/satellite/reporting.yaml#/components/schemas/Alert)*
+
+#### Consistency with other screens
+
+- Match `POS-020`: Same alert vocabulary and severities.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+alerts:
+- Critical · Bottled water 500 ml below reorder level · Surf Café · 38 left, reorder at 120 · since 09:14
+- Warning · Wastage rate 6.2% above 4% · Main Kitchen · since yesterday
+```
 
 #### Permissions
 
@@ -1126,6 +1505,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-105`, `BO-464`.
 - [ ] Every gated control is gated: `PROCUREMENT_REQUEST`, `REPORT_VIEW_VENUE`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 1 edge case(s) from the process notes are drawn.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -1228,24 +1609,25 @@ Method, path, parameters, request and response for every operation these screens
 ```json
 {
 "acknowledgeAlert": {"method":"POST","path":"/alerts/{alertId}/acknowledge","contract":"reporting","summary":"Mark it seen","permission":"REPORT_VIEW_VENUE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Alert"},
-"completeProductionRun": {"method":"POST","path":"/production-runs/{runId}/complete","contract":"fnb","summary":"Record what was actually made","permission":"PRODUCT_CONFIGURE","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"ProductionRun"},
 "createInventoryItem": {"method":"POST","path":"/inventory-items","contract":"inventory","summary":"Create an inventory item","permission":"PRODUCT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"CreateInventoryItemRequest","responds":"InventoryItem"},
 "createRequisition": {"method":"POST","path":"/requisitions","contract":"inventory","summary":"Raise a requisition","permission":"PROCUREMENT_REQUEST","offlineCapable":true,"conflictPolicy":"append","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"CreateRequisitionRequest","responds":"Requisition"},
 "getCountVariance": {"method":"GET","path":"/stock-counts/{countId}/variance","contract":"inventory","summary":"Variance between counted and expected","permission":"PRODUCT_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"CountVariance"},
-"getKpiValues": {"method":"GET","path":"/kpi-values","contract":"reporting","summary":"Current values, against target, with movement","permission":"REPORT_VIEW_VENUE","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[{"name":"kpiIds","in":"query","required":null},{"name":"kpiCodes","in":"query","required":null},{"name":"scopePath","in":"query","required":null},{"name":"period","in":"query","required":null},{"name":"compareTo","in":"query","required":null},{"name":"interval","in":"query","required":null},{"name":"groupBy","in":"query","required":null}],"requestBody":null,"responds":"KpiValue"},
+"getHaccpStatus": {"method":"GET","path":"/food-safety/status","contract":"fnb","summary":"Where this venue stands, right now","permission":"INCIDENT_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":null},
+"getKpiValues": {"method":"GET","path":"/kpi-values","contract":"reporting","summary":"Current values, against target, with movement","permission":"REPORT_VIEW_VENUE","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[{"name":"kpiIds","in":"query","required":null},{"name":"kpiCodes","in":"query","required":null},{"name":"scopePath","in":"query","required":null},{"name":"period","in":"query","required":null},{"name":"compareTo","in":"query","required":null},{"name":"interval","in":"query","required":null},{"name":"groupBy","in":"query","required":null},{"name":"module","in":"query","required":null}],"requestBody":null,"responds":"KpiValue"},
+"getMenu": {"method":"GET","path":"/menus/{menuId}","contract":"fnb","summary":"Read a menu with sections and items","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"Menu"},
 "getProductionRun": {"method":"GET","path":"/production-runs/{runId}","contract":"fnb","summary":"One run — its plan, its output, and the gap","permission":"PRODUCT_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"ProductionRun"},
-"getVenueSettings": {"method":"GET","path":"/venues/{venueId}/settings","contract":"tenancy","summary":"Operational settings for this venue","permission":"TENANT_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"VenueSettings"},
+"getWasteApprovalPolicy": {"method":"GET","path":"/waste-approval-policy","contract":"fnb","summary":"The venue's waste-approval policy","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"WasteApprovalPolicy"},
+"list86Events": {"method":"GET","path":"/outlets/{outletId}/86-events","contract":"fnb","summary":"What came off the menu today, when, and for how long","permission":"PRODUCT_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"from","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listAlerts": {"method":"GET","path":"/alerts","contract":"reporting","summary":"What is currently wrong","permission":"REPORT_VIEW_VENUE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"status","in":"query","required":null},{"name":"severity","in":"query","required":null},{"name":"workstationId","in":"query","required":null},{"name":"shiftId","in":"query","required":null},{"name":"itemId","in":"query","required":null}],"requestBody":null,"responds":"Alert"},
-"listExpiringBatches": {"method":"GET","path":"/stock-batches/expiring","contract":"inventory","summary":"What is about to go out of date","permission":"PRODUCT_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"withinDays","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
-"listInventoryItems": {"method":"GET","path":"/inventory-items","contract":"inventory","summary":"List inventory items","permission":"PRODUCT_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"venueId","in":"query","required":null},{"name":"categoryId","in":"query","required":null},{"name":"belowReorderPoint","in":"query","required":null},{"name":"search","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listProductionRuns": {"method":"GET","path":"/production-runs","contract":"fnb","summary":"What is being made, and what was","permission":"PRODUCT_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"status","in":"query","required":null},{"name":"locationKind","in":"query","required":null},{"name":"from","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
-"listPurchaseOrders": {"method":"GET","path":"/purchase-orders","contract":"inventory","summary":"List purchase orders","permission":"PROCUREMENT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"status","in":"query","required":null},{"name":"supplierId","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listRecipes": {"method":"GET","path":"/recipes","contract":"fnb","summary":"List recipes","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"search","in":"query","required":null},{"name":"menuItemId","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
-"planProductionRun": {"method":"POST","path":"/production-runs","contract":"fnb","summary":"Plan a batch, for one outlet or several","permission":"PRODUCT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"ProductionRun","responds":"ProductionRun"},
+"listTemperatureCheckpoints": {"method":"GET","path":"/food-safety/checkpoints","contract":"fnb","summary":"The units that get read, and the range each must hold","permission":"PRODUCT_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "recordWaste": {"method":"POST","path":"/outlets/{outletId}/waste","contract":"fnb","summary":"Record waste","permission":"ORDER_MODIFY","offlineCapable":true,"conflictPolicy":"append","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":null},
 "requestSuggestion": {"method":"POST","path":"/ai/suggestions","contract":"ai","summary":"Ask for an answer, however it is currently produced","permission":"AI_USE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Suggestion"},
 "setItemAvailability": {"method":"PUT","path":"/menu-items/{itemId}/availability","contract":"fnb","summary":"Mark an item available or eighty-sixed","permission":"PRODUCT_CONFIGURE","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"MenuItem"},
-"setTemperatureCheckpoint": {"method":"PUT","path":"/food-safety/checkpoints","contract":"fnb","summary":"Define a checkpoint and its safe range","permission":"PRODUCT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":"TemperatureCheckpoint","responds":"TemperatureCheckpoint"}
+"setMenuItemDailyCount": {"method":"PUT","path":"/menu-items/{itemId}/daily-count","contract":"fnb","summary":"Set today's count for a dish","permission":"PRODUCT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"MenuItem"},
+"setTemperatureCheckpoint": {"method":"PUT","path":"/food-safety/checkpoints","contract":"fnb","summary":"Define a checkpoint and its safe range","permission":"PRODUCT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":"TemperatureCheckpoint","responds":"TemperatureCheckpoint"},
+"setWasteApprovalPolicy": {"method":"PUT","path":"/waste-approval-policy","contract":"fnb","summary":"Switch waste approval on or off, and set its bands","permission":"PRODUCT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":"WasteApprovalPolicy","responds":"WasteApprovalPolicy"}
 }
 ```
 
@@ -1264,24 +1646,25 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "CountVariance": {"x-ticvai-persistence":"none — computed at close","type":"object","required":["countId","totalVarianceValue","lines"],"properties":{"countId":{"type":"string","format":"uuid"},"totalVarianceValue":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"exceptionCount":{"type":"integer","description":"Lines beyond `VenueSettings.inventory.countVarianceTolerancePercent` (proposed default 2 per cent, audit R094), requiring review before posting."},"lines":{"type":"array","items":{"type":"object","required":["itemId","expectedQuantity","countedQuantity","variance","isException"],"properties":{"itemId":{"type":"string","format":"uuid"},"itemName":{"type":"string"},"sku":{"type":"string"},"expectedQuantity":{"type":"number"},"countedQuantity":{"type":"number"},"variance":{"type":"number"},"variancePercentage":{"type":"number"},"varianceValue":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"isException":{"type":"boolean"},"recountCount":{"type":"integer","description":"A line counted several times is itself a finding."},"note":{"type":"string","nullable":true}}}}}},
 "CreateInventoryItemRequest": {"x-ticvai-persistence":"none — request only","type":"object","required":["sku","name","venueId","baseUnit","costingMethod"],"properties":{"sku":{"type":"string","maxLength":64},"barcode":{"type":"string","maxLength":128},"name":{"type":"string","maxLength":200},"venueId":{"type":"string","format":"uuid"},"categoryId":{"type":"string","format":"uuid"},"baseUnit":{"type":"string","description":"The unit stock is held in. Immutable once movements exist."},"purchaseUnit":{"type":"string","description":"How the supplier sells it — a case of 24 against a base unit of one."},"purchaseUnitFactor":{"type":"number","minimum":0,"default":1},"costingMethod":{"$ref":"#/components/schemas/CostingMethod"},"reorderPoint":{"type":"number","minimum":0},"reorderQuantity":{"type":"number","minimum":0},"parLevel":{"type":"number","minimum":0},"preferredSupplierId":{"type":"string","format":"uuid"},"allowNegativeStock":{"type":"boolean","default":false,"description":"True permits issue beyond on-hand. Occasionally needed at a bar mid-service; dangerous everywhere else.\n"},"isPerishable":{"type":"boolean","default":false},"shelfLifeDays":{"type":"integer","nullable":true}}},
 "CreateRequisitionRequest": {"x-ticvai-persistence":"none — request only","type":"object","required":["id","venueId","lines","requiredBy"],"properties":{"id":{"type":"string","format":"uuid"},"venueId":{"type":"string","format":"uuid"},"departmentId":{"type":"string","format":"uuid"},"costCenterId":{"type":"string","format":"uuid"},"lines":{"type":"array","minItems":1,"items":{"type":"object","required":["itemId","quantity"],"properties":{"itemId":{"type":"string","format":"uuid"},"quantity":{"type":"number","minimum":0},"unit":{"type":"string"},"note":{"type":"string","maxLength":200}}}},"requiredBy":{"type":"string","format":"date"},"justification":{"type":"string","maxLength":1000}}},
+"EightySixEvent": {"type":"object","x-ticvai-persistence":"fnb.sold_out_item","description":"Board 5J. **`setItemAvailability` recorded the current state and not the history.** An item 86'd at 7pm on a Saturday is a lost-sales figure and a prep-planning signal, and the package kept only the flag.\n**`refusedOrderCount` is what makes it worth keeping.** *Off for ninety minutes* is a note; *off for ninety minutes and eleven guests asked for it* is a purchasing decision.\n","required":["id","menuItemId","offAt"],"properties":{"id":{"type":"string","format":"uuid"},"outletId":{"type":"string","format":"uuid"},"menuItemId":{"type":"string","format":"uuid"},"offAt":{"type":"string","format":"date-time"},"backAt":{"type":"string","format":"date-time","nullable":true},"reason":{"type":"string","enum":["ranOut","qualityIssue","equipmentDown","supplierFailure","seasonal","other"],"description":"`other` always carries a `note` (audit R222)."},"note":{"type":"string","maxLength":500,"nullable":true,"description":"The note given with the 86. Required where the reason is `other` (audit R222)."},"calledByPrincipalId":{"type":"string","format":"uuid"},"source":{"type":"string","readOnly":true,"enum":["manual","dailyCount"],"default":"manual","description":"**Who took the item off** (CHG-CSA-017). `manual`: a person, through `setItemAvailability`. `dailyCount`: the item's `remainingCount` reached zero and the system marked it unavailable (`setMenuItemDailyCount`; Chinmay, 2 October, workbook Q194). An automatic 86 carries no `calledByPrincipalId`.\n"},"refusedOrderCount":{"type":"integer","default":0,"readOnly":true}}},
 "InventoryItem": {"x-ticvai-persistence":"inventory.item","allOf":[{"$ref":"#/components/schemas/CreateInventoryItemRequest"},{"type":"object","required":["id","onHand","isActive"],"properties":{"id":{"type":"string","format":"uuid"},"onHand":{"type":"number","description":"Derived from movements. Not directly editable."},"onOrder":{"type":"number"},"inTransit":{"type":"number"},"available":{"type":"number","description":"On-hand minus allocated, where allocated is stock reserved for orders (decided 28 September, audit R171)."},"averageCost":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"lastPurchasePrice":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"isBelowReorderPoint":{"type":"boolean"},"hasMovements":{"type":"boolean","description":"True locks costing method and base unit."},"isActive":{"type":"boolean"}}}]},
 "KpiValue": {"type":"object","description":"BI board 10.3. **Value, target, variance, direction and freshness in one read.**","properties":{"kpiId":{"type":"string","format":"uuid"},"code":{"type":"string"},"bucketStart":{"type":"string","format":"date-time","nullable":true,"description":"The start of the bucket this value covers, when `getKpiValues` was asked for an `interval`; null otherwise."},"groupKey":{"type":"string","nullable":true,"description":"The value of the `groupBy` dimension this row is for (a status, a category code, a tier); null when no `groupBy` was asked."},"name":{"type":"string"},"scopePath":{"type":"string"},"period":{"type":"string"},"value":{"$ref":"#/components/schemas/MetricValue"},"target":{"allOf":[{"$ref":"#/components/schemas/MetricValue"}],"nullable":true},"comparison":{"allOf":[{"$ref":"#/components/schemas/MetricValue"}],"nullable":true},"variancePercent":{"type":"number","nullable":true},"direction":{"type":"string","enum":["up","down","flat"]},"status":{"type":"string","enum":["green","amber","red","noTarget"]},"asOf":{"type":"string","format":"date-time"},"stale":{"type":"boolean","description":"**True when the pipeline behind it has not refreshed.** A number nobody flagged as stale is a number somebody will act on.\n"}}},
-"MenuItem": {"x-ticvai-persistence":"fnb.menu_item","type":"object","required":["id","productVariantId","name","price","isAvailable"],"properties":{"id":{"type":"string","format":"uuid"},"productVariantId":{"type":"string","format":"uuid","description":"The catalogue variant this item sells. Pricing and tax come from there — a menu is a presentation of the catalogue, not a second catalogue.\n"},"name":{"type":"string"},"description":{"type":"string","nullable":true},"price":{"x-ticvai-column":"list_price","$ref":"../shared/common.yaml#/components/schemas/Money"},"sortOrder":{"type":"integer"},"modifierGroupIds":{"type":"array","items":{"type":"string","format":"uuid"}},"stationId":{"type":"string","format":"uuid","nullable":true},"menuSectionId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"The section the item sits in, set by `setMenuSections` and `applyMenuActions` (`moveSection`)."},"isStockTracked":{"type":"boolean","description":"True where a recipe exists. Stock-tracked items cannot be sold offline."},"isAvailable":{"type":"boolean"},"unavailableReason":{"type":"string","nullable":true},"restoreAt":{"type":"string","format":"date-time","nullable":true,"description":"When an unavailable item comes back on its own (`setItemAvailability`). Null means by hand."},"preparationMinutes":{"type":"integer","nullable":true},"allergens":{"type":"array","items":{"$ref":"#/components/schemas/AllergenCode"}}}},
-"MetricSource": {"type":"string","description":"**A named metric with a verified source.** BL-053, 75 requirement rows.\n`reporting` is a generic builder, and **a generic builder makes every reporting requirement look covered** — it will happily assemble a report over data nobody produces. That is the shape to watch across the whole walk, and this enum is the answer to it: each value below was checked against the schema before being named.\n| Metric | Source | |---|---| | `occupancy` | `catalogue.channel_capacity.sold` and `leased` against `capacity` | | `capacityUtilisation` | `catalogue.channel_capacity.remaining` over the same window | | `admissionRate` | `access.scan_event.outcome`, in-direction | | `noShowRate` | Entitlements issued against scans that never arrived | | `conversion` | `orders.cart` against `orders.sales_order` | | `salesByOperator` | `orders.sales_order.principal_id` | | `salesByWorkstation` | The workstation on the shift that took it | | `waitTime` | `queue.waiting_guest.estimated_call_at` against `called_at` | | `throughput` | `queue.waiting_guest` completions per hour | | `abandonmentRate` | Queue entries that left before being called |\n**`salesByInstructor` was deliberately absent from the first cut** because it needed the staff-assignment link CL-01 covers. It was added on 18 August once `resources.Resource` produced it — see `x-ticvai-extension-note` below. Naming a metric with no source is still the defect this enum exists to prevent.\n**Money-valued metrics are listed in `x-ticvai-money-valued`.** A reading or threshold on one of them is a `Money`, never a float (`MetricValue`).\n","enum":["occupancy","capacityUtilisation","admissionRate","noShowRate","conversion","salesByOperator","salesByWorkstation","waitTime","throughput","abandonmentRate","inventoryValuation","stockTurnover","stockAgeing","wastageRate","resaleVolume","resaleCommission","salesByInstructor","resourceUtilisation","allocationUtilisation","channelAllocationBurn","membershipChurn","membershipRenewalRate","supplierDeliveryPerformance","revenuePerEntitlement","revenuePerVisitor","assetDowntime","meanTimeToRepair","challengeCompletionRate","attributedRevenue","loyaltyActiveMembers","loyaltyTierDistribution","loyaltyPointsLiability","loyaltyBreakageRate","loyaltyMemberRetention","challengeParticipationRate","gamificationLoyaltyImpact","gamificationMembershipImpact","gamificationRetention","accreditationApplications","accreditationTimeToDecision","accreditationCredentialsIssued","accreditationActiveHolders","accreditationRenewalsDue","staffingShortfall"],"x-ticvai-money-valued":["inventoryValuation","resaleCommission","revenuePerEntitlement","revenuePerVisitor","attributedRevenue","loyaltyPointsLiability"],"x-ticvai-extended-29-september":"**Fourteen metrics added 29 September (build pass)**, each checked against the schema of the contract that produces it.\n\n| Metric | Source | Requirement | |---|---|---| | `loyaltyActiveMembers` | `marketing.loyalty_position` members with a `marketing.loyalty_points` movement in the period | 5.4.27 | | `loyaltyTierDistribution` | `marketing.loyalty_position.tier_id` against `marketing.programme_tier`, members per tier | 5.4.27 | | `loyaltyPointsLiability` | the balance of `ledger.journal_line` on each programme's `pointsLiabilityAccountId`, where points post on accrual and release on redemption or expiry | 5.4.27 | | `loyaltyBreakageRate` | `marketing.loyalty_points` expiry movements over points earned, in the period | 5.4.27 | | `loyaltyMemberRetention` | members with a movement in the previous period who also have one in this period | 5.4.27 | | `challengeParticipationRate` | distinct `marketing.challenge_progress.subject_id` over active loyalty members | 22.6.20 | | `gamificationLoyaltyImpact` | points earned per member, challenge participants against non-participants (`marketing.loyalty_points` split by `marketing.challenge_progress`) | 22.6.20 | | `gamificationMembershipImpact` | joins and renewals in `identity.customer_membership`, participants against non-participants | 22.6.20 | | `gamificationRetention` | return visits (`access.scan_event`, in-direction) of participants against non-participants | 22.6.20 | | `accreditationApplications` | `accreditation.application` by `status` | 12.1.50 | | `accreditationTimeToDecision` | `accreditation.application.decided_at` minus `submitted_at` | 12.1.50 | | `accreditationCredentialsIssued` | `accreditation.credential.issued_at` | 12.1.50 | | `accreditationActiveHolders` | `accreditation.holder` `active`, by `category_code` | 12.1.50 | | `accreditationRenewalsDue` | `accreditation.holder.valid_to` inside `accreditation.validity.renewal_window_days` | 12.1.50 |\n\n**`staffingShortfall` added the same evening (build pass, group G2; 8.2.49)**: the largest gap in the window between the staff rostered and the staff the forecast requires, per venue and position, from `workforce.forecast_requirement` (the handed-over AI staff requirement) against `workforce.rota_assignment` and `workforce.open_shift`, computed as `workforce.getStaffingCoverage` with `basis` `forecastRequirement`. An `AlertRule` on it with `comparator` `above` and `threshold` 0 is the staffing shortage alert; `windowMinutes` looks ahead rather than back for this metric (the rota for the coming window), and `cooldownMinutes` stops one short shift alerting every quarter hour.\n\n**Points issued, points redeemed, campaign performance and reward redemption were already served** by the `loyalty` and `campaigns` sources, and challenge completion and revenue attribution by `challengeCompletionRate` and `attributedRevenue`.\n","x-ticvai-money-valued-note":"**`salesByOperator`, `salesByWorkstation` and `resaleVolume` are not listed because the package does not say whether they count sales or sum their value.** Until that is decided, a rule on them carries a plain number.\n","x-ticvai-extended":"18 August 2026","x-ticvai-extension-note":"**Nineteen metrics added when their upstream models landed**, which is how BL-053 was always going to close — not by changing `reporting` but by building the things it wanted to report on.\n`inventoryValuation`, `stockTurnover`, `stockAgeing` and `wastageRate` came from `inventory.StockBatch`; `resaleVolume` and `resaleCommission` from `orders.ResaleListing`; **`salesByInstructor` from `resources.Resource`, which was the one metric this enum deliberately refused to name in the morning** because nothing produced it. `allocationUtilisation` from `PartnerUser` and `ChannelListing`, `membershipChurn` from `Journey`, `supplierDeliveryPerformance` from `ProductionRun`, `assetDowntime` and `meanTimeToRepair` from `WorkOrder.downtimeMinutes`, `challengeCompletionRate` from `ChallengeProgress`, `attributedRevenue` from `AttributionTouch`.\n**Each was checked against the schema before being named.** That rule has not changed — naming a metric with no source is the defect this enum exists to prevent.\n"},
+"Menu": {"x-ticvai-persistence":"fnb.menu","type":"object","required":["id","code","name","outletId","isActive"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string","maxLength":64},"name":{"type":"string","maxLength":200},"outletId":{"type":"string","format":"uuid"},"availability":{"$ref":"#/components/schemas/MenuAvailability"},"sections":{"type":"array","items":{"$ref":"#/components/schemas/MenuSection"}},"isActive":{"type":"boolean"},"publishedVersion":{"type":"integer","nullable":true,"readOnly":true,"description":"The `MenuVersion.version` live now. Null for a menu never published."},"publishedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true}}},
+"MenuAvailability": {"x-ticvai-persistence":"none — embedded in menu","type":"object","description":"When this menu is in force. Absent means always. Days, times and dates are all read in the Region's time zone, not UTC.","properties":{"daysOfWeek":{"type":"array","items":{"type":"integer","minimum":0,"maximum":6}},"startTime":{"type":"string","pattern":"^([01]\\d|2[0-3]):[0-5]\\d$","description":"Wall-clock time, in the Region's time zone."},"endTime":{"type":"string","pattern":"^([01]\\d|2[0-3]):[0-5]\\d$","description":"Wall-clock time, in the Region's time zone."},"validFrom":{"type":"string","format":"date","nullable":true,"description":"Calendar day, in the Region's time zone, not UTC."},"validTo":{"type":"string","format":"date","nullable":true,"description":"Calendar day, in the Region's time zone, not UTC."}}},
+"MenuItem": {"x-ticvai-persistence":"fnb.menu_item","type":"object","required":["id","productVariantId","name","price","isAvailable"],"properties":{"id":{"type":"string","format":"uuid"},"productVariantId":{"type":"string","format":"uuid","description":"**The catalogue variant this item links to, for reporting, stock and tax class only. It is not where the price comes from** (Chinmay, 2 October, workbook Q34; CHG-CSA-009). F&B owns its own catalogue: F&B prices were migrated into the F&B service so ticketing scales as an isolated service (ADR-0028), and the price an outlet sells at is `price` on this item. The central catalogue prices tickets and single-price booths; it never reprices a dish. A menu belongs to one outlet, so `price` is that outlet's price, and an outlet may set its own; it changes through `updateMenu`, `setMenuSections` or `applyMenuActions` (`reprice`). Tax is computed on the order line by the tax engine. (Replaces the earlier text \"pricing and tax come from there — a menu is a presentation of the catalogue\", which was stale.)\n"},"name":{"type":"string"},"description":{"type":"string","nullable":true},"price":{"x-ticvai-column":"list_price","$ref":"../shared/common.yaml#/components/schemas/Money"},"dailyCount":{"type":"integer","minimum":0,"nullable":true,"readOnly":true,"description":"**How many portions the kitchen set for today** (`setMenuItemDailyCount`; Chinmay, 2 October, workbook Q194; CHG-CSA-017). Null means the item is not counted. Reset at the venue day start.\n"},"remainingCount":{"type":"integer","minimum":0,"nullable":true,"readOnly":true,"description":"**What is left of `dailyCount`** (\"6 left\" on the till and the guest menu). Each sale takes from it; **at zero the item is marked unavailable automatically**, with an `EightySixEvent` whose `source` is `dailyCount`. Null where the item is not counted.\n"},"sortOrder":{"type":"integer"},"modifierGroupIds":{"type":"array","items":{"type":"string","format":"uuid"}},"stationId":{"type":"string","format":"uuid","nullable":true},"menuSectionId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"The section the item sits in, set by `setMenuSections` and `applyMenuActions` (`moveSection`)."},"isStockTracked":{"type":"boolean","description":"True where a recipe exists. Stock-tracked items cannot be sold offline."},"isAvailable":{"type":"boolean"},"unavailableReason":{"type":"string","nullable":true},"restoreAt":{"type":"string","format":"date-time","nullable":true,"description":"When an unavailable item comes back on its own (`setItemAvailability`). Null means by hand."},"preparationMinutes":{"type":"integer","nullable":true},"allergens":{"type":"array","items":{"$ref":"#/components/schemas/AllergenCode"}}}},
+"MenuSection": {"x-ticvai-persistence":"fnb.menu_section","type":"object","required":["code","name","sortOrder"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"code":{"type":"string"},"name":{"type":"string"},"sortOrder":{"type":"integer"},"items":{"type":"array","description":"The section's items, in sale-board order. An item's membership is `MenuItem.menuSectionId`.","items":{"$ref":"#/components/schemas/MenuItem"}}}},
+"MetricSource": {"type":"string","description":"**A named metric with a verified source.** BL-053, 75 requirement rows.\n`reporting` is a generic builder, and **a generic builder makes every reporting requirement look covered** — it will happily assemble a report over data nobody produces. That is the shape to watch across the whole walk, and this enum is the answer to it: each value below was checked against the schema before being named.\n| Metric | Source | |---|---| | `occupancy` | `catalogue.channel_capacity.sold` and `leased` against `capacity` | | `capacityUtilisation` | `catalogue.channel_capacity.remaining` over the same window | | `admissionRate` | `access.scan_event.outcome`, in-direction | | `noShowRate` | Entitlements issued against scans that never arrived | | `conversion` | `orders.cart` against `orders.sales_order` | | `salesByOperator` | `orders.sales_order.principal_id` | | `salesByWorkstation` | The workstation on the shift that took it | | `waitTime` | `queue.waiting_guest.estimated_call_at` against `called_at` | | `throughput` | `queue.waiting_guest` completions per hour | | `abandonmentRate` | Queue entries that left before being called |\n**`salesByInstructor` was deliberately absent from the first cut** because it needed the staff-assignment link CL-01 covers. It was added on 18 August once `resources.Resource` produced it — see `x-ticvai-extension-note` below. Naming a metric with no source is still the defect this enum exists to prevent.\n**Money-valued metrics are listed in `x-ticvai-money-valued`.** A reading or threshold on one of them is a `Money`, never a float (`MetricValue`).\n","enum":["occupancy","capacityUtilisation","admissionRate","noShowRate","conversion","salesByOperator","salesByWorkstation","waitTime","throughput","abandonmentRate","inventoryValuation","stockTurnover","stockAgeing","wastageRate","resaleVolume","resaleCommission","salesByInstructor","resourceUtilisation","allocationUtilisation","channelAllocationBurn","membershipChurn","membershipRenewalRate","supplierDeliveryPerformance","revenuePerEntitlement","revenuePerVisitor","assetDowntime","meanTimeToRepair","challengeCompletionRate","attributedRevenue","loyaltyActiveMembers","loyaltyTierDistribution","loyaltyPointsLiability","loyaltyBreakageRate","loyaltyMemberRetention","challengeParticipationRate","gamificationLoyaltyImpact","gamificationMembershipImpact","gamificationRetention","accreditationApplications","accreditationTimeToDecision","accreditationCredentialsIssued","accreditationActiveHolders","accreditationRenewalsDue","staffingShortfall","grossSales","discounts","refunds","netRevenue","recognisedRevenue","deferredRevenue","taxCollected","takings"],"x-ticvai-money-valued":["grossSales","discounts","refunds","netRevenue","recognisedRevenue","deferredRevenue","taxCollected","takings","inventoryValuation","resaleCommission","revenuePerEntitlement","revenuePerVisitor","attributedRevenue","loyaltyPointsLiability"],"x-ticvai-extended-29-september":"**Fourteen metrics added 29 September (build pass)**, each checked against the schema of the contract that produces it.\n\n| Metric | Source | Requirement | |---|---|---| | `loyaltyActiveMembers` | `marketing.loyalty_position` members with a `marketing.loyalty_points` movement in the period | 5.4.27 | | `loyaltyTierDistribution` | `marketing.loyalty_position.tier_id` against `marketing.programme_tier`, members per tier | 5.4.27 | | `loyaltyPointsLiability` | the balance of `ledger.journal_line` on each programme's `pointsLiabilityAccountId`, where points post on accrual and release on redemption or expiry | 5.4.27 | | `loyaltyBreakageRate` | `marketing.loyalty_points` expiry movements over points earned, in the period | 5.4.27 | | `loyaltyMemberRetention` | members with a movement in the previous period who also have one in this period | 5.4.27 | | `challengeParticipationRate` | distinct `marketing.challenge_progress.subject_id` over active loyalty members | 22.6.20 | | `gamificationLoyaltyImpact` | points earned per member, challenge participants against non-participants (`marketing.loyalty_points` split by `marketing.challenge_progress`) | 22.6.20 | | `gamificationMembershipImpact` | joins and renewals in `identity.customer_membership`, participants against non-participants | 22.6.20 | | `gamificationRetention` | return visits (`access.scan_event`, in-direction) of participants against non-participants | 22.6.20 | | `accreditationApplications` | `accreditation.application` by `status` | 12.1.50 | | `accreditationTimeToDecision` | `accreditation.application.decided_at` minus `submitted_at` | 12.1.50 | | `accreditationCredentialsIssued` | `accreditation.credential.issued_at` | 12.1.50 | | `accreditationActiveHolders` | `accreditation.holder` `active`, by `category_code` | 12.1.50 | | `accreditationRenewalsDue` | `accreditation.holder.valid_to` inside `accreditation.validity.renewal_window_days` | 12.1.50 |\n\n**`staffingShortfall` added the same evening (build pass, group G2; 8.2.49)**: the largest gap in the window between the staff rostered and the staff the forecast requires, per venue and position, from `workforce.forecast_requirement` (the handed-over AI staff requirement) against `workforce.rota_assignment` and `workforce.open_shift`, computed as `workforce.getStaffingCoverage` with `basis` `forecastRequirement`. An `AlertRule` on it with `comparator` `above` and `threshold` 0 is the staffing shortage alert; `windowMinutes` looks ahead rather than back for this metric (the rota for the coming window), and `cooldownMinutes` stops one short shift alerting every quarter hour.\n\n**Points issued, points redeemed, campaign performance and reward redemption were already served** by the `loyalty` and `campaigns` sources, and challenge completion and revenue attribution by `challengeCompletionRate` and `attributedRevenue`.\n","x-ticvai-extended-2-october":"**Eight finance measures added 2 October 2026** (Chinmay; CHG-FIN-007, CHG-FIN-010), each with the source and formula of the seeded KPI of the same code in `ReportingSystemKpi`: `grossSales`, `discounts`, `refunds`, `netRevenue`, `recognisedRevenue`, `deferredRevenue`, `taxCollected` and `takings`, so an alert rule can watch them (a refund spike, takings below a target). Formulas are the D-185 default; client finance sign-off is pending.","x-ticvai-money-valued-note":"**`salesByOperator`, `salesByWorkstation` and `resaleVolume` are not listed because the package does not say whether they count sales or sum their value.** Until that is decided, a rule on them carries a plain number.\n","x-ticvai-extended":"18 August 2026","x-ticvai-extension-note":"**Nineteen metrics added when their upstream models landed**, which is how BL-053 was always going to close — not by changing `reporting` but by building the things it wanted to report on.\n`inventoryValuation`, `stockTurnover`, `stockAgeing` and `wastageRate` came from `inventory.StockBatch`; `resaleVolume` and `resaleCommission` from `orders.ResaleListing`; **`salesByInstructor` from `resources.Resource`, which was the one metric this enum deliberately refused to name in the morning** because nothing produced it. `allocationUtilisation` from `PartnerUser` and `ChannelListing`, `membershipChurn` from `Journey`, `supplierDeliveryPerformance` from `ProductionRun`, `assetDowntime` and `meanTimeToRepair` from `WorkOrder.downtimeMinutes`, `challengeCompletionRate` from `ChallengeProgress`, `attributedRevenue` from `AttributionTouch`.\n**Each was checked against the schema before being named.** That rule has not changed — naming a metric with no source is the defect this enum exists to prevent.\n"},
 "MetricValue": {"x-ticvai-persistence-column":"numeric(18,4)","description":"**A reading of a metric or KPI, or a threshold on one.** A `Money` where the metric is money-valued — `MetricSource` lists those in `x-ticvai-money-valued`, and a KPI is when its `unit` is `currency` — and a plain number otherwise. naming-and-style 5.1: money is never a float, at any layer.\nStored as `numeric(18,4)` either way: a money value stores its amount, and currency and scale resolve from the scope as they do for every `Money`.\n","oneOf":[{"type":"number"},{"$ref":"../shared/common.yaml#/components/schemas/Money"}]},
 "Money": {"type":"object","x-ticvai-persistence-kind":"valueObject","x-ticvai-persistence-column":"numeric(18,4)","description":"**On the wire this is three fields; in the database it is one column.**\n24 August. Every column typed `Money` was landing as `jsonb` — 129 of them, including `orders.shift.opening_float`, `inventory.purchase_order.total` and `promotions.voucher.balance`. **`orders.cash_movement.amount` was `numeric(18,4)` because somebody hand-typed that one**, and the inconsistency is what made it visible.\n**A jsonb price cannot be summed in SQL.** Every total, variance and reconciliation moves into application code — and a shift variance computed in .NET against a ledger computed in Postgres is two answers to one question. That is F13 month-end and F98 takings-to-ledger, both walked, both assuming the arithmetic is in the database.\n**`currency` and `scale` are not stored per row.** ADR-0018 makes them region-scoped and not overridable below, so they resolve from the scope walk — storing AED against nine million rows in a UAE region is nine million copies of a fact that cannot differ. A row that needed its own currency would be a row in the wrong region.\n**They stay on the wire** because a client reading a figure should not have to walk a hierarchy to know what it means.\n","required":["amount","currency","scale"],"properties":{"amount":{"type":"string","description":"Decimal string, never a float. Up to 4 decimal places. **Persisted as `numeric(18,4)`** — the string is a transport choice, so a JavaScript client cannot round a fare in transit.\n","pattern":"^-?\\d+(\\.\\d{1,4})?$"},"currency":{"type":"string","description":"**Resolved from the region, not stored on the row** (ADR-0018). OMR uses 3 decimal places and AED uses 2 — a venue on a different scale from its region is a ledger that cannot consolidate.\n","pattern":"^[A-Z]{3}$"},"scale":{"type":"integer","description":"Resolved from the region alongside `currency`.","minimum":0,"maximum":4}}},
 "Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}},
 "ProductionRun": {"type":"object","x-ticvai-persistence":"fnb.production_run","description":"BL-129. **A central kitchen makes 400 portions at 6am for four outlets**, and nothing modelled that — orders consume stock and no operation produced any.\n**Production converts ingredients into a sellable item**, which is a stock movement in both directions at once, and treating it as two unrelated adjustments loses the yield.\n","required":["id","recipeId","plannedQuantity","status"],"properties":{"id":{"type":"string","format":"uuid"},"recipeId":{"type":"string","format":"uuid"},"productionPlanId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"The plan whose release created this run. Null for a run planned directly."},"stationId":{"type":"string","format":"uuid","nullable":true,"description":"**The station whose prep list this run is on.** Copied from the plan line on release, where runs are grouped by station (audit R125 (7)).\n"},"producingOutletId":{"type":"string","format":"uuid"},"forOutletIds":{"type":"array","description":"**Where it goes.** A central kitchen produces for outlets that did not make it.\n","items":{"type":"string","format":"uuid"}},"plannedQuantity":{"type":"number"},"actualQuantity":{"type":"number","nullable":true,"description":"BL-126. **Theoretical against actual is the whole point of recording this.** A recipe says 400 portions from the ingredients issued; the run says how many were made, and the gap is waste, theft or a recipe that is wrong.\n"},"scheduledFor":{"type":"string","format":"date-time"},"status":{"type":"string","enum":["planned","inProgress","completed","cancelled"]},"varianceReason":{"type":"string","nullable":true}}},
-"PurchaseOrder": {"x-ticvai-persistence":"inventory.purchase_order + inventory.purchase_order_line","type":"object","required":["id","purchaseOrderNumber","supplierId","status","lines","total","createdAt"],"properties":{"id":{"type":"string","format":"uuid"},"purchaseOrderNumber":{"type":"string","readOnly":true,"description":"**Per venue, in sequence** (decided 28 September, audit R171). Assigned by the server from the venue's gap-free sequence, or the tenant's for an order with no venue. Proposed format `PO-<venue code>-<sequence, six digits>`, client to correct.\n"},"requisitionId":{"type":"string","format":"uuid","nullable":true,"description":"Null on a blanket order or an RFQ award, which are raised without one."},"quotationId":{"type":"string","format":"uuid","nullable":true,"description":"The quotation selected when the order was raised (`createPurchaseOrder` requires it). **The link that shows the comparison was made**, which `rfqId` alone does not."},"supplierId":{"type":"string","format":"uuid"},"supplierName":{"type":"string"},"kind":{"type":"string","enum":["standard","blanket","release","rfqAward"],"default":"standard","description":"BL-159. **A blanket order is a price and a commitment, not a delivery.** Releases draw against it, and modelling each release as its own purchase order loses the contract that makes the price valid.\n"},"blanketParentId":{"type":"string","format":"uuid","nullable":true,"description":"The blanket order this release draws against — another purchase order, so the same id type."},"contractPriceValidUntil":{"type":"string","format":"date","nullable":true},"rfqId":{"type":"string","format":"uuid","nullable":true,"description":"Where this order came from a quotation round. **Keeping the link is what lets a venue show it took the best of three**, which is usually the procurement rule rather than a preference.\n"},"supplierInvoiceRef":{"type":"string","nullable":true,"description":"BL-123. **Purchase orders and goods receipts both existed — the third leg did not.** A three-way match with two legs is a two-way match, and it is the supplier invoice that carries the price nobody has checked yet.\n"},"matchStatus":{"type":"string","nullable":true,"enum":["unmatched","matched","priceVariance","quantityVariance","bothVariance"],"description":"**The variance kinds are separated because they have different owners** — a price variance is a buyer's problem and a quantity variance is a receiving one.\n"},"status":{"$ref":"#/components/schemas/PurchaseOrderStatus"},"deliverToLocationId":{"type":"string","format":"uuid","nullable":true,"description":"**Scoped 31 August.** A purchase order is raised by somebody, for somewhere, and carried neither. `requisitionId` reaches a venue through a join, but **a purchase order raised without a requisition — a blanket order, an RFQ award — had no scope at all**, so nothing could answer *whose budget is this* without guessing.\n\n**`deliverToLocationId` is separate from `venueId` on purpose.** A tenant buying centrally and delivering to three venues is one order and three destinations; collapsing them would force one order per venue and lose the volume the tenant negotiated for."},"lines":{"type":"array","items":{"type":"object","properties":{"lineId":{"type":"string"},"itemId":{"type":"string","format":"uuid"},"itemName":{"type":"string"},"orderedQuantity":{"type":"number"},"receivedQuantity":{"type":"number"},"outstandingQuantity":{"type":"number"},"unitPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"quotedUnitPrice":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"nullable":true,"description":"The selected quotation line's price, kept beside `unitPrice` (audit R171)."},"priceOverrideReason":{"type":"string","nullable":true,"description":"Why `unitPrice` differs from `quotedUnitPrice` (audit R171)."},"lineTotal":{"$ref":"../shared/common.yaml#/components/schemas/Money"}}}},"subtotal":{"x-ticvai-column":"net_amount","$ref":"../shared/common.yaml#/components/schemas/Money"},"taxAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"total":{"x-ticvai-column":"gross_amount","$ref":"../shared/common.yaml#/components/schemas/Money"},"expectedDelivery":{"type":"string","format":"date"},"raisedByPrincipalId":{"type":"string","format":"uuid"},"createdAt":{"type":"string","format":"date-time"},"closedAt":{"type":"string","format":"date-time","nullable":true},"supplierReference":{"type":"string","nullable":true,"description":"The supplier's own order reference, from `acknowledgePurchaseOrder`."},"acknowledgedAt":{"type":"string","format":"date-time","nullable":true,"description":"**Null is the supplier performance figure** — goods arriving against an order never acknowledged."},"closeShortReason":{"type":"string","nullable":true,"description":"Why the balance was written off, from `closePurchaseOrderShort`."},"cancelReason":{"type":"string","nullable":true,"description":"From `cancelPurchaseOrder`."},"approvalRequestId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"The pending approval request raised by `cancelPurchaseOrder` or `closePurchaseOrderShort` (kinds `purchaseOrderCancel`, `purchaseOrderShortClose`; audit R144). Null when none is open."},"cancelledAt":{"type":"string","format":"date-time","nullable":true},"venueId":{"type":"string","format":"uuid","nullable":true,"description":"Which venue is buying. **Null on a tenant-level order** — see `deliverToLocationId`."},"scopePath":{"type":"string","description":"**The partition key** (ADR-0005). Present on every order regardless of whether a venue is named, because a tenant-level order still belongs to a tenant."}}},
-"PurchaseOrderStatus": {"type":"string","enum":["raised","sent","acknowledged","partiallyReceived","received","closedShort","cancelled"]},
 "Recipe": {"x-ticvai-persistence":"fnb.recipe + fnb.recipe_ingredient","type":"object","required":["menuItemId","ingredients"],"properties":{"menuItemId":{"type":"string","format":"uuid"},"yield":{"type":"number","minimum":0,"description":"Portions produced by one execution."},"ingredients":{"type":"array","minItems":1,"items":{"type":"object","required":["inventoryItemId","quantity","unit"],"properties":{"inventoryItemId":{"type":"string","format":"uuid"},"quantity":{"type":"number","minimum":0},"unit":{"type":"string"},"isOptional":{"type":"boolean","default":false}}}},"costPerPortion":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"readOnly":true,"description":"**Computed, never entered** (decided 28 September, audit R125 (9)): the sum of each ingredient quantity at its current inventory cost, divided by `yield`. Recomputed when the recipe or an ingredient cost changes.\n"}}},
 "Requisition": {"x-ticvai-persistence":"inventory.requisition + inventory.requisition_line","type":"object","required":["id","requisitionNumber","venueId","status","lines","raisedByPrincipalId","createdAt"],"properties":{"id":{"type":"string","format":"uuid"},"requisitionNumber":{"type":"string"},"venueId":{"type":"string","format":"uuid"},"departmentId":{"type":"string","format":"uuid","nullable":true},"costCenterId":{"type":"string","format":"uuid","nullable":true},"justification":{"type":"string","nullable":true},"status":{"$ref":"#/components/schemas/RequisitionStatus"},"lines":{"type":"array","items":{"type":"object","properties":{"lineId":{"type":"string"},"itemId":{"type":"string","format":"uuid"},"itemName":{"type":"string"},"requestedQuantity":{"type":"number"},"suggestedQuantity":{"type":"number","nullable":true,"description":"**Kept, never overwritten** (`updateRequisitionLines`). Null on a line nobody suggested.\n"},"approvedQuantity":{"type":"number","nullable":true},"orderedQuantity":{"type":"number","nullable":true},"unit":{"type":"string"},"reason":{"type":"string","nullable":true,"description":"Why the requested quantity differs from the suggestion."},"note":{"type":"string","nullable":true},"estimatedCost":{"$ref":"../shared/common.yaml#/components/schemas/Money"}}}},"estimatedTotal":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"raisedByPrincipalId":{"type":"string","format":"uuid"},"approvedByPrincipalId":{"type":"string","format":"uuid","nullable":true},"approvalNote":{"type":"string","nullable":true},"requiredBy":{"type":"string","format":"date"},"createdAt":{"type":"string","format":"date-time"},"approvedAt":{"type":"string","format":"date-time","nullable":true},"rejectionReason":{"type":"string","nullable":true,"description":"From `rejectRequisition`. What the requester reads before copying it into a new draft."},"rejectedAt":{"type":"string","format":"date-time","nullable":true},"returnQuestion":{"type":"string","nullable":true,"description":"From `returnRequisition`. What the requester must answer before resubmitting."},"returnedAt":{"type":"string","format":"date-time","nullable":true},"cancelReason":{"type":"string","nullable":true,"description":"From `cancelRequisition`."},"cancelledAt":{"type":"string","format":"date-time","nullable":true}}},
 "RequisitionStatus": {"type":"string","enum":["draft","pendingApproval","approved","rejected","returnedForInfo","ordered","closed","cancelled"]},
-"StockBatch": {"type":"object","x-ticvai-persistence":"inventory.stock_batch","description":"BL-122. **`isPerishable` and `shelfLifeDays` are on the item, so a shelf life is declared and never instantiated.** Two deliveries of the same milk arriving a week apart are one stock level with one implied expiry, and the older one is invisible.\n**A batch is the instance that actually expires.** Without it, first-expiry-first-out is not computable and a venue discovers the problem by smell.\n","required":["id","itemId","locationId","quantity","receivedAt"],"properties":{"id":{"type":"string","format":"uuid"},"itemId":{"type":"string","format":"uuid"},"locationId":{"type":"string","format":"uuid"},"batchCode":{"type":"string","nullable":true},"lotNumber":{"type":"string","nullable":true,"description":"The supplier's own reference. **A recall names a lot number**, and an inventory that cannot resolve one has to discard everything.\n"},"quantity":{"type":"number"},"receivedAt":{"type":"string","format":"date-time"},"expiresAt":{"type":"string","format":"date","nullable":true},"supplierId":{"type":"string","format":"uuid","nullable":true},"status":{"type":"string","enum":["available","quarantined","expired","recalled","consumed","written-off"]}}},
 "Suggestion": {"type":"object","x-ticvai-persistence":"ai.suggestion","description":"One answer to one question, with its reasoning and its confidence. **Built 24 August so that machine learning can be swapped in without touching a screen.**\n**A suggestion is never an action.** It proposes; `ProposedAction` and its approval path decide. A model that can order stock is a model that will order stock wrongly at three in the morning.\n**`inputs` is recorded, not just referenced.** A suggestion that cannot be reproduced cannot be defended to a finance controller asking why the system said to order four hundred.\n","required":["id","kind","basis","maturity","producedAt"],"properties":{"id":{"type":"string","format":"uuid"},"kind":{"$ref":"#/components/schemas/SuggestionKind"},"basis":{"$ref":"#/components/schemas/SuggestionBasis"},"scopePath":{"type":"string"},"subjectRef":{"type":"string","nullable":true,"description":"What it is about — a product, an outlet, an item, a party."},"value":{"type":"object","additionalProperties":true,"description":"The suggestion itself. Shape depends on `kind`."},"confidence":{"type":"number","nullable":true,"minimum":0,"maximum":1,"description":"**Null for a heuristic and that is honest.** A rule has no confidence — dressing one up with 0.85 is the fastest way to make a manager trust a number that means nothing.\n"},"explanation":{"type":"string","description":"**Plain words, always present, whatever the basis.** *Because covers are up 12% on this day last year* — a suggestion a manager cannot explain to their own boss is a suggestion they will not action.\n"},"inputs":{"type":"object","additionalProperties":true,"description":"What went in. **Recorded so the answer can be reproduced** — and so that when a model replaces the rule, the two can be run against the same inputs and compared.\n"},"producerRef":{"type":"string","description":"The rule name or the model id and version. **A model version is part of the record**: *the model said so* is not an answer to *which model, when*.\n"},"maturity":{"$ref":"#/components/schemas/AiMaturity"},"producedAt":{"type":"string","format":"date-time"},"expiresAt":{"type":"string","format":"date-time","nullable":true,"description":"**A demand forecast for Saturday is worthless on Sunday.** An expired suggestion is hidden rather than shown stale.\n"}}},
 "SuggestionBasis": {"type":"string","description":"**How the answer was reached, and this is the field the whole design exists for.**\nA venue must be able to see that today's price suggestion is a margin rule and next quarter's is a trained model — **the same operation, the same screen, a different basis** — and a screen that cannot say which is a screen that asks a manager to trust arithmetic it will not show.\n**Swapping a heuristic for a model is a provider change, not a contract change.** That is the point of the abstraction: the frontend, the audit record and the outcome capture all stay exactly as they are.\n","enum":["heuristic","statistical","model","hybrid","manual"]},
 "SuggestionKind": {"type":"string","description":"What is being suggested. **A closed set, and the reason it is closed is the swap.** Every entry here is a question a venue asks that a model could answer better than a rule — and each one starts as a heuristic and becomes a model when there is data.\n**Six of these were drawn as their own endpoints on the client F&B boards** — `suggestPrice`, `simulateScenario`, `simulateSlaPolicy`, `suggestRequisition`, `suggestReplenishment`, `publishDemandPlan`. **Building six endpoints means six places to change when a model changes**, and the model will change more often than the venue's question does.\n**What each kind is based on, and when the venue's own data takes over. Proposed, client to correct (decided 28 September, audit R213; re-read 29 September, AI functions review).** The figure after each rule is **the point where own data takes over from the baseline, not a refusal**: below it the kind answers from the baseline (venue AI settings, the starting pattern for the venue type, the UAE calendar, the weather) with `maturity.stage` `starting`, and between it and about three months it blends the two (`learning`). The day-one baseline per kind: `replenishment`, `requisition`, `prepPlan`, `staffing`, `demandForecast` and `scenario` from the baseline forecast (typical attendance from the venue AI settings x the venue-type month curve x the calendar x weather, bookings on hand as a floor); `menuEngineering` ranked by margin with popularity marked learning; `slaTarget` a standard default; `waitTime` people ahead / configured capacity; `upsell` the relationship map and business priority; `segmentation` known guest attributes; `anomaly` the venue's configured thresholds and actual against the forecast's low end; `sendTime` the channel's typical hour; `wasteRisk` shelf life and par against the forecast; `queueBalancing` configured capacity per queue. Only a missing setting refuses (422 `AiMissingSettingProblem`).\n- `price`: unit cost plus the category's target margin, held inside the price band. Minimum: a current cost, no history.\n- `replenishment`: par level minus on-hand plus expected use over the supplier lead time. Minimum: 14 days of stock movements.\n- `requisition`: the next service's prep-plan ingredient needs minus kitchen stock. Minimum: 14 days of sales.\n- `demandForecast`: the average of the same weekday over the last 8 weeks, adjusted by admissions already booked. Minimum: 8 weeks of sales.\n- `prepPlan`: forecast covers for the service times each item's share of the last 4 same weekdays. Minimum: 4 weeks of sales.\n- `menuEngineering`: each item placed by popularity against margin, over 90 days. Minimum: 90 days of sales.\n- `staffing`: forecast demand divided by the role's standard covers per staff hour. Minimum: 8 weeks of sales (the forecast it rests on).\n- `slaTarget`: the 80th percentile of actual times over the last 30 days. Minimum: 30 days of timed events.\n- `waitTime`: people ahead divided by the throughput of the last 30 minutes. Minimum: 30 minutes of throughput today.\n- `upsell`: the item most often bought with the basket's items over 90 days. Minimum: 90 days of orders.\n- `segmentation`: recency, frequency and spend scores over 12 months. Minimum: 90 days of orders.\n- `anomaly`: a value outside three standard deviations of the same weekday over 8 weeks. Minimum: 8 weeks of the measure.\n- `scenario`: the demand forecast re-run with the stated changes. Minimum: as `demandForecast`.\n- `sendTime` (added 29 September): per recipient, the hour inside `context.sendWindow` in which they have most often opened or clicked over the last 90 days (marketing-crm attribution touches), and where `context.channel` is `best`, the consented channel with the highest engagement. A recipient with fewer than three touches gets their segment's modal hour, and one with none the window's start. Asked with `subjectRef` a segment id or `context.subjectIds` (at most 10,000). `value` is `{recommendations: [{subjectId, sendAt, channel, basisTouches}]}`. Minimum: 90 days of message touches at the scope.\n- `wasteRisk` (added 29 September): per item at an outlet or store location, planned production and stock on hand minus forecast demand over the item's shelf life, plus batches expiring inside the horizon (`inventory.listExpiringBatches`). `value` is `{items: [{itemRef, quantityAtRisk, valueAtCost, expiresAt, recommendedAction (reducePrep, promote, transfer, useInRecipe), transferTo}]}`. Minimum: 14 days of recorded waste and of sales.\n- `queueBalancing` (added 29 September): per queue or attraction at `subjectRef` (a venue) over `horizon`, the forecast wait (the `queue` forecast definition) against throughput capacity, a recommended virtual-queue return-slot allocation by queue type, and guest redirection from over-used to under-used attractions. `value` is `{queues: [{queueId, forecastWaitMinutes, capacityPerHour, returnSlotsPerInterval, redirectTo}]}`. Minimum: 14 days of queue readings.\n- `itinerary` (added 29 September, MOB-6, guest-allowed): refines a `venue-map` visit plan the guest owns. `subjectRef` is the plan id; `value` is `{planId, baseVersion, changes, rationale}`, applied with `updateVisitPlan` as the guest. Minimum: none; the rules plan is the baseline. Every change names a point or performance of that day's venue only, rides, dining and retail alike (30 September client meeting, MoM 4.7).\n","enum":["price","replenishment","requisition","demandForecast","prepPlan","menuEngineering","staffing","slaTarget","waitTime","upsell","segmentation","anomaly","scenario","sendTime","wasteRisk","queueBalancing","itinerary"]},
 "TemperatureCheckpoint": {"type":"object","x-ticvai-persistence":"fnb.temperature_checkpoint","description":"**A unit that gets read, and the range it is required to hold.** The entity `TemperatureLog.checkPointId` has always been required to name and that nothing defined.\n**The safe range belongs here and is snapshotted onto each reading**, so that a range revised in March cannot silently re-judge a reading taken in January.","required":["id","kind","label","isActive"],"properties":{"id":{"type":"string","format":"uuid"},"outletId":{"type":"string","format":"uuid","nullable":true},"kind":{"type":"string","enum":["fridge","freezer","holdingCabinet","blastChiller","coreProbe","delivery","displayCounter","ambient"],"description":"The same closed set `TemperatureLog.checkPointKind` records."},"label":{"type":"string","description":"**What the person reading it calls it** — *Walk-in 2*, *Dessert counter*. A checkpoint identified only by a uuid is one somebody will read the wrong unit for."},"minCelsius":{"type":"number","nullable":true},"maxCelsius":{"type":"number","nullable":true,"description":"**Null at either end is legitimate** — a core probe has a floor and no ceiling. Both null is not, and is what an unconfigured checkpoint looks like."},"checkFrequencyMinutes":{"type":"integer","nullable":true,"description":"**How often it must be read.** The gap this leaves open otherwise is the one an inspector finds: not a bad reading, but a missing one."},"requiresCorrectiveActionOnBreach":{"type":"boolean"},"isActive":{"type":"boolean"},"scopePath":{"type":"string"}}},
-"VenueSettings": {"type":"object","x-ticvai-persistence":"platform.venue_settings","description":"**Venue-level operational configuration that no other level can answer.**\nRegion owns currency, tax regime and fiscal year (ADR-0011). Venue owns the things that vary between two venues in one region — **opening hours, support hours, and what the local law requires of the gate.**\n**And the configured limits** (decided 28 September, audit R094): every limit the contracts call *configured* is a field here, from `displayCurrencies` and `cartLeaseSeconds` down to the grouped `catalogue`, `inventory`, `seating`, `promotions`, `fnb`, `queue`, `reporting`, `marketing` and `identity` settings. **Each has a tenant-level default**: the tenant sets it once with `setVenueSettingsDefaults`, a venue overrides it within the field's bounds, and a null field here inherits it. Each field's `default` is the proposed tenant default, marked proposed, client to correct (audit R094); `docs/active/configured-limits-proposal.md` is the sheet the client corrects, and where the two differ this contract is what runs.\n","properties":{"id":{"type":"string","format":"uuid","readOnly":true,"description":"**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"},"venueId":{"type":"string","format":"uuid","readOnly":true,"description":"From the path of `setVenueSettings`."},"calendarDayStartHour":{"type":"integer","minimum":0,"maximum":23,"nullable":true,"default":6,"description":"**Where the venue's calendar day starts** (17 September minutes M17-03, added 30 September): the first hour row of every day and week calendar view (`calendarView` in `screens/_components.yaml`), so a venue open 06:00 to 02:00 sees its night on the day it belongs to. Display only: it moves no booking, slot or business date. Null inherits the tenant default (proposed 6, client to correct).\n"},"currencyCode":{"type":"string","pattern":"^[A-Z]{3}$","nullable":true,"readOnly":true,"description":"**`readOnly` is the freeze.** `setVenueSettings` takes this whole schema as its request body, so without it any settings save could rewrite the currency of a venue that had already traded — which is the one thing ADR-0018's amendment forbids. It is set when the venue is provisioned, defaulted from the region, and changed only by an operation whose precondition is that the venue has not yet traded.\n**The venue's trading currency, defaulted from its region and frozen once the venue has traded** (ADR-0018, amended 20 September). Currency was a region-only fact, grouped with tax rates on the reasoning that *\"a venue cannot choose its VAT\"* -- true of tax and over-applied to currency, because a free-zone unit, a duty-free shop and a cruise terminal genuinely trade in a currency their region does not.\n**This column exists because the freeze needs somewhere to live.** A venue that resolved purely from its region would silently follow a region currency change after it had already traded, and every dated artefact beneath it -- a price list is a `validFrom`/`validTo` range -- would render retrospectively wrong. Null means \"resolve from the region\", which is the answer for every venue that has not overridden.\n"},"currencyScale":{"type":"integer","minimum":0,"maximum":4,"nullable":true,"readOnly":true,"description":"**Scale travels with currency** (ADR-0008), and so does the freeze. OMR is three decimal places because Oman says so; overriding the currency without the scale gets rounding wrong. Set together or not at all.\n"},"supportHours":{"type":"object","description":"CF-100. **A venue decides whether its support desk is 24/7 or bounded, and the platform does not.** This was recorded as an open question for eleven days and was never one — the code is identical either way, and what was missing was somewhere to put the answer.\n","properties":{"mode":{"type":"string","enum":["alwaysOn","businessHours","custom","none"]},"timezone":{"type":"string","description":"IANA zone the `windows` are read in. Absent, they are read in the region's `timeZone`, like every other wall-clock time in this contract.\n"},"windows":{"type":"array","items":{"type":"object","properties":{"day":{"type":"string","enum":["mon","tue","wed","thu","fri","sat","sun"]},"from":{"type":"string","description":"Wall-clock time the desk opens."},"to":{"type":"string","description":"Wall-clock time the desk closes."}}}},"outOfHoursMessage":{"type":"string","nullable":true}}},"quietHours":{"type":"object","nullable":true,"description":"**When the platform does not send.** A wallet low-balance alert at 3am is a complaint, and journeys and message triggers both respect this.\n**Operational messages ignore it** — a queue-turn alert is why a guest is holding the phone.\n","properties":{"from":{"type":"string","description":"Wall-clock time sending stops","in the region's time zone.":null},"to":{"type":"string","description":"Wall-clock time sending resumes","in the region's time zone.":null}}},"biometrics":{"type":"object","nullable":true,"description":"CF-35, BL-096, BL-105, BL-106. **The venue-level master switch, and the one place a person is asked whether the paperwork exists.** Biometric data is sensitive under PDPL (Federal Decree-Law 45/2021) — heightened protection, explicit consent, and an Article 21 assessment before the processing rather than after it.\n**Nothing below this switch operates while it is off.** `AdmissionRules` may carry a `biometricPolicy` per ticket type and those rules are inert until a venue enables biometrics here, which means a profile copied between venues cannot start capturing faces at the destination.\n**Venue level because that is where the assessment is filed.** Region owns tax and currency; the DPIA, the consent notice and the hardware are a venue's.\n","properties":{"isEnabled":{"type":"boolean","default":false,"description":"**Off by default, and turning it on is refused without the two fields below.** `setVenueSettings` answers 422 rather than accepting an enable it cannot evidence — **a DPIA nobody can name is a DPIA nobody did**, and the point of the refusal is that the person switching this on is asked at the moment they switch it on rather than by an auditor a year later.\n"},"dpiaReference":{"type":"string","nullable":true,"maxLength":200,"description":"**The venue's own reference for its Article 21 assessment.** The platform does not hold the document and does not judge it; it records that one was named, by whom, and when — which is what an audit asks for and what the venue can produce.\n"},"consentNoticeAcknowledgedAt":{"type":"string","format":"date-time","nullable":true,"description":"**When somebody confirmed the consent forms are in place at the point of capture.** A guest consenting in an app is a record; a guest consenting at a ticket counter is a notice somebody has to have printed and a question somebody has to have asked.\n"},"acknowledgedByPrincipalId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"**Who confirmed it.** An acknowledgement with no name behind it cannot be followed up, and this is the field that makes the switch an act rather than a setting. Recorded by the server as the caller whose save carried the acknowledgement, so it cannot name somebody else.\n"},"faceTagPurgeMinutesAfterClose":{"type":"integer","nullable":true,"default":0,"description":"BL-106. **How long a same-visit Face Tag survives past the close of the operating day**, and zero is the default because that is what 3.2.44 describes. A non-zero value is an operational allowance for a late reconciliation, not a retention period — **`facePass` ignores this entirely** and is bounded by its entitlement.\n"}}},"segregatedAccess":{"type":"object","nullable":true,"description":"CF-130. **Configured at venue level because it changes by region and the venue is where it is known** — a Ladies Night, a family session, a prayer-time closure.\n**The platform does not infer gender.** 3.2.45 asks for automatic gender recognition and 3.2.46 for rule-based facial recognition validation, and neither is built. Two reasons, and the second is the one that decided it:\n**A Ladies Night ticket is already gendered at the point of sale**, so the gate checks the entitlement the platform issued rather than the face in front of it — deterministic, auditable, and already contracted through `admissionRules`.\n**And these events are staffed.** A steward at the entrance is making the judgment anyway, and a classifier that overrules a person who can see more than it can is a machine and a human disagreeing while a guest waits.\n**`genderVerification` is a switch, not an implementation.** Where a venue's access hardware offers the capability and the venue chooses to use it, this turns it on — following ADR-0015's standards-first driver model, where the device does what the device does. **Not everything needs to be built.**\n","properties":{"isEnabled":{"type":"boolean","default":false},"appliesToAccessPointIds":{"type":"array","items":{"type":"string","format":"uuid"}},"schedule":{"type":"array","items":{"type":"object","properties":{"day":{"type":"string","enum":["mon","tue","wed","thu","fri","sat","sun"]},"from":{"type":"string","description":"Wall-clock time","in the region's time zone.":null},"to":{"type":"string","description":"Wall-clock time","in the region's time zone.":null},"admits":{"type":"string","enum":["all","women","womenAndChildren","families","members"]}}}},"entitlementGated":{"type":"boolean","default":true,"readOnly":true,"description":"**Always true, and stated rather than assumed.** The gate admits on the entitlement. Everything below is advisory on top of that, and nothing replaces it.\n"},"genderVerification":{"type":"string","enum":["off","staffAssisted","deviceAssisted"],"default":"off","description":"`off` — the entitlement decides and a steward handles exceptions. **The default, and what is contracted.**\n`staffAssisted` — the steward's screen shows the ticket type so they can ask. No inference anywhere.\n`deviceAssisted` — **the venue's access hardware performs the check, not the platform.** Available only where the driver reports the capability, and the result is **advisory to the steward rather than decisive at the turnstile** (3.2.45 asks for rejection; this deviates deliberately).\n"},"overrideRateAlertThreshold":{"type":"number","nullable":true,"description":"Where `deviceAssisted` is on. **An override rate near zero means the steward has stopped deciding**, and that is the number that says whether the human safeguard is working or decorative.\n"}}},"alerting":{"type":"object","description":"CF-134. **On-platform notification, marked as read.** Six contracts detect their own trouble and none told a person.\n**The panel is the default and email or WhatsApp only where the matrix names them** — an operational alert that arrives by email is an alert nobody sees in time.\n","properties":{"channel":{"type":"string","enum":["dashboardPanel","dashboardAndEmail","dashboardAndWhatsapp"],"default":"dashboardPanel"},"acknowledgementRequired":{"type":"boolean","default":true},"escalateAfterMinutes":{"type":"integer","nullable":true}}},"displayCurrencies":{"type":"array","nullable":true,"description":"**Which currencies this venue shows guests** (decided 28 September, audit R120 (a)). ISO 4217 codes, each one its region holds an `FxRate` for; the rate itself stays per region and is never set here. `finance.listFxRates` with `venueId` narrows the region's rates to these. Null or empty shows the trading currency only. A code the region has no rate for is refused `400`.\n","items":{"type":"string","pattern":"^[A-Z]{3}$"}},"cartLeaseSeconds":{"type":"integer","nullable":true,"minimum":30,"maximum":3600,"default":900,"description":"**How long a cart holds capacity** (decided 28 September, audit R169): 15 minutes, the default `catalogue.acquireInventoryHold` takes for `ttlSeconds`. Proposed, client to correct (audit R094).\n"},"cartHoldExtensionMinutes":{"type":"integer","nullable":true,"minimum":1,"maximum":30,"default":5,"description":"How long one `orders.extendCart` extension adds. Proposed, client to correct (audit R094)."},"cartMaxExtensions":{"type":"integer","nullable":true,"minimum":0,"maximum":5,"default":1,"description":"How many extensions a cart may take before `extensionCapReached` (`Cart.maxExtensions`). Proposed, client to correct (audit R094)."},"resaleCutoffHours":{"type":"integer","nullable":true,"minimum":0,"maximum":168,"default":24,"description":"Hours before the performance after which a ticket can no longer be listed for resale (`orders.createResaleListing`). Proposed, client to correct (audit R094)."},"exchangeCutoffHours":{"type":"integer","nullable":true,"minimum":0,"maximum":720,"default":24,"description":"Hours before the original performance after which lines can no longer be exchanged (`orders.exchangeOrderLines`, `outsideExchangeWindow`). Proposed, client to correct (audit R094)."},"rescheduleCutoffHours":{"type":"integer","nullable":true,"minimum":0,"maximum":720,"default":24,"description":"Hours before the original performance after which an order can no longer be rescheduled (`orders.rescheduleOrder`, `outsideRescheduleWindow`). Proposed, client to correct (audit R094)."},"reservationMaxExtensions":{"type":"integer","nullable":true,"minimum":0,"maximum":5,"default":1,"description":"How many times `orders.extendReservation` may extend one reservation. Proposed, client to correct (audit R094)."},"shiftVarianceThreshold":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"nullable":true,"description":"Over or short at shift close beyond which the shift waits in `pendingVariance` for `shift.acceptShiftVariance`. **Proposed tenant default AED 20.00, bounds 0 to 1,000 in the venue currency; client finance to correct (audit R094).**\n"},"catalogue":{"type":"object","nullable":true,"properties":{"maxVariantsPerProduct":{"type":"integer","nullable":true,"minimum":1,"maximum":2000,"default":200,"description":"Variants one product may generate from its attributes (`setProductAttributes` refuses above it). Proposed, client to correct (audit R094)."},"waitlistOfferHoldMinutes":{"type":"integer","nullable":true,"minimum":1,"maximum":1440,"default":30,"description":"How long a waitlist offer holds the released capacity for the guest it was offered to. Proposed, client to correct (audit R094)."},"bulkPriceChangeEscalationPercent":{"type":"number","nullable":true,"minimum":0,"maximum":100,"default":10,"description":"A `bulkChangePrices` run changing any price by more than this percentage needs `PRICE_CONFIGURE` (audit R197). Proposed, client to correct (audit R094)."},"bulkPriceChangeEscalationCount":{"type":"integer","nullable":true,"minimum":1,"default":50,"description":"A `bulkChangePrices` run touching more prices than this needs `PRICE_CONFIGURE` (audit R197). Proposed, client to correct (audit R094)."}}},"inventory":{"type":"object","nullable":true,"properties":{"overReceiptTolerancePercent":{"type":"number","nullable":true,"minimum":0,"maximum":25,"default":5,"description":"Percent above the outstanding ordered quantity a goods receipt line may record (`createGoodsReceipt`). Proposed, client to correct (audit R094)."},"countVarianceTolerancePercent":{"type":"number","nullable":true,"minimum":0,"maximum":25,"default":2,"description":"Percent difference between counted and expected quantity before a count line is an exception (`getCountVariance`). Proposed, client to correct (audit R094)."},"countVarianceApprovalAmount":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"nullable":true,"description":"Total variance value of a count above which posting it needs approval (`postStockCount`). **Proposed tenant default 1,000.00 in the venue currency, client finance to correct (audit R094).**\n"}}},"seating":{"type":"object","nullable":true,"properties":{"seatHoldExtensionSeconds":{"type":"integer","nullable":true,"minimum":60,"maximum":1800,"default":300,"description":"What one `extendSeatHold` adds. No hold outlives 30 minutes in all (audit R169). Proposed, client to correct (audit R094)."},"seatHoldMaxExtensions":{"type":"integer","nullable":true,"minimum":0,"maximum":5,"default":2,"description":"How many times a seat hold may be extended. Proposed, client to correct (audit R094). A resource hold on a venue map (`resources.extendResourceHold`) uses the same two bounds (decided 29 September, rev 3 REV3-15)."},"maxSeatsPerGuestOrder":{"type":"integer","nullable":true,"minimum":1,"maximum":50,"default":10,"description":"**Seats one guest may take in one booking on a guest channel** (Guest Web, Guest App), decided 29 September, rev 3 REV3-7. `seating.createSeatHold` counts the seats in the request plus the seats the same guest already holds on the same performance, and refuses above this with `422` `seat-limit-exceeded`, naming the limit. Default 10, bounds 1 to 50; a venue sets its own in Venue Management. Staff and POS sales keep 10 per sale (audit R080 (c)) and do not read this field.\n"}}},"promotions":{"type":"object","nullable":true,"properties":{"maxDiscountPercent":{"type":"number","nullable":true,"minimum":0,"maximum":100,"default":30,"description":"The largest discount one promotion may give (`createPromotion` refuses above it). Proposed, client to correct (audit R094)."},"nearZeroLinePrice":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"nullable":true,"description":"Net line price below which a stacked combination is flagged near-zero in `analysePromotionConflicts` (audit R096 (5)); a warning, not a refusal. **Proposed tenant default AED 1.00, client to correct (audit R094).**\n"}}},"fnb":{"type":"object","nullable":true,"properties":{"recallWindowMinutes":{"type":"integer","nullable":true,"minimum":0,"maximum":60,"default":10,"description":"Minutes after a bump during which `recallKitchenTicket` still recalls; after it the act is a refire. Proposed, client to correct (audit R094)."},"compEscalationAmount":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"nullable":true,"description":"Line value above which `compItem` needs `ORDER_DISCOUNT` (audit R197). **Proposed tenant default AED 100.00, client to correct (audit R094).**\n"},"foodSafetyLeadPrincipalId":{"type":"string","format":"uuid","nullable":true,"description":"**The venue's food-safety lead**, to whom `escalateCorrectiveAction` sends every escalation (decided 28 September, audit R096 (9)). A venue fact, so it has no tenant default; while it is null an escalation is refused `409 no-food-safety-lead`.\n"}}},"queue":{"type":"object","nullable":true,"properties":{"crossQueueLimit":{"type":"integer","nullable":true,"minimum":1,"maximum":10,"default":2,"description":"Virtual queues one guest party may wait in at once (`joinQueue`, `crossQueueLimitReached`). Proposed, client to correct (audit R094)."}}},"reporting":{"type":"object","nullable":true,"properties":{"inlineRunRowLimit":{"type":"integer","nullable":true,"minimum":1000,"maximum":100000,"default":5000,"description":"Estimated rows above which `runReport` answers `202` and runs in the background. Proposed, client to correct (audit R094)."},"dashboardRefreshBudgetPerMinute":{"type":"integer","nullable":true,"minimum":1,"default":24,"description":"Tile refreshes per minute, summed over a dashboard's tiles, that `createDashboard` allows. Proposed, client to correct (audit R094)."}}},"marketing":{"type":"object","nullable":true,"properties":{"attributionWindowDays":{"type":"integer","nullable":true,"minimum":1,"maximum":30,"default":7,"description":"Days after a campaign touch within which a booking is attributed to it (`getCampaignPerformance`). Proposed, client to correct (audit R094)."}}},"identity":{"type":"object","nullable":true,"properties":{"guestOtpMaxAttempts":{"type":"integer","nullable":true,"minimum":3,"maximum":10,"default":5,"description":"Wrong entries allowed per guest one-time code before `verifyGuestOtp` invalidates it. A guest code is tenant-scoped, so the tenant default is the value used. Proposed, client to correct (audit R094).\n"},"guestTwoStep":{"type":"object","nullable":true,"description":"**Guest two-step verification: a venue option, off unless the venue enables it in Venue Management** (decided 29 September, rev 3 GAP-B1, per venue, superseding the second part of audit R167, \"no guest MFA\"; an earlier draft of the same day put it on the tenant's `PasswordPolicy`, which no longer carries it). **The guest's enrolment stays tenant-wide**: one guest account across the tenant's venues, so a method enrolled once is used in every venue that has this on, and is never asked in a venue that has it off. Identity learns the venue from `venueId` on the guest sign-in (`verifyGuestOtp`, `guestPasswordLogin`, `guestSocialLogin`, `guestUaePassLogin`) and on `createMfaChallenge`: the venue the guest app or booking is in; with no venue given, an enrolled guest is asked when any venue of the tenant has it on. Guests may enrol `totp` with `emailOtp` as the fallback, as staff do (audit R126 (5)); it is never forced. Guests still never use enterprise SSO (R167, first part). A null inherits the tenant default set with `setVenueSettingsDefaults`.\n","properties":{"enabled":{"type":"boolean","default":false,"description":"Off unless the venue enables it. While no venue of the tenant has it on, guests cannot enrol (`enrolMfaMethod` answers 403 `guest-two-step-disabled`)."},"stepUpActions":{"type":"array","uniqueItems":true,"description":"The guest actions in this venue that ask an enrolled guest for the factor again, whatever the age of the session. The service performing the action passes this venue to `createMfaChallenge`. Proposed, client to correct (rev 3 GAP-B1).\n","items":{"type":"string","enum":["changeContactDetails","changePassword","managePaymentMethods","transferTickets","deleteAccount"]},"default":["changeContactDetails","changePassword","managePaymentMethods","deleteAccount"]}}}}}}}
+"WasteApprovalPolicy": {"type":"object","x-ticvai-persistence":"fnb.waste_approval_policy","description":"**Whether waste needs approval, and above what value** (Chinmay, 2 October, workbook Q192; CHG-CSA-016). Off by default: a venue that never set one has `enabled` false. One row per venue.\n","required":["enabled"],"properties":{"enabled":{"type":"boolean","default":false},"bands":{"type":"array","x-ticvai-persistence-kind":"valueObject","x-ticvai-persistence-column":"jsonb","description":"Value bands in ascending `fromValue`; a record's value falls in the last band it reaches. A value below the first band needs nothing.","items":{"type":"object","required":["fromValue","requiresApproval"],"properties":{"fromValue":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"requiresApproval":{"type":"boolean"},"approverPermission":{"type":"string","nullable":true,"description":"The permission an approver in this band holds (a value of the permission vocabulary, e.g. `APPROVAL_ACT`)."}}}},"photoRequiredAbove":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"nullable":true,"description":"At or above this value a photo is required (`recordWaste.photoAssetId`). Null means never."},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005). Operations write it at `venue` scope."},"updatedAt":{"type":"string","format":"date-time","readOnly":true}}}
 }
 ```

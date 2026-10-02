@@ -1,27 +1,22 @@
 {
- "acquireInventoryHold": {
+ "buildProductionPlan": {
   "method": "POST",
-  "path": "/inventory-holds",
-  "contract": "catalogue",
-  "summary": "Acquire an inventory hold",
-  "permission": "ORDER_CREATE",
+  "path": "/production-plans",
+  "contract": "fnb",
+  "summary": "Turn a forecast into a prep list",
+  "permission": "PRODUCT_CONFIGURE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
-  "scopeLevel": "workstation",
+  "scopeLevel": "venue",
   "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
    {
     "name": null,
     "in": null,
     "required": null
    }
   ],
-  "requestBody": "AcquireLeaseRequest",
-  "responds": "InventoryHold"
+  "requestBody": "ProductionPlan",
+  "responds": "ProductionPlan"
  },
  "cancelPerformance": {
   "method": "POST",
@@ -60,6 +55,25 @@
   ],
   "requestBody": null,
   "responds": "ProductionRun"
+ },
+ "createChannelCapacity": {
+  "method": "POST",
+  "path": "/channel-capacities",
+  "contract": "catalogue",
+  "summary": "Create a channel capacity",
+  "permission": "CAPACITY_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateEnvelopeRequest",
+  "responds": "ChannelCapacity"
  },
  "createEvent": {
   "method": "POST",
@@ -104,6 +118,44 @@
   "requestBody": "CreatePerformancesRequest",
   "responds": null
  },
+ "createSaleBoard": {
+  "method": "POST",
+  "path": "/sale-boards",
+  "contract": "tenancy",
+  "summary": "Create a sale board",
+  "permission": "WORKSTATION_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "SaleBoard",
+  "responds": "SaleBoard"
+ },
+ "createStockTransfer": {
+  "method": "POST",
+  "path": "/stock-transfers",
+  "contract": "inventory",
+  "summary": "Send stock to another location",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateStockTransferRequest",
+  "responds": "StockTransfer"
+ },
  "decideRecommendations": {
   "method": "POST",
   "path": "/recommendations/decide",
@@ -142,6 +194,32 @@
   "requestBody": null,
   "responds": "InventoryHold"
  },
+ "getAllergenVerification": {
+  "method": "GET",
+  "path": "/menu-items/{menuItemId}/allergen-verification",
+  "contract": "fnb",
+  "summary": "The last allergen verdict recorded for a dish",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "AllergenVerdict"
+ },
+ "getChannelAllocations": {
+  "method": "GET",
+  "path": "/channel-capacities/{channelCapacityId}/channel-allocations",
+  "contract": "catalogue",
+  "summary": "Capacity allocated to each channel",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ChannelAllocationSet"
+ },
  "getEvent": {
   "method": "GET",
   "path": "/events/{eventId}",
@@ -179,44 +257,18 @@
   "requestBody": null,
   "responds": "CatalogueBundle"
  },
- "getOfflinePackage": {
+ "getMenu": {
   "method": "GET",
-  "path": "/access/offline-package",
-  "contract": "access",
-  "summary": "Entitlement and rule set for offline validation",
-  "permission": "ACCESS_VALIDATE",
+  "path": "/menus/{menuId}",
+  "contract": "fnb",
+  "summary": "Read a menu with sections and items",
+  "permission": "PRODUCT_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
-  "scopeLevel": "workstation",
-  "parameters": [
-   {
-    "name": "sinceVersion",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": "validFrom",
-    "in": "query",
-    "required": true
-   },
-   {
-    "name": "validTo",
-    "in": "query",
-    "required": true
-   },
-   {
-    "name": "If-None-Match",
-    "in": "header",
-    "required": null
-   }
-  ],
+  "scopeLevel": "venue",
+  "parameters": [],
   "requestBody": null,
-  "responds": "OfflinePackage"
+  "responds": "Menu"
  },
  "getPerformance": {
   "method": "GET",
@@ -230,6 +282,19 @@
   "parameters": [],
   "requestBody": null,
   "responds": "Performance"
+ },
+ "getProductionRun": {
+  "method": "GET",
+  "path": "/production-runs/{runId}",
+  "contract": "fnb",
+  "summary": "One run — its plan, its output, and the gap",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ProductionRun"
  },
  "getSeatAvailability": {
   "method": "GET",
@@ -290,6 +355,35 @@
   "parameters": [],
   "requestBody": null,
   "responds": "BundleSummary"
+ },
+ "listChannelCapacities": {
+  "method": "GET",
+  "path": "/channel-capacities",
+  "contract": "catalogue",
+  "summary": "List channel capacities",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "performanceId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
  },
  "listEvents": {
   "method": "GET",
@@ -354,40 +448,6 @@
   "requestBody": null,
   "responds": "Page"
  },
- "listMenus": {
-  "method": "GET",
-  "path": "/menus",
-  "contract": "fnb",
-  "summary": "List menus",
-  "permission": "PRODUCT_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "outletId",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "activeAt",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- },
  "listPerformances": {
   "method": "GET",
   "path": "/events/{eventId}/performances",
@@ -415,6 +475,45 @@
    },
    {
     "name": "language",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listProductionRuns": {
+  "method": "GET",
+  "path": "/production-runs",
+  "contract": "fnb",
+  "summary": "What is being made, and what was",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "locationKind",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "from",
     "in": "query",
     "required": null
    },
@@ -465,6 +564,30 @@
   ],
   "requestBody": null,
   "responds": "Page"
+ },
+ "listSaleBoards": {
+  "method": "GET",
+  "path": "/sale-boards",
+  "contract": "tenancy",
+  "summary": "List sale boards",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "kind",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "SaleBoard"
  },
  "listSyncRejections": {
   "method": "GET",
@@ -534,6 +657,25 @@
   "requestBody": null,
   "responds": "Page"
  },
+ "listWaitlistEntries": {
+  "method": "GET",
+  "path": "/waitlist-entries",
+  "contract": "catalogue",
+  "summary": "Who is waiting for capacity",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "performanceId",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "WaitlistEntry"
+ },
  "listWorkstations": {
   "method": "GET",
   "path": "/workstations",
@@ -568,6 +710,25 @@
   "requestBody": null,
   "responds": "Page"
  },
+ "offerWaitlistCapacity": {
+  "method": "POST",
+  "path": "/waitlist-entries/{entryId}/offer",
+  "contract": "catalogue",
+  "summary": "Tell a waiting guest that capacity appeared",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "WaitlistEntry"
+ },
  "planProductionRun": {
   "method": "POST",
   "path": "/production-runs",
@@ -586,6 +747,25 @@
   ],
   "requestBody": "ProductionRun",
   "responds": "ProductionRun"
+ },
+ "printPrepSheet": {
+  "method": "POST",
+  "path": "/production-plans/{planId}/prep-sheet",
+  "contract": "fnb",
+  "summary": "Print a production plan's prep sheet",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "PrepSheet"
  },
  "publishBundle": {
   "method": "POST",
@@ -625,14 +805,14 @@
   "requestBody": "SeatRecommendationRequest",
   "responds": null
  },
- "recordRecommendationEvents": {
+ "releaseProductionPlan": {
   "method": "POST",
-  "path": "/recommendations/events",
-  "contract": "ai",
-  "summary": "Report what happened to recommended items",
-  "permission": "AI_USE",
+  "path": "/production-plans/{planId}/release",
+  "contract": "fnb",
+  "summary": "Make the plan real",
+  "permission": "PRODUCT_CONFIGURE",
   "offlineCapable": false,
-  "conflictPolicy": "append",
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -642,36 +822,17 @@
    }
   ],
   "requestBody": null,
-  "responds": null
+  "responds": "ProductionPlan"
  },
- "relinquishInventoryHold": {
-  "method": "DELETE",
-  "path": "/inventory-holds/{inventoryHoldId}",
-  "contract": "catalogue",
-  "summary": "Return unsold units",
-  "permission": "ORDER_CREATE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "workstation",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "InventoryHold"
- },
- "renewInventoryHold": {
+ "relinquishChannelAllocation": {
   "method": "POST",
-  "path": "/inventory-holds/{inventoryHoldId}/renew",
+  "path": "/channel-capacities/{channelCapacityId}/channel-allocations/release",
   "contract": "catalogue",
-  "summary": "Extend an inventory hold's TTL",
-  "permission": "ORDER_CREATE",
+  "summary": "Return unsold channel allocation to the general pool",
+  "permission": "CAPACITY_CONFIGURE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
-  "scopeLevel": "workstation",
+  "scopeLevel": "venue",
   "parameters": [
    {
     "name": null,
@@ -680,7 +841,7 @@
    }
   ],
   "requestBody": null,
-  "responds": "InventoryHold"
+  "responds": "ChannelAllocationSet"
  },
  "reportBundleApplied": {
   "method": "POST",
@@ -700,6 +861,25 @@
   ],
   "requestBody": null,
   "responds": null
+ },
+ "setChannelAllocations": {
+  "method": "PUT",
+  "path": "/channel-capacities/{channelCapacityId}/channel-allocations",
+  "contract": "catalogue",
+  "summary": "Allocate a channel capacity across sales channels",
+  "permission": "CAPACITY_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ChannelAllocationSet"
  },
  "setIngredientSubstitutes": {
   "method": "PUT",
@@ -859,6 +1039,25 @@
   "requestBody": null,
   "responds": "OrderSyncResult"
  },
+ "updateChannelCapacity": {
+  "method": "PATCH",
+  "path": "/channel-capacities/{channelCapacityId}",
+  "contract": "catalogue",
+  "summary": "Amend a channel capacity",
+  "permission": "CAPACITY_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ChannelCapacity"
+ },
  "updateEvent": {
   "method": "PATCH",
   "path": "/events/{eventId}",
@@ -877,30 +1076,6 @@
   ],
   "requestBody": null,
   "responds": "Event"
- },
- "updateMenu": {
-  "method": "PATCH",
-  "path": "/menus/{menuId}",
-  "contract": "fnb",
-  "summary": "Amend a menu",
-  "permission": "PRODUCT_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Menu"
  },
  "updateOutlet": {
   "method": "PATCH",

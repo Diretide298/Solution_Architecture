@@ -138,6 +138,11 @@
     "name": "groupBy",
     "in": "query",
     "required": null
+   },
+   {
+    "name": "module",
+    "in": "query",
+    "required": null
    }
   ],
   "requestBody": null,
@@ -155,6 +160,19 @@
   "parameters": [],
   "requestBody": null,
   "responds": "PerformanceParticipant"
+ },
+ "getRentalBooking": {
+  "method": "GET",
+  "path": "/rental-bookings/{bookingId}",
+  "contract": "rental",
+  "summary": "One booking, its timeline and its readiness",
+  "permission": "RENTAL_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "RentalBooking"
  },
  "getResourceAvailability": {
   "method": "GET",
@@ -180,18 +198,18 @@
   "requestBody": null,
   "responds": "ResourceAvailability"
  },
- "getVenueSettings": {
+ "getResourceQualifications": {
   "method": "GET",
-  "path": "/venues/{venueId}/settings",
-  "contract": "tenancy",
-  "summary": "Operational settings for this venue",
-  "permission": "TENANT_VIEW",
-  "offlineCapable": true,
+  "path": "/resources/{resourceId}/qualifications",
+  "contract": "resources",
+  "summary": "What an instructor or staff resource is certified to do, and until when — as saved",
+  "permission": "RESOURCE_VIEW",
+  "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [],
   "requestBody": null,
-  "responds": "VenueSettings"
+  "responds": "Qualification"
  },
  "listAccessPoints": {
   "method": "GET",

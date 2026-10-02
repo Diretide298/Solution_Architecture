@@ -283,5 +283,320 @@
     "decided": "10 September 2026"
    }
   }
+ },
+ {
+  "id": "ANL-072",
+  "name": "Finance Dashboard",
+  "module": "Analytics",
+  "requiresModule": "core",
+  "wave": 3,
+  "source": {
+   "pack": "TICVAI Finance Backend Structure Reference v1.0.pdf",
+   "board": "1",
+   "number": "1",
+   "page": 106
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/analytics/finance-dashboard-anl-072",
+   "component": "apps/venue-management-web/src/routes/analytics/FinanceDashboard.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ANL-021"
+   ],
+   "exitTo": [
+    "ANL-021"
+   ],
+   "transitions": [
+    {
+     "to": "ANL-021",
+     "trigger": "Back to Dashboard Library",
+     "provenance": "decided 2 October 2026 (DEC-219, CHG-SOT-008): the Finance standard dashboard sits in the reporting area",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "permission": "LEDGER_VIEW",
+  "pattern": "commandCentre",
+  "patternReason": "the Finance standard dashboard of the reporting area (DI-721): seeded finance measures over a period, not a population the screen lists",
+  "purpose": "The finance team's one-glance position for one legal entity and one period: the six finance measures as separate tiles, where the money stands, and the health of tax documents.",
+  "purposeNote": "**One P16 Finance dashboard; Orders & Money (P08) shows a link card to it** (decided 2 October 2026, Chinmay, workbook Q219, BO-1081; DEC-219). DI-260's content stands, its location moves to the one reporting area (DI-721).",
+  "layout": {
+   "template": "dashboard",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "filters",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Legal entity",
+       "operation": "getKpiValues",
+       "notes": "Required, first in the filter bar. It fixes the base currency, shown read-only beside it, never offered as a choice (DI-211, DI-282).",
+       "provenance": "design notes BO-1081 inputs; moved 2 October 2026 (DEC-219)"
+      },
+      {
+       "kind": "selectField",
+       "label": "Venue",
+       "operation": "getKpiValues",
+       "notes": "Sends the scope as `scopePath`. Lists only the venues the signed-in user may see; a venue manager arrives locked to their venue (DI-061, DI-248).",
+       "provenance": "contract reporting.yaml GET /kpi-values"
+      },
+      {
+       "kind": "selectField",
+       "label": "Product category",
+       "operation": "getKpiValues",
+       "notes": "The pack's \"Attraction\" filter is a product category under the venue, not a scope node (decided 2 October 2026, DEC-218).",
+       "provenance": "design notes BO-1081 decisions (DEC-218)"
+      },
+      {
+       "kind": "datePicker",
+       "label": "Period",
+       "operation": "getKpiValues",
+       "notes": "Sends `period`. Month by default; day, week, month, quarter, fiscal year and a custom range (DI-260, DI-263).",
+       "provenance": "contract reporting.yaml GET /kpi-values"
+      }
+     ]
+    },
+    {
+     "name": "tiles",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "metricTile",
+       "label": "Gross sales",
+       "bindsTo": "KpiValue",
+       "columns": [
+        "KpiValue.value",
+        "KpiValue.comparison",
+        "KpiValue.direction"
+       ],
+       "operation": "getKpiValues",
+       "notes": "`getKpiValues?kpiCodes=grossSales` for the chosen legal entity, venue and period, with its as-of time; formula in `ReportingSystemKpi` (D-185 default, client finance sign-off pending; CHG-FIN-007). Excluding VAT; service fees are not inside it and are footnoted as their own line (decided 2 October 2026, DEC-217).",
+       "provenance": "contract reporting.yaml ReportingSystemKpi (CHG-FIN-007); moved from BO-1081, 2 October 2026 (DEC-219)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Discounts",
+       "bindsTo": "KpiValue",
+       "columns": [
+        "KpiValue.value",
+        "KpiValue.comparison",
+        "KpiValue.direction"
+       ],
+       "operation": "getKpiValues",
+       "notes": "`getKpiValues?kpiCodes=discounts` for the chosen legal entity, venue and period, with its as-of time; formula in `ReportingSystemKpi` (D-185 default, client finance sign-off pending; CHG-FIN-007).",
+       "provenance": "contract reporting.yaml ReportingSystemKpi (CHG-FIN-007); moved from BO-1081, 2 October 2026 (DEC-219)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Refunds",
+       "bindsTo": "KpiValue",
+       "columns": [
+        "KpiValue.value",
+        "KpiValue.comparison",
+        "KpiValue.direction"
+       ],
+       "operation": "getKpiValues",
+       "notes": "`getKpiValues?kpiCodes=refunds` for the chosen legal entity, venue and period, with its as-of time; formula in `ReportingSystemKpi` (D-185 default, client finance sign-off pending; CHG-FIN-007).",
+       "provenance": "contract reporting.yaml ReportingSystemKpi (CHG-FIN-007); moved from BO-1081, 2 October 2026 (DEC-219)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Net revenue",
+       "bindsTo": "KpiValue",
+       "columns": [
+        "KpiValue.value",
+        "KpiValue.comparison",
+        "KpiValue.direction"
+       ],
+       "operation": "getKpiValues",
+       "notes": "`getKpiValues?kpiCodes=netRevenue` for the chosen legal entity, venue and period, with its as-of time; formula in `ReportingSystemKpi` (D-185 default, client finance sign-off pending; CHG-FIN-007). Gross sales less discounts and refunds.",
+       "provenance": "contract reporting.yaml ReportingSystemKpi (CHG-FIN-007); moved from BO-1081, 2 October 2026 (DEC-219)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Recognised revenue",
+       "bindsTo": "KpiValue",
+       "columns": [
+        "KpiValue.value",
+        "KpiValue.comparison",
+        "KpiValue.direction"
+       ],
+       "operation": "getKpiValues",
+       "notes": "`getKpiValues?kpiCodes=recognisedRevenue` for the chosen legal entity, venue and period, with its as-of time; formula in `ReportingSystemKpi` (D-185 default, client finance sign-off pending; CHG-FIN-007).",
+       "provenance": "contract reporting.yaml ReportingSystemKpi (CHG-FIN-007); moved from BO-1081, 2 October 2026 (DEC-219)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Deferred revenue",
+       "bindsTo": "KpiValue",
+       "columns": [
+        "KpiValue.value",
+        "KpiValue.comparison",
+        "KpiValue.direction"
+       ],
+       "operation": "getKpiValues",
+       "notes": "`getKpiValues?kpiCodes=deferredRevenue` for the chosen legal entity, venue and period, with its as-of time; formula in `ReportingSystemKpi` (D-185 default, client finance sign-off pending; CHG-FIN-007). The balance at period end.",
+       "provenance": "contract reporting.yaml ReportingSystemKpi (CHG-FIN-007); moved from BO-1081, 2 October 2026 (DEC-219)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "VAT collected",
+       "bindsTo": "KpiValue",
+       "columns": [
+        "KpiValue.value",
+        "KpiValue.comparison",
+        "KpiValue.direction"
+       ],
+       "operation": "getKpiValues",
+       "notes": "`getKpiValues?kpiCodes=taxCollected` for the chosen legal entity, venue and period, with its as-of time; formula in `ReportingSystemKpi` (D-185 default, client finance sign-off pending; CHG-FIN-007).",
+       "provenance": "contract reporting.yaml ReportingSystemKpi (CHG-FIN-007); moved from BO-1081, 2 October 2026 (DEC-219)"
+      },
+      {
+       "kind": "chart",
+       "label": "Gross sales to net revenue",
+       "bindsTo": "KpiValue",
+       "operation": "getKpiValues",
+       "notes": "The `waterfall` mark (CHG-FIN-007): Gross sales, minus Discounts, minus Refunds, equals Net revenue, from the same seeded KPIs as the tiles. Never gross and net stacked in one bar.",
+       "provenance": "contract reporting.yaml DashboardTile.visualisation waterfall (CHG-FIN-007)"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "Where the money stands",
+       "bindsTo": "UnifiedReconciliation",
+       "columns": [
+        "UnifiedReconciliation.from",
+        "UnifiedReconciliation.to",
+        "UnifiedReconciliation.sources",
+        "UnifiedReconciliation.variances"
+       ],
+       "operation": "getUnifiedReconciliation",
+       "notes": "POS, gateway, bank, wallet and ledger, each with its total and count, then each variance naming the two sources that disagree (\"Gateway vs Ledger, short AED 500.00\"). Shown as \"Not available with your access\" without ledger access, never as zeros.",
+       "provenance": "contract finance.yaml GET /reconciliation/unified"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Tax invoices issued",
+       "operation": "listTaxInvoices",
+       "notes": "Count for the legal entity and period.",
+       "provenance": "contract finance.yaml GET /tax-invoices"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Credit memos",
+       "operation": "listCreditMemos",
+       "notes": "Count and value for the legal entity and period. \"Credit memo\", not \"Tax credit note\", until the label is decided.",
+       "provenance": "contract finance.yaml GET /credit-memos"
+      },
+      {
+       "kind": "metricTile",
+       "label": "E-invoice transmissions failed",
+       "operation": "listEInvoiceTransmissions",
+       "notes": "`status=failed`; red above zero and links to the transmission log.",
+       "provenance": "contract finance.yaml GET /e-invoicing/transmissions"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The finance measures for the chosen legal entity and period.",
+   "error": "Could not load. Names which read failed (the measures, the money position or the tax documents) and leaves the others on screen.",
+   "emptyFirstRun": "No postings for this period yet. Offers no create action: a dashboard has nothing to create; it says which period is empty and offers the previous one.",
+   "emptyNoResults": "The venue or product category filter matched no sales in the period. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `LEDGER_VIEW`, which the money position and tax documents require, and names that permission. **Never an empty table** — that reads as *there is no data*."
+  },
+  "apis": [
+   {
+    "operationId": "getKpiValues",
+    "contract": "reporting",
+    "purpose": "The finance measures, with their as-of time",
+    "trigger": "onLoad",
+    "provenance": "moved from BO-1081, 2 October 2026 (DEC-219)"
+   },
+   {
+    "operationId": "getUnifiedReconciliation",
+    "contract": "finance",
+    "purpose": "Where the money stands",
+    "trigger": "onLoad",
+    "provenance": "moved from BO-1081, 2 October 2026 (DEC-219)"
+   },
+   {
+    "operationId": "listTaxInvoices",
+    "contract": "finance",
+    "purpose": "Tax invoices issued in the period",
+    "trigger": "onLoad",
+    "provenance": "moved from BO-1081, 2 October 2026 (DEC-219)"
+   },
+   {
+    "operationId": "listCreditMemos",
+    "contract": "finance",
+    "purpose": "Credit memos issued in the period",
+    "trigger": "onLoad",
+    "provenance": "moved from BO-1081, 2 October 2026 (DEC-219)"
+   },
+   {
+    "operationId": "listEInvoiceTransmissions",
+    "contract": "finance",
+    "purpose": "E-invoicing transmission failures",
+    "trigger": "onLoad",
+    "provenance": "moved from BO-1081, 2 October 2026 (DEC-219)"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "legalEntityId",
+     "from": "navigation"
+    }
+   ],
+   "coldEntry": "Resolves the legal entity from the caller's scope when none is passed; the Orders & Money link card (P08) opens it with the venue's legal entity."
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P16 Venue Analytics.dc.html#anl-072",
+   "workshopBoard": "wireframes/WS163 TICVAI Finance Backend Structure Reference v1.0 Board 1.dc.html#bo-1081",
+   "note": "The client's workshop frame for this dashboard is the one drawn for BO-1081 (the same pack, board 1, number 1), whose content ANL-072 carries since DEC-219 (CHG-SOT-008; CHG-GTB-006)."
+  },
+  "notes": "**Issued 2 October 2026 (CHG-SOT-008, DEC-219).** The Finance standard dashboard of the one reporting area (DI-721), carrying DI-260's content from BO-1081, which becomes a link card on Orders & Money (P08, the back-office agent's change). The design notes of BO-1081 (finance-insights) apply here in full: tile order, definitions, the money-position sentence, tax-document counts and freshness. **Measure names, not \"Revenue\"** (CHG-FIN-002): Gross sales, Net revenue, Recognised revenue and Deferred revenue never share a label, and the tiles never bind `takings`. **One reporting area, one set of numbers** (CHG-FIN-006): this screen reads the same seeded KPIs as the till report (POS-008) and the back-office reports for the same scope, period and as-of time, computes no total of its own and shows the as-of time on every figure. **The guard is the frontend comparison test TEST-SAME-NUMBERS** (decided 2 October 2026, DEC-559; `docs/active/block-a-extra-tasks.json`), which compares takings, gross sales, net revenue and refunds here with POS-008 and the back office for the same period and scope, and fails when they differ.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**No service-fee measure is seeded.** DEC-217 shows fees as their own line under Gross sales with a footnote; `ReportingSystemKpi` has no fee code yet, so the line is drawn \"Definition pending\" until finance names one (D-185).",
+    "source": "contracts/satellite/reporting.yaml#/components/schemas/ReportingSystemKpi"
+   }
+  ],
+  "_platform": {
+   "code": "P16",
+   "formFactor": "web",
+   "app": "venue-management-web",
+   "operator": "venue",
+   "name": "Venue Analytics — Cross-Domain Reporting",
+   "shortName": "Venue Analytics",
+   "audience": "staff",
+   "offlineCapable": false,
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P08",
+     "P12",
+     "P13"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
  }
 ]

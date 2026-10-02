@@ -1,29 +1,29 @@
 id: LLD-FnbService
-title: FnbService — 120 operations, 49 tables
+title: FnbService — 131 operations, 52 tables
 generatedBy: tools/derive-diagrams.py
 tier: operations
 deployable: operations
 index: diagrams/hld/02-services.yaml
-why: '**120 operations and 49 tables — the largest single domain after marketing.** Its own service
+why: '**131 operations and 52 tables — the largest single domain after marketing.** Its own service
   because a kitchen pass has a latency profile nothing else shares: a bump must land in under a second
   on a display that may be offline.'
 scale: Write-heavy during service, idle between. **Two peaks a day, sharply.**
 ifDown: Down means the kitchen falls back to paper. Offline-capable by design.
 coverage:
-  operations: 120
-  inAFlow: 70
-  percent: 58%
+  operations: 131
+  inAFlow: 65
+  percent: 50%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
 - schema: fnb
-  tables: 49
+  tables: 52
   stores:
   - postgres
   largestTable: fnb.table_reservation
 operationsByContract:
 - contract: fnb
-  count: 120
+  count: 131
   operations:
   - operation: acceptFnbOrder
     verb: POST
@@ -201,6 +201,14 @@ operationsByContract:
     offline: false
     reads: 4
     writes: 3
+  - operation: createTableReservationForGuest
+    verb: POST
+    path: /outlets/{outletId}/table-reservations
+    scope: venue
+    permission: ORDER_CREATE
+    offline: false
+    reads: 2
+    writes: 2
   - operation: enterCountLine
     verb: POST
     path: /stock-counts/{countId}/lines
@@ -240,6 +248,14 @@ operationsByContract:
     permission: ORDER_VIEW
     offline: true
     reads: 3
+    writes: 0
+  - operation: getCourseRules
+    verb: GET
+    path: /outlets/{outletId}/course-rules
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: true
+    reads: 1
     writes: 0
   - operation: getFnbDeliveryPolicy
     verb: GET
@@ -305,6 +321,22 @@ operationsByContract:
     offline: true
     reads: 3
     writes: 0
+  - operation: getKitchenRoutingRules
+    verb: GET
+    path: /outlets/{outletId}/kitchen-routing
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: true
+    reads: 1
+    writes: 0
+  - operation: getKitchenSla
+    verb: GET
+    path: /outlets/{outletId}/kitchen-sla
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: true
+    reads: 0
+    writes: 0
   - operation: getMenu
     verb: GET
     path: /menus/{menuId}
@@ -312,6 +344,14 @@ operationsByContract:
     permission: PRODUCT_VIEW
     offline: false
     reads: 3
+    writes: 0
+  - operation: getPrepSheetTemplate
+    verb: GET
+    path: /prep-sheet-template
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 1
     writes: 0
   - operation: getProductionRun
     verb: GET
@@ -336,6 +376,14 @@ operationsByContract:
     permission: ORDER_VIEW
     offline: true
     reads: 5
+    writes: 0
+  - operation: getWasteApprovalPolicy
+    verb: GET
+    path: /waste-approval-policy
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 1
     writes: 0
   - operation: holdCourse
     verb: POST
@@ -593,6 +641,14 @@ operationsByContract:
     offline: true
     reads: 1
     writes: 0
+  - operation: printPrepSheet
+    verb: POST
+    path: /production-plans/{planId}/prep-sheet
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 0
+    writes: 0
   - operation: prioritiseKitchenTicket
     verb: POST
     path: /kitchen/tickets/{ticketId}/prioritise
@@ -809,6 +865,14 @@ operationsByContract:
     offline: true
     reads: 2
     writes: 2
+  - operation: setKitchenRoutingRules
+    verb: PUT
+    path: /outlets/{outletId}/kitchen-routing
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
   - operation: setKitchenSla
     verb: PUT
     path: /outlets/{outletId}/kitchen-sla
@@ -833,6 +897,14 @@ operationsByContract:
     offline: true
     reads: 3
     writes: 3
+  - operation: setMenuItemDailyCount
+    verb: PUT
+    path: /menu-items/{itemId}/daily-count
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 0
   - operation: setMenuSections
     verb: PUT
     path: /menus/{menuId}/sections
@@ -849,6 +921,14 @@ operationsByContract:
     offline: false
     reads: 1
     writes: 0
+  - operation: setPrepSheetTemplate
+    verb: PUT
+    path: /prep-sheet-template
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
   - operation: setRecipe
     verb: PUT
     path: /recipes
@@ -900,6 +980,14 @@ operationsByContract:
   - operation: setTemperatureCheckpoint
     verb: PUT
     path: /food-safety/checkpoints
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: setWasteApprovalPolicy
+    verb: PUT
+    path: /waste-approval-policy
     scope: venue
     permission: PRODUCT_CONFIGURE
     offline: false
@@ -1279,8 +1367,15 @@ tables:
   writtenBy:
   - fnb
   foreignWriters: null
+- table: fnb.kitchen_routing_rule
+  columns: 6
+  store: postgres
+  parent: null
+  writtenBy:
+  - fnb
+  foreignWriters: null
 - table: fnb.kitchen_station
-  columns: 8
+  columns: 10
   store: postgres
   parent: null
   writtenBy:
@@ -1315,7 +1410,7 @@ tables:
   - fnb
   foreignWriters: null
 - table: fnb.menu_item
-  columns: 15
+  columns: 17
   store: postgres
   parent: null
   writtenBy:
@@ -1374,6 +1469,13 @@ tables:
   parent: null
   writtenBy: []
   foreignWriters: null
+- table: fnb.prep_sheet_template
+  columns: 7
+  store: postgres
+  parent: null
+  writtenBy:
+  - fnb
+  foreignWriters: null
 - table: fnb.product_recommendation
   columns: 17
   store: postgres
@@ -1416,7 +1518,7 @@ tables:
   - fnb
   foreignWriters: null
 - table: fnb.reservation_policy
-  columns: 7
+  columns: 8
   store: postgres
   parent: null
   writtenBy:
@@ -1437,7 +1539,7 @@ tables:
   - fnb
   foreignWriters: null
 - table: fnb.service_order
-  columns: 15
+  columns: 17
   store: postgres
   parent: null
   writtenBy:
@@ -1451,7 +1553,7 @@ tables:
   - fnb
   foreignWriters: null
 - table: fnb.sold_out_item
-  columns: 9
+  columns: 10
   store: postgres
   parent: null
   writtenBy: []
@@ -1477,7 +1579,7 @@ tables:
   - fnb
   foreignWriters: null
 - table: fnb.table_reservation
-  columns: 21
+  columns: 24
   store: postgres
   parent: null
   writtenBy:
@@ -1513,6 +1615,13 @@ tables:
   foreignWriters: null
 - table: fnb.waitlist_entry
   columns: 11
+  store: postgres
+  parent: null
+  writtenBy:
+  - fnb
+  foreignWriters: null
+- table: fnb.waste_approval_policy
+  columns: 6
   store: postgres
   parent: null
   writtenBy:
@@ -1618,11 +1727,9 @@ screens:
 - P01:WEB-037 Menu Item Detail
 - P01:WEB-038 F&B – Order Tracking
 - P01:WEB-044 AI Concierge – Home
-- P01:WEB-046 In-Venue Notifications
 - P02:GST-024 F&B – Browse & Order
 - P02:GST-025 F&B – Order Tracking
 - P02:GST-029 Venue Info & Services
-- P02:GST-030 In-Venue Notifications
 - P02:GST-031 AI Concierge – Home
 - P02:GST-032 AI Concierge – Chat
 - P02:GST-061 Menu Item Detail
@@ -1634,7 +1741,6 @@ screens:
 - P04:POS-028 Table Service
 - P04:POS-029 Order Queue
 - P05:KSK-016 Order Food
-- P06:EMP-030 Venue map
 - P06:EMP-051 Restaurant Service Command Center
 - P06:EMP-052 Floor Plan & Table Map
 - P06:EMP-053 Table & Seating Configuration
@@ -1644,40 +1750,29 @@ screens:
 - P06:EMP-058 Live Table & Service Management
 - P06:EMP-059 Table Order, Bill & Payment Management
 - P06:EMP-060 Reservation & Table Performance
-- P06:EMP-062 Store Stock & SKU Availability
-- P06:EMP-065 Receiving & Store Put-Away
+- P06:EMP-065 Receiving
 - P06:EMP-066 Stock Count & Cycle Count Management
 - P06:EMP-067 Damage, Loss, Shrinkage & Stock Adjustment
 - P08:BO-007 Product Directory
 - P08:BO-011 Packages & Bundles
-- P08:BO-014 Catalogue Publishing
 - P08:BO-020 F&B Order Management
 - P08:BO-021 Order Search
 - P08:BO-044 F&B Outlets
 - P08:BO-045 Menu Management
 - P08:BO-046 Kitchen Display
-- P08:BO-049 Stock Levels
-- P08:BO-062 Venue Profile
 - P08:BO-065 Venue Configuration
 - P08:BO-079 Stock Count
-- P08:BO-104 Food & Beverage
 - P08:BO-109 Menu Builder & POS Layout Designer
-- P08:BO-110 Recipe & BOM Management
 - P08:BO-111 Ingredient Substitution, Allergen & Nutrition
 - P08:BO-112 Production Planning & Production Sheets
-- P08:BO-113 Central Kitchen & Commissary Management
 - P08:BO-134 Kitchen & Preparation Stations
 - P08:BO-135 Order Routing & KDS/Printer Rules
 - P08:BO-136 F&B Global Settings & Controls
 - P08:BO-137 Recipe Consumption & Theoretical Inventory
-- P08:BO-138 Production Execution & Batch Management
 - P08:BO-139 Wastage, Spoilage, Returns & Write-Off
 - P08:BO-140 Product Availability, 86 & Operational Food Safety
-- P08:BO-729 Create / Edit Outlet
 - P08:BO-730 Outlet Types & Templates
-- P08:BO-731 Operating Hours & Service Periods
 - P08:BO-733 Service Channel Configuration
-- P13:CMS-009 Navigation & Menus
 - P15:KIT-001 Kitchen Operations Command Center
 - P15:KIT-002 Kitchen Display System (KDS)
 - P15:KIT-003 Order Firing & Course Management
@@ -1697,9 +1792,7 @@ flows:
 - F35 Stock arrives short and an oversell is resolved
 - F48 A guest finds it, queues for it, and eats
 - F60 An online order is collected at the counter
-- F70 A guest needs help and something is lost
 - F80 A table is configured, reserved, seated and billed
-- F81 A retail sale runs from overview to tender
 - F83 A kitchen works a service from the rail to the exception
 - F85 Production is planned, costed and released
 - F88 An order is assembled, collected and notified

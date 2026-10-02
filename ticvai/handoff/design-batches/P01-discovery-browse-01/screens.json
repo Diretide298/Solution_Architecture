@@ -131,7 +131,7 @@
     {
      "to": "WEB-008",
      "trigger": "Add-ons & Upsell",
-     "provenance": "derived — WEB-008 declares entryState.params bundleId and WEB-001 holds none of them. The edge carries nothing: WEB-008 opens on listCatalogueBundles, and bundleId has no source on WEB-008 yet (a gap in WEB-008, not in this edge)"
+     "provenance": "derived — WEB-008 declares entryState.params bundleId and WEB-001 holds none of them, so the edge carries nothing and WEB-008 opens cold"
     },
     {
      "to": "WEB-009",
@@ -141,7 +141,7 @@
     {
      "to": "WEB-017",
      "trigger": "My Account Dashboard",
-     "provenance": "derived — WEB-017 declares entryState.params deviceId, itemId, token and WEB-001 holds none of them. The edge carries nothing: deviceId, itemId, token only pre-select (deep link or optional), and WEB-017 opens on its own"
+     "provenance": "derived — WEB-017 declares entryState.params token and WEB-001 holds none of them. The edge carries nothing: token only pre-selects (deep link or optional), and WEB-017 opens on its own"
     },
     {
      "to": "WEB-018",
@@ -183,7 +183,7 @@
     {
      "to": "WEB-027",
      "trigger": "Newsletter Subscription",
-     "provenance": "derived — WEB-027 declares entryState.params deviceId, itemId and WEB-001 holds none of them. The edge carries nothing: deviceId, itemId only pre-select (deep link or optional), and WEB-027 opens on its own"
+     "provenance": "derived — WEB-027 declares entryState.params unsubscribeToken and WEB-001 holds none of them. The edge carries nothing: unsubscribeToken only pre-selects (deep link or optional), and WEB-027 opens on its own"
     },
     {
      "to": "WEB-032",
@@ -313,9 +313,10 @@
       {
        "kind": "cardList",
        "bindsTo": "HomepageLayout.sections",
-       "notes": "Section order comes from tenant configuration (WLB-011), not from code. A section referencing a disabled module must not render at all The sections, their order and their styling come from `getPublishedTenantConfig` `homepage`, read with no session (GFIX-1).",
-       "provenance": "carried from the previous definition",
-       "operation": "getPublishedTenantConfig"
+       "notes": "The sections of the published home, from the tenant's template (`templateKey`) or its own layout, each with the card count the venue chose (`maxItems`) and its scroll animation. **The client-approved web wireframe is the layout** (decided by Chinmay, 2 October 2026; DEC-163); a tenant with its own landing page links in with deep links (DEC-548) (CHG-SGU-005).",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-005, decided by Chinmay 2 October 2026, DEC-163, DEC-548)",
+       "operation": "getPublishedTenantConfig",
+       "label": "Home sections"
       }
      ]
     },
@@ -1191,7 +1192,7 @@
     "verified": "2026-09-29",
     "match": "partial",
     "view": "Config → Marketing layer → 'Single-event page' on, then Book; or any product card → 'Read more' dialog; or a listing card's preview aside",
-    "differences": "No standing attraction-detail page in the default flow: details are a banner above the booking step (behind a Config toggle), a pop-up per product, or the listing preview. Eligibility rule display (getProductEligibilityRule) appears only as tags. Prototype labels it WEB-003b, not WEB-004."
+    "differences": "No standing attraction-detail page in the default flow: details are a banner above the booking step (behind a Config toggle), a pop-up per product, or the listing preview. Eligibility rule display (getProductEligibilityRule) appears only as tags. Prototype labels it WEB-003b, not WEB-004. **Handoff: the screen id is WEB-004**; the prototype's \"WEB-003b\" label is not an id (CHG-SGU-020)."
    }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
@@ -1296,7 +1297,7 @@
       {
        "kind": "progressIndicator",
        "label": "Plan your visit · n of 6",
-       "notes": "Who, heights (skipped with no children), days (up to 3), pace, interests, lunch.",
+       "notes": "Who, heights (skipped with no children), days (up to 3), pace (packed, balanced or relaxed; DI-1098), interests, lunch.",
        "provenance": "decided 29 September 2026, MOB-6; Visit Planner prototype"
       }
      ]

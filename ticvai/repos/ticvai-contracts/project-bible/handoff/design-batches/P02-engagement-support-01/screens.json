@@ -33,14 +33,11 @@
     {
      "to": "GST-031",
      "trigger": "AI Concierge – Home",
-     "carries": [
-      "outletId"
-     ],
-     "provenance": "derived — GST-031 declares entryState.params conversationId, outletId and GST-030 holds outletId, so an edge into it carries them"
+     "provenance": "derived — GST-031 declares entryState.params conversationId, messageId, outletId and GST-030 holds none of them. The edge carries nothing: conversationId, outletId, messageId only pre-select (deep link or optional), and GST-031 opens on its own"
     }
    ]
   },
-  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Back in the first release** (decided 29 September, rev 3 GAP-C1): the notifications feed is needed in the first release, which reverses audit R242's deferral of this screen. The `deferred` block is removed and the screen returns to `wave: 2`, where it sat before R242. Queue calls and order status still also show on the queue and order screens, which poll.",
+  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Back in the first release** (decided 29 September, rev 3 GAP-C1): the notifications feed is needed in the first release, which reverses audit R242's deferral of this screen. The `deferred` block is removed and the screen returns to `wave: 2`, where it sat before R242. Queue calls and order status still also show on the queue and order screens, which poll.\n\n**In the first release (rev 3 GAP-C1, 29 September; DI-1075)**, superseding the R242 deferral (CHG-SGU-017).",
   "density": "comfortable",
   "pattern": "configEditor",
   "patternReason": "`listMyNotifications` reads the feed (decided 29 September, rev 3 GAP-C1); the location-session claim stays a form on the same screen, so the pattern is kept until the screen is redrawn",
@@ -54,12 +51,6 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Claim location session",
-       "operation": "claimLocationSession",
-       "provenance": "contract fnb.yaml POST /location-sessions"
-      },
-      {
-       "kind": "secondaryButton",
        "label": "Mark all as read",
        "operation": "markMyNotificationsRead",
        "notes": "Sends `{all: true}`. Only the guest's own notifications are marked.",
@@ -70,24 +61,6 @@
     {
      "name": "contentBody",
      "components": [
-      {
-       "kind": "textField",
-       "label": "Location code",
-       "operation": "claimLocationSession",
-       "provenance": "contract fnb.yaml POST /location-sessions"
-      },
-      {
-       "kind": "textField",
-       "label": "Seat reference",
-       "operation": "claimLocationSession",
-       "provenance": "contract fnb.yaml POST /location-sessions"
-      },
-      {
-       "kind": "numberField",
-       "label": "Party size",
-       "operation": "claimLocationSession",
-       "provenance": "contract fnb.yaml POST /location-sessions"
-      },
       {
        "kind": "cardList",
        "label": "Notifications",
@@ -116,12 +89,6 @@
   },
   "apis": [
    {
-    "operationId": "claimLocationSession",
-    "contract": "fnb",
-    "purpose": "From the flow it appears in",
-    "trigger": "onAction"
-   },
-   {
     "operationId": "listMyNotifications",
     "contract": "marketing-crm",
     "purpose": "The guest's notification feed, newest first: queue calls, order ready, booking changes, venue alerts (decided 29 September, rev 3 GAP-C1)",
@@ -148,6 +115,14 @@
    }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "entryState": {
+   "params": [
+    {
+     "name": "subjectId",
+     "from": "session"
+    }
+   ]
+  },
   "_platform": {
    "code": "P02",
    "audience": "guest",
@@ -183,7 +158,7 @@
   "id": "GST-031",
   "name": "AI Concierge – Home",
   "module": "Engagement & Support",
-  "requiresModule": "fnb",
+  "requiresModule": "ai",
   "wave": 2,
   "capability": "AI-02",
   "implementation": {
@@ -213,39 +188,60 @@
      "to": "GST-032",
      "trigger": "AI Concierge – Chat",
      "carries": [
-      "conversationId"
+      "conversationId",
+      "messageId"
      ],
-     "provenance": "derived — GST-032 declares entryState.params conversationId, messageId, orderId and GST-031 holds conversationId, so an edge into it carries them"
+     "provenance": "derived — GST-032 declares entryState.params conversationId, messageId, orderId and GST-031 holds conversationId, messageId, so an edge into it carries them"
     }
    ]
   },
   "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Guest concierge confirmed in Phase 1 on 17 August (CF-14), charged per token and bounded by `AiPolicy.guestCapabilityScope`.** Still degrades to the manual planner rather than to an error. **Cross-surface parity, 31 August**: added createAiConversation, handoverToAgent, requestSuggestion. **A guest does not know which surface they are on** — the same named screen on web and app now calls the same guest-callable operations.\n\n**Rev 3 (decided 29 September).** The concierge shows as mascot art when `BookingFlowConfig.conciergeMascot` is on (default), otherwise a plain button (CFG-5).",
   "density": "comfortable",
   "pattern": "statusTracker",
-  "patternReason": "`getGuestMenu` reads one record and nothing reads a population — the screen is about that one thing",
-  "purpose": "The screen this app sits on. Everything else is entered from here and returns to it.",
+  "patternReason": "The conversation and its state (thinking, answered, handed to a person) are the content; the menu is only a shortcut (design-notes correction ai, CHG-SGU-016)",
+  "purpose": "Ask, and be answered or handed to a person.",
   "layout": {
    "template": "detail",
    "regions": [
     {
      "name": "contentBody",
-     "slot": "record",
+     "slot": "collection",
      "components": [
       {
-       "kind": "detailPanel",
-       "label": "The guest menu",
-       "bindsTo": "GuestMenu",
+       "kind": "assistantPanel",
+       "label": "Ask Sahli",
+       "operation": "sendAiMessage",
+       "notes": "**The conversation is the content.** The question shows at once and the answer streams with its sources; on 503 (every provider failed) \"Sahli can't answer right now\" with Hand over to a person and Try again. The conversation is opened silently (`createAiConversation`) on the first message, its scope taken from the session; the guest never picks a module.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-016, design-notes correction)"
+      },
+      {
+       "kind": "textField",
+       "label": "Your question",
+       "operation": "sendAiMessage",
+       "notes": "The ask box under the conversation (typed, or a starter chip). Sending opens the conversation on the first message.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-016, design-notes correction)",
+       "bindsTo": "AiMessage.content"
+      },
+      {
+       "kind": "textField",
+       "label": "Message to the agent",
+       "operation": "sendConversationMessage",
+       "notes": "Replaces the ask box once a person has taken the conversation; the transcript stays above.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-016, design-notes correction)",
+       "bindsTo": "ConversationMessage.body"
+      },
+      {
+       "kind": "cardList",
+       "label": "Earlier conversations",
+       "bindsTo": "AiConversation",
        "columns": [
-        "GuestMenu.outletId",
-        "GuestMenu.menuId",
-        "GuestMenu.name",
-        "GuestMenu.inForceUntil",
-        "GuestMenu.currency",
-        "GuestMenu.currencyScale",
-        "GuestMenu.sections"
+        "AiConversation.startedAt",
+        "AiConversation.lastMessageAt",
+        "AiConversation.messageCount"
        ],
-       "operation": "getGuestMenu",
-       "provenance": "contract fnb.yaml GET /outlets/{outletId}/guest-menu"
+       "operation": "listAiConversations",
+       "notes": "The signed-in guest's own conversations, newest first, the first question as the title; no principal, scope or module columns.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-016, design-notes correction)"
       }
      ]
     },
@@ -254,46 +250,43 @@
      "slot": "rowActions",
      "components": [
       {
-       "kind": "primaryButton",
-       "label": "Send AI message",
-       "operation": "sendAiMessage",
-       "provenance": "contract ai.yaml POST /conversations/{conversationId}/messages"
-      },
-      {
        "kind": "secondaryButton",
-       "label": "Create AI conversation",
-       "operation": "createAiConversation",
-       "provenance": "contract ai.yaml POST /conversations"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Handover to agent",
+       "label": "Hand over to a person",
        "operation": "handoverToAgent",
-       "provenance": "contract marketing-crm.yaml POST /conversations/{conversationId}/handover"
+       "notes": "One tap, always visible in the panel header. Sends reason `guestRequested` with Sahli's own summary; the platform sets `assistantFailed`, `outOfScope` or `negativeSentiment` itself. The panel becomes the agent chat (`sendConversationMessage`) with queue position and wait; 409 offers to raise a case.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-016, design-notes correction)"
       },
       {
        "kind": "secondaryButton",
-       "label": "Request suggestion",
-       "operation": "requestSuggestion",
-       "provenance": "contract ai.yaml POST /ai/suggestions"
+       "label": "Helpful / Not helpful",
+       "operation": "recordAnswerFeedback",
+       "notes": "Recorded silently with a small \"Thanks\"; nothing in the answer changes.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-016, design-notes correction)"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Order food",
+       "operation": "getGuestMenu",
+       "notes": "An optional shortcut to the outlet's menu in force (\"Menu until 11:00\" from `inForceUntil`); the concierge is not an F&B screen.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-016, design-notes correction)"
       }
      ]
     }
    ]
   },
   "states": {
-   "loading": "The concierge home, read by `getGuestMenu`.",
+   "loading": "The concierge home: earlier conversations (`listAiConversations`) and the ask box.",
    "error": "Could not load. Names which read failed and leaves the concierge home untouched.",
-   "emptyFirstRun": "No concierge home yet. Offers Create AI conversation (`createAiConversation`).",
-   "emptyNoAccess": "Shown when the caller lacks `AI_USE`, which `sendAiMessage` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "\"Ask Sahli anything about your visit\": no earlier conversations; the first question opens one.",
+   "emptyNoAccess": "**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**Not available, and the offline banner says why.** The assistant needs the connection; conversations already loaded stay readable."
   },
   "apis": [
    {
     "operationId": "getGuestMenu",
     "contract": "fnb",
-    "purpose": "From the flow it appears in",
-    "trigger": "onLoad"
+    "purpose": "Optional \"Order food\" shortcut to the menu in force",
+    "trigger": "onAction"
    },
    {
     "operationId": "sendAiMessage",
@@ -304,19 +297,37 @@
    {
     "operationId": "createAiConversation",
     "contract": "ai",
-    "purpose": "Open a conversation",
-    "trigger": "onAction"
+    "purpose": "Opened silently on the first message; the scope comes from the session, never a module the guest picks",
+    "trigger": "background"
    },
    {
     "operationId": "handoverToAgent",
     "contract": "marketing-crm",
-    "purpose": "Pass an assistant conversation to a person",
+    "purpose": "One tap; reason guestRequested and Sahli's summary are set for the guest",
     "trigger": "onAction"
    },
    {
     "operationId": "requestSuggestion",
     "contract": "ai",
-    "purpose": "A suggestion of kind prepPlan, upsell or waitTime from the concierge; an itinerary (guest-allowed since 29 September) is asked on the Plan tab (GST-054), not here",
+    "purpose": "From the conversation only, kinds waitTime and upsell (prepPlan is the kitchen's production plan; an itinerary is asked on the Plan tab); never a kind picker",
+    "trigger": "background"
+   },
+   {
+    "operationId": "listAiConversations",
+    "contract": "ai",
+    "purpose": "The guest's own earlier conversations",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "recordAnswerFeedback",
+    "contract": "ai",
+    "purpose": "Say whether an answer helped",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "sendConversationMessage",
+    "contract": "marketing-crm",
+    "purpose": "After a handover, the guest talks to the agent",
     "trigger": "onAction"
    }
   ],
@@ -329,9 +340,14 @@
     {
      "name": "outletId",
      "from": "deepLink"
+    },
+    {
+     "name": "messageId",
+     "from": "navigation",
+     "optional": true
     }
    ],
-   "coldEntry": "A conversation link an agent opens from a notification. Resolves, or says it was closed and by whom."
+   "coldEntry": "A guest opening a notification about their own conversation (an agent replied, a handover was picked up): it opens that conversation, or says it was closed."
   },
   "wireframe": {
    "status": "notStarted",
@@ -347,83 +363,6 @@
    "note": "**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified, awaiting the client's design reviewer.** `provenance: designed` because the accepted vocabulary has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
-  "overlays": [
-   {
-    "id": "formSendAiMessage",
-    "component": "modal",
-    "trigger": "Send AI message",
-    "body": "**Collects what `sendAiMessage` sends before it is called.** Required: `content`. Optional: `collectionIds`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Send AI message",
-     "operation": "sendAiMessage"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "content",
-      "collectionIds"
-     ]
-    },
-    "provenance": "client-verified"
-   },
-   {
-    "id": "formCreateAiConversation",
-    "component": "modal",
-    "trigger": "Create AI conversation",
-    "body": "**Collects what `createAiConversation` sends before it is called.** Required: `module`. Optional: `locale`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Create AI conversation",
-     "operation": "createAiConversation"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "module",
-      "locale"
-     ]
-    },
-    "provenance": "client-verified"
-   },
-   {
-    "id": "formHandoverToAgent",
-    "component": "modal",
-    "trigger": "Handover to agent",
-    "body": "**Collects what `handoverToAgent` sends before it is called.** Required: `reason`. Optional: `summary`, `preferredQueueId`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Handover to agent",
-     "operation": "handoverToAgent"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "reason",
-      "summary",
-      "preferredQueueId"
-     ]
-    },
-    "provenance": "client-verified"
-   },
-   {
-    "id": "formRequestSuggestion",
-    "component": "modal",
-    "trigger": "Request suggestion",
-    "body": "**Collects what `requestSuggestion` sends before it is called.** Required: `kind`, offered as `prepPlan`, `upsell` or `waitTime` only — no `scenario`; an itinerary is asked on the Plan tab (GST-054, since 29 September). Optional: `subjectRef`, `horizon`, `context`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Request suggestion",
-     "operation": "requestSuggestion"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "kind",
-      "subjectRef",
-      "horizon",
-      "context"
-     ]
-    },
-    "provenance": "client-verified"
-   }
-  ],
   "_platform": {
    "code": "P02",
    "audience": "guest",
@@ -489,17 +428,18 @@
      "to": "GST-033",
      "trigger": "AI Concierge – Contextual Help",
      "carries": [
-      "conversationId"
+      "conversationId",
+      "messageId"
      ],
-     "provenance": "derived — GST-033 declares entryState.params conversationId and GST-032 holds conversationId, so an edge into it carries them"
+     "provenance": "derived — GST-033 declares entryState.params conversationId, messageId and GST-032 holds conversationId, messageId, so an edge into it carries them"
     }
    ]
   },
-  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Guest concierge confirmed in Phase 1 on 17 August (CF-14), charged per token and bounded by `AiPolicy.guestCapabilityScope`.** Still degrades to the manual planner rather than to an error.",
+  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Guest concierge confirmed in Phase 1 on 17 August (CF-14), charged per token and bounded by `AiPolicy.guestCapabilityScope`.** Still degrades to the manual planner rather than to an error.\n\nThe chat design itself was deferred to the AI workshop (DI-195); this screen keeps the operations it needs until then (CHG-SGU-020).",
   "density": "comfortable",
   "pattern": "statusTracker",
   "patternReason": "`getGuestOrderStatus` reads one record and nothing reads a population — the screen is about that one thing",
-  "purpose": "Add ai concierge – chat for this venue.",
+  "purpose": "Talk to Sahli: the answers, and a person when Sahli cannot help.",
   "layout": {
    "template": "detail",
    "regions": [
@@ -527,14 +467,9 @@
        "label": "The cart",
        "bindsTo": "Cart",
        "columns": [
-        "Cart.id",
-        "Cart.token",
-        "Cart.venueId",
         "Cart.channel",
-        "Cart.subjectId",
         "Cart.status",
         "Cart.lines",
-        "Cart.conflicts",
         "Cart.subtotal",
         "Cart.discountTotal",
         "Cart.taxTotal",
@@ -546,6 +481,13 @@
        ],
        "operation": "getCart",
        "provenance": "contract orders.yaml GET /carts/{cartId}"
+      },
+      {
+       "kind": "cardList",
+       "label": "Order to confirm",
+       "operation": "createGuestFnbOrder",
+       "notes": "An order the concierge proposes is a card in the conversation: items, total and Confirm, which places it (`createGuestFnbOrder`). No raw form.",
+       "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
       }
      ]
     },
@@ -553,12 +495,6 @@
      "name": "actionBar",
      "slot": "rowActions",
      "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Create guest F&B order",
-       "operation": "createGuestFnbOrder",
-       "provenance": "contract fnb.yaml POST /guest-orders"
-      },
       {
        "kind": "secondaryButton",
        "label": "Add cart line",
@@ -597,8 +533,9 @@
    "loading": "The concierge chat, read by `getGuestOrderStatus`.",
    "error": "Could not load. Names which read failed and leaves the concierge chat untouched.",
    "emptyFirstRun": "No concierge chat yet. Offers Create guest F&B order (`createGuestFnbOrder`).",
-   "emptyNoAccess": "Shown when the caller lacks `AI_USE`, which `sendAiMessage` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "**Not available, and the offline banner says why.** The assistant needs the connection; conversations already loaded stay readable."
+   "emptyNoAccess": "**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**Not available, and the offline banner says why.** The assistant needs the connection; conversations already loaded stay readable.",
+   "emptyNoResults": "Nothing the concierge found matches the question; it says so in the conversation and offers to hand over to a person."
   },
   "apis": [
    {
@@ -610,13 +547,13 @@
    {
     "operationId": "getGuestOrderStatus",
     "contract": "fnb",
-    "purpose": "Track an order",
+    "purpose": "Track an order Only when signed in (decided 2 October 2026 by Chinmay, fix before Block A starts (GFIX-6)).",
     "trigger": "onLoad"
    },
    {
     "operationId": "getCart",
     "contract": "orders",
-    "purpose": "The cart, priced and checked, right now",
+    "purpose": "The cart, priced and checked, right now With the guest session the device already holds: signed in, or the anonymous cart session a visitor gets with the first line (ADR-0045) (decided 2 October 2026 by Chinmay, fix before Block A starts (GFIX-6)).",
     "trigger": "onLoad"
    },
    {
@@ -693,31 +630,6 @@
   },
   "apisNote": "Rebuilt 9 September 2026 from the 8 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "overlays": [
-   {
-    "id": "formCreateGuestFnbOrder",
-    "component": "modal",
-    "trigger": "Create guest F&B order",
-    "body": "**Collects what `createGuestFnbOrder` sends before it is called.** Required: `id`, `lines`, `quotedTotal`, `recordedAt`. Optional: `locationSessionId`, `outletId`, `fulfilment`, `paymentMethod`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "CreateGuestOrderRequest",
-    "confirm": {
-     "label": "Create guest F&B order",
-     "operation": "createGuestFnbOrder"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "id",
-      "lines",
-      "quotedTotal",
-      "recordedAt",
-      "locationSessionId",
-      "outletId",
-      "fulfilment",
-      "paymentMethod"
-     ]
-    },
-    "provenance": "client-verified"
-   },
    {
     "id": "formAddCartLine",
     "component": "modal",
@@ -879,49 +791,59 @@
   },
   "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Guest concierge confirmed in Phase 1 on 17 August (CF-14), charged per token and bounded by `AiPolicy.guestCapabilityScope`.** Still degrades to the manual planner rather than to an error. **createPayment removed 18 August** — attached by module resemblance, not by what this screen does. A screen that does not handle money should not be able to move it (CF-87's class). **Navigation repointed to P15 on 20 August** — the F&B screens it linked to moved out of the back office when the client board was adopted. **Cross-platform navigation removed 24 August**: BO-020. **A till does not navigate to a back office and a guest app does not navigate to either** — those are device handovers, and a flow declares them with `crossesDevice` rather than a screen pretending there is a link.",
   "density": "comfortable",
-  "pattern": "configEditor",
-  "patternReason": "the screen declares only writes (`sendAiMessage`) and no read of a population — it is settings, not a list",
+  "pattern": "statusTracker",
+  "patternReason": "A conversation sheet: the question, the answer and its state are the content; nothing is configured or saved here (CHG-SGU-016)",
   "purpose": "Answer a question without needing a person.",
   "layout": {
    "template": "form",
    "regions": [
     {
-     "name": "actionBar",
-     "slot": "publish",
+     "name": "contentBody",
+     "slot": "collection",
      "components": [
       {
-       "kind": "primaryButton",
-       "label": "Send AI message",
+       "kind": "assistantPanel",
+       "label": "Ask about this",
        "operation": "sendAiMessage",
-       "provenance": "contract ai.yaml POST /conversations/{conversationId}/messages"
+       "notes": "A conversation sheet over the screen the guest is on (product, booking or cart). Opened silently with `createAiConversation` on the first question; knowledge collections are the venue's, never chosen by the guest.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-016, design-notes correction)"
+      },
+      {
+       "kind": "textField",
+       "label": "Your question",
+       "operation": "sendAiMessage",
+       "notes": "The ask box under the conversation (typed, or a starter chip). Sending opens the conversation on the first message.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-016, design-notes correction)",
+       "bindsTo": "AiMessage.content"
       }
      ]
     },
     {
-     "name": "contentBody",
+     "name": "actionBar",
+     "slot": "rowActions",
      "components": [
       {
-       "kind": "textField",
-       "label": "Content",
-       "operation": "sendAiMessage",
-       "notes": "Required.",
-       "provenance": "contract ai.yaml POST /conversations/{conversationId}/messages"
+       "kind": "secondaryButton",
+       "label": "Hand over to a person",
+       "operation": "handoverToAgent",
+       "notes": "One tap; reason guestRequested and Sahli's summary, as on GST-031.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-016, design-notes correction)"
       },
       {
-       "kind": "multiSelect",
-       "label": "Collection ids",
-       "operation": "sendAiMessage",
-       "provenance": "contract ai.yaml POST /conversations/{conversationId}/messages"
+       "kind": "secondaryButton",
+       "label": "Helpful / Not helpful",
+       "operation": "recordAnswerFeedback",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-016, design-notes correction)"
       }
      ]
     }
    ]
   },
   "states": {
-   "loading": "The saved concierge contextual help.",
-   "error": "Could not load. Names which read failed and leaves the concierge contextual help untouched.",
-   "emptyFirstRun": "No concierge contextual help configured. The form opens empty and `sendAiMessage` saves the first one; it says what the platform does in the meantime.",
-   "emptyNoAccess": "Shown when the caller lacks `AI_USE`, which `sendAiMessage` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "loading": "Sahli is thinking: a typing indicator under the question.",
+   "error": "Sahli can't answer right now (every provider failed): Hand over to a person and Try again.",
+   "emptyFirstRun": "No question yet: the sheet opens with the ask box and two starter questions about the screen behind it.",
+   "emptyNoAccess": "**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**Not available, and the offline banner says why.** The assistant needs the connection; conversations already loaded stay readable."
   },
   "apis": [
@@ -930,6 +852,24 @@
     "contract": "ai",
     "purpose": "Ask",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "createAiConversation",
+    "contract": "ai",
+    "purpose": "Opened silently on the first question; the scope comes from the session",
+    "trigger": "background"
+   },
+   {
+    "operationId": "handoverToAgent",
+    "contract": "marketing-crm",
+    "purpose": "One tap; reason guestRequested",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "recordAnswerFeedback",
+    "contract": "ai",
+    "purpose": "Say whether an answer helped",
+    "trigger": "onAction"
    }
   ],
   "entryState": {
@@ -937,13 +877,18 @@
     {
      "name": "conversationId",
      "from": "deepLink"
+    },
+    {
+     "name": "messageId",
+     "from": "navigation",
+     "optional": true
     }
    ],
-   "coldEntry": "A conversation link an agent opens from a notification. Resolves, or says it was closed and by whom."
+   "coldEntry": "A guest opening a notification about their own conversation: it opens the conversation, or says it was closed."
   },
   "wireframe": {
    "status": "notStarted",
-   "provenance": "client-verified",
+   "provenance": "designed",
    "board": "wireframes/P02 Guest App.dc.html#gst-033",
    "prototype": {
     "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html",
@@ -951,7 +896,8 @@
     "verified": "2026-09-28",
     "match": "exact",
     "view": "Account → All screens → Wave 2 → AI concierge – contextual help"
-   }
+   },
+   "note": "Corrected 2 October 2026 (CHG-SGU-016): the prototype view is a catalogue entry (\"Account → All screens → Wave 2\"), not a client-drawn layout, so the frame is treated as designed, not client-verified."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "_platform": {
@@ -1019,61 +965,53 @@
   "density": "comfortable",
   "pattern": "configEditor",
   "patternReason": "the screen declares only writes (`submitReview`, `raiseMyCase`) and no read of a population — it is settings, not a list",
-  "purpose": "Work with feedback & ratings for this venue.",
+  "purpose": "Tell the venue how the visit went, answer a survey it sent, or report a problem.",
   "layout": {
    "template": "form",
    "regions": [
     {
      "name": "contentBody",
-     "slot": "fields",
+     "slot": "form",
      "components": [
       {
-       "kind": "textField",
-       "label": "id",
-       "bindsTo": "SubmitReviewRequest.id",
-       "provenance": "contract marketing-crm.yaml POST /reviews"
-      },
-      {
-       "kind": "textField",
-       "label": "subjectId",
-       "bindsTo": "SubmitReviewRequest.subjectId",
-       "provenance": "contract marketing-crm.yaml POST /reviews"
-      },
-      {
-       "kind": "textField",
-       "label": "venueId",
-       "bindsTo": "SubmitReviewRequest.venueId",
-       "provenance": "contract marketing-crm.yaml POST /reviews"
-      },
-      {
-       "kind": "textField",
-       "label": "relatedOrderId",
+       "kind": "selectField",
+       "label": "Which visit",
        "bindsTo": "SubmitReviewRequest.relatedOrderId",
-       "provenance": "contract marketing-crm.yaml POST /reviews"
+       "operation": "listMyOrders",
+       "notes": "Chosen from the guest's recent orders (\"Coastal Aqua - Sat 26 Sep 2026\"); never typed.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)"
       },
       {
-       "kind": "textField",
-       "label": "rating",
+       "kind": "selectField",
+       "label": "Your rating",
        "bindsTo": "SubmitReviewRequest.rating",
-       "provenance": "contract marketing-crm.yaml POST /reviews"
+       "operation": "submitReview",
+       "notes": "1 to 5 stars; required.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)"
       },
       {
-       "kind": "textField",
-       "label": "body",
-       "bindsTo": "SubmitReviewRequest.body",
-       "provenance": "contract marketing-crm.yaml POST /reviews"
-      },
-      {
-       "kind": "textField",
-       "label": "aspects",
+       "kind": "multiSelect",
+       "label": "What stood out",
        "bindsTo": "SubmitReviewRequest.aspects",
-       "provenance": "contract marketing-crm.yaml POST /reviews"
+       "operation": "submitReview",
+       "notes": "The venue's closed aspect set (Cleanliness, Staff, Food, Queues); multi-select, optional.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)"
       },
       {
        "kind": "textField",
-       "label": "recordedAt",
-       "bindsTo": "SubmitReviewRequest.recordedAt",
-       "provenance": "contract marketing-crm.yaml POST /reviews"
+       "label": "Your comments",
+       "bindsTo": "SubmitReviewRequest.body",
+       "operation": "submitReview",
+       "notes": "Optional, any language. Id, subject, venue and time are set by the platform.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Survey",
+       "bindsTo": "FormDefinition",
+       "operation": "getForm",
+       "notes": "A triggered survey link (post-visit, post-scan, case closure) opens here with its formId; answered with `submitForm` (DI-391).",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)"
       }
      ]
     },
@@ -1092,6 +1030,12 @@
        "label": "Raise my case",
        "operation": "raiseMyCase",
        "provenance": "contract marketing-crm.yaml POST /my/cases"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Send survey",
+       "operation": "submitForm",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)"
       }
      ]
     }
@@ -1115,6 +1059,24 @@
     "contract": "marketing-crm",
     "purpose": "Report something — lost property, a complaint, a question",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "getForm",
+    "contract": "marketing-crm",
+    "purpose": "A triggered survey opened from its link",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "submitForm",
+    "contract": "marketing-crm",
+    "purpose": "Answer the survey",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "listMyOrders",
+    "contract": "orders",
+    "purpose": "The recent visits a review can be about",
+    "trigger": "onLoad"
    }
   ],
   "wireframe": {
@@ -1155,6 +1117,15 @@
     "provenance": "client-verified"
    }
   ],
+  "entryState": {
+   "params": [
+    {
+     "name": "formId",
+     "from": "deepLink",
+     "optional": true
+    }
+   ]
+  },
   "_platform": {
    "code": "P02",
    "audience": "guest",
@@ -1239,39 +1210,55 @@
      "slot": "headline",
      "components": [
       {
-       "kind": "metricTile",
-       "label": "Faqs",
-       "bindsTo": "FaqCategory",
-       "operation": "listFaqs",
-       "provenance": "contract white-label.yaml GET /tenant-config/faqs"
+       "kind": "cardList",
+       "label": "Questions and answers",
+       "bindsTo": "PublishedFaqCategory",
+       "columns": [
+        "PublishedFaqCategory.name",
+        "PublishedFaqCategory.entries"
+       ],
+       "operation": "listPublishedFaqs",
+       "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)",
+       "notes": "Categories in their order, each opening to its questions. Was the generated table 'Every faq category'; staff and plumbing columns removed (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3))."
       },
       {
-       "kind": "metricTile",
-       "label": "Content pages",
-       "bindsTo": "ContentPage",
-       "operation": "listContentPages",
-       "provenance": "contract white-label.yaml GET /tenant-config/pages"
+       "kind": "cardList",
+       "label": "Help pages",
+       "bindsTo": "PublishedContentPage",
+       "columns": [
+        "PublishedContentPage.title",
+        "PublishedContentPage.iconAssetRef"
+       ],
+       "operation": "listPublishedContentPages",
+       "notes": "The live help pages; the accessibility ones open GST-057.",
+       "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-2)"
       },
       {
-       "kind": "metricTile",
+       "kind": "cardList",
+       "label": "Policies",
+       "bindsTo": "PublishedPolicy",
+       "columns": [
+        "PublishedPolicy.title",
+        "PublishedPolicy.version",
+        "PublishedPolicy.effectiveFrom"
+       ],
+       "operation": "listPublishedPolicies",
+       "notes": "The current terms, privacy, refund, cookie and accessibility policies.",
+       "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-2)"
+      },
+      {
+       "kind": "cardList",
        "label": "My cases",
        "bindsTo": "Case",
-       "operation": "listMyCases",
-       "provenance": "contract marketing-crm.yaml GET /my/cases"
-      },
-      {
-       "kind": "dataTable",
-       "label": "Every faq category",
-       "bindsTo": "FaqCategory",
        "columns": [
-        "FaqCategory.code",
-        "FaqCategory.name",
-        "FaqCategory.sortOrder",
-        "FaqCategory.entries",
-        "FaqCategory.scopePath"
+        "Case.caseNumber",
+        "Case.subject",
+        "Case.status",
+        "Case.recordedAt"
        ],
-       "operation": "listFaqs",
-       "provenance": "contract white-label.yaml GET /tenant-config/faqs"
+       "operation": "listMyCases",
+       "notes": "Only when signed in: the cases this guest raised, newest first.",
+       "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
       },
       {
        "kind": "cardList",
@@ -1303,30 +1290,32 @@
    ]
   },
   "states": {
-   "loading": "The help support figures; each tile loads on its own.",
+   "loading": "Questions, pages and policies load in place; each list loads on its own.",
    "error": "Could not load. Names which read failed and leaves the help support untouched.",
    "emptyFirstRun": "No help support yet. Offers Raise my case (`raiseMyCase`).",
-   "emptyNoResults": "Never shown: `listFaqs` takes no filter, so an empty list is always the first-run state above.",
-   "emptyNoAccess": "Shown when the caller lacks `TENANT_CONFIGURE`, which `listFaqs` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoResults": "Never shown: `listPublishedFaqs` takes no filter, so an empty list is always the first-run state above.",
+   "emptyNoAccess": "Reading help needs no sign-in (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-2)). **Raising or reading a case needs a signed-in guest**: one who is not signed in is offered sign-in and brought back to this screen; the questions, pages and policies stay readable.",
    "offline": "**The offline banner shows.** Help already loaded stays readable, marked with its age. **Raising a case is disabled offline** — it needs the connection (decided 28 September, audit R148) — and the screen says how to reach staff in person instead: the guest services desk, or any member of staff."
   },
   "apis": [
    {
-    "operationId": "listFaqs",
+    "operationId": "listPublishedFaqs",
     "contract": "white-label",
-    "purpose": "List FAQs",
-    "trigger": "onLoad"
+    "purpose": "The published FAQs, readable before sign-in (GFIX-2)",
+    "trigger": "onLoad",
+    "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-2)"
    },
    {
-    "operationId": "listContentPages",
+    "operationId": "listPublishedContentPages",
     "contract": "white-label",
-    "purpose": "List custom content pages",
-    "trigger": "onLoad"
+    "purpose": "The live help and accessibility pages, readable before sign-in (GFIX-2)",
+    "trigger": "onLoad",
+    "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-2)"
    },
    {
     "operationId": "listMyCases",
     "contract": "marketing-crm",
-    "purpose": "The cases this guest raised",
+    "purpose": "The cases this guest raised Only when signed in (decided 2 October 2026 by Chinmay, fix before Block A starts (GFIX-6)).",
     "trigger": "onLoad"
    },
    {
@@ -1335,7 +1324,7 @@
     "purpose": "Report something — lost property, a complaint, a question",
     "trigger": "onAction",
     "invalidates": [
-     "listFaqs"
+     "listMyCases"
     ]
    },
    {
@@ -1344,7 +1333,7 @@
     "purpose": "Reply on a case the guest raised",
     "trigger": "onAction",
     "invalidates": [
-     "listFaqs"
+     "listMyCases"
     ]
    },
    {
@@ -1352,6 +1341,13 @@
     "contract": "white-label",
     "purpose": "App status and the public *What's new*",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listPublishedPolicies",
+    "contract": "white-label",
+    "purpose": "Terms, privacy, refund, cookie and accessibility policies, readable before sign-in (GFIX-2)",
+    "trigger": "onLoad",
+    "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-2)"
    }
   ],
   "entryState": {
@@ -1417,6 +1413,20 @@
      ]
     },
     "provenance": "client-verified"
+   }
+  ],
+  "gaps": [
+   {
+    "operation": "listFaqs",
+    "removed": true,
+    "why": "Replaced by `listPublishedFaqs`, the guest read of the same data.",
+    "source": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-2)"
+   },
+   {
+    "operation": "listContentPages",
+    "removed": true,
+    "why": "Replaced by `listPublishedContentPages`, the guest read of the same data.",
+    "source": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-2)"
    }
   ],
   "_platform": {
@@ -1508,7 +1518,7 @@
     }
    ]
   },
-  "notes": "Minuted 10 Aug §4.9. Benchmarked against Skidata. Tied to a ticket purchase and saved as a personal visit profile. **Out of the first release** (decided 28 September, audit R187): the itinerary planner is deferred and this screen is `wave: 4` with a `deferred` block. Kept, not deleted, for the release that builds it.\n\n**Rev 3 (decided 29 September).** Had stayed in wave 4 (GAP-C3); superseded the same day by the re-plan below.\n\n**Brought into Block A on 29 September** (Chinmay, the 29 September re-plan, MOB-6): a rules-based planner with the AI planner agent on top. This supersedes audit R187, the deferral half of R209 and rev 3 GAP-C3; the `deferred` block is removed and the screen is wave 1.\n\n**Mobile v4 role (MOB-6): the Plan tab root, \"Plan\".** Inputs: party size, heights (or ages), dates, pace (packed, balanced or relaxed), interests and cuisine. The rules planner (`generateVisitPlan`) runs with no AI. The tab is hidden when the venue turns module `visitPlanner` off.\n\n**Multi-venue intelligence (client meeting 30 September, MoM 4.7, Allam; agreed by Chinmay).** In a multi-venue tenant each chosen day is at one park, and the planner uses **only the rides, dining and retail that exist at that park**: a cuisine or shop preference is checked against that park's own points, never assumed of every park (only one park has the Indian restaurant, so *Indian* places lunch there on that park's day and nowhere else). Retail and kiosk shops are now planner options alongside F&B (the gap a Softlabs teammate flagged). Contract: venue-map `generateVisitPlan` `dayVenues`, `retailTags`, `VisitPlan.unmatchedPreferences`.",
+  "notes": "Minuted 10 Aug §4.9. Benchmarked against Skidata. Tied to a ticket purchase and saved as a personal visit profile. **Out of the first release** (decided 28 September, audit R187): the itinerary planner is deferred and this screen is `wave: 4` with a `deferred` block. Kept, not deleted, for the release that builds it.\n\n**Rev 3 (decided 29 September).** Had stayed in wave 4 (GAP-C3); superseded the same day by the re-plan below.\n\n**Brought into Block A on 29 September** (Chinmay, the 29 September re-plan, MOB-6): a rules-based planner with the AI planner agent on top. This supersedes audit R187, the deferral half of R209 and rev 3 GAP-C3; the `deferred` block is removed and the screen is wave 1.\n\n**Mobile v4 role (MOB-6): the Plan tab root, \"Plan\".** Inputs: party size, heights (or ages), dates, pace (packed, balanced or relaxed), interests and cuisine. The rules planner (`generateVisitPlan`) runs with no AI. The tab is hidden when the venue turns module `visitPlanner` off.\n\n**Multi-venue intelligence (client meeting 30 September, MoM 4.7, Allam; agreed by Chinmay).** In a multi-venue tenant each chosen day is at one park, and the planner uses **only the rides, dining and retail that exist at that park**: a cuisine or shop preference is checked against that park's own points, never assumed of every park (only one park has the Indian restaurant, so *Indian* places lunch there on that park's day and nowhere else). Retail and kiosk shops are now planner options alongside F&B (the gap a Softlabs teammate flagged). Contract: venue-map `generateVisitPlan` `dayVenues`, `retailTags`, `VisitPlan.unmatchedPreferences`.\n\n**In the first release (Block A, wave 1), stated plainly (CHG-SGU-021).** The R187 note that put the planner out of the first release (wave 4) was superseded by rev 3 (29 September); the Plan tab is in the Block A slice.",
   "density": "comfortable",
   "pattern": "multiStepForm",
   "patternReason": "The v4 prototype asks six questions one at a time (who, heights, days, pace, likes, food) and ends on *Make my plan*",
@@ -2097,7 +2107,7 @@
    {
     "operationId": "getCart",
     "contract": "orders",
-    "purpose": "The cart, priced and checked, right now",
+    "purpose": "The cart, priced and checked, right now With the guest session the device already holds: signed in, or the anonymous cart session a visitor gets with the first line (ADR-0045) (decided 2 October 2026 by Chinmay, fix before Block A starts (GFIX-6)).",
     "trigger": "onLoad"
    },
    {
@@ -2115,7 +2125,7 @@
    {
     "operationId": "getVisitPlan",
     "contract": "venue-map",
-    "purpose": "The plan: days, timed items and add-on suggestions, at its current version",
+    "purpose": "The plan: days, timed items and add-on suggestions, at its current version Only when signed in (decided 2 October 2026 by Chinmay, fix before Block A starts (GFIX-6)).",
     "trigger": "onLoad",
     "provenance": "decided 29 September 2026, MOB-6"
    },
@@ -2353,7 +2363,7 @@
    {
     "operationId": "getVisitPlan",
     "contract": "venue-map",
-    "purpose": "The plan: days, timed items and add-on suggestions, at its current version",
+    "purpose": "The plan: days, timed items and add-on suggestions, at its current version Only when signed in (decided 2 October 2026 by Chinmay, fix before Block A starts (GFIX-6)).",
     "trigger": "onLoad",
     "provenance": "decided 29 September 2026, MOB-6"
    },
@@ -2367,8 +2377,8 @@
    {
     "operationId": "createAiConversation",
     "contract": "ai",
-    "purpose": "Open the planner conversation for this plan",
-    "trigger": "onLoad",
+    "purpose": "Opened on the first message to the planner, never on opening the Plan tab (a conversation is billed); the plan loads without it",
+    "trigger": "onAction",
     "provenance": "decided 29 September 2026, MOB-6"
    },
    {

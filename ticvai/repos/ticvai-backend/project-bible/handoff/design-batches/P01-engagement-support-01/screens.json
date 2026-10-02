@@ -27,7 +27,12 @@
     {
      "to": "WEB-027",
      "trigger": "Newsletter Subscription",
-     "provenance": "derived — WEB-027 declares entryState.params deviceId, itemId and WEB-025 holds none of them. The edge carries nothing: deviceId, itemId only pre-select (deep link or optional), and WEB-027 opens on its own"
+     "provenance": "derived — WEB-027 declares entryState.params unsubscribeToken and WEB-025 holds none of them. The edge carries nothing: unsubscribeToken only pre-selects (deep link or optional), and WEB-027 opens on its own"
+    },
+    {
+     "to": "WEB-026",
+     "trigger": "Survey & Feedback",
+     "provenance": "derived — WEB-026 declares entryState.params formId and WEB-025 holds none of them. The edge carries nothing: formId only pre-selects (deep link or optional), and WEB-026 opens on its own"
     }
    ]
   },
@@ -44,46 +49,27 @@
      "slot": "record",
      "components": [
       {
-       "kind": "detailPanel",
-       "label": "The tenant app status",
-       "bindsTo": "TenantAppStatus",
-       "columns": [
-        "TenantAppStatus.isPublished",
-        "TenantAppStatus.publishedVersion",
-        "TenantAppStatus.publishedAt",
-        "TenantAppStatus.draftVersion",
-        "TenantAppStatus.hasUnpublishedChanges",
-        "TenantAppStatus.activeModuleCount",
-        "TenantAppStatus.licensedModuleCount",
-        "TenantAppStatus.activePageCount",
-        "TenantAppStatus.isInMaintenance",
-        "TenantAppStatus.maintenanceMessage",
-        "TenantAppStatus.expectedBackAt",
-        "TenantAppStatus.recentChanges"
-       ],
-       "operation": "getTenantAppStatus",
-       "provenance": "contract white-label.yaml GET /tenant-config/status"
+       "kind": "cardList",
+       "label": "Questions people ask",
+       "bindsTo": "PublishedFaqCategory",
+       "operation": "listPublishedFaqs",
+       "notes": "The published FAQs, readable without signing in; WEB-045 and this screen are one implementation (GAP-D3).",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)"
       },
       {
-       "kind": "dataTable",
-       "label": "Every case",
+       "kind": "cardList",
+       "label": "My cases",
        "bindsTo": "Case",
        "columns": [
-        "Case.id",
         "Case.caseNumber",
-        "Case.subjectId",
-        "Case.guestName",
         "Case.subject",
-        "Case.kind",
-        "Case.channel",
-        "Case.recordedAt",
-        "Case.syncedAt",
-        "Case.categoryId",
         "Case.status",
-        "Case.priority"
+        "Case.createdAt",
+        "Case.resolvedAt"
        ],
-       "operation": "listCases",
-       "provenance": "contract marketing-crm.yaml GET /cases"
+       "operation": "listMyCases",
+       "notes": "The guest's own cases (R148); no staff filters, assignee or SLA.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)"
       },
       {
        "kind": "cardList",
@@ -100,9 +86,15 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Create case",
-       "operation": "createCase",
-       "provenance": "contract marketing-crm.yaml POST /cases"
+       "label": "Ask for help",
+       "operation": "raiseMyCase",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Reply",
+       "operation": "replyToMyCase",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)"
       }
      ]
     }
@@ -123,15 +115,27 @@
     "trigger": "onLoad"
    },
    {
-    "operationId": "createCase",
+    "operationId": "listMyCases",
     "contract": "marketing-crm",
-    "purpose": "Raise a case",
+    "purpose": "The cases this guest raised",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "raiseMyCase",
+    "contract": "marketing-crm",
+    "purpose": "Raise a case as the guest",
     "trigger": "onAction"
    },
    {
-    "operationId": "listCases",
+    "operationId": "replyToMyCase",
     "contract": "marketing-crm",
-    "purpose": "Cases this guest has open",
+    "purpose": "Reply on a case the guest raised",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "listPublishedFaqs",
+    "contract": "white-label",
+    "purpose": "The published FAQs (GAP-D3: one implementation with WEB-045)",
     "trigger": "onLoad"
    }
   ],
@@ -151,35 +155,42 @@
   "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "overlays": [
    {
-    "id": "formCreateCase",
+    "id": "formRaiseMyCase",
     "component": "modal",
-    "trigger": "Create case",
-    "body": "**Collects what `createCase` sends before it is called.** Required: `id`, `subject`, `description`, `channel`, `recordedAt`. Optional: `subjectId`, `categoryId`, `priority`, `kind`, `venueId`, `relatedOrderId`, `attachmentRefs`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "CreateCaseRequest",
+    "trigger": "Ask for help",
+    "body": "What it is about (lost property, a complaint, a question), a short summary and the detail; optionally the visit or order it concerns, chosen from the guest's own. Nothing else is asked.",
     "confirm": {
-     "label": "Create case",
-     "operation": "createCase"
+     "label": "Ask for help",
+     "operation": "raiseMyCase"
     },
     "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "id",
-      "subject",
-      "description",
-      "channel",
-      "recordedAt",
-      "subjectId",
-      "categoryId",
-      "priority",
-      "kind",
-      "venueId",
-      "relatedOrderId",
-      "attachmentRefs"
-     ]
+     "label": "Cancel"
     },
-    "provenance": "client-verified"
+    "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)"
+   },
+   {
+    "id": "formReplyToMyCase",
+    "component": "modal",
+    "trigger": "Reply",
+    "body": "The reply text, added to the case thread the guest raised.",
+    "confirm": {
+     "label": "Reply",
+     "operation": "replyToMyCase"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)"
    }
   ],
+  "entryState": {
+   "params": [
+    {
+     "name": "caseId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P01",
    "audience": "guest",
@@ -239,7 +250,7 @@
     {
      "to": "WEB-027",
      "trigger": "Newsletter Subscription",
-     "provenance": "derived — WEB-027 declares entryState.params deviceId, itemId and WEB-026 holds none of them. The edge carries nothing: deviceId, itemId only pre-select (deep link or optional), and WEB-027 opens on its own"
+     "provenance": "derived — WEB-027 declares entryState.params unsubscribeToken and WEB-026 holds none of them. The edge carries nothing: unsubscribeToken only pre-selects (deep link or optional), and WEB-027 opens on its own"
     }
    ]
   },
@@ -247,61 +258,53 @@
   "density": "compact",
   "pattern": "configEditor",
   "patternReason": "the screen declares only writes (`submitReview`) and no read of a population — it is settings, not a list",
-  "purpose": "Work with survey & feedback for this venue.",
+  "purpose": "Tell the venue how the visit went, answer a survey it sent, or report a problem.",
   "layout": {
    "template": "form",
    "regions": [
     {
      "name": "contentBody",
-     "slot": "fields",
+     "slot": "form",
      "components": [
       {
-       "kind": "textField",
-       "label": "id",
-       "bindsTo": "SubmitReviewRequest.id",
-       "provenance": "contract marketing-crm.yaml POST /reviews"
-      },
-      {
-       "kind": "textField",
-       "label": "subjectId",
-       "bindsTo": "SubmitReviewRequest.subjectId",
-       "provenance": "contract marketing-crm.yaml POST /reviews"
-      },
-      {
-       "kind": "textField",
-       "label": "venueId",
-       "bindsTo": "SubmitReviewRequest.venueId",
-       "provenance": "contract marketing-crm.yaml POST /reviews"
-      },
-      {
-       "kind": "textField",
-       "label": "relatedOrderId",
+       "kind": "selectField",
+       "label": "Which visit",
        "bindsTo": "SubmitReviewRequest.relatedOrderId",
-       "provenance": "contract marketing-crm.yaml POST /reviews"
+       "operation": "listMyOrders",
+       "notes": "Chosen from the guest's recent orders (\"Coastal Aqua - Sat 26 Sep 2026\"); never typed.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)"
       },
       {
-       "kind": "textField",
-       "label": "rating",
+       "kind": "selectField",
+       "label": "Your rating",
        "bindsTo": "SubmitReviewRequest.rating",
-       "provenance": "contract marketing-crm.yaml POST /reviews"
+       "operation": "submitReview",
+       "notes": "1 to 5 stars; required.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)"
       },
       {
-       "kind": "textField",
-       "label": "body",
-       "bindsTo": "SubmitReviewRequest.body",
-       "provenance": "contract marketing-crm.yaml POST /reviews"
-      },
-      {
-       "kind": "textField",
-       "label": "aspects",
+       "kind": "multiSelect",
+       "label": "What stood out",
        "bindsTo": "SubmitReviewRequest.aspects",
-       "provenance": "contract marketing-crm.yaml POST /reviews"
+       "operation": "submitReview",
+       "notes": "The venue's closed aspect set (Cleanliness, Staff, Food, Queues); multi-select, optional.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)"
       },
       {
        "kind": "textField",
-       "label": "recordedAt",
-       "bindsTo": "SubmitReviewRequest.recordedAt",
-       "provenance": "contract marketing-crm.yaml POST /reviews"
+       "label": "Your comments",
+       "bindsTo": "SubmitReviewRequest.body",
+       "operation": "submitReview",
+       "notes": "Optional, any language. Id, subject, venue and time are set by the platform.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Survey",
+       "bindsTo": "FormDefinition",
+       "operation": "getForm",
+       "notes": "A triggered survey link (post-visit, post-scan, case closure) opens here with its formId; answered with `submitForm` (DI-391).",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)"
       }
      ]
     },
@@ -314,6 +317,18 @@
        "label": "Submit review",
        "operation": "submitReview",
        "provenance": "contract marketing-crm.yaml POST /reviews"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Send survey",
+       "operation": "submitForm",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Report a problem",
+       "operation": "raiseMyCase",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)"
       }
      ]
     }
@@ -332,6 +347,30 @@
     "contract": "marketing-crm",
     "purpose": "from page inventory",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "getForm",
+    "contract": "marketing-crm",
+    "purpose": "A triggered survey opened from its link",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "submitForm",
+    "contract": "marketing-crm",
+    "purpose": "Answer the survey",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "raiseMyCase",
+    "contract": "marketing-crm",
+    "purpose": "Report a problem as a case",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "listMyOrders",
+    "contract": "orders",
+    "purpose": "The recent visits a review can be about",
+    "trigger": "onLoad"
    }
   ],
   "wireframe": {
@@ -348,6 +387,31 @@
    }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formRaiseMyCase",
+    "component": "modal",
+    "trigger": "Report a problem",
+    "body": "A short summary and the detail of the problem; the visit is the one chosen above.",
+    "confirm": {
+     "label": "Report a problem",
+     "operation": "raiseMyCase"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "formId",
+     "from": "deepLink",
+     "optional": true
+    }
+   ]
+  },
   "_platform": {
    "code": "P01",
    "audience": "guest",
@@ -402,13 +466,20 @@
     "WEB-026",
     "WEB-028"
    ],
-   "inferred": true
+   "inferred": true,
+   "transitions": [
+    {
+     "to": "WEB-026",
+     "trigger": "Survey & Feedback",
+     "provenance": "derived — WEB-026 declares entryState.params formId and WEB-027 holds none of them. The edge carries nothing: formId only pre-selects (deep link or optional), and WEB-026 opens on its own"
+    }
+   ]
   },
   "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement.",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listGuestDevices` reads the population and `getWishlist` reads one of them — list, select, act",
-  "purpose": "Record newsletter subscription for this venue.",
+  "purpose": "Choose which newsletters you receive and on which channel, or leave one from its email link.",
   "layout": {
    "template": "split",
    "regions": [
@@ -417,239 +488,53 @@
      "slot": "collection",
      "components": [
       {
-       "kind": "dataTable",
-       "label": "Every guest device",
-       "bindsTo": "GuestDevice",
-       "columns": [
-        "GuestDevice.id",
-        "GuestDevice.subjectId",
-        "GuestDevice.platform",
-        "GuestDevice.tokenFingerprint",
-        "GuestDevice.appVersion",
-        "GuestDevice.osVersion",
-        "GuestDevice.deviceModel",
-        "GuestDevice.locale",
-        "GuestDevice.status",
-        "GuestDevice.failureCount",
-        "GuestDevice.registeredAt",
-        "GuestDevice.lastSeenAt"
-       ],
-       "operation": "listGuestDevices",
-       "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}/devices"
+       "kind": "consentBlock",
+       "label": "What we may send you",
+       "bindsTo": "ConsentState.purposes",
+       "operation": "getGuestConsents",
+       "notes": "One row per configured purpose (`listConsentPurposes`), its channels as toggles, its plain-language description and the notice version in force; the current position from `getGuestConsents` (Given with date, Withdrawn with date, Not asked, Needs renewing). A change is recorded at once with `recordConsent` (source and notice version set by the app; the guest never types a purpose, decision, source or time). Withdrawing is as easy as giving.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)"
       },
       {
-       "kind": "confirmDialog",
-       "derived": true,
-       "label": "Confirm",
-       "notes": "**The consequence goes in the body, not the title.** *Cancel 3 orders worth AED 480* is a confirmation; *are you sure* is not — and a dialog that cannot name what it destroys is a dialog somebody dismisses.\n\n**Added 31 August.** `confirmDialog` and `modal` were both in the component library and used **zero times across 492 screens**, while `destructiveButton` was used 39 times and its own entry reads *always requires confirmation*.",
-       "provenance": "carried from the previous definition"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected guest device",
-       "bindsTo": "GuestDevice",
-       "columns": [
-        "GuestDevice.id",
-        "GuestDevice.subjectId",
-        "GuestDevice.platform",
-        "GuestDevice.tokenFingerprint",
-        "GuestDevice.tokenRef",
-        "GuestDevice.appVersion",
-        "GuestDevice.osVersion",
-        "GuestDevice.deviceModel",
-        "GuestDevice.locale",
-        "GuestDevice.status",
-        "GuestDevice.failureCount",
-        "GuestDevice.registeredAt",
-        "GuestDevice.lastSeenAt",
-        "GuestDevice.revokedAt"
-       ],
-       "operation": "listGuestDevices",
-       "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}/devices"
+       "kind": "cardList",
+       "label": "Purposes and notices",
+       "operation": "listConsentPurposes",
+       "notes": "The configured purposes with their plain-language description, channels and the notice version in force.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)"
       },
       {
-       "kind": "detailPanel",
-       "label": "The marketing subscription",
+       "kind": "toggle",
+       "label": "Consent toggle",
+       "operation": "recordConsent",
+       "notes": "Per purpose and channel; recorded at once on change, append-only.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)",
+       "bindsTo": "ConsentState.purposes"
+      },
+      {
+       "kind": "cardList",
+       "label": "Lists I receive",
        "bindsTo": "MarketingSubscription",
        "columns": [
-        "MarketingSubscription.id",
-        "MarketingSubscription.subjectId",
-        "MarketingSubscription.channel",
         "MarketingSubscription.listName",
-        "MarketingSubscription.isSubscribed",
-        "MarketingSubscription.source",
-        "MarketingSubscription.unsubscribeToken"
+        "MarketingSubscription.channel",
+        "MarketingSubscription.isSubscribed"
        ],
        "operation": "getMarketingSubscription",
-       "provenance": "contract marketing-crm.yaml GET /marketing-subscriptions"
+       "notes": "One row per list with a toggle per channel; a channel can be switched on only where marketing consent for it is given, otherwise the toggle asks \"Allow offers by email?\" first and records the consent in the same act. The guest never types an id, a subject, a token or a list name.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)"
       },
       {
-       "kind": "detailPanel",
-       "label": "The wishlist",
-       "bindsTo": "Wishlist",
-       "columns": [
-        "Wishlist.subjectId",
-        "Wishlist.items"
-       ],
-       "operation": "getWishlist",
-       "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}/wishlist"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Record consent",
-       "operation": "recordConsent",
-       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/consents"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Add to wishlist",
-       "operation": "addToWishlist",
-       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/wishlist"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Register guest device",
-       "operation": "registerGuestDevice",
-       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/devices"
-      },
-      {
-       "kind": "destructiveButton",
-       "label": "Remove from wishlist",
-       "operation": "removeFromWishlist",
-       "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/wishlist/{itemId}"
-      },
-      {
-       "kind": "destructiveButton",
-       "label": "Revoke guest device",
-       "operation": "revokeGuestDevice",
-       "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/devices/{deviceId}"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Save marketing subscription",
+       "kind": "textField",
+       "label": "Channel toggle",
        "operation": "setMarketingSubscription",
-       "provenance": "contract marketing-crm.yaml PUT /marketing-subscriptions"
+       "notes": "Arriving from an email link with its unsubscribe token: that list on that channel is unsubscribed at once (\"You will no longer receive Coastal Aqua news by email\"), with no sign-in and no confirmation. Resubscribing needs sign-in.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)",
+       "bindsTo": "MarketingSubscription.isSubscribed"
       }
      ]
     }
    ]
   },
-  "overlays": [
-   {
-    "id": "confirmRemoveFromWishlist",
-    "component": "confirmDialog",
-    "trigger": "Remove from wishlist",
-    "body": "**Names what `removeFromWishlist` changes and what it leaves alone**, in the consequence rather than the verb. A newsletter subscription this affects should be identified in the dialog, not just counted.",
-    "provenance": "client-verified"
-   },
-   {
-    "id": "confirmRevokeGuestDevice",
-    "component": "confirmDialog",
-    "trigger": "Revoke guest device",
-    "body": "**Names what `revokeGuestDevice` changes and what it leaves alone**, in the consequence rather than the verb. A newsletter subscription this affects should be identified in the dialog, not just counted.",
-    "provenance": "client-verified"
-   },
-   {
-    "id": "formRecordConsent",
-    "component": "modal",
-    "trigger": "Record consent",
-    "body": "**Collects what `recordConsent` sends before it is called.** Required: `purpose`, `decision`, `noticeVersion`, `source`, `recordedAt`. Optional: `channels`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "RecordConsentRequest",
-    "confirm": {
-     "label": "Record consent",
-     "operation": "recordConsent"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "purpose",
-      "decision",
-      "noticeVersion",
-      "source",
-      "recordedAt",
-      "channels"
-     ]
-    },
-    "provenance": "client-verified"
-   },
-   {
-    "id": "formAddToWishlist",
-    "component": "modal",
-    "trigger": "Add to wishlist",
-    "body": "**Collects what `addToWishlist` sends before it is called.** Required: `variantId`. Optional: `performanceId`, `note`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Add to wishlist",
-     "operation": "addToWishlist"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "variantId",
-      "performanceId",
-      "note"
-     ]
-    },
-    "provenance": "client-verified"
-   },
-   {
-    "id": "formRegisterGuestDevice",
-    "component": "modal",
-    "trigger": "Register guest device",
-    "body": "**Collects what `registerGuestDevice` sends before it is called.** Required: `platform`, `token`. Optional: `appVersion`, `osVersion`, `deviceModel`, `locale`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Register guest device",
-     "operation": "registerGuestDevice"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "platform",
-      "token",
-      "appVersion",
-      "osVersion",
-      "deviceModel",
-      "locale"
-     ]
-    },
-    "provenance": "client-verified"
-   },
-   {
-    "id": "formSetMarketingSubscription",
-    "component": "modal",
-    "trigger": "Save marketing subscription",
-    "body": "**Collects what `setMarketingSubscription` sends before it is called.** Required: `id`, `subjectId`, `channel`, `listName`, `isSubscribed`. Optional: `source`, `unsubscribeToken`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "MarketingSubscription",
-    "confirm": {
-     "label": "Save marketing subscription",
-     "operation": "setMarketingSubscription"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "id",
-      "subjectId",
-      "channel",
-      "listName",
-      "isSubscribed",
-      "source",
-      "unsubscribeToken"
-     ]
-    },
-    "provenance": "client-verified"
-   }
-  ],
   "states": {
    "loading": "—",
    "error": "Could not subscribe. **Consent is not recorded on a failed request**, because a subscription the guest believes happened and did not is worse than a visible failure",
@@ -666,54 +551,6 @@
     "trigger": "onAction"
    },
    {
-    "operationId": "addToWishlist",
-    "contract": "marketing-crm",
-    "purpose": "Save an item",
-    "trigger": "onAction",
-    "invalidates": [
-     "listGuestDevices"
-    ]
-   },
-   {
-    "operationId": "getWishlist",
-    "contract": "marketing-crm",
-    "purpose": "Read a guest's saved items",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "listGuestDevices",
-    "contract": "marketing-crm",
-    "purpose": "A guest's registered devices",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "registerGuestDevice",
-    "contract": "marketing-crm",
-    "purpose": "Register a device for push",
-    "trigger": "onAction",
-    "invalidates": [
-     "listGuestDevices"
-    ]
-   },
-   {
-    "operationId": "removeFromWishlist",
-    "contract": "marketing-crm",
-    "purpose": "Remove a saved item",
-    "trigger": "onAction",
-    "invalidates": [
-     "listGuestDevices"
-    ]
-   },
-   {
-    "operationId": "revokeGuestDevice",
-    "contract": "marketing-crm",
-    "purpose": "Revoke a device registration",
-    "trigger": "onAction",
-    "invalidates": [
-     "listGuestDevices"
-    ]
-   },
-   {
     "operationId": "getMarketingSubscription",
     "contract": "marketing-crm",
     "purpose": "What this guest has opted into",
@@ -723,25 +560,31 @@
     "operationId": "setMarketingSubscription",
     "contract": "marketing-crm",
     "purpose": "Subscribe or unsubscribe",
-    "trigger": "onAction",
-    "invalidates": [
-     "listGuestDevices"
-    ]
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "getGuestConsents",
+    "contract": "marketing-crm",
+    "purpose": "The current consent per channel (signed in)",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listConsentPurposes",
+    "contract": "marketing-crm",
+    "purpose": "The purposes the consent rows show",
+    "trigger": "onLoad"
    }
   ],
   "entryState": {
    "params": [
     {
-     "name": "deviceId",
-     "from": "deepLink"
-    },
-    {
-     "name": "itemId",
-     "from": "deepLink"
-    },
-    {
      "name": "subjectId",
      "from": "session"
+    },
+    {
+     "name": "unsubscribeToken",
+     "from": "deepLink",
+     "optional": true
     }
    ],
    "coldEntry": "**A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened three weeks late all land here, and the person holding the link did nothing wrong. **The screen names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.** Arrives with `deviceId`, `itemId`.",
@@ -826,7 +669,12 @@
     {
      "to": "WEB-027",
      "trigger": "Newsletter Subscription",
-     "provenance": "derived — WEB-027 declares entryState.params deviceId, itemId and WEB-028 holds none of them. The edge carries nothing: deviceId, itemId only pre-select (deep link or optional), and WEB-027 opens on its own"
+     "provenance": "derived — WEB-027 declares entryState.params unsubscribeToken and WEB-028 holds none of them. The edge carries nothing: unsubscribeToken only pre-selects (deep link or optional), and WEB-027 opens on its own"
+    },
+    {
+     "to": "WEB-026",
+     "trigger": "Survey & Feedback",
+     "provenance": "derived — WEB-026 declares entryState.params formId and WEB-028 holds none of them. The edge carries nothing: formId only pre-selects (deep link or optional), and WEB-026 opens on its own"
     }
    ]
   },
@@ -844,39 +692,11 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The tenant app status",
-       "bindsTo": "TenantAppStatus",
-       "columns": [
-        "TenantAppStatus.isPublished",
-        "TenantAppStatus.publishedVersion",
-        "TenantAppStatus.publishedAt",
-        "TenantAppStatus.draftVersion",
-        "TenantAppStatus.hasUnpublishedChanges",
-        "TenantAppStatus.activeModuleCount",
-        "TenantAppStatus.licensedModuleCount",
-        "TenantAppStatus.activePageCount",
-        "TenantAppStatus.isInMaintenance",
-        "TenantAppStatus.maintenanceMessage",
-        "TenantAppStatus.expectedBackAt",
-        "TenantAppStatus.recentChanges"
-       ],
-       "operation": "getTenantAppStatus",
-       "provenance": "contract white-label.yaml GET /tenant-config/status"
-      },
-      {
-       "kind": "detailPanel",
        "label": "How to reach the venue",
-       "bindsTo": "VenueContact",
-       "columns": [
-        "VenueContact.phone",
-        "VenueContact.email",
-        "VenueContact.whatsapp",
-        "VenueContact.address",
-        "VenueContact.openingHours"
-       ],
-       "operation": "getTenantAppStatus",
+       "bindsTo": "PublishedTenantConfig.contact",
+       "operation": "getPublishedTenantConfig",
        "notes": "**From `getTenantAppStatus.contact`** (decided 28 September, audit R073 (f)): phone, email, WhatsApp, address and opening hours, set from CMS-001 through `setMaintenanceMode`. Each is optional and a missing one is left out rather than shown blank.",
-       "provenance": "contract white-label.yaml GET /tenant-config/status"
+       "provenance": "corrected 2 October 2026 (CHG-SGU-022, design-notes correction)"
       }
      ]
     }
@@ -886,14 +706,14 @@
    "loading": "Venue details",
    "error": "Could not load. Falls back to the tenant contact details from the cached config",
    "emptyFirstRun": "—",
-   "emptyNoAccess": "**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "**Nothing here needs a sign-in** (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-2)): the screen reads only what the tenant has published, which is public, so there is no no-access case. A host that belongs to no tenant shows the platform's neutral holding page.",
    "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "apis": [
    {
-    "operationId": "getTenantAppStatus",
+    "operationId": "getPublishedTenantConfig",
     "contract": "white-label",
-    "purpose": "App status and recent changes",
+    "purpose": "The published contact details, readable without signing in",
     "trigger": "onLoad"
    }
   ],
@@ -965,57 +785,50 @@
   "notes": "**A concierge in a browser is a concierge.** ADR-0020 keeps it read-only against the transactional core regardless of surface. **Renamed 31 August** from *AI Concierge*. **A guest surface is one product with two renderings** — a screen named differently on web and app is two screens to a developer and one journey to a guest. **Cross-surface parity, 31 August**: added getGuestMenu. **A guest does not know which surface they are on** — the same named screen on web and app now calls the same guest-callable operations.\n\n**Rev 3 (decided 29 September, rev 3 CFG-5).** The concierge entry shows as mascot art when `BookingFlowConfig.conciergeMascot` is on (default on), otherwise as a plain button.",
   "density": "compact",
   "pattern": "statusTracker",
-  "patternReason": "`getGuestMenu` reads one record and nothing reads a population — the screen is about that one thing",
+  "patternReason": "The conversation and its state (thinking, answered, handed to a person) are the content; the menu is only a shortcut (design-notes correction ai, CHG-SGU-016)",
   "purpose": "Ask, and be answered or handed to a person.",
   "layout": {
    "template": "detail",
    "regions": [
     {
      "name": "contentBody",
-     "slot": "record",
+     "slot": "collection",
      "components": [
       {
-       "kind": "detailPanel",
-       "label": "The guest menu",
-       "bindsTo": "GuestMenu",
-       "columns": [
-        "GuestMenu.outletId",
-        "GuestMenu.menuId",
-        "GuestMenu.name",
-        "GuestMenu.inForceUntil",
-        "GuestMenu.currency",
-        "GuestMenu.currencyScale",
-        "GuestMenu.sections"
-       ],
-       "operation": "getGuestMenu",
-       "provenance": "contract fnb.yaml GET /outlets/{outletId}/guest-menu"
+       "kind": "assistantPanel",
+       "label": "Ask Sahli",
+       "operation": "sendAiMessage",
+       "notes": "**The conversation is the content.** The question shows at once and the answer streams with its sources; on 503 (every provider failed) \"Sahli can't answer right now\" with Hand over to a person and Try again. The conversation is opened silently (`createAiConversation`) on the first message, its scope taken from the session; the guest never picks a module.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-016, design-notes correction)"
       },
       {
-       "kind": "dataTable",
-       "label": "Every AI conversation",
-       "bindsTo": "AiConversation",
-       "columns": [
-        "AiConversation.id",
-        "AiConversation.principalId",
-        "AiConversation.scopePath",
-        "AiConversation.module",
-        "AiConversation.locale",
-        "AiConversation.messageCount",
-        "AiConversation.startedAt",
-        "AiConversation.lastMessageAt"
-       ],
-       "operation": "listAiConversations",
-       "provenance": "contract ai.yaml GET /conversations"
+       "kind": "textField",
+       "label": "Your question",
+       "operation": "sendAiMessage",
+       "notes": "The ask box under the conversation (typed, or a starter chip). Sending opens the conversation on the first message.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-016, design-notes correction)",
+       "bindsTo": "AiMessage.content"
+      },
+      {
+       "kind": "textField",
+       "label": "Message to the agent",
+       "operation": "sendConversationMessage",
+       "notes": "Replaces the ask box once a person has taken the conversation; the transcript stays above.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-016, design-notes correction)",
+       "bindsTo": "ConversationMessage.body"
       },
       {
        "kind": "cardList",
-       "label": "AI Concierge",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "detailPanel",
-       "label": "Detail",
-       "provenance": "carried from the previous definition"
+       "label": "Earlier conversations",
+       "bindsTo": "AiConversation",
+       "columns": [
+        "AiConversation.startedAt",
+        "AiConversation.lastMessageAt",
+        "AiConversation.messageCount"
+       ],
+       "operation": "listAiConversations",
+       "notes": "The signed-in guest's own conversations, newest first, the first question as the title; no principal, scope or module columns.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-016, design-notes correction)"
       }
      ]
     },
@@ -1024,34 +837,25 @@
      "slot": "rowActions",
      "components": [
       {
-       "kind": "primaryButton",
-       "label": "Create AI conversation",
-       "operation": "createAiConversation",
-       "provenance": "contract ai.yaml POST /conversations"
-      },
-      {
        "kind": "secondaryButton",
-       "label": "Send AI message",
-       "operation": "sendAiMessage",
-       "provenance": "contract ai.yaml POST /conversations/{conversationId}/messages"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Handover to agent",
+       "label": "Hand over to a person",
        "operation": "handoverToAgent",
-       "provenance": "contract marketing-crm.yaml POST /conversations/{conversationId}/handover"
+       "notes": "One tap, always visible in the panel header. Sends reason `guestRequested` with Sahli's own summary; the platform sets `assistantFailed`, `outOfScope` or `negativeSentiment` itself. The panel becomes the agent chat (`sendConversationMessage`) with queue position and wait; 409 offers to raise a case.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-016, design-notes correction)"
       },
       {
        "kind": "secondaryButton",
-       "label": "Request suggestion",
-       "operation": "requestSuggestion",
-       "provenance": "contract ai.yaml POST /ai/suggestions"
+       "label": "Helpful / Not helpful",
+       "operation": "recordAnswerFeedback",
+       "notes": "Recorded silently with a small \"Thanks\"; nothing in the answer changes.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-016, design-notes correction)"
       },
       {
        "kind": "secondaryButton",
-       "label": "Send conversation message",
-       "operation": "sendConversationMessage",
-       "provenance": "contract marketing-crm.yaml POST /conversations/{conversationId}/messages"
+       "label": "Order food",
+       "operation": "getGuestMenu",
+       "notes": "An optional shortcut to the outlet's menu in force (\"Menu until 11:00\" from `inForceUntil`); the concierge is not an F&B screen.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-016, design-notes correction)"
       }
      ]
     }
@@ -1062,15 +866,15 @@
    "error": "Could not load. **The rest of the site is unaffected.**",
    "emptyFirstRun": "**Nothing here yet for this venue.** Names what turns it on rather than showing an empty panel.",
    "emptyNoResults": "Nothing matches.",
-   "emptyNoAccess": "**Sign in to see this.** A guest who is not signed in is offered the door, not refused.",
+   "emptyNoAccess": "**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**Not available, and the offline banner says why.** The assistant needs the connection; conversations already loaded stay readable."
   },
   "apis": [
    {
     "operationId": "createAiConversation",
     "contract": "ai",
-    "purpose": "Open a conversation",
-    "trigger": "onAction"
+    "purpose": "Opened silently on the first message; the scope comes from the session, never a module the guest picks",
+    "trigger": "background"
    },
    {
     "operationId": "sendAiMessage",
@@ -1081,25 +885,25 @@
    {
     "operationId": "handoverToAgent",
     "contract": "marketing-crm",
-    "purpose": "Pass an assistant conversation to a person",
+    "purpose": "One tap; reason guestRequested and Sahli's summary are set for the guest",
     "trigger": "onAction"
    },
    {
     "operationId": "requestSuggestion",
     "contract": "ai",
-    "purpose": "requestSuggestion",
-    "trigger": "onAction"
+    "purpose": "From the conversation only, kinds waitTime and upsell (prepPlan is the kitchen's production plan; an itinerary is asked on the Plan tab); never a kind picker",
+    "trigger": "background"
    },
    {
     "operationId": "getGuestMenu",
     "contract": "fnb",
-    "purpose": "The menu a guest sees",
-    "trigger": "onLoad"
+    "purpose": "Optional \"Order food\" shortcut to the menu in force",
+    "trigger": "onAction"
    },
    {
     "operationId": "listAiConversations",
     "contract": "ai",
-    "purpose": "Earlier conversations",
+    "purpose": "Earlier conversations Only when signed in (decided 2 October 2026 by Chinmay, fix before Block A starts (GFIX-6)).",
     "trigger": "onLoad"
    },
    {
@@ -1147,101 +951,6 @@
    }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
-  "overlays": [
-   {
-    "id": "formSendConversationMessage",
-    "component": "modal",
-    "trigger": "Send conversation message",
-    "body": "**Collects what `sendConversationMessage` sends before it is called.** Required: `body`. Optional: `attachments`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Send conversation message",
-     "operation": "sendConversationMessage"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "body",
-      "attachments"
-     ]
-    },
-    "provenance": "client-verified"
-   },
-   {
-    "id": "formCreateAiConversation",
-    "component": "modal",
-    "trigger": "Create AI conversation",
-    "body": "**Collects what `createAiConversation` sends before it is called.** Required: `module`. Optional: `locale`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Create AI conversation",
-     "operation": "createAiConversation"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "module",
-      "locale"
-     ]
-    },
-    "provenance": "client-verified"
-   },
-   {
-    "id": "formSendAiMessage",
-    "component": "modal",
-    "trigger": "Send AI message",
-    "body": "**Collects what `sendAiMessage` sends before it is called.** Required: `content`. Optional: `collectionIds`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Send AI message",
-     "operation": "sendAiMessage"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "content",
-      "collectionIds"
-     ]
-    },
-    "provenance": "client-verified"
-   },
-   {
-    "id": "formHandoverToAgent",
-    "component": "modal",
-    "trigger": "Handover to agent",
-    "body": "**Collects what `handoverToAgent` sends before it is called.** Required: `reason`. Optional: `summary`, `preferredQueueId`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Handover to agent",
-     "operation": "handoverToAgent"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "reason",
-      "summary",
-      "preferredQueueId"
-     ]
-    },
-    "provenance": "client-verified"
-   },
-   {
-    "id": "formRequestSuggestion",
-    "component": "modal",
-    "trigger": "Request suggestion",
-    "body": "**Collects what `requestSuggestion` sends before it is called.** Required: `kind`. Optional: `subjectRef`, `horizon`, `context`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Request suggestion",
-     "operation": "requestSuggestion"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "kind",
-      "subjectRef",
-      "horizon",
-      "context"
-     ]
-    },
-    "provenance": "client-verified"
-   }
-  ],
   "_platform": {
    "code": "P01",
    "audience": "guest",
@@ -1293,7 +1002,7 @@
     "WEB-001"
    ]
   },
-  "notes": "**Web push is weaker than native and it is not absent.** A guest with a tab open gets their queue call; the app does it better and the web does it. **Back in the first release** (decided 29 September, rev 3 GAP-C1): the notifications feed is needed in the first release, which reverses audit R242's deferral of this screen. The `deferred` block is removed and the screen returns to `wave: 2`, where it sat before R242. Queue calls and order status still also show on the queue and order screens, which poll.",
+  "notes": "**Web push is weaker than native and it is not absent.** A guest with a tab open gets their queue call; the app does it better and the web does it. **Back in the first release** (decided 29 September, rev 3 GAP-C1): the notifications feed is needed in the first release, which reverses audit R242's deferral of this screen. The `deferred` block is removed and the screen returns to `wave: 2`, where it sat before R242. Queue calls and order status still also show on the queue and order screens, which poll.\n\n**In the first release (rev 3 GAP-C1, 29 September; DI-1075)**, superseding the R242 deferral (CHG-SGU-017).",
   "density": "compact",
   "pattern": "configEditor",
   "patternReason": "`listMyNotifications` reads the feed (decided 29 September, rev 3 GAP-C1); the location-session claim stays a form on the same screen, so the pattern is kept until the screen is redrawn",
@@ -1307,12 +1016,6 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Claim location session",
-       "operation": "claimLocationSession",
-       "provenance": "contract fnb.yaml POST /location-sessions"
-      },
-      {
-       "kind": "secondaryButton",
        "label": "Mark all as read",
        "operation": "markMyNotificationsRead",
        "notes": "Sends `{all: true}`. Only the guest's own notifications are marked.",
@@ -1338,24 +1041,6 @@
        "provenance": "carried from the previous definition"
       },
       {
-       "kind": "textField",
-       "label": "Location code",
-       "operation": "claimLocationSession",
-       "provenance": "contract fnb.yaml POST /location-sessions"
-      },
-      {
-       "kind": "textField",
-       "label": "Seat reference",
-       "operation": "claimLocationSession",
-       "provenance": "contract fnb.yaml POST /location-sessions"
-      },
-      {
-       "kind": "numberField",
-       "label": "Party size",
-       "operation": "claimLocationSession",
-       "provenance": "contract fnb.yaml POST /location-sessions"
-      },
-      {
        "kind": "toggle",
        "label": "Unread only",
        "operation": "listMyNotifications",
@@ -1370,17 +1055,11 @@
    "loading": "Content resolves in place.",
    "error": "Could not load. **The rest of the site is unaffected.**",
    "emptyFirstRun": "**Nothing here yet for this venue.** Names what turns it on rather than showing an empty panel.",
-   "emptyNoAccess": "**Sign in to see this.** A guest who is not signed in is offered the door, not refused.",
+   "emptyNoAccess": "**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** Notices already received stay listed. New queue calls and order updates arrive once the connection is back, and the banner is the warning that they may be late.",
    "emptyNoResults": "**No unread notifications.** Names the Unread only filter and offers to show all; the read ones are still there."
   },
   "apis": [
-   {
-    "operationId": "claimLocationSession",
-    "contract": "fnb",
-    "purpose": "Tell the platform where the guest is",
-    "trigger": "onAction"
-   },
    {
     "operationId": "listMyNotifications",
     "contract": "marketing-crm",
@@ -1395,7 +1074,12 @@
    }
   ],
   "entryState": {
-   "params": [],
+   "params": [
+    {
+     "name": "subjectId",
+     "from": "session"
+    }
+   ],
    "coldEntry": "**A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared link, a scanned code and a forwarded confirmation all land here, and the person holding it did nothing wrong. Arrives with no parameter — the venue comes from the site."
   },
   "wireframe": {
@@ -1408,7 +1092,7 @@
     "verified": "2026-10-01",
     "match": "exact",
     "view": "Summit Peaks → header 'At the venue' → Alerts",
-    "differences": "Deferred in the YAML (release later, R242: no in-app feed in the first release), but the prototype draws it as a live section, so the client will expect it."
+    "differences": "Deferred in the YAML (release later, R242: no in-app feed in the first release), but the prototype draws it as a live section, so the client will expect it. **Superseded 29 September (rev 3 GAP-C1, DI-1075): the screen is in the first release** (CHG-SGU-017)."
    }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",

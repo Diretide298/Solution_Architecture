@@ -40,11 +40,11 @@ steps:
   operations:
   - login
   - selectRole
-  - resolvePermissions
   outcome: '**The person carries the authority, not the device** (ADR-0002). A handheld passed to a
     colleague at a break carries nothing with it, which is the property that makes a shared device safe.
 
     '
+  note: '**Repointed 2 October (CHG-WIR-021).** resolvePermissions is an administration simulator; a steward signing in never calls it.'
 - step: 2
   screen: SCN-002
   action: They pick an access point and a direction.
@@ -69,7 +69,6 @@ steps:
   action: A guest presents a ticket and it scans.
   operations:
   - validateAccess
-  - listScans
   outcome: '**Decided locally against the package**, in under 300ms. `frozenDays` is held rather than
     replayed precisely because the gate cannot afford the arithmetic.
 
@@ -79,7 +78,6 @@ steps:
   action: A school party of forty arrives on one booking.
   operations:
   - validateGroupAccess
-  - listScans
   outcome: '**One credential, forty admissions, counted individually.** A group scanned as a single
     event is a group the venue cannot evacuate — occupancy needs the count, not the booking.
 
@@ -87,14 +85,13 @@ steps:
 - step: 6
   screen: SCN-007
   action: Thirty-eight go through and two are missing.
-  operations:
-  - listScans
+  operations: []
   outcome: '**The group stays open and the remaining two can arrive later.** A group closed at the first
     scan forces two children to be refused at the gate their teacher just walked through.
 
     '
 - step: 7
-  screen: SCN-003
+  screen: SCN-014
   action: The session ends and the device syncs.
   operations:
   - syncScans
@@ -102,6 +99,7 @@ steps:
     at the gate** — refusing a guest because another lane might have seen them is a queue nobody accepts.
 
     '
+  note: '**Repointed 2 October (CHG-WIR-001).** The sync runs on SCN-014 Sync & reconciliation; the ready screen calls nothing (F06 step 4).'
 branches:
 - at: 1
   condition: The steward has no role at this venue.

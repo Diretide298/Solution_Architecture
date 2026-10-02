@@ -14,8 +14,6 @@
   },
   "navigation": {
    "exitTo": [
-    "EMP-001",
-    "EMP-002",
     "EMP-003"
    ],
    "inferred": true,
@@ -25,16 +23,6 @@
      "to": "EMP-003",
      "trigger": "Sees the home screen on duty",
      "provenance": "flow F08 step 3→4, F64 step 3→4"
-    },
-    {
-     "to": "EMP-001",
-     "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-048 holds none of them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
-    },
-    {
-     "to": "EMP-002",
-     "trigger": "Select venue & role",
-     "provenance": "derived — EMP-002 declares entryState.params  and EMP-048 holds none of them. The edge carries nothing: EMP-002 needs nothing to open"
     }
    ]
   },
@@ -124,12 +112,6 @@
        "label": "Submit inspection",
        "operation": "submitInspection",
        "provenance": "contract maintenance.yaml POST /inspections"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Create inspection template",
-       "operation": "createInspectionTemplate",
-       "provenance": "contract maintenance.yaml POST /inspection-templates"
       }
      ]
     }
@@ -154,15 +136,6 @@
     "operationId": "submitInspection",
     "contract": "maintenance",
     "purpose": "Submit a completed inspection",
-    "trigger": "onAction",
-    "invalidates": [
-     "listInspectionTemplates"
-    ]
-   },
-   {
-    "operationId": "createInspectionTemplate",
-    "contract": "maintenance",
-    "purpose": "Create an inspection template",
     "trigger": "onAction",
     "invalidates": [
      "listInspectionTemplates"
@@ -214,33 +187,14 @@
      ]
     },
     "provenance": "contract maintenance.yaml POST /inspections"
-   },
+   }
+  ],
+  "gaps": [
    {
-    "id": "formCreateInspectionTemplate",
-    "component": "modal",
-    "trigger": "Create inspection template",
-    "body": "**Collects what `createInspectionTemplate` sends before it is called.** Required: `id`, `code`, `name`, `items`. Optional: `instructions`, `venueId`, `appliesToAssetCategoryId`, `frequency`, `retentionYears`, `isActive`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "InspectionTemplate",
-    "confirm": {
-     "label": "Create inspection template",
-     "operation": "createInspectionTemplate"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "id",
-      "code",
-      "name",
-      "items",
-      "instructions",
-      "venueId",
-      "appliesToAssetCategoryId",
-      "frequency",
-      "retentionYears",
-      "isActive"
-     ]
-    },
-    "provenance": "contract maintenance.yaml POST /inspection-templates"
+    "operation": "createInspectionTemplate",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): Template authoring (createInspectionTemplate, INSPECTION_MANAGE) is tenant-level management in the back office; the opening checklist only works today's checks (design-notes correction venue-operations EMP-048).",
+    "source": "contracts/satellite/maintenance.yaml#createInspectionTemplate | R254"
    }
   ],
   "_platform": {
@@ -294,7 +248,7 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-047 holds none of them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-047 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
@@ -352,12 +306,6 @@
        ],
        "operation": "listAnnouncements",
        "provenance": "contract workforce.yaml GET /announcements"
-      },
-      {
-       "kind": "publishGate",
-       "impliedBy": "publishAnnouncement",
-       "notes": "Declares `publishAnnouncement`. **The gate names what the publish will affect before it happens** — a disabled Publish with no reason is the state operators escalate.\n",
-       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -385,20 +333,6 @@
        ],
        "operation": "listAnnouncements",
        "provenance": "contract workforce.yaml GET /announcements"
-      },
-      {
-       "kind": "detailPanel",
-       "label": "The announcement reach",
-       "bindsTo": "AnnouncementReach",
-       "columns": [
-        "AnnouncementReach.announcementId",
-        "AnnouncementReach.targeted",
-        "AnnouncementReach.delivered",
-        "AnnouncementReach.acknowledged",
-        "AnnouncementReach.outstanding"
-       ],
-       "operation": "getAnnouncementReach",
-       "provenance": "contract workforce.yaml GET /announcements/{announcementId}/reach"
       }
      ]
     },
@@ -411,13 +345,6 @@
        "label": "Acknowledge announcement",
        "operation": "acknowledgeAnnouncement",
        "provenance": "contract workforce.yaml POST /announcements/{announcementId}/acknowledge"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Publish announcement",
-       "operation": "publishAnnouncement",
-       "provenance": "contract workforce.yaml POST /announcements",
-       "notes": "Kind `emergency` needs ANNOUNCEMENT_EMERGENCY, not ANNOUNCEMENT_PUBLISH; without it the emergency kind is not offered and a publish is refused 403 `emergency-permission-required` (decided 28 September, audit R091 (1))."
       },
       {
        "kind": "publishGate",
@@ -452,21 +379,6 @@
     "invalidates": [
      "listAnnouncements"
     ]
-   },
-   {
-    "operationId": "getAnnouncementReach",
-    "contract": "workforce",
-    "purpose": "Who has acknowledged, and who has not",
-    "trigger": "onAction"
-   },
-   {
-    "operationId": "publishAnnouncement",
-    "contract": "workforce",
-    "purpose": "Tell staff something",
-    "trigger": "onAction",
-    "invalidates": [
-     "listAnnouncements"
-    ]
    }
   ],
   "entryState": {
@@ -491,35 +403,23 @@
    "board": "wireframes/P06 Venue Staff App.dc.html#emp-047"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
-  "overlays": [
+  "gaps": [
    {
-    "id": "formPublishAnnouncement",
-    "component": "modal",
-    "trigger": "Publish announcement",
-    "body": "**Collects what `publishAnnouncement` sends before it is called.** Required: `title`, `body`, `kind`, `publishedAt`. Optional: `id`, `venueIds`, `departmentIds`, `roleIds`, `requiresAcknowledgement`, `expiresAt`, `publishedByPrincipalId`, `locale`. **An `emergency` kind requires ANNOUNCEMENT_EMERGENCY** (audit R091 (1)). Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "Announcement",
-    "confirm": {
-     "label": "Publish announcement",
-     "operation": "publishAnnouncement"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "title",
-      "body",
-      "kind",
-      "publishedAt",
-      "id",
-      "venueIds",
-      "departmentIds",
-      "roleIds",
-      "requiresAcknowledgement",
-      "expiresAt",
-      "publishedByPrincipalId",
-      "locale"
-     ]
-    },
-    "provenance": "contract workforce.yaml POST /announcements"
+    "operation": "getAnnouncementReach",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): Emergency mode is a full-screen takeover with one action (acknowledge); the generic announcements set put publish and the reach roll call on it. Declaring goes out from EMP-038 (F69 step 4 repointed) (F08 step 2; design-notes correction venue-operations EMP-047).",
+    "source": "F08 step 2 | screens/P06-staff-app.yaml#EMP-047"
+   },
+   {
+    "operation": "publishAnnouncement",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): Emergency mode is a full-screen takeover with one action (acknowledge); the generic announcements set put publish and the reach roll call on it. Declaring goes out from EMP-038 (F69 step 4 repointed) (F08 step 2; design-notes correction venue-operations EMP-047).",
+    "source": "F08 step 2 | screens/P06-staff-app.yaml#EMP-047"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-004): No staff all-clear (announcement kind or operation) ends emergency mode.",
+    "source": "contracts/satellite/workforce.yaml#/components/schemas/AnnouncementKind | contracts/satellite/workforce.yaml#broadcastToGuests"
    }
   ],
   "_platform": {
@@ -578,7 +478,7 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-050 holds none of them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-050 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
@@ -712,12 +612,6 @@
      "slot": "rowActions",
      "components": [
       {
-       "kind": "primaryButton",
-       "label": "Record authority notification",
-       "operation": "recordAuthorityNotification",
-       "provenance": "contract maintenance.yaml POST /incidents/{incidentId}/notify-authority"
-      },
-      {
        "kind": "secondaryButton",
        "label": "Save incident",
        "operation": "updateIncident",
@@ -730,7 +624,7 @@
   "states": {
    "loading": "The post-incident restore list.",
    "error": "Could not load. Names which read failed and leaves the post-incident restore untouched.",
-   "emptyFirstRun": "No post-incident restore yet. Offers Record authority notification (`recordAuthorityNotification`); distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No post-incident restore yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "Nothing matches the filter on severity, status, isReportable and the post-incident restore are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Shown when the caller lacks `INCIDENT_VIEW`, which `listIncidents` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**Works offline by design.** Post-incident restore is exactly when the network is worst"
@@ -747,15 +641,6 @@
     "contract": "maintenance",
     "purpose": "Read an incident",
     "trigger": "onAction"
-   },
-   {
-    "operationId": "recordAuthorityNotification",
-    "contract": "maintenance",
-    "purpose": "Record notification to an external authority",
-    "trigger": "onAction",
-    "invalidates": [
-     "listIncidents"
-    ]
    },
    {
     "operationId": "updateIncident",
@@ -791,27 +676,6 @@
   "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "overlays": [
    {
-    "id": "formRecordAuthorityNotification",
-    "component": "modal",
-    "trigger": "Record authority notification",
-    "body": "**Collects what `recordAuthorityNotification` sends before it is called.** Required: `authority`, `notifiedAt`. Optional: `reference`, `notifiedByPrincipalId`, `attachmentRefs`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Record authority notification",
-     "operation": "recordAuthorityNotification"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "authority",
-      "notifiedAt",
-      "reference",
-      "notifiedByPrincipalId",
-      "attachmentRefs"
-     ]
-    },
-    "provenance": "contract maintenance.yaml POST /incidents/{incidentId}/notify-authority"
-   },
-   {
     "id": "formUpdateIncident",
     "component": "modal",
     "trigger": "Save incident",
@@ -834,6 +698,14 @@
      ]
     },
     "provenance": "contract maintenance.yaml PATCH /incidents/{incidentId}"
+   }
+  ],
+  "gaps": [
+   {
+    "operation": "recordAuthorityNotification",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): Recording the authority notification is a step of following up the incident (EMP-027), not of restoring the venue; the screen's own note says notification belongs where the incident is handled (F69 step 3; design-notes corrections venue-operations EMP-050, EMP-027).",
+    "source": "F69 step 3 | screens/P06-staff-app.yaml#EMP-050 | contracts/satellite/maintenance.yaml#recordAuthorityNotification"
    }
   ],
   "_platform": {
@@ -885,7 +757,7 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-045 holds none of them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-045 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
@@ -982,7 +854,7 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-046 holds none of them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-046 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
@@ -1107,7 +979,7 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-049 holds none of them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-049 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
@@ -1300,6 +1172,13 @@
      ]
     },
     "provenance": "contract access.yaml POST /access/scans"
+   }
+  ],
+  "gaps": [
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-004): No operation hands an unsynced scan journal from one device to another or to the edge node.",
+    "source": "F71 step 3 | screens/P06-staff-app.yaml#EMP-049"
    }
   ],
   "_platform": {

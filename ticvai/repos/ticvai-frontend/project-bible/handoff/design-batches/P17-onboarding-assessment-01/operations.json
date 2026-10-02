@@ -12,55 +12,6 @@
   "requestBody": null,
   "responds": "ModuleListing"
  },
- "listSaleChannel": {
-  "method": "GET",
-  "path": "/sale-channel",
-  "contract": "catalogue",
-  "summary": "Sales Channel Command Center",
-  "permission": "PRODUCT_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "channelType",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "status",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "venue",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "brand",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "search",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- },
  "scoreVsiAssessment": {
   "method": "POST",
   "path": "/vsi-assessments",
@@ -80,6 +31,25 @@
   "requestBody": "VsiAssessment",
   "responds": "VsiResult"
  },
+ "startProspectSignup": {
+  "method": "POST",
+  "path": "/auth/prospect/signup",
+  "contract": "identity",
+  "summary": "Start (or resume) a TICVAI sign-up with an email and a one-time code",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "platform",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "StartProspectSignupRequest",
+  "responds": "ProspectSignupChallenge"
+ },
  "submitOnboardingApplication": {
   "method": "POST",
   "path": "/onboarding-applications",
@@ -98,5 +68,24 @@
   ],
   "requestBody": "OnboardingApplication",
   "responds": "OnboardingApplication"
+ },
+ "verifyProspectSignupCode": {
+  "method": "POST",
+  "path": "/auth/prospect/signup/{challengeId}/verify",
+  "contract": "identity",
+  "summary": "Prove the email with the one-time code and receive the prospect sign-up session",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "platform",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "VerifyProspectSignupCodeRequest",
+  "responds": "ProspectSignupSession"
  }
 }

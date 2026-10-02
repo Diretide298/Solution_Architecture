@@ -129,7 +129,7 @@
   "states": {
    "loading": "The recommended package overview list.",
    "error": "Could not load. Names which read failed and leaves the recommended package overview untouched.",
-   "emptyFirstRun": "No recommended package overview yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No recommended package overview yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the recommended package overview are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -148,6 +148,7 @@
    "workshopBoard": "wireframes/WS156 Subscription Licensing AI Self Service Board 4.dc.html#adm-399"
   },
   "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 44. 0 of 0 labels bound to a contract property; 0 of 27 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "notes": "**Kept as TICVAI's operator-led view of the prospect journey (2 October 2026, CHG-SBO-015; BL-165):** ADM-399 to ADM-417 and SGN-011 to SGN-024 are one journey with two doors. A TICVAI sales operator runs it with or for a prospect on the Console; a prospect runs it alone on the sign-up (P17). The copies stay identical (`source.sameAs`), so the operator sees exactly what the prospect sees.",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -254,7 +255,7 @@
   "states": {
    "loading": "The commercial model tier list.",
    "error": "Could not load. Names which read failed and leaves the commercial model tier untouched.",
-   "emptyFirstRun": "No commercial model tier yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No commercial model tier yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the commercial model tier are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -405,7 +406,7 @@
   "states": {
    "loading": "The module marketplace list.",
    "error": "Could not load. Names which read failed and leaves the module marketplace untouched.",
-   "emptyFirstRun": "No module marketplace yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No module marketplace yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the module marketplace are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -555,7 +556,7 @@
   "states": {
    "loading": "The module package recommendations list.",
    "error": "Could not load. Names which read failed and leaves the module package recommendations untouched.",
-   "emptyFirstRun": "No module package recommendations yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No module package recommendations yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the module package recommendations are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -677,7 +678,7 @@
   "states": {
    "loading": "The module detail commercial list.",
    "error": "Could not load. Names which read failed and leaves the module detail commercial untouched.",
-   "emptyFirstRun": "No module detail commercial yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No module detail commercial yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the module detail commercial are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -773,6 +774,12 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Subscription_Licensing_AI_Self_Service.pdf, page 49"
+   },
+   {
+    "operation": "setModuleListing",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-021): setModuleListing edits TICVAI's module catalogue and was offered to a prospect; ADM-404 keeps it (design-notes correction platform-foundation SGN-016).",
+    "source": "contracts/satellite/subscription.yaml#setModuleListing"
    }
   ],
   "layout": {
@@ -782,24 +789,10 @@
      "name": "contentBody",
      "components": [
       {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "setModuleListing",
-       "label": "Save module listing",
-       "notes": "The act the screen exists for."
-      },
-      {
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listModuleCatalogue",
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "setModuleListing"
       }
      ]
     }
@@ -808,21 +801,11 @@
   "states": {
    "loading": "The module dependency compatibility list.",
    "error": "Could not load. Names which read failed and leaves the module dependency compatibility untouched.",
-   "emptyFirstRun": "No module dependency compatibility yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No module dependency compatibility yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the module dependency compatibility are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
-   {
-    "operationId": "setModuleListing",
-    "contract": "subscription",
-    "purpose": "Dependencies and compatibility",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026",
-    "invalidates": [
-     "listModuleCatalogue"
-    ]
-   },
    {
     "operationId": "listModuleCatalogue",
     "contract": "subscription",
@@ -1088,7 +1071,7 @@
   "states": {
    "loading": "The commercial package simulator list.",
    "error": "Could not load. Names which read failed and leaves the commercial package simulator untouched.",
-   "emptyFirstRun": "No commercial package simulator yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No commercial package simulator yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the commercial package simulator are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -1236,7 +1219,7 @@
   "states": {
    "loading": "The package review commercial list.",
    "error": "Could not load. Names which read failed and leaves the package review commercial untouched.",
-   "emptyFirstRun": "No package review commercial yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No package review commercial yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the package review commercial are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -1342,6 +1325,17 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Subscription_Licensing_AI_Self_Service.pdf, page 54"
+   },
+   {
+    "operation": "createPartnerQuote",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-021): The only operation was createPartnerQuote (partner audience, PARTNER_MANAGE), a tenant's B2B quote; final package approval is a TICVAI commercial act (design-notes correction platform-foundation ADM-408). See the CHG-WIR-024 gap.",
+    "source": "contracts/satellite/subscription.yaml#createPartnerQuote"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-024): No operation approves a prospect's commercial package and hands it to purchase and contract activation.",
+    "source": "screens/P09-platform-admin-console.yaml#ADM-408"
    }
   ],
   "layout": {
@@ -1350,44 +1344,22 @@
     {
      "name": "actionBar",
      "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Board 4 — Required Package Data Model",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 54 §Actions"
-      }
-     ]
+     "components": []
     },
     {
      "name": "contentBody",
-     "components": [
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "createPartnerQuote"
-      }
-     ]
+     "components": []
     }
    ]
   },
   "states": {
    "loading": "The final package approval list.",
    "error": "Could not load. Names which read failed and leaves the final package approval untouched.",
-   "emptyFirstRun": "No final package approval yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No final package approval yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the final package approval are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Not shown: nothing on this screen needs a permission of its own; the app's sign-in decides access."
   },
-  "apis": [
-   {
-    "operationId": "createPartnerQuote",
-    "contract": "subscription",
-    "purpose": "Confirm the package",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026"
-   }
-  ],
+  "apis": [],
   "wireframe": {
    "status": "notStarted",
    "board": "wireframes/P09 TICVAI Web.dc.html#adm-408",

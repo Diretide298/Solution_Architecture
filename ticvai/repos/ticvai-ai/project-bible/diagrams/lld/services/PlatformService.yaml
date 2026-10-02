@@ -1,10 +1,10 @@
 id: LLD-PlatformService
-title: PlatformService — 216 operations, 104 tables
+title: PlatformService — 221 operations, 108 tables
 generatedBy: tools/derive-diagrams.py
 tier: platform
 deployable: operations
 index: diagrams/hld/02-services.yaml
-why: '**Three contracts, two schemas, 104 tables.** Subscription, platform operations and the public
+why: '**Three contracts, two schemas, 108 tables.** Subscription, platform operations and the public
   API all write `control.*` — **they are one bounded context that was split into three contracts for
   API-surface reasons, not for data reasons.**
 
@@ -14,14 +14,14 @@ why: '**Three contracts, two schemas, 104 tables.** Subscription, platform opera
 scale: Low volume, high consequence. Tenant provisioning and licensing.
 ifDown: Down blocks provisioning and the developer API. **Trading is unaffected.**
 coverage:
-  operations: 216
-  inAFlow: 91
-  percent: 42%
+  operations: 221
+  inAFlow: 80
+  percent: 36%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
 - schema: control
-  tables: 81
+  tables: 85
   stores:
   - postgres
   largestTable: control.partner_agreement
@@ -32,7 +32,7 @@ schemas:
   largestTable: subscription.membership_product
 operationsByContract:
 - contract: subscription
-  count: 148
+  count: 150
   operations:
   - operation: actOnPartnerApplicationReview
     verb: POST
@@ -258,6 +258,14 @@ operationsByContract:
     offline: false
     reads: 9
     writes: 3
+  - operation: getBillingEntity
+    verb: GET
+    path: /tenants/{tenantId}/billing-entity
+    scope: tenant
+    permission: PLATFORM_BILLING_VIEW
+    offline: false
+    reads: 1
+    writes: 0
   - operation: getBillingReconciliation
     verb: GET
     path: /billing-reconciliation
@@ -930,6 +938,14 @@ operationsByContract:
     offline: false
     reads: 6
     writes: 4
+  - operation: setBillingEntity
+    verb: PUT
+    path: /tenants/{tenantId}/billing-entity
+    scope: tenant
+    permission: PLATFORM_BILLING_MANAGE
+    offline: false
+    reads: 1
+    writes: 1
   - operation: setChannelListing
     verb: PUT
     path: /channel-listings
@@ -1176,8 +1192,8 @@ operationsByContract:
     scope: tenant
     permission: TENANT_VIEW
     offline: false
-    reads: 4
-    writes: 2
+    reads: 5
+    writes: 3
   - operation: suspendTenant
     verb: POST
     path: /tenants/{tenantId}/suspend
@@ -1219,8 +1235,16 @@ operationsByContract:
     reads: 2
     writes: 2
 - contract: platform-ops
-  count: 37
+  count: 40
   operations:
+  - operation: applyConfigPackage
+    verb: POST
+    path: /config-packages/{packageId}/apply
+    scope: tenant
+    permission: PLATFORM_MIGRATION_APPLY
+    offline: false
+    reads: 1
+    writes: 0
   - operation: applyMigration
     verb: POST
     path: /migrations/apply
@@ -1245,6 +1269,22 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 3
+  - operation: diffConfigPackage
+    verb: POST
+    path: /config-packages/{packageId}/diff
+    scope: tenant
+    permission: PLATFORM_RELEASE_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: exportConfigPackage
+    verb: POST
+    path: /config-packages
+    scope: tenant
+    permission: PLATFORM_RELEASE_MANAGE
+    offline: false
+    reads: 1
+    writes: 0
   - operation: getMigrationRun
     verb: GET
     path: /migrations/runs/{runId}
@@ -2055,6 +2095,13 @@ tables:
   parent: null
   writtenBy: []
   foreignWriters: null
+- table: control.billing_entity
+  columns: 11
+  store: postgres
+  parent: null
+  writtenBy:
+  - subscription
+  foreignWriters: null
 - table: control.burst_environment
   columns: 19
   store: postgres
@@ -2102,6 +2149,24 @@ tables:
   parent: null
   writtenBy:
   - subscription
+  foreignWriters: null
+- table: control.config_package
+  columns: 8
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
+- table: control.config_package_application
+  columns: 6
+  store: postgres
+  parent: control.config_package
+  writtenBy: []
+  foreignWriters: null
+- table: control.config_package_diff
+  columns: 5
+  store: postgres
+  parent: control.config_package
+  writtenBy: []
   foreignWriters: null
 - table: control.content_block
   columns: 12
@@ -2216,7 +2281,7 @@ tables:
   writtenBy: []
   foreignWriters: null
 - table: control.onboarding_application
-  columns: 11
+  columns: 12
   store: postgres
   parent: null
   writtenBy:
@@ -2501,7 +2566,7 @@ tables:
   - subscription
   foreignWriters: null
 - table: control.tenant_domain
-  columns: 9
+  columns: 12
   store: postgres
   parent: control.tenant
   writtenBy:
@@ -2859,6 +2924,9 @@ writesOutside:
     - orders.payment
     - orders.sales_order
 screens:
+- P08:ADM-351 Approval API Management
+- P08:ADM-352 Workflow Event Framework
+- P08:ADM-356 Integration Security & Access Control
 - P08:BO-013 Channel & Distribution
 - P08:BO-067 Integrations
 - P08:BO-1071 Integration Command Center
@@ -2872,7 +2940,6 @@ screens:
 - P08:BO-1176 Wallet Events, Webhooks & Notification Orchestration
 - P08:BO-1177 API Security, Access & Integration Permissions
 - P08:BO-1179 Integration Monitoring & Exception Workbench
-- P08:BO-126 Deployment, Preview & Audit
 - P08:BO-284 Membership & Annual Pass Command Center
 - P08:BO-285 Membership Product & Tier Builder
 - P08:BO-286 Membership Eligibility & Qualification Rule Builder
@@ -2893,12 +2960,9 @@ screens:
 - P08:BO-301 Member Exceptions, Overrides & Service Recovery
 - P08:BO-302 Member Lifecycle History, Audit & Case Timeline
 - P08:BO-303 Membership Analytics, Renewal Intelligence & AI Retention Center
-- P08:BO-483 Integration Certification & Test Console
-- P08:BO-503 Product Validation, Approval & Publication
 - P08:BO-594 Environment Ready & Handoff to AI Setup
 - P08:BO-595 AI Setup Command Center
 - P08:BO-596 Guided Setup Plan
-- P08:BO-601 Product, Pricing & Sales Channel Setup
 - P08:BO-603 Configuration Health & AI Review
 - P08:BO-604 Setup Completion & Handoff to Go-Live
 - P08:BO-605 Go-Live Readiness Command Center
@@ -2914,8 +2978,17 @@ screens:
 - P08:BO-691 Accreditation API Management
 - P08:BO-692 Accreditation Webhook Management
 - P08:BO-949 Approval, Exception & Override Control Center
+- P08:PTR-026 Territory, Market & Distribution Rights
+- P08:PTR-029 Partner Access, Roles & Permission Profile
+- P08:PTR-035 Commission, Margin & Incentive Management
+- P08:PTR-036 Credit Limit & Exposure Management
+- P08:PTR-037 Deposit, Guarantee & Financial Security Management
+- P08:PTR-039 Commercial Allocation, Quota & Commitment Management
+- P08:PTR-047 Partner Reconciliation & Exception Management
+- P08:PTR-048 Commission Calculation & Settlement Management
 - P09:ADM-002 Platform Dashboard
 - P09:ADM-003 Cross-Tenant Health Dashboard
+- P09:ADM-004 Platform Audit Log
 - P09:ADM-005 Tenant Directory
 - P09:ADM-006 Tenant Hierarchy Explorer
 - P09:ADM-007 Module & Feature Entitlement
@@ -2929,8 +3002,10 @@ screens:
 - P09:ADM-015 API Rate Limit & Quota Management
 - P09:ADM-016 White-Label Branding Management
 - P09:ADM-017 Domain & Certificate Management
-- P09:ADM-018 Localisation & Language Pack
+- P09:ADM-018 Interface Languages
 - P09:ADM-019 Global Configuration & Defaults
+- P09:ADM-020 Platform User Directory
+- P09:ADM-021 Platform Role Management
 - P09:ADM-022 Release & Version Management
 - P09:ADM-023 Staging Promotion & Approval
 - P09:ADM-024 Release Notification Composer
@@ -2947,22 +3022,16 @@ screens:
 - P09:ADM-035 Support & Escalation Console
 - P09:ADM-036 Platform Notification Broadcast
 - P09:ADM-037 AI Provider & Credentials
-- P09:ADM-048 Commercial Pricing Command Center
+- P09:ADM-068 Tax, Fee & Calculation Command Center
 - P09:ADM-318 Dead Letters
-- P09:ADM-352 Workflow Event Framework
-- P09:ADM-353 Webhook Configuration & Subscription Manager
-- P09:ADM-354 External Workflow System Integration
 - P09:ADM-369 Commercial Command Center
 - P09:ADM-370 Customer Subscription & Commercial Portfolio
 - P09:ADM-371 Customer Commercial 360°
 - P09:ADM-372 Operational Profile, VSI & Commercial Model Intelligence
 - P09:ADM-373 Revenue & Commercial Model Analytics
 - P09:ADM-374 Trial & Conversion Monitor
-- P09:ADM-375 Renewal & Retention Center
-- P09:ADM-376 Commercial Optimization & Expansion Opportunities
 - P09:ADM-377 Subscription Exceptions & Commercial Alerts
 - P09:ADM-378 Executive AI Commercial Intelligence
-- P09:ADM-379 Welcome & Start Your TICVAI Journey
 - P09:ADM-380 Customer & Organization Registration
 - P09:ADM-381 Venue Type & Business Profile
 - P09:ADM-382 Visitor, Capacity & Operational Scale
@@ -2991,9 +3060,8 @@ screens:
 - P09:ADM-405 Add-Ons, Capacity & Commercial Options
 - P09:ADM-406 Commercial Package Simulator
 - P09:ADM-407 Package Review & Commercial Summary
-- P09:ADM-408 Final Package Approval & Handoff
-- P09:ADM-409 Purchase / Trial Journey Selection
 - P09:ADM-410 Contract & Billing Cycle Selection
+- P09:ADM-411 Billing & Legal Entity Information
 - P09:ADM-412 Payment Method & Settlement Setup
 - P09:ADM-413 Trial Configuration & Conversion Rules
 - P09:ADM-414 Order & Commercial Pricing Review
@@ -3002,10 +3070,12 @@ screens:
 - P09:ADM-417 Subscription Confirmation & Commercial Activation
 - P09:ADM-418 Subscription Lifecycle & Trial-to-Paid Handoff
 - P09:ADM-419 Provisioning Command Center
+- P09:ADM-420 Tenant & Organization Provisioning
 - P09:ADM-421 Venue & Operational Structure Creation
 - P09:ADM-422 Administrator & Security Initialization
 - P09:ADM-423 License & Entitlement Activation
 - P09:ADM-424 Module Activation & Dependency Validation
+- P09:ADM-425 Venue Template Application
 - P09:ADM-426 Initial Configuration & Regional Defaults
 - P09:ADM-427 Provisioning Validation & Exception Management
 - P09:ADM-449 Usage & License Command Center
@@ -3023,12 +3093,102 @@ screens:
 - P09:ADM-461 Consumption Reconciliation & Billing Approval
 - P09:ADM-462 Invoice & Payment Management
 - P09:ADM-463 Subscription & Commercial Change Management
-- P09:ADM-464 Renewal Management Center
 - P09:ADM-465 AI Upgrade, Downgrade & Commercial Right-Sizing
 - P09:ADM-466 Commercial Scenario Simulator
 - P09:ADM-467 Discount, Credit & Commercial Override Management
 - P09:ADM-468 Renewal Approval, Activation & Commercial Handoff
-- P10:PTR-001 Partner Login / MFA
+- P09:ADM-469 AI Configuration Home & Start
+- P09:ADM-470 Setup Type & Business Intent Discovery
+- P09:ADM-471 Venue & Business Model Discovery
+- P09:ADM-472 Guided Question & Answer Workspace
+- P09:ADM-473 Product & Admission Model Discovery
+- P09:ADM-474 Operational Requirement Discovery
+- P09:ADM-475 Commercial Requirement Discovery
+- P09:ADM-476 Required, Recommended & Optional Decisions
+- P09:ADM-477 Missing Information & Clarification Center
+- P09:ADM-478 Configuration Blueprint & Dependency Map
+- P09:ADM-479 AI Configuration Build Command Center
+- P09:ADM-480 Venue & Organization Configuration
+- P09:ADM-481 Product Configuration Assistant
+- P09:ADM-482 Schedule, Capacity & Availability Configuration
+- P09:ADM-483 Pricing & Commercial Configuration
+- P09:ADM-484 Promotion, Bundle & Upsell Configuration
+- P09:ADM-485 Seating, Access & Operational Configuration
+- P09:ADM-486 Channel, Media & Fulfillment Configuration
+- P09:ADM-487 Cross-Module Conflict & Dependency Validation
+- P09:ADM-488 Configuration Preview & Impact Analysis
+- P09:ADM-489 AI Configuration Readiness Center
+- P09:ADM-490 Configuration Validation Results
+- P09:ADM-491 AI Recommendations & Best-Practice Review
+- P09:ADM-492 Configuration Approval Workflow
+- P09:ADM-493 AI Configuration Execution Center
+- P09:ADM-494 Execution Progress & Dependency Monitor
+- P09:ADM-495 Configuration Results & Object Mapping
+- P09:ADM-496 Configuration Change & Modification Assistant
+- P09:ADM-497 Configuration History, Versions & Rollback
+- P09:ADM-498 AI Configuration Audit & Governance
+- P09:ADM-499 Forecasting Command Center
+- P09:ADM-500 Forecast Configuration & Forecasting Strategy
+- P09:ADM-501 Forecast Data & Signal Configuration
+- P09:ADM-502 Attendance & Visitation Forecast
+- P09:ADM-503 Ticket, Product & Timeslot Demand Forecast
+- P09:ADM-504 Channel & Booking Pace Forecast
+- P09:ADM-505 Revenue & Commercial Forecast
+- P09:ADM-506 Forecast Drivers, Confidence & Explainability
+- P09:ADM-507 Forecast Scenario & What-If Simulator
+- P09:ADM-508 Forecast Accuracy, Review & Publication Center
+- P09:ADM-509 Operational Forecasting Command Center
+- P09:ADM-510 Capacity & Occupancy Forecast
+- P09:ADM-511 Attraction Utilization & Queue Forecast
+- P09:ADM-512 Entry, Access & Guest Flow Forecast
+- P09:ADM-513 Workforce Demand & Staffing Forecast
+- P09:ADM-514 POS, Kiosk & Frontline Service Forecast
+- P09:ADM-515 F&B, Retail & Inventory Demand Forecast
+- P09:ADM-516 Resource, Equipment & Facility Requirement Forecast
+- P09:ADM-517 Operational Scenario & Readiness Simulator
+- P09:ADM-518 Operational Forecast Review, Recommendations & Handover
+- P09:ADM-519 AI Governance Command Center
+- P09:ADM-520 AI Capability Registry & Ownership
+- P09:ADM-521 AI Risk Classification & Assessment
+- P09:ADM-522 AI Autonomy Level Configuration
+- P09:ADM-523 AI Action & Permission Policy Builder
+- P09:ADM-524 AI Data Access & Usage Policy
+- P09:ADM-525 Environment, Tenant & Scope Governance
+- P09:ADM-526 AI Policy Conflict, Exception & Override Management
+- P09:ADM-527 AI Policy Testing & Governance Simulation
+- P09:ADM-528 AI Governance Policy Publication & Effective Policy Map
+- P09:ADM-529 AI Human Oversight Command Center
+- P09:ADM-530 AI Approval Requirement & Routing Configuration
+- P09:ADM-531 AI Approval Review Workspace
+- P09:ADM-532 Conditional Approval & Approval Conditions
+- P09:ADM-533 Human Review, Challenge & AI Clarification Workspace
+- P09:ADM-534 Escalation, Delegation & Approval SLA Management
+- P09:ADM-535 Live AI Execution Oversight & Human Intervention
+- P09:ADM-536 Human Override & Manual Control Center
+- P09:ADM-537 Approval & Intervention History / Decision Timeline
+- P09:ADM-538 Human Oversight Workflow Simulator & Readiness Center
+- P09:ADM-539 AI Explainability & Audit Command Center
+- P09:ADM-540 AI Decision Explorer & Search
+- P09:ADM-541 AI Decision Explanation Workspace
+- P09:ADM-542 Data, Feature & Evidence Provenance
+- P09:ADM-543 Candidate, Rule & Decision Path Trace
+- P09:ADM-544 Model, Provider & AI Runtime Trace
+- P09:ADM-545 Governance, Approval & Human Decision Trace
+- P09:ADM-546 Execution & Business Outcome Trace
+- P09:ADM-547 AI Audit Record & Evidence Package
+- P09:ADM-548 AI Trace Investigation & Replay Simulator
+- P09:ADM-549 AI Governance Monitoring Command Center
+- P09:ADM-550 AI Risk Register & Risk Exposure Management
+- P09:ADM-551 AI Governance Control Library & Control Effectiveness
+- P09:ADM-552 AI Policy Compliance & Violation Monitoring
+- P09:ADM-553 AI Data, Privacy & Usage Compliance Monitoring
+- P09:ADM-554 AI Quality, Behavior & Governance Drift Monitoring
+- P09:ADM-555 AI Governance Alert & Detection Center
+- P09:ADM-556 AI Incident & Remediation Management
+- P09:ADM-557 AI Compliance, Assurance & Governance Reporting
+- P09:ADM-558 AI Governance Review, Action Plan & Continuous Improvement
+- P09:ADM-619 Reconciliation & Settlement Command Center
+- P09:ADM-700 Configuration Promotion
 - P10:PTR-011 Quote Management
 - P10:PTR-017 Commission Statement
 - P10:PTR-019 API Credentials & Integration
@@ -3036,20 +3196,14 @@ screens:
 - P10:PTR-023 Partner Profile & Organization Setup
 - P10:PTR-024 Partner Onboarding & Application Workflow
 - P10:PTR-025 Partner Contacts & User Administration
-- P10:PTR-026 Territory, Market & Distribution Rights
 - P10:PTR-027 Partner Brand, Venue & Business Scope Assignment
 - P10:PTR-028 Partner Documentation & Compliance Repository
-- P10:PTR-029 Partner Access, Roles & Permission Profile
 - P10:PTR-030 Partner Approval, Status & Lifecycle Management
 - P10:PTR-031 Partner 360° Profile, Readiness & AI Review
 - P10:PTR-032 Commercial Agreement Command Center
 - P10:PTR-033 Agreement & Contract Terms Builder
 - P10:PTR-034 Partner Rate & Net Pricing Configuration
-- P10:PTR-035 Commission, Margin & Incentive Management
-- P10:PTR-036 Credit Limit & Exposure Management
-- P10:PTR-037 Deposit, Guarantee & Financial Security Management
 - P10:PTR-038 Payment Terms, Billing & Account Configuration
-- P10:PTR-039 Commercial Allocation, Quota & Commitment Management
 - P10:PTR-040 Booking Limits, Commercial Exceptions & Approval
 - P10:PTR-041 Commercial Agreement 360°, Health & AI Review
 - P10:PTR-042 Partner Operations Command Center
@@ -3057,8 +3211,6 @@ screens:
 - P10:PTR-044 Reservations, Holds & Release Management
 - P10:PTR-045 Partner Cancellations, Refunds & Amendments
 - P10:PTR-046 Partner Statement & Account Activity
-- P10:PTR-047 Partner Reconciliation & Exception Management
-- P10:PTR-048 Commission Calculation & Settlement Management
 - P10:PTR-049 Partner Disputes, Cases & Service Management
 - P10:PTR-050 Partner Performance Scorecard & Risk Monitoring
 - P10:PTR-051 Partner AI Intelligence & Relationship Optimization
@@ -3070,7 +3222,6 @@ screens:
 - P14:DEV-006 Usage & Limits
 - P14:DEV-007 Marketplace Listing
 - P14:DEV-008 Programme Administration
-- P17:SGN-001 Welcome & Start Your TICVAI Journey
 - P17:SGN-002 Customer & Organization Registration
 - P17:SGN-003 Venue Type & Business Profile
 - P17:SGN-004 Visitor, Capacity & Operational Scale
@@ -3087,8 +3238,8 @@ screens:
 - P17:SGN-015 Module Detail & Commercial Treatment
 - P17:SGN-016 Module Dependency & Compatibility Manager
 - P17:SGN-017 Add-Ons, Capacity & Commercial Options
-- P17:SGN-018 Purchase / Trial Journey Selection
 - P17:SGN-019 Contract & Billing Cycle Selection
+- P17:SGN-020 Billing & Legal Entity Information
 - P17:SGN-022 Order & Commercial Pricing Review
 - P17:SGN-023 Commercial Agreement, Billable Definition & Customer Acceptance
 - P17:SGN-024 Subscription Confirmation & Commercial Activation
@@ -3105,6 +3256,5 @@ flows:
 - F27 A developer integrates
 - F36 A developer goes from sandbox to production
 - F77 A promotion is built, bundled, published and measured
-- F79 A workstation is registered, configured and rolled out
 - F96 A tenant is provisioned, licensed and its modules enabled
 - F97 A cell is capacity-checked and a tenant is placed on it

@@ -94,6 +94,32 @@
   "requestBody": null,
   "responds": "GoLiveReadiness"
  },
+ "getModuleEnablement": {
+  "method": "GET",
+  "path": "/tenant-config/modules",
+  "contract": "white-label",
+  "summary": "Read module enablement",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ModuleEnablement"
+ },
+ "getRegionSettings": {
+  "method": "GET",
+  "path": "/regions/{regionId}/settings",
+  "contract": "tenancy",
+  "summary": "Read region settings",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "region",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "RegionSettings"
+ },
  "getTenantLicences": {
   "method": "GET",
   "path": "/tenants/{tenantId}/licences",
@@ -107,6 +133,43 @@
   "requestBody": null,
   "responds": "LicencePosition"
  },
+ "getVenueSettingsDefaults": {
+  "method": "GET",
+  "path": "/venue-settings-defaults",
+  "contract": "tenancy",
+  "summary": "The tenant's default for every venue setting",
+  "permission": "TENANT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "VenueSettings"
+ },
+ "listCellJobs": {
+  "method": "GET",
+  "path": "/cells/{cellId}/jobs",
+  "contract": "subscription",
+  "summary": "Provisioning, migration and maintenance jobs",
+  "permission": "PLATFORM_CELL_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "listModuleCatalogue": {
   "method": "GET",
   "path": "/module-catalogue",
@@ -119,6 +182,35 @@
   "parameters": [],
   "requestBody": null,
   "responds": "ModuleListing"
+ },
+ "listOwnPlatformStaffGrants": {
+  "method": "GET",
+  "path": "/platform-staff-grants/mine",
+  "contract": "identity",
+  "summary": "The calling platform operator's own grants into this tenant",
+  "permission": "PLATFORM_TENANT_ACCESS",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "activeOnly",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
  },
  "listTenants": {
   "method": "GET",
@@ -205,6 +297,25 @@
   "requestBody": null,
   "responds": null
  },
+ "setModuleEnablement": {
+  "method": "PUT",
+  "path": "/tenant-config/modules",
+  "contract": "white-label",
+  "summary": "Enable or disable modules",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ModuleEnablement"
+ },
  "setPasswordPolicy": {
   "method": "PUT",
   "path": "/password-policy",
@@ -223,6 +334,25 @@
   ],
   "requestBody": "PasswordPolicy",
   "responds": "PasswordPolicy"
+ },
+ "setVenueSettingsDefaults": {
+  "method": "PUT",
+  "path": "/venue-settings-defaults",
+  "contract": "tenancy",
+  "summary": "Set the tenant's default for every venue setting",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "VenueSettings",
+  "responds": "VenueSettings"
  },
  "updateRegionSettings": {
   "method": "PUT",

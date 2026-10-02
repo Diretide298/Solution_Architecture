@@ -1,253 +1,4 @@
 {
- "AccessAccreditationCredential": {
-  "type": "object",
-  "x-ticvai-persistence": "access.accreditation_credential",
-  "x-ticvai-agreed": "29 September: build pass (group OWN, from group RA's handoff; BL-181); the events accreditation.credentialIssued and accreditation.holderStatusChanged name access as their critical consumer",
-  "description": "**What a gate needs to admit an accredited person, kept by `access`** (29 September, build). Written only by the consumers of `accreditation.credentialIssued` (a row per credential; a replacement sets the replaced row's `admits` false) and `accreditation.holderStatusChanged` (every credential of the holder: `admits` false unless the holder is `active`, validity taken from the event). Read by `validateAccess` and shipped in the offline package. The record of truth stays in `accreditation`; this is a copy shaped for the gate, never edited by a person.",
-  "required": [
-   "id",
-   "holderId",
-   "encodedIdentifier",
-   "admits",
-   "scopePath"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid",
-    "description": "The accreditation credential's id (`credentialId` on the events)."
-   },
-   "holderId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "programmeId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "kind": {
-    "type": "string",
-    "description": "printedBadge, mobileCredential, qr, nfcCard, rfidCard or wristband, as issued."
-   },
-   "encodedIdentifier": {
-    "type": "string",
-    "x-ticvai-unique": "tenant",
-    "description": "What the gate reads from the credential. Never sent to webhook subscribers."
-   },
-   "validFrom": {
-    "type": "string",
-    "format": "date",
-    "nullable": true
-   },
-   "validTo": {
-    "type": "string",
-    "format": "date",
-    "nullable": true
-   },
-   "zoneIds": {
-    "type": "array",
-    "description": "The holder's effective zones, from the event (`effectiveZones`).",
-    "items": {
-     "type": "string",
-     "format": "uuid"
-    }
-   },
-   "holderStatus": {
-    "type": "string",
-    "enum": [
-     "active",
-     "suspended",
-     "revoked",
-     "expired",
-     "archived"
-    ],
-    "description": "The holder's status as last published; only `active` admits."
-   },
-   "admits": {
-    "type": "boolean",
-    "description": "False once the credential is replaced or the holder is not active."
-   },
-   "sourceChangedAt": {
-    "type": "string",
-    "format": "date-time",
-    "description": "The `issuedAt` or `changedAt` of the event last applied; an older event arriving late is ignored."
-   },
-   "scopePath": {
-    "type": "string",
-    "description": "**The partition key** (ADR-0005), the accreditation programme's scope."
-   }
-  }
- },
- "AccessDynamicPolicy": {
-  "type": "object",
-  "x-ticvai-persistence": "access.dynamic_policy",
-  "description": "One guest-admission dynamic (attribute-based) policy with its current content - type, context or identity it tests, condition expression, result, priority, zones, validity, status and current version. Not identity.authorisation_policy, which is staff permission (declared 29 September, data-model close-out DM1).\n\n**Guest admission lives here and nowhere else** (ADR-0068, accepted 1 October). `validateAccess` online and the gate offline evaluate the same active version: `getOfflinePackage` carries it, and every `scan_event` records the policy and version that decided it (`dynamicPolicyId`, `dynamicPolicyVersion`) and the set it was decided under (`policySetVersion`). The condition is `conditionRule`, a closed JSON format (`AdmissionRule`), not free text. Identity's staff-permission engine was renamed `AuthorisationPolicy` on the same day, so \"access policy\" means this.\n\n**Which of the two policy engines this is** (stated 29 September, build pass). **This one governs who may pass which gate**: admission of a guest, pass holder, accreditation holder or employee at an access point, decided in validation with results a gate acts on (allow, deny, review, requireId, requireBiometric, requireCompanion, requireSupervisor). **identity `AuthorisationPolicy` governs who may do what in the software**: a principal's permissions on operations and screens, decided by identity `evaluateAccess`. An employee's badge opening a staff door is decided here; the same employee approving a refund is decided in identity. Effectiveness is reported per engine: `listDynamicPolicyEffectiveness` here, `listAuthorisationPolicyEffectiveness` in identity.",
-  "required": [
-   "id",
-   "scopePath",
-   "name",
-   "policyType",
-   "conditionRule",
-   "result",
-   "status",
-   "currentVersion"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid",
-    "description": "The policyId"
-   },
-   "venueId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "scopePath": {
-    "type": "string",
-    "description": "ltree of the owning scope node; where it applies further is access.policy_scope_assignment"
-   },
-   "name": {
-    "type": "string",
-    "maxLength": 200
-   },
-   "policyType": {
-    "type": "string",
-    "enum": [
-     "guestAttribute",
-     "accreditation",
-     "occupancy",
-     "employee",
-     "risk",
-     "membership",
-     "timeEvent"
-    ]
-   },
-   "contextType": {
-    "type": "string",
-    "enum": [
-     "date",
-     "day",
-     "time",
-     "season",
-     "event",
-     "performance",
-     "specialEvent",
-     "holiday",
-     "operatingCalendar",
-     "occupancy",
-     "attractionStatus"
-    ],
-    "nullable": true,
-    "description": "Context/time/event policies (setContextTimeEvent)"
-   },
-   "identityType": {
-    "type": "string",
-    "enum": [
-     "guest",
-     "member",
-     "annualPassHolder",
-     "employee",
-     "contractor",
-     "vendor",
-     "performer",
-     "media",
-     "vip",
-     "security",
-     "emergencyServices",
-     "eventStaff"
-    ],
-    "nullable": true,
-    "description": "Identity-based policies (listIdentityMembershipAccreditation)"
-   },
-   "conditionRule": {
-    "$ref": "#/components/schemas/AdmissionRule",
-    "description": "The condition, in the closed JSON rule format evaluated the same way online and at the gate (ADR-0068; replaces the free-text `conditionExpression`)."
-   },
-   "result": {
-    "type": "string",
-    "enum": [
-     "allow",
-     "deny",
-     "review",
-     "requireId",
-     "requireBiometric",
-     "requireCompanion",
-     "requireSupervisor"
-    ]
-   },
-   "priority": {
-    "type": "integer",
-    "nullable": true
-   },
-   "allowedZoneIds": {
-    "type": "array",
-    "items": {
-     "type": "string",
-     "format": "uuid"
-    }
-   },
-   "deniedZoneIds": {
-    "type": "array",
-    "items": {
-     "type": "string",
-     "format": "uuid"
-    }
-   },
-   "monitorThresholdPercent": {
-    "type": "integer",
-    "minimum": 0,
-    "maximum": 100,
-    "nullable": true,
-    "description": "Occupancy policies. Percent at which the band becomes Monitor"
-   },
-   "restrictThresholdPercent": {
-    "type": "integer",
-    "minimum": 0,
-    "maximum": 100,
-    "nullable": true,
-    "description": "Occupancy policies. Percent at which the band becomes Restrict"
-   },
-   "validFrom": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "validTo": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true,
-    "description": "The grant expires automatically at validTo"
-   },
-   "status": {
-    "type": "string",
-    "enum": [
-     "draft",
-     "pendingApproval",
-     "active",
-     "inactive",
-     "expired"
-    ],
-    "default": "draft"
-   },
-   "currentVersion": {
-    "type": "integer",
-    "minimum": 1,
-    "description": "The version in force (access.dynamic_policy_version)"
-   },
-   "createdAt": {
-    "type": "string",
-    "format": "date-time",
-    "readOnly": true
-   },
-   "updatedAt": {
-    "type": "string",
-    "format": "date-time",
-    "readOnly": true
-   }
-  }
- },
  "Asset": {
   "x-ticvai-persistence": "maintenance.asset",
   "allOf": [
@@ -790,165 +541,6 @@
    }
   }
  },
- "CreateQueueRequest": {
-  "x-ticvai-persistence": "none — request only",
-  "type": "object",
-  "required": [
-   "code",
-   "name",
-   "venueId",
-   "capacityPerCycle",
-   "cycleMinutes"
-  ],
-  "properties": {
-   "code": {
-    "type": "string",
-    "maxLength": 64
-   },
-   "name": {
-    "$ref": "#/components/schemas/LocalisedText"
-   },
-   "venueId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "attractionProductId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "assetId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "The ride. Taking it out of service closes this queue rather than leaving guests holding positions for something that is not running.\n"
-   },
-   "accessPointId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "kind": {
-    "type": "string",
-    "enum": [
-     "standby",
-     "singleRider",
-     "fastPass",
-     "virtual",
-     "accessible",
-     "groupOnly",
-     "staffOnly"
-    ],
-    "default": "standby",
-    "description": "5.6.x. **A ride has several queues and the model had one.** A single-rider line and a standby line at the same attraction draw from one capacity and fill at different rates, and modelling them as one queue makes both wait estimates wrong.\n**`accessible` is not a courtesy lane.** It has its own capacity because a guest who cannot stand in a switchback needs a place to wait, not priority.\n"
-   },
-   "operatingWindows": {
-    "type": "array",
-    "description": "**When the queue runs, which is not when the venue is open.** A ride closing an hour early for maintenance leaves a queue accepting guests for a cycle that will not happen.\nStored one row per window in `queue.queue_operating_window` (see `Queue`), not as a column on the queue.\n",
-    "items": {
-     "type": "object",
-     "required": [
-      "day",
-      "from",
-      "to"
-     ],
-     "properties": {
-      "day": {
-       "type": "string",
-       "enum": [
-        "mon",
-        "tue",
-        "wed",
-        "thu",
-        "fri",
-        "sat",
-        "sun"
-       ]
-      },
-      "from": {
-       "type": "string",
-       "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$",
-       "description": "Venue local time, 24-hour `HH:MM`, when the queue starts running."
-      },
-      "to": {
-       "type": "string",
-       "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$",
-       "description": "Venue local time, 24-hour `HH:MM`, when the queue stops running."
-      },
-      "lastEntryMinutesBefore": {
-       "type": "integer",
-       "default": 0,
-       "description": "**When the queue stops accepting, which is before it stops running.** A guest joining two minutes before close waits twenty and is turned away at the front.\n"
-      }
-     }
-    }
-   },
-   "parentQueueId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "Where several queues share one capacity. **The standby and single-rider lines at one ride draw from the same cycles**, and a parent is how that is expressed without either queue owning the other.\n"
-   },
-   "loadBalanceWithQueueIds": {
-    "type": "array",
-    "description": "BL-137. **Two rides with the same theme and different waits**, and nothing directed a guest to the shorter one. Load balancing is an offer, not an assignment — **a guest sent to a ride they did not choose is a guest who feels managed.**\n",
-    "items": {
-     "type": "string",
-     "format": "uuid"
-    }
-   },
-   "inQueueOfferEnabled": {
-    "type": "boolean",
-    "default": false,
-    "description": "**A guest with twenty minutes to wait is a guest with twenty minutes to buy something.** Offers surface in the wait screen and are the only reason a virtual queue earns its infrastructure.\n"
-   },
-   "notifyBeforeCallMinutes": {
-    "type": "integer",
-    "default": 5,
-    "description": "BL-017, 19.2.61. **A guest was not told their turn was approaching**, which makes a virtual queue worse than a physical one — at least a line is visible.\n"
-   },
-   "capacityPerCycle": {
-    "type": "integer",
-    "minimum": 1
-   },
-   "cycleMinutes": {
-    "type": "number",
-    "minimum": 0
-   },
-   "maxPartySize": {
-    "type": "integer",
-    "default": 6
-   },
-   "returnWindowMinutes": {
-    "type": "integer",
-    "default": 15,
-    "description": "How long a called party has to arrive before the entry expires."
-   },
-   "heightRequirementCm": {
-    "type": "integer",
-    "nullable": true
-   },
-   "fastPassAllocationPercent": {
-    "type": "number",
-    "minimum": 0,
-    "maximum": 100,
-    "default": 0,
-    "description": "Share of each cycle reserved for Fast Pass holders."
-   },
-   "zone": {
-    "type": "string",
-    "nullable": true
-   },
-   "fastPass": {
-    "allOf": [
-     {
-      "$ref": "#/components/schemas/QueueFastPass"
-     }
-    ],
-    "nullable": true,
-    "description": "The lane's Fast Pass block (decided 29 September, VM close-out). Null on a queue that takes no Fast Pass.\n"
-   }
-  }
- },
  "DenyReason": {
   "type": "string",
   "description": "Enumerated so the client can render an appropriate operator prompt. A gate operator facing a queue needs a reason and a next action, not a boolean.\n",
@@ -1035,86 +627,6 @@
     "nullable": true
    }
   }
- },
- "Game": {
-  "x-ticvai-persistence": "games.game",
-  "type": "object",
-  "required": [
-   "id",
-   "code",
-   "name",
-   "venueId",
-   "creditCost",
-   "status"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "code": {
-    "type": "string",
-    "maxLength": 64
-   },
-   "name": {
-    "type": "string",
-    "maxLength": 200
-   },
-   "venueId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "zone": {
-    "type": "string",
-    "nullable": true
-   },
-   "assetId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "The machine. Taken out of service by maintenance, the game stops accepting play rather than swallowing credits.\n"
-   },
-   "readerId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "creditCost": {
-    "type": "integer",
-    "minimum": 1
-   },
-   "minPointsAwarded": {
-    "type": "integer"
-   },
-   "maxPointsAwarded": {
-    "type": "integer"
-   },
-   "heightRequirementCm": {
-    "type": "integer",
-    "nullable": true
-   },
-   "status": {
-    "$ref": "#/components/schemas/GameStatus"
-   },
-   "playsToday": {
-    "type": "integer"
-   },
-   "creditsTakenToday": {
-    "type": "integer"
-   },
-   "pointsAwardedToday": {
-    "type": "integer"
-   }
-  }
- },
- "GameStatus": {
-  "type": "string",
-  "enum": [
-   "inService",
-   "outOfService",
-   "maintenance",
-   "retired"
-  ]
  },
  "GraphValidation": {
   "type": "object",
@@ -1876,254 +1388,6 @@
    "archived"
   ]
  },
- "OfflinePackage": {
-  "x-ticvai-persistence": "none — generated artefact in object storage",
-  "type": "object",
-  "required": [
-   "etag",
-   "generatedAt",
-   "validFrom",
-   "validTo",
-   "accessPointId",
-   "entitlements"
-  ],
-  "properties": {
-   "etag": {
-    "type": "string"
-   },
-   "generatedAt": {
-    "type": "string",
-    "format": "date-time"
-   },
-   "validFrom": {
-    "type": "string",
-    "format": "date-time"
-   },
-   "validTo": {
-    "type": "string",
-    "format": "date-time"
-   },
-   "accessPointId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "entitlementsVersion": {
-    "type": "integer",
-    "description": "The highest `access.entitlement` change included (SD-052, 29 September). A refresh sends it as `sinceVersion` and receives only what changed after it, so a 60,000-guest venue is not re-sent whole."
-   },
-   "policySetVersion": {
-    "type": "string",
-    "description": "**The active admission policy version the package carries** (ADR-0068, 1 October): a fingerprint of the `(id, currentVersion)` of every policy in `dynamicPolicies`, computed the same way by `validateAccess` online. Every scan the gate records carries it (`ScanEvent.policySetVersion`), so a scan decided offline under a set that has since changed is visible at sync rather than assumed equal."
-   },
-   "dynamicPolicies": {
-    "type": "array",
-    "description": "The active guest-admission dynamic policies for this access point's zones (SD-052), each at its active version with its `conditionRule` (ADR-0068), so an offline gate applies the same rules as an online one.",
-    "items": {
-     "$ref": "#/components/schemas/AccessDynamicPolicy"
-    }
-   },
-   "entitlements": {
-    "type": "array",
-    "description": "Read from `access.entitlement` (SD-052). With `sinceVersion`, only the rows changed after it, including ones now void or used, so a device removes them.",
-    "items": {
-     "type": "object",
-     "required": [
-      "ticketId",
-      "mediaCodes",
-      "validFrom",
-      "validTo",
-      "entriesAllowed",
-      "reentryAllowed"
-     ],
-     "properties": {
-      "ticketId": {
-       "type": "string",
-       "format": "uuid",
-       "description": "The `Entitlement.id`."
-      },
-      "mediaCodes": {
-       "type": "array",
-       "items": {
-        "type": "string"
-       },
-       "description": "A ticket may carry several media over its life."
-      },
-      "validFrom": {
-       "type": "string",
-       "format": "date-time"
-      },
-      "validTo": {
-       "type": "string",
-       "format": "date-time"
-      },
-      "performanceId": {
-       "type": "string",
-       "format": "uuid",
-       "nullable": true
-      },
-      "entriesAllowed": {
-       "type": "integer",
-       "nullable": true
-      },
-      "entriesUsed": {
-       "type": "integer"
-      },
-      "reentryAllowed": {
-       "type": "boolean"
-      },
-      "admissionRulesId": {
-       "type": "string",
-       "format": "uuid"
-      }
-     }
-    }
-   },
-   "delegatedRights": {
-    "type": "array",
-    "description": "Redemption rights issued by other cells and valid at this access point. Included in the package so a cross-region entitlement still admits when the inter-cell link is down — the same reason locally issued entitlements are included.\n",
-    "items": {
-     "type": "object",
-     "required": [
-      "rightId",
-      "ticketId",
-      "issuingCellId",
-      "validFrom",
-      "validTo",
-      "entriesAllowed",
-      "entriesConsumed"
-     ],
-     "properties": {
-      "rightId": {
-       "type": "string"
-      },
-      "ticketId": {
-       "type": "string",
-       "format": "uuid",
-       "description": "The `Entitlement.id` in the issuing cell."
-      },
-      "issuingCellId": {
-       "type": "string"
-      },
-      "guestLinkId": {
-       "type": "string",
-       "nullable": true
-      },
-      "mediaCodes": {
-       "type": "array",
-       "items": {
-        "type": "string"
-       }
-      },
-      "validFrom": {
-       "type": "string",
-       "format": "date-time"
-      },
-      "validTo": {
-       "type": "string",
-       "format": "date-time"
-      },
-      "entriesAllowed": {
-       "type": "integer",
-       "nullable": true
-      },
-      "entriesConsumed": {
-       "type": "integer"
-      },
-      "admissionRulesId": {
-       "type": "string",
-       "format": "uuid"
-      }
-     }
-    }
-   },
-   "blacklist": {
-    "type": "array",
-    "items": {
-     "type": "string"
-    },
-    "description": "Media codes to deny outright regardless of entitlement state."
-   },
-   "admissionRules": {
-    "type": "array",
-    "items": {
-     "type": "object",
-     "required": [
-      "id",
-      "openMinutesBefore",
-      "closeMinutesAfter"
-     ],
-     "properties": {
-      "id": {
-       "type": "string",
-       "format": "uuid"
-      },
-      "openMinutesBefore": {
-       "type": "integer"
-      },
-      "closeMinutesAfter": {
-       "type": "integer"
-      },
-      "maxDurationMinutes": {
-       "type": "integer",
-       "nullable": true
-      },
-      "requiresExitBeforeReentry": {
-       "type": "boolean"
-      }
-     }
-    }
-   },
-   "accreditationCredentials": {
-    "type": "array",
-    "description": "Accreditation credentials that admit at this access point, from access.accreditation_credential (29 September, build; BL-181). Only rows that admit are included; a credential dropped from one package to the next no longer admits.",
-    "items": {
-     "$ref": "#/components/schemas/AccessAccreditationCredential"
-    }
-   }
-  }
- },
- "OfflineScan": {
-  "x-ticvai-persistence": "none — client-side journal",
-  "allOf": [
-   {
-    "$ref": "#/components/schemas/ValidateRequest"
-   },
-   {
-    "type": "object",
-    "required": [
-     "sequence",
-     "localOutcome"
-    ],
-    "properties": {
-     "sequence": {
-      "type": "integer",
-      "minimum": 1,
-      "description": "Monotonic per device. The server processes in this order."
-     },
-     "localOutcome": {
-      "allOf": [
-       {
-        "$ref": "#/components/schemas/ScanOutcome"
-       }
-      ],
-      "description": "What the device decided offline. The server is authoritative and may disagree; disagreements are returned for reconciliation, not discarded.\n"
-     },
-     "localDenyReason": {
-      "$ref": "#/components/schemas/DenyReason"
-     },
-     "overriddenByPrincipalId": {
-      "type": "string",
-      "format": "uuid",
-      "nullable": true
-     },
-     "overrideReason": {
-      "type": "string",
-      "nullable": true
-     }
-    }
-   }
-  ]
- },
  "Page": {
   "type": "object",
   "required": [
@@ -2162,195 +1426,6 @@
      }
     }
    }
-  ]
- },
- "Permission": {
-  "type": "string",
-  "enum": [
-   "SESSION_FORCE_LOGOUT",
-   "USER_MANAGE",
-   "ROLE_MANAGE",
-   "PERMISSION_GRANT",
-   "PERMISSION_VIEW",
-   "PERMISSION_MANAGE",
-   "PLATFORM_TENANT_VIEW",
-   "PLATFORM_TENANT_MANAGE",
-   "PLATFORM_TENANT_TERMINATE",
-   "PLATFORM_PLAN_MANAGE",
-   "PLATFORM_CELL_VIEW",
-   "PLATFORM_CELL_MANAGE",
-   "PLATFORM_BILLING_VIEW",
-   "PLATFORM_AI_MANAGE",
-   "PLATFORM_BILLING_MANAGE",
-   "PLATFORM_RELEASE_VIEW",
-   "PLATFORM_RELEASE_MANAGE",
-   "PLATFORM_RELEASE_PROMOTE",
-   "PLATFORM_MIGRATION_VIEW",
-   "PLATFORM_MIGRATION_APPLY",
-   "PLATFORM_TENANT_ACCESS",
-   "TENANT_CONFIGURE",
-   "TENANT_VIEW",
-   "TENANT_PUBLISH",
-   "SCOPE_VIEW",
-   "SCOPE_MANAGE",
-   "REGION_CONFIGURE",
-   "WORKSTATION_CONFIGURE",
-   "PRODUCT_VIEW",
-   "PRODUCT_CONFIGURE",
-   "PRODUCT_APPROVE",
-   "PRODUCT_PUBLISH",
-   "PRICE_VIEW",
-   "PRICE_CONFIGURE",
-   "EVENT_CONFIGURE",
-   "PERFORMANCE_CONFIGURE",
-   "CAPACITY_CONFIGURE",
-   "ORDER_VIEW",
-   "ORDER_VIEW_OTHER",
-   "ORDER_CREATE",
-   "ORDER_MODIFY",
-   "ORDER_DISCOUNT",
-   "ORDER_CANCEL",
-   "ORDER_VOID",
-   "ORDER_REFUND",
-   "ORDER_REFUND_APPROVE",
-   "ORDER_REFUND_BULK",
-   "ORDER_EXCHANGE",
-   "ORDER_RESCHEDULE",
-   "ORDER_REPRINT",
-   "PRICE_OVERRIDE",
-   "DISCOUNT_APPLY",
-   "CREDIT_MANAGE",
-   "CREDIT_OVERRIDE",
-   "WALLET_VIEW",
-   "WALLET_OPERATE",
-   "WALLET_CONFIGURE",
-   "PAYMENT_VIEW",
-   "PAYMENT_CONFIGURE",
-   "PAYMENT_PROVIDER_MANAGE",
-   "PAYMENT_DISPUTE",
-   "SHIFT_OPEN",
-   "SHIFT_CLOSE",
-   "SHIFT_SUSPEND",
-   "SHIFT_CLOSE_OTHER",
-   "SHIFT_APPROVE_OPEN",
-   "SHIFT_APPROVE_CLOSE",
-   "SHIFT_REOPEN",
-   "CASH_LIFT",
-   "CASH_ADD",
-   "CASH_NO_SALE",
-   "DEPOSIT_BOX_MODIFY_OWN",
-   "DEPOSIT_BOX_MODIFY_OTHER",
-   "OVERSHORT_ACCEPT",
-   "ACCESS_VALIDATE",
-   "ACCESS_OVERRIDE",
-   "ACCESS_POINT_CONFIGURE",
-   "TURNSTILE_MODE_SET",
-   "TICKET_LOOKUP",
-   "ACCREDITATION_VIEW",
-   "ACCREDITATION_APPLY",
-   "ACCREDITATION_APPROVE",
-   "ACCREDITATION_ISSUE",
-   "ACCREDITATION_MANAGE",
-   "ACCREDITATION_CONFIGURE",
-   "REPORT_VIEW_OWN",
-   "REPORT_VIEW_WORKSTATION",
-   "REPORT_VIEW_VENUE",
-   "REPORT_VIEW_REGION",
-   "REPORT_VIEW_TENANT",
-   "REPORT_EXPORT",
-   "REPORT_EXPORT_PII",
-   "REPORT_MANAGE",
-   "REPORT_SCHEDULE",
-   "LEDGER_VIEW",
-   "LEDGER_POST",
-   "LEDGER_APPROVE",
-   "TAX_CONFIGURE",
-   "ACCOUNT_CONFIGURE",
-   "SETTLEMENT_VIEW",
-   "SETTLEMENT_RECONCILE",
-   "GUEST_VIEW",
-   "GUEST_VIEW_PII",
-   "GUEST_MANAGE",
-   "VENUE_MAP_VIEW",
-   "VENUE_MAP_MANAGE",
-   "VENUE_MAP_PUBLISH",
-   "RESOURCE_VIEW",
-   "RESOURCE_BOOK",
-   "RESOURCE_MANAGE",
-   "RESOURCE_CONFIGURE",
-   "RENTAL_VIEW",
-   "RENTAL_BOOK",
-   "RENTAL_OPERATE",
-   "RENTAL_MANAGE",
-   "RENTAL_CONFIGURE",
-   "RENTAL_PRICE",
-   "RENTAL_APPROVE",
-   "RENTAL_OVERRIDE",
-   "DEVELOPER_VIEW",
-   "DEVELOPER_MANAGE",
-   "DEVELOPER_ADMIN",
-   "LOYALTY_ACCRUE",
-   "LOYALTY_REDEEM",
-   "LOYALTY_ADJUST",
-   "MARKETING_VIEW",
-   "MARKETING_MANAGE",
-   "MARKETING_SEND",
-   "CASE_VIEW",
-   "CASE_MANAGE",
-   "ASSET_LIBRARY_VIEW",
-   "ASSET_LIBRARY_MANAGE",
-   "ASSET_LIBRARY_APPROVE",
-   "ASSET_LIBRARY_SHARE",
-   "QUEUE_VIEW",
-   "QUEUE_MANAGE",
-   "QUEUE_REDEEM",
-   "QUEUE_OVERRIDE",
-   "TRANSPORT_VIEW",
-   "TRANSPORT_MANAGE",
-   "TRANSPORT_PRICE",
-   "ASSET_VIEW",
-   "ASSET_MANAGE",
-   "WORK_ORDER_VIEW",
-   "WORK_ORDER_MANAGE",
-   "WORK_ORDER_VERIFY",
-   "INSPECTION_VIEW",
-   "INSPECTION_SUBMIT",
-   "INSPECTION_MANAGE",
-   "INCIDENT_REPORT",
-   "INCIDENT_VIEW",
-   "INCIDENT_MANAGE",
-   "KIOSK_ATTEND",
-   "DEVICE_VIEW",
-   "DEVICE_CONFIGURE",
-   "DEVICE_MANAGE",
-   "APPROVAL_ACT",
-   "APPROVAL_DELEGATE",
-   "AI_USE",
-   "AI_CONFIGURE",
-   "AI_APPROVE",
-   "AI_AUDIT_VIEW",
-   "RISK_REVIEW",
-   "RISK_INVESTIGATE",
-   "AUDIT_VIEW",
-   "APPROVAL_VIEW",
-   "APPROVAL_REQUEST",
-   "APPROVAL_DECIDE",
-   "APPROVAL_CONFIGURE",
-   "MAINTENANCE_EXECUTE",
-   "MAINTENANCE_APPROVE",
-   "WORKFORCE_VIEW",
-   "WORKFORCE_MANAGE",
-   "ATTENDANCE_RECORD",
-   "ANNOUNCEMENT_PUBLISH",
-   "ANNOUNCEMENT_EMERGENCY",
-   "PARTNER_VIEW",
-   "PARTNER_MANAGE",
-   "PARKING_CONFIGURE",
-   "PAYMENT_VOID",
-   "PROCUREMENT_VIEW",
-   "PROCUREMENT_REQUEST",
-   "PROCUREMENT_MANAGE",
-   "PROCUREMENT_RECEIVE"
   ]
  },
  "PlacedResource": {
@@ -2463,50 +1538,6 @@
     "type": "boolean",
     "default": true,
     "description": "False keeps it on the map and off sale, e.g. a cabana kept for staff use. Shown greyed.\n"
-   }
-  }
- },
- "PlayResult": {
-  "x-ticvai-persistence": "games.play",
-  "type": "object",
-  "required": [
-   "playId",
-   "creditsUsed",
-   "pointsAwarded",
-   "creditsRemaining",
-   "pointsBalance"
-  ],
-  "properties": {
-   "playId": {
-    "type": "string"
-   },
-   "cardCode": {
-    "type": "string"
-   },
-   "gameId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "creditsUsed": {
-    "type": "integer"
-   },
-   "pointsAwarded": {
-    "type": "integer"
-   },
-   "creditsRemaining": {
-    "type": "integer"
-   },
-   "pointsBalance": {
-    "type": "integer"
-   },
-   "recordedAt": {
-    "type": "string",
-    "format": "date-time"
-   },
-   "syncedAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
    }
   }
  },
@@ -2893,301 +1924,6 @@
    }
   }
  },
- "Queue": {
-  "x-ticvai-persistence": "queue.queue + queue.queue_operating_window",
-  "allOf": [
-   {
-    "$ref": "#/components/schemas/CreateQueueRequest"
-   },
-   {
-    "type": "object",
-    "required": [
-     "id",
-     "status",
-     "waitingPartyCount"
-    ],
-    "properties": {
-     "id": {
-      "type": "string",
-      "format": "uuid"
-     },
-     "status": {
-      "$ref": "#/components/schemas/QueueStatus"
-     },
-     "statusReason": {
-      "type": "string",
-      "nullable": true
-     },
-     "waitingPartyCount": {
-      "type": "integer"
-     },
-     "waitingGuestCount": {
-      "type": "integer"
-     },
-     "currentWaitMinutes": {
-      "type": "integer",
-      "nullable": true
-     },
-     "waitTimeSource": {
-      "$ref": "#/components/schemas/WaitTimeSource"
-     },
-     "waitTimeAsOf": {
-      "type": "string",
-      "format": "date-time",
-      "nullable": true,
-      "readOnly": true,
-      "description": "When `currentWaitMinutes` was last set, by whichever source set it. `WaitTime.asOf` reads this.\n"
-     },
-     "manualWaitExpiresAt": {
-      "type": "string",
-      "format": "date-time",
-      "nullable": true,
-      "readOnly": true,
-      "description": "Set by `setWaitTime` as now plus `expiresInMinutes`. Past it, the manual figure is dropped and the queue reverts to its sensor or throughput estimate. Null when the current figure is not manual.\n"
-     },
-     "manualWaitNote": {
-      "type": "string",
-      "maxLength": 200,
-      "nullable": true,
-      "readOnly": true,
-      "description": "The `note` given with the current manual figure. Cleared when it expires."
-     },
-     "expectedReopenAt": {
-      "type": "string",
-      "format": "date-time",
-      "nullable": true
-     }
-    }
-   }
-  ]
- },
- "QueueDetail": {
-  "x-ticvai-persistence": "queue.queue",
-  "allOf": [
-   {
-    "$ref": "#/components/schemas/Queue"
-   },
-   {
-    "type": "object",
-    "properties": {
-     "nowServingPartyNumber": {
-      "type": "integer",
-      "nullable": true
-     },
-     "lastCalledAt": {
-      "type": "string",
-      "format": "date-time",
-      "nullable": true
-     },
-     "throughputLastHour": {
-      "type": "integer"
-     },
-     "noShowRatePercent": {
-      "type": "number"
-     },
-     "feed": {
-      "$ref": "#/components/schemas/QueueFeedHealth"
-     }
-    }
-   }
-  ]
- },
- "QueueEntryStatus": {
-  "type": "string",
-  "enum": [
-   "waiting",
-   "called",
-   "redeemed",
-   "expired",
-   "noShow",
-   "cancelled",
-   "released"
-  ]
- },
- "QueueFastPass": {
-  "x-ticvai-persistence": "queue.queue",
-  "type": "object",
-  "description": "**Which Fast Pass entitlements this lane accepts, and how** (decided 29 September, VM close-out; pack 'Access Control Module' p.109, BO-221 Fast Pass & Attraction Access Journey). Fast Pass stays an entitlement owned by Product & Entitlement; this block is the lane's side of it: which products it honours, the return window, a per-guest daily cap and the access points that redeem it. Stored on the queue row. Only meaningful where `kind` is `fastPass` or `fastPassAllocationPercent` is above 0.\n**Four ways into priority, not one** (decided 29 September, build pass; 5.6.7 and 5.6.34). A guest joins this lane as priority when they hold an entitlement from `entitlementProductIds` (VIP, annual pass, premium package), are a member of a tier in `loyaltyTierIds`, qualify for a live promotion in `promotionIds`, or declare an accessibility need where `accessibilityPriority` is on. The first criterion met is recorded on the entry as `WaitingGuest.priorityBasis`. Every criterion is resolved by the server at join time; nothing the request asserts about a tier or a promotion is trusted. All four draw on the same reserved `fastPassAllocationPercent`, so widening who qualifies never widens the share of the ride they take.\n",
-  "required": [
-   "entitlementProductIds"
-  ],
-  "properties": {
-   "entitlementProductIds": {
-    "type": "array",
-    "description": "Catalogue products whose entitlement admits to this lane. May be empty where priority comes only from a tier, a promotion or an accessibility need.\n",
-    "items": {
-     "type": "string",
-     "format": "uuid"
-    }
-   },
-   "loyaltyTierIds": {
-    "type": "array",
-    "description": "5.6.7 and 5.6.34 (decided 29 September, build pass). Loyalty programme tiers (`marketing.programme_tier`) whose members join this lane as priority. Read from the guest's own loyalty position at join time, never from the request, so a guest cannot claim a tier they do not hold. Empty: tier grants nothing on this lane.\n",
-    "items": {
-     "type": "string",
-     "format": "uuid"
-    }
-   },
-   "promotionIds": {
-    "type": "array",
-    "description": "5.6.34 (decided 29 September, build pass). Promotions that grant queue privilege on this lane while they are live. A guest qualifies when the promotion's conditions hold for them at join (the evaluation `promotions` already makes for a price), or by presenting its code in `JoinQueueRequest.promotionCode`. A paused or expired promotion grants nothing.\n",
-    "items": {
-     "type": "string",
-     "format": "uuid"
-    }
-   },
-   "accessibilityPriority": {
-    "type": "boolean",
-    "default": false,
-    "description": "5.6.7 (decided 29 September, build pass). A party that declares an accessibility need (`JoinQueueRequest.accessibilityNeedDeclared`) joins as priority. **Taken on trust**, because asking for proof at a ride entrance is worse than the occasional abuse; the declaration is on the entry, so the operator at the front sees it (`listQueueEntries`). A venue that wants proof sells or issues an accessibility pass and lists it in `entitlementProductIds` instead. **Not the `accessible` lane**: that is where a guest who cannot stand in a switchback waits; this moves them ahead in the lane they chose.\n"
-   },
-   "returnWindowMinutes": {
-    "type": "integer",
-    "minimum": 1,
-    "maximum": 240,
-    "default": 60,
-    "description": "How long after the booked return time a Fast Pass holder may still enter. Proposed, our build plan.\n"
-   },
-   "maxPerGuestPerDay": {
-    "type": "integer",
-    "minimum": 1,
-    "nullable": true,
-    "description": "Fast Pass redemptions one guest may make on this lane per day; null is no cap."
-   },
-   "allowedAccessPointIds": {
-    "type": "array",
-    "description": "Access points that redeem Fast Pass for this lane; empty is the queue's own.",
-    "items": {
-     "type": "string",
-     "format": "uuid"
-    }
-   }
-  }
- },
- "QueueFeedHealth": {
-  "x-ticvai-persistence": "none — computed",
-  "type": "object",
-  "required": [
-   "feedId",
-   "isHealthy",
-   "isQuiet"
-  ],
-  "properties": {
-   "feedId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "adaptor": {
-    "$ref": "#/components/schemas/QueueFeedAdaptor"
-   },
-   "isHealthy": {
-    "type": "boolean",
-    "description": "**Healthy means the last reading arrived within the feed's expected interval** (decided 28 September, audit R106 (1)): `lastReadingAt` is no older than `expectedIntervalSeconds`. It is the opposite of `isQuiet`, and nothing else (latency, discards) makes a reporting feed unhealthy.\n"
-   },
-   "isQuiet": {
-    "type": "boolean",
-    "description": "No reading within the expected interval. The wait time falls back to throughput-derived and is marked stale rather than freezing at the last value.\n"
-   },
-   "lastReadingAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "expectedIntervalSeconds": {
-    "type": "integer",
-    "description": "The feed's `expectedIntervalSeconds` — the interval `isQuiet` is judged against, returned here so a health panel does not need the feed row as well.\n"
-   },
-   "readingsLastHour": {
-    "type": "integer"
-   },
-   "discardedLastHour": {
-    "type": "integer",
-    "description": "Out-of-order readings rejected in the last hour — rows of `queue.reading` for this feed with `disposition: discardedOutOfOrder`. Duplicates are not counted here: a duplicate has no row, and `submitQueueReading` reports it in its own `duplicates`.\n"
-   }
-  }
- },
- "QueueStatus": {
-  "type": "string",
-  "enum": [
-   "open",
-   "paused",
-   "closed",
-   "atCapacity"
-  ]
- },
- "QueueStatusResult": {
-  "x-ticvai-persistence": "none — computed",
-  "type": "object",
-  "required": [
-   "queue",
-   "affectedEntries"
-  ],
-  "properties": {
-   "queue": {
-    "$ref": "#/components/schemas/Queue"
-   },
-   "affectedEntries": {
-    "type": "object",
-    "description": "What happened to guests already waiting. Closing releases and notifies them — a guest holding a position for a ride that will not run should be told.\n",
-    "properties": {
-     "released": {
-      "type": "integer"
-     },
-     "held": {
-      "type": "integer"
-     },
-     "notified": {
-      "type": "integer"
-     }
-    }
-   }
-  }
- },
- "RecordPlayRequest": {
-  "x-ticvai-persistence": "none — request only",
-  "type": "object",
-  "required": [
-   "id",
-   "cardCode",
-   "gameId",
-   "recordedAt"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid",
-    "description": "The play ID, generated on the reader, and returned as `PlayResult.playId`. Also the idempotency key: on `recordGamePlay` it must equal the `Idempotency-Key` header (a mismatch is the shared 409 `Conflict`); in a `syncGamePlays` batch it is the key on its own.\n"
-   },
-   "cardCode": {
-    "type": "string"
-   },
-   "gameId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "creditsUsed": {
-    "type": "integer",
-    "minimum": 1
-   },
-   "pointsAwarded": {
-    "type": "integer",
-    "minimum": 0
-   },
-   "sequence": {
-    "type": "integer",
-    "description": "Monotonic per reader. Preserves order across an offline batch."
-   },
-   "playedOffline": {
-    "type": "boolean",
-    "default": false,
-    "description": "**True where the reader recorded the play while offline** and is replaying it. Such a play is accepted even against too few credits and reported for reconciliation; a live play (false) is refused instead (decided 28 September, audit R106 (3)). Every play in a `syncGamePlays` batch is treated as offline.\n"
-   },
-   "recordedAt": {
-    "type": "string",
-    "format": "date-time"
-   }
-  }
- },
  "ReportIncidentRequest": {
   "x-ticvai-persistence": "none — request only",
   "type": "object",
@@ -3267,6 +2003,35 @@
    "recordedAt": {
     "type": "string",
     "format": "date-time"
+   }
+  }
+ },
+ "ResolveSyncRejectionRequest": {
+  "type": "object",
+  "x-ticvai-persistence": "none — request only; lands on sync.rejection",
+  "required": [
+   "resolution",
+   "resolvedRecordId"
+  ],
+  "properties": {
+   "resolution": {
+    "type": "string",
+    "enum": [
+     "posted",
+     "voided",
+     "refunded"
+    ],
+    "description": "`posted` — the sale was entered with `createOrder` (F33 step 8); `voided` — with `voidOrder`; `refunded` — with `createRefund`.\n"
+   },
+   "resolvedRecordId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The id of the order, void or refund that resolution produced."
+   },
+   "note": {
+    "type": "string",
+    "maxLength": 500,
+    "nullable": true
    }
   }
  },
@@ -3567,64 +2332,6 @@
    "overridden"
   ]
  },
- "ScanSyncResult": {
-  "x-ticvai-persistence": "none — computed",
-  "type": "object",
-  "required": [
-   "accepted",
-   "results"
-  ],
-  "properties": {
-   "accepted": {
-    "type": "integer",
-    "description": "Entries processed before any stop."
-   },
-   "stoppedAtSequence": {
-    "type": "integer",
-    "nullable": true,
-    "description": "Sequence of the first entry that could not be processed. Null when the whole batch succeeded. The client retries from here — never past it.\n"
-   },
-   "results": {
-    "type": "array",
-    "items": {
-     "type": "object",
-     "required": [
-      "id",
-      "sequence",
-      "status"
-     ],
-     "properties": {
-      "id": {
-       "type": "string"
-      },
-      "sequence": {
-       "type": "integer"
-      },
-      "status": {
-       "type": "string",
-       "enum": [
-        "accepted",
-        "duplicate",
-        "reconciled",
-        "rejected"
-       ]
-      },
-      "serverOutcome": {
-       "$ref": "#/components/schemas/ScanOutcome"
-      },
-      "divergence": {
-       "type": "string",
-       "nullable": true,
-       "description": "Present when `reconciled` — the device admitted and the server would have denied, or vice versa. Surfaced to the operator, not swallowed.\n"
-      },
-      "error": {
-       "$ref": "../shared/common.yaml#/components/schemas/Problem"
-      }
-     }
-    }
-   }
-  }
- },
  "SetAssetStatusRequest": {
   "x-ticvai-persistence": "none — request only",
   "type": "object",
@@ -3722,6 +2429,83 @@
    }
   }
  },
+ "SyncRejection": {
+  "x-ticvai-persistence": "sync.rejection",
+  "type": "object",
+  "required": [
+   "id",
+   "workstationId",
+   "kind",
+   "rejectedAt",
+   "problem"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "workstationId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "order",
+     "payment",
+     "refund",
+     "void",
+     "scan"
+    ]
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "rejectedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "problem": {
+    "$ref": "../shared/common.yaml#/components/schemas/Problem"
+   },
+   "payload": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "**Deliberately open: the journal entry exactly as the till sent it.** Its shape is the request schema for `kind` — an `OfflineOrder` for `order`, a `CreatePaymentRequest` for `payment` — kept verbatim so the supervisor resolves what was actually recorded, not a re-typed copy.\n"
+   },
+   "resolvedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   },
+   "resolvedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true
+   },
+   "resolution": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "enum": [
+     "posted",
+     "voided",
+     "refunded"
+    ],
+    "description": "What `resolveSyncRejection` recorded. Null while the rejection waits."
+   },
+   "resolvedRecordId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The order, void or refund the resolution produced — what stops the entry being posted twice."
+   }
+  }
+ },
  "TicketStatus": {
   "x-ticvai-persistence": "none — computed from entitlement and scans",
   "description": "**A validation result, not a lifecycle**, despite the name. Computed at scan time from the entitlement and its scan history — `isValid`, `entriesUsed`, `isInsideVenue`.\n**The name misled a state model into anchoring on it** (`states/entitlement.yaml`, removed 18 August): six lifecycle states were checked against an object with no values, and `check-states` warned about it for a day before anyone read the schema.\nThe entitlement's lifecycle is `orders.EntitlementStatus`. **This is what a gate learns when it scans**, which is a different question with a similar name.\n",
@@ -3797,120 +2581,6 @@
    },
    "denyReason": {
     "$ref": "#/components/schemas/DenyReason"
-   }
-  }
- },
- "ValidateRequest": {
-  "type": "object",
-  "required": [
-   "id",
-   "mediaCode",
-   "mediaKind",
-   "direction",
-   "recordedAt"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid",
-    "description": "Client-generated UUIDv7. Also the idempotency key and dedupe key."
-   },
-   "mediaCode": {
-    "type": "string",
-    "maxLength": 256,
-    "description": "What was read from the media. NOT the ticket id — media can be re-linked over a ticket's life.\n"
-   },
-   "mediaKind": {
-    "$ref": "#/components/schemas/MediaKind"
-   },
-   "direction": {
-    "$ref": "#/components/schemas/Direction"
-   },
-   "groupSize": {
-    "type": "integer",
-    "minimum": 1,
-    "description": "For group media admitting several holders on one read."
-   },
-   "proximityToken": {
-    "type": "string",
-    "description": "BLE proximity assertion where the venue requires the operator to be physically at the gate. Absent where not configured.\n"
-   },
-   "recordedAt": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Device time of the read. Authoritative for ordering, not for validity."
-   }
-  }
- },
- "ValidationResult": {
-  "x-ticvai-persistence": "none — computed, persisted as scan_event",
-  "type": "object",
-  "required": [
-   "scanId",
-   "outcome",
-   "accessPointId",
-   "recordedAt"
-  ],
-  "properties": {
-   "scanId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "outcome": {
-    "$ref": "#/components/schemas/ScanOutcome"
-   },
-   "denyReason": {
-    "$ref": "#/components/schemas/DenyReason"
-   },
-   "denyDetail": {
-    "type": "string",
-    "description": "Human-readable, localised. For operator display, never for logic."
-   },
-   "accessPointId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "ticket": {
-    "$ref": "#/components/schemas/TicketStatus"
-   },
-   "admittedCount": {
-    "type": "integer",
-    "description": "Holders admitted on this read. Differs from groupSize on partial admission."
-   },
-   "recordedAt": {
-    "type": "string",
-    "format": "date-time"
-   },
-   "serverEvaluatedAt": {
-    "type": "string",
-    "format": "date-time"
-   },
-   "advisory": {
-    "type": "object",
-    "nullable": true,
-    "description": "BL-179, CF-130. **What a device observed, for the steward, never for the gate.** Present only where an access point's device reports the matching `DeviceCapability` and the venue has turned the corresponding setting on.\n**Never persisted.** This schema is computed and stored as `access.scan_event`, and the advisory is deliberately not part of what is stored: an inferred classification kept against a guest is sensitive personal data with no consent behind it. **A guest agreed to be admitted, not to be classified** — Face Pass and Face Tag carry `consent_purpose_id` and `consent_given_at` because somebody enrolled, and nobody enrols in being looked at by a turnstile. `scan_event` records that an override happened and never what the device thought, which keeps `overrideRateAlertThreshold` working without building a register nobody agreed to.\n**It cannot reach `outcome` or `denyReason`.** Those are decisive and `entitlementGated` is `true` and read-only: the gate admits on the entitlement, and everything here sits on top of that without replacing any of it.\n",
-    "properties": {
-     "genderClassification": {
-      "type": "string",
-      "enum": [
-       "women",
-       "men",
-       "undetermined"
-      ],
-      "description": "**`undetermined` is a real answer and the most common one to design for.** A classifier that never returns it is one that has been tuned to look confident.\n"
-     },
-     "confidence": {
-      "type": "number",
-      "minimum": 0,
-      "maximum": 1,
-      "description": "**Required reading for the steward, not decoration.** An advisory with no confidence is read as a fact, and `overrideRateAlertThreshold` exists to catch exactly the failure that produces — *an override rate near zero means the steward has stopped deciding.* That number only means anything if the steward could see how sure the device was.\n"
-     },
-     "reportedByDeviceId": {
-      "type": "string",
-      "format": "uuid",
-      "description": "**Which device said it.** A classifier that degrades is one camera, not a venue, and an advisory nobody can trace to hardware cannot be investigated or switched off alone.\n"
-     }
-    }
    }
   }
  },
@@ -4613,193 +3283,6 @@
      "type": "string",
      "maxLength": 30
     }
-   }
-  }
- },
- "WaitTime": {
-  "x-ticvai-persistence": "none — computed from readings and throughput",
-  "type": "object",
-  "required": [
-   "queueId",
-   "waitMinutes",
-   "source",
-   "asOf",
-   "isStale"
-  ],
-  "properties": {
-   "queueId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "queueName": {
-    "$ref": "#/components/schemas/LocalisedText"
-   },
-   "attractionProductId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "attractionCategoryId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "The catalogue `ProductCategory` the attraction product is filed under — the value the `category` filter on `getWaitTimes` matches. Read from catalogue, not stored here.\n"
-   },
-   "status": {
-    "$ref": "#/components/schemas/QueueStatus"
-   },
-   "waitMinutes": {
-    "type": "integer",
-    "nullable": true,
-    "description": "Null where the queue is closed or no estimate is available."
-   },
-   "source": {
-    "$ref": "#/components/schemas/WaitTimeSource"
-   },
-   "isStale": {
-    "type": "boolean",
-    "description": "The underlying feed has gone quiet past its expected interval. The figure is shown with a caveat rather than frozen and presented as current, and it is not hidden (decided 28 September, audit R080 (b)): the screen shows `waitMinutes` with its `asOf` and a stale marker.\n"
-   },
-   "heightRequirementCm": {
-    "type": "integer",
-    "nullable": true
-   },
-   "zone": {
-    "type": "string",
-    "nullable": true
-   },
-   "asOf": {
-    "type": "string",
-    "format": "date-time",
-    "description": "When the figure was produced — the queue's `waitTimeAsOf`."
-   }
-  }
- },
- "WaitTimeSource": {
-  "type": "string",
-  "description": "Where the estimate came from. Surfaced so an operator knows whether a figure is measured or guessed.\n",
-  "enum": [
-   "sensor",
-   "throughput",
-   "manual",
-   "unavailable"
-  ]
- },
- "WaitingGuest": {
-  "x-ticvai-persistence": "queue.entry",
-  "type": "object",
-  "required": [
-   "id",
-   "queueId",
-   "partyNumber",
-   "partySize",
-   "status",
-   "joinedAt"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid",
-    "description": "The client-generated UUIDv7 from `JoinQueueRequest.id`, and the `entryId` every entry path takes. `listMyWaitingGuests` gives it back to a guest who has lost it.\n"
-   },
-   "queueId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "queueName": {
-    "$ref": "#/components/schemas/LocalisedText"
-   },
-   "subjectId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "partyNumber": {
-    "type": "integer",
-    "description": "What the guest sees and what appears on signage."
-   },
-   "partySize": {
-    "type": "integer"
-   },
-   "status": {
-    "$ref": "#/components/schemas/QueueEntryStatus"
-   },
-   "positionInQueue": {
-    "type": "integer",
-    "nullable": true
-   },
-   "partiesAhead": {
-    "type": "integer",
-    "nullable": true
-   },
-   "estimatedCallAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "isFastPass": {
-    "type": "boolean"
-   },
-   "priorityBasis": {
-    "type": "string",
-    "enum": [
-     "none",
-     "entitlement",
-     "loyaltyTier",
-     "promotion",
-     "accessibility"
-    ],
-    "default": "none",
-    "description": "Why this party is priority, when it is (decided 29 September, build pass; 5.6.7, 5.6.34): the first `QueueFastPass` criterion met at join, in the order entitlement, loyalty tier, promotion, accessibility. `isFastPass` is true whenever this is not `none`. Kept on the entry so a disputed priority can be explained afterwards.\n"
-   },
-   "priorityTierId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "The loyalty tier that granted priority, where `priorityBasis` is `loyaltyTier`."
-   },
-   "priorityPromotionId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "The promotion that granted priority, where `priorityBasis` is `promotion`."
-   },
-   "accessibilityNeedDeclared": {
-    "type": "boolean",
-    "default": false,
-    "description": "What the party declared at join, shown to the operator at the front."
-   },
-   "entitlementId": {
-    "type": "string",
-    "nullable": true
-   },
-   "calledAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "returnWindowEndsAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "redeemedAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "admittedCount": {
-    "type": "integer",
-    "nullable": true
-   },
-   "joinedAt": {
-    "type": "string",
-    "format": "date-time"
-   },
-   "syncedAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
    }
   }
  },

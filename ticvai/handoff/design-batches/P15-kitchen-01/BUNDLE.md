@@ -1,6 +1,6 @@
 # P15-kitchen-01 — P15 · Kitchen
 
-**10 screens · 27 operations · 28 schemas · 8 permissions**
+**10 screens · 26 operations · 27 schemas · 7 permissions**
 
 Platform P15 Kitchen Display · ships as **venue-pos** ·
 staff audience · kiosk ·
@@ -48,10 +48,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 8 permissions apply here:
-  `INCIDENT_REPORT, INCIDENT_VIEW, ORDER_MODIFY, ORDER_VIEW, PRODUCT_CONFIGURE, PRODUCT_VIEW, REPORT_VIEW_VENUE, TENANT_CONFIGURE`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 7 permissions apply here:
+  `INCIDENT_REPORT, INCIDENT_VIEW, ORDER_MODIFY, ORDER_VIEW, PRODUCT_CONFIGURE, PRODUCT_VIEW, REPORT_VIEW_VENUE`. A control nobody can use must say so,
   not sit enabled and fail.
-- **16 of these operations work offline**: chaseStation, fireCourse, getFnbOrder, getHaccpStatus, holdCourse, list86Events, listKitchenStations, listKitchenTickets
+- **18 of these operations work offline**: chaseStation, fireCourse, getCourseRules, getFnbOrder, getHaccpStatus, getKitchenSla, holdCourse, list86Events
   — and the rest do not. A surface that looks the same online and off is lying.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
@@ -62,21 +62,83 @@ convincingly. It is never a caption.
   and its error; and, element by element, what is shown and in what format, what each action
   produces and where the user goes next. Draw exactly that.
 
+## The processes these screens belong to
+
+Written by the owner of each process (`handoff/design-notes/`). Read before any screen: it says how the process runs end to end and which words the screens must use.
+
+### Food, Beverage & Retail
+
+Food & beverage, retail, rentals, inventory and procurement across the till (P04), the kitchen display (P15), the staff app (P06), Venue Management (P08), the guest web and app (P01/P02), the kiosk (P05) and the CMS (P13). COUNTER SERVICE (F108): the cashier takes the order on the Food & Drink board from the outlet's menu in force (sections in the outlet's order, option groups attached to the item), sends it to the kitchen, and only then charges — send to kitchen, then charge, for every POS F&B order (R261, upheld against the v2 frame by POSV2-4). The kitchen ticket is on the rail while the card is in the guest's hand; an unpaid sent order is cancelled while ordered or accepted and voided with a reason after (R125(3), R091(5)); the guest gets an order number, and the customer-facing status board (numbers only) is the kitchen display's KIT-007, mirrored on the till's queue (POSV2-7). TABLE SERVICE (F29, F80, F94): a party is seated with its covers, orders across the visit, courses are fired by the pass (DI-333, DI-407), the bill is printed and settled at the end and split by amount, covers, category, item or seat (DI-106); the client's table statuses are Available → Ordered → Table closed → Reserved with no cleaning status (DI-336); moving and merging tables stay on the staff app until after r2 (POSV2-8). GUEST ORDERING (F11, F48): a guest inside the venue orders in the app or web for pickup or delivery to a seat or a scanned location (DI-288, DI-291); F&B and retail are optional licensed modules completed inside TICVAI (DI-505), kept simple (DI-1091); no food without an admission ticket (DI-292); table reservations and the waitlist do not go through the cart and a dining deposit is a venue option, off by default (DI-1048, DI-1049, R077). KITCHEN (P15, F83, F88): TICVAI's own display on commodity screens (19 September, replacing the 31 July "integration point only", DI-077); one kitchen ticket per preparation station from the outlet's routing rules with a fallback display (DI-323); a fired timer counts up and resets per course, not shown for quick service (DI-334); displays are assigned to stations and filter by course, with no station-load tile in r1 (R277). 86 takes an item off sale on every till and guest menu immediately (R110(c)); guests always see "Sold out", never a missing dish. RETAIL (F17, F34, F51): scan and sell through the same cart, charge and payment as tickets and food (DI-795), one cart, one receipt and one QR per guest (DI-293); system stock per venue gates the sale (DI-294); returns by receipt or order number only in r1 (R139(c)), refund to the original tender with a reason code and note (DI-796, DI-797); Shop & Drop is paid online and collected on the way out (R236), a merchandise reservation lasts to the end of the visit day (R169, R215). TILL MONEY (F32, F73, F74, F87): the float is counted by denomination with note images and typed quantities (DI-775, DI-776, R229) while the hardware checks itself (DI-778); the close is a …
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Send to kitchen | Put the order on the kitchen rail. On the till it always comes before Charge. | Fire, Fire order, Submit order, kitchen fires on payment | R261 / POSV2-4 / F108 step 3 |
+| Charge | The till's single tender step (Payment, POS-005); the button reads "Charge AED 110.25". | Checkout (on staff screens), Pay now | F108 step 4 / screens/P04-point-of-sale.yaml#POS-021 |
+| Fire / Hold (a course) | Kitchen-pass words for releasing or holding the next course of a table, and the "fired" timer. | using "fire" for sending an order from the till | DI-333 / DI-334 / DI-407 |
+| Kitchen ticket | The slip on the kitchen display, one per preparation station. | Order (on the kitchen display), KOT | R210 |
+| Ready · Served · Collected · Delivered | How an order reaches the guest; a server marks Served, a counter Collected, a runner Delivered (with the location). | Done, Complete, Bumped (as a status) | R125 / contracts/satellite/fnb.yaml#recordOrderHandover |
+| Recall (kitchen) / Recall held sale (till) | Bring a mis-bumped kitchen ticket back to the rail; separately, bring a held cart back into a sale. Never "Recall" alone where both could apply. | Undo bump, Restore | contracts/satellite/fnb.yaml#recallKitchenTicket / POSV2-6 |
+| Unavailable (86) / Sold out | Staff screens say "Unavailable" and may add "86"; guest screens say "Sold out". Immediate everywhere. | Out of stock (for food), Disabled, Hidden | R110 / contracts/satellite/fnb.yaml#getGuestMenu |
+| Order type | Dine-in · Quick service · Takeaway · Delivery, chosen in the cart. | Service mode, Fulfilment source (on the till) | DI-789 / contracts/satellite/fnb.yaml#/components/schemas/ServiceMode |
+| Covers | The number of guests at a table, entered when seating; drives split-by-covers. | Pax (except as a small suffix on the floor plan), Heads | DI-104 / contracts/satellite/fnb.yaml#openTableVisit |
+| Vacant · Seated · Ordered · Bill requested · Table closed · … | Table statuses on every floor plan (till and staff app); "Table closed" is the client's word for after payment. | Cleaning, Needs clearing, Dirty | DI-336 / DI-792 |
+| Till · Cash drawer | Staff copy may say "till" for the workstation; the cash drawer is the deposit box. | Terminal id as a heading, Deposit box (on staff screens) | R156 |
+| Float · Count · Blind count · Variance | The opening float; the denomination count; the closing count made without seeing the expected cash; counted minus expected. | Expected in drawer, Discrepancy, Error | R080 / POSV2-3 |
+| Cash out · Cash in · Safe drop | Taking cash out of the drawer mid-shift, adding change, and a supervisor moving cash to the safe with the cashier as witness. | Lift, Withdrawal (as button labels) | DI-274 / contracts/spine/shift.yaml#createCashMovement / … |
+| Menu item · Merchandise item · Inventory item · SKU | The scoped product words; SKU is a variant's code, Product stays the sellable thing. | SKU as the item's name, Article | R131 |
+| Stock on hand · Allocated · Available | Available is on hand minus allocated. | Inventory (as a number), Free stock | R171 / DI-361 |
+| Requisition · Purchase order · Goods receipt · Transfer · … | The procurement and stock words, in that flow. | GRN as the only label, Indent | DI-341 / DI-348 / DI-362 / DI-363 |
+| Shop & Drop | Bought and paid now, collected on the way out. | Click & collect | R236 |
+| Check-out (rental) · Return (rental) | Handing equipment to the guest and taking it back. On the same screens payment is "Charge" or "Pay". | Checkout (for a handover), Check-in (for a return) | DI-758 / DI-765 |
+| Deposit hold · Release · Capture | A refundable deposit held, given back in full, or partly kept for damage with the rest released. | Charge deposit, Refund deposit | DI-752 / R127 |
+| Extension · Swap · Overdue · Late fee | The active-rental words; a quick swap restarts the clock, a late swap earns a free extension. | Renewal, Exchange (for a swap) | DI-761 / DI-762 / DI-764 |
+
+### Finance, Ledger & Tax · Reporting & Analytics
+
+Finance and insights run underneath every sale. A sale at a till (P04), kiosk, web storefront (P01) or guest app (P02) is priced and taxed per line at the moment of sale, recorded in the venue's base currency (AED in the UAE; 2 decimals, or 3 for BHD, KWD and OMR, never rounded away), and posted to an append-only dual ledger through account mappings per money event; anything unmapped lands in suspense. Tax follows the jurisdiction's tax profile: inclusive or exclusive, compound where a tax applies on another, zero-rated or exempt with verified evidence, and computed on the discounted price by default or on the price before discount where the region requires it (Egypt). A guest may select a currency the venue charges and pay in it: the rate is locked on the order, the payment partner is asked in that currency, the ledger keeps the base amount with the rate, and a refund goes back in the currency paid (decided 2 October 2026, Chinmay); a currency shown but not charged is an approximate price. Foreign cash at a till is recorded at its base equivalent and change is given in base currency. A paid order can carry a VAT receipt (simplified tax invoice), a full tax invoice with the buyer's TRN, or a consolidated invoice for a company, each numbered without gaps and never edited; corrections are credit memos. Revenue is recognised by rule: POS-style immediate, tickets on the visit, gift cards and wallet on use, annual passes straight-line or per visit, breakage on expiry; deferred revenue is a balance that ages. Each venue's day is reconciled (POS cash, gateways, bank, wallet against the ledger, provider files matched automatically, only genuine mismatches to a person); chargebacks are defended against the bank's deadline; month end runs seven close checks and goes to a finance approver. Nothing posted is deleted: a correction is a reversal, an approver is never the preparer, and ledger approval needs a second factor. Back-office finance lives in Venue Management (P08: chart of accounts, mapping, FX, journals, recognition, reconciliation, period close, chargebacks); tax profiles, calculation validation and platform reconciliation in the TICVAI Console (P09); partner settlement in P10. Reporting is one consolidated, permission-based area (Analytics, P16): seeded standard dashboards and reports plus no-code builders over a governed business catalogue; the P08 report screens, the POS terminal day view and the kitchen performance view are scoped windows onto the same definitions and must show the same numbers. Every figure is read from a lag-tolerant reporting copy and shows its "as of" time; scope comes from the person's rights, never from a filter; AI explains and recommends but never acts, answers only within the person's role, labels forecasts, and is phase two for finance ledgers.
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Base currency | The venue's region currency; the currency every record and ledger posting is in. A guest may pay in a currency they select (where the venue charges it); the books still hold the base amount and the rate. | Home currency, Local price, Default currency | DI-211 / DI-282 / contracts/spine/orders.yaml#/components/schemas/Order |
+| Pay in USD (a currency the venue charges) | The guest's selected payment currency; the card is charged in it at the rate locked on the order, and refunds go back in it. | Converted price, Approx. (for a charged currency) | contracts/spine/orders.yaml#checkoutCart / … |
+| ≈ (approx.) price in USD / SAR / … | A conversion of a base-currency price for a currency the venue shows but does not charge, always next to the base price. | Converted price, USD price | DI-211 / screens/P02-guest-mobile-app.yaml#GST-044 |
+| Takings | Money received in the period less refunds (cash-basis); the seeded KPI on hubs. | Revenue, Sales, Income | contracts/satellite/reporting.yaml#/components/schemas/ReportingSystemKpi / R283 |
+| Gross sales | Issued sales before discounts and refunds; whether tax is included must be stated on the tile. | Revenue, Turnover | MATRIX 6.1.78 |
+| Net revenue | Gross sales less discounts less refunds, adjusted per finance policy. | Net sales, Revenue, Income | MATRIX 6.1.78 |
+| Recognised revenue / Deferred revenue | Earned under the recognition rules / paid for but not yet earned. Kept distinct from sales. | Realised revenue, Unearned income, Wallet revenue | MATRIX 5.12.6 / DI-260 / contracts/spine/finance.yaml#getDeferredRevenue |
+| VAT receipt | The simplified tax invoice issued on a paid order. | Receipt (when it is a tax document), Bill | contracts/spine/finance.yaml#issueTaxInvoice |
+| Tax invoice / Combined tax invoice | A full invoice with the buyer's details / one invoice for several paid orders of one buyer. | Bill, Statement | contracts/spine/finance.yaml#/components/schemas/FinTaxInvoiceType |
+| Credit memo | The document that corrects an issued invoice after a refund; the invoice itself is never edited. | Credit note (until the client's tax adviser chooses "Tax credit note"), Edit invoice | contracts/spine/finance.yaml#/components/schemas/FinTaxInvoice |
+| VAT (or the jurisdiction's tax name) | Use the tax profile's own name on every surface; "Tax" only where several kinds are summed. | GST in UAE, Service charge for a tax | contracts/spine/catalogue.yaml#setTaxProfileJurisdiction |
+| Price before discount | The taxable base where the jurisdiction taxes the undiscounted price. | Gross price, List tax | DI-598 |
+| Post / Reverse | A journal reaches the ledger when approved and posted; a correction is a reversal, never an edit or delete. | Edit entry, Delete entry, Undo | contracts/spine/finance.yaml#reverseJournalEntry |
+| Period (Open / Closing / Closed) | A fiscal period's state; closing stops postings, closed locks them. | Month locked, Frozen | contracts/spine/finance.yaml#/components/schemas/PeriodStatus |
+| Variance (Over / Short) | The difference between expected and counted or recorded, always saying between which two figures. | Discrepancy, Error, Loss | DI-275 / contracts/spine/finance.yaml#/components/schemas/UnifiedReconciliation |
+| Settlement / Exception / Resolve | A provider's file for a day / a line that did not match / the recorded explanation. | Payout file, Error, Close | contracts/spine/finance.yaml#/components/schemas/SettlementException |
+| Chargeback | A bank-initiated reversal with an evidence deadline; not a refund. | Dispute refund, Reversal | contracts/spine/orders.yaml#/components/schemas/Chargeback |
+| Report / Dashboard / Tile / KPI | A runnable, exportable, schedulable definition / a page of tiles / one visual bound to a report / a company-wide measure defined once. | Widget (outside the builder's library), Board (for a user-facing dashboard) | contracts/satellite/reporting.yaml#/components/schemas/DashboardTile / … |
+| Warning / Critical | KPI status bands set by a target's amber and red thresholds; always words plus colour. | Amber, Red (alone), Bad | contracts/satellite/reporting.yaml#/components/schemas/KpiTarget |
+| As of HH:MM / Updated N sec ago | The freshness of every figure read from the reporting copy; stale shows a warning. | Live (unless refreshed), Real-time | MATRIX 8.7.22 |
+| Forecast | Any projected figure, with its range; never shown as a fact. | Expected, Will be | DI-973 |
+| Outlet / Workstation (till) | A sales point / the device; staff copy may say "till" for the workstation. | Store, POS (in copy), Drawer (for the device) | R156 |
+| Channel | POS, Web, App, Kiosk, B2B, OTA, from one closed list. | Source, Platform | MoM 2026-08-18 4.2 Recipes, Operating Hours & Service Channels / MATRIX 1.4.7 |
+
+
 ## The screens
 
 Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs count fields; requirements are matrix rows; meeting inputs are the ones naming the screen (the module and platform ones are below); white label says whether the tenant's brand reaches it (guest) or it sets the brand (configures).
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `KIT-001` | Kitchen Operations Command Center | A | 2 | 63 | 6 | 6 | 1 | 3 | — | notStarted (generated) |
-| `KIT-002` | Kitchen Display System (KDS) | A | 19 | 27 | 6 | 6 | 2 | 3 | — | notStarted (generated) |
-| `KIT-003` | Order Firing & Course Management | A | 22 | 0 | 6 | 4 | 3 | 0 | — | notStarted (generated) |
-| `KIT-004` | Active Order Management & Fulfilment Journey | A | 2 | 41 | 6 | 8 | 1 | 6 | — | notStarted (generated) |
-| `KIT-005` | Kitchen Station Workload & Dynamic Routing | A | 11 | 16 | 6 | 4 | 1 | 6 | — | notStarted (generated) |
-| `KIT-006` | Expeditor & Order Assembly | A | 11 | 27 | 6 | 6 | 0 | 0 | — | notStarted (generated) |
-| `KIT-007` | Guest Collection, Buzzer & Digital Notification | A | 7 | 47 | 6 | 7 | 2 | 0 | — | notStarted (generated) |
-| `KIT-008` | Exceptions, Re-Fire & Unavailable Items | A | 18 | 14 | 6 | 4 | 0 | 0 | — | notStarted (generated) |
-| `KIT-009` | SLA, Priority & Service Rules | A | 76 | 0 | 5 | 18 | 0 | 0 | — | notStarted (generated) |
+| `KIT-001` | Kitchen Operations Command Center | A | 0 | 65 | 6 | 6 | 1 | 3 | — | notStarted (generated) |
+| `KIT-002` | Kitchen Display System (KDS) | A | 11 | 27 | 6 | 6 | 2 | 3 | — | notStarted (generated) |
+| `KIT-003` | Order Firing & Course Management | A | 18 | 0 | 6 | 4 | 3 | 0 | — | notStarted (generated) |
+| `KIT-004` | Active Order Management & Fulfilment Journey | A | 0 | 41 | 6 | 8 | 1 | 6 | — | notStarted (generated) |
+| `KIT-005` | Kitchen Station Workload & Dynamic Routing | A | 2 | 16 | 6 | 3 | 1 | 6 | — | notStarted (generated) |
+| `KIT-006` | Expeditor & Order Assembly | A | 14 | 27 | 6 | 7 | 0 | 0 | — | notStarted (generated) |
+| `KIT-007` | Guest Collection, Buzzer & Digital Notification | A | 5 | 20 | 6 | 7 | 2 | 0 | — | notStarted (generated) |
+| `KIT-008` | Exceptions, Re-Fire & Unavailable Items | A | 14 | 14 | 6 | 4 | 0 | 0 | — | notStarted (generated) |
+| `KIT-009` | SLA, Priority & Service Rules | A | 0 | 14 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
 | `KIT-010` | Kitchen Performance, AI & Operational Optimization | A | 3 | 1 | 6 | 1 | 0 | 3 | — | notStarted (generated) |
 
 ---
@@ -101,26 +163,27 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Opens with | `venueId` (session), `stationId` (session) · cold entry: **Cold is the only way in.** Nobody logs into a kitchen display — it is on when the kitchen is open, and it resolves its station from the device assignment … |
 | Route | `/kitchen/kitchen-operations-command-center` |
 
-**What the spec says about it.** **Built 20 August from board 3 of the client F&B design set.** **Board repointed 24 August.** This screen pointed at `wireframes/FnB Board 3.dc.html#fnb-3a` — a frame in the client pack, which is where the design came from and not where this screen is drawn. **`P15 Kitchen Display.dc.html` and `P16 Venue Analytics.dc.html` carry one anchor per screen and nothing referenced either**, so both shipped correctly anchored and unreachable. The pack frame is kept in `derivedFrom` because provenance is worth more than the wrong pointer. **`wireframe.status` corrected 25 August.** When these screens were repointed from the client pack to their own board on 24 August, the status stayed `designed` — **which claimed a client had drawn a board this package generated.** `derivedFrom` keeps the pack frame, which is where the design came from; `status` describes the file being pointed at, and those are different facts. **Drawn 31 August** — `FnB Board 3.dc.html` frame `fnb-3a`. **Matched on frame title against screen name, constrained to this board’s platforms.** These packs label by board position (`GM-6C`) rather than naming the screen, so the title is the only join — *Kitchen Operations Command Center* matched at 1.0. **A cross-platform title match was refused**: `Outlet Management` scored 0.85 against a partner-portal screen, which is how a mapping goes wrong quietly.
+**What the spec says about it.** **Built 20 August from board 3 of the client F&B design set.** **Board repointed 24 August.** This screen pointed at `wireframes/FnB Board 3.dc.html#fnb-3a` — a frame in the client pack, which is where the design came from and not where this screen is drawn. **`P15 Kitchen Display.dc.html` and `P16 Venue Analytics.dc.html` carry one anchor per screen and nothing referenced either**, so both shipped correctly anchored and unreachable. The pack frame is kept in `derivedFrom` because provenance is worth more than the wrong pointer. **`wireframe.status` corrected 25 August.** When these screens were repointed from the client pack to their own board on 24 August, the status stayed `designed` — **which claimed a client had drawn a board this package generated.** `derivedFrom` keeps the pack frame, which is where the design came from; `status` describes the file being pointed at, and those are different facts. **Drawn 31 August** — `FnB Board 3.dc.html` frame `fnb-3a`. **Matched on frame title against screen name, constrained to this board’s platforms.** These packs label by board position (`GM-6C`) rather than naming the screen, so the title is the only join — *Kitchen Operations Command Center* matched at 1.0. **A cross-platform title match was refused**: `Outlet Management` scored 0.85 against a partner-portal screen, which is how a mapping goes wrong quietly. **DI-077 is superseded** (19 September: the kitchen display is TICVAI's own, not an integration point; design-notes correction fnb-retail KIT-001; CHG-SPO-017). The design-input index entry is the design-inputs owner's …
+
+**From the Food, Beverage & Retail process.** The kitchen supervisor's or head chef's overview of the whole kitchen during service: how deep each station's rail is, the oldest ticket and how late it is against its target, held courses, refires and 86'd items, and a way into each working screen. It is not another rail. The one thing to get right: two glanceable numbers per station (tickets waiting, oldest age) and the exceptions that need a decision now, readable from two metres.
+
+**Fixed on main** (the package already carries these; draw what it says): The screen repeats the station rail (ticket cards, Bump, a course number field and a free-text "Status" filter) with states copied from the … (CHG-SPO-017); The loading state says "oldest ticket first" while the cards say "ordered by promise time"; the contract says the rail order is the … (CHG-SPO-017); The meeting input "Softlabs need not build a full KDS, only an integration point" (31 July) is still in force in the design-input index. (CHG-CLN-012).
 
 #### Inputs: what the user enters or picks
-
-**On the screen**
-
-| Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
-|---|---|---|---|---|---|---|---|
-| Course | number field | optional | — | min 1 | — | Sends `?course=` to `listKitchenTickets`; only that course's lines come back. **No station picker**: the display's station comes from its assignment (`KitchenStation.displayWorkstationIds`, set in … | `listKitchenTickets` ?course |
-| Status | select | optional | — | Received · Preparing · Ready · Served · Recalled · Cancelled | — | Sends `?status=` to `listKitchenTickets`. | `listKitchenTickets` ?status |
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
 
 | Filter | Drawn as | Default | Allowed values, rules | Source |
 |---|---|---|---|---|
 | Station | picker: choose a station | — | — | `listKitchenTickets` ?stationId |
+| Status | select | — | Received · Preparing · Ready · Served · Recalled · Cancelled | `listKitchenTickets` ?status |
+| Course | number field | — | min 1 | `listKitchenTickets` ?course |
 | Outlet | picker: choose an outlet | — | — | `listKitchenStations` ?outletId |
 | Outlet | picker: choose an outlet | — | — | `listFnbOrders` ?outletId |
 | Table visit | picker: choose a table visit | — | — | `listFnbOrders` ?tableVisitId |
 | Status | select | — | Ordered · Accepted · In preparation · Ready · Served · Collected · Delivered · Cancelled · Refunded | `listFnbOrders` ?status |
+
+Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
 
 #### Outputs: what the screen shows and produces
 
@@ -163,6 +226,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Menu items | list or chips (count when long) | Items routed to this station. |
 | Display workstations | list or chips (count when long) | The kitchen displays assigned to this station (decided 28 September, audit R277), as tenancy `Workstation` ids, primary first and fallbacks … |
 | Display endpoint | text | The P15 Kitchen Display device this station's tickets go to (19 Sep: the display is TICVAI software on commodity hardware, per station … |
+| Printer devices | list or chips (count when long) | The kitchen printers assigned to this station (Chinmay, 2 October, workbook Q187: kitchen printers are in release 1; CHG-CSA-014), as … |
+| Serves outlets | list or chips (count when long) | A producing outlet's station serving other outlets (Chinmay, 2 October, workbook Q186 and Q188; DI-330; CHG-CSA-015). |
 | Is active | yes / no (icon or chip) | — |
 | Next cursor | text | — |
 | Has more | yes / no (icon or chip) | — |
@@ -175,6 +240,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | ID | the name it points at, never the id | — |
 | Order number | text | — |
 | Outlet | the name it points at, never the id | — |
+| Payment timing | chip: Send first, Pay first | The outlet's payment timing when the order was placed (CHG-CSA-010), kept as a snapshot. |
+| Sent to kitchen at | 1 Oct 2026, 14:30 | When the order's kitchen tickets were created. Null on a `payFirst` order not yet paid (CHG-CSA-010). |
 | Service mode | chip: Quick service, Table service, Room service, Collection, Delivery | — |
 | Table visit | the name it points at, never the id | — |
 | Status | chip: Ordered, Accepted, In preparation, Ready, Served, Collected… | The full lifecycle from 4.6.35. Nine states, not six — the earlier enum collapsed `accepted` into `placed` and had no `collected` or … |
@@ -189,10 +256,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Redeem entitlement | text | A meal combo redeemed at the till or by a scan (29 September, MOB-4; applied 30 September). |
 | Status | chip: Ordered, Accepted, In preparation, Ready, Served, Collected… | The full lifecycle from 4.6.35. Nine states, not six — the earlier enum collapsed `accepted` into `placed` and had no `collected` or … |
 | Unit price | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Line total | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Sales order | the name it points at, never the id | Retyped 29 September (SD-046), and `format: uuid` since ADR-0056 (30 September): every id is a uuid, so this joins `orders.sales_order.id`. |
 
-**Every kitchen ticket** (data table, from `listKitchenTickets`)
+**Every station, at a glance** (data table, from `listKitchenTickets`): The command centre spans every station (DI-332): load per station, late tickets and the oldest wait. No bump here: the rail is KIT-002. **The server's order, never re-sorted on the device** (`listKitchenTickets` orders by priority weights; design-notes correction fnb-retail): no "oldest first" and no "promise time" sort of its own.
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -213,11 +278,15 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 **Metric tile** (metric tile): Depth and oldest ticket age. **Two numbers, glanceable** — anything a chef has to read is a number they will not read. The station-load tile is not in the first release (decided 28 September, audit R277).
 
-**Actions and what each produces**
+**Rules for what is shown** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
 
-| Action | Calls | Sends | On success returns | Errors to show | Notes |
-|---|---|---|---|---|---|
-| Bump (primary button) | navigation or local | — | — | — | — |
+- **Per-station strip**: Each station (Grill, Fryer, Cold, Bar, Pastry) with tickets waiting and the age of the oldest, coloured against the outlet's target for that order type (amber at the warning percentage, red past target). No load percentage or capacity gauge in the first release. *(source: DI-332 / R277 / contracts/satellite/fnb.yaml#/components/schemas/KitchenSla)*
+- **Orders by stage**: Counts of orders Received, Preparing, Ready (waiting for pickup or a runner) for the outlet; Ready orders waiting longest listed first. *(source: DI-332 / contracts/satellite/fnb.yaml#listFnbOrders)*
+- **Needs attention**: Late tickets, held courses older than a few minutes, chased stations, items 86'd today with when they come back. *(source: contracts/satellite/fnb.yaml#holdCourse / contracts/satellite/fnb.yaml#chaseStation / contracts/satellite/fnb.yaml#list86Events)*
+
+**What each action does** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
+
+- **Open a station's rail, the pass, collection, exceptions or rules**: Each tile opens its screen (KIT-002 for a station, KIT-006 the pass, KIT-007 collection, KIT-008 exceptions, KIT-009 rules). *(source: screens/P15-kitchen-display.yaml#KIT-001)*
 
 **Data it reads**: `listKitchenTickets` (onLoad, Kitchen ticket queue); `listKitchenStations` (onLoad, List preparation stations and their routing); `listFnbOrders` (onLoad, List F&B orders)
 
@@ -237,12 +306,41 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | State | What it shows |
 |---|---|
-| Loading (`?state=loading`) | The rail, oldest ticket first. **The count renders before the tickets** — a kitchen wants to know how deep it is before it reads anything. |
+| Loading (`?state=loading`) | Every station's load, then the tickets, in the server's order. |
 | Error (`?state=error`) | Could not reach the platform. **The rail is still live from cache** and every bump is queued. |
 | Empty, first run (`?state=emptyFirstRun`) | **No tickets. The kitchen is clear**, and that is worth saying plainly rather than showing a blank rail — a screen that looks broken and a screen that means nothing to do are the same picture otherwise. |
-| Empty, no results (`?state=emptyNoResults`) | Nothing matches this station or course filter. **The rail is not empty** — the filter is narrow, and on a kitchen screen that distinction is the difference between calm and panic. |
-| Permission denied (`?state=emptyNoAccess`) | This display is not assigned to a station. **Assignment is a back-office act** — a kitchen screen does not choose what it shows. **A principal without `ORDER_VIEW` gets this state naming `ORDER_VIEW`**, the screen's `permission` and the one its read enforces; a button whose own `permission` the principal lacks is hidden, and a 403 from an action names that operation's permission. |
+| Empty, no results (`?state=emptyNoResults`) | Nothing matches the station chips; the kitchen is not empty. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `ORDER_VIEW`, the screen's permission, and names it. The command centre is not tied to one station, so it never says "not assigned to a station". |
 | Offline (`?state=offline`) | **Amber, and it keeps working.** The kitchen still has to send food out — a display that blanks mid-service is worse than one that says it is behind, and every bump journals locally and syncs when the network returns. |
+
+#### Edge cases to draw
+
+- **Offline**: Amber banner, numbers from cache with their age; every bump made on station screens is journaled and syncs. *(source: screens/P15-kitchen-display.yaml#KIT-001)*
+- **No tickets**: "The kitchen is clear" stated plainly, not a blank screen. *(source: screens/P15-kitchen-display.yaml#KIT-001)*
+
+#### Consistency with other screens
+
+- Match `KIT-002`: Same ticket card and colours; this screen shows counts, the station screen the cards.
+- Match `BO-046`: The back office's kitchen view reads the same numbers after the fact.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+outlet: Oasis Bistro kitchen · dinner service
+stations:
+- Grill · 7 waiting · oldest 14 min (target 12) — red
+- Fryer · 3 · 6 min
+- Cold · 2 · 4 min
+- Bar · 5 · 3 min
+- Pastry · 1 · 2 min
+stages: Received 2 · Preparing 14 · Ready 3 (oldest ready 5 min)
+attention:
+- T4 mains held 7 min — table not ready
+- Grill chased twice
+- Kunafa unavailable until 18:00
+```
 
 #### Permissions
 
@@ -250,7 +348,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 - `listKitchenStations` → `PRODUCT_VIEW` (read) · staff
 - `listFnbOrders` → `ORDER_VIEW` (read) · staff
 
-**A refused user sees:** This display is not assigned to a station. **Assignment is a back-office act** — a kitchen screen does not choose what it shows. **A principal without `ORDER_VIEW` gets this state naming `ORDER_VIEW`**, the screen's `permission` and the one its read enforces; a button whose own `permission` the principal lacks is hidden, and a 403 from an action names that operation's permission.
+**A refused user sees:** Shown when the caller lacks `ORDER_VIEW`, the screen's permission, and names it. The command centre is not tied to one station, so it never says "not assigned to a station".
 
 Screen guard: `ORDER_VIEW`
 
@@ -273,7 +371,7 @@ For this screen, newest first. An **Open question** is built to the default it s
 
 - Kitchen Operations Command Center shows live order counts, items pending/firing and kitchen station status. *(client request · MoM 18 Aug 2026, 4.7 Kitchen Operations & Course-Wise Ordering · DI-332)*
 
-Also apply: 6 for all of P15, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 5 for all of P15, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -293,13 +391,14 @@ Also apply: 6 for all of P15, 29 for every app (section *Design inputs from the 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (2), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (63 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
+- [ ] Every output is drawn (65 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#KIT-001?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: Bump.
+- [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `KIT-002`, `KIT-003`, `KIT-004`, `KIT-005`, `KIT-006`, `KIT-007`, `KIT-008`, `KIT-009`, `KIT-010`.
 - [ ] Every gated control is gated: `ORDER_VIEW`, `PRODUCT_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 2 edge case(s) from the process notes are drawn.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -320,7 +419,11 @@ Also apply: 6 for all of P15, 29 for every app (section *Design inputs from the 
 | Opens with | `venueId` (session), `stationId` (session), `ticketId` (KIT-002), `visitId` (deepLink) · cold entry: **Cold is the only way in.** Nobody logs into a kitchen display — it is on when the kitchen is open, and it resolves its station from the device assignment … |
 | Route | `/kitchen/kitchen-display-system-kds` |
 
-**What the spec says about it.** **Built 20 August from board 3 of the client F&B design set.** **The screen the platform exists for.** Bumped, not tapped — a bump bar and a touch target sized for somebody wearing gloves. Nothing on it is more than one action deep. **Operations from the 24 August F&B build wired here** — the contract grew and the screens had not caught up, which is how 92 operations reached 49% of screens. **Cross-platform navigation removed 24 August**: EMP-058. **A till does not navigate to a back office and a guest app does not navigate to either** — those are device handovers, and a flow declares them with `crossesDevice` rather than a screen pretending there is a link. **Board repointed 24 August.** This screen pointed at `wireframes/FnB Board 3.dc.html#fnb-3b` — a frame in the client pack, which is where the design came from and not where this screen is drawn. **`P15 Kitchen Display.dc.html` and `P16 Venue Analytics.dc.html` carry one anchor per screen and nothing referenced either**, so both shipped correctly anchored and unreachable. The pack frame is kept in `derivedFrom` because provenance is worth more than the wrong pointer. **Drawn 31 August** — `FnB Board 3.dc.html` frame `fnb-3b`. **Matched on frame title against screen name, constrained to this board’s platforms.** These packs label by board position (`GM-6C`) rather than naming the screen, so the title is the only join — *Kitchen Display System (KDS)* matched at 1.0. **A cross-platform title match was refused**: `Outlet Management` scored 0.85 against a partner-portal screen, which is how a mapping goes wrong quietly.
+**What the spec says about it.** **Fire and hold leave the station display** (2 October 2026, CHG-CLN-006): the pass fires and holds courses (DI-407; KIT-003), and flow F88 step 2 no longer calls them here (CHG-SPO-020). **Built 20 August from board 3 of the client F&B design set.** **The screen the platform exists for.** Bumped, not tapped — a bump bar and a touch target sized for somebody wearing gloves. Nothing on it is more than one action deep. **Operations from the 24 August F&B build wired here** — the contract grew and the screens had not caught up, which is how 92 operations reached 49% of screens. **Cross-platform navigation removed 24 August**: EMP-058. **A till does not navigate to a back office and a guest app does not navigate to either** — those are device handovers, and a flow declares them with `crossesDevice` rather than a screen pretending there is a link. **Board repointed 24 August.** This screen pointed at `wireframes/FnB Board 3.dc.html#fnb-3b` — a frame in the client pack, which is where the design came from and not where this screen is drawn. **`P15 Kitchen Display.dc.html` and `P16 Venue Analytics.dc.html` carry one anchor per screen and nothing referenced either**, so both shipped correctly anchored and unreachable. The pack frame is kept in `derivedFrom` because provenance is worth more than the wrong pointer. **Drawn 31 August** — `FnB Board 3.dc.html` frame `fnb-3b`. **Matched on frame title against screen name, constrained to this board’s platforms.** These packs label by board position (`GM-6C`) rather than naming the screen, so the title is the only join — *Kitchen Display …
+
+**From the Food, Beverage & Retail process.** The station display on the kitchen wall: the tickets this station must make, in the order the kitchen should make them, bumped with one touch or a bump bar by someone wearing gloves. The one thing to get right: each ticket card reads in a glance from two metres — order number or table, order type, items with options and allergy notes in red, and a fired timer counting up — and nothing is more than one action deep.
+
+**Fixed on main** (the package already carries these; draw what it says): The layout has a number field "Course", a free-text "Status" filter, a table "Every kitchen ticket", and a "Save kitchen ticket status" … (CHG-SPO-017); Fire course and Hold course are on the station display. (CHG-CLN-006); The cards say "ordered by promise time not arrival", the loading state "oldest ticket first". (CHG-SPO-017).
 
 #### Inputs: what the user enters or picks
 
@@ -328,18 +431,18 @@ Also apply: 6 for all of P15, 29 for every app (section *Design inputs from the 
 
 | Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
 |---|---|---|---|---|---|---|---|
-| Course | number field | optional | — | min 1 | — | Sends `?course=` to `listKitchenTickets`; only that course's lines come back. **No station picker**: the display's station comes from its assignment (`KitchenStation.displayWorkstationIds`, set in … | `listKitchenTickets` ?course |
-| Status | select | optional | — | Received · Preparing · Ready · Served · Recalled · Cancelled | — | Sends `?status=` to `listKitchenTickets`. | `listKitchenTickets` ?status |
+| Course | number field | optional | — | min 1 | — | Course chips, not a typed number (design-notes correction fnb-retail KIT-002). Sends `?course=` to `listKitchenTickets`; only that course's lines come back. **No station picker**: the display's … | `listKitchenTickets` ?course |
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
 
 | Filter | Drawn as | Default | Allowed values, rules | Source |
 |---|---|---|---|---|
 | Station | picker: choose a station | — | — | `listKitchenTickets` ?stationId |
+| Status | select | — | Received · Preparing · Ready · Served · Recalled · Cancelled | `listKitchenTickets` ?status |
 
 **Form: Save kitchen ticket status** (modal, opened by *Save kitchen ticket status*; *Save kitchen ticket status* calls `setKitchenTicketStatus`, *Cancel* sends nothing)
 
-**Collects what `setKitchenTicketStatus` sends before it is called.** Required: `status`, `recordedAt`. Optional: `lineIds`, `stationId`. Dismissing sends nothing; the screen behind is unchanged.
+**A gesture on the card** (bump, start, ready); no form, no line ids typed and no time entered: the time is the device's (design-notes correction fnb-retail KIT-002).
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
@@ -349,29 +452,6 @@ Also apply: 6 for all of P15, 29 for every app (section *Design inputs from the 
 | Recorded at `recordedAt` | date and time picker | required | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `setKitchenTicketStatus` body |
 
 Errors to draw in the form: 409 The move is not one of the four above. Names the ticket's current status.
-
-**Form: Fire course** (modal, opened by *Fire course*; *Fire course* calls `fireCourse`, *Cancel* sends nothing)
-
-**Collects what `fireCourse` sends before it is called.** Required: `recordedAt`, `course`. Optional: `fireAt`. Dismissing sends nothing; the screen behind is unchanged.
-
-| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
-|---|---|---|---|---|---|---|---|
-| Recorded at `recordedAt` | date and time picker | required | — | — | 1 Oct 2026, 14:30 (venue time zone) | Device time of the act (offline-capable; replayed in this order). | `fireCourse` body |
-| Course `course` | number field | required | — | min 1 | — | — | `fireCourse` body |
-| Fire at `fireAt` | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | For `timed` coursing. Absent means now — a server standing at the pass is not scheduling, they are calling it. | `fireCourse` body |
-
-**Form: Hold course** (modal, opened by *Hold course*; *Hold course* calls `holdCourse`, *Cancel* sends nothing)
-
-**Collects what `holdCourse` sends before it is called.** Required: `recordedAt`, `course`. Optional: `reason`. Dismissing sends nothing; the screen behind is unchanged.
-
-| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
-|---|---|---|---|---|---|---|---|
-| Recorded at `recordedAt` | date and time picker | required | — | — | 1 Oct 2026, 14:30 (venue time zone) | Device time of the act (offline-capable; replayed in this order). | `holdCourse` body |
-| Course `course` | number field | required | — | min 1 | — | — | `holdCourse` body |
-| Reason `reason` | radio group | optional | — | Table not ready · Guest request · Kitchen backed up · Awaiting previous · Other; A reason of `other` with no note is refused `400`, and the notes are reviewed quarterly so the common ones become real reasons. | — | `other` is allowed only with a `note`, which it then requires (decided 28 September, audit R222). | `holdCourse` body |
-| Note `note` | text area | optional | — | max length 500 | — | Free text. Required where the reason is `other` (audit R222). | `holdCourse` body |
-
-Errors to draw in the form: 400 Validation failed
 
 **Form: Refire item** (modal, opened by *Refire item*; *Refire item* calls `refireItem`, *Cancel* sends nothing)
 
@@ -402,11 +482,16 @@ Errors to draw in the form: 409 Past the recall window (`VenueSettings.fnb.recal
 |---|---|---|---|---|---|---|---|
 | Reason `reason` | radio group | optional | — | Food ready · Guest waiting · Bill requested · Assistance needed · Allergy query | — | — | `notifyServer` body |
 
+**Rules for these inputs** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
+
+- **Course filter**: Chips with the outlet's course names (Starters · Mains · Desserts), not a number field; only that course's lines show. *(source: R277 / contracts/satellite/fnb.yaml#listKitchenTickets / contracts/satellite/fnb.yaml#setCourseRules)*
+- **Station**: Never picked on the display; the display shows the station it is assigned to in station setup. *(source: R277 / contracts/satellite/fnb.yaml#/components/schemas/KitchenStation)*
+
 #### Outputs: what the screen shows and produces
 
 **Shown**
 
-**Every kitchen ticket** (data table, from `listKitchenTickets`)
+**Every kitchen ticket** (data table, from `listKitchenTickets`): **The server's order, never re-sorted on the device** (`listKitchenTickets` orders by priority weights; design-notes correction fnb-retail): no "oldest first" and no "promise time" sort of its own.
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -453,11 +538,24 @@ Errors to draw in the form: 409 Past the recall window (`VenueSettings.fnb.recal
 |---|---|---|---|---|---|
 | Bump (primary button) | navigation or local | — | — | — | — |
 | Save kitchen ticket status (primary button) | `setKitchenTicketStatus` PUT `/kitchen/tickets/{ticketId}/status` | inline | KitchenTicket | 409 The move is not one of the four above. Names the ticket's current status. | works offline; gated `ORDER_MODIFY`; opens modal first; produces a document or message: Advance a kitchen ticket |
-| Fire course (secondary button) | `fireCourse` POST `/kitchen-tickets/{ticketId}/fire` | inline | KitchenTicket | — | works offline; gated `ORDER_MODIFY`; opens modal first |
-| Hold course (secondary button) | `holdCourse` POST `/kitchen-tickets/{ticketId}/hold` | inline | KitchenTicket | 400 Validation failed | works offline; gated `ORDER_MODIFY`; opens modal first |
 | Refire item (secondary button) | `refireItem` POST `/kitchen-tickets/{ticketId}/refire` | inline | KitchenTicket | — | works offline; gated `ORDER_MODIFY`; opens modal first |
 | Recall kitchen ticket (secondary button) | `recallKitchenTicket` POST `/kitchen-tickets/{ticketId}/recall` | inline | KitchenTicket | 409 Past the recall window (`VenueSettings.fnb.recallWindowMinutes`, proposed default 10, audit R094). | works offline; gated `ORDER_MODIFY`; opens modal first; produces a document or message: Bring back a ticket that was bumped by mistake |
 | Notify server (secondary button) | `notifyServer` POST `/table-visits/{visitId}/notify-server` | inline | no body | — | gated `ORDER_MODIFY`; opens modal first |
+
+**Rules for what is shown** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
+
+- **Ticket card**: Header: "order number (counter) or table and covers (dine-in), order type badge, server. Lines: quantity," item, options indented, the note to the kitchen, allergen flags highlighted. A refire line is marked "REFIRE · overcooked". Priority tickets marked. Lines of a held course greyed with "Held". *(source: contracts/satellite/fnb.yaml#/components/schemas/KitchenTicket / contracts/satellite/fnb.yaml#refireItem)*
+- **Fired timer**: Counts up from when the ticket (or course) was sent — never a countdown; resets when a course is completed; not shown for quick-service outlets. Turns amber at the warning percentage and red past the target for that order type. *(source: DI-334 / contracts/satellite/fnb.yaml#/components/schemas/KitchenSla)*
+- **Rail order**: Exactly as the server returns it (priority, then the outlet's weights for age, promise time, table stage, VIP); the display does not re-sort. *(source: contracts/satellite/fnb.yaml#listKitchenTickets)*
+- **Header**: Station name, tickets waiting and oldest age — two numbers. *(source: screens/P15-kitchen-display.yaml#KIT-002)*
+
+**What each action does** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
+
+- **Start (tap a received ticket)**: Received → Preparing. *(source: contracts/satellite/fnb.yaml#setKitchenTicketStatus)*
+- **Bump (ready)**: Preparing → Ready for the whole ticket or the tapped lines; the ticket leaves the rail and the counter or server sees it ready. *(source: contracts/satellite/fnb.yaml#setKitchenTicketStatus / F108 step 5)*
+- **Recall**: Brings back a ticket bumped by mistake within the recall window (proposed 10 minutes); after it, the display offers a refire instead. *(source: contracts/satellite/fnb.yaml#recallKitchenTicket / R094)*
+- **Refire line**: Remakes a line with a reason (overcooked, undercooked, wrong item, dropped, cold, allergy risk, guest changed mind, late add); not chargeable by default. *(source: contracts/satellite/fnb.yaml#refireItem / F29 step 6)*
+- **Call server**: Notifies the table's assigned server (or the outlet supervisor if none) that food is ready, the guest is waiting, or there is an allergy query. *(source: contracts/satellite/fnb.yaml#notifyServer / R125 / F29 step 4)*
 
 **Data it reads**: `listKitchenTickets` (onLoad, Kitchen ticket queue)
 
@@ -473,20 +571,52 @@ Errors to draw in the form: 409 Past the recall window (`VenueSettings.fnb.recal
 
 | State | What it shows |
 |---|---|
-| Loading (`?state=loading`) | The rail, oldest ticket first. **The count renders before the tickets** — a kitchen wants to know how deep it is before it reads anything. |
+| Loading (`?state=loading`) | The rail. **The count renders before the tickets.** **The server's order, never re-sorted on the device** (`listKitchenTickets` orders by priority weights; design-notes correction fnb-retail): no "oldest first" and no "promise time" sort of its own. |
 | Error (`?state=error`) | Could not reach the platform. **The rail is still live from cache** and every bump is queued. |
 | Empty, first run (`?state=emptyFirstRun`) | **No tickets. The kitchen is clear**, and that is worth saying plainly rather than showing a blank rail — a screen that looks broken and a screen that means nothing to do are the same picture otherwise. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches this station or course filter. **The rail is not empty** — the filter is narrow, and on a kitchen screen that distinction is the difference between calm and panic. |
 | Permission denied (`?state=emptyNoAccess`) | This display is not assigned to a station. **Assignment is a back-office act** — a kitchen screen does not choose what it shows. **A principal without `ORDER_VIEW` gets this state naming `ORDER_VIEW`**, the screen's `permission` and the one its read enforces; a button whose own `permission` the principal lacks is hidden, and a 403 from an action names that operation's permission. |
 | Offline (`?state=offline`) | **Amber, and it keeps working.** The kitchen still has to send food out — a display that blanks mid-service is worse than one that says it is behind, and every bump journals locally and syncs when the network returns. |
-| Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 Past the recall window (`VenueSettings.fnb.recallWindowMinutes`, proposed default 10, audit R094).; 409 The move is not one of the four above. Names the ticket's current status. |
+| Validation and conflict | the form keeps what was entered and marks the problem: 409 Past the recall window (`VenueSettings.fnb.recallWindowMinutes`, proposed default 10, audit R094).; 409 The move is not one of the four above. Names the ticket's current status. |
+
+#### Edge cases to draw
+
+- **Offline**: The rail stays live from cache with an amber banner; every bump is journaled and syncs; new orders from tills on the venue network still arrive. *(source: screens/P15-kitchen-display.yaml#KIT-002 / contracts/satellite/fnb.yaml#createFnbOrder)*
+- **The primary display of a station is down**: Tickets route to the station's fallback display; the fallback shows which station it is covering. *(source: DI-323 / contracts/satellite/fnb.yaml#/components/schemas/KitchenStation)*
+- **A move the ticket's state does not allow (e.g. bump a received ticket straight to served)**: Refused with the ticket's current state; only Received→Preparing, Preparing→Ready, Ready→Recalled, Recalled→Preparing happen here. *(source: contracts/satellite/fnb.yaml#setKitchenTicketStatus)*
+- **Recall after the window**: "Too late to recall — refire instead?" with the refire reasons. *(source: contracts/satellite/fnb.yaml#recallKitchenTicket)*
+
+#### Consistency with other screens
+
+- Match `POS-021`: The notes and allergen flags typed at the till appear here word for word.
+- Match `KIT-003`: Held and fired courses look the same here and on the pass.
+- Match `POS-022`: Ready on this display is Ready on the counter rail.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+station: Grill · 7 waiting · oldest 14 min
+tickets:
+- header: T4 · 6 covers · Dine-in · Priya
+  course: Mains
+  fired: '11:42'
+  lines:
+  - 2 × Ribeye 300 g — medium rare, peppercorn
+  - '1 × Ribeye 300 g — well done · ALLERGY: no butter (milk)'
+- header: BNG-004127 · Quick service
+  lines:
+  - 1 × Marina Smash Burger — medium, cheese · NO SESAME — allergy
+- header: T9 · 2 covers
+  lines:
+  - 1 × Lamb chops — REFIRE · undercooked
+```
 
 #### Permissions
 
 - `listKitchenTickets` → `ORDER_VIEW` (read) · staff
 - `setKitchenTicketStatus` → `ORDER_MODIFY` (operate) · staff
-- `fireCourse` → `ORDER_MODIFY` (operate) · staff
-- `holdCourse` → `ORDER_MODIFY` (operate) · staff
 - `refireItem` → `ORDER_MODIFY` (operate) · staff
 - `recallKitchenTicket` → `ORDER_MODIFY` (operate) · staff
 - `notifyServer` → `ORDER_MODIFY` (operate) · staff
@@ -515,7 +645,7 @@ For this screen, newest first. An **Open question** is built to the default it s
 - Kitchen display lets cashier/kitchen mark orders ready, handed over or delivered, driving the guest-facing order-status board. *(client request · MoM 9 Sep 2026, 4.15 POS Prototype Review - Food & Beverage, Tables & Kitchen Display · DI-794)*
 - Each kitchen ticket shows a live "fired" timer counting elapsed time since the order was sent (not a countdown); it resets when a course within that ticket is completed/dished out. Not shown for quick-service outlets, which print and prepare immediately. *(client request · MoM 18 Aug 2026, 4.7 Kitchen Operations & Course-Wise Ordering · DI-334)*
 
-Also apply: 6 for all of P15, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 5 for all of P15, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -538,13 +668,14 @@ Also apply: 6 for all of P15, 29 for every app (section *Design inputs from the 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (19), with its required mark, default, format and its error state (400, 409).
+- [ ] Every input above is drawn (11), with its required mark, default, format and its error state (409).
 - [ ] Every output is drawn (27 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#KIT-002?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: Bump, Save kitchen ticket status, Fire course, Hold course, Refire item, Recall kitchen ticket, Notify server.
+- [ ] Every action is wired with its success and its failure: Bump, Save kitchen ticket status, Refire item, Recall kitchen ticket, Notify server.
 - [ ] Every transition is wired: `KIT-001`, `KIT-003`, `EMP-058`, `EMP-059`, `POS-022`.
 - [ ] Every gated control is gated: `ORDER_MODIFY`, `ORDER_VIEW`.
 - [ ] The 2 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 4 edge case(s) from the process notes are drawn.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -558,7 +689,7 @@ Also apply: 6 for all of P15, 29 for every app (section *Design inputs from the 
 | App · platform | TICVAI POS · P15 Kitchen Display (display) |
 | Module | Kitchen · wave 2 · needs the `fnb` module |
 | Block | Block A · ticket #18182 (APP-POS-KIT-003) |
-| Who uses it | venue staff holding `ORDER_MODIFY`, `ORDER_VIEW`, `PRODUCT_CONFIGURE` (1 operate, 1 read, 1 configure); in the flows as supervisor |
+| Who uses it | venue staff holding `ORDER_MODIFY`, `ORDER_VIEW` (1 operate, 1 read); in the flows as supervisor |
 | Device and orientation | kiosk · LTR · dark theme |
 | Pattern | configEditor (touchLarge density): the screen declares only writes (`setKitchenTicketStatus`, `prioritiseKitchenTicket`, `fireCourse`) and no read of a population — it is settings, not a list |
 | Offline | **Amber, and it keeps working.** The kitchen still has to send food out — a display that blanks mid-service is worse than one that says it is behind, and every bump journals locally and syncs when the network returns. |
@@ -566,6 +697,12 @@ Also apply: 6 for all of P15, 29 for every app (section *Design inputs from the 
 | Route | `/kitchen/order-firing-course-management` |
 
 **What the spec says about it.** **Built 20 August from board 3 of the client F&B design set.** **Starters before mains is the entire job of a kitchen pass.** `KitchenTicket.coursing` carries `holdAndFire`, `phased` and `timed`; without it a table gets dessert while eating its starter. **Operations from the 24 August F&B build wired here** — the contract grew and the screens had not caught up, which is how 92 operations reached 49% of screens. **Board repointed 24 August.** This screen pointed at `wireframes/FnB Board 3.dc.html#fnb-3c` — a frame in the client pack, which is where the design came from and not where this screen is drawn. **`P15 Kitchen Display.dc.html` and `P16 Venue Analytics.dc.html` carry one anchor per screen and nothing referenced either**, so both shipped correctly anchored and unreachable. The pack frame is kept in `derivedFrom` because provenance is worth more than the wrong pointer. **Drawn 31 August** — `FnB Board 3.dc.html` frame `fnb-3c`. **Matched on frame title against screen name, constrained to this board’s platforms.** These packs label by board position (`GM-6C`) rather than naming the screen, so the title is the only join — *Order Firing &amp; Course Management* matched at 1.0. **A cross-platform title match was refused**: `Outlet Management` scored 0.85 against a partner-portal screen, which is how a mapping goes wrong quietly.
+
+**Known gaps.** Removed 2 October 2026 (CHG-WIR-008): "Save course rules" (setCourseRules, outlet configuration) sat on the live pass; course rules are set up before service (now on BO-136) (R254; design-notes …
+
+**From the Food, Beverage & Retail process.** The pass (head chef or expeditor) for table service: courses of each table — starters before mains — and when the next course goes. The pass fires a held course when the table is ready, holds one when the table has gone quiet, and moves an urgent ticket up. The one thing to get right: per table, which course is out, which is held and for how long, and a single Fire button for the next course.
+
+**Fixed on main** (the package already carries these; draw what it says): "Save course rules" (setCourseRules, outlet configuration) sits on the live pass, and the layout exposes the status request fields … (CHG-WIR-008); Course rules and kitchen targets have setters (setCourseRules, setKitchenSla) but no read operation. (CHG-WIR-008).
 
 #### Inputs: what the user enters or picks
 
@@ -618,19 +755,6 @@ Also apply: 6 for all of P15, 29 for every app (section *Design inputs from the 
 
 Errors to draw in the form: 400 Validation failed
 
-**Form: Save course rules** (modal, opened by *Save course rules*; *Save course rules* calls `setCourseRules`, *Cancel* sends nothing)
-
-**Collects what `setCourseRules` sends before it is called.** Nothing in the body is required. Optional: `outletId`, `defaultCoursing`, `courseNames`, `autoFireMinutes`, `serviceModeOverrides`, `scopePath`. Dismissing sends nothing; the screen behind is unchanged.
-
-| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
-|---|---|---|---|---|---|---|---|
-| Default coursing `defaultCoursing` | radio group | optional | — | Fire and forget · Hold and fire · Phased · Timed · Delayed | — | How a ticket's courses are fired. `fireAndForget` sends every course at once, which is no coursing; `holdAndFire` waits for a server to call each course; `timed` fires on a clock … | `setCourseRules` body |
-| Course names `courseNames` | list of values (chips) | optional | — | — | — | — | `setCourseRules` body |
-| Auto fire minutes `autoFireMinutes` | number field (minutes) | optional | — | — | — | — | `setCourseRules` body |
-| Service mode overrides `serviceModeOverrides` | key and value settings | optional | — | — | — | A different default per service mode. | `setCourseRules` body |
-
-Errors to draw in the form: 412 The row changed since the `If-Match` version was read (SD-013). Re-read and retry.
-
 **Sent by *Save kitchen ticket status*** (`setKitchenTicketStatus`; no form is declared, so these are filled from the screen or collected inline)
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
@@ -639,6 +763,12 @@ Errors to draw in the form: 412 The row changed since the `If-Match` version was
 | Lines `lineIds` | multi-picker: choose lines | optional | — | — | — | Advance specific lines. Omit for the whole ticket. | `setKitchenTicketStatus` body |
 | Station `stationId` | picker: choose a station | optional | — | — | shows names, sends the id | — | `setKitchenTicketStatus` body |
 | Recorded at `recordedAt` | date and time picker | required | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `setKitchenTicketStatus` body |
+
+**Rules for these inputs** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
+
+- **Hold reason**: Table not ready · Guest request · Kitchen backed up · Waiting for previous course · Other (needs a note). *(source: contracts/satellite/fnb.yaml#holdCourse / R222)*
+- **Fire at (timed coursing)**: Only for outlets using timed coursing; empty means now. *(source: contracts/satellite/fnb.yaml#fireCourse)*
+- **Prioritise**: A reason is required (3+ characters); no position given means top of the rail; recorded against the person. *(source: contracts/satellite/fnb.yaml#prioritiseKitchenTicket / R125)*
 
 #### Outputs: what the screen shows and produces
 
@@ -656,8 +786,18 @@ Errors to draw in the form: 412 The row changed since the `If-Match` version was
 | Prioritise kitchen ticket (secondary button) | `prioritiseKitchenTicket` POST `/kitchen/tickets/{ticketId}/prioritise` | inline | KitchenTicket | — | gated `ORDER_MODIFY`; opens modal first; produces a document or message: Move a ticket up the queue |
 | Fire course (secondary button) | `fireCourse` POST `/kitchen-tickets/{ticketId}/fire` | inline | KitchenTicket | — | works offline; gated `ORDER_MODIFY`; opens modal first |
 | Hold course (secondary button) | `holdCourse` POST `/kitchen-tickets/{ticketId}/hold` | inline | KitchenTicket | 400 Validation failed | works offline; gated `ORDER_MODIFY`; opens modal first |
-| Save course rules (secondary button) | `setCourseRules` PUT `/outlets/{outletId}/course-rules` | CourseRules | CourseRules | 412 The row changed since the `If-Match` version was read (SD-013). Re-read and retry. | gated `PRODUCT_CONFIGURE`; opens modal first |
 | Bump (primary button) | navigation or local | — | — | — | — |
+
+**Rules for what is shown** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
+
+- **Tables by course**: One row per table: covers, server, each course as a chip — Sent · Preparing · Ready · Served · Held (with how long). A held course keeps its place and shows its waiting time. *(source: contracts/satellite/fnb.yaml#holdCourse / DI-333)*
+- **Coursing policy**: The outlet's default (Hold & fire, Timed, Phased, Fire all at once) shown as a label, per order type. *(source: contracts/satellite/fnb.yaml#setCourseRules)*
+
+**What each action does** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
+
+- **Fire next course**: Sends the held course to the stations; works offline and replays in order. *(source: contracts/satellite/fnb.yaml#fireCourse)*
+- **Hold course**: Stops a course going out, with a reason; it keeps its place on the rail. *(source: contracts/satellite/fnb.yaml#holdCourse)*
+- **Move up**: Puts the ticket at the top of the rail (or a chosen place) with a reason; online only. *(source: contracts/satellite/fnb.yaml#prioritiseKitchenTicket)*
 
 **Data it reads**: `listKitchenTickets` (onLoad, Kitchen ticket queue, filtered by course (audit R277))
 
@@ -678,6 +818,32 @@ Errors to draw in the form: 412 The row changed since the `If-Match` version was
 | Offline (`?state=offline`) | **Amber, and it keeps working.** The kitchen still has to send food out — a display that blanks mid-service is worse than one that says it is behind, and every bump journals locally and syncs when the network returns. |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 The move is not one of the four above. Names the ticket's current status. |
 
+#### Edge cases to draw
+
+- **Offline**: Fire and hold work and replay in order; Move up needs the connection and is disabled with the reason. *(source: contracts/satellite/fnb.yaml#fireCourse / contracts/satellite/fnb.yaml#prioritiseKitchenTicket)*
+- **Quick-service outlet**: No courses and no fired timer; the screen is not offered. *(source: DI-334)*
+
+#### Consistency with other screens
+
+- Match `EMP-058`: A server's "ready for mains" on the staff app reaches this screen; the server does not fire courses (DI-407).
+- Match `KIT-002`: Held lines appear greyed with "Held" on the station rails.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+tables:
+- table: T2
+  covers: 4
+  server: Priya Nair
+  courses: Starters served 19:52 · Mains held 6 min (table not ready) · Desserts —
+- table: T4
+  covers: 6
+  courses: Starters served · Mains preparing (fired 20:03)
+policy: Hold & fire for dine-in · Fire all at once for room service
+```
+
 #### Permissions
 
 - `listKitchenTickets` → `ORDER_VIEW` (read) · staff
@@ -685,7 +851,6 @@ Errors to draw in the form: 412 The row changed since the `If-Match` version was
 - `prioritiseKitchenTicket` → `ORDER_MODIFY` (operate) · staff
 - `fireCourse` → `ORDER_MODIFY` (operate) · staff
 - `holdCourse` → `ORDER_MODIFY` (operate) · staff
-- `setCourseRules` → `PRODUCT_CONFIGURE` (configure) · staff
 
 **A refused user sees:** This display is not assigned to a station. **Assignment is a back-office act** — a kitchen screen does not choose what it shows. **A principal without `ORDER_MODIFY` gets this state naming `ORDER_MODIFY`**, the screen's `permission` and the one its fire, hold, status and prioritise actions need (the screen has no read); a button whose own `permission` the principal lacks is hidden, and a 403 from an action names that operation's permission.
 
@@ -710,7 +875,7 @@ For this screen, newest first. An **Open question** is built to the default it s
 - Each kitchen ticket shows a live "fired" timer counting elapsed time since the order was sent (not a countdown); it resets when a course within that ticket is completed/dished out. Not shown for quick-service outlets, which print and prepare immediately. *(client request · MoM 18 Aug 2026, 4.7 Kitchen Operations & Course-Wise Ordering · DI-334)*
 - Course-wise ordering (mainly fine dining) groups an order by course (starters, main course, dessert) so the kitchen fires each course at the right time. *(client request · MoM 18 Aug 2026, 4.7 Kitchen Operations & Course-Wise Ordering · DI-333)*
 
-Also apply: 6 for all of P15, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 5 for all of P15, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -727,20 +892,21 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (22), with its required mark, default, format and its error state (400, 409, 412).
+- [ ] Every input above is drawn (18), with its required mark, default, format and its error state (400, 409).
 - [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#KIT-003?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: Save kitchen ticket status, Prioritise kitchen ticket, Fire course, Hold course, Save course rules, Bump.
+- [ ] Every action is wired with its success and its failure: Save kitchen ticket status, Prioritise kitchen ticket, Fire course, Hold course, Bump.
 - [ ] Every transition is wired: `KIT-001`, `KIT-004`.
-- [ ] Every gated control is gated: `ORDER_MODIFY`, `ORDER_VIEW`, `PRODUCT_CONFIGURE`.
+- [ ] Every gated control is gated: `ORDER_MODIFY`, `ORDER_VIEW`.
 - [ ] The 3 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 2 edge case(s) from the process notes are drawn.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
 
 ### `KIT-004` Active Order Management & Fulfilment Journey
 
-**Active Order Management & Fulfilment Journey — board 3 of the client F&B design set.**
+**Follow one order from the till to the pass and out to the guest.**
 
 | | |
 |---|---|
@@ -756,26 +922,27 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **What the spec says about it.** **Built 20 August from board 3 of the client F&B design set.** **Board repointed 24 August.** This screen pointed at `wireframes/FnB Board 3.dc.html#fnb-3d` — a frame in the client pack, which is where the design came from and not where this screen is drawn. **`P15 Kitchen Display.dc.html` and `P16 Venue Analytics.dc.html` carry one anchor per screen and nothing referenced either**, so both shipped correctly anchored and unreachable. The pack frame is kept in `derivedFrom` because provenance is worth more than the wrong pointer.
 
+**From the Food, Beverage & Retail process.** One order's journey across stations for the pass or a supervisor: which of its kitchen tickets are ready, which are still on which station, and how it will be handed over. The one thing to get right: an order split across three stations reads as one order with its parts, so the pass knows what it is waiting for.
+
+**Fixed on main** (the package already carries these; draw what it says): The layout repeats the station rail (cards, Bump, course number, status text field) instead of one order's detail. (CHG-SPO-017); The purpose is "Active Order Management & Fulfilment Journey — board 3 of the client F&B design set". (CHG-WIR-010).
+
 #### Inputs: what the user enters or picks
-
-**On the screen**
-
-| Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
-|---|---|---|---|---|---|---|---|
-| Course | number field | optional | — | min 1 | — | Sends `?course=` to `listKitchenTickets`; only that course's lines come back. **No station picker**: the display's station comes from its assignment (`KitchenStation.displayWorkstationIds`, set in … | `listKitchenTickets` ?course |
-| Status | select | optional | — | Received · Preparing · Ready · Served · Recalled · Cancelled | — | Sends `?status=` to `listKitchenTickets`. | `listKitchenTickets` ?status |
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
 
 | Filter | Drawn as | Default | Allowed values, rules | Source |
 |---|---|---|---|---|
 | Station | picker: choose a station | — | — | `listKitchenTickets` ?stationId |
+| Status | select | — | Received · Preparing · Ready · Served · Recalled · Cancelled | `listKitchenTickets` ?status |
+| Course | number field | — | min 1 | `listKitchenTickets` ?course |
+
+Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
 
 #### Outputs: what the screen shows and produces
 
 **Shown**
 
-**Every kitchen ticket** (data table, from `listKitchenTickets`)
+**This order's tickets, station by station** (data table, from `listKitchenTickets`): One order's journey from the till to the pass and out; it has no actions of its own (design-notes correction fnb-retail KIT-004).
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -835,11 +1002,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Recorded at | 1 Oct 2026, 14:30 | — |
 | Synced at | 1 Oct 2026, 14:30 | — |
 
-**Actions and what each produces**
+**Rules for what is shown** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
 
-| Action | Calls | Sends | On success returns | Errors to show | Notes |
-|---|---|---|---|---|---|
-| Bump (primary button) | navigation or local | — | — | — | — |
+- **Order header**: Order number or table, order type, guest name only for takeaway/delivery, promised time, nine-state status in the shared words (Ordered, Accepted, Preparing, Ready, Served, Collected, Delivered, Cancelled, Refunded). *(source: contracts/satellite/fnb.yaml#getFnbOrder / MATRIX 4.6.35 / MATRIX 5.1.11)*
+- **Parts by station**: One row per kitchen ticket (station), with its status and age; the slowest part highlighted. *(source: contracts/satellite/fnb.yaml#/components/schemas/FnbOrder)*
 
 **Data it reads**: `listKitchenTickets` (onLoad, Kitchen ticket queue); `getFnbOrder` (onLoad, Read an F&B order)
 
@@ -852,19 +1018,40 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | State | What it shows |
 |---|---|
-| Loading (`?state=loading`) | The rail, oldest ticket first. **The count renders before the tickets** — a kitchen wants to know how deep it is before it reads anything. |
+| Loading (`?state=loading`) | The order, then its tickets at each station. |
 | Error (`?state=error`) | Could not reach the platform. **The rail is still live from cache** and every bump is queued. |
 | Empty, first run (`?state=emptyFirstRun`) | **No tickets. The kitchen is clear**, and that is worth saying plainly rather than showing a blank rail — a screen that looks broken and a screen that means nothing to do are the same picture otherwise. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches this station or course filter. **The rail is not empty** — the filter is narrow, and on a kitchen screen that distinction is the difference between calm and panic. |
-| Permission denied (`?state=emptyNoAccess`) | This display is not assigned to a station. **Assignment is a back-office act** — a kitchen screen does not choose what it shows. **A principal without `ORDER_VIEW` gets this state naming `ORDER_VIEW`**, the screen's `permission` and the one its read enforces; a button whose own `permission` the principal lacks is hidden, and a 403 from an action names that operation's permission. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks ORDER_VIEW for this outlet, and names it. |
 | Offline (`?state=offline`) | **Amber, and it keeps working.** The kitchen still has to send food out — a display that blanks mid-service is worse than one that says it is behind, and every bump journals locally and syncs when the network returns. |
+
+#### Edge cases to draw
+
+- **Offline**: The order is read from cache with its age. *(source: contracts/satellite/fnb.yaml#getFnbOrder)*
+
+#### Consistency with other screens
+
+- Match `KIT-006`: Assembly on the pass uses the same per-station parts.
+- Match `GST-025`: The guest's order tracker reads the same status words.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+order: BNG-004131 · Takeaway · Aisha Rahman · promised 13:10
+parts:
+- Grill — Ready 12:58
+- Fryer — Preparing 6 min
+- Bar — Ready 12:55
+```
 
 #### Permissions
 
 - `listKitchenTickets` → `ORDER_VIEW` (read) · staff
 - `getFnbOrder` → `ORDER_VIEW` (read) · staff
 
-**A refused user sees:** This display is not assigned to a station. **Assignment is a back-office act** — a kitchen screen does not choose what it shows. **A principal without `ORDER_VIEW` gets this state naming `ORDER_VIEW`**, the screen's `permission` and the one its read enforces; a button whose own `permission` the principal lacks is hidden, and a 403 from an action names that operation's permission.
+**A refused user sees:** Shown when the caller lacks ORDER_VIEW for this outlet, and names it.
 
 Screen guard: `ORDER_VIEW`
 
@@ -889,7 +1076,7 @@ For this screen, newest first. An **Open question** is built to the default it s
 
 - Kitchen display lets cashier/kitchen mark orders ready, handed over or delivered, driving the guest-facing order-status board. *(client request · MoM 9 Sep 2026, 4.15 POS Prototype Review - Food & Beverage, Tables & Kitchen Display · DI-794)*
 
-Also apply: 6 for all of P15, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 5 for all of P15, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -911,13 +1098,14 @@ Also apply: 6 for all of P15, 29 for every app (section *Design inputs from the 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (2), with its required mark, default, format and its error state (404).
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (404).
 - [ ] Every output is drawn (41 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#KIT-004?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: Bump.
+- [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `KIT-001`, `KIT-008`.
 - [ ] Every gated control is gated: `ORDER_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 1 edge case(s) from the process notes are drawn.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -940,6 +1128,18 @@ Also apply: 6 for all of P15, 29 for every app (section *Design inputs from the 
 
 **What the spec says about it.** **Built 20 August from board 3 of the client F&B design set.** **Board repointed 24 August.** This screen pointed at `wireframes/FnB Board 3.dc.html#fnb-3e` — a frame in the client pack, which is where the design came from and not where this screen is drawn. **`P15 Kitchen Display.dc.html` and `P16 Venue Analytics.dc.html` carry one anchor per screen and nothing referenced either**, so both shipped correctly anchored and unreachable. The pack frame is kept in `derivedFrom` because provenance is worth more than the wrong pointer. **Drawn 31 August** — `FnB Board 3.dc.html` frame `fnb-3e`. **Matched on frame title against screen name, constrained to this board’s platforms.** These packs label by board position (`GM-6C`) rather than naming the screen, so the title is the only join — *Station Workload &amp; Dynamic Routing* matched at 0.89. **A cross-platform title match was refused**: `Outlet Management` scored 0.85 against a partner-portal screen, which is how a mapping goes wrong quietly.
 
+**Known gaps.** Removed 2 October 2026 (CHG-WIR-008): setKitchenStations is permanent station set-up and display assignment; the contract says a temporary move is the rebalance, and permanent set-up belongs in …
+
+**From the Food, Beverage & Retail process.** A head chef moves work between stations mid-service when one is buried and another idle (a temporary rebalance that reverts at close), and sees each station's queue depth to decide. The one thing to get right: a rebalance is visibly temporary — it shows when it reverts — and is never mistaken for changing the permanent routing.
+
+**Fixed on main** (the package already carries these; draw what it says): setKitchenStations (permanent station set-up and display assignment) is on the kitchen display, beside an "Outlet id" text field and a raw … (CHG-WIR-008).
+
+#### Decided on this screen
+
+Answered questions: draw the decision, not the old default. Where a decision and the tables below differ, the decision wins.
+
+- **R277 dropped the station-load tile from the first release. Is queue depth and oldest age per station acceptable as the "workload" on this screen?** → Drawn default stands (answer: "Default / recommended accepted"): Show depth and oldest age only; no load gauge or percentage. *(decided by Chinmay, 2026-10-02; DEC-055 / CHG-NOTE-004)*
+
 #### Inputs: what the user enters or picks
 
 **On the screen**
@@ -956,23 +1156,9 @@ Also apply: 6 for all of P15, 29 for every app (section *Design inputs from the 
 | Station | picker: choose a station | — | — | `listKitchenTickets` ?stationId |
 | Status | select | — | Received · Preparing · Ready · Served · Recalled · Cancelled | `listKitchenTickets` ?status |
 
-**Form: Save kitchen stations** (modal, opened by *Save kitchen stations*; *Save kitchen stations* calls `setKitchenStations`, *Cancel* sends nothing)
+**Rules for these inputs** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
 
-**Collects what `setKitchenStations` sends before it is called.** Required: `stations`. Dismissing sends nothing; the screen behind is unchanged.
-
-| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
-|---|---|---|---|---|---|---|---|
-| Stations `stations` | repeatable rows | required | — | — | — | — | `setKitchenStations` body |
-| ID `stations[].id` | picker: choose an id | required | — | — | shows names, sends the id | — | `setKitchenStations` body |
-| Code `stations[].code` | text field | required | — | — | — | — | `setKitchenStations` body |
-| Name `stations[].name` | text field | required | — | — | — | — | `setKitchenStations` body |
-| Outlet `stations[].outletId` | picker: choose an outlet | optional | — | — | shows names, sends the id | — | `setKitchenStations` body |
-| Menu items `stations[].menuItemIds` | multi-picker: choose menu items | optional | — | — | — | Items routed to this station. | `setKitchenStations` body |
-| Display workstations `stations[].displayWorkstationIds` | multi-picker: choose display workstations | optional | — | A workstation is assigned to at most one station; a second assignment is refused `400`. | — | The kitchen displays assigned to this station (decided 28 September, audit R277), as tenancy `Workstation` ids, primary first and fallbacks after it. | `setKitchenStations` body |
-| Display endpoint `stations[].displayEndpoint` | text field | optional | — | — | — | The P15 Kitchen Display device this station's tickets go to (19 Sep: the display is TICVAI software on commodity hardware, per station, with a fallback device where the primary is … | `setKitchenStations` body |
-| Is active `stations[].isActive` | toggle | optional | — | — | — | — | `setKitchenStations` body |
-
-Errors to draw in the form: 400 A workstation is assigned to more than one station (`displayWorkstationIds`, audit R277), or the body fails validation.; 412 The row changed since the `If-Match` version was read (SD-013). Re-read and retry.
+- **Move**: From station, to station, which items (or all of a category), until when (defaults to the end of service). *(source: contracts/satellite/fnb.yaml#rebalanceStationLoad)*
 
 #### Outputs: what the screen shows and produces
 
@@ -1013,7 +1199,15 @@ Errors to draw in the form: 400 A workstation is assigned to more than one stati
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
 | Bump (primary button) | navigation or local | — | — | — | — |
-| Save kitchen stations (primary button) | `setKitchenStations` PUT `/kitchen/stations` | inline | KitchenStation[] | 400 A workstation is assigned to more than one station (`displayWorkstationIds`, audit R277), or the body fails validation.; 412 The row changed since the `If-Match` version was read (SD-013). Re-read and retry. | gated `PRODUCT_CONFIGURE`; opens modal first |
+
+**Rules for what is shown** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
+
+- **Stations**: Name, assigned displays (primary and fallback), tickets waiting and oldest age; a station with no working display flagged. No load percentage in the first release. *(source: contracts/satellite/fnb.yaml#listKitchenStations / R277)*
+- **Active rebalances**: What moved, from where to where, and "reverts at 23:30". *(source: contracts/satellite/fnb.yaml#rebalanceStationLoad)*
+
+**What each action does** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
+
+- **Move work**: Applies the temporary move; online only. *(source: contracts/satellite/fnb.yaml#rebalanceStationLoad)*
 
 **Data it reads**: `listKitchenTickets` (onLoad, Kitchen ticket queue, filtered by course (audit R277)); `listKitchenStations` (onLoad, List preparation stations and their routing)
 
@@ -1031,13 +1225,31 @@ Errors to draw in the form: 400 A workstation is assigned to more than one stati
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches this station or course filter. **The rail is not empty** — the filter is narrow, and on a kitchen screen that distinction is the difference between calm and panic. |
 | Permission denied (`?state=emptyNoAccess`) | This display is not assigned to a station. **Assignment is a back-office act** — a kitchen screen does not choose what it shows. **A principal without `PRODUCT_VIEW` gets this state naming `PRODUCT_VIEW`**, the screen's `permission` and the one its read enforces; a button whose own `permission` the principal lacks is hidden, and a 403 from an action names that operation's permission. |
 | Offline (`?state=offline`) | **Amber, and it keeps working.** The kitchen still has to send food out — a display that blanks mid-service is worse than one that says it is behind, and every bump journals locally and syncs when the network returns. |
-| Validation and conflict | the form keeps what was entered and marks the problem: 400 A workstation is assigned to more than one station (`displayWorkstationIds`, audit R277), or the body fails validation. |
+
+#### Edge cases to draw
+
+- **Offline**: Moving work is disabled with the reason; the station list shows from cache. *(source: contracts/satellite/fnb.yaml#rebalanceStationLoad)*
+
+#### Consistency with other screens
+
+- Match `BO-134`: Permanent stations and display assignment are set up in Venue Management; this screen only moves work for tonight.
+- Match `BO-135`: Routing rules there decide where items go when no rebalance is active.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+stations:
+- Grill · Display K2 (fallback K5) · 11 waiting · oldest 16 min
+- Cold · Display K3 · 1 waiting
+move: Burgers Grill → Fryer line until 23:30
+```
 
 #### Permissions
 
 - `listKitchenTickets` → `ORDER_VIEW` (read) · staff
 - `listKitchenStations` → `PRODUCT_VIEW` (read) · staff
-- `setKitchenStations` → `PRODUCT_CONFIGURE` (configure) · staff
 - `rebalanceStationLoad` → `PRODUCT_CONFIGURE` (configure) · staff
 
 **A refused user sees:** This display is not assigned to a station. **Assignment is a back-office act** — a kitchen screen does not choose what it shows. **A principal without `PRODUCT_VIEW` gets this state naming `PRODUCT_VIEW`**, the screen's `permission` and the one its read enforces; a button whose own `permission` the principal lacks is hidden, and a 403 from an action names that operation's permission.
@@ -1046,14 +1258,13 @@ Screen guard: `PRODUCT_VIEW`
 
 #### Requirements it meets
 
-4 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+3 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
 
 | Ref | Requirement (shortened) | Domain | Verdict | Via |
 |---|---|---|---|---|
 | 4.6.20 | The system should be able to create a new Check with table numbers and guest numbers, add items to print in kitchen or on QSR(Quick service restaurants). | Bundles and Promotions | CONTRACTED | `listKitchenTickets` |
 | 4.6.21 | The system should be able to send order information consisting of table number and guest count and added items with condiments to multiple parts of the restaurant with additional prints (being … | Bundles and Promotions | CONTRACTED | `listKitchenTickets` |
 | 4.7.1 | The system should be able to create a new Check with table and guest numbers, add items to print in kitchen or on QSR(Quick service restaurants), void items and ensure they don't appear in kitchen. | Bundles and Promotions | CONTRACTED | `listKitchenTickets` |
-| 4.6.33 | Support configurable kitchen routing rules to automatically direct orders/items to kitchen stations, printers, KDS screens, bars, dessert stations, or production areas based on product, category … | Bundles and Promotions | CONTRACTED | `setKitchenStations` |
 
 #### Client meeting inputs
 
@@ -1061,7 +1272,7 @@ For this screen, newest first. An **Open question** is built to the default it s
 
 - Kitchens are divided into stations (grill, fryer, beverage, dessert, etc.), each mapped to specific printers or KDS devices. Routing rules decide where an item prints/displays by category or item, with a fallback station/device if the primary one is offline or faulty. *(client request · MoM 18 Aug 2026, 4.3 Kitchen & Preparation Stations · DI-323)*
 
-Also apply: 6 for all of P15, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 5 for all of P15, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -1081,13 +1292,15 @@ Also apply: 6 for all of P15, 29 for every app (section *Design inputs from the 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (11), with its required mark, default, format and its error state (400, 412).
+- [ ] Every input above is drawn (2), with its required mark, default, format and its error state.
 - [ ] Every output is drawn (16 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#KIT-005?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: Bump, Save kitchen stations.
+- [ ] Every action is wired with its success and its failure: Bump.
 - [ ] Every transition is wired: `KIT-001`.
 - [ ] Every gated control is gated: `ORDER_VIEW`, `PRODUCT_CONFIGURE`, `PRODUCT_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 1 edge case(s) from the process notes are drawn.
+- [ ] The 1 decision(s) taken on this screen are drawn as decided, not as the old default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -1110,20 +1323,19 @@ Also apply: 6 for all of P15, 29 for every app (section *Design inputs from the 
 
 **What the spec says about it.** **Built 20 August from board 3 of the client F&B design set.** **No expeditor role is modelled** — this reads and sets ticket status like the KDS. Whether an expeditor needs their own state is a kitchen question rather than a contract one. **Operations from the 24 August F&B build wired here** — the contract grew and the screens had not caught up, which is how 92 operations reached 49% of screens. **Retail board operations wired 24 August.** **Board repointed 24 August.** This screen pointed at `wireframes/FnB Board 3.dc.html#fnb-3f` — a frame in the client pack, which is where the design came from and not where this screen is drawn. **`P15 Kitchen Display.dc.html` and `P16 Venue Analytics.dc.html` carry one anchor per screen and nothing referenced either**, so both shipped correctly anchored and unreachable. The pack frame is kept in `derivedFrom` because provenance is worth more than the wrong pointer. **Drawn 31 August** — `FnB Board 3.dc.html` frame `fnb-3f`. **Matched on frame title against screen name, constrained to this board’s platforms.** These packs label by board position (`GM-6C`) rather than naming the screen, so the title is the only join — *Expeditor &amp; Order Assembly* matched at 1.0. **A cross-platform title match was refused**: `Outlet Management` scored 0.85 against a partner-portal screen, which is how a mapping goes wrong quietly.
 
+**From the Food, Beverage & Retail process.** The expeditor at the pass assembles orders whose parts come from several stations, chases a station that is holding the rest up, prints the bag label for takeaway and delivery, and hands over. The one thing to get right: for each order, which parts are ready and which are missing, and a label that always carries the allergen flags.
+
+**Fixed on main** (the package already carries these; draw what it says): The layout repeats the station rail (course number, status text field, "Every kitchen ticket", Bump). (CHG-SPO-017); Collection is recorded with markOrderCollected only; a runner's delivery has no action here. (CHG-WIR-008).
+
 #### Inputs: what the user enters or picks
-
-**On the screen**
-
-| Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
-|---|---|---|---|---|---|---|---|
-| Course | number field | optional | — | min 1 | — | Sends `?course=` to `listKitchenTickets`; only that course's lines come back. **No station picker**: the display's station comes from its assignment (`KitchenStation.displayWorkstationIds`, set in … | `listKitchenTickets` ?course |
-| Status | select | optional | — | Received · Preparing · Ready · Served · Recalled · Cancelled | — | Sends `?status=` to `listKitchenTickets`. | `listKitchenTickets` ?status |
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
 
 | Filter | Drawn as | Default | Allowed values, rules | Source |
 |---|---|---|---|---|
 | Station | picker: choose a station | — | — | `listKitchenTickets` ?stationId |
+| Status | select | — | Received · Preparing · Ready · Served · Recalled · Cancelled | `listKitchenTickets` ?status |
+| Course | number field | — | min 1 | `listKitchenTickets` ?course |
 
 **Form: Save kitchen ticket status** (modal, opened by *Save kitchen ticket status*; *Save kitchen ticket status* calls `setKitchenTicketStatus`, *Cancel* sends nothing)
 
@@ -1157,11 +1369,25 @@ Errors to draw in the form: 409 The move is not one of the four above. Names the
 | Verified by `verifiedBy` | radio group | optional | — | Buzzer · Order number · Name · QR · None | — | — | `markOrderCollected` body |
 | Recorded at `recordedAt` | date and time picker | required | — | — | 1 Oct 2026, 14:30 (venue time zone) | Device time of the collection. Closes the ready-to-collected clock. | `markOrderCollected` body |
 
+**Form: Delivered** (modal, opened by *Delivered*; *Delivered* calls `recordOrderHandover`, *Cancel* sends nothing)
+
+**Collects what `recordOrderHandover` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Outcome `outcome` | radio group | required | — | Served · Collected · Delivered · Guest not found · Refused | — | `served`, `collected` and `delivered` move the order to the `FnbOrderStatus` of the same name. | `recordOrderHandover` body |
+| Delivered to location `deliveredToLocationId` | picker: choose a delivered to location | optional | — | — | shows names, sends the id | Required where `outcome` is `delivered` (audit R125 (1)). | `recordOrderHandover` body |
+| Runner principal `runnerPrincipalId` | picker: choose a runner principal | optional | — | — | shows names, sends the id | — | `recordOrderHandover` body |
+| Note `note` | text area | optional | — | max length 500 | — | Required for guestNotFound and refused. | `recordOrderHandover` body |
+| Recorded at `recordedAt` | date and time picker | required | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `recordOrderHandover` body |
+
+Errors to draw in the form: 409 Order is not ready, or already closed; 422 The outcome does not close this order's service mode, or a delivery names no location (audit R125 (1)).
+
 #### Outputs: what the screen shows and produces
 
 **Shown**
 
-**Every kitchen ticket** (data table, from `listKitchenTickets`)
+**Whole orders, ready to assemble** (data table, from `listKitchenTickets`): The pass works whole orders across stations, not one station's tickets (design-notes correction fnb-retail KIT-006). **The server's order, never re-sorted on the device** (`listKitchenTickets` orders by priority weights; design-notes correction fnb-retail): no "oldest first" and no "promise time" sort of its own.
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -1206,11 +1432,22 @@ Errors to draw in the form: 409 The move is not one of the four above. Names the
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Bump (primary button) | navigation or local | — | — | — | — |
 | Save kitchen ticket status (primary button) | `setKitchenTicketStatus` PUT `/kitchen/tickets/{ticketId}/status` | inline | KitchenTicket | 409 The move is not one of the four above. Names the ticket's current status. | works offline; gated `ORDER_MODIFY`; opens modal first; produces a document or message: Advance a kitchen ticket |
 | Chase station (secondary button) | `chaseStation` POST `/kitchen-stations/{stationId}/chase` | inline | no body | — | works offline; gated `ORDER_MODIFY`; opens modal first |
 | Mark order collected (secondary button) | `markOrderCollected` POST `/orders/{orderId}/collected` | inline | FnbOrder | — | works offline; gated `ORDER_MODIFY`; opens modal first |
 | Print order label (secondary button) | `printOrderLabel` POST `/kitchen-tickets/{ticketId}/label` | — | OrderLabel | — | works offline; gated `ORDER_VIEW`; produces a document or message: A label for the bag |
+| Delivered (secondary button) | `recordOrderHandover` POST `/guest-orders/{orderId}/delivery` | inline | GuestOrderStatus | 409 Order is not ready, or already closed; 422 The outcome does not close this order's service mode, or a delivery names no location (audit R125 (1)). | works offline; opens modal first |
+
+**Rules for what is shown** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
+
+- **Assembly cards**: One card per order: parts ready (ticked) and missing (with station and age); complete orders rise to the top. *(source: contracts/satellite/fnb.yaml#listKitchenTickets)*
+- **Bag label**: Order number, guest name, items with options, allergen flags — printed from the order, not composed on the device. *(source: contracts/satellite/fnb.yaml#printOrderLabel)*
+
+**What each action does** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
+
+- **Chase station**: Asks the station where a line is; recorded as a chased exception (a station chased six times a service is a signal). *(source: contracts/satellite/fnb.yaml#chaseStation)*
+- **Print label**: Prints the bag label for takeaway and delivery orders. *(source: contracts/satellite/fnb.yaml#printOrderLabel)*
+- **Hand over**: Collected at the counter, or handed to a runner who records Delivered with the location. *(source: contracts/satellite/fnb.yaml#markOrderCollected / contracts/satellite/fnb.yaml#recordOrderHandover)*
 
 **Data it reads**: `listKitchenTickets` (onLoad, Kitchen ticket queue)
 
@@ -1223,13 +1460,31 @@ Errors to draw in the form: 409 The move is not one of the four above. Names the
 
 | State | What it shows |
 |---|---|
-| Loading (`?state=loading`) | The rail, oldest ticket first. **The count renders before the tickets** — a kitchen wants to know how deep it is before it reads anything. |
+| Loading (`?state=loading`) | Whole orders, in the server's order. |
 | Error (`?state=error`) | Could not reach the platform. **The rail is still live from cache** and every bump is queued. |
 | Empty, first run (`?state=emptyFirstRun`) | **No tickets. The kitchen is clear**, and that is worth saying plainly rather than showing a blank rail — a screen that looks broken and a screen that means nothing to do are the same picture otherwise. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches this station or course filter. **The rail is not empty** — the filter is narrow, and on a kitchen screen that distinction is the difference between calm and panic. |
 | Permission denied (`?state=emptyNoAccess`) | This display is not assigned to a station. **Assignment is a back-office act** — a kitchen screen does not choose what it shows. **A principal without `ORDER_VIEW` gets this state naming `ORDER_VIEW`**, the screen's `permission` and the one its read enforces; a button whose own `permission` the principal lacks is hidden, and a 403 from an action names that operation's permission. |
 | Offline (`?state=offline`) | **Amber, and it keeps working.** The kitchen still has to send food out — a display that blanks mid-service is worse than one that says it is behind, and every bump journals locally and syncs when the network returns. |
-| Validation and conflict | the form keeps what was entered and marks the problem: 409 The move is not one of the four above. Names the ticket's current status. |
+| Validation and conflict | the form keeps what was entered and marks the problem: 409 Order is not ready, or already closed; 409 The move is not one of the four above. Names the ticket's current status.; 422 The outcome does not close this order's service mode, or a delivery names no location (audit R125 (1)). |
+
+#### Edge cases to draw
+
+- **Offline**: Chase, label and hand-over work offline and sync. *(source: contracts/satellite/fnb.yaml#chaseStation / contracts/satellite/fnb.yaml#printOrderLabel)*
+
+#### Consistency with other screens
+
+- Match `KIT-007`: An order assembled here moves to Ready for pickup on the guest board.
+- Match `POS-029`: The till's queue shows the same ready orders.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+card: BNG-004131 · Takeaway · Aisha Rahman — Grill ✓, Bar ✓, Fryer missing (6 min) → Chase
+label: 'BNG-004131 · Aisha Rahman · 1 × Loaded Fries · 1 × Smash Burger (no onions) · CONTAINS: gluten, milk, sesame'
+```
 
 #### Permissions
 
@@ -1238,6 +1493,7 @@ Errors to draw in the form: 409 The move is not one of the four above. Names the
 - `chaseStation` → `ORDER_MODIFY` (operate) · staff
 - `markOrderCollected` → `ORDER_MODIFY` (operate) · staff
 - `printOrderLabel` → `ORDER_VIEW` (read) · staff
+- `recordOrderHandover` → `ORDER_MODIFY` (operate) · staff
 
 **A refused user sees:** This display is not assigned to a station. **Assignment is a back-office act** — a kitchen screen does not choose what it shows. **A principal without `ORDER_VIEW` gets this state naming `ORDER_VIEW`**, the screen's `permission` and the one its read enforces; a button whose own `permission` the principal lacks is hidden, and a 403 from an action names that operation's permission.
 
@@ -1245,13 +1501,14 @@ Screen guard: `ORDER_VIEW`
 
 #### Requirements it meets
 
-6 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+7 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
 
 | Ref | Requirement (shortened) | Domain | Verdict | Via |
 |---|---|---|---|---|
 | 4.6.20 | The system should be able to create a new Check with table numbers and guest numbers, add items to print in kitchen or on QSR(Quick service restaurants). | Bundles and Promotions | CONTRACTED | `listKitchenTickets` |
 | 4.6.21 | The system should be able to send order information consisting of table number and guest count and added items with condiments to multiple parts of the restaurant with additional prints (being … | Bundles and Promotions | CONTRACTED | `listKitchenTickets` |
 | 4.7.1 | The system should be able to create a new Check with table and guest numbers, add items to print in kitchen or on QSR(Quick service restaurants), void items and ensure they don't appear in kitchen. | Bundles and Promotions | CONTRACTED | `listKitchenTickets` |
+| 19.2.49 | Pickup Ordering - System shall support pickup ordering. | Guest Mobile App & Branding | CONTRACTED | `recordOrderHandover` |
 | 4.7.5 | The system should support usage of buzzers for notifying guests when their order is ready. A buzzer would be assigned to the guests at the time of taking their order. | Bundles and Promotions | CONTRACTED | data `KitchenTicket` |
 | 5.2.3 | The system should be able to have options as Fire & forget and Hold & fire orders(modifications should including the manual time adjustment). | F&B & Guest Management | CONTRACTED | data `KitchenTicket` |
 | 5.2.4 | The system should be able to have options as phased, timed, delayed ordering (used in fine dine options). | F&B & Guest Management | CONTRACTED | data `KitchenTicket` |
@@ -1260,7 +1517,7 @@ Screen guard: `ORDER_VIEW`
 
 None names this screen.
 
-Also apply: 6 for all of P15, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 5 for all of P15, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -1277,13 +1534,14 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (11), with its required mark, default, format and its error state (409).
+- [ ] Every input above is drawn (14), with its required mark, default, format and its error state (409, 422).
 - [ ] Every output is drawn (27 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#KIT-006?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: Bump, Save kitchen ticket status, Chase station, Mark order collected, Print order label.
+- [ ] Every action is wired with its success and its failure: Save kitchen ticket status, Chase station, Mark order collected, Print order label, Delivered.
 - [ ] Every transition is wired: `KIT-001`, `KIT-002`.
 - [ ] Every gated control is gated: `ORDER_MODIFY`, `ORDER_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 1 edge case(s) from the process notes are drawn.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -1304,22 +1562,31 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | `venueId` (session), `stationId` (session), `orderId` (KIT-002) · cold entry: **Cold is the only way in.** Nobody logs into a kitchen display — it is on when the kitchen is open, and it resolves its station from the device assignment … |
 | Route | `/kitchen/guest-collection-buzzer-digital-notification` |
 
-**What the spec says about it.** **Built 20 August from board 3 of the client F&B design set.** **`buzzerCode` exists and nothing dispatches to a physical pager.** The digital half works; the buzzer half assumes a device driver the package does not model. **Board repointed 24 August.** This screen pointed at `wireframes/FnB Board 3.dc.html#fnb-3g` — a frame in the client pack, which is where the design came from and not where this screen is drawn. **`P15 Kitchen Display.dc.html` and `P16 Venue Analytics.dc.html` carry one anchor per screen and nothing referenced either**, so both shipped correctly anchored and unreachable. The pack frame is kept in `derivedFrom` because provenance is worth more than the wrong pointer. **The customer-facing order status board is this screen's** (decided 1 October 2026, POS v2 decision POSV2-7, docs/registers/pos-v2-decisions.md): the board the guests read, order numbers only under Preparing and Ready for pickup, never a name. The till's Order Queue (POS-029) shows a mirror of it, not a board of its own.
+**What the spec says about it.** **Built 20 August from board 3 of the client F&B design set.** **`buzzerCode` exists and nothing dispatches to a physical pager.** The digital half works; the buzzer half assumes a device driver the package does not model. **Board repointed 24 August.** This screen pointed at `wireframes/FnB Board 3.dc.html#fnb-3g` — a frame in the client pack, which is where the design came from and not where this screen is drawn. **`P15 Kitchen Display.dc.html` and `P16 Venue Analytics.dc.html` carry one anchor per screen and nothing referenced either**, so both shipped correctly anchored and unreachable. The pack frame is kept in `derivedFrom` because provenance is worth more than the wrong pointer. **The customer-facing order status board is this screen's** (decided 1 October 2026, POS v2 decision POSV2-7, docs/registers/pos-v2-decisions.md): the board the guests read, order numbers only under Preparing and Ready for pickup, never a name. The till's Order Queue (POS-029) shows a mirror of it, not a board of its own. **The guest board is an unattended customer display** (POSV2-7; design-notes correction fnb-retail KIT-007; CHG-SPO-017): order numbers only, under Preparing and Ready for pickup, never a name and no staff control. Handover is recorded at the pass (KIT-006). The buzzer number is on the ticket, but nothing writes it from the till or dispatches to a pager yet (open entry CHG-SPO-019).
+
+**From the Food, Beverage & Retail process.** Two faces of collection. (1) The **guest status board**: a customer-facing screen in the dining area showing order numbers only, under Preparing and Ready for pickup, readable across the room; this screen owns it and the till's queue mirrors it (POSV2-7). (2) The collection point's staff view: call the number, hand over, record it. The one thing to get right: the guest board shows numbers only — never a name — and is an unattended display with no buttons.
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- The buzzer number exists on the ticket, but nothing writes it from the till and nothing dispatches to a pager. (CHG-SPO-019)
+
+**Fixed on main** (the package already carries these; draw what it says): The guest board is drawn inside a staff screen that also has the course number field, a status text field, "Every kitchen ticket" and Bump … (CHG-SPO-017).
+
+#### Decided on this screen
+
+Answered questions: draw the decision, not the old default. Where a decision and the tables below differ, the decision wins.
+
+- **Does the guest board carry the venue's branding (it is guest-facing) or TICVAI branding (it runs on a staff device)?** → Drawn default stands (answer: "Default / recommended accepted"): Venue branding on the guest board; TICVAI branding on the staff collection view. *(decided by Chinmay, 2026-10-02; DEC-056 / CHG-NOTE-004)*
 
 #### Inputs: what the user enters or picks
-
-**On the screen**
-
-| Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
-|---|---|---|---|---|---|---|---|
-| Course | number field | optional | — | min 1 | — | Sends `?course=` to `listKitchenTickets`; only that course's lines come back. **No station picker**: the display's station comes from its assignment (`KitchenStation.displayWorkstationIds`, set in … | `listKitchenTickets` ?course |
-| Status | select | optional | — | Received · Preparing · Ready · Served · Recalled · Cancelled | — | Sends `?status=` to `listKitchenTickets`. | `listKitchenTickets` ?status |
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
 
 | Filter | Drawn as | Default | Allowed values, rules | Source |
 |---|---|---|---|---|
 | Station | picker: choose a station | — | — | `listKitchenTickets` ?stationId |
+| Status | select | — | Received · Preparing · Ready · Served · Recalled · Cancelled | `listKitchenTickets` ?status |
+| Course | number field | — | min 1 | `listKitchenTickets` ?course |
 
 **Form: Record order handover** (modal, opened by *Record order handover*; *Record order handover* calls `recordOrderHandover`, *Cancel* sends nothing)
 
@@ -1338,23 +1605,6 @@ Errors to draw in the form: 409 Order is not ready, or already closed; 422 The o
 #### Outputs: what the screen shows and produces
 
 **Shown**
-
-**Every kitchen ticket** (data table, from `listKitchenTickets`)
-
-| Shows | Format | Notes |
-|---|---|---|
-| ID | the name it points at, never the id | — |
-| Order | the name it points at, never the id | The F&B order the ticket was created from on acceptance (`FnbOrder.id`). |
-| Order number | text | — |
-| Outlet | the name it points at, never the id | — |
-| Table label | text | — |
-| Service mode | chip: Quick service, Table service, Room service, Collection, Delivery | — |
-| Coursing | chip: Fire and forget, Hold and fire, Phased, Timed, Delayed | BL-131. Starters before mains is the entire job of a kitchen pass, and the model fired everything at once. |
-| Buzzer code | text | BL-128. The pager number handed to a guest at a counter. |
-| Status | chip: Received, Preparing, Ready, Served, Recalled, Cancelled | — |
-| Priority | 1,234 | Higher fires sooner. Raised by Fast Pass or supervisor override. |
-| Prioritised by principal | the name it points at, never the id | — |
-| Prioritise reason | text | — |
 
 **Card list** (card list): **One ticket per card, ordered by promise time not arrival.** A ticket due in two minutes sits above one that arrived first, because a kitchen works to when food is wanted.
 
@@ -1385,32 +1635,20 @@ Errors to draw in the form: 409 Order is not ready, or already closed; 422 The o
 
 **Metric tile** (metric tile): Depth and oldest ticket age. **Two numbers, glanceable** — anything a chef has to read is a number they will not read. The station-load tile is not in the first release (decided 28 September, audit R277).
 
-**The selected kitchen ticket** (detail panel, from `listKitchenTickets`)
-
-| Shows | Format | Notes |
-|---|---|---|
-| ID | the name it points at, never the id | — |
-| Order | the name it points at, never the id | The F&B order the ticket was created from on acceptance (`FnbOrder.id`). |
-| Order number | text | — |
-| Outlet | the name it points at, never the id | — |
-| Table label | text | — |
-| Service mode | chip: Quick service, Table service, Room service, Collection, Delivery | — |
-| Coursing | chip: Fire and forget, Hold and fire, Phased, Timed, Delayed | BL-131. Starters before mains is the entire job of a kitchen pass, and the model fired everything at once. |
-| Buzzer code | text | BL-128. The pager number handed to a guest at a counter. |
-| Status | chip: Received, Preparing, Ready, Served, Recalled, Cancelled | — |
-| Priority | 1,234 | Higher fires sooner. Raised by Fast Pass or supervisor override. |
-| Prioritised by principal | the name it points at, never the id | — |
-| Prioritise reason | text | — |
-| Lines | list or chips (count when long) | — |
-| Target ready at | 1 Oct 2026, 14:30 | — |
-| Elapsed seconds | 1,234 | — |
-
 **Actions and what each produces**
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Bump (primary button) | navigation or local | — | — | — | — |
 | Record order handover (primary button) | `recordOrderHandover` POST `/guest-orders/{orderId}/delivery` | inline | GuestOrderStatus | 409 Order is not ready, or already closed; 422 The outcome does not close this order's service mode, or a delivery names no location (audit R125 (1)). | works offline; gated `ORDER_MODIFY`; opens modal first |
+
+**Rules for what is shown** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
+
+- **Guest status board**: Two columns, Preparing and Ready for pickup, large order numbers; a number moving to Ready animates once and may chime; numbers leave the board when collected. Only counter, takeaway and app-collection orders — never dine-in, delivery or partner orders. Venue branding allowed on this guest-facing display. *(source: POSV2-7 / DI-790 / DI-794 / screens/P15-kitchen-display.yaml#KIT-007)*
+- **Staff collection list**: Ready orders with how long they have waited; buzzer number where pagers are used. *(source: contracts/satellite/fnb.yaml#/components/schemas/KitchenTicket / F108 step 6)*
+
+**What each action does** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
+
+- **Handed over**: Records Collected (or Guest not found / Refused with a note, which leaves the order Ready). *(source: contracts/satellite/fnb.yaml#recordOrderHandover)*
 
 **Data it reads**: `listKitchenTickets` (onLoad, Kitchen ticket queue)
 
@@ -1422,20 +1660,45 @@ Errors to draw in the form: 409 Order is not ready, or already closed; 422 The o
 
 | State | What it shows |
 |---|---|
-| Loading (`?state=loading`) | The rail, oldest ticket first. **The count renders before the tickets** — a kitchen wants to know how deep it is before it reads anything. |
+| Loading (`?state=loading`) | Order numbers under Preparing and Ready for pickup. |
 | Error (`?state=error`) | Could not reach the platform. **The rail is still live from cache** and every bump is queued. |
-| Empty, first run (`?state=emptyFirstRun`) | **No tickets. The kitchen is clear**, and that is worth saying plainly rather than showing a blank rail — a screen that looks broken and a screen that means nothing to do are the same picture otherwise. |
+| Empty, first run (`?state=emptyFirstRun`) | Nothing preparing or ready: the board shows the venue's idle message. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches this station or course filter. **The rail is not empty** — the filter is narrow, and on a kitchen screen that distinction is the difference between calm and panic. |
-| Permission denied (`?state=emptyNoAccess`) | This display is not assigned to a station. **Assignment is a back-office act** — a kitchen screen does not choose what it shows. **A principal without `ORDER_VIEW` gets this state naming `ORDER_VIEW`**, the screen's `permission` and the one its read enforces; a button whose own `permission` the principal lacks is hidden, and a 403 from an action names that operation's permission. |
+| Permission denied (`?state=emptyNoAccess`) | Never shown on the board: it is an unattended guest display and carries no staff state. |
 | Offline (`?state=offline`) | **Amber, and it keeps working.** The kitchen still has to send food out — a display that blanks mid-service is worse than one that says it is behind, and every bump journals locally and syncs when the network returns. |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 Order is not ready, or already closed; 422 The outcome does not close this order's service mode, or a delivery names no location (audit R125 (1)). |
+
+#### Edge cases to draw
+
+- **Nobody collects a ready order**: It stays on the board, then is recorded as uncollected rather than silently closed. *(source: F108 step 6)*
+- **Offline**: The board keeps showing from the venue network; a stale board shows a small "updating" marker, never a frozen list without notice. *(source: screens/P15-kitchen-display.yaml#KIT-007)*
+
+#### Consistency with other screens
+
+- Match `POS-029`: The till's queue shows a mirror of this board with the same numbers and columns (POSV2-7).
+- Match `GST-025`: The guest's app tracker says "Ready for pickup" at the same moment the number moves here.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+board:
+  preparing:
+  - '841'
+  - '847'
+  - '850'
+  readyForPickup:
+  - '846'
+  - '848'
+```
 
 #### Permissions
 
 - `listKitchenTickets` → `ORDER_VIEW` (read) · staff
 - `recordOrderHandover` → `ORDER_MODIFY` (operate) · staff
 
-**A refused user sees:** This display is not assigned to a station. **Assignment is a back-office act** — a kitchen screen does not choose what it shows. **A principal without `ORDER_VIEW` gets this state naming `ORDER_VIEW`**, the screen's `permission` and the one its read enforces; a button whose own `permission` the principal lacks is hidden, and a 403 from an action names that operation's permission.
+**A refused user sees:** Never shown on the board: it is an unattended guest display and carries no staff state.
 
 Screen guard: `ORDER_VIEW`
 
@@ -1460,7 +1723,7 @@ For this screen, newest first. An **Open question** is built to the default it s
 - Kitchen display lets cashier/kitchen mark orders ready, handed over or delivered, driving the guest-facing order-status board. *(client request · MoM 9 Sep 2026, 4.15 POS Prototype Review - Food & Beverage, Tables & Kitchen Display · DI-794)*
 - Quick-service (QSR) orders capture no pickup details: guest orders, pays, gets a receipt/order number and is notified via a KDS-driven order-status board. Takeaway/delivery do need contact and timing details. *(client request · MoM 9 Sep 2026, 4.15 POS Prototype Review - Food & Beverage, Tables & Kitchen Display · DI-790)*
 
-Also apply: 6 for all of P15, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 5 for all of P15, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -1475,13 +1738,15 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (7), with its required mark, default, format and its error state (409, 422).
-- [ ] Every output is drawn (47 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (5), with its required mark, default, format and its error state (409, 422).
+- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#KIT-007?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: Bump, Record order handover.
+- [ ] Every action is wired with its success and its failure: Record order handover.
 - [ ] Every transition is wired: `KIT-001`.
 - [ ] Every gated control is gated: `ORDER_MODIFY`, `ORDER_VIEW`.
 - [ ] The 2 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 2 edge case(s) from the process notes are drawn.
+- [ ] The 1 decision(s) taken on this screen are drawn as decided, not as the old default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -1495,7 +1760,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | App · platform | TICVAI POS · P15 Kitchen Display (display) |
 | Module | Kitchen · wave 2 · needs the `fnb` module |
 | Block | Block A · ticket #18184 (APP-POS-KIT-008) |
-| Who uses it | venue staff holding `INCIDENT_REPORT`, `INCIDENT_VIEW`, `ORDER_MODIFY`, `ORDER_VIEW`, `PRODUCT_CONFIGURE`, `PRODUCT_VIEW` (2 operate, 3 read, 1 configure); in the flows as supervisor |
+| Who uses it | venue staff holding `INCIDENT_REPORT`, `INCIDENT_VIEW`, `ORDER_VIEW`, `PRODUCT_CONFIGURE`, `PRODUCT_VIEW` (1 operate, 3 read, 1 configure); in the flows as supervisor |
 | Device and orientation | kiosk · LTR · dark theme |
 | Pattern | listDetail (touchLarge density): `list86Events` reads the population and `getHaccpStatus` reads one of them — list, select, act |
 | Offline | **Amber, and it keeps working.** The kitchen still has to send food out — a display that blanks mid-service is worse than one that says it is behind, and every bump journals locally and syncs when the network returns. |
@@ -1504,7 +1769,15 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **What the spec says about it.** **Built 20 August from board 3 of the client F&B design set.** **86 is a kitchen word and a real state.** An item marked unavailable here stops selling at every till in the venue within seconds, which is the only reason to put it on a kitchen screen. **Food-safety operations wired 20 August** — boards 5G and 5J of the client F&B pack, and **HACCP is a regulatory obligation nothing in the package touched.** **Operations from the 24 August F&B build wired here** — the contract grew and the screens had not caught up, which is how 92 operations reached 49% of screens. **Board repointed 24 August.** This screen pointed at `wireframes/FnB Board 3.dc.html#fnb-3h` — a frame in the client pack, which is where the design came from and not where this screen is drawn. **`P15 Kitchen Display.dc.html` and `P16 Venue Analytics.dc.html` carry one anchor per screen and nothing referenced either**, so both shipped correctly anchored and unreachable. The pack frame is kept in `derivedFrom` because provenance is worth more than the wrong pointer. **Drawn 31 August** — `FnB Board 3.dc.html` frame `fnb-3h`. **Matched on frame title against screen name, constrained to this board’s platforms.** These packs label by board position (`GM-6C`) rather than naming the screen, so the title is the only join — *Exceptions, Re-Fire &amp; Unavailable Items* matched at 1.0. **A cross-platform title match was refused**: `Outlet Management` scored 0.85 against a partner-portal screen, which is how a mapping goes wrong quietly.
 
-**Known gaps.** **`getHaccpStatus` declares its response inline**, so the component that shows it names fields but binds to no schema. The contract should name the shape.
+**Known gaps.** **`getHaccpStatus` declares its response inline**, so the component that shows it names fields but binds to no schema. The contract should name the shape. Removed 2 October 2026 (CHG-WIR-008): "Save kitchen ticket status" on an exceptions screen is plumbing; the screen shows today's events and has no ticket status to save (R254; design-notes correction …
+
+**From the Food, Beverage & Retail process.** What went wrong in the kitchen tonight and the controls for it: take an item off sale (86) at once on every till and guest menu, see what was 86'd today and for how long, log an equipment failure or a late delivery, and the food-safety position before and during service. The one thing to get right: 86 is one tap with a reason and an optional return time, and it says it is live everywhere.
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- The food-safety status read declares its response inline, so the panel cannot bind to a named shape. (CHG-SPO-019)
+
+**Fixed on main** (the package already carries these; draw what it says): A "From" date picker and a raw "Every eighty six event" table, plus "Save kitchen ticket status" on an exceptions screen. (CHG-WIR-008).
 
 #### Inputs: what the user enters or picks
 
@@ -1536,19 +1809,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 Errors to draw in the form: 400 Validation failed; 412 The row changed since the `If-Match` version was read (SD-013). Re-read and retry.
 
-**Form: Save kitchen ticket status** (modal, opened by *Save kitchen ticket status*; *Save kitchen ticket status* calls `setKitchenTicketStatus`, *Cancel* sends nothing)
-
-**Collects what `setKitchenTicketStatus` sends before it is called.** Required: `status`, `recordedAt`. Optional: `lineIds`, `stationId`. Dismissing sends nothing; the screen behind is unchanged.
-
-| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
-|---|---|---|---|---|---|---|---|
-| Status `status` | select | required | — | Received · Preparing · Ready · Served · Recalled · Cancelled | — | — | `setKitchenTicketStatus` body |
-| Lines `lineIds` | multi-picker: choose lines | optional | — | — | — | Advance specific lines. Omit for the whole ticket. | `setKitchenTicketStatus` body |
-| Station `stationId` | picker: choose a station | optional | — | — | shows names, sends the id | — | `setKitchenTicketStatus` body |
-| Recorded at `recordedAt` | date and time picker | required | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `setKitchenTicketStatus` body |
-
-Errors to draw in the form: 409 The move is not one of the four above. Names the ticket's current status.
-
 **Form: Log kitchen exception** (modal, opened by *Log kitchen exception*; *Log kitchen exception* calls `logKitchenException`, *Cancel* sends nothing)
 
 **Collects what `logKitchenException` sends before it is called.** Required: `kind`, `outletId`, `recordedAt`. Optional: `stationId`, `ticketId`, `durationMinutes`, `note`. **When the kind is Other, the note is required** — the operation refuses 400 without it (decided 28 September, audit R222). Dismissing sends nothing; the screen behind is unchanged.
@@ -1564,6 +1824,11 @@ Errors to draw in the form: 409 The move is not one of the four above. Names the
 | Recorded at `recordedAt` | date and time picker | required | — | — | 1 Oct 2026, 14:30 (venue time zone) | Device time, not arrival time. Becomes `KitchenException.raisedAt`, so a replay after a dropped network keeps when the fryer actually went down. | `logKitchenException` body |
 
 Errors to draw in the form: 400 Validation failed
+
+**Rules for these inputs** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
+
+- **Take off sale (86)**: Item, reason (Sold out · Ingredient unavailable · Equipment down · Seasonal · Other with a note), back at (optional). Immediate; works offline and replays. *(source: contracts/satellite/fnb.yaml#setItemAvailability / R110 / R222)*
+- **Kitchen exception**: Equipment down · Item ran out · Late delivery · Staff short · Power loss · Spillage · Other (note required); station and ticket optional; duration in minutes. *(source: contracts/satellite/fnb.yaml#logKitchenException / R222)*
 
 #### Outputs: what the screen shows and produces
 
@@ -1602,9 +1867,13 @@ Errors to draw in the form: 400 Validation failed
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
 | Save item availability (primary button) | `setItemAvailability` PUT `/menu-items/{itemId}/availability` | inline | MenuItem | 400 Validation failed; 412 The row changed since the `If-Match` version was read (SD-013). Re-read and retry. | works offline; gated `PRODUCT_CONFIGURE`; opens modal first |
-| Save kitchen ticket status (secondary button) | `setKitchenTicketStatus` PUT `/kitchen/tickets/{ticketId}/status` | inline | KitchenTicket | 409 The move is not one of the four above. Names the ticket's current status. | works offline; gated `ORDER_MODIFY`; opens modal first; produces a document or message: Advance a kitchen ticket |
 | Log kitchen exception (secondary button) | `logKitchenException` POST `/kitchen-exceptions` | inline | KitchenException | 400 Validation failed | works offline; gated `INCIDENT_REPORT`; opens modal first |
 | Bump (primary button) | navigation or local | — | — | — | — |
+
+**Rules for what is shown** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
+
+- **Off sale today**: Item, when it went off, who called it, reason, back at / came back, orders refused meanwhile. *(source: contracts/satellite/fnb.yaml#list86Events)*
+- **Food safety**: Checks due, checks missed, open corrective actions, unsigned findings, oldest open action; a missed check counts like a failed one. *(source: contracts/satellite/fnb.yaml#getHaccpStatus / R125)*
 
 **Data it reads**: `listKitchenTickets` (onLoad, Kitchen ticket queue, filtered by course (audit R277)); `getHaccpStatus` (onLoad, getHaccpStatus); `list86Events` (onLoad, What came off the menu today, when, and for how long)
 
@@ -1622,13 +1891,33 @@ Errors to draw in the form: 400 Validation failed
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches this station or course filter. **The rail is not empty** — the filter is narrow, and on a kitchen screen that distinction is the difference between calm and panic. |
 | Permission denied (`?state=emptyNoAccess`) | This display is not assigned to a station. **Assignment is a back-office act** — a kitchen screen does not choose what it shows. **A principal without `PRODUCT_VIEW` gets this state naming `PRODUCT_VIEW`**, the screen's `permission` and the one `list86Events`, the population it reads, enforces (`getHaccpStatus` needs `INCIDENT_VIEW` and reaches no component yet, see `gaps`); a button whose own `permission` the principal lacks is hidden, and a 403 from an action names that operation's permission. |
 | Offline (`?state=offline`) | **Amber, and it keeps working.** The kitchen still has to send food out — a display that blanks mid-service is worse than one that says it is behind, and every bump journals locally and syncs when the network returns. |
-| Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 The move is not one of the four above. Names the ticket's current status. |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed |
+
+#### Edge cases to draw
+
+- **An item 86'd here while a till is offline**: The offline till keeps selling it; the kitchen refuses it at send, before payment. *(source: F108 step 3)*
+
+#### Consistency with other screens
+
+- Match `BO-140`: The back office's availability and food-safety screen shows the same 86 events; both apply immediately (R110(c)).
+- Match `POS-021`: The till shows the item as Unavailable with the return time.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+offSale:
+- Kunafa — Sold out · 17:10 by Chef Rami · back at 18:00
+- Grilled hammour — Supplier failure · 12:30 · back tomorrow
+exception: Fryer 2 down · 40 min · Fryer station · 'oil temperature fault'
+foodSafety: Checks due 3 · missed 1 · open actions 2 · oldest 5 h
+```
 
 #### Permissions
 
 - `listKitchenTickets` → `ORDER_VIEW` (read) · staff
 - `setItemAvailability` → `PRODUCT_CONFIGURE` (configure) · staff
-- `setKitchenTicketStatus` → `ORDER_MODIFY` (operate) · staff
 - `getHaccpStatus` → `INCIDENT_VIEW` (read) · staff
 - `list86Events` → `PRODUCT_VIEW` (read) · staff
 - `logKitchenException` → `INCIDENT_REPORT` (operate) · staff
@@ -1652,7 +1941,7 @@ Screen guard: `PRODUCT_VIEW`
 
 None names this screen.
 
-Also apply: 6 for all of P15, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 5 for all of P15, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -1668,13 +1957,14 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (18), with its required mark, default, format and its error state (400, 409, 412).
+- [ ] Every input above is drawn (14), with its required mark, default, format and its error state (400, 412).
 - [ ] Every output is drawn (14 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#KIT-008?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: Save item availability, Save kitchen ticket status, Log kitchen exception, Bump.
+- [ ] Every action is wired with its success and its failure: Save item availability, Log kitchen exception, Bump.
 - [ ] Every transition is wired: `KIT-001`.
-- [ ] Every gated control is gated: `INCIDENT_REPORT`, `INCIDENT_VIEW`, `ORDER_MODIFY`, `ORDER_VIEW`, `PRODUCT_CONFIGURE`, `PRODUCT_VIEW`.
+- [ ] Every gated control is gated: `INCIDENT_REPORT`, `INCIDENT_VIEW`, `ORDER_VIEW`, `PRODUCT_CONFIGURE`, `PRODUCT_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 1 edge case(s) from the process notes are drawn.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -1688,85 +1978,30 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | App · platform | TICVAI POS · P15 Kitchen Display (display) |
 | Module | Kitchen · wave 2 · needs the `fnb` module |
 | Block | Block A · ticket #18160 (APP-POS-KIT-009) |
-| Who uses it | venue staff holding `ORDER_MODIFY`, `PRODUCT_CONFIGURE`, `TENANT_CONFIGURE` (1 operate, 2 configure) |
+| Who uses it | venue staff holding `PRODUCT_CONFIGURE`, `PRODUCT_VIEW` (1 configure, 1 read) |
 | Device and orientation | kiosk · LTR · dark theme |
 | Pattern | configEditor (touchLarge density): the screen declares only writes (`prioritiseKitchenTicket`, `setVenueSettings`) and no read of a population — it is settings, not a list |
 | Offline | **Amber, and it keeps working.** The kitchen still has to send food out — a display that blanks mid-service is worse than one that says it is behind, and every bump journals locally and syncs when the network returns. |
-| Opens with | `venueId` (session), `stationId` (session), `outletId` (session), `ticketId` (KIT-002) · cold entry: **Cold is the only way in.** Nobody logs into a kitchen display — it is on when the kitchen is open, and it resolves its station from the device assignment … |
+| Opens with | `venueId` (session), `stationId` (session), `outletId` (session) · cold entry: **Cold is the only way in.** Nobody logs into a kitchen display — it is on when the kitchen is open, and it resolves its station from the device assignment … |
 | Route | `/kitchen/sla-priority-service-rules` |
 
 **What the spec says about it.** **Built 20 August from board 3 of the client F&B design set.** **Board repointed 24 August.** This screen pointed at `wireframes/FnB Board 3.dc.html#fnb-3j` — a frame in the client pack, which is where the design came from and not where this screen is drawn. **`P15 Kitchen Display.dc.html` and `P16 Venue Analytics.dc.html` carry one anchor per screen and nothing referenced either**, so both shipped correctly anchored and unreachable. The pack frame is kept in `derivedFrom` because provenance is worth more than the wrong pointer. **Drawn 31 August** — `FnB Board 3.dc.html` frame `fnb-3j`. **Matched on frame title against screen name, constrained to this board’s platforms.** These packs label by board position (`GM-6C`) rather than naming the screen, so the title is the only join — *SLA, Priority &amp; Service Rules* matched at 1.0. **A cross-platform title match was refused**: `Outlet Management` scored 0.85 against a partner-portal screen, which is how a mapping goes wrong quietly.
 
+**Known gaps.** Removed 2 October 2026 (CHG-WIR-008): setVenueSettings (the whole venue record, TENANT_CONFIGURE) on a kitchen device is a permission leak, and prioritising one ticket is a live act on the pass … Removed 2 October 2026 (CHG-WIR-008): setVenueSettings (the whole venue record, TENANT_CONFIGURE) on a kitchen device is a permission leak, and prioritising one ticket is a live act on the pass … Contract gap recorded 2 October 2026 (CHG-WIR-011): No read of an outlet's course rules or kitchen SLA.
+
+**From the Food, Beverage & Retail process.** The kitchen's targets and priority rules for an outlet: how long a ticket may wait per order type before it is late, when it turns amber, and what pushes a ticket up the rail (age, promise time, table stage, VIP). Used by a head chef or F&B manager before service. The one thing to get right: the targets read as plain minutes per order type, with a preview of how tonight's rail would look.
+
+**Fixed on main** (the package already carries these; draw what it says): setVenueSettings (the whole venue settings record, TENANT_CONFIGURE — support hours, biometrics, segregated access) is on the kitchen … (CHG-WIR-008); Prioritising a single ticket ("Reason", "Priority" fields) is on a rules screen; there is no read of the current targets. (CHG-SPO-017).
+
 #### Inputs: what the user enters or picks
 
-**On the screen**
+Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
 
-| Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
-|---|---|---|---|---|---|---|---|
-| Reason | text field | — | — | — | — | Required. | — |
-| Priority | number field | — | — | — | — | — | — |
+**Rules for these inputs** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
 
-**Form: Save venue settings** (modal, opened by *Save venue settings*; *Save venue settings* calls `setVenueSettings`, *Cancel* sends nothing)
-
-**Collects what `setVenueSettings` sends before it is called.** Nothing in the body is required. Optional: `id`, `venueId`, `currencyCode`, `currencyScale`, `supportHours`, `quietHours`, `biometrics`, `segregatedAccess`, `alerting`. Dismissing sends nothing; the screen behind is unchanged.
-
-| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
-|---|---|---|---|---|---|---|---|
-| Calendar day start hour `calendarDayStartHour` | stepper or slider | optional | 6 | min 0; max 23 | — | Where the venue's calendar day starts (17 September minutes M17-03, added 30 September): the first hour row of every day and week calendar view (`calendarView` in … | `setVenueSettings` body |
-| Support hours `supportHours` | group | optional | — | — | — | CF-100. A venue decides whether its support desk is 24/7 or bounded, and the platform does not. | `setVenueSettings` body |
-| Mode `supportHours.mode` | radio group | optional | — | Always on · Business hours · Custom · None | — | — | `setVenueSettings` body |
-| Timezone `supportHours.timezone` | text field | optional | — | — | — | IANA zone the `windows` are read in. Absent, they are read in the region's `timeZone`, like every other wall-clock time in this contract. | `setVenueSettings` body |
-| Windows `supportHours.windows` | repeatable rows | optional | — | — | — | — | `setVenueSettings` body |
-| Day `supportHours.windows[].day` | select | optional | — | Mon · Tue · Wed · Thu · Fri · Sat · Sun | — | — | `setVenueSettings` body |
-| From `supportHours.windows[].from` | text field | optional | — | — | — | Wall-clock time the desk opens. | `setVenueSettings` body |
-| To `supportHours.windows[].to` | text field | optional | — | — | — | Wall-clock time the desk closes. | `setVenueSettings` body |
-| Out of hours message `supportHours.outOfHoursMessage` | text field | optional | — | — | — | — | `setVenueSettings` body |
-| Quiet hours `quietHours` | group | optional | — | — | — | When the platform does not send. A wallet low-balance alert at 3am is a complaint, and journeys and message triggers both respect this. | `setVenueSettings` body |
-| From `quietHours.from` | text field | optional | — | — | — | Wall-clock time sending stops | `setVenueSettings` body |
-| To `quietHours.to` | text field | optional | — | — | — | Wall-clock time sending resumes | `setVenueSettings` body |
-| Biometrics `biometrics` | group | optional | — | — | — | CF-35, BL-096, BL-105, BL-106. The venue-level master switch, and the one place a person is asked whether the paperwork exists. | `setVenueSettings` body |
-| Is enabled `biometrics.isEnabled` | toggle | optional | off | Off by default, and turning it on is refused without the two fields below. | — | Off by default, and turning it on is refused without the two fields below. `setVenueSettings` answers 422 rather than accepting an enable it cannot evidence — a DPIA nobody can … | `setVenueSettings` body |
-| Dpia reference `biometrics.dpiaReference` | text field | optional | — | max length 200 | — | The venue's own reference for its Article 21 assessment. The platform does not hold the document and does not judge it; it records that one was named, by whom, and when — which is … | `setVenueSettings` body |
-| Consent notice acknowledged at `biometrics.consentNoticeAcknowledgedAt` | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | When somebody confirmed the consent forms are in place at the point of capture. A guest consenting in an app is a record; a guest consenting at a ticket counter is a notice … | `setVenueSettings` body |
-| Face tag purge minutes after close `biometrics.faceTagPurgeMinutesAfterClose` | number field (minutes) | optional | 0 | — | — | BL-106. How long a same-visit Face Tag survives past the close of the operating day, and zero is the default because that is what 3.2.44 describes. | `setVenueSettings` body |
-| Segregated access `segregatedAccess` | group | optional | — | — | — | CF-130. Configured at venue level because it changes by region and the venue is where it is known — a Ladies Night, a family session, a prayer-time closure. | `setVenueSettings` body |
-| Is enabled `segregatedAccess.isEnabled` | toggle | optional | off | — | — | — | `setVenueSettings` body |
-| Applies to access points `segregatedAccess.appliesToAccessPointIds` | multi-picker: choose applies to access points | optional | — | — | — | — | `setVenueSettings` body |
-| Schedule `segregatedAccess.schedule` | repeatable rows | optional | — | — | — | — | `setVenueSettings` body |
-| Day `segregatedAccess.schedule[].day` | select | optional | — | Mon · Tue · Wed · Thu · Fri · Sat · Sun | — | — | `setVenueSettings` body |
-| From `segregatedAccess.schedule[].from` | text field | optional | — | — | — | Wall-clock time | `setVenueSettings` body |
-| To `segregatedAccess.schedule[].to` | text field | optional | — | — | — | Wall-clock time | `setVenueSettings` body |
-| Admits `segregatedAccess.schedule[].admits` | radio group | optional | — | All · Women · Women and children · Families · Members | — | — | `setVenueSettings` body |
-| Gender verification `segregatedAccess.genderVerification` | segmented control | optional | Off | Off · Staff assisted · Device assisted; Available only where the driver reports the capability, and the result is advisory to the steward rather than decisive at the turnstile (3. | — | `off` — the entitlement decides and a steward handles exceptions. The default, and what is contracted. | `setVenueSettings` body |
-| Override rate alert threshold `segregatedAccess.overrideRateAlertThreshold` | number field | optional | — | — | — | Where `deviceAssisted` is on. An override rate near zero means the steward has stopped deciding, and that is the number that says whether the human safeguard is working or … | `setVenueSettings` body |
-| Alerting `alerting` | group | optional | — | The panel is the default and email or WhatsApp only where the matrix names them — an operational alert that arrives by email is an alert nobody sees in time. | — | CF-134. On-platform notification, marked as read. | `setVenueSettings` body |
-| Channel `alerting.channel` | segmented control | optional | Dashboard panel | Dashboard panel · Dashboard and email · Dashboard and whatsapp | — | — | `setVenueSettings` body |
-| Acknowledgement required `alerting.acknowledgementRequired` | toggle | optional | on | — | — | — | `setVenueSettings` body |
-| Escalate after minutes `alerting.escalateAfterMinutes` | number field (minutes) | optional | — | — | — | — | `setVenueSettings` body |
-| Display currencies `displayCurrencies` | list of values (chips) | optional | — | A code the region has no rate for is refused `400`. | — | Which currencies this venue shows guests (decided 28 September, audit R120 (a)). | `setVenueSettings` body |
-| Cart lease seconds `cartLeaseSeconds` | number field (seconds) | optional | 900 | min 30; max 3600 | — | How long a cart holds capacity (decided 28 September, audit R169): 15 minutes, the default `catalogue.acquireInventoryHold` takes for `ttlSeconds`. | `setVenueSettings` body |
-| Cart hold extension minutes `cartHoldExtensionMinutes` | stepper or slider (minutes) | optional | 5 | min 1; max 30 | — | How long one `orders.extendCart` extension adds. Proposed, client to correct (audit R094). | `setVenueSettings` body |
-| Cart max extensions `cartMaxExtensions` | stepper or slider | optional | 1 | min 0; max 5 | — | How many extensions a cart may take before `extensionCapReached` (`Cart.maxExtensions`). | `setVenueSettings` body |
-| Resale cutoff hours `resaleCutoffHours` | number field (hours) | optional | 24 | min 0; max 168 | — | Hours before the performance after which a ticket can no longer be listed for resale (`orders.createResaleListing`). | `setVenueSettings` body |
-| Exchange cutoff hours `exchangeCutoffHours` | number field (hours) | optional | 24 | min 0; max 720 | — | Hours before the original performance after which lines can no longer be exchanged (`orders.exchangeOrderLines`, `outsideExchangeWindow`). | `setVenueSettings` body |
-| Reschedule cutoff hours `rescheduleCutoffHours` | number field (hours) | optional | 24 | min 0; max 720 | — | Hours before the original performance after which an order can no longer be rescheduled (`orders.rescheduleOrder`, `outsideRescheduleWindow`). | `setVenueSettings` body |
-| Reservation max extensions `reservationMaxExtensions` | stepper or slider | optional | 1 | min 0; max 5 | — | How many times `orders.extendReservation` may extend one reservation. Proposed, client to correct (audit R094). | `setVenueSettings` body |
-| Shift variance threshold `shiftVarianceThreshold` | money field | optional | — | — | AED, 2 decimals shown (up to 4 accepted), currency from the … | Over or short at shift close beyond which the shift waits in `pendingVariance` for `shift.acceptShiftVariance`. | `setVenueSettings` body |
-| Catalogue `catalogue` | group | optional | — | — | — | — | `setVenueSettings` body |
-| Max variants per product `catalogue.maxVariantsPerProduct` | number field | optional | 200 | min 1; max 2000 | — | Variants one product may generate from its attributes (`setProductAttributes` refuses above it). | `setVenueSettings` body |
-| Waitlist offer hold minutes `catalogue.waitlistOfferHoldMinutes` | number field (minutes) | optional | 30 | min 1; max 1440 | — | How long a waitlist offer holds the released capacity for the guest it was offered to. | `setVenueSettings` body |
-| Bulk price change escalation percent `catalogue.bulkPriceChangeEscalationPercent` | stepper or slider | optional | 10 | min 0; max 100; A `bulkChangePrices` run changing any price by more than this percentage needs `PRICE_CONFIGURE` (audit R197). | — | A `bulkChangePrices` run changing any price by more than this percentage needs `PRICE_CONFIGURE` (audit R197). | `setVenueSettings` body |
-| Bulk price change escalation count `catalogue.bulkPriceChangeEscalationCount` | number field | optional | 50 | min 1; A `bulkChangePrices` run touching more prices than this needs `PRICE_CONFIGURE` (audit R197). | — | A `bulkChangePrices` run touching more prices than this needs `PRICE_CONFIGURE` (audit R197). | `setVenueSettings` body |
-| … 27 more | | | | | | the rest are in `schemas.json` | `setVenueSettings` body |
-
-Errors to draw in the form: 400 Validation failed; 403 Authenticated but not permitted at the requested scope; 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 422 An enable the venue cannot evidence. Biometrics switched on without a DPIA reference and a consent-notice acknowledgement, or device-assisted gender …
-
-**Sent by *Prioritise kitchen ticket*** (`prioritiseKitchenTicket`; no form is declared, so these are filled from the screen or collected inline)
-
-| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
-|---|---|---|---|---|---|---|---|
-| Reason `reason` | text area | required | — | min length 3; max length 500 | — | — | `prioritiseKitchenTicket` body |
-| Priority `priority` | stepper or slider | optional | 100 | min 0; max 100 | — | Absent means the top of the queue (decided 28 September, audit R125 (2)): the ticket takes the highest priority on the rail. | `prioritiseKitchenTicket` body |
+- **Target per order type**: Minutes (at least 1) for Dine-in, Quick service, Takeaway, Delivery, Room service; warn at a percentage (default 80%). *(source: contracts/satellite/fnb.yaml#setKitchenSla / contracts/satellite/fnb.yaml#/components/schemas/KitchenSla)*
+- **Priority weights**: Relative weights for ticket age, promise time, table stage and VIP, shown as sliders with a plain explanation. *(source: contracts/satellite/fnb.yaml#setKitchenSla)*
+- **Recall window**: Minutes a bumped ticket can be recalled (proposed 10); a venue setting with a tenant default. *(source: R094 / contracts/satellite/fnb.yaml#recallKitchenTicket)*
 
 #### Outputs: what the screen shows and produces
 
@@ -1776,13 +2011,37 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 
 **Metric tile** (metric tile): Depth and oldest ticket age. **Two numbers, glanceable** — anything a chef has to read is a number they will not read. The station-load tile is not in the first release (decided 28 September, audit R277).
 
+**Targets set now** (detail panel, from `getKitchenSla`): How long a ticket may sit before it is late, per station; edited with Save. Prioritising a single ticket is a live act on the pass (KIT-003), not a rule here (design-notes correction fnb-retail KIT-009).
+
+| Shows | Format | Notes |
+|---|---|---|
+| Targets | list or chips (count when long) | — |
+| Service mode | chip: Quick service, Table service, Room service, Collection, Delivery | — |
+| Target minutes | 1,234 | — |
+| Warn at percent | 1,234 | — |
+| Priority weights | grouped details | The weight of each signal the board names — age, promise time, table stage, a VIP marker. |
+| Age | 1,234 | — |
+| Target ready at | 1,234 | Promise time. |
+| Table stage | 1,234 | — |
+| Vip | 1,234 | — |
+
+**Course rules** (detail panel, from `getCourseRules`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Outlet | the name it points at, never the id | The outlet in the path. |
+| Default coursing | chip: Fire and forget, Hold and fire, Phased, Timed, Delayed | How a ticket's courses are fired. `fireAndForget` sends every course at once, which is no coursing; `holdAndFire` waits for a server to … |
+| Course names | list or chips (count when long) | — |
+| Auto fire minutes | 1,234 | — |
+| Service mode overrides | grouped details | A different default per service mode. |
+
 **Actions and what each produces**
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Prioritise kitchen ticket (primary button) | `prioritiseKitchenTicket` POST `/kitchen/tickets/{ticketId}/prioritise` | inline | KitchenTicket | — | gated `ORDER_MODIFY`; produces a document or message: Move a ticket up the queue |
-| Save venue settings (secondary button) | `setVenueSettings` PUT `/venues/{venueId}/settings` | VenueSettings | VenueSettings | 400 Validation failed; 403 Authenticated but not permitted at the requested scope; 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path. | gated `TENANT_CONFIGURE`; opens modal first |
 | Bump (primary button) | navigation or local | — | — | — | — |
+
+**Data it reads**: `getKitchenSla` (onLoad, The targets set now, so the rules editor loads what it …); `getCourseRules` (onLoad, How this outlet courses by default, shown beside the …)
 
 **Where the user goes next**
 
@@ -1797,13 +2056,34 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | Empty, first run (`?state=emptyFirstRun`) | **No tickets. The kitchen is clear**, and that is worth saying plainly rather than showing a blank rail — a screen that looks broken and a screen that means nothing to do are the same picture otherwise. |
 | Permission denied (`?state=emptyNoAccess`) | This display is not assigned to a station. **Assignment is a back-office act** — a kitchen screen does not choose what it shows. **A principal without `ORDER_MODIFY` gets this state naming `ORDER_MODIFY`**, the screen's `permission` and the one prioritising needs (the screen has no read); a button whose own `permission` the principal lacks is hidden, and a 403 from an action names that operation's permission. |
 | Offline (`?state=offline`) | **Amber, and it keeps working.** The kitchen still has to send food out — a display that blanks mid-service is worse than one that says it is behind, and every bump journals locally and syncs when the network returns. |
-| Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 422 An enable the venue cannot evidence. Biometrics switched on without a DPIA reference and a consent-notice acknowledgement, or device-assisted gender … |
+
+#### Edge cases to draw
+
+- **Someone else saved the rules meanwhile**: "These rules changed since you opened them — reload." *(source: contracts/satellite/fnb.yaml#setKitchenSla)*
+
+#### Consistency with other screens
+
+- Match `BO-136`: The F&B global settings hold the venue-level defaults; this screen sets one outlet's targets.
+- Match `KIT-002`: The amber/red colours on the rail come from these targets.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+targets:
+- Dine-in mains 18 min (amber at 80%)
+- Quick service 8 min
+- Takeaway 12 min
+- Delivery 15 min
+weights: Age 3 · Promise time 5 · Table stage 2 · VIP 4
+```
 
 #### Permissions
 
-- `prioritiseKitchenTicket` → `ORDER_MODIFY` (operate) · staff
-- `setVenueSettings` → `TENANT_CONFIGURE` (configure) · staff
 - `setKitchenSla` → `PRODUCT_CONFIGURE` (configure) · staff
+- `getKitchenSla` → `PRODUCT_VIEW` (read) · staff
+- `getCourseRules` → `PRODUCT_VIEW` (read) · staff
 
 **A refused user sees:** This display is not assigned to a station. **Assignment is a back-office act** — a kitchen screen does not choose what it shows. **A principal without `ORDER_MODIFY` gets this state naming `ORDER_MODIFY`**, the screen's `permission` and the one prioritising needs (the screen has no read); a button whose own `permission` the principal lacks is hidden, and a 403 from an action names that operation's permission.
 
@@ -1811,29 +2091,13 @@ Screen guard: `ORDER_MODIFY`
 
 #### Requirements it meets
 
-18 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
-
-| Ref | Requirement (shortened) | Domain | Verdict | Via |
-|---|---|---|---|---|
-| 4.6.34 | Support automatic and manual prioritization of kitchen orders based on VIP guests, memberships, Fast Pass, SLA targets, group bookings, events, or supervisor override. | Bundles and Promotions | CONTRACTED | `prioritiseKitchenTicket` |
-| 3.2.45 | Face Pass and Face Tag should support automatic gender recognition and reject customers who do not match the designated gender segment. | Admission and Access | CONTRACTED_PARTIAL | data `VenueSettings` |
-| 3.2.46 | Face Pass shouldt restrict male guests attempting to enter during Friday Ladies Night, which needs to be validated with rule-based facial recognition validation. | Admission and Access | CONTRACTED | data `VenueSettings` |
-| 8.9.3 | System shall display queue lengths, estimated wait times, queue utilization, queue alerts, and queue prediction metrics. | Unified Operations Dashboard | CONTRACTED | data `VenueSettings` |
-| 11.1.15 | Approval Breach Alerts - System shall notify users when approval SLA thresholds are exceeded. | Approval Workflows & Governance | CONTRACTED | data `VenueSettings` |
-| 11.1.17 | Approval Notifications - System shall notify approvers when new approval requests are assigned. | Approval Workflows & Governance | CONTRACTED | data `VenueSettings` |
-| 11.1.18 | Approval Reminder Notifications - System shall send reminder notifications for pending approvals. | Approval Workflows & Governance | CONTRACTED | data `VenueSettings` |
-| 11.1.19 | Approval Outcome Notifications - System shall notify requestors when approvals are approved, rejected or escalated. | Approval Workflows & Governance | CONTRACTED | data `VenueSettings` |
-| 15.1.32 | Overstock Alerts - System shall generate overstock alerts. | Inventory Management | CONTRACTED | data `VenueSettings` |
-| 15.1.33 | Stock Shortage Alerts - System shall generate stock shortage alerts. | Inventory Management | CONTRACTED | data `VenueSettings` |
-| 15.1.34 | Expiry Alerts - System shall generate expiry alerts. | Inventory Management | CONTRACTED | data `VenueSettings` |
-| 16.4.23 | Device Alerts - System shall generate device alerts. | Device Management | CONTRACTED | data `VenueSettings` |
-| … 6 more | | | | `traceability.json` |
+No matrix row traces to this screen's operations or data.
 
 #### Client meeting inputs
 
 None names this screen.
 
-Also apply: 6 for all of P15, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 5 for all of P15, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -1848,13 +2112,14 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (76), with its required mark, default, format and its error state (400, 403, 404, 412, 422).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (404, 412).
+- [ ] Every output is drawn (14 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#KIT-009?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: Prioritise kitchen ticket, Save venue settings, Bump.
+- [ ] Every action is wired with its success and its failure: Bump.
 - [ ] Every transition is wired: `KIT-001`.
-- [ ] Every gated control is gated: `ORDER_MODIFY`, `PRODUCT_CONFIGURE`, `TENANT_CONFIGURE`.
+- [ ] Every gated control is gated: `PRODUCT_CONFIGURE`, `PRODUCT_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 1 edge case(s) from the process notes are drawn.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -1875,7 +2140,21 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | `venueId` (session), `stationId` (session), `dashboardId` (KIT-002) · cold entry: **Cold is the only way in.** Nobody logs into a kitchen display — it is on when the kitchen is open, and it resolves its station from the device assignment … |
 | Route | `/kitchen/kitchen-performance-ai-operational-optimization` |
 
-**What the spec says about it.** **Built 20 August from board 3 of the client F&B design set.** **Board repointed 24 August.** This screen pointed at `wireframes/FnB Board 3.dc.html#fnb-3k` — a frame in the client pack, which is where the design came from and not where this screen is drawn. **`P15 Kitchen Display.dc.html` and `P16 Venue Analytics.dc.html` carry one anchor per screen and nothing referenced either**, so both shipped correctly anchored and unreachable. The pack frame is kept in `derivedFrom` because provenance is worth more than the wrong pointer.
+**What the spec says about it.** **Built 20 August from board 3 of the client F&B design set.** **Board repointed 24 August.** This screen pointed at `wireframes/FnB Board 3.dc.html#fnb-3k` — a frame in the client pack, which is where the design came from and not where this screen is drawn. **`P15 Kitchen Display.dc.html` and `P16 Venue Analytics.dc.html` carry one anchor per screen and nothing referenced either**, so both shipped correctly anchored and unreachable. The pack frame is kept in `derivedFrom` because provenance is worth more than the wrong pointer. **This is the performance and AI analysis (pack frame FNB-3K), not the rail** (design-notes correction finance-insights KIT-010; CHG-SPO-017): kitchen performance, station performance, demand forecast and the recommendations. The rail and Bump are KIT-002. The named reads behind those tiles do not exist yet (open entry CHG-SPO-019).
+
+**From the Finance, Ledger & Tax · Reporting & Analytics process.** Kitchen performance over a period: where time is lost, by station and by hour, with forecast demand beside it and a few recommendations, each with its expected effect. This is a manager's analytical view, not the live ticket rail. The one thing to get right: a recommendation is something to judge, so each shows its expected effect, its cost and its confidence, and nothing is applied from here.
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- The screen reads a generic dashboard, while the pack names kitchen performance, station performance, demand forecast and recommendation reads, and an "insufficient data" state. (CHG-SPO-019)
+
+**Fixed on main** (the package already carries these; draw what it says): The layout and states describe the live rail (ticket cards, Bump, "No tickets, the kitchen is clear"). (CHG-SPO-017).
+
+#### Decided on this screen
+
+Answered questions: draw the decision, not the old default. Where a decision and the tables below differ, the decision wins.
+
+- **Is this shown on the kitchen display device (no one signed in) or only to a signed-in kitchen manager?** → Drawn default accepted: A signed-in manager; the assistant and recommendations need a person whose role scopes the answer. *(decided by Chinmay, 2026-10-02; DEC-087 / CHG-NOTE-003)*
 
 #### Inputs: what the user enters or picks
 
@@ -1897,6 +2176,11 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 Errors to draw in the form: 400 Question could not be interpreted. (ReportQuestionProblem); 403 Authenticated but not permitted at the requested scope
 
+**Rules for these inputs** (from the Finance, Ledger & Tax · Reporting & Analytics process; these refine the tables above and win where they differ)
+
+- **Period**: Last 7 / 30 / 90 days; default 30. *(source: screens/P15-kitchen-display.yaml#KIT-010)*
+- **Kitchen**: The kitchens the person may see; default the device's kitchen. *(source: screens/P15-kitchen-display.yaml#KIT-010)*
+
 #### Outputs: what the screen shows and produces
 
 **Shown**
@@ -1915,8 +2199,19 @@ Errors to draw in the form: 400 Question could not be interpreted. (ReportQuesti
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Bump (primary button) | navigation or local | — | — | — | — |
 | Ask reporting question (primary button) | `askReportingQuestion` POST `/reports/ask` | inline | NaturalLanguageAnswer | 400 Question could not be interpreted. (ReportQuestionProblem); 403 Authenticated but not permitted at the requested scope | gated `REPORT_VIEW_VENUE`; opens modal first |
+
+**Rules for what is shown** (from the Finance, Ledger & Tax · Reporting & Analytics process; these refine the tables above and win where they differ)
+
+- **Headline tiles**: Tickets (with change against the prior period), average preparation time in minutes, on-time percentage against its target, re-fire rate, peak throughput in tickets per hour. *(source: screens/P15-kitchen-display.yaml#KIT-010)*
+- **Preparation time against demand by hour**: Bars for ticket volume and a line for average preparation time, with the target as a reference line; a caption names when preparation time crosses the target ("19:30–21:00"). Two axes need their units stated. *(source: screens/P15-kitchen-display.yaml#KIT-010 / MATRIX 8.7.1)*
+- **Station table**: Station, tickets, average preparation, on-time, re-fires; the constraint station is called out in words. *(source: screens/P15-kitchen-display.yaml#KIT-010)*
+- **Demand forecast, next 7 days**: Labelled Forecast, against last week's actual; shows the peak hour against current capacity. *(source: DI-973 / screens/P15-kitchen-display.yaml#KIT-010)*
+- **Recommendations**: At most three, each with expected effect ("+6.2 pts on-time"), cost or risk ("labour AED 180 per service", "4% waste risk") and confidence. *(source: screens/P15-kitchen-display.yaml#KIT-010 / MATRIX 8.6.21 / MATRIX 3.6.37)*
+
+**What each action does** (from the Finance, Ledger & Tax · Reporting & Analytics process; these refine the tables above and win where they differ)
+
+- **Review all recommendations**: Opens the recommendation list; accepting one is done by a person on the routing or rota screen it names. *(source: screens/P15-kitchen-display.yaml#KIT-010 / F20 step 2)*
 
 **Data it reads**: `getDashboard` (onLoad, Read a dashboard with tile data); `recordDashboardView` (background, Record that a dashboard was opened — fired once when the …)
 
@@ -1928,13 +2223,44 @@ Errors to draw in the form: 400 Question could not be interpreted. (ReportQuesti
 
 | State | What it shows |
 |---|---|
-| Loading (`?state=loading`) | The rail, oldest ticket first. **The count renders before the tickets** — a kitchen wants to know how deep it is before it reads anything. |
-| Error (`?state=error`) | Could not reach the platform. **The rail is still live from cache** and every bump is queued. |
-| Empty, first run (`?state=emptyFirstRun`) | **No tickets. The kitchen is clear**, and that is worth saying plainly rather than showing a blank rail — a screen that looks broken and a screen that means nothing to do are the same picture otherwise. |
-| Empty, no results (`?state=emptyNoResults`) | Nothing matches this station or course filter. **The rail is not empty** — the filter is narrow, and on a kitchen screen that distinction is the difference between calm and panic. |
-| Permission denied (`?state=emptyNoAccess`) | This display is not assigned to a station. **Assignment is a back-office act** — a kitchen screen does not choose what it shows. **A principal without `REPORT_VIEW_VENUE` gets this state naming `REPORT_VIEW_VENUE`**, the screen's `permission` and the one its read enforces; a button whose own `permission` the principal lacks is hidden, and a 403 from an action names that operation's permission. |
+| Loading (`?state=loading`) | Kitchen and station performance for the period, then the AI analysis. |
+| Error (`?state=error`) | Could not load the performance figures. Names which read failed. |
+| Empty, first run (`?state=emptyFirstRun`) | **Insufficient data**: fewer service days than the analysis needs; says how many more. |
+| Empty, no results (`?state=emptyNoResults`) | No service in the chosen period. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks REPORT_VIEW_VENUE, and names it. |
 | Offline (`?state=offline`) | **Not available offline.** `getDashboard` is an analytical read (ADR-0016) and there is nothing local to serve. The rail on KIT-001 is what survives a network loss. **Corrected 24 August**: the earlier wording described the kitchen rather than this screen, and a checker cannot tell those apart from prose. |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Question could not be interpreted. (ReportQuestionProblem) |
+
+#### Edge cases to draw
+
+- **Not enough history (first weeks after go-live)**: "Not enough history yet: forecasts start after 4 weeks of service." Tiles show what exists; the forecast panel is empty with that sentence. *(source: DI-280 / screens/P15-kitchen-display.yaml#KIT-010)*
+- **Offline**: Not available; the live rail on KIT-001 is what keeps working. *(source: screens/P15-kitchen-display.yaml#KIT-010)*
+
+#### Consistency with other screens
+
+- Match `KIT-001`: The live rail owns bumping tickets and ticket cards; this screen owns analysis only.
+- Match `ANL-003`: The same preparation-time and on-time definitions as the operational performance board.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+header: Main Kitchen · last 30 days · 12,486 tickets
+tiles:
+- Tickets 12,486 +8.2%
+- Avg prep 12.8 min +0.6
+- On-time 92.6% · target 95%
+- Re-fire rate 1.4% −0.3 pts
+- Peak 96 tickets/hour
+stations:
+- Grill · 4,286 · 15.4 min · 86.2% · 72 re-fires
+- Fryer · 3,142 · 8.6 min · 95.4% · 24
+- Cold Kitchen · 1,884 · 9.8 min · 96.8% · 11
+recommendations:
+- Add a second grill cook 19:00–21:30 · +6.2 pts on-time · labour AED 180 per service · confidence 91%
+- Pre-sear patties at 18:45 · −2.1 min · 4% waste risk · confidence 78%
+```
 
 #### Permissions
 
@@ -1942,7 +2268,7 @@ Errors to draw in the form: 400 Question could not be interpreted. (ReportQuesti
 - `askReportingQuestion` → `REPORT_VIEW_VENUE` (operate) · staff, partner
 - `recordDashboardView` → `REPORT_VIEW_VENUE` (operate) · staff
 
-**A refused user sees:** This display is not assigned to a station. **Assignment is a back-office act** — a kitchen screen does not choose what it shows. **A principal without `REPORT_VIEW_VENUE` gets this state naming `REPORT_VIEW_VENUE`**, the screen's `permission` and the one its read enforces; a button whose own `permission` the principal lacks is hidden, and a 403 from an action names that operation's permission.
+**A refused user sees:** Shown when the caller lacks REPORT_VIEW_VENUE, and names it.
 
 Screen guard: `REPORT_VIEW_VENUE`
 
@@ -1958,7 +2284,7 @@ Screen guard: `REPORT_VIEW_VENUE`
 
 None names this screen.
 
-Also apply: 6 for all of P15, 29 for every app (section *Design inputs from the client meetings* below).
+Also apply: 5 for all of P15, 29 for every app (section *Design inputs from the client meetings* below).
 
 #### Workshop task tracker
 
@@ -1981,10 +2307,12 @@ Also apply: 6 for all of P15, 29 for every app (section *Design inputs from the 
 - [ ] Every input above is drawn (3), with its required mark, default, format and its error state (400, 403, 404).
 - [ ] Every output is drawn (1 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#KIT-010?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: Bump, Ask reporting question.
+- [ ] Every action is wired with its success and its failure: Ask reporting question.
 - [ ] Every transition is wired: `KIT-001`.
 - [ ] Every gated control is gated: `REPORT_VIEW_VENUE`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 2 edge case(s) from the process notes are drawn.
+- [ ] The 1 decision(s) taken on this screen are drawn as decided, not as the old default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -2040,7 +2368,6 @@ Also apply: 6 for all of P15, 29 for every app (section *Design inputs from the 
 
 - Client boards (POS Frontline, F&B, Retail, Inventory & Procurement) share one architecture: six boards of ten screens per domain, a command centre first and an AI/analytics board last, under the hierarchy Company > Venue > Department > Workstation > Operator/Shift > Transaction > Exception > Reconciliation > Analytics. *(agreed · client-design-boards-audit 20 Aug 2026, Opening / What the boards give us · DI-400)*
 - Staff-facing POS and tablet UIs always carry TICVAI branding, not client branding. *(agreed · MoM 14 Aug 2026, 8. POS / Kiosk Branding · DI-296)*
-- Allam: Softlabs need not build a full kitchen display system, only an integration point that sends order information to an existing KDS for display. *(agreed · MoM 31 Jul 2026, 11. Offline Functionality Scope · DI-077)*
 - Typeface Inter (Light, Regular, Medium, Semibold, Bold). Scale: H1 32/40 Bold, H2 24/32 Semibold, H3 20/28 Semibold, Body 1 16/24 Regular, Body 2 14/20 Regular, Caption 12/16 Regular. *(agreed · Design Vision Book 29 Jul 2026, 08 Design System (p8) - 2. Typography · DI-047)*
 - Palette ("modern, trustworthy and accessible"): Primary #0D6EFD, #00B8FF, #00D4C4, #0B1324; Neutral #F7F9FC, #E5E7EB, #9CA3AF, #4B5563, #1F2937. *(agreed · Design Vision Book 29 Jul 2026, 08 Design System (p8) - 1. Color Palette · DI-046)*
 - Primary button spec: height 40px, padding 12px 24px, radius 8px, Inter 14 Semibold, colour #0D6EFD, width auto. *(agreed · Design Vision Book 29 Jul 2026, 09 Deliverables (p9) - Developer Handoff preview · DI-037)*
@@ -2062,9 +2389,11 @@ Method, path, parameters, request and response for every operation these screens
 "askReportingQuestion": {"method":"POST","path":"/reports/ask","contract":"reporting","summary":"Natural-language reporting query","permission":"REPORT_VIEW_VENUE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"NaturalLanguageAnswer"},
 "chaseStation": {"method":"POST","path":"/kitchen-stations/{stationId}/chase","contract":"fnb","summary":"The pass asks a station where an item is","permission":"ORDER_MODIFY","offlineCapable":true,"conflictPolicy":"lastWriterWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":null},
 "fireCourse": {"method":"POST","path":"/kitchen-tickets/{ticketId}/fire","contract":"fnb","summary":"Send a held course to the pass","permission":"ORDER_MODIFY","offlineCapable":true,"conflictPolicy":"lastWriterWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"KitchenTicket"},
+"getCourseRules": {"method":"GET","path":"/outlets/{outletId}/course-rules","contract":"fnb","summary":"How this outlet courses by default (read)","permission":"PRODUCT_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"CourseRules"},
 "getDashboard": {"method":"GET","path":"/dashboards/{dashboardId}","contract":"reporting","summary":"Read a dashboard with tile data","permission":"REPORT_VIEW_VENUE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"refresh","in":"query","required":null}],"requestBody":null,"responds":"DashboardData"},
 "getFnbOrder": {"method":"GET","path":"/fnb-orders/{orderId}","contract":"fnb","summary":"Read an F&B order","permission":"ORDER_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"FnbOrder"},
 "getHaccpStatus": {"method":"GET","path":"/food-safety/status","contract":"fnb","summary":"Where this venue stands, right now","permission":"INCIDENT_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":null},
+"getKitchenSla": {"method":"GET","path":"/outlets/{outletId}/kitchen-sla","contract":"fnb","summary":"How long a ticket may sit before it is late (read)","permission":"PRODUCT_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"KitchenSla"},
 "holdCourse": {"method":"POST","path":"/kitchen-tickets/{ticketId}/hold","contract":"fnb","summary":"Stop a course going out","permission":"ORDER_MODIFY","offlineCapable":true,"conflictPolicy":"lastWriterWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"KitchenTicket"},
 "list86Events": {"method":"GET","path":"/outlets/{outletId}/86-events","contract":"fnb","summary":"What came off the menu today, when, and for how long","permission":"PRODUCT_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"from","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listFnbOrders": {"method":"GET","path":"/fnb-orders","contract":"fnb","summary":"List F&B orders","permission":"ORDER_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"outletId","in":"query","required":null},{"name":"tableVisitId","in":"query","required":null},{"name":"status","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
@@ -2080,12 +2409,9 @@ Method, path, parameters, request and response for every operation these screens
 "recordDashboardView": {"method":"POST","path":"/dashboards/{dashboardId}/views","contract":"reporting","summary":"Record that a dashboard was opened","permission":"REPORT_VIEW_VENUE","offlineCapable":false,"conflictPolicy":"append","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":null},
 "recordOrderHandover": {"method":"POST","path":"/guest-orders/{orderId}/delivery","contract":"fnb","summary":"Record that an order reached the guest","permission":"ORDER_MODIFY","offlineCapable":true,"conflictPolicy":"append","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"GuestOrderStatus"},
 "refireItem": {"method":"POST","path":"/kitchen-tickets/{ticketId}/refire","contract":"fnb","summary":"Make it again","permission":"ORDER_MODIFY","offlineCapable":true,"conflictPolicy":"append","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"KitchenTicket"},
-"setCourseRules": {"method":"PUT","path":"/outlets/{outletId}/course-rules","contract":"fnb","summary":"How this outlet courses by default","permission":"PRODUCT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":"CourseRules","responds":"CourseRules"},
 "setItemAvailability": {"method":"PUT","path":"/menu-items/{itemId}/availability","contract":"fnb","summary":"Mark an item available or eighty-sixed","permission":"PRODUCT_CONFIGURE","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"MenuItem"},
 "setKitchenSla": {"method":"PUT","path":"/outlets/{outletId}/kitchen-sla","contract":"fnb","summary":"How long a ticket may sit before it is late","permission":"PRODUCT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":"KitchenSla","responds":"KitchenSla"},
-"setKitchenStations": {"method":"PUT","path":"/kitchen/stations","contract":"fnb","summary":"Configure stations and item routing","permission":"PRODUCT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":"outletId","in":"query","required":true},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"KitchenStation"},
-"setKitchenTicketStatus": {"method":"PUT","path":"/kitchen/tickets/{ticketId}/status","contract":"fnb","summary":"Advance a kitchen ticket","permission":"ORDER_MODIFY","offlineCapable":true,"conflictPolicy":"append","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"KitchenTicket"},
-"setVenueSettings": {"method":"PUT","path":"/venues/{venueId}/settings","contract":"tenancy","summary":"Set support hours, quiet hours, segregated access and alerting","permission":"TENANT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"VenueSettings","responds":"VenueSettings"}
+"setKitchenTicketStatus": {"method":"PUT","path":"/kitchen/tickets/{ticketId}/status","contract":"fnb","summary":"Advance a kitchen ticket","permission":"ORDER_MODIFY","offlineCapable":true,"conflictPolicy":"append","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"KitchenTicket"}
 }
 ```
 
@@ -2101,17 +2427,17 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "CreateFnbOrderLine": {"x-ticvai-persistence":"none — request only","type":"object","required":["id","menuItemId","quantity"],"properties":{"id":{"type":"string","format":"uuid"},"menuItemId":{"type":"string","format":"uuid"},"quantity":{"type":"integer","minimum":1},"modifierOptionIds":{"type":"array","items":{"type":"string","format":"uuid"}},"note":{"type":"string","maxLength":200,"description":"Free text to the kitchen. Allergy notes belong here and are surfaced prominently."},"seatNumber":{"type":"integer","nullable":true,"description":"Which cover ordered it. Drives split-by-covers accurately."},"course":{"type":"integer","nullable":true,"description":"Course grouping, so the kitchen fires in sequence."},"redeemEntitlementId":{"type":"string","nullable":true,"x-ticvai-references":"access.entitlement","description":"**A meal combo redeemed at the till or by a scan** (29 September, MOB-4; applied 30 September). The entitlement a bundle's `fnbMenuItem` component issued (promotions `BundleComponent.componentKind: fnbMenuItem`, `menuItemId`, `redeemAtOutletIds`). The line is priced at zero against it, `menuItemId` must be the component's menu item and the outlet one of `redeemAtOutletIds` (or any outlet with the item on a live menu when that list is empty), and the entitlement is marked used in the same step through access `validateAccess` at the outlet. An entitlement already used, for another item or outlet, or not yet valid is refused 409 `entitlementNotRedeemable`; a till that is offline queues the redemption like any sale and the replay is refused the same way if it was used meanwhile."}}},
 "Dashboard": {"x-ticvai-persistence":"reporting.dashboard + reporting.dashboard_tile","allOf":[{"$ref":"#/components/schemas/CreateDashboardRequest"},{"type":"object","required":["id","ownerPrincipalId","aggregateCost","createdAt"],"properties":{"id":{"type":"string","format":"uuid"},"ownerPrincipalId":{"type":"string","format":"uuid"},"aggregateCost":{"type":"string","enum":["low","medium","high"],"description":"Combined refresh load of every tile."},"archivedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true,"description":"**Set by `deleteDashboard`, which archives rather than removes.** A dashboard's tiles carry `visualisation`, `parameters` and `refresh_seconds` that somebody configured, and `reporting.dashboard_tile` cascades — so a hard delete takes an afternoon's work with it and leaves nothing to say what was there.\nArchived dashboards are excluded from `listDashboards` unless asked for with `includeArchived=true`.\n"},"createdAt":{"type":"string","format":"date-time"}}}]},
 "DashboardData": {"x-ticvai-persistence":"none — computed","allOf":[{"$ref":"#/components/schemas/Dashboard"},{"type":"object","properties":{"tileData":{"type":"array","items":{"type":"object","properties":{"tileId":{"type":"string","format":"uuid"},"result":{"$ref":"#/components/schemas/ReportResult"},"isCached":{"type":"boolean"},"error":{"type":"string","nullable":true}}}}}}]},
-"EightySixEvent": {"type":"object","x-ticvai-persistence":"fnb.sold_out_item","description":"Board 5J. **`setItemAvailability` recorded the current state and not the history.** An item 86'd at 7pm on a Saturday is a lost-sales figure and a prep-planning signal, and the package kept only the flag.\n**`refusedOrderCount` is what makes it worth keeping.** *Off for ninety minutes* is a note; *off for ninety minutes and eleven guests asked for it* is a purchasing decision.\n","required":["id","menuItemId","offAt"],"properties":{"id":{"type":"string","format":"uuid"},"outletId":{"type":"string","format":"uuid"},"menuItemId":{"type":"string","format":"uuid"},"offAt":{"type":"string","format":"date-time"},"backAt":{"type":"string","format":"date-time","nullable":true},"reason":{"type":"string","enum":["ranOut","qualityIssue","equipmentDown","supplierFailure","seasonal","other"],"description":"`other` always carries a `note` (audit R222)."},"note":{"type":"string","maxLength":500,"nullable":true,"description":"The note given with the 86. Required where the reason is `other` (audit R222)."},"calledByPrincipalId":{"type":"string","format":"uuid"},"refusedOrderCount":{"type":"integer","default":0,"readOnly":true}}},
-"FnbOrder": {"x-ticvai-persistence":"fnb.service_order + fnb.service_order_line","type":"object","required":["id","orderNumber","outletId","serviceMode","status","lines","grossAmount","createdAt"],"properties":{"id":{"type":"string","format":"uuid"},"orderNumber":{"type":"string"},"outletId":{"type":"string","format":"uuid"},"serviceMode":{"$ref":"#/components/schemas/ServiceMode"},"tableVisitId":{"type":"string","format":"uuid","nullable":true},"status":{"$ref":"#/components/schemas/FnbOrderStatus"},"lines":{"type":"array","items":{"allOf":[{"$ref":"#/components/schemas/CreateFnbOrderLine"},{"type":"object","properties":{"status":{"$ref":"#/components/schemas/FnbOrderStatus"},"unitPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"lineTotal":{"$ref":"../shared/common.yaml#/components/schemas/Money"}}}]}},"salesOrderId":{"type":"string","format":"uuid","nullable":true,"x-ticvai-references":"orders.sales_order","description":"**Retyped 29 September (SD-046)**, and `format: uuid` since ADR-0056 (30 September): every id is a uuid, so this joins `orders.sales_order.id`. **Taken from their `fnb.order`, 20 September.** We carried outlet, table visit and kitchen ticket on an F&B order and nothing joining it to what was actually sold, so an F&B line could not be reconciled to the order that paid for it.\n"},"updatedAt":{"type":"string","format":"date-time","nullable":true,"description":"Taken from their `fnb.order`. Ours had `recordedAt` and `syncedAt`, which are both offline-sync fields, and no plain updated timestamp.\n"},"grossAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"taxAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"kitchenTicketId":{"type":"string","format":"uuid","nullable":true},"kitchenTickets":{"type":"array","readOnly":true,"x-ticvai-persisted":false,"description":"The kitchen tickets this order created, one per station (SD-046). Returned, not stored here; they are `fnb.kitchen_ticket` rows.","items":{"$ref":"#/components/schemas/KitchenTicket"}},"estimatedReadyAt":{"type":"string","format":"date-time","nullable":true},"createdAt":{"type":"string","format":"date-time"},"recordedAt":{"type":"string","format":"date-time"},"syncedAt":{"type":"string","format":"date-time","nullable":true}}},
+"EightySixEvent": {"type":"object","x-ticvai-persistence":"fnb.sold_out_item","description":"Board 5J. **`setItemAvailability` recorded the current state and not the history.** An item 86'd at 7pm on a Saturday is a lost-sales figure and a prep-planning signal, and the package kept only the flag.\n**`refusedOrderCount` is what makes it worth keeping.** *Off for ninety minutes* is a note; *off for ninety minutes and eleven guests asked for it* is a purchasing decision.\n","required":["id","menuItemId","offAt"],"properties":{"id":{"type":"string","format":"uuid"},"outletId":{"type":"string","format":"uuid"},"menuItemId":{"type":"string","format":"uuid"},"offAt":{"type":"string","format":"date-time"},"backAt":{"type":"string","format":"date-time","nullable":true},"reason":{"type":"string","enum":["ranOut","qualityIssue","equipmentDown","supplierFailure","seasonal","other"],"description":"`other` always carries a `note` (audit R222)."},"note":{"type":"string","maxLength":500,"nullable":true,"description":"The note given with the 86. Required where the reason is `other` (audit R222)."},"calledByPrincipalId":{"type":"string","format":"uuid"},"source":{"type":"string","readOnly":true,"enum":["manual","dailyCount"],"default":"manual","description":"**Who took the item off** (CHG-CSA-017). `manual`: a person, through `setItemAvailability`. `dailyCount`: the item's `remainingCount` reached zero and the system marked it unavailable (`setMenuItemDailyCount`; Chinmay, 2 October, workbook Q194). An automatic 86 carries no `calledByPrincipalId`.\n"},"refusedOrderCount":{"type":"integer","default":0,"readOnly":true}}},
+"FnbOrder": {"x-ticvai-persistence":"fnb.service_order + fnb.service_order_line","type":"object","required":["id","orderNumber","outletId","serviceMode","status","lines","grossAmount","createdAt"],"properties":{"id":{"type":"string","format":"uuid"},"orderNumber":{"type":"string"},"outletId":{"type":"string","format":"uuid"},"paymentTiming":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/OutletPaymentTiming"}],"readOnly":true,"description":"The outlet's payment timing when the order was placed (CHG-CSA-010), kept as a snapshot."},"sentToKitchenAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true,"description":"When the order's kitchen tickets were created. Null on a `payFirst` order not yet paid (CHG-CSA-010)."},"serviceMode":{"$ref":"#/components/schemas/ServiceMode"},"tableVisitId":{"type":"string","format":"uuid","nullable":true},"status":{"$ref":"#/components/schemas/FnbOrderStatus"},"lines":{"type":"array","items":{"allOf":[{"$ref":"#/components/schemas/CreateFnbOrderLine"},{"type":"object","properties":{"status":{"$ref":"#/components/schemas/FnbOrderStatus"},"unitPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"lineTotal":{"$ref":"../shared/common.yaml#/components/schemas/Money"}}}]}},"salesOrderId":{"type":"string","format":"uuid","nullable":true,"x-ticvai-references":"orders.sales_order","description":"**Retyped 29 September (SD-046)**, and `format: uuid` since ADR-0056 (30 September): every id is a uuid, so this joins `orders.sales_order.id`. **Taken from their `fnb.order`, 20 September.** We carried outlet, table visit and kitchen ticket on an F&B order and nothing joining it to what was actually sold, so an F&B line could not be reconciled to the order that paid for it.\n"},"updatedAt":{"type":"string","format":"date-time","nullable":true,"description":"Taken from their `fnb.order`. Ours had `recordedAt` and `syncedAt`, which are both offline-sync fields, and no plain updated timestamp.\n"},"grossAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"taxAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"kitchenTicketId":{"type":"string","format":"uuid","nullable":true},"kitchenTickets":{"type":"array","readOnly":true,"x-ticvai-persisted":false,"description":"The kitchen tickets this order created, one per station (SD-046). Returned, not stored here; they are `fnb.kitchen_ticket` rows.","items":{"$ref":"#/components/schemas/KitchenTicket"}},"estimatedReadyAt":{"type":"string","format":"date-time","nullable":true},"createdAt":{"type":"string","format":"date-time"},"recordedAt":{"type":"string","format":"date-time"},"syncedAt":{"type":"string","format":"date-time","nullable":true}}},
 "FnbOrderStatus": {"type":"string","description":"The full lifecycle from 4.6.35. Nine states, not six — the earlier enum collapsed `accepted` into `placed` and had no `collected` or `delivered` at all, which made collection and delivery indistinguishable from a server putting a plate down.\n`accepted` matters because an outlet may refuse: past last orders, out of a key ingredient, or simply too far behind. A guest whose order sat in `placed` for ten minutes and was then rejected has a worse experience than one refused immediately.\n","enum":["ordered","accepted","inPreparation","ready","served","collected","delivered","cancelled","refunded"]},
 "GeneratedQuery": {"x-ticvai-persistence":"none — embedded; stored whole in `reporting.natural_language_query`","type":"object","description":"The structured query a natural-language question produced — data source, columns, filters, grouping. Named on 26 September so the answer and the kept copy are one shape.\n","properties":{"dataSource":{"$ref":"#/components/schemas/DataSource"},"columns":{"type":"array","items":{"$ref":"#/components/schemas/ReportColumn"}},"filters":{"type":"array","items":{"$ref":"#/components/schemas/ReportFilter"}},"groupBy":{"type":"array","items":{"type":"string"}},"compiledSql":{"type":"string","nullable":true,"description":"The SQL the semantic spec compiled to, exactly as run on the analytical replica (29 September, design 5.7). The replica's row-level security applies beneath it, so it does not need to carry the caller's scope. Null on queries kept before the semantic compile.\n"}}},
 "GuestOrderStatus": {"type":"object","x-ticvai-persistence":"none — projection over kitchen_ticket","required":["orderId","status","lines"],"properties":{"orderId":{"type":"string"},"orderNumber":{"type":"string"},"status":{"$ref":"#/components/schemas/FnbOrderStatus"},"estimatedReadyAt":{"type":"string","format":"date-time","nullable":true},"isReadyForCollection":{"type":"boolean"},"lines":{"type":"array","description":"Per-line status. A guest waiting on one dish should see which.","items":{"type":"object","properties":{"name":{"type":"string"},"quantity":{"type":"integer"},"status":{"$ref":"#/components/schemas/KitchenTicketStatus"}}}}}},
 "KitchenException": {"type":"object","x-ticvai-persistence":"fnb.kitchen_exception","description":"Board 3, 24 August. **Something that cost the kitchen a service and left no other trace** — equipment down, an item run out mid-ticket, a late delivery, a station short.\n`refireItem` covers a dish. **This covers the reasons a venue looking at a bad Saturday needs**, and which currently live in somebody's memory.\n","required":["id","kind","raisedAt"],"properties":{"id":{"type":"string","format":"uuid"},"outletId":{"type":"string","format":"uuid"},"stationId":{"type":"string","format":"uuid","nullable":true},"ticketId":{"type":"string","format":"uuid","nullable":true},"kind":{"type":"string","enum":["equipmentDown","itemRanOut","lateDelivery","staffShort","powerLoss","spillage","chased","other"],"description":"`other` always carries a `note` (audit R222)."},"durationMinutes":{"type":"integer","nullable":true},"raisedAt":{"type":"string","format":"date-time"},"raisedByPrincipalId":{"type":"string","format":"uuid"},"note":{"type":"string","nullable":true}}},
 "KitchenSla": {"type":"object","description":"**How long a ticket may sit, per service mode, and what pushes it up the rail** (`setKitchenSla`). The priority weights are the ones `listKitchenTickets` orders the rail by.\n","properties":{"targets":{"type":"array","items":{"type":"object","required":["serviceMode","targetMinutes"],"properties":{"serviceMode":{"$ref":"#/components/schemas/ServiceMode"},"targetMinutes":{"type":"integer","minimum":1},"warnAtPercent":{"type":"integer","default":80}}}},"priorityWeights":{"type":"object","description":"The weight of each signal the board names — age, promise time, table stage, a VIP marker.","properties":{"age":{"type":"integer","minimum":0},"targetReadyAt":{"type":"integer","minimum":0,"description":"Promise time."},"tableStage":{"type":"integer","minimum":0},"vip":{"type":"integer","minimum":0}}}}},
-"KitchenStation": {"x-ticvai-persistence":"fnb.kitchen_station","type":"object","required":["id","code","name"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string"},"name":{"type":"string"},"outletId":{"type":"string","format":"uuid"},"menuItemIds":{"type":"array","items":{"type":"string","format":"uuid"},"description":"Items routed to this station."},"displayWorkstationIds":{"type":"array","items":{"type":"string","format":"uuid"},"description":"**The kitchen displays assigned to this station** (decided 28 September, audit R277), as tenancy `Workstation` ids, primary first and fallbacks after it. Set with `setKitchenStations`. A display reads the rail for the station it is assigned to (`listKitchenTickets`). A workstation is assigned to at most one station; a second assignment is refused `400`.\n"},"displayEndpoint":{"type":"string","nullable":true,"description":"The P15 Kitchen Display device this station's tickets go to (19 Sep: the display is TICVAI software on commodity hardware, per station, with a fallback device where the primary is down — 18 Aug minute). Absent where the station has no display assigned.\n"},"isActive":{"type":"boolean"}}},
+"KitchenStation": {"x-ticvai-persistence":"fnb.kitchen_station","type":"object","required":["id","code","name"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string"},"name":{"type":"string"},"outletId":{"type":"string","format":"uuid"},"menuItemIds":{"type":"array","items":{"type":"string","format":"uuid"},"description":"Items routed to this station."},"displayWorkstationIds":{"type":"array","items":{"type":"string","format":"uuid"},"description":"**The kitchen displays assigned to this station** (decided 28 September, audit R277), as tenancy `Workstation` ids, primary first and fallbacks after it. Set with `setKitchenStations`. A display reads the rail for the station it is assigned to (`listKitchenTickets`). A workstation is assigned to at most one station; a second assignment is refused `400`.\n"},"displayEndpoint":{"type":"string","nullable":true,"description":"The P15 Kitchen Display device this station's tickets go to (19 Sep: the display is TICVAI software on commodity hardware, per station, with a fallback device where the primary is down — 18 Aug minute). Absent where the station has no display assigned.\n"},"printerDeviceIds":{"type":"array","items":{"type":"string","format":"uuid"},"description":"**The kitchen printers assigned to this station** (Chinmay, 2 October, workbook Q187: kitchen printers are in release 1; CHG-CSA-014), as tenancy `RegisteredDevice` ids of kind `receiptPrinter` or `labelPrinter`. A station may have printers, displays or both; a ticket for a station with printers is printed there as well as shown, and `printPrepSheet` sends the station's part of a prep sheet to them.\n"},"servesOutletIds":{"type":"array","items":{"type":"string","format":"uuid"},"description":"**A producing outlet's station serving other outlets** (Chinmay, 2 October, workbook Q186 and Q188; DI-330; CHG-CSA-015). `outletId` is the producing outlet (the commissary or main kitchen); the outlets listed here route their orders to this station as if it were their own. Empty, the default, means the station serves only its own outlet.\n"},"isActive":{"type":"boolean"}}},
 "KitchenTicket": {"x-ticvai-persistence":"fnb.kitchen_ticket + fnb.kitchen_ticket_line","type":"object","required":["id","orderId","outletId","status","lines","createdAt"],"properties":{"id":{"type":"string","format":"uuid"},"orderId":{"type":"string","format":"uuid","description":"The F&B order the ticket was created from on acceptance (`FnbOrder.id`)."},"orderNumber":{"type":"string"},"outletId":{"type":"string","format":"uuid"},"tableLabel":{"type":"string","nullable":true},"serviceMode":{"$ref":"#/components/schemas/ServiceMode"},"coursing":{"allOf":[{"$ref":"#/components/schemas/CoursingPolicy"}],"nullable":true,"description":"BL-131. **Starters before mains is the entire job of a kitchen pass**, and the model fired everything at once.\n`holdAndFire` waits for a server to call it; `timed` fires on a clock; `phased` staggers by course. **Without this a table gets its dessert while eating its starter.**\n"},"buzzerCode":{"type":"string","nullable":true,"description":"BL-128. **The pager number handed to a guest at a counter.** Recorded against the order so a lost buzzer is a lookup rather than an argument.\n"},"status":{"$ref":"#/components/schemas/KitchenTicketStatus"},"priority":{"type":"integer","description":"Higher fires sooner. Raised by Fast Pass or supervisor override."},"prioritisedByPrincipalId":{"type":"string","format":"uuid","nullable":true},"prioritiseReason":{"type":"string","nullable":true},"lines":{"type":"array","items":{"type":"object","required":["lineId","name","quantity","status"],"properties":{"lineId":{"type":"string","format":"uuid"},"name":{"type":"string"},"quantity":{"type":"integer"},"modifiers":{"type":"array","items":{"type":"string"}},"note":{"type":"string","nullable":true},"allergens":{"type":"array","items":{"$ref":"#/components/schemas/AllergenCode"}},"refireOfLineId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"**Set on a refire.** The line it remakes, which stays — food cost counts both, the bill counts one (`refireItem`)."},"refireReason":{"allOf":[{"$ref":"#/components/schemas/RefireReason"}],"nullable":true,"readOnly":true},"isChargeable":{"type":"boolean","nullable":true,"readOnly":true,"description":"A refire's `chargeable` flag. Null on a line that is not a refire."},"course":{"type":"integer","nullable":true},"stationId":{"type":"string","format":"uuid","nullable":true},"status":{"$ref":"#/components/schemas/KitchenTicketStatus"}}}},"createdAt":{"type":"string","format":"date-time"},"targetReadyAt":{"type":"string","format":"date-time","nullable":true},"elapsedSeconds":{"type":"integer"}}},
 "KitchenTicketStatus": {"type":"string","enum":["received","preparing","ready","served","recalled","cancelled"]},
-"MenuItem": {"x-ticvai-persistence":"fnb.menu_item","type":"object","required":["id","productVariantId","name","price","isAvailable"],"properties":{"id":{"type":"string","format":"uuid"},"productVariantId":{"type":"string","format":"uuid","description":"The catalogue variant this item sells. Pricing and tax come from there — a menu is a presentation of the catalogue, not a second catalogue.\n"},"name":{"type":"string"},"description":{"type":"string","nullable":true},"price":{"x-ticvai-column":"list_price","$ref":"../shared/common.yaml#/components/schemas/Money"},"sortOrder":{"type":"integer"},"modifierGroupIds":{"type":"array","items":{"type":"string","format":"uuid"}},"stationId":{"type":"string","format":"uuid","nullable":true},"menuSectionId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"The section the item sits in, set by `setMenuSections` and `applyMenuActions` (`moveSection`)."},"isStockTracked":{"type":"boolean","description":"True where a recipe exists. Stock-tracked items cannot be sold offline."},"isAvailable":{"type":"boolean"},"unavailableReason":{"type":"string","nullable":true},"restoreAt":{"type":"string","format":"date-time","nullable":true,"description":"When an unavailable item comes back on its own (`setItemAvailability`). Null means by hand."},"preparationMinutes":{"type":"integer","nullable":true},"allergens":{"type":"array","items":{"$ref":"#/components/schemas/AllergenCode"}}}},
+"MenuItem": {"x-ticvai-persistence":"fnb.menu_item","type":"object","required":["id","productVariantId","name","price","isAvailable"],"properties":{"id":{"type":"string","format":"uuid"},"productVariantId":{"type":"string","format":"uuid","description":"**The catalogue variant this item links to, for reporting, stock and tax class only. It is not where the price comes from** (Chinmay, 2 October, workbook Q34; CHG-CSA-009). F&B owns its own catalogue: F&B prices were migrated into the F&B service so ticketing scales as an isolated service (ADR-0028), and the price an outlet sells at is `price` on this item. The central catalogue prices tickets and single-price booths; it never reprices a dish. A menu belongs to one outlet, so `price` is that outlet's price, and an outlet may set its own; it changes through `updateMenu`, `setMenuSections` or `applyMenuActions` (`reprice`). Tax is computed on the order line by the tax engine. (Replaces the earlier text \"pricing and tax come from there — a menu is a presentation of the catalogue\", which was stale.)\n"},"name":{"type":"string"},"description":{"type":"string","nullable":true},"price":{"x-ticvai-column":"list_price","$ref":"../shared/common.yaml#/components/schemas/Money"},"dailyCount":{"type":"integer","minimum":0,"nullable":true,"readOnly":true,"description":"**How many portions the kitchen set for today** (`setMenuItemDailyCount`; Chinmay, 2 October, workbook Q194; CHG-CSA-017). Null means the item is not counted. Reset at the venue day start.\n"},"remainingCount":{"type":"integer","minimum":0,"nullable":true,"readOnly":true,"description":"**What is left of `dailyCount`** (\"6 left\" on the till and the guest menu). Each sale takes from it; **at zero the item is marked unavailable automatically**, with an `EightySixEvent` whose `source` is `dailyCount`. Null where the item is not counted.\n"},"sortOrder":{"type":"integer"},"modifierGroupIds":{"type":"array","items":{"type":"string","format":"uuid"}},"stationId":{"type":"string","format":"uuid","nullable":true},"menuSectionId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"The section the item sits in, set by `setMenuSections` and `applyMenuActions` (`moveSection`)."},"isStockTracked":{"type":"boolean","description":"True where a recipe exists. Stock-tracked items cannot be sold offline."},"isAvailable":{"type":"boolean"},"unavailableReason":{"type":"string","nullable":true},"restoreAt":{"type":"string","format":"date-time","nullable":true,"description":"When an unavailable item comes back on its own (`setItemAvailability`). Null means by hand."},"preparationMinutes":{"type":"integer","nullable":true},"allergens":{"type":"array","items":{"$ref":"#/components/schemas/AllergenCode"}}}},
 "NaturalLanguageAnswer": {"x-ticvai-persistence":"none — computed","type":"object","required":["conversationId","question","interpretation","result","reliability"],"properties":{"conversationId":{"type":"string"},"question":{"type":"string"},"interpretation":{"type":"string","description":"What the question was understood to mean, in plain language. When the question is outside the semantic model, the \"not available yet\" sentence."},"semanticSpec":{"allOf":[{"$ref":"#/components/schemas/ReportingSemanticQuerySpec"}],"nullable":true,"description":"What the model returned instead of SQL (design 2.2 E, 5.7): metric, dimensions, filters, period, comparison, as validated against the semantic model. Null when the question is outside it. **Also kept**, on `NaturalLanguageQuery`, so a follow-up edits it.\n"},"generatedQuery":{"allOf":[{"$ref":"#/components/schemas/GeneratedQuery"}],"nullable":true,"description":"The query the spec compiled to: data source, columns, filters, grouping, and the compiled SQL in `compiledSql`. Returned so the answer can be checked. An answer nobody can verify is worse than no answer. **Also kept, as `NaturalLanguageQuery`**, for `saveNaturalLanguageQuery`. Null when the question is outside the semantic model.\n"},"result":{"allOf":[{"$ref":"#/components/schemas/ReportResult"}],"nullable":true,"description":"Null when the question is outside the semantic model."},"dataAsOf":{"type":"string","format":"date-time","nullable":true,"description":"Replica position the answer was read at, the result's `dataAsOf`, stated beside the answer so a figure that moved is not argued about. Null when nothing was run."},"reliability":{"$ref":"#/components/schemas/ReportingAnswerReliability"},"unavailableReason":{"allOf":[{"$ref":"#/components/schemas/ReportingUnavailableReason"}],"nullable":true,"description":"Set only when `reliability` is `insufficientEvidence` because the question is outside the semantic model (\"not available yet\"); names which part is not modelled."},"confidence":{"type":"number","minimum":0,"maximum":1,"deprecated":true,"description":"Superseded by `reliability` on 29 September (design 5.6, never a bare percentage for analytics). Returned for one release, then removed."},"suggestedFollowUps":{"type":"array","items":{"type":"string"}},"modelVersion":{"type":"string"},"tokensUsed":{"type":"integer"}}},
 "OrderLabel": {"type":"object","x-ticvai-persistence":"none — rendered from the kitchen ticket and its order","description":"**What goes on the bag** (`printOrderLabel`). Order number, guest name, items and **the allergen flags, which are the reason the label is rendered by the server** from the same source as the order rather than printed from whatever the client has.\n","required":["ticketId","orderNumber","lines","allergens"],"properties":{"ticketId":{"type":"string","format":"uuid"},"orderNumber":{"type":"string"},"guestName":{"type":"string","nullable":true},"serviceMode":{"$ref":"#/components/schemas/ServiceMode"},"deliveryLabel":{"type":"string","nullable":true,"description":"Where it is going, as a runner would read it."},"buzzerCode":{"type":"string","nullable":true},"lines":{"type":"array","items":{"type":"object","required":["name","quantity"],"properties":{"name":{"type":"string"},"quantity":{"type":"integer"},"modifiers":{"type":"array","items":{"type":"string"}},"allergens":{"type":"array","items":{"$ref":"#/components/schemas/AllergenCode"}}}}},"allergens":{"type":"array","description":"Every allergen on the order, together. Present and possibly empty — never omitted.","items":{"$ref":"#/components/schemas/AllergenCode"}}}},
 "Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}},
@@ -2121,7 +2447,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "ReportingSemanticQuerySpec": {"x-ticvai-persistence":"none — embedded; stored whole in `reporting.natural_language_query`","type":"object","description":"**A question in the semantic model's own vocabulary** (decided 29 September, AI system design 2.2 E and 5.7). What the model returns for a live-number question instead of SQL, and what `runSemanticQuery` takes. Every code is a `SemanticModel` field code or a KPI code; Reporting validates the spec against the published model and compiles it deterministically, so the same spec compiles to the same SQL for the same model version.\n","required":["metric","period"],"properties":{"metric":{"type":"string","description":"A measure field code in the `SemanticModel`, or a `KpiDefinition.code`. The governed definition the dashboards use, so the number matches them."},"dimensions":{"type":"array","maxItems":5,"description":"Field codes to group by. Each must be reachable from the metric's dataset through a relationship the semantic model declares.","items":{"type":"string"}},"filters":{"type":"array","items":{"type":"object","required":["field","operator"],"properties":{"field":{"type":"string","description":"A `SemanticModel` field code."},"operator":{"type":"string","enum":["equals","notEquals","greaterThan","lessThan","between","in","notIn","isNull","isNotNull"]},"values":{"type":"array","description":"**Open on purpose; typed by the field.** One value for the comparison operators, exactly two (from, to) for `between`, any number for `in` and `notIn`, none for `isNull` and `isNotNull`.\n","items":{}}}}},"period":{"type":"string","description":"ISO 8601 interval in the venue's time zone, e.g. `2026-09-21/2026-09-27`, the form `explainMetricChange` takes."},"comparison":{"type":"string","nullable":true,"description":"As `getKpiValues` `compareTo`. With one, each row carries the metric for the comparison beside the current value.","enum":["previousPeriod","samePeriodLastYear","target","benchmark"]},"semanticModelVersion":{"type":"integer","readOnly":true,"description":"The `SemanticModel.version` the spec was validated and compiled against. Set by Reporting."}}},
 "ReportingUnavailableReason": {"type":"string","description":"Which part of a question is outside the semantic model, so the answer is \"not available yet\" (design 5.7). A metric or field the caller may not see is reported as not modelled, so the reason does not reveal that it exists.","enum":["metricNotModelled","dimensionNotModelled","filterNotModelled","comparisonNotAvailable","periodOutsideHistory"]},
 "ServiceMode": {"type":"string","enum":["quickService","tableService","roomService","collection","delivery"]},
-"StationRebalance": {"type":"object","description":"**A temporary move of work between stations** (`rebalanceStationLoad`). Reverts at `revertAt`, or at close where that is null — a permanent change is `setKitchenStations`.\n","required":["moves"],"properties":{"moves":{"type":"array","items":{"type":"object","required":["fromStationId","toStationId"],"properties":{"fromStationId":{"type":"string","format":"uuid"},"toStationId":{"type":"string","format":"uuid"},"categoryIds":{"type":"array","items":{"type":"string","format":"uuid"}}}}},"revertAt":{"type":"string","format":"date-time","nullable":true}}},
-"VenueSettings": {"type":"object","x-ticvai-persistence":"platform.venue_settings","description":"**Venue-level operational configuration that no other level can answer.**\nRegion owns currency, tax regime and fiscal year (ADR-0011). Venue owns the things that vary between two venues in one region — **opening hours, support hours, and what the local law requires of the gate.**\n**And the configured limits** (decided 28 September, audit R094): every limit the contracts call *configured* is a field here, from `displayCurrencies` and `cartLeaseSeconds` down to the grouped `catalogue`, `inventory`, `seating`, `promotions`, `fnb`, `queue`, `reporting`, `marketing` and `identity` settings. **Each has a tenant-level default**: the tenant sets it once with `setVenueSettingsDefaults`, a venue overrides it within the field's bounds, and a null field here inherits it. Each field's `default` is the proposed tenant default, marked proposed, client to correct (audit R094); `docs/active/configured-limits-proposal.md` is the sheet the client corrects, and where the two differ this contract is what runs.\n","properties":{"id":{"type":"string","format":"uuid","readOnly":true,"description":"**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"},"venueId":{"type":"string","format":"uuid","readOnly":true,"description":"From the path of `setVenueSettings`."},"calendarDayStartHour":{"type":"integer","minimum":0,"maximum":23,"nullable":true,"default":6,"description":"**Where the venue's calendar day starts** (17 September minutes M17-03, added 30 September): the first hour row of every day and week calendar view (`calendarView` in `screens/_components.yaml`), so a venue open 06:00 to 02:00 sees its night on the day it belongs to. Display only: it moves no booking, slot or business date. Null inherits the tenant default (proposed 6, client to correct).\n"},"currencyCode":{"type":"string","pattern":"^[A-Z]{3}$","nullable":true,"readOnly":true,"description":"**`readOnly` is the freeze.** `setVenueSettings` takes this whole schema as its request body, so without it any settings save could rewrite the currency of a venue that had already traded — which is the one thing ADR-0018's amendment forbids. It is set when the venue is provisioned, defaulted from the region, and changed only by an operation whose precondition is that the venue has not yet traded.\n**The venue's trading currency, defaulted from its region and frozen once the venue has traded** (ADR-0018, amended 20 September). Currency was a region-only fact, grouped with tax rates on the reasoning that *\"a venue cannot choose its VAT\"* -- true of tax and over-applied to currency, because a free-zone unit, a duty-free shop and a cruise terminal genuinely trade in a currency their region does not.\n**This column exists because the freeze needs somewhere to live.** A venue that resolved purely from its region would silently follow a region currency change after it had already traded, and every dated artefact beneath it -- a price list is a `validFrom`/`validTo` range -- would render retrospectively wrong. Null means \"resolve from the region\", which is the answer for every venue that has not overridden.\n"},"currencyScale":{"type":"integer","minimum":0,"maximum":4,"nullable":true,"readOnly":true,"description":"**Scale travels with currency** (ADR-0008), and so does the freeze. OMR is three decimal places because Oman says so; overriding the currency without the scale gets rounding wrong. Set together or not at all.\n"},"supportHours":{"type":"object","description":"CF-100. **A venue decides whether its support desk is 24/7 or bounded, and the platform does not.** This was recorded as an open question for eleven days and was never one — the code is identical either way, and what was missing was somewhere to put the answer.\n","properties":{"mode":{"type":"string","enum":["alwaysOn","businessHours","custom","none"]},"timezone":{"type":"string","description":"IANA zone the `windows` are read in. Absent, they are read in the region's `timeZone`, like every other wall-clock time in this contract.\n"},"windows":{"type":"array","items":{"type":"object","properties":{"day":{"type":"string","enum":["mon","tue","wed","thu","fri","sat","sun"]},"from":{"type":"string","description":"Wall-clock time the desk opens."},"to":{"type":"string","description":"Wall-clock time the desk closes."}}}},"outOfHoursMessage":{"type":"string","nullable":true}}},"quietHours":{"type":"object","nullable":true,"description":"**When the platform does not send.** A wallet low-balance alert at 3am is a complaint, and journeys and message triggers both respect this.\n**Operational messages ignore it** — a queue-turn alert is why a guest is holding the phone.\n","properties":{"from":{"type":"string","description":"Wall-clock time sending stops","in the region's time zone.":null},"to":{"type":"string","description":"Wall-clock time sending resumes","in the region's time zone.":null}}},"biometrics":{"type":"object","nullable":true,"description":"CF-35, BL-096, BL-105, BL-106. **The venue-level master switch, and the one place a person is asked whether the paperwork exists.** Biometric data is sensitive under PDPL (Federal Decree-Law 45/2021) — heightened protection, explicit consent, and an Article 21 assessment before the processing rather than after it.\n**Nothing below this switch operates while it is off.** `AdmissionRules` may carry a `biometricPolicy` per ticket type and those rules are inert until a venue enables biometrics here, which means a profile copied between venues cannot start capturing faces at the destination.\n**Venue level because that is where the assessment is filed.** Region owns tax and currency; the DPIA, the consent notice and the hardware are a venue's.\n","properties":{"isEnabled":{"type":"boolean","default":false,"description":"**Off by default, and turning it on is refused without the two fields below.** `setVenueSettings` answers 422 rather than accepting an enable it cannot evidence — **a DPIA nobody can name is a DPIA nobody did**, and the point of the refusal is that the person switching this on is asked at the moment they switch it on rather than by an auditor a year later.\n"},"dpiaReference":{"type":"string","nullable":true,"maxLength":200,"description":"**The venue's own reference for its Article 21 assessment.** The platform does not hold the document and does not judge it; it records that one was named, by whom, and when — which is what an audit asks for and what the venue can produce.\n"},"consentNoticeAcknowledgedAt":{"type":"string","format":"date-time","nullable":true,"description":"**When somebody confirmed the consent forms are in place at the point of capture.** A guest consenting in an app is a record; a guest consenting at a ticket counter is a notice somebody has to have printed and a question somebody has to have asked.\n"},"acknowledgedByPrincipalId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"**Who confirmed it.** An acknowledgement with no name behind it cannot be followed up, and this is the field that makes the switch an act rather than a setting. Recorded by the server as the caller whose save carried the acknowledgement, so it cannot name somebody else.\n"},"faceTagPurgeMinutesAfterClose":{"type":"integer","nullable":true,"default":0,"description":"BL-106. **How long a same-visit Face Tag survives past the close of the operating day**, and zero is the default because that is what 3.2.44 describes. A non-zero value is an operational allowance for a late reconciliation, not a retention period — **`facePass` ignores this entirely** and is bounded by its entitlement.\n"}}},"segregatedAccess":{"type":"object","nullable":true,"description":"CF-130. **Configured at venue level because it changes by region and the venue is where it is known** — a Ladies Night, a family session, a prayer-time closure.\n**The platform does not infer gender.** 3.2.45 asks for automatic gender recognition and 3.2.46 for rule-based facial recognition validation, and neither is built. Two reasons, and the second is the one that decided it:\n**A Ladies Night ticket is already gendered at the point of sale**, so the gate checks the entitlement the platform issued rather than the face in front of it — deterministic, auditable, and already contracted through `admissionRules`.\n**And these events are staffed.** A steward at the entrance is making the judgment anyway, and a classifier that overrules a person who can see more than it can is a machine and a human disagreeing while a guest waits.\n**`genderVerification` is a switch, not an implementation.** Where a venue's access hardware offers the capability and the venue chooses to use it, this turns it on — following ADR-0015's standards-first driver model, where the device does what the device does. **Not everything needs to be built.**\n","properties":{"isEnabled":{"type":"boolean","default":false},"appliesToAccessPointIds":{"type":"array","items":{"type":"string","format":"uuid"}},"schedule":{"type":"array","items":{"type":"object","properties":{"day":{"type":"string","enum":["mon","tue","wed","thu","fri","sat","sun"]},"from":{"type":"string","description":"Wall-clock time","in the region's time zone.":null},"to":{"type":"string","description":"Wall-clock time","in the region's time zone.":null},"admits":{"type":"string","enum":["all","women","womenAndChildren","families","members"]}}}},"entitlementGated":{"type":"boolean","default":true,"readOnly":true,"description":"**Always true, and stated rather than assumed.** The gate admits on the entitlement. Everything below is advisory on top of that, and nothing replaces it.\n"},"genderVerification":{"type":"string","enum":["off","staffAssisted","deviceAssisted"],"default":"off","description":"`off` — the entitlement decides and a steward handles exceptions. **The default, and what is contracted.**\n`staffAssisted` — the steward's screen shows the ticket type so they can ask. No inference anywhere.\n`deviceAssisted` — **the venue's access hardware performs the check, not the platform.** Available only where the driver reports the capability, and the result is **advisory to the steward rather than decisive at the turnstile** (3.2.45 asks for rejection; this deviates deliberately).\n"},"overrideRateAlertThreshold":{"type":"number","nullable":true,"description":"Where `deviceAssisted` is on. **An override rate near zero means the steward has stopped deciding**, and that is the number that says whether the human safeguard is working or decorative.\n"}}},"alerting":{"type":"object","description":"CF-134. **On-platform notification, marked as read.** Six contracts detect their own trouble and none told a person.\n**The panel is the default and email or WhatsApp only where the matrix names them** — an operational alert that arrives by email is an alert nobody sees in time.\n","properties":{"channel":{"type":"string","enum":["dashboardPanel","dashboardAndEmail","dashboardAndWhatsapp"],"default":"dashboardPanel"},"acknowledgementRequired":{"type":"boolean","default":true},"escalateAfterMinutes":{"type":"integer","nullable":true}}},"displayCurrencies":{"type":"array","nullable":true,"description":"**Which currencies this venue shows guests** (decided 28 September, audit R120 (a)). ISO 4217 codes, each one its region holds an `FxRate` for; the rate itself stays per region and is never set here. `finance.listFxRates` with `venueId` narrows the region's rates to these. Null or empty shows the trading currency only. A code the region has no rate for is refused `400`.\n","items":{"type":"string","pattern":"^[A-Z]{3}$"}},"cartLeaseSeconds":{"type":"integer","nullable":true,"minimum":30,"maximum":3600,"default":900,"description":"**How long a cart holds capacity** (decided 28 September, audit R169): 15 minutes, the default `catalogue.acquireInventoryHold` takes for `ttlSeconds`. Proposed, client to correct (audit R094).\n"},"cartHoldExtensionMinutes":{"type":"integer","nullable":true,"minimum":1,"maximum":30,"default":5,"description":"How long one `orders.extendCart` extension adds. Proposed, client to correct (audit R094)."},"cartMaxExtensions":{"type":"integer","nullable":true,"minimum":0,"maximum":5,"default":1,"description":"How many extensions a cart may take before `extensionCapReached` (`Cart.maxExtensions`). Proposed, client to correct (audit R094)."},"resaleCutoffHours":{"type":"integer","nullable":true,"minimum":0,"maximum":168,"default":24,"description":"Hours before the performance after which a ticket can no longer be listed for resale (`orders.createResaleListing`). Proposed, client to correct (audit R094)."},"exchangeCutoffHours":{"type":"integer","nullable":true,"minimum":0,"maximum":720,"default":24,"description":"Hours before the original performance after which lines can no longer be exchanged (`orders.exchangeOrderLines`, `outsideExchangeWindow`). Proposed, client to correct (audit R094)."},"rescheduleCutoffHours":{"type":"integer","nullable":true,"minimum":0,"maximum":720,"default":24,"description":"Hours before the original performance after which an order can no longer be rescheduled (`orders.rescheduleOrder`, `outsideRescheduleWindow`). Proposed, client to correct (audit R094)."},"reservationMaxExtensions":{"type":"integer","nullable":true,"minimum":0,"maximum":5,"default":1,"description":"How many times `orders.extendReservation` may extend one reservation. Proposed, client to correct (audit R094)."},"shiftVarianceThreshold":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"nullable":true,"description":"Over or short at shift close beyond which the shift waits in `pendingVariance` for `shift.acceptShiftVariance`. **Proposed tenant default AED 20.00, bounds 0 to 1,000 in the venue currency; client finance to correct (audit R094).**\n"},"catalogue":{"type":"object","nullable":true,"properties":{"maxVariantsPerProduct":{"type":"integer","nullable":true,"minimum":1,"maximum":2000,"default":200,"description":"Variants one product may generate from its attributes (`setProductAttributes` refuses above it). Proposed, client to correct (audit R094)."},"waitlistOfferHoldMinutes":{"type":"integer","nullable":true,"minimum":1,"maximum":1440,"default":30,"description":"How long a waitlist offer holds the released capacity for the guest it was offered to. Proposed, client to correct (audit R094)."},"bulkPriceChangeEscalationPercent":{"type":"number","nullable":true,"minimum":0,"maximum":100,"default":10,"description":"A `bulkChangePrices` run changing any price by more than this percentage needs `PRICE_CONFIGURE` (audit R197). Proposed, client to correct (audit R094)."},"bulkPriceChangeEscalationCount":{"type":"integer","nullable":true,"minimum":1,"default":50,"description":"A `bulkChangePrices` run touching more prices than this needs `PRICE_CONFIGURE` (audit R197). Proposed, client to correct (audit R094)."}}},"inventory":{"type":"object","nullable":true,"properties":{"overReceiptTolerancePercent":{"type":"number","nullable":true,"minimum":0,"maximum":25,"default":5,"description":"Percent above the outstanding ordered quantity a goods receipt line may record (`createGoodsReceipt`). Proposed, client to correct (audit R094)."},"countVarianceTolerancePercent":{"type":"number","nullable":true,"minimum":0,"maximum":25,"default":2,"description":"Percent difference between counted and expected quantity before a count line is an exception (`getCountVariance`). Proposed, client to correct (audit R094)."},"countVarianceApprovalAmount":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"nullable":true,"description":"Total variance value of a count above which posting it needs approval (`postStockCount`). **Proposed tenant default 1,000.00 in the venue currency, client finance to correct (audit R094).**\n"}}},"seating":{"type":"object","nullable":true,"properties":{"seatHoldExtensionSeconds":{"type":"integer","nullable":true,"minimum":60,"maximum":1800,"default":300,"description":"What one `extendSeatHold` adds. No hold outlives 30 minutes in all (audit R169). Proposed, client to correct (audit R094)."},"seatHoldMaxExtensions":{"type":"integer","nullable":true,"minimum":0,"maximum":5,"default":2,"description":"How many times a seat hold may be extended. Proposed, client to correct (audit R094). A resource hold on a venue map (`resources.extendResourceHold`) uses the same two bounds (decided 29 September, rev 3 REV3-15)."},"maxSeatsPerGuestOrder":{"type":"integer","nullable":true,"minimum":1,"maximum":50,"default":10,"description":"**Seats one guest may take in one booking on a guest channel** (Guest Web, Guest App), decided 29 September, rev 3 REV3-7. `seating.createSeatHold` counts the seats in the request plus the seats the same guest already holds on the same performance, and refuses above this with `422` `seat-limit-exceeded`, naming the limit. Default 10, bounds 1 to 50; a venue sets its own in Venue Management. Staff and POS sales keep 10 per sale (audit R080 (c)) and do not read this field.\n"}}},"promotions":{"type":"object","nullable":true,"properties":{"maxDiscountPercent":{"type":"number","nullable":true,"minimum":0,"maximum":100,"default":30,"description":"The largest discount one promotion may give (`createPromotion` refuses above it). Proposed, client to correct (audit R094)."},"nearZeroLinePrice":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"nullable":true,"description":"Net line price below which a stacked combination is flagged near-zero in `analysePromotionConflicts` (audit R096 (5)); a warning, not a refusal. **Proposed tenant default AED 1.00, client to correct (audit R094).**\n"}}},"fnb":{"type":"object","nullable":true,"properties":{"recallWindowMinutes":{"type":"integer","nullable":true,"minimum":0,"maximum":60,"default":10,"description":"Minutes after a bump during which `recallKitchenTicket` still recalls; after it the act is a refire. Proposed, client to correct (audit R094)."},"compEscalationAmount":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"nullable":true,"description":"Line value above which `compItem` needs `ORDER_DISCOUNT` (audit R197). **Proposed tenant default AED 100.00, client to correct (audit R094).**\n"},"foodSafetyLeadPrincipalId":{"type":"string","format":"uuid","nullable":true,"description":"**The venue's food-safety lead**, to whom `escalateCorrectiveAction` sends every escalation (decided 28 September, audit R096 (9)). A venue fact, so it has no tenant default; while it is null an escalation is refused `409 no-food-safety-lead`.\n"}}},"queue":{"type":"object","nullable":true,"properties":{"crossQueueLimit":{"type":"integer","nullable":true,"minimum":1,"maximum":10,"default":2,"description":"Virtual queues one guest party may wait in at once (`joinQueue`, `crossQueueLimitReached`). Proposed, client to correct (audit R094)."}}},"reporting":{"type":"object","nullable":true,"properties":{"inlineRunRowLimit":{"type":"integer","nullable":true,"minimum":1000,"maximum":100000,"default":5000,"description":"Estimated rows above which `runReport` answers `202` and runs in the background. Proposed, client to correct (audit R094)."},"dashboardRefreshBudgetPerMinute":{"type":"integer","nullable":true,"minimum":1,"default":24,"description":"Tile refreshes per minute, summed over a dashboard's tiles, that `createDashboard` allows. Proposed, client to correct (audit R094)."}}},"marketing":{"type":"object","nullable":true,"properties":{"attributionWindowDays":{"type":"integer","nullable":true,"minimum":1,"maximum":30,"default":7,"description":"Days after a campaign touch within which a booking is attributed to it (`getCampaignPerformance`). Proposed, client to correct (audit R094)."}}},"identity":{"type":"object","nullable":true,"properties":{"guestOtpMaxAttempts":{"type":"integer","nullable":true,"minimum":3,"maximum":10,"default":5,"description":"Wrong entries allowed per guest one-time code before `verifyGuestOtp` invalidates it. A guest code is tenant-scoped, so the tenant default is the value used. Proposed, client to correct (audit R094).\n"},"guestTwoStep":{"type":"object","nullable":true,"description":"**Guest two-step verification: a venue option, off unless the venue enables it in Venue Management** (decided 29 September, rev 3 GAP-B1, per venue, superseding the second part of audit R167, \"no guest MFA\"; an earlier draft of the same day put it on the tenant's `PasswordPolicy`, which no longer carries it). **The guest's enrolment stays tenant-wide**: one guest account across the tenant's venues, so a method enrolled once is used in every venue that has this on, and is never asked in a venue that has it off. Identity learns the venue from `venueId` on the guest sign-in (`verifyGuestOtp`, `guestPasswordLogin`, `guestSocialLogin`, `guestUaePassLogin`) and on `createMfaChallenge`: the venue the guest app or booking is in; with no venue given, an enrolled guest is asked when any venue of the tenant has it on. Guests may enrol `totp` with `emailOtp` as the fallback, as staff do (audit R126 (5)); it is never forced. Guests still never use enterprise SSO (R167, first part). A null inherits the tenant default set with `setVenueSettingsDefaults`.\n","properties":{"enabled":{"type":"boolean","default":false,"description":"Off unless the venue enables it. While no venue of the tenant has it on, guests cannot enrol (`enrolMfaMethod` answers 403 `guest-two-step-disabled`)."},"stepUpActions":{"type":"array","uniqueItems":true,"description":"The guest actions in this venue that ask an enrolled guest for the factor again, whatever the age of the session. The service performing the action passes this venue to `createMfaChallenge`. Proposed, client to correct (rev 3 GAP-B1).\n","items":{"type":"string","enum":["changeContactDetails","changePassword","managePaymentMethods","transferTickets","deleteAccount"]},"default":["changeContactDetails","changePassword","managePaymentMethods","deleteAccount"]}}}}}}}
+"StationRebalance": {"type":"object","description":"**A temporary move of work between stations** (`rebalanceStationLoad`). Reverts at `revertAt`, or at close where that is null — a permanent change is `setKitchenStations`.\n","required":["moves"],"properties":{"moves":{"type":"array","items":{"type":"object","required":["fromStationId","toStationId"],"properties":{"fromStationId":{"type":"string","format":"uuid"},"toStationId":{"type":"string","format":"uuid"},"categoryIds":{"type":"array","items":{"type":"string","format":"uuid"}}}}},"revertAt":{"type":"string","format":"date-time","nullable":true}}}
 }
 ```

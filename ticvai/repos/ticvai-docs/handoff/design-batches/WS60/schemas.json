@@ -2425,6 +2425,15 @@
     "type": "string",
     "format": "uri",
     "description": "Where the rendered proof can be fetched or sent to the printer from."
+   },
+   "walletPlatform": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "appleWallet",
+     "googleWallet"
+    ],
+    "description": "Which wallet the pass preview is for, where `mediaType` is `walletPass` (DEC-151; CHG-CSP-038)."
    }
   }
  },

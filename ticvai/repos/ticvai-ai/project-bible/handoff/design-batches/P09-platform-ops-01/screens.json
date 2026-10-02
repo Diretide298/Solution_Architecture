@@ -25,7 +25,7 @@
     {
      "to": "ADM-001",
      "trigger": "Platform Login / MFA",
-     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId and ADM-318 holds none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and ADM-001 opens on its own"
+     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId, providerId and ADM-318 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and ADM-001 opens on its own"
     }
    ]
   },
@@ -60,16 +60,13 @@
        "label": "Every dead letter",
        "bindsTo": "DeadLetter",
        "columns": [
-        "DeadLetter.id",
-        "DeadLetter.outboxId",
         "DeadLetter.eventName",
         "DeadLetter.consumer",
         "DeadLetter.payload",
         "DeadLetter.attempts",
         "DeadLetter.lastError",
         "DeadLetter.lastAttemptAt",
-        "DeadLetter.replayCount",
-        "DeadLetter.scopePath"
+        "DeadLetter.replayCount"
        ],
        "operation": "listDeadLetters",
        "provenance": "contract platform-ops.yaml GET /dead-letters"
@@ -137,7 +134,6 @@
        "label": "Outbox republishes, newest first",
        "bindsTo": "OutboxRepublish",
        "columns": [
-        "OutboxRepublish.tenantId",
         "OutboxRepublish.from",
         "OutboxRepublish.to",
         "OutboxRepublish.eventNames",
@@ -243,7 +239,7 @@
   "states": {
    "loading": "The dead letters list.",
    "error": "Could not load. Names which read failed and leaves the dead letters untouched.",
-   "emptyFirstRun": "No dead letters yet. **Offers no create action for them** — this screen declares no operation that makes one — and says so rather than showing an empty table. The republish list below it keeps its own action, `republishOutbox`.",
+   "emptyFirstRun": "No dead letters yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "Nothing matches the filter on consumer, since and the dead letters are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Shown when the caller lacks `PLATFORM_CELL_VIEW`, which `listDeadLetters` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },

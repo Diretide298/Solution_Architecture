@@ -7,20 +7,20 @@
  "audience": "guest",
  "formFactor": "mobileApp",
  "offlineCapable": true,
- "generated": "2026-10-01",
+ "generated": "2026-10-02",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 77,
-  "operations": 219,
+  "operations": 213,
   "contracts": 19,
   "modules": 17,
   "undrawn": 0,
-  "operationsWithNoScreen": 19
+  "operationsWithNoScreen": 17
  },
  "waves": {
   "wave1": 25,
-  "wave2": 35,
-  "wave3": 17
+  "wave2": 36,
+  "wave3": 16
  },
  "modules": [
   {
@@ -105,8 +105,7 @@
    "module": "In-Venue Experience",
    "screens": 2,
    "waves": [
-    2,
-    3
+    2
    ]
   },
   {
@@ -155,23 +154,23 @@
  "contracts": [
   {
    "contract": "marketing-crm",
-   "operations": 38
+   "operations": 39
   },
   {
    "contract": "orders",
-   "operations": 36
+   "operations": 35
   },
   {
    "contract": "identity",
-   "operations": 23
+   "operations": 21
   },
   {
    "contract": "catalogue",
-   "operations": 19
+   "operations": 16
   },
   {
    "contract": "fnb",
-   "operations": 15
+   "operations": 13
   },
   {
    "contract": "transport",
@@ -182,15 +181,15 @@
    "operations": 11
   },
   {
-   "contract": "venue-map",
-   "operations": 8
+   "contract": "white-label",
+   "operations": 9
   },
   {
    "contract": "wallet",
    "operations": 8
   },
   {
-   "contract": "white-label",
+   "contract": "venue-map",
    "operations": 8
   },
   {
@@ -210,19 +209,19 @@
    "operations": 5
   },
   {
-   "contract": "promotions",
-   "operations": 4
-  },
-  {
    "contract": "retail",
    "operations": 4
   },
   {
-   "contract": "seating",
+   "contract": "promotions",
    "operations": 4
   },
   {
    "contract": "payments",
+   "operations": 4
+  },
+  {
+   "contract": "seating",
    "operations": 4
   },
   {
@@ -309,7 +308,7 @@
    "module": "Cart & Checkout",
    "wave": 1,
    "route": "/general/review-and-payment",
-   "operations": 10,
+   "operations": 9,
    "drawn": true
   },
   {
@@ -327,7 +326,7 @@
    "module": "Membership, Loyalty & Value",
    "wave": 2,
    "route": "/general/wallet-overview",
-   "operations": 6,
+   "operations": 7,
    "drawn": true
   },
   {
@@ -363,7 +362,7 @@
    "module": "Membership, Loyalty & Value",
    "wave": 2,
    "route": "/general/memberships",
-   "operations": 11,
+   "operations": 10,
    "drawn": true
   },
   {
@@ -390,7 +389,7 @@
    "module": "Account & Self-Service",
    "wave": 3,
    "route": "/general/add-to-calendar-reminders",
-   "operations": 6,
+   "operations": 5,
    "drawn": true
   },
   {
@@ -399,7 +398,7 @@
    "module": "Account & Self-Service",
    "wave": 2,
    "route": "/general/order-history-wallet",
-   "operations": 9,
+   "operations": 7,
    "drawn": true
   },
   {
@@ -444,7 +443,7 @@
    "module": "In-venue Services",
    "wave": 2,
    "route": "/general/fandb-browse-and-order",
-   "operations": 10,
+   "operations": 8,
    "drawn": true
   },
   {
@@ -453,7 +452,7 @@
    "module": "In-venue Services",
    "wave": 2,
    "route": "/general/fandb-order-tracking",
-   "operations": 3,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -462,7 +461,7 @@
    "module": "Retail",
    "wave": 2,
    "route": "/general/retail-merchandise",
-   "operations": 7,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -471,7 +470,7 @@
    "module": "In-venue Services",
    "wave": 3,
    "route": "/general/parking-reserve-and-pay",
-   "operations": 5,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -498,7 +497,7 @@
    "module": "Engagement & Support",
    "wave": 2,
    "route": "/general/in-venue-notifications",
-   "operations": 3,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -507,7 +506,7 @@
    "module": "Engagement & Support",
    "wave": 2,
    "route": "/general/ai-concierge-home",
-   "operations": 5,
+   "operations": 8,
    "drawn": true
   },
   {
@@ -525,7 +524,7 @@
    "module": "Engagement & Support",
    "wave": 2,
    "route": "/general/ai-concierge-contextual-help",
-   "operations": 1,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -534,7 +533,7 @@
    "module": "Support",
    "wave": 2,
    "route": "/general/lost-and-found",
-   "operations": 3,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -543,7 +542,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/general/feedback-and-ratings",
-   "operations": 2,
+   "operations": 5,
    "drawn": true
   },
   {
@@ -552,7 +551,7 @@
    "module": "Membership, Loyalty & Value",
    "wave": 2,
    "route": "/loyalty-rewards",
-   "operations": 5,
+   "operations": 11,
    "drawn": true
   },
   {
@@ -579,7 +578,7 @@
    "module": "Account & Self-Service",
    "wave": 1,
    "route": "/general/profile",
-   "operations": 2,
+   "operations": 5,
    "drawn": true
   },
   {
@@ -588,7 +587,7 @@
    "module": "Engagement & Support",
    "wave": 2,
    "route": "/general/help-and-support",
-   "operations": 6,
+   "operations": 7,
    "drawn": true
   },
   {
@@ -615,7 +614,7 @@
    "module": "System States",
    "wave": 1,
    "route": "/general/arabic-rtl-experience",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -651,7 +650,7 @@
    "module": "System States",
    "wave": 1,
    "route": "/general/maintenance-page",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -723,7 +722,7 @@
    "module": "Account & Self-Service",
    "wave": 1,
    "route": "/general/dynamic-qr-ticket",
-   "operations": 5,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -732,7 +731,7 @@
    "module": "Booking & Selection",
    "wave": 2,
    "route": "/general/bundle-package",
-   "operations": 3,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -768,14 +767,14 @@
    "module": "In-Venue Experience",
    "wave": 2,
    "route": "/in-venue-experience/menu-item-detail",
-   "operations": 2,
+   "operations": 1,
    "drawn": true
   },
   {
    "id": "GST-062",
    "name": "Shop & Drop Collection",
    "module": "In-Venue Experience",
-   "wave": 3,
+   "wave": 2,
    "route": "/in-venue-experience/shop-and-drop-collection",
    "operations": 1,
    "drawn": true
@@ -795,7 +794,7 @@
    "module": "Marketing",
    "wave": 3,
    "route": "/newsletter-preferences",
-   "operations": 4,
+   "operations": 5,
    "drawn": true
   },
   {
@@ -813,7 +812,7 @@
    "module": "Account & Self-Service",
    "wave": 2,
    "route": "/account/refunds-resale",
-   "operations": 3,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -822,7 +821,7 @@
    "module": "Engagement & Support",
    "wave": 2,
    "route": "/account/help-my-cases",
-   "operations": 3,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -839,8 +838,8 @@
    "name": "Reserve a Table",
    "module": "In-venue Services",
    "wave": 2,
-   "route": "/account/reserve-table-cabana",
-   "operations": 7,
+   "route": "/reserve-table",
+   "operations": 5,
    "drawn": true
   },
   {
@@ -858,7 +857,7 @@
    "module": "Booking & Selection",
    "wave": 2,
    "route": "/account/share-group-booking",
-   "operations": 8,
+   "operations": 6,
    "drawn": true
   },
   {
@@ -867,7 +866,7 @@
    "module": "Account & Self-Service",
    "wave": 2,
    "route": "/account/security-sign-in",
-   "operations": 14,
+   "operations": 12,
    "drawn": true
   },
   {
@@ -940,6 +939,24 @@
     "summary": "Which benefits a plan grants, and how much of each"
    },
    {
+    "operation": "joinWaitlist",
+    "contract": "catalogue",
+    "verb": "POST",
+    "summary": "Ask to be told if capacity frees up"
+   },
+   {
+    "operation": "leaveWaitlist",
+    "contract": "catalogue",
+    "verb": "DELETE",
+    "summary": "Stop waiting"
+   },
+   {
+    "operation": "listGuestMemberships",
+    "contract": "catalogue",
+    "verb": "GET",
+    "summary": "A guest's memberships, benefits and history"
+   },
+   {
     "operation": "listMembershipBenefits",
     "contract": "catalogue",
     "verb": "GET",
@@ -950,6 +967,12 @@
     "contract": "catalogue",
     "verb": "GET",
     "summary": "Membership schemes, the level above a plan"
+   },
+   {
+    "operation": "claimTableSession",
+    "contract": "fnb",
+    "verb": "POST",
+    "summary": "Identify which table a guest is sitting at"
    },
    {
     "operation": "listCustomerMemberships",
@@ -970,46 +993,10 @@
     "summary": "Use the existing profile or keep this booking separate"
    },
    {
-    "operation": "getForm",
+    "operation": "uploadGuestDocument",
     "contract": "marketing-crm",
-    "verb": "GET",
-    "summary": "One form, to fill in or to edit"
-   },
-   {
-    "operation": "getMyProfile",
-    "contract": "marketing-crm",
-    "verb": "GET",
-    "summary": "A guest reading their own details"
-   },
-   {
-    "operation": "listBadges",
-    "contract": "marketing-crm",
-    "verb": "GET",
-    "summary": "Badges a guest can be awarded"
-   },
-   {
-    "operation": "listCustomerBadges",
-    "contract": "marketing-crm",
-    "verb": "GET",
-    "summary": "Badges a guest holds"
-   },
-   {
-    "operation": "listLeaderboard",
-    "contract": "marketing-crm",
-    "verb": "GET",
-    "summary": "Standings, by nickname"
-   },
-   {
-    "operation": "listRewards",
-    "contract": "marketing-crm",
-    "verb": "GET",
-    "summary": "What points can be turned into"
-   },
-   {
-    "operation": "setLeaderboardNickname",
-    "contract": "marketing-crm",
-    "verb": "PUT",
-    "summary": "Choose the name shown on the board"
+    "verb": "POST",
+    "summary": "Store a guest photo, ID or signed document"
    },
    {
     "operation": "listTicketTransfers",
@@ -1070,13 +1057,6 @@
     "module": "Engagement & Support",
     "waves": [
      1,
-     2,
-     3
-    ]
-   },
-   {
-    "module": "In-Venue Experience",
-    "waves": [
      2,
      3
     ]

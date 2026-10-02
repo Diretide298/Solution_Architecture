@@ -122,7 +122,7 @@
   "states": {
    "loading": "The usage license list.",
    "error": "Could not load. Names which read failed and leaves the usage license untouched.",
-   "emptyFirstRun": "No usage license yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No usage license yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the usage license are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -242,7 +242,7 @@
   "states": {
    "loading": "The entitlement license inventory list.",
    "error": "Could not load. Names which read failed and leaves the entitlement license inventory untouched.",
-   "emptyFirstRun": "No entitlement license inventory yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No entitlement license inventory yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the entitlement license inventory are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -362,7 +362,7 @@
   "states": {
    "loading": "The commercial consumption billable list.",
    "error": "Could not load. Names which read failed and leaves the commercial consumption billable untouched.",
-   "emptyFirstRun": "No commercial consumption billable yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No commercial consumption billable yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the commercial consumption billable are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -475,7 +475,7 @@
   "states": {
    "loading": "The operational usage threshold list.",
    "error": "Could not load. Names which read failed and leaves the operational usage threshold untouched.",
-   "emptyFirstRun": "No operational usage threshold yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No operational usage threshold yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the operational usage threshold are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -736,7 +736,7 @@
        "kind": "dataTable",
        "label": "Every minimum guarantee variable",
        "columns": [
-        "Projected month-end billable tickets: 43,800",
+        "Projected month-end billable tickets",
         "Projected variable billing basis: AED 32,850"
        ],
        "bindsTo": null,
@@ -754,7 +754,7 @@
        "label": "The selected minimum guarantee variable",
        "bindsTo": null,
        "columns": [
-        "Projected month-end billable tickets: 43,800",
+        "Projected month-end billable tickets",
         "Projected variable billing basis: AED 32,850"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Rate”, “Billable Tickets”, “Current Position”, “Automatically calculate”, “Progress Visualization”, “Where applicable show”.",
@@ -767,7 +767,7 @@
   "states": {
    "loading": "The minimum guarantee variable list.",
    "error": "Could not load. Names which read failed and leaves the minimum guarantee variable untouched.",
-   "emptyFirstRun": "No minimum guarantee variable yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No minimum guarantee variable yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the minimum guarantee variable are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -1037,7 +1037,7 @@
   "states": {
    "loading": "The usage alerts reconciliation configuration as saved.",
    "error": "Could not load. Names which read failed and leaves the usage alerts reconciliation untouched.",
-   "emptyFirstRun": "No usage alerts reconciliation configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyFirstRun": "No usage alerts reconciliation configured yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },
@@ -1149,7 +1149,7 @@
   "states": {
    "loading": "The usage forecast commercial list.",
    "error": "Could not load. Names which read failed and leaves the usage forecast commercial untouched.",
-   "emptyFirstRun": "No usage forecast commercial yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No usage forecast commercial yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the usage forecast commercial are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -1301,7 +1301,7 @@
   "states": {
    "loading": "The license metering commercial list.",
    "error": "Could not load. Names which read failed and leaves the license metering commercial untouched.",
-   "emptyFirstRun": "No license metering commercial yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No license metering commercial yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the license metering commercial are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },

@@ -20,6 +20,8 @@
 <polyline points="1000,440 950,90" fill="none" stroke="#F2A900" stroke-width="2.4"/>
 <polyline points="780,90 700,145" fill="none" stroke="#F2A900" stroke-width="2.4"/>
 <polyline points="780,90 700,245" fill="none" stroke="#F2A900" stroke-width="2.4"/>
+<polyline points="865,120 865,165" fill="none" stroke="#F2A900" stroke-width="2.4"/>
+<polyline points="780,195 700,145" fill="none" stroke="#F2A900" stroke-width="2.4"/>
 <polyline points="540,145 450,145" fill="none" stroke="#D62828" stroke-width="2.4"/>
 <polyline points="540,145 450,345" fill="none" stroke="#D62828" stroke-width="2.4"/>
 <polyline points="540,245 450,145" fill="none" stroke="#D62828" stroke-width="2.4"/>
@@ -36,8 +38,8 @@
 <polyline points="700,365 780,335" fill="none" stroke="#D62828" stroke-width="2.4"/>
 <polyline points="700,365 780,440" fill="none" stroke="#F2A900" stroke-width="2.4"/>
 <polyline points="700,161 745,170 745,562 1300,569" fill="none" stroke="#F2A900" stroke-width="2.4"/>
-<polyline points="358,580 350,686 1250,686 1300,676" fill="none" stroke="#F2A900" stroke-width="2.4" stroke-dasharray="8,5"/>
-<polyline points="363,580 372,693 1240,693 1304,720" fill="none" stroke="#F2A900" stroke-width="2.4" stroke-dasharray="8,5"/>
+<polyline points="358,580 350,686 1250,686 1300,676" fill="none" stroke="#F2A900" stroke-width="2.4"/>
+<polyline points="363,580 372,693 1240,693 1304,720" fill="none" stroke="#F2A900" stroke-width="2.4"/>
 <polyline points="150,847 150,787 780,650" fill="none" stroke="#2F80ED" stroke-width="2.4"/>
 <polyline points="150,853 150,793 780,655" fill="none" stroke="#F2A900" stroke-width="2.4" stroke-dasharray="8,5"/>
 <polyline points="430,847 430,787 780,661" fill="none" stroke="#2F80ED" stroke-width="2.4"/>
@@ -52,17 +54,17 @@
 <polygon points="220,110 230,100 230,170 220,180" fill="#9E9E9E" stroke="#8A8A8A"/>
 <rect x="70" y="110" width="150" height="70" fill="url(#g)" stroke="#8A8A8A"/>
 <text x="145.0" y="143.0" text-anchor="middle" font-size="15" font-weight="600">Read replicas</text>
-<text x="145.0" y="161.0" text-anchor="middle" font-size="11" fill="#333">x2, zone-redundant</text>
+<text x="145.0" y="161.0" text-anchor="middle" font-size="11" fill="#333">x2, operational reads</text>
 <polygon points="70,510 80,500 230,500 220,510" fill="#E6E6E6" stroke="#8A8A8A"/>
 <polygon points="220,510 230,500 230,570 220,580" fill="#9E9E9E" stroke="#8A8A8A"/>
 <rect x="70" y="510" width="150" height="70" fill="url(#g)" stroke="#8A8A8A"/>
 <text x="145.0" y="543.0" text-anchor="middle" font-size="15" font-weight="600">Blob storage</text>
-<text x="145.0" y="561.0" text-anchor="middle" font-size="11" fill="#333">media, exports, backups</text>
+<text x="145.0" y="561.0" text-anchor="middle" font-size="11" fill="#333">media, 3D maps, dumps</text>
 <polygon points="270,110 280,100 460,100 450,110" fill="#E6E6E6" stroke="#8A8A8A"/>
 <polygon points="450,110 460,100 460,170 450,180" fill="#9E9E9E" stroke="#8A8A8A"/>
 <rect x="270" y="110" width="180" height="70" fill="url(#g)" stroke="#8A8A8A"/>
 <text x="360.0" y="143.0" text-anchor="middle" font-size="15" font-weight="600">PostgreSQL 16</text>
-<text x="360.0" y="161.0" text-anchor="middle" font-size="11" fill="#333">control DB + one DB per tenant</text>
+<text x="360.0" y="161.0" text-anchor="middle" font-size="11" fill="#333">zone-redundant; DB per tenant</text>
 <polygon points="270,210 280,200 460,200 450,210" fill="#E6E6E6" stroke="#8A8A8A"/>
 <polygon points="450,210 460,200 460,270 450,280" fill="#9E9E9E" stroke="#8A8A8A"/>
 <rect x="270" y="210" width="180" height="70" fill="url(#g)" stroke="#8A8A8A"/>
@@ -72,12 +74,12 @@
 <polygon points="450,310 460,300 460,370 450,380" fill="#9E9E9E" stroke="#8A8A8A"/>
 <rect x="270" y="310" width="180" height="70" fill="url(#g)" stroke="#8A8A8A"/>
 <text x="360.0" y="343.0" text-anchor="middle" font-size="15" font-weight="600">Azure Managed Redis</text>
-<text x="360.0" y="361.0" text-anchor="middle" font-size="11" fill="#333">sessions, idempotency, cache</text>
+<text x="360.0" y="361.0" text-anchor="middle" font-size="11" fill="#333">sessions, budgets, 1 s cache</text>
 <polygon points="270,410 280,400 460,400 450,410" fill="#E6E6E6" stroke="#8A8A8A"/>
 <polygon points="450,410 460,400 460,470 450,480" fill="#9E9E9E" stroke="#8A8A8A"/>
 <rect x="270" y="410" width="180" height="70" fill="url(#g)" stroke="#8A8A8A"/>
 <text x="360.0" y="443.0" text-anchor="middle" font-size="15" font-weight="600">Event broker</text>
-<text x="360.0" y="461.0" text-anchor="middle" font-size="11" fill="#333">RabbitMQ or Kafka (client)</text>
+<text x="360.0" y="461.0" text-anchor="middle" font-size="11" fill="#333">RabbitMQ (rec.) or Kafka</text>
 <polygon points="270,510 280,500 460,500 450,510" fill="#E6E6E6" stroke="#8A8A8A"/>
 <polygon points="450,510 460,500 460,570 450,580" fill="#9E9E9E" stroke="#8A8A8A"/>
 <rect x="270" y="510" width="180" height="70" fill="url(#g)" stroke="#8A8A8A"/>
@@ -108,6 +110,11 @@
 <rect x="780" y="60" width="170" height="60" fill="url(#g)" stroke="#8A8A8A"/>
 <text x="865.0" y="88.0" text-anchor="middle" font-size="15" font-weight="600">Front Door + WAF</text>
 <text x="865.0" y="106.0" text-anchor="middle" font-size="11" fill="#333">one entry, origin in UAE</text>
+<polygon points="780,165 790,155 960,155 950,165" fill="#E6E6E6" stroke="#8A8A8A"/>
+<polygon points="950,165 960,155 960,215 950,225" fill="#9E9E9E" stroke="#8A8A8A"/>
+<rect x="780" y="165" width="170" height="60" fill="url(#g)" stroke="#8A8A8A"/>
+<text x="865.0" y="193.0" text-anchor="middle" font-size="15" font-weight="600">Waiting room</text>
+<text x="865.0" y="211.0" text-anchor="middle" font-size="11" fill="#333">on-sale; admission token</text>
 <polygon points="780,300 790,290 940,290 930,300" fill="#E6E6E6" stroke="#8A8A8A"/>
 <polygon points="930,300 940,290 940,360 930,370" fill="#9E9E9E" stroke="#8A8A8A"/>
 <rect x="780" y="300" width="150" height="70" fill="url(#g)" stroke="#8A8A8A"/>
@@ -122,7 +129,7 @@
 <polygon points="940,600 950,590 950,660 940,670" fill="#9E9E9E" stroke="#8A8A8A"/>
 <rect x="780" y="600" width="160" height="70" fill="url(#g)" stroke="#8A8A8A"/>
 <text x="860.0" y="633.0" text-anchor="middle" font-size="15" font-weight="600">Device API</text>
-<text x="860.0" y="651.0" text-anchor="middle" font-size="11" fill="#333">POS, kiosk, KDS</text>
+<text x="860.0" y="651.0" text-anchor="middle" font-size="11" fill="#333">one device register</text>
 <polygon points="1000,110 1010,100 1170,100 1160,110" fill="#E6E6E6" stroke="#8A8A8A"/>
 <polygon points="1160,110 1170,100 1170,160 1160,170" fill="#9E9E9E" stroke="#8A8A8A"/>
 <rect x="1000" y="110" width="160" height="60" fill="url(#g)" stroke="#8A8A8A"/>
@@ -197,7 +204,7 @@
 <polygon points="730,800 740,790 740,860 730,870" fill="#9E9E9E" stroke="#8A8A8A"/>
 <rect x="560" y="800" width="170" height="70" fill="url(#g)" stroke="#8A8A8A"/>
 <text x="645.0" y="833.0" text-anchor="middle" font-size="15" font-weight="600">Venue edge node</text>
-<text x="645.0" y="851.0" text-anchor="middle" font-size="11" fill="#333">access + local DB, offline</text>
+<text x="645.0" y="851.0" text-anchor="middle" font-size="11" fill="#333">access + policy, offline</text>
 <polygon points="800,850 810,840 930,840 920,850" fill="#E6E6E6" stroke="#8A8A8A"/>
 <polygon points="920,850 930,840 930,900 920,910" fill="#9E9E9E" stroke="#8A8A8A"/>
 <rect x="800" y="850" width="120" height="60" fill="url(#g)" stroke="#8A8A8A"/>
@@ -209,7 +216,7 @@
 <text x="1000.0" y="878.0" text-anchor="middle" font-size="15" font-weight="600">Handhelds</text>
 <text x="1000.0" y="896.0" text-anchor="middle" font-size="11" fill="#333">scanners, staff app</text>
 <text x="1300" y="36" font-size="24" font-weight="700">TICVAI PLATFORM HLD</text>
-<text x="1300" y="58" font-size="12" fill="#555">30 September 2026</text>
+<text x="1300" y="58" font-size="12" fill="#555">1 October 2026</text>
 <rect x="1220" y="830" width="330" height="284" fill="#FFFFFF" stroke="#111" stroke-width="2"/>
 <text x="1250" y="864" font-size="20" font-weight="700">CONNECTIONS</text>
 <line x1="1238" y1="890" x2="1298" y2="890" stroke="#F2A900" stroke-width="2.4"/>

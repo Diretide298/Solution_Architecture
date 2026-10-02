@@ -24,23 +24,31 @@ steps:
   operations:
   - configureWorkstation
   outcome: '**A workstation is a scope** — it holds a profile, an offline policy and a deposit box,
-    and none of those travel with the person.'
+    and none of those travel with the person. It may also hold its own drawer limit
+    (`Workstation.cashDrawerLimit`), overriding the venue''s (DEC-179, CHG-CSP-016).'
 - step: 2
   screen: POS-019
   action: Shift policy is set.
   operations:
-  - getVenueSettings
-  - setVenueSettings
+  - getTillShiftPolicy
+  - setTillShiftPolicy
   outcome: '**Venue scope, not workstation.** Every till in a venue closes to the same rules or the
     variance report compares nothing.'
   crossesDevice: true
+  note: '**Repointed 2 October (CHG-WIR-021, CHG-WIR-024).** This step set venue-wide settings (getVenueSettings/setVenueSettings) from a till; venue configuration belongs in Venue Management. No operation reads or writes a till shift policy yet (open contract gap CHG-WIR-024), so the step has no operation until one exists. **2 October (CHG-SOT-004):** the gap is closed in the contract (`getTillShiftPolicy`, `setTillShiftPolicy`, CHG-CSP-020); they join this step once POS-019 declares them (the POS agent''s screen).'
 - step: 3
   screen: POS-015
-  action: Cash limits and the drawer ceiling are set.
+  action: Cash limits and the drawer limit are set, and the till watches the drawer against it.
   operations:
   - listCashMovements
   - listDepositBoxes
-  outcome: '**A ceiling on the drawer is a security control.** F32 step 4 is the safe drop it forces.'
+  outcome: '**A limit on the drawer is a security control, and a warning, never a block** (decided 2 October
+    2026, Chinmay, BO-042: "Add drawer limit setting (warn + offer cash lift)"; DEC-179, CHG-CSP-016, DI-274).
+    The venue sets the default (`VenueSettings.cashDrawerLimit`, in Venue Management) and a till may override
+    it (step 1). When the cash taken since the last count takes the drawer over the limit, `listDepositBoxes`
+    flags the box (`DepositBox.overDrawerLimit`), the till warns and offers a cash lift; F32 step 4 is the
+    safe drop it leads to. No figure is shown to the cashier, and no proposed default: the client''s finance
+    team sets it.'
   crossesDevice: true
 - step: 4
   screen: POS-018
@@ -57,6 +65,13 @@ branches:
     not open under.'
   severity: high
   resolvedBy: configureWorkstation
+- at: 3
+  condition: The drawer goes over its limit during the shift.
+  behaviour: '**The till warns and offers a cash lift; it never refuses a sale** (DEC-179, CHG-CSP-016). The
+    lift is a `createCashMovement` of kind `lift` on POS-018, witnessed with the cashier''s PIN on the same
+    device (DEC-178), and BO-042 flags the box until it is lifted.'
+  severity: recoverable
+  resolvedBy: Cashier and supervisor, with a cash lift (createCashMovement) on POS-018
 exitStates:
 - state: configured
   description: Till ready, policy set, box allocated.

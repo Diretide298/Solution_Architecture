@@ -1,0 +1,39 @@
+id: LLD-Registered device approval
+title: Registered device approval — 2 transitions
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/04-lifecycles.yaml
+source: states/registered-device-approval.yaml
+entity: Registered device approval
+contract: tenancy
+enum: DeviceApprovalStatus
+enumKind: named
+enumSchema: DeviceApprovalStatus
+owner: tenancy
+description: Whether a registered device may go into production. Separate from `enrolmentState` (where
+  the device is in its life) and from `status` (what it last reported), so the r1 values of both stay
+  as they were. Every device registers `pendingApproval` (`registerDevice`, which also issues the one-time
+  enrolment code); `enrolDevice` refuses `active` until it is `approved`.
+initial:
+- pendingApproval
+terminal:
+- approved
+- rejected
+transitions:
+- from: pendingApproval
+  to: approved
+  operation: approveDevice
+  trigger: operation
+  guard: A second person approves after the acceptance test is recorded. The approver is neither the
+    tester (`testedByPrincipalId`) nor the person who registered the device (`403 approver-is-tester`;
+    DEC-245); a device with no recorded test is `409 device-not-tested`
+  requiresApproval: true
+- from: pendingApproval
+  to: rejected
+  operation: approveDevice
+  trigger: operation
+  guard: The second person rejects it, with a reason. A rejected device never reaches `active`; it is
+    retired with `enrolDevice`
+  requiresApproval: true
+notes: '**Both outcomes are terminal.** A rejected device that is fixed and offered again is registered
+  again, with a new enrolment code, so the history shows each attempt and who decided it. MoM 15 September
+  (DI-892, DI-906) asked for the code and the approval step; Chinmay confirmed both on 2 October.'

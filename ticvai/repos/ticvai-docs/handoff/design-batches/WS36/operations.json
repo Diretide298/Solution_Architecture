@@ -1,38 +1,4 @@
 {
- "getVatReturn": {
-  "method": "GET",
-  "path": "/tax/vat-returns",
-  "contract": "finance",
-  "summary": "A legal entity's VAT return for a tax period, in the FTA's boxes",
-  "permission": "LEDGER_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "region",
-  "parameters": [
-   {
-    "name": "legalEntityId",
-    "in": "query",
-    "required": true
-   },
-   {
-    "name": "periodFrom",
-    "in": "query",
-    "required": true
-   },
-   {
-    "name": "periodTo",
-    "in": "query",
-    "required": true
-   },
-   {
-    "name": "format",
-    "in": "query",
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "FinVatReturn"
- },
  "listCalculationValidationReconciliation": {
   "method": "GET",
   "path": "/calculation-validation-reconciliation",
@@ -265,55 +231,6 @@
   "requestBody": null,
   "responds": "Page"
  },
- "listTaxFeeCalculation": {
-  "method": "GET",
-  "path": "/tax-fee-calculation",
-  "contract": "catalogue",
-  "summary": "Tax, Fee & Calculation Command Center",
-  "permission": "PRODUCT_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "type",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "country",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "legalEntity",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "status",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "search",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- },
  "listTaxInvoiceTemplates": {
   "method": "GET",
   "path": "/tax-invoice-templates",
@@ -326,60 +243,6 @@
   "parameters": [
    {
     "name": "legalEntityId",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- },
- "listTaxInvoices": {
-  "method": "GET",
-  "path": "/tax-invoices",
-  "contract": "finance",
-  "summary": "Tax invoices issued, newest first",
-  "permission": "LEDGER_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "region",
-  "parameters": [
-   {
-    "name": "orderId",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "legalEntityId",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "invoiceType",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "status",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "issuedFrom",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "issuedTo",
     "in": "query",
     "required": null
    },

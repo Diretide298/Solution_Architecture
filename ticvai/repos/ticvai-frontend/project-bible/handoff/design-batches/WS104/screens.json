@@ -117,9 +117,11 @@
      "slot": "fields",
      "components": [
       {
-       "kind": "selectField",
-       "label": "42% Configuration Complete",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 84 §Setup Progress"
+       "kind": "progressIndicator",
+       "label": "Configuration complete",
+       "operation": "getGoLiveReadiness",
+       "notes": "The percentage is an output of the go-live readiness, not a field.",
+       "provenance": "contract subscription.yaml GET /go-live-readiness"
       }
      ]
     }
@@ -128,7 +130,7 @@
   "states": {
    "loading": "The record configuration as saved.",
    "error": "Could not load. Names which read failed and leaves the record untouched.",
-   "emptyFirstRun": "No record configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyFirstRun": "No record configured yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },
@@ -271,7 +273,7 @@
   "states": {
    "loading": "The guided plan list.",
    "error": "Could not load. Names which read failed and leaves the guided plan untouched.",
-   "emptyFirstRun": "No guided plan yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No guided plan yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the guided plan are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -528,6 +530,17 @@
        "impliedBy": "generateConfiguration"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "components": [
+      {
+       "kind": "secondaryButton",
+       "label": "Approve or reject",
+       "operation": "decideProposedAction",
+       "provenance": "contract ai.yaml POST /proposed-actions/{actionId}/decide; wiring fix, 2 October 2026"
+      }
+     ]
     }
    ]
   },
@@ -552,6 +565,13 @@
     "purpose": "A plan with its steps",
     "trigger": "onLoad",
     "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "decideProposedAction",
+    "contract": "ai",
+    "purpose": "Approve or reject the AI draft",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-012)"
    }
   ],
   "wireframe": {
@@ -565,9 +585,29 @@
     {
      "name": "planId",
      "from": "navigation"
+    },
+    {
+     "name": "actionId",
+     "from": "navigation"
     }
    ]
   },
+  "overlays": [
+   {
+    "id": "formDecideProposedAction",
+    "component": "modal",
+    "trigger": "Approve or reject",
+    "body": "**Collects what `decideProposedAction` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Approve or reject",
+     "operation": "decideProposedAction"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "contract ai.yaml POST /proposed-actions/{actionId}/decide; wiring fix, 2 October 2026"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -640,6 +680,12 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Subscription_Licensing_AI_Self_Service.pdf, page 88"
+   },
+   {
+    "operation": "getTenantConfig",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-015): The screen is navigation; a full configuration read (getTenantConfig) is not needed (design-notes correction white-label BO-599).",
+    "source": "screens/P08-venue-back-office.yaml#BO-599"
    }
   ],
   "layout": {
@@ -670,19 +716,11 @@
   "states": {
    "loading": "The manual list.",
    "error": "Could not load. Names which read failed and leaves the manual untouched.",
-   "emptyFirstRun": "No manual yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No manual yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the manual are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Not shown: nothing on this screen needs a permission of its own; the app's sign-in decides access."
   },
-  "apis": [
-   {
-    "operationId": "getTenantConfig",
-    "contract": "white-label",
-    "purpose": "Manual configuration",
-    "trigger": "onLoad",
-    "provenance": "board reading, 19 September 2026"
-   }
-  ],
+  "apis": [],
   "wireframe": {
    "status": "notStarted",
    "board": "wireframes/P08 Venue Management.dc.html#bo-599",
@@ -889,6 +927,12 @@
     "operation": null,
     "why": "**Product, Pricing & Sales Channel Setup declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
     "source": "contract — the screen's declared operations"
+   },
+   {
+    "operation": "setChannelListing",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-025): setChannelListing lists products on OTAs (subscription, PARTNER_MANAGE), not on the venue's own channels; first-time channel setup is publishChannelAvailability. The screen also had no read: listPrices returns the prices setPrices writes (PR-9) (design-notes correction ticketing-backoffice BO-601)",
+    "source": "contracts/spine/catalogue.yaml#setPrices | contracts/satellite/subscription.yaml#setChannelListing | screens/P08-venue-back-office.yaml#BO-601 | contracts/spine/catalogue.yaml#publishChannelAvailability"
    }
   ],
   "layout": {
@@ -932,6 +976,30 @@
        "kind": "selectField",
        "label": "Ticket Media",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 90 §Configuration"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Prices",
+       "operation": "listPrices",
+       "provenance": "contract catalogue.yaml GET /price-lists/{priceListId}/prices; wiring fix, 2 October 2026"
+      },
+      {
+       "kind": "publishGate",
+       "impliedBy": "publishChannelAvailability",
+       "operation": "publishChannelAvailability",
+       "notes": "Declares `publishChannelAvailability`. **The gate names what the publish will affect before it happens** — a disabled Publish with no reason is the state operators escalate.",
+       "provenance": "wiring fix, 2 October 2026: the operation moved here"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "components": [
+      {
+       "kind": "secondaryButton",
+       "label": "Publish to channels",
+       "operation": "publishChannelAvailability",
+       "provenance": "contract catalogue.yaml PUT /channel-availability; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -940,7 +1008,7 @@
   "states": {
    "loading": "The product pricing sales configuration as saved.",
    "error": "Could not load. Names which read failed and leaves the product pricing sales untouched.",
-   "emptyFirstRun": "No product pricing sales configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyFirstRun": "No product pricing sales configured yet. Offers no create action — this screen declares no operation that makes one and says what the platform does in the meantime.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },
@@ -953,11 +1021,18 @@
     "provenance": "board reading, 19 September 2026"
    },
    {
-    "operationId": "setChannelListing",
-    "contract": "subscription",
-    "purpose": "Sales channels",
+    "operationId": "listPrices",
+    "contract": "catalogue",
+    "purpose": "The prices already in the list",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
+   },
+   {
+    "operationId": "publishChannelAvailability",
+    "contract": "catalogue",
+    "purpose": "Publish the products on the venue's own sales channels",
     "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026"
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {
@@ -974,6 +1049,22 @@
     }
    ]
   },
+  "overlays": [
+   {
+    "id": "formPublishChannelAvailability",
+    "component": "modal",
+    "trigger": "Publish to channels",
+    "body": "**Collects what `publishChannelAvailability` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Publish to channels",
+     "operation": "publishChannelAvailability"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "contract catalogue.yaml PUT /channel-availability; wiring fix, 2 October 2026"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1031,7 +1122,7 @@
     }
    ]
   },
-  "notes": "**Moved from P09 `ADM-436` on 11 September 2026.** Board 7 is worked by the new customer's own administrator inside their tenant, not by TICVAI; `tools/applied/apply-subscription-placement.py` records why. `ADM-436` is retired and never reissued.",
+  "notes": "**Moved from P09 `ADM-436` on 11 September 2026.** Board 7 is worked by the new customer's own administrator inside their tenant, not by TICVAI; `tools/applied/apply-subscription-placement.py` records why. `ADM-436` is retired and never reissued.\n\nProgress (\"6 of 12\", \"10\") is shown from the go-live readiness on BO-595, not as fields here.",
   "density": "compact",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configured; Configure) and no display directory — it is settings, not a population",
@@ -1050,16 +1141,6 @@
      "name": "contentBody",
      "slot": "fields",
      "components": [
-      {
-       "kind": "selectField",
-       "label": "6/12",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 90 §Configured"
-      },
-      {
-       "kind": "selectField",
-       "label": "10",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 90 §Configured"
-      },
       {
        "kind": "selectField",
        "label": "POS Name",
@@ -1253,7 +1334,7 @@
   "states": {
    "loading": "The health review configuration as saved.",
    "error": "Could not load. Names which read failed and leaves the health review untouched.",
-   "emptyFirstRun": "No health review configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyFirstRun": "No health review configured yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },
@@ -1379,7 +1460,7 @@
   "states": {
    "loading": "The completion handoff go-live configuration as saved.",
    "error": "Could not load. Names which read failed and leaves the completion handoff go-live untouched.",
-   "emptyFirstRun": "No completion handoff go-live configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyFirstRun": "No completion handoff go-live configured yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },

@@ -37,44 +37,6 @@
   "requestBody": null,
   "responds": "WorkOrder"
  },
- "acknowledgeAnnouncement": {
-  "method": "POST",
-  "path": "/announcements/{announcementId}/acknowledge",
-  "contract": "workforce",
-  "summary": "Confirm you have read it",
-  "permission": "WORKFORCE_VIEW",
-  "offlineCapable": true,
-  "conflictPolicy": "append",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": null
- },
- "approveShiftOpen": {
-  "method": "POST",
-  "path": "/shifts/{shiftId}/approve-open",
-  "contract": "shift",
-  "summary": "Approve a shift opening outside tolerance",
-  "permission": "SHIFT_APPROVE_OPEN",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Shift"
- },
  "attachWorkOrderEvidence": {
   "method": "POST",
   "path": "/work-orders/{workOrderId}/attachments",
@@ -113,15 +75,15 @@
   "requestBody": null,
   "responds": "WorkOrder"
  },
- "closeShift": {
+ "changeOwnCredential": {
   "method": "POST",
-  "path": "/shifts/{shiftId}/close",
-  "contract": "shift",
-  "summary": "Blind close-out",
-  "permission": "SHIFT_CLOSE",
+  "path": "/auth/credential",
+  "contract": "identity",
+  "summary": "Change the caller's own password or PIN",
+  "permission": null,
   "offlineCapable": false,
-  "conflictPolicy": "append",
-  "scopeLevel": "workstation",
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
   "parameters": [
    {
     "name": null,
@@ -129,8 +91,8 @@
     "required": null
    }
   ],
-  "requestBody": "CloseShiftRequest",
-  "responds": "ShiftCloseResult"
+  "requestBody": "ChangeCredentialRequest",
+  "responds": null
  },
  "closeWorkOrder": {
   "method": "POST",
@@ -151,6 +113,25 @@
   "requestBody": null,
   "responds": "WorkOrder"
  },
+ "completeSsoAuthorization": {
+  "method": "POST",
+  "path": "/auth/sso/{providerId}/callback",
+  "contract": "identity",
+  "summary": "Exchange an SSO code for a session",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "LoginResponse"
+ },
  "completeWorkOrder": {
   "method": "POST",
   "path": "/work-orders/{workOrderId}/complete",
@@ -169,25 +150,6 @@
   ],
   "requestBody": null,
   "responds": "WorkOrder"
- },
- "createCashMovement": {
-  "method": "POST",
-  "path": "/shifts/{shiftId}/cash-movements",
-  "contract": "shift",
-  "summary": "Record a cash lift or add",
-  "permission": "CASH_LIFT",
-  "offlineCapable": true,
-  "conflictPolicy": "append",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "CreateCashMovementRequest",
-  "responds": "CashMovement"
  },
  "createMfaChallenge": {
   "method": "POST",
@@ -246,19 +208,6 @@
   "requestBody": "CreateWorkOrderRequest",
   "responds": "WorkOrder"
  },
- "getAnnouncementReach": {
-  "method": "GET",
-  "path": "/announcements/{announcementId}/reach",
-  "contract": "workforce",
-  "summary": "Who has acknowledged, and who has not",
-  "permission": "WORKFORCE_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "AnnouncementReach"
- },
  "getCurrentSession": {
   "method": "GET",
   "path": "/auth/session",
@@ -298,44 +247,24 @@
   "requestBody": null,
   "responds": "IncidentDetail"
  },
- "getOfflinePackage": {
+ "getServiceSummary": {
   "method": "GET",
-  "path": "/access/offline-package",
-  "contract": "access",
-  "summary": "Entitlement and rule set for offline validation",
-  "permission": "ACCESS_VALIDATE",
+  "path": "/service-summary",
+  "contract": "reporting",
+  "summary": "My service summary (a server without a till)",
+  "permission": "REPORT_VIEW_OWN",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
-  "scopeLevel": "workstation",
+  "scopeLevel": "venue",
   "parameters": [
    {
-    "name": "sinceVersion",
+    "name": "date",
     "in": "query",
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": "validFrom",
-    "in": "query",
-    "required": true
-   },
-   {
-    "name": "validTo",
-    "in": "query",
-    "required": true
-   },
-   {
-    "name": "If-None-Match",
-    "in": "header",
     "required": null
    }
   ],
   "requestBody": null,
-  "responds": "OfflinePackage"
+  "responds": "ServiceSummary"
  },
  "getShift": {
   "method": "GET",
@@ -363,24 +292,18 @@
   "requestBody": null,
   "responds": "WorkOrderDetail"
  },
- "listAnnouncements": {
+ "getWorkstationShift": {
   "method": "GET",
-  "path": "/announcements",
-  "contract": "workforce",
-  "summary": "What staff have been told",
-  "permission": "WORKFORCE_VIEW",
+  "path": "/shifts/current/overview",
+  "contract": "shift",
+  "summary": "Read the open or suspended shift on the session's workstation, without the right to open one",
+  "permission": "REPORT_VIEW_WORKSTATION",
   "offlineCapable": true,
   "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "unacknowledgedOnly",
-    "in": "query",
-    "required": null
-   }
-  ],
+  "scopeLevel": "workstation",
+  "parameters": [],
   "requestBody": null,
-  "responds": "Announcement"
+  "responds": "Shift"
  },
  "listCashMovements": {
   "method": "GET",
@@ -428,92 +351,6 @@
    },
    {
     "name": "isReportable",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- },
- "listMfaMethods": {
-  "method": "GET",
-  "path": "/auth/mfa/methods",
-  "contract": "identity",
-  "summary": "Enrolled MFA methods",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "MfaMethod"
- },
- "listRoles": {
-  "method": "GET",
-  "path": "/roles",
-  "contract": "identity",
-  "summary": "List roles",
-  "permission": "ROLE_MANAGE",
-  "offlineCapable": true,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- },
- "listScans": {
-  "method": "GET",
-  "path": "/access/scans",
-  "contract": "access",
-  "summary": "List scan events",
-  "permission": "REPORT_VIEW_VENUE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "accessPointId",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "ticketId",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "outcome",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "recordedFrom",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "recordedTo",
     "in": "query",
     "required": null
    },
@@ -729,25 +566,6 @@
   "requestBody": null,
   "responds": "TicketStatus"
  },
- "openShift": {
-  "method": "POST",
-  "path": "/shifts",
-  "contract": "shift",
-  "summary": "Open a shift",
-  "permission": "SHIFT_OPEN",
-  "offlineCapable": false,
-  "conflictPolicy": "append",
-  "scopeLevel": "workstation",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "OpenShiftRequest",
-  "responds": "Shift"
- },
  "overrideAccess": {
   "method": "POST",
   "path": "/access/override",
@@ -786,25 +604,6 @@
   "requestBody": null,
   "responds": "WorkOrder"
  },
- "publishAnnouncement": {
-  "method": "POST",
-  "path": "/announcements",
-  "contract": "workforce",
-  "summary": "Tell staff something",
-  "permission": "ANNOUNCEMENT_PUBLISH",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "Announcement",
-  "responds": "Announcement"
- },
  "recordAuthorityNotification": {
   "method": "POST",
   "path": "/incidents/{incidentId}/notify-authority",
@@ -823,25 +622,6 @@
   ],
   "requestBody": null,
   "responds": "Incident"
- },
- "recordNoSale": {
-  "method": "POST",
-  "path": "/shifts/{shiftId}/no-sale",
-  "contract": "shift",
-  "summary": "Open the Deposit Box without a sale",
-  "permission": "CASH_NO_SALE",
-  "offlineCapable": true,
-  "conflictPolicy": "append",
-  "scopeLevel": "workstation",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "NoSaleEvent"
  },
  "recordWorkOrderParts": {
   "method": "POST",
@@ -919,25 +699,6 @@
   "requestBody": null,
   "responds": "InventoryStockReservation"
  },
- "reopenShift": {
-  "method": "POST",
-  "path": "/shifts/{shiftId}/reopen",
-  "contract": "shift",
-  "summary": "Reopen a shift closed in error",
-  "permission": "SHIFT_REOPEN",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Shift"
- },
  "reportIncident": {
   "method": "POST",
   "path": "/incidents",
@@ -956,25 +717,6 @@
   ],
   "requestBody": "ReportIncidentRequest",
   "responds": "Incident"
- },
- "resumeShift": {
-  "method": "POST",
-  "path": "/shifts/{shiftId}/resume",
-  "contract": "shift",
-  "summary": "Resume a suspended shift",
-  "permission": "SHIFT_OPEN",
-  "offlineCapable": true,
-  "conflictPolicy": "append",
-  "scopeLevel": "workstation",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Shift"
  },
  "resumeWorkOrder": {
   "method": "POST",
@@ -1014,6 +756,25 @@
   "requestBody": null,
   "responds": "Session"
  },
+ "startSsoAuthorization": {
+  "method": "GET",
+  "path": "/auth/sso/{providerId}/authorize",
+  "contract": "identity",
+  "summary": "Begin an SSO flow",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "redirectUri",
+    "in": "query",
+    "required": true
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
  "startWorkOrder": {
   "method": "POST",
   "path": "/work-orders/{workOrderId}/start",
@@ -1033,6 +794,25 @@
   "requestBody": null,
   "responds": "WorkOrder"
  },
+ "submitShiftCount": {
+  "method": "POST",
+  "path": "/shifts/{shiftId}/count",
+  "contract": "shift",
+  "summary": "The cashier's blind count, closing their own shift",
+  "permission": "SHIFT_CLOSE",
+  "offlineCapable": false,
+  "conflictPolicy": "append",
+  "scopeLevel": "workstation",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CloseShiftRequest",
+  "responds": "ShiftCountReceipt"
+ },
  "suspendShift": {
   "method": "POST",
   "path": "/shifts/{shiftId}/suspend",
@@ -1051,25 +831,6 @@
   ],
   "requestBody": null,
   "responds": "Shift"
- },
- "syncScans": {
-  "method": "POST",
-  "path": "/access/scans",
-  "contract": "access",
-  "summary": "Replay scans recorded offline",
-  "permission": "ACCESS_VALIDATE",
-  "offlineCapable": false,
-  "conflictPolicy": "append",
-  "scopeLevel": "workstation",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "ScanSyncResult"
  },
  "updateIncident": {
   "method": "PATCH",

@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """Names in the contracts that the glossary says never to use.
 
-**Audit class A-GLOSSARY (audit/ticvai/ROOT-CLASSES.md).** Fourteen root issues were one mistake
+**Audit class A-GLOSSARY (docs/active/root-classes.md).** Fourteen root issues were one mistake
 in fourteen places: a synonym the glossary bans, used as a schema, field or operation name --
 Item/SKU for Product (R131), Booking/Hold for Reservation (R145), Guest for Subject (R155),
 Till/Drawer/Station for Workstation or Deposit Box (R156), Session for Performance (R165),

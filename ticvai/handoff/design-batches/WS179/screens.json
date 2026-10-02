@@ -106,6 +106,7 @@
     }
    ]
   },
+  "notes": "**One reporting area, one set of numbers** (decided 2 October 2026, Chinmay; CHG-FIN-006; DI-721, DI-702). This screen is a scoped window onto the reporting area (Analytics, P16): it runs the same seeded report definitions and reads the same seeded KPIs, so its figures equal what Analytics shows for the same scope, period and as-of time. It computes no total of its own and shows the as-of time on every figure.",
   "_platform": {
    "code": "P08",
    "audience": "staff",

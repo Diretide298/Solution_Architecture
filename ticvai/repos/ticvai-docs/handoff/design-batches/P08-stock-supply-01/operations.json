@@ -579,60 +579,6 @@
   "requestBody": null,
   "responds": "Page"
  },
- "listOrders": {
-  "method": "GET",
-  "path": "/orders",
-  "contract": "orders",
-  "summary": "List orders",
-  "permission": "ORDER_VIEW",
-  "offlineCapable": true,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "venueId",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "principalId",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "shiftId",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "status",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "createdFrom",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "createdTo",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- },
  "listPurchaseOrders": {
   "method": "GET",
   "path": "/purchase-orders",
@@ -1113,30 +1059,6 @@
   ],
   "requestBody": "InventoryKitDefinition",
   "responds": "InventoryKitDefinition"
- },
- "setItemAvailability": {
-  "method": "PUT",
-  "path": "/menu-items/{itemId}/availability",
-  "contract": "fnb",
-  "summary": "Mark an item available or eighty-sixed",
-  "permission": "PRODUCT_CONFIGURE",
-  "offlineCapable": true,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "MenuItem"
  },
  "startStockCount": {
   "method": "POST",

@@ -31,7 +31,7 @@ offlineBehaviour: '**Steps 1 to 4 work offline and must.** A walk-in freezer is 
   '
 steps:
 - step: 1
-  screen: EMP-062
+  screen: EMP-067
   action: The check falls due and appears on the storekeeper's list.
   operations:
   - getHaccpStatus
@@ -39,6 +39,7 @@ steps:
     one** — a log with a gap cannot be told apart from a log nobody kept.
 
     '
+  note: 'Repointed 2 October (CHG-WIR-008): EMP-062 is retail store stock; the staff app''s food-safety section is on EMP-067, which now reads what is due.'
 - step: 2
   screen: EMP-067
   action: They read the unit and record the temperature.

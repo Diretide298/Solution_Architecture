@@ -23,30 +23,6 @@
   "requestBody": null,
   "responds": "GuestMenu"
  },
- "listModifierGroups": {
-  "method": "GET",
-  "path": "/modifier-groups",
-  "contract": "fnb",
-  "summary": "List modifier groups",
-  "permission": "PRODUCT_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- },
  "lookupShopAndDrop": {
   "method": "GET",
   "path": "/shop-and-drop/lookup",

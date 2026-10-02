@@ -54,7 +54,7 @@ steps:
   screen: CMS-012
   action: Previews in both directions
   operations:
-  - getTenantConfig
+  - createPreview
   - validateTenantConfig
   outcome: '**Arabic is a mirror, not a translation** — the preview must show it'
 - step: 5

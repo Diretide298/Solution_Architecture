@@ -1,154 +1,451 @@
 {
- "Page": {
+ "BillingEntity": {
   "type": "object",
-  "required": [
-   "items",
-   "hasMore"
-  ],
+  "x-ticvai-persistence": "control.billing_entity",
+  "description": "**The company TICVAI invoices for a tenant, with its trade licence and VAT certificate** (Chinmay, 2 October, workbook Q209: \"a new billing-entity record in the subscription contract\"; DI-830; CHG-CSA-030). One per tenant, mastered in the control plane. `legalName` and `countryCode` are required on save (400 otherwise); they are not marked required here so the record can ride, optional, on an onboarding application. **Documents** (workbook Q210, the default): a trade licence always; a VAT certificate when a `trn` is entered. Which documents a country requires is configurable per country (tenancy `RegionSettings`); the default is that rule.",
   "properties": {
-   "items": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "tenantId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "Null while it rides on an onboarding application."
+   },
+   "legalName": {
+    "type": "string",
+    "maxLength": 300
+   },
+   "tradeLicenceNumber": {
+    "type": "string",
+    "maxLength": 100,
+    "nullable": true
+   },
+   "trn": {
+    "type": "string",
+    "maxLength": 30,
+    "nullable": true,
+    "description": "The tax registration number; entering one makes the VAT certificate required."
+   },
+   "countryCode": {
+    "type": "string",
+    "minLength": 2,
+    "maxLength": 2
+   },
+   "address": {
+    "type": "string",
+    "maxLength": 1000,
+    "nullable": true
+   },
+   "invoiceEmail": {
+    "type": "string",
+    "format": "email",
+    "nullable": true
+   },
+   "documents": {
+    "x-ticvai-persistence-kind": "valueObject",
+    "x-ticvai-persistence-column": "jsonb",
     "type": "array",
-    "items": {}
+    "description": "The trade licence and, where a TRN is entered, the VAT certificate, each a stored file with its verification.",
+    "items": {
+     "type": "object",
+     "properties": {
+      "documentType": {
+       "type": "string",
+       "enum": [
+        "tradeLicence",
+        "vatCertificate"
+       ]
+      },
+      "fileRef": {
+       "type": "string",
+       "nullable": true
+      },
+      "expiryDate": {
+       "type": "string",
+       "format": "date",
+       "nullable": true
+      },
+      "verificationStatus": {
+       "type": "string",
+       "enum": [
+        "missing",
+        "uploaded",
+        "verified",
+        "rejected",
+        "expired"
+       ]
+      }
+     }
+    }
    },
-   "nextCursor": {
-    "type": "string"
+   "missingDocuments": {
+    "type": "array",
+    "readOnly": true,
+    "description": "The documents the country's rule requires that are not yet uploaded and verified.",
+    "items": {
+     "type": "string"
+    }
    },
-   "hasMore": {
-    "type": "boolean"
-   }
-  }
- },
- "SalesChannelCommandCenterSummary": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection; the headline tiles over the list, computed at read time for the filters in force",
-  "description": "**The headline figures on Sales Channel Command Center.** The pack's KPI cards, split out of the row (decided 29 September, readiness close-out): a count describes the list, not each item in it.",
-  "properties": {
-   "totalChannels": {
-    "type": "integer",
-    "description": "Total Channels"
-   },
-   "activeChannels": {
-    "type": "integer",
-    "description": "Active Channels"
-   },
-   "inactiveChannels": {
-    "type": "integer",
-    "description": "Inactive Channels"
-   },
-   "channelsInDraft": {
-    "type": "integer",
-    "description": "Channels in Draft"
-   },
-   "channelsWithErrors": {
-    "type": "integer",
-    "description": "Channels With Errors"
-   },
-   "productsDistributed": {
-    "type": "integer",
-    "description": "Products Distributed: distinct products assigned to at least one active channel"
-   },
-   "channelsWithCapacityAlerts": {
-    "type": "integer",
-    "description": "Channels With Capacity Alerts"
-   },
-   "channelsWithPricingIssues": {
-    "type": "integer",
-    "description": "Channels With Pricing Issues"
-   },
-   "scheduledActivations": {
-    "type": "integer",
-    "description": "Scheduled Activations"
-   },
-   "scheduledDeactivations": {
-    "type": "integer",
-    "description": "Scheduled Deactivations"
-   }
-  }
- },
- "SalesChannelCommandCenterView": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
-  "description": "**What Sales Channel Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
-  "properties": {
-   "channelId": {
-    "type": "string",
-    "description": "Channel ID"
-   },
-   "channelName": {
-    "type": "string",
-    "description": "Channel Name"
-   },
-   "channelType": {
-    "type": "string",
-    "enum": [
-     "b2cWeb",
-     "b2cMobileApp",
-     "pos",
-     "mobilePos",
-     "flyingPos",
-     "kiosk",
-     "callCentre",
-     "b2bPortal",
-     "reseller",
-     "ota",
-     "api",
-     "partnerPortal",
-     "marketplace",
-     "thirdPartyChannel",
-     "customChannel"
-    ],
-    "description": "Channel Type (pack p.3-4 Channel Types). The type decides which configuration applies (p.6); each type reports under one SalesChannel value (see salesChannel)"
-   },
-   "brand": {
-    "type": "string",
-    "description": "Brand"
-   },
-   "venueScope": {
-    "type": "string",
-    "description": "Venue/Scope: the channel's operational scope level and the name of the scoped item (e.g. a venue name, or Global)"
-   },
-   "products": {
-    "type": "integer",
-    "description": "Products: number of products assigned to the channel"
-   },
-   "currency": {
-    "type": "string",
-    "description": "Currency: ISO 4217 code",
-    "pattern": "^[A-Z]{3}$"
-   },
-   "status": {
-    "type": "string",
-    "description": "Status: draft, configuration, validation, approved, scheduled, active, suspended, disabled or archived (the pack's suggested lifecycle, p.5)"
-   },
-   "publicationStatus": {
-    "type": "string",
-    "description": "Publication Status: unpublished, pendingApproval, scheduled or published (decided 29 September, readiness close-out)"
-   },
-   "integrationStatus": {
-    "type": "string",
-    "description": "Integration Status: notRequired, notConfigured, connected, degraded or offline (decided 29 September, readiness close-out)"
-   },
-   "lastUpdated": {
+   "updatedAt": {
     "type": "string",
     "format": "date-time",
-    "description": "Last Updated"
+    "readOnly": true
+   }
+  }
+ },
+ "ModuleListing": {
+  "type": "object",
+  "x-ticvai-persistence": "subscription.module_listing",
+  "description": "Board 4.6. **A marketplace without a dependency graph sells combinations that cannot be provisioned.**\n**TICVAI configures each module's price here, and tenants are billed per module (decided 29 September, Chinmay).** A usage-priced module (the AI module's tokens) has `pricingBasis` `metered`: `price` is then per `meteredUnitSize` units of `meteredMetric`, and the invoice carries it as a `metered` line.\n",
+  "required": [
+   "moduleCode"
+  ],
+  "properties": {
+   "moduleCode": {
+    "type": "string"
    },
-   "owner": {
+   "name": {
+    "type": "string"
+   },
+   "description": {
     "type": "string",
-    "description": "Owner: the channel's commercial owner (user ID)"
+    "nullable": true
    },
-   "salesChannel": {
-    "$ref": "../shared/common.yaml#/components/schemas/SalesChannel",
-    "description": "The shared reporting dimension this channel's sales are attributed to (b2cWeb -> guestWeb, b2cMobileApp -> guestApp, the POS types -> pos, callCentre, b2bPortal -> b2b, ota and marketplace -> ota, api, reseller/partnerPortal/thirdPartyChannel -> partner; a custom channel picks one) (decided 29 September, readiness close-out)"
+   "category": {
+    "type": "string",
+    "nullable": true
    },
-   "aiInsights": {
+   "requiresModules": {
     "type": "array",
     "items": {
      "type": "string"
-    },
-    "description": "Configuration problems AI flags on this channel (pack p.5, e.g. products assigned without a valid price profile for the channel). Advisory only: nothing is changed until a user acts."
+    }
+   },
+   "incompatibleWithModules": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "includedInTiers": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "price": {
+    "x-ticvai-column": "list_price",
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "pricingBasis": {
+    "type": "string",
+    "enum": [
+     "included",
+     "flatFee",
+     "perVenue",
+     "perUnit",
+     "revenueShare",
+     "metered"
+    ]
+   },
+   "meteredMetric": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/UsageMetric"
+     }
+    ],
+    "nullable": true,
+    "description": "For `metered`, what is counted (`aiTokens` for the AI module). Null otherwise."
+   },
+   "meteredUnitSize": {
+    "type": "integer",
+    "minimum": 1,
+    "nullable": true,
+    "description": "For `metered`, how many units `price` buys (e.g. 1000 tokens). Null otherwise."
+   },
+   "provisioningMinutes": {
+    "type": "integer",
+    "nullable": true
+   },
+   "requiresProfessionalServices": {
+    "type": "boolean",
+    "default": false
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "available",
+     "beta",
+     "deprecated",
+     "withdrawn"
+    ]
+   }
+  }
+ },
+ "OnboardingApplication": {
+  "type": "object",
+  "x-ticvai-persistence": "control.onboarding_application",
+  "description": "BL-165. **`subscription` handles the operator-led path well and has no prospect-led one.** `createTenant` and `provisionCell` assume somebody at Softlabs decided this tenant exists.\nA prospect signing themselves up is a different shape: **nothing is provisioned until they are verified**, because an unverified application that provisions a cell is a cell somebody has to clean up.\n",
+  "required": [
+   "id",
+   "companyName",
+   "contactEmail",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "companyName": {
+    "type": "string"
+   },
+   "contactEmail": {
+    "type": "string",
+    "format": "email"
+   },
+   "contactPhone": {
+    "type": "string",
+    "nullable": true
+   },
+   "countryCode": {
+    "type": "string"
+   },
+   "venueTypeTemplateId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**A water park and a theatre need different defaults**, and asking a prospect to configure 300 settings from empty is asking them to leave.\n"
+   },
+   "requestedPlanId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "submitted",
+     "verifying",
+     "approved",
+     "provisioning",
+     "active",
+     "rejected",
+     "abandoned"
+    ]
+   },
+   "trialEndsAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "**Trial is a state, not a plan.** A tenant on trial has the plan they will pay for and a date by which they must — modelling it as a separate plan means migrating them at conversion, which is the moment least worth adding risk to.\n"
+   },
+   "rejectionReason": {
+    "type": "string",
+    "nullable": true
+   },
+   "provisionedTenantId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "billingEntity": {
+    "$ref": "#/components/schemas/BillingEntity",
+    "description": "**The company to be invoiced, saved on the application before verification** (Chinmay, 2 October, workbook Q209 and Q223; CHG-CSA-030). Nothing is provisioned until the application is verified; on provisioning it becomes the tenant's billing entity (`getBillingEntity`)."
+   }
+  }
+ },
+ "ProspectSignupChallenge": {
+  "type": "object",
+  "x-ticvai-persistence": "none — the challenge is held by identity for its lifetime (CHG-CLN-019)",
+  "required": [
+   "challengeId",
+   "expiresInSeconds"
+  ],
+  "properties": {
+   "challengeId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "expiresInSeconds": {
+    "type": "integer"
+   },
+   "resendAfterSeconds": {
+    "type": "integer"
+   }
+  }
+ },
+ "ProspectSignupSession": {
+  "type": "object",
+  "x-ticvai-persistence": "none — a session token, not a table the package reads (CHG-CLN-019)",
+  "required": [
+   "token",
+   "expiresAt",
+   "resumed"
+  ],
+  "properties": {
+   "token": {
+    "type": "string",
+    "description": "The `prospectAuth` bearer token, scoped to one onboarding application."
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "onboardingApplicationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The application in progress for this email, or null until the first `submitOnboardingApplication`."
+   },
+   "resumed": {
+    "type": "boolean",
+    "description": "True when the email already had an application in progress (\"Continue saved setup\")."
+   }
+  }
+ },
+ "StartProspectSignupRequest": {
+  "type": "object",
+  "x-ticvai-persistence": "none — request only (DEC-167; CHG-CLN-019)",
+  "required": [
+   "email"
+  ],
+  "properties": {
+   "email": {
+    "type": "string",
+    "format": "email",
+    "maxLength": 256,
+    "description": "The prospect's work email; the one-time code goes here."
+   },
+   "locale": {
+    "type": "string",
+    "maxLength": 16,
+    "nullable": true,
+    "description": "The language the code message is written in (BCP 47), default English."
+   }
+  }
+ },
+ "UsageMetric": {
+  "type": "string",
+  "enum": [
+   "venues",
+   "workstations",
+   "activeUsers",
+   "devices",
+   "brandedApps",
+   "aiTokens",
+   "apiCalls",
+   "storageGb",
+   "transactions",
+   "guestProfiles"
+  ]
+ },
+ "VerifyProspectSignupCodeRequest": {
+  "type": "object",
+  "x-ticvai-persistence": "none — request only (CHG-CLN-019)",
+  "required": [
+   "code"
+  ],
+  "properties": {
+   "code": {
+    "type": "string",
+    "pattern": "^[0-9]{6}$",
+    "description": "The six-digit one-time code sent to the email."
+   }
+  }
+ },
+ "VsiAssessment": {
+  "type": "object",
+  "x-ticvai-persistence": "subscription.vsi_assessment",
+  "description": "Board 2 — the ten-screen questionnaire, as data.",
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "organisationName": {
+    "type": "string",
+    "nullable": true
+   },
+   "contactEmail": {
+    "type": "string",
+    "nullable": true
+   },
+   "venueType": {
+    "type": "string",
+    "nullable": true
+   },
+   "answers": {
+    "type": "object",
+    "additionalProperties": true
+   },
+   "requestedModules": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "submittedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "VsiResult": {
+  "type": "object",
+  "description": "Board 2.10. **A prospect told only their price has been told nothing they can argue with.**\n",
+  "properties": {
+   "assessmentId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "score": {
+    "type": "number"
+   },
+   "tierCode": {
+    "type": "string"
+   },
+   "tierName": {
+    "type": "string"
+   },
+   "factors": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "code": {
+       "type": "string"
+      },
+      "label": {
+       "type": "string"
+      },
+      "answer": {
+       "type": "string"
+      },
+      "points": {
+       "type": "number"
+      }
+     }
+    }
+   },
+   "recommendedModules": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "recommendedPlanId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "indicativePrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
    }
   }
  }

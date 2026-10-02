@@ -76,7 +76,10 @@
     {
      "to": "BO-1040",
      "trigger": "Alternatives & Reseating",
-     "provenance": "structural — pack board 9 wiring, 19 September 2026"
+     "provenance": "structural — pack board 9 wiring, 19 September 2026",
+     "carries": [
+      "performanceId"
+     ]
     },
     {
      "to": "BO-1041",
@@ -312,6 +315,13 @@
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
        "impliedBy": "setSeatRecommendationRules"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "What \"best\" means at this venue",
+       "bindsTo": "SeatRecommendationRules",
+       "operation": "getSeatRecommendationRules",
+       "provenance": "contract seating.yaml GET /seat-recommendation-rules; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -334,6 +344,13 @@
     "invalidates": [
      "getSeatRecommendationRules"
     ]
+   },
+   {
+    "operationId": "getSeatRecommendationRules",
+    "contract": "seating",
+    "purpose": "What \"best\" means at this venue",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {
@@ -342,6 +359,7 @@
    "workshopBoard": "wireframes/WS148 Seat Management Venue Mapping Reference v1.0 Board 9.dc.html#bo-1034"
   },
   "apisNote": "Regenerated 9 September 2026 from Seat_Management_Venue_Mapping_Reference v1.0.pdf page 38. 0 of 0 labels bound to a contract property; 0 of 8 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {},
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -434,6 +452,13 @@
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
        "impliedBy": "setSeatRecommendationRules"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "What \"best\" means at this venue",
+       "bindsTo": "SeatRecommendationRules",
+       "operation": "getSeatRecommendationRules",
+       "provenance": "contract seating.yaml GET /seat-recommendation-rules; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -456,6 +481,13 @@
     "invalidates": [
      "getSeatRecommendationRules"
     ]
+   },
+   {
+    "operationId": "getSeatRecommendationRules",
+    "contract": "seating",
+    "purpose": "What \"best\" means at this venue",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {
@@ -464,6 +496,7 @@
    "workshopBoard": "wireframes/WS148 Seat Management Venue Mapping Reference v1.0 Board 9.dc.html#bo-1035"
   },
   "apisNote": "Regenerated 9 September 2026 from Seat_Management_Venue_Mapping_Reference v1.0.pdf page 38. 0 of 0 labels bound to a contract property; 0 of 9 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {},
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -556,6 +589,13 @@
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
        "impliedBy": "setSeatRecommendationRules"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "What \"best\" means at this venue",
+       "bindsTo": "SeatRecommendationRules",
+       "operation": "getSeatRecommendationRules",
+       "provenance": "contract seating.yaml GET /seat-recommendation-rules; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -578,6 +618,13 @@
     "invalidates": [
      "getSeatRecommendationRules"
     ]
+   },
+   {
+    "operationId": "getSeatRecommendationRules",
+    "contract": "seating",
+    "purpose": "What \"best\" means at this venue",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {
@@ -586,6 +633,7 @@
    "workshopBoard": "wireframes/WS148 Seat Management Venue Mapping Reference v1.0 Board 9.dc.html#bo-1036"
   },
   "apisNote": "Regenerated 9 September 2026 from Seat_Management_Venue_Mapping_Reference v1.0.pdf page 39. 0 of 0 labels bound to a contract property; 0 of 8 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {},
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -678,6 +726,13 @@
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
        "impliedBy": "setSeatRecommendationRules"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "What \"best\" means at this venue",
+       "bindsTo": "SeatRecommendationRules",
+       "operation": "getSeatRecommendationRules",
+       "provenance": "contract seating.yaml GET /seat-recommendation-rules; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -700,6 +755,13 @@
     "invalidates": [
      "getSeatRecommendationRules"
     ]
+   },
+   {
+    "operationId": "getSeatRecommendationRules",
+    "contract": "seating",
+    "purpose": "What \"best\" means at this venue",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {
@@ -708,6 +770,7 @@
    "workshopBoard": "wireframes/WS148 Seat Management Venue Mapping Reference v1.0 Board 9.dc.html#bo-1037"
   },
   "apisNote": "Regenerated 9 September 2026 from Seat_Management_Venue_Mapping_Reference v1.0.pdf page 39. 0 of 0 labels bound to a contract property; 0 of 8 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {},
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -928,6 +991,13 @@
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
        "impliedBy": "recommendSeats"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Seat status for a performance",
+       "bindsTo": "SeatAvailability",
+       "operation": "getSeatAvailability",
+       "provenance": "contract seating.yaml GET /performances/{performanceId}/seat-availability; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -947,6 +1017,13 @@
     "purpose": "Upgrade options",
     "trigger": "onAction",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "getSeatAvailability",
+    "contract": "seating",
+    "purpose": "Seat status for a performance",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {
@@ -1054,6 +1131,13 @@
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
        "impliedBy": "reassignSeats"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Seat status for a performance",
+       "bindsTo": "SeatAvailability",
+       "operation": "getSeatAvailability",
+       "provenance": "contract seating.yaml GET /performances/{performanceId}/seat-availability; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -1077,6 +1161,13 @@
      "getSeatInventory",
      "getSeatReconciliation"
     ]
+   },
+   {
+    "operationId": "getSeatAvailability",
+    "contract": "seating",
+    "purpose": "Seat status for a performance",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {
@@ -1085,6 +1176,14 @@
    "workshopBoard": "wireframes/WS148 Seat Management Venue Mapping Reference v1.0 Board 9.dc.html#bo-1040"
   },
   "apisNote": "Regenerated 9 September 2026 from Seat_Management_Venue_Mapping_Reference v1.0.pdf page 40. 0 of 0 labels bound to a contract property; 0 of 8 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "performanceId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1177,6 +1276,13 @@
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
        "impliedBy": "setSeatRecommendationRules"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "What \"best\" means at this venue",
+       "bindsTo": "SeatRecommendationRules",
+       "operation": "getSeatRecommendationRules",
+       "provenance": "contract seating.yaml GET /seat-recommendation-rules; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -1199,6 +1305,13 @@
     "invalidates": [
      "getSeatRecommendationRules"
     ]
+   },
+   {
+    "operationId": "getSeatRecommendationRules",
+    "contract": "seating",
+    "purpose": "What \"best\" means at this venue",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {
@@ -1207,6 +1320,7 @@
    "workshopBoard": "wireframes/WS148 Seat Management Venue Mapping Reference v1.0 Board 9.dc.html#bo-1041"
   },
   "apisNote": "Regenerated 9 September 2026 from Seat_Management_Venue_Mapping_Reference v1.0.pdf page 40. 0 of 0 labels bound to a contract property; 0 of 8 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {},
   "_platform": {
    "code": "P08",
    "audience": "staff",

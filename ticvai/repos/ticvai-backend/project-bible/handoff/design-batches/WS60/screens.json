@@ -544,6 +544,13 @@
    "workshopBoard": "wireframes/WS166 Ticket Media   Credential Management Board 2.dc.html#bo-345"
   },
   "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 24. 0 of 0 labels bound to a contract property; 15 of 48 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-004): No read of digital QR and barcode ticket designs.",
+    "source": "contracts/spine/access.yaml#setDigitalBarcodeTicket"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1027,6 +1034,13 @@
    "workshopBoard": "wireframes/WS166 Ticket Media   Credential Management Board 2.dc.html#bo-347"
   },
   "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 27. 0 of 0 labels bound to a contract property; 24 of 33 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-004): No read of Apple Wallet pass designs and no preview operation.",
+    "source": "contracts/spine/access.yaml#setAppleWalletPass"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1242,6 +1256,13 @@
    "workshopBoard": "wireframes/WS166 Ticket Media   Credential Management Board 2.dc.html#bo-348"
   },
   "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 29. 0 of 0 labels bound to a contract property; 22 of 30 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Event time change, Venue change, Ticket status change, Relevant ticket information changes are choices sent by `setGoogleWalletPass`.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-004): No read of Google Wallet pass designs and no preview operation.",
+    "source": "contracts/spine/access.yaml#setGoogleWalletPass"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1477,6 +1498,13 @@
    "workshopBoard": "wireframes/WS166 Ticket Media   Credential Management Board 2.dc.html#bo-349"
   },
   "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 30. 0 of 0 labels bound to a contract property; 26 of 41 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Membership Card, Staff/guest card where applicable, Size where applicable, Deposit/reference where applicable are choices sent by `setRfidNfcCard`.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-004): No read of RFID, NFC, card and wristband media designs.",
+    "source": "contracts/spine/access.yaml#setRfidNfcCard"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1647,6 +1675,13 @@
    "workshopBoard": "wireframes/WS166 Ticket Media   Credential Management Board 2.dc.html#bo-350"
   },
   "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 31. 0 of 0 labels bound to a contract property; 13 of 36 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Tier designs are choices sent by `setDigitalCardMembership`.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-004): No read of digital card, membership and wearable designs and no preview operation.",
+    "source": "contracts/spine/access.yaml#setDigitalCardMembership"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1789,6 +1824,13 @@
    "workshopBoard": "wireframes/WS166 Ticket Media   Credential Management Board 2.dc.html#bo-351"
   },
   "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 32. 0 of 0 labels bound to a contract property; 7 of 64 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-004): No read lists the dynamic field library.",
+    "source": "contracts/spine/access.yaml#setDynamicFieldData"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -2031,6 +2073,11 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Ticket_Media___Credential_Management_Reference.pdf, page 36"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-004): No read of media templates, rendered previews or server-run check results, and no version list.",
+    "source": "contracts/spine/access.yaml#approveMultiMediaPreview"
    }
   ],
   "layout": {

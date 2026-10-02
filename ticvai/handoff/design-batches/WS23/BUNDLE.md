@@ -1,6 +1,6 @@
 # WS23 — B2B, Reseller & OTA Partner Management board 3
 
-**10 screens · 0 operations · 0 schemas · 0 permissions**
+**8 screens · 12 operations · 18 schemas · 3 permissions**
 
 Platform P10 Partner Web · ships as **ticvai-control** ·
 partner audience · web ·
@@ -48,8 +48,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 0 permissions apply here:
-  ``. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 3 permissions apply here:
+  `CASE_MANAGE, ORDER_MODIFY, PLATFORM_TENANT_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -61,6 +61,35 @@ convincingly. It is never a caption.
   and its error; and, element by element, what is shown and in what format, what each action
   produces and where the user goes next. Draw exactly that.
 
+## The processes these screens belong to
+
+Written by the owner of each process (`handoff/design-notes/`). Read before any screen: it says how the process runs end to end and which words the screens must use.
+
+### Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management)
+
+Platform Foundation is everything the apps stand on. Five apps each have one door: the guest app and website (WEB-016, GST-042: a six-digit code to email or mobile, a password, Apple or Google, UAE Pass; never enterprise SSO), the till (POS-000: employee number and PIN, recent operators as tiles; the kitchen display is the same app), the staff handheld and scanner (EMP-001, SCN-001), Venue Management (SUP-001, the single door for the back office P08, the CMS P13, analytics P16 and the support desk P12) and TICVAI Control (ADM-001 for TICVAI's own platform operators, PTR-001 for partner users; the developer portal P14 and the sign-up P17 belong to this app too). A second factor is required by permission, not by role or device: ROLE_MANAGE, LEDGER_APPROVE and every PLATFORM_* permission, plus any the tenant adds; so a cashier never sees it and a platform operator always does. The factor is an authenticator app with an emailed code as fallback; five wrong codes lock step-up for the lockout minutes, never permanently. Guests get two-step verification only at a venue that switched it on. One person holds one session per workstation: a second sign-in is refused and only a supervisor ends the other session. Several roles mean a role prompt; one role goes straight in. The workstation decides the Sale Board, hardware and till identity, never what a person may do. Sensitive actions (refund approval, journal approval, credential reset, partner credit, commission rules, opening a platform-staff grant and 17 more) demand a fresh step-up on the operation itself, asked in place in the action's confirmation; the tenant may raise the strength, never remove it. Permission outcomes are three, never one word: self-authorised (proceeds, audited), escalated (a supervisor PIN in place), refused (the denied state, naming the permission); a missing permission is never an empty table, and a record outside the person's venues is "not found", indistinguishable from absent. The hierarchy is binding (tenant, brand, region, venue, department, sub-department, workstation; outlet beside department for F&B and retail); region owns currency, decimals, time zone, date format and fiscal year; configuration resolves nearest-ancestor across tenant, region and venue (outlet for F&B and retail), venue is the floor and a workstation is assigned a profile, never configured; every configuration screen says which level it writes and what it inherits. Venue Management is one tenant-level surface filtering across the venues in the session's scope. TICVAI's Console runs outside every cell: a platform operator picks a tenant and opens a time-boxed, audited platform-staff grant (with step-up) before any tenant action, and the tenant sees every action in its audit log (ADM-412 is the reference implementation). Approval workflows record authorisations and never perform the action; the requester cannot approve their own request; a venue may tighten and never loosen a rule from above; in-flight …
+*(source: screens/P12-support-agent-console.yaml#SUP-001; R135; R126; R167; DI-1072; ADR-0002; ADR-0003; ADR-0004; R184; contracts/spine/identity.yaml#createMfaChallenge; contracts/spine/approvals.yaml#setStepUpPolicy; ADR-0011; ADR-0018; ADR-0029; R098; contracts/spine/approvals.yaml#decideApprovalRequest …)*
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Sign in / Sign out | Entering and leaving any app, staff or guest. | Login, Log in, Logon, Logout | screens/P04-point-of-sale.yaml#POS-000 … |
+| Authentication code | The staff second factor from the authenticator app (or the emailed fallback). | OTP, 2FA code, token | screens/P09-platform-admin-console.yaml#ADM-001 |
+| One-time code | The six-digit code a guest receives to sign in or prove a contact. | OTP, PIN, password | DI-1034; R167 |
+| Two-step verification | The guest's optional second factor, asked only at venues that switched it on. | MFA, 2FA | DI-1072 |
+| Tenant / Brand / Region / Venue / Department / Outlet | The binding hierarchy levels; region owns currency and dates; outlet is F&B or retail inside a venue. | Client, Customer, Org (for tenant), Site, Park, Property (for venue), Area, Territory (for region) | ADR-0011; ADR-0018 |
+| Workstation (back office) / till (operator copy) | A configured device; decides Sale Board, hardware and till identity, never authorisation. | Terminal, Station, POS (for the device), till (for the Deposit Box) | ADR-0002; R156 |
+| Sale Board | The configured front end a workstation loads (ticketing, F&B or retail). | Screen, Layout, Menu | ADR-0003 |
+| Role | A named, fully configurable grouping of permissions; the seeded five are editable starting points. | Group, Profile | R229 |
+| Staff member / Partner user / Platform operator | A tenant's staff principal; a partner's user; a TICVAI employee in the Console. | User (alone), Account, Agent (for venue staff) | F104 step 1; F104 step 4; F104 step 5 |
+| Platform-staff grant | The time-boxed, audited access a platform operator opens into one tenant before acting in it. | Impersonation, Support login | R098 |
+| Escalate / Refused | Escalate is supervisor approval captured in place; Refused is the denied state that names the permission. | Denied (for an action that can be escalated) | R197 |
+| Approve / Reject / Return / Request information | The four decisions on an approval request; Withdraw is the requester's own act and never a rejection. | Accept, Decline, Cancel (for withdraw) | contracts/spine/approvals.yaml#decideApprovalRequest … |
+| Subscription / Plan / Module / Licence | TICVAI's commercial relationship with a tenant, its plan, the modules it licenses and the limits. | Membership (that is the guest's pass) | R214 |
+| Membership / Annual pass | A guest's pass product and its holder (BO-284 to BO-303). | Subscription (that is the tenant's TICVAI plan) | screens/P08-venue-back-office.yaml#BO-284 |
+| Sandbox client / Production client | A developer's own test credential; a TICVAI-issued live credential after certification. | Test key, Live key, API key (without environment) | DI-927 |
+| Asset (DAM) / Media (ticket) | A digital file in the library; ticket media is a wristband or card carrying entitlements. Never mix them. | Media (for a library asset) | contracts/satellite/assets.yaml#searchMedia … |
+
+
 ## The screens
 
 Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs count fields; requirements are matrix rows; meeting inputs are the ones naming the screen (the module and platform ones are below); white label says whether the tenant's brand reaches it (guest) or it sets the brand (configures).
@@ -69,12 +98,10 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|---|---|---|---|---|---|---|---|---|
 | `PTR-042` | Partner Operations Command Center | B–D | 2 | 28 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
 | `PTR-043` | Partner Orders & Booking Management | B–D | 2 | 32 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
-| `PTR-044` | Reservations, Holds & Release Management | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `PTR-045` | Partner Cancellations, Refunds & Amendments | B–D | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
+| `PTR-044` | Reservations, Holds & Release Management | B–D | 0 | 160 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `PTR-045` | Partner Cancellations, Refunds & Amendments | B–D | 8 | 0 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
 | `PTR-046` | Partner Statement & Account Activity | B–D | 0 | 18 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `PTR-047` | Partner Reconciliation & Exception Management | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `PTR-048` | Commission Calculation & Settlement Management | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `PTR-049` | Partner Disputes, Cases & Service Management | B–D | 0 | 8 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `PTR-049` | Partner Disputes, Cases & Service Management | B–D | 21 | 8 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
 | `PTR-050` | Partner Performance Scorecard & Risk Monitoring | B–D | 0 | 2 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
 | `PTR-051` | Partner AI Intelligence & Relationship Optimization | B–D | 0 | 2 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
 
@@ -97,12 +124,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | App · platform | TICVAI Control · P10 Partner Web (web) |
 | Module | Partners · wave 3 · needs the `partner` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | partner; in the flows as partner |
+| Who uses it | partner staff holding `PLATFORM_TENANT_VIEW` (1 read); in the flows as partner |
 | Device and orientation | web · LTR and RTL · light theme |
 | Pattern | commandCentre (compact density): the pack gives this screen both a metric directory (§Display) and a per-row directory (§Each partner should show) — counts over a population, then the population |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/partners/partner-operations-command-center-ptr-042` |
+
+**From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** Partner business today: sales, orders, holds, cancellations, receivables, commission payable, exceptions.
+
+**Fixed on main** (the package already carries these; draw what it says): emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything. (CHG-SOT-015).
 
 #### Inputs: what the user enters or picks
 
@@ -112,6 +143,28 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|---|---|---|---|---|---|
 | Search partner operations | search field | — | — | — | — | — | — |
 | Filter by | multi select | — | — | — | — | The pack filters this screen by partner, partner type, venue, event, market, account manager and 4 more — which are present is a decision the pack already made. | — |
+
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Venue | text field | — | — | `listPartner2` ?venue |
+| Event | text field | — | — | `listPartner2` ?event |
+| Market | text field | — | — | `listPartner2` ?market |
+| Channel | select | — | POS · Kiosk · Guest app · Guest web · Call centre · Partner · API · Back office · B2B · Ota | `listPartner2` ?channel |
+| From | date picker | — | — | `listPartner2` ?from |
+| To | date picker | — | — | `listPartner2` ?to |
+| Partner | picker: choose a partner | — | — | `listPartner2` ?partnerId |
+| Partner type | text field | — | — | `listPartner2` ?partnerType |
+| Account manager | text field | — | — | `listPartner2` ?accountManager |
+| Operational status | radio group | — | Normal · Attention · Restricted · Suspended | `listPartner2` ?operationalStatus |
+| Risk | radio group | — | Low · Medium · High · Critical | `listPartner2` ?risk |
+| Brand | text field | — | — | `listPartner` ?brand |
+| Venue | text field | — | — | `listPartner` ?venue |
+| Account manager | text field | — | — | `listPartner` ?accountManager |
+| Status | select | — | Lead · Applicant · Under review · Approved · Configuration · Active · Restricted · Suspended · Terminated · Archived | `listPartner` ?status |
+| Risk | radio group | — | Low · Medium · High · Critical | `listPartner` ?risk |
+| … 7 more | | | | `operations.json` |
 
 #### Outputs: what the screen shows and produces
 
@@ -145,39 +198,43 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | Shows | Format | Notes |
 |---|---|---|
-| Partner | text | not in the schema: `PartnerOperationsCommandCenterView.partner` |
-| Partner type | text | not in the schema: `PartnerOperationsCommandCenterView.partnerType` |
-| Account manager | text | not in the schema: `PartnerOperationsCommandCenterView.accountManager` |
-| Orders | text | not in the schema: `PartnerOperationsCommandCenterView.orders` |
-| Tickets | text | not in the schema: `PartnerOperationsCommandCenterView.tickets` |
-| Gross sales | text | not in the schema: `PartnerOperationsCommandCenterView.grossSales` |
-| Net sales | text | not in the schema: `PartnerOperationsCommandCenterView.netSales` |
-| Commission | text | not in the schema: `PartnerOperationsCommandCenterView.commission` |
-| Outstanding balance | text | not in the schema: `PartnerOperationsCommandCenterView.outstandingBalance` |
-| Credit utilization | text | not in the schema: `PartnerOperationsCommandCenterView.creditUtilization` |
-| Allocation utilization | text | not in the schema: `PartnerOperationsCommandCenterView.allocationUtilization` |
-| Cancellation rate | text | not in the schema: `PartnerOperationsCommandCenterView.cancellationRate` |
-| Operational status | text | not in the schema: `PartnerOperationsCommandCenterView.operationalStatus` |
-| Risk | text | not in the schema: `PartnerOperationsCommandCenterView.risk` |
+| Partner | text | Partner trading name |
+| Partner type | text | Partner Type code |
+| Account manager | text | Account Manager |
+| Orders | 1,234 | Orders |
+| Tickets | 1,234 | Tickets |
+| Gross sales | AED 1,234.50 | Gross Sales |
+| Net sales | AED 1,234.50 | Net Sales |
+| Commission | AED 1,234.50 | Commission |
+| Outstanding balance | AED 1,234.50 | Outstanding Balance |
+| Credit utilization | 1,234.5 | Credit Utilization, percent |
+| Allocation utilization | 1,234.5 | Allocation Utilization, percent |
+| Cancellation rate | 12.5% | Cancellation Rate, percent |
+| Operational status | text | Operational Status: normal, attention, restricted, suspended |
+| Risk | chip: Low, Medium, High, Critical | Risk |
 
 **The selected partner operations** (detail panel)
 
 | Shows | Format | Notes |
 |---|---|---|
-| Partner | text | not in the schema: `PartnerOperationsCommandCenterView.partner` |
-| Partner type | text | not in the schema: `PartnerOperationsCommandCenterView.partnerType` |
-| Account manager | text | not in the schema: `PartnerOperationsCommandCenterView.accountManager` |
-| Orders | text | not in the schema: `PartnerOperationsCommandCenterView.orders` |
-| Tickets | text | not in the schema: `PartnerOperationsCommandCenterView.tickets` |
-| Gross sales | text | not in the schema: `PartnerOperationsCommandCenterView.grossSales` |
-| Net sales | text | not in the schema: `PartnerOperationsCommandCenterView.netSales` |
-| Commission | text | not in the schema: `PartnerOperationsCommandCenterView.commission` |
-| Outstanding balance | text | not in the schema: `PartnerOperationsCommandCenterView.outstandingBalance` |
-| Credit utilization | text | not in the schema: `PartnerOperationsCommandCenterView.creditUtilization` |
-| Allocation utilization | text | not in the schema: `PartnerOperationsCommandCenterView.allocationUtilization` |
-| Cancellation rate | text | not in the schema: `PartnerOperationsCommandCenterView.cancellationRate` |
-| Operational status | text | not in the schema: `PartnerOperationsCommandCenterView.operationalStatus` |
-| Risk | text | not in the schema: `PartnerOperationsCommandCenterView.risk` |
+| Partner | text | Partner trading name |
+| Partner type | text | Partner Type code |
+| Account manager | text | Account Manager |
+| Orders | 1,234 | Orders |
+| Tickets | 1,234 | Tickets |
+| Gross sales | AED 1,234.50 | Gross Sales |
+| Net sales | AED 1,234.50 | Net Sales |
+| Commission | AED 1,234.50 | Commission |
+| Outstanding balance | AED 1,234.50 | Outstanding Balance |
+| Credit utilization | 1,234.5 | Credit Utilization, percent |
+| Allocation utilization | 1,234.5 | Allocation Utilization, percent |
+| Cancellation rate | 12.5% | Cancellation Rate, percent |
+| Operational status | text | Operational Status: normal, attention, restricted, suspended |
+| Risk | chip: Low, Medium, High, Critical | Risk |
+
+**Rules for what is shown** (from the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process; these refine the tables above and win where they differ)
+
+- **Money columns (commission, outstandingBalance)**: Money in the region's currency and scale, never a bare number: AED to 2 decimals, OMR/BHD/KWD to 3, the third decimal never rounded away (2.013 stays 2.013); the currency code is shown with the figure. Across tenants or regions figures in different currencies are never summed into one total; group by currency, or label the converted figure with its rate and time. *(source: ADR-0008; ADR-0011; DI-306)*
 
 **Data it reads**: `listPartner2` (onLoad, Partner Operations Command Center); `listPartner` (onLoad, Partner Management Command Center)
 
@@ -187,8 +244,6 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 - → `PTR-044` Reservations, Holds & Release Management: *Works in Reservations, Holds & Release Management*; calls `listPartner2`
 - → `PTR-045` Partner Cancellations, Refunds & Amendments: *Works in Partner Cancellations, Refunds & Amendments*; calls `listPartner2`
 - → `PTR-046` Partner Statement & Account Activity: *Works in Partner Statement & Account Activity*; calls `listPartner2`
-- → `PTR-047` Partner Reconciliation & Exception Management: *Works in Partner Reconciliation & Exception Management*; calls `listPartner2`
-- → `PTR-048` Commission Calculation & Settlement Management: *Works in Commission Calculation & Settlement Management*; calls `listPartner2`
 - → `PTR-049` Partner Disputes, Cases & Service Management: *Works in Partner Disputes, Cases & Service Management*; calls `listPartner2`
 - → `PTR-050` Partner Performance Scorecard & Risk Monitoring: *Works in Partner Performance Scorecard & Risk Monitoring*; calls `listPartner2`
 - → `PTR-051` Partner AI Intelligence & Relationship Optimization: *Works in Partner AI Intelligence & Relationship Optimization*; calls `listPartner2`
@@ -199,12 +254,33 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | Loading (`?state=loading`) | The partner operations list; the counts above it resolve separately. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the partner operations untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No partner operations yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, first run (`?state=emptyFirstRun`) | No partner activity yet today. Offers no create action; the tiles show zero sales, not missing data. |
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the partner operations are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+metric tiles:
+  Partner Sales Today: 128
+  Partner Sales MTD: 46
+  Active Partner Orders: 312
+  Active Reservations/Holds: 74
+  Tickets Sold: 19
+  Cancellations: 233
+  Refunds: 57
+  Outstanding Receivables: AED 96,750.00
+  Commission Payable: AED 12,400.00
+  Pending Settlements: 46
+```
+
 #### Permissions
+
+- `listPartner2` → `PLATFORM_TENANT_VIEW` (read) · partner
+- `listPartner` → `PLATFORM_TENANT_VIEW` (read) · partner
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -237,8 +313,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Flow F132 *B2B, Reseller & OTA Partner Management board 3: Partner Operations Command …*, step 9: Returns to the board's landing screen → Ready for the next screen on this board
 - Flow F132 *B2B, Reseller & OTA Partner Management board 3: Partner Operations Command …*, step 11: Returns to the board's landing screen → Ready for the next screen on this board
 - Flow F132 *B2B, Reseller & OTA Partner Management board 3: Partner Operations Command …*, step 13: Returns to the board's landing screen → Ready for the next screen on this board
-- Flow F132 *B2B, Reseller & OTA Partner Management board 3: Partner Operations Command …*, step 15: Returns to the board's landing screen → Ready for the next screen on this board
-- … and 1 more flow steps (`flows/`)
 - Flow F132 branch at step 1 (expected): when Nothing has been set up on Partner Operations Command Center yet, The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and it is a different situation from an empty result on an established one.
 - Flow F132 branch at step 1 (requiresStaff): when The operator does not hold the permission this screen requires, The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**, which is the right shape -- but the permission that would satisfy it is not granted by any role in …
 
@@ -248,8 +322,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every output is drawn (28 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#PTR-042?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
-- [ ] Every transition is wired: `PTR-043`, `PTR-044`, `PTR-045`, `PTR-046`, `PTR-047`, `PTR-048`, `PTR-049`, `PTR-050`, `PTR-051`.
-- [ ] Sign-in is asked only where the spec asks for it.
+- [ ] Every transition is wired: `PTR-043`, `PTR-044`, `PTR-045`, `PTR-046`, `PTR-049`, `PTR-050`, `PTR-051`.
+- [ ] Every gated control is gated: `PLATFORM_TENANT_VIEW`.
 - [ ] The 2 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -264,12 +338,16 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | App · platform | TICVAI Control · P10 Partner Web (web) |
 | Module | Partners · wave 3 · needs the `partner` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | partner; in the flows as partner |
+| Who uses it | partner staff holding `PLATFORM_TENANT_VIEW` (1 read); in the flows as partner |
 | Device and orientation | web · LTR and RTL · light theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Display) and no metric row |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/partners/partner-orders-booking-management-ptr-043` |
+
+**From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** Orders created by partners with their references, agent user, customer, event and value.
+
+**Fixed on main** (the package already carries these; draw what it says): emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything. (CHG-SOT-015).
 
 #### Inputs: what the user enters or picks
 
@@ -280,6 +358,22 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Search partner orders booking | search field | — | — | — | — | — | — |
 | Filter by | multi select | — | — | — | — | The pack filters this screen by partner, partner order reference, ticvai order id, event, venue, product and 5 more — which are present is a decision the pack already made. | — |
 
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Partner | text field | — | — | `listPartnerOrderBooking` ?partner |
+| Partner order reference | text field | — | — | `listPartnerOrderBooking` ?partnerOrderReference |
+| Ticvai order | text field | — | — | `listPartnerOrderBooking` ?ticvaiOrderId |
+| Event | text field | — | — | `listPartnerOrderBooking` ?event |
+| Venue | text field | — | — | `listPartnerOrderBooking` ?venue |
+| Product | text field | — | — | `listPartnerOrderBooking` ?product |
+| Booking date | date picker | — | — | `listPartnerOrderBooking` ?bookingDate |
+| Visit event date | date picker | — | — | `listPartnerOrderBooking` ?visitEventDate |
+| Status | select | — | Draft · Held · Confirmed · Partially fulfilled · Fulfilled · Cancelled · Refunded · Failed | `listPartnerOrderBooking` ?status |
+| Agent | text field | — | — | `listPartnerOrderBooking` ?agent |
+| Channel | select | — | POS · Kiosk · Guest app · Guest web · Call centre · Partner · API · Back office · B2B · Ota | `listPartnerOrderBooking` ?channel |
+
 #### Outputs: what the screen shows and produces
 
 **Shown**
@@ -289,44 +383,48 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Shows | Format | Notes |
 |---|---|---|
 | TICVAI order ID | text | not in the schema: `TICVAI Order ID` |
-| Partner reference | text | not in the schema: `PartnerOrdersBookingManagementView.partnerReference` |
+| Partner reference | text | Partner Reference |
 | Partner | text | not in the schema: `Partner` |
-| Agent user | text | not in the schema: `PartnerOrdersBookingManagementView.agentUser` |
-| Customer name | text | not in the schema: `PartnerOrdersBookingManagementView.customerName` |
+| Agent user | text | Agent/User |
+| Customer name | text | Customer/Guest where applicable |
 | Booking date | text | not in the schema: `Booking Date` |
 | Event | text | not in the schema: `Event` |
-| Products | text | not in the schema: `PartnerOrdersBookingManagementView.products` |
-| Quantity | text | not in the schema: `PartnerOrdersBookingManagementView.quantity` |
-| Gross value | text | not in the schema: `PartnerOrdersBookingManagementView.grossValue` |
-| Partner rate | text | not in the schema: `PartnerOrdersBookingManagementView.partnerRate` |
-| Commission | text | not in the schema: `PartnerOrdersBookingManagementView.commission` |
-| Net amount | text | not in the schema: `PartnerOrdersBookingManagementView.netAmount` |
-| Payment method | text | not in the schema: `PartnerOrdersBookingManagementView.paymentMethod` |
-| Billing status | text | not in the schema: `PartnerOrdersBookingManagementView.billingStatus` |
-| Fulfillment status | text | not in the schema: `PartnerOrdersBookingManagementView.fulfillmentStatus` |
+| Products | list or chips (count when long) | Products |
+| Quantity | 1,234 | Quantity |
+| Gross value | AED 1,234.50 | Gross Value |
+| Partner rate | AED 1,234.50 | Partner Rate applied |
+| Commission | AED 1,234.50 | Commission |
+| Net amount | AED 1,234.50 | Net Amount |
+| Payment method | chip: Credit account, Prepaid, Card | Payment Method (the three payment models) |
+| Billing status | text | Billing Status: unbilled, invoiced, paid, overdue or credited |
+| Fulfillment status | text | Fulfillment Status: pending, partiallyIssued, issued or delivered |
 
 **The selected partner orders booking** (detail panel): The pack groups this record's detail under its own headings: “Important Architecture”.
 
 | Shows | Format | Notes |
 |---|---|---|
 | TICVAI order ID | text | not in the schema: `TICVAI Order ID` |
-| Partner reference | text | not in the schema: `PartnerOrdersBookingManagementView.partnerReference` |
+| Partner reference | text | Partner Reference |
 | Partner | text | not in the schema: `Partner` |
-| Agent user | text | not in the schema: `PartnerOrdersBookingManagementView.agentUser` |
-| Customer name | text | not in the schema: `PartnerOrdersBookingManagementView.customerName` |
+| Agent user | text | Agent/User |
+| Customer name | text | Customer/Guest where applicable |
 | Booking date | text | not in the schema: `Booking Date` |
 | Event | text | not in the schema: `Event` |
-| Products | text | not in the schema: `PartnerOrdersBookingManagementView.products` |
-| Quantity | text | not in the schema: `PartnerOrdersBookingManagementView.quantity` |
-| Gross value | text | not in the schema: `PartnerOrdersBookingManagementView.grossValue` |
-| Partner rate | text | not in the schema: `PartnerOrdersBookingManagementView.partnerRate` |
-| Commission | text | not in the schema: `PartnerOrdersBookingManagementView.commission` |
-| Net amount | text | not in the schema: `PartnerOrdersBookingManagementView.netAmount` |
-| Payment method | text | not in the schema: `PartnerOrdersBookingManagementView.paymentMethod` |
-| Billing status | text | not in the schema: `PartnerOrdersBookingManagementView.billingStatus` |
-| Fulfillment status | text | not in the schema: `PartnerOrdersBookingManagementView.fulfillmentStatus` |
+| Products | list or chips (count when long) | Products |
+| Quantity | 1,234 | Quantity |
+| Gross value | AED 1,234.50 | Gross Value |
+| Partner rate | AED 1,234.50 | Partner Rate applied |
+| Commission | AED 1,234.50 | Commission |
+| Net amount | AED 1,234.50 | Net Amount |
+| Payment method | chip: Credit account, Prepaid, Card | Payment Method (the three payment models) |
+| Billing status | text | Billing Status: unbilled, invoiced, paid, overdue or credited |
+| Fulfillment status | text | Fulfillment Status: pending, partiallyIssued, issued or delivered |
 
 **Permissions this screen separates** (banner): **The pack separates these permissions and no action on the screen claims them yet:** View, Modify, Cancel, Rebook, Resend Tickets, Reissue, Add Internal Note, Escalate, Open Financial Record. Each needs attaching to the control it gates, or the screen needs the control.
+
+**Rules for what is shown** (from the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process; these refine the tables above and win where they differ)
+
+- **Money columns (commission, grossValue, netAmount)**: Money in the region's currency and scale, never a bare number: AED to 2 decimals, OMR/BHD/KWD to 3, the third decimal never rounded away (2.013 stays 2.013); the currency code is shown with the figure. Across tenants or regions figures in different currencies are never summed into one total; group by currency, or label the converted figure with its rate and time. *(source: ADR-0008; ADR-0011; DI-306)*
 
 **Data it reads**: `listPartnerOrderBooking` (onLoad, Partner Orders & Booking Management)
 
@@ -340,12 +438,34 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | Loading (`?state=loading`) | The partner orders booking list. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the partner orders booking untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No partner orders booking yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, first run (`?state=emptyFirstRun`) | No partner bookings yet. Offers no create action: partners book on their own booking screens. |
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the partner orders booking are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+Every partner orders booking:
+- TICVAI Order ID: 11
+  Partner: Marina Leisure Group
+  Booking Date: 01/10/2026 09:14
+  Event: 233
+- TICVAI Order ID: 128
+  Partner: Desert Gate Tours LLC
+  Booking Date: 30/09/2026 18:02
+  Event: 57
+- TICVAI Order ID: 46
+  Partner: Arabian Trails
+  Booking Date: 28/09/2026 11:45
+  Event: 11
+```
+
 #### Permissions
+
+- `listPartnerOrderBooking` → `PLATFORM_TENANT_VIEW` (read) · partner
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -384,7 +504,7 @@ Also apply: 12 for all of P10, 29 for every app (section *Design inputs from the
 - [ ] Every state opens from `#PTR-043?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `PTR-042`.
-- [ ] Sign-in is asked only where the spec asks for it.
+- [ ] Every gated control is gated: `PLATFORM_TENANT_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -399,14 +519,27 @@ Also apply: 12 for all of P10, 29 for every app (section *Design inputs from the
 | App · platform | TICVAI Control · P10 Partner Web (web) |
 | Module | Partners · wave 3 · needs the `partner` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | partner; in the flows as partner |
+| Who uses it | partner staff holding `PLATFORM_TENANT_VIEW` (1 read); in the flows as partner |
 | Device and orientation | web · LTR and RTL · light theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Display) and no metric row |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/partners/reservations-holds-release-management-ptr-044` |
 
+**From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** Inventory held by partners before confirmation: expiring today, expired, converted, released.
+
+**Fixed on main** (the package already carries these; draw what it says): emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything. (CHG-SOT-015).
+
 #### Inputs: what the user enters or picks
+
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Partner | picker: choose a partner | — | — | `listReservationHoldRelease` ?partnerId |
+| Event | text field | — | — | `listReservationHoldRelease` ?event |
+| Status | radio group | — | Active · Extended · Converted · Released · Expired | `listReservationHoldRelease` ?status |
+| Expiring before | date and time picker | — | — | `listReservationHoldRelease` ?expiringBefore |
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
 
@@ -416,19 +549,203 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Active Holds** (metric tile, from `listReservationHoldRelease`)
 
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| Hold | the name it points at, never the id | Hold ID |
+| Partner | text | Partner trading name |
+| Event | text | Event |
+| Product | text | Product |
+| Quantity | 1,234 | Quantity |
+| Seat zone | text | Seat/Zone where applicable |
+| Hold created at | 1 Oct 2026, 14:30 | Hold Created |
+| Hold expires at | 1 Oct 2026, 14:30 | Hold Expiry |
+| Created by | 1 Oct 2026, 14:30 | Created By |
+| Commercial value | AED 1,234.50 | Commercial Value |
+| Allocation source | chip: Partner allocation, Channel allocation, General capacity | Allocation Source |
+| Status | text | Status: active, extended, converted, released, expired |
+| Extensions used | 1,234 | Extensions used so far |
+| Partner | the name it points at, never the id | Partner |
+| AI insights | list or chips (count when long) | Advisory AI conversion-probability and release suggestions |
+| Next cursor | text | — |
+| Has more | yes / no (icon or chip) | — |
+| Summary | grouped details | The headline figures on Reservations, Holds & Release Management. The pack's KPI cards, split out of the row (decided 29 September … |
+| Active holds | 1,234 | Active Holds |
+
 **Held Tickets** (metric tile, from `listReservationHoldRelease`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| Hold | the name it points at, never the id | Hold ID |
+| Partner | text | Partner trading name |
+| Event | text | Event |
+| Product | text | Product |
+| Quantity | 1,234 | Quantity |
+| Seat zone | text | Seat/Zone where applicable |
+| Hold created at | 1 Oct 2026, 14:30 | Hold Created |
+| Hold expires at | 1 Oct 2026, 14:30 | Hold Expiry |
+| Created by | 1 Oct 2026, 14:30 | Created By |
+| Commercial value | AED 1,234.50 | Commercial Value |
+| Allocation source | chip: Partner allocation, Channel allocation, General capacity | Allocation Source |
+| Status | text | Status: active, extended, converted, released, expired |
+| Extensions used | 1,234 | Extensions used so far |
+| Partner | the name it points at, never the id | Partner |
+| AI insights | list or chips (count when long) | Advisory AI conversion-probability and release suggestions |
+| Next cursor | text | — |
+| Has more | yes / no (icon or chip) | — |
+| Summary | grouped details | The headline figures on Reservations, Holds & Release Management. The pack's KPI cards, split out of the row (decided 29 September … |
+| Active holds | 1,234 | Active Holds |
 
 **Held Value** (metric tile, from `listReservationHoldRelease`)
 
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| Hold | the name it points at, never the id | Hold ID |
+| Partner | text | Partner trading name |
+| Event | text | Event |
+| Product | text | Product |
+| Quantity | 1,234 | Quantity |
+| Seat zone | text | Seat/Zone where applicable |
+| Hold created at | 1 Oct 2026, 14:30 | Hold Created |
+| Hold expires at | 1 Oct 2026, 14:30 | Hold Expiry |
+| Created by | 1 Oct 2026, 14:30 | Created By |
+| Commercial value | AED 1,234.50 | Commercial Value |
+| Allocation source | chip: Partner allocation, Channel allocation, General capacity | Allocation Source |
+| Status | text | Status: active, extended, converted, released, expired |
+| Extensions used | 1,234 | Extensions used so far |
+| Partner | the name it points at, never the id | Partner |
+| AI insights | list or chips (count when long) | Advisory AI conversion-probability and release suggestions |
+| Next cursor | text | — |
+| Has more | yes / no (icon or chip) | — |
+| Summary | grouped details | The headline figures on Reservations, Holds & Release Management. The pack's KPI cards, split out of the row (decided 29 September … |
+| Active holds | 1,234 | Active Holds |
+
 **Expiring Today** (metric tile, from `listReservationHoldRelease`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| Hold | the name it points at, never the id | Hold ID |
+| Partner | text | Partner trading name |
+| Event | text | Event |
+| Product | text | Product |
+| Quantity | 1,234 | Quantity |
+| Seat zone | text | Seat/Zone where applicable |
+| Hold created at | 1 Oct 2026, 14:30 | Hold Created |
+| Hold expires at | 1 Oct 2026, 14:30 | Hold Expiry |
+| Created by | 1 Oct 2026, 14:30 | Created By |
+| Commercial value | AED 1,234.50 | Commercial Value |
+| Allocation source | chip: Partner allocation, Channel allocation, General capacity | Allocation Source |
+| Status | text | Status: active, extended, converted, released, expired |
+| Extensions used | 1,234 | Extensions used so far |
+| Partner | the name it points at, never the id | Partner |
+| AI insights | list or chips (count when long) | Advisory AI conversion-probability and release suggestions |
+| Next cursor | text | — |
+| Has more | yes / no (icon or chip) | — |
+| Summary | grouped details | The headline figures on Reservations, Holds & Release Management. The pack's KPI cards, split out of the row (decided 29 September … |
+| Active holds | 1,234 | Active Holds |
 
 **Expired Holds** (metric tile, from `listReservationHoldRelease`)
 
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| Hold | the name it points at, never the id | Hold ID |
+| Partner | text | Partner trading name |
+| Event | text | Event |
+| Product | text | Product |
+| Quantity | 1,234 | Quantity |
+| Seat zone | text | Seat/Zone where applicable |
+| Hold created at | 1 Oct 2026, 14:30 | Hold Created |
+| Hold expires at | 1 Oct 2026, 14:30 | Hold Expiry |
+| Created by | 1 Oct 2026, 14:30 | Created By |
+| Commercial value | AED 1,234.50 | Commercial Value |
+| Allocation source | chip: Partner allocation, Channel allocation, General capacity | Allocation Source |
+| Status | text | Status: active, extended, converted, released, expired |
+| Extensions used | 1,234 | Extensions used so far |
+| Partner | the name it points at, never the id | Partner |
+| AI insights | list or chips (count when long) | Advisory AI conversion-probability and release suggestions |
+| Next cursor | text | — |
+| Has more | yes / no (icon or chip) | — |
+| Summary | grouped details | The headline figures on Reservations, Holds & Release Management. The pack's KPI cards, split out of the row (decided 29 September … |
+| Active holds | 1,234 | Active Holds |
+
 **Converted Holds** (metric tile, from `listReservationHoldRelease`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| Hold | the name it points at, never the id | Hold ID |
+| Partner | text | Partner trading name |
+| Event | text | Event |
+| Product | text | Product |
+| Quantity | 1,234 | Quantity |
+| Seat zone | text | Seat/Zone where applicable |
+| Hold created at | 1 Oct 2026, 14:30 | Hold Created |
+| Hold expires at | 1 Oct 2026, 14:30 | Hold Expiry |
+| Created by | 1 Oct 2026, 14:30 | Created By |
+| Commercial value | AED 1,234.50 | Commercial Value |
+| Allocation source | chip: Partner allocation, Channel allocation, General capacity | Allocation Source |
+| Status | text | Status: active, extended, converted, released, expired |
+| Extensions used | 1,234 | Extensions used so far |
+| Partner | the name it points at, never the id | Partner |
+| AI insights | list or chips (count when long) | Advisory AI conversion-probability and release suggestions |
+| Next cursor | text | — |
+| Has more | yes / no (icon or chip) | — |
+| Summary | grouped details | The headline figures on Reservations, Holds & Release Management. The pack's KPI cards, split out of the row (decided 29 September … |
+| Active holds | 1,234 | Active Holds |
 
 **Released Inventory, tickets** (metric tile, from `listReservationHoldRelease`)
 
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| Hold | the name it points at, never the id | Hold ID |
+| Partner | text | Partner trading name |
+| Event | text | Event |
+| Product | text | Product |
+| Quantity | 1,234 | Quantity |
+| Seat zone | text | Seat/Zone where applicable |
+| Hold created at | 1 Oct 2026, 14:30 | Hold Created |
+| Hold expires at | 1 Oct 2026, 14:30 | Hold Expiry |
+| Created by | 1 Oct 2026, 14:30 | Created By |
+| Commercial value | AED 1,234.50 | Commercial Value |
+| Allocation source | chip: Partner allocation, Channel allocation, General capacity | Allocation Source |
+| Status | text | Status: active, extended, converted, released, expired |
+| Extensions used | 1,234 | Extensions used so far |
+| Partner | the name it points at, never the id | Partner |
+| AI insights | list or chips (count when long) | Advisory AI conversion-probability and release suggestions |
+| Next cursor | text | — |
+| Has more | yes / no (icon or chip) | — |
+| Summary | grouped details | The headline figures on Reservations, Holds & Release Management. The pack's KPI cards, split out of the row (decided 29 September … |
+| Active holds | 1,234 | Active Holds |
+
 **Every reservations holds release** (data table, from `listReservationHoldRelease`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| Hold | the name it points at, never the id | Hold ID |
+| Partner | text | Partner trading name |
+| Event | text | Event |
+| Product | text | Product |
+| Quantity | 1,234 | Quantity |
+| Seat zone | text | Seat/Zone where applicable |
+| Hold created at | 1 Oct 2026, 14:30 | Hold Created |
+| Hold expires at | 1 Oct 2026, 14:30 | Hold Expiry |
+| Created by | 1 Oct 2026, 14:30 | Created By |
+| Commercial value | AED 1,234.50 | Commercial Value |
+| Allocation source | chip: Partner allocation, Channel allocation, General capacity | Allocation Source |
+| Status | text | Status: active, extended, converted, released, expired |
+| Extensions used | 1,234 | Extensions used so far |
+| Partner | the name it points at, never the id | Partner |
+| AI insights | list or chips (count when long) | Advisory AI conversion-probability and release suggestions |
+| Next cursor | text | — |
+| Has more | yes / no (icon or chip) | — |
+| Summary | grouped details | The headline figures on Reservations, Holds & Release Management. The pack's KPI cards, split out of the row (decided 29 September … |
+| Active holds | 1,234 | Active Holds |
 
 **The selected reservations holds release** (detail panel): The pack groups this record's detail under its own headings: “When a hold expires”.
 
@@ -446,12 +763,29 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |---|---|
 | Loading (`?state=loading`) | The reservations holds release list. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the reservations holds release untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No reservations holds release yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, first run (`?state=emptyFirstRun`) | No holds open: no partner inventory is reserved right now. Offers no create action. |
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the reservations holds release are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+metric tiles:
+  Active Holds: 128
+  Held Tickets: 46
+  Held Value: AED 12,400.00
+  Expiring Today: 74
+  Expired Holds: 3
+  Converted Holds: 233
+  Released Inventory, tickets: 57
+```
+
 #### Permissions
+
+- `listReservationHoldRelease` → `PLATFORM_TENANT_VIEW` (read) · partner
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -479,11 +813,11 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (160 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#PTR-044?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `PTR-042`.
-- [ ] Sign-in is asked only where the spec asks for it.
+- [ ] Every gated control is gated: `PLATFORM_TENANT_VIEW`.
 - [ ] The module and platform inputs below are applied.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -498,7 +832,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | App · platform | TICVAI Control · P10 Partner Web (web) |
 | Module | Partners · wave 3 · needs the `partner` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | partner; in the flows as partner |
+| Who uses it | partner staff holding `ORDER_MODIFY`, `PLATFORM_TENANT_VIEW` (1 operate, 1 read); in the flows as partner |
 | Device and orientation | web · LTR and RTL · light theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
 | Offline | online only |
@@ -507,15 +841,36 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** Partner cancellations, refunds and amendments under the agreement's policies.
+
 #### Inputs: what the user enters or picks
+
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Partner | picker: choose a partner | — | — | `listPartnerCancellationRefund` ?partnerId |
+| Request type | select | — | Full cancellation · Partial cancellation · Date change · Performance change · Quantity reduction · Product change · Ticket reissue · Customer name change · Refund request | `listPartnerCancellationRefund` ?requestType |
+| Status | radio group | — | Requested · Pending approval · Approved · Rejected · Processed | `listPartnerCancellationRefund` ?status |
+| From | date picker | — | — | `listPartnerCancellationRefund` ?from |
+| To | date picker | — | — | `listPartnerCancellationRefund` ?to |
 
 **Form: Create partner change request** (modal, opened by *Create partner change request*; *Create partner change request* calls `createPartnerChangeRequest`, *Cancel* sends nothing)
 
 **Collects what `createPartnerChangeRequest` sends before it is called.** Required: `orderId`, `requestType`. Optional: `quantity`, `targetPerformanceId`, `targetProductId`, `newCustomerName`, `feeWaiverRequested`, `reason`. Dismissing sends nothing; the screen behind is unchanged.
 
-`createPartnerChangeRequest` is not in any contract: draw the form greyed and list it in FINDINGS.md.
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Order `orderId` | picker: choose an order | required | — | — | shows names, sends the id | The partner's order (orders.sales_order) | `createPartnerChangeRequest` body |
+| Request type `requestType` | select | required | — | Full cancellation · Partial cancellation · Date change · Performance change · Quantity reduction · Product change · Ticket reissue · Customer name change · Refund request | — | — | `createPartnerChangeRequest` body |
+| Quantity `quantity` | number field | optional | — | min 1 | — | Tickets affected; required for partialCancellation and quantityReduction | `createPartnerChangeRequest` body |
+| Target performance `targetPerformanceId` | picker: choose a target performance | optional | — | — | shows names, sends the id | Required for dateChange and performanceChange | `createPartnerChangeRequest` body |
+| Target product `targetProductId` | picker: choose a target product | optional | — | — | shows names, sends the id | Required for productChange | `createPartnerChangeRequest` body |
+| New customer name `newCustomerName` | text field | optional | — | — | — | Required for customerNameChange | `createPartnerChangeRequest` body |
+| Fee waiver requested `feeWaiverRequested` | toggle | optional | off | — | — | — | `createPartnerChangeRequest` body |
+| Reason `reason` | text area | optional | — | — | — | — | `createPartnerChangeRequest` body |
 
-Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+Errors to draw in the form: 404 No such order for this partner; 422 A field the request type needs is missing
 
 #### Outputs: what the screen shows and produces
 
@@ -527,7 +882,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Create partner change request (primary button) | `createPartnerChangeRequest` (not in any contract) | — | — | — | — |
+| Create partner change request (primary button) | `createPartnerChangeRequest` POST `/partner-change-requests` | PartnerChangeRequestInput | PartnerChangeRequest | 404 No such order for this partner; 422 A field the request type needs is missing | gated `ORDER_MODIFY`; opens modal first |
 
 **Data it reads**: `listPartnerCancellationRefund` (onLoad, Partner Cancellations, Refunds & Amendments)
 
@@ -545,8 +900,29 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the partner cancellations refunds are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+| Validation and conflict | the form keeps what was entered and marks the problem: 422 A field the request type needs is missing |
+
+#### Edge cases to draw
+
+- **Can read but not change (holds PLATFORM_TENANT_VIEW only)**: Everything reads; the actions needing another permission are not offered as live buttons: ORDER_MODIFY for Create partner change request. Where the person would reasonably expect the action, it shows disabled with the permission named. The server refuses with 403 forbidden regardless. *(source: contracts/satellite/subscription.yaml#createPartnerChangeRequest)*
+- **createPartnerChangeRequest answers 404**: Show it as something the person can act on, not a failure: No such order for this partner *(source: contracts/satellite/subscription.yaml#createPartnerChangeRequest)*
+- **createPartnerChangeRequest answers 422**: Show it as something the person can act on, not a failure: A field the request type needs is missing *(source: contracts/satellite/subscription.yaml#createPartnerChangeRequest)*
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+booking: DGT-AUH-88412
+change: Cancel 6 of 40 tickets
+policy: free until 48 h before visit
+refund: AED 1,050.00
+```
 
 #### Permissions
+
+- `listPartnerCancellationRefund` → `PLATFORM_TENANT_VIEW` (read) · partner
+- `createPartnerChangeRequest` → `ORDER_MODIFY` (operate) · partner, staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -580,13 +956,14 @@ Also apply: 12 for all of P10, 29 for every app (section *Design inputs from the
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
+- [ ] Every input above is drawn (8), with its required mark, default, format and its error state (404, 422).
 - [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#PTR-045?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Create partner change request.
 - [ ] Every transition is wired: `PTR-042`.
-- [ ] Sign-in is asked only where the spec asks for it.
+- [ ] Every gated control is gated: `ORDER_MODIFY`, `PLATFORM_TENANT_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 3 edge case(s) from the process notes are drawn.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -600,14 +977,28 @@ Also apply: 12 for all of P10, 29 for every app (section *Design inputs from the
 | App · platform | TICVAI Control · P10 Partner Web (web) |
 | Module | Partners · wave 3 · needs the `partner` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | partner; in the flows as partner |
+| Who uses it | partner staff holding `PLATFORM_TENANT_VIEW` (1 read); in the flows as partner |
 | Device and orientation | web · LTR and RTL · light theme |
 | Pattern | commandCentre (compact density): the pack gives this screen both a metric directory (§Display) and a per-row directory (§Each line should show) — counts over a population, then the population |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/partners/partner-statement-account-activity-ptr-046` |
 
+**From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** A partner account statement: opening balance, sales, payments, credits, commission, closing balance and ageing.
+
+**Fixed on main** (the package already carries these; draw what it says): emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything. (CHG-SOT-015).
+
 #### Inputs: what the user enters or picks
+
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Partner | picker: choose a partner | — | — | `listPartnerStatementAccount` ?partnerId |
+| Period | radio group | — | Daily · Weekly · Monthly · Custom | `listPartnerStatementAccount` ?period |
+| From | date picker | — | — | `listPartnerStatementAccount` ?from |
+| To | date picker | — | — | `listPartnerStatementAccount` ?to |
+| Transaction type | select | — | Booking · Invoice · Payment · Refund · Credit note · Commission · Manual adjustment · Deposit · Settlement | `listPartnerStatementAccount` ?transactionType |
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
 
@@ -649,29 +1040,34 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 | Shows | Format | Notes |
 |---|---|---|
-| Date | text | not in the schema: `PartnerStatementAccountActivityView.date` |
-| Transaction type | text | not in the schema: `PartnerStatementAccountActivityView.transactionType` |
-| Reference | text | not in the schema: `PartnerStatementAccountActivityView.reference` |
-| Order invoice | text | not in the schema: `PartnerStatementAccountActivityView.orderInvoice` |
-| Debit | text | not in the schema: `PartnerStatementAccountActivityView.debit` |
-| Credit | text | not in the schema: `PartnerStatementAccountActivityView.credit` |
-| Running balance | text | not in the schema: `PartnerStatementAccountActivityView.runningBalance` |
-| Due date | text | not in the schema: `PartnerStatementAccountActivityView.dueDate` |
-| Status | text | not in the schema: `PartnerStatementAccountActivityView.status` |
+| Date | 1 Oct 2026 | Date |
+| Transaction type | chip: Booking, Invoice, Payment, Refund, Credit note, Commission… | Transaction Type |
+| Reference | text | Reference |
+| Order invoice | text | Order/Invoice number |
+| Debit | AED 1,234.50 | Debit |
+| Credit | AED 1,234.50 | Credit |
+| Running balance | AED 1,234.50 | Running Balance |
+| Due date | 1 Oct 2026 | Due Date |
+| Status | text | Status: open, partiallyPaid, paid, overdue or void |
 
 **The selected partner statement account** (detail panel): The pack groups this record's detail under its own headings: “Generate by”, “Partner Access”, “Architecture”.
 
 | Shows | Format | Notes |
 |---|---|---|
-| Date | text | not in the schema: `PartnerStatementAccountActivityView.date` |
-| Transaction type | text | not in the schema: `PartnerStatementAccountActivityView.transactionType` |
-| Reference | text | not in the schema: `PartnerStatementAccountActivityView.reference` |
-| Order invoice | text | not in the schema: `PartnerStatementAccountActivityView.orderInvoice` |
-| Debit | text | not in the schema: `PartnerStatementAccountActivityView.debit` |
-| Credit | text | not in the schema: `PartnerStatementAccountActivityView.credit` |
-| Running balance | text | not in the schema: `PartnerStatementAccountActivityView.runningBalance` |
-| Due date | text | not in the schema: `PartnerStatementAccountActivityView.dueDate` |
-| Status | text | not in the schema: `PartnerStatementAccountActivityView.status` |
+| Date | 1 Oct 2026 | Date |
+| Transaction type | chip: Booking, Invoice, Payment, Refund, Credit note, Commission… | Transaction Type |
+| Reference | text | Reference |
+| Order invoice | text | Order/Invoice number |
+| Debit | AED 1,234.50 | Debit |
+| Credit | AED 1,234.50 | Credit |
+| Running balance | AED 1,234.50 | Running Balance |
+| Due date | 1 Oct 2026 | Due Date |
+| Status | text | Status: open, partiallyPaid, paid, overdue or void |
+
+**Rules for what is shown** (from the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process; these refine the tables above and win where they differ)
+
+- **Ageing**: Current, 1–30, 31–60, 61–90, 90+ days in the account currency; overdue highlighted. *(source: contracts/satellite/subscription.yaml#listPartnerStatementAccount)*
+- **Money columns (runningBalance)**: Money in the region's currency and scale, never a bare number: AED to 2 decimals, OMR/BHD/KWD to 3, the third decimal never rounded away (2.013 stays 2.013); the currency code is shown with the figure. Across tenants or regions figures in different currencies are never summed into one total; group by currency, or label the converted figure with its rate and time. *(source: ADR-0008; ADR-0011; DI-306)*
 
 **Data it reads**: `listPartnerStatementAccount` (onLoad, Partner Statement & Account Activity)
 
@@ -685,12 +1081,32 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |---|---|
 | Loading (`?state=loading`) | The partner statement account list; the counts above it resolve separately. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the partner statement account untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No partner statement account yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, first run (`?state=emptyFirstRun`) | No account activity in this period: the opening balance is the closing balance. Offers no create action. |
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the partner statement account are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+metric tiles:
+  Opening Balance: 128
+  Sales: 46
+  Payments: 312
+  Credits: 74
+  Refunds: 19
+  Commission: AED 12,400.00
+  Adjustments: 57
+  Closing Balance: 11
+  Overdue Balance: 1
+  Available Credit: 46
+```
+
 #### Permissions
+
+- `listPartnerStatementAccount` → `PLATFORM_TENANT_VIEW` (read) · partner
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -724,244 +1140,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every state opens from `#PTR-046?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `PTR-042`.
-- [ ] Sign-in is asked only where the spec asks for it.
+- [ ] Every gated control is gated: `PLATFORM_TENANT_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
-- [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
-
----
-
-### `PTR-047` Partner Reconciliation & Exception Management
-
-**Reconcile operational bookings against financial and channel records and identify discrepancies.**
-
-| | |
-|---|---|
-| App · platform | TICVAI Control · P10 Partner Web (web) |
-| Module | Partners · wave 3 · needs the `partner` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | partner; in the flows as partner |
-| Device and orientation | web · LTR and RTL · light theme |
-| Pattern | listDetail (compact density): the pack gives this screen a display directory (§Display) and no metric row |
-| Offline | online only |
-| Opens with | `exceptionId` (navigation) |
-| Route | `/partners/partner-reconciliation-exception-management-ptr-047` |
-
-#### Inputs: what the user enters or picks
-
-**Form: Act on partner reconciliation exception** (modal, opened by *Act on partner reconciliation exception*; *Act on partner reconciliation exception* calls `actOnPartnerReconciliationException`, *Cancel* sends nothing)
-
-**Collects what `actOnPartnerReconciliationException` sends before it is called.** Required: `action`. Optional: `assigneePrincipalId`, `adjustmentRef`, `note`. Dismissing sends nothing; the screen behind is unchanged.
-
-`actOnPartnerReconciliationException` is not in any contract: draw the form greyed and list it in FINDINGS.md.
-
-Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
-
-#### Outputs: what the screen shows and produces
-
-**Shown**
-
-**Records Reconciled** (metric tile, from `listPartnerReconciliationException`)
-
-**Unmatched Orders** (metric tile, from `listPartnerReconciliationException`)
-
-**Amount Mismatches** (metric tile, from `listPartnerReconciliationException`)
-
-**Missing Tickets** (metric tile, from `listPartnerReconciliationException`)
-
-**Pricing Differences** (metric tile, from `listPartnerReconciliationException`)
-
-**Commission Differences** (metric tile, from `listPartnerReconciliationException`)
-
-**Payment Differences** (metric tile, from `listPartnerReconciliationException`)
-
-**Pending Investigation** (metric tile, from `listPartnerReconciliationException`)
-
-**Every partner reconciliation exception** (data table, from `listPartnerReconciliationException`)
-
-**The selected partner reconciliation exception** (detail panel): The pack groups this record's detail under its own headings: “Partner Orders”, “Partner Reference OTA-82714”, “Exception Types”.
-
-**Permissions this screen separates** (banner): **The pack separates these permissions and no action on the screen claims them yet:** Match, Correct, Accept Difference, Create Adjustment, Assign, Escalate, Dispute. Each needs attaching to the control it gates, or the screen needs the control.
-
-**Actions and what each produces**
-
-| Action | Calls | Sends | On success returns | Errors to show | Notes |
-|---|---|---|---|---|---|
-| Act on partner reconciliation exception (primary button) | `actOnPartnerReconciliationException` (not in any contract) | — | — | — | — |
-
-**Data it reads**: `listPartnerReconciliationException` (onLoad, Partner Reconciliation & Exception Management)
-
-**Where the user goes next**
-
-- → `PTR-042` Partner Operations Command Center: *Returns to the board's landing screen*; calls `listPartnerReconciliationException`
-
-#### States
-
-| State | What it shows |
-|---|---|
-| Loading (`?state=loading`) | The partner reconciliation exception list. |
-| Error (`?state=error`) | Could not load. Names which read failed and leaves the partner reconciliation exception untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No partner reconciliation exception yet. Carries the create action; distinct from a filter that matched nothing. |
-| Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the partner reconciliation exception are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| Offline (`?state=offline`) | online only |
-
-#### Permissions
-
-**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
-
-#### Requirements it meets
-
-No matrix row traces to this screen's operations or data.
-
-#### Client meeting inputs
-
-For this screen, newest first. An **Open question** is built to the default it states. Where an item disagrees with the fields above, the item wins.
-
-- Operations dashboard per partner: order volume, revenue, reservations and tickets on hold (booked but not yet issued). Cancellations/refund requests, statement of account (opening/closing balance, activity), reconciliation exceptions and disputes are tracked from this view. *(client request · MoM 31 Aug 2026, 4.5 B2B Day-to-Day Operations & Settlement · DI-557)*
-
-Also apply: 12 for all of P10, 29 for every app (section *Design inputs from the client meetings* below).
-
-#### Workshop task tracker
-
-No tracker row concerns this screen; the rows for its platform are listed once, below.
-
-#### References
-
-- Wireframe frame: `wireframes/P10 Partner Web.dc.html#ptr-047` · status **notStarted** · provenance generated
-- Client workshop board: `wireframes/WS40 B2B, Reseller & OTA Partner Management Board 3.dc.html#ptr-047`
-- Workshop pack: B2B, Reseller & OTA Partner Management_Reference.pdf board 3
-- Flow F132 *B2B, Reseller & OTA Partner Management board 3: Partner Operations Command …*, step 10: Works in Partner Reconciliation & Exception Management → Reconcile operational bookings against financial and channel records and identify discrepancies.
-
-#### Acceptance for the design
-
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
-- [ ] Every state opens from `#PTR-047?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: Act on partner reconciliation exception.
-- [ ] Every transition is wired: `PTR-042`.
-- [ ] Sign-in is asked only where the spec asks for it.
-- [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
-- [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
-
----
-
-### `PTR-048` Commission Calculation & Settlement Management
-
-**Calculate, approve and settle commission or incentive amounts owed under partner commercial agreements.**
-
-| | |
-|---|---|
-| App · platform | TICVAI Control · P10 Partner Web (web) |
-| Module | Partners · wave 3 · needs the `partner` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | partner; in the flows as partner |
-| Device and orientation | web · LTR and RTL · light theme |
-| Pattern | listDetail (compact density): the pack gives this screen a display directory (§Display) and no metric row |
-| Offline | online only |
-| Opens with | `lineId` (navigation), `batchId` (navigation) |
-| Route | `/partners/commission-calculation-settlement-management-ptr-048` |
-
-**Known gaps.** **The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Per Transaction. Each needs an operation, or needs removing from the screen; this is the Phase 3 …
-
-#### Inputs: what the user enters or picks
-
-**Form: Act on partner commission line** (modal, opened by *Act on partner commission line*; *Act on partner commission line* calls `actOnPartnerCommissionLine`, *Cancel* sends nothing)
-
-**Collects what `actOnPartnerCommissionLine` sends before it is called.** Required: `action`. Optional: `reason`, `caseId`. Dismissing sends nothing; the screen behind is unchanged.
-
-`actOnPartnerCommissionLine` is not in any contract: draw the form greyed and list it in FINDINGS.md.
-
-**Form: Act on partner settlement batch** (modal, opened by *Act on partner settlement batch*; *Act on partner settlement batch* calls `actOnPartnerSettlementBatch`, *Cancel* sends nothing)
-
-**Collects what `actOnPartnerSettlementBatch` sends before it is called.** Required: `action`. Optional: `scheduledDate`, `reason`, `caseId`. Dismissing sends nothing; the screen behind is unchanged.
-
-`actOnPartnerSettlementBatch` is not in any contract: draw the form greyed and list it in FINDINGS.md.
-
-Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
-
-#### Outputs: what the screen shows and produces
-
-**Shown**
-
-**Commission Earned** (metric tile, from `listCommissionCalculationSettlement`)
-
-**Commission Pending** (metric tile, from `listCommissionCalculationSettlement`)
-
-**Approved** (metric tile, from `listCommissionCalculationSettlement`)
-
-**On Hold** (metric tile, from `listCommissionCalculationSettlement`)
-
-**Paid** (metric tile, from `listCommissionCalculationSettlement`)
-
-**Reversed** (metric tile, from `listCommissionCalculationSettlement`)
-
-**Incentives Earned** (metric tile, from `listCommissionCalculationSettlement`)
-
-**Next Settlement date** (metric tile, from `listCommissionCalculationSettlement`)
-
-**Every commission calculation settlement** (data table, from `listCommissionCalculationSettlement`)
-
-**The selected commission calculation settlement** (detail panel): The pack groups this record's detail under its own headings: “For each transaction”, “Automatically account for”, “Exception states”, “Settlement Batch”, “Important Boundary”.
-
-**Actions and what each produces**
-
-| Action | Calls | Sends | On success returns | Errors to show | Notes |
-|---|---|---|---|---|---|
-| Per Transaction (primary button) | navigation or local | — | — | — | — |
-| Act on partner commission line (secondary button) | `actOnPartnerCommissionLine` (not in any contract) | — | — | — | — |
-| Act on partner settlement batch (secondary button) | `actOnPartnerSettlementBatch` (not in any contract) | — | — | — | — |
-
-**Data it reads**: `listCommissionCalculationSettlement` (onLoad, Commission Calculation & Settlement Management)
-
-**Where the user goes next**
-
-- → `PTR-042` Partner Operations Command Center: *Returns to the board's landing screen*; calls `listCommissionCalculationSettlement`
-
-#### States
-
-| State | What it shows |
-|---|---|
-| Loading (`?state=loading`) | The commission calculation settlement list. |
-| Error (`?state=error`) | Could not load. Names which read failed and leaves the commission calculation settlement untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No commission calculation settlement yet. Carries the create action; distinct from a filter that matched nothing. |
-| Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the commission calculation settlement are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| Offline (`?state=offline`) | online only |
-
-#### Permissions
-
-**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
-
-#### Requirements it meets
-
-No matrix row traces to this screen's operations or data.
-
-#### Client meeting inputs
-
-None names this screen.
-
-Also apply: 12 for all of P10, 29 for every app (section *Design inputs from the client meetings* below).
-
-#### Workshop task tracker
-
-No tracker row concerns this screen; the rows for its platform are listed once, below.
-
-#### References
-
-- Wireframe frame: `wireframes/P10 Partner Web.dc.html#ptr-048` · status **notStarted** · provenance generated
-- Client workshop board: `wireframes/WS40 B2B, Reseller & OTA Partner Management Board 3.dc.html#ptr-048`
-- Workshop pack: B2B, Reseller & OTA Partner Management_Reference.pdf board 3
-- Flow F132 *B2B, Reseller & OTA Partner Management board 3: Partner Operations Command …*, step 12: Works in Commission Calculation & Settlement Management → Calculate, approve and settle commission or incentive amounts owed under partner commercial agreements.
-
-#### Acceptance for the design
-
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
-- [ ] Every state opens from `#PTR-048?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: Per Transaction, Act on partner commission line, Act on partner settlement batch.
-- [ ] Every transition is wired: `PTR-042`.
-- [ ] Sign-in is asked only where the spec asks for it.
-- [ ] The module and platform inputs below are applied.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -975,7 +1155,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | App · platform | TICVAI Control · P10 Partner Web (web) |
 | Module | Partners · wave 3 · needs the `partner` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | partner; in the flows as partner |
+| Who uses it | partner staff holding `CASE_MANAGE`, `PLATFORM_TENANT_VIEW` (1 configure, 1 read); in the flows as partner |
 | Device and orientation | web · LTR and RTL · light theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Monitor) and no metric row |
 | Offline | online only |
@@ -984,21 +1164,66 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Known gaps.** **The pack names 8 actions on this screen; 6 are served since the writers pass (29 September): Booking Dispute, Pricing Dispute, Credit Dispute, Ticket Issue, Allocation Issue, API Issue by …
 
+**From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** Partner disputes and cases by type with SLA.
+
+**Fixed on main** (the package already carries these; draw what it says): Case types drawn as buttons. (CHG-SOT-015); formCreatePartnerCase asks the person for status, id. (CHG-SOT-015).
+
 #### Inputs: what the user enters or picks
+
+**On the screen**
+
+| Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
+|---|---|---|---|---|---|---|---|
+| Case type | select field | — | — | — | — | Chosen when creating a case (`createPartnerCase.category`). Options: Booking Dispute; Pricing Dispute; Credit Dispute; Ticket Issue; Allocation Issue; API Issue; Finance review; Technical review. | — |
+
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Partner | picker: choose a partner | — | — | `listPartnerDisputeCase` ?partnerId |
+| Category | select | — | Booking dispute · Pricing dispute · Commission dispute · Credit dispute · Invoice dispute · Cancellation dispute · Ticket issue · Allocation issue · API issue · Settlement dispute | `listPartnerDisputeCase` ?category |
+| Status | select | — | Open · Assigned · Investigating · Waiting partner · Waiting internal · Resolution proposed · Resolved · Closed | `listPartnerDisputeCase` ?status |
+| Priority | radio group | — | Low · Medium · High · Urgent | `listPartnerDisputeCase` ?priority |
+| Owner | text field | — | — | `listPartnerDisputeCase` ?owner |
+| Sla breach | toggle | — | — | `listPartnerDisputeCase` ?slaBreach |
 
 **Form: Create partner case** (modal, opened by *Create partner case*; *Create partner case* calls `createPartnerCase`, *Cancel* sends nothing)
 
-**Collects what `createPartnerCase` sends before it is called.** Required: `id`, `partnerId`, `category`, `priority`, `description`, `status`, `resolutionTargetAt`. Optional: `contactId`, `orderId`, `invoiceReference`, `settlementBatchId`, `amountInDispute`, `evidence`, `ownerPrincipalId`, `slaPolicyId`, `firstResponseAt`, `resolvedAt`, `scopePath`. Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `createPartnerCase` sends before it is called.** The person picks the **case type** (booking dispute, pricing dispute, credit dispute, ticket issue, allocation issue, API issue) and the priority, describes it and links the order, invoice or settlement batch; `partnerId` comes from the session; the owner, SLA policy, resolution target and response times are the server's. Never `id` or `status`: an id is a client UUIDv7 generated silently and the status and timestamps are the server's (design-notes correction, CHG-SOT-015). Dismissing sends nothing; the screen behind is unchanged.
 
-`createPartnerCase` is not in any contract: draw the form greyed and list it in FINDINGS.md.
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Partner `partnerId` | picker: choose a partner | required | — | — | shows names, sends the id | The partner (control.partner). | `createPartnerCase` body |
+| Contact `contactId` | picker: choose a contact | optional | — | — | shows names, sends the id | Partner contact (control.partner_contact). | `createPartnerCase` body |
+| Category `category` | select | required | — | Booking dispute · Pricing dispute · Commission dispute · Credit dispute · Invoice dispute · Cancellation dispute · Ticket issue · Allocation issue · API issue · Settlement dispute | — | Category. | `createPartnerCase` body |
+| Priority `priority` | radio group | required | — | Low · Medium · High · Urgent | — | Priority (decided 29 September, readiness close-out). | `createPartnerCase` body |
+| Order `orderId` | picker: choose an order | optional | — | — | shows names, sends the id | Related order (orders.sales_order). | `createPartnerCase` body |
+| Invoice reference `invoiceReference` | text field | optional | — | — | — | Related invoice number. | `createPartnerCase` body |
+| Settlement batch `settlementBatchId` | picker: choose a settlement batch | optional | — | — | shows names, sends the id | Related settlement (control.partner_settlement_batch). | `createPartnerCase` body |
+| Amount in dispute `amountInDispute` | money field | optional | — | — | AED, 2 decimals shown (up to 4 accepted), currency from the … | Amount in dispute. | `createPartnerCase` body |
+| Description `description` | text area | required | — | — | — | Description. | `createPartnerCase` body |
+| Evidence `evidence` | list of values (chips) | optional | — | — | — | Evidence: attachment references. | `createPartnerCase` body |
+| Owner principal `ownerPrincipalId` | picker: choose an owner principal | optional | — | — | shows names, sends the id | Owner, a staff principal. | `createPartnerCase` body |
+| Sla policy `slaPolicyId` | picker: choose a sla policy | optional | — | — | shows names, sends the id | The SLA policy applied (approvals.sla_policy, the approvals engine's ApprovalSlaPolicy), which sets the first-response and resolution targets and the reminder/breach behaviour … | `createPartnerCase` body |
+| First response at `firstResponseAt` | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | First response at. | `createPartnerCase` body |
+| Resolved at `resolvedAt` | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | Resolved at. | `createPartnerCase` body |
+| Scope path `scopePath` | text field | optional | — | — | — | The partition key (ADR-0005), written at `tenant` scope. | `createPartnerCase` body |
+
+Errors to draw in the form: 422 A money category with nothing named, or an unknown SLA policy
 
 **Form: Act on partner case** (modal, opened by *Act on partner case*; *Act on partner case* calls `actOnPartnerCase`, *Cancel* sends nothing)
 
 **Collects what `actOnPartnerCase` sends before it is called.** Required: `action`. Optional: `ownerPrincipalId`, `resolution`, `reason`, `note`. Dismissing sends nothing; the screen behind is unchanged.
 
-`actOnPartnerCase` is not in any contract: draw the form greyed and list it in FINDINGS.md.
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Action `action` | select | required | — | Assign · Start investigation · Wait for partner · Partner responded · Wait for internal · Internal responded · Propose resolution · Accept resolution · Reject resolution · Reopen · Close without investigation | — | — | `actOnPartnerCase` body |
+| Owner principal `ownerPrincipalId` | picker: choose an owner principal | optional | — | — | shows names, sends the id | For assign | `actOnPartnerCase` body |
+| Resolution `resolution` | text field | optional | — | — | — | For proposeResolution, the adjustment, credit, correction or no-change reason proposed | `actOnPartnerCase` body |
+| Reason `reason` | text area | optional | — | — | — | For rejectResolution, reopen and closeWithoutInvestigation | `actOnPartnerCase` body |
+| Note `note` | text area | optional | — | — | — | Message kept on the case trail | `actOnPartnerCase` body |
 
-Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+Errors to draw in the form: 404 No such case; 409 The action does not fit the case's status, or the reopening window has passed; 422 A field the action needs is missing
 
 #### Outputs: what the screen shows and produces
 
@@ -1008,34 +1233,26 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 | Shows | Format | Notes |
 |---|---|---|
-| First response | text | not in the schema: `PartnerDisputesCasesServiceManagementView.firstResponse` |
-| Resolution target | text | not in the schema: `PartnerDisputesCasesServiceManagementView.resolutionTarget` |
-| Time open | text | not in the schema: `PartnerDisputesCasesServiceManagementView.timeOpen` |
-| Sla breach | text | not in the schema: `PartnerDisputesCasesServiceManagementView.slaBreach` |
+| First response | 1 Oct 2026, 14:30 | First Response at |
+| Resolution target | 1 Oct 2026, 14:30 | Resolution Target |
+| Time open | 1,234 | Time Open, hours |
+| Sla breach | yes / no (icon or chip) | SLA Breach |
 
 **The selected partner disputes cases** (detail panel)
 
 | Shows | Format | Notes |
 |---|---|---|
-| First response | text | not in the schema: `PartnerDisputesCasesServiceManagementView.firstResponse` |
-| Resolution target | text | not in the schema: `PartnerDisputesCasesServiceManagementView.resolutionTarget` |
-| Time open | text | not in the schema: `PartnerDisputesCasesServiceManagementView.timeOpen` |
-| Sla breach | text | not in the schema: `PartnerDisputesCasesServiceManagementView.slaBreach` |
+| First response | 1 Oct 2026, 14:30 | First Response at |
+| Resolution target | 1 Oct 2026, 14:30 | Resolution Target |
+| Time open | 1,234 | Time Open, hours |
+| Sla breach | yes / no (icon or chip) | SLA Breach |
 
 **Actions and what each produces**
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Booking Dispute (primary button) | navigation or local | — | — | — | — |
-| Pricing Dispute (secondary button) | navigation or local | — | — | — | — |
-| Credit Dispute (secondary button) | navigation or local | — | — | — | — |
-| Ticket Issue (secondary button) | navigation or local | — | — | — | — |
-| Allocation Issue (secondary button) | navigation or local | — | — | — | — |
-| API Issue (secondary button) | navigation or local | — | — | — | — |
-| Finance review (secondary button) | navigation or local | — | — | — | — |
-| Technical review (secondary button) | navigation or local | — | — | — | — |
-| Create partner case (secondary button) | `createPartnerCase` (not in any contract) | — | — | — | — |
-| Act on partner case (secondary button) | `actOnPartnerCase` (not in any contract) | — | — | — | — |
+| Create partner case (secondary button) | `createPartnerCase` POST `/partner-cases` | PartnerCase | PartnerCase | 422 A money category with nothing named, or an unknown SLA policy | gated `CASE_MANAGE`; opens modal first |
+| Act on partner case (secondary button) | `actOnPartnerCase` POST `/partner-cases/{caseId}/actions` | inline | PartnerCase | 404 No such case; 409 The action does not fit the case's status, or the reopening window has passed; 422 A field the action needs is missing | gated `CASE_MANAGE`; opens modal first |
 
 **Data it reads**: `listPartnerDisputeCase` (onLoad, Partner Disputes, Cases & Service Management)
 
@@ -1053,8 +1270,32 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the partner disputes cases are still there. The pack's own statuses are Proposed → Resolved → Closed — the state names which is selected. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+| Validation and conflict | the form keeps what was entered and marks the problem: 409 The action does not fit the case's status, or the reopening window has passed; 422 A field the action needs is missing; 422 A money category with nothing named, or an unknown SLA policy |
+
+#### Edge cases to draw
+
+- **Can read but not change (holds PLATFORM_TENANT_VIEW only)**: Everything reads; the actions needing another permission are not offered as live buttons: CASE_MANAGE for Create partner case, Act on partner case. Where the person would reasonably expect the action, it shows disabled with the permission named. The server refuses with 403 forbidden regardless. *(source: contracts/satellite/subscription.yaml#createPartnerCase)*
+- **createPartnerCase answers 422**: Show it as something the person can act on, not a failure: A money category with nothing named, or an unknown SLA policy *(source: contracts/satellite/subscription.yaml#createPartnerCase)*
+- **actOnPartnerCase answers 409**: Show it as something the person can act on, not a failure: The action does not fit the case's status, or the reopening window has passed *(source: contracts/satellite/subscription.yaml#actOnPartnerCase)*
+- **actOnPartnerCase answers 422**: Show it as something the person can act on, not a failure: A field the action needs is missing *(source: contracts/satellite/subscription.yaml#actOnPartnerCase)*
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+case: PC-2026-0091
+type: Pricing dispute
+partner: Arabian Trails
+firstResponse: 2 h
+status: open
+```
 
 #### Permissions
+
+- `listPartnerDisputeCase` → `PLATFORM_TENANT_VIEW` (read) · partner
+- `createPartnerCase` → `CASE_MANAGE` (configure) · staff, partner
+- `actOnPartnerCase` → `CASE_MANAGE` (configure) · staff, partner
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -1079,17 +1320,18 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Wireframe frame: `wireframes/P10 Partner Web.dc.html#ptr-049` · status **notStarted** · provenance generated
 - Client workshop board: `wireframes/WS40 B2B, Reseller & OTA Partner Management Board 3.dc.html#ptr-049`
 - Workshop pack: B2B, Reseller & OTA Partner Management_Reference.pdf board 3
-- Flow F132 *B2B, Reseller & OTA Partner Management board 3: Partner Operations Command …*, step 14: Works in Partner Disputes, Cases & Service Management → Provide a structured case-management environment for partner operational and commercial disputes.
+- Flow F132 *B2B, Reseller & OTA Partner Management board 3: Partner Operations Command …*, step 10: Works in Partner Disputes, Cases & Service Management → Provide a structured case-management environment for partner operational and commercial disputes.
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
+- [ ] Every input above is drawn (21), with its required mark, default, format and its error state (404, 409, 422).
 - [ ] Every output is drawn (8 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#PTR-049?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: Booking Dispute, Pricing Dispute, Credit Dispute, Ticket Issue, Allocation Issue, API Issue, Finance review, Technical review, Create partner case, Act on partner case.
+- [ ] Every action is wired with its success and its failure: Create partner case, Act on partner case.
 - [ ] Every transition is wired: `PTR-042`.
-- [ ] Sign-in is asked only where the spec asks for it.
+- [ ] Every gated control is gated: `CASE_MANAGE`, `PLATFORM_TENANT_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 4 edge case(s) from the process notes are drawn.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -1103,14 +1345,29 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | App · platform | TICVAI Control · P10 Partner Web (web) |
 | Module | Partners · wave 3 · needs the `partner` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | partner; in the flows as partner |
+| Who uses it | partner staff holding `PLATFORM_TENANT_VIEW` (1 read); in the flows as partner |
 | Device and orientation | web · LTR and RTL · light theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Show) and no metric row |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/partners/partner-performance-scorecard-risk-monitoring-ptr-050` |
 
+**From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** A consistent partner scorecard (sales, cancellations, payment behaviour, compliance) with risk.
+
+**Fixed on main** (the package already carries these; draw what it says): emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything. (CHG-SOT-015).
+
 #### Inputs: what the user enters or picks
+
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Partner | picker: choose a partner | — | — | `listPartnerPerformanceScorecard` ?partnerId |
+| Partner type | text field | — | — | `listPartnerPerformanceScorecard` ?partnerType |
+| Market | text field | — | — | `listPartnerPerformanceScorecard` ?market |
+| Risk rating | radio group | — | Low · Medium · High · Critical | `listPartnerPerformanceScorecard` ?riskRating |
+| Trend | segmented control | — | Improving · Stable · Declining | `listPartnerPerformanceScorecard` ?trend |
+| Period | text field | — | — | `listPartnerPerformanceScorecard` ?period |
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
 
@@ -1122,13 +1379,13 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 | Shows | Format | Notes |
 |---|---|---|
-| Trend | text | not in the schema: `PartnerPerformanceScorecardRiskMonitoringView.trend` |
+| Trend | chip: Improving, Stable, Declining | Trend |
 
 **The selected partner performance scorecard** (detail panel): The pack groups this record's detail under its own headings: “Commercial”, “Allocation”, “Financial”, “Operational”, “Technical”, “Compliance”.
 
 | Shows | Format | Notes |
 |---|---|---|
-| Trend | text | not in the schema: `PartnerPerformanceScorecardRiskMonitoringView.trend` |
+| Trend | chip: Improving, Stable, Declining | Trend |
 
 **Data it reads**: `listPartnerPerformanceScorecard` (onLoad, Partner Performance Scorecard & Risk Monitoring)
 
@@ -1142,12 +1399,32 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |---|---|
 | Loading (`?state=loading`) | The partner performance scorecard list. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the partner performance scorecard untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No partner performance scorecard yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, first run (`?state=emptyFirstRun`) | No scorecard yet: a partner is scored after its first full period of trading. Offers no create action. |
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the partner performance scorecard are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+listPartnerPerformanceScorecard (PartnerPerformanceScorecardRiskMonitoringView):
+- growth: 12
+  margin: 12
+  utilization: 12
+  sellThrough: 12
+  returnedInventory: 12
+- growth: 3
+  margin: 3
+  utilization: 3
+  sellThrough: 3
+  returnedInventory: 3
+```
+
 #### Permissions
+
+- `listPartnerPerformanceScorecard` → `PLATFORM_TENANT_VIEW` (read) · partner
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -1172,7 +1449,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Wireframe frame: `wireframes/P10 Partner Web.dc.html#ptr-050` · status **notStarted** · provenance generated
 - Client workshop board: `wireframes/WS40 B2B, Reseller & OTA Partner Management Board 3.dc.html#ptr-050`
 - Workshop pack: B2B, Reseller & OTA Partner Management_Reference.pdf board 3
-- Flow F132 *B2B, Reseller & OTA Partner Management board 3: Partner Operations Command …*, step 16: Works in Partner Performance Scorecard & Risk Monitoring → Create a consistent scorecard for evaluating the quality and commercial value of every partner relationship.
+- Flow F132 *B2B, Reseller & OTA Partner Management board 3: Partner Operations Command …*, step 12: Works in Partner Performance Scorecard & Risk Monitoring → Create a consistent scorecard for evaluating the quality and commercial value of every partner relationship.
 
 #### Acceptance for the design
 
@@ -1181,7 +1458,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every state opens from `#PTR-050?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `PTR-042`.
-- [ ] Sign-in is asked only where the spec asks for it.
+- [ ] Every gated control is gated: `PLATFORM_TENANT_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -1196,14 +1473,27 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | App · platform | TICVAI Control · P10 Partner Web (web) |
 | Module | Partners · wave 3 · needs the `partner` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | partner; in the flows as partner |
+| Who uses it | partner staff holding `PLATFORM_TENANT_VIEW` (1 read); in the flows as partner |
 | Device and orientation | web · LTR and RTL · light theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Analyze) and no metric row |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/partners/partner-ai-intelligence-relationship-optimization-ptr-051` |
 
+**From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** AI insights across the partner lifecycle with the inputs considered.
+
+**Fixed on main** (the package already carries these; draw what it says): emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything. (CHG-SOT-015).
+
 #### Inputs: what the user enters or picks
+
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Partner | picker: choose a partner | — | — | `listPartnerRelationship` ?partnerId |
+| Category | radio group | — | Commercial · Allocation · Credit · Risk · Growth | `listPartnerRelationship` ?category |
+| Opportunity class | radio group | — | Grow · Maintain · Review · Restrict | `listPartnerRelationship` ?opportunityClass |
+| Status | radio group | — | Open · Accepted · Modified · Rejected · Assigned | `listPartnerRelationship` ?status |
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
 
@@ -1215,13 +1505,13 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 | Shows | Format | Notes |
 |---|---|---|
-| Inputs considered | text | not in the schema: `PartnerAiIntelligenceRelationshipOptimizationView.inputsConsidered` |
+| Inputs considered | list or chips (count when long) | AI Inputs the recommendation drew on |
 
 **The selected partner intelligence relationship** (detail panel): The pack groups this record's detail under its own headings: “Commercial”, “Allocation”, “Credit”, “Risk”, “Growth”, “Natural-Language Analysis”.
 
 | Shows | Format | Notes |
 |---|---|---|
-| Inputs considered | text | not in the schema: `PartnerAiIntelligenceRelationshipOptimizationView.inputsConsidered` |
+| Inputs considered | list or chips (count when long) | AI Inputs the recommendation drew on |
 
 **Data it reads**: `listPartnerRelationship` (onLoad, Partner AI Intelligence & Relationship Optimization)
 
@@ -1231,12 +1521,28 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |---|---|
 | Loading (`?state=loading`) | The partner intelligence relationship list. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the partner intelligence relationship untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No partner intelligence relationship yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, first run (`?state=emptyFirstRun`) | No recommendations yet: there is not enough partner history to learn from. Offers no create action. |
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the partner intelligence relationship are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+listPartnerRelationship (PartnerAiIntelligenceRelationshipOptimizationView):
+- reason: Guest charged twice at Main Gate Till 3
+  confidence: 12
+  category: commercial
+- reason: Group of 40 from Desert Gate Tours
+  confidence: 3
+  category: allocation
+```
+
 #### Permissions
+
+- `listPartnerRelationship` → `PLATFORM_TENANT_VIEW` (read) · partner
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -1261,7 +1567,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Wireframe frame: `wireframes/P10 Partner Web.dc.html#ptr-051` · status **notStarted** · provenance generated
 - Client workshop board: `wireframes/WS40 B2B, Reseller & OTA Partner Management Board 3.dc.html#ptr-051`
 - Workshop pack: B2B, Reseller & OTA Partner Management_Reference.pdf board 3
-- Flow F132 *B2B, Reseller & OTA Partner Management board 3: Partner Operations Command …*, step 18: Works in Partner AI Intelligence & Relationship Optimization → Provide TICVAI's AI decision-support layer across the complete partner lifecycle. This screen should combine information from Boards 1, 2 and 3.
+- Flow F132 *B2B, Reseller & OTA Partner Management board 3: Partner Operations Command …*, step 14: Works in Partner AI Intelligence & Relationship Optimization → Provide TICVAI's AI decision-support layer across the complete partner lifecycle. This screen should combine information from Boards 1, 2 and 3.
 
 #### Acceptance for the design
 
@@ -1270,7 +1576,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every state opens from `#PTR-051?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] No transition is declared; back returns where the user came from.
-- [ ] Sign-in is asked only where the spec asks for it.
+- [ ] Every gated control is gated: `PLATFORM_TENANT_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -1348,7 +1654,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Primary button spec: height 40px, padding 12px 24px, radius 8px, Inter 14 Semibold, colour #0D6EFD, width auto. *(agreed · Design Vision Book 29 Jul 2026, 09 Deliverables (p9) - Developer Handoff preview · DI-037)*
 - Dynamic KPIs, forecasts and real-time insights; role-based dashboards, preferences and smart shortcuts for every user (e.g. greeting "Good morning, Ahmed" on the home screen, p2). *(agreed · Design Vision Book 29 Jul 2026, 03 Visual Direction (p3) - Smarter Data / Personalized Experience · DI-028)*
 
-**9 more name particular screens** and are in each screen's block above (*Client meeting inputs*).
+**8 more name particular screens** and are in each screen's block above (*Client meeting inputs*).
 
 ---
 
@@ -1362,7 +1668,18 @@ Method, path, parameters, request and response for every operation these screens
 
 ```json
 {
-
+"actOnPartnerCase": {"method":"POST","path":"/partner-cases/{caseId}/actions","contract":"subscription","summary":"Work a partner case","permission":"CASE_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"PartnerCase"},
+"createPartnerCase": {"method":"POST","path":"/partner-cases","contract":"subscription","summary":"Open a partner dispute or service case","permission":"CASE_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"PartnerCase","responds":"PartnerCase"},
+"createPartnerChangeRequest": {"method":"POST","path":"/partner-change-requests","contract":"subscription","summary":"A partner asks to cancel or amend a booking","permission":"ORDER_MODIFY","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null},{"name":"dryRun","in":"query","required":false}],"requestBody":"PartnerChangeRequestInput","responds":"PartnerChangeRequest"},
+"listPartner": {"method":"GET","path":"/partner","contract":"subscription","summary":"Partner Management Command Center","permission":"PLATFORM_TENANT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":"brand","in":"query","required":false},{"name":"venue","in":"query","required":false},{"name":"accountManager","in":"query","required":false},{"name":"status","in":"query","required":false},{"name":"risk","in":"query","required":false},{"name":"integrationType","in":"query","required":false},{"name":"partnerType","in":"query","required":false},{"name":"country","in":"query","required":false},{"name":"territory","in":"query","required":false},{"name":"agreementStatus","in":"query","required":false},{"name":"creditStatus","in":"query","required":false},{"name":"search","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
+"listPartner2": {"method":"GET","path":"/partner-2","contract":"subscription","summary":"Partner Operations Command Center","permission":"PLATFORM_TENANT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":"venue","in":"query","required":false},{"name":"event","in":"query","required":false},{"name":"market","in":"query","required":false},{"name":"channel","in":"query","required":false},{"name":"from","in":"query","required":false},{"name":"to","in":"query","required":false},{"name":"partnerId","in":"query","required":false},{"name":"partnerType","in":"query","required":false},{"name":"accountManager","in":"query","required":false},{"name":"operationalStatus","in":"query","required":false},{"name":"risk","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
+"listPartnerCancellationRefund": {"method":"GET","path":"/partner-cancellation-refund","contract":"subscription","summary":"Partner Cancellations, Refunds & Amendments","permission":"PLATFORM_TENANT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":"partnerId","in":"query","required":false},{"name":"requestType","in":"query","required":false},{"name":"status","in":"query","required":false},{"name":"from","in":"query","required":false},{"name":"to","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
+"listPartnerDisputeCase": {"method":"GET","path":"/partner-dispute-case","contract":"subscription","summary":"Partner Disputes, Cases & Service Management","permission":"PLATFORM_TENANT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":"partnerId","in":"query","required":false},{"name":"category","in":"query","required":false},{"name":"status","in":"query","required":false},{"name":"priority","in":"query","required":false},{"name":"owner","in":"query","required":false},{"name":"slaBreach","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
+"listPartnerOrderBooking": {"method":"GET","path":"/partner-order-booking","contract":"subscription","summary":"Partner Orders & Booking Management","permission":"PLATFORM_TENANT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":"partner","in":"query","required":false},{"name":"partnerOrderReference","in":"query","required":false},{"name":"ticvaiOrderId","in":"query","required":false},{"name":"event","in":"query","required":false},{"name":"venue","in":"query","required":false},{"name":"product","in":"query","required":false},{"name":"bookingDate","in":"query","required":false},{"name":"visitEventDate","in":"query","required":false},{"name":"status","in":"query","required":false},{"name":"agent","in":"query","required":false},{"name":"channel","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
+"listPartnerPerformanceScorecard": {"method":"GET","path":"/partner-performance-scorecard","contract":"subscription","summary":"Partner Performance Scorecard & Risk Monitoring","permission":"PLATFORM_TENANT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":"partnerId","in":"query","required":false},{"name":"partnerType","in":"query","required":false},{"name":"market","in":"query","required":false},{"name":"riskRating","in":"query","required":false},{"name":"trend","in":"query","required":false},{"name":"period","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
+"listPartnerRelationship": {"method":"GET","path":"/partner-relationship","contract":"subscription","summary":"Partner AI Intelligence & Relationship Optimization","permission":"PLATFORM_TENANT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":"partnerId","in":"query","required":false},{"name":"category","in":"query","required":false},{"name":"opportunityClass","in":"query","required":false},{"name":"status","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
+"listPartnerStatementAccount": {"method":"GET","path":"/partner-statement-account","contract":"subscription","summary":"Partner Statement & Account Activity","permission":"PLATFORM_TENANT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":"partnerId","in":"query","required":false},{"name":"period","in":"query","required":false},{"name":"from","in":"query","required":false},{"name":"to","in":"query","required":false},{"name":"transactionType","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
+"listReservationHoldRelease": {"method":"GET","path":"/reservation-hold-release","contract":"subscription","summary":"Reservations, Holds & Release Management","permission":"PLATFORM_TENANT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":"partnerId","in":"query","required":false},{"name":"event","in":"query","required":false},{"name":"status","in":"query","required":false},{"name":"expiringBefore","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"}
 }
 ```
 
@@ -1372,6 +1689,23 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
-
+"Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}},
+"PartnerAgreementStatus": {"type":"string","enum":["pendingApproval","active","expiringSoon","expired","suspended","terminated"]},
+"PartnerAiIntelligenceRelationshipOptimizationView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over subscription state, assembled at read time from tables that already exist","description":"**What Partner AI Intelligence & Relationship Optimization displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"recommendation":{"type":"string","description":"Recommendation"},"reason":{"type":"string","description":"Reason"},"expectedImpact":{"type":"string","description":"Expected Impact"},"confidence":{"type":"number","description":"Confidence, 0-1"},"risks":{"type":"array","items":{"type":"string"},"description":"Risks"},"supportingMetrics":{"type":"array","description":"Supporting Metrics","items":{"type":"object","properties":{"name":{"type":"string"},"value":{"type":"string"}}}},"recommendationId":{"type":"string","format":"uuid","description":"Recommendation id"},"partnerId":{"type":"string","format":"uuid","description":"Partner"},"partner":{"type":"string","description":"Partner trading name"},"category":{"type":"string","enum":["commercial","allocation","credit","risk","growth"],"description":"Recommendation category"},"opportunityClass":{"type":"string","enum":["grow","maintain","review","restrict"],"description":"Partner Opportunity Matrix class, from configurable business criteria"},"inputsConsidered":{"type":"array","items":{"type":"string","enum":["partnerProfile","territory","agreements","rates","commission","credit","paymentBehavior","allocation","orders","cancellations","settlement","cases","channelPerformance","historicalTrends"]},"description":"AI Inputs the recommendation drew on"},"scenarioEstimate":{"type":"object","nullable":true,"description":"Scenario Simulation estimate, where the recommendation carries one","properties":{"additionalSales":{"type":"integer"},"revenue":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"margin":{"type":"number"},"creditExposure":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"inventoryRisk":{"type":"string"}}},"status":{"type":"string","description":"Recommendation status: open, accepted, modified, rejected, assigned"},"createdAt":{"type":"string","format":"date-time","description":"Generated at"}}},
+"PartnerCancellationsRefundsAmendmentsView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over control.partner_change_request (PartnerChangeRequest) and the existing subscription state, assembled at read time (data model DM4)","description":"**What Partner Cancellations, Refunds & Amendments displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"originalState":{"type":"string","description":"Audit: original state of the booking (summary)"},"newState":{"type":"string","description":"Audit: new state of the booking (summary)","nullable":true},"requestedBy":{"type":"string","description":"Audit: requesting user"},"reason":{"type":"string","description":"Reason"},"financialImpact":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Financial impact (net change to the partner account)"},"approvedBy":{"type":"string","description":"Approved by","nullable":true},"requestId":{"type":"string","format":"uuid","description":"Amendment request id"},"partnerId":{"type":"string","format":"uuid","description":"Partner"},"partner":{"type":"string","description":"Partner trading name"},"orderId":{"type":"string","format":"uuid","description":"Order"},"orderNumber":{"type":"string","description":"Order number"},"requestType":{"type":"string","enum":["fullCancellation","partialCancellation","dateChange","performanceChange","quantityReduction","productChange","ticketReissue","customerNameChange","refundRequest"],"description":"Request type"},"quantity":{"type":"integer","description":"Tickets affected","nullable":true},"originalValue":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Original Value"},"cancellationAllowed":{"type":"boolean","description":"Cancellation/change allowed under the evaluated policy"},"cancellationFee":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Cancellation Fee"},"refundOrCredit":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Refund/Credit to the partner"},"allocationImpact":{"type":"integer","description":"Allocation impact, units returned (+) or taken (-)"},"commissionAdjustment":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Commission Adjustment"},"approvalReasons":{"type":"array","items":{"type":"string","enum":["transactionValue","eventProximity","cancellationPercentage","partnerStatus","exceptionRequest"]},"description":"Why approval is required; empty when none"},"status":{"type":"string","description":"Status: requested, pendingApproval, approved, rejected, processed"},"requestedAt":{"type":"string","format":"date-time","description":"Requested at"},"aiInsights":{"type":"array","items":{"type":"string"},"description":"Advisory AI unusual-cancellation-pattern flags"}}},
+"PartnerCase": {"type":"object","x-ticvai-persistence":"control.partner_case","description":"A partner dispute or service case: category, priority, what it relates to, the amount in dispute, the evidence, the owner and the SLA. Partner cases stay apart from `marketing.case`, which is a guest's service case with a guest lifecycle (decided 29 September, data model DM4)\n\n**Written by** createPartnerCase and actOnPartnerCase (assign, investigate, wait on the partner or a team, propose, accept or reject a resolution, reopen, close) (decided 29 September, writers pass; DM4).","required":["id","partnerId","category","priority","description","status","resolutionTargetAt"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"partnerId":{"type":"string","format":"uuid","description":"The partner (control.partner)."},"contactId":{"type":"string","format":"uuid","nullable":true,"description":"Partner contact (control.partner_contact)."},"category":{"type":"string","enum":["bookingDispute","pricingDispute","commissionDispute","creditDispute","invoiceDispute","cancellationDispute","ticketIssue","allocationIssue","apiIssue","settlementDispute"],"description":"Category."},"priority":{"type":"string","enum":["low","medium","high","urgent"],"description":"Priority (decided 29 September, readiness close-out)."},"orderId":{"type":"string","format":"uuid","nullable":true,"description":"Related order (orders.sales_order)."},"invoiceReference":{"type":"string","nullable":true,"description":"Related invoice number."},"settlementBatchId":{"type":"string","format":"uuid","nullable":true,"description":"Related settlement (control.partner_settlement_batch)."},"amountInDispute":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"nullable":true,"description":"Amount in dispute."},"description":{"type":"string","description":"Description."},"evidence":{"type":"array","items":{"type":"string"},"description":"Evidence: attachment references."},"ownerPrincipalId":{"type":"string","format":"uuid","nullable":true,"description":"Owner, a staff principal."},"slaPolicyId":{"x-ticvai-references":"approvals.sla_policy","type":"string","format":"uuid","nullable":true,"description":"The SLA policy applied (approvals.sla_policy, the approvals engine's ApprovalSlaPolicy), which sets the first-response and resolution targets and the reminder/breach behaviour; `resolutionTargetAt` is computed from it when the case is opened. Replaces the free-text `slaPolicy` (decided 29 September, writers pass; DM4)"},"status":{"type":"string","enum":["open","assigned","investigating","waitingPartner","waitingInternal","resolutionProposed","resolved","closed"],"default":"open","readOnly":true,"description":"Status (states/partner-case.yaml). Created `open` by createPartnerCase and moved only by actOnPartnerCase (decided 29 September, writers pass; DM4)"},"firstResponseAt":{"type":"string","format":"date-time","nullable":true,"description":"First response at."},"resolutionTargetAt":{"type":"string","format":"date-time","readOnly":true,"description":"Resolution target, computed from the SLA policy (`slaPolicyId`) when the case is opened; time in `waitingPartner` extends it (decided 29 September, writers pass; DM4)"},"resolvedAt":{"type":"string","format":"date-time","nullable":true,"description":"Resolved at."},"scopePath":{"type":"string","description":"The partition key (ADR-0005), written at `tenant` scope."},"createdAt":{"type":"string","format":"date-time","readOnly":true},"updatedAt":{"type":"string","format":"date-time","readOnly":true}}},
+"PartnerChangeRequest": {"type":"object","x-ticvai-persistence":"control.partner_change_request","description":"A partner's request to cancel or amend a booking, with the outcome the policy evaluated: whether it is allowed, the fee, the refund or credit, and the allocation and commission impact. A refund it produces is an `orders.refund`; this row is the request and its evaluation (decided 29 September, data model DM4)\n\n**Written by** createPartnerChangeRequest, which creates the row and evaluates it against policy in the same call; approval, where needed, is decided in approvals and the order change is carried out in orders (decided 29 September, writers pass; DM4).","required":["id","partnerId","orderId","requestType","status","requestedAt"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"partnerId":{"type":"string","format":"uuid","description":"The partner (control.partner)."},"orderId":{"type":"string","format":"uuid","description":"Order (orders.sales_order)."},"requestType":{"type":"string","enum":["fullCancellation","partialCancellation","dateChange","performanceChange","quantityReduction","productChange","ticketReissue","customerNameChange","refundRequest"],"description":"Request type."},"quantity":{"type":"integer","minimum":0,"nullable":true,"description":"Tickets affected."},"reason":{"type":"string","nullable":true,"description":"Reason."},"originalState":{"type":"string","description":"Audit: original state of the booking (summary)."},"newState":{"type":"string","nullable":true,"description":"Audit: new state of the booking (summary)."},"originalValue":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"nullable":true,"description":"Original value."},"cancellationAllowed":{"type":"boolean","description":"Cancellation/change allowed under the evaluated policy."},"cancellationFee":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"nullable":true,"description":"Cancellation fee."},"refundOrCredit":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"nullable":true,"description":"Refund/credit to the partner."},"financialImpact":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"nullable":true,"description":"Net change to the partner account."},"allocationImpact":{"type":"integer","nullable":true,"description":"Allocation impact, units returned (+) or taken (-)."},"commissionAdjustment":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"nullable":true,"description":"Commission adjustment."},"approvalReasons":{"type":"array","items":{"type":"string","enum":["transactionValue","eventProximity","cancellationPercentage","partnerStatus","exceptionRequest"]},"description":"Why approval is required; empty when none."},"status":{"type":"string","enum":["requested","pendingApproval","approved","rejected","processed"],"default":"requested","description":"Status."},"requestedByPrincipalId":{"type":"string","format":"uuid","description":"Requesting user."},"approvedByPrincipalId":{"type":"string","format":"uuid","nullable":true,"description":"Approver."},"approvalRequestId":{"type":"string","nullable":true,"readOnly":true,"description":"Approval request, when one was needed."},"refundId":{"type":"string","format":"uuid","nullable":true,"description":"The refund it produced (orders.refund), once processed."},"requestedAt":{"type":"string","format":"date-time","description":"Requested at."},"targetPerformanceId":{"type":"string","format":"uuid","nullable":true,"description":"The performance (catalogue.performance) asked for, for dateChange and performanceChange (decided 29 September, writers pass; DM4)"},"targetProductId":{"type":"string","format":"uuid","nullable":true,"description":"The product (catalogue.product) asked for, for productChange (decided 29 September, writers pass; DM4)"},"newCustomerName":{"type":"string","nullable":true,"description":"The name asked for, for customerNameChange (decided 29 September, writers pass; DM4)"},"feeWaiverRequested":{"type":"boolean","default":false,"description":"The partner asks for the cancellation fee to be waived; a waiver always needs approval (`approvalReasons` gains exceptionRequest) (decided 29 September, writers pass; DM4)"},"scopePath":{"type":"string","description":"The partition key (ADR-0005), written at `tenant` scope."},"updatedAt":{"type":"string","format":"date-time","readOnly":true}}},
+"PartnerChangeRequestInput": {"type":"object","x-ticvai-persistence":"none — request only; stored as control.partner_change_request (PartnerChangeRequest) with its evaluation (decided 29 September, writers pass; DM4)","description":"What a partner sends to cancel or amend a booking (createPartnerChangeRequest). The evaluation (allowed, fee, refund, impacts, status) is computed, never sent (decided 29 September, writers pass; DM4)","required":["orderId","requestType"],"properties":{"orderId":{"type":"string","format":"uuid","description":"The partner's order (orders.sales_order)"},"requestType":{"type":"string","enum":["fullCancellation","partialCancellation","dateChange","performanceChange","quantityReduction","productChange","ticketReissue","customerNameChange","refundRequest"]},"quantity":{"type":"integer","minimum":1,"nullable":true,"description":"Tickets affected; required for partialCancellation and quantityReduction"},"targetPerformanceId":{"type":"string","format":"uuid","nullable":true,"description":"Required for dateChange and performanceChange"},"targetProductId":{"type":"string","format":"uuid","nullable":true,"description":"Required for productChange"},"newCustomerName":{"type":"string","nullable":true,"description":"Required for customerNameChange"},"feeWaiverRequested":{"type":"boolean","default":false},"reason":{"type":"string","nullable":true}}},
+"PartnerDisputesCasesServiceManagementView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over control.partner_case (PartnerCase) and the existing subscription state, assembled at read time (data model DM4)","description":"**What Partner Disputes, Cases & Service Management displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"caseId":{"type":"string","description":"Case ID"},"partner":{"type":"string","description":"Partner trading name"},"contact":{"type":"string","description":"Partner contact","nullable":true},"category":{"type":"string","enum":["bookingDispute","pricingDispute","commissionDispute","creditDispute","invoiceDispute","cancellationDispute","ticketIssue","allocationIssue","apiIssue","settlementDispute"],"description":"Category (Case Types)"},"priority":{"type":"string","enum":["low","medium","high","urgent"],"description":"Priority (decided 29 September, readiness close-out)"},"relatedOrder":{"type":"string","description":"Related Order","nullable":true},"relatedInvoice":{"type":"string","description":"Related Invoice","nullable":true},"relatedSettlement":{"type":"string","description":"Related Settlement","nullable":true},"amountInDispute":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Amount in Dispute"},"description":{"type":"string","description":"Description"},"evidence":{"type":"array","items":{"type":"string"},"description":"Evidence: attachment references"},"owner":{"type":"string","description":"Owner","nullable":true},"sla":{"type":"string","description":"SLA policy applied"},"status":{"type":"string","description":"Status: open, assigned, investigating, waitingPartner, waitingInternal, resolutionProposed, resolved, closed"},"firstResponse":{"type":"string","format":"date-time","description":"First Response at","nullable":true},"resolutionTarget":{"type":"string","format":"date-time","description":"Resolution Target"},"timeOpen":{"type":"integer","description":"Time Open, hours"},"slaBreach":{"type":"boolean","description":"SLA Breach"},"partnerId":{"type":"string","format":"uuid","description":"Partner"},"aiSummary":{"type":"string","description":"Advisory AI case summary","nullable":true}}},
+"PartnerManagementCommandCenterSummary": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection; the headline tiles over the list, computed at read time for the filters in force","description":"**The headline figures on Partner Management Command Center.** The pack's KPI cards, split out of the row (decided 29 September, readiness close-out): a count describes the list, not each item in it.","properties":{"totalPartners":{"type":"integer","description":"Total Partners"},"activePartners":{"type":"integer","description":"Active Partners"},"pendingOnboarding":{"type":"integer","description":"Pending Onboarding"},"pendingApproval":{"type":"integer","description":"Pending Approval"},"suspendedPartners":{"type":"integer","description":"Suspended Partners"},"expiringAgreements":{"type":"integer","description":"Expiring Agreements: partners whose active agreement ends within its expiryAlertDays (default 30) (decided 29 September, readiness close-out)"},"documentationIssues":{"type":"integer","description":"Documentation Issues: partners with a mandatory document missing, rejected, expiring or expired"},"partnersWithCreditHolds":{"type":"integer","description":"Partners With Credit Holds: partners whose credit status is onHold or blocked"},"connectedOtaApiPartners":{"type":"integer","description":"Connected OTA/API Partners"},"partnerSalesYtd":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Partner Sales YTD: gross value of partner orders this calendar year (decided 29 September, readiness close-out)"},"partnerRevenueYtd":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Partner Revenue YTD: partner sales net of commission this calendar year (decided 29 September, readiness close-out)"},"highRiskPartners":{"type":"integer","description":"High-Risk Partners"}}},
+"PartnerManagementCommandCenterView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over control.partner (Partner), control.partner_credit_profile, control.partner_application, control.partner_scope_assignment and control.partner_distribution_right and the existing subscription state, assembled at read time (data model DM4)","description":"**What Partner Management Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"partnerId":{"type":"string","format":"uuid","description":"Partner ID"},"tradingName":{"type":"string","description":"Trading Name"},"legalEntity":{"type":"string","description":"Legal Entity"},"partnerType":{"type":"string","description":"Partner type code from the tenant's configurable partner-type list (MoM 31 Aug 4.3: configurable category/type), seeded with the pack's p.7 list: b2bReseller, travelAgent, tourOperator, ota, corporateCustomer, hotelConcierge, destinationManagementCompany, affiliate, wholesaler, distributor, governmentPartner, schoolInstitution, apiPartner, internalGroupCompany"},"country":{"type":"string","description":"Country, ISO 3166-1 alpha-2"},"territory":{"type":"string","description":"Territory: summary of the authorised markets (listTerritoryMarketDistribution)"},"assignedBrands":{"type":"array","items":{"type":"string"},"description":"Assigned Brand/Venue: brand names in the partner's business scope (setPartnerBrandVenue)"},"assignedVenues":{"type":"array","items":{"type":"string"},"description":"Assigned Brand/Venue: venue names in the partner's business scope (setPartnerBrandVenue)"},"commercialOwner":{"type":"string","description":"Commercial Owner: staff display name of the account manager"},"distributionChannel":{"type":"array","items":{"type":"string","enum":["b2bPortal","api","otaConnection","agentPortal","affiliateLink","voucherDistribution","bulkTicketExport","other"]},"description":"Distribution Channel: Distribution methods: b2bPortal (the TICVAI B2B portal), api (partner consumes the TICVAI API), otaConnection (TICVAI integrates into the OTA, either direction per MoM 31 Aug 4.3), agentPortal, affiliateLink, voucherDistribution, bulkTicketExport (pre-generated QR tickets as CSV, MoM 5 Aug option 3), other"},"accountStatus":{"type":"string","description":"Account Status: lead, applicant, underReview, approved, configuration, active, restricted, suspended, terminated or archived (pack p.6 and p.18 merged with MoM 31 Aug 4.3 lead -> submitted -> active -> suspended; \"submitted\" is applicant)"},"onboardingStatus":{"type":"string","description":"Onboarding Status: the application stage (application, businessVerification, documentation, commercialReview, financeReview, technicalReview, approval, configuration, activation) or complete"},"agreementStatus":{"allOf":[{"$ref":"#/components/schemas/PartnerAgreementStatus"}],"nullable":true,"description":"Agreement Status of the partner's current agreement; empty when none"},"creditStatus":{"type":"string","description":"Credit Status: notEnabled, withinLimit, warning (at the warning threshold), highRisk, onHold or blocked (decided 29 September, readiness close-out)"},"integrationStatus":{"type":"string","enum":["none","testing","connected","degraded","disconnected"],"x-ticvai-persisted":false,"description":"Integration Status: none, testing, connected, degraded or disconnected (decided 29 September, readiness close-out). **Derived at read time, not a column** (decided 29 September, writers pass; DM4), from the partner's OTA/API channel listings (control.channel_listing) and the health of its API clients (control.api_client, with webhook deliveries in control.webhook_delivery), first match wins: `none` when the partner has no channel listing and no API client; `disconnected` when every listing is `paused` or `delisted` or every production API client is `suspended` or `revoked`; `degraded` when a `live` listing's `lastPushedAt` is older than twice its `pushIntervalMinutes`, or webhook deliveries to the partner failed in the last hour; `connected` when a `live` listing or an `active` production client exists and none of the above holds; otherwise `testing` (only `draft` listings or only sandbox clients). The thresholds are proposed, the venue may correct them."},"lastActivity":{"type":"string","format":"date-time","description":"Last Activity"},"riskRating":{"type":"string","enum":["low","medium","high","critical"],"description":"Risk rating, Low / Medium / High / Critical (pack p.58); drives the Risk filter and the High-Risk Partners KPI"},"aiInsights":{"type":"array","items":{"type":"string"},"description":"Partner Attention Required: advisory AI flags such as an agreement expiring against forward bookings (pack p.6)"}}},
+"PartnerOperationsCommandCenterSummary": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection; the headline tiles over the list, computed at read time for the filters in force","description":"**The headline figures on Partner Operations Command Center.** The pack's KPI cards, split out of the row (decided 29 September, readiness close-out): a count describes the list, not each item in it.","properties":{"partnerSalesToday":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Partner Sales Today"},"partnerSalesMtd":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Partner Sales MTD"},"activePartnerOrders":{"type":"integer","description":"Active Partner Orders"},"activeReservations":{"type":"integer","description":"Active Reservations"},"activeHolds":{"type":"integer","description":"Active Holds"},"ticketsSold":{"type":"integer","description":"Tickets Sold"},"cancellations":{"type":"integer","description":"Cancellations"},"refunds":{"type":"integer","description":"Refunds"},"outstandingReceivables":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Outstanding Receivables"},"commissionPayable":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Commission Payable"},"pendingSettlements":{"type":"integer","description":"Pending Settlements"},"operationalExceptions":{"type":"integer","description":"Operational Exceptions"},"partnersRequiringAttention":{"type":"integer","description":"Partners Requiring Attention"},"activityFeed":{"type":"array","description":"Activity Feed: recent partner events, newest first","items":{"type":"object","properties":{"at":{"type":"string","format":"date-time"},"partnerId":{"type":"string","format":"uuid"},"message":{"type":"string"}}}}}},
+"PartnerOperationsCommandCenterView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over subscription state, assembled at read time from tables that already exist","description":"**What Partner Operations Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"partner":{"type":"string","description":"Partner trading name"},"partnerType":{"type":"string","description":"Partner Type code"},"accountManager":{"type":"string","description":"Account Manager"},"orders":{"type":"integer","description":"Orders"},"tickets":{"type":"integer","description":"Tickets"},"grossSales":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Gross Sales"},"netSales":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Net Sales"},"commission":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Commission"},"outstandingBalance":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Outstanding Balance"},"creditUtilization":{"type":"number","description":"Credit Utilization, percent"},"allocationUtilization":{"type":"number","description":"Allocation Utilization, percent"},"cancellationRate":{"type":"number","description":"Cancellation Rate, percent"},"operationalStatus":{"type":"string","description":"Operational Status: normal, attention, restricted, suspended"},"risk":{"type":"string","enum":["low","medium","high","critical"],"description":"Risk"},"partnerId":{"type":"string","format":"uuid","description":"Partner"},"aiInsights":{"type":"array","items":{"type":"string"},"description":"Advisory AI attention flags for this partner"}}},
+"PartnerOrdersBookingManagementView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over subscription state, assembled at read time from tables that already exist","description":"**What Partner Orders & Booking Management displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"partnerReference":{"type":"string","description":"Partner Reference"},"agentUser":{"type":"string","description":"Agent/User"},"customerName":{"type":"string","description":"Customer/Guest where applicable","nullable":true},"products":{"type":"array","items":{"type":"string"},"description":"Products"},"quantity":{"type":"integer","description":"Quantity"},"grossValue":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Gross Value"},"partnerRate":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Partner Rate applied"},"commission":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Commission"},"netAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Net Amount"},"paymentMethod":{"type":"string","enum":["creditAccount","prepaid","card"],"description":"Payment Method (the three payment models)"},"billingStatus":{"type":"string","description":"Billing Status: unbilled, invoiced, paid, overdue or credited"},"fulfillmentStatus":{"type":"string","description":"Fulfillment Status: pending, partiallyIssued, issued or delivered"},"orderId":{"type":"string","format":"uuid","description":"TICVAI Order ID"},"orderNumber":{"type":"string","description":"TICVAI order number"},"partnerId":{"type":"string","format":"uuid","description":"Partner"},"partnerName":{"type":"string","description":"Partner"},"bookingDate":{"type":"string","format":"date-time","description":"Booking Date"},"event":{"type":"string","description":"Event","nullable":true},"visitDate":{"type":"string","format":"date","description":"Visit/Event Date","nullable":true},"orderStatus":{"type":"string","description":"Order status: draft, held, confirmed, partiallyFulfilled, fulfilled, cancelled, refunded, failed"},"salesChannel":{"$ref":"../shared/common.yaml#/components/schemas/SalesChannel","description":"Channel"}}},
+"PartnerPerformanceScorecardRiskMonitoringView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over control.partner, control.partner_document, control.partner_security, control.partner_allocation and control.partner_case and the existing subscription state, assembled at read time (data model DM4)","description":"**What Partner Performance Scorecard & Risk Monitoring displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"sales":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Commercial: gross sales"},"revenue":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Commercial: revenue net of commission"},"growth":{"type":"number","description":"Commercial: growth against the previous period, percent"},"margin":{"type":"number","description":"Commercial: margin, percent"},"averageOrderValue":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Commercial: average order value"},"utilization":{"type":"number","description":"Allocation: utilisation, percent"},"sellThrough":{"type":"number","description":"Allocation: sell-through, percent"},"returnedInventory":{"type":"integer","description":"Allocation: returned inventory, units"},"averagePaymentDelayDays":{"type":"number","description":"Financial: average payment delay, days"},"creditUtilization":{"type":"number","description":"Financial: credit utilisation, percent"},"overdueBalance":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Financial: overdue balance"},"cancellationRate":{"type":"number","description":"Operational: cancellation rate, percent"},"errorRate":{"type":"number","description":"Operational: error rate, percent"},"supportCases":{"type":"integer","description":"Operational: support cases"},"apiSuccessRate":{"type":"number","description":"Technical: API success rate, percent","nullable":true},"transactionFailureRate":{"type":"number","description":"Technical: transaction failure rate, percent","nullable":true},"documentation":{"type":"string","description":"Compliance: documentation state, compliant, expiring, incomplete or nonCompliant"},"agreementStatus":{"allOf":[{"$ref":"#/components/schemas/PartnerAgreementStatus"}],"nullable":true,"description":"Compliance: agreement status"},"securityGuaranteeStatus":{"type":"string","description":"Compliance: security/guarantee state, covered, partiallyCovered, expired or notRequired"},"partnerId":{"type":"string","format":"uuid","description":"Partner"},"partner":{"type":"string","description":"Partner trading name"},"partnerType":{"type":"string","description":"Partner Type code"},"period":{"type":"string","description":"Scorecard period, e.g. 2026-09"},"refundRate":{"type":"number","description":"Operational: refund rate, percent"},"syncReliability":{"type":"number","description":"Technical: sync reliability, percent","nullable":true},"overallScore":{"type":"integer","description":"Partner Score, 0-100"},"dimensionScores":{"type":"object","description":"Score by dimension, each 0-100","properties":{"commercial":{"type":"integer"},"financial":{"type":"integer"},"allocation":{"type":"integer"},"operational":{"type":"integer"},"technical":{"type":"integer"},"compliance":{"type":"integer"}}},"riskRating":{"type":"string","enum":["low","medium","high","critical"],"description":"Risk Rating"},"trend":{"type":"string","enum":["improving","stable","declining"],"description":"Trend"},"benchmark":{"type":"object","description":"Benchmarking: average overall score of the comparison groups","properties":{"samePartnerType":{"type":"number"},"sameMarket":{"type":"number"},"sameChannel":{"type":"number"},"portfolioAverage":{"type":"number"}}},"aiInsights":{"type":"array","items":{"type":"string"},"description":"Advisory AI risk detection"}}},
+"PartnerStatementAccountActivitySummary": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection; the headline tiles over the list, computed at read time for the filters in force","description":"**The headline figures on Partner Statement & Account Activity.** The pack's KPI cards, split out of the row (decided 29 September, readiness close-out): a count describes the list, not each item in it.","properties":{"openingBalance":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Opening Balance"},"sales":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Sales"},"payments":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Payments"},"credits":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Credits"},"refunds":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Refunds"},"commission":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Commission"},"adjustments":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Adjustments"},"closingBalance":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Closing Balance"},"overdueBalance":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Overdue Balance"},"availableCredit":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Available Credit"},"current":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Aging: current (not yet due)"},"aged1To30":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Aging: 1-30 days"},"aged31To60":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Aging: 31-60 days"},"aged61To90":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Aging: 61-90 days"},"aged90Plus":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Aging: 90+ days"}}},
+"PartnerStatementAccountActivityView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over subscription state, assembled at read time from tables that already exist","description":"**What Partner Statement & Account Activity displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"date":{"type":"string","format":"date","description":"Date"},"transactionType":{"type":"string","enum":["booking","invoice","payment","refund","creditNote","commission","manualAdjustment","deposit","settlement"],"description":"Transaction Type"},"reference":{"type":"string","description":"Reference"},"orderInvoice":{"type":"string","description":"Order/Invoice number","nullable":true},"debit":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Debit"},"credit":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Credit"},"runningBalance":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Running Balance"},"dueDate":{"type":"string","format":"date","description":"Due Date","nullable":true},"status":{"type":"string","description":"Status: open, partiallyPaid, paid, overdue or void"}}},
+"ReservationsHoldsReleaseManagementSummary": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection; the headline tiles over the list, computed at read time for the filters in force","description":"**The headline figures on Reservations, Holds & Release Management.** The pack's KPI cards, split out of the row (decided 29 September, readiness close-out): a count describes the list, not each item in it.","properties":{"activeHolds":{"type":"integer","description":"Active Holds"},"heldTickets":{"type":"integer","description":"Held Tickets"},"heldValue":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Held Value"},"expiringToday":{"type":"integer","description":"Expiring Today"},"expiredHolds":{"type":"integer","description":"Expired Holds"},"convertedHolds":{"type":"integer","description":"Converted Holds"},"releasedInventory":{"type":"integer","description":"Released Inventory, tickets"}}},
+"ReservationsHoldsReleaseManagementView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over subscription state, assembled at read time from tables that already exist","description":"**What Reservations, Holds & Release Management displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"holdId":{"type":"string","format":"uuid","description":"Hold ID"},"partner":{"type":"string","description":"Partner trading name"},"event":{"type":"string","description":"Event"},"product":{"type":"string","description":"Product"},"quantity":{"type":"integer","description":"Quantity"},"seatZone":{"type":"string","description":"Seat/Zone where applicable","nullable":true},"holdCreatedAt":{"type":"string","format":"date-time","description":"Hold Created"},"holdExpiresAt":{"type":"string","format":"date-time","description":"Hold Expiry"},"createdBy":{"type":"string","format":"date-time","description":"Created By"},"commercialValue":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Commercial Value"},"allocationSource":{"type":"string","enum":["partnerAllocation","channelAllocation","generalCapacity"],"description":"Allocation Source"},"status":{"type":"string","description":"Status: active, extended, converted, released, expired"},"extensionsUsed":{"type":"integer","description":"Extensions used so far"},"partnerId":{"type":"string","format":"uuid","description":"Partner"},"aiInsights":{"type":"array","items":{"type":"string"},"description":"Advisory AI conversion-probability and release suggestions"}}}
 }
 ```

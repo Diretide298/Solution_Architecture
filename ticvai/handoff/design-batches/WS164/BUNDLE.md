@@ -1,6 +1,6 @@
 # WS164 — Resource Management Configuration board 10
 
-**10 screens · 11 operations · 12 schemas · 5 permissions**
+**10 screens · 12 operations · 13 schemas · 6 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -48,8 +48,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 5 permissions apply here:
-  `PRODUCT_VIEW, REPORT_VIEW_TENANT, RESOURCE_CONFIGURE, RESOURCE_MANAGE, RESOURCE_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 6 permissions apply here:
+  `PLATFORM_TENANT_VIEW, PRODUCT_VIEW, REPORT_VIEW_TENANT, RESOURCE_CONFIGURE, RESOURCE_MANAGE, RESOURCE_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -60,6 +60,124 @@ convincingly. It is never a caption.
   field, the control, whether it is required, its default, its limits and allowed values, its format
   and its error; and, element by element, what is shown and in what format, what each action
   produces and where the user goes next. Draw exactly that.
+
+## The processes these screens belong to
+
+Written by the owner of each process (`handoff/design-notes/`). Read before any screen: it says how the process runs end to end and which words the screens must use.
+
+### Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue)
+
+Venue operations is everything that happens after a sale and inside the gates. A guest's ticket is one virtual ticket with interchangeable media (QR, dynamic QR, RFID wristband, NFC, Face Pass or Face Tag); at an access point a scanner (P07, or the scan function inside the Staff App P06) validates the media against the admission profile and the guest admission policy, offline if it must, and every deny carries a reason and a next action. The back office (Venue Management P08) configures that estate: the venue topology (venue, park, zone, attraction, access point, gate and lane, device placement), admission profiles and rules (entry, exit, re-entry, anti-passback, validity, crossover, companions), credential security (dynamic QR, device binding, beacons), biometrics, gate modes, and the live operations, fraud and monitoring views. Accreditation (P08 setup and review, P11 web portal for applicants, web first) takes an applicant from a configurable form through document checks, OCR, duplicate blocking and multi-level approval to a credential with zone rights. Resources and capacity manage bookable resources (rooms, vehicles, equipment, cabanas, instructors) that are booked as a consequence of selling a product, never sold directly. Workforce covers shift templates, rosters, attendance, swaps and breaks, mirrored on the Staff App. Maintenance and safety cover the asset register, preventive calendars, work orders with scored priority, inspections and incidents, with technicians working from the Staff App. Games and rides configure readers, credit types and consumption priority, play entitlements, game pricing, retry pricing, redemption and the card lifecycle. The virtual queue (Q1) gives a guest a live wait time and a return window for a ride; it is not the on-sale waiting room (Q2). Every calendar has day, week and month views. Configuration resolves tenant, region, venue (outlet only for F&B and retail), and a user's permissions, never the device, decide what they may do. The guest apps (P01, P02) show the guest's side of this: My Tickets, the scan code, Face Pass, wait times, the virtual queue, map booking of cabanas and the visit planner.
+*(source: F06 step 1 / F112 step 1 / F111 step 1 / ADR-0002 / ADR-0012 / ADR-0018 / ADR-0041 / ADR-0066 / ADR-0067 / ADR-0068 / DI-652 / DI-627 / DI-640 / DI-654 / DI-666 / DI-482 / DI-483 / DI-907 / DI-919 / DI-923 / DI-865 / DI-678 / TRACKER Actions row 160 / MoM 2026-09-02 AccessControl / MoM 2026-09-07 …)*
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Ticket | The one virtual record a guest owns (ticket number, product, validity, entries). Its number never changes, whatever media carries it or whoever it is transferred or resold to. | Pass (unless the product is a pass), Booking, Order line | DI-652 / DI-620 / contracts/spine/access.yaml#/components/schemas/TicketStatus |
+| Media | What the ticket is presented by at a gate (QR code, dynamic QR, wristband/RFID card, NFC, Face Pass, Face Tag). One ticket can carry several media as fallbacks; a media code can also cover several tickets scanned as one group. Show one … | Credential (for guest media; keep Credential for accreditation badges and staff), Ticket code | DI-180 / DI-608 / DI-652 |
+| Access point | A place where a scan is judged, with a fixed direction (entry, exit, re-entry, crossover). Hierarchy shown to users is Venue > Park > Zone > Attraction > Access point > Gate/lane > Device. | Scanner (that is the device), Door | screens/P08-venue-back-office.yaml#BO-144 / … |
+| Admission profile | The named set of rules an access point enforces (opening window, entries, exit scan, re-entry, validity, crossover). Products point at a profile; tiers such as Bronze/Silver/Gold are profiles with gate allow and deny lists. | Admission rules (as a screen title), Access rule set | DI-185 / contracts/spine/access.yaml#/components/schemas/AdmissionRules |
+| Admitted / Denied / Overridden | The three scan outcomes. A denial is always shown with its reason in plain words and a next action; an override is a supervisor admitting despite a denial, and is always attributed and reasoned. | Valid/Invalid, Success/Fail, Error | contracts/spine/access.yaml#/components/schemas/ScanOutcome / … |
+| Used | A ticket entry is used the moment a scan succeeds, whether or not the guest physically passed. Mistakes are resolved from the scan history, not by un-scanning. | Redeemed (for admission), Checked in (that is group check-in, a different step) | DI-627 / TRACKER Actions row 221 / TRACKER Actions row 189 |
+| Gate mode | What a lane is doing now, set live by the podium or supervisor - Normal, Free flow (counts, does not validate), Drop arm (everybody through, evacuation), Closed (nobody through), Podium (staff validating by eye), Maintenance. Direction is … | Turnstile mode (as a label for direction), Open/Locked | contracts/spine/access.yaml#/components/schemas/AccessPointOperatingMode / R221 |
+| Offline package | What a scanner holds to validate with no network - entitlements, blacklist, admission profiles and the active guest admission policy version - with its age always visible. | Cache, Local DB | F06 step 3 / ADR-0068 |
+| Sync and reconciliation | Sending the offline scan journal to the server, and the duty manager's review of scans the server rejected after the device had already admitted the guest. | Upload, Retry | F06 step 6 / DI-065 |
+| Face Pass / Face Tag | Face Pass is the long-lived face credential for members and season-pass holders (renewable); Face Tag is short-lived, for one day or event. Retention is set per tier by the venue. | Face ID, Biometric login | DI-640 / ADR-0063 |
+| Accreditation / Credential (accreditation) | Accreditation is the application and approval of a person (media, contractor, corporate, staff of a partner) for an event or season; the credential is what is issued after approval (photo badge, QR or RFID) with zone access rights. | Registration (for the whole process), Ticket | DI-654 / DI-662 |
+| Resource | A bookable thing or person a product needs (room, vehicle, cabana, equipment set, instructor). Guests buy products; resources are assigned to the booking, pre-assigned or dynamically. | Asset (that is maintenance), Inventory (that is stock) | DI-475 / DI-482 / TRACKER Actions row 160 |
+| Asset | A physical item maintained by the venue (ride, turnstile, printer, pump) with a register record, documents, warranty and maintenance history. | Resource, Device (unless it is an IT device in the device register) | DI-910 / ADR-0067 |
+| Work order | A unit of maintenance work, lifecycle Created > Assigned > In progress > Review > Closed, with a resolution timer. | Ticket (reserved for guest tickets), Job card | DI-231 |
+| Game / attraction (games module) | In the games and rides module an attraction is an individual game or ride (roller coaster, racing game, bumper cars), not a venue. | Venue, Park | DI-863 |
+| Virtual queue / Return window | A guest's place in a ride's queue held without standing in line, with a return window (for example 4:50 to 5:00 PM) that recalculates live. Distinct from the walk-in line and the VIP/express lane, and from the on-sale waiting room. | Waiting room, Fast pass (that is the express product), Booking | DI-675 / DI-678 / DI-679 / ADR-0066 |
+| Wait time source | Where a ride's wait time comes from - Sensor, Throughput, Manual, or Unavailable - always shown beside the number. | Live (when the source is manual) | contracts/satellite/queue.yaml#/components/schemas/WaitTimeSource / DI-315 |
+
+### Ticketing & Guest Commerce, as the venue and TICVAI configure and run it
+
+WHAT THE PROCESS IS. Everything a guest can buy is set up, priced, promoted and serviced here, on Venue Management (P08, the venue's own back office, served inside the venue's cell) and on the TICVAI Console (P09, TICVAI's control plane, outside every cell). End to end: (1) CATALOGUE. A product has one of twelve kinds (admission, timedAdmission, datedAdmission, openDated, seated, membership, bundle, fnb, retail, rental, addOn, giftCard). Its ticket types (adult, child, senior, resident...) are not typed one by one: they are generated from the product's attributes (components) and each value combination becomes a sellable ticket type with no extra setup (DI-164). What a ticket grants (validity, entries, re-entry, days of week, blackout dates, expiry anchor, fast track, transfer) lives on a reusable entitlement template, not on the product. Who may take part (age, height, supervision, certification) is the eligibility rule; what the guest must answer is the data mask and the consent questions; how the guest sees it is guestListing (bookable, infoOnly, hidden), display tags (at most six), media and the booking flow. Group, family and corporate products and every after-sales policy (reschedule, exchange, refund, cancellation, upgrade, transfer) are configured inside the one product configuration, never on separate screens (DI-465, DI-466). (2) LIFECYCLE AND PUBLICATION. A product moves draft, inReview, approved, live, withdrawn, archived. Approval and publication are two acts with two permissions (PRODUCT_APPROVE, PRODUCT_PUBLISH, R091); every product is authorised before it sells online or on site (DI-438). Approved is still not on a till: a till sells only what is in the signed catalogue release it pulled (publishBundle, ADR-0013), so a saved price is a back-office fact until the venue publishes to tills. Changing something that has sold is preceded by an impact check (assessProductChange: orders affected, entitlements issued, future performances, open carts); restoring a version creates a new version, and sold tickets keep the price and terms they were sold under (restoreProductVersion, DI-938, TRACKER Actions row 145). (3) PRICE. Prices live in price lists: per venue, per channel set, with validity dates and a priority, copied for the next season with an uplift (copyPriceList) and repriced in bulk only after a dry run (bulkChangePrices). Currency and decimal scale are never chosen on a form: they resolve from the venue's region (ADR-0008, ADR-0018; AED 2 places, OMR and BHD 3). When several rules apply, the configured hierarchy decides; there is no "lowest price wins" default (DI-595). Tax on the pre-discount price and three-decimal rounding are regional settings (DI-598). Dynamic rules always show their minimum and maximum price guardrails beside the trigger (getDynamicPriceRule). (4) PROMOTE AND BUNDLE. A promotion is a rule (automatic, or gated by a code) created in draft, made live only by Publish, which first analyses stacking; a …
+*(source: DI-164; DI-171; DI-438; DI-465; DI-466; DI-595; DI-598; DI-387; DI-039; DI-044; DI-474; DI-671; DI-987; DI-019; DI-080; ADR-0008; ADR-0013; ADR-0018; ADR-0019; ADR-0030; R091; R098; R101; R222; REV3-21; contracts/spine/catalogue.yaml#transitionProductLifecycle …)*
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Product | Anything sellable, of one of the twelve kinds. The record that carries names, channels, listing, media and policies. | Item (except on F&B and retail screens), SKU (for tickets), Offering | contracts/spine/catalogue.yaml#/components/schemas/ProductKind |
+| Ticket type | One sellable variant of an admission or event product (Adult, Child, Resident Adult), generated from the product's attributes. For retail and F&B the same record is labelled Variant. | Variant (on ticket screens), Sub-product, Rate (that is a price), Axis value | contracts/spine/catalogue.yaml#updateProductVariant / DI-164 / DI-437 |
+| Attribute | A dimension that generates ticket types (Guest category, Residency, Tier, Length). Each has values; adding a value adds ticket types. | Axis, Component (the client's word; use it only in help text), Option | contracts/spine/catalogue.yaml#setProductAttributes / DI-164 / DI-450 |
+| Entitlement | What a ticket lets the holder do (validity, entries, re-entry, days, blackout dates, expiry, fast track, transfer), defined once on an entitlement template and shared by several products. | Access rights, Ticket rules, Validity profile | contracts/spine/catalogue.yaml#createEntitlementTemplate / DI-171 / DI-451 |
+| Eligibility rule | Who may take part in or buy a product (age, height, supervision, waiver, certification). Distinct from a promotion's eligibility, which decides who gets a discount. | Restriction, Access rule (that is access control) | contracts/spine/catalogue.yaml#setProductEligibilityRule / DI-463 |
+| Price list | A set of prices for one venue and a set of channels, valid between two dates, with a priority. Several coexist (B2C, B2B, season). | Price book, Rate card, Tariff | contracts/spine/catalogue.yaml#createPriceList / DI-140 / DI-163 |
+| Price category | A standard rate type (Adult, Child, Member) reused across lists so venues do not invent "Adult Standard" and "Normal Adult". | Price band (that is a seat-category band), Fare type (transport) | contracts/spine/catalogue.yaml#setPriceCategoryRateType / … |
+| Price band | A priced band on a seat category (code, label, colour, amount, channel, from-date). | Price category, Zone price | contracts/satellite/seating.yaml#/components/schemas/SeatPriceBand |
+| Promotion | A rule that changes a price automatically or when a code is entered; draft until published; declares how it stacks. | Offer (except in guest copy), Deal, Discount rule | contracts/satellite/promotions.yaml#createPromotion / DI-173 / DI-174 |
+| Coupon code | A code issued from a coupon campaign that applies a promotion-style discount; one shared code or many single-use codes. | Voucher, Promo voucher | contracts/satellite/promotions.yaml#createCouponCampaign / DI-173 |
+| Voucher | A code that carries money (face value, balance), sold or issued; a liability until redeemed or expired. | Coupon, Credit note | contracts/satellite/promotions.yaml#listVoucherBatches / … |
+| Bundle | A product sold as one line whose price differs from the sum of its components, with a mandatory revenue allocation. "Package" is acceptable in guest copy. | Combo (that is an F&B meal deal), Catalogue bundle | contracts/satellite/promotions.yaml#createBundle / DI-220 / ADR-0019 |
+| Catalogue release | The signed snapshot of a venue's catalogue, prices, promotions and sale boards that tills, kiosks and devices pull. Its action label is "Publish to tills". | Bundle, Catalogue bundle, Sync, Deploy | contracts/spine/catalogue.yaml#publishBundle / … |
+| Approve / Publish / Save | Save keeps a draft; Approve records that it is authorised (PRODUCT_APPROVE); Publish makes it live for guests and channels (PRODUCT_PUBLISH). Three different buttons, never merged. | Submit, Go live, Activate (except CatalogueConfigStatus active), Deploy | R091 / contracts/spine/catalogue.yaml#transitionProductLifecycle / DI-438 |
+| Product states | Draft, In review, Approved, Live, Withdrawn, Archived (ProductLifecycleState), always as coloured badges with these exact labels. | Published (for a product), Pending, Inactive (for a product) | contracts/spine/catalogue.yaml#/components/schemas/ProductLifecycleState |
+| Channel | Where something is sold. Labels: pos Point of sale; kiosk Kiosk; web and guestWeb Website; mobile and guestApp App; b2b B2B partners; partner Partner; ota Travel agents (OTA); callCentre Call centre; api API; backOffice Back office. | Touchpoint, Outlet (an outlet is a business inside a venue), raw enum values | contracts/spine/catalogue.yaml#/components/schemas/Channel / … |
+| Refund | Money returned after settlement, wholly or for some lines, under the venue's refund policy. | Return (that is retail goods), Reversal, Void | contracts/spine/orders.yaml#createRefund / DI-252 |
+| Void | Cancelling a whole order before settlement, within the same shift, with a reason from the void list. After settlement it is a refund. | Cancel order, Delete | contracts/spine/orders.yaml#voidOrder / R222 |
+| Exchange / Reschedule | Exchange swaps lines for other products or dates and settles only the difference; Reschedule is the same product moved to another date or time. | Rebook, Date change (acceptable only in guest copy), Refund and resell | contracts/spine/orders.yaml#exchangeOrderLines / … |
+| Hold / Capture / Release | A deposit or stored-value amount is held, then partly or fully captured, and the rest released. A held deposit is not a payment. | Charge, Pre-auth (in staff copy), Block funds | contracts/spine/orders.yaml#authoriseStoredValue / … |
+| Wallet (TICVAI wallet) | The guest's stored-value balance on TICVAI, spent by hold and capture. Distinct from the tender "Apple Pay / Google Pay", which the contract also calls wallet. | Digital wallet (for stored value), E-wallet, Credit (without a type) | contracts/spine/orders.yaml#/components/schemas/TenderKind / R080 |
+| Credit lot | One amount of wallet credit of one credit type (cash, bonus, gift) with its own expiry; lots are spent nearest expiry first and the guest sees the breakdown but cannot choose. | Bucket, Batch, Top-up | TRACKER Actions row 171 / contracts/satellite/wallet.yaml#expireCreditLots |
+| Venue map / Seat map | A venue map is the wayfinding map of a park or a floor (points, paths, bookable places); a seat map is the seating layout of an auditorium or stand. Never just "map" where both could be meant. | Layout (alone), Floor plan (unless it is a floor map), Map (alone) | contracts/satellite/venue-map.yaml#createVenueMap / … |
+| Point / Bookable place | A point is a place on a venue map (toilet, ride, restaurant, exit). A bookable place is a cabana, lounger, table or pitch placed on the map and sold through its price band. | Pin, POI, Marker, Resource (in staff copy) | contracts/satellite/venue-map.yaml#setVenuePoint / … |
+| Station / Route / Timetable / Departure / Fare table / Pass … | A route is an ordered list of stations with offsets; a timetable generates departures up to its release horizon; a fare table prices a route per passenger type; a pass type is a multi-trip or unlimited pass sold as a product. | Stop (except in the stop list), Line (except lineCode), Schedule, Trip (except a guest's journey) | contracts/satellite/transport.yaml / REV3-21 |
+| Applies from | The effective date of a change. Every dated change shows it, and sold items keep their old terms. | Effective date (in labels), Start date (for a change) | contracts/satellite/seating.yaml#updateSeatCategory / TRACKER Actions row 194 |
+
+### Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management)
+
+Platform Foundation is everything the apps stand on. Five apps each have one door: the guest app and website (WEB-016, GST-042: a six-digit code to email or mobile, a password, Apple or Google, UAE Pass; never enterprise SSO), the till (POS-000: employee number and PIN, recent operators as tiles; the kitchen display is the same app), the staff handheld and scanner (EMP-001, SCN-001), Venue Management (SUP-001, the single door for the back office P08, the CMS P13, analytics P16 and the support desk P12) and TICVAI Control (ADM-001 for TICVAI's own platform operators, PTR-001 for partner users; the developer portal P14 and the sign-up P17 belong to this app too). A second factor is required by permission, not by role or device: ROLE_MANAGE, LEDGER_APPROVE and every PLATFORM_* permission, plus any the tenant adds; so a cashier never sees it and a platform operator always does. The factor is an authenticator app with an emailed code as fallback; five wrong codes lock step-up for the lockout minutes, never permanently. Guests get two-step verification only at a venue that switched it on. One person holds one session per workstation: a second sign-in is refused and only a supervisor ends the other session. Several roles mean a role prompt; one role goes straight in. The workstation decides the Sale Board, hardware and till identity, never what a person may do. Sensitive actions (refund approval, journal approval, credential reset, partner credit, commission rules, opening a platform-staff grant and 17 more) demand a fresh step-up on the operation itself, asked in place in the action's confirmation; the tenant may raise the strength, never remove it. Permission outcomes are three, never one word: self-authorised (proceeds, audited), escalated (a supervisor PIN in place), refused (the denied state, naming the permission); a missing permission is never an empty table, and a record outside the person's venues is "not found", indistinguishable from absent. The hierarchy is binding (tenant, brand, region, venue, department, sub-department, workstation; outlet beside department for F&B and retail); region owns currency, decimals, time zone, date format and fiscal year; configuration resolves nearest-ancestor across tenant, region and venue (outlet for F&B and retail), venue is the floor and a workstation is assigned a profile, never configured; every configuration screen says which level it writes and what it inherits. Venue Management is one tenant-level surface filtering across the venues in the session's scope. TICVAI's Console runs outside every cell: a platform operator picks a tenant and opens a time-boxed, audited platform-staff grant (with step-up) before any tenant action, and the tenant sees every action in its audit log (ADM-412 is the reference implementation). Approval workflows record authorisations and never perform the action; the requester cannot approve their own request; a venue may tighten and never loosen a rule from above; in-flight …
+*(source: screens/P12-support-agent-console.yaml#SUP-001; R135; R126; R167; DI-1072; ADR-0002; ADR-0003; ADR-0004; R184; contracts/spine/identity.yaml#createMfaChallenge; contracts/spine/approvals.yaml#setStepUpPolicy; ADR-0011; ADR-0018; ADR-0029; R098; contracts/spine/approvals.yaml#decideApprovalRequest …)*
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Sign in / Sign out | Entering and leaving any app, staff or guest. | Login, Log in, Logon, Logout | screens/P04-point-of-sale.yaml#POS-000 … |
+| Authentication code | The staff second factor from the authenticator app (or the emailed fallback). | OTP, 2FA code, token | screens/P09-platform-admin-console.yaml#ADM-001 |
+| One-time code | The six-digit code a guest receives to sign in or prove a contact. | OTP, PIN, password | DI-1034; R167 |
+| Two-step verification | The guest's optional second factor, asked only at venues that switched it on. | MFA, 2FA | DI-1072 |
+| Tenant / Brand / Region / Venue / Department / Outlet | The binding hierarchy levels; region owns currency and dates; outlet is F&B or retail inside a venue. | Client, Customer, Org (for tenant), Site, Park, Property (for venue), Area, Territory (for region) | ADR-0011; ADR-0018 |
+| Workstation (back office) / till (operator copy) | A configured device; decides Sale Board, hardware and till identity, never authorisation. | Terminal, Station, POS (for the device), till (for the Deposit Box) | ADR-0002; R156 |
+| Sale Board | The configured front end a workstation loads (ticketing, F&B or retail). | Screen, Layout, Menu | ADR-0003 |
+| Role | A named, fully configurable grouping of permissions; the seeded five are editable starting points. | Group, Profile | R229 |
+| Staff member / Partner user / Platform operator | A tenant's staff principal; a partner's user; a TICVAI employee in the Console. | User (alone), Account, Agent (for venue staff) | F104 step 1; F104 step 4; F104 step 5 |
+| Platform-staff grant | The time-boxed, audited access a platform operator opens into one tenant before acting in it. | Impersonation, Support login | R098 |
+| Escalate / Refused | Escalate is supervisor approval captured in place; Refused is the denied state that names the permission. | Denied (for an action that can be escalated) | R197 |
+| Approve / Reject / Return / Request information | The four decisions on an approval request; Withdraw is the requester's own act and never a rejection. | Accept, Decline, Cancel (for withdraw) | contracts/spine/approvals.yaml#decideApprovalRequest … |
+| Subscription / Plan / Module / Licence | TICVAI's commercial relationship with a tenant, its plan, the modules it licenses and the limits. | Membership (that is the guest's pass) | R214 |
+| Membership / Annual pass | A guest's pass product and its holder (BO-284 to BO-303). | Subscription (that is the tenant's TICVAI plan) | screens/P08-venue-back-office.yaml#BO-284 |
+| Sandbox client / Production client | A developer's own test credential; a TICVAI-issued live credential after certification. | Test key, Live key, API key (without environment) | DI-927 |
+| Asset (DAM) / Media (ticket) | A digital file in the library; ticket media is a wristband or card carrying entitlements. Never mix them. | Media (for a library asset) | contracts/satellite/assets.yaml#searchMedia … |
+
+### Finance, Ledger & Tax · Reporting & Analytics
+
+Finance and insights run underneath every sale. A sale at a till (P04), kiosk, web storefront (P01) or guest app (P02) is priced and taxed per line at the moment of sale, recorded in the venue's base currency (AED in the UAE; 2 decimals, or 3 for BHD, KWD and OMR, never rounded away), and posted to an append-only dual ledger through account mappings per money event; anything unmapped lands in suspense. Tax follows the jurisdiction's tax profile: inclusive or exclusive, compound where a tax applies on another, zero-rated or exempt with verified evidence, and computed on the discounted price by default or on the price before discount where the region requires it (Egypt). A guest may select a currency the venue charges and pay in it: the rate is locked on the order, the payment partner is asked in that currency, the ledger keeps the base amount with the rate, and a refund goes back in the currency paid (decided 2 October 2026, Chinmay); a currency shown but not charged is an approximate price. Foreign cash at a till is recorded at its base equivalent and change is given in base currency. A paid order can carry a VAT receipt (simplified tax invoice), a full tax invoice with the buyer's TRN, or a consolidated invoice for a company, each numbered without gaps and never edited; corrections are credit memos. Revenue is recognised by rule: POS-style immediate, tickets on the visit, gift cards and wallet on use, annual passes straight-line or per visit, breakage on expiry; deferred revenue is a balance that ages. Each venue's day is reconciled (POS cash, gateways, bank, wallet against the ledger, provider files matched automatically, only genuine mismatches to a person); chargebacks are defended against the bank's deadline; month end runs seven close checks and goes to a finance approver. Nothing posted is deleted: a correction is a reversal, an approver is never the preparer, and ledger approval needs a second factor. Back-office finance lives in Venue Management (P08: chart of accounts, mapping, FX, journals, recognition, reconciliation, period close, chargebacks); tax profiles, calculation validation and platform reconciliation in the TICVAI Console (P09); partner settlement in P10. Reporting is one consolidated, permission-based area (Analytics, P16): seeded standard dashboards and reports plus no-code builders over a governed business catalogue; the P08 report screens, the POS terminal day view and the kitchen performance view are scoped windows onto the same definitions and must show the same numbers. Every figure is read from a lag-tolerant reporting copy and shows its "as of" time; scope comes from the person's rights, never from a filter; AI explains and recommends but never acts, answers only within the person's role, labels forecasts, and is phase two for finance ledgers.
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Base currency | The venue's region currency; the currency every record and ledger posting is in. A guest may pay in a currency they select (where the venue charges it); the books still hold the base amount and the rate. | Home currency, Local price, Default currency | DI-211 / DI-282 / contracts/spine/orders.yaml#/components/schemas/Order |
+| Pay in USD (a currency the venue charges) | The guest's selected payment currency; the card is charged in it at the rate locked on the order, and refunds go back in it. | Converted price, Approx. (for a charged currency) | contracts/spine/orders.yaml#checkoutCart / … |
+| ≈ (approx.) price in USD / SAR / … | A conversion of a base-currency price for a currency the venue shows but does not charge, always next to the base price. | Converted price, USD price | DI-211 / screens/P02-guest-mobile-app.yaml#GST-044 |
+| Takings | Money received in the period less refunds (cash-basis); the seeded KPI on hubs. | Revenue, Sales, Income | contracts/satellite/reporting.yaml#/components/schemas/ReportingSystemKpi / R283 |
+| Gross sales | Issued sales before discounts and refunds; whether tax is included must be stated on the tile. | Revenue, Turnover | MATRIX 6.1.78 |
+| Net revenue | Gross sales less discounts less refunds, adjusted per finance policy. | Net sales, Revenue, Income | MATRIX 6.1.78 |
+| Recognised revenue / Deferred revenue | Earned under the recognition rules / paid for but not yet earned. Kept distinct from sales. | Realised revenue, Unearned income, Wallet revenue | MATRIX 5.12.6 / DI-260 / contracts/spine/finance.yaml#getDeferredRevenue |
+| VAT receipt | The simplified tax invoice issued on a paid order. | Receipt (when it is a tax document), Bill | contracts/spine/finance.yaml#issueTaxInvoice |
+| Tax invoice / Combined tax invoice | A full invoice with the buyer's details / one invoice for several paid orders of one buyer. | Bill, Statement | contracts/spine/finance.yaml#/components/schemas/FinTaxInvoiceType |
+| Credit memo | The document that corrects an issued invoice after a refund; the invoice itself is never edited. | Credit note (until the client's tax adviser chooses "Tax credit note"), Edit invoice | contracts/spine/finance.yaml#/components/schemas/FinTaxInvoice |
+| VAT (or the jurisdiction's tax name) | Use the tax profile's own name on every surface; "Tax" only where several kinds are summed. | GST in UAE, Service charge for a tax | contracts/spine/catalogue.yaml#setTaxProfileJurisdiction |
+| Price before discount | The taxable base where the jurisdiction taxes the undiscounted price. | Gross price, List tax | DI-598 |
+| Post / Reverse | A journal reaches the ledger when approved and posted; a correction is a reversal, never an edit or delete. | Edit entry, Delete entry, Undo | contracts/spine/finance.yaml#reverseJournalEntry |
+| Period (Open / Closing / Closed) | A fiscal period's state; closing stops postings, closed locks them. | Month locked, Frozen | contracts/spine/finance.yaml#/components/schemas/PeriodStatus |
+| Variance (Over / Short) | The difference between expected and counted or recorded, always saying between which two figures. | Discrepancy, Error, Loss | DI-275 / contracts/spine/finance.yaml#/components/schemas/UnifiedReconciliation |
+| Settlement / Exception / Resolve | A provider's file for a day / a line that did not match / the recorded explanation. | Payout file, Error, Close | contracts/spine/finance.yaml#/components/schemas/SettlementException |
+| Chargeback | A bank-initiated reversal with an evidence deadline; not a refund. | Dispute refund, Reversal | contracts/spine/orders.yaml#/components/schemas/Chargeback |
+| Report / Dashboard / Tile / KPI | A runnable, exportable, schedulable definition / a page of tiles / one visual bound to a report / a company-wide measure defined once. | Widget (outside the builder's library), Board (for a user-facing dashboard) | contracts/satellite/reporting.yaml#/components/schemas/DashboardTile / … |
+| Warning / Critical | KPI status bands set by a target's amber and red thresholds; always words plus colour. | Amber, Red (alone), Bad | contracts/satellite/reporting.yaml#/components/schemas/KpiTarget |
+| As of HH:MM / Updated N sec ago | The freshness of every figure read from the reporting copy; stale shows a warning. | Live (unless refreshed), Real-time | MATRIX 8.7.22 |
+| Forecast | Any projected figure, with its range; never shown as a fact. | Expected, Will be | DI-973 |
+| Outlet / Workstation (till) | A sales point / the device; staff copy may say "till" for the workstation. | Store, POS (in copy), Drawer (for the device) | R156 |
+| Channel | POS, Web, App, Kiosk, B2B, OTA, from one closed list. | Source, Platform | MoM 2026-08-18 4.2 Recipes, Operating Hours & Service Channels / MATRIX 1.4.7 |
+
 
 ## The screens
 
@@ -106,6 +224,19 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 **Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
 
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** The executive dashboard of resource management: a Resource Health score with its components, headline KPIs, breakdown by venue, attraction, event, department, category, type, staff, equipment and space, executive health indicators and an AI executive brief, and the entry to the board 10 screens. The one thing to get right: every tile drills to the screen that explains it, and the health score shows its components and weights.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **The fourteen KPIs are drawn as columns of a table titled "Every resource analytics", and the breakdown dimensions as action buttons** Why: KPIs are tiles (VO-R02); breakdown is a control, not six buttons. *(source: screens/P08-venue-back-office.yaml#BO-943; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **Readiness, conflicts, unfulfilled demand, overtime, downtime, cost, forecast vs actual and the health score have no source among the bound reads** Why: Only listResources and getResourceUtilisation are bound. *(source: contracts/satellite/resources.yaml#getResourceUtilisation / contracts/satellite/resources.yaml#listResources; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+
+#### Decided on this screen
+
+Answered questions: draw the decision, not the old default. Where a decision and the tables below differ, the decision wins.
+
+- **Who sets the Resource Health score weights, and where?** → Drawn default accepted: Show the weights read-only under the gauge with "Set in Governance & Policy" (BO-948). *(decided by Chinmay, 2026-10-02; DEC-519 / CHG-NOTE-008)* **Reviewable:** a default the lead may still overrule before the block is tasked.
+
 #### Inputs: what the user enters or picks
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
@@ -120,6 +251,10 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Group by | radio group | — | Resource · Resource type · Category · Venue | `getResourceUtilisation` ?groupBy |
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Breakdown and period**: Breakdown as a segmented control (Venue, Attraction, Event, Resource category, Resource type, Equipment...); tenant and region only for tenant users; date range. *(source: screens/P08-venue-back-office.yaml#BO-943)*
 
 #### Outputs: what the screen shows and produces
 
@@ -176,6 +311,16 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Resource type (secondary button) | navigation or local | — | — | — | — |
 | Equipment (secondary button) | navigation or local | — | — | — | — |
 
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Resource health score**: Gauge 0-100 with band label (Excellent, Good, At risk) and components - Availability, Utilisation, Workforce coverage, Asset reliability, Event readiness, Forecast accuracy, Compliance - each clickable. *(source: screens/P08-venue-back-office.yaml#BO-952 / screens/P08-venue-back-office.yaml#BO-943)*
+- **KPI tiles**: Total active resources, Available, Currently assigned, Utilisation %, Readiness %, Staff utilisation, Physical asset utilisation, Conflicts, Unfulfilled demand, Overtime (h), Maintenance downtime, Resource-related cost (AED), Forecast vs actual, AI recommendations implemented - tiles with deltas (VO-R02). *(source: screens/P08-venue-back-office.yaml#BO-943)*
+- **AI executive brief**: Three or four sentences ("Utilisation up 7% this week; Ski School near optimal; Event Operations has 18% under-used equipment; three staffing gaps predicted for the weekend"), labelled AI with data freshness. *(source: screens/P08-venue-back-office.yaml#BO-943)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Board tiles**: Utilisation (BO-944), Cost and efficiency (BO-945), Forecast accuracy, KPI and SLA (BO-947), Governance (BO-948), Approvals, Audit (BO-950), Integration health, Executive intelligence (BO-952). *(source: screens/P08-venue-back-office.yaml#BO-943)*
+
 **Data it reads**: `listResources` (onLoad, Resources at this venue); `getResourceUtilisation` (onLoad, Utilisation across the estate)
 
 **Where the user goes next**
@@ -201,6 +346,38 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the resource analytics are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Edge cases to draw
+
+- **A component of the health score has no data**: The score is computed over the components that have data and says "Forecast accuracy not available - excluded". *(source: screens/P08-venue-back-office.yaml#BO-952)*
+
+#### Consistency with other screens
+
+- Match `BO-854`: Total active resources must match the master-data command centre for the same scope.
+- Match `ANL-001`: The venue analytics executive command centre uses the same tile and brief components.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+health:
+  score: 94/100 Excellent
+  availability: 97%
+  utilisation: 88%
+  workforceCoverage: 98%
+  assetReliability: 91%
+  eventReadiness: 96%
+  forecastAccuracy: 93%
+  compliance: 100%
+tiles:
+  totalResources: 12,458
+  assignedNow: 7,821
+  utilisation: 78%
+  readiness: 96%
+  conflicts: 12
+  overtime: 182 h
+```
 
 #### Permissions
 
@@ -249,6 +426,9 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-100`, `BO-944`, `BO-945`, `BO-946`, `BO-947`, `BO-948`, `BO-949`, `BO-950`, `BO-951`, `BO-952`.
 - [ ] Every gated control is gated: `RESOURCE_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 1 edge case(s) from the process notes are drawn.
+- [ ] The 2 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
+- [ ] The 1 decision(s) taken on this screen are drawn as decided, not as the old default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -271,6 +451,14 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Known gaps.** **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** How well resources are used: available, scheduled and actual hours, idle and blocked time, utilisation against a target, with rankings of under- and over-used resources, a trend, venue comparison and a day-by-hour heatmap. Over-utilisation is capacity risk, not success ("Level 3 instructors above 92% for five weekends"). The one thing to get right: utilisation is over operationally available time (after schedules, blocks, setup and travel), and the target line is always drawn.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **Actual usage, reserved vs assigned time, idle and maintenance time have no field** Why: The read returns available, booked and blocked minutes; the pack's formula uses actual utilised hours. *(source: screens/P08-venue-back-office.yaml#BO-944 / contracts/satellite/resources.yaml#/components/schemas/ResourceUtilisation; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **Trend, heatmap and day/time analysis cannot be fed** Why: The read returns one row per group for the whole window, with no time buckets. *(source: contracts/satellite/resources.yaml#getResourceUtilisation; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **Utilisation target has no field** Why: Under/over-utilisation is judged against a configured target that nothing stores. *(source: screens/P08-venue-back-office.yaml#BO-944; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+
 #### Inputs: what the user enters or picks
 
 **On the screen**
@@ -288,6 +476,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | From | date and time picker | — | — | `getResourceUtilisation` ?from |
 | To | date and time picker | — | — | `getResourceUtilisation` ?to |
 | Group by | radio group | — | Resource · Resource type · Category · Venue | `getResourceUtilisation` ?groupBy |
+
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Period and grouping**: Period presets and range; group by Resource / Type / Category / Venue as tabs (Overview, By resource, By venue, Heatmap). *(source: screens/P08-venue-back-office.yaml#BO-944 / contracts/satellite/resources.yaml#getResourceUtilisation)*
 
 #### Outputs: what the screen shows and produces
 
@@ -335,6 +527,17 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Utilisation percent | 1,234.5 | — |
 | Booking count | 1,234 | — |
 
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Tiles**: Available capacity (h), Scheduled (h), Actual usage (h), Utilisation % ; plus Underutilised % and Overutilised % of resources against target. *(source: screens/P08-venue-back-office.yaml#BO-944)*
+- **Trend and ranking**: 30-day trend with the target as a dashed line (80% default); ranking bars sorted by utilisation with resources under target in one colour and over the risk threshold in another. *(source: screens/P08-venue-back-office.yaml#BO-944)*
+- **Under- and over-utilisation lists**: Top 5 underutilised (Meeting Room C 21% over 90 days) and top 5 overutilised with trend arrows; AI recommendation as advice ("Consider more Level 3 capacity at weekends"). *(source: screens/P08-venue-back-office.yaml#BO-944 / screens/P08-venue-back-office.yaml#BO-945)*
+- **Table**: Label, available h, booked h, blocked h, utilisation %, bookings - hours not minutes. *(source: contracts/satellite/resources.yaml#getResourceUtilisation)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Click a resource**: Opens the resource calendar on the period (BO-864) filtered to it. *(source: designer default)*
+
 **Data it reads**: `getResourceUtilisation` (onLoad, Utilisation and capacity)
 
 **Where the user goes next**
@@ -351,6 +554,32 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the resource utilization capacity are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Edge cases to draw
+
+- **Resource with zero available hours in the period (retired, closed)**: Excluded from rankings with a note, never shown as 0% underutilised. *(source: contracts/satellite/resources.yaml#/components/schemas/ResourceUtilisation)*
+
+#### Consistency with other screens
+
+- Match `BO-586`: Same definition and visuals as rental utilisation.
+- Match `BO-947`: The target line is the Resource utilisation KPI target.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+example:
+  group: Ski instructors - Sat 10 Oct 2026
+  available: 420 h
+  scheduled: 376 h
+  actual: 354 h
+  utilisation: 84.3%
+underutilised:
+- Meeting Room C 21%
+- Projector P-41 24%
+- Booth B-12 29%
+```
 
 #### Permissions
 
@@ -388,6 +617,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-943`.
 - [ ] Every gated control is gated: `RESOURCE_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 1 edge case(s) from the process notes are drawn.
+- [ ] The 3 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -409,6 +640,14 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Route | `/rentals/resource-cost-revenue-efficiency-analytics-bo-945` |
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** What resources cost and earn: labour, overtime, maintenance, rental, external, transfer, operating and replacement costs against ticket, experience, rental and event revenue, with efficiency ratios (revenue per resource hour, cost per participant, revenue/cost) and the cost ledger behind them. Finance remains the system of record. The one thing to get right: insights are advice only, and a wrong cost entry is removed and re-entered, never edited.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **"Transfer cost", "Asset operating cost", "Resource replacement cost" are drawn as action buttons, and "Resource id" as a text filter** Why: They are the kind filter (and the kind on create); the resource filter is a picker. *(source: screens/P08-venue-back-office.yaml#BO-945; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **The cost table lists id, resourceId, fromVenueId, toVenueId and scopePath** Why: Show names, not ids (VO-R12). *(source: screens/P08-venue-back-office.yaml#BO-156 / DI-039; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **Labour, overtime, maintenance, rental and external costs and ticket/experience/event revenue association are not in the cost analytics read** Why: It returns transfer, operating and replacement cost and booking revenue; labour comes from workforce and is not bound; DI-501 asks for cost and revenue by event, which is not a grouping. *(source: contracts/satellite/resources.yaml#/components/schemas/ResourceCostAnalytics / contracts/satellite/workforce.yaml#getLabourCost / DI-501; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
 
 #### Inputs: what the user enters or picks
 
@@ -448,6 +687,11 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 Errors to draw in the form: 422 Unknown resource at this venue; a `transfer` without both venues or with the same venue twice; a non-positive amount.
 
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Period and grouping**: Period; group by Resource / Type / Category / Venue as tabs. *(source: contracts/satellite/resources.yaml#getResourceCostAnalytics)*
+- **Cost entry (create)**: Kind as one choice Transfer / Operating / Replacement; resource picker (not an id field); amount in AED, positive; incurred on date; From and To venue only for Transfer, and they must differ; note. *(source: contracts/satellite/resources.yaml#createResourceCost)*
+
 #### Outputs: what the screen shows and produces
 
 **Shown**
@@ -476,6 +720,18 @@ Errors to draw in the form: 422 Unknown resource at this venue; a `transfer` wit
 | Create resource cost (secondary button) | `createResourceCost` POST `/resource-costs` | ResourceCostEntry | ResourceCostEntry | 422 Unknown resource at this venue; a `transfer` without both venues or with the same venue twice; a non-positive amount. | gated `RESOURCE_MANAGE`; opens modal first |
 | Delete resource cost (destructive button) | `deleteResourceCost` DELETE `/resource-costs/{costId}` | — | — | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path. | gated `RESOURCE_MANAGE` |
 
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Tiles**: Total resource cost, Revenue attributed, Cost/revenue %, with deltas; efficiency tiles Revenue per resource hour, Labour cost per participant, Revenue/cost ratio. *(source: screens/P08-venue-back-office.yaml#BO-945)*
+- **Cost breakdown**: Donut and table by cost kind in AED with percent. *(source: screens/P08-venue-back-office.yaml#BO-945)*
+- **Cost ledger**: Date, resource name, kind, amount, from-to venue for transfers, note, entered by; newest first, cursor paging (VO-R12); no ids or scope paths. *(source: contracts/satellite/resources.yaml#listResourceCosts)*
+- **AI insight**: "Private lessons earn 34% more per instructor hour than group lessons on weekday afternoons" labelled as insight, no Apply button. *(source: screens/P08-venue-back-office.yaml#BO-946)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Add cost**: Books the entry; analytics refresh. A transfer with the same venue twice is refused against the field. *(source: contracts/satellite/resources.yaml#createResourceCost)*
+- **Remove cost entry**: Confirm naming the amount and period affected ("September analytics will change by AED 450.00"); removal is audited (VO-R16). *(source: contracts/satellite/resources.yaml#deleteResourceCost)*
+
 **Data it reads**: `getResourceUtilisation` (onLoad, Cost and efficiency against use); `getResourceCostAnalytics` (onLoad, What resources cost and earn, grouped); `listResourceCosts` (onLoad, Cost entries booked against resources)
 
 **Where the user goes next**
@@ -497,6 +753,40 @@ Errors to draw in the form: 422 Unknown resource at this venue; a `transfer` wit
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 422 Unknown resource at this venue; a `transfer` without both venues or with the same venue twice; a non-positive amount. |
+
+#### Edge cases to draw
+
+- **Group with no booked hours**: Cost per booked hour shows a dash, not zero or infinity. *(source: contracts/satellite/resources.yaml#/components/schemas/ResourceCostAnalytics)*
+
+#### Consistency with other screens
+
+- Match `BO-862`: Transfers between venues set there are what Transfer cost entries record.
+- Match `BO-910`: Maintenance costs are booked as Operating from the maintenance screen.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+example:
+  group: Private Ski Lessons - Sep 2026
+  revenue: AED 420,000.00
+  instructorCost: AED 112,000.00
+  hours: 1,480 h
+  revenuePerHour: AED 284.00
+ledger:
+- date: 28 Sep 2026
+  resource: Projector P-17
+  kind: Operating
+  amount: AED 450.00
+  note: Lamp replacement
+- date: 25 Sep 2026
+  resource: Portable stage S-2
+  kind: Transfer
+  amount: AED 1,200.00
+  from: Aqua Park
+  to: Summit Peaks
+```
 
 #### Permissions
 
@@ -540,6 +830,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-943`.
 - [ ] Every gated control is gated: `RESOURCE_MANAGE`, `RESOURCE_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 1 edge case(s) from the process notes are drawn.
+- [ ] The 3 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -559,6 +851,14 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/rentals/demand-forecast-accuracy-planning-performance-bo-946` |
+
+**Known gaps.** Contract gap recorded 2 October 2026 (CHG-WIR-027): A read of resource demand forecasts against actual resource use; listDemandBookingCurve is the ticket booking curve.
+
+**From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** How accurate resource demand forecasts were against what actually happened.
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- The only read is the ticket demand forecast (booking curve), not resource demand. (CHG-WIR-027)
 
 #### Inputs: what the user enters or picks
 
@@ -605,6 +905,10 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Understaffing rate** (metric tile)
 
+**Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
+
+- **accuracy**: Forecast vs actual by period with the error percentage. *(source: contracts/spine/catalogue.yaml#listDemandBookingCurve)*
+
 **Data it reads**: `listDemandBookingCurve` (onLoad, Forecast accuracy)
 
 **Where the user goes next**
@@ -621,6 +925,16 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the demand forecast accuracy are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+accuracy:
+  period: October 2026
+  forecastError: 8.4%
+```
 
 #### Permissions
 
@@ -686,6 +1000,13 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
 
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** Where the organisation defines what good looks like: a KPI and SLA library (utilisation, assignment fulfilment, staffing coverage, readiness, equipment availability, downtime, conflict resolution time, replacement time, attendance compliance, overtime, rental return rate, forecast accuracy) with target, warning and critical thresholds, scope, period and owner, and a scorecard of target vs actual. The one thing to get right: each KPI says whether higher or lower is better, so status colours are never inverted.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **The KPI library names and the KPI configuration fields are all drawn as 22 columns of one table** Why: KPI names are rows; configuration fields are a form; the scorecard is its own table. *(source: screens/P08-venue-back-office.yaml#BO-947; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **Only getResourceUtilisation is bound; no operation stores KPI or SLA definitions or computes actuals** Why: The pack requires configurable KPIs, thresholds and continuous monitoring. *(source: screens/P08-venue-back-office.yaml#BO-947 / contracts/satellite/resources.yaml#getResourceUtilisation; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+
 #### Inputs: what the user enters or picks
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
@@ -697,6 +1018,11 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Group by | radio group | — | Resource · Resource type · Category · Venue | `getResourceUtilisation` ?groupBy |
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **KPI definition**: Name (Arabic variant), description, formula (picked from defined measures, not free text), direction (Higher is better / Lower is better), target, warning and critical thresholds consistent with the direction, applicable venue and resource scope, effective period, owner. *(source: screens/P08-venue-back-office.yaml#BO-947)*
+- **SLA**: Event-based target ("Replacement identified within 10 minutes") with the event it measures and the time limit. *(source: screens/P08-venue-back-office.yaml#BO-948)*
 
 #### Outputs: what the screen shows and produces
 
@@ -756,6 +1082,14 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Effective period | text | not in the schema: `Effective period` |
 | Owner | text | not in the schema: `Owner` |
 
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Scorecard**: KPI/SLA, Target, Actual, Variance, Trend arrow, Status (green/amber/red) - rows sorted by status, critical first. *(source: screens/P08-venue-back-office.yaml#BO-948 / screens/P08-venue-back-office.yaml#BO-947)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Add / Edit KPI**: Opens the definition form; saving starts measuring from the effective date. *(source: screens/P08-venue-back-office.yaml#BO-947)*
+
 **Data it reads**: `getResourceUtilisation` (onLoad, The KPI base)
 
 **Where the user goes next**
@@ -772,6 +1106,45 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the resource kpi sla are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Edge cases to draw
+
+- **Warning threshold on the wrong side of critical**: Refused against the field ("For Higher is better, warning must be above critical"). *(source: designer default)*
+
+#### Consistency with other screens
+
+- Match `BO-944`: The utilisation target drawn there is this KPI's target.
+- Match `BO-943`: Health indicators use these thresholds for their colours.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+kpis:
+- kpi: Resource assignment fulfilment
+  direction: Higher
+  target: '>= 98%'
+  warning: 95-97.9%
+  critical: < 95%
+  actual: 98.4%
+  status: green
+- kpi: Maintenance downtime
+  direction: Lower
+  target: <= 5%
+  actual: 4.2%
+  status: green
+- kpi: Resource conflicts
+  direction: Lower
+  target: <= 10
+  actual: 12
+  status: red
+- kpi: Critical replacement time
+  direction: Lower
+  target: <= 10 min
+  actual: 8.4 min
+  status: green
+```
 
 #### Permissions
 
@@ -809,6 +1182,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-943`.
 - [ ] Every gated control is gated: `RESOURCE_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 1 edge case(s) from the process notes are drawn.
+- [ ] The 2 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -831,9 +1206,20 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** One place for the policies that govern resource behaviour (assignment, availability, booking, priority, customer selection, qualification, certification, overtime, maintenance blocking, rental, deposits, replacement, event allocation, AI autonomy, overrides), each with scope, version, effective dates, owner and approval, inherited Global > Tenant > Region > Venue > Category > Resource. The one thing to get right: show for every value whether it is inherited or overridden here ("Automatic staff replacement - Global: Allowed; Venue B: Manager approval required").
+
+**Known correction pending (do not draw the wrong version)**
+
+- **Only the allocation policy is bound, with Save and Cancel; the gap note says nothing is drawable** Why: The pack lists fifteen policy areas, a ten-field policy structure and a six-level hierarchy; one of fifteen has an operation and none has versions, effective dates or inheritance. *(source: screens/P08-venue-back-office.yaml#BO-948 / screens/P08-venue-back-office.yaml#BO-949 / contracts/satellite/resources.yaml#setResourceAllocationPolicy; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **The allocation policy has no inheritance read** Why: The screen must show inherited versus local values, but the read returns only the venue's effective policy. *(source: contracts/satellite/resources.yaml#getResourceAllocationPolicy / ADR-0018; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+
 #### Inputs: what the user enters or picks
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Policy**: Name, policy area (one of fifteen), scope level and target, effective and expiry dates, owner, approval requirement; the policy's own settings below (e.g. the allocation policy's strategy and weights). *(source: screens/P08-venue-back-office.yaml#BO-948 / screens/P08-venue-back-office.yaml#BO-949)*
 
 #### Outputs: what the screen shows and produces
 
@@ -843,6 +1229,17 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |---|---|---|---|---|---|
 | Save (primary button) | navigation or local | — | — | — | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
+
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Active policies**: Table - policy, area, scope, status, version, owner; filter by area. *(source: screens/P08-venue-back-office.yaml#BO-948)*
+- **Policy hierarchy**: For a selected policy, the six levels with the value at each, inherited values in grey with "From Tenant", local overrides in bold with Reset to inherited. *(source: screens/P08-venue-back-office.yaml#BO-949 / ADR-0018)*
+- **Effective calendar**: Month view of when policy versions start and end (VO-R01). *(source: screens/P08-venue-back-office.yaml#BO-948)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **New policy / Save as new version**: Creates a version effective from a date; earlier versions stay in history; approval where required. *(source: screens/P08-venue-back-office.yaml#BO-949)*
+- **Open allocation policy**: The resource assignment policy opens its editor (BO-901) and saves through the allocation policy write. *(source: contracts/satellite/resources.yaml#setResourceAllocationPolicy)*
 
 **Data it reads**: `getResourceAllocationPolicy` (onLoad, Policy in force)
 
@@ -860,6 +1257,41 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the resource governance policy are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Edge cases to draw
+
+- **A venue override contradicts a non-overridable global policy (safety)**: Override control disabled with "Locked at Global - safety". *(source: screens/P08-venue-back-office.yaml#BO-949)*
+
+#### Consistency with other screens
+
+- Match `BO-901`: Same allocation policy record (VO-R14).
+- Match `ADM-529`: AI autonomy policy is set in the platform AI governance; show it here read-only with a link.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+policies:
+- name: Staff replacement rule
+  area: Resource replacement
+  scope: Global
+  status: Active
+  version: '2.3'
+  owner: Operations
+- name: Overtime policy
+  area: Overtime
+  scope: All venues
+  version: '1.6'
+  owner: HR
+- name: Customer selection policy
+  area: Customer selection
+  scope: Tenant
+  version: '1.1'
+  owner: Operations
+hierarchy: 'Automatic staff replacement - Global: Allowed; Aqua Park: Allowed; Summit Peaks: Manager approval required
+  (override)'
+```
 
 #### Permissions
 
@@ -898,6 +1330,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-943`.
 - [ ] Every gated control is gated: `RESOURCE_CONFIGURE`, `RESOURCE_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 1 edge case(s) from the process notes are drawn.
+- [ ] The 2 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -911,7 +1345,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Rentals · wave 3 · needs the `resources` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue; in the flows as venue manager |
+| Who uses it | venue staff holding `PLATFORM_TENANT_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Each request shall show) and no metric row |
 | Offline | online only |
@@ -920,7 +1354,24 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
 
+**From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** Resource-management exceptions and overrides waiting for a decision, with operational and financial impact.
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- A Venue Management screen calls operations gated by TICVAI-only permissions: listMemberExceptionOverride (PLATFORM_TENANT_VIEW). (CHG-SBO-005)
+- The table's columns are the workshop pack's labels with no bound response field (0 of 10 labels bound). (CHG-SBO-005)
+
+**Fixed on main** (the package already carries these; draw what it says): emptyFirstRun says it 'carries the create action', and the screen declares no operation that creates anything. (CHG-SBO-002).
+
 #### Inputs: what the user enters or picks
+
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Exception type | select | — | Eligibility override · Activation extension · Expiry extension · Complimentary renewal · Complimentary benefit · Entitlement adjustment · Freeze exception · Suspension override · Replacement credential · Renewal exception · Dependent exception | `listMemberExceptionOverride` ?exceptionType |
+| Approval status | radio group | — | Pending · Approved · Rejected · Applied | `listMemberExceptionOverride` ?approvalStatus |
+| Membership | text field | — | — | `listMemberExceptionOverride` ?membershipId |
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
 
@@ -970,12 +1421,46 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |---|---|
 | Loading (`?state=loading`) | The approval exception override list. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the approval exception override untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No approval exception override yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, first run (`?state=emptyFirstRun`) | No approval exception override yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the approval exception override are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+Every approval exception override:
+- Request: 11
+  Resource: 128
+  Requester: Rahul Menon
+  Venue: AquaCove Abu Dhabi
+  Reason: 57
+  Operational impact: 312
+  Financial impact: 128
+  Risk: 3
+- Request: 128
+  Resource: 46
+  Requester: Fatima Al Mansoori
+  Venue: AquaCove Dubai
+  Reason: 11
+  Operational impact: 74
+  Financial impact: 46
+  Risk: 2
+- Request: 46
+  Resource: 312
+  Requester: Omar Haddad
+  Venue: AquaCove Muscat
+  Reason: 128
+  Operational impact: 19
+  Financial impact: 312
+  Risk: 0
+```
+
 #### Permissions
+
+- `listMemberExceptionOverride` → `PLATFORM_TENANT_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -1009,7 +1494,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - [ ] Every state opens from `#BO-949?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-943`.
-- [ ] Sign-in is asked only where the spec asks for it.
+- [ ] Every gated control is gated: `PLATFORM_TENANT_VIEW`.
 - [ ] The module and platform inputs below are applied.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -1030,6 +1515,14 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | Offline | online only |
 | Opens with | `resourceId` (navigation) |
 | Route | `/rentals/audit-trail-resource-decision-history-bo-950` |
+
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** The immutable history of material resource decisions - creation, changes, availability, assignment and reassignment, cancellations, overrides, maintenance blocks, rental and deposit actions, event allocation, AI recommendations and executions, approvals and policy changes - each with who, what, when, where, before, after, reason, approval and source. The one thing to get right: the source says whether a person, the Staff App, POS, an API, an integration, an automated rule or TICVAI AI started it, and AI lines link to their reasoning.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **The fifteen event kinds and nine record fields are drawn as 23 selectFields** Why: Event kinds are filter chips; record fields are table columns and the detail panel. *(source: screens/P08-venue-back-office.yaml#BO-950; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **The only read is per resource (opened with a resourceId), with no search** Why: The pack searches by employee, event, user, date, action, venue and source across all resources. *(source: screens/P08-venue-back-office.yaml#BO-951 / contracts/satellite/resources.yaml#getResourceAuditTrail; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **The audit entry has no approval and no explicit initiator type** Why: The pack requires the approval and that AI-executed actions are distinguishable from manual ones; sourceChannel is free text. *(source: screens/P08-venue-back-office.yaml#BO-932 / contracts/satellite/resources.yaml#/components/schemas/ResourceAuditEntry; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
 
 #### Inputs: what the user enters or picks
 
@@ -1061,7 +1554,20 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | Reason | select field | — | — | — | — | — | — |
 | Source | select field | — | — | — | — | — | — |
 
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Search**: Search by resource, employee, event, user, date range, action, venue and source; chips for the fifteen event kinds and seven sources. *(source: screens/P08-venue-back-office.yaml#BO-951)*
+
 #### Outputs: what the screen shows and produces
+
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Audit table**: Date/time, User (or System / TICVAI AI), Action, Resource and details ("Maria Santos - Private lesson Zone A -> Group lesson Zone B"), Source; newest first, cursor paging (VO-R12). *(source: screens/P08-venue-back-office.yaml#BO-950)*
+- **Entry detail**: Before and after side by side, reason, approval (approved by, when), correlation id; for AI-initiated entries "Initiated by TICVAI AI recommendation, approved by Operations Manager" and a link to the decision trace. *(source: screens/P08-venue-back-office.yaml#BO-951 / contracts/satellite/resources.yaml#/components/schemas/ResourceAuditEntry / contracts/satellite/ai.yaml#getAiDecisionTrace)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Export**: CSV/PDF of the filter, permission-checked and itself audited. *(source: screens/P08-venue-back-office.yaml#BO-950)*
 
 **Where the user goes next**
 
@@ -1077,6 +1583,39 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Empty, no results (`?state=emptyNoResults`) | **Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist |
 | Offline (`?state=offline`) | online only |
+
+#### Edge cases to draw
+
+- **Entry from an action made offline**: Shows when it happened on the device and when it synced. *(source: contracts/satellite/resources.yaml#setResourceBookingProgress)*
+- **Viewer without audit rights**: "Needs audit access" empty state (VO-R08). *(source: ADR-0002 / DI-387)*
+
+#### Consistency with other screens
+
+- Match `BO-592`: The rental audit log is a filtered view of this table.
+- Match `BO-863`: The per-resource audit timeline uses the same entries.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+rows:
+- at: 10 Oct 2026 09:41
+  user: Fatima Al Hashimi
+  action: Assignment changed
+  details: Maria Santos - Private lesson Zone A -> Group lesson Zone B
+  source: Back office
+- at: 10 Oct 2026 09:37
+  user: TICVAI AI
+  action: Recommendation
+  details: Reallocate 4 instructors Zone B -> Zone A
+  source: AI engine (approved by Ahmed Al Mansoori)
+- at: 10 Oct 2026 09:30
+  user: System
+  action: Resource status
+  details: Projector P-17 -> Under maintenance
+  source: Integration
+```
 
 #### Permissions
 
@@ -1114,6 +1653,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-943`.
 - [ ] Every gated control is gated: `RESOURCE_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 2 edge case(s) from the process notes are drawn.
+- [ ] The 3 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -1135,6 +1676,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Route | `/rentals/resource-integration-system-health-center-bo-951` |
 
 **Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
+
+**From the Finance, Ledger & Tax · Reporting & Analytics process.** Health of the integrations that feed resource management (HR system, workforce provider, booking sync): last success, failures, records affected and what that failure means operationally.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **The screen reads the analytics data pipelines (feeds into the reporting replica), not the resource integrations it describes.** Why: Wrong source; it also duplicates P16's pipeline monitor. *(source: contracts/satellite/reporting.yaml#listAnalyticsPipelines / screens/P16-venue-analytics.yaml#ANL-067; Finance, Ledger & Tax · Reporting & Analytics)*
 
 #### Inputs: what the user enters or picks
 
@@ -1185,6 +1732,14 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+- HR system roster sync · failed 03:00 · 214 records not updated · tomorrow's roster may miss 6 new starters
+```
+
 #### Permissions
 
 - `listAnalyticsPipelines` → `REPORT_VIEW_TENANT` (operate) · staff
@@ -1221,6 +1776,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-943`.
 - [ ] Every gated control is gated: `REPORT_VIEW_TENANT`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -1243,6 +1799,13 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
 
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** The executive AI workspace that closes the module: ask "How did our resources perform this month?" and get the headline numbers, AI findings and recommended actions with evidence, confidence, expected benefit, risk, affected resources and financial and operational impact; plus how the AI itself is performing (recommendations generated, accepted, rejected, savings predicted vs realised). The one thing to get right: management reviews, simulates, assigns an owner or dismisses - the AI never makes a strategic change by itself.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **The seven governance fields are drawn as columns of a table titled "Every executive resource intelligence"** Why: They are a strip on each recommendation card. *(source: screens/P08-venue-back-office.yaml#BO-952; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **Only getResourceUtilisation is bound; the nine AI performance tiles and the findings have no source** Why: Insights, their decisions and forecast accuracy live in the AI contract (listAiInsights, decideAiInsight, getForecastAccuracy) and are not bound. *(source: contracts/satellite/ai.yaml#listAiInsights / contracts/satellite/ai.yaml#decideAiInsight / contracts/satellite/ai.yaml#getForecastAccuracy; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+
 #### Inputs: what the user enters or picks
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
@@ -1254,6 +1817,11 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Group by | radio group | — | Resource · Resource type · Category · Venue | `getResourceUtilisation` ?groupBy |
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Executive question**: A question box with suggested questions; the answer is a structured summary, not free chat. *(source: screens/P08-venue-back-office.yaml#BO-952)*
+- **Period**: Month selector (default last full month). *(source: screens/P08-venue-back-office.yaml#BO-952)*
 
 #### Outputs: what the screen shows and produces
 
@@ -1301,6 +1869,16 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Financial impact | text | not in the schema: `Financial impact` |
 | Operational impact | text | not in the schema: `Operational impact` |
 
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Performance summary**: Overall utilisation with change, readiness, assignment fulfilment, forecast accuracy, overtime change, resource-related cost change - tiles (VO-R02). *(source: screens/P08-venue-back-office.yaml#BO-952)*
+- **Findings and recommended actions**: Cards with an impact tag (High, Medium, Low), the finding, the action and expected effect ("Replace projectors P-17, P-22, P-31 - AED 18,400 a year less maintenance"), and a governance strip Evidence / Confidence / Expected benefit / Risk / Affected resources / Financial impact / Operational impact. *(source: screens/P08-venue-back-office.yaml#BO-952)*
+- **AI performance**: Tiles Recommendations generated, Accepted %, Rejected %, Expired/no action %, Auto-actions executed, Forecast accuracy, Savings predicted, Savings realised (validated), Replacement success, Conflict-resolution success. *(source: screens/P08-venue-back-office.yaml#BO-952)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Review / Simulate / Create action / Assign owner / Dismiss**: Dismiss asks for a reason (it is the signal that judges the recommender); Create action assigns an owner and a due date; nothing changes resources directly. *(source: screens/P08-venue-back-office.yaml#BO-952 / contracts/satellite/ai.yaml#decideAiInsight)*
+
 **Data it reads**: `getResourceUtilisation` (onLoad, Executive resource view)
 
 **Where the user goes next**
@@ -1317,6 +1895,47 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the executive resource intelligence are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Edge cases to draw
+
+- **Savings not yet measured**: Realised shows "Measuring - available after 30 days" instead of zero. *(source: contracts/satellite/ai.yaml#decideAiInsight)*
+
+#### Consistency with other screens
+
+- Match `BO-923`: Same recommendation card and governance strip.
+- Match `ANL-019`: The platform's AI management insights use the same insight lifecycle (new, reviewed, accepted/rejected, actioned, measured).
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+month: September 2026
+summary:
+  utilisation: 78% (+6%)
+  readiness: 96%
+  fulfilment: 98.4%
+  forecastAccuracy: 92%
+  overtime: -14%
+  cost: +4.8%
+findings:
+- impact: High
+  finding: Level 3 instructors above 90% utilisation on four weekends
+  action: Increase Level 3 capacity
+  effect: +8% peak availability
+- impact: Medium
+  finding: Three projectors account for 41% of AV maintenance spend
+  action: Replace P-17, P-22, P-31
+  effect: AED 18,400 a year
+aiPerformance:
+  recommendations: 1,284
+  accepted: 81%
+  rejected: 12%
+  expired: 7%
+  forecastAccuracy: 92.4%
+  predicted: AED 148,000
+  validated: AED 121,000
+```
 
 #### Permissions
 
@@ -1354,6 +1973,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-943`.
 - [ ] Every gated control is gated: `RESOURCE_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 1 edge case(s) from the process notes are drawn.
+- [ ] The 2 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -1458,6 +2079,7 @@ Method, path, parameters, request and response for every operation these screens
 "getResourceUtilisation": {"method":"GET","path":"/resource-utilisation","contract":"resources","summary":"How much of each resource's available time was used","permission":"RESOURCE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"from","in":"query","required":true},{"name":"to","in":"query","required":true},{"name":"groupBy","in":"query","required":null}],"requestBody":null,"responds":"ResourceUtilisation"},
 "listAnalyticsPipelines": {"method":"GET","path":"/analytics-pipelines","contract":"reporting","summary":"Data sources, refresh state and freshness","permission":"REPORT_VIEW_TENANT","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"tenant","parameters":[],"requestBody":null,"responds":"AnalyticsPipeline"},
 "listDemandBookingCurve": {"method":"GET","path":"/demand-booking-curve","contract":"catalogue","summary":"AI Demand Forecasting & Booking Curve Studio","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"venue","in":"query","required":false},{"name":"product","in":"query","required":false},{"name":"event","in":"query","required":false},{"name":"performance","in":"query","required":false},{"name":"channel","in":"query","required":false},{"name":"horizon","in":"query","required":false},{"name":"dateFrom","in":"query","required":false},{"name":"dateTo","in":"query","required":false},{"name":"priceCategory","in":"query","required":false},{"name":"sectionCode","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
+"listMemberExceptionOverride": {"method":"GET","path":"/member-exception-override","contract":"subscription","summary":"Member Exceptions, Overrides & Service Recovery","permission":"PLATFORM_TENANT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":"exceptionType","in":"query","required":false},{"name":"approvalStatus","in":"query","required":false},{"name":"membershipId","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listResourceCosts": {"method":"GET","path":"/resource-costs","contract":"resources","summary":"Cost entries booked against resources","permission":"RESOURCE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"resourceId","in":"query","required":null},{"name":"kind","in":"query","required":null},{"name":"from","in":"query","required":null},{"name":"to","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listResources": {"method":"GET","path":"/resources","contract":"resources","summary":"Resources at this venue","permission":"RESOURCE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"kind","in":"query","required":null},{"name":"availableFrom","in":"query","required":null},{"name":"availableTo","in":"query","required":null}],"requestBody":null,"responds":"Resource"},
 "setResourceAllocationPolicy": {"method":"PUT","path":"/resource-allocation-policy","contract":"resources","summary":"Rotation, priority and scoring","permission":"RESOURCE_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"ResourceAllocationPolicy","responds":"ResourceAllocationPolicy"}
@@ -1473,6 +2095,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "AiDemandForecastingBookingCurveStudioView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over catalogue state, assembled at read time from tables that already exist","description":"**What AI Demand Forecasting & Booking Curve Studio displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"venue":{"type":"string","description":"Venue id"},"product":{"type":"string","description":"Product id","nullable":true},"event":{"type":"string","description":"Event id","nullable":true},"performance":{"type":"string","description":"Performance id","nullable":true},"date":{"type":"string","description":"Date","format":"date"},"timeslot":{"type":"string","description":"Timeslot","nullable":true},"priceCategory":{"type":"string","description":"Price category","nullable":true},"sectionCode":{"type":"string","nullable":true,"description":"Seat-map section (`seating.Section.code`) the row forecasts; null for a row at price-category or performance level (29 September, build pass, group G2; 21.11.4)"},"channel":{"$ref":"#/components/schemas/Channel","description":"Channel"},"confidence":{"type":"number","description":"Forecast Confidence, percent"},"forecastFinalOccupancy":{"type":"number","description":"Forecast Final Occupancy, percent"},"demand":{"type":"integer","description":"Forecast demand"},"attendance":{"type":"integer","description":"Forecast attendance"},"occupancy":{"type":"number","description":"Forecast occupancy, percent"},"sellThrough":{"type":"number","description":"Forecast sell-through, percent"},"expectedSellOutTime":{"type":"string","description":"Expected Sell-Out Time; empty if no sell-out forecast","format":"date-time","nullable":true},"revenue":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Forecast revenue"},"conversion":{"type":"number","description":"Forecast conversion, percent"},"remainingInventory":{"type":"integer","description":"Forecast remaining inventory at event"},"mape":{"type":"number","description":"MAPE over closed forecasts at this level, percent"},"forecastBias":{"type":"number","description":"Forecast Bias (positive = over-forecast), percent"},"overForecast":{"type":"number","description":"Share of closed forecasts that over-forecast, percent"},"underForecast":{"type":"number","description":"Share of closed forecasts that under-forecast, percent"},"forecastId":{"type":"string","description":"Forecast id"},"horizon":{"type":"string","description":"Forecast Horizon","enum":["intraday","tomorrow","days7","days30","eventHorizon","seasonalHorizon"]},"bookingCurve":{"type":"array","items":{"type":"object","properties":{"daysBeforeEvent":{"type":"integer","description":"T minus days"},"historicalExpectedPercentSold":{"type":"number","description":"Historical expected curve, percent sold"},"actualPercentSold":{"type":"number","nullable":true,"description":"Current actual curve, percent sold (empty for future points)"},"forecastPercentSold":{"type":"number","description":"AI forecast curve, percent sold"}}},"description":"Booking Curve"},"signalContributions":{"type":"array","items":{"type":"object","properties":{"signal":{"type":"string","enum":["internalSales","bookingVelocity","occupancy","historicalEvents","nearbyEvent","weather","marketTourism","competitor","priceElasticity","other"],"description":"Signal category"},"contributionPercent":{"type":"number","description":"Explanatory share of the forecast"}}},"description":"Model Inputs: which signals contributed"},"confidenceReasons":{"type":"array","items":{"type":"string","enum":["strongHistoricalData","stableBookingPattern","reliableExternalSignals","limitedHistoricalData","volatileBookingPattern","degradedExternalSignals"]},"description":"Reasons behind the forecast confidence"},"modelVersion":{"type":"string","description":"Model version that produced the forecast"},"generatedAt":{"type":"string","description":"When the forecast was produced","format":"date-time"}}},
 "AnalyticsPipeline": {"type":"object","x-ticvai-persistence":"reporting.pipeline","description":"BI board 10.7. **Freshness decides whether a dashboard can be trusted.**","properties":{"id":{"type":"string","format":"uuid"},"name":{"type":"string"},"sourceKind":{"type":"string"},"datasets":{"type":"array","items":{"type":"string"}},"schedule":{"type":"string","nullable":true},"lastRunAt":{"type":"string","format":"date-time","nullable":true},"lastSuccessAt":{"type":"string","format":"date-time","nullable":true},"freshnessMinutes":{"type":"integer","nullable":true},"expectedFreshnessMinutes":{"type":"integer","nullable":true},"status":{"type":"string","enum":["healthy","degraded","stale","failed","paused"]},"lastError":{"type":"string","nullable":true},"rowsLastRun":{"type":"integer","nullable":true},"scopePath":{"type":"string"}}},
 "Channel": {"type":"string","enum":["pos","kiosk","web","mobile","b2b","ota","callCentre"]},
+"MemberExceptionsOverridesServiceRecoveryView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over subscription state, assembled at read time from tables that already exist","description":"**What Member Exceptions, Overrides & Service Recovery displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"member":{"type":"string","description":"Member"},"membership":{"type":"string","description":"Membership"},"requestedAction":{"type":"string","description":"Requested Action"},"standardPolicyResult":{"type":"string","description":"Standard Policy Result"},"requestedException":{"type":"string","description":"Requested Exception"},"reason":{"type":"string","description":"Reason"},"supportingDocumentation":{"type":"array","items":{"type":"string"},"description":"Supporting Documentation: document ids"},"financialImpact":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"nullable":true,"description":"Financial Impact of the exception"},"entitlementImpact":{"type":"string","description":"Entitlement Impact"},"requestor":{"type":"string","description":"Requestor"},"exceptionType":{"type":"string","enum":["eligibilityOverride","activationExtension","expiryExtension","complimentaryRenewal","complimentaryBenefit","entitlementAdjustment","freezeException","suspensionOverride","replacementCredential","renewalException","dependentException"],"description":"Exception Type (pack p.32)"},"exceptionValue":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"nullable":true,"description":"Value used for approval routing"},"durationDays":{"type":"integer","description":"Duration in days, for extensions","nullable":true},"membershipTier":{"type":"string","description":"Membership Tier"},"exceptionId":{"type":"string","description":"Exception ID"},"approvalStatus":{"type":"string","description":"Approval status: pending, approved, rejected or applied"},"approver":{"type":"string","description":"Approver; must differ from the requestor for high-value exceptions","nullable":true},"remedy":{"type":"string","enum":["extendMembership","guestTicket","complimentaryVisit","feeWaiver","benefitCredit","renewalDiscount","alternativeEntitlement"],"description":"Service Recovery remedy (pack p.33)","nullable":true},"aiSuggestion":{"type":"string","description":"AI suggestion, advisory","nullable":true}}},
 "Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}},
 "Resource": {"type":"object","x-ticvai-persistence":"resources.resource","description":"**A specific object, not a quantity of interchangeable ones.** A venue with forty identical strollers has forty resources, because guest number twelve returned stroller number twelve.\n","required":["id","code","name","kind","venueId"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string"},"name":{"type":"string"},"kind":{"$ref":"#/components/schemas/ResourceKind"},"venueId":{"type":"string","format":"uuid"},"scopePath":{"type":"string"},"parentResourceId":{"type":"string","format":"uuid","nullable":true,"description":"**A pool cabana belongs to the pool area; a seat belongs to an auditorium.** Booking a parent takes its children with it, which is the behaviour a venue expects and would otherwise have to enforce by hand.\n"},"principalId":{"type":"string","format":"uuid","nullable":true,"description":"For a resource of kind `instructor` or `staff`. **`workforce` still owns their rota** — this says whether they are qualified and whether they are already committed.\n"},"attributes":{"type":"object","additionalProperties":true,"description":"Configurable per kind — capacity, size, shade, power, poolside."},"setupMinutes":{"type":"integer","default":0,"description":"**Before the booking, not inside it.** An auditorium booked 14:00–16:00 is unavailable from 13:30 with a 30-minute setup, and a calendar that cannot express that double-books every time.\n"},"teardownMinutes":{"type":"integer","default":0,"description":"After the booking. **Kept as it is** (decided 29 September, W10): with a `cleaningPolicy` of `afterEveryBooking` the cleaning buffer is added after the teardown, so a room with no teardown and a 15-minute clean is free 15 minutes after each booking ends.\n"},"cleaningPolicy":{"allOf":[{"$ref":"#/components/schemas/ResourceCleaningPolicy"}],"nullable":true,"description":"How the resource is cleaned between uses (decided 29 September, W10). Null means no cleaning is scheduled beyond `teardownMinutes`."},"requiresQualification":{"type":"array","items":{"type":"string"},"description":"Qualification codes a person must hold to be assigned to this."},"depositAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"status":{"type":"string","enum":["available","booked","checkedOut","maintenance","retired"]},"isActive":{"type":"boolean","default":true}}},
 "ResourceAllocationPolicy": {"type":"object","x-ticvai-persistence":"resources.allocation_policy","description":"Board 5.08, and the 26 August rotation decision. **Named rather than hidden in the allocator**, so somebody can answer why cabana three never gets used.\n","properties":{"strategy":{"type":"string","enum":["rotate","leastUtilised","priorityOrder","nearestFirst"],"default":"rotate","description":"**`rotate` is the default because 26 August made it one.** *\"rotate across all available resources… rather than repeatedly reusing the same resource, to avoid overburdening any single resource while others remain unused.\"*\n"},"respectResourcePriority":{"type":"boolean","default":true},"scoringWeights":{"type":"object","additionalProperties":{"type":"number"}},"allowPartialAllocation":{"type":"boolean","default":false,"description":"**False by default.** A stage allocated without its sound system is worse than no allocation, because it looks finished.\n"},"scopePath":{"type":"string"}}},

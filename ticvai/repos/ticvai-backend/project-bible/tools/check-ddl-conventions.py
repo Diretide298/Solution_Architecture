@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """The derived DDL, read back against the conventions it was derived to hold.
 
-**Audit class A-DDL-DERIVATION (audit/ticvai/ROOT-CLASSES.md).** `derive-schema.py` and
+**Audit class A-DDL-DERIVATION (docs/active/root-classes.md).** `derive-schema.py` and
 `derive-ddl.py` produce `backend/*/010-*.sql`, `900-foreign-keys.sql` and `910-indexes.sql`. The
 26 September pull audit found what they got wrong and nothing failed on: foreign keys with no index
 (R090), `scope_path` typed text (R092) or nullable under forced row-level security (R180), a column

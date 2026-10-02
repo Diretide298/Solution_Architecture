@@ -114,9 +114,8 @@ screens:
         on listCases, and conversationId has no source on SUP-005 yet (a gap in SUP-005, not in this edge)'
     - to: SUP-006
       trigger: Knowledge Base Search
-      provenance: 'derived — SUP-006 declares entryState.params bannerId, pageId, policyKind, version
-        and SUP-001 holds none of them. The edge carries nothing: bannerId, pageId, policyKind, version
-        only pre-select (deep link or optional), and SUP-006 opens on its own'
+      provenance: 'derived — SUP-006 declares entryState.params  and SUP-001 holds none of them. The edge
+        carries nothing: SUP-006 needs nothing to open'
     - to: SUP-008
       trigger: Agent Performance & SLA View
       provenance: 'derived — SUP-008 declares entryState.params conversationId, reportId and SUP-001 holds
@@ -407,8 +406,8 @@ screens:
       trigger: Conversation Queue
       carries:
       - conversationId
-      provenance: derived — SUP-004 declares entryState.params caseId, conversationId and SUP-002 holds
-        caseId, conversationId, so an edge into it carries them
+      provenance: derived — SUP-004 declares entryState.params conversationId and SUP-002 holds conversationId,
+        so an edge into it carries them
   notes: States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement. **Drawn 26 August**
@@ -858,12 +857,15 @@ screens:
         edge is the way back and SUP-001 keeps its own state'
     - to: SUP-002
       trigger: Agent Dashboard
+      carries:
+      - caseId
       provenance: derived — SUP-002 declares entryState.params caseId and SUP-004 holds caseId, so an
         edge into it carries them
     - to: SUP-005
-      trigger: Reads the history and replies
-      provenance: flow F05 step 1→2, F24 step 3→4
+      trigger: The agent answers
+      provenance: flow F24 step 3→4
       carries:
+      - caseId
       - conversationId
   notes: States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
@@ -2085,6 +2087,8 @@ screens:
       trigger: Works in Case Investigation & Resolution Workspace
       provenance: flow F134 step 7→8
       operation: listCustomerService
+      carries:
+      - caseId
     - to: SUP-014
       trigger: Works in Order, Booking & Ticket Service Workspace
       provenance: flow F134 step 9→10
@@ -2101,6 +2105,8 @@ screens:
       trigger: Works in Case Resolution, Closure & Customer Feedback
       provenance: flow F134 step 15→16
       operation: listCustomerService
+      carries:
+      - caseId
     - to: SUP-018
       trigger: Works in AI Customer Service Copilot & Knowledge Workspace
       provenance: flow F134 step 17→18
@@ -2793,6 +2799,8 @@ screens:
     - CaseInvestigationResolutionWorkspaceView.status
     params:
     - name: caseId
+      from: navigation
+    - name: uploadId
       from: navigation
   wireframe:
     status: notStarted
@@ -3681,6 +3689,7 @@ screens:
     - to: SUP-019
       trigger: Returns to the board's landing screen
       provenance: flow F135 step 2→3
+      operation: listServiceQueues
   density: compact
   purposeNote: Administrators can configure specialized service queues and supervisors can operationally
     adjust them without changing application code.

@@ -1,5 +1,5 @@
 id: LLD-ai
-title: ai — 141 operations
+title: ai — 144 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -671,6 +671,17 @@ operations:
   reads:
   - ai.policy
   writes: []
+- operation: getAiSpendCeiling
+  verb: GET
+  path: /policy/spend-ceiling
+  scope: venue
+  permission: AI_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.spend_ceiling
+  writes: []
 - operation: getAiUsage
   verb: GET
   path: /usage
@@ -807,6 +818,16 @@ operations:
   - ai.case_evidence
   - ai.risk_alert
   - ai.risk_case
+  writes: []
+- operation: getTranslationProposals
+  verb: GET
+  path: /ai/translate/{translationJobId}
+  scope: tenant
+  permission: TENANT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
   writes: []
 - operation: getVenueHistoryImport
   verb: GET
@@ -2026,6 +2047,18 @@ operations:
   writes:
   - ai.risk_register
   - cache:idempotency
+- operation: setAiSpendCeiling
+  verb: PUT
+  path: /policy/spend-ceiling
+  scope: venue
+  permission: AI_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.spend_ceiling
+  writes:
+  - ai.spend_ceiling
 - operation: setAiTool
   verb: PUT
   path: /tools/{toolKey}

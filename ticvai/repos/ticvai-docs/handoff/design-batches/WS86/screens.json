@@ -303,6 +303,24 @@
        "kind": "selectField",
        "label": "☑ Network Connectivity",
        "provenance": "pack Game_and_Ride_Module.pdf, page 87 §Configure supported capabilities"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Reader models",
+       "bindsTo": "DeviceTypeHardwareLibraryView",
+       "operation": "listDeviceTypeHardware",
+       "provenance": "contract access.yaml GET /device-type-hardware; wiring fix, 2 October 2026"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "components": [
+      {
+       "kind": "secondaryButton",
+       "label": "Save model",
+       "operation": "setHardwareModel",
+       "provenance": "contract access.yaml PUT /hardware-models; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -311,17 +329,24 @@
   "states": {
    "loading": "The reader manufacturer model configuration as saved.",
    "error": "Could not load. Names which read failed and leaves the reader manufacturer model untouched.",
-   "emptyFirstRun": "No reader manufacturer model configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyFirstRun": "No reader manufacturer model configured yet. Offers no create action — this screen declares no operation that makes one and says what the platform does in the meantime.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },
   "apis": [
    {
-    "operationId": "setReaderProfile",
-    "contract": "games",
-    "purpose": "Manufacturer and model",
+    "operationId": "listDeviceTypeHardware",
+    "contract": "access",
+    "purpose": "Reader models in the hardware library",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-001)"
+   },
+   {
+    "operationId": "setHardwareModel",
+    "contract": "access",
+    "purpose": "Add or change a reader model",
     "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026"
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-001)"
    }
   ],
   "wireframe": {
@@ -330,6 +355,31 @@
    "workshopBoard": "wireframes/WS66 Game and Ride Board 9.dc.html#bo-475"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 87. 0 of 0 labels bound to a contract property; 9 of 28 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetHardwareModel",
+    "component": "modal",
+    "trigger": "Save model",
+    "body": "**Collects what `setHardwareModel` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save model",
+     "operation": "setHardwareModel"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "contract access.yaml PUT /hardware-models; wiring fix, 2 October 2026"
+   }
+  ],
+  "entryState": {},
+  "gaps": [
+   {
+    "operation": "setReaderProfile",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): ReaderProfile holds display behaviour, retry and replay window, not manufacturer, model or capabilities; the model belongs to the hardware model library (design-notes correction venue-operations BO-475).",
+    "source": "contracts/satellite/games.yaml#setReaderProfile | contracts/spine/access.yaml#setHardwareModel"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -547,6 +597,12 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Game_and_Ride_Module.pdf, page 89"
+   },
+   {
+    "operation": "setReaderConfiguration",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): Command and event mapping is the vendor adaptor's, per model (ADR-0015); setReaderConfiguration writes one reader, and the screen is reached from the integration command centre with no reader (design-notes correction venue-operations BO-477).",
+    "source": "contracts/satellite/games.yaml#setReaderConfiguration | screens/P08-venue-back-office.yaml#BO-477 | ADR-0015"
    }
   ],
   "layout": {
@@ -554,58 +610,25 @@
    "regions": [
     {
      "name": "contentBody",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "setReaderConfiguration",
-       "label": "Save reader configuration",
-       "notes": "The act the screen exists for."
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "setReaderConfiguration"
-      }
-     ]
+     "components": []
     }
    ]
   },
   "states": {
    "loading": "The reader command event list.",
    "error": "Could not load. Names which read failed and leaves the reader command event untouched.",
-   "emptyFirstRun": "No reader command event yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No reader command event yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the reader command event are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Not shown: nothing on this screen needs a permission of its own; the app's sign-in decides access."
   },
-  "apis": [
-   {
-    "operationId": "setReaderConfiguration",
-    "contract": "games",
-    "purpose": "Command and event mapping",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026",
-    "invalidates": [
-     "listReaders"
-    ]
-   }
-  ],
+  "apis": [],
   "wireframe": {
    "status": "notStarted",
    "board": "wireframes/P08 Venue Management.dc.html#bo-477",
    "workshopBoard": "wireframes/WS66 Game and Ride Board 9.dc.html#bo-477"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 89. 0 of 0 labels bound to a contract property; 0 of 23 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "entryState": {
-   "params": [
-    {
-     "name": "readerId",
-     "from": "navigation"
-    }
-   ]
-  },
+  "entryState": {},
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -677,6 +700,11 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Game_and_Ride_Module.pdf, page 89"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-004): No bulk reader deploy, rollback, version compare or deployment status read.",
+    "source": "contracts/satellite/games.yaml#deployReaderConfiguration"
    }
   ],
   "layout": {
@@ -1359,6 +1387,17 @@
     "operation": null,
     "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
     "source": "pack Game_and_Ride_Module.pdf, page 93 §Card"
+   },
+   {
+    "operation": "certifyIntegration",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-021): certifyIntegration (DEVELOPER_ADMIN, a TICVAI permission) certifies an API integration listing; a tenant cannot hold it and reader-model certification is a different object (DEV-008 keeps the operation; design-notes correction platform-foundation BO-483). See the CHG-WIR-024 gap.",
+    "source": "contracts/satellite/public-api.yaml#certifyIntegration"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-024): No operation records or reads the certification of a reader (access or games hardware) model.",
+    "source": "contracts/satellite/public-api.yaml#certifyIntegration | contracts/satellite/payments.yaml#listPaymentTerminalCertifications"
    }
   ],
   "layout": {
@@ -1411,19 +1450,11 @@
   "states": {
    "loading": "The integration certification test list.",
    "error": "Could not load. Names which read failed and leaves the integration certification test untouched.",
-   "emptyFirstRun": "No integration certification test yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No integration certification test yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the integration certification test are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Not shown: nothing on this screen needs a permission of its own; the app's sign-in decides access."
   },
-  "apis": [
-   {
-    "operationId": "certifyIntegration",
-    "contract": "public-api",
-    "purpose": "Integration certification",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026"
-   }
-  ],
+  "apis": [],
   "entryState": {
    "preloaded": [
     "RFID Tap",
@@ -1432,12 +1463,6 @@
     "Text",
     "Price",
     "Balance"
-   ],
-   "params": [
-    {
-     "name": "listingId",
-     "from": "navigation"
-    }
    ]
   },
   "wireframe": {

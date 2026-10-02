@@ -33,7 +33,6 @@ steps:
   operations:
   - getVenueMap
   - getVenueMapLive
-  - listDiningOutlets
   outcome: '**`getVenueMapLive` carries closures and queues.** A map showing an outlet that shut an
     hour ago sends the guest to a locked door.'
   crossesDevice: true

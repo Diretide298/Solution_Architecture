@@ -40,9 +40,14 @@ transitions:
   guard: '`lockDuration` `untilInvestigationComplete` and the linked `securityInvestigationId` reached
     `resolved` or `closed`'
   isReversal: true
-openQuestions:
-- Whether `releaseIdentityLock` may release a `permanent` lock, and under what approval, is not stated;
-  confirm it is refused or needs a second person.
-notes: '**`released` is terminal.** Locking the identity again is a new lock, so the history shows each
-  lock and its release. Credential bindings under the lock''s scope follow it (`suspended` while it
-  is active, `active` again when the last covering lock is released).'
+notes: '**Decided 2 October 2026: a second approver for permanent locks and for releasing full-identity
+  or permanent locks; none for an until-end-of-day lock** (Chinmay, critical set 1, BO-229 and BO-247;
+  DEC-254, DEC-260; CHG-CSP-031). This closes the open question on releasing a `permanent` lock. A permanent
+  `lockIdentity` and such a `releaseIdentityLock` answer `202` and wait for a second person in the approvals
+  engine (kind `accessPermissionChange`); the row is written, or moves to `released`, only when that
+  person approves, so neither pending step is a state of the lock.
+
+
+  **`released` is terminal.** Locking the identity again is a new lock, so the history shows each lock
+  and its release. Credential bindings under the lock''s scope follow it (`suspended` while it is active,
+  `active` again when the last covering lock is released).'

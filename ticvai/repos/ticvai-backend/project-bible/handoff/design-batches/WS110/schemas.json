@@ -330,112 +330,9 @@
    }
   }
  },
- "ApprovalInboxDecisionWorkspaceInput": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
-  "description": "**What Approval Inbox & Decision Workspace submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
-  "properties": {
-   "decision": {
-    "type": "string",
-    "enum": [
-     "approve",
-     "reject",
-     "returnForChange",
-     "requestInformation",
-     "delegate"
-    ],
-    "description": "Approver decision"
-   },
-   "comment": {
-    "type": "string",
-    "description": "Approver comment"
-   },
-   "delegateTo": {
-    "type": "string",
-    "description": "Approver delegated to, for delegate"
-   }
-  }
- },
- "ApprovalInboxDecisionWorkspaceView": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
-  "description": "**What Approval Inbox & Decision Workspace displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
-  "properties": {
-   "campaign": {
-    "type": "string",
-    "description": "Campaign"
-   },
-   "promotion": {
-    "type": "string",
-    "description": "Promotion"
-   },
-   "requestedBy": {
-    "type": "string",
-    "description": "Requested by"
-   },
-   "requestDate": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Request date"
-   },
-   "requestedAction": {
-    "type": "string",
-    "description": "Requested action"
-   },
-   "discount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Discount"
-   },
-   "budget": {
-    "type": "string",
-    "description": "Budget"
-   },
-   "estimatedRedemptions": {
-    "type": "integer",
-    "description": "Estimated redemptions"
-   },
-   "estimatedRevenue": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Estimated revenue"
-   },
-   "marginImpact": {
-    "type": "number",
-    "description": "Margin impact"
-   },
-   "customerReach": {
-    "type": "string",
-    "description": "Customer reach"
-   },
-   "riskLevel": {
-    "type": "string",
-    "description": "Risk level"
-   },
-   "aiForecast": {
-    "type": "string",
-    "description": "AI forecast"
-   },
-   "decision": {
-    "type": "string",
-    "enum": [
-     "approve",
-     "reject",
-     "returnForChange",
-     "requestInformation",
-     "delegate"
-    ],
-    "description": "Approver decision"
-   },
-   "comment": {
-    "type": "string",
-    "description": "Approver comment"
-   }
-  }
- },
  "ApprovalKind": {
   "type": "string",
-  "description": "11.1.7 and 11.1.30–11.1.37. **The first four already exist as bespoke implementations** and this contract is what they collapse into.\n**Which actions route here — decided 28 September, audit R144.** Finance and procurement acts go through this engine to a **finance approver**: closing a fiscal period (`periodClose`), reopening one (`periodReopen`), cancelling a purchase order (`purchaseOrderCancel`) and closing one short (`purchaseOrderShortClose`). The tenant default matrix for each of these names the finance approver role; a venue may tighten it and never loosen it. Starting a release rollout routes through `releasePromotion` to the platform release manager (a holder of `PLATFORM_RELEASE_PROMOTE`). **Not every `requiresApproval` goes here:** reopening a shift, recounting a stock count and a retail return above the venue threshold take a supervisor's step-up on the same device instead, and never raise a request.\n**Catalogue change requests route through `productChange` and `pricingChange`** (decided 29 September, writers pass): a product change and a price or pricing change raised in `catalogue` ask for approval under these two kinds, so a venue can route product edits and price edits to different approvers.\n",
+  "description": "11.1.7 and 11.1.30–11.1.37. **The first four already exist as bespoke implementations** and this contract is what they collapse into.\n**Which actions route here — decided 28 September, audit R144.** Finance and procurement acts go through this engine to a **finance approver**: closing a fiscal period (`periodClose`), reopening one (`periodReopen`), cancelling a purchase order (`purchaseOrderCancel`) and closing one short (`purchaseOrderShortClose`). The tenant default matrix for each of these names the finance approver role; a venue may tighten it and never loosen it. Starting a release rollout routes through `releasePromotion` to the platform release manager (a holder of `PLATFORM_RELEASE_PROMOTE`). **Not every `requiresApproval` goes here:** reopening a shift, recounting a stock count and a retail return above the venue threshold take a supervisor's step-up on the same device instead, and never raise a request.\n**Catalogue change requests route through `productChange` and `pricingChange`** (decided 29 September, writers pass): a product change and a price or pricing change raised in `catalogue` ask for approval under these two kinds, so a venue can route product edits and price edits to different approvers.\n\n**Optional review steps a venue switches on, decided 2 October 2026** (Chinmay; CHG-CSP-036, CHG-CSP-028, CHG-CSP-031). Each is an existing kind narrowed by the rule's `subjectTypes`, so no kind is added (a new value here would be a breaking change against r1) and each is off until the venue saves an active matrix for it:\n- **Publishing white-label content** (`configurationChange`, subject `whiteLabelPublication`): simulate, then a single publish by a holder of the permission; a review step only where the venue sets one up (batch 1, CMS-014; DEC-156). - **Recording F&B waste above a value** (`stockWriteOff`, subject `fnbWaste`): the venue's waste-approval policy, value bands as `minAmount` and `maxAmount`, photo evidence above a value held by fnb (batch 6 #192, BO-139; DEC-192; R144). - **Publishing an access topology** (`configurationChange`, subject `topologyPublication`): second-person approval when the venue switches it on (batch 6 #230, BO-153; DEC-230). - **A permanent identity lock, a whitelist entry, or releasing a full-identity or permanent lock** (`accessPermissionChange`, subjects `identityLock`, `whitelistEntry`, `identityLockRelease`): always a second approver, never for an until-end-of-day lock (critical set 1, BO-229 and BO-247; DEC-254, DEC-260); the tenant default matrix names the security approver role and a venue may tighten it, never remove it.\n",
   "enum": [
    "refund",
    "priceOverride",
@@ -663,6 +560,26 @@
     "format": "date-time",
     "nullable": true
    },
+   "assignedToPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "Who claimed or was assigned the request in a shared queue (`assignApprovalRequest`; DI-723; CHG-CSP-042). Null while it sits in the queue."
+   },
+   "assignedToDepartmentId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The department queue it was assigned to, where it went to a department rather than a person (CHG-CSP-042)."
+   },
+   "assignedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   },
    "requestedAt": {
     "type": "string",
     "format": "date-time"
@@ -843,6 +760,27 @@
     "type": "integer",
     "nullable": true,
     "description": "11.1.53. An unanswered request eventually stops waiting."
+   },
+   "subjectTypes": {
+    "type": "array",
+    "description": "**Which subjects of the kind this rule matches** (decided 2 October 2026, Chinmay; CHG-CSP-028, CHG-CSP-036, CHG-CSP-031): the `CreateApprovalRequest.subjectType` values, for example `topologyPublication` or `whiteLabelPublication` under `configurationChange`. Empty matches every subject of the kind. It is how a venue switches an optional review step on for one kind of act without routing every act of the kind.",
+    "items": {
+     "type": "string",
+     "maxLength": 64
+    }
+   },
+   "signatureMethods": {
+    "type": "array",
+    "description": "**The signature methods this level accepts, where `requiresSignature` is true** (design-notes correction on ADM-344, Block B: \"Configuring which stages need a signature is a policy write\"; CHG-CSP-045). Values of `ApprovalSignature.method`. Empty accepts any of them. With `requiresSignature` this makes the rule the signature policy: which levels of which kinds need a signature, and how it is given; `signApprovalDecision` refuses a method the level does not accept.",
+    "items": {
+     "type": "string",
+     "enum": [
+      "platformKey",
+      "uaePass",
+      "externalCertificate",
+      "drawnSignature"
+     ]
+    }
    },
    "externalProviderId": {
     "type": "string",
@@ -1335,6 +1273,530 @@
    "workflowName",
    "module",
    "definition"
+  ]
+ },
+ "WorkflowInstance": {
+  "type": "object",
+  "x-ticvai-persistence": "approvals.workflow_instance",
+  "description": "**One running workflow** (pack 13.2.1, 13.2.3 and 13.2.5; data model for the agreed operations, 29 September). Started by a `WorkflowTrigger`, on the version in force at that moment and kept on it to the end (audit R129). Its steps are `WorkflowStepExecution` rows, keyed by the same `correlationId` the participating services trace with. **The SLA clock and its reminder and escalation timestamps are held here**, not in a table of their own: there is one clock per instance, and the SLA, Escalation & Bottleneck Monitor lists instances. Lifecycle in `states/workflow-instance.yaml`. The engine writes this row; an operator changes it only through `actOnWorkflowInstance`, which keeps each change as a `WorkflowIntervention` (decided 29 September, writers pass).",
+  "required": [
+   "id",
+   "workflowDefinitionId",
+   "workflowVersionId",
+   "sourceModule",
+   "status",
+   "correlationId",
+   "startedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "workflowDefinitionId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "workflowVersionId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The version the instance started on; never changes"
+   },
+   "workflowTriggerId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "sourceModule": {
+    "$ref": "#/components/schemas/WorkflowModule"
+   },
+   "businessObjectType": {
+    "type": "string",
+    "maxLength": 100,
+    "nullable": true
+   },
+   "businessObjectId": {
+    "type": "string",
+    "nullable": true,
+    "description": "**A reference, never a copy**, as `ApprovalRequest.subjectId`"
+   },
+   "initiatedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Null when a system event or schedule started it"
+   },
+   "ownerPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "priority": {
+    "type": "string",
+    "maxLength": 30,
+    "nullable": true
+   },
+   "currentNodeId": {
+    "type": "string",
+    "nullable": true,
+    "description": "The node of the version's graph the instance is at"
+   },
+   "status": {
+    "$ref": "#/components/schemas/WorkflowInstanceStatus"
+   },
+   "correlationId": {
+    "type": "string",
+    "maxLength": 100,
+    "description": "The shared correlation id every participating service logs, for distributed tracing"
+   },
+   "slaPolicyId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The `ApprovalSlaPolicy` whose clock runs on this instance"
+   },
+   "slaDueAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "slaBreached": {
+    "type": "boolean",
+    "default": false
+   },
+   "escalationLevel": {
+    "type": "integer",
+    "minimum": 0,
+    "default": 0
+   },
+   "firstReminderAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "secondReminderAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "managerEscalatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "executiveEscalatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "slaOutcome": {
+    "type": "string",
+    "enum": [
+     "metWithinTarget",
+     "metAfterReminder",
+     "metAfterEscalation",
+     "breached"
+    ],
+    "nullable": true,
+    "description": "How the instance finished against its SLA; set on completion (the monitor's Final Outcome)"
+   },
+   "startedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "completedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "The partition key (ADR-0005). Written at venue scope"
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
+ "WorkflowInstanceActionInput": {
+  "type": "object",
+  "x-ticvai-persistence": "none — request only; writes approvals.workflow_intervention (schema WorkflowIntervention) (decided 29 September, writers pass)",
+  "description": "One operator action on a running workflow instance (decided 29 September, writers pass).",
+  "required": [
+   "action",
+   "reason"
+  ],
+  "properties": {
+   "action": {
+    "$ref": "#/components/schemas/WorkflowInterventionAction"
+   },
+   "reason": {
+    "type": "string",
+    "minLength": 1,
+    "maxLength": 500,
+    "description": "Mandatory for every action (pack 13.2.5, \"actions capture a mandatory reason\")"
+   },
+   "workflowStepExecutionId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The step acted on; for `retryStep` the step to retry from. Defaults to the instance's current step"
+   },
+   "workflowExceptionId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The exception the action is taken from; required for `escalateException`"
+   },
+   "assigneePrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Required for `reassign`, `addBackupApprover` and `escalateException`"
+   },
+   "alternativeNodeId": {
+    "type": "string",
+    "nullable": true,
+    "description": "For `skipStep`, the node to continue at instead of the next one (Use Approved Alternative)"
+   },
+   "correctedInput": {
+    "type": "object",
+    "additionalProperties": true,
+    "nullable": true,
+    "description": "For `resume`, the corrected input of the failed step (Correct Data)"
+   },
+   "extendByMinutes": {
+    "type": "integer",
+    "minimum": 1,
+    "maximum": 43200,
+    "nullable": true,
+    "description": "Required for `extendSla`"
+   },
+   "priority": {
+    "type": "string",
+    "maxLength": 30,
+    "nullable": true,
+    "description": "Required for `changePriority`"
+   }
+  }
+ },
+ "WorkflowInstanceStatus": {
+  "type": "string",
+  "description": "Where one running workflow stands (pack 13.2.1 and 13.2.3; decided 29 September, readiness close-out). Modelled in `states/workflow-instance.yaml`.",
+  "enum": [
+   "running",
+   "waitingApproval",
+   "waitingTask",
+   "waitingSystem",
+   "escalated",
+   "failed",
+   "completed",
+   "cancelled"
+  ]
+ },
+ "WorkflowInterventionAction": {
+  "type": "string",
+  "description": "What an operator did to a running workflow instance (pack 13.2.3, 13.2.4 and 13.2.5; decided 29 September, writers pass). The effect of each is on `actOnWorkflowInstance`.",
+  "enum": [
+   "reassign",
+   "retryStep",
+   "skipStep",
+   "resume",
+   "cancel",
+   "extendSla",
+   "addBackupApprover",
+   "changePriority",
+   "escalateException"
+  ]
+ },
+ "WorkflowModule": {
+  "type": "string",
+  "description": "The module a workflow, rule or automation belongs to and a workflow instance originates from. The same values as `WorkflowOperationsCommandCenterView.module` (decided 29 September, readiness close-out), named so the workflow engine's tables share one vocabulary (data model for the agreed operations, 29 September).",
+  "enum": [
+   "ticketing",
+   "pricing",
+   "finance",
+   "procurement",
+   "crm",
+   "resourceManagement",
+   "fnb",
+   "retail",
+   "groupSales",
+   "customerService",
+   "membership",
+   "wallet",
+   "waiver",
+   "subscriptionLicensing"
+  ]
+ },
+ "WorkflowOperationsCommandCenterView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over approvals.workflow_instance (schema WorkflowInstance) (data model for the agreed operations, 29 September)",
+  "description": "**What Workflow Operations Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "workflowInstanceId": {
+    "type": "string",
+    "description": "Workflow Instance ID"
+   },
+   "workflow": {
+    "type": "string",
+    "description": "Workflow"
+   },
+   "module": {
+    "type": "string",
+    "enum": [
+     "ticketing",
+     "pricing",
+     "finance",
+     "procurement",
+     "crm",
+     "resourceManagement",
+     "fnb",
+     "retail",
+     "groupSales",
+     "customerService",
+     "membership",
+     "wallet",
+     "waiver",
+     "subscriptionLicensing"
+    ],
+    "description": "Module the workflow originates from"
+   },
+   "businessObject": {
+    "type": "string",
+    "description": "Business Object"
+   },
+   "initiatedBy": {
+    "type": "string",
+    "description": "Initiated By"
+   },
+   "started": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Started"
+   },
+   "currentStep": {
+    "type": "string",
+    "description": "Current Step"
+   },
+   "owner": {
+    "type": "string",
+    "description": "Owner"
+   },
+   "priority": {
+    "type": "string",
+    "description": "Priority"
+   },
+   "sla": {
+    "type": "string",
+    "description": "SLA"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "running",
+     "waitingApproval",
+     "waitingTask",
+     "waitingSystem",
+     "escalated",
+     "failed",
+     "completed",
+     "cancelled"
+    ],
+    "description": "Status"
+   }
+  },
+  "required": [
+   "workflowInstanceId"
+  ]
+ },
+ "WorkflowOperationsCommandCenterViewSummary": {
+  "type": "object",
+  "x-ticvai-persistence": "none - aggregate computed at read time over the rows the page lists",
+  "description": "The KPI tiles shown above the list on this screen. Computed over the whole filtered set, not the current page (decided 29 September, readiness close-out).",
+  "properties": {
+   "workflowsRunning": {
+    "type": "integer",
+    "description": "Workflows Running"
+   },
+   "startedToday": {
+    "type": "integer",
+    "description": "Started Today"
+   },
+   "completedToday": {
+    "type": "integer",
+    "description": "Completed Today"
+   },
+   "pendingApprovals": {
+    "type": "integer",
+    "description": "Pending Approvals"
+   },
+   "waitingTasks": {
+    "type": "integer",
+    "description": "Waiting Tasks"
+   },
+   "slaAtRisk": {
+    "type": "integer",
+    "description": "SLA At Risk"
+   },
+   "slaBreached": {
+    "type": "integer",
+    "description": "SLA Breached"
+   },
+   "failedWorkflows": {
+    "type": "integer",
+    "description": "Failed Workflows"
+   },
+   "escalated": {
+    "type": "integer",
+    "description": "Escalated"
+   },
+   "automatedExecutions": {
+    "type": "integer",
+    "description": "Automated Executions"
+   },
+   "averageCompletionTime": {
+    "type": "integer",
+    "description": "Minutes"
+   },
+   "automationSuccessRate": {
+    "type": "number",
+    "description": "Automation Success Rate"
+   }
+  }
+ },
+ "WorkflowTestingSimulationImpactAnalysisInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; the outcome is recorded as approvals.workflow_version test results (data model for the agreed operations, 29 September)",
+  "description": "**What Workflow Testing, Simulation & Impact Analysis submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "workflowId": {
+    "type": "string",
+    "description": "Workflow under test"
+   },
+   "testMode": {
+    "type": "string",
+    "enum": [
+     "manualTestCase",
+     "sampleTransaction",
+     "historicalReplay",
+     "scenarioSimulation",
+     "batchTest"
+    ],
+    "description": "How the workflow is tested"
+   },
+   "version": {
+    "type": "string",
+    "description": "Version under test"
+   },
+   "compareWithVersion": {
+    "type": "string",
+    "description": "Existing version to compare against for regression"
+   },
+   "inputPayload": {
+    "type": "string",
+    "description": "Sample transaction as a JSON document, for manual and sample tests"
+   },
+   "replayFrom": {
+    "type": "string",
+    "format": "date",
+    "description": "Historical replay start"
+   },
+   "replayTo": {
+    "type": "string",
+    "format": "date",
+    "description": "Historical replay end"
+   }
+  },
+  "required": [
+   "workflowId",
+   "testMode"
+  ]
+ },
+ "WorkflowTestingSimulationImpactAnalysisView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — computed by simulation over approvals.workflow_version and the rules it calls; never executes actions (data model for the agreed operations, 29 September)",
+  "description": "**What Workflow Testing, Simulation & Impact Analysis displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "workflowId": {
+    "type": "string",
+    "description": "Workflow under test"
+   },
+   "testMode": {
+    "type": "string",
+    "enum": [
+     "manualTestCase",
+     "sampleTransaction",
+     "historicalReplay",
+     "scenarioSimulation",
+     "batchTest"
+    ],
+    "description": "How the workflow is tested"
+   },
+   "rulesEvaluated": {
+    "type": "integer",
+    "description": "Rules Evaluated"
+   },
+   "conditionsMatched": {
+    "type": "integer",
+    "description": "Conditions Matched"
+   },
+   "decisions": {
+    "type": "integer",
+    "description": "Decisions"
+   },
+   "approvalPath": {
+    "type": "string",
+    "description": "Approval Path"
+   },
+   "actions": {
+    "type": "integer",
+    "description": "Actions"
+   },
+   "notifications": {
+    "type": "integer",
+    "description": "Notifications"
+   },
+   "sla": {
+    "type": "string",
+    "description": "SLA"
+   },
+   "expectedOutcome": {
+    "type": "string",
+    "description": "Expected Outcome"
+   },
+   "version": {
+    "type": "string",
+    "description": "Version under test"
+   },
+   "compareWithVersion": {
+    "type": "string",
+    "description": "Existing version to compare against for regression"
+   },
+   "inputPayload": {
+    "type": "string",
+    "description": "Sample transaction as a JSON document, for manual and sample tests"
+   },
+   "replayFrom": {
+    "type": "string",
+    "format": "date",
+    "description": "Historical replay start"
+   },
+   "replayTo": {
+    "type": "string",
+    "format": "date",
+    "description": "Historical replay end"
+   }
+  },
+  "required": [
+   "workflowId",
+   "testMode"
   ]
  }
 }

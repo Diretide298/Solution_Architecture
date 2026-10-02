@@ -8,7 +8,7 @@
 | Runtime | reactNative |
 | App | guest-app |
 | Offline | yes |
-| Themes | light, dark |
+| Themes | light |
 | Directions | ltr, rtl |
 | Packages | design-tokens, ui, api-client, offline-core |
 | target | iOS / Android native |
@@ -32,69 +32,69 @@
 | [GST-006](#gst-006-item-detail-event-exhibition) | Item Detail – Event / Exhibition | Discovery & Browse | 1 | 2 |
 | [GST-007](#gst-007-select-date-time) | Select Date & Time | Booking & Selection | 1 | 9 |
 | [GST-008](#gst-008-tickets-add-ons) | Tickets & Add-ons | Booking & Selection | 1 | 6 |
-| [GST-009](#gst-009-review-payment) | Review & Payment | Cart & Checkout | 1 | 10 |
+| [GST-009](#gst-009-review-payment) | Review & Payment | Cart & Checkout | 1 | 9 |
 | [GST-010](#gst-010-booking-confirmation) | Booking Confirmation | Cart & Checkout | 1 | 3 |
 | [GST-012](#gst-012-my-tickets) | My Tickets | Account & Self-Service | 1 | 6 |
 | [GST-013](#gst-013-ticket-details) | Ticket Details | Account & Self-Service | 1 | 5 |
-| [GST-039](#gst-039-profile) | Profile | Account & Self-Service | 1 | 2 |
+| [GST-039](#gst-039-profile) | Profile | Account & Self-Service | 1 | 5 |
 | [GST-041](#gst-041-checkout-entry) | Checkout Entry | Cart & Checkout | 1 | 12 |
 | [GST-042](#gst-042-simple-registration-otp) | Simple Registration & OTP | Account & Self-Service | 1 | 13 |
-| [GST-043](#gst-043-arabic-rtl-experience) | Arabic / RTL Experience | System States | 1 | 0 |
+| [GST-043](#gst-043-arabic-rtl-experience) | Arabic / RTL Experience | System States | 1 | 1 |
 | [GST-046](#gst-046-branded-queue-waiting-room) | Branded Queue / Waiting Room | High-Demand Access | 1 | 2 |
-| [GST-047](#gst-047-maintenance-upgrade-page) | Maintenance / Upgrade Page | System States | 1 | 1 |
+| [GST-047](#gst-047-maintenance-upgrade-page) | Maintenance / Upgrade Page | System States | 1 | 2 |
 | [GST-051](#gst-051-plan) | Plan | Engagement & Support | 1 | 4 |
 | [GST-052](#gst-052-suggested-itineraries) | Suggested Itineraries | Engagement & Support | 1 | 3 |
 | [GST-053](#gst-053-your-plan) | Your Plan | Engagement & Support | 1 | 7 |
 | [GST-054](#gst-054-ai-planner) | AI Planner | Engagement & Support | 1 | 6 |
-| [GST-055](#gst-055-dynamic-qr-ticket) | Dynamic QR Ticket | Account & Self-Service | 1 | 5 |
+| [GST-055](#gst-055-dynamic-qr-ticket) | Dynamic QR Ticket | Account & Self-Service | 1 | 4 |
 | [GST-059](#gst-059-plan-in-progress) | Plan in Progress | Engagement & Support | 1 | 4 |
 | [GST-063](#gst-063-explore-search-results) | Explore – Search Results | Discovery | 1 | 1 |
-| [GST-011](#gst-011-wallet-overview) | Wallet Overview | Membership, Loyalty & Value | 2 | 6 |
+| [GST-011](#gst-011-wallet-overview) | Wallet Overview | Membership, Loyalty & Value | 2 | 7 |
 | [GST-014](#gst-014-ticket-transfer) | Ticket Transfer | Ticketing | 2 | 3 |
-| [GST-015](#gst-015-memberships) | Memberships | Membership, Loyalty & Value | 2 | 11 |
+| [GST-015](#gst-015-memberships) | Memberships | Membership, Loyalty & Value | 2 | 10 |
 | [GST-016](#gst-016-my-reservations) | My Reservations | Ticketing | 2 | 3 |
 | [GST-017](#gst-017-reservation-details) | Reservation Details | Ticketing | 2 | 2 |
-| [GST-019](#gst-019-order-history) | Order History | Account & Self-Service | 2 | 9 |
+| [GST-019](#gst-019-order-history) | Order History | Account & Self-Service | 2 | 7 |
 | [GST-021](#gst-021-interactive-map) | Interactive Map | In-venue Services | 2 | 4 |
 | [GST-022](#gst-022-attraction-wait-times) | Attraction Wait Times | In-venue Services | 2 | 1 |
-| [GST-024](#gst-024-f-b-browse-order) | F&B – Browse & Order | In-venue Services | 2 | 10 |
-| [GST-025](#gst-025-f-b-order-tracking) | F&B – Order Tracking | In-venue Services | 2 | 3 |
-| [GST-026](#gst-026-retail-merchandise) | Retail / Merchandise | Retail | 2 | 7 |
+| [GST-024](#gst-024-f-b-browse-order) | F&B – Browse & Order | In-venue Services | 2 | 8 |
+| [GST-025](#gst-025-f-b-order-tracking) | F&B – Order Tracking | In-venue Services | 2 | 2 |
+| [GST-026](#gst-026-retail-merchandise) | Retail / Merchandise | Retail | 2 | 4 |
 | [GST-029](#gst-029-venue-info-services) | Venue Info & Services | In-venue Services | 2 | 3 |
-| [GST-030](#gst-030-in-venue-notifications) | In-Venue Notifications | Engagement & Support | 2 | 3 |
-| [GST-031](#gst-031-ai-concierge-home) | AI Concierge – Home | Engagement & Support | 2 | 5 |
+| [GST-030](#gst-030-in-venue-notifications) | In-Venue Notifications | Engagement & Support | 2 | 2 |
+| [GST-031](#gst-031-ai-concierge-home) | AI Concierge – Home | Engagement & Support | 2 | 8 |
 | [GST-032](#gst-032-ai-concierge-chat) | AI Concierge – Chat | Engagement & Support | 2 | 9 |
-| [GST-033](#gst-033-ai-concierge-contextual-help) | AI Concierge – Contextual Help | Engagement & Support | 2 | 1 |
-| [GST-034](#gst-034-lost-found) | Lost & Found | Support | 2 | 3 |
-| [GST-036](#gst-036-loyalty-rewards) | Loyalty & Rewards | Membership, Loyalty & Value | 2 | 5 |
+| [GST-033](#gst-033-ai-concierge-contextual-help) | AI Concierge – Contextual Help | Engagement & Support | 2 | 4 |
+| [GST-034](#gst-034-lost-found) | Lost & Found | Support | 2 | 4 |
+| [GST-036](#gst-036-loyalty-rewards) | Loyalty & Rewards | Membership, Loyalty & Value | 2 | 11 |
 | [GST-037](#gst-037-offers-promotions) | Offers & Promotions | Promotions | 2 | 3 |
-| [GST-040](#gst-040-help-support) | Help & Support | Engagement & Support | 2 | 6 |
+| [GST-040](#gst-040-help-support) | Help & Support | Engagement & Support | 2 | 7 |
 | [GST-044](#gst-044-multi-currency-pricing) | Multi-Currency & Pricing | Ticketing | 2 | 2 |
 | [GST-045](#gst-045-ticket-delivery-sharing) | Ticket Delivery & Sharing | Account & Self-Service | 2 | 1 |
 | [GST-048](#gst-048-upsell-cross-sell) | Upsell / Cross-Sell | Booking & Selection | 2 | 3 |
 | [GST-049](#gst-049-interactive-seat-selection) | Interactive Seat Selection | Booking & Selection | 2 | 5 |
-| [GST-056](#gst-056-bundle-package) | Bundle Package | Booking & Selection | 2 | 3 |
+| [GST-056](#gst-056-bundle-package) | Bundle Package | Booking & Selection | 2 | 2 |
 | [GST-057](#gst-057-accessibility-information) | Accessibility Information | Discovery & Browse | 2 | 1 |
-| [GST-061](#gst-061-menu-item-detail) | Menu Item Detail | In-Venue Experience | 2 | 2 |
+| [GST-061](#gst-061-menu-item-detail) | Menu Item Detail | In-Venue Experience | 2 | 1 |
+| [GST-062](#gst-062-shop-drop-collection) | Shop & Drop Collection | In-Venue Experience | 2 | 1 |
 | [GST-066](#gst-066-privacy-my-data) | Privacy & My Data | Account & Self-Service | 2 | 9 |
-| [GST-067](#gst-067-refunds-resale) | Refunds & Resale | Account & Self-Service | 2 | 3 |
-| [GST-068](#gst-068-help-my-cases) | Help & My Cases | Engagement & Support | 2 | 3 |
+| [GST-067](#gst-067-refunds-resale) | Refunds & Resale | Account & Self-Service | 2 | 2 |
+| [GST-068](#gst-068-help-my-cases) | Help & My Cases | Engagement & Support | 2 | 4 |
 | [GST-069](#gst-069-face-pass) | Face Pass | Account & Self-Service | 2 | 4 |
-| [GST-070](#gst-070-reserve-a-table) | Reserve a Table | In-venue Services | 2 | 7 |
+| [GST-070](#gst-070-reserve-a-table) | Reserve a Table | In-venue Services | 2 | 5 |
 | [GST-071](#gst-071-payment-methods) | Payment Methods | Account & Self-Service | 2 | 5 |
-| [GST-072](#gst-072-share-group-booking) | Share & Group Booking | Booking & Selection | 2 | 8 |
-| [GST-073](#gst-073-security-sign-in) | Security & Sign-in | Account & Self-Service | 2 | 14 |
-| [GST-018](#gst-018-add-to-calendar-reminders) | Add to Calendar / Reminders | Account & Self-Service | 3 | 6 |
+| [GST-072](#gst-072-share-group-booking) | Share & Group Booking | Booking & Selection | 2 | 6 |
+| [GST-073](#gst-073-security-sign-in) | Security & Sign-in | Account & Self-Service | 2 | 12 |
+| [GST-018](#gst-018-add-to-calendar-reminders) | Add to Calendar / Reminders | Account & Self-Service | 3 | 5 |
 | [GST-020](#gst-020-saved-items-wishlist) | Saved Items / Wishlist | Account & Self-Service | 3 | 3 |
 | [GST-023](#gst-023-virtual-queue) | Virtual Queue | In-venue Services | 3 | 5 |
-| [GST-027](#gst-027-parking-reserve-pay) | Parking – Reserve & Pay | In-venue Services | 3 | 5 |
+| [GST-027](#gst-027-parking-reserve-pay) | Parking – Reserve & Pay | In-venue Services | 3 | 3 |
 | [GST-028](#gst-028-parking-reservation-confirmed) | Parking – Reservation Confirmed | In-venue Services | 3 | 2 |
-| [GST-035](#gst-035-feedback-ratings) | Feedback & Ratings | Engagement & Support | 3 | 2 |
+| [GST-035](#gst-035-feedback-ratings) | Feedback & Ratings | Engagement & Support | 3 | 5 |
 | [GST-038](#gst-038-at-the-venue) | At the Venue | In-venue Services | 3 | 3 |
 | [GST-050](#gst-050-resource-booking-cabana) | Resource Booking – Cabana | Booking & Selection | 3 | 3 |
 | [GST-058](#gst-058-resource-availability-cabana) | Resource Availability (Cabana) | Booking & Selection | 3 | 2 |
-| [GST-062](#gst-062-shop-drop-collection) | Shop & Drop Collection | In-Venue Experience | 3 | 1 |
-| [GST-065](#gst-065-newsletter-preferences) | Newsletter & Preferences | Marketing | 3 | 4 |
+| [GST-065](#gst-065-newsletter-preferences) | Newsletter & Preferences | Marketing | 3 | 5 |
 | [GST-074](#gst-074-map-booking-cabanas-spots) | Map Booking — Cabanas & Spots | Booking & Selection | 3 | 8 |
 | [GST-075](#gst-075-book-a-space-by-the-hour) | Book a Space by the Hour | Booking & Selection | 3 | 4 |
 | [GST-076](#gst-076-intercity-trip-route-schedule) | Intercity Trip — Route & Schedule | Transport | 3 | 4 |
@@ -104,7 +104,7 @@
 
 ## GST-001 Home
 
-**The Home tab: what this venue is, when it is open and what there is to do, with one or two highlights per type, from which everything else is entered.**
+**The Home tab: what this venue is, when it is open and what there is to do, with the highlights per type the venue chose, from which everything else is entered.**
 
 |  |  |
 |---|---|
@@ -126,10 +126,10 @@
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
 | `getTenantAppStatus` | [WhiteLabelService](../backend/WhiteLabelService.md#gettenantappstatus) | onLoad | App status and recent changes | `None` |
-| `getGuestProfile` | [MarketingService](../backend/MarketingService.md#getguestprofile) | onLoad | Read a guest profile | `GUEST_VIEW` |
+| `getMyProfile` | [MarketingService](../backend/MarketingService.md#getmyprofile) | onLoad | The signed-in guest's own name and language for the greeting; the CRM fields stay staff only (GFIX-3) | `GUEST_VIEW` |
 | `listMyEntitlements` | [AccessService](../backend/AccessService.md#listmyentitlements) | onLoad | Every ticket, pass and membership this guest holds; on a visit day, the ticket's venue is suggested (decided 28 September, audit R267) | `ORDER_VIEW` |
 | `searchCatalogue` | [CatalogueService](../backend/CatalogueService.md#searchcatalogue) | onAction | Find something by name | `None` |
-| `getTenantConfig` | [WhiteLabelService](../backend/WhiteLabelService.md#gettenantconfig) | onLoad | Branding, currency and what this venue enables | `TENANT_CONFIGURE` |
+| `getPublishedTenantConfig` | [WhiteLabelService](../backend/WhiteLabelService.md#getpublishedtenantconfig) | onLoad | The published brand, theme, fonts, header, footer, navigation, homepage, booking-flow display settings and languages, read before anyone signs in (GFIX-1) | `None` |
 | `getCookieConsentRuntime` | [MarketingService](../backend/MarketingService.md#getcookieconsentruntime) | onLoad | Tracking consent prompt on first launch and the SDK gate | `None` |
 | `recordDeviceConsent` | [MarketingService](../backend/MarketingService.md#recorddeviceconsent) | onAction | Accept, reject or customise tracking on first launch | `None` |
 | `listAnalyticsProviders` | [WhiteLabelService](../backend/WhiteLabelService.md#listanalyticsproviders) | onLoad | Analytics SDKs to start once their consent category is granted | `TENANT_CONFIGURE` |
@@ -146,8 +146,8 @@
 | loading | The home default list. |
 | error | Could not load. Names which read failed and leaves the home default untouched. |
 | emptyFirstRun | No home default yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
-| emptyNoResults | Nothing matches the filter on state, includeShared and the home default are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Shown when the caller lacks `GUEST_VIEW`, which `getGuestProfile` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyNoResults | Nothing is on sale at this venue today. Said in the tenant's voice, with Change venue; the venue overview and the type tiles stay. |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
 | introVideo | First-launch state (MOB-5): the intro video overlay plays over Home while Home loads behind it; Skip introduction reveals Home. |
 
@@ -164,16 +164,16 @@
 | GST-008 | Tickets & Add-ons | productId |  |
 | GST-009 | Review & Payment | orderId |  |
 | GST-010 | Booking Confirmation | orderId |  |
-| GST-011 | Wallet Overview | subjectId |  |
+| GST-011 | Wallet Overview |  |  |
 | GST-012 | My Tickets | entitlementId, orderId |  |
 | GST-013 | Ticket Details | entitlementId, orderId |  |
 | GST-014 | Ticket Transfer | orderId |  |
-| GST-015 | Memberships | subjectId |  |
+| GST-015 | Memberships |  |  |
 | GST-016 | My Reservations |  |  |
 | GST-017 | Reservation Details |  |  |
 | GST-018 | Add to Calendar / Reminders | orderId |  |
 | GST-019 | Order History | orderId |  |
-| GST-020 | Saved Items / Wishlist | subjectId |  |
+| GST-020 | Saved Items / Wishlist |  |  |
 | GST-021 | Interactive Map |  |  |
 | GST-023 | Virtual Queue |  |  |
 | GST-024 | F&B – Browse & Order | orderId |  |
@@ -183,7 +183,7 @@
 | GST-031 | AI Concierge – Home |  |  |
 | GST-032 | AI Concierge – Chat | orderId |  |
 | GST-033 | AI Concierge – Contextual Help |  |  |
-| GST-034 | Lost & Found | orderId |  |
+| GST-034 | Lost & Found |  |  |
 | GST-037 | Offers & Promotions |  |  |
 | GST-039 | Profile | subjectId |  |
 | GST-040 | Help & Support |  |  |
@@ -249,8 +249,8 @@
 | loading | The explore categories list. |
 | error | Could not load. Names which read failed and leaves the explore categories untouched. |
 | emptyFirstRun | No explore categories yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
-| emptyNoResults | Nothing matches the filter on venueId, kind, isSellable and the explore categories are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyNoResults | Nothing in the category picked; the other categories are still there. |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
 
 **Goes to**
@@ -299,8 +299,8 @@
 | loading | The event attraction listing list. |
 | error | Could not load. Names which read failed and leaves the event attraction listing untouched. |
 | emptyFirstRun | No event attraction listing yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
-| emptyNoResults | Nothing matches the filter on venueId, kind, isSellable and the event attraction listing are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyNoResults | Nothing matches what was typed or picked; the other tickets are still there. Names it and offers to clear it. |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
 
 **Goes to**
@@ -359,8 +359,8 @@
 | videoUnavailable | The video cannot play (no video, a failed stream, data saver on). The poster stays and the details are unaffected; no error screen and no loader. |
 | error | Could not load. Names which read failed and leaves the attraction untouched. |
 | emptyFirstRun | No attraction yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
-| emptyNoResults | Nothing matches the filter on from, to and the attraction are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Shown when the caller lacks `PRODUCT_VIEW`, which `getProductEligibilityRule` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyNoResults | No performance in the next days shown; the strip says so and offers the calendar. |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
 
 **Goes to**
@@ -411,7 +411,7 @@
 | error | Could not load. Names which read failed and leaves the what's untouched. |
 | emptyFirstRun | No what's yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
 | emptyNoResults | Nothing matches the filter on from, to and the what's are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Shown when the caller lacks `PRODUCT_VIEW`, which `listPerformances` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
 
 **Goes to**
@@ -455,7 +455,7 @@
 | loading | The event exhibition, read by `getPerformance`. |
 | error | Could not load. Names which read failed and leaves the event exhibition untouched. |
 | emptyFirstRun | No event exhibition yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
-| emptyNoAccess | Shown when the caller lacks `PRODUCT_VIEW`, which `getPerformance` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
 
 **Goes to**
@@ -508,8 +508,8 @@
 | loading | The select date time list. |
 | error | Could not load. Names which read failed and leaves the select date time untouched. |
 | emptyFirstRun | No select date time yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
-| emptyNoResults | Nothing matches the filter on from, to and the select date time are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Shown when the caller lacks `PRODUCT_VIEW`, which `listPerformances` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyNoResults | No time matches the part of the day or the language picked, and the other times are still there. Names the filter and offers to clear it. |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
 
 **Goes to**
@@ -605,16 +605,15 @@
 
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
-| `transferOrderTickets` | [OrderService](../backend/OrderService.md#transferordertickets) | onAction | Transfer tickets to another guest | `None` |
 | `createPayment` | [OrderService](../backend/OrderService.md#createpayment) | onAction | Take a payment against an order | `ORDER_CREATE` |
 | `inquirePaymentStatus` | [OrderService](../backend/OrderService.md#inquirepaymentstatus) | onAction | Ask the provider what actually happened | `ORDER_CREATE` |
 | `checkoutCart` | [OrderService](../backend/OrderService.md#checkoutcart) | onAction | Turn the cart into an order | `None` |
-| `getCart` | [OrderService](../backend/OrderService.md#getcart) | onLoad | The cart, priced and checked, right now | `None` |
-| `addCartLine` | [OrderService](../backend/OrderService.md#addcartline) | onAction | Hold the stock while payment is taken | `None` |
+| `getCart` | [OrderService](../backend/OrderService.md#getcart) | onLoad | The cart, priced and checked, right now With the guest session the device already holds: signed in, or the anonymous cart session a visitor gets with the first line (ADR-0045) (decided 2 October 2026 by Chinmay, fix before Block A starts (GFIX-6)). | `None` |
 | `createOrder` | [OrderService](../backend/OrderService.md#createorder) | onAction | Turn the checked-out cart into an order | `ORDER_CREATE` |
 | `getPaymentLink` | [OrderService](../backend/OrderService.md#getpaymentlink) | onLoad | Open a payment link sent to this guest | `ORDER_VIEW` |
 | `payByLink` | [OrderService](../backend/OrderService.md#paybylink) | onAction | Pay a booking somebody else made | `ORDER_CREATE` |
 | `getPublishedBookingFlow` | [WhiteLabelService](../backend/WhiteLabelService.md#getpublishedbookingflow) | onLoad | The published booking flow for this product: which steps it has and in what order (W12) | `None` |
+| `listPublishedPolicies` | [WhiteLabelService](../backend/WhiteLabelService.md#listpublishedpolicies) | onLoad | The current terms and conditions the guest ticks, with their version, readable before sign-in (GFIX-2) | `None` |
 
 **States**
 
@@ -623,7 +622,7 @@
 | loading | The review payment, read by `getCart`. |
 | error | Could not load. Names which read failed and leaves the review payment untouched. |
 | emptyFirstRun | No review payment yet. Offers Create payment (`createPayment`). |
-| emptyNoAccess | Shown when the caller lacks `ORDER_VIEW`, which `getPaymentLink` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | Not available, and the offline banner says why. A payment needs the gateway, and pretending otherwise takes money nobody can confirm. What was typed stays on screen so nothing is entered twice. |
 
 **Goes to**
@@ -631,7 +630,9 @@
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
 | GST-001 | Home – Default |  |  |
+| GST-010 | Paid: the booking confirmation | orderId |  |
 | BO-020 | Kitchen accepts and prepares | orderId |  |
+| GST-028 | It is confirmed with a facility | orderId |  |
 
 ## GST-010 Booking Confirmation
 
@@ -656,9 +657,9 @@
 
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
-| `transferOrderTickets` | [OrderService](../backend/OrderService.md#transferordertickets) | onAction | Transfer tickets to another guest | `None` |
-| `getOrder` | [OrderService](../backend/OrderService.md#getorder) | onLoad | Read an order | `ORDER_VIEW` |
+| `getOrder` | [OrderService](../backend/OrderService.md#getorder) | onLoad | Read an order With the guest session the device already holds: signed in, or the anonymous cart session a visitor gets with the first line (ADR-0045) (decided 2 October 2026 by Chinmay, fix before Block A starts (GFIX-6)). | `ORDER_VIEW` |
 | `reprintOrder` | [OrderService](../backend/OrderService.md#reprintorder) | onAction | Reprint or resend tickets | `ORDER_REPRINT` |
+| `linkGuestCheckout` | [IdentityService](../backend/IdentityService.md#linkguestcheckout) | onAction | Set a password: turn the guest-checkout order into an account | `None` |
 
 **States**
 
@@ -667,7 +668,7 @@
 | loading | The booking confirmation, read by `getOrder`. |
 | error | Could not load. Names which read failed and leaves the booking confirmation untouched. |
 | emptyFirstRun | No booking confirmation yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
-| emptyNoAccess | Shown when the caller lacks `ORDER_VIEW`, which `getOrder` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
 
 **Goes to**
@@ -693,6 +694,7 @@
 
 | Parameter | From |
 |---|---|
+| subjectId | session |
 | entitlementId | deepLink |
 | orderId | deepLink |
 
@@ -715,7 +717,7 @@
 | error | Could not load. Names which read failed and leaves the tickets untouched. |
 | emptyFirstRun | No tickets yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
 | emptyNoResults | Nothing matches the filter on state, includeShared and the tickets are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Shown when the caller lacks `ORDER_VIEW`, which `listMyEntitlements` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | The offline banner shows. Tickets already loaded stay visible with their age, and a ticket's rotating code is derived on the device from its seed, so it changes with no signal (decided 28 September, audit R230). Sharing, transferring and adding to a phone wallet need the connection. |
 
 **Goes to**
@@ -742,6 +744,7 @@
 
 | Parameter | From |
 |---|---|
+| subjectId | session |
 | entitlementId | deepLink |
 | orderId | deepLink |
 | credentialId | navigation |
@@ -763,7 +766,7 @@
 | loading | Availability is live, never cached |
 | error | Availability unavailable. Selection is blocked — overselling is worse than waiting |
 | emptyFirstRun | Sold out is a real answer. Offers the next available rather than a dead end |
-| emptyNoAccess | Shown when the caller lacks `ORDER_VIEW`, which `getEntitlement` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | The offline banner shows. Tickets already loaded stay visible with their age, and a ticket's rotating code is derived on the device from its seed, so it changes with no signal (decided 28 September, audit R230). Sharing, transferring and adding to a phone wallet need the connection. |
 
 **Goes to**
@@ -796,8 +799,11 @@
 
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
-| `recordConsent` | [MarketingService](../backend/MarketingService.md#recordconsent) | onAction | Record a consent decision | `None` |
+| `recordConsent` | [MarketingService](../backend/MarketingService.md#recordconsent) | onAction | A consent toggle changed: recorded at once with source guestApp and the notice version | `None` |
 | `updateMyProfile` | [MarketingService](../backend/MarketingService.md#updatemyprofile) | onAction | Change name, contact and preferences | `GUEST_VIEW` |
+| `getMyProfile` | [MarketingService](../backend/MarketingService.md#getmyprofile) | onLoad | The guest's own details, read by session | `GUEST_VIEW` |
+| `getGuestConsents` | [MarketingService](../backend/MarketingService.md#getguestconsents) | onLoad | The current consent position the toggles change | `GUEST_VIEW` |
+| `listConsentPurposes` | [MarketingService](../backend/MarketingService.md#listconsentpurposes) | onLoad | The purposes the consent rows show | `GUEST_VIEW` |
 
 **States**
 
@@ -806,7 +812,7 @@
 | loading | The saved profile. |
 | error | Could not load. Names which read failed and leaves the profile untouched. |
 | emptyFirstRun | No profile configured. The form opens empty and `recordConsent` saves the first one; it says what the platform does in the meantime. |
-| emptyNoAccess | Shown when the caller lacks `GUEST_VIEW`, which `updateMyProfile` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
 
 **Goes to**
@@ -848,7 +854,7 @@
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
 | `applyCartPromoCode` | [OrderService](../backend/OrderService.md#applycartpromocode) | onAction | Apply a promo code to the cart; refused 422 promoCodeInvalid or promoCodeNotApplicable, shown as different messages (decided 28 September, audit R073 (e)) | `None` |
-| `getCart` | [OrderService](../backend/OrderService.md#getcart) | onLoad | The cart, priced and checked, right now | `None` |
+| `getCart` | [OrderService](../backend/OrderService.md#getcart) | onLoad | The cart, priced and checked, right now With the guest session the device already holds: signed in, or the anonymous cart session a visitor gets with the first line (ADR-0045) (decided 2 October 2026 by Chinmay, fix before Block A starts (GFIX-6)). | `None` |
 | `checkoutCart` | [OrderService](../backend/OrderService.md#checkoutcart) | onAction | Turn the cart into an order | `None` |
 | `abandonCart` | [OrderService](../backend/OrderService.md#abandoncart) | onAction | Give the inventory back | `None` |
 | `claimCart` | [OrderService](../backend/OrderService.md#claimcart) | onAction | Pick up a basket started on another device | `None` |
@@ -857,7 +863,7 @@
 | `removeCartLine` | [OrderService](../backend/OrderService.md#removecartline) | onAction | Take a line out of the basket | `None` |
 | `updateCartLine` | [OrderService](../backend/OrderService.md#updatecartline) | onAction | Change a quantity before paying | `None` |
 | `getPerformance` | [CatalogueService](../backend/CatalogueService.md#getperformance) | onLoad | The visit date of each line (`Performance.startsAt`) | `PRODUCT_VIEW` |
-| `getResourceHold` | [VenueOpsService](../backend/VenueOpsService.md#getresourcehold) | onInterval | The countdown of a spot held on the venue map | `ORDER_VIEW` |
+| `getResourceHold` | [VenueOpsService](../backend/VenueOpsService.md#getresourcehold) | onInterval | The countdown of a spot held on the venue map With the guest session the device already holds: signed in, or the anonymous cart session a visitor gets with the first line (ADR-0045) (decided 2 October 2026 by Chinmay, fix before Block A starts (GFIX-6)). | `ORDER_VIEW` |
 | `getPublishedBookingFlow` | [WhiteLabelService](../backend/WhiteLabelService.md#getpublishedbookingflow) | onLoad | The published booking flow for this product: which steps it has and in what order (W12) | `None` |
 
 **States**
@@ -867,7 +873,7 @@
 | loading | Terminal or gateway state, shown plainly |
 | error | Declined reads differently from unresolved. An unresolved payment inquires rather than retries, and nothing is issued until it resolves |
 | emptyFirstRun | — |
-| emptyNoResults | Never shown: `listProductVariants` takes no filter, so an empty list is always the first-run state above. |
+| emptyNoResults | Never shown: the basket has no filter; an empty basket is the first-run state. |
 | emptyNoAccess | This is the checkout page, and it is where identity is settled (ADR-0045, 18 September 2026). An unverified or anonymous guest is not turned away — they are offered sign-in or, where the site's `guestCheckout` is on, the one-time code. The cart stays intact either way; `checkoutCart` is what refuses. |
 | offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
 
@@ -878,6 +884,7 @@
 | GST-042 | Signs in, or proves the contact the tickets go to | cartId | no verified guest session. This screen is the checkout page, so the fork sits here rather than in front of the cart (matrix 2.6.1 §2.4) |
 | GST-001 | Home – Default |  |  |
 | GST-059 | They follow it through the day |  |  |
+| GST-009 | Checkout | orderId, paymentId, token |  |
 
 ## GST-042 Simple Registration & OTP
 
@@ -905,13 +912,13 @@
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
 | `registerGuest` | [IdentityService](../backend/IdentityService.md#registerguest) | onAction | Create a guest account | `None` |
-| `getGuestSession` | [IdentityService](../backend/IdentityService.md#getguestsession) | onLoad | Read the current guest session | `None` |
+| `getGuestSession` | [IdentityService](../backend/IdentityService.md#getguestsession) | onLoad | Read the current guest session Only when signed in (decided 2 October 2026 by Chinmay, fix before Block A starts (GFIX-6)). | `None` |
 | `guestLogout` | [IdentityService](../backend/IdentityService.md#guestlogout) | onAction | End a guest session | `None` |
 | `guestPasswordLogin` | [IdentityService](../backend/IdentityService.md#guestpasswordlogin) | onAction | Sign in with the email or mobile and the password set at registration (identifier, password, deviceId -> GuestSession); one indistinguishable 401, lockout, 429 (decided 28 September, audit R073 (a)) | `None` |
 | `guestSocialLogin` | [IdentityService](../backend/IdentityService.md#guestsociallogin) | onAction | Sign in with Apple or Google | `None` |
 | `guestUaePassLogin` | [IdentityService](../backend/IdentityService.md#guestuaepasslogin) | onAction | Sign in with a national identity provider | `None` |
 | `linkGuestCheckout` | [IdentityService](../backend/IdentityService.md#linkguestcheckout) | onAction | Attach a guest checkout to an account | `None` |
-| `refreshToken` | [IdentityService](../backend/IdentityService.md#refreshtoken) | onAction | Rotate the access token | `None` |
+| `refreshToken` | [IdentityService](../backend/IdentityService.md#refreshtoken) | background | Rotate the access token | `None` |
 | `requestGuestOtp` | [IdentityService](../backend/IdentityService.md#requestguestotp) | onAction | Request a one-time code | `None` |
 | `verifyGuestOtp` | [IdentityService](../backend/IdentityService.md#verifyguestotp) | onAction | Verify a one-time code and issue a session | `None` |
 | `createMfaChallenge` | [IdentityService](../backend/IdentityService.md#createmfachallenge) | onAction | Ask for the second factor (`action: signIn`) when the session comes back `requiresMfa` at a venue with guest two-step verification on | `None` |
@@ -939,7 +946,7 @@
 
 ## GST-043 Arabic / RTL Experience
 
-**Arabic / RTL Experience — the screen a person opens when they need to deal with arabic / rtl experience.**
+**Choose the app's language; Arabic turns the whole app right to left.**
 
 |  |  |
 |---|---|
@@ -948,7 +955,13 @@
 | Licensed module | core |
 | Route | `/general/arabic-rtl-experience` |
 | Component | `apps/guest-app/src/routes/general/ArabicRtlExperienceDetail.tsx` |
-| Pattern | listDetail |
+| Pattern | configEditor |
+
+**Operations**
+
+| Operation | Service | When | Purpose | Permission |
+|---|---|---|---|---|
+| `getPublishedTenantConfig` | [WhiteLabelService](../backend/WhiteLabelService.md#getpublishedtenantconfig) | onLoad | The published languages | `None` |
 
 **States**
 
@@ -1025,6 +1038,7 @@
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
 | `getTenantAppStatus` | [WhiteLabelService](../backend/WhiteLabelService.md#gettenantappstatus) | onLoad | from page inventory | `None` |
+| `getPublishedTenantConfig` | [WhiteLabelService](../backend/WhiteLabelService.md#getpublishedtenantconfig) | onLoad | Maintenance, message and expected-back time, readable without signing in | `None` |
 
 **States**
 
@@ -1037,6 +1051,8 @@
 | forcedUpgrade | Update required. The app's version is below `getTenantAppStatus.minimumAppVersion` for its platform; the screen offers only the store link, because an app too old to talk to the server cannot be trusted to book or pay (decided 28 September, audit R073 (b)). |
 | soldOut | Sold out today. `getTenantAppStatus.availability` is `soldOut`: the page says so with the tenant's `availabilityMessage` and offers another day, never a generic error (decided 28 September, audit R073 (f)). |
 | closed | Closed. `getTenantAppStatus.availability` is `closed`: the page says the venue is not open, with the tenant's `availabilityMessage` and the opening hours from `contact` (decided 28 September, audit R073 (f)). |
+| emptyNoAccess | Nothing here needs a sign-in (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-2)): the screen reads only what the tenant has published, which is public, so there is no no-access case. A host that belongs to no tenant shows the platform's neutral holding page. |
+| maintenance | The venue's maintenance message and when it expects to be back; one way onward (try again at that time). Set live on CMS-001, never published. |
 
 **Goes to**
 
@@ -1164,10 +1180,10 @@
 
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
-| `getCart` | [OrderService](../backend/OrderService.md#getcart) | onLoad | The cart, priced and checked, right now | `None` |
+| `getCart` | [OrderService](../backend/OrderService.md#getcart) | onLoad | The cart, priced and checked, right now With the guest session the device already holds: signed in, or the anonymous cart session a visitor gets with the first line (ADR-0045) (decided 2 October 2026 by Chinmay, fix before Block A starts (GFIX-6)). | `None` |
 | `listProducts` | [CatalogueService](../backend/CatalogueService.md#listproducts) | onLoad | List products | `PRODUCT_VIEW` |
 | `getWaitTimes` | [VenueOpsService](../backend/VenueOpsService.md#getwaittimes) | onLoad | Wait times across a venue | `None` |
-| `getVisitPlan` | [VenueOpsService](../backend/VenueOpsService.md#getvisitplan) | onLoad | The plan: days, timed items and add-on suggestions, at its current version | `None` |
+| `getVisitPlan` | [VenueOpsService](../backend/VenueOpsService.md#getvisitplan) | onLoad | The plan: days, timed items and add-on suggestions, at its current version Only when signed in (decided 2 October 2026 by Chinmay, fix before Block A starts (GFIX-6)). | `None` |
 | `updateVisitPlan` | [VenueOpsService](../backend/VenueOpsService.md#updatevisitplan) | onAction | Swap, remove, add or undo: each change is a new version, so undo goes back one | `None` |
 | `listVisitPlanAlternatives` | [VenueOpsService](../backend/VenueOpsService.md#listvisitplanalternatives) | onAction | Swap candidates for one item that suit everyone in the party | `None` |
 | `bookVisitPlan` | [VenueOpsService](../backend/VenueOpsService.md#bookvisitplan) | onAction | Book this plan: turns the plan (and chosen add-ons) into cart lines and returns the cart | `None` |
@@ -1222,9 +1238,9 @@
 |---|---|---|---|---|
 | `getWaitTimes` | [VenueOpsService](../backend/VenueOpsService.md#getwaittimes) | onLoad | Wait times across a venue | `None` |
 | `sendAiMessage` | [AiService](../backend/AiService.md#sendaimessage) | onAction | Chat with the planner agent; its tools are the plan operations, so a change it makes is a new plan version | `AI_USE` |
-| `getVisitPlan` | [VenueOpsService](../backend/VenueOpsService.md#getvisitplan) | onLoad | The plan: days, timed items and add-on suggestions, at its current version | `None` |
+| `getVisitPlan` | [VenueOpsService](../backend/VenueOpsService.md#getvisitplan) | onLoad | The plan: days, timed items and add-on suggestions, at its current version Only when signed in (decided 2 October 2026 by Chinmay, fix before Block A starts (GFIX-6)). | `None` |
 | `updateVisitPlan` | [VenueOpsService](../backend/VenueOpsService.md#updatevisitplan) | onAction | Swap, remove, add or undo: each change is a new version, so undo goes back one | `None` |
-| `createAiConversation` | [AiService](../backend/AiService.md#createaiconversation) | onLoad | Open the planner conversation for this plan | `AI_USE` |
+| `createAiConversation` | [AiService](../backend/AiService.md#createaiconversation) | onAction | Opened on the first message to the planner, never on opening the Plan tab (a conversation is billed); the plan loads without it | `AI_USE` |
 | `requestSuggestion` | [AiService](../backend/AiService.md#requestsuggestion) | onAction | A suggestion of kind `itinerary` (guest-allowed since 29 September): the planner agent's proposal for the plan, applied through `updateVisitPlan` | `AI_USE` |
 
 **States**
@@ -1249,7 +1265,7 @@
 
 ## GST-055 Dynamic QR Ticket
 
-**Find dynamic qr ticket for this venue.**
+**Show the live ticket code at the gate.**
 
 |  |  |
 |---|---|
@@ -1258,12 +1274,13 @@
 | Licensed module | ticketing |
 | Route | `/general/dynamic-qr-ticket` |
 | Component | `apps/guest-app/src/routes/general/DynamicQrTicketCanvas.tsx` |
-| Pattern | configEditor |
+| Pattern | credentialView |
 
 **Entry parameters**
 
 | Parameter | From |
 |---|---|
+| subjectId | session |
 | orderId | deepLink |
 | entitlementId | navigation |
 | credentialId | navigation |
@@ -1275,7 +1292,6 @@
 | `listMyEntitlements` | [AccessService](../backend/AccessService.md#listmyentitlements) | onLoad | The guest's tickets and passes | `ORDER_VIEW` |
 | `getEntitlement` | [AccessService](../backend/AccessService.md#getentitlement) | onAction | The selected ticket | `ORDER_VIEW` |
 | `getEntitlementCredential` | [AccessService](../backend/AccessService.md#getentitlementcredential) | onAction | The QR code that gets scanned, refreshed — with the `rotation` seed the device derives the rotating code from (audit R230) | `ORDER_VIEW` |
-| `transferOrderTickets` | [OrderService](../backend/OrderService.md#transferordertickets) | onAction | Transfer tickets to another guest | `None` |
 | `bindCredentialDevice` | [AccessService](../backend/AccessService.md#bindcredentialdevice) | onAction | Bind my credential to this device | `None` |
 
 **States**
@@ -1285,7 +1301,7 @@
 | loading | Availability is live, never cached |
 | error | Availability unavailable. Selection is blocked — overselling is worse than waiting |
 | emptyFirstRun | Sold out is a real answer. Offers the next available rather than a dead end |
-| emptyNoAccess | Shown when the caller lacks `ORDER_VIEW`, which `listMyEntitlements` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | The offline banner shows. A ticket already loaded shows its rotating code, derived on the device from its seed, so it changes with no signal (decided 28 September, audit R230). Transferring a ticket needs the connection. |
 
 **Goes to**
@@ -1320,7 +1336,7 @@
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
 | `getWaitTimes` | [VenueOpsService](../backend/VenueOpsService.md#getwaittimes) | onLoad | Wait times across a venue | `None` |
-| `getVisitPlan` | [VenueOpsService](../backend/VenueOpsService.md#getvisitplan) | onLoad | The plan: days, timed items and add-on suggestions, at its current version | `None` |
+| `getVisitPlan` | [VenueOpsService](../backend/VenueOpsService.md#getvisitplan) | onLoad | The plan: days, timed items and add-on suggestions, at its current version Only when signed in (decided 2 October 2026 by Chinmay, fix before Block A starts (GFIX-6)). | `None` |
 | `updateVisitPlan` | [VenueOpsService](../backend/VenueOpsService.md#updatevisitplan) | onAction | Swap, remove, add or undo: each change is a new version, so undo goes back one | `None` |
 | `listVisitPlanAlternatives` | [VenueOpsService](../backend/VenueOpsService.md#listvisitplanalternatives) | onAction | Swap candidates for one item that suit everyone in the party | `None` |
 
@@ -1369,7 +1385,7 @@
 | loading | The search list. |
 | error | Could not load. Names which read failed and leaves the search untouched. |
 | emptyFirstRun | No search yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
-| emptyNoResults | Nothing matches the filter on q, venueId, kind and the search are still there. Names the active filter and offers to clear it. |
+| emptyNoResults | Nothing matches what was typed. Names the search, suggests a shorter one and offers to clear it; a sold-out match is shown as sold out, not hidden. |
 | offline | The offline banner shows. Results come only from what was already loaded, with a note that newer items may exist. |
 
 **Goes to**
@@ -1382,7 +1398,7 @@
 
 ## GST-011 Wallet Overview
 
-**The screen this app sits on. Everything else is entered from here and returns to it.**
+**My wallet: balance, activity and auto top-up, and what is due or refundable at exit.**
 
 |  |  |
 |---|---|
@@ -1397,7 +1413,8 @@
 
 | Parameter | From |
 |---|---|
-| subjectId | GST-001 |
+| cardCode | deepLink |
+| subjectId | session |
 | walletId | navigation |
 
 **Operations**
@@ -1410,6 +1427,7 @@
 | `setWalletAutoReloadSetting` | [WalletService](../backend/WalletService.md#setwalletautoreloadsetting) | onAction | Set auto top-up | `WALLET_OPERATE` |
 | `getWalletExitBalance` | [WalletService](../backend/WalletService.md#getwalletexitbalance) | onLoad | Balance due / refundable at exit | `WALLET_VIEW` |
 | `settleWalletAtExit` | [WalletService](../backend/WalletService.md#settlewalletatexit) | onAction | Settle the wallet at exit | `WALLET_OPERATE` |
+| `getGameCard` | [VenueOpsService](../backend/VenueOpsService.md#getgamecard) | onAction | Balance on a game card | `None` |
 
 **States**
 
@@ -1419,7 +1437,7 @@
 | error | Could not load. Names which read failed and leaves the wallet overview untouched. |
 | emptyFirstRun | No wallet overview yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
 | emptyNoResults | Never shown: `listWalletTransactions` takes no filter, so an empty list is always the first-run state above. |
-| emptyNoAccess | Shown when the caller lacks `WALLET_VIEW`, which `getWallet` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | The offline banner shows. Balances and stored cards already loaded stay visible with their age, cards masked. Storing a card and transferring value need the server. |
 
 **Goes to**
@@ -1427,7 +1445,8 @@
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
 | GST-001 | Home – Default |  |  |
-| GST-020 | Saved items carry across sessions | subjectId |  |
+| GST-020 | Saved items carry across sessions |  |  |
+| BO-395 | Machine records the play |  |  |
 
 ## GST-014 Ticket Transfer
 
@@ -1446,6 +1465,7 @@
 
 | Parameter | From |
 |---|---|
+| subjectId | session |
 | orderId | deepLink |
 | transferId | deepLink |
 
@@ -1455,7 +1475,7 @@
 |---|---|---|---|---|
 | `transferOrderTickets` | [OrderService](../backend/OrderService.md#transferordertickets) | onAction | Transfer tickets to another guest | `None` |
 | `claimTicketTransfer` | [OrderService](../backend/OrderService.md#claimtickettransfer) | onAction | Claim transferred tickets | `None` |
-| `listOrders` | [OrderService](../backend/OrderService.md#listorders) | onLoad | List orders | `ORDER_VIEW` |
+| `listMyOrders` | [OrderService](../backend/OrderService.md#listmyorders) | onLoad | The orders this guest placed | `None` |
 
 **States**
 
@@ -1465,7 +1485,7 @@
 | error | Availability unavailable. Selection is blocked — overselling is worse than waiting |
 | emptyFirstRun | Sold out is a real answer. Offers the next available rather than a dead end |
 | emptyNoResults | Nothing matches the filter on venueId, principalId, shiftId, status, createdFrom, createdTo and the ticket transfer are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Shown when the caller lacks `ORDER_VIEW`, which `listOrders` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | The offline banner shows. Sending, claiming and listing for resale need the connection — a transfer nobody received is a ticket nobody holds. Tickets already loaded stay visible. |
 
 **Goes to**
@@ -1492,7 +1512,7 @@
 | Parameter | From |
 |---|---|
 | guestLinkId | deepLink |
-| subjectId | GST-001 |
+| subjectId | session |
 | caseId | navigation |
 | statementId | navigation |
 
@@ -1508,7 +1528,6 @@
 | `listDelegations` | [IdentityService](../backend/IdentityService.md#listdelegations) | onLoad | Who may act for this guest, and for whom they may act | `GUEST_VIEW` |
 | `grantDelegation` | [IdentityService](../backend/IdentityService.md#grantdelegation) | onAction | Let one guest act for another | `GUEST_MANAGE` |
 | `listProducts` | [CatalogueService](../backend/CatalogueService.md#listproducts) | onLoad | List products | `PRODUCT_VIEW` |
-| `listGuestMemberships` | [CatalogueService](../backend/CatalogueService.md#listguestmemberships) | onLoad | A guest's memberships, benefits and history | `PRODUCT_VIEW` |
 | `listInstalmentPlans` | [OrderService](../backend/OrderService.md#listinstalmentplans) | onLoad | Instalment plans and schedule | `PAYMENT_VIEW` |
 | `createInstalmentPlan` | [OrderService](../backend/OrderService.md#createinstalmentplan) | onAction | Pay in instalments | `ORDER_CREATE` |
 
@@ -1520,7 +1539,7 @@
 | error | Could not load. Names which read failed and leaves the memberships untouched. |
 | emptyFirstRun | No memberships yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
 | emptyNoResults | Nothing matches the filter on from, to and the memberships are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Shown when the caller lacks `PRODUCT_VIEW`, which `getMyMemberships` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
 
 **Goes to**
@@ -1547,6 +1566,7 @@
 
 | Parameter | From |
 |---|---|
+| subjectId | session |
 | reservationId | deepLink |
 
 **Operations**
@@ -1564,8 +1584,8 @@
 | loading | The reservations list. |
 | error | Could not load. Names which read failed and leaves the reservations untouched. |
 | emptyFirstRun | No reservations yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
-| emptyNoResults | Nothing matches the filter on status, expiringWithinMinutes and the reservations are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Shown when the caller lacks `ORDER_VIEW`, which `listReservations` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyNoResults | Never shown as a filter result: an empty tab says there is nothing upcoming (or past) and offers to book. |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | The offline banner shows. Reservations already loaded stay visible with their age. Booking, changing and cancelling need the connection — a table held offline is a table two people think they have. |
 
 **Goes to**
@@ -1592,6 +1612,7 @@
 
 | Parameter | From |
 |---|---|
+| subjectId | session |
 | reservationId | deepLink |
 
 **Operations**
@@ -1608,7 +1629,7 @@
 | loading | The reservation, read by `getReservation`. |
 | error | Could not load. Names which read failed and leaves the reservation untouched. |
 | emptyFirstRun | No reservation yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
-| emptyNoAccess | Shown when the caller lacks `ORDER_VIEW`, which `getReservation` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | The offline banner shows. Reservations already loaded stay visible with their age. Booking, changing and cancelling need the connection — a table held offline is a table two people think they have. |
 
 **Goes to**
@@ -1619,7 +1640,7 @@
 
 ## GST-019 Order History
 
-**Find order history (wallet) for this venue.**
+**My orders at this venue, with their tax documents; transfer tickets or ask for a refund from here.**
 
 |  |  |
 |---|---|
@@ -1634,6 +1655,7 @@
 
 | Parameter | From |
 |---|---|
+| subjectId | session |
 | orderId | deepLink |
 | documentId | navigation |
 | invoiceId | navigation |
@@ -1642,10 +1664,8 @@
 
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
-| `listOrders` | [OrderService](../backend/OrderService.md#listorders) | onLoad | List orders | `ORDER_VIEW` |
 | `getOrder` | [OrderService](../backend/OrderService.md#getorder) | onAction | Read an order | `ORDER_VIEW` |
 | `listMyOrders` | [OrderService](../backend/OrderService.md#listmyorders) | onLoad | The orders this guest placed | `None` |
-| `transferOrderTickets` | [OrderService](../backend/OrderService.md#transferordertickets) | onAction | Transfer tickets to another guest | `None` |
 | `listTaxInvoices` | [LedgerService](../backend/LedgerService.md#listtaxinvoices) | onLoad | List tax invoices | `LEDGER_VIEW` |
 | `issueTaxInvoice` | [LedgerService](../backend/LedgerService.md#issuetaxinvoice) | onAction | Issue a tax invoice | `LEDGER_POST` |
 | `getTaxInvoice` | [LedgerService](../backend/LedgerService.md#gettaxinvoice) | onLoad | Show a tax invoice | `LEDGER_VIEW` |
@@ -1660,7 +1680,7 @@
 | error | Could not load. Names which read failed and leaves the order history untouched. |
 | emptyFirstRun | No order history yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
 | emptyNoResults | Nothing matches the filter on venueId, principalId, shiftId, status, createdFrom, createdTo and the order history are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Shown when the caller lacks `ORDER_VIEW`, which `listOrders` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
 
 **Goes to**
@@ -1705,8 +1725,8 @@
 | loading | The interactive map list. |
 | error | Could not load. Names which read failed and leaves the interactive map untouched. |
 | emptyFirstRun | No interactive map yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
-| emptyNoResults | Nothing matches the filter on venueId, kind, isSellable and the interactive map are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyNoResults | No point of that category on this map; the other categories stay. |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | The offline banner shows. A map and route graph already loaded stay usable, so directions do not need a signal. Wait times show their last reading marked out of date, never as live — a queue length from an hour ago sends a guest to the wrong ride. With no map loaded yet, the screen asks the guest to reconnect. |
 | map3dUnavailable | No 3D model for this map: the 2D map, same route (ADR-0069; client meeting 30 September, MoM 4.8). The venue has not published a GLB model for this map (the default for every venue until it supplies one), the phone fails the 3D capability check, or rendering drops below 20 fps. The 2D map shows the same route from `getVenueMapGraph` and the same live position dot; the 2D/3D toggle is hidden and nothing else is said: no message, no error. |
 | weakGps | Position approximate (ADR-0069, section 4): reported GPS accuracy worse than 30 metres, or the route runs along an indoor path. The dot dims and an approximate-position ring is drawn round the last confident position, labelled *Position approximate*; the turn list and the remaining distance stay, and *I am at…* (tap a nearby location, or scan its QR sign) re-anchors. Routing does not stop, in 3D or in 2D. |
@@ -1786,11 +1806,9 @@
 | `listDiningOutlets` | [FnbService](../backend/FnbService.md#listdiningoutlets) | onLoad | Outlets open now, with ordering method | `None` |
 | `getGuestMenu` | [FnbService](../backend/FnbService.md#getguestmenu) | onLoad | The menu in force at this moment | `None` |
 | `claimLocationSession` | [FnbService](../backend/FnbService.md#claimlocationsession) | onAction | Scan the table, cabana or sunbed code | `None` |
-| `createGuestFnbOrder` | [FnbService](../backend/FnbService.md#createguestfnborder) | onAction | Place the order | `None` |
-| `getGuestOrderStatus` | [FnbService](../backend/FnbService.md#getguestorderstatus) | onLoad | Track an order | `None` |
+| `createGuestFnbOrder` | [FnbService](../backend/FnbService.md#createguestfnborder) | onAction | A guest orders food; refused 403 entry-ticket-required at an inside-the-venue outlet without admission; paid on its own pay step with its own receipt (DEC-070, DEC-071) | `None` |
+| `getGuestOrderStatus` | [FnbService](../backend/FnbService.md#getguestorderstatus) | onLoad | Track an order Only when signed in (decided 2 October 2026 by Chinmay, fix before Block A starts (GFIX-6)). | `None` |
 | `listDeliveryLocations` | [FnbService](../backend/FnbService.md#listdeliverylocations) | onLoad | Where an order can be delivered | `None` |
-| `claimTableSession` | [FnbService](../backend/FnbService.md#claimtablesession) | onAction | Identify which table a guest is sitting at | `None` |
-| `listModifierGroups` | [FnbService](../backend/FnbService.md#listmodifiergroups) | onLoad | List modifier groups | `PRODUCT_VIEW` |
 
 **States**
 
@@ -1798,9 +1816,9 @@
 |---|---|
 | loading | The browse order list. |
 | error | Could not load. Names which read failed and leaves the browse order untouched. |
-| emptyFirstRun | No browse order yet. Offers Create guest F&B order (`createGuestFnbOrder`); distinct from a filter that matched nothing. |
-| emptyNoResults | Nothing matches the filter on mode, date and the browse order are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Shown when the caller lacks `PRODUCT_VIEW`, which `getFnbDeliveryPolicy` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyFirstRun | No outlet takes orders here now. Names when the next one opens; a counter-only outlet's menu can still be read. |
+| emptyNoResults | No outlet open now matches: says so, with the next opening time. |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | The offline banner shows. The menu already loaded stays with its age. Ordering, claiming a table and booking wait for the connection — an order placed offline is food nobody is making. |
 
 **Goes to**
@@ -1808,12 +1826,12 @@
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
 | GST-001 | Home – Default |  |  |
-| GST-009 | Pays | orderId |  |
+| GST-009 | Pays for the food order on its own | orderId |  |
 | GST-025 | They watch the order progress | orderId |  |
 
 ## GST-025 F&B – Order Tracking
 
-**Track an order to the point it reaches the guest.**
+**Watch it being made, and see the table bill; it is paid at the table.**
 
 |  |  |
 |---|---|
@@ -1837,16 +1855,15 @@
 |---|---|---|---|---|
 | `getGuestOrderStatus` | [FnbService](../backend/FnbService.md#getguestorderstatus) | onInterval | The order's status (ordered, accepted, in preparation, ready, served, collected or delivered), read on entry and polled while the screen is open; order updates show here, and in the in-venue notifications feed too, which is back in the first release (decided 29 September, rev 3 GAP-C1, reversing the deferral of audit R242) | `None` |
 | `getGuestBill` | [FnbService](../backend/FnbService.md#getguestbill) | onLoad | Everything ordered at this location this sitting | `None` |
-| `claimTableSession` | [FnbService](../backend/FnbService.md#claimtablesession) | onAction | Identify which table a guest is sitting at | `None` |
 
 **States**
 
 | State | Behaviour |
 |---|---|
-| loading | Availability is live, never cached |
+| loading | Loading the order. |
 | error | Availability unavailable. Selection is blocked — overselling is worse than waiting |
-| emptyFirstRun | Sold out is a real answer. Offers the next available rather than a dead end |
-| offline | The offline banner shows. The last status stays on screen with its age and is never presented as current. Settling the bill waits for the connection. |
+| emptyFirstRun | The order is not found or was refunded (a cold link): says which, with the way back to ordering. |
+| offline | The offline banner shows. The last status stays with its age ("Preparing, 2 min ago"); nothing refreshes until the connection returns. |
 
 **Goes to**
 
@@ -1859,13 +1876,13 @@
 
 ## GST-026 Retail / Merchandise
 
-**Find retail / merchandise for this venue.**
+**Buy merchandise and collect it on the way out, or have it delivered home.**
 
 |  |  |
 |---|---|
 | Module | Retail |
 | Wave | 2 |
-| Licensed module | games |
+| Licensed module | retail |
 | Route | `/general/retail-merchandise` |
 | Component | `apps/guest-app/src/routes/general/RetailMerchandiseDetail.tsx` |
 | Pattern | listDetail |
@@ -1875,19 +1892,15 @@
 | Parameter | From |
 |---|---|
 | cartId | session |
-| cardCode | deepLink |
 | outletId | session |
 
 **Operations**
 
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
-| `getGameCard` | [VenueOpsService](../backend/VenueOpsService.md#getgamecard) | onAction | Read a card's balances | `None` |
 | `listMerchandise` | [RetailService](../backend/RetailService.md#listmerchandise) | onLoad | List merchandise | `PRODUCT_VIEW` |
 | `lookupMerchandise` | [RetailService](../backend/RetailService.md#lookupmerchandise) | onAction | Find an item by code or scan | `PRODUCT_VIEW` |
 | `addCartLine` | [OrderService](../backend/OrderService.md#addcartline) | onAction | Put the item in the cart, marked for collection on the way out (audit R236) | `None` |
-| `checkoutCart` | [OrderService](../backend/OrderService.md#checkoutcart) | onAction | Turn the cart into an order; merchandise for collection is paid online (audit R236) | `None` |
-| `createPayment` | [OrderService](../backend/OrderService.md#createpayment) | onAction | Pay for it; payment creates the shop-and-drop for collection (decided 28 September, audit R236) | `ORDER_CREATE` |
 | `reserveMerchandise` | [RetailService](../backend/RetailService.md#reservemerchandise) | onAction | Hold it for collection | `ORDER_CREATE` |
 
 **States**
@@ -1898,7 +1911,7 @@
 | error | Could not load. Names which read failed and leaves the retail merchandise untouched. |
 | emptyFirstRun | No retail merchandise yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
 | emptyNoResults | Nothing matches the filter on outletId, categoryId, inStockOnly, search and the retail merchandise are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Shown when the caller lacks `PRODUCT_VIEW`, which `listMerchandise` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyNoAccess | There is no permission to name: a guest holds none (ADR-0025). The shop is public; buying needs the guest's cart. |
 | offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
 
 **Goes to**
@@ -1906,18 +1919,18 @@
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
 | GST-001 | Home – Default |  |  |
-| BO-069 | Machine records the play |  |  |
 | BO-048 | Collected on the way out | merchandiseId |  |
+| GST-041 | Checkout Entry | performanceId |  |
 
 ## GST-029 Venue Info & Services
 
-**See venue info & services for this venue.**
+**How to reach the venue, its contact details, and where to eat.**
 
 |  |  |
 |---|---|
 | Module | In-venue Services |
 | Wave | 2 |
-| Licensed module | fnb |
+| Licensed module | core |
 | Route | `/general/venue-info-and-services` |
 | Component | `apps/guest-app/src/routes/general/VenueInfoAndServicesDetail.tsx` |
 | Pattern | listDetail |
@@ -1965,11 +1978,16 @@
 | Component | `apps/guest-app/src/routes/general/InVenueNotificationsDetail.tsx` |
 | Pattern | configEditor |
 
+**Entry parameters**
+
+| Parameter | From |
+|---|---|
+| subjectId | session |
+
 **Operations**
 
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
-| `claimLocationSession` | [FnbService](../backend/FnbService.md#claimlocationsession) | onAction | From the flow it appears in | `None` |
 | `listMyNotifications` | [MarketingService](../backend/MarketingService.md#listmynotifications) | onLoad | The guest's notification feed, newest first: queue calls, order ready, booking changes, venue alerts (decided 29 September, rev 3 GAP-C1) | `None` |
 | `markMyNotificationsRead` | [MarketingService](../backend/MarketingService.md#markmynotificationsread) | onAction | Mark the opened notifications, or all of them, read | `None` |
 
@@ -1988,17 +2006,17 @@
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
 | GST-001 | Home – Default |  |  |
-| GST-031 | AI Concierge – Home | outletId |  |
+| GST-031 | AI Concierge – Home |  |  |
 
 ## GST-031 AI Concierge – Home
 
-**The screen this app sits on. Everything else is entered from here and returns to it.**
+**Ask, and be answered or handed to a person.**
 
 |  |  |
 |---|---|
 | Module | Engagement & Support |
 | Wave | 2 |
-| Licensed module | fnb |
+| Licensed module | ai |
 | Route | `/general/ai-concierge-home` |
 | Component | `apps/guest-app/src/routes/general/AiConciergeHomeDashboard.tsx` |
 | Pattern | statusTracker |
@@ -2009,25 +2027,29 @@
 |---|---|
 | conversationId | deepLink |
 | outletId | deepLink |
+| messageId | navigation |
 
 **Operations**
 
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
-| `getGuestMenu` | [FnbService](../backend/FnbService.md#getguestmenu) | onLoad | From the flow it appears in | `None` |
+| `getGuestMenu` | [FnbService](../backend/FnbService.md#getguestmenu) | onAction | Optional "Order food" shortcut to the menu in force | `None` |
 | `sendAiMessage` | [AiService](../backend/AiService.md#sendaimessage) | onAction | Ask | `AI_USE` |
-| `createAiConversation` | [AiService](../backend/AiService.md#createaiconversation) | onAction | Open a conversation | `AI_USE` |
-| `handoverToAgent` | [MarketingService](../backend/MarketingService.md#handovertoagent) | onAction | Pass an assistant conversation to a person | `None` |
-| `requestSuggestion` | [AiService](../backend/AiService.md#requestsuggestion) | onAction | A suggestion of kind prepPlan, upsell or waitTime from the concierge; an itinerary (guest-allowed since 29 September) is asked on the Plan tab (GST-054), not here | `AI_USE` |
+| `createAiConversation` | [AiService](../backend/AiService.md#createaiconversation) | background | Opened silently on the first message; the scope comes from the session, never a module the guest picks | `AI_USE` |
+| `handoverToAgent` | [MarketingService](../backend/MarketingService.md#handovertoagent) | onAction | One tap; reason guestRequested and Sahli's summary are set for the guest | `None` |
+| `requestSuggestion` | [AiService](../backend/AiService.md#requestsuggestion) | background | From the conversation only, kinds waitTime and upsell (prepPlan is the kitchen's production plan; an itinerary is asked on the Plan tab); never a kind picker | `AI_USE` |
+| `listAiConversations` | [AiService](../backend/AiService.md#listaiconversations) | onLoad | The guest's own earlier conversations | `AI_USE` |
+| `recordAnswerFeedback` | [AiService](../backend/AiService.md#recordanswerfeedback) | onAction | Say whether an answer helped | `AI_USE` |
+| `sendConversationMessage` | [MarketingService](../backend/MarketingService.md#sendconversationmessage) | onAction | After a handover, the guest talks to the agent | `CASE_MANAGE` |
 
 **States**
 
 | State | Behaviour |
 |---|---|
-| loading | The concierge home, read by `getGuestMenu`. |
+| loading | The concierge home: earlier conversations (`listAiConversations`) and the ask box. |
 | error | Could not load. Names which read failed and leaves the concierge home untouched. |
-| emptyFirstRun | No concierge home yet. Offers Create AI conversation (`createAiConversation`). |
-| emptyNoAccess | Shown when the caller lacks `AI_USE`, which `sendAiMessage` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyFirstRun | "Ask Sahli anything about your visit": no earlier conversations; the first question opens one. |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | Not available, and the offline banner says why. The assistant needs the connection; conversations already loaded stay readable. |
 
 **Goes to**
@@ -2035,11 +2057,11 @@
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
 | GST-001 | Home – Default |  |  |
-| GST-032 | AI Concierge – Chat | conversationId |  |
+| GST-032 | AI Concierge – Chat | conversationId, messageId |  |
 
 ## GST-032 AI Concierge – Chat
 
-**Add ai concierge – chat for this venue.**
+**Talk to Sahli: the answers, and a person when Sahli cannot help.**
 
 |  |  |
 |---|---|
@@ -2064,8 +2086,8 @@
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
 | `createGuestFnbOrder` | [FnbService](../backend/FnbService.md#createguestfnborder) | onAction | From the flow it appears in | `None` |
-| `getGuestOrderStatus` | [FnbService](../backend/FnbService.md#getguestorderstatus) | onLoad | Track an order | `None` |
-| `getCart` | [OrderService](../backend/OrderService.md#getcart) | onLoad | The cart, priced and checked, right now | `None` |
+| `getGuestOrderStatus` | [FnbService](../backend/FnbService.md#getguestorderstatus) | onLoad | Track an order Only when signed in (decided 2 October 2026 by Chinmay, fix before Block A starts (GFIX-6)). | `None` |
+| `getCart` | [OrderService](../backend/OrderService.md#getcart) | onLoad | The cart, priced and checked, right now With the guest session the device already holds: signed in, or the anonymous cart session a visitor gets with the first line (ADR-0045) (decided 2 October 2026 by Chinmay, fix before Block A starts (GFIX-6)). | `None` |
 | `addCartLine` | [OrderService](../backend/OrderService.md#addcartline) | onAction | Add something | `None` |
 | `checkoutCart` | [OrderService](../backend/OrderService.md#checkoutcart) | onAction | Turn the cart into an order | `None` |
 | `sendAiMessage` | [AiService](../backend/AiService.md#sendaimessage) | onAction | Ask | `AI_USE` |
@@ -2080,15 +2102,16 @@
 | loading | The concierge chat, read by `getGuestOrderStatus`. |
 | error | Could not load. Names which read failed and leaves the concierge chat untouched. |
 | emptyFirstRun | No concierge chat yet. Offers Create guest F&B order (`createGuestFnbOrder`). |
-| emptyNoAccess | Shown when the caller lacks `AI_USE`, which `sendAiMessage` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | Not available, and the offline banner says why. The assistant needs the connection; conversations already loaded stay readable. |
+| emptyNoResults | Nothing the concierge found matches the question; it says so in the conversation and offers to hand over to a person. |
 
 **Goes to**
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
 | GST-001 | Home – Default |  |  |
-| GST-033 | AI Concierge – Contextual Help | conversationId |  |
+| GST-033 | AI Concierge – Contextual Help | conversationId, messageId |  |
 
 ## GST-033 AI Concierge – Contextual Help
 
@@ -2101,28 +2124,32 @@
 | Licensed module | ai |
 | Route | `/general/ai-concierge-contextual-help` |
 | Component | `apps/guest-app/src/routes/general/AiConciergeContextualHelpDetail.tsx` |
-| Pattern | configEditor |
+| Pattern | statusTracker |
 
 **Entry parameters**
 
 | Parameter | From |
 |---|---|
 | conversationId | deepLink |
+| messageId | navigation |
 
 **Operations**
 
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
 | `sendAiMessage` | [AiService](../backend/AiService.md#sendaimessage) | onAction | Ask | `AI_USE` |
+| `createAiConversation` | [AiService](../backend/AiService.md#createaiconversation) | background | Opened silently on the first question; the scope comes from the session | `AI_USE` |
+| `handoverToAgent` | [MarketingService](../backend/MarketingService.md#handovertoagent) | onAction | One tap; reason guestRequested | `None` |
+| `recordAnswerFeedback` | [AiService](../backend/AiService.md#recordanswerfeedback) | onAction | Say whether an answer helped | `AI_USE` |
 
 **States**
 
 | State | Behaviour |
 |---|---|
-| loading | The saved concierge contextual help. |
-| error | Could not load. Names which read failed and leaves the concierge contextual help untouched. |
-| emptyFirstRun | No concierge contextual help configured. The form opens empty and `sendAiMessage` saves the first one; it says what the platform does in the meantime. |
-| emptyNoAccess | Shown when the caller lacks `AI_USE`, which `sendAiMessage` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| loading | Sahli is thinking: a typing indicator under the question. |
+| error | Sahli can't answer right now (every provider failed): Hand over to a person and Try again. |
+| emptyFirstRun | No question yet: the sheet opens with the ask box and two starter questions about the screen behind it. |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | Not available, and the offline banner says why. The assistant needs the connection; conversations already loaded stay readable. |
 
 **Goes to**
@@ -2148,7 +2175,7 @@
 
 | Parameter | From |
 |---|---|
-| orderId | deepLink |
+| subjectId | session |
 | caseId | deepLink |
 
 **Operations**
@@ -2158,6 +2185,7 @@
 | `listMyCases` | [MarketingService](../backend/MarketingService.md#listmycases) | onLoad | The cases this guest raised | `None` |
 | `raiseMyCase` | [MarketingService](../backend/MarketingService.md#raisemycase) | onAction | Report something — lost property, a complaint, a question | `None` |
 | `replyToMyCase` | [MarketingService](../backend/MarketingService.md#replytomycase) | onAction | Reply on a case the guest raised | `None` |
+| `recordLostItem` | [MarketingService](../backend/MarketingService.md#recordlostitem) | onAction | The lost-item record BO-073 matches, linked to the guest's case | `CASE_MANAGE` |
 
 **States**
 
@@ -2188,6 +2216,13 @@
 | Component | `apps/guest-app/src/routes/LoyaltyRewards.tsx` |
 | Pattern | listDetail |
 
+**Entry parameters**
+
+| Parameter | From |
+|---|---|
+| subjectId | session |
+| customerId | session |
+
 **Operations**
 
 | Operation | Service | When | Purpose | Permission |
@@ -2197,6 +2232,12 @@
 | `listPromotions` | [CatalogueService](../backend/CatalogueService.md#listpromotions) | onLoad | List promotions | `PRICE_VIEW` |
 | `decideRecommendations` | [AiService](../backend/AiService.md#deciderecommendations) | onLoad | Recommendation slot (homepage / loyalty placement: products, offers, rewards, challenges) | `AI_USE` |
 | `recordRecommendationEvents` | [AiService](../backend/AiService.md#recordrecommendationevents) | onAction | Report impressions, clicks and declines of recommended items | `AI_USE` |
+| `listRewards` | [MarketingService](../backend/MarketingService.md#listrewards) | onLoad | What points can be turned into | `MARKETING_VIEW` |
+| `listCustomerBadges` | [MarketingService](../backend/MarketingService.md#listcustomerbadges) | onLoad | Badges the guest holds | `MARKETING_VIEW` |
+| `listLeaderboard` | [MarketingService](../backend/MarketingService.md#listleaderboard) | onLoad | Standings, by nickname | `None` |
+| `setLeaderboardNickname` | [MarketingService](../backend/MarketingService.md#setleaderboardnickname) | onAction | Choose the name shown on the board | `None` |
+| `redeemLoyaltyPoints` | [MarketingService](../backend/MarketingService.md#redeemloyaltypoints) | onAction | Spend points on a reward | `LOYALTY_REDEEM` |
+| `createReferral` | [MarketingService](../backend/MarketingService.md#createreferral) | onAction | Issue my referral code | `MARKETING_MANAGE` |
 
 **States**
 
@@ -2206,7 +2247,7 @@
 | error | Could not load. Names which read failed and leaves the loyalty rewards untouched. |
 | emptyFirstRun | No loyalty rewards yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
 | emptyNoResults | Never shown: `listLoyaltyProgrammes` takes no filter, so an empty list is always the first-run state above. |
-| emptyNoAccess | Shown when the caller lacks `MARKETING_VIEW`, which `listLoyaltyProgrammes` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | The offline banner shows. The last known balance stays with its age, and points earned since are not shown — and that is said. Redeeming and referring need the connection. |
 
 **Goes to**
@@ -2251,8 +2292,8 @@
 | loading | The offers promotions list. |
 | error | Could not load. Names which read failed and leaves the offers promotions untouched. |
 | emptyFirstRun | No offers promotions yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
-| emptyNoResults | Nothing matches the filter on venueId, status, activeAt and the offers promotions are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Shown when the caller lacks `PRICE_VIEW`, which `listPromotions` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyNoResults | Never shown as a filter result: no offer is active at this venue now, said plainly. |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
 
 **Goes to**
@@ -2285,22 +2326,23 @@
 
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
-| `listFaqs` | [WhiteLabelService](../backend/WhiteLabelService.md#listfaqs) | onLoad | List FAQs | `TENANT_CONFIGURE` |
-| `listContentPages` | [WhiteLabelService](../backend/WhiteLabelService.md#listcontentpages) | onLoad | List custom content pages | `TENANT_CONFIGURE` |
-| `listMyCases` | [MarketingService](../backend/MarketingService.md#listmycases) | onLoad | The cases this guest raised | `None` |
+| `listPublishedFaqs` | [WhiteLabelService](../backend/WhiteLabelService.md#listpublishedfaqs) | onLoad | The published FAQs, readable before sign-in (GFIX-2) | `None` |
+| `listPublishedContentPages` | [WhiteLabelService](../backend/WhiteLabelService.md#listpublishedcontentpages) | onLoad | The live help and accessibility pages, readable before sign-in (GFIX-2) | `None` |
+| `listMyCases` | [MarketingService](../backend/MarketingService.md#listmycases) | onLoad | The cases this guest raised Only when signed in (decided 2 October 2026 by Chinmay, fix before Block A starts (GFIX-6)). | `None` |
 | `raiseMyCase` | [MarketingService](../backend/MarketingService.md#raisemycase) | onAction | Report something — lost property, a complaint, a question | `None` |
 | `replyToMyCase` | [MarketingService](../backend/MarketingService.md#replytomycase) | onAction | Reply on a case the guest raised | `None` |
 | `getTenantAppStatus` | [WhiteLabelService](../backend/WhiteLabelService.md#gettenantappstatus) | onLoad | App status and the public *What's new* | `None` |
+| `listPublishedPolicies` | [WhiteLabelService](../backend/WhiteLabelService.md#listpublishedpolicies) | onLoad | Terms, privacy, refund, cookie and accessibility policies, readable before sign-in (GFIX-2) | `None` |
 
 **States**
 
 | State | Behaviour |
 |---|---|
-| loading | The help support figures; each tile loads on its own. |
+| loading | Questions, pages and policies load in place; each list loads on its own. |
 | error | Could not load. Names which read failed and leaves the help support untouched. |
 | emptyFirstRun | No help support yet. Offers Raise my case (`raiseMyCase`). |
-| emptyNoResults | Never shown: `listFaqs` takes no filter, so an empty list is always the first-run state above. |
-| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `listFaqs` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyNoResults | Never shown: `listPublishedFaqs` takes no filter, so an empty list is always the first-run state above. |
+| emptyNoAccess | Reading help needs no sign-in (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-2)). Raising or reading a case needs a signed-in guest: one who is not signed in is offered sign-in and brought back to this screen; the questions, pages and policies stay readable. |
 | offline | The offline banner shows. Help already loaded stays readable, marked with its age. Raising a case is disabled offline — it needs the connection (decided 28 September, audit R148) — and the screen says how to reach staff in person instead: the guest services desk, or any member of staff. |
 
 **Goes to**
@@ -2312,7 +2354,7 @@
 
 ## GST-044 Multi-Currency & Pricing
 
-**See prices in your own currency, in the app, before and during the visit.**
+**Choose the currency you see prices in and pay in.**
 
 |  |  |
 |---|---|
@@ -2327,7 +2369,7 @@
 
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
-| `listFxRates` | [LedgerService](../backend/LedgerService.md#listfxrates) | onLoad | The rates in force for the venue's shown currencies — always called with `venueId` (decided 28 September, audit R120 (a)) | `LEDGER_VIEW` |
+| `listFxRates` | [LedgerService](../backend/LedgerService.md#listfxrates) | onLoad | The currencies the venue shows, each marked chargeable or approximate — called with `venueId` (audit R120 (a)) and `chargeable` (CHG-FIN-001) | `LEDGER_VIEW` |
 | `listProducts` | [CatalogueService](../backend/CatalogueService.md#listproducts) | onLoad | List products | `PRODUCT_VIEW` |
 
 **States**
@@ -2336,9 +2378,9 @@
 |---|---|
 | loading | The multi-currency pricing list. |
 | error | Could not load. Names which read failed and leaves the multi-currency pricing untouched. |
-| emptyFirstRun | No multi-currency pricing yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
-| emptyNoResults | Nothing matches the filter on asAt, purpose and the multi-currency pricing are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Shown when the caller lacks `LEDGER_VIEW`, which `listFxRates` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyFirstRun | Not reachable: with no other currency at the venue the screen is not linked, and prices stay in the venue's currency. |
+| emptyNoResults | Never shown: the screen sends no filter a guest chose. |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | The offline banner shows. Last known rates stay, with their age. A rate is a number a guest may act on, and an undated one they cannot judge. |
 
 **Goes to**
@@ -2380,6 +2422,7 @@
 | error | Availability unavailable. Selection is blocked — overselling is worse than waiting |
 | emptyFirstRun | Sold out is a real answer. Offers the next available rather than a dead end |
 | offline | The offline banner shows. Sending, claiming and listing for resale need the connection — a transfer nobody received is a ticket nobody holds. Tickets already loaded stay visible. |
+| emptyNoResults | No ticket to send: the guest holds none that can be shared. Says so and offers My Tickets. |
 
 **Goes to**
 
@@ -2411,17 +2454,17 @@
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
 | `addCartLine` | [OrderService](../backend/OrderService.md#addcartline) | onAction | Add something | `None` |
-| `decideRecommendations` | [AiService](../backend/AiService.md#deciderecommendations) | onLoad | Fill a recommendation slot | `AI_USE` |
+| `decideRecommendations` | [AiService](../backend/AiService.md#deciderecommendations) | onLoad | Fill the cart slot, maxItems 3 (DI-959) | `AI_USE` |
 | `recordRecommendationEvents` | [AiService](../backend/AiService.md#recordrecommendationevents) | onAction | Report what happened to recommended items | `AI_USE` |
 
 **States**
 
 | State | Behaviour |
 |---|---|
-| loading | The upsell cross-sell, read by `getUpsellSuggestions`. |
+| loading | The suggestions, read by `decideRecommendations`. |
 | error | Could not load. Names which read failed and leaves the upsell cross-sell untouched. |
-| emptyFirstRun | No upsell cross-sell yet. Offers Add cart line (`addCartLine`). |
-| emptyNoAccess | Shown when the caller lacks `PRODUCT_VIEW`, which `getUpsellSuggestions` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyFirstRun | No offers for this basket: the step is skipped and the guest goes straight on (DI-428). |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
 
 **Goes to**
@@ -2468,7 +2511,7 @@
 | loading | The interactive seat selection, read by `getSeatAvailability`. |
 | error | Could not load. Names which read failed and leaves the interactive seat selection untouched. |
 | emptyFirstRun | No interactive seat selection yet. Offers Create seat hold (`createSeatHold`). |
-| emptyNoAccess | Shown when the caller lacks `PRODUCT_VIEW`, which `getSeatAvailability` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
 
 **Goes to**
@@ -2476,6 +2519,8 @@
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
 | GST-001 | Home – Default |  |  |
+| GST-008 | Continue to add-ons | performanceId |  |
+| GST-041 | Go to basket | holdId, performanceId |  |
 
 ## GST-056 Bundle Package
 
@@ -2501,7 +2546,6 @@
 
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
-| `listCatalogueBundles` | [CatalogueService](../backend/CatalogueService.md#listcataloguebundles) | onLoad | List published bundles | `PRODUCT_VIEW` |
 | `getBundle` | [CatalogueService](../backend/CatalogueService.md#getbundle) | onLoad | Read a bundle with components and allocation | `PRODUCT_VIEW` |
 | `addCartLine` | [OrderService](../backend/OrderService.md#addcartline) | onAction | Add something | `None` |
 
@@ -2512,8 +2556,8 @@
 | loading | The bundle package list. |
 | error | Could not load. Names which read failed and leaves the bundle package untouched. |
 | emptyFirstRun | No bundle package yet. Offers Add cart line (`addCartLine`). |
-| emptyNoResults | Never shown: `listCatalogueBundles` takes no filter, so an empty list is always the first-run state above. |
-| emptyNoAccess | Shown when the caller lacks `PRODUCT_VIEW`, which `listCatalogueBundles` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyNoResults | Never shown: the screen opens on one bundle and has no filter. |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
 
 **Goes to**
@@ -2540,7 +2584,7 @@
 
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
-| `listContentPages` | [WhiteLabelService](../backend/WhiteLabelService.md#listcontentpages) | onLoad | List custom content pages | `TENANT_CONFIGURE` |
+| `listPublishedContentPages` | [WhiteLabelService](../backend/WhiteLabelService.md#listpublishedcontentpages) | onLoad | The live accessibility pages (`categoryCode` fixed by the screen), readable before sign-in (GFIX-2) | `None` |
 
 **States**
 
@@ -2549,8 +2593,8 @@
 | loading | The accessibility information list. |
 | error | Could not load. Names which read failed and leaves the accessibility information untouched. |
 | emptyFirstRun | No accessibility information yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
-| emptyNoResults | Nothing matches the filter on status, categoryCode, slug and the accessibility information are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `listContentPages` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyNoResults | Never shown: the screen sends no filter a guest chose, so an empty list is the first-run state above. |
+| emptyNoAccess | Nothing here needs a sign-in (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-2)): the screen reads only what the tenant has published, which is public, so there is no no-access case. A host that belongs to no tenant shows the platform's neutral holding page. |
 | offline | The offline banner shows. Help already loaded stays readable, marked with its age. Raising a case is disabled offline — it needs the connection (decided 28 September, audit R148) — and the screen says how to reach staff in person instead: the guest services desk, or any member of staff. |
 
 **Goes to**
@@ -2578,13 +2622,13 @@
 | Parameter | From |
 |---|---|
 | outletId | deepLink |
+| menuItemId | deepLink |
 
 **Operations**
 
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
 | `getGuestMenu` | [FnbService](../backend/FnbService.md#getguestmenu) | onLoad | Item, modifiers and allergens | `None` |
-| `listModifierGroups` | [FnbService](../backend/FnbService.md#listmodifiergroups) | onLoad | List modifier groups | `PRODUCT_VIEW` |
 
 **States**
 
@@ -2593,8 +2637,7 @@
 | loading | Item skeleton |
 | error | Item unavailable, with a route back to the menu |
 | emptyFirstRun | Not applicable |
-| emptyNoResults | Never shown: `listModifierGroups` takes no filter, so an empty list is always the first-run state above. |
-| emptyNoAccess | Shown when the caller lacks `PRODUCT_VIEW`, which `listModifierGroups` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyNoAccess | Never shown: a menu is public and browsing a dish needs no sign-in. |
 | offline | The offline banner shows. The dish already loaded stays, with a note that it may be out of date and its allergens in full. Ordering is refused — availability changes by the minute. |
 
 **Goes to**
@@ -2602,6 +2645,44 @@
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
 | GST-001 | Home – Default |  |  |
+| GST-024 | Back to the menu | outletId |  |
+| GST-041 | Add and view the basket |  |  |
+
+## GST-062 Shop & Drop Collection
+
+**Collect shopping left earlier, using the ticket rather than a receipt.**
+
+|  |  |
+|---|---|
+| Module | In-Venue Experience |
+| Wave | 2 |
+| Licensed module | retail |
+| Route | `/in-venue-experience/shop-and-drop-collection` |
+| Component | `apps/guest-app/src/routes/in-venue-experience/ShopAndDropCollectionList.tsx` |
+| Pattern | statusTracker |
+
+**Operations**
+
+| Operation | Service | When | Purpose | Permission |
+|---|---|---|---|---|
+| `lookupShopAndDrop` | [RetailService](../backend/RetailService.md#lookupshopanddrop) | onLoad | Find a guest's dropped goods | `ORDER_VIEW` |
+
+**States**
+
+| State | Behaviour |
+|---|---|
+| loading | Finding what is waiting for you. |
+| error | Could not load. Names which read failed and leaves the shop drop collection untouched. |
+| emptyFirstRun | Nothing waiting: no shop-and-drop for this guest. |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| offline | The offline banner shows, and lookup cannot run. A drop reference already on screen stays visible so the guest can quote it at the collection point. Reserving merchandise needs the connection. |
+
+**Goes to**
+
+| To | Trigger | Carries | Guard |
+|---|---|---|---|
+| GST-001 | Home – Default |  |  |
+| POS-012 | Collected on the way out, at the exit desk | orderId |  |
 
 ## GST-066 Privacy & My Data
 
@@ -2629,12 +2710,12 @@
 | `exportSubjectData` | [IdentityService](../backend/IdentityService.md#exportsubjectdata) | onAction | Everything the platform holds about one guest | `GUEST_VIEW_PII` |
 | `deleteGuestAccount` | [IdentityService](../backend/IdentityService.md#deleteguestaccount) | onAction | Self-service account deletion | `None` |
 | `getGuestConsents` | [MarketingService](../backend/MarketingService.md#getguestconsents) | onLoad | Read a guest's consent state | `GUEST_VIEW` |
-| `updateGuestPreferences` | [MarketingService](../backend/MarketingService.md#updateguestpreferences) | onAction | The things a regular should not have to say twice | `GUEST_MANAGE` |
-| `uploadGuestDocument` | [MarketingService](../backend/MarketingService.md#uploadguestdocument) | onAction | Store a guest photo, ID or signed document | `GUEST_VIEW_PII` |
 | `getCookieConsentRuntime` | [MarketingService](../backend/MarketingService.md#getcookieconsentruntime) | onLoad | Tracking preferences: categories and the current decision | `None` |
 | `listPublishedTrackingTechnologies` | [MarketingService](../backend/MarketingService.md#listpublishedtrackingtechnologies) | onLoad | Each SDK and tracker the app uses | `None` |
 | `getDeviceConsentHistory` | [MarketingService](../backend/MarketingService.md#getdeviceconsenthistory) | onLoad | My tracking decisions so far | `None` |
 | `recordDeviceConsent` | [MarketingService](../backend/MarketingService.md#recorddeviceconsent) | onAction | Change or withdraw tracking preferences | `None` |
+| `recordConsent` | [MarketingService](../backend/MarketingService.md#recordconsent) | onAction | Withdraw or give a consent from the privacy page: withdrawal as easy as granting | `None` |
+| `listConsentPurposes` | [MarketingService](../backend/MarketingService.md#listconsentpurposes) | onLoad | The purposes the consent rows show | `GUEST_VIEW` |
 
 **States**
 
@@ -2644,7 +2725,7 @@
 | error | Could not load. Says what failed and offers one way onward, never a bare failure. |
 | emptyFirstRun | Nothing requested yet. No export, no erasure, no document — and that is the ordinary state. The screen explains what each request means before offering it, because an erasure a guest did not understand is one they will phone about. |
 | emptyNoResults | Nothing here yet. The scope is what narrowed it — naming the scope is what stops somebody concluding the record does not exist. |
-| emptyNoAccess | Shown when the caller lacks `GUEST_VIEW_PII`, which `exportSubjectData` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyNoAccess | There is no permission to name: a guest holds none (ADR-0025). Not signed in: the guest is offered sign-in and brought back here. The data rights are the guest's own and always available to them. |
 | offline | Nothing here is offered offline, and the banner says so. An erasure request or a device change queued and never sent is worse than one that could not be made — the legal clock starts when the platform receives it, and a device signed out offline is still signed in. |
 
 **Goes to**
@@ -2678,7 +2759,6 @@
 |---|---|---|---|---|
 | `createRefundRequest` | [OrderService](../backend/OrderService.md#createrefundrequest) | onAction | Guest-initiated refund request | `None` |
 | `createResaleListing` | [OrderService](../backend/OrderService.md#createresalelisting) | onAction | List an entitlement for resale | `ORDER_CREATE` |
-| `getWaiverStatus` | [MarketingService](../backend/MarketingService.md#getwaiverstatus) | onLoad | Whether this guest may be issued a ticket that requires a wa | `GUEST_VIEW` |
 
 **States**
 
@@ -2688,7 +2768,7 @@
 | error | Could not load. Says what failed and offers one way onward, never a bare failure. |
 | emptyFirstRun | No refunds or listings yet. The venue's policy is shown regardless, so a guest knows the answer before they need it. |
 | emptyNoResults | Nothing here yet. The scope is what narrowed it — naming the scope is what stops somebody concluding the record does not exist. |
-| emptyNoAccess | Shown when the caller lacks `GUEST_VIEW`, which `getWaiverStatus` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | Not available, and the offline banner says why. Refunds and resale listings need the server — a queued refund request is a promise nobody made. |
 
 **Goes to**
@@ -2715,14 +2795,16 @@
 | Parameter | From |
 |---|---|
 | subjectId | session |
+| caseId | navigation |
 
 **Operations**
 
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
-| `createCase` | [MarketingService](../backend/MarketingService.md#createcase) | onAction | Raise a service case | `CASE_MANAGE` |
-| `listCases` | [MarketingService](../backend/MarketingService.md#listcases) | onLoad | List service cases | `CASE_VIEW` |
 | `listAiConversations` | [AiService](../backend/AiService.md#listaiconversations) | onLoad | A principal's conversation history | `AI_USE` |
+| `listMyCases` | [MarketingService](../backend/MarketingService.md#listmycases) | onLoad | The cases this guest raised | `None` |
+| `raiseMyCase` | [MarketingService](../backend/MarketingService.md#raisemycase) | onAction | Raise a case as the guest | `None` |
+| `replyToMyCase` | [MarketingService](../backend/MarketingService.md#replytomycase) | onAction | Reply on a case the guest raised | `None` |
 
 **States**
 
@@ -2731,8 +2813,7 @@
 | loading | Content loads. |
 | error | Could not load. Says what failed and offers one way onward, never a bare failure. |
 | emptyFirstRun | No cases open. The concierge sits here too — most questions never become a case, and that is the intent. |
-| emptyNoResults | Nothing here yet. The scope is what narrowed it — naming the scope is what stops somebody concluding the record does not exist. |
-| emptyNoAccess | Shown when the caller lacks `CASE_VIEW`, which `listCases` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | The offline banner shows. Cases already loaded stay read-only with their age, so a guest can see what they raised without believing a reply arrived. Raising a case and replying are disabled offline — both need the connection (decided 28 September, audit R148) — and the screen says how to reach staff in person instead: the guest services desk, or any member of staff. |
 
 **Goes to**
@@ -2743,7 +2824,7 @@
 
 ## GST-069 Face Pass
 
-**🔴 **Biometric enrolment had no guest-facing consent step.** `enrolFacePass` was callable by a guest and reachable from nowhere, which means enrolment was happening at a desk with somebody else operat**
+**Register or remove my face for gate entry on my pass, or a linked child's with my consent as guardian.**
 
 |  |  |
 |---|---|
@@ -2778,7 +2859,7 @@
 | error | Could not load. Says what failed and offers one way onward, never a bare failure. |
 | emptyFirstRun | Not enrolled. What a face pass is for, where it works, and what withdrawing it does — before the camera opens. |
 | emptyNoResults | Nothing here yet. The scope is what narrowed it — naming the scope is what stops somebody concluding the record does not exist. |
-| emptyNoAccess | Shown when the caller lacks `GUEST_VIEW`, which `getFacePassEnrolment` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | Not available, and the offline banner says why. Biometric enrolment never happens offline — a face captured and queued is a face the guest cannot withdraw until it uploads. |
 | subjectNotLinked | Refused: that person is not linked to you (403 `subject-not-linked`). A guest may enrol only themselves or a child linked to them by a family-member or primary-holder delegation; the screen says so and returns to Who is this for, which is refreshed in case the link was just removed (decided 28 September, audit R205). |
 
@@ -2796,9 +2877,9 @@
 |---|---|
 | Module | In-venue Services |
 | Wave | 2 |
-| Licensed module | core |
-| Route | `/account/reserve-table-cabana` |
-| Component | `apps/guest-app/src/routes/account/ReserveTableCabana.tsx` |
+| Licensed module | fnb |
+| Route | `/reserve-table` |
+| Component | `apps/guest-app/src/routes/ReserveTable.tsx` |
 | Pattern | form |
 
 **Entry parameters**
@@ -2818,8 +2899,6 @@
 | `updateTableReservation` | [FnbService](../backend/FnbService.md#updatetablereservation) | onAction | Change or cancel a booking | `None` |
 | `joinRestaurantWaitlist` | [FnbService](../backend/FnbService.md#joinrestaurantwaitlist) | onAction | Add a party to an outlet's waitlist | `ORDER_MODIFY` |
 | `leaveRestaurantWaitlist` | [FnbService](../backend/FnbService.md#leaverestaurantwaitlist) | onAction | Leave the restaurant waitlist; the entry returns cancelled (decided 28 September, audit R073 (d)) | `ORDER_MODIFY` |
-| `joinWaitlist` | [CatalogueService](../backend/CatalogueService.md#joinwaitlist) | onAction | Ask to be told if capacity frees up | `None` |
-| `leaveWaitlist` | [CatalogueService](../backend/CatalogueService.md#leavewaitlist) | onAction | Stop waiting | `None` |
 | `addCartLine` | [OrderService](../backend/OrderService.md#addcartline) | onAction | Add the table deposit to the cart when the venue requires one | `None` |
 
 **States**
@@ -2879,7 +2958,7 @@
 | error | Could not load. Says what failed and offers one way onward, never a bare failure. |
 | emptyFirstRun | No stored cards. A guest arrives here after a first purchase, so the empty state is the common one. |
 | emptyNoResults | Nothing here yet. The scope is what narrowed it — naming the scope is what stops somebody concluding the record does not exist. |
-| emptyNoAccess | Shown when the caller lacks `ORDER_VIEW`, which `listPaymentTokens` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | The offline banner shows. Balances and stored cards already loaded stay visible with their age, cards masked. Storing a card and transferring value need the server. |
 
 **Goes to**
@@ -2921,8 +3000,6 @@
 | `shareEntitlement` | [OrderService](../backend/OrderService.md#shareentitlement) | onAction | Let somebody else use this, without giving it away | `ORDER_MODIFY` |
 | `getGroupBooking` | [OrderService](../backend/OrderService.md#getgroupbooking) | onLoad | getGroupBooking | `ORDER_VIEW` |
 | `respondToInvitation` | [MarketingService](../backend/MarketingService.md#respondtoinvitation) | onAction | Accept or decline | `GUEST_VIEW` |
-| `createReferral` | [MarketingService](../backend/MarketingService.md#createreferral) | onAction | Issue a referral code | `MARKETING_MANAGE` |
-| `getMyChallenges` | [MarketingService](../backend/MarketingService.md#getmychallenges) | onLoad | Active challenges and how far along I am | `MARKETING_VIEW` |
 
 **States**
 
@@ -2932,7 +3009,7 @@
 | error | Could not load. Says what failed and offers one way onward, never a bare failure. |
 | emptyFirstRun | Nothing shared. A guest holding eight tickets sees the option here rather than discovering it at the gate. |
 | emptyNoResults | Nothing here yet. The scope is what narrowed it — naming the scope is what stops somebody concluding the record does not exist. |
-| emptyNoAccess | Shown when the caller lacks `PRODUCT_VIEW`, which `listGroupPackages` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | The offline banner shows. Tickets already shared stay visible. Sharing, invitations and referrals need the connection — a transfer nobody received is a ticket nobody holds. |
 
 **Goes to**
@@ -2970,7 +3047,7 @@
 | `getGuestSession` | [IdentityService](../backend/IdentityService.md#getguestsession) | onLoad | The sign-in methods linked to the account and whether it is verified | `None` |
 | `guestLogout` | [IdentityService](../backend/IdentityService.md#guestlogout) | onAction | Sign out on this device | `None` |
 | `listGuestDevices` | [MarketingService](../backend/MarketingService.md#listguestdevices) | onLoad | Which devices hold this guest's credentials | `None` |
-| `registerGuestDevice` | [MarketingService](../backend/MarketingService.md#registerguestdevice) | onAction | Trust this device | `None` |
+| `registerGuestDevice` | [MarketingService](../backend/MarketingService.md#registerguestdevice) | background | The app registers its push token silently at launch; never a button or a typed token | `None` |
 | `revokeGuestDevice` | [MarketingService](../backend/MarketingService.md#revokeguestdevice) | onAction | Sign a lost device out | `None` |
 | `verifyGuestEmail` | [IdentityService](../backend/IdentityService.md#verifyguestemail) | onAction | Confirm the address before it can recover an account | `GUEST_VIEW` |
 | `listMfaMethods` | [IdentityService](../backend/IdentityService.md#listmfamethods) | onLoad | The guest's enrolled methods | `None` |
@@ -2979,8 +3056,6 @@
 | `removeMfaMethod` | [IdentityService](../backend/IdentityService.md#removemfamethod) | onAction | Remove a method | `None` |
 | `createMfaChallenge` | [IdentityService](../backend/IdentityService.md#createmfachallenge) | onAction | Step-up before a sensitive act at a venue that has it on | `None` |
 | `verifyMfaChallenge` | [IdentityService](../backend/IdentityService.md#verifymfachallenge) | onAction | Check the step-up code | `None` |
-| `getMyIdentityVerification` | [IdentityService](../backend/IdentityService.md#getmyidentityverification) | onLoad | Show the guest's ID verification status | `None` |
-| `submitGuestIdentityDocument` | [IdentityService](../backend/IdentityService.md#submitguestidentitydocument) | onAction | Upload an ID document for verification | `None` |
 
 **States**
 
@@ -2989,7 +3064,7 @@
 | loading | Content loads. |
 | error | Could not load. Says what failed and offers one way onward, never a bare failure. |
 | emptyFirstRun | Only this device is signed in. The device list holds one row, this one, and the screen says that signing in elsewhere will add a row here. |
-| emptyNoAccess | Shown when the caller lacks `GUEST_VIEW`, which `verifyGuestEmail` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | Nothing here is offered offline, and the banner says so. An erasure request or a device change queued and never sent is worse than one that could not be made — the legal clock starts when the platform receives it, and a device signed out offline is still signed in. |
 
 **Goes to**
@@ -3025,7 +3100,6 @@
 | `getVisitReminder` | [OrderService](../backend/OrderService.md#getvisitreminder) | onAction | The reminder set for this booking | `ORDER_VIEW` |
 | `setVisitReminder` | [OrderService](../backend/OrderService.md#setvisitreminder) | onAction | Turn a visit reminder on or off | `ORDER_VIEW` |
 | `getOrder` | [OrderService](../backend/OrderService.md#getorder) | onAction | Read an order | `ORDER_VIEW` |
-| `listOrders` | [OrderService](../backend/OrderService.md#listorders) | onLoad | List orders | `ORDER_VIEW` |
 | `issueWalletPass` | [OrderService](../backend/OrderService.md#issuewalletpass) | onAction | Generate an Apple or Google wallet pass | `ORDER_VIEW` |
 
 **States**
@@ -3036,7 +3110,7 @@
 | error | Could not load. Names which read failed and leaves the add calendar reminders untouched. |
 | emptyFirstRun | No add calendar reminders yet. Offers Issue wallet pass (`issueWalletPass`); distinct from a filter that matched nothing. |
 | emptyNoResults | Nothing matches the filter on venueId, principalId, shiftId, status, createdFrom, createdTo and the add calendar reminders are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Shown when the caller lacks `ORDER_VIEW`, which `getOrderCalendarEvent` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
 
 **Goes to**
@@ -3063,14 +3137,14 @@
 | Parameter | From |
 |---|---|
 | itemId | deepLink |
-| subjectId | GST-001 |
+| subjectId | session |
 
 **Operations**
 
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
 | `getWishlist` | [MarketingService](../backend/MarketingService.md#getwishlist) | onLoad | Read a guest's saved items | `None` |
-| `addToWishlist` | [MarketingService](../backend/MarketingService.md#addtowishlist) | onAction | Save an item | `None` |
+| `addToWishlist` | [MarketingService](../backend/MarketingService.md#addtowishlist) | onAction | Undo after a remove re-saves the same variant and date (idempotent); saving itself happens on the product and date cards | `None` |
 | `removeFromWishlist` | [MarketingService](../backend/MarketingService.md#removefromwishlist) | onAction | Remove a saved item | `None` |
 
 **States**
@@ -3090,7 +3164,7 @@
 
 ## GST-023 Virtual Queue
 
-**Find the right one quickly, and act on it without opening it.**
+**Hold a place in a ride queue without standing in it.**
 
 |  |  |
 |---|---|
@@ -3105,6 +3179,7 @@
 
 | Parameter | From |
 |---|---|
+| subjectId | session |
 | entryId | deepLink |
 
 **Operations**
@@ -3124,7 +3199,7 @@
 | loading | The virtual queue, read by `getWaitingGuest`. |
 | error | Could not load. Names which read failed and leaves the virtual queue untouched. |
 | emptyFirstRun | No virtual queue yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
-| emptyNoAccess | Shown when the caller lacks `QUEUE_VIEW`, which `listQueues` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | The offline banner shows. The guest's place stays on screen with its age, so they can see they hold it. Joining and leaving need the connection — a place taken offline is a place nobody else can see. |
 
 **Goes to**
@@ -3136,7 +3211,7 @@
 
 ## GST-027 Parking – Reserve & Pay
 
-**Take the money, and be unambiguous about whether it worked.**
+**Choose a car park and add parking to the basket; change the plate on parking already bought.**
 
 |  |  |
 |---|---|
@@ -3159,8 +3234,6 @@
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
 | `addCartLine` | [OrderService](../backend/OrderService.md#addcartline) | onAction | Put the car park's parking product in the cart; refused `soldOutForDay` when the car park is at capacity (decided 28 September, audit R166) | `None` |
-| `checkoutCart` | [OrderService](../backend/OrderService.md#checkoutcart) | onAction | Turn the cart into an order | `None` |
-| `createPayment` | [OrderService](../backend/OrderService.md#createpayment) | onAction | Pay for it; the parking entitlement is issued at payment with the order's id (audit R166) | `ORDER_CREATE` |
 | `updateParkingEntitlement` | [AccessService](../backend/AccessService.md#updateparkingentitlement) | onAction | Change the plate, or revoke | `None` |
 | `listParkingFacilities` | [AccessService](../backend/AccessService.md#listparkingfacilities) | onLoad | Car parks at a venue, and how each integrates | `PARKING_CONFIGURE` |
 
@@ -3171,8 +3244,8 @@
 | loading | Terminal or gateway state, shown plainly |
 | error | Declined reads differently from unresolved. An unresolved payment inquires rather than retries, and nothing is issued until it resolves |
 | emptyFirstRun | — |
-| emptyNoResults | Nothing matches the filter on venueId and the parking reserve pay are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Shown when the caller lacks `PARKING_CONFIGURE`, which `listParkingFacilities` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyNoResults | Never shown: the car parks are the venue's, with no filter a guest sets. |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | The offline banner shows. A reservation already confirmed stays on screen with its plate and car park. Reserving, paying and changing the plate need the connection. |
 | soldOutForDay | The car park is full. `addCartLine` refused the parking line with `soldOutForDay`: issued entitlements have reached the facility's capacity for that day. Shown only then — there is no live space count in the first release, so the screen never promises spaces before the guest tries (decided 28 September, audit R166). |
 
@@ -3182,6 +3255,7 @@
 |---|---|---|---|
 | GST-001 | Home – Default |  |  |
 | GST-028 | It is confirmed with a facility | orderId |  |
+| GST-009 | They pay in the basket, and the parking entitlement is issued (R166; | token |  |
 
 ## GST-028 Parking – Reservation Confirmed
 
@@ -3206,7 +3280,7 @@
 
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
-| `getOrder` | [OrderService](../backend/OrderService.md#getorder) | onLoad | The paid order that carries the parking entitlement (audit R166) | `ORDER_VIEW` |
+| `getOrder` | [OrderService](../backend/OrderService.md#getorder) | onLoad | The paid order that carries the parking entitlement (audit R166) With the guest session the device already holds: signed in, or the anonymous cart session a visitor gets with the first line (ADR-0045) (decided 2 October 2026 by Chinmay, fix before Block A starts (GFIX-6)). | `ORDER_VIEW` |
 | `listParkingFacilities` | [AccessService](../backend/AccessService.md#listparkingfacilities) | onLoad | Car parks at a venue, and how each integrates | `PARKING_CONFIGURE` |
 
 **States**
@@ -3216,8 +3290,8 @@
 | loading | The parking reservation confirmed list. |
 | error | Could not load. Names which read failed and leaves the parking reservation confirmed untouched. |
 | emptyFirstRun | Paid, entitlement not yet shown. The order is paid and the entitlement is issued at payment; until it appears the screen shows the order and says the car park pass follows (audit R166). |
-| emptyNoResults | Nothing matches the filter on venueId and the parking reservation confirmed are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Shown when the caller lacks `PARKING_CONFIGURE`, which `listParkingFacilities` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyNoResults | Never shown: the confirmation shows one order's parking. |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | The offline banner shows. A reservation already confirmed stays on screen with its plate and car park. Reserving, paying and changing the plate need the connection. |
 
 **Goes to**
@@ -3229,7 +3303,7 @@
 
 ## GST-035 Feedback & Ratings
 
-**Work with feedback & ratings for this venue.**
+**Tell the venue how the visit went, answer a survey it sent, or report a problem.**
 
 |  |  |
 |---|---|
@@ -3240,12 +3314,21 @@
 | Component | `apps/guest-app/src/routes/general/FeedbackAndRatingsList.tsx` |
 | Pattern | configEditor |
 
+**Entry parameters**
+
+| Parameter | From |
+|---|---|
+| formId | deepLink |
+
 **Operations**
 
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
 | `submitReview` | [MarketingService](../backend/MarketingService.md#submitreview) | onAction | from page inventory | `None` |
 | `raiseMyCase` | [MarketingService](../backend/MarketingService.md#raisemycase) | onAction | Report something — lost property, a complaint, a question | `None` |
+| `getForm` | [MarketingService](../backend/MarketingService.md#getform) | onLoad | A triggered survey opened from its link | `GUEST_VIEW` |
+| `submitForm` | [MarketingService](../backend/MarketingService.md#submitform) | onAction | Answer the survey | `GUEST_VIEW` |
+| `listMyOrders` | [OrderService](../backend/OrderService.md#listmyorders) | onLoad | The recent visits a review can be about | `None` |
 
 **States**
 
@@ -3290,8 +3373,8 @@
 | loading | The digital companion mode list. |
 | error | Could not load. Names which read failed and leaves the digital companion mode untouched. |
 | emptyFirstRun | No digital companion mode yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
-| emptyNoResults | Nothing matches the filter on venueId, kind, isSellable and the digital companion mode are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyNoResults | Nothing under the chosen tab right now; the other tabs stay. |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
 | map3dUnavailable | No 3D model for this map: the 2D map, same route (ADR-0069; client meeting 30 September, MoM 4.8). The Map view of this screen is GST-021's map (one implementation): where the venue has not published a GLB model (the default until it supplies one), the phone fails the 3D capability check or rendering drops below 20 fps, the 2D map shows with the same route and the same live position dot; the 2D/3D toggle is hidden and nothing else is said. |
 | weakGps | Position approximate (ADR-0069, section 4): reported GPS accuracy worse than 30 metres, or indoors. The Map view dims the dot and draws an approximate-position ring round the last confident position, labelled *Position approximate*; directions keep their turn list and remaining distance, and *I am at…* (a nearby location, or its QR sign) re-anchors. Waits, shows and services are unaffected. |
@@ -3342,8 +3425,8 @@
 | loading | The resource booking cabana list. |
 | error | Could not load. Names which read failed and leaves the resource booking cabana untouched. |
 | emptyFirstRun | No resource booking cabana yet. Offers Add cart line (`addCartLine`); distinct from a filter that matched nothing. |
-| emptyNoResults | Nothing matches the filter on venueId, kind, isSellable and the resource booking cabana are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyNoResults | Nothing free on the date picked; offers the next free date. |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
 
 **Goes to**
@@ -3380,8 +3463,8 @@
 | loading | The resource availability (cabana) list. |
 | error | Could not load. Names which read failed and leaves the resource availability (cabana) untouched. |
 | emptyFirstRun | No resource availability (cabana) yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
-| emptyNoResults | Nothing matches the filter on venueId, kind, isSellable and the resource availability (cabana) are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Shown when the caller lacks `PRODUCT_VIEW`, which `getAvailability` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyNoResults | Nothing free on the date picked; offers the next free date. |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
 
 **Goes to**
@@ -3391,43 +3474,6 @@
 | GST-050 | They book and pay |  |  |
 | GST-001 | Home – Default |  |  |
 | GST-074 | Choose on the map (a venue with its spots on a map) | productId |  |
-
-## GST-062 Shop & Drop Collection
-
-**Collect shopping left earlier, using the ticket rather than a receipt.**
-
-|  |  |
-|---|---|
-| Module | In-Venue Experience |
-| Wave | 3 |
-| Licensed module | retail |
-| Route | `/in-venue-experience/shop-and-drop-collection` |
-| Component | `apps/guest-app/src/routes/in-venue-experience/ShopAndDropCollectionList.tsx` |
-| Pattern | configEditor |
-
-**Operations**
-
-| Operation | Service | When | Purpose | Permission |
-|---|---|---|---|---|
-| `lookupShopAndDrop` | [RetailService](../backend/RetailService.md#lookupshopanddrop) | onAction | Find a guest's dropped goods | `ORDER_VIEW` |
-
-**States**
-
-| State | Behaviour |
-|---|---|
-| loading | The saved shop drop collection. |
-| error | Could not load. Names which read failed and leaves the shop drop collection untouched. |
-| emptyFirstRun | No shop drop collection configured. The form opens empty and `lookupShopAndDrop` saves the first one; it says what the platform does in the meantime. |
-| emptyNoAccess | Shown when the caller lacks `ORDER_VIEW`, which `lookupShopAndDrop` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | The offline banner shows, and lookup cannot run. A drop reference already on screen stays visible so the guest can quote it at the collection point. Reserving merchandise needs the connection. |
-
-**Goes to**
-
-| To | Trigger | Carries | Guard |
-|---|---|---|---|
-| GST-001 | Home – Default |  |  |
-| GST-061 | Menu Item Detail |  |  |
-| KSK-017 | Or they collect from a kiosk |  |  |
 
 ## GST-065 Newsletter & Preferences
 
@@ -3456,6 +3502,7 @@
 | `listConsentPurposes` | [MarketingService](../backend/MarketingService.md#listconsentpurposes) | onLoad | Configured consent purposes | `GUEST_VIEW` |
 | `getMarketingSubscription` | [MarketingService](../backend/MarketingService.md#getmarketingsubscription) | onLoad | What this guest has opted into | `MARKETING_VIEW` |
 | `setMarketingSubscription` | [MarketingService](../backend/MarketingService.md#setmarketingsubscription) | onAction | Change it | `MARKETING_VIEW` |
+| `getGuestConsents` | [MarketingService](../backend/MarketingService.md#getguestconsents) | onLoad | Where each opt-in came from and the current position | `GUEST_VIEW` |
 
 **States**
 
@@ -3465,7 +3512,7 @@
 | error | Could not load. Names which read failed and leaves the newsletter preferences untouched. |
 | emptyFirstRun | No newsletter preferences yet. Offers Record consent (`recordConsent`). |
 | emptyNoResults | Never shown: `listConsentPurposes` takes no filter, so an empty list is always the first-run state above. |
-| emptyNoAccess | Shown when the caller lacks `GUEST_VIEW`, which `listConsentPurposes` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | Not available, and the offline banner says why. A consent change must reach the server to mean anything. |
 
 **Goes to**
@@ -3504,7 +3551,7 @@
 | `getVenueMap` | [VenueOpsService](../backend/VenueOpsService.md#getvenuemap) | onLoad | The map with its placed spots (label, kind, zone, capacity, price band) | `VENUE_MAP_VIEW` |
 | `getMapResourceAvailability` | [VenueOpsService](../backend/VenueOpsService.md#getmapresourceavailability) | onLoad | Every spot's status for the day in one call | `RESOURCE_VIEW` |
 | `createResourceHold` | [VenueOpsService](../backend/VenueOpsService.md#createresourcehold) | onAction | Hold the tapped spot for the window | `ORDER_CREATE` |
-| `getResourceHold` | [VenueOpsService](../backend/VenueOpsService.md#getresourcehold) | onInterval | The hold's countdown | `ORDER_VIEW` |
+| `getResourceHold` | [VenueOpsService](../backend/VenueOpsService.md#getresourcehold) | onInterval | The hold's countdown With the guest session the device already holds: signed in, or the anonymous cart session a visitor gets with the first line (ADR-0045) (decided 2 October 2026 by Chinmay, fix before Block A starts (GFIX-6)). | `ORDER_VIEW` |
 | `extendResourceHold` | [VenueOpsService](../backend/VenueOpsService.md#extendresourcehold) | onAction | Keep the hold longer while paying | `ORDER_CREATE` |
 | `relinquishResourceHold` | [VenueOpsService](../backend/VenueOpsService.md#relinquishresourcehold) | onAction | Release the hold | `ORDER_CREATE` |
 | `addCartLine` | [OrderService](../backend/OrderService.md#addcartline) | onAction | Add the held spot to the basket (`variantId`, `resourceHoldId`) | `None` |
@@ -3664,7 +3711,7 @@
 | loading | The route of the chosen departure. |
 | error | Could not load. Names which read failed; nothing is bought. |
 | emptyFirstRun | No routes are published for this venue yet. Says so; the client still owes the real network (stations, fares, timetable). |
-| emptyNoResults | No departure in that period. Names the period and offers Next Available Trip or another period or date. |
+| emptyNoResults | Never shown as a list: the screen opens on one departure. If it has gone, says so and offers the next departure on the route. |
 | emptyNoAccess | Searching and buying need no account. Favourites need a signed-in guest: a guest who is not signed in is offered sign-in and brought back, never shown an empty list. |
 | offline | The offline banner shows. A route's stop list and schematic line already loaded stay readable with their age; the street map needs the connection. Searching departures, buying a trip or a pass and saving a favourite route need the connection. |
 
@@ -3711,7 +3758,7 @@
 | loading | The passes for the station pair. |
 | error | Could not load. Names which read failed; nothing is bought. |
 | emptyFirstRun | No routes are published for this venue yet. Says so; the client still owes the real network (stations, fares, timetable). |
-| emptyNoResults | No departure in that period. Names the period and offers Next Available Trip or another period or date. |
+| emptyNoResults | No passes for this route: says so and offers the one-way trip. |
 | emptyNoAccess | Searching and buying need no account. Favourites need a signed-in guest: a guest who is not signed in is offered sign-in and brought back, never shown an empty list. |
 | offline | The offline banner shows. A route's stop list and schematic line already loaded stay readable with their age; the street map needs the connection. Searching departures, buying a trip or a pass and saving a favourite route need the connection. |
 
@@ -3739,6 +3786,7 @@
 
 | Parameter | From |
 |---|---|
+| subjectId | session |
 | favouriteId | navigation |
 
 **Operations**
@@ -3755,7 +3803,7 @@
 | loading | The saved routes. |
 | error | Could not load. Names which read failed; nothing is bought. |
 | emptyFirstRun | No saved routes yet. Says how to save one (Save this route on a trip) and offers the one-way search. |
-| emptyNoResults | No departure in that period. Names the period and offers Next Available Trip or another period or date. |
+| emptyNoResults | No saved routes yet: save one with Save route on a one-way trip. |
 | emptyNoAccess | Searching and buying need no account. Favourites need a signed-in guest: a guest who is not signed in is offered sign-in and brought back, never shown an empty list. |
 | offline | The offline banner shows. A route's stop list and schematic line already loaded stay readable with their age; the street map needs the connection. Searching departures, buying a trip or a pass and saving a favourite route need the connection. |
 
@@ -3764,4 +3812,4 @@
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
 | GST-076 | Book this route | favouriteId |  |
-| GST-042 | Sign in to see saved routes |  |  |
+| GST-042 | Sign in to see saved routes | subjectId |  |

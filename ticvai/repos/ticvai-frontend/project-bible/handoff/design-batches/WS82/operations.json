@@ -46,50 +46,6 @@
   "requestBody": null,
   "responds": "PricingDynamicPriceRule"
  },
- "listPricing": {
-  "method": "GET",
-  "path": "/pricing",
-  "contract": "catalogue",
-  "summary": "AI Pricing Intelligence Command Center",
-  "permission": "PRODUCT_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "venue",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "urgency",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "risk",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "minConfidence",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- },
  "listRulePriorityConflict": {
   "method": "GET",
   "path": "/rule-priority-conflict",

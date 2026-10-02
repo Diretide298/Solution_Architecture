@@ -998,13 +998,13 @@
   "density": "compact",
   "purposeNote": "Dashboards, reports and AI operate against a consistent governed business-data model rather than independently querying raw tables.",
   "pattern": "listDetail",
-  "patternReason": "the pack gives this screen a display directory (§Detect) and no metric row",
+  "patternReason": "`getSemanticModel` reads the model as a tree; the selection is a domain, dataset or field (CHG-SOT-012).",
   "purpose": "Create the governed business layer between raw data and dashboards/AI. This is one of the most important technical screens in Board 10.",
   "gaps": [
    {
     "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 129 §Detect"
+    "why": "**No certification, owner, glossary or lineage on a dataset or field** (design-notes correction ANL-066). The client asks for certified badges with owner, glossary and lineage; the model holds none of them. Logged as a contract gap 2 October 2026 (CHG-SOT-016). The earlier gap (\"operations return no schema with described properties\") was stale: `SemanticModel` is fully described.",
+    "source": "contracts/satellite/reporting.yaml#/components/schemas/SemanticModel"
    }
   ],
   "layout": {
@@ -1015,18 +1015,23 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "treeNav",
+       "label": "Domains, datasets and fields",
+       "bindsTo": "SemanticModel.domains",
+       "operation": "getSemanticModel",
+       "notes": "Domain (code, name), then its datasets (name and **grain: what one row means**), then their fields (label, data type, default aggregation, sensitive).",
+       "provenance": "contract reporting.yaml GET /semantic-model"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every semantic model business",
+       "label": "Relationships",
+       "bindsTo": "SemanticModel.relationships",
        "columns": [
-        "Missing relationships",
-        "Circular relationships",
-        "Duplicate aggregation risk",
-        "Invalid cardinality",
-        "Broken references"
+        "SemanticModel.relationships"
        ],
-       "bindsTo": null,
-       "operation": null,
-       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 129 §Detect"
+       "operation": "getSemanticModel",
+       "notes": "From dataset, to dataset, cardinality. The pack's checks (missing, circular, duplicate aggregation risk, invalid cardinality, broken references) flag rows here before publish.",
+       "provenance": "contract reporting.yaml SemanticModel.relationships"
       }
      ]
     },
@@ -1036,28 +1041,40 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected semantic model business",
-       "bindsTo": null,
+       "label": "The model",
+       "bindsTo": "SemanticModel",
        "columns": [
-        "Missing relationships",
-        "Circular relationships",
-        "Duplicate aggregation risk",
-        "Invalid cardinality",
-        "Broken references"
+        "SemanticModel.version",
+        "SemanticModel.publishedAt",
+        "SemanticModel.domains",
+        "SemanticModel.relationships"
        ],
-       "notes": "The pack groups this record's detail under its own headings: “Customer”, “Order”, “Ticket”, “Admission”, “F&B Sale”.",
-       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 129 §Detect"
+       "operation": "getSemanticModel",
+       "provenance": "contract reporting.yaml GET /semantic-model"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Publish model",
+       "operation": "setSemanticModel",
+       "notes": "A new version; reports and fields re-read it.",
+       "provenance": "contract reporting.yaml PUT /semantic-model"
       }
      ]
     }
    ]
   },
   "states": {
-   "loading": "The semantic model business list.",
-   "error": "Could not load. Names which read failed and leaves the semantic model business untouched.",
-   "emptyFirstRun": "No semantic model business yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the semantic model business are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "loading": "The semantic model.",
+   "error": "Could not load. Names which read failed and leaves the model untouched.",
+   "emptyFirstRun": "No model published yet. Offers Publish model (`setSemanticModel`); until then reports read the seeded catalogue.",
+   "emptyNoResults": "Nothing in the model matches the search. Names it and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `REPORT_VIEW_TENANT`, which `getSemanticModel` requires, and names that permission."
   },
   "apis": [
    {
@@ -1094,6 +1111,27 @@
    "workshopBoard": "wireframes/WS177 Unified BI Reporting and AI Analytics Platform Board 10.dc.html#anl-066"
   },
   "apisNote": "Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf page 129. 0 of 5 labels bound to a contract property; 13 of 30 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "confirmSetSemanticModel",
+    "component": "confirmDialog",
+    "trigger": "Publish model",
+    "body": "**Names what changes for report authors** (fields added, removed or renamed, relationships changed) before the new version is published. Dismissing sends nothing.",
+    "confirm": {
+     "label": "Publish model",
+     "operation": "setSemanticModel"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "domains",
+      "relationships"
+     ]
+    },
+    "provenance": "contract reporting.yaml PUT /semantic-model"
+   }
+  ],
+  "permission": "REPORT_VIEW_TENANT",
   "_platform": {
    "code": "P16",
    "formFactor": "web",
@@ -1704,6 +1742,17 @@
     "operation": null,
     "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
     "source": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 133 §Monitor"
+   },
+   {
+    "operation": "listSecurityDetectionGovernance",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): listSecurityDetectionGovernance is access fraud analytics (BO-253); this screen governs BI and analytics, whose data is the platform audit trail and AI usage and interactions. An analytics governance read does not exist yet (contract gap CHG-WIR-004) (design-notes correction venue-operations ANL-070).",
+    "source": "contracts/spine/access.yaml#listSecurityDetectionGovernance | contracts/spine/tenancy.yaml#listAuditRecords | contracts/satellite/ai.yaml#getAiUsage"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-004): No analytics governance read (report and dataset access, sharing, sensitivity). **Closed 2 October 2026:** getAnalyticsGovernancePolicy and setAnalyticsGovernancePolicy (CHG-CSA-021, DEC-225) hold the governance policies; bound here by CHG-SOT-009. Field classification and governance exceptions still have no operation.",
+    "source": "contracts/spine/tenancy.yaml#listAuditRecords"
    }
   ],
   "layout": {
@@ -1738,6 +1787,100 @@
        "bindsTo": null,
        "operation": null,
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 133 §Monitor"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Audit trail",
+       "operation": "listAuditRecords",
+       "provenance": "contract tenancy.yaml GET /audit-records; wiring fix, 2 October 2026"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "AI usage",
+       "bindsTo": "AiUsageReport",
+       "operation": "getAiUsage",
+       "provenance": "contract ai.yaml GET /usage; wiring fix, 2 October 2026"
+      },
+      {
+       "kind": "dataTable",
+       "label": "AI interactions",
+       "operation": "listAiInteractions",
+       "provenance": "contract ai.yaml GET /interactions; wiring fix, 2 October 2026"
+      }
+     ]
+    },
+    {
+     "name": "governancePolicy",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "multiSelect",
+       "label": "Masked fields",
+       "bindsTo": "AnalyticsGovernancePolicy.masking",
+       "operation": "setAnalyticsGovernancePolicy",
+       "notes": "`masking.maskedFields` as `schema.table.column`, picked from the semantic model's sensitive fields; `masking.unmaskedForPermissions` names who may see them unmasked. Masked before a value leaves the query (ADR-0054).",
+       "provenance": "contract reporting.yaml PUT /analytics-governance-policy (CHG-CSA-021)",
+       "permission": "REPORT_GOVERNANCE_MANAGE"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Export formats allowed",
+       "bindsTo": "AnalyticsGovernancePolicy.export",
+       "operation": "setAnalyticsGovernancePolicy",
+       "notes": "`export.allowedFormats`; `export.personalDataNeedsPermission` (default on: an export carrying personal data needs `REPORT_EXPORT_PII`) and `export.maxRows` beside it.",
+       "provenance": "contract reporting.yaml PUT /analytics-governance-policy (CHG-CSA-021)",
+       "permission": "REPORT_GOVERNANCE_MANAGE"
+      },
+      {
+       "kind": "numberField",
+       "label": "Keep report results and exports for (days)",
+       "bindsTo": "AnalyticsGovernancePolicy.retention",
+       "operation": "setAnalyticsGovernancePolicy",
+       "notes": "`retention.resultDays`; empty keeps them until the data-retention settings remove them (ANL-050).",
+       "provenance": "contract reporting.yaml PUT /analytics-governance-policy (CHG-CSA-021)",
+       "permission": "REPORT_GOVERNANCE_MANAGE"
+      },
+      {
+       "kind": "toggle",
+       "label": "Allow external share links",
+       "bindsTo": "AnalyticsGovernancePolicy.sharing",
+       "operation": "setAnalyticsGovernancePolicy",
+       "notes": "`sharing.externalLinks` (default off) and `sharing.allowedDomains`, the only domains a link may be sent to.",
+       "provenance": "contract reporting.yaml PUT /analytics-governance-policy (CHG-CSA-021)",
+       "permission": "REPORT_GOVERNANCE_MANAGE"
+      },
+      {
+       "kind": "toggle",
+       "label": "AI assistant may answer analytics questions",
+       "bindsTo": "AnalyticsGovernancePolicy.aiAndApiAccess",
+       "operation": "setAnalyticsGovernancePolicy",
+       "notes": "`aiAndApiAccess.aiAssistant` (default on, through the semantic layer only) and `aiAndApiAccess.publicApi` (default off).",
+       "provenance": "contract reporting.yaml PUT /analytics-governance-policy (CHG-CSA-021)",
+       "permission": "REPORT_GOVERNANCE_MANAGE"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The policy in force",
+       "bindsTo": "AnalyticsGovernancePolicy",
+       "columns": [
+        "AnalyticsGovernancePolicy.masking",
+        "AnalyticsGovernancePolicy.export",
+        "AnalyticsGovernancePolicy.retention",
+        "AnalyticsGovernancePolicy.sharing",
+        "AnalyticsGovernancePolicy.aiAndApiAccess",
+        "AnalyticsGovernancePolicy.updatedAt"
+       ],
+       "operation": "getAnalyticsGovernancePolicy",
+       "notes": "A tenant that never set one reads the defaults: personal fields masked, personal-data exports need `REPORT_EXPORT_PII`, no external sharing, AI and API access through the semantic layer only. Shown as \"Defaults\" until saved.",
+       "provenance": "contract reporting.yaml GET /analytics-governance-policy (CHG-CSA-021)"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Save governance policy",
+       "operation": "setAnalyticsGovernancePolicy",
+       "notes": "Replaces the whole policy; the confirmation names each section that changes. Needs `REPORT_GOVERNANCE_MANAGE` (joined the vocabulary 2 October, CHG-FUP-007); shown only to its holders.",
+       "provenance": "contract reporting.yaml PUT /analytics-governance-policy (CHG-CSA-021)",
+       "permission": "REPORT_GOVERNANCE_MANAGE"
       }
      ]
     },
@@ -1778,16 +1921,48 @@
   "states": {
    "loading": "The analytics governance security list.",
    "error": "Could not load. Names which read failed and leaves the analytics governance security untouched.",
-   "emptyFirstRun": "No analytics governance security yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No analytics governance security yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the analytics governance security are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Names the missing permission: reading the audit trail and the governance policy needs `REPORT_VIEW_TENANT`, and changing the policy needs `REPORT_GOVERNANCE_MANAGE` (CHG-FUP-007); without it the policy shows read-only and says who can change it. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
-    "operationId": "listSecurityDetectionGovernance",
-    "contract": "access",
-    "purpose": "Security Analytics, AI Detection & Governance",
-    "trigger": "onLoad"
+    "operationId": "listAuditRecords",
+    "contract": "tenancy",
+    "purpose": "Changes to analytics objects: who did what, and when",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-001)"
+   },
+   {
+    "operationId": "getAiUsage",
+    "contract": "ai",
+    "purpose": "AI usage, cost and performance in analytics",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-001)"
+   },
+   {
+    "operationId": "listAiInteractions",
+    "contract": "ai",
+    "purpose": "Every AI prompt, response and action",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-001)"
+   },
+   {
+    "operationId": "getAnalyticsGovernancePolicy",
+    "contract": "reporting",
+    "purpose": "The tenant's analytics governance policy: masking, export, retention, sharing, AI and API access",
+    "trigger": "onLoad",
+    "provenance": "decided 2 October 2026, Chinmay, workbook Q225 (DEC-225, CHG-CSA-021); bound by CHG-SOT-009"
+   },
+   {
+    "operationId": "setAnalyticsGovernancePolicy",
+    "contract": "reporting",
+    "purpose": "Set the analytics governance policy (the whole policy is replaced)",
+    "trigger": "onAction",
+    "invalidates": [
+     "getAnalyticsGovernancePolicy"
+    ],
+    "provenance": "decided 2 October 2026, Chinmay, workbook Q225 (DEC-225, CHG-CSA-021); bound by CHG-SOT-009"
    }
   ],
   "entryState": {
@@ -1806,6 +1981,30 @@
    "workshopBoard": "wireframes/WS177 Unified BI Reporting and AI Analytics Platform Board 10.dc.html#anl-070"
   },
   "apisNote": "Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf page 133. 0 of 17 labels bound to a contract property; 24 of 56 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "confirmSetAnalyticsGovernancePolicy",
+    "component": "confirmDialog",
+    "trigger": "Save governance policy",
+    "body": "**Names what changes before it is saved**, section by section (\"Exports of personal data will need REPORT_EXPORT_PII; external share links switched off\"). The whole policy is replaced; the semantic layer applies it to every report, dashboard, export and natural-language answer at once. Dismissing sends nothing.",
+    "confirm": {
+     "label": "Save governance policy",
+     "operation": "setAnalyticsGovernancePolicy"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "masking",
+      "export",
+      "retention",
+      "sharing",
+      "aiAndApiAccess"
+     ]
+    },
+    "provenance": "contract reporting.yaml PUT /analytics-governance-policy (CHG-CSA-021)"
+   }
+  ],
+  "notes": "**Governance policy bound 2 October 2026 (CHG-SOT-009).** Chinmay, workbook Q225: \"Add a governance policy operation (masking, export, retention, sharing, AI/API access)\" (DEC-225). This screen edits the one policy per tenant; ANL-047 shows its sharing and export parts beside report access.",
   "_platform": {
    "code": "P16",
    "formFactor": "web",

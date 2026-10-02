@@ -204,7 +204,10 @@ paths:
         - "P02 GST-074 Map Booking — Cabanas & Spots"
         - "P06 EMP-030 Venue map"
         - "P08 BO-094 Map Editor & Publish"
+      # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
+      # or staff token is still accepted. `{}` makes the credential optional.
       security:
+      - {}
       - guestAuth: []
       - bearerAuth: []
       summary: A map with its points and paths
@@ -763,7 +766,10 @@ paths:
         - "P01 WEB-039 Venue Map & Wait Times"
         - "P02 GST-021 Interactive Map"
         - "P08 BO-094 Map Editor & Publish"
+      # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
+      # or staff token is still accepted. `{}` makes the credential optional.
       security:
+      - {}
       - guestAuth: []
       - bearerAuth: []
       summary: The navigation graph, ready to route over
@@ -1072,7 +1078,10 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-047 Map Booking — Cabanas & Spots"
         - "P02 GST-074 Map Booking — Cabanas & Spots"
+      # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
+      # or staff token is still accepted. `{}` makes the credential optional.
       security:
+      - {}
       - guestAuth: []
       - bearerAuth: []
       summary: The published maps of a venue that carry bookable spots

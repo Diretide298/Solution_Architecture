@@ -43,12 +43,18 @@
     {
      "to": "BO-616",
      "trigger": "Accreditation Application Directory",
-     "provenance": "structural — pack board 1 wiring, 19 September 2026"
+     "provenance": "structural — pack board 1 wiring, 19 September 2026",
+     "carries": [
+      "applicationId"
+     ]
     },
     {
      "to": "BO-617",
      "trigger": "New Accreditation Application",
-     "provenance": "structural — pack board 1 wiring, 19 September 2026"
+     "provenance": "structural — pack board 1 wiring, 19 September 2026",
+     "carries": [
+      "applicationId"
+     ]
     },
     {
      "to": "BO-618",
@@ -123,6 +129,26 @@
        "derived": true,
        "impliedBy": "listAccreditationApplications",
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      },
+      {
+       "kind": "dataTable",
+       "label": "Active credentials",
+       "bindsTo": "AccreditationCredential",
+       "operation": "listAccreditationCredentials",
+       "provenance": "contract accreditation.yaml GET /accreditation-credentials; wiring fix, 2 October 2026"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Expired documents",
+       "operation": "listAccreditationDocuments",
+       "provenance": "contract accreditation.yaml GET /accreditation-documents; wiring fix, 2 October 2026"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Duplicate alerts",
+       "bindsTo": "AccreditationIdentityConflict",
+       "operation": "listAccreditationIdentityConflicts",
+       "provenance": "contract accreditation.yaml GET /accreditation-identity-conflicts; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -149,6 +175,27 @@
     "purpose": "Holders by status",
     "trigger": "onLoad",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "listAccreditationCredentials",
+    "contract": "accreditation",
+    "purpose": "Active credentials",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-001)"
+   },
+   {
+    "operationId": "listAccreditationDocuments",
+    "contract": "accreditation",
+    "purpose": "Documents expired or expiring",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-001)"
+   },
+   {
+    "operationId": "listAccreditationIdentityConflicts",
+    "contract": "accreditation",
+    "purpose": "Possible duplicate identities",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-001)"
    }
   ],
   "wireframe": {
@@ -157,6 +204,7 @@
    "workshopBoard": "wireframes/WS01 ACCREDITATION Board 1.dc.html#bo-615"
   },
   "apisNote": "Regenerated 9 September 2026 from ACCREDITATION.pdf page 3. 0 of 0 labels bound to a contract property; 0 of 20 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {},
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -549,14 +597,24 @@
      "slot": "fields",
      "components": [
       {
-       "kind": "textField",
-       "label": "Mandatory / Optional / Conditional / Hidden",
-       "provenance": "pack ACCREDITATION.pdf, page 5 §Fields may be configured as"
+       "kind": "selectField",
+       "label": "Field requirement",
+       "provenance": "pack ACCREDITATION.pdf, page 5 §Fields may be configured as",
+       "operation": "createForm",
+       "notes": "Per field: mandatory, optional, conditional or hidden."
       },
       {
-       "kind": "selectField",
-       "label": "Key requirement: 12.1.2",
-       "provenance": "pack ACCREDITATION.pdf, page 5 §Fields may be configured as"
+       "kind": "dataTable",
+       "label": "Forms",
+       "operation": "listForms",
+       "provenance": "contract marketing-crm.yaml GET /forms; wiring fix, 2 October 2026"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The form",
+       "bindsTo": "FormDefinition",
+       "operation": "getForm",
+       "provenance": "contract marketing-crm.yaml GET /forms/{formId}; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -583,6 +641,20 @@
     "purpose": "Link the built form to the programme (formId)",
     "trigger": "onAction",
     "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "listForms",
+    "contract": "marketing-crm",
+    "purpose": "The builder's list of forms",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-005)"
+   },
+   {
+    "operationId": "getForm",
+    "contract": "marketing-crm",
+    "purpose": "Open one form at a version",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-005)"
    }
   ],
   "wireframe": {
@@ -595,6 +667,10 @@
    "params": [
     {
      "name": "programmeId",
+     "from": "navigation"
+    },
+    {
+     "name": "formId",
      "from": "navigation"
     }
    ]
@@ -685,6 +761,17 @@
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "components": [
+      {
+       "kind": "secondaryButton",
+       "label": "Save categories",
+       "operation": "updateAccreditationProgramme",
+       "provenance": "contract accreditation.yaml PUT /accreditation-programmes/{programmeId}; wiring fix, 2 October 2026"
+      }
+     ]
     }
    ]
   },
@@ -702,6 +789,13 @@
     "purpose": "Categories within a programme",
     "trigger": "onLoad",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "updateAccreditationProgramme",
+    "contract": "accreditation",
+    "purpose": "Save the programme's categories",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-001)"
    }
   ],
   "wireframe": {
@@ -710,6 +804,30 @@
    "workshopBoard": "wireframes/WS01 ACCREDITATION Board 1.dc.html#bo-619"
   },
   "apisNote": "Regenerated 9 September 2026 from ACCREDITATION.pdf page 6. 0 of 0 labels bound to a contract property; 0 of 25 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formUpdateAccreditationProgramme",
+    "component": "modal",
+    "trigger": "Save categories",
+    "body": "**Collects what `updateAccreditationProgramme` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save categories",
+     "operation": "updateAccreditationProgramme"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "contract accreditation.yaml PUT /accreditation-programmes/{programmeId}; wiring fix, 2 October 2026"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "programmeId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -937,6 +1055,11 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack ACCREDITATION.pdf, page 7"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-004): No read of accreditation requirements (only PUT /accreditation-requirements exists); affects BO-621 and BO-622.",
+    "source": "contracts/satellite/accreditation.yaml#setAccreditationRequirements"
    }
   ],
   "layout": {
@@ -1202,6 +1325,13 @@
        "bindsTo": null,
        "operation": null,
        "provenance": "pack ACCREDITATION.pdf, page 8 §The screen shall show"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Duplicate candidates",
+       "bindsTo": "AccreditationIdentityConflict",
+       "operation": "listAccreditationIdentityConflicts",
+       "provenance": "contract accreditation.yaml GET /accreditation-identity-conflicts; wiring fix, 2 October 2026"
       }
      ]
     },
@@ -1245,6 +1375,13 @@
     "purpose": "Intake monitor",
     "trigger": "onLoad",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "listAccreditationIdentityConflicts",
+    "contract": "accreditation",
+    "purpose": "Duplicate candidates among incoming applications",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-001)"
    }
   ],
   "entryState": {
@@ -1334,6 +1471,17 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack ACCREDITATION.pdf, page 9"
+   },
+   {
+    "operation": "createAccreditationProgramme",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): createAccreditationProgramme was bound as \"Publish the rules\"; publishing an existing programme is updateAccreditationProgramme with status open (already declared), and the screen creates nothing (design-notes correction venue-operations BO-624).",
+    "source": "contracts/satellite/accreditation.yaml#createAccreditationProgramme | contracts/satellite/accreditation.yaml#updateAccreditationProgramme"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-004): No operation validates a programme before it opens (form, categories, requirements, validity, notifications).",
+    "source": "contracts/satellite/accreditation.yaml#setAccreditationRequirements"
    }
   ],
   "layout": {
@@ -1345,8 +1493,8 @@
       {
        "kind": "primaryButton",
        "derived": true,
-       "impliedBy": "createAccreditationProgramme",
-       "label": "Create",
+       "impliedBy": "updateAccreditationProgramme",
+       "label": "Save",
        "notes": "The act the screen exists for."
       },
       {
@@ -1354,7 +1502,7 @@
        "label": "Cancel",
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
-       "impliedBy": "createAccreditationProgramme"
+       "impliedBy": "updateAccreditationProgramme"
       }
      ]
     }
@@ -1363,21 +1511,11 @@
   "states": {
    "loading": "The registration rules publication list.",
    "error": "Could not load. Names which read failed and leaves the registration rules publication untouched.",
-   "emptyFirstRun": "No registration rules publication yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No registration rules publication yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the registration rules publication are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
-   {
-    "operationId": "createAccreditationProgramme",
-    "contract": "accreditation",
-    "purpose": "Publish the rules",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026",
-    "invalidates": [
-     "listAccreditationProgrammes"
-    ]
-   },
    {
     "operationId": "updateAccreditationProgramme",
     "contract": "accreditation",

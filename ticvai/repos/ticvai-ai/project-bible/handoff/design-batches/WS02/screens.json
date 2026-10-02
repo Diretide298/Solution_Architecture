@@ -362,6 +362,12 @@
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
        "impliedBy": "setVisualAccessRule"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Rules",
+       "operation": "listAdmissionRules",
+       "provenance": "contract access.yaml GET /admission-rules; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -380,6 +386,13 @@
     "contract": "access",
     "purpose": "Visual Access Rule Builder",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "listAdmissionRules",
+    "contract": "access",
+    "purpose": "The admission profiles whose ruleConditions the builder edits",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-001)"
    }
   ],
   "wireframe": {
@@ -444,7 +457,7 @@
      "to": "BO-154",
      "trigger": "Returns to the board's landing screen",
      "provenance": "flow F112 step 4→5",
-     "operation": "listEntryExitRule"
+     "operation": "listAdmissionRules"
     }
    ]
   },
@@ -463,6 +476,12 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Access Control Module_Reference.pdf, page 19"
+   },
+   {
+    "operation": "listEntryExitRule",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): listEntryExitRule returns its own rule rows (entryMode, exitMode, designatedGateRequired) while the write is the admission profile; two shapes for one block. The block is read from listAdmissionRules, already declared (VO-R14; design-notes correction venue-operations BO-156).",
+    "source": "contracts/spine/access.yaml#listEntryExitRule | contracts/spine/access.yaml#/components/schemas/AdmissionRules"
    }
   ],
   "layout": {
@@ -474,8 +493,15 @@
       {
        "kind": "dataTable",
        "derived": true,
-       "impliedBy": "listEntryExitRule",
+       "impliedBy": "listAdmissionRules",
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "updateAdmissionRules"
       }
      ]
     },
@@ -496,17 +522,11 @@
   "states": {
    "loading": "The entry exit re-entry list.",
    "error": "Could not load. Names which read failed and leaves the entry exit re-entry untouched.",
-   "emptyFirstRun": "No entry exit re-entry yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No entry exit re-entry yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the entry exit re-entry are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
-   {
-    "operationId": "listEntryExitRule",
-    "contract": "access",
-    "purpose": "Entry, Exit & Re-entry Rules",
-    "trigger": "onLoad"
-   },
    {
     "operationId": "listAdmissionRules",
     "contract": "access",
@@ -521,7 +541,6 @@
     "trigger": "onAction",
     "provenance": "decided 29 September, VM close-out (venue management and configuration)",
     "invalidates": [
-     "listEntryExitRule",
      "listAdmissionRules"
     ]
    }
@@ -737,6 +756,7 @@
     }
    ]
   },
+  "notes": "**\"Applies to\": venue-wide by default, or chosen products or admission profiles (decided 2 October 2026 by Chinmay, DEC-231; CHG-CSP-029, `appliesTo`).**",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1104,6 +1124,7 @@
    "workshopBoard": "wireframes/WS19 Access Control Board 2.dc.html#bo-159"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 22. 0 of 0 labels bound to a contract property; 5 of 27 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** still owed by a contract change: `setEntitlementConsumption`.",
+  "notes": "**Time-bound entitlements belong here (decided 2 October 2026 by Chinmay, DEC-232; CHG-CSP-030):** valid for N minutes from the first scan (for example 60), refused after, offline too.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1159,7 +1180,7 @@
      "to": "BO-154",
      "trigger": "Returns to the board's landing screen",
      "provenance": "flow F112 step 12→13",
-     "operation": "listMultiParkCrossover"
+     "operation": "listAdmissionRules"
     }
    ]
   },
@@ -1177,6 +1198,12 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Access Control Module_Reference.pdf, page 23"
+   },
+   {
+    "operation": "listMultiParkCrossover",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): listMultiParkCrossover names its fields differently from AdmissionRules.crossover (allowedParks vs allowedParkOrgUnitIds, crossoverTime vs crossoverAfterTime); the section reads and writes the profile's crossover block only, through listAdmissionRules (design-notes correction venue-operations BO-160).",
+    "source": "contracts/spine/access.yaml#listMultiParkCrossover | contracts/spine/access.yaml#/components/schemas/AdmissionRules"
    }
   ],
   "layout": {
@@ -1210,17 +1237,11 @@
   "states": {
    "loading": "The multi-park crossover rules list.",
    "error": "Could not load. Names which read failed and leaves the multi-park crossover rules untouched.",
-   "emptyFirstRun": "No multi-park crossover rules yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No multi-park crossover rules yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the multi-park crossover rules are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
-   {
-    "operationId": "listMultiParkCrossover",
-    "contract": "access",
-    "purpose": "Multi-Park & Crossover Rules",
-    "trigger": "onLoad"
-   },
    {
     "operationId": "listAdmissionRules",
     "contract": "access",
@@ -1236,7 +1257,6 @@
     "provenance": "decided 29 September, VM close-out (venue management and configuration)",
     "invalidates": [
      "listMultiParkCrossover2",
-     "listMultiParkCrossover",
      "listAdmissionRules"
     ]
    }
@@ -1393,6 +1413,18 @@
        "operation": "setProductEligibilityRule",
        "notes": "**Child Ticket + Assigned Adult Ticket** from the pack — a guest below this age must be accompanied (`accompaniedBelowAge`) (audit R275 (b)).",
        "provenance": "contract catalogue.yaml PUT /products/{productId}/eligibility-rule"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "Companion and eligibility types (reference)",
+       "operation": "listGuestCompanionEligibility",
+       "notes": "Read-only reference: the seven pack categories are credential or entitlement types (R275 b), not editable eligibility.",
+       "provenance": "contract access.yaml GET /guest-companion-eligibility"
       }
      ]
     },
@@ -1692,6 +1724,12 @@
        "label": "What publishing changes",
        "notes": "**Names what goes live, where, and from when.** A publish with no stated consequence is one somebody presses meaning to save.",
        "provenance": "authored — required by check-screens for publishRuleConflictCheck"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Submit for approval",
+       "operation": "createApprovalRequest",
+       "provenance": "contract approvals.yaml POST /approval-requests; wiring fix, 2 October 2026"
       }
      ]
     },
@@ -1714,6 +1752,13 @@
     "contract": "access",
     "purpose": "Rule Simulation, Conflict Check & Publication",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "createApprovalRequest",
+    "contract": "approvals",
+    "purpose": "Submit the tested rule set for approval before publication",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-001)"
    }
   ],
   "wireframe": {
@@ -1723,6 +1768,23 @@
    "workshopBoard": "wireframes/WS19 Access Control Board 2.dc.html#bo-163"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 26. 0 of 0 labels bound to a contract property; 3 of 59 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formCreateApprovalRequest",
+    "component": "modal",
+    "trigger": "Submit for approval",
+    "body": "**Collects what `createApprovalRequest` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Submit for approval",
+     "operation": "createApprovalRequest"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "contract approvals.yaml POST /approval-requests; wiring fix, 2 October 2026"
+   }
+  ],
+  "entryState": {},
   "_platform": {
    "code": "P08",
    "audience": "staff",

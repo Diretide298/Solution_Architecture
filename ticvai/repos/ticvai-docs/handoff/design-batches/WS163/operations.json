@@ -56,19 +56,6 @@
   "requestBody": null,
   "responds": "ApprovalRequest"
  },
- "getGameplaySyncStatus": {
-  "method": "GET",
-  "path": "/gameplay-sync-status",
-  "contract": "games",
-  "summary": "What readers took offline and have not sent",
-  "permission": "PRODUCT_VIEW",
-  "offlineCapable": null,
-  "conflictPolicy": null,
-  "scopeLevel": "venue",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "ReaderSyncStatus"
- },
  "getResource": {
   "method": "GET",
   "path": "/resources/{resourceId}",
@@ -240,25 +227,6 @@
   "parameters": [],
   "requestBody": null,
   "responds": "ShiftSwap"
- },
- "raiseMyCase": {
-  "method": "POST",
-  "path": "/my/cases",
-  "contract": "marketing-crm",
-  "summary": "Report something — lost property, a complaint, a question",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "append",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Case"
  },
  "raiseResourceRequest": {
   "method": "POST",

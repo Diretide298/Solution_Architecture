@@ -31,14 +31,13 @@ steps:
   screen: BO-024
   action: Payment Exceptions.
   operations:
-  - addTip
   - capturePayment
   - closeDepositBoxes
-  - createPayment
   - inquirePaymentStatus
   - settleDeposit
   outcome: 6 operations, 0 of them previously unwalked.
   crossesDevice: true
+  note: '**Repointed 2 October (CHG-WIR-025).** Taking a payment and adding a tip are till acts at workstation scope; the exceptions screen resolves existing payments (capture, inquire) and settles or closes deposits.'
 - step: 3
   screen: PTR-014
   action: Settlement & Payment History.

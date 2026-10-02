@@ -1,13 +1,13 @@
 {
- "approveDecision": {
-  "method": "PUT",
-  "path": "/decision",
-  "contract": "promotions",
-  "summary": "Approval Inbox & Decision Workspace",
-  "permission": "PRICE_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
+ "createApprovalEvidencePackage": {
+  "method": "POST",
+  "path": "/approval-evidence-packages",
+  "contract": "approvals",
+  "summary": "Assemble what an auditor asked for",
+  "permission": "APPROVAL_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
   "parameters": [
    {
     "name": null,
@@ -15,8 +15,8 @@
     "required": null
    }
   ],
-  "requestBody": "ApprovalInboxDecisionWorkspaceInput",
-  "responds": "ApprovalInboxDecisionWorkspaceView"
+  "requestBody": null,
+  "responds": null
  },
  "decideApprovalRequest": {
   "method": "POST",

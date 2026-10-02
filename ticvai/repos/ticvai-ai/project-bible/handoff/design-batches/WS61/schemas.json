@@ -902,6 +902,254 @@
    }
   }
  },
+ "DenyReason": {
+  "type": "string",
+  "description": "Enumerated so the client can render an appropriate operator prompt. A gate operator facing a queue needs a reason and a next action, not a boolean.\n",
+  "enum": [
+   "notFound",
+   "notYetValid",
+   "expired",
+   "alreadyUsed",
+   "reentryLimitReached",
+   "exitRequiredBeforeReentry",
+   "wrongAccessPoint",
+   "wrongPerformance",
+   "outsideAdmissionWindow",
+   "entitlementSuspended",
+   "blacklisted",
+   "capacityReached",
+   "waiverRequired",
+   "accompanimentRequired",
+   "mediaDeactivated",
+   "unpaid",
+   "delegatedRightExhausted",
+   "delegatedRightRevoked",
+   "journeyNotCovered"
+  ]
+ },
+ "Entitlement": {
+  "type": "object",
+  "x-ticvai-persistence": "access.entitlement",
+  "description": "**What a guest actually holds.** Found missing on 18 August by the schema audit — 33 tables in `orders`, seven in `access`, and none of them stored an issued ticket.\nThe package sold products, defined `EntitlementTemplate`, recorded `ScanEvent.ticketId`, transferred `ticket_transfer.ticketIds` and issued `wallet_pass.entitlementId` — **five artefacts referring to a thing that did not exist.** `validateAccess` read the *template* and never the instance, and `suspendEntitlement` suspended the template, **which would have suspended it for every guest who held one.**\n**The template is the definition and this is the instance.** A template says *an annual pass admits once a day for a year*; this says *this guest's annual pass, bought on 3 March, used eleven times, frozen for two weeks in July, valid until 2 March.*\n",
+  "required": [
+   "id",
+   "templateId",
+   "productId",
+   "orderId",
+   "subjectId",
+   "status",
+   "validFrom",
+   "validTo"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "description": "A UUIDv7, matching `TicketStatus.ticketId` — **stable for the life of the ticket and independent of the media carrying it.** A guest whose wristband broke keeps the same entitlement with a new `mediaCode`.\n**This is the ticket id.** Wherever an operation takes a `ticketId` or `ticketIds` — `lookupTicket`, `listScans`, `ScanEvent`, the offline package and `transferOrderTickets` — it is this value. An order line's `entitlementIds` are the ticket ids of that line.\n"
+   },
+   "templateId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The definition it was issued against. **Pinned at issue** — a template edited next month must not change what this guest bought.\n"
+   },
+   "productId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "orderId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The order's id, a UUIDv7 as in `/orders/{orderId}` (`orders.sales_order.id`)."
+   },
+   "orderLineId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Who holds it. **Null is legitimate** — a ticket bought as a gift or sold at a till to somebody who gave no details has no subject until it is claimed.\n"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "mediaCode": {
+    "type": "string",
+    "description": "What is scanned — a QR payload, a wristband serial, a card number. **Rotatable without reissuing**, because a guest whose wristband broke should not need a new ticket.\n"
+   },
+   "status": {
+    "$ref": "../spine/orders.yaml#/components/schemas/EntitlementStatus"
+   },
+   "statusNote": {
+    "type": "string",
+    "nullable": true,
+    "description": "**Not `TicketStatus` — that is a validation result with a misleading name**, computed at scan time and carrying `isValid` and `isInsideVenue`. The lifecycle is `orders.EntitlementStatus`, and `states/entitlement-status.yaml` has modelled it since before this table existed.\n**Which is the finding in one line: the package had the lifecycle, the state model and the validation result, and no row to hang them on.**\n"
+   },
+   "validFrom": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "validTo": {
+    "type": "string",
+    "format": "date-time",
+    "description": "**Resolved at issue from the template, then owned here.** A freeze extends it, a reissue replaces it, and neither reaches back to the template.\n**What the pre-expiry notice is measured from** (29 September, build pass, group G2; 5.5.30). A daily run in access publishes `entitlement.expiringSoon` once per entitlement and `validTo` when an entitlement in `issued` or `partiallyConsumed` comes within its template's `expiryNoticeDays` (`catalogue.EntitlementTemplate`), and not for one bought inside that window. Marketing turns it into the reminder (a `MessageTrigger` on the event, or a triggered campaign on `entitlementExpiring`); access only says the date is near. A freeze or renewal that moves `validTo` raises the next notice once.\n"
+   },
+   "entriesUsed": {
+    "type": "integer",
+    "default": 0,
+    "readOnly": true,
+    "x-ticvai-derived": "onWrite",
+    "description": "**The number `validateAccess` decrements and nothing was decrementing.** A ten-entry pass with no counter is a ten-entry pass that admits forever.\n**Maintained on write**, in the same transaction as the admitting `access.scan_event` row: by `validateAccess`, `validateGroupAccess` (by the count admitted) and `syncScans` for each replayed admission the server accepts. A replayed scan the server downgrades to `denied` does not count.\n"
+   },
+   "entriesAllowed": {
+    "type": "integer",
+    "nullable": true
+   },
+   "lastEntryAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-derived": "onWrite",
+    "description": "`recordedAt` of the latest admission counted in `entriesUsed`, written by the same writes. A scan replayed late with an earlier `recordedAt` does not move it back.\n"
+   },
+   "firstEntryAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-derived": "onWrite",
+    "description": "`recordedAt` of the first admission, written by the same writes as `lastEntryAt`; it starts a time-bound entitlement's window (DEC-232; CHG-CSP-030). A replayed earlier scan moves it back."
+   },
+   "timeBoundUntil": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-derived": "onWrite",
+    "description": "**Where the template is time-bound, when its window closes**: `firstEntryAt` plus the validity rule's `minutesAfterFirstScan` (decided 2 October 2026, Chinmay, BO-159; DEC-232; CHG-CSP-030). Null until the first scan and on an entitlement with no time bound. A scan after it is denied (`timeBoundWindowElapsed`); it never extends `validTo`, and the earlier of the two wins."
+   },
+   "lifecycleLabel": {
+    "type": "string",
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "x-ticvai-derived": "onRead",
+    "enum": [
+     "created",
+     "pendingFulfillment",
+     "active",
+     "partiallyUsed",
+     "used",
+     "expired",
+     "suspended",
+     "cancelled",
+     "voided",
+     "reissuedSuperseded",
+     "refunded",
+     "transferred",
+     "blocked"
+    ],
+    "description": "**The Virtual Ticket status in the client's 13 names, mapped onto the entitlement model** (decided 2 October 2026, Chinmay, critical set 2, BO-336: \"Map the pack's 13 names onto the model; add any missing states\", and BO-336/DI-670: \"Reserved maps to Pending fulfilment\"; DEC-266; CHG-CSP-033). Computed on read from `status` (orders `EntitlementStatus`), `suspendedReason`, `cancellationKind`, `issuedVia` and an active identity lock; the mapping is in `states/entitlement-status.yaml`. It is what BO-334, BO-336 and the ticket status transition matrix (`AccessTicketStatusTransition`) show; logic still reads `status`."
+   },
+   "cancellationKind": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-derived": "onWrite",
+    "enum": [
+     "voided",
+     "refunded",
+     "performanceCancelled",
+     "superseded"
+    ],
+    "description": "**Which act cancelled the entitlement**, so the pack's Voided, Refunded and Reissued / superseded are told apart while `status` keeps the one r1 value `cancelled` (DEC-266; CHG-CSP-033). Written with the cancelling transition: `voidEntitlement`, `createRefund`, `cancelPerformance`, or a reissue that supersedes it (`supersedesEntitlementId` on the new one). Null unless `cancelled`."
+   },
+   "frozenDays": {
+    "type": "integer",
+    "default": 0,
+    "readOnly": true,
+    "x-ticvai-derived": "onWrite",
+    "description": "Days added by a freeze. **Maintained on write** by the freeze operation (`freezeEntitlement`), in the same write that extends `validTo` by those days. **Held here rather than computed from a freeze log**, because a gate has to answer in under 300ms and cannot replay a history to decide validity.\n"
+   },
+   "suspendedReason": {
+    "type": "string",
+    "nullable": true
+   },
+   "freezeReason": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "travelling",
+     "injury",
+     "personal",
+     "seasonal",
+     "other"
+    ],
+    "description": "The `reason` of the latest `freezeEntitlement` (audit R222). Null when never frozen."
+   },
+   "freezeNote": {
+    "type": "string",
+    "nullable": true,
+    "maxLength": 500,
+    "description": "The `note` the latest `freezeEntitlement` took, required there when `reason` is `other` (decided 28 September, audit R222). Kept so the quarterly review of `other` notes has something to read."
+   },
+   "isNameBound": {
+    "type": "boolean",
+    "default": false
+   },
+   "holderName": {
+    "type": "string",
+    "nullable": true
+   },
+   "sharedWithSubjectIds": {
+    "type": "array",
+    "description": "`shareEntitlement`. **The owner keeps it and a second person may present it** — the asymmetry that stops a shared family pass becoming a resale chain.\n",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "issuedVia": {
+    "type": "string",
+    "enum": [
+     "sale",
+     "invitation",
+     "reissue",
+     "transfer",
+     "resale",
+     "membership",
+     "groupBooking"
+    ],
+    "description": "**How it came to exist, and it matters to finance.** A sold entitlement carries deferred revenue; an invitation carries a marketing cost; a reissue carries neither.\n"
+   },
+   "supersedesEntitlementId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "For a reissue or a resale. **The chain is traceable** — a ticket appearing from nowhere is indistinguishable from a fraudulent one.\n"
+   },
+   "walletValueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Where the template carries stored value. **A `retail.Wallet` bound to the entitlement, not a balance on it** (CF-126).\n"
+   },
+   "facePassEnrolmentId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "x-ticvai-derived": "onRead",
+    "description": "The active `facePass` enrolment on this entitlement (`FacePassEnrolment.id`), or null when none is. **Computed on read from `pii.subject_biometric` and not stored here** — the PII split keeps the biometric on its own side, and this carries only its id. It is how a screen holding a pass finds the enrolment `getFacePassEnrolment` and `revokeFacePass` take.\n"
+   }
+  }
+ },
  "FailedGenerationDeliveryCredentialExceptionManagemenView": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
@@ -1289,262 +1537,82 @@
    }
   }
  },
- "VirtualTicketCredential360WorkspaceInput": {
+ "TicketStatus": {
+  "x-ticvai-persistence": "none — computed from entitlement and scans",
+  "description": "**A validation result, not a lifecycle**, despite the name. Computed at scan time from the entitlement and its scan history — `isValid`, `entriesUsed`, `isInsideVenue`.\n**The name misled a state model into anchoring on it** (`states/entitlement.yaml`, removed 18 August): six lifecycle states were checked against an object with no values, and `check-states` warned about it for a day before anyone read the schema.\nThe entitlement's lifecycle is `orders.EntitlementStatus`. **This is what a gate learns when it scans**, which is a different question with a similar name.\n",
   "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table covers these fields** — the closest is access.entitlement at 9%, so this is not an update to anything the package stores today and no new table has been decided",
-  "description": "**What Virtual Ticket & Credential 360° Workspace submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.\n\n**The pack defines this as a record**, under *For each media show* - one of only 13 drafted writes that does. That is the client writing a row rather than a screen, and it is where the table conversation should start.",
+  "required": [
+   "ticketId",
+   "isValid"
+  ],
   "properties": {
-   "virtualTicketId": {
+   "ticketId": {
     "type": "string",
-    "description": "Virtual Ticket ID"
+    "format": "uuid",
+    "description": "Stable for the life of the ticket, independent of the media carrying it."
    },
-   "mediaRole": {
+   "mediaCode": {
     "type": "string",
-    "enum": [
-     "primary",
-     "secondary",
-     "fallback",
-     "temporary",
-     "revokedHistorical"
-    ],
-    "description": "Role of the medium on the ticket"
+    "nullable": true
    },
-   "bindingId": {
-    "type": "string",
-    "description": "Binding ID"
+   "productName": {
+    "type": "string"
    },
-   "mediaType": {
+   "holderName": {
     "type": "string",
-    "description": "Media type"
+    "nullable": true,
+    "description": "Present only where the entitlement is name-bound. Identity and entitlement are separate concerns; most entitlements carry no holder.\n"
    },
-   "provider": {
-    "type": "string",
-    "description": "Provider"
-   },
-   "issued": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Issued"
-   },
-   "delivered": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Delivered"
-   },
-   "activated": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Activated"
+   "isValid": {
+    "type": "boolean"
    },
    "validFrom": {
     "type": "string",
     "format": "date-time",
-    "description": "Valid From"
+    "nullable": true
    },
    "validTo": {
     "type": "string",
     "format": "date-time",
-    "description": "Valid To"
+    "nullable": true
    },
-   "lastUpdate": {
+   "performanceId": {
     "type": "string",
-    "format": "date-time",
-    "description": "Last update"
+    "format": "uuid",
+    "nullable": true
    },
-   "lastPresentation": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Last presentation"
+   "entriesUsed": {
+    "type": "integer"
    },
-   "lastUse": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Last use"
+   "entriesAllowed": {
+    "type": "integer",
+    "nullable": true,
+    "description": "Null means unlimited."
    },
-   "deviceReferenceWhereAppropriate": {
-    "type": "string",
-    "description": "Device/reference where appropriate"
+   "reentryAllowed": {
+    "type": "boolean"
    },
-   "status": {
+   "isInsideVenue": {
+    "type": "boolean",
+    "description": "Derived from the last scan. Drives anti-passback evaluation."
+   },
+   "issuingCellId": {
     "type": "string",
-    "enum": [
-     "pending",
-     "active",
-     "suspended",
-     "revoked",
-     "expired"
-    ],
-    "description": "Medium status"
+    "nullable": true,
+    "description": "Present when this entitlement was issued in a different cell and is being redeemed here as a delegated right (ADR-0010). Null for locally issued tickets.\n"
+   },
+   "guestLinkId": {
+    "type": "string",
+    "nullable": true,
+    "description": "Pseudonymous cross-region guest reference. Present only on delegated rights. Carries no personal data.\n"
+   },
+   "admissionRulesId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "denyReason": {
+    "$ref": "#/components/schemas/DenyReason"
    }
-  },
-  "x-ticvai-record-definition": "For each media show",
-  "required": [
-   "virtualTicketId"
-  ]
- },
- "VirtualTicketCredential360WorkspaceView": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
-  "description": "**What Virtual Ticket & Credential 360° Workspace displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
-  "properties": {
-   "virtualTicketId": {
-    "type": "string",
-    "description": "Virtual Ticket ID"
-   },
-   "ticketHolder": {
-    "type": "string",
-    "description": "Ticket Holder"
-   },
-   "participant": {
-    "type": "string",
-    "description": "Participant"
-   },
-   "product": {
-    "type": "string",
-    "description": "Product"
-   },
-   "event": {
-    "type": "string",
-    "description": "Event"
-   },
-   "performance": {
-    "type": "string",
-    "description": "Performance"
-   },
-   "venue": {
-    "type": "string",
-    "description": "Venue"
-   },
-   "seat": {
-    "type": "string",
-    "description": "Seat"
-   },
-   "order": {
-    "type": "string",
-    "description": "Order"
-   },
-   "ticketStatus": {
-    "type": "string",
-    "enum": [
-     "created",
-     "pendingFulfillment",
-     "active",
-     "partiallyUsed",
-     "used",
-     "expired",
-     "suspended",
-     "cancelled",
-     "voided",
-     "reissuedSuperseded",
-     "refunded",
-     "transferred",
-     "blocked"
-    ],
-    "description": "Virtual Ticket status"
-   },
-   "usageStatus": {
-    "type": "string",
-    "enum": [
-     "unused",
-     "partiallyUsed",
-     "used"
-    ],
-    "description": "Usage status"
-   },
-   "validity": {
-    "type": "string",
-    "description": "Validity"
-   },
-   "entitlements": {
-    "type": "array",
-    "items": {
-     "type": "string"
-    },
-    "description": "Entitlements on the ticket"
-   },
-   "mediaRole": {
-    "type": "string",
-    "enum": [
-     "primary",
-     "secondary",
-     "fallback",
-     "temporary",
-     "revokedHistorical"
-    ],
-    "description": "Role of the medium on the ticket"
-   },
-   "bindingId": {
-    "type": "string",
-    "description": "Binding ID"
-   },
-   "mediaType": {
-    "type": "string",
-    "description": "Media type"
-   },
-   "provider": {
-    "type": "string",
-    "description": "Provider"
-   },
-   "issued": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Issued"
-   },
-   "delivered": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Delivered"
-   },
-   "activated": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Activated"
-   },
-   "validFrom": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Valid From"
-   },
-   "validTo": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Valid To"
-   },
-   "lastUpdate": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Last update"
-   },
-   "lastPresentation": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Last presentation"
-   },
-   "lastUse": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Last use"
-   },
-   "deviceReferenceWhereAppropriate": {
-    "type": "string",
-    "description": "Device/reference where appropriate"
-   },
-   "status": {
-    "type": "string",
-    "enum": [
-     "pending",
-     "active",
-     "suspended",
-     "revoked",
-     "expired"
-    ],
-    "description": "Medium status"
-   }
-  },
-  "required": [
-   "virtualTicketId"
-  ]
+  }
  }
 }

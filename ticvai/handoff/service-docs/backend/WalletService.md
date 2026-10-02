@@ -7,7 +7,7 @@
 | Tier | commerce: The sale path. Highest availability, highest write rate. |
 | Contracts | `wallet` |
 | Schemas owned | `wallet` |
-| Operations in the slice | 17 of 66 |
+| Operations in the slice | 18 of 68 |
 | Scale | Read-heavy on the sale path — every till and reader resolves a balance — and write-heavy on top-up. Latency-critical in a way LedgerService is not, which is why the two are separate: the ledger is append-only and batch-tolerant, a balance check is neither. |
 | If it is down | It holds a liability owed to a customer. A wallet that double-spends is a financial loss, not a bug report. Deduction order across credit lots is FEFO and is decided here, once, rather than per caller. |
 
@@ -28,7 +28,7 @@
 | Group | Operation | Method | Path | Part | Wave | Called by |
 |---|---|---|---|---|---|---|
 | card | [`loadGameCredits`](#loadgamecredits) | POST | `/game-cards/{cardCode}/load` | core | 1 | POS-002 |
-| giftCard | [`getGiftCard`](#getgiftcard) | GET | `/gift-cards/{cardCode}` | core | 2 | BO-1123, GST-071, WEB-021 |
+| giftCard | [`getGiftCard`](#getgiftcard) | GET | `/gift-cards/{cardCode}` | core | 2 | BO-1123, BO-1125, GST-071, WEB-021 |
 | retail | [`getWalletAutoReloadSetting`](#getwalletautoreloadsetting) | GET | `/wallets/{walletId}/auto-reload` | core | 2 | BO-416, GST-011, WEB-021 |
 | retail | [`getWalletExitBalance`](#getwalletexitbalance) | GET | `/wallets/{walletId}/exit-balance` | core | 2 | BO-416, BO-487, GST-011, WEB-021 |
 | retail | [`setWalletAutoReloadSetting`](#setwalletautoreloadsetting) | PUT | `/wallets/{walletId}/auto-reload` | core | 2 | BO-416, GST-011, WEB-021 |
@@ -36,14 +36,15 @@
 | retail | [`transferWalletBalance`](#transferwalletbalance) | POST | `/wallets/{walletId}/transfer` | core | 2 | BO-1116, BO-1121, GST-071, WEB-021 |
 | wallet | [`captureWalletHold`](#capturewallethold) | POST | `/wallet-holds/{walletHoldId}/capture` | setup | 2 |  |
 | wallet | [`expireCreditLots`](#expirecreditlots) | POST | `/credit-lots/expire` | setup | 1 | BO-1111, BO-1130 |
-| wallet | [`getWallet`](#getwallet) | GET | `/wallets/{subjectId}` | core | 2 | BO-1086, BO-414, BO-416, BO-448, BO-487, GST-011 … |
+| wallet | [`getWallet`](#getwallet) | GET | `/wallets/{subjectId}` | core | 1 | BO-1086, BO-1100, BO-1149, BO-1150, BO-414, BO-416 … |
 | wallet | [`holdWalletFunds`](#holdwalletfunds) | POST | `/wallets/{walletId}/holds` | setup | 2 |  |
-| wallet | [`listWalletTransactions`](#listwallettransactions) | GET | `/wallets/{subjectId}/transactions` | core | 2 | BO-1093, BO-1102, BO-1142, BO-1143, BO-414, BO-423 … |
+| wallet | [`listWalletTransactions`](#listwallettransactions) | GET | `/wallets/{subjectId}/transactions` | core | 2 | BO-1093, BO-1102, BO-1142, BO-1143, BO-1148, BO-414 … |
 | wallet | [`publishWalletConfiguration`](#publishwalletconfiguration) | POST | `/wallet-configuration/publish` | setup | 2 | BO-1092, BO-1112, BO-1132, BO-1162, BO-1173, BO-1180 … |
 | wallet | [`releaseWalletHold`](#releasewallethold) | POST | `/wallet-holds/{walletHoldId}/release` | setup | 2 |  |
 | wallet | [`restoreWalletConfigurationVersion`](#restorewalletconfigurationversion) | POST | `/wallet-configuration/versions/{version}/restore` | setup | 2 | BO-1162 |
 | wallet | [`setWalletFundingRules`](#setwalletfundingrules) | PUT | `/wallet-funding-rules` | setup | 2 | BO-1094, BO-1095, BO-1096, BO-1097, BO-1098, BO-1099 … |
 | wallet | [`setWalletRefundPolicy`](#setwalletrefundpolicy) | PUT | `/wallet-refund-policy` | setup | 2 | ADM-612, BO-1146, BO-1147 |
+| wallet | [`topUpWallet`](#topupwallet) | POST | `/wallets/{subjectId}/top-ups` | core | 1 | BO-488, POS-027 |
 
 ## Group: card
 
@@ -145,7 +146,7 @@ Bonus credits from a promotion are tracked separately because they are typically
 | Read routing | primary |
 | Reads | `wallet.gift_card` |
 | Writes | - |
-| Called by | BO-1123, GST-071, WEB-021 |
+| Called by | BO-1123, BO-1125, GST-071, WEB-021 |
 
 **Parameters**
 
@@ -306,7 +307,7 @@ Bonus credits from a promotion are tracked separately because they are typically
 
 **`PUT /wallets/{walletId}/auto-reload`**: Top the wallet up automatically from a stored card when it runs low
 
-4.2.17, 4.3.28. **The holder's own auto top-up**, within the venue's `WalletFundingRules.autoReload`: when the balance falls below `thresholdAmount`, `reloadAmount` is charged to the stored card (`paymentTokenId`, one of the caller's own) and loaded as cash credit. The venue's rules bound it (minimum and maximum top-up, velocity limits, `maximumPerDay`); this is refused where the venue has auto-reload disabled. A declined charge suspends the setting until the holder updates it, rather than retrying a card that has said no. The holder sets it for their own wallet; staff set it for a guest at a counter with the guest present.
+4.2.17, 4.3.28. **The holder's own auto top-up**, within the venue's `WalletFundingRules.autoReload`: when the balance falls below `thresholdAmount`, `reloadAmount` is charged to the stored card (`paymentTokenId`, one of the caller's own) and loaded as cash credit. The venue's rules bound it (minimum and maximum top-up, velocity limits, `maximumPerDay`); this is refused where the venue has auto-reload disabled, or where the wallet's type does not allow it (`WalletType.autoReloadAllowed`, CHG-CSA-027). A declined charge suspends the setting until the holder updates it, rather than retrying a card that has said no. The holder sets it for their own wallet; staff set it for a guest at a counter with the guest present.
 
 |  |  |
 |---|---|
@@ -658,13 +659,13 @@ Stored value belonging to a guest, distinct from a bearer gift card. Where the g
 | Permission | `WALLET_VIEW` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | primary |
 | Reads | `wallet.credit_lot`, `wallet.wallet` |
 | Writes | - |
-| Called by | BO-1086, BO-414, BO-416, BO-448, BO-487, GST-011, WEB-021 |
+| Called by | BO-1086, BO-1100, BO-1149, BO-1150, BO-414, BO-416, BO-422, BO-448, BO-487, BO-488, GST-011, WEB-017, WEB-021 |
 
 **Parameters**
 
@@ -790,7 +791,7 @@ Stored value belonging to a guest, distinct from a bearer gift card. Where the g
 | Read routing | primary |
 | Reads | `wallet.wallet_transaction` |
 | Writes | - |
-| Called by | BO-1093, BO-1102, BO-1142, BO-1143, BO-414, BO-423, BO-469, GST-011, WEB-021 |
+| Called by | BO-1093, BO-1102, BO-1142, BO-1143, BO-1148, BO-414, BO-423, BO-453, BO-469, GST-011, WEB-021 |
 
 **Parameters**
 
@@ -1203,6 +1204,9 @@ Boards 7.4 and 7.5. **A refund to a wallet and a refund to a card are different 
 | restoreToOriginalLots | boolean |  | (default True) |
 | restoreOriginalExpiry | boolean |  | Refunding into a new lot with a fresh expiry is a gift. (default True) |
 | walletRefundBonusPercent | number |  | An incentive to take the refund as credit rather than to a card. (nullable) |
+| destinationsBySource | array of object |  | A destination per refund source (contract gap CHG-WIR-027, BO-1146; CHG-CSA-045). |
+| destinationsBySource[].source | enum (ticket, event, fnb, retail, rental, parking, membership, compensation) |  |  |
+| destinationsBySource[].destination | enum (originalTender, wallet, guestChoice) |  |  |
 | scopePath | string |  |  |
 
 **Response**: `WalletRefundPolicy`
@@ -1214,6 +1218,9 @@ Boards 7.4 and 7.5. **A refund to a wallet and a refund to a card are different 
 | restoreToOriginalLots | boolean |  | (default True) |
 | restoreOriginalExpiry | boolean |  | Refunding into a new lot with a fresh expiry is a gift. (default True) |
 | walletRefundBonusPercent | number |  | An incentive to take the refund as credit rather than to a card. (nullable) |
+| destinationsBySource | array of object |  | A destination per refund source (contract gap CHG-WIR-027, BO-1146; CHG-CSA-045). |
+| destinationsBySource[].source | enum (ticket, event, fnb, retail, rental, parking, membership, compensation) |  |  |
+| destinationsBySource[].destination | enum (originalTender, wallet, guestChoice) |  |  |
 | scopePath | string |  |  |
 
 **Responses**
@@ -1222,6 +1229,87 @@ Boards 7.4 and 7.5. **A refund to a wallet and a refund to a card are different 
 |---|---|---|
 | 412 | PreconditionFailed | The row changed since the If-Match version was read (SD-013). |
 | 200 |  | Set |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
+### topUpWallet
+
+**`POST /wallets/{subjectId}/top-ups`**: Add value to a wallet
+
+Creates a liability, not revenue. Recognition happens when the value is spent, or as breakage if the wallet expires.
+
+|  |  |
+|---|---|
+| Permission | `WALLET_OPERATE` |
+| Scope level | workstation |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Lock | rowExclusive |
+| Guest callable | True |
+| Reads | `cache:idempotency`, `wallet.credit_lot`, `wallet.wallet` |
+| Writes | `cache:idempotency`, `wallet.wallet` |
+| Called by | BO-488, POS-027 |
+| State model | Guest wallet ([states/wallet.yaml](../../../states/wallet.yaml)): created as `active` |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| subjectId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) | yes |  |
+| amount | Money | yes | On the wire this is three fields; in the database it is one column. |
+| amount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| amount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| amount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| tender | string | yes |  |
+| bonusAmount | object |  | Promotional bonus on top of the paid amount. |
+| bonusAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| bonusAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| bonusAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| recordedAt | string (date-time) | yes |  |
+
+**Response**: `Wallet`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) |  | Added 20 August. (read-only) |
+| subjectId | string (uuid) | yes |  |
+| balance | Money | yes | On the wire this is three fields; in the database it is one column. |
+| balance.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| balance.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| balance.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| credits | array of object |  | 4.3.5 and 4.3.19. |
+| credits[].kind | enum (cash, bonus, redemption, refund, goodwill) | yes | cash is money the guest paid and the others are not. |
+| credits[].amount | Money | yes | On the wire this is three fields; in the database it is one column. |
+| credits[].amount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| credits[].amount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| credits[].amount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| credits[].expiresAt | string (date-time) |  | (nullable) |
+| credits[].sourceRef | string |  | (nullable) |
+| credits[].isRefundable | boolean |  | True only for cash. (default False) |
+| bonusBalance | object |  | Promotional value. |
+| bonusBalance.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| bonusBalance.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| bonusBalance.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| currency | string | yes | (pattern ^[A-Z]{3}$) |
+| status | enum (active, suspended, closed) | yes |  |
+| homeCellName | string |  | Where the authoritative balance lives. (nullable) |
+| expiresAt | string (date-time) |  | (nullable) |
+| lastActivityAt | string (date-time) |  | (nullable) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 201 |  | Topped up |
+| 402 |  | Payment declined |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ## Tables
@@ -1467,6 +1555,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | restore_to_original_lots | boolean | no |  |
 | restore_original_expiry | boolean | no | Refunding into a new lot with a fresh expiry is a gift. |
 | wallet_refund_bonus_percent | numeric | no | An incentive to take the refund as credit rather than to a card. |
+| destinations_by_source | jsonb | no | A destination per refund source (contract gap CHG-WIR-027, BO-1146; CHG-CSA-045). |
 | scope_path | text | no |  |
 | id | uuid | yes | Synthesised key. |
 
@@ -1526,6 +1615,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
+| is_auto_reload_allowed | boolean | no | Auto-reload is optional per wallet type (Chinmay, 2 October, workbook Q105, default accepted; CHG-CSA-027). |
 | id | uuid | no |  |
 | code | text | yes |  |
 | name | text | yes |  |
@@ -1553,11 +1643,11 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-49 operations, added to this service in later releases without changing any of the above.
+50 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
 | card | `adjustGameCard` |
 | giftCard | `blockGiftCard`, `issueGiftCard` |
 | retail | `activateGiftCard`, `closeWallet`, `redeemGiftCard`, `reinstateWallet`, `suspendWallet` |
-| wallet | `adjustWallet`, `createCreditType`, `createSharedWallet`, `createVoucherType`, `createWalletType`, `diffWalletConfigurationVersion`, `getCreditConsumptionPolicy`, `getWalletBalance`, `getWalletFundingRules`, `getWalletLiability`, `getWalletReconciliation`, `linkWalletCredential`, `listCreditLots`, `listCreditTypes`, `listSharedWallets`, `listVoucherTypes`, `listWalletConfigurationVersions`, `listWalletDisputes`, `listWalletHolds`, `listWalletTypes`, `raiseWalletDispute`, `resolveWalletDispute`, `reverseWalletFunding`, `setCreditConsumptionPolicy`, `setCreditEligibilityRules`, `setGiftCardProduct`, `setSharedWalletMembers`, `setWalletAccountingMapping`, `setWalletAuthenticationPolicy`, `setWalletChannelRules`, `setWalletIntegrationMapping`, `setWalletReconciliationSources`, `setWalletRestriction`, `setWalletRiskRuleStatus`, `setWalletRiskRules`, `setWalletTransferRules`, `simulateCreditConsumption`, `topUpWallet`, `updateCreditType`, `updateWalletType`, `withdrawWalletDispute` |
+| wallet | `adjustWallet`, `createCreditType`, `createSharedWallet`, `createVoucherType`, `createWalletType`, `diffWalletConfigurationVersion`, `getCreditConsumptionPolicy`, `getWalletBalance`, `getWalletFundingRules`, `getWalletLiability`, `getWalletMovementSummary`, `getWalletPreCloseChecks`, `getWalletReconciliation`, `linkWalletCredential`, `listCreditLots`, `listCreditTypes`, `listSharedWallets`, `listVoucherTypes`, `listWalletConfigurationVersions`, `listWalletDisputes`, `listWalletHolds`, `listWalletTypes`, `raiseWalletDispute`, `resolveWalletDispute`, `reverseWalletFunding`, `setCreditConsumptionPolicy`, `setCreditEligibilityRules`, `setGiftCardProduct`, `setSharedWalletMembers`, `setWalletAccountingMapping`, `setWalletAuthenticationPolicy`, `setWalletChannelRules`, `setWalletIntegrationMapping`, `setWalletReconciliationSources`, `setWalletRestriction`, `setWalletRiskRuleStatus`, `setWalletRiskRules`, `setWalletTransferRules`, `simulateCreditConsumption`, `updateCreditType`, `updateWalletType`, `withdrawWalletDispute` |

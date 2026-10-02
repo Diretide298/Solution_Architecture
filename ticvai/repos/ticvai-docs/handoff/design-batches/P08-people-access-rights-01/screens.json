@@ -13,7 +13,18 @@
    "status": "notStarted"
   },
   "navigation": {
-   "inferred": true
+   "inferred": true,
+   "exitTo": [
+    "BO-055"
+   ],
+   "transitions": [
+    {
+     "to": "BO-055",
+     "trigger": "Rota & Scheduling",
+     "provenance": "design-note correction, 2 October 2026 (CHG-SBO)"
+    }
+   ],
+   "notes": "A top-level Venue Management menu entry (People & Access Rights); it opens the rota (BO-055) and each person's record."
   },
   "notes": "Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. **Drawn 31 August** — `Marketing Board 1.dc.html` frame `crm-1b` (*Guest Directory*), matched on title at 0.80 within this board’s platforms.",
   "density": "compact",
@@ -49,13 +60,11 @@
        "label": "Every principal",
        "bindsTo": "Principal",
        "columns": [
-        "Principal.id",
         "Principal.username",
         "Principal.displayName",
         "Principal.isActive",
         "Principal.validFrom",
         "Principal.validTo",
-        "Principal.primaryRoleId",
         "Principal.roles",
         "Principal.lastLoginAt"
        ],
@@ -85,6 +94,30 @@
        ],
        "operation": "getPrincipal",
        "provenance": "contract identity.yaml GET /principals/{principalId}"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Signed in now",
+       "bindsTo": "ActiveSession",
+       "columns": [
+        "ActiveSession.principalName",
+        "ActiveSession.roleName",
+        "ActiveSession.workstationName",
+        "ActiveSession.deviceInfo",
+        "ActiveSession.hasOpenShift",
+        "ActiveSession.startedAt",
+        "ActiveSession.lastSeenAt"
+       ],
+       "operation": "listActiveSessions",
+       "notes": "**Session management lives here, not on the doors** (CHG-DOOR-003, 2 October 2026). The selected person's active session (`?principalId=`): where, since when, and whether a shift is open on it. Shown only to a holder of SESSION_FORCE_LOGOUT; absent, not empty, for anyone else. This is where a supervisor ends the session a door refused with 409 (audit R184).",
+       "provenance": "contract identity.yaml GET /auth/sessions"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "End this session",
+       "operation": "forceLogout",
+       "notes": "SESSION_FORCE_LOGOUT. Ends the session and leaves the shift open and the float where it is (ADR-0004); the person signs in again, it is never a refresh.",
+       "provenance": "contract identity.yaml POST /auth/sessions/{sessionId}/force-logout"
       }
      ]
     },
@@ -109,6 +142,27 @@
        "label": "Reset principal credential",
        "operation": "resetPrincipalCredential",
        "provenance": "contract identity.yaml POST /principals/{principalId}/credential-reset"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Sign everyone out",
+       "operation": "revokeAllSessions",
+       "notes": "SESSION_FORCE_LOGOUT, for an incident (a lost device, a leaked password). Ends every session in the venues in scope, the caller's own unless they choose otherwise; the confirmation asks for the authentication code in place, because the request carries a `stepUpToken`.",
+       "provenance": "contract identity.yaml POST /auth/sessions/revoke-all"
+      },
+      {
+       "kind": "textField",
+       "label": "Authentication code",
+       "operation": "verifyMfaChallenge",
+       "notes": "Asked in place inside the Sign everyone out confirmation; its result is the `stepUpToken`. Five wrong codes lock step-up for the lockout minutes (audit R126).",
+       "provenance": "contract identity.yaml POST /auth/mfa/challenge/{challengeId}/verify"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Email me a code instead",
+       "operation": "createMfaChallenge",
+       "notes": "Opens the step-up challenge for Sign everyone out; the emailed code is the fallback to the authenticator app (audit R126 (5)).",
+       "provenance": "contract identity.yaml POST /auth/mfa/challenge"
       }
      ]
     }
@@ -199,16 +253,61 @@
     "purpose": "Roles to grant a new or moved member of staff (by principal, or by job title and posting before the principal exists)",
     "trigger": "onAction",
     "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "listActiveSessions",
+    "contract": "identity",
+    "purpose": "Where the selected person is signed in now, so a supervisor can end a session a door refused (audit R184; moved here from the doors, CHG-DOOR-003)",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "forceLogout",
+    "contract": "identity",
+    "purpose": "End one person's session; their shift and float stay as they are (ADR-0004)",
+    "trigger": "onAction",
+    "invalidates": [
+     "listActiveSessions"
+    ]
+   },
+   {
+    "operationId": "revokeAllSessions",
+    "contract": "identity",
+    "purpose": "Sign everyone in scope out after an incident, under step-up (moved here from the doors, CHG-DOOR-003)",
+    "trigger": "onAction",
+    "invalidates": [
+     "listActiveSessions"
+    ]
+   },
+   {
+    "operationId": "createMfaChallenge",
+    "contract": "identity",
+    "purpose": "The step-up challenge Sign everyone out asks for in place",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "verifyMfaChallenge",
+    "contract": "identity",
+    "purpose": "Answers the step-up challenge; its token goes into revokeAllSessions",
+    "trigger": "onAction"
    }
   ],
   "entryState": {
    "params": [
     {
-     "name": "principalId",
+     "name": "challengeId",
+     "from": "navigation"
+    },
+    {
+     "name": "sessionId",
      "from": "session"
+    },
+    {
+     "name": "principalId",
+     "from": "navigation",
+     "optional": true
     }
    ],
-   "coldEntry": "Resolves from the session; a cold arrival is the ordinary case.",
+   "coldEntry": "Opened from the Venue Management menu; lists everyone in scope. The selected person comes from the row, not the session.",
    "preloaded": [
     "Principal.id",
     "Principal.username",
@@ -276,6 +375,28 @@
      ]
     },
     "provenance": "contract identity.yaml PATCH /principals/{principalId}"
+   },
+   {
+    "id": "confirmForceLogout",
+    "component": "confirmDialog",
+    "trigger": "End this session",
+    "body": "**Names whose session ends, where and since when, and that their shift stays open and their float does not move.** Collects what `forceLogout` sends: Required: `reason`.",
+    "confirm": {
+     "label": "End session",
+     "operation": "forceLogout"
+    },
+    "provenance": "contract identity.yaml POST /auth/sessions/{sessionId}/force-logout"
+   },
+   {
+    "id": "confirmRevokeAllSessions",
+    "component": "confirmDialog",
+    "trigger": "Sign everyone out",
+    "body": "**Says how many people in which venues are signed out, and whether the caller is one of them.** Collects what `revokeAllSessions` sends: Required: `reason`, `stepUpToken` (the authentication code, asked in place). Optional: `venueId`, `excludeSelf`.",
+    "confirm": {
+     "label": "Sign everyone out",
+     "operation": "revokeAllSessions"
+    },
+    "provenance": "contract identity.yaml POST /auth/sessions/revoke-all"
    }
   ],
   "_platform": {
@@ -334,18 +455,37 @@
        "label": "Every role",
        "bindsTo": "Role",
        "columns": [
-        "Role.id",
         "Role.code",
         "Role.name",
         "Role.description",
         "Role.permissions",
-        "Role.inheritsFromRoleId",
         "Role.isSystem",
         "Role.principalCount",
         "Role.grantCount"
        ],
        "operation": "listRoles",
        "provenance": "contract identity.yaml GET /roles"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Start from presets",
+       "bindsTo": "CapabilityTemplate.id",
+       "columns": [
+        "CapabilityTemplate.name",
+        "CapabilityTemplate.module",
+        "CapabilityTemplate.presetLevel"
+       ],
+       "operation": "listCapabilityTemplates",
+       "notes": "**There are no default roles (decided 2 October 2026 by Chinmay, DEC-007; CHG-CSP-003, CHG-CSA-006).** A role starts from presets per module (All, Viewer, Mid-level); picking one fills that module's checklist, which stays fully editable, and the role can be renamed. Each module has its own \"Publish AI model\" check.",
+       "provenance": "contract identity.yaml GET /capability-templates"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Permissions by module",
+       "bindsTo": "Role.permissions",
+       "operation": "setRolePermissions",
+       "notes": "The per-module checklist: one group per module, every permission in exactly one module (x-ticvai-permission-modules).",
+       "provenance": "contract tenancy.yaml PUT /roles/{roleId}/permissions"
       }
      ]
     },
@@ -382,6 +522,24 @@
        "label": "Create role",
        "operation": "createRole",
        "provenance": "contract identity.yaml POST /roles"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save role permissions",
+       "operation": "setRolePermissions",
+       "provenance": "contract tenancy.yaml PUT /roles/{roleId}/permissions; wiring fix, 2 October 2026"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Grant role",
+       "operation": "updatePrincipal",
+       "provenance": "contract identity.yaml PATCH /principals/{principalId}; wiring fix, 2 October 2026"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Preview effective permissions",
+       "operation": "resolvePermissions",
+       "provenance": "contract identity.yaml POST /permissions/resolve; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -447,6 +605,34 @@
     "purpose": "My pending review items (assignedToMe)",
     "trigger": "onAction",
     "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "setRolePermissions",
+    "contract": "tenancy",
+    "purpose": "Set what this role may do",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-021)"
+   },
+   {
+    "operationId": "updatePrincipal",
+    "contract": "identity",
+    "purpose": "Grant or remove a role for the selected person",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-021)"
+   },
+   {
+    "operationId": "resolvePermissions",
+    "contract": "identity",
+    "purpose": "What this person would actually be able to do, before the grant is saved",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-021)"
+   },
+   {
+    "operationId": "listCapabilityTemplates",
+    "contract": "identity",
+    "purpose": "The presets (All, Viewer, Mid-level) per module that fill the checklist (DEC-007)",
+    "trigger": "onLoad",
+    "provenance": "design-note correction, 2 October 2026 (BO-054)"
    }
   ],
   "entryState": {
@@ -459,7 +645,15 @@
    ],
    "params": [
     {
+     "name": "principalId",
+     "from": "navigation"
+    },
+    {
      "name": "campaignId",
+     "from": "navigation"
+    },
+    {
+     "name": "roleId",
      "from": "navigation"
     }
    ]
@@ -472,10 +666,52 @@
   "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "overlays": [
    {
+    "id": "formSetRolePermissions",
+    "component": "modal",
+    "trigger": "Save role permissions",
+    "body": "**Collects what `setRolePermissions` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save role permissions",
+     "operation": "setRolePermissions"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "contract tenancy.yaml PUT /roles/{roleId}/permissions; wiring fix, 2 October 2026"
+   },
+   {
+    "id": "formUpdatePrincipal",
+    "component": "modal",
+    "trigger": "Grant role",
+    "body": "**Collects what `updatePrincipal` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Grant role",
+     "operation": "updatePrincipal"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "contract identity.yaml PATCH /principals/{principalId}; wiring fix, 2 October 2026"
+   },
+   {
+    "id": "formResolvePermissions",
+    "component": "modal",
+    "trigger": "Preview effective permissions",
+    "body": "**Collects what `resolvePermissions` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Preview effective permissions",
+     "operation": "resolvePermissions"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "contract identity.yaml POST /permissions/resolve; wiring fix, 2 October 2026"
+   },
+   {
     "id": "formCreateRole",
     "component": "modal",
     "trigger": "Create role",
-    "body": "**Collects what `createRole` sends before it is called.** Required: `code`, `name`. Optional: `description`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `createRole` sends before it is called.** Required: `code`, `name`. Optional: `description`, `presetCodes`, `permissions`. `presetCodes` fills the checklist from the chosen presets; `permissions` is the edited result. Dismissing sends nothing; the screen behind is unchanged.",
     "confirm": {
      "label": "Create role",
      "operation": "createRole"
@@ -485,7 +721,9 @@
      "discards": [
       "code",
       "name",
-      "description"
+      "description",
+      "presetCodes",
+      "permissions"
      ]
     },
     "provenance": "contract identity.yaml POST /roles"
@@ -528,7 +766,20 @@
    "status": "notStarted"
   },
   "navigation": {
-   "inferred": true
+   "inferred": true,
+   "entryFrom": [
+    "BO-053"
+   ],
+   "exitTo": [
+    "BO-056"
+   ],
+   "transitions": [
+    {
+     "to": "BO-056",
+     "trigger": "Time & Attendance",
+     "provenance": "design-note correction, 2 October 2026 (CHG-SBO)"
+    }
+   ]
   },
   "notes": "Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.",
   "density": "compact",
@@ -542,6 +793,21 @@
      "name": "contentBody",
      "slot": "collection",
      "components": [
+      {
+       "kind": "calendarView",
+       "label": "Rota",
+       "bindsTo": "RotaAssignment",
+       "columns": [
+        "RotaAssignment.displayName",
+        "RotaAssignment.position",
+        "RotaAssignment.startsAt",
+        "RotaAssignment.endsAt",
+        "RotaAssignment.status"
+       ],
+       "operation": "listRotaAssignments",
+       "notes": "Day, week and month views (VO-R01); the table below is the same rota as a list.",
+       "provenance": "contract workforce.yaml GET /rota-assignments"
+      },
       {
        "kind": "datePicker",
        "label": "From",
@@ -557,18 +823,23 @@
        "provenance": "contract workforce.yaml GET /rota-assignments"
       },
       {
-       "kind": "textField",
-       "label": "Principal id",
+       "kind": "selectField",
+       "label": "Staff member",
        "operation": "listRotaAssignments",
-       "notes": "Sends `?principalId=` to `listRotaAssignments`.",
-       "provenance": "contract workforce.yaml GET /rota-assignments"
+       "notes": "A pick list of staff by name.",
+       "provenance": "contract workforce.yaml GET /rota-assignments",
+       "bindsTo": "RotaAssignment.principalId"
       },
       {
-       "kind": "textField",
-       "label": "Department id",
-       "operation": "listRotaAssignments",
-       "notes": "Sends `?departmentId=` to `listRotaAssignments`.",
-       "provenance": "contract workforce.yaml GET /rota-assignments"
+       "kind": "selectField",
+       "label": "Department",
+       "operation": "listOrgUnits",
+       "notes": "A pick list in words, never a typed id (design-note correction, 2 October 2026).",
+       "provenance": "contract workforce.yaml GET /rota-assignments",
+       "bindsTo": "OrgUnit.id",
+       "columns": [
+        "OrgUnit.name"
+       ]
       },
       {
        "kind": "dataTable",
@@ -690,6 +961,13 @@
     "invalidates": [
      "listRotaAssignments"
     ]
+   },
+   {
+    "operationId": "listOrgUnits",
+    "contract": "tenancy",
+    "purpose": "List scope nodes visible to the session (the pick list)",
+    "trigger": "onLoad",
+    "provenance": "design-note correction, 2 October 2026 (BO-055)"
    }
   ],
   "entryState": {
@@ -839,7 +1117,10 @@
    "status": "notStarted"
   },
   "navigation": {
-   "inferred": true
+   "inferred": true,
+   "entryFrom": [
+    "BO-055"
+   ]
   },
   "notes": "Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.",
   "density": "compact",
@@ -1130,18 +1411,23 @@
        "label": "Every principal",
        "bindsTo": "Principal",
        "columns": [
-        "Principal.id",
         "Principal.username",
         "Principal.displayName",
         "Principal.isActive",
         "Principal.validFrom",
         "Principal.validTo",
-        "Principal.primaryRoleId",
         "Principal.roles",
         "Principal.lastLoginAt"
        ],
        "operation": "listPrincipals",
        "provenance": "contract identity.yaml GET /principals"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Training records",
+       "bindsTo": "TrainingRecord",
+       "operation": "listTrainingRecords",
+       "provenance": "contract workforce.yaml GET /training-records; wiring fix, 2 October 2026"
       }
      ]
     },
@@ -1174,7 +1460,7 @@
   "states": {
    "loading": "The training certification list.",
    "error": "Could not load. Names which read failed and leaves the training certification untouched.",
-   "emptyFirstRun": "No training certification yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyFirstRun": "No training certification yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "Nothing matches the filter on scopePath, isActive and the training certification are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Shown when the caller lacks `USER_MANAGE`, which `listPrincipals` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -1184,6 +1470,13 @@
     "contract": "identity",
     "purpose": "List principals",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listTrainingRecords",
+    "contract": "workforce",
+    "purpose": "Training completed and what is expiring, per person",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-021)"
    }
   ],
   "entryState": {
@@ -1340,12 +1633,6 @@
        "provenance": "contract workforce.yaml POST /announcements"
       },
       {
-       "kind": "secondaryButton",
-       "label": "Acknowledge announcement",
-       "operation": "acknowledgeAnnouncement",
-       "provenance": "contract workforce.yaml POST /announcements/{announcementId}/acknowledge"
-      },
-      {
        "kind": "publishGate",
        "label": "What publishing changes",
        "notes": "**Names what goes live, where, and from when.** A publish with no stated consequence is one somebody presses meaning to save.",
@@ -1373,15 +1660,6 @@
     "operationId": "publishAnnouncement",
     "contract": "workforce",
     "purpose": "Tell staff something",
-    "trigger": "onAction",
-    "invalidates": [
-     "listAnnouncements"
-    ]
-   },
-   {
-    "operationId": "acknowledgeAnnouncement",
-    "contract": "workforce",
-    "purpose": "Confirm you have read it",
     "trigger": "onAction",
     "invalidates": [
      "listAnnouncements"
@@ -1447,6 +1725,14 @@
     "provenance": "contract workforce.yaml POST /announcements"
    }
   ],
+  "gaps": [
+   {
+    "operation": "acknowledgeAnnouncement",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): Acknowledging an announcement is the recipient's act on the Staff App, not a back-office action (design-notes correction venue-operations BO-066).",
+    "source": "contracts/satellite/workforce.yaml#acknowledgeAnnouncement | R254"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1485,10 +1771,12 @@
   },
   "navigation": {
    "exitTo": [
+    "ADM-248",
     "BO-052",
     "BO-085",
     "BO-086",
-    "BO-087"
+    "BO-087",
+    "BO-364"
    ],
    "inferred": true,
    "fromFlows": true,
@@ -1504,6 +1792,11 @@
      "provenance": "derived — BO-087 declares entryState.params delegationId and BO-084 holds none of them. The edge carries nothing: delegationId only pre-selects (deep link or optional), and BO-087 opens on its own"
     },
     {
+     "to": "BO-364",
+     "trigger": "Back to the approval command centre",
+     "provenance": "wiring fix, 2 October 2026 (CHG-WIR-022): inherited from BO-365 (merged), flow F123 step 2→3"
+    },
+    {
      "to": "BO-085",
      "trigger": "Approves it",
      "provenance": "flow F14 step 3→4",
@@ -1511,7 +1804,16 @@
      "carries": [
       "requestId"
      ]
+    },
+    {
+     "to": "ADM-248",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F165 step 2→3"
     }
+   ],
+   "entryFrom": [
+    "ADM-248",
+    "BO-364"
    ]
   },
   "notes": "Added 17 August because the contract had operations no screen declared. **Not on the wireframe board** — needs drawing.",
@@ -1541,18 +1843,20 @@
        "provenance": "contract approvals.yaml GET /approval-requests"
       },
       {
-       "kind": "textField",
+       "kind": "multiSelect",
        "label": "Status",
        "operation": "listApprovalRequests",
-       "notes": "Sends `?status=` to `listApprovalRequests`.",
-       "provenance": "contract approvals.yaml GET /approval-requests"
+       "notes": "The request status values in words, as chips; free text matched nothing.",
+       "provenance": "contract approvals.yaml GET /approval-requests",
+       "bindsTo": "ApprovalRequest.status"
       },
       {
-       "kind": "textField",
+       "kind": "multiSelect",
        "label": "Kind",
        "operation": "listApprovalRequests",
-       "notes": "Sends `?kind=` to `listApprovalRequests`.",
-       "provenance": "contract approvals.yaml GET /approval-requests"
+       "notes": "The request kind values in words, as chips; free text matched nothing.",
+       "provenance": "contract approvals.yaml GET /approval-requests",
+       "bindsTo": "ApprovalRequest.kind"
       },
       {
        "kind": "numberField",
@@ -1566,17 +1870,8 @@
        "label": "Waiting for a decision",
        "bindsTo": "ApprovalRequest",
        "columns": [
-        "ApprovalRequest.id",
         "ApprovalRequest.kind",
-        "ApprovalRequest.rerouteOnNoApprover",
-        "ApprovalRequest.outOfOfficeDelegateId",
-        "ApprovalRequest.allowEmailApproval",
-        "ApprovalRequest.reopenedFrom",
         "ApprovalRequest.status",
-        "ApprovalRequest.subjectContract",
-        "ApprovalRequest.subjectType",
-        "ApprovalRequest.subjectId",
-        "ApprovalRequest.scopePath",
         "ApprovalRequest.summary"
        ],
        "operation": "listApprovalRequests",
@@ -1812,8 +2107,8 @@
   },
   "notes": "Added 17 August because the contract had operations no screen declared. **Not on the wireframe board** — needs drawing. **Cross-platform navigation removed 24 August**: POS-005. **A till does not navigate to a back office and a guest app does not navigate to either** — those are device handovers, and a flow declares them with `crossesDevice` rather than a screen pretending there is a link.",
   "density": "compact",
-  "pattern": "approvalInbox",
-  "patternReason": "`decideApprovalRequest` decides items that `listApprovalRequests` queues — every row is waiting for a person, so the empty state is success",
+  "pattern": "statusTracker",
+  "patternReason": "One request opened by `requestId`: its subject, its trail and the decision. The queue is BO-084 (design-note correction, 2 October 2026).",
   "purpose": "One request, its subject, and the decision.",
   "layout": {
    "template": "split",
@@ -1821,64 +2116,7 @@
     {
      "name": "contentBody",
      "slot": "queue",
-     "components": [
-      {
-       "kind": "toggle",
-       "label": "Assigned to me",
-       "operation": "listApprovalRequests",
-       "notes": "Sends `?assignedToMe=` to `listApprovalRequests`.",
-       "provenance": "contract approvals.yaml GET /approval-requests"
-      },
-      {
-       "kind": "toggle",
-       "label": "Raised by me",
-       "operation": "listApprovalRequests",
-       "notes": "Sends `?raisedByMe=` to `listApprovalRequests`.",
-       "provenance": "contract approvals.yaml GET /approval-requests"
-      },
-      {
-       "kind": "textField",
-       "label": "Status",
-       "operation": "listApprovalRequests",
-       "notes": "Sends `?status=` to `listApprovalRequests`.",
-       "provenance": "contract approvals.yaml GET /approval-requests"
-      },
-      {
-       "kind": "textField",
-       "label": "Kind",
-       "operation": "listApprovalRequests",
-       "notes": "Sends `?kind=` to `listApprovalRequests`.",
-       "provenance": "contract approvals.yaml GET /approval-requests"
-      },
-      {
-       "kind": "numberField",
-       "label": "Breaching within minutes",
-       "operation": "listApprovalRequests",
-       "notes": "Sends `?breachingWithinMinutes=` to `listApprovalRequests`.",
-       "provenance": "contract approvals.yaml GET /approval-requests"
-      },
-      {
-       "kind": "dataTable",
-       "label": "Waiting for a decision",
-       "bindsTo": "ApprovalRequest",
-       "columns": [
-        "ApprovalRequest.id",
-        "ApprovalRequest.kind",
-        "ApprovalRequest.rerouteOnNoApprover",
-        "ApprovalRequest.outOfOfficeDelegateId",
-        "ApprovalRequest.allowEmailApproval",
-        "ApprovalRequest.reopenedFrom",
-        "ApprovalRequest.status",
-        "ApprovalRequest.subjectContract",
-        "ApprovalRequest.subjectType",
-        "ApprovalRequest.subjectId",
-        "ApprovalRequest.scopePath",
-        "ApprovalRequest.summary"
-       ],
-       "operation": "listApprovalRequests",
-       "provenance": "contract approvals.yaml GET /approval-requests"
-      }
-     ]
+     "components": []
     },
     {
      "name": "contextPanel",
@@ -1886,20 +2124,12 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected approval request",
+       "label": "The request",
        "bindsTo": "ApprovalRequest",
        "columns": [
-        "ApprovalRequest.id",
         "ApprovalRequest.kind",
-        "ApprovalRequest.rerouteOnNoApprover",
-        "ApprovalRequest.outOfOfficeDelegateId",
-        "ApprovalRequest.allowEmailApproval",
-        "ApprovalRequest.reopenedFrom",
         "ApprovalRequest.status",
-        "ApprovalRequest.subjectContract",
-        "ApprovalRequest.subjectType",
         "ApprovalRequest.subjectId",
-        "ApprovalRequest.scopePath",
         "ApprovalRequest.summary",
         "ApprovalRequest.amount",
         "ApprovalRequest.justification",
@@ -1907,7 +2137,8 @@
         "ApprovalRequest.matrixVersion"
        ],
        "operation": "listApprovalRequests",
-       "provenance": "contract approvals.yaml GET /approval-requests"
+       "provenance": "contract approvals.yaml GET /approval-requests",
+       "notes": "Read with `listApprovalRequests` filtered to the one `requestId` (no single-request read exists)."
       }
      ]
     },
@@ -1932,12 +2163,6 @@
        "label": "Withdraw approval request",
        "operation": "withdrawApprovalRequest",
        "provenance": "contract approvals.yaml POST /approval-requests/{requestId}/withdraw"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Evaluate approval requirement",
-       "operation": "evaluateApprovalRequirement",
-       "provenance": "contract approvals.yaml POST /approval-requests/evaluate"
       }
      ]
     }
@@ -1989,33 +2214,13 @@
      ]
     },
     "provenance": "contract approvals.yaml POST /approval-requests/{requestId}/resubmit"
-   },
-   {
-    "id": "formEvaluateApprovalRequirement",
-    "component": "modal",
-    "trigger": "Evaluate approval requirement",
-    "body": "**Collects what `evaluateApprovalRequirement` sends before it is called.** Required: `kind`, `scopePath`. Optional: `amount`, `attributes`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Evaluate approval requirement",
-     "operation": "evaluateApprovalRequirement"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "kind",
-      "scopePath",
-      "amount",
-      "attributes"
-     ]
-    },
-    "provenance": "contract approvals.yaml POST /approval-requests/evaluate"
    }
   ],
   "states": {
    "loading": "The approval request list.",
    "error": "Could not load. Names which read failed and leaves the approval request untouched.",
    "emptyFirstRun": "**Nothing is waiting, which is the good outcome.** An empty queue means every item has been decided; it offers no create action, because creating work is not what it needs.",
-   "emptyNoResults": "Nothing matches the filter on assignedToMe, raisedByMe, status, kind, breachingWithinMinutes and the approval request are still there. Names the active filter and offers to clear it.",
+   "emptyNoResults": "Never shown: the screen opens one request.",
    "emptyNoAccess": "Shown when the caller lacks `APPROVAL_VIEW`, which `listApprovalRequests` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
@@ -2051,15 +2256,6 @@
     "invalidates": [
      "listApprovalRequests"
     ]
-   },
-   {
-    "operationId": "evaluateApprovalRequirement",
-    "contract": "approvals",
-    "purpose": "Does this need approval, and from whom",
-    "trigger": "onAction",
-    "invalidates": [
-     "listApprovalRequests"
-    ]
    }
   ],
   "entryState": {
@@ -2084,6 +2280,14 @@
    "board": "wireframes/P08 Venue Management.dc.html#bo-085"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "gaps": [
+   {
+    "operation": "evaluateApprovalRequirement",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-021): evaluateApprovalRequirement answers \"does this need approval, and from whom\" for the raising screen (till, purchase order) before a request exists; it has no meaning for the approver of an existing request (design-notes correction platform-foundation BO-085).",
+    "source": "contracts/spine/approvals.yaml#evaluateApprovalRequirement"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -2122,6 +2326,7 @@
   },
   "navigation": {
    "exitTo": [
+    "ADM-238",
     "BO-084",
     "BO-085",
     "BO-087"
@@ -2142,7 +2347,15 @@
      "to": "BO-087",
      "trigger": "Approval Delegations",
      "provenance": "derived — BO-087 declares entryState.params delegationId and BO-086 holds none of them. The edge carries nothing: delegationId only pre-selects (deep link or optional), and BO-087 opens on its own"
+    },
+    {
+     "to": "ADM-238",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F164 step 8→9"
     }
+   ],
+   "entryFrom": [
+    "ADM-238"
    ]
   },
   "notes": "Added 17 August because the contract had operations no screen declared. **Not on the wireframe board** — needs drawing.",
@@ -2176,10 +2389,8 @@
        "label": "Every approval matrix",
        "bindsTo": "ApprovalMatrix",
        "columns": [
-        "ApprovalMatrix.id",
         "ApprovalMatrix.kind",
         "ApprovalMatrix.scopeLevel",
-        "ApprovalMatrix.scopePath",
         "ApprovalMatrix.rules",
         "ApprovalMatrix.isActive"
        ],
@@ -2360,16 +2571,12 @@
        "label": "Every approval delegation",
        "bindsTo": "ApprovalDelegation",
        "columns": [
-        "ApprovalDelegation.id",
-        "ApprovalDelegation.delegatorPrincipalId",
-        "ApprovalDelegation.delegatePrincipalId",
         "ApprovalDelegation.kinds",
         "ApprovalDelegation.maxAmount",
         "ApprovalDelegation.from",
         "ApprovalDelegation.to",
         "ApprovalDelegation.reason",
-        "ApprovalDelegation.isActive",
-        "ApprovalDelegation.scopePath"
+        "ApprovalDelegation.isActive"
        ],
        "operation": "listApprovalDelegations",
        "provenance": "contract approvals.yaml GET /delegations"

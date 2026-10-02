@@ -270,7 +270,8 @@
         "TableMap.tables"
        ],
        "operation": "getTableMap",
-       "provenance": "contract fnb.yaml GET /outlets/{outletId}/tables"
+       "provenance": "contract fnb.yaml GET /outlets/{outletId}/tables",
+       "notes": "**Table states** (DI-336; CHG-CSA-012): Available, Ordered, Table closed (a short state after payment, ended by Make available; DEC-201, default) and Reserved, shown when a booking names the table or from N minutes (the venue's lead time) before a pre-allocated booking (decided 2 October 2026, Chinmay, batch 6; DEC-202)."
       },
       {
        "kind": "searchField",
@@ -292,14 +293,7 @@
     {
      "name": "actionBar",
      "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Save table layout",
-       "operation": "setTableLayout",
-       "provenance": "contract fnb.yaml PUT /outlets/{outletId}/tables"
-      }
-     ]
+     "components": []
     }
    ]
   },
@@ -316,12 +310,6 @@
     "contract": "fnb",
     "purpose": "Table map with live state",
     "trigger": "onLoad"
-   },
-   {
-    "operationId": "setTableLayout",
-    "contract": "fnb",
-    "purpose": "Configure the table layout",
-    "trigger": "onAction"
    }
   ],
   "entryState": {
@@ -345,23 +333,12 @@
    "note": "**Drawn by Claude Design on `FnB Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
-  "overlays": [
+  "gaps": [
    {
-    "id": "formSetTableLayout",
-    "component": "modal",
-    "trigger": "Save table layout",
-    "body": "**Collects what `setTableLayout` sends before it is called.** Required: `tables`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Save table layout",
-     "operation": "setTableLayout"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "tables"
-     ]
-    },
-    "provenance": "contract fnb.yaml PUT /outlets/{outletId}/tables"
+    "operation": "setTableLayout",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-008): \"Save table layout\" (setTableLayout, PRODUCT_CONFIGURE) is configuration on the live service map; layout editing is EMP-053, and F80 says configuration does not work offline while service does (F94 step 1, R254; design-notes correction fnb-retail EMP-052).",
+    "source": "F94 step 1 | R254"
    }
   ],
   "_platform": {
@@ -481,6 +458,12 @@
        "label": "Save table layout",
        "operation": "setTableLayout",
        "provenance": "contract fnb.yaml PUT /outlets/{outletId}/tables"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save table combinations",
+       "operation": "setTableCombinations",
+       "provenance": "contract fnb.yaml PUT /outlets/{outletId}/table-combinations; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -501,25 +484,18 @@
     "trigger": "onAction"
    },
    {
-    "operationId": "createTable",
-    "contract": "fnb",
-    "purpose": "Add a table to the floor",
-    "trigger": "onAction",
-    "provenance": "decided 29 September, VM close-out (venue management and configuration)"
-   },
-   {
-    "operationId": "updateTable",
-    "contract": "fnb",
-    "purpose": "Change a table's covers, shape or section",
-    "trigger": "onAction",
-    "provenance": "decided 29 September, VM close-out (venue management and configuration)"
-   },
-   {
     "operationId": "setSectionLayout",
     "contract": "fnb",
     "purpose": "Arrange the outlet's sections",
     "trigger": "onAction",
     "provenance": "decided 29 September, VM close-out (venue management and configuration)"
+   },
+   {
+    "operationId": "setTableCombinations",
+    "contract": "fnb",
+    "purpose": "Which tables can be pushed together, and to what capacity",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-008)"
    }
   ],
   "entryState": {
@@ -531,10 +507,6 @@
     {
      "name": "outletId",
      "from": "EMP-003"
-    },
-    {
-     "name": "tableId",
-     "from": "navigation"
     }
    ],
    "coldEntry": "**Resolves from the session and the shift.** A handheld is signed into at the start of a shift, not navigated to."
@@ -547,6 +519,36 @@
    "note": "**Drawn by Claude Design on `FnB Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formSetTableCombinations",
+    "component": "modal",
+    "trigger": "Save table combinations",
+    "body": "**Collects what `setTableCombinations` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save table combinations",
+     "operation": "setTableCombinations"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "contract fnb.yaml PUT /outlets/{outletId}/table-combinations; wiring fix, 2 October 2026"
+   }
+  ],
+  "gaps": [
+   {
+    "operation": "createTable",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-008): Three ways to write the same table (setTableLayout for the whole outlet, createTable and updateTable for one) mean two conflict behaviours on one screen; the editor saves the whole layout. Table combinations are declared before service and saved with the layout, so setTableCombinations moves here from the live service screen (F94 step 1, F29 step 2; design-notes corrections fnb-retail EMP-053).",
+    "source": "contracts/satellite/fnb.yaml#setTableLayout | contracts/satellite/fnb.yaml#setTableCombinations | F94 step 1"
+   },
+   {
+    "operation": "updateTable",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-008): Three ways to write the same table (setTableLayout for the whole outlet, createTable and updateTable for one) mean two conflict behaviours on one screen; the editor saves the whole layout. Table combinations are declared before service and saved with the layout, so setTableCombinations moves here from the live service screen (F94 step 1, F29 step 2; design-notes corrections fnb-retail EMP-053).",
+    "source": "contracts/satellite/fnb.yaml#setTableLayout | contracts/satellite/fnb.yaml#setTableCombinations | F94 step 1"
+   }
+  ],
   "_platform": {
    "code": "P06",
    "audience": "staff",
@@ -658,6 +660,12 @@
        "kind": "primaryButton",
        "label": "Confirm",
        "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Conflicts",
+       "operation": "resolveBookingConflict",
+       "provenance": "contract fnb.yaml GET /table-reservations/conflicts; wiring fix, 2 October 2026"
       }
      ]
     },
@@ -706,6 +714,13 @@
     "contract": "fnb",
     "purpose": "Bookings for a service period",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "resolveBookingConflict",
+    "contract": "fnb",
+    "purpose": "Double bookings to resolve",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-008)"
    }
   ],
   "entryState": {
@@ -789,24 +804,6 @@
      "components": [
       {
        "kind": "textField",
-       "label": "id",
-       "bindsTo": "TableReservation.id",
-       "provenance": "contract fnb.yaml POST /table-reservations"
-      },
-      {
-       "kind": "textField",
-       "label": "outletId",
-       "bindsTo": "TableReservation.outletId",
-       "provenance": "contract fnb.yaml POST /table-reservations"
-      },
-      {
-       "kind": "textField",
-       "label": "subjectId",
-       "bindsTo": "TableReservation.subjectId",
-       "provenance": "contract fnb.yaml POST /table-reservations"
-      },
-      {
-       "kind": "textField",
        "label": "guestName",
        "bindsTo": "TableReservation.guestName",
        "provenance": "contract fnb.yaml POST /table-reservations"
@@ -843,32 +840,8 @@
       },
       {
        "kind": "textField",
-       "label": "status",
-       "bindsTo": "TableReservation.status",
-       "provenance": "contract fnb.yaml POST /table-reservations"
-      },
-      {
-       "kind": "textField",
-       "label": "groupId",
-       "bindsTo": "TableReservation.groupId",
-       "provenance": "contract fnb.yaml POST /table-reservations"
-      },
-      {
-       "kind": "textField",
        "label": "notes",
        "bindsTo": "TableReservation.notes",
-       "provenance": "contract fnb.yaml POST /table-reservations"
-      },
-      {
-       "kind": "textField",
-       "label": "actualPartySize",
-       "bindsTo": "TableReservation.actualPartySize",
-       "provenance": "contract fnb.yaml POST /table-reservations"
-      },
-      {
-       "kind": "textField",
-       "label": "tableVisitId",
-       "bindsTo": "TableReservation.tableVisitId",
        "provenance": "contract fnb.yaml POST /table-reservations"
       },
       {
@@ -895,6 +868,27 @@
        "kind": "duplicateMatch",
        "label": "Possible existing guest",
        "notes": "**Runs while the booking is being typed, not after it is saved.** A duplicate created at the podium is one somebody has to find later. Proposes only — `matchGuest` never merges, and the reason each candidate matched is shown beside it.\n"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Reservation policy",
+       "bindsTo": "FnbReservationPolicy",
+       "operation": "getFnbReservationPolicy",
+       "provenance": "contract fnb.yaml GET /reservation-policy; wiring fix, 2 October 2026"
+      },
+      {
+       "kind": "selectField",
+       "label": "Seating preference",
+       "bindsTo": "TableReservation.seatingPreference",
+       "notes": "Indoor, terrace, majlis: a preference, not a table (decided 2 October 2026, Chinmay, batch 6; DEC-204; CHG-CSA-018).",
+       "provenance": "contract fnb.yaml TableReservation.seatingPreference"
+      },
+      {
+       "kind": "selectField",
+       "label": "Occasion",
+       "bindsTo": "TableReservation.occasion",
+       "notes": "Birthday, anniversary, business and so on; shown to the host and the server (DEC-204).",
+       "provenance": "contract fnb.yaml TableReservation.occasion"
       }
      ]
     },
@@ -902,13 +896,6 @@
      "name": "actionBar",
      "slot": "publish",
      "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Create table reservation",
-       "operation": "createTableReservation",
-       "provenance": "contract fnb.yaml POST /table-reservations",
-       "notes": "**No deposit unless the venue switched the table deposit on** (decided 29 September, rev 3 REV3-8b, superseding audit R077 (a) \"no table deposit in the first release\"; the venue sets it on BO-327). With it off, or a party below its size, the booking is `booked`, takes no payment and the copy names no fee. Where it applies, `createTableReservation` returns `awaitingDeposit` with the deposit amount, basis and `holdExpiresAt`: the screen shows them, says the cover is held until then, and names the refund cut-off and the late-cancel and no-show terms from the policy. The deposit is paid through the cart (`addCartLine` with `tableReservationId`, then `checkoutCart`), at a till or by the guest; unpaid by `holdExpiresAt`, the booking is cancelled and the cover released."
-      },
       {
        "kind": "duplicateMatch",
        "label": "Possible existing guest",
@@ -919,6 +906,18 @@
        "label": "Find matches for guest",
        "operation": "matchGuest",
        "provenance": "contract marketing-crm.yaml POST /guests/match"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Send confirmation",
+       "operation": "sendBookingConfirmation",
+       "provenance": "contract fnb.yaml POST /table-reservations/{reservationId}/confirm; wiring fix, 2 October 2026"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Save booking",
+       "operation": "createTableReservationForGuest",
+       "provenance": "contract fnb.yaml POST /outlets/{outletId}/table-reservations"
       }
      ]
     }
@@ -927,22 +926,37 @@
   "states": {
    "loading": "The saved create edit reservation.",
    "error": "Could not load. Names which read failed and leaves the create edit reservation untouched.",
-   "emptyFirstRun": "No create edit reservation configured. The form opens empty and `createTableReservation` saves the first one; it says what the platform does in the meantime.",
+   "emptyFirstRun": "No create edit reservation configured. The form opens empty; it says what the platform does in the meantime.",
    "emptyNoAccess": "Shown when the caller lacks `GUEST_VIEW`, which `matchGuest` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**Works from cache and queues what it records.** Staff walk out of coverage constantly — a stock count in a warehouse corner and a table order on a terrace both happen where the signal does not reach, and a screen that blanks there is a screen nobody uses twice."
   },
   "apis": [
    {
-    "operationId": "createTableReservation",
-    "contract": "fnb",
-    "purpose": "Book a table in advance",
-    "trigger": "onAction"
-   },
-   {
     "operationId": "matchGuest",
     "contract": "marketing-crm",
     "purpose": "Propose existing guests who may be the same person, before a second record is created",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "getFnbReservationPolicy",
+    "contract": "fnb",
+    "purpose": "The default duration and turn times",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-008)"
+   },
+   {
+    "operationId": "sendBookingConfirmation",
+    "contract": "fnb",
+    "purpose": "Send the confirmation and reminder",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-008)"
+   },
+   {
+    "operationId": "createTableReservationForGuest",
+    "contract": "fnb",
+    "purpose": "The host books a table for a guest, with seating preference and occasion (DEC-204; CHG-CSA-018, CHG-CSA-045)",
+    "trigger": "onAction",
+    "invalidates": []
    }
   ],
   "entryState": {
@@ -950,6 +964,15 @@
     {
      "name": "venueId",
      "from": "session"
+    },
+    {
+     "name": "reservationId",
+     "from": "navigation"
+    },
+    {
+     "name": "outletId",
+     "from": "navigation",
+     "notes": "The outlet the reservation is for, picked on the way in (CHG-CLN-016)."
     }
    ],
    "coldEntry": "**Resolves from the session and the shift.** A handheld is signed into at the start of a shift, not navigated to."
@@ -981,6 +1004,23 @@
      ]
     },
     "provenance": "contract marketing-crm.yaml POST /guests/match"
+   }
+  ],
+  "gaps": [
+   {
+    "operation": "createTableReservation",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-008): createTableReservation is a guest operation (guestAuth, self-scoped, no permission); a host booking for a caller is not the caller, so it comes off the staff app until a staff-audience create exists (open contract gap CHG-WIR-011). The confirmation (\"Board 4E\") and the default duration were not wired although this screen is the client's frame fnb-4e (design-notes corrections fnb-retail EMP-055).",
+    "source": "contracts/satellite/fnb.yaml#createTableReservation | contracts/satellite/fnb.yaml#sendBookingConfirmation | contracts/satellite/fnb.yaml#getFnbReservationPolicy"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-011): No staff-audience create, amend or cancel of a table reservation.",
+    "source": "contracts/satellite/fnb.yaml#createTableReservation | contracts/satellite/fnb.yaml#updateTableReservation | MATRIX 4.9.10"
+   },
+   {
+    "why": "2 October 2026 (CHG-SPO-010): the staff create now exists (`createTableReservationForGuest`, CHG-CSA-045), so a host books from here; amending or cancelling a booking from staff still has no staff-audience operation (CHG-WIR-011 stays open for those).",
+    "source": "contracts/satellite/fnb.yaml#createTableReservationForGuest"
    }
   ],
   "_platform": {
@@ -1125,6 +1165,18 @@
        "operation": "leaveRestaurantWaitlist",
        "provenance": "contract fnb.yaml POST /waitlist/{entryId}/leave",
        "notes": "Takes the selected party off the list; the entry returns `cancelled`, and a party already called releases its held table at once. Not `walkedAway`, which records a party that left without saying so (decided 28 September, audit R073 (d))."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Quote wait",
+       "operation": "quoteWaitTime",
+       "provenance": "contract fnb.yaml POST /waitlist/{entryId}/quote; wiring fix, 2 October 2026"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Notify party",
+       "operation": "notifyWaitlistParty",
+       "provenance": "contract fnb.yaml POST /waitlist/{entryId}/notify; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -1149,6 +1201,20 @@
     "contract": "fnb",
     "purpose": "Take a party off the waitlist; the entry ends cancelled (audit R073 (d))",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "quoteWaitTime",
+    "contract": "fnb",
+    "purpose": "Tell a party how long",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-008)"
+   },
+   {
+    "operationId": "notifyWaitlistParty",
+    "contract": "fnb",
+    "purpose": "Their table is ready",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-008)"
    }
   ],
   "entryState": {
@@ -1192,6 +1258,13 @@
      ]
     },
     "provenance": "contract fnb.yaml POST /waitlist/{entryId}/leave"
+   }
+  ],
+  "gaps": [
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-011): No read of an outlet's waitlist entries; no operation seats a waiting party or records walked away.",
+    "source": "contracts/satellite/fnb.yaml#joinRestaurantWaitlist | DI-337"
    }
   ],
   "_platform": {
@@ -1616,42 +1689,6 @@
      "slot": "fields",
      "components": [
       {
-       "kind": "textField",
-       "label": "id",
-       "bindsTo": "OpenTableVisitRequest.id",
-       "provenance": "contract fnb.yaml POST /table-visits"
-      },
-      {
-       "kind": "textField",
-       "label": "tableId",
-       "bindsTo": "OpenTableVisitRequest.tableId",
-       "provenance": "contract fnb.yaml POST /table-visits"
-      },
-      {
-       "kind": "textField",
-       "label": "covers",
-       "bindsTo": "OpenTableVisitRequest.covers",
-       "provenance": "contract fnb.yaml POST /table-visits"
-      },
-      {
-       "kind": "textField",
-       "label": "serverPrincipalId",
-       "bindsTo": "OpenTableVisitRequest.serverPrincipalId",
-       "provenance": "contract fnb.yaml POST /table-visits"
-      },
-      {
-       "kind": "textField",
-       "label": "subjectId",
-       "bindsTo": "OpenTableVisitRequest.subjectId",
-       "provenance": "contract fnb.yaml POST /table-visits"
-      },
-      {
-       "kind": "textField",
-       "label": "recordedAt",
-       "bindsTo": "OpenTableVisitRequest.recordedAt",
-       "provenance": "contract fnb.yaml POST /table-visits"
-      },
-      {
        "kind": "detailPanel",
        "label": "The table visit",
        "bindsTo": "TableVisit",
@@ -1704,9 +1741,10 @@
       },
       {
        "kind": "secondaryButton",
-       "label": "Save table visit",
+       "label": "Change covers",
        "operation": "updateTableVisit",
-       "provenance": "contract fnb.yaml PATCH /table-visits/{visitId}"
+       "provenance": "contract fnb.yaml PATCH /table-visits/{visitId}",
+       "notes": "Covers only (`updateTableVisit`); the table and the server change through their own acts. (Design-notes corrections fnb-retail EMP-058.)"
       },
       {
        "kind": "destructiveButton",
@@ -1716,9 +1754,10 @@
       },
       {
        "kind": "secondaryButton",
-       "label": "Transfer table visit",
+       "label": "Change server",
        "operation": "transferTableVisit",
-       "provenance": "contract fnb.yaml POST /table-visits/{visitId}/transfer"
+       "provenance": "contract fnb.yaml POST /table-visits/{visitId}/transfer",
+       "notes": "Hands the check to another server (`transferTableVisit`). Not \"Transfer\": the client's \"Transfer table\" is moving the party. (Design-notes corrections fnb-retail EMP-058.)"
       },
       {
        "kind": "secondaryButton",
@@ -1734,21 +1773,16 @@
       },
       {
        "kind": "secondaryButton",
-       "label": "Move table visit",
+       "label": "Transfer table",
        "operation": "moveTableVisit",
-       "provenance": "contract fnb.yaml POST /table-visits/{visitId}/move"
+       "provenance": "contract fnb.yaml POST /table-visits/{visitId}/move",
+       "notes": "The client's \"Transfer table\": move the party to another table (`moveTableVisit`; DI-338). (Design-notes corrections fnb-retail EMP-058.)"
       },
       {
        "kind": "secondaryButton",
        "label": "Reassign server",
        "operation": "reassignServer",
        "provenance": "contract fnb.yaml PUT /table-visits/{visitId}/server"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Notify server",
-       "operation": "notifyServer",
-       "provenance": "contract fnb.yaml POST /table-visits/{visitId}/notify-server"
       },
       {
        "kind": "secondaryButton",
@@ -1767,30 +1801,6 @@
        "label": "Hold course",
        "operation": "holdCourse",
        "provenance": "contract fnb.yaml POST /kitchen-tickets/{ticketId}/hold"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Save table combinations",
-       "operation": "setTableCombinations",
-       "provenance": "contract fnb.yaml PUT /outlets/{outletId}/table-combinations"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Quote wait time",
-       "operation": "quoteWaitTime",
-       "provenance": "contract fnb.yaml POST /waitlist/{entryId}/quote"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Join restaurant waitlist",
-       "operation": "joinRestaurantWaitlist",
-       "provenance": "contract fnb.yaml POST /waitlist"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Notify waitlist party",
-       "operation": "notifyWaitlistParty",
-       "provenance": "contract fnb.yaml POST /waitlist/{entryId}/notify"
       }
      ]
     }
@@ -1922,27 +1932,10 @@
     "provenance": "contract fnb.yaml PUT /table-visits/{visitId}/server"
    },
    {
-    "id": "formNotifyServer",
-    "component": "modal",
-    "trigger": "Notify server",
-    "body": "**Collects what `notifyServer` sends before it is called.** Nothing in the body is required. Optional: `reason`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Notify server",
-     "operation": "notifyServer"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "reason"
-     ]
-    },
-    "provenance": "contract fnb.yaml POST /table-visits/{visitId}/notify-server"
-   },
-   {
     "id": "formCreateFnbOrder",
     "component": "modal",
     "trigger": "Create F&B order",
-    "body": "**Collects what `createFnbOrder` sends before it is called.** Required: `id`, `outletId`, `serviceMode`, `lines`, `recordedAt`. Optional: `tableVisitId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Ordering is a menu, like the till's order pad**: dishes and options are tapped, not typed; ids, outlet and device time are set by the app (design-notes correction fnb-retail EMP-058).",
     "bindsTo": "CreateFnbOrderRequest",
     "confirm": {
      "label": "Create F&B order",
@@ -1999,69 +1992,6 @@
      ]
     },
     "provenance": "contract fnb.yaml POST /kitchen-tickets/{ticketId}/hold"
-   },
-   {
-    "id": "formSetTableCombinations",
-    "component": "modal",
-    "trigger": "Save table combinations",
-    "body": "**Collects what `setTableCombinations` sends before it is called.** Required: `combinations`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Save table combinations",
-     "operation": "setTableCombinations"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "combinations"
-     ]
-    },
-    "provenance": "contract fnb.yaml PUT /outlets/{outletId}/table-combinations"
-   },
-   {
-    "id": "formJoinRestaurantWaitlist",
-    "component": "modal",
-    "trigger": "Join restaurant waitlist",
-    "body": "**Collects what `joinRestaurantWaitlist` sends before it is called.** Required: `id`, `outletId`, `partySize`, `status`, `recordedAt`. Optional: `subjectId`, `quotedWaitMinutes`, `seatingPreference`, `notifiedAt`, `syncedAt`, `holdExpiresAt`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "RestaurantWaitlist",
-    "confirm": {
-     "label": "Join restaurant waitlist",
-     "operation": "joinRestaurantWaitlist"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "id",
-      "outletId",
-      "partySize",
-      "status",
-      "recordedAt",
-      "subjectId",
-      "quotedWaitMinutes",
-      "seatingPreference",
-      "notifiedAt",
-      "syncedAt",
-      "holdExpiresAt"
-     ]
-    },
-    "provenance": "contract fnb.yaml POST /waitlist"
-   },
-   {
-    "id": "formNotifyWaitlistParty",
-    "component": "modal",
-    "trigger": "Notify waitlist party",
-    "body": "**Collects what `notifyWaitlistParty` sends before it is called.** Nothing in the body is required. Optional: `channel`, `holdMinutes`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Notify waitlist party",
-     "operation": "notifyWaitlistParty"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "channel",
-      "holdMinutes"
-     ]
-    },
-    "provenance": "contract fnb.yaml POST /waitlist/{entryId}/notify"
    }
   ],
   "states": {
@@ -2121,12 +2051,6 @@
     "trigger": "onAction"
    },
    {
-    "operationId": "notifyServer",
-    "contract": "fnb",
-    "purpose": "The kitchen calls the server to the pass",
-    "trigger": "onAction"
-   },
-   {
     "operationId": "createFnbOrder",
     "contract": "fnb",
     "purpose": "Place an F&B order",
@@ -2142,30 +2066,6 @@
     "operationId": "holdCourse",
     "contract": "fnb",
     "purpose": "Stop a course going out",
-    "trigger": "onAction"
-   },
-   {
-    "operationId": "setTableCombinations",
-    "contract": "fnb",
-    "purpose": "Which tables can be pushed together, and to what capacity",
-    "trigger": "onAction"
-   },
-   {
-    "operationId": "quoteWaitTime",
-    "contract": "fnb",
-    "purpose": "Tell a party how long, and mean it",
-    "trigger": "onAction"
-   },
-   {
-    "operationId": "joinRestaurantWaitlist",
-    "contract": "fnb",
-    "purpose": "Add a party to an outlet's waitlist",
-    "trigger": "onAction"
-   },
-   {
-    "operationId": "notifyWaitlistParty",
-    "contract": "fnb",
-    "purpose": "Their table is ready",
     "trigger": "onAction"
    },
    {
@@ -2191,11 +2091,6 @@
      "from": "deepLink"
     },
     {
-     "name": "entryId",
-     "from": "deepLink",
-     "optional": true
-    },
-    {
      "name": "outletId",
      "from": "session",
      "optional": true
@@ -2217,6 +2112,38 @@
    "note": "**Drawn by Claude Design on `FnB Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 16 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "gaps": [
+   {
+    "operation": "joinRestaurantWaitlist",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-008): Combinations are pre-service configuration (EMP-053) and the waitlist actions belong to EMP-056; R254 re-derives operations from purpose (F94 step 1, F29 step 1; design-notes correction fnb-retail EMP-058).",
+    "source": "R254 | F94 step 1 | F29 step 1 | contracts/satellite/fnb.yaml#setTableCombinations"
+   },
+   {
+    "operation": "notifyWaitlistParty",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-008): Combinations are pre-service configuration (EMP-053) and the waitlist actions belong to EMP-056; R254 re-derives operations from purpose (F94 step 1, F29 step 1; design-notes correction fnb-retail EMP-058).",
+    "source": "R254 | F94 step 1 | F29 step 1 | contracts/satellite/fnb.yaml#setTableCombinations"
+   },
+   {
+    "operation": "quoteWaitTime",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-008): Combinations are pre-service configuration (EMP-053) and the waitlist actions belong to EMP-056; R254 re-derives operations from purpose (F94 step 1, F29 step 1; design-notes correction fnb-retail EMP-058).",
+    "source": "R254 | F94 step 1 | F29 step 1 | contracts/satellite/fnb.yaml#setTableCombinations"
+   },
+   {
+    "operation": "setTableCombinations",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-008): Combinations are pre-service configuration (EMP-053) and the waitlist actions belong to EMP-056; R254 re-derives operations from purpose (F94 step 1, F29 step 1; design-notes correction fnb-retail EMP-058).",
+    "source": "R254 | F94 step 1 | F29 step 1 | contracts/satellite/fnb.yaml#setTableCombinations"
+   },
+   {
+    "operation": "notifyServer",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-SPO-018): the kitchen calls the server to the pass; on the staff app that is an incoming notification, not a button (F29 step 4; design-notes correction fnb-retail EMP-058). Stays on KIT-002.",
+    "source": "F29 step 4 | contracts/satellite/fnb.yaml#notifyServer"
+   }
+  ],
   "_platform": {
    "code": "P06",
    "audience": "staff",
@@ -2343,7 +2270,8 @@
        "kind": "secondaryButton",
        "label": "Create payment",
        "operation": "createPayment",
-       "provenance": "contract orders.yaml POST /payments"
+       "provenance": "contract orders.yaml POST /payments",
+       "notes": "No cash tender on a handheld; \"Pay cash at the till\" sends the guest's bill to a till instead (DEC-200)."
       },
       {
        "kind": "secondaryButton",
@@ -2408,7 +2336,7 @@
     "id": "formCreatePayment",
     "component": "modal",
     "trigger": "Create payment",
-    "body": "**Collects what `createPayment` sends before it is called.** Required: `id`, `orderId`, `tender`, `amount`, `recordedAt`. Optional: `tenderCurrency`, `tenderAmount`, `walletAuthorisationId`, `deviceId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Card, contactless, wallet or room charge; never cash.** A handheld takes no cash payment: cash goes to a till (decided 2 October 2026, Chinmay, batch 6, EMP-009: \"No cash on handhelds; cash goes to a till\"; DEC-200; CHG-CSP-039), and `createPayment` refuses cash from a session with no till (409 `cashNotOnHandheld`). Required: `orderId`, `tender`, `amount`; `id` and `recordedAt` are set by the app. Dismissing sends nothing.",
     "bindsTo": "CreatePaymentRequest",
     "confirm": {
      "label": "Create payment",
@@ -2637,11 +2565,11 @@
     "EMP-003",
     "EMP-058"
    ],
+   "inferred": false,
+   "notes": "**Returns to EMP-003.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
    "exitTo": [
     "EMP-061"
    ],
-   "inferred": false,
-   "notes": "**Returns to EMP-003.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
    "transitions": [
     {
      "to": "EMP-061",
@@ -2665,6 +2593,14 @@
      "name": "contentBody",
      "slot": "collection",
      "components": [
+      {
+       "kind": "metricTile",
+       "label": "Turn time, no-shows, covers, wait accuracy",
+       "bindsTo": "KpiValue",
+       "operation": "getKpiValues",
+       "notes": "All four from reporting, never computed on the device (decided 2 October 2026, Chinmay, batch 6, EMP-060; DEC-205; CHG-CSA-020): `tableTurnTime`, `noShowRate`, `covers`, `waitQuoteAccuracy`, for this outlet and today.",
+       "provenance": "contract reporting.yaml GET /kpi-values"
+      },
       {
        "kind": "textField",
        "label": "Outlet id",
@@ -2779,6 +2715,12 @@
     "operationId": "getTableMap",
     "contract": "fnb",
     "purpose": "Table map with live state",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getKpiValues",
+    "contract": "reporting",
+    "purpose": "Turn time, no-show rate, covers and wait-quote accuracy, computed by reporting (DEC-205; CHG-CSA-020)",
     "trigger": "onLoad"
    }
   ],

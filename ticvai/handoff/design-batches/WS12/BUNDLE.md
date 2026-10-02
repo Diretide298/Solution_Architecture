@@ -61,6 +61,66 @@ convincingly. It is never a caption.
   and its error; and, element by element, what is shown and in what format, what each action
   produces and where the user goes next. Draw exactly that.
 
+## The processes these screens belong to
+
+Written by the owner of each process (`handoff/design-notes/`). Read before any screen: it says how the process runs end to end and which words the screens must use.
+
+### Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue)
+
+Venue operations is everything that happens after a sale and inside the gates. A guest's ticket is one virtual ticket with interchangeable media (QR, dynamic QR, RFID wristband, NFC, Face Pass or Face Tag); at an access point a scanner (P07, or the scan function inside the Staff App P06) validates the media against the admission profile and the guest admission policy, offline if it must, and every deny carries a reason and a next action. The back office (Venue Management P08) configures that estate: the venue topology (venue, park, zone, attraction, access point, gate and lane, device placement), admission profiles and rules (entry, exit, re-entry, anti-passback, validity, crossover, companions), credential security (dynamic QR, device binding, beacons), biometrics, gate modes, and the live operations, fraud and monitoring views. Accreditation (P08 setup and review, P11 web portal for applicants, web first) takes an applicant from a configurable form through document checks, OCR, duplicate blocking and multi-level approval to a credential with zone rights. Resources and capacity manage bookable resources (rooms, vehicles, equipment, cabanas, instructors) that are booked as a consequence of selling a product, never sold directly. Workforce covers shift templates, rosters, attendance, swaps and breaks, mirrored on the Staff App. Maintenance and safety cover the asset register, preventive calendars, work orders with scored priority, inspections and incidents, with technicians working from the Staff App. Games and rides configure readers, credit types and consumption priority, play entitlements, game pricing, retry pricing, redemption and the card lifecycle. The virtual queue (Q1) gives a guest a live wait time and a return window for a ride; it is not the on-sale waiting room (Q2). Every calendar has day, week and month views. Configuration resolves tenant, region, venue (outlet only for F&B and retail), and a user's permissions, never the device, decide what they may do. The guest apps (P01, P02) show the guest's side of this: My Tickets, the scan code, Face Pass, wait times, the virtual queue, map booking of cabanas and the visit planner.
+*(source: F06 step 1 / F112 step 1 / F111 step 1 / ADR-0002 / ADR-0012 / ADR-0018 / ADR-0041 / ADR-0066 / ADR-0067 / ADR-0068 / DI-652 / DI-627 / DI-640 / DI-654 / DI-666 / DI-482 / DI-483 / DI-907 / DI-919 / DI-923 / DI-865 / DI-678 / TRACKER Actions row 160 / MoM 2026-09-02 AccessControl / MoM 2026-09-07 …)*
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Ticket | The one virtual record a guest owns (ticket number, product, validity, entries). Its number never changes, whatever media carries it or whoever it is transferred or resold to. | Pass (unless the product is a pass), Booking, Order line | DI-652 / DI-620 / contracts/spine/access.yaml#/components/schemas/TicketStatus |
+| Media | What the ticket is presented by at a gate (QR code, dynamic QR, wristband/RFID card, NFC, Face Pass, Face Tag). One ticket can carry several media as fallbacks; a media code can also cover several tickets scanned as one group. Show one … | Credential (for guest media; keep Credential for accreditation badges and staff), Ticket code | DI-180 / DI-608 / DI-652 |
+| Access point | A place where a scan is judged, with a fixed direction (entry, exit, re-entry, crossover). Hierarchy shown to users is Venue > Park > Zone > Attraction > Access point > Gate/lane > Device. | Scanner (that is the device), Door | screens/P08-venue-back-office.yaml#BO-144 / … |
+| Admission profile | The named set of rules an access point enforces (opening window, entries, exit scan, re-entry, validity, crossover). Products point at a profile; tiers such as Bronze/Silver/Gold are profiles with gate allow and deny lists. | Admission rules (as a screen title), Access rule set | DI-185 / contracts/spine/access.yaml#/components/schemas/AdmissionRules |
+| Admitted / Denied / Overridden | The three scan outcomes. A denial is always shown with its reason in plain words and a next action; an override is a supervisor admitting despite a denial, and is always attributed and reasoned. | Valid/Invalid, Success/Fail, Error | contracts/spine/access.yaml#/components/schemas/ScanOutcome / … |
+| Used | A ticket entry is used the moment a scan succeeds, whether or not the guest physically passed. Mistakes are resolved from the scan history, not by un-scanning. | Redeemed (for admission), Checked in (that is group check-in, a different step) | DI-627 / TRACKER Actions row 221 / TRACKER Actions row 189 |
+| Gate mode | What a lane is doing now, set live by the podium or supervisor - Normal, Free flow (counts, does not validate), Drop arm (everybody through, evacuation), Closed (nobody through), Podium (staff validating by eye), Maintenance. Direction is … | Turnstile mode (as a label for direction), Open/Locked | contracts/spine/access.yaml#/components/schemas/AccessPointOperatingMode / R221 |
+| Offline package | What a scanner holds to validate with no network - entitlements, blacklist, admission profiles and the active guest admission policy version - with its age always visible. | Cache, Local DB | F06 step 3 / ADR-0068 |
+| Sync and reconciliation | Sending the offline scan journal to the server, and the duty manager's review of scans the server rejected after the device had already admitted the guest. | Upload, Retry | F06 step 6 / DI-065 |
+| Face Pass / Face Tag | Face Pass is the long-lived face credential for members and season-pass holders (renewable); Face Tag is short-lived, for one day or event. Retention is set per tier by the venue. | Face ID, Biometric login | DI-640 / ADR-0063 |
+| Accreditation / Credential (accreditation) | Accreditation is the application and approval of a person (media, contractor, corporate, staff of a partner) for an event or season; the credential is what is issued after approval (photo badge, QR or RFID) with zone access rights. | Registration (for the whole process), Ticket | DI-654 / DI-662 |
+| Resource | A bookable thing or person a product needs (room, vehicle, cabana, equipment set, instructor). Guests buy products; resources are assigned to the booking, pre-assigned or dynamically. | Asset (that is maintenance), Inventory (that is stock) | DI-475 / DI-482 / TRACKER Actions row 160 |
+| Asset | A physical item maintained by the venue (ride, turnstile, printer, pump) with a register record, documents, warranty and maintenance history. | Resource, Device (unless it is an IT device in the device register) | DI-910 / ADR-0067 |
+| Work order | A unit of maintenance work, lifecycle Created > Assigned > In progress > Review > Closed, with a resolution timer. | Ticket (reserved for guest tickets), Job card | DI-231 |
+| Game / attraction (games module) | In the games and rides module an attraction is an individual game or ride (roller coaster, racing game, bumper cars), not a venue. | Venue, Park | DI-863 |
+| Virtual queue / Return window | A guest's place in a ride's queue held without standing in line, with a return window (for example 4:50 to 5:00 PM) that recalculates live. Distinct from the walk-in line and the VIP/express lane, and from the on-sale waiting room. | Waiting room, Fast pass (that is the express product), Booking | DI-675 / DI-678 / DI-679 / ADR-0066 |
+| Wait time source | Where a ride's wait time comes from - Sensor, Throughput, Manual, or Unavailable - always shown beside the number. | Live (when the source is manual) | contracts/satellite/queue.yaml#/components/schemas/WaitTimeSource / DI-315 |
+
+### Finance, Ledger & Tax · Reporting & Analytics
+
+Finance and insights run underneath every sale. A sale at a till (P04), kiosk, web storefront (P01) or guest app (P02) is priced and taxed per line at the moment of sale, recorded in the venue's base currency (AED in the UAE; 2 decimals, or 3 for BHD, KWD and OMR, never rounded away), and posted to an append-only dual ledger through account mappings per money event; anything unmapped lands in suspense. Tax follows the jurisdiction's tax profile: inclusive or exclusive, compound where a tax applies on another, zero-rated or exempt with verified evidence, and computed on the discounted price by default or on the price before discount where the region requires it (Egypt). A guest may select a currency the venue charges and pay in it: the rate is locked on the order, the payment partner is asked in that currency, the ledger keeps the base amount with the rate, and a refund goes back in the currency paid (decided 2 October 2026, Chinmay); a currency shown but not charged is an approximate price. Foreign cash at a till is recorded at its base equivalent and change is given in base currency. A paid order can carry a VAT receipt (simplified tax invoice), a full tax invoice with the buyer's TRN, or a consolidated invoice for a company, each numbered without gaps and never edited; corrections are credit memos. Revenue is recognised by rule: POS-style immediate, tickets on the visit, gift cards and wallet on use, annual passes straight-line or per visit, breakage on expiry; deferred revenue is a balance that ages. Each venue's day is reconciled (POS cash, gateways, bank, wallet against the ledger, provider files matched automatically, only genuine mismatches to a person); chargebacks are defended against the bank's deadline; month end runs seven close checks and goes to a finance approver. Nothing posted is deleted: a correction is a reversal, an approver is never the preparer, and ledger approval needs a second factor. Back-office finance lives in Venue Management (P08: chart of accounts, mapping, FX, journals, recognition, reconciliation, period close, chargebacks); tax profiles, calculation validation and platform reconciliation in the TICVAI Console (P09); partner settlement in P10. Reporting is one consolidated, permission-based area (Analytics, P16): seeded standard dashboards and reports plus no-code builders over a governed business catalogue; the P08 report screens, the POS terminal day view and the kitchen performance view are scoped windows onto the same definitions and must show the same numbers. Every figure is read from a lag-tolerant reporting copy and shows its "as of" time; scope comes from the person's rights, never from a filter; AI explains and recommends but never acts, answers only within the person's role, labels forecasts, and is phase two for finance ledgers.
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Base currency | The venue's region currency; the currency every record and ledger posting is in. A guest may pay in a currency they select (where the venue charges it); the books still hold the base amount and the rate. | Home currency, Local price, Default currency | DI-211 / DI-282 / contracts/spine/orders.yaml#/components/schemas/Order |
+| Pay in USD (a currency the venue charges) | The guest's selected payment currency; the card is charged in it at the rate locked on the order, and refunds go back in it. | Converted price, Approx. (for a charged currency) | contracts/spine/orders.yaml#checkoutCart / … |
+| ≈ (approx.) price in USD / SAR / … | A conversion of a base-currency price for a currency the venue shows but does not charge, always next to the base price. | Converted price, USD price | DI-211 / screens/P02-guest-mobile-app.yaml#GST-044 |
+| Takings | Money received in the period less refunds (cash-basis); the seeded KPI on hubs. | Revenue, Sales, Income | contracts/satellite/reporting.yaml#/components/schemas/ReportingSystemKpi / R283 |
+| Gross sales | Issued sales before discounts and refunds; whether tax is included must be stated on the tile. | Revenue, Turnover | MATRIX 6.1.78 |
+| Net revenue | Gross sales less discounts less refunds, adjusted per finance policy. | Net sales, Revenue, Income | MATRIX 6.1.78 |
+| Recognised revenue / Deferred revenue | Earned under the recognition rules / paid for but not yet earned. Kept distinct from sales. | Realised revenue, Unearned income, Wallet revenue | MATRIX 5.12.6 / DI-260 / contracts/spine/finance.yaml#getDeferredRevenue |
+| VAT receipt | The simplified tax invoice issued on a paid order. | Receipt (when it is a tax document), Bill | contracts/spine/finance.yaml#issueTaxInvoice |
+| Tax invoice / Combined tax invoice | A full invoice with the buyer's details / one invoice for several paid orders of one buyer. | Bill, Statement | contracts/spine/finance.yaml#/components/schemas/FinTaxInvoiceType |
+| Credit memo | The document that corrects an issued invoice after a refund; the invoice itself is never edited. | Credit note (until the client's tax adviser chooses "Tax credit note"), Edit invoice | contracts/spine/finance.yaml#/components/schemas/FinTaxInvoice |
+| VAT (or the jurisdiction's tax name) | Use the tax profile's own name on every surface; "Tax" only where several kinds are summed. | GST in UAE, Service charge for a tax | contracts/spine/catalogue.yaml#setTaxProfileJurisdiction |
+| Price before discount | The taxable base where the jurisdiction taxes the undiscounted price. | Gross price, List tax | DI-598 |
+| Post / Reverse | A journal reaches the ledger when approved and posted; a correction is a reversal, never an edit or delete. | Edit entry, Delete entry, Undo | contracts/spine/finance.yaml#reverseJournalEntry |
+| Period (Open / Closing / Closed) | A fiscal period's state; closing stops postings, closed locks them. | Month locked, Frozen | contracts/spine/finance.yaml#/components/schemas/PeriodStatus |
+| Variance (Over / Short) | The difference between expected and counted or recorded, always saying between which two figures. | Discrepancy, Error, Loss | DI-275 / contracts/spine/finance.yaml#/components/schemas/UnifiedReconciliation |
+| Settlement / Exception / Resolve | A provider's file for a day / a line that did not match / the recorded explanation. | Payout file, Error, Close | contracts/spine/finance.yaml#/components/schemas/SettlementException |
+| Chargeback | A bank-initiated reversal with an evidence deadline; not a refund. | Dispute refund, Reversal | contracts/spine/orders.yaml#/components/schemas/Chargeback |
+| Report / Dashboard / Tile / KPI | A runnable, exportable, schedulable definition / a page of tiles / one visual bound to a report / a company-wide measure defined once. | Widget (outside the builder's library), Board (for a user-facing dashboard) | contracts/satellite/reporting.yaml#/components/schemas/DashboardTile / … |
+| Warning / Critical | KPI status bands set by a target's amber and red thresholds; always words plus colour. | Amber, Red (alone), Bad | contracts/satellite/reporting.yaml#/components/schemas/KpiTarget |
+| As of HH:MM / Updated N sec ago | The freshness of every figure read from the reporting copy; stale shows a warning. | Live (unless refreshed), Real-time | MATRIX 8.7.22 |
+| Forecast | Any projected figure, with its range; never shown as a fact. | Expected, Will be | DI-973 |
+| Outlet / Workstation (till) | A sales point / the device; staff copy may say "till" for the workstation. | Store, POS (in copy), Drawer (for the device) | R156 |
+| Channel | POS, Web, App, Kiosk, B2B, OTA, from one closed list. | Source, Platform | MoM 2026-08-18 4.2 Recipes, Operating Hours & Service Channels / MATRIX 1.4.7 |
+
+
 ## The screens
 
 Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs count fields; requirements are matrix rows; meeting inputs are the ones naming the screen (the module and platform ones are below); white label says whether the tenant's brand reaches it (guest) or it sets the brand (configures).
@@ -104,9 +164,27 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Opens with | nothing: it opens on its own |
 | Route | `/access-venue/access-monitoring-analytics-command-center-bo-254` |
 
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** Board 12 hub, the management view of access across every venue the user can see: fourteen global KPI tiles (admissions, entries, exits, currently in venue, re-entries, crossovers, group admissions, Fast Pass uses, valid and rejected scans, intervention rate, average validation time, active gates, offline devices), a venue comparison and an AI operations summary, with tiles into BO-255 to BO-263. The one thing to get right: this is where management watches and analyses; live operational action stays on board 9 (BO-224), so the hub has no operational buttons.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **The tile "Seconds" and the venue table "Every access monitoring analytics" with no columns** Why: The tile is Average validation time (seconds is its unit); the table is Venue comparison with five columns (VO-R12). *(source: screens/P08-venue-back-office.yaml#BO-254 / contracts/spine/access.yaml#/components/schemas/AccessMonitoringAnalyticsCommandCenterViewSummary; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **Validation success is returned (validationSuccessRate) but not drawn** Why: It is one of the pack's four headline figures. *(source: screens/P08-venue-back-office.yaml#BO-254 / contracts/spine/access.yaml#listAccessMonitoring; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **The AI operations summary has no field** Why: The pack shows it on the hub; the read returns no sentence. *(source: screens/P08-venue-back-office.yaml#BO-254; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+
+#### Decided on this screen
+
+Answered questions: draw the decision, not the old default. Where a decision and the tables below differ, the decision wins.
+
+- **The pack says "across all TICVAI-controlled venues" but the read is venue-scoped; is this hub tenant-wide?** → Drawn default accepted: Tenant-wide when the switcher is on All venues, rows per venue; one venue selected shows its parks. *(decided by Chinmay, 2026-10-02; DEC-262 / CHG-NOTE-008)* **Reviewable:** a default the lead may still overrule before the block is tasked.
+
 #### Inputs: what the user enters or picks
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Period and venue filter**: Today by default (live), with Yesterday, Last 7 days and a date range; venues limited to the user's scope. *(source: DI-061 / designer default)*
 
 #### Outputs: what the screen shows and produces
 
@@ -489,6 +567,16 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **The selected access monitoring analytics** (detail panel): The pack groups this record's detail under its own headings: “TOTAL ADMISSIONS”, “CURRENTLY IN VENUE”, “Venue Comparison”.
 
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **KPI tiles**: Fourteen metric tiles with deltas against the same day last week (VO-R02); the hero row repeats the pack's four headline figures large - TOTAL ADMISSIONS 42,684, CURRENTLY IN VENUE 18,427, VALIDATION SUCCESS 97.8%, AVG. VALIDATION 0.42 sec. Offline devices red when above zero and opens BO-204. *(source: screens/P08-venue-back-office.yaml#BO-254 / contracts/spine/access.yaml#listAccessMonitoring)*
+- **Venue comparison**: Table Venue, Entries, In venue, Rejected %, Throughput (per minute), one row per venue; sorted by entries. *(source: screens/P08-venue-back-office.yaml#BO-254 / contracts/spine/access.yaml#/components/schemas/AccessMonitoringAnalyticsCommandCenterView)*
+- **AI operations summary**: Sentence with figures and a time window, e.g. "Adventure Park attendance is tracking 11% above forecast. Main Entrance is projected to exceed the configured queue target between 11:15 and 11:45", linking to BO-263 and BO-259; advisory only (VO-R11). *(source: screens/P08-venue-back-office.yaml#BO-254)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Open a board 12 screen**: Tiles open BO-255 to BO-263 and return here (VO-R13). *(source: DI-653 / F122 step 1)*
+
 **Data it reads**: `listAccessMonitoring` (onLoad, Access Monitoring & Analytics Command Center)
 
 **Where the user goes next**
@@ -514,6 +602,49 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the access monitoring analytics are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Edge cases to draw
+
+- **Offline scans not yet synced**: A note under the tiles "18 offline transactions not yet included" so the figures are not read as final. *(source: F06 step 6 / DI-065)*
+- **Venue manager with one venue**: Venue comparison shows that venue's parks instead of other venues. *(source: DI-061)*
+
+#### Consistency with other screens
+
+- Match `BO-224`: Board 9 shows the same live counts for action; the numbers must agree for the same moment.
+- Match `BO-255`: Currently in venue equals the occupancy screen's venue total.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+tiles:
+  totalAdmissionsToday: 42684
+  entries: 44102
+  exits: 25675
+  currentlyInVenue: 18427
+  reEntries: 3842
+  crossovers: 1104
+  groupAdmissions: 2216
+  fastPassUses: 5130
+  validationSuccess: 97.8%
+  rejectedScans: 962
+  interventionRate: 1.4%
+  averageValidation: 0.42 sec
+  activeGates: 64 / 70
+  offlineDevices: 3
+venues:
+- venue: Summit Peaks
+  entries: 18421
+  inVenue: 8214
+  rejected: 1.8%
+  throughput: 32/min
+- venue: Aqua Park
+  entries: 12840
+  inVenue: 6321
+  rejected: 2.1%
+  throughput: 27/min
+```
 
 #### Permissions
 
@@ -564,6 +695,9 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-100`, `BO-255`, `BO-256`, `BO-257`, `BO-258`, `BO-259`, `BO-260`, `BO-261`, `BO-262`, `BO-263`.
 - [ ] Every gated control is gated: `REPORT_VIEW_VENUE`.
 - [ ] The 2 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 2 edge case(s) from the process notes are drawn.
+- [ ] The 3 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
+- [ ] The 1 decision(s) taken on this screen are drawn as decided, not as the old default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -586,15 +720,45 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** Live people count: opening occupancy plus entries minus exits plus operational adjustments gives current occupancy, by venue, park, zone, attraction and controlled area, each against its capacity and coloured by thresholds (Normal 0-79%, Warning 80-89%, High 90-94%, Critical 95% and above). The one thing to get right: this is admission capacity (people inside now), shown apart from sales capacity, and when the venue reaches its maximum the scanners deny "Venue full" until guests exit.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **The content is an empty unbound table** Why: Bind listLiveVenueOccupancy and draw the hierarchy with bars. *(source: contracts/spine/access.yaml#listLiveVenueOccupancy; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **Thresholds and operational adjustments have no write; the read has no opening occupancy** Why: The pack has administrators configure thresholds and the equation needs opening occupancy and adjustments. *(source: screens/P08-venue-back-office.yaml#BO-255 / screens/P08-venue-back-office.yaml#BO-256; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **Navigation has no trigger back to BO-254** Why: Board screens return to their hub (VO-R13). *(source: DI-653; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+
+#### Decided on this screen
+
+Answered questions: draw the decision, not the old default. Where a decision and the tables below differ, the decision wins.
+
+- **Where is a venue's maximum live occupancy (the Venue full limit) set?** → Drawn default accepted: Show capacity read-only here with a link to the capacity configuration; do not edit it on this screen. *(decided by Chinmay, 2026-10-02; DEC-263 / CHG-NOTE-008)* **Reviewable:** a default the lead may still overrule before the block is tasked.
+
 #### Inputs: what the user enters or picks
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Thresholds**: Four bands with editable lower bounds (80, 90, 95) per area level; bands cannot overlap. *(source: screens/P08-venue-back-office.yaml#BO-256)*
+- **Operational adjustment**: A supervisor enters "+/- N" with a reason (e.g. counter fault at Gate 4, staff group not scanned); the reason is mandatory and the adjustment is audited. *(source: screens/P08-venue-back-office.yaml#BO-255)*
 
 #### Outputs: what the screen shows and produces
 
 **Shown**
 
 **Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Occupancy equation**: A strip "Opening occupancy + Entries - Exits +/- Adjustments = CURRENT OCCUPANCY" with today's numbers. *(source: screens/P08-venue-back-office.yaml#BO-255)*
+- **Hierarchy**: Expandable tree Venue > Park > Zone > Attraction > Controlled area; each row "8,214 / 12,000 - 68.5%" with a bar in its threshold colour; zones sorted by occupancy descending. *(source: screens/P08-venue-back-office.yaml#BO-255 / contracts/spine/access.yaml#listLiveVenueOccupancy)*
+- **Alerts**: "Adventure Zone has exceeded its 90% operational threshold" with time and Open on the map (BO-256). *(source: screens/P08-venue-back-office.yaml#BO-256)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Save thresholds**: Applies to alerts from now; logged (VO-R05). *(source: screens/P08-venue-back-office.yaml#BO-256)*
+- **Record adjustment**: Changes current occupancy immediately and appears in the equation as Adjustments with who and why. *(source: screens/P08-venue-back-office.yaml#BO-255)*
 
 **Data it reads**: `listLiveVenueOccupancy` (onLoad, Live Venue Occupancy & People Counting)
 
@@ -612,6 +776,47 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the live venue occupancy are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Edge cases to draw
+
+- **Exit scan is optional (free rotation exits)**: Occupancy is labelled "estimated" because exits are inferred, not scanned. *(source: contracts/spine/access.yaml#updateAdmissionRules)*
+- **Venue reaches its maximum live occupancy**: Status Critical and a banner "Gates are denying Venue full"; scans resume admitting as guests exit. *(source: DI-650)*
+- **Gates offline and journalling**: Area shows "Includes estimates - 2 gates not synced" until sync. *(source: F06 step 6)*
+
+#### Consistency with other screens
+
+- Match `BO-254`: Venue total equals Currently in venue there.
+- Match `BO-237`: Occupancy policies (Peak capacity control) read this same figure.
+- Match `BO-064`: Sales capacity screens show the other capacity type; label both distinctly (Admission capacity vs Sales capacity).
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+equation: 0 opening + 15,920 entries - 7,706 exits + 0 adjustments = 8,214
+areas:
+- area: Summit Peaks
+  current: 8214
+  capacity: 12000
+  occupancy: 68.5%
+  status: Normal
+- area: Kids Zone
+  current: 1842
+  capacity: 2500
+  occupancy: 74%
+  status: Normal
+- area: Adventure Zone
+  current: 3107
+  capacity: 3500
+  occupancy: 89%
+  status: Warning
+- area: VIP Zone
+  current: 421
+  capacity: 600
+  occupancy: 70%
+  status: Normal
+```
 
 #### Permissions
 
@@ -654,6 +859,9 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-254`.
 - [ ] Every gated control is gated: `SCOPE_VIEW`.
 - [ ] The 4 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 3 edge case(s) from the process notes are drawn.
+- [ ] The 3 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
+- [ ] The 1 decision(s) taken on this screen are drawn as decided, not as the old default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -674,6 +882,13 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | nothing: it opens on its own |
 | Route | `/access-venue/graphical-access-map-live-gate-performance-bo-256` |
 
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** The board 1 topology turned into a live map: every gate, turnstile, entry and exit point, re-entry, group and VIP gate, attraction access and crossover point placed on the venue plan with a status colour, and a gate overlay with guests, throughput, success, reject and yellow rates and average validation. Heatmap layers (guest flow, queue pressure, rejection rate, device health, occupancy) and drill-down from venue to device. The one thing to get right: it is a map, not a table, and a bottleneck is visible at a glance.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **The screen is a data table "Every graphical access map" with one column (pointType)** Why: The pack asks for a venue digital twin with heatmap layers; draw the map component with the overlay, and use the table only as an accessible alternative (VO-R12). *(source: screens/P08-venue-back-office.yaml#BO-256; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **The read returns no map coordinates and no heatmap values (queue pressure, device health, occupancy)** Why: Positions live with setAccessGraphicalMap; the layers need per-point values. *(source: contracts/spine/access.yaml#listGraphicalAccessMap / contracts/spine/access.yaml#setAccessGraphicalMap; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+
 #### Inputs: what the user enters or picks
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
@@ -685,6 +900,11 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Zone | text field | — | — | `listGraphicalAccessMap` ?zone |
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Layer**: One heatmap layer at a time from the pack's five; default Guest flow. *(source: screens/P08-venue-back-office.yaml#BO-257)*
+- **Drill-down**: Breadcrumb Venue > Park > Zone > Access point > Gate > Device; the map zooms to the level chosen. *(source: screens/P08-venue-back-office.yaml#BO-257 / contracts/spine/access.yaml#listGraphicalAccessMap)*
 
 #### Outputs: what the screen shows and produces
 
@@ -702,6 +922,15 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |---|---|---|
 | Point type | chip: Gate, Turnstile, Entry point, Exit point, Re entry gate, Group gate… | — |
 
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Venue digital twin**: Point icons by type (nine types) on the venue plan from BO-15x topology, coloured Healthy green, Warning amber, Critical red, Offline grey with a crossed icon; RTL mirrors the legend, not the map. *(source: screens/P08-venue-back-office.yaml#BO-256 / contracts/spine/access.yaml#listGraphicalAccessMap)*
+- **Gate overlay**: "MAIN GATE 03 - Guests 4,821 - Throughput 31/min - Success 96.4% - Reject 2.1% - Yellow 1.5% - Average validation 0.38 sec" on hover or tap. *(source: screens/P08-venue-back-office.yaml#BO-256 / screens/P08-venue-back-office.yaml#BO-257)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Open gate**: Opens BO-259 on that gate for performance, or BO-230 for lane control when the user has live operation rights. *(source: designer default)*
+
 **Data it reads**: `listGraphicalAccessMap` (onLoad, Graphical Access Map & Live Gate Performance)
 
 **Where the user goes next**
@@ -718,6 +947,33 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the graphical access map are still there. The pack's own statuses are 🟢 Healthy — the state names which is selected. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Edge cases to draw
+
+- **Venue has no plan image or point positions**: Fall back to a schematic list grouped by zone with the same colours, and say "No map positions configured". *(source: contracts/spine/access.yaml#setAccessGraphicalMap)*
+- **Gate offline**: Grey with the time last seen; rates show "No data since 10:42", not zero. *(source: DI-071 / DI-072)*
+
+#### Consistency with other screens
+
+- Match `BO-150`: Point positions and types come from the board 1 graphical map; same icons.
+- Match `BO-224`: Same status colours as live operations.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+gate:
+  name: Main Plaza Gate 3
+  guests: 4821
+  throughput: 31/min
+  success: 96.4%
+  reject: 2.1%
+  yellow: 1.5%
+  averageValidation: 0.38 sec
+  status: Healthy
+critical: North Entry turnstile 2 - Critical - reject 9.8%
+```
 
 #### Permissions
 
@@ -757,6 +1013,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-254`.
 - [ ] Every gated control is gated: `SCOPE_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 2 edge case(s) from the process notes are drawn.
+- [ ] The 2 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -776,6 +1034,14 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/access-venue/attendance-admission-analytics-bo-257` |
+
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** Who actually came compared with what was sold: tickets sold, eligible today, scanned, unique guests, no-shows, group and membership attendance, repeat entry and attendance rate (21,384 attended of 23,842 eligible = 89.7%), broken down by ticket type, product, event, timeslot, membership, channel, B2B partner, reseller, customer segment, guest category and venue; group analytics (school group 112 of 120 = 93.3%); no-show analysis; AI insight. The one thing to get right: attendance is people admitted, including group waves, never the purchased quantity.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **The nine KPIs drawn as columns of a data table; attendance rate missing** Why: KPIs are tiles (VO-R02); attendanceRate is in the read. *(source: contracts/spine/access.yaml#listAttendanceAdmission; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **The read returns one set of totals - no breakdown rows, no group list, no no-show analysis** Why: The pack's breakdown, group analytics and no-show analysis need rows per dimension value. *(source: screens/P08-venue-back-office.yaml#BO-257 / contracts/spine/access.yaml#listAttendanceAdmission; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **Filter drawn with six of the twelve dimensions the read accepts** Why: Ticket type, event, channel, customer segment, venue and date are missing. *(source: screens/P08-venue-back-office.yaml#BO-257 / contracts/spine/access.yaml#listAttendanceAdmission; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
 
 #### Inputs: what the user enters or picks
 
@@ -802,6 +1068,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Channel | text field | — | — | `listAttendanceAdmission` ?channel |
 | Customer segment | text field | — | — | `listAttendanceAdmission` ?customerSegment |
 | Date | text field | — | — | `listAttendanceAdmission` ?date |
+
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Date / breakdown**: Date (default today) or range; "Break down by" one of eleven dimensions, plus filters. *(source: screens/P08-venue-back-office.yaml#BO-257 / contracts/spine/access.yaml#listAttendanceAdmission)*
 
 #### Outputs: what the screen shows and produces
 
@@ -835,6 +1105,13 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Repeat entry | 1,234 | Repeat Entry |
 | No show rate | 12.5% | no-show rate |
 
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Attendance KPIs**: Tiles (VO-R02) - Sold, Eligible, Attended, Attendance rate defined as attended / eligible, Unique guests, No-shows, Group, Membership, Repeat entry. *(source: screens/P08-venue-back-office.yaml#BO-257 / contracts/spine/access.yaml#listAttendanceAdmission)*
+- **Breakdown table**: One row per value of the chosen dimension with sold, eligible, attended, rate, no-show rate. *(source: screens/P08-venue-back-office.yaml#BO-257)*
+- **Group analytics**: Groups with purchased vs actual and rate (from the waves of BO-217); morning vs afternoon comparison. *(source: screens/P08-venue-back-office.yaml#BO-257 / screens/P08-venue-back-office.yaml#BO-258)*
+- **AI insight**: "Morning school groups average 94% attendance, afternoon 81%; consider adjusting capacity assumptions for afternoon group products" - advisory. *(source: screens/P08-venue-back-office.yaml#BO-258)*
+
 **Data it reads**: `listAttendanceAdmission` (onLoad, Attendance & Admission Analytics)
 
 **Where the user goes next**
@@ -851,6 +1128,33 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the attendance admission analytics are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Consistency with other screens
+
+- Match `BO-217`: Group attendance is the waves admitted there.
+- Match `BO-060`: Attendance & Footfall reporting uses the same definitions (cross-process).
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+kpis:
+  sold: 25000
+  eligible: 23842
+  attended: 21384
+  rate: 89.7%
+  uniqueGuests: 20917
+  noShows: 2458
+  group: 2911
+  membership: 3120
+  repeatEntry: 467
+groups:
+- group: Abu Dhabi International School
+  purchased: 120
+  attended: 112
+  rate: 93.3%
+```
 
 #### Permissions
 
@@ -888,6 +1192,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-254`.
 - [ ] Every gated control is gated: `REPORT_VIEW_VENUE`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 3 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -908,9 +1213,20 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | nothing: it opens on its own |
 | Route | `/access-venue/entry-exit-re-entry-crossover-analytics-bo-258` |
 
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** Guest movement analysed as a journey: first entries, temporary exits, re-entries, crossovers and final exits as a funnel, re-entry analytics (rate, average time outside, most-used re-entry gates, rejected re-entry, by product) and crossover analytics (Park A to Park B and back, crossover time, product, utilisation). The one thing to get right: re-entries and crossovers are counted apart from first entries, so movement is understood rather than only totals.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **The read's single object is drawn as a six-column data table "Every entry exit re-entry"** Why: These are metrics and a funnel, not rows; draw tiles, funnel and flow (VO-R02, VO-R12). *(source: contracts/spine/access.yaml#listEntryExitCrossover; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **crossoverFlows, mostUsedReEntryGates and reEntryByProduct are arrays of strings** Why: Directional flows and ranked gates need counts; strings cannot be drawn as a flow or ranking. *(source: contracts/spine/access.yaml#/components/schemas/EntryExitReEntryCrossoverAnalyticsView; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+
 #### Inputs: what the user enters or picks
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Date range and venue**: Default today; park filter for multi-park venues. *(source: designer default)*
 
 #### Outputs: what the screen shows and produces
 
@@ -938,6 +1254,12 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Crossover time | 1,234 | Average minutes between leaving one park and entering the next |
 | Crossover product | list or chips (count when long) | Products used for crossover, with counts |
 
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Journey funnel**: Five stages with counts (18,421 first entries, 5,284 temporary exits, 3,842 re-entries, 1,104 crossovers, 17,921 final exits) as a funnel or stepped bars, not a table. *(source: screens/P08-venue-back-office.yaml#BO-258 / contracts/spine/access.yaml#listEntryExitCrossover)*
+- **Re-entry analytics**: Re-entry rate %, average time outside (h m), most-used re-entry gates ranked, rejected re-entries with top reason, re-entry by product. *(source: screens/P08-venue-back-office.yaml#BO-258 / contracts/spine/access.yaml#listEntryExitCrossover)*
+- **Crossover flow**: A two-way flow between parks with counts each way (Adventure Park 2,184, Water Park 1,327), average crossover time and utilisation of crossover entitlements. *(source: screens/P08-venue-back-office.yaml#BO-259 / contracts/spine/access.yaml#listEntryExitCrossover)*
+
 **Data it reads**: `listEntryExitCrossover` (onLoad, Entry, Exit, Re-entry & Crossover Analytics)
 
 **Where the user goes next**
@@ -954,6 +1276,32 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the entry exit re-entry are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Edge cases to draw
+
+- **Exits not scanned (free rotation exits)**: Temporary exits and final exits are shown as "not measured" for those gates rather than zero. *(source: contracts/spine/access.yaml#updateAdmissionRules)*
+
+#### Consistency with other screens
+
+- Match `BO-219`: Re-entry rules configured there explain the re-entry figures here.
+- Match `BO-220`: Same crossover event definitions.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+funnel: 18,421 first entries / 5,284 temporary exits / 3,842 re-entries / 1,104 crossovers / 17,921 final exits
+reEntry:
+  rate: 20.9%
+  averageTimeOutside: 1h 12m
+  topGate: Re-entry Gate 03
+  rejected: 61
+crossover:
+  summitToAqua: 2184
+  aquaToSummit: 1327
+  averageTime: 3h 40m
+```
 
 #### Permissions
 
@@ -993,6 +1341,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-254`.
 - [ ] Every gated control is gated: `REPORT_VIEW_VENUE`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 1 edge case(s) from the process notes are drawn.
+- [ ] The 2 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -1013,9 +1363,20 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | nothing: it opens on its own |
 | Route | `/access-venue/throughput-queue-validation-performance-analytics-bo-259` |
 
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** Gate efficiency: guests per minute and hour, average scan time and gate cycle, success, yellow, reject and manual intervention rates and downtime, per gate side by side, with bottleneck detection naming the likely reason (QR read failures, excessive manual verification, hardware latency, policy complexity, wrong guest routing) and queue analytics current, historical and forecast. The one thing to get right: an underperforming gate is flagged with its cause, not just a low number.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **The eight metric tiles are bound to no operation and there is no gate comparison table** Why: The read returns per-gate rows; tiles summarise the selection and the comparison is the pack's main table. *(source: screens/P08-venue-back-office.yaml#BO-259 / contracts/spine/access.yaml#listThroughputQueueValidation; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **Queue analytics (current, historical, forecast) has no field** Why: The read is per gate with no time series. *(source: screens/P08-venue-back-office.yaml#BO-260; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+
 #### Inputs: what the user enters or picks
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Period and gate group**: Today by default; compare gates within a gate group so like is compared with like. *(source: screens/P08-venue-back-office.yaml#BO-259 / designer default)*
 
 #### Outputs: what the screen shows and produces
 
@@ -1037,6 +1398,13 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Manual Intervention Rate** (metric tile)
 
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Gate KPIs**: Nine metric tiles for the selection (the screen is missing Downtime). *(source: screens/P08-venue-back-office.yaml#BO-259 / contracts/spine/access.yaml#listThroughputQueueValidation)*
+- **Gate comparison**: Table Gate, Guests/hr, Validation (s), Reject %, Intervention %, Downtime, with the underperforming gate highlighted and labelled "GATE 03 - UNDERPERFORMING" and its bottleneck reason in words. *(source: screens/P08-venue-back-office.yaml#BO-259 / contracts/spine/access.yaml#listThroughputQueueValidation)*
+- **Queue analytics**: Current, Historical and Forecast as three tabs on one chart of queue length by time. *(source: screens/P08-venue-back-office.yaml#BO-260)*
+- **AI recommendation**: "Gate 03 processes 39% fewer guests per minute than comparable gates. RFID read retries are the primary contributor", advisory (VO-R11). *(source: screens/P08-venue-back-office.yaml#BO-260)*
+
 **Data it reads**: `listThroughputQueueValidation` (onLoad, Throughput, Queue & Validation Performance Analytics)
 
 **Where the user goes next**
@@ -1053,6 +1421,39 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the throughput queue validation are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Edge cases to draw
+
+- **Gate in Free flow or Drop arm for part of the period**: Validation figures exclude those minutes and the row notes "Free flow 10:00-10:40". *(source: contracts/spine/access.yaml#/components/schemas/AccessPointOperatingMode)*
+
+#### Consistency with other screens
+
+- Match `BO-231`: Board 9 queue and lane optimisation acts on the same throughput figures live.
+- Match `BO-203`: The 0.9-second validation target used by the hardware advisor is the same target.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+gates:
+- gate: Main Plaza Gate 1
+  guestsPerHour: 1482
+  validation: 0.39 s
+  reject: 1.2%
+  intervention: 0.8%
+- gate: Main Plaza Gate 2
+  guestsPerHour: 1391
+  validation: 0.42 s
+  reject: 1.4%
+  intervention: 1.1%
+- gate: Main Plaza Gate 3
+  guestsPerHour: 821
+  validation: 0.81 s
+  reject: 8.2%
+  intervention: 6.4%
+  flag: UNDERPERFORMING - QR read failures
+```
 
 #### Permissions
 
@@ -1095,6 +1496,8 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 - [ ] Every transition is wired: `BO-254`.
 - [ ] Every gated control is gated: `REPORT_VIEW_VENUE`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 1 edge case(s) from the process notes are drawn.
+- [ ] The 2 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -1116,6 +1519,13 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 | Route | `/access-venue/validation-outcome-rejection-analytics-bo-260` |
 
 **Known gaps.** **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** Why guests are denied or need intervention: the outcome split (Allowed, Operator review, Denied), the rejection reasons ranked with count and share, analysis by ten dimensions, and override correlation (482 Wrong visit date rejections, 281 overrides, 58.3%), with an AI root cause. The one thing to get right: a reason with a high override rate is shown as a likely configuration or business-process problem, not fraud.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **The screen has only a search and a filter; nothing draws the read** Why: Bind listValidationOutcomeRejection to the outcome bar and reasons table. *(source: contracts/spine/access.yaml#listValidationOutcomeRejection; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **rejectionReasons is an array of strings with no count, share or overrides per reason** Why: The ranked table and the override correlation need them per reason. *(source: screens/P08-venue-back-office.yaml#BO-261 / contracts/spine/access.yaml#/components/schemas/ValidationOutcomeRejectionAnalyticsView; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
 
 #### Inputs: what the user enters or picks
 
@@ -1141,7 +1551,21 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 | Credential type | text field | — | — | `listValidationOutcomeRejection` ?credentialType |
 | Time | text field | — | — | `listValidationOutcomeRejection` ?time |
 
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Analyse by and filters**: Venue, Gate, Product, Ticket type, Channel, Reseller, Operator, Device, Credential type, Time; date range default today. *(source: screens/P08-venue-back-office.yaml#BO-261 / contracts/spine/access.yaml#listValidationOutcomeRejection)*
+
 #### Outputs: what the screen shows and produces
+
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Outcome distribution**: A single stacked bar Allowed 96.8% green, Operator review 2.1% amber, Denied 1.1% red, with counts on hover. *(source: screens/P08-venue-back-office.yaml#BO-260)*
+- **Rejection reasons**: Ranked table Reason, Count, %, Overrides, Override rate, using the deny reason labels of VO-R06 (Wrong visit date, Already used, Wrong park, Anti-passback, Expired, Credential revoked, Other); a row with override rate above 50% carries "Likely configuration issue". *(source: screens/P08-venue-back-office.yaml#BO-260 / screens/P08-venue-back-office.yaml#BO-261)*
+- **AI root cause**: "72% of Wrong Visit Date overrides originate from tickets sold through Reseller X. Review the reseller's date-mapping configuration", advisory. *(source: screens/P08-venue-back-office.yaml#BO-261)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Open scans for a reason**: Opens the scan activity filtered to that reason and period. *(source: screens/P08-venue-back-office.yaml#BO-034)*
 
 **Data it reads**: `listValidationOutcomeRejection` (onLoad, Validation Outcome & Rejection Analytics)
 
@@ -1159,6 +1583,43 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the validation outcome rejection are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Consistency with other screens
+
+- Match `BO-227`: Reason labels come from the reason code manager; same words.
+- Match `BO-228`: Override counts equal the override audit for the period.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+distribution:
+  allowed: 96.8%
+  operatorReview: 2.1%
+  denied: 1.1%
+reasons:
+- reason: Wrong visit date
+  count: 482
+  share: 31%
+  overrides: 281
+  overrideRate: 58.3%
+- reason: Already used
+  count: 318
+  share: 20%
+- reason: Wrong park
+  count: 201
+  share: 13%
+- reason: Anti-passback
+  count: 184
+  share: 12%
+- reason: Expired
+  count: 129
+  share: 8%
+- reason: Credential revoked
+  count: 82
+  share: 5%
+```
 
 #### Permissions
 
@@ -1196,6 +1657,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-254`.
 - [ ] Every gated control is gated: `REPORT_VIEW_VENUE`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 2 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -1216,9 +1678,27 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | nothing: it opens on its own |
 | Route | `/access-venue/guest-dwell-time-length-of-stay-attraction-flow-bo-261` |
 
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** How guests use the venue, from access events: length of stay where entry and final exit exist (09:12 to 16:42 = 7h 30m), average and median stay, peak arrival and departure, zone dwell time, attraction visits, Fast Pass use and re-entry behaviour; a guest flow (main entrance > adventure zone > coaster > F&B > water zone > exit); per-attraction figures (Falcon Coaster - 5,842 unique guests, 6,211 validations, 1,827 Fast Pass, 369 repeat visits, peak 14:00-15:00). The one thing to get right: pseudonymised, aggregated figures with their coverage stated, never individual guest tracking on this screen.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **Seven tiles drawn with no operation bound** Why: Bind listGuestDwellTime. *(source: screens/P08-venue-back-office.yaml#BO-261 / contracts/spine/access.yaml#listGuestDwellTime; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **The read returns one set of totals - no per-attraction rows, no flow between areas, no coverage figure** Why: The pack's attraction analytics and guest flow cannot be drawn; coverage is needed to read stay figures honestly. *(source: screens/P08-venue-back-office.yaml#BO-261 / contracts/spine/access.yaml#listGuestDwellTime; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **The pack's flow includes F&B, which is not an access event** Why: An F&B step needs POS events (cross-process); without them the flow shows access points only. *(source: screens/P08-venue-back-office.yaml#BO-261; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+
+#### Decided on this screen
+
+Answered questions: draw the decision, not the old default. Where a decision and the tables below differ, the decision wins.
+
+- **Should the guest flow use F&B and retail transactions as flow steps?** → Drawn default accepted: Access points only; F&B shown greyed "Needs POS data". *(decided by Chinmay, 2026-10-02; DEC-264 / CHG-NOTE-008)* **Reviewable:** a default the lead may still overrule before the block is tasked.
+
 #### Inputs: what the user enters or picks
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Date range / venue / zone**: Default yesterday (a complete day); filters by park and zone. *(source: designer default)*
 
 #### Outputs: what the screen shows and produces
 
@@ -1238,6 +1718,12 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Fast Pass Usage** (metric tile)
 
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Stay KPIs**: Average and median length of stay (h:mm), peak arrival and departure (hour bands), zone dwell time; each with "based on 62% of guests with a final exit scan". *(source: screens/P08-venue-back-office.yaml#BO-261 / contracts/spine/access.yaml#listGuestDwellTime)*
+- **Guest flow**: A flow (Sankey) between areas in visit order, widths by guest count. *(source: screens/P08-venue-back-office.yaml#BO-261)*
+- **Attraction analytics**: Per attraction - unique guests, total validations, Fast Pass, repeat visits, peak hour; sortable. *(source: screens/P08-venue-back-office.yaml#BO-261)*
+
 **Data it reads**: `listGuestDwellTime` (onLoad, Guest Dwell Time, Length of Stay & Attraction Flow)
 
 **Where the user goes next**
@@ -1254,6 +1740,35 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the guest dwell time are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Edge cases to draw
+
+- **Exits not scanned (free rotation) or guests leaving through an unscanned exit**: Length of stay is computed only for guests with a final exit; the coverage is always shown. *(source: screens/P08-venue-back-office.yaml#BO-261 / contracts/spine/access.yaml#/components/schemas/AdmissionRules)*
+- **Request for one named guest's movements**: Not on this screen; individual history is in the ticket investigation console (BO-226) for permitted roles. *(source: screens/P08-venue-back-office.yaml#BO-262)*
+
+#### Consistency with other screens
+
+- Match `BO-258`: Re-entry behaviour uses the same re-entry counts.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+kpis:
+  averageStay: 6h 10m
+  medianStay: 5h 45m
+  peakArrival: 09:30-10:30
+  peakDeparture: 16:30-17:30
+  coverage: 62% of guests
+attraction:
+  name: Falcon Coaster
+  uniqueGuests: 5842
+  validations: 6211
+  fastPass: 1827
+  repeatVisits: 369
+  peak: 14:00-15:00
+```
 
 #### Permissions
 
@@ -1291,6 +1806,9 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-254`.
 - [ ] Every gated control is gated: `REPORT_VIEW_VENUE`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 2 edge case(s) from the process notes are drawn.
+- [ ] The 3 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
+- [ ] The 1 decision(s) taken on this screen are drawn as decided, not as the old default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -1312,6 +1830,13 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Route | `/access-venue/access-reports-scheduled-reporting-data-export-bo-262` |
 
 **Known gaps.** **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+
+**From the Finance, Ledger & Tax · Reporting & Analytics process.** Access-control reports (entries, exits, denials, in-park count, length of stay by gate and time) run now, scheduled, or exported. In-park is entries minus exits; length of stay is the time between a guest's scans.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **Two sources of access schedules: the access contract's own "scheduled reporting" list and the reporting schedules.** Why: A schedule created in one will not show in the other. *(source: contracts/spine/access.yaml#listAccessReportScheduled / contracts/satellite/reporting.yaml#listReportSchedules; Finance, Ledger & Tax · Reporting & Analytics)*
+- **BO-262 duplicates the reporting area's scheduler and export centre.** Why: DI-721. *(source: DI-721 / screens/P16-venue-analytics.yaml#ANL-045; Finance, Ledger & Tax · Reporting & Analytics)*
 
 #### Inputs: what the user enters or picks
 
@@ -1340,7 +1865,15 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Category | select | — | Sales · Admission · Financial · Inventory · Guest · Operations · Marketing · Workforce · Compliance · Custom | `listReports` ?category |
 | Search | text field | — | — | `listReports` ?search |
 
+**Rules for these inputs** (from the Finance, Ledger & Tax · Reporting & Analytics process; these refine the tables above and win where they differ)
+
+- **filters**: Venue, zone, gate or access point, event, date range (bounded by the report's maximum range), outcome. *(source: MATRIX 3.2.65 / MATRIX 6.1.19)*
+
 #### Outputs: what the screen shows and produces
+
+**Rules for what is shown** (from the Finance, Ledger & Tax · Reporting & Analytics process; these refine the tables above and win where they differ)
+
+- **report list**: Access reports only (category access); each with Run now, Schedule, Export. *(source: contracts/satellite/reporting.yaml#listReports)*
 
 **Data it reads**: `listAccessReportScheduled` (onLoad, Access Reports, Scheduled Reporting & Data Export); `listReportSchedules` (onLoad, The scheduled access reports); `listReports` (onLoad, The access reports to run or schedule)
 
@@ -1359,6 +1892,25 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Invalid cadence (a field its frequency needs is missing, or one it does not take is sent, audit R158), or no recipients; 400 Required parameter missing, or the date range exceeds `maxDateRangeDays` (366 days when the definition sets none, audit R158) |
+
+#### Edge cases to draw
+
+- **a range longer than the report allows**: The date picker stops at the limit and says so. *(source: MATRIX 6.1.19)*
+- **guest-level rows (names, photos)**: Hidden unless the user may export personal data; the export is audited. *(source: contracts/shared/permissions.yaml#/components/schemas/Permission)*
+
+#### Consistency with other screens
+
+- Match `P16 ANL-031 Report Catalogue, ANL-042 Report Scheduler, ANL-045 Export & Download Center`: Access reports are definitions in the one catalogue; this screen is the same list filtered to access.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+- Entries by gate, hourly · Aquaventure · Gate 2 · 30 Sep 10:00–11:00 · 1,284 entries, 41 denied (expired 22, wrong
+  date 19)
+- In-park now · 6,912 (entries 9,140 − exits 2,228)
+```
 
 #### Permissions
 
@@ -1414,6 +1966,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-254`.
 - [ ] Every gated control is gated: `REPORT_SCHEDULE`, `REPORT_VIEW_VENUE`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 2 edge case(s) from the process notes are drawn.
+- [ ] The 2 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -1434,9 +1988,22 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | nothing: it opens on its own |
 | Route | `/access-venue/ai-access-intelligence-forecasting-executive-insights-bo-263` |
 
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** The intelligence screen of the access module: Ask TICVAI in plain language ("Why was Main Entrance slow yesterday 10-11?" - throughput down 22%, Gate 04 offline 18 minutes, QR retries at Gate 07, two school groups of 286 within 12 minutes); forecasts for tomorrow (attendance 28,400, peak arrival 09:40-10:30, recommended entry lanes 14 vs 10 planned); a recommendation; what-if scenarios (attendance 35,000); and executive insights. AI analyses, explains, forecasts and recommends; people act through the normal permissions. The one thing to get right: every forecast and recommendation shows its basis and is accepted or rejected by a person.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **The eight forecast metrics drawn as data table columns; field name "tomorrowSAttendance"** Why: They are tiles of one forecast (VO-R02); the label is "Tomorrow's attendance". *(source: screens/P08-venue-back-office.yaml#BO-263 / contracts/spine/access.yaml#listAccessExecutiveInsight; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **Ask TICVAI, scenario planning and recommendation decisions are not bound; aiRecommendation is one string without its basis** Why: The platform already offers askReportingQuestion, createForecastScenario and decideAiInsight; a recommendation must carry its reasons (VO-R11). *(source: contracts/satellite/reporting.yaml#askReportingQuestion / contracts/satellite/ai.yaml#createForecastScenario / contracts/satellite/ai.yaml#decideAiInsight; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **Navigation has no return edge to BO-254** Why: Board screens return to their command centre (VO-R13). *(source: screens/P08-venue-back-office.yaml#BO-263; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+
 #### Inputs: what the user enters or picks
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Ask TICVAI**: A question box with suggested questions; answers cite the figures and time ranges they used. *(source: screens/P08-venue-back-office.yaml#BO-263 / contracts/satellite/reporting.yaml#askReportingQuestion)*
+- **Scenario**: "What if attendance reaches [35,000]" (and date); returns gate requirements, throughput, occupancy risk, queue duration, device utilisation. *(source: screens/P08-venue-back-office.yaml#BO-263 / contracts/satellite/ai.yaml#createForecastScenario)*
 
 #### Outputs: what the screen shows and produces
 
@@ -1468,6 +2035,16 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Group arrival pressure | text | Group Arrival Pressure |
 | Re entry demand | text | Re-entry Demand |
 
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Tomorrow forecast**: Tiles for expected attendance, peak arrival and exit times, venue and zone occupancy, gate demand, group arrival pressure, re-entry demand, device capacity; "Recommended entry lanes 14 - currently planned 10" as a gap. *(source: screens/P08-venue-back-office.yaml#BO-263 / contracts/spine/access.yaml#listAccessExecutiveInsight)*
+- **Recommendation**: "Open four more standard lanes 09:30-10:45 and give Group Gate 02 to B2B arrivals 10:00-10:30" with its reasons, Accept / Reject; accepting opens BO-230 prefilled, nothing changes by itself. *(source: screens/P08-venue-back-office.yaml#BO-263)*
+- **Executive insights**: Attendance vs forecast, guest flow efficiency, gate efficiency, access failure rate, security impact, venue utilisation, operational recommendations - tiles with trend. *(source: screens/P08-venue-back-office.yaml#BO-263)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Accept / Reject recommendation**: Records the decision (a rejection with a reason is the false-alarm signal); accepted actions go through the normal screens and permissions. *(source: contracts/satellite/ai.yaml#decideAiInsight)*
+
 **Data it reads**: `listAccessExecutiveInsight` (onLoad, AI Access Intelligence, Forecasting & Executive Insights)
 
 #### States
@@ -1480,6 +2057,27 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the access intelligence forecasting are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Consistency with other screens
+
+- Match `ANL-052`: Ask TICVAI in analytics (cross-process) is the same natural-language capability; board 12 must not become a second BI module.
+- Match `BO-253`: Security impact figures come from security analytics.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+forecast:
+  date: Sat 3 Oct 2026
+  attendance: 28400
+  peakArrival: 09:40-10:30
+  peakExit: 17:00-18:00
+  recommendedLanes: 14
+  planned: 10
+answer: 'Throughput fell 22%: Main Plaza Gate 4 offline 18 min, elevated QR retries at Gate 7, and two school groups
+  (286 guests) arrived within 12 minutes.'
+```
 
 #### Permissions
 
@@ -1521,6 +2119,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] No transition is declared; back returns where the user came from.
 - [ ] Every gated control is gated: `REPORT_VIEW_VENUE`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 3 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---

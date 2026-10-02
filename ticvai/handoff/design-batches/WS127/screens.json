@@ -48,8 +48,8 @@
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
-  "purpose": "Provide management with a consolidated backend view of the financial, commercial, sponsorship, attendance and operational performance of events.",
-  "purposeNote": "Authorized users can obtain a consolidated view of event commercial and operational performance while data visibility remains controlled by tenant, entity and role permissions.",
+  "purpose": "See the halls, rooms and areas events can occupy, with their capacity, and open one to configure it.",
+  "purposeNote": "Authorized users can obtain a consolidated view of event commercial and operational performance while data visibility remains controlled by tenant, entity and role permissions. Purpose rewritten 2 October 2026 (CHG-WIR-026): The purpose was pack text attached by page rather than by screen and does not describe this screen; it is rewritten from the screen's name and operations (design-notes correction ticketing-backoffice BO-700)",
   "gaps": [
    {
     "operation": null,
@@ -160,8 +160,8 @@
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
-  "purpose": "Configure the financial plan and budget against which event performance will be measured.",
-  "purposeNote": "Administrators can create an event-level financial plan and compare budget, commitments, actuals and forecasts using data referenced from the shared Finance services.",
+  "purpose": "Define a space an event can occupy: its name, capacity and layout.",
+  "purposeNote": "Administrators can create an event-level financial plan and compare budget, commitments, actuals and forecasts using data referenced from the shared Finance services. Purpose rewritten 2 October 2026 (CHG-WIR-026): The purpose was pack text attached by page rather than by screen and does not describe this screen; it is rewritten from the screen's name and operations (design-notes correction ticketing-backoffice BO-701)",
   "gaps": [
    {
     "operation": null,
@@ -193,6 +193,13 @@
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
        "impliedBy": "setSpace"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Halls, rooms and areas an event can occupy",
+       "bindsTo": "Space",
+       "operation": "listSpaces",
+       "provenance": "contract catalogue.yaml GET /spaces; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -215,6 +222,13 @@
     "invalidates": [
      "listSpaces"
     ]
+   },
+   {
+    "operationId": "listSpaces",
+    "contract": "catalogue",
+    "purpose": "Halls, rooms and areas an event can occupy",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {
@@ -223,6 +237,7 @@
    "workshopBoard": "wireframes/WS50 Event Management Configuration Backend Structure v1.0 Board 3.dc.html#bo-701"
   },
   "apisNote": "Regenerated 9 September 2026 from Event_Management_Configuration_Backend_Structure_v1.0.pdf page 82. 0 of 0 labels bound to a contract property; 0 of 41 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {},
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -283,8 +298,8 @@
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
-  "purpose": "Allow authorized administrators to use AI to accelerate creation of event configuration from natural-language instructions or existing templates.",
-  "purposeNote": "AI can accelerate event setup while every proposed configuration remains reviewable, editable, permission-controlled and subject to normal approval workflows.",
+  "purpose": "Set the access rules of a space: who may enter it and when.",
+  "purposeNote": "AI can accelerate event setup while every proposed configuration remains reviewable, editable, permission-controlled and subject to normal approval workflows. Purpose rewritten 2 October 2026 (CHG-WIR-026): The purpose was pack text attached by page rather than by screen and does not describe this screen; it is rewritten from the screen's name and operations (design-notes correction ticketing-backoffice BO-702)",
   "gaps": [
    {
     "operation": null,
@@ -309,6 +324,13 @@
        "bindsTo": null,
        "operation": null,
        "provenance": "pack Event_Management_Configuration_Backend_Structure_v1.0.pdf, page 85 §Display"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Halls, rooms and areas an event can occupy",
+       "bindsTo": "Space",
+       "operation": "listSpaces",
+       "provenance": "contract catalogue.yaml GET /spaces; wiring fix, 2 October 2026"
       }
      ]
     },
@@ -348,6 +370,13 @@
     "invalidates": [
      "listSpaces"
     ]
+   },
+   {
+    "operationId": "listSpaces",
+    "contract": "catalogue",
+    "purpose": "Halls, rooms and areas an event can occupy",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "entryState": {

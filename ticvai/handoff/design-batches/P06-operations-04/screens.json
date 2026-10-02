@@ -33,7 +33,7 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-035 holds none of them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-035 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
@@ -278,7 +278,7 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-036 holds none of them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-036 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
@@ -480,7 +480,7 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-037 holds none of them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-037 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
@@ -535,10 +535,10 @@
        "provenance": "contract workforce.yaml GET /announcements"
       },
       {
-       "kind": "publishGate",
-       "impliedBy": "publishAnnouncement",
-       "notes": "Declares `publishAnnouncement`. **The gate names what the publish will affect before it happens** — a disabled Publish with no reason is the state operators escalate.\n",
-       "provenance": "carried from the previous definition"
+       "kind": "dataTable",
+       "label": "Action required",
+       "operation": "listApprovalRequests",
+       "provenance": "contract approvals.yaml GET /approval-requests; wiring fix, 2 October 2026"
       }
      ]
     },
@@ -594,12 +594,6 @@
        "provenance": "contract workforce.yaml POST /announcements/{announcementId}/acknowledge"
       },
       {
-       "kind": "secondaryButton",
-       "label": "Publish announcement",
-       "operation": "publishAnnouncement",
-       "provenance": "contract workforce.yaml POST /announcements"
-      },
-      {
        "kind": "publishGate",
        "label": "What publishing changes",
        "notes": "**Names what goes live, where, and from when.** A publish with no stated consequence is one somebody presses meaning to save.",
@@ -640,15 +634,6 @@
     "trigger": "onAction"
    },
    {
-    "operationId": "publishAnnouncement",
-    "contract": "workforce",
-    "purpose": "Tell staff something",
-    "trigger": "onAction",
-    "invalidates": [
-     "listAnnouncements"
-    ]
-   },
-   {
     "operationId": "listStaffConversations",
     "contract": "workforce",
     "purpose": "My conversations with colleagues, unread first",
@@ -675,6 +660,13 @@
     "purpose": "Mark a conversation read",
     "trigger": "onAction",
     "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "listApprovalRequests",
+    "contract": "approvals",
+    "purpose": "Approvals waiting on me, for the Action required tab",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-001)"
    }
   ],
   "entryState": {
@@ -703,35 +695,12 @@
    "board": "wireframes/P06 Venue Staff App.dc.html#emp-037"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
-  "overlays": [
+  "gaps": [
    {
-    "id": "formPublishAnnouncement",
-    "component": "modal",
-    "trigger": "Publish announcement",
-    "body": "**Collects what `publishAnnouncement` sends before it is called.** Required: `title`, `body`, `kind`, `publishedAt`. Optional: `id`, `venueIds`, `departmentIds`, `roleIds`, `requiresAcknowledgement`, `expiresAt`, `publishedByPrincipalId`, `locale`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "Announcement",
-    "confirm": {
-     "label": "Publish announcement",
-     "operation": "publishAnnouncement"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "title",
-      "body",
-      "kind",
-      "publishedAt",
-      "id",
-      "venueIds",
-      "departmentIds",
-      "roleIds",
-      "requiresAcknowledgement",
-      "expiresAt",
-      "publishedByPrincipalId",
-      "locale"
-     ]
-    },
-    "provenance": "contract workforce.yaml POST /announcements"
+    "operation": "publishAnnouncement",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): The inbox is where staff read; publishing belongs to EMP-038 (and BO-066 on the back office). F14 routes a manager's mobile approval of a discount here and DI-229 asks for action-required items, so the approvals read is added; without it the Action required tab is empty except for acknowledgements (F14 step 3; design-notes correction venue-operations EMP-037).",
+    "source": "screens/P06-staff-app.yaml#EMP-037 | contracts/satellite/workforce.yaml#publishAnnouncement | F14 step 3 | DI-229"
    }
   ],
   "_platform": {
@@ -783,7 +752,7 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-039 holds none of them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-039 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
@@ -836,12 +805,6 @@
        ],
        "operation": "listAnnouncements",
        "provenance": "contract workforce.yaml GET /announcements"
-      },
-      {
-       "kind": "publishGate",
-       "impliedBy": "publishAnnouncement",
-       "notes": "Declares `publishAnnouncement`. **The gate names what the publish will affect before it happens** — a disabled Publish with no reason is the state operators escalate.\n",
-       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -869,20 +832,6 @@
        ],
        "operation": "listAnnouncements",
        "provenance": "contract workforce.yaml GET /announcements"
-      },
-      {
-       "kind": "detailPanel",
-       "label": "The announcement reach",
-       "bindsTo": "AnnouncementReach",
-       "columns": [
-        "AnnouncementReach.announcementId",
-        "AnnouncementReach.targeted",
-        "AnnouncementReach.delivered",
-        "AnnouncementReach.acknowledged",
-        "AnnouncementReach.outstanding"
-       ],
-       "operation": "getAnnouncementReach",
-       "provenance": "contract workforce.yaml GET /announcements/{announcementId}/reach"
       }
      ]
     },
@@ -895,12 +844,6 @@
        "label": "Acknowledge announcement",
        "operation": "acknowledgeAnnouncement",
        "provenance": "contract workforce.yaml POST /announcements/{announcementId}/acknowledge"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Publish announcement",
-       "operation": "publishAnnouncement",
-       "provenance": "contract workforce.yaml POST /announcements"
       },
       {
        "kind": "publishGate",
@@ -935,21 +878,6 @@
     "invalidates": [
      "listAnnouncements"
     ]
-   },
-   {
-    "operationId": "getAnnouncementReach",
-    "contract": "workforce",
-    "purpose": "Who has acknowledged, and who has not",
-    "trigger": "onAction"
-   },
-   {
-    "operationId": "publishAnnouncement",
-    "contract": "workforce",
-    "purpose": "Tell staff something",
-    "trigger": "onAction",
-    "invalidates": [
-     "listAnnouncements"
-    ]
    }
   ],
   "entryState": {
@@ -974,35 +902,18 @@
    "board": "wireframes/P06 Venue Staff App.dc.html#emp-039"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
-  "overlays": [
+  "gaps": [
    {
-    "id": "formPublishAnnouncement",
-    "component": "modal",
-    "trigger": "Publish announcement",
-    "body": "**Collects what `publishAnnouncement` sends before it is called.** Required: `title`, `body`, `kind`, `publishedAt`. Optional: `id`, `venueIds`, `departmentIds`, `roleIds`, `requiresAcknowledgement`, `expiresAt`, `publishedByPrincipalId`, `locale`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "Announcement",
-    "confirm": {
-     "label": "Publish announcement",
-     "operation": "publishAnnouncement"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "title",
-      "body",
-      "kind",
-      "publishedAt",
-      "id",
-      "venueIds",
-      "departmentIds",
-      "roleIds",
-      "requiresAcknowledgement",
-      "expiresAt",
-      "publishedByPrincipalId",
-      "locale"
-     ]
-    },
-    "provenance": "contract workforce.yaml POST /announcements"
+    "operation": "getAnnouncementReach",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): Staff read here: publishing is EMP-038 and BO-066, and the reach roll call is for the publisher and supervisors, not for every reader (design-notes correction venue-operations EMP-039).",
+    "source": "screens/P06-staff-app.yaml#EMP-039 | contracts/satellite/workforce.yaml#getAnnouncementReach"
+   },
+   {
+    "operation": "publishAnnouncement",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): Staff read here: publishing is EMP-038 and BO-066, and the reach roll call is for the publisher and supervisors, not for every reader (design-notes correction venue-operations EMP-039).",
+    "source": "screens/P06-staff-app.yaml#EMP-039 | contracts/satellite/workforce.yaml#getAnnouncementReach"
    }
   ],
   "_platform": {
@@ -1047,14 +958,15 @@
    ],
    "inferred": false,
    "entryFrom": [
-    "EMP-003"
+    "EMP-003",
+    "EMP-027"
    ],
    "notes": "**Reached from EMP-003** — the screen the device sits on between tasks. Stated on 4 September: this screen exited to the hubs and nothing exited to it, so it was outside the navigation graph entirely.",
    "transitions": [
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-038 holds none of them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-038 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
@@ -1169,12 +1081,6 @@
        "notes": "Kind `emergency` needs ANNOUNCEMENT_EMERGENCY, not ANNOUNCEMENT_PUBLISH; without it the emergency kind is not offered and a publish is refused 403 `emergency-permission-required` (decided 28 September, audit R091 (1))."
       },
       {
-       "kind": "secondaryButton",
-       "label": "Acknowledge announcement",
-       "operation": "acknowledgeAnnouncement",
-       "provenance": "contract workforce.yaml POST /announcements/{announcementId}/acknowledge"
-      },
-      {
        "kind": "publishGate",
        "label": "What publishing changes",
        "notes": "**Names what goes live, where, and from when.** A publish with no stated consequence is one somebody presses meaning to save.",
@@ -1190,7 +1096,7 @@
    "emptyFirstRun": "No broadcast team yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
    "emptyNoResults": "Nothing matches the filter on unacknowledgedOnly and the broadcast team are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Shown when the caller lacks `WORKFORCE_VIEW`, which `getAnnouncementReach` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "Queues, and states that it has not gone yet"
+   "offline": "Refused offline: a broadcast needs the network. The draft stays on the device and the screen says it has not gone."
   },
   "apis": [
    {
@@ -1207,15 +1113,6 @@
     "contract": "workforce",
     "purpose": "Who has acknowledged, and who has not",
     "trigger": "onAction"
-   },
-   {
-    "operationId": "acknowledgeAnnouncement",
-    "contract": "workforce",
-    "purpose": "Confirm you have read it",
-    "trigger": "onAction",
-    "invalidates": [
-     "listAnnouncements"
-    ]
    },
    {
     "operationId": "listAnnouncements",
@@ -1277,6 +1174,14 @@
     "provenance": "contract workforce.yaml POST /announcements"
    }
   ],
+  "gaps": [
+   {
+    "operation": "acknowledgeAnnouncement",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): Acknowledging is the recipient's act (EMP-039, EMP-037), not the sender's (design-notes correction venue-operations EMP-038).",
+    "source": "screens/P06-staff-app.yaml#EMP-038"
+   }
+  ],
   "_platform": {
    "code": "P06",
    "audience": "staff",
@@ -1328,7 +1233,7 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-040 holds none of them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-040 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
@@ -1459,7 +1364,7 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-041 holds none of them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-041 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
@@ -1651,7 +1556,7 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-042 holds none of them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-042 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
@@ -1689,7 +1594,6 @@
        "label": "Every MFA method",
        "bindsTo": "MfaMethod",
        "columns": [
-        "MfaMethod.id",
         "MfaMethod.kind",
         "MfaMethod.label",
         "MfaMethod.maskedTarget",
@@ -1706,12 +1610,10 @@
        "label": "Every SSO provider",
        "bindsTo": "SsoProvider",
        "columns": [
-        "SsoProvider.id",
         "SsoProvider.displayName",
         "SsoProvider.protocol",
         "SsoProvider.iconAssetRef",
-        "SsoProvider.isEnforced",
-        "SsoProvider.scopePath"
+        "SsoProvider.isEnforced"
        ],
        "operation": "listSsoProviders",
        "provenance": "contract identity.yaml GET /auth/sso/providers"
@@ -1948,7 +1850,7 @@
   "id": "EMP-043",
   "name": "Device settings",
   "module": "Operations",
-  "requiresModule": "marketing",
+  "requiresModule": "core",
   "wave": 1,
   "capability": "C00",
   "implementation": {
@@ -1981,7 +1883,7 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-043 holds none of them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-043 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
@@ -2008,33 +1910,13 @@
      "slot": "collection",
      "components": [
       {
-       "kind": "textField",
-       "label": "Workstation id",
-       "operation": "listDevices",
-       "notes": "Sends `?workstationId=` to `listDevices`.",
-       "provenance": "contract tenancy.yaml GET /devices"
-      },
-      {
-       "kind": "textField",
-       "label": "Kind",
-       "operation": "listDevices",
-       "notes": "Sends `?kind=` to `listDevices`.",
-       "provenance": "contract tenancy.yaml GET /devices"
-      },
-      {
        "kind": "dataTable",
        "label": "Every registered device",
        "bindsTo": "RegisteredDevice",
        "columns": [
-        "RegisteredDevice.id",
         "RegisteredDevice.kind",
-        "RegisteredDevice.driver",
         "RegisteredDevice.identifier",
-        "RegisteredDevice.workstationId",
         "RegisteredDevice.model",
-        "RegisteredDevice.pushToken",
-        "RegisteredDevice.pushPlatform",
-        "RegisteredDevice.pushFailureCount",
         "RegisteredDevice.offlineScope",
         "RegisteredDevice.firmwareVersion",
         "RegisteredDevice.isRequired"
@@ -2141,7 +2023,7 @@
     "id": "formRegisterDevice",
     "component": "modal",
     "trigger": "Register device",
-    "body": "**Collects what `registerDevice` sends before it is called.** Required: `id`, `kind`, `driver`, `workstationId`. Optional: `identifier`, `model`, `pushToken`, `pushPlatform`, `pushFailureCount`, `offlineScope`, `firmwareVersion`, `isRequired`, `status`, `batteryPercent`, `lastCheckedAt`, `health` and 5 more. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Registers this handheld.** The device id is a UUIDv7 the app generates silently; status and timestamps are the server's, so none of them is a field (design-notes correction platform-foundation EMP-043).",
     "bindsTo": "RegisteredDevice",
     "confirm": {
      "label": "Register device",
@@ -2150,7 +2032,6 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "id",
       "kind",
       "driver",
       "workstationId",
@@ -2222,7 +2103,7 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-044 holds none of them. The edge carries nothing: EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-044 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",

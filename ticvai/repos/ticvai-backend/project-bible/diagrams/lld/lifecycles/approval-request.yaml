@@ -1,5 +1,5 @@
 id: LLD-Approval request
-title: Approval request — 21 transitions
+title: Approval request — 25 transitions
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/04-lifecycles.yaml
 source: states/approval-request.yaml
@@ -149,6 +149,27 @@ transitions:
   guard: Nobody answered after escalation
   emits:
   - approval.expired
+- from: pending
+  to: cancelled
+  operation: cancelApprovalRequest
+  trigger: operation
+  guard: An approvals administrator cancels a request whose subject went away, with a reason. Not a
+    rejection (design-notes correction on BO-380; CHG-CSP-043)
+- from: escalated
+  to: cancelled
+  operation: cancelApprovalRequest
+  trigger: operation
+  guard: Cancelled after escalation (CHG-CSP-043)
+- from: returned
+  to: cancelled
+  operation: cancelApprovalRequest
+  trigger: operation
+  guard: Cancelled while waiting on the requester (CHG-CSP-043)
+- from: informationRequested
+  to: cancelled
+  operation: cancelApprovalRequest
+  trigger: operation
+  guard: Cancelled while waiting on the requester's answer (CHG-CSP-043)
 - from: rejected
   to: pending
   operation: resubmitApprovalRequest
@@ -164,6 +185,12 @@ notes: 'No transition out of `approved` or `rejected`. **A completed approval is
   `withdrawn` and `expired` are deliberately distinct from `rejected`. One is the requester changing
   their mind, one is nobody answering, and only the third is an approver saying no. Collapsing them
   makes the rejection rate meaningless.
+
+
+  **Reopening an `expired` or `cancelled` request is not a transition of it** (design-notes correction
+  on BO-380; CHG-CSP-043): `reopenApprovalRequest` creates a new request at `pending` whose `reopenedFrom`
+  names the old one, which stays terminal as it was. `cancelApprovalRequest` is an administrator''s
+  cancellation of a request still waiting, and like a withdrawal it is never counted as a rejection.
 
 
   `returned` and `informationRequested` (decided 29 September, readiness close-out) are the Return and

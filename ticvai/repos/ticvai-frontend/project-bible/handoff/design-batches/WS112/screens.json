@@ -455,6 +455,13 @@
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
        "impliedBy": "setAccessProfile"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Access profiles",
+       "bindsTo": "AccessProfile",
+       "operation": "listAccessProfiles",
+       "provenance": "contract accreditation.yaml GET /accreditation-access-profiles; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -477,6 +484,13 @@
     "invalidates": [
      "listAccessProfiles"
     ]
+   },
+   {
+    "operationId": "listAccessProfiles",
+    "contract": "accreditation",
+    "purpose": "The access profiles and their zones",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-001)"
    }
   ],
   "wireframe": {
@@ -485,6 +499,7 @@
    "workshopBoard": "wireframes/WS05 ACCREDITATION Board 5.dc.html#bo-656"
   },
   "apisNote": "Regenerated 9 September 2026 from ACCREDITATION.pdf page 39. 0 of 0 labels bound to a contract property; 0 of 20 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {},
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -577,6 +592,13 @@
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
        "impliedBy": "setAccessProfile"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Access profiles",
+       "bindsTo": "AccessProfile",
+       "operation": "listAccessProfiles",
+       "provenance": "contract accreditation.yaml GET /accreditation-access-profiles; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -599,6 +621,13 @@
     "invalidates": [
      "listAccessProfiles"
     ]
+   },
+   {
+    "operationId": "listAccessProfiles",
+    "contract": "accreditation",
+    "purpose": "The access profiles and their operational areas",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-001)"
    }
   ],
   "wireframe": {
@@ -607,6 +636,7 @@
    "workshopBoard": "wireframes/WS05 ACCREDITATION Board 5.dc.html#bo-657"
   },
   "apisNote": "Regenerated 9 September 2026 from ACCREDITATION.pdf page 40. 0 of 0 labels bound to a contract property; 0 of 21 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {},
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -699,6 +729,13 @@
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
        "impliedBy": "setAccessProfile"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Access profiles",
+       "bindsTo": "AccessProfile",
+       "operation": "listAccessProfiles",
+       "provenance": "contract accreditation.yaml GET /accreditation-access-profiles; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -721,6 +758,13 @@
     "invalidates": [
      "listAccessProfiles"
     ]
+   },
+   {
+    "operationId": "listAccessProfiles",
+    "contract": "accreditation",
+    "purpose": "The access profiles and their date and time rules",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-001)"
    }
   ],
   "wireframe": {
@@ -729,6 +773,7 @@
    "workshopBoard": "wireframes/WS05 ACCREDITATION Board 5.dc.html#bo-658"
   },
   "apisNote": "Regenerated 9 September 2026 from ACCREDITATION.pdf page 40. 0 of 0 labels bound to a contract property; 0 of 20 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {},
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -917,6 +962,11 @@
     "operation": null,
     "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
     "source": "pack ACCREDITATION.pdf, page 42 §The screen shall display"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-004): No read of HolderAccess (per holder or across holders); affects BO-660, BO-661, BO-668.",
+    "source": "contracts/satellite/accreditation.yaml#setHolderAccess"
    }
   ],
   "layout": {
@@ -942,6 +992,20 @@
        "bindsTo": null,
        "operation": null,
        "provenance": "pack ACCREDITATION.pdf, page 42 §The screen shall display"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Holders",
+       "bindsTo": "AccreditationHolder",
+       "operation": "listAccreditationHolders",
+       "provenance": "contract accreditation.yaml GET /accreditation-holders; wiring fix, 2 October 2026"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Access profiles",
+       "bindsTo": "AccessProfile",
+       "operation": "listAccessProfiles",
+       "provenance": "contract accreditation.yaml GET /accreditation-access-profiles; wiring fix, 2 October 2026"
       }
      ]
     },
@@ -987,6 +1051,20 @@
     "invalidates": [
      "getAccreditationHolder"
     ]
+   },
+   {
+    "operationId": "listAccreditationHolders",
+    "contract": "accreditation",
+    "purpose": "Holders to assign access to",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-001)"
+   },
+   {
+    "operationId": "listAccessProfiles",
+    "contract": "accreditation",
+    "purpose": "Profiles that can be assigned",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-001)"
    }
   ],
   "entryState": {

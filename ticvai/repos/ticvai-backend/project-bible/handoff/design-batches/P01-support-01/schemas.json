@@ -265,133 +265,6 @@
    "closed"
   ]
  },
- "ContentPage": {
-  "x-ticvai-persistence": "whitelabel.content_page",
-  "type": "object",
-  "required": [
-   "id",
-   "slug",
-   "title",
-   "body",
-   "status"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid",
-    "readOnly": true
-   },
-   "slug": {
-    "type": "string",
-    "pattern": "^[a-z0-9-]+$"
-   },
-   "title": {
-    "$ref": "#/components/schemas/LocalisedText"
-   },
-   "body": {
-    "$ref": "#/components/schemas/LocalisedRichText"
-   },
-   "isEnabled": {
-    "type": "boolean",
-    "default": true,
-    "description": "BL-005. **Enablement is not publication.** A published page that is disabled exists, keeps its URL and its history, and does not render — which is what a tenant wants when a section is seasonal.\n**Unpublishing loses the version; disabling does not.** Collapsing them means a venue turning off its water-park section for winter has to republish it every spring.\n"
-   },
-   "status": {
-    "allOf": [
-     {
-      "$ref": "#/components/schemas/ContentStatus"
-     }
-    ],
-    "readOnly": true,
-    "description": "Created as `draft`, published by `publishTenantConfig`, archived through `updateContentPage` (`states/content.yaml`)."
-   },
-   "iconAssetRef": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "categoryCode": {
-    "type": "string",
-    "nullable": true
-   },
-   "sortOrder": {
-    "type": "integer"
-   },
-   "isReferenced": {
-    "type": "boolean",
-    "readOnly": true,
-    "x-ticvai-derived": "onWrite",
-    "description": "True when navigation or the homepage links to this page. Blocks deletion. Maintained by `setNavigation` and `setHomepageLayout` in the same transaction as the links they write."
-   },
-   "scopePath": {
-    "type": "string",
-    "readOnly": true,
-    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `tenant` scope.**"
-   }
-  }
- },
- "ContentStatus": {
-  "type": "string",
-  "enum": [
-   "draft",
-   "published",
-   "archived"
-  ]
- },
- "FaqCategory": {
-  "x-ticvai-persistence": "whitelabel.faq_category + whitelabel.faq_entry",
-  "type": "object",
-  "required": [
-   "code",
-   "name",
-   "entries"
-  ],
-  "properties": {
-   "code": {
-    "type": "string"
-   },
-   "name": {
-    "$ref": "#/components/schemas/LocalisedText"
-   },
-   "sortOrder": {
-    "type": "integer"
-   },
-   "entries": {
-    "type": "array",
-    "items": {
-     "type": "object",
-     "required": [
-      "id",
-      "question",
-      "answer"
-     ],
-     "properties": {
-      "id": {
-       "type": "string",
-       "format": "uuid"
-      },
-      "question": {
-       "$ref": "#/components/schemas/LocalisedText"
-      },
-      "answer": {
-       "$ref": "#/components/schemas/LocalisedRichText"
-      },
-      "sortOrder": {
-       "type": "integer"
-      },
-      "isPublished": {
-       "type": "boolean"
-      }
-     }
-    }
-   },
-   "scopePath": {
-    "type": "string",
-    "readOnly": true,
-    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `tenant` scope.**"
-   }
-  }
- },
  "LocalisedRichText": {
   "x-ticvai-persistence": "none — jsonb column",
   "type": "object",
@@ -405,6 +278,126 @@
   "type": "object",
   "additionalProperties": {
    "type": "string"
+  }
+ },
+ "LostItem": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.lost_item",
+  "description": "BL-021. **Screens existed on three platforms and `lostAndFound` is a `ModuleKey`, and there was no item, no claim and no match between them** — which is the whole capability.\nGeneric case management holds a conversation about a lost bag. **It cannot tell you that the bag somebody handed in on Tuesday is the one somebody asked about on Monday**, and that match is the only thing the module is for.\n",
+  "required": [
+   "id",
+   "kind",
+   "foundOrLost",
+   "venueId",
+   "reportedAt"
+  ],
+  "properties": {
+   "id": {
+    "readOnly": true,
+    "type": "string",
+    "format": "uuid"
+   },
+   "foundOrLost": {
+    "type": "string",
+    "enum": [
+     "lost",
+     "found"
+    ],
+    "description": "**One entity, two directions.** A guest reports a loss and a steward reports a find, and modelling them separately means matching across two tables that drift.\n"
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "bag",
+     "phone",
+     "wallet",
+     "keys",
+     "clothing",
+     "jewellery",
+     "documents",
+     "toy",
+     "buggy",
+     "other"
+    ]
+   },
+   "description": {
+    "type": "string"
+   },
+   "colour": {
+    "type": "string",
+    "nullable": true
+   },
+   "brand": {
+    "type": "string",
+    "nullable": true
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "lastSeenPointId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "A point on the venue map. **Where a guest thinks they lost it is the strongest signal for a match**, and it is also the thing they are least sure about.\n"
+   },
+   "reportedAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "**Device time** — `recordLostItem` is offline-capable, so this is when the loss was reported or the find handed in, not when the device synced. The `recorded_at` of naming-and-style 5.2 for this row.\n"
+   },
+   "syncedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true,
+    "description": "Server time the record arrived. Equal to `reportedAt` for one recorded online."
+   },
+   "reportedBySubjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "storageLocation": {
+    "type": "string",
+    "nullable": true
+   },
+   "status": {
+    "readOnly": true,
+    "type": "string",
+    "enum": [
+     "open",
+     "matched",
+     "claimed",
+     "disposed",
+     "returned"
+    ]
+   },
+   "photoAssetIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "matchedItemId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The other side of the match — set by `matchLostItem` `match` (to `otherItemId`) and cleared by `unmatch`, on both items."
+   },
+   "caseId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The case the guest raised about it (`raiseMyCase` with `kind` `lostProperty`), where there is one."
+   },
+   "disposeAfter": {
+    "type": "string",
+    "format": "date",
+    "nullable": true,
+    "description": "**A retention date, because unclaimed property has one.** A storeroom with no disposal date is a storeroom that fills, and the date is a venue policy rather than a default.\n"
+   }
   }
  },
  "MessageChannel": {
@@ -452,6 +445,139 @@
    },
    "hasMore": {
     "type": "boolean"
+   }
+  }
+ },
+ "PolicyKind": {
+  "type": "string",
+  "enum": [
+   "privacy",
+   "termsAndConditions",
+   "refund",
+   "cookie",
+   "accessibility"
+  ]
+ },
+ "PublishedContentPage": {
+  "x-ticvai-persistence": "none — a public projection of whitelabel.content_page",
+  "type": "object",
+  "x-ticvai-agreed": "2 October: decided by Chinmay, fix before Block A starts (GFIX-2)",
+  "description": "A live content page as a guest reads it (`listPublishedContentPages`). Only published and enabled pages exist in this view, so it carries no status.",
+  "required": [
+   "id",
+   "slug",
+   "title",
+   "body"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "slug": {
+    "type": "string",
+    "pattern": "^[a-z0-9-]+$"
+   },
+   "title": {
+    "$ref": "#/components/schemas/LocalisedText"
+   },
+   "body": {
+    "$ref": "#/components/schemas/LocalisedRichText"
+   },
+   "iconAssetRef": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "categoryCode": {
+    "type": "string",
+    "nullable": true
+   },
+   "sortOrder": {
+    "type": "integer"
+   }
+  }
+ },
+ "PublishedFaqCategory": {
+  "x-ticvai-persistence": "none — a public projection of whitelabel.faq_category + whitelabel.faq_entry",
+  "type": "object",
+  "x-ticvai-agreed": "2 October: decided by Chinmay, fix before Block A starts (GFIX-2)",
+  "description": "One FAQ category with its published entries only (`listPublishedFaqs`).",
+  "required": [
+   "code",
+   "name",
+   "entries"
+  ],
+  "properties": {
+   "code": {
+    "type": "string"
+   },
+   "name": {
+    "$ref": "#/components/schemas/LocalisedText"
+   },
+   "sortOrder": {
+    "type": "integer"
+   },
+   "entries": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "id",
+      "question",
+      "answer"
+     ],
+     "properties": {
+      "id": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "question": {
+       "$ref": "#/components/schemas/LocalisedText"
+      },
+      "answer": {
+       "$ref": "#/components/schemas/LocalisedRichText"
+      },
+      "sortOrder": {
+       "type": "integer"
+      }
+     }
+    }
+   }
+  }
+ },
+ "PublishedPolicy": {
+  "x-ticvai-persistence": "none — a public projection of whitelabel.policy",
+  "type": "object",
+  "x-ticvai-agreed": "2 October: decided by Chinmay, fix before Block A starts (GFIX-2)",
+  "description": "The current version of one policy as a guest reads it (`listPublishedPolicies`). Who published it and the partition key stay on `Policy`.",
+  "required": [
+   "kind",
+   "version",
+   "body",
+   "effectiveFrom"
+  ],
+  "properties": {
+   "kind": {
+    "$ref": "#/components/schemas/PolicyKind"
+   },
+   "title": {
+    "type": "string"
+   },
+   "version": {
+    "type": "string",
+    "description": "The version a consent records (a guest who consented to version 3 consented to version 3)."
+   },
+   "body": {
+    "$ref": "#/components/schemas/LocalisedRichText"
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "format": "date"
+   },
+   "requiresReconsent": {
+    "type": "boolean",
+    "description": "True when guests who consented to an earlier version are asked again on next launch."
    }
   }
  },

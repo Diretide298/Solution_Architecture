@@ -1,5 +1,5 @@
 id: LLD-payments
-title: payments — 48 operations
+title: payments — 49 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -65,6 +65,17 @@ operations:
   - payments.provider_connection
   writes:
   - payments.provider_connection
+- operation: getB2bPaymentTerms
+  verb: GET
+  path: /b2b-credit-accounts/{accountId}/terms
+  scope: tenant
+  permission: PAYMENT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - payments.payment_terms
+  writes: []
 - operation: getDunningPolicy
   verb: GET
   path: /dunning-policy

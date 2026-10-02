@@ -1,4 +1,13 @@
 {
+ "DeviceApprovalStatus": {
+  "type": "string",
+  "description": "Whether a registered device may go into production (DEC-241, DEC-245; CHG-CSP-011). The model is `states/registered-device-approval.yaml`.\n",
+  "enum": [
+   "pendingApproval",
+   "approved",
+   "rejected"
+  ]
+ },
  "DeviceCapability": {
   "type": "string",
   "description": "BL-179. **Something a driver reports, not something the platform provides.** The list grows as vendors are added, which is ADR-0015's whole position: adding a vendor is a driver plus configuration rather than a core change.\n**`genderClassification` is here because `VenueSettings.segregatedAccess. genderVerification` already offers `deviceAssisted` and nothing answered it** — a switch with no driver behind it. Where a venue's access hardware performs the check and the venue chooses to use it, the result is **advisory to the steward and never decisive at the turnstile** (`ValidationResult.advisory`). 3.2.45 asks for rejection; the package deviates deliberately and CF-130 records why.\n**Access's capabilities merged in** (ADR-0067, 1 October): `dynamicQr`, `rfid`, `nfc`, `facePass`, `offline` and `heightCheck` were the access register's own list, from the compatibility matrix.\n",
@@ -11,37 +20,6 @@
    "offline",
    "heightCheck"
   ]
- },
- "DeviceEnrolment": {
-  "x-ticvai-persistence": "platform.device",
-  "type": "object",
-  "description": "BL-160. **The body `enrolDevice` accepts, named so that it writes.**\nIt was an anonymous inline object, and `derive-lineage` reads writes from the schema an operation accepts — so the one operation that moves a device through its whole lifecycle recorded no writes at all, and `platform.device` looked like a table only `registerDevice` touched.\n**Provisioning is inside enrolment rather than beside it**, which is why `configurationProfileId` is here: a device that is enrolled but unprovisioned is a device that will fail at the gate on its first morning.\n",
-  "required": [
-   "state"
-  ],
-  "properties": {
-   "state": {
-    "type": "string",
-    "enum": [
-     "enrolled",
-     "provisioned",
-     "active",
-     "deactivated",
-     "retired"
-    ],
-    "description": "**The target state, not the current one.** `registered` is absent because `registerDevice` is what produces it and nothing transitions back to it.\n"
-   },
-   "configurationProfileId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "reason": {
-    "type": "string",
-    "nullable": true,
-    "description": "**Recorded on the `tenancy.device_audit` row, not on the device.** Required in practice for `deactivated` and `retired`, where an investigation six months later needs to know why a gate stopped working.\n"
-   }
-  }
  },
  "DeviceKind": {
   "type": "string",
@@ -72,6 +50,117 @@
    "bleBeacon"
   ],
   "description": "`mobileHandset` (18.1.5, added 29 September): a staff phone or tablet running the staff app, registered for push and bound to no workstation.\n**One kind vocabulary for every device** (ADR-0067, 1 October). `handheldScanner`, `accessPodium` and `bleBeacon` came from Access's register; the finer hardware type (a speed gate under `turnstileController`, a tablet under `handheldScanner`) is `RegisteredDevice.hardwareType` (common `DeviceHardwareType`).\n"
+ },
+ "GamePriceResolution": {
+  "type": "object",
+  "description": "Board 5.9. **What will this actually charge.**",
+  "properties": {
+   "gameId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "effectivePrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "appliedRule": {
+    "type": "string"
+   },
+   "trace": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "rule": {
+       "type": "string"
+      },
+      "applied": {
+       "type": "boolean"
+      },
+      "price": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "skippedBecause": {
+       "type": "string",
+       "nullable": true
+      }
+     }
+    }
+   }
+  }
+ },
+ "GameplayValidationRules": {
+  "type": "object",
+  "x-ticvai-persistence": "games.validation_rules",
+  "description": "Boards 4.2 and 4.3. **Must be an answer, stated once**, rather than whatever the firmware happens to do.\n",
+  "properties": {
+   "deductionOrder": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "entitlement",
+      "freePlay",
+      "bonusCredit",
+      "promotionalCredit",
+      "gameCredit",
+      "cashCredit",
+      "directPay"
+     ]
+    }
+   },
+   "checkOrder": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "cardValid",
+      "cardNotExpired",
+      "cardNotBlocked",
+      "restrictionsMet",
+      "retapWindow",
+      "entitlementAvailable",
+      "fundsSufficient"
+     ]
+    }
+   },
+   "allowPartialEntitlement": {
+    "type": "boolean",
+    "default": false,
+    "description": "**Whether an entitlement covering part of the price may be topped up with credit.** Usually no, because a guest who thinks they have a pass does not expect a charge.\n"
+   },
+   "refuseBelowBalance": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "offlineDecisionAllowed": {
+    "type": "boolean",
+    "default": true
+   },
+   "offlineMaximumValue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
  },
  "Reader": {
   "type": "object",
@@ -510,6 +599,50 @@
     "nullable": true,
     "readOnly": true,
     "description": "**The profile this device was provisioned with.** `enrolDevice` has accepted one since 16.1.3 and there was nowhere to keep it, so the answer to *\"what is this reader configured as\"* lived only in the request that set it.\n"
+   },
+   "approvalStatus": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/DeviceApprovalStatus"
+     }
+    ],
+    "default": "pendingApproval",
+    "readOnly": true,
+    "description": "**A new device waits for approval before it may go live** (decided 2 October 2026, Chinmay, critical set 1, BO-196: \"Secure enrolment code + pending approval\"; DEC-241; CHG-CSP-011; MoM 15 September, DI-892, DI-906). Every device registers `pendingApproval`. It may enrol and be provisioned and tested, but `enrolDevice` refuses `active` until `approveDevice` approves it (`409 device-approval-required`). A separate axis from `enrolmentState`, which keeps its r1 values; the model is `states/registered-device-approval.yaml`.\n"
+   },
+   "enrolmentCode": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "maxLength": 12,
+    "description": "**A one-time code the device must present to enrol** (DEC-241; CHG-CSP-011). Issued by `registerDevice` and returned once, in its response only; every later read returns null. The installer enters it on the device, and `enrolDevice` to `enrolled` must carry the same code before `enrolmentCodeExpiresAt` (`422 enrolment-code-invalid`). A device that never presents it never gets an identity, so a box plugged into the venue network cannot claim to be a reader.\n"
+   },
+   "enrolmentCodeExpiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "When the enrolment code stops working (24 hours after registration, proposed; client to correct)."
+   },
+   "testedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "Who recorded the device's acceptance test (`DeviceEnrolment.testResult` on the move to `provisioned`). The approver must be someone else (DEC-245).\n"
+   },
+   "approvedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**Who approved the device into production, never the person who tested it** (decided 2 October 2026, Chinmay, critical set 1, BO-203: \"Approver must differ from the tester\"; DEC-245; CHG-CSP-011). `approveDevice` refuses the tester with `403 approver-is-tester`.\n"
+   },
+   "approvedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
    }
   }
  }

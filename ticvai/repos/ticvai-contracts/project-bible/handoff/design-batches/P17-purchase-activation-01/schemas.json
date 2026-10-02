@@ -399,6 +399,105 @@
    }
   }
  },
+ "BillingEntity": {
+  "type": "object",
+  "x-ticvai-persistence": "control.billing_entity",
+  "description": "**The company TICVAI invoices for a tenant, with its trade licence and VAT certificate** (Chinmay, 2 October, workbook Q209: \"a new billing-entity record in the subscription contract\"; DI-830; CHG-CSA-030). One per tenant, mastered in the control plane. `legalName` and `countryCode` are required on save (400 otherwise); they are not marked required here so the record can ride, optional, on an onboarding application. **Documents** (workbook Q210, the default): a trade licence always; a VAT certificate when a `trn` is entered. Which documents a country requires is configurable per country (tenancy `RegionSettings`); the default is that rule.",
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "tenantId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "Null while it rides on an onboarding application."
+   },
+   "legalName": {
+    "type": "string",
+    "maxLength": 300
+   },
+   "tradeLicenceNumber": {
+    "type": "string",
+    "maxLength": 100,
+    "nullable": true
+   },
+   "trn": {
+    "type": "string",
+    "maxLength": 30,
+    "nullable": true,
+    "description": "The tax registration number; entering one makes the VAT certificate required."
+   },
+   "countryCode": {
+    "type": "string",
+    "minLength": 2,
+    "maxLength": 2
+   },
+   "address": {
+    "type": "string",
+    "maxLength": 1000,
+    "nullable": true
+   },
+   "invoiceEmail": {
+    "type": "string",
+    "format": "email",
+    "nullable": true
+   },
+   "documents": {
+    "x-ticvai-persistence-kind": "valueObject",
+    "x-ticvai-persistence-column": "jsonb",
+    "type": "array",
+    "description": "The trade licence and, where a TRN is entered, the VAT certificate, each a stored file with its verification.",
+    "items": {
+     "type": "object",
+     "properties": {
+      "documentType": {
+       "type": "string",
+       "enum": [
+        "tradeLicence",
+        "vatCertificate"
+       ]
+      },
+      "fileRef": {
+       "type": "string",
+       "nullable": true
+      },
+      "expiryDate": {
+       "type": "string",
+       "format": "date",
+       "nullable": true
+      },
+      "verificationStatus": {
+       "type": "string",
+       "enum": [
+        "missing",
+        "uploaded",
+        "verified",
+        "rejected",
+        "expired"
+       ]
+      }
+     }
+    }
+   },
+   "missingDocuments": {
+    "type": "array",
+    "readOnly": true,
+    "description": "The documents the country's rule requires that are not yet uploaded and verified.",
+    "items": {
+     "type": "string"
+    }
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
  "CellTier": {
   "type": "string",
   "enum": [
@@ -456,69 +555,75 @@
    }
   ]
  },
- "LegalEntity": {
-  "x-ticvai-persistence": "ledger.legal_entity",
+ "OnboardingApplication": {
   "type": "object",
-  "description": "Also the `createLegalEntity` body. **`id` and `scopePath` are server-owned** (`readOnly`) and ignored if sent.\n",
+  "x-ticvai-persistence": "control.onboarding_application",
+  "description": "BL-165. **`subscription` handles the operator-led path well and has no prospect-led one.** `createTenant` and `provisionCell` assume somebody at Softlabs decided this tenant exists.\nA prospect signing themselves up is a different shape: **nothing is provisioned until they are verified**, because an unverified application that provisions a cell is a cell somebody has to clean up.\n",
   "required": [
    "id",
-   "code",
-   "name",
-   "countryCode",
-   "currency",
-   "currencyScale",
-   "fiscalYearStartMonth"
+   "companyName",
+   "contactEmail",
+   "status"
   ],
   "properties": {
    "id": {
     "type": "string",
-    "format": "uuid",
-    "readOnly": true
+    "format": "uuid"
    },
-   "code": {
+   "companyName": {
+    "type": "string"
+   },
+   "contactEmail": {
     "type": "string",
-    "maxLength": 64
+    "format": "email"
    },
-   "name": {
-    "type": "string",
-    "maxLength": 200
-   },
-   "countryCode": {
-    "type": "string",
-    "pattern": "^[A-Z]{2}$"
-   },
-   "currency": {
-    "type": "string",
-    "pattern": "^[A-Z]{3}$"
-   },
-   "currencyScale": {
-    "type": "integer",
-    "minimum": 0,
-    "maximum": 4
-   },
-   "taxRegistrationNumber": {
+   "contactPhone": {
     "type": "string",
     "nullable": true
    },
-   "fiscalYearStartMonth": {
-    "type": "integer",
-    "minimum": 1,
-    "maximum": 12
+   "countryCode": {
+    "type": "string"
    },
-   "regionIds": {
-    "type": "array",
-    "items": {
-     "type": "string",
-     "format": "uuid"
-    }
-   },
-   "isActive": {
-    "type": "boolean"
-   },
-   "scopePath": {
+   "venueTypeTemplateId": {
     "type": "string",
-    "readOnly": true,
-    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `tenant` scope.**"
+    "format": "uuid",
+    "nullable": true,
+    "description": "**A water park and a theatre need different defaults**, and asking a prospect to configure 300 settings from empty is asking them to leave.\n"
+   },
+   "requestedPlanId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "submitted",
+     "verifying",
+     "approved",
+     "provisioning",
+     "active",
+     "rejected",
+     "abandoned"
+    ]
+   },
+   "trialEndsAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "**Trial is a state, not a plan.** A tenant on trial has the plan they will pay for and a date by which they must — modelling it as a separate plan means migrating them at conversion, which is the moment least worth adding risk to.\n"
+   },
+   "rejectionReason": {
+    "type": "string",
+    "nullable": true
+   },
+   "provisionedTenantId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "billingEntity": {
+    "$ref": "#/components/schemas/BillingEntity",
+    "description": "**The company to be invoiced, saved on the application before verification** (Chinmay, 2 October, workbook Q209 and Q223; CHG-CSA-030). Nothing is provisioned until the application is verified; on provisioning it becomes the tenant's billing entity (`getBillingEntity`)."
    }
   }
  },
@@ -908,65 +1013,6 @@
       "type": "boolean"
      }
     }
-   }
-  }
- },
- "TrialConfiguration": {
-  "type": "object",
-  "x-ticvai-persistence": "subscription.trial_config",
-  "description": "Board 5.5. **A trial that expires with no conversion path is a tenant full of real data nobody can bill.**\n",
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "tierCode": {
-    "type": "string",
-    "nullable": true
-   },
-   "durationDays": {
-    "type": "integer",
-    "default": 30
-   },
-   "includedModules": {
-    "type": "array",
-    "items": {
-     "type": "string"
-    }
-   },
-   "usageCaps": {
-    "type": "object",
-    "additionalProperties": {
-     "type": "integer"
-    }
-   },
-   "paymentMethodRequiredUpFront": {
-    "type": "boolean",
-    "default": false
-   },
-   "conversionOfferPercent": {
-    "type": "number",
-    "nullable": true
-   },
-   "noticeDaysBeforeExpiry": {
-    "type": "array",
-    "items": {
-     "type": "integer"
-    }
-   },
-   "onExpiry": {
-    "type": "string",
-    "enum": [
-     "suspend",
-     "convert",
-     "decommission"
-    ],
-    "default": "suspend",
-    "description": "**Suspension is the humane default.** Customers routinely let a trial lapse and come back a week later.\n"
-   },
-   "retainDataDays": {
-    "type": "integer",
-    "default": 90
    }
   }
  }

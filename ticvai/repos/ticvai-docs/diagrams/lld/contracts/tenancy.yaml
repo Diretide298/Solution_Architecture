@@ -1,10 +1,21 @@
 id: LLD-tenancy
-title: tenancy — 55 operations
+title: tenancy — 56 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: spine
 service: TenancyService
 operations:
+- operation: approveDevice
+  verb: POST
+  path: /devices/{deviceId}/approval
+  scope: venue
+  permission: DEVICE_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - platform.device
+  writes: []
 - operation: configureWorkstation
   verb: PUT
   path: /workstations/{workstationId}

@@ -37,6 +37,25 @@
   "requestBody": "PartnerApprovalStatusLifecycleManagementInput",
   "responds": "PartnerApprovalStatusLifecycleManagementView"
  },
+ "createMfaChallenge": {
+  "method": "POST",
+  "path": "/auth/mfa/challenge",
+  "contract": "identity",
+  "summary": "Second factor at staff sign-in, and step-up for a sensitive action",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
  "createPartnerUser": {
   "method": "POST",
   "path": "/partners/{partnerId}/users",
@@ -202,45 +221,6 @@
    },
    {
     "name": "risk",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- },
- "listPartnerAccessRole": {
-  "method": "GET",
-  "path": "/partner-access-role",
-  "contract": "subscription",
-  "summary": "Partner Access, Roles & Permission Profile",
-  "permission": "PLATFORM_TENANT_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": "partnerId",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "capability",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "grantType",
     "in": "query",
     "required": false
    },
@@ -434,55 +414,6 @@
   "requestBody": null,
   "responds": "Page"
  },
- "listTerritoryMarketDistribution": {
-  "method": "GET",
-  "path": "/territory-market-distribution",
-  "contract": "subscription",
-  "summary": "Territory, Market & Distribution Rights",
-  "permission": "PLATFORM_TENANT_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": "partnerId",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "country",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "market",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "distributionMethod",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "exclusivity",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- },
  "setPartnerBrandVenue": {
   "method": "PUT",
   "path": "/partner-brand-venue",
@@ -501,25 +432,6 @@
   ],
   "requestBody": "PartnerBrandVenueBusinessScopeAssignmentInput",
   "responds": "PartnerBrandVenueBusinessScopeAssignmentView"
- },
- "setPartnerCapabilityGrants": {
-  "method": "PUT",
-  "path": "/partners/{partnerId}/capability-grants",
-  "contract": "subscription",
-  "summary": "Replace the capability ceiling of a partner",
-  "permission": "PARTNER_MANAGE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": null
  },
  "setPartnerContact": {
   "method": "PUT",
@@ -540,25 +452,6 @@
   "requestBody": "PartnerContactInput",
   "responds": "PartnerContact"
  },
- "setPartnerDistributionRights": {
-  "method": "PUT",
-  "path": "/partners/{partnerId}/distribution-rights",
-  "contract": "subscription",
-  "summary": "Replace a partner's territory, market and distribution rights",
-  "permission": "PARTNER_MANAGE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": null
- },
  "setPartnerProfileOrganization": {
   "method": "PUT",
   "path": "/partner-profile-organization",
@@ -577,5 +470,24 @@
   ],
   "requestBody": "PartnerProfileOrganizationSetupInput",
   "responds": "PartnerProfileOrganizationSetupView"
+ },
+ "verifyMfaChallenge": {
+  "method": "POST",
+  "path": "/auth/mfa/challenge/{challengeId}/verify",
+  "contract": "identity",
+  "summary": "Complete a sign-in or step-up challenge",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
  }
 }

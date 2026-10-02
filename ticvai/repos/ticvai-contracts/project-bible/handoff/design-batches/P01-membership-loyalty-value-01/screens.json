@@ -57,40 +57,33 @@
      "slot": "collection",
      "components": [
       {
-       "kind": "dataTable",
-       "label": "Every wallet transaction",
+       "kind": "cardList",
+       "label": "Activity",
        "bindsTo": "WalletTransaction",
        "columns": [
-        "WalletTransaction.id",
         "WalletTransaction.kind",
         "WalletTransaction.amount",
         "WalletTransaction.balanceAfter",
-        "WalletTransaction.orderId",
-        "WalletTransaction.venueId",
         "WalletTransaction.reason",
-        "WalletTransaction.principalId",
         "WalletTransaction.recordedAt"
        ],
        "operation": "listWalletTransactions",
-       "provenance": "contract retail.yaml GET /wallets/{subjectId}/transactions"
+       "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)",
+       "notes": "Was the generated table 'Every wallet transaction'; staff and plumbing columns removed (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)). From `wallet.yaml` `listWalletTransactions`."
       },
       {
-       "kind": "dataTable",
-       "label": "Every payment token",
+       "kind": "cardList",
+       "label": "Saved cards",
        "bindsTo": "PaymentToken",
        "columns": [
-        "PaymentToken.id",
-        "PaymentToken.subjectId",
-        "PaymentToken.providerId",
-        "PaymentToken.token",
         "PaymentToken.method",
         "PaymentToken.maskedIdentifier",
         "PaymentToken.expiresAt",
-        "PaymentToken.isDefault",
-        "PaymentToken.consentPurposeId"
+        "PaymentToken.isDefault"
        ],
        "operation": "listPaymentTokens",
-       "provenance": "contract orders.yaml GET /payment-tokens"
+       "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)",
+       "notes": "Was the generated table 'Every payment token'; staff and plumbing columns removed (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3))."
       }
      ]
     },
@@ -98,24 +91,6 @@
      "name": "contextPanel",
      "slot": "selection",
      "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected wallet transaction",
-       "bindsTo": "WalletTransaction",
-       "columns": [
-        "WalletTransaction.id",
-        "WalletTransaction.kind",
-        "WalletTransaction.amount",
-        "WalletTransaction.balanceAfter",
-        "WalletTransaction.orderId",
-        "WalletTransaction.venueId",
-        "WalletTransaction.reason",
-        "WalletTransaction.principalId",
-        "WalletTransaction.recordedAt"
-       ],
-       "operation": "listWalletTransactions",
-       "provenance": "contract wallet.yaml GET /wallets/{subjectId}/transactions"
-      },
       {
        "kind": "detailPanel",
        "label": "The gift card",
@@ -141,8 +116,6 @@
        "columns": [
         "GameCard.cardCode",
         "GameCard.kind",
-        "GameCard.venueId",
-        "GameCard.subjectId",
         "GameCard.credits",
         "GameCard.bonusCredits",
         "GameCard.points",
@@ -161,8 +134,6 @@
        "label": "The wallet",
        "bindsTo": "Wallet",
        "columns": [
-        "Wallet.id",
-        "Wallet.subjectId",
         "Wallet.balance",
         "Wallet.credits",
         "Wallet.bonusBalance",
@@ -183,7 +154,7 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Store payment token",
+       "label": "Add a card",
        "operation": "storePaymentToken",
        "provenance": "contract orders.yaml POST /payment-tokens"
       },
@@ -319,22 +290,17 @@
    {
     "id": "formStorePaymentToken",
     "component": "modal",
-    "trigger": "Store payment token",
-    "body": "**Collects what `storePaymentToken` sends before it is called.** Required: `providerId`, `providerToken`, `consentPurposeId`. Optional: `setDefault`. Dismissing sends nothing; the screen behind is unchanged.",
+    "trigger": "Add a card",
+    "body": "**The gateway's own card form**, hosted by the provider; it returns the token that `storePaymentToken` saves with the guest's consent. No token, provider or consent id is ever a field.",
     "confirm": {
-     "label": "Store payment token",
+     "label": "Save card",
      "operation": "storePaymentToken"
     },
     "dismiss": {
      "label": "Cancel",
-     "discards": [
-      "providerId",
-      "providerToken",
-      "consentPurposeId",
-      "setDefault"
-     ]
+     "discards": []
     },
-    "provenance": "client-verified"
+    "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
    },
    {
     "id": "formTransferWalletBalance",
@@ -443,66 +409,17 @@
      "slot": "collection",
      "components": [
       {
-       "kind": "textField",
-       "label": "Venue id",
-       "operation": "listProducts",
-       "notes": "Sends `?venueId=` to `listProducts`.",
-       "provenance": "contract catalogue.yaml GET /products"
-      },
-      {
-       "kind": "textField",
-       "label": "Kind",
-       "operation": "listProducts",
-       "notes": "Sends `?kind=` to `listProducts`.",
-       "provenance": "contract catalogue.yaml GET /products"
-      },
-      {
-       "kind": "toggle",
-       "label": "Is sellable",
-       "operation": "listProducts",
-       "notes": "Sends `?isSellable=` to `listProducts`.",
-       "provenance": "contract catalogue.yaml GET /products"
-      },
-      {
-       "kind": "dataTable",
-       "label": "Every product",
+       "kind": "cardList",
+       "label": "Membership plans",
        "bindsTo": "Product",
        "columns": [
-        "Product.id",
-        "Product.code",
         "Product.name",
         "Product.description",
-        "Product.kind",
-        "Product.venueId",
-        "Product.scopePath",
-        "Product.createdByPrincipalId",
-        "Product.approvedByPrincipalId",
-        "Product.responsibleDepartmentId",
-        "Product.onSaleFrom",
-        "Product.onSaleTo"
+        "Product.media"
        ],
        "operation": "listProducts",
-       "provenance": "contract catalogue.yaml GET /products"
-      },
-      {
-       "kind": "dataTable",
-       "label": "Every guest membership",
-       "bindsTo": "GuestMembership",
-       "columns": [
-        "GuestMembership.entitlementId",
-        "GuestMembership.productId",
-        "GuestMembership.name",
-        "GuestMembership.tier",
-        "GuestMembership.status",
-        "GuestMembership.validFrom",
-        "GuestMembership.validTo",
-        "GuestMembership.frozenDays",
-        "GuestMembership.benefits",
-        "GuestMembership.renewsOn",
-        "GuestMembership.previousTerms"
-       ],
-       "operation": "listGuestMemberships",
-       "provenance": "contract catalogue.yaml GET /guest/memberships"
+       "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)",
+       "notes": "Membership products only, for the guest's venue. The venue is the one the guest picked on Home (`venueId` from the session, audit R267), never typed. Was the generated table 'Every product'; staff and plumbing columns removed (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3))."
       }
      ]
     },
@@ -512,23 +429,13 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected product",
+       "label": "The plan",
        "bindsTo": "Product",
        "columns": [
-        "Product.id",
-        "Product.code",
         "Product.name",
         "Product.description",
-        "Product.kind",
-        "Product.venueId",
-        "Product.scopePath",
-        "Product.createdByPrincipalId",
-        "Product.approvedByPrincipalId",
-        "Product.responsibleDepartmentId",
         "Product.onSaleFrom",
         "Product.onSaleTo",
-        "Product.lifecycleState",
-        "Product.isSellable",
         "Product.hasVariants",
         "Product.variantCount"
        ],
@@ -537,7 +444,7 @@
       },
       {
        "kind": "detailPanel",
-       "label": "The guest membership",
+       "label": "Your membership",
        "bindsTo": "GuestMembership",
        "columns": [
         "GuestMembership.entitlementId",
@@ -563,7 +470,7 @@
    "loading": "The membership plans list.",
    "error": "Could not load. Names which read failed and leaves the membership plans untouched.",
    "emptyFirstRun": "No membership plans yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
-   "emptyNoResults": "Nothing matches the filter on venueId, kind, isSellable and the membership plans are still there. Names the active filter and offers to clear it.",
+   "emptyNoResults": "Never shown: the plans are the venue's membership products, with no filter a guest sets.",
    "emptyNoAccess": "**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
@@ -583,13 +490,7 @@
    {
     "operationId": "getMyMemberships",
     "contract": "catalogue",
-    "purpose": "A guest's own memberships, benefits and history",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "listGuestMemberships",
-    "contract": "catalogue",
-    "purpose": "A guest's memberships, benefits and history",
+    "purpose": "A guest's own memberships, benefits and history Only when signed in (decided 2 October 2026 by Chinmay, fix before Block A starts (GFIX-6)).",
     "trigger": "onLoad"
    }
   ],
@@ -623,6 +524,14 @@
    }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "gaps": [
+   {
+    "operation": "listGuestMemberships",
+    "removed": true,
+    "why": "The staff-shaped membership list; the guest's own are `getMyMemberships`.",
+    "source": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
+   }
+  ],
   "_platform": {
    "code": "P01",
    "audience": "guest",
@@ -712,26 +621,6 @@
      "slot": "collection",
      "components": [
       {
-       "kind": "dataTable",
-       "label": "Every membership",
-       "bindsTo": "GuestMembership",
-       "columns": [
-        "GuestMembership.entitlementId",
-        "GuestMembership.productId",
-        "GuestMembership.name",
-        "GuestMembership.tier",
-        "GuestMembership.status",
-        "GuestMembership.validFrom",
-        "GuestMembership.validTo",
-        "GuestMembership.frozenDays",
-        "GuestMembership.benefits",
-        "GuestMembership.renewsOn",
-        "GuestMembership.previousTerms"
-       ],
-       "operation": "listGuestMemberships",
-       "provenance": "contract catalogue.yaml GET /guest/memberships"
-      },
-      {
        "kind": "datePicker",
        "label": "From",
        "operation": "listBillingStatements",
@@ -746,12 +635,10 @@
        "provenance": "contract orders.yaml GET /billing-statements"
       },
       {
-       "kind": "dataTable",
-       "label": "Every billing statement",
+       "kind": "cardList",
+       "label": "Statements",
        "bindsTo": "BillingStatement",
        "columns": [
-        "BillingStatement.id",
-        "BillingStatement.subjectId",
         "BillingStatement.periodStart",
         "BillingStatement.periodEnd",
         "BillingStatement.lines",
@@ -759,15 +646,14 @@
         "BillingStatement.isTaxInvoice"
        ],
        "operation": "listBillingStatements",
-       "provenance": "contract orders.yaml GET /billing-statements"
+       "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)",
+       "notes": "Was the generated table 'Every billing statement'; staff and plumbing columns removed (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3))."
       },
       {
-       "kind": "dataTable",
-       "label": "Every dunning case",
+       "kind": "cardList",
+       "label": "Payments that need you",
        "bindsTo": "DunningCase",
        "columns": [
-        "DunningCase.id",
-        "DunningCase.subjectId",
         "DunningCase.orderId",
         "DunningCase.amount",
         "DunningCase.state",
@@ -780,7 +666,8 @@
         "DunningCase.resolutionNote"
        ],
        "operation": "listMyPaymentIssues",
-       "provenance": "contract payments.yaml GET /guests/me/payment-issues"
+       "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)",
+       "notes": "Was the generated table 'Every dunning case'; staff and plumbing columns removed (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3))."
       }
      ]
     },
@@ -793,8 +680,6 @@
        "label": "The selected billing statement",
        "bindsTo": "BillingStatement",
        "columns": [
-        "BillingStatement.id",
-        "BillingStatement.subjectId",
         "BillingStatement.periodStart",
         "BillingStatement.periodEnd",
         "BillingStatement.lines",
@@ -806,7 +691,7 @@
       },
       {
        "kind": "detailPanel",
-       "label": "The guest membership",
+       "label": "Your membership",
        "bindsTo": "GuestMembership",
        "columns": [
         "GuestMembership.entitlementId",
@@ -831,14 +716,8 @@
      "slot": "rowActions",
      "components": [
       {
-       "kind": "primaryButton",
-       "label": "Transfer order tickets",
-       "operation": "transferOrderTickets",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
-      },
-      {
        "kind": "secondaryButton",
-       "label": "Retry my dunning payment",
+       "label": "Retry the payment",
        "operation": "retryMyDunningPayment",
        "provenance": "contract payments.yaml POST /dunning-cases/{caseId}/retry"
       }
@@ -880,24 +759,9 @@
     "trigger": "onAction"
    },
    {
-    "operationId": "transferOrderTickets",
-    "contract": "orders",
-    "purpose": "Transfer tickets to another guest",
-    "trigger": "onAction",
-    "invalidates": [
-     "listGuestMemberships"
-    ]
-   },
-   {
     "operationId": "getMyMemberships",
     "contract": "catalogue",
     "purpose": "A guest's own memberships, benefits and history",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "listGuestMemberships",
-    "contract": "catalogue",
-    "purpose": "A guest's memberships, benefits and history",
     "trigger": "onLoad"
    },
    {
@@ -917,6 +781,10 @@
   ],
   "entryState": {
    "params": [
+    {
+     "name": "subjectId",
+     "from": "session"
+    },
     {
      "name": "orderId",
      "from": "deepLink"
@@ -957,7 +825,7 @@
    {
     "id": "formRetryMyDunningPayment",
     "component": "modal",
-    "trigger": "Retry my dunning payment",
+    "trigger": "Retry the payment",
     "body": "**Collects what `retryMyDunningPayment` sends before it is called.** Nothing in the body is required. Optional: `paymentTokenId`. Dismissing sends nothing; the screen behind is unchanged.",
     "bindsTo": "RetryDunningPaymentRequest",
     "confirm": {
@@ -971,25 +839,20 @@
      ]
     },
     "provenance": "client-verified"
+   }
+  ],
+  "gaps": [
+   {
+    "operation": "listGuestMemberships",
+    "removed": true,
+    "why": "The staff-shaped membership list; the guest's own are `getMyMemberships`.",
+    "source": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
    },
    {
-    "id": "formTransferOrderTickets",
-    "component": "modal",
-    "trigger": "Transfer order tickets",
-    "body": "**Collects what `transferOrderTickets` sends before it is called.** Required: `ticketIds`, `recipient`. Optional: `message`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Transfer order tickets",
-     "operation": "transferOrderTickets"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "ticketIds",
-      "recipient",
-      "message"
-     ]
-    },
-    "provenance": "client-verified"
+    "operation": "transferOrderTickets",
+    "removed": true,
+    "why": "No use on Membership Management; moving a membership to a family member is a different operation.",
+    "source": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
    }
   ],
   "_platform": {
@@ -1076,7 +939,7 @@
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listGuestDevices` reads the population and `getWishlist` reads one of them — list, select, act",
-  "purpose": "See loyalty & rewards for this venue.",
+  "purpose": "Your devices, security, cookie choices and data rights.",
   "layout": {
    "template": "split",
    "regions": [
@@ -1132,6 +995,29 @@
        "label": "Confirm",
        "notes": "**The consequence goes in the body, not the title.** *Cancel 3 orders worth AED 480* is a confirmation; *are you sure* is not — and a dialog that cannot name what it destroys is a dialog somebody dismisses.\n\n**Added 31 August.** `confirmDialog` and `modal` were both in the component library and used **zero times across 492 screens**, while `destructiveButton` was used 39 times and its own entry reads *always requires confirmation*.",
        "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "consentBlock",
+       "label": "What we may send you",
+       "bindsTo": "ConsentState.purposes",
+       "operation": "getGuestConsents",
+       "notes": "One row per configured purpose (`listConsentPurposes`), its channels as toggles, its plain-language description and the notice version in force; the current position from `getGuestConsents` (Given with date, Withdrawn with date, Not asked, Needs renewing). A change is recorded at once with `recordConsent` (source and notice version set by the app; the guest never types a purpose, decision, source or time). Withdrawing is as easy as giving.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)"
+      },
+      {
+       "kind": "cardList",
+       "label": "Purposes and notices",
+       "operation": "listConsentPurposes",
+       "notes": "The configured purposes with their plain-language description, channels and the notice version in force.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)"
+      },
+      {
+       "kind": "toggle",
+       "label": "Consent toggle",
+       "operation": "recordConsent",
+       "notes": "Per purpose and channel; recorded at once on change, append-only.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)",
+       "bindsTo": "ConsentState.purposes"
       }
      ]
     },
@@ -1233,10 +1119,10 @@
       },
       {
        "kind": "cardList",
-       "label": "Signed-in devices",
-       "notes": "The devices signed in to this account, with **Sign out this device** for a lost one (`revokeGuestDevice`).",
+       "label": "Notifications on my devices",
+       "notes": "Push registrations (`listGuestDevices`). \"Stop notifications on this device\" (`revokeGuestDevice`) stops notifications; it does not sign a lost device out. No guest operation lists or ends other sessions yet (CHG-SGU-024).",
        "operation": "listGuestDevices",
-       "provenance": "decided 29 September, rev 3 GAP-D1"
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)"
       }
      ]
     },
@@ -1245,52 +1131,22 @@
      "slot": "rowActions",
      "components": [
       {
-       "kind": "primaryButton",
-       "label": "Add to wishlist",
-       "operation": "addToWishlist",
-       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/wishlist"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Record consent",
-       "operation": "recordConsent",
-       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/consents"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Register guest device",
-       "operation": "registerGuestDevice",
-       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/devices"
-      },
-      {
        "kind": "destructiveButton",
-       "label": "Remove from wishlist",
-       "operation": "removeFromWishlist",
-       "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/wishlist/{itemId}"
-      },
-      {
-       "kind": "destructiveButton",
-       "label": "Revoke guest device",
+       "label": "Stop notifications on this device",
        "operation": "revokeGuestDevice",
-       "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/devices/{deviceId}"
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)"
       },
       {
        "kind": "destructiveButton",
-       "label": "Delete guest account",
+       "label": "Delete my account",
        "operation": "deleteGuestAccount",
        "provenance": "contract identity.yaml DELETE /auth/guest/account"
       },
       {
        "kind": "secondaryButton",
-       "label": "Export subject data",
+       "label": "Get a copy of my data",
        "operation": "exportSubjectData",
        "provenance": "contract identity.yaml POST /guests/{subjectId}/data-export"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Grant delegation",
-       "operation": "grantDelegation",
-       "provenance": "contract identity.yaml POST /guests/{subjectId}/delegations"
       },
       {
        "kind": "destructiveButton",
@@ -1304,47 +1160,17 @@
   },
   "overlays": [
    {
-    "id": "confirmRemoveFromWishlist",
-    "component": "confirmDialog",
-    "trigger": "Remove from wishlist",
-    "body": "**Names what `removeFromWishlist` changes and what it leaves alone**, in the consequence rather than the verb. A devices wishlist consent this affects should be identified in the dialog, not just counted.",
-    "provenance": "client-verified"
-   },
-   {
     "id": "confirmRevokeGuestDevice",
     "component": "confirmDialog",
-    "trigger": "Revoke guest device",
+    "trigger": "Stop notifications on this device",
     "body": "**Names what `revokeGuestDevice` changes and what it leaves alone**, in the consequence rather than the verb. A devices wishlist consent this affects should be identified in the dialog, not just counted.",
     "provenance": "client-verified"
    },
    {
     "id": "confirmDeleteGuestAccount",
     "component": "confirmDialog",
-    "trigger": "Delete guest account",
+    "trigger": "Delete my account",
     "body": "**Names what `deleteGuestAccount` changes and what it leaves alone**, in the consequence rather than the verb. A devices wishlist consent this affects should be identified in the dialog, not just counted.",
-    "provenance": "client-verified"
-   },
-   {
-    "id": "formGrantDelegation",
-    "component": "modal",
-    "trigger": "Grant delegation",
-    "body": "**Collects what `grantDelegation` sends before it is called.** Required: `overSubjectId`, `delegationKind`, `permission`. Optional: `overObjectRef`, `quota`, `validTo`, `isRevocableBySubject`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Grant delegation",
-     "operation": "grantDelegation"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "overSubjectId",
-      "delegationKind",
-      "permission",
-      "overObjectRef",
-      "quota",
-      "validTo",
-      "isRevocableBySubject"
-     ]
-    },
     "provenance": "client-verified"
    },
    {
@@ -1352,70 +1178,6 @@
     "component": "confirmDialog",
     "trigger": "Revoke face pass",
     "body": "**Names what `revokeFacePass` changes and what it leaves alone**, in the consequence rather than the verb. A devices wishlist consent this affects should be identified in the dialog, not just counted.",
-    "provenance": "client-verified"
-   },
-   {
-    "id": "formAddToWishlist",
-    "component": "modal",
-    "trigger": "Add to wishlist",
-    "body": "**Collects what `addToWishlist` sends before it is called.** Required: `variantId`. Optional: `performanceId`, `note`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Add to wishlist",
-     "operation": "addToWishlist"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "variantId",
-      "performanceId",
-      "note"
-     ]
-    },
-    "provenance": "client-verified"
-   },
-   {
-    "id": "formRecordConsent",
-    "component": "modal",
-    "trigger": "Record consent",
-    "body": "**Collects what `recordConsent` sends before it is called.** Required: `purpose`, `decision`, `noticeVersion`, `source`, `recordedAt`. Optional: `channels`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "RecordConsentRequest",
-    "confirm": {
-     "label": "Record consent",
-     "operation": "recordConsent"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "purpose",
-      "decision",
-      "noticeVersion",
-      "source",
-      "recordedAt",
-      "channels"
-     ]
-    },
-    "provenance": "client-verified"
-   },
-   {
-    "id": "formRegisterGuestDevice",
-    "component": "modal",
-    "trigger": "Register guest device",
-    "body": "**Collects what `registerGuestDevice` sends before it is called.** Required: `platform`, `token`. Optional: `appVersion`, `osVersion`, `deviceModel`, `locale`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Register guest device",
-     "operation": "registerGuestDevice"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "platform",
-      "token",
-      "appVersion",
-      "osVersion",
-      "deviceModel",
-      "locale"
-     ]
-    },
     "provenance": "client-verified"
    }
   ],
@@ -1428,15 +1190,6 @@
    "offline": "**Nothing here is offered offline, and the banner says so.** An erasure request or a device change queued and never sent is worse than one that could not be made — the legal clock starts when the platform receives it, and a device signed out offline is still signed in."
   },
   "apis": [
-   {
-    "operationId": "addToWishlist",
-    "contract": "marketing-crm",
-    "purpose": "Save an item",
-    "trigger": "onAction",
-    "invalidates": [
-     "listGuestDevices"
-    ]
-   },
    {
     "operationId": "getWishlist",
     "contract": "marketing-crm",
@@ -1453,24 +1206,6 @@
     "operationId": "recordConsent",
     "contract": "marketing-crm",
     "purpose": "Record a consent decision",
-    "trigger": "onAction",
-    "invalidates": [
-     "listGuestDevices"
-    ]
-   },
-   {
-    "operationId": "registerGuestDevice",
-    "contract": "marketing-crm",
-    "purpose": "Register a device for push",
-    "trigger": "onAction",
-    "invalidates": [
-     "listGuestDevices"
-    ]
-   },
-   {
-    "operationId": "removeFromWishlist",
-    "contract": "marketing-crm",
-    "purpose": "Remove a saved item",
     "trigger": "onAction",
     "invalidates": [
      "listGuestDevices"
@@ -1514,12 +1249,6 @@
     "contract": "marketing-crm",
     "purpose": "Which waivers are signed and which are due",
     "trigger": "onLoad"
-   },
-   {
-    "operationId": "grantDelegation",
-    "contract": "identity",
-    "purpose": "Let somebody else manage a booking",
-    "trigger": "onAction"
    },
    {
     "operationId": "listDelegations",
@@ -1593,6 +1322,12 @@
     "purpose": "Change or withdraw cookie preferences",
     "trigger": "onAction",
     "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "listConsentPurposes",
+    "contract": "marketing-crm",
+    "purpose": "The purposes the consent rows show",
+    "trigger": "onLoad"
    }
   ],
   "entryState": {
@@ -1766,6 +1501,27 @@
        "kind": "detailPanel",
        "label": "Detail",
        "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "cardList",
+       "label": "Rewards",
+       "operation": "listRewards",
+       "notes": "What points can be turned into, with the points each needs; Redeem on a reward the guest can afford.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)"
+      },
+      {
+       "kind": "cardList",
+       "label": "My badges",
+       "operation": "listCustomerBadges",
+       "notes": "Status badges the guest holds (DI-392).",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)"
+      },
+      {
+       "kind": "cardList",
+       "label": "Leaderboard",
+       "operation": "listLeaderboard",
+       "notes": "Standings by nickname; the guest sets theirs with Choose my name.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)"
       }
      ]
     },
@@ -1788,15 +1544,21 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Create referral",
+       "label": "Invite a friend",
        "operation": "createReferral",
        "provenance": "contract marketing-crm.yaml POST /referrals"
       },
       {
        "kind": "secondaryButton",
-       "label": "Redeem loyalty points",
+       "label": "Redeem",
        "operation": "redeemLoyaltyPoints",
        "provenance": "contract marketing-crm.yaml POST /loyalty/redemptions"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Choose my name",
+       "operation": "setLeaderboardNickname",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)"
       }
      ]
     }
@@ -1807,7 +1569,7 @@
    "error": "Could not load. **The rest of the site is unaffected.**",
    "emptyFirstRun": "**Nothing here yet for this venue.** Names what turns it on rather than showing an empty panel.",
    "emptyNoResults": "Nothing matches.",
-   "emptyNoAccess": "**Sign in to see this.** A guest who is not signed in is offered the door, not refused.",
+   "emptyNoAccess": "**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** The last known balance stays with its age, and **points earned since are not shown** — and that is said. Redeeming and referring need the connection."
   },
   "apis": [
@@ -1854,10 +1616,43 @@
     "purpose": "Report impressions, clicks and declines of recommended items",
     "trigger": "onAction",
     "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "listRewards",
+    "contract": "marketing-crm",
+    "purpose": "What points can be turned into",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listCustomerBadges",
+    "contract": "marketing-crm",
+    "purpose": "Badges the guest holds",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listLeaderboard",
+    "contract": "marketing-crm",
+    "purpose": "Standings, by nickname",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "setLeaderboardNickname",
+    "contract": "marketing-crm",
+    "purpose": "Choose the name shown on the board",
+    "trigger": "onAction"
    }
   ],
   "entryState": {
-   "params": [],
+   "params": [
+    {
+     "name": "subjectId",
+     "from": "session"
+    },
+    {
+     "name": "customerId",
+     "from": "session"
+    }
+   ],
    "coldEntry": "**A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared link, a scanned code and a forwarded confirmation all land here, and the person holding it did nothing wrong. Arrives with no parameter — the venue comes from the site."
   },
   "wireframe": {
@@ -1876,52 +1671,46 @@
   "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "overlays": [
    {
-    "id": "formCreateReferral",
-    "component": "modal",
-    "trigger": "Create referral",
-    "body": "**Collects what `createReferral` sends before it is called.** Required: `id`, `referrerSubjectId`, `code`, `status`. Optional: `refereeSubjectId`, `qualifyingAction`, `referrerRewardId`, `refereeRewardId`, `expiresAt`, `scopePath`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "Referral",
+    "id": "confirmCreateReferral",
+    "component": "confirmDialog",
+    "trigger": "Invite a friend",
+    "body": "One tap: the code that comes back is shown with Share. Code, status, qualifying action, rewards and expiry are set by the platform; the guest types nothing.",
     "confirm": {
-     "label": "Create referral",
+     "label": "Invite a friend",
      "operation": "createReferral"
     },
     "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "id",
-      "referrerSubjectId",
-      "code",
-      "status",
-      "refereeSubjectId",
-      "qualifyingAction",
-      "referrerRewardId",
-      "refereeRewardId",
-      "expiresAt",
-      "scopePath"
-     ]
+     "label": "Cancel"
     },
-    "provenance": "client-verified"
+    "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)"
    },
    {
     "id": "formRedeemLoyaltyPoints",
     "component": "modal",
-    "trigger": "Redeem loyalty points",
-    "body": "**Collects what `redeemLoyaltyPoints` sends before it is called.** Required: `subjectId`, `programmeId`, `points`. Optional: `rewardId`, `orderId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "trigger": "Redeem",
+    "body": "The reward chosen from the list and its points; the guest is the caller, so no subject or programme is asked.",
     "confirm": {
-     "label": "Redeem loyalty points",
+     "label": "Redeem",
      "operation": "redeemLoyaltyPoints"
     },
     "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "subjectId",
-      "programmeId",
-      "points",
-      "rewardId",
-      "orderId"
-     ]
+     "label": "Cancel"
     },
-    "provenance": "client-verified"
+    "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)"
+   },
+   {
+    "id": "formSetLeaderboardNickname",
+    "component": "modal",
+    "trigger": "Choose my name",
+    "body": "The nickname shown on the leaderboard.",
+    "confirm": {
+     "label": "Choose my name",
+     "operation": "setLeaderboardNickname"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)"
    }
   ],
   "_platform": {

@@ -170,7 +170,7 @@
   "states": {
    "loading": "The access list.",
    "error": "Could not load. Names which read failed and leaves the access untouched.",
-   "emptyFirstRun": "No access yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No access yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the access are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -180,16 +180,6 @@
     "contract": "access",
     "purpose": "Access Control Command Center",
     "trigger": "onLoad"
-   },
-   {
-    "operationId": "createAccessPoint",
-    "contract": "access",
-    "purpose": "Add an access point to the estate from the command centre",
-    "trigger": "onAction",
-    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
-    "invalidates": [
-     "listAccess"
-    ]
    }
   ],
   "entryState": {
@@ -209,6 +199,14 @@
    "workshopBoard": "wireframes/WS18 Access Control Board 1.dc.html#bo-144"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 6. 14 of 16 labels bound to a contract property; 16 of 30 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "gaps": [
+   {
+    "operation": "createAccessPoint",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): The command centre monitors (VO-R02); creating an access point belongs on the Access Point Directory BO-148 (design-notes correction venue-operations BO-144).",
+    "source": "contracts/spine/access.yaml#createAccessPoint | screens/P08-venue-back-office.yaml#BO-148"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -449,6 +447,11 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Access Control Module_Reference.pdf, page 8"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-004): No read lists access areas and zones (setAccessAreaZone has no list or get).",
+    "source": "contracts/spine/access.yaml#setAccessAreaZone"
    }
   ],
   "layout": {
@@ -501,6 +504,37 @@
    "workshopBoard": "wireframes/WS18 Access Control Board 1.dc.html#bo-146"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 8. 0 of 0 labels bound to a contract property; 0 of 24 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "notes": "**Zone security classification: Public, Restricted, Secure, Critical, renamable (decided 2 October 2026 by Chinmay, DEC-227; CHG-CSP-025, `securityClassificationLevel`).**",
+  "overlays": [
+   {
+    "id": "formSetAccessAreaZone",
+    "component": "modal",
+    "trigger": "Save zone",
+    "body": "**Collects what `setAccessAreaZone` sends before it is called.** Required: `zoneId`, `venueId`, `name`, `zoneType`. Optional: `capacity`, `operatingSchedule`, `securityClassification`, `securityClassificationLevel`, `entryRequirements`, `exitRequirements`, `allowedCredentialClasses`, `parentId`. The classification level is one of the four, shown with the venue's labels. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save zone",
+     "operation": "setAccessAreaZone"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "zoneId",
+      "venueId",
+      "name",
+      "zoneType",
+      "capacity",
+      "operatingSchedule",
+      "securityClassification",
+      "securityClassificationLevel",
+      "entryRequirements",
+      "exitRequirements",
+      "allowedCredentialClasses",
+      "parentId"
+     ]
+    },
+    "provenance": "contract access.yaml PUT /access-area-zone"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -575,6 +609,11 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Access Control Module_Reference.pdf, page 9"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-004): No read lists attraction access records (setAttractionAccess has no list or get).",
+    "source": "contracts/spine/access.yaml#setAttractionAccess"
    }
   ],
   "layout": {
@@ -588,6 +627,13 @@
        "kind": "primaryButton",
        "label": "Save changes",
        "provenance": "contract operation setAttractionAccess"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Close temporarily",
+       "operation": "updateAccessPoint",
+       "notes": "**A temporarily closed attraction denies, shows the reopening time and offers a virtual-queue return window where enabled (decided 2 October 2026 by Chinmay, DEC-228; CHG-CSP-026, `temporaryClosure`).**",
+       "provenance": "contract access.yaml PATCH /access-points/{accessPointId}"
       }
      ]
     },
@@ -618,6 +664,13 @@
     "contract": "access",
     "purpose": "Attraction Access Configuration",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "updateAccessPoint",
+    "contract": "access",
+    "purpose": "Update an access point",
+    "trigger": "onAction",
+    "provenance": "design-note correction, 2 October 2026 (BO-147)"
    }
   ],
   "wireframe": {
@@ -627,6 +680,40 @@
    "workshopBoard": "wireframes/WS18 Access Control Board 1.dc.html#bo-147"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 9. 0 of 0 labels bound to a contract property; 0 of 20 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formUpdateAccessPoint",
+    "component": "modal",
+    "trigger": "Close temporarily",
+    "body": "**Collects what `updateAccessPoint` sends before it is called.** Nothing in the body is required. Optional: `name`, `direction`, `antiPassbackEnabled`, `requiresExitBeforeReentry`, `isActive`, `driver`, `temporaryClosure`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Close temporarily",
+     "operation": "updateAccessPoint"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "name",
+      "direction",
+      "antiPassbackEnabled",
+      "requiresExitBeforeReentry",
+      "isActive",
+      "driver",
+      "temporaryClosure"
+     ]
+    },
+    "provenance": "contract access.yaml PATCH /access-points/{accessPointId}"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "accessPointId",
+     "from": "navigation",
+     "optional": true
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -729,6 +816,23 @@
        "provenance": "pack Access Control Module_Reference.pdf, page 10 §Additional settings"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "components": [
+      {
+       "kind": "secondaryButton",
+       "label": "Add access point",
+       "operation": "createAccessPoint",
+       "provenance": "contract access.yaml POST /access-points; wiring fix, 2 October 2026"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save access point",
+       "operation": "updateAccessPoint",
+       "provenance": "contract access.yaml PATCH /access-points/{accessPointId}; wiring fix, 2 October 2026"
+      }
+     ]
     }
    ]
   },
@@ -744,6 +848,20 @@
     "contract": "access",
     "purpose": "List access points",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "createAccessPoint",
+    "contract": "access",
+    "purpose": "Add an access point to the estate",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-001)"
+   },
+   {
+    "operationId": "updateAccessPoint",
+    "contract": "access",
+    "purpose": "Change an access point",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-001)"
    }
   ],
   "wireframe": {
@@ -753,6 +871,44 @@
    "workshopBoard": "wireframes/WS18 Access Control Board 1.dc.html#bo-148"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 10. 0 of 0 labels bound to a contract property; 6 of 24 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formCreateAccessPoint",
+    "component": "modal",
+    "trigger": "Add access point",
+    "body": "**Collects what `createAccessPoint` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Add access point",
+     "operation": "createAccessPoint"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "contract access.yaml POST /access-points; wiring fix, 2 October 2026"
+   },
+   {
+    "id": "formUpdateAccessPoint",
+    "component": "modal",
+    "trigger": "Save access point",
+    "body": "**Collects what `updateAccessPoint` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save access point",
+     "operation": "updateAccessPoint"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "contract access.yaml PATCH /access-points/{accessPointId}; wiring fix, 2 October 2026"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "accessPointId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -827,6 +983,11 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Access Control Module_Reference.pdf, page 11"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-004): No read lists gates and lanes (setGateLane has no list or get).",
+    "source": "contracts/spine/access.yaml#setGateLane"
    }
   ],
   "layout": {
@@ -953,6 +1114,11 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Access Control Module_Reference.pdf, page 12"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-004): No read of the saved access map (setAccessGraphicalMap has no get), and no operation accepts an AI-proposed topology.",
+    "source": "contracts/spine/access.yaml#setAccessGraphicalMap"
    }
   ],
   "layout": {
@@ -1089,9 +1255,15 @@
      "components": [
       {
        "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listAccessLocationGrouping",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "label": "Access-point groups",
+       "bindsTo": "AccessLocationGroupingView",
+       "columns": [
+        "AccessLocationGroupingView.name",
+        "AccessLocationGroupingView.parentGroupId",
+        "AccessLocationGroupingView.accessPointIds"
+       ],
+       "operation": "listAccessLocationGrouping",
+       "provenance": "contract access.yaml GET /access-location-grouping"
       }
      ]
     },
@@ -1437,6 +1609,7 @@
     }
    ]
   },
+  "notes": "**Overlapping entries: the venue sets a priority per entry (decided 2 October 2026 by Chinmay, DEC-229; CHG-CSP-027);** equal priorities on an overlap are refused. An entry can close the whole venue (`venueClosed`).",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1503,6 +1676,11 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Access Control Module_Reference.pdf, page 14"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-004): No read lists access configuration versions with their validation results.",
+    "source": "contracts/spine/access.yaml#publishTopologyValidation | contracts/spine/access.yaml#rollbackConfigurationVersion"
    }
   ],
   "layout": {
@@ -1595,6 +1773,7 @@
     }
    ]
   },
+  "notes": "**Publication approval is a venue policy, off by default; when on, a second person approves (decided 2 October 2026 by Chinmay, DEC-230; CHG-CSP-028).** A publication held for approval answers 200 with `awaitingApproval`, shown as \"Waiting for approval\".",
   "_platform": {
    "code": "P08",
    "audience": "staff",

@@ -54,8 +54,8 @@
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
-  "purpose": "Provide management with a consolidated backend view of the financial, commercial, sponsorship, attendance and operational performance of events.",
-  "purposeNote": "Authorized users can obtain a consolidated view of event commercial and operational performance while data visibility remains controlled by tenant, entity and role permissions.",
+  "purpose": "Review and set an event's capacity profile: how many guests it takes and how that capacity is split.",
+  "purposeNote": "Authorized users can obtain a consolidated view of event commercial and operational performance while data visibility remains controlled by tenant, entity and role permissions. Purpose rewritten 2 October 2026 (CHG-WIR-026): The purpose was pack text attached by page rather than by screen and does not describe this screen; it is rewritten from the screen's name and operations (design-notes correction ticketing-backoffice BO-703)",
   "gaps": [
    {
     "operation": null,
@@ -87,6 +87,13 @@
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
        "impliedBy": "setEventCapacityProfile"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Read an event",
+       "bindsTo": "Event",
+       "operation": "getEvent",
+       "provenance": "contract catalogue.yaml GET /events/{eventId}; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -109,6 +116,13 @@
     "invalidates": [
      "getSeatInventory"
     ]
+   },
+   {
+    "operationId": "getEvent",
+    "contract": "catalogue",
+    "purpose": "Read an event",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {
@@ -188,8 +202,8 @@
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
-  "purpose": "Configure the financial plan and budget against which event performance will be measured.",
-  "purposeNote": "Administrators can create an event-level financial plan and compare budget, commitments, actuals and forecasts using data referenced from the shared Finance services.",
+  "purpose": "Set an event's capacity profile: total capacity, allocations and limits.",
+  "purposeNote": "Administrators can create an event-level financial plan and compare budget, commitments, actuals and forecasts using data referenced from the shared Finance services. Purpose rewritten 2 October 2026 (CHG-WIR-026): The purpose was pack text attached by page rather than by screen and does not describe this screen; it is rewritten from the screen's name and operations (design-notes correction ticketing-backoffice BO-704)",
   "gaps": [
    {
     "operation": null,
@@ -221,6 +235,13 @@
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
        "impliedBy": "setEventCapacityProfile"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Read an event",
+       "bindsTo": "Event",
+       "operation": "getEvent",
+       "provenance": "contract catalogue.yaml GET /events/{eventId}; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -243,6 +264,13 @@
     "invalidates": [
      "getSeatInventory"
     ]
+   },
+   {
+    "operationId": "getEvent",
+    "contract": "catalogue",
+    "purpose": "Read an event",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {
@@ -322,8 +350,8 @@
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
-  "purpose": "Define how financial performance should be measured and attributed to an event.",
-  "purposeNote": "The system provides traceable event profitability using configured financial attribution rules without duplicating the underlying accounting ledger.",
+  "purpose": "Choose whether an event is seated, general admission or mixed, and how places are reserved.",
+  "purposeNote": "The system provides traceable event profitability using configured financial attribution rules without duplicating the underlying accounting ledger. Purpose rewritten 2 October 2026 (CHG-WIR-026): The purpose was pack text attached by page rather than by screen and does not describe this screen; it is rewritten from the screen's name and operations (design-notes correction ticketing-backoffice BO-705)",
   "gaps": [
    {
     "operation": null,
@@ -355,6 +383,13 @@
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
        "impliedBy": "setEventCapacityProfile"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Read an event",
+       "bindsTo": "Event",
+       "operation": "getEvent",
+       "provenance": "contract catalogue.yaml GET /events/{eventId}; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -377,6 +412,13 @@
     "invalidates": [
      "getSeatInventory"
     ]
+   },
+   {
+    "operationId": "getEvent",
+    "contract": "catalogue",
+    "purpose": "Read an event",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {

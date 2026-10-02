@@ -42,7 +42,10 @@
     {
      "to": "BO-636",
      "trigger": "Application Review Workspace",
-     "provenance": "structural — pack board 3 wiring, 19 September 2026"
+     "provenance": "structural — pack board 3 wiring, 19 September 2026",
+     "carries": [
+      "applicationId"
+     ]
     },
     {
      "to": "BO-637",
@@ -62,7 +65,10 @@
     {
      "to": "BO-640",
      "trigger": "Rejection & Resubmission Management",
-     "provenance": "structural — pack board 3 wiring, 19 September 2026"
+     "provenance": "structural — pack board 3 wiring, 19 September 2026",
+     "carries": [
+      "applicationId"
+     ]
     },
     {
      "to": "BO-641",
@@ -186,6 +192,18 @@
        "kind": "primaryButton",
        "label": "Key requirement: 12.1.3",
        "provenance": "pack ACCREDITATION.pdf, page 20 §Actions shall include"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Assign reviewer",
+       "operation": "actOnWorkflowInstance",
+       "provenance": "contract approvals.yaml POST /workflow-instances/{instanceId}/actions; wiring fix, 2 October 2026"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Escalate",
+       "operation": "decideAccreditationApplication",
+       "provenance": "contract accreditation.yaml POST /accreditation-applications/{applicationId}/decide; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -205,6 +223,20 @@
     "purpose": "The review queue",
     "trigger": "onLoad",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "actOnWorkflowInstance",
+    "contract": "approvals",
+    "purpose": "Assign or reassign the reviewer",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-001)"
+   },
+   {
+    "operationId": "decideAccreditationApplication",
+    "contract": "accreditation",
+    "purpose": "Escalate an application",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-001)"
    }
   ],
   "entryState": {
@@ -215,6 +247,16 @@
     "Accreditation category",
     "Organization",
     "Event / venue"
+   ],
+   "params": [
+    {
+     "name": "instanceId",
+     "from": "navigation"
+    },
+    {
+     "name": "applicationId",
+     "from": "navigation"
+    }
    ]
   },
   "wireframe": {
@@ -223,6 +265,37 @@
    "workshopBoard": "wireframes/WS03 ACCREDITATION Board 3.dc.html#bo-635"
   },
   "apisNote": "Regenerated 9 September 2026 from ACCREDITATION.pdf page 20. 0 of 21 labels bound to a contract property; 22 of 25 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Key requirement: 12.1.3 are choices sent by `listAccreditationApplications` (requirement reference shown on the queue).",
+  "overlays": [
+   {
+    "id": "formActOnWorkflowInstance",
+    "component": "modal",
+    "trigger": "Assign reviewer",
+    "body": "**Collects what `actOnWorkflowInstance` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Assign reviewer",
+     "operation": "actOnWorkflowInstance"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "contract approvals.yaml POST /workflow-instances/{instanceId}/actions; wiring fix, 2 October 2026"
+   },
+   {
+    "id": "formDecideAccreditationApplication",
+    "component": "modal",
+    "trigger": "Escalate",
+    "body": "**Collects what `decideAccreditationApplication` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Escalate",
+     "operation": "decideAccreditationApplication"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "contract accreditation.yaml POST /accreditation-applications/{applicationId}/decide; wiring fix, 2 October 2026"
+   }
+  ],
+  "notes": "**One queue and one workspace component, used in P11 (ACC-006, ACC-007) and here (decided 2 October 2026 by Chinmay, DEC-368).** The component is `screens/_components.yaml`'s (screens-other).\n\n**Renders the shared `accreditationReview` queue** (`screens/_components.yaml` patterns; decided 2 October 2026 by Chinmay, DEC-368; CHG-SOT-018), the same component as ACC-006 on P11: a fix to one is a fix to both.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -294,6 +367,12 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack ACCREDITATION.pdf, page 21"
+   },
+   {
+    "operation": "listAccreditationApplications",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): The workspace reads one application (getAccreditationApplication); listAccreditationApplications bound as \"The application\" is redundant. It shows and verifies documents and previous accreditations, so verify and the audit read are needed (design-notes correction venue-operations BO-636).",
+    "source": "contracts/satellite/accreditation.yaml#verifyAccreditationDocument | contracts/satellite/accreditation.yaml#listAccreditationAudit"
    }
   ],
   "layout": {
@@ -309,17 +388,29 @@
        "notes": "The act the screen exists for."
       },
       {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listAccreditationApplications",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
-      },
-      {
        "kind": "secondaryButton",
        "label": "Cancel",
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
        "impliedBy": "decideAccreditationApplication"
+      },
+      {
+       "kind": "dataTable",
+       "label": "History",
+       "bindsTo": "AccreditationAuditRecord",
+       "operation": "listAccreditationAudit",
+       "provenance": "contract accreditation.yaml GET /accreditation-audit; wiring fix, 2 October 2026"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "components": [
+      {
+       "kind": "secondaryButton",
+       "label": "Verify document",
+       "operation": "verifyAccreditationDocument",
+       "provenance": "contract accreditation.yaml POST /accreditation-documents/{documentId}/verify; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -328,7 +419,7 @@
   "states": {
    "loading": "The application review list.",
    "error": "Could not load. Names which read failed and leaves the application review untouched.",
-   "emptyFirstRun": "No application review yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No application review yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the application review are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -340,16 +431,8 @@
     "trigger": "onAction",
     "provenance": "board reading, 19 September 2026",
     "invalidates": [
-     "listAccreditationApplications",
      "listAccreditationHolders"
     ]
-   },
-   {
-    "operationId": "listAccreditationApplications",
-    "contract": "accreditation",
-    "purpose": "The application",
-    "trigger": "onLoad",
-    "provenance": "board reading, 19 September 2026"
    },
    {
     "operationId": "getAccreditationApplication",
@@ -364,6 +447,20 @@
     "purpose": "The application's documents",
     "trigger": "onLoad",
     "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "verifyAccreditationDocument",
+    "contract": "accreditation",
+    "purpose": "Accept or refuse a submitted document",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-001)"
+   },
+   {
+    "operationId": "listAccreditationAudit",
+    "contract": "accreditation",
+    "purpose": "The applicant's previous accreditations and decisions",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-001)"
    }
   ],
   "wireframe": {
@@ -377,9 +474,30 @@
     {
      "name": "applicationId",
      "from": "navigation"
+    },
+    {
+     "name": "documentId",
+     "from": "navigation"
     }
    ]
   },
+  "overlays": [
+   {
+    "id": "formVerifyAccreditationDocument",
+    "component": "modal",
+    "trigger": "Verify document",
+    "body": "**Collects what `verifyAccreditationDocument` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Verify document",
+     "operation": "verifyAccreditationDocument"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "contract accreditation.yaml POST /accreditation-documents/{documentId}/verify; wiring fix, 2 October 2026"
+   }
+  ],
+  "notes": "**One queue and one workspace component, used in P11 (ACC-006, ACC-007) and here (decided 2 October 2026 by Chinmay, DEC-368).** The component is `screens/_components.yaml`'s (screens-other).\n\n**Renders the shared `accreditationReview` workspace** (`screens/_components.yaml` patterns; decided 2 October 2026 by Chinmay, DEC-368; CHG-SOT-018), the same component as ACC-007 on P11: a fix to one is a fix to both.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -440,7 +558,7 @@
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
-  "purpose": "Configure reusable accreditation approval workflows.",
+  "purpose": "Design the product approval workflows (who approves a product change, in which order); accreditation approvals are configured with the approvals platform.",
   "gaps": [
    {
     "operation": null,
@@ -456,6 +574,11 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack ACCREDITATION.pdf, page 22"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-027): A read (get or list) of the approval workflow definitions that approveWorkflow writes.",
+    "source": "contracts/spine/catalogue.yaml#approveWorkflow | screens/P08-venue-back-office.yaml#BO-637"
    }
   ],
   "layout": {
@@ -465,18 +588,24 @@
      "name": "contentBody",
      "components": [
       {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "approveWorkflow",
-       "label": "Approve workflow",
-       "notes": "The act the screen exists for."
-      },
-      {
        "kind": "secondaryButton",
        "label": "Cancel",
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
        "impliedBy": "approveWorkflow"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save product approval workflow",
+       "operation": "approveWorkflow",
+       "notes": "Despite its name, `approveWorkflow` designs (creates or changes) the workflow; the button says what it does.",
+       "provenance": "contract catalogue.yaml PUT /workflow"
       }
      ]
     }
@@ -503,6 +632,33 @@
    "workshopBoard": "wireframes/WS03 ACCREDITATION Board 3.dc.html#bo-637"
   },
   "apisNote": "Regenerated 9 September 2026 from ACCREDITATION.pdf page 22. 0 of 0 labels bound to a contract property; 0 of 21 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formApproveWorkflow",
+    "component": "modal",
+    "trigger": "Save product approval workflow",
+    "body": "**Collects what `approveWorkflow` sends before it is called.** Nothing in the body is required. Optional: `workflowName`, `applicableProductTypes`, `venue`, `department`, `changeTypes`, `approvalStages`, `rejectionBehavior`, `resubmissionBehavior`, `workflowId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save product approval workflow",
+     "operation": "approveWorkflow"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "workflowName",
+      "applicableProductTypes",
+      "venue",
+      "department",
+      "changeTypes",
+      "approvalStages",
+      "rejectionBehavior",
+      "resubmissionBehavior",
+      "workflowId"
+     ]
+    },
+    "provenance": "contract catalogue.yaml PUT /workflow"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -832,6 +988,13 @@
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
        "impliedBy": "decideAccreditationApplication"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Refused and returned",
+       "bindsTo": "AccreditationApplication",
+       "operation": "listAccreditationApplications",
+       "provenance": "contract accreditation.yaml GET /accreditation-applications; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -876,6 +1039,13 @@
     "purpose": "Amend an application returned for information",
     "trigger": "onAction",
     "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "listAccreditationApplications",
+    "contract": "accreditation",
+    "purpose": "Applications refused or returned for information",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-001)"
    }
   ],
   "wireframe": {
@@ -991,7 +1161,7 @@
   "states": {
    "loading": "The escalation exception list.",
    "error": "Could not load. Names which read failed and leaves the escalation exception untouched.",
-   "emptyFirstRun": "No escalation exception yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No escalation exception yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the escalation exception are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -1089,6 +1259,12 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack ACCREDITATION.pdf, page 25"
+   },
+   {
+    "operation": "approveDecision",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-025): A decision history is a read-only record, yet it declared only a write from the promotions contract (approveDecision); the accreditation decision record is listAccreditationAudit (design-notes correction ticketing-backoffice BO-642)",
+    "source": "contracts/satellite/promotions.yaml#approveDecision | screens/P08-venue-back-office.yaml#BO-642 | contracts/satellite/accreditation.yaml#listAccreditationAudit"
    }
   ],
   "layout": {
@@ -1098,18 +1274,11 @@
      "name": "contentBody",
      "components": [
       {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "approveDecision",
-       "label": "Approve decision",
-       "notes": "The act the screen exists for."
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "approveDecision"
+       "kind": "dataTable",
+       "label": "Decision history",
+       "bindsTo": "AccreditationAuditRecord",
+       "operation": "listAccreditationAudit",
+       "provenance": "contract accreditation.yaml GET /accreditation-audit; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -1118,16 +1287,17 @@
   "states": {
    "loading": "The approval decision history list.",
    "error": "Could not load. Names which read failed and leaves the approval decision history untouched.",
-   "emptyFirstRun": "No approval decision history yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No approval decision history yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the approval decision history are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
-    "operationId": "approveDecision",
-    "contract": "promotions",
-    "purpose": "Approval Inbox & Decision Workspace",
-    "trigger": "onAction"
+    "operationId": "listAccreditationAudit",
+    "contract": "accreditation",
+    "purpose": "Every accreditation decision: who granted what to whom, and when",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {
@@ -1136,6 +1306,7 @@
    "workshopBoard": "wireframes/WS03 ACCREDITATION Board 3.dc.html#bo-642"
   },
   "apisNote": "Regenerated 9 September 2026 from ACCREDITATION.pdf page 25. 0 of 0 labels bound to a contract property; 0 of 14 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {},
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1217,9 +1388,33 @@
      "components": [
       {
        "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listAccreditationAudit",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "label": "Workflows",
+       "operation": "listWorkflow",
+       "provenance": "contract approvals.yaml GET /workflow; wiring fix, 2 October 2026"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Validation checks",
+       "operation": "simulateWorkflowTestingImpact",
+       "notes": "The ten checks the pack lists, as results of the simulation, before Publish.",
+       "provenance": "contract approvals.yaml PUT /workflow-testing-impact"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "components": [
+      {
+       "kind": "secondaryButton",
+       "label": "Simulate",
+       "operation": "simulateWorkflowTestingImpact",
+       "provenance": "contract approvals.yaml PUT /workflow-testing-impact; wiring fix, 2 October 2026"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Publish workflow",
+       "operation": "setVisualWorkflow",
+       "provenance": "contract approvals.yaml PUT /visual-workflow; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -1239,6 +1434,27 @@
     "purpose": "Decision history",
     "trigger": "onLoad",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "listWorkflow",
+    "contract": "approvals",
+    "purpose": "The approval workflows in force",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-001)"
+   },
+   {
+    "operationId": "simulateWorkflowTestingImpact",
+    "contract": "approvals",
+    "purpose": "Test a workflow before publishing it",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-001)"
+   },
+   {
+    "operationId": "setVisualWorkflow",
+    "contract": "approvals",
+    "purpose": "Publish the workflow",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-001)"
    }
   ],
   "wireframe": {
@@ -1247,6 +1463,38 @@
    "workshopBoard": "wireframes/WS03 ACCREDITATION Board 3.dc.html#bo-643"
   },
   "apisNote": "Regenerated 9 September 2026 from ACCREDITATION.pdf page 26. 0 of 0 labels bound to a contract property; 0 of 14 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSimulateWorkflowTestingImpact",
+    "component": "modal",
+    "trigger": "Simulate",
+    "body": "**Collects what `simulateWorkflowTestingImpact` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Simulate",
+     "operation": "simulateWorkflowTestingImpact"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "contract approvals.yaml PUT /workflow-testing-impact; wiring fix, 2 October 2026"
+   },
+   {
+    "id": "formSetVisualWorkflow",
+    "component": "modal",
+    "trigger": "Publish workflow",
+    "body": "**Collects what `setVisualWorkflow` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Publish workflow",
+     "operation": "setVisualWorkflow"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "contract approvals.yaml PUT /visual-workflow; wiring fix, 2 October 2026"
+   }
+  ],
+  "entryState": {},
+  "notes": "The approvals validation and publication, opened with the accreditation scope (VO-R14): the approvals platform owns the machinery; accreditation does not (design-note correction).",
   "_platform": {
    "code": "P08",
    "audience": "staff",

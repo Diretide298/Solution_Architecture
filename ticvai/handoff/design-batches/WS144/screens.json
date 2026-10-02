@@ -96,6 +96,17 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 49"
+   },
+   {
+    "operation": "getMyChallenges",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-005): getMyChallenges returns the caller's own challenges; a command centre needs programme-wide figures (design-notes correction customer-marketing BO-824).",
+    "source": "contracts/satellite/marketing-crm.yaml#getMyChallenges"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-007): No staff read of challenges across the programme.",
+    "source": "contracts/satellite/marketing-crm.yaml#getMyChallenges"
    }
   ],
   "layout": {
@@ -105,17 +116,6 @@
      "name": "contentBody",
      "slot": "headline",
      "components": [
-      {
-       "kind": "metricTile",
-       "label": "Active challenges",
-       "bindsTo": "Challenge",
-       "columns": [
-        "Challenge.status"
-       ],
-       "operation": "getMyChallenges",
-       "notes": "Count where `status` is active. The bound read is the caller's own list (`/guests/me/challenges`), not the tenant's.",
-       "provenance": "contract marketing-crm.yaml GET /guests/me/challenges"
-      },
       {
        "kind": "metricTile",
        "label": "Participants",
@@ -166,78 +166,23 @@
     {
      "name": "contentBody",
      "slot": "collection",
-     "components": [
-      {
-       "kind": "dataTable",
-       "label": "Challenges",
-       "bindsTo": "Challenge",
-       "columns": [
-        "Challenge.name",
-        "Challenge.kind",
-        "Challenge.scope",
-        "Challenge.eventId",
-        "Challenge.rewardKind",
-        "Challenge.rewardValue",
-        "Challenge.startsAt",
-        "Challenge.endsAt",
-        "Challenge.status"
-       ],
-       "operation": "getMyChallenges",
-       "provenance": "contract marketing-crm.yaml GET /guests/me/challenges"
-      }
-     ]
+     "components": []
     },
     {
      "name": "contextPanel",
      "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected challenge",
-       "bindsTo": "Challenge",
-       "columns": [
-        "Challenge.id",
-        "Challenge.name",
-        "Challenge.kind",
-        "Challenge.scope",
-        "Challenge.goal",
-        "Challenge.rewardKind",
-        "Challenge.rewardValue",
-        "Challenge.rewardAmount",
-        "Challenge.badgeAssetId",
-        "Challenge.startsAt",
-        "Challenge.endsAt",
-        "Challenge.status",
-        "Challenge.scopePath",
-        "ChallengeProgress.current",
-        "ChallengeProgress.target",
-        "ChallengeProgress.streakCount",
-        "ChallengeProgress.completedAt"
-       ],
-       "operation": "getMyChallenges",
-       "notes": "Progress is the caller's own, from the same read.",
-       "provenance": "contract marketing-crm.yaml GET /guests/me/challenges"
-      }
-     ]
+     "components": []
     }
    ]
   },
   "states": {
    "loading": "The gamification list.",
    "error": "Could not load. Names which read failed and leaves the gamification untouched.",
-   "emptyFirstRun": "No gamification yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No gamification yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the gamification are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Not shown: nothing on this screen needs a permission of its own; the app's sign-in decides access."
   },
-  "apis": [
-   {
-    "operationId": "getMyChallenges",
-    "contract": "marketing-crm",
-    "purpose": "Challenges running",
-    "trigger": "onLoad",
-    "provenance": "board reading, 19 September 2026"
-   }
-  ],
+  "apis": [],
   "wireframe": {
    "status": "notStarted",
    "board": "wireframes/P08 Venue Management.dc.html#bo-824",
@@ -325,6 +270,11 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 49"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-007): No listChallenges or getChallenge, and no activate step.",
+    "source": "contracts/satellite/marketing-crm.yaml#createChallenge"
    }
   ],
   "layout": {
@@ -334,13 +284,6 @@
      "name": "contentBody",
      "components": [
       {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "createChallenge",
-       "label": "Create challenge",
-       "notes": "The act the screen exists for."
-      },
-      {
        "kind": "selectField",
        "label": "Challenge action",
        "operation": "createChallenge",
@@ -348,11 +291,45 @@
        "provenance": "contract marketing-crm.yaml POST /challenges"
       },
       {
+       "kind": "dataTable",
+       "label": "Challenges",
+       "operation": "listChallenges",
+       "provenance": "contract marketing-crm.yaml GET /challenges"
+      },
+      {
+       "kind": "publishGate",
+       "label": "What activating changes",
+       "notes": "Names the audience and dates the challenge goes live for.",
+       "provenance": "design-note correction, 2 October 2026"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The challenge",
+       "operation": "getChallenge",
+       "provenance": "contract marketing-crm.yaml GET /challenges/{challengeId}"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Create challenge",
+       "operation": "createChallenge",
+       "provenance": "contract marketing-crm.yaml POST /challenges"
+      },
+      {
        "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "createChallenge"
+       "label": "Activate challenge",
+       "operation": "activateChallenge",
+       "provenance": "contract marketing-crm.yaml POST /challenges/{challengeId}/activate"
       }
      ]
     }
@@ -372,6 +349,27 @@
     "purpose": "Build a challenge",
     "trigger": "onAction",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "listChallenges",
+    "contract": "marketing-crm",
+    "purpose": "Reopen a draft challenge (CHG-CSA-045)",
+    "trigger": "onLoad",
+    "provenance": "design-note correction, 2 October 2026 (BO-825)"
+   },
+   {
+    "operationId": "getChallenge",
+    "contract": "marketing-crm",
+    "purpose": "Open one challenge (CHG-CSA-045)",
+    "trigger": "onLoad",
+    "provenance": "design-note correction, 2 October 2026 (BO-825)"
+   },
+   {
+    "operationId": "activateChallenge",
+    "contract": "marketing-crm",
+    "purpose": "Publish a draft challenge to guests",
+    "trigger": "onAction",
+    "provenance": "design-note correction, 2 October 2026 (BO-825)"
    }
   ],
   "wireframe": {
@@ -380,6 +378,43 @@
    "workshopBoard": "wireframes/WS79 Marketing CRM Configuration Reference v1.0 Board 10.dc.html#bo-825"
   },
   "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 49. 0 of 0 labels bound to a contract property; 0 of 9 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formCreateChallenge",
+    "component": "modal",
+    "trigger": "Create challenge",
+    "body": "**Collects what `createChallenge` sends before it is called.** Required: `name`, `kind`, `goal`. Optional: `scope`, `eventId`, `rewardKind`, `rewardValue`, `rewardAmount`, `badgeAssetId`, `startsAt`, `endsAt`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Create challenge",
+     "operation": "createChallenge"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "name",
+      "kind",
+      "goal",
+      "scope",
+      "eventId",
+      "rewardKind",
+      "rewardValue",
+      "rewardAmount",
+      "badgeAssetId",
+      "startsAt",
+      "endsAt"
+     ]
+    },
+    "provenance": "contract marketing-crm.yaml POST /challenges"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "challengeId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -451,6 +486,12 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 49"
+   },
+   {
+    "operation": "createChallenge",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-005): The screen manages badges and its primary action was \"Create challenge\"; listBadges and setBadge are its main act (design-notes correction customer-marketing BO-826).",
+    "source": "contracts/satellite/marketing-crm.yaml#listBadges"
    }
   ],
   "layout": {
@@ -460,10 +501,16 @@
      "name": "contentBody",
      "components": [
       {
+       "kind": "dataTable",
+       "label": "Badges",
+       "operation": "listBadges",
+       "provenance": "contract marketing-crm.yaml GET /badges; wiring fix, 2 October 2026"
+      },
+      {
        "kind": "primaryButton",
        "derived": true,
-       "impliedBy": "createChallenge",
-       "label": "Create challenge",
+       "impliedBy": "setBadge",
+       "label": "Save badge",
        "notes": "The act the screen exists for."
       },
       {
@@ -471,7 +518,7 @@
        "label": "Cancel",
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
-       "impliedBy": "createChallenge"
+       "impliedBy": "setBadge"
       }
      ]
     }
@@ -480,18 +527,11 @@
   "states": {
    "loading": "The achievement badge list.",
    "error": "Could not load. Names which read failed and leaves the achievement badge untouched.",
-   "emptyFirstRun": "No achievement badge yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No achievement badge yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the achievement badge are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
-   {
-    "operationId": "createChallenge",
-    "contract": "marketing-crm",
-    "purpose": "Achievements and badges",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026"
-   },
    {
     "operationId": "setBadge",
     "contract": "marketing-crm",
@@ -505,6 +545,13 @@
     "purpose": "Award a badge to a guest by hand",
     "trigger": "onAction",
     "provenance": "decided 29 September, VM close-out (venue management and configuration)"
+   },
+   {
+    "operationId": "listBadges",
+    "contract": "marketing-crm",
+    "purpose": "The badges defined",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-005)"
    }
   ],
   "entryState": {
@@ -593,6 +640,12 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 50"
+   },
+   {
+    "operation": "createLoyaltyProgramme",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-005): A whole-set replace (setLoyaltyRules) without reading the current set erases rules, and getLoyaltyRules was consumed by no screen; programme creation belongs on the programme list, not on a rules screen entered with a programmeId (design-notes corrections customer-marketing BO-827).",
+    "source": "contracts/satellite/marketing-crm.yaml#getLoyaltyRules | screens/P08-venue-back-office.yaml#BO-827"
    }
   ],
   "layout": {
@@ -602,10 +655,17 @@
      "name": "contentBody",
      "components": [
       {
+       "kind": "detailPanel",
+       "label": "Rules in force",
+       "bindsTo": "LoyaltyRuleSet",
+       "operation": "getLoyaltyRules",
+       "provenance": "contract marketing-crm.yaml GET /loyalty/programmes/{programmeId}/rules; wiring fix, 2 October 2026"
+      },
+      {
        "kind": "primaryButton",
        "derived": true,
-       "impliedBy": "createLoyaltyProgramme",
-       "label": "Create loyalty programme",
+       "impliedBy": "setLoyaltyRules",
+       "label": "Save loyalty rules",
        "notes": "The act the screen exists for."
       },
       {
@@ -613,7 +673,7 @@
        "label": "Cancel",
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
-       "impliedBy": "createLoyaltyProgramme"
+       "impliedBy": "setLoyaltyRules"
       }
      ]
     }
@@ -622,18 +682,11 @@
   "states": {
    "loading": "The points activity rules list.",
    "error": "Could not load. Names which read failed and leaves the points activity rules untouched.",
-   "emptyFirstRun": "No points activity rules yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No points activity rules yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the points activity rules are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
-   {
-    "operationId": "createLoyaltyProgramme",
-    "contract": "marketing-crm",
-    "purpose": "Points and activity rules",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026"
-   },
    {
     "operationId": "setLoyaltyRules",
     "contract": "marketing-crm",
@@ -647,6 +700,13 @@
     "purpose": "Define a bonus-points campaign and its window",
     "trigger": "onAction",
     "provenance": "decided 29 September, VM close-out (venue management and configuration)"
+   },
+   {
+    "operationId": "getLoyaltyRules",
+    "contract": "marketing-crm",
+    "purpose": "Every rule the programme runs on",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-005)"
    }
   ],
   "wireframe": {
@@ -741,20 +801,24 @@
    "regions": [
     {
      "name": "contentBody",
+     "components": []
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
      "components": [
       {
        "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "createLoyaltyProgramme",
-       "label": "Create loyalty programme",
-       "notes": "The act the screen exists for."
+       "label": "Save milestones and rewards",
+       "operation": "createLoyaltyProgramme",
+       "notes": "Milestones and rewards are set on an existing programme; programme creation is elsewhere (the loyalty set-up). The operation carries the programme's tiers and earn rules.",
+       "provenance": "contract marketing-crm.yaml POST /loyalty/programmes"
       },
       {
        "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "createLoyaltyProgramme"
+       "label": "Save reward",
+       "operation": "setReward",
+       "provenance": "contract marketing-crm.yaml PUT /loyalty/rewards"
       }
      ]
     }
@@ -789,6 +853,57 @@
    "workshopBoard": "wireframes/WS79 Marketing CRM Configuration Reference v1.0 Board 10.dc.html#bo-828"
   },
   "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 50. 0 of 0 labels bound to a contract property; 0 of 8 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formCreateLoyaltyProgramme",
+    "component": "modal",
+    "trigger": "Save milestones and rewards",
+    "body": "**Collects what `createLoyaltyProgramme` sends before it is called.** Required: `code`, `name`, `earnRules`, `tiers`. Optional: `venueId`, `pointsLiabilityAccountId`, `pointsExpireAfterMonths`, `isActive`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save milestones and rewards",
+     "operation": "createLoyaltyProgramme"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "code",
+      "name",
+      "earnRules",
+      "tiers",
+      "venueId",
+      "pointsLiabilityAccountId",
+      "pointsExpireAfterMonths",
+      "isActive"
+     ]
+    },
+    "provenance": "contract marketing-crm.yaml POST /loyalty/programmes"
+   },
+   {
+    "id": "formSetReward",
+    "component": "modal",
+    "trigger": "Save reward",
+    "body": "**Collects what `setReward` sends before it is called.** Required: `loyaltyProgramId`, `code`, `name`, `type`, `isActive`. Optional: `productId`, `pointsCost`, `discountValue`, `validityDays`. `id` is a client UUIDv7 generated silently, never asked. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save reward",
+     "operation": "setReward"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "loyaltyProgramId",
+      "code",
+      "name",
+      "type",
+      "isActive",
+      "productId",
+      "pointsCost",
+      "discountValue",
+      "validityDays"
+     ]
+    },
+    "provenance": "contract marketing-crm.yaml PUT /loyalty/rewards"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1094,6 +1209,17 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 51"
+   },
+   {
+    "operation": "getLoyaltyPosition",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-005): Participant progress was bound to getLoyaltyPosition (the caller's own position, guest audience); staff read a named guest with getGuestLoyalty (design-notes correction customer-marketing BO-831).",
+    "source": "contracts/satellite/marketing-crm.yaml#getLoyaltyPosition | contracts/satellite/marketing-crm.yaml#getGuestLoyalty"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-007): No staff-audience leaderboard read.",
+    "source": "contracts/satellite/marketing-crm.yaml#listLeaderboard"
    }
   ],
   "layout": {
@@ -1191,7 +1317,7 @@
   "states": {
    "loading": "The progress leaderboards list.",
    "error": "Could not load. Names which read failed and leaves the progress leaderboards untouched.",
-   "emptyFirstRun": "No progress leaderboards yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No progress leaderboards yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the progress leaderboards are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Shown when the caller lacks `GUEST_VIEW`, which `getGuestLoyalty` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },

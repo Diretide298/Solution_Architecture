@@ -1,5 +1,5 @@
 id: LLD-Shift
-title: Shift — 10 transitions
+title: Shift — 13 transitions
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/04-lifecycles.yaml
 source: states/shift.yaml
@@ -50,12 +50,32 @@ transitions:
   to: closed
   operation: acceptShiftVariance
   trigger: operation
-  guard: Supervisor accepted, with a reason, on the till with a PIN step-up. **The only way past a variance
-    above the threshold** (decided 28 September, audit R080 (e)); no pre-close PIN hold and no approval
-    request
+  guard: Supervisor accepted, with a reason, with a PIN step-up. **The only way past a variance above
+    the threshold** (decided 28 September, audit R080 (e)); no pre-close PIN hold and no approval request.
+    At any till of the venue or in the daily cash reconciliation (BO-043) since 2 October 2026 (Chinmay,
+    batch 6
   requiresApproval: true
   emits:
   - shift.closed
+- from: pendingVariance
+  to: closed
+  operation: submitShiftCount
+  trigger: operation
+  guard: The cashier's recount after `rejectShiftVariance` (DEC-175; CHG-CSP-013) comes within the venue's
+    threshold. Beyond it the shift stays `pendingVariance` for the supervisor, which is no move
+  emits:
+  - shift.closed
+- from: open
+  to: pendingClosure
+  operation: submitShiftCount
+  trigger: operation
+  guard: The cashier's own blind count (CHG-FIN-003). Measured against the threshold as `closeShift`
+    is; the receipt carries no figure
+- from: suspended
+  to: pendingClosure
+  operation: submitShiftCount
+  trigger: operation
+  guard: The cashier counts a suspended shift on return (CHG-FIN-003)
 - from: open
   to: autoClosed
   trigger: timer
@@ -74,7 +94,25 @@ transitions:
   isReversal: true
   requiresApproval: true
 notes: '`autoClosed` is deliberately distinct from `closed`. A shift nobody counted must not appear
-  in reconciliation as one that was.'
+  in reconciliation as one that was.
+
+
+  **A shift waiting for review never blocks the next one** (decided 2 October 2026, Chinmay, batch 3
+  #1, POS-007, and batch 6 #173, BO-040; DEC-059, DEC-173; CHG-CSP-012; DI-805). The cashier signs out
+  with the shift `pendingVariance` or `pendingClosure`; their till shows it as "Under review" (or "Recount
+  requested" after a rejection), and `openShift` refuses a new shift on the workstation only while one
+  is `open` or `suspended`. The supervisor resolves waiting shifts at any till, or one by one in the
+  daily cash reconciliation (BO-043), where `closeShift` also closes a shift still open (pre-apply round,
+  2 October). The venue''s opening and closing rules (approval on open or close, the auto-close limit)
+  are `shift.TillShiftPolicy` (CHG-CSP-020).
+
+
+  **Reject and recount move no state** (decided 2 October 2026, Chinmay, batch 6 #175: "Add Reject +
+  recount (DI-804)"; DEC-175; CHG-CSP-013). `rejectShiftVariance` (a supervisor other than the cashier,
+  PIN step-up, a reason) leaves the shift `pendingVariance` and sets `recountRequestedAt`; the cashier''s
+  recount with `submitShiftCount`, at any till of the venue, clears it and the latest count is measured
+  again: within the threshold it closes, beyond it it waits again for `acceptShiftVariance`. No status
+  was added, so clients built at r1 keep the values they switch on.'
 offlineReachable:
 - open
 - suspended

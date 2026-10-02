@@ -73,7 +73,18 @@ TRADING_PERM = re.compile(r"_(EXECUTE|VALIDATE|BOOK|CREATE|MODIFY)$")
 # writes no table a core operation reads. From the AI functions review and the P29 pass.
 ALSO = ["evaluateAiGovernance", "getAiUsage", "getAiPolicy", "proposeGuidedChoice", "proposeTranslations",
         "proposeVenueLabels", "getAiVenueSettings", "setAiVenueSettings", "importVenueHistory",
-        "listVenueHistoryImports", "getVenueHistoryImport"]
+        "listVenueHistoryImports", "getVenueHistoryImport",
+        # **The Block A AI setup screens' reads** (2 October 2026, CHG-SBO-006, applied by CHG-CLN-014): the
+        # screens could write and not read what they wrote. ADM-037 (providers, BYOK, the region, the grant
+        # found again after a reload), ADM-508 (forecast versions and accuracy), ADM-520 (capability registry),
+        # ADM-523, 526, 527, 528 (policy versions, the effective policy, revoking an exception), ADM-536 (pause a
+        # capability, override a decision), ADM-554 (alerts, evaluations, training runs), ADM-556 (incidents),
+        # BO-919 and BO-927 (the forecast and the operational requirements).
+        "listAiProviders", "testAiProvider", "listOwnPlatformStaffGrants", "getRegionSettings",
+        "getAiByokEnablement", "listForecastVersions", "getForecastAccuracy", "listAiCapabilities",
+        "listAiGovernancePolicyVersions", "getEffectiveAiPolicy", "revokeAiPolicyException", "pauseAiCapability",
+        "overrideAiDecision", "listAiGovernanceAlerts", "listAiEvaluations", "listAiTrainingRuns",
+        "openAiIncident", "listAiIncidents", "getForecast", "listOperationalRequirements"]
 
 
 def is_deferred(s: dict) -> bool:

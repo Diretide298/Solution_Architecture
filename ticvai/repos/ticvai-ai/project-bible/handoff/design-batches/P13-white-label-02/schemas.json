@@ -932,6 +932,11 @@
     ],
     "default": "off",
     "description": "When GST-001 plays it full screen. \"Skip introduction\" is always shown. Anything but `off` needs `introVideoAssetRef`, or 400."
+   },
+   "showPoweredBy": {
+    "type": "boolean",
+    "default": true,
+    "description": "**\"Powered by TICVAI\", a configuration toggle, on by default** (Chinmay, 2 October, workbook Q160 and the pre-apply round; consistent with DI-297; CHG-CSA-036). Shown on the launch screen and at the foot of Account and the web footer while true. **Switching it off needs the tenant's licence to allow it**: `setBrandIdentity` refuses `false` with `403 powered-by-locked` unless the tenant's plan carries the `poweredByRemoval` add-on (subscription `LicencePosition.poweredByRemovable`)."
    }
   }
  },
@@ -1107,6 +1112,24 @@
    },
    "note": {
     "type": "string"
+   },
+   "reviewStatus": {
+    "type": "string",
+    "readOnly": true,
+    "enum": [
+     "notRequired",
+     "pending",
+     "approved",
+     "rejected"
+    ],
+    "default": "notRequired",
+    "description": "The review step, where the tenant's publish-review policy is on (CHG-CSA-042)."
+   },
+   "approvalRequestId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true
    },
    "isCurrent": {
     "type": "boolean"
@@ -1420,6 +1443,113 @@
    "failureReason": {
     "type": "string",
     "nullable": true
+   },
+   "routing": {
+    "type": "string",
+    "enum": [
+     "cname",
+     "delegatedSubdomain",
+     "apex"
+    ],
+    "default": "cname",
+    "description": "**How the hostname reaches TICVAI** (Chinmay, 2 October: \"subdomain plus CNAME\"; CHG-CSA-043). `cname`, the default: a CNAME (e.g. `tickets.venue.com`) straight to the Front Door endpoint, validated by the TXT `_dnsauth` record, with a Front Door managed certificate. `delegatedSubdomain`: the tenant delegates a subdomain to TICVAI's name servers (NS). `apex`: the bare domain, only on request. There is no path proxy."
+   },
+   "dnsRecords": {
+    "x-ticvai-persistence-kind": "valueObject",
+    "x-ticvai-persistence-column": "jsonb",
+    "type": "array",
+    "readOnly": true,
+    "description": "**Every record the tenant must publish, with what is observed now** (CHG-CSA-043): the TXT `_dnsauth` record, the CNAME, and CAA or NS where they apply. CMS-017 lists them with their status.",
+    "items": {
+     "type": "object",
+     "required": [
+      "type",
+      "name",
+      "expectedValue",
+      "status"
+     ],
+     "properties": {
+      "type": {
+       "type": "string",
+       "enum": [
+        "TXT",
+        "CNAME",
+        "CAA",
+        "NS"
+       ]
+      },
+      "name": {
+       "type": "string"
+      },
+      "expectedValue": {
+       "type": "string"
+      },
+      "observedValue": {
+       "type": "string",
+       "nullable": true
+      },
+      "status": {
+       "type": "string",
+       "enum": [
+        "ok",
+        "missing",
+        "wrong"
+       ]
+      }
+     }
+    }
+   },
+   "revalidation": {
+    "type": "string",
+    "readOnly": true,
+    "enum": [
+     "none",
+     "pendingRevalidation",
+     "timedOut"
+    ],
+    "default": "none",
+    "description": "**The two waits CMS-017 shows beside `status`** (CHG-CSA-043). `pendingRevalidation`: an `active` domain whose validation must be renewed (the managed certificate's periodic revalidation, or a record that changed); it keeps serving while the job re-checks. `timedOut`: a claim whose records were not published within the validation window; `regenerateDomainToken` starts it again. Kept beside `status`, not inside it, because a new status value would break a client built at r1 (CHG-CSA-043 notes)."
+   },
+   "cnameLost": {
+    "type": "boolean",
+    "readOnly": true,
+    "description": "**Takeover warning** (CHG-CSA-043). True when a scheduled check finds that an `active` or released hostname's CNAME still points at TICVAI with no tenant serving it, or no longer points at us while `active`. Relinquishing a domain tells the tenant to remove the CNAME first, so nobody else can claim the dangling record."
+   },
+   "isPrimary": {
+    "type": "boolean",
+    "readOnly": true,
+    "description": "The tenant's primary domain for its `kind`; the others redirect to it (`setPrimaryDomain`)."
+   },
+   "readiness": {
+    "type": "object",
+    "readOnly": true,
+    "description": "**Per-domain setup a guest needs** (CHG-CSA-043): the UAE Pass redirect URI registered for this hostname, the Apple Pay merchant domain verified, and the app links (Apple app-site association, Android asset links) served.",
+    "properties": {
+     "uaePassRedirect": {
+      "type": "string",
+      "enum": [
+       "ready",
+       "pending",
+       "notApplicable"
+      ]
+     },
+     "applePayDomain": {
+      "type": "string",
+      "enum": [
+       "ready",
+       "pending",
+       "notApplicable"
+      ]
+     },
+     "appLinks": {
+      "type": "string",
+      "enum": [
+       "ready",
+       "pending",
+       "notApplicable"
+      ]
+     }
+    }
    }
   }
  },
@@ -2038,10 +2168,25 @@
  "HomepageLayout": {
   "x-ticvai-persistence": "whitelabel.homepage_section",
   "type": "object",
+  "description": "**The client-approved web and app wireframes are the layout** (Chinmay, 2 October, workbook Q163; CHG-CSA-040): sections, their order and their options follow the approved wireframes and change only where the spec breaks. **Landing-page templates** (workbook Q41 batch 2; CHG-CSA-037): a tenant with no landing page of its own starts from a TICVAI template (`templateKey`, `listLandingPageTemplates`); a tenant with its own site links into the storefront with deep links (`getDeepLinkScheme`, `buildDeepLink`).",
   "required": [
    "sections"
   ],
   "properties": {
+   "templateKey": {
+    "type": "string",
+    "nullable": true,
+    "description": "The landing-page template this layout started from (`listLandingPageTemplates`), or null for a layout composed from scratch (CHG-CSA-037)."
+   },
+   "landingSource": {
+    "type": "string",
+    "enum": [
+     "storefront",
+     "ownSite"
+    ],
+    "default": "storefront",
+    "description": "`storefront`: this home is the tenant's landing page. `ownSite`: the tenant's own website is the landing page and links in with deep links; this home is still served at the storefront address."
+   },
    "id": {
     "type": "string",
     "format": "uuid",
@@ -2084,7 +2229,19 @@
       "maxItems": {
        "type": "integer",
        "nullable": true,
-       "description": "How many items the section shows. On the mobile Home, `attractions`, `dining`, `whatsOn` and `shop` show 1 or 2 highlights (decided 29 September, MOB-3)."
+       "description": "**How many cards the section shows, the venue's choice** (Chinmay, 2 October, workbook Q152: every customisation option of the approved wireframe, including the card count per section; CHG-CSA-040). Replaces the fixed 1 or 2 highlights of MOB-3: the CMS offers the counts the approved wireframe offers."
+      },
+      "scrollAnimation": {
+       "type": "string",
+       "enum": [
+        "rise",
+        "scale",
+        "slide",
+        "blur",
+        "none"
+       ],
+       "default": "rise",
+       "description": "**How the section enters as the guest scrolls** (Chinmay, 2 October, workbook Q153: \"must be there\"; DI-1088; CHG-CSA-040). Rise, Scale, Slide, Blur or None, as the v4 prototype offers; `none` for guests who asked the device for reduced motion is applied whatever is set."
       },
       "heroStyle": {
        "type": "string",
@@ -2113,6 +2270,7 @@
   "properties": {
    "languages": {
     "type": "array",
+    "description": "**A tenant may add or select interface languages beyond English and Arabic** (Chinmay, 2 October, workbook Q145; CHG-CSA-039). Any ISO 639-1 language. English and Arabic ship with complete interface strings; for any other, the interface strings come as a TICVAI string pack drafted by AI translation and reviewed (T03), and a string with no translation falls back to English. Content (pages, products, banners) is the tenant's to translate (`translationGaps`).",
     "items": {
      "type": "string",
      "pattern": "^[a-z]{2}$"
@@ -2121,6 +2279,32 @@
    "defaultLanguage": {
     "type": "string",
     "pattern": "^[a-z]{2}$"
+   },
+   "uiStringCoverage": {
+    "type": "array",
+    "readOnly": true,
+    "description": "How complete the interface strings are in each enabled language (CHG-CSA-039). English and Arabic are always complete.",
+    "items": {
+     "type": "object",
+     "properties": {
+      "language": {
+       "type": "string"
+      },
+      "coveragePercent": {
+       "type": "number",
+       "minimum": 0,
+       "maximum": 100
+      },
+      "status": {
+       "type": "string",
+       "enum": [
+        "complete",
+        "draft",
+        "missing"
+       ]
+      }
+     }
+    }
    },
    "rtlLanguages": {
     "type": "array",
@@ -2382,6 +2566,34 @@
    }
   }
  },
+ "PlatformSubdomain": {
+  "x-ticvai-persistence": "none — derived from the tenant's slug and its cell",
+  "type": "object",
+  "description": "**Every tenant's own address on TICVAI** (Chinmay, 2 October: \"subdomain plus CNAME\"; DI-283; CHG-CSA-043). Given at provisioning, one stem per cell (`<venue>.<cell>.ticvai.app`, e.g. `*.ae.ticvai.app`), under a wildcard certificate, with host-only cookies. Always live, whether or not a custom domain is claimed; a custom domain is added on top of it.",
+  "required": [
+   "hostname",
+   "cell"
+  ],
+  "properties": {
+   "hostname": {
+    "type": "string",
+    "description": "e.g. `aquaventure.ae.ticvai.app`."
+   },
+   "cell": {
+    "type": "string"
+   },
+   "certificate": {
+    "type": "string",
+    "enum": [
+     "wildcard"
+    ]
+   },
+   "isPrimary": {
+    "type": "boolean",
+    "description": "True while no custom domain is primary."
+   }
+  }
+ },
  "Policy": {
   "x-ticvai-persistence": "whitelabel.policy",
   "type": "object",
@@ -2438,6 +2650,76 @@
    "cookie",
    "accessibility"
   ]
+ },
+ "Preview": {
+  "x-ticvai-persistence": "none — short-lived, cache only",
+  "type": "object",
+  "required": [
+   "previewId",
+   "url",
+   "expiresAt"
+  ],
+  "properties": {
+   "previewId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "url": {
+    "type": "string"
+   },
+   "platform": {
+    "type": "string",
+    "enum": [
+     "ios",
+     "android",
+     "web"
+    ]
+   },
+   "theme": {
+    "type": "string",
+    "deprecated": true,
+    "enum": [
+     "light",
+     "dark"
+    ],
+    "description": "Deprecated with `Theme.darkMode` (CHG-CSA-035); the preview always renders the venue's theme."
+   },
+   "language": {
+    "type": "string",
+    "pattern": "^[a-z]{2}$"
+   },
+   "outputPreviews": {
+    "type": "array",
+    "readOnly": true,
+    "description": "**The PDF ticket and the Apple and Google Wallet passes, previewed with the app** (Chinmay, 2 October, workbook Q151: in Block A; CHG-CSA-041). One entry per output asked for in `outputs`.",
+    "items": {
+     "type": "object",
+     "required": [
+      "output",
+      "url"
+     ],
+     "properties": {
+      "output": {
+       "type": "string",
+       "enum": [
+        "app",
+        "pdfTicket",
+        "appleWalletPass",
+        "googleWalletPass"
+       ]
+      },
+      "url": {
+       "type": "string",
+       "description": "A short-lived link to the rendered output (the PDF, the `.pkpass`, or the Google pass preview), expiring with the preview."
+      }
+     }
+    }
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
  },
  "Principal": {
   "x-ticvai-persistence": "identity.principal",
@@ -2981,6 +3263,40 @@
    }
   }
  },
+ "PublishReviewPolicy": {
+  "x-ticvai-persistence": "whitelabel.publish_review_policy",
+  "type": "object",
+  "description": "Whether publishing goes through a review step (CHG-CSA-042). One row per tenant; off by default.",
+  "required": [
+   "enabled"
+  ],
+  "properties": {
+   "enabled": {
+    "type": "boolean",
+    "default": false
+   },
+   "reviewerMustDifferFromAuthor": {
+    "type": "boolean",
+    "default": true
+   },
+   "appliesTo": {
+    "type": "array",
+    "description": "What the review covers. Empty means both.",
+    "items": {
+     "type": "string",
+     "enum": [
+      "tenantConfig",
+      "contentBlocks"
+     ]
+    }
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "The partition key (ADR-0005). Written at `tenant` scope."
+   }
+  }
+ },
  "Role": {
   "x-ticvai-persistence": "identity.role",
   "type": "object",
@@ -3021,7 +3337,14 @@
    "isSystem": {
     "type": "boolean",
     "default": false,
-    "description": "**Seeded roles ship and are editable; deleting one is refused.** A venue that removes `cashier` and rebuilds it has two roles with one name in the audit log.\n**The seeded system roles are Cashier, Supervisor, Venue Manager, Finance and Tenant Admin** (proposed in `docs/active/seed-data-proposal.md` section 2, client to correct; audit R229).\n"
+    "description": "**Seeded roles ship and are editable; deleting one is refused.** A venue that removes `cashier` and rebuilds it has two roles with one name in the audit log.\n**The seeded system roles are Cashier, Supervisor, Venue Manager, Finance and Tenant Admin** (proposed in `docs/active/seed-data-proposal.md` section 2, client to correct; audit R229).\n\n**Superseded 2 October 2026: no fixed default roles** (Chinmay; DEC-007; CHG-CSP-003). The five are presets (`CapabilityTemplate`, `isPreset`) a role starts from, not roles a tenant is given. The field stays for clients built at r1 and is false on every role created from 2 October.\n"
+   },
+   "presetCode": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "maxLength": 64,
+    "description": "**The preset this role was started from, for the record only** (decided 2 October 2026, Chinmay; DEC-007; CHG-CSP-003): the first of `createRole.presetCodes`, or null for a role ticked by hand. It binds nothing; a later edit of the preset never changes this role.\n"
    },
    "principalCount": {
     "type": "integer"
@@ -3157,6 +3480,65 @@
     "readOnly": true,
     "type": "string",
     "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `tenant` scope.**"
+   }
+  }
+ },
+ "SitePackage": {
+  "x-ticvai-persistence": "whitelabel.site_package",
+  "type": "object",
+  "description": "A self-hosting package of one published version (`exportSitePackage`, CHG-CSA-038).",
+  "required": [
+   "id",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "version": {
+    "type": "string"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "building",
+     "ready",
+     "failed"
+    ]
+   },
+   "downloadUrl": {
+    "type": "string",
+    "nullable": true,
+    "description": "Short-lived; present when `ready`."
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "requestedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "platformStaffGrantId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The platform-staff grant it was made under, where platform staff made it (R098)."
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "The partition key (ADR-0005). Written at `tenant` scope."
    }
   }
  },
@@ -3675,7 +4057,8 @@
    },
    "darkMode": {
     "type": "object",
-    "description": "Optional dark variant. Derived from the light theme when absent.",
+    "deprecated": true,
+    "description": "**Deprecated and ignored** (Chinmay, 2 October, workbook Q150 and the pre-apply round; CHG-CSA-035). White label has no dark or light mode: the venue's chosen theme is applied, on every device setting. The field is kept so a client built at r1 still parses, is accepted on `setTheme` and returned as stored, and **is never used to render anything or drawn on any screen**; the guest app has no Light/Dark switch.",
     "properties": {
      "primaryColour": {
       "type": "string",
@@ -3739,6 +4122,129 @@
       "$ref": "#/components/schemas/ThemeComponentColour"
      }
     }
+   }
+  }
+ },
+ "TranslationProposals": {
+  "type": "object",
+  "x-ticvai-persistence": "none — each draft is written on the block it translates",
+  "description": "What `proposeTranslations` drafted. **Every entry is a draft, never a publish** — a person edits and publishes it through the contract that owns the block.\n",
+  "required": [
+   "targetLocale",
+   "drafts"
+  ],
+  "properties": {
+   "targetLocale": {
+    "type": "string"
+   },
+   "translationJobId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "The job to follow with `getTranslationProposals` (contract gap CHG-WIR-017, CMS-011; CHG-CSA-045)."
+   },
+   "status": {
+    "type": "string",
+    "readOnly": true,
+    "enum": [
+     "running",
+     "completed",
+     "failed"
+    ],
+    "description": "`running` while drafts are still being written; `drafts` then holds those done so far."
+   },
+   "drafts": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "targetKind",
+      "targetRef",
+      "draftText"
+     ],
+     "properties": {
+      "targetKind": {
+       "type": "string",
+       "enum": [
+        "contentBlock",
+        "productName",
+        "emailTemplate",
+        "messageTemplate"
+       ]
+      },
+      "targetRef": {
+       "type": "string",
+       "description": "The id of the block, product or template the draft sits on."
+      },
+      "draftText": {
+       "type": "string",
+       "description": "The first-pass translation, as saved on the draft."
+      }
+     }
+    }
+   }
+  }
+ },
+ "UrlRedirect": {
+  "type": "object",
+  "x-ticvai-persistence": "control.url_redirect",
+  "description": "22.11.7. **Retired pages, expired campaigns and migrated content**, which is most of a website's history.\n**A redirect chain is the failure mode.** A → B → C loses ranking at every hop, so a new redirect whose target is itself a redirect is collapsed rather than appended.\n",
+  "required": [
+   "id",
+   "fromPath",
+   "toPath",
+   "statusCode"
+  ],
+  "properties": {
+   "id": {
+    "readOnly": true,
+    "type": "string",
+    "format": "uuid"
+   },
+   "fromPath": {
+    "type": "string"
+   },
+   "toPath": {
+    "type": "string"
+   },
+   "statusCode": {
+    "type": "integer",
+    "enum": [
+     301,
+     302,
+     307,
+     308
+    ]
+   },
+   "reason": {
+    "type": "string",
+    "enum": [
+     "contentMigrated",
+     "pageRetired",
+     "campaignExpired",
+     "restructure",
+     "slugChanged"
+    ]
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true,
+    "nullable": true,
+    "description": "**Taken from their `whitelabel.redirect`, 20 September.** This table counts hits and could not say when a redirect was added — a record of a site's history with no date on its own rows. Ours had `hitCount` and no timestamp of any kind.\n"
+   },
+   "hitCount": {
+    "type": "integer",
+    "readOnly": true
+   },
+   "isActive": {
+    "type": "boolean",
+    "default": true
+   },
+   "scopePath": {
+    "readOnly": true,
+    "type": "string",
+    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `tenant` scope.**"
    }
   }
  },

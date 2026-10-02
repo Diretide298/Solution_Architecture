@@ -92,205 +92,6 @@
    }
   }
  },
- "BookingFlow": {
-  "x-ticvai-persistence": "whitelabel.booking_flow",
-  "type": "object",
-  "description": "**A venue's booking flow (decided 29 September, W12: operators pick their flows, see which steps are required, set their own order).** Made from a `BookingFlowType`; lives in the working draft and reaches guests with `publishTenantConfig`, which copies the venue's flows into the version's snapshot. A product or category names its flow (catalogue `bookingFlowId`); otherwise the venue's default for the type serving its kind applies.\n",
-  "required": [
-   "flowTypeKey",
-   "name"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid",
-    "readOnly": true
-   },
-   "venueId": {
-    "type": "string",
-    "format": "uuid",
-    "readOnly": true,
-    "description": "From the path of `createBookingFlowDefinition`."
-   },
-   "flowTypeKey": {
-    "$ref": "#/components/schemas/BookingFlowTypeKey"
-   },
-   "name": {
-    "type": "string",
-    "maxLength": 80,
-    "description": "Staff-facing, e.g. \"Day pass, date first\". Not shown to guests."
-   },
-   "isDefaultForType": {
-    "type": "boolean",
-    "default": false,
-    "description": "At most one per venue and type; setting it takes it from the previous default."
-   },
-   "isEnabled": {
-    "type": "boolean",
-    "default": true,
-    "description": "A disabled flow is kept and not published; products naming it fall back to the default."
-   },
-   "steps": {
-    "type": "array",
-    "maxItems": 30,
-    "description": "Every step of the type, in the venue's order. Filled from the type when left out on create.",
-    "items": {
-     "$ref": "#/components/schemas/BookingFlowStep"
-    }
-   },
-   "settings": {
-    "$ref": "#/components/schemas/BookingFlowLevelSettings"
-   },
-   "isValid": {
-    "type": "boolean",
-    "readOnly": true,
-    "x-ticvai-derived": "onWrite",
-    "description": "Whether the flow passes `validateBookingFlow`; worked out in the same transaction as each write. `publishTenantConfig` refuses a draft holding an invalid enabled flow."
-   },
-   "scopePath": {
-    "type": "string",
-    "readOnly": true,
-    "description": "The partition key (ADR-0005). Written at `venue` scope."
-   },
-   "updatedAt": {
-    "type": "string",
-    "format": "date-time",
-    "readOnly": true
-   }
-  }
- },
- "BookingFlowLevelSettings": {
-  "x-ticvai-persistence": "none — jsonb column on whitelabel.booking_flow",
-  "type": "object",
-  "description": "**The settings that belong to one flow, not to the venue (decided 29 September, W12).** Moved here from `BookingFlowSettings`, which keeps the venue-wide ones. Each keeps its rev 3 meaning and default. A field left out takes its default.\n",
-  "properties": {
-   "performanceReveal": {
-    "type": "string",
-    "enum": [
-     "dateTimeTicket",
-     "allAtOnce"
-    ],
-    "default": "dateTimeTicket",
-    "description": "**Performance reveal (rev 3 REV3-2).** `dateTimeTicket` shows the times only once a date is picked and the tickets only once a time is picked; `allAtOnce` shows them together. Product-first (W8) is the step order of `experienceWorkshop`, not a value here.\n"
-   },
-   "signInAt": {
-    "type": "string",
-    "enum": [
-     "afterAddOns",
-     "atPayment"
-    ],
-    "default": "afterAddOns",
-    "description": "**Where the guest is asked to sign in, or for a guest-checkout code (rev 3 REV3-3).** `afterAddOns` asks as the guest leaves the extras step; `atPayment` asks at payment. The basket is kept either way.\n"
-   },
-   "seatEventDateMode": {
-    "type": "string",
-    "enum": [
-     "inlineStep",
-     "popupOnSeatMap"
-    ],
-    "default": "inlineStep",
-    "description": "**Date and time on a seated event (rev 3 REV3-4).** `inlineStep` asks for them before the seat map; `popupOnSeatMap` opens the seat map with a date and time pop-up. Read only by the seated flow types.\n"
-   },
-   "extrasStep": {
-    "type": "string",
-    "enum": [
-     "auto",
-     "always",
-     "never"
-    ],
-    "default": "auto",
-    "description": "`auto` shows the extras step only when the cart's products have add-ons; `never` is the same as turning the optional `extras` step off."
-   },
-   "quickTour": {
-    "type": "boolean",
-    "default": false,
-    "description": "**Quick tour (rev 3 REV3-20).** A first visit gets a coach-mark tour of this flow's steps, replayable from a Quick tour button. Seen-state kept on the device only.\n"
-   },
-   "consentQuestionIds": {
-    "type": "array",
-    "maxItems": 10,
-    "uniqueItems": true,
-    "default": [],
-    "description": "**The flow's own consent questions (rev 3 REV3-26).** Asked on every booking through this flow, together with those of each product in the cart, each question once. Each id names an active `ConsentQuestion` of the tenant in marketing-crm, or 400. A Help me choose answer may pre-fill one (`GuidedChoice` `consentPrefill`); the guest still confirms it.\n",
-    "items": {
-     "type": "string",
-     "format": "uuid"
-    }
-   }
-  }
- },
- "BookingFlowStep": {
-  "x-ticvai-persistence": "whitelabel.booking_flow_step",
-  "type": "object",
-  "description": "One step of a venue's flow, in the venue's order (decided 29 September, W12).",
-  "required": [
-   "stepKey",
-   "enabled",
-   "sortOrder"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid",
-    "readOnly": true
-   },
-   "bookingFlowId": {
-    "type": "string",
-    "format": "uuid",
-    "readOnly": true
-   },
-   "stepKey": {
-    "$ref": "#/components/schemas/BookingFlowStepKey"
-   },
-   "enabled": {
-    "type": "boolean",
-    "description": "A `required` step cannot be off; the flow saves and `isValid` turns false."
-   },
-   "sortOrder": {
-    "type": "integer",
-    "minimum": 0
-   },
-   "requirement": {
-    "type": "string",
-    "enum": [
-     "required",
-     "optional",
-     "conditional"
-    ],
-    "readOnly": true,
-    "x-ticvai-derived": "onRead",
-    "description": "From the flow type, so the CMS can mark the step without a second read."
-   },
-   "settings": {
-    "type": "object",
-    "additionalProperties": true,
-    "default": {},
-    "description": "The step's own settings, by the names the type's `stepSettings` gives for this step (e.g. `languages` on `language`, `minHours` on `duration`). A name the type does not give is refused with 400."
-   }
-  }
- },
- "BookingFlowTypeKey": {
-  "type": "string",
-  "description": "**The flow types the system catalogue offers (decided 29 September, W12; impact.md b).** `seatedFixedPerformance` and `seatedDateTimeSeatMap` are the two seated flows; `cabanaMap` and `cabanaBySize` are the two cabana flows (W6); `experienceWorkshop` puts the product before the date (W8); `multiLocation` opens on the location switcher.\n",
-  "enum": [
-   "datedDayPass",
-   "timedEntry",
-   "openDated",
-   "seatedFixedPerformance",
-   "seatedDateTimeSeatMap",
-   "experienceWorkshop",
-   "surfSession",
-   "meetingRoomHourly",
-   "cabanaMap",
-   "cabanaBySize",
-   "guidedTourByLanguage",
-   "transport",
-   "tableReservation",
-   "membership",
-   "giftCard",
-   "multiLocation"
-  ]
- },
  "CashCountLine": {
   "x-ticvai-persistence": "orders.cash_count_line",
   "type": "object",
@@ -417,14 +218,38 @@
    }
   ]
  },
- "CashMovementKind": {
-  "type": "string",
-  "enum": [
-   "openingFloat",
-   "lift",
-   "add"
+ "CatalogueState": {
+  "x-ticvai-persistence": "none — computed from workstation bundle_version",
+  "type": "object",
+  "description": "The workstation's local catalogue position. A terminal beyond `staleAfter` must refuse to trade rather than transact against stale prices.\n",
+  "required": [
+   "appliedBundleVersion",
+   "appliedAt",
+   "staleAfter",
+   "isStale"
   ],
-  "description": "`openingFloat` is written by `openShift`; `lift` by `createCashMovement` and by `withdrawFromDepositBox`, which is a lift from one cashier's box; `add` by `createCashMovement`.\n"
+  "properties": {
+   "appliedBundleVersion": {
+    "type": "string"
+   },
+   "appliedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "staleAfter": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Beyond this the terminal refuses to trade."
+   },
+   "isStale": {
+    "type": "boolean"
+   },
+   "pendingBundleVersion": {
+    "type": "string",
+    "nullable": true,
+    "description": "Published but not yet applied."
+   }
+  }
  },
  "Channel": {
   "type": "string",
@@ -624,7 +449,19 @@
    },
    "notes": {
     "type": "string",
-    "maxLength": 1000
+    "maxLength": 1000,
+    "description": "The cashier's note on the count. Asked of every cashier on a blind count, never only after a variance is shown (CHG-FIN-003, DI-803).\n"
+   },
+   "cashierReason": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "tillError",
+     "unrecordedRefund",
+     "miscount",
+     "other"
+    ],
+    "description": "Anything the cashier knows went wrong in the shift (DI-803: till error, unrecorded refund, miscount, other). Optional and given without seeing the variance (CHG-FIN-003); the supervisor reads it beside the variance on BO-040.\n"
    },
    "releaseHeldLeases": {
     "type": "boolean",
@@ -636,105 +473,6 @@
     "format": "date-time"
    }
   }
- },
- "ConsentQuestion": {
-  "type": "object",
-  "x-ticvai-persistence": "marketing.consent_question + marketing.consent_question_version",
-  "description": "**A venue-defined consent question asked at booking** (decided 29 September, rev 3 REV3-26). Each version's text is kept in `consent_question_version`, so an answer always points at the exact words the guest saw. Attached to products by the catalogue and to booking flows by the white-label flow configuration; one or several per flow, as the venue chooses.\n",
-  "required": [
-   "id",
-   "kind",
-   "text",
-   "version",
-   "scope",
-   "required",
-   "blockingAnswer",
-   "status"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid",
-    "readOnly": true
-   },
-   "kind": {
-    "$ref": "#/components/schemas/ConsentQuestionKind"
-   },
-   "text": {
-    "allOf": [
-     {
-      "$ref": "#/components/schemas/LocalisedText"
-     }
-    ],
-    "description": "The question as the guest reads it, per locale."
-   },
-   "helpText": {
-    "allOf": [
-     {
-      "$ref": "#/components/schemas/LocalisedText"
-     }
-    ],
-    "nullable": true
-   },
-   "version": {
-    "type": "integer",
-    "minimum": 1,
-    "readOnly": true,
-    "description": "Raised by one each time the question changes (`updateConsentQuestion`)."
-   },
-   "scope": {
-    "type": "string",
-    "enum": [
-     "perPerson",
-     "perBooking"
-    ],
-    "default": "perPerson",
-    "description": "Asked for each declared person, or once for the whole booking."
-   },
-   "required": {
-    "type": "boolean",
-    "default": true,
-    "description": "Checkout waits until it is answered (`orders.checkoutCart` 422 `consentRequired`)."
-   },
-   "blockingAnswer": {
-    "type": "string",
-    "enum": [
-     "yes",
-     "no",
-     "none"
-    ],
-    "default": "none",
-    "description": "The answer that stops the booking, for the person or the booking it covers. `none` records the answer and blocks nothing."
-   },
-   "status": {
-    "type": "string",
-    "enum": [
-     "active",
-     "retired"
-    ],
-    "default": "active"
-   },
-   "scopePath": {
-    "type": "string",
-    "readOnly": true,
-    "description": "**The partition key** (ADR-0005). Operations write it at `venue` scope."
-   },
-   "updatedAt": {
-    "type": "string",
-    "format": "date-time",
-    "readOnly": true
-   }
-  }
- },
- "ConsentQuestionKind": {
-  "type": "string",
-  "description": "What the question is about (decided 29 September, rev 3 REV3-26). `swim` feeds the derived `confidentSwimmer` on the order line; the others are recorded and checked as the venue set them.",
-  "enum": [
-   "swim",
-   "scuba",
-   "risk",
-   "custom"
-  ]
  },
  "CountedDenominationLine": {
   "type": "object",
@@ -1073,79 +811,6 @@
    }
   }
  },
- "CreatePaymentRequest": {
-  "type": "object",
-  "required": [
-   "id",
-   "orderId",
-   "tender",
-   "amount",
-   "recordedAt"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid",
-    "description": "Client-generated UUIDv7 of the payment, and its idempotency key — it must equal the `Idempotency-Key` header."
-   },
-   "orderId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "tender": {
-    "$ref": "#/components/schemas/TenderKind"
-   },
-   "amount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "tenderCurrency": {
-    "type": "string",
-    "pattern": "^[A-Z]{3}$",
-    "nullable": true,
-    "description": "The currency the guest handed over, where it is not the venue's — becomes `Payment.tenderCurrency`. Omit for a payment in the venue's own currency."
-   },
-   "tenderAmount": {
-    "allOf": [
-     {
-      "$ref": "../shared/common.yaml#/components/schemas/Money"
-     }
-    ],
-    "description": "**What the guest handed over**, in `tenderCurrency` — becomes `Payment.tenderAmount`, one name for one concept (renamed from `tenderedAmount` on 26 September). For cash, change is the difference.\n"
-   },
-   "walletAuthorisationId": {
-    "type": "string",
-    "nullable": true,
-    "description": "Cross-cell wallet hold, where the guest's home cell is elsewhere."
-   },
-   "walletHoldId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "For a `wallet` tender, the hold `wallet.holdWalletFunds` placed (SD-027). Capture debits it; the order service writes no wallet table."
-   },
-   "returnUrl": {
-    "type": "string",
-    "format": "uri",
-    "nullable": true,
-    "description": "Where the provider returns the guest after a 3-D Secure challenge or hosted page (SD-034). Required for a card payment from the guest web or app."
-   },
-   "terminalId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "The card terminal to instruct, for a card payment at a till (ECR flow, SD-034)."
-   },
-   "deviceId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "recordedAt": {
-    "type": "string",
-    "format": "date-time"
-   }
-  }
- },
  "CreateRefundRequest": {
   "type": "object",
   "required": [
@@ -1271,6 +936,148 @@
    }
   }
  },
+ "CredentialOperationsCommandCenterView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Credential Operations Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "virtualTicketId": {
+    "type": "string",
+    "description": "Virtual Ticket ID"
+   },
+   "credentialId": {
+    "type": "string",
+    "description": "Credential ID"
+   },
+   "mediaType": {
+    "type": "string",
+    "description": "Media Type"
+   },
+   "customerParticipant": {
+    "type": "string",
+    "description": "Customer / Participant"
+   },
+   "product": {
+    "type": "string",
+    "description": "Product"
+   },
+   "event": {
+    "type": "string",
+    "description": "Event"
+   },
+   "credentialStatus": {
+    "type": "string",
+    "enum": [
+     "pendingGeneration",
+     "generated",
+     "pendingActivation",
+     "active",
+     "suspended",
+     "revoked",
+     "expired",
+     "failed"
+    ],
+    "description": "Credential status"
+   },
+   "deliveryStatus": {
+    "type": "string",
+    "enum": [
+     "notRequired",
+     "pending",
+     "sent",
+     "delivered",
+     "openedDownloaded",
+     "completed",
+     "failed",
+     "bounced",
+     "expired",
+     "cancelled"
+    ],
+    "description": "Delivery status (15.3.4)"
+   },
+   "activationStatus": {
+    "type": "string",
+    "enum": [
+     "pending",
+     "scheduled",
+     "active",
+     "notRequired"
+    ],
+    "description": "Activation status"
+   },
+   "bindingStatus": {
+    "type": "string",
+    "enum": [
+     "pending",
+     "bound",
+     "unbound",
+     "failed"
+    ],
+    "description": "Binding status"
+   },
+   "provider": {
+    "type": "string",
+    "description": "Provider"
+   },
+   "lastActivity": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Last Activity"
+   },
+   "exception": {
+    "type": "string",
+    "description": "Exception"
+   },
+   "owner": {
+    "type": "string",
+    "description": "Owner"
+   }
+  }
+ },
+ "CredentialReplacementInput": {
+  "type": "object",
+  "x-ticvai-persistence": "none — request only (decided 29 September, VM close-out)",
+  "description": "Replace the media of a credential while the Virtual Ticket stays the same (decided 29 September, VM close-out).",
+  "required": [
+   "reason"
+  ],
+  "properties": {
+   "reason": {
+    "type": "string",
+    "enum": [
+     "lost",
+     "stolen",
+     "damaged",
+     "compromised",
+     "customerChangedPhone",
+     "rfidFailure",
+     "wristbandReplacement",
+     "qrCompromise",
+     "walletReplacement",
+     "faceReEnrollment",
+     "incorrectAssignment"
+    ]
+   },
+   "newMediaKind": {
+    "type": "string",
+    "description": "Media type of the replacement (`MediaTypeTechnologyLibraryView.mediaType`); empty keeps the current kind"
+   },
+   "newMediaCode": {
+    "type": "string",
+    "description": "Code of the new physical media where one is encoded at the counter"
+   },
+   "approvalRequestId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The granted approval, where the replacement rule requires one"
+   },
+   "note": {
+    "type": "string",
+    "maxLength": 500
+   }
+  }
+ },
  "CredentialReplacementReissueRevocationRecoveryView": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
@@ -1382,6 +1189,15 @@
    "$ref": "#/components/schemas/CashCountLine"
   },
   "minItems": 1
+ },
+ "DeploymentProfile": {
+  "type": "string",
+  "description": "How this workstation obtains catalogue and inventory (ADR-0013).\n- `terminalLocal` — own SQLite, leases direct from the cell. Small venues, 4G sites - `venueEdge` — own SQLite, distributed via the venue edge node which holds the\n  venue lease and sub-leases to terminals. Mid and large venues, stadium gates\n- `thin` — no local catalogue, server reads. Non-transactional surfaces only\n",
+  "enum": [
+   "terminalLocal",
+   "venueEdge",
+   "thin"
+  ]
  },
  "Deposit": {
   "type": "object",
@@ -1529,6 +1345,14 @@
     "readOnly": true,
     "description": "**Reduces the expected close figure.** Cash skimmed for banking is not a shortfall, and a system that treats it as one makes every busy cashier look short.\n"
    },
+   "overDrawerLimit": {
+    "type": "boolean",
+    "readOnly": true,
+    "default": false,
+    "x-ticvai-persisted": false,
+    "x-ticvai-derived": "onRead",
+    "description": "**The box holds more than its till's drawer limit** (decided 2 October 2026, Chinmay, BO-042; DEC-179; CHG-CSP-016): computed on read from the box's expected cash against `tenancy.Workstation.cashDrawerLimit` or the venue's `cashDrawerLimit`. BO-042 flags the box and offers a lift; false where no limit is set. A flag, not a figure: it tells the cashier nothing about the expected cash (CHG-FIN-003).\n"
+   },
    "foreignHoldings": {
     "type": "array",
     "description": "4.6.11 and 6.1.10. **Foreign cash accepted at this till, counted separately by currency.** A till taking USD and EUR alongside AED has three counts and three variances — collapsing them into a base-currency total makes a variance unattributable to the currency that caused it.\n**No opening float in a foreign currency and no change given in one.** Foreign cash only ever comes in, which is what keeps this to one number per currency rather than a full reconciliation each.\n",
@@ -1607,9 +1431,36 @@
    "reconciled"
   ]
  },
+ "DeviceBinding": {
+  "x-ticvai-persistence": "platform.device",
+  "type": "object",
+  "required": [
+   "kind",
+   "driver"
+  ],
+  "properties": {
+   "kind": {
+    "$ref": "#/components/schemas/DeviceKind"
+   },
+   "driver": {
+    "type": "string",
+    "description": "Driver identifier. Adding a vendor is a driver plus configuration, never a core change — every venue arrives with hardware not previously seen.\n"
+   },
+   "identifier": {
+    "type": "string",
+    "description": "Serial",
+    "port or network address.": null
+   },
+   "isRequired": {
+    "type": "boolean",
+    "default": false,
+    "description": "When true, the workstation refuses to open a shift if the device is absent.\n"
+   }
+  }
+ },
  "EntitlementStatus": {
   "type": "string",
-  "description": "**What the storage layer holds, and what a guest is shown.** `MediaEntitlements` carried only `isValid` and a reason string — a boolean cannot distinguish a ticket that was used from one that expired, was refunded, or was transferred to somebody else, and those are four different conversations at a gate.\nAdded 17 August. `states/entitlement.yaml` had modelled these six since 14 August and the contract had no enum behind it, which the state checker reported correctly for three days.\n",
+  "description": "**What the storage layer holds, and what a guest is shown.** `MediaEntitlements` carried only `isValid` and a reason string — a boolean cannot distinguish a ticket that was used from one that expired, was refunded, or was transferred to somebody else, and those are four different conversations at a gate.\nAdded 17 August. `states/entitlement.yaml` had modelled these six since 14 August and the contract had no enum behind it, which the state checker reported correctly for three days.\n\n**The client's 13 Virtual Ticket statuses map onto these six** (decided 2 October 2026, Chinmay, critical set 2, BO-336: \"Map the pack's 13 names onto the model; add any missing states\"; DEC-266; CHG-CSP-033). Every name maps, so no value is added (one would be a breaking change against r1): Active is `issued`, Partially used `partiallyConsumed`, Used `fullyConsumed`, Expired `expired`, Transferred `surrendered`, Suspended and Blocked are `issued` with the suspended flag or an identity lock, and Cancelled, Voided, Refunded and Reissued / superseded are `cancelled` told apart by access `Entitlement.cancellationKind`. Created and Pending fulfilment (DI-670's Reserved) are the order before an entitlement exists. The table is `states/entitlement-status.yaml` (`pack_status_map`); access `Entitlement.lifecycleLabel` carries the name.\n",
   "enum": [
    "issued",
    "partiallyConsumed",
@@ -1777,9 +1628,69 @@
    "taxAmountInLegalCurrency": {
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
+   "legalFxRate": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/FxRateValue"
+     }
+    ],
+    "nullable": true,
+    "readOnly": true,
+    "description": "The invoice's own `legalFxRate`, never today's (CHG-FIN-011)."
+   },
+   "invoiceSupplyValue": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "readOnly": true,
+    "description": "**The value of the supply shown on the tax invoice** (Executive Regulation Art. 60(1)(e)), adjusted by any earlier credit note on the same invoice. With `correctedSupplyValue` and `netAmount` (the difference) and `taxAmountInLegalCurrency` (the tax on the difference in AED), the four figures the law requires (CHG-FIN-011)."
+   },
+   "correctedSupplyValue": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "readOnly": true,
+    "description": "The correct value of the supply after this credit note (Art. 60(1)(e))."
+   },
+   "supplierName": {
+    "type": "string",
+    "readOnly": true,
+    "description": "Snapshot of the legal entity at issue, as on the invoice (Art. 60(1)(b))."
+   },
+   "supplierAddress": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true
+   },
+   "supplierTaxRegistrationNumber": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true
+   },
+   "buyerName": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The recipient as on the invoice; name, address and TRN where they are registered (Art. 60(1)(c))."
+   },
+   "buyerAddress": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true
+   },
+   "buyerTaxRegistrationNumber": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true
+   },
    "note": {
     "type": "string",
-    "nullable": true
+    "nullable": true,
+    "description": "The brief explanation of why the credit note was issued, printed on it (Art. 60(1)(f)); the reason's own wording when no note is given (CHG-FIN-011)."
    },
    "renditionAssetId": {
     "type": "string",
@@ -2144,7 +2055,64 @@
    },
    "taxAmountInLegalCurrency": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "The tax in the legal entity's currency (AED in the UAE) where the invoice currency differs, at the rate the orders were stored at."
+    "description": "The tax in the legal entity's currency (AED in the UAE) where the invoice currency differs. **In the UAE the converted amounts use the UAE Central Bank rate at the date of supply** (Decree-Law Art. 69) and the rate is printed (`legalFxRate`, Executive Regulation Art. 59(1)(k)); CHG-FIN-011."
+   },
+   "legalCurrency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$",
+    "readOnly": true,
+    "description": "The legal entity's currency (AED in the UAE), in which the law requires the tax and the gross amount (CHG-FIN-011)."
+   },
+   "grossAmountInLegalCurrency": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "readOnly": true,
+    "description": "The gross amount payable in the legal currency (Executive Regulation Art. 59(1)(j); for a simplified invoice the total consideration, Art. 59(2)(e)). Equal to `grossAmount` when the invoice is in the legal currency (CHG-FIN-011)."
+   },
+   "legalFxRate": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/FxRateValue"
+     }
+    ],
+    "nullable": true,
+    "readOnly": true,
+    "description": "Units of the legal currency per one unit of `currency`, printed with the tax where the invoice is not in the legal currency (Art. 59(1)(k)). Null when it is (CHG-FIN-011)."
+   },
+   "legalFxRateSource": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/FxRateSource"
+     }
+    ],
+    "nullable": true,
+    "readOnly": true,
+    "description": "`uaeCentralBank` for a UAE legal entity (Decree-Law Art. 69)."
+   },
+   "paidCurrency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$",
+    "nullable": true,
+    "readOnly": true,
+    "description": "Where the guest paid in a currency they selected (`orders.Order.chargeCurrency`, CHG-FIN-001), printed as payment information with `paidAmount` and the charge rate. The invoice itself is in the base currency, so the AED amounts the law requires are the invoice's own figures (CHG-FIN-011)."
+   },
+   "paidAmount": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "readOnly": true,
+    "description": "What the guest paid in `paidCurrency` (`orders.Order.chargeTotal`)."
+   },
+   "reverseChargeStatement": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "Where the recipient must account for the tax, the statement saying so and the Decree-Law provision (Art. 59(1)(l), Art. 48). Null otherwise (CHG-FIN-011)."
    },
    "creditedAmount": {
     "$ref": "../shared/common.yaml#/components/schemas/Money"
@@ -2275,6 +2243,15 @@
    },
    "creditedAmount": {
     "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "grossAmountInLegalCurrency": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "readOnly": true,
+    "description": "The amount payable for the line in the legal currency (AED), Executive Regulation Art. 59(1)(h); equal to `grossAmount` on an invoice in the legal currency (CHG-FIN-011)."
    }
   }
  },
@@ -2326,105 +2303,30 @@
  },
  "FinTaxInvoiceType": {
   "type": "string",
-  "description": "5.7.93. `simplified` for one order with no recipient details, `full` for one order with them, `consolidated` for several paid orders of one buyer on one invoice.",
+  "description": "5.7.93. `simplified` for one order with no recipient details, `full` for one order with them, `consolidated` for several paid orders of one buyer on one invoice.\n**When a simplified tax invoice is allowed in the UAE** (research 2 October 2026, CHG-FIN-011; Executive Regulation, Cabinet Decision 52 of 2017 as amended, Art. 59(5)): the recipient is not VAT-registered, or is registered and the consideration does not exceed AED 10,000, and the reverse charge does not apply. Otherwise the invoice is `full`. Both kinds carry the title \"Tax Invoice\" (Art. 59(1)(a), 59(2)(a)); a simplified one is issued on the date of supply (Art. 59(13)(1)), a full one within 14 days (Decree-Law Art. 67(1)).",
   "enum": [
    "simplified",
    "full",
    "consolidated"
   ]
  },
- "FinancialReport": {
-  "x-ticvai-persistence": "none — computed from replica",
-  "type": "object",
-  "required": [
-   "report",
-   "fiscalPeriodId",
-   "currency",
-   "generatedAt",
-   "sections"
-  ],
-  "properties": {
-   "report": {
-    "$ref": "#/components/schemas/FinancialReportKind"
-   },
-   "fiscalPeriodId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "legalEntityId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "currency": {
-    "type": "string",
-    "pattern": "^[A-Z]{3}$"
-   },
-   "currencyScale": {
-    "type": "integer"
-   },
-   "generatedAt": {
-    "type": "string",
-    "format": "date-time"
-   },
-   "sections": {
-    "type": "array",
-    "items": {
-     "type": "object",
-     "required": [
-      "name",
-      "lines",
-      "total"
-     ],
-     "properties": {
-      "name": {
-       "type": "string"
-      },
-      "lines": {
-       "type": "array",
-       "items": {
-        "type": "object",
-        "properties": {
-         "label": {
-          "type": "string"
-         },
-         "accountCode": {
-          "type": "string",
-          "nullable": true
-         },
-         "amount": {
-          "$ref": "../shared/common.yaml#/components/schemas/Money"
-         },
-         "priorPeriodAmount": {
-          "allOf": [
-           {
-            "$ref": "../shared/common.yaml#/components/schemas/Money"
-           }
-          ],
-          "description": "The same line for **the same period last year** (decided 28 September, audit R127 (3)). Absent where that period did not exist."
-         }
-        }
-       }
-      },
-      "total": {
-       "$ref": "../shared/common.yaml#/components/schemas/Money"
-      }
-     }
-    }
-   }
-  }
- },
- "FinancialReportKind": {
+ "FxRateSource": {
   "type": "string",
-  "description": "The report `getFinancialReport` returns. One vocabulary for the query and the response.",
+  "description": "**Where the rate came from, and which provider specifically.** `source: provider` said a feed set it and not which one — two tenants on different feeds were indistinguishable in the ledger, and a rate cannot be defended in an audit without naming its origin.\n\n**`uaeCentralBank` is the default for AED pairs.** The UAE Central Bank publishes an official daily rate and it is what a UAE auditor expects to see — a commercial feed is defensible for tender and awkward for statutory reporting.\n\n**`openExchangeRates` and `ecb` are the commercial and reference options.** ECB publishes daily reference rates free and is the usual fallback for non-AED pairs; Open Exchange Rates is the common commercial feed with intraday granularity. **The choice is per purpose, not per platform** — a tender rate wants intraday, a reporting rate wants the official daily close.",
   "enum": [
-   "profitAndLoss",
-   "balanceSheet",
-   "cashFlow",
-   "revenueByVenue",
-   "revenueByProduct",
-   "taxSummary"
+   "manual",
+   "uaeCentralBank",
+   "ecb",
+   "openExchangeRates",
+   "cardScheme",
+   "provider"
   ]
+ },
+ "FxRateValue": {
+  "x-ticvai-persistence-column": "numeric(18,6)",
+  "type": "string",
+  "pattern": "^\\d+(\\.\\d{1,6})?$",
+  "description": "**An exchange rate: a decimal string, never a float**, for the reason `Money.amount` is one (naming-and-style 5.1). Up to six decimal places — a two-place rate on a three-place currency loses money on every transaction, quietly — and stored as `numeric(18,6)` so the six places the wire carries survive the database.\n"
  },
  "GeneratedQuery": {
   "x-ticvai-persistence": "none — embedded; stored whole in `reporting.natural_language_query`",
@@ -2586,23 +2488,6 @@
    }
   }
  },
- "GuestListing": {
-  "type": "string",
-  "enum": [
-   "bookable",
-   "infoOnly",
-   "hidden"
-  ],
-  "default": "bookable",
-  "description": "**How a product appears to a guest** (decided 29 September, rev 3 REV3-14). `bookable`: listed and searched while it is on sale, and added to the basket. `infoOnly`: listed and searched with its details, photo and `notBookableLabel` whether or not it is on sale, and **never added to a basket** (`addCartLine` refuses it with `409`); the screen opens its details instead. `hidden`: never listed or searched for a guest, and reachable only where a staff channel sells it. Independent of `isSellable`, which says whether a channel may sell it at all.\n"
- },
- "LocalisedText": {
-  "x-ticvai-persistence": "none — jsonb column",
-  "type": "object",
-  "additionalProperties": {
-   "type": "string"
-  }
- },
  "ManualDiscountRequest": {
   "type": "object",
   "x-ticvai-persistence": "none — request only",
@@ -2653,210 +2538,6 @@
     "format": "date-time"
    }
   }
- },
- "MediaAsset": {
-  "x-ticvai-persistence": "assets.media_asset",
-  "type": "object",
-  "required": [
-   "id",
-   "kind",
-   "status",
-   "filename",
-   "contentType",
-   "sizeBytes",
-   "referenceCount",
-   "createdAt"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "kind": {
-    "$ref": "#/components/schemas/MediaKind"
-   },
-   "status": {
-    "$ref": "#/components/schemas/MediaStatus"
-   },
-   "filename": {
-    "type": "string"
-   },
-   "contentType": {
-    "type": "string"
-   },
-   "sizeBytes": {
-    "type": "integer"
-   },
-   "title": {
-    "$ref": "#/components/schemas/LocalisedText"
-   },
-   "description": {
-    "allOf": [
-     {
-      "$ref": "#/components/schemas/LocalisedText"
-     }
-    ],
-    "description": "Set by `updateMediaAsset` and matched by `searchMedia`'s `search`. It was accepted and searched on before it had anywhere to be stored.\n"
-   },
-   "altText": {
-    "allOf": [
-     {
-      "$ref": "#/components/schemas/LocalisedText"
-     }
-    ],
-    "description": "Required before use in a guest-facing surface. WCAG 2.2 AA."
-   },
-   "width": {
-    "type": "integer",
-    "nullable": true
-   },
-   "height": {
-    "type": "integer",
-    "nullable": true
-   },
-   "durationSeconds": {
-    "type": "number",
-    "nullable": true
-   },
-   "customMetadata": {
-    "type": "object",
-    "nullable": true,
-    "additionalProperties": true,
-    "description": "BL-178. **`assets` is a strong contract and its metadata was fixed** — kind, title, alt text, dimensions, rights. A venue photographing four thousand products wants its own fields: shoot date, photographer, model release, season.\n**Free-form and searchable, not a schema.** Every venue would want a different one, and a fixed set would be wrong for all of them.\n"
-   },
-   "sharedWithTenantIds": {
-    "type": "array",
-    "items": {
-     "type": "string",
-     "format": "uuid"
-    },
-    "description": "BL-178. **Cross-tenant sharing, and it is refused by default for a reason.** A brand operating three venues wants one logo library; two unrelated tenants sharing an asset store is the isolation breach ADR-0011 exists to prevent.\n**Only within one tenant's own scope tree.** A share naming a tenant outside it is refused rather than warned about — this is the one place where a permissive default would be a cross-tenant data leak.\n"
-   },
-   "tags": {
-    "type": "array",
-    "items": {
-     "type": "string"
-    }
-   },
-   "categoryId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "The asset's category, one of `MediaTaxonomy.categories[].id`; null while unclassified. Set by `bulkUpdateMediaAssets` (`setCategoryId`) (decided 29 September, data model DM4).\n"
-   },
-   "venueId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "url": {
-    "type": "string",
-    "description": "Signed and expiring for private assets; stable CDN URL for public ones."
-   },
-   "thumbnailUrl": {
-    "type": "string",
-    "nullable": true
-   },
-   "referenceCount": {
-    "type": "integer",
-    "description": "How many surfaces reference this asset. Non-zero refuses deletion.\n"
-   },
-   "rights": {
-    "$ref": "#/components/schemas/MediaRights"
-   },
-   "isRightsExpired": {
-    "type": "boolean"
-   },
-   "version": {
-    "type": "integer"
-   },
-   "uploadedByPrincipalId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "createdAt": {
-    "type": "string",
-    "format": "date-time"
-   }
-  }
- },
- "MediaAssetDetail": {
-  "x-ticvai-persistence": "assets.media_asset",
-  "allOf": [
-   {
-    "$ref": "#/components/schemas/MediaAsset"
-   },
-   {
-    "type": "object",
-    "properties": {
-     "derivatives": {
-      "type": "array",
-      "description": "Generated from the original, never uploaded separately. A new breakpoint is a re-render rather than a re-upload of everything.\n",
-      "items": {
-       "type": "object",
-       "properties": {
-        "label": {
-         "type": "string"
-        },
-        "width": {
-         "type": "integer"
-        },
-        "height": {
-         "type": "integer"
-        },
-        "sizeBytes": {
-         "type": "integer"
-        },
-        "url": {
-         "type": "string"
-        }
-       }
-      }
-     },
-     "usage": {
-      "type": "array",
-      "description": "Every place this asset is referenced.",
-      "items": {
-       "$ref": "#/components/schemas/MediaUsage"
-      }
-     },
-     "collections": {
-      "type": "array",
-      "items": {
-       "type": "object",
-       "properties": {
-        "id": {
-         "type": "string",
-         "format": "uuid"
-        },
-        "name": {
-         "type": "string"
-        }
-       }
-      }
-     },
-     "previousVersions": {
-      "type": "array",
-      "items": {
-       "type": "object",
-       "properties": {
-        "version": {
-         "type": "integer"
-        },
-        "replacedAt": {
-         "type": "string",
-         "format": "date-time"
-        },
-        "replacedByPrincipalId": {
-         "type": "string",
-         "format": "uuid"
-        }
-       }
-      }
-     }
-    }
-   }
-  ]
  },
  "MediaEntitlements": {
   "type": "object",
@@ -2961,181 +2642,6 @@
       }
      }
     }
-   }
-  }
- },
- "MediaKind": {
-  "type": "string",
-  "enum": [
-   "image",
-   "video",
-   "audio",
-   "document",
-   "vector",
-   "font",
-   "archive"
-  ]
- },
- "MediaReplaceResult": {
-  "x-ticvai-persistence": "none — computed",
-  "type": "object",
-  "required": [
-   "asset",
-   "affectedSurfaces"
-  ],
-  "properties": {
-   "asset": {
-    "$ref": "#/components/schemas/MediaAsset"
-   },
-   "affectedSurfaces": {
-    "type": "integer",
-    "description": "How many surfaces now show the new file."
-   },
-   "liveSurfaces": {
-    "type": "integer",
-    "description": "Of those, how many are published to guests right now."
-   },
-   "derivativesRegenerating": {
-    "type": "boolean"
-   }
-  }
- },
- "MediaRights": {
-  "x-ticvai-persistence": "none — embedded in asset",
-  "type": "object",
-  "description": "Licensing terms. Tracked because an expired licence on a live surface is a legal exposure, not a housekeeping item.\n",
-  "properties": {
-   "licenceKind": {
-    "type": "string",
-    "enum": [
-     "owned",
-     "royaltyFree",
-     "rightsManaged",
-     "creativeCommons",
-     "editorialOnly",
-     "unknown"
-    ]
-   },
-   "licensor": {
-    "type": "string",
-    "nullable": true
-   },
-   "licenceReference": {
-    "type": "string",
-    "nullable": true
-   },
-   "validFrom": {
-    "type": "string",
-    "format": "date",
-    "nullable": true
-   },
-   "validTo": {
-    "type": "string",
-    "format": "date",
-    "nullable": true
-   },
-   "permittedUses": {
-    "type": "array",
-    "items": {
-     "type": "string",
-     "enum": [
-      "web",
-      "print",
-      "socialMedia",
-      "inVenue",
-      "advertising",
-      "internal"
-     ]
-    }
-   },
-   "attributionRequired": {
-    "type": "boolean",
-    "default": false
-   },
-   "attributionText": {
-    "type": "string",
-    "nullable": true
-   },
-   "permittedTerritories": {
-    "type": "array",
-    "items": {
-     "type": "string"
-    },
-    "description": "ISO country or region codes. **Empty means unrestricted, which is a claim rather than an absence** — an unknown territory and a worldwide licence are not the same thing, and `licenceKind: unknown` is how the second is said.\n"
-   },
-   "permittedChannels": {
-    "type": "array",
-    "items": {
-     "type": "string"
-    },
-    "description": "Distribution channel codes, checked by `setMediaDistributionChannels`. Narrower than `permittedUses`, which describes the medium rather than the route.\n"
-   },
-   "modelReleaseHeld": {
-    "type": "boolean",
-    "default": false
-   },
-   "renewalOwner": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   }
-  }
- },
- "MediaStatus": {
-  "type": "string",
-  "enum": [
-   "processing",
-   "ready",
-   "quarantined",
-   "failed",
-   "archived"
-  ]
- },
- "MediaUsage": {
-  "x-ticvai-persistence": "assets.media_usage",
-  "type": "object",
-  "description": "One place an asset is used. **`surface: product` is written by catalogue** for each item of `Product.media` (decided 29 September, rev 3 23SEP-4): `referenceId` is the product id and `isLive` is true while the product is listed to guests, which is what stops an asset in use on a ticket card being archived from under it.\n",
-  "required": [
-   "surface",
-   "referenceId"
-  ],
-  "properties": {
-   "extractedText": {
-    "type": "string",
-    "description": "**Text pulled out of an uploaded document**, after extraction. The generic retrieval path for anything a tenant uploads — a PDF nobody can search is a PDF nobody reads.\n"
-   },
-   "id": {
-    "type": "string",
-    "format": "uuid",
-    "readOnly": true,
-    "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
-   },
-   "surface": {
-    "type": "string",
-    "enum": [
-     "tenantBranding",
-     "homepageBanner",
-     "promoBlock",
-     "contentPage",
-     "product",
-     "event",
-     "menuItem",
-     "merchandise",
-     "workOrder",
-     "incident",
-     "inspection",
-     "campaign"
-    ]
-   },
-   "referenceId": {
-    "type": "string"
-   },
-   "label": {
-    "type": "string"
-   },
-   "isLive": {
-    "type": "boolean",
-    "description": "True where the referencing surface is published to guests."
    }
   }
  },
@@ -3287,81 +2793,6 @@
    },
    "tokensUsed": {
     "type": "integer"
-   }
-  }
- },
- "NoSaleEvent": {
-  "type": "object",
-  "x-ticvai-persistence": "orders.no_sale_event",
-  "required": [
-   "id",
-   "shiftId",
-   "reason",
-   "principalId",
-   "recordedAt"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "shiftId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "workstationId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "reason": {
-    "type": "string"
-   },
-   "note": {
-    "type": "string",
-    "nullable": true
-   },
-   "principalId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "recordedAt": {
-    "type": "string",
-    "format": "date-time"
-   },
-   "countThisShift": {
-    "type": "integer",
-    "description": "Running count. Returned so the terminal can show it — a cashier who can see they are on their ninth no-sale behaves differently from one who cannot.\n"
-   }
-  }
- },
- "OpenShiftRequest": {
-  "type": "object",
-  "required": [
-   "workstationId",
-   "openingFloat"
-  ],
-  "properties": {
-   "workstationId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "openingFloat": {
-    "$ref": "#/components/schemas/DenominationCount"
-   },
-   "depositBoxCode": {
-    "type": "string",
-    "maxLength": 64,
-    "description": "Physical container assigned to this shift. Required where the venue configures deposit box allocation.\n"
-   },
-   "bagNumber": {
-    "type": "string",
-    "maxLength": 64,
-    "description": "Required where the venue configures bag numbers as mandatory."
-   },
-   "recordedAt": {
-    "type": "string",
-    "format": "date-time",
-    "description": "When the device recorded it. `openShift` is online-only (F32), so this differs from server receipt time only by transit; it is kept because the shift's other device writes are ordered against it.\n"
    }
   }
  },
@@ -3543,6 +2974,46 @@
    },
    "refundedAmount": {
     "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "chargeCurrency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**The currency the guest selected and is charged in** (CHG-FIN-001, 2 October 2026). Null or equal to `currency` for a sale in the base currency. Everything else on the order, and every ledger posting, stays in the base currency `currency`."
+   },
+   "chargeFxRate": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/ExchangeRateDecimal"
+     }
+    ],
+    "nullable": true,
+    "readOnly": true,
+    "description": "Units of `chargeCurrency` per one unit of the base currency, from the region's `tender` rate in force at checkout (`finance.FxRate`), stored on the order so the payment, the receipt, the tax invoice and any refund use the same rate (CHG-FIN-001)."
+   },
+   "chargeFxRateId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The `finance.FxRate` row the rate was taken from, for audit."
+   },
+   "chargeTotal": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "readOnly": true,
+    "description": "`grossAmount` converted at `chargeFxRate` and rounded to the charge currency's scale: what the guest pays and what the payment request to the provider asks for (CHG-FIN-001)."
+   },
+   "chargeRateLockedUntil": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The quote holds until then (the cart lease). After it, the next payment attempt re-quotes at the rate then in force and the guest confirms the new amount (CHG-FIN-001)."
    },
    "droppedPromotions": {
     "type": "array",
@@ -4057,6 +3528,85 @@
    }
   }
  },
+ "OrdersDeposit": {
+  "type": "object",
+  "x-ticvai-persistence": "orders.deposit",
+  "description": "**Taken from the backend workbook, 20 September.** NEW TABLE. Stores the financial/security deposit associated with a rental order, including hold, release, forfeiture, and settlement totals.",
+  "required": [
+   "orderId",
+   "currencyCode",
+   "requiredAmount",
+   "authorizedAmount",
+   "capturedAmount",
+   "releasedAmount",
+   "forfeitedAmount",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "orderId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "customerId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "rentalAgreementId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "tableReservationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The `fnb.TableReservation` this deposit secures, where the venue's `DepositPolicy.dining` is enabled (decided 29 September, rev 3 REV3-8b). Written at checkout from the cart line's `tableReservationId`.\n"
+   },
+   "currencyCode": {
+    "type": "string",
+    "maxLength": 10
+   },
+   "requiredAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "authorizedAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "capturedAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "releasedAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "forfeitedAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "status": {
+    "type": "string",
+    "maxLength": 30
+   },
+   "settledAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
  "Page": {
   "type": "object",
   "required": [
@@ -4135,7 +3685,7 @@
     "type": "string",
     "pattern": "^[A-Z]{3}$",
     "nullable": true,
-    "description": "4.6.11 is deliberately asymmetric: **accept foreign currency, refund in local.** A till giving change in five currencies needs five floats and five counts, and the variance becomes unattributable.\n"
+    "description": "4.6.11 is deliberately asymmetric: **accept foreign currency, refund in local.** A till giving change in five currencies needs five floats and five counts, and the variance becomes unattributable.\n**Cash at a till only** (CHG-FIN-001, 2 October 2026). A card or wallet payment the guest made in a currency they selected is refunded in that currency (`Refund.tenderCurrency`).\n"
    },
    "amount": {
     "$ref": "../shared/common.yaml#/components/schemas/Money"
@@ -4217,525 +3767,70 @@
    }
   }
  },
- "Product": {
-  "x-ticvai-persistence": "catalogue.product",
+ "PaymentReconciliationExceptionManagementView": {
   "type": "object",
-  "required": [
-   "id",
-   "code",
-   "name",
-   "kind",
-   "venueId",
-   "scopePath",
-   "isSellable",
-   "hasVariants"
-  ],
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over orders state, assembled at read time from tables that already exist",
+  "description": "**What Payment Reconciliation & Exception Management displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "id": {
+   "transactionId": {
     "type": "string",
-    "format": "uuid"
+    "description": "Transaction ID"
    },
-   "code": {
+   "externalReference": {
     "type": "string",
-    "maxLength": 64
+    "description": "External Reference"
    },
-   "familyKey": {
+   "amount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Amount"
+   },
+   "currency": {
     "type": "string",
-    "maxLength": 64,
-    "pattern": "^[A-Za-z0-9_-]+$",
-    "nullable": true,
-    "x-ticvai-unique": "venue",
-    "description": "**The same product at another location** (decided 29 September, rev 3 REV3-18). Optional. A tenant that sells one attraction at several venues gives each venue's product the same key, e.g. `aquarium-entry`; the key names the family across the tenant and each venue has at most one product in it, so a second product at the same venue with the key is refused with `409 duplicate-code`. **What it is for:** when a guest changes location on the booking screen (the 'Booking at' switcher, `BookingFlowConfig.locationSwitcher`), lines whose product shares a `familyKey` with a product at the new venue are carried over to that product, with times and prices refreshed; every other line is cleared. Null means the product belongs to no family and its lines always clear on a switch. Compared case-insensitively, like `code`.\n"
+    "description": "Currency"
    },
-   "name": {
-    "type": "string",
-    "maxLength": 200
-   },
-   "description": {
-    "type": "string"
-   },
-   "kind": {
-    "$ref": "#/components/schemas/ProductKind"
-   },
-   "venueId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "scopePath": {
-    "type": "string"
-   },
-   "createdByPrincipalId": {
-    "type": "string",
-    "format": "uuid",
-    "readOnly": true,
-    "description": "1.4.18. **The approval gate refuses an approver who is the author, and nothing recorded either.** `SeatBlock`, `DelegatedAccess` and `ManualDiscountRequest` all carry this and the product passing through approval did not.\n"
-   },
-   "approvedByPrincipalId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "readOnly": true
-   },
-   "responsibleDepartmentId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "Who owns this product commercially. A scope node at `department` level."
-   },
-   "onSaleFrom": {
+   "date": {
     "type": "string",
     "format": "date-time",
-    "nullable": true,
-    "description": "1.4.8. **A seasonal product should not need somebody awake at midnight.** Archiving already runs on a timer in this contract, so the machinery exists; `effectiveFrom` appears on tax codes, FX rates and white-label policies and not here.\n"
+    "description": "Date"
    },
-   "onSaleTo": {
+   "merchant": {
     "type": "string",
-    "format": "date-time",
-    "nullable": true,
-    "description": "Retires the product automatically. **Retirement is not deletion** — the product stops selling and every order that referenced it still resolves.\n"
+    "description": "Merchant"
    },
-   "categoryId": {
+   "order": {
     "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "**Taken from their `fnb.product` and `retail.product`, 20 September.** `catalogue.product_category` has existed since 20 August with two operations and nothing could be filed under it — a merchandise hierarchy with a tree and no leaves. Their per-domain product tables both carried this column and ours did not.\n"
+    "description": "Order"
    },
-   "lifecycleState": {
-    "$ref": "#/components/schemas/ProductLifecycleState"
-   },
-   "isSellable": {
-    "type": "boolean",
-    "readOnly": true,
-    "description": "True only when live **and** carried by a published bundle. Approval and publication are different acts.\n**Derived, never set.** It changes when `transitionProductLifecycle` moves the product and when `publishBundle` carries it, so `updateProduct` does not take it — `withdraw` is how a product stops selling.\n"
-   },
-   "isStockTracked": {
-    "type": "boolean",
-    "default": false,
-    "description": "**Taken from their `fnb.product`, 20 September.** Whether a sale decrements stock, which is not what `isSellable` asks. A ticket is sellable and tracks no stock; a bottle of water is both. Without it, an F&B sale cannot tell inventory whether to move.\n"
-   },
-   "hasVariants": {
-    "type": "boolean"
-   },
-   "variantCount": {
-    "type": "integer"
-   },
-   "segmentTags": {
-    "type": "array",
-    "description": "7.3.5. **A channel and a segment tag are mandatory and nothing required either.** A catalogue that cannot be filtered by segment is a catalogue nobody can report on.\n**Hierarchical, not flat** — `family/with-toddlers` narrows `family` without duplicating it, which is how the promotions engine already treats scope.\n**A level is a tag under `level/`** (decided 29 September, rev 3 REV3-19): `level/beginner`, `level/intermediate`, `level/advanced`, `level/expert` (proposed codes, client to correct). A guest screen filters on it with `listProducts` `segmentTag`, and the words a guest reads beside each option come from `ProductCategory.description`, not from the tag.\n",
-    "items": {
-     "type": "string"
-    }
-   },
-   "codeSchema": {
+   "authorizationCode": {
     "type": "string",
-    "readOnly": true,
-    "description": "7.3.4 specifies `[ParkCode]-[ProductType]-[Variant]`. **`Product.code` existed and nothing required a format**, so a venue with three thousand products had three thousand conventions.\nThe tenant sets the pattern and the platform generates against it. **Validation is the point, not the string** — a code typed by hand is a code that will not sort.\n"
+    "description": "Authorization Code"
    },
-   "channels": {
-    "type": "array",
-    "items": {
-     "$ref": "#/components/schemas/Channel"
-    }
-   },
-   "entitlementTemplateId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "What the buyer receives. Null for products that grant nothing — F&B and retail. Identity and entitlement are separate concerns.\n"
-   },
-   "blockedOffline": {
-    "type": "boolean",
-    "description": "True for seated and retail. Seated because a seat map is not a count; retail because stock depletes in real time.\n"
-   },
-   "dataMaskValues": {
-    "type": "object",
-    "additionalProperties": true,
-    "description": "Custom fields. JSONB-backed, defined by the venue's data mask."
-   },
-   "guestListing": {
-    "$ref": "#/components/schemas/GuestListing"
-   },
-   "notBookableLabel": {
-    "allOf": [
-     {
-      "$ref": "#/components/schemas/LocalisedText"
-     }
-    ],
-    "nullable": true,
-    "description": "The label a guest reads on an `infoOnly` product, e.g. *Info only* or *Not bookable online; ask at the desk* (decided 29 September, rev 3 REV3-14). Each value at most 60 characters. Null means the guest screen shows its default wording. Ignored unless `guestListing` is `infoOnly`.\n"
-   },
-   "salesContact": {
-    "allOf": [
-     {
-      "$ref": "#/components/schemas/ProductSalesContact"
-     }
-    ],
-    "nullable": true,
-    "description": "**Who a guest contacts to book a view-only product** (decided 29 September, W3), e.g. a training course listed with full details and no Book button. Shown as *Call sales* and *Email sales* on an `infoOnly` product. Null means the venue's own contact (white-label `getTenantAppStatus.contact`). Ignored unless `guestListing` is `infoOnly`.\n"
-   },
-   "bookingFlowId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "**The booking flow this product is sold through** (decided 29 September, W8 and W12): a white-label `BookingFlow` of the venue, which orders the guest's steps (for a workshop, the product first and then the date and time). Null means the category's flow (`ProductCategory.bookingFlowId`), and failing that the venue's flow for the product's `kind`. Written by `createProduct` and `updateProduct`, which refuse an id that is not a flow of the venue with `422`.\n"
-   },
-   "displayTags": {
-    "type": "array",
-    "maxItems": 6,
-    "items": {
-     "$ref": "#/components/schemas/ProductDisplayTag"
-    },
-    "description": "**Short facts a guest reads on the ticket card and under *Read more***: *2 Hours*, *Min 1.10 m*, *Free adult entry*, *Valid 90 days*, *Emirates ID* (decided 29 September, 23SEP-3). Not `segmentTags`, which are for reporting and segmentation and which a guest never reads.\n**Derived on read when none are set.** When the venue has written no tags, a read returns tags derived from the product's duration (`clock`), entitlement validity (`calendar`) and the eligibility rule's `minHeightCm` (`height`), each marked `derived: true`; they are never stored. Once the venue writes any tag, only what it wrote is returned. Whether the guest screen shows them is `BookingFlowConfig.ticketTags` (white-label).\n"
-   },
-   "media": {
-    "type": "array",
-    "maxItems": 20,
-    "items": {
-     "$ref": "#/components/schemas/ProductMedia"
-    },
-    "description": "**The product's own photos and video** (decided 29 September, 23SEP-4). *Read more* opens on the `isPrimary` item, and a listing shows each product's primary image, so two tickets in one category no longer share the category's picture (`ProductCategory.imageAssetId`).\nEvery `assetId` names an asset of the asset library (`assets.yaml` `MediaAsset`) in status `ready` whose kind matches `kind`; anything else is a `422`. **Exactly one item is `isPrimary`** when the list is not empty, and an `assetId` appears once; otherwise `400`. Setting the list records each reference as asset usage (`MediaUsage` with `surface: product`, `referenceId` the product id, `isLive` true while the product is listed to guests), which is what stops a used asset being archived from under the product.\n"
-   },
-   "consentQuestionIds": {
-    "type": "array",
-    "maxItems": 10,
-    "uniqueItems": true,
-    "items": {
-     "type": "string",
-     "format": "uuid"
-    },
-    "description": "**The consent questions a guest answers when booking this product**, in the order they are asked (decided 29 September, rev 3 REV3-26): *Are you able to swim?*, *Do you hold a scuba certification?*, *I accept the risk*. Each id names a consent question defined in marketing-crm (`ConsentQuestion`), which owns the text, its version and whether it is asked per person or once per booking; the answer is stored there as a consent record (question version, answer, who answered, when). **One question or several, as the venue chooses.** A flow can carry its own list too (`white-label.BookingFlow.settings.consentQuestionIds`, on the product's published booking flow as `getPublishedBookingFlow` resolves it: product, then category, then the venue's flow for the kind; moved from `BookingFlowConfig` 29 September, W12); a booking asks the union of the flow's questions and those of every product in the cart, each question once (`orders.Cart.consentQuestions`). An id that names no active consent question of the tenant is a `422`.\n"
-   },
-   "requiresTimeWindow": {
-    "type": "boolean",
-    "default": false,
-    "description": "**True for a space sold by the hour**, e.g. a meeting room type (decided 29 September, rev 3 REV3-13). The product is the room type (*focus pod*, *majlis*, *boardroom*, *auditorium*), never a named room; its lengths are a `length` axis (`setProductAttributes`) whose values carry `durationMinutes`, and each length is a variant priced on its own in the price list, so price is the room rate for that length. The cart line carries the booked start and end (orders), the end being the start plus the chosen variant's `durationMinutes`; `resources.listProductStartTimes` supplies the start times for a variant and a date and `allocateResources` picks the room from the product's resource requirements (`setExperienceResourceRequirements`) at checkout. True requires every active variant to have a `durationMinutes`; otherwise `422`.\n"
-   },
-   "productOwnerPrincipalId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "The product owner (29 September, data model DM3), set with `setProductContextOwnership`. `responsibleDepartmentId` is the owning department."
-   },
-   "operationalContact": {
-    "type": "string",
-    "maxLength": 200,
-    "nullable": true,
-    "description": "A principal id or a name, as the context screen takes it."
-   },
-   "businessUnitId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "legalEntityId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "A `ledger.legal_entity`, read through finance."
-   },
-   "attractionId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "siteId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "locationId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "brandId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "The brand, as the context screen names it (a catalogue brand category)."
-   },
-   "marketCode": {
-    "type": "string",
-    "maxLength": 40,
-    "nullable": true
-   },
-   "salesTerritory": {
-    "type": "string",
-    "maxLength": 100,
-    "nullable": true
-   }
-  }
- },
- "ProductChangeImpact": {
-  "type": "object",
-  "description": "1.4.4 and 1.4.16. What a proposed change would touch. **Modelled on `PerformanceCancellationResult`**, which does this for a cancellation.\n",
-  "required": [
-   "entitlementsIssued",
-   "ordersAffected",
-   "propagates"
-  ],
-  "properties": {
-   "entitlementsIssued": {
-    "type": "integer",
-    "description": "How many live entitlements came from this product."
-   },
-   "ordersAffected": {
-    "type": "integer"
-   },
-   "futurePerformances": {
-    "type": "integer"
-   },
-   "openCarts": {
-    "type": "integer",
-    "description": "**A guest with this product in a cart while its price changes underneath them** is the case nobody thinks about until it happens.\n"
-   },
-   "propagates": {
-    "type": "boolean",
-    "description": "Whether the change reaches what has already been sold. **A name correction should; a price change must not**, and the difference is the whole reason this operation exists.\n"
-   },
-   "blockedBy": {
-    "type": "array",
-    "description": "Reasons the change would be refused outright.",
-    "items": {
-     "type": "string"
-    }
-   }
-  }
- },
- "ProductDisplayTag": {
-  "x-ticvai-persistence": "none — jsonb column on catalogue.product",
-  "type": "object",
-  "required": [
-   "kind",
-   "label"
-  ],
-  "description": "One short fact on a ticket card (decided 29 September, 23SEP-3). `kind` picks the icon.",
-  "properties": {
-   "kind": {
+   "sourceSystem": {
     "type": "string",
     "enum": [
-     "clock",
-     "height",
-     "free",
-     "calendar",
-     "id"
+     "paymentGateway",
+     "acquirer",
+     "bank",
+     "pos",
+     "ota",
+     "reseller",
+     "wallet",
+     "erp"
     ],
-    "description": "`clock` a duration, `height` a height rule, `free` something included free, `calendar` a validity, `id` a document the guest must bring."
+    "description": "Source system."
    },
-   "label": {
-    "allOf": [
-     {
-      "$ref": "#/components/schemas/LocalisedText"
-     }
-    ],
-    "description": "What the guest reads, e.g. *2 Hours*. Each language value at most 40 characters."
-   },
-   "derived": {
-    "type": "boolean",
-    "readOnly": true,
-    "default": false,
-    "description": "True on a tag the server derived on read because the venue set none. Never sent."
-   }
-  }
- },
- "ProductKind": {
-  "type": "string",
-  "description": "**`openDated` added 24 August** from the client's *Create Ticket Flow* board, which names six main ticket types and this was the one with no kind: **valid on any date within an eligible range, rather than for a named performance or a fixed date.**\nThe mechanism already existed — `access.entitlement` carries `valid_from`, `valid_to`, `entries_allowed` and `frozen_days`, which is exactly an open-dated pass. **What was missing was the product saying it is one**, so a catalogue could not offer it and a report could not count it.\n**`datedAdmission` is a different thing and the two were being conflated**: dated is *this Tuesday*, open-dated is *any Tuesday between March and June*. A guest buying the second and being sold the first has bought the wrong ticket.\n**Transport uses two existing kinds, not a new one** (decided 29 September, rev 3 REV3-21). A one-way trip is `timedAdmission`: `transport.createTransportRoute` creates the route's product with one variant per passenger type, and each departure is a performance. A multi-trip or unlimited pass is `openDated`: `transport.createTransportPassType` creates it, with `EntitlementTemplate.entriesAllowed` = the pass's trips (null for unlimited), the validity = `validityDays`, and `EntitlementTemplate.transportRestriction` naming the station pair the pass was bought for, so `access` refuses it on another journey. The sale path is unchanged: both are cart lines, priced by `transport.quoteTransportFare` (orders `TransportLineAttributes`).\n",
-  "enum": [
-   "admission",
-   "timedAdmission",
-   "datedAdmission",
-   "openDated",
-   "seated",
-   "membership",
-   "bundle",
-   "fnb",
-   "retail",
-   "rental",
-   "addOn",
-   "giftCard"
-  ]
- },
- "ProductLifecycleState": {
-  "type": "string",
-  "enum": [
-   "draft",
-   "inReview",
-   "approved",
-   "live",
-   "withdrawn",
-   "archived"
-  ]
- },
- "ProductMedia": {
-  "x-ticvai-persistence": "catalogue.product_media",
-  "type": "object",
-  "required": [
-   "assetId",
-   "kind",
-   "isPrimary"
-  ],
-  "description": "One photo or video of a product, referencing the asset library (decided 29 September, 23SEP-4). One row per product and asset, so the asset library can answer which products use an asset.\n",
-  "properties": {
-   "assetId": {
+   "exceptionType": {
     "type": "string",
-    "format": "uuid",
-    "description": "A `MediaAsset` of `assets.yaml`, in status `ready`."
+    "description": "Exception, e.g. amount mismatch, unmatched settlement"
    },
-   "kind": {
-    "type": "string",
-    "enum": [
-     "image",
-     "video"
-    ]
+   "expectedAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Expected amount"
    },
-   "isPrimary": {
-    "type": "boolean",
-    "default": false,
-    "description": "The item *Read more* opens on and a listing shows. Exactly one per product."
-   },
-   "displayOrder": {
-    "type": "integer",
-    "default": 100
-   },
-   "altText": {
-    "allOf": [
-     {
-      "$ref": "#/components/schemas/LocalisedText"
-     }
-    ],
-    "nullable": true
-   }
-  }
- },
- "ProductSalesContact": {
-  "x-ticvai-persistence": "none — jsonb column on catalogue.product",
-  "type": "object",
-  "description": "Who to contact to book a view-only product (decided 29 September, W3). At least one of `phone` or `email`.\n",
-  "minProperties": 1,
-  "properties": {
-   "phone": {
-    "type": "string",
-    "maxLength": 32,
-    "nullable": true
-   },
-   "email": {
-    "type": "string",
-    "format": "email",
-    "maxLength": 254,
-    "nullable": true
-   },
-   "note": {
-    "allOf": [
-     {
-      "$ref": "#/components/schemas/LocalisedText"
-     }
-    ],
-    "nullable": true,
-    "description": "A line shown under the contact, e.g. *Group courses are booked by phone*. At most 200 characters per language."
-   }
-  }
- },
- "ProductVariant": {
-  "x-ticvai-persistence": "catalogue.variant",
-  "type": "object",
-  "required": [
-   "id",
-   "productId",
-   "sku",
-   "axisValues",
-   "isActive"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "productId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "sku": {
-    "type": "string"
-   },
-   "axisValues": {
-    "type": "object",
-    "additionalProperties": {
-     "type": "string"
-    }
-   },
-   "name": {
-    "type": "string",
-    "maxLength": 150,
-    "nullable": true,
-    "description": "**Taken from their variant tables, 20 September.** `axisValues` gives `{size: L}` and no string a guest can read. A menu showing *Large* needs somewhere for the word to live.\n"
-   },
-   "barcode": {
-    "type": "string",
-    "maxLength": 64,
-    "nullable": true,
-    "description": "**Taken from their variant tables, 20 September.** `catalogue.alternative_code` is a partner's own code for a variant and **requires `partnerId`**, so a manufacturer's EAN had nowhere to go. One per variant against many per variant is a different cardinality and belongs in a different place — and a POS scan should be an indexed column lookup, not a join.\n"
-   },
-   "isDefault": {
-    "type": "boolean",
-    "default": false,
-    "description": "Taken from their variant tables. Which variant a product page opens on. Ours had no way to say, so a three-size drink opened on whichever row sorted first.\n"
-   },
-   "isActive": {
-    "type": "boolean",
-    "description": "False when retired. Retired variants are never deleted — orders reference them."
-   },
-   "description": {
-    "allOf": [
-     {
-      "$ref": "#/components/schemas/LocalisedText"
-     }
-    ],
-    "nullable": true,
-    "description": "**Who this ticket type is for and what it includes**, shown behind the (i) on each Adult, Child, Senior or Infant row (decided 29 September, 23SEP-6). Each language value at most 300 characters; longer is a `400`. Set with `updateProductVariant`. Whether the guest screen shows it is `BookingFlowConfig.cardInfo` (white-label).\n"
-   }
-  }
- },
- "ProductVersion": {
-  "type": "object",
-  "x-ticvai-persistence": "catalogue.product_version",
-  "description": "1.1.47, 1.4.9 to 1.4.11. **Follows `white-label.ConfigVersion`** — the same pattern for the same reason, and the fourth place this mechanism was asked for.\n",
-  "required": [
-   "version",
-   "publishedAt",
-   "publishedByPrincipalId"
-  ],
-  "properties": {
-   "version": {
-    "type": "integer"
-   },
-   "productId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "publishedAt": {
-    "type": "string",
-    "format": "date-time"
-   },
-   "publishedByPrincipalId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "note": {
-    "type": "string",
-    "nullable": true
-   },
-   "isCurrent": {
-    "type": "boolean"
-   },
-   "contentHash": {
-    "type": "string",
-    "description": "**Lets a diff be cheap and a no-op change be recognised.** Republishing an unchanged product should not create a version.\n"
-   },
-   "restoredFromVersion": {
-    "type": "integer",
-    "nullable": true,
-    "description": "Set where this version was created by a restore. **A restore is a new version, not a rewind** — a price that was wrong for three days stays visible, because a finance query run next quarter has to reproduce what was charged.\n"
+   "actualAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Actual amount"
    }
   }
  },
@@ -4791,7 +3886,7 @@
      "storeCredit"
     ],
     "default": "originalTender",
-    "description": "BL-086. **A refund could only go back the way it came.** A guest whose card has expired, a partner settling by wire, a guest who would rather have the credit — three real cases with one answer.\n**`originalTender` stays the default** because refunding elsewhere is how money laundering works, and anything else needs a reason.\n"
+    "description": "BL-086. **A refund could only go back the way it came.** A guest whose card has expired, a partner settling by wire, a guest who would rather have the credit — three real cases with one answer.\n**`originalTender` stays the default** because refunding elsewhere is how money laundering works, and anything else needs a reason.\n\n**`storeCredit` is a gift card issued for the refund amount** (decided 2 October 2026, Chinmay, batch 1, POS-011; DEC-061; CHG-CSP-037; DI-796), never a voucher or a wallet top-up.\n"
    },
    "fxVariance": {
     "allOf": [
@@ -4800,6 +3895,22 @@
      }
     ],
     "description": "Where the sale rate and the current rate differ, **the difference is booked as an FX variance rather than hidden in the refund**. `runFxRevaluation` already handles this class of movement and this is the same act at a smaller scale.\n"
+   },
+   "tenderCurrency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**A refund goes back in the currency the guest paid** (decided 2 October 2026, Chinmay; CHG-FIN-001). For a card or wallet payment taken in a guest-selected currency, the refund request to the provider is in that currency, and `tenderAmount` is the refunded share of the original `Payment.tenderAmount` at the sale rate (`fxRate`), so a full refund returns exactly what was charged. `amount` stays in base currency for the ledger. Null for a refund in the base currency. Foreign cash refunded at a till is paid in base currency (DI-282)."
+   },
+   "tenderAmount": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "readOnly": true,
+    "description": "The refund in `tenderCurrency`, at that currency's own scale (CHG-FIN-001)."
    },
    "amount": {
     "$ref": "../shared/common.yaml#/components/schemas/Money"
@@ -4999,6 +4110,69 @@
    "format": {
     "type": "string",
     "nullable": true
+   },
+   "role": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "dimension",
+     "measure"
+    ],
+    "description": "**What the column is to a chart** (decided 2 October 2026, Chinmay; CHG-FIN-007). A `dimension` groups (date, venue, channel, product); a `measure` is aggregated (sum of net revenue, count of admissions). Null on a column only a table shows."
+   },
+   "encoding": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "category",
+     "x",
+     "y",
+     "series",
+     "value",
+     "size",
+     "colour",
+     "location",
+     "stage",
+     "source",
+     "target",
+     "row",
+     "column",
+     "hierarchyLevel",
+     "label",
+     "tooltip"
+    ],
+    "description": "**Which field well the column fills** (CHG-FIN-007), the binding the twenty marks of `DashboardTile.visualisation` need. The per-mark rule is on that field."
+   },
+   "axis": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "primary",
+     "secondary"
+    ],
+    "description": "For a measure on a `combo`, the axis it is drawn against. A secondary axis needs its own `unitLabel` (CHG-FIN-007)."
+   },
+   "seriesType": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "bar",
+     "line",
+     "area"
+    ],
+    "description": "For a measure on a `combo`, how that series is drawn (CHG-FIN-007)."
+   },
+   "hierarchyLevel": {
+    "type": "integer",
+    "nullable": true,
+    "minimum": 1,
+    "description": "For `matrix` rows and columns, `treemap` nesting and `decompositionTree` levels, the depth of this dimension, 1 outermost. Levels must follow a real hierarchy (DI-709), for example year, month, day, or region, venue, outlet (CHG-FIN-007)."
+   },
+   "unitLabel": {
+    "type": "string",
+    "nullable": true,
+    "maxLength": 40,
+    "description": "The unit an axis states, for example \"AED\" or \"Admissions\". Required on a secondary axis (CHG-FIN-007)."
    }
   }
  },
@@ -5328,6 +4502,15 @@
    }
   }
  },
+ "SaleBoardKind": {
+  "type": "string",
+  "enum": [
+   "ticketing",
+   "fnb",
+   "retail",
+   "mixed"
+  ]
+ },
  "Settlement": {
   "x-ticvai-persistence": "ledger.settlement",
   "type": "object",
@@ -5624,7 +4807,7 @@
    "salesTotal": {
     "x-ticvai-column": "gross_sales_amount",
     "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "What the till took in sales, as the guest paid it — tax included."
+    "description": "What the till took in sales, as the guest paid it — tax included: the shift's takings, not Gross sales (CHG-FIN-002, CHG-FIN-010). **Never shown to the shift's own cashier before the count is in** (CHG-FIN-003): with the float and the lifts it gives away the expected cash.\n"
    },
    "refundsTotal": {
     "x-ticvai-column": "gross_refunded_amount",
@@ -5645,7 +4828,7 @@
     ],
     "readOnly": true,
     "nullable": true,
-    "description": "26 September, pull audit R207. **The figure the blind count was measured against**, revealed once the count is in — null until then. Until this date only `ShiftCloseResult` carried it, returned once by `closeShift`, so BO-040 could not show the over/short it exists to accept.\n"
+    "description": "26 September, pull audit R207. **The figure the blind count was measured against**, revealed once the count is in — null until then. Until this date only `ShiftCloseResult` carried it, returned once by `closeShift`, so BO-040 could not show the over/short it exists to accept. **Null to the shift's own cashier on every read** (CHG-FIN-003, 2 October): returned only to a caller holding OVERSHORT_ACCEPT or SHIFT_CLOSE_OTHER at the venue.\n"
    },
    "countedCash": {
     "x-ticvai-column": "counted_cash_amount",
@@ -5667,7 +4850,26 @@
     ],
     "readOnly": true,
     "nullable": true,
-    "description": "Counted minus expected, as `ShiftCloseResult.variance`. Negative is short."
+    "description": "Counted minus expected, as `ShiftCloseResult.variance`. Negative is short. Null to the shift's own cashier, as `expectedCash` (CHG-FIN-003)."
+   },
+   "cashierReason": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "enum": [
+     "tillError",
+     "unrecordedRefund",
+     "miscount",
+     "other"
+    ],
+    "description": "What the cashier said went wrong, given with the blind count (`CloseShiftRequest.cashierReason`, DI-803) without seeing the variance; the supervisor reads it beside the variance on BO-040 (CHG-FIN-003).\n"
+   },
+   "cashierNote": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "maxLength": 1000,
+    "description": "The cashier's note with the count (`CloseShiftRequest.notes`; CHG-FIN-003)."
    },
    "heldLeaseCount": {
     "type": "integer",
@@ -5703,6 +4905,33 @@
     "format": "uuid",
     "nullable": true,
     "description": "Who submitted the close count. `reopenShift` refuses an approver who is this principal, and until 26 September there was nothing to compare against (pull audit R099).\n"
+   },
+   "recountRequestedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**Set by `rejectShiftVariance`, cleared by the cashier's recount** (decided 2 October 2026, Chinmay; DEC-175; CHG-CSP-013; DI-804). While set, the shift is `pendingVariance` waiting for the cashier rather than the supervisor: the cashier's view says \"Recount requested\" instead of \"Under review\".\n"
+   },
+   "recountRequestedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The supervisor who sent the count back (CHG-CSP-013)."
+   },
+   "recountReason": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "maxLength": 500,
+    "description": "The supervisor's reason, shown to the cashier; never an amount (CHG-CSP-013, CHG-FIN-003)."
+   },
+   "countNumber": {
+    "type": "integer",
+    "minimum": 0,
+    "readOnly": true,
+    "description": "How many close counts the shift has had: 0 before the first, 1 after it, 2 after a recount (CHG-CSP-013). The latest is the one measured.\n"
    },
    "syncedAt": {
     "type": "string",
@@ -5816,27 +5045,6 @@
    "closed",
    "autoClosed"
   ]
- },
- "SupervisorStepUp": {
-  "type": "object",
-  "description": "**A supervisor signs the act in place, on the device making the call** (decided 28 September, audit R144). Used where the decision is a same-device step-up rather than an approval request: reopening a shift, recounting a stock count, a retail return above the venue threshold, and (proposed by the coordinator, client to confirm) closing a stock transfer short and cancelling a performance.\n\n**The verification rule, the same on every operation that takes it:** the server checks `credential` against `principalId`; that principal must hold the operation's `x-ticvai-permission` at the operation's scope, must be active at that venue, and must not be the person whose act is being reversed where the operation says so. Any failure is a `403` (`supervisor-step-up-refused`) and nothing is written. **No approval request is raised**, and the operation declares `x-ticvai-step-up: pin`.\n",
-  "required": [
-   "principalId",
-   "credential"
-  ],
-  "properties": {
-   "principalId": {
-    "type": "string",
-    "format": "uuid",
-    "description": "The supervisor signing. Recorded against the act."
-   },
-   "credential": {
-    "type": "string",
-    "maxLength": 512,
-    "writeOnly": true,
-    "description": "The supervisor's staff PIN, as they sign in at a till with it. **A PIN, never a password** (audit R123 (7)). Never stored or returned."
-   }
-  }
  },
  "TenderKind": {
   "type": "string",
@@ -6006,140 +5214,6 @@
    }
   }
  },
- "UpdateProductRequest": {
-  "type": "object",
-  "minProperties": 1,
-  "properties": {
-   "familyKey": {
-    "type": "string",
-    "maxLength": 64,
-    "pattern": "^[A-Za-z0-9_-]+$",
-    "nullable": true,
-    "x-ticvai-unique": "venue",
-    "description": "The product family across the tenant's venues (decided 29 September, rev 3 REV3-18); see `Product.familyKey`. At most one product per venue in a family, else `409 duplicate-code`."
-   },
-   "name": {
-    "type": "string",
-    "maxLength": 200
-   },
-   "description": {
-    "type": "string"
-   },
-   "channels": {
-    "type": "array",
-    "items": {
-     "$ref": "#/components/schemas/Channel"
-    }
-   },
-   "dataMaskValues": {
-    "type": "object",
-    "additionalProperties": true
-   },
-   "guestListing": {
-    "$ref": "#/components/schemas/GuestListing"
-   },
-   "notBookableLabel": {
-    "allOf": [
-     {
-      "$ref": "#/components/schemas/LocalisedText"
-     }
-    ],
-    "nullable": true
-   },
-   "salesContact": {
-    "allOf": [
-     {
-      "$ref": "#/components/schemas/ProductSalesContact"
-     }
-    ],
-    "nullable": true,
-    "description": "See `Product.salesContact` (W3, 29 September)."
-   },
-   "bookingFlowId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "See `Product.bookingFlowId` (W8, W12, 29 September)."
-   },
-   "displayTags": {
-    "type": "array",
-    "maxItems": 6,
-    "items": {
-     "$ref": "#/components/schemas/ProductDisplayTag"
-    }
-   },
-   "media": {
-    "type": "array",
-    "maxItems": 20,
-    "items": {
-     "$ref": "#/components/schemas/ProductMedia"
-    }
-   },
-   "consentQuestionIds": {
-    "type": "array",
-    "maxItems": 10,
-    "uniqueItems": true,
-    "items": {
-     "type": "string",
-     "format": "uuid"
-    }
-   },
-   "requiresTimeWindow": {
-    "type": "boolean"
-   }
-  }
- },
- "VariantDimension": {
-  "x-ticvai-persistence": "catalogue.variant_dimension",
-  "type": "object",
-  "description": "**A length is an axis like any other** (decided 29 September, rev 3 REV3-13). A meeting room type sold by the hour has an axis `length` with values `1h`, `2h`, `halfDay`, `fullDay`, each carrying `durationMinutes` (proposed 60, 120, 240 and 480, client to correct), and each generated variant is priced on its own, so a half day need not cost four single hours.\n",
-  "required": [
-   "code",
-   "name",
-   "values"
-  ],
-  "properties": {
-   "code": {
-    "type": "string",
-    "maxLength": 64
-   },
-   "name": {
-    "type": "string",
-    "maxLength": 200
-   },
-   "values": {
-    "type": "array",
-    "minItems": 1,
-    "items": {
-     "type": "object",
-     "required": [
-      "code",
-      "label"
-     ],
-     "properties": {
-      "code": {
-       "type": "string",
-       "maxLength": 64
-      },
-      "label": {
-       "type": "string",
-       "maxLength": 200
-      },
-      "priceDelta": {
-       "$ref": "../shared/common.yaml#/components/schemas/Money"
-      },
-      "durationMinutes": {
-       "type": "integer",
-       "minimum": 15,
-       "maximum": 1440,
-       "nullable": true,
-       "description": "How long a variant carrying this value books its space for, on a `length` axis of a product with `requiresTimeWindow` (decided 29 September, rev 3 REV3-13). Null on any other axis. One axis per product at most may carry it; a second is a `400`."
-      }
-     }
-    }
-   }
-  }
- },
  "VoidReason": {
   "type": "string",
   "description": "**The void reason list** (decided 28 September, audit R125 (4)): the one list `voidOrder` takes, and the list `fnb.amendFnbOrder` and `fnb.cancelFnbOrder` point to. `other` requires a note (audit R222), and the notes are reviewed quarterly to add real reasons. Proposed, client to correct.\n",
@@ -6161,5 +5235,156 @@
    "changeOrder",
    "other"
   ]
+ },
+ "Workstation": {
+  "x-ticvai-persistence": "platform.workstation",
+  "type": "object",
+  "required": [
+   "id",
+   "code",
+   "name",
+   "venueId",
+   "regionId",
+   "scopePath",
+   "saleBoard",
+   "currency",
+   "currencyScale",
+   "timeZone"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string",
+    "maxLength": 64
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "regionId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "departmentId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "outletId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**The outlet this till stands in** (CHG-CSP-006). Its board is the till's board unless the till overrides it. Null on a workstation that belongs to no outlet (a ticket office counter set up before outlets), which must then carry its own board.\n"
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "saleBoard": {
+    "type": "object",
+    "description": "Determines which front end loads. Bound to the workstation, not the role — the F&B terminal opens the F&B board. What the operator may then DO within it is governed by their permissions.\n**The effective board** since 2 October 2026 (DEC-183; CHG-CSP-006): the till's own when it overrides the outlet, otherwise the outlet's (`saleBoardSource`).\n",
+    "required": [
+     "id",
+     "kind"
+    ],
+    "properties": {
+     "id": {
+      "type": "string",
+      "format": "uuid"
+     },
+     "kind": {
+      "$ref": "#/components/schemas/SaleBoardKind"
+     },
+     "name": {
+      "type": "string"
+     }
+    }
+   },
+   "saleBoardSource": {
+    "type": "string",
+    "enum": [
+     "outlet",
+     "workstation"
+    ],
+    "readOnly": true,
+    "description": "**Where `saleBoard` came from** (decided 2 October 2026, Chinmay, BO-109: \"Per outlet, with a till override\"; DEC-183; CHG-CSP-006): `outlet` when the till uses its outlet's layout, `workstation` when this till overrides it. BO-109 shows which tills differ from their outlet.\n"
+   },
+   "cashDrawerLimit": {
+    "oneOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true,
+    "description": "**This till's drawer limit, overriding the venue's** (`VenueSettings.cashDrawerLimit`; DEC-179; CHG-CSP-016). Null inherits the venue's. Above it the till warns and offers a cash lift.\n"
+   },
+   "accessPointId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Inherited from the workstation, never selected by the operator. Null where the workstation is not at an access point.\n"
+   },
+   "devices": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/DeviceBinding"
+    }
+   },
+   "currency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$",
+    "x-ticvai-persisted": false,
+    "description": "**Resolved from the region, not stored** (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and cannot be anything else. **Kept on the wire , removed from the table** — a client should not walk a hierarchy to read a figure, and the  database should not hold nine million copies of AED. Four tables genuinely differ from their\n region and keep a stored currency: `orders.payment.tender_currency`, `inventory.supplier`, \n`ledger.account`, `control.partner_agreement`.\n"
+   },
+   "currencyScale": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 4,
+    "x-ticvai-persisted": false,
+    "description": "**Resolved from the region, not stored** (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and cannot be anything else — storing it per ro w is a copy of a fact that cannot differ. **Kept on the wire, removed from the table**: a cl ient reading a figure should not walk a hierarchy to know what it means, and the database sh ould not hold nine million copies of AED. Four tables genuinely differ from their region and\n keep a stored currency — `orders.payment.tender_currency`, `inventory.supplier`, `ledger.ac\ncount`, `control.partner_agreement`. **A guest paying USD at an AED venue is a real row; a w orkstation with its own currency is a misconfiguration.**\n"
+   },
+   "timeZone": {
+    "type": "string"
+   },
+   "deploymentProfile": {
+    "$ref": "#/components/schemas/DeploymentProfile"
+   },
+   "edgeNodeId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Present when `deploymentProfile` is `venueEdge`."
+   },
+   "healthScore": {
+    "type": "integer",
+    "nullable": true,
+    "minimum": 0,
+    "maximum": 100,
+    "readOnly": true,
+    "description": "Board 1 of the client's POS set. **A number a manager can sort by** — the package held `lastHeartbeatAt` and a heartbeat timestamp is not a score.\nThe client's board shows 1,248 workstations at 96% healthy, and **the value of that figure is that it ranks**: a fleet dashboard exists so somebody can open the worst one first.\n**Derived from its devices, its heartbeat age, its firmware currency and its error rate.** Read-only, because a workstation that could set its own score would.\n**The formula, proposed, client to correct (audit R096 (2)):** score = 40% device online share (the share of its devices reporting online) + 25% heartbeat freshness (100 at one minute old or less, 0 at 15 minutes or more, linear between) + 20% firmware and profile currency (100 on the latest, 50 one version behind, 0 older) + 15% error rate (100 at 0 errors an hour, 0 at 10 or more, linear between), rounded to a whole number. **Below 80 is a warning and below 60 a failure.**\n"
+   },
+   "configurationProfileId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Which profile this workstation runs, and at which version. **The client's board shows a fleet split four ways — 72% latest, 18.8% one behind, 6.1% outdated** — and the package had a firmware version field and no profile.\n**A profile is what a venue changes; a version is what it deploys.** Conflating them means a venue cannot say *roll the ticketing counters back and leave the kiosks*.\n"
+   },
+   "catalogueState": {
+    "$ref": "#/components/schemas/CatalogueState"
+   },
+   "offlineCapable": {
+    "type": "boolean",
+    "description": "Derived from `deploymentProfile`. False only for `thin`. Under local-first, catalogue READS are always local on transactional surfaces; this flag governs whether WRITES can be queued.\n"
+   },
+   "isActive": {
+    "type": "boolean"
+   }
+  }
  }
 }

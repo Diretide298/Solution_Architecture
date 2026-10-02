@@ -12,17 +12,17 @@
    "page": 60
   },
   "implementation": {
-   "app": "ticvai-web",
+   "app": "venue-management-web",
    "route": "/platform/approval-integration-command-center-adm-349",
-   "component": "apps/ticvai-web/src/routes/platform/ApprovalIntegrationCommandCenter.tsx",
+   "component": "apps/venue-management-web/src/routes/platform/ApprovalIntegrationCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
    "entryFrom": [
-    "ADM-002"
+    "BO-100"
    ],
    "exitTo": [
-    "ADM-002",
+    "BO-100",
     "ADM-350",
     "ADM-351",
     "ADM-352",
@@ -35,9 +35,9 @@
    ],
    "transitions": [
     {
-     "to": "ADM-002",
-     "trigger": "Back to Platform Dashboard",
-     "provenance": "structural — pack board 7 wiring, 9 September 2026",
+     "to": "BO-100",
+     "trigger": "Back to Venue Home",
+     "provenance": "moved to Venue Management 2 October 2026 (CHG-CLN-003); it returned to the console's Platform Dashboard (ADM-002)",
      "back": true
     },
     {
@@ -87,6 +87,7 @@
     }
    ]
   },
+  "notes": "**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, 2 October: the approvals workflow and matrix screens and the communication service screens move to Venue Management; CHG-CLN-003). It configures a record the tenant owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The console's tenant picker and grant (CHG-SBO-001) came off with the move. The id is kept, so its tickets keep their keys.",
   "density": "compact",
   "pattern": "commandCentre",
   "patternReason": "the pack gives this screen a metric directory (§KPI Cards) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's",
@@ -145,7 +146,7 @@
   "states": {
    "loading": "The approval integration list; the counts above it resolve separately.",
    "error": "Could not load. Names which read failed and leaves the approval integration untouched.",
-   "emptyFirstRun": "No approval integration yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "**Nothing to show yet**: the figures fill as activity is recorded. Offers no create action — a monitor creates nothing — and says so rather than showing empty tiles.",
    "emptyNoResults": "The filter narrowed it and the approval integration are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -184,30 +185,29 @@
   },
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-349",
+   "board": "wireframes/P08 Venue Management.dc.html#adm-349",
    "workshopBoard": "wireframes/WS36 Approval Workflows and Governance Board 7.dc.html#adm-349"
   },
   "apisNote": "Regenerated 9 September 2026 from Approval_Workflows_and_Governance_Reference.pdf page 60. 0 of 0 labels bound to a contract property; 8 of 15 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
+   "code": "P08",
+   "audience": "staff",
    "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
    "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
+   "app": "venue-management-web",
+   "operator": "venue",
    "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
     "shell": "web",
     "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
+     "P12",
+     "P13",
+     "P16"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
     "decided": "10 September 2026"
    }
   }
@@ -225,9 +225,9 @@
    "page": 61
   },
   "implementation": {
-   "app": "ticvai-web",
+   "app": "venue-management-web",
    "route": "/platform/module-integration-registry-adm-350",
-   "component": "apps/ticvai-web/src/routes/platform/ModuleIntegrationRegistry.tsx",
+   "component": "apps/venue-management-web/src/routes/platform/ModuleIntegrationRegistry.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -246,6 +246,7 @@
     }
    ]
   },
+  "notes": "**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, 2 October: the approvals workflow and matrix screens and the communication service screens move to Venue Management; CHG-CLN-003). It configures a record the tenant owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The console's tenant picker and grant (CHG-SBO-001) came off with the move. The id is kept, so its tickets keep their keys.",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
@@ -281,7 +282,7 @@
   "states": {
    "loading": "The module integration registry list.",
    "error": "Could not load. Names which read failed and leaves the module integration registry untouched.",
-   "emptyFirstRun": "No module integration registry yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No module integration registry yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the module integration registry are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -296,30 +297,30 @@
   ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-350",
+   "board": "wireframes/P08 Venue Management.dc.html#adm-350",
    "workshopBoard": "wireframes/WS36 Approval Workflows and Governance Board 7.dc.html#adm-350"
   },
   "apisNote": "Regenerated 9 September 2026 from Approval_Workflows_and_Governance_Reference.pdf page 61. 0 of 0 labels bound to a contract property; 0 of 29 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {},
   "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
+   "code": "P08",
+   "audience": "staff",
    "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
    "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
+   "app": "venue-management-web",
+   "operator": "venue",
    "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
     "shell": "web",
     "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
+     "P12",
+     "P13",
+     "P16"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
     "decided": "10 September 2026"
    }
   }
@@ -337,9 +338,9 @@
    "page": 62
   },
   "implementation": {
-   "app": "ticvai-web",
+   "app": "venue-management-web",
    "route": "/platform/approval-api-management-adm-351",
-   "component": "apps/ticvai-web/src/routes/platform/ApprovalApiManagement.tsx",
+   "component": "apps/venue-management-web/src/routes/platform/ApprovalApiManagement.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -358,6 +359,7 @@
     }
    ]
   },
+  "notes": "**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, 2 October: the approvals workflow and matrix screens and the communication service screens move to Venue Management; CHG-CLN-003). It configures a record the tenant owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The console's tenant picker and grant (CHG-SBO-001) came off with the move. The id is kept, so its tickets keep their keys.",
   "density": "compact",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§API Configuration) and no display directory — it is settings, not a population",
@@ -413,6 +415,26 @@
        "kind": "selectField",
        "label": "rate limit",
        "provenance": "pack Approval_Workflows_and_Governance_Reference.pdf, page 62 §API Configuration"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Approval API scopes",
+       "operation": "listApiScopes",
+       "provenance": "contract public-api.yaml GET /api-scopes; wiring fix, 2 October 2026"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Clients",
+       "bindsTo": "ApiClient",
+       "operation": "listApiClients",
+       "provenance": "contract public-api.yaml GET /api-clients; wiring fix, 2 October 2026"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Usage",
+       "bindsTo": "ApiUsageSummary",
+       "operation": "getApiUsage",
+       "provenance": "contract public-api.yaml GET /api-usage; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -421,44 +443,66 @@
   "states": {
    "loading": "The approval api configuration as saved.",
    "error": "Could not load. Names which read failed and leaves the approval api untouched.",
-   "emptyFirstRun": "No approval api configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyFirstRun": "No approval api configured yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
-    "operationId": "listApprovalRequests",
-    "contract": "approvals",
-    "purpose": "What the API exposes",
+    "operationId": "listApiScopes",
+    "contract": "public-api",
+    "purpose": "The approval scopes the API exposes, read and write",
     "trigger": "onLoad",
-    "provenance": "board reading, 19 September 2026"
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-021)"
+   },
+   {
+    "operationId": "listApiClients",
+    "contract": "public-api",
+    "purpose": "The integrations that hold approval scopes",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-021)"
+   },
+   {
+    "operationId": "getApiUsage",
+    "contract": "public-api",
+    "purpose": "Calls, errors, latency and success rate of the approval API",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-021)"
    }
   ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-351",
+   "board": "wireframes/P08 Venue Management.dc.html#adm-351",
    "workshopBoard": "wireframes/WS36 Approval Workflows and Governance Board 7.dc.html#adm-351"
   },
   "apisNote": "Regenerated 9 September 2026 from Approval_Workflows_and_Governance_Reference.pdf page 62. 0 of 0 labels bound to a contract property; 9 of 13 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {},
+  "gaps": [
+   {
+    "operation": "listApprovalRequests",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-021): Approval API Management configures and monitors the APIs that create, read and process approval requests; it was wired to listApprovalRequests, the approval inbox read. The API side is the scope catalogue (one read and one write scope per module, approvals included), the clients that hold those scopes, and their usage (design-notes correction platform-foundation ADM-351).",
+    "source": "screens/P08-venue-back-office.yaml#ADM-351; contracts/satellite/public-api.yaml#listApiScopes"
+   }
+  ],
   "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
+   "code": "P08",
+   "audience": "staff",
    "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
    "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
+   "app": "venue-management-web",
+   "operator": "venue",
    "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
     "shell": "web",
     "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
+     "P12",
+     "P13",
+     "P16"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
     "decided": "10 September 2026"
    }
   }
@@ -476,9 +520,9 @@
    "page": 63
   },
   "implementation": {
-   "app": "ticvai-web",
+   "app": "venue-management-web",
    "route": "/platform/workflow-event-framework-adm-352",
-   "component": "apps/ticvai-web/src/routes/platform/WorkflowEventFramework.tsx",
+   "component": "apps/venue-management-web/src/routes/platform/WorkflowEventFramework.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -497,6 +541,7 @@
     }
    ]
   },
+  "notes": "**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, 2 October: the approvals workflow and matrix screens and the communication service screens move to Venue Management; CHG-CLN-003). It configures a record the tenant owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The console's tenant picker and grant (CHG-SBO-001) came off with the move. The id is kept, so its tickets keep their keys.",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
@@ -565,30 +610,30 @@
   ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-352",
+   "board": "wireframes/P08 Venue Management.dc.html#adm-352",
    "workshopBoard": "wireframes/WS36 Approval Workflows and Governance Board 7.dc.html#adm-352"
   },
   "apisNote": "Regenerated 9 September 2026 from Approval_Workflows_and_Governance_Reference.pdf page 63. 0 of 0 labels bound to a contract property; 0 of 26 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {},
   "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
+   "code": "P08",
+   "audience": "staff",
    "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
    "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
+   "app": "venue-management-web",
+   "operator": "venue",
    "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
     "shell": "web",
     "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
+     "P12",
+     "P13",
+     "P16"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
     "decided": "10 September 2026"
    }
   }
@@ -606,9 +651,9 @@
    "page": 64
   },
   "implementation": {
-   "app": "ticvai-web",
+   "app": "venue-management-web",
    "route": "/platform/webhook-configuration-subscription-manager-adm-353",
-   "component": "apps/ticvai-web/src/routes/platform/WebhookConfigurationSubscriptionManager.tsx",
+   "component": "apps/venue-management-web/src/routes/platform/WebhookConfigurationSubscriptionManager.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -616,7 +661,8 @@
     "ADM-349"
    ],
    "exitTo": [
-    "ADM-349"
+    "ADM-349",
+    "BO-1074"
    ],
    "transitions": [
     {
@@ -624,13 +670,19 @@
      "trigger": "Back to Approval Integration Command Center",
      "provenance": "structural — pack board 7 wiring, 9 September 2026",
      "back": true
+    },
+    {
+     "to": "BO-1074",
+     "trigger": "Open Webhook Configuration",
+     "provenance": "merged into BO-1074 2 October 2026 (CHG-CLN-003)"
     }
    ]
   },
+  "notes": "**Merged into BO-1074 Webhook Configuration** (decided 2 October 2026, Chinmay: \"duplicate screens: merge as proposed\"; CHG-CLN-003). On P08 it declared the same operations as BO-1074 (check-screen-wiring S-DUP-SCREEN). One implementation, both ids kept: this id stays for traceability and routes to BO-1074.\n\n**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, 2 October: the approvals workflow and matrix screens and the communication service screens move to Venue Management; CHG-CLN-003). It configures a record the tenant owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The console's tenant picker and grant (CHG-SBO-001) came off with the move. The id is kept, so its tickets keep their keys.",
   "density": "compact",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Delivery Configuration) and no display directory — it is settings, not a population",
-  "purpose": "Allow external or internal systems to subscribe to approval events. The source explicitly requires webhook notifications for approval events.",
+  "purpose": "Allow external or internal systems to subscribe to approval events. The source explicitly requires webhook notifications for approval events. (merged into BO-1074 Webhook Configuration).",
   "gaps": [
    {
     "operation": null,
@@ -677,58 +729,36 @@
   "states": {
    "loading": "The webhook subscription configuration as saved.",
    "error": "Could not load. Names which read failed and leaves the webhook subscription untouched.",
-   "emptyFirstRun": "No webhook subscription configured yet. Carries the create action and says what the platform does in the meantime.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "Nothing set up yet. The create action is BO-1074's; this anchor offers none of its own.",
+   "emptyNoAccess": "Shown when the caller lacks the permission BO-1074 Webhook Configuration requires; this id has no operation of its own since the merge, so it names that screen's."
   },
-  "apis": [
-   {
-    "operationId": "createWebhookSubscription",
-    "contract": "public-api",
-    "purpose": "Webhook subscriptions",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026"
-   },
-   {
-    "operationId": "listWebhookEventTypes",
-    "contract": "public-api",
-    "purpose": "Events a subscription can take",
-    "trigger": "onLoad",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "listWebhookSubscriptions",
-    "contract": "public-api",
-    "purpose": "Existing subscriptions",
-    "trigger": "onLoad",
-    "provenance": "build, 29 September 2026"
-   }
-  ],
+  "apis": [],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-353",
+   "board": "wireframes/P08 Venue Management.dc.html#adm-353",
    "workshopBoard": "wireframes/WS36 Approval Workflows and Governance Board 7.dc.html#adm-353"
   },
-  "apisNote": "Regenerated 9 September 2026 from Approval_Workflows_and_Governance_Reference.pdf page 64. 0 of 0 labels bound to a contract property; 6 of 17 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "No operations of its own since 2 October 2026 (CHG-CLN-003): merged into BO-1074 Webhook Configuration, whose operations it routes to (createWebhookSubscription, listWebhookEventTypes, listWebhookSubscriptions).",
+  "entryState": {},
   "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
+   "code": "P08",
+   "audience": "staff",
    "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
    "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
+   "app": "venue-management-web",
+   "operator": "venue",
    "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
     "shell": "web",
     "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
+     "P12",
+     "P13",
+     "P16"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
     "decided": "10 September 2026"
    }
   }
@@ -746,9 +776,9 @@
    "page": 65
   },
   "implementation": {
-   "app": "ticvai-web",
+   "app": "venue-management-web",
    "route": "/platform/external-workflow-system-integration-adm-354",
-   "component": "apps/ticvai-web/src/routes/platform/ExternalWorkflowSystemIntegration.tsx",
+   "component": "apps/venue-management-web/src/routes/platform/ExternalWorkflowSystemIntegration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -767,6 +797,7 @@
     }
    ]
   },
+  "notes": "**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, 2 October: the approvals workflow and matrix screens and the communication service screens move to Venue Management; CHG-CLN-003). It configures a record the tenant owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The console's tenant picker and grant (CHG-SBO-001) came off with the move. The id is kept, so its tickets keep their keys.",
   "density": "compact",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configuration) and no display directory — it is settings, not a population",
@@ -779,44 +810,57 @@
      "slot": "fields",
      "components": [
       {
-       "kind": "selectField",
+       "kind": "textField",
        "label": "System name",
-       "provenance": "pack Approval_Workflows_and_Governance_Reference.pdf, page 65 §Configuration"
+       "provenance": "pack Approval_Workflows_and_Governance_Reference.pdf, page 65 §Configuration",
+       "operation": "setApprovalExternalProvider",
+       "bindsTo": "ApprovalExternalProvider.name"
       },
       {
        "kind": "selectField",
-       "label": "integration direction",
-       "provenance": "pack Approval_Workflows_and_Governance_Reference.pdf, page 65 §Configuration"
+       "label": "Authentication",
+       "provenance": "pack Approval_Workflows_and_Governance_Reference.pdf, page 65 §Configuration",
+       "operation": "setApprovalExternalProvider",
+       "bindsTo": "ApprovalExternalProvider.outboundAuth"
       },
       {
        "kind": "selectField",
-       "label": "authentication",
-       "provenance": "pack Approval_Workflows_and_Governance_Reference.pdf, page 65 §Configuration"
+       "label": "Workflow mapping",
+       "provenance": "pack Approval_Workflows_and_Governance_Reference.pdf, page 65 §Configuration",
+       "operation": "setApprovalExternalProvider",
+       "bindsTo": "ApprovalExternalProvider.requestMapping"
       },
       {
        "kind": "selectField",
-       "label": "workflow mapping",
-       "provenance": "pack Approval_Workflows_and_Governance_Reference.pdf, page 65 §Configuration"
+       "label": "Status mapping",
+       "provenance": "pack Approval_Workflows_and_Governance_Reference.pdf, page 65 §Configuration",
+       "operation": "setApprovalExternalProvider",
+       "bindsTo": "ApprovalExternalProvider.decisionMapping"
       },
       {
        "kind": "selectField",
-       "label": "user/role mapping",
-       "provenance": "pack Approval_Workflows_and_Governance_Reference.pdf, page 65 §Configuration"
+       "label": "Error handling",
+       "provenance": "pack Approval_Workflows_and_Governance_Reference.pdf, page 65 §Configuration",
+       "operation": "setApprovalExternalProvider",
+       "bindsTo": "ApprovalExternalProvider.onTimeout"
       },
       {
-       "kind": "selectField",
-       "label": "status mapping",
-       "provenance": "pack Approval_Workflows_and_Governance_Reference.pdf, page 65 §Configuration"
-      },
+       "kind": "dataTable",
+       "label": "Dispatches",
+       "operation": "listApprovalExternalDispatches",
+       "provenance": "contract approvals.yaml GET /approval-external-dispatches; wiring fix, 2 October 2026"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
       {
-       "kind": "selectField",
-       "label": "error handling",
-       "provenance": "pack Approval_Workflows_and_Governance_Reference.pdf, page 65 §Configuration"
-      },
-      {
-       "kind": "selectField",
-       "label": "synchronization mode",
-       "provenance": "pack Approval_Workflows_and_Governance_Reference.pdf, page 65 §Configuration"
+       "kind": "primaryButton",
+       "label": "Save provider",
+       "operation": "setApprovalExternalProvider",
+       "provenance": "contract approvals.yaml PUT /approval-external-providers"
       }
      ]
     }
@@ -825,17 +869,10 @@
   "states": {
    "loading": "The external workflow system configuration as saved.",
    "error": "Could not load. Names which read failed and leaves the external workflow system untouched.",
-   "emptyFirstRun": "No external workflow system configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyFirstRun": "No external workflow system configured yet. Offers no create action — this screen declares no operation that makes one and says what the platform does in the meantime.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
-   {
-    "operationId": "listApiClients",
-    "contract": "public-api",
-    "purpose": "External workflow systems",
-    "trigger": "onLoad",
-    "provenance": "board reading, 19 September 2026"
-   },
    {
     "operationId": "listApprovalExternalProviders",
     "contract": "approvals",
@@ -849,34 +886,84 @@
     "purpose": "Register or change a provider",
     "trigger": "onAction",
     "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "listApprovalExternalDispatches",
+    "contract": "approvals",
+    "purpose": "What was sent to each external workflow system, and what failed",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-021)"
    }
   ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-354",
+   "board": "wireframes/P08 Venue Management.dc.html#adm-354",
    "workshopBoard": "wireframes/WS36 Approval Workflows and Governance Board 7.dc.html#adm-354"
   },
   "apisNote": "Regenerated 9 September 2026 from Approval_Workflows_and_Governance_Reference.pdf page 65. 0 of 0 labels bound to a contract property; 8 of 21 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {},
+  "gaps": [
+   {
+    "operation": "listApiClients",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-021): listApiClients was used as \"External workflow systems\"; API clients are developer integrations, and the providers are listApprovalExternalProviders (declared). DI-733 asks for retry handling, seen through the dispatch list listApprovalExternalDispatches (design-notes correction platform-foundation ADM-354).",
+    "source": "DI-733 | contracts/spine/approvals.yaml#listApprovalExternalDispatches"
+   },
+   {
+    "operation": null,
+    "why": "Integration direction, user and role mapping and synchronisation mode have no field on ApprovalExternalProvider; the screen binds what the provider record holds.",
+    "source": "contracts/spine/approvals.yaml#setApprovalExternalProvider"
+   }
+  ],
+  "overlays": [
+   {
+    "id": "formSetApprovalExternalProvider",
+    "component": "modal",
+    "trigger": "Save provider",
+    "body": "**Collects what `setApprovalExternalProvider` sends before it is called.** Required: `code`, `name`, `endpointUrl`, `apiClientId`, `decisionMapping`. Optional: `outboundAuth`, `outboundCredential`, `signingSecret`, `requestMapping`, `timeoutMinutes`, `onTimeout`, `maxAttempts`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save provider",
+     "operation": "setApprovalExternalProvider"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "code",
+      "name",
+      "endpointUrl",
+      "apiClientId",
+      "decisionMapping",
+      "outboundAuth",
+      "outboundCredential",
+      "signingSecret",
+      "requestMapping",
+      "timeoutMinutes",
+      "onTimeout",
+      "maxAttempts"
+     ]
+    },
+    "provenance": "contract approvals.yaml PUT /approval-external-providers"
+   }
+  ],
   "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
+   "code": "P08",
+   "audience": "staff",
    "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
    "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
+   "app": "venue-management-web",
+   "operator": "venue",
    "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
     "shell": "web",
     "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
+     "P12",
+     "P13",
+     "P16"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
     "decided": "10 September 2026"
    }
   }
@@ -894,9 +981,9 @@
    "page": 66
   },
   "implementation": {
-   "app": "ticvai-web",
+   "app": "venue-management-web",
    "route": "/platform/data-workflow-mapping-studio-adm-355",
-   "component": "apps/ticvai-web/src/routes/platform/DataWorkflowMappingStudio.tsx",
+   "component": "apps/venue-management-web/src/routes/platform/DataWorkflowMappingStudio.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -915,6 +1002,7 @@
     }
    ]
   },
+  "notes": "**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, 2 October: the approvals workflow and matrix screens and the communication service screens move to Venue Management; CHG-CLN-003). It configures a record the tenant owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The console's tenant picker and grant (CHG-SBO-001) came off with the move. The id is kept, so its tickets keep their keys.",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
@@ -981,30 +1069,30 @@
   ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-355",
+   "board": "wireframes/P08 Venue Management.dc.html#adm-355",
    "workshopBoard": "wireframes/WS36 Approval Workflows and Governance Board 7.dc.html#adm-355"
   },
   "apisNote": "Regenerated 9 September 2026 from Approval_Workflows_and_Governance_Reference.pdf page 66. 0 of 0 labels bound to a contract property; 0 of 26 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {},
   "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
+   "code": "P08",
+   "audience": "staff",
    "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
    "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
+   "app": "venue-management-web",
+   "operator": "venue",
    "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
     "shell": "web",
     "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
+     "P12",
+     "P13",
+     "P16"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
     "decided": "10 September 2026"
    }
   }
@@ -1022,9 +1110,9 @@
    "page": 67
   },
   "implementation": {
-   "app": "ticvai-web",
+   "app": "venue-management-web",
    "route": "/platform/integration-security-access-control-adm-356",
-   "component": "apps/ticvai-web/src/routes/platform/IntegrationSecurityAccessControl.tsx",
+   "component": "apps/venue-management-web/src/routes/platform/IntegrationSecurityAccessControl.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1043,6 +1131,7 @@
     }
    ]
   },
+  "notes": "**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, 2 October: the approvals workflow and matrix screens and the communication service screens move to Venue Management; CHG-CLN-003). It configures a record the tenant owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The console's tenant picker and grant (CHG-SBO-001) came off with the move. The id is kept, so its tickets keep their keys.",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
@@ -1071,6 +1160,12 @@
        "label": "Permissions this screen separates",
        "notes": "**The pack separates these permissions and no action on the screen claims them yet:** ☑ Create Approval Request, ☑ Read Status, ☑ Read History, ☐ Submit Approval Decision, ☐ Modify Workflow. Each needs attaching to the control it gates, or the screen needs the control.",
        "provenance": "pack Approval_Workflows_and_Governance_Reference.pdf, page 67 §Permissions"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Suspend or reactivate",
+       "operation": "setApiClientStatus",
+       "provenance": "contract public-api.yaml POST /api-clients/{clientId}/status; wiring fix, 2 October 2026"
       }
      ]
     },
@@ -1079,9 +1174,17 @@
      "components": [
       {
        "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listAuthorisationPolicies",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "label": "Integrations with access",
+       "bindsTo": "ApiClient",
+       "operation": "listApiClients",
+       "provenance": "contract public-api.yaml GET /api-clients; wiring fix, 2 October 2026"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Authorisation policies",
+       "bindsTo": "AuthorisationPolicy",
+       "operation": "listAuthorisationPolicies",
+       "provenance": "contract identity.yaml GET /authorisation-policies"
       }
      ]
     }
@@ -1090,7 +1193,7 @@
   "states": {
    "loading": "The integration security access list.",
    "error": "Could not load. Names which read failed and leaves the integration security access untouched.",
-   "emptyFirstRun": "No integration security access yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No integration security access yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the integration security access are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -1101,34 +1204,71 @@
     "purpose": "Integration access control",
     "trigger": "onLoad",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "listApiClients",
+    "contract": "public-api",
+    "purpose": "The applications and systems that can call the Approval Engine",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-021)"
+   },
+   {
+    "operationId": "setApiClientStatus",
+    "contract": "public-api",
+    "purpose": "Suspend or reactivate one integration's access",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-021)"
    }
   ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-356",
+   "board": "wireframes/P08 Venue Management.dc.html#adm-356",
    "workshopBoard": "wireframes/WS36 Approval Workflows and Governance Board 7.dc.html#adm-356"
   },
   "apisNote": "Regenerated 9 September 2026 from Approval_Workflows_and_Governance_Reference.pdf page 67. 0 of 0 labels bound to a contract property; 5 of 19 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetApiClientStatus",
+    "component": "modal",
+    "trigger": "Suspend or reactivate",
+    "body": "**Collects what `setApiClientStatus` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Suspend or reactivate",
+     "operation": "setApiClientStatus"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "contract public-api.yaml POST /api-clients/{clientId}/status; wiring fix, 2 October 2026"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "clientId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
+   "code": "P08",
+   "audience": "staff",
    "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
    "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
+   "app": "venue-management-web",
+   "operator": "venue",
    "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
     "shell": "web",
     "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
+     "P12",
+     "P13",
+     "P16"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
     "decided": "10 September 2026"
    }
   }
@@ -1146,9 +1286,9 @@
    "page": 68
   },
   "implementation": {
-   "app": "ticvai-web",
+   "app": "venue-management-web",
    "route": "/platform/integration-monitoring-error-retry-center-adm-357",
-   "component": "apps/ticvai-web/src/routes/platform/IntegrationMonitoringErrorRetryCenter.tsx",
+   "component": "apps/venue-management-web/src/routes/platform/IntegrationMonitoringErrorRetryCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1167,6 +1307,7 @@
     }
    ]
   },
+  "notes": "**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, 2 October: the approvals workflow and matrix screens and the communication service screens move to Venue Management; CHG-CLN-003). It configures a record the tenant owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The console's tenant picker and grant (CHG-SBO-001) came off with the move. The id is kept, so its tickets keep their keys.",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
@@ -1202,7 +1343,7 @@
   "states": {
    "loading": "The integration monitoring error list.",
    "error": "Could not load. Names which read failed and leaves the integration monitoring error untouched.",
-   "emptyFirstRun": "No integration monitoring error yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No integration monitoring error yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the integration monitoring error are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -1224,30 +1365,30 @@
   ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-357",
+   "board": "wireframes/P08 Venue Management.dc.html#adm-357",
    "workshopBoard": "wireframes/WS36 Approval Workflows and Governance Board 7.dc.html#adm-357"
   },
   "apisNote": "Regenerated 9 September 2026 from Approval_Workflows_and_Governance_Reference.pdf page 68. 0 of 0 labels bound to a contract property; 0 of 13 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {},
   "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
+   "code": "P08",
+   "audience": "staff",
    "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
    "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
+   "app": "venue-management-web",
+   "operator": "venue",
    "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
     "shell": "web",
     "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
+     "P12",
+     "P13",
+     "P16"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
     "decided": "10 September 2026"
    }
   }
@@ -1265,9 +1406,9 @@
    "page": 69
   },
   "implementation": {
-   "app": "ticvai-web",
+   "app": "venue-management-web",
    "route": "/platform/integration-analytics-ai-health-advisor-adm-358",
-   "component": "apps/ticvai-web/src/routes/platform/IntegrationAnalyticsAiHealthAdvisor.tsx",
+   "component": "apps/venue-management-web/src/routes/platform/IntegrationAnalyticsAiHealthAdvisor.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1286,6 +1427,7 @@
     }
    ]
   },
+  "notes": "**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, 2 October: the approvals workflow and matrix screens and the communication service screens move to Venue Management; CHG-CLN-003). It configures a record the tenant owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The console's tenant picker and grant (CHG-SBO-001) came off with the move. The id is kept, so its tickets keep their keys.",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
@@ -1321,7 +1463,7 @@
   "states": {
    "loading": "The integration analytics health list.",
    "error": "Could not load. Names which read failed and leaves the integration analytics health untouched.",
-   "emptyFirstRun": "No integration analytics health yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No integration analytics health yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the integration analytics health are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -1336,30 +1478,30 @@
   ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-358",
+   "board": "wireframes/P08 Venue Management.dc.html#adm-358",
    "workshopBoard": "wireframes/WS36 Approval Workflows and Governance Board 7.dc.html#adm-358"
   },
   "apisNote": "Regenerated 9 September 2026 from Approval_Workflows_and_Governance_Reference.pdf page 69. 0 of 0 labels bound to a contract property; 0 of 16 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {},
   "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
+   "code": "P08",
+   "audience": "staff",
    "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
    "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
+   "app": "venue-management-web",
+   "operator": "venue",
    "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
     "shell": "web",
     "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
+     "P12",
+     "P13",
+     "P16"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
     "decided": "10 September 2026"
    }
   }

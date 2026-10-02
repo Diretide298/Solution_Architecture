@@ -37,6 +37,45 @@
   "requestBody": "RentalCheckOut",
   "responds": "RentalBooking"
  },
+ "getRentalAvailability": {
+  "method": "GET",
+  "path": "/rental-availability",
+  "contract": "rental",
+  "summary": "What can be rented, when, with turnaround already subtracted",
+  "permission": "RENTAL_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "productId",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "locationId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "quantity",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "RentalAvailability"
+ },
  "getRentalBooking": {
   "method": "GET",
   "path": "/rental-bookings/{bookingId}",

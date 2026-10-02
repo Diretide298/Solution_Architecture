@@ -132,6 +132,14 @@
        "permission": "TURNSTILE_MODE_SET",
        "notes": "Cancels a `pending` gate mode change, one `setTurnstileMode` scheduled with a future `effectiveAt`.",
        "provenance": "contract access.yaml POST /gate-mode-changes/{changeId}/cancel"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Switch direction",
+       "operation": "setAccessPointDirection",
+       "permission": "ACCESS_DIRECTION_SET",
+       "notes": "**Live, with a specific permission, and logged** (decided 2 October 2026, Chinmay, critical set 1, BO-230: \"Live direction switch with permission, logged; R221 amended\"; DEC-255; CHG-CSP-032). The permission is ACCESS_DIRECTION_SET, the operation's own (CHG-FUP-006; CHG-CLN-013). Entry to Exit or back, with a reason and an optional time it takes effect; the gate mode change records the from and to direction. Hidden without the permission.",
+       "provenance": "contract access.yaml PUT /access-points/{accessPointId}/direction"
       }
      ]
     }
@@ -168,6 +176,15 @@
     "operationId": "cancelGateModeChange",
     "contract": "access",
     "purpose": "Cancel a scheduled gate mode change",
+    "trigger": "onAction",
+    "invalidates": [
+     "listAccessPoints"
+    ]
+   },
+   {
+    "operationId": "setAccessPointDirection",
+    "contract": "access",
+    "purpose": "Switch the gate's direction live (Entry to Exit), with a reason; the switch is logged (DEC-255; CHG-CSP-032)",
     "trigger": "onAction",
     "invalidates": [
      "listAccessPoints"
@@ -227,6 +244,21 @@
     "trigger": "Cancel gate mode change",
     "body": "**Names what `cancelGateModeChange` changes and what it leaves alone**, in the consequence rather than the verb. A access gate mode change this affects should be identified in the dialog, not just counted. **Collects what `cancelGateModeChange` sends before it is called.** Nothing in the body is required. Optional: `reason`.",
     "provenance": "contract access.yaml POST /gate-mode-changes/{changeId}/cancel"
+   },
+   {
+    "id": "formSetAccessPointDirection",
+    "component": "modal",
+    "trigger": "Switch direction",
+    "body": "**Collects what `setAccessPointDirection` sends**: the new direction (Entry or Exit), a reason, and optionally when it takes effect. Names the gate and its current direction. Dismissing sends nothing.",
+    "confirm": {
+     "label": "Switch direction",
+     "operation": "setAccessPointDirection"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": []
+    },
+    "provenance": "contract access.yaml PUT /access-points/{accessPointId}/direction"
    }
   ],
   "_platform": {

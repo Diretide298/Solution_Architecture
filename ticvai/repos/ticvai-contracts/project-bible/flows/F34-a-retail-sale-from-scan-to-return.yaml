@@ -19,7 +19,6 @@ contracts:
 - inventory
 platforms:
 - P04
-- P08
 trigger:
   description: 'A guest brings items to a till. **No booking, no reservation, no account** — retail
     is the one path in this platform that starts with a person holding something.
@@ -50,7 +49,7 @@ steps:
   action: The guest offers a membership card.
   operations:
   - identifyGuest
-  - getLoyaltyPosition
+  - getGuestLoyalty
   - evaluatePromotions
   outcome: 'Member pricing applies. **Stacking is resolved at evaluation, not per line** — a promotion
     applied per line and one applied per basket give different totals, and only one of them is what
@@ -110,20 +109,6 @@ steps:
     note.
 
     '
-- step: 8
-  screen: BO-082
-  action: The returned item is dispositioned — resaleable, damaged, or back to the supplier.
-  operations:
-  - createStockMovement
-  crossesDevice: true
-  note: '**A handover, not a navigation.** The till took the item; a stock controller decides what happens
-    to it, and nobody taps from one to the other.
-
-    '
-  outcome: '**Three different movements, and only one of them is saleable stock.** A damaged return
-    that goes back on the shelf is the shrinkage a count finds three weeks later.
-
-    '
 branches:
 - at: 4
   condition: The network drops mid-basket.
@@ -170,7 +155,7 @@ exitStates:
 
     '
 - state: returned
-  description: Refunded to the original tender and dispositioned.
+  description: Refunded to the original tender; the return put a resaleable item back in stock (createRetailReturn), so no manual movement follows (CHG-CLN-005).
 - state: refusedReturn
   description: 'Outside the policy. **Recorded, because a refused return is a guest who may complain**
     — and a venue with no record of refusing has no answer.

@@ -328,6 +328,13 @@
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
        "impliedBy": "setSeatRules"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Kill, buffer, companion and accessibility rules",
+       "bindsTo": "SeatRules",
+       "operation": "getSeatRules",
+       "provenance": "contract seating.yaml GET /seat-rules; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -351,6 +358,13 @@
      "getSeatRules",
      "getSeatInventory"
     ]
+   },
+   {
+    "operationId": "getSeatRules",
+    "contract": "seating",
+    "purpose": "Kill, buffer, companion and accessibility rules",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {
@@ -359,6 +373,7 @@
    "workshopBoard": "wireframes/WS146 Seat Management Venue Mapping Reference v1.0 Board 7.dc.html#bo-1014"
   },
   "apisNote": "Regenerated 9 September 2026 from Seat_Management_Venue_Mapping_Reference v1.0.pdf page 30. 0 of 0 labels bound to a contract property; 0 of 8 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {},
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -451,6 +466,13 @@
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
        "impliedBy": "setSeatRules"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Kill, buffer, companion and accessibility rules",
+       "bindsTo": "SeatRules",
+       "operation": "getSeatRules",
+       "provenance": "contract seating.yaml GET /seat-rules; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -474,6 +496,13 @@
      "getSeatRules",
      "getSeatInventory"
     ]
+   },
+   {
+    "operationId": "getSeatRules",
+    "contract": "seating",
+    "purpose": "Kill, buffer, companion and accessibility rules",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {
@@ -482,6 +511,7 @@
    "workshopBoard": "wireframes/WS146 Seat Management Venue Mapping Reference v1.0 Board 7.dc.html#bo-1015"
   },
   "apisNote": "Regenerated 9 September 2026 from Seat_Management_Venue_Mapping_Reference v1.0.pdf page 30. 0 of 0 labels bound to a contract property; 0 of 9 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {},
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -574,6 +604,13 @@
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
        "impliedBy": "setSeatRules"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Kill, buffer, companion and accessibility rules",
+       "bindsTo": "SeatRules",
+       "operation": "getSeatRules",
+       "provenance": "contract seating.yaml GET /seat-rules; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -597,6 +634,13 @@
      "getSeatRules",
      "getSeatInventory"
     ]
+   },
+   {
+    "operationId": "getSeatRules",
+    "contract": "seating",
+    "purpose": "Kill, buffer, companion and accessibility rules",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {
@@ -605,6 +649,7 @@
    "workshopBoard": "wireframes/WS146 Seat Management Venue Mapping Reference v1.0 Board 7.dc.html#bo-1016"
   },
   "apisNote": "Regenerated 9 September 2026 from Seat_Management_Venue_Mapping_Reference v1.0.pdf page 31. 0 of 0 labels bound to a contract property; 0 of 8 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {},
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -957,6 +1002,13 @@
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
        "impliedBy": "setAccessibleSeating"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Accessible seats, their routes and who may buy them",
+       "bindsTo": "AccessibleSeating",
+       "operation": "getAccessibleSeating",
+       "provenance": "contract seating.yaml GET /accessible-seating; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -980,6 +1032,13 @@
      "getAccessibleSeating",
      "validateSeatCompliance"
     ]
+   },
+   {
+    "operationId": "getAccessibleSeating",
+    "contract": "seating",
+    "purpose": "Accessible seats, their routes and who may buy them",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {
@@ -988,6 +1047,7 @@
    "workshopBoard": "wireframes/WS146 Seat Management Venue Mapping Reference v1.0 Board 7.dc.html#bo-1019"
   },
   "apisNote": "Regenerated 9 September 2026 from Seat_Management_Venue_Mapping_Reference v1.0.pdf page 31. 0 of 0 labels bound to a contract property; 0 of 9 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {},
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1080,6 +1140,13 @@
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
        "impliedBy": "setAccessibleSeating"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Accessible seats, their routes and who may buy them",
+       "bindsTo": "AccessibleSeating",
+       "operation": "getAccessibleSeating",
+       "provenance": "contract seating.yaml GET /accessible-seating; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -1103,6 +1170,13 @@
      "getAccessibleSeating",
      "validateSeatCompliance"
     ]
+   },
+   {
+    "operationId": "getAccessibleSeating",
+    "contract": "seating",
+    "purpose": "Accessible seats, their routes and who may buy them",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {
@@ -1111,6 +1185,7 @@
    "workshopBoard": "wireframes/WS146 Seat Management Venue Mapping Reference v1.0 Board 7.dc.html#bo-1020"
   },
   "apisNote": "Regenerated 9 September 2026 from Seat_Management_Venue_Mapping_Reference v1.0.pdf page 32. 0 of 0 labels bound to a contract property; 0 of 9 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {},
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1203,6 +1278,13 @@
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
        "impliedBy": "setSeatRules"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Kill, buffer, companion and accessibility rules",
+       "bindsTo": "SeatRules",
+       "operation": "getSeatRules",
+       "provenance": "contract seating.yaml GET /seat-rules; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -1226,6 +1308,13 @@
      "getSeatRules",
      "getSeatInventory"
     ]
+   },
+   {
+    "operationId": "getSeatRules",
+    "contract": "seating",
+    "purpose": "Kill, buffer, companion and accessibility rules",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {
@@ -1234,6 +1323,7 @@
    "workshopBoard": "wireframes/WS146 Seat Management Venue Mapping Reference v1.0 Board 7.dc.html#bo-1021"
   },
   "apisNote": "Regenerated 9 September 2026 from Seat_Management_Venue_Mapping_Reference v1.0.pdf page 32. 0 of 0 labels bound to a contract property; 0 of 8 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {},
   "_platform": {
    "code": "P08",
    "audience": "staff",

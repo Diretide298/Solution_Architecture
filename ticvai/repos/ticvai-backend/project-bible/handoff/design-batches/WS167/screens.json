@@ -540,6 +540,13 @@
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
        "impliedBy": "cloneSeatMap"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Read a seat map with its structure",
+       "bindsTo": "SeatMap",
+       "operation": "getSeatMap",
+       "provenance": "contract seating.yaml GET /seat-maps/{seatMapId}; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -570,6 +577,13 @@
     "invalidates": [
      "getSeatMap"
     ]
+   },
+   {
+    "operationId": "getSeatMap",
+    "contract": "seating",
+    "purpose": "Read a seat map with its structure",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {
@@ -850,6 +864,12 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 15"
+   },
+   {
+    "operation": "publishSeatMap",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-025): publishSeatMap publishes a map (BO-982's act); assigning a map to performances is updatePerformance with its seatMapId (design-notes correction ticketing-backoffice BO-978)",
+    "source": "contracts/satellite/seating.yaml#publishSeatMap | contracts/spine/catalogue.yaml#updatePerformance"
    }
   ],
   "layout": {
@@ -865,24 +885,21 @@
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
       },
       {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "publishSeatMap",
-       "label": "Publish seat map",
-       "notes": "The act the screen exists for."
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "publishSeatMap"
-      },
-      {
        "kind": "publishGate",
        "label": "What publishing changes",
        "notes": "**Replaces the map every channel sells from.** Seats already sold keep their labels; seats that no longer exist in the new map are listed before this proceeds.",
        "provenance": "authored — required by check-screens, 19 September 2026"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "components": [
+      {
+       "kind": "secondaryButton",
+       "label": "Assign layout",
+       "operation": "updatePerformance",
+       "provenance": "contract catalogue.yaml PATCH /performances/{performanceId}; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -891,7 +908,7 @@
   "states": {
    "loading": "The multi-performance list.",
    "error": "Could not load. Names which read failed and leaves the multi-performance untouched.",
-   "emptyFirstRun": "No multi-performance yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No multi-performance yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the multi-performance are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -904,11 +921,11 @@
     "provenance": "board reading, 19 September 2026"
    },
    {
-    "operationId": "publishSeatMap",
-    "contract": "seating",
-    "purpose": "Assign to performances",
+    "operationId": "updatePerformance",
+    "contract": "catalogue",
+    "purpose": "Assign the chosen layout to a performance (seatMapId)",
     "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026"
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {
@@ -922,9 +939,29 @@
     {
      "name": "seatMapId",
      "from": "navigation"
+    },
+    {
+     "name": "performanceId",
+     "from": "navigation"
     }
    ]
   },
+  "overlays": [
+   {
+    "id": "formUpdatePerformance",
+    "component": "modal",
+    "trigger": "Assign layout",
+    "body": "**Collects what `updatePerformance` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Assign layout",
+     "operation": "updatePerformance"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "contract catalogue.yaml PATCH /performances/{performanceId}; wiring fix, 2 October 2026"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1284,6 +1321,17 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 16"
+   },
+   {
+    "operation": "simulatePolicyConflictImpact",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): simulatePolicyConflictImpact tests dynamic access policies against a scan (BO-242); this screen simulates seat-layout changes, which no seating operation computes yet (contract gap CHG-WIR-004) (design-notes correction venue-operations BO-981).",
+    "source": "contracts/spine/access.yaml#simulatePolicyConflictImpact | contracts/satellite/seating.yaml#diffSeatMapVersions"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-004): No seating operation computes the impact of a layout change.",
+    "source": "contracts/satellite/seating.yaml#diffSeatMapVersions"
    }
   ],
   "layout": {
@@ -1293,17 +1341,21 @@
      "name": "contentBody",
      "components": [
       {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "simulatePolicyConflictImpact",
-       "notes": "The act the screen exists for."
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "simulatePolicyConflictImpact"
+       "kind": "detailPanel",
+       "label": "What the layout change does",
+       "bindsTo": "SeatMapDiff",
+       "columns": [
+        "SeatMapDiff.seatCountBefore",
+        "SeatMapDiff.seatCountAfter",
+        "SeatMapDiff.sectionsAdded",
+        "SeatMapDiff.sectionsRemoved",
+        "SeatMapDiff.sectionsChanged",
+        "SeatMapDiff.accessibleSeatsBefore",
+        "SeatMapDiff.accessibleSeatsAfter"
+       ],
+       "operation": "diffSeatMapVersions",
+       "notes": "Drawn from the pack (change types, impact measures, resolutions) with the version diff as its only bound data until an impact simulation exists.",
+       "provenance": "contract seating.yaml GET /seat-maps/{seatMapId}/diff"
       }
      ]
     }
@@ -1312,16 +1364,17 @@
   "states": {
    "loading": "The conflict impact simulation list.",
    "error": "Could not load. Names which read failed and leaves the conflict impact simulation untouched.",
-   "emptyFirstRun": "No conflict impact simulation yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No conflict impact simulation yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the conflict impact simulation are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Not shown: nothing on this screen needs a permission of its own; the app's sign-in decides access."
   },
   "apis": [
    {
-    "operationId": "simulatePolicyConflictImpact",
-    "contract": "access",
-    "purpose": "Policy Simulation, Conflict & Impact Analysis",
-    "trigger": "onAction"
+    "operationId": "diffSeatMapVersions",
+    "contract": "seating",
+    "purpose": "The version difference, the one bound part of the simulation",
+    "trigger": "onLoad",
+    "provenance": "design-note correction, 2 October 2026 (BO-981)"
    }
   ],
   "wireframe": {
@@ -1330,6 +1383,16 @@
    "workshopBoard": "wireframes/WS142 Seat Management Venue Mapping Reference v1.0 Board 3.dc.html#bo-981"
   },
   "apisNote": "Regenerated 9 September 2026 from Seat_Management_Venue_Mapping_Reference v1.0.pdf page 16. 0 of 0 labels bound to a contract property; 0 of 9 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "notes": "Belongs to Seat Management and Venue Mapping (board 3, from BO-973 Layout Command Center); venue operations is a dependency through gates and routes.",
+  "entryState": {
+   "params": [
+    {
+     "name": "seatMapId",
+     "from": "navigation",
+     "optional": true
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1427,6 +1490,13 @@
        "label": "What publishing changes",
        "notes": "**Replaces the map every channel sells from.** Seats already sold keep their labels; seats that no longer exist in the new map are listed before this proceeds.",
        "provenance": "authored — required by check-screens, 19 September 2026"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Read a seat map with its structure",
+       "bindsTo": "SeatMap",
+       "operation": "getSeatMap",
+       "provenance": "contract seating.yaml GET /seat-maps/{seatMapId}; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -1462,6 +1532,13 @@
     "purpose": "Propose categories, numbering, a stage variant or consistency findings for this map",
     "trigger": "onAction",
     "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "getSeatMap",
+    "contract": "seating",
+    "purpose": "Read a seat map with its structure",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {

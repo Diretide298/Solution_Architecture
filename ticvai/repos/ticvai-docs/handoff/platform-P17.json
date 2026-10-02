@@ -7,12 +7,12 @@
  "audience": "public",
  "formFactor": "web",
  "offlineCapable": false,
- "generated": "2026-10-01",
+ "generated": "2026-10-02",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 24,
-  "operations": 14,
-  "contracts": 4,
+  "operations": 12,
+  "contracts": 3,
   "modules": 3,
   "undrawn": 0,
   "operationsWithNoScreen": 0
@@ -46,15 +46,11 @@
  "contracts": [
   {
    "contract": "subscription",
-   "operations": 11
+   "operations": 9
   },
   {
-   "contract": "catalogue",
-   "operations": 1
-  },
-  {
-   "contract": "finance",
-   "operations": 1
+   "contract": "identity",
+   "operations": 2
   },
   {
    "contract": "orders",
@@ -68,7 +64,7 @@
    "module": "Onboarding & Assessment",
    "wave": 3,
    "route": "/onboarding-assessment/welcome-start-your-ticvai-journey-sgn-001",
-   "operations": 1,
+   "operations": 0,
    "drawn": true
   },
   {
@@ -77,7 +73,7 @@
    "module": "Onboarding & Assessment",
    "wave": 3,
    "route": "/onboarding-assessment/customer-organization-registration-sgn-002",
-   "operations": 1,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -104,7 +100,7 @@
    "module": "Onboarding & Assessment",
    "wave": 3,
    "route": "/onboarding-assessment/sales-channel-assessment-sgn-005",
-   "operations": 2,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -203,7 +199,7 @@
    "module": "Package Builder",
    "wave": 3,
    "route": "/package-builder/module-dependency-compatibility-manager-sgn-016",
-   "operations": 2,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -221,7 +217,7 @@
    "module": "Purchase & Activation",
    "wave": 3,
    "route": "/purchase-activation/purchase-trial-journey-selection-sgn-018",
-   "operations": 1,
+   "operations": 0,
    "drawn": true
   },
   {

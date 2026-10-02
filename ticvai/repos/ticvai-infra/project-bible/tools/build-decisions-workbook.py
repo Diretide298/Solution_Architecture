@@ -91,12 +91,15 @@ NEW_QUESTIONS = [
      "provider per venue when your mandate covers them.", "Your finance team"),
     ("Availability", "What 99.99% covers",
      "Which services does the 99.99% availability commitment cover: the whole platform, or the guest purchase "
-     "and admission path only? And do you accept a separate target per tier (for example 99.99% for purchase and "
-     "admission, 99.9% for back office and reporting)? (ADR-0060)", "a",
-     "Purchase and admission are designed to 99.99%; back office, reporting and AI to 99.9%.", "Your IT owner"),
+     "and admission path only? And do you accept a separate target per tier: 99.99% at the venue (gates, POS, kitchen "
+     "display, which keep working offline), 99.95% for online sales, 99.9% for the back office and reporting, 99.5% "
+     "for AI? (ADR-0060)", "a",
+     "Built to those four tiers: the venue at 99.99% because it runs offline, online sales at 99.95%, back office "
+     "99.9%, AI 99.5%.", "Your IT owner"),
     ("Availability", "Zone-redundant hosting cost",
-     "99.99% needs zone-redundant hosting in UAE North: about USD 8,050 a month against about USD 4,530 without "
-     "it. Do you accept that cost for production? (ADR-0060, the Azure cost sheet)", "a",
+     "The availability targets need high-availability hosting in UAE North: about USD 8,050 a month for a production "
+     "cell, against about USD 5,550 without it (re-priced 1 October). Do you accept that cost for production? "
+     "(ADR-0060, the Azure cost sheet)", "a",
      "Production is costed zone-redundant; pre-production is not.", "Your budget owner"),
     ("Guest data", "Where face templates are stored",
      "Where may face templates be stored: only inside the facial-reader vendor's system at the venue, or also in "

@@ -1,11 +1,11 @@
 id: F147
 name: 'Pricing   Revenue Management board 5: Dynamic Pricing Strategy Command Center'
-actor: platformAdmin
+actor: venueManager
 wave: 3
 frequency: routine
 criticality: operational
 platforms:
-- P09 TICVAI Web
+- P08 Venue Management
 provenance: derived-from-board
 offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
   not guess.
@@ -127,7 +127,7 @@ steps:
   - listDynamicPricingStrategy
   outcome: Ready for the next screen on this board
 - step: 18
-  screen: ADM-097
+  screen: BO-441
   action: Works in Rule Priority, Conflict Resolution & Dynamic Pricing Test Console
   operations:
   - listRulePriorityConflict

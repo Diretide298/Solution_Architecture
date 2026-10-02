@@ -7,24 +7,24 @@
  "audience": "partner",
  "formFactor": "web",
  "offlineCapable": false,
- "generated": "2026-10-01",
+ "generated": "2026-10-02",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
-  "screens": 51,
-  "operations": 142,
+  "screens": 43,
+  "operations": 118,
   "contracts": 10,
   "modules": 9,
   "undrawn": 0,
-  "operationsWithNoScreen": 2
+  "operationsWithNoScreen": 4
  },
  "waves": {
   "wave2": 11,
-  "wave3": 40
+  "wave3": 32
  },
  "modules": [
   {
    "module": "Partners",
-   "screens": 30,
+   "screens": 22,
    "waves": [
     3
    ]
@@ -91,23 +91,19 @@
  "contracts": [
   {
    "contract": "subscription",
-   "operations": 49
+   "operations": 32
   },
   {
    "contract": "orders",
-   "operations": 26
+   "operations": 20
   },
   {
    "contract": "identity",
-   "operations": 16
+   "operations": 18
   },
   {
    "contract": "catalogue",
    "operations": 12
-  },
-  {
-   "contract": "marketing-crm",
-   "operations": 9
   },
   {
    "contract": "reporting",
@@ -118,12 +114,16 @@
    "operations": 7
   },
   {
+   "contract": "marketing-crm",
+   "operations": 7
+  },
+  {
    "contract": "finance",
    "operations": 6
   },
   {
    "contract": "promotions",
-   "operations": 5
+   "operations": 4
   },
   {
    "contract": "seating",
@@ -137,7 +137,7 @@
    "module": "Access & Account",
    "wave": 2,
    "route": "/general/partner-login-mfa",
-   "operations": 13,
+   "operations": 11,
    "drawn": true
   },
   {
@@ -146,7 +146,7 @@
    "module": "Overview",
    "wave": 2,
    "route": "/general/partner-dashboard",
-   "operations": 16,
+   "operations": 12,
    "drawn": true
   },
   {
@@ -173,7 +173,7 @@
    "module": "Inventory & Pricing",
    "wave": 2,
    "route": "/general/inventory-and-allocation-view",
-   "operations": 16,
+   "operations": 8,
    "drawn": true
   },
   {
@@ -200,7 +200,7 @@
    "module": "Booking & Quotes",
    "wave": 2,
    "route": "/general/booking-creation",
-   "operations": 14,
+   "operations": 11,
    "drawn": true
   },
   {
@@ -218,7 +218,7 @@
    "module": "Booking & Quotes",
    "wave": 3,
    "route": "/general/cart-and-quote",
-   "operations": 10,
+   "operations": 9,
    "drawn": true
   },
   {
@@ -236,7 +236,7 @@
    "module": "Credit & Settlement",
    "wave": 2,
    "route": "/general/checkout-credit-purchase",
-   "operations": 4,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -245,7 +245,7 @@
    "module": "Credit & Settlement",
    "wave": 2,
    "route": "/general/credit-limit-and-balance",
-   "operations": 3,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -263,7 +263,7 @@
    "module": "Orders & Fulfilment",
    "wave": 2,
    "route": "/general/order-history",
-   "operations": 14,
+   "operations": 11,
    "drawn": true
   },
   {
@@ -272,7 +272,7 @@
    "module": "Orders & Fulfilment",
    "wave": 2,
    "route": "/general/voucher-ticket-download",
-   "operations": 13,
+   "operations": 5,
    "drawn": true
   },
   {
@@ -317,7 +317,7 @@
    "module": "Support",
    "wave": 3,
    "route": "/general/support-and-contact",
-   "operations": 7,
+   "operations": 5,
    "drawn": true
   },
   {
@@ -357,15 +357,6 @@
    "drawn": true
   },
   {
-   "id": "PTR-026",
-   "name": "Territory, Market & Distribution Rights",
-   "module": "Partners",
-   "wave": 3,
-   "route": "/partners/territory-market-distribution-rights-ptr-026",
-   "operations": 2,
-   "drawn": true
-  },
-  {
    "id": "PTR-027",
    "name": "Partner Brand, Venue & Business Scope Assignment",
    "module": "Partners",
@@ -384,21 +375,12 @@
    "drawn": true
   },
   {
-   "id": "PTR-029",
-   "name": "Partner Access, Roles & Permission Profile",
-   "module": "Partners",
-   "wave": 3,
-   "route": "/partners/partner-access-roles-permission-profile-ptr-029",
-   "operations": 2,
-   "drawn": true
-  },
-  {
    "id": "PTR-030",
    "name": "Partner Approval, Status & Lifecycle Management",
    "module": "Partners",
    "wave": 3,
    "route": "/partners/partner-approval-status-lifecycle-management-ptr-030",
-   "operations": 1,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -438,33 +420,6 @@
    "drawn": true
   },
   {
-   "id": "PTR-035",
-   "name": "Commission, Margin & Incentive Management",
-   "module": "Partners",
-   "wave": 3,
-   "route": "/partners/commission-margin-incentive-management-ptr-035",
-   "operations": 2,
-   "drawn": true
-  },
-  {
-   "id": "PTR-036",
-   "name": "Credit Limit & Exposure Management",
-   "module": "Partners",
-   "wave": 3,
-   "route": "/partners/credit-limit-exposure-management-ptr-036",
-   "operations": 2,
-   "drawn": true
-  },
-  {
-   "id": "PTR-037",
-   "name": "Deposit, Guarantee & Financial Security Management",
-   "module": "Partners",
-   "wave": 3,
-   "route": "/partners/deposit-guarantee-financial-security-management-ptr-037",
-   "operations": 2,
-   "drawn": true
-  },
-  {
    "id": "PTR-038",
    "name": "Payment Terms, Billing & Account Configuration",
    "module": "Partners",
@@ -474,21 +429,12 @@
    "drawn": true
   },
   {
-   "id": "PTR-039",
-   "name": "Commercial Allocation, Quota & Commitment Management",
-   "module": "Partners",
-   "wave": 3,
-   "route": "/partners/commercial-allocation-quota-commitment-management-ptr-039",
-   "operations": 2,
-   "drawn": true
-  },
-  {
    "id": "PTR-040",
    "name": "Booking Limits, Commercial Exceptions & Approval",
    "module": "Partners",
    "wave": 3,
    "route": "/partners/booking-limits-commercial-exceptions-approval-ptr-040",
-   "operations": 1,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -546,24 +492,6 @@
    "drawn": true
   },
   {
-   "id": "PTR-047",
-   "name": "Partner Reconciliation & Exception Management",
-   "module": "Partners",
-   "wave": 3,
-   "route": "/partners/partner-reconciliation-exception-management-ptr-047",
-   "operations": 2,
-   "drawn": true
-  },
-  {
-   "id": "PTR-048",
-   "name": "Commission Calculation & Settlement Management",
-   "module": "Partners",
-   "wave": 3,
-   "route": "/partners/commission-calculation-settlement-management-ptr-048",
-   "operations": 3,
-   "drawn": true
-  },
-  {
    "id": "PTR-049",
    "name": "Partner Disputes, Cases & Service Management",
    "module": "Partners",
@@ -593,6 +521,18 @@
  ],
  "gaps": {
   "operationsWithNoScreen": [
+   {
+    "operation": "overrideCreditLimit",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "Authorise an order beyond the credit limit"
+   },
+   {
+    "operation": "setB2bCreditLimit",
+    "contract": "orders",
+    "verb": "PUT",
+    "summary": "Set a partner credit limit"
+   },
    {
     "operation": "issueApiToken",
     "contract": "public-api",

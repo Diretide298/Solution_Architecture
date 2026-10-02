@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Order & Payment
   version: 0.1.0
-  x-ticvai-screen-count: 204
+  x-ticvai-screen-count: 205
   x-ticvai-tier: spine
   x-ticvai-module: 2 — Ticketing Sales
   x-ticvai-requirements: 343
@@ -158,12 +158,12 @@ paths:
     get:
       operationId: listMyOrders
       x-ticvai-consumed-by:
+        - "P01 WEB-017 My Account Dashboard"
         - "P01 WEB-019 Order History"
+        - "P01 WEB-026 Survey & Feedback"
         - "P01 WEB-030 Ticket Transfer"
         - "P02 GST-014 Ticket Transfer"
         - "P02 GST-019 Order History"
-        - "P01 WEB-017 My Account Dashboard"
-        - "P01 WEB-026 Survey & Feedback"
         - "P02 GST-035 Feedback & Ratings"
       security:
       - guestAuth: []
@@ -3522,8 +3522,8 @@ paths:
     post:
       operationId: voidPayment
       x-ticvai-consumed-by:
-        - "P08 BO-319 Void, Reversal & Same-Day Correction Management"
         - "P08 ADM-613 Void, Reversal & Cancellation Manager"
+        - "P08 BO-319 Void, Reversal & Same-Day Correction Management"
       x-ticvai-audience:
       - staff
       summary: Release an authorisation before it is captured
@@ -4504,13 +4504,13 @@ paths:
         - "P04 POS-006 Held Orders"
         - "P06 EMP-014 Ticket lookup"
         - "P06 EMP-034 Walk-up sale"
+        - "P08 ADM-609 Refund & Payment Adjustment Command Center"
+        - "P08 ADM-616 Payment Adjustment & Financial Correction Manager"
         - "P08 BO-022 Order Detail"
         - "P08 BO-023 Refunds & Exchanges"
         - "P08 BO-026 Group Bookings"
         - "P08 BO-047 Order Corrections & Exceptions"
         - "P08 BO-1147 Refund Routing & Credit Restoration Engine"
-        - "P08 ADM-609 Refund & Payment Adjustment Command Center"
-        - "P08 ADM-616 Payment Adjustment & Financial Correction Manager"
         - "P10 PTR-002 Partner Dashboard"
         - "P10 PTR-005 Inventory & Allocation View"
         - "P10 PTR-008 Booking Creation"
@@ -4557,13 +4557,13 @@ paths:
         - "P04 POS-006 Held Orders"
         - "P04 POS-011 Returns, Refunds & Exchanges"
         - "P06 EMP-034 Walk-up sale"
+        - "P08 ADM-610 Refund Request & Eligibility Workspace"
+        - "P08 ADM-616 Payment Adjustment & Financial Correction Manager"
         - "P08 BO-022 Order Detail"
         - "P08 BO-023 Refunds & Exchanges"
         - "P08 BO-026 Group Bookings"
         - "P08 BO-047 Order Corrections & Exceptions"
         - "P08 BO-1147 Refund Routing & Credit Restoration Engine"
-        - "P08 ADM-610 Refund Request & Eligibility Workspace"
-        - "P08 ADM-616 Payment Adjustment & Financial Correction Manager"
       x-ticvai-api-scope: ticketing.write
       x-ticvai-audience:
       - staff
@@ -4730,6 +4730,9 @@ paths:
         format: uuid
     get:
       operationId: previewProductTickets
+      x-ticvai-consumed-by:
+        - "P08 BO-008 Product Detail & Variants"
+        - "P13 CMS-006 Component Preview"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -4783,8 +4786,8 @@ paths:
     post:
       operationId: approveRefund
       x-ticvai-consumed-by:
-        - "P08 BO-028 Refund Approval Queue"
         - "P08 ADM-614 Refund Approval & Exception Workflow"
+        - "P08 BO-028 Refund Approval Queue"
       x-ticvai-audience:
       - staff
       summary: Approve a refund held for approval
@@ -5011,12 +5014,12 @@ paths:
     get:
       operationId: getRefundPolicy
       x-ticvai-consumed-by:
+        - "P08 ADM-610 Refund Request & Eligibility Workspace"
         - "P08 BO-023 Refunds & Exchanges"
         - "P08 BO-062 Venue Profile"
         - "P08 BO-065 Venue Configuration"
         - "P08 BO-1146 Refund-to-Wallet Policy Configuration"
         - "P08 BO-318 Refund Policy & Refund Calculation Configuration"
-        - "P08 ADM-610 Refund Request & Eligibility Workspace"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -5247,10 +5250,10 @@ paths:
         - "P04 POS-005 Payment"
         - "P05 KSK-008 Payment unresolved"
         - "P06 EMP-035 Payment on device"
-        - "P08 BO-024 Payment Exceptions"
         - "P08 ADM-595 Digital Payment Session & Transaction Monitor"
         - "P08 ADM-597 Digital Payment Exception, Recovery & Expiry Center"
         - "P08 ADM-615 Refund Processing, Provider Status & Recovery Center"
+        - "P08 BO-024 Payment Exceptions"
         - "P10 PTR-012 Checkout / Credit Purchase"
       x-ticvai-api-scope: ticketing.write
       security:
@@ -9622,8 +9625,8 @@ paths:
     get:
       operationId: listVoidReversalSame
       x-ticvai-consumed-by:
-        - "P08 BO-319 Void, Reversal & Same-Day Correction Management"
         - "P08 ADM-613 Void, Reversal & Cancellation Manager"
+        - "P08 BO-319 Void, Reversal & Same-Day Correction Management"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -9988,9 +9991,9 @@ paths:
     get:
       operationId: listOrderPaymentDetail
       x-ticvai-consumed-by:
-        - "P08 BO-325 Order Payment Detail & Transaction Ledger"
         - "P08 ADM-607 Mixed Tender Transaction Trace & Allocation Audit"
         - "P08 ADM-617 Refund Transaction Trace & Audit Investigation"
+        - "P08 BO-325 Order Payment Detail & Transaction Ledger"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -10034,8 +10037,8 @@ paths:
     put:
       operationId: setMultiPaymentSplit
       x-ticvai-consumed-by:
-        - "P08 BO-326 Multi-Payment, Split Tender & Payment Allocation Configuration"
         - "P08 ADM-601 Split Payment & Tender Allocation Manager"
+        - "P08 BO-326 Multi-Payment, Split Tender & Payment Allocation Configuration"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Order___Reservation_Management_Reference.pdf p.43; MoM 1 Sep 4.11-4.12 (orders, holds, amendments, deposits); shape fixed (4 non-field properties removed; enums allocationLevel)'
@@ -13794,8 +13797,8 @@ paths:
     get:
       operationId: listPaymentAllocationRules
       x-ticvai-consumed-by:
-        - "P08 BO-326 Multi-Payment, Split Tender & Payment Allocation Configuration"
         - "P08 ADM-601 Split Payment & Tender Allocation Manager"
+        - "P08 BO-326 Multi-Payment, Split Tender & Payment Allocation Configuration"
       summary: The venue's split-tender allocation rules
       description: '**The rows `setMultiPaymentSplit` writes** in `orders.payment_allocation_rule`: at
         what level a split-tender payment is allocated, per channel, terminal, product, order type and
@@ -13858,8 +13861,8 @@ paths:
     post:
       operationId: recordChargeback
       x-ticvai-consumed-by:
-        - "P08 BO-025 Chargebacks & Disputes"
         - "P08 ADM-634 Chargeback & Dispute Command Center"
+        - "P08 BO-025 Chargebacks & Disputes"
       x-ticvai-audience:
       - staff
       - service
@@ -13987,9 +13990,9 @@ paths:
     post:
       operationId: assignChargeback
       x-ticvai-consumed-by:
-        - "P08 BO-025 Chargebacks & Disputes"
         - "P08 ADM-633 Fraud Alert, Investigation & Case Management"
         - "P08 ADM-634 Chargeback & Dispute Command Center"
+        - "P08 BO-025 Chargebacks & Disputes"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: our build plan (retrace 5.7.92 investigation workflow); shape follows respondToChargeback'
@@ -14055,8 +14058,8 @@ paths:
     post:
       operationId: recordChargebackOutcome
       x-ticvai-consumed-by:
-        - "P08 BO-025 Chargebacks & Disputes"
         - "P08 ADM-634 Chargeback & Dispute Command Center"
+        - "P08 BO-025 Chargebacks & Disputes"
       x-ticvai-audience:
       - staff
       - service
@@ -14131,10 +14134,10 @@ paths:
     get:
       operationId: getChargebackAnalytics
       x-ticvai-consumed-by:
-        - "P08 BO-025 Chargebacks & Disputes"
         - "P08 ADM-633 Fraud Alert, Investigation & Case Management"
         - "P08 ADM-634 Chargeback & Dispute Command Center"
         - "P08 ADM-637 AI Fraud, Anomaly & Payment Intelligence Center"
+        - "P08 BO-025 Chargebacks & Disputes"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: our build plan (retrace 4.2.21); shape follows getPaymentPerformance'

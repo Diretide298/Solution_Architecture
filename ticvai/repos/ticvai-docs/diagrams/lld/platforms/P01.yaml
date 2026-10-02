@@ -20,11 +20,11 @@ deployment:
 why: null
 modulesUsed:
 - module: ticketing
-  screens: 21
+  screens: 20
 - module: marketing
   screens: 10
 - module: core
-  screens: 4
+  screens: 5
 - module: retail
   screens: 3
 - module: fnb
@@ -43,29 +43,29 @@ modulesUsed:
   screens: 1
 servicesCalled:
 - service: MarketingService
-  operationCalls: 69
+  operationCalls: 60
 - service: OrderService
-  operationCalls: 63
+  operationCalls: 55
 - service: CatalogueService
-  operationCalls: 48
+  operationCalls: 43
 - service: VenueOpsService
   operationCalls: 38
+- service: WhiteLabelService
+  operationCalls: 24
 - service: IdentityService
   operationCalls: 23
 - service: FnbService
-  operationCalls: 21
-- service: WhiteLabelService
-  operationCalls: 20
+  operationCalls: 17
+- service: AccessService
+  operationCalls: 11
 - service: AiService
   operationCalls: 11
-- service: AccessService
-  operationCalls: 10
 - service: WalletService
-  operationCalls: 8
+  operationCalls: 9
 - service: LedgerService
   operationCalls: 6
 - service: RetailService
-  operationCalls: 5
+  operationCalls: 4
 coverage:
   screens: 50
   inAFlow: 14
@@ -82,8 +82,8 @@ screens:
   operations:
   - decideRecommendations
   - getCookieConsentRuntime
+  - getPublishedTenantConfig
   - getTenantAppStatus
-  - getTenantConfig
   - listAnalyticsProviders
   - listMyEntitlements
   - listProducts
@@ -357,12 +357,10 @@ screens:
   - decideRecommendations
   - getBundle
   - getPublishedBookingFlow
-  - listCatalogueBundles
   - recordRecommendationEvents
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   - offline
@@ -462,20 +460,12 @@ screens:
   wave: 1
   density: compact
   operations:
-  - addToWishlist
   - getCart
-  - getGuestProfile
+  - getMyProfile
   - getPublishedBookingFlow
-  - getWishlist
   - listConsentPurposes
-  - listGuestDevices
-  - recordConsent
   - recordConsentAnswers
-  - registerGuestDevice
-  - removeFromWishlist
-  - revokeGuestDevice
   - updateMyProfile
-  - uploadGuestDocument
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -485,8 +475,6 @@ screens:
   - offline
   offlineState: true
   entryParams:
-  - deviceId<-deepLink
-  - itemId<-deepLink
   - subjectId<-session
   - cartId<-session
   - venueId<-session
@@ -513,7 +501,7 @@ screens:
   - getOrder
   - getPublishedBookingFlow
   - inquirePaymentStatus
-  - transferOrderTickets
+  - listPublishedPolicies
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -544,8 +532,8 @@ screens:
   density: compact
   operations:
   - getOrder
+  - linkGuestCheckout
   - reprintOrder
-  - transferOrderTickets
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -617,7 +605,7 @@ screens:
 - screen: WEB-016
   name: Login / Register
   module: Account & Self-Service
-  requiresModule: ticketing
+  requiresModule: core
   wave: 1
   density: compact
   operations:
@@ -666,15 +654,13 @@ screens:
   wave: 1
   density: compact
   operations:
-  - addToWishlist
+  - getLoyaltyPosition
   - getMyChallenges
+  - getWallet
   - getWishlist
-  - listGuestDevices
-  - recordConsent
-  - registerGuestDevice
-  - removeFromWishlist
+  - listMyEntitlements
+  - listMyOrders
   - respondToInvitation
-  - revokeGuestDevice
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -684,8 +670,6 @@ screens:
   - offline
   offlineState: true
   entryParams:
-  - deviceId<-deepLink
-  - itemId<-deepLink
   - subjectId<-session
   - token<-deepLink
   goesTo:
@@ -721,6 +705,7 @@ screens:
   - offline
   offlineState: true
   entryParams:
+  - subjectId<-session
   - entitlementId<-deepLink
   - orderId<-deepLink
   goesTo:
@@ -745,9 +730,7 @@ screens:
   - issueTaxInvoice
   - listCreditMemos
   - listMyOrders
-  - listOrders
   - listTaxInvoices
-  - transferOrderTickets
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -757,6 +740,7 @@ screens:
   - offline
   offlineState: true
   entryParams:
+  - subjectId<-session
   - orderId<-deepLink
   - documentId<-navigation
   - invoiceId<-navigation
@@ -775,8 +759,9 @@ screens:
   wave: 1
   density: compact
   operations:
-  - getGuestProfile
+  - getGuestConsents
   - getMyIdentityVerification
+  - getMyProfile
   - listConsentPurposes
   - recordConsent
   - submitGuestIdentityDocument
@@ -848,7 +833,6 @@ screens:
   operations:
   - getMyMemberships
   - getProduct
-  - listGuestMemberships
   - listProducts
   states:
   - emptyFirstRun
@@ -879,11 +863,9 @@ screens:
   - getBillingStatement
   - getMyMemberships
   - listBillingStatements
-  - listGuestMemberships
   - listInstalmentPlans
   - listMyPaymentIssues
   - retryMyDunningPayment
-  - transferOrderTickets
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -893,6 +875,7 @@ screens:
   - offline
   offlineState: true
   entryParams:
+  - subjectId<-session
   - orderId<-deepLink
   - caseId<-navigation
   - statementId<-navigation
@@ -911,7 +894,6 @@ screens:
   wave: 3
   density: compact
   operations:
-  - addToWishlist
   - deleteGuestAccount
   - enrolMfaMethod
   - exportSubjectData
@@ -921,15 +903,13 @@ screens:
   - getGuestConsents
   - getWaiverStatus
   - getWishlist
-  - grantDelegation
+  - listConsentPurposes
   - listDelegations
   - listGuestDevices
   - listMfaMethods
   - listPublishedTrackingTechnologies
   - recordConsent
   - recordDeviceConsent
-  - registerGuestDevice
-  - removeFromWishlist
   - removeMfaMethod
   - revokeFacePass
   - revokeGuestDevice
@@ -964,9 +944,11 @@ screens:
   wave: 1
   density: compact
   operations:
-  - createCase
   - getTenantAppStatus
-  - listCases
+  - listMyCases
+  - listPublishedFaqs
+  - raiseMyCase
+  - replyToMyCase
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -990,6 +972,10 @@ screens:
   wave: 3
   density: compact
   operations:
+  - getForm
+  - listMyOrders
+  - raiseMyCase
+  - submitForm
   - submitReview
   states:
   - emptyFirstRun
@@ -998,7 +984,8 @@ screens:
   - loading
   - offline
   offlineState: true
-  entryParams: []
+  entryParams:
+  - formId<-deepLink
   goesTo:
   - WEB-001
   - WEB-025
@@ -1014,14 +1001,10 @@ screens:
   wave: 2
   density: compact
   operations:
-  - addToWishlist
+  - getGuestConsents
   - getMarketingSubscription
-  - getWishlist
-  - listGuestDevices
+  - listConsentPurposes
   - recordConsent
-  - registerGuestDevice
-  - removeFromWishlist
-  - revokeGuestDevice
   - setMarketingSubscription
   states:
   - emptyFirstRun
@@ -1032,9 +1015,8 @@ screens:
   - offline
   offlineState: true
   entryParams:
-  - deviceId<-deepLink
-  - itemId<-deepLink
   - subjectId<-session
+  - unsubscribeToken<-deepLink
   goesTo:
   - WEB-001
   - WEB-025
@@ -1050,7 +1032,7 @@ screens:
   wave: 1
   density: compact
   operations:
-  - getTenantAppStatus
+  - getPublishedTenantConfig
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -1074,6 +1056,7 @@ screens:
   wave: 1
   density: compact
   operations:
+  - getPublishedTenantConfig
   - getTenantAppStatus
   states:
   - closed
@@ -1081,6 +1064,7 @@ screens:
   - emptyNoAccess
   - error
   - loading
+  - maintenance
   - offline
   - soldOut
   offlineState: true
@@ -1097,9 +1081,8 @@ screens:
   wave: 1
   density: compact
   operations:
-  - claimTicketTransfer
   - createResaleListing
-  - listOrders
+  - listMyOrders
   - transferOrderTickets
   states:
   - emptyFirstRun
@@ -1110,6 +1093,7 @@ screens:
   - offline
   offlineState: true
   entryParams:
+  - subjectId<-session
   - orderId<-deepLink
   - transferId<-deepLink
   goesTo:
@@ -1145,6 +1129,7 @@ screens:
   - offline
   offlineState: true
   entryParams:
+  - subjectId<-session
   - reservationId<-deepLink
   - groupBookingId<-navigation
   - resourceId<-navigation
@@ -1218,6 +1203,7 @@ screens:
   operations:
   - listMyCases
   - raiseMyCase
+  - recordLostItem
   - replyToMyCase
   states:
   - emptyFirstRun
@@ -1228,6 +1214,7 @@ screens:
   - offline
   offlineState: true
   entryParams:
+  - subjectId<-session
   - caseId<-deepLink
   goesTo:
   - WEB-001
@@ -1269,7 +1256,6 @@ screens:
   operations:
   - addCartLine
   - claimLocationSession
-  - claimTableSession
   - createGuestFnbOrder
   - createTableReservation
   - getFnbDeliveryPolicy
@@ -1280,7 +1266,7 @@ screens:
   - listDeliveryLocations
   - listDiningOutlets
   - listFulfilmentSlots
-  - listModifierGroups
+  - updateTableReservation
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -1308,17 +1294,16 @@ screens:
   density: compact
   operations:
   - getGuestMenu
-  - listModifierGroups
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   - offline
   offlineState: true
   entryParams:
   - outletId<-deepLink
+  - menuItemId<-deepLink
   goesTo:
   - WEB-001
   boardFrames: null
@@ -1331,18 +1316,17 @@ screens:
   wave: 2
   density: compact
   operations:
-  - claimTableSession
   - getGuestBill
   - getGuestOrderStatus
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   - offline
   offlineState: true
   entryParams:
+  - subjectId<-session
   - orderId<-deepLink
   - sessionId<-deepLink
   - venueId<-session
@@ -1389,9 +1373,7 @@ screens:
   - getWaitTimes
   - getWaitingGuest
   - joinQueue
-  - joinWaitlist
   - leaveQueue
-  - leaveWaitlist
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -1401,6 +1383,7 @@ screens:
   - offline
   offlineState: true
   entryParams:
+  - subjectId<-session
   - entryId<-deepLink
   goesTo:
   - WEB-001
@@ -1415,8 +1398,6 @@ screens:
   density: compact
   operations:
   - addCartLine
-  - checkoutCart
-  - createPayment
   - listParkingFacilities
   - updateParkingEntitlement
   states:
@@ -1445,10 +1426,7 @@ screens:
   density: compact
   operations:
   - addCartLine
-  - checkoutCart
-  - createPayment
   - listMerchandise
-  - lookupMerchandise
   - lookupShopAndDrop
   states:
   - emptyFirstRun
@@ -1463,6 +1441,7 @@ screens:
   - cartId<-session
   goesTo:
   - WEB-001
+  - WEB-010
   boardFrames: null
   wireframe: wireframes/P01 Guest Web.dc.html#web-042
   inFlows: null
@@ -1476,10 +1455,14 @@ screens:
   - createReferral
   - decideRecommendations
   - getLoyaltyPosition
+  - listCustomerBadges
+  - listLeaderboard
   - listLoyaltyProgrammes
   - listPromotions
+  - listRewards
   - recordRecommendationEvents
   - redeemLoyaltyPoints
+  - setLeaderboardNickname
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -1488,7 +1471,9 @@ screens:
   - loading
   - offline
   offlineState: true
-  entryParams: []
+  entryParams:
+  - subjectId<-session
+  - customerId<-session
   goesTo:
   - WEB-001
   boardFrames: null
@@ -1534,8 +1519,9 @@ screens:
   density: compact
   operations:
   - getTenantAppStatus
-  - listContentPages
-  - listFaqs
+  - listPublishedContentPages
+  - listPublishedFaqs
+  - listPublishedPolicies
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -1557,7 +1543,6 @@ screens:
   wave: 2
   density: compact
   operations:
-  - claimLocationSession
   - listMyNotifications
   - markMyNotificationsRead
   states:
@@ -1568,7 +1553,8 @@ screens:
   - loading
   - offline
   offlineState: true
-  entryParams: []
+  entryParams:
+  - subjectId<-session
   goesTo:
   - WEB-001
   boardFrames: null

@@ -595,76 +595,6 @@
    }
   }
  },
- "DataRetentionPolicy": {
-  "type": "object",
-  "x-ticvai-persistence": "marketing.retention_policy",
-  "description": "Board 2.8. **The only routine operation that destroys data irrecoverably at scale.**",
-  "required": [
-   "code"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "code": {
-    "type": "string"
-   },
-   "dataCategory": {
-    "type": "string"
-   },
-   "jurisdictions": {
-    "type": "array",
-    "items": {
-     "type": "string"
-    }
-   },
-   "purposes": {
-    "type": "array",
-    "items": {
-     "type": "string"
-    }
-   },
-   "guestStatus": {
-    "type": "array",
-    "items": {
-     "type": "string"
-    }
-   },
-   "retainMonths": {
-    "type": "integer",
-    "description": "At most the tenant's effective `guestProfile` period (tenancy `setDataRetentionSetting`, decided 29 September); a rule may only shorten it."
-   },
-   "action": {
-    "type": "string",
-    "enum": [
-     "archive",
-     "anonymise",
-     "pseudonymise",
-     "delete"
-    ]
-   },
-   "legalHoldsRespected": {
-    "type": "boolean",
-    "default": true
-   },
-   "fraudExceptionMonths": {
-    "type": "integer",
-    "nullable": true
-   },
-   "approvalRequired": {
-    "type": "boolean",
-    "default": true
-   },
-   "schedule": {
-    "type": "string",
-    "nullable": true
-   },
-   "scopePath": {
-    "type": "string"
-   }
-  }
- },
  "DataSubjectCustomerPrivacyRequestManagementView": {
   "type": "object",
   "x-ticvai-persistence": "marketing.privacy_request",
@@ -966,6 +896,209 @@
    }
   }
  },
+ "FormDefinition": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.form_definition + marketing.form_definition_field",
+  "description": "CF-129, CL-04. **A waiver, a survey and a data-capture form are one mechanism.**\nA waiver is this form with a signature. A survey is this form with a scale. A demographic capture is this form at the point of sale. They were raised as three separate gaps and share every part: field configuration, conditional display, versioning, an acceptance record and a stored artefact.\n**Three implementations would drift on the version rule first.** A waiver signed against version 3 must stay bound to version 3, and that is the same requirement a survey has when question wording changes mid-campaign — **an NPS score means nothing if you cannot say which question produced it.**\n",
+  "required": [
+   "id",
+   "name",
+   "kind",
+   "version",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "readOnly": true,
+    "type": "string",
+    "format": "uuid"
+   },
+   "name": {
+    "type": "string"
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "waiver",
+     "survey",
+     "dataCapture",
+     "consentForm",
+     "incidentReport",
+     "registration"
+    ]
+   },
+   "consentPurposes": {
+    "type": "array",
+    "description": "**What a `consentForm` consents to** (Chinmay, 2 October, batch 4; follows BO-188: biometric capture needs consent on the venue's own form; CHG-CSA-026). A guardian-signed form for a minor carries the guardian fields of the waiver builder (workbook Q237: guardian consent, configurable per country). Empty for any other kind.",
+    "items": {
+     "type": "string",
+     "enum": [
+      "facePass",
+      "faceTag",
+      "marketing",
+      "photography",
+      "waiver"
+     ]
+    }
+   },
+   "version": {
+    "readOnly": true,
+    "type": "integer",
+    "description": "**Set by the server** — 1 on `createForm`, the next number on every change. **Immutable once anything is submitted against it.** A change creates a new version, and the old one stays readable forever — 2.15.13 requires the exact accepted version retained, which is legal evidence rather than a nicety.\n"
+   },
+   "fields": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/FormField"
+    }
+   },
+   "requiresSignature": {
+    "type": "boolean",
+    "default": false,
+    "description": "**What makes it a waiver.** And 2.15.9 makes ticket issuance conditional on one, which puts this in the purchase path rather than beside it.\n"
+   },
+   "signatureKind": {
+    "type": "string",
+    "enum": [
+     "drawn",
+     "typed",
+     "checkbox",
+     "none"
+    ],
+    "default": "none"
+   },
+   "scoreScale": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "nps",
+     "csat",
+     "ces",
+     "likert5",
+     "likert7",
+     "stars"
+    ],
+    "description": "**What makes it a survey.** Named rather than free-form because a score whose scale is unknown cannot be compared to last quarter's.\n"
+   },
+   "appliesToProductIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "validForMonths": {
+    "type": "integer",
+    "nullable": true,
+    "description": "**How long an acceptance lasts.** A waiver signed last summer may or may not still hold, and 2.15.x asks for a returning participant not to sign again — which only works if the expiry is stated.\n"
+   },
+   "minimumAge": {
+    "type": "integer",
+    "nullable": true
+   },
+   "requiresGuardianForMinors": {
+    "type": "boolean",
+    "default": true,
+    "description": "**A minor cannot waive their own rights.** A guardian signs, and the record has to name them — an unsigned or self-signed minor waiver is worth nothing at the moment it matters.\n"
+   },
+   "status": {
+    "readOnly": true,
+    "type": "string",
+    "enum": [
+     "draft",
+     "published",
+     "superseded",
+     "retired"
+    ]
+   },
+   "legalReviewedBy": {
+    "type": "string",
+    "nullable": true
+   },
+   "legalReviewedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "scopePath": {
+    "readOnly": true,
+    "type": "string",
+    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"
+   }
+  }
+ },
+ "FormField": {
+  "type": "object",
+  "description": "One field. **Conditional display is the shared requirement** — a survey branching on an answer and a waiver revealing a medical question on a yes are the same mechanism.\n",
+  "required": [
+   "key",
+   "label",
+   "type"
+  ],
+  "properties": {
+   "key": {
+    "type": "string"
+   },
+   "label": {
+    "type": "string"
+   },
+   "labelLocalised": {
+    "type": "object",
+    "additionalProperties": {
+     "type": "string"
+    }
+   },
+   "type": {
+    "type": "string",
+    "enum": [
+     "text",
+     "longText",
+     "number",
+     "date",
+     "select",
+     "multiSelect",
+     "boolean",
+     "scale",
+     "signature",
+     "file",
+     "phone",
+     "email"
+    ]
+   },
+   "options": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "isRequired": {
+    "type": "boolean",
+    "default": false
+   },
+   "isPersonalData": {
+    "type": "boolean",
+    "default": false,
+    "description": "**Marked at the field, because retention is decided at the field.** A survey answer and a medical condition on the same form have different lifetimes, and a form-level flag makes the whole thing as sensitive as its most sensitive field.\n"
+   },
+   "consentPurposeId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "showWhen": {
+    "type": "object",
+    "nullable": true,
+    "properties": {
+     "field": {
+      "type": "string"
+     },
+     "equals": {
+      "type": "string"
+     }
+    }
+   }
+  }
+ },
  "GuestMatchPolicy": {
   "type": "object",
   "x-ticvai-persistence": "marketing.guest_match_policy",
@@ -1094,6 +1227,14 @@
    }
   }
  },
+ "LocalisedRichText": {
+  "x-ticvai-persistence": "none — jsonb column",
+  "type": "object",
+  "description": "Keyed by language code. Values are sanitised HTML.",
+  "additionalProperties": {
+   "type": "string"
+  }
+ },
  "MergeResult": {
   "x-ticvai-persistence": "none — computed",
   "type": "object",
@@ -1205,6 +1346,63 @@
     "type": "boolean"
    }
   }
+ },
+ "Policy": {
+  "x-ticvai-persistence": "whitelabel.policy",
+  "type": "object",
+  "required": [
+   "kind",
+   "version",
+   "body",
+   "effectiveFrom",
+   "publishedAt"
+  ],
+  "properties": {
+   "kind": {
+    "$ref": "#/components/schemas/PolicyKind"
+   },
+   "title": {
+    "type": "string",
+    "description": "The heading a guest sees, and the field a refund question retrieves against.\n"
+   },
+   "version": {
+    "type": "string",
+    "description": "Immutable. A guest who consented to version 3 consented to version 3, and a policy that changes under a recorded consent is a compliance failure.\n"
+   },
+   "body": {
+    "$ref": "#/components/schemas/LocalisedRichText"
+   },
+   "requiresReconsent": {
+    "type": "boolean"
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "format": "date"
+   },
+   "publishedByPrincipalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "publishedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `tenant` scope.**"
+   }
+  }
+ },
+ "PolicyKind": {
+  "type": "string",
+  "enum": [
+   "privacy",
+   "termsAndConditions",
+   "refund",
+   "cookie",
+   "accessibility"
+  ]
  },
  "PrivacyAnalyticsAiComplianceIntelligenceView": {
   "type": "object",
@@ -2079,188 +2277,6 @@
     "type": "string",
     "readOnly": true,
     "description": "The tenant. Retention is set at tenant scope only."
-   }
-  }
- },
- "VersioningEffectiveDatesLegalChangeControlView": {
-  "type": "object",
-  "x-ticvai-persistence": "none — projection over marketing.form_definition, marketing.waiver_version_control (new), marketing.form_submission and marketing.waiver_signature",
-  "description": "One version of one waiver and its change control (pack 11.1.8).",
-  "required": [
-   "formId",
-   "versionNumber",
-   "status",
-   "createdAt"
-  ],
-  "properties": {
-   "formId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "waiverName": {
-    "type": "string"
-   },
-   "versionNumber": {
-    "type": "integer",
-    "minimum": 1
-   },
-   "status": {
-    "type": "string",
-    "enum": [
-     "draft",
-     "published",
-     "superseded",
-     "retired"
-    ],
-    "description": "`FormDefinition.status` (states/form-definition.yaml)."
-   },
-   "lifecycleStatus": {
-    "type": "string",
-    "enum": [
-     "draft",
-     "review",
-     "pendingApproval",
-     "approved",
-     "scheduled",
-     "published",
-     "suspended",
-     "expired",
-     "archived"
-    ]
-   },
-   "createdByUserId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "createdAt": {
-    "type": "string",
-    "format": "date-time"
-   },
-   "changeReason": {
-    "type": "string",
-    "maxLength": 1000,
-    "nullable": true
-   },
-   "legalReviewer": {
-    "type": "string",
-    "nullable": true,
-    "description": "`FormDefinition.legalReviewedBy`."
-   },
-   "legalReviewedAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "approvedByUserId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "approvedAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "effectiveFrom": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "effectiveTo": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "resignRule": {
-    "type": "string",
-    "enum": [
-     "noResign",
-     "resignAtNextBooking",
-     "resignBeforeNextVisit"
-    ],
-    "description": "Whether people who signed an earlier version must sign this one."
-   },
-   "suspended": {
-    "type": "boolean",
-    "default": false
-   },
-   "suspensionReason": {
-    "type": "string",
-    "maxLength": 500,
-    "nullable": true
-   },
-   "signatureCount": {
-    "type": "integer",
-    "minimum": 0,
-    "description": "Signatures taken against this exact version."
-   },
-   "comparison": {
-    "type": "object",
-    "nullable": true,
-    "description": "Present when `compareWith` is given.",
-    "properties": {
-     "comparedWithVersion": {
-      "type": "integer",
-      "minimum": 1
-     },
-     "addedText": {
-      "type": "array",
-      "items": {
-       "type": "object",
-       "properties": {
-        "blockKey": {
-         "type": "string"
-        },
-        "language": {
-         "type": "string"
-        },
-        "text": {
-         "type": "string"
-        }
-       }
-      }
-     },
-     "removedText": {
-      "type": "array",
-      "items": {
-       "type": "object",
-       "properties": {
-        "blockKey": {
-         "type": "string"
-        },
-        "language": {
-         "type": "string"
-        },
-        "text": {
-         "type": "string"
-        }
-       }
-      }
-     },
-     "changedQuestions": {
-      "type": "array",
-      "items": {
-       "type": "string"
-      },
-      "description": "Field keys added, removed or changed."
-     },
-     "changedSignatoryRules": {
-      "type": "array",
-      "items": {
-       "type": "string"
-      },
-      "description": "Names of the signatory-rule properties that differ."
-     },
-     "changedAssociations": {
-      "type": "array",
-      "items": {
-       "type": "string",
-       "format": "uuid"
-      },
-      "description": "Associations added, removed or changed between the two versions' publication."
-     }
-    }
    }
   }
  }

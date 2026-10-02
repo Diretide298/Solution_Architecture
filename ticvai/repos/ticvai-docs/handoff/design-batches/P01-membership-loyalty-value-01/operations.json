@@ -1,23 +1,4 @@
 {
- "addToWishlist": {
-  "method": "POST",
-  "path": "/guests/{subjectId}/wishlist",
-  "contract": "marketing-crm",
-  "summary": "Save an item",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "subject",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Wishlist"
- },
  "createInstalmentPlan": {
   "method": "POST",
   "path": "/instalment-plans",
@@ -404,25 +385,6 @@
   "requestBody": null,
   "responds": "Wishlist"
  },
- "grantDelegation": {
-  "method": "POST",
-  "path": "/guests/{subjectId}/delegations",
-  "contract": "identity",
-  "summary": "Let one guest act for another",
-  "permission": "GUEST_MANAGE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "DelegatedAccess"
- },
  "listBillingStatements": {
   "method": "GET",
   "path": "/billing-statements",
@@ -442,6 +404,59 @@
     "name": "to",
     "in": "query",
     "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listConsentPurposes": {
+  "method": "GET",
+  "path": "/consent-purposes",
+  "contract": "marketing-crm",
+  "summary": "Configured consent purposes",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listCustomerBadges": {
+  "method": "GET",
+  "path": "/customers/{customerId}/badges",
+  "contract": "marketing-crm",
+  "summary": "Badges a guest holds",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "customerId",
+    "in": "path",
+    "required": true
    },
    {
     "name": null,
@@ -505,35 +520,6 @@
   "requestBody": null,
   "responds": "Page"
  },
- "listGuestMemberships": {
-  "method": "GET",
-  "path": "/guest/memberships",
-  "contract": "catalogue",
-  "summary": "A guest's memberships, benefits and history",
-  "permission": "PRODUCT_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "includeLapsed",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- },
  "listInstalmentPlans": {
   "method": "GET",
   "path": "/instalment-plans",
@@ -551,6 +537,40 @@
    },
    {
     "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listLeaderboard": {
+  "method": "GET",
+  "path": "/loyalty/leaderboard",
+  "contract": "marketing-crm",
+  "summary": "Standings, by nickname",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "programmeId",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "window",
     "in": "query",
     "required": null
    },
@@ -780,6 +800,35 @@
   "requestBody": null,
   "responds": "Page"
  },
+ "listRewards": {
+  "method": "GET",
+  "path": "/loyalty/rewards",
+  "contract": "marketing-crm",
+  "summary": "What points can be turned into",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "programmeId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "listWalletTransactions": {
   "method": "GET",
   "path": "/wallets/{subjectId}/transactions",
@@ -885,44 +934,6 @@
   "requestBody": null,
   "responds": "LoyaltyPosition"
  },
- "registerGuestDevice": {
-  "method": "POST",
-  "path": "/guests/{subjectId}/devices",
-  "contract": "marketing-crm",
-  "summary": "Register a device for push",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "subject",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "GuestDevice"
- },
- "removeFromWishlist": {
-  "method": "DELETE",
-  "path": "/guests/{subjectId}/wishlist/{itemId}",
-  "contract": "marketing-crm",
-  "summary": "Remove a saved item",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "subject",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": null
- },
  "removeMfaMethod": {
   "method": "DELETE",
   "path": "/auth/mfa/methods/{methodId}",
@@ -1004,6 +1015,25 @@
   "requestBody": null,
   "responds": null
  },
+ "setLeaderboardNickname": {
+  "method": "PUT",
+  "path": "/loyalty/leaderboard-nickname",
+  "contract": "marketing-crm",
+  "summary": "Choose the name shown on the board",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "subject",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "LoyaltyPosition"
+ },
  "setWalletAutoReloadSetting": {
   "method": "PUT",
   "path": "/wallets/{walletId}/auto-reload",
@@ -1065,25 +1095,6 @@
   ],
   "requestBody": null,
   "responds": "PaymentToken"
- },
- "transferOrderTickets": {
-  "method": "POST",
-  "path": "/orders/{orderId}/transfer",
-  "contract": "orders",
-  "summary": "Transfer tickets to another guest",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": null
  },
  "transferWalletBalance": {
   "method": "POST",

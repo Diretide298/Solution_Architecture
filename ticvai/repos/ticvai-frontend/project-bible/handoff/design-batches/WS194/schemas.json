@@ -202,6 +202,72 @@
       }
      }
     }
+   },
+   "walletChecks": {
+    "type": "array",
+    "description": "**The wallet pre-close checks** (decided 2 October 2026, Chinmay, batch 6 #220, BO-1170; DEC-220; CHG-CSP-040). Beside `checks`, whose values clients built at r1 already switch on, so no value is added there. `passed` is false while any of these fails. Empty where the tenant has no wallet module.",
+    "items": {
+     "type": "object",
+     "required": [
+      "check",
+      "passed"
+     ],
+     "properties": {
+      "check": {
+       "type": "string",
+       "enum": [
+        "walletRollForwardTies",
+        "walletLiabilityMatchesLedger",
+        "noPendingWalletAuthorisations",
+        "expiredBalancesReleased",
+        "walletDisputesReviewed"
+       ],
+       "description": "`walletRollForwardTies`: opening liability plus top-ups, minus spend, refunds and expiry, equals closing liability. `walletLiabilityMatchesLedger`: that closing liability equals the wallet liability account. `noPendingWalletAuthorisations`: no authorisation is still held open in the period. `expiredBalancesReleased`: balances past expiry were released to breakage. `walletDisputesReviewed`: no wallet dispute raised in the period is unreviewed."
+      },
+      "passed": {
+       "type": "boolean"
+      },
+      "detail": {
+       "type": "string"
+      },
+      "blockingCount": {
+       "type": "integer"
+      }
+     }
+    }
+   },
+   "walletRollForward": {
+    "type": "object",
+    "nullable": true,
+    "description": "**The period's wallet movement summary, as the close checked it** (DEC-220; CHG-CSP-040): read from wallet `getWalletMovementSummary` so BO-1170 shows the roll-forward beside the ledger checks. Null where the tenant has no wallet module.",
+    "properties": {
+     "openingLiability": {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     },
+     "toppedUp": {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     },
+     "spent": {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     },
+     "refunded": {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     },
+     "expired": {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     },
+     "closingLiability": {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     },
+     "ledgerLiability": {
+      "allOf": [
+       {
+        "$ref": "../shared/common.yaml#/components/schemas/Money"
+       }
+      ],
+      "description": "The wallet liability account's balance, to compare with `closingLiability`."
+     }
+    }
    }
   }
  },
@@ -467,6 +533,94 @@
    "oldestLotAt": {
     "type": "string",
     "format": "date",
+    "nullable": true
+   }
+  }
+ },
+ "WalletMovementSummary": {
+  "type": "object",
+  "x-ticvai-persistence": "none — aggregated from wallet.transaction and wallet.credit_lot",
+  "description": "One row of the wallet roll-forward (`getWalletMovementSummary`, CHG-CSA-027). Every amount is in the base currency.",
+  "properties": {
+   "groupKey": {
+    "type": "string",
+    "nullable": true
+   },
+   "opening": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "topUps": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "refundsIn": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "transfersIn": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "adjustmentsIn": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "spend": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "transfersOut": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "adjustmentsOut": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "refundsOut": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "expired": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "breakageRecognised": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "closing": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "tiesOut": {
+    "type": "boolean",
+    "description": "Opening plus every movement equals closing."
+   }
+  }
+ },
+ "WalletPreCloseCheck": {
+  "type": "object",
+  "x-ticvai-persistence": "none — computed at the call",
+  "description": "One wallet check before a period closes (`getWalletPreCloseChecks`, CHG-CSA-027).",
+  "properties": {
+   "code": {
+    "type": "string",
+    "enum": [
+     "rollForwardTies",
+     "subLedgerTiesToLedger",
+     "noExpiredHoldsOpen",
+     "noPendingExpiryRun",
+     "noOverdueDisputes",
+     "reconciliationSourcesMatched"
+    ]
+   },
+   "outcome": {
+    "type": "string",
+    "enum": [
+     "pass",
+     "warn",
+     "fail"
+    ]
+   },
+   "detail": {
+    "type": "string"
+   },
+   "difference": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
     "nullable": true
    }
   }

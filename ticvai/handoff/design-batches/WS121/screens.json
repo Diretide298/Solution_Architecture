@@ -3,7 +3,7 @@
   "id": "ADM-519",
   "name": "AI Governance Command Center",
   "module": "Platform",
-  "requiresModule": "ai",
+  "requiresModule": "core",
   "wave": 3,
   "source": {
    "pack": "AI_Governance_Reference.pdf",
@@ -67,32 +67,50 @@
     {
      "to": "ADM-523",
      "trigger": "AI Action & Permission Policy Builder",
-     "provenance": "structural — pack board 1 wiring, 19 September 2026"
+     "provenance": "structural — pack board 1 wiring, 19 September 2026",
+     "carries": [
+      "tenantId"
+     ]
     },
     {
      "to": "ADM-524",
      "trigger": "AI Data Access & Usage Policy",
-     "provenance": "structural — pack board 1 wiring, 19 September 2026"
+     "provenance": "structural — pack board 1 wiring, 19 September 2026",
+     "carries": [
+      "tenantId"
+     ]
     },
     {
      "to": "ADM-525",
      "trigger": "Environment, Tenant & Scope Governance",
-     "provenance": "structural — pack board 1 wiring, 19 September 2026"
+     "provenance": "structural — pack board 1 wiring, 19 September 2026",
+     "carries": [
+      "tenantId"
+     ]
     },
     {
      "to": "ADM-526",
      "trigger": "AI Policy Conflict, Exception & Override Management",
-     "provenance": "structural — pack board 1 wiring, 19 September 2026"
+     "provenance": "structural — pack board 1 wiring, 19 September 2026",
+     "carries": [
+      "tenantId"
+     ]
     },
     {
      "to": "ADM-527",
      "trigger": "AI Policy Testing & Governance Simulation",
-     "provenance": "structural — pack board 1 wiring, 19 September 2026"
+     "provenance": "structural — pack board 1 wiring, 19 September 2026",
+     "carries": [
+      "tenantId"
+     ]
     },
     {
      "to": "ADM-528",
      "trigger": "AI Governance Policy Publication & Effective Policy Map",
-     "provenance": "structural — pack board 1 wiring, 19 September 2026"
+     "provenance": "structural — pack board 1 wiring, 19 September 2026",
+     "carries": [
+      "tenantId"
+     ]
     }
    ]
   },
@@ -107,6 +125,42 @@
      "name": "contentBody",
      "slot": "headline",
      "components": [
+      {
+       "kind": "selectField",
+       "label": "Tenant",
+       "bindsTo": "Tenant.id",
+       "columns": [
+        "Tenant.code",
+        "Tenant.name",
+        "Tenant.status"
+       ],
+       "operation": "listTenants",
+       "notes": "**Pick a tenant first** (audit R098; decided 2 October 2026, Chinmay: console screens get the tenant picker and grant, CHG-SBO-001). This screen's operations run in that tenant's cell, and a platform token carries no tenant permission there until a platform-staff grant into it is open.",
+       "provenance": "contract subscription.yaml GET /tenants"
+      },
+      {
+       "kind": "banner",
+       "label": "Open grant into this tenant",
+       "bindsTo": "PlatformStaffGrant",
+       "columns": [
+        "PlatformStaffGrant.operatorDisplayName",
+        "PlatformStaffGrant.permissions",
+        "PlatformStaffGrant.reason",
+        "PlatformStaffGrant.ticketRef",
+        "PlatformStaffGrant.openedAt",
+        "PlatformStaffGrant.expiresAt"
+       ],
+       "operation": "listOwnPlatformStaffGrants",
+       "notes": "**Always visible while the screen acts on a tenant** (audit R098, the ADM-412 pattern): which tenant, which permissions, why, and the time left to `expiresAt`. At expiry every tenant action is disabled and the screen returns to its grantRequired state; a new need is a new grant. The tenant sees the grant in its own audit log. Found again after a reload with `listOwnPlatformStaffGrants`.",
+       "provenance": "contract identity.yaml GET /platform-staff-grants/mine"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Open access grant",
+       "operation": "openPlatformStaffGrant",
+       "notes": "Shown until a grant into the picked tenant is open; asks for the second factor first (step-up, audit R135).",
+       "provenance": "contract identity.yaml POST /platform-staff-grants"
+      },
       {
        "kind": "publishGate",
        "impliedBy": "promoteAiRelease",
@@ -186,7 +240,8 @@
    "error": "Could not load. Names which read failed and leaves the governance untouched.",
    "emptyFirstRun": "No governance yet. Carries the create action; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the governance are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "grantRequired": "**No access into this tenant yet.** A tenant is picked and no platform-staff grant into it is open, so every tenant action is disabled and the screen offers **Open access grant** (`openPlatformStaffGrant`: reason, permissions `AI_CONFIGURE`, `AI_USE`, expiry). The same state returns when the grant reaches `expiresAt` (audit R098; CHG-SBO-001)."
   },
   "apis": [
    {
@@ -223,6 +278,27 @@
     "purpose": "Where each AI answer stands on the way to learned",
     "trigger": "onLoad",
     "provenance": "29 September pass (group A)"
+   },
+   {
+    "operationId": "listTenants",
+    "contract": "subscription",
+    "purpose": "The tenant picker: the operator picks a tenant before acting in its cell (audit R098; decided 2 October 2026, CHG-SBO-001)",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listOwnPlatformStaffGrants",
+    "contract": "identity",
+    "purpose": "Find a grant into the picked tenant already open, after a reload (audit R098; CHG-SBO-001)",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "openPlatformStaffGrant",
+    "contract": "identity",
+    "purpose": "Open a time-boxed, audited platform-staff grant into the picked tenant before any tenant-scoped operation here; the tenant sees it (audit R098; decided 2 October 2026, CHG-SBO-001)",
+    "trigger": "onAction",
+    "invalidates": [
+     "listOwnPlatformStaffGrants"
+    ]
    }
   ],
   "wireframe": {
@@ -240,9 +316,37 @@
     {
      "name": "releaseId",
      "from": "navigation"
+    },
+    {
+     "name": "tenantId",
+     "from": "navigation",
+     "optional": true
     }
    ]
   },
+  "overlays": [
+   {
+    "id": "formOpenPlatformStaffGrant",
+    "component": "modal",
+    "trigger": "Open access grant",
+    "body": "**Collects what `openPlatformStaffGrant` sends before it is called** (audit R098). Required: `id` (a client UUIDv7, generated silently), `permissions` (tenant permissions only; `AI_CONFIGURE`, `AI_USE` preselected for this screen), `reason`, `expiresAt` (at most 8 hours ahead, proposed). Optional: `ticketRef`. Requires step-up: the operator presents a second factor first. The tenant sees the grant and everything done under it. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Open access grant",
+     "operation": "openPlatformStaffGrant"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "permissions",
+      "reason",
+      "ticketRef",
+      "expiresAt"
+     ]
+    },
+    "provenance": "contract identity.yaml POST /platform-staff-grants"
+   }
+  ],
+  "notes": "**Tenant picker and platform-staff grant added 2 October 2026** (CHG-SBO-001; Chinmay, pre-apply round: console screens get the R098 tenant picker and grant, the ADM-412 pattern). The Console runs outside every cell; `listAiCapabilities` (AI_USE), `pauseAiCapability` (AI_CONFIGURE), `promoteAiRelease` (AI_USE), `listAiGovernanceAlerts` (AI_USE), `listAiCapabilityMaturity` (AI_USE) are tenant operations, refused 403 to a platform token until a time-boxed, audited grant into the picked tenant is open. The tenant sees the grant and every action under it.",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -271,7 +375,7 @@
   "id": "ADM-520",
   "name": "AI Capability Registry & Ownership",
   "module": "Platform",
-  "requiresModule": "ai",
+  "requiresModule": "core",
   "wave": 3,
   "source": {
    "pack": "AI_Governance_Reference.pdf",
@@ -327,23 +431,91 @@
      "name": "contentBody",
      "components": [
       {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listAiCapabilities",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "kind": "selectField",
+       "label": "Tenant",
+       "bindsTo": "Tenant.id",
+       "columns": [
+        "Tenant.code",
+        "Tenant.name",
+        "Tenant.status"
+       ],
+       "operation": "listTenants",
+       "notes": "**Pick a tenant first** (audit R098; decided 2 October 2026, Chinmay: console screens get the tenant picker and grant, CHG-SBO-001). This screen's operations run in that tenant's cell, and a platform token carries no tenant permission there until a platform-staff grant into it is open.",
+       "provenance": "contract subscription.yaml GET /tenants"
+      },
+      {
+       "kind": "banner",
+       "label": "Open grant into this tenant",
+       "bindsTo": "PlatformStaffGrant",
+       "columns": [
+        "PlatformStaffGrant.operatorDisplayName",
+        "PlatformStaffGrant.permissions",
+        "PlatformStaffGrant.reason",
+        "PlatformStaffGrant.ticketRef",
+        "PlatformStaffGrant.openedAt",
+        "PlatformStaffGrant.expiresAt"
+       ],
+       "operation": "listOwnPlatformStaffGrants",
+       "notes": "**Always visible while the screen acts on a tenant** (audit R098, the ADM-412 pattern): which tenant, which permissions, why, and the time left to `expiresAt`. At expiry every tenant action is disabled and the screen returns to its grantRequired state; a new need is a new grant. The tenant sees the grant in its own audit log. Found again after a reload with `listOwnPlatformStaffGrants`.",
+       "provenance": "contract identity.yaml GET /platform-staff-grants/mine"
       },
       {
        "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "configureAiCapability",
-       "notes": "The act the screen exists for."
+       "label": "Open access grant",
+       "operation": "openPlatformStaffGrant",
+       "notes": "Shown until a grant into the picked tenant is open; asks for the second factor first (step-up, audit R135).",
+       "provenance": "contract identity.yaml POST /platform-staff-grants"
       },
       {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "configureAiCapability"
+       "kind": "dataTable",
+       "label": "AI capabilities",
+       "bindsTo": "AiCapabilityRegistration",
+       "columns": [
+        "AiCapabilityRegistration.name",
+        "AiCapabilityRegistration.family",
+        "AiCapabilityRegistration.businessFunction",
+        "AiCapabilityRegistration.riskClass",
+        "AiCapabilityRegistration.autonomyLevel",
+        "AiCapabilityRegistration.autonomyCeiling",
+        "AiCapabilityRegistration.lifecycle",
+        "AiCapabilityRegistration.status"
+       ],
+       "operation": "listAiCapabilities",
+       "provenance": "contract ai.yaml GET /governance/capabilities"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected capability",
+       "bindsTo": "AiCapabilityRegistration",
+       "columns": [
+        "AiCapabilityRegistration.capabilityKey",
+        "AiCapabilityRegistration.description",
+        "AiCapabilityRegistration.ownerPrincipalId",
+        "AiCapabilityRegistration.dataCategories",
+        "AiCapabilityRegistration.degradationMode",
+        "AiCapabilityRegistration.pausedReason",
+        "AiCapabilityRegistration.updatedAt"
+       ],
+       "operation": "listAiCapabilities",
+       "provenance": "contract ai.yaml GET /governance/capabilities"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save capability",
+       "operation": "configureAiCapability",
+       "provenance": "contract ai.yaml PUT /governance/capabilities/{capabilityKey}"
       }
      ]
     }
@@ -354,7 +526,8 @@
    "error": "Could not load. Names which read failed and leaves the capability registry ownership untouched.",
    "emptyFirstRun": "No capability registry ownership yet. Carries the create action; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the capability registry ownership are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "grantRequired": "**No access into this tenant yet.** A tenant is picked and no platform-staff grant into it is open, so every tenant action is disabled and the screen offers **Open access grant** (`openPlatformStaffGrant`: reason, permissions `AI_CONFIGURE`, `AI_USE`, expiry). The same state returns when the grant reaches `expiresAt` (audit R098; CHG-SBO-001)."
   },
   "apis": [
    {
@@ -370,6 +543,27 @@
     "purpose": "Register a capability, or change its owner, risk class or autonomy",
     "trigger": "onAction",
     "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "listTenants",
+    "contract": "subscription",
+    "purpose": "The tenant picker: the operator picks a tenant before acting in its cell (audit R098; decided 2 October 2026, CHG-SBO-001)",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listOwnPlatformStaffGrants",
+    "contract": "identity",
+    "purpose": "Find a grant into the picked tenant already open, after a reload (audit R098; CHG-SBO-001)",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "openPlatformStaffGrant",
+    "contract": "identity",
+    "purpose": "Open a time-boxed, audited platform-staff grant into the picked tenant before any tenant-scoped operation here; the tenant sees it (audit R098; decided 2 October 2026, CHG-SBO-001)",
+    "trigger": "onAction",
+    "invalidates": [
+     "listOwnPlatformStaffGrants"
+    ]
    }
   ],
   "wireframe": {
@@ -383,9 +577,64 @@
     {
      "name": "capabilityKey",
      "from": "navigation"
+    },
+    {
+     "name": "tenantId",
+     "from": "navigation",
+     "optional": true
     }
    ]
   },
+  "overlays": [
+   {
+    "id": "formOpenPlatformStaffGrant",
+    "component": "modal",
+    "trigger": "Open access grant",
+    "body": "**Collects what `openPlatformStaffGrant` sends before it is called** (audit R098). Required: `id` (a client UUIDv7, generated silently), `permissions` (tenant permissions only; `AI_CONFIGURE`, `AI_USE` preselected for this screen), `reason`, `expiresAt` (at most 8 hours ahead, proposed). Optional: `ticketRef`. Requires step-up: the operator presents a second factor first. The tenant sees the grant and everything done under it. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Open access grant",
+     "operation": "openPlatformStaffGrant"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "permissions",
+      "reason",
+      "ticketRef",
+      "expiresAt"
+     ]
+    },
+    "provenance": "contract identity.yaml POST /platform-staff-grants"
+   },
+   {
+    "id": "formConfigureAiCapability",
+    "component": "modal",
+    "trigger": "Save capability",
+    "body": "**Collects what `configureAiCapability` sends before it is called.** Required: `capabilityKey`, `family`, `riskClass`, `autonomyLevel`. Optional: `name`, `description`, `ownerPrincipalId`, `businessFunction`, `dataCategories`, `lifecycle`, `degradationMode`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save capability",
+     "operation": "configureAiCapability"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "capabilityKey",
+      "family",
+      "riskClass",
+      "autonomyLevel",
+      "name",
+      "description",
+      "ownerPrincipalId",
+      "businessFunction",
+      "dataCategories",
+      "lifecycle",
+      "degradationMode"
+     ]
+    },
+    "provenance": "contract ai.yaml PUT /governance/capabilities/{capabilityKey}"
+   }
+  ],
+  "notes": "**Tenant picker and platform-staff grant added 2 October 2026** (CHG-SBO-001; Chinmay, pre-apply round: console screens get the R098 tenant picker and grant, the ADM-412 pattern). The Console runs outside every cell; `listAiCapabilities` (AI_USE), `configureAiCapability` (AI_CONFIGURE) are tenant operations, refused 403 to a platform token until a time-boxed, audited grant into the picked tenant is open. The tenant sees the grant and every action under it.",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -414,7 +663,7 @@
   "id": "ADM-521",
   "name": "AI Risk Classification & Assessment",
   "module": "Platform",
-  "requiresModule": "ai",
+  "requiresModule": "core",
   "wave": 3,
   "source": {
    "pack": "AI_Governance_Reference.pdf",
@@ -470,6 +719,42 @@
      "name": "contentBody",
      "components": [
       {
+       "kind": "selectField",
+       "label": "Tenant",
+       "bindsTo": "Tenant.id",
+       "columns": [
+        "Tenant.code",
+        "Tenant.name",
+        "Tenant.status"
+       ],
+       "operation": "listTenants",
+       "notes": "**Pick a tenant first** (audit R098; decided 2 October 2026, Chinmay: console screens get the tenant picker and grant, CHG-SBO-001). This screen's operations run in that tenant's cell, and a platform token carries no tenant permission there until a platform-staff grant into it is open.",
+       "provenance": "contract subscription.yaml GET /tenants"
+      },
+      {
+       "kind": "banner",
+       "label": "Open grant into this tenant",
+       "bindsTo": "PlatformStaffGrant",
+       "columns": [
+        "PlatformStaffGrant.operatorDisplayName",
+        "PlatformStaffGrant.permissions",
+        "PlatformStaffGrant.reason",
+        "PlatformStaffGrant.ticketRef",
+        "PlatformStaffGrant.openedAt",
+        "PlatformStaffGrant.expiresAt"
+       ],
+       "operation": "listOwnPlatformStaffGrants",
+       "notes": "**Always visible while the screen acts on a tenant** (audit R098, the ADM-412 pattern): which tenant, which permissions, why, and the time left to `expiresAt`. At expiry every tenant action is disabled and the screen returns to its grantRequired state; a new need is a new grant. The tenant sees the grant in its own audit log. Found again after a reload with `listOwnPlatformStaffGrants`.",
+       "provenance": "contract identity.yaml GET /platform-staff-grants/mine"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Open access grant",
+       "operation": "openPlatformStaffGrant",
+       "notes": "Shown until a grant into the picked tenant is open; asks for the second factor first (step-up, audit R135).",
+       "provenance": "contract identity.yaml POST /platform-staff-grants"
+      },
+      {
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listAiCapabilities",
@@ -497,7 +782,8 @@
    "error": "Could not load. Names which read failed and leaves the risk classification assessment untouched.",
    "emptyFirstRun": "No risk classification assessment yet. Carries the create action; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the risk classification assessment are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "grantRequired": "**No access into this tenant yet.** A tenant is picked and no platform-staff grant into it is open, so every tenant action is disabled and the screen offers **Open access grant** (`openPlatformStaffGrant`: reason, permissions `AI_CONFIGURE`, `AI_USE`, expiry). The same state returns when the grant reaches `expiresAt` (audit R098; CHG-SBO-001)."
   },
   "apis": [
    {
@@ -513,6 +799,27 @@
     "purpose": "Register a capability, or change its owner, risk class or autonomy",
     "trigger": "onAction",
     "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "listTenants",
+    "contract": "subscription",
+    "purpose": "The tenant picker: the operator picks a tenant before acting in its cell (audit R098; decided 2 October 2026, CHG-SBO-001)",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listOwnPlatformStaffGrants",
+    "contract": "identity",
+    "purpose": "Find a grant into the picked tenant already open, after a reload (audit R098; CHG-SBO-001)",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "openPlatformStaffGrant",
+    "contract": "identity",
+    "purpose": "Open a time-boxed, audited platform-staff grant into the picked tenant before any tenant-scoped operation here; the tenant sees it (audit R098; decided 2 October 2026, CHG-SBO-001)",
+    "trigger": "onAction",
+    "invalidates": [
+     "listOwnPlatformStaffGrants"
+    ]
    }
   ],
   "wireframe": {
@@ -526,9 +833,37 @@
     {
      "name": "capabilityKey",
      "from": "navigation"
+    },
+    {
+     "name": "tenantId",
+     "from": "navigation",
+     "optional": true
     }
    ]
   },
+  "overlays": [
+   {
+    "id": "formOpenPlatformStaffGrant",
+    "component": "modal",
+    "trigger": "Open access grant",
+    "body": "**Collects what `openPlatformStaffGrant` sends before it is called** (audit R098). Required: `id` (a client UUIDv7, generated silently), `permissions` (tenant permissions only; `AI_CONFIGURE`, `AI_USE` preselected for this screen), `reason`, `expiresAt` (at most 8 hours ahead, proposed). Optional: `ticketRef`. Requires step-up: the operator presents a second factor first. The tenant sees the grant and everything done under it. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Open access grant",
+     "operation": "openPlatformStaffGrant"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "permissions",
+      "reason",
+      "ticketRef",
+      "expiresAt"
+     ]
+    },
+    "provenance": "contract identity.yaml POST /platform-staff-grants"
+   }
+  ],
+  "notes": "**Tenant picker and platform-staff grant added 2 October 2026** (CHG-SBO-001; Chinmay, pre-apply round: console screens get the R098 tenant picker and grant, the ADM-412 pattern). The Console runs outside every cell; `listAiCapabilities` (AI_USE), `configureAiCapability` (AI_CONFIGURE) are tenant operations, refused 403 to a platform token until a time-boxed, audited grant into the picked tenant is open. The tenant sees the grant and every action under it.",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -557,7 +892,7 @@
   "id": "ADM-522",
   "name": "AI Autonomy Level Configuration",
   "module": "Platform",
-  "requiresModule": "ai",
+  "requiresModule": "core",
   "wave": 3,
   "source": {
    "pack": "AI_Governance_Reference.pdf",
@@ -601,6 +936,42 @@
      "name": "contentBody",
      "slot": "fields",
      "components": [
+      {
+       "kind": "selectField",
+       "label": "Tenant",
+       "bindsTo": "Tenant.id",
+       "columns": [
+        "Tenant.code",
+        "Tenant.name",
+        "Tenant.status"
+       ],
+       "operation": "listTenants",
+       "notes": "**Pick a tenant first** (audit R098; decided 2 October 2026, Chinmay: console screens get the tenant picker and grant, CHG-SBO-001). This screen's operations run in that tenant's cell, and a platform token carries no tenant permission there until a platform-staff grant into it is open.",
+       "provenance": "contract subscription.yaml GET /tenants"
+      },
+      {
+       "kind": "banner",
+       "label": "Open grant into this tenant",
+       "bindsTo": "PlatformStaffGrant",
+       "columns": [
+        "PlatformStaffGrant.operatorDisplayName",
+        "PlatformStaffGrant.permissions",
+        "PlatformStaffGrant.reason",
+        "PlatformStaffGrant.ticketRef",
+        "PlatformStaffGrant.openedAt",
+        "PlatformStaffGrant.expiresAt"
+       ],
+       "operation": "listOwnPlatformStaffGrants",
+       "notes": "**Always visible while the screen acts on a tenant** (audit R098, the ADM-412 pattern): which tenant, which permissions, why, and the time left to `expiresAt`. At expiry every tenant action is disabled and the screen returns to its grantRequired state; a new need is a new grant. The tenant sees the grant in its own audit log. Found again after a reload with `listOwnPlatformStaffGrants`.",
+       "provenance": "contract identity.yaml GET /platform-staff-grants/mine"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Open access grant",
+       "operation": "openPlatformStaffGrant",
+       "notes": "Shown until a grant into the picked tenant is open; asks for the second factor first (step-up, audit R135).",
+       "provenance": "contract identity.yaml POST /platform-staff-grants"
+      },
       {
        "kind": "selectField",
        "label": "Tenant",
@@ -655,7 +1026,8 @@
    "error": "Could not load. Names which read failed and leaves the autonomy level untouched.",
    "emptyFirstRun": "No autonomy level configured yet. Carries the create action and says what the platform does in the meantime.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
+   "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist",
+   "grantRequired": "**No access into this tenant yet.** A tenant is picked and no platform-staff grant into it is open, so every tenant action is disabled and the screen offers **Open access grant** (`openPlatformStaffGrant`: reason, permissions `AI_CONFIGURE`, `AI_USE`, expiry). The same state returns when the grant reaches `expiresAt` (audit R098; CHG-SBO-001)."
   },
   "apis": [
    {
@@ -678,6 +1050,27 @@
     "purpose": "The policy in force for a capability at a scope",
     "trigger": "onLoad",
     "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "listTenants",
+    "contract": "subscription",
+    "purpose": "The tenant picker: the operator picks a tenant before acting in its cell (audit R098; decided 2 October 2026, CHG-SBO-001)",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listOwnPlatformStaffGrants",
+    "contract": "identity",
+    "purpose": "Find a grant into the picked tenant already open, after a reload (audit R098; CHG-SBO-001)",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "openPlatformStaffGrant",
+    "contract": "identity",
+    "purpose": "Open a time-boxed, audited platform-staff grant into the picked tenant before any tenant-scoped operation here; the tenant sees it (audit R098; decided 2 October 2026, CHG-SBO-001)",
+    "trigger": "onAction",
+    "invalidates": [
+     "listOwnPlatformStaffGrants"
+    ]
    }
   ],
   "wireframe": {
@@ -691,9 +1084,37 @@
     {
      "name": "capabilityKey",
      "from": "navigation"
+    },
+    {
+     "name": "tenantId",
+     "from": "navigation",
+     "optional": true
     }
    ]
   },
+  "overlays": [
+   {
+    "id": "formOpenPlatformStaffGrant",
+    "component": "modal",
+    "trigger": "Open access grant",
+    "body": "**Collects what `openPlatformStaffGrant` sends before it is called** (audit R098). Required: `id` (a client UUIDv7, generated silently), `permissions` (tenant permissions only; `AI_CONFIGURE`, `AI_USE` preselected for this screen), `reason`, `expiresAt` (at most 8 hours ahead, proposed). Optional: `ticketRef`. Requires step-up: the operator presents a second factor first. The tenant sees the grant and everything done under it. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Open access grant",
+     "operation": "openPlatformStaffGrant"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "permissions",
+      "reason",
+      "ticketRef",
+      "expiresAt"
+     ]
+    },
+    "provenance": "contract identity.yaml POST /platform-staff-grants"
+   }
+  ],
+  "notes": "**Tenant picker and platform-staff grant added 2 October 2026** (CHG-SBO-001; Chinmay, pre-apply round: console screens get the R098 tenant picker and grant, the ADM-412 pattern). The Console runs outside every cell; `listAiCapabilities` (AI_USE), `configureAiCapability` (AI_CONFIGURE), `getEffectiveAiPolicy` (AI_USE) are tenant operations, refused 403 to a platform token until a time-boxed, audited grant into the picked tenant is open. The tenant sees the grant and every action under it.",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -722,7 +1143,7 @@
   "id": "ADM-523",
   "name": "AI Action & Permission Policy Builder",
   "module": "Platform",
-  "requiresModule": "ai",
+  "requiresModule": "core",
   "wave": 3,
   "source": {
    "pack": "AI_Governance_Reference.pdf",
@@ -748,7 +1169,10 @@
      "to": "ADM-519",
      "trigger": "Back to AI Governance Command Center",
      "provenance": "structural — pack board 1 wiring, 19 September 2026",
-     "back": true
+     "back": true,
+     "carries": [
+      "tenantId"
+     ]
     }
    ]
   },
@@ -759,16 +1183,6 @@
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 19 actions on this screen and the screen declares 0 operations.** Unserved: Analyze, Recommend, Generate, Prepare, Create, Modify, Delete, Publish …. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack AI_Governance_Reference.pdf, page 11 §Action Types"
-   },
-   {
-    "operation": null,
-    "why": "**AI Action & Permission Policy Builder declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
-    "source": "contract — the screen's declared operations"
-   },
-   {
-    "operation": null,
     "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
     "source": "pack AI_Governance_Reference.pdf, page 11"
    },
@@ -776,6 +1190,12 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack AI_Governance_Reference.pdf, page 11"
+   },
+   {
+    "operation": "setAiTool",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-012): setAiTool (PLATFORM_AI_MANAGE) was declared on a tenant policy screen; tools are platform facts replicated read-only into tenants, so the tenant board only reads them (listAiTools) (design-notes correction ai ADM-523).",
+    "source": "contracts/satellite/ai.yaml#setAiTool"
    }
   ],
   "layout": {
@@ -787,59 +1207,133 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Analyze",
-       "provenance": "pack AI_Governance_Reference.pdf, page 11 §Action Types"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Recommend",
-       "provenance": "pack AI_Governance_Reference.pdf, page 11 §Action Types"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Generate",
-       "provenance": "pack AI_Governance_Reference.pdf, page 11 §Action Types"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Prepare",
-       "provenance": "pack AI_Governance_Reference.pdf, page 11 §Action Types"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Create",
-       "provenance": "pack AI_Governance_Reference.pdf, page 11 §Action Types"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Modify",
-       "provenance": "pack AI_Governance_Reference.pdf, page 11 §Action Types"
-      },
-      {
-       "kind": "destructiveButton",
-       "label": "Delete",
-       "provenance": "pack AI_Governance_Reference.pdf, page 11 §Action Types"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Publish",
-       "provenance": "pack AI_Governance_Reference.pdf, page 11 §Action Types"
+       "label": "Save draft",
+       "operation": "createAiGovernancePolicyDraft",
+       "provenance": "contract ai.yaml POST /governance/policy-drafts"
       }
      ]
     },
     {
      "name": "contentBody",
-     "components": []
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Tenant",
+       "bindsTo": "Tenant.id",
+       "columns": [
+        "Tenant.code",
+        "Tenant.name",
+        "Tenant.status"
+       ],
+       "operation": "listTenants",
+       "notes": "**Pick a tenant first** (audit R098; decided 2 October 2026, Chinmay: console screens get the tenant picker and grant, CHG-SBO-001). This screen's operations run in that tenant's cell, and a platform token carries no tenant permission there until a platform-staff grant into it is open.",
+       "provenance": "contract subscription.yaml GET /tenants"
+      },
+      {
+       "kind": "banner",
+       "label": "Open grant into this tenant",
+       "bindsTo": "PlatformStaffGrant",
+       "columns": [
+        "PlatformStaffGrant.operatorDisplayName",
+        "PlatformStaffGrant.permissions",
+        "PlatformStaffGrant.reason",
+        "PlatformStaffGrant.ticketRef",
+        "PlatformStaffGrant.openedAt",
+        "PlatformStaffGrant.expiresAt"
+       ],
+       "operation": "listOwnPlatformStaffGrants",
+       "notes": "**Always visible while the screen acts on a tenant** (audit R098, the ADM-412 pattern): which tenant, which permissions, why, and the time left to `expiresAt`. At expiry every tenant action is disabled and the screen returns to its grantRequired state; a new need is a new grant. The tenant sees the grant in its own audit log. Found again after a reload with `listOwnPlatformStaffGrants`.",
+       "provenance": "contract identity.yaml GET /platform-staff-grants/mine"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Open access grant",
+       "operation": "openPlatformStaffGrant",
+       "notes": "Shown until a grant into the picked tenant is open; asks for the second factor first (step-up, audit R135).",
+       "provenance": "contract identity.yaml POST /platform-staff-grants"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Policies and versions",
+       "bindsTo": "AiGovernancePolicyVersion",
+       "columns": [
+        "AiGovernancePolicyVersion.policyId",
+        "AiGovernancePolicyVersion.version",
+        "AiGovernancePolicyVersion.status",
+        "AiGovernancePolicyVersion.changeNote",
+        "AiGovernancePolicyVersion.publishedAt"
+       ],
+       "operation": "listAiGovernancePolicyVersions",
+       "provenance": "contract ai.yaml GET /governance/policy-versions"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Actions the rule covers",
+       "bindsTo": "AiGovernancePolicyVersion.rules",
+       "operation": "createAiGovernancePolicyDraft",
+       "notes": "Per rule, the verbs it governs (`AiGovernanceRule.actions`: read, analyze, recommend, generate, prepare, create, modify, publish, execute, delete). The board's Analyze ... Publish buttons were these verbs, not screen actions; the ten contract verbs are grouped under the minutes' five (read, recommend, prepare, execute, publish; DEC-004 default).",
+       "provenance": "contract ai.yaml POST /governance/policy-drafts"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Tools the rules may allow",
+       "bindsTo": "AiTool",
+       "columns": [
+        "AiTool.targetContract",
+        "AiTool.effect",
+        "AiTool.status"
+       ],
+       "operation": "listAiTools",
+       "notes": "Read-only: tools are platform facts replicated into the tenant.",
+       "provenance": "contract ai.yaml GET /tools"
+      }
+     ]
     }
    ]
   },
   "overlays": [
    {
-    "id": "confirmDelete",
-    "component": "confirmDialog",
-    "trigger": "Delete",
-    "body": "**Delete on a action permission policy is not reversible from this screen.** Names what it affects and what it leaves alone. The pack requires the decision to reach the audit trail, so the dialog states that it is recorded.",
-    "provenance": "pack AI_Governance_Reference.pdf, page 11 §Action Types"
+    "id": "formOpenPlatformStaffGrant",
+    "component": "modal",
+    "trigger": "Open access grant",
+    "body": "**Collects what `openPlatformStaffGrant` sends before it is called** (audit R098). Required: `id` (a client UUIDv7, generated silently), `permissions` (tenant permissions only; `AI_CONFIGURE`, `AI_USE` preselected for this screen), `reason`, `expiresAt` (at most 8 hours ahead, proposed). Optional: `ticketRef`. Requires step-up: the operator presents a second factor first. The tenant sees the grant and everything done under it. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Open access grant",
+     "operation": "openPlatformStaffGrant"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "permissions",
+      "reason",
+      "ticketRef",
+      "expiresAt"
+     ]
+    },
+    "provenance": "contract identity.yaml POST /platform-staff-grants"
+   },
+   {
+    "id": "formCreateAiGovernancePolicyDraft",
+    "component": "modal",
+    "trigger": "Save draft",
+    "body": "**Collects what `createAiGovernancePolicyDraft` sends before it is called.** Required: `rules`. Optional: `policyId`, `policyKey`, `name`, `kind`, `capabilityKeys`, `changeNote`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save draft",
+     "operation": "createAiGovernancePolicyDraft"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "rules",
+      "policyId",
+      "policyKey",
+      "name",
+      "kind",
+      "capabilityKeys",
+      "changeNote"
+     ]
+    },
+    "provenance": "contract ai.yaml POST /governance/policy-drafts"
    }
   ],
   "states": {
@@ -847,7 +1341,8 @@
    "error": "Could not load. Names which read failed and leaves the action permission policy untouched.",
    "emptyFirstRun": "No action permission policy yet. Carries the create action; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the action permission policy are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "grantRequired": "**No access into this tenant yet.** A tenant is picked and no platform-staff grant into it is open, so every tenant action is disabled and the screen offers **Open access grant** (`openPlatformStaffGrant`: reason, permissions `AI_CONFIGURE`, `AI_USE`, expiry). The same state returns when the grant reaches `expiresAt` (audit R098; CHG-SBO-001)."
   },
   "apis": [
    {
@@ -872,11 +1367,25 @@
     "provenance": "build, 29 September 2026"
    },
    {
-    "operationId": "setAiTool",
-    "contract": "ai",
-    "purpose": "Register or change a tool (platform)",
+    "operationId": "listTenants",
+    "contract": "subscription",
+    "purpose": "The tenant picker: the operator picks a tenant before acting in its cell (audit R098; decided 2 October 2026, CHG-SBO-001)",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listOwnPlatformStaffGrants",
+    "contract": "identity",
+    "purpose": "Find a grant into the picked tenant already open, after a reload (audit R098; CHG-SBO-001)",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "openPlatformStaffGrant",
+    "contract": "identity",
+    "purpose": "Open a time-boxed, audited platform-staff grant into the picked tenant before any tenant-scoped operation here; the tenant sees it (audit R098; decided 2 October 2026, CHG-SBO-001)",
     "trigger": "onAction",
-    "provenance": "build, 29 September 2026"
+    "invalidates": [
+     "listOwnPlatformStaffGrants"
+    ]
    }
   ],
   "wireframe": {
@@ -888,11 +1397,13 @@
   "entryState": {
    "params": [
     {
-     "name": "toolKey",
-     "from": "navigation"
+     "name": "tenantId",
+     "from": "navigation",
+     "optional": true
     }
    ]
   },
+  "notes": "**Tenant picker and platform-staff grant added 2 October 2026** (CHG-SBO-001; Chinmay, pre-apply round: console screens get the R098 tenant picker and grant, the ADM-412 pattern). The Console runs outside every cell; `createAiGovernancePolicyDraft` (AI_CONFIGURE), `listAiGovernancePolicyVersions` (AI_USE), `listAiTools` (AI_USE) are tenant operations, refused 403 to a platform token until a time-boxed, audited grant into the picked tenant is open. The tenant sees the grant and every action under it.",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -921,7 +1432,7 @@
   "id": "ADM-524",
   "name": "AI Data Access & Usage Policy",
   "module": "Platform",
-  "requiresModule": "ai",
+  "requiresModule": "core",
   "wave": 3,
   "source": {
    "pack": "AI_Governance_Reference.pdf",
@@ -947,7 +1458,10 @@
      "to": "ADM-519",
      "trigger": "Back to AI Governance Command Center",
      "provenance": "structural — pack board 1 wiring, 19 September 2026",
-     "back": true
+     "back": true,
+     "carries": [
+      "tenantId"
+     ]
     }
    ]
   },
@@ -973,6 +1487,42 @@
     {
      "name": "contentBody",
      "components": [
+      {
+       "kind": "selectField",
+       "label": "Tenant",
+       "bindsTo": "Tenant.id",
+       "columns": [
+        "Tenant.code",
+        "Tenant.name",
+        "Tenant.status"
+       ],
+       "operation": "listTenants",
+       "notes": "**Pick a tenant first** (audit R098; decided 2 October 2026, Chinmay: console screens get the tenant picker and grant, CHG-SBO-001). This screen's operations run in that tenant's cell, and a platform token carries no tenant permission there until a platform-staff grant into it is open.",
+       "provenance": "contract subscription.yaml GET /tenants"
+      },
+      {
+       "kind": "banner",
+       "label": "Open grant into this tenant",
+       "bindsTo": "PlatformStaffGrant",
+       "columns": [
+        "PlatformStaffGrant.operatorDisplayName",
+        "PlatformStaffGrant.permissions",
+        "PlatformStaffGrant.reason",
+        "PlatformStaffGrant.ticketRef",
+        "PlatformStaffGrant.openedAt",
+        "PlatformStaffGrant.expiresAt"
+       ],
+       "operation": "listOwnPlatformStaffGrants",
+       "notes": "**Always visible while the screen acts on a tenant** (audit R098, the ADM-412 pattern): which tenant, which permissions, why, and the time left to `expiresAt`. At expiry every tenant action is disabled and the screen returns to its grantRequired state; a new need is a new grant. The tenant sees the grant in its own audit log. Found again after a reload with `listOwnPlatformStaffGrants`.",
+       "provenance": "contract identity.yaml GET /platform-staff-grants/mine"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Open access grant",
+       "operation": "openPlatformStaffGrant",
+       "notes": "Shown until a grant into the picked tenant is open; asks for the second factor first (step-up, audit R135).",
+       "provenance": "contract identity.yaml POST /platform-staff-grants"
+      },
       {
        "kind": "primaryButton",
        "derived": true,
@@ -1002,7 +1552,8 @@
    "error": "Could not load. Names which read failed and leaves the data access usage untouched.",
    "emptyFirstRun": "No data access usage yet. Carries the create action; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the data access usage are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "grantRequired": "**No access into this tenant yet.** A tenant is picked and no platform-staff grant into it is open, so every tenant action is disabled and the screen offers **Open access grant** (`openPlatformStaffGrant`: reason, permissions `AI_CONFIGURE`, `AI_USE`, `TENANT_CONFIGURE`, `TENANT_VIEW`, expiry). The same state returns when the grant reaches `expiresAt` (audit R098; CHG-SBO-001)."
   },
   "apis": [
    {
@@ -1032,6 +1583,27 @@
     "purpose": "Set an AI class's period",
     "trigger": "onAction",
     "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "listTenants",
+    "contract": "subscription",
+    "purpose": "The tenant picker: the operator picks a tenant before acting in its cell (audit R098; decided 2 October 2026, CHG-SBO-001)",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listOwnPlatformStaffGrants",
+    "contract": "identity",
+    "purpose": "Find a grant into the picked tenant already open, after a reload (audit R098; CHG-SBO-001)",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "openPlatformStaffGrant",
+    "contract": "identity",
+    "purpose": "Open a time-boxed, audited platform-staff grant into the picked tenant before any tenant-scoped operation here; the tenant sees it (audit R098; decided 2 October 2026, CHG-SBO-001)",
+    "trigger": "onAction",
+    "invalidates": [
+     "listOwnPlatformStaffGrants"
+    ]
    }
   ],
   "wireframe": {
@@ -1045,9 +1617,37 @@
     {
      "name": "dataClass",
      "from": "navigation"
+    },
+    {
+     "name": "tenantId",
+     "from": "navigation",
+     "optional": true
     }
    ]
   },
+  "overlays": [
+   {
+    "id": "formOpenPlatformStaffGrant",
+    "component": "modal",
+    "trigger": "Open access grant",
+    "body": "**Collects what `openPlatformStaffGrant` sends before it is called** (audit R098). Required: `id` (a client UUIDv7, generated silently), `permissions` (tenant permissions only; `AI_CONFIGURE`, `AI_USE`, `TENANT_CONFIGURE`, `TENANT_VIEW` preselected for this screen), `reason`, `expiresAt` (at most 8 hours ahead, proposed). Optional: `ticketRef`. Requires step-up: the operator presents a second factor first. The tenant sees the grant and everything done under it. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Open access grant",
+     "operation": "openPlatformStaffGrant"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "permissions",
+      "reason",
+      "ticketRef",
+      "expiresAt"
+     ]
+    },
+    "provenance": "contract identity.yaml POST /platform-staff-grants"
+   }
+  ],
+  "notes": "**Tenant picker and platform-staff grant added 2 October 2026** (CHG-SBO-001; Chinmay, pre-apply round: console screens get the R098 tenant picker and grant, the ADM-412 pattern). The Console runs outside every cell; `createAiGovernancePolicyDraft` (AI_CONFIGURE), `listAiGovernancePolicyVersions` (AI_USE), `listDataRetentionSettings` (TENANT_VIEW), `setDataRetentionSetting` (TENANT_CONFIGURE) are tenant operations, refused 403 to a platform token until a time-boxed, audited grant into the picked tenant is open. The tenant sees the grant and every action under it.",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -1076,7 +1676,7 @@
   "id": "ADM-525",
   "name": "Environment, Tenant & Scope Governance",
   "module": "Platform",
-  "requiresModule": "ai",
+  "requiresModule": "core",
   "wave": 3,
   "source": {
    "pack": "AI_Governance_Reference.pdf",
@@ -1156,7 +1756,44 @@
     },
     {
      "name": "contentBody",
-     "components": []
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Tenant",
+       "bindsTo": "Tenant.id",
+       "columns": [
+        "Tenant.code",
+        "Tenant.name",
+        "Tenant.status"
+       ],
+       "operation": "listTenants",
+       "notes": "**Pick a tenant first** (audit R098; decided 2 October 2026, Chinmay: console screens get the tenant picker and grant, CHG-SBO-001). This screen's operations run in that tenant's cell, and a platform token carries no tenant permission there until a platform-staff grant into it is open.",
+       "provenance": "contract subscription.yaml GET /tenants"
+      },
+      {
+       "kind": "banner",
+       "label": "Open grant into this tenant",
+       "bindsTo": "PlatformStaffGrant",
+       "columns": [
+        "PlatformStaffGrant.operatorDisplayName",
+        "PlatformStaffGrant.permissions",
+        "PlatformStaffGrant.reason",
+        "PlatformStaffGrant.ticketRef",
+        "PlatformStaffGrant.openedAt",
+        "PlatformStaffGrant.expiresAt"
+       ],
+       "operation": "listOwnPlatformStaffGrants",
+       "notes": "**Always visible while the screen acts on a tenant** (audit R098, the ADM-412 pattern): which tenant, which permissions, why, and the time left to `expiresAt`. At expiry every tenant action is disabled and the screen returns to its grantRequired state; a new need is a new grant. The tenant sees the grant in its own audit log. Found again after a reload with `listOwnPlatformStaffGrants`.",
+       "provenance": "contract identity.yaml GET /platform-staff-grants/mine"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Open access grant",
+       "operation": "openPlatformStaffGrant",
+       "notes": "Shown until a grant into the picked tenant is open; asks for the second factor first (step-up, audit R135).",
+       "provenance": "contract identity.yaml POST /platform-staff-grants"
+      }
+     ]
     }
    ]
   },
@@ -1165,7 +1802,8 @@
    "error": "Could not load. Names which read failed and leaves the environment tenant scope untouched.",
    "emptyFirstRun": "No environment tenant scope yet. Carries the create action; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the environment tenant scope are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "grantRequired": "**No access into this tenant yet.** A tenant is picked and no platform-staff grant into it is open, so every tenant action is disabled and the screen offers **Open access grant** (`openPlatformStaffGrant`: reason, permissions `AI_CONFIGURE`, `AI_USE`, expiry). The same state returns when the grant reaches `expiresAt` (audit R098; CHG-SBO-001)."
   },
   "apis": [
    {
@@ -1181,6 +1819,27 @@
     "purpose": "Draft a governance policy, or a new version of one",
     "trigger": "onAction",
     "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "listTenants",
+    "contract": "subscription",
+    "purpose": "The tenant picker: the operator picks a tenant before acting in its cell (audit R098; decided 2 October 2026, CHG-SBO-001)",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listOwnPlatformStaffGrants",
+    "contract": "identity",
+    "purpose": "Find a grant into the picked tenant already open, after a reload (audit R098; CHG-SBO-001)",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "openPlatformStaffGrant",
+    "contract": "identity",
+    "purpose": "Open a time-boxed, audited platform-staff grant into the picked tenant before any tenant-scoped operation here; the tenant sees it (audit R098; decided 2 October 2026, CHG-SBO-001)",
+    "trigger": "onAction",
+    "invalidates": [
+     "listOwnPlatformStaffGrants"
+    ]
    }
   ],
   "wireframe": {
@@ -1189,6 +1848,38 @@
    "workshopBoard": "wireframes/WS14 AI Governance Board 1.dc.html#adm-525"
   },
   "apisNote": "Regenerated 9 September 2026 from AI_Governance_Reference.pdf page 15. 0 of 0 labels bound to a contract property; 3 of 46 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formOpenPlatformStaffGrant",
+    "component": "modal",
+    "trigger": "Open access grant",
+    "body": "**Collects what `openPlatformStaffGrant` sends before it is called** (audit R098). Required: `id` (a client UUIDv7, generated silently), `permissions` (tenant permissions only; `AI_CONFIGURE`, `AI_USE` preselected for this screen), `reason`, `expiresAt` (at most 8 hours ahead, proposed). Optional: `ticketRef`. Requires step-up: the operator presents a second factor first. The tenant sees the grant and everything done under it. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Open access grant",
+     "operation": "openPlatformStaffGrant"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "permissions",
+      "reason",
+      "ticketRef",
+      "expiresAt"
+     ]
+    },
+    "provenance": "contract identity.yaml POST /platform-staff-grants"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "tenantId",
+     "from": "navigation",
+     "optional": true
+    }
+   ]
+  },
+  "notes": "**Tenant picker and platform-staff grant added 2 October 2026** (CHG-SBO-001; Chinmay, pre-apply round: console screens get the R098 tenant picker and grant, the ADM-412 pattern). The Console runs outside every cell; `getEffectiveAiPolicy` (AI_USE), `createAiGovernancePolicyDraft` (AI_CONFIGURE) are tenant operations, refused 403 to a platform token until a time-boxed, audited grant into the picked tenant is open. The tenant sees the grant and every action under it.",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -1217,7 +1908,7 @@
   "id": "ADM-526",
   "name": "AI Policy Conflict, Exception & Override Management",
   "module": "Platform",
-  "requiresModule": "ai",
+  "requiresModule": "core",
   "wave": 3,
   "source": {
    "pack": "AI_Governance_Reference.pdf",
@@ -1273,42 +1964,84 @@
      "name": "contentBody",
      "components": [
       {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listAiGovernancePolicyVersions",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "operation": "getEffectiveAiPolicy"
+       "kind": "selectField",
+       "label": "Tenant",
+       "bindsTo": "Tenant.id",
+       "columns": [
+        "Tenant.code",
+        "Tenant.name",
+        "Tenant.status"
+       ],
+       "operation": "listTenants",
+       "notes": "**Pick a tenant first** (audit R098; decided 2 October 2026, Chinmay: console screens get the tenant picker and grant, CHG-SBO-001). This screen's operations run in that tenant's cell, and a platform token carries no tenant permission there until a platform-staff grant into it is open.",
+       "provenance": "contract subscription.yaml GET /tenants"
+      },
+      {
+       "kind": "banner",
+       "label": "Open grant into this tenant",
+       "bindsTo": "PlatformStaffGrant",
+       "columns": [
+        "PlatformStaffGrant.operatorDisplayName",
+        "PlatformStaffGrant.permissions",
+        "PlatformStaffGrant.reason",
+        "PlatformStaffGrant.ticketRef",
+        "PlatformStaffGrant.openedAt",
+        "PlatformStaffGrant.expiresAt"
+       ],
+       "operation": "listOwnPlatformStaffGrants",
+       "notes": "**Always visible while the screen acts on a tenant** (audit R098, the ADM-412 pattern): which tenant, which permissions, why, and the time left to `expiresAt`. At expiry every tenant action is disabled and the screen returns to its grantRequired state; a new need is a new grant. The tenant sees the grant in its own audit log. Found again after a reload with `listOwnPlatformStaffGrants`.",
+       "provenance": "contract identity.yaml GET /platform-staff-grants/mine"
       },
       {
        "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "createAiPolicyException",
-       "label": "Create AI policy exception",
-       "notes": "The act the screen exists for.",
-       "operation": "createAiPolicyException"
-      },
-      {
-       "kind": "destructiveButton",
-       "derived": true,
-       "impliedBy": "revokeAiPolicyException",
-       "label": "Revoke AI policy exception",
-       "notes": "**Always confirms, never the default focus.** The consequence goes in the body — which AI policy exception is affected and what goes with it, in the screen's own words; *are you sure* is not a confirmation.",
-       "operation": "revokeAiPolicyException"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "createAiPolicyException"
+       "label": "Open access grant",
+       "operation": "openPlatformStaffGrant",
+       "notes": "Shown until a grant into the picked tenant is open; asks for the second factor first (step-up, audit R135).",
+       "provenance": "contract identity.yaml POST /platform-staff-grants"
       },
       {
        "kind": "dataTable",
        "label": "Policy conflicts",
        "bindsTo": "AiEffectivePolicy.conflicts",
        "operation": "getEffectiveAiPolicy",
-       "notes": "**Each conflict and the more restrictive result it resolved to** (18 September minutes, M18-01; AIC-161). A plan step that fails the owning module's limit (a price above the configured maximum) is shown as governance-blocked and is never applied.",
+       "notes": "The conflicts `getEffectiveAiPolicy` resolved for the capability and scope, and which rule won.",
        "provenance": "29 September pass (group A)"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Exceptions in force",
+       "bindsTo": "AiEffectivePolicy.exceptions",
+       "columns": [
+        "AiPolicyException.capabilityKey",
+        "AiPolicyException.reason",
+        "AiPolicyException.compensatingControls",
+        "AiPolicyException.startsAt",
+        "AiPolicyException.expiresAt",
+        "AiPolicyException.status",
+        "AiPolicyException.approvedByPrincipalId"
+       ],
+       "operation": "getEffectiveAiPolicy",
+       "notes": "Drawn from `getEffectiveAiPolicy.exceptions` per capability (there is no separate exceptions list): every exception, its expiry and who approved it, so none is a silent bypass.",
+       "provenance": "contract ai.yaml GET /governance/effective-policy"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Create AI policy exception",
+       "operation": "createAiPolicyException",
+       "notes": "Time-boxed: `expiresAt` is required and the reason and compensating controls are kept.",
+       "provenance": "contract ai.yaml POST /governance/policy-exceptions"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Revoke AI policy exception",
+       "operation": "revokeAiPolicyException",
+       "provenance": "contract ai.yaml POST /governance/policy-exceptions/{exceptionId}/revoke"
       }
      ]
     }
@@ -1319,7 +2052,8 @@
    "error": "Could not load. Names which read failed and leaves the policy conflict exception untouched.",
    "emptyFirstRun": "No policy conflict exception yet. Carries the create action; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the policy conflict exception are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "grantRequired": "**No access into this tenant yet.** A tenant is picked and no platform-staff grant into it is open, so every tenant action is disabled and the screen offers **Open access grant** (`openPlatformStaffGrant`: reason, permissions `AI_APPROVE`, `AI_USE`, expiry). The same state returns when the grant reaches `expiresAt` (audit R098; CHG-SBO-001)."
   },
   "apis": [
    {
@@ -1349,6 +2083,27 @@
     "purpose": "End an exception before it expires",
     "trigger": "onAction",
     "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "listTenants",
+    "contract": "subscription",
+    "purpose": "The tenant picker: the operator picks a tenant before acting in its cell (audit R098; decided 2 October 2026, CHG-SBO-001)",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listOwnPlatformStaffGrants",
+    "contract": "identity",
+    "purpose": "Find a grant into the picked tenant already open, after a reload (audit R098; CHG-SBO-001)",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "openPlatformStaffGrant",
+    "contract": "identity",
+    "purpose": "Open a time-boxed, audited platform-staff grant into the picked tenant before any tenant-scoped operation here; the tenant sees it (audit R098; decided 2 October 2026, CHG-SBO-001)",
+    "trigger": "onAction",
+    "invalidates": [
+     "listOwnPlatformStaffGrants"
+    ]
    }
   ],
   "wireframe": {
@@ -1362,18 +2117,76 @@
     {
      "name": "exceptionId",
      "from": "navigation"
+    },
+    {
+     "name": "tenantId",
+     "from": "navigation",
+     "optional": true
     }
    ]
   },
   "overlays": [
    {
-    "id": "confirmRevokeAiPolicyException",
-    "component": "confirmDialog",
+    "id": "formOpenPlatformStaffGrant",
+    "component": "modal",
+    "trigger": "Open access grant",
+    "body": "**Collects what `openPlatformStaffGrant` sends before it is called** (audit R098). Required: `id` (a client UUIDv7, generated silently), `permissions` (tenant permissions only; `AI_APPROVE`, `AI_USE` preselected for this screen), `reason`, `expiresAt` (at most 8 hours ahead, proposed). Optional: `ticketRef`. Requires step-up: the operator presents a second factor first. The tenant sees the grant and everything done under it. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Open access grant",
+     "operation": "openPlatformStaffGrant"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "permissions",
+      "reason",
+      "ticketRef",
+      "expiresAt"
+     ]
+    },
+    "provenance": "contract identity.yaml POST /platform-staff-grants"
+   },
+   {
+    "id": "formCreateAiPolicyException",
+    "component": "modal",
+    "trigger": "Create AI policy exception",
+    "body": "**Collects what `createAiPolicyException` sends before it is called.** Required: `policyId`, `reason`, `expiresAt`. Optional: `capabilityKey`, `compensatingControls`, `startsAt`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Create AI policy exception",
+     "operation": "createAiPolicyException"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "policyId",
+      "reason",
+      "expiresAt",
+      "capabilityKey",
+      "compensatingControls",
+      "startsAt"
+     ]
+    },
+    "provenance": "contract ai.yaml POST /governance/policy-exceptions"
+   },
+   {
+    "id": "formRevokeAiPolicyException",
+    "component": "modal",
     "trigger": "Revoke AI policy exception",
-    "body": "**Names the exception and what the capability falls back to** once it is revoked: the stricter policy applies at once to every scope the exception covered.",
-    "provenance": "29 September pass (group A)"
+    "body": "**Collects what `revokeAiPolicyException` sends before it is called.** Required: `reason`. Names the exception and what the capability falls back to: the stricter policy applies at once to every scope the exception covered. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Revoke AI policy exception",
+     "operation": "revokeAiPolicyException"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "reason"
+     ]
+    },
+    "provenance": "contract ai.yaml POST /governance/policy-exceptions/{exceptionId}/revoke"
    }
   ],
+  "notes": "**Tenant picker and platform-staff grant added 2 October 2026** (CHG-SBO-001; Chinmay, pre-apply round: console screens get the R098 tenant picker and grant, the ADM-412 pattern). The Console runs outside every cell; `getEffectiveAiPolicy` (AI_USE), `listAiGovernancePolicyVersions` (AI_USE), `createAiPolicyException` (AI_APPROVE), `revokeAiPolicyException` (AI_APPROVE) are tenant operations, refused 403 to a platform token until a time-boxed, audited grant into the picked tenant is open. The tenant sees the grant and every action under it.",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -1402,7 +2215,7 @@
   "id": "ADM-527",
   "name": "AI Policy Testing & Governance Simulation",
   "module": "Platform",
-  "requiresModule": "ai",
+  "requiresModule": "core",
   "wave": 3,
   "source": {
    "pack": "AI_Governance_Reference.pdf",
@@ -1438,7 +2251,7 @@
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
-  "purpose": "Allow administrators to test governance policies before activating them. This is extremely important because a policy mistake could either: Allow AI too much authority, or Block legitimate TICVAI operations. Simulation Scenario User Venue Administrator AI Capability AI Configuration Assistant Request Increase Adult Ticket Price Module Pricing Environment Production Risk High Policy Evaluation Step 1: User Permission ✓ Can modify pricing Step 2: AI Capability Permission ✓ Can prepare pricing change Step 3: Autonomy Level 2 — Prepare Step 4: Production Policy Approval required Step 5: Risk Policy Commercial Owner approval Final Decision ALLOW PREPARATION Execution BLOCKED UNTIL APPROVAL",
+  "purpose": "Test governance policies before activating them, so a policy mistake neither gives AI too much authority nor blocks legitimate operations.",
   "gaps": [
    {
     "operation": null,
@@ -1458,23 +2271,66 @@
      "name": "contentBody",
      "components": [
       {
+       "kind": "selectField",
+       "label": "Tenant",
+       "bindsTo": "Tenant.id",
+       "columns": [
+        "Tenant.code",
+        "Tenant.name",
+        "Tenant.status"
+       ],
+       "operation": "listTenants",
+       "notes": "**Pick a tenant first** (audit R098; decided 2 October 2026, Chinmay: console screens get the tenant picker and grant, CHG-SBO-001). This screen's operations run in that tenant's cell, and a platform token carries no tenant permission there until a platform-staff grant into it is open.",
+       "provenance": "contract subscription.yaml GET /tenants"
+      },
+      {
+       "kind": "banner",
+       "label": "Open grant into this tenant",
+       "bindsTo": "PlatformStaffGrant",
+       "columns": [
+        "PlatformStaffGrant.operatorDisplayName",
+        "PlatformStaffGrant.permissions",
+        "PlatformStaffGrant.reason",
+        "PlatformStaffGrant.ticketRef",
+        "PlatformStaffGrant.openedAt",
+        "PlatformStaffGrant.expiresAt"
+       ],
+       "operation": "listOwnPlatformStaffGrants",
+       "notes": "**Always visible while the screen acts on a tenant** (audit R098, the ADM-412 pattern): which tenant, which permissions, why, and the time left to `expiresAt`. At expiry every tenant action is disabled and the screen returns to its grantRequired state; a new need is a new grant. The tenant sees the grant in its own audit log. Found again after a reload with `listOwnPlatformStaffGrants`.",
+       "provenance": "contract identity.yaml GET /platform-staff-grants/mine"
+      },
+      {
        "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "simulateAiGovernancePolicy",
-       "notes": "The act the screen exists for."
+       "label": "Open access grant",
+       "operation": "openPlatformStaffGrant",
+       "notes": "Shown until a grant into the picked tenant is open; asks for the second factor first (step-up, audit R135).",
+       "provenance": "contract identity.yaml POST /platform-staff-grants"
       },
       {
        "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listAiGovernancePolicyVersions",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
-      },
+       "label": "Draft versions",
+       "bindsTo": "AiGovernancePolicyVersion",
+       "columns": [
+        "AiGovernancePolicyVersion.policyId",
+        "AiGovernancePolicyVersion.version",
+        "AiGovernancePolicyVersion.status",
+        "AiGovernancePolicyVersion.changeNote",
+        "AiGovernancePolicyVersion.simulationSummary"
+       ],
+       "operation": "listAiGovernancePolicyVersions",
+       "provenance": "contract ai.yaml GET /governance/policy-versions"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
       {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "simulateAiGovernancePolicy"
+       "kind": "primaryButton",
+       "label": "Simulate policy",
+       "operation": "simulateAiGovernancePolicy",
+       "provenance": "contract ai.yaml POST /governance/policy-versions/{versionId}/simulate"
       }
      ]
     }
@@ -1485,7 +2341,8 @@
    "error": "Could not load. Names which read failed and leaves the policy testing governance untouched.",
    "emptyFirstRun": "No policy testing governance yet. Carries the create action; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the policy testing governance are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "grantRequired": "**No access into this tenant yet.** A tenant is picked and no platform-staff grant into it is open, so every tenant action is disabled and the screen offers **Open access grant** (`openPlatformStaffGrant`: reason, permissions `AI_CONFIGURE`, `AI_USE`, expiry). The same state returns when the grant reaches `expiresAt` (audit R098; CHG-SBO-001)."
   },
   "apis": [
    {
@@ -1501,6 +2358,27 @@
     "purpose": "Governance policies and their versions",
     "trigger": "onLoad",
     "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "listTenants",
+    "contract": "subscription",
+    "purpose": "The tenant picker: the operator picks a tenant before acting in its cell (audit R098; decided 2 October 2026, CHG-SBO-001)",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listOwnPlatformStaffGrants",
+    "contract": "identity",
+    "purpose": "Find a grant into the picked tenant already open, after a reload (audit R098; CHG-SBO-001)",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "openPlatformStaffGrant",
+    "contract": "identity",
+    "purpose": "Open a time-boxed, audited platform-staff grant into the picked tenant before any tenant-scoped operation here; the tenant sees it (audit R098; decided 2 October 2026, CHG-SBO-001)",
+    "trigger": "onAction",
+    "invalidates": [
+     "listOwnPlatformStaffGrants"
+    ]
    }
   ],
   "wireframe": {
@@ -1514,9 +2392,57 @@
     {
      "name": "versionId",
      "from": "navigation"
+    },
+    {
+     "name": "tenantId",
+     "from": "navigation",
+     "optional": true
     }
    ]
   },
+  "purposeNote": "Purpose rewritten 2 October 2026 (CHG-WIR-013): The board's example (user, capability, request, steps, final decision) was pasted into the purpose; it belongs in sample data (design-notes correction ai ADM-527).",
+  "overlays": [
+   {
+    "id": "formOpenPlatformStaffGrant",
+    "component": "modal",
+    "trigger": "Open access grant",
+    "body": "**Collects what `openPlatformStaffGrant` sends before it is called** (audit R098). Required: `id` (a client UUIDv7, generated silently), `permissions` (tenant permissions only; `AI_CONFIGURE`, `AI_USE` preselected for this screen), `reason`, `expiresAt` (at most 8 hours ahead, proposed). Optional: `ticketRef`. Requires step-up: the operator presents a second factor first. The tenant sees the grant and everything done under it. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Open access grant",
+     "operation": "openPlatformStaffGrant"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "permissions",
+      "reason",
+      "ticketRef",
+      "expiresAt"
+     ]
+    },
+    "provenance": "contract identity.yaml POST /platform-staff-grants"
+   },
+   {
+    "id": "formSimulateAiGovernancePolicy",
+    "component": "modal",
+    "trigger": "Simulate policy",
+    "body": "**Collects what `simulateAiGovernancePolicy` sends before it is called.** Nothing in the body is required. Optional: `from`, `to`, `capabilityKeys`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Simulate policy",
+     "operation": "simulateAiGovernancePolicy"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "from",
+      "to",
+      "capabilityKeys"
+     ]
+    },
+    "provenance": "contract ai.yaml POST /governance/policy-versions/{versionId}/simulate"
+   }
+  ],
+  "notes": "**Tenant picker and platform-staff grant added 2 October 2026** (CHG-SBO-001; Chinmay, pre-apply round: console screens get the R098 tenant picker and grant, the ADM-412 pattern). The Console runs outside every cell; `simulateAiGovernancePolicy` (AI_CONFIGURE), `listAiGovernancePolicyVersions` (AI_USE) are tenant operations, refused 403 to a platform token until a time-boxed, audited grant into the picked tenant is open. The tenant sees the grant and every action under it.",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -1545,7 +2471,7 @@
   "id": "ADM-528",
   "name": "AI Governance Policy Publication & Effective Policy Map",
   "module": "Platform",
-  "requiresModule": "ai",
+  "requiresModule": "core",
   "wave": 3,
   "source": {
    "pack": "AI_Governance_Reference.pdf",
@@ -1601,30 +2527,107 @@
      "name": "contentBody",
      "components": [
       {
+       "kind": "selectField",
+       "label": "Tenant",
+       "bindsTo": "Tenant.id",
+       "columns": [
+        "Tenant.code",
+        "Tenant.name",
+        "Tenant.status"
+       ],
+       "operation": "listTenants",
+       "notes": "**Pick a tenant first** (audit R098; decided 2 October 2026, Chinmay: console screens get the tenant picker and grant, CHG-SBO-001). This screen's operations run in that tenant's cell, and a platform token carries no tenant permission there until a platform-staff grant into it is open.",
+       "provenance": "contract subscription.yaml GET /tenants"
+      },
+      {
+       "kind": "banner",
+       "label": "Open grant into this tenant",
+       "bindsTo": "PlatformStaffGrant",
+       "columns": [
+        "PlatformStaffGrant.operatorDisplayName",
+        "PlatformStaffGrant.permissions",
+        "PlatformStaffGrant.reason",
+        "PlatformStaffGrant.ticketRef",
+        "PlatformStaffGrant.openedAt",
+        "PlatformStaffGrant.expiresAt"
+       ],
+       "operation": "listOwnPlatformStaffGrants",
+       "notes": "**Always visible while the screen acts on a tenant** (audit R098, the ADM-412 pattern): which tenant, which permissions, why, and the time left to `expiresAt`. At expiry every tenant action is disabled and the screen returns to its grantRequired state; a new need is a new grant. The tenant sees the grant in its own audit log. Found again after a reload with `listOwnPlatformStaffGrants`.",
+       "provenance": "contract identity.yaml GET /platform-staff-grants/mine"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Open access grant",
+       "operation": "openPlatformStaffGrant",
+       "notes": "Shown until a grant into the picked tenant is open; asks for the second factor first (step-up, audit R135).",
+       "provenance": "contract identity.yaml POST /platform-staff-grants"
+      },
+      {
        "kind": "publishGate",
        "impliedBy": "publishAiGovernancePolicy",
        "notes": "Declares `publishAiGovernancePolicy`. **The gate names what the publish will affect before it happens**: which tenants, venues or capabilities take the new version, and that the previous one stays available to roll back to.",
        "provenance": "check-screens publish rule, 29 September 2026"
       },
       {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "publishAiGovernancePolicy",
-       "label": "Publish AI governance policy",
-       "notes": "The act the screen exists for."
-      },
-      {
        "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listAiGovernancePolicyVersions",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "label": "Simulated versions",
+       "bindsTo": "AiGovernancePolicyVersion",
+       "columns": [
+        "AiGovernancePolicyVersion.policyId",
+        "AiGovernancePolicyVersion.version",
+        "AiGovernancePolicyVersion.status",
+        "AiGovernancePolicyVersion.simulationSummary",
+        "AiGovernancePolicyVersion.changeNote"
+       ],
+       "operation": "listAiGovernancePolicyVersions",
+       "provenance": "contract ai.yaml GET /governance/policy-versions"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "Effective policy map",
+       "bindsTo": "AiEffectivePolicy",
+       "columns": [
+        "AiEffectivePolicy.capabilityKey",
+        "AiEffectivePolicy.autonomyLevel",
+        "AiEffectivePolicy.autonomyCeiling",
+        "AiEffectivePolicy.rules",
+        "AiEffectivePolicy.exceptions",
+        "AiEffectivePolicy.conflicts",
+        "AiEffectivePolicy.resolvedAt"
+       ],
+       "operation": "getEffectiveAiPolicy",
+       "provenance": "contract ai.yaml GET /governance/effective-policy"
       },
       {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "publishAiGovernancePolicy"
+       "kind": "detailPanel",
+       "label": "The selected version",
+       "bindsTo": "AiGovernancePolicyVersion",
+       "columns": [
+        "AiGovernancePolicyVersion.rules",
+        "AiGovernancePolicyVersion.draftedByPrincipalId",
+        "AiGovernancePolicyVersion.publishedByPrincipalId",
+        "AiGovernancePolicyVersion.supersededAt"
+       ],
+       "operation": "listAiGovernancePolicyVersions",
+       "provenance": "contract ai.yaml GET /governance/policy-versions"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Publish AI governance policy",
+       "operation": "publishAiGovernancePolicy",
+       "provenance": "contract ai.yaml POST /governance/policy-versions/{versionId}/publish"
       }
      ]
     }
@@ -1635,7 +2638,8 @@
    "error": "Could not load. Names which read failed and leaves the governance policy publication untouched.",
    "emptyFirstRun": "No governance policy publication yet. Carries the create action; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the governance policy publication are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "grantRequired": "**No access into this tenant yet.** A tenant is picked and no platform-staff grant into it is open, so every tenant action is disabled and the screen offers **Open access grant** (`openPlatformStaffGrant`: reason, permissions `AI_APPROVE`, `AI_USE`, expiry). The same state returns when the grant reaches `expiresAt` (audit R098; CHG-SBO-001)."
   },
   "apis": [
    {
@@ -1658,6 +2662,27 @@
     "purpose": "Governance policies and their versions",
     "trigger": "onLoad",
     "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "listTenants",
+    "contract": "subscription",
+    "purpose": "The tenant picker: the operator picks a tenant before acting in its cell (audit R098; decided 2 October 2026, CHG-SBO-001)",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listOwnPlatformStaffGrants",
+    "contract": "identity",
+    "purpose": "Find a grant into the picked tenant already open, after a reload (audit R098; CHG-SBO-001)",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "openPlatformStaffGrant",
+    "contract": "identity",
+    "purpose": "Open a time-boxed, audited platform-staff grant into the picked tenant before any tenant-scoped operation here; the tenant sees it (audit R098; decided 2 October 2026, CHG-SBO-001)",
+    "trigger": "onAction",
+    "invalidates": [
+     "listOwnPlatformStaffGrants"
+    ]
    }
   ],
   "wireframe": {
@@ -1671,9 +2696,37 @@
     {
      "name": "versionId",
      "from": "navigation"
+    },
+    {
+     "name": "tenantId",
+     "from": "navigation",
+     "optional": true
     }
    ]
   },
+  "overlays": [
+   {
+    "id": "formOpenPlatformStaffGrant",
+    "component": "modal",
+    "trigger": "Open access grant",
+    "body": "**Collects what `openPlatformStaffGrant` sends before it is called** (audit R098). Required: `id` (a client UUIDv7, generated silently), `permissions` (tenant permissions only; `AI_APPROVE`, `AI_USE` preselected for this screen), `reason`, `expiresAt` (at most 8 hours ahead, proposed). Optional: `ticketRef`. Requires step-up: the operator presents a second factor first. The tenant sees the grant and everything done under it. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Open access grant",
+     "operation": "openPlatformStaffGrant"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "permissions",
+      "reason",
+      "ticketRef",
+      "expiresAt"
+     ]
+    },
+    "provenance": "contract identity.yaml POST /platform-staff-grants"
+   }
+  ],
+  "notes": "**Tenant picker and platform-staff grant added 2 October 2026** (CHG-SBO-001; Chinmay, pre-apply round: console screens get the R098 tenant picker and grant, the ADM-412 pattern). The Console runs outside every cell; `getEffectiveAiPolicy` (AI_USE), `publishAiGovernancePolicy` (AI_APPROVE), `listAiGovernancePolicyVersions` (AI_USE) are tenant operations, refused 403 to a platform token until a time-boxed, audited grant into the picked tenant is open. The tenant sees the grant and every action under it.",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",

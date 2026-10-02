@@ -366,7 +366,7 @@
     "type": "string",
     "pattern": "^[A-Z]{3}$",
     "nullable": true,
-    "description": "4.6.11 is deliberately asymmetric: **accept foreign currency, refund in local.** A till giving change in five currencies needs five floats and five counts, and the variance becomes unattributable.\n"
+    "description": "4.6.11 is deliberately asymmetric: **accept foreign currency, refund in local.** A till giving change in five currencies needs five floats and five counts, and the variance becomes unattributable.\n**Cash at a till only** (CHG-FIN-001, 2 October 2026). A card or wallet payment the guest made in a currency they selected is refunded in that currency (`Refund.tenderCurrency`).\n"
    },
    "amount": {
     "$ref": "../shared/common.yaml#/components/schemas/Money"
@@ -500,7 +500,7 @@
      "storeCredit"
     ],
     "default": "originalTender",
-    "description": "BL-086. **A refund could only go back the way it came.** A guest whose card has expired, a partner settling by wire, a guest who would rather have the credit — three real cases with one answer.\n**`originalTender` stays the default** because refunding elsewhere is how money laundering works, and anything else needs a reason.\n"
+    "description": "BL-086. **A refund could only go back the way it came.** A guest whose card has expired, a partner settling by wire, a guest who would rather have the credit — three real cases with one answer.\n**`originalTender` stays the default** because refunding elsewhere is how money laundering works, and anything else needs a reason.\n\n**`storeCredit` is a gift card issued for the refund amount** (decided 2 October 2026, Chinmay, batch 1, POS-011; DEC-061; CHG-CSP-037; DI-796), never a voucher or a wallet top-up.\n"
    },
    "fxVariance": {
     "allOf": [
@@ -509,6 +509,22 @@
      }
     ],
     "description": "Where the sale rate and the current rate differ, **the difference is booked as an FX variance rather than hidden in the refund**. `runFxRevaluation` already handles this class of movement and this is the same act at a smaller scale.\n"
+   },
+   "tenderCurrency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**A refund goes back in the currency the guest paid** (decided 2 October 2026, Chinmay; CHG-FIN-001). For a card or wallet payment taken in a guest-selected currency, the refund request to the provider is in that currency, and `tenderAmount` is the refunded share of the original `Payment.tenderAmount` at the sale rate (`fxRate`), so a full refund returns exactly what was charged. `amount` stays in base currency for the ledger. Null for a refund in the base currency. Foreign cash refunded at a till is paid in base currency (DI-282)."
+   },
+   "tenderAmount": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "readOnly": true,
+    "description": "The refund in `tenderCurrency`, at that currency's own scale (CHG-FIN-001)."
    },
    "amount": {
     "$ref": "../shared/common.yaml#/components/schemas/Money"
@@ -668,6 +684,73 @@
    "complimentary"
   ]
  },
+ "VoidReversalSameDayCorrectionManagementView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over orders state, assembled at read time from tables that already exist",
+  "description": "**What Void, Reversal & Same-Day Correction Management displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "sameBusinessDayOnly": {
+    "type": "string",
+    "description": "Same Business Day Only"
+   },
+   "beforeSettlement": {
+    "type": "string",
+    "description": "Before Settlement"
+   },
+   "beforeTicketUse": {
+    "type": "string",
+    "description": "Before Ticket Use"
+   },
+   "beforeFiscalClosure": {
+    "type": "string",
+    "description": "Before Fiscal Closure"
+   },
+   "supervisorRequired": {
+    "type": "boolean",
+    "description": "Supervisor Required"
+   },
+   "specificChannelsOnly": {
+    "type": "string",
+    "description": "Specific Channels Only"
+   },
+   "rolePermission": {
+    "type": "string",
+    "description": "Role Permission"
+   },
+   "supervisorApproval": {
+    "type": "string",
+    "description": "Supervisor Approval"
+   },
+   "optionalDualAuthorization": {
+    "type": "string",
+    "description": "Optional Dual Authorization"
+   },
+   "voidType": {
+    "type": "string",
+    "enum": [
+     "orderVoid",
+     "paymentVoidRequest",
+     "ticketVoid",
+     "accidentalSaleReversal",
+     "sameDayCorrection",
+     "failedTransactionCleanup"
+    ],
+    "description": "What is voided or reversed."
+   },
+   "reasonCode": {
+    "type": "string",
+    "enum": [
+     "operatorError",
+     "wrongProduct",
+     "wrongQuantity",
+     "wrongPayment",
+     "technicalFailure"
+    ],
+    "description": "Mandatory reason."
+   }
+  }
+ },
  "WalletRefundPolicy": {
   "type": "object",
   "x-ticvai-persistence": "wallet.refund_policy",
@@ -698,6 +781,38 @@
     "type": "number",
     "nullable": true,
     "description": "An incentive to take the refund as credit rather than to a card."
+   },
+   "destinationsBySource": {
+    "x-ticvai-persistence-kind": "valueObject",
+    "x-ticvai-persistence-column": "jsonb",
+    "type": "array",
+    "description": "**A destination per refund source** (contract gap CHG-WIR-027, BO-1146; CHG-CSA-045). A refund of a ticket, an event, F&B, retail, a rental, parking, a membership or a compensation goes to the destination listed for its source; a source not listed takes `defaultDestination`.",
+    "items": {
+     "type": "object",
+     "properties": {
+      "source": {
+       "type": "string",
+       "enum": [
+        "ticket",
+        "event",
+        "fnb",
+        "retail",
+        "rental",
+        "parking",
+        "membership",
+        "compensation"
+       ]
+      },
+      "destination": {
+       "type": "string",
+       "enum": [
+        "originalTender",
+        "wallet",
+        "guestChoice"
+       ]
+      }
+     }
+    }
    },
    "scopePath": {
     "type": "string"

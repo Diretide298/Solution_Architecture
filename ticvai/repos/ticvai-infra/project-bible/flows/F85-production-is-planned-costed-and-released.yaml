@@ -18,7 +18,7 @@ trigger:
 offlineBehaviour: Planning needs the network. A forecast is not a local computation.
 steps:
 - step: 1
-  screen: BO-136
+  screen: BO-112
   action: F&B Global Settings & Controls.
   operations:
   - buildProductionPlan
@@ -47,7 +47,7 @@ steps:
   screen: BO-007
   action: Product Directory.
   operations:
-  - bulkUpdateProducts
+  - bulkUpdateCatalogueProducts
   - createMerchandise
   - createProduct
   - getProduct

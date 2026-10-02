@@ -412,6 +412,13 @@
        "kind": "selectField",
        "label": "Liability classification",
        "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 24 §For each credit type configure"
+      },
+      {
+       "kind": "dataTable",
+       "label": "The kinds of value that may sit in a wallet",
+       "bindsTo": "CreditType",
+       "operation": "listCreditTypes",
+       "provenance": "contract wallet.yaml GET /credit-types; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -444,6 +451,13 @@
     "invalidates": [
      "listCreditTypes"
     ]
+   },
+   {
+    "operationId": "listCreditTypes",
+    "contract": "wallet",
+    "purpose": "The kinds of value that may sit in a wallet",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {
@@ -593,6 +607,13 @@
        "kind": "selectField",
        "label": "Accounting treatment",
        "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 25 §Configure"
+      },
+      {
+       "kind": "dataTable",
+       "label": "The kinds of value that may sit in a wallet",
+       "bindsTo": "CreditType",
+       "operation": "listCreditTypes",
+       "provenance": "contract wallet.yaml GET /credit-types; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -615,6 +636,13 @@
     "invalidates": [
      "listCreditTypes"
     ]
+   },
+   {
+    "operationId": "listCreditTypes",
+    "contract": "wallet",
+    "purpose": "The kinds of value that may sit in a wallet",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {
@@ -631,6 +659,13 @@
     }
    ]
   },
+  "gaps": [
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-027): A credit issuance rule record (trigger to credit) with its read and write; updateCreditType changes the credit type itself.",
+    "source": "screens/P08-venue-back-office.yaml#BO-1105"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -703,6 +738,11 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 26"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-027): A read (get or list) of the credit eligibility (where a credit may be spent; CreditType does not carry it) that setCreditEligibilityRules writes.",
+    "source": "contracts/satellite/wallet.yaml#setCreditEligibilityRules | screens/P08-venue-back-office.yaml#BO-1106"
    }
   ],
   "layout": {
@@ -1081,6 +1121,13 @@
        "kind": "textField",
        "label": "Accounting treatment after expiry",
        "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 28 §Configure"
+      },
+      {
+       "kind": "dataTable",
+       "label": "The kinds of value that may sit in a wallet",
+       "bindsTo": "CreditType",
+       "operation": "listCreditTypes",
+       "provenance": "contract wallet.yaml GET /credit-types; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -1103,6 +1150,13 @@
     "invalidates": [
      "listCreditTypes"
     ]
+   },
+   {
+    "operationId": "listCreditTypes",
+    "contract": "wallet",
+    "purpose": "The kinds of value that may sit in a wallet",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {
@@ -1411,6 +1465,13 @@
        "kind": "textField",
        "label": "Route to corporate wallet",
        "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 30 §Options when balance is insufficient"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Which credit is spent first",
+       "bindsTo": "CreditConsumptionPolicy",
+       "operation": "getCreditConsumptionPolicy",
+       "provenance": "contract wallet.yaml GET /credit-consumption-policy; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -1440,6 +1501,13 @@
     "purpose": "What a purchase would use",
     "trigger": "onAction",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "getCreditConsumptionPolicy",
+    "contract": "wallet",
+    "purpose": "Which credit is spent first",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {
@@ -1448,6 +1516,7 @@
    "workshopBoard": "wireframes/WS188 Wallet Configuration Backend Structure v1.0 Board 3.dc.html#bo-1110"
   },
   "apisNote": "Regenerated 9 September 2026 from Wallet_Configuration_Backend_Structure_v1.0.pdf page 30. 0 of 0 labels bound to a contract property; 18 of 31 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {},
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1539,6 +1608,13 @@
        "bindsTo": null,
        "operation": null,
        "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 31 §Display"
+      },
+      {
+       "kind": "dataTable",
+       "label": "The tranches behind a balance, with their expiry",
+       "bindsTo": "CreditLot",
+       "operation": "listCreditLots",
+       "provenance": "contract wallet.yaml GET /credit-lots; wiring fix, 2 October 2026"
       }
      ]
     },
@@ -1584,6 +1660,13 @@
      "listCreditLots",
      "getWalletLiability"
     ]
+   },
+   {
+    "operationId": "listCreditLots",
+    "contract": "wallet",
+    "purpose": "The tranches behind a balance, with their expiry",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "entryState": {
@@ -1700,6 +1783,13 @@
        "label": "What publishing changes",
        "notes": "**Takes effect at every till and reader immediately.** Credit types, consumption order and funding rules change for balances that already exist, not only for new ones.",
        "provenance": "authored — required by check-screens, 19 September 2026"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Which credit is spent first",
+       "bindsTo": "CreditConsumptionPolicy",
+       "operation": "getCreditConsumptionPolicy",
+       "provenance": "contract wallet.yaml GET /credit-consumption-policy; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -1730,6 +1820,13 @@
      "listWalletTypes",
      "listCreditTypes"
     ]
+   },
+   {
+    "operationId": "getCreditConsumptionPolicy",
+    "contract": "wallet",
+    "purpose": "Which credit is spent first",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {
@@ -1738,6 +1835,7 @@
    "workshopBoard": "wireframes/WS188 Wallet Configuration Backend Structure v1.0 Board 3.dc.html#bo-1112"
   },
   "apisNote": "Regenerated 9 September 2026 from Wallet_Configuration_Backend_Structure_v1.0.pdf page 32. 0 of 0 labels bound to a contract property; 0 of 79 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {},
   "_platform": {
    "code": "P08",
    "audience": "staff",

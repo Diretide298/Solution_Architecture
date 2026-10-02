@@ -22,10 +22,11 @@ steps:
   operations: []
   outcome: Provide management and approvers with a real-time overview of approval activity.
 - step: 2
-  screen: BO-365
+  screen: BO-084
   action: Works in My Approval Inbox
   operations: []
   outcome: Provide each approver with their personal actionable queue.
+  note: 'Repointed 2 October (CHG-WIR-021): BO-365 My Approval Inbox was merged into BO-084 Approval Inbox.'
 - step: 3
   screen: BO-364
   action: Returns to the board's landing screen

@@ -546,6 +546,11 @@
     "operation": null,
     "why": "**The pack names 5 actions on this screen and the screen declares 1 operation.** Unserved: Email Link, SMS Link, WhatsApp where integrated, POS, Staff-Assisted Device. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 29 §Support"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-007): No operation sends or resends a waiver signing link (email, SMS, WhatsApp, QR).",
+    "source": "contracts/satellite/marketing-crm.yaml#listDigitalSigningCollection"
    }
   ],
   "layout": {
@@ -826,6 +831,7 @@
    "workshopBoard": "wireframes/WS185 Waiver, Consent & Digital Form Management Board 2.dc.html#cms-054"
   },
   "apisNote": "Regenerated 9 September 2026 from Waiver, Consent & Digital Form Management_Reference.pdf page 31. 6 of 6 labels bound to a contract property; 16 of 40 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "notes": "**Minors (decided by Chinmay, 2 October 2026; DEC-237, superseding the GST-069 default):** a child is enrolled or consents through a guardian on the venue's consent form; the minor age is set per country (`RegionSettings.minorAgeThreshold`) and the venue can switch minors off (`VenueSettings.biometrics.allowMinors`); the guardian links this screen sends go to that form (DEC-549) (CHG-SGU-004).",
   "_platform": {
    "code": "P13",
    "audience": "staff",
@@ -915,6 +921,12 @@
        "bindsTo": "WaiverVerificationValidationWorkspaceView",
        "operation": "setWaiverVerificationValidation",
        "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 33 §Display"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Submissions to verify",
+       "operation": "listWaiverVerificationQueue",
+       "provenance": "contract marketing-crm.yaml GET /waiver-verification-validation; wiring fix, 2 October 2026"
       }
      ]
     },
@@ -969,6 +981,13 @@
     "contract": "marketing-crm",
     "purpose": "Waiver Verification & Validation Workspace",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "listWaiverVerificationQueue",
+    "contract": "marketing-crm",
+    "purpose": "Waiver submissions awaiting or given verification",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-005)"
    }
   ],
   "entryState": {
@@ -1270,6 +1289,13 @@
    "workshopBoard": "wireframes/WS185 Waiver, Consent & Digital Form Management Board 2.dc.html#cms-057"
   },
   "apisNote": "Regenerated 9 September 2026 from Waiver, Consent & Digital Form Management_Reference.pdf page 36. 0 of 0 labels bound to a contract property; 7 of 40 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-007): No write records an on-site waiver exception with its reason.",
+    "source": "contracts/satellite/marketing-crm.yaml#listSiteWaiverException"
+   }
+  ],
   "_platform": {
    "code": "P13",
    "audience": "staff",

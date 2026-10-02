@@ -166,25 +166,6 @@
   "requestBody": "RentalIncident",
   "responds": "RentalIncident"
  },
- "sendTransactionalMessage": {
-  "method": "POST",
-  "path": "/messages",
-  "contract": "marketing-crm",
-  "summary": "Send a transactional message",
-  "permission": "MARKETING_SEND",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": null
- },
  "swapRentalEquipment": {
   "method": "POST",
   "path": "/rental-bookings/{bookingId}/swap",

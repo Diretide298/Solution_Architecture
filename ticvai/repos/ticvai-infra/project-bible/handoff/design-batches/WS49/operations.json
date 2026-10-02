@@ -1,4 +1,17 @@
 {
+ "getBundle": {
+  "method": "GET",
+  "path": "/bundles/{bundleId}",
+  "contract": "promotions",
+  "summary": "Read a bundle with components and allocation",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "Bundle"
+ },
  "listBundleAvailabilityCapacity": {
   "method": "GET",
   "path": "/bundle-availability-capacity",
@@ -221,44 +234,6 @@
   "requestBody": null,
   "responds": "RevenueAllocationCostSettlementRulesView"
  },
- "setBundleComponent": {
-  "method": "PUT",
-  "path": "/bundle-component",
-  "contract": "promotions",
-  "summary": "Bundle Component Builder",
-  "permission": "PRICE_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "BundleComponentBuilderInput",
-  "responds": "BundleComponentBuilderView"
- },
- "setBundleDefinition": {
-  "method": "PUT",
-  "path": "/bundle-definition",
-  "contract": "promotions",
-  "summary": "Bundle Definition & Setup",
-  "permission": "PRICE_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "BundleDefinitionSetupInput",
-  "responds": "BundleDefinitionSetupView"
- },
  "setBundlePartnerProductMappings": {
   "method": "PUT",
   "path": "/bundles/{bundleId}/partner-products",
@@ -277,25 +252,6 @@
   ],
   "requestBody": null,
   "responds": null
- },
- "setGuestChoiceBuild": {
-  "method": "PUT",
-  "path": "/guest-choice-build",
-  "contract": "promotions",
-  "summary": "Guest Choice & Build-Your-Own Bundle Designer",
-  "permission": "PRICE_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "GuestChoiceBuildYourOwnBundleDesignerInput",
-  "responds": "GuestChoiceBuildYourOwnBundleDesignerView"
  },
  "simulateBundlePreviewRecommendation": {
   "method": "PUT",

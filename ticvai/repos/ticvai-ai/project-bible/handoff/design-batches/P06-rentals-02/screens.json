@@ -1068,20 +1068,6 @@
        "impliedBy": "listOverdueRentals",
        "kind": "dataTable",
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
-      },
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "sendTransactionalMessage",
-       "label": "Send transactional message",
-       "notes": "The act the screen exists for."
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "sendTransactionalMessage"
       }
      ],
      "name": "contentBody"
@@ -1090,7 +1076,7 @@
    "template": "split"
   },
   "states": {
-   "emptyFirstRun": "No overdue rental yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No overdue rental yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "emptyNoResults": "The filter narrowed it and the overdue rental are still there. Names the active filter and offers to clear it.",
    "error": "Could not load. Names which read failed and leaves the overdue rental untouched.",
@@ -1107,6 +1093,17 @@
     "operation": null,
     "source": "pack Rental_Management.pdf, page 85",
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built."
+   },
+   {
+    "operation": "sendTransactionalMessage",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-008): sendTransactionalMessage declares the service and partner audiences, not staff, so a staff device cannot call it as declared (design-notes correction fnb-retail EMP-088).",
+    "source": "contracts/satellite/marketing-crm.yaml#sendTransactionalMessage"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-011): No staff-callable reminder for an overdue rental.",
+    "source": "contracts/satellite/marketing-crm.yaml#sendTransactionalMessage"
    }
   ],
   "apis": [
@@ -1116,13 +1113,6 @@
     "provenance": "board reading, 19 September 2026",
     "purpose": "Late, and what it is accruing",
     "trigger": "onLoad"
-   },
-   {
-    "contract": "marketing-crm",
-    "operationId": "sendTransactionalMessage",
-    "provenance": "board reading, 19 September 2026",
-    "purpose": "Contact the guest about an overdue rental",
-    "trigger": "onAction"
    }
   ],
   "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 85. 0 of 0 labels bound to a contract property; 0 of 8 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",

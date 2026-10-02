@@ -190,8 +190,15 @@ def build(schedule, keys):
         plat = sdoc.get("platform") if isinstance(sdoc.get("platform"), dict) else {}
         for s in sdoc["screens"]:
             screens[s["id"]] = dict(s, _platform=f.stem, _operator=plat.get("operator"))
+    # **A Venue Management screen is built on the backend track** (sprint_plan SCREEN_PREFIX: P08 is VM),
+    # and it is still a screen. The 2 October move put seven pushed APP-SETUP-ADM tickets on P08 as `[BE]`
+    # rows, and they fell through to the epic branch: a one-line description and no Done-when
+    # (T-DONE-WHEN; CHG-GTB-012). A task whose subject opens with its screen id is that screen's ticket.
     screen_of = {k: m.group(1) for k, r in rows.items()
-                 if r["type"] == "Task" and r["track"] == "Frontend" and (m := SCREEN.search(k))}
+                 if r["type"] == "Task" and (m := SCREEN.search(k))
+                 and (r["track"] == "Frontend"
+                      or (r["track"] == "Backend" and r.get("area") == "VM"
+                          and r["subject"].startswith(f"[BE] {m.group(1)} ")))}
     callers = collections.defaultdict(set)
     for sid in set(screen_of.values()):
         for api in screens.get(sid, {}).get("apis") or []:
@@ -280,8 +287,13 @@ def build(schedule, keys):
         ticketed = sorted(callers.get(op, ()))
         later = [x for x in declared if not any(sid in x.split() for sid in ticketed)]
         if ticketed or later:
+            # **Every one, never "..."** (2 October, CHG-GTB-012): the platform-staff grant put
+            # listOwnPlatformStaffGrants on 113 console screens, and a list cut at twelve left 61 out of the
+            # ticket (T-USED-BY). Past twelve, the later ones are named by screen id alone.
+            if len(later) > 12:
+                later = [x.split()[1] if len(x.split()) > 1 and SCREEN.fullmatch(x.split()[1]) else x for x in later]
             out.append("- **Used by:** " + (", ".join(screen_label(x) for x in ticketed) or "no screen in this release")
-                       + (f"; later: {', '.join(later[:12])}{' ...' if len(later) > 12 else ''}" if later else ""))
+                       + (f"; later: {', '.join(later)}" if later else ""))
         return out
 
     def plan(key, base):
@@ -475,7 +487,7 @@ def build(schedule, keys):
             continue
         r = rows[base]
         text = []
-        if r["track"] == "Backend" and r["type"] == "Task" and OPS_TASK.fullmatch(base):
+        if r["track"] == "Backend" and r["type"] == "Task" and OPS_TASK.fullmatch(base) and base not in screen_of:
             op_list = [part] if part else (r["subject"].split(": ", 1)[1].split(", ") if ": " in r["subject"] else [])
             text += [("Build this endpoint to its contract." if part else
                       f"Build {'this operation' if len(op_list) == 1 else f'these {len(op_list)} operations'} "
@@ -496,7 +508,7 @@ def build(schedule, keys):
                 text += [f"Source DDL: `{src.group(1)}`; order and numbering in "
                          "`handoff/service-docs/backend/MIGRATIONS.md`.", ""]
             text += done_db(base)
-        elif r["track"] == "Frontend" and base in screen_of:
+        elif base in screen_of:
             sid = screen_of[base]
             if part in FE_PART:
                 title, checks = FE_PART[part]

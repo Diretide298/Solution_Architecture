@@ -25,7 +25,7 @@
     {
      "to": "SUP-001",
      "trigger": "Agent Login",
-     "provenance": "derived — SUP-001 declares entryState.params challengeId and SUP-006 holds none of them. The edge carries nothing: SUP-006 is opened from SUP-001, so this edge is the way back and SUP-001 keeps its own state"
+     "provenance": "derived — SUP-001 declares entryState.params challengeId, methodId, providerId and SUP-006 holds none of them. The edge carries nothing: SUP-006 is opened from SUP-001, so this edge is the way back and SUP-001 keeps its own state"
     }
    ]
   },
@@ -41,27 +41,6 @@
      "name": "contentBody",
      "slot": "collection",
      "components": [
-      {
-       "kind": "dataTable",
-       "label": "Every knowledge collection",
-       "bindsTo": "KnowledgeCollection",
-       "columns": [
-        "KnowledgeCollection.id",
-        "KnowledgeCollection.name",
-        "KnowledgeCollection.description",
-        "KnowledgeCollection.scopeLevel",
-        "KnowledgeCollection.scopePath",
-        "KnowledgeCollection.documentCount",
-        "KnowledgeCollection.shardKey",
-        "KnowledgeCollection.retrieval",
-        "KnowledgeCollection.sparseModel",
-        "KnowledgeCollection.idfScope",
-        "KnowledgeCollection.embeddingModel",
-        "KnowledgeCollection.isActive"
-       ],
-       "operation": "listKnowledgeCollections",
-       "provenance": "contract ai.yaml GET /collections"
-      },
       {
        "kind": "dataTable",
        "label": "Every faq category",
@@ -81,27 +60,16 @@
     {
      "name": "contextPanel",
      "slot": "selection",
+     "components": []
+    },
+    {
+     "name": "actionBar",
      "components": [
       {
-       "kind": "detailPanel",
-       "label": "The selected knowledge collection",
-       "bindsTo": "KnowledgeCollection",
-       "columns": [
-        "KnowledgeCollection.id",
-        "KnowledgeCollection.name",
-        "KnowledgeCollection.description",
-        "KnowledgeCollection.scopeLevel",
-        "KnowledgeCollection.scopePath",
-        "KnowledgeCollection.documentCount",
-        "KnowledgeCollection.shardKey",
-        "KnowledgeCollection.retrieval",
-        "KnowledgeCollection.sparseModel",
-        "KnowledgeCollection.idfScope",
-        "KnowledgeCollection.embeddingModel",
-        "KnowledgeCollection.isActive"
-       ],
-       "operation": "listKnowledgeCollections",
-       "provenance": "contract ai.yaml GET /collections"
+       "kind": "secondaryButton",
+       "label": "Search",
+       "operation": "semanticSearch",
+       "provenance": "contract ai.yaml POST /search; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -111,16 +79,10 @@
    "loading": "The knowledge base search list.",
    "error": "Could not load. Names which read failed and leaves the knowledge base search untouched.",
    "emptyFirstRun": "No knowledge base search yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
-   "emptyNoResults": "Never shown: `listKnowledgeCollections` takes no filter, so an empty list is always the first-run state above.",
-   "emptyNoAccess": "Shown when the caller lacks `AI_CONFIGURE`, which `listKnowledgeCollections` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoResults": "Never shown: nothing on this screen filters its list, so an empty list is always the first-run state above.",
+   "emptyNoAccess": "Shown when the caller lacks `TENANT_CONFIGURE`, which `listFaqs` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
-   {
-    "operationId": "listKnowledgeCollections",
-    "contract": "ai",
-    "purpose": "Collections an agent may search",
-    "trigger": "onLoad"
-   },
    {
     "operationId": "listFaqs",
     "contract": "white-label",
@@ -133,27 +95,16 @@
     "purpose": "Questions the assistant could not answer",
     "trigger": "onLoad",
     "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "semanticSearch",
+    "contract": "ai",
+    "purpose": "Search the knowledge an agent may use",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-012)"
    }
   ],
   "entryState": {
-   "params": [
-    {
-     "name": "bannerId",
-     "from": "deepLink"
-    },
-    {
-     "name": "pageId",
-     "from": "deepLink"
-    },
-    {
-     "name": "policyKind",
-     "from": "deepLink"
-    },
-    {
-     "name": "version",
-     "from": "deepLink"
-    }
-   ],
    "coldEntry": "**A version link is expected to point at something superseded — that is what versions are for.** The screen opens the requested version read-only, says it is not current, and links to the one that is. **An old version is history, not an error.** Arrives with `bannerId`, `pageId`, `policyKind`.",
    "preloaded": [
     "KnowledgeCollection.id",
@@ -169,6 +120,30 @@
    "board": "wireframes/P12 Venue Support.dc.html#sup-006"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formSemanticSearch",
+    "component": "modal",
+    "trigger": "Search",
+    "body": "**Collects what `semanticSearch` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Search",
+     "operation": "semanticSearch"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "contract ai.yaml POST /search; wiring fix, 2 October 2026"
+   }
+  ],
+  "gaps": [
+   {
+    "operation": "listKnowledgeCollections",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-012): Agents search content; collection engineering (listKnowledgeCollections, AI_CONFIGURE, with shard and embedding columns) belongs to knowledge administration, and the agent's search is semanticSearch. The entry parameters bannerId, pageId, policyKind and version were left from the white-label bulk attach (design-notes corrections ai SUP-006).",
+    "source": "contracts/satellite/ai.yaml#listKnowledgeCollections | contracts/satellite/ai.yaml#semanticSearch"
+   }
+  ],
   "_platform": {
    "code": "P12",
    "audience": "staff",
@@ -218,7 +193,7 @@
     {
      "to": "SUP-001",
      "trigger": "Agent Login",
-     "provenance": "derived — SUP-001 declares entryState.params challengeId and SUP-007 holds none of them. The edge carries nothing: SUP-007 is opened from SUP-001, so this edge is the way back and SUP-001 keeps its own state"
+     "provenance": "derived — SUP-001 declares entryState.params challengeId, methodId, providerId and SUP-007 holds none of them. The edge carries nothing: SUP-007 is opened from SUP-001, so this edge is the way back and SUP-001 keeps its own state"
     }
    ]
   },

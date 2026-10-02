@@ -254,7 +254,7 @@
  "AccessTicketStatusTransition": {
   "type": "object",
   "x-ticvai-persistence": "access.ticket_status_transition",
-  "description": "One Virtual Ticket lifecycle transition rule - from status, to status, whether allowed, whether it needs an authorised exception and where it may originate (declared 29 September, data-model close-out DM1). Seeded from states/entitlement-status.yaml when a venue is created; setTicketStatusTransition may narrow a move, never add one (decided 29 September, writers pass).",
+  "description": "One Virtual Ticket lifecycle transition rule - from status, to status, whether allowed, whether it needs an authorised exception and where it may originate (declared 29 September, data-model close-out DM1). Seeded from states/entitlement-status.yaml when a venue is created; setTicketStatusTransition may narrow a move, never add one (decided 29 September, writers pass).\n\n**The 13 names are the client's, mapped onto the entitlement model** (decided 2 October 2026, Chinmay, critical set 2, BO-336; DEC-266; CHG-CSP-033): created and pendingFulfillment (Reserved, DI-670) are the order before an entitlement is issued; active is `issued`; partiallyUsed and used are `partiallyConsumed` and `fullyConsumed`; expired is `expired`; suspended is `issued` with the suspended flag; blocked is `issued` under an active identity lock; cancelled, voided, refunded and reissuedSuperseded are `cancelled` told apart by `Entitlement.cancellationKind`; transferred is `surrendered`. Every name maps, so no state was added to the model; a cell with no model transition behind it is locked \"Not in the platform lifecycle\". `Entitlement.lifecycleLabel` carries the name.\n",
   "required": [
    "id",
    "fromStatus",

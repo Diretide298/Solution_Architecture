@@ -126,14 +126,13 @@ screens:
         yet (a gap in CMS-008, not in this edge)'
     - to: CMS-009
       trigger: Navigation & Menus
-      provenance: 'derived — CMS-009 declares entryState.params menuId and CMS-001 holds none of them.
-        The edge carries nothing: menuId only pre-selects (deep link or optional), and CMS-009 opens on
-        its own'
+      provenance: 'derived — CMS-009 declares entryState.params  and CMS-001 holds none of them. The edge
+        carries nothing: CMS-009 needs nothing to open'
     - to: CMS-010
       trigger: Media Library
-      provenance: 'derived — CMS-010 declares entryState.params mediaCode, mediaId, uploadId and CMS-001
-        holds none of them. The edge carries nothing: mediaCode, mediaId, uploadId only pre-select (deep
-        link or optional), and CMS-010 opens on its own'
+      provenance: 'derived — CMS-010 declares entryState.params mediaId, uploadId and CMS-001 holds none
+        of them. The edge carries nothing: mediaId, uploadId only pre-select (deep link or optional),
+        and CMS-010 opens on its own'
     - to: CMS-011
       trigger: Translations
       provenance: structural — CMS-001 is P13's home screen and its exits are its launcher
@@ -337,14 +336,14 @@ screens:
       or restored: Maintenance (on, message, back at), Minimum app version (iOS, Android), Contact (phone,
       email, WhatsApp, address, hours) and today’s availability (open, sold out, closed, message). The
       confirmation names the consequence ("Guests on web and app see the maintenance page from now until
-      you clear it") (CHG-SGU-022). **Collects what `setMaintenanceMode` sends before it is called.** Required:
-      `isInMaintenance`. Optional: `message`, `expectedBackAt`, `minimumAppVersion` (`ios`, `android`),
-      `contact` (`phone`, `email`, `whatsapp`, `address`, `openingHours`), `availability` (`open`, `soldOut`,
-      `closed`) and `availabilityMessage`. **The live app status is set here, not published** (decided
-      28 September, audit R073 (b)(f)): a guest app below `minimumAppVersion` for its platform is sent
-      to the forced upgrade (GST-047), the contact details feed WEB-028 and the availability feeds WEB-029''s
-      sold-out and closed states. A field not sent is left as it is, so clearing maintenance does not
-      clear the contact details. Dismissing sends nothing; the screen behind is unchanged.'
+      you clear it") (CHG-SGU-022). **Collects what `setMaintenanceMode` sends before it is called.**
+      Required: `isInMaintenance`. Optional: `message`, `expectedBackAt`, `minimumAppVersion` (`ios`,
+      `android`), `contact` (`phone`, `email`, `whatsapp`, `address`, `openingHours`), `availability`
+      (`open`, `soldOut`, `closed`) and `availabilityMessage`. **The live app status is set here, not
+      published** (decided 28 September, audit R073 (b)(f)): a guest app below `minimumAppVersion` for
+      its platform is sent to the forced upgrade (GST-047), the contact details feed WEB-028 and the availability
+      feeds WEB-029''s sold-out and closed states. A field not sent is left as it is, so clearing maintenance
+      does not clear the contact details. Dismissing sends nothing; the screen behind is unchanged.'
     confirm:
       label: Save maintenance mode
       operation: setMaintenanceMode
@@ -388,19 +387,18 @@ screens:
         carries nothing: CMS-001 needs nothing to open'
     - to: CMS-003
       trigger: Typography
-      provenance: 'derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version
-        and CMS-002 holds none of them. The edge carries nothing: bannerId, pageId, policyKind, version
-        only pre-select (deep link or optional), and CMS-003 opens on its own'
+      provenance: 'derived — CMS-003 declares entryState.params  and CMS-002 holds none of them. The edge
+        carries nothing: CMS-003 needs nothing to open'
     - to: CMS-004
       trigger: Logo & Assets
       provenance: 'derived — CMS-004 declares entryState.params  and CMS-002 holds none of them. The edge
         carries nothing: CMS-004 needs nothing to open'
-  notes: "Definition derived from the wireframe board on 14 August. Components, states and operations
-    still to be written. States derived from the screen pattern on 17 August, not individually considered
-    — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.\n
-    \n**This screen owns the marks and the logo variant** (logo, dark logo, variant, favicon); CMS-004
-    owns the app icons, the splash and the intro video, so the two never edit the same fields (CHG-SGU-022).
-    `splashChangeScope` is read-only and shown, never sent."
+  notes: "Definition derived from the wireframe board on 14 August. Components, states and operations\
+    \ still to be written. States derived from the screen pattern on 17 August, not individually considered\
+    \ — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.\n\
+    \ \n**This screen owns the marks and the logo variant** (logo, dark logo, variant, favicon); CMS-004\
+    \ owns the app icons, the splash and the intro video, so the two never edit the same fields (CHG-SGU-022).\
+    \ `splashChangeScope` is read-only and shown, never sent."
   density: compact
   pattern: statusTracker
   patternReason: '`getBrandIdentity` reads one record and nothing reads a population — the screen is about
@@ -597,7 +595,7 @@ screens:
     purpose: Set fonts
     trigger: onAction
   entryState:
-    coldEntry: 'Opens on the fonts in the draft; nothing to resolve.'
+    coldEntry: Opens on the fonts in the draft; nothing to resolve.
   wireframe:
     status: notStarted
     provenance: generated
@@ -669,9 +667,8 @@ screens:
         on its own'
     - to: CMS-003
       trigger: Typography
-      provenance: 'derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version
-        and CMS-004 holds none of them. The edge carries nothing: bannerId, pageId, policyKind, version
-        only pre-select (deep link or optional), and CMS-003 opens on its own'
+      provenance: 'derived — CMS-003 declares entryState.params  and CMS-004 holds none of them. The edge
+        carries nothing: CMS-003 needs nothing to open'
   notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written. States derived from the screen pattern on 17 August, not individually considered
     — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
@@ -845,14 +842,13 @@ screens:
         on its own'
     - to: CMS-003
       trigger: Typography
-      provenance: 'derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version
-        and CMS-005 holds none of them. The edge carries nothing: bannerId, pageId, policyKind, version
-        only pre-select (deep link or optional), and CMS-003 opens on its own'
+      provenance: 'derived — CMS-003 declares entryState.params  and CMS-005 holds none of them. The edge
+        carries nothing: CMS-003 needs nothing to open'
     - to: CMS-006
       trigger: Component Preview
-      provenance: 'derived — CMS-006 declares entryState.params bannerId, pageId, policyKind, version
-        and CMS-005 holds none of them. The edge carries nothing: bannerId, pageId, policyKind, version
-        only pre-select (deep link or optional), and CMS-006 opens on its own'
+      provenance: 'derived — CMS-006 declares entryState.params productId and CMS-005 holds none of them.
+        The edge carries nothing: productId only pre-selects (deep link or optional), and CMS-006 opens
+        on its own'
   notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written. States derived from the screen pattern on 17 August, not individually considered
     — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
@@ -979,6 +975,7 @@ screens:
     - CMS-001
     - CMS-002
     - CMS-003
+    - CMS-014
     inferred: false
     entryFrom:
     - CMS-003
@@ -997,8 +994,13 @@ screens:
         on its own'
     - to: CMS-003
       trigger: Typography
-      provenance: derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version and
-        CMS-006 holds bannerId, pageId, policyKind, version, so an edge into it carries them
+      provenance: 'derived — CMS-003 declares entryState.params  and CMS-006 holds none of them. The edge
+        carries nothing: CMS-006 is opened from CMS-003, so this edge is the way back and CMS-003 keeps
+        its own state'
+    - to: CMS-014
+      trigger: White-Label Branding Management
+      provenance: flow F102 step 3→4
+      operation: createPreview
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written. States derived from the screen pattern on 17 August, not individually considered —
     sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. **36
@@ -1209,8 +1211,8 @@ screens:
         on its own'
     - to: CMS-003
       trigger: Typography
-      provenance: derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version and
-        CMS-007 holds pageId, so an edge into it carries them
+      provenance: 'derived — CMS-003 declares entryState.params  and CMS-007 holds none of them. The edge
+        carries nothing: CMS-003 needs nothing to open'
   notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written. States derived from the screen pattern on 17 August, not individually considered
     — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
@@ -1400,6 +1402,8 @@ screens:
       from: navigation
     - name: actionId
       from: navigation
+    - name: blockId
+      from: navigation
   overlays:
   - id: formCreateContentPage
     component: modal
@@ -1517,13 +1521,13 @@ screens:
         on its own'
     - to: CMS-003
       trigger: Typography
-      provenance: derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version and
-        CMS-008 holds bannerId, so an edge into it carries them
-  notes: "Definition derived from the wireframe board on 14 August. Components, states and operations
-    still to be written. States derived from the screen pattern on 17 August, not individually considered
-    — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.\n
-    \n**Banners and promo blocks go live on their own schedule, not with Publish** (the contract header
-    lists them outside the draft); the screen says so beside each (CHG-SGU-022)."
+      provenance: 'derived — CMS-003 declares entryState.params  and CMS-008 holds none of them. The edge
+        carries nothing: CMS-003 needs nothing to open'
+  notes: "Definition derived from the wireframe board on 14 August. Components, states and operations\
+    \ still to be written. States derived from the screen pattern on 17 August, not individually considered\
+    \ — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.\n\
+    \ \n**Banners and promo blocks go live on their own schedule, not with Publish** (the contract header\
+    \ lists them outside the draft); the screen says so beside each (CHG-SGU-022)."
   density: compact
   pattern: listDetail
   patternReason: '`listPromoBlocks` reads a population and nothing reads one of them; the detail is the
@@ -1849,18 +1853,17 @@ screens:
         on its own'
     - to: CMS-003
       trigger: Typography
-      provenance: 'derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version
-        and CMS-009 holds none of them. The edge carries nothing: bannerId, pageId, policyKind, version
-        only pre-select (deep link or optional), and CMS-003 opens on its own'
+      provenance: 'derived — CMS-003 declares entryState.params  and CMS-009 holds none of them. The edge
+        carries nothing: CMS-003 needs nothing to open'
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written. States derived from the screen pattern on 17 August, not individually considered —
     sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
   density: compact
   pattern: listDetail
   patternReason: '`listMenus` reads the population and `getMenu` reads one of them — list, select, act'
-  purpose: "Three editors, each saved on its own: the header, the footer and the mobile tab bar with the
-    Buy tickets button (Site Builder steps 5 and 6); and the links a tenant's own site uses to deep-link
-    in."
+  purpose: 'Three editors, each saved on its own: the header, the footer and the mobile tab bar with the
+    Buy tickets button (Site Builder steps 5 and 6); and the links a tenant''s own site uses to deep-link
+    in.'
   layout:
     template: split
     regions:
@@ -1904,9 +1907,9 @@ screens:
         label: Links into the storefront
         bindsTo: DeepLinkScheme
         operation: getDeepLinkScheme
-        notes: "**For a tenant with its own landing page** (DEC-548): the published deep-link scheme and
-          a link builder, so the tenant's site links straight to a product, an event or a booking step
-          (CHG-SGU-005)."
+        notes: '**For a tenant with its own landing page** (DEC-548): the published deep-link scheme and
+          a link builder, so the tenant''s site links straight to a product, an event or a booking step
+          (CHG-SGU-005).'
         provenance: corrected 2 October 2026 (CHG-SGU-005, decided by Chinmay 2 October 2026, DEC-163,
           DEC-548)
     - name: actionBar
@@ -1932,8 +1935,8 @@ screens:
   states:
     loading: The navigation menus list.
     error: Could not load. Names which read failed and leaves the navigation menus untouched.
-    emptyFirstRun: "Nothing configured yet: the header, footer and tab bar open with the preset's defaults,
-      each with its own Save."
+    emptyFirstRun: 'Nothing configured yet: the header, footer and tab bar open with the preset''s defaults,
+      each with its own Save.'
     emptyNoAccess: Shown when the caller lacks `TENANT_CONFIGURE`, which `getNavigation` requires, and
       names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
       to support with the wrong question.
@@ -2015,8 +2018,8 @@ screens:
   - id: formSetFooter
     component: modal
     trigger: Save footer
-    body: "Footer columns, legal links, copyright text and social links; `id` and `scopePath` are the
-      server's and never asked (the contract still lists them as required: CHG-SGU-024)."
+    body: 'Footer columns, legal links, copyright text and social links; `id` and `scopePath` are the
+      server''s and never asked (the contract still lists them as required: CHG-SGU-024).'
     confirm:
       label: Save footer
       operation: setFooter
@@ -2104,9 +2107,8 @@ screens:
         an edge into it carries them
     - to: CMS-003
       trigger: Typography
-      provenance: 'derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version
-        and CMS-010 holds none of them. The edge carries nothing: bannerId, pageId, policyKind, version
-        only pre-select (deep link or optional), and CMS-003 opens on its own'
+      provenance: 'derived — CMS-003 declares entryState.params  and CMS-010 holds none of them. The edge
+        carries nothing: CMS-003 needs nothing to open'
   notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written. States derived from the screen pattern on 17 August, not individually considered
     — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
@@ -2555,9 +2557,8 @@ screens:
         on its own'
     - to: CMS-003
       trigger: Typography
-      provenance: 'derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version
-        and CMS-013 holds none of them. The edge carries nothing: bannerId, pageId, policyKind, version
-        only pre-select (deep link or optional), and CMS-003 opens on its own'
+      provenance: 'derived — CMS-003 declares entryState.params  and CMS-013 holds none of them. The edge
+        carries nothing: CMS-003 needs nothing to open'
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written. States derived from the screen pattern on 17 August, not individually considered —
     sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
@@ -2706,14 +2707,13 @@ screens:
         on its own'
     - to: CMS-003
       trigger: Typography
-      provenance: 'derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version
-        and CMS-011 holds none of them. The edge carries nothing: bannerId, pageId, policyKind, version
-        only pre-select (deep link or optional), and CMS-003 opens on its own'
-  notes: "Definition derived from the wireframe board on 14 August. Components, states and operations
-    still to be written. States derived from the screen pattern on 17 August, not individually considered
-    — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.\n
-    \nThe CHG-WIR-017 gap (no read follows a proposeTranslations job) is closed: getTranslationProposals
-    was built (CHG-CSA-045) and is bound here (CHG-SGU-022)."
+      provenance: 'derived — CMS-003 declares entryState.params  and CMS-011 holds none of them. The edge
+        carries nothing: CMS-003 needs nothing to open'
+  notes: "Definition derived from the wireframe board on 14 August. Components, states and operations\
+    \ still to be written. States derived from the screen pattern on 17 August, not individually considered\
+    \ — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.\n\
+    \ \nThe CHG-WIR-017 gap (no read follows a proposeTranslations job) is closed: getTranslationProposals\
+    \ was built (CHG-CSA-045) and is bound here (CHG-SGU-022)."
   density: compact
   pattern: configEditor
   patternReason: the screen declares only writes (`setLanguages`) and no read of a population — it is
@@ -2828,8 +2828,8 @@ screens:
         on its own'
     - to: CMS-003
       trigger: Typography
-      provenance: derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version and
-        CMS-012 holds version, so an edge into it carries them
+      provenance: 'derived — CMS-003 declares entryState.params  and CMS-012 holds none of them. The edge
+        carries nothing: CMS-003 needs nothing to open'
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written. States derived from the screen pattern on 17 August, not individually considered —
     sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
@@ -2915,8 +2915,8 @@ screens:
         on its own'
     - to: CMS-003
       trigger: Typography
-      provenance: derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version and
-        CMS-014 holds version, so an edge into it carries them
+      provenance: 'derived — CMS-003 declares entryState.params  and CMS-014 holds none of them. The edge
+        carries nothing: CMS-003 needs nothing to open'
     - to: CMS-103
       trigger: Fix a booking flow
       provenance: authored 29 September, W12 (an invalid flow blocks the publish)
@@ -2933,6 +2933,8 @@ screens:
       provenance: flow F22 step 5→6
       carries:
       - version
+    entryFrom:
+    - CMS-006
   notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written. States derived from the screen pattern on 17 August, not individually considered
     — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
@@ -3007,9 +3009,9 @@ screens:
       - kind: secondaryButton
         label: Generate site package
         operation: exportSitePackage
-        notes: "**Self-hosted tenants** (DEC-144): the site is generated as a package to deploy themselves;
-          hosted tenants publish here, and platform staff may publish a hosted tenant's site under a TENANT_PUBLISH
-          grant from the console (ADM-016) (CHG-SGU-010)."
+        notes: '**Self-hosted tenants** (DEC-144): the site is generated as a package to deploy themselves;
+          hosted tenants publish here, and platform staff may publish a hosted tenant''s site under a
+          TENANT_PUBLISH grant from the console (ADM-016) (CHG-SGU-010).'
         provenance: corrected 2 October 2026 (CHG-SGU-010, decided by Chinmay 2 October 2026, DEC-144,
           DEC-156)
       - kind: detailPanel
@@ -3139,6 +3141,8 @@ screens:
       from: session
     - name: version
       from: navigation
+    - name: packageId
+      from: navigation
 - id: CMS-015
   name: Version History
   module: White Label
@@ -3173,12 +3177,14 @@ screens:
         on its own'
     - to: CMS-003
       trigger: Typography
-      provenance: derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version and
-        CMS-015 holds version, so an edge into it carries them
+      provenance: 'derived — CMS-003 declares entryState.params  and CMS-015 holds none of them. The edge
+        carries nothing: CMS-003 needs nothing to open'
     - to: CMS-014
       trigger: Review and publish the restored draft
       provenance: decided 28 September, audit R139 (b) — a restore lands in the working draft, and the
         publish is a separate, deliberate step
+      carries:
+      - version
   notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written. States derived from the screen pattern on 17 August, not individually considered
     — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
@@ -3354,8 +3360,8 @@ screens:
         on its own'
     - to: CMS-003
       trigger: Typography
-      provenance: derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version and
-        CMS-016 holds version, so an edge into it carries them
+      provenance: 'derived — CMS-003 declares entryState.params  and CMS-016 holds none of them. The edge
+        carries nothing: CMS-003 needs nothing to open'
     - to: CMS-017
       trigger: Domain & Certificate
       provenance: 'derived — CMS-017 declares entryState.params domainId and CMS-016 holds none of them.
@@ -3603,9 +3609,8 @@ screens:
         on its own'
     - to: CMS-003
       trigger: Typography
-      provenance: 'derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version
-        and CMS-017 holds none of them. The edge carries nothing: bannerId, pageId, policyKind, version
-        only pre-select (deep link or optional), and CMS-003 opens on its own'
+      provenance: 'derived — CMS-003 declares entryState.params  and CMS-017 holds none of them. The edge
+        carries nothing: CMS-003 needs nothing to open'
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written. States derived from the screen pattern on 17 August, not individually considered —
     sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
@@ -3823,8 +3828,8 @@ screens:
         on its own'
     - to: CMS-003
       trigger: Typography
-      provenance: derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version and
-        CMS-018 holds policyKind, version, so an edge into it carries them
+      provenance: 'derived — CMS-003 declares entryState.params  and CMS-018 holds none of them. The edge
+        carries nothing: CMS-003 needs nothing to open'
   notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written. States derived from the screen pattern on 17 August, not individually considered
     — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
@@ -3834,9 +3839,9 @@ screens:
     subscription billing where its purpose names White Labelling. Its operations now match its purpose.
 
 
-    **Two permission families on one screen (DI-387; CHG-SGU-017).** Policies need `TENANT_CONFIGURE`; consent
-    purposes and questions need `GUEST_MANAGE` (reads `GUEST_VIEW`). A role holding one and not the other
-    sees the other section read-only, or hidden with the permission named, never a broken page.'
+    **Two permission families on one screen (DI-387; CHG-SGU-017).** Policies need `TENANT_CONFIGURE`;
+    consent purposes and questions need `GUEST_MANAGE` (reads `GUEST_VIEW`). A role holding one and not
+    the other sees the other section read-only, or hidden with the permission named, never a broken page.'
   density: compact
   pattern: listDetail
   patternReason: '`listPolicies` reads a population and nothing reads one of them; the detail is the row
@@ -4163,9 +4168,8 @@ screens:
         on its own'
     - to: CMS-003
       trigger: Typography
-      provenance: 'derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version
-        and CMS-019 holds none of them. The edge carries nothing: bannerId, pageId, policyKind, version
-        only pre-select (deep link or optional), and CMS-003 opens on its own'
+      provenance: 'derived — CMS-003 declares entryState.params  and CMS-019 holds none of them. The edge
+        carries nothing: CMS-003 needs nothing to open'
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written. States derived from the screen pattern on 17 August, not individually considered —
     sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
@@ -4247,9 +4251,9 @@ screens:
   states:
     loading: The user access list.
     error: Could not load. Names which read failed and leaves the user access untouched.
-    emptyFirstRun: "Nobody but the tenant owner has access yet: an empty list here is normal on a new
-      tenant. Change access is offered on each person once they exist; people are invited from the platform's
-      user management, not here."
+    emptyFirstRun: 'Nobody but the tenant owner has access yet: an empty list here is normal on a new
+      tenant. Change access is offered on each person once they exist; people are invited from the platform''s
+      user management, not here.'
     emptyNoResults: Nothing matches the filter on scopePath, isActive and the user access are still there.
       Names the active filter and offers to clear it.
     emptyNoAccess: Shown when the caller lacks `USER_MANAGE`, which `listPrincipals` requires, and names
@@ -4276,6 +4280,9 @@ screens:
     - Principal.displayName
     - Principal.isActive
     - Principal.validFrom
+    params:
+    - name: principalId
+      from: session
   wireframe:
     status: notStarted
     provenance: generated
@@ -4743,9 +4750,9 @@ screens:
     7. 0 of 0 labels bound to a contract property; 17 of 46 pack bullets carried onto the screen — the
     rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
     rather than here.
-  notes: "**Consent purposes are captured on the venue's consent forms** (DEC-549): each purpose here
+  notes: '**Consent purposes are captured on the venue''s consent forms** (DEC-549): each purpose here
     is the `consentPurposes` value a consent form built on CMS-043 (BO-747 in Venue Management) collects;
-    there is one form builder, not a second one on this screen (CHG-SGU-014)."
+    there is one form builder, not a second one on this screen (CHG-SGU-014).'
 - id: CMS-024
   name: Communication Preference & Marketing Permission Configuration
   module: Policy
@@ -4974,16 +4981,16 @@ screens:
         - CookieScanRun.newlyDetectedCount
         - CookieScanRun.missingCount
         operation: listCookieScans
-        notes: "**A bought scanner API (hybrid) runs the scheduled scans** (decided by Chinmay, 2 October
-          2026; DEC-019; CHG-CSA-023): it feeds `recordCookieScan` through TICVAI's adapter, and the manual
-          \"Upload scan report\" path stays for a venue that scans elsewhere. The source column says Scanner
-          or Upload per run. Our banner, runtime, registry and consent logs stay ours (CHG-SGU-013)."
+        notes: '**A bought scanner API (hybrid) runs the scheduled scans** (decided by Chinmay, 2 October
+          2026; DEC-019; CHG-CSA-023): it feeds `recordCookieScan` through TICVAI''s adapter, and the
+          manual "Upload scan report" path stays for a venue that scans elsewhere. The source column says
+          Scanner or Upload per run. Our banner, runtime, registry and consent logs stay ours (CHG-SGU-013).'
         provenance: corrected 2 October 2026 (CHG-SGU-013, decided by Chinmay 2 October 2026, DEC-019)
       - kind: metricTile
         label: Loaded before consent
         operation: listCookieScans
-        notes: "**The compliance output, shown first and prominently:** the scan run's `preConsentViolationCount`,
-          the technologies seen loading before the visitor decided (CHG-FUP-009) (CHG-SGU-013)."
+        notes: '**The compliance output, shown first and prominently:** the scan run''s `preConsentViolationCount`,
+          the technologies seen loading before the visitor decided (CHG-FUP-009) (CHG-SGU-013).'
         provenance: corrected 2 October 2026 (CHG-SGU-013, decided by Chinmay 2 October 2026, DEC-019)
       - kind: dataTable
         label: What the scan saw
@@ -5077,6 +5084,9 @@ screens:
   entryState:
     preloaded:
     - CookieTrackingDigitalTechnologyRegistryView.technologyType
+    params:
+    - name: scanRunId
+      from: navigation
   wireframe:
     status: notStarted
     provenance: generated
@@ -5668,11 +5678,11 @@ screens:
     15. 0 of 0 labels bound to a contract property; 8 of 40 pack bullets carried onto the screen — the
     rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
     rather than here.
-  notes: "**Children's biometric data: as BO-187, guardian consent, configurable** (decided by Chinmay,
-    2 October 2026; DEC-283, DEC-237). Allowed with a guardian-signed consent on the venue's form; the
-    minor age per country and whether minors may be enrolled at all are the venue's settings (`RegionSettings.minorAgeThreshold`,
+  notes: '**Children''s biometric data: as BO-187, guardian consent, configurable** (decided by Chinmay,
+    2 October 2026; DEC-283, DEC-237). Allowed with a guardian-signed consent on the venue''s form; the
+    minor age per country and whether minors may be enrolled at all are the venue''s settings (`RegionSettings.minorAgeThreshold`,
     `VenueSettings.biometrics.allowMinors`); `setMinorGuardianAge` keeps the privacy rules per country
-    (CHG-SGU-004)."
+    (CHG-SGU-004).'
 - id: CMS-030
   name: Privacy Configuration Testing, Approval & Publication
   module: Policy
@@ -7712,11 +7722,11 @@ screens:
         label: Form kind
         bindsTo: FormDefinition.kind
         operation: setDigitalWaiverForm
-        notes: "**The consent-form builder (decided by Chinmay, 2 October 2026; DEC-549):** the existing
+        notes: '**The consent-form builder (decided by Chinmay, 2 October 2026; DEC-549):** the existing
           waiver builder extended, not a second builder. A form is a waiver or a `consentForm` with its
-          `consentPurposes` (facePass, faceTag, marketing, photography, waiver) (CHG-CSA-026). Venue Management's
+          `consentPurposes` (facePass, faceTag, marketing, photography, waiver) (CHG-CSA-026). Venue Management''s
           BO-747 is the same builder for the venue; Face Pass and Face Tag enrolment reference a consent
-          form by id (`VenueSettings.biometrics.consentFormId`, CHG-CSP-018) (CHG-SGU-014)."
+          form by id (`VenueSettings.biometrics.consentFormId`, CHG-CSP-018) (CHG-SGU-014).'
         provenance: corrected 2 October 2026 (CHG-SGU-014, decided by Chinmay 2 October 2026, DEC-549)
       - kind: toggle
         label: Guardian consent for minors
@@ -9201,10 +9211,10 @@ screens:
     page 31. 6 of 6 labels bound to a contract property; 16 of 40 pack bullets carried onto the screen
     — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
     the contracts rather than here.
-  notes: "**Minors (decided by Chinmay, 2 October 2026; DEC-237, superseding the GST-069 default):** a
-    child is enrolled or consents through a guardian on the venue's consent form; the minor age is set
+  notes: '**Minors (decided by Chinmay, 2 October 2026; DEC-237, superseding the GST-069 default):** a
+    child is enrolled or consents through a guardian on the venue''s consent form; the minor age is set
     per country (`RegionSettings.minorAgeThreshold`) and the venue can switch minors off (`VenueSettings.biometrics.allowMinors`);
-    the guardian links this screen sends go to that form (DEC-549) (CHG-SGU-004)."
+    the guardian links this screen sends go to that form (DEC-549) (CHG-SGU-004).'
 - id: CMS-055
   name: Waiver Verification & Validation Workspace
   module: Policy
@@ -10541,22 +10551,22 @@ screens:
       slot: fields
       components:
       - kind: selectField
-        label: 'Venue'
+        label: Venue
         provenance: corrected 2 October 2026 (CHG-SGU-023, design-notes correction)
         notes: e.g. Dubai Park
         bindsTo: MediaAsset.venueId
       - kind: selectField
-        label: 'Category'
+        label: Category
         provenance: corrected 2 October 2026 (CHG-SGU-023, design-notes correction)
         notes: e.g. Marketing
         bindsTo: MediaAsset.categoryId
       - kind: selectField
-        label: 'Campaign'
+        label: Campaign
         provenance: corrected 2 October 2026 (CHG-SGU-023, design-notes correction)
         notes: e.g. Summer 2026
         bindsTo: MediaAsset.tags
       - kind: selectField
-        label: 'Tags'
+        label: Tags
         provenance: corrected 2 October 2026 (CHG-SGU-023, design-notes correction)
         notes: e.g. Family, Outdoor
         bindsTo: MediaAsset.tags
@@ -14430,8 +14440,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /media-library/distribution-intelligence-ai-insights-optimization-cms-100
-    component: 
-      apps/venue-management-web/src/routes/media-library/DistributionIntelligenceAiInsightsOptimization.tsx
+    component: apps/venue-management-web/src/routes/media-library/DistributionIntelligenceAiInsightsOptimization.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -14879,6 +14888,8 @@ screens:
       trigger: 7 Publish
       provenance: authored 29 September, W12
       back: true
+      carries:
+      - version
     - to: CMS-015
       trigger: Roll back a version
       provenance: authored 29 September, W12 (CMS-015 handles rollback)
@@ -15104,6 +15115,8 @@ screens:
     - to: CMS-014
       trigger: Publish with the site
       provenance: authored 29 September, W12 (flows publish through publishTenantConfig)
+      carries:
+      - version
   notes: '**Added 29 September for W12: operators pick their ticketing flows, see which steps are required,
     optional or conditional, and set their own order.** The catalogue (`listBookingFlowTypes`) is the
     same for every tenant: dated day pass, timed entry, open-dated, seated (fixed performance, or date
@@ -15504,10 +15517,10 @@ screens:
         label: Show "Powered by TICVAI"
         bindsTo: BrandIdentity.showPoweredBy
         operation: setBrandIdentity
-        notes: "**A configuration toggle, on by default** (decided by Chinmay, 2 October 2026; DEC-160;
+        notes: '**A configuration toggle, on by default** (decided by Chinmay, 2 October 2026; DEC-160;
           CHG-CSA-036). The credit shows on the launch screen under the splash and at the foot of Account
-          (DI-250, DI-297); switching it off is refused 403 `powered-by-locked` unless the tenant's licence
-          carries the powered-by removal add-on, and the toggle says so (CHG-SGU-011)."
+          (DI-250, DI-297); switching it off is refused 403 `powered-by-locked` unless the tenant''s licence
+          carries the powered-by removal add-on, and the toggle says so (CHG-SGU-011).'
         provenance: corrected 2 October 2026 (CHG-SGU-011, decided by Chinmay 2 October 2026, DEC-160)
       - kind: detailPanel
         label: Credit shown

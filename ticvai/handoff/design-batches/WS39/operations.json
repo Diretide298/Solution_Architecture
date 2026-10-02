@@ -1,4 +1,23 @@
 {
+ "decidePricingRecommendation": {
+  "method": "POST",
+  "path": "/recommendation-review-decision/{recommendationId}/decision",
+  "contract": "catalogue",
+  "summary": "Record a human decision on an AI pricing recommendation",
+  "permission": "AI_APPROVE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "PricingRecommendationDecisionInput",
+  "responds": "PricingRecommendationDecision"
+ },
  "listCompetitorPricingMarket": {
   "method": "GET",
   "path": "/competitor-pricing-market",

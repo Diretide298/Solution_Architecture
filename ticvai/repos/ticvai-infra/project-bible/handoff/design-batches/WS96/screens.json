@@ -240,6 +240,13 @@
    "workshopBoard": "wireframes/WS124 Rental Management Board 9.dc.html#bo-574"
   },
   "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 109. 0 of 9 labels bound to a contract property; 19 of 26 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-004): No maintenance KPI read (counts by state, average downtime).",
+    "source": "contracts/satellite/maintenance.yaml#listWorkOrders"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -505,6 +512,12 @@
        "kind": "selectField",
        "label": "Priority",
        "provenance": "pack Rental_Management.pdf, page 111 §Configure"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Scheduled jobs",
+       "operation": "listWorkOrders",
+       "provenance": "contract maintenance.yaml GET /work-orders; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -535,6 +548,13 @@
      "listWorkOrders",
      "getDueMaintenance"
     ]
+   },
+   {
+    "operationId": "listWorkOrders",
+    "contract": "maintenance",
+    "purpose": "Scheduled work orders in the calendar window",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-001)"
    }
   ],
   "wireframe": {
@@ -543,6 +563,7 @@
    "workshopBoard": "wireframes/WS124 Rental Management Board 9.dc.html#bo-576"
   },
   "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 111. 0 of 0 labels bound to a contract property; 7 of 20 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {},
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -962,6 +983,29 @@
        "impliedBy": "startWorkOrder"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "components": [
+      {
+       "kind": "secondaryButton",
+       "label": "Pause",
+       "operation": "pauseWorkOrder",
+       "provenance": "contract maintenance.yaml POST /work-orders/{workOrderId}/pause; wiring fix, 2 October 2026"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Resume",
+       "operation": "resumeWorkOrder",
+       "provenance": "contract maintenance.yaml POST /work-orders/{workOrderId}/resume; wiring fix, 2 October 2026"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Add evidence",
+       "operation": "attachWorkOrderEvidence",
+       "provenance": "contract maintenance.yaml POST /work-orders/{workOrderId}/attachments; wiring fix, 2 October 2026"
+      }
+     ]
     }
    ]
   },
@@ -1001,6 +1045,27 @@
      "getWorkOrder",
      "listWorkOrders"
     ]
+   },
+   {
+    "operationId": "pauseWorkOrder",
+    "contract": "maintenance",
+    "purpose": "Stop work, with the reason that decides the state",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-001)"
+   },
+   {
+    "operationId": "resumeWorkOrder",
+    "contract": "maintenance",
+    "purpose": "Back to work",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-001)"
+   },
+   {
+    "operationId": "attachWorkOrderEvidence",
+    "contract": "maintenance",
+    "purpose": "Photos and documents of the repair",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-001)"
    }
   ],
   "wireframe": {
@@ -1017,6 +1082,36 @@
     }
    ]
   },
+  "overlays": [
+   {
+    "id": "formPauseWorkOrder",
+    "component": "modal",
+    "trigger": "Pause",
+    "body": "**Collects what `pauseWorkOrder` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Pause",
+     "operation": "pauseWorkOrder"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "contract maintenance.yaml POST /work-orders/{workOrderId}/pause; wiring fix, 2 October 2026"
+   },
+   {
+    "id": "formAttachWorkOrderEvidence",
+    "component": "modal",
+    "trigger": "Add evidence",
+    "body": "**Collects what `attachWorkOrderEvidence` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Add evidence",
+     "operation": "attachWorkOrderEvidence"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "contract maintenance.yaml POST /work-orders/{workOrderId}/attachments; wiring fix, 2 October 2026"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1422,6 +1517,17 @@
        "impliedBy": "submitInspection"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "components": [
+      {
+       "kind": "secondaryButton",
+       "label": "Return to service",
+       "operation": "setAssetStatus",
+       "provenance": "contract maintenance.yaml PUT /assets/{assetId}/status; wiring fix, 2 October 2026"
+      }
+     ]
     }
    ]
   },
@@ -1450,6 +1556,13 @@
      "getWorkOrder",
      "listWorkOrders"
     ]
+   },
+   {
+    "operationId": "setAssetStatus",
+    "contract": "maintenance",
+    "purpose": "Return the asset to service once the inspection passes",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-001)"
    }
   ],
   "wireframe": {
@@ -1463,9 +1576,29 @@
     {
      "name": "workOrderId",
      "from": "navigation"
+    },
+    {
+     "name": "assetId",
+     "from": "navigation"
     }
    ]
   },
+  "overlays": [
+   {
+    "id": "formSetAssetStatus",
+    "component": "modal",
+    "trigger": "Return to service",
+    "body": "**Collects what `setAssetStatus` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Return to service",
+     "operation": "setAssetStatus"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "contract maintenance.yaml PUT /assets/{assetId}/status; wiring fix, 2 October 2026"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",

@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Subscription & Licensing
   version: 0.1.0
-  x-ticvai-screen-count: 129
+  x-ticvai-screen-count: 128
   x-ticvai-tier: satellite
   x-ticvai-module: 20 — Subscription & Licensing Management
   x-ticvai-requirements: 59
@@ -71,6 +71,7 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-380 Customer & Organization Registration"
         - "P17 SGN-002 Customer & Organization Registration"
+        - "P17 SGN-020 Billing & Legal Entity Information"
       summary: A prospect signs themselves up
       description: 'BL-165. **The operator-led path assumes somebody at Softlabs decided this tenant exists.**
         This is the other one.
@@ -82,12 +83,20 @@ paths:
         will pay for, so conversion is a date change rather than a migration — and conversion is the moment
         least worth adding risk to.
 
+        **The billing entity is saved on the application** (Chinmay, 2 October, workbook Q223; CHG-CSA-030):
+        `billingEntity` carries the company to be invoiced and its documents before verification; nothing is
+        provisioned until it is verified.
+
         '
       tags:
       - subscription
       x-ticvai-permission: TENANT_CONFIGURE
+      security:
+      - bearerAuth: []
+      - prospectAuth: []
       x-ticvai-audience:
       - public
+      - prospect
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -115,7 +124,7 @@ paths:
     get:
       operationId: listVenueTypeTemplates
       x-ticvai-consumed-by:
-        - "P09 ADM-424 Module Activation & Dependency Validation"
+        - "P09 ADM-425 Venue Template Application"
       summary: Starting configurations by venue kind
       description: '**A water park and a theatre need different defaults**, and asking a prospect to configure
         300 settings from empty is asking them to leave.
@@ -255,7 +264,6 @@ paths:
       operationId: setChannelListing
       x-ticvai-consumed-by:
         - "P08 BO-013 Channel & Distribution"
-        - "P08 BO-601 Product, Pricing & Sales Channel Setup"
       summary: List a product on a channel, with its own allocation
       description: 'BL-076. **An OTA pulls a feed, caches it and sells against the cache**, so the gap
         between pushes is the oversell window and the allocation is the bound on it.
@@ -556,8 +564,6 @@ paths:
     get:
       operationId: listPartnerAgreements
       x-ticvai-consumed-by:
-        - "P09 ADM-008 Subscription & Plan Management"
-        - "P10 PTR-001 Partner Login / MFA"
         - "P10 PTR-011 Quote Management"
         - "P10 PTR-017 Commission Statement"
       x-ticvai-api-scope: partner.read
@@ -603,8 +609,6 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createPartnerAgreement
-      x-ticvai-consumed-by:
-        - "P09 ADM-008 Subscription & Plan Management"
       x-ticvai-audience:
       - staff
       summary: Agree commercial terms with a partner
@@ -652,8 +656,6 @@ paths:
         format: uuid
     patch:
       operationId: updatePartnerAgreement
-      x-ticvai-consumed-by:
-        - "P09 ADM-008 Subscription & Plan Management"
       x-ticvai-audience:
       - staff
       summary: Amend, suspend or terminate
@@ -836,6 +838,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-594 Environment Ready & Handoff to AI Setup"
         - "P09 ADM-002 Platform Dashboard"
+        - "P09 ADM-004 Platform Audit Log"
         - "P09 ADM-005 Tenant Directory"
         - "P09 ADM-006 Tenant Hierarchy Explorer"
         - "P09 ADM-007 Module & Feature Entitlement"
@@ -847,15 +850,116 @@ paths:
         - "P09 ADM-015 API Rate Limit & Quota Management"
         - "P09 ADM-016 White-Label Branding Management"
         - "P09 ADM-017 Domain & Certificate Management"
-        - "P09 ADM-018 Localisation & Language Pack"
+        - "P09 ADM-018 Interface Languages"
         - "P09 ADM-019 Global Configuration & Defaults"
+        - "P09 ADM-020 Platform User Directory"
+        - "P09 ADM-021 Platform Role Management"
+        - "P09 ADM-026 End-of-Support Notice Management"
         - "P09 ADM-031 Security & Compliance Dashboard"
         - "P09 ADM-037 AI Provider & Credentials"
+        - "P09 ADM-068 Tax, Fee & Calculation Command Center"
         - "P09 ADM-369 Commercial Command Center"
         - "P09 ADM-370 Customer Subscription & Commercial Portfolio"
         - "P09 ADM-374 Trial & Conversion Monitor"
+        - "P09 ADM-411 Billing & Legal Entity Information"
         - "P09 ADM-412 Payment Method & Settlement Setup"
+        - "P09 ADM-420 Tenant & Organization Provisioning"
         - "P09 ADM-421 Venue & Operational Structure Creation"
+        - "P09 ADM-422 Administrator & Security Initialization"
+        - "P09 ADM-424 Module Activation & Dependency Validation"
+        - "P09 ADM-425 Venue Template Application"
+        - "P09 ADM-426 Initial Configuration & Regional Defaults"
+        - "P09 ADM-469 AI Configuration Home & Start"
+        - "P09 ADM-470 Setup Type & Business Intent Discovery"
+        - "P09 ADM-471 Venue & Business Model Discovery"
+        - "P09 ADM-472 Guided Question & Answer Workspace"
+        - "P09 ADM-473 Product & Admission Model Discovery"
+        - "P09 ADM-474 Operational Requirement Discovery"
+        - "P09 ADM-475 Commercial Requirement Discovery"
+        - "P09 ADM-476 Required, Recommended & Optional Decisions"
+        - "P09 ADM-477 Missing Information & Clarification Center"
+        - "P09 ADM-478 Configuration Blueprint & Dependency Map"
+        - "P09 ADM-479 AI Configuration Build Command Center"
+        - "P09 ADM-480 Venue & Organization Configuration"
+        - "P09 ADM-481 Product Configuration Assistant"
+        - "P09 ADM-482 Schedule, Capacity & Availability Configuration"
+        - "P09 ADM-483 Pricing & Commercial Configuration"
+        - "P09 ADM-484 Promotion, Bundle & Upsell Configuration"
+        - "P09 ADM-485 Seating, Access & Operational Configuration"
+        - "P09 ADM-486 Channel, Media & Fulfillment Configuration"
+        - "P09 ADM-487 Cross-Module Conflict & Dependency Validation"
+        - "P09 ADM-488 Configuration Preview & Impact Analysis"
+        - "P09 ADM-489 AI Configuration Readiness Center"
+        - "P09 ADM-490 Configuration Validation Results"
+        - "P09 ADM-491 AI Recommendations & Best-Practice Review"
+        - "P09 ADM-492 Configuration Approval Workflow"
+        - "P09 ADM-493 AI Configuration Execution Center"
+        - "P09 ADM-494 Execution Progress & Dependency Monitor"
+        - "P09 ADM-495 Configuration Results & Object Mapping"
+        - "P09 ADM-496 Configuration Change & Modification Assistant"
+        - "P09 ADM-497 Configuration History, Versions & Rollback"
+        - "P09 ADM-498 AI Configuration Audit & Governance"
+        - "P09 ADM-499 Forecasting Command Center"
+        - "P09 ADM-500 Forecast Configuration & Forecasting Strategy"
+        - "P09 ADM-501 Forecast Data & Signal Configuration"
+        - "P09 ADM-502 Attendance & Visitation Forecast"
+        - "P09 ADM-503 Ticket, Product & Timeslot Demand Forecast"
+        - "P09 ADM-504 Channel & Booking Pace Forecast"
+        - "P09 ADM-505 Revenue & Commercial Forecast"
+        - "P09 ADM-506 Forecast Drivers, Confidence & Explainability"
+        - "P09 ADM-507 Forecast Scenario & What-If Simulator"
+        - "P09 ADM-508 Forecast Accuracy, Review & Publication Center"
+        - "P09 ADM-509 Operational Forecasting Command Center"
+        - "P09 ADM-510 Capacity & Occupancy Forecast"
+        - "P09 ADM-511 Attraction Utilization & Queue Forecast"
+        - "P09 ADM-512 Entry, Access & Guest Flow Forecast"
+        - "P09 ADM-513 Workforce Demand & Staffing Forecast"
+        - "P09 ADM-514 POS, Kiosk & Frontline Service Forecast"
+        - "P09 ADM-515 F&B, Retail & Inventory Demand Forecast"
+        - "P09 ADM-516 Resource, Equipment & Facility Requirement Forecast"
+        - "P09 ADM-517 Operational Scenario & Readiness Simulator"
+        - "P09 ADM-518 Operational Forecast Review, Recommendations & Handover"
+        - "P09 ADM-519 AI Governance Command Center"
+        - "P09 ADM-520 AI Capability Registry & Ownership"
+        - "P09 ADM-521 AI Risk Classification & Assessment"
+        - "P09 ADM-522 AI Autonomy Level Configuration"
+        - "P09 ADM-523 AI Action & Permission Policy Builder"
+        - "P09 ADM-524 AI Data Access & Usage Policy"
+        - "P09 ADM-525 Environment, Tenant & Scope Governance"
+        - "P09 ADM-526 AI Policy Conflict, Exception & Override Management"
+        - "P09 ADM-527 AI Policy Testing & Governance Simulation"
+        - "P09 ADM-528 AI Governance Policy Publication & Effective Policy Map"
+        - "P09 ADM-529 AI Human Oversight Command Center"
+        - "P09 ADM-530 AI Approval Requirement & Routing Configuration"
+        - "P09 ADM-531 AI Approval Review Workspace"
+        - "P09 ADM-532 Conditional Approval & Approval Conditions"
+        - "P09 ADM-533 Human Review, Challenge & AI Clarification Workspace"
+        - "P09 ADM-534 Escalation, Delegation & Approval SLA Management"
+        - "P09 ADM-535 Live AI Execution Oversight & Human Intervention"
+        - "P09 ADM-536 Human Override & Manual Control Center"
+        - "P09 ADM-537 Approval & Intervention History / Decision Timeline"
+        - "P09 ADM-538 Human Oversight Workflow Simulator & Readiness Center"
+        - "P09 ADM-539 AI Explainability & Audit Command Center"
+        - "P09 ADM-540 AI Decision Explorer & Search"
+        - "P09 ADM-541 AI Decision Explanation Workspace"
+        - "P09 ADM-542 Data, Feature & Evidence Provenance"
+        - "P09 ADM-543 Candidate, Rule & Decision Path Trace"
+        - "P09 ADM-544 Model, Provider & AI Runtime Trace"
+        - "P09 ADM-545 Governance, Approval & Human Decision Trace"
+        - "P09 ADM-546 Execution & Business Outcome Trace"
+        - "P09 ADM-547 AI Audit Record & Evidence Package"
+        - "P09 ADM-548 AI Trace Investigation & Replay Simulator"
+        - "P09 ADM-549 AI Governance Monitoring Command Center"
+        - "P09 ADM-550 AI Risk Register & Risk Exposure Management"
+        - "P09 ADM-551 AI Governance Control Library & Control Effectiveness"
+        - "P09 ADM-552 AI Policy Compliance & Violation Monitoring"
+        - "P09 ADM-553 AI Data, Privacy & Usage Compliance Monitoring"
+        - "P09 ADM-554 AI Quality, Behavior & Governance Drift Monitoring"
+        - "P09 ADM-555 AI Governance Alert & Detection Center"
+        - "P09 ADM-556 AI Incident & Remediation Management"
+        - "P09 ADM-557 AI Compliance, Assurance & Governance Reporting"
+        - "P09 ADM-558 AI Governance Review, Action Plan & Continuous Improvement"
+        - "P09 ADM-619 Reconciliation & Settlement Command Center"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -901,6 +1005,7 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-005 Tenant Directory"
         - "P09 ADM-419 Provisioning Command Center"
+        - "P09 ADM-420 Tenant & Organization Provisioning"
       x-ticvai-audience:
       - staff
       summary: Create a tenant
@@ -1227,12 +1332,15 @@ paths:
       operationId: listPlans
       x-ticvai-consumed-by:
         - "P09 ADM-008 Subscription & Plan Management"
-        - "P09 ADM-019 Global Configuration & Defaults"
         - "P09 ADM-392 Subscription Tier Configuration"
         - "P09 ADM-400 Commercial Model & Tier Selection"
         - "P17 SGN-012 Commercial Model & Tier Selection"
+      security:
+      - bearerAuth: []
+      - prospectAuth: []
       x-ticvai-audience:
       - staff
+      - prospect
       x-ticvai-read-routing: replica
       summary: List subscription plans
       description: '**Packages, standard and custom (decided 29 September, Chinmay).** With `offeredToTenantId`,
@@ -1277,7 +1385,6 @@ paths:
       operationId: createPlan
       x-ticvai-consumed-by:
         - "P09 ADM-008 Subscription & Plan Management"
-        - "P09 ADM-019 Global Configuration & Defaults"
         - "P09 ADM-392 Subscription Tier Configuration"
       x-ticvai-audience:
       - staff
@@ -1337,7 +1444,6 @@ paths:
       operationId: getPlan
       x-ticvai-consumed-by:
         - "P09 ADM-008 Subscription & Plan Management"
-        - "P09 ADM-019 Global Configuration & Defaults"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -1363,7 +1469,6 @@ paths:
       operationId: createPlanVersion
       x-ticvai-consumed-by:
         - "P09 ADM-008 Subscription & Plan Management"
-        - "P09 ADM-019 Global Configuration & Defaults"
         - "P09 ADM-398 Rule Versioning, Approval & Publication"
       x-ticvai-audience:
       - staff
@@ -1448,14 +1553,17 @@ paths:
       operationId: setSubscription
       x-ticvai-consumed-by:
         - "P09 ADM-008 Subscription & Plan Management"
-        - "P09 ADM-011 Licence & Seat Management"
         - "P09 ADM-410 Contract & Billing Cycle Selection"
         - "P09 ADM-417 Subscription Confirmation & Commercial Activation"
         - "P09 ADM-463 Subscription & Commercial Change Management"
         - "P17 SGN-019 Contract & Billing Cycle Selection"
         - "P17 SGN-024 Subscription Confirmation & Commercial Activation"
+      security:
+      - bearerAuth: []
+      - prospectAuth: []
       x-ticvai-audience:
       - staff
+      - prospect
       summary: Assign or change a subscription
       description: 'Upgrades take effect immediately. **Downgrades are checked first**: if the target
         plan licenses fewer modules than the tenant currently has enabled, or lower limits than they are
@@ -1545,8 +1653,12 @@ paths:
         - "P09 ADM-414 Order & Commercial Pricing Review"
         - "P09 ADM-463 Subscription & Commercial Change Management"
         - "P17 SGN-022 Order & Commercial Pricing Review"
+      security:
+      - bearerAuth: []
+      - prospectAuth: []
       x-ticvai-audience:
       - staff
+      - prospect
       summary: Preview the effect of a plan change
       description: 'What would change, what would break, and the prorated amount. Run before committing
         — an account manager should never discover a conflict by causing it.
@@ -1597,6 +1709,7 @@ paths:
         - "P09 ADM-012 Tenant Isolation & Resource Pool"
         - "P09 ADM-015 API Rate Limit & Quota Management"
         - "P09 ADM-422 Administrator & Security Initialization"
+        - "P09 ADM-424 Module Activation & Dependency Validation"
         - "P09 ADM-450 Entitlement & License Inventory"
       x-ticvai-audience:
       - staff
@@ -1786,11 +1899,9 @@ paths:
         - "P09 ADM-006 Tenant Hierarchy Explorer"
         - "P09 ADM-007 Module & Feature Entitlement"
         - "P09 ADM-008 Subscription & Plan Management"
-        - "P09 ADM-009 Tenant Billing & Invoicing"
         - "P09 ADM-010 Usage Metering"
         - "P09 ADM-011 Licence & Seat Management"
         - "P09 ADM-012 Tenant Isolation & Resource Pool"
-        - "P09 ADM-015 API Rate Limit & Quota Management"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -1884,10 +1995,7 @@ paths:
         - "P09 ADM-013 Tenant Performance Monitor"
         - "P09 ADM-014 Auto-Scaling Configuration"
         - "P09 ADM-029 Deployment Monitor"
-        - "P09 ADM-030 Infrastructure Sizing & Scaling Policy"
-        - "P09 ADM-032 WAF & Security Policy View"
         - "P09 ADM-033 Backup & DR Status"
-        - "P09 ADM-034 Archival Job Monitor"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -1913,13 +2021,6 @@ paths:
       operationId: updateCellTier
       x-ticvai-consumed-by:
         - "P09 ADM-003 Cross-Tenant Health Dashboard"
-        - "P09 ADM-013 Tenant Performance Monitor"
-        - "P09 ADM-014 Auto-Scaling Configuration"
-        - "P09 ADM-029 Deployment Monitor"
-        - "P09 ADM-030 Infrastructure Sizing & Scaling Policy"
-        - "P09 ADM-032 WAF & Security Policy View"
-        - "P09 ADM-033 Backup & DR Status"
-        - "P09 ADM-034 Archival Job Monitor"
       x-ticvai-audience:
       - staff
       summary: Change a cell's tier
@@ -1978,13 +2079,6 @@ paths:
       operationId: decommissionCell
       x-ticvai-consumed-by:
         - "P09 ADM-003 Cross-Tenant Health Dashboard"
-        - "P09 ADM-013 Tenant Performance Monitor"
-        - "P09 ADM-014 Auto-Scaling Configuration"
-        - "P09 ADM-029 Deployment Monitor"
-        - "P09 ADM-030 Infrastructure Sizing & Scaling Policy"
-        - "P09 ADM-032 WAF & Security Policy View"
-        - "P09 ADM-033 Backup & DR Status"
-        - "P09 ADM-034 Archival Job Monitor"
       x-ticvai-audience:
       - staff
       summary: Begin decommissioning a cell
@@ -2036,13 +2130,6 @@ paths:
       operationId: cancelDecommission
       x-ticvai-consumed-by:
         - "P09 ADM-003 Cross-Tenant Health Dashboard"
-        - "P09 ADM-013 Tenant Performance Monitor"
-        - "P09 ADM-014 Auto-Scaling Configuration"
-        - "P09 ADM-029 Deployment Monitor"
-        - "P09 ADM-030 Infrastructure Sizing & Scaling Policy"
-        - "P09 ADM-032 WAF & Security Policy View"
-        - "P09 ADM-033 Backup & DR Status"
-        - "P09 ADM-034 Archival Job Monitor"
       x-ticvai-audience:
       - staff
       summary: Halt a decommission
@@ -2099,9 +2186,6 @@ paths:
         - "P09 ADM-014 Auto-Scaling Configuration"
         - "P09 ADM-029 Deployment Monitor"
         - "P09 ADM-030 Infrastructure Sizing & Scaling Policy"
-        - "P09 ADM-032 WAF & Security Policy View"
-        - "P09 ADM-033 Backup & DR Status"
-        - "P09 ADM-034 Archival Job Monitor"
       x-ticvai-audience:
       - staff
       summary: Load against headroom
@@ -2491,10 +2575,7 @@ paths:
         - "P09 ADM-013 Tenant Performance Monitor"
         - "P09 ADM-014 Auto-Scaling Configuration"
         - "P09 ADM-029 Deployment Monitor"
-        - "P09 ADM-030 Infrastructure Sizing & Scaling Policy"
-        - "P09 ADM-032 WAF & Security Policy View"
         - "P09 ADM-033 Backup & DR Status"
-        - "P09 ADM-034 Archival Job Monitor"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -2533,10 +2614,7 @@ paths:
         - "P09 ADM-013 Tenant Performance Monitor"
         - "P09 ADM-014 Auto-Scaling Configuration"
         - "P09 ADM-029 Deployment Monitor"
-        - "P09 ADM-030 Infrastructure Sizing & Scaling Policy"
-        - "P09 ADM-032 WAF & Security Policy View"
-        - "P09 ADM-033 Backup & DR Status"
-        - "P09 ADM-034 Archival Job Monitor"
+        - "P09 ADM-419 Provisioning Command Center"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -2881,6 +2959,88 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /tenants/{tenantId}/billing-entity:
+    parameters:
+    - name: tenantId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    get:
+      operationId: getBillingEntity
+      x-ticvai-consumed-by:
+        - "P09 ADM-411 Billing & Legal Entity Information"
+      x-ticvai-audience:
+      - staff
+      x-ticvai-read-routing: replica
+      x-ticvai-agreed: '2 October: Chinmay, workbook Q209 (ADM-411); shape follows getTenant'
+      summary: The company TICVAI invoices for a tenant
+      description: 'The tenant''s billing entity with its documents and what is still missing (CHG-CSA-030).
+
+        '
+      tags:
+      - billing
+      x-ticvai-permission: PLATFORM_BILLING_VIEW
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: The billing entity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BillingEntity'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+    put:
+      operationId: setBillingEntity
+      x-ticvai-consumed-by:
+        - "P09 ADM-411 Billing & Legal Entity Information"
+      x-ticvai-audience:
+      - staff
+      x-ticvai-agreed: '2 October: Chinmay, workbook Q209 and Q210 (ADM-411); shape follows the billing operations'
+      summary: Set the company TICVAI invoices for a tenant
+      description: '**A new billing-entity record in the subscription contract** (Chinmay, 2 October, workbook Q209;
+        CHG-CSA-030). Replaces the tenant''s billing entity whole. A trade licence is always required; a VAT
+        certificate is required once a `trn` is entered (workbook Q210); a country may require more (tenancy
+        `RegionSettings`). Missing documents do not refuse the save; they are listed in `missingDocuments`, and
+        invoicing waits on them.
+
+        '
+      tags:
+      - billing
+      x-ticvai-permission: PLATFORM_BILLING_MANAGE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BillingEntity'
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Saved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BillingEntity'
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /tenants/{tenantId}/invoices:
@@ -3251,7 +3411,6 @@ paths:
     post:
       operationId: createPartnerQuote
       x-ticvai-consumed-by:
-        - "P09 ADM-408 Final Package Approval & Handoff"
         - "P10 PTR-011 Quote Management"
       x-ticvai-api-scope: partner.write
       x-ticvai-audience:
@@ -3717,7 +3876,6 @@ paths:
       operationId: listMembershipCommercialPricing
       x-ticvai-consumed-by:
         - "P08 BO-291 Membership Commercial, Pricing & Channel Association"
-        - "P09 ADM-048 Commercial Pricing Command Center"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Membership___Annual_Pass_Management_Reference.pdf'' pp.14-15 (13.1.8
@@ -3790,7 +3948,6 @@ paths:
       operationId: setRenewalAutoMembership
       x-ticvai-consumed-by:
         - "P08 BO-292 Renewal, Auto-Renewal & Membership Continuity Configuration"
-        - "P09 ADM-464 Renewal Management Center"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Membership___Annual_Pass_Management_Reference.pdf'' pp.15-16 (13.1.9
@@ -3844,7 +4001,6 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-284 Membership & Annual Pass Command Center"
         - "P08 BO-293 Membership Product Validation, Approval, Publication & Versioning"
-        - "P08 BO-503 Product Validation, Approval & Publication"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Membership___Annual_Pass_Management_Reference.pdf'' pp.17-18 (13.1.10
@@ -4442,8 +4598,6 @@ paths:
       operationId: listRenewalAuto
       x-ticvai-consumed-by:
         - "P08 BO-300 Renewal Operations & Auto-Renewal Management"
-        - "P09 ADM-376 Commercial Optimization & Expansion Opportunities"
-        - "P09 ADM-464 Renewal Management Center"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Membership___Annual_Pass_Management_Reference.pdf'' pp.30-31 (13.2.7
@@ -4734,7 +4888,6 @@ paths:
       operationId: listMembershipRenewalRetention
       x-ticvai-consumed-by:
         - "P08 BO-303 Membership Analytics, Renewal Intelligence & AI Retention Center"
-        - "P09 ADM-375 Renewal & Retention Center"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Membership___Annual_Pass_Management_Reference.pdf'' pp.35-37 (13.2.10
@@ -5249,10 +5402,11 @@ paths:
     get:
       operationId: listTerritoryMarketDistribution
       x-ticvai-consumed-by:
-        - "P10 PTR-026 Territory, Market & Distribution Rights"
+        - "P08 PTR-026 Territory, Market & Distribution Rights"
       x-ticvai-api-scope: partner.read
       x-ticvai-audience:
       - partner
+      - staff
       x-ticvai-agreed: '29 September: pack ''B2B, Reseller & OTA Partner Management_Reference.pdf'' pp.12-14
         (Territory Configuration, Distribution Rights, Example, Exclusivity, Sub-Agent Rights, Effective Dates,
         Conflict Detection); MoM 31 Aug 2026 §4.3 (territory/market and distribution rights define which regions
@@ -5271,7 +5425,7 @@ paths:
         above it; overlapping exclusive rights for the same market and period are rejected on save.'
       tags:
       - drafted
-      x-ticvai-permission: PLATFORM_TENANT_VIEW
+      x-ticvai-permission: PARTNER_VIEW
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -5476,10 +5630,11 @@ paths:
     get:
       operationId: listPartnerAccessRole
       x-ticvai-consumed-by:
-        - "P10 PTR-029 Partner Access, Roles & Permission Profile"
+        - "P08 PTR-029 Partner Access, Roles & Permission Profile"
       x-ticvai-api-scope: partner.read
       x-ticvai-audience:
       - partner
+      - staff
       x-ticvai-agreed: '29 September: pack ''B2B, Reseller & OTA Partner Management_Reference.pdf'' pp.16-18
         (Organization-Level Capabilities, Partner-Level vs User-Level, Sensitive Functions, Effective Dates);
         MoM 31 Aug 2026 §4.3 (partner access controls define which actions a partner may perform, e.g. refund,
@@ -5497,7 +5652,7 @@ paths:
         p.17); sensitive functions may need internal approval through the approvals engine.'
       tags:
       - drafted
-      x-ticvai-permission: PLATFORM_TENANT_VIEW
+      x-ticvai-permission: PARTNER_VIEW
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -5842,8 +5997,12 @@ paths:
         - "P10 PTR-033 Agreement & Contract Terms Builder"
         - "P17 SGN-023 Commercial Agreement, Billable Definition & Customer Acceptance"
       x-ticvai-api-scope: partner.write
+      security:
+      - bearerAuth: []
+      - prospectAuth: []
       x-ticvai-audience:
       - partner
+      - prospect
       x-ticvai-agreed: '29 September: pack ''B2B, Reseller & OTA Partner Management_Reference.pdf'' pp.25-27
         (Agreement Information, Agreement Types, Contract Terms, Renewal, Document Association, Versioning);
         MoM 31 Aug 2026 §4.4 (each agreement captures term/value; three payment models); shape follows createPartnerAgreement/updatePartnerAgreement
@@ -5944,10 +6103,11 @@ paths:
     get:
       operationId: listCommissionMarginIncentive
       x-ticvai-consumed-by:
-        - "P10 PTR-035 Commission, Margin & Incentive Management"
+        - "P08 PTR-035 Commission, Margin & Incentive Management"
       x-ticvai-api-scope: partner.read
       x-ticvai-audience:
       - partner
+      - staff
       x-ticvai-agreed: '29 September: pack ''B2B, Reseller & OTA Partner Management_Reference.pdf'' pp.29-30
         (Commission Models, Example Tier, Configuration Dimensions, Incentives, Margin Visibility, Conflict
         Detection, AI Capability); MoM 31 Aug 2026 §4.4 (commission rate a partner earns per ticket sold); shape
@@ -5964,7 +6124,7 @@ paths:
         rules are flagged; AI analysis of commission against incremental sales is advisory.'
       tags:
       - drafted
-      x-ticvai-permission: PLATFORM_TENANT_VIEW
+      x-ticvai-permission: PARTNER_VIEW
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -6021,10 +6181,11 @@ paths:
     get:
       operationId: listCreditLimitExposure
       x-ticvai-consumed-by:
-        - "P10 PTR-036 Credit Limit & Exposure Management"
+        - "P08 PTR-036 Credit Limit & Exposure Management"
       x-ticvai-api-scope: partner.read
       x-ticvai-audience:
       - partner
+      - staff
       x-ticvai-agreed: '29 September: pack ''B2B, Reseller & OTA Partner Management_Reference.pdf'' pp.30-32
         (Credit Profile, Real-Time Exposure, Credit Utilization, Thresholds, Credit Actions, Temporary Credit,
         Booking Validation, AI Capability); MoM 31 Aug 2026 §4.4 (payment model 1: sells up to an approved credit
@@ -6044,7 +6205,7 @@ paths:
         only if transaction amount + exposure <= available credit unless an approved exception exists (approveBookingLimitCommercial).'
       tags:
       - drafted
-      x-ticvai-permission: PLATFORM_TENANT_VIEW
+      x-ticvai-permission: PARTNER_VIEW
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -6103,10 +6264,11 @@ paths:
     get:
       operationId: listDepositGuaranteeFinancial
       x-ticvai-consumed-by:
-        - "P10 PTR-037 Deposit, Guarantee & Financial Security Management"
+        - "P08 PTR-037 Deposit, Guarantee & Financial Security Management"
       x-ticvai-api-scope: partner.read
       x-ticvai-audience:
       - partner
+      - staff
       x-ticvai-agreed: '29 September: pack ''B2B, Reseller & OTA Partner Management_Reference.pdf'' pp.32-33
         (Security Types, Security Record, Coverage Analysis, Alerts, Rules); MoM 31 Aug 2026 §4.4 (payment model
         2: prepayment/advance wallet balance)'
@@ -6123,7 +6285,7 @@ paths:
         its expiryAction automatically.'
       tags:
       - drafted
-      x-ticvai-permission: PLATFORM_TENANT_VIEW
+      x-ticvai-permission: PARTNER_VIEW
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -6249,10 +6411,11 @@ paths:
     get:
       operationId: listCommercialAllocationQuota
       x-ticvai-consumed-by:
-        - "P10 PTR-039 Commercial Allocation, Quota & Commitment Management"
+        - "P08 PTR-039 Commercial Allocation, Quota & Commitment Management"
       x-ticvai-api-scope: partner.read
       x-ticvai-audience:
       - partner
+      - staff
       x-ticvai-agreed: '29 September: pack ''B2B, Reseller & OTA Partner Management_Reference.pdf'' pp.35-36
         and p.41 (Allocation Models, Configuration, Example, Commitment Rules, Performance, Integration, AI
         Capability; Critical architecture distinction); MoM 31 Aug 2026 §4.4 (a defined quantity of inventory
@@ -6271,7 +6434,7 @@ paths:
         manually per releaseMode; AI under-utilisation flags are advisory.'
       tags:
       - drafted
-      x-ticvai-permission: PLATFORM_TENANT_VIEW
+      x-ticvai-permission: PARTNER_VIEW
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -7000,10 +7163,11 @@ paths:
     get:
       operationId: listPartnerReconciliationException
       x-ticvai-consumed-by:
-        - "P10 PTR-047 Partner Reconciliation & Exception Management"
+        - "P08 PTR-047 Partner Reconciliation & Exception Management"
       x-ticvai-api-scope: partner.read
       x-ticvai-audience:
       - partner
+      - staff
       x-ticvai-agreed: '29 September: pack ''B2B, Reseller & OTA Partner Management_Reference.pdf'' pp.52-54
         (Reconciliation Sources, Reconciliation Dashboard, Example, Exception Types, Resolution Workflow, AI
         Capability); MoM 31 Aug 2026 §4.5 (reconciliation/exception management, e.g. manual postings or unsettled
@@ -7022,7 +7186,7 @@ paths:
         suggestions are advisory.'
       tags:
       - drafted
-      x-ticvai-permission: PLATFORM_TENANT_VIEW
+      x-ticvai-permission: PARTNER_VIEW
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -7090,10 +7254,11 @@ paths:
     get:
       operationId: listCommissionCalculationSettlement
       x-ticvai-consumed-by:
-        - "P10 PTR-048 Commission Calculation & Settlement Management"
+        - "P08 PTR-048 Commission Calculation & Settlement Management"
       x-ticvai-api-scope: partner.read
       x-ticvai-audience:
       - partner
+      - staff
       x-ticvai-agreed: '29 September: pack ''B2B, Reseller & OTA Partner Management_Reference.pdf'' pp.54-55
         (Settlement Dashboard, Calculation Record, Settlement Period, Adjustments, Settlement Workflow, Settlement
         Batch, Important Boundary); MoM 31 Aug 2026 §4.4 (commission per ticket) and §4.5; shape follows CommissionStatement
@@ -7111,7 +7276,7 @@ paths:
         until the lines and adjustments are reconciled; posting and payment execution belong to Finance.'
       tags:
       - drafted
-      x-ticvai-permission: PLATFORM_TENANT_VIEW
+      x-ticvai-permission: PARTNER_VIEW
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -7537,7 +7702,6 @@ paths:
       operationId: scoreVsiAssessment
       x-ticvai-consumed-by:
         - "P09 ADM-372 Operational Profile, VSI & Commercial Model Intelligence"
-        - "P09 ADM-379 Welcome & Start Your TICVAI Journey"
         - "P09 ADM-381 Venue Type & Business Profile"
         - "P09 ADM-382 Visitor, Capacity & Operational Scale"
         - "P09 ADM-383 Sales Channel Assessment"
@@ -7546,7 +7710,6 @@ paths:
         - "P09 ADM-386 Additional Business Module Assessment"
         - "P09 ADM-387 Integration, Payment & Technical Readiness"
         - "P09 ADM-388 AI Assessment Summary & Handoff"
-        - "P17 SGN-001 Welcome & Start Your TICVAI Journey"
         - "P17 SGN-003 Venue Type & Business Profile"
         - "P17 SGN-004 Visitor, Capacity & Operational Scale"
         - "P17 SGN-005 Sales Channel Assessment"
@@ -7555,6 +7718,10 @@ paths:
         - "P17 SGN-008 Additional Business Module Assessment"
         - "P17 SGN-009 Integration, Payment & Technical Readiness"
         - "P17 SGN-010 AI Assessment Summary & Handoff"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
+      - prospectAuth: []
       summary: Score a prospect's answers into a tier and a package
       description: 'Board 2, all ten screens of it — venue type, visitor scale, channels, ticketing
         needs, access and queue, additional modules, integrations.
@@ -7571,6 +7738,7 @@ paths:
       x-ticvai-audience:
       - staff
       - guest
+      - prospect
       x-ticvai-scope-level: platform
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
@@ -7670,11 +7838,19 @@ paths:
         - "P09 ADM-403 Module Detail & Commercial Treatment"
         - "P09 ADM-404 Module Dependency & Compatibility Manager"
         - "P09 ADM-423 License & Entitlement Activation"
+        - "P09 ADM-424 Module Activation & Dependency Validation"
         - "P17 SGN-008 Additional Business Module Assessment"
         - "P17 SGN-013 Module Marketplace"
         - "P17 SGN-014 AI Module & Package Recommendations"
         - "P17 SGN-015 Module Detail & Commercial Treatment"
         - "P17 SGN-016 Module Dependency & Compatibility Manager"
+      # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
+      # or staff token is still accepted. `{}` makes the credential optional.
+      security:
+      - {}
+      - guestAuth: []
+      - bearerAuth: []
+      - prospectAuth: []
       summary: Modules, their dependencies and their commercial treatment
       description: 'Boards 4.3 and 4.6. **A module marketplace without a dependency graph sells
         combinations that cannot be provisioned.** F&B needs inventory; seating needs the venue map;
@@ -7689,6 +7865,7 @@ paths:
       x-ticvai-audience:
       - staff
       - guest
+      - prospect
       x-ticvai-scope-level: platform
       x-ticvai-read-routing: replica
       responses:
@@ -7704,9 +7881,6 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setModuleListing
-      x-ticvai-consumed-by:
-        - "P09 ADM-404 Module Dependency & Compatibility Manager"
-        - "P17 SGN-016 Module Dependency & Compatibility Manager"
       summary: Define a module's dependencies, incompatibilities and price
       tags:
       - subscription
@@ -7749,6 +7923,10 @@ paths:
         - "P09 ADM-466 Commercial Scenario Simulator"
         - "P17 SGN-011 Recommended Package Overview"
         - "P17 SGN-012 Commercial Model & Tier Selection"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
+      - prospectAuth: []
       summary: What this package would cost, and what it would provision
       description: 'Boards 3.9, 4.8 and 10.8. **Four boards ask for a simulator, which is the pack
         saying the model is too complex to hold in a head.** Tier, allowances, billable unit, minimum
@@ -7766,6 +7944,7 @@ paths:
       x-ticvai-audience:
       - staff
       - guest
+      - prospect
       x-ticvai-scope-level: platform
       requestBody:
         required: true
@@ -7788,10 +7967,7 @@ paths:
     put:
       operationId: setTrialConfiguration
       x-ticvai-consumed-by:
-        - "P09 ADM-374 Trial & Conversion Monitor"
-        - "P09 ADM-409 Purchase / Trial Journey Selection"
         - "P09 ADM-413 Trial Configuration & Conversion Rules"
-        - "P17 SGN-018 Purchase / Trial Journey Selection"
       summary: What a trial includes, how long it lasts and how it converts
       description: 'Board 5.5. **A trial that expires with no conversion path is a tenant full of a
         customer''s real data that nobody can bill.** So the configuration states the conversion
@@ -7927,6 +8103,7 @@ paths:
     get:
       operationId: getLicenceEnforcement
       x-ticvai-consumed-by:
+        - "P09 ADM-377 Subscription Exceptions & Commercial Alerts"
         - "P09 ADM-378 Executive AI Commercial Intelligence"
         - "P09 ADM-452 Operational Usage & Threshold Monitor"
         - "P09 ADM-454 Minimum Guarantee & Variable Consumption Monitor"
@@ -8013,8 +8190,12 @@ paths:
       tags:
       - subscription
       x-ticvai-permission: PLATFORM_BILLING_MANAGE
+      security:
+      - bearerAuth: []
+      - prospectAuth: []
       x-ticvai-audience:
       - staff
+      - prospect
       x-ticvai-scope-level: platform
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
@@ -8459,7 +8640,7 @@ paths:
     put:
       operationId: setPartnerDistributionRights
       x-ticvai-consumed-by:
-        - "P10 PTR-026 Territory, Market & Distribution Rights"
+        - "P08 PTR-026 Territory, Market & Distribution Rights"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: writers pass; DM4 (control.partner_distribution_right had no writer; listTerritoryMarketDistribution
@@ -8541,7 +8722,7 @@ paths:
     put:
       operationId: setPartnerCapabilityGrants
       x-ticvai-consumed-by:
-        - "P10 PTR-029 Partner Access, Roles & Permission Profile"
+        - "P08 PTR-029 Partner Access, Roles & Permission Profile"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: writers pass; DM4 (control.partner_capability_grant had no writer; listPartnerAccessRole
@@ -8627,7 +8808,7 @@ paths:
     put:
       operationId: setPartnerCommissionRules
       x-ticvai-consumed-by:
-        - "P10 PTR-035 Commission, Margin & Incentive Management"
+        - "P08 PTR-035 Commission, Margin & Incentive Management"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: writers pass; DM4 (control.partner_commission_rule and its tiers had no
@@ -8712,7 +8893,7 @@ paths:
     put:
       operationId: setPartnerCreditProfile
       x-ticvai-consumed-by:
-        - "P10 PTR-036 Credit Limit & Exposure Management"
+        - "P08 PTR-036 Credit Limit & Exposure Management"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: writers pass; DM4 (control.partner_credit_profile had no writer; listCreditLimitExposure
@@ -8780,7 +8961,7 @@ paths:
     put:
       operationId: setPartnerSecurity
       x-ticvai-consumed-by:
-        - "P10 PTR-037 Deposit, Guarantee & Financial Security Management"
+        - "P08 PTR-037 Deposit, Guarantee & Financial Security Management"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: writers pass; DM4 (control.partner_security had no writer; listDepositGuaranteeFinancial
@@ -8849,7 +9030,7 @@ paths:
     put:
       operationId: setPartnerAllocations
       x-ticvai-consumed-by:
-        - "P10 PTR-039 Commercial Allocation, Quota & Commitment Management"
+        - "P08 PTR-039 Commercial Allocation, Quota & Commitment Management"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: writers pass; DM4 (control.partner_allocation had no writer; listCommercialAllocationQuota
@@ -9006,7 +9187,7 @@ paths:
     post:
       operationId: actOnPartnerReconciliationException
       x-ticvai-consumed-by:
-        - "P10 PTR-047 Partner Reconciliation & Exception Management"
+        - "P08 PTR-047 Partner Reconciliation & Exception Management"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: writers pass; DM4 (control.partner_reconciliation_exception had no owner
@@ -9113,7 +9294,7 @@ paths:
     post:
       operationId: actOnPartnerCommissionLine
       x-ticvai-consumed-by:
-        - "P10 PTR-048 Commission Calculation & Settlement Management"
+        - "P08 PTR-048 Commission Calculation & Settlement Management"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: writers pass; DM4 (control.partner_commission_line is written by the commission
@@ -9203,7 +9384,7 @@ paths:
     post:
       operationId: actOnPartnerSettlementBatch
       x-ticvai-consumed-by:
-        - "P10 PTR-048 Commission Calculation & Settlement Management"
+        - "P08 PTR-048 Commission Calculation & Settlement Management"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: writers pass; DM4 (control.partner_settlement_batch is created by the settlement
@@ -11161,6 +11342,95 @@ components:
           type: string
           format: uuid
           nullable: true
+        billingEntity:
+          $ref: '#/components/schemas/BillingEntity'
+          description: '**The company to be invoiced, saved on the application before verification** (Chinmay,
+            2 October, workbook Q209 and Q223; CHG-CSA-030). Nothing is provisioned until the application is verified;
+            on provisioning it becomes the tenant''s billing entity (`getBillingEntity`).'
+    BillingEntity:
+      type: object
+      x-ticvai-persistence: control.billing_entity
+      description: '**The company TICVAI invoices for a tenant, with its trade licence and VAT certificate** (Chinmay,
+        2 October, workbook Q209: "a new billing-entity record in the subscription contract"; DI-830; CHG-CSA-030).
+        One per tenant, mastered in the control plane. `legalName` and `countryCode` are required on save (400
+        otherwise); they are not marked required here so the record can ride, optional, on an onboarding
+        application. **Documents** (workbook Q210, the default): a trade licence always; a VAT certificate when a
+        `trn` is entered. Which documents a country requires is configurable per country (tenancy `RegionSettings`);
+        the default is that rule.'
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        tenantId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          description: Null while it rides on an onboarding application.
+        legalName:
+          type: string
+          maxLength: 300
+        tradeLicenceNumber:
+          type: string
+          maxLength: 100
+          nullable: true
+        trn:
+          type: string
+          maxLength: 30
+          nullable: true
+          description: The tax registration number; entering one makes the VAT certificate required.
+        countryCode:
+          type: string
+          minLength: 2
+          maxLength: 2
+        address:
+          type: string
+          maxLength: 1000
+          nullable: true
+        invoiceEmail:
+          type: string
+          format: email
+          nullable: true
+        documents:
+          x-ticvai-persistence-kind: valueObject
+          x-ticvai-persistence-column: jsonb
+          type: array
+          description: The trade licence and, where a TRN is entered, the VAT certificate, each a stored file
+            with its verification.
+          items:
+            type: object
+            properties:
+              documentType:
+                type: string
+                enum:
+                - tradeLicence
+                - vatCertificate
+              fileRef:
+                type: string
+                nullable: true
+              expiryDate:
+                type: string
+                format: date
+                nullable: true
+              verificationStatus:
+                type: string
+                enum:
+                - missing
+                - uploaded
+                - verified
+                - rejected
+                - expired
+        missingDocuments:
+          type: array
+          readOnly: true
+          description: The documents the country's rule requires that are not yet uploaded and verified.
+          items:
+            type: string
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
     VenueTypeTemplate:
       type: object
       x-ticvai-persistence: control.venue_type_template
@@ -15075,6 +15345,14 @@ components:
       - licensedModules
       - limits
       properties:
+        poweredByRemovable:
+          type: boolean
+          readOnly: true
+          default: false
+          description: '**Whether the tenant''s licence lets it switch "Powered by TICVAI" off** (Chinmay, 2 October,
+            workbook Q160 and the pre-apply round; CHG-CSA-036). False by default; true where TICVAI sold the tenant
+            the add-on keyed `poweredByRemoval` (`addLicenceAddOn`). White label''s `setBrandIdentity` refuses
+            `showPoweredBy` false while this is false.'
         tenantId:
           type: string
           format: uuid
@@ -24693,6 +24971,11 @@ components:
           format: date-time
           description: Generated at
   securitySchemes:
+    prospectAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Prospect sign-up session token (common.yaml prospectAuth). Scoped to one onboarding application; DEC-167, CHG-CLN-010.
     serviceAuth:
       type: http
       scheme: bearer

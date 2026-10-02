@@ -1,4 +1,257 @@
 {
+ "Game": {
+  "x-ticvai-persistence": "games.game",
+  "type": "object",
+  "required": [
+   "id",
+   "code",
+   "name",
+   "venueId",
+   "creditCost",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string",
+    "maxLength": 64
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "zone": {
+    "type": "string",
+    "nullable": true
+   },
+   "assetId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The machine. Taken out of service by maintenance, the game stops accepting play rather than swallowing credits.\n"
+   },
+   "readerId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "creditCost": {
+    "type": "integer",
+    "minimum": 1
+   },
+   "minPointsAwarded": {
+    "type": "integer"
+   },
+   "maxPointsAwarded": {
+    "type": "integer"
+   },
+   "heightRequirementCm": {
+    "type": "integer",
+    "nullable": true
+   },
+   "status": {
+    "$ref": "#/components/schemas/GameStatus"
+   },
+   "playsToday": {
+    "type": "integer"
+   },
+   "creditsTakenToday": {
+    "type": "integer"
+   },
+   "pointsAwardedToday": {
+    "type": "integer"
+   }
+  }
+ },
+ "GamePricing": {
+  "type": "object",
+  "x-ticvai-persistence": "games.pricing",
+  "description": "Board 5. **Priority is explicit**, because evaluation order is not a decision anybody made.\n`groupPricing`, `peakPricing` and `calendarExceptions` are stored one row per entry in `games.pricing_exception` (`GamePricingException`); the rest of this shape is `games.pricing`.\n",
+  "properties": {
+   "gameId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "standardPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "vipPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "groupPricing": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "minimumPlayers": {
+       "type": "integer"
+      },
+      "pricePerPlayer": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      }
+     }
+    }
+   },
+   "peakPricing": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "daysOfWeek": {
+       "type": "array",
+       "items": {
+        "type": "string"
+       }
+      },
+      "from": {
+       "type": "string"
+      },
+      "to": {
+       "type": "string"
+      },
+      "price": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      }
+     }
+    }
+   },
+   "calendarExceptions": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "date": {
+       "type": "string",
+       "format": "date"
+      },
+      "price": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "closed": {
+       "type": "boolean",
+       "default": false
+      }
+     }
+    }
+   },
+   "retryPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "retryWindowSeconds": {
+    "type": "integer",
+    "nullable": true,
+    "description": "How long after the game ends the retry offer stays open."
+   },
+   "retryOfferLeadSeconds": {
+    "type": "integer",
+    "minimum": 0,
+    "nullable": true,
+    "description": "**When the retry offer appears** (Chinmay, 2 October, workbook Q410, default accepted; DI-877; CHG-CSA-028): this many seconds before the game ends, and it stays open `retryWindowSeconds` after. A retry is charged in money at `retryPrice`, never from an entitlement; a retry after a machine fault is the reader's `retryPricing`, not this."
+   },
+   "priority": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "calendarException",
+      "peak",
+      "group",
+      "vip",
+      "retry",
+      "standard"
+     ]
+    }
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "GameStatus": {
+  "type": "string",
+  "enum": [
+   "inService",
+   "outOfService",
+   "maintenance",
+   "retired"
+  ]
+ },
+ "GameplayTransaction": {
+  "type": "object",
+  "x-ticvai-persistence": "games.gameplay_transaction",
+  "description": "Boards 8.2 and 8.5. **The refused ones are the valuable half.**",
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "readerId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "gameId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "cardId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "at": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "outcome": {
+    "type": "string",
+    "enum": [
+     "allowed",
+     "refused",
+     "reversed"
+    ]
+   },
+   "reason": {
+    "type": "string",
+    "nullable": true
+   },
+   "amount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "chargedFrom": {
+    "type": "string",
+    "nullable": true
+   },
+   "entitlementId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "ticketsEarned": {
+    "type": "integer",
+    "nullable": true
+   },
+   "decidedOffline": {
+    "type": "boolean",
+    "default": false
+   },
+   "syncedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
  "Page": {
   "type": "object",
   "required": [
@@ -187,96 +440,90 @@
    }
   }
  },
- "RedemptionAnalyticsAuditAiOptimizationView": {
+ "Reader": {
   "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
-  "description": "**What Redemption Analytics, Audit & AI Optimization displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "x-ticvai-persistence": "games.reader",
+  "description": "Board 2. **A `tenancy` device with a game configuration on it.**",
+  "required": [
+   "deviceId"
+  ],
   "properties": {
-   "codesGenerated": {
+   "deviceId": {
     "type": "string",
-    "description": "Codes generated"
+    "format": "uuid",
+    "description": "`tenancy.RegisteredDevice`. **Enrolment, firmware and tamper state live there.**\n"
    },
-   "codesDistributed": {
+   "gameId": {
     "type": "string",
-    "description": "Codes distributed"
+    "format": "uuid",
+    "nullable": true
    },
-   "codesRedeemed": {
+   "readerProfileId": {
     "type": "string",
-    "description": "Codes redeemed"
+    "format": "uuid",
+    "nullable": true
    },
-   "redemptionRate": {
-    "type": "number",
-    "description": "Redemption rate"
+   "acceptedCreditTypeIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
    },
-   "conversionRate": {
-    "type": "number",
-    "description": "Conversion rate"
+   "acceptsDirectPay": {
+    "type": "boolean",
+    "default": false
    },
-   "revenueGenerated": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Revenue generated"
-   },
-   "discountGranted": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Discount granted"
-   },
-   "incrementalRevenue": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Incremental revenue"
-   },
-   "aovUplift": {
-    "type": "number",
-    "description": "AOV uplift"
-   },
-   "costPerRedemption": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Cost per redemption"
-   },
-   "marginImpact": {
-    "type": "number",
-    "description": "Margin impact"
-   },
-   "expiredUnusedCodes": {
+   "retapDelaySeconds": {
     "type": "integer",
-    "description": "Expired unused codes"
+    "default": 3,
+    "description": "**The setting that stops a guest paying twice for one go.** A wristband held against a reader for a second and a half is two taps to the hardware and one intention to the guest.\n"
    },
-   "user": {
-    "type": "string",
-    "description": "User"
+   "displayRules": {
+    "type": "object",
+    "properties": {
+     "freeGameGlow": {
+      "type": "boolean",
+      "default": true,
+      "description": "**What tells a guest their entitlement was used rather than their money.** Without it the complaint arrives at the desk.\n"
+     },
+     "showBalance": {
+      "type": "boolean",
+      "default": true
+     },
+     "showPrice": {
+      "type": "boolean",
+      "default": true
+     },
+     "themeCode": {
+      "type": "string",
+      "nullable": true
+     },
+     "languages": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      }
+     }
+    }
    },
-   "timestamp": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Timestamp"
+   "ioMapping": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "Board 9.6. Which output starts the game, which input reports it finished. **Deliberately open.** The keys are the reader model's own I/O lines, so the shape belongs to the vendor adaptor for that model (game readers are a driver, not a build — ADR-0012, ADR-0015), not to this contract.\n"
    },
-   "previousValue": {
-    "type": "string",
-    "description": "Previous value"
-   },
-   "newValue": {
-    "type": "integer",
-    "description": "New value"
-   },
-   "reason": {
-    "type": "string",
-    "description": "Reason"
-   },
-   "approvalReference": {
-    "type": "string",
-    "description": "Approval reference"
-   },
-   "auditEvent": {
+   "status": {
     "type": "string",
     "enum": [
-     "created",
-     "modified",
-     "assigned",
-     "suspended",
-     "reactivated",
-     "cancelled"
-    ],
-    "description": "Code audit event."
+     "unconfigured",
+     "active",
+     "offline",
+     "maintenance",
+     "disabled"
+    ]
+   },
+   "scopePath": {
+    "type": "string"
    }
   }
  },
@@ -500,5 +747,77 @@
     "nullable": true
    }
   }
+ },
+ "WalletTransaction": {
+  "x-ticvai-persistence": "wallet.wallet_transaction",
+  "type": "object",
+  "required": [
+   "id",
+   "kind",
+   "amount",
+   "balanceAfter",
+   "recordedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string"
+   },
+   "walletId": {
+    "type": "string",
+    "format": "uuid",
+    "x-ticvai-references": "wallet.wallet",
+    "description": "The wallet this movement is on (SD-027, 29 September). A shared wallet has many subjects, so the subject alone cannot say which balance moved."
+   },
+   "walletHoldId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "x-ticvai-references": "wallet.hold",
+    "description": "The hold a spend settled, where it came through `holdWalletFunds`."
+   },
+   "kind": {
+    "$ref": "#/components/schemas/WalletTransactionKind"
+   },
+   "amount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "balanceAfter": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "orderId": {
+    "type": "string",
+    "nullable": true
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "reason": {
+    "type": "string",
+    "nullable": true
+   },
+   "principalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "WalletTransactionKind": {
+  "type": "string",
+  "enum": [
+   "topUp",
+   "spend",
+   "refund",
+   "adjustment",
+   "bonus",
+   "expiry",
+   "transfer"
+  ]
  }
 }

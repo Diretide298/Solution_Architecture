@@ -117,26 +117,6 @@
    "expired"
   ]
  },
- "AllergenCode": {
-  "type": "string",
-  "description": "**The fourteen declarable allergens, as one closed list.** Every allergen field in this contract uses it — the menu claim, the ticket line, a substitution's delta, a modifier option, the label on a bag — so a declared set and an actual set compare without anybody normalising case or synonyms. It was the `Allergen.contains` enum; the other fields were free text.\n",
-  "enum": [
-   "gluten",
-   "crustaceans",
-   "eggs",
-   "fish",
-   "peanuts",
-   "soybeans",
-   "milk",
-   "nuts",
-   "celery",
-   "mustard",
-   "sesame",
-   "sulphites",
-   "lupin",
-   "molluscs"
-  ]
- },
  "ColdChainEvent": {
   "type": "object",
   "x-ticvai-persistence": "fnb.cold_chain_event",
@@ -304,79 +284,6 @@
    "posted",
    "cancelled"
   ]
- },
- "CountVariance": {
-  "x-ticvai-persistence": "none — computed at close",
-  "type": "object",
-  "required": [
-   "countId",
-   "totalVarianceValue",
-   "lines"
-  ],
-  "properties": {
-   "countId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "totalVarianceValue": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "exceptionCount": {
-    "type": "integer",
-    "description": "Lines beyond `VenueSettings.inventory.countVarianceTolerancePercent` (proposed default 2 per cent, audit R094), requiring review before posting."
-   },
-   "lines": {
-    "type": "array",
-    "items": {
-     "type": "object",
-     "required": [
-      "itemId",
-      "expectedQuantity",
-      "countedQuantity",
-      "variance",
-      "isException"
-     ],
-     "properties": {
-      "itemId": {
-       "type": "string",
-       "format": "uuid"
-      },
-      "itemName": {
-       "type": "string"
-      },
-      "sku": {
-       "type": "string"
-      },
-      "expectedQuantity": {
-       "type": "number"
-      },
-      "countedQuantity": {
-       "type": "number"
-      },
-      "variance": {
-       "type": "number"
-      },
-      "variancePercentage": {
-       "type": "number"
-      },
-      "varianceValue": {
-       "$ref": "../shared/common.yaml#/components/schemas/Money"
-      },
-      "isException": {
-       "type": "boolean"
-      },
-      "recountCount": {
-       "type": "integer",
-       "description": "A line counted several times is itself a finding."
-      },
-      "note": {
-       "type": "string",
-       "nullable": true
-      }
-     }
-    }
-   }
-  }
  },
  "CreateGoodsReceiptRequest": {
   "x-ticvai-persistence": "none — request only",
@@ -898,88 +805,6 @@
    "transit"
   ]
  },
- "MenuItem": {
-  "x-ticvai-persistence": "fnb.menu_item",
-  "type": "object",
-  "required": [
-   "id",
-   "productVariantId",
-   "name",
-   "price",
-   "isAvailable"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "productVariantId": {
-    "type": "string",
-    "format": "uuid",
-    "description": "The catalogue variant this item sells. Pricing and tax come from there — a menu is a presentation of the catalogue, not a second catalogue.\n"
-   },
-   "name": {
-    "type": "string"
-   },
-   "description": {
-    "type": "string",
-    "nullable": true
-   },
-   "price": {
-    "x-ticvai-column": "list_price",
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "sortOrder": {
-    "type": "integer"
-   },
-   "modifierGroupIds": {
-    "type": "array",
-    "items": {
-     "type": "string",
-     "format": "uuid"
-    }
-   },
-   "stationId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "menuSectionId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "readOnly": true,
-    "description": "The section the item sits in, set by `setMenuSections` and `applyMenuActions` (`moveSection`)."
-   },
-   "isStockTracked": {
-    "type": "boolean",
-    "description": "True where a recipe exists. Stock-tracked items cannot be sold offline."
-   },
-   "isAvailable": {
-    "type": "boolean"
-   },
-   "unavailableReason": {
-    "type": "string",
-    "nullable": true
-   },
-   "restoreAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true,
-    "description": "When an unavailable item comes back on its own (`setItemAvailability`). Null means by hand."
-   },
-   "preparationMinutes": {
-    "type": "integer",
-    "nullable": true
-   },
-   "allergens": {
-    "type": "array",
-    "items": {
-     "$ref": "#/components/schemas/AllergenCode"
-    }
-   }
-  }
- },
  "MerchandiseReservation": {
   "x-ticvai-persistence": "retail.reservation + retail.reservation_line",
   "type": "object",
@@ -1095,9 +920,25 @@
    "accreditationCredentialsIssued",
    "accreditationActiveHolders",
    "accreditationRenewalsDue",
-   "staffingShortfall"
+   "staffingShortfall",
+   "grossSales",
+   "discounts",
+   "refunds",
+   "netRevenue",
+   "recognisedRevenue",
+   "deferredRevenue",
+   "taxCollected",
+   "takings"
   ],
   "x-ticvai-money-valued": [
+   "grossSales",
+   "discounts",
+   "refunds",
+   "netRevenue",
+   "recognisedRevenue",
+   "deferredRevenue",
+   "taxCollected",
+   "takings",
    "inventoryValuation",
    "resaleCommission",
    "revenuePerEntitlement",
@@ -1106,6 +947,7 @@
    "loyaltyPointsLiability"
   ],
   "x-ticvai-extended-29-september": "**Fourteen metrics added 29 September (build pass)**, each checked against the schema of the contract that produces it.\n\n| Metric | Source | Requirement | |---|---|---| | `loyaltyActiveMembers` | `marketing.loyalty_position` members with a `marketing.loyalty_points` movement in the period | 5.4.27 | | `loyaltyTierDistribution` | `marketing.loyalty_position.tier_id` against `marketing.programme_tier`, members per tier | 5.4.27 | | `loyaltyPointsLiability` | the balance of `ledger.journal_line` on each programme's `pointsLiabilityAccountId`, where points post on accrual and release on redemption or expiry | 5.4.27 | | `loyaltyBreakageRate` | `marketing.loyalty_points` expiry movements over points earned, in the period | 5.4.27 | | `loyaltyMemberRetention` | members with a movement in the previous period who also have one in this period | 5.4.27 | | `challengeParticipationRate` | distinct `marketing.challenge_progress.subject_id` over active loyalty members | 22.6.20 | | `gamificationLoyaltyImpact` | points earned per member, challenge participants against non-participants (`marketing.loyalty_points` split by `marketing.challenge_progress`) | 22.6.20 | | `gamificationMembershipImpact` | joins and renewals in `identity.customer_membership`, participants against non-participants | 22.6.20 | | `gamificationRetention` | return visits (`access.scan_event`, in-direction) of participants against non-participants | 22.6.20 | | `accreditationApplications` | `accreditation.application` by `status` | 12.1.50 | | `accreditationTimeToDecision` | `accreditation.application.decided_at` minus `submitted_at` | 12.1.50 | | `accreditationCredentialsIssued` | `accreditation.credential.issued_at` | 12.1.50 | | `accreditationActiveHolders` | `accreditation.holder` `active`, by `category_code` | 12.1.50 | | `accreditationRenewalsDue` | `accreditation.holder.valid_to` inside `accreditation.validity.renewal_window_days` | 12.1.50 |\n\n**`staffingShortfall` added the same evening (build pass, group G2; 8.2.49)**: the largest gap in the window between the staff rostered and the staff the forecast requires, per venue and position, from `workforce.forecast_requirement` (the handed-over AI staff requirement) against `workforce.rota_assignment` and `workforce.open_shift`, computed as `workforce.getStaffingCoverage` with `basis` `forecastRequirement`. An `AlertRule` on it with `comparator` `above` and `threshold` 0 is the staffing shortage alert; `windowMinutes` looks ahead rather than back for this metric (the rota for the coming window), and `cooldownMinutes` stops one short shift alerting every quarter hour.\n\n**Points issued, points redeemed, campaign performance and reward redemption were already served** by the `loyalty` and `campaigns` sources, and challenge completion and revenue attribution by `challengeCompletionRate` and `attributedRevenue`.\n",
+  "x-ticvai-extended-2-october": "**Eight finance measures added 2 October 2026** (Chinmay; CHG-FIN-007, CHG-FIN-010), each with the source and formula of the seeded KPI of the same code in `ReportingSystemKpi`: `grossSales`, `discounts`, `refunds`, `netRevenue`, `recognisedRevenue`, `deferredRevenue`, `taxCollected` and `takings`, so an alert rule can watch them (a refund spike, takings below a target). Formulas are the D-185 default; client finance sign-off is pending.",
   "x-ticvai-money-valued-note": "**`salesByOperator`, `salesByWorkstation` and `resaleVolume` are not listed because the package does not say whether they count sales or sum their value.** Until that is decided, a rule on them carries a plain number.\n",
   "x-ticvai-extended": "18 August 2026",
   "x-ticvai-extension-note": "**Nineteen metrics added when their upstream models landed**, which is how BL-053 was always going to close — not by changing `reporting` but by building the things it wanted to report on.\n`inventoryValuation`, `stockTurnover`, `stockAgeing` and `wastageRate` came from `inventory.StockBatch`; `resaleVolume` and `resaleCommission` from `orders.ResaleListing`; **`salesByInstructor` from `resources.Resource`, which was the one metric this enum deliberately refused to name in the morning** because nothing produced it. `allocationUtilisation` from `PartnerUser` and `ChannelListing`, `membershipChurn` from `Journey`, `supplierDeliveryPerformance` from `ProductionRun`, `assetDowntime` and `meanTimeToRepair` from `WorkOrder.downtimeMinutes`, `challengeCompletionRate` from `ChallengeProgress`, `attributedRevenue` from `AttributionTouch`.\n**Each was checked against the schema before being named.** That rule has not changed — naming a metric with no source is the defect this enum exists to prevent.\n"
@@ -1168,6 +1010,50 @@
    "supplierReturn",
    "production"
   ]
+ },
+ "OutletStockLine": {
+  "x-ticvai-persistence": "none — projection over inventory",
+  "type": "object",
+  "required": [
+   "merchandiseId",
+   "name",
+   "onHand",
+   "isBelowReorderPoint"
+  ],
+  "properties": {
+   "merchandiseId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "sku": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "categoryName": {
+    "type": "string",
+    "nullable": true
+   },
+   "onHand": {
+    "type": "number"
+   },
+   "allocated": {
+    "type": "number",
+    "description": "Held by an unexpired collection reservation."
+   },
+   "available": {
+    "type": "number"
+   },
+   "isBelowReorderPoint": {
+    "type": "boolean"
+   },
+   "lastSoldAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
  },
  "Page": {
   "type": "object",
@@ -1256,31 +1142,232 @@
    }
   }
  },
- "RecountResult": {
+ "PurchaseOrder": {
+  "x-ticvai-persistence": "inventory.purchase_order + inventory.purchase_order_line",
   "type": "object",
-  "x-ticvai-persistence": "none — response shape",
-  "description": "The lines `requestRecount` reopened.",
   "required": [
-   "countId",
-   "reopenedLineIds"
+   "id",
+   "purchaseOrderNumber",
+   "supplierId",
+   "status",
+   "lines",
+   "total",
+   "createdAt"
   ],
   "properties": {
-   "countId": {
+   "id": {
     "type": "string",
     "format": "uuid"
    },
-   "reopenedLineIds": {
+   "purchaseOrderNumber": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**Per venue, in sequence** (decided 28 September, audit R171). Assigned by the server from the venue's gap-free sequence, or the tenant's for an order with no venue. Proposed format `PO-<venue code>-<sequence, six digits>`, client to correct.\n"
+   },
+   "requisitionId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Null on a blanket order or an RFQ award, which are raised without one."
+   },
+   "quotationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The quotation selected when the order was raised (`createPurchaseOrder` requires it). **The link that shows the comparison was made**, which `rfqId` alone does not."
+   },
+   "supplierId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "supplierName": {
+    "type": "string"
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "standard",
+     "blanket",
+     "release",
+     "rfqAward"
+    ],
+    "default": "standard",
+    "description": "BL-159. **A blanket order is a price and a commitment, not a delivery.** Releases draw against it, and modelling each release as its own purchase order loses the contract that makes the price valid.\n"
+   },
+   "blanketParentId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The blanket order this release draws against — another purchase order, so the same id type."
+   },
+   "contractPriceValidUntil": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "rfqId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Where this order came from a quotation round. **Keeping the link is what lets a venue show it took the best of three**, which is usually the procurement rule rather than a preference.\n"
+   },
+   "supplierInvoiceRef": {
+    "type": "string",
+    "nullable": true,
+    "description": "BL-123. **Purchase orders and goods receipts both existed — the third leg did not.** A three-way match with two legs is a two-way match, and it is the supplier invoice that carries the price nobody has checked yet.\n"
+   },
+   "matchStatus": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "unmatched",
+     "matched",
+     "priceVariance",
+     "quantityVariance",
+     "bothVariance"
+    ],
+    "description": "**The variance kinds are separated because they have different owners** — a price variance is a buyer's problem and a quantity variance is a receiving one.\n"
+   },
+   "status": {
+    "$ref": "#/components/schemas/PurchaseOrderStatus"
+   },
+   "deliverToLocationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**Scoped 31 August.** A purchase order is raised by somebody, for somewhere, and carried neither. `requisitionId` reaches a venue through a join, but **a purchase order raised without a requisition — a blanket order, an RFQ award — had no scope at all**, so nothing could answer *whose budget is this* without guessing.\n\n**`deliverToLocationId` is separate from `venueId` on purpose.** A tenant buying centrally and delivering to three venues is one order and three destinations; collapsing them would force one order per venue and lose the volume the tenant negotiated for."
+   },
+   "lines": {
     "type": "array",
     "items": {
-     "type": "string",
-     "format": "uuid"
+     "type": "object",
+     "properties": {
+      "lineId": {
+       "type": "string"
+      },
+      "itemId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "itemName": {
+       "type": "string"
+      },
+      "orderedQuantity": {
+       "type": "number"
+      },
+      "receivedQuantity": {
+       "type": "number"
+      },
+      "outstandingQuantity": {
+       "type": "number"
+      },
+      "unitPrice": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "quotedUnitPrice": {
+       "allOf": [
+        {
+         "$ref": "../shared/common.yaml#/components/schemas/Money"
+        }
+       ],
+       "nullable": true,
+       "description": "The selected quotation line's price, kept beside `unitPrice` (audit R171)."
+      },
+      "priceOverrideReason": {
+       "type": "string",
+       "nullable": true,
+       "description": "Why `unitPrice` differs from `quotedUnitPrice` (audit R171)."
+      },
+      "lineTotal": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      }
+     }
     }
    },
-   "reason": {
+   "subtotal": {
+    "x-ticvai-column": "net_amount",
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "taxAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "total": {
+    "x-ticvai-column": "gross_amount",
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "expectedDelivery": {
     "type": "string",
+    "format": "date"
+   },
+   "raisedByPrincipalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "closedAt": {
+    "type": "string",
+    "format": "date-time",
     "nullable": true
+   },
+   "supplierReference": {
+    "type": "string",
+    "nullable": true,
+    "description": "The supplier's own order reference, from `acknowledgePurchaseOrder`."
+   },
+   "acknowledgedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "**Null is the supplier performance figure** — goods arriving against an order never acknowledged."
+   },
+   "closeShortReason": {
+    "type": "string",
+    "nullable": true,
+    "description": "Why the balance was written off, from `closePurchaseOrderShort`."
+   },
+   "cancelReason": {
+    "type": "string",
+    "nullable": true,
+    "description": "From `cancelPurchaseOrder`."
+   },
+   "approvalRequestId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The pending approval request raised by `cancelPurchaseOrder` or `closePurchaseOrderShort` (kinds `purchaseOrderCancel`, `purchaseOrderShortClose`; audit R144). Null when none is open."
+   },
+   "cancelledAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Which venue is buying. **Null on a tenant-level order** — see `deliverToLocationId`."
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "**The partition key** (ADR-0005). Present on every order regardless of whether a venue is named, because a tenant-level order still belongs to a tenant."
    }
   }
+ },
+ "PurchaseOrderStatus": {
+  "type": "string",
+  "enum": [
+   "raised",
+   "sent",
+   "acknowledged",
+   "partiallyReceived",
+   "received",
+   "closedShort",
+   "cancelled"
+  ]
  },
  "ReportResult": {
   "x-ticvai-persistence": "none — result set, cached in object storage",
@@ -1505,6 +1592,55 @@
    "closed",
    "cancelled"
   ]
+ },
+ "RequisitionSuggestion": {
+  "x-ticvai-persistence": "none — computed",
+  "type": "object",
+  "required": [
+   "itemId",
+   "onHand",
+   "reorderPoint",
+   "suggestedQuantity"
+  ],
+  "properties": {
+   "itemId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "itemName": {
+    "type": "string"
+   },
+   "sku": {
+    "type": "string"
+   },
+   "onHand": {
+    "type": "number"
+   },
+   "reorderPoint": {
+    "type": "number"
+   },
+   "parLevel": {
+    "type": "number"
+   },
+   "suggestedQuantity": {
+    "type": "number"
+   },
+   "averageDailyConsumption": {
+    "type": "number"
+   },
+   "daysOfCoverRemaining": {
+    "type": "number"
+   },
+   "preferredSupplierId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "leadTimeDays": {
+    "type": "integer",
+    "nullable": true
+   }
+  }
  },
  "SerialisedItem": {
   "type": "object",

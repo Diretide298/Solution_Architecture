@@ -1,6 +1,6 @@
 # P06-operations-05 — P06 · Operations (5 of 5)
 
-**6 screens · 15 operations · 26 schemas · 9 permissions**
+**6 screens · 11 operations · 25 schemas · 7 permissions**
 
 Platform P06 Venue Staff App · ships as **venue-staff-mobile** ·
 staff audience · mobileApp ·
@@ -48,8 +48,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 9 permissions apply here:
-  `ACCESS_VALIDATE, ANNOUNCEMENT_PUBLISH, INCIDENT_MANAGE, INCIDENT_VIEW, INSPECTION_MANAGE, INSPECTION_SUBMIT, INSPECTION_VIEW, REPORT_VIEW_VENUE, WORKFORCE_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 7 permissions apply here:
+  `ACCESS_VALIDATE, INCIDENT_MANAGE, INCIDENT_VIEW, INSPECTION_SUBMIT, INSPECTION_VIEW, REPORT_VIEW_VENUE, WORKFORCE_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
 - **5 of these operations work offline**: acknowledgeAnnouncement, listAnnouncements, listInspectionTemplates, logout, submitInspection
   — and the rest do not. A surface that looks the same online and off is lying.
@@ -62,15 +62,69 @@ convincingly. It is never a caption.
   and its error; and, element by element, what is shown and in what format, what each action
   produces and where the user goes next. Draw exactly that.
 
+## The processes these screens belong to
+
+Written by the owner of each process (`handoff/design-notes/`). Read before any screen: it says how the process runs end to end and which words the screens must use.
+
+### Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue)
+
+Venue operations is everything that happens after a sale and inside the gates. A guest's ticket is one virtual ticket with interchangeable media (QR, dynamic QR, RFID wristband, NFC, Face Pass or Face Tag); at an access point a scanner (P07, or the scan function inside the Staff App P06) validates the media against the admission profile and the guest admission policy, offline if it must, and every deny carries a reason and a next action. The back office (Venue Management P08) configures that estate: the venue topology (venue, park, zone, attraction, access point, gate and lane, device placement), admission profiles and rules (entry, exit, re-entry, anti-passback, validity, crossover, companions), credential security (dynamic QR, device binding, beacons), biometrics, gate modes, and the live operations, fraud and monitoring views. Accreditation (P08 setup and review, P11 web portal for applicants, web first) takes an applicant from a configurable form through document checks, OCR, duplicate blocking and multi-level approval to a credential with zone rights. Resources and capacity manage bookable resources (rooms, vehicles, equipment, cabanas, instructors) that are booked as a consequence of selling a product, never sold directly. Workforce covers shift templates, rosters, attendance, swaps and breaks, mirrored on the Staff App. Maintenance and safety cover the asset register, preventive calendars, work orders with scored priority, inspections and incidents, with technicians working from the Staff App. Games and rides configure readers, credit types and consumption priority, play entitlements, game pricing, retry pricing, redemption and the card lifecycle. The virtual queue (Q1) gives a guest a live wait time and a return window for a ride; it is not the on-sale waiting room (Q2). Every calendar has day, week and month views. Configuration resolves tenant, region, venue (outlet only for F&B and retail), and a user's permissions, never the device, decide what they may do. The guest apps (P01, P02) show the guest's side of this: My Tickets, the scan code, Face Pass, wait times, the virtual queue, map booking of cabanas and the visit planner.
+*(source: F06 step 1 / F112 step 1 / F111 step 1 / ADR-0002 / ADR-0012 / ADR-0018 / ADR-0041 / ADR-0066 / ADR-0067 / ADR-0068 / DI-652 / DI-627 / DI-640 / DI-654 / DI-666 / DI-482 / DI-483 / DI-907 / DI-919 / DI-923 / DI-865 / DI-678 / TRACKER Actions row 160 / MoM 2026-09-02 AccessControl / MoM 2026-09-07 …)*
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Ticket | The one virtual record a guest owns (ticket number, product, validity, entries). Its number never changes, whatever media carries it or whoever it is transferred or resold to. | Pass (unless the product is a pass), Booking, Order line | DI-652 / DI-620 / contracts/spine/access.yaml#/components/schemas/TicketStatus |
+| Media | What the ticket is presented by at a gate (QR code, dynamic QR, wristband/RFID card, NFC, Face Pass, Face Tag). One ticket can carry several media as fallbacks; a media code can also cover several tickets scanned as one group. Show one … | Credential (for guest media; keep Credential for accreditation badges and staff), Ticket code | DI-180 / DI-608 / DI-652 |
+| Access point | A place where a scan is judged, with a fixed direction (entry, exit, re-entry, crossover). Hierarchy shown to users is Venue > Park > Zone > Attraction > Access point > Gate/lane > Device. | Scanner (that is the device), Door | screens/P08-venue-back-office.yaml#BO-144 / … |
+| Admission profile | The named set of rules an access point enforces (opening window, entries, exit scan, re-entry, validity, crossover). Products point at a profile; tiers such as Bronze/Silver/Gold are profiles with gate allow and deny lists. | Admission rules (as a screen title), Access rule set | DI-185 / contracts/spine/access.yaml#/components/schemas/AdmissionRules |
+| Admitted / Denied / Overridden | The three scan outcomes. A denial is always shown with its reason in plain words and a next action; an override is a supervisor admitting despite a denial, and is always attributed and reasoned. | Valid/Invalid, Success/Fail, Error | contracts/spine/access.yaml#/components/schemas/ScanOutcome / … |
+| Used | A ticket entry is used the moment a scan succeeds, whether or not the guest physically passed. Mistakes are resolved from the scan history, not by un-scanning. | Redeemed (for admission), Checked in (that is group check-in, a different step) | DI-627 / TRACKER Actions row 221 / TRACKER Actions row 189 |
+| Gate mode | What a lane is doing now, set live by the podium or supervisor - Normal, Free flow (counts, does not validate), Drop arm (everybody through, evacuation), Closed (nobody through), Podium (staff validating by eye), Maintenance. Direction is … | Turnstile mode (as a label for direction), Open/Locked | contracts/spine/access.yaml#/components/schemas/AccessPointOperatingMode / R221 |
+| Offline package | What a scanner holds to validate with no network - entitlements, blacklist, admission profiles and the active guest admission policy version - with its age always visible. | Cache, Local DB | F06 step 3 / ADR-0068 |
+| Sync and reconciliation | Sending the offline scan journal to the server, and the duty manager's review of scans the server rejected after the device had already admitted the guest. | Upload, Retry | F06 step 6 / DI-065 |
+| Face Pass / Face Tag | Face Pass is the long-lived face credential for members and season-pass holders (renewable); Face Tag is short-lived, for one day or event. Retention is set per tier by the venue. | Face ID, Biometric login | DI-640 / ADR-0063 |
+| Accreditation / Credential (accreditation) | Accreditation is the application and approval of a person (media, contractor, corporate, staff of a partner) for an event or season; the credential is what is issued after approval (photo badge, QR or RFID) with zone access rights. | Registration (for the whole process), Ticket | DI-654 / DI-662 |
+| Resource | A bookable thing or person a product needs (room, vehicle, cabana, equipment set, instructor). Guests buy products; resources are assigned to the booking, pre-assigned or dynamically. | Asset (that is maintenance), Inventory (that is stock) | DI-475 / DI-482 / TRACKER Actions row 160 |
+| Asset | A physical item maintained by the venue (ride, turnstile, printer, pump) with a register record, documents, warranty and maintenance history. | Resource, Device (unless it is an IT device in the device register) | DI-910 / ADR-0067 |
+| Work order | A unit of maintenance work, lifecycle Created > Assigned > In progress > Review > Closed, with a resolution timer. | Ticket (reserved for guest tickets), Job card | DI-231 |
+| Game / attraction (games module) | In the games and rides module an attraction is an individual game or ride (roller coaster, racing game, bumper cars), not a venue. | Venue, Park | DI-863 |
+| Virtual queue / Return window | A guest's place in a ride's queue held without standing in line, with a return window (for example 4:50 to 5:00 PM) that recalculates live. Distinct from the walk-in line and the VIP/express lane, and from the on-sale waiting room. | Waiting room, Fast pass (that is the express product), Booking | DI-675 / DI-678 / DI-679 / ADR-0066 |
+| Wait time source | Where a ride's wait time comes from - Sensor, Throughput, Manual, or Unavailable - always shown beside the number. | Live (when the source is manual) | contracts/satellite/queue.yaml#/components/schemas/WaitTimeSource / DI-315 |
+
+### Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management)
+
+Platform Foundation is everything the apps stand on. Five apps each have one door: the guest app and website (WEB-016, GST-042: a six-digit code to email or mobile, a password, Apple or Google, UAE Pass; never enterprise SSO), the till (POS-000: employee number and PIN, recent operators as tiles; the kitchen display is the same app), the staff handheld and scanner (EMP-001, SCN-001), Venue Management (SUP-001, the single door for the back office P08, the CMS P13, analytics P16 and the support desk P12) and TICVAI Control (ADM-001 for TICVAI's own platform operators, PTR-001 for partner users; the developer portal P14 and the sign-up P17 belong to this app too). A second factor is required by permission, not by role or device: ROLE_MANAGE, LEDGER_APPROVE and every PLATFORM_* permission, plus any the tenant adds; so a cashier never sees it and a platform operator always does. The factor is an authenticator app with an emailed code as fallback; five wrong codes lock step-up for the lockout minutes, never permanently. Guests get two-step verification only at a venue that switched it on. One person holds one session per workstation: a second sign-in is refused and only a supervisor ends the other session. Several roles mean a role prompt; one role goes straight in. The workstation decides the Sale Board, hardware and till identity, never what a person may do. Sensitive actions (refund approval, journal approval, credential reset, partner credit, commission rules, opening a platform-staff grant and 17 more) demand a fresh step-up on the operation itself, asked in place in the action's confirmation; the tenant may raise the strength, never remove it. Permission outcomes are three, never one word: self-authorised (proceeds, audited), escalated (a supervisor PIN in place), refused (the denied state, naming the permission); a missing permission is never an empty table, and a record outside the person's venues is "not found", indistinguishable from absent. The hierarchy is binding (tenant, brand, region, venue, department, sub-department, workstation; outlet beside department for F&B and retail); region owns currency, decimals, time zone, date format and fiscal year; configuration resolves nearest-ancestor across tenant, region and venue (outlet for F&B and retail), venue is the floor and a workstation is assigned a profile, never configured; every configuration screen says which level it writes and what it inherits. Venue Management is one tenant-level surface filtering across the venues in the session's scope. TICVAI's Console runs outside every cell: a platform operator picks a tenant and opens a time-boxed, audited platform-staff grant (with step-up) before any tenant action, and the tenant sees every action in its audit log (ADM-412 is the reference implementation). Approval workflows record authorisations and never perform the action; the requester cannot approve their own request; a venue may tighten and never loosen a rule from above; in-flight …
+*(source: screens/P12-support-agent-console.yaml#SUP-001; R135; R126; R167; DI-1072; ADR-0002; ADR-0003; ADR-0004; R184; contracts/spine/identity.yaml#createMfaChallenge; contracts/spine/approvals.yaml#setStepUpPolicy; ADR-0011; ADR-0018; ADR-0029; R098; contracts/spine/approvals.yaml#decideApprovalRequest …)*
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Sign in / Sign out | Entering and leaving any app, staff or guest. | Login, Log in, Logon, Logout | screens/P04-point-of-sale.yaml#POS-000 … |
+| Authentication code | The staff second factor from the authenticator app (or the emailed fallback). | OTP, 2FA code, token | screens/P09-platform-admin-console.yaml#ADM-001 |
+| One-time code | The six-digit code a guest receives to sign in or prove a contact. | OTP, PIN, password | DI-1034; R167 |
+| Two-step verification | The guest's optional second factor, asked only at venues that switched it on. | MFA, 2FA | DI-1072 |
+| Tenant / Brand / Region / Venue / Department / Outlet | The binding hierarchy levels; region owns currency and dates; outlet is F&B or retail inside a venue. | Client, Customer, Org (for tenant), Site, Park, Property (for venue), Area, Territory (for region) | ADR-0011; ADR-0018 |
+| Workstation (back office) / till (operator copy) | A configured device; decides Sale Board, hardware and till identity, never authorisation. | Terminal, Station, POS (for the device), till (for the Deposit Box) | ADR-0002; R156 |
+| Sale Board | The configured front end a workstation loads (ticketing, F&B or retail). | Screen, Layout, Menu | ADR-0003 |
+| Role | A named, fully configurable grouping of permissions; the seeded five are editable starting points. | Group, Profile | R229 |
+| Staff member / Partner user / Platform operator | A tenant's staff principal; a partner's user; a TICVAI employee in the Console. | User (alone), Account, Agent (for venue staff) | F104 step 1; F104 step 4; F104 step 5 |
+| Platform-staff grant | The time-boxed, audited access a platform operator opens into one tenant before acting in it. | Impersonation, Support login | R098 |
+| Escalate / Refused | Escalate is supervisor approval captured in place; Refused is the denied state that names the permission. | Denied (for an action that can be escalated) | R197 |
+| Approve / Reject / Return / Request information | The four decisions on an approval request; Withdraw is the requester's own act and never a rejection. | Accept, Decline, Cancel (for withdraw) | contracts/spine/approvals.yaml#decideApprovalRequest … |
+| Subscription / Plan / Module / Licence | TICVAI's commercial relationship with a tenant, its plan, the modules it licenses and the limits. | Membership (that is the guest's pass) | R214 |
+| Membership / Annual pass | A guest's pass product and its holder (BO-284 to BO-303). | Subscription (that is the tenant's TICVAI plan) | screens/P08-venue-back-office.yaml#BO-284 |
+| Sandbox client / Production client | A developer's own test credential; a TICVAI-issued live credential after certification. | Test key, Live key, API key (without environment) | DI-927 |
+| Asset (DAM) / Media (ticket) | A digital file in the library; ticket media is a wristband or card carrying entitlements. Never mix them. | Media (for a library asset) | contracts/satellite/assets.yaml#searchMedia … |
+
+
 ## The screens
 
 Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs count fields; requirements are matrix rows; meeting inputs are the ones naming the screen (the module and platform ones are below); white label says whether the tenant's brand reaches it (guest) or it sets the brand (configures).
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `EMP-048` | Opening checklist | A | 31 | 30 | 6 | 4 | 0 | 0 | — | notStarted (generated) |
-| `EMP-047` | Emergency mode | B–D | 12 | 29 | 6 | 4 | 0 | 2 | — | notStarted (generated) |
-| `EMP-050` | Post-incident restore | B–D | 16 | 44 | 6 | 1 | 0 | 0 | — | notStarted (generated) |
+| `EMP-048` | Opening checklist | A | 12 | 30 | 6 | 2 | 0 | 0 | — | notStarted (generated) |
+| `EMP-047` | Emergency mode | B–D | 1 | 24 | 6 | 0 | 0 | 2 | — | notStarted (generated) |
+| `EMP-050` | Post-incident restore | B–D | 11 | 44 | 6 | 1 | 0 | 0 | — | notStarted (generated) |
 | `EMP-045` | Arabic / RTL | B–D | 0 | 0 | 4 | 0 | 0 | 0 | — | notStarted (generated) |
 | `EMP-046` | Sign out | B–D | 0 | 0 | 4 | 0 | 0 | 0 | — | notStarted (generated) |
 | `EMP-049` | Hand over the journal | B–D | 20 | 27 | 6 | 8 | 0 | 0 | — | notStarted (generated) |
@@ -94,7 +148,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Operations · wave 1 · needs the `maintenance` module |
 | Block | Block A · ticket #20693 (APP-SETUP-EMP-048) |
-| Who uses it | venue staff holding `INSPECTION_MANAGE`, `INSPECTION_SUBMIT`, `INSPECTION_VIEW` (1 configure, 1 operate, 1 read); in the flows as supervisor |
+| Who uses it | venue staff holding `INSPECTION_SUBMIT`, `INSPECTION_VIEW` (1 operate, 1 read); in the flows as supervisor |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | listDetail (comfortable density): `listInspectionTemplates` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
 | Offline | Works from the cached template. Completions queue |
@@ -102,6 +156,12 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Route | `/operations/opening-checklist` |
 
 **What the spec says about it.** Definition derived from the wireframe board on 14 August. Components, states and operations still to be written.
+
+**Known gaps.** Removed 2 October 2026 (CHG-WIR-001): Template authoring (createInspectionTemplate, INSPECTION_MANAGE) is tenant-level management in the back office; the opening checklist only works today's checks …
+
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** On the Staff App, before the first guest arrives, a steward or technician works the opening checklist for their gate, ride or area: pick today's checks, answer each item (pass/fail, yes/no, a number, a photo, a signature), sign, submit - offline if needed. The one thing to get right: a failed safety-critical item is unmistakable, cannot be "passed" by completing the rest, and takes the asset out of service by itself.
+
+**Fixed on main** (the package already carries these; draw what it says): "Create inspection template" on the phone screen and a table of every template (CHG-WIR-001); Navigation exits to Sign in and Select venue (inferred) (CHG-WIR-002).
 
 #### Inputs: what the user enters or picks
 
@@ -136,31 +196,11 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 Errors to draw in the form: 400 A required item was not answered
 
-**Form: Create inspection template** (modal, opened by *Create inspection template*; *Create inspection template* calls `createInspectionTemplate`, *Cancel* sends nothing)
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
 
-**Collects what `createInspectionTemplate` sends before it is called.** Required: `id`, `code`, `name`, `items`. Optional: `instructions`, `venueId`, `appliesToAssetCategoryId`, `frequency`, `retentionYears`, `isActive`. Dismissing sends nothing; the screen behind is unchanged.
-
-| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
-|---|---|---|---|---|---|---|---|
-| Instructions `instructions` | text field | optional | — | — | — | The procedure itself. A technician asking how to isolate a chiller is asking a safety question, and the answer has to come from the template rather than from its title. | `createInspectionTemplate` body |
-| ID `id` | picker: choose an id | required | — | — | shows names, sends the id | — | `createInspectionTemplate` body |
-| Code `code` | text field | required | — | max length 64 | — | — | `createInspectionTemplate` body |
-| Name `name` | text field | required | — | max length 200 | — | — | `createInspectionTemplate` body |
-| Venue `venueId` | picker: choose a venue | optional | — | — | shows names, sends the id | — | `createInspectionTemplate` body |
-| Applies to asset category `appliesToAssetCategoryId` | picker: choose an applies to asset category | optional | — | — | shows names, sends the id | — | `createInspectionTemplate` body |
-| Frequency `frequency` | select | optional | — | Pre opening · Post closing · Daily · Weekly · Monthly · Annual · Ad hoc | — | — | `createInspectionTemplate` body |
-| Items `items` | repeatable rows | required | — | at least 1 | — | — | `createInspectionTemplate` body |
-| Key `items[].key` | text field | required | — | — | — | — | `createInspectionTemplate` body |
-| Label `items[].label` | text field | required | — | — | — | — | `createInspectionTemplate` body |
-| Kind `items[].kind` | select | required | — | Pass fail · Yes no · Numeric · Text · Photo · Signature | — | — | `createInspectionTemplate` body |
-| Is required `items[].isRequired` | toggle | required | — | — | — | — | `createInspectionTemplate` body |
-| Is safety critical `items[].isSafetyCritical` | toggle | optional | off | A failed safety-critical item blocks the inspection from passing and cannot be overridden by completing the rest. | — | A failed safety-critical item blocks the inspection from passing and cannot be overridden by completing the rest. | `createInspectionTemplate` body |
-| Requires photo on fail `items[].requiresPhotoOnFail` | toggle | optional | on | — | — | — | `createInspectionTemplate` body |
-| Min value `items[].minValue` | number field | optional | — | — | — | — | `createInspectionTemplate` body |
-| Max value `items[].maxValue` | number field | optional | — | — | — | — | `createInspectionTemplate` body |
-| Guidance `items[].guidance` | text field | optional | — | — | — | — | `createInspectionTemplate` body |
-| Retention years `retentionYears` | number field | optional | 7 | — | — | Compliance inspections are retained alongside the financial trail. | `createInspectionTemplate` body |
-| Is active `isActive` | toggle | optional | — | — | — | — | `createInspectionTemplate` body |
+- **Checklist choice**: Show only today's pre-opening templates for the venue and the person's area (frequency Pre-opening first, then Daily); not a table of all templates. *(source: contracts/satellite/maintenance.yaml#listInspectionTemplates)*
+- **Item responses**: One item per card, large touch targets: Pass/Fail and Yes/No as two big buttons, numeric with unit and expected range, text, photo (camera opens directly), signature pad at the end. Safety-critical items carry a red "Safety" tag; the template's instructions are one tap away on each item. *(source: contracts/satellite/maintenance.yaml#createInspectionTemplate / MATRIX 17.5.1 / DI-232)*
+- **Asset**: Scan the asset's tag to attach it (lookup works offline); typed search as fallback. *(source: contracts/satellite/maintenance.yaml#lookupAsset)*
 
 #### Outputs: what the screen shows and produces
 
@@ -216,15 +256,21 @@ Errors to draw in the form: 400 A required item was not answered
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
 | Submit inspection (primary button) | `submitInspection` POST `/inspections` | SubmitInspectionRequest | InspectionResult | 400 A required item was not answered | works offline; opens modal first |
-| Create inspection template (secondary button) | `createInspectionTemplate` POST `/inspection-templates` | InspectionTemplate | InspectionTemplate | — | opens modal first |
+
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Progress**: "7 of 12 checked, 1 failed (safety)" with failed items listed first at the end. *(source: contracts/satellite/maintenance.yaml#submitInspection)*
+- **Result**: Passed (green) / Failed - asset taken out of service, work order raised (red), with the work order number. *(source: contracts/satellite/maintenance.yaml#submitInspection)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Submit**: Requires the signature; queued when offline with "Will send when you are back online" and a count in the header. *(source: contracts/satellite/maintenance.yaml#submitInspection)*
 
 **Data it reads**: `listInspectionTemplates` (onLoad, List inspection templates); `listInspections` (onLoad, List completed inspections)
 
 **Where the user goes next**
 
 - → `EMP-003` Home — on duty: *Sees the home screen on duty*
-- → `EMP-001` Sign in: *Sign in*
-- → `EMP-002` Select venue & role: *Select venue & role*
 
 #### States
 
@@ -238,24 +284,48 @@ Errors to draw in the form: 400 A required item was not answered
 | Offline (`?state=offline`) | Works from the cached template. Completions queue |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 A required item was not answered |
 
+#### Edge cases to draw
+
+- **Offline at the start of the shift**: Works from the cached template; the submission queues; the asset is marked out of service locally and the server confirms on sync. *(source: screens/P06-staff-app.yaml#EMP-048 / contracts/satellite/maintenance.yaml#submitInspection)*
+- **Template changed since cached**: Banner "A newer checklist exists - refresh when online"; completing the cached one is still valid. *(source: designer default)*
+
+#### Consistency with other screens
+
+- Match `EMP-004`: A failed item's work order appears in the technician's task list.
+- Match `BO-069`: The asset's status changes there (Out of service) with the inspection as the reason.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+checklist:
+  name: Falcon Coaster - pre-opening
+  items:
+  - Restraint bars lock (safety) - Pass
+  - Track walk complete - Yes
+  - Hydraulic pressure 180-220 bar - 205
+  - Queue line barriers in place - Yes
+  - Photo of station platform
+  by: Rahul Menon
+  at: 07:42
+```
+
 #### Permissions
 
 - `listInspectionTemplates` → `INSPECTION_VIEW` (read) · staff
 - `submitInspection` → `INSPECTION_SUBMIT` (operate) · staff
-- `createInspectionTemplate` → `INSPECTION_MANAGE` (configure) · staff
 - `listInspections` → `INSPECTION_VIEW` (read) · staff
 
 **A refused user sees:** Shown when the caller lacks `INSPECTION_VIEW`, which `listInspectionTemplates` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
 #### Requirements it meets
 
-4 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+2 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
 
 | Ref | Requirement (shortened) | Domain | Verdict | Via |
 |---|---|---|---|---|
 | 17.5.7 | Safety Audits - System shall support safety audits. | Maintenance & Safety Management | CONTRACTED | `submitInspection` |
-| 17.5.1 | Safety Inspections - System shall support safety inspections. | Maintenance & Safety Management | CONTRACTED | `createInspectionTemplate` |
-| 17.5.2 | Safety Checklists - System shall support configurable safety checklists. | Maintenance & Safety Management | CONTRACTED | `createInspectionTemplate` |
 | 17.5.9 | Safety Compliance Tracking - System shall support safety compliance tracking. | Maintenance & Safety Management | CONTRACTED | `listInspections` |
 
 #### Client meeting inputs
@@ -277,13 +347,14 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (31), with its required mark, default, format and its error state (400).
+- [ ] Every input above is drawn (12), with its required mark, default, format and its error state (400).
 - [ ] Every output is drawn (30 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#EMP-048?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: Submit inspection, Create inspection template.
-- [ ] Every transition is wired: `EMP-003`, `EMP-001`, `EMP-002`.
-- [ ] Every gated control is gated: `INSPECTION_MANAGE`, `INSPECTION_SUBMIT`, `INSPECTION_VIEW`.
+- [ ] Every action is wired with its success and its failure: Submit inspection.
+- [ ] Every transition is wired: `EMP-003`.
+- [ ] Every gated control is gated: `INSPECTION_SUBMIT`, `INSPECTION_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 2 edge case(s) from the process notes are drawn.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -297,7 +368,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Operations · wave 1 · needs the `core` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `ANNOUNCEMENT_PUBLISH`, `WORKFORCE_VIEW` (1 configure, 1 read); in the flows as supervisor |
+| Who uses it | venue staff holding `WORKFORCE_VIEW` (1 read) |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | listDetail (comfortable density): `listAnnouncements` reads the population and `getAnnouncementReach` reads one of them — list, select, act |
 | Offline | Fully offline by design |
@@ -305,6 +376,24 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Route | `/operations/emergency-mode` |
 
 **What the spec says about it.** Definition derived from the wireframe board on 14 August. Components, states and operations still to be written.
+
+**Known gaps.** Removed 2 October 2026 (CHG-WIR-001): Emergency mode is a full-screen takeover with one action (acknowledge); the generic announcements set put publish and the reach roll call on it. Declaring goes … Removed 2 October 2026 (CHG-WIR-001): Emergency mode is a full-screen takeover with one action (acknowledge); the generic announcements set put publish and the reach roll call on it. Declaring goes … Contract gap recorded 2 October 2026 (CHG-WIR-004): No staff all-clear (announcement kind or operation) ends emergency mode.
+
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** Emergency mode: when an emergency announcement arrives, the Staff App stops being a ticketing app and becomes one screen - what is happening, what to do, where to go, and a single "I have received this" button - until the duty manager stands it down. The one thing to get right: it is a full-screen takeover that cannot be dismissed into normal work, the acknowledgement works with no signal, and a duty manager on the same screen sees the roll call of who has not confirmed.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **The screen is the generic announcements list-detail (toggle, "Every announcement" table, detail panel)** Why: Emergency mode is a full-screen takeover with one action; a table of all announcements is the opposite of what the flow asks. *(source: F08 step 2 / screens/P06-staff-app.yaml#EMP-047; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **Nothing in the staff contract ends an emergency (no all-clear kind, no stand-down)** Why: The guest broadcast has allClear; the staff AnnouncementKind does not, so phones have no defined way out of emergency mode except expiresAt. *(source: contracts/satellite/workforce.yaml#/components/schemas/AnnouncementKind / contracts/satellite/workforce.yaml#broadcastToGuests; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+
+**Fixed on main** (the package already carries these; draw what it says): Offline state "Fully offline by design" while publishAnnouncement and getAnnouncementReach are online only (CHG-WIR-001).
+
+#### Decided on this screen
+
+Answered questions: draw the decision, not the old default. Where a decision and the tables below differ, the decision wins.
+
+- **Should staff emergency announcements carry assembly points like the guest broadcast does?** → Drawn default accepted: Name the assembly point in the instructions text; draw a "Show on map" link greyed until a field exists. *(decided by Chinmay, 2026-10-02; DEC-536 / CHG-NOTE-008)* **Reviewable:** a default the lead may still overrule before the block is tasked.
+- **Does declaring a staff emergency also need a second person, as the guest evacuation does?** → Drawn default stands (answer: "Single declarer with a typed confirmation; second person only on the guest broadcast"): Single declarer with typed confirmation; second-person approval drawn only on the guest broadcast. *(decided by Chinmay, 2026-10-02; DEC-537 / CHG-NOTE-008)*
 
 #### Inputs: what the user enters or picks
 
@@ -314,25 +403,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|---|---|---|---|---|---|
 | Unacknowledged only | toggle | optional | — | — | — | Sends `?unacknowledgedOnly=` to `listAnnouncements`. | `listAnnouncements` ?unacknowledgedOnly |
 
-**Form: Publish announcement** (modal, opened by *Publish announcement*; *Publish announcement* calls `publishAnnouncement`, *Cancel* sends nothing)
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
 
-**Collects what `publishAnnouncement` sends before it is called.** Required: `title`, `body`, `kind`, `publishedAt`. Optional: `id`, `venueIds`, `departmentIds`, `roleIds`, `requiresAcknowledgement`, `expiresAt`, `publishedByPrincipalId`, `locale`. **An `emergency` kind requires ANNOUNCEMENT_EMERGENCY** (audit R091 (1)). Dismissing sends nothing; the screen behind is unchanged.
-
-| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
-|---|---|---|---|---|---|---|---|
-| Title `title` | text field | required | — | max length 140 | — | — | `publishAnnouncement` body |
-| Body `body` | text area | required | — | max length 4000 | — | — | `publishAnnouncement` body |
-| Kind `kind` | radio group | required | — | Operational · Safety · Emergency · Hr · Celebration | — | `emergency` is not a louder `operational`. It overrides the home screen, bypasses quiet hours, requires acknowledgement, and carries a separate permission. | `publishAnnouncement` body |
-| Venues `venueIds` | multi-picker: choose venues | optional | — | — | — | — | `publishAnnouncement` body |
-| Departments `departmentIds` | multi-picker: choose departments | optional | — | — | — | — | `publishAnnouncement` body |
-| Roles `roleIds` | multi-picker: choose roles | optional | — | — | — | — | `publishAnnouncement` body |
-| Requires acknowledgement `requiresAcknowledgement` | toggle | optional | — | — | — | — | `publishAnnouncement` body |
-| Delivery channels `deliveryChannels` | multi-select chips | optional | In app, Push | In app · Push | — | How it reaches people (29 September, build, 18.1.5). `inApp` always; `push` to the targeted people's registered staff phones (tenancy `RegisteredDevice`, kind `mobileHandset`). | `publishAnnouncement` body |
-| Expires at `expiresAt` | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `publishAnnouncement` body |
-| Published at `publishedAt` | date and time picker | required | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `publishAnnouncement` body |
-| Locale `locale` | text field | optional | — | — | — | — | `publishAnnouncement` body |
-
-Errors to draw in the form: 403 The caller lacks `ANNOUNCEMENT_PUBLISH` at the target scope, or sent `kind` `emergency` without `ANNOUNCEMENT_EMERGENCY` (problem type …
+- **Acknowledge**: One large button "I have received this" (Arabic "تم الاستلام"), at least 56 px high, reachable one-handed at the bottom. Optional status after acknowledging, as chips: "Safe at assembly point", "Helping guests", "Need help". *(source: contracts/satellite/workforce.yaml#acknowledgeAnnouncement / F69 step 4 / designer default)*
+- **Declare emergency (duty manager only)**: Title (max 140), instructions (max 4,000), audience (whole venue by default), and a typed confirmation ("EVACUATE") before sending. Kind is fixed to Emergency; acknowledgement and push are forced on and shown locked. *(source: contracts/satellite/workforce.yaml#publishAnnouncement)*
 
 #### Outputs: what the screen shows and produces
 
@@ -372,24 +446,23 @@ Errors to draw in the form: 403 The caller lacks `ANNOUNCEMENT_PUBLISH` at the t
 | Published at | 1 Oct 2026, 14:30 | — |
 | Locale | text | — |
 
-**The announcement reach** (detail panel, from `getAnnouncementReach`)
-
-| Shows | Format | Notes |
-|---|---|---|
-| Announcement | the name it points at, never the id | — |
-| Targeted | 1,234 | — |
-| Delivered | 1,234 | — |
-| Acknowledged | 1,234 | — |
-| Outstanding | list or chips (count when long) | The list that matters. For an operational notice it measures whether anyone read it; during an emergency it is the roll call. |
-
 **Actions and what each produces**
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-|  (publish gate) | navigation or local | — | — | — | — |
 | Acknowledge announcement (primary button) | `acknowledgeAnnouncement` POST `/announcements/{announcementId}/acknowledge` | — | — | — | works offline |
-| Publish announcement (secondary button) | `publishAnnouncement` POST `/announcements` | Announcement | Announcement | 403 The caller lacks `ANNOUNCEMENT_PUBLISH` at the target scope, or sent `kind` `emergency` without `ANNOUNCEMENT_EMERGENCY` (problem type … | opens modal first |
 | What publishing changes (publish gate) | navigation or local | — | — | — | — |
+
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Takeover screen**: Red full-screen header "EMERGENCY" with the title, the instructions in large type, time declared and by whom, and the assembly point or exit named in the text. Bypasses quiet hours, plays the alert sound and vibrates even on silent where the OS allows. Normal navigation is hidden except a "Call duty manager" button. *(source: contracts/satellite/workforce.yaml#publishAnnouncement / F08 step 2)*
+- **Roll call (duty manager)**: Targeted, delivered, acknowledged counts as tiles, then the outstanding list with on-shift people first, each with name, role and last known post, and a Call button. Refreshes every 15 seconds while online; shows its age offline. *(source: contracts/satellite/workforce.yaml#getAnnouncementReach / F69 step 4)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **I have received this**: Acknowledged instantly on the device ("Received 14:31, sending..." until sync); the screen stays in emergency mode with the instructions still visible. *(source: contracts/satellite/workforce.yaml#acknowledgeAnnouncement)*
+- **Declare emergency**: Confirmation names the reach ("This will take over 212 staff phones at Aqua Park"); on success the declarer's own phone shows the roll call. A 403 shows "Needs emergency announcement rights". *(source: contracts/satellite/workforce.yaml#publishAnnouncement)*
+- **Stand down (all clear)**: Duty manager ends emergency mode for the audience; phones return to EMP-050 post-incident restore, then home. *(source: F08 step 2 / screens/P06-staff-app.yaml#EMP-047)*
 
 **Data it reads**: `listAnnouncements` (onLoad, What staff have been told)
 
@@ -411,25 +484,55 @@ Errors to draw in the form: 403 The caller lacks `ANNOUNCEMENT_PUBLISH` at the t
 | Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `WORKFORCE_VIEW`, which `listAnnouncements` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | Fully offline by design |
 
+#### Edge cases to draw
+
+- **No signal when the emergency is received or acknowledged**: The takeover works from the cached announcement; the acknowledgement is journalled and sent on the first signal. The roll call is greyed with "Needs a connection" for the manager. *(source: contracts/satellite/workforce.yaml#acknowledgeAnnouncement)*
+- **Person signed in mid-emergency or was on a break**: Emergency mode opens straight after sign-in, before role selection completes. *(source: F08 step 2)*
+- **Two emergencies at once (e.g. evacuation of one zone and lightning hold elsewhere)**: Stacked, newest on top, each with its own acknowledge; the count "2 active" in the header. *(source: designer default)*
+- **Publisher without ANNOUNCEMENT_EMERGENCY**: Declare emergency shown disabled with "Needs emergency announcement rights", never hidden. *(source: contracts/satellite/workforce.yaml#publishAnnouncement)*
+
+#### Consistency with other screens
+
+- Match `BO-066`: Emergency published from the back office triggers this screen; same title and instructions, same roll call wording.
+- Match `EMP-050`: Stand down leads to post-incident restore.
+- Match `BO-201`: Gate emergency controls (Drop arm) are a separate act on the gates; this screen tells staff. Guest evacuation notices (broadcastToGuests) are a third, two-person act. Show "Guests notified 14:32" here when known, and use the same zone and exit names.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+emergency:
+  title: Evacuate Adventure Zone via North Exit
+  instructions: Stop all rides in Adventure Zone. Guide guests to Assembly Point B (North Car Park). Do not use
+    Gate 3.
+  declared: 14:30 by Ahmed Al Mansoori, Operations manager
+  reach:
+    targeted: 212
+    delivered: 205
+    acknowledged: 188
+    outstanding: 24
+  outstanding:
+  - name: Omar Haddad
+    role: Ride operator
+    post: Falcon Coaster
+    onShift: true
+  - name: Maria Santos
+    role: Cashier
+    post: North Entry ticket office
+    onShift: true
+```
+
 #### Permissions
 
 - `listAnnouncements` → `WORKFORCE_VIEW` (read) · staff
 - `acknowledgeAnnouncement` → `WORKFORCE_VIEW` (read) · staff
-- `getAnnouncementReach` → `WORKFORCE_VIEW` (read) · staff
-- `publishAnnouncement` → `ANNOUNCEMENT_PUBLISH` (configure) · staff
 
 **A refused user sees:** Shown when the caller lacks `WORKFORCE_VIEW`, which `listAnnouncements` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
 #### Requirements it meets
 
-4 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
-
-| Ref | Requirement (shortened) | Domain | Verdict | Via |
-|---|---|---|---|---|
-| 1.2.66 | System shall send assignment and schedule notifications. | Ticketing Catalogue | CONTRACTED | `publishAnnouncement` |
-| 18.1.5 | Push Notifications - System shall support push notifications. | Employee Mobile App & AI Assistant | CONTRACTED | `publishAnnouncement` |
-| 18.9.3 | Announcements - Users shall receive announcements. | Employee Mobile App & AI Assistant | CONTRACTED | `publishAnnouncement` |
-| 18.9.4 | Emergency Alerts - Users shall receive emergency notifications. | Employee Mobile App & AI Assistant | CONTRACTED | `publishAnnouncement` |
+No matrix row traces to this screen's operations or data.
 
 #### Client meeting inputs
 
@@ -445,18 +548,19 @@ Also apply: 1 for P06 · Operations, 12 for all of P06, 29 for every app (sectio
 #### References
 
 - Wireframe frame: `wireframes/P06 Venue Staff App.dc.html#emp-047` · status **notStarted** · provenance generated
-- Flow F69 *An incident is reported, escalated and closed*, step 4: If it is a venue-wide event, an announcement goes out. → **Reach is measured.** An evacuation announcement nobody acknowledged is an evacuation nobody heard.
-- Flow F69 branch at step 4 (high): when Staff do not acknowledge the announcement., **Escalated by name, not re-broadcast.** A second identical message to everybody is a message everybody ignores.
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (12), with its required mark, default, format and its error state (403).
-- [ ] Every output is drawn (29 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (1), with its required mark, default, format and its error state.
+- [ ] Every output is drawn (24 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#EMP-047?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: , Acknowledge announcement, Publish announcement, What publishing changes.
+- [ ] Every action is wired with its success and its failure: Acknowledge announcement, What publishing changes.
 - [ ] Every transition is wired: `EMP-001`, `EMP-002`, `EMP-003`, `EMP-050`.
-- [ ] Every gated control is gated: `ANNOUNCEMENT_PUBLISH`, `WORKFORCE_VIEW`.
+- [ ] Every gated control is gated: `WORKFORCE_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 4 edge case(s) from the process notes are drawn.
+- [ ] The 2 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
+- [ ] The 2 decision(s) taken on this screen are drawn as decided, not as the old default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -470,7 +574,7 @@ Also apply: 1 for P06 · Operations, 12 for all of P06, 29 for every app (sectio
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Operations · wave 2 · needs the `maintenance` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `INCIDENT_MANAGE`, `INCIDENT_VIEW` (1 configure, 1 read); in the flows as supervisor |
+| Who uses it | venue staff holding `INCIDENT_MANAGE`, `INCIDENT_VIEW` (1 configure, 1 read) |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | listDetail (comfortable density): `listIncidents` reads the population and `getIncident` reads one of them — list, select, act |
 | Offline | **Works offline by design.** Post-incident restore is exactly when the network is worst |
@@ -478,6 +582,24 @@ Also apply: 1 for P06 · Operations, 12 for all of P06, 29 for every app (sectio
 | Route | `/operations/post-incident-restore` |
 
 **What the spec says about it.** Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. **Removed 24 August**: reportIncident. **Bulk-attach residue.** A device-settings screen does not merge guest profiles, a rota view does not author the rota, a shift summary does not open a shift, and **authority notification belongs where the incident is raised, not where it is read.**
+
+**Known gaps.** Removed 2 October 2026 (CHG-WIR-001): Recording the authority notification is a step of following up the incident (EMP-027), not of restoring the venue; the screen's own note says notification …
+
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** After an incident is controlled - an evacuation, a fire alarm, a ride stop, a cordoned area - the duty supervisor puts the venue back the way it was: checks each thing the incident changed, returns rides and gates to service (with an inspection where required), sends the all-clear, and records that it was done. It must cope with poor or no network, because that is when it is used. The one thing to get right: a checklist of what is still out because of this incident, each item visibly restored or deliberately kept closed, so nothing reopens by accident and nothing stays closed by oversight.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **The screen binds only incident list, update and authority notification; nothing it binds restores anything** Why: "Put the venue back to how it was" needs asset return to service (setAssetStatus with inspection), gate modes (setTurnstileMode), an all-clear (publishAnnouncement, getAnnouncementReach) and a read of what the incident changed. None is bound. *(source: screens/P06-staff-app.yaml#EMP-050 / contracts/satellite/maintenance.yaml#setAssetStatus / F69 step 4; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **Nothing records what an incident took out of service** Why: AssetStatusChange carries workOrderId and inspectionId but no incidentId, so "what is still out because of this incident" cannot be read. *(source: contracts/satellite/maintenance.yaml#/components/schemas/AssetStatusChange; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **State "Works offline by design" but listIncidents and getIncident are online only** Why: The read the screen opens with cannot be served offline; cache the incident when EMP-027 opens it, or make getIncident offline-capable. *(source: contracts/satellite/maintenance.yaml#getIncident / screens/P06-staff-app.yaml#EMP-050; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+
+**Fixed on main** (the package already carries these; draw what it says): Record authority notification bound here, and F69 step 3 makes this the notification screen (CHG-WIR-001).
+
+#### Decided on this screen
+
+Answered questions: draw the decision, not the old default. Where a decision and the tables below differ, the decision wins.
+
+- **Is the restore checklist a configurable ad-hoc inspection template per venue (as the rental pack's incident-based inspection suggests), or a fixed list?** → Drawn default accepted: Draw the incident-derived rows plus a configurable "Restore checks" section from an ad-hoc template. *(decided by Chinmay, 2026-10-02; DEC-538 / CHG-NOTE-008)* **Reviewable:** a default the lead may still overrule before the block is tasked.
 
 #### Inputs: what the user enters or picks
 
@@ -488,20 +610,6 @@ Also apply: 1 for P06 · Operations, 12 for all of P06, 29 for every app (sectio
 | Severity | radio group | optional | — | Near miss · Minor · Moderate · Major · Critical | — | Sends `?severity=` to `listIncidents`. | `listIncidents` ?severity |
 | Status | radio group | optional | — | Reported · Under investigation · Action required · Closed | — | Sends `?status=` to `listIncidents`. | `listIncidents` ?status |
 | Is reportable | toggle | optional | — | — | — | Sends `?isReportable=` to `listIncidents`. | `listIncidents` ?isReportable |
-
-**Form: Record authority notification** (modal, opened by *Record authority notification*; *Record authority notification* calls `recordAuthorityNotification`, *Cancel* sends nothing)
-
-**Collects what `recordAuthorityNotification` sends before it is called.** Required: `authority`, `notifiedAt`. Optional: `reference`, `notifiedByPrincipalId`, `attachmentRefs`. Dismissing sends nothing; the screen behind is unchanged.
-
-| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
-|---|---|---|---|---|---|---|---|
-| Authority `authority` | text field | required | — | max length 200 | — | — | `recordAuthorityNotification` body |
-| Reference `reference` | text field | optional | — | max length 128 | — | — | `recordAuthorityNotification` body |
-| Notified at `notifiedAt` | date and time picker | required | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `recordAuthorityNotification` body |
-| Notified by principal `notifiedByPrincipalId` | picker: choose a notified by principal | optional | — | — | shows names, sends the id | — | `recordAuthorityNotification` body |
-| Attachment refs `attachmentRefs` | list of values (chips) | optional | — | — | — | — | `recordAuthorityNotification` body |
-
-Errors to draw in the form: 409 The incident is not reportable (`isReportable` false, audit R106 (6)).
 
 **Form: Save incident** (modal, opened by *Save incident*; *Save incident* calls `updateIncident`, *Cancel* sends nothing)
 
@@ -518,7 +626,14 @@ Errors to draw in the form: 409 The incident is not reportable (`isReportable` f
 | Corrective work order `correctiveWorkOrderId` | picker: choose a corrective work order | optional | — | — | shows names, sends the id | — | `updateIncident` body |
 | Attachment refs `attachmentRefs` | list of values (chips) | optional | — | — | — | — | `updateIncident` body |
 
-Errors to draw in the form: 400 Closure attempted without findings or a corrective action
+Errors to draw in the form: 400 Closure attempted without findings or a corrective action; 403 A critical incident closed by the person who completed its corrective action (`closer-completed-action`; workbook Q530; CHG-CSA-033).
+
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Restore checklist**: One row per thing taken out - assets out of service, gates in Drop arm or Closed, rides closed, areas restricted, products stopped - each with Restore or Keep closed; Keep closed requires a reason. Generic checks follow (area clear of hazards, barriers removed, first-aid stock replaced) from an ad-hoc inspection template. *(source: screens/P06-staff-app.yaml#EMP-050 / contracts/satellite/maintenance.yaml#/components/schemas/InspectionTemplate)*
+- **Return asset to service**: For an asset that requires an inspection to return, Restore opens the inspection first; the return is refused without it. A reason is always recorded ("Restored after INC-2026-0217 - false alarm, ride inspected"). *(source: contracts/satellite/maintenance.yaml#setAssetStatus / F12 step 5)*
+- **Gate mode**: Gates changed during the incident are listed with their current mode and a "Back to Normal" control, using the access gate-mode component (Drop arm green, Closed red). *(source: contracts/spine/access.yaml#setTurnstileMode)*
+- **All-clear announcement**: Prefilled message ("All clear at the food court - normal operation resumed 12:40"), audience (staff in zone or whole venue), acknowledgement required for venue-wide events. *(source: contracts/satellite/workforce.yaml#publishAnnouncement / F69 step 4)*
 
 #### Outputs: what the screen shows and produces
 
@@ -587,8 +702,19 @@ Errors to draw in the form: 400 Closure attempted without findings or a correcti
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Record authority notification (primary button) | `recordAuthorityNotification` POST `/incidents/{incidentId}/notify-authority` | inline | Incident | 409 The incident is not reportable (`isReportable` false, audit R106 (6)). | opens modal first |
-| Save incident (secondary button) | `updateIncident` PATCH `/incidents/{incidentId}` | inline | Incident | 400 Closure attempted without findings or a corrective action | opens modal first |
+| Save incident (secondary button) | `updateIncident` PATCH `/incidents/{incidentId}` | inline | Incident | 400 Closure attempted without findings or a corrective action; 403 A critical incident closed by the person who completed its corrective action (`closer-completed-action`; workbook Q530; CHG-CSA-033). | opens modal first |
+
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Incident header**: Incident number, kind, severity, time since it occurred, and progress "4 of 6 restored"; reportable incidents show notification status read-only. *(source: contracts/satellite/maintenance.yaml#getIncident)*
+- **Restored log**: Each restored item with who and when, appended to the incident as an investigation note so the incident's timeline shows the restore. *(source: contracts/satellite/maintenance.yaml#updateIncident)*
+- **Announcement reach**: "Read by 38 of 45 staff" with the names of those who have not acknowledged, for venue-wide events. *(source: contracts/satellite/workforce.yaml#getAnnouncementReach / F69 step 4)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Restore (per row)**: Performs that row's act (asset status, gate mode, ride reopen) and ticks it; a failure is shown on the row ("Needs the post-maintenance inspection"). *(source: contracts/satellite/maintenance.yaml#setAssetStatus / contracts/spine/access.yaml#setTurnstileMode)*
+- **Send all clear**: Publishes the announcement and opens Emergency mode (EMP-047) to follow acknowledgements. *(source: contracts/satellite/workforce.yaml#publishAnnouncement / F69 step 4)*
+- **Finish restore**: Allowed when every row is Restored or Keep closed with a reason; appends a "Venue restored" note and returns home carrying the incident id. *(source: contracts/satellite/maintenance.yaml#updateIncident / designer default)*
 
 **Data it reads**: `listIncidents` (onLoad, List incidents)
 
@@ -605,17 +731,54 @@ Errors to draw in the form: 400 Closure attempted without findings or a correcti
 |---|---|
 | Loading (`?state=loading`) | The post-incident restore list. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the post-incident restore untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No post-incident restore yet. Offers Record authority notification (`recordAuthorityNotification`); distinct from a filter that matched nothing. |
+| Empty, first run (`?state=emptyFirstRun`) | No post-incident restore yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on severity, status, isReportable and the post-incident restore are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `INCIDENT_VIEW`, which `listIncidents` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | **Works offline by design.** Post-incident restore is exactly when the network is worst |
-| Validation and conflict | the form keeps what was entered and marks the problem: 400 Closure attempted without findings or a corrective action; 409 The incident is not reportable (`isReportable` false, audit R106 (6)). |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 Closure attempted without findings or a corrective action |
+
+#### Edge cases to draw
+
+- **No network**: Asset return to service and inspections are offline-capable and queue; gate modes and announcements need the network and are greyed with "Needs connection - use the radio" (per VO-R07). *(source: contracts/satellite/maintenance.yaml#setAssetStatus / contracts/satellite/maintenance.yaml#submitInspection)*
+- **Something stays closed**: Kept-closed items stay on the home screen as "Still closed after INC-2026-0217" until restored. *(source: designer default)*
+- **Ride back in service but its queue did not reopen**: The row shows "Ride back in service - queue still closed" and offers to reopen the queue (the F12 cascade failure). *(source: F12 step 5)*
+
+#### Consistency with other screens
+
+- Match `EMP-047`: Emergency mode starts what this screen ends; the same list of what was changed (gates, rides, areas) is shown in both.
+- Match `BO-069`: Return to service uses the same reason and inspection rules as the asset register.
+- Match `EMP-027`: Restore entries appear in the incident's timeline.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+incident: INC-2026-0217 Fire alarm, Summit Peaks food court, Major, occurred 12:05
+items:
+- item: Food court zone
+  change: Evacuated
+  action: Restore
+  done: 12:38 Ahmed Al Mansoori
+- item: North Entry gates 1-2
+  change: Drop arm
+  action: Back to Normal
+  done: '12:39'
+- item: Laser Arena
+  change: Out of service
+  action: Restore after inspection
+  done: pending
+- item: Falcon Coaster
+  change: Stopped
+  action: Keep closed
+  reason: Unrelated restraint fault WO-2026-01482
+announcement: All clear at Summit Peaks food court - normal operation resumed 12:40 (read by 38 of 45)
+```
 
 #### Permissions
 
 - `listIncidents` → `INCIDENT_VIEW` (read) · staff
 - `getIncident` → `INCIDENT_VIEW` (read) · staff
-- `recordAuthorityNotification` → `INCIDENT_MANAGE` (configure) · staff
 - `updateIncident` → `INCIDENT_MANAGE` (configure) · staff
 
 **A refused user sees:** Shown when the caller lacks `INCIDENT_VIEW`, which `listIncidents` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
@@ -641,17 +804,19 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### References
 
 - Wireframe frame: `wireframes/P06 Venue Staff App.dc.html#emp-050` · status **notStarted** · provenance generated
-- Flow F69 *An incident is reported, escalated and closed*, step 3: Where required, the authorities are notified. → **The notification is itself a record.** *We told the police* with no time and no name is not evidence.
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (16), with its required mark, default, format and its error state (400, 404, 409).
+- [ ] Every input above is drawn (11), with its required mark, default, format and its error state (400, 403, 404).
 - [ ] Every output is drawn (44 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#EMP-050?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: Record authority notification, Save incident.
+- [ ] Every action is wired with its success and its failure: Save incident.
 - [ ] Every transition is wired: `EMP-047`, `EMP-001`, `EMP-002`, `EMP-003`.
 - [ ] Every gated control is gated: `INCIDENT_MANAGE`, `INCIDENT_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 3 edge case(s) from the process notes are drawn.
+- [ ] The 3 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
+- [ ] The 1 decision(s) taken on this screen are drawn as decided, not as the old default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -676,11 +841,38 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Known gaps.** **This screen declares no operation the contracts recognise.** Nothing fills it, nothing it does is committed anywhere, and its shape below is a default rather than a reading.
 
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** Language and direction for the Staff App: choose English or Arabic, and the whole app mirrors right to left. Reached from Device settings; works with no network. The one thing to get right: Arabic is a mirror, not a translation - layout, navigation and icons with a direction flip, while numbers, times, money, ticket and media codes stay left to right inside the Arabic line.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **Screen named "Arabic / RTL" with pattern listDetail and no operations** Why: It is the Language setting (English, Arabic) whose consequence is direction; draw it as a two-option settings screen with preview. *(source: screens/P06-staff-app.yaml#EMP-045; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **Staff announcements carry a single locale with no Arabic variant, so the language chosen here cannot be honoured for them** Why: DI-019 includes notifications in full Arabic support. *(source: DI-019 / contracts/satellite/workforce.yaml#/components/schemas/Announcement; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+
+#### Decided on this screen
+
+Answered questions: draw the decision, not the old default. Where a decision and the tables below differ, the decision wins.
+
+- **Are Arabic-Indic digits ever wanted on staff devices, or always Western digits?** → Drawn default accepted: Western digits in both languages; no digits toggle drawn until confirmed. *(decided by Chinmay, 2026-10-02; DEC-535 / CHG-NOTE-008)* **Reviewable:** a default the lead may still overrule before the block is tasked.
+
 #### Inputs: what the user enters or picks
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
 
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Language**: Two large options, each written in its own language: "English" and "العربية". Choosing one switches text and direction immediately, with no restart. Follows the device language on first run. *(source: DI-019)*
+- **Digits**: Western digits (0-9) by default in both languages; a toggle for Arabic-Indic digits only if the client confirms. *(source: designer default)*
+
 #### Outputs: what the screen shows and produces
+
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Preview**: A sample shift card ("السبت 10 أكتوبر، 07:00 - 15:00، بوابة الساحة الرئيسية 2") and a sample price "AED 1,855.00" rendered in the chosen direction, showing the time range and amount kept left to right. *(source: DI-019)*
+- **What changes**: One line under the choice, "Menus, lists and calendars run right to left. Times, prices and codes do not change." *(source: ADR-0011 / DI-019)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Choose language**: Applies at once to every screen, including the rota calendar (days run right to left), the scanner result and notifications text. *(source: DI-019)*
 
 **Where the user goes next**
 
@@ -696,6 +888,33 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Error (`?state=error`) | — |
 | Empty, first run (`?state=emptyFirstRun`) | — |
 | Offline (`?state=offline`) | **Fully offline.** Direction is a device setting, not a server one |
+
+#### Edge cases to draw
+
+- **Content that exists only in English (an announcement written in English, a guest name in Latin script)**: Shown as written inside the mirrored layout, aligned to its own script; tagged "English only" on announcements. *(source: DI-019 / contracts/satellite/workforce.yaml#/components/schemas/Announcement)*
+- **Offline**: Fully usable; language is a device setting. *(source: screens/P06-staff-app.yaml#EMP-045)*
+- **Time range in Arabic**: "07:00 - 15:00" keeps start on the left; the dash never reverses the operands. *(source: ADR-0011 / DI-019)*
+
+#### Consistency with other screens
+
+- Match `EMP-044`: Same settings layout; the accessibility preview follows the language chosen here.
+- Match `EMP-022`: The rota calendar must be checked in both directions (week runs right to left in Arabic).
+- Match `EMP-039`: Announcements show the Arabic version when the device is in Arabic and one exists.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+options:
+- English
+- العربية
+preview:
+  shift: السبت 10 أكتوبر 2026، 07:00 - 15:00
+  post: بوابة الساحة الرئيسية 2
+  amount: AED 1,855.00
+  ticket: VT0010
+```
 
 #### Permissions
 
@@ -726,6 +945,9 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `EMP-001`, `EMP-002`, `EMP-003`.
 - [ ] Sign-in is asked only where the spec asks for it.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 3 edge case(s) from the process notes are drawn.
+- [ ] The 2 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
+- [ ] The 1 decision(s) taken on this screen are drawn as decided, not as the old default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -750,6 +972,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Known gaps.** **`logout` declares no request body shape**, so nothing says what this editor edits. The fields cannot be derived and the screen needs the contract before it needs a designer.
 
+**From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** Leave the shared handheld safe for the next person: sign out, with what stays on the device said plainly. A steward with queued offline scans is told they will sync after sign-out, not lost.
+
 #### Inputs: what the user enters or picks
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
@@ -762,6 +986,10 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |---|---|---|---|---|---|
 | Logout (primary button) | `logout` POST `/auth/logout` | — | — | — | works offline |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
+
+**What each action does** (from the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process; these refine the tables above and win where they differ)
+
+- **Sign out**: Ends this session only; pending offline actions remain queued under the person who made them and sync when online; returns to EMP-001. *(source: contracts/spine/identity.yaml#logout; ADR-0013)*
 
 **Where the user goes next**
 
@@ -777,6 +1005,15 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Error (`?state=error`) | **Sign-out with a pending journal warns rather than blocks.** A steward handing over a device must not be trapped by a failed sync |
 | Empty, first run (`?state=emptyFirstRun`) | — |
 | Offline (`?state=offline`) | Signs out locally and the journal stays on the device for the next steward |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+pendingSync: 14 scans waiting to sync
+signedIn: Yusuf Rahman · Steward · since 07:58
+```
 
 #### Permissions
 
@@ -830,6 +1067,14 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Route | `/operations/hand-over-the-journal` |
 
 **What the spec says about it.** Definition derived from the wireframe board on 14 August. Components, states and operations still to be written.
+
+**Known gaps.** Contract gap recorded 2 October 2026 (CHG-WIR-004): No operation hands an unsynced scan journal from one device to another or to the edge node.
+
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** Hand over an unsynced journal from a device that is going flat or changing hands, so the next shift does not carry somebody else's scans: show what is unsynced, and transfer it (to another device or the venue edge) before the device is passed on. The one thing to get right: the device cannot be handed over silently with an unsynced journal.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **The screen declares no operation at all** Why: Handing over a journal (device to device, or to the edge node) has no contract; it cannot be built. *(source: screens/P06-staff-app.yaml#EMP-049 / F71 step 3; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
 
 #### Inputs: what the user enters or picks
 
@@ -914,6 +1159,14 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 |---|---|---|---|---|---|
 | Sync scans (primary button) | `syncScans` POST `/access/scans` | inline | ScanSyncResult | 400 Validation failed; 403 Authenticated but not permitted at the requested scope | opens modal first |
 
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Unsynced journal**: Count, oldest item, owner (the steward whose scans they are). *(source: F71 step 3)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Hand over**: Not bound to any operation yet; draw the action with the transfer target and flag it. *(source: screens/P06-staff-app.yaml#EMP-049)*
+
 **Data it reads**: `listScans` (onLoad, List scan events)
 
 **Where the user goes next**
@@ -933,6 +1186,22 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `REPORT_VIEW_VENUE`, which `listScans` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | **The point of the screen.** It exists because the journal outlives the shift |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed |
+
+#### Consistency with other screens
+
+- Match `EMP-017`: A successful sync makes the handover unnecessary.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+journal:
+  owner: Rahul Menon
+  unsynced: 86
+  oldest: '11:05'
+  battery: 6%
+```
 
 #### Permissions
 
@@ -981,6 +1250,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `EMP-001`, `EMP-002`, `EMP-003`.
 - [ ] Every gated control is gated: `ACCESS_VALIDATE`, `REPORT_VIEW_VENUE`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -1070,8 +1340,6 @@ Method, path, parameters, request and response for every operation these screens
 ```json
 {
 "acknowledgeAnnouncement": {"method":"POST","path":"/announcements/{announcementId}/acknowledge","contract":"workforce","summary":"Confirm you have read it","permission":"WORKFORCE_VIEW","offlineCapable":true,"conflictPolicy":"append","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":null},
-"createInspectionTemplate": {"method":"POST","path":"/inspection-templates","contract":"maintenance","summary":"Create an inspection template","permission":"INSPECTION_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"InspectionTemplate","responds":"InspectionTemplate"},
-"getAnnouncementReach": {"method":"GET","path":"/announcements/{announcementId}/reach","contract":"workforce","summary":"Who has acknowledged, and who has not","permission":"WORKFORCE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"AnnouncementReach"},
 "getIncident": {"method":"GET","path":"/incidents/{incidentId}","contract":"maintenance","summary":"Read an incident","permission":"INCIDENT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"IncidentDetail"},
 "listAnnouncements": {"method":"GET","path":"/announcements","contract":"workforce","summary":"What staff have been told","permission":"WORKFORCE_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"unacknowledgedOnly","in":"query","required":null}],"requestBody":null,"responds":"Announcement"},
 "listIncidents": {"method":"GET","path":"/incidents","contract":"maintenance","summary":"List incidents","permission":"INCIDENT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"severity","in":"query","required":null},{"name":"status","in":"query","required":null},{"name":"isReportable","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
@@ -1079,8 +1347,6 @@ Method, path, parameters, request and response for every operation these screens
 "listInspections": {"method":"GET","path":"/inspections","contract":"maintenance","summary":"List completed inspections","permission":"INSPECTION_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"templateId","in":"query","required":null},{"name":"assetId","in":"query","required":null},{"name":"outcome","in":"query","required":null},{"name":"performedFrom","in":"query","required":null},{"name":"performedTo","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listScans": {"method":"GET","path":"/access/scans","contract":"access","summary":"List scan events","permission":"REPORT_VIEW_VENUE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"accessPointId","in":"query","required":null},{"name":"ticketId","in":"query","required":null},{"name":"outcome","in":"query","required":null},{"name":"recordedFrom","in":"query","required":null},{"name":"recordedTo","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "logout": {"method":"POST","path":"/auth/logout","contract":"identity","summary":"Close the current session","permission":null,"offlineCapable":true,"conflictPolicy":"append","scopeLevel":"workstation","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":null},
-"publishAnnouncement": {"method":"POST","path":"/announcements","contract":"workforce","summary":"Tell staff something","permission":"ANNOUNCEMENT_PUBLISH","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"Announcement","responds":"Announcement"},
-"recordAuthorityNotification": {"method":"POST","path":"/incidents/{incidentId}/notify-authority","contract":"maintenance","summary":"Record notification to an external authority","permission":"INCIDENT_MANAGE","offlineCapable":false,"conflictPolicy":"append","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Incident"},
 "submitInspection": {"method":"POST","path":"/inspections","contract":"maintenance","summary":"Submit a completed inspection","permission":"INSPECTION_SUBMIT","offlineCapable":true,"conflictPolicy":"append","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"SubmitInspectionRequest","responds":"InspectionResult"},
 "syncScans": {"method":"POST","path":"/access/scans","contract":"access","summary":"Replay scans recorded offline","permission":"ACCESS_VALIDATE","offlineCapable":false,"conflictPolicy":"append","scopeLevel":"workstation","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"ScanSyncResult"},
 "updateIncident": {"method":"PATCH","path":"/incidents/{incidentId}","contract":"maintenance","summary":"Investigate, escalate or close an incident","permission":"INCIDENT_MANAGE","offlineCapable":false,"conflictPolicy":"append","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Incident"}
@@ -1095,7 +1361,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 {
 "Announcement": {"type":"object","x-ticvai-persistence":"workforce.announcement","required":["title","body","kind","publishedAt"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"title":{"type":"string","maxLength":140},"body":{"type":"string","maxLength":4000},"kind":{"$ref":"#/components/schemas/AnnouncementKind"},"venueIds":{"type":"array","items":{"type":"string","format":"uuid"}},"departmentIds":{"type":"array","items":{"type":"string","format":"uuid"}},"roleIds":{"type":"array","items":{"type":"string","format":"uuid"}},"requiresAcknowledgement":{"type":"boolean"},"deliveryChannels":{"type":"array","description":"How it reaches people (29 September, build, 18.1.5). `inApp` always; `push` to the targeted people's registered staff phones (tenancy `RegisteredDevice`, kind `mobileHandset`). `emergency` is sent by both whatever is set here.\n","items":{"type":"string","enum":["inApp","push"]},"default":["inApp","push"]},"expiresAt":{"type":"string","format":"date-time","nullable":true},"publishedByPrincipalId":{"type":"string","format":"uuid","readOnly":true},"publishedAt":{"type":"string","format":"date-time"},"locale":{"type":"string","nullable":true}}},
 "AnnouncementKind": {"type":"string","description":"`emergency` is not a louder `operational`. It overrides the home screen, bypasses quiet hours, requires acknowledgement, and carries a separate permission.\n","enum":["operational","safety","emergency","hr","celebration"]},
-"AnnouncementReach": {"type":"object","x-ticvai-persistence":"none — computed from workforce.announcement_receipt","properties":{"announcementId":{"type":"string","format":"uuid"},"targeted":{"type":"integer"},"delivered":{"type":"integer"},"acknowledged":{"type":"integer"},"outstanding":{"type":"array","description":"**The list that matters.** For an operational notice it measures whether anyone read it; during an emergency it is the roll call.\n","items":{"type":"object","properties":{"principalId":{"type":"string","format":"uuid"},"displayName":{"type":"string"},"onShift":{"type":"boolean"}}}}}},
 "DenyReason": {"type":"string","description":"Enumerated so the client can render an appropriate operator prompt. A gate operator facing a queue needs a reason and a next action, not a boolean.\n","enum":["notFound","notYetValid","expired","alreadyUsed","reentryLimitReached","exitRequiredBeforeReentry","wrongAccessPoint","wrongPerformance","outsideAdmissionWindow","entitlementSuspended","blacklisted","capacityReached","waiverRequired","accompanimentRequired","mediaDeactivated","unpaid","delegatedRightExhausted","delegatedRightRevoked","journeyNotCovered"]},
 "Direction": {"type":"string","enum":["entry","exit","reentry","crossover"]},
 "Incident": {"x-ticvai-persistence":"maintenance.incident","type":"object","required":["id","incidentNumber","kind","severity","status","venueId","occurredAt","reportedByPrincipalId"],"properties":{"id":{"type":"string","format":"uuid"},"incidentNumber":{"type":"string","readOnly":true,"description":"**Server-assigned: the venue prefix plus a sequence per venue** (decided 28 September, audit R152). Not gapless; only tax invoices are gapless, per legal entity.\n"},"kind":{"$ref":"#/components/schemas/IncidentKind"},"severity":{"$ref":"#/components/schemas/IncidentSeverity"},"status":{"$ref":"#/components/schemas/IncidentStatus"},"venueId":{"type":"string","format":"uuid"},"assetId":{"type":"string","format":"uuid","nullable":true},"locationDescription":{"type":"string","nullable":true},"isReportable":{"type":"boolean","description":"Requires notification to an external authority within a statutory window."},"notificationDueAt":{"type":"string","format":"date-time","nullable":true},"notifiedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true,"x-ticvai-derived":"onWrite","description":"The earliest `notifiedAt` among this incident's authority notifications. **Maintained on write** by `recordAuthorityNotification`; each notification itself is a row of `maintenance.incident_authority_notification`.\n"},"assignedToPrincipalId":{"type":"string","format":"uuid","nullable":true},"reportedByPrincipalId":{"type":"string","format":"uuid"},"correctiveWorkOrderId":{"type":"string","format":"uuid","nullable":true},"occurredAt":{"type":"string","format":"date-time"},"recordedAt":{"type":"string","format":"date-time"},"closedAt":{"type":"string","format":"date-time","nullable":true},"syncedAt":{"type":"string","format":"date-time","nullable":true}}},

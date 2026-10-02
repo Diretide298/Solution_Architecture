@@ -101,6 +101,12 @@
     "operation": null,
     "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
     "source": "pack Digital Asset Management DAM.pdf, page 25 §Display"
+   },
+   {
+    "operation": "listAssets",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): The screen is about media files in the DAM (assets.yaml); maintenance listAssets returns rides, turnstiles and pumps from the physical asset register (design-notes correction venue-operations CMS-071).",
+    "source": "screens/P13-white-label-cms.yaml#CMS-071 | contracts/satellite/maintenance.yaml#listAssets"
    }
   ],
   "layout": {
@@ -108,65 +114,123 @@
    "regions": [
     {
      "name": "contentBody",
-     "slot": "collection",
+     "slot": "metrics",
      "components": [
       {
-       "kind": "dataTable",
-       "label": "Every asset intelligence",
-       "columns": [
-        "AI-Processed Assets",
-        "Pending AI Processing",
-        "AI Tags Generated",
-        "Duplicate Candidates",
-        "Version Updates",
-        "Renditions Generated",
-        "Processing Failures",
-        "Assets Requiring Review",
-        "Processed",
-        "Queued",
-        "Processing",
-        "Review Required",
-        "Failed",
-        "95–100%",
-        "80–94%",
-        "60–79%",
-        "Below Threshold"
-       ],
-       "bindsTo": null,
-       "operation": null,
-       "provenance": "pack Digital Asset Management DAM.pdf, page 25 §Display"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
+       "kind": "metricTile",
+       "label": "AI-Processed Assets",
+       "operation": "getMediaUsageAnalytics",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-023, design-notes correction)"
+      },
       {
-       "kind": "detailPanel",
-       "label": "The selected asset intelligence",
-       "bindsTo": null,
-       "columns": [
-        "AI-Processed Assets",
-        "Pending AI Processing",
-        "AI Tags Generated",
-        "Duplicate Candidates",
-        "Version Updates",
-        "Renditions Generated",
-        "Processing Failures",
-        "Assets Requiring Review",
-        "Processed",
-        "Queued",
-        "Processing",
-        "Review Required",
-        "Failed",
-        "95–100%",
-        "80–94%",
-        "60–79%",
-        "Below Threshold"
-       ],
-       "notes": null,
-       "provenance": "pack Digital Asset Management DAM.pdf, page 25 §Display"
+       "kind": "metricTile",
+       "label": "Pending AI Processing",
+       "operation": "getMediaUsageAnalytics",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-023, design-notes correction)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "AI Tags Generated",
+       "operation": "getMediaUsageAnalytics",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-023, design-notes correction)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Duplicate Candidates",
+       "operation": "getMediaUsageAnalytics",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-023, design-notes correction)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Version Updates",
+       "operation": "getMediaUsageAnalytics",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-023, design-notes correction)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Renditions Generated",
+       "operation": "getMediaUsageAnalytics",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-023, design-notes correction)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Processing Failures",
+       "operation": "getMediaUsageAnalytics",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-023, design-notes correction)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Assets Requiring Review",
+       "operation": "getMediaUsageAnalytics",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-023, design-notes correction)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Processed",
+       "operation": "getMediaUsageAnalytics",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-023, design-notes correction)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Queued",
+       "operation": "getMediaUsageAnalytics",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-023, design-notes correction)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Processing",
+       "operation": "getMediaUsageAnalytics",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-023, design-notes correction)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Review Required",
+       "operation": "getMediaUsageAnalytics",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-023, design-notes correction)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Failed",
+       "operation": "getMediaUsageAnalytics",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-023, design-notes correction)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "95–100%",
+       "operation": "getMediaUsageAnalytics",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-023, design-notes correction)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "80–94%",
+       "operation": "getMediaUsageAnalytics",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-023, design-notes correction)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "60–79%",
+       "operation": "getMediaUsageAnalytics",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-023, design-notes correction)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Below Threshold",
+       "operation": "getMediaUsageAnalytics",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-023, design-notes correction)"
+      },
+      {
+       "kind": "chart",
+       "label": "AI processing over time",
+       "operation": "getMediaUsageAnalytics",
+       "notes": "Per VO-R02: processing volume by day.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-023, design-notes correction)"
+      },
+      {
+       "kind": "chart",
+       "label": "Confidence bands",
+       "operation": "getMediaUsageAnalytics",
+       "notes": "Per VO-R02: high, medium and low confidence counts; drawn pending the fields (CHG-SGU-024).",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-023, design-notes correction)"
       }
      ]
     },
@@ -206,17 +270,11 @@
   "states": {
    "loading": "The asset intelligence list.",
    "error": "Could not load. Names which read failed and leaves the asset intelligence untouched.",
-   "emptyFirstRun": "No asset intelligence yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No asset intelligence yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the asset intelligence are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
-   {
-    "operationId": "listAssets",
-    "contract": "maintenance",
-    "purpose": "List assets",
-    "trigger": "onLoad"
-   },
    {
     "operationId": "getMediaUsageAnalytics",
     "contract": "assets",
@@ -527,7 +585,7 @@
   "states": {
    "loading": "The semantic natural-language asset list.",
    "error": "Could not load. Names which read failed and leaves the semantic natural-language asset untouched.",
-   "emptyFirstRun": "No semantic natural-language asset yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "Nothing here yet for Semantic & Natural-Language Asset Search. This screen only reads, so it offers no create action and says where the records come from.",
    "emptyNoResults": "The filter narrowed it and the semantic natural-language asset are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -695,7 +753,7 @@
   "states": {
    "loading": "The visual similarity related list.",
    "error": "Could not load. Names which read failed and leaves the visual similarity related untouched.",
-   "emptyFirstRun": "No visual similarity related yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "Nothing here yet for Visual Similarity & Related Asset Discovery. This screen only reads, so it offers no create action and says where the records come from.",
    "emptyNoResults": "The filter narrowed it and the visual similarity related are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -886,7 +944,7 @@
   "states": {
    "loading": "The duplicate near-duplicate list.",
    "error": "Could not load. Names which read failed and leaves the duplicate near-duplicate untouched.",
-   "emptyFirstRun": "No duplicate near-duplicate yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "Nothing here yet for Duplicate & Near-Duplicate Management. This screen only reads, so it offers no create action and says where the records come from.",
    "emptyNoResults": "The filter narrowed it and the duplicate near-duplicate are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -1037,7 +1095,7 @@
   "states": {
    "loading": "The asset version revision list.",
    "error": "Could not load. Names which read failed and leaves the asset version revision untouched.",
-   "emptyFirstRun": "No asset version revision yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "Nothing here yet for Asset Version Control & Revision History. This screen only reads, so it offers no create action and says where the records come from.",
    "emptyNoResults": "The filter narrowed it and the asset version revision are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -1171,7 +1229,7 @@
   "states": {
    "loading": "The version comparison replacement list.",
    "error": "Could not load. Names which read failed and leaves the version comparison replacement untouched.",
-   "emptyFirstRun": "No version comparison replacement yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "Nothing here yet for Version Comparison & Replacement Impact. This screen only reads, so it offers no create action and says where the records come from.",
    "emptyNoResults": "The filter narrowed it and the version comparison replacement are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -1297,7 +1355,7 @@
   "states": {
    "loading": "The transformation rendition configuration as saved.",
    "error": "Could not load. Names which read failed and leaves the transformation rendition untouched.",
-   "emptyFirstRun": "No transformation rendition configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyFirstRun": "Nothing here yet for Transformation & Rendition Management. Offers `requestMediaRendition`, the action this screen has; distinct from a filter that matched nothing.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },
@@ -1459,7 +1517,7 @@
   "states": {
    "loading": "The rendition processing delivery list.",
    "error": "Could not load. Names which read failed and leaves the rendition processing delivery untouched.",
-   "emptyFirstRun": "No rendition processing delivery yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "Nothing here yet for Rendition Processing & Delivery Readiness. This screen only reads, so it offers no create action and says where the records come from.",
    "emptyNoResults": "The filter narrowed it and the rendition processing delivery are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -1670,7 +1728,7 @@
   "states": {
    "loading": "The quality intelligence review list.",
    "error": "Could not load. Names which read failed and leaves the quality intelligence review untouched.",
-   "emptyFirstRun": "No quality intelligence review yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "Nothing here yet for AI Quality, Intelligence Review & Recommendations. This screen only reads, so it offers no create action and says where the records come from.",
    "emptyNoResults": "The filter narrowed it and the quality intelligence review are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },

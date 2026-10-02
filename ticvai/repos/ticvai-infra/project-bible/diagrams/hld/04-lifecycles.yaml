@@ -1,13 +1,13 @@
 id: HLD-LIFECYCLES
 sourceFiles:
   folder: states/
-  files: 207
-  drawn: 206
+  files: 208
+  drawn: 207
   skipped:
   - _schema.yaml
   why: '**`_schema.yaml` is the shape, not a model.** Every state file validates against it; it has
     no entity and no transitions.'
-title: 206 state models and 77 events
+title: 207 state models and 77 events
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/00-platform.yaml
 about: '**What can happen to a thing, and in what order.** A state model is a lifecycle within one entity;
@@ -749,7 +749,7 @@ stateModels:
   owner: approvals
   service: TenancyService
   states: null
-  transitions: 21
+  transitions: 25
   initial:
   - draft
   - pending
@@ -759,12 +759,13 @@ stateModels:
   - expired
   - cancelled
   operations:
+  - cancelApprovalRequest
   - decideApprovalRequest
   - escalateApprovalRequest
   - resubmitApprovalRequest
   - submitApprovalRequest
   - withdrawApprovalRequest
-  guarded: 21
+  guarded: 25
   ref: diagrams/lld/lifecycles/approval-request.yaml
 - entity: Approved action execution
   contract: approvals
@@ -1001,14 +1002,15 @@ stateModels:
 - entity: Challenge
   contract: marketing-crm
   owner: marketing-crm
-  service: null
+  service: MarketingService
   states: null
   transitions: 7
   initial:
   - draft
   terminal:
   - archived
-  operations: []
+  operations:
+  - activateChallenge
   guarded: 7
   ref: diagrams/lld/lifecycles/challenge.yaml
 - entity: Channel incident
@@ -2416,6 +2418,21 @@ stateModels:
   - decideApprovalRequest
   guarded: 5
   ref: diagrams/lld/lifecycles/refund.yaml
+- entity: Registered device approval
+  contract: tenancy
+  owner: tenancy
+  service: TenancyService
+  states: null
+  transitions: 2
+  initial:
+  - pendingApproval
+  terminal:
+  - approved
+  - rejected
+  operations:
+  - approveDevice
+  guarded: 2
+  ref: diagrams/lld/lifecycles/registered-device-approval.yaml
 - entity: Registered device
   contract: tenancy
   owner: tenancy
@@ -2838,7 +2855,7 @@ stateModels:
   owner: shift
   service: OrderService
   states: null
-  transitions: 10
+  transitions: 13
   initial:
   - pendingApproval
   - open
@@ -2850,8 +2867,9 @@ stateModels:
   - closeShift
   - reopenShift
   - resumeShift
+  - submitShiftCount
   - suspendShift
-  guarded: 10
+  guarded: 13
   ref: diagrams/lld/lifecycles/shift.yaml
 - entity: Shop and drop
   contract: retail
@@ -2975,7 +2993,7 @@ stateModels:
   owner: fnb
   service: FnbService
   states: null
-  transitions: 11
+  transitions: 12
   initial:
   - free
   terminal: []
@@ -2985,7 +3003,8 @@ stateModels:
   - createFnbOrder
   - createPayment
   - createReservation
-  guarded: 11
+  - setTableLayout
+  guarded: 12
   ref: diagrams/lld/lifecycles/table.yaml
 - entity: Tenant migration
   contract: subscription

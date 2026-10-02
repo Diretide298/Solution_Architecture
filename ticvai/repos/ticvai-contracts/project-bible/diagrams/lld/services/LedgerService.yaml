@@ -730,7 +730,7 @@ tables:
   - finance
   foreignWriters: null
 - table: ledger.credit_memo
-  columns: 21
+  columns: 30
   store: postgres
   parent: null
   writtenBy:
@@ -891,14 +891,14 @@ tables:
   - finance
   foreignWriters: null
 - table: ledger.tax_invoice
-  columns: 32
+  columns: 39
   store: postgres
   parent: null
   writtenBy:
   - finance
   foreignWriters: null
 - table: ledger.tax_invoice_line
-  columns: 16
+  columns: 17
   store: postgres
   parent: ledger.tax_invoice
   writtenBy:
@@ -988,14 +988,21 @@ screens:
 - P01:WEB-035 Multi-Currency & Pricing
 - P02:GST-019 Order History
 - P02:GST-044 Multi-Currency & Pricing
-- P04:POS-008 Reports
 - P04:POS-011 Returns, Refunds & Exchanges
 - P04:POS-026 Receipt & Reprint
+- P04:POS-030 Sales Journal
+- P08:ADM-069 Tax Profile & Jurisdiction Configuration
+- P08:ADM-077 Calculation Validation, Reconciliation & Service Interface
+- P08:ADM-620 Reconciliation Source & Import Manager
+- P08:ADM-622 Reconciliation Exception & Investigation Center
+- P08:ADM-623 Settlement & Payout Manager
+- P08:ADM-626 Settlement Posting, Finance Handoff & Close Manager
+- P08:ADM-627 Reconciliation Audit, Trace & Evidence Center
+- P08:ADM-628 Reconciliation Simulator, Forecast & AI Operations Advisor
 - P08:BO-022 Order Detail
 - P08:BO-023 Refunds & Exchanges
 - P08:BO-024 Payment Exceptions
 - P08:BO-025 Chargebacks & Disputes
-- P08:BO-029 Report Builder
 - P08:BO-043 Daily Reconciliation
 - P08:BO-058 Reporting Home
 - P08:BO-059 Sales Reports
@@ -1012,20 +1019,12 @@ screens:
 - P08:BO-1170 Wallet Financial Period & Closing Controls
 - P08:BO-1172 Finance Validation, Reporting & Audit Center
 - P09:ADM-068 Tax, Fee & Calculation Command Center
-- P09:ADM-069 Tax Profile & Jurisdiction Configuration
-- P09:ADM-077 Calculation Validation, Reconciliation & Service Interface
 - P09:ADM-411 Billing & Legal Entity Information
-- P09:ADM-619 Reconciliation & Settlement Command Center\t139
-- P09:ADM-620 Reconciliation Source & Import Manager\t141
-- P09:ADM-622 Reconciliation Exception & Investigation Center\t143
-- P09:ADM-623 Settlement & Payout Manager\t144
-- P09:ADM-626 Settlement Posting, Finance Handoff & Close Manager\t148
-- P09:ADM-627 Reconciliation Audit, Trace & Evidence Center\t149
-- P09:ADM-628 Reconciliation Simulator, Forecast & AI Operations Advisor\t150
+- P09:ADM-619 Reconciliation & Settlement Command Center
 - P10:PTR-014 Settlement & Payment History
 - P10:PTR-018 Reports & Sales Performance
 - P12:SUP-008 Agent Performance & SLA View
-- P17:SGN-020 Billing & Legal Entity Information
+- P16:ANL-072 Finance Dashboard
 flows:
 - F13 Month end closes
 - F16 A venue opens for the first time

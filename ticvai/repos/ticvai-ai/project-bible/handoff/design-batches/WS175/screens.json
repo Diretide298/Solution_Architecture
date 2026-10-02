@@ -101,6 +101,11 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 46"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-027): A seat analytics read (occupancy, revenue, yield by section and performance); listSeats carries no sales.",
+    "source": "screens/P08-venue-back-office.yaml#BO-1051"
    }
   ],
   "layout": {
@@ -633,7 +638,7 @@
         "KpiValue.direction"
        ],
        "operation": "getKpiValues",
-       "notes": "`takings` is the only seeded money KPI.",
+       "notes": "`getKpiValues?kpiCodes=netRevenue` (CHG-FIN-007). Never the `takings` KPI (CHG-FIN-002, CHG-FIN-010).",
        "provenance": "contract reporting.yaml GET /kpi-values"
       },
       {
@@ -657,7 +662,7 @@
      "components": [
       {
        "kind": "dataTable",
-       "label": "Revenue by section",
+       "label": "Net revenue by section",
        "bindsTo": "KpiValue",
        "columns": [
         "KpiValue.scopePath",
@@ -667,7 +672,7 @@
         "KpiValue.variancePercent",
         "KpiValue.status",
         "Section",
-        "Gross revenue",
+        "Gross sales",
         "Tax",
         "Fees",
         "Discounts",
@@ -676,7 +681,7 @@
         "Reconciliation status"
        ],
        "operation": "getKpiValues",
-       "notes": "KpiValue has no section dimension; the section columns are pack labels.",
+       "notes": "KpiValue has no section dimension; the section columns are pack labels. (CHG-FIN-002: never a bare \"Revenue\")",
        "provenance": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 47"
       }
      ]
@@ -705,6 +710,7 @@
    "workshopBoard": "wireframes/WS150 Seat Management Venue Mapping Reference v1.0 Board 11.dc.html#bo-1054"
   },
   "apisNote": "Regenerated 9 September 2026 from Seat_Management_Venue_Mapping_Reference v1.0.pdf page 47. 0 of 0 labels bound to a contract property; 0 of 8 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Layout drafted 29 September (VM close-out)** from pack Seat_Management_Venue_Mapping_Reference v1.0.pdf p.47; contract reporting.yaml GET /kpi-values. Pack labels with no schema field yet (shown as plain labels): Section dimension, Gross revenue, Tax, Fees, Discounts, Refunds, % of performance total, Yield, Price band, Reconciliation status.",
+  "notes": "**Measure names, not \"Revenue\"** (decided 2 October 2026, Chinmay; CHG-FIN-002; BOARDREQ MOM-2758..2761). Takings (money taken less money paid back, a cash-control figure), Gross sales (before discounts, excluding VAT), Net revenue (gross sales less discounts and refunds), Recognised revenue and Deferred revenue are different numbers and never share a label; a tile takes its label from the seeded KPI it is bound to (`ReportingSystemKpi`).",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1070,6 +1076,12 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 47"
+   },
+   {
+    "operation": "listInventoryHolds",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-025): listInventoryHolds lists terminal and basket leases, not stakeholder seat holds; VIP, sponsor and media holds are seating's pools (listSeatHoldPools) (design-notes correction ticketing-backoffice BO-1057)",
+    "source": "contracts/satellite/seating.yaml#listSeatHoldPools"
    }
   ],
   "layout": {
@@ -1080,9 +1092,10 @@
      "components": [
       {
        "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listInventoryHolds",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "label": "Hold pools",
+       "bindsTo": "SeatHoldPool",
+       "operation": "listSeatHoldPools",
+       "provenance": "contract seating.yaml GET /seat-hold-pools; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -1091,16 +1104,17 @@
   "states": {
    "loading": "The hold inventory reporting list.",
    "error": "Could not load. Names which read failed and leaves the hold inventory reporting untouched.",
-   "emptyFirstRun": "No hold inventory reporting yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No hold inventory reporting yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the hold inventory reporting are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
-    "operationId": "listInventoryHolds",
-    "contract": "catalogue",
-    "purpose": "List leases",
-    "trigger": "onLoad"
+    "operationId": "listSeatHoldPools",
+    "contract": "seating",
+    "purpose": "Held seats by pool and stakeholder, with what is left and when it releases",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {
@@ -1109,6 +1123,7 @@
    "workshopBoard": "wireframes/WS150 Seat Management Venue Mapping Reference v1.0 Board 11.dc.html#bo-1057"
   },
   "apisNote": "Regenerated 9 September 2026 from Seat_Management_Venue_Mapping_Reference v1.0.pdf page 47. 0 of 0 labels bound to a contract property; 0 of 8 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {},
   "_platform": {
    "code": "P08",
    "audience": "staff",

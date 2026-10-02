@@ -300,6 +300,13 @@
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
        "impliedBy": "setGameplayValidationRules"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Validation rules",
+       "bindsTo": "GameplayValidationRules",
+       "operation": "getGameplayValidationRules",
+       "provenance": "contract games.yaml GET /gameplay-validation-rules; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -322,6 +329,13 @@
     "invalidates": [
      "getGameplayValidationRules"
     ]
+   },
+   {
+    "operationId": "getGameplayValidationRules",
+    "contract": "games",
+    "purpose": "The rules in force, to edit",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-001)"
    }
   ],
   "wireframe": {
@@ -330,6 +344,7 @@
    "workshopBoard": "wireframes/WS61 Game and Ride Board 4.dc.html#bo-425"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 34. 0 of 0 labels bound to a contract property; 0 of 25 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {},
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -576,6 +591,13 @@
        "kind": "selectField",
        "label": "Limited Total Plays",
        "provenance": "pack Game_and_Ride_Module.pdf, page 36 §Options"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Passes",
+       "bindsTo": "GameEntitlement",
+       "operation": "listGameEntitlements",
+       "provenance": "contract games.yaml GET /game-entitlements; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -598,6 +620,13 @@
     "invalidates": [
      "listGameEntitlements"
     ]
+   },
+   {
+    "operationId": "listGameEntitlements",
+    "contract": "games",
+    "purpose": "All-games passes already defined",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-001)"
    }
   ],
   "wireframe": {
@@ -606,6 +635,15 @@
    "workshopBoard": "wireframes/WS61 Game and Ride Board 4.dc.html#bo-427"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 36. 0 of 0 labels bound to a contract property; 11 of 20 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {},
+  "gaps": [
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-004): No get, update or deactivate operation for a game entitlement.",
+    "source": "contracts/satellite/games.yaml#createGameEntitlement"
+   }
+  ],
+  "notes": "**An all-games pass covers games added after sale unless the venue says not; type-based passes cover new games by default (decided 2 October 2026 by Chinmay, DEC-397; CHG-CSA-028, `coversGamesAddedLater`).**",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1202,6 +1240,17 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Game_and_Ride_Module.pdf, page 40"
+   },
+   {
+    "operation": "authoriseGameplay",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): authoriseGameplay (ACCESS_VALIDATE) decides and charges a live tap at a reader; calling it from the back office would charge a guest. The stored decision trace has no read yet (contract gap CHG-WIR-004) (design-notes correction venue-operations BO-432).",
+    "source": "contracts/satellite/games.yaml#authoriseGameplay | contracts/satellite/games.yaml#/components/schemas/GameplayAuthorisation"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-004): No read returns past gameplay authorisations with their decision trace.",
+    "source": "contracts/satellite/games.yaml#/components/schemas/GameplayAuthorisation"
    }
   ],
   "layout": {
@@ -1209,44 +1258,18 @@
    "regions": [
     {
      "name": "contentBody",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "authoriseGameplay",
-       "notes": "The act the screen exists for."
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "authoriseGameplay"
-      }
-     ]
+     "components": []
     }
    ]
   },
   "states": {
    "loading": "The real-time gameplay authorization list.",
    "error": "Could not load. Names which read failed and leaves the real-time gameplay authorization untouched.",
-   "emptyFirstRun": "No real-time gameplay authorization yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No real-time gameplay authorization yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the real-time gameplay authorization are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Not shown: nothing on this screen needs a permission of its own; the app's sign-in decides access."
   },
-  "apis": [
-   {
-    "operationId": "authoriseGameplay",
-    "contract": "games",
-    "purpose": "Authorise a tap",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026",
-    "invalidates": [
-     "listGameplayTransactions",
-     "getGameCard"
-    ]
-   }
-  ],
+  "apis": [],
   "wireframe": {
    "status": "notStarted",
    "board": "wireframes/P08 Venue Management.dc.html#bo-432",

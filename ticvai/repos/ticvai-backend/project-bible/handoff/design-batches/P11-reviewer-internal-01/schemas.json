@@ -1,4 +1,45 @@
 {
+ "AccreditationAccessEvent": {
+  "type": "object",
+  "description": "Board 8.4. **Granted access against used access is the whole of the annual review.**\n",
+  "properties": {
+   "at": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "holderId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "holderName": {
+    "type": "string"
+   },
+   "zoneId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "zoneName": {
+    "type": "string"
+   },
+   "credentialId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "outcome": {
+    "type": "string",
+    "enum": [
+     "admitted",
+     "denied",
+     "escorted"
+    ]
+   },
+   "deniedReason": {
+    "type": "string",
+    "nullable": true
+   }
+  }
+ },
  "AccreditationApplication": {
   "type": "object",
   "x-ticvai-persistence": "accreditation.application",

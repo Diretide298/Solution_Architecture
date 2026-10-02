@@ -36,26 +36,17 @@
     {
      "to": "BO-049",
      "trigger": "Stock Levels",
-     "carries": [
-      "itemId"
-     ],
-     "provenance": "derived — BO-049 declares entryState.params itemId and BO-105 holds itemId, so an edge into it carries them"
+     "provenance": "derived — BO-049 declares entryState.params itemId and BO-105 holds none of them. The edge carries nothing: itemId only pre-selects (deep link or optional), and BO-049 opens on its own"
     },
     {
      "to": "BO-052",
      "trigger": "Goods Receipt",
-     "carries": [
-      "purchaseOrderId"
-     ],
-     "provenance": "derived — BO-052 declares entryState.params purchaseOrderId, receiptId, transferId and BO-105 holds purchaseOrderId, so an edge into it carries them"
+     "provenance": "derived — BO-052 declares entryState.params purchaseOrderId, receiptId and BO-105 holds none of them. The edge carries nothing: purchaseOrderId, receiptId only pre-select (deep link or optional), and BO-052 opens on its own"
     },
     {
      "to": "BO-078",
      "trigger": "Requisitions",
-     "carries": [
-      "requisitionId"
-     ],
-     "provenance": "derived — BO-078 declares entryState.params requisitionId and BO-105 holds requisitionId, so an edge into it carries them"
+     "provenance": "derived — BO-078 declares entryState.params requisitionId and BO-105 holds none of them. The edge carries nothing: requisitionId only pre-selects (deep link or optional), and BO-078 opens on its own"
     },
     {
      "to": "BO-079",
@@ -70,18 +61,12 @@
     {
      "to": "BO-081",
      "trigger": "Inventory Items",
-     "carries": [
-      "itemId"
-     ],
-     "provenance": "derived — BO-081 declares entryState.params itemId and BO-105 holds itemId, so an edge into it carries them"
+     "provenance": "derived — BO-081 declares entryState.params itemId and BO-105 holds none of them. The edge carries nothing: itemId only pre-selects (deep link or optional), and BO-081 opens on its own"
     },
     {
      "to": "BO-083",
      "trigger": "Suppliers",
-     "carries": [
-      "supplierId"
-     ],
-     "provenance": "derived — BO-083 declares entryState.params contractId, supplierId and BO-105 holds supplierId, so an edge into it carries them"
+     "provenance": "derived — BO-083 declares entryState.params contractId, supplierId and BO-105 holds none of them. The edge carries nothing: supplierId only pre-selects (deep link or optional); BO-083 finds contractId (listSupplierContracts) itself, and BO-083 opens on its own"
     },
     {
      "to": "BO-137",
@@ -101,10 +86,7 @@
     {
      "to": "BO-140",
      "trigger": "Product Availability, 86 & Operational Food Safety",
-     "carries": [
-      "itemId"
-     ],
-     "provenance": "derived — BO-140 declares entryState.params itemId and BO-105 holds itemId, so an edge into it carries them"
+     "provenance": "derived — BO-140 declares entryState.params itemId, menuId, outletId and BO-105 holds none of them. The edge carries nothing: itemId only pre-selects (deep link or optional); BO-140 finds outletId (setTemperatureCheckpoint) itself; BO-140 opens on list86Events, and menuId has no source on BO-140 yet (a gap in BO-140, not in this edge)"
     },
     {
      "to": "BO-141",
@@ -114,10 +96,7 @@
     {
      "to": "BO-051",
      "trigger": "Purchase Orders",
-     "provenance": "moved 29 September, VM close-out: purchase orders sit in Stock & Supply beside Goods Receipt; BO-051 opens its list without an id",
-     "carries": [
-      "purchaseOrderId"
-     ]
+     "provenance": "moved 29 September, VM close-out: purchase orders sit in Stock & Supply beside Goods Receipt; BO-051 opens its list without an id"
     }
    ]
   },
@@ -136,76 +115,6 @@
      "name": "contentBody",
      "slot": "collection",
      "components": [
-      {
-       "kind": "textField",
-       "label": "Venue id",
-       "operation": "listInventoryItems",
-       "notes": "Sends `?venueId=` to `listInventoryItems`.",
-       "provenance": "contract inventory.yaml GET /inventory-items"
-      },
-      {
-       "kind": "textField",
-       "label": "Category id",
-       "operation": "listInventoryItems",
-       "notes": "Sends `?categoryId=` to `listInventoryItems`.",
-       "provenance": "contract inventory.yaml GET /inventory-items"
-      },
-      {
-       "kind": "toggle",
-       "label": "Below reorder point",
-       "operation": "listInventoryItems",
-       "notes": "Sends `?belowReorderPoint=` to `listInventoryItems`.",
-       "provenance": "contract inventory.yaml GET /inventory-items"
-      },
-      {
-       "kind": "searchField",
-       "label": "Search",
-       "operation": "listInventoryItems",
-       "notes": "Sends `?search=` to `listInventoryItems`.",
-       "provenance": "contract inventory.yaml GET /inventory-items"
-      },
-      {
-       "kind": "dataTable",
-       "label": "Every inventory",
-       "bindsTo": "InventoryItem",
-       "columns": [
-        "InventoryItem.sku",
-        "InventoryItem.barcode",
-        "InventoryItem.name",
-        "InventoryItem.venueId",
-        "InventoryItem.categoryId",
-        "InventoryItem.baseUnit",
-        "InventoryItem.purchaseUnit",
-        "InventoryItem.purchaseUnitFactor",
-        "InventoryItem.costingMethod",
-        "InventoryItem.reorderPoint",
-        "InventoryItem.reorderQuantity",
-        "InventoryItem.parLevel"
-       ],
-       "operation": "listInventoryItems",
-       "provenance": "contract inventory.yaml GET /inventory-items"
-      },
-      {
-       "kind": "dataTable",
-       "label": "Every purchase order",
-       "bindsTo": "PurchaseOrder",
-       "columns": [
-        "PurchaseOrder.id",
-        "PurchaseOrder.purchaseOrderNumber",
-        "PurchaseOrder.requisitionId",
-        "PurchaseOrder.quotationId",
-        "PurchaseOrder.supplierId",
-        "PurchaseOrder.supplierName",
-        "PurchaseOrder.kind",
-        "PurchaseOrder.blanketParentId",
-        "PurchaseOrder.contractPriceValidUntil",
-        "PurchaseOrder.rfqId",
-        "PurchaseOrder.supplierInvoiceRef",
-        "PurchaseOrder.matchStatus"
-       ],
-       "operation": "listPurchaseOrders",
-       "provenance": "contract inventory.yaml GET /purchase-orders"
-      },
       {
        "kind": "metricTile",
        "label": "Takings and admissions today",
@@ -238,51 +147,7 @@
     {
      "name": "contextPanel",
      "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected inventory",
-       "bindsTo": "InventoryItem",
-       "columns": [
-        "InventoryItem.sku",
-        "InventoryItem.barcode",
-        "InventoryItem.name",
-        "InventoryItem.venueId",
-        "InventoryItem.categoryId",
-        "InventoryItem.baseUnit",
-        "InventoryItem.purchaseUnit",
-        "InventoryItem.purchaseUnitFactor",
-        "InventoryItem.costingMethod",
-        "InventoryItem.reorderPoint",
-        "InventoryItem.reorderQuantity",
-        "InventoryItem.parLevel",
-        "InventoryItem.preferredSupplierId",
-        "InventoryItem.allowNegativeStock",
-        "InventoryItem.isPerishable",
-        "InventoryItem.shelfLifeDays"
-       ],
-       "operation": "listInventoryItems",
-       "provenance": "contract inventory.yaml GET /inventory-items"
-      },
-      {
-       "kind": "detailPanel",
-       "label": "The venue settings",
-       "bindsTo": "VenueSettings",
-       "columns": [
-        "VenueSettings.id",
-        "VenueSettings.venueId",
-        "VenueSettings.currencyCode",
-        "VenueSettings.currencyScale",
-        "VenueSettings.supportHours",
-        "VenueSettings.quietHours",
-        "VenueSettings.biometrics",
-        "VenueSettings.segregatedAccess",
-        "VenueSettings.alerting"
-       ],
-       "operation": "getVenueSettings",
-       "provenance": "contract tenancy.yaml GET /venues/{venueId}/settings"
-      }
-     ]
+     "components": []
     },
     {
      "name": "actionBar",
@@ -313,31 +178,10 @@
     "trigger": "onLoad"
    },
    {
-    "operationId": "getVenueSettings",
-    "contract": "tenancy",
-    "purpose": "What is enabled here",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "listInventoryItems",
-    "contract": "inventory",
-    "purpose": "Stock on hand",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "listPurchaseOrders",
-    "contract": "inventory",
-    "purpose": "Orders placed with suppliers",
-    "trigger": "onLoad"
-   },
-   {
     "operationId": "createInventoryItem",
     "contract": "inventory",
     "purpose": "Add an item",
-    "trigger": "onAction",
-    "invalidates": [
-     "listInventoryItems"
-    ]
+    "trigger": "onAction"
    }
   ],
   "entryState": {
@@ -397,6 +241,26 @@
     "provenance": "contract inventory.yaml POST /inventory-items"
    }
   ],
+  "gaps": [
+   {
+    "operation": "getVenueSettings",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-008): The hub bound an inventory-item table, a purchase-order table and a venue-settings panel, duplicating BO-081 and BO-051; a hub's operations are the KPI read plus the add-item shortcut, and getVenueSettings carries no module enablement (R254, R283; design-notes corrections fnb-retail BO-105).",
+    "source": "R254 | R283 | contracts/spine/tenancy.yaml#getVenueSettings"
+   },
+   {
+    "operation": "listInventoryItems",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-008): The hub bound an inventory-item table, a purchase-order table and a venue-settings panel, duplicating BO-081 and BO-051; a hub's operations are the KPI read plus the add-item shortcut, and getVenueSettings carries no module enablement (R254, R283; design-notes corrections fnb-retail BO-105).",
+    "source": "R254 | R283 | contracts/spine/tenancy.yaml#getVenueSettings"
+   },
+   {
+    "operation": "listPurchaseOrders",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-008): The hub bound an inventory-item table, a purchase-order table and a venue-settings panel, duplicating BO-081 and BO-051; a hub's operations are the KPI read plus the add-item shortcut, and getVenueSettings carries no module enablement (R254, R283; design-notes corrections fnb-retail BO-105).",
+    "source": "R254 | R283 | contracts/spine/tenancy.yaml#getVenueSettings"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -436,6 +300,7 @@
    "entryFrom": [
     "BO-079",
     "BO-105",
+    "BO-112",
     "BO-136"
    ],
    "exitTo": [
@@ -460,7 +325,6 @@
   "notes": "**Added 20 August from the client design board.** The operations existed and no screen called them.",
   "density": "compact",
   "boardFrames": [
-   "FnB Board 2.dc.html#fnb-2f",
    "FnB Board 5.dc.html#fnb-5c"
   ],
   "pattern": "listDetail",
@@ -696,136 +560,39 @@
     }
    ]
   },
-  "notes": "**Added 20 August from the client design board.** The operations existed and no screen called them.",
+  "notes": "**Merged into BO-112** (decided 2 October 2026, Chinmay: duplicate screens merged as proposed; CHG-SBO-021). Batch execution is a tab of the one Production screen (design-note correction fnb-retail BO-112). **One implementation, both ids kept**, as the M24-03 merges do: this id stays for traceability and routes to BO-112, and nothing on it is built separately.\n\n**Added 20 August from the client design board.** The operations existed and no screen called them.",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listExpiringBatches` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
-  "purpose": "Production Execution & Batch Management — from the client design board, 20 August.",
+  "purpose": "Production Execution & Batch Management — from the client design board, 20 August (merged into BO-112 Production Planning & Production Sheets).",
   "layout": {
    "template": "split",
    "regions": [
     {
      "name": "contentBody",
      "slot": "collection",
-     "components": [
-      {
-       "kind": "numberField",
-       "label": "Within days",
-       "operation": "listExpiringBatches",
-       "notes": "Sends `?withinDays=` to `listExpiringBatches`.",
-       "provenance": "contract inventory.yaml GET /stock-batches/expiring"
-      },
-      {
-       "kind": "dataTable",
-       "label": "Every stock batch",
-       "bindsTo": "StockBatch",
-       "columns": [
-        "StockBatch.id",
-        "StockBatch.itemId",
-        "StockBatch.locationId",
-        "StockBatch.batchCode",
-        "StockBatch.lotNumber",
-        "StockBatch.quantity",
-        "StockBatch.receivedAt",
-        "StockBatch.expiresAt",
-        "StockBatch.supplierId",
-        "StockBatch.status"
-       ],
-       "operation": "listExpiringBatches",
-       "provenance": "contract inventory.yaml GET /stock-batches/expiring"
-      },
-      {
-       "kind": "searchField",
-       "label": "Search production execution",
-       "provenance": "carried from the previous definition"
-      }
-     ]
+     "components": []
     },
     {
      "name": "contextPanel",
      "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected stock batch",
-       "bindsTo": "StockBatch",
-       "columns": [
-        "StockBatch.id",
-        "StockBatch.itemId",
-        "StockBatch.locationId",
-        "StockBatch.batchCode",
-        "StockBatch.lotNumber",
-        "StockBatch.quantity",
-        "StockBatch.receivedAt",
-        "StockBatch.expiresAt",
-        "StockBatch.supplierId",
-        "StockBatch.status"
-       ],
-       "operation": "listExpiringBatches",
-       "provenance": "contract inventory.yaml GET /stock-batches/expiring"
-      }
-     ]
+     "components": []
     },
     {
      "name": "actionBar",
      "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Plan production run",
-       "operation": "planProductionRun",
-       "provenance": "contract fnb.yaml POST /production-runs"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Complete production run",
-       "operation": "completeProductionRun",
-       "provenance": "contract fnb.yaml POST /production-runs/{runId}/complete"
-      }
-     ]
+     "components": []
     }
    ]
   },
   "states": {
-   "loading": "The production execution batch list.",
-   "error": "Could not load. Names which read failed and leaves the production execution batch untouched.",
-   "emptyFirstRun": "No production execution batch yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
-   "emptyNoResults": "Nothing matches the filter on withinDays and the production execution batch are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listExpiringBatches` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "loading": "Routes to BO-112 while it opens.",
+   "error": "Could not open BO-112; says so and offers to retry.",
+   "emptyFirstRun": "Never shown: this id routes to BO-112, whose empty states apply.",
+   "emptyNoResults": "Never shown: this id routes to BO-112.",
+   "emptyNoAccess": "As BO-112: shown when the caller lacks the access BO-112 requires, named in words."
   },
-  "apis": [
-   {
-    "operationId": "planProductionRun",
-    "contract": "fnb",
-    "purpose": "Plan a batch, for one outlet or several",
-    "trigger": "onAction",
-    "invalidates": [
-     "listExpiringBatches"
-    ]
-   },
-   {
-    "operationId": "completeProductionRun",
-    "contract": "fnb",
-    "purpose": "Record what was actually made",
-    "trigger": "onAction",
-    "invalidates": [
-     "listExpiringBatches"
-    ]
-   },
-   {
-    "operationId": "listExpiringBatches",
-    "contract": "inventory",
-    "purpose": "What is about to go out of date",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "requestSuggestion",
-    "contract": "ai",
-    "purpose": "Waste-risk suggestion (kind wasteRisk): items at risk with a recommended action",
-    "trigger": "onAction",
-    "provenance": "build, 29 September 2026"
-   }
-  ],
+  "apis": [],
   "entryState": {
    "params": [
     {
@@ -851,55 +618,7 @@
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-138"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
-  "overlays": [
-   {
-    "id": "formPlanProductionRun",
-    "component": "modal",
-    "trigger": "Plan production run",
-    "body": "**Collects what `planProductionRun` sends before it is called.** Required: `id`, `recipeId`, `plannedQuantity`, `status`. Optional: `productionPlanId`, `producingOutletId`, `forOutletIds`, `actualQuantity`, `scheduledFor`, `varianceReason`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "ProductionRun",
-    "confirm": {
-     "label": "Plan production run",
-     "operation": "planProductionRun"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "id",
-      "recipeId",
-      "plannedQuantity",
-      "status",
-      "productionPlanId",
-      "producingOutletId",
-      "forOutletIds",
-      "actualQuantity",
-      "scheduledFor",
-      "varianceReason"
-     ]
-    },
-    "provenance": "contract fnb.yaml POST /production-runs"
-   },
-   {
-    "id": "formCompleteProductionRun",
-    "component": "modal",
-    "trigger": "Complete production run",
-    "body": "**Collects what `completeProductionRun` sends before it is called.** Required: `actualQuantity`, `recordedAt`. Optional: `varianceReason`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Complete production run",
-     "operation": "completeProductionRun"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "actualQuantity",
-      "recordedAt",
-      "varianceReason"
-     ]
-    },
-    "provenance": "contract fnb.yaml POST /production-runs/{runId}/complete"
-   }
-  ],
+  "apisNote": "No operations of its own since 2 October 2026 (CHG-SBO-021): merged into BO-112, whose operations it routes to.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -973,6 +692,12 @@
        "label": "Record waste",
        "operation": "recordWaste",
        "provenance": "contract fnb.yaml POST /outlets/{outletId}/waste"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save waste approval policy",
+       "operation": "setWasteApprovalPolicy",
+       "provenance": "contract fnb.yaml PUT /waste-approval-policy"
       }
      ]
     },
@@ -1018,6 +743,14 @@
        "label": "Note",
        "operation": "recordWaste",
        "provenance": "contract fnb.yaml POST /outlets/{outletId}/waste"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Waste approval policy",
+       "bindsTo": "WasteApprovalPolicy",
+       "operation": "getWasteApprovalPolicy",
+       "notes": "**A policy the venue switches on or off (decided 2 October 2026 by Chinmay, DEC-192; CHG-CSA-016):** off by default; when on, value bands decide approval and a photo is required above a value.",
+       "provenance": "contract fnb.yaml GET /waste-approval-policy"
       }
      ]
     }
@@ -1042,6 +775,20 @@
     "purpose": "Waste-risk suggestion (kind wasteRisk): items at risk with a recommended action",
     "trigger": "onAction",
     "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "getWasteApprovalPolicy",
+    "contract": "fnb",
+    "purpose": "The waste-approval policy in force (DEC-192)",
+    "trigger": "onLoad",
+    "provenance": "design-note correction, 2 October 2026 (BO-139)"
+   },
+   {
+    "operationId": "setWasteApprovalPolicy",
+    "contract": "fnb",
+    "purpose": "Switch waste approval on or off, and set its bands",
+    "trigger": "onAction",
+    "provenance": "design-note correction, 2 October 2026 (BO-139)"
    }
   ],
   "entryState": {
@@ -1063,6 +810,34 @@
    "board": "wireframes/P08 Venue Management.dc.html#bo-139"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-011): No read lists recorded waste per item, with value and reason.",
+    "source": "MATRIX 6.1.38 | DI-341"
+   }
+  ],
+  "overlays": [
+   {
+    "id": "formSetWasteApprovalPolicy",
+    "component": "modal",
+    "trigger": "Save waste approval policy",
+    "body": "**Collects what `setWasteApprovalPolicy` sends before it is called.** Required: `enabled`. Optional: `bands`, `photoRequiredAbove`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save waste approval policy",
+     "operation": "setWasteApprovalPolicy"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "enabled",
+      "bands",
+      "photoRequiredAbove"
+     ]
+    },
+    "provenance": "contract fnb.yaml PUT /waste-approval-policy"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1128,62 +903,41 @@
      "slot": "collection",
      "components": [
       {
-       "kind": "numberField",
-       "label": "Within days",
-       "operation": "listExpiringBatches",
-       "notes": "Sends `?withinDays=` to `listExpiringBatches`.",
-       "provenance": "contract inventory.yaml GET /stock-batches/expiring"
-      },
-      {
-       "kind": "dataTable",
-       "label": "Every stock batch",
-       "bindsTo": "StockBatch",
-       "columns": [
-        "StockBatch.id",
-        "StockBatch.itemId",
-        "StockBatch.locationId",
-        "StockBatch.batchCode",
-        "StockBatch.lotNumber",
-        "StockBatch.quantity",
-        "StockBatch.receivedAt",
-        "StockBatch.expiresAt",
-        "StockBatch.supplierId",
-        "StockBatch.status"
-       ],
-       "operation": "listExpiringBatches",
-       "provenance": "contract inventory.yaml GET /stock-batches/expiring"
-      },
-      {
        "kind": "searchField",
        "label": "Search product availability, 86",
        "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Menu items",
+       "bindsTo": "Menu",
+       "operation": "getMenu",
+       "provenance": "contract fnb.yaml GET /menus/{menuId}; wiring fix, 2 October 2026"
+      },
+      {
+       "kind": "dataTable",
+       "label": "86 history",
+       "operation": "list86Events",
+       "provenance": "contract fnb.yaml GET /outlets/{outletId}/86-events; wiring fix, 2 October 2026"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Food safety",
+       "operation": "getHaccpStatus",
+       "provenance": "contract fnb.yaml GET /food-safety/status; wiring fix, 2 October 2026"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Checkpoints",
+       "operation": "listTemperatureCheckpoints",
+       "provenance": "contract fnb.yaml GET /food-safety/checkpoints; wiring fix, 2 October 2026"
       }
      ]
     },
     {
      "name": "contextPanel",
      "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected stock batch",
-       "bindsTo": "StockBatch",
-       "columns": [
-        "StockBatch.id",
-        "StockBatch.itemId",
-        "StockBatch.locationId",
-        "StockBatch.batchCode",
-        "StockBatch.lotNumber",
-        "StockBatch.quantity",
-        "StockBatch.receivedAt",
-        "StockBatch.expiresAt",
-        "StockBatch.supplierId",
-        "StockBatch.status"
-       ],
-       "operation": "listExpiringBatches",
-       "provenance": "contract inventory.yaml GET /stock-batches/expiring"
-      }
-     ]
+     "components": []
     },
     {
      "name": "actionBar",
@@ -1195,6 +949,13 @@
        "operation": "setItemAvailability",
        "notes": "**Takes effect immediately** (decided 28 September, audit R110) — switching an item off (86) or back on calls `setItemAvailability` at once and every terminal in the outlet follows; there is no Save changes step. Switching off asks only for the reason.",
        "provenance": "contract fnb.yaml PUT /menu-items/{itemId}/availability"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Set daily count",
+       "operation": "setMenuItemDailyCount",
+       "notes": "**Daily counts (\"6 left\"); the dish goes sold out automatically at zero (decided 2 October 2026 by Chinmay, DEC-194; CHG-CSA-017).** A temperature breach suggests \"86 affected items\" and does not 86 on its own (DEC-193).",
+       "provenance": "contract fnb.yaml PUT /menu-items/{itemId}/daily-count"
       }
      ]
     }
@@ -1205,23 +966,14 @@
    "error": "Could not load. Names which read failed and leaves the product availability operational untouched.",
    "emptyFirstRun": "No product availability operational yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
    "emptyNoResults": "Nothing matches the filter on withinDays and the product availability operational are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listExpiringBatches` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `getMenu` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
     "operationId": "setItemAvailability",
     "contract": "fnb",
     "purpose": "Mark an item available or eighty-sixed",
-    "trigger": "onAction",
-    "invalidates": [
-     "listExpiringBatches"
-    ]
-   },
-   {
-    "operationId": "listExpiringBatches",
-    "contract": "inventory",
-    "purpose": "What is about to go out of date",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "setTemperatureCheckpoint",
@@ -1229,6 +981,41 @@
     "purpose": "Define a temperature checkpoint and its safe range",
     "trigger": "onAction",
     "provenance": "decided 29 September, VM close-out (venue management and configuration)"
+   },
+   {
+    "operationId": "getMenu",
+    "contract": "fnb",
+    "purpose": "The outlet's menu items with their availability",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-008)"
+   },
+   {
+    "operationId": "list86Events",
+    "contract": "fnb",
+    "purpose": "The 86 history",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-008)"
+   },
+   {
+    "operationId": "getHaccpStatus",
+    "contract": "fnb",
+    "purpose": "Food-safety status",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-008)"
+   },
+   {
+    "operationId": "listTemperatureCheckpoints",
+    "contract": "fnb",
+    "purpose": "The temperature checkpoints to edit",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-008)"
+   },
+   {
+    "operationId": "setMenuItemDailyCount",
+    "contract": "fnb",
+    "purpose": "Set today's count for a dish",
+    "trigger": "onAction",
+    "provenance": "design-note correction, 2 October 2026 (BO-140)"
    }
   ],
   "entryState": {
@@ -1240,6 +1027,14 @@
     {
      "name": "itemId",
      "from": "deepLink"
+    },
+    {
+     "name": "menuId",
+     "from": "navigation"
+    },
+    {
+     "name": "outletId",
+     "from": "navigation"
     }
    ],
    "coldEntry": "Resolves from the session. A principal with more than one venue is asked which first.",
@@ -1276,6 +1071,31 @@
      ]
     },
     "provenance": "contract fnb.yaml PUT /menu-items/{itemId}/availability"
+   },
+   {
+    "id": "formSetMenuItemDailyCount",
+    "component": "modal",
+    "trigger": "Set daily count",
+    "body": "**Collects what `setMenuItemDailyCount` sends before it is called.** Required: `count`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Set daily count",
+     "operation": "setMenuItemDailyCount"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "count"
+     ]
+    },
+    "provenance": "contract fnb.yaml PUT /menu-items/{itemId}/daily-count"
+   }
+  ],
+  "gaps": [
+   {
+    "operation": "listExpiringBatches",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-008): The population was listExpiringBatches (stock batches), so the Available toggle had no menu item to bind; the list is the outlet's menu items with availability (getMenu), and the 86 history, HACCP status and checkpoint list the frame and F28 show were not declared (design-notes corrections fnb-retail BO-140).",
+    "source": "contracts/satellite/fnb.yaml#getMenu | contracts/satellite/fnb.yaml#list86Events | contracts/satellite/fnb.yaml#getHaccpStatus | F28 step 6"
    }
   ],
   "_platform": {

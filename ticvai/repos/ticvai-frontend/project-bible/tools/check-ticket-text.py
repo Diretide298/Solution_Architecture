@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """The ticket text a developer reads, against the package it was generated from.
 
-**Audit classes A-TICKET-* (audit/ticvai/ROOT-CLASSES.md).** The 26 September pull audit traced 29
+**Audit classes A-TICKET-* (docs/active/root-classes.md).** The 26 September pull audit traced 29
 root issues to the generated ticket text: screen tickets with no acceptance criteria beyond
 "build, connect, tests" (R041), 'Used by' shorter than `x-ticvai-consumed-by` (R042), 401/403 tests
 demanded where no permission applies (R054), a slice line naming fewer operations than the screen

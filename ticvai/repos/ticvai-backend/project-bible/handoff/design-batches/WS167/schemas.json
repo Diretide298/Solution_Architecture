@@ -390,6 +390,80 @@
    }
   }
  },
+ "Performance": {
+  "x-ticvai-persistence": "catalogue.performance",
+  "type": "object",
+  "required": [
+   "id",
+   "eventId",
+   "startsAt",
+   "endsAt",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "eventId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "startsAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "endsAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "approvalRequestId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "BL-048. **The approval chain and the occurrence lifecycle sat on different entities**, so neither was complete: `states/performance.yaml` models scheduled, onSale, soldOut, suspended, cancelled and completed properly, and nothing said which of those transitions somebody had to sign.\n**Set on the transition that needs it, not on the performance.** Publishing a performance is routine; cancelling one that has sold is the act somebody signs — and binding approval to the whole entity would have required a signature to reschedule a wet Tuesday.\n"
+   },
+   "requiresApprovalToCancel": {
+    "type": "boolean",
+    "default": true,
+    "description": "**Cancelling a sold performance is the one transition that needs a name against it.** `assessProductChange` already answers how many tickets are affected; this decides who has to look at that number before the button works.\n"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "scheduled",
+     "onSale",
+     "soldOut",
+     "suspended",
+     "cancelled",
+     "completed"
+    ]
+   },
+   "admissionRulesId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "seatMapId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "language": {
+    "type": "string",
+    "nullable": true,
+    "maxLength": 35,
+    "pattern": "^[A-Za-z]{2,3}(-[A-Za-z0-9]{1,8})*$",
+    "description": "The language the performance is given in, as a BCP 47 tag (`en`, `ar`, `fr`, `de`, `zh`, `ru`, `ar-AE`). **A guided tour at 10:00 in French and one at 10:00 in Arabic are two performances**, so a guest who picks a language sees only the tours in it (`listPerformances` `language`). Null when the performance is not language-specific (decided 29 September, rev 3 REV3-17).\n"
+   },
+   "format": {
+    "type": "string",
+    "nullable": true,
+    "maxLength": 40,
+    "description": "How it is presented, free text the venue chooses, e.g. `2D`, `3D`, `IMAX`, `subtitled`. A cinema screening shows language and format together. Null when it does not apply (decided 29 September, rev 3 REV3-17).\n"
+   }
+  }
+ },
  "Point": {
   "type": "object",
   "required": [
@@ -404,134 +478,6 @@
     "type": "number"
    }
   }
- },
- "PolicySimulationConflictImpactAnalysisInput": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
-  "description": "**What Policy Simulation, Conflict & Impact Analysis submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
-  "properties": {
-   "policyId": {
-    "type": "string"
-   },
-   "policyVersion": {
-    "type": "string"
-   },
-   "scenarioTime": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Simulated moment of the scan"
-   },
-   "credentialId": {
-    "type": "string",
-    "description": "Optional credential to simulate"
-   },
-   "runSavedScenarios": {
-    "type": "boolean",
-    "description": "Regression: run saved scenarios against this policy version"
-   },
-   "scenarioCount": {
-    "type": "integer"
-   },
-   "passedCount": {
-    "type": "integer"
-   },
-   "changedOutcomeCount": {
-    "type": "integer"
-   },
-   "affectedCredentials": {
-    "type": "integer"
-   }
-  },
-  "required": [
-   "policyId"
-  ]
- },
- "PolicySimulationConflictImpactAnalysisView": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
-  "description": "**What Policy Simulation, Conflict & Impact Analysis displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
-  "properties": {
-   "policyId": {
-    "type": "string"
-   },
-   "occupancy": {
-    "type": "integer",
-    "description": "Occupancy (the pack shows 82%)"
-   },
-   "policiesInvolved": {
-    "type": "array",
-    "items": {
-     "type": "string"
-    },
-    "description": "policies involved"
-   },
-   "hierarchy": {
-    "type": "string",
-    "description": "hierarchy"
-   },
-   "priority": {
-    "type": "integer",
-    "description": "priority"
-   },
-   "resultingDecision": {
-    "type": "string",
-    "enum": [
-     "allow",
-     "deny",
-     "review",
-     "requireId",
-     "requireBiometric",
-     "requireCompanion",
-     "requireSupervisor"
-    ],
-    "description": "resulting decision"
-   },
-   "affectedProducts": {
-    "type": "integer",
-    "description": "affected products"
-   },
-   "affectedVenues": {
-    "type": "integer",
-    "description": "affected venues"
-   },
-   "estimatedGuestsImpacted": {
-    "type": "integer",
-    "description": "estimated guests impacted"
-   },
-   "policyVersion": {
-    "type": "string"
-   },
-   "scenarioTime": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Simulated moment of the scan"
-   },
-   "credentialId": {
-    "type": "string",
-    "description": "Optional credential to simulate"
-   },
-   "runSavedScenarios": {
-    "type": "boolean",
-    "description": "Regression: run saved scenarios against this policy version"
-   },
-   "scenarioCount": {
-    "type": "integer"
-   },
-   "passedCount": {
-    "type": "integer"
-   },
-   "changedOutcomeCount": {
-    "type": "integer"
-   },
-   "affectedCredentials": {
-    "type": "integer"
-   }
-  },
-  "required": [
-   "policyId"
-  ]
  },
  "ProposedAction": {
   "type": "object",

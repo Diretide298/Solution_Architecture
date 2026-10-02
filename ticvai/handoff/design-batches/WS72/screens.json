@@ -487,7 +487,8 @@
       {
        "kind": "primaryButton",
        "label": "Create New",
-       "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 8 §Allow"
+       "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 8 §Allow",
+       "operation": "createForm"
       },
       {
        "kind": "secondaryButton",
@@ -498,6 +499,12 @@
        "kind": "secondaryButton",
        "label": "Create From Approved Corporate Template",
        "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 8 §Allow"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Create waiver form",
+       "operation": "createForm",
+       "provenance": "contract marketing-crm.yaml POST /forms; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -515,6 +522,13 @@
     "contract": "marketing-crm",
     "purpose": "Waiver Template Library & Master Setup",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "createForm",
+    "contract": "marketing-crm",
+    "purpose": "Create the master definition of a waiver form",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-005)"
    }
   ],
   "wireframe": {
@@ -524,6 +538,23 @@
    "workshopBoard": "wireframes/WS184 Waiver, Consent & Digital Form Management Board 1.dc.html#cms-042"
   },
   "apisNote": "Regenerated 9 September 2026 from Waiver, Consent & Digital Form Management_Reference.pdf page 8. 0 of 0 labels bound to a contract property; 14 of 27 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formCreateForm",
+    "component": "modal",
+    "trigger": "Create waiver form",
+    "body": "**Collects what `createForm` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Create waiver form",
+     "operation": "createForm"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "contract marketing-crm.yaml POST /forms; wiring fix, 2 October 2026"
+   }
+  ],
+  "entryState": {},
   "_platform": {
    "code": "P13",
    "audience": "staff",
@@ -626,12 +657,36 @@
        "kind": "secondaryButton",
        "label": "Guardian Details",
        "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 9 §Support configurable blocks"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "New consent form",
+       "operation": "createForm",
+       "notes": "A new form of kind waiver or consentForm, with its consent purposes.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-014, decided by Chinmay 2 October 2026, DEC-549)"
       }
      ]
     },
     {
      "name": "contentBody",
-     "components": []
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Form kind",
+       "bindsTo": "FormDefinition.kind",
+       "operation": "setDigitalWaiverForm",
+       "notes": "**The consent-form builder (decided by Chinmay, 2 October 2026; DEC-549):** the existing waiver builder extended, not a second builder. A form is a waiver or a `consentForm` with its `consentPurposes` (facePass, faceTag, marketing, photography, waiver) (CHG-CSA-026). Venue Management's BO-747 is the same builder for the venue; Face Pass and Face Tag enrolment reference a consent form by id (`VenueSettings.biometrics.consentFormId`, CHG-CSP-018) (CHG-SGU-014).",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-014, decided by Chinmay 2 October 2026, DEC-549)"
+      },
+      {
+       "kind": "toggle",
+       "label": "Guardian consent for minors",
+       "bindsTo": "FormDefinition.requiresGuardianForMinors",
+       "operation": "setDigitalWaiverForm",
+       "notes": "A child signs through a guardian on the venue's form; the minor age is the country's (DEC-237) (CHG-SGU-004).",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-004, decided by Chinmay 2 October 2026, DEC-237, DEC-283)"
+      }
+     ]
     }
    ]
   },
@@ -648,6 +703,12 @@
     "contract": "marketing-crm",
     "purpose": "Digital Waiver & Form Builder",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "createForm",
+    "contract": "marketing-crm",
+    "purpose": "A new waiver or consent form (kind consentForm: Face Pass, Face Tag, marketing, photography; CHG-CSA-026)",
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
@@ -657,6 +718,22 @@
    "workshopBoard": "wireframes/WS184 Waiver, Consent & Digital Form Management Board 1.dc.html#cms-043"
   },
   "apisNote": "Regenerated 9 September 2026 from Waiver, Consent & Digital Form Management_Reference.pdf page 9. 0 of 0 labels bound to a contract property; 3 of 41 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formCreateForm",
+    "component": "modal",
+    "trigger": "New consent form",
+    "body": "Name, kind (waiver or consentForm) and the consent purposes it collects; fields are added in the builder.",
+    "confirm": {
+     "label": "New consent form",
+     "operation": "createForm"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "corrected 2 October 2026 (CHG-SGU-014, decided by Chinmay 2 October 2026, DEC-549)"
+   }
+  ],
   "_platform": {
    "code": "P13",
    "audience": "staff",
@@ -726,6 +803,11 @@
     "operation": null,
     "why": "**The pack names 2 actions on this screen and the screen declares 1 operation.** Unserved: Single Select, Customer Lookup. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 11 §Support"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-007): No write saves a waiver's dynamic fields, questions and conditional logic.",
+    "source": "contracts/satellite/marketing-crm.yaml#listDynamicFieldQuestion"
    }
   ],
   "layout": {
@@ -1134,6 +1216,11 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 14"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-007): No write creates or changes a waiver's product, event and experience associations.",
+    "source": "contracts/satellite/marketing-crm.yaml#listProductEventExperience"
    }
   ],
   "layout": {
@@ -1389,6 +1476,13 @@
    "workshopBoard": "wireframes/WS184 Waiver, Consent & Digital Form Management Board 1.dc.html#cms-047"
   },
   "apisNote": "Regenerated 9 September 2026 from Waiver, Consent & Digital Form Management_Reference.pdf page 16. 0 of 0 labels bound to a contract property; 15 of 46 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-007): No write saves waiver trigger, eligibility and completion rules.",
+    "source": "contracts/satellite/marketing-crm.yaml#listWaiverTriggerEligibility"
+   }
+  ],
   "_platform": {
    "code": "P13",
    "audience": "staff",
@@ -1635,6 +1729,13 @@
        "bindsTo": "LocalizationBrandingCustomerExperienceConfigurationView",
        "operation": "setLocalizationBrandingCustomer",
        "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 19 §Each version should show"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Current configuration",
+       "bindsTo": "LocalizationBrandingCustomerExperienceConfigurationView",
+       "operation": "getLocalizationBrandingCustomer",
+       "provenance": "contract marketing-crm.yaml GET /localization-branding-customer; wiring fix, 2 October 2026"
       }
      ]
     },
@@ -1685,6 +1786,13 @@
     "contract": "marketing-crm",
     "purpose": "Localization, Branding & Customer Experience Configuration",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "getLocalizationBrandingCustomer",
+    "contract": "marketing-crm",
+    "purpose": "The waiver version's languages",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-005)"
    }
   ],
   "entryState": {

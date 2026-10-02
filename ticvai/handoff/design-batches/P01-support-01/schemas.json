@@ -280,6 +280,126 @@
    "type": "string"
   }
  },
+ "LostItem": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.lost_item",
+  "description": "BL-021. **Screens existed on three platforms and `lostAndFound` is a `ModuleKey`, and there was no item, no claim and no match between them** — which is the whole capability.\nGeneric case management holds a conversation about a lost bag. **It cannot tell you that the bag somebody handed in on Tuesday is the one somebody asked about on Monday**, and that match is the only thing the module is for.\n",
+  "required": [
+   "id",
+   "kind",
+   "foundOrLost",
+   "venueId",
+   "reportedAt"
+  ],
+  "properties": {
+   "id": {
+    "readOnly": true,
+    "type": "string",
+    "format": "uuid"
+   },
+   "foundOrLost": {
+    "type": "string",
+    "enum": [
+     "lost",
+     "found"
+    ],
+    "description": "**One entity, two directions.** A guest reports a loss and a steward reports a find, and modelling them separately means matching across two tables that drift.\n"
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "bag",
+     "phone",
+     "wallet",
+     "keys",
+     "clothing",
+     "jewellery",
+     "documents",
+     "toy",
+     "buggy",
+     "other"
+    ]
+   },
+   "description": {
+    "type": "string"
+   },
+   "colour": {
+    "type": "string",
+    "nullable": true
+   },
+   "brand": {
+    "type": "string",
+    "nullable": true
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "lastSeenPointId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "A point on the venue map. **Where a guest thinks they lost it is the strongest signal for a match**, and it is also the thing they are least sure about.\n"
+   },
+   "reportedAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "**Device time** — `recordLostItem` is offline-capable, so this is when the loss was reported or the find handed in, not when the device synced. The `recorded_at` of naming-and-style 5.2 for this row.\n"
+   },
+   "syncedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true,
+    "description": "Server time the record arrived. Equal to `reportedAt` for one recorded online."
+   },
+   "reportedBySubjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "storageLocation": {
+    "type": "string",
+    "nullable": true
+   },
+   "status": {
+    "readOnly": true,
+    "type": "string",
+    "enum": [
+     "open",
+     "matched",
+     "claimed",
+     "disposed",
+     "returned"
+    ]
+   },
+   "photoAssetIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "matchedItemId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The other side of the match — set by `matchLostItem` `match` (to `otherItemId`) and cleared by `unmatch`, on both items."
+   },
+   "caseId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The case the guest raised about it (`raiseMyCase` with `kind` `lostProperty`), where there is one."
+   },
+   "disposeAfter": {
+    "type": "string",
+    "format": "date",
+    "nullable": true,
+    "description": "**A retention date, because unclaimed property has one.** A storeroom with no disposal date is a storeroom that fills, and the date is a venue policy rather than a default.\n"
+   }
+  }
+ },
  "MessageChannel": {
   "type": "string",
   "enum": [

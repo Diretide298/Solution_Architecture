@@ -14,12 +14,16 @@
   },
   "navigation": {
    "entryFrom": [
-    "GST-001"
+    "GST-001",
+    "GST-027",
+    "GST-041"
    ],
    "inferred": true,
    "exitTo": [
     "GST-001",
-    "GST-002"
+    "GST-002",
+    "GST-010",
+    "GST-028"
    ],
    "fromFlows": true,
    "transitions": [
@@ -27,6 +31,14 @@
      "to": "GST-001",
      "trigger": "Home – Default",
      "provenance": "derived — GST-001 declares entryState.params  and GST-009 holds none of them. The edge carries nothing: GST-009 is opened from GST-001, so this edge is the way back and GST-001 keeps its own state"
+    },
+    {
+     "to": "GST-010",
+     "trigger": "Paid: the booking confirmation",
+     "provenance": "corrected 2 October 2026 (CHG-SGU-020, design-notes correction)",
+     "carries": [
+      "orderId"
+     ]
     },
     {
      "to": "BO-020",
@@ -38,10 +50,18 @@
      "carries": [
       "orderId"
      ]
+    },
+    {
+     "to": "GST-028",
+     "trigger": "It is confirmed with a facility",
+     "provenance": "flow F50 step 2→3",
+     "carries": [
+      "orderId"
+     ]
     }
    ]
   },
-  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement. **`createPayment` added 18 August** — the guest app's payment screen did not declare the operation that takes a payment, and F11 routed food payment through the AI concierge instead. **Card or wallet** (TenderKind `card`, `wallet`, as `createPayment` and flow F11 step 4 say; decided 28 September, audit R080 (a)), **both in base currency, so tender currency equals base currency**; a foreign card is converted by the guest's own issuer at their rate, which is not ours and is not recorded as ours. **Navigation repointed to P15 on 20 August** — the F&B screens it linked to moved out of the back office when the client board was adopted. **Cross-platform navigation removed 24 August**: BO-020. **A till does not navigate to a back office and a guest app does not navigate to either** — those are device handovers, and a flow declares them with `crossesDevice` rather than a screen pretending there is a link. **No 'is this you?' at checkout** (decided 28 September, audit R120 (b)): a verified contact that matches an existing profile attaches the order automatically inside `checkoutCart` (ADR-0045), so `checkGuestCheckoutMatch` and `decideGuestCheckoutMatch` were removed from this screen; only unverified matches go to staff review.\n\n**The step order comes from the published booking flow** (W12, 29 September): `getPublishedBookingFlow` returns the flow the product (or its category, else the venue default for its kind) uses, with its enabled steps in `sortOrder`; this screen renders when that flow has its step and in the order the flow gives. Flow-level settings (`performanceReveal`, `signInAt`, `seatEventDateMode`, `extrasStep`, `quickTour`, `consentQuestionIds`) are read from the flow; venue-wide settings stay on `getTenantConfig` `bookingFlow`.\n\n**29 September.** **W1:** a guest who proved the contact with the code arrives here with it; only the T&Cs tick (and the unticked marketing opt-in, M18-15) remains.",
+  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement. **`createPayment` added 18 August** — the guest app's payment screen did not declare the operation that takes a payment, and F11 routed food payment through the AI concierge instead. **Card or wallet** (TenderKind `card`, `wallet`, as `createPayment` and flow F11 step 4 say; decided 28 September, audit R080 (a)), **both in base currency, so tender currency equals base currency**; a foreign card is converted by the guest's own issuer at their rate, which is not ours and is not recorded as ours. **Navigation repointed to P15 on 20 August** — the F&B screens it linked to moved out of the back office when the client board was adopted. **Cross-platform navigation removed 24 August**: BO-020. **A till does not navigate to a back office and a guest app does not navigate to either** — those are device handovers, and a flow declares them with `crossesDevice` rather than a screen pretending there is a link. **No 'is this you?' at checkout** (decided 28 September, audit R120 (b)): a verified contact that matches an existing profile attaches the order automatically inside `checkoutCart` (ADR-0045), so `checkGuestCheckoutMatch` and `decideGuestCheckoutMatch` were removed from this screen; only unverified matches go to staff review.\n\n**The step order comes from the published booking flow** (W12, 29 September): `getPublishedBookingFlow` returns the flow the product (or its category, else the venue default for its kind) uses, with its enabled steps in `sortOrder`; this screen renders when that flow has its step and in the order the flow gives. Flow-level settings (`performanceReveal`, `signInAt`, `seatEventDateMode`, `extrasStep`, `quickTour`, `consentQuestionIds`) are read from the flow; venue-wide settings stay on `getTenantConfig` `bookingFlow`.\n\n**29 September.** **W1:** a guest who proved the contact with the code arrives here with it; only the T&Cs tick (and the unticked marketing opt-in, M18-15) remains.\n\n**The guest selects the currency and pays in it** (decided 2 October 2026, Chinmay; CHG-FIN-001; reverses the display-only rule, CF-37 and \"payment will be processed in AED\", in favour of option (b) of MoM 10 Aug 2026 4.7, DI-211). The venue lists the currencies a guest may pay in (`VenueSettings.chargeCurrencies`, a subset of the currencies it shows); `listFxRates` with `chargeable=true` returns them, each marked `chargeable`. The selected currency is sent at checkout (`checkoutCart.chargeCurrency`), the rate is locked on the order (`Order.chargeFxRate`, `chargeTotal`, until `chargeRateLockedUntil`), and the payment request goes to the payment partner in that currency. The ledger stays in the venue's base currency, with the rate recorded on the order, the payment and any refund. **Refunds go back in the currency paid**, at the sale rate, so a full refund returns exactly what was charged. A currency the venue shows but does not charge is still an approximate price, marked \"approx.\", with \"You pay in <base currency>\" beside it.\n\n**F&B is paid on its own (decided by Chinmay, 2 October 2026; DEC-052, DEC-071).** When this step pays a guest F&B order (F11 step 4, after `createGuestFnbOrder`), it pays that order alone, with its own receipt; F&B lines never join the ticket cart's one receipt (DI-293 does not apply to F&B) (CHG-SGU-001).",
   "density": "comfortable",
   "pattern": "statusTracker",
   "patternReason": "`getCart` reads one record and nothing reads a population — the screen is about that one thing",
@@ -74,6 +94,14 @@
        "provenance": "contract orders.yaml GET /carts/{cartId}"
       },
       {
+       "kind": "banner",
+       "label": "You pay in",
+       "bindsTo": "Order.chargeTotal",
+       "operation": "checkoutCart",
+       "notes": "After checkout: the amount in the selected currency, the base amount and the rate, and how long the rate holds (`Order.chargeCurrency`, `chargeTotal`, `chargeFxRate`, `chargeRateLockedUntil`; CHG-FIN-001).",
+       "provenance": "contract orders.yaml Order.chargeTotal (CHG-FIN-001, 2 October 2026)"
+      },
+      {
        "kind": "detailPanel",
        "label": "The payment link",
        "bindsTo": "PaymentLinkView",
@@ -93,7 +121,7 @@
         "BookingFlow.steps"
        ],
        "operation": "getPublishedBookingFlow",
-       "notes": "The steps of the published flow in their `sortOrder`, this one (review and payment) highlighted. A step the flow has turned off is not shown and is skipped by Continue and Back.",
+       "notes": "The steps of the published flow in their `sortOrder`, this one (review and payment) highlighted. A step the flow has turned off is not shown and is skipped by Continue and Back. Drawn in the venue's `BookingFlowSettings.stepIndicator` style; `embedMode` and `singleEventPage` come from the same published settings (CMS-016) (CHG-SGU-022).",
        "provenance": "decided 29 September 2026, W12; CMS-103 Booking Flows"
       },
       {
@@ -325,7 +353,8 @@
   },
   "navigation": {
    "entryFrom": [
-    "GST-001"
+    "GST-001",
+    "GST-009"
    ],
    "inferred": true,
    "exitTo": [
@@ -388,6 +417,13 @@
        "label": "Transfer tickets",
        "notes": "Opens Ticket Transfer (WEB-030 on the web, GST-014 in the app), after the tickets.",
        "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Set a password",
+       "operation": "linkGuestCheckout",
+       "notes": "Offered after a guest checkout: keeps these tickets in an account.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-020, design-notes correction)"
       }
      ]
     }
@@ -411,6 +447,12 @@
     "operationId": "reprintOrder",
     "contract": "orders",
     "purpose": "Reprint or resend tickets",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "linkGuestCheckout",
+    "contract": "identity",
+    "purpose": "Set a password: turn the guest-checkout order into an account",
     "trigger": "onAction"
    }
   ],
@@ -458,6 +500,20 @@
      ]
     },
     "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
+   },
+   {
+    "id": "formLinkGuestCheckout",
+    "component": "modal",
+    "trigger": "Set a password",
+    "body": "A password for the account; the order and the verified contact come from the checkout just made.",
+    "confirm": {
+     "label": "Set a password",
+     "operation": "linkGuestCheckout"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "corrected 2 October 2026 (CHG-SGU-020, design-notes correction)"
    }
   ],
   "gaps": [
@@ -530,7 +586,8 @@
     "GST-001",
     "GST-002",
     "GST-042",
-    "GST-059"
+    "GST-059",
+    "GST-009"
    ],
    "transitions": [
     {
@@ -552,6 +609,16 @@
      "to": "GST-059",
      "trigger": "They follow it through the day",
      "provenance": "flow F49 step 5→6"
+    },
+    {
+     "to": "GST-009",
+     "trigger": "Checkout",
+     "provenance": "corrected 2 October 2026 (CHG-SGU-020, design-notes correction)",
+     "carries": [
+      "orderId",
+      "paymentId",
+      "token"
+     ]
     }
    ]
   },

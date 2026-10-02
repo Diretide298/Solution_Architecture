@@ -459,10 +459,11 @@ paths:
     get:
       operationId: getUnifiedReconciliation
       x-ticvai-consumed-by:
+        - "P08 ADM-627 Reconciliation Audit, Trace & Evidence Center"
+        - "P08 ADM-628 Reconciliation Simulator, Forecast & AI Operations Advisor"
         - "P08 BO-1081 Finance Dashboard"
         - "P08 BO-1172 Finance Validation, Reporting & Audit Center"
-        - "P09 ADM-627 Reconciliation Audit, Trace & Evidence Center\t149"
-        - "P09 ADM-628 Reconciliation Simulator, Forecast & AI Operations Advisor\t150"
+        - "P16 ANL-072 Finance Dashboard"
       summary: Every money source against the ledger, in one view
       description: '4.2.19. **Reconciliation was per provider and the question is not per provider.**
         `ingestSettlementFile` and its siblings are good and gateway-scoped; **a venue closing a day needs
@@ -472,6 +473,11 @@ paths:
         Returns each source with its own total and the variance against the ledger. **The variance is
         the answer** — a reconciliation that shows four balanced sources and no comparison has not reconciled
         anything.
+
+        **Reconciliation is daily, per venue** (decided 2 October 2026, Chinmay; CHG-FIN-009; confirms
+        audit R110 (b)). The unit a finance user works and signs off is one venue-day: `from` equal to
+        `to`. A longer range is a review of days already reconciled, never a reconciliation of its own;
+        a provider that sends a monthly file (DI-268) is matched day by day against it.
 
         '
       tags:
@@ -518,7 +524,7 @@ paths:
     post:
       operationId: recordSettlement
       x-ticvai-consumed-by:
-        - "P09 ADM-626 Settlement Posting, Finance Handoff & Close Manager\t148"
+        - "P08 ADM-626 Settlement Posting, Finance Handoff & Close Manager"
       x-ticvai-audience:
       - staff
       summary: One entity paid another
@@ -1369,8 +1375,13 @@ paths:
         applied code in order, and whether it compounded — so a variance can be explained rather than
         merely observed.
 
-        Discount treatment is explicit: `discountsAreTaxInclusive` determines whether a discount reduces
-        the taxable base or is applied after tax.
+        **The taxable base comes from the tax profile, and only from there** (decided 2 October 2026,
+        Chinmay; CHG-FIN-004). Each tax code is applied on the base its jurisdiction''s tax profile names
+        (`catalogue.TaxProfile.taxBase`): `discountedPrice` (the default) taxes what the guest pays;
+        `preDiscountPrice` taxes the price before the discount (Egypt, MoM 1 Sep 2026 4.5, DI-598: a
+        ticket listed at 100 with 20% off is paid at 80 and taxed on 100, so at 14% VAT the tax is 14.00,
+        not 11.20). `discountsAreTaxInclusive` is deprecated and ignored; each result line says which base
+        it used (`taxBase`).
 
         '
       tags:
@@ -1645,6 +1656,11 @@ paths:
       description: 'Created in `draft`. A finance user posts it; a finance manager or director approves
         it; only then does it reach the ledger (12 Aug §15).
 
+        **Every manual journal needs approval, whatever its amount** (decided 2 October 2026, Chinmay;
+        CHG-FIN-008; DI-265). There is no threshold below which a manual journal posts itself; a
+        threshold may be introduced later as a venue setting, and until then none exists. The approver
+        is never the preparer (`approveJournalEntry`, `approver-is-preparer`).
+
         Lines must balance. An unbalanced entry is rejected rather than saved as a draft to fix later
         — a half-formed journal in a list is an invitation to approve it by accident.
 
@@ -1742,6 +1758,11 @@ paths:
       - staff
       summary: Approve a journal entry and post it
       description: 'The approver may not be the poster. Segregation of duties is enforced here, not assumed.
+
+        **Approver is never the preparer, for every manual journal and every reversal** (decided 2 October
+        2026, Chinmay; CHG-FIN-005, CHG-FIN-008). A posted entry is never edited: the only correction is
+        `reverseJournalEntry` and, where needed, a new entry, each approved by somebody other than the
+        person who prepared it.
 
         '
       tags:
@@ -1887,6 +1908,12 @@ paths:
         Only a `posted` entry is reversed, once. `reason` is kept on the reversal as `reversalReason`.
         A `draft` or `pendingApproval` entry has not reached the ledger and is rejected, not reversed.
 
+        **Posted entries are never edited, only reversed** (decided 2 October 2026, Chinmay; CHG-FIN-005).
+        A reversal a person asks for is a manual journal (CHG-FIN-008): it is created `pendingApproval`
+        and posts when a finance approver who is not the requester approves it (`approveJournalEntry`).
+        Reversals the platform writes itself (a refund, a void, a period-close adjustment) post as
+        before, each tied to its source document.
+
         '
       tags:
       - journal
@@ -1947,7 +1974,10 @@ paths:
         - "P01 WEB-035 Multi-Currency & Pricing"
         - "P02 GST-044 Multi-Currency & Pricing"
         - "P08 BO-077 FX Rates & Variances"
+      # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
+      # or staff token is still accepted. `{}` makes the credential optional.
       security:
+      - {}
       - guestAuth: []
       - bearerAuth: []
       x-ticvai-audience:
@@ -1971,6 +2001,15 @@ paths:
         audit R120 (a)). A guest screen passes `venueId` and gets the region''s rates narrowed to the
         currencies that venue has chosen to display (`tenancy.VenueSettings.displayCurrencies`); the
         rate itself is never set per venue.
+
+        **Superseded in part, 2 October 2026 (Chinmay; CHG-FIN-001): the guest may now pay in a
+        currency they select.** The ledger still holds base currency only, but a guest-selected
+        currency is charged at the gateway at the region''s `tender` rate, locked on the order
+        (`orders.Order.chargeFxRate`), and a refund goes back in the currency paid at the sale rate,
+        so the venue never refunds at today''s rate. The quotation above (Allam, 10 August) describes
+        the display-only option this replaces for card and wallet; it still holds for foreign cash at
+        a till (DI-282). `chargeable=true` with `venueId` narrows the list to the currencies the venue
+        lets a guest pay in (`tenancy.VenueSettings.chargeCurrencies`); each rate says `chargeable`.
 
         '
       tags:
@@ -1998,6 +2037,12 @@ paths:
         schema:
           type: string
           format: uuid
+      - name: chargeable
+        in: query
+        description: With `venueId`, only the currencies a guest may select and pay in at that venue
+          (`tenancy.VenueSettings.chargeCurrencies`; CHG-FIN-001).
+        schema:
+          type: boolean
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
       responses:
@@ -2522,11 +2567,11 @@ paths:
     get:
       operationId: listSettlements
       x-ticvai-consumed-by:
+        - "P08 ADM-623 Settlement & Payout Manager"
         - "P08 BO-025 Chargebacks & Disputes"
         - "P08 BO-043 Daily Reconciliation"
         - "P08 BO-101 Orders & Money"
-        - "P09 ADM-619 Reconciliation & Settlement Command Center\t139"
-        - "P09 ADM-623 Settlement & Payout Manager\t144"
+        - "P09 ADM-619 Reconciliation & Settlement Command Center"
         - "P10 PTR-014 Settlement & Payment History"
       x-ticvai-api-scope: partner.read
       x-ticvai-audience:
@@ -2576,9 +2621,9 @@ paths:
     post:
       operationId: ingestSettlementFile
       x-ticvai-consumed-by:
+        - "P08 ADM-620 Reconciliation Source & Import Manager"
         - "P08 BO-025 Chargebacks & Disputes"
         - "P08 BO-043 Daily Reconciliation"
-        - "P09 ADM-620 Reconciliation Source & Import Manager\t141"
         - "P10 PTR-014 Settlement & Payment History"
       x-ticvai-api-scope: partner.write
       x-ticvai-audience:
@@ -2725,9 +2770,9 @@ paths:
     get:
       operationId: listSettlementExceptions
       x-ticvai-consumed-by:
+        - "P08 ADM-622 Reconciliation Exception & Investigation Center"
         - "P08 BO-025 Chargebacks & Disputes"
         - "P08 BO-043 Daily Reconciliation"
-        - "P09 ADM-622 Reconciliation Exception & Investigation Center\t143"
         - "P10 PTR-014 Settlement & Payment History"
       x-ticvai-api-scope: partner.read
       x-ticvai-audience:
@@ -2772,9 +2817,9 @@ paths:
     post:
       operationId: resolveSettlementException
       x-ticvai-consumed-by:
+        - "P08 ADM-622 Reconciliation Exception & Investigation Center"
         - "P08 BO-025 Chargebacks & Disputes"
         - "P08 BO-043 Daily Reconciliation"
-        - "P09 ADM-622 Reconciliation Exception & Investigation Center\t143"
         - "P10 PTR-014 Settlement & Payment History"
       x-ticvai-api-scope: partner.write
       x-ticvai-audience:
@@ -2902,7 +2947,6 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-074 Chart of Accounts"
         - "P09 ADM-411 Billing & Legal Entity Information"
-        - "P17 SGN-020 Billing & Legal Entity Information"
       x-ticvai-audience:
       - staff
       summary: Create a legal entity
@@ -2997,6 +3041,13 @@ paths:
         the balance moves while it is being counted, and the two never agree.
 
         Moves an `open` period to `closing`, and records the step (who, when) in the period''s `events`.
+
+
+        **Wallet movements are frozen with the rest** (decided 2 October 2026, Chinmay, batch 6 #220, BO-1170: "Add
+        a wallet movement summary operation and wallet pre-close checks"; DEC-220; CHG-CSP-040). From `closing` the
+        period''s wallet movements are summarised (wallet `getWalletMovementSummary`, owned by the wallet contract) and
+        the close checks include the wallet checks (`PeriodCloseResult.walletChecks`): the close cannot pass while the
+        wallet roll-forward does not tie.
 
         '
       tags:
@@ -3264,8 +3315,6 @@ paths:
     get:
       operationId: getFinancialReport
       x-ticvai-consumed-by:
-        - "P04 POS-008 Reports"
-        - "P08 BO-029 Report Builder"
         - "P08 BO-058 Reporting Home"
         - "P08 BO-059 Sales Reports"
         - "P08 BO-060 Attendance & Footfall"
@@ -3602,6 +3651,7 @@ paths:
         - "P08 BO-022 Order Detail"
         - "P08 BO-1081 Finance Dashboard"
         - "P09 ADM-068 Tax, Fee & Calculation Command Center"
+        - "P16 ANL-072 Finance Dashboard"
       x-ticvai-audience:
       - staff
       - guest
@@ -3680,6 +3730,7 @@ paths:
         - "P01 WEB-019 Order History"
         - "P02 GST-019 Order History"
         - "P04 POS-026 Receipt & Reprint"
+        - "P04 POS-030 Sales Journal"
         - "P08 BO-022 Order Detail"
       x-ticvai-audience:
       - staff
@@ -3712,6 +3763,23 @@ paths:
 
         An invoice is never edited or deleted: a correction is a credit memo (`issueCreditMemo`) and, where
         needed, a new invoice. A guest may call this for their own paid orders only.
+
+        **What the UAE requires on each kind** (research 2 October 2026, CHG-FIN-011; Executive
+        Regulation Art. 59, Cabinet Decision 52 of 2017 as amended by Cabinet Decision 100 of 2024;
+        the note is docs/active/research-uae-vat-and-blind-close-2-october.md). A full tax invoice:
+        the words "Tax Invoice"; the supplier's name, address and TRN; the recipient's name, address and
+        TRN where registered; a sequential number; the date of issue and the date of supply where
+        different; a description; per line the unit price, quantity, tax rate and amount payable in AED;
+        any discount; the gross amount in AED; the tax in AED with the exchange rate where converted;
+        and the reverse-charge statement where it applies. A simplified tax invoice: "Tax Invoice"; the
+        supplier's name, address and TRN; the date of issue; a description; the total consideration and
+        the tax in AED. A guest who paid in a currency they selected (CHG-FIN-001) gets an invoice in the
+        base currency with the amount paid in their currency and the rate shown as payment information.
+        **From the e-invoicing go-live of the legal entity** (Ministerial Decisions 243 and 244 of 2025:
+        1 January 2027 for revenue of AED 50 million or more, 1 July 2027 below it) business-to-business
+        invoices and credit notes are issued as electronic invoices through the accredited service
+        provider (`transmitEInvoices`), and a simplified invoice is no longer available for them (Cabinet
+        Decision 100 of 2025); supplies to consumers stay outside e-invoicing.
       tags:
       - tax
       x-ticvai-permission: LEDGER_POST
@@ -3850,6 +3918,14 @@ paths:
         the invoice's own rate per line, never today's. Issuing one moves the invoice to
         `partiallyCredited` or `fullyCredited`; the ledger movement is the refund's or the reversal's, not
         this document's. Who issued it, when and why is kept on the memo and in the audit record.
+
+        **Titled "Tax Credit Note" in the UAE** (research 2 October 2026, CHG-FIN-011; Executive
+        Regulation Art. 60(1)), showing the supplier's name, address and TRN, the recipient's where
+        registered, the date of issue, the invoice's supply value, the corrected value, the difference
+        and the tax on it in AED, a brief explanation, and the invoice it corrects. "Credit memo" stays
+        the contract's name; screens and the document say "Tax credit note". A refund paid in a
+        guest-selected currency (CHG-FIN-001) credits the invoice's own base-currency figures at the
+        invoice's own rate.
       tags:
       - tax
       x-ticvai-permission: LEDGER_POST
@@ -3904,6 +3980,7 @@ paths:
         - "P02 GST-019 Order History"
         - "P08 BO-023 Refunds & Exchanges"
         - "P08 BO-1081 Finance Dashboard"
+        - "P16 ANL-072 Finance Dashboard"
       x-ticvai-audience:
       - staff
       - guest
@@ -3982,6 +4059,7 @@ paths:
         - "P01 WEB-019 Order History"
         - "P02 GST-019 Order History"
         - "P04 POS-026 Receipt & Reprint"
+        - "P04 POS-030 Sales Journal"
         - "P08 BO-022 Order Detail"
         - "P08 BO-023 Refunds & Exchanges"
       x-ticvai-audience:
@@ -4026,7 +4104,7 @@ paths:
     get:
       operationId: listTaxInvoiceTemplates
       x-ticvai-consumed-by:
-        - "P09 ADM-069 Tax Profile & Jurisdiction Configuration"
+        - "P08 ADM-069 Tax Profile & Jurisdiction Configuration"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: our build plan (retrace 5.7.93 template, numbering, language); shape follows listLegalEntities'
@@ -4065,7 +4143,7 @@ paths:
     put:
       operationId: setTaxInvoiceTemplate
       x-ticvai-consumed-by:
-        - "P09 ADM-069 Tax Profile & Jurisdiction Configuration"
+        - "P08 ADM-069 Tax Profile & Jurisdiction Configuration"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: our build plan (retrace 5.7.93 template, numbering, language); shape follows createLegalEntity'
@@ -4121,8 +4199,8 @@ paths:
     get:
       operationId: listEInvoicingProviders
       x-ticvai-consumed-by:
-        - "P09 ADM-069 Tax Profile & Jurisdiction Configuration"
-        - "P09 ADM-077 Calculation Validation, Reconciliation & Service Interface"
+        - "P08 ADM-069 Tax Profile & Jurisdiction Configuration"
+        - "P08 ADM-077 Calculation Validation, Reconciliation & Service Interface"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: our build plan (retrace 6.1.1); shape follows listLegalEntities'
@@ -4156,7 +4234,7 @@ paths:
     put:
       operationId: setEInvoicingProvider
       x-ticvai-consumed-by:
-        - "P09 ADM-069 Tax Profile & Jurisdiction Configuration"
+        - "P08 ADM-069 Tax Profile & Jurisdiction Configuration"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: our build plan (retrace 6.1.1); shape follows setFxProvider'
@@ -4211,8 +4289,9 @@ paths:
     get:
       operationId: listEInvoiceTransmissions
       x-ticvai-consumed-by:
+        - "P08 ADM-077 Calculation Validation, Reconciliation & Service Interface"
         - "P08 BO-1081 Finance Dashboard"
-        - "P09 ADM-077 Calculation Validation, Reconciliation & Service Interface"
+        - "P16 ANL-072 Finance Dashboard"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: our build plan (retrace 6.1.1); shape follows listSettlementExceptions'
@@ -4264,7 +4343,7 @@ paths:
     post:
       operationId: transmitEInvoices
       x-ticvai-consumed-by:
-        - "P09 ADM-077 Calculation Validation, Reconciliation & Service Interface"
+        - "P08 ADM-077 Calculation Validation, Reconciliation & Service Interface"
       x-ticvai-audience:
       - staff
       - service
@@ -4502,8 +4581,15 @@ components:
   schemas:
     FinTaxInvoiceType:
       type: string
-      description: 5.7.93. `simplified` for one order with no recipient details, `full` for one order with
+      description: '5.7.93. `simplified` for one order with no recipient details, `full` for one order with
         them, `consolidated` for several paid orders of one buyer on one invoice.
+
+        **When a simplified tax invoice is allowed in the UAE** (research 2 October 2026, CHG-FIN-011;
+        Executive Regulation, Cabinet Decision 52 of 2017 as amended, Art. 59(5)): the recipient is not
+        VAT-registered, or is registered and the consideration does not exceed AED 10,000, and the
+        reverse charge does not apply. Otherwise the invoice is `full`. Both kinds carry the title
+        "Tax Invoice" (Art. 59(1)(a), 59(2)(a)); a simplified one is issued on the date of supply
+        (Art. 59(13)(1)), a full one within 14 days (Decree-Law Art. 67(1)).'
       enum:
       - simplified
       - full
@@ -4639,6 +4725,12 @@ components:
           $ref: ../shared/common.yaml#/components/schemas/Money
         creditedAmount:
           $ref: ../shared/common.yaml#/components/schemas/Money
+        grossAmountInLegalCurrency:
+          allOf:
+          - $ref: ../shared/common.yaml#/components/schemas/Money
+          readOnly: true
+          description: The amount payable for the line in the legal currency (AED), Executive Regulation
+            Art. 59(1)(h); equal to `grossAmount` on an invoice in the legal currency (CHG-FIN-011).
     FinTaxInvoice:
       x-ticvai-persistence: ledger.tax_invoice + ledger.tax_invoice_line
       type: object
@@ -4739,8 +4831,57 @@ components:
           $ref: ../shared/common.yaml#/components/schemas/Money
         taxAmountInLegalCurrency:
           $ref: ../shared/common.yaml#/components/schemas/Money
-          description: The tax in the legal entity's currency (AED in the UAE) where the invoice currency differs,
-            at the rate the orders were stored at.
+          description: >-
+            The tax in the legal entity's currency (AED in the UAE) where the invoice currency differs.
+            **In the UAE the converted amounts use the UAE Central Bank rate at the date of supply** (Decree-Law
+            Art. 69) and the rate is printed (`legalFxRate`, Executive Regulation Art. 59(1)(k));
+            CHG-FIN-011.
+        legalCurrency:
+          type: string
+          pattern: ^[A-Z]{3}$
+          readOnly: true
+          description: The legal entity's currency (AED in the UAE), in which the law requires the tax and
+            the gross amount (CHG-FIN-011).
+        grossAmountInLegalCurrency:
+          allOf:
+          - $ref: ../shared/common.yaml#/components/schemas/Money
+          readOnly: true
+          description: The gross amount payable in the legal currency (Executive Regulation Art. 59(1)(j);
+            for a simplified invoice the total consideration, Art. 59(2)(e)). Equal to `grossAmount` when
+            the invoice is in the legal currency (CHG-FIN-011).
+        legalFxRate:
+          allOf:
+          - $ref: '#/components/schemas/FxRateValue'
+          nullable: true
+          readOnly: true
+          description: Units of the legal currency per one unit of `currency`, printed with the tax where
+            the invoice is not in the legal currency (Art. 59(1)(k)). Null when it is (CHG-FIN-011).
+        legalFxRateSource:
+          allOf:
+          - $ref: '#/components/schemas/FxRateSource'
+          nullable: true
+          readOnly: true
+          description: '`uaeCentralBank` for a UAE legal entity (Decree-Law Art. 69).'
+        paidCurrency:
+          type: string
+          pattern: ^[A-Z]{3}$
+          nullable: true
+          readOnly: true
+          description: Where the guest paid in a currency they selected (`orders.Order.chargeCurrency`,
+            CHG-FIN-001), printed as payment information with `paidAmount` and the charge rate. The
+            invoice itself is in the base currency, so the AED amounts the law requires are the
+            invoice's own figures (CHG-FIN-011).
+        paidAmount:
+          allOf:
+          - $ref: ../shared/common.yaml#/components/schemas/Money
+          readOnly: true
+          description: What the guest paid in `paidCurrency` (`orders.Order.chargeTotal`).
+        reverseChargeStatement:
+          type: string
+          nullable: true
+          readOnly: true
+          description: Where the recipient must account for the tax, the statement saying so and the
+            Decree-Law provision (Art. 59(1)(l), Art. 48). Null otherwise (CHG-FIN-011).
         creditedAmount:
           $ref: ../shared/common.yaml#/components/schemas/Money
         languages:
@@ -4940,9 +5081,56 @@ components:
           $ref: ../shared/common.yaml#/components/schemas/Money
         taxAmountInLegalCurrency:
           $ref: ../shared/common.yaml#/components/schemas/Money
+        legalFxRate:
+          allOf:
+          - $ref: '#/components/schemas/FxRateValue'
+          nullable: true
+          readOnly: true
+          description: The invoice's own `legalFxRate`, never today's (CHG-FIN-011).
+        invoiceSupplyValue:
+          allOf:
+          - $ref: ../shared/common.yaml#/components/schemas/Money
+          readOnly: true
+          description: '**The value of the supply shown on the tax invoice** (Executive Regulation Art. 60(1)(e)),
+            adjusted by any earlier credit note on the same invoice. With `correctedSupplyValue` and
+            `netAmount` (the difference) and `taxAmountInLegalCurrency` (the tax on the difference in AED),
+            the four figures the law requires (CHG-FIN-011).'
+        correctedSupplyValue:
+          allOf:
+          - $ref: ../shared/common.yaml#/components/schemas/Money
+          readOnly: true
+          description: The correct value of the supply after this credit note (Art. 60(1)(e)).
+        supplierName:
+          type: string
+          readOnly: true
+          description: Snapshot of the legal entity at issue, as on the invoice (Art. 60(1)(b)).
+        supplierAddress:
+          type: string
+          nullable: true
+          readOnly: true
+        supplierTaxRegistrationNumber:
+          type: string
+          nullable: true
+          readOnly: true
+        buyerName:
+          type: string
+          nullable: true
+          readOnly: true
+          description: The recipient as on the invoice; name, address and TRN where they are registered
+            (Art. 60(1)(c)).
+        buyerAddress:
+          type: string
+          nullable: true
+          readOnly: true
+        buyerTaxRegistrationNumber:
+          type: string
+          nullable: true
+          readOnly: true
         note:
           type: string
           nullable: true
+          description: The brief explanation of why the credit note was issued, printed on it (Art. 60(1)(f));
+            the reason's own wording when no note is given (CHG-FIN-011).
         renditionAssetId:
           type: string
           format: uuid
@@ -5042,7 +5230,11 @@ components:
             pattern: ^[a-z]{2}(-[A-Z]{2})?$
         title:
           type: object
-          description: The document title per language, e.g. "Tax Invoice". Prescribed wording is law (CF-133).
+          description: 'The document title per language. **Prescribed wording is law** (CF-133, answered by
+            research 2 October 2026, CHG-FIN-011): in the UAE "Tax Invoice" for both `taxInvoice` and
+            `simplifiedTaxInvoice` (Executive Regulation Art. 59(1)(a), 59(2)(a)) and "Tax Credit Note" for
+            `creditMemo` (Art. 60(1)(a)). Never "Receipt" or "VAT receipt" as the title; the Arabic title
+            is the client''s tax adviser''s to confirm.'
           additionalProperties:
             type: string
         footerText:
@@ -5060,9 +5252,20 @@ components:
         autoIssueOnPayment:
           type: boolean
           default: false
-          description: For `simplifiedTaxInvoice`, issue one on every paid order (the VAT receipt).
+          description: 'For `simplifiedTaxInvoice`, issue one on every paid order (the VAT receipt).
+            **Always on for a UAE VAT-registered legal entity** (research 2 October 2026, CHG-FIN-011): a
+            registrant making a taxable supply issues and delivers a tax invoice (Decree-Law Art. 65(1)),
+            and a simplified one on the date of supply (Executive Regulation Art. 59(13)(1)); a template
+            for such an entity saved with this false is refused 422 `tax-invoice-required`. The till prints
+            it as the receipt (POS-026); the guest web and app show it on the order.'
         simplifiedAllowedUpTo:
-          $ref: ../shared/common.yaml#/components/schemas/Money
+          allOf:
+          - $ref: ../shared/common.yaml#/components/schemas/Money
+          description: '**For a VAT-registered recipient only**: the consideration up to which a simplified
+            invoice is still allowed (UAE AED 10,000, Executive Regulation Art. 59(5)(b)). A recipient who is
+            not registered may always get a simplified one (Art. 59(5)(a)). Above it, or where the
+            reverse charge applies, the till and the back office offer the full invoice only
+            (CHG-FIN-011).'
         showLegalCurrencyTax:
           type: boolean
           default: true
@@ -5915,8 +6118,11 @@ components:
         discountsAreTaxInclusive:
           type: boolean
           default: true
-          description: 'True reduces the taxable base by the discount. False applies tax to the undiscounted
-            amount. Venue policy.
+          deprecated: true
+          description: '**Deprecated 2 October 2026 and ignored** (Chinmay; CHG-FIN-004). It was a second
+            source of truth for the taxable base beside `catalogue.TaxProfile.taxBase`, set per venue
+            while the law sets it per jurisdiction. The base now comes from the tax profile of each tax
+            code; the response says which base was used (`TaxCalculation.lines[].taxBase`).
 
             '
         lines:
@@ -5963,6 +6169,12 @@ components:
                 type: string
               taxableBase:
                 $ref: ../shared/common.yaml#/components/schemas/Money
+              taxBase:
+                type: string
+                enum:
+                - discountedPrice
+                - preDiscountPrice
+                description: Which price `taxableBase` is, from the tax profile (CHG-FIN-004).
               appliedTaxes:
                 type: array
                 description: In application order, so a compound calculation can be traced.
@@ -6637,6 +6849,13 @@ components:
           description: When the rate was pulled. **Distinct from `effectiveFrom`**, which is when it applies
             — a rate fetched at 06:00 for a business day starting at 00:00 has two different times and
             conflating them makes a late feed look like a backdated rate.
+        chargeable:
+          type: boolean
+          readOnly: true
+          x-ticvai-persisted: false
+          description: With `venueId`, true where a guest may select this currency and pay in it at that
+            venue (`tenancy.VenueSettings.chargeCurrencies`), false where it is shown as an approximate
+            price only (CHG-FIN-001).
     ForeignTenderReport:
       type: object
       x-ticvai-persistence: none — aggregated from payment
@@ -7215,6 +7434,59 @@ components:
                 type: string
               blockingCount:
                 type: integer
+        walletChecks:
+          type: array
+          description: '**The wallet pre-close checks** (decided 2 October 2026, Chinmay, batch 6 #220, BO-1170; DEC-220;
+            CHG-CSP-040). Beside `checks`, whose values clients built at r1 already switch on, so no value is added there.
+            `passed` is false while any of these fails. Empty where the tenant has no wallet module.'
+          items:
+            type: object
+            required:
+            - check
+            - passed
+            properties:
+              check:
+                type: string
+                enum:
+                - walletRollForwardTies
+                - walletLiabilityMatchesLedger
+                - noPendingWalletAuthorisations
+                - expiredBalancesReleased
+                - walletDisputesReviewed
+                description: '`walletRollForwardTies`: opening liability plus top-ups, minus spend, refunds and expiry,
+                  equals closing liability. `walletLiabilityMatchesLedger`: that closing liability equals the wallet
+                  liability account. `noPendingWalletAuthorisations`: no authorisation is still held open in the
+                  period. `expiredBalancesReleased`: balances past expiry were released to breakage. `walletDisputesReviewed`:
+                  no wallet dispute raised in the period is unreviewed.'
+              passed:
+                type: boolean
+              detail:
+                type: string
+              blockingCount:
+                type: integer
+        walletRollForward:
+          type: object
+          nullable: true
+          description: '**The period''s wallet movement summary, as the close checked it** (DEC-220; CHG-CSP-040): read
+            from wallet `getWalletMovementSummary` so BO-1170 shows the roll-forward beside the ledger checks. Null where
+            the tenant has no wallet module.'
+          properties:
+            openingLiability:
+              $ref: ../shared/common.yaml#/components/schemas/Money
+            toppedUp:
+              $ref: ../shared/common.yaml#/components/schemas/Money
+            spent:
+              $ref: ../shared/common.yaml#/components/schemas/Money
+            refunded:
+              $ref: ../shared/common.yaml#/components/schemas/Money
+            expired:
+              $ref: ../shared/common.yaml#/components/schemas/Money
+            closingLiability:
+              $ref: ../shared/common.yaml#/components/schemas/Money
+            ledgerLiability:
+              allOf:
+              - $ref: ../shared/common.yaml#/components/schemas/Money
+              description: The wallet liability account's balance, to compare with `closingLiability`.
     FinancialReport:
       x-ticvai-persistence: none — computed from replica
       type: object

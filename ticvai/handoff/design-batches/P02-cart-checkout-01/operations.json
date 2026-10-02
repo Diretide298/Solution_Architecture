@@ -257,6 +257,25 @@
   "requestBody": null,
   "responds": "Payment"
  },
+ "linkGuestCheckout": {
+  "method": "POST",
+  "path": "/auth/guest/link-checkout",
+  "contract": "identity",
+  "summary": "Attach a guest checkout to an account",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
  "listProductVariants": {
   "method": "GET",
   "path": "/products/{productId}/variants",

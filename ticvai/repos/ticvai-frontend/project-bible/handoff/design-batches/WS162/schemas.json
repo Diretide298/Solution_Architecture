@@ -221,6 +221,15 @@
     "type": "integer",
     "minimum": 1
    },
+   "module": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/ModuleKey"
+     }
+    ],
+    "readOnly": true,
+    "description": "The module of the version's definition (`AiForecastDefinition.module`), copied when the version is produced; the module whose AI publish permission `publishForecastVersion` requires (CHG-FUP-004)."
+   },
    "status": {
     "type": "string",
     "enum": [
@@ -468,7 +477,7 @@
  "AiOperationalRequirement": {
   "type": "object",
   "x-ticvai-persistence": "ai.operational_requirement",
-  "description": "**A requirement derived from a forecast version** (design 2.2 C step 6, AIP-067): staff, POS, gates, F&B, stock or resources, computed with the tenant's productivity standards. **Autonomy L2 (prepare)**: it is sent to the owning module as a recommendation bound to that version, and a person applies it there.",
+  "description": "**A requirement derived from a forecast version** (design 2.2 C step 6, AIP-067): staff, POS, gates, F&B, stock or resources, computed with the tenant's productivity standards. **Autonomy L2 (prepare)**: it is sent to the owning module as a recommendation bound to that version, and a person applies it there.\n**Every kind, from release 1** (Chinmay, 2 October, workbook Q9: \"all kinds\"; CHG-CSA-005). The event forecast derives requirements of every `kind` below, filtered to what the venue has configured (a venue with no kiosks gets no `kiosk` rows); the models in place improve with the venue's data.",
   "required": [
    "versionId",
    "kind",
@@ -587,7 +596,7 @@
    "localLlm",
    "openaiCompatible"
   ],
-  "description": "`openaiCompatible` (added 29 September, AI design 3.3): a customer endpoint that speaks the OpenAI API, taken with no custom development (AIC-009). Any other protocol needs an adapter.\n"
+  "description": "`openaiCompatible` (added 29 September, AI design 3.3): a customer endpoint that speaks the OpenAI API, taken with no custom development (AIC-009). Any other protocol needs an adapter.\n**Core42 Compass is reached through `openaiCompatible`** (Chinmay, 2 October: the AI residency decision, amending AI-D02; CHG-CSA-002). Compass is the provider of the `uaeOnly` residency class (common `AiResidencyClass`): Small tier Compass GPT-4.1 mini (or Seraj), Strong tier Compass GPT-5, with OpenAI UAE and then the in-cell open-weights model as the fallback chain. OpenAI UAE is `openai` with a UAE `endpoint`; the in-cell model is `localLlm`.\n**A kind is a protocol, not a vendor** (Chinmay, 2 October, contract follow-ups: BYOK accepts any provider; CHG-FUP-008). Any vendor is accepted, named in `AiProvider.vendor`: Mistral, Cohere or any other is reached through `openaiCompatible` where its API speaks it, which the compatibility test confirms before activation (`AiProviderCompatibility`). A new native adapter is a new value here, a breaking change for a client built earlier that goes out with an approval (`docs/active/breaking-changes.yaml`); until then a vendor without either protocol is refused `422 provider-protocol-unsupported`.\n"
  },
  "AiScenarioComparison": {
   "type": "object",
@@ -635,6 +644,122 @@
   "description": "**The sources an answer was grounded in, stored with the answer** (8.3.70). One `jsonb` column on the row that carries it — `ai.message.sources` and `ai.activity.sources` — because the grounding audit reads the list as it was when the answer was given, and a source is never queried on its own.\n",
   "items": {
    "$ref": "#/components/schemas/AiSource"
+  }
+ },
+ "AiVenueSettings": {
+  "type": "object",
+  "x-ticvai-persistence": "ai.venue_settings",
+  "description": "**The venue AI profile** (29 September, AI functions review): the figures a venue gives at onboarding so every data-driven answer is useful before it has history. One row per venue; configuration, not history. Defaults come from the starting pattern for `venueType`, which TICVAI writes from published sources and made-up example curves, **never from another tenant's data** (AI-D01, AIP-149).",
+  "required": [
+   "venueId",
+   "venueType"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "venueType": {
+    "type": "string",
+    "enum": [
+     "waterPark",
+     "themePark",
+     "familyEntertainmentCentre",
+     "museum",
+     "arena",
+     "zooAquarium",
+     "other"
+    ]
+   },
+   "isOutdoor": {
+    "type": "boolean",
+    "default": true,
+    "description": "Outdoor venues take the summer-heat and weather effects."
+   },
+   "capacity": {
+    "type": "integer",
+    "minimum": 1,
+    "nullable": true
+   },
+   "openingHours": {
+    "type": "array",
+    "description": "The usual week. Exceptions come from the venue calendar.",
+    "items": {
+     "type": "object",
+     "properties": {
+      "dayOfWeek": {
+       "type": "integer",
+       "minimum": 1,
+       "maximum": 7
+      },
+      "opensAt": {
+       "type": "string"
+      },
+      "closesAt": {
+       "type": "string"
+      }
+     }
+    }
+   },
+   "typicalWeekdayAttendance": {
+    "type": "integer",
+    "minimum": 0,
+    "nullable": true
+   },
+   "typicalWeekendAttendance": {
+    "type": "integer",
+    "minimum": 0,
+    "nullable": true
+   },
+   "peakMonths": {
+    "type": "array",
+    "items": {
+     "type": "integer",
+     "minimum": 1,
+     "maximum": 12
+    }
+   },
+   "averageSpend": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true
+   },
+   "fnbAttachRate": {
+    "type": "number",
+    "minimum": 0,
+    "maximum": 1,
+    "nullable": true
+   },
+   "staffProductivity": {
+    "type": "object",
+    "additionalProperties": {
+     "type": "number"
+    },
+    "description": "Per role, units per staff hour, e.g. `{\"cashier\": 40, \"gate\": 300}`. Defaults from the pattern."
+   },
+   "startingPatternKey": {
+    "type": "string",
+    "readOnly": true,
+    "description": "The pattern and version in use, e.g. `waterPark@3`."
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."
+   }
   }
  },
  "ModuleKey": {

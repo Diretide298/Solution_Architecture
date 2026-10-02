@@ -7,7 +7,7 @@
 | Tier | foundation: Read by everything, reads nothing above. Deploys first and alone. |
 | Contracts | `tenancy`, `workforce`, `approvals`, `accreditation` |
 | Schemas owned | `platform`, `workforce`, `approvals`, `accreditation`, `tenancy` |
-| Operations in the slice | 28 of 204 |
+| Operations in the slice | 28 of 209 |
 | Scale | Read-heavy and highly cacheable. Config changes are rare. |
 | If it is down | Same as identity — nothing runs without a scope. |
 
@@ -33,32 +33,32 @@
 |---|---|---|---|---|---|---|
 | approvals | [`approveMatrixMultiLevel`](#approvematrixmultilevel) | PUT | `/matrix-multi-level` | setup | 1 |  |
 | approvals | [`approveRoleAuthorityDelegation`](#approveroleauthoritydelegation) | PUT | `/role-authority-delegation` | setup | 1 |  |
+| attendance | [`recordAttendance`](#recordattendance) | POST | `/attendance/clock` | core | 2 | BO-056, BO-889, BO-935, BO-936, EMP-024, EMP-025 … |
 | delegation | [`createApprovalDelegation`](#createapprovaldelegation) | POST | `/delegations` | setup | 1 | ADM-243, ADM-534, BO-087, BO-385 |
-| devices | [`setDeviceAssignment`](#setdeviceassignment) | PUT | `/devices/{deviceId}/assignment` | core | 1 | ADM-582, POS-016 |
+| devices | [`setDeviceAssignment`](#setdeviceassignment) | PUT | `/devices/{deviceId}/assignment` | core | 1 | ADM-582, BO-732, POS-016 |
 | matrix | [`setApprovalExternalProvider`](#setapprovalexternalprovider) | PUT | `/approval-external-providers` | setup | 1 | ADM-354 |
-| matrix | [`setApprovalMatrix`](#setapprovalmatrix) | PUT | `/approval-matrices` | setup | 1 | ADM-242, ADM-243, ADM-330, ADM-331, ADM-332, ADM-333 … |
-| region | [`updateRegionSettings`](#updateregionsettings) | PUT | `/regions/{regionId}/settings` | setup | 1 | ADM-425, BO-1065 |
-| request | [`createApprovalRequest`](#createapprovalrequest) | POST | `/approval-requests` | core | 1 | ADM-567, BO-1010, BO-1031, BO-1080, BO-1181, BO-243 … |
-| request | [`decideApprovalRequest`](#decideapprovalrequest) | POST | `/approval-requests/{requestId}/decide` | core | 1 | ADM-145, ADM-249, BO-084, BO-085, BO-133, BO-243 … |
-| request | [`evaluateApprovalRequirement`](#evaluateapprovalrequirement) | POST | `/approval-requests/evaluate` | core | 1 | ADM-337, ADM-530, ADM-532, BO-085, BO-368, POS-002 … |
-| rota | [`createRotaAssignment`](#createrotaassignment) | POST | `/rota-assignments` | core | 1 | BO-055, BO-712, BO-884, BO-917, POS-009, POS-018 |
-| rota | [`listRotaAssignments`](#listrotaassignments) | GET | `/rota-assignments` | core | 1 | BO-055, BO-882, BO-883, EMP-021, EMP-022, EMP-023 … |
-| scope | [`createOrgUnit`](#createorgunit) | POST | `/org-units` | setup | 1 | ADM-006, ADM-420, BO-064, BO-145 |
-| scope | [`listOrgUnits`](#listorgunits) | GET | `/org-units` | core | 2 | ADM-006, BO-064, BO-145, CMS-016 |
+| matrix | [`setApprovalMatrix`](#setapprovalmatrix) | PUT | `/approval-matrices` | setup | 1 | ADM-243, ADM-330, ADM-331, ADM-332, ADM-333, ADM-334 … |
+| region | [`getRegionSettings`](#getregionsettings) | GET | `/regions/{regionId}/settings` | core | 1 | ADM-037, ADM-426, BO-1064, BO-1065 |
+| region | [`updateRegionSettings`](#updateregionsettings) | PUT | `/regions/{regionId}/settings` | setup | 1 | ADM-426, BO-1065 |
+| request | [`createApprovalRequest`](#createapprovalrequest) | POST | `/approval-requests` | core | 1 | ADM-567, BO-045, BO-1010, BO-1031, BO-1080, BO-1181 … |
+| request | [`decideApprovalRequest`](#decideapprovalrequest) | POST | `/approval-requests/{requestId}/decide` | core | 1 | ADM-145, BO-084, BO-085, BO-243, BO-367, BO-374 … |
+| request | [`evaluateApprovalRequirement`](#evaluateapprovalrequirement) | POST | `/approval-requests/evaluate` | core | 1 | ADM-337, ADM-530, ADM-532, POS-002 |
+| rota | [`createRotaAssignment`](#createrotaassignment) | POST | `/rota-assignments` | setup | 2 | BO-055, BO-712, BO-714, BO-884, BO-917 |
+| rota | [`listRotaAssignments`](#listrotaassignments) | GET | `/rota-assignments` | core | 2 | BO-055, BO-712, BO-714, BO-883, BO-884, EMP-021 … |
+| rota | [`updateRotaAssignment`](#updaterotaassignment) | PATCH | `/rota-assignments/{assignmentId}` | setup | 2 | BO-055 |
+| scope | [`createOrgUnit`](#createorgunit) | POST | `/org-units` | setup | 1 | ADM-006, ADM-420, ADM-421, BO-064, BO-145 |
+| scope | [`listOrgUnits`](#listorgunits) | GET | `/org-units` | core | 2 | ADM-006, ADM-412, BO-055, BO-064, BO-068, BO-145 … |
 | scope | [`updateOrgUnit`](#updateorgunit) | PATCH | `/org-units/{orgUnitId}` | setup | 1 | BO-064, BO-145 |
-| tenancy | [`getVenueSettings`](#getvenuesettings) | GET | `/venues/{venueId}/settings` | core | 1 | BO-063, BO-065, BO-100, BO-101, BO-102, BO-103 … |
-| tenancy | [`getWorkstationHealth`](#getworkstationhealth) | GET | `/workstations/{workstationId}/health` | core | 1 | BO-036, BO-1069, BO-125, BO-128, BO-129, POS-001 … |
-| tenancy | [`setVenueSettings`](#setvenuesettings) | PUT | `/venues/{venueId}/settings` | core | 1 | BO-065, BO-1063, BO-116, BO-136, BO-143, BO-600 … |
-| workstation | [`configureWorkstation`](#configureworkstation) | PUT | `/workstations/{workstationId}` | core | 1 | BO-036, BO-129, BO-602, POS-016 |
+| tenancy | [`getWorkstationHealth`](#getworkstationhealth) | GET | `/workstations/{workstationId}/health` | core | 1 | BO-036, BO-128, BO-129, POS-001, POS-025 |
+| tenancy | [`setVenueSettings`](#setvenuesettings) | PUT | `/venues/{venueId}/settings` | setup | 1 | BO-065, BO-1063, BO-136, BO-187, BO-600 |
+| tenancy | [`setVenueSettingsDefaults`](#setvenuesettingsdefaults) | PUT | `/venue-settings-defaults` | setup | 1 | ADM-019, ADM-426, BO-1062 |
+| workstation | [`configureWorkstation`](#configureworkstation) | PUT | `/workstations/{workstationId}` | core | 1 | BO-036, BO-602, POS-016 |
 | workstation | [`createOutlet`](#createoutlet) | POST | `/outlets` | setup | 1 | BO-044 |
-| workstation | [`createSaleBoard`](#createsaleboard) | POST | `/sale-boards` | setup | 1 | BO-124 |
-| workstation | [`listDevices`](#listdevices) | GET | `/devices` | core | 1 | ADM-580, ANL-003, BO-036, BO-124, EMP-043, POS-016 … |
-| workstation | [`listOutlets`](#listoutlets) | GET | `/outlets` | core | 1 | BO-044, BO-134, BO-727, BO-728, BO-732, POS-011 … |
-| workstation | [`listSaleBoards`](#listsaleboards) | GET | `/sale-boards` | core | 1 | BO-115, BO-116, BO-117, BO-118, BO-122, BO-123 … |
-| workstation | [`listWorkstations`](#listworkstations) | GET | `/workstations` | core | 2 | BO-036, BO-037, BO-116, BO-126, BO-128, BO-129 … |
-| workstation | [`recordDeviceHeartbeat`](#recorddeviceheartbeat) | POST | `/devices/{deviceId}/heartbeat` | core | 1 | BO-036, BO-124, BO-125, POS-016 |
-| workstation | [`updateOutlet`](#updateoutlet) | PATCH | `/outlets/{outletId}` | setup | 1 | BO-044, BO-063 |
-| workstation | [`updateSaleBoard`](#updatesaleboard) | PUT | `/sale-boards/{saleBoardId}` | setup | 1 | BO-109, BO-116, BO-117, BO-118, BO-124, BO-125 … |
+| workstation | [`createSaleBoard`](#createsaleboard) | POST | `/sale-boards` | setup | 1 | BO-109, BO-124 |
+| workstation | [`listDevices`](#listdevices) | GET | `/devices` | core | 1 | ADM-580, ANL-003, BO-036, BO-124, BO-405, BO-732 … |
+| workstation | [`listSaleBoards`](#listsaleboards) | GET | `/sale-boards` | core | 1 | BO-109, BO-116, BO-122, BO-123, BO-124, BO-126 … |
+| workstation | [`updateOutlet`](#updateoutlet) | PATCH | `/outlets/{outletId}` | setup | 1 | BO-044, BO-063, BO-731 |
+| workstation | [`updateSaleBoard`](#updatesaleboard) | PUT | `/sale-boards/{saleBoardId}` | setup | 1 | BO-109, BO-116, BO-124, BO-125, BO-126 |
 
 ## Group: approvals
 
@@ -78,7 +78,7 @@
 |---|---|
 | Permission | `APPROVAL_CONFIGURE` |
 | Scope level | venue |
-| Part of slice | setup, makes `approvals.matrix`, `approvals.rule` non-empty |
+| Part of slice | setup, changes rows of `approvals.matrix`, `approvals.rule` that another operation creates |
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
@@ -171,7 +171,7 @@
 |---|---|
 | Permission | `APPROVAL_CONFIGURE` |
 | Scope level | venue |
-| Part of slice | setup, makes `approvals.delegation` non-empty |
+| Part of slice | setup, changes rows of `approvals.delegation` that another operation creates |
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
@@ -246,6 +246,84 @@
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Roles, Authority, Delegation & Approval Limits |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
+
+## Group: attendance
+
+Who actually turned up
+
+### recordAttendance
+
+**`POST /attendance/clock`**: Clock in, clock out, or take a break
+
+18.9.1 and `EMP-024`, `EMP-025`. **Offline-capable and timestamped on the device**, then reconciled. A steward clocking in at a gate with no signal must not be marked absent.
+Where the venue requires it, the record carries the access point or geofence the clock happened at — **a clock-in from a car park is a different fact from one at the staff entrance**, and the difference is what makes attendance evidence rather than self-report.
+A missing clock-out is not corrected automatically. It is flagged, because guessing when someone left is how a payroll dispute starts.
+
+|  |  |
+|---|---|
+| Permission | `ATTENDANCE_RECORD` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 2 |
+| Offline | yes |
+| Conflict policy | append |
+| Reads | `access.access_point`, `cache:idempotency`, `workforce.attendance`, `workforce.attendance_amendment`, `workforce.rota_assignment` |
+| Writes | `cache:idempotency`, `workforce.attendance` |
+| Called by | BO-056, BO-889, BO-935, BO-936, EMP-024, EMP-025, POS-009 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| kind | enum (clockIn, clockOut, breakStart, breakEnd) | yes |  |
+| occurredAt | string (date-time) | yes | Device time. |
+| assignmentId | string (uuid) |  | (nullable) |
+| accessPointId | string (uuid) |  | (nullable) |
+| latitude | number |  | (nullable) |
+| longitude | number |  | (nullable) |
+
+**Response**: `AttendanceRecord`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) | yes |  |
+| principalId | string (uuid) | yes |  |
+| assignmentId | string (uuid) |  | (nullable) |
+| venueId | string (uuid) |  |  |
+| kind | enum (clockIn, clockOut, breakStart, breakEnd) | yes |  |
+| occurredAt | string (date-time) | yes | Device time — when it happened. |
+| recordedAt | string (date-time) |  | When the server received it. |
+| accessPointId | string (uuid) |  | (nullable) |
+| latitude | number |  | (nullable) |
+| longitude | number |  | (nullable) |
+| isAmended | boolean |  | (read-only) |
+| amendedByPrincipalId | string (uuid) |  | Who made the latest amendment. (read-only; nullable) |
+| amendmentReason | string |  | The latest amendment's reason. (read-only; nullable) |
+| originalOccurredAt | string (date-time) |  | The original is never overwritten. (nullable) |
+| amendments | array of AttendanceAmendment |  | Every correction, oldest first, one row each (decided 28 September, audit R129 (7)). (read-only) |
+| amendments[].id | string (uuid) | yes |  |
+| amendments[].attendanceRecordId | string (uuid) | yes |  |
+| amendments[].amendedByPrincipalId | string (uuid) | yes |  |
+| amendments[].amendedAt | string (date-time) | yes |  |
+| amendments[].occurredAtBefore | string (date-time) | yes | The record's time before this correction. |
+| amendments[].occurredAtAfter | string (date-time) | yes | The time this correction set (correctedAt on the request). |
+| amendments[].reason | string | yes | (max length 300) |
+| exception | enum (late, earlyLeave, missingClockOut, noShow, outOfGeofence, unscheduled) |  | Computed against the rota. (nullable) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 201 |  | Recorded |
+| 409 |  | Out of sequence — a clock-out with no clock-in, or a second clock-in. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
@@ -345,7 +423,7 @@ The delegate cannot exceed the delegator's own authority, and **cannot approve a
 | Conflict policy | serverWins |
 | Reads | `tenancy.device_assignment` |
 | Writes | `tenancy.device_assignment` |
-| Called by | ADM-582, POS-016 |
+| Called by | ADM-582, BO-732, POS-016 |
 
 **Parameters**
 
@@ -511,7 +589,7 @@ Changing a matrix creates a version (11.1.80). Requests in flight keep the versi
 | Conflict policy | serverWins |
 | Reads | `approvals.external_provider`, `approvals.matrix`, `approvals.rule`, `cache:idempotency` |
 | Writes | `approvals.matrix`, `approvals.rule`, `cache:idempotency` |
-| Called by | ADM-242, ADM-243, ADM-330, ADM-331, ADM-332, ADM-333, ADM-334, ADM-335, ADM-530, BO-086, BO-1120, BO-1149, BO-639, BO-863 |
+| Called by | ADM-243, ADM-330, ADM-331, ADM-332, ADM-333, ADM-334, ADM-335, ADM-530, BO-086, BO-1120, BO-1149, BO-639, BO-863 |
 
 **Parameters**
 
@@ -551,6 +629,8 @@ Changing a matrix creates a version (11.1.80). Requests in flight keep the versi
 | rules[].escalateAfterMinutes | integer |  | (nullable) |
 | rules[].escalateToRoleIds | array of string (uuid) |  | Role ids from identity.listRoles, as approverRoleIds. |
 | rules[].expiresAfterMinutes | integer |  | 11.1.53. (nullable) |
+| rules[].subjectTypes | array of string |  | Which subjects of the kind this rule matches (decided 2 October 2026, Chinmay; CHG-CSP-028, CHG-CSP-036, CHG-CSP-031): the CreateApprovalRequest.subjectType values, for example topologyPublication or… |
+| rules[].signatureMethods | array of enum (platformKey, uaePass, externalCertificate, drawnSignature) |  | The signature methods this level accepts, where requiresSignature is true (design-notes correction on ADM-344, Block B: "Configuring which stages need a signature is a policy write"; CHG-CSP-045). |
 | rules[].externalProviderId | string (uuid) |  | 11.1.65 (29 September). (nullable) |
 | isActive | boolean |  |  |
 
@@ -586,6 +666,8 @@ Changing a matrix creates a version (11.1.80). Requests in flight keep the versi
 | rules[].escalateAfterMinutes | integer |  | (nullable) |
 | rules[].escalateToRoleIds | array of string (uuid) |  | Role ids from identity.listRoles, as approverRoleIds. |
 | rules[].expiresAfterMinutes | integer |  | 11.1.53. (nullable) |
+| rules[].subjectTypes | array of string |  | Which subjects of the kind this rule matches (decided 2 October 2026, Chinmay; CHG-CSP-028, CHG-CSP-036, CHG-CSP-031): the CreateApprovalRequest.subjectType values, for example topologyPublication or… |
+| rules[].signatureMethods | array of enum (platformKey, uaePass, externalCertificate, drawnSignature) |  | The signature methods this level accepts, where requiresSignature is true (design-notes correction on ADM-344, Block B: "Configuring which stages need a signature is a policy write"; CHG-CSP-045). |
 | rules[].externalProviderId | string (uuid) |  | 11.1.65 (29 September). (nullable) |
 | isActive | boolean |  |  |
 
@@ -602,6 +684,71 @@ Changing a matrix creates a version (11.1.80). Requests in flight keep the versi
 
 ## Group: region
 
+### getRegionSettings
+
+**`GET /regions/{regionId}/settings`**: Read region settings
+
+Currency, decimal scale, time zone, date format and fiscal year. These inherit to every venue beneath and are not overridable at venue level.
+
+|  |  |
+|---|---|
+| Permission | `SCOPE_VIEW` |
+| Scope level | region |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | yes |
+| Conflict policy | serverWins |
+| Read routing | replica |
+| Reads | `cache:resolution`, `platform.region_settings` |
+| Writes | `cache:resolution` |
+| Called by | ADM-037, ADM-426, BO-1064, BO-1065 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| regionId | path | yes | string (uuid) |  |
+
+**Response**: `RegionSettings`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| countryCode | string | yes | ISO 3166-1 alpha-2. (pattern ^[A-Z]{2}$) |
+| currencyCode | string | yes | (pattern ^[A-Z]{3}$) |
+| currencyScale | integer | yes | Decimal places for this region's currency. (min 0; max 4) |
+| timeZone | string | yes | IANA zone, e.g. |
+| dateFormat | string |  | (default dd/MM/yyyy) |
+| numberFormat | string |  | (default #,##0.00) |
+| fiscalYearStartMonth | integer | yes | Varies by country. (min 1; max 12) |
+| allowedAiResidencies | array of string |  | The region's compliance gate on AI providers (decided 28 September, audit R203; ADR-0009). (default []) |
+| aiResidencyClass | enum (uaeOnly, globalAllowed, onPrem) |  | The tenant's AI residency class (decided 2 October 2026, Chinmay, "AI residency: per-tenant residency class"; DEC-539; CHG-CSP-009; amends AI-D02 and ADR-0009 section 1). (default uaeOnly) |
+| aiResidencyClassLocked | boolean |  | Set by TICVAI at onboarding for a government, bank or health tenant (DEC-539), which must stay uaeOnly. (default False; read-only) |
+| aiResidencyOptIn | object |  | The evidence a globalAllowed opt-in needs under PDPL Article 23 (DEC-539; CHG-CSP-009): the tenant's references to its vendor contract, its DPIA and the notice guests see. (nullable) |
+| aiResidencyOptIn.vendorContractReference | string |  | (max length 200) |
+| aiResidencyOptIn.dpiaReference | string |  | (max length 200) |
+| aiResidencyOptIn.guestNoticeReference | string |  | (max length 200) |
+| aiResidencyOptIn.confirmedByPrincipalId | string (uuid) |  | (read-only) |
+| aiResidencyOptIn.confirmedAt | string (date-time) |  | (read-only) |
+| localLanguageNameLocales | array of string |  | The languages an outlet name must also be given in, in this country (decided 2 October 2026, Chinmay, batch 2 #26: "English plus the local language where the country needs it"; DEC-031; CHG-CSP-005). (default []) |
+| requiredBillingDocuments | array of object |  | Which documents a TICVAI customer's billing entity must upload, in this country (decided 2 October 2026, Chinmay, batch 6 set 7, ADM-411: "Trade licence always; VAT certificate when a TRN is entered;… (default [{'documentType': 'tradeLicence', 'requiredWhen': 'always'}, {'documentType': 'vatCertificate', 'requiredWhen': 'trnEntered'}]) |
+| requiredBillingDocuments[].documentType | string |  | The document kind, as the subscription contract's PartnerDocument names it (tradeLicence, vatCertificate, ...). (max length 64) |
+| requiredBillingDocuments[].requiredWhen | enum (always, trnEntered) |  |  |
+| minorAgeThreshold | integer |  | The age below which a guest is a minor here, set per country (decided 2 October 2026, Chinmay, critical set 1, BO-187: "Guardian consent on the venue's form; minor age per country"; DEC-237; CHG-CSP-… (min 0; max 21; default 18) |
+| placement | Placement |  | Read-only here. (read-only) |
+| placement.mode | enum (shared, dedicated, isolated, clientHosted) | yes |  |
+| placement.cellName | string |  |  |
+| placement.cloudRegion | string |  |  |
+| cellName | string |  | The cell serving this region. (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Settings |
+| 403 | Forbidden | Authenticated but not permitted at the requested scope |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
 ### updateRegionSettings
 
 **`PUT /regions/{regionId}/settings`**: Update region settings
@@ -613,14 +760,14 @@ Changing `currencyCode` or `currencyScale` after transactions exist is rejected.
 |---|---|
 | Permission | `REGION_CONFIGURE` |
 | Scope level | region |
-| Part of slice | setup, makes `platform.region_settings` non-empty |
+| Part of slice | setup, changes rows of `platform.region_settings` that another operation creates |
 | Wave | 1 |
 | Offline | no |
 | Config scope | region |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `platform.region_settings` |
 | Writes | `cache:idempotency`, `cache:resolution`, `platform.region_settings` |
-| Called by | ADM-425, BO-1065 |
+| Called by | ADM-426, BO-1065 |
 
 **Parameters**
 
@@ -641,6 +788,19 @@ Changing `currencyCode` or `currencyScale` after transactions exist is rejected.
 | numberFormat | string |  | (default #,##0.00) |
 | fiscalYearStartMonth | integer | yes | Varies by country. (min 1; max 12) |
 | allowedAiResidencies | array of string |  | The region's compliance gate on AI providers (decided 28 September, audit R203; ADR-0009). (default []) |
+| aiResidencyClass | enum (uaeOnly, globalAllowed, onPrem) |  | The tenant's AI residency class (decided 2 October 2026, Chinmay, "AI residency: per-tenant residency class"; DEC-539; CHG-CSP-009; amends AI-D02 and ADR-0009 section 1). (default uaeOnly) |
+| aiResidencyClassLocked | boolean |  | Set by TICVAI at onboarding for a government, bank or health tenant (DEC-539), which must stay uaeOnly. (default False; read-only) |
+| aiResidencyOptIn | object |  | The evidence a globalAllowed opt-in needs under PDPL Article 23 (DEC-539; CHG-CSP-009): the tenant's references to its vendor contract, its DPIA and the notice guests see. (nullable) |
+| aiResidencyOptIn.vendorContractReference | string |  | (max length 200) |
+| aiResidencyOptIn.dpiaReference | string |  | (max length 200) |
+| aiResidencyOptIn.guestNoticeReference | string |  | (max length 200) |
+| aiResidencyOptIn.confirmedByPrincipalId | string (uuid) |  | (read-only) |
+| aiResidencyOptIn.confirmedAt | string (date-time) |  | (read-only) |
+| localLanguageNameLocales | array of string |  | The languages an outlet name must also be given in, in this country (decided 2 October 2026, Chinmay, batch 2 #26: "English plus the local language where the country needs it"; DEC-031; CHG-CSP-005). (default []) |
+| requiredBillingDocuments | array of object |  | Which documents a TICVAI customer's billing entity must upload, in this country (decided 2 October 2026, Chinmay, batch 6 set 7, ADM-411: "Trade licence always; VAT certificate when a TRN is entered;… (default [{'documentType': 'tradeLicence', 'requiredWhen': 'always'}, {'documentType': 'vatCertificate', 'requiredWhen': 'trnEntered'}]) |
+| requiredBillingDocuments[].documentType | string |  | The document kind, as the subscription contract's PartnerDocument names it (tradeLicence, vatCertificate, ...). (max length 64) |
+| requiredBillingDocuments[].requiredWhen | enum (always, trnEntered) |  |  |
+| minorAgeThreshold | integer |  | The age below which a guest is a minor here, set per country (decided 2 October 2026, Chinmay, critical set 1, BO-187: "Guardian consent on the venue's form; minor age per country"; DEC-237; CHG-CSP-… (min 0; max 21; default 18) |
 | placement | Placement |  | Read-only here. (read-only) |
 | placement.mode | enum (shared, dedicated, isolated, clientHosted) | yes |  |
 | placement.cellName | string |  |  |
@@ -659,6 +819,19 @@ Changing `currencyCode` or `currencyScale` after transactions exist is rejected.
 | numberFormat | string |  | (default #,##0.00) |
 | fiscalYearStartMonth | integer | yes | Varies by country. (min 1; max 12) |
 | allowedAiResidencies | array of string |  | The region's compliance gate on AI providers (decided 28 September, audit R203; ADR-0009). (default []) |
+| aiResidencyClass | enum (uaeOnly, globalAllowed, onPrem) |  | The tenant's AI residency class (decided 2 October 2026, Chinmay, "AI residency: per-tenant residency class"; DEC-539; CHG-CSP-009; amends AI-D02 and ADR-0009 section 1). (default uaeOnly) |
+| aiResidencyClassLocked | boolean |  | Set by TICVAI at onboarding for a government, bank or health tenant (DEC-539), which must stay uaeOnly. (default False; read-only) |
+| aiResidencyOptIn | object |  | The evidence a globalAllowed opt-in needs under PDPL Article 23 (DEC-539; CHG-CSP-009): the tenant's references to its vendor contract, its DPIA and the notice guests see. (nullable) |
+| aiResidencyOptIn.vendorContractReference | string |  | (max length 200) |
+| aiResidencyOptIn.dpiaReference | string |  | (max length 200) |
+| aiResidencyOptIn.guestNoticeReference | string |  | (max length 200) |
+| aiResidencyOptIn.confirmedByPrincipalId | string (uuid) |  | (read-only) |
+| aiResidencyOptIn.confirmedAt | string (date-time) |  | (read-only) |
+| localLanguageNameLocales | array of string |  | The languages an outlet name must also be given in, in this country (decided 2 October 2026, Chinmay, batch 2 #26: "English plus the local language where the country needs it"; DEC-031; CHG-CSP-005). (default []) |
+| requiredBillingDocuments | array of object |  | Which documents a TICVAI customer's billing entity must upload, in this country (decided 2 October 2026, Chinmay, batch 6 set 7, ADM-411: "Trade licence always; VAT certificate when a TRN is entered;… (default [{'documentType': 'tradeLicence', 'requiredWhen': 'always'}, {'documentType': 'vatCertificate', 'requiredWhen': 'trnEntered'}]) |
+| requiredBillingDocuments[].documentType | string |  | The document kind, as the subscription contract's PartnerDocument names it (tradeLicence, vatCertificate, ...). (max length 64) |
+| requiredBillingDocuments[].requiredWhen | enum (always, trnEntered) |  |  |
+| minorAgeThreshold | integer |  | The age below which a guest is a minor here, set per country (decided 2 October 2026, Chinmay, critical set 1, BO-187: "Guardian consent on the venue's form; minor age per country"; DEC-237; CHG-CSP-… (min 0; max 21; default 18) |
 | placement | Placement |  | Read-only here. (read-only) |
 | placement.mode | enum (shared, dedicated, isolated, clientHosted) | yes |  |
 | placement.cellName | string |  |  |
@@ -673,7 +846,8 @@ Changing `currencyCode` or `currencyScale` after transactions exist is rejected.
 | 400 | BadRequest | Validation failed |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
-| 409 |  | Currency or scale change rejected because transactions exist in this region. |
+| 409 |  | Currency or scale change rejected because transactions exist in this region, or a change to aiResidencyClass on a tenant TICVAI locked to uaeOnly (residency-class-locked; CHG-CSP-009). |
+| 422 |  | aiResidencyClass globalAllowed without the three references of aiResidencyOptIn (residency-opt-in-required; PDPL Article 23; DEC-539; CHG-CSP-009). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
@@ -700,7 +874,7 @@ Draft is supported (11.1.51) for the case where a person raises it themselves an
 | Conflict policy | serverWins |
 | Reads | `approvals.decision`, `approvals.delegation`, `approvals.matrix`, `approvals.request`, `approvals.rule`, `cache:idempotency`, `identity.principal` |
 | Writes | `approvals.request`, `cache:idempotency` |
-| Called by | ADM-567, BO-1010, BO-1031, BO-1080, BO-1181, BO-243, BO-301, BO-718, BO-771, BO-922, POS-002, POS-020 |
+| Called by | ADM-567, BO-045, BO-1010, BO-1031, BO-1080, BO-1181, BO-163, BO-243, BO-301, BO-718, BO-771, BO-922, POS-002, POS-020 |
 | State model | Approval request ([states/approval-request.yaml](../../../states/approval-request.yaml)): created as `draft` or `pending` |
 
 **Parameters**
@@ -782,6 +956,9 @@ Draft is supported (11.1.51) for the case where a person raises it themselves an
 | slaDueAt | string (date-time) |  | (nullable) |
 | slaBreached | boolean |  |  |
 | expiresAt | string (date-time) |  | (nullable) |
+| assignedToPrincipalId | string (uuid) |  | Who claimed or was assigned the request in a shared queue (assignApprovalRequest; DI-723; CHG-CSP-042). (read-only; nullable) |
+| assignedToDepartmentId | string (uuid) |  | The department queue it was assigned to, where it went to a department rather than a person (CHG-CSP-042). (read-only; nullable) |
+| assignedAt | string (date-time) |  | (read-only; nullable) |
 | requestedAt | string (date-time) | yes |  |
 | completedAt | string (date-time) |  | (nullable) |
 | aiAssessment | object |  | AI context for the reviewer, never an input to the decision (11.1.73 to 11.1.75; MoM 8 September; 29 September, build pass, group G2). (read-only; nullable) |
@@ -826,7 +1003,7 @@ A rejection requires a reason (11.1.21). An approval may carry a comment (11.1.2
 | Conflict policy | serverWins |
 | Reads | `approvals.decision`, `approvals.request`, `approvals.rule`, `cache:idempotency`, `identity.principal` |
 | Writes | `approvals.decision`, `approvals.request`, `cache:idempotency`, `control.partner_agreement`, `control.partner_application`, `control.partner_change_request`, `marketing.privacy_notice_governance`, `platform.outbox` |
-| Called by | ADM-145, ADM-249, BO-084, BO-085, BO-133, BO-243, BO-367, BO-377, BO-378, BO-940, POS-020 |
+| Called by | ADM-145, BO-084, BO-085, BO-243, BO-367, BO-374, BO-377, BO-378, BO-940, POS-020 |
 | State model | AccessConfigurationVersion ([states/access-configuration-version.yaml](../../../states/access-configuration-version.yaml)): moves `pendingApproval` -> `active`, `pendingApproval` -> `scheduled`, `pendingApproval` -> `draft`<br/>AccessDynamicPolicyVersion ([states/access-dynamic-policy-version.yaml](../../../states/access-dynamic-policy-version.yaml)): moves `pendingApproval` -> `active`, `pendingApproval` -> `rejected`<br/>AccessDynamicPolicy ([states/access-dynamic-policy.yaml](../../../states/access-dynamic-policy.yaml)): moves `pendingApproval` -> `active`, `pendingApproval` -> `draft`<br/>AccessMediaTemplateVersion ([states/access-media-template-version.yaml](../../../states/access-media-template-version.yaml)): moves `pendingApproval` -> `published`, `pendingApproval` -> `scheduled`, `pendingApproval` -> `rejected`<br/>AccessMediaTemplate ([states/access-media-template.yaml](../../../states/access-media-template.yaml)): moves `pendingApproval` -> `published`, `pendingApproval` -> `scheduled`, `pendingApproval` -> `draft`<br/>Approval request ([states/approval-request.yaml](../../../states/approval-request.yaml)): moves `escalated` -> `pending`, `pending` -> `approved`, `escalated` -> `approved`, `pending` -> `rejected`, `escalated` -> `rejected`, `pending` -> `returned`, `escalated` -> `returned`, `pending` -> `informationRequested`, `escalated` -> `informationRequested`<br/>Partner agreement ([states/partner-agreement.yaml](../../../states/partner-agreement.yaml)): moves `pendingApproval` -> `active`, `pendingApproval` -> `terminated`<br/>Partner application ([states/partner-application.yaml](../../../states/partner-application.yaml)): moves `inReview` -> `approved`, `inReview` -> `rejected`<br/>Partner change request ([states/partner-change-request.yaml](../../../states/partner-change-request.yaml)): moves `pendingApproval` -> `approved`, `pendingApproval` -> `rejected`<br/>Privacy notice governance ([states/privacy-notice-governance.yaml](../../../states/privacy-notice-governance.yaml)): moves `review` -> `approved`<br/>Refund ([states/refund.yaml](../../../states/refund.yaml)): moves `pendingApproval` -> `pendingGateway`, `pendingApproval` -> `declined`<br/>Shift swap ([states/shift-swap.yaml](../../../states/shift-swap.yaml)): moves `awaitingApproval` -> `approved`, `awaitingApproval` -> `rejected` |
 
 **Parameters**
@@ -900,6 +1077,9 @@ A rejection requires a reason (11.1.21). An approval may carry a comment (11.1.2
 | slaDueAt | string (date-time) |  | (nullable) |
 | slaBreached | boolean |  |  |
 | expiresAt | string (date-time) |  | (nullable) |
+| assignedToPrincipalId | string (uuid) |  | Who claimed or was assigned the request in a shared queue (assignApprovalRequest; DI-723; CHG-CSP-042). (read-only; nullable) |
+| assignedToDepartmentId | string (uuid) |  | The department queue it was assigned to, where it went to a department rather than a person (CHG-CSP-042). (read-only; nullable) |
+| assignedAt | string (date-time) |  | (read-only; nullable) |
 | requestedAt | string (date-time) | yes |  |
 | completedAt | string (date-time) |  | (nullable) |
 | aiAssessment | object |  | AI context for the reviewer, never an input to the decision (11.1.73 to 11.1.75; MoM 8 September; 29 September, build pass, group G2). (read-only; nullable) |
@@ -945,7 +1125,7 @@ Read-only and deliberately cheap. It runs on the hot path — every refund, ever
 | Read routing | primary |
 | Reads | `approvals.delegation`, `approvals.matrix`, `approvals.rule`, `cache:idempotency`, `identity.delegated_access`, `platform.scope` |
 | Writes | `cache:idempotency` |
-| Called by | ADM-337, ADM-530, ADM-532, BO-085, BO-368, POS-002, POS-004 |
+| Called by | ADM-337, ADM-530, ADM-532, POS-002 |
 
 **Parameters**
 
@@ -993,6 +1173,8 @@ Read-only and deliberately cheap. It runs on the hot path — every refund, ever
 | matchedRule.escalateAfterMinutes | integer |  | (nullable) |
 | matchedRule.escalateToRoleIds | array of string (uuid) |  | Role ids from identity.listRoles, as approverRoleIds. |
 | matchedRule.expiresAfterMinutes | integer |  | 11.1.53. (nullable) |
+| matchedRule.subjectTypes | array of string |  | Which subjects of the kind this rule matches (decided 2 October 2026, Chinmay; CHG-CSP-028, CHG-CSP-036, CHG-CSP-031): the CreateApprovalRequest.subjectType values, for example topologyPublication or… |
+| matchedRule.signatureMethods | array of enum (platformKey, uaePass, externalCertificate, drawnSignature) |  | The signature methods this level accepts, where requiresSignature is true (design-notes correction on ADM-344, Block B: "Configuring which stages need a signature is a policy write"; CHG-CSP-045). |
 | matchedRule.externalProviderId | string (uuid) |  | 11.1.65 (29 September). (nullable) |
 | matrixVersion | integer |  | (nullable) |
 | approvers | array of object |  | Resolved, with delegations applied. |
@@ -1027,13 +1209,13 @@ Where the position needs a till, the assignment names the workstation their shif
 |---|---|
 | Permission | `WORKFORCE_MANAGE` |
 | Scope level | venue |
-| Part of slice | core |
-| Wave | 1 |
+| Part of slice | setup, makes `workforce.rota_assignment` non-empty |
+| Wave | 2 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `identity.delegated_access`, `identity.principal`, `platform.workstation`, `workforce.rota_assignment` |
 | Writes | `cache:idempotency`, `workforce.rota_assignment` |
-| Called by | BO-055, BO-712, BO-884, BO-917, POS-009, POS-018 |
+| Called by | BO-055, BO-712, BO-714, BO-884, BO-917 |
 | State model | Rota assignment ([states/rota-assignment.yaml](../../../states/rota-assignment.yaml)): created as `planned`; moves `planned` -> `published` **(not settled: see the Gaps sheet)** |
 
 **Parameters**
@@ -1111,13 +1293,13 @@ Where the position needs a till, the assignment names the workstation their shif
 | Permission | `WORKFORCE_VIEW` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 1 |
+| Wave | 2 |
 | Offline | yes |
 | Conflict policy | serverWins |
 | Read routing | replica |
 | Reads | `identity.principal`, `workforce.rota_assignment` |
 | Writes | - |
-| Called by | BO-055, BO-882, BO-883, EMP-021, EMP-022, EMP-023, POS-009, POS-018 |
+| Called by | BO-055, BO-712, BO-714, BO-883, BO-884, EMP-021, EMP-022, EMP-023, POS-009 |
 
 **Parameters**
 
@@ -1165,6 +1347,87 @@ Where the position needs a till, the assignment names the workstation their shif
 | 200 |  | Assignments |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
+### updateRotaAssignment
+
+**`PATCH /rota-assignments/{assignmentId}`**: Move or cancel an assignment
+
+|  |  |
+|---|---|
+| Permission | `WORKFORCE_MANAGE` |
+| Scope level | venue |
+| Part of slice | setup, changes rows of `workforce.rota_assignment` that another operation creates |
+| Wave | 2 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `cache:idempotency`, `workforce.rota_assignment` |
+| Writes | `cache:idempotency`, `workforce.rota_assignment` |
+| Called by | BO-055 |
+| State model | Rota assignment ([states/rota-assignment.yaml](../../../states/rota-assignment.yaml)): moves `published` -> `confirmed`, `swapPending` -> `cancelled`, `planned` -> `cancelled`, `published` -> `cancelled` |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| assignmentId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
+
+**Request body**: `RotaAssignment`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| overtimeMinutes | integer |  | BL-044, 1.2.83. (read-only; nullable) |
+| restPeriodBefore | integer |  | Minutes since the previous shift ended. (nullable) |
+| breachesWorkingHourLimit | boolean |  | Flagged at assignment, not discovered at payroll. (default False; read-only) |
+| labourCost | object |  | Cost at the point of scheduling. |
+| labourCost.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| labourCost.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| labourCost.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| id | string (uuid) |  | (read-only) |
+| principalId | string (uuid) | yes |  |
+| displayName | string |  | (read-only) |
+| venueId | string (uuid) | yes |  |
+| departmentId | string (uuid) |  | (nullable) |
+| position | string | yes | What they are rostered to do — gate steward, cashier, lifeguard, technician. |
+| requiredRoleId | string (uuid) |  | Checked on assignment. (nullable) |
+| workstationId | string (uuid) |  | Where the position needs a till. (nullable) |
+| startsAt | string (date-time) | yes |  |
+| endsAt | string (date-time) | yes |  |
+| status | RotaStatus: enum (planned, published, confirmed, swapPending, cancelled, completed, noShow) |  |  |
+| breakMinutes | integer |  | (nullable) |
+| note | string |  | (nullable) |
+
+**Response**: `RotaAssignment`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| overtimeMinutes | integer |  | BL-044, 1.2.83. (read-only; nullable) |
+| restPeriodBefore | integer |  | Minutes since the previous shift ended. (nullable) |
+| breachesWorkingHourLimit | boolean |  | Flagged at assignment, not discovered at payroll. (default False; read-only) |
+| labourCost | object |  | Cost at the point of scheduling. |
+| labourCost.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| labourCost.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| labourCost.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| id | string (uuid) |  | (read-only) |
+| principalId | string (uuid) | yes |  |
+| displayName | string |  | (read-only) |
+| venueId | string (uuid) | yes |  |
+| departmentId | string (uuid) |  | (nullable) |
+| position | string | yes | What they are rostered to do — gate steward, cashier, lifeguard, technician. |
+| requiredRoleId | string (uuid) |  | Checked on assignment. (nullable) |
+| workstationId | string (uuid) |  | Where the position needs a till. (nullable) |
+| startsAt | string (date-time) | yes |  |
+| endsAt | string (date-time) | yes |  |
+| status | RotaStatus: enum (planned, published, confirmed, swapPending, cancelled, completed, noShow) |  |  |
+| breakMinutes | integer |  | (nullable) |
+| note | string |  | (nullable) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Updated |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
 
 ## Group: scope
 
@@ -1182,7 +1445,7 @@ Where the position needs a till, the assignment names the workstation their shif
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `platform.scope` |
 | Writes | `cache:idempotency`, `cache:resolution`, `platform.scope` |
-| Called by | ADM-006, ADM-420, BO-064, BO-145 |
+| Called by | ADM-006, ADM-420, ADM-421, BO-064, BO-145 |
 
 **Parameters**
 
@@ -1237,7 +1500,7 @@ Where the position needs a till, the assignment names the workstation their shif
 | Read routing | replica |
 | Reads | `cache:resolution`, `platform.scope` |
 | Writes | `cache:resolution` |
-| Called by | ADM-006, BO-064, BO-145, CMS-016 |
+| Called by | ADM-006, ADM-412, BO-055, BO-064, BO-068, BO-145, CMS-016 |
 
 **Parameters**
 
@@ -1284,7 +1547,7 @@ Deactivating a node causes every permission query at or beneath it to resolve to
 |---|---|
 | Permission | `SCOPE_MANAGE` |
 | Scope level | brand |
-| Part of slice | setup, makes `platform.scope` non-empty |
+| Part of slice | setup, changes rows of `platform.scope` that another operation creates |
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
@@ -1333,136 +1596,6 @@ Deactivating a node causes every permission query at or beneath it to resolve to
 
 ## Group: tenancy
 
-### getVenueSettings
-
-**`GET /venues/{venueId}/settings`**: Operational settings for this venue
-
-**What this returns, and what it does not.** `VenueSettings` holds the venue's trading currency, support hours, quiet hours, biometrics, segregated access and alerting — the things `setVenueSettings` writes. It carries **no module enablement and no retail setting**, so a section landing that wants *what is enabled here*, or a store settings screen, does not get it from this read (pull audit R279). **Since 28 September it does carry the configured limits** (audit R094), the F&B ones among them (`fnb.recallWindowMinutes`, `fnb.compEscalationAmount`, `fnb.foodSafetyLeadPrincipalId`). A limit the venue has not set is null and resolves to the tenant default, which `getVenueSettingsDefaults` returns. It is gated by `TENANT_VIEW` (decided 28 September, audit R091): reading a venue's settings no longer needs the right to change them. A caller holding only a section's view permission is refused `403`.
-**A venue with nothing saved still has settings** (pull audit R175). Where `platform.venue_settings` has no row for this venue the answer is `200` with the schema defaults, no `id`, and `currencyCode` and `currencyScale` null — which already means *resolve from the region*. `404` means the venue does not exist or is outside the caller's scope.
-
-|  |  |
-|---|---|
-| Permission | `TENANT_VIEW` |
-| Scope level | venue |
-| Part of slice | core |
-| Wave | 1 |
-| Offline | yes |
-| Conflict policy | serverWins |
-| Read routing | replica |
-| Reads | `cache:resolution`, `platform.venue_settings` |
-| Writes | - |
-| Called by | BO-063, BO-065, BO-100, BO-101, BO-102, BO-103, BO-104, BO-105, BO-106, BO-1063, BO-107, BO-108, BO-136, BO-142, BO-143, POS-019 |
-
-**Parameters**
-
-| Name | In | Required | Type | Notes |
-|---|---|---|---|---|
-| venueId | path | yes | string (uuid) |  |
-
-**Response**: `VenueSettings`
-
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| id | string (uuid) |  | Added 20 August. (read-only) |
-| venueId | string (uuid) |  | From the path of setVenueSettings. (read-only) |
-| calendarDayStartHour | integer |  | Where the venue's calendar day starts (17 September minutes M17-03, added 30 September): the first hour row of every day and week calendar view (calendarView in screens/_components.yaml), so a venue… (min 0; max 23; default 6; nullable) |
-| currencyCode | string |  | readOnly is the freeze. (pattern ^[A-Z]{3}$; read-only; nullable) |
-| currencyScale | integer |  | Scale travels with currency (ADR-0008), and so does the freeze. (min 0; max 4; read-only; nullable) |
-| supportHours | object |  | CF-100. |
-| supportHours.mode | enum (alwaysOn, businessHours, custom, none) |  |  |
-| supportHours.timezone | string |  | IANA zone the windows are read in. |
-| supportHours.windows | array of object |  |  |
-| supportHours.windows[].day | enum (mon, tue, wed, thu, fri, sat, sun) |  |  |
-| supportHours.windows[].from | string |  | Wall-clock time the desk opens. |
-| supportHours.windows[].to | string |  | Wall-clock time the desk closes. |
-| supportHours.outOfHoursMessage | string |  | (nullable) |
-| quietHours | object |  | When the platform does not send. (nullable) |
-| quietHours.from | string |  | Wall-clock time sending stops |
-| quietHours.to | string |  | Wall-clock time sending resumes |
-| biometrics | object |  | CF-35, BL-096, BL-105, BL-106. (nullable) |
-| biometrics.isEnabled | boolean |  | Off by default, and turning it on is refused without the two fields below. (default False) |
-| biometrics.dpiaReference | string |  | The venue's own reference for its Article 21 assessment. (max length 200; nullable) |
-| biometrics.consentNoticeAcknowledgedAt | string (date-time) |  | When somebody confirmed the consent forms are in place at the point of capture. (nullable) |
-| biometrics.acknowledgedByPrincipalId | string (uuid) |  | Who confirmed it. (read-only; nullable) |
-| biometrics.faceTagPurgeMinutesAfterClose | integer |  | BL-106. (default 0; nullable) |
-| segregatedAccess | object |  | CF-130. (nullable) |
-| segregatedAccess.isEnabled | boolean |  | (default False) |
-| segregatedAccess.appliesToAccessPointIds | array of string (uuid) |  |  |
-| segregatedAccess.schedule | array of object |  |  |
-| segregatedAccess.schedule[].day | enum (mon, tue, wed, thu, fri, sat, sun) |  |  |
-| segregatedAccess.schedule[].from | string |  | Wall-clock time |
-| segregatedAccess.schedule[].to | string |  | Wall-clock time |
-| segregatedAccess.schedule[].admits | enum (all, women, womenAndChildren, families, members) |  |  |
-| segregatedAccess.entitlementGated | boolean |  | Always true, and stated rather than assumed. (default True; read-only) |
-| segregatedAccess.genderVerification | enum (off, staffAssisted, deviceAssisted) |  | off — the entitlement decides and a steward handles exceptions. (default off) |
-| segregatedAccess.overrideRateAlertThreshold | number |  | Where deviceAssisted is on. (nullable) |
-| alerting | object |  | CF-134. |
-| alerting.channel | enum (dashboardPanel, dashboardAndEmail, dashboardAndWhatsapp) |  | (default dashboardPanel) |
-| alerting.acknowledgementRequired | boolean |  | (default True) |
-| alerting.escalateAfterMinutes | integer |  | (nullable) |
-| displayCurrencies | array of string |  | Which currencies this venue shows guests (decided 28 September, audit R120 (a)). (nullable) |
-| cartLeaseSeconds | integer |  | How long a cart holds capacity (decided 28 September, audit R169): 15 minutes, the default catalogue.acquireInventoryHold takes for ttlSeconds. (min 30; max 3600; default 900; nullable) |
-| cartHoldExtensionMinutes | integer |  | How long one orders.extendCart extension adds. (min 1; max 30; default 5; nullable) |
-| cartMaxExtensions | integer |  | How many extensions a cart may take before extensionCapReached (Cart.maxExtensions). (min 0; max 5; default 1; nullable) |
-| resaleCutoffHours | integer |  | Hours before the performance after which a ticket can no longer be listed for resale (orders.createResaleListing). (min 0; max 168; default 24; nullable) |
-| exchangeCutoffHours | integer |  | Hours before the original performance after which lines can no longer be exchanged (orders.exchangeOrderLines, outsideExchangeWindow). (min 0; max 720; default 24; nullable) |
-| rescheduleCutoffHours | integer |  | Hours before the original performance after which an order can no longer be rescheduled (orders.rescheduleOrder, outsideRescheduleWindow). (min 0; max 720; default 24; nullable) |
-| reservationMaxExtensions | integer |  | How many times orders.extendReservation may extend one reservation. (min 0; max 5; default 1; nullable) |
-| shiftVarianceThreshold | object |  | Over or short at shift close beyond which the shift waits in pendingVariance for shift.acceptShiftVariance. (nullable) |
-| shiftVarianceThreshold.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
-| shiftVarianceThreshold.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
-| shiftVarianceThreshold.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| catalogue | object |  | (nullable) |
-| catalogue.maxVariantsPerProduct | integer |  | Variants one product may generate from its attributes (setProductAttributes refuses above it). (min 1; max 2000; default 200; nullable) |
-| catalogue.waitlistOfferHoldMinutes | integer |  | How long a waitlist offer holds the released capacity for the guest it was offered to. (min 1; max 1440; default 30; nullable) |
-| catalogue.bulkPriceChangeEscalationPercent | number |  | A bulkChangePrices run changing any price by more than this percentage needs PRICE_CONFIGURE (audit R197). (min 0; max 100; default 10; nullable) |
-| catalogue.bulkPriceChangeEscalationCount | integer |  | A bulkChangePrices run touching more prices than this needs PRICE_CONFIGURE (audit R197). (min 1; default 50; nullable) |
-| inventory | object |  | (nullable) |
-| inventory.overReceiptTolerancePercent | number |  | Percent above the outstanding ordered quantity a goods receipt line may record (createGoodsReceipt). (min 0; max 25; default 5; nullable) |
-| inventory.countVarianceTolerancePercent | number |  | Percent difference between counted and expected quantity before a count line is an exception (getCountVariance). (min 0; max 25; default 2; nullable) |
-| inventory.countVarianceApprovalAmount | object |  | Total variance value of a count above which posting it needs approval (postStockCount). (nullable) |
-| inventory.countVarianceApprovalAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
-| inventory.countVarianceApprovalAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
-| inventory.countVarianceApprovalAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| seating | object |  | (nullable) |
-| seating.seatHoldExtensionSeconds | integer |  | What one extendSeatHold adds. (min 60; max 1800; default 300; nullable) |
-| seating.seatHoldMaxExtensions | integer |  | How many times a seat hold may be extended. (min 0; max 5; default 2; nullable) |
-| seating.maxSeatsPerGuestOrder | integer |  | Seats one guest may take in one booking on a guest channel (Guest Web, Guest App), decided 29 September, rev 3 REV3-7. (min 1; max 50; default 10; nullable) |
-| promotions | object |  | (nullable) |
-| promotions.maxDiscountPercent | number |  | The largest discount one promotion may give (createPromotion refuses above it). (min 0; max 100; default 30; nullable) |
-| promotions.nearZeroLinePrice | object |  | Net line price below which a stacked combination is flagged near-zero in analysePromotionConflicts (audit R096 (5)); a warning, not a refusal. (nullable) |
-| promotions.nearZeroLinePrice.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
-| promotions.nearZeroLinePrice.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
-| promotions.nearZeroLinePrice.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| fnb | object |  | (nullable) |
-| fnb.recallWindowMinutes | integer |  | Minutes after a bump during which recallKitchenTicket still recalls; after it the act is a refire. (min 0; max 60; default 10; nullable) |
-| fnb.compEscalationAmount | object |  | Line value above which compItem needs ORDER_DISCOUNT (audit R197). (nullable) |
-| fnb.compEscalationAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
-| fnb.compEscalationAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
-| fnb.compEscalationAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| fnb.foodSafetyLeadPrincipalId | string (uuid) |  | The venue's food-safety lead, to whom escalateCorrectiveAction sends every escalation (decided 28 September, audit R096 (9)). (nullable) |
-| queue | object |  | (nullable) |
-| queue.crossQueueLimit | integer |  | Virtual queues one guest party may wait in at once (joinQueue, crossQueueLimitReached). (min 1; max 10; default 2; nullable) |
-| reporting | object |  | (nullable) |
-| reporting.inlineRunRowLimit | integer |  | Estimated rows above which runReport answers 202 and runs in the background. (min 1000; max 100000; default 5000; nullable) |
-| reporting.dashboardRefreshBudgetPerMinute | integer |  | Tile refreshes per minute, summed over a dashboard's tiles, that createDashboard allows. (min 1; default 24; nullable) |
-| marketing | object |  | (nullable) |
-| marketing.attributionWindowDays | integer |  | Days after a campaign touch within which a booking is attributed to it (getCampaignPerformance). (min 1; max 30; default 7; nullable) |
-| identity | object |  | (nullable) |
-| identity.guestOtpMaxAttempts | integer |  | Wrong entries allowed per guest one-time code before verifyGuestOtp invalidates it. (min 3; max 10; default 5; nullable) |
-| identity.guestTwoStep | object |  | Guest two-step verification: a venue option, off unless the venue enables it in Venue Management (decided 29 September, rev 3 GAP-B1, per venue, superseding the second part of audit R167, "no guest M… (nullable) |
-| identity.guestTwoStep.enabled | boolean |  | Off unless the venue enables it. (default False) |
-| identity.guestTwoStep.stepUpActions | array of enum (changeContactDetails, changePassword, managePaymentMethods, transferTickets, deleteAccount) |  | The guest actions in this venue that ask an enrolled guest for the factor again, whatever the age of the session. (default ['changeContactDetails', 'changePassword', 'managePaymentMethods', 'deleteAccount']) |
-
-**Responses**
-
-| Code | Shape | Meaning |
-|---|---|---|
-| 200 |  | Settings, or the defaults where none are saved |
-| 403 | Forbidden | Authenticated but not permitted at the requested scope |
-| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
-| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
-
 ### getWorkstationHealth
 
 **`GET /workstations/{workstationId}/health`**: A score a manager can sort by, and what is dragging it down
@@ -1482,7 +1615,7 @@ Board 1 of the client's POS design set. **The package held `lastHeartbeatAt` and
 | Read routing | replica |
 | Reads | `platform.device`, `platform.device_heartbeat`, `platform.workstation` |
 | Writes | - |
-| Called by | BO-036, BO-1069, BO-125, BO-128, BO-129, POS-001, POS-025 |
+| Called by | BO-036, BO-128, BO-129, POS-001, POS-025 |
 
 **Parameters**
 
@@ -1518,19 +1651,20 @@ Support hours were an open conflict for eleven days and were never a design ques
 **PUT semantics** (pull audit R103, R175). The target is the venue in the path, and a venue has one settings row. The first save creates it and later saves replace it whole; the answer is `200` either way, because before the first save the venue already had settings — the defaults `getVenueSettings` returns. **An omitted property returns to its default or to null.** `id`, `venueId`, `currencyCode`, `currencyScale`, `segregatedAccess.entitlementGated` and `biometrics.acknowledgedByPrincipalId` are `readOnly` and ignored on input.
 **The configured limits** (audit R094) are set here as venue overrides. A null limit inherits the tenant default (`setVenueSettingsDefaults`); a value outside the field's `minimum` and `maximum` is refused `400` with `errors[]` naming the field.
 **Refused with `422`** (pull audit R078) where the body asks for something the venue cannot evidence: `biometrics.isEnabled` true without both `dpiaReference` and `consentNoticeAcknowledgedAt`, or `segregatedAccess.genderVerification: deviceAssisted` where no device in the venue reports the `genderClassification` capability.
+**And, from 2 October 2026** (Chinmay; CHG-CSP-018, CHG-CSP-022): biometrics switched on without the venue's own `biometrics.consentFormId` (DEC-128), and accreditation face matching switched on without `legalSignOffReference` (DEC-461). `cashDrawerLimit` (CHG-CSP-016) is a venue override like the other limits; `fnb.tableReservedLeadMinutes` (CHG-CSP-017) is deprecated in favour of `fnb.FnbReservationPolicy.reservedLeadMinutes` (CHG-CLN-009).
 
 |  |  |
 |---|---|
 | Permission | `TENANT_CONFIGURE` |
 | Scope level | venue |
-| Part of slice | core |
+| Part of slice | setup, makes `platform.venue_settings` non-empty |
 | Wave | 1 |
 | Offline | no |
 | Config scope | venue |
 | Conflict policy | serverWins |
 | Reads | `access.access_point`, `cache:idempotency`, `platform.venue_settings` |
 | Writes | `cache:idempotency`, `cache:resolution`, `platform.venue_settings` |
-| Called by | BO-065, BO-1063, BO-116, BO-136, BO-143, BO-600, KIT-009, POS-019 |
+| Called by | BO-065, BO-1063, BO-136, BO-187, BO-600 |
 
 **Parameters**
 
@@ -1565,6 +1699,14 @@ Support hours were an open conflict for eleven days and were never a design ques
 | biometrics.consentNoticeAcknowledgedAt | string (date-time) |  | When somebody confirmed the consent forms are in place at the point of capture. (nullable) |
 | biometrics.acknowledgedByPrincipalId | string (uuid) |  | Who confirmed it. (read-only; nullable) |
 | biometrics.faceTagPurgeMinutesAfterClose | integer |  | BL-106. (default 0; nullable) |
+| biometrics.consentFormId | string (uuid) |  | The venue's own consent form, which every biometric capture is taken on (decided 2 October 2026, Chinmay, batch 4, BO-188: "Consent first, on the venue's consent form"; DEC-128, DEC-549; CHG-CSP-018). (nullable) |
+| biometrics.templatesHeldByTicvai | boolean |  | True where TICVAI's platform stores this venue's biometric templates (rather than the venue's own on-premises reader estate). (read-only) |
+| biometrics.allowMinors | boolean |  | Whether this venue enrols minors at all (decided 2 October 2026, Chinmay, critical set 1, BO-187 and CMS-029: "Guardian consent on the venue's form; minor age per country; the venue can switch minors… (default True) |
+| biometrics.accreditationFaceMatching | object |  | Face matching to find duplicate accreditation applicants, off unless the venue enables it (decided 2 October 2026, Chinmay, critical set 3, BO-631: "Only where the venue enables it, with applicant co… (nullable) |
+| biometrics.accreditationFaceMatching.isEnabled | boolean |  | (default False) |
+| biometrics.accreditationFaceMatching.legalSignOffReference | string |  | The venue's own reference for its legal sign-off; the platform records that one was named, by whom and when. (max length 200; nullable) |
+| biometrics.accreditationFaceMatching.signedOffByPrincipalId | string (uuid) |  | (read-only; nullable) |
+| biometrics.accreditationFaceMatching.signedOffAt | string (date-time) |  | (read-only; nullable) |
 | segregatedAccess | object |  | CF-130. (nullable) |
 | segregatedAccess.isEnabled | boolean |  | (default False) |
 | segregatedAccess.appliesToAccessPointIds | array of string (uuid) |  |  |
@@ -1581,6 +1723,7 @@ Support hours were an open conflict for eleven days and were never a design ques
 | alerting.acknowledgementRequired | boolean |  | (default True) |
 | alerting.escalateAfterMinutes | integer |  | (nullable) |
 | displayCurrencies | array of string |  | Which currencies this venue shows guests (decided 28 September, audit R120 (a)). (nullable) |
+| chargeCurrencies | array of string |  | Which currencies a guest may select and pay in (decided 2 October 2026, Chinmay; CHG-FIN-001; MoM 10 Aug 2026 4.7 option (b), DI-211). (nullable) |
 | cartLeaseSeconds | integer |  | How long a cart holds capacity (decided 28 September, audit R169): 15 minutes, the default catalogue.acquireInventoryHold takes for ttlSeconds. (min 30; max 3600; default 900; nullable) |
 | cartHoldExtensionMinutes | integer |  | How long one orders.extendCart extension adds. (min 1; max 30; default 5; nullable) |
 | cartMaxExtensions | integer |  | How many extensions a cart may take before extensionCapReached (Cart.maxExtensions). (min 0; max 5; default 1; nullable) |
@@ -1592,6 +1735,7 @@ Support hours were an open conflict for eleven days and were never a design ques
 | shiftVarianceThreshold.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | shiftVarianceThreshold.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | shiftVarianceThreshold.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| cashDrawerLimit | Money |  | The most cash a till drawer should hold before some is lifted to the safe (decided 2 October 2026, Chinmay, batch 6 set 3, BO-042: "Add drawer limit setting (warn + offer cash lift)"; DEC-179; CHG-CS… (nullable) |
 | catalogue | object |  | (nullable) |
 | catalogue.maxVariantsPerProduct | integer |  | Variants one product may generate from its attributes (setProductAttributes refuses above it). (min 1; max 2000; default 200; nullable) |
 | catalogue.waitlistOfferHoldMinutes | integer |  | How long a waitlist offer holds the released capacity for the guest it was offered to. (min 1; max 1440; default 30; nullable) |
@@ -1616,6 +1760,7 @@ Support hours were an open conflict for eleven days and were never a design ques
 | promotions.nearZeroLinePrice.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | fnb | object |  | (nullable) |
 | fnb.recallWindowMinutes | integer |  | Minutes after a bump during which recallKitchenTicket still recalls; after it the act is a refire. (min 0; max 60; default 10; nullable) |
+| fnb.tableReservedLeadMinutes | integer |  | Deprecated (2 October 2026, CHG-CLN-009): fnb.FnbReservationPolicy.reservedLeadMinutes is canonical. (min 0; max 240; default 30; nullable) |
 | fnb.compEscalationAmount | object |  | Line value above which compItem needs ORDER_DISCOUNT (audit R197). (nullable) |
 | fnb.compEscalationAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | fnb.compEscalationAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
@@ -1660,6 +1805,14 @@ Support hours were an open conflict for eleven days and were never a design ques
 | biometrics.consentNoticeAcknowledgedAt | string (date-time) |  | When somebody confirmed the consent forms are in place at the point of capture. (nullable) |
 | biometrics.acknowledgedByPrincipalId | string (uuid) |  | Who confirmed it. (read-only; nullable) |
 | biometrics.faceTagPurgeMinutesAfterClose | integer |  | BL-106. (default 0; nullable) |
+| biometrics.consentFormId | string (uuid) |  | The venue's own consent form, which every biometric capture is taken on (decided 2 October 2026, Chinmay, batch 4, BO-188: "Consent first, on the venue's consent form"; DEC-128, DEC-549; CHG-CSP-018). (nullable) |
+| biometrics.templatesHeldByTicvai | boolean |  | True where TICVAI's platform stores this venue's biometric templates (rather than the venue's own on-premises reader estate). (read-only) |
+| biometrics.allowMinors | boolean |  | Whether this venue enrols minors at all (decided 2 October 2026, Chinmay, critical set 1, BO-187 and CMS-029: "Guardian consent on the venue's form; minor age per country; the venue can switch minors… (default True) |
+| biometrics.accreditationFaceMatching | object |  | Face matching to find duplicate accreditation applicants, off unless the venue enables it (decided 2 October 2026, Chinmay, critical set 3, BO-631: "Only where the venue enables it, with applicant co… (nullable) |
+| biometrics.accreditationFaceMatching.isEnabled | boolean |  | (default False) |
+| biometrics.accreditationFaceMatching.legalSignOffReference | string |  | The venue's own reference for its legal sign-off; the platform records that one was named, by whom and when. (max length 200; nullable) |
+| biometrics.accreditationFaceMatching.signedOffByPrincipalId | string (uuid) |  | (read-only; nullable) |
+| biometrics.accreditationFaceMatching.signedOffAt | string (date-time) |  | (read-only; nullable) |
 | segregatedAccess | object |  | CF-130. (nullable) |
 | segregatedAccess.isEnabled | boolean |  | (default False) |
 | segregatedAccess.appliesToAccessPointIds | array of string (uuid) |  |  |
@@ -1676,6 +1829,7 @@ Support hours were an open conflict for eleven days and were never a design ques
 | alerting.acknowledgementRequired | boolean |  | (default True) |
 | alerting.escalateAfterMinutes | integer |  | (nullable) |
 | displayCurrencies | array of string |  | Which currencies this venue shows guests (decided 28 September, audit R120 (a)). (nullable) |
+| chargeCurrencies | array of string |  | Which currencies a guest may select and pay in (decided 2 October 2026, Chinmay; CHG-FIN-001; MoM 10 Aug 2026 4.7 option (b), DI-211). (nullable) |
 | cartLeaseSeconds | integer |  | How long a cart holds capacity (decided 28 September, audit R169): 15 minutes, the default catalogue.acquireInventoryHold takes for ttlSeconds. (min 30; max 3600; default 900; nullable) |
 | cartHoldExtensionMinutes | integer |  | How long one orders.extendCart extension adds. (min 1; max 30; default 5; nullable) |
 | cartMaxExtensions | integer |  | How many extensions a cart may take before extensionCapReached (Cart.maxExtensions). (min 0; max 5; default 1; nullable) |
@@ -1687,6 +1841,7 @@ Support hours were an open conflict for eleven days and were never a design ques
 | shiftVarianceThreshold.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | shiftVarianceThreshold.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | shiftVarianceThreshold.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| cashDrawerLimit | Money |  | The most cash a till drawer should hold before some is lifted to the safe (decided 2 October 2026, Chinmay, batch 6 set 3, BO-042: "Add drawer limit setting (warn + offer cash lift)"; DEC-179; CHG-CS… (nullable) |
 | catalogue | object |  | (nullable) |
 | catalogue.maxVariantsPerProduct | integer |  | Variants one product may generate from its attributes (setProductAttributes refuses above it). (min 1; max 2000; default 200; nullable) |
 | catalogue.waitlistOfferHoldMinutes | integer |  | How long a waitlist offer holds the released capacity for the guest it was offered to. (min 1; max 1440; default 30; nullable) |
@@ -1711,6 +1866,7 @@ Support hours were an open conflict for eleven days and were never a design ques
 | promotions.nearZeroLinePrice.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | fnb | object |  | (nullable) |
 | fnb.recallWindowMinutes | integer |  | Minutes after a bump during which recallKitchenTicket still recalls; after it the act is a refire. (min 0; max 60; default 10; nullable) |
+| fnb.tableReservedLeadMinutes | integer |  | Deprecated (2 October 2026, CHG-CLN-009): fnb.FnbReservationPolicy.reservedLeadMinutes is canonical. (min 0; max 240; default 30; nullable) |
 | fnb.compEscalationAmount | object |  | Line value above which compItem needs ORDER_DISCOUNT (audit R197). (nullable) |
 | fnb.compEscalationAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | fnb.compEscalationAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
@@ -1740,6 +1896,252 @@ Support hours were an open conflict for eleven days and were never a design ques
 | 422 |  | An enable the venue cannot evidence. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
+### setVenueSettingsDefaults
+
+**`PUT /venue-settings-defaults`**: Set the tenant's default for every venue setting
+
+**Sets the tenant-level defaults** (decided 28 September, audit R094), stored as the tenant's own row of `platform.venue_settings` (no `venueId`). **PUT semantics**: the body replaces the row whole, and an omitted limit returns to its proposed default. Each value must sit within the field's `minimum` and `maximum`, or the request is refused `400` with `errors[]` naming the field. A venue's own values are untouched; a venue that has none follows the new default at once.
+
+|  |  |
+|---|---|
+| Permission | `TENANT_CONFIGURE` |
+| Scope level | tenant |
+| Part of slice | setup, makes `platform.venue_settings` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Config scope | tenant |
+| Conflict policy | serverWins |
+| Reads | `platform.venue_settings` |
+| Writes | `platform.venue_settings` |
+| Called by | ADM-019, ADM-426, BO-1062 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
+
+**Request body**: `VenueSettings`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) |  | Added 20 August. (read-only) |
+| venueId | string (uuid) |  | From the path of setVenueSettings. (read-only) |
+| calendarDayStartHour | integer |  | Where the venue's calendar day starts (17 September minutes M17-03, added 30 September): the first hour row of every day and week calendar view (calendarView in screens/_components.yaml), so a venue… (min 0; max 23; default 6; nullable) |
+| currencyCode | string |  | readOnly is the freeze. (pattern ^[A-Z]{3}$; read-only; nullable) |
+| currencyScale | integer |  | Scale travels with currency (ADR-0008), and so does the freeze. (min 0; max 4; read-only; nullable) |
+| supportHours | object |  | CF-100. |
+| supportHours.mode | enum (alwaysOn, businessHours, custom, none) |  |  |
+| supportHours.timezone | string |  | IANA zone the windows are read in. |
+| supportHours.windows | array of object |  |  |
+| supportHours.windows[].day | enum (mon, tue, wed, thu, fri, sat, sun) |  |  |
+| supportHours.windows[].from | string |  | Wall-clock time the desk opens. |
+| supportHours.windows[].to | string |  | Wall-clock time the desk closes. |
+| supportHours.outOfHoursMessage | string |  | (nullable) |
+| quietHours | object |  | When the platform does not send. (nullable) |
+| quietHours.from | string |  | Wall-clock time sending stops |
+| quietHours.to | string |  | Wall-clock time sending resumes |
+| biometrics | object |  | CF-35, BL-096, BL-105, BL-106. (nullable) |
+| biometrics.isEnabled | boolean |  | Off by default, and turning it on is refused without the two fields below. (default False) |
+| biometrics.dpiaReference | string |  | The venue's own reference for its Article 21 assessment. (max length 200; nullable) |
+| biometrics.consentNoticeAcknowledgedAt | string (date-time) |  | When somebody confirmed the consent forms are in place at the point of capture. (nullable) |
+| biometrics.acknowledgedByPrincipalId | string (uuid) |  | Who confirmed it. (read-only; nullable) |
+| biometrics.faceTagPurgeMinutesAfterClose | integer |  | BL-106. (default 0; nullable) |
+| biometrics.consentFormId | string (uuid) |  | The venue's own consent form, which every biometric capture is taken on (decided 2 October 2026, Chinmay, batch 4, BO-188: "Consent first, on the venue's consent form"; DEC-128, DEC-549; CHG-CSP-018). (nullable) |
+| biometrics.templatesHeldByTicvai | boolean |  | True where TICVAI's platform stores this venue's biometric templates (rather than the venue's own on-premises reader estate). (read-only) |
+| biometrics.allowMinors | boolean |  | Whether this venue enrols minors at all (decided 2 October 2026, Chinmay, critical set 1, BO-187 and CMS-029: "Guardian consent on the venue's form; minor age per country; the venue can switch minors… (default True) |
+| biometrics.accreditationFaceMatching | object |  | Face matching to find duplicate accreditation applicants, off unless the venue enables it (decided 2 October 2026, Chinmay, critical set 3, BO-631: "Only where the venue enables it, with applicant co… (nullable) |
+| biometrics.accreditationFaceMatching.isEnabled | boolean |  | (default False) |
+| biometrics.accreditationFaceMatching.legalSignOffReference | string |  | The venue's own reference for its legal sign-off; the platform records that one was named, by whom and when. (max length 200; nullable) |
+| biometrics.accreditationFaceMatching.signedOffByPrincipalId | string (uuid) |  | (read-only; nullable) |
+| biometrics.accreditationFaceMatching.signedOffAt | string (date-time) |  | (read-only; nullable) |
+| segregatedAccess | object |  | CF-130. (nullable) |
+| segregatedAccess.isEnabled | boolean |  | (default False) |
+| segregatedAccess.appliesToAccessPointIds | array of string (uuid) |  |  |
+| segregatedAccess.schedule | array of object |  |  |
+| segregatedAccess.schedule[].day | enum (mon, tue, wed, thu, fri, sat, sun) |  |  |
+| segregatedAccess.schedule[].from | string |  | Wall-clock time |
+| segregatedAccess.schedule[].to | string |  | Wall-clock time |
+| segregatedAccess.schedule[].admits | enum (all, women, womenAndChildren, families, members) |  |  |
+| segregatedAccess.entitlementGated | boolean |  | Always true, and stated rather than assumed. (default True; read-only) |
+| segregatedAccess.genderVerification | enum (off, staffAssisted, deviceAssisted) |  | off — the entitlement decides and a steward handles exceptions. (default off) |
+| segregatedAccess.overrideRateAlertThreshold | number |  | Where deviceAssisted is on. (nullable) |
+| alerting | object |  | CF-134. |
+| alerting.channel | enum (dashboardPanel, dashboardAndEmail, dashboardAndWhatsapp) |  | (default dashboardPanel) |
+| alerting.acknowledgementRequired | boolean |  | (default True) |
+| alerting.escalateAfterMinutes | integer |  | (nullable) |
+| displayCurrencies | array of string |  | Which currencies this venue shows guests (decided 28 September, audit R120 (a)). (nullable) |
+| chargeCurrencies | array of string |  | Which currencies a guest may select and pay in (decided 2 October 2026, Chinmay; CHG-FIN-001; MoM 10 Aug 2026 4.7 option (b), DI-211). (nullable) |
+| cartLeaseSeconds | integer |  | How long a cart holds capacity (decided 28 September, audit R169): 15 minutes, the default catalogue.acquireInventoryHold takes for ttlSeconds. (min 30; max 3600; default 900; nullable) |
+| cartHoldExtensionMinutes | integer |  | How long one orders.extendCart extension adds. (min 1; max 30; default 5; nullable) |
+| cartMaxExtensions | integer |  | How many extensions a cart may take before extensionCapReached (Cart.maxExtensions). (min 0; max 5; default 1; nullable) |
+| resaleCutoffHours | integer |  | Hours before the performance after which a ticket can no longer be listed for resale (orders.createResaleListing). (min 0; max 168; default 24; nullable) |
+| exchangeCutoffHours | integer |  | Hours before the original performance after which lines can no longer be exchanged (orders.exchangeOrderLines, outsideExchangeWindow). (min 0; max 720; default 24; nullable) |
+| rescheduleCutoffHours | integer |  | Hours before the original performance after which an order can no longer be rescheduled (orders.rescheduleOrder, outsideRescheduleWindow). (min 0; max 720; default 24; nullable) |
+| reservationMaxExtensions | integer |  | How many times orders.extendReservation may extend one reservation. (min 0; max 5; default 1; nullable) |
+| shiftVarianceThreshold | object |  | Over or short at shift close beyond which the shift waits in pendingVariance for shift.acceptShiftVariance. (nullable) |
+| shiftVarianceThreshold.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| shiftVarianceThreshold.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| shiftVarianceThreshold.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| cashDrawerLimit | Money |  | The most cash a till drawer should hold before some is lifted to the safe (decided 2 October 2026, Chinmay, batch 6 set 3, BO-042: "Add drawer limit setting (warn + offer cash lift)"; DEC-179; CHG-CS… (nullable) |
+| catalogue | object |  | (nullable) |
+| catalogue.maxVariantsPerProduct | integer |  | Variants one product may generate from its attributes (setProductAttributes refuses above it). (min 1; max 2000; default 200; nullable) |
+| catalogue.waitlistOfferHoldMinutes | integer |  | How long a waitlist offer holds the released capacity for the guest it was offered to. (min 1; max 1440; default 30; nullable) |
+| catalogue.bulkPriceChangeEscalationPercent | number |  | A bulkChangePrices run changing any price by more than this percentage needs PRICE_CONFIGURE (audit R197). (min 0; max 100; default 10; nullable) |
+| catalogue.bulkPriceChangeEscalationCount | integer |  | A bulkChangePrices run touching more prices than this needs PRICE_CONFIGURE (audit R197). (min 1; default 50; nullable) |
+| inventory | object |  | (nullable) |
+| inventory.overReceiptTolerancePercent | number |  | Percent above the outstanding ordered quantity a goods receipt line may record (createGoodsReceipt). (min 0; max 25; default 5; nullable) |
+| inventory.countVarianceTolerancePercent | number |  | Percent difference between counted and expected quantity before a count line is an exception (getCountVariance). (min 0; max 25; default 2; nullable) |
+| inventory.countVarianceApprovalAmount | object |  | Total variance value of a count above which posting it needs approval (postStockCount). (nullable) |
+| inventory.countVarianceApprovalAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| inventory.countVarianceApprovalAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| inventory.countVarianceApprovalAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| seating | object |  | (nullable) |
+| seating.seatHoldExtensionSeconds | integer |  | What one extendSeatHold adds. (min 60; max 1800; default 300; nullable) |
+| seating.seatHoldMaxExtensions | integer |  | How many times a seat hold may be extended. (min 0; max 5; default 2; nullable) |
+| seating.maxSeatsPerGuestOrder | integer |  | Seats one guest may take in one booking on a guest channel (Guest Web, Guest App), decided 29 September, rev 3 REV3-7. (min 1; max 50; default 10; nullable) |
+| promotions | object |  | (nullable) |
+| promotions.maxDiscountPercent | number |  | The largest discount one promotion may give (createPromotion refuses above it). (min 0; max 100; default 30; nullable) |
+| promotions.nearZeroLinePrice | object |  | Net line price below which a stacked combination is flagged near-zero in analysePromotionConflicts (audit R096 (5)); a warning, not a refusal. (nullable) |
+| promotions.nearZeroLinePrice.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| promotions.nearZeroLinePrice.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| promotions.nearZeroLinePrice.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| fnb | object |  | (nullable) |
+| fnb.recallWindowMinutes | integer |  | Minutes after a bump during which recallKitchenTicket still recalls; after it the act is a refire. (min 0; max 60; default 10; nullable) |
+| fnb.tableReservedLeadMinutes | integer |  | Deprecated (2 October 2026, CHG-CLN-009): fnb.FnbReservationPolicy.reservedLeadMinutes is canonical. (min 0; max 240; default 30; nullable) |
+| fnb.compEscalationAmount | object |  | Line value above which compItem needs ORDER_DISCOUNT (audit R197). (nullable) |
+| fnb.compEscalationAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| fnb.compEscalationAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| fnb.compEscalationAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| fnb.foodSafetyLeadPrincipalId | string (uuid) |  | The venue's food-safety lead, to whom escalateCorrectiveAction sends every escalation (decided 28 September, audit R096 (9)). (nullable) |
+| queue | object |  | (nullable) |
+| queue.crossQueueLimit | integer |  | Virtual queues one guest party may wait in at once (joinQueue, crossQueueLimitReached). (min 1; max 10; default 2; nullable) |
+| reporting | object |  | (nullable) |
+| reporting.inlineRunRowLimit | integer |  | Estimated rows above which runReport answers 202 and runs in the background. (min 1000; max 100000; default 5000; nullable) |
+| reporting.dashboardRefreshBudgetPerMinute | integer |  | Tile refreshes per minute, summed over a dashboard's tiles, that createDashboard allows. (min 1; default 24; nullable) |
+| marketing | object |  | (nullable) |
+| marketing.attributionWindowDays | integer |  | Days after a campaign touch within which a booking is attributed to it (getCampaignPerformance). (min 1; max 30; default 7; nullable) |
+| identity | object |  | (nullable) |
+| identity.guestOtpMaxAttempts | integer |  | Wrong entries allowed per guest one-time code before verifyGuestOtp invalidates it. (min 3; max 10; default 5; nullable) |
+| identity.guestTwoStep | object |  | Guest two-step verification: a venue option, off unless the venue enables it in Venue Management (decided 29 September, rev 3 GAP-B1, per venue, superseding the second part of audit R167, "no guest M… (nullable) |
+| identity.guestTwoStep.enabled | boolean |  | Off unless the venue enables it. (default False) |
+| identity.guestTwoStep.stepUpActions | array of enum (changeContactDetails, changePassword, managePaymentMethods, transferTickets, deleteAccount) |  | The guest actions in this venue that ask an enrolled guest for the factor again, whatever the age of the session. (default ['changeContactDetails', 'changePassword', 'managePaymentMethods', 'deleteAccount']) |
+
+**Response**: `VenueSettings`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) |  | Added 20 August. (read-only) |
+| venueId | string (uuid) |  | From the path of setVenueSettings. (read-only) |
+| calendarDayStartHour | integer |  | Where the venue's calendar day starts (17 September minutes M17-03, added 30 September): the first hour row of every day and week calendar view (calendarView in screens/_components.yaml), so a venue… (min 0; max 23; default 6; nullable) |
+| currencyCode | string |  | readOnly is the freeze. (pattern ^[A-Z]{3}$; read-only; nullable) |
+| currencyScale | integer |  | Scale travels with currency (ADR-0008), and so does the freeze. (min 0; max 4; read-only; nullable) |
+| supportHours | object |  | CF-100. |
+| supportHours.mode | enum (alwaysOn, businessHours, custom, none) |  |  |
+| supportHours.timezone | string |  | IANA zone the windows are read in. |
+| supportHours.windows | array of object |  |  |
+| supportHours.windows[].day | enum (mon, tue, wed, thu, fri, sat, sun) |  |  |
+| supportHours.windows[].from | string |  | Wall-clock time the desk opens. |
+| supportHours.windows[].to | string |  | Wall-clock time the desk closes. |
+| supportHours.outOfHoursMessage | string |  | (nullable) |
+| quietHours | object |  | When the platform does not send. (nullable) |
+| quietHours.from | string |  | Wall-clock time sending stops |
+| quietHours.to | string |  | Wall-clock time sending resumes |
+| biometrics | object |  | CF-35, BL-096, BL-105, BL-106. (nullable) |
+| biometrics.isEnabled | boolean |  | Off by default, and turning it on is refused without the two fields below. (default False) |
+| biometrics.dpiaReference | string |  | The venue's own reference for its Article 21 assessment. (max length 200; nullable) |
+| biometrics.consentNoticeAcknowledgedAt | string (date-time) |  | When somebody confirmed the consent forms are in place at the point of capture. (nullable) |
+| biometrics.acknowledgedByPrincipalId | string (uuid) |  | Who confirmed it. (read-only; nullable) |
+| biometrics.faceTagPurgeMinutesAfterClose | integer |  | BL-106. (default 0; nullable) |
+| biometrics.consentFormId | string (uuid) |  | The venue's own consent form, which every biometric capture is taken on (decided 2 October 2026, Chinmay, batch 4, BO-188: "Consent first, on the venue's consent form"; DEC-128, DEC-549; CHG-CSP-018). (nullable) |
+| biometrics.templatesHeldByTicvai | boolean |  | True where TICVAI's platform stores this venue's biometric templates (rather than the venue's own on-premises reader estate). (read-only) |
+| biometrics.allowMinors | boolean |  | Whether this venue enrols minors at all (decided 2 October 2026, Chinmay, critical set 1, BO-187 and CMS-029: "Guardian consent on the venue's form; minor age per country; the venue can switch minors… (default True) |
+| biometrics.accreditationFaceMatching | object |  | Face matching to find duplicate accreditation applicants, off unless the venue enables it (decided 2 October 2026, Chinmay, critical set 3, BO-631: "Only where the venue enables it, with applicant co… (nullable) |
+| biometrics.accreditationFaceMatching.isEnabled | boolean |  | (default False) |
+| biometrics.accreditationFaceMatching.legalSignOffReference | string |  | The venue's own reference for its legal sign-off; the platform records that one was named, by whom and when. (max length 200; nullable) |
+| biometrics.accreditationFaceMatching.signedOffByPrincipalId | string (uuid) |  | (read-only; nullable) |
+| biometrics.accreditationFaceMatching.signedOffAt | string (date-time) |  | (read-only; nullable) |
+| segregatedAccess | object |  | CF-130. (nullable) |
+| segregatedAccess.isEnabled | boolean |  | (default False) |
+| segregatedAccess.appliesToAccessPointIds | array of string (uuid) |  |  |
+| segregatedAccess.schedule | array of object |  |  |
+| segregatedAccess.schedule[].day | enum (mon, tue, wed, thu, fri, sat, sun) |  |  |
+| segregatedAccess.schedule[].from | string |  | Wall-clock time |
+| segregatedAccess.schedule[].to | string |  | Wall-clock time |
+| segregatedAccess.schedule[].admits | enum (all, women, womenAndChildren, families, members) |  |  |
+| segregatedAccess.entitlementGated | boolean |  | Always true, and stated rather than assumed. (default True; read-only) |
+| segregatedAccess.genderVerification | enum (off, staffAssisted, deviceAssisted) |  | off — the entitlement decides and a steward handles exceptions. (default off) |
+| segregatedAccess.overrideRateAlertThreshold | number |  | Where deviceAssisted is on. (nullable) |
+| alerting | object |  | CF-134. |
+| alerting.channel | enum (dashboardPanel, dashboardAndEmail, dashboardAndWhatsapp) |  | (default dashboardPanel) |
+| alerting.acknowledgementRequired | boolean |  | (default True) |
+| alerting.escalateAfterMinutes | integer |  | (nullable) |
+| displayCurrencies | array of string |  | Which currencies this venue shows guests (decided 28 September, audit R120 (a)). (nullable) |
+| chargeCurrencies | array of string |  | Which currencies a guest may select and pay in (decided 2 October 2026, Chinmay; CHG-FIN-001; MoM 10 Aug 2026 4.7 option (b), DI-211). (nullable) |
+| cartLeaseSeconds | integer |  | How long a cart holds capacity (decided 28 September, audit R169): 15 minutes, the default catalogue.acquireInventoryHold takes for ttlSeconds. (min 30; max 3600; default 900; nullable) |
+| cartHoldExtensionMinutes | integer |  | How long one orders.extendCart extension adds. (min 1; max 30; default 5; nullable) |
+| cartMaxExtensions | integer |  | How many extensions a cart may take before extensionCapReached (Cart.maxExtensions). (min 0; max 5; default 1; nullable) |
+| resaleCutoffHours | integer |  | Hours before the performance after which a ticket can no longer be listed for resale (orders.createResaleListing). (min 0; max 168; default 24; nullable) |
+| exchangeCutoffHours | integer |  | Hours before the original performance after which lines can no longer be exchanged (orders.exchangeOrderLines, outsideExchangeWindow). (min 0; max 720; default 24; nullable) |
+| rescheduleCutoffHours | integer |  | Hours before the original performance after which an order can no longer be rescheduled (orders.rescheduleOrder, outsideRescheduleWindow). (min 0; max 720; default 24; nullable) |
+| reservationMaxExtensions | integer |  | How many times orders.extendReservation may extend one reservation. (min 0; max 5; default 1; nullable) |
+| shiftVarianceThreshold | object |  | Over or short at shift close beyond which the shift waits in pendingVariance for shift.acceptShiftVariance. (nullable) |
+| shiftVarianceThreshold.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| shiftVarianceThreshold.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| shiftVarianceThreshold.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| cashDrawerLimit | Money |  | The most cash a till drawer should hold before some is lifted to the safe (decided 2 October 2026, Chinmay, batch 6 set 3, BO-042: "Add drawer limit setting (warn + offer cash lift)"; DEC-179; CHG-CS… (nullable) |
+| catalogue | object |  | (nullable) |
+| catalogue.maxVariantsPerProduct | integer |  | Variants one product may generate from its attributes (setProductAttributes refuses above it). (min 1; max 2000; default 200; nullable) |
+| catalogue.waitlistOfferHoldMinutes | integer |  | How long a waitlist offer holds the released capacity for the guest it was offered to. (min 1; max 1440; default 30; nullable) |
+| catalogue.bulkPriceChangeEscalationPercent | number |  | A bulkChangePrices run changing any price by more than this percentage needs PRICE_CONFIGURE (audit R197). (min 0; max 100; default 10; nullable) |
+| catalogue.bulkPriceChangeEscalationCount | integer |  | A bulkChangePrices run touching more prices than this needs PRICE_CONFIGURE (audit R197). (min 1; default 50; nullable) |
+| inventory | object |  | (nullable) |
+| inventory.overReceiptTolerancePercent | number |  | Percent above the outstanding ordered quantity a goods receipt line may record (createGoodsReceipt). (min 0; max 25; default 5; nullable) |
+| inventory.countVarianceTolerancePercent | number |  | Percent difference between counted and expected quantity before a count line is an exception (getCountVariance). (min 0; max 25; default 2; nullable) |
+| inventory.countVarianceApprovalAmount | object |  | Total variance value of a count above which posting it needs approval (postStockCount). (nullable) |
+| inventory.countVarianceApprovalAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| inventory.countVarianceApprovalAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| inventory.countVarianceApprovalAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| seating | object |  | (nullable) |
+| seating.seatHoldExtensionSeconds | integer |  | What one extendSeatHold adds. (min 60; max 1800; default 300; nullable) |
+| seating.seatHoldMaxExtensions | integer |  | How many times a seat hold may be extended. (min 0; max 5; default 2; nullable) |
+| seating.maxSeatsPerGuestOrder | integer |  | Seats one guest may take in one booking on a guest channel (Guest Web, Guest App), decided 29 September, rev 3 REV3-7. (min 1; max 50; default 10; nullable) |
+| promotions | object |  | (nullable) |
+| promotions.maxDiscountPercent | number |  | The largest discount one promotion may give (createPromotion refuses above it). (min 0; max 100; default 30; nullable) |
+| promotions.nearZeroLinePrice | object |  | Net line price below which a stacked combination is flagged near-zero in analysePromotionConflicts (audit R096 (5)); a warning, not a refusal. (nullable) |
+| promotions.nearZeroLinePrice.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| promotions.nearZeroLinePrice.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| promotions.nearZeroLinePrice.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| fnb | object |  | (nullable) |
+| fnb.recallWindowMinutes | integer |  | Minutes after a bump during which recallKitchenTicket still recalls; after it the act is a refire. (min 0; max 60; default 10; nullable) |
+| fnb.tableReservedLeadMinutes | integer |  | Deprecated (2 October 2026, CHG-CLN-009): fnb.FnbReservationPolicy.reservedLeadMinutes is canonical. (min 0; max 240; default 30; nullable) |
+| fnb.compEscalationAmount | object |  | Line value above which compItem needs ORDER_DISCOUNT (audit R197). (nullable) |
+| fnb.compEscalationAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| fnb.compEscalationAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| fnb.compEscalationAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| fnb.foodSafetyLeadPrincipalId | string (uuid) |  | The venue's food-safety lead, to whom escalateCorrectiveAction sends every escalation (decided 28 September, audit R096 (9)). (nullable) |
+| queue | object |  | (nullable) |
+| queue.crossQueueLimit | integer |  | Virtual queues one guest party may wait in at once (joinQueue, crossQueueLimitReached). (min 1; max 10; default 2; nullable) |
+| reporting | object |  | (nullable) |
+| reporting.inlineRunRowLimit | integer |  | Estimated rows above which runReport answers 202 and runs in the background. (min 1000; max 100000; default 5000; nullable) |
+| reporting.dashboardRefreshBudgetPerMinute | integer |  | Tile refreshes per minute, summed over a dashboard's tiles, that createDashboard allows. (min 1; default 24; nullable) |
+| marketing | object |  | (nullable) |
+| marketing.attributionWindowDays | integer |  | Days after a campaign touch within which a booking is attributed to it (getCampaignPerformance). (min 1; max 30; default 7; nullable) |
+| identity | object |  | (nullable) |
+| identity.guestOtpMaxAttempts | integer |  | Wrong entries allowed per guest one-time code before verifyGuestOtp invalidates it. (min 3; max 10; default 5; nullable) |
+| identity.guestTwoStep | object |  | Guest two-step verification: a venue option, off unless the venue enables it in Venue Management (decided 29 September, rev 3 GAP-B1, per venue, superseding the second part of audit R167, "no guest M… (nullable) |
+| identity.guestTwoStep.enabled | boolean |  | Off unless the venue enables it. (default False) |
+| identity.guestTwoStep.stepUpActions | array of enum (changeContactDetails, changePassword, managePaymentMethods, transferTickets, deleteAccount) |  | The guest actions in this venue that ask an enrolled guest for the factor again, whatever the age of the session. (default ['changeContactDetails', 'changePassword', 'managePaymentMethods', 'deleteAccount']) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Set |
+| 400 | BadRequest | Validation failed |
+| 403 | Forbidden | Authenticated but not permitted at the requested scope |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
 
 ## Group: workstation
 
@@ -1749,6 +2151,7 @@ Support hours were an open conflict for eleven days and were never a design ques
 
 **Configures an existing workstation; it never creates one** (pull audit R103). The target is the workstation in the path, and the body has no code, venue or region, which a new workstation would need — an unknown `workstationId` is `404`. `mediaStockRemaining` is `readOnly` and ignored on input.
 **Refused while a shift is open on this workstation** (F73, pull audit R078). Changing the rules under an open shift means it closes against rules it did not open under, so the change waits for the shift to close.
+**The till layout is the outlet's unless this till overrides it** (decided 2 October 2026, Chinmay, BO-109; DEC-183; CHG-CSP-006). `saleBoardId` is optional since 2 October: absent or null, the workstation uses its outlet's `Outlet.saleBoardId`; set, it overrides it for this till alone. A workstation with neither an outlet board nor its own is refused `422 sale-board-required`, because a till must open on something. `cashDrawerLimit` overrides the venue's drawer limit for this till (DEC-179; CHG-CSP-016).
 
 |  |  |
 |---|---|
@@ -1761,7 +2164,7 @@ Support hours were an open conflict for eleven days and were never a design ques
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `platform.device`, `platform.workstation` |
 | Writes | `cache:idempotency`, `platform.device`, `platform.workstation` |
-| Called by | BO-036, BO-129, BO-602, POS-016 |
+| Called by | BO-036, BO-602, POS-016 |
 
 **Parameters**
 
@@ -1779,7 +2182,9 @@ Support hours were an open conflict for eleven days and were never a design ques
 | loadedMediaStockId | string (uuid) |  | BL-095. (nullable) |
 | mediaStockRemaining | integer |  | Decremented on issue. (read-only; nullable) |
 | name | string | yes | (max length 200) |
-| saleBoardId | string (uuid) | yes |  |
+| saleBoardId | string (uuid) |  | This till's own layout, overriding its outlet's (DEC-183; CHG-CSP-006). (nullable) |
+| outletId | string (uuid) |  | The outlet this till stands in (CHG-CSP-006). (nullable) |
+| cashDrawerLimit | Money |  | This till's drawer limit; null inherits VenueSettings.cashDrawerLimit (DEC-179; CHG-CSP-016). (nullable) |
 | departmentId | string (uuid) |  | (nullable) |
 | accessPointId | string (uuid) |  | (nullable) |
 | devices | array of DeviceBinding |  |  |
@@ -1801,11 +2206,14 @@ Support hours were an open conflict for eleven days and were never a design ques
 | venueId | string (uuid) | yes |  |
 | regionId | string (uuid) | yes |  |
 | departmentId | string (uuid) |  | (nullable) |
+| outletId | string (uuid) |  | The outlet this till stands in (CHG-CSP-006). (nullable) |
 | scopePath | string | yes |  |
 | saleBoard | object | yes | Determines which front end loads. |
 | saleBoard.id | string (uuid) | yes |  |
 | saleBoard.kind | SaleBoardKind: enum (ticketing, fnb, retail, mixed) | yes |  |
 | saleBoard.name | string |  |  |
+| saleBoardSource | enum (outlet, workstation) |  | Where saleBoard came from (decided 2 October 2026, Chinmay, BO-109: "Per outlet, with a till override"; DEC-183; CHG-CSP-006): outlet when the till uses its outlet's layout, workstation when this til… (read-only) |
+| cashDrawerLimit | Money |  | This till's drawer limit, overriding the venue's (VenueSettings.cashDrawerLimit; DEC-179; CHG-CSP-016). (nullable) |
 | accessPointId | string (uuid) |  | Inherited from the workstation, never selected by the operator. (nullable) |
 | devices | array of DeviceBinding |  |  |
 | devices[].kind | DeviceKind: enum (receiptPrinter, ticketPrinter, labelPrinter, cashDrawer, barcodeScanner, rfidReader, nfcReader, cardReader, …) | yes | mobileHandset (18.1.5, added 29 September): a staff phone or tablet running the staff app, registered for push and bound to no workstation. |
@@ -1837,6 +2245,7 @@ Support hours were an open conflict for eleven days and were never a design ques
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 409 |  | A shift is open on this workstation. |
+| 422 |  | No board would apply: the request sends no saleBoardId and the workstation's outlet has none (sale-board-required; CHG-CSP-006). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### createOutlet
@@ -1867,16 +2276,24 @@ Support hours were an open conflict for eleven days and were never a design ques
 |---|---|---|---|
 | id | string (uuid) | yes | (read-only) |
 | code | string | yes | (max length 64) |
-| name | string | yes | (max length 200) |
+| name | string | yes | The outlet's name in English. (max length 200) |
+| nameTranslations | OutletNameTranslations |  | The outlet's name in other languages, keyed by ISO 639-1 code (decided 2 October 2026, Chinmay, batch 2 #26, BO-044: "Yes, where a country needs it: the local language plus English"; DEC-031; CHG-CSP… |
 | venueId | string (uuid) | yes |  |
 | kind | OutletKind: enum (shop, restaurant, bar, cafe, kiosk, gameFloor, ticketOffice, mobile) | yes |  |
+| outletType | object |  | The service model (DI-319; DEC-196; CHG-CSP-005). (nullable) |
+| departmentId | string (uuid) |  | The department the outlet belongs to (DI-319: department, sub-department, cost centre and status; DEC-196; CHG-CSP-005): an OrgUnit of kind department, as Workstation.departmentId. (nullable) |
 | zone | string |  | (nullable) |
 | stockLocationId | string (uuid) |  | Where this outlet draws stock from. (nullable) |
 | costCenterId | string (uuid) |  | Revenue and cost attribution. (nullable) |
+| paymentTiming | object |  | Pay first, or send to the kitchen first then pay (DEC-064; CHG-CSP-004). (default sendFirst) |
+| admissionContext | object |  | Inside the venue (needs an admission ticket) or standalone (no ticket) (DEC-070; CHG-CSP-004). (default insideVenue) |
+| producesForOutletIds | array of string (uuid) |  | One kitchen serving several outlets is a producing outlet (decided 2 October 2026, Chinmay, batch 6 set 5, BO-134: "Yes: via a producing outlet (one kitchen outlet produces for several)"; DEC-188; CH… (default []) |
+| saleBoardId | string (uuid) |  | The till layout every till in this outlet uses, unless a till overrides it (decided 2 October 2026, Chinmay, batch 6 set 4, BO-109: "Per outlet, with a till override"; DEC-183; CHG-CSP-006). (nullable) |
 | openingHours | array of OpeningHoursWindow |  | The weekly pattern, one entry per window. |
 | openingHours[].day | enum (mon, tue, wed, thu, fri, sat, sun) | yes |  |
 | openingHours[].from | string | yes | Local time, 24-hour HH:MM, when the outlet opens. (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$) |
 | openingHours[].to | string | yes | Local time, 24-hour HH:MM, when the outlet closes. (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$) |
+| openingHours[].endsNextDay | boolean |  | A late-night window is one window past midnight (decided 2 October 2026, Chinmay, batch 6 set 6a, BO-731; DEC-197; CHG-CSP-007). (default False) |
 | isActive | boolean |  |  |
 
 **Response**: `Outlet`
@@ -1885,16 +2302,24 @@ Support hours were an open conflict for eleven days and were never a design ques
 |---|---|---|---|
 | id | string (uuid) | yes | (read-only) |
 | code | string | yes | (max length 64) |
-| name | string | yes | (max length 200) |
+| name | string | yes | The outlet's name in English. (max length 200) |
+| nameTranslations | OutletNameTranslations |  | The outlet's name in other languages, keyed by ISO 639-1 code (decided 2 October 2026, Chinmay, batch 2 #26, BO-044: "Yes, where a country needs it: the local language plus English"; DEC-031; CHG-CSP… |
 | venueId | string (uuid) | yes |  |
 | kind | OutletKind: enum (shop, restaurant, bar, cafe, kiosk, gameFloor, ticketOffice, mobile) | yes |  |
+| outletType | object |  | The service model (DI-319; DEC-196; CHG-CSP-005). (nullable) |
+| departmentId | string (uuid) |  | The department the outlet belongs to (DI-319: department, sub-department, cost centre and status; DEC-196; CHG-CSP-005): an OrgUnit of kind department, as Workstation.departmentId. (nullable) |
 | zone | string |  | (nullable) |
 | stockLocationId | string (uuid) |  | Where this outlet draws stock from. (nullable) |
 | costCenterId | string (uuid) |  | Revenue and cost attribution. (nullable) |
+| paymentTiming | object |  | Pay first, or send to the kitchen first then pay (DEC-064; CHG-CSP-004). (default sendFirst) |
+| admissionContext | object |  | Inside the venue (needs an admission ticket) or standalone (no ticket) (DEC-070; CHG-CSP-004). (default insideVenue) |
+| producesForOutletIds | array of string (uuid) |  | One kitchen serving several outlets is a producing outlet (decided 2 October 2026, Chinmay, batch 6 set 5, BO-134: "Yes: via a producing outlet (one kitchen outlet produces for several)"; DEC-188; CH… (default []) |
+| saleBoardId | string (uuid) |  | The till layout every till in this outlet uses, unless a till overrides it (decided 2 October 2026, Chinmay, batch 6 set 4, BO-109: "Per outlet, with a till override"; DEC-183; CHG-CSP-006). (nullable) |
 | openingHours | array of OpeningHoursWindow |  | The weekly pattern, one entry per window. |
 | openingHours[].day | enum (mon, tue, wed, thu, fri, sat, sun) | yes |  |
 | openingHours[].from | string | yes | Local time, 24-hour HH:MM, when the outlet opens. (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$) |
 | openingHours[].to | string | yes | Local time, 24-hour HH:MM, when the outlet closes. (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$) |
+| openingHours[].endsNextDay | boolean |  | A late-night window is one window past midnight (decided 2 October 2026, Chinmay, batch 6 set 6a, BO-731; DEC-197; CHG-CSP-007). (default False) |
 | isActive | boolean |  |  |
 
 **Responses**
@@ -1905,6 +2330,7 @@ Support hours were an open conflict for eleven days and were never a design ques
 | 400 | BadRequest | Validation failed |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
 | 409 |  | Code already in use in this venue |
+| 422 |  | The region requires a local-language name and nameTranslations lacks it (local-name-required), an opening window ends before it starts (window-ends-before-start), or producesForOutletIds names the ou… |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### createSaleBoard
@@ -1924,7 +2350,7 @@ Tiles reference catalogue variants and are grouped into pages. A cashier finds a
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `platform.sale_board` |
 | Writes | `cache:idempotency`, `platform.sale_board`, `platform.sale_board_page`, `platform.sale_board_tile` |
-| Called by | BO-124 |
+| Called by | BO-109, BO-124 |
 
 **Parameters**
 
@@ -2002,7 +2428,7 @@ Physical devices bound to workstations, and staff handsets (`mobileHandset`), wh
 | Read routing | replica |
 | Reads | `platform.device` |
 | Writes | - |
-| Called by | ADM-580, ANL-003, BO-036, BO-124, EMP-043, POS-016, POS-025 |
+| Called by | ADM-580, ANL-003, BO-036, BO-124, BO-405, BO-732, EMP-043, POS-016, POS-025 |
 
 **Parameters**
 
@@ -2050,6 +2476,12 @@ Physical devices bound to workstations, and staff handsets (`mobileHandset`), wh
 | items[].enrolmentState | enum (registered, enrolled, provisioned, active, deactivated, retired) |  | BL-160. (default registered; read-only) |
 | items[].retiredAt | string (date-time) |  | Set when enrolmentState reaches retired, and null otherwise. (read-only; nullable) |
 | items[].configurationProfileId | string (uuid) |  | The profile this device was provisioned with. (read-only; nullable) |
+| items[].approvalStatus | object |  | A new device waits for approval before it may go live (decided 2 October 2026, Chinmay, critical set 1, BO-196: "Secure enrolment code + pending approval"; DEC-241; CHG-CSP-011; MoM 15 September, DI-… (default pendingApproval; read-only) |
+| items[].enrolmentCode | string |  | A one-time code the device must present to enrol (DEC-241; CHG-CSP-011). (max length 12; read-only; nullable) |
+| items[].enrolmentCodeExpiresAt | string (date-time) |  | When the enrolment code stops working (24 hours after registration, proposed; client to correct). (read-only; nullable) |
+| items[].testedByPrincipalId | string (uuid) |  | Who recorded the device's acceptance test (DeviceEnrolment.testResult on the move to provisioned). (read-only; nullable) |
+| items[].approvedByPrincipalId | string (uuid) |  | Who approved the device into production, never the person who tested it (decided 2 October 2026, Chinmay, critical set 1, BO-203: "Approver must differ from the tester"; DEC-245; CHG-CSP-011). (read-only; nullable) |
+| items[].approvedAt | string (date-time) |  | (read-only; nullable) |
 | nextCursor | string |  |  |
 | hasMore | boolean | yes |  |
 
@@ -2058,40 +2490,6 @@ Physical devices bound to workstations, and staff handsets (`mobileHandset`), wh
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Devices |
-| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
-
-### listOutlets
-
-**`GET /outlets`**: List outlets
-
-A point of sale within a venue — a shop, a restaurant, a bar, a kiosk cluster. F&B, retail and games all key off it, and until now it was referenced by all three without being defined anywhere.
-An outlet is not a workstation. Several workstations sit in one outlet, and the outlet is what carries the menu, the stock location and the revenue attribution.
-
-|  |  |
-|---|---|
-| Permission | `SCOPE_VIEW` |
-| Scope level | venue |
-| Part of slice | core |
-| Wave | 1 |
-| Offline | yes |
-| Conflict policy | serverWins |
-| Read routing | replica |
-| Reads | `platform.outlet` |
-| Writes | - |
-| Called by | BO-044, BO-134, BO-727, BO-728, BO-732, POS-011, POS-024 |
-
-**Parameters**
-
-| Name | In | Required | Type | Notes |
-|---|---|---|---|---|
-| venueId | query |  | string (uuid) |  |
-| kind | query |  | OutletKind: enum (shop, restaurant, bar, cafe, kiosk, gameFloor, ticketOffice, mobile) |  |
-
-**Responses**
-
-| Code | Shape | Meaning |
-|---|---|---|
-| 200 |  | Outlets |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### listSaleBoards
@@ -2111,7 +2509,7 @@ The configured front ends a workstation may load. A board determines presentatio
 | Read routing | replica |
 | Reads | `platform.sale_board`, `platform.sale_board_page`, `platform.sale_board_tile` |
 | Writes | - |
-| Called by | BO-115, BO-116, BO-117, BO-118, BO-122, BO-123, BO-126, POS-002, POS-025 |
+| Called by | BO-109, BO-116, BO-122, BO-123, BO-124, BO-126, POS-002, POS-025 |
 
 **Parameters**
 
@@ -2127,131 +2525,6 @@ The configured front ends a workstation may load. A board determines presentatio
 | 200 |  | Sale boards |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
-### listWorkstations
-
-**`GET /workstations`**: List workstations
-
-|  |  |
-|---|---|
-| Permission | `SCOPE_VIEW` |
-| Scope level | venue |
-| Part of slice | core |
-| Wave | 2 |
-| Offline | no |
-| Conflict policy | serverWins |
-| Read routing | replica |
-| Reads | `platform.device`, `platform.workstation` |
-| Writes | - |
-| Called by | BO-036, BO-037, BO-116, BO-126, BO-128, BO-129, BO-135, POS-009 |
-
-**Parameters**
-
-| Name | In | Required | Type | Notes |
-|---|---|---|---|---|
-| venueId | query |  | string (uuid) |  |
-| saleBoardKind | query |  | SaleBoardKind: enum (ticketing, fnb, retail, mixed) |  |
-| pageSize | query |  | integer |  |
-| cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
-
-**Response**: `object`
-
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| items | array of Workstation | yes |  |
-| items[].id | string (uuid) | yes |  |
-| items[].code | string | yes | (max length 64) |
-| items[].name | string | yes | (max length 200) |
-| items[].venueId | string (uuid) | yes |  |
-| items[].regionId | string (uuid) | yes |  |
-| items[].departmentId | string (uuid) |  | (nullable) |
-| items[].scopePath | string | yes |  |
-| items[].saleBoard | object | yes | Determines which front end loads. |
-| items[].saleBoard.id | string (uuid) | yes |  |
-| items[].saleBoard.kind | SaleBoardKind: enum (ticketing, fnb, retail, mixed) | yes |  |
-| items[].saleBoard.name | string |  |  |
-| items[].accessPointId | string (uuid) |  | Inherited from the workstation, never selected by the operator. (nullable) |
-| items[].devices | array of DeviceBinding |  |  |
-| items[].devices[].kind | DeviceKind: enum (receiptPrinter, ticketPrinter, labelPrinter, cashDrawer, barcodeScanner, rfidReader, nfcReader, cardReader, …) | yes | mobileHandset (18.1.5, added 29 September): a staff phone or tablet running the staff app, registered for push and bound to no workstation. |
-| items[].devices[].driver | string | yes | Driver identifier. |
-| items[].devices[].identifier | string |  | Serial |
-| items[].devices[].isRequired | boolean |  | When true, the workstation refuses to open a shift if the device is absent. (default False) |
-| items[].currency | string | yes | Resolved from the region, not stored (ADR-0018, 24 August). (pattern ^[A-Z]{3}$) |
-| items[].currencyScale | integer | yes | Resolved from the region, not stored (ADR-0018, 24 August). (min 0; max 4) |
-| items[].timeZone | string | yes |  |
-| items[].deploymentProfile | DeploymentProfile: enum (terminalLocal, venueEdge, thin) |  | How this workstation obtains catalogue and inventory (ADR-0013). |
-| items[].edgeNodeId | string (uuid) |  | Present when deploymentProfile is venueEdge. (nullable) |
-| items[].healthScore | integer |  | Board 1 of the client's POS set. (min 0; max 100; read-only; nullable) |
-| items[].configurationProfileId | string (uuid) |  | Which profile this workstation runs, and at which version. (nullable) |
-| items[].catalogueState | CatalogueState |  | The workstation's local catalogue position. |
-| items[].catalogueState.appliedBundleVersion | string | yes |  |
-| items[].catalogueState.appliedAt | string (date-time) | yes |  |
-| items[].catalogueState.staleAfter | string (date-time) | yes | Beyond this the terminal refuses to trade. |
-| items[].catalogueState.isStale | boolean | yes |  |
-| items[].catalogueState.pendingBundleVersion | string |  | Published but not yet applied. (nullable) |
-| items[].offlineCapable | boolean |  | Derived from deploymentProfile. |
-| items[].isActive | boolean |  |  |
-| nextCursor | string |  |  |
-| hasMore | boolean | yes |  |
-
-**Responses**
-
-| Code | Shape | Meaning |
-|---|---|---|
-| 200 |  | Workstations |
-| 403 | Forbidden | Authenticated but not permitted at the requested scope |
-| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
-
-### recordDeviceHeartbeat
-
-**`POST /devices/{deviceId}/heartbeat`**: Device heartbeat and status
-
-Reports reachability and consumables — paper low, drawer open, reader offline. A required device that stops reporting blocks shift open, which is better discovered before a queue forms than during one.
-**Called by the device, never by a person** (pull audit R100). The caller is the enrolled device named in the path, and the workstation this is scoped to is the one that device is bound to — there is no other workstation to resolve, and a back-office session has none. A screen that shows device state reads it through `listDevices`, `getDevice` or `getWorkstationHealth`; it does not call this.
-
-|  |  |
-|---|---|
-| Permission | `None` |
-| Scope level | workstation |
-| Part of slice | core |
-| Wave | 1 |
-| Offline | no |
-| Conflict policy | append |
-| Reads | `platform.device` |
-| Writes | `platform.device`, `platform.outbox` |
-| Called by | BO-036, BO-124, BO-125, POS-016 |
-| State model | Registered device ([states/registered-device.yaml](../../../states/registered-device.yaml)): moves `offline` -> `online`, `online` -> `error`, `online` -> `consumableLow`, `consumableLow` -> `online`, `error` -> `online`, `online` -> `needsAttention`, `needsAttention` -> `online`, `online` -> `localMode`, `localMode` -> `online`, `offline` -> `localMode`, `unknown` -> `online` |
-
-**Parameters**
-
-| Name | In | Required | Type | Notes |
-|---|---|---|---|---|
-| deviceId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
-
-**Request body**
-
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| status | enum (online, offline, error, consumableLow, needsAttention, localMode) | yes | localMode: an access-control device validating from its offline package with its link to the platform down (ADR-0067; was access's device status). |
-| detail | string |  | (max length 500) |
-| firmwareVersion | string |  |  |
-| configurationVersion | string |  | Access configuration the device runs (ADR-0067). |
-| localRuleVersion | string |  | Admission rule package the device runs (ADR-0067). |
-| credentialSecurityPackageVersion | string |  | Credential security package the device runs (ADR-0067). |
-| scannerHealth | string |  | (max length 100) |
-| controllerHealth | string |  | (max length 100) |
-| cameraHealth | string |  | (max length 100) |
-| connectivity | string |  | (max length 100) |
-| recordedAt | string (date-time) | yes |  |
-
-**Responses**
-
-| Code | Shape | Meaning |
-|---|---|---|
-| 204 |  | Recorded |
-| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
-| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
-
 ### updateOutlet
 
 **`PATCH /outlets/{outletId}`**: Amend an outlet
@@ -2260,13 +2533,13 @@ Reports reachability and consumables — paper low, drawer open, reader offline.
 |---|---|
 | Permission | `REGION_CONFIGURE` |
 | Scope level | venue |
-| Part of slice | setup, makes `platform.outlet` non-empty |
+| Part of slice | setup, changes rows of `platform.outlet` that another operation creates |
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `platform.outlet` |
 | Writes | `cache:idempotency`, `platform.outlet` |
-| Called by | BO-044, BO-063 |
+| Called by | BO-044, BO-063, BO-731 |
 
 **Parameters**
 
@@ -2280,12 +2553,20 @@ Reports reachability and consumables — paper low, drawer open, reader offline.
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | name | string |  | (max length 200) |
+| nameTranslations | OutletNameTranslations |  | The outlet's name in other languages, keyed by ISO 639-1 code (decided 2 October 2026, Chinmay, batch 2 #26, BO-044: "Yes, where a country needs it: the local language plus English"; DEC-031; CHG-CSP… |
 | stockLocationId | string (uuid) |  |  |
 | costCenterId | string (uuid) |  |  |
+| departmentId | string (uuid) |  | (nullable) |
+| outletType | OutletType: enum (fineDining, casualDining, quickService, coffeeShop, barLounge, foodCourt, buffet, commissary, …) |  | How an F&B or retail outlet trades, which switches features on or off (decided 2 October 2026, Chinmay, batch 6 set 6a, BO-729: "Add both fields: outlet type and department (DI-319)"; DEC-196; CHG-CS… |
+| paymentTiming | OutletPaymentTiming: enum (sendFirst, payFirst) |  | When an F&B order is paid, per outlet (decided 2 October 2026, Chinmay, batch 1, POS-021: "Two configurations: one takes the bill (payment) first, the other sends first and charges after"; DEC-064; C… |
+| admissionContext | OutletAdmissionContext: enum (insideVenue, standalone) |  | Whether an outlet sits behind the admission gate (decided 2 October 2026, Chinmay, batch 1, WEB-036: "Inside the venue, a ticket is needed. |
+| producesForOutletIds | array of string (uuid) |  | Replaces the whole list of outlets this one produces for (CHG-CSP-005). |
+| saleBoardId | string (uuid) |  | (nullable) |
 | openingHours | array of OpeningHoursWindow |  | Replaces the whole weekly pattern. |
 | openingHours[].day | enum (mon, tue, wed, thu, fri, sat, sun) | yes |  |
 | openingHours[].from | string | yes | Local time, 24-hour HH:MM, when the outlet opens. (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$) |
 | openingHours[].to | string | yes | Local time, 24-hour HH:MM, when the outlet closes. (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$) |
+| openingHours[].endsNextDay | boolean |  | A late-night window is one window past midnight (decided 2 October 2026, Chinmay, batch 6 set 6a, BO-731; DEC-197; CHG-CSP-007). (default False) |
 | isActive | boolean |  |  |
 
 **Response**: `Outlet`
@@ -2294,16 +2575,24 @@ Reports reachability and consumables — paper low, drawer open, reader offline.
 |---|---|---|---|
 | id | string (uuid) | yes | (read-only) |
 | code | string | yes | (max length 64) |
-| name | string | yes | (max length 200) |
+| name | string | yes | The outlet's name in English. (max length 200) |
+| nameTranslations | OutletNameTranslations |  | The outlet's name in other languages, keyed by ISO 639-1 code (decided 2 October 2026, Chinmay, batch 2 #26, BO-044: "Yes, where a country needs it: the local language plus English"; DEC-031; CHG-CSP… |
 | venueId | string (uuid) | yes |  |
 | kind | OutletKind: enum (shop, restaurant, bar, cafe, kiosk, gameFloor, ticketOffice, mobile) | yes |  |
+| outletType | object |  | The service model (DI-319; DEC-196; CHG-CSP-005). (nullable) |
+| departmentId | string (uuid) |  | The department the outlet belongs to (DI-319: department, sub-department, cost centre and status; DEC-196; CHG-CSP-005): an OrgUnit of kind department, as Workstation.departmentId. (nullable) |
 | zone | string |  | (nullable) |
 | stockLocationId | string (uuid) |  | Where this outlet draws stock from. (nullable) |
 | costCenterId | string (uuid) |  | Revenue and cost attribution. (nullable) |
+| paymentTiming | object |  | Pay first, or send to the kitchen first then pay (DEC-064; CHG-CSP-004). (default sendFirst) |
+| admissionContext | object |  | Inside the venue (needs an admission ticket) or standalone (no ticket) (DEC-070; CHG-CSP-004). (default insideVenue) |
+| producesForOutletIds | array of string (uuid) |  | One kitchen serving several outlets is a producing outlet (decided 2 October 2026, Chinmay, batch 6 set 5, BO-134: "Yes: via a producing outlet (one kitchen outlet produces for several)"; DEC-188; CH… (default []) |
+| saleBoardId | string (uuid) |  | The till layout every till in this outlet uses, unless a till overrides it (decided 2 October 2026, Chinmay, batch 6 set 4, BO-109: "Per outlet, with a till override"; DEC-183; CHG-CSP-006). (nullable) |
 | openingHours | array of OpeningHoursWindow |  | The weekly pattern, one entry per window. |
 | openingHours[].day | enum (mon, tue, wed, thu, fri, sat, sun) | yes |  |
 | openingHours[].from | string | yes | Local time, 24-hour HH:MM, when the outlet opens. (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$) |
 | openingHours[].to | string | yes | Local time, 24-hour HH:MM, when the outlet closes. (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$) |
+| openingHours[].endsNextDay | boolean |  | A late-night window is one window past midnight (decided 2 October 2026, Chinmay, batch 6 set 6a, BO-731; DEC-197; CHG-CSP-007). (default False) |
 | isActive | boolean |  |  |
 
 **Responses**
@@ -2314,6 +2603,7 @@ Reports reachability and consumables — paper low, drawer open, reader offline.
 | 400 | BadRequest | Validation failed |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 422 |  | As createOutlet: a missing required local-language name (local-name-required), a window that ends before it starts (window-ends-before-start), or a producing-outlet list naming the outlet itself, ano… |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### updateSaleBoard
@@ -2327,14 +2617,14 @@ Changes reach terminals with the next catalogue bundle, not immediately — a bo
 |---|---|
 | Permission | `WORKSTATION_CONFIGURE` |
 | Scope level | venue |
-| Part of slice | setup, makes `platform.sale_board`, `platform.sale_board_page`, `platform.sale_board_tile` non-empty |
+| Part of slice | setup, changes rows of `platform.sale_board`, `platform.sale_board_page`, `platform.sale_board_tile` that another operation creates |
 | Wave | 1 |
 | Offline | no |
 | Config scope | venue |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `platform.sale_board` |
 | Writes | `cache:idempotency`, `platform.sale_board`, `platform.sale_board_page`, `platform.sale_board_tile` |
-| Called by | BO-109, BO-116, BO-117, BO-118, BO-124, BO-125, BO-126 |
+| Called by | BO-109, BO-116, BO-124, BO-125, BO-126 |
 
 **Parameters**
 
@@ -2490,6 +2780,9 @@ Every table this service owns that the slice reads or writes, with its columns a
 | sla_due_at | timestamptz | no |  |
 | is_sla_breached | boolean | no |  |
 | expires_at | timestamptz | no |  |
+| assigned_to_principal_id | uuid | no | Who claimed or was assigned the request in a shared queue (assignApprovalRequest; DI-723; CHG-CSP-042). |
+| assigned_to_department_id | uuid | no | The department queue it was assigned to, where it went to a department rather than a person (CHG-CSP-042). |
+| assigned_at | timestamptz | no |  |
 | requested_at | timestamptz | yes |  |
 | completed_at | timestamptz | no |  |
 | ai_assessment | jsonb | no | AI context for the reviewer, never an input to the decision (11.1.73 to 11.1.75; MoM 8 September; 29 September, build pass, group G2). |
@@ -2514,6 +2807,8 @@ Every table this service owns that the slice reads or writes, with its columns a
 | escalate_after_minutes | integer | no |  |
 | escalate_to_role_ids | text[] | no | Role ids from identity.listRoles, as approverRoleIds. |
 | expires_after_minutes | integer | no | 11.1.53. |
+| subject_types | text[] | no | Which subjects of the kind this rule matches (decided 2 October 2026, Chinmay; CHG-CSP-028, CHG-CSP-036, CHG-CSP-031): the CreateApprovalRequest.subjectType values, for example topologyPublication or… |
+| signature_methods | text[] | no | The signature methods this level accepts, where requiresSignature is true (design-notes correction on ADM-344, Block B: "Configuring which stages need a signature is a policy write"; CHG-CSP-045). |
 | external_provider_id | uuid | no | 11.1.65 (29 September). |
 | matrix_id | uuid | yes | Points at approvals.matrix. |
 
@@ -2523,6 +2818,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 |---|---|---|---|
 | state | text | yes | The target state, not the current one. |
 | reason | text | no | Recorded on the tenancy.device_audit row, not on the device. |
+| test_result | jsonb | no | The acceptance test, recorded on the move to provisioned (DEC-245; CHG-CSP-011). |
 | id | uuid | yes |  |
 | kind | text | yes |  |
 | driver | text | yes | Built to an open standard where one exists — ESC/POS, UnifiedPOS, OSDP. |
@@ -2555,6 +2851,12 @@ Every table this service owns that the slice reads or writes, with its columns a
 | enrolment_state | text | no | BL-160. |
 | retired_at | timestamptz | no | Set when enrolmentState reaches retired, and null otherwise. |
 | configuration_profile_id | uuid | no | The profile this device was provisioned with. |
+| approval_status | text | no | A new device waits for approval before it may go live (decided 2 October 2026, Chinmay, critical set 1, BO-196: "Secure enrolment code + pending approval"; DEC-241; CHG-CSP-011; MoM 15 September, DI-… |
+| enrolment_code | text | no | A one-time code the device must present to enrol (DEC-241; CHG-CSP-011). |
+| enrolment_code_expires_at | timestamptz | no | When the enrolment code stops working (24 hours after registration, proposed; client to correct). |
+| tested_by_principal_id | uuid | no | Who recorded the device's acceptance test (DeviceEnrolment.testResult on the move to provisioned). |
+| approved_by_principal_id | uuid | no | Who approved the device into production, never the person who tested it (decided 2 October 2026, Chinmay, critical set 1, BO-203: "Approver must differ from the tester"; DEC-245; CHG-CSP-011). |
+| approved_at | timestamptz | no |  |
 
 ### `platform.device_heartbeat`
 
@@ -2589,12 +2891,19 @@ Every table this service owns that the slice reads or writes, with its columns a
 |---|---|---|---|
 | id | uuid | yes |  |
 | code | text | yes |  |
-| name | text | yes |  |
+| name | text | yes | The outlet's name in English. |
+| name_translations | jsonb | no |  |
 | venue_id | uuid | yes |  |
 | kind | text | yes |  |
+| outlet_type | text | no | The service model (DI-319; DEC-196; CHG-CSP-005). |
+| department_id | uuid | no | The department the outlet belongs to (DI-319: department, sub-department, cost centre and status; DEC-196; CHG-CSP-005): an OrgUnit of kind department, as Workstation.departmentId. |
 | zone | text | no |  |
 | stock_location_id | uuid | no | Where this outlet draws stock from. |
 | cost_center_id | uuid | no | Revenue and cost attribution. |
+| payment_timing | text | no | Pay first, or send to the kitchen first then pay (DEC-064; CHG-CSP-004). |
+| admission_context | text | no | Inside the venue (needs an admission ticket) or standalone (no ticket) (DEC-070; CHG-CSP-004). |
+| produces_for_outlet_ids | text[] | no | One kitchen serving several outlets is a producing outlet (decided 2 October 2026, Chinmay, batch 6 set 5, BO-134: "Yes: via a producing outlet (one kitchen outlet produces for several)"; DEC-188; CH… |
+| sale_board_id | uuid | no | The till layout every till in this outlet uses, unless a till overrides it (decided 2 October 2026, Chinmay, batch 6 set 4, BO-109: "Per outlet, with a till override"; DEC-183; CHG-CSP-006). |
 | is_active | boolean | no |  |
 
 ### `platform.region_settings`
@@ -2609,6 +2918,12 @@ Every table this service owns that the slice reads or writes, with its columns a
 | number_format | text | no |  |
 | fiscal_year_start_month | integer | yes | Varies by country. |
 | allowed_ai_residencies | text[] | no | The region's compliance gate on AI providers (decided 28 September, audit R203; ADR-0009). |
+| ai_residency_class | text | no | The tenant's AI residency class (decided 2 October 2026, Chinmay, "AI residency: per-tenant residency class"; DEC-539; CHG-CSP-009; amends AI-D02 and ADR-0009 section 1). |
+| is_ai_residency_class_locked | boolean | no | Set by TICVAI at onboarding for a government, bank or health tenant (DEC-539), which must stay uaeOnly. |
+| ai_residency_opt_in | jsonb | no | The evidence a globalAllowed opt-in needs under PDPL Article 23 (DEC-539; CHG-CSP-009): the tenant's references to its vendor contract, its DPIA and the notice guests see. |
+| local_language_name_locales | text[] | no | The languages an outlet name must also be given in, in this country (decided 2 October 2026, Chinmay, batch 2 #26: "English plus the local language where the country needs it"; DEC-031; CHG-CSP-005). |
+| required_billing_documents | jsonb | no | Which documents a TICVAI customer's billing entity must upload, in this country (decided 2 October 2026, Chinmay, batch 6 set 7, ADM-411: "Trade licence always; VAT certificate when a TRN is entered;… |
+| minor_age_threshold | integer | no | The age below which a guest is a minor here, set per country (decided 2 October 2026, Chinmay, critical set 1, BO-187: "Guardian consent on the venue's form; minor age per country"; DEC-237; CHG-CSP-… |
 | placement | jsonb | no |  |
 | cell_name | text | no | The cell serving this region. |
 | id | uuid | yes | Synthesised key. |
@@ -2669,6 +2984,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | segregated_access | jsonb | no | CF-130. |
 | alerting | jsonb | no | CF-134. |
 | display_currencies | text[] | no | Which currencies this venue shows guests (decided 28 September, audit R120 (a)). |
+| charge_currencies | text[] | no | Which currencies a guest may select and pay in (decided 2 October 2026, Chinmay; CHG-FIN-001; MoM 10 Aug 2026 4.7 option (b), DI-211). |
 | cart_lease_seconds | integer | no | How long a cart holds capacity (decided 28 September, audit R169): 15 minutes, the default catalogue.acquireInventoryHold takes for ttlSeconds. |
 | cart_hold_extension_minutes | integer | no | How long one orders.extendCart extension adds. |
 | cart_max_extensions | integer | no | How many extensions a cart may take before extensionCapReached (Cart.maxExtensions). |
@@ -2677,6 +2993,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | reschedule_cutoff_hours | integer | no | Hours before the original performance after which an order can no longer be rescheduled (orders.rescheduleOrder, outsideRescheduleWindow). |
 | reservation_max_extensions | integer | no | How many times orders.extendReservation may extend one reservation. |
 | shift_variance_threshold | numeric(18,4) | no | Over or short at shift close beyond which the shift waits in pendingVariance for shift.acceptShiftVariance. |
+| cash_drawer_limit | text | no | The most cash a till drawer should hold before some is lifted to the safe (decided 2 October 2026, Chinmay, batch 6 set 3, BO-042: "Add drawer limit setting (warn + offer cash lift)"; DEC-179; CHG-CS… |
 | catalogue | jsonb | no |  |
 | inventory | jsonb | no |  |
 | seating | jsonb | no |  |
@@ -2698,8 +3015,11 @@ Every table this service owns that the slice reads or writes, with its columns a
 | venue_id | uuid | yes |  |
 | region_id | uuid | yes |  |
 | department_id | uuid | no |  |
+| outlet_id | uuid | no | The outlet this till stands in (CHG-CSP-006). |
 | scope_path | text | yes |  |
 | sale_board | jsonb | yes | Determines which front end loads. |
+| sale_board_source | text | no | Where saleBoard came from (decided 2 October 2026, Chinmay, BO-109: "Per outlet, with a till override"; DEC-183; CHG-CSP-006): outlet when the till uses its outlet's layout, workstation when this til… |
+| cash_drawer_limit | text | no | This till's drawer limit, overriding the venue's (VenueSettings.cashDrawerLimit; DEC-179; CHG-CSP-016). |
 | access_point_id | uuid | no | Inherited from the workstation, never selected by the operator. |
 | time_zone | text | yes |  |
 | deployment_profile | text | no |  |
@@ -2727,6 +3047,38 @@ Every table this service owns that the slice reads or writes, with its columns a
 | scope_path | text | no |  |
 | id | uuid | yes | Synthesised key. |
 
+### `workforce.attendance`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes |  |
+| principal_id | uuid | yes |  |
+| assignment_id | uuid | no |  |
+| venue_id | uuid | no |  |
+| kind | text | yes |  |
+| occurred_at | timestamptz | yes | Device time — when it happened. |
+| recorded_at | timestamptz | no | When the server received it. |
+| access_point_id | uuid | no |  |
+| latitude | numeric | no |  |
+| longitude | numeric | no |  |
+| is_amended | boolean | no |  |
+| amended_by_principal_id | uuid | no | Who made the latest amendment. |
+| amendment_reason | text | no | The latest amendment's reason. |
+| original_occurred_at | timestamptz | no | The original is never overwritten. |
+| exception | text | no | Computed against the rota. |
+
+### `workforce.attendance_amendment`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes |  |
+| attendance_record_id | uuid | yes |  |
+| amended_by_principal_id | uuid | yes |  |
+| amended_at | timestamptz | yes |  |
+| occurred_at_before | timestamptz | yes | The record's time before this correction. |
+| occurred_at_after | timestamptz | yes | The time this correction set (correctedAt on the request). |
+| reason | text | yes |  |
+
 ### `workforce.rota_assignment`
 
 | Column | Type | Required | Notes |
@@ -2751,23 +3103,22 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-176 operations, added to this service in later releases without changing any of the above.
+181 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
 | accreditation | `cloneAccreditationProgramme`, `createAccreditationApplication`, `createAccreditationProgramme`, `createBadgePrintJob`, `decideAccreditationApplication`, `deliverAccreditationCredential`, `exportAccreditationData`, `getAccreditationApplication`, `getAccreditationExport`, `getAccreditationHolder`, `importAccreditationHolders`, `issueAccreditationCredential`, `issueMyAccreditationWalletPass`, `listAccessProfiles`, `listAccreditationAccessActivity`, `listAccreditationApplications`, `listAccreditationAudit`, `listAccreditationCredentials`, `listAccreditationDocuments`, `listAccreditationExports`, `listAccreditationHolders`, `listAccreditationIdentityConflicts`, `listAccreditationProgrammes`, `listBadgePrintJobs`, `listBadgeTemplates`, `listMyAccreditationApplications`, `listMyAccreditationCredentials`, `previewAccessImpact`, `renewAccreditation`, `replaceAccreditationCredential`, `resolveIdentityConflict`, `resubmitAccreditationApplication`, `setAccessProfile`, `setAccreditationNotificationRules`, `setAccreditationRequirements`, `setAccreditationStatus`, `setAccreditationValidity`, `setBadgeTemplate`, `setHolderAccess`, `submitAccreditationApplication`, `submitAccreditationDocument`, `updateAccreditationApplication`, `updateAccreditationHolder`, `updateAccreditationProgramme`, `verifyAccreditationCredential`, `verifyAccreditationDocument`, `withdrawAccreditationApplication` |
 | analytics | `getApprovalAnalytics` |
 | announcements | `acknowledgeAnnouncement`, `getAnnouncementReach`, `listAnnouncements`, `listStaffConversations`, `listStaffMessages`, `markStaffConversationRead`, `publishAnnouncement`, `sendStaffMessage` |
-| approvals | `actOnWorkflowInstance`, `approveUnifiedDecision`, `approveVersioningGovernance`, `createApprovalEvidencePackage`, `createAutomationAutonomouAction`, `getApprovalRecord`, `issueAccreditationBadge`, `listAccreditationBadges`, `listApprovalControlPolicies`, `listConditionDecisionLogic`, `listCrossModuleOrchestration`, `listProcessAutomationOpportunity`, `listRuleWorkflow`, `listSlaEscalationBottleneck`, `listSlaEscalationReminder`, `listWorkflow`, `listWorkflowAutonomouGovernance`, `listWorkflowExceptionFailure`, `listWorkflowInstanceProcess`, `listWorkflowProcessPerformance`, `setApprovalControlPolicy`, `setApprovalRetentionPolicy`, `setApprovalSlaPolicy`, `setApproverAvailability`, `setTriggerActionCross`, `setVisualBusinessRule`, `setVisualWorkflow`, `signApprovalDecision`, `simulateWorkflowTestingImpact` |
-| attendance | `amendAttendance`, `listAttendance`, `recordAttendance` |
+| approvals | `actOnWorkflowInstance`, `approveUnifiedDecision`, `approveVersioningGovernance`, `createApprovalEvidencePackage`, `createAutomationAutonomouAction`, `getApprovalRecord`, `issueAccreditationBadge`, `listAccreditationBadges`, `listApprovalControlPolicies`, `listAutomationExecutions`, `listConditionDecisionLogic`, `listCrossModuleOrchestration`, `listProcessAutomationOpportunity`, `listRuleWorkflow`, `listSlaEscalationBottleneck`, `listSlaEscalationReminder`, `listWorkflow`, `listWorkflowAutonomouGovernance`, `listWorkflowExceptionFailure`, `listWorkflowInstanceProcess`, `listWorkflowProcessPerformance`, `setApprovalControlPolicy`, `setApprovalRetentionPolicy`, `setApprovalSlaPolicy`, `setApproverAvailability`, `setTriggerActionCross`, `setVisualBusinessRule`, `setVisualWorkflow`, `signApprovalDecision`, `simulateWorkflowTestingImpact` |
+| attendance | `amendAttendance`, `listAttendance` |
 | delegation | `listApprovalDelegations`, `revokeApprovalDelegation` |
-| devices | `createDeviceFirmware`, `enrolDevice`, `getDeviceFirmware`, `getDeviceTelemetry`, `issueDeviceCredential`, `listDeviceAuditRecords`, `listDeviceFirmware`, `listDeviceTamperEvents`, `recordDeviceTamperEvent`, `revokeDeviceCredential`, `rollbackDeviceFirmware`, `setDeviceFirmwareStatus`, `startDeviceFirmwareRollout` |
+| devices | `approveDevice`, `createDeviceFirmware`, `enrolDevice`, `getDeviceFirmware`, `getDeviceTelemetry`, `issueDeviceCredential`, `listDeviceAuditRecords`, `listDeviceFirmware`, `listDeviceTamperEvents`, `recordDeviceTamperEvent`, `revokeDeviceCredential`, `rollbackDeviceFirmware`, `setDeviceFirmwareStatus`, `startDeviceFirmwareRollout` |
 | identity | `setRolePermissions` |
 | matrix | `listApprovalExternalProviders`, `listApprovalMatrices`, `listStepUpPolicies`, `setStepUpPolicy` |
-| region | `getRegionSettings` |
-| request | `escalateApprovalRequest`, `listApprovalExternalDispatches`, `listApprovalRequests`, `listApprovedActionExecutions`, `recordExternalApprovalDecision`, `resolveApprovedActionExecution`, `resubmitApprovalRequest`, `submitApprovalRequest`, `withdrawApprovalRequest` |
-| rota | `requestShiftSwap`, `updateRotaAssignment` |
+| request | `assignApprovalRequest`, `cancelApprovalRequest`, `escalateApprovalRequest`, `listApprovalExternalDispatches`, `listApprovalRequests`, `listApprovedActionExecutions`, `recordExternalApprovalDecision`, `reopenApprovalRequest`, `resolveApprovedActionExecution`, `resubmitApprovalRequest`, `submitApprovalRequest`, `withdrawApprovalRequest` |
+| rota | `requestShiftSwap` |
 | scope | `getOrgUnit` |
-| tenancy | `deployConfigurationProfile`, `getConfigurationProfile`, `getConnectivityPolicy`, `getOfflinePolicy`, `getVenueSettingsDefaults`, `listAuditRecords`, `listCellEndpoints`, `listConfigurationProfiles`, `listDataRetentionSettings`, `listProfileDeployments`, `resolveTenantHost`, `setConfigurationProfile`, `setConnectivityThresholds`, `setDataRetentionSetting`, `setOfflinePolicy`, `setTenantDomainMapping`, `setVenueSettingsDefaults` |
+| tenancy | `deployConfigurationProfile`, `getConfigurationProfile`, `getConnectivityPolicy`, `getOfflinePolicy`, `getVenueSettings`, `getVenueSettingsDefaults`, `listAuditRecords`, `listCellEndpoints`, `listConfigurationProfiles`, `listDataRetentionSettings`, `listProfileDeployments`, `resolveTenantHost`, `setConfigurationProfile`, `setConnectivityThresholds`, `setDataRetentionSetting`, `setOfflinePolicy`, `setTenantDomainMapping` |
 | workforce | `broadcastToGuests`, `claimOpenShift`, `getEmployee`, `getFieldOwnership`, `getLabourCost`, `getStaffingCoverage`, `listEmployees`, `listIntegrationSources`, `listJobTitles`, `listLabourBudgets`, `listLeaveBalances`, `listLeaveRequests`, `listLeaveTypes`, `listOpenShifts`, `listShiftPatterns`, `listShiftSwapRequests`, `listShiftTemplates`, `listSyncConflicts`, `listSyncRuns`, `listTrainingRecords`, `listWorkAssignments`, `requestLeave`, `resolveSyncConflict`, `setFieldOwnership`, `setIntegrationSource`, `setJobTitle`, `setLabourBudget`, `setLeaveType`, `setShiftPattern`, `setShiftTemplate`, `setStaffingRules`, `setWorkAssignment`, `startSync`, `validateWorkforceCompliance` |
-| workstation | `getDevice`, `getOutlet`, `getWorkstation`, `registerDevice` |
+| workstation | `getDevice`, `getOutlet`, `getWorkstation`, `listOutlets`, `listWorkstations`, `recordDeviceHeartbeat`, `registerDevice` |

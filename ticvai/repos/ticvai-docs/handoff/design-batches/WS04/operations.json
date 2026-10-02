@@ -139,25 +139,6 @@
   "requestBody": null,
   "responds": "Page"
  },
- "listMediaTypeCredential": {
-  "method": "GET",
-  "path": "/media-type-credential",
-  "contract": "access",
-  "summary": "Media Type & Credential Technology Registry",
-  "permission": "SCOPE_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "MediaTypeCredentialTechnologyRegistryView"
- },
  "listMediaTypeTechnology": {
   "method": "GET",
   "path": "/media-type-technology",
@@ -314,25 +295,6 @@
   ],
   "requestBody": "RfidNfcConfigurationInput",
   "responds": "RfidNfcConfigurationView"
- },
- "setRfidNfcCard": {
-  "method": "PUT",
-  "path": "/rfid-nfc-card",
-  "contract": "access",
-  "summary": "RFID, NFC, Card & Wristband Media Designer",
-  "permission": "ACCESS_POINT_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "RfidNfcCardWristbandMediaDesignerInput",
-  "responds": "RfidNfcCardWristbandMediaDesignerView"
  },
  "setVerificationMethodPolicy": {
   "method": "PUT",

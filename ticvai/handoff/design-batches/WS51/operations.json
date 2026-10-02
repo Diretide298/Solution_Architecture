@@ -227,48 +227,5 @@
   ],
   "requestBody": null,
   "responds": "TargetingEligibilityCommandCenterView"
- },
- "setEligibilityRule": {
-  "method": "PUT",
-  "path": "/eligibility-rule",
-  "contract": "promotions",
-  "summary": "Eligibility Rule Builder",
-  "permission": "PRICE_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "EligibilityRuleBuilderInput",
-  "responds": "EligibilityRuleBuilderView"
- },
- "setResaleEligibilityRule": {
-  "method": "PUT",
-  "path": "/resale-eligibility-rule",
-  "contract": "orders",
-  "summary": "Resale Eligibility Rule Configuration",
-  "permission": "ORDER_CREATE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "ResaleEligibilityRuleConfigurationInput",
-  "responds": "ResaleEligibilityRuleConfigurationView"
  }
 }

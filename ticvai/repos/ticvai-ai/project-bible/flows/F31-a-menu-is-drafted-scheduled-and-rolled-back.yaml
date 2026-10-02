@@ -47,7 +47,7 @@ steps:
   - step: 3
     screen: BO-111
     action: An item's recipe changed, so its allergens are re-verified.
-    operations: [updateMenu]
+    operations: [getAllergenVerification]
     outcome: >
       **A substituted ingredient changes the allergen claim.** BL-127 built allergens without
       linking substitution, and `verifyAllergens` is the one remaining gap this step names.
@@ -82,6 +82,7 @@ steps:
 
   - step: 7
     screen: BO-045
+    crossesDevice: true
     action: The new price is wrong on eleven items. The manager rolls back.
     operations: [rollbackMenu]
     outcome: >

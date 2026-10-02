@@ -39,10 +39,11 @@ steps:
   screen: BO-156
   action: Works in Entry, Exit & Re-entry Rules
   operations:
-  - listEntryExitRule
+  - listAdmissionRules
   outcome: Configure admission quantity and journey sequencing. The source matrix explicitly requires
     configurable quantities for entry, exit and same-day re-entry, anti- passback intervals, required
     exit before re-entry, and required entry before exit.
+  note: '**Repointed 2 October (CHG-WIR-001).** Entry, exit and re-entry limits are a block of the admission profile, read from listAdmissionRules; the separate listEntryExitRule shape was removed from BO-156.'
 - step: 5
   screen: BO-154
   action: Returns to the board's landing screen
@@ -91,10 +92,11 @@ steps:
   screen: BO-160
   action: Works in Multi-Park & Crossover Rules
   operations:
-  - listMultiParkCrossover
+  - listAdmissionRules
   outcome: Configure complex access between multiple parks/venues. The matrix specifically requires multi-park
     access on different days, same-day crossover, park-specific entry quantities and conditional access
     based on previous park admission.
+  note: '**Repointed 2 October (CHG-WIR-001).** Crossover is a block of the admission profile, read from listAdmissionRules; listMultiParkCrossover, with differently named fields, was removed from BO-160.'
 - step: 13
   screen: BO-154
   action: Returns to the board's landing screen

@@ -293,7 +293,7 @@
   "states": {
    "loading": "The virtual ticket list; the counts above it resolve separately.",
    "error": "Could not load. Names which read failed and leaves the virtual ticket untouched.",
-   "emptyFirstRun": "No virtual ticket yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No virtual ticket yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the virtual ticket are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -302,18 +302,6 @@
     "operationId": "listVirtualTicket",
     "contract": "access",
     "purpose": "Virtual Ticket Command Center",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "listVirtualTicketStatus",
-    "contract": "access",
-    "purpose": "Virtual Ticket Status & Lifecycle Model",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "listVirtualTicketArchitecture",
-    "contract": "access",
-    "purpose": "Virtual Ticket Architecture Testing, Governance & Audit",
     "trigger": "onLoad"
    }
   ],
@@ -324,6 +312,20 @@
    "workshopBoard": "wireframes/WS165 Ticket Media   Credential Management Board 1.dc.html#bo-334"
   },
   "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 4. 29 of 39 labels bound to a contract property; 50 of 69 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "gaps": [
+   {
+    "operation": "listVirtualTicketArchitecture",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): listVirtualTicketStatus and listVirtualTicketArchitecture are the reads of BO-336 and BO-343; the hub needs neither, and the second needs AUDIT_VIEW, which operations staff lack (design-notes correction venue-operations BO-334).",
+    "source": "screens/P08-venue-back-office.yaml#BO-334 | contracts/spine/access.yaml#listVirtualTicketArchitecture"
+   },
+   {
+    "operation": "listVirtualTicketStatus",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): listVirtualTicketStatus and listVirtualTicketArchitecture are the reads of BO-336 and BO-343; the hub needs neither, and the second needs AUDIT_VIEW, which operations staff lack (design-notes correction venue-operations BO-334).",
+    "source": "screens/P08-venue-back-office.yaml#BO-334 | contracts/spine/access.yaml#listVirtualTicketArchitecture"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -644,6 +646,7 @@
     "provenance": "contract access.yaml PUT /ticket-status-transitions"
    }
   ],
+  "notes": "**The pack's 13 Virtual Ticket status names map onto the entitlement model (decided 2 October 2026 by Chinmay, DEC-266; CHG-CSP-033); no state is missing.** Reserved is Pending fulfilment (DEC-267).",
   "_platform": {
    "code": "P08",
    "audience": "staff",

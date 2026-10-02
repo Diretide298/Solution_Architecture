@@ -7,7 +7,7 @@
 | Tier | commerce: The sale path. Highest availability, highest write rate. |
 | Contracts | `orders`, `shift`, `payments` |
 | Schemas owned | `orders`, `payments` |
-| Operations in the slice | 83 of 288 |
+| Operations in the slice | 93 of 297 |
 | Scale | Write-heavy, spiky, latency-critical. The one that autoscales. |
 | If it is down | Down means no sales. Highest availability target in the platform. |
 
@@ -27,6 +27,7 @@
 |---|---|
 | [AccessService](AccessService.md) | `access.entitlement`, `access.scan_event` |
 | [CatalogueService](CatalogueService.md) | `catalogue.channel_capacity`, `catalogue.entitlement_template`, `catalogue.group_package`, `catalogue.inventory_hold`, `catalogue.performance`, `catalogue.price_list`, `catalogue.product`, `catalogue.variant`, `promotions.coupon_campaign`, `promotions.coupon_code`, `promotions.promotion` |
+| [CrossRegionService](CrossRegionService.md) | `sync.rejection` |
 | [IdentityService](IdentityService.md) | `identity.delegated_access`, `identity.principal`, `pii.subject` |
 | [LedgerService](LedgerService.md) | `ledger.fx_rate`, `ledger.posting`, `ledger.tax_invoice_line` |
 | [MarketingService](MarketingService.md) | `marketing.consent_question`, `marketing.consent_question_version`, `marketing.consent_record` |
@@ -37,88 +38,98 @@
 | Group | Operation | Method | Path | Part | Wave | Called by |
 |---|---|---|---|---|---|---|
 | cart | [`abandonCart`](#abandoncart) | DELETE | `/carts/{cartId}` | core | 1 | GST-041, WEB-010 |
-| cart | [`addCartLine`](#addcartline) | POST | `/carts/{cartId}/lines` | core | 1 | GST-007, GST-008, GST-009, GST-026, GST-027, GST-032 … |
+| cart | [`addCartLine`](#addcartline) | POST | `/carts/{cartId}/lines` | core | 1 | GST-007, GST-008, GST-026, GST-027, GST-032, GST-048 … |
 | cart | [`applyCartPromoCode`](#applycartpromocode) | POST | `/carts/{cartId}/promo-codes` | core | 1 | GST-041, WEB-010 |
-| cart | [`checkoutCart`](#checkoutcart) | POST | `/carts/{cartId}/checkout` | core | 1 | GST-009, GST-026, GST-027, GST-032, GST-041, KSK-006 … |
+| cart | [`checkoutCart`](#checkoutcart) | POST | `/carts/{cartId}/checkout` | core | 1 | GST-009, GST-032, GST-041, KSK-006, PTR-010, WEB-010 … |
 | cart | [`claimCart`](#claimcart) | POST | `/carts/{cartId}/claim` | core | 1 | GST-041, WEB-016 |
 | cart | [`createCart`](#createcart) | POST | `/carts` | core | 1 | WEB-010 |
 | cart | [`extendCart`](#extendcart) | POST | `/carts/{cartId}/extend` | core | 1 | GST-041, WEB-010 |
 | cart | [`getCart`](#getcart) | GET | `/carts/{cartId}` | core | 1 | GST-007, GST-009, GST-032, GST-041, GST-053, KSK-006 … |
 | cart | [`removeCartLine`](#removecartline) | DELETE | `/carts/{cartId}/lines/{lineId}` | core | 1 | GST-041, PTR-010, WEB-010 |
 | cart | [`updateCartLine`](#updatecartline) | PATCH | `/carts/{cartId}/lines/{lineId}` | core | 1 | GST-041, PTR-010, WEB-010 |
-| cash | [`createCashMovement`](#createcashmovement) | POST | `/shifts/{shiftId}/cash-movements` | core | 1 | BO-039, BO-040, BO-041, EMP-009, POS-001, POS-007 … |
-| cash | [`listCashMovements`](#listcashmovements) | GET | `/shifts/{shiftId}/cash-movements` | core | 1 | BO-039, BO-040, BO-041, BO-042, EMP-003, EMP-008 … |
+| cash | [`createCashMovement`](#createcashmovement) | POST | `/shifts/{shiftId}/cash-movements` | core | 1 | BO-041, BO-042, POS-017, POS-018 |
+| cash | [`listCashMovements`](#listcashmovements) | GET | `/shifts/{shiftId}/cash-movements` | core | 1 | BO-039, BO-040, BO-041, EMP-008, EMP-009, POS-007 … |
+| drafted | [`listGroupArrivalCheck`](#listgrouparrivalcheck) | GET | `/group-arrival-check` | core | 1 | BO-280, POS-031 |
 | dunning | [`listMyPaymentIssues`](#listmypaymentissues) | GET | `/guests/me/payment-issues` | core | 2 | GST-015, WEB-023 |
 | dunning | [`retryMyDunningPayment`](#retrymydunningpayment) | POST | `/dunning-cases/{caseId}/retry` | core | 2 | GST-015, WEB-023 |
-| order | [`appendEntitlementToMedia`](#appendentitlementtomedia) | POST | `/media/{mediaCode}/entitlements` | core | 1 | BO-027, CMS-010, EMP-036, POS-010 |
-| order | [`applyManualDiscount`](#applymanualdiscount) | POST | `/orders/{orderId}/discounts` | core | 1 | BO-022, BO-023, BO-026, BO-047, EMP-014, EMP-034 … |
-| order | [`claimTicketTransfer`](#claimtickettransfer) | POST | `/ticket-transfers/{transferId}/claim` | core | 1 | GST-014, WEB-030 |
-| order | [`createOrder`](#createorder) | POST | `/orders` | core | 1 | BO-022, BO-023, BO-026, BO-047, BO-130, EMP-014 … |
-| order | [`exchangeOrderLines`](#exchangeorderlines) | POST | `/orders/{orderId}/exchanges` | core | 1 | BO-022, BO-023, BO-026, BO-047, EMP-014, EMP-034 … |
-| order | [`getMediaEntitlements`](#getmediaentitlements) | GET | `/media/{mediaCode}/entitlements` | core | 1 | BO-027, CMS-010, EMP-036, POS-010 |
-| order | [`getOrder`](#getorder) | GET | `/orders/{orderId}` | core | 1 | BO-022, BO-023, BO-026, BO-047, EMP-014, EMP-034 … |
+| order | [`appendEntitlementToMedia`](#appendentitlementtomedia) | POST | `/media/{mediaCode}/entitlements` | core | 1 | BO-027, EMP-036, POS-010 |
+| order | [`applyManualDiscount`](#applymanualdiscount) | POST | `/orders/{orderId}/discounts` | core | 1 | BO-022, BO-023, BO-026, BO-047, EMP-034, POS-002 … |
+| order | [`claimTicketTransfer`](#claimtickettransfer) | POST | `/ticket-transfers/{transferId}/claim` | core | 2 | GST-014 |
+| order | [`createOrder`](#createorder) | POST | `/orders` | core | 1 | BO-022, BO-026, BO-047, EMP-034, GST-009, POS-002 … |
+| order | [`exchangeOrderLines`](#exchangeorderlines) | POST | `/orders/{orderId}/exchanges` | core | 1 | BO-022, BO-023, BO-026, BO-047, BO-315, EMP-034 … |
+| order | [`getMediaEntitlements`](#getmediaentitlements) | GET | `/media/{mediaCode}/entitlements` | core | 1 | BO-027, EMP-036, POS-010 |
+| order | [`getOrder`](#getorder) | GET | `/orders/{orderId}` | core | 1 | BO-022, BO-023, BO-026, BO-047, BO-1147, BO-305 … |
 | order | [`getOrderCalendarEvent`](#getordercalendarevent) | GET | `/orders/{orderId}/calendar-event` | core | 3 | GST-018 |
-| order | [`getOrderStatement`](#getorderstatement) | GET | `/orders/{orderId}/statement` | core | 1 | BO-022, BO-023, BO-026, BO-047, EMP-014, EMP-034 … |
+| order | [`getOrderStatement`](#getorderstatement) | GET | `/orders/{orderId}/statement` | core | 1 | BO-022, BO-023, BO-026, BO-047, BO-305, EMP-014 … |
 | order | [`getVisitReminder`](#getvisitreminder) | GET | `/orders/{orderId}/reminder` | core | 3 | GST-018 |
-| order | [`holdOrder`](#holdorder) | POST | `/orders/{orderId}/hold` | core | 1 | BO-022, BO-023, BO-026, BO-047, EMP-014, EMP-034 … |
-| order | [`listOrders`](#listorders) | GET | `/orders` | core | 1 | ANL-009, BO-022, BO-023, BO-026, BO-047, BO-082 … |
-| order | [`modifyOrder`](#modifyorder) | POST | `/orders/{orderId}/modify` | core | 1 | BO-022, BO-023, BO-026, BO-047, BO-281, EMP-014 … |
+| order | [`holdOrder`](#holdorder) | POST | `/orders/{orderId}/hold` | core | 1 | BO-022, BO-026, BO-047, EMP-034, POS-002, POS-006 … |
+| order | [`listOrders`](#listorders) | GET | `/orders` | core | 1 | ANL-009, BO-022, BO-023, BO-026, BO-047, BO-101 … |
+| order | [`modifyOrder`](#modifyorder) | POST | `/orders/{orderId}/modify` | core | 1 | BO-022, BO-023, BO-026, BO-047, BO-281, BO-315 … |
 | order | [`reprintOrder`](#reprintorder) | POST | `/orders/{orderId}/reprints` | core | 1 | BO-022, BO-023, BO-026, BO-047, EMP-014, EMP-034 … |
-| order | [`rescheduleOrder`](#rescheduleorder) | POST | `/orders/{orderId}/reschedule` | core | 1 | BO-022, BO-023, BO-026, BO-047, BO-281, EMP-014 … |
-| order | [`resumeOrder`](#resumeorder) | POST | `/orders/{orderId}/resume` | core | 1 | BO-022, BO-023, BO-026, BO-047, EMP-014, EMP-034 … |
+| order | [`rescheduleOrder`](#rescheduleorder) | POST | `/orders/{orderId}/reschedule` | core | 1 | BO-022, BO-023, BO-026, BO-047, BO-281, BO-315 … |
+| order | [`resumeOrder`](#resumeorder) | POST | `/orders/{orderId}/resume` | core | 1 | BO-022, BO-026, BO-047, EMP-034, POS-002, POS-006 … |
 | order | [`setVisitReminder`](#setvisitreminder) | PUT | `/orders/{orderId}/reminder` | core | 3 | GST-018 |
-| order | [`transferOrderTickets`](#transferordertickets) | POST | `/orders/{orderId}/transfer` | core | 1 | GST-009, GST-010, GST-012, GST-013, GST-014, GST-019 … |
-| order | [`voidOrder`](#voidorder) | POST | `/orders/{orderId}/voids` | core | 1 | BO-022, BO-023, BO-026, BO-047, BO-319, EMP-014 … |
+| order | [`transferOrderTickets`](#transferordertickets) | POST | `/orders/{orderId}/transfer` | core | 1 | GST-012, GST-013, GST-014, GST-045, WEB-018, WEB-030 |
+| order | [`voidOrder`](#voidorder) | POST | `/orders/{orderId}/voids` | core | 1 | BO-022, BO-023, BO-026, BO-047, BO-319, EMP-034 … |
 | orders | [`createResaleListing`](#createresalelisting) | POST | `/resale-listings` | core | 1 | GST-067, WEB-030 |
 | orders | [`createTicketTemplate`](#createtickettemplate) | POST | `/ticket-templates` | setup | 1 | BO-346 |
 | orders | [`getBillingStatement`](#getbillingstatement) | GET | `/billing-statements/{statementId}` | core | 2 | GST-015, WEB-023 |
-| orders | [`getGroupBooking`](#getgroupbooking) | GET | `/group-bookings/{groupBookingId}` | core | 2 | BO-026, GST-072, WEB-031 |
+| orders | [`getGroupBooking`](#getgroupbooking) | GET | `/group-bookings/{groupBookingId}` | core | 1 | BO-026, BO-273, GST-072, POS-031, WEB-031 |
 | orders | [`getPaymentLink`](#getpaymentlink) | GET | `/payment-links/{token}` | core | 1 | ADM-593, GST-009, WEB-014 |
 | orders | [`issueWalletPass`](#issuewalletpass) | POST | `/wallet-passes` | core | 1 | GST-018, WEB-018 |
 | orders | [`listBillingStatements`](#listbillingstatements) | GET | `/billing-statements` | core | 2 | GST-015, WEB-023 |
-| orders | [`listMyOrders`](#listmyorders) | GET | `/my/orders` | core | 1 | GST-019, WEB-019 |
+| orders | [`listMyOrders`](#listmyorders) | GET | `/my/orders` | core | 1 | GST-014, GST-019, GST-035, WEB-017, WEB-019, WEB-026 … |
 | orders | [`listPaymentTokens`](#listpaymenttokens) | GET | `/payment-tokens` | core | 2 | GST-071, WEB-021 |
 | orders | [`payByLink`](#paybylink) | POST | `/payment-links/{token}/pay` | core | 1 | GST-009, WEB-014 |
+| orders | [`previewProductTickets`](#previewproducttickets) | GET | `/products/{productId}/ticket-previews` | core | 2 | BO-008, CMS-006 |
+| orders | [`recordGroupCheckIn`](#recordgroupcheckin) | POST | `/group-bookings/{groupBookingId}/check-in` | core | 1 | BO-280, POS-031 |
 | orders | [`reissueEntitlement`](#reissueentitlement) | POST | `/entitlements/{entitlementId}/reissue` | core | 1 | POS-026 |
 | orders | [`requestGroupBooking`](#requestgroupbooking) | POST | `/group-booking-requests` | core | 2 | GST-072, WEB-031 |
 | orders | [`setPaymentProvider`](#setpaymentprovider) | PUT | `/payment-providers` | setup | 1 | ADM-412, SGN-021 |
 | orders | [`shareEntitlement`](#shareentitlement) | POST | `/entitlements/{entitlementId}/share` | core | 1 | GST-072, WEB-018 |
 | orders | [`storePaymentToken`](#storepaymenttoken) | POST | `/payment-tokens` | core | 2 | GST-071, WEB-021 |
 | orders | [`updateTicketTemplate`](#updatetickettemplate) | PATCH | `/ticket-templates/{templateId}` | setup | 1 | BO-346 |
-| payment | [`addTip`](#addtip) | POST | `/payments/{paymentId}/tip` | core | 1 | BO-024, EMP-035, POS-005, PTR-012 |
+| payment | [`addTip`](#addtip) | POST | `/payments/{paymentId}/tip` | core | 1 | EMP-035, POS-005 |
 | payment | [`capturePayment`](#capturepayment) | POST | `/payments/{paymentId}/capture` | core | 1 | BO-024, EMP-035, POS-005, PTR-012 |
-| payment | [`createPayment`](#createpayment) | POST | `/payments` | core | 1 | BO-024, EMP-035, EMP-059, GST-009, GST-026, GST-027 … |
+| payment | [`createPayment`](#createpayment) | POST | `/payments` | core | 1 | EMP-035, EMP-059, GST-009, KSK-007, POS-002, POS-004 … |
 | payment | [`inquirePaymentStatus`](#inquirepaymentstatus) | POST | `/payments/{paymentId}/inquiry` | core | 1 | ADM-595, ADM-597, ADM-615, BO-024, EMP-035, GST-009 … |
 | payments | [`createInstalmentPlan`](#createinstalmentplan) | POST | `/instalment-plans` | core | 2 | BO-324, GST-015, WEB-023 |
 | payments | [`createPaymentProviderConnection`](#createpaymentproviderconnection) | POST | `/payment-providers` | setup | 1 | ADM-570, ADM-571 |
 | payments | [`listInstalmentPlans`](#listinstalmentplans) | GET | `/instalment-plans` | core | 2 | BO-324, GST-015, WEB-023 |
 | payments | [`setInstalmentPolicy`](#setinstalmentpolicy) | PUT | `/instalment-policy` | setup | 2 | ADM-603 |
-| policy | [`setRefundPolicy`](#setrefundpolicy) | PUT | `/venues/{venueId}/refund-policy` | setup | 1 | ADM-611, BO-062, BO-065, BO-1146, BO-318 |
-| refund | [`createRefund`](#createrefund) | POST | `/orders/{orderId}/refunds` | core | 1 | ADM-616, BO-022, BO-023, BO-026, BO-047, BO-1147 … |
-| refund | [`createRefundRequest`](#createrefundrequest) | POST | `/refund-requests` | core | 1 | ADM-610, BO-028, GST-067, WEB-019 |
-| refund | [`listOrderRefunds`](#listorderrefunds) | GET | `/orders/{orderId}/refunds` | core | 1 | ADM-609, BO-022, BO-023, BO-026, BO-047, EMP-014 … |
-| reservation | [`cancelReservation`](#cancelreservation) | DELETE | `/reservations/{reservationId}` | core | 2 | GST-016, GST-017, WEB-031 |
-| reservation | [`getReservation`](#getreservation) | GET | `/reservations/{reservationId}` | core | 2 | GST-016, GST-017, WEB-031 |
-| reservation | [`listReservations`](#listreservations) | GET | `/reservations` | core | 2 | GST-016, WEB-031 |
-| shift | [`acceptShiftVariance`](#acceptshiftvariance) | POST | `/shifts/{shiftId}/accept-variance` | core | 1 | BO-039, BO-040, EMP-003, EMP-009, POS-001, POS-007 … |
-| shift | [`adjustDepositBoxFloat`](#adjustdepositboxfloat) | POST | `/deposit-boxes/{boxId}/adjust-float` | core | 1 | POS-001, POS-007, POS-011, POS-012, POS-013 |
+| policy | [`setRefundPolicy`](#setrefundpolicy) | PUT | `/venues/{venueId}/refund-policy` | setup | 1 | BO-062, BO-065, BO-1146, BO-318 |
+| refund | [`createRefund`](#createrefund) | POST | `/orders/{orderId}/refunds` | core | 1 | ADM-610, ADM-616, BO-022, BO-023, BO-026, BO-047 … |
+| refund | [`createRefundRequest`](#createrefundrequest) | POST | `/refund-requests` | core | 1 | GST-067, WEB-019 |
+| refund | [`listOrderRefunds`](#listorderrefunds) | GET | `/orders/{orderId}/refunds` | core | 1 | ADM-609, ADM-616, BO-022, BO-023, BO-026, BO-047 … |
+| reservation | [`cancelReservation`](#cancelreservation) | DELETE | `/reservations/{reservationId}` | core | 1 | GST-016, GST-017, POS-031, WEB-031 |
+| reservation | [`convertReservation`](#convertreservation) | POST | `/reservations/{reservationId}/convert` | core | 1 | POS-031 |
+| reservation | [`createReservation`](#createreservation) | POST | `/reservations` | core | 1 | POS-031 |
+| reservation | [`extendReservation`](#extendreservation) | POST | `/reservations/{reservationId}/extend` | core | 1 | POS-031 |
+| reservation | [`getReservation`](#getreservation) | GET | `/reservations/{reservationId}` | core | 1 | GST-016, GST-017, POS-031, WEB-031 |
+| reservation | [`listReservations`](#listreservations) | GET | `/reservations` | core | 1 | GST-016, POS-031, WEB-031 |
+| shift | [`acceptShiftVariance`](#acceptshiftvariance) | POST | `/shifts/{shiftId}/accept-variance` | core | 1 | BO-040, BO-043, EMP-009, POS-007 |
 | shift | [`allocateDepositBox`](#allocatedepositbox) | POST | `/deposit-boxes` | core | 1 | POS-016 |
-| shift | [`approveShiftOpen`](#approveshiftopen) | POST | `/shifts/{shiftId}/approve-open` | core | 1 | BO-039, BO-040, EMP-003, EMP-009, POS-001, POS-007 … |
-| shift | [`closeDepositBoxes`](#closedepositboxes) | POST | `/deposit-boxes/close` | core | 1 | BO-024, POS-007 |
-| shift | [`closeShift`](#closeshift) | POST | `/shifts/{shiftId}/close` | core | 1 | BO-039, BO-040, EMP-003, EMP-009, POS-001, POS-007 … |
-| shift | [`getCurrentShift`](#getcurrentshift) | GET | `/shifts/current` | core | 1 | BO-039, BO-040, EMP-003, EMP-008, EMP-009, EMP-022 … |
-| shift | [`getShift`](#getshift) | GET | `/shifts/{shiftId}` | core | 1 | BO-039, BO-040, BO-041, BO-042, EMP-003, EMP-008 … |
-| shift | [`listDenominations`](#listdenominations) | GET | `/denominations` | core | 1 | BO-1065, POS-001, POS-007, POS-011, POS-012, POS-013 |
-| shift | [`listDepositBoxes`](#listdepositboxes) | GET | `/deposit-boxes` | core | 1 | BO-042, POS-015 |
-| shift | [`listShifts`](#listshifts) | GET | `/shifts` | core | 1 | BO-039, BO-040, BO-041, BO-042, BO-100, EMP-003 … |
-| shift | [`openShift`](#openshift) | POST | `/shifts` | core | 1 | BO-039, BO-040, EMP-003, EMP-009, POS-001, POS-007 … |
-| shift | [`recordNoSale`](#recordnosale) | POST | `/shifts/{shiftId}/no-sale` | core | 1 | BO-039, BO-040, BO-041, EMP-003, EMP-009, POS-001 … |
-| shift | [`reopenShift`](#reopenshift) | POST | `/shifts/{shiftId}/reopen` | core | 1 | BO-039, BO-040, EMP-003, EMP-009, POS-001, POS-007 … |
-| shift | [`resumeShift`](#resumeshift) | POST | `/shifts/{shiftId}/resume` | core | 1 | BO-039, BO-040, EMP-003, EMP-009, POS-001, POS-007 … |
+| shift | [`approveShiftOpen`](#approveshiftopen) | POST | `/shifts/{shiftId}/approve-open` | core | 1 | POS-001 |
+| shift | [`closeShift`](#closeshift) | POST | `/shifts/{shiftId}/close` | core | 1 | BO-040, BO-043, POS-007 |
+| shift | [`getCurrentShift`](#getcurrentshift) | GET | `/shifts/current` | core | 1 | EMP-008, EMP-009, POS-001, POS-007, POS-012 |
+| shift | [`getShiftCountLines`](#getshiftcountlines) | GET | `/shifts/{shiftId}/count-lines` | core | 1 | BO-040, BO-043, POS-007 |
+| shift | [`getTillShiftPolicy`](#gettillshiftpolicy) | GET | `/venues/{venueId}/till-shift-policy` | core | 1 | BO-065, POS-019 |
+| shift | [`getWorkstationShift`](#getworkstationshift) | GET | `/shifts/current/overview` | core | 1 | EMP-003, POS-025 |
+| shift | [`listDenominations`](#listdenominations) | GET | `/denominations` | core | 1 | BO-1065, POS-001, POS-007 |
+| shift | [`listDepositBoxes`](#listdepositboxes) | GET | `/deposit-boxes` | core | 1 | BO-042, POS-015, POS-018 |
+| shift | [`listShifts`](#listshifts) | GET | `/shifts` | core | 1 | BO-039, BO-040, BO-041, BO-043, BO-100, EMP-008 … |
+| shift | [`openShift`](#openshift) | POST | `/shifts` | core | 1 | POS-001 |
+| shift | [`recordNoSale`](#recordnosale) | POST | `/shifts/{shiftId}/no-sale` | core | 1 | POS-014, POS-020 |
+| shift | [`rejectShiftVariance`](#rejectshiftvariance) | POST | `/shifts/{shiftId}/reject-variance` | core | 1 | BO-040, BO-043, POS-007 |
+| shift | [`reopenShift`](#reopenshift) | POST | `/shifts/{shiftId}/reopen` | core | 1 | POS-025 |
+| shift | [`resumeShift`](#resumeshift) | POST | `/shifts/{shiftId}/resume` | core | 1 | POS-001 |
 | shift | [`setDenominations`](#setdenominations) | PUT | `/denominations` | setup | 1 | BO-1065 |
-| shift | [`suspendShift`](#suspendshift) | POST | `/shifts/{shiftId}/suspend` | core | 1 | BO-039, BO-040, EMP-003, EMP-008, EMP-009, POS-001 … |
-| shift | [`withdrawFromDepositBox`](#withdrawfromdepositbox) | POST | `/deposit-boxes/{boxId}/withdraw` | core | 1 | BO-042, POS-013, POS-018 |
-| sync | [`syncOrders`](#syncorders) | POST | `/sync/orders` | core | 1 | BO-037, BO-130, BO-132, EMP-017, POS-002, POS-013 … |
+| shift | [`setTillShiftPolicy`](#settillshiftpolicy) | PUT | `/venues/{venueId}/till-shift-policy` | core | 1 | BO-065, POS-019 |
+| shift | [`submitShiftCount`](#submitshiftcount) | POST | `/shifts/{shiftId}/count` | core | 1 | EMP-009, POS-007 |
+| shift | [`suspendShift`](#suspendshift) | POST | `/shifts/{shiftId}/suspend` | core | 1 | EMP-009, POS-025 |
+| shift | [`withdrawFromDepositBox`](#withdrawfromdepositbox) | POST | `/deposit-boxes/{boxId}/withdraw` | core | 1 | BO-042, POS-018 |
+| sync | [`listSyncRejections`](#listsyncrejections) | GET | `/sync/rejections` | core | 1 | BO-037, BO-038, BO-130, BO-132, BO-133, EMP-017 … |
+| sync | [`syncOrders`](#syncorders) | POST | `/sync/orders` | core | 1 | BO-037, BO-132, POS-013 |
 
 ## Group: cart
 
@@ -161,6 +172,8 @@ Distinct from expiry: this is a decision, and the recovery campaign must not cha
 
 **`POST /carts/{cartId}/lines`**: Add something
 
+**A till's cart is the session's own** (decided 2 October 2026, CHG-SEED-013). On the till the cart belongs to the workstation session that opened it; `x-ticvai-self-scoped: subject` means the caller's own cart, and for a till that is the session's. A guest identified at the till is attached to the cart, never its owner, and there is no guest-scoped cart operation.
+**Staff since 1 October 2026**: the till adds lines to its own cart (`cartId` from the workstation session) on POS-002, POS-021, POS-023 and POS-030; the declaration said guest and partner while P04 called it.
 2.9.4. **Acquiring the lease is the whole reason this is a server operation.** A capacity-bound product added to a cart reserves capacity for a configured window, and a cart held in a browser cannot reserve anything.
 **The window is 15 minutes** (decided 28 September, audit R169): the cart lease is acquired for 900 seconds unless the venue sets otherwise, and `extendCart` adds to it.
 **Parking is sold here like any other line** (decided 28 September, audit R166). A parking product goes through the cart and `checkoutCart`, so the parking entitlement is issued at payment carrying this order's id. There is no live space count in the first release: a car park at its capacity refuses the line with `soldOutForDay`.
@@ -185,7 +198,7 @@ Returns the cart with any conflicts the addition created (2.9.5) — golf at 13:
 | Conflict policy | serverWins |
 | Reads | `catalogue.channel_capacity`, `catalogue.performance`, `catalogue.variant`, `marketing.consent_question`, `marketing.consent_question_version`, `orders.cart`, `orders.cart_line` |
 | Writes | `orders.cart`, `orders.cart_line`, `platform.idempotency_record` |
-| Called by | GST-007, GST-008, GST-009, GST-026, GST-027, GST-032, GST-048, GST-050, GST-056, GST-070, GST-074, GST-075, GST-077, GST-078, KSK-005, KSK-006, KSK-017, POS-002, POS-021, POS-023, PTR-010, WEB-006, WEB-008, WEB-010, WEB-033, WEB-036, WEB-041, WEB-042, WEB-047, WEB-048, WEB-049 |
+| Called by | GST-007, GST-008, GST-026, GST-027, GST-032, GST-048, GST-050, GST-056, GST-070, GST-074, GST-075, GST-077, GST-078, KSK-005, KSK-006, KSK-017, POS-002, POS-021, POS-023, POS-030, PTR-010, WEB-006, WEB-008, WEB-010, WEB-033, WEB-036, WEB-041, WEB-042, WEB-047, WEB-048, WEB-049 |
 | State model | Cart ([states/cart.yaml](../../../states/cart.yaml)): moves `expiring` -> `active`, `expired` -> `active` |
 
 **Parameters**
@@ -463,6 +476,7 @@ The cart is retained, not deleted — a checkout that fails at payment must be r
 **A line carrying `resourceHoldId` keeps its hold into the order** (rev 3 REV3-15): the hold is converted to a `ResourceBooking` as `createOrder` describes, never released and re-taken. An expired hold is refused 409 `resourceHoldInvalid`, naming the line. **A transport line keeps its `attributes.transport`** on the order line (rev 3 REV3-21), so the ticket shows the route, the stations and the departure.
 **Transaction risk before the charge** (29 September, build; AI system design 2.2 B). After the orders `FraudRule` charge rules, checkout calls ai `scoreTransactionRisk` (service audience, 80 ms timeout) with the order id, amount, channel, product mix, payment token reference (never card data), hashed device id, account, subject and attempt number, and (29 September, build pass, group G2, from group G1's handoff; 8.3.8, 8.3.40) `ipHash` and `ipCountry` computed at the edge from the caller's address (the address itself is not passed) and `sessionRef`, the storefront session the checkout came from, which joins the browsing in `storefront.sessionEvent`. `allow` and `monitor` proceed; `stepUp` asks for 3-D Secure through Payments; `holdForReview` takes the same hold a `FraudRule` `hold` takes, so the order waits for review and is not declined. **On a timeout or an error checkout proceeds on its own rules** (fail-open); a tenant set to fail closed holds, and never declines.
 **A line's `recommendationId` is carried to the order line** (design 2.2 A step 8), so `order.completed` attributes the purchase to the recommendation it came from.
+**The guest may pay in the currency they selected** (decided 2 October 2026, Chinmay; CHG-FIN-001; reverses the display-only rule of 10 August, MoM 10 Aug 2026 4.7 option (a) and DI-211, in favour of its option (b), charging in the guest's currency at the gateway). `chargeCurrency` names it. The order stays in the venue's base currency (ADR-0018) and the ledger posts in base currency; the order carries the charge currency, the rate used, its source and the converted total, locked until `chargeRateLockedUntil` (the cart lease, `VenueSettings.cartLeaseSeconds`). A payment started after the lock lapses is re-quoted at the rate then in force and the guest sees the new amount before confirming.
 
 |  |  |
 |---|---|
@@ -474,7 +488,7 @@ The cart is retained, not deleted — a checkout that fails at payment must be r
 | Conflict policy | serverWins |
 | Reads | `catalogue.inventory_hold`, `marketing.consent_question`, `orders.cart`, `orders.cart_line`, `orders.fraud_rule`, `orders.order_line`, `orders.order_line_discount`, `orders.order_line_eligibility`, `orders.payment`, `orders.sales_order` |
 | Writes | `marketing.consent_record`, `orders.cart`, `orders.order_line`, `orders.order_line_discount`, `orders.order_line_eligibility`, `orders.sales_order`, `platform.idempotency_record`, `platform.outbox` |
-| Called by | GST-009, GST-026, GST-027, GST-032, GST-041, KSK-006, PTR-010, WEB-010, WEB-033, WEB-041, WEB-042 |
+| Called by | GST-009, GST-032, GST-041, KSK-006, PTR-010, WEB-010, WEB-033 |
 | State model | Cart ([states/cart.yaml](../../../states/cart.yaml)): moves `active` -> `checkedOut`, `expiring` -> `checkedOut`<br/>Order ([states/order.yaml](../../../states/order.yaml)): created as `pending` |
 
 **Parameters**
@@ -489,6 +503,7 @@ The cart is retained, not deleted — a checkout that fails at payment must be r
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | subjectId | string (uuid) |  | The guest the order is for. |
+| chargeCurrency | string |  | The currency the guest selected to pay in (decided 2 October 2026, Chinmay; CHG-FIN-001). (pattern ^[A-Z]{3}$; nullable) |
 | marketingConsents | array of object |  | Marketing opt-ins given at checkout (29 September, M18-15). |
 | marketingConsents[].channel | enum (email, sms, whatsapp, push) | yes |  |
 | marketingConsents[].purpose | string | yes | The consent purpose code (marketing ConsentPurpose), for example marketing. (max length 60) |
@@ -526,6 +541,14 @@ The cart is retained, not deleted — a checkout that fails at payment must be r
 | refundedAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | refundedAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | refundedAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| chargeCurrency | string |  | The currency the guest selected and is charged in (CHG-FIN-001, 2 October 2026). (pattern ^[A-Z]{3}$; read-only; nullable) |
+| chargeFxRate | object |  | Units of chargeCurrency per one unit of the base currency, from the region's tender rate in force at checkout (finance.FxRate), stored on the order so the payment, the receipt, the tax invoice and an… (read-only; nullable) |
+| chargeFxRateId | string (uuid) |  | The finance.FxRate row the rate was taken from, for audit. (read-only; nullable) |
+| chargeTotal | object |  | grossAmount converted at chargeFxRate and rounded to the charge currency's scale: what the guest pays and what the payment request to the provider asks for (CHG-FIN-001). (read-only) |
+| chargeTotal.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| chargeTotal.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| chargeTotal.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| chargeRateLockedUntil | string (date-time) |  | The quote holds until then (the cart lease). (read-only; nullable) |
 | droppedPromotions | array of object |  | Promotions left off this order at checkout because their budget cap would have been exceeded (decided 28 September, audit R101 (8)). (read-only) |
 | droppedPromotions[].promotionId | string (uuid) | yes |  |
 | droppedPromotions[].name | string |  |  |
@@ -640,6 +663,7 @@ The cart is retained, not deleted — a checkout that fails at payment must be r
 | 201 |  | An order, pending payment |
 | 403 |  | The contact the tickets would go to is not proven — an unverified session (sessionNotVerified), or a guest checkout with no confirmed one-time code (contactNotConfirmed). |
 | 409 |  | A lease expired between the last read and checkout (leaseExpired), or a resource hold did (resourceHoldInvalid, rev 3 REV3-15). |
+| 400 |  | chargeCurrency is not one the venue takes (problem type currency-not-chargeable, CHG-FIN-001). |
 | 422 |  | A required consent question is unanswered (consentRequired), or an answer blocks the booking (consentAnswerBlocks), with the lines in lineIds (decided 29 September, rev 3 REV3-26). |
 
 ### claimCart
@@ -1012,6 +1036,8 @@ Offered once, typically, and the interface should say it is the last extension r
 
 **`GET /carts/{cartId}`**: The cart, priced and checked, right now
 
+**A till's cart is the session's own** (decided 2 October 2026, CHG-SEED-013). On the till the cart belongs to the workstation session that opened it; `x-ticvai-self-scoped: subject` means the caller's own cart, and for a till that is the session's. A guest identified at the till is attached to the cart, never its owner, and there is no guest-scoped cart operation.
+**Staff since 1 October 2026**: the till reads its own cart (`cartId` from the workstation session) on POS-010; the declaration said guest and partner while P04 called it.
 2.9.2. **Re-prices and re-checks on every read**, because a cart is a claim about the future and the future moves. Availability, promotions and lease expiry are all live.
 Returns the conflicts (2.9.5) and the leases with their remaining time, so the interface can say *"your seats are held for 6 minutes"* rather than discovering it at checkout.
 
@@ -1389,6 +1415,7 @@ Increasing extends the lease and may fail on capacity; decreasing releases part 
 
 A lift removes cash from an open float mid-shift without closing it — the supervisor takes the excess to the safe and the cashier keeps trading. Both directions are traced, both record the authorising principal, and both adjust the expected figure used at close.
 **What "exceeds the counted float" means** (decided 28 September, audit R123 (2)): the cash available to lift is the float counted at the shift's last count (the opening float, or the last `movement` count if one is later), less every lift recorded since, plus every add. A lift larger than that is refused with `lift-exceeds-float`. Cash taken in sales since the last count does not count towards it, because nobody has counted it.
+**The drawer limit offers the lift** (decided 2 October 2026, Chinmay, batch 6 #179, BO-042: "Add drawer limit setting (warn + offer cash lift)"; DEC-179; CHG-CSP-016; DI-274). When the cash a till has taken since its last count puts the drawer over the till's limit (`tenancy.Workstation.cashDrawerLimit`, else `tenancy.VenueSettings.cashDrawerLimit`), the till warns and offers a lift recorded here; `DepositBox.overDrawerLimit` flags the box on BO-042. The warning never blocks a sale, and the cashier is told only that the drawer is over its limit, not what it holds (CHG-FIN-003). A supervisor recording the lift counts what they take, which makes it counted cash.
 
 |  |  |
 |---|---|
@@ -1400,7 +1427,7 @@ A lift removes cash from an open float mid-shift without closing it — the supe
 | Conflict policy | append |
 | Reads | `cache:idempotency`, `orders.cash_count_line`, `orders.cash_movement` |
 | Writes | `cache:idempotency`, `orders.cash_count_line`, `orders.cash_movement` |
-| Called by | BO-039, BO-040, BO-041, EMP-009, POS-001, POS-007, POS-013, POS-017, POS-018 |
+| Called by | BO-041, BO-042, POS-017, POS-018 |
 
 **Parameters**
 
@@ -1499,7 +1526,7 @@ A lift removes cash from an open float mid-shift without closing it — the supe
 | Read routing | primary |
 | Reads | `orders.cash_count_line`, `orders.cash_movement` |
 | Writes | - |
-| Called by | BO-039, BO-040, BO-041, BO-042, EMP-003, EMP-008, EMP-009, POS-001, POS-007, POS-009, POS-013, POS-015 |
+| Called by | BO-039, BO-040, BO-041, EMP-008, EMP-009, POS-007, POS-015 |
 
 **Parameters**
 
@@ -1551,6 +1578,45 @@ A lift removes cash from an open float mid-shift without closing it — the supe
 |---|---|---|
 | 200 |  | Movements in sequence, one page at a time |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
+
+## Group: drafted
+
+### listGroupArrivalCheck
+
+**`GET /group-arrival-check`**: Group Arrival, Check-In & Admission Operations
+
+**Drafted from the workshop pack; the shape below is read out of it, not invented.** Group Sales   Corporate Booking Management, page 29. The screen says: Manage the physical arrival and admission of large groups efficiently.
+
+**Every property carries the sentence it came from.** 25 were read from the screen's own bulleted directory and 13 bullets were dropped as prose, examples or hierarchy illustrations rather than bent into fields. Names and types are this package's reading of those sentences and are the part to check; the sentences themselves are the client's.
+
+**Agreed 29 September (decided 29 September, readiness close-out).** Checked against the pack page and the minutes: MoM 31 Aug Key Decisions (group check-in is a status distinct from the access scan). Shape: 2 properties removed that were filters, actions, behaviour, roles, examples or prose fragments rather than fields; 8 one-value-per-field properties folded into enums (issues).
+
+|  |  |
+|---|---|
+| Permission | `ORDER_VIEW` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | replica |
+| Reads | `access.entitlement`, `access.scan_event`, `orders.group_booking`, `orders.group_participant`, `orders.group_visit_plan` |
+| Writes | - |
+| Called by | BO-280, POS-031 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| pageSize | query |  | integer |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Group Arrival, Check-In & Admission Operations |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
@@ -1698,7 +1764,7 @@ The media is the join, not the order. That is why this operation is keyed on `me
 | Conflict policy | serverWins |
 | Reads | `access.entitlement`, `cache:idempotency`, `orders.order_line`, `orders.order_line_discount`, `orders.order_line_eligibility`, `orders.payment`, `orders.sales_order` |
 | Writes | `access.entitlement`, `cache:idempotency`, `orders.order_line`, `orders.payment`, `orders.sales_order` |
-| Called by | BO-027, CMS-010, EMP-036, POS-010 |
+| Called by | BO-027, EMP-036, POS-010 |
 
 **Parameters**
 
@@ -1749,6 +1815,14 @@ The media is the join, not the order. That is why this operation is keyed on `me
 | order.refundedAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | order.refundedAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | order.refundedAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| order.chargeCurrency | string |  | The currency the guest selected and is charged in (CHG-FIN-001, 2 October 2026). (pattern ^[A-Z]{3}$; read-only; nullable) |
+| order.chargeFxRate | object |  | Units of chargeCurrency per one unit of the base currency, from the region's tender rate in force at checkout (finance.FxRate), stored on the order so the payment, the receipt, the tax invoice and an… (read-only; nullable) |
+| order.chargeFxRateId | string (uuid) |  | The finance.FxRate row the rate was taken from, for audit. (read-only; nullable) |
+| order.chargeTotal | object |  | grossAmount converted at chargeFxRate and rounded to the charge currency's scale: what the guest pays and what the payment request to the provider asks for (CHG-FIN-001). (read-only) |
+| order.chargeTotal.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| order.chargeTotal.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| order.chargeTotal.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| order.chargeRateLockedUntil | string (date-time) |  | The quote holds until then (the cart lease). (read-only; nullable) |
 | order.droppedPromotions | array of object |  | Promotions left off this order at checkout because their budget cap would have been exceeded (decided 28 September, audit R101 (8)). (read-only) |
 | order.droppedPromotions[].promotionId | string (uuid) | yes |  |
 | order.droppedPromotions[].name | string |  |  |
@@ -1859,7 +1933,7 @@ Posts to a discount account, never as a price change. A line sold at a reduced p
 | Conflict policy | append |
 | Reads | `cache:idempotency`, `orders.order_line`, `orders.order_line_discount`, `orders.order_line_eligibility`, `orders.payment`, `orders.sales_order` |
 | Writes | `cache:idempotency`, `orders.order_line`, `orders.payment`, `orders.sales_order` |
-| Called by | BO-022, BO-023, BO-026, BO-047, EMP-014, EMP-034, POS-002, POS-006, POS-014, PTR-002, PTR-005, PTR-008, PTR-015, PTR-016 |
+| Called by | BO-022, BO-023, BO-026, BO-047, EMP-034, POS-002, POS-006, POS-014 |
 
 **Parameters**
 
@@ -1912,6 +1986,14 @@ Posts to a discount account, never as a price change. A line sold at a reduced p
 | refundedAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | refundedAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | refundedAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| chargeCurrency | string |  | The currency the guest selected and is charged in (CHG-FIN-001, 2 October 2026). (pattern ^[A-Z]{3}$; read-only; nullable) |
+| chargeFxRate | object |  | Units of chargeCurrency per one unit of the base currency, from the region's tender rate in force at checkout (finance.FxRate), stored on the order so the payment, the receipt, the tax invoice and an… (read-only; nullable) |
+| chargeFxRateId | string (uuid) |  | The finance.FxRate row the rate was taken from, for audit. (read-only; nullable) |
+| chargeTotal | object |  | grossAmount converted at chargeFxRate and rounded to the charge currency's scale: what the guest pays and what the payment request to the provider asks for (CHG-FIN-001). (read-only) |
+| chargeTotal.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| chargeTotal.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| chargeTotal.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| chargeRateLockedUntil | string (date-time) |  | The quote holds until then (the cart lease). (read-only; nullable) |
 | droppedPromotions | array of object |  | Promotions left off this order at checkout because their budget cap would have been exceeded (decided 28 September, audit R101 (8)). (read-only) |
 | droppedPromotions[].promotionId | string (uuid) | yes |  |
 | droppedPromotions[].name | string |  |  |
@@ -2035,12 +2117,12 @@ Posts to a discount account, never as a price change. A line sold at a reduced p
 | Permission | `None` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 1 |
+| Wave | 2 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `access.entitlement`, `cache:idempotency`, `orders.ticket_transfer` |
 | Writes | `access.entitlement`, `cache:idempotency`, `orders.ticket_transfer`, `platform.outbox` |
-| Called by | GST-014, WEB-030 |
+| Called by | GST-014 |
 | State model | Ticket transfer ([states/ticket-transfer.yaml](../../../states/ticket-transfer.yaml)): moves `offered` -> `claimed` |
 
 **Parameters**
@@ -2103,7 +2185,7 @@ Offline-capable. The client writes to its local journal, acknowledges the cashie
 | Conflict policy | append |
 | Reads | `cache:idempotency`, `orders.order_line`, `orders.order_line_discount`, `orders.order_line_eligibility`, `orders.payment`, `orders.sales_order` |
 | Writes | `cache:idempotency`, `orders.order_event`, `orders.order_line`, `orders.payment`, `orders.sales_order`, `promotions.promotion_evaluation_trace` |
-| Called by | BO-022, BO-023, BO-026, BO-047, BO-130, EMP-014, EMP-034, GST-009, POS-002, POS-004, POS-005, POS-006, POS-013, PTR-002, PTR-005, PTR-008, PTR-015, PTR-016, WEB-012 |
+| Called by | BO-022, BO-026, BO-047, EMP-034, GST-009, POS-002, POS-004, POS-005, POS-006, POS-013, PTR-002, PTR-008, PTR-015, WEB-012 |
 | State model | Order ([states/order.yaml](../../../states/order.yaml)): created as `pending`<br/>Resource hold ([states/resource-hold.yaml](../../../states/resource-hold.yaml)): moves `held` -> `converted`<br/>Seat hold ([states/seat-hold.yaml](../../../states/seat-hold.yaml)): moves `held` -> `converted` |
 
 **Parameters**
@@ -2179,6 +2261,14 @@ Offline-capable. The client writes to its local journal, acknowledges the cashie
 | refundedAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | refundedAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | refundedAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| chargeCurrency | string |  | The currency the guest selected and is charged in (CHG-FIN-001, 2 October 2026). (pattern ^[A-Z]{3}$; read-only; nullable) |
+| chargeFxRate | object |  | Units of chargeCurrency per one unit of the base currency, from the region's tender rate in force at checkout (finance.FxRate), stored on the order so the payment, the receipt, the tax invoice and an… (read-only; nullable) |
+| chargeFxRateId | string (uuid) |  | The finance.FxRate row the rate was taken from, for audit. (read-only; nullable) |
+| chargeTotal | object |  | grossAmount converted at chargeFxRate and rounded to the charge currency's scale: what the guest pays and what the payment request to the provider asks for (CHG-FIN-001). (read-only) |
+| chargeTotal.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| chargeTotal.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| chargeTotal.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| chargeRateLockedUntil | string (date-time) |  | The quote holds until then (the cart lease). (read-only; nullable) |
 | droppedPromotions | array of object |  | Promotions left off this order at checkout because their budget cap would have been exceeded (decided 28 September, audit R101 (8)). (read-only) |
 | droppedPromotions[].promotionId | string (uuid) | yes |  |
 | droppedPromotions[].name | string |  |  |
@@ -2315,7 +2405,7 @@ The replacement is held before the original is released, never the other way rou
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `orders.sales_order` |
 | Writes | `cache:idempotency`, `orders.order_event`, `orders.sales_order`, `platform.outbox` |
-| Called by | BO-022, BO-023, BO-026, BO-047, EMP-014, EMP-034, POS-002, POS-006, POS-010, POS-011, PTR-002, PTR-005, PTR-008, PTR-015, PTR-016 |
+| Called by | BO-022, BO-023, BO-026, BO-047, BO-315, EMP-034, POS-006, POS-010, POS-011, PTR-002, PTR-008, PTR-015 |
 
 **Parameters**
 
@@ -2412,7 +2502,7 @@ Scanned at a counter before adding something. Shows what the guest holds so a ca
 | Offline note | 24 August: A handheld issuing media offline reads the local range allocated at shift start . |
 | Reads | `access.entitlement`, `access.scan_event`, `catalogue.entitlement_template`, `orders.sales_order`, `pii.subject` |
 | Writes | - |
-| Called by | BO-027, CMS-010, EMP-036, POS-010 |
+| Called by | BO-027, EMP-036, POS-010 |
 
 **Parameters**
 
@@ -2466,7 +2556,7 @@ Scanned at a counter before adding something. Shows what the guest holds so a ca
 | Read routing | primary |
 | Reads | `orders.order_line`, `orders.order_line_discount`, `orders.order_line_eligibility`, `orders.payment`, `orders.sales_order` |
 | Writes | - |
-| Called by | BO-022, BO-023, BO-026, BO-047, EMP-014, EMP-034, GST-010, GST-018, GST-019, GST-028, KSK-009, KSK-011, POS-002, POS-006, PTR-002, PTR-005, PTR-008, PTR-015, PTR-016, WEB-012, WEB-013, WEB-019 |
+| Called by | BO-022, BO-023, BO-026, BO-047, BO-1147, BO-305, BO-315, EMP-014, EMP-034, GST-010, GST-018, GST-019, GST-028, KSK-009, KSK-011, POS-002, POS-006, POS-030, PTR-002, PTR-005, PTR-008, PTR-015, PTR-016, WEB-012, WEB-013, WEB-019 |
 
 **Parameters**
 
@@ -2503,6 +2593,14 @@ Scanned at a counter before adding something. Shows what the guest holds so a ca
 | refundedAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | refundedAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | refundedAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| chargeCurrency | string |  | The currency the guest selected and is charged in (CHG-FIN-001, 2 October 2026). (pattern ^[A-Z]{3}$; read-only; nullable) |
+| chargeFxRate | object |  | Units of chargeCurrency per one unit of the base currency, from the region's tender rate in force at checkout (finance.FxRate), stored on the order so the payment, the receipt, the tax invoice and an… (read-only; nullable) |
+| chargeFxRateId | string (uuid) |  | The finance.FxRate row the rate was taken from, for audit. (read-only; nullable) |
+| chargeTotal | object |  | grossAmount converted at chargeFxRate and rounded to the charge currency's scale: what the guest pays and what the payment request to the provider asks for (CHG-FIN-001). (read-only) |
+| chargeTotal.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| chargeTotal.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| chargeTotal.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| chargeRateLockedUntil | string (date-time) |  | The quote holds until then (the cart lease). (read-only; nullable) |
 | droppedPromotions | array of object |  | Promotions left off this order at checkout because their budget cap would have been exceeded (decided 28 September, audit R101 (8)). (read-only) |
 | droppedPromotions[].promotionId | string (uuid) | yes |  |
 | droppedPromotions[].name | string |  |  |
@@ -2670,7 +2768,7 @@ Every payment, refund, void, modification and exchange in sequence, with the run
 | Read routing | primary |
 | Reads | `ledger.posting`, `orders.payment`, `orders.refund`, `orders.sales_order` |
 | Writes | - |
-| Called by | BO-022, BO-023, BO-026, BO-047, EMP-014, EMP-034, POS-002, POS-006, PTR-002, PTR-005, PTR-008, PTR-015, PTR-016 |
+| Called by | BO-022, BO-023, BO-026, BO-047, BO-305, EMP-014, EMP-034, POS-006, PTR-002, PTR-005, PTR-008, PTR-015, PTR-016 |
 
 **Parameters**
 
@@ -2786,7 +2884,7 @@ Held orders expire. A till that accumulates parked sales across a shift cannot b
 | Conflict policy | lastWriterWins |
 | Reads | `cache:idempotency`, `orders.order_line`, `orders.order_line_discount`, `orders.order_line_eligibility`, `orders.payment`, `orders.sales_order` |
 | Writes | `cache:idempotency`, `orders.order_event`, `orders.order_line`, `orders.payment`, `orders.sales_order` |
-| Called by | BO-022, BO-023, BO-026, BO-047, EMP-014, EMP-034, POS-002, POS-006, PTR-002, PTR-005, PTR-008, PTR-015, PTR-016 |
+| Called by | BO-022, BO-026, BO-047, EMP-034, POS-002, POS-006, PTR-002, PTR-008, PTR-015 |
 | State model | Order ([states/order.yaml](../../../states/order.yaml)): moves `pending` -> `held` |
 
 **Parameters**
@@ -2832,6 +2930,14 @@ Held orders expire. A till that accumulates parked sales across a shift cannot b
 | refundedAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | refundedAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | refundedAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| chargeCurrency | string |  | The currency the guest selected and is charged in (CHG-FIN-001, 2 October 2026). (pattern ^[A-Z]{3}$; read-only; nullable) |
+| chargeFxRate | object |  | Units of chargeCurrency per one unit of the base currency, from the region's tender rate in force at checkout (finance.FxRate), stored on the order so the payment, the receipt, the tax invoice and an… (read-only; nullable) |
+| chargeFxRateId | string (uuid) |  | The finance.FxRate row the rate was taken from, for audit. (read-only; nullable) |
+| chargeTotal | object |  | grossAmount converted at chargeFxRate and rounded to the charge currency's scale: what the guest pays and what the payment request to the provider asks for (CHG-FIN-001). (read-only) |
+| chargeTotal.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| chargeTotal.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| chargeTotal.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| chargeRateLockedUntil | string (date-time) |  | The quote holds until then (the cart lease). (read-only; nullable) |
 | droppedPromotions | array of object |  | Promotions left off this order at checkout because their budget cap would have been exceeded (decided 28 September, audit R101 (8)). (read-only) |
 | droppedPromotions[].promotionId | string (uuid) | yes |  |
 | droppedPromotions[].name | string |  |  |
@@ -2950,7 +3056,7 @@ Held orders expire. A till that accumulates parked sales across a shift cannot b
 
 **`GET /orders`**: List orders
 
-**The staff list: venue-scoped, filtered by venue, cashier and shift.** A guest's own history is `listMyOrders`, which is scoped to the caller rather than filtered by a parameter (raised 24 August for `WEB-019` and `GST-019`). A guest surface does not load its list from here.
+**The staff list: venue-scoped, filtered by venue, cashier, shift, terminal, customer and tender** (the last three added 1 October 2026, optional). A guest's own history is `listMyOrders`, which is scoped to the caller rather than filtered by a parameter (raised 24 August for `WEB-019` and `GST-019`). A guest surface does not load its list from here.
 
 |  |  |
 |---|---|
@@ -2963,7 +3069,7 @@ Held orders expire. A till that accumulates parked sales across a shift cannot b
 | Read routing | replica |
 | Reads | `orders.order_line`, `orders.sales_order` |
 | Writes | - |
-| Called by | ANL-009, BO-022, BO-023, BO-026, BO-047, BO-082, BO-101, EMP-014, EMP-034, EMP-057, GST-014, GST-018, GST-019, POS-002, POS-006, POS-012, PTR-002, PTR-005, PTR-008, PTR-015, PTR-016, WEB-019, WEB-030 |
+| Called by | ANL-009, BO-022, BO-023, BO-026, BO-047, BO-101, EMP-014, EMP-034, EMP-057, POS-002, POS-006, POS-012, POS-030, PTR-002, PTR-005, PTR-008, PTR-015, PTR-016, SUP-014 |
 
 **Parameters**
 
@@ -2975,6 +3081,9 @@ Held orders expire. A till that accumulates parked sales across a shift cannot b
 | status | query |  | OrderStatus: enum (pending, held, paid, partiallyPaid, completed, voided, refunded, partiallyRefunded, …) |  |
 | createdFrom | query |  | string (date-time) | Only orders whose createdAt is at or after this instant. |
 | createdTo | query |  | string (date-time) | Only orders whose createdAt is before this instant. |
+| workstationId | query |  | string (uuid) | Exact match on the till the order was taken on (Order.workstationId). |
+| subjectId | query |  | string (uuid) | Exact match on the guest the order belongs to (Order.subjectId). |
+| tender | query |  | TenderKind: enum (cash, card, wallet, voucher, bankTransfer, hotelCharge, installment, giftCard, …) | Only orders with at least one payment in this tender (Payment.tender), so a split order matches each tender it used. |
 | pageSize | query |  | integer |  |
 | cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
 
@@ -3029,7 +3138,7 @@ Lines whose entitlement has been redeemed cannot be removed. The guest has used 
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `orders.order_line`, `orders.order_line_discount`, `orders.order_line_eligibility`, `orders.payment`, `orders.sales_order` |
 | Writes | `cache:idempotency`, `orders.order_event`, `orders.order_line`, `orders.payment`, `orders.sales_order` |
-| Called by | BO-022, BO-023, BO-026, BO-047, BO-281, EMP-014, EMP-034, POS-002, POS-006, PTR-002, PTR-005, PTR-008, PTR-015, PTR-016 |
+| Called by | BO-022, BO-023, BO-026, BO-047, BO-281, BO-315, EMP-034, POS-006, PTR-002, PTR-008, PTR-015 |
 
 **Parameters**
 
@@ -3102,6 +3211,14 @@ Lines whose entitlement has been redeemed cannot be removed. The guest has used 
 | order.refundedAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | order.refundedAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | order.refundedAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| order.chargeCurrency | string |  | The currency the guest selected and is charged in (CHG-FIN-001, 2 October 2026). (pattern ^[A-Z]{3}$; read-only; nullable) |
+| order.chargeFxRate | object |  | Units of chargeCurrency per one unit of the base currency, from the region's tender rate in force at checkout (finance.FxRate), stored on the order so the payment, the receipt, the tax invoice and an… (read-only; nullable) |
+| order.chargeFxRateId | string (uuid) |  | The finance.FxRate row the rate was taken from, for audit. (read-only; nullable) |
+| order.chargeTotal | object |  | grossAmount converted at chargeFxRate and rounded to the charge currency's scale: what the guest pays and what the payment request to the provider asks for (CHG-FIN-001). (read-only) |
+| order.chargeTotal.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| order.chargeTotal.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| order.chargeTotal.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| order.chargeRateLockedUntil | string (date-time) |  | The quote holds until then (the cart lease). (read-only; nullable) |
 | order.droppedPromotions | array of object |  | Promotions left off this order at checkout because their budget cap would have been exceeded (decided 28 September, audit R101 (8)). (read-only) |
 | order.droppedPromotions[].promotionId | string (uuid) | yes |  |
 | order.droppedPromotions[].name | string |  |  |
@@ -3205,7 +3322,7 @@ Offline-capable, so it carries `recordedAt`: the moment the till reprinted, kept
 | Conflict policy | append |
 | Reads | `cache:idempotency`, `orders.sales_order` |
 | Writes | `cache:idempotency`, `orders.sales_order` |
-| Called by | BO-022, BO-023, BO-026, BO-047, EMP-014, EMP-034, GST-010, POS-002, POS-006, POS-026, PTR-002, PTR-005, PTR-008, PTR-015, PTR-016, WEB-013 |
+| Called by | BO-022, BO-023, BO-026, BO-047, EMP-014, EMP-034, GST-010, KSK-009, KSK-010, KSK-012, POS-002, POS-006, POS-026, POS-030, PTR-002, PTR-005, PTR-008, PTR-015, PTR-016, WEB-013 |
 
 **Parameters**
 
@@ -3261,7 +3378,7 @@ Where the new performance is priced differently, the balance settles as for an e
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `orders.sales_order` |
 | Writes | `cache:idempotency`, `orders.order_event`, `orders.sales_order` |
-| Called by | BO-022, BO-023, BO-026, BO-047, BO-281, EMP-014, EMP-034, POS-002, POS-006, PTR-002, PTR-005, PTR-008, PTR-015, PTR-016 |
+| Called by | BO-022, BO-023, BO-026, BO-047, BO-281, BO-315, EMP-034, POS-006, PTR-002, PTR-008, PTR-015 |
 
 **Parameters**
 
@@ -3332,7 +3449,7 @@ Prices are re-evaluated. Where a price, a promotion or an availability has moved
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `orders.order_line`, `orders.order_line_discount`, `orders.order_line_eligibility`, `orders.payment`, `orders.sales_order` |
 | Writes | `cache:idempotency`, `orders.order_event`, `orders.order_line`, `orders.payment`, `orders.sales_order` |
-| Called by | BO-022, BO-023, BO-026, BO-047, EMP-014, EMP-034, POS-002, POS-006, PTR-002, PTR-005, PTR-008, PTR-015, PTR-016 |
+| Called by | BO-022, BO-026, BO-047, EMP-034, POS-002, POS-006, PTR-002, PTR-008, PTR-015 |
 | State model | Order ([states/order.yaml](../../../states/order.yaml)): moves `held` -> `pending` |
 
 **Parameters**
@@ -3371,6 +3488,14 @@ Prices are re-evaluated. Where a price, a promotion or an availability has moved
 | order.refundedAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | order.refundedAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | order.refundedAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| order.chargeCurrency | string |  | The currency the guest selected and is charged in (CHG-FIN-001, 2 October 2026). (pattern ^[A-Z]{3}$; read-only; nullable) |
+| order.chargeFxRate | object |  | Units of chargeCurrency per one unit of the base currency, from the region's tender rate in force at checkout (finance.FxRate), stored on the order so the payment, the receipt, the tax invoice and an… (read-only; nullable) |
+| order.chargeFxRateId | string (uuid) |  | The finance.FxRate row the rate was taken from, for audit. (read-only; nullable) |
+| order.chargeTotal | object |  | grossAmount converted at chargeFxRate and rounded to the charge currency's scale: what the guest pays and what the payment request to the provider asks for (CHG-FIN-001). (read-only) |
+| order.chargeTotal.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| order.chargeTotal.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| order.chargeTotal.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| order.chargeRateLockedUntil | string (date-time) |  | The quote holds until then (the cart lease). (read-only; nullable) |
 | order.droppedPromotions | array of object |  | Promotions left off this order at checkout because their budget cap would have been exceeded (decided 28 September, audit R101 (8)). (read-only) |
 | order.droppedPromotions[].promotionId | string (uuid) | yes |  |
 | order.droppedPromotions[].name | string |  |  |
@@ -3534,7 +3659,7 @@ The recipient receives a claim link. **Ownership moves only when they claim it**
 | Conflict policy | serverWins |
 | Reads | `access.entitlement`, `cache:idempotency`, `orders.ticket_transfer` |
 | Writes | `access.entitlement`, `cache:idempotency`, `orders.ticket_transfer` |
-| Called by | GST-009, GST-010, GST-012, GST-013, GST-014, GST-019, GST-045, GST-055, KSK-009, KSK-010, KSK-012, WEB-012, WEB-013, WEB-018, WEB-019, WEB-023, WEB-030 |
+| Called by | GST-012, GST-013, GST-014, GST-045, WEB-018, WEB-030 |
 | State model | Entitlement ([states/entitlement-status.yaml](../../../states/entitlement-status.yaml)): moves `issued` -> `surrendered`<br/>Ticket transfer ([states/ticket-transfer.yaml](../../../states/ticket-transfer.yaml)): moves `offered` -> `cancelled` |
 
 **Parameters**
@@ -3598,7 +3723,7 @@ Only before settlement and only within the same shift. After that it is a refund
 | Conflict policy | append |
 | Reads | `cache:idempotency`, `orders.order_line`, `orders.order_line_discount`, `orders.order_line_eligibility`, `orders.payment`, `orders.sales_order` |
 | Writes | `cache:idempotency`, `orders.order_event`, `orders.order_line`, `orders.payment`, `orders.sales_order`, `platform.outbox` |
-| Called by | BO-022, BO-023, BO-026, BO-047, BO-319, EMP-014, EMP-034, POS-002, POS-006, POS-014, PTR-002, PTR-005, PTR-008, PTR-015, PTR-016 |
+| Called by | BO-022, BO-023, BO-026, BO-047, BO-319, EMP-034, POS-006, POS-014 |
 | State model | Order ([states/order.yaml](../../../states/order.yaml)): moves `pending` -> `voided` |
 
 **Parameters**
@@ -3645,6 +3770,14 @@ Only before settlement and only within the same shift. After that it is a refund
 | refundedAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | refundedAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | refundedAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| chargeCurrency | string |  | The currency the guest selected and is charged in (CHG-FIN-001, 2 October 2026). (pattern ^[A-Z]{3}$; read-only; nullable) |
+| chargeFxRate | object |  | Units of chargeCurrency per one unit of the base currency, from the region's tender rate in force at checkout (finance.FxRate), stored on the order so the payment, the receipt, the tax invoice and an… (read-only; nullable) |
+| chargeFxRateId | string (uuid) |  | The finance.FxRate row the rate was taken from, for audit. (read-only; nullable) |
+| chargeTotal | object |  | grossAmount converted at chargeFxRate and rounded to the charge currency's scale: what the guest pays and what the payment request to the provider asks for (CHG-FIN-001). (read-only) |
+| chargeTotal.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| chargeTotal.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| chargeTotal.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| chargeRateLockedUntil | string (date-time) |  | The quote holds until then (the cart lease). (read-only; nullable) |
 | droppedPromotions | array of object |  | Promotions left off this order at checkout because their budget cap would have been exceeded (decided 28 September, audit R101 (8)). (read-only) |
 | droppedPromotions[].promotionId | string (uuid) | yes |  |
 | droppedPromotions[].name | string |  |  |
@@ -3994,14 +4127,14 @@ BL-028. **`orders.group_booking` had ten columns and nothing read it** — a tab
 | Permission | `ORDER_VIEW` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | replica |
 | Guest callable | True |
 | Reads | `orders.group_booking`, `orders.sales_order`, `pii.subject` |
 | Writes | - |
-| Called by | BO-026, GST-072, WEB-031 |
+| Called by | BO-026, BO-273, GST-072, POS-031, WEB-031 |
 
 **Parameters**
 
@@ -4297,7 +4430,7 @@ BL-029. **A wallet pass is a live object, not a download.** Its value over a PDF
 | Guest callable | True |
 | Reads | `orders.order_line`, `orders.order_line_discount`, `orders.order_line_eligibility`, `orders.payment`, `orders.sales_order`, `pii.subject` |
 | Writes | - |
-| Called by | GST-019, WEB-019 |
+| Called by | GST-014, GST-019, GST-035, WEB-017, WEB-019, WEB-026, WEB-030 |
 
 **Parameters**
 
@@ -4337,6 +4470,14 @@ BL-029. **A wallet pass is a live object, not a download.** Its value over a PDF
 | items[].refundedAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | items[].refundedAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | items[].refundedAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| items[].chargeCurrency | string |  | The currency the guest selected and is charged in (CHG-FIN-001, 2 October 2026). (pattern ^[A-Z]{3}$; read-only; nullable) |
+| items[].chargeFxRate | object |  | Units of chargeCurrency per one unit of the base currency, from the region's tender rate in force at checkout (finance.FxRate), stored on the order so the payment, the receipt, the tax invoice and an… (read-only; nullable) |
+| items[].chargeFxRateId | string (uuid) |  | The finance.FxRate row the rate was taken from, for audit. (read-only; nullable) |
+| items[].chargeTotal | object |  | grossAmount converted at chargeFxRate and rounded to the charge currency's scale: what the guest pays and what the payment request to the provider asks for (CHG-FIN-001). (read-only) |
+| items[].chargeTotal.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| items[].chargeTotal.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| items[].chargeTotal.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| items[].chargeRateLockedUntil | string (date-time) |  | The quote holds until then (the cart lease). (read-only; nullable) |
 | items[].droppedPromotions | array of object |  | Promotions left off this order at checkout because their budget cap would have been exceeded (decided 28 September, audit R101 (8)). (read-only) |
 | items[].droppedPromotions[].promotionId | string (uuid) | yes |  |
 | items[].droppedPromotions[].name | string |  |  |
@@ -4509,6 +4650,120 @@ BL-072. **Payment against the link, by somebody with no account.**
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 | 200 |  | Paid, and the reservation converted |
 | 409 |  | The hold went while they were paying (linesUnavailable). |
+
+### previewProductTickets
+
+**`GET /products/{productId}/ticket-previews`**: Preview a product's PDF ticket and wallet passes
+
+**Every output format of a product, previewed before it is published** (decided 2 October 2026, Chinmay, batch 4, CMS-006: "the preview of the PDF ticket and the Apple/Google Wallet pass must be in Block A"; DEC-151; and the design-notes correction on BO-008, Block A: "No operation renders the PDF ticket or Wallet pass preview for a product; printTicketProof works on a template, not on a product"; DI-444; CHG-CSP-038). For a product, renders a proof of each ticket template it issues through (`TicketTemplate`): the PDF ticket, and the Apple Wallet and Google Wallet passes (`WalletPass`) where the product issues one, each filled with the product's own data and **marked as a proof on the artefact**, so a preview left on a counter cannot be presented at a gate. Nothing is stored, sold or pushed to a wallet. A product with no template for a format returns no proof for it. Read with `PRODUCT_VIEW`, so the product editor (BO-008) and the white-label preview (CMS-006) can call it; `printTicketProof` stays the till's sample print.
+
+|  |  |
+|---|---|
+| Permission | `PRODUCT_VIEW` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 2 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | replica |
+| Reads | - |
+| Writes | - |
+| Called by | BO-008, CMS-006 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| productId | path | yes | string (uuid) |  |
+| locale | query |  | string | The language to render in; the venue's default when omitted. |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | One proof per output format |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
+### recordGroupCheckIn
+
+**`POST /group-bookings/{groupBookingId}/check-in`**: Record a group's arrival at the venue
+
+**Group check-in is a status distinct from the access scan** (MoM 31 Aug Key Decisions). This records the group's arrival on `orders.group_visit_plan` (creating the row if the booking has none yet): who arrived, how many, at which gate, and what went wrong. Each guest is still admitted by their own entitlement scan, so `arrivedCount` is what the group leader and the gate agree on and can differ from the scans.
+**`checkInStatus` follows the counts**: `arrived` when `arrivedCount` reaches the booking's `expectedSize`, otherwise `partiallyArrived`; calling again as more of the group arrives updates the same row, and `partiallyArrived` never moves back to `expected`. `noShow` is set by the timer when the visit window closes with nobody checked in, never by this call; a late group after that is recorded here and moves it on. Also appends an `orders.order_event` row (`eventType` `groupCheckIn`) to the booking's order. A `cancelled` booking is refused 409 `groupClosed` (decided 29 September, writers pass).
+
+|  |  |
+|---|---|
+| Permission | `ORDER_MODIFY` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `orders.group_booking`, `orders.group_visit_plan` |
+| Writes | `orders.group_visit_plan`, `orders.order_event` |
+| Called by | BO-280, POS-031 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| groupBookingId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
+
+**Request body**: `GroupCheckInRequest`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| arrivedCount | integer | yes | Members of the booked group who have arrived. (min 0) |
+| additionalGuests | integer |  | People who arrived beyond the booked size; they still need entitlements to be admitted. (min 0; default 0) |
+| staffLeadersCount | integer |  | (min 0; default 0) |
+| arrivalGateId | string (uuid) |  | (nullable) |
+| actualArrivalAt | string (date-time) |  | Defaults to now on the first call; later calls keep the first arrival time. (nullable) |
+| checkInIssues | array of enum (missingGuest, extraGuest, invalidTicket, wrongDate, lateArrival, paymentHold, missingCredential, accessibilityRequirement) |  |  |
+
+**Response**: `GroupVisitPlan`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) | yes | (read-only) |
+| groupBookingId | string (uuid) | yes | Unique; one plan per group booking. |
+| arrivalAt | string (date-time) |  | (nullable) |
+| arrivalLocation | string |  | (max length 200; nullable) |
+| meetingPoint | string |  | (max length 200; nullable) |
+| entryGateId | string (uuid) |  | (nullable) |
+| departureAt | string (date-time) |  | (nullable) |
+| groupLeaders | string |  | (max length 500; nullable) |
+| contactId | string (uuid) |  | (nullable) |
+| ticketingMethod | string |  | (max length 60; nullable) |
+| requirements | object |  | Seating, guides, catering, transportation, parking, accessibility, equipment and special requirements, as free text keyed by those names. (nullable) |
+| operationalOwnerPrincipalId | string (uuid) |  | (nullable) |
+| handoverNotes | string |  | (max length 4000; nullable) |
+| handoverAttachmentIds | array of string (uuid) |  |  |
+| handoverAcknowledgedByPrincipalId | string (uuid) |  | (nullable) |
+| handoverAcknowledgedAt | string (date-time) |  | (nullable) |
+| checkInStatus | enum (expected, partiallyArrived, arrived, noShow) | yes | (default expected) |
+| actualArrivalAt | string (date-time) |  | (nullable) |
+| arrivalGateId | string (uuid) |  | (nullable) |
+| arrivedCount | integer |  | (min 0; default 0) |
+| additionalGuests | integer |  | (min 0; default 0) |
+| staffLeadersCount | integer |  | (min 0; default 0) |
+| checkInIssues | array of enum (missingGuest, extraGuest, invalidTicket, wrongDate, lateArrival, paymentHold, missingCredential, accessibilityRequirement) |  |  |
+| checkedInByPrincipalId | string (uuid) |  | (nullable) |
+| scopePath | string |  | The partition key (ADR-0005). (read-only) |
+| createdAt | string (date-time) | yes | (read-only) |
+| updatedAt | string (date-time) |  | (read-only; nullable) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | The group's visit plan with its check-in recorded |
+| 400 | BadRequest | Validation failed |
+| 403 | Forbidden | Authenticated but not permitted at the requested scope |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 409 |  | The booking is cancelled (groupClosed). |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### reissueEntitlement
 
@@ -4868,7 +5123,7 @@ BL-116. **The keystone.** Recurring membership billing, wallet auto-reload, one-
 |---|---|
 | Permission | `PRODUCT_CONFIGURE` |
 | Scope level | venue |
-| Part of slice | setup, makes `orders.ticket_template` non-empty |
+| Part of slice | setup, changes rows of `orders.ticket_template` that another operation creates |
 | Wave | 1 |
 | Offline | no |
 | Config scope | venue |
@@ -4947,7 +5202,7 @@ Where the terminal captured the tip, this records what it reported. Where the gu
 | Conflict policy | append |
 | Reads | `cache:idempotency`, `orders.payment` |
 | Writes | `cache:idempotency`, `orders.payment` |
-| Called by | BO-024, EMP-035, POS-005, PTR-012 |
+| Called by | EMP-035, POS-005 |
 
 **Parameters**
 
@@ -5101,6 +5356,9 @@ A card payment returns `pendingConfirmation` when the terminal has been instruct
 **Which tenders each channel takes** (decided 28 September, audit R080 (a) and (d)). **In the guest app and on the guest web, card or wallet** (`card`, `wallet`): any other `tender` from a guest caller is refused with 409 `tenderNotAllowedOnChannel`. **At the till, all five the payment screen offers**: card, cash, digital wallet (`wallet`), gift card or voucher (`giftCard`, `voucher`), and online payment, which is a payment link the guest pays on their own device (`createPaymentLink`) rather than a tender on this call.
 **Posts to the ledger through the account mappings** (decided 28 September, audit R191): a captured `cash` payment posts `cashReceived`, `card` posts `cardReceived` and `wallet` posts `walletReceived`, each to the accounts `finance.setAccountMappings` holds for the venue, and to the fiscal period that is open for the payment date. An offline cash payment replayed through `syncOrders` posts the same event, dated by its `recordedAt`.
 **Writes one `payments.payment_attempt` row per provider call**, including a declined, errored or abandoned attempt that never becomes a payment: `orders.payment` records what was taken, the attempt records what was tried, and the provider health and payment performance reads count them. Also appends to `orders.order_event` when the order's payment state changes (decided 29 September, writers pass; DM6).
+**A guest-selected currency is what the provider is asked for** (decided 2 October 2026, Chinmay; CHG-FIN-001). Where the order has a `chargeCurrency`, a card or wallet payment from the guest web, app or kiosk is sent to the provider in that currency for `Order.chargeTotal`; the server sets `tenderCurrency`, `tenderAmount` and `fxRate` from the order's locked quote and ignores different values from the client. `amount` stays the base-currency amount, and that is what the ledger posts. Foreign cash handed over at a till is unchanged: recorded at its base equivalent, change in base.
+
+**No cash on a handheld; cash goes to a till** (decided 2 October 2026, Chinmay, batch 6 #200, EMP-009: "No cash on handhelds; cash goes to a till"; DEC-200; CHG-CSP-039; DI-805). A server taking payment at the table on a staff handheld (EMP-059) offers card, wallet, gift card and voucher only; a `cash` tender from a session with no till (the staff app, a handheld, a browser) is refused `409 cashNotOnHandheld`, and the guest pays cash at a till, where a drawer and a person reconcile it. So a server's End shift (EMP-009) has no cash count; the till holder's shift does.
 
 |  |  |
 |---|---|
@@ -5112,7 +5370,7 @@ A card payment returns `pendingConfirmation` when the terminal has been instruct
 | Conflict policy | append |
 | Reads | `catalogue.inventory_hold`, `ledger.fx_rate`, `orders.order_line`, `orders.payment`, `orders.sales_order`, `payments.provider_connection` |
 | Writes | `cache:idempotency`, `catalogue.channel_capacity`, `catalogue.inventory_hold`, `ledger.journal_entry`, `ledger.journal_line`, `orders.order_event`, `orders.payment`, `payments.payment_attempt`, `platform.idempotency_record`, `platform.outbox` |
-| Called by | BO-024, EMP-035, EMP-059, GST-009, GST-026, GST-027, KSK-007, POS-002, POS-004, POS-005, PTR-012, WEB-012, WEB-033, WEB-041, WEB-042 |
+| Called by | EMP-035, EMP-059, GST-009, KSK-007, POS-002, POS-004, POS-005, PTR-012, WEB-012, WEB-033 |
 | State model | Order ([states/order.yaml](../../../states/order.yaml)): moves `pending` -> `paid`, `pending` -> `partiallyPaid`, `partiallyPaid` -> `paid`, `pending` -> `failed`<br/>PaymentLink ([states/payment-link.yaml](../../../states/payment-link.yaml)): moves `issued` -> `paid`, `viewed` -> `paid`<br/>Payment ([states/payment.yaml](../../../states/payment.yaml)): created as `authorised` or `pendingConfirmation`<br/>Seat ([states/seat.yaml](../../../states/seat.yaml)): moves `held` -> `sold`<br/>SubBill ([states/sub-bill.yaml](../../../states/sub-bill.yaml)): moves `open` -> `paid`<br/>Table ([states/table.yaml](../../../states/table.yaml)): moves `billRequested` -> `needsClearing` |
 
 **Parameters**
@@ -5583,7 +5841,7 @@ This queries the provider directly and reconciles. A background reconciler runs 
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `orders.refund_policy`, `orders.refund_policy_time_band` |
 | Writes | `cache:idempotency`, `cache:resolution`, `orders.refund_policy`, `orders.refund_policy_time_band` |
-| Called by | ADM-611, BO-062, BO-065, BO-1146, BO-318 |
+| Called by | BO-062, BO-065, BO-1146, BO-318 |
 
 **Parameters**
 
@@ -5671,6 +5929,8 @@ Sequencing is ledger-first: the ledger entry is written, then the gateway is cal
 **The ledger entry is a `refundIssued` posting** to the accounts `finance.setAccountMappings` holds for the venue, in the fiscal period open for the refund date (decided 28 September, audit R191).
 **Appends to `orders.order_event`** (the order and reservation lifecycle log) one row per state change it makes, with the previous and new state, the actor and the correlation id (decided 29 September, writers pass).
 
+**Store credit is a gift card** (decided 2 October 2026, Chinmay, batch 1, POS-011: "Gift card"; DEC-061; CHG-CSP-037; DI-796). A refund settled as store credit (`Refund.settleTo` `storeCredit`, or `alternateTender` `giftCard`) issues a new gift card for the refund amount (wallet `issueGiftCard`) and hands it to the guest; it is not a voucher and not a top-up of the guest's wallet. POS-011 offers it as "Gift card".
+
 |  |  |
 |---|---|
 | Permission | `ORDER_REFUND` |
@@ -5681,7 +5941,7 @@ Sequencing is ledger-first: the ledger entry is written, then the gateway is cal
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `orders.fraud_rule`, `orders.payment`, `orders.refund`, `orders.sales_order` |
 | Writes | `cache:idempotency`, `ledger.journal_entry`, `ledger.posting`, `orders.order_event`, `orders.refund`, `platform.outbox` |
-| Called by | ADM-616, BO-022, BO-023, BO-026, BO-047, BO-1147, EMP-014, EMP-034, POS-002, POS-006, POS-011, PTR-008, PTR-015 |
+| Called by | ADM-610, ADM-616, BO-022, BO-023, BO-026, BO-047, BO-1147, EMP-034, POS-006, POS-011 |
 | State model | Coupon code ([states/coupon.yaml](../../../states/coupon.yaml)): moves `redeemed` -> `issued`<br/>Entitlement ([states/entitlement-status.yaml](../../../states/entitlement-status.yaml)): moves `issued` -> `cancelled`, `partiallyConsumed` -> `cancelled`<br/>F&B order ([states/fnb-order.yaml](../../../states/fnb-order.yaml)): moves `served` -> `refunded`, `collected` -> `refunded`, `delivered` -> `refunded`<br/>Order ([states/order.yaml](../../../states/order.yaml)): moves `paid` -> `refunded`, `completed` -> `refunded`, `paid` -> `partiallyRefunded`, `completed` -> `partiallyRefunded`, `partiallyRefunded` -> `refunded`<br/>Payment ([states/payment.yaml](../../../states/payment.yaml)): moves `captured` -> `refunded`<br/>Refund ([states/refund.yaml](../../../states/refund.yaml)): moves `failed` -> `pendingGateway`<br/>Seat ([states/seat.yaml](../../../states/seat.yaml)): moves `sold` -> `available` |
 
 **Parameters**
@@ -5723,6 +5983,11 @@ Sequencing is ledger-first: the ledger entry is written, then the gateway is cal
 | fxVariance.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | fxVariance.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | fxVariance.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| tenderCurrency | string |  | A refund goes back in the currency the guest paid (decided 2 October 2026, Chinmay; CHG-FIN-001). (pattern ^[A-Z]{3}$; read-only; nullable) |
+| tenderAmount | object |  | The refund in tenderCurrency, at that currency's own scale (CHG-FIN-001). (read-only) |
+| tenderAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| tenderAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| tenderAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | amount | Money | yes | On the wire this is three fields; in the database it is one column. |
 | amount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | amount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
@@ -5765,7 +6030,7 @@ Raised from the guest app. Enters the operations approval queue rather than refu
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `orders.fraud_rule`, `orders.refund_policy`, `orders.sales_order` |
 | Writes | `cache:idempotency`, `orders.refund` |
-| Called by | ADM-610, BO-028, GST-067, WEB-019 |
+| Called by | GST-067, WEB-019 |
 
 **Parameters**
 
@@ -5813,7 +6078,7 @@ An unknown order, or one outside the caller's scope, is the shared 404; an order
 | Read routing | replica |
 | Reads | `orders.refund` |
 | Writes | - |
-| Called by | ADM-609, BO-022, BO-023, BO-026, BO-047, EMP-014, EMP-034, POS-002, POS-006, PTR-002, PTR-005, PTR-008, PTR-015, PTR-016 |
+| Called by | ADM-609, ADM-616, BO-022, BO-023, BO-026, BO-047, BO-1147, EMP-014, EMP-034, POS-006, PTR-002, PTR-005, PTR-008, PTR-015, PTR-016 |
 
 **Parameters**
 
@@ -5838,6 +6103,11 @@ An unknown order, or one outside the caller's scope, is the shared 404; an order
 | items[].fxVariance.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | items[].fxVariance.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | items[].fxVariance.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| items[].tenderCurrency | string |  | A refund goes back in the currency the guest paid (decided 2 October 2026, Chinmay; CHG-FIN-001). (pattern ^[A-Z]{3}$; read-only; nullable) |
+| items[].tenderAmount | object |  | The refund in tenderCurrency, at that currency's own scale (CHG-FIN-001). (read-only) |
+| items[].tenderAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| items[].tenderAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| items[].tenderAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | items[].amount | Money | yes | On the wire this is three fields; in the database it is one column. |
 | items[].amount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | items[].amount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
@@ -5878,12 +6148,12 @@ Releases held capacity immediately rather than waiting for expiry. A guest cance
 | Permission | `ORDER_CANCEL` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `orders.reservation` |
 | Writes | `cache:idempotency`, `orders.order_event`, `orders.reservation` |
-| Called by | GST-016, GST-017, WEB-031 |
+| Called by | GST-016, GST-017, POS-031, WEB-031 |
 | State model | Reservation ([states/reservation.yaml](../../../states/reservation.yaml)): moves `held` -> `cancelled` |
 
 **Parameters**
@@ -5901,6 +6171,362 @@ Releases held capacity immediately rather than waiting for expiry. A guest cance
 | 409 |  | Already converted (alreadyConverted), or no longer held — expired or already cancelled (reservationNotHeld). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
+### convertReservation
+
+**`POST /reservations/{reservationId}/convert`**: Convert a reservation into an order
+
+**Appends to `orders.order_event`** on both the reservation (`converted`) and the new order, with the correlation id tying them, and writes `promotions.promotion_evaluation_trace` when the order is priced (decided 29 September, writers pass).
+
+|  |  |
+|---|---|
+| Permission | `ORDER_CREATE` |
+| Scope level | workstation |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `cache:idempotency`, `orders.order_line`, `orders.order_line_discount`, `orders.order_line_eligibility`, `orders.payment`, `orders.sales_order` |
+| Writes | `cache:idempotency`, `orders.order_event`, `orders.order_line`, `orders.payment`, `orders.sales_order`, `promotions.promotion_evaluation_trace` |
+| Called by | POS-031 |
+| State model | Order ([states/order.yaml](../../../states/order.yaml)): created as `pending`<br/>Reservation ([states/reservation.yaml](../../../states/reservation.yaml)): moves `held` -> `converted` |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| reservationId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
+
+**Response**: `Order`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) | yes | The client UUIDv7 from CreateOrderRequest.id. |
+| orderNumber | string |  | The number a guest reads and a cashier types. (read-only) |
+| channel | object | yes | Where it came from. |
+| venueId | string (uuid) | yes |  |
+| scopePath | string | yes |  |
+| status | OrderStatus: enum (pending, held, paid, partiallyPaid, completed, voided, refunded, partiallyRefunded, …) | yes | held is a parked sale — the cashier freed the till and the guest will return. |
+| currency | string | yes | Resolved from the region, not stored (ADR-0018, 24 August). (pattern ^[A-Z]{3}$) |
+| currencyScale | integer | yes | Resolved from the region, not stored (ADR-0018, 24 August). (min 0; max 4) |
+| grossAmount | Money | yes | On the wire this is three fields; in the database it is one column. |
+| grossAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| grossAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| grossAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| taxAmount | Money | yes | On the wire this is three fields; in the database it is one column. |
+| taxAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| taxAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| taxAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| netAmount | Money | yes | On the wire this is three fields; in the database it is one column. |
+| netAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| netAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| netAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| refundedAmount | Money |  | On the wire this is three fields; in the database it is one column. |
+| refundedAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| refundedAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| refundedAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| chargeCurrency | string |  | The currency the guest selected and is charged in (CHG-FIN-001, 2 October 2026). (pattern ^[A-Z]{3}$; read-only; nullable) |
+| chargeFxRate | object |  | Units of chargeCurrency per one unit of the base currency, from the region's tender rate in force at checkout (finance.FxRate), stored on the order so the payment, the receipt, the tax invoice and an… (read-only; nullable) |
+| chargeFxRateId | string (uuid) |  | The finance.FxRate row the rate was taken from, for audit. (read-only; nullable) |
+| chargeTotal | object |  | grossAmount converted at chargeFxRate and rounded to the charge currency's scale: what the guest pays and what the payment request to the provider asks for (CHG-FIN-001). (read-only) |
+| chargeTotal.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| chargeTotal.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| chargeTotal.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| chargeRateLockedUntil | string (date-time) |  | The quote holds until then (the cart lease). (read-only; nullable) |
+| droppedPromotions | array of object |  | Promotions left off this order at checkout because their budget cap would have been exceeded (decided 28 September, audit R101 (8)). (read-only) |
+| droppedPromotions[].promotionId | string (uuid) | yes |  |
+| droppedPromotions[].name | string |  |  |
+| droppedPromotions[].reason | enum (budgetCapReached) |  |  |
+| totalPriceVariance | object |  | Sum across lines. |
+| totalPriceVariance.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| totalPriceVariance.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| totalPriceVariance.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| lines | array of OrderLine | yes |  |
+| lines[].id | string (uuid) | yes | Client-generated UUIDv7 of the line. |
+| lines[].variantId | string (uuid) | yes |  |
+| lines[].recommendationId | string (uuid) |  | The trackingId of the ai decideRecommendations item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather t… (nullable) |
+| lines[].performanceId | string (uuid) |  |  |
+| lines[].bookedWindow | BookedWindow |  | The booked time window of an hourly product, such as a meeting room (decided 29 September, rev 3 REV3-13: meeting rooms by the hour are in scope). (nullable) |
+| lines[].bookedWindow.startsAt | string (date-time) | yes |  |
+| lines[].bookedWindow.endsAt | string (date-time) | yes | After startsAt, on the same venue day. |
+| lines[].inventoryHoldId | string |  | Lease the units were drawn from — a catalogue.InventoryHold.id. (nullable) |
+| lines[].seatIds | array of string (uuid) |  | Seated products only, as seating.Seat.id. (max items 50) |
+| lines[].resourceHoldId | string (uuid) |  | A resources.ResourceHold on a resource the guest picked on a venue map (decided 29 September, rev 3 REV3-15); variantId is the placed resource's price-band variant. (nullable) |
+| lines[].attributes | OrderLineAttributes |  | Open attributes of a line, kept from the cart to the order line. (nullable) |
+| lines[].attributes.transport | TransportLineAttributes |  | What a transport line is for (decided 29 September, rev 3 REV3-21). (nullable) |
+| lines[].quantity | integer | yes | (min 1) |
+| lines[].eligibilityDeclaration | array of object |  | What was declared for each guest on this line, kept as the record staff check at the gate. (nullable) |
+| lines[].eligibilityDeclaration[].ageBand | enum (infant, child, junior, adult, senior) |  | Infant under 3, child 3–12, junior 13–17, adult 18–59, senior 60+. |
+| lines[].eligibilityDeclaration[].ageYears | integer |  | (nullable) |
+| lines[].eligibilityDeclaration[].heightBandIndex | integer |  | (nullable) |
+| lines[].eligibilityDeclaration[].confidentSwimmer | boolean |  | Derived, kept for the gate check (decided 29 September, rev 3 REV3-26). (nullable) |
+| lines[].eligibilityDeclaration[].guardianSigned | boolean |  |  |
+| lines[].quotedUnitPrice | object | yes | What the client charged, from its local bundle. |
+| lines[].quotedUnitPrice.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| lines[].quotedUnitPrice.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| lines[].quotedUnitPrice.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| lines[].holderName | string |  | (nullable) |
+| lines[].dataMaskValues | object |  | Deliberately open. |
+| lines[].serverUnitPrice | object | yes | What the server computed on ingest. |
+| lines[].serverUnitPrice.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| lines[].serverUnitPrice.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| lines[].serverUnitPrice.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| lines[].priceVariance | object |  | Server minus quoted. |
+| lines[].priceVariance.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| lines[].priceVariance.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| lines[].priceVariance.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| lines[].taxAmount | Money | yes | On the wire this is three fields; in the database it is one column. |
+| lines[].taxAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| lines[].taxAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| lines[].taxAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| lines[].netAmount | Money | yes | On the wire this is three fields; in the database it is one column. |
+| lines[].netAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| lines[].netAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| lines[].netAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| lines[].grossAmount | Money | yes | On the wire this is three fields; in the database it is one column. |
+| lines[].grossAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| lines[].grossAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| lines[].grossAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| lines[].entitlementIds | array of string (uuid) |  | The entitlements this line issued. |
+| lines[].crossRegionRightIds | array of string |  | Redemption rights propagated to other cells for this line. |
+| lines[].reprintCount | integer |  | How many times this line's tickets were reprinted or resent. (min 0; default 0; read-only) |
+| lines[].venueId | string (uuid) |  | The order's venue, copied onto the line (ADR-0044's own example; system-design review SD-008, 29 September) so a line is scoped and partitionable without its order. (read-only) |
+| lines[].discounts | array of OrderLineDiscount |  | The discounts applied to this line, one row each (system-design review SD-008, 29 September). (read-only) |
+| lines[].discounts[].id | string (uuid) | yes |  |
+| lines[].discounts[].promotionId | string (uuid) |  | The promotion that gave it. (nullable) |
+| lines[].discounts[].source | enum (promotion, promoCode, manual, bundle, member) | yes |  |
+| lines[].discounts[].amount | Money | yes | On the wire this is three fields; in the database it is one column. |
+| lines[].discounts[].reason | string |  | A cashier's reason for a manual discount. (max length 200; nullable) |
+| payments | array of Payment |  |  |
+| payments[].id | string (uuid) | yes |  |
+| payments[].orderId | string (uuid) | yes |  |
+| payments[].tender | TenderKind: enum (cash, card, wallet, voucher, bankTransfer, hotelCharge, installment, giftCard, …) | yes | wallet is a digital wallet (Apple Pay, Google Pay and the like, taken through the gateway), the value the guest channels accept beside card (decided 28 September, audit R080 (a)). |
+| payments[].tenderCurrency | string |  | 4.6.11. (pattern ^[A-Z]{3}$) |
+| payments[].tenderAmount | object |  | The amount in tenderCurrency, at that currency's own scale. |
+| payments[].tenderAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| payments[].tenderAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| payments[].tenderAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| payments[].fxRate | object |  | The rate applied, stored on the payment rather than looked up later (CF-37). (nullable) |
+| payments[].fxRateSource | enum (manual, feed, cardScheme) |  | 4.2.8. (nullable) |
+| payments[].changeCurrency | string |  | 4.6.11 is deliberately asymmetric: accept foreign currency, refund in local. (pattern ^[A-Z]{3}$; nullable) |
+| payments[].amount | Money | yes | On the wire this is three fields; in the database it is one column. |
+| payments[].amount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| payments[].amount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| payments[].amount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| payments[].changeAmount | Money |  | On the wire this is three fields; in the database it is one column. |
+| payments[].changeAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| payments[].changeAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| payments[].changeAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| payments[].status | enum (authorised, captured, pendingConfirmation, declined, failed, voided, refunded) | yes |  |
+| payments[].providerName | string |  | (nullable) |
+| payments[].providerReference | string |  | The provider's own id for the charge (Stripe PaymentIntent, NI order reference). (nullable) |
+| payments[].providerIdempotencyKey | string |  | The idempotency key sent to the provider, which is this payment's id (SD-034, 29 September). (read-only; nullable) |
+| payments[].terminalId | string (uuid) |  | The card terminal a till payment ran on (ECR flow, SD-034). (nullable) |
+| payments[].nextAction | object |  | What the caller does while the payment is pendingConfirmation (SD-034, 29 September). (nullable) |
+| payments[].nextAction.kind | enum (redirect, terminal) |  |  |
+| payments[].nextAction.url | string (uri) |  | (nullable) |
+| payments[].nextAction.expiresAt | string (date-time) |  | (nullable) |
+| payments[].lastInquiryAt | string (date-time) |  | (nullable) |
+| payments[].recordedAt | string (date-time) | yes |  |
+| payments[].syncedAt | string (date-time) |  | (nullable) |
+| principalId | string (uuid) |  |  |
+| workstationId | string (uuid) |  |  |
+| shiftId | string (uuid) |  | (nullable) |
+| subjectId | string (uuid) |  | (nullable) |
+| holdLabel | string |  | The label a cashier gave when parking it with holdOrder — how they find it again. (max length 60; read-only; nullable) |
+| heldUntil | string (date-time) |  | When a held order expires and is voided (states/order.yaml), from holdOrder's holdUntil. (read-only; nullable) |
+| createdAt | string (date-time) | yes |  |
+| recordedAt | string (date-time) | yes |  |
+| syncedAt | string (date-time) |  | (nullable) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 201 |  | Converted |
+| 409 |  | Expired (reservationExpired) or already converted (alreadyConverted). |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
+### createReservation
+
+**`POST /reservations`**: Hold without payment
+
+A reservation is not an order. It holds capacity, expires, creates no entitlement and posts nothing to the ledger.
+**Appends to `orders.order_event`** (the order and reservation lifecycle log) one row per state change it makes, with the previous and new state, the actor and the correlation id (decided 29 September, writers pass).
+
+|  |  |
+|---|---|
+| Permission | `ORDER_CREATE` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `cache:idempotency`, `orders.reservation`, `orders.reservation_line` |
+| Writes | `cache:idempotency`, `orders.order_event`, `orders.reservation`, `orders.reservation_line` |
+| Called by | POS-031 |
+| State model | Reservation ([states/reservation.yaml](../../../states/reservation.yaml)): created as `held`<br/>Table ([states/table.yaml](../../../states/table.yaml)): moves `free` -> `reserved` |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
+
+**Request body**: `CreateReservationRequest`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) | yes | Client-generated UUIDv7 of the reservation, and its idempotency key — it must equal the Idempotency-Key header. |
+| venueId | string (uuid) | yes |  |
+| subjectId | string (uuid) |  | The guest the reservation is held for. |
+| lines | array of CreateOrderLine | yes | (min items 1) |
+| lines[].id | string (uuid) | yes | Client-generated UUIDv7 of the line. |
+| lines[].variantId | string (uuid) | yes |  |
+| lines[].recommendationId | string (uuid) |  | The trackingId of the ai decideRecommendations item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather t… (nullable) |
+| lines[].performanceId | string (uuid) |  |  |
+| lines[].bookedWindow | BookedWindow |  | The booked time window of an hourly product, such as a meeting room (decided 29 September, rev 3 REV3-13: meeting rooms by the hour are in scope). (nullable) |
+| lines[].bookedWindow.startsAt | string (date-time) | yes |  |
+| lines[].bookedWindow.endsAt | string (date-time) | yes | After startsAt, on the same venue day. |
+| lines[].inventoryHoldId | string |  | Lease the units were drawn from — a catalogue.InventoryHold.id. (nullable) |
+| lines[].seatIds | array of string (uuid) |  | Seated products only, as seating.Seat.id. (max items 50) |
+| lines[].resourceHoldId | string (uuid) |  | A resources.ResourceHold on a resource the guest picked on a venue map (decided 29 September, rev 3 REV3-15); variantId is the placed resource's price-band variant. (nullable) |
+| lines[].attributes | OrderLineAttributes |  | Open attributes of a line, kept from the cart to the order line. (nullable) |
+| lines[].attributes.transport | TransportLineAttributes |  | What a transport line is for (decided 29 September, rev 3 REV3-21). (nullable) |
+| lines[].quantity | integer | yes | (min 1) |
+| lines[].eligibilityDeclaration | array of object |  | What was declared for each guest on this line, kept as the record staff check at the gate. (nullable) |
+| lines[].eligibilityDeclaration[].ageBand | enum (infant, child, junior, adult, senior) |  | Infant under 3, child 3–12, junior 13–17, adult 18–59, senior 60+. |
+| lines[].eligibilityDeclaration[].ageYears | integer |  | (nullable) |
+| lines[].eligibilityDeclaration[].heightBandIndex | integer |  | (nullable) |
+| lines[].eligibilityDeclaration[].confidentSwimmer | boolean |  | Derived, kept for the gate check (decided 29 September, rev 3 REV3-26). (nullable) |
+| lines[].eligibilityDeclaration[].guardianSigned | boolean |  |  |
+| lines[].quotedUnitPrice | object | yes | What the client charged, from its local bundle. |
+| lines[].quotedUnitPrice.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| lines[].quotedUnitPrice.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| lines[].quotedUnitPrice.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| lines[].holderName | string |  | (nullable) |
+| lines[].dataMaskValues | object |  | Deliberately open. |
+| expiresAt | string (date-time) | yes |  |
+
+**Response**: `Reservation`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) | yes |  |
+| venueId | string (uuid) | yes |  |
+| subjectId | string (uuid) |  | The guest it is held for, from CreateReservationRequest.subjectId. (nullable) |
+| status | enum (held, converted, expired, cancelled) | yes |  |
+| lines | array of CreateOrderLine |  |  |
+| lines[].id | string (uuid) | yes | Client-generated UUIDv7 of the line. |
+| lines[].variantId | string (uuid) | yes |  |
+| lines[].recommendationId | string (uuid) |  | The trackingId of the ai decideRecommendations item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather t… (nullable) |
+| lines[].performanceId | string (uuid) |  |  |
+| lines[].bookedWindow | BookedWindow |  | The booked time window of an hourly product, such as a meeting room (decided 29 September, rev 3 REV3-13: meeting rooms by the hour are in scope). (nullable) |
+| lines[].bookedWindow.startsAt | string (date-time) | yes |  |
+| lines[].bookedWindow.endsAt | string (date-time) | yes | After startsAt, on the same venue day. |
+| lines[].inventoryHoldId | string |  | Lease the units were drawn from — a catalogue.InventoryHold.id. (nullable) |
+| lines[].seatIds | array of string (uuid) |  | Seated products only, as seating.Seat.id. (max items 50) |
+| lines[].resourceHoldId | string (uuid) |  | A resources.ResourceHold on a resource the guest picked on a venue map (decided 29 September, rev 3 REV3-15); variantId is the placed resource's price-band variant. (nullable) |
+| lines[].attributes | OrderLineAttributes |  | Open attributes of a line, kept from the cart to the order line. (nullable) |
+| lines[].attributes.transport | TransportLineAttributes |  | What a transport line is for (decided 29 September, rev 3 REV3-21). (nullable) |
+| lines[].quantity | integer | yes | (min 1) |
+| lines[].eligibilityDeclaration | array of object |  | What was declared for each guest on this line, kept as the record staff check at the gate. (nullable) |
+| lines[].eligibilityDeclaration[].ageBand | enum (infant, child, junior, adult, senior) |  | Infant under 3, child 3–12, junior 13–17, adult 18–59, senior 60+. |
+| lines[].eligibilityDeclaration[].ageYears | integer |  | (nullable) |
+| lines[].eligibilityDeclaration[].heightBandIndex | integer |  | (nullable) |
+| lines[].eligibilityDeclaration[].confidentSwimmer | boolean |  | Derived, kept for the gate check (decided 29 September, rev 3 REV3-26). (nullable) |
+| lines[].eligibilityDeclaration[].guardianSigned | boolean |  |  |
+| lines[].quotedUnitPrice | object | yes | What the client charged, from its local bundle. |
+| lines[].quotedUnitPrice.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| lines[].quotedUnitPrice.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| lines[].quotedUnitPrice.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| lines[].holderName | string |  | (nullable) |
+| lines[].dataMaskValues | object |  | Deliberately open. |
+| expiresAt | string (date-time) | yes |  |
+| createdAt | string (date-time) | yes |  |
+| convertedOrderId | string (uuid) |  | (nullable) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 201 |  | Held |
+| 409 |  | Capacity unavailable (capacityUnavailable). |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
+### extendReservation
+
+**`POST /reservations/{reservationId}/extend`**: Extend a reservation
+
+Bounded by the venue's maximum, so a reservation cannot be renewed indefinitely against a busy performance.
+**The maximum is the venue setting `reservationMaxExtensions`, with a tenant default** (decided 28 September, audit R094). **Proposed default, client to correct (audit R094): 1 extension.**
+**Appends to `orders.order_event`** (the order and reservation lifecycle log) one row per state change it makes, with the previous and new state, the actor and the correlation id (decided 29 September, writers pass).
+
+|  |  |
+|---|---|
+| Permission | `ORDER_CREATE` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `cache:idempotency`, `orders.reservation`, `orders.reservation_line` |
+| Writes | `cache:idempotency`, `orders.order_event`, `orders.reservation` |
+| Called by | POS-031 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| reservationId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
+
+**Response**: `Reservation`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) | yes |  |
+| venueId | string (uuid) | yes |  |
+| subjectId | string (uuid) |  | The guest it is held for, from CreateReservationRequest.subjectId. (nullable) |
+| status | enum (held, converted, expired, cancelled) | yes |  |
+| lines | array of CreateOrderLine |  |  |
+| lines[].id | string (uuid) | yes | Client-generated UUIDv7 of the line. |
+| lines[].variantId | string (uuid) | yes |  |
+| lines[].recommendationId | string (uuid) |  | The trackingId of the ai decideRecommendations item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather t… (nullable) |
+| lines[].performanceId | string (uuid) |  |  |
+| lines[].bookedWindow | BookedWindow |  | The booked time window of an hourly product, such as a meeting room (decided 29 September, rev 3 REV3-13: meeting rooms by the hour are in scope). (nullable) |
+| lines[].bookedWindow.startsAt | string (date-time) | yes |  |
+| lines[].bookedWindow.endsAt | string (date-time) | yes | After startsAt, on the same venue day. |
+| lines[].inventoryHoldId | string |  | Lease the units were drawn from — a catalogue.InventoryHold.id. (nullable) |
+| lines[].seatIds | array of string (uuid) |  | Seated products only, as seating.Seat.id. (max items 50) |
+| lines[].resourceHoldId | string (uuid) |  | A resources.ResourceHold on a resource the guest picked on a venue map (decided 29 September, rev 3 REV3-15); variantId is the placed resource's price-band variant. (nullable) |
+| lines[].attributes | OrderLineAttributes |  | Open attributes of a line, kept from the cart to the order line. (nullable) |
+| lines[].attributes.transport | TransportLineAttributes |  | What a transport line is for (decided 29 September, rev 3 REV3-21). (nullable) |
+| lines[].quantity | integer | yes | (min 1) |
+| lines[].eligibilityDeclaration | array of object |  | What was declared for each guest on this line, kept as the record staff check at the gate. (nullable) |
+| lines[].eligibilityDeclaration[].ageBand | enum (infant, child, junior, adult, senior) |  | Infant under 3, child 3–12, junior 13–17, adult 18–59, senior 60+. |
+| lines[].eligibilityDeclaration[].ageYears | integer |  | (nullable) |
+| lines[].eligibilityDeclaration[].heightBandIndex | integer |  | (nullable) |
+| lines[].eligibilityDeclaration[].confidentSwimmer | boolean |  | Derived, kept for the gate check (decided 29 September, rev 3 REV3-26). (nullable) |
+| lines[].eligibilityDeclaration[].guardianSigned | boolean |  |  |
+| lines[].quotedUnitPrice | object | yes | What the client charged, from its local bundle. |
+| lines[].quotedUnitPrice.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| lines[].quotedUnitPrice.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| lines[].quotedUnitPrice.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| lines[].holderName | string |  | (nullable) |
+| lines[].dataMaskValues | object |  | Deliberately open. |
+| expiresAt | string (date-time) | yes |  |
+| createdAt | string (date-time) | yes |  |
+| convertedOrderId | string (uuid) |  | (nullable) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Extended |
+| 409 |  | Expired (reservationExpired), or the extension limit is reached (extensionLimitReached). |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
 ### getReservation
 
 **`GET /reservations/{reservationId}`**: Read a reservation
@@ -5912,13 +6538,13 @@ A guest reads only a reservation held for them; another guest's is the shared 40
 | Permission | `ORDER_VIEW` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | primary |
 | Reads | `orders.reservation`, `orders.reservation_line` |
 | Writes | - |
-| Called by | GST-016, GST-017, WEB-031 |
+| Called by | GST-016, GST-017, POS-031, WEB-031 |
 
 **Parameters**
 
@@ -5983,13 +6609,13 @@ A guest reads only a reservation held for them; another guest's is the shared 40
 | Permission | `ORDER_VIEW` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | replica |
 | Reads | `orders.reservation`, `orders.reservation_line` |
 | Writes | - |
-| Called by | GST-016, WEB-031 |
+| Called by | GST-016, POS-031, WEB-031 |
 
 **Parameters**
 
@@ -6046,6 +6672,7 @@ A guest reads only a reservation held for them; another guest's is the shared 40
 
 **The single mechanism for a shift variance above the threshold** (decided 28 September, audit R080 (e)). A supervisor holding OVERSHORT_ACCEPT accepts it **on the till**, with a supervisor PIN step-up on the same device, after `closeShift` has left the shift in `pendingVariance`. The two other paths the package described are removed: no Duty Manager PIN holds the close before it is submitted, and no approval request (`approvals.createApprovalRequest`) is raised for a shift variance. BO-040 lists the shifts waiting here; it does not approve them by another route.
 Moves the shift to `closed` and each of its deposit boxes from `closed` to `reconciled` (`states/shift.yaml`, `states/deposit-box.yaml`).
+**Any till at the venue, and the daily cash reconciliation, with the supervisor's PIN** (decided 2 October 2026, Chinmay, batch 6 #174, BO-040: "Any till, with supervisor PIN"; batch 3 #1 and #173: the cashier signs out, the shift waits as "Under review", the next cashier starts, and the daily cash reconciliation goes through each shift; DEC-059, DEC-173; CHG-CSP-012). The till the shift was counted on may already be another cashier's, so the supervisor accepts from whichever till they are at, or from BO-043. The PIN step-up stays: still one mechanism, still a supervisor in person. The alternative is `rejectShiftVariance`: send it back for a recount (DEC-175).
 
 |  |  |
 |---|---|
@@ -6058,7 +6685,7 @@ Moves the shift to `closed` and each of its deposit boxes from `closed` to `reco
 | Step-up auth | pin |
 | Reads | `cache:idempotency`, `orders.pos_shift`, `orders.pos_shift_approval`, `orders.pos_shift_incident` |
 | Writes | `cache:idempotency`, `orders.pos_shift`, `platform.outbox` |
-| Called by | BO-039, BO-040, EMP-003, EMP-009, POS-001, POS-007, POS-009 |
+| Called by | BO-040, BO-043, EMP-009, POS-007 |
 | State model | Deposit box ([states/deposit-box.yaml](../../../states/deposit-box.yaml)): moves `closed` -> `reconciled`<br/>Shift ([states/shift.yaml](../../../states/shift.yaml)): moves `pendingVariance` -> `closed`<br/>Shift variance review ([states/variance-review.yaml](../../../states/variance-review.yaml)): moves `pendingReview` -> `reviewed` |
 
 **Parameters**
@@ -6122,6 +6749,8 @@ Moves the shift to `closed` and each of its deposit boxes from `closed` to `reco
 | variance.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | variance.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | variance.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| cashierReason | enum (tillError, unrecordedRefund, miscount, other) |  | What the cashier said went wrong, given with the blind count (CloseShiftRequest.cashierReason, DI-803) without seeing the variance; the supervisor reads it beside the variance on BO-040 (CHG-FIN-003). (read-only; nullable) |
+| cashierNote | string |  | The cashier's note with the count (CloseShiftRequest.notes; CHG-FIN-003). (max length 1000; read-only; nullable) |
 | heldLeaseCount | integer |  | Inventory leases currently held by this workstation. |
 | openedAt | string (date-time) | yes |  |
 | recordedAt | string (date-time) |  | When the device recorded the open. |
@@ -6129,6 +6758,10 @@ Moves the shift to `closed` and each of its deposit boxes from `closed` to `reco
 | suspendReason | string |  | The reason given to suspendShift. (max length 200; nullable) |
 | closedAt | string (date-time) |  | (nullable) |
 | closedByPrincipalId | string (uuid) |  | Who submitted the close count. (nullable) |
+| recountRequestedAt | string (date-time) |  | Set by rejectShiftVariance, cleared by the cashier's recount (decided 2 October 2026, Chinmay; DEC-175; CHG-CSP-013; DI-804). (read-only; nullable) |
+| recountRequestedByPrincipalId | string (uuid) |  | The supervisor who sent the count back (CHG-CSP-013). (read-only; nullable) |
+| recountReason | string |  | The supervisor's reason, shown to the cashier; never an amount (CHG-CSP-013, CHG-FIN-003). (max length 500; read-only; nullable) |
+| countNumber | integer |  | How many close counts the shift has had: 0 before the first, 1 after it, 2 after a recount (CHG-CSP-013). (min 0; read-only) |
 | syncedAt | string (date-time) |  | Null while the shift has unsynced operations. (nullable) |
 | approvals | array of object |  |  |
 | approvals[].kind | enum (open, close, variance) | yes | open from approveShiftOpen, close from approveShiftClose, variance from acceptShiftVariance. |
@@ -6143,108 +6776,6 @@ Moves the shift to `closed` and each of its deposit boxes from `closed` to `reco
 | 200 |  | Accepted and finalised |
 | 403 |  | The caller lacks OVERSHORT_ACCEPT at this venue, or is the cashier whose shift it is (problem type approver-is-cashier) — a cashier signing off their own shortfall is not a control (states/variance-r… |
 | 409 |  | Shift is not pendingVariance (problem type shift-not-pending-variance) — within tolerance, still open, or already accepted. |
-| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
-
-### adjustDepositBoxFloat
-
-**`POST /deposit-boxes/{boxId}/adjust-float`**: Change the initial fund
-
-5.8.4. **Gated on a right the cashier does not have**, because a cashier who can raise their own opening float can cover a shortfall by declaring one.
-**`amount` is a change, not the new total** (decided 28 September, audit R123 (3)): positive raises the float, negative lowers it, and the new `openingFloat` is the old one plus `amount`. A change that would take the float below zero is refused with 422 `float-below-zero`.
-
-|  |  |
-|---|---|
-| Permission | `CASH_ADD` |
-| Scope level | venue |
-| Part of slice | core |
-| Wave | 1 |
-| Offline | no |
-| Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `orders.deposit_box`, `orders.deposit_box_foreign_holding`, `orders.deposit_box_opening_denomination` |
-| Writes | `cache:idempotency`, `orders.cash_movement`, `orders.deposit_box` |
-| Called by | POS-001, POS-007, POS-011, POS-012, POS-013 |
-
-**Parameters**
-
-| Name | In | Required | Type | Notes |
-|---|---|---|---|---|
-| boxId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
-
-**Request body**
-
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| amount | object | yes | The change to the float, signed. |
-| amount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
-| amount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
-| amount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| reason | string | yes | (max length 300) |
-
-**Response**: `DepositBox`
-
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| id | string (uuid) |  | (read-only) |
-| cashierPrincipalId | string (uuid) | yes |  |
-| cashierName | string |  | (read-only) |
-| venueId | string (uuid) | yes |  |
-| workstationId | string (uuid) |  | Where it is being used now. (nullable) |
-| shiftId | string (uuid) |  | The shift trading from this box. (nullable) |
-| status | DepositBoxStatus: enum (allocated, open, suspended, closing, closed, reconciled) |  |  |
-| openingFloat | Money | yes | On the wire this is three fields; in the database it is one column. |
-| openingFloat.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
-| openingFloat.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
-| openingFloat.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| openingDenominations | array of object |  | 5.8.3. |
-| openingDenominations[].denominationId | string (uuid) | yes | References platform.denomination, as CashCountLine.denominationId does. |
-| openingDenominations[].count | integer | yes | (min 0) |
-| withdrawnTotal | object |  | Reduces the expected close figure. (read-only) |
-| withdrawnTotal.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
-| withdrawnTotal.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
-| withdrawnTotal.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| foreignHoldings | array of object |  | 4.6.11 and 6.1.10. |
-| foreignHoldings[].currency | string | yes | Stored, because it is the one thing that is not the region's. (pattern ^[A-Z]{3}$) |
-| foreignHoldings[].expectedAmount | object |  | The sum of tenders taken in this currency during the shift. |
-| foreignHoldings[].expectedAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
-| foreignHoldings[].expectedAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
-| foreignHoldings[].expectedAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| foreignHoldings[].countedAmount | Money | yes | On the wire this is three fields; in the database it is one column. |
-| foreignHoldings[].countedAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
-| foreignHoldings[].countedAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
-| foreignHoldings[].countedAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| foreignHoldings[].variance | Money |  | On the wire this is three fields; in the database it is one column. |
-| foreignHoldings[].variance.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
-| foreignHoldings[].variance.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
-| foreignHoldings[].variance.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| foreignHoldings[].baseEquivalent | object |  | At the rates on the payments, not today's. |
-| foreignHoldings[].baseEquivalent.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
-| foreignHoldings[].baseEquivalent.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
-| foreignHoldings[].baseEquivalent.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| expectedTotal | Money |  | On the wire this is three fields; in the database it is one column. |
-| expectedTotal.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
-| expectedTotal.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
-| expectedTotal.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| countedTotal | Money |  | On the wire this is three fields; in the database it is one column. |
-| countedTotal.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
-| countedTotal.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
-| countedTotal.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| variance | Money |  | On the wire this is three fields; in the database it is one column. |
-| variance.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
-| variance.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
-| variance.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| closedByPrincipalId | string (uuid) |  | Flagged where it is not the holder. (nullable) |
-| allocatedAt | string (date-time) |  | When the device recorded the allocation. |
-| closedAt | string (date-time) |  | (nullable) |
-
-**Responses**
-
-| Code | Shape | Meaning |
-|---|---|---|
-| 200 |  | Adjusted, and recorded against the person who authorised it |
-| 403 | Forbidden | Authenticated but not permitted at the requested scope |
-| 409 |  | The box is being counted or has been counted — closing, closed or reconciled (problem type deposit-box-not-open). |
-| 422 |  | The change would leave the float below zero (problem type float-below-zero, audit R123 (3)). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### allocateDepositBox
@@ -6295,6 +6826,7 @@ Moves the shift to `closed` and each of its deposit boxes from `closed` to `reco
 | withdrawnTotal.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | withdrawnTotal.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | withdrawnTotal.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| overDrawerLimit | boolean |  | The box holds more than its till's drawer limit (decided 2 October 2026, Chinmay, BO-042; DEC-179; CHG-CSP-016): computed on read from the box's expected cash against tenancy.Workstation.cashDrawerLi… (default False; read-only) |
 | foreignHoldings | array of object |  | 4.6.11 and 6.1.10. |
 | foreignHoldings[].currency | string | yes | Stored, because it is the one thing that is not the region's. (pattern ^[A-Z]{3}$) |
 | foreignHoldings[].expectedAmount | object |  | The sum of tenders taken in this currency during the shift. |
@@ -6351,6 +6883,7 @@ Moves the shift to `closed` and each of its deposit boxes from `closed` to `reco
 | withdrawnTotal.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | withdrawnTotal.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | withdrawnTotal.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| overDrawerLimit | boolean |  | The box holds more than its till's drawer limit (decided 2 October 2026, Chinmay, BO-042; DEC-179; CHG-CSP-016): computed on read from the box's expected cash against tenancy.Workstation.cashDrawerLi… (default False; read-only) |
 | foreignHoldings | array of object |  | 4.6.11 and 6.1.10. |
 | foreignHoldings[].currency | string | yes | Stored, because it is the one thing that is not the region's. (pattern ^[A-Z]{3}$) |
 | foreignHoldings[].expectedAmount | object |  | The sum of tenders taken in this currency during the shift. |
@@ -6408,7 +6941,7 @@ A float that does not match the venue's expected amount holds the shift in `pend
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `orders.pos_shift`, `orders.pos_shift_approval`, `orders.pos_shift_incident` |
 | Writes | `cache:idempotency`, `orders.pos_shift` |
-| Called by | BO-039, BO-040, EMP-003, EMP-009, POS-001, POS-007, POS-009 |
+| Called by | POS-001 |
 | State model | Shift ([states/shift.yaml](../../../states/shift.yaml)): moves `pendingApproval` -> `open` |
 
 **Parameters**
@@ -6472,6 +7005,8 @@ A float that does not match the venue's expected amount holds the shift in `pend
 | variance.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | variance.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | variance.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| cashierReason | enum (tillError, unrecordedRefund, miscount, other) |  | What the cashier said went wrong, given with the blind count (CloseShiftRequest.cashierReason, DI-803) without seeing the variance; the supervisor reads it beside the variance on BO-040 (CHG-FIN-003). (read-only; nullable) |
+| cashierNote | string |  | The cashier's note with the count (CloseShiftRequest.notes; CHG-FIN-003). (max length 1000; read-only; nullable) |
 | heldLeaseCount | integer |  | Inventory leases currently held by this workstation. |
 | openedAt | string (date-time) | yes |  |
 | recordedAt | string (date-time) |  | When the device recorded the open. |
@@ -6479,6 +7014,10 @@ A float that does not match the venue's expected amount holds the shift in `pend
 | suspendReason | string |  | The reason given to suspendShift. (max length 200; nullable) |
 | closedAt | string (date-time) |  | (nullable) |
 | closedByPrincipalId | string (uuid) |  | Who submitted the close count. (nullable) |
+| recountRequestedAt | string (date-time) |  | Set by rejectShiftVariance, cleared by the cashier's recount (decided 2 October 2026, Chinmay; DEC-175; CHG-CSP-013; DI-804). (read-only; nullable) |
+| recountRequestedByPrincipalId | string (uuid) |  | The supervisor who sent the count back (CHG-CSP-013). (read-only; nullable) |
+| recountReason | string |  | The supervisor's reason, shown to the cashier; never an amount (CHG-CSP-013, CHG-FIN-003). (max length 500; read-only; nullable) |
+| countNumber | integer |  | How many close counts the shift has had: 0 before the first, 1 after it, 2 after a recount (CHG-CSP-013). (min 0; read-only) |
 | syncedAt | string (date-time) |  | Null while the shift has unsynced operations. (nullable) |
 | approvals | array of object |  |  |
 | approvals[].kind | enum (open, close, variance) | yes | open from approveShiftOpen, close from approveShiftClose, variance from acceptShiftVariance. |
@@ -6494,66 +7033,6 @@ A float that does not match the venue's expected amount holds the shift in `pend
 | 409 |  | Shift is not pendingApproval (problem type shift-not-awaiting-approval) |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
-### closeDepositBoxes
-
-**`POST /deposit-boxes/close`**: Close one box or all of them
-
-5.8.6. **Automated close-out of one or more boxes.** A venue closing at 23:00 with forty tills does not close them one at a time, and a box whose holder has gone home still has to be reconciled.
-A box closed without its holder present is flagged rather than blocked — **the cash is counted by somebody, and who counted it is the record that matters.**
-**Counted figures are required, and a mismatch still closes** (decided 28 September, audit R123 (4)). Every box being closed needs an entry in `counts`, as a total or a denomination count (a denomination count takes precedence where both are sent). A box whose count differs from its expected figure closes with that difference recorded as its `variance`; it is not refused. A box still `allocated`, never traded, needs no count and closes at its opening float.
-
-|  |  |
-|---|---|
-| Permission | `SHIFT_CLOSE` |
-| Scope level | venue |
-| Part of slice | core |
-| Wave | 1 |
-| Offline | no |
-| Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `ledger.fx_rate`, `orders.cash_count_line`, `orders.deposit_box`, `orders.deposit_box_foreign_holding`, `orders.deposit_box_opening_denomination` |
-| Writes | `cache:idempotency`, `ledger.posting`, `orders.cash_count_line`, `orders.deposit_box` |
-| Called by | BO-024, POS-007 |
-| State model | Deposit box ([states/deposit-box.yaml](../../../states/deposit-box.yaml)): moves `open` -> `closing`, `closing` -> `closed`, `allocated` -> `closed` |
-
-**Parameters**
-
-| Name | In | Required | Type | Notes |
-|---|---|---|---|---|
-| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
-
-**Request body**
-
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| boxIds | array of string (uuid) |  |  |
-| allOpenAtVenue | boolean |  |  |
-| counts | array of object | yes | One count per box being closed that has traded (audit R123 (4)). |
-| counts[].boxId | string (uuid) | yes |  |
-| counts[].countedTotal | Money |  | On the wire this is three fields; in the database it is one column. |
-| counts[].countedTotal.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
-| counts[].countedTotal.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
-| counts[].countedTotal.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| counts[].countedDenominations | array of CashCountLine |  | A count is a list of lines and the line is the row. (min items 1) |
-| counts[].countedDenominations[].id | string (uuid) |  |  |
-| counts[].countedDenominations[].shiftId | string (uuid) | yes | A UUIDv7, as Shift.id and orders.pos_shift.id are. |
-| counts[].countedDenominations[].depositBoxId | string (uuid) |  | (nullable) |
-| counts[].countedDenominations[].countKind | enum (openingFloat, close, movement) |  | Which count this line belongs to — the opening float (openShift), the close (closeShift) or a lift or add (createCashMovement). |
-| counts[].countedDenominations[].cashMovementId | string (uuid) |  | The movement this line counts, where countKind is movement. (nullable) |
-| counts[].countedDenominations[].denominationId | string (uuid) | yes | References platform.denomination — face value, kind and sort order live there. |
-| counts[].countedDenominations[].countedQuantity | integer | yes | How many of this note or coin were in the drawer. (min 0) |
-| counts[].countedDenominations[].countedValue | Money |  | On the wire this is three fields; in the database it is one column. |
-| counts[].countedDenominations[].countedBy | string (uuid) |  | (nullable) |
-| counts[].countedDenominations[].countedAt | string (date-time) |  |  |
-| counts[].countedDenominations[].recountOf | string (uuid) |  | A recount points at what it replaces rather than overwriting it. (nullable) |
-
-**Responses**
-
-| Code | Shape | Meaning |
-|---|---|---|
-| 200 |  | Closed, with a variance per box |
-| 422 |  | A box being closed has no entry in counts, or its entry has neither a total nor a denomination count (problem type deposit-box-count-missing, audit R123 (4)). |
-| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
-
 ### closeShift
 
 **`POST /shifts/{shiftId}/close`**: Blind close-out
@@ -6564,19 +7043,22 @@ The response carries the variance. Where it exceeds the configured threshold, th
 **`acceptShiftVariance` is the one way past that threshold** (decided 28 September, audit R080 (e)): a supervisor accepts the variance on the till. The close is not held for a PIN before this call, and no approval request is raised for it.
 Closing a shift opened by another principal requires SHIFT_CLOSE_OTHER.
 Where the venue requires approval on close, the shift waits in `pendingClosure` for `approveShiftClose` (SHIFT_APPROVE_CLOSE).
+**The cashier never sees the expected cash** (decided 2 October 2026, Chinmay; CHG-FIN-003). This response carries `expectedCash` and `variance`, so it is the **supervisor and back-office close** (BO-039, BO-040: closing a shift on a cashier's behalf). A cashier counting their own drawer at the till or on the staff app submits the count with `submitShiftCount`, which returns neither figure. A caller closing a shift they opened themselves, without OVERSHORT_ACCEPT, is refused 403 `blind-count-required`. Retail practice and the client's reason are in docs/active/research-uae-vat-and-blind-close-2-october.md (MoM 9 Sep 2026 4.18, DI-271, DI-806).
 **Online only** (F32, 26 September pull audit R257). Closing needs the server's total — a variance computed against a stale local journal is not a variance — and POS-007 and `states/shift.yaml` (`pendingClosure` is not offline-reachable) already said so.
+**The supervisor's close: on POS-007 with a supervisor PIN, at any till, and in the daily cash reconciliation** (decided 2 October 2026, Chinmay, pre-apply round: "closeShift is declared on POS-007 (supervisor PIN, any till) and in the daily cash reconciliation"; batch 3 #1 and batch 6 #174; DEC-059, DEC-173; CHG-CSP-012). A supervisor closes a cashier's shift at the till the cashier left (POS-007), at any other till of the venue, or from the daily cash reconciliation (BO-043), which lists every shift of the day and resolves them one by one: a shift still open is closed here, a counted shift waiting for review is accepted (`acceptShiftVariance`) or sent back for a recount (`rejectShiftVariance`). The supervisor presents their own PIN on the device in use; the cashier's own count stays `submitShiftCount`.
 
 |  |  |
 |---|---|
 | Permission | `SHIFT_CLOSE` |
-| Scope level | workstation |
+| Scope level | venue |
 | Part of slice | core |
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | append |
+| Step-up auth | pin |
 | Reads | `cache:idempotency`, `ledger.fx_rate`, `orders.cash_count_line`, `orders.cash_movement`, `orders.payment`, `orders.pos_shift`, `orders.pos_shift_approval`, `orders.pos_shift_incident`, `platform.venue_settings` |
 | Writes | `cache:idempotency`, `ledger.journal_entry`, `orders.cash_count_line`, `orders.pos_shift` |
-| Called by | BO-039, BO-040, EMP-003, EMP-009, POS-001, POS-007, POS-009 |
+| Called by | BO-040, BO-043, POS-007 |
 | State model | Shift ([states/shift.yaml](../../../states/shift.yaml)): moves `open` -> `pendingClosure` |
 
 **Parameters**
@@ -6603,7 +7085,8 @@ Where the venue requires approval on close, the shift waits in `pendingClosure` 
 | nonCashDeclared[].amount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | nonCashDeclared[].amount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | nonCashDeclared[].amount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| notes | string |  | (max length 1000) |
+| notes | string |  | The cashier's note on the count. (max length 1000) |
+| cashierReason | enum (tillError, unrecordedRefund, miscount, other) |  | Anything the cashier knows went wrong in the shift (DI-803: till error, unrecorded refund, miscount, other). (nullable) |
 | releaseHeldLeases | boolean |  | Return unsold inventory leases held by this workstation (ADR-0013 C103). (default True) |
 | recordedAt | string (date-time) | yes |  |
 
@@ -6656,6 +7139,8 @@ Where the venue requires approval on close, the shift waits in `pendingClosure` 
 | shift.variance.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | shift.variance.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | shift.variance.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| shift.cashierReason | enum (tillError, unrecordedRefund, miscount, other) |  | What the cashier said went wrong, given with the blind count (CloseShiftRequest.cashierReason, DI-803) without seeing the variance; the supervisor reads it beside the variance on BO-040 (CHG-FIN-003). (read-only; nullable) |
+| shift.cashierNote | string |  | The cashier's note with the count (CloseShiftRequest.notes; CHG-FIN-003). (max length 1000; read-only; nullable) |
 | shift.heldLeaseCount | integer |  | Inventory leases currently held by this workstation. |
 | shift.openedAt | string (date-time) | yes |  |
 | shift.recordedAt | string (date-time) |  | When the device recorded the open. |
@@ -6663,6 +7148,10 @@ Where the venue requires approval on close, the shift waits in `pendingClosure` 
 | shift.suspendReason | string |  | The reason given to suspendShift. (max length 200; nullable) |
 | shift.closedAt | string (date-time) |  | (nullable) |
 | shift.closedByPrincipalId | string (uuid) |  | Who submitted the close count. (nullable) |
+| shift.recountRequestedAt | string (date-time) |  | Set by rejectShiftVariance, cleared by the cashier's recount (decided 2 October 2026, Chinmay; DEC-175; CHG-CSP-013; DI-804). (read-only; nullable) |
+| shift.recountRequestedByPrincipalId | string (uuid) |  | The supervisor who sent the count back (CHG-CSP-013). (read-only; nullable) |
+| shift.recountReason | string |  | The supervisor's reason, shown to the cashier; never an amount (CHG-CSP-013, CHG-FIN-003). (max length 500; read-only; nullable) |
+| shift.countNumber | integer |  | How many close counts the shift has had: 0 before the first, 1 after it, 2 after a recount (CHG-CSP-013). (min 0; read-only) |
 | shift.syncedAt | string (date-time) |  | Null while the shift has unsynced operations. (nullable) |
 | shift.approvals | array of object |  |  |
 | shift.approvals[].kind | enum (open, close, variance) | yes | open from approveShiftOpen, close from approveShiftClose, variance from acceptShiftVariance. |
@@ -6702,8 +7191,8 @@ Where the venue requires approval on close, the shift waits in `pendingClosure` 
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Closed, or held pending variance acceptance or approval |
+| 403 |  | The caller is the cashier whose shift it is and does not hold OVERSHORT_ACCEPT (problem type blind-count-required): their count goes through submitShiftCount, which never returns the expected figure… |
 | 400 | BadRequest | Validation failed |
-| 403 | Forbidden | Authenticated but not permitted at the requested scope |
 | 409 |  | Shift is not open or suspended — already closing or closed (problem type shift-not-open) — or open orders remain (open-orders-remain) |
 | 422 |  | A counted line names an unknown or inactive denomination (unknown-denomination), repeats one (duplicate-denomination), or sends a total that disagrees with count times face value (count-total-mismatc… |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
@@ -6723,7 +7212,7 @@ Where the venue requires approval on close, the shift waits in `pendingClosure` 
 | Read routing | primary |
 | Reads | `orders.pos_shift`, `orders.pos_shift_approval`, `orders.pos_shift_incident` |
 | Writes | - |
-| Called by | BO-039, BO-040, EMP-003, EMP-008, EMP-009, EMP-022, POS-001, POS-007, POS-009, POS-012, POS-025, SCN-001 |
+| Called by | EMP-008, EMP-009, POS-001, POS-007, POS-012 |
 
 **Response**: `Shift`
 
@@ -6773,6 +7262,8 @@ Where the venue requires approval on close, the shift waits in `pendingClosure` 
 | variance.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | variance.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | variance.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| cashierReason | enum (tillError, unrecordedRefund, miscount, other) |  | What the cashier said went wrong, given with the blind count (CloseShiftRequest.cashierReason, DI-803) without seeing the variance; the supervisor reads it beside the variance on BO-040 (CHG-FIN-003). (read-only; nullable) |
+| cashierNote | string |  | The cashier's note with the count (CloseShiftRequest.notes; CHG-FIN-003). (max length 1000; read-only; nullable) |
 | heldLeaseCount | integer |  | Inventory leases currently held by this workstation. |
 | openedAt | string (date-time) | yes |  |
 | recordedAt | string (date-time) |  | When the device recorded the open. |
@@ -6780,6 +7271,10 @@ Where the venue requires approval on close, the shift waits in `pendingClosure` 
 | suspendReason | string |  | The reason given to suspendShift. (max length 200; nullable) |
 | closedAt | string (date-time) |  | (nullable) |
 | closedByPrincipalId | string (uuid) |  | Who submitted the close count. (nullable) |
+| recountRequestedAt | string (date-time) |  | Set by rejectShiftVariance, cleared by the cashier's recount (decided 2 October 2026, Chinmay; DEC-175; CHG-CSP-013; DI-804). (read-only; nullable) |
+| recountRequestedByPrincipalId | string (uuid) |  | The supervisor who sent the count back (CHG-CSP-013). (read-only; nullable) |
+| recountReason | string |  | The supervisor's reason, shown to the cashier; never an amount (CHG-CSP-013, CHG-FIN-003). (max length 500; read-only; nullable) |
+| countNumber | integer |  | How many close counts the shift has had: 0 before the first, 1 after it, 2 after a recount (CHG-CSP-013). (min 0; read-only) |
 | syncedAt | string (date-time) |  | Null while the shift has unsynced operations. (nullable) |
 | approvals | array of object |  |  |
 | approvals[].kind | enum (open, close, variance) | yes | open from approveShiftOpen, close from approveShiftClose, variance from acceptShiftVariance. |
@@ -6795,9 +7290,12 @@ Where the venue requires approval on close, the shift waits in `pendingClosure` 
 | 404 |  | No shift open or suspended on this workstation, or the session has no workstation (problem type no-current-shift) |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
-### getShift
+### getShiftCountLines
 
-**`GET /shifts/{shiftId}`**: Read a shift
+**`GET /shifts/{shiftId}/count-lines`**: The denomination breakdown of a shift's counts
+
+**The closing count, note by note, for the person reviewing it** (decided 2 October 2026, Chinmay, batch 6 #176, BO-040: "Add a read for the count lines"; DEC-176; CHG-CSP-014; DI-272: the closing receipt itemises denominations). Until 2 October the lines were written (`CashCountLine`) and nothing returned them, so BO-040 could show totals only. Returns the shift's `CashCountLine` rows, filtered by `countKind` (default all), **ordered by `countKind` (opening float, close, movement), then count number (a recount after the first count), then the denomination's counting order, `id` as the tiebreak**. Each recount line names the line it replaces (`recountOf`).
+**What the cashier counted, never what was expected**: a line carries counted quantity and value only (`CashCountLine.expectedQuantity` is derived and not returned), so the read is safe for the shift's own cashier as well as the supervisor; the expected figure and the variance stay on `Shift` for OVERSHORT_ACCEPT or SHIFT_CLOSE_OTHER holders (CHG-FIN-003).
 
 |  |  |
 |---|---|
@@ -6805,18 +7303,123 @@ Where the venue requires approval on close, the shift waits in `pendingClosure` 
 | Scope level | venue |
 | Part of slice | core |
 | Wave | 1 |
-| Offline | yes |
+| Offline | no |
 | Conflict policy | serverWins |
-| Read routing | primary |
-| Reads | `orders.pos_shift`, `orders.pos_shift_approval`, `orders.pos_shift_incident` |
+| Read routing | replica |
+| Reads | `orders.cash_count_line` |
 | Writes | - |
-| Called by | BO-039, BO-040, BO-041, BO-042, EMP-003, EMP-008, EMP-009, POS-001, POS-007, POS-009 |
+| Called by | BO-040, BO-043, POS-007 |
 
 **Parameters**
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | shiftId | path | yes | string (uuid) |  |
+| countKind | query |  | enum (openingFloat, close, movement) |  |
+| pageSize | query |  | integer |  |
+| cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
+
+**Response**: `object`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| items | array of CashCountLine | yes |  |
+| items[].id | string (uuid) |  |  |
+| items[].shiftId | string (uuid) | yes | A UUIDv7, as Shift.id and orders.pos_shift.id are. |
+| items[].depositBoxId | string (uuid) |  | (nullable) |
+| items[].countKind | enum (openingFloat, close, movement) |  | Which count this line belongs to — the opening float (openShift), the close (closeShift) or a lift or add (createCashMovement). |
+| items[].cashMovementId | string (uuid) |  | The movement this line counts, where countKind is movement. (nullable) |
+| items[].denominationId | string (uuid) | yes | References platform.denomination — face value, kind and sort order live there. |
+| items[].countedQuantity | integer | yes | How many of this note or coin were in the drawer. (min 0) |
+| items[].countedValue | Money |  | On the wire this is three fields; in the database it is one column. |
+| items[].countedValue.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| items[].countedValue.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| items[].countedValue.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| items[].countedBy | string (uuid) |  | (nullable) |
+| items[].countedAt | string (date-time) |  |  |
+| items[].recountOf | string (uuid) |  | A recount points at what it replaces rather than overwriting it. (nullable) |
+| nextCursor | string |  |  |
+| hasMore | boolean | yes |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | The shift's count lines, one page at a time, in the order above |
+| 403 | Forbidden | Authenticated but not permitted at the requested scope |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
+### getTillShiftPolicy
+
+**`GET /venues/{venueId}/till-shift-policy`**: The rules every till in the venue opens and closes to
+
+**What `setTillShiftPolicy` writes, read back** (CHG-CSP-020); a venue that has saved none reads the defaults. Tills read it at sign-in, so the open and close screens know whether to ask for a deposit box, a bag number or an approval.
+
+|  |  |
+|---|---|
+| Permission | `SCOPE_VIEW` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | yes |
+| Conflict policy | serverWins |
+| Read routing | replica |
+| Reads | `orders.till_shift_policy` |
+| Writes | - |
+| Called by | BO-065, POS-019 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| venueId | path | yes | string (uuid) |  |
+
+**Response**: `TillShiftPolicy`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) |  | (read-only) |
+| venueId | string (uuid) | yes |  |
+| scopePath | string |  | (read-only) |
+| requireOpenApproval | boolean |  | Every shift opens pendingApproval and waits for approveShiftOpen (SHIFT_APPROVE_OPEN). (default False) |
+| openingFloatTolerance | object |  | How far a declared opening float may differ from the box's allocated float before the shift waits for approval (states/shift.yaml, pendingApproval). (nullable) |
+| openingFloatTolerance.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| openingFloatTolerance.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| openingFloatTolerance.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| depositBoxRequired | boolean |  | A shift cannot open without a deposit box (OpenShiftRequest.depositBoxCode); refused 400 otherwise. (default True) |
+| bagNumberRequired | boolean |  | A shift cannot open without a bag number (OpenShiftRequest.bagNumber). (default False) |
+| requireCloseApproval | boolean |  | Every counted shift waits in pendingClosure for approveShiftClose (SHIFT_APPROVE_CLOSE), even within the variance threshold. (default False) |
+| autoCloseAfterHours | integer |  | Hours after which an open or suspended shift nobody closed is closed by the inactivity job as autoClosed and the supervisors are told (states/shift.yaml). (min 1; max 48; default 14; nullable) |
+| noSaleAlertCount | integer |  | No-sales in one shift (recordNoSale) at which the supervisors are alerted on the venue's alerting channel; the count is on POS-020. (min 1; default 10; nullable) |
+| updatedAt | string (date-time) |  | (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | The venue's till shift policy |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
+### getWorkstationShift
+
+**`GET /shifts/current/overview`**: Read the open or suspended shift on the session's workstation, without the right to open one
+
+**A read needs a view permission, not the right to open a shift** (CHG-DOOR-005, Chinmay, 2 October 2026: fix the Block A blockers now; platform-foundation process notes, correction on POS-025). `getCurrentShift` declares SHIFT_OPEN, so a supervisor covering a till who holds no shift of their own could not load the till home (POS-025) at all. This is the same answer for a person who may only look: the shift on the session's workstation under REPORT_VIEW_WORKSTATION, the permission `getShift` and `listShifts` already use to read a shift. `getCurrentShift` keeps SHIFT_OPEN unchanged for the screens that act on the shift (begin, close), so nothing built against r1 changes. The response is the same `Shift`; what a role may see of the figures is decided on the screen (DI-802), not by a second shape.
+
+|  |  |
+|---|---|
+| Permission | `REPORT_VIEW_WORKSTATION` |
+| Scope level | workstation |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | yes |
+| Conflict policy | serverWins |
+| Read routing | primary |
+| Reads | `orders.pos_shift`, `orders.pos_shift_approval`, `orders.pos_shift_incident` |
+| Writes | - |
+| Called by | EMP-003, POS-025 |
 
 **Response**: `Shift`
 
@@ -6866,6 +7469,8 @@ Where the venue requires approval on close, the shift waits in `pendingClosure` 
 | variance.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | variance.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | variance.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| cashierReason | enum (tillError, unrecordedRefund, miscount, other) |  | What the cashier said went wrong, given with the blind count (CloseShiftRequest.cashierReason, DI-803) without seeing the variance; the supervisor reads it beside the variance on BO-040 (CHG-FIN-003). (read-only; nullable) |
+| cashierNote | string |  | The cashier's note with the count (CloseShiftRequest.notes; CHG-FIN-003). (max length 1000; read-only; nullable) |
 | heldLeaseCount | integer |  | Inventory leases currently held by this workstation. |
 | openedAt | string (date-time) | yes |  |
 | recordedAt | string (date-time) |  | When the device recorded the open. |
@@ -6873,6 +7478,10 @@ Where the venue requires approval on close, the shift waits in `pendingClosure` 
 | suspendReason | string |  | The reason given to suspendShift. (max length 200; nullable) |
 | closedAt | string (date-time) |  | (nullable) |
 | closedByPrincipalId | string (uuid) |  | Who submitted the close count. (nullable) |
+| recountRequestedAt | string (date-time) |  | Set by rejectShiftVariance, cleared by the cashier's recount (decided 2 October 2026, Chinmay; DEC-175; CHG-CSP-013; DI-804). (read-only; nullable) |
+| recountRequestedByPrincipalId | string (uuid) |  | The supervisor who sent the count back (CHG-CSP-013). (read-only; nullable) |
+| recountReason | string |  | The supervisor's reason, shown to the cashier; never an amount (CHG-CSP-013, CHG-FIN-003). (max length 500; read-only; nullable) |
+| countNumber | integer |  | How many close counts the shift has had: 0 before the first, 1 after it, 2 after a recount (CHG-CSP-013). (min 0; read-only) |
 | syncedAt | string (date-time) |  | Null while the shift has unsynced operations. (nullable) |
 | approvals | array of object |  |  |
 | approvals[].kind | enum (open, close, variance) | yes | open from approveShiftOpen, close from approveShiftClose, variance from acceptShiftVariance. |
@@ -6884,9 +7493,9 @@ Where the venue requires approval on close, the shift waits in `pendingClosure` 
 
 | Code | Shape | Meaning |
 |---|---|---|
-| 200 |  | Shift |
+| 200 |  | The open or suspended shift on this workstation |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
-| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 404 |  | No shift open or suspended on this workstation, or the session has no workstation (problem type no-current-shift). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### listDenominations
@@ -6908,7 +7517,7 @@ Raised by Tanmay in the 20 August review, and **the table was built and nothing 
 | Read routing | replica |
 | Reads | `platform.denomination`, `platform.region_settings` |
 | Writes | - |
-| Called by | BO-1065, POS-001, POS-007, POS-011, POS-012, POS-013 |
+| Called by | BO-1065, POS-001, POS-007 |
 
 **Parameters**
 
@@ -6941,7 +7550,7 @@ That separation is what makes a variance attributable to a person rather than to
 | Read routing | primary |
 | Reads | `identity.principal`, `orders.deposit_box`, `orders.deposit_box_foreign_holding`, `orders.deposit_box_opening_denomination` |
 | Writes | - |
-| Called by | BO-042, POS-015 |
+| Called by | BO-042, POS-015, POS-018 |
 
 **Parameters**
 
@@ -6974,6 +7583,7 @@ That separation is what makes a variance attributable to a person rather than to
 | items[].withdrawnTotal.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | items[].withdrawnTotal.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | items[].withdrawnTotal.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| items[].overDrawerLimit | boolean |  | The box holds more than its till's drawer limit (decided 2 October 2026, Chinmay, BO-042; DEC-179; CHG-CSP-016): computed on read from the box's expected cash against tenancy.Workstation.cashDrawerLi… (default False; read-only) |
 | items[].foreignHoldings | array of object |  | 4.6.11 and 6.1.10. |
 | items[].foreignHoldings[].currency | string | yes | Stored, because it is the one thing that is not the region's. (pattern ^[A-Z]{3}$) |
 | items[].foreignHoldings[].expectedAmount | object |  | The sum of tenders taken in this currency during the shift. |
@@ -7020,7 +7630,7 @@ That separation is what makes a variance attributable to a person rather than to
 | Read routing | primary |
 | Reads | `orders.pos_shift`, `orders.pos_shift_approval`, `orders.pos_shift_incident` |
 | Writes | - |
-| Called by | BO-039, BO-040, BO-041, BO-042, BO-100, EMP-003, EMP-008, EMP-009, POS-001, POS-007, POS-009, POS-019 |
+| Called by | BO-039, BO-040, BO-041, BO-043, BO-100, EMP-008, EMP-009, POS-009, POS-019 |
 
 **Parameters**
 
@@ -7082,6 +7692,8 @@ That separation is what makes a variance attributable to a person rather than to
 | items[].variance.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | items[].variance.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | items[].variance.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| items[].cashierReason | enum (tillError, unrecordedRefund, miscount, other) |  | What the cashier said went wrong, given with the blind count (CloseShiftRequest.cashierReason, DI-803) without seeing the variance; the supervisor reads it beside the variance on BO-040 (CHG-FIN-003). (read-only; nullable) |
+| items[].cashierNote | string |  | The cashier's note with the count (CloseShiftRequest.notes; CHG-FIN-003). (max length 1000; read-only; nullable) |
 | items[].heldLeaseCount | integer |  | Inventory leases currently held by this workstation. |
 | items[].openedAt | string (date-time) | yes |  |
 | items[].recordedAt | string (date-time) |  | When the device recorded the open. |
@@ -7089,6 +7701,10 @@ That separation is what makes a variance attributable to a person rather than to
 | items[].suspendReason | string |  | The reason given to suspendShift. (max length 200; nullable) |
 | items[].closedAt | string (date-time) |  | (nullable) |
 | items[].closedByPrincipalId | string (uuid) |  | Who submitted the close count. (nullable) |
+| items[].recountRequestedAt | string (date-time) |  | Set by rejectShiftVariance, cleared by the cashier's recount (decided 2 October 2026, Chinmay; DEC-175; CHG-CSP-013; DI-804). (read-only; nullable) |
+| items[].recountRequestedByPrincipalId | string (uuid) |  | The supervisor who sent the count back (CHG-CSP-013). (read-only; nullable) |
+| items[].recountReason | string |  | The supervisor's reason, shown to the cashier; never an amount (CHG-CSP-013, CHG-FIN-003). (max length 500; read-only; nullable) |
+| items[].countNumber | integer |  | How many close counts the shift has had: 0 before the first, 1 after it, 2 after a recount (CHG-CSP-013). (min 0; read-only) |
 | items[].syncedAt | string (date-time) |  | Null while the shift has unsynced operations. (nullable) |
 | items[].approvals | array of object |  |  |
 | items[].approvals[].kind | enum (open, close, variance) | yes | open from approveShiftOpen, close from approveShiftClose, variance from acceptShiftVariance. |
@@ -7110,7 +7726,8 @@ That separation is what makes a variance attributable to a person rather than to
 
 **`POST /shifts`**: Open a shift
 
-Fails if another shift is already open on this workstation. Where the venue is configured to require approval on open, the shift is created in `pendingApproval` and cannot transact until approved.
+Fails if another shift is already open on this workstation. Where the venue is configured to require approval on open (`TillShiftPolicy.requireOpenApproval`), the shift is created in `pendingApproval` and cannot transact until approved.
+**A shift waiting for review never blocks the next one** (decided 2 October 2026, Chinmay, batch 3 #1, POS-007, and batch 6 #173, BO-040: "The cashier may sign out, and the shift stays pending until the supervisor accepts. That must not stop the next cashier starting a shift"; DEC-059, DEC-173; CHG-CSP-012; DI-805). Only a shift that is `open` or `suspended` on this workstation refuses a new one. A previous shift that is counted and waiting (`pendingVariance`, `pendingClosure`) has its own deposit box and its own count, so the next cashier opens with a new box and float while it waits; the outgoing cashier's till shows it as "Under review", and the supervisor resolves it at any till or in the daily cash reconciliation (BO-043).
 **Online only** (F32, 26 September pull audit R257). An opening float declared offline is a float nobody can reconcile against the safe; POS-001's own transition and `states/shift.yaml` already said so, and this flag said the opposite until 26 September.
 
 |  |  |
@@ -7123,7 +7740,7 @@ Fails if another shift is already open on this workstation. Where the venue is c
 | Conflict policy | append |
 | Reads | `cache:idempotency`, `identity.principal`, `orders.cash_count_line`, `orders.pos_shift`, `orders.pos_shift_approval`, `orders.pos_shift_incident`, `platform.venue_settings`, `platform.workstation` |
 | Writes | `cache:idempotency`, `orders.cash_count_line`, `orders.pos_shift` |
-| Called by | BO-039, BO-040, EMP-003, EMP-009, POS-001, POS-007, POS-009, POS-012 |
+| Called by | POS-001 |
 | State model | Deposit box ([states/deposit-box.yaml](../../../states/deposit-box.yaml)): moves `allocated` -> `open`<br/>Shift ([states/shift.yaml](../../../states/shift.yaml)): created as `pendingApproval` or `open` |
 
 **Parameters**
@@ -7204,6 +7821,8 @@ Fails if another shift is already open on this workstation. Where the venue is c
 | variance.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | variance.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | variance.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| cashierReason | enum (tillError, unrecordedRefund, miscount, other) |  | What the cashier said went wrong, given with the blind count (CloseShiftRequest.cashierReason, DI-803) without seeing the variance; the supervisor reads it beside the variance on BO-040 (CHG-FIN-003). (read-only; nullable) |
+| cashierNote | string |  | The cashier's note with the count (CloseShiftRequest.notes; CHG-FIN-003). (max length 1000; read-only; nullable) |
 | heldLeaseCount | integer |  | Inventory leases currently held by this workstation. |
 | openedAt | string (date-time) | yes |  |
 | recordedAt | string (date-time) |  | When the device recorded the open. |
@@ -7211,6 +7830,10 @@ Fails if another shift is already open on this workstation. Where the venue is c
 | suspendReason | string |  | The reason given to suspendShift. (max length 200; nullable) |
 | closedAt | string (date-time) |  | (nullable) |
 | closedByPrincipalId | string (uuid) |  | Who submitted the close count. (nullable) |
+| recountRequestedAt | string (date-time) |  | Set by rejectShiftVariance, cleared by the cashier's recount (decided 2 October 2026, Chinmay; DEC-175; CHG-CSP-013; DI-804). (read-only; nullable) |
+| recountRequestedByPrincipalId | string (uuid) |  | The supervisor who sent the count back (CHG-CSP-013). (read-only; nullable) |
+| recountReason | string |  | The supervisor's reason, shown to the cashier; never an amount (CHG-CSP-013, CHG-FIN-003). (max length 500; read-only; nullable) |
+| countNumber | integer |  | How many close counts the shift has had: 0 before the first, 1 after it, 2 after a recount (CHG-CSP-013). (min 0; read-only) |
 | syncedAt | string (date-time) |  | Null while the shift has unsynced operations. (nullable) |
 | approvals | array of object |  |  |
 | approvals[].kind | enum (open, close, variance) | yes | open from approveShiftOpen, close from approveShiftClose, variance from acceptShiftVariance. |
@@ -7225,7 +7848,7 @@ Fails if another shift is already open on this workstation. Where the venue is c
 | 201 |  | Opened, or awaiting approval |
 | 400 | BadRequest | Validation failed |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
-| 409 |  | A shift is already open on this workstation (problem type shift-already-open), or a required device is absent (required-device-absent). |
+| 409 |  | A shift is already open or suspended on this workstation (problem type shift-already-open), or a required device is absent (required-device-absent). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### recordNoSale
@@ -7245,7 +7868,7 @@ Change for a guest, a dropped coin, correcting a float. Legitimate and routine.
 | Conflict policy | append |
 | Reads | `cache:idempotency`, `orders.no_sale_event` |
 | Writes | `cache:idempotency`, `orders.no_sale_event` |
-| Called by | BO-039, BO-040, BO-041, EMP-003, EMP-009, POS-001, POS-007, POS-009, POS-014, POS-020 |
+| Called by | POS-014, POS-020 |
 
 **Parameters**
 
@@ -7284,6 +7907,116 @@ Change for a guest, a dropped coin, correcting a float. Legitimate and routine.
 | 409 |  | Shift is not open (problem type shift-not-open) |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
+### rejectShiftVariance
+
+**`POST /shifts/{shiftId}/reject-variance`**: Send a counted shift back for a recount
+
+**A supervisor rejects the variance and the cashier recounts and resubmits** (decided 2 October 2026, Chinmay, batch 6 #175, BO-040: "Add Reject + recount (DI-804)"; DEC-175; CHG-CSP-013; MoM 9 September 4.18, DI-804). Until 2 October the only way back was `reopenShift` on BO-039, which reopens a closed shift for trading; a recount is narrower and happens before anything is accepted.
+From `pendingVariance` only. The shift **stays `pendingVariance`** with `recountRequestedAt`, `recountRequestedByPrincipalId` and `recountReason` set (`states/shift.yaml`: the recount transition; no new status, so clients built at r1 keep the values they switch on). The cashier whose shift it is sees "Recount requested" rather than "Under review", recounts the box at any till of the venue and submits with `submitShiftCount`; the new lines point at the ones they replace (`CashCountLine.recountOf`), the latest count is the one measured, and the request flags clear. Still blind: the rejection carries the supervisor's reason and never the expected figure or the variance (CHG-FIN-003).
+
+|  |  |
+|---|---|
+| Permission | `OVERSHORT_ACCEPT` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | append |
+| Step-up auth | pin |
+| Reads | `orders.pos_shift`, `orders.pos_shift_approval`, `orders.pos_shift_incident` |
+| Writes | - |
+| Called by | BO-040, BO-043, POS-007 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| shiftId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| reason | string | yes | Why a recount is needed, shown to the cashier. (min length 3; max length 500) |
+
+**Response**: `Shift`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) | yes | Client-generated UUIDv7. |
+| workstationId | string (uuid) | yes |  |
+| venueId | string (uuid) | yes |  |
+| scopePath | string | yes |  |
+| principalId | string (uuid) | yes | Who opened it. |
+| principalDisplayName | string |  |  |
+| incidents | array of object |  | BL-097. |
+| incidents[].kind | enum (noSale, drawerOpen, override, voidAfterPayment, guestDispute, tillJam, priceQuery, other) |  |  |
+| incidents[].at | string (date-time) |  |  |
+| incidents[].principalId | string (uuid) |  |  |
+| incidents[].note | string |  | (nullable) |
+| status | ShiftStatus: enum (pendingApproval, open, suspended, pendingVariance, pendingClosure, closed, autoClosed) | yes |  |
+| currency | string | yes | Resolved from the region, not stored (ADR-0018, 24 August). (pattern ^[A-Z]{3}$) |
+| currencyScale | integer | yes | Resolved from the region, not stored (ADR-0018, 24 August). (min 0; max 4) |
+| depositBoxCode | string |  | (nullable) |
+| bagNumber | string |  | (nullable) |
+| openingFloat | Money |  | On the wire this is three fields; in the database it is one column. |
+| openingFloat.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| openingFloat.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| openingFloat.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| salesTotal | Money |  | On the wire this is three fields; in the database it is one column. |
+| salesTotal.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| salesTotal.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| salesTotal.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| refundsTotal | Money |  | On the wire this is three fields; in the database it is one column. |
+| refundsTotal.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| refundsTotal.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| refundsTotal.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| liftsTotal | Money |  | On the wire this is three fields; in the database it is one column. |
+| liftsTotal.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| liftsTotal.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| liftsTotal.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| expectedCash | object |  | 26 September, pull audit R207. (read-only; nullable) |
+| expectedCash.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| expectedCash.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| expectedCash.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| countedCash | object |  | What the close count found. (read-only; nullable) |
+| countedCash.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| countedCash.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| countedCash.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| variance | object |  | Counted minus expected, as ShiftCloseResult.variance. (read-only; nullable) |
+| variance.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| variance.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| variance.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| cashierReason | enum (tillError, unrecordedRefund, miscount, other) |  | What the cashier said went wrong, given with the blind count (CloseShiftRequest.cashierReason, DI-803) without seeing the variance; the supervisor reads it beside the variance on BO-040 (CHG-FIN-003). (read-only; nullable) |
+| cashierNote | string |  | The cashier's note with the count (CloseShiftRequest.notes; CHG-FIN-003). (max length 1000; read-only; nullable) |
+| heldLeaseCount | integer |  | Inventory leases currently held by this workstation. |
+| openedAt | string (date-time) | yes |  |
+| recordedAt | string (date-time) |  | When the device recorded the open. |
+| suspendedAt | string (date-time) |  | (nullable) |
+| suspendReason | string |  | The reason given to suspendShift. (max length 200; nullable) |
+| closedAt | string (date-time) |  | (nullable) |
+| closedByPrincipalId | string (uuid) |  | Who submitted the close count. (nullable) |
+| recountRequestedAt | string (date-time) |  | Set by rejectShiftVariance, cleared by the cashier's recount (decided 2 October 2026, Chinmay; DEC-175; CHG-CSP-013; DI-804). (read-only; nullable) |
+| recountRequestedByPrincipalId | string (uuid) |  | The supervisor who sent the count back (CHG-CSP-013). (read-only; nullable) |
+| recountReason | string |  | The supervisor's reason, shown to the cashier; never an amount (CHG-CSP-013, CHG-FIN-003). (max length 500; read-only; nullable) |
+| countNumber | integer |  | How many close counts the shift has had: 0 before the first, 1 after it, 2 after a recount (CHG-CSP-013). (min 0; read-only) |
+| syncedAt | string (date-time) |  | Null while the shift has unsynced operations. (nullable) |
+| approvals | array of object |  |  |
+| approvals[].kind | enum (open, close, variance) | yes | open from approveShiftOpen, close from approveShiftClose, variance from acceptShiftVariance. |
+| approvals[].principalId | string (uuid) | yes |  |
+| approvals[].at | string (date-time) | yes |  |
+| approvals[].reason | string |  |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Sent back for a recount; the shift waits for the cashier's new count |
+| 403 |  | The caller lacks OVERSHORT_ACCEPT at this venue, or is the cashier whose shift it is (approver-is-cashier). |
+| 409 |  | Shift is not pendingVariance (shift-not-pending-variance), or a recount is already requested and not yet submitted (recount-already-requested). |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
 ### reopenShift
 
 **`POST /shifts/{shiftId}/reopen`**: Reopen a shift closed in error
@@ -7303,7 +8036,7 @@ A cashier who closed the wrong till, or a count submitted before the drawer was 
 | Step-up auth | pin |
 | Reads | `cache:idempotency`, `orders.pos_shift`, `orders.pos_shift_approval`, `orders.pos_shift_incident` |
 | Writes | `cache:idempotency`, `orders.pos_shift` |
-| Called by | BO-039, BO-040, EMP-003, EMP-009, POS-001, POS-007, POS-009 |
+| Called by | POS-025 |
 | State model | Shift ([states/shift.yaml](../../../states/shift.yaml)): moves `closed` -> `open` |
 
 **Parameters**
@@ -7370,6 +8103,8 @@ A cashier who closed the wrong till, or a count submitted before the drawer was 
 | variance.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | variance.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | variance.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| cashierReason | enum (tillError, unrecordedRefund, miscount, other) |  | What the cashier said went wrong, given with the blind count (CloseShiftRequest.cashierReason, DI-803) without seeing the variance; the supervisor reads it beside the variance on BO-040 (CHG-FIN-003). (read-only; nullable) |
+| cashierNote | string |  | The cashier's note with the count (CloseShiftRequest.notes; CHG-FIN-003). (max length 1000; read-only; nullable) |
 | heldLeaseCount | integer |  | Inventory leases currently held by this workstation. |
 | openedAt | string (date-time) | yes |  |
 | recordedAt | string (date-time) |  | When the device recorded the open. |
@@ -7377,6 +8112,10 @@ A cashier who closed the wrong till, or a count submitted before the drawer was 
 | suspendReason | string |  | The reason given to suspendShift. (max length 200; nullable) |
 | closedAt | string (date-time) |  | (nullable) |
 | closedByPrincipalId | string (uuid) |  | Who submitted the close count. (nullable) |
+| recountRequestedAt | string (date-time) |  | Set by rejectShiftVariance, cleared by the cashier's recount (decided 2 October 2026, Chinmay; DEC-175; CHG-CSP-013; DI-804). (read-only; nullable) |
+| recountRequestedByPrincipalId | string (uuid) |  | The supervisor who sent the count back (CHG-CSP-013). (read-only; nullable) |
+| recountReason | string |  | The supervisor's reason, shown to the cashier; never an amount (CHG-CSP-013, CHG-FIN-003). (max length 500; read-only; nullable) |
+| countNumber | integer |  | How many close counts the shift has had: 0 before the first, 1 after it, 2 after a recount (CHG-CSP-013). (min 0; read-only) |
 | syncedAt | string (date-time) |  | Null while the shift has unsynced operations. (nullable) |
 | approvals | array of object |  |  |
 | approvals[].kind | enum (open, close, variance) | yes | open from approveShiftOpen, close from approveShiftClose, variance from acceptShiftVariance. |
@@ -7409,7 +8148,7 @@ A cashier who closed the wrong till, or a count submitted before the drawer was 
 | Conflict policy | append |
 | Reads | `cache:idempotency`, `orders.pos_shift`, `orders.pos_shift_approval`, `orders.pos_shift_incident` |
 | Writes | `cache:idempotency`, `orders.pos_shift` |
-| Called by | BO-039, BO-040, EMP-003, EMP-009, POS-001, POS-007, POS-009 |
+| Called by | POS-001 |
 | State model | Deposit box ([states/deposit-box.yaml](../../../states/deposit-box.yaml)): moves `suspended` -> `open`<br/>Shift ([states/shift.yaml](../../../states/shift.yaml)): moves `suspended` -> `open` |
 
 **Parameters**
@@ -7473,6 +8212,8 @@ A cashier who closed the wrong till, or a count submitted before the drawer was 
 | variance.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | variance.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | variance.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| cashierReason | enum (tillError, unrecordedRefund, miscount, other) |  | What the cashier said went wrong, given with the blind count (CloseShiftRequest.cashierReason, DI-803) without seeing the variance; the supervisor reads it beside the variance on BO-040 (CHG-FIN-003). (read-only; nullable) |
+| cashierNote | string |  | The cashier's note with the count (CloseShiftRequest.notes; CHG-FIN-003). (max length 1000; read-only; nullable) |
 | heldLeaseCount | integer |  | Inventory leases currently held by this workstation. |
 | openedAt | string (date-time) | yes |  |
 | recordedAt | string (date-time) |  | When the device recorded the open. |
@@ -7480,6 +8221,10 @@ A cashier who closed the wrong till, or a count submitted before the drawer was 
 | suspendReason | string |  | The reason given to suspendShift. (max length 200; nullable) |
 | closedAt | string (date-time) |  | (nullable) |
 | closedByPrincipalId | string (uuid) |  | Who submitted the close count. (nullable) |
+| recountRequestedAt | string (date-time) |  | Set by rejectShiftVariance, cleared by the cashier's recount (decided 2 October 2026, Chinmay; DEC-175; CHG-CSP-013; DI-804). (read-only; nullable) |
+| recountRequestedByPrincipalId | string (uuid) |  | The supervisor who sent the count back (CHG-CSP-013). (read-only; nullable) |
+| recountReason | string |  | The supervisor's reason, shown to the cashier; never an amount (CHG-CSP-013, CHG-FIN-003). (max length 500; read-only; nullable) |
+| countNumber | integer |  | How many close counts the shift has had: 0 before the first, 1 after it, 2 after a recount (CHG-CSP-013). (min 0; read-only) |
 | syncedAt | string (date-time) |  | Null while the shift has unsynced operations. (nullable) |
 | approvals | array of object |  |  |
 | approvals[].kind | enum (open, close, variance) | yes | open from approveShiftOpen, close from approveShiftClose, variance from acceptShiftVariance. |
@@ -7551,6 +8296,152 @@ A cashier who closed the wrong till, or a count submitted before the drawer was 
 | 422 |  | A zero or negative value, or two entries with the same value and kind (problem type denomination-invalid). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
+### setTillShiftPolicy
+
+**`PUT /venues/{venueId}/till-shift-policy`**: Set the rules every till in the venue opens and closes to
+
+**Shift templates and policies, as POS-019 is named** (design-notes correction on POS-019, Block A: "nothing reads or writes a shift template or close policy ... either add the shift-policy operations or rename the screen"; DI-309: opening and closing rules, exceptions and alerts; CHG-CSP-020). The contract has said since August that a shift waits for approval "where the venue is configured to require approval on open", that a deposit box or a bag number is required "where the venue configures it", and that an abandoned shift is closed "past the venue limit"; none of those had a setting. This is it.
+**Venue scope, never per till** (POS-019's own rule: a variance report compares tills against one rule set). The variance threshold and the drawer limit stay where they are (`tenancy.VenueSettings.shiftVarianceThreshold`, `cashDrawerLimit`); this holds the rest. PUT replaces the policy whole; a field left out returns to its default. A change applies to shifts opened after it; a shift already open keeps the rules it opened under.
+
+|  |  |
+|---|---|
+| Permission | `WORKSTATION_CONFIGURE` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Config scope | venue |
+| Conflict policy | serverWins |
+| Reads | `orders.till_shift_policy` |
+| Writes | `orders.till_shift_policy` |
+| Called by | BO-065, POS-019 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| venueId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
+
+**Request body**: `TillShiftPolicy`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) |  | (read-only) |
+| venueId | string (uuid) | yes |  |
+| scopePath | string |  | (read-only) |
+| requireOpenApproval | boolean |  | Every shift opens pendingApproval and waits for approveShiftOpen (SHIFT_APPROVE_OPEN). (default False) |
+| openingFloatTolerance | object |  | How far a declared opening float may differ from the box's allocated float before the shift waits for approval (states/shift.yaml, pendingApproval). (nullable) |
+| openingFloatTolerance.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| openingFloatTolerance.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| openingFloatTolerance.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| depositBoxRequired | boolean |  | A shift cannot open without a deposit box (OpenShiftRequest.depositBoxCode); refused 400 otherwise. (default True) |
+| bagNumberRequired | boolean |  | A shift cannot open without a bag number (OpenShiftRequest.bagNumber). (default False) |
+| requireCloseApproval | boolean |  | Every counted shift waits in pendingClosure for approveShiftClose (SHIFT_APPROVE_CLOSE), even within the variance threshold. (default False) |
+| autoCloseAfterHours | integer |  | Hours after which an open or suspended shift nobody closed is closed by the inactivity job as autoClosed and the supervisors are told (states/shift.yaml). (min 1; max 48; default 14; nullable) |
+| noSaleAlertCount | integer |  | No-sales in one shift (recordNoSale) at which the supervisors are alerted on the venue's alerting channel; the count is on POS-020. (min 1; default 10; nullable) |
+| updatedAt | string (date-time) |  | (read-only) |
+
+**Response**: `TillShiftPolicy`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) |  | (read-only) |
+| venueId | string (uuid) | yes |  |
+| scopePath | string |  | (read-only) |
+| requireOpenApproval | boolean |  | Every shift opens pendingApproval and waits for approveShiftOpen (SHIFT_APPROVE_OPEN). (default False) |
+| openingFloatTolerance | object |  | How far a declared opening float may differ from the box's allocated float before the shift waits for approval (states/shift.yaml, pendingApproval). (nullable) |
+| openingFloatTolerance.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| openingFloatTolerance.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| openingFloatTolerance.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| depositBoxRequired | boolean |  | A shift cannot open without a deposit box (OpenShiftRequest.depositBoxCode); refused 400 otherwise. (default True) |
+| bagNumberRequired | boolean |  | A shift cannot open without a bag number (OpenShiftRequest.bagNumber). (default False) |
+| requireCloseApproval | boolean |  | Every counted shift waits in pendingClosure for approveShiftClose (SHIFT_APPROVE_CLOSE), even within the variance threshold. (default False) |
+| autoCloseAfterHours | integer |  | Hours after which an open or suspended shift nobody closed is closed by the inactivity job as autoClosed and the supervisors are told (states/shift.yaml). (min 1; max 48; default 14; nullable) |
+| noSaleAlertCount | integer |  | No-sales in one shift (recordNoSale) at which the supervisors are alerted on the venue's alerting channel; the count is on POS-020. (min 1; default 10; nullable) |
+| updatedAt | string (date-time) |  | (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Set |
+| 400 | BadRequest | Validation failed |
+| 403 | Forbidden | Authenticated but not permitted at the requested scope |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
+### submitShiftCount
+
+**`POST /shifts/{shiftId}/count`**: The cashier's blind count, closing their own shift
+
+**Blind close: the cashier never sees the expected cash** (decided 2 October 2026, Chinmay; CHG-FIN-003; MoM 12 Aug 2026 section 19, DI-271; MoM 9 Sep 2026 4.18, DI-803 to DI-806). The cashier counts the drawer by denomination and submits it. The server measures the count against the expected figure (opening float + cash takings − cash refunds paid out + float entries − lifts and withdrawals, `Shift.liftsTotal`) and records the variance, **and returns neither the expected figure nor the variance, nor whether the drawer is over or short**. The receipt says only what happens next: `closed` (within the venue's `shiftVarianceThreshold`), `referredToSupervisor` (beyond it: the shift is `pendingVariance`) or `awaitingCloseApproval` (the venue supervises every close: `pendingClosure`).
+**The variance goes to the supervisor, not the cashier.** Beyond the threshold an alert is raised to the supervisors holding OVERSHORT_ACCEPT at the venue, on the venue's alerting channel (`tenancy.VenueSettings.alerting`); the shift appears on BO-040 and on the till's exceptions list (POS-020) for a supervisor, and the supervisor sees counted, expected and variance there (`getShift`, `closeShift`, `acceptShiftVariance`). The cashier may give a reason and a note with the count (`cashierReason`, `notes`; DI-803) without being told the amount. **A recount the supervisor asks for** (DI-804) is submitted the same way from `pendingVariance`; every count is kept (`CashCountLine`, `countKind` close) and the latest is the one measured.
+**The recount after a rejection** (decided 2 October 2026, Chinmay; DEC-175; CHG-CSP-013): once `rejectShiftVariance` has set `Shift.recountRequestedAt`, the cashier submits the recount here, at any till of the venue, because the till the shift was counted on may be the next cashier's by then (DEC-059). The receipt's `countNumber` rises and the request flags clear.
+`Shift.expectedCash` and `Shift.variance` stay null to the shift's own cashier on every read; they are returned to a caller holding OVERSHORT_ACCEPT or SHIFT_CLOSE_OTHER at the venue.
+Online only, as `closeShift`: the expected figure is the server's.
+
+|  |  |
+|---|---|
+| Permission | `SHIFT_CLOSE` |
+| Scope level | workstation |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | append |
+| Reads | `cache:idempotency`, `ledger.fx_rate`, `orders.cash_count_line`, `orders.cash_movement`, `orders.payment`, `orders.pos_shift`, `orders.pos_shift_approval`, `orders.pos_shift_incident`, `platform.venue_settings` |
+| Writes | `cache:idempotency`, `ledger.journal_entry`, `orders.cash_count_line`, `orders.pos_shift` |
+| Called by | EMP-009, POS-007 |
+| State model | Shift ([states/shift.yaml](../../../states/shift.yaml)): moves `pendingVariance` -> `closed`, `open` -> `pendingClosure`, `suspended` -> `pendingClosure` |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| shiftId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
+
+**Request body**: `CloseShiftRequest`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| countedCash | array of CountedDenominationLine | yes | The cashier's blind count, one line per denomination counted (decided 29 September, readiness close-out; our build plan). (min items 1) |
+| countedCash[].denominationId | string (uuid) | yes | References platform.denomination (Denomination.id) — face value, kind and counting order live there. |
+| countedCash[].count | integer | yes | How many of this note or coin were counted. (min 0; max 100000) |
+| countedCash[].total | object |  | count times the face value, in the denomination's currency. |
+| countedCash[].total.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| countedCash[].total.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| countedCash[].total.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| nonCashDeclared | array of object |  | Declared totals per non-cash tender, for reconciliation against captured payments. |
+| nonCashDeclared[].tender | string | yes |  |
+| nonCashDeclared[].amount | Money | yes | On the wire this is three fields; in the database it is one column. |
+| nonCashDeclared[].amount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| nonCashDeclared[].amount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| nonCashDeclared[].amount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| notes | string |  | The cashier's note on the count. (max length 1000) |
+| cashierReason | enum (tillError, unrecordedRefund, miscount, other) |  | Anything the cashier knows went wrong in the shift (DI-803: till error, unrecorded refund, miscount, other). (nullable) |
+| releaseHeldLeases | boolean |  | Return unsold inventory leases held by this workstation (ADR-0013 C103). (default True) |
+| recordedAt | string (date-time) | yes |  |
+
+**Response**: `ShiftCountReceipt`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| shiftId | string (uuid) | yes |  |
+| status | ShiftStatus: enum (pendingApproval, open, suspended, pendingVariance, pendingClosure, closed, autoClosed) | yes |  |
+| outcome | enum (closed, referredToSupervisor, awaitingCloseApproval) | yes | closed: within the venue's threshold, the shift is closed. |
+| countedAt | string (date-time) | yes |  |
+| countNumber | integer |  | 1 for the first count of the close, 2 for a recount the supervisor asked for, and so on. (min 1) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Count recorded; the receipt says what happens next and nothing about the variance |
+| 403 |  | The shift is not the caller's own (problem type not-shift-operator): a supervisor closing somebody else's shift uses closeShift (SHIFT_CLOSE_OTHER). |
+| 409 |  | The shift is neither open, suspended nor pendingVariance (problem type shift-not-countable). |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
 ### suspendShift
 
 **`POST /shifts/{shiftId}/suspend`**: Suspend a shift so another user can log in
@@ -7568,7 +8459,7 @@ The break mechanism. The float and the shift stay intact; the workstation become
 | Conflict policy | append |
 | Reads | `cache:idempotency`, `orders.pos_shift`, `orders.pos_shift_approval`, `orders.pos_shift_incident` |
 | Writes | `cache:idempotency`, `orders.pos_shift` |
-| Called by | BO-039, BO-040, EMP-003, EMP-008, EMP-009, POS-001, POS-007, POS-009 |
+| Called by | EMP-009, POS-025 |
 | State model | Deposit box ([states/deposit-box.yaml](../../../states/deposit-box.yaml)): moves `open` -> `suspended`<br/>Shift ([states/shift.yaml](../../../states/shift.yaml)): moves `open` -> `suspended` |
 
 **Parameters**
@@ -7633,6 +8524,8 @@ The break mechanism. The float and the shift stay intact; the workstation become
 | variance.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | variance.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | variance.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| cashierReason | enum (tillError, unrecordedRefund, miscount, other) |  | What the cashier said went wrong, given with the blind count (CloseShiftRequest.cashierReason, DI-803) without seeing the variance; the supervisor reads it beside the variance on BO-040 (CHG-FIN-003). (read-only; nullable) |
+| cashierNote | string |  | The cashier's note with the count (CloseShiftRequest.notes; CHG-FIN-003). (max length 1000; read-only; nullable) |
 | heldLeaseCount | integer |  | Inventory leases currently held by this workstation. |
 | openedAt | string (date-time) | yes |  |
 | recordedAt | string (date-time) |  | When the device recorded the open. |
@@ -7640,6 +8533,10 @@ The break mechanism. The float and the shift stay intact; the workstation become
 | suspendReason | string |  | The reason given to suspendShift. (max length 200; nullable) |
 | closedAt | string (date-time) |  | (nullable) |
 | closedByPrincipalId | string (uuid) |  | Who submitted the close count. (nullable) |
+| recountRequestedAt | string (date-time) |  | Set by rejectShiftVariance, cleared by the cashier's recount (decided 2 October 2026, Chinmay; DEC-175; CHG-CSP-013; DI-804). (read-only; nullable) |
+| recountRequestedByPrincipalId | string (uuid) |  | The supervisor who sent the count back (CHG-CSP-013). (read-only; nullable) |
+| recountReason | string |  | The supervisor's reason, shown to the cashier; never an amount (CHG-CSP-013, CHG-FIN-003). (max length 500; read-only; nullable) |
+| countNumber | integer |  | How many close counts the shift has had: 0 before the first, 1 after it, 2 after a recount (CHG-CSP-013). (min 0; read-only) |
 | syncedAt | string (date-time) |  | Null while the shift has unsynced operations. (nullable) |
 | approvals | array of object |  |  |
 | approvals[].kind | enum (open, close, variance) | yes | open from approveShiftOpen, close from approveShiftClose, variance from acceptShiftVariance. |
@@ -7662,6 +8559,7 @@ The break mechanism. The float and the shift stay intact; the workstation become
 
 5.8.8. **A mid-day skim, and it is not a variance.** Cash removed from a till for banking must reduce the expected close figure, or every busy cashier ends the day apparently short by the amount that was taken from them.
 Two people sign: the supervisor taking it and the cashier it came from.
+**The cashier signs as witness with their own PIN on the same device** (decided 2 October 2026, Chinmay, batch 6 #178, BO-042: "PIN on the same device"; DEC-178; CHG-CSP-015). Until then the witness was a name the supervisor typed (`witnessPrincipalId` with no credential). The step-up below is answered by the witness, not the caller: the PIN must be that of `witnessPrincipalId`, or the call is refused `403 witness-not-verified`, and the supervisor may not witness their own withdrawal (`403 witness-is-caller`).
 **Recorded as one `CashMovement` of kind `lift`** (F32 step 4: a safe drop "is recorded as a movement so the settlement adds up"; 26 September, pull audit R099/R104). The row carries this box's `depositBoxId` and `shiftId`, the caller as `authorisedByPrincipalId`, the witness, `withdrawalReason` from `reason`, and `note` as its `reason` text. It is the box-level form of the same lift `createCashMovement` records — **one withdrawal is one movement**, so the expected close figure falls once, and `withdrawnTotal` is the sum of the box's lifts.
 **`recordedAt` is the device's time** (offline-and-sync: offline data keeps both `recorded_at` and `synced_at`), and `id` is the client UUIDv7 that doubles as the idempotency key.
 
@@ -7673,9 +8571,10 @@ Two people sign: the supervisor taking it and the cashier it came from.
 | Wave | 1 |
 | Offline | yes |
 | Conflict policy | append |
+| Step-up auth | pin |
 | Reads | `cache:idempotency`, `orders.deposit_box`, `orders.deposit_box_foreign_holding`, `orders.deposit_box_opening_denomination` |
 | Writes | `cache:idempotency`, `orders.cash_movement`, `orders.deposit_box` |
-| Called by | BO-042, POS-013, POS-018 |
+| Called by | BO-042, POS-018 |
 | State model | Deposit box ([states/deposit-box.yaml](../../../states/deposit-box.yaml)): created as `allocated` |
 
 **Parameters**
@@ -7721,6 +8620,7 @@ Two people sign: the supervisor taking it and the cashier it came from.
 | withdrawnTotal.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | withdrawnTotal.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | withdrawnTotal.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| overDrawerLimit | boolean |  | The box holds more than its till's drawer limit (decided 2 October 2026, Chinmay, BO-042; DEC-179; CHG-CSP-016): computed on read from the box's expected cash against tenancy.Workstation.cashDrawerLi… (default False; read-only) |
 | foreignHoldings | array of object |  | 4.6.11 and 6.1.10. |
 | foreignHoldings[].currency | string | yes | Stored, because it is the one thing that is not the region's. (pattern ^[A-Z]{3}$) |
 | foreignHoldings[].expectedAmount | object |  | The sum of tenders taken in this currency during the shift. |
@@ -7768,6 +8668,69 @@ Two people sign: the supervisor taking it and the cashier it came from.
 
 ## Group: sync
 
+### listSyncRejections
+
+**`GET /sync/rejections`**: Entries the server refused
+
+Needs operator attention. These will not retry — surfacing them is the difference between a reconciliation task and silent data loss behind an "all synced" indicator.
+A rejection leaves this list's unresolved view when `resolveSyncRejection` records what was done about it.
+
+|  |  |
+|---|---|
+| Permission | `ORDER_VIEW` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | replica |
+| Reads | `sync.rejection` |
+| Writes | - |
+| Called by | BO-037, BO-038, BO-130, BO-132, BO-133, EMP-017, POS-013, SCN-014 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| workstationId | query |  | string (uuid) | Exact match on the till that journalled the entry. |
+| kind | query |  | enum (order, payment, refund, void, scan) | Exact match on SyncRejection.kind. |
+| resolved | query |  | boolean | false returns only rejections still waiting for a decision (resolvedAt null), true only those resolved. |
+| pageSize | query |  | integer |  |
+| cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
+
+**Response**: `object`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| items | array of SyncRejection | yes |  |
+| items[].id | string (uuid) | yes |  |
+| items[].workstationId | string (uuid) | yes |  |
+| items[].kind | enum (order, payment, refund, void, scan) | yes |  |
+| items[].recordedAt | string (date-time) |  |  |
+| items[].rejectedAt | string (date-time) | yes |  |
+| items[].problem | Problem | yes | RFC 9457 problem details. |
+| items[].problem.type | string (uri) | yes | The problem type URI, https://api.ticvai.com/problems/<slug>. |
+| items[].problem.title | string | yes |  |
+| items[].problem.status | integer | yes |  |
+| items[].problem.detail | string |  |  |
+| items[].problem.instance | string |  |  |
+| items[].problem.traceId | string |  |  |
+| items[].problem.errors | array of object |  |  |
+| items[].payload | object |  | Deliberately open: the journal entry exactly as the till sent it. |
+| items[].resolvedAt | string (date-time) |  | (read-only; nullable) |
+| items[].resolvedByPrincipalId | string (uuid) |  | (read-only; nullable) |
+| items[].resolution | enum (posted, voided, refunded) |  | What resolveSyncRejection recorded. (read-only; nullable) |
+| items[].resolvedRecordId | string (uuid) |  | The order, void or refund the resolution produced — what stops the entry being posted twice. (read-only; nullable) |
+| nextCursor | string |  |  |
+| hasMore | boolean | yes |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Rejections, oldest first — rejectedAt ascending, id as the tiebreak — so the entry that has waited longest is at the top. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
 ### syncOrders
 
 **`POST /sync/orders`**: Replay orders recorded offline
@@ -7785,7 +8748,7 @@ Every line is re-priced on ingest. Variances are returned per order and posted t
 | Conflict policy | append |
 | Reads | `catalogue.inventory_hold`, `catalogue.price_list`, `catalogue.variant`, `orders.sales_order` |
 | Writes | `catalogue.channel_capacity`, `catalogue.inventory_hold`, `ledger.price_variance`, `orders.order_line`, `orders.order_line_discount`, `orders.payment`, `orders.sales_order`, `platform.idempotency_record`, `platform.outbox`, `sync.rejection` |
-| Called by | BO-037, BO-130, BO-132, EMP-017, POS-002, POS-013, SCN-014 |
+| Called by | BO-037, BO-132, POS-013 |
 
 **Parameters**
 
@@ -8041,6 +9004,50 @@ Every table this service owns that the slice reads or writes, with its columns a
 | attendee_capture_due_by | timestamptz | no |  |
 | status | text | yes |  |
 
+### `orders.group_participant`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| group_participant_list_id | uuid | yes | The parent row. |
+| id | uuid | yes |  |
+| full_name | text | yes |  |
+| role | text | no |  |
+| email | text | no |  |
+| phone | text | no |  |
+| date_of_birth | date | no |  |
+
+### `orders.group_visit_plan`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes |  |
+| group_booking_id | uuid | yes | Unique; one plan per group booking. |
+| arrival_at | timestamptz | no |  |
+| arrival_location | text | no |  |
+| meeting_point | text | no |  |
+| entry_gate_id | uuid | no |  |
+| departure_at | timestamptz | no |  |
+| group_leaders | text | no |  |
+| contact_id | uuid | no |  |
+| ticketing_method | text | no |  |
+| requirements | jsonb | no | Seating, guides, catering, transportation, parking, accessibility, equipment and special requirements, as free text keyed by those names. |
+| operational_owner_principal_id | uuid | no |  |
+| handover_notes | text | no |  |
+| handover_attachment_ids | text[] | no |  |
+| handover_acknowledged_by_principal_id | uuid | no |  |
+| handover_acknowledged_at | timestamptz | no |  |
+| check_in_status | text | yes |  |
+| actual_arrival_at | timestamptz | no |  |
+| arrival_gate_id | uuid | no |  |
+| arrived_count | integer | no |  |
+| additional_guests | integer | no |  |
+| staff_leaders_count | integer | no |  |
+| check_in_issues | text[] | no |  |
+| checked_in_by_principal_id | uuid | no |  |
+| scope_path | text | no | The partition key (ADR-0005). |
+| created_at | timestamptz | yes |  |
+| updated_at | timestamptz | no |  |
+
 ### `orders.no_sale_event`
 
 | Column | Type | Required | Notes |
@@ -8182,12 +9189,14 @@ Every table this service owns that the slice reads or writes, with its columns a
 | deposit_box_code | text | no |  |
 | bag_number | text | no |  |
 | opening_float | numeric(18,4) | no |  |
-| gross_sales_amount | numeric(18,4) | no | What the till took in sales, as the guest paid it — tax included. |
+| gross_sales_amount | numeric(18,4) | no | What the till took in sales, as the guest paid it — tax included: the shift's takings, not Gross sales (CHG-FIN-002, CHG-FIN-010). |
 | gross_refunded_amount | numeric(18,4) | no | What the till paid back, as the guest was refunded it — tax included. |
 | lifted_amount | numeric(18,4) | no | Cash taken out mid-shift by lifts and withdrawals. |
 | expected_cash_amount | numeric(18,4) | no | 26 September, pull audit R207. |
 | counted_cash_amount | numeric(18,4) | no | What the close count found. |
 | variance_amount | numeric(18,4) | no | Counted minus expected, as ShiftCloseResult.variance. |
+| cashier_reason | text | no | What the cashier said went wrong, given with the blind count (CloseShiftRequest.cashierReason, DI-803) without seeing the variance; the supervisor reads it beside the variance on BO-040 (CHG-FIN-003). |
+| cashier_note | text | no | The cashier's note with the count (CloseShiftRequest.notes; CHG-FIN-003). |
 | held_lease_count | integer | no | Inventory leases currently held by this workstation. |
 | opened_at | timestamptz | yes |  |
 | recorded_at | timestamptz | no | When the device recorded the open. |
@@ -8195,6 +9204,10 @@ Every table this service owns that the slice reads or writes, with its columns a
 | suspend_reason | text | no | The reason given to suspendShift. |
 | closed_at | timestamptz | no |  |
 | closed_by_principal_id | uuid | no | Who submitted the close count. |
+| recount_requested_at | timestamptz | no | Set by rejectShiftVariance, cleared by the cashier's recount (decided 2 October 2026, Chinmay; DEC-175; CHG-CSP-013; DI-804). |
+| recount_requested_by_principal_id | uuid | no | The supervisor who sent the count back (CHG-CSP-013). |
+| recount_reason | text | no | The supervisor's reason, shown to the cashier; never an amount (CHG-CSP-013, CHG-FIN-003). |
+| count_number | integer | no | How many close counts the shift has had: 0 before the first, 1 after it, 2 after a recount (CHG-CSP-013). |
 | synced_at | timestamptz | no | Null while the shift has unsynced operations. |
 
 ### `orders.pos_shift_approval`
@@ -8230,6 +9243,8 @@ Every table this service owns that the slice reads or writes, with its columns a
 | tax_reversal_entry_id | uuid | no | A refund reverses the tax entry it created, and this is where that is stated rather than implied. |
 | settle_to | text | no | BL-086. |
 | fx_variance | numeric(18,4) | no | Where the sale rate and the current rate differ, the difference is booked as an FX variance rather than hidden in the refund. |
+| tender_currency | text | no | A refund goes back in the currency the guest paid (decided 2 October 2026, Chinmay; CHG-FIN-001). |
+| tender_amount | numeric(18,4) | no | The refund in tenderCurrency, at that currency's own scale (CHG-FIN-001). |
 | amount | numeric(18,4) | yes |  |
 | applied_percentage | numeric | no | From the venue's time bands, or an approver override. |
 | status | text | yes |  |
@@ -8330,6 +9345,11 @@ Every table this service owns that the slice reads or writes, with its columns a
 | tax_amount | numeric(18,4) | yes |  |
 | net_amount | numeric(18,4) | yes |  |
 | refunded_amount | numeric(18,4) | no |  |
+| charge_currency | text | no | The currency the guest selected and is charged in (CHG-FIN-001, 2 October 2026). |
+| charge_fx_rate | numeric(18,6) | no | Units of chargeCurrency per one unit of the base currency, from the region's tender rate in force at checkout (finance.FxRate), stored on the order so the payment, the receipt, the tax invoice and an… |
+| charge_fx_rate_id | uuid | no | The finance.FxRate row the rate was taken from, for audit. |
+| charge_total | numeric(18,4) | no | grossAmount converted at chargeFxRate and rounded to the charge currency's scale: what the guest pays and what the payment request to the provider asks for (CHG-FIN-001). |
+| charge_rate_locked_until | timestamptz | no | The quote holds until then (the cart lease). |
 | total_price_variance | numeric(18,4) | no | Sum across lines. |
 | principal_id | uuid | no |  |
 | workstation_id | uuid | no |  |
@@ -8380,6 +9400,22 @@ Every table this service owns that the slice reads or writes, with its columns a
 | offered_at | timestamptz | yes |  |
 | claimed_at | timestamptz | no |  |
 | expires_at | timestamptz | yes | An unclaimed transfer expires and the tickets return. |
+
+### `orders.till_shift_policy`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | no |  |
+| venue_id | uuid | yes |  |
+| scope_path | text | no |  |
+| require_open_approval | boolean | no | Every shift opens pendingApproval and waits for approveShiftOpen (SHIFT_APPROVE_OPEN). |
+| opening_float_tolerance | numeric(18,4) | no | How far a declared opening float may differ from the box's allocated float before the shift waits for approval (states/shift.yaml, pendingApproval). |
+| is_deposit_box_required | boolean | no | A shift cannot open without a deposit box (OpenShiftRequest.depositBoxCode); refused 400 otherwise. |
+| is_bag_number_required | boolean | no | A shift cannot open without a bag number (OpenShiftRequest.bagNumber). |
+| require_close_approval | boolean | no | Every counted shift waits in pendingClosure for approveShiftClose (SHIFT_APPROVE_CLOSE), even within the variance threshold. |
+| auto_close_after_hours | integer | no | Hours after which an open or suspended shift nobody closed is closed by the inactivity job as autoClosed and the supervisors are told (states/shift.yaml). |
+| no_sale_alert_count | integer | no | No-sales in one shift (recordNoSale) at which the supervisors are alerted on the venue's alerting channel; the count is on POS-020. |
+| updated_at | timestamptz | no |  |
 
 ### `orders.visit_reminder`
 
@@ -8561,18 +9597,17 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-205 operations, added to this service in later releases without changing any of the above.
+204 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
 | b2b | `getB2bCredit`, `overrideCreditLimit`, `setB2bCreditLimit` |
 | cart | `listAbandonedCarts` |
-| drafted | `approveExceptionServiceRecovery`, `approveGroupDiscountException`, `approveListingModeration`, `createListingSeller`, `createOrderSourceChannel`, `createUpgradeCredentialRegeneration`, `listAmendmentAfterSale`, `listAmendmentAfterSale2`, `listBulkGroupAssisted`, `listBuyerCheckoutInventory`, `listBuyerPurchaseResale`, `listCapacityInventoryReconciliation`, `listCapacityReservationInventory`, `listCreateListingResale`, `listCredentialRevocationRegeneration`, `listDepositPartialPayment`, `listExternalPaymentPartner`, `listFeeSellerProceed`, `listFinancialTraceability`, `listGroupAmendmentCancellation`, `listGroupArrivalCheck`, `listGroupBooking`, `listGroupBookingReconciliation`, `listGroupCustomerOrganization`, `listGroupEnquiryOpportunity`, `listGroupPaymentDeposit`, `listGroupRequirementAvailability`, `listGroupSale`, `listGroupSale2`, `listGroupTicketFulfillment`, `listGroupTicketSeat`, `listListingLifecycleExpiry`, `listOfficialResaleMarketplace`, `listOrderFinancialReconciliation`, `listOrderLifecycleTimeline`, `listOrderLineProduct`, `listOrderPaymentDetail`, `listOrderReservation`, `listOrderSplitMerge`, `listParticipantGuestList`, `listPaymentOrderFinancial`, `listPaymentReconciliationException`, `listPersonTypeProduct`, `listQuoteBookingConversion`, `listQuoteRevisionNegotiation`, `listRefundDisputeResale`, `listRelatedOrderTransaction`, `listResale`, `listResale2`, `listResaleConfirmationOwnership`, `listResaleEligibilityTicket`, `listResaleFeeCommission`, `listResaleFraudDuplicate`, `listResaleInventoryAvailability`, `listResaleListingSeller`, `listResaleMarketplace`, `listResaleOwnership`, `listResalePolicyMarketplace`, `listResalePricingPrice`, `listResaleTicketDetail`, `listReservationConfirmationExpiry`, `listSellerSettlementPayout`, `listTicketOwnershipTransfer`, `listTicketReissueFulfillment`, `listTicketResaleMarketplace`, `listUpgradeConversion`, `listUpgradeEligibilityQualification`, `listUpgradeException`, `listUpgradeFinancialTreatment`, `listUpgradeTimingUsage`, `listVoidReversalSame`, `listWhiteLabelMarketplace`, `setAfterSaleFinancial`, `setAmendmentEligibilityPolicy`, `setCancellationPartialPolicy`, `setCustomerGuestAccount`, `setGroupBookingHandover`, `setGroupOperationalPlanning`, `setGroupPackageExperience`, `setGroupQuotationProposal`, `setMultiPaymentSplit`, `setOrderAmendment`, `setOrderDetailTransaction`, `setOrderReservationStatus`, `setProRataResidual`, `setResaleEligibilityRule`, `setResaleMarketplaceRecommendation`, `setReservationHoldPolicy`, `setUpgradeConversionPath` |
+| drafted | `approveExceptionServiceRecovery`, `approveGroupDiscountException`, `approveListingModeration`, `createListingSeller`, `createOrderSourceChannel`, `createUpgradeCredentialRegeneration`, `listAmendmentAfterSale`, `listAmendmentAfterSale2`, `listBulkGroupAssisted`, `listBuyerCheckoutInventory`, `listBuyerPurchaseResale`, `listCapacityInventoryReconciliation`, `listCapacityReservationInventory`, `listCreateListingResale`, `listCredentialRevocationRegeneration`, `listDepositPartialPayment`, `listExternalPaymentPartner`, `listFeeSellerProceed`, `listFinancialTraceability`, `listGroupAmendmentCancellation`, `listGroupBooking`, `listGroupBookingReconciliation`, `listGroupCustomerOrganization`, `listGroupEnquiryOpportunity`, `listGroupPaymentDeposit`, `listGroupRequirementAvailability`, `listGroupSale`, `listGroupSale2`, `listGroupTicketFulfillment`, `listGroupTicketSeat`, `listListingLifecycleExpiry`, `listOfficialResaleMarketplace`, `listOrderFinancialReconciliation`, `listOrderLifecycleTimeline`, `listOrderLineProduct`, `listOrderPaymentDetail`, `listOrderReservation`, `listOrderSplitMerge`, `listParticipantGuestList`, `listPaymentOrderFinancial`, `listPaymentReconciliationException`, `listPersonTypeProduct`, `listQuoteBookingConversion`, `listQuoteRevisionNegotiation`, `listRefundDisputeResale`, `listRelatedOrderTransaction`, `listResale`, `listResale2`, `listResaleConfirmationOwnership`, `listResaleEligibilityTicket`, `listResaleFeeCommission`, `listResaleFraudDuplicate`, `listResaleInventoryAvailability`, `listResaleListingSeller`, `listResaleMarketplace`, `listResaleOwnership`, `listResalePolicyMarketplace`, `listResalePricingPrice`, `listResaleTicketDetail`, `listReservationConfirmationExpiry`, `listSellerSettlementPayout`, `listTicketOwnershipTransfer`, `listTicketReissueFulfillment`, `listTicketResaleMarketplace`, `listUpgradeConversion`, `listUpgradeEligibilityQualification`, `listUpgradeException`, `listUpgradeFinancialTreatment`, `listUpgradeTimingUsage`, `listVoidReversalSame`, `listWhiteLabelMarketplace`, `setAfterSaleFinancial`, `setAmendmentEligibilityPolicy`, `setCancellationPartialPolicy`, `setCustomerGuestAccount`, `setGroupBookingHandover`, `setGroupOperationalPlanning`, `setGroupPackageExperience`, `setGroupQuotationProposal`, `setMultiPaymentSplit`, `setOrderAmendment`, `setOrderDetailTransaction`, `setOrderReservationStatus`, `setProRataResidual`, `setResaleEligibilityRule`, `setResaleMarketplaceRecommendation`, `setReservationHoldPolicy`, `setUpgradeConversionPath` |
 | order | `getDepositPolicy`, `listTicketTransfers`, `setDepositPolicy` |
-| orders | `assignChargeback`, `authoriseStoredValue`, `captureStoredValue`, `cleanupFailedPayment`, `cloneTicketTemplate`, `convertToTermProduct`, `createGroupBooking`, `createGroupEnquiry`, `createMemberException`, `createPaymentLink`, `getChargebackAnalytics`, `getResaleFeePolicy`, `getResaleMarketplaceConfig`, `holdResaleSettlement`, `importTicketTemplate`, `issueInvitation`, `listChargebacks`, `listDeposits`, `listExternalReferenceMappings`, `listFraudRules`, `listInvitationAllowances`, `listMembershipRenewals`, `listOrderDiscounts`, `listOrderFees`, `listPaymentAllocationRules`, `listPaymentProviders`, `listTicketTemplates`, `listUpgrades`, `mergeOrders`, `migrateMembership`, `openGuestCreditAccount`, `printTicketProof`, `pushWalletPassUpdate`, `quoteUpgrade`, `recordChargeback`, `recordChargebackOutcome`, `recordExternalReference`, `recordGroupCheckIn`, `releaseResaleSettlementHold`, `relinquishStoredValue`, `renewMembership`, `resendPaymentLink`, `resolveMembershipActivation`, `respondToChargeback`, `revokeEntitlementShare`, `setFraudRules`, `setGroupCustomerOrganization`, `setGroupPaymentSchedule`, `setGroupTicketAllocation`, `setGroupTicketFulfillment`, `setParticipantGuestList`, `setResaleFeePolicy`, `setResaleMarketplaceConfig`, `splitOrder`, `updateGroupBooking`, `voidEntitlement`, `voidPayment` |
-| payments | `createB2bCreditAccount`, `createPaymentMethod`, `getDunningPolicy`, `getInstalmentPolicy`, `getMixedTenderRules`, `getPaymentPerformance`, `getPaymentProviderEconomics`, `getPaymentProviderHealth`, `getPaymentRules`, `listB2bCreditAccounts`, `listDepositActivity`, `listDunningCases`, `listMerchantAccounts`, `listPaymentMethods`, `listPaymentProviderConnections`, `listPaymentRoutingRules`, `listPaymentTerminalCertifications`, `listPaymentTerminals`, `listReconciliationSources`, `listStoredForwardTransactions`, `receivePaymentProviderWebhook`, `recordDepositActivity`, `recordPaymentTerminalCertification`, `resolveDunningCase`, `setB2bPaymentTerms`, `setDunningPolicy`, `setHostedCheckoutConfiguration`, `setMerchantAccount`, `setMixedTenderRules`, `setPaymentAuthenticationPolicy`, `setPaymentFailoverPolicy`, `setPaymentRiskRules`, `setPaymentRoutingRules`, `setPaymentRules`, `setPaymentTerminalConfiguration`, `setReconciliationMatchingRules`, `setReconciliationSource`, `simulatePaymentConfiguration`, `simulatePaymentRouting`, `submitChargebackEvidence`, `testPaymentProviderConnection`, `updatePaymentMethod` |
+| orders | `assignChargeback`, `authoriseStoredValue`, `captureStoredValue`, `cleanupFailedPayment`, `cloneTicketTemplate`, `convertToTermProduct`, `createGroupBooking`, `createGroupEnquiry`, `createMemberException`, `createPaymentLink`, `getChargebackAnalytics`, `getResaleFeePolicy`, `getResaleMarketplaceConfig`, `holdResaleSettlement`, `importTicketTemplate`, `issueInvitation`, `listChargebacks`, `listDeposits`, `listExternalReferenceMappings`, `listFraudRules`, `listInvitationAllowances`, `listMembershipRenewals`, `listOrderDiscounts`, `listOrderFees`, `listPaymentAllocationRules`, `listPaymentProviders`, `listTicketTemplates`, `listUpgrades`, `mergeOrders`, `migrateMembership`, `openGuestCreditAccount`, `printTicketProof`, `pushWalletPassUpdate`, `quoteUpgrade`, `recordChargeback`, `recordChargebackOutcome`, `recordExternalReference`, `releaseResaleSettlementHold`, `relinquishStoredValue`, `renewMembership`, `resendPaymentLink`, `resolveMembershipActivation`, `respondToChargeback`, `revokeEntitlementShare`, `setFraudRules`, `setGroupCustomerOrganization`, `setGroupPaymentSchedule`, `setGroupTicketAllocation`, `setGroupTicketFulfillment`, `setParticipantGuestList`, `setResaleFeePolicy`, `setResaleMarketplaceConfig`, `splitOrder`, `updateGroupBooking`, `voidEntitlement`, `voidPayment` |
+| payments | `createB2bCreditAccount`, `createPaymentMethod`, `getB2bPaymentTerms`, `getDunningPolicy`, `getInstalmentPolicy`, `getMixedTenderRules`, `getPaymentPerformance`, `getPaymentProviderEconomics`, `getPaymentProviderHealth`, `getPaymentRules`, `listB2bCreditAccounts`, `listDepositActivity`, `listDunningCases`, `listMerchantAccounts`, `listPaymentMethods`, `listPaymentProviderConnections`, `listPaymentRoutingRules`, `listPaymentTerminalCertifications`, `listPaymentTerminals`, `listReconciliationSources`, `listStoredForwardTransactions`, `receivePaymentProviderWebhook`, `recordDepositActivity`, `recordPaymentTerminalCertification`, `resolveDunningCase`, `setB2bPaymentTerms`, `setDunningPolicy`, `setHostedCheckoutConfiguration`, `setMerchantAccount`, `setMixedTenderRules`, `setPaymentAuthenticationPolicy`, `setPaymentFailoverPolicy`, `setPaymentRiskRules`, `setPaymentRoutingRules`, `setPaymentRules`, `setPaymentTerminalConfiguration`, `setReconciliationMatchingRules`, `setReconciliationSource`, `simulatePaymentConfiguration`, `simulatePaymentRouting`, `submitChargebackEvidence`, `testPaymentProviderConnection`, `updatePaymentMethod` |
 | policy | `getRefundPolicy`, `setRefundCalculationPolicy` |
-| refund | `approveRefund`, `createBulkRefund` |
-| reservation | `convertReservation`, `createReservation`, `extendReservation` |
-| shift | `approveShiftClose` |
-| sync | `listSyncRejections`, `resolveSyncRejection` |
+| refund | `approveRefund`, `createBulkRefund`, `simulateRefund` |
+| shift | `adjustDepositBoxFloat`, `approveShiftClose`, `closeDepositBoxes`, `getShift` |
+| sync | `resolveSyncRejection` |

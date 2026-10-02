@@ -7,7 +7,7 @@
 | Tier | platform: Provisioning, publishing, reporting, and the one cross-region path. |
 | Contracts | `white-label` |
 | Schemas owned | `whitelabel` |
-| Operations in the slice | 78 of 79 |
+| Operations in the slice | 91 of 93 |
 | Scale | Read-heavy and heavily cached. Published, not queried. |
 | If it is down | Down freezes the current published config. Guests see the last good version. |
 
@@ -42,10 +42,10 @@ Branding, content, navigation and the tenant's own app configuration. Separate b
 | bookingFlows | [`updateBookingFlowDefinition`](#updatebookingflowdefinition) | PATCH | `/booking-flows/{bookingFlowId}` | core | 1 | CMS-103 |
 | bookingFlows | [`validateBookingFlow`](#validatebookingflow) | POST | `/booking-flows/{bookingFlowId}/validate` | core | 1 | CMS-103 |
 | brand | [`getAppIcons`](#getappicons) | GET | `/tenant-config/app-icons` | core | 2 | ADM-016, CMS-004 |
-| brand | [`getBrandIdentity`](#getbrandidentity) | GET | `/tenant-config/brand` | core | 2 | ADM-016, CMS-002, CMS-004 |
+| brand | [`getBrandIdentity`](#getbrandidentity) | GET | `/tenant-config/brand` | core | 1 | ADM-016, CMS-002, CMS-004, CMS-006, CMS-104 |
 | brand | [`setAppIcons`](#setappicons) | PUT | `/tenant-config/app-icons` | core | 2 | ADM-016, CMS-004 |
-| brand | [`setBrandIdentity`](#setbrandidentity) | PUT | `/tenant-config/brand` | core | 2 | ADM-016, BO-836, CMS-002, CMS-004 |
-| branding | [`getBookingFlowConfig`](#getbookingflowconfig) | GET | `/tenant-config/booking-flow` | core | 2 | CMS-016 |
+| brand | [`setBrandIdentity`](#setbrandidentity) | PUT | `/tenant-config/brand` | core | 1 | ADM-016, BO-836, CMS-002, CMS-004, CMS-104 |
+| branding | [`getBookingFlowConfig`](#getbookingflowconfig) | GET | `/tenant-config/booking-flow` | core | 2 | CMS-006, CMS-016 |
 | branding | [`setBookingFlowConfig`](#setbookingflowconfig) | PUT | `/tenant-config/booking-flow` | core | 2 | CMS-016 |
 | content | [`createBanner`](#createbanner) | POST | `/tenant-config/banners` | core | 2 | CMS-008 |
 | content | [`createContentPage`](#createcontentpage) | POST | `/tenant-config/pages` | core | 2 | BO-837, CMS-007 |
@@ -57,55 +57,68 @@ Branding, content, navigation and the tenant's own app configuration. Separate b
 | content | [`deletePromoBlock`](#deletepromoblock) | DELETE | `/tenant-config/promo-blocks/{promoBlockId}` | core | 2 | CMS-008 |
 | content | [`getPublishedGuidedChoice`](#getpublishedguidedchoice) | GET | `/venues/{venueId}/guided-choice` | core | 1 | GST-003, GST-008, WEB-002, WEB-005 |
 | content | [`listBanners`](#listbanners) | GET | `/tenant-config/banners` | core | 2 | CMS-008 |
-| content | [`listContentPages`](#listcontentpages) | GET | `/tenant-config/pages` | core | 2 | BO-837, CMS-007, GST-040, GST-057, WEB-045 |
-| content | [`listFaqs`](#listfaqs) | GET | `/tenant-config/faqs` | core | 2 | ADM-018, GST-040, SUP-006, WEB-045 |
+| content | [`listContentPages`](#listcontentpages) | GET | `/tenant-config/pages` | core | 2 | BO-837, CMS-007 |
 | content | [`listGuidedChoices`](#listguidedchoices) | GET | `/venues/{venueId}/guided-choices` | core | 2 | CMS-101 |
-| content | [`listPolicies`](#listpolicies) | GET | `/tenant-config/policies` | core | 2 | ADM-018, BO-243, CMS-018 |
+| content | [`listPolicies`](#listpolicies) | GET | `/tenant-config/policies` | core | 2 | BO-748, CMS-018 |
 | content | [`listPromoBlocks`](#listpromoblocks) | GET | `/tenant-config/promo-blocks` | core | 2 | CMS-008 |
+| content | [`listPublishedContentPages`](#listpublishedcontentpages) | GET | `/storefront/pages` | core | 2 | GST-040, GST-057, WEB-045 |
+| content | [`listPublishedFaqs`](#listpublishedfaqs) | GET | `/storefront/faqs` | core | 1 | GST-040, WEB-025, WEB-045 |
+| content | [`listPublishedPolicies`](#listpublishedpolicies) | GET | `/storefront/policies` | core | 1 | GST-009, GST-040, WEB-012, WEB-045 |
 | content | [`proposeGuidedChoice`](#proposeguidedchoice) | POST | `/venues/{venueId}/guided-choice-suggestions` | core | 1 |  |
 | content | [`publishGuidedChoice`](#publishguidedchoice) | POST | `/guided-choices/{guidedChoiceId}/publish` | core | 2 | CMS-101 |
-| content | [`setFaqs`](#setfaqs) | PUT | `/tenant-config/faqs` | core | 2 | ADM-018 |
-| content | [`setPolicy`](#setpolicy) | PUT | `/tenant-config/policies/{policyKind}` | core | 2 | ADM-018, CMS-018 |
+| content | [`setFaqs`](#setfaqs) | PUT | `/tenant-config/faqs` | setup | 1 |  |
+| content | [`setPolicy`](#setpolicy) | PUT | `/tenant-config/policies/{policyKind}` | core | 2 | CMS-018 |
 | content | [`unpublishGuidedChoice`](#unpublishguidedchoice) | POST | `/guided-choices/{guidedChoiceId}/unpublish` | core | 2 | CMS-101 |
 | content | [`updateBanner`](#updatebanner) | PATCH | `/tenant-config/banners/{bannerId}` | core | 2 | CMS-008 |
 | content | [`updateContentPage`](#updatecontentpage) | PUT | `/tenant-config/pages/{pageId}` | core | 2 | CMS-007 |
 | content | [`updateGuidedChoice`](#updateguidedchoice) | PATCH | `/guided-choices/{guidedChoiceId}` | core | 2 | CMS-101 |
 | content | [`updatePromoBlock`](#updatepromoblock) | PATCH | `/tenant-config/promo-blocks/{promoBlockId}` | core | 2 | CMS-008 |
 | homepage | [`getHomepageLayout`](#gethomepagelayout) | GET | `/tenant-config/homepage` | core | 2 | CMS-007 |
+| homepage | [`listLandingPageTemplates`](#listlandingpagetemplates) | GET | `/landing-page-templates` | core | 2 | CMS-007 |
 | homepage | [`setHomepageLayout`](#sethomepagelayout) | PUT | `/tenant-config/homepage` | core | 2 | BO-840, CMS-007 |
 | modules | [`getFeatureToggles`](#getfeaturetoggles) | GET | `/tenant-config/features` | core | 2 | CMS-001 |
-| modules | [`getModuleEnablement`](#getmoduleenablement) | GET | `/tenant-config/modules` | core | 2 | CMS-001, CMS-007 |
+| modules | [`getModuleEnablement`](#getmoduleenablement) | GET | `/tenant-config/modules` | core | 2 | ADM-424, CMS-001, CMS-007 |
 | modules | [`setFeatureToggles`](#setfeaturetoggles) | PUT | `/tenant-config/features` | core | 2 | CMS-001 |
 | modules | [`setLanguages`](#setlanguages) | PUT | `/tenant-config/languages` | core | 2 | ADM-018, CMS-011 |
-| modules | [`setModuleEnablement`](#setmoduleenablement) | PUT | `/tenant-config/modules` | core | 2 | CMS-001 |
+| modules | [`setModuleEnablement`](#setmoduleenablement) | PUT | `/tenant-config/modules` | core | 2 | ADM-424, CMS-001 |
+| navigation | [`buildDeepLink`](#builddeeplink) | POST | `/deep-links` | core | 2 | CMS-009 |
+| navigation | [`getDeepLinkScheme`](#getdeeplinkscheme) | GET | `/deep-links` | core | 2 | CMS-009 |
 | navigation | [`getNavigation`](#getnavigation) | GET | `/tenant-config/navigation` | core | 2 | CMS-009 |
-| navigation | [`setHeader`](#setheader) | PUT | `/tenant-config/header` | core | 2 | CMS-007 |
+| navigation | [`setHeader`](#setheader) | PUT | `/tenant-config/header` | core | 2 | CMS-009 |
 | navigation | [`setNavigation`](#setnavigation) | PUT | `/tenant-config/navigation` | core | 2 | CMS-009 |
+| overview | [`getPublishedTenantConfig`](#getpublishedtenantconfig) | GET | `/storefront/tenant-config` | core | 1 | GST-001, GST-043, GST-047, KSK-002, WEB-001, WEB-028 … |
 | overview | [`getTenantAppStatus`](#gettenantappstatus) | GET | `/tenant-config/status` | core | 1 | CMS-001, CMS-014, CMS-102, GST-001, GST-029, GST-038 … |
-| overview | [`getTenantConfig`](#gettenantconfig) | GET | `/tenant-config` | core | 1 | BO-599, BO-834, CMS-001, CMS-012, CMS-016, GST-001 … |
+| overview | [`getTenantConfig`](#gettenantconfig) | GET | `/tenant-config` | core | 2 | ADM-018, BO-834, CMS-011 |
 | overview | [`listAnalyticsProviders`](#listanalyticsproviders) | GET | `/tenant-config/analytics-providers` | core | 1 | CMS-016, GST-001, WEB-001 |
 | overview | [`recordStorefrontSessionEvents`](#recordstorefrontsessionevents) | POST | `/storefront/session-events` | core | 1 | GST-001, WEB-001 |
 | overview | [`setAnalyticsProvider`](#setanalyticsprovider) | PUT | `/tenant-config/analytics-providers` | core | 2 | CMS-016 |
 | overview | [`setMaintenanceMode`](#setmaintenancemode) | PUT | `/tenant-config/status` | core | 2 | CMS-001 |
-| publishing | [`createPreview`](#createpreview) | POST | `/tenant-config/preview` | core | 2 | ADM-016, CMS-006 |
-| publishing | [`diffConfigVersion`](#diffconfigversion) | GET | `/tenant-config/versions/{version}/diff` | core | 2 | ADM-016, CMS-006, CMS-015 |
-| publishing | [`getSiteSetupProgress`](#getsitesetupprogress) | GET | `/tenant-config/site-setup` | core | 1 | CMS-102 |
-| publishing | [`listConfigVersions`](#listconfigversions) | GET | `/tenant-config/versions` | core | 2 | ADM-016, CMS-006, CMS-015 |
-| publishing | [`publishTenantConfig`](#publishtenantconfig) | POST | `/tenant-config/publish` | core | 1 | ADM-016, BO-843, CMS-006, CMS-014, CMS-103 |
-| publishing | [`restoreConfigVersion`](#restoreconfigversion) | POST | `/tenant-config/versions/{version}/restore` | core | 2 | ADM-016, CMS-006, CMS-015 |
+| publishing | [`createPreview`](#createpreview) | POST | `/tenant-config/preview` | core | 2 | ADM-016, CMS-006, CMS-012, CMS-014 |
+| publishing | [`diffConfigVersion`](#diffconfigversion) | GET | `/tenant-config/versions/{version}/diff` | core | 2 | ADM-016, CMS-014, CMS-015 |
+| publishing | [`exportSitePackage`](#exportsitepackage) | POST | `/site-package` | core | 2 | ADM-016, CMS-014 |
+| publishing | [`getPublishReviewPolicy`](#getpublishreviewpolicy) | GET | `/publish-review-policy` | core | 2 | CMS-014 |
+| publishing | [`getSitePackage`](#getsitepackage) | GET | `/site-package/{packageId}` | core | 2 | ADM-016, CMS-014 |
+| publishing | [`getSiteSetupProgress`](#getsitesetupprogress) | GET | `/tenant-config/site-setup` | core | 1 | CMS-001, CMS-102 |
+| publishing | [`listConfigVersions`](#listconfigversions) | GET | `/tenant-config/versions` | core | 2 | ADM-016, CMS-015 |
+| publishing | [`publishTenantConfig`](#publishtenantconfig) | POST | `/tenant-config/publish` | core | 1 | ADM-016, BO-843, CMS-014, CMS-103 |
+| publishing | [`restoreConfigVersion`](#restoreconfigversion) | POST | `/tenant-config/versions/{version}/restore` | core | 2 | ADM-016, CMS-015 |
+| publishing | [`setPublishReviewPolicy`](#setpublishreviewpolicy) | PUT | `/publish-review-policy` | core | 2 | CMS-014 |
 | publishing | [`setSiteSetupProgress`](#setsitesetupprogress) | PUT | `/tenant-config/site-setup` | core | 1 | CMS-102 |
 | publishing | [`validateTenantConfig`](#validatetenantconfig) | POST | `/tenant-config/validate` | core | 1 | CMS-012, CMS-014, CMS-102 |
-| theme | [`getFonts`](#getfonts) | GET | `/tenant-config/fonts` | core | 2 | CMS-003 |
-| theme | [`getTheme`](#gettheme) | GET | `/tenant-config/theme` | core | 2 | ADM-016, CMS-003, CMS-005 |
+| theme | [`getFonts`](#getfonts) | GET | `/tenant-config/fonts` | core | 2 | CMS-003, CMS-006 |
+| theme | [`getTheme`](#gettheme) | GET | `/tenant-config/theme` | core | 2 | ADM-016, CMS-005, CMS-006 |
 | theme | [`setFonts`](#setfonts) | PUT | `/tenant-config/fonts` | core | 2 | CMS-003 |
-| theme | [`setTheme`](#settheme) | PUT | `/tenant-config/theme` | core | 2 | ADM-016, CMS-003, CMS-005 |
+| theme | [`setTheme`](#settheme) | PUT | `/tenant-config/theme` | core | 2 | ADM-016, CMS-005 |
 | white-label | [`claimCustomDomain`](#claimcustomdomain) | POST | `/tenant-domains` | core | 2 | ADM-017, BO-835, CMS-017 |
+| white-label | [`getPlatformSubdomain`](#getplatformsubdomain) | GET | `/platform-subdomain` | core | 2 | ADM-017, CMS-017 |
 | white-label | [`listCustomDomains`](#listcustomdomains) | GET | `/tenant-domains` | core | 2 | ADM-017, CMS-017 |
+| white-label | [`regenerateDomainToken`](#regeneratedomaintoken) | POST | `/tenant-domains/{domainId}/token` | core | 2 | ADM-017, CMS-017 |
 | white-label | [`relinquishCustomDomain`](#relinquishcustomdomain) | DELETE | `/tenant-domains/{domainId}` | core | 2 | ADM-017, CMS-017 |
+| white-label | [`setPrimaryDomain`](#setprimarydomain) | POST | `/tenant-domains/{domainId}/primary` | core | 2 | ADM-017, CMS-017 |
 | white-label | [`verifyCustomDomain`](#verifycustomdomain) | POST | `/tenant-domains/{domainId}/verify` | core | 2 | ADM-017, CMS-017 |
-| whiteLabel | [`createContentBlock`](#createcontentblock) | POST | `/content-blocks` | setup | 2 | BO-839 |
-| whiteLabel | [`publishContentBlock`](#publishcontentblock) | POST | `/content-blocks/{blockId}/publish` | setup | 2 |  |
-| whiteLabel | [`setFooter`](#setfooter) | PUT | `/footer` | core | 2 | CMS-007 |
+| whiteLabel | [`createContentBlock`](#createcontentblock) | POST | `/content-blocks` | core | 2 | BO-839, CMS-007 |
+| whiteLabel | [`publishContentBlock`](#publishcontentblock) | POST | `/content-blocks/{blockId}/publish` | core | 2 | CMS-007 |
+| whiteLabel | [`setFooter`](#setfooter) | PUT | `/footer` | core | 2 | CMS-009 |
 
 ## Group: appPublishing
 
@@ -999,13 +1012,13 @@ A partial update of the working draft; guests see it after `publishTenantConfig`
 | Permission | `TENANT_CONFIGURE` |
 | Scope level | tenant |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | replica |
 | Reads | `whitelabel.tenant_config` |
 | Writes | - |
-| Called by | ADM-016, CMS-002, CMS-004 |
+| Called by | ADM-016, CMS-002, CMS-004, CMS-006, CMS-104 |
 
 **Response**: `BrandIdentity`
 
@@ -1022,6 +1035,7 @@ A partial update of the working draft; guests see it after `publishTenantConfig`
 | splashChangeScope | object |  | Always buildTime for native apps. (read-only) |
 | introVideoAssetRef | string (uuid) |  | The optional intro video (decided 29 September, MOB-5). (nullable) |
 | introVideoMode | enum (off, firstLaunch, everyLaunch) |  | When GST-001 plays it full screen. (default off) |
+| showPoweredBy | boolean |  | "Powered by TICVAI", a configuration toggle, on by default (Chinmay, 2 October, workbook Q160 and the pre-apply round; consistent with DI-297; CHG-CSA-036). (default True) |
 
 **Responses**
 
@@ -1090,18 +1104,19 @@ Source is a single 1024×1024 PNG without transparency; derived sizes are genera
 
 Logo and favicon are runtime — they change with a publish. **Splash images are build-time on native apps** and are marked as such in the response, because changing them requires a rebuild and a store submission. **On the guest web app a splash change is immediate (decided 28 September, audit R163)**: it reaches web guests with the publish, with no build.
 **Each asset is PNG or SVG, up to 2 MB (decided 28 September, audit R270).** Anything else is refused with 400 before it is stored against the brand.
+**"Powered by TICVAI" is a toggle, on by default** (Chinmay, 2 October, workbook Q160; CHG-CSA-036): `showPoweredBy` false is accepted only where the tenant's licence allows it, or 403 `powered-by-locked`.
 
 |  |  |
 |---|---|
 | Permission | `TENANT_CONFIGURE` |
 | Scope level | tenant |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `whitelabel.tenant_config` |
 | Writes | `cache:idempotency`, `whitelabel.tenant_config` |
-| Called by | ADM-016, BO-836, CMS-002, CMS-004 |
+| Called by | ADM-016, BO-836, CMS-002, CMS-004, CMS-104 |
 
 **Parameters**
 
@@ -1124,6 +1139,7 @@ Logo and favicon are runtime — they change with a publish. **Splash images are
 | splashChangeScope | object |  | Always buildTime for native apps. (read-only) |
 | introVideoAssetRef | string (uuid) |  | The optional intro video (decided 29 September, MOB-5). (nullable) |
 | introVideoMode | enum (off, firstLaunch, everyLaunch) |  | When GST-001 plays it full screen. (default off) |
+| showPoweredBy | boolean |  | "Powered by TICVAI", a configuration toggle, on by default (Chinmay, 2 October, workbook Q160 and the pre-apply round; consistent with DI-297; CHG-CSA-036). (default True) |
 
 **Response**: `BrandIdentity`
 
@@ -1140,6 +1156,7 @@ Logo and favicon are runtime — they change with a publish. **Splash images are
 | splashChangeScope | object |  | Always buildTime for native apps. (read-only) |
 | introVideoAssetRef | string (uuid) |  | The optional intro video (decided 29 September, MOB-5). (nullable) |
 | introVideoMode | enum (off, firstLaunch, everyLaunch) |  | When GST-001 plays it full screen. (default off) |
+| showPoweredBy | boolean |  | "Powered by TICVAI", a configuration toggle, on by default (Chinmay, 2 October, workbook Q160 and the pre-apply round; consistent with DI-297; CHG-CSA-036). (default True) |
 
 **Responses**
 
@@ -1147,6 +1164,7 @@ Logo and favicon are runtime — they change with a publish. **Splash images are
 |---|---|---|
 | 200 |  | Updated |
 | 400 |  | An asset is larger than 2 MB, or is not PNG or SVG (audit R270) |
+| 403 |  | showPoweredBy false, and the tenant's licence does not allow removing "Powered by TICVAI" (powered-by-locked; workbook Q160, DI-297; CHG-CSA-036). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
@@ -1167,7 +1185,7 @@ Logo and favicon are runtime — they change with a publish. **Splash images are
 | Read routing | replica |
 | Reads | `whitelabel.tenant_config` |
 | Writes | - |
-| Called by | CMS-016 |
+| Called by | CMS-006, CMS-016 |
 
 **Parameters**
 
@@ -2009,6 +2027,7 @@ A `published` choice is unpublished first, or 409.
 **`GET /tenant-config/pages`**: List custom content pages
 
 **A guest caller sees only what is live**: pages whose `status` is `published` and `isEnabled` is true. For a guest `status` is ignored and `TENANT_CONFIGURE` is not needed — reading a published page is not configuring it. A staff caller sees every page, and with no `status` gets all three states.
+**A guest screen reads `listPublishedContentPages`** (decided 2 October, GFIX-2), which needs no session: help and accessibility pages are public.
 
 |  |  |
 |---|---|
@@ -2022,7 +2041,7 @@ A `published` choice is unpublished first, or 409.
 | Offline note | 24 August: servable from a local cache. |
 | Reads | `whitelabel.content_page` |
 | Writes | - |
-| Called by | BO-837, CMS-007, GST-040, GST-057, WEB-045 |
+| Called by | BO-837, CMS-007 |
 
 **Parameters**
 
@@ -2058,33 +2077,6 @@ A `published` choice is unpublished first, or 409.
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Pages |
-| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
-
-### listFaqs
-
-**`GET /tenant-config/faqs`**: List FAQs
-
-A guest caller sees only entries whose `isPublished` is true, and needs no `TENANT_CONFIGURE` — reading the help content is not configuring it.
-
-|  |  |
-|---|---|
-| Permission | `TENANT_CONFIGURE` |
-| Scope level | tenant |
-| Part of slice | core |
-| Wave | 2 |
-| Offline | yes |
-| Conflict policy | serverWins |
-| Read routing | replica |
-| Offline note | 24 August: servable from a local cache. |
-| Reads | `whitelabel.faq_category`, `whitelabel.faq_entry` |
-| Writes | - |
-| Called by | ADM-018, GST-040, SUP-006, WEB-045 |
-
-**Responses**
-
-| Code | Shape | Meaning |
-|---|---|---|
-| 200 |  | FAQ categories with entries |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### listGuidedChoices
@@ -2157,6 +2149,7 @@ Drafts, AI suggestions awaiting review and the published one (decided 29 Septemb
 **`GET /tenant-config/policies`**: List legal policies
 
 **The current version of each policy only, with history on request (decided 28 September, audit R163).** Without `includeHistory` the list holds one entry per `PolicyKind`, its current version; with it, every version, newest first within each kind.
+**Staff only. Guests read `listPublishedPolicies`** (decided 2 October, GFIX-2): the current version of each published policy, with no session, for checkout terms, sign-up and the help centre.
 
 |  |  |
 |---|---|
@@ -2169,7 +2162,7 @@ Drafts, AI suggestions awaiting review and the published one (decided 29 Septemb
 | Read routing | replica |
 | Reads | `whitelabel.policy` |
 | Writes | - |
-| Called by | ADM-018, BO-243, CMS-018 |
+| Called by | BO-748, CMS-018 |
 
 **Parameters**
 
@@ -2207,6 +2200,122 @@ Drafts, AI suggestions awaiting review and the published one (decided 29 Septemb
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Blocks |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
+### listPublishedContentPages
+
+**`GET /storefront/pages`**: The live content pages, readable before sign-in
+
+**The help, accessibility and information pages a visitor reads** (decided 2 October by Chinmay, GFIX-2). `listContentPages` needs a session and answers staff with drafts; this answers anyone with the live pages only: `status` `published` and `isEnabled` true. Ordered by `sortOrder`, then by slug. `slug` fetches one known page; `categoryCode` is how a screen reads its own category (GST-057 reads the accessibility pages), fixed by the screen and never typed by a guest. The tenant comes from the host, as for `getPublishedTenantConfig`. Cached at the edge and invalidated by `publishTenantConfig`.
+
+|  |  |
+|---|---|
+| Permission | `None` |
+| Scope level | tenant |
+| Part of slice | core |
+| Wave | 2 |
+| Offline | yes |
+| Conflict policy | serverWins |
+| Read routing | replica |
+| Offline note | 2 October: servable from a local cache. |
+| Reads | - |
+| Writes | - |
+| Called by | GST-040, GST-057, WEB-045 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| categoryCode | query |  | string | Only live pages with this categoryCode. |
+| slug | query |  | string | Only the live page with this slug. |
+| pageSize | query |  | integer |  |
+| cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
+
+**Response**: `object`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| items | array of PublishedContentPage | yes |  |
+| items[].id | string (uuid) | yes |  |
+| items[].slug | string | yes | (pattern ^[a-z0-9-]+$) |
+| items[].title | LocalisedText | yes | Keyed by ISO 639-1 code. |
+| items[].body | LocalisedRichText | yes | Keyed by language code. |
+| items[].iconAssetRef | string (uuid) |  | (nullable) |
+| items[].categoryCode | string |  | (nullable) |
+| items[].sortOrder | integer |  |  |
+| nextCursor | string |  |  |
+| hasMore | boolean | yes |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Live pages |
+| 404 |  | The host belongs to no tenant (not-found). |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
+### listPublishedFaqs
+
+**`GET /storefront/faqs`**: The published FAQs, readable before sign-in
+
+**Help is public** (decided 2 October by Chinmay, GFIX-2). `listFaqs` needs a guest session, so the help centre (WEB-045, GST-040) told a visitor to sign in before they could read how to sign in. This returns the same categories with only the entries whose `isPublished` is true, ordered by `sortOrder` within each category, and categories ordered by `sortOrder`; a category with no published entry is left out. The tenant comes from the host, as for `getPublishedTenantConfig`. Cached at the edge and invalidated by `setFaqs`.
+
+|  |  |
+|---|---|
+| Permission | `None` |
+| Scope level | tenant |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | yes |
+| Conflict policy | serverWins |
+| Read routing | replica |
+| Offline note | 2 October: servable from a local cache. |
+| Reads | - |
+| Writes | - |
+| Called by | GST-040, WEB-025, WEB-045 |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Published FAQ categories with their published entries |
+| 404 |  | The host belongs to no tenant (not-found). |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
+### listPublishedPolicies
+
+**`GET /storefront/policies`**: The tenant's current legal policies, readable before sign-in
+
+**Terms, privacy, refund, cookie and accessibility, as a guest reads them** (decided 2 October by Chinmay, GFIX-2). `listPolicies` is staff-only (`TENANT_CONFIGURE`), so no guest could read a policy: not the terms they tick at checkout (WEB-012, GST-009), not the privacy notice before they sign up, not the help centre's policy tab (WEB-045, GST-040). Every policy is public by nature, so this needs no session.
+
+**The current version of each kind only**, one entry per `PolicyKind` that has been published, with its `version` so a consent records exactly what was shown. A kind never published is absent, not empty. History and who published it stay on `listPolicies`. The tenant comes from the host, as for `getPublishedTenantConfig`. Cached at the edge and invalidated by `setPolicy`.
+
+|  |  |
+|---|---|
+| Permission | `None` |
+| Scope level | tenant |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | yes |
+| Conflict policy | serverWins |
+| Read routing | replica |
+| Offline note | 2 October: servable from a local cache. |
+| Reads | - |
+| Writes | - |
+| Called by | GST-009, GST-040, WEB-012, WEB-045 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| kind | query |  | PolicyKind: enum (privacy, termsAndConditions, refund, cookie, accessibility) | Only this policy kind, how the checkout reads the terms alone. |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | The current version of each published policy |
+| 404 |  | The host belongs to no tenant (not-found). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### proposeGuidedChoice
@@ -2394,13 +2503,13 @@ Also the grounding corpus for the AI concierge, which is why an answer here is c
 |---|---|
 | Permission | `TENANT_CONFIGURE` |
 | Scope level | tenant |
-| Part of slice | core |
-| Wave | 2 |
+| Part of slice | setup, makes `whitelabel.faq_entry` non-empty |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `whitelabel.faq_category`, `whitelabel.faq_entry` |
 | Writes | `cache:idempotency`, `whitelabel.faq_category`, `whitelabel.faq_entry` |
-| Called by | ADM-018 |
+| Called by | **no screen**: no screen lists it in its apis, so it is reachable only by API or import until one does (README, Known gaps) |
 
 **Parameters**
 
@@ -2449,7 +2558,7 @@ Also the grounding corpus for the AI concierge, which is why an answer here is c
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `whitelabel.policy` |
 | Writes | `cache:idempotency`, `whitelabel.policy` |
-| Called by | ADM-018, CMS-018 |
+| Called by | CMS-018 |
 
 **Parameters**
 
@@ -2881,6 +2990,8 @@ A partial update. Only a `draft` may be edited: a `published` choice is unpublis
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
+| templateKey | string |  | The landing-page template this layout started from (listLandingPageTemplates), or null for a layout composed from scratch (CHG-CSA-037). (nullable) |
+| landingSource | enum (storefront, ownSite) |  | storefront: this home is the tenant's landing page. (default storefront) |
 | id | string (uuid) |  | Added 20 August. (read-only) |
 | sections | array of object | yes |  |
 | sections[].id | string (uuid) |  | Added 20 August. (read-only) |
@@ -2889,7 +3000,8 @@ A partial update. Only a `draft` may be edited: a `published` choice is unpublis
 | sections[].sortOrder | integer | yes |  |
 | sections[].isVisible | boolean | yes |  |
 | sections[].contentPageId | string (uuid) |  | (nullable) |
-| sections[].maxItems | integer |  | How many items the section shows. (nullable) |
+| sections[].maxItems | integer |  | How many cards the section shows, the venue's choice (Chinmay, 2 October, workbook Q152: every customisation option of the approved wireframe, including the card count per section; CHG-CSA-040). (nullable) |
+| sections[].scrollAnimation | enum (rise, scale, slide, blur, none) |  | How the section enters as the guest scrolls (Chinmay, 2 October, workbook Q153: "must be there"; DI-1088; CHG-CSA-040). (default rise) |
 | sections[].heroStyle | enum (carousel, video, poster, split, None) |  | For heroBanner only (decided 29 September, MOB-3). (nullable) |
 
 **Responses**
@@ -2898,6 +3010,56 @@ A partial update. Only a `draft` may be edited: a `published` choice is unpublis
 |---|---|---|
 | 200 |  | Layout |
 | 404 | NotConfigured | This part of the working draft has never been saved. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
+### listLandingPageTemplates
+
+**`GET /landing-page-templates`**: The landing-page templates TICVAI provides
+
+**For a tenant without its own landing page** (Chinmay, 2 October, batch 2 #41; CHG-CSA-037). One complete home page per Site Builder preset (`SiteSetupProgress.presetKey`): its sections, their order, card counts and animations, ordered by `presetKey`, then `templateKey`. Picking one in the page builder writes it as the draft `HomepageLayout` with its `templateKey`; nothing is published until the tenant publishes.
+
+|  |  |
+|---|---|
+| Permission | `TENANT_CONFIGURE` |
+| Scope level | tenant |
+| Part of slice | core |
+| Wave | 2 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | replica |
+| Reads | `whitelabel.homepage_section` |
+| Writes | - |
+| Called by | CMS-007 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| pageSize | query |  | integer |  |
+| cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
+
+**Response**: `object`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| items | array of LandingPageTemplate | yes |  |
+| items[].templateKey | string | yes |  |
+| items[].name | string | yes |  |
+| items[].presetKey | string |  | The Site Builder preset it belongs to (SiteSetupProgress.presetKey). (nullable) |
+| items[].thumbnailUrl | string |  | (nullable) |
+| items[].layout | HomepageLayout | yes | The client-approved web and app wireframes are the layout (Chinmay, 2 October, workbook Q163; CHG-CSA-040): sections, their order and their options follow the approved wireframes and change only wher… |
+| items[].layout.templateKey | string |  | The landing-page template this layout started from (listLandingPageTemplates), or null for a layout composed from scratch (CHG-CSA-037). (nullable) |
+| items[].layout.landingSource | enum (storefront, ownSite) |  | storefront: this home is the tenant's landing page. (default storefront) |
+| items[].layout.id | string (uuid) |  | Added 20 August. (read-only) |
+| items[].layout.sections | array of object | yes |  |
+| nextCursor | string |  |  |
+| hasMore | boolean | yes |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Templates |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setHomepageLayout
@@ -2932,6 +3094,8 @@ The drag-and-drop builder. Sections are an ordered list; the order here is the o
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
+| templateKey | string |  | The landing-page template this layout started from (listLandingPageTemplates), or null for a layout composed from scratch (CHG-CSA-037). (nullable) |
+| landingSource | enum (storefront, ownSite) |  | storefront: this home is the tenant's landing page. (default storefront) |
 | id | string (uuid) |  | Added 20 August. (read-only) |
 | sections | array of object | yes |  |
 | sections[].id | string (uuid) |  | Added 20 August. (read-only) |
@@ -2940,13 +3104,16 @@ The drag-and-drop builder. Sections are an ordered list; the order here is the o
 | sections[].sortOrder | integer | yes |  |
 | sections[].isVisible | boolean | yes |  |
 | sections[].contentPageId | string (uuid) |  | (nullable) |
-| sections[].maxItems | integer |  | How many items the section shows. (nullable) |
+| sections[].maxItems | integer |  | How many cards the section shows, the venue's choice (Chinmay, 2 October, workbook Q152: every customisation option of the approved wireframe, including the card count per section; CHG-CSA-040). (nullable) |
+| sections[].scrollAnimation | enum (rise, scale, slide, blur, none) |  | How the section enters as the guest scrolls (Chinmay, 2 October, workbook Q153: "must be there"; DI-1088; CHG-CSA-040). (default rise) |
 | sections[].heroStyle | enum (carousel, video, poster, split, None) |  | For heroBanner only (decided 29 September, MOB-3). (nullable) |
 
 **Response**: `HomepageLayout`
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
+| templateKey | string |  | The landing-page template this layout started from (listLandingPageTemplates), or null for a layout composed from scratch (CHG-CSA-037). (nullable) |
+| landingSource | enum (storefront, ownSite) |  | storefront: this home is the tenant's landing page. (default storefront) |
 | id | string (uuid) |  | Added 20 August. (read-only) |
 | sections | array of object | yes |  |
 | sections[].id | string (uuid) |  | Added 20 August. (read-only) |
@@ -2955,7 +3122,8 @@ The drag-and-drop builder. Sections are an ordered list; the order here is the o
 | sections[].sortOrder | integer | yes |  |
 | sections[].isVisible | boolean | yes |  |
 | sections[].contentPageId | string (uuid) |  | (nullable) |
-| sections[].maxItems | integer |  | How many items the section shows. (nullable) |
+| sections[].maxItems | integer |  | How many cards the section shows, the venue's choice (Chinmay, 2 October, workbook Q152: every customisation option of the approved wireframe, including the card count per section; CHG-CSA-040). (nullable) |
+| sections[].scrollAnimation | enum (rise, scale, slide, blur, none) |  | How the section enters as the guest scrolls (Chinmay, 2 October, workbook Q153: "must be there"; DI-1088; CHG-CSA-040). (default rise) |
 | sections[].heroStyle | enum (carousel, video, poster, split, None) |  | For heroBanner only (decided 29 September, MOB-3). (nullable) |
 
 **Responses**
@@ -3010,7 +3178,7 @@ Shows which modules the tenant has licensed and which are enabled. A module that
 | Read routing | replica |
 | Reads | `cache:resolution`, `control.licence_add_on`, `subscription.contract`, `subscription.plan`, `whitelabel.module_enablement` |
 | Writes | `cache:resolution` |
-| Called by | CMS-001, CMS-007 |
+| Called by | ADM-424, CMS-001, CMS-007 |
 
 **Responses**
 
@@ -3065,6 +3233,7 @@ Several are build-time on native apps and are flagged accordingly. A tenant enab
 **`PUT /tenant-config/languages`**: Set enabled languages and default
 
 Enabling a language does not translate existing content. The response reports how many content items lack a version in each newly enabled language, so a tenant does not publish a half-translated app.
+**Any language, not only English and Arabic** (Chinmay, 2 October, workbook Q145; CHG-CSA-039): a venue adds its own interface languages here (ADM-018 for platform staff under a grant, CMS-011 for the tenant). The response's `uiStringCoverage` says how far the interface strings reach in each.
 
 |  |  |
 |---|---|
@@ -3095,8 +3264,12 @@ Enabling a language does not translate existing content. The response reports ho
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| languages | array of string | yes |  |
+| languages | array of string | yes | A tenant may add or select interface languages beyond English and Arabic (Chinmay, 2 October, workbook Q145; CHG-CSA-039). |
 | defaultLanguage | string | yes | (pattern ^[a-z]{2}$) |
+| uiStringCoverage | array of object |  | How complete the interface strings are in each enabled language (CHG-CSA-039). (read-only) |
+| uiStringCoverage[].language | string |  |  |
+| uiStringCoverage[].coveragePercent | number |  | (min 0; max 100) |
+| uiStringCoverage[].status | enum (complete, draft, missing) |  |  |
 | rtlLanguages | array of string |  | The enabled languages written right to left — those whose Unicode CLDR character order is right-to-left (Arabic, ar, among them). (read-only) |
 | translationGaps | array of object |  | Content lacking a version in an enabled language. (read-only) |
 | translationGaps[].language | string |  |  |
@@ -3128,7 +3301,7 @@ A disabled module is **hidden from the guest app entirely** — not shown and re
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `control.licence_add_on`, `subscription.contract`, `subscription.plan`, `whitelabel.module_enablement` |
 | Writes | `cache:idempotency`, `cache:resolution`, `whitelabel.module_enablement` |
-| Called by | CMS-001 |
+| Called by | ADM-424, CMS-001 |
 
 **Parameters**
 
@@ -3154,6 +3327,89 @@ A disabled module is **hidden from the guest app entirely** — not shown and re
 
 
 ## Group: navigation
+
+### buildDeepLink
+
+**`POST /deep-links`**: Build a deep link to a target
+
+The CMS link builder (CHG-CSA-037): given a target, the URL to paste on the tenant's own site, with optional campaign tags. Writes nothing.
+
+|  |  |
+|---|---|
+| Permission | `TENANT_CONFIGURE` |
+| Scope level | tenant |
+| Part of slice | core |
+| Wave | 2 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | - |
+| Writes | - |
+| Called by | CMS-009 |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| target | LinkTarget | yes |  |
+| target.kind | enum (module, contentPage, product, event, externalUrl, appSection, none) | yes | appSection points at a section of the guest mobile app (decided 29 September, MOB-1), so the bottom navigation can hold Home, Explore, Plan and Tickets. |
+| target.moduleKey | ModuleKey: enum (ticketsAndBooking, membership, events, attractions, virtualQueue, diningAndFnb, shop, parking, …) |  | visitPlanner (decided 29 September, MOB-1 and the Plan tab in Block A) is the Plan tab and WEB-050; off, the tab and the page are not shown. |
+| target.appSection | enum (home, explore, plan, tickets, map, account, buyTickets) |  | Required when kind is appSection. |
+| target.contentPageId | string (uuid) |  |  |
+| target.productId | string (uuid) |  |  |
+| target.eventId | string (uuid) |  |  |
+| target.url | string |  |  |
+| utm | object |  | Campaign tags appended to the link, e.g. |
+
+**Response**: `object`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| url | string | yes |  |
+| appLink | string |  | The universal or app link that opens the app where installed. (nullable) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | The link |
+| 400 | BadRequest | Validation failed |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
+### getDeepLinkScheme
+
+**`GET /deep-links`**: The published deep-link scheme
+
+**How a tenant's own website links into the storefront and the app** (CHG-CSA-037). The URL patterns per target kind (a product, an event, a content page, an app section, the booking flow), on the tenant's primary domain, with the app-link fallback to the store. The patterns are stable: a link a tenant printed keeps working across releases.
+
+|  |  |
+|---|---|
+| Permission | `TENANT_CONFIGURE` |
+| Scope level | tenant |
+| Part of slice | core |
+| Wave | 2 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | replica |
+| Reads | - |
+| Writes | - |
+| Called by | CMS-009 |
+
+**Response**: `DeepLinkScheme`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| baseUrl | string | yes | The primary domain, or the platform subdomain where none is primary. |
+| patterns | array of object | yes |  |
+| patterns[].kind | string | yes | A LinkTarget.kind, or bookingFlow. |
+| patterns[].pattern | string | yes | e.g. |
+| appLinksEnabled | boolean |  |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | The scheme |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### getNavigation
 
@@ -3220,7 +3476,7 @@ A disabled module is **hidden from the guest app entirely** — not shown and re
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `whitelabel.tenant_config` |
 | Writes | `cache:idempotency`, `whitelabel.tenant_config` |
-| Called by | CMS-007 |
+| Called by | CMS-009 |
 
 **Parameters**
 
@@ -3261,6 +3517,7 @@ A disabled module is **hidden from the guest app entirely** — not shown and re
 **`PUT /tenant-config/navigation`**: Set main and overflow navigation
 
 Items pointing at a disabled module are refused. A navigation entry that leads nowhere is worse than an absent one.
+**Three editors, each saved on its own** (Chinmay, 2 October, workbook Q49; DI-285; CHG-CSA-037): the tab bar is this operation (`kind` `bottomNavigation`); the web header is `setHeader` and the web footer `setFooter`. Saving one never rewrites the others.
 Bottom navigation is capped at five visible items; the remainder moves to the overflow menu.
 **Accepts `Prefer: validate-only`** (29 September, build pass, group G2): validates and answers 200 with the would-be result without writing, for the AI executor's plan validation; registered as an AI tool (`ai.AiTool`, 1.2.59, 2.6.50).
 
@@ -3342,6 +3599,220 @@ Bottom navigation is capped at five visible items; the remainder moves to the ov
 
 ## Group: overview
 
+### getPublishedTenantConfig
+
+**`GET /storefront/tenant-config`**: The published guest-facing configuration, before anyone signs in
+
+**What a first-time visitor's storefront renders in** (decided 2 October by Chinmay, GFIX-1). `getTenantConfig` needs a guest or a staff session, so a visitor with neither could not load the tenant's brand, theme, fonts, header, footer or navigation, and the home page (WEB-001, GST-001), the maintenance and sold-out pages (WEB-029, GST-047) and the kiosk (KSK-002) had nothing to style themselves with. This is that read with no session at all.
+
+**The tenant comes from the host, never from the caller.** The request carries no tenant: the edge resolves the host it arrived on to a tenant with `tenancy.resolveTenantHost` (SD-021), which is the tenant's verified custom domain or its platform subdomain. The platform subdomain is the tenant slug the guest app and kiosk builds are configured with, so all three shells call the same path. An unknown host is `404` and never falls through to a default tenant.
+
+**Published, non-sensitive fields only.** Read from the current published `ConfigVersion` (never the working draft) plus the live status `setMaintenanceMode` writes. Left out, because a public and cacheable response must not carry them: the draft markers (`isDraft`, `version`, the draft booking flows), notification branding (sender addresses), the enabled payment methods (checkout reads what the gateway offers), licensing, and every CMS status field `getTenantAppStatus` keeps for staff. A module the tenant has not enabled is not listed, so a guest never learns what was not bought.
+
+**Cacheable.** With no session the answer is the same for every visitor of a host and venue and is cached at the edge, invalidated by `publishTenantConfig` and `setMaintenanceMode`; `publishedVersion` lets a client keep its copy when nothing changed. A signed-in guest gets the same answer.
+
+|  |  |
+|---|---|
+| Permission | `None` |
+| Scope level | tenant |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | yes |
+| Conflict policy | serverWins |
+| Read routing | replica |
+| Offline note | 2 October: servable from a local cache. |
+| Reads | `whitelabel.footer_config`, `whitelabel.footer_config_column`, `whitelabel.footer_config_social_link`, `whitelabel.homepage_section`, `whitelabel.navigation_item` |
+| Writes | - |
+| Called by | GST-001, GST-043, GST-047, KSK-002, WEB-001, WEB-028, WEB-029 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| venueId | query |  | string (uuid) | The venue the guest picked (WEB-001, GST-001). |
+
+**Response**: `PublishedTenantConfig`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| tenantId | string (uuid) | yes |  |
+| publishedVersion | string | yes | The ConfigVersion.version this answer was read from; a client holding the same version keeps its copy. |
+| publishedAt | string (date-time) | yes |  |
+| brand | BrandIdentity |  | Every *AssetRef here is a MediaAsset id from the assets library (createUpload then completeUpload), PNG or SVG and at most 2 MB (decided 28 September, audit R270). |
+| brand.logoAssetRef | string (uuid) | yes | The primary logo. |
+| brand.logoDarkAssetRef | string (uuid) |  | Used on dark backgrounds. (nullable) |
+| brand.logoVariant | enum (light, dark, duotone) |  | Which lockup sits in the nav bar, and whose colours drive the theme (decided 29 September, rev 3 CFG-4). (default light) |
+| brand.faviconAssetRef | string (uuid) |  | The browser tab icon for the guest web app. (nullable) |
+| brand.splashImageAssetRefs | array of string (uuid) |  | Splash images, shown in order. |
+| brand.splashDurationSeconds | integer |  | (min 0; max 10; default 3) |
+| brand.splashBackgroundColour | string |  | (pattern ^#[0-9A-Fa-f]{6}$) |
+| brand.showLoadingIndicator | boolean |  | (default True) |
+| brand.splashChangeScope | object |  | Always buildTime for native apps. (read-only) |
+| brand.introVideoAssetRef | string (uuid) |  | The optional intro video (decided 29 September, MOB-5). (nullable) |
+| brand.introVideoMode | enum (off, firstLaunch, everyLaunch) |  | When GST-001 plays it full screen. (default off) |
+| brand.showPoweredBy | boolean |  | "Powered by TICVAI", a configuration toggle, on by default (Chinmay, 2 October, workbook Q160 and the pre-apply round; consistent with DI-297; CHG-CSA-036). (default True) |
+| appIcons | AppIcons |  |  |
+| appIcons.sourceAssetRef | string (uuid) | yes | The MediaAsset id of the 1024×1024 source. |
+| appIcons.derived | array of object |  | Generated by setAppIcons from the source, one entry per platform and size — the iOS and Android store sets and the web favicons listed on setAppIcons (audit R163). (read-only) |
+| appIcons.derived[].platform | enum (ios, android, web) |  |  |
+| appIcons.derived[].size | string |  |  |
+| appIcons.derived[].assetRef | string (uuid) |  |  |
+| appIcons.changeScope | object | yes | Always buildTime — icons are baked into the binary. (read-only) |
+| appIcons.liveVersion | string |  | Icon currently shipped. (read-only; nullable) |
+| appIcons.requiresRebuild | boolean |  | True while the draft's source differs from the icon in liveVersion. (read-only) |
+| theme | Theme |  |  |
+| theme.primaryColour | string | yes | (pattern ^#[0-9A-Fa-f]{6}$) |
+| theme.secondaryColour | string | yes | (pattern ^#[0-9A-Fa-f]{6}$) |
+| theme.accentColour | string |  | (pattern ^#[0-9A-Fa-f]{6}$) |
+| theme.backgroundColour | string | yes | (pattern ^#[0-9A-Fa-f]{6}$) |
+| theme.textColour | string | yes | (pattern ^#[0-9A-Fa-f]{6}$) |
+| theme.darkMode | object |  | Deprecated and ignored (Chinmay, 2 October, workbook Q150 and the pre-apply round; CHG-CSA-035). |
+| theme.darkMode.primaryColour | string |  | (pattern ^#[0-9A-Fa-f]{6}$) |
+| theme.darkMode.backgroundColour | string |  | (pattern ^#[0-9A-Fa-f]{6}$) |
+| theme.darkMode.textColour | string |  | (pattern ^#[0-9A-Fa-f]{6}$) |
+| theme.cornerRadius | integer |  | The prototype's 0 to 22 px slider sits inside these bounds (rev 3 CFG-2, no change). (min 0; max 32) |
+| theme.surfaceStyle | enum (glass, solid) |  | Cards and panels as frosted glass or opaque (decided 29 September, rev 3 CFG-3). (default glass) |
+| theme.buttonStyle | enum (solid, outline, pill) |  | Button shape (decided 29 September, rev 3 CFG-3). (default solid) |
+| theme.componentColours | object |  | Colours for single interactive elements (decided 17 September, M17-11). |
+| theme.componentColours.primaryCta | ThemeComponentColour |  |  |
+| theme.componentColours.payButton | ThemeComponentColour |  |  |
+| theme.componentColours.addToCart | ThemeComponentColour |  |  |
+| theme.componentColours.buyTicketsButton | ThemeComponentColour |  |  |
+| theme.componentColours.link | ThemeComponentColour |  |  |
+| theme.componentColours.badge | ThemeComponentColour |  |  |
+| fonts | FontConfig |  |  |
+| fonts.primaryLatin | string | yes |  |
+| fonts.primaryArabic | string |  | Required when ar is among the tenant's languages (audit R163). (nullable) |
+| fonts.secondaryLatin | string |  | (nullable) |
+| fonts.secondaryArabic | string |  | Required whenever secondaryLatin is set and ar is among the tenant's languages (decided 28 September, audit R163). (nullable) |
+| fonts.customFontAssetRefs | array of string (uuid) |  | Uploaded font files, as MediaAsset ids. |
+| fonts.changeScope | object |  | Custom font files are buildTime; selecting a bundled face is runtime. (read-only) |
+| header | HeaderConfig |  |  |
+| header.layout | enum (logoLeft, logoCentre, logoWithMenu) | yes |  |
+| header.showLogo | boolean |  | (default True) |
+| header.showMenu | boolean |  | (default True) |
+| header.showNotifications | boolean |  | (default True) |
+| header.backgroundColour | string |  | (pattern ^#[0-9A-Fa-f]{6}$) |
+| footer | FooterConfig |  | BL-002. |
+| footer.id | string (uuid) | yes | (read-only) |
+| footer.scopePath | string | yes | The partition key (ADR-0005), written at tenant scope by the server. (read-only) |
+| footer.columns | array of object |  |  |
+| footer.columns[].heading | string |  |  |
+| footer.columns[].links | array of object |  |  |
+| footer.legalLinks | object |  | Required links, held separately from the free-form columns — a tenant reorganising their footer must not be able to remove the privacy notice by accident. |
+| footer.legalLinks.termsUrl | string |  |  |
+| footer.legalLinks.privacyUrl | string |  |  |
+| footer.legalLinks.accessibilityUrl | string |  | (nullable) |
+| footer.legalLinks.cookiePolicyUrl | string |  | (nullable) |
+| footer.copyrightText | string |  |  |
+| footer.socialLinks | array of object |  |  |
+| footer.socialLinks[].platform | string |  |  |
+| footer.socialLinks[].url | string |  |  |
+| navigation | NavigationConfig |  | The mobile tab set is venue configuration (decided 29 September, MOB-1; 29 September brief decision 6). |
+| navigation.id | string (uuid) |  | Added 20 August. (read-only) |
+| navigation.kind | enum (bottomNavigation, drawer, tabs) | yes |  |
+| navigation.items | array of object | yes | (max items 12) |
+| navigation.items[].id | string (uuid) |  | Added 20 August. (read-only) |
+| navigation.items[].label | LocalisedText | yes | Keyed by ISO 639-1 code. |
+| navigation.items[].icon | string |  |  |
+| navigation.items[].target | LinkTarget | yes |  |
+| navigation.items[].isVisible | boolean | yes | At most five may be visible in bottom navigation; the rest overflow. |
+| navigation.items[].sortOrder | integer | yes |  |
+| navigation.buyButton | object |  | The persistent Buy tickets button (decided 29 September, MOB-2). (nullable) |
+| navigation.buyButton.style | enum (raised, floating, flat, hidden) |  | raised sits in the centre of the tab bar, as the v4 prototype shows; hidden turns it off. (default raised) |
+| navigation.buyButton.label | LocalisedText |  | Keyed by ISO 639-1 code. |
+| homepage | HomepageLayout |  | The client-approved web and app wireframes are the layout (Chinmay, 2 October, workbook Q163; CHG-CSA-040): sections, their order and their options follow the approved wireframes and change only wher… |
+| homepage.templateKey | string |  | The landing-page template this layout started from (listLandingPageTemplates), or null for a layout composed from scratch (CHG-CSA-037). (nullable) |
+| homepage.landingSource | enum (storefront, ownSite) |  | storefront: this home is the tenant's landing page. (default storefront) |
+| homepage.id | string (uuid) |  | Added 20 August. (read-only) |
+| homepage.sections | array of object | yes |  |
+| homepage.sections[].id | string (uuid) |  | Added 20 August. (read-only) |
+| homepage.sections[].kind | HomepageSectionKind: enum (heroBanner, quickActions, tickets, whatsOn, attractions, membership, dining, shop, …) | yes | Which module each section needs, proposed, client to correct (decided 28 September, audit R163). |
+| homepage.sections[].title | LocalisedText |  | Keyed by ISO 639-1 code. |
+| homepage.sections[].sortOrder | integer | yes |  |
+| homepage.sections[].isVisible | boolean | yes |  |
+| homepage.sections[].contentPageId | string (uuid) |  | (nullable) |
+| homepage.sections[].maxItems | integer |  | How many cards the section shows, the venue's choice (Chinmay, 2 October, workbook Q152: every customisation option of the approved wireframe, including the card count per section; CHG-CSA-040). (nullable) |
+| homepage.sections[].scrollAnimation | enum (rise, scale, slide, blur, none) |  | How the section enters as the guest scrolls (Chinmay, 2 October, workbook Q153: "must be there"; DI-1088; CHG-CSA-040). (default rise) |
+| homepage.sections[].heroStyle | enum (carousel, video, poster, split, None) |  | For heroBanner only (decided 29 September, MOB-3). (nullable) |
+| bookingFlow | object |  | The booking-flow display settings, resolved for venueId when one was sent (the tenant's values with that venue's venueOverrides entry laid over, rev 3 CFG-11). |
+| bookingFlow.preset | enum (auto, ticketBox, playCentre, venueSite, marketplace, singleEvent, season, custom) |  | L1 Ticket box … L6 Season. (default auto) |
+| bookingFlow.stepIndicator | enum (bar, numbered, dots, segmented, breadcrumb, pills, ticks, none) |  | (default bar) |
+| bookingFlow.cartLayout | enum (sidebarRight, sidebarLeft, slideInRight, slideUpBottom, singleColumn, floatingIcon) |  | floatingIcon is a round basket button with the item count that opens the cart (decided 29 September, rev 3 REV3-10). (default sidebarRight) |
+| bookingFlow.cartSideInRtl | enum (keepRight, mirror) |  | The cart side when the guest reads Arabic or another right-to-left language (decided 29 September, rev 3 REV3-10). (default keepRight) |
+| bookingFlow.cardLayout | enum (stackedRows, splitRows, cardsAcross, posterCards) |  | How ticket and product cards are laid out (decided 29 September, rev 3 DG-6). (default stackedRows) |
+| bookingFlow.cardSize | enum (compact, standard, large, extraLarge) |  | Labels Compact, Standard, Large, Extra large (decided 29 September, rev 3 DG-6). (default compact) |
+| bookingFlow.seatPicker | enum (bowl, zonesThenSeats, zonesOnly, seatsOnly) |  | Default bowl, as the prototype has it (decided 29 September, rev 3 CFG-6). (default bowl) |
+| bookingFlow.mapView | enum (2d, 3d) |  | (default 3d) |
+| bookingFlow.density | enum (compact, standard, roomy) |  | Labels Compact, Standard, Roomy, default Compact as the design has it (decided 29 September, rev 3 DG-6). (default compact) |
+| bookingFlow.embedMode | enum (fullPage, embedded) |  | embedded hides the hero banner, event page and venue header, for a flow placed inside the venue's own site. (default fullPage) |
+| bookingFlow.heroBanner | boolean |  | (default True) |
+| bookingFlow.searchInBanner | boolean |  | Off by default, as the prototype has it (decided 29 September, rev 3 CFG-6). (default False) |
+| bookingFlow.eventBannerDates | boolean |  | Dates in event banner (decided 29 September, rev 3 23SEP-19). (default False) |
+| bookingFlow.singleEventPage | boolean |  | (default False) |
+| bookingFlow.quantitiesOnAddOns | boolean |  | (default True) |
+| bookingFlow.timesPerPage | enum (8, 12, 24, all) |  | Times per page (decided 29 September, rev 3 REV3-1). (default 24) |
+| bookingFlow.dayPartFilter | boolean |  | Morning, afternoon and evening chips with counts above the times (decided 29 September, rev 3 REV3-1). (default True) |
+| bookingFlow.dayPartBoundaries | object |  | Where the day parts divide, in the venue's time zone (decided 29 September, rev 3 REV3-1). |
+| bookingFlow.dayPartBoundaries.afternoonStartsAt | string |  | (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$; default 12:00) |
+| bookingFlow.dayPartBoundaries.eveningStartsAt | string |  | (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$; default 17:00) |
+| bookingFlow.seatViewPosition | enum (bottom, right, left, top) |  | Where the view-from-your-seat box sits around the seat map (decided 29 September, rev 3 REV3-5). (default bottom) |
+| bookingFlow.seatTimeBar | boolean |  | Time bar above the seat map (decided 29 September, rev 3 REV3-6). (default True) |
+| bookingFlow.ticketCategories | enum (categoryThenSubcategory, flatList) |  | How tickets are grouped (decided 29 September, rev 3 REV3-16). (default categoryThenSubcategory) |
+| bookingFlow.ticketTags | boolean |  | Tags on tickets (decided 29 September, rev 3 23SEP-3). (default True) |
+| bookingFlow.cardInfo | boolean |  | Extra info on cards (decided 29 September, rev 3 23SEP-6). (default True) |
+| bookingFlow.conciergeMascot | boolean |  | The concierge as mascot art or a plain button (decided 29 September, rev 3 CFG-5). (default True) |
+| bookingFlow.showInfoOnly | boolean |  | Show info-only products (decided 29 September, rev 3 REV3-14). (default True) |
+| bookingFlow.locationSwitcher | boolean |  | Location switcher (decided 29 September, rev 3 REV3-18). (default False) |
+| bookingFlow.guestContactFields | array of enum (email, mobile, name) |  | What the guest-checkout pop-up asks, and nothing else (decided 29 September, W1). (min items 1; max items 3; default ['email']) |
+| bookingFlow.dateStripDays | integer |  | The date strip (decided 17 September, M17-08). (min 3; max 31; default 7) |
+| bookingFlow.venueOverrides | array of BookingFlowVenueOverride |  | Per-venue overrides, at most one per venue. (max items 200; default []) |
+| bookingFlow.venueOverrides[].venueId | string (uuid) | yes | One of the tenant's active venues. |
+| bookingFlow.venueOverrides[].settings | BookingFlowSettings | yes | Every guest booking-flow setting, once. |
+| languages | LanguageConfig |  |  |
+| languages.languages | array of string | yes | A tenant may add or select interface languages beyond English and Arabic (Chinmay, 2 October, workbook Q145; CHG-CSA-039). |
+| languages.defaultLanguage | string | yes | (pattern ^[a-z]{2}$) |
+| languages.uiStringCoverage | array of object |  | How complete the interface strings are in each enabled language (CHG-CSA-039). (read-only) |
+| languages.uiStringCoverage[].language | string |  |  |
+| languages.uiStringCoverage[].coveragePercent | number |  | (min 0; max 100) |
+| languages.uiStringCoverage[].status | enum (complete, draft, missing) |  |  |
+| languages.rtlLanguages | array of string |  | The enabled languages written right to left — those whose Unicode CLDR character order is right-to-left (Arabic, ar, among them). (read-only) |
+| languages.translationGaps | array of object |  | Content lacking a version in an enabled language. (read-only) |
+| languages.translationGaps[].language | string |  |  |
+| languages.translationGaps[].missingCount | integer |  |  |
+| languages.translationGaps[].areas | array of string |  |  |
+| accessibility | AccessibilitySettings |  | BL-065, 2.1.27. |
+| accessibility.largeTextAvailable | boolean |  | (default True) |
+| accessibility.highContrastAvailable | boolean |  | (default True) |
+| accessibility.simplifiedNavigationAvailable | boolean |  | (default True) |
+| accessibility.screenReaderSupported | boolean |  | (default True) |
+| accessibility.reachableHeightModeAvailable | boolean |  | Moves the interface to the lower half of the screen for a guest using a wheelchair. (default False) |
+| accessibility.sessionTimeoutMultiplier | number |  | Timeouts are an accessibility barrier nobody counts. (default 1) |
+| enabledModules | array of ModuleKey: enum (ticketsAndBooking, membership, events, attractions, virtualQueue, diningAndFnb, shop, parking, …) |  | The modules the tenant has enabled and published, so a guest surface hides a tab or a homepage section for a module that is off. |
+| enabledFeatures | array of string |  | The featureKey of every feature toggle that is on in the published version. |
+| isInMaintenance | boolean | yes | Live state (setMaintenanceMode), as on getTenantAppStatus. |
+| maintenanceMessage | object |  | (nullable) |
+| expectedBackAt | string (date-time) |  | (nullable) |
+| minimumAppVersion | MinimumAppVersion |  | The oldest guest app build still allowed to run (decided 28 September, audit R073). (nullable) |
+| minimumAppVersion.ios | string |  | (pattern ^\d+\.\d+\.\d+$; nullable) |
+| minimumAppVersion.android | string |  | (pattern ^\d+\.\d+\.\d+$; nullable) |
+| availability | AppAvailability: enum (open, soldOut, closed) |  | The sold-out or closed signal (decided 28 September, audit R073). (default open) |
+| availabilityMessage | object |  | (nullable) |
+| contact | VenueContact |  | How a guest reaches the venue: WEB-028 Contact & Venue Information, and the screen shown on an error or when the app cannot help (decided 28 September, audit R073). (nullable) |
+| contact.phone | string |  | (nullable) |
+| contact.email | string (email) |  | (nullable) |
+| contact.whatsapp | string |  | (nullable) |
+| contact.address | object |  | (nullable) |
+| contact.openingHours | object |  | Prose, as the guest reads it. (nullable) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | The published guest-facing configuration |
+| 404 |  | The host belongs to no tenant (not-found), or the tenant has published nothing yet (not-configured); the storefront shows the platform's neutral holding page. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
 ### getTenantAppStatus
 
 **`GET /tenant-config/status`**: App status and recent changes
@@ -3363,7 +3834,7 @@ Also the endpoint the guest app calls to discover a maintenance window, which is
 | Read routing | replica |
 | Reads | `whitelabel.config_version`, `whitelabel.tenant_config` |
 | Writes | - |
-| Called by | CMS-001, CMS-014, CMS-102, GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, WEB-001, WEB-025, WEB-028, WEB-029, WEB-045, WEB-050 |
+| Called by | CMS-001, CMS-014, CMS-102, GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, WEB-001, WEB-025, WEB-029, WEB-045, WEB-050 |
 
 **Response**: `TenantAppStatus`
 
@@ -3421,19 +3892,20 @@ Also the endpoint the guest app calls to discover a maintenance window, which is
 **`GET /tenant-config`**: Full working configuration
 
 Everything the builder edits. **A staff caller gets the working draft**, or with `version` the snapshot of that published version. **A guest caller always gets the current published version**: `version` is ignored and `TENANT_CONFIGURE` is not needed, because reading the published app is not configuring it. The dashboard's status view (published state, module and page counts, recent changes) is `getTenantAppStatus`, not this.
+**A visitor with no session reads `getPublishedTenantConfig`** (decided 2 October, GFIX-1): the published, non-sensitive part of this, resolved from the host and cacheable, so a storefront renders in the tenant's brand before anyone signs in.
 
 |  |  |
 |---|---|
 | Permission | `TENANT_CONFIGURE` |
 | Scope level | tenant |
 | Part of slice | core |
-| Wave | 1 |
+| Wave | 2 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | replica |
 | Reads | `whitelabel.booking_flow`, `whitelabel.booking_flow_step`, `whitelabel.feature_toggle`, `whitelabel.footer_config`, `whitelabel.footer_config_column`, `whitelabel.footer_config_social_link`, `whitelabel.homepage_section`, `whitelabel.module_enablement`, `whitelabel.navigation_item`, `whitelabel.tenant_config` |
 | Writes | - |
-| Called by | BO-599, BO-834, CMS-001, CMS-012, CMS-016, GST-001, KSK-002, WEB-001 |
+| Called by | ADM-018, BO-834, CMS-011 |
 
 **Parameters**
 
@@ -3460,6 +3932,7 @@ Everything the builder edits. **A staff caller gets the working draft**, or with
 | brand.splashChangeScope | object |  | Always buildTime for native apps. (read-only) |
 | brand.introVideoAssetRef | string (uuid) |  | The optional intro video (decided 29 September, MOB-5). (nullable) |
 | brand.introVideoMode | enum (off, firstLaunch, everyLaunch) |  | When GST-001 plays it full screen. (default off) |
+| brand.showPoweredBy | boolean |  | "Powered by TICVAI", a configuration toggle, on by default (Chinmay, 2 October, workbook Q160 and the pre-apply round; consistent with DI-297; CHG-CSA-036). (default True) |
 | appIcons | AppIcons |  |  |
 | appIcons.sourceAssetRef | string (uuid) | yes | The MediaAsset id of the 1024×1024 source. |
 | appIcons.derived | array of object |  | Generated by setAppIcons from the source, one entry per platform and size — the iOS and Android store sets and the web favicons listed on setAppIcons (audit R163). (read-only) |
@@ -3534,7 +4007,7 @@ Everything the builder edits. **A staff caller gets the working draft**, or with
 | theme.accentColour | string |  | (pattern ^#[0-9A-Fa-f]{6}$) |
 | theme.backgroundColour | string | yes | (pattern ^#[0-9A-Fa-f]{6}$) |
 | theme.textColour | string | yes | (pattern ^#[0-9A-Fa-f]{6}$) |
-| theme.darkMode | object |  | Optional dark variant. |
+| theme.darkMode | object |  | Deprecated and ignored (Chinmay, 2 October, workbook Q150 and the pre-apply round; CHG-CSA-035). |
 | theme.darkMode.primaryColour | string |  | (pattern ^#[0-9A-Fa-f]{6}$) |
 | theme.darkMode.backgroundColour | string |  | (pattern ^#[0-9A-Fa-f]{6}$) |
 | theme.darkMode.textColour | string |  | (pattern ^#[0-9A-Fa-f]{6}$) |
@@ -3603,7 +4076,9 @@ Everything the builder edits. **A staff caller gets the working draft**, or with
 | navigation.buyButton | object |  | The persistent Buy tickets button (decided 29 September, MOB-2). (nullable) |
 | navigation.buyButton.style | enum (raised, floating, flat, hidden) |  | raised sits in the centre of the tab bar, as the v4 prototype shows; hidden turns it off. (default raised) |
 | navigation.buyButton.label | LocalisedText |  | Keyed by ISO 639-1 code. |
-| homepage | HomepageLayout |  |  |
+| homepage | HomepageLayout |  | The client-approved web and app wireframes are the layout (Chinmay, 2 October, workbook Q163; CHG-CSA-040): sections, their order and their options follow the approved wireframes and change only wher… |
+| homepage.templateKey | string |  | The landing-page template this layout started from (listLandingPageTemplates), or null for a layout composed from scratch (CHG-CSA-037). (nullable) |
+| homepage.landingSource | enum (storefront, ownSite) |  | storefront: this home is the tenant's landing page. (default storefront) |
 | homepage.id | string (uuid) |  | Added 20 August. (read-only) |
 | homepage.sections | array of object | yes |  |
 | homepage.sections[].id | string (uuid) |  | Added 20 August. (read-only) |
@@ -3612,7 +4087,8 @@ Everything the builder edits. **A staff caller gets the working draft**, or with
 | homepage.sections[].sortOrder | integer | yes |  |
 | homepage.sections[].isVisible | boolean | yes |  |
 | homepage.sections[].contentPageId | string (uuid) |  | (nullable) |
-| homepage.sections[].maxItems | integer |  | How many items the section shows. (nullable) |
+| homepage.sections[].maxItems | integer |  | How many cards the section shows, the venue's choice (Chinmay, 2 October, workbook Q152: every customisation option of the approved wireframe, including the card count per section; CHG-CSA-040). (nullable) |
+| homepage.sections[].scrollAnimation | enum (rise, scale, slide, blur, none) |  | How the section enters as the guest scrolls (Chinmay, 2 October, workbook Q153: "must be there"; DI-1088; CHG-CSA-040). (default rise) |
 | homepage.sections[].heroStyle | enum (carousel, video, poster, split, None) |  | For heroBanner only (decided 29 September, MOB-3). (nullable) |
 | modules | array of ModuleEnablement |  |  |
 | modules[].moduleKey | ModuleKey: enum (ticketsAndBooking, membership, events, attractions, virtualQueue, diningAndFnb, shop, parking, …) | yes | visitPlanner (decided 29 September, MOB-1 and the Plan tab in Block A) is the Plan tab and WEB-050; off, the tab and the page are not shown. |
@@ -3627,8 +4103,12 @@ Everything the builder edits. **A staff caller gets the working draft**, or with
 | features[].changeScope | object | yes | Wallet and payment integrations are buildTime on native apps — enabling one needs a release, not a publish. (read-only) |
 | features[].requiresConfiguration | boolean |  | True where the feature needs credentials or setup elsewhere first. |
 | languages | LanguageConfig |  |  |
-| languages.languages | array of string | yes |  |
+| languages.languages | array of string | yes | A tenant may add or select interface languages beyond English and Arabic (Chinmay, 2 October, workbook Q145; CHG-CSA-039). |
 | languages.defaultLanguage | string | yes | (pattern ^[a-z]{2}$) |
+| languages.uiStringCoverage | array of object |  | How complete the interface strings are in each enabled language (CHG-CSA-039). (read-only) |
+| languages.uiStringCoverage[].language | string |  |  |
+| languages.uiStringCoverage[].coveragePercent | number |  | (min 0; max 100) |
+| languages.uiStringCoverage[].status | enum (complete, draft, missing) |  |  |
 | languages.rtlLanguages | array of string |  | The enabled languages written right to left — those whose Unicode CLDR character order is right-to-left (Arabic, ar, among them). (read-only) |
 | languages.translationGaps | array of object |  | Content lacking a version in an enabled language. (read-only) |
 | languages.translationGaps[].language | string |  |  |
@@ -3954,6 +4434,7 @@ Renders the branded maintenance screen with an expected-back time. Tenant-brande
 **`POST /tenant-config/preview`**: Generate a preview link
 
 A short-lived link rendering the working draft as the guest app would, for a chosen platform, theme and language. Shareable for review before publishing.
+**Also the PDF ticket and the Wallet passes, in Block A** (Chinmay, 2 October, workbook Q151; CHG-CSA-041). `outputs` asks for them; each is rendered from the draft's branding and the ticket and pass templates, for `productId` where one is named (a product's own ticket, as the catalogue's publish step needs, DI-444) or a sample ticket otherwise. **Simulate, then publish** (workbook Q156, CHG-CSA-042): this is the simulate step.
 
 |  |  |
 |---|---|
@@ -3965,7 +4446,7 @@ A short-lived link rendering the working draft as the guest app would, for a cho
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `whitelabel.tenant_config` |
 | Writes | `cache:idempotency`, `whitelabel.tenant_config` |
-| Called by | ADM-016, CMS-006 |
+| Called by | ADM-016, CMS-006, CMS-012, CMS-014 |
 
 **Parameters**
 
@@ -3978,8 +4459,10 @@ A short-lived link rendering the working draft as the guest app would, for a cho
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | platform | enum (ios, android, web) |  |  |
-| theme | enum (light, dark) |  |  |
+| theme | enum (light, dark) |  | Deprecated with Theme.darkMode (CHG-CSA-035); ignored. |
 | language | string |  | (pattern ^[a-z]{2}$) |
+| outputs | array of enum (app, pdfTicket, appleWalletPass, googleWalletPass) |  | What to render besides the app (CHG-CSA-041). |
+| productId | string (uuid) |  | The product whose ticket and passes to render; a sample ticket where absent. (nullable) |
 | expiresInHours | integer |  | (min 1; max 168; default 24) |
 
 **Response**: `Preview`
@@ -3989,8 +4472,11 @@ A short-lived link rendering the working draft as the guest app would, for a cho
 | previewId | string (uuid) | yes |  |
 | url | string | yes |  |
 | platform | enum (ios, android, web) |  |  |
-| theme | enum (light, dark) |  |  |
+| theme | enum (light, dark) |  | Deprecated with Theme.darkMode (CHG-CSA-035); the preview always renders the venue's theme. |
 | language | string |  | (pattern ^[a-z]{2}$) |
+| outputPreviews | array of object |  | The PDF ticket and the Apple and Google Wallet passes, previewed with the app (Chinmay, 2 October, workbook Q151: in Block A; CHG-CSA-041). (read-only) |
+| outputPreviews[].output | enum (app, pdfTicket, appleWalletPass, googleWalletPass) | yes |  |
+| outputPreviews[].url | string | yes | A short-lived link to the rendered output (the PDF, the .pkpass, or the Google pass preview), expiring with the preview. |
 | expiresAt | string (date-time) | yes |  |
 
 **Responses**
@@ -4017,7 +4503,7 @@ What a review step actually needs. A publish note saying "updated homepage" is n
 | Read routing | replica |
 | Reads | `whitelabel.tenant_config` |
 | Writes | - |
-| Called by | ADM-016, CMS-006, CMS-015 |
+| Called by | ADM-016, CMS-014, CMS-015 |
 
 **Parameters**
 
@@ -4047,6 +4533,141 @@ What a review step actually needs. A publish note saying "updated homepage" is n
 | 200 |  | Diff |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
+### exportSitePackage
+
+**`POST /site-package`**: Generate a site package (self-hosted)
+
+**For a tenant that hosts its own site** (Chinmay, 2 October, workbook Q144; CHG-CSA-038). Builds a downloadable package of the published configuration: the storefront build, its configuration snapshot and the hosting instructions. A job: answers 202, followed with `getSitePackage`. Only from a published version; the working draft never leaves.
+
+|  |  |
+|---|---|
+| Permission | `TENANT_PUBLISH` |
+| Scope level | tenant |
+| Part of slice | core |
+| Wave | 2 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `whitelabel.site_package` |
+| Writes | - |
+| Called by | ADM-016, CMS-014 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| version | string |  | The published version to package; the current one where absent. (nullable) |
+
+**Response**: `SitePackage`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) | yes | (read-only) |
+| version | string |  |  |
+| status | enum (building, ready, failed) | yes |  |
+| downloadUrl | string |  | Short-lived; present when ready. (nullable) |
+| expiresAt | string (date-time) |  | (nullable) |
+| requestedByPrincipalId | string (uuid) |  | (read-only) |
+| platformStaffGrantId | string (uuid) |  | The platform-staff grant it was made under, where platform staff made it (R098). (read-only; nullable) |
+| createdAt | string (date-time) |  | (read-only) |
+| scopePath | string |  | The partition key (ADR-0005). (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 202 |  | Building |
+| 409 |  | Nothing is published yet (nothing-published). |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
+### getPublishReviewPolicy
+
+**`GET /publish-review-policy`**: Whether publishing needs a review
+
+Off by default: a single publish by a `TENANT_PUBLISH` holder (CHG-CSA-042).
+
+|  |  |
+|---|---|
+| Permission | `TENANT_CONFIGURE` |
+| Scope level | tenant |
+| Part of slice | core |
+| Wave | 2 |
+| Offline | no |
+| Config scope | tenant |
+| Conflict policy | serverWins |
+| Read routing | replica |
+| Reads | `whitelabel.publish_review_policy` |
+| Writes | - |
+| Called by | CMS-014 |
+
+**Response**: `PublishReviewPolicy`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| enabled | boolean | yes | (default False) |
+| reviewerMustDifferFromAuthor | boolean |  | (default True) |
+| appliesTo | array of enum (tenantConfig, contentBlocks) |  | What the review covers. |
+| scopePath | string |  | The partition key (ADR-0005). (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | The policy |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
+### getSitePackage
+
+**`GET /site-package/{packageId}`**: A site package and its download link
+
+The package job's status and, once `ready`, a short-lived download link (CHG-CSA-038).
+
+|  |  |
+|---|---|
+| Permission | `TENANT_PUBLISH` |
+| Scope level | tenant |
+| Part of slice | core |
+| Wave | 2 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | primary |
+| Reads | `whitelabel.site_package` |
+| Writes | - |
+| Called by | ADM-016, CMS-014 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| packageId | path | yes | string (uuid) |  |
+
+**Response**: `SitePackage`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) | yes | (read-only) |
+| version | string |  |  |
+| status | enum (building, ready, failed) | yes |  |
+| downloadUrl | string |  | Short-lived; present when ready. (nullable) |
+| expiresAt | string (date-time) |  | (nullable) |
+| requestedByPrincipalId | string (uuid) |  | (read-only) |
+| platformStaffGrantId | string (uuid) |  | The platform-staff grant it was made under, where platform staff made it (R098). (read-only; nullable) |
+| createdAt | string (date-time) |  | (read-only) |
+| scopePath | string |  | The partition key (ADR-0005). (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | The package |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
 ### getSiteSetupProgress
 
 **`GET /tenant-config/site-setup`**: Where the tenant is in the Site Builder
@@ -4064,7 +4685,7 @@ The builder's checklist (decided 29 September, W12 and M24-05): the preset picke
 | Read routing | replica |
 | Reads | `whitelabel.booking_flow`, `whitelabel.config_version`, `whitelabel.site_setup_progress`, `whitelabel.tenant_config` |
 | Writes | - |
-| Called by | CMS-102 |
+| Called by | CMS-001, CMS-102 |
 
 **Response**: `SiteSetupProgress`
 
@@ -4101,7 +4722,7 @@ The builder's checklist (decided 29 September, W12 and M24-05): the preset picke
 | Read routing | replica |
 | Reads | `whitelabel.config_version` |
 | Writes | - |
-| Called by | ADM-016, CMS-006, CMS-015 |
+| Called by | ADM-016, CMS-015 |
 
 **Parameters**
 
@@ -4120,6 +4741,8 @@ The builder's checklist (decided 29 September, W12 and M24-05): the preset picke
 | items[].publishedByPrincipalId | string (uuid) | yes |  |
 | items[].publishedByName | string |  |  |
 | items[].note | string | yes |  |
+| items[].reviewStatus | enum (notRequired, pending, approved, rejected) |  | The review step, where the tenant's publish-review policy is on (CHG-CSA-042). (default notRequired; read-only) |
+| items[].approvalRequestId | string (uuid) |  | (read-only; nullable) |
 | items[].isCurrent | boolean | yes |  |
 | items[].scheduledFor | string (date-time) |  | (nullable) |
 | items[].contentHash | string |  |  |
@@ -4146,6 +4769,8 @@ The builder's checklist (decided 29 September, W12 and M24-05): the preset picke
 Validates, snapshots, versions and activates atomically: the draft is copied into the new version's `snapshot`, and that version becomes the one guests read. Guests receive the new configuration on next launch — no store release, because runtime configuration is deliberately separated from build-time.
 The response names any build-time change in the draft that will **not** reach guests until the next release. A tenant who changed their app icon and published should be told plainly that the icon has not shipped.
 **Booking flows are published here (decided 29 September, W12).** Each venue's enabled flows are copied into the snapshot with the rest of the draft; `getPublishedBookingFlow` reads them from the current version. An invalid enabled flow fails validation (409, `bookingFlowInvalid`).
+**Simulate, then a single publish by the permission holder; review only if the venue switches it on** (Chinmay, 2 October, workbook Q156; CHG-CSA-042). The simulate step is `createPreview`. With the tenant's publish-review policy off (the default), a `TENANT_PUBLISH` holder publishes in one step (201). With it on (`setPublishReviewPolicy`), the version is validated and snapshotted and an approval request is raised; the response is 202 with `reviewStatus` `pending`, and the version becomes current when a reviewer (never the author, where the policy says so) approves it.
+**Platform staff publish a hosted tenant's site** (Chinmay, 2 October, workbook Q144; R098; CHG-CSA-038) only under a platform-staff grant naming `TENANT_PUBLISH`, with step-up. A self-hosted tenant exports a site package (`exportSitePackage`) instead.
 
 |  |  |
 |---|---|
@@ -4158,7 +4783,7 @@ The response names any build-time change in the draft that will **not** reach gu
 | Conflict policy | serverWins |
 | Reads | `whitelabel.booking_flow`, `whitelabel.booking_flow_step`, `whitelabel.config_version`, `whitelabel.tenant_config` |
 | Writes | `cache:idempotency`, `whitelabel.config_version` |
-| Called by | ADM-016, BO-843, CMS-006, CMS-014, CMS-103 |
+| Called by | ADM-016, BO-843, CMS-014, CMS-103 |
 | State model | White-label content ([states/content.yaml](../../../states/content.yaml)): moves `draft` -> `published`, `archived` -> `published` |
 
 **Parameters**
@@ -4183,6 +4808,8 @@ The response names any build-time change in the draft that will **not** reach gu
 | publishedByPrincipalId | string (uuid) | yes |  |
 | publishedByName | string |  |  |
 | note | string | yes |  |
+| reviewStatus | enum (notRequired, pending, approved, rejected) |  | The review step, where the tenant's publish-review policy is on (CHG-CSA-042). (default notRequired; read-only) |
+| approvalRequestId | string (uuid) |  | (read-only; nullable) |
 | isCurrent | boolean | yes |  |
 | scheduledFor | string (date-time) |  | (nullable) |
 | contentHash | string |  |  |
@@ -4198,6 +4825,7 @@ The response names any build-time change in the draft that will **not** reach gu
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Published |
+| 202 |  | Submitted for review; the venue's publish-review policy is on (CHG-CSA-042). |
 | 409 |  | Validation failed. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
@@ -4218,7 +4846,7 @@ Copies the chosen version's `snapshot` into the working draft. **It does not pub
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `whitelabel.booking_flow`, `whitelabel.booking_flow_step`, `whitelabel.feature_toggle`, `whitelabel.footer_config`, `whitelabel.footer_config_column`, `whitelabel.footer_config_social_link`, `whitelabel.homepage_section`, `whitelabel.module_enablement`, `whitelabel.navigation_item`, `whitelabel.tenant_config` |
 | Writes | `cache:idempotency`, `cache:resolution`, `whitelabel.feature_toggle`, `whitelabel.homepage_section`, `whitelabel.module_enablement`, `whitelabel.navigation_item`, `whitelabel.tenant_config` |
-| Called by | ADM-016, CMS-006, CMS-015 |
+| Called by | ADM-016, CMS-015 |
 | State model | White-label content ([states/content.yaml](../../../states/content.yaml)): moves `published` -> `draft` |
 
 **Parameters**
@@ -4247,6 +4875,7 @@ Copies the chosen version's `snapshot` into the working draft. **It does not pub
 | brand.splashChangeScope | object |  | Always buildTime for native apps. (read-only) |
 | brand.introVideoAssetRef | string (uuid) |  | The optional intro video (decided 29 September, MOB-5). (nullable) |
 | brand.introVideoMode | enum (off, firstLaunch, everyLaunch) |  | When GST-001 plays it full screen. (default off) |
+| brand.showPoweredBy | boolean |  | "Powered by TICVAI", a configuration toggle, on by default (Chinmay, 2 October, workbook Q160 and the pre-apply round; consistent with DI-297; CHG-CSA-036). (default True) |
 | appIcons | AppIcons |  |  |
 | appIcons.sourceAssetRef | string (uuid) | yes | The MediaAsset id of the 1024×1024 source. |
 | appIcons.derived | array of object |  | Generated by setAppIcons from the source, one entry per platform and size — the iOS and Android store sets and the web favicons listed on setAppIcons (audit R163). (read-only) |
@@ -4321,7 +4950,7 @@ Copies the chosen version's `snapshot` into the working draft. **It does not pub
 | theme.accentColour | string |  | (pattern ^#[0-9A-Fa-f]{6}$) |
 | theme.backgroundColour | string | yes | (pattern ^#[0-9A-Fa-f]{6}$) |
 | theme.textColour | string | yes | (pattern ^#[0-9A-Fa-f]{6}$) |
-| theme.darkMode | object |  | Optional dark variant. |
+| theme.darkMode | object |  | Deprecated and ignored (Chinmay, 2 October, workbook Q150 and the pre-apply round; CHG-CSA-035). |
 | theme.darkMode.primaryColour | string |  | (pattern ^#[0-9A-Fa-f]{6}$) |
 | theme.darkMode.backgroundColour | string |  | (pattern ^#[0-9A-Fa-f]{6}$) |
 | theme.darkMode.textColour | string |  | (pattern ^#[0-9A-Fa-f]{6}$) |
@@ -4390,7 +5019,9 @@ Copies the chosen version's `snapshot` into the working draft. **It does not pub
 | navigation.buyButton | object |  | The persistent Buy tickets button (decided 29 September, MOB-2). (nullable) |
 | navigation.buyButton.style | enum (raised, floating, flat, hidden) |  | raised sits in the centre of the tab bar, as the v4 prototype shows; hidden turns it off. (default raised) |
 | navigation.buyButton.label | LocalisedText |  | Keyed by ISO 639-1 code. |
-| homepage | HomepageLayout |  |  |
+| homepage | HomepageLayout |  | The client-approved web and app wireframes are the layout (Chinmay, 2 October, workbook Q163; CHG-CSA-040): sections, their order and their options follow the approved wireframes and change only wher… |
+| homepage.templateKey | string |  | The landing-page template this layout started from (listLandingPageTemplates), or null for a layout composed from scratch (CHG-CSA-037). (nullable) |
+| homepage.landingSource | enum (storefront, ownSite) |  | storefront: this home is the tenant's landing page. (default storefront) |
 | homepage.id | string (uuid) |  | Added 20 August. (read-only) |
 | homepage.sections | array of object | yes |  |
 | homepage.sections[].id | string (uuid) |  | Added 20 August. (read-only) |
@@ -4399,7 +5030,8 @@ Copies the chosen version's `snapshot` into the working draft. **It does not pub
 | homepage.sections[].sortOrder | integer | yes |  |
 | homepage.sections[].isVisible | boolean | yes |  |
 | homepage.sections[].contentPageId | string (uuid) |  | (nullable) |
-| homepage.sections[].maxItems | integer |  | How many items the section shows. (nullable) |
+| homepage.sections[].maxItems | integer |  | How many cards the section shows, the venue's choice (Chinmay, 2 October, workbook Q152: every customisation option of the approved wireframe, including the card count per section; CHG-CSA-040). (nullable) |
+| homepage.sections[].scrollAnimation | enum (rise, scale, slide, blur, none) |  | How the section enters as the guest scrolls (Chinmay, 2 October, workbook Q153: "must be there"; DI-1088; CHG-CSA-040). (default rise) |
 | homepage.sections[].heroStyle | enum (carousel, video, poster, split, None) |  | For heroBanner only (decided 29 September, MOB-3). (nullable) |
 | modules | array of ModuleEnablement |  |  |
 | modules[].moduleKey | ModuleKey: enum (ticketsAndBooking, membership, events, attractions, virtualQueue, diningAndFnb, shop, parking, …) | yes | visitPlanner (decided 29 September, MOB-1 and the Plan tab in Block A) is the Plan tab and WEB-050; off, the tab and the page are not shown. |
@@ -4414,8 +5046,12 @@ Copies the chosen version's `snapshot` into the working draft. **It does not pub
 | features[].changeScope | object | yes | Wallet and payment integrations are buildTime on native apps — enabling one needs a release, not a publish. (read-only) |
 | features[].requiresConfiguration | boolean |  | True where the feature needs credentials or setup elsewhere first. |
 | languages | LanguageConfig |  |  |
-| languages.languages | array of string | yes |  |
+| languages.languages | array of string | yes | A tenant may add or select interface languages beyond English and Arabic (Chinmay, 2 October, workbook Q145; CHG-CSA-039). |
 | languages.defaultLanguage | string | yes | (pattern ^[a-z]{2}$) |
+| languages.uiStringCoverage | array of object |  | How complete the interface strings are in each enabled language (CHG-CSA-039). (read-only) |
+| languages.uiStringCoverage[].language | string |  |  |
+| languages.uiStringCoverage[].coveragePercent | number |  | (min 0; max 100) |
+| languages.uiStringCoverage[].status | enum (complete, draft, missing) |  |  |
 | languages.rtlLanguages | array of string |  | The enabled languages written right to left — those whose Unicode CLDR character order is right-to-left (Arabic, ar, among them). (read-only) |
 | languages.translationGaps | array of object |  | Content lacking a version in an enabled language. (read-only) |
 | languages.translationGaps[].language | string |  |  |
@@ -4448,6 +5084,56 @@ Copies the chosen version's `snapshot` into the working draft. **It does not pub
 |---|---|---|
 | 200 |  | Restored into the working draft |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
+### setPublishReviewPolicy
+
+**`PUT /publish-review-policy`**: Switch the publish review step on or off
+
+**An optional review step the venue can switch on** (Chinmay, 2 October, workbook Q156; CHG-CSA-042). When on, `publishTenantConfig` and `publishContentBlock` raise an approval request instead of publishing, and the version or block goes live when approved; `reviewerMustDifferFromAuthor` keeps the products' rule. When off, a permission holder simulates (`createPreview`) and publishes in one step.
+
+|  |  |
+|---|---|
+| Permission | `TENANT_PUBLISH` |
+| Scope level | tenant |
+| Part of slice | core |
+| Wave | 2 |
+| Offline | no |
+| Config scope | tenant |
+| Conflict policy | serverWins |
+| Reads | `whitelabel.publish_review_policy` |
+| Writes | `whitelabel.publish_review_policy` |
+| Called by | CMS-014 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
+
+**Request body**: `PublishReviewPolicy`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| enabled | boolean | yes | (default False) |
+| reviewerMustDifferFromAuthor | boolean |  | (default True) |
+| appliesTo | array of enum (tenantConfig, contentBlocks) |  | What the review covers. |
+| scopePath | string |  | The partition key (ADR-0005). (read-only) |
+
+**Response**: `PublishReviewPolicy`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| enabled | boolean | yes | (default False) |
+| reviewerMustDifferFromAuthor | boolean |  | (default True) |
+| appliesTo | array of enum (tenantConfig, contentBlocks) |  | What the review covers. |
+| scopePath | string |  | The partition key (ADR-0005). (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Saved |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setSiteSetupProgress
@@ -4571,7 +5257,7 @@ Run before publishing. Reports missing translations, navigation pointing at disa
 | Read routing | replica |
 | Reads | `whitelabel.tenant_config` |
 | Writes | - |
-| Called by | CMS-003 |
+| Called by | CMS-003, CMS-006 |
 
 **Response**: `FontConfig`
 
@@ -4607,7 +5293,7 @@ Run before publishing. Reports missing translations, navigation pointing at disa
 | Read routing | replica |
 | Reads | `cache:resolution`, `whitelabel.tenant_config` |
 | Writes | `cache:resolution` |
-| Called by | ADM-016, CMS-003, CMS-005 |
+| Called by | ADM-016, CMS-005, CMS-006 |
 
 **Response**: `Theme`
 
@@ -4618,7 +5304,7 @@ Run before publishing. Reports missing translations, navigation pointing at disa
 | accentColour | string |  | (pattern ^#[0-9A-Fa-f]{6}$) |
 | backgroundColour | string | yes | (pattern ^#[0-9A-Fa-f]{6}$) |
 | textColour | string | yes | (pattern ^#[0-9A-Fa-f]{6}$) |
-| darkMode | object |  | Optional dark variant. |
+| darkMode | object |  | Deprecated and ignored (Chinmay, 2 October, workbook Q150 and the pre-apply round; CHG-CSA-035). |
 | darkMode.primaryColour | string |  | (pattern ^#[0-9A-Fa-f]{6}$) |
 | darkMode.backgroundColour | string |  | (pattern ^#[0-9A-Fa-f]{6}$) |
 | darkMode.textColour | string |  | (pattern ^#[0-9A-Fa-f]{6}$) |
@@ -4715,6 +5401,7 @@ Run before publishing. Reports missing translations, navigation pointing at disa
 **`PUT /tenant-config/theme`**: Set colour theme
 
 Runtime (reaches guests on publish, not on a store release) and written to the working draft. Contrast is checked against WCAG 2.2 AA and a failing pair is refused — accessibility is a stated target for the guest app, and a tenant picking two similar colours should be told at configuration time rather than at audit. **Refused, not warned (confirmed 28 September, audit R139)**: flow F22 is corrected to match.
+**One theme, no dark mode** (Chinmay, 2 October, workbook Q150; CHG-CSA-035): `darkMode` is deprecated and ignored; a body that carries it is accepted and the field is not applied.
 **Accepts `Prefer: validate-only`** (29 September, build pass, group G2): validates and answers 200 with the would-be result without writing, for the AI executor's plan validation; registered as an AI tool (`ai.AiTool`, 1.2.59, 2.6.50).
 
 |  |  |
@@ -4727,7 +5414,7 @@ Runtime (reaches guests on publish, not on a store release) and written to the w
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `whitelabel.tenant_config` |
 | Writes | `cache:idempotency`, `cache:resolution`, `whitelabel.tenant_config` |
-| Called by | ADM-016, CMS-003, CMS-005 |
+| Called by | ADM-016, CMS-005 |
 
 **Parameters**
 
@@ -4745,7 +5432,7 @@ Runtime (reaches guests on publish, not on a store release) and written to the w
 | accentColour | string |  | (pattern ^#[0-9A-Fa-f]{6}$) |
 | backgroundColour | string | yes | (pattern ^#[0-9A-Fa-f]{6}$) |
 | textColour | string | yes | (pattern ^#[0-9A-Fa-f]{6}$) |
-| darkMode | object |  | Optional dark variant. |
+| darkMode | object |  | Deprecated and ignored (Chinmay, 2 October, workbook Q150 and the pre-apply round; CHG-CSA-035). |
 | darkMode.primaryColour | string |  | (pattern ^#[0-9A-Fa-f]{6}$) |
 | darkMode.backgroundColour | string |  | (pattern ^#[0-9A-Fa-f]{6}$) |
 | darkMode.textColour | string |  | (pattern ^#[0-9A-Fa-f]{6}$) |
@@ -4781,7 +5468,7 @@ Runtime (reaches guests on publish, not on a store release) and written to the w
 | accentColour | string |  | (pattern ^#[0-9A-Fa-f]{6}$) |
 | backgroundColour | string | yes | (pattern ^#[0-9A-Fa-f]{6}$) |
 | textColour | string | yes | (pattern ^#[0-9A-Fa-f]{6}$) |
-| darkMode | object |  | Optional dark variant. |
+| darkMode | object |  | Deprecated and ignored (Chinmay, 2 October, workbook Q150 and the pre-apply round; CHG-CSA-035). |
 | darkMode.primaryColour | string |  | (pattern ^#[0-9A-Fa-f]{6}$) |
 | darkMode.backgroundColour | string |  | (pattern ^#[0-9A-Fa-f]{6}$) |
 | darkMode.textColour | string |  | (pattern ^#[0-9A-Fa-f]{6}$) |
@@ -4825,6 +5512,7 @@ Runtime (reaches guests on publish, not on a store release) and written to the w
 
 **Claiming is not owning.** The response carries the record the tenant must publish (`verificationRecord`), and nothing happens until it resolves.
 **Refused where another tenant already holds it** — with no detail about who, because telling one tenant that another owns a hostname is telling them something about a customer.
+**A CNAME to the Front Door endpoint is the default** (Chinmay, 2 October: "subdomain plus CNAME"; CHG-CSA-043): the response lists every record to publish (`dnsRecords`: the TXT `_dnsauth` validation and the CNAME), and Front Door issues a managed certificate. `routing` asks for a delegated subdomain instead; the apex only on request. The tenant's platform subdomain (`getPlatformSubdomain`) keeps working throughout.
 
 |  |  |
 |---|---|
@@ -4872,6 +5560,20 @@ Runtime (reaches guests on publish, not on a store release) and written to the w
 | certificateExpiresAt | string (date-time) |  | Renewal is a job, not a reminder. (nullable) |
 | lastCheckedAt | string (date-time) |  | (nullable) |
 | failureReason | string |  | (nullable) |
+| routing | enum (cname, delegatedSubdomain, apex) |  | How the hostname reaches TICVAI (Chinmay, 2 October: "subdomain plus CNAME"; CHG-CSA-043). (default cname) |
+| dnsRecords | array of object |  | Every record the tenant must publish, with what is observed now (CHG-CSA-043): the TXT _dnsauth record, the CNAME, and CAA or NS where they apply. (read-only) |
+| dnsRecords[].type | enum (TXT, CNAME, CAA, NS) | yes |  |
+| dnsRecords[].name | string | yes |  |
+| dnsRecords[].expectedValue | string | yes |  |
+| dnsRecords[].observedValue | string |  | (nullable) |
+| dnsRecords[].status | enum (ok, missing, wrong) | yes |  |
+| revalidation | enum (none, pendingRevalidation, timedOut) |  | The two waits CMS-017 shows beside status (CHG-CSA-043). (default none; read-only) |
+| cnameLost | boolean |  | Takeover warning (CHG-CSA-043). (read-only) |
+| isPrimary | boolean |  | The tenant's primary domain for its kind; the others redirect to it (setPrimaryDomain). (read-only) |
+| readiness | object |  | Per-domain setup a guest needs (CHG-CSA-043): the UAE Pass redirect URI registered for this hostname, the Apple Pay merchant domain verified, and the app links (Apple app-site association, Android as… (read-only) |
+| readiness.uaePassRedirect | enum (ready, pending, notApplicable) |  |  |
+| readiness.applePayDomain | enum (ready, pending, notApplicable) |  |  |
+| readiness.appLinks | enum (ready, pending, notApplicable) |  |  |
 
 **Responses**
 
@@ -4879,6 +5581,41 @@ Runtime (reaches guests on publish, not on a store release) and written to the w
 |---|---|---|
 | 201 |  | Claimed, with the record to publish |
 | 409 |  | Already claimed. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
+### getPlatformSubdomain
+
+**`GET /platform-subdomain`**: The tenant's platform subdomain
+
+The address every tenant gets at provisioning, `<venue>.<cell>.ticvai.app` (CHG-CSA-043). CMS-017 shows it as the default address above any custom domains.
+
+|  |  |
+|---|---|
+| Permission | `TENANT_CONFIGURE` |
+| Scope level | tenant |
+| Part of slice | core |
+| Wave | 2 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | replica |
+| Reads | - |
+| Writes | - |
+| Called by | ADM-017, CMS-017 |
+
+**Response**: `PlatformSubdomain`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| hostname | string | yes | e.g. |
+| cell | string | yes |  |
+| certificate | enum (wildcard) |  |  |
+| isPrimary | boolean |  | True while no custom domain is primary. |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | The platform subdomain |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### listCustomDomains
@@ -4907,6 +5644,73 @@ Runtime (reaches guests on publish, not on a store release) and written to the w
 | 200 |  | Domains |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
+### regenerateDomainToken
+
+**`POST /tenant-domains/{domainId}/token`**: Issue a new validation token
+
+**For a claim that timed out, or a revalidation that needs a fresh record** (CHG-CSA-043). Issues a new `_dnsauth` token, returns the records to publish again, and restarts the validation window. The old token stops validating.
+
+|  |  |
+|---|---|
+| Permission | `TENANT_CONFIGURE` |
+| Scope level | tenant |
+| Part of slice | core |
+| Wave | 2 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `whitelabel.custom_domain` |
+| Writes | - |
+| Called by | ADM-017, CMS-017 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| domainId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
+
+**Response**: `CustomDomain`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) | yes |  |
+| tenantId | string (uuid) | yes |  |
+| hostname | string | yes |  |
+| kind | enum (guestWeb, guestApp, partnerPortal, developerPortal) |  |  |
+| status | enum (pending, verifying, verified, issuing, active, failed, expired, revoked) | yes |  |
+| verificationMethod | enum (dnsTxt, cname, httpFile) |  |  |
+| verificationToken | string |  | (read-only) |
+| verificationRecord | object |  | The record the tenant must publish, which claimCustomDomain promises and the claim had nowhere to hold. (read-only) |
+| verificationRecord.type | enum (TXT, CNAME, httpFile) | yes |  |
+| verificationRecord.name | string | yes | The DNS name to create, or for httpFile the URL path on hostname. |
+| verificationRecord.value | string | yes | The record's value, CNAME target or file content. |
+| certificateExpiresAt | string (date-time) |  | Renewal is a job, not a reminder. (nullable) |
+| lastCheckedAt | string (date-time) |  | (nullable) |
+| failureReason | string |  | (nullable) |
+| routing | enum (cname, delegatedSubdomain, apex) |  | How the hostname reaches TICVAI (Chinmay, 2 October: "subdomain plus CNAME"; CHG-CSA-043). (default cname) |
+| dnsRecords | array of object |  | Every record the tenant must publish, with what is observed now (CHG-CSA-043): the TXT _dnsauth record, the CNAME, and CAA or NS where they apply. (read-only) |
+| dnsRecords[].type | enum (TXT, CNAME, CAA, NS) | yes |  |
+| dnsRecords[].name | string | yes |  |
+| dnsRecords[].expectedValue | string | yes |  |
+| dnsRecords[].observedValue | string |  | (nullable) |
+| dnsRecords[].status | enum (ok, missing, wrong) | yes |  |
+| revalidation | enum (none, pendingRevalidation, timedOut) |  | The two waits CMS-017 shows beside status (CHG-CSA-043). (default none; read-only) |
+| cnameLost | boolean |  | Takeover warning (CHG-CSA-043). (read-only) |
+| isPrimary | boolean |  | The tenant's primary domain for its kind; the others redirect to it (setPrimaryDomain). (read-only) |
+| readiness | object |  | Per-domain setup a guest needs (CHG-CSA-043): the UAE Pass redirect URI registered for this hostname, the Apple Pay merchant domain verified, and the app links (Apple app-site association, Android as… (read-only) |
+| readiness.uaePassRedirect | enum (ready, pending, notApplicable) |  |  |
+| readiness.applePayDomain | enum (ready, pending, notApplicable) |  |  |
+| readiness.appLinks | enum (ready, pending, notApplicable) |  |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | A new token and the records to publish |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 409 |  | The domain is revoked (domain-revoked); claim it again instead. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
 ### relinquishCustomDomain
 
 **`DELETE /tenant-domains/{domainId}`**: Give the domain up
@@ -4915,6 +5719,7 @@ Runtime (reaches guests on publish, not on a store release) and written to the w
 **A live app is an app with a published configuration (decided 28 September, audit R096)**: the tenant has a current `ConfigVersion` (`TenantAppStatus.isPublished` true) for the app the domain serves. Maintenance mode does not make an app less live.
 
 **Detaching unroutes the hostname** (SD-021, applied 30 September): the release calls tenancy `setTenantDomainMapping` with status `detached`, so the edge stops routing the host to this tenant in the same step; the row is kept for the audit trail, not deleted.
+**The takeover warning** (CHG-CSA-043): the confirmation tells the tenant to remove the CNAME (and the TXT record) from its DNS, because a record left pointing at TICVAI could be claimed by somebody else; a scheduled check flags any that remain (`CustomDomain.cnameLost`).
 
 |  |  |
 |---|---|
@@ -4942,6 +5747,73 @@ Runtime (reaches guests on publish, not on a store release) and written to the w
 |---|---|---|
 | 204 |  | Released |
 | 409 |  | The only active domain for a live app. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
+### setPrimaryDomain
+
+**`POST /tenant-domains/{domainId}/primary`**: Make a domain the primary one
+
+**One primary domain per kind; the others redirect to it** (CHG-CSA-043). The domain must be `active`, or 409 `domain-not-active`. The tenant's platform subdomain redirects to the primary too, and is primary again when none is.
+
+|  |  |
+|---|---|
+| Permission | `TENANT_CONFIGURE` |
+| Scope level | tenant |
+| Part of slice | core |
+| Wave | 2 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `whitelabel.custom_domain` |
+| Writes | - |
+| Called by | ADM-017, CMS-017 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| domainId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
+
+**Response**: `CustomDomain`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) | yes |  |
+| tenantId | string (uuid) | yes |  |
+| hostname | string | yes |  |
+| kind | enum (guestWeb, guestApp, partnerPortal, developerPortal) |  |  |
+| status | enum (pending, verifying, verified, issuing, active, failed, expired, revoked) | yes |  |
+| verificationMethod | enum (dnsTxt, cname, httpFile) |  |  |
+| verificationToken | string |  | (read-only) |
+| verificationRecord | object |  | The record the tenant must publish, which claimCustomDomain promises and the claim had nowhere to hold. (read-only) |
+| verificationRecord.type | enum (TXT, CNAME, httpFile) | yes |  |
+| verificationRecord.name | string | yes | The DNS name to create, or for httpFile the URL path on hostname. |
+| verificationRecord.value | string | yes | The record's value, CNAME target or file content. |
+| certificateExpiresAt | string (date-time) |  | Renewal is a job, not a reminder. (nullable) |
+| lastCheckedAt | string (date-time) |  | (nullable) |
+| failureReason | string |  | (nullable) |
+| routing | enum (cname, delegatedSubdomain, apex) |  | How the hostname reaches TICVAI (Chinmay, 2 October: "subdomain plus CNAME"; CHG-CSA-043). (default cname) |
+| dnsRecords | array of object |  | Every record the tenant must publish, with what is observed now (CHG-CSA-043): the TXT _dnsauth record, the CNAME, and CAA or NS where they apply. (read-only) |
+| dnsRecords[].type | enum (TXT, CNAME, CAA, NS) | yes |  |
+| dnsRecords[].name | string | yes |  |
+| dnsRecords[].expectedValue | string | yes |  |
+| dnsRecords[].observedValue | string |  | (nullable) |
+| dnsRecords[].status | enum (ok, missing, wrong) | yes |  |
+| revalidation | enum (none, pendingRevalidation, timedOut) |  | The two waits CMS-017 shows beside status (CHG-CSA-043). (default none; read-only) |
+| cnameLost | boolean |  | Takeover warning (CHG-CSA-043). (read-only) |
+| isPrimary | boolean |  | The tenant's primary domain for its kind; the others redirect to it (setPrimaryDomain). (read-only) |
+| readiness | object |  | Per-domain setup a guest needs (CHG-CSA-043): the UAE Pass redirect URI registered for this hostname, the Apple Pay merchant domain verified, and the app links (Apple app-site association, Android as… (read-only) |
+| readiness.uaePassRedirect | enum (ready, pending, notApplicable) |  |  |
+| readiness.applePayDomain | enum (ready, pending, notApplicable) |  |  |
+| readiness.appLinks | enum (ready, pending, notApplicable) |  |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Primary |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 409 |  | The domain is not active (domain-not-active). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### verifyCustomDomain
@@ -4991,6 +5863,20 @@ Runtime (reaches guests on publish, not on a store release) and written to the w
 | certificateExpiresAt | string (date-time) |  | Renewal is a job, not a reminder. (nullable) |
 | lastCheckedAt | string (date-time) |  | (nullable) |
 | failureReason | string |  | (nullable) |
+| routing | enum (cname, delegatedSubdomain, apex) |  | How the hostname reaches TICVAI (Chinmay, 2 October: "subdomain plus CNAME"; CHG-CSA-043). (default cname) |
+| dnsRecords | array of object |  | Every record the tenant must publish, with what is observed now (CHG-CSA-043): the TXT _dnsauth record, the CNAME, and CAA or NS where they apply. (read-only) |
+| dnsRecords[].type | enum (TXT, CNAME, CAA, NS) | yes |  |
+| dnsRecords[].name | string | yes |  |
+| dnsRecords[].expectedValue | string | yes |  |
+| dnsRecords[].observedValue | string |  | (nullable) |
+| dnsRecords[].status | enum (ok, missing, wrong) | yes |  |
+| revalidation | enum (none, pendingRevalidation, timedOut) |  | The two waits CMS-017 shows beside status (CHG-CSA-043). (default none; read-only) |
+| cnameLost | boolean |  | Takeover warning (CHG-CSA-043). (read-only) |
+| isPrimary | boolean |  | The tenant's primary domain for its kind; the others redirect to it (setPrimaryDomain). (read-only) |
+| readiness | object |  | Per-domain setup a guest needs (CHG-CSA-043): the UAE Pass redirect URI registered for this hostname, the Apple Pay merchant domain verified, and the app links (Apple app-site association, Android as… (read-only) |
+| readiness.uaePassRedirect | enum (ready, pending, notApplicable) |  |  |
+| readiness.applePayDomain | enum (ready, pending, notApplicable) |  |  |
+| readiness.appLinks | enum (ready, pending, notApplicable) |  |  |
 
 **Responses**
 
@@ -5014,13 +5900,13 @@ BL-172. **The CMS modelled configuration and not authoring** — a marketer coul
 |---|---|
 | Permission | `TENANT_CONFIGURE` |
 | Scope level | tenant |
-| Part of slice | setup, makes `control.content_block` non-empty |
+| Part of slice | core |
 | Wave | 2 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `control.content_block`, `marketing.segment` |
 | Writes | `cache:idempotency`, `control.content_block` |
-| Called by | BO-839 |
+| Called by | BO-839, CMS-007 |
 | State model | Content block ([states/content-block.yaml](../../../states/content-block.yaml)): created as `draft` |
 
 **Parameters**
@@ -5075,20 +5961,20 @@ BL-172. **The CMS modelled configuration and not authoring** — a marketer coul
 **`POST /content-blocks/{blockId}/publish`**: Publish now, or schedule it
 
 **A seasonal banner needing somebody awake at midnight is the same defect `Product.onSaleFrom` fixed**, and the answer is the same: a date on the object rather than a person with an alarm.
-Approval is separate from authoring where the tenant requires it — **the approver may not be the author**, following the rule already enforced on products.
+Approval is separate from authoring where the tenant requires it — **the approver may not be the author**, following the rule already enforced on products. **Whether it is required is the tenant's publish-review policy** (`getPublishReviewPolicy`; Chinmay, 2 October, workbook Q156; CHG-CSA-042), off by default: a single publish by a `TENANT_PUBLISH` holder.
 **`expireAt` must follow `publishAt`** when both are sent (decided 28 September, audit R163), or 400. A scheduled job makes the publish and the expiry at those times (audit R163).
 
 |  |  |
 |---|---|
 | Permission | `TENANT_PUBLISH` |
 | Scope level | tenant |
-| Part of slice | setup, makes `control.content_block` non-empty |
+| Part of slice | core |
 | Wave | 2 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `control.content_block`, `identity.principal` |
 | Writes | `cache:idempotency`, `cache:resolution`, `control.content_block` |
-| Called by | **no screen**: no screen lists it in its apis, so it is reachable only by API or import until one does (README, Known gaps) |
+| Called by | CMS-007 |
 
 **Parameters**
 
@@ -5147,7 +6033,7 @@ BL-002. **A header is chrome and a footer is a link surface**, which is why this
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `whitelabel.footer_config`, `whitelabel.footer_config_column`, `whitelabel.footer_config_social_link` |
 | Writes | `cache:idempotency`, `cache:resolution`, `whitelabel.footer_config`, `whitelabel.footer_config_column`, `whitelabel.footer_config_social_link` |
-| Called by | CMS-007 |
+| Called by | CMS-009 |
 
 **Parameters**
 
@@ -5301,6 +6187,8 @@ Every table this service owns that the slice reads or writes, with its columns a
 | published_by_principal_id | uuid | yes |  |
 | published_by_name | text | no |  |
 | note | text | yes |  |
+| review_status | text | no | The review step, where the tenant's publish-review policy is on (CHG-CSA-042). |
+| approval_request_id | uuid | no |  |
 | is_current | boolean | yes |  |
 | scheduled_for | timestamptz | no |  |
 | content_hash | text | no |  |
@@ -5339,6 +6227,12 @@ Every table this service owns that the slice reads or writes, with its columns a
 | certificate_expires_at | timestamptz | no | Renewal is a job, not a reminder. |
 | last_checked_at | timestamptz | no |  |
 | failure_reason | text | no |  |
+| routing | text | no | How the hostname reaches TICVAI (Chinmay, 2 October: "subdomain plus CNAME"; CHG-CSA-043). |
+| dns_records | jsonb | no | Every record the tenant must publish, with what is observed now (CHG-CSA-043): the TXT _dnsauth record, the CNAME, and CAA or NS where they apply. |
+| revalidation | text | no | The two waits CMS-017 shows beside status (CHG-CSA-043). |
+| cname_lost | boolean | no | Takeover warning (CHG-CSA-043). |
+| is_primary | boolean | no | The tenant's primary domain for its kind; the others redirect to it (setPrimaryDomain). |
+| readiness | jsonb | no | Per-domain setup a guest needs (CHG-CSA-043): the UAE Pass redirect URI registered for this hostname, the Apple Pay merchant domain verified, and the app links (Apple app-site association, Android as… |
 
 ### `whitelabel.faq_category`
 
@@ -5441,6 +6335,8 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
+| template_key | text | no | The landing-page template this layout started from (listLandingPageTemplates), or null for a layout composed from scratch (CHG-CSA-037). |
+| landing_source | text | no | storefront: this home is the tenant's landing page. |
 | id | uuid | no | Added 20 August. |
 | content_page_id | uuid | no | Points at whitelabel.content_page. |
 | homepage_section_id | uuid | yes | Points at whitelabel.homepage_section. |
@@ -5495,6 +6391,30 @@ Every table this service owns that the slice reads or writes, with its columns a
 | ends_at | timestamptz | no | Must follow startsAt when both are set (decided 28 September, audit R163). |
 | state | text | no | Moved by the schedule timer at startsAt and endsAt, in the tenant's timezone, as for Banner.state. |
 | sort_order | integer | no |  |
+| scope_path | text | no | The partition key (ADR-0005). |
+
+### `whitelabel.publish_review_policy`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes | Synthesised key. |
+| is_enabled | boolean | yes |  |
+| reviewer_must_differ_from_author | boolean | no |  |
+| applies_to | text[] | no | What the review covers. |
+| scope_path | text | no | The partition key (ADR-0005). |
+
+### `whitelabel.site_package`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes |  |
+| version | text | no |  |
+| status | text | yes |  |
+| download_url | text | no | Short-lived; present when ready. |
+| expires_at | timestamptz | no |  |
+| requested_by_principal_id | uuid | no |  |
+| platform_staff_grant_id | uuid | no | The platform-staff grant it was made under, where platform staff made it (R098). |
+| created_at | timestamptz | no |  |
 | scope_path | text | no | The partition key (ADR-0005). |
 
 ### `whitelabel.site_setup_progress`
@@ -5557,8 +6477,9 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-1 operations, added to this service in later releases without changing any of the above.
+2 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
+| content | `listFaqs` |
 | overview | `getStorefrontInsights` |

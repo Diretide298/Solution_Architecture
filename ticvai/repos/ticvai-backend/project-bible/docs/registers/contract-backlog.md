@@ -1,25 +1,24 @@
 # Contract backlog — index
 
-**182 edits raised by the requirement walk — 5 open, 175 done, 2 withdrawn.**
+**182 edits raised by the requirement walk — 4 open, 176 done, 2 withdrawn.**
 
 Generated from `handoff/contract-backlog.json` by `tools/build-backlog-index.py`.
 Every gap the walk finds lands here. **The ones carrying a decision or a cost also carry a CF** and are in `conflicts.md`; the rest are work rather than conflict, and putting them in the conflict register would bury the open decisions among them.
 
 | Lane | Open |
 |---|---|
-| Needs a decision | **2** |
+| Needs a decision | **1** |
 | Deferred | **0** |
 | Settled | **3** |
-| **Total open** | **5** |
+| **Total open** | **4** |
 
 
-## Needs a decision — tracked as a conflict — 2
+## Needs a decision — tracked as a conflict — 1
 
 Each of these has a CF. The register holds the reasoning; this is the index.
 
 | ID | Section | Refs | What | Contracts | Blocked on | CF |
 |---|---|---|---|---|---|---|
-| **BL-073** | 2.6 | 2.6.51, 2.6.52, 2.6.53, 2.6.54, 2.6.55, 2.6… | No cookie consent management — banner, categorisation, scanning, script blocking, multi-domain preference sharing or consent analytics. | `white-label` | — | CF-127 |
 | **BL-140** | 5.7 | 5.7.93, 5.7.94, 5.10.3, 6.1.1, 6.1.23, 20.7.7 | No invoice, no credit memo, and no statement of what a compliant receipt must show. | `finance` | — | CF-133 |
 
 ## Settled — made at section close — 3
@@ -108,6 +107,7 @@ One contract, and that contract already shows how it should look.
 | **BL-070** | 2.6 | No presentment currency — a storefront cannot show prices in a guest's currency. | **Done.** PaymentProvider.presentmentCurrencies — what a storefront may quote in, distinct from what it settles in. **A guest sees GBP and the venue books AED.** |
 | **BL-071** | 2.6 | No AI first-pass translation with human editing. | **Done.** ai.proposeTranslations. **setLanguages already measured the gap** and nothing filled it. **A first pass, never a publish** — a tenant own words in a language nobody at the venue reads is exactly the content that must not go live unreviewed. glossaryRef exists because without one **Ladies Night becomes a literal translation somebody has to find and undo.** |
 | **BL-072** | 2.6 | No payment link. A booking taken at POS cannot be paid later by the guest. | **Done.** createPaymentLink with an expiry that **releases the hold, not just the link** — unpaid inventory nobody can sell is the failure this avoids. |
+| **BL-073** | 2.6 | No cookie consent management — banner, categorisation, scanning, script blocking, multi-domain preference sharing or consent analytics. | **Done.** CF-127 closed 2 October (Chinmay, DEC-019; CHG-DOC-021, CHG-CSA-023): **buy a scanner API, hybrid.** Our banner, runtime, registry and consent logs stay; a bought scanner API feeds `recordCookieScan` (marketing-crm) through a TICVAI adapter (`CookieScanPolicy.scanSource`, default boughtScanner), and the manual "Upload scan report" path stays. The vendor is still to be chosen (external dependencies, Class S). Closed in the backlog by CHG-GTB-005. |
 | **BL-074** | 2.7 | Payment is contracted; no payment provider is. | **Done.** PaymentProvider with Network International and Stripe (CF-131, decided by Chinmay 18 August). **Two gateways is the number that forces an abstraction** — one can be hard-coded and two cannot. |
 | **BL-075** | 2.7 | A partner is a flat account. No sub-users, no hierarchy, no partner-managed access controls. | **Done.** PartnerUser on a branch scope path. **The answer was already in the package** — 2.7.51 asks for Master Agency, Branch, Department and User, which is a scope tree, and tenancy has one. Quota and credit resolve nearest-ancestor-wins like configuration, and **canManageUsers exists because a venue administering every travel agent staff list is a venue doing the agency HR.** |
 | **BL-076** | 2.7 | No OTA channel manager, and therefore no marketplace price, inventory or guest-data exchange. | **Done.** ChannelListing. **The integration register marked Resellers and OTA as covered, and that was true of the commercial model and not of the integration.** An OTA pulls a feed, caches it and sells against the cache — **so the gap between pushes is the oversell window**, and allocationUnits bounds it. guestDataScope states what comes back, because a ticket arriving with no contact detail cannot be reissued and the venue should know at listing time rather than at the gate. |

@@ -56,6 +56,25 @@
   "requestBody": null,
   "responds": "ConfigDiff"
  },
+ "exportSitePackage": {
+  "method": "POST",
+  "path": "/site-package",
+  "contract": "white-label",
+  "summary": "Generate a site package (self-hosted)",
+  "permission": "TENANT_PUBLISH",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
  "getAppIcons": {
   "method": "GET",
   "path": "/tenant-config/app-icons",
@@ -81,6 +100,51 @@
   "parameters": [],
   "requestBody": null,
   "responds": "BrandIdentity"
+ },
+ "getPlatformSubdomain": {
+  "method": "GET",
+  "path": "/platform-subdomain",
+  "contract": "white-label",
+  "summary": "The tenant's platform subdomain",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "PlatformSubdomain"
+ },
+ "getSitePackage": {
+  "method": "GET",
+  "path": "/site-package/{packageId}",
+  "contract": "white-label",
+  "summary": "A site package and its download link",
+  "permission": "TENANT_PUBLISH",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "SitePackage"
+ },
+ "getTenantConfig": {
+  "method": "GET",
+  "path": "/tenant-config",
+  "contract": "white-label",
+  "summary": "Full working configuration",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "version",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "TenantConfig"
  },
  "getTheme": {
   "method": "GET",
@@ -145,42 +209,68 @@
   "requestBody": null,
   "responds": "CustomDomain"
  },
- "listFaqs": {
+ "listOwnPlatformStaffGrants": {
   "method": "GET",
-  "path": "/tenant-config/faqs",
-  "contract": "white-label",
-  "summary": "List FAQs",
-  "permission": "TENANT_CONFIGURE",
-  "offlineCapable": true,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "FaqCategory"
- },
- "listPolicies": {
-  "method": "GET",
-  "path": "/tenant-config/policies",
-  "contract": "white-label",
-  "summary": "List legal policies",
-  "permission": "TENANT_CONFIGURE",
+  "path": "/platform-staff-grants/mine",
+  "contract": "identity",
+  "summary": "The calling platform operator's own grants into this tenant",
+  "permission": "PLATFORM_TENANT_ACCESS",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
   "parameters": [
    {
-    "name": "includeHistory",
+    "name": "activeOnly",
     "in": "query",
     "required": null
    },
    {
-    "name": "kind",
-    "in": "query",
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
     "required": null
    }
   ],
   "requestBody": null,
-  "responds": "Policy"
+  "responds": "Page"
+ },
+ "listTenants": {
+  "method": "GET",
+  "path": "/tenants",
+  "contract": "subscription",
+  "summary": "List tenants",
+  "permission": "PLATFORM_TENANT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "planId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
  },
  "openPlatformStaffGrant": {
   "method": "POST",
@@ -219,6 +309,25 @@
   ],
   "requestBody": null,
   "responds": "ConfigVersion"
+ },
+ "regenerateDomainToken": {
+  "method": "POST",
+  "path": "/tenant-domains/{domainId}/token",
+  "contract": "white-label",
+  "summary": "Issue a new validation token",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "CustomDomain"
  },
  "relinquishCustomDomain": {
   "method": "DELETE",
@@ -296,25 +405,6 @@
   "requestBody": "BrandIdentity",
   "responds": "BrandIdentity"
  },
- "setFaqs": {
-  "method": "PUT",
-  "path": "/tenant-config/faqs",
-  "contract": "white-label",
-  "summary": "Set FAQ categories and entries",
-  "permission": "TENANT_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "FaqCategory"
- },
  "setLanguages": {
   "method": "PUT",
   "path": "/tenant-config/languages",
@@ -334,11 +424,11 @@
   "requestBody": null,
   "responds": "LanguageConfig"
  },
- "setPolicy": {
-  "method": "PUT",
-  "path": "/tenant-config/policies/{policyKind}",
+ "setPrimaryDomain": {
+  "method": "POST",
+  "path": "/tenant-domains/{domainId}/primary",
   "contract": "white-label",
-  "summary": "Publish a policy version",
+  "summary": "Make a domain the primary one",
   "permission": "TENANT_CONFIGURE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
@@ -351,7 +441,7 @@
    }
   ],
   "requestBody": null,
-  "responds": "Policy"
+  "responds": "CustomDomain"
  },
  "setTheme": {
   "method": "PUT",

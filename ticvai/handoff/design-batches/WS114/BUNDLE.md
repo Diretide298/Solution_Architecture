@@ -1,6 +1,6 @@
 # WS114 — ACCREDITATION board 7
 
-**10 screens · 12 operations · 15 schemas · 8 permissions**
+**10 screens · 7 operations · 6 schemas · 3 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -48,8 +48,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 8 permissions apply here:
-  `ACCREDITATION_CONFIGURE, ACCREDITATION_MANAGE, ACCREDITATION_VIEW, GUEST_MANAGE, MARKETING_SEND, MARKETING_VIEW, REPORT_EXPORT, REPORT_VIEW_VENUE`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 3 permissions apply here:
+  `ACCREDITATION_CONFIGURE, ACCREDITATION_MANAGE, ACCREDITATION_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -61,21 +61,82 @@ convincingly. It is never a caption.
   and its error; and, element by element, what is shown and in what format, what each action
   produces and where the user goes next. Draw exactly that.
 
+## The processes these screens belong to
+
+Written by the owner of each process (`handoff/design-notes/`). Read before any screen: it says how the process runs end to end and which words the screens must use.
+
+### Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue)
+
+Venue operations is everything that happens after a sale and inside the gates. A guest's ticket is one virtual ticket with interchangeable media (QR, dynamic QR, RFID wristband, NFC, Face Pass or Face Tag); at an access point a scanner (P07, or the scan function inside the Staff App P06) validates the media against the admission profile and the guest admission policy, offline if it must, and every deny carries a reason and a next action. The back office (Venue Management P08) configures that estate: the venue topology (venue, park, zone, attraction, access point, gate and lane, device placement), admission profiles and rules (entry, exit, re-entry, anti-passback, validity, crossover, companions), credential security (dynamic QR, device binding, beacons), biometrics, gate modes, and the live operations, fraud and monitoring views. Accreditation (P08 setup and review, P11 web portal for applicants, web first) takes an applicant from a configurable form through document checks, OCR, duplicate blocking and multi-level approval to a credential with zone rights. Resources and capacity manage bookable resources (rooms, vehicles, equipment, cabanas, instructors) that are booked as a consequence of selling a product, never sold directly. Workforce covers shift templates, rosters, attendance, swaps and breaks, mirrored on the Staff App. Maintenance and safety cover the asset register, preventive calendars, work orders with scored priority, inspections and incidents, with technicians working from the Staff App. Games and rides configure readers, credit types and consumption priority, play entitlements, game pricing, retry pricing, redemption and the card lifecycle. The virtual queue (Q1) gives a guest a live wait time and a return window for a ride; it is not the on-sale waiting room (Q2). Every calendar has day, week and month views. Configuration resolves tenant, region, venue (outlet only for F&B and retail), and a user's permissions, never the device, decide what they may do. The guest apps (P01, P02) show the guest's side of this: My Tickets, the scan code, Face Pass, wait times, the virtual queue, map booking of cabanas and the visit planner.
+*(source: F06 step 1 / F112 step 1 / F111 step 1 / ADR-0002 / ADR-0012 / ADR-0018 / ADR-0041 / ADR-0066 / ADR-0067 / ADR-0068 / DI-652 / DI-627 / DI-640 / DI-654 / DI-666 / DI-482 / DI-483 / DI-907 / DI-919 / DI-923 / DI-865 / DI-678 / TRACKER Actions row 160 / MoM 2026-09-02 AccessControl / MoM 2026-09-07 …)*
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Ticket | The one virtual record a guest owns (ticket number, product, validity, entries). Its number never changes, whatever media carries it or whoever it is transferred or resold to. | Pass (unless the product is a pass), Booking, Order line | DI-652 / DI-620 / contracts/spine/access.yaml#/components/schemas/TicketStatus |
+| Media | What the ticket is presented by at a gate (QR code, dynamic QR, wristband/RFID card, NFC, Face Pass, Face Tag). One ticket can carry several media as fallbacks; a media code can also cover several tickets scanned as one group. Show one … | Credential (for guest media; keep Credential for accreditation badges and staff), Ticket code | DI-180 / DI-608 / DI-652 |
+| Access point | A place where a scan is judged, with a fixed direction (entry, exit, re-entry, crossover). Hierarchy shown to users is Venue > Park > Zone > Attraction > Access point > Gate/lane > Device. | Scanner (that is the device), Door | screens/P08-venue-back-office.yaml#BO-144 / … |
+| Admission profile | The named set of rules an access point enforces (opening window, entries, exit scan, re-entry, validity, crossover). Products point at a profile; tiers such as Bronze/Silver/Gold are profiles with gate allow and deny lists. | Admission rules (as a screen title), Access rule set | DI-185 / contracts/spine/access.yaml#/components/schemas/AdmissionRules |
+| Admitted / Denied / Overridden | The three scan outcomes. A denial is always shown with its reason in plain words and a next action; an override is a supervisor admitting despite a denial, and is always attributed and reasoned. | Valid/Invalid, Success/Fail, Error | contracts/spine/access.yaml#/components/schemas/ScanOutcome / … |
+| Used | A ticket entry is used the moment a scan succeeds, whether or not the guest physically passed. Mistakes are resolved from the scan history, not by un-scanning. | Redeemed (for admission), Checked in (that is group check-in, a different step) | DI-627 / TRACKER Actions row 221 / TRACKER Actions row 189 |
+| Gate mode | What a lane is doing now, set live by the podium or supervisor - Normal, Free flow (counts, does not validate), Drop arm (everybody through, evacuation), Closed (nobody through), Podium (staff validating by eye), Maintenance. Direction is … | Turnstile mode (as a label for direction), Open/Locked | contracts/spine/access.yaml#/components/schemas/AccessPointOperatingMode / R221 |
+| Offline package | What a scanner holds to validate with no network - entitlements, blacklist, admission profiles and the active guest admission policy version - with its age always visible. | Cache, Local DB | F06 step 3 / ADR-0068 |
+| Sync and reconciliation | Sending the offline scan journal to the server, and the duty manager's review of scans the server rejected after the device had already admitted the guest. | Upload, Retry | F06 step 6 / DI-065 |
+| Face Pass / Face Tag | Face Pass is the long-lived face credential for members and season-pass holders (renewable); Face Tag is short-lived, for one day or event. Retention is set per tier by the venue. | Face ID, Biometric login | DI-640 / ADR-0063 |
+| Accreditation / Credential (accreditation) | Accreditation is the application and approval of a person (media, contractor, corporate, staff of a partner) for an event or season; the credential is what is issued after approval (photo badge, QR or RFID) with zone access rights. | Registration (for the whole process), Ticket | DI-654 / DI-662 |
+| Resource | A bookable thing or person a product needs (room, vehicle, cabana, equipment set, instructor). Guests buy products; resources are assigned to the booking, pre-assigned or dynamically. | Asset (that is maintenance), Inventory (that is stock) | DI-475 / DI-482 / TRACKER Actions row 160 |
+| Asset | A physical item maintained by the venue (ride, turnstile, printer, pump) with a register record, documents, warranty and maintenance history. | Resource, Device (unless it is an IT device in the device register) | DI-910 / ADR-0067 |
+| Work order | A unit of maintenance work, lifecycle Created > Assigned > In progress > Review > Closed, with a resolution timer. | Ticket (reserved for guest tickets), Job card | DI-231 |
+| Game / attraction (games module) | In the games and rides module an attraction is an individual game or ride (roller coaster, racing game, bumper cars), not a venue. | Venue, Park | DI-863 |
+| Virtual queue / Return window | A guest's place in a ride's queue held without standing in line, with a return window (for example 4:50 to 5:00 PM) that recalculates live. Distinct from the walk-in line and the VIP/express lane, and from the on-sale waiting room. | Waiting room, Fast pass (that is the express product), Booking | DI-675 / DI-678 / DI-679 / ADR-0066 |
+| Wait time source | Where a ride's wait time comes from - Sensor, Throughput, Manual, or Unavailable - always shown beside the number. | Live (when the source is manual) | contracts/satellite/queue.yaml#/components/schemas/WaitTimeSource / DI-315 |
+
+### Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers)
+
+Customer & marketing is how a venue knows its guests and talks to them. There is ONE guest profile per person across ticketing, F&B and retail, so a guest who books online and later dines is the same profile (DI-339). A profile needs at least an email or a mobile, never neither (DI-372). Profiles are created by registration, by guest checkout, or by staff at a till or desk. Repeat guest checkouts with the same verified email or phone attach to the same profile automatically (DI-941, R120 default). Two records that might be the same person are NEVER merged automatically: the guest is asked to confirm, and an admin review queue runs alongside (DI-377). Each candidate shows why it matched; the record that loses is superseded, not deleted; consent takes the narrower of the two positions (DI-808). Around the profile sit three things that must never be confused. CONSENT is what the law allows: per purpose and per channel, append-only, with the notice version and the source (recordConsent). It is Given, Withdrawn or Not asked. A SUBSCRIPTION is what the guest asked to receive, e.g. a newsletter list (MarketingSubscription). A PREFERENCE is what they like: table, dietary, accessibility (updateGuestPreferences). An anonymous visitor's cookie decision is recorded against a device key (recordDeviceConsent) and attaches to the guest when they sign in (claimDeviceConsent). Marketing consent at GUEST CHECKOUT is an open client question, and the design follows its default: an unticked opt-in beside the terms, one per channel and purpose. It is recorded with source "checkout" against the order and the verified contact, and nothing is sent without it. Whether that is sufficient consent under PDPL is the client DPO's call (M18-15 (audit R-M18-15), DI-954, DI-940). Marketing reads profiles through SEGMENTS (rules, evaluated when used) and static LISTS (imported). It reaches guests by CAMPAIGNS (one send to an audience) and JOURNEYS (automations started by an event, with waits and branches). Journeys may offer only pre-configured offers, never a free-typed discount (MoM 2026-08-20 4.6). Everything goes through ONE communications module that every other module uses (MoM 2026-08-31 4.6). Consent and suppression are applied at send time, and the number excluded, with the reasons, is reported before anything goes out (launchCampaign). Transactional messages (tickets, receipts, queue calls, case replies) do not need marketing consent and must never carry marketing. LOYALTY pays for spend: points, tiers, rewards and expiry. GAMIFICATION pays for behaviour: challenges, badges, streaks, referrals and leaderboards (createChallenge). A guest reads their own loyalty position (getLoyaltyPosition). A till, the back office or support reads a named guest's (getGuestLoyalty, or identifyGuest at a till). SERVICE: one Case object covers lost property, complaints, questions, accessibility and refund requests (CaseKind). A guest raises one with raiseMyCase, which needs the connection …
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Guest | The person the venue serves, signed in or not. In body copy on every surface. | Customer, User, Subject, Contact, Patron | contracts/satellite/marketing-crm.yaml#/components/schemas/GuestProfile |
+| Guest profile | The CRM record of one person (details, consent, preferences, history). Distinct from the Account, which is how a guest signs in. | Customer record, Contact, Subject | contracts/satellite/marketing-crm.yaml#getGuestProfile |
+| Consent - Given / Withdrawn / Not asked | What the law allows, per purpose (marketing, personalisation, profiling, third-party sharing, AI processing, transactional) and per channel. "Not asked" is not "Withdrawn" and must look different. | Opted in/out as a status, Accepted, Declined, Revoked, Unsubscribed (that is a subscription) | contracts/satellite/marketing-crm.yaml#/components/schemas/ConsentDecision |
+| Subscription | A list the guest asked to receive (a newsletter, event news), per channel. Unsubscribing from a list is not withdrawing consent. | Consent, Opt-in | contracts/satellite/marketing-crm.yaml#/components/schemas/MarketingSubscription |
+| Preferences | What the guest likes or needs (seating, drinks, dietary, accessibility, contact channel). Never grants permission. | Consents, Settings | contracts/satellite/marketing-crm.yaml#updateGuestPreferences |
+| Send me offers and news | The marketing opt-in label beside the terms at checkout, unticked, one per channel and purpose. | I agree to marketing, Pre-ticked boxes, Keep me updated ticked by default | DI-954 |
+| Points / Tier / Points to next tier / Expiring points | The loyalty position. Points are a liability earned per programme; tiers are ranked (Bronze, Silver, Gold, Platinum in the meetings). | Credits, Coins, Balance alone (wallet money is "credit"), Level | DI-382 |
+| Pending points | Points earned on a purchase still inside its refund window; shown apart from spendable points. | Available points for pending ones | contracts/satellite/marketing-crm.yaml#getLoyaltyPosition |
+| Reward | What points can be turned into (rewards catalogue). | Prize (games redemption uses prize), Voucher unless it is one | contracts/satellite/marketing-crm.yaml#listRewards |
+| Challenge / Badge / Streak / Referral | Gamification - rewards for behaviour, not spend. Status badges such as Explorer, Adventurer, Legend. | Mission and Quest used interchangeably on one screen, Loyalty tier for a badge | DI-392 |
+| Case | One service record - lost property, complaint, question, accessibility, refund request or other - with a number (venue prefix plus sequence), a status and an SLA. | Ticket (a ticket is an admission product), Issue, Incident (that is maintenance and safety) | contracts/satellite/marketing-crm.yaml#/components/schemas/CaseKind |
+| Reply to guest / Internal note | The two kinds of case message. The agent always chooses one explicitly; there is no default. | Comment, Message (ambiguous) | F05 step 2 |
+| Conversation | A live chat session (web chat, in-app, WhatsApp, SMS, email, kiosk, voice). With the assistant, then queued, then with an agent. It is not a case. | Ticket, Case (until one is raised from it) | contracts/satellite/marketing-crm.yaml#/components/schemas/ConversationState |
+| Segment / List / Audience | A segment is rules evaluated when used. A list is static, imported or hand-picked. The audience is what a campaign or journey targets. | Group, Cohort, Target list for a segment | DI-381 |
+| Campaign / Journey | A campaign is one send (one-off, scheduled, triggered or recurring) to an audience. A journey is an automation started by an event, with steps, waits and branches. | Flow (booking flows use it), Automation for a one-off send, Blast | R146 |
+| Offer | A pre-configured, system-validated discount or benefit that a campaign or journey references. It is never typed into the builder. | Discount field, Coupon (unless the offer is a coupon code) | MoM 2026-08-20 4.6 |
+| Reachable | How many guests in an audience can actually be sent to on a channel after consent and suppression. Always shown beside the matching count. | Audience size alone | contracts/satellite/marketing-crm.yaml#previewSegment |
+| Possible duplicate / Merge | Two profiles that may be one person. Never called "Duplicate" as a verdict. Merging needs confirmation and stays reversible for 30 days. | Duplicate (as a status), Combine, Auto-merge | DI-808 |
+| Data request | A guest's privacy request - a copy of my data, a correction, erasure, a restriction - with a legal clock. Statuses submitted, in progress, completed. | DSAR on guest screens, Subject data, Ticket | DI-379 |
+| Waiver / Consent question | A waiver is a signed, versioned form. A consent question ("Are you able to swim?", "I accept the risk") is a single question asked per person or per booking and recorded as consent. | Contract, Disclaimer, Form for a waiver in guest copy | DI-1062 |
+| Lost item / Found item / Possible match | The two directions of lost property and the suggested pairing between them. | Lost case, Claim before it is claimed | contracts/satellite/marketing-crm.yaml#/components/schemas/LostItem |
+| Wishlist | Products and dates a guest saved to buy later, including F&B and retail to buy on site. | Favourites (used for transport routes), Saved for later on one surface and Wishlist on another | DI-202 |
+| Notification / Message | A notification is an item in the guest's in-app feed. A message is one send on a channel (email, SMS, WhatsApp, push, in-app). | Alert for marketing content, Inbox for the guest feed | contracts/satellite/marketing-crm.yaml#/components/schemas/GuestNotification |
+| Template | A reusable message body per channel and language with merge fields. Transactional and marketing templates are separate kinds. | Layout, Design | contracts/satellite/marketing-crm.yaml#createMessageTemplate |
+
+
 ## The screens
 
 Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs count fields; requirements are matrix rows; meeting inputs are the ones naming the screen (the module and platform ones are below); white label says whether the tenant's brand reaches it (guest) or it sets the brand (configures).
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-674` | Accreditation Communications Command Center | B–D | 0 | 10 | 6 | 5 | 0 | 6 | — | notStarted (—) |
+| `BO-674` | Accreditation Communications Command Center | B–D | 0 | 5 | 6 | 0 | 0 | 6 | — | notStarted (—) |
 | `BO-675` | Notification Rule Management | B–D | 9 | 0 | 6 | 5 | 1 | 0 | — | notStarted (—) |
 | `BO-676` | Expiry & Renewal Notification Scheduler | B–D | 6 | 0 | 6 | 5 | 0 | 0 | — | notStarted (—) |
-| `BO-677` | Communication Template Library | B–D | 0 | 0 | 6 | 2 | 0 | 0 | — | notStarted (—) |
-| `BO-678` | Channel, Language & Branding Configuration | B–D | 10 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
-| `BO-679` | Manual & Bulk Communication Center | B–D | 0 | 0 | 6 | 8 | 0 | 0 | — | notStarted (—) |
+| `BO-677` | Communication Template Library | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-678` | Channel, Language & Branding Configuration | B–D | 9 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
+| `BO-679` | Manual & Bulk Communication Center | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-680` | Accreditation Bulk Import | B–D | 0 | 0 | 6 | 1 | 1 | 6 | — | notStarted (—) |
-| `BO-681` | Import Validation & Processing Monitor | B–D | 0 | 20 | 6 | 1 | 0 | 0 | — | notStarted (—) |
-| `BO-682` | Accreditation Export & Data Extract Center | B–D | 7 | 0 | 6 | 14 | 0 | 6 | — | notStarted (—) |
+| `BO-681` | Import Validation & Processing Monitor | B–D | 0 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-682` | Accreditation Export & Data Extract Center | B–D | 7 | 0 | 6 | 4 | 0 | 6 | — | notStarted (—) |
 | `BO-683` | Delivery, Batch & Operational History | B–D | 0 | 0 | 6 | 2 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
@@ -97,24 +158,32 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 3 · needs the `accreditation` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `ACCREDITATION_CONFIGURE` (1 configure); in the flows as venue manager |
+| Who uses it | venue; in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Dashboard analytics shall show) and no metric row |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/access-venue/accreditation-communications-command-center-bo-674` |
 
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
+**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape … Removed 2 October 2026 (CHG-WIR-001): The only bound operation was the rule write, used "at a glance"; the rules are edited on BO-675. No read returns accreditation notification sends or delivery … Contract gap recorded 2 October 2026 (CHG-WIR-004): No read of accreditation notification sends and delivery outcomes (or an accreditation filter on listDeliveryQueueFailure).
+
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** The landing page of the communications and bulk-operations board: what was sent, what is scheduled, what failed, and quick routes to send, configure rules, templates, imports and exports. Per VO-R02 it is a command-centre dashboard. The one thing to get right: failures and exceptions lead (a rejection email that never arrived is a complaint tomorrow), and every figure is about accreditation messages only.
+
+**Fixed on main** (the package already carries these; draw what it says): Analytics names (Delivery success rate, Notifications by type, by channel, Failure trends, Upcoming scheduled communications) are drawn as … (CHG-SBO-016); The only bound operation is a write (setAccreditationNotificationRules) used "at a glance" (CHG-WIR-001).
 
 #### Inputs: what the user enters or picks
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
 
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **filters (Tenant, Event, Venue, Programme, Category, Notification type, Channel, Delivery status, Date range)**: A filter bar; Tenant only for tenant-level users (VO-R09), Channel and Delivery status as chips, Date range defaults to the last 7 days. *(source: screens/P08-venue-back-office.yaml#BO-675)*
+
 #### Outputs: what the screen shows and produces
 
 **Shown**
 
-**Every accreditation communications** (data table)
+**Communications** (chart): Delivery success rate, notifications by type and channel, failure trends and upcoming scheduled communications are charts and tiles on a dashboard (VO-R02), not table columns.
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -124,15 +193,14 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Failure trends | text | not in the schema: `Failure trends` |
 | Upcoming scheduled communications | text | not in the schema: `Upcoming scheduled communications` |
 
-**The selected accreditation communications** (detail panel): The pack groups this record's detail under its own headings: “Scope of Work”, “Key requirements”.
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
 
-| Shows | Format | Notes |
-|---|---|---|
-| Delivery success rate | text | not in the schema: `Delivery success rate` |
-| Notifications by type | text | not in the schema: `Notifications by type` |
-| Notifications by channel | text | not in the schema: `Notifications by channel` |
-| Failure trends | text | not in the schema: `Failure trends` |
-| Upcoming scheduled communications | text | not in the schema: `Upcoming scheduled communications` |
+- **KPI tiles**: Notifications sent, Scheduled, Pending delivery, Delivered, Failed, Approval notifications, Expiry notifications, Renewal reminders, Manual communications, Communication exceptions; Failed and Exceptions red above zero. *(source: screens/P08-venue-back-office.yaml#BO-674 / screens/P08-venue-back-office.yaml#BO-675)*
+- **Charts**: Delivery success rate (percentage with trend), Notifications by type (bar), by channel (bar), Failure trend (line, daily), Upcoming scheduled communications (agenda list for the next 7 days). *(source: screens/P08-venue-back-office.yaml#BO-675)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Quick actions**: Send communication (BO-679), Create rule (BO-675), Manage templates (BO-677), Import records (BO-680), Export data (BO-682). *(source: screens/P08-venue-back-office.yaml#BO-675)*
 
 **Where the user goes next**
 
@@ -153,28 +221,46 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |---|---|
 | Loading (`?state=loading`) | The accreditation communications list. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the accreditation communications untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No accreditation communications yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, first run (`?state=emptyFirstRun`) | No accreditation communications yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the accreditation communications are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Not shown: nothing on this screen needs a permission of its own; the app's sign-in decides access. |
 | Offline (`?state=offline`) | online only |
+
+#### Edge cases to draw
+
+- **Messaging provider down**: Banner "Email provider not responding since 09:10; 42 messages queued" and the Pending tile in amber. *(source: designer default)*
+
+#### Consistency with other screens
+
+- Match `BO-791`: Delivery, retry and failover of messages belong to the communication platform; this dashboard is its accreditation-filtered view and must use the same delivery status names.
+- Match `BO-683`: Every tile drills into the operational history filtered.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+tiles:
+  sent: 4820
+  scheduled: 312
+  pending: 42
+  delivered: 4701
+  failed: 77
+  approval: 1240
+  expiry: 610
+  renewal: 288
+  manual: 6
+  exceptions: 3
+successRate: 97.6%
+```
 
 #### Permissions
 
-- `setAccreditationNotificationRules` → `ACCREDITATION_CONFIGURE` (configure) · staff
-
-**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Not shown: nothing on this screen needs a permission of its own; the app's sign-in decides access.
 
 #### Requirements it meets
 
-5 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
-
-| Ref | Requirement (shortened) | Domain | Verdict | Via |
-|---|---|---|---|---|
-| 12.1.36 | Accreditation Expiry Notifications - System shall notify users before accreditation expiration. | Accreditation & Credential Management | CONTRACTED | `setAccreditationNotificationRules` |
-| 12.1.43 | Accreditation Notifications - System shall send accreditation status notifications. | Accreditation & Credential Management | CONTRACTED | `setAccreditationNotificationRules` |
-| 12.1.44 | Approval Notifications - System shall notify applicants of approval decisions. | Accreditation & Credential Management | CONTRACTED | `setAccreditationNotificationRules` |
-| 12.1.45 | Renewal Notifications - System shall notify users of upcoming renewals. | Accreditation & Credential Management | CONTRACTED | `setAccreditationNotificationRules` |
-| 12.1.46 | Expiration Notifications - System shall notify users of upcoming expirations. | Accreditation & Credential Management | CONTRACTED | `setAccreditationNotificationRules` |
+No matrix row traces to this screen's operations or data.
 
 #### Client meeting inputs
 
@@ -211,12 +297,13 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (10 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (5 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-674?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-100`, `BO-675`, `BO-676`, `BO-677`, `BO-678`, `BO-679`, `BO-680`, `BO-681`, `BO-682`, `BO-683`.
-- [ ] Every gated control is gated: `ACCREDITATION_CONFIGURE`.
+- [ ] Sign-in is asked only where the spec asks for it.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 1 edge case(s) from the process notes are drawn.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -237,6 +324,16 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 | Opens with | nothing: it opens on its own |
 | Route | `/access-venue/notification-rule-management-bo-675` |
 
+**Known gaps.** Contract gap recorded 2 October 2026 (CHG-WIR-004): No read of AccreditationNotificationRules; affects BO-675 and BO-676.
+
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** Automatic notification rules per programme: which lifecycle event triggers which message, to whom (holder, organisation, sponsor, accreditation team), on which channel and in which language. Per DI-663 applicants are told at every status change, so the approved, rejected and information-requested rules ship on by default. The one thing to get right: the rule set for a programme is saved as one list, and every trigger the pack names has a row, even where the contract cannot yet hold it.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **Write bound with no read** Why: There is no get operation for AccreditationNotificationRules; a whole-list PUT cannot be edited safely (VO-R04). *(source: contracts/satellite/accreditation.yaml#setAccreditationNotificationRules; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **Rule items lack language, category scope, active/inactive and a timing after the event; channels are free strings** Why: The pack's rule definition lists Trigger, Recipient, Channel, Template, Timing, Event/programme scope, Category, Language, Active/inactive. *(source: screens/P08-venue-back-office.yaml#BO-676 / contracts/satellite/accreditation.yaml#/components/schemas/AccreditationNotificationRules; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **Triggers Resubmitted, Credential issued, Credential activated, Reactivated and Renewal approved are missing from the event enum** Why: Named by the pack; DI-663 asks for a notice at each status change. *(source: screens/P08-venue-back-office.yaml#BO-675 / screens/P08-venue-back-office.yaml#BO-676 / DI-663; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+
 #### Inputs: what the user enters or picks
 
 **On the screen**
@@ -253,7 +350,24 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 | Language | select field | — | — | — | — | — | — |
 | Active/inactive status | select field | — | — | — | — | — | — |
 
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **programme**: Picked first; the rule list belongs to a programme. *(source: contracts/satellite/accreditation.yaml#/components/schemas/AccreditationNotificationRules)*
+- **trigger**: Select of lifecycle events in plain words (Application received, Information requested, Approved, Rejected, Credential ready, Expiring soon, Renewal window open, Expired, Suspended, Revoked). The pack's others (Resubmitted, Credential issued, Credential activated, Reactivated, Renewal approved) listed greyed. *(source: screens/P08-venue-back-office.yaml#BO-675 / screens/P08-venue-back-office.yaml#BO-676 / contracts/satellite/accreditation.yaml#/components/schemas/AccreditationNotificationRules)*
+- **recipients**: Chips Holder, Organisation, Sponsor, Accreditation team (several allowed). Expiring and expired default to Holder plus Organisation, as the contract insists. *(source: contracts/satellite/accreditation.yaml#setAccreditationNotificationRules)*
+- **channels**: Chips from the channels enabled in BO-678 (Email, SMS, App notification, In-platform); never free text. *(source: screens/P08-venue-back-office.yaml#BO-678)*
+- **template / timing / language / category / active**: Template picker from BO-677 filtered by trigger; Timing (Immediately, or N days before for expiry triggers); Language and Category scope and Active switch drawn greyed until stored (see corrections). Arabic and English variants per DI-019. *(source: screens/P08-venue-back-office.yaml#BO-676 / DI-019)*
+
 #### Outputs: what the screen shows and produces
+
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Rules table**: Trigger, Recipients, Channels, Template, Timing, Active; grouped by lifecycle stage (Application, Credential, Lifecycle, Expiry and renewal). *(source: screens/P08-venue-back-office.yaml#BO-676)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Save rules**: Sends the programme's whole rule list (VO-R04); a removed row is a deleted rule, so the confirm lists removed triggers. *(source: contracts/satellite/accreditation.yaml#setAccreditationNotificationRules)*
+- **Send test**: Sends the rule's template to the signed-in user with sample values. *(source: designer default)*
 
 **Where the user goes next**
 
@@ -269,6 +383,40 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Empty, no results (`?state=emptyNoResults`) | **Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist |
 | Offline (`?state=offline`) | online only |
+
+#### Edge cases to draw
+
+- **Disabling the Approved or Rejected rule**: Warn "Applicants will not be told of this decision (DI-663)" and require a reason. *(source: DI-663)*
+- **Holder without email and the rule is email only**: Rule saves; the history (BO-683) shows those sends as Failed "No email on file". *(source: contracts/satellite/accreditation.yaml#deliverAccreditationCredential)*
+
+#### Consistency with other screens
+
+- Match `BO-676`: Expiry and renewal sequences are rules of the same list with days before; one record, one Save.
+- Match `BO-677`: Templates are picked from the library by trigger.
+- Match `ACC-004`: The applicant's status page on P11 shows the same status names the messages use.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+rules:
+- trigger: Approved
+  recipients: Holder, Organisation
+  channels: Email, App
+  template: Approval - EN/AR
+  timing: Immediately
+- trigger: Information requested
+  recipients: Holder
+  channels: Email, SMS
+  template: Additional information request
+  timing: Immediately
+- trigger: Expiring soon
+  recipients: Holder, Organisation
+  channels: Email
+  template: Expiry reminder
+  timing: 30 days before
+```
 
 #### Permissions
 
@@ -316,6 +464,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-674`.
 - [ ] Every gated control is gated: `ACCREDITATION_CONFIGURE`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 2 edge case(s) from the process notes are drawn.
+- [ ] The 3 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -336,6 +486,15 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | nothing: it opens on its own |
 | Route | `/access-venue/expiry-renewal-notification-scheduler-bo-676` |
 
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** Reminder sequences before and after expiry, and renewal invitations: 30, 14, 7 and 1 day before, then on expiry. The one thing to get right: a sequence is a list of rules on the same trigger with different day offsets, drawn as a timeline, with duplicate protection so a holder never gets two "final reminders"; and the upcoming sends are visible on a calendar with day, week and month views (VO-R01).
+
+**Known correction pending (do not draw the wrong version)**
+
+- **Label "Days before/after event" is wrong for the anchor** Why: The pack anchors the sequence on expiry (and on the renewal window), and the contract holds daysBefore only; there is no "after". *(source: screens/P08-venue-back-office.yaml#BO-676 / contracts/satellite/accreditation.yaml#/components/schemas/AccreditationNotificationRules; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **Escalation rule, retry policy and duplicate protection have no field** Why: Listed by the pack; rules carry event, daysBefore, recipients, channels and template only. *(source: screens/P08-venue-back-office.yaml#BO-677 / contracts/satellite/accreditation.yaml#/components/schemas/AccreditationNotificationRules; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **Places sends in time with no calendar component** Why: Per VO-R01 a calendar with day, week and month views. *(source: DI-907 / DI-919; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **Write bound with no read** Why: No get for the rule list (VO-R04). *(source: contracts/spine/access.yaml#setJourneySequenceRule; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+
 #### Inputs: what the user enters or picks
 
 **On the screen**
@@ -349,7 +508,21 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Escalation rule | select field | — | — | — | — | — | — |
 | Retry policy | select field | — | — | — | — | — | — |
 
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **sequence steps**: A vertical timeline of steps, each "N days before expiry" (or "On expiry"), Recipient, Template, Channel. Pre-filled with the pack's sequence: 30 Reminder 1, 14 Reminder 2, 7 Urgent, 1 Final, 0 Expiration notice. Days are whole numbers, 0-365, unique per sequence. *(source: screens/P08-venue-back-office.yaml#BO-676 / contracts/satellite/accreditation.yaml#/components/schemas/AccreditationNotificationRules)*
+- **renewal sequence**: A separate tab with Eligibility notice, Invitation, Reminder, Final reminder, Confirmation, anchored to the renewal window opening. *(source: screens/P08-venue-back-office.yaml#BO-676)*
+- **escalation rule / retry policy**: Escalation ("If not renewed 7 days before, also notify the organisation and accreditation team") and Retry (attempts, interval) drawn greyed until stored. *(source: screens/P08-venue-back-office.yaml#BO-677)*
+
 #### Outputs: what the screen shows and produces
+
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Upcoming sends calendar**: Day, Week and Month views (VO-R01) of scheduled reminders with counts per day; clicking a day lists the holders. *(source: screens/P08-venue-back-office.yaml#BO-675)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Save sequence**: Writes the steps as rules in the programme's rule list (whole list, VO-R04). *(source: contracts/satellite/accreditation.yaml#setAccreditationNotificationRules)*
 
 **Where the user goes next**
 
@@ -365,6 +538,45 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Empty, no results (`?state=emptyNoResults`) | **Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist |
 | Offline (`?state=offline`) | online only |
+
+#### Edge cases to draw
+
+- **Holder renews after Reminder 2**: Remaining steps are cancelled for that holder; the calendar count drops. *(source: screens/P08-venue-back-office.yaml#BO-677)*
+- **Two steps on the same day offset**: Refused at the field ("Already a step at 7 days"). *(source: screens/P08-venue-back-office.yaml#BO-677)*
+- **Holder expiry changed after reminders were scheduled**: Schedule recalculates; already-sent steps are not resent (duplicate protection). *(source: screens/P08-venue-back-office.yaml#BO-677)*
+
+#### Consistency with other screens
+
+- Match `BO-675`: Same rule list; the sequence editor is a view of the expiry triggers.
+- Match `BO-672`: The expiry monitor shows the last reminder sent per holder.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+expirySequence:
+- days: 30
+  step: Reminder 1
+  recipient: Holder
+  channel: Email
+- days: 14
+  step: Reminder 2
+  recipient: Holder, Organisation
+  channel: Email
+- days: 7
+  step: Urgent reminder
+  recipient: Holder, Organisation
+  channel: Email, SMS
+- days: 1
+  step: Final reminder
+  recipient: Holder, Organisation, Accreditation team
+  channel: Email, SMS
+- days: 0
+  step: Expiration notice
+  recipient: Holder, Organisation
+  channel: Email
+```
 
 #### Permissions
 
@@ -410,45 +622,45 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-674`.
 - [ ] Every gated control is gated: `ACCREDITATION_CONFIGURE`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 3 edge case(s) from the process notes are drawn.
+- [ ] The 4 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
 
 ### `BO-677` Communication Template Library
 
-**Manage reusable accreditation communication templates.**
+**Manage reusable accreditation communication templates (merged into BO-785 Template Library).**
 
 | | |
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 3 · needs the `accreditation` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `MARKETING_VIEW` (1 read); in the flows as venue manager |
+| Who uses it | venue; in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/access-venue/communication-template-library-bo-677` |
 
-**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+**What the spec says about it.** **Merged into BO-785** (decided 2 October 2026, Chinmay: duplicate screens merged as proposed; CHG-SBO-021). Accreditation communication templates are message templates (listMessageTemplates) in the one library, filtered to the accreditation purpose (design-note correction customer-marketing BO-785). **One implementation, both ids kept**, as the M24-03 merges do: this id stays for traceability and routes to BO-785, and nothing on it is built separately.
+
+**From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** The accreditation team's message templates (application received, documents missing, approved, rejected, credential ready). They are transactional messages to applicants, so they need no marketing consent and must carry no promotion.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **Only listMessageTemplates is declared; templates cannot be created or edited here, and there is no filter for accreditation templates.** Why: Either link to BO-785 for editing, or add the create and update operations and a purpose/module filter. *(source: contracts/satellite/marketing-crm.yaml#listMessageTemplates; Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers))*
 
 #### Inputs: what the user enters or picks
-
-**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
-
-| Filter | Drawn as | Default | Allowed values, rules | Source |
-|---|---|---|---|---|
-| Channel | select | — | Email · SMS · Whatsapp · Push · In app · Post | `listMessageTemplates` ?channel |
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
 
 #### Outputs: what the screen shows and produces
 
-**Shown**
+**Rules for what is shown** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
 
-**Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
-
-**Data it reads**: `listMessageTemplates` (onLoad, Template library)
+- **Template row**: Code, channel, kind (transactional), languages with missing ones flagged, status. *(source: contracts/satellite/marketing-crm.yaml#listMessageTemplates)*
 
 **Where the user goes next**
 
@@ -458,27 +670,35 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 | State | What it shows |
 |---|---|
-| Loading (`?state=loading`) | The communication template list. |
-| Error (`?state=error`) | Could not load. Names which read failed and leaves the communication template untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No communication template yet. Carries the create action; distinct from a filter that matched nothing. |
-| Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the communication template are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Loading (`?state=loading`) | Routes to BO-785 while it opens. |
+| Error (`?state=error`) | Could not open BO-785; says so and offers to retry. |
+| Empty, first run (`?state=emptyFirstRun`) | Never shown: this id routes to BO-785, whose empty states apply. |
+| Empty, no results (`?state=emptyNoResults`) | Never shown: this id routes to BO-785. |
+| Permission denied (`?state=emptyNoAccess`) | As BO-785: shown when the caller lacks the access BO-785 requires, named in words. |
 | Offline (`?state=offline`) | online only |
+
+#### Consistency with other screens
+
+- Match `BO-785`: Same template component and rules; this is the accreditation-filtered view of the one library.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+templates:
+- ACC-RECEIVED (email, EN AR)
+- ACC-DOCS-MISSING (email, WhatsApp, EN)
+- ACC-APPROVED (email, EN AR)
+```
 
 #### Permissions
 
-- `listMessageTemplates` → `MARKETING_VIEW` (read) · staff
-
-**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** As BO-785: shown when the caller lacks the access BO-785 requires, named in words.
 
 #### Requirements it meets
 
-2 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
-
-| Ref | Requirement (shortened) | Domain | Verdict | Via |
-|---|---|---|---|---|
-| 2.6.3 | The system should support email templates for e-ticket purchase confirmation supporting dynamic parameters. The email templates should be configurable per site, per event | Ticketing Sales | CONTRACTED | `listMessageTemplates` |
-| 2.6.26 | It is expected that confirmation email can be generated including the number of tickets, the cost, the order number. | Ticketing Sales | CONTRACTED | `listMessageTemplates` |
+No matrix row traces to this screen's operations or data.
 
 #### Client meeting inputs
 
@@ -504,8 +724,9 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every state opens from `#BO-677?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-674`.
-- [ ] Every gated control is gated: `MARKETING_VIEW`.
+- [ ] Sign-in is asked only where the spec asks for it.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -519,12 +740,18 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 3 · needs the `accreditation` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `GUEST_MANAGE` (1 configure); in the flows as venue manager |
+| Who uses it | venue; in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Administrators shall configure) and no display directory — it is settings, not a population |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/access-venue/channel-language-branding-configuration-bo-678` |
+
+**Known gaps.** Removed 2 October 2026 (CHG-WIR-005): setLocalizationBrandingCustomer sets a waiver version's languages, branding and channels; accreditation communication branding is not a waiver version … Contract gap recorded 2 October 2026 (CHG-WIR-007): No operation configures accreditation communication branding and sender identity.
+
+**From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** How accreditation communications are delivered and branded: sender identity, reply-to, default and alternative languages, tenant, event and venue branding, header and footer, contact information.
+
+**Fixed on main** (the package already carries these; draw what it says): The only operation is setLocalizationBrandingCustomer, which sets a WAIVER version's languages, branding and channels. (CHG-WIR-005); A select labelled "Key requirement - 12.1.57". (CHG-SBO-019).
 
 #### Inputs: what the user enters or picks
 
@@ -541,7 +768,11 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Venue branding | select field | — | — | — | — | — | — |
 | Header/footer | select field | — | — | — | — | — | — |
 | Contact information | select field | — | — | — | — | — | — |
-| Key requirement: 12.1.57 | select field | — | — | — | — | — | — |
+
+**Rules for these inputs** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
+
+- **Sender identity and reply-to**: Chosen from the brand's verified sender identities (platform-level), not typed. *(source: contracts/satellite/marketing-crm.yaml#setSenderIdentityDomain; DI-560)*
+- **Languages**: Default language and alternatives; English and Arabic as a pair by default. *(source: DI-019)*
 
 #### Outputs: what the screen shows and produces
 
@@ -555,17 +786,25 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | Loading (`?state=loading`) | The channel language branding configuration as saved. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the channel language branding untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No channel language branding configured yet. Carries the create action and says what the platform does in the meantime. |
-| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Empty, first run (`?state=emptyFirstRun`) | No channel language branding configured yet. Offers no create action — this screen declares no operation that makes one and says what the platform does in the meantime. |
+| Permission denied (`?state=emptyNoAccess`) | Not shown: nothing on this screen needs a permission of its own; the app's sign-in decides access. |
 | Empty, no results (`?state=emptyNoResults`) | **Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 A language of a published version was changed.; 422 An approval without a human reviewer, or approved by the translator. |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+sender: accreditation@coastalaqua.ae (reply-to media@coastalaqua.ae)
+languages:
+- English (default)
+- Arabic
+```
 
 #### Permissions
 
-- `setLocalizationBrandingCustomer` → `GUEST_MANAGE` (configure) · staff
-
-**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Not shown: nothing on this screen needs a permission of its own; the app's sign-in decides access.
 
 #### Requirements it meets
 
@@ -595,12 +834,12 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (10), with its required mark, default, format and its error state (400, 404, 409, 422).
+- [ ] Every input above is drawn (9), with its required mark, default, format and its error state.
 - [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-678?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, emptyNoResults, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-674`.
-- [ ] Every gated control is gated: `GUEST_MANAGE`.
+- [ ] Sign-in is asked only where the spec asks for it.
 - [ ] The module and platform inputs below are applied.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -615,27 +854,32 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 3 · needs the `accreditation` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `MARKETING_SEND` (1 operate); in the flows as venue manager |
+| Who uses it | venue; in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/access-venue/manual-bulk-communication-center-bo-679` |
 
-**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built. Removed 2 October 2026 (CHG-WIR-005): sendTransactionalMessage declares the service and partner audiences only, and is per message; a staff screen cannot call it (design-notes correction …
+
+**From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** Authorised operators message a selected accreditation population (all approved media for an event, all applicants missing a document). These are operational messages about their accreditation; no marketing may ride on them.
+
+**Fixed on main** (the package already carries these; draw what it says): sendTransactionalMessage is service and partner audience only, but is the staff screen's only action. (CHG-WIR-005).
 
 #### Inputs: what the user enters or picks
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
 
+**Rules for these inputs** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
+
+- **Population**: Chosen by programme, category and status, with the recipient count before sending. *(source: screens/P08-venue-back-office.yaml#BO-679)*
+
 #### Outputs: what the screen shows and produces
 
-**Actions and what each produces**
+**Rules for what is shown** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
 
-| Action | Calls | Sends | On success returns | Errors to show | Notes |
-|---|---|---|---|---|---|
-| Send transactional message (primary button) | navigation or local | — | — | — | — |
-| Cancel (secondary button) | navigation or local | — | — | — | — |
+- **Send result**: Queued, delivered and failed counts, with failures retried or sent on the fallback channel. *(source: DI-559)*
 
 **Where the user goes next**
 
@@ -647,32 +891,27 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |---|---|
 | Loading (`?state=loading`) | The manual bulk communication list. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the manual bulk communication untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No manual bulk communication yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, first run (`?state=emptyFirstRun`) | No manual bulk communication yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the manual bulk communication are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Not shown: nothing on this screen needs a permission of its own; the app's sign-in decides access. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 409 Address suppressed, or the guest has no address for that channel |
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+population: Approved media - Coastal Aqua Summer Festival - 86 recipients
+message: Your media credential is ready for collection at Gate 2 from 10:00 on 14 Oct 2026.
+```
 
 #### Permissions
 
-- `sendTransactionalMessage` → `MARKETING_SEND` (operate) · service, partner
-
-**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Not shown: nothing on this screen needs a permission of its own; the app's sign-in decides access.
 
 #### Requirements it meets
 
-8 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
-
-| Ref | Requirement (shortened) | Domain | Verdict | Via |
-|---|---|---|---|---|
-| 19.2.61 | Reservation Notifications - System shall provide reservation reminders. | Guest Mobile App & Branding | CONTRACTED | `sendTransactionalMessage` |
-| 19.2.62 | Ticket Notifications - System shall provide ticket reminders. | Guest Mobile App & Branding | CONTRACTED | `sendTransactionalMessage` |
-| 19.2.64 | Operational Notifications - System shall provide operational notifications. | Guest Mobile App & Branding | CONTRACTED | `sendTransactionalMessage` |
-| 2.7.21 | It is expected that confirmation email can be generated; the email shall include relevant visit information such as the number of tickets, the cost, the order number. | Ticketing Sales | CONTRACTED | `sendTransactionalMessage` |
-| 4.4.8 | The system should be able to reduce the use of paper and send out receipts via phone as SMS or whatsapp or email for all transactions. | Bundles and Promotions | CONTRACTED | `sendTransactionalMessage` |
-| 4.6.14 | The system should be able to reduce the use of paper and send out receipts via phone or email for all transactions. | Bundles and Promotions | CONTRACTED | `sendTransactionalMessage` |
-| 13.3.15 | APIs shall support email, SMS, push notifications, WhatsApp notifications and notification status retrieval. | Developer & API Management | CONTRACTED | `sendTransactionalMessage` |
-| 22.9.2 | Multi-Channel Delivery | Marketing & CRM | CONTRACTED | `sendTransactionalMessage` |
+No matrix row traces to this screen's operations or data.
 
 #### Client meeting inputs
 
@@ -693,12 +932,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (409).
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
 - [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-679?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: Send transactional message, Cancel.
+- [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-674`.
-- [ ] Every gated control is gated: `MARKETING_SEND`.
+- [ ] Sign-in is asked only where the spec asks for it.
 - [ ] The module and platform inputs below are applied.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -722,9 +961,32 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** Bulk import of an organisation's roster from the Excel template (a broadcaster's 200 crew, a contractor's 1,000 workers). A guided wizard: download template, upload, map columns, validate, resolve, submit. The one thing to get right: nothing is written until validation is complete, duplicates (same passport or Emirates ID) are caught row by row, and per DI-664 each imported person still goes through profile, documents and approval rather than becoming an accredited holder straight from a spreadsheet.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **Import outcome is created/updated holders, so an imported row becomes an accredited holder without review** Why: DI-664 says each imported record still goes through profile, documents and approval; the import should create applications (submitted) not holders. *(source: DI-664 / contracts/satellite/accreditation.yaml#/components/schemas/AccreditationImportResult; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **No template download, no column mapping, and no way to submit documents with the roster** Why: The pack and DI-664 ask for an Excel template with details and documents at once and column mapping; the call takes one spreadsheet asset only. *(source: screens/P08-venue-back-office.yaml#BO-680 / DI-664 / contracts/satellite/accreditation.yaml#importAccreditationHolders; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **Row outcome is a free string; the pack's Valid / Warning / Error / Duplicate is a closed set** Why: Row filters and colours need the enum. *(source: screens/P08-venue-back-office.yaml#BO-681 / contracts/satellite/accreditation.yaml#/components/schemas/AccreditationImportResult; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **Bulk import is reached from the Communications Command Center** Why: Matches the pack's Board 7, but the import is also a quick action on the Accreditation Command Center (BO-615) where organisations' rosters are managed; add that entry. *(source: screens/P08-venue-back-office.yaml#BO-674 / screens/P08-venue-back-office.yaml#BO-680; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+
+#### Decided on this screen
+
+Answered questions: draw the decision, not the old default. Where a decision and the tables below differ, the decision wins.
+
+- **How are documents (ID scans, photos) supplied with a bulk roster - a zip matched by file name, or uploaded per person afterwards?** → Drawn default accepted: Draw an optional "Documents (zip)" upload in step 2 with "File names must match the ID number column", greyed. *(decided by Chinmay, 2026-10-02; DEC-486 / CHG-NOTE-008)* **Reviewable:** a default the lead may still overrule before the block is tasked.
+
 #### Inputs: what the user enters or picks
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **programme / organisation**: Programme required; organisation optional (all rows belong to it when set, and its users see the result on P11). *(source: contracts/satellite/accreditation.yaml#importAccreditationHolders / DI-655)*
+- **file**: The programme's template only (XLSX or CSV), downloaded from step 1 with the programme's form fields as columns and an instructions sheet in English and Arabic. Uploaded as an asset first. *(source: screens/P08-venue-back-office.yaml#BO-680 / DI-664 / DI-019)*
+- **column mapping**: Auto-matched by header; unmatched columns shown for manual mapping; required form fields must be mapped before Validate. *(source: screens/P08-venue-back-office.yaml#BO-680)*
+- **default access profile**: Optional; defaults to each category's default profile, and is applied only once a record is approved. *(source: contracts/satellite/accreditation.yaml#importAccreditationHolders / DI-664)*
+- **mode**: Not a field. "Validate" sends validateOnly; "Submit import" sends commit, enabled only after a clean validation. *(source: screens/P08-venue-back-office.yaml#BO-681 / contracts/satellite/accreditation.yaml#importAccreditationHolders)*
 
 #### Outputs: what the screen shows and produces
 
@@ -734,6 +996,16 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |---|---|---|---|---|---|
 | Import accreditation holders (primary button) | navigation or local | — | — | — | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
+
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Wizard steps**: Download template > Upload > Map columns > Validate > Resolve > Submit, with the current step and row counts in the header. *(source: screens/P08-venue-back-office.yaml#BO-680)*
+- **Row results**: Each row with the pack's four statuses, Valid (green), Warning (amber, can import), Error (red, cannot), Duplicate (purple, identity conflict with an existing holder or another row), and the detail ("Emirates ID 784-1990-... already accredited as ACC-2026-000912"). Filter by status; error report download. *(source: screens/P08-venue-back-office.yaml#BO-681 / contracts/satellite/accreditation.yaml#/components/schemas/AccreditationImportResult)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Validate**: Runs the import in validate-only mode and shows rows read, would create, would update, rejected and identity conflicts. *(source: contracts/satellite/accreditation.yaml#importAccreditationHolders)*
+- **Submit import**: Commits valid and warning rows; the confirm states the counts and that errors and duplicates are skipped. Result opens in the processing monitor (BO-681). *(source: contracts/satellite/accreditation.yaml#importAccreditationHolders / F223 step 12)*
 
 **Where the user goes next**
 
@@ -749,6 +1021,45 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the accreditation bulk import are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Edge cases to draw
+
+- **The same person appears twice in the file**: Both rows marked Duplicate with each other's row number. *(source: contracts/satellite/accreditation.yaml#importAccreditationHolders / DI-692)*
+- **File larger than the inline limit (e.g. 1,000 rows with documents)**: Validation runs in the background with progress; the user can leave and find it in BO-681. *(source: DI-664)*
+- **Programme closed for applications**: Block at step 1 with "Applications closed on 1 Dec 2026". *(source: contracts/satellite/accreditation.yaml#/components/schemas/AccreditationProgramme)*
+
+#### Consistency with other screens
+
+- Match `BO-681`: Same row statuses and wording; the monitor is where a submitted import is followed.
+- Match `BO-631`: Duplicates found here use the same identity-conflict wording and resolution as single applications.
+- Match `P11`: The organisation portal's bulk upload (DI-664) uses the same template and row statuses.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+file: GulfMediaNetwork_WinterFestival_crew.xlsx
+result:
+  rowsRead: 214
+  valid: 196
+  warning: 9
+  error: 6
+  duplicate: 3
+rows:
+- row: 12
+  name: Rahul Menon
+  status: Warning
+  detail: Photo below recommended resolution
+- row: 47
+  name: Omar Haddad
+  status: Duplicate
+  detail: Passport already accredited as ACC-2026-000912
+- row: 88
+  name: Maria Santos
+  status: Error
+  detail: Category 'Press' does not exist in this programme
+```
 
 #### Permissions
 
@@ -797,6 +1108,9 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 - [ ] Every transition is wired: `BO-674`.
 - [ ] Every gated control is gated: `ACCREDITATION_MANAGE`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 3 edge case(s) from the process notes are drawn.
+- [ ] The 4 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
+- [ ] The 1 decision(s) taken on this screen are drawn as decided, not as the old default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -810,14 +1124,22 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 3 · needs the `accreditation` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `ACCREDITATION_MANAGE` (1 configure); in the flows as venue manager |
+| Who uses it | venue; in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§The screen shall display) and no metric row |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/access-venue/import-validation-processing-monitor-bo-681` |
 
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
+**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape … Removed 2 October 2026 (CHG-WIR-001): importAccreditationHolders (a POST that runs an import) was bound on load, so opening the monitor would start an import; the import is run from BO-680. A list of … Contract gap recorded 2 October 2026 (CHG-WIR-004): No read lists accreditation import batches or loads one.
+
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** The list of import batches and their progress, with row-level errors and an error report. Used to follow a large import and to answer "which of my 200 crew went in". The one thing to get right: a batch is a lasting record with an id, status and counts, and every imported record keeps its batch reference.
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- AccreditationImportResult has no batch id, file name, uploader, time or processing status (CHG-SBO-005)
+
+**Fixed on main** (the package already carries these; draw what it says): importAccreditationHolders (a POST that runs an import) is bound on load (CHG-WIR-001); Table and panel titled "Every import validation processing" / "The selected import validation processing" (CHG-SBO-016).
 
 #### Inputs: what the user enters or picks
 
@@ -827,7 +1149,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Every import validation processing** (data table)
+**Import batches** (data table)
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -842,7 +1164,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Duplicate records | text | not in the schema: `Duplicate records` |
 | Processing status | text | not in the schema: `Processing status` |
 
-**The selected import validation processing** (detail panel): The pack groups this record's detail under its own headings: “Processing statuses shall include”.
+**The selected batch** (detail panel): The pack groups this record's detail under its own headings: “Processing statuses shall include”.
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -857,7 +1179,16 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Duplicate records | text | not in the schema: `Duplicate records` |
 | Processing status | text | not in the schema: `Processing status` |
 
-**Data it reads**: `importAccreditationHolders` (onLoad, Validation and processing)
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Batch list**: Columns as the pack: Import batch ID (IMP-2026-0142), File name, Uploaded by, Upload date/time, Total, Valid, Warning, Failed, Duplicate, Processing status. Newest first, cursor paging (VO-R12). *(source: screens/P08-venue-back-office.yaml#BO-681)*
+- **Processing status**: The pack's sequence as a chip, Uploaded > Validating > Ready > Processing > Completed / Partially completed / Failed; Partially completed in amber with the failed count. *(source: screens/P08-venue-back-office.yaml#BO-681)*
+- **Batch detail**: Row table with status and detail (same as BO-680), and the created records linking to their applications. *(source: screens/P08-venue-back-office.yaml#BO-681 / contracts/satellite/accreditation.yaml#/components/schemas/AccreditationImportResult)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Download error report**: XLSX of the failed and duplicate rows with a reason column, in the template's layout so it can be fixed and re-uploaded. *(source: screens/P08-venue-back-office.yaml#BO-681)*
+- **Continue import**: For a batch in Ready, opens BO-680 at the Submit step. *(source: screens/P08-venue-back-office.yaml#BO-681)*
 
 **Where the user goes next**
 
@@ -869,24 +1200,56 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |---|---|
 | Loading (`?state=loading`) | The import validation processing list. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the import validation processing untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No import validation processing yet. Carries the create action; distinct from a filter that matched nothing. |
+| Empty, first run (`?state=emptyFirstRun`) | No import validation processing yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the import validation processing are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Not shown: nothing on this screen needs a permission of its own; the app's sign-in decides access. |
 | Offline (`?state=offline`) | online only |
+
+#### Edge cases to draw
+
+- **Batch failed half-way through commit**: Status Partially completed with the counts committed; re-running commits only the rows not yet created. *(source: screens/P08-venue-back-office.yaml#BO-681)*
+- **User not the uploader**: Sees batches of their venue; personal data in rows needs the same rights as the holder directory. *(source: ADR-0002 / DI-387)*
+
+#### Consistency with other screens
+
+- Match `BO-680`: Same statuses and row wording.
+- Match `BO-683`: Each batch appears in the operational history.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+batches:
+- id: IMP-2026-0142
+  file: GulfMediaNetwork_WinterFestival_crew.xlsx
+  by: Maria Santos
+  at: 02 Dec 2026 14:05
+  total: 214
+  valid: 196
+  warning: 9
+  failed: 6
+  duplicate: 3
+  status: Partially completed
+- id: IMP-2026-0141
+  file: AlNoor_contractors_Dec.xlsx
+  by: Rahul Menon
+  at: 01 Dec 2026 09:40
+  total: 1000
+  valid: 1000
+  warning: 0
+  failed: 0
+  duplicate: 0
+  status: Completed
+```
 
 #### Permissions
 
-- `importAccreditationHolders` → `ACCREDITATION_MANAGE` (configure) · staff
-
-**A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Not shown: nothing on this screen needs a permission of its own; the app's sign-in decides access.
 
 #### Requirements it meets
 
-1 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
-
-| Ref | Requirement (shortened) | Domain | Verdict | Via |
-|---|---|---|---|---|
-| 12.1.54 | Accreditation Import - System shall support bulk import of accreditation records. | Accreditation & Credential Management | CONTRACTED | `importAccreditationHolders` |
+No matrix row traces to this screen's operations or data.
 
 #### Client meeting inputs
 
@@ -912,8 +1275,9 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every state opens from `#BO-681?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-674`.
-- [ ] Every gated control is gated: `ACCREDITATION_MANAGE`.
+- [ ] Sign-in is asked only where the spec asks for it.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 2 edge case(s) from the process notes are drawn.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -927,12 +1291,24 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 3 · needs the `accreditation` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `ACCREDITATION_MANAGE`, `ACCREDITATION_VIEW`, `REPORT_EXPORT`, `REPORT_VIEW_VENUE` (1 configure, 2 read, 1 operate); in the flows as venue manager |
+| Who uses it | venue staff holding `ACCREDITATION_MANAGE`, `ACCREDITATION_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§The system shall capture) and no display directory — it is settings, not a population |
 | Offline | online only |
-| Opens with | `executionId` (navigation), `exportId` (navigation), `reportId` (navigation) |
+| Opens with | `exportId` (navigation) |
 | Route | `/access-venue/accreditation-export-data-extract-center-bo-682` |
+
+**Known gaps.** Removed 2 October 2026 (CHG-WIR-001): runReport and exportReportResult were a second export path beside exportAccreditationData; the accreditation export is the one the pack describes, and reports … Removed 2 October 2026 (CHG-WIR-001): runReport and exportReportResult were a second export path beside exportAccreditationData; the accreditation export is the one the pack describes, and reports …
+
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** Exporting accreditation data (holders, applications, credentials, access assignments, documents) as CSV or XLSX, with a history of who exported what. The typical export is the register a security team is handed before an event. The one thing to get right: personal data is off by default, needs a separate permission and a stated purpose, and the download link expires.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **Requested by, Export date/time, Number of records and Export status are drawn as select inputs** Why: They are the export history columns the system captures, not choices the user makes. *(source: screens/P08-venue-back-office.yaml#BO-683 / screens/P08-venue-back-office.yaml#BO-682; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **Select field "Key requirement 12.1.55"** Why: Pack prose turned into a field; remove. *(source: screens/P08-venue-back-office.yaml#BO-682; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **Filters Event, Venue, Credential type and Date range are not in the export request** Why: The pack lists them; the request has programme, status, organisation, category and validOn. *(source: screens/P08-venue-back-office.yaml#BO-681 / screens/P08-venue-back-office.yaml#BO-683 / contracts/satellite/accreditation.yaml#/components/schemas/AccreditationDataExport; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+
+**Fixed on main** (the package already carries these; draw what it says): runReport and exportReportResult are bound beside exportAccreditationData, with entry params executionId and reportId (CHG-WIR-001).
 
 #### Inputs: what the user enters or picks
 
@@ -958,7 +1334,24 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Expiring within days | number field (days) | — | — | `listAccreditationHolders` ?expiringWithinDays |
 | Status | text field | — | — | `listAccreditationExports` ?status |
 
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **dataset**: One of Holders, Applications, Credentials, Access assignments, Documents (cards, one choice). *(source: contracts/satellite/accreditation.yaml#exportAccreditationData)*
+- **filters**: Programme, Status, Organisation, Category, and "Valid on" (a date - "only accreditations valid on 15 Dec 2026"). The pack's Event, Venue, Credential type and Date range are greyed until supported. *(source: screens/P08-venue-back-office.yaml#BO-681 / screens/P08-venue-back-office.yaml#BO-683 / contracts/satellite/accreditation.yaml#/components/schemas/AccreditationDataExport)*
+- **fields**: Checklist of the dataset's columns, standard set pre-ticked; personal columns (contact, date of birth, nationality, document references) appear only when Include personal data is on. *(source: contracts/satellite/accreditation.yaml#exportAccreditationData)*
+- **includePersonalData / purpose**: A switch disabled with "Needs personal-data export rights" for users without them (VO-R08); when on, Purpose (max 500) is required and the confirm says the export is recorded in the audit trail. *(source: contracts/satellite/accreditation.yaml#/components/schemas/AccreditationDataExport)*
+- **format**: CSV or XLSX. *(source: contracts/satellite/accreditation.yaml#/components/schemas/AccreditationDataExport)*
+
 #### Outputs: what the screen shows and produces
+
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Export history**: Columns from the pack: Requested by, Export date/time, Filters (as a short sentence), Fields (count, hover list), Records, Status (Queued, Running, Ready, Failed, Expired), with a padlock on exports that carried personal data. Cursor paging. *(source: screens/P08-venue-back-office.yaml#BO-683 / contracts/satellite/accreditation.yaml#listAccreditationExports)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Export**: Queues the export and adds a row Queued that becomes Ready with Download; large exports are asynchronous, the user may leave. *(source: contracts/satellite/accreditation.yaml#exportAccreditationData / contracts/satellite/accreditation.yaml#getAccreditationExport)*
+- **Download**: Fetches the signed link; an Expired row offers "Export again" with the same settings instead of a link. *(source: contracts/satellite/accreditation.yaml#getAccreditationExport)*
 
 **Data it reads**: `listAccreditationHolders` (onLoad, Export); `listAccreditationExports` (onLoad, Export history: requested by, date, filters, fields …)
 
@@ -972,11 +1365,44 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | Loading (`?state=loading`) | The accreditation export data configuration as saved. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the accreditation export data untouched. |
-| Empty, first run (`?state=emptyFirstRun`) | No accreditation export data configured yet. Carries the create action and says what the platform does in the meantime. |
+| Empty, first run (`?state=emptyFirstRun`) | No accreditation export data configured yet. Offers no create action — this screen declares no operation that makes one and says what the platform does in the meantime. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Empty, no results (`?state=emptyNoResults`) | **Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 400 Required parameter missing, or the date range exceeds `maxDateRangeDays` (366 days when the definition sets none, audit R158); 422 Personal data requested without a purpose |
+| Validation and conflict | the form keeps what was entered and marks the problem: 422 Personal data requested without a purpose |
+
+#### Edge cases to draw
+
+- **Export fails**: Row Failed with the reason and Retry with the same settings. *(source: contracts/satellite/accreditation.yaml#/components/schemas/AccreditationDataExport)*
+
+#### Consistency with other screens
+
+- Match `BO-683`: Exports appear in the operational history with the same columns.
+- Match `BO-690`: Exports with personal data appear as audit records.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+history:
+- by: Ahmed Al Mansoori
+  at: 14 Dec 2026 17:20
+  dataset: Holders
+  filters: Valid on 15 Dec 2026, Media and Contractor
+  fields: 9
+  records: 1142
+  status: Ready
+  personalData: 'No'
+- by: Fatima Al Hashimi
+  at: 10 Dec 2026 11:02
+  dataset: Documents
+  filters: Gulf Media Network
+  fields: 12
+  records: 214
+  status: Expired
+  personalData: Yes - visa processing
+```
 
 #### Permissions
 
@@ -984,14 +1410,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - `listAccreditationExports` → `ACCREDITATION_MANAGE` (configure) · staff
 - `exportAccreditationData` → `ACCREDITATION_MANAGE` (configure) · staff
 - `getAccreditationExport` → `ACCREDITATION_MANAGE` (configure) · staff
-- `runReport` → `REPORT_VIEW_VENUE` (operate) · staff, partner
-- `exportReportResult` → `REPORT_EXPORT` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
 #### Requirements it meets
 
-14 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+4 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
 
 | Ref | Requirement (shortened) | Domain | Verdict | Via |
 |---|---|---|---|---|
@@ -999,15 +1423,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | 12.1.47 | Accreditation Dashboard - System shall provide accreditation dashboards. | Accreditation & Credential Management | CONTRACTED | `listAccreditationHolders` |
 | 12.1.52 | Accreditation API - System shall expose accreditation functionality through APIs. | Accreditation & Credential Management | CONTRACTED | `listAccreditationHolders` |
 | 12.1.55 | Accreditation Export - System shall support export of accreditation data. | Accreditation & Credential Management | CONTRACTED | `exportAccreditationData` |
-| 6.1.19 | The system should have ability for reporting ranges which allow for specific beginning/end points; e.g., date-to-date as well as month, or guest name list | Retail POS | CONTRACTED | `runReport` |
-| 6.1.43 | The system should be able to report on Historical records up to 5 years for internal reporting requirements or as required by finance operation team for Audit purpose. | Retail POS | CONTRACTED | `runReport` |
-| 8.7.24 | System shall support historical analytics. | Unified Operations Dashboard | CONTRACTED | `runReport` |
-| 8.7.25 | System shall support trend analysis. | Unified Operations Dashboard | CONTRACTED | `runReport` |
-| 13.3.14 | APIs shall expose operational, financial, attendance, membership and sales reporting data. | Developer & API Management | CONTRACTED | `runReport` |
-| 6.1.20 | The system should be able to all reporting functions should have export option to multiple file formats; minimum of PDF, Excel, delimited text, and XML. | Retail POS | CONTRACTED | `exportReportResult` |
-| 6.1.26 | The system should be able to view/export (as CSV) user data. | Retail POS | CONTRACTED | `exportReportResult` |
-| 8.7.18 | System shall support report exports to Excel. | Unified Operations Dashboard | CONTRACTED | `exportReportResult` |
-| … 2 more | | | | `traceability.json` |
 
 #### Client meeting inputs
 
@@ -1033,13 +1448,15 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (7), with its required mark, default, format and its error state (400, 403, 404, 422).
+- [ ] Every input above is drawn (7), with its required mark, default, format and its error state (403, 404, 422).
 - [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-682?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, emptyNoResults, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-674`.
-- [ ] Every gated control is gated: `ACCREDITATION_MANAGE`, `ACCREDITATION_VIEW`, `REPORT_EXPORT`, `REPORT_VIEW_VENUE`.
+- [ ] Every gated control is gated: `ACCREDITATION_MANAGE`, `ACCREDITATION_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 1 edge case(s) from the process notes are drawn.
+- [ ] The 3 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -1062,6 +1479,13 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
+**From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** One searchable history of the board's operations: communications sent (recipient, type, template, channel, delivery status, failure reason, retries), imports and exports. Used to answer "did the contractor get the collection notice" and to retry failed messages without recreating them. The one thing to get right: three kinds of rows in one timeline with a type filter, and Retry on a failed message resends the original.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **Only listAccreditationAudit is bound** Why: The audit trail records who changed what, not message delivery or retry; the history needs the communication platform's delivery records, an import batch list and listAccreditationExports, plus a retry call. *(source: contracts/satellite/accreditation.yaml#listAccreditationAudit / contracts/satellite/marketing-crm.yaml#listDeliveryQueueFailure / contracts/satellite/accreditation.yaml#listAccreditationExports; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+- **Data table has no label or columns** Why: Generated placeholder; "Operational history". *(source: screens/P08-venue-back-office.yaml#BO-683; Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue))*
+
 #### Inputs: what the user enters or picks
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
@@ -1073,11 +1497,24 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
 
+**Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **filters**: Type (Communication / Import / Export), date range, user, status, recipient or holder search. *(source: screens/P08-venue-back-office.yaml#BO-683)*
+
 #### Outputs: what the screen shows and produces
 
 **Shown**
 
 **Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+
+**Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **History table**: Type icon, When, Subject (recipient and notification type, or batch file, or export dataset), By, Channel or scope, Status, Detail (failure reason, records processed). Communications show retry count and expand to the attempt list. Cursor paging (VO-R12). *(source: screens/P08-venue-back-office.yaml#BO-683)*
+
+**What each action does** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
+
+- **Retry**: For a failed communication, resends the same message to the same recipient; the row shows the new attempt. Only for authorised administrators. *(source: screens/P08-venue-back-office.yaml#BO-683)*
+- **Open**: Imports open BO-681 batch detail; exports open BO-682 row; communications open the message preview. *(source: screens/P08-venue-back-office.yaml#BO-683)*
 
 **Data it reads**: `listAccreditationAudit` (onLoad, Import and export audit)
 
@@ -1095,6 +1532,41 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the delivery batch operational are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Edge cases to draw
+
+- **Recipient's address changed since the failure**: Retry goes to the holder's current own address, and the row says so. *(source: contracts/satellite/accreditation.yaml#deliverAccreditationCredential)*
+
+#### Consistency with other screens
+
+- Match `BO-791`: Communication delivery states and retry belong to the communication platform; same status names.
+- Match `BO-690`: The audit log is the immutable record; this is an operational view and may summarise.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+rows:
+- type: Communication
+  when: 14 Dec 2026 08:00
+  subject: Khalid Al Zaabi - Collection instructions
+  channel: SMS
+  status: Failed
+  detail: Number unreachable, 2 retries
+- type: Import
+  when: 02 Dec 2026 14:05
+  subject: GulfMediaNetwork_WinterFestival_crew.xlsx
+  by: Maria Santos
+  status: Partially completed
+  detail: 205 of 214
+- type: Export
+  when: 14 Dec 2026 17:20
+  subject: Holders valid on 15 Dec
+  by: Ahmed Al Mansoori
+  status: Ready
+  detail: 1,142 records
+```
 
 #### Permissions
 
@@ -1137,6 +1609,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-674`.
 - [ ] Every gated control is gated: `ACCREDITATION_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 1 edge case(s) from the process notes are drawn.
+- [ ] The 2 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -1238,17 +1712,12 @@ Method, path, parameters, request and response for every operation these screens
 ```json
 {
 "exportAccreditationData": {"method":"POST","path":"/accreditation-exports","contract":"accreditation","summary":"Export holders, applications, credentials or access assignments","permission":"ACCREDITATION_MANAGE","offlineCapable":null,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"AccreditationDataExport","responds":null},
-"exportReportResult": {"method":"POST","path":"/report-executions/{executionId}/export","contract":"reporting","summary":"Export a completed result","permission":"REPORT_EXPORT","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":null},
 "getAccreditationExport": {"method":"GET","path":"/accreditation-exports/{exportId}","contract":"accreditation","summary":"One export, and its download link once ready","permission":"ACCREDITATION_MANAGE","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"AccreditationDataExport"},
 "importAccreditationHolders": {"method":"POST","path":"/accreditation-imports","contract":"accreditation","summary":"Load a roster supplied by an organisation","permission":"ACCREDITATION_MANAGE","offlineCapable":null,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"AccreditationImportResult"},
 "listAccreditationAudit": {"method":"GET","path":"/accreditation-audit","contract":"accreditation","summary":"The immutable record of who granted what to whom","permission":"ACCREDITATION_VIEW","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[{"name":"holderId","in":"query","required":null},{"name":"from","in":"query","required":null}],"requestBody":null,"responds":"AccreditationAuditRecord"},
 "listAccreditationExports": {"method":"GET","path":"/accreditation-exports","contract":"accreditation","summary":"Exports taken, by whom, of what","permission":"ACCREDITATION_MANAGE","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[{"name":"status","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listAccreditationHolders": {"method":"GET","path":"/accreditation-holders","contract":"accreditation","summary":"Everybody accredited, and what state they are in","permission":"ACCREDITATION_VIEW","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[{"name":"programmeId","in":"query","required":null},{"name":"organisationId","in":"query","required":null},{"name":"status","in":"query","required":null},{"name":"expiringWithinDays","in":"query","required":null}],"requestBody":null,"responds":"AccreditationHolder"},
-"listMessageTemplates": {"method":"GET","path":"/message-templates","contract":"marketing-crm","summary":"List message templates","permission":"MARKETING_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"channel","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
-"runReport": {"method":"POST","path":"/reports/{reportId}/run","contract":"reporting","summary":"Run a report","permission":"REPORT_VIEW_VENUE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"RunReportRequest","responds":"ReportResult"},
-"sendTransactionalMessage": {"method":"POST","path":"/messages","contract":"marketing-crm","summary":"Send a transactional message","permission":"MARKETING_SEND","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":null},
-"setAccreditationNotificationRules": {"method":"PUT","path":"/accreditation-notifications","contract":"accreditation","summary":"Who is told what, and when","permission":"ACCREDITATION_CONFIGURE","offlineCapable":null,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"AccreditationNotificationRules","responds":"AccreditationNotificationRules"},
-"setLocalizationBrandingCustomer": {"method":"PUT","path":"/localization-branding-customer","contract":"marketing-crm","summary":"Set a waiver version's languages, branding and channels","permission":"GUEST_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"LocalizationBrandingCustomerExperienceConfigurationInput","responds":"LocalizationBrandingCustomerExperienceConfigurationView"}
+"setAccreditationNotificationRules": {"method":"PUT","path":"/accreditation-notifications","contract":"accreditation","summary":"Who is told what, and when","permission":"ACCREDITATION_CONFIGURE","offlineCapable":null,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"AccreditationNotificationRules","responds":"AccreditationNotificationRules"}
 }
 ```
 
@@ -1263,15 +1732,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "AccreditationHolder": {"type":"object","x-ticvai-persistence":"accreditation.holder","description":"**A subject who may never sign in to anything.** `identity` owns principals; this owns accredited people.\n","required":["id","fullName"],"properties":{"id":{"type":"string","format":"uuid"},"subjectId":{"type":"string","format":"uuid","nullable":true},"accreditationNumber":{"type":"string"},"fullName":{"type":"string"},"photoAssetId":{"type":"string","format":"uuid","nullable":true},"dateOfBirth":{"type":"string","format":"date","nullable":true},"nationality":{"type":"string","nullable":true},"email":{"type":"string","format":"email","nullable":true,"description":"12.1.16. The holder's own address — where a mobile credential and renewal notices go"},"phone":{"type":"string","nullable":true,"description":"12.1.16. E.164"},"identityDocumentVerified":{"type":"boolean","default":false},"organisationId":{"type":"string","format":"uuid","nullable":true},"affiliationRole":{"type":"string","nullable":true},"programmeId":{"type":"string","format":"uuid"},"categoryCode":{"type":"string","nullable":true},"status":{"type":"string","enum":["active","suspended","revoked","expired","archived"]},"validFrom":{"type":"string","format":"date","nullable":true},"validTo":{"type":"string","format":"date","nullable":true},"completenessPercent":{"type":"integer","readOnly":true},"scopePath":{"type":"string"}}},
 "AccreditationImportResult": {"type":"object","description":"Board 7.8. **A bulk import is exactly where the same person gets accredited twice.**\n","properties":{"rowsRead":{"type":"integer"},"created":{"type":"integer"},"updated":{"type":"integer"},"rejected":{"type":"integer"},"identityConflicts":{"type":"integer"},"rows":{"type":"array","items":{"type":"object","properties":{"row":{"type":"integer"},"name":{"type":"string"},"outcome":{"type":"string"},"detail":{"type":"string","nullable":true}}}},"committed":{"type":"boolean"}}},
 "AccreditationNotificationRules": {"type":"object","x-ticvai-persistence":"accreditation.notification_rules","description":"Board 7.2. **Notices go to the organisation as well as the holder.**","properties":{"programmeId":{"type":"string","format":"uuid"},"rules":{"type":"array","items":{"type":"object","properties":{"event":{"type":"string","enum":["applicationReceived","informationRequested","approved","rejected","credentialReady","expiringSoon","renewalWindowOpen","expired","suspended","revoked"]},"daysBefore":{"type":"integer","nullable":true},"recipients":{"type":"array","items":{"type":"string","enum":["holder","organisation","sponsor","accreditationTeam"]}},"channels":{"type":"array","items":{"type":"string"}},"templateId":{"type":"string","format":"uuid","nullable":true}}}},"scopePath":{"type":"string"}}},
-"ExportFormat": {"type":"string","enum":["csv","xlsx","pdf","json"]},
-"FieldType": {"type":"string","enum":["string","integer","decimal","money","boolean","date","dateTime","uuid","enum"]},
-"LocalisedText": {"x-ticvai-persistence":"none — jsonb column","type":"object","additionalProperties":{"type":"string"}},
-"LocalizationBrandingCustomerExperienceConfigurationInput": {"description":"The request body of `setLocalizationBrandingCustomer`, the record itself; read-only properties are ignored.","allOf":[{"$ref":"#/components/schemas/LocalizationBrandingCustomerExperienceConfigurationView"}]},
-"LocalizationBrandingCustomerExperienceConfigurationView": {"type":"object","x-ticvai-persistence":"marketing.waiver_localisation","description":"Languages, branding and channels of one waiver version (pack 11.1.9), keyed on `formId` + `formVersion`.","required":["formId","formVersion","sourceLanguage","languages"],"properties":{"formId":{"type":"string","format":"uuid"},"formVersion":{"type":"integer","minimum":1},"sourceLanguage":{"type":"string","maxLength":10,"description":"The language the legal text is written and reviewed in."},"languages":{"type":"array","minItems":1,"description":"Every language the version is offered in, the source language included. Arabic renders right to left.","items":{"type":"object","required":["language","required","translationStatus","approvalStatus"],"properties":{"language":{"type":"string","maxLength":10},"required":{"type":"boolean","description":"Publication waits for this language's approval."},"translationStatus":{"type":"string","enum":["notStarted","aiDrafted","inTranslation","inReview","complete"]},"translatorUserId":{"type":"string","format":"uuid","nullable":true},"reviewerUserId":{"type":"string","format":"uuid","nullable":true},"approvalStatus":{"type":"string","enum":["pending","approved","rejected"]},"lastUpdated":{"type":"string","format":"date-time","readOnly":true}}}},"branding":{"type":"object","properties":{"brandLogoAssetId":{"type":"string","format":"uuid","nullable":true},"venueLogoAssetId":{"type":"string","format":"uuid","nullable":true},"themeId":{"type":"string","nullable":true,"description":"The white-label theme it takes colours and typography from."},"header":{"$ref":"#/components/schemas/LocalisedText"},"footer":{"$ref":"#/components/schemas/LocalisedText"},"customerInstructions":{"$ref":"#/components/schemas/LocalisedText"},"confirmationMessage":{"$ref":"#/components/schemas/LocalisedText"},"supportEmail":{"type":"string","format":"email","nullable":true},"supportPhone":{"type":"string","maxLength":30,"nullable":true}}},"channels":{"type":"array","items":{"type":"string","enum":["b2cWeb","mobileApp","emailLink","qrLink","kiosk","posFrontDesk","groupPortal"]},"description":"Where the waiver is offered; every channel renders the same version and rules."},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005)."},"updatedAt":{"type":"string","format":"date-time","readOnly":true}}},
-"MessageChannel": {"type":"string","enum":["email","sms","whatsapp","push","inApp","post"]},
-"MessageTemplate": {"x-ticvai-persistence":"marketing.message_template","type":"object","required":["id","code","name","channel","bodies"],"properties":{"id":{"readOnly":true,"type":"string","format":"uuid"},"code":{"type":"string","maxLength":64},"name":{"type":"string","maxLength":200},"channel":{"$ref":"#/components/schemas/MessageChannel"},"subjects":{"type":"object","description":"Per language. Email only.","additionalProperties":{"type":"string"}},"bodies":{"type":"object","description":"Per language, keyed by ISO 639-1 code.","additionalProperties":{"type":"string"}},"mergeFields":{"type":"array","items":{"type":"string"}},"missingLanguages":{"type":"array","readOnly":true,"description":"Enabled languages without a body. Flagged rather than silently falling back — a guest receiving English when they chose Arabic is a defect.\n","items":{"type":"string"}},"providerTemplateId":{"type":"string","nullable":true,"description":"Required for WhatsApp, where templates are pre-approved by the provider."},"brandId":{"type":"string","format":"uuid","nullable":true,"description":"The brand whose identity the template carries; null for the tenant default."},"ownership":{"type":"string","enum":["platform","crm"],"default":"crm","description":"`platform` = a transactional template owned by the communication service; `crm` = a marketing template owned by CRM (`listSystemTransactionalTemplate`). Content by language and version is in `MessageTemplateVersion`. (decided 29 September, data model for the agreed operations)"}}},
-"Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}},
-"ReportResult": {"x-ticvai-persistence":"none — result set, cached in object storage","type":"object","required":["executionId","columns","rows"],"properties":{"executionId":{"type":"string"},"columns":{"type":"array","items":{"type":"object","properties":{"key":{"type":"string"},"label":{"type":"string"},"type":{"$ref":"#/components/schemas/FieldType"}}}},"rows":{"type":"array","description":"**Open on purpose; the shape is `columns`.** Each row is keyed by `columns[].key`, and each value is of that column's `type` — money as a `Money`, dates, date-times and uuids as strings. A report's columns are chosen at run time, so no fixed schema can name them.\n","items":{"type":"object","additionalProperties":true}},"totals":{"type":"object","additionalProperties":true,"description":"Aggregated columns only, keyed and typed as a row is."},"rowCount":{"type":"integer"},"nextCursor":{"type":"string","nullable":true},"generatedAt":{"type":"string","format":"date-time"},"dataAsOf":{"type":"string","format":"date-time","description":"Replica position the result was read at. Reporting reads a lag-tolerant replica, so this may trail the primary by seconds — stating it prevents an argument about a figure that moved.\n"}}},
-"RunReportRequest": {"x-ticvai-persistence":"none — request only","type":"object","properties":{"parameters":{"type":"object","additionalProperties":true,"description":"**Open on purpose; its shape is the report's.** Keyed by `ReportParameter.key` of the definition being run, each value of that parameter's `type`. An `isRequired` parameter with no value here and no `defaultValue` is the `400` `runReport` lists.\n"},"venueId":{"type":"string","format":"uuid","description":"Narrows to one venue. Omitting it returns everything the caller's scope permits — it cannot be used to reach beyond that.\n"},"dateFrom":{"type":"string","format":"date","description":"Defaults to today in the venue's time zone when not sent (decided 28 September, audit R158)."},"dateTo":{"type":"string","format":"date","description":"Defaults to today in the venue's time zone when not sent (audit R158)."},"forceAsync":{"type":"boolean","default":false,"description":"Queue regardless of size, for a result to be collected later."}}}
+"Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}}
 }
 ```

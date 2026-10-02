@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Marketing & CRM
   version: 0.1.0
-  x-ticvai-screen-count: 211
+  x-ticvai-screen-count: 229
   x-ticvai-tier: satellite
   x-ticvai-module: 22 — Marketing & CRM
   x-ticvai-requirements: 319
@@ -84,11 +84,14 @@ paths:
     get:
       operationId: listMyCases
       x-ticvai-consumed-by:
+        - "P01 WEB-025 Help Centre / FAQ"
         - "P01 WEB-034 Lost & Found"
         - "P02 GST-034 Lost & Found"
         - "P02 GST-040 Help & Support"
-        - "P08 BO-804 Case Command Center"
-        - "P08 BO-813 Case Analytics & Audit"
+        - "P02 GST-068 Help & My Cases"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       summary: The cases this guest raised
       description: '24 August. **No case operation was guest-callable** — `createCase`, `getCase` and
         `addCaseMessage` all carry staff permissions, so a guest could raise nothing and read nothing.
@@ -133,11 +136,13 @@ paths:
     post:
       operationId: raiseMyCase
       x-ticvai-consumed-by:
+        - "P01 WEB-025 Help Centre / FAQ"
+        - "P01 WEB-026 Survey & Feedback"
         - "P01 WEB-034 Lost & Found"
         - "P02 GST-034 Lost & Found"
         - "P02 GST-035 Feedback & Ratings"
         - "P02 GST-040 Help & Support"
-        - "P08 BO-938 Employee Requests & Resource Support"
+        - "P02 GST-068 Help & My Cases"
       security:
       - guestAuth: []
       summary: Report something — lost property, a complaint, a question
@@ -241,9 +246,14 @@ paths:
     post:
       operationId: replyToMyCase
       x-ticvai-consumed-by:
+        - "P01 WEB-025 Help Centre / FAQ"
         - "P01 WEB-034 Lost & Found"
         - "P02 GST-034 Lost & Found"
         - "P02 GST-040 Help & Support"
+        - "P02 GST-068 Help & My Cases"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       summary: Reply on a case the guest raised
       description: '**Threaded, so the guest sees what was said.** A support model where the venue can
         write and the guest cannot is an email address with extra steps.
@@ -296,7 +306,7 @@ paths:
     get:
       operationId: getGuestMatchPolicy
       x-ticvai-consumed-by:
-        - "P08 BO-746 Duplicate Review & Merge"
+        - "P08 BO-745 Identity Resolution Rules"
       summary: How returning guests are recognised at checkout
       tags:
       - guests
@@ -321,7 +331,7 @@ paths:
     put:
       operationId: setGuestMatchPolicy
       x-ticvai-consumed-by:
-        - "P08 BO-746 Duplicate Review & Merge"
+        - "P08 BO-745 Identity Resolution Rules"
       summary: Set how returning guests are recognised
       description: '**Design gap, 23 September.** The booking design matches a guest checking out without
         an account to an existing profile, by email, mobile or either, and asks them whether it is them.
@@ -714,8 +724,10 @@ paths:
       operationId: updateGuestPreferences
       x-ticvai-consumed-by:
         - "P01 WEB-020 Profile & Preferences"
-        - "P02 GST-066 Privacy & My Data"
         - "P08 BO-740 Family & Guardians"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       summary: The things a regular should not have to say twice
       description: 'Board 4G. **Table, drink, dietary needs, contact channel.** A guest who states an
         allergy on every visit is a guest the venue is not looking after.
@@ -764,8 +776,6 @@ paths:
   /invitation-campaigns:
     post:
       operationId: createInvitationCampaign
-      x-ticvai-consumed-by:
-        - "P08 BO-766 Campaign Builder"
       summary: A quota-bounded, addressed invitation
       description: 'BL-150 and CF-74''s issuance half. **A campaign broadcasts; an invitation is addressed
         and expects a response.**
@@ -815,6 +825,9 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-017 My Account Dashboard"
         - "P02 GST-072 Share & Group Booking"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       summary: Accept or decline
       description: '**The token is single-use.** An invitation link forwarded to a group chat is the failure
         mode, and a token that survives its first use ends up there.
@@ -916,6 +929,9 @@ paths:
   /forms:
     get:
       operationId: listForms
+      x-ticvai-consumed-by:
+        - "P08 BO-618 Accreditation Form Builder"
+        - "P08 BO-747 Consent Policy Configuration"
       summary: Waivers, surveys and capture forms
       description: 'The builder''s list. **The latest version of each form**; older versions stay readable
         through `getForm` with `version`.
@@ -964,9 +980,10 @@ paths:
       operationId: createForm
       x-ticvai-consumed-by:
         - "P08 BO-618 Accreditation Form Builder"
+        - "P08 BO-747 Consent Policy Configuration"
         - "P08 BO-815 Survey Builder"
-        - "P08 BO-817 NPS, CSAT & CES Configuration"
-        - "P08 BO-838 Content, Media & Forms"
+        - "P13 CMS-042 Waiver Template Library & Master Setup"
+        - "P13 CMS-043 Digital Waiver & Form Builder"
       summary: Define a waiver, survey or capture form
       description: 'CF-129. **One mechanism, three uses.** A waiver is this with a signature, a survey
         is this with a scale, a capture is this at the point of sale.
@@ -1013,6 +1030,13 @@ paths:
         format: uuid
     get:
       operationId: getForm
+      x-ticvai-consumed-by:
+        - "P01 WEB-026 Survey & Feedback"
+        - "P02 GST-035 Feedback & Ratings"
+        - "P08 BO-618 Accreditation Form Builder"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       summary: One form, to fill in or to edit
       description: '**What a guest reads before signing or answering, and what the builder loads.** Without
         it a survey screen had nothing to load.
@@ -1052,6 +1076,12 @@ paths:
   /form-submissions:
     post:
       operationId: submitForm
+      x-ticvai-consumed-by:
+        - "P01 WEB-026 Survey & Feedback"
+        - "P02 GST-035 Feedback & Ratings"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       summary: Sign a waiver, answer a survey, capture details
       description: '**Bound to the version accepted, not to the form.** A submission pointing at a form
         that has since changed is a submission proving nothing.
@@ -1105,8 +1135,10 @@ paths:
       operationId: getWaiverStatus
       x-ticvai-consumed-by:
         - "P01 WEB-024 Devices, Wishlist & Consent"
-        - "P02 GST-067 Refunds & Resale"
         - "P08 BO-852 Documents, Search & Retention"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       summary: Whether this guest may be issued a ticket that requires a waiver
       description: '2.15.9. **Ticket issuance is conditional on waiver acceptance**, which puts this in
         the purchase path rather than beside it — and means it must answer fast and offline.
@@ -1157,9 +1189,9 @@ paths:
     post:
       operationId: uploadGuestDocument
       x-ticvai-consumed-by:
-        - "P01 WEB-011 Guest Details & Attendee Forms"
-        - "P02 GST-066 Privacy & My Data"
-        - "P08 BO-743 AI Guest Intelligence"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       summary: Store a guest photo, ID or signed document
       description: 'BL-133. **Deliberately not `assets`.** A guest''s passport scan is not a marketing
         asset — it has a different retention clock, a different access rule and a different reason to
@@ -1205,7 +1237,6 @@ paths:
       operationId: createChallenge
       x-ticvai-consumed-by:
         - "P08 BO-825 Challenge Builder"
-        - "P08 BO-826 Achievement & Badge Engine"
         - "P08 BO-829 Family, Team & Event Challenges"
       summary: Define a challenge, mission or streak
       description: '22.6.1. **Gamification is not loyalty** — loyalty pays for spend, and a challenge
@@ -1243,13 +1274,151 @@ paths:
                 $ref: '#/components/schemas/Challenge'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+    get:
+      operationId: listChallenges
+      x-ticvai-consumed-by:
+        - "P08 BO-825 Challenge Builder"
+      x-ticvai-audience:
+      - staff
+      x-ticvai-read-routing: replica
+      x-ticvai-agreed: '2 October: contract gap CHG-WIR-007 (BO-825: no list or read of challenges, so a builder cannot
+        reopen a draft); shape follows listCookieScans'
+      summary: The venue's challenges
+      description: 'Every challenge of the venue, drafts included (contract gap logged in CHG-WIR-007 for BO-825;
+        CHG-CSA-045). Ordered by `status`, then `name`, then `id`.
+
+        '
+      tags:
+      - marketing
+      x-ticvai-permission: MARKETING_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - name: status
+        in: query
+        schema:
+          type: string
+          enum:
+          - draft
+          - active
+          - paused
+          - ended
+          - archived
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: Challenges
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/Challenge'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /challenges/{challengeId}:
+    parameters:
+    - name: challengeId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    get:
+      operationId: getChallenge
+      x-ticvai-consumed-by:
+        - "P08 BO-825 Challenge Builder"
+      x-ticvai-audience:
+      - staff
+      x-ticvai-read-routing: replica
+      x-ticvai-agreed: '2 October: contract gap CHG-WIR-007 (BO-825); shape follows createChallenge'
+      summary: One challenge
+      description: 'The challenge as stored, so the builder can reopen a draft (CHG-CSA-045).
+
+        '
+      tags:
+      - marketing
+      x-ticvai-permission: MARKETING_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: The challenge
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Challenge'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /challenges/{challengeId}/activate:
+    parameters:
+    - name: challengeId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: activateChallenge
+      x-ticvai-consumed-by:
+        - "P08 BO-825 Challenge Builder"
+      x-ticvai-audience:
+      - staff
+      x-ticvai-agreed: '2 October: contract gap CHG-WIR-007 (BO-825: no activate step); shape follows createChallenge'
+      summary: Publish a draft challenge to guests
+      description: '**Draft to active** (contract gap logged in CHG-WIR-007 for BO-825; CHG-CSA-045;
+        states/challenge.yaml). Only a `draft` challenge is activated; any other status is refused 409
+        `challenge-not-draft`. Launching a challenge to guests is a send-like act, so it takes `MARKETING_SEND`.
+
+        '
+      tags:
+      - marketing
+      x-ticvai-permission: MARKETING_SEND
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Active
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Challenge'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '409':
+          description: The challenge is not a draft (`challenge-not-draft`).
+          x-ticvai-problem-types:
+          - challenge-not-draft
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /guests/me/challenges:
     get:
       operationId: getMyChallenges
       x-ticvai-consumed-by:
         - "P01 WEB-017 My Account Dashboard"
-        - "P02 GST-072 Share & Group Booking"
-        - "P08 BO-824 Gamification Command Center"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       summary: Active challenges and how far along I am
       description: '22.6.14 and 22.6.15. **Progress is shown, not just the outcome.** A guest two visits
         from a reward behaves differently from one who does not know how close they are — **which is the
@@ -1294,6 +1463,8 @@ paths:
   /seo-metadata:
     get:
       operationId: getSeoMetadata
+      x-ticvai-consumed-by:
+        - "P13 CMS-013 SEO & Metadata"
       summary: The metadata in force for one page
       description: '**The read `setSeoMetadata` had none of**, so the editor could not show what was there
         before replacing it.
@@ -1391,6 +1562,7 @@ paths:
       operationId: createUrlRedirect
       x-ticvai-consumed-by:
         - "P08 BO-842 SEO Management"
+        - "P13 CMS-013 SEO & Metadata"
       summary: 301, 302 and custom redirects
       description: '22.11.7. **A redirect chain is the failure mode.** A to B to C loses ranking at every
         hop, so a new redirect whose target is itself a redirect is **collapsed rather than appended.**
@@ -1429,6 +1601,9 @@ paths:
       operationId: listLostItems
       x-ticvai-consumed-by:
         - "P08 BO-073 Lost & Found Register"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       summary: Reported and found items
       description: 'BL-021. **The match is the capability.** A guest reports a lost phone and a cleaner
         hands one in — without both sides modelled, somebody searches a case list by hand.
@@ -1470,7 +1645,12 @@ paths:
     post:
       operationId: recordLostItem
       x-ticvai-consumed-by:
+        - "P01 WEB-034 Lost & Found"
+        - "P02 GST-034 Lost & Found"
         - "P08 BO-073 Lost & Found Register"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       summary: Report something lost, or hand something in
       description: '**One operation for both sides**, distinguished by `kind`. A guest reports; a cleaner
         hands in. **Modelling them separately would mean matching across two shapes**, which is how a
@@ -1517,6 +1697,8 @@ paths:
         format: uuid
     get:
       operationId: getLostItemMatches
+      x-ticvai-consumed-by:
+        - "P08 BO-073 Lost & Found Register"
       summary: Candidate matches, scored
       description: '**The point of the module.** Generic case management holds a conversation about a
         lost bag and cannot tell you the bag handed in on Tuesday is the one asked about on Monday.
@@ -1550,8 +1732,11 @@ paths:
       operationId: createReferral
       x-ticvai-consumed-by:
         - "P01 WEB-043 Loyalty & Rewards"
-        - "P02 GST-072 Share & Group Booking"
+        - "P02 GST-036 Loyalty & Rewards"
         - "P08 BO-830 Referral & Streak Management"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       summary: Issue a referral code
       description: 'BL-034. **The reward fires on the referee''s qualifying act, not on the sign-up**
         — a referral that pays on registration pays for accounts rather than for guests.
@@ -1706,8 +1891,6 @@ paths:
   /attribution/touches:
     post:
       operationId: recordTouchPoint
-      x-ticvai-consumed-by:
-        - "P08 BO-773 Attribution & Audit"
       summary: Record a marketing touch
       description: '22.14.17, BL-177. **The platform records touches and does not pick an attribution
         model.**
@@ -1751,8 +1934,8 @@ paths:
       operationId: listJourneys
       x-ticvai-consumed-by:
         - "P08 BO-120 Omnichannel Commerce & Journey Configuration"
-        - "P08 BO-223 Journey Simulation, Audit & Publication"
         - "P08 BO-774 Journey Automation Center"
+        - "P08 BO-777 Decision Logic & Timing"
         - "P08 BO-780 Guest Engagement Journeys"
         - "P08 BO-782 AI Journey Optimization"
         - "P08 BO-783 Journey Analytics & Audit"
@@ -1903,7 +2086,9 @@ paths:
     get:
       operationId: getJourneyPerformance
       x-ticvai-consumed-by:
+        - "P08 BO-774 Journey Automation Center"
         - "P08 BO-781 Cross-Sell & Service Recovery"
+        - "P08 BO-783 Journey Analytics & Audit"
       summary: Entrants, completions, goals reached
       description: '**The goal rate is the number that matters, not the open rate.** An abandoned-cart
         journey with a 60% open rate and a 2% purchase rate is a journey annoying people.
@@ -2014,6 +2199,66 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /message-dispatches:
+    get:
+      operationId: listMessageDispatches
+      x-ticvai-audience:
+      - staff
+      x-ticvai-read-routing: replica
+      x-ticvai-agreed: '2 October: contract gap CHG-WIR-004 (BO-023, F09 step 5: confirm the guests of a cancelled
+        performance were notified; no list of dispatches existed); shape follows listCookieScans'
+      summary: Messages sent, and whether they arrived
+      description: '**What was sent to whom, and what became of it** (contract gap logged in CHG-WIR-004 for BO-023;
+        CHG-CSA-045). F09 step 5 confirms that the guests of a cancelled performance were notified: filter by
+        `sourceRef` (the performance, order or other record whose business event triggered the message) and read
+        the delivered, failed and suppressed counts with each dispatch. Ordered by `queuedAt` descending, then `id`.
+        Guest contact details are not returned; `subjectId` is.
+
+        '
+      tags:
+      - marketing
+      x-ticvai-permission: MARKETING_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - name: sourceRef
+        in: query
+        description: The id of the record whose business event triggered the messages, e.g. a performance id.
+        schema:
+          type: string
+      - name: campaignId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: status
+        in: query
+        schema:
+          type: string
+      - name: from
+        in: query
+        schema:
+          type: string
+          format: date-time
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: Dispatches
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/MessageDispatch'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /message-dispatches/{dispatchId}/retry:
@@ -2156,6 +2401,11 @@ paths:
   /guests/me/profile:
     get:
       operationId: getMyProfile
+      x-ticvai-consumed-by:
+        - "P01 WEB-011 Guest Details & Attendee Forms"
+        - "P01 WEB-020 Profile & Preferences"
+        - "P02 GST-001 Home"
+        - "P02 GST-039 Profile"
       security:
       - guestAuth: []
       summary: A guest reading their own details
@@ -2348,9 +2598,13 @@ paths:
       operationId: redeemLoyaltyPoints
       x-ticvai-consumed-by:
         - "P01 WEB-043 Loyalty & Rewards"
+        - "P02 GST-036 Loyalty & Rewards"
         - "P02 GST-071 Payment Methods"
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-005 Payment"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       summary: Spend points
       description: 'BL-018. **A guest could see a balance and not spend it, and there was no rewards catalogue**
         — points that accrue and never redeem are a liability with no exit.
@@ -2530,9 +2784,13 @@ paths:
       operationId: sendConversationMessage
       x-ticvai-consumed-by:
         - "P01 WEB-044 AI Concierge – Home"
+        - "P02 GST-031 AI Concierge – Home"
         - "P02 GST-032 AI Concierge – Chat"
         - "P08 BO-799 Agent Workspace"
         - "P12 SUP-005 Live Chat Workspace"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-audience:
       - staff
       - guest
@@ -2607,8 +2865,11 @@ paths:
         - "P01 WEB-044 AI Concierge – Home"
         - "P02 GST-031 AI Concierge – Home"
         - "P02 GST-032 AI Concierge – Chat"
+        - "P02 GST-033 AI Concierge – Contextual Help"
         - "P05 KSK-015 Assistant"
-        - "P08 BO-799 Agent Workspace"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-audience:
       - guest
       summary: Pass an assistant conversation to a person
@@ -2700,6 +2961,7 @@ paths:
       operationId: claimConversation
       x-ticvai-consumed-by:
         - "P08 BO-795 Unified Inbox"
+        - "P08 BO-799 Agent Workspace"
         - "P12 SUP-004 Conversation Queue"
       x-ticvai-audience:
       - staff
@@ -3020,10 +3282,12 @@ paths:
     get:
       operationId: getLoyaltyPosition
       x-ticvai-consumed-by:
+        - "P01 WEB-017 My Account Dashboard"
         - "P01 WEB-043 Loyalty & Rewards"
         - "P02 GST-036 Loyalty & Rewards"
-        - "P04 POS-002 Sell — Ticket Catalogue"
-        - "P08 BO-831 Progress, Leaderboards & Hub"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-audience:
       - guest
       summary: A guest's points, tier and what is within reach
@@ -3100,6 +3364,9 @@ paths:
   /loyalty/leaderboard:
     get:
       operationId: listLeaderboard
+      x-ticvai-consumed-by:
+        - "P01 WEB-043 Loyalty & Rewards"
+        - "P02 GST-036 Loyalty & Rewards"
       x-ticvai-audience:
       - guest
       summary: Standings, by nickname
@@ -3165,6 +3432,9 @@ paths:
   /loyalty/leaderboard-nickname:
     put:
       operationId: setLeaderboardNickname
+      x-ticvai-consumed-by:
+        - "P01 WEB-043 Loyalty & Rewards"
+        - "P02 GST-036 Loyalty & Rewards"
       x-ticvai-audience:
       - guest
       summary: Choose the name shown on the board
@@ -3220,6 +3490,7 @@ paths:
       operationId: searchGuests
       x-ticvai-consumed-by:
         - "P04 POS-027 Guest Lookup"
+        - "P04 POS-030 Sales Journal"
         - "P08 BO-734 CRM Command Center"
         - "P08 BO-735 Guest Directory"
       x-ticvai-audience:
@@ -3292,14 +3563,15 @@ paths:
     get:
       operationId: getGuestProfile
       x-ticvai-consumed-by:
-        - "P01 WEB-011 Guest Details & Attendee Forms"
-        - "P01 WEB-020 Profile & Preferences"
-        - "P02 GST-001 Home"
         - "P06 EMP-057 Guest Profile & Dining History"
+        - "P08 ADM-680 Customer Recommendation Profile"
         - "P08 BO-735 Guest Directory"
+        - "P08 BO-737 Customer 360 Profile"
         - "P08 BO-738 Activity Timeline"
         - "P08 BO-740 Family & Guardians"
-        - "P09 ADM-680 Customer Recommendation Profile"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-audience:
       - staff
       - guest
@@ -3457,9 +3729,17 @@ paths:
     get:
       operationId: getGuestConsents
       x-ticvai-consumed-by:
+        - "P01 WEB-020 Profile & Preferences"
         - "P01 WEB-024 Devices, Wishlist & Consent"
+        - "P01 WEB-027 Newsletter Subscription"
+        - "P02 GST-039 Profile"
+        - "P02 GST-065 Newsletter & Preferences"
         - "P02 GST-066 Privacy & My Data"
+        - "P08 BO-737 Customer 360 Profile"
         - "P08 BO-749 Guest Preference Center"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-audience:
       - staff
       - guest
@@ -3490,16 +3770,17 @@ paths:
     post:
       operationId: recordConsent
       x-ticvai-consumed-by:
-        - "P01 WEB-011 Guest Details & Attendee Forms"
-        - "P01 WEB-017 My Account Dashboard"
         - "P01 WEB-020 Profile & Preferences"
         - "P01 WEB-024 Devices, Wishlist & Consent"
         - "P01 WEB-027 Newsletter Subscription"
         - "P02 GST-039 Profile"
         - "P02 GST-065 Newsletter & Preferences"
+        - "P02 GST-066 Privacy & My Data"
+        - "P04 POS-027 Guest Lookup"
         - "P08 BO-748 Consent Capture & Versions"
       x-ticvai-audience:
       - guest
+      - staff
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -3513,7 +3794,9 @@ paths:
         **Two callers, two rules.** A guest recording their own consent uses a guest token and may only
         act on their own subject. An agent recording on a guest''s behalf uses a staff token, requires
         `GUEST_MANAGE`, and the resulting record names them in `recordedByPrincipalId` — consent captured
-        by proxy has to be attributable.
+        by proxy has to be attributable. **The staff audience is declared** (contract gap CHG-WIR-007, POS-027;
+        CHG-CSA-045): the till records the consent of a guest enrolled at the counter with source
+        `agentRecorded`. Creating the guest''s profile at the till is identity''s (`registerGuest`, spine).
 
         '
       tags:
@@ -3580,8 +3863,13 @@ paths:
 
 
         **Idempotent on order id + channel + purpose**: a redelivered `order.created` finds the records already
-        written and returns them. Invoked by the event relay, never by a screen. Whether a guest-checkout
-        opt-in is sufficient consent is the client''s to confirm (make-or-break on `checkoutCart`).
+        written and returns them. Invoked by the event relay, never by a screen.
+
+
+        **Decided: the ticked checkout opt-in is the marketing consent, and nothing is sent without it**
+        (Chinmay, 2 October, from WEB-011: workbook Q23, Q275, Q276 and Q282; CHG-CSA-025). A guest who checked out
+        without an account receives marketing only where this recorded a `granted` opt-in with source `checkout`;
+        segment eligibility and campaign sends exclude every guest-checkout buyer without one.
 
         '
       tags:
@@ -3707,9 +3995,19 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-011 Guest Details & Attendee Forms"
         - "P01 WEB-020 Profile & Preferences"
+        - "P01 WEB-024 Devices, Wishlist & Consent"
+        - "P01 WEB-027 Newsletter Subscription"
+        - "P02 GST-039 Profile"
         - "P02 GST-065 Newsletter & Preferences"
+        - "P02 GST-066 Privacy & My Data"
         - "P08 BO-747 Consent Policy Configuration"
         - "P13 CMS-018 Consent & Legal"
+      # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
+      # or staff token is still accepted. `{}` makes the credential optional.
+      security:
+      - {}
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-audience:
       - staff
       - guest
@@ -3893,10 +4191,8 @@ paths:
       operationId: getWishlist
       x-ticvai-consumed-by:
         - "P01 WEB-009 Wishlist"
-        - "P01 WEB-011 Guest Details & Attendee Forms"
         - "P01 WEB-017 My Account Dashboard"
         - "P01 WEB-024 Devices, Wishlist & Consent"
-        - "P01 WEB-027 Newsletter Subscription"
         - "P02 GST-020 Saved Items / Wishlist"
       x-ticvai-audience:
       - guest
@@ -3942,10 +4238,6 @@ paths:
       operationId: addToWishlist
       x-ticvai-consumed-by:
         - "P01 WEB-009 Wishlist"
-        - "P01 WEB-011 Guest Details & Attendee Forms"
-        - "P01 WEB-017 My Account Dashboard"
-        - "P01 WEB-024 Devices, Wishlist & Consent"
-        - "P01 WEB-027 Newsletter Subscription"
         - "P02 GST-020 Saved Items / Wishlist"
       x-ticvai-audience:
       - guest
@@ -4032,10 +4324,6 @@ paths:
       operationId: removeFromWishlist
       x-ticvai-consumed-by:
         - "P01 WEB-009 Wishlist"
-        - "P01 WEB-011 Guest Details & Attendee Forms"
-        - "P01 WEB-017 My Account Dashboard"
-        - "P01 WEB-024 Devices, Wishlist & Consent"
-        - "P01 WEB-027 Newsletter Subscription"
         - "P02 GST-020 Saved Items / Wishlist"
       x-ticvai-audience:
       - guest
@@ -4079,10 +4367,7 @@ paths:
     get:
       operationId: listGuestDevices
       x-ticvai-consumed-by:
-        - "P01 WEB-011 Guest Details & Attendee Forms"
-        - "P01 WEB-017 My Account Dashboard"
         - "P01 WEB-024 Devices, Wishlist & Consent"
-        - "P01 WEB-027 Newsletter Subscription"
         - "P02 GST-073 Security & Sign-in"
       x-ticvai-audience:
       - guest
@@ -4132,10 +4417,6 @@ paths:
     post:
       operationId: registerGuestDevice
       x-ticvai-consumed-by:
-        - "P01 WEB-011 Guest Details & Attendee Forms"
-        - "P01 WEB-017 My Account Dashboard"
-        - "P01 WEB-024 Devices, Wishlist & Consent"
-        - "P01 WEB-027 Newsletter Subscription"
         - "P02 GST-073 Security & Sign-in"
       x-ticvai-audience:
       - guest
@@ -4222,10 +4503,7 @@ paths:
     delete:
       operationId: revokeGuestDevice
       x-ticvai-consumed-by:
-        - "P01 WEB-011 Guest Details & Attendee Forms"
-        - "P01 WEB-017 My Account Dashboard"
         - "P01 WEB-024 Devices, Wishlist & Consent"
-        - "P01 WEB-027 Newsletter Subscription"
         - "P02 GST-073 Security & Sign-in"
       x-ticvai-audience:
       - guest
@@ -4271,7 +4549,8 @@ paths:
         - "P08 BO-121 Personalized Offers & Guest Engagement"
         - "P08 BO-734 CRM Command Center"
         - "P08 BO-754 Audience Intelligence"
-        - "P08 BO-768 Multichannel Composer"
+        - "P08 BO-755 Dynamic Segment Builder"
+        - "P08 BO-757 Behavioral Segmentation"
         - "P16 ANL-007 Guest & Conversion Intelligence"
       x-ticvai-audience:
       - staff
@@ -4358,6 +4637,48 @@ paths:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /segments/preview:
+    post:
+      operationId: previewSegmentDraft
+      x-ticvai-consumed-by:
+        - "P08 BO-755 Dynamic Segment Builder"
+      x-ticvai-audience:
+      - staff
+      x-ticvai-agreed: '2 October: contract gap CHG-WIR-007 (BO-755: previewSegment works only on a saved segment, the
+        builder needs a live count while editing); shape follows previewSegment'
+      summary: Estimate an unsaved segment's size and reachability
+      description: '**The live count while the segment is being built** (contract gap logged in CHG-WIR-007 for BO-755;
+        CHG-CSA-045). The same evaluation as `previewSegment`, on a definition that is not saved: the matching count
+        and the reachable count per channel after consent and suppression. Writes nothing.
+
+        '
+      tags:
+      - segment
+      x-ticvai-permission: MARKETING_VIEW
+      x-ticvai-idempotency-exempt: A computation that writes nothing; a replay returns the same counts and duplicates no row.
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSegmentRequest'
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Preview
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SegmentDraftPreview'
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /segments/{segmentId}/preview:
     parameters:
     - name: segmentId
@@ -4369,7 +4690,9 @@ paths:
     post:
       operationId: previewSegment
       x-ticvai-consumed-by:
-        - "P08 BO-755 Dynamic Segment Builder"
+        - "P08 BO-757 Behavioral Segmentation"
+        - "P08 BO-758 Membership & Loyalty Segments"
+        - "P08 BO-760 Revenue & Engagement Segments"
         - "P08 BO-762 Predictive Audiences"
         - "P16 ANL-007 Guest & Conversion Intelligence"
       x-ticvai-audience:
@@ -4444,7 +4767,6 @@ paths:
     get:
       operationId: listCampaigns
       x-ticvai-consumed-by:
-        - "P08 BO-005 Queue Monitor"
         - "P08 BO-107 Guests & Marketing"
         - "P08 BO-118 Campaign & Audience Management"
         - "P08 BO-764 Campaign Command Center"
@@ -4485,10 +4807,10 @@ paths:
     post:
       operationId: createCampaign
       x-ticvai-consumed-by:
-        - "P08 BO-005 Queue Monitor"
         - "P08 BO-107 Guests & Marketing"
         - "P08 BO-118 Campaign & Audience Management"
         - "P08 BO-121 Personalized Offers & Guest Engagement"
+        - "P08 BO-766 Campaign Builder"
         - "P08 BO-767 Audience & Offer Selection"
       x-ticvai-audience:
       - staff
@@ -4536,7 +4858,6 @@ paths:
     get:
       operationId: getCampaign
       x-ticvai-consumed-by:
-        - "P08 BO-005 Queue Monitor"
         - "P08 BO-771 Budget, Goals & Forecast"
       x-ticvai-audience:
       - staff
@@ -4562,7 +4883,6 @@ paths:
     patch:
       operationId: updateCampaign
       x-ticvai-consumed-by:
-        - "P08 BO-005 Queue Monitor"
         - "P08 BO-767 Audience & Offer Selection"
         - "P08 BO-768 Multichannel Composer"
         - "P08 BO-769 Schedule & Trigger Rules"
@@ -4638,7 +4958,7 @@ paths:
     post:
       operationId: testSendCampaign
       x-ticvai-consumed-by:
-        - "P08 BO-005 Queue Monitor"
+        - "P08 BO-766 Campaign Builder"
       x-ticvai-audience:
       - staff
       summary: Send a test to named recipients
@@ -4704,7 +5024,7 @@ paths:
     post:
       operationId: launchCampaign
       x-ticvai-consumed-by:
-        - "P08 BO-005 Queue Monitor"
+        - "P08 BO-766 Campaign Builder"
       x-ticvai-audience:
       - staff
       summary: Launch or schedule a campaign
@@ -4783,8 +5103,6 @@ paths:
         format: uuid
     post:
       operationId: pauseCampaign
-      x-ticvai-consumed-by:
-        - "P08 BO-005 Queue Monitor"
       x-ticvai-audience:
       - staff
       summary: Pause a campaign mid-send
@@ -4842,8 +5160,6 @@ paths:
         format: uuid
     post:
       operationId: unscheduleCampaign
-      x-ticvai-consumed-by:
-        - "P08 BO-005 Queue Monitor"
       x-ticvai-audience:
       - staff
       summary: Pull a scheduled campaign before it sends
@@ -4888,8 +5204,6 @@ paths:
         format: uuid
     post:
       operationId: stopCampaign
-      x-ticvai-consumed-by:
-        - "P08 BO-005 Queue Monitor"
       x-ticvai-audience:
       - staff
       summary: Stop a campaign mid-send
@@ -4950,7 +5264,6 @@ paths:
     get:
       operationId: getCampaignPerformance
       x-ticvai-consumed-by:
-        - "P08 BO-005 Queue Monitor"
         - "P08 BO-772 A/B & AI Optimization"
         - "P08 BO-773 Attribution & Audit"
       x-ticvai-audience:
@@ -4985,7 +5298,7 @@ paths:
     get:
       operationId: listMessageTemplates
       x-ticvai-consumed-by:
-        - "P08 BO-677 Communication Template Library"
+        - "P08 BO-768 Multichannel Composer"
         - "P08 BO-769 Schedule & Trigger Rules"
         - "P08 BO-785 Template Library"
         - "P12 SUP-007 Canned Response Management"
@@ -5074,9 +5387,6 @@ paths:
     post:
       operationId: sendTransactionalMessage
       x-ticvai-consumed-by:
-        - "P06 EMP-088 Overdue Rental Management"
-        - "P08 BO-561 Overdue Rental Management"
-        - "P08 BO-679 Manual & Bulk Communication Center"
         - "P10 PTR-004 Notifications"
       x-ticvai-api-scope: marketing.write
       x-ticvai-audience:
@@ -5191,8 +5501,6 @@ paths:
     get:
       operationId: listCases
       x-ticvai-consumed-by:
-        - "P01 WEB-025 Help Centre / FAQ"
-        - "P02 GST-068 Help & My Cases"
         - "P06 EMP-028 Lost & found"
         - "P06 EMP-029 Guest assistance"
         - "P08 BO-804 Case Command Center"
@@ -5200,8 +5508,10 @@ paths:
         - "P08 BO-813 Case Analytics & Audit"
         - "P10 PTR-021 Support & Contact"
         - "P12 SUP-002 Agent Dashboard"
-        - "P12 SUP-004 Conversation Queue"
         - "P12 SUP-005 Live Chat Workspace"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-api-scope: marketing.read
       x-ticvai-audience:
       - staff
@@ -5262,15 +5572,16 @@ paths:
     post:
       operationId: createCase
       x-ticvai-consumed-by:
-        - "P01 WEB-025 Help Centre / FAQ"
-        - "P02 GST-068 Help & My Cases"
         - "P06 EMP-028 Lost & found"
         - "P06 EMP-029 Guest assistance"
         - "P08 BO-806 Case Creation"
         - "P10 PTR-021 Support & Contact"
         - "P12 SUP-002 Agent Dashboard"
-        - "P12 SUP-004 Conversation Queue"
         - "P12 SUP-005 Live Chat Workspace"
+        - "P12 SUP-012 Case Creation, Classification & Intelligent Routing"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-api-scope: marketing.write
       x-ticvai-audience:
       - staff
@@ -5329,8 +5640,8 @@ paths:
         - "P08 BO-811 Case Workspace"
         - "P10 PTR-021 Support & Contact"
         - "P12 SUP-002 Agent Dashboard"
-        - "P12 SUP-004 Conversation Queue"
         - "P12 SUP-005 Live Chat Workspace"
+        - "P12 SUP-013 Case Investigation & Resolution Workspace"
       x-ticvai-api-scope: marketing.read
       x-ticvai-audience:
       - staff
@@ -5359,11 +5670,13 @@ paths:
       x-ticvai-consumed-by:
         - "P06 EMP-028 Lost & found"
         - "P06 EMP-029 Guest assistance"
+        - "P08 BO-808 Assignment & Workload"
         - "P08 BO-811 Case Workspace"
-        - "P10 PTR-021 Support & Contact"
         - "P12 SUP-002 Agent Dashboard"
-        - "P12 SUP-004 Conversation Queue"
         - "P12 SUP-005 Live Chat Workspace"
+        - "P12 SUP-013 Case Investigation & Resolution Workspace"
+        - "P12 SUP-017 Case Resolution, Closure & Customer Feedback"
+        - "P12 SUP-023 Agent Workload, Availability & Workforce Control"
       x-ticvai-api-scope: marketing.write
       x-ticvai-audience:
       - staff
@@ -5432,8 +5745,8 @@ paths:
         - "P08 BO-811 Case Workspace"
         - "P10 PTR-021 Support & Contact"
         - "P12 SUP-002 Agent Dashboard"
-        - "P12 SUP-004 Conversation Queue"
         - "P12 SUP-005 Live Chat Workspace"
+        - "P12 SUP-013 Case Investigation & Resolution Workspace"
       x-ticvai-api-scope: marketing.write
       x-ticvai-audience:
       - staff
@@ -5508,7 +5821,6 @@ paths:
         - "P06 EMP-029 Guest assistance"
         - "P10 PTR-021 Support & Contact"
         - "P12 SUP-002 Agent Dashboard"
-        - "P12 SUP-004 Conversation Queue"
         - "P12 SUP-005 Live Chat Workspace"
       x-ticvai-api-scope: marketing.write
       x-ticvai-audience:
@@ -5574,9 +5886,7 @@ paths:
         - "P06 EMP-028 Lost & found"
         - "P06 EMP-029 Guest assistance"
         - "P08 BO-802 Sentiment, Quality & Escalation"
-        - "P10 PTR-021 Support & Contact"
         - "P12 SUP-002 Agent Dashboard"
-        - "P12 SUP-004 Conversation Queue"
         - "P12 SUP-005 Live Chat Workspace"
       x-ticvai-api-scope: marketing.write
       x-ticvai-audience:
@@ -5628,6 +5938,12 @@ paths:
         - "P01 WEB-043 Loyalty & Rewards"
         - "P02 GST-036 Loyalty & Rewards"
         - "P08 BO-833 Gamification Analytics & Audit"
+      # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
+      # or staff token is still accepted. `{}` makes the credential optional.
+      security:
+      - {}
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-audience:
       - staff
       - guest
@@ -5661,7 +5977,6 @@ paths:
     post:
       operationId: createLoyaltyProgramme
       x-ticvai-consumed-by:
-        - "P08 BO-827 Points & Activity Rules"
         - "P08 BO-828 Milestones & Reward Rules"
       x-ticvai-audience:
       - staff
@@ -5711,7 +6026,11 @@ paths:
     get:
       operationId: getGuestLoyalty
       x-ticvai-consumed-by:
+        - "P04 POS-002 Sell — Ticket Catalogue"
+        - "P04 POS-027 Guest Lookup"
         - "P08 BO-735 Guest Directory"
+        - "P08 BO-737 Customer 360 Profile"
+        - "P08 BO-831 Progress, Leaderboards & Hub"
       x-ticvai-audience:
       - staff
       - service
@@ -5958,7 +6277,9 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-027 Newsletter Subscription"
         - "P02 GST-065 Newsletter & Preferences"
-        - "P08 BO-788 Subscriptions & Preferences"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-audience:
       - guest
       summary: What this guest has opted into
@@ -5991,7 +6312,9 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-027 Newsletter Subscription"
         - "P02 GST-065 Newsletter & Preferences"
-        - "P08 BO-788 Subscriptions & Preferences"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-audience:
       - guest
       summary: Subscribe or unsubscribe
@@ -6033,8 +6356,8 @@ paths:
     get:
       operationId: listCommunicationService
       x-ticvai-consumed-by:
+        - "P08 ADM-038 Communication Service Command Center"
         - "P08 BO-784 Communications Center"
-        - "P09 ADM-038 Communication Service Command Center"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: MoM 31 Aug §4.6; pack ''Communication & Notification Platform Services'' pp.4-5'
@@ -6092,7 +6415,7 @@ paths:
     put:
       operationId: setChannelProvider
       x-ticvai-consumed-by:
-        - "P09 ADM-039 Channel & Provider Configuration"
+        - "P08 ADM-039 Channel & Provider Configuration"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: MoM 31 Aug §4.6; pack ''Communication & Notification Platform Services'' pp.6-7'
@@ -6151,7 +6474,7 @@ paths:
     put:
       operationId: setSenderIdentityDomain
       x-ticvai-consumed-by:
-        - "P09 ADM-040 Sender Identity, Domain & Brand Configuration"
+        - "P08 ADM-040 Sender Identity, Domain & Brand Configuration"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: MoM 31 Aug §4.6; pack ''Communication & Notification Platform Services'' pp.7-9'
@@ -6210,8 +6533,8 @@ paths:
     get:
       operationId: listSystemTransactionalTemplate
       x-ticvai-consumed-by:
+        - "P08 ADM-041 System Transactional Template Registry"
         - "P08 BO-789 Transactional Notification Rules"
-        - "P09 ADM-041 System Transactional Template Registry"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: MoM 31 Aug §4.6; pack ''Communication & Notification Platform Services'' pp.9-10'
@@ -6312,7 +6635,7 @@ paths:
     get:
       operationId: listBusinessEventNotification
       x-ticvai-consumed-by:
-        - "P09 ADM-042 Business Event & Notification Trigger Mapping"
+        - "P08 ADM-042 Business Event & Notification Trigger Mapping"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: MoM 31 Aug §4.6; pack ''Communication & Notification Platform Services'' pp.11-13'
@@ -6442,8 +6765,8 @@ paths:
     get:
       operationId: listRoutingPriorityThrottling
       x-ticvai-consumed-by:
+        - "P08 ADM-043 Routing, Priority, Throttling & Fallback Rules"
         - "P08 BO-790 Scheduling, Priority & Approval"
-        - "P09 ADM-043 Routing, Priority, Throttling & Fallback Rules"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: MoM 31 Aug §4.6; pack ''Communication & Notification Platform Services'' pp.13-14'
@@ -6568,7 +6891,7 @@ paths:
     get:
       operationId: listConsentPreferenceCommunication
       x-ticvai-consumed-by:
-        - "P09 ADM-044 Consent, Preference & Communication Policy Enforcement"
+        - "P08 ADM-044 Consent, Preference & Communication Policy Enforcement"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: MoM 31 Aug §4.6; MoM 20 Aug §4.3; pack ''Communication & Notification Platform Services'' pp.14-16'
@@ -6658,8 +6981,8 @@ paths:
     get:
       operationId: listDeliveryQueueFailure
       x-ticvai-consumed-by:
+        - "P08 ADM-045 Delivery Queue, Failure & Retry Management"
         - "P08 BO-791 Delivery, Retry & Failover"
-        - "P09 ADM-045 Delivery Queue, Failure & Retry Management"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: MoM 31 Aug §4.6; pack ''Communication & Notification Platform Services'' pp.16-18'
@@ -6817,8 +7140,8 @@ paths:
     get:
       operationId: listProviderHealthUsage
       x-ticvai-consumed-by:
+        - "P08 ADM-046 Provider Health, Usage & Cost Monitoring"
         - "P08 BO-792 Deliverability & Analytics"
-        - "P09 ADM-046 Provider Health, Usage & Cost Monitoring"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: MoM 31 Aug §4.6; pack ''Communication & Notification Platform Services'' pp.18-19'
@@ -6940,7 +7263,7 @@ paths:
     get:
       operationId: listDeliveryCommunicationPlatform
       x-ticvai-consumed-by:
-        - "P09 ADM-047 AI Delivery Optimization & Communication Platform Diagnostics"
+        - "P08 ADM-047 AI Delivery Optimization & Communication Platform Diagnostics"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: MoM 31 Aug §4.6; pack ''Communication & Notification Platform Services'' pp.19-21'
@@ -7180,6 +7503,8 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setDataProcessingPurpose
+      x-ticvai-consumed-by:
+        - "P13 CMS-022 Data Processing Purpose & Lawful Basis Registry"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Privacy__Consent___Preference_Management_Reference.pdf'' pp.5-6 (17.1.2 Configuration Fields); the registry needs its write'
@@ -8028,7 +8353,6 @@ paths:
     get:
       operationId: listCustomerPrivacyConsent
       x-ticvai-consumed-by:
-        - "P13 CMS-021 Privacy & Consent Configuration Command Center"
         - "P13 CMS-032 Customer Privacy, Consent & Preference 360°"
       x-ticvai-audience:
         - staff
@@ -8296,6 +8620,8 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setPrivacyRequest
+      x-ticvai-consumed-by:
+        - "P08 BO-750 Data Subject Requests"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: MoM 20 Aug §4.3; pack ''Privacy__Consent___Preference_Management_Reference.pdf'' pp.26-27 (17.2.4 Case Information, Workflow, Identity Verification); ADR-0047 §7 (a request that arrives by phone or email has no operation)'
@@ -8619,6 +8945,8 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setLegalHold
+      x-ticvai-consumed-by:
+        - "P13 CMS-037 Data Retention, Expiry & Legal Hold Operations"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Privacy__Consent___Preference_Management_Reference.pdf'' p.31 (17.2.7 Legal / Operational Hold, Place Hold, Release Hold); ADR-0047 §6 (a hold may have to be applied before erasure); DataRetentionPolicy.legalHoldsRespected had no writer for a hold'
@@ -8670,6 +8998,8 @@ paths:
   /privacy-compliance-exception:
     get:
       operationId: listPrivacyComplianceExceptions
+      x-ticvai-consumed-by:
+        - "P13 CMS-038 Privacy Compliance, Exception & Investigation Workspace"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Privacy__Consent___Preference_Management_Reference.pdf'' p.32 (17.2.8 Exception Queue); the exception record had a writer and no reader'
@@ -9318,7 +9648,6 @@ paths:
     put:
       operationId: setCaseInvestigationResolution
       x-ticvai-consumed-by:
-        - "P08 BO-807 Classification & Workflow"
         - "P12 SUP-013 Case Investigation & Resolution Workspace"
       x-ticvai-audience:
         - staff
@@ -9477,8 +9806,6 @@ paths:
     put:
       operationId: setRefundCompensationService
       x-ticvai-consumed-by:
-        - "P08 BO-812 Service Recovery"
-        - "P08 BO-822 Service Recovery Automation"
         - "P12 SUP-015 Refund, Compensation & Service Exception Workspace"
       x-ticvai-audience:
         - staff
@@ -9840,7 +10167,6 @@ paths:
     put:
       operationId: setCustomerServiceCopilot
       x-ticvai-consumed-by:
-        - "P08 BO-797 AI Chatbot Configuration"
         - "P08 BO-798 Intent & Knowledge Management"
         - "P12 SUP-018 AI Customer Service Copilot & Knowledge Workspace"
       x-ticvai-audience:
@@ -11125,6 +11451,7 @@ paths:
     get:
       operationId: listWaiverTemplateMaster
       x-ticvai-consumed-by:
+        - "P08 BO-845 Waiver Template Builder"
         - "P08 BO-846 Assignment Rules"
         - "P13 CMS-042 Waiver Template Library & Master Setup"
       x-ticvai-audience:
@@ -11249,7 +11576,8 @@ paths:
         '409':
           $ref: ../shared/common.yaml#/components/responses/Conflict
         '422':
-          description: The form is not of kind `waiver`, or `sourceWaiverId` is missing for a duplicate.
+          description: The form is not of kind `waiver` or `consentForm` (CHG-CSA-026), or `sourceWaiverId` is
+            missing for a duplicate.
           content:
             application/problem+json:
               schema:
@@ -11260,16 +11588,22 @@ paths:
     put:
       operationId: setDigitalWaiverForm
       x-ticvai-consumed-by:
-        - "P08 BO-846 Assignment Rules"
+        - "P08 BO-845 Waiver Template Builder"
         - "P13 CMS-043 Digital Waiver & Form Builder"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: MoM 31 Aug §4.9 (drag-and-drop fields, builder fully configurable, conditional questions, mobile view); pack ''Waiver, Consent & Digital Form Management_Reference.pdf'' pp.9-11 (11.1.3)'
       summary: Save the layout of a draft waiver version
       description: >
-        **Saves the customer-facing layout of one draft waiver version: its sections and content
-        blocks.** An upsert keyed on `formId` + `formVersion`, which must be a `FormDefinition` of kind
-        `waiver` in `draft` (404 if absent; 409 once published, superseded or retired, because a
+        **Saves the customer-facing layout of one draft waiver or consent-form version: its sections and
+        content blocks.** **The consent-form builder is this builder** (Chinmay, 2 October, batch 4: "consent
+        form builder in Venue Management"; CHG-CSA-026): a venue authors its biometric (Face Pass, Face Tag),
+        marketing and other consent forms here as a `FormDefinition` of kind `consentForm`, with the same
+        fields, versioning, signature and acceptance record as a waiver, rather than in a second builder.
+        `FormDefinition.consentPurposes` says what the form consents to; Face Pass and Face Tag enrolment name
+        the venue's form by id (access `BiometricPolicy`). An upsert keyed on `formId` + `formVersion`, which
+        must be a `FormDefinition` of kind `waiver` or `consentForm` in `draft` (404 if absent; 409 once
+        published, superseded or retired, because a
         published version is immutable and a change is a new version through `createForm`). Input
         blocks (question, checkbox, acknowledgement, signature, initials, date, customer and guardian
         details) point at a field of the same version by `fieldKey`; the fields themselves are written
@@ -11494,6 +11828,7 @@ paths:
     put:
       operationId: setSignatorySignatureGuardian
       x-ticvai-consumed-by:
+        - "P08 BO-848 Signature Experience Setup"
         - "P08 BO-849 Guardian & Group Signing"
         - "P13 CMS-045 Signatory, Signature & Guardian Rule Configuration"
       x-ticvai-audience:
@@ -11559,6 +11894,8 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     get:
       operationId: getSignatorySignatureGuardian
+      x-ticvai-consumed-by:
+        - "P08 BO-848 Signature Experience Setup"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Waiver, Consent & Digital Form Management_Reference.pdf'' pp.13-14 (11.1.5); the configuration screen needs to load what it saved'
@@ -11764,7 +12101,7 @@ paths:
     get:
       operationId: listWaiverTriggerEligibility
       x-ticvai-consumed-by:
-        - "P08 BO-847 Version, Expiry & Renewal"
+        - "P08 BO-846 Assignment Rules"
         - "P13 CMS-047 Waiver Trigger, Eligibility & Completion Rules"
       x-ticvai-audience:
         - staff
@@ -11895,9 +12232,7 @@ paths:
     get:
       operationId: listVersioningEffectiveDate
       x-ticvai-consumed-by:
-        - "P08 BO-748 Consent Capture & Versions"
-        - "P08 BO-848 Signature Experience Setup"
-        - "P09 ADM-328 Workflow Versioning & Change History"
+        - "P08 BO-847 Version, Expiry & Renewal"
         - "P13 CMS-048 Versioning, Effective Dates & Legal Change Control"
       x-ticvai-audience:
         - staff
@@ -11971,9 +12306,6 @@ paths:
     put:
       operationId: setLocalizationBrandingCustomer
       x-ticvai-consumed-by:
-        - "P08 BO-678 Channel, Language & Branding Configuration"
-        - "P08 BO-793 AI Content, Translation & Audit"
-        - "P08 BO-841 Personalization & Localization"
         - "P13 CMS-049 Localization, Branding & Customer Experience Configuration"
       x-ticvai-audience:
         - staff
@@ -12037,6 +12369,8 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     get:
       operationId: getLocalizationBrandingCustomer
+      x-ticvai-consumed-by:
+        - "P13 CMS-049 Localization, Branding & Customer Experience Configuration"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Waiver, Consent & Digital Form Management_Reference.pdf'' pp.19-20 (11.1.9 Translation Management); the screen needs to load what it saved'
@@ -12251,7 +12585,6 @@ paths:
       operationId: listWaiver
       x-ticvai-consumed-by:
         - "P08 BO-844 Waiver Command Center"
-        - "P08 BO-845 Waiver Template Builder"
         - "P13 CMS-051 Waiver Operations Command Center"
       x-ticvai-audience:
         - staff
@@ -12382,6 +12715,7 @@ paths:
     get:
       operationId: listParticipantWaiverStatus
       x-ticvai-consumed-by:
+        - "P08 BO-850 Pre-Arrival Completion"
         - "P08 BO-851 Verification & Access Control"
         - "P13 CMS-052 Participant Waiver Status & Tracking"
       x-ticvai-audience:
@@ -12885,6 +13219,8 @@ paths:
   /waiver-verification-validation:
     get:
       operationId: listWaiverVerificationQueue
+      x-ticvai-consumed-by:
+        - "P13 CMS-055 Waiver Verification & Validation Workspace"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: MoM 31 Aug §4.9 (verification workspace flags missing/expired/invalid); pack ''Waiver, Consent & Digital Form Management_Reference.pdf'' pp.33-34 (11.2.5 Verification Queue); the workspace needs its read'
@@ -13319,6 +13655,7 @@ paths:
     get:
       operationId: listComplianceEvidenceWaiver
       x-ticvai-consumed-by:
+        - "P08 BO-852 Documents, Search & Retention"
         - "P08 BO-853 Legal Evidence & Audit"
         - "P13 CMS-058 Compliance Evidence, Audit & Waiver Repository"
       x-ticvai-audience:
@@ -13708,8 +14045,10 @@ paths:
     get:
       operationId: getGuestTimeline
       x-ticvai-consumed-by:
+        - "P08 BO-737 Customer 360 Profile"
+        - "P08 BO-738 Activity Timeline"
         - "P08 BO-739 Contact & Preferences"
-        - "P08 BO-743 AI Guest Intelligence"
+        - "P08 BO-742 Commerce & Documents"
         - "P08 BO-796 Guest Conversation 360"
       summary: Everything this guest did, in order, across the platform
       description: 'Board 1.5. Purchases, scans, reservations, visits, membership changes, loyalty,
@@ -13768,6 +14107,7 @@ paths:
       operationId: getGuestRelationships
       x-ticvai-consumed-by:
         - "P08 BO-738 Activity Timeline"
+        - "P08 BO-740 Family & Guardians"
         - "P08 BO-741 Corporate & Groups"
       summary: Household, guardians, corporate and group links
       tags:
@@ -13793,8 +14133,8 @@ paths:
     put:
       operationId: setGuestRelationships
       x-ticvai-consumed-by:
+        - "P08 BO-740 Family & Guardians"
         - "P08 BO-741 Corporate & Groups"
-        - "P08 BO-742 Commerce & Documents"
       summary: Link people without merging them
       description: 'Boards 1.7 and 1.8 — *"model households, dependants and guardians **while preserving
         each person''s individual identity**."*
@@ -13856,7 +14196,8 @@ paths:
     get:
       operationId: getGuestIntelligence
       x-ticvai-consumed-by:
-        - "P08 BO-738 Activity Timeline"
+        - "P08 BO-737 Customer 360 Profile"
+        - "P08 BO-743 AI Guest Intelligence"
         - "P08 BO-832 AI Engagement Optimization"
       summary: Value, engagement, churn and propensity, with their reasons
       description: 'Board 1.10 — *"turn the unified record into **explainable** customer insight."*
@@ -14079,8 +14420,6 @@ paths:
   /retention-policies:
     put:
       operationId: setDataRetentionPolicy
-      x-ticvai-consumed-by:
-        - "P08 BO-751 Retention & Anonymization"
       summary: How long guest data is kept, and what happens at expiry
       description: 'Board 2.8. **`listDataRetentionExpiry` could read them and nothing set them.**
 
@@ -14141,6 +14480,7 @@ paths:
       operationId: runDataRetention
       x-ticvai-consumed-by:
         - "P08 BO-751 Retention & Anonymization"
+        - "P13 CMS-037 Data Retention, Expiry & Legal Hold Operations"
       summary: Preview or execute a retention pass
       description: 'Board 2.8. **Produces completion evidence**, because demonstrating that data *was*
         deleted is the half of compliance that gets forgotten until an audit asks.
@@ -14393,6 +14733,8 @@ paths:
   /loyalty/programmes/{programmeId}/rules:
     get:
       operationId: getLoyaltyRules
+      x-ticvai-consumed-by:
+        - "P08 BO-827 Points & Activity Rules"
       summary: Every rule a loyalty programme runs on
       description: 'Decision 8 of the schema merge. **`marketing.loyalty_programme` holds no rules** —
         it is a header with a code, a name and an expiry. The rules were taken from the backend
@@ -14634,6 +14976,15 @@ paths:
   /loyalty/rewards:
     get:
       operationId: listRewards
+      x-ticvai-consumed-by:
+        - "P01 WEB-043 Loyalty & Rewards"
+        - "P02 GST-036 Loyalty & Rewards"
+      # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
+      # or staff token is still accepted. `{}` makes the credential optional.
+      security:
+      - {}
+      - guestAuth: []
+      - bearerAuth: []
       summary: What points can be turned into
       tags:
       - loyalty
@@ -14792,6 +15143,14 @@ paths:
   /badges:
     get:
       operationId: listBadges
+      x-ticvai-consumed-by:
+        - "P08 BO-826 Achievement & Badge Engine"
+      # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
+      # or staff token is still accepted. `{}` makes the credential optional.
+      security:
+      - {}
+      - guestAuth: []
+      - bearerAuth: []
       summary: Badges a guest can be awarded
       tags:
       - loyalty
@@ -14859,6 +15218,12 @@ paths:
   /customers/{customerId}/badges:
     get:
       operationId: listCustomerBadges
+      x-ticvai-consumed-by:
+        - "P01 WEB-043 Loyalty & Rewards"
+        - "P02 GST-036 Loyalty & Rewards"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       summary: Badges a guest holds
       description: '**A badge can expire and can be revoked**, so this returns the status rather than
         a list of names — a guest page showing a lapsed badge as current is a promise the venue did
@@ -15151,6 +15516,7 @@ paths:
       operationId: setSlaPolicy
       x-ticvai-consumed-by:
         - "P08 BO-809 SLA Policy Configuration"
+        - "P12 SUP-022 SLA Policy & Service-Level Management"
       summary: Define an SLA policy
       description: >
         **`businessHoursOnly` is the field that makes the rest meaningful.** Four hours to first
@@ -15439,6 +15805,9 @@ paths:
         - "P01 WEB-006 Date & Performance Selection"
         - "P01 WEB-011 Guest Details & Attendee Forms"
         - "P02 GST-007 Select Date & Time"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-requires-module: core   # booking consent works without the marketing licence (decided 29 September, rev 3 REV3-26)
       x-ticvai-audience:
       - guest
@@ -15514,6 +15883,9 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-046 In-Venue Notifications"
         - "P02 GST-030 In-Venue Notifications"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-requires-module: core
       summary: The signed-in guest's notification feed
       description: '**The in-venue notifications feed** (decided 29 September, rev 3 GAP-C1: the feed is in
@@ -15576,6 +15948,9 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-046 In-Venue Notifications"
         - "P02 GST-030 In-Venue Notifications"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-requires-module: core
       summary: Mark the signed-in guest's notifications read
       description: 'Marks the given notifications, or all of them when `all` is true, as opened. Only the
@@ -16368,6 +16743,25 @@ paths:
         policy names (`setCookieScanPolicy`); the scan run is kept with its counts. A technology
         missing from two consecutive scans of its channel is flagged for retirement, never retired
         automatically.
+
+
+        **Decided: buy a scanner API, hybrid** (Chinmay, 2 October, batch 5 set 2, answering CF-127 and
+        workbook Q19; CHG-CSA-023). Our banner, consent runtime, registry and consent logs stay ours; a bought
+        scanner API is called on each channel's schedule by a TICVAI adapter, which posts its results here with
+        a service credential and `source` `boughtScanner` (`scannerRef` naming the vendor and its scan id). The
+        manual "Upload scan report" path stays, as `manualUpload`. The vendor is a procurement choice and its
+        egress is in the HLD and LLD; nothing downstream of this operation depends on which vendor.
+
+
+        **Each finding records the consent state it was seen in** (Chinmay, 2 October, contract follow-ups: "add
+        now"; CHG-FUP-009). A scanner loads each page with no decision, after reject-all and after accept-all
+        (`findings[].consentState`), and says where the technology was set (`pageUrl`, `initiatorUrl`), its cookie
+        attributes and the category it suggests and from where (`suggestedCategory`, `classificationSource`; the
+        platform catalogue of known technologies, `listTrackingTechnologyCatalogue`, is one source, CHG-FUP-010).
+        Every finding is kept (`listCookieScanFindings`). **A finding seen with no decision or after reject-all whose
+        category is not `strictlyNecessary` is a pre-consent violation**: it is flagged on the finding, counted in
+        `CookieScanRun.preConsentViolationCount` and raises the administrator alert whether or not the technology is
+        new. That is what proves nothing loads before consent (2.6.58).
       tags:
       - consent
       x-ticvai-permission: GUEST_MANAGE
@@ -16441,6 +16835,196 @@ paths:
                         $ref: '#/components/schemas/CookieScanRun'
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /cookie-tracking-digital/scans/{scanRunId}/findings:
+    parameters:
+    - name: scanRunId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    get:
+      operationId: listCookieScanFindings
+      x-ticvai-consumed-by:
+        - "P13 CMS-025 Cookie, Tracking & Digital Technology Registry"
+      x-ticvai-requires-module: core   # cookie consent is the law on every storefront, licensed marketing or not
+      x-ticvai-audience:
+      - staff
+      x-ticvai-agreed: '2 October: Chinmay, contract follow-ups (cookie scan consent state, "add now"); research A9
+        item 1; shape follows listCookieScans'
+      summary: What one scan saw, in each consent state
+      description: >
+        **The findings of one scan run** (Chinmay, 2 October, contract follow-ups; CHG-FUP-009): each technology in
+        the consent state it was seen in, where it was set and by what, and whether it is a pre-consent violation.
+        `preConsentOnly` returns only the violations, the list an administrator acts on. Ordered by `name` then
+        `id`; keyset cursor.
+      tags:
+      - consent
+      x-ticvai-permission: GUEST_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: consentState
+        in: query
+        required: false
+        schema:
+          type: string
+          enum:
+          - noDecision
+          - rejectedAll
+          - acceptedAll
+      - name: preConsentOnly
+        in: query
+        required: false
+        schema:
+          type: boolean
+          default: false
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: Findings
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/CookieScanFinding'
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /cookie-tracking-digital/platform-catalogue:
+    get:
+      operationId: listTrackingTechnologyCatalogue
+      x-ticvai-consumed-by:
+        - "P13 CMS-025 Cookie, Tracking & Digital Technology Registry"
+      x-ticvai-requires-module: core   # cookie consent is the law on every storefront, licensed marketing or not
+      x-ticvai-audience:
+      - staff
+      x-ticvai-agreed: '2 October: Chinmay, contract follow-ups (a platform-wide catalogue of known cookies); research
+        A9 item 2; shape follows listCookieScans'
+      summary: The platform's catalogue of known cookies and trackers
+      description: >
+        **What TICVAI already knows about a technology** (Chinmay, 2 October, contract follow-ups; CHG-FUP-010): the
+        platform catalogue, read from the cell's replicated copy. A venue's administrator reads it when classifying a
+        `detected` technology; a scan uses it to suggest a category. `search` matches `namePattern` and `provider`.
+        Ordered by `provider` then `namePattern`; keyset cursor.
+      tags:
+      - consent
+      x-ticvai-permission: GUEST_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: search
+        in: query
+        required: false
+        description: Matches the start of `namePattern` or of `provider`, ignoring case (`_ga`, `Google`).
+        schema:
+          type: string
+          maxLength: 200
+      - name: category
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/CookieCategory'
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: Catalogue entries
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/TrackingTechnologyCatalogueEntry'
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /cookie-tracking-digital/platform-catalogue/{entryKey}:
+    parameters:
+    - name: entryKey
+      in: path
+      required: true
+      description: The entry's stable key, `TrackingTechnologyCatalogueEntry.entryKey`.
+      schema:
+        type: string
+        pattern: ^[a-z0-9][a-z0-9-]{1,119}$
+    put:
+      operationId: setTrackingTechnologyCatalogueEntry
+      x-ticvai-audience:
+      - staff
+      x-ticvai-agreed: '2 October: Chinmay, contract follow-ups (a platform-wide catalogue of known cookies); research
+        A9 item 2; shape follows setAiModel (a platform catalogue row replicated into every cell)'
+      summary: Add or correct a catalogue entry (platform staff)
+      description: >
+        **Platform staff curate the catalogue** (Chinmay, 2 October, contract follow-ups; CHG-FUP-010). The body is
+        one whole entry, addressed by `entryKey`: an existing key is replaced (200), a new one is added (201);
+        `isActive: false` retires it. Written in the control plane and replicated read-only into every cell;
+        no tenant writes it. A change suggests differently from the next scan on and never reclassifies a venue's
+        approved registry entry.
+      tags:
+      - consent
+      x-ticvai-permission: PLATFORM_PLAN_MANAGE
+      x-ticvai-permission-note: 'The platform''s own catalogues (the module catalogue, licensing models) are curated
+        under PLATFORM_PLAN_MANAGE, read from the platform token; a dedicated privacy-owner permission is a question for
+        the lead (CHG-FUP-010).'
+      x-ticvai-scope-level: platform
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TrackingTechnologyCatalogueEntry'
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: ../shared/common.yaml#/components/headers/ConsistencyToken
+          description: Replaced
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TrackingTechnologyCatalogueEntry'
+        '201':
+          headers:
+            X-Consistency-Token:
+              $ref: ../shared/common.yaml#/components/headers/ConsistencyToken
+          description: Added
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TrackingTechnologyCatalogueEntry'
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /cookie-scan-policy:
@@ -16949,6 +17533,55 @@ components:
                 type: string
                 maxLength: 255
                 nullable: true
+              consentState:
+                type: string
+                enum:
+                - noDecision
+                - rejectedAll
+                - acceptedAll
+                description: The consent state the page was loaded in when the technology was seen (CHG-FUP-009).
+                  Absent from a scanner that tests one state only; such a finding proves nothing about consent.
+              pageUrl:
+                type: string
+                format: uri
+                maxLength: 2000
+                nullable: true
+                description: The page the technology was seen on.
+              initiatorUrl:
+                type: string
+                format: uri
+                maxLength: 2000
+                nullable: true
+                description: The script or frame that set it, so a violation names its cause (a tag manager, an embed).
+              cookieDomain:
+                type: string
+                maxLength: 255
+                nullable: true
+              sameSite:
+                type: string
+                enum:
+                - strict
+                - lax
+                - none
+                nullable: true
+              secure:
+                type: boolean
+                nullable: true
+              suggestedCategory:
+                allOf:
+                - $ref: '#/components/schemas/CookieCategory'
+                nullable: true
+                description: The category the scanner or the catalogue suggests. A suggestion only; the venue's
+                  administrator classifies it with `setTrackingTechnology`.
+              classificationSource:
+                type: string
+                enum:
+                - openCookieDatabase
+                - vendor
+                - platformCatalogue
+                - none
+                nullable: true
+                description: Where `suggestedCategory` came from (CHG-FUP-009, CHG-FUP-010).
     CookieScanRun:
       type: object
       x-ticvai-persistence: marketing.cookie_scan_run
@@ -16994,6 +17627,11 @@ components:
           type: integer
           minimum: 0
           description: Registry entries for this channel the scan did not see.
+        preConsentViolationCount:
+          type: integer
+          minimum: 0
+          description: Findings seen with no decision or after reject-all whose category is not `strictlyNecessary`
+            (CHG-FUP-009). Above zero, the administrator alert is raised.
         alertedAt:
           type: string
           format: date-time
@@ -17002,6 +17640,176 @@ components:
           type: string
           readOnly: true
           description: '**The partition key** (ADR-0005).'
+    CookieScanFinding:
+      type: object
+      x-ticvai-persistence: marketing.cookie_scan_finding
+      description: '**One technology one scan saw, in one consent state** (Chinmay, 2 October, contract follow-ups;
+        CHG-FUP-009). Written by `recordCookieScan` from `findings[]`, never edited; read by `listCookieScanFindings`.
+        Kept with its run, so an audit can show what loaded before consent on a given day.'
+      required:
+      - scanRunId
+      - name
+      - provider
+      - technologyType
+      - isThirdParty
+      - preConsentViolation
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        scanRunId:
+          type: string
+          format: uuid
+          x-ticvai-references: marketing.cookie_scan_run
+        technologyId:
+          type: string
+          format: uuid
+          nullable: true
+          description: The registry entry the finding matched or created (`name` + `provider` + `domainApplication`).
+        name:
+          type: string
+          maxLength: 200
+        provider:
+          type: string
+          maxLength: 150
+        technologyType:
+          type: string
+          maxLength: 40
+          description: As `RecordCookieScanRequest.findings[].technologyType`.
+        isThirdParty:
+          type: boolean
+        durationDays:
+          type: integer
+          minimum: 0
+          nullable: true
+        domainApplication:
+          type: string
+          maxLength: 255
+          nullable: true
+        consentState:
+          type: string
+          enum:
+          - noDecision
+          - rejectedAll
+          - acceptedAll
+          nullable: true
+        pageUrl:
+          type: string
+          maxLength: 2000
+          nullable: true
+        initiatorUrl:
+          type: string
+          maxLength: 2000
+          nullable: true
+        cookieDomain:
+          type: string
+          maxLength: 255
+          nullable: true
+        sameSite:
+          type: string
+          enum:
+          - strict
+          - lax
+          - none
+          nullable: true
+        secure:
+          type: boolean
+          nullable: true
+        suggestedCategory:
+          allOf:
+          - $ref: '#/components/schemas/CookieCategory'
+          nullable: true
+        classificationSource:
+          type: string
+          enum:
+          - openCookieDatabase
+          - vendor
+          - platformCatalogue
+          - none
+          nullable: true
+        preConsentViolation:
+          type: boolean
+          description: Seen with no decision or after reject-all, and its category (the registry's, else the
+            suggested one) is not `strictlyNecessary`. An unclassified technology counts as a violation, as
+            `detected` is treated as blocked.
+        scopePath:
+          type: string
+          readOnly: true
+          description: '**The partition key** (ADR-0005).'
+    TrackingTechnologyCatalogueEntry:
+      type: object
+      x-ticvai-persistence: marketing.tracking_technology_catalogue
+      description: '**The platform''s catalogue of known cookies and trackers** (Chinmay, 2 October, contract
+        follow-ups: "a platform-wide catalogue of known cookies"; CHG-FUP-010). One row per known technology,
+        matched on `namePattern` + `provider`, with the category TICVAI''s privacy owner approved. Seeded from the Open
+        Cookie Database (Apache-2.0) and curated by platform staff; mastered in the control plane and replicated
+        read-only into every cell with the platform root as `scopePath`, as the platform model catalogue is. **It
+        suggests, it does not decide**: a scan finding that matches takes `suggestedCategory` from it with
+        `classificationSource` `platformCatalogue`, and each venue still approves its own registry entry
+        (`setTrackingTechnology`), so `_ga` is suggested once for every tenant rather than researched by each.'
+      required:
+      - namePattern
+      - provider
+      - category
+      - technologyType
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        entryKey:
+          type: string
+          readOnly: true
+          pattern: ^[a-z0-9][a-z0-9-]{1,119}$
+          description: The stable key the entry is written under (`setTrackingTechnologyCatalogueEntry`), such as
+            `google-analytics-ga`; taken from the path.
+        namePattern:
+          type: string
+          maxLength: 200
+          description: The cookie or key name, with `*` as a wildcard (`_ga_*`).
+        provider:
+          type: string
+          maxLength: 150
+        category:
+          $ref: '#/components/schemas/CookieCategory'
+        technologyType:
+          type: string
+          maxLength: 40
+          description: As `RecordCookieScanRequest.findings[].technologyType`.
+        purpose:
+          type: string
+          maxLength: 1000
+          nullable: true
+        typicalDurationDays:
+          type: integer
+          minimum: 0
+          nullable: true
+        isThirdParty:
+          type: boolean
+          nullable: true
+        privacyInformationUrl:
+          type: string
+          maxLength: 2000
+          nullable: true
+        source:
+          type: string
+          enum:
+          - openCookieDatabase
+          - platformCuration
+          description: Imported, or added or corrected by platform staff.
+        isActive:
+          type: boolean
+          default: true
+          description: A retired entry stops suggesting; it is kept for the findings that cited it.
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+        scopePath:
+          type: string
+          readOnly: true
+          description: '**The partition key** (ADR-0005): the platform root on every replicated row.'
     CookieScanPolicy:
       type: object
       x-ticvai-persistence: marketing.cookie_scan_policy
@@ -17044,6 +17852,21 @@ components:
           items:
             type: string
             format: uuid
+        scanSource:
+          type: string
+          enum:
+          - boughtScanner
+          - manualUpload
+          default: boughtScanner
+          description: '**Who scans this channel** (Chinmay, 2 October: buy a scanner API, hybrid; CHG-CSA-023).
+            `boughtScanner`: the scheduled run calls the bought scanner API through TICVAI''s adapter, which feeds
+            `recordCookieScan`. `manualUpload`: no scheduled scan; an administrator uploads a scan report.'
+        scannerVendorRef:
+          type: string
+          maxLength: 200
+          nullable: true
+          description: The scanner vendor and the account or domain group the adapter uses; set by TICVAI when the
+            vendor is contracted.
         lastRunAt:
           type: string
           format: date-time
@@ -19347,6 +20170,20 @@ components:
           - consentForm
           - incidentReport
           - registration
+        consentPurposes:
+          type: array
+          description: '**What a `consentForm` consents to** (Chinmay, 2 October, batch 4; follows BO-188: biometric
+            capture needs consent on the venue''s own form; CHG-CSA-026). A guardian-signed form for a minor carries
+            the guardian fields of the waiver builder (workbook Q237: guardian consent, configurable per country).
+            Empty for any other kind.'
+          items:
+            type: string
+            enum:
+            - facePass
+            - faceTag
+            - marketing
+            - photography
+            - waiver
         version:
           readOnly: true
           type: integer
@@ -21820,6 +22657,69 @@ components:
           items:
             type: string
             format: uuid
+        ruleGroups:
+          x-ticvai-persistence-kind: valueObject
+          x-ticvai-persistence-column: jsonb
+          type: array
+          description: '**Nested AND / OR / NOT groups** (contract gap CHG-WIR-007, BO-755; CHG-CSA-045). Where present,
+            the segment matches `criteria` (combined by `match`) AND every group here. Absent keeps the flat list.'
+          items:
+            $ref: '#/components/schemas/SegmentRuleGroup'
+        effectiveFrom:
+          type: string
+          format: date-time
+          nullable: true
+          description: The segment is evaluated for sends only from this time.
+        effectiveTo:
+          type: string
+          format: date-time
+          nullable: true
+        ownerPrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+          description: Who answers for the segment; defaults to its creator.
+        requiresApproval:
+          type: boolean
+          default: false
+          description: Where true, a campaign may use the segment only after an `approvals` request on it is approved.
+    SegmentRuleGroup:
+      x-ticvai-persistence: none — stored with the segment as jsonb
+      type: object
+      description: One group of a segment's nested rules (CHG-CSA-045). `operator` combines the group's `criteria` and
+        its child `groups`; `not` negates the group (it takes one child, criteria or group).
+      properties:
+        operator:
+          type: string
+          enum:
+          - and
+          - or
+          - not
+        criteria:
+          type: array
+          description: Each entry has the shape of `SegmentCriterion` (`attribute`, `operator`, `value`). Typed loosely
+            here so the new optional field adds no required member to `createSegment`'s body for clients built at r1;
+            the server validates each entry as a `SegmentCriterion` (400 otherwise).
+          items:
+            type: object
+            additionalProperties: true
+        groups:
+          type: array
+          items:
+            $ref: '#/components/schemas/SegmentRuleGroup'
+    SegmentDraftPreview:
+      x-ticvai-persistence: none — evaluated live
+      type: object
+      description: The preview of an unsaved segment (`previewSegmentDraft`, CHG-CSA-045); `SegmentPreview` without a
+        segment id.
+      properties:
+        matchingCount:
+          type: integer
+        reachable:
+          $ref: '#/components/schemas/SegmentPreview/properties/reachable'
+        evaluatedAt:
+          type: string
+          format: date-time
     Segment:
       x-ticvai-persistence: marketing.segment + marketing.segment_criterion
       allOf:

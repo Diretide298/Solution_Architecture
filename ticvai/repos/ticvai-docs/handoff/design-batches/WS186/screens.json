@@ -695,6 +695,13 @@
        "kind": "textField",
        "label": "Maximum wallets per account",
        "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 5 §Configure"
+      },
+      {
+       "kind": "dataTable",
+       "label": "The kinds of wallet that may exist — who owns one",
+       "bindsTo": "WalletType",
+       "operation": "listWalletTypes",
+       "provenance": "contract wallet.yaml GET /wallet-types; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -727,6 +734,13 @@
     "invalidates": [
      "listWalletTypes"
     ]
+   },
+   {
+    "operationId": "listWalletTypes",
+    "contract": "wallet",
+    "purpose": "The kinds of wallet that may exist — who owns one",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {
@@ -1085,6 +1099,13 @@
        "kind": "selectField",
        "label": "Rounding policy",
        "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 7 §Configure"
+      },
+      {
+       "kind": "dataTable",
+       "label": "The kinds of wallet that may exist — who owns one",
+       "bindsTo": "WalletType",
+       "operation": "listWalletTypes",
+       "provenance": "contract wallet.yaml GET /wallet-types; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -1107,6 +1128,13 @@
     "invalidates": [
      "listWalletTypes"
     ]
+   },
+   {
+    "operationId": "listWalletTypes",
+    "contract": "wallet",
+    "purpose": "The kinds of wallet that may exist — who owns one",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {
@@ -1489,6 +1517,13 @@
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
        "impliedBy": "updateWalletType"
+      },
+      {
+       "kind": "dataTable",
+       "label": "The kinds of wallet that may exist — who owns one",
+       "bindsTo": "WalletType",
+       "operation": "listWalletTypes",
+       "provenance": "contract wallet.yaml GET /wallet-types; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -1511,6 +1546,13 @@
     "invalidates": [
      "listWalletTypes"
     ]
+   },
+   {
+    "operationId": "listWalletTypes",
+    "contract": "wallet",
+    "purpose": "The kinds of wallet that may exist — who owns one",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {
@@ -1650,6 +1692,13 @@
        "kind": "selectField",
        "label": "Data retention period",
        "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 9 §Configure"
+      },
+      {
+       "kind": "dataTable",
+       "label": "The kinds of wallet that may exist — who owns one",
+       "bindsTo": "WalletType",
+       "operation": "listWalletTypes",
+       "provenance": "contract wallet.yaml GET /wallet-types; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -1672,6 +1721,13 @@
     "invalidates": [
      "listWalletTypes"
     ]
+   },
+   {
+    "operationId": "listWalletTypes",
+    "contract": "wallet",
+    "purpose": "The kinds of wallet that may exist — who owns one",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {
@@ -1841,6 +1897,13 @@
        "kind": "selectField",
        "label": "Lost/stolen credential handling",
        "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 10 §Configure"
+      },
+      {
+       "kind": "dataTable",
+       "label": "The kinds of wallet that may exist — who owns one",
+       "bindsTo": "WalletType",
+       "operation": "listWalletTypes",
+       "provenance": "contract wallet.yaml GET /wallet-types; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -1873,6 +1936,13 @@
     "invalidates": [
      "getWallet"
     ]
+   },
+   {
+    "operationId": "listWalletTypes",
+    "contract": "wallet",
+    "purpose": "The kinds of wallet that may exist — who owns one",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {
@@ -2053,6 +2123,12 @@
        "label": "What publishing changes",
        "notes": "**Takes effect at every till and reader immediately.** Credit types, consumption order and funding rules change for balances that already exist, not only for new ones.",
        "provenance": "authored — required by check-screens, 19 September 2026"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Wallet configuration versions, newest first",
+       "operation": "listWalletConfigurationVersions",
+       "provenance": "contract wallet.yaml GET /wallet-configuration/versions; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -2076,6 +2152,13 @@
      "listWalletTypes",
      "listCreditTypes"
     ]
+   },
+   {
+    "operationId": "listWalletConfigurationVersions",
+    "contract": "wallet",
+    "purpose": "Wallet configuration versions, newest first",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {
@@ -2084,6 +2167,7 @@
    "workshopBoard": "wireframes/WS186 Wallet Configuration Backend Structure v1.0 Board 1.dc.html#bo-1092"
   },
   "apisNote": "Regenerated 9 September 2026 from Wallet_Configuration_Backend_Structure_v1.0.pdf page 11. 0 of 0 labels bound to a contract property; 18 of 55 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {},
   "_platform": {
    "code": "P08",
    "audience": "staff",

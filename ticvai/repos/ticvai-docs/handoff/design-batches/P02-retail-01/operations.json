@@ -23,57 +23,6 @@
   "requestBody": "AddCartLineRequest",
   "responds": "Cart"
  },
- "checkoutCart": {
-  "method": "POST",
-  "path": "/carts/{cartId}/checkout",
-  "contract": "orders",
-  "summary": "Turn the cart into an order",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Order"
- },
- "createPayment": {
-  "method": "POST",
-  "path": "/payments",
-  "contract": "orders",
-  "summary": "Take a payment against an order",
-  "permission": "ORDER_CREATE",
-  "offlineCapable": true,
-  "conflictPolicy": "append",
-  "scopeLevel": "workstation",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "CreatePaymentRequest",
-  "responds": "Payment"
- },
- "getGameCard": {
-  "method": "GET",
-  "path": "/game-cards/{cardCode}",
-  "contract": "games",
-  "summary": "Read a card's balances",
-  "permission": null,
-  "offlineCapable": true,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "GameCard"
- },
  "listMerchandise": {
   "method": "GET",
   "path": "/merchandise",

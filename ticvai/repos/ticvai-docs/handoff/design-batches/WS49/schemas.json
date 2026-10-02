@@ -1,4 +1,45 @@
 {
+ "Bundle": {
+  "x-ticvai-persistence": "promotions.bundle + promotions.bundle_component",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/CreateBundleRequest"
+   },
+   {
+    "type": "object",
+    "required": [
+     "id",
+     "savingsAmount",
+     "isActive",
+     "hasBeenSold"
+    ],
+    "properties": {
+     "id": {
+      "type": "string",
+      "format": "uuid"
+     },
+     "savingsAmount": {
+      "allOf": [
+       {
+        "$ref": "../shared/common.yaml#/components/schemas/Money"
+       }
+      ],
+      "description": "Sum of component list prices less the bundle price."
+     },
+     "savingsPercentage": {
+      "type": "number"
+     },
+     "hasBeenSold": {
+      "type": "boolean",
+      "description": "True locks components and allocation against amendment."
+     },
+     "isActive": {
+      "type": "boolean"
+     }
+    }
+   }
+  ]
+ },
  "BundleAvailabilityCapacityValidationView": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
@@ -151,282 +192,6 @@
    "archived": {
     "type": "string",
     "description": "Archived"
-   }
-  }
- },
- "BundleComponentBuilderInput": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
-  "description": "**What Bundle Component Builder submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
-  "properties": {
-   "typesType": {
-    "type": "string",
-    "enum": [
-     "mandatory",
-     "optional",
-     "choice",
-     "conditional",
-     "recommended"
-    ],
-    "description": "Vocabulary listed under Component Types."
-   },
-   "fixedQuantity": {
-    "type": "integer",
-    "description": "Fixed quantity"
-   },
-   "minimum": {
-    "type": "string",
-    "description": "Minimum"
-   },
-   "maximum": {
-    "type": "string",
-    "description": "Maximum"
-   },
-   "quantityBasedOnGuestCount": {
-    "type": "integer",
-    "description": "Quantity based on guest count"
-   },
-   "quantityBasedOnTicketCount": {
-    "type": "integer",
-    "description": "Quantity based on ticket count"
-   },
-   "componentType": {
-    "type": "string",
-    "enum": [
-     "admissionTicket",
-     "attraction",
-     "event",
-     "timeslot",
-     "experience",
-     "membership",
-     "annualPass",
-     "fBProduct",
-     "fBMealPackage",
-     "retailProduct",
-     "parking",
-     "locker",
-     "photo",
-     "rental",
-     "voucher",
-     "giftCard",
-     "service",
-     "externalProduct"
-    ],
-    "description": "What the component is."
-   }
-  }
- },
- "BundleComponentBuilderView": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
-  "description": "**What Bundle Component Builder displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
-  "properties": {
-   "typesType": {
-    "type": "string",
-    "enum": [
-     "mandatory",
-     "optional",
-     "choice",
-     "conditional",
-     "recommended"
-    ],
-    "description": "Vocabulary listed under Component Types."
-   },
-   "fixedQuantity": {
-    "type": "integer",
-    "description": "Fixed quantity"
-   },
-   "minimum": {
-    "type": "string",
-    "description": "Minimum"
-   },
-   "maximum": {
-    "type": "string",
-    "description": "Maximum"
-   },
-   "quantityBasedOnGuestCount": {
-    "type": "integer",
-    "description": "Quantity based on guest count"
-   },
-   "quantityBasedOnTicketCount": {
-    "type": "integer",
-    "description": "Quantity based on ticket count"
-   },
-   "componentType": {
-    "type": "string",
-    "enum": [
-     "admissionTicket",
-     "attraction",
-     "event",
-     "timeslot",
-     "experience",
-     "membership",
-     "annualPass",
-     "fBProduct",
-     "fBMealPackage",
-     "retailProduct",
-     "parking",
-     "locker",
-     "photo",
-     "rental",
-     "voucher",
-     "giftCard",
-     "service",
-     "externalProduct"
-    ],
-    "description": "What the component is."
-   }
-  }
- },
- "BundleDefinitionSetupInput": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table covers these fields** — the closest is promotions.allocation_split at 5%, so this is not an update to anything the package stores today and no new table has been decided",
-  "description": "**What Bundle Definition & Setup submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
-  "properties": {
-   "bundleName": {
-    "type": "string",
-    "description": "Bundle name"
-   },
-   "bundleId": {
-    "type": "string",
-    "description": "Bundle ID"
-   },
-   "internalDescription": {
-    "type": "string",
-    "description": "Internal description"
-   },
-   "guestFacingDescription": {
-    "type": "string",
-    "description": "Guest-facing description"
-   },
-   "businessEntity": {
-    "type": "string",
-    "description": "Business entity"
-   },
-   "venue": {
-    "type": "string",
-    "description": "Venue"
-   },
-   "bundleCategory": {
-    "type": "string",
-    "description": "Bundle category"
-   },
-   "owner": {
-    "type": "string",
-    "description": "Owner"
-   },
-   "campaign": {
-    "type": "string",
-    "description": "Campaign"
-   },
-   "effectiveDates": {
-    "type": "string",
-    "description": "Effective dates"
-   },
-   "salesStatus": {
-    "type": "string",
-    "description": "Sales status"
-   },
-   "appearsAsStandaloneProduct": {
-    "type": "string",
-    "description": "Appears as standalone product"
-   },
-   "isRecommendedDuringCheckout": {
-    "type": "boolean",
-    "description": "Is recommended during checkout"
-   },
-   "requiresAnotherProduct": {
-    "type": "string",
-    "description": "Requires another product"
-   },
-   "bundleType": {
-    "type": "string",
-    "enum": [
-     "fixed",
-     "configurable",
-     "buildYourOwn",
-     "dynamic",
-     "partner"
-    ],
-    "description": "Bundle type"
-   }
-  }
- },
- "BundleDefinitionSetupView": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
-  "description": "**What Bundle Definition & Setup displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
-  "properties": {
-   "bundleName": {
-    "type": "string",
-    "description": "Bundle name"
-   },
-   "bundleId": {
-    "type": "string",
-    "description": "Bundle ID"
-   },
-   "internalDescription": {
-    "type": "string",
-    "description": "Internal description"
-   },
-   "guestFacingDescription": {
-    "type": "string",
-    "description": "Guest-facing description"
-   },
-   "businessEntity": {
-    "type": "string",
-    "description": "Business entity"
-   },
-   "venue": {
-    "type": "string",
-    "description": "Venue"
-   },
-   "bundleCategory": {
-    "type": "string",
-    "description": "Bundle category"
-   },
-   "owner": {
-    "type": "string",
-    "description": "Owner"
-   },
-   "campaign": {
-    "type": "string",
-    "description": "Campaign"
-   },
-   "effectiveDates": {
-    "type": "string",
-    "description": "Effective dates"
-   },
-   "salesStatus": {
-    "type": "string",
-    "description": "Sales status"
-   },
-   "appearsAsStandaloneProduct": {
-    "type": "string",
-    "description": "Appears as standalone product"
-   },
-   "isRecommendedDuringCheckout": {
-    "type": "boolean",
-    "description": "Is recommended during checkout"
-   },
-   "requiresAnotherProduct": {
-    "type": "string",
-    "description": "Requires another product"
-   },
-   "bundleType": {
-    "type": "string",
-    "enum": [
-     "fixed",
-     "configurable",
-     "buildYourOwn",
-     "dynamic",
-     "partner"
-    ],
-    "description": "Bundle type: all components predefined; required plus optional choices; guest selects from permitted categories; changes with availability or rules; contains internal and external products"
    }
   }
  },
@@ -797,84 +562,124 @@
    }
   }
  },
- "GuestChoiceBuildYourOwnBundleDesignerInput": {
+ "CreateBundleRequest": {
+  "x-ticvai-persistence": "none — request only",
   "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
-  "description": "**What Guest Choice & Build-Your-Own Bundle Designer submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.\n\n**The pack defines this as a record**, under *For each group* - one of only 13 drafted writes that does. That is the client writing a row rather than a screen, and it is where the table conversation should start.",
+  "required": [
+   "code",
+   "name",
+   "venueId",
+   "kind",
+   "price",
+   "components",
+   "allocation"
+  ],
   "properties": {
-   "groupName": {
+   "code": {
     "type": "string",
-    "description": "Group name"
+    "maxLength": 64
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "description": {
+    "type": "string",
+    "maxLength": 1000
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "kind": {
+    "$ref": "#/components/schemas/BundleKind"
+   },
+   "price": {
+    "x-ticvai-column": "list_price",
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "components": {
+    "type": "array",
+    "minItems": 0,
+    "items": {
+     "$ref": "#/components/schemas/BundleComponent"
+    }
+   },
+   "choiceGroups": {
+    "type": "array",
+    "description": "Dynamic bundles (3.5.10). A bundle may carry fixed components and choice groups at once — a family pass with fixed parking and two groups the guest chooses from. **The bundle price does not move with the choice** (ADR-0019).\n",
+    "items": {
+     "$ref": "#/components/schemas/BundleChoiceGroup"
+    }
+   },
+   "allocation": {
+    "type": "object",
+    "required": [
+     "method",
+     "components"
+    ],
+    "properties": {
+     "method": {
+      "allOf": [
+       {
+        "$ref": "#/components/schemas/AllocationMethod"
+       }
+      ],
+      "default": "proRataListPrice",
+      "description": "Proportional to list price by default. The rounding remainder in the currency's minor unit goes to the first component (decided 28 September, audit R101).\n"
+     },
+     "components": {
+      "type": "array",
+      "items": {
+       "$ref": "#/components/schemas/AllocationComponent"
+      }
+     }
+    }
+   },
+   "validFrom": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "validTo": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "campaignId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The commercial campaign (`promotions.campaign`) the bundle is sold under. (DM5, 29 September: data model for the agreed operations)"
+   },
+   "ownerPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The bundle owner (Bundle Definition & Setup). (DM5, 29 September: data model for the agreed operations)"
    },
    "category": {
     "type": "string",
-    "description": "Category"
+    "maxLength": 100,
+    "nullable": true,
+    "description": "The bundle category the setup screen files it under. (DM5, 29 September: data model for the agreed operations)"
    },
-   "minimumSelections": {
-    "type": "string",
-    "description": "Minimum selections"
+   "isStandaloneProduct": {
+    "type": "boolean",
+    "default": true,
+    "description": "Whether the bundle appears as a product in its own right, or only as an offer on another product. (DM5, 29 September: data model for the agreed operations)"
    },
-   "maximumSelections": {
-    "type": "string",
-    "description": "Maximum selections"
+   "isRecommendedAtCheckout": {
+    "type": "boolean",
+    "default": false,
+    "description": "Whether checkout recommends the bundle. (DM5, 29 September: data model for the agreed operations)"
    },
-   "requiredOptional": {
-    "type": "string",
-    "description": "Required/optional"
-   },
-   "eligibleProducts": {
-    "type": "string",
-    "description": "Eligible products"
-   },
-   "additionalCharge": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Additional charge"
-   },
-   "selectionOrder": {
-    "type": "string",
-    "description": "Selection order"
-   }
-  },
-  "x-ticvai-record-definition": "For each group"
- },
- "GuestChoiceBuildYourOwnBundleDesignerView": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
-  "description": "**What Guest Choice & Build-Your-Own Bundle Designer displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
-  "properties": {
-   "groupName": {
-    "type": "string",
-    "description": "Group name"
-   },
-   "category": {
-    "type": "string",
-    "description": "Category"
-   },
-   "minimumSelections": {
-    "type": "string",
-    "description": "Minimum selections"
-   },
-   "maximumSelections": {
-    "type": "string",
-    "description": "Maximum selections"
-   },
-   "requiredOptional": {
-    "type": "string",
-    "description": "Required/optional"
-   },
-   "eligibleProducts": {
-    "type": "string",
-    "description": "Eligible products"
-   },
-   "additionalCharge": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Additional charge"
-   },
-   "selectionOrder": {
-    "type": "string",
-    "description": "Selection order"
+   "requiredVariantIds": {
+    "type": "array",
+    "nullable": true,
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    },
+    "description": "Products that must already be in the basket for the bundle to be sold (the setup screen's \"requires another product\"). (DM5, 29 September: data model for the agreed operations)"
    }
   }
  },

@@ -25,14 +25,14 @@ modulesUsed:
   screens: 2
 servicesCalled:
 - service: AccessService
-  operationCalls: 59
+  operationCalls: 37
 - service: IdentityService
-  operationCalls: 8
-- service: OrderService
-  operationCalls: 3
+  operationCalls: 6
 - service: CrossRegionService
   operationCalls: 3
 - service: TenancyService
+  operationCalls: 1
+- service: OrderService
   operationCalls: 1
 coverage:
   screens: 11
@@ -48,26 +48,23 @@ screens:
   wave: 1
   density: comfortable
   operations:
+  - changeOwnCredential
   - createMfaChallenge
   - getCurrentSession
-  - getCurrentShift
-  - listMfaMethods
-  - listSsoProviders
   - login
-  - resolvePermissions
   - selectRole
   - verifyMfaChallenge
   states:
+  - denied
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   - mfaRequired
   - offline
+  - sessionHeld
   offlineState: true
   entryParams:
-  - shiftId<-session
   - challengeId<-navigation
   goesTo:
   - SCN-002
@@ -87,7 +84,6 @@ screens:
   - endPodiumShift
   - getAccessPoint
   - listAccessPoints
-  - setTurnstileMode
   - startPodiumShift
   states:
   - emptyFirstRun
@@ -120,12 +116,8 @@ screens:
   density: comfortable
   operations:
   - consumeCrossRegionEntitlement
-  - getOfflinePackage
-  - listBlacklist
-  - listScans
   - lookupTicket
   - overrideAccess
-  - syncScans
   - validateAccess
   - validateGroupAccess
   - verifyAccreditationCredential
@@ -170,11 +162,7 @@ screens:
   density: comfortable
   operations:
   - getOfflinePackage
-  - listScans
   - lookupTicket
-  - overrideAccess
-  - syncScans
-  - validateAccess
   - validateGroupAccess
   states:
   - emptyFirstRun
@@ -189,6 +177,7 @@ screens:
   - SCN-001
   - SCN-002
   - SCN-003
+  - SCN-014
   boardFrames: null
   wireframe: wireframes/P07 Venue Scanner.dc.html#scn-007
   inFlows:
@@ -201,12 +190,8 @@ screens:
   density: comfortable
   operations:
   - getOfflinePackage
-  - listScans
   - lookupTicket
-  - overrideAccess
-  - syncScans
   - validateAccess
-  - validateGroupAccess
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -235,10 +220,6 @@ screens:
   - getOfflinePackage
   - listScans
   - lookupTicket
-  - overrideAccess
-  - syncScans
-  - validateAccess
-  - validateGroupAccess
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -289,7 +270,6 @@ screens:
   density: comfortable
   operations:
   - getOfflinePackage
-  - listScans
   - lookupTicket
   - overrideAccess
   - syncScans
@@ -325,7 +305,6 @@ screens:
   - listSyncRejections
   - lookupTicket
   - overrideAccess
-  - syncOrders
   - syncScans
   - validateAccess
   - validateGroupAccess
@@ -347,6 +326,7 @@ screens:
   inFlows:
   - F06 Guest enters the venue
   - F19 A membership works in another country
+  - F61 A gate opens, a steward signs in, and a group is admitted
   - F63 A gate goes offline and reconciles
 - screen: SCN-015
   name: Offline package
@@ -356,12 +336,7 @@ screens:
   density: comfortable
   operations:
   - getOfflinePackage
-  - listScans
   - lookupTicket
-  - overrideAccess
-  - syncScans
-  - validateAccess
-  - validateGroupAccess
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -392,6 +367,7 @@ screens:
   - cancelGateModeChange
   - getAccessPoint
   - listAccessPoints
+  - setAccessPointDirection
   - setTurnstileMode
   states:
   - emptyFirstRun

@@ -178,65 +178,99 @@
    }
   }
  },
- "ApprovalDecision": {
+ "ApiScope": {
   "type": "object",
-  "x-ticvai-persistence": "approvals.decision",
+  "x-ticvai-persistence": "none — generated at release from x-ticvai-api-scope on each partner-callable operation",
+  "description": "**One module scope** (17 September minutes, M17-05): `{module}.read` or `{module}.write`, and the operations it opens.\n**A write scope never opens a catalogue write** (M17-04): `ticketing.write` opens carts, orders and holds for a partner or developer client, and no product, price list, price, channel capacity, lifecycle or alternative-code write, since those operations are not partner-callable and carry no `x-ticvai-api-scope`. Only a platform-staff `ApiLicence.catalogueWriteException` opens one, for one named client.\n",
   "required": [
-   "level",
-   "principalId",
-   "decision",
-   "decidedAt"
+   "scope",
+   "module",
+   "access"
   ],
   "properties": {
-   "id": {
+   "scope": {
     "type": "string",
-    "format": "uuid",
-    "readOnly": true,
-    "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
+    "description": "e.g. `ticketing.read`."
    },
-   "level": {
-    "type": "integer"
+   "module": {
+    "$ref": "../shared/common.yaml#/components/schemas/ModuleKey"
    },
-   "principalId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "displayName": {
-    "type": "string"
-   },
-   "isDelegate": {
-    "type": "boolean"
-   },
-   "delegatedFrom": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "decision": {
+   "access": {
     "type": "string",
     "enum": [
-     "approve",
-     "reject"
+     "read",
+     "write"
     ]
    },
-   "comment": {
-    "type": "string",
-    "nullable": true
+   "description": {
+    "type": "string"
    },
-   "reason": {
-    "type": "string",
-    "nullable": true
+   "operations": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "contract": {
+       "type": "string"
+      },
+      "operationId": {
+       "type": "string"
+      }
+     }
+    }
    },
-   "usedMfa": {
-    "type": "boolean"
+   "licensed": {
+    "type": "boolean",
+    "description": "Whether the caller's tenant licenses the module (`ApiLicence.licensedModules`)."
+   }
+  }
+ },
+ "ApiUsageSummary": {
+  "type": "object",
+  "description": "13.1.16 to 13.1.20, 13.1.41 to 13.1.45. **One endpoint because they are one question asked five ways.**\n",
+  "properties": {
+   "totalCalls": {
+    "type": "integer"
    },
-   "signatureRef": {
-    "type": "string",
-    "nullable": true
+   "successRate": {
+    "type": "number"
    },
-   "decidedAt": {
-    "type": "string",
-    "format": "date-time"
+   "clientErrorRate": {
+    "type": "number",
+    "description": "**4xx — the integrator's problem.** Separated because a single error rate lets both sides blame the other.\n"
+   },
+   "serverErrorRate": {
+    "type": "number",
+    "description": "5xx — TICVAI's problem."
+   },
+   "p50LatencyMs": {
+    "type": "number"
+   },
+   "p95LatencyMs": {
+    "type": "number"
+   },
+   "p99LatencyMs": {
+    "type": "number"
+   },
+   "quotaBreaches": {
+    "type": "integer"
+   },
+   "byOperation": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "operationId": {
+       "type": "string"
+      },
+      "calls": {
+       "type": "integer"
+      },
+      "errorRate": {
+       "type": "number"
+      }
+     }
+    }
    }
   }
  },
@@ -465,295 +499,6 @@
     "readOnly": true
    }
   }
- },
- "ApprovalKind": {
-  "type": "string",
-  "description": "11.1.7 and 11.1.30–11.1.37. **The first four already exist as bespoke implementations** and this contract is what they collapse into.\n**Which actions route here — decided 28 September, audit R144.** Finance and procurement acts go through this engine to a **finance approver**: closing a fiscal period (`periodClose`), reopening one (`periodReopen`), cancelling a purchase order (`purchaseOrderCancel`) and closing one short (`purchaseOrderShortClose`). The tenant default matrix for each of these names the finance approver role; a venue may tighten it and never loosen it. Starting a release rollout routes through `releasePromotion` to the platform release manager (a holder of `PLATFORM_RELEASE_PROMOTE`). **Not every `requiresApproval` goes here:** reopening a shift, recounting a stock count and a retail return above the venue threshold take a supervisor's step-up on the same device instead, and never raise a request.\n**Catalogue change requests route through `productChange` and `pricingChange`** (decided 29 September, writers pass): a product change and a price or pricing change raised in `catalogue` ask for approval under these two kinds, so a venue can route product edits and price edits to different approvers.\n",
-  "enum": [
-   "refund",
-   "priceOverride",
-   "discountOverride",
-   "complimentaryTicket",
-   "membershipCancellation",
-   "accessPermissionChange",
-   "configurationChange",
-   "aiRecommendation",
-   "releasePromotion",
-   "requisition",
-   "stockWriteOff",
-   "journalEntry",
-   "periodClose",
-   "periodReopen",
-   "purchaseOrderCancel",
-   "purchaseOrderShortClose",
-   "tenantMigration",
-   "productChange",
-   "pricingChange"
-  ]
- },
- "ApprovalMode": {
-  "type": "string",
-  "description": "11.1.43–11.1.46. **Sequential** asks one at a time, **parallel** asks everyone at once, **consensus** needs all of them, **majority** needs more than half.\nParallel and consensus differ in when it completes: parallel completes on the first approval, consensus waits for all. Conflating them is how a four-eyes rule turns into a one-eye rule.\n",
-  "enum": [
-   "sequential",
-   "parallel",
-   "consensus",
-   "majority"
-  ]
- },
- "ApprovalRequest": {
-  "type": "object",
-  "x-ticvai-persistence": "approvals.request",
-  "required": [
-   "id",
-   "kind",
-   "status",
-   "requestedByPrincipalId",
-   "requestedAt"
-  ],
-  "properties": {
-   "id": {
-    "type": "string"
-   },
-   "kind": {
-    "$ref": "#/components/schemas/ApprovalKind"
-   },
-   "rerouteOnNoApprover": {
-    "type": "boolean",
-    "default": true,
-    "description": "BL-154. **An approver on leave is an approval that waits for them to come back.** Reroutes to the next in the chain rather than stalling — `workforce` already knows who is on leave, and an approval queue nobody is watching is the thing that stops a venue.\n"
-   },
-   "outOfOfficeDelegateId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "allowEmailApproval": {
-    "type": "boolean",
-    "default": false,
-    "description": "**Approving from an email link with no second factor is the weakest path in the system**, so it is off by default and available only below a configured value.\n"
-   },
-   "reopenedFrom": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "**Reopening a decided approval creates a new one that points back.** Editing a decision in place destroys the record of what was originally approved, which is the only thing an audit wants.\n"
-   },
-   "status": {
-    "$ref": "#/components/schemas/ApprovalStatus"
-   },
-   "subjectContract": {
-    "type": "string"
-   },
-   "subjectType": {
-    "type": "string"
-   },
-   "subjectId": {
-    "type": "string"
-   },
-   "scopePath": {
-    "type": "string"
-   },
-   "summary": {
-    "type": "string"
-   },
-   "amount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "justification": {
-    "type": "string",
-    "nullable": true
-   },
-   "requestedByPrincipalId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "matrixVersion": {
-    "type": "integer"
-   },
-   "mode": {
-    "$ref": "#/components/schemas/ApprovalMode"
-   },
-   "currentLevel": {
-    "type": "integer"
-   },
-   "totalLevels": {
-    "type": "integer"
-   },
-   "pendingApprovers": {
-    "type": "array",
-    "items": {
-     "type": "object",
-     "properties": {
-      "principalId": {
-       "type": "string",
-       "format": "uuid"
-      },
-      "displayName": {
-       "type": "string"
-      },
-      "isDelegate": {
-       "type": "boolean"
-      }
-     }
-    }
-   },
-   "decisions": {
-    "type": "array",
-    "description": "Every decision at every level, in order. **Immutable once the request completes** (11.1.56) — an approval is evidence, and amending one is a different fact.\n",
-    "items": {
-     "$ref": "#/components/schemas/ApprovalDecision"
-    }
-   },
-   "escalations": {
-    "type": "array",
-    "description": "11.1.48. Who was asked, when, and why it moved up. **Escalation adds an approver rather than replacing one**, so the original stays in the record.\n",
-    "items": {
-     "type": "object",
-     "properties": {
-      "at": {
-       "type": "string",
-       "format": "date-time"
-      },
-      "reason": {
-       "type": "string"
-      },
-      "fromLevel": {
-       "type": "integer"
-      },
-      "toLevel": {
-       "type": "integer"
-      },
-      "wasAutomatic": {
-       "type": "boolean"
-      }
-     }
-    }
-   },
-   "resubmittedFromId": {
-    "type": "string",
-    "nullable": true
-   },
-   "reopenedFromId": {
-    "type": "string",
-    "nullable": true
-   },
-   "slaDueAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "slaBreached": {
-    "type": "boolean"
-   },
-   "expiresAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "requestedAt": {
-    "type": "string",
-    "format": "date-time"
-   },
-   "completedAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "aiAssessment": {
-    "type": "object",
-    "nullable": true,
-    "readOnly": true,
-    "description": "**AI context for the reviewer, never an input to the decision** (11.1.73 to 11.1.75; MoM 8 September; 29 September, build pass, group G2). Written by approvals from `ai.scoreApprovalRequest` on submit and on each SLA tick; null where AI is off or has not answered. Shown on the request labelled as AI; orders the inbox only when `sort=aiPriority` is asked for.",
-    "properties": {
-     "riskScore": {
-      "type": "integer",
-      "minimum": 0,
-      "maximum": 100
-     },
-     "riskBand": {
-      "type": "string",
-      "enum": [
-       "low",
-       "medium",
-       "high",
-       "critical"
-      ]
-     },
-     "priorityScore": {
-      "type": "integer",
-      "minimum": 0,
-      "maximum": 100
-     },
-     "escalationSuggestion": {
-      "type": "object",
-      "description": "A suggestion a person may act on through `escalateApprovalRequest`, or the tenant's own SLA policy may; nothing escalates because of it.",
-      "properties": {
-       "action": {
-        "type": "string",
-        "enum": [
-         "escalate",
-         "addBackupApprover",
-         "none"
-        ]
-       },
-       "reason": {
-        "type": "string",
-        "nullable": true
-       }
-      }
-     },
-     "signals": {
-      "type": "array",
-      "maxItems": 10,
-      "description": "The signals behind the scores, largest first, as `ai.AiApprovalRequestScore.signals`.",
-      "items": {
-       "type": "object",
-       "properties": {
-        "code": {
-         "type": "string"
-        },
-        "contribution": {
-         "type": "number"
-        },
-        "detail": {
-         "type": "string",
-         "nullable": true
-        }
-       }
-      }
-     },
-     "scoreId": {
-      "type": "string",
-      "format": "uuid",
-      "description": "The `ai.approval_request_score` row it was copied from; `ai.getApprovalRequestScore` gives the full context. Not a foreign key (the score lives in the AI service)."
-     },
-     "decisionRecordId": {
-      "type": "string",
-      "description": "The ai decision record, for the audit of what the AI said and why."
-     },
-     "assessedAt": {
-      "type": "string",
-      "format": "date-time"
-     }
-    }
-   }
-  }
- },
- "ApprovalStatus": {
-  "type": "string",
-  "enum": [
-   "draft",
-   "pending",
-   "escalated",
-   "returned",
-   "informationRequested",
-   "approved",
-   "rejected",
-   "withdrawn",
-   "expired",
-   "cancelled"
-  ]
  },
  "AuthorisationPolicy": {
   "type": "object",
@@ -1211,72 +956,6 @@
    "tenant.suspended",
    "whitelabel.contentPublished"
   ]
- },
- "WebhookSubscription": {
-  "type": "object",
-  "x-ticvai-persistence": "control.webhook_subscription",
-  "description": "13.1.26, 13.3.18 and 13.3.22. **The 29 events already exist and nothing outside could receive one.**\n",
-  "required": [
-   "id",
-   "clientId",
-   "endpointUrl",
-   "eventTypes",
-   "status"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid",
-    "readOnly": true
-   },
-   "clientId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "endpointUrl": {
-    "type": "string"
-   },
-   "eventTypes": {
-    "type": "array",
-    "description": "**Filtered at subscription, not at delivery.** A subscriber taking every event and discarding 99% is a subscriber the platform pays to talk to. Each entry is a name from the webhook event catalogue (`WebhookEventType`).\n",
-    "items": {
-     "$ref": "#/components/schemas/WebhookEventType"
-    }
-   },
-   "filters": {
-    "type": "object",
-    "nullable": true,
-    "description": "13.3.22. Tenant, venue, or a business condition on the payload.",
-    "additionalProperties": true
-   },
-   "signingSecret": {
-    "type": "string",
-    "format": "password",
-    "writeOnly": true,
-    "description": "**How the receiver knows it was TICVAI.** Without a signature an endpoint accepts a ticket-sale event from anybody who learns the URL.\n**Write-only: accepted on create, never returned.** The same rule as `clientSecret` — a system that can show you a secret later is a system that hands it to whoever reads the subscription.\n"
-   },
-   "status": {
-    "type": "string",
-    "enum": [
-     "pendingVerification",
-     "active",
-     "paused",
-     "failing",
-     "disabled"
-    ],
-    "readOnly": true
-   },
-   "consecutiveFailures": {
-    "type": "integer",
-    "readOnly": true
-   },
-   "disabledReason": {
-    "type": "string",
-    "nullable": true,
-    "readOnly": true,
-    "description": "13.1.29. **An endpoint failing for days is disabled rather than retried forever**, and the developer is told — a queue growing against a dead endpoint is a cost the platform carries silently.\n"
-   }
-  }
  },
  "WorkflowAnalyticsProcessPerformanceView": {
   "type": "object",

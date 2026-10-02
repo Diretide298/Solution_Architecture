@@ -123,7 +123,8 @@
         "DepartureOffer.fare"
        ],
        "operation": "searchTransportDepartures",
-       "provenance": "decided 29 September, rev 3 REV3-21"
+       "provenance": "decided 29 September, rev 3 REV3-21",
+       "notes": "Departures list as soon as From, To and the date are set; there is no Search button (DI-1109)."
       }
      ]
     },
@@ -131,12 +132,6 @@
      "name": "actionBar",
      "slot": "rowActions",
      "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Search Trips",
-       "operation": "searchTransportDepartures",
-       "provenance": "decided 29 September, rev 3 REV3-21"
-      },
       {
        "kind": "secondaryButton",
        "label": "Next Available Trip",
@@ -374,7 +369,7 @@
    "loading": "The route of the chosen departure.",
    "error": "Could not load. Names which read failed; nothing is bought.",
    "emptyFirstRun": "**No routes are published for this venue yet.** Says so; the client still owes the real network (stations, fares, timetable).",
-   "emptyNoResults": "No departure in that period. Names the period and offers **Next Available Trip** or another period or date.",
+   "emptyNoResults": "Never shown as a list: the screen opens on one departure. If it has gone, says so and offers the next departure on the route.",
    "emptyNoAccess": "Searching and buying need no account. **Favourites need a signed-in guest**: a guest who is not signed in is offered sign-in and brought back, never shown an empty list.",
    "offline": "**The offline banner shows.** A route's stop list and schematic line already loaded stay readable with their age; the street map needs the connection. Searching departures, buying a trip or a pass and saving a favourite route need the connection."
   },
@@ -588,7 +583,7 @@
    "loading": "The passes for the station pair.",
    "error": "Could not load. Names which read failed; nothing is bought.",
    "emptyFirstRun": "**No routes are published for this venue yet.** Says so; the client still owes the real network (stations, fares, timetable).",
-   "emptyNoResults": "No departure in that period. Names the period and offers **Next Available Trip** or another period or date.",
+   "emptyNoResults": "No passes for this route: says so and offers the one-way trip.",
    "emptyNoAccess": "Searching and buying need no account. **Favourites need a signed-in guest**: a guest who is not signed in is offered sign-in and brought back, never shown an empty list.",
    "offline": "**The offline banner shows.** A route's stop list and schematic line already loaded stay readable with their age; the street map needs the connection. Searching departures, buying a trip or a pass and saving a favourite route need the connection."
   },
@@ -698,7 +693,10 @@
      "to": "GST-042",
      "trigger": "Sign in to see saved routes",
      "returnsTo": "GST-079",
-     "provenance": "decided 29 September, rev 3 REV3-21"
+     "provenance": "decided 29 September, rev 3 REV3-21",
+     "carries": [
+      "subjectId"
+     ]
     }
    ]
   },
@@ -751,7 +749,7 @@
    "loading": "The saved routes.",
    "error": "Could not load. Names which read failed; nothing is bought.",
    "emptyFirstRun": "**No saved routes yet.** Says how to save one (Save this route on a trip) and offers the one-way search.",
-   "emptyNoResults": "No departure in that period. Names the period and offers **Next Available Trip** or another period or date.",
+   "emptyNoResults": "No saved routes yet: save one with Save route on a one-way trip.",
    "emptyNoAccess": "Searching and buying need no account. **Favourites need a signed-in guest**: a guest who is not signed in is offered sign-in and brought back, never shown an empty list.",
    "offline": "**The offline banner shows.** A route's stop list and schematic line already loaded stay readable with their age; the street map needs the connection. Searching departures, buying a trip or a pass and saving a favourite route need the connection."
   },

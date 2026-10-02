@@ -7,15 +7,15 @@
  "audience": "staff",
  "formFactor": "kiosk",
  "offlineCapable": true,
- "generated": "2026-10-01",
+ "generated": "2026-10-02",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 10,
-  "operations": 27,
-  "contracts": 3,
+  "operations": 26,
+  "contracts": 2,
   "modules": 1,
   "undrawn": 0,
-  "operationsWithNoScreen": 23
+  "operationsWithNoScreen": 9
  },
  "waves": {
   "wave2": 10
@@ -37,10 +37,6 @@
   {
    "contract": "reporting",
    "operations": 3
-  },
-  {
-   "contract": "tenancy",
-   "operations": 1
   }
  ],
  "screens": [
@@ -59,7 +55,7 @@
    "module": "Kitchen",
    "wave": 2,
    "route": "/kitchen/kitchen-display-system-kds",
-   "operations": 7,
+   "operations": 5,
    "drawn": true
   },
   {
@@ -68,7 +64,7 @@
    "module": "Kitchen",
    "wave": 2,
    "route": "/kitchen/order-firing-course-management",
-   "operations": 6,
+   "operations": 5,
    "drawn": true
   },
   {
@@ -86,7 +82,7 @@
    "module": "Kitchen",
    "wave": 2,
    "route": "/kitchen/kitchen-station-workload-dynamic-routing",
-   "operations": 4,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -95,7 +91,7 @@
    "module": "Kitchen",
    "wave": 2,
    "route": "/kitchen/expeditor-order-assembly",
-   "operations": 5,
+   "operations": 6,
    "drawn": true
   },
   {
@@ -113,7 +109,7 @@
    "module": "Kitchen",
    "wave": 2,
    "route": "/kitchen/exceptions-re-fire-unavailable-items",
-   "operations": 6,
+   "operations": 5,
    "drawn": true
   },
   {
@@ -138,22 +134,16 @@
  "gaps": {
   "operationsWithNoScreen": [
    {
-    "operation": "getAllergenVerification",
+    "operation": "createTable",
     "contract": "fnb",
-    "verb": "GET",
-    "summary": "The last allergen verdict recorded for a dish"
+    "verb": "POST",
+    "summary": "A table as a thing, not an inference"
    },
    {
-    "operation": "getFnbReservationPolicy",
+    "operation": "getPrepSheetTemplate",
     "contract": "fnb",
     "verb": "GET",
-    "summary": "How long a table is held, by party size"
-   },
-   {
-    "operation": "getFnbServiceChargePolicy",
-    "contract": "fnb",
-    "verb": "GET",
-    "summary": "The service charge a venue applies, and on what"
+    "summary": "The venue's prep-sheet print template"
    },
    {
     "operation": "listFnbRecommendations",
@@ -168,112 +158,34 @@
     "summary": "Approved substitutions for a recipe's ingredients"
    },
    {
-    "operation": "listMenuSchedules",
-    "contract": "fnb",
-    "verb": "GET",
-    "summary": "What is scheduled to go live, and when"
-   },
-   {
-    "operation": "listMenuVersions",
-    "contract": "fnb",
-    "verb": "GET",
-    "summary": "Every published version of a menu"
-   },
-   {
-    "operation": "listTemperatureCheckpoints",
-    "contract": "fnb",
-    "verb": "GET",
-    "summary": "The units that get read, and the range each must hold"
-   },
-   {
-    "operation": "resolveBookingConflict",
-    "contract": "fnb",
-    "verb": "GET",
-    "summary": "Two bookings, one table \u2014 and what to do about it"
-   },
-   {
-    "operation": "sendBookingConfirmation",
-    "contract": "fnb",
-    "verb": "POST",
-    "summary": "Confirm a booking, and ask them to confirm back"
-   },
-   {
     "operation": "sendOrderNotification",
     "contract": "fnb",
     "verb": "POST",
     "summary": "Tell the guest where their order is"
    },
    {
+    "operation": "setFnbReservationPolicy",
+    "contract": "fnb",
+    "verb": "PUT",
+    "summary": "Set turn times and seating buffers"
+   },
+   {
+    "operation": "setPrepSheetTemplate",
+    "contract": "fnb",
+    "verb": "PUT",
+    "summary": "Set the prep-sheet print template"
+   },
+   {
+    "operation": "updateTable",
+    "contract": "fnb",
+    "verb": "PUT",
+    "summary": "Change what a table is"
+   },
+   {
     "operation": "listAlertRules",
     "contract": "reporting",
     "verb": "GET",
     "summary": "What raises an alert, and when"
-   },
-   {
-    "operation": "getConfigurationProfile",
-    "contract": "tenancy",
-    "verb": "GET",
-    "summary": "One profile, at its latest version or at a named one"
-   },
-   {
-    "operation": "getConnectivityPolicy",
-    "contract": "tenancy",
-    "verb": "GET",
-    "summary": "The connectivity thresholds saved at one scope node"
-   },
-   {
-    "operation": "getDevice",
-    "contract": "tenancy",
-    "verb": "GET",
-    "summary": "Read one registered device"
-   },
-   {
-    "operation": "getOfflinePolicy",
-    "contract": "tenancy",
-    "verb": "GET",
-    "summary": "The offline policy saved at one scope node"
-   },
-   {
-    "operation": "getOutlet",
-    "contract": "tenancy",
-    "verb": "GET",
-    "summary": "Read an outlet"
-   },
-   {
-    "operation": "listCellEndpoints",
-    "contract": "tenancy",
-    "verb": "GET",
-    "summary": "Where each service answers inside a cell"
-   },
-   {
-    "operation": "listConfigurationProfiles",
-    "contract": "tenancy",
-    "verb": "GET",
-    "summary": "Every configuration profile, at its current version"
-   },
-   {
-    "operation": "listDeviceAuditRecords",
-    "contract": "tenancy",
-    "verb": "GET",
-    "summary": "What was done to this device, and what it did"
-   },
-   {
-    "operation": "listDeviceTamperEvents",
-    "contract": "tenancy",
-    "verb": "GET",
-    "summary": "Devices that report having been interfered with"
-   },
-   {
-    "operation": "listProfileDeployments",
-    "contract": "tenancy",
-    "verb": "GET",
-    "summary": "Recent deployments, with a date, a target and an outcome"
-   },
-   {
-    "operation": "recordDeviceTamperEvent",
-    "contract": "tenancy",
-    "verb": "POST",
-    "summary": "A device reports interference"
    }
   ],
   "modulesSplitAcrossWaves": [],

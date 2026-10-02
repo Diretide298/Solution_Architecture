@@ -45,7 +45,10 @@
     {
      "to": "BO-729",
      "trigger": "Create / Edit Outlet",
-     "provenance": "structural — pack board 1 wiring, 19 September 2026"
+     "provenance": "structural — pack board 1 wiring, 19 September 2026",
+     "carries": [
+      "outletId"
+     ]
     },
     {
      "to": "BO-730",
@@ -137,7 +140,7 @@
   "states": {
    "loading": "The record list; the counts above it resolve separately.",
    "error": "Could not load. Names which read failed and leaves the record untouched.",
-   "emptyFirstRun": "No record yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "**Nothing to show yet**: the figures fill as activity is recorded. Offers no create action — a monitor creates nothing — and says so rather than showing empty tiles.",
    "emptyNoResults": "The filter narrowed it and the record are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -156,6 +159,13 @@
    "workshopBoard": "wireframes/WS57 F&B Backend Structure Module Sample Reference v1.0 Board 1.dc.html#bo-727"
   },
   "apisNote": "Regenerated 9 September 2026 from F&B_Backend_Structure_Module Sample Reference v1.0.pdf page 4. 0 of 0 labels bound to a contract property; 10 of 22 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-024): No operation returns outlet KPIs (sales, orders, preparation time, stock alerts) per outlet.",
+    "source": "screens/P08-venue-back-office.yaml#BO-727"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -216,56 +226,31 @@
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
-  "purpose": "Outlet Management",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
-    "source": "pack F&B_Backend_Structure_Module Sample Reference v1.0.pdf, page 5"
-   },
-   {
-    "operation": null,
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
-    "source": "pack F&B_Backend_Structure_Module Sample Reference v1.0.pdf, page 5"
-   }
-  ],
+  "purpose": "Outlet Management (merged into BO-044 F&B Outlets).",
   "layout": {
    "template": "split",
    "regions": [
     {
      "name": "contentBody",
-     "components": [
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listOutlets",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
-      }
-     ]
+     "components": []
     }
    ]
   },
   "states": {
-   "loading": "The outlet list.",
-   "error": "Could not load. Names which read failed and leaves the outlet untouched.",
-   "emptyFirstRun": "No outlet yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the outlet are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "loading": "Routes to BO-044 while it opens.",
+   "error": "Could not open BO-044; says so and offers to retry.",
+   "emptyFirstRun": "Never shown: this id routes to BO-044, whose empty states apply.",
+   "emptyNoResults": "Never shown: this id routes to BO-044.",
+   "emptyNoAccess": "As BO-044: shown when the caller lacks the access BO-044 requires, named in words."
   },
-  "apis": [
-   {
-    "operationId": "listOutlets",
-    "contract": "tenancy",
-    "purpose": "List outlets",
-    "trigger": "onLoad"
-   }
-  ],
+  "apis": [],
   "wireframe": {
    "status": "notStarted",
    "board": "wireframes/P08 Venue Management.dc.html#bo-728",
    "workshopBoard": "wireframes/WS57 F&B Backend Structure Module Sample Reference v1.0 Board 1.dc.html#bo-728"
   },
-  "apisNote": "Regenerated 9 September 2026 from F&B_Backend_Structure_Module Sample Reference v1.0.pdf page 5. 0 of 0 labels bound to a contract property; 0 of 9 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "No operations of its own since 2 October 2026 (CHG-SBO-021): merged into BO-044, whose operations it routes to.",
+  "notes": "**Merged into BO-044** (decided 2 October 2026, Chinmay: duplicate screens merged as proposed; CHG-SBO-021). BO-044 F&B Outlets is the outlet register and its create/edit form; the client pack's Outlet Management and Create / Edit Outlet are the same register (R276, DI-319; design-note corrections fnb-retail BO-044, BO-729). The outlet type and department (DEC-196) and the opening hours are edited on BO-044. **One implementation, both ids kept**, as the M24-03 merges do: this id stays for traceability and routes to BO-044, and nothing on it is built separately.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -326,104 +311,33 @@
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
-  "purpose": "Create / Edit Outlet",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
-    "source": "pack F&B_Backend_Structure_Module Sample Reference v1.0.pdf, page 5"
-   },
-   {
-    "operation": null,
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
-    "source": "pack F&B_Backend_Structure_Module Sample Reference v1.0.pdf, page 5"
-   }
-  ],
+  "purpose": "Create / Edit Outlet (merged into BO-044 F&B Outlets).",
   "layout": {
    "template": "split",
    "regions": [
     {
      "name": "contentBody",
-     "components": [
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listMenus",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
-      },
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "createTable",
-       "label": "Create table",
-       "notes": "The act the screen exists for."
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "createTable"
-      }
-     ]
+     "components": []
+    },
+    {
+     "name": "actionBar",
+     "components": []
     }
    ]
   },
   "states": {
-   "loading": "The create edit outlet list.",
-   "error": "Could not load. Names which read failed and leaves the create edit outlet untouched.",
-   "emptyFirstRun": "No create edit outlet yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the create edit outlet are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "loading": "Routes to BO-044 while it opens.",
+   "error": "Could not open BO-044; says so and offers to retry.",
+   "emptyFirstRun": "Never shown: this id routes to BO-044, whose empty states apply.",
+   "emptyNoResults": "Never shown: this id routes to BO-044.",
+   "emptyNoAccess": "As BO-044: shown when the caller lacks the access BO-044 requires, named in words."
   },
-  "apis": [
-   {
-    "operationId": "listMenus",
-    "contract": "fnb",
-    "purpose": "Menus",
-    "trigger": "onLoad",
-    "provenance": "board reading, 19 September 2026"
-   },
-   {
-    "operationId": "createTable",
-    "contract": "fnb",
-    "purpose": "Add a table to the outlet floor",
-    "trigger": "onAction",
-    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
-    "invalidates": [
-     "listMenus"
-    ]
-   },
-   {
-    "operationId": "updateTable",
-    "contract": "fnb",
-    "purpose": "Change a table (covers, shape, joinable)",
-    "trigger": "onAction",
-    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
-    "invalidates": [
-     "listMenus"
-    ]
-   },
-   {
-    "operationId": "setSectionLayout",
-    "contract": "fnb",
-    "purpose": "Divide the floor into sections and give each a server",
-    "trigger": "onAction",
-    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
-    "invalidates": [
-     "listMenus"
-    ]
-   }
-  ],
+  "apis": [],
   "entryState": {
    "params": [
     {
      "name": "outletId",
      "from": "BO-727"
-    },
-    {
-     "name": "tableId",
-     "from": "navigation"
     }
    ],
    "coldEntry": "Opened from BO-727 with the outlet picked there. Opened cold (a bookmark or a refresh), it shows the list to pick from rather than an empty record, and says plainly if the outlet no longer exists."
@@ -433,7 +347,8 @@
    "board": "wireframes/P08 Venue Management.dc.html#bo-729",
    "workshopBoard": "wireframes/WS57 F&B Backend Structure Module Sample Reference v1.0 Board 1.dc.html#bo-729"
   },
-  "apisNote": "Regenerated 9 September 2026 from F&B_Backend_Structure_Module Sample Reference v1.0.pdf page 5. 0 of 0 labels bound to a contract property; 0 of 3 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "No operations of its own since 2 October 2026 (CHG-SBO-021): merged into BO-044, whose operations it routes to.",
+  "notes": "**Merged into BO-044** (decided 2 October 2026, Chinmay: duplicate screens merged as proposed; CHG-SBO-021). BO-044 F&B Outlets is the outlet register and its create/edit form; the client pack's Outlet Management and Create / Edit Outlet are the same register (R276, DI-319; design-note corrections fnb-retail BO-044, BO-729). The outlet type and department (DEC-196) and the opening hours are edited on BO-044. **One implementation, both ids kept**, as the M24-03 merges do: this id stays for traceability and routes to BO-044, and nothing on it is built separately.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -505,6 +420,12 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack F&B_Backend_Structure_Module Sample Reference v1.0.pdf, page 7"
+   },
+   {
+    "operation": "listMenus",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-008): The content table was bound to listMenus (\"Menu items\"); the templates list (listOutletTemplates, declared) is the screen (design-notes correction fnb-retail BO-730).",
+    "source": "contracts/satellite/fnb.yaml#listOutletTemplates"
    }
   ],
   "layout": {
@@ -528,8 +449,15 @@
       {
        "kind": "dataTable",
        "derived": true,
-       "impliedBy": "listMenus",
+       "impliedBy": "listOutletTemplates",
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setOutletTemplate"
       }
      ]
     }
@@ -538,18 +466,11 @@
   "states": {
    "loading": "The outlet types templates list.",
    "error": "Could not load. Names which read failed and leaves the outlet types templates untouched.",
-   "emptyFirstRun": "No outlet types templates yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No outlet types templates yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the outlet types templates are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
-   {
-    "operationId": "listMenus",
-    "contract": "fnb",
-    "purpose": "Menu items",
-    "trigger": "onLoad",
-    "provenance": "board reading, 19 September 2026"
-   },
    {
     "operationId": "listOutletTemplates",
     "contract": "fnb",
@@ -640,6 +561,12 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack F&B_Backend_Structure_Module Sample Reference v1.0.pdf, page 7"
+   },
+   {
+    "operation": "listKitchenTickets",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-008): The only operation was listKitchenTickets (the kitchen rail), nothing to do with hours or periods; opening hours are Outlet.openingHours, written by updateOutlet (R254; design-notes correction fnb-retail BO-731).",
+    "source": "R254 | contracts/spine/tenancy.yaml#updateOutlet"
    }
   ],
   "layout": {
@@ -650,9 +577,21 @@
      "components": [
       {
        "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listKitchenTickets",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "label": "Outlets",
+       "bindsTo": "Outlet",
+       "operation": "listOutlets",
+       "provenance": "contract tenancy.yaml GET /outlets; wiring fix, 2 October 2026"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "components": [
+      {
+       "kind": "secondaryButton",
+       "label": "Save hours",
+       "operation": "updateOutlet",
+       "provenance": "contract tenancy.yaml PATCH /outlets/{outletId}; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -661,17 +600,24 @@
   "states": {
    "loading": "The operating hours service list.",
    "error": "Could not load. Names which read failed and leaves the operating hours service untouched.",
-   "emptyFirstRun": "No operating hours service yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No operating hours service yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the operating hours service are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
-    "operationId": "listKitchenTickets",
-    "contract": "fnb",
-    "purpose": "Kitchen operations",
+    "operationId": "listOutlets",
+    "contract": "tenancy",
+    "purpose": "The outlets and their opening hours",
     "trigger": "onLoad",
-    "provenance": "board reading, 19 September 2026"
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-008)"
+   },
+   {
+    "operationId": "updateOutlet",
+    "contract": "tenancy",
+    "purpose": "Set an outlet's opening hours",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-008)"
    }
   ],
   "wireframe": {
@@ -680,6 +626,31 @@
    "workshopBoard": "wireframes/WS57 F&B Backend Structure Module Sample Reference v1.0 Board 1.dc.html#bo-731"
   },
   "apisNote": "Regenerated 9 September 2026 from F&B_Backend_Structure_Module Sample Reference v1.0.pdf page 7. 0 of 0 labels bound to a contract property; 0 of 13 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formUpdateOutlet",
+    "component": "modal",
+    "trigger": "Save hours",
+    "body": "**Collects what `updateOutlet` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save hours",
+     "operation": "updateOutlet"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "contract tenancy.yaml PATCH /outlets/{outletId}; wiring fix, 2 October 2026"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "outletId",
+     "from": "session"
+    }
+   ]
+  },
+  "notes": "**A late-night window is one window past midnight, marked \"ends next day\" (decided 2 October 2026 by Chinmay, DEC-197; CHG-CSP-007, `OpeningHoursWindow.endsNextDay`).**",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -764,6 +735,12 @@
        "bindsTo": null,
        "operation": null,
        "provenance": "pack F&B_Backend_Structure_Module Sample Reference v1.0.pdf, page 8 §Device cards/table"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Devices",
+       "operation": "listDevices",
+       "provenance": "contract tenancy.yaml GET /devices; wiring fix, 2 October 2026"
       }
      ]
     },
@@ -782,13 +759,24 @@
        "provenance": "pack F&B_Backend_Structure_Module Sample Reference v1.0.pdf, page 8 §Device cards/table"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "components": [
+      {
+       "kind": "secondaryButton",
+       "label": "Assign device",
+       "operation": "setDeviceAssignment",
+       "provenance": "contract tenancy.yaml PUT /devices/{deviceId}/assignment; wiring fix, 2 October 2026"
+      }
+     ]
     }
    ]
   },
   "states": {
    "loading": "The pos device list.",
    "error": "Could not load. Names which read failed and leaves the pos device untouched.",
-   "emptyFirstRun": "No pos device yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No pos device yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the pos device are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -799,11 +787,31 @@
     "purpose": "Outlet configuration",
     "trigger": "onLoad",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "listDevices",
+    "contract": "tenancy",
+    "purpose": "The tills, readers and printers that can be assigned",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-021)"
+   },
+   {
+    "operationId": "setDeviceAssignment",
+    "contract": "tenancy",
+    "purpose": "Assign a device to an outlet and a workstation",
+    "trigger": "onAction",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-021)"
    }
   ],
   "entryState": {
    "preloaded": [
     "Terminal Outlet Type Cashier Payment Printer Status"
+   ],
+   "params": [
+    {
+     "name": "deviceId",
+     "from": "session"
+    }
    ]
   },
   "wireframe": {
@@ -812,6 +820,22 @@
    "workshopBoard": "wireframes/WS57 F&B Backend Structure Module Sample Reference v1.0 Board 1.dc.html#bo-732"
   },
   "apisNote": "Regenerated 9 September 2026 from F&B_Backend_Structure_Module Sample Reference v1.0.pdf page 8. 0 of 1 labels bound to a contract property; 16 of 25 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetDeviceAssignment",
+    "component": "modal",
+    "trigger": "Assign device",
+    "body": "**Collects what `setDeviceAssignment` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Assign device",
+     "operation": "setDeviceAssignment"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "contract tenancy.yaml PUT /devices/{deviceId}/assignment; wiring fix, 2 October 2026"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -878,6 +902,23 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack F&B_Backend_Structure_Module Sample Reference v1.0.pdf, page 9"
+   },
+   {
+    "operation": "getKpiValues",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-008): The table was bound to getKpiValues (no per-channel KPI is seeded) and setFnbReservationPolicy (table turn times) belongs to reservations; the screen could read and save nothing it shows (R254; design-notes correction fnb-retail BO-733).",
+    "source": "R254 | screens/P08-venue-back-office.yaml#BO-733"
+   },
+   {
+    "operation": "setFnbReservationPolicy",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-008): The table was bound to getKpiValues (no per-channel KPI is seeded) and setFnbReservationPolicy (table turn times) belongs to reservations; the screen could read and save nothing it shows (R254; design-notes correction fnb-retail BO-733).",
+    "source": "R254 | screens/P08-venue-back-office.yaml#BO-733"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-011): No operation configures F&B service channels.",
+    "source": "screens/P08-venue-back-office.yaml#BO-733"
    }
   ],
   "layout": {
@@ -904,6 +945,13 @@
        ],
        "notes": "POS Counter, Dine-In, QR Table Order, Mobile App, B2C Web, Kiosk, Takeaway, Delivery, VIP / Hospitality, Event Catering. The bound read is `getKpiValues`, which carries no channel configuration.",
        "provenance": "pack F&B_Backend_Structure_Module Sample Reference v1.0.pdf, page 9"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Service charge",
+       "bindsTo": "FnbServiceChargePolicy",
+       "operation": "getFnbServiceChargePolicy",
+       "provenance": "contract fnb.yaml GET /service-charge-policy; wiring fix, 2 October 2026"
       }
      ]
     },
@@ -933,52 +981,31 @@
     {
      "name": "contentBody",
      "slot": "headline",
-     "components": [
-      {
-       "kind": "metricTile",
-       "label": "Orders by channel",
-       "bindsTo": "KpiValue",
-       "columns": [
-        "KpiValue.name",
-        "KpiValue.value",
-        "KpiValue.comparison"
-       ],
-       "operation": "getKpiValues",
-       "notes": "The only use `getKpiValues` has here; needs a per-channel KPI code, which is not seeded.",
-       "provenance": "contract reporting.yaml GET /kpi-values"
-      }
-     ]
+     "components": []
     }
    ]
   },
   "states": {
    "loading": "The service channel list.",
    "error": "Could not load. Names which read failed and leaves the service channel untouched.",
-   "emptyFirstRun": "No service channel yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No service channel yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the service channel are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
-   {
-    "operationId": "getKpiValues",
-    "contract": "reporting",
-    "purpose": "F&B performance",
-    "trigger": "onLoad",
-    "provenance": "board reading, 19 September 2026"
-   },
-   {
-    "operationId": "setFnbReservationPolicy",
-    "contract": "fnb",
-    "purpose": "Set turn times and seating buffers for table reservations",
-    "trigger": "onAction",
-    "provenance": "decided 29 September, VM close-out (venue management and configuration)"
-   },
    {
     "operationId": "setFnbServiceChargePolicy",
     "contract": "fnb",
     "purpose": "Set the service charge per channel",
     "trigger": "onAction",
     "provenance": "decided 29 September, VM close-out (venue management and configuration)"
+   },
+   {
+    "operationId": "getFnbServiceChargePolicy",
+    "contract": "fnb",
+    "purpose": "The service charge in force",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-008)"
    }
   ],
   "wireframe": {
@@ -987,6 +1014,7 @@
    "workshopBoard": "wireframes/WS57 F&B Backend Structure Module Sample Reference v1.0 Board 1.dc.html#bo-733"
   },
   "apisNote": "Regenerated 9 September 2026 from F&B_Backend_Structure_Module Sample Reference v1.0.pdf page 9. 0 of 0 labels bound to a contract property; 0 of 9 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Layout drafted 29 September (VM close-out)** from pack F&B_Backend_Structure_Module Sample Reference v1.0.pdf p.9; pack F&B_Backend_Structure_Module Sample Reference v1.0.pdf p.10; contract reporting.yaml GET /kpi-values. Pack labels with no schema field yet (shown as plain labels): Channel, Channel status, Available outlets, Menu, Price book, Payment options, Guest login, Operating hours, Maximum items per order, Minimum order, A channel-configuration read (bound op is getKpiValues).",
+  "entryState": {},
   "_platform": {
    "code": "P08",
    "audience": "staff",

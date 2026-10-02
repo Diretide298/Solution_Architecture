@@ -188,80 +188,6 @@
    }
   }
  },
- "GameCard": {
-  "x-ticvai-persistence": "games.card",
-  "type": "object",
-  "required": [
-   "cardCode",
-   "venueId",
-   "credits",
-   "bonusCredits",
-   "points",
-   "status",
-   "issuedAt"
-  ],
-  "properties": {
-   "cardCode": {
-    "type": "string",
-    "description": "**A pre-printed card keeps the code printed on it. A generated code** (a digital card, or a card issued with no printed code) **is the venue prefix plus a sequence per venue** (decided 28 September, audit R152). Each till holds a reserved range of that sequence, so a card issued offline takes its code at once. Not gapless; only tax invoices are gapless, per legal entity.\n"
-   },
-   "kind": {
-    "type": "string"
-   },
-   "venueId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "subjectId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "credits": {
-    "type": "integer",
-    "description": "Bought with money. Buys plays."
-   },
-   "bonusCredits": {
-    "type": "integer",
-    "description": "From a promotion. Typically non-refundable and spent before paid credits.\n"
-   },
-   "points": {
-    "type": "integer",
-    "description": "Won by playing. Buys prizes. **Not interchangeable with credits** — a guest who wins should not simply be able to play more.\n"
-   },
-   "status": {
-    "type": "string",
-    "enum": [
-     "active",
-     "blocked",
-     "expired",
-     "transferred"
-    ]
-   },
-   "blockedReason": {
-    "type": "string",
-    "nullable": true
-   },
-   "transferredToCardCode": {
-    "type": "string",
-    "nullable": true
-   },
-   "lastPlayedAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "issuedAt": {
-    "type": "string",
-    "format": "date-time"
-   },
-   "expiresAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   }
-  }
- },
  "GameConfigurationHealth": {
   "x-ticvai-persistence": "none — computed",
   "type": "object",
@@ -392,6 +318,11 @@
      "type": "string",
      "format": "uuid"
     }
+   },
+   "coversGamesAddedLater": {
+    "type": "boolean",
+    "default": true,
+    "description": "**Whether a pass sold today covers a game added tomorrow** (Chinmay, 2 October, workbook Q397: \"venue configures; default yes\"; CHG-CSA-028). True, the default: an `allGamesPass`, or a pass bound by `attractionTypeIds`, covers games added after it was sold that match it; the coverage summary says so. False: it covers only the games that existed at sale. A pass listing `gameIds` covers those games only, whatever this says."
    },
    "playCount": {
     "type": "integer",

@@ -1,6 +1,6 @@
 # P08-stock-supply-01 — P08 · Stock & Supply (1 of 2)
 
-**10 screens · 56 operations · 42 schemas · 12 permissions**
+**10 screens · 54 operations · 37 schemas · 11 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -48,8 +48,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 12 permissions apply here:
-  `APPROVAL_ACT, LEDGER_APPROVE, LEDGER_POST, LEDGER_VIEW, ORDER_VIEW, PROCUREMENT_MANAGE, PROCUREMENT_RECEIVE, PROCUREMENT_REQUEST, PROCUREMENT_VIEW, PRODUCT_CONFIGURE, PRODUCT_VIEW, REPORT_VIEW_VENUE`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 11 permissions apply here:
+  `APPROVAL_ACT, LEDGER_APPROVE, LEDGER_POST, LEDGER_VIEW, PROCUREMENT_MANAGE, PROCUREMENT_RECEIVE, PROCUREMENT_REQUEST, PROCUREMENT_VIEW, PRODUCT_CONFIGURE, PRODUCT_VIEW, REPORT_VIEW_VENUE`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -61,21 +61,53 @@ convincingly. It is never a caption.
   and its error; and, element by element, what is shown and in what format, what each action
   produces and where the user goes next. Draw exactly that.
 
+## The processes these screens belong to
+
+Written by the owner of each process (`handoff/design-notes/`). Read before any screen: it says how the process runs end to end and which words the screens must use.
+
+### Food, Beverage & Retail
+
+Food & beverage, retail, rentals, inventory and procurement across the till (P04), the kitchen display (P15), the staff app (P06), Venue Management (P08), the guest web and app (P01/P02), the kiosk (P05) and the CMS (P13). COUNTER SERVICE (F108): the cashier takes the order on the Food & Drink board from the outlet's menu in force (sections in the outlet's order, option groups attached to the item), sends it to the kitchen, and only then charges — send to kitchen, then charge, for every POS F&B order (R261, upheld against the v2 frame by POSV2-4). The kitchen ticket is on the rail while the card is in the guest's hand; an unpaid sent order is cancelled while ordered or accepted and voided with a reason after (R125(3), R091(5)); the guest gets an order number, and the customer-facing status board (numbers only) is the kitchen display's KIT-007, mirrored on the till's queue (POSV2-7). TABLE SERVICE (F29, F80, F94): a party is seated with its covers, orders across the visit, courses are fired by the pass (DI-333, DI-407), the bill is printed and settled at the end and split by amount, covers, category, item or seat (DI-106); the client's table statuses are Available → Ordered → Table closed → Reserved with no cleaning status (DI-336); moving and merging tables stay on the staff app until after r2 (POSV2-8). GUEST ORDERING (F11, F48): a guest inside the venue orders in the app or web for pickup or delivery to a seat or a scanned location (DI-288, DI-291); F&B and retail are optional licensed modules completed inside TICVAI (DI-505), kept simple (DI-1091); no food without an admission ticket (DI-292); table reservations and the waitlist do not go through the cart and a dining deposit is a venue option, off by default (DI-1048, DI-1049, R077). KITCHEN (P15, F83, F88): TICVAI's own display on commodity screens (19 September, replacing the 31 July "integration point only", DI-077); one kitchen ticket per preparation station from the outlet's routing rules with a fallback display (DI-323); a fired timer counts up and resets per course, not shown for quick service (DI-334); displays are assigned to stations and filter by course, with no station-load tile in r1 (R277). 86 takes an item off sale on every till and guest menu immediately (R110(c)); guests always see "Sold out", never a missing dish. RETAIL (F17, F34, F51): scan and sell through the same cart, charge and payment as tickets and food (DI-795), one cart, one receipt and one QR per guest (DI-293); system stock per venue gates the sale (DI-294); returns by receipt or order number only in r1 (R139(c)), refund to the original tender with a reason code and note (DI-796, DI-797); Shop & Drop is paid online and collected on the way out (R236), a merchandise reservation lasts to the end of the visit day (R169, R215). TILL MONEY (F32, F73, F74, F87): the float is counted by denomination with note images and typed quantities (DI-775, DI-776, R229) while the hardware checks itself (DI-778); the close is a …
+
+| Say | Meaning | Never say | Source |
+|---|---|---|---|
+| Send to kitchen | Put the order on the kitchen rail. On the till it always comes before Charge. | Fire, Fire order, Submit order, kitchen fires on payment | R261 / POSV2-4 / F108 step 3 |
+| Charge | The till's single tender step (Payment, POS-005); the button reads "Charge AED 110.25". | Checkout (on staff screens), Pay now | F108 step 4 / screens/P04-point-of-sale.yaml#POS-021 |
+| Fire / Hold (a course) | Kitchen-pass words for releasing or holding the next course of a table, and the "fired" timer. | using "fire" for sending an order from the till | DI-333 / DI-334 / DI-407 |
+| Kitchen ticket | The slip on the kitchen display, one per preparation station. | Order (on the kitchen display), KOT | R210 |
+| Ready · Served · Collected · Delivered | How an order reaches the guest; a server marks Served, a counter Collected, a runner Delivered (with the location). | Done, Complete, Bumped (as a status) | R125 / contracts/satellite/fnb.yaml#recordOrderHandover |
+| Recall (kitchen) / Recall held sale (till) | Bring a mis-bumped kitchen ticket back to the rail; separately, bring a held cart back into a sale. Never "Recall" alone where both could apply. | Undo bump, Restore | contracts/satellite/fnb.yaml#recallKitchenTicket / POSV2-6 |
+| Unavailable (86) / Sold out | Staff screens say "Unavailable" and may add "86"; guest screens say "Sold out". Immediate everywhere. | Out of stock (for food), Disabled, Hidden | R110 / contracts/satellite/fnb.yaml#getGuestMenu |
+| Order type | Dine-in · Quick service · Takeaway · Delivery, chosen in the cart. | Service mode, Fulfilment source (on the till) | DI-789 / contracts/satellite/fnb.yaml#/components/schemas/ServiceMode |
+| Covers | The number of guests at a table, entered when seating; drives split-by-covers. | Pax (except as a small suffix on the floor plan), Heads | DI-104 / contracts/satellite/fnb.yaml#openTableVisit |
+| Vacant · Seated · Ordered · Bill requested · Table closed · … | Table statuses on every floor plan (till and staff app); "Table closed" is the client's word for after payment. | Cleaning, Needs clearing, Dirty | DI-336 / DI-792 |
+| Till · Cash drawer | Staff copy may say "till" for the workstation; the cash drawer is the deposit box. | Terminal id as a heading, Deposit box (on staff screens) | R156 |
+| Float · Count · Blind count · Variance | The opening float; the denomination count; the closing count made without seeing the expected cash; counted minus expected. | Expected in drawer, Discrepancy, Error | R080 / POSV2-3 |
+| Cash out · Cash in · Safe drop | Taking cash out of the drawer mid-shift, adding change, and a supervisor moving cash to the safe with the cashier as witness. | Lift, Withdrawal (as button labels) | DI-274 / contracts/spine/shift.yaml#createCashMovement / … |
+| Menu item · Merchandise item · Inventory item · SKU | The scoped product words; SKU is a variant's code, Product stays the sellable thing. | SKU as the item's name, Article | R131 |
+| Stock on hand · Allocated · Available | Available is on hand minus allocated. | Inventory (as a number), Free stock | R171 / DI-361 |
+| Requisition · Purchase order · Goods receipt · Transfer · … | The procurement and stock words, in that flow. | GRN as the only label, Indent | DI-341 / DI-348 / DI-362 / DI-363 |
+| Shop & Drop | Bought and paid now, collected on the way out. | Click & collect | R236 |
+| Check-out (rental) · Return (rental) | Handing equipment to the guest and taking it back. On the same screens payment is "Charge" or "Pay". | Checkout (for a handover), Check-in (for a return) | DI-758 / DI-765 |
+| Deposit hold · Release · Capture | A refundable deposit held, given back in full, or partly kept for damage with the rest released. | Charge deposit, Refund deposit | DI-752 / R127 |
+| Extension · Swap · Overdue · Late fee | The active-rental words; a quick swap restarts the clock, a late swap earns a free extension. | Renewal, Exchange (for a swap) | DI-761 / DI-762 / DI-764 |
+
+
 ## The screens
 
 Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs count fields; requirements are matrix rows; meeting inputs are the ones naming the screen (the module and platform ones are below); white label says whether the tenant's brand reaches it (guest) or it sets the brand (configures).
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-049` | Stock Levels | B–D | 23 | 30 | 6 | 35 | 2 | 4 | — | notStarted (generated) |
+| `BO-049` | Stock Levels | B–D | 18 | 30 | 6 | 34 | 2 | 4 | — | notStarted (generated) |
 | `BO-050` | Stock Position & Valuation | B–D | 0 | 16 | 5 | 12 | 2 | 4 | — | notStarted (generated) |
 | `BO-051` | Purchase Orders | B–D | 18 | 21 | 6 | 12 | 1 | 4 | — | notStarted (generated) |
-| `BO-052` | Goods Receipt | B–D | 39 | 53 | 6 | 18 | 1 | 0 | — | notStarted (generated) |
+| `BO-052` | Goods Receipt | B–D | 19 | 41 | 6 | 12 | 1 | 0 | — | notStarted (generated) |
 | `BO-078` | Requisitions | B–D | 25 | 46 | 6 | 16 | 3 | 0 | — | notStarted (generated) |
 | `BO-079` | Stock Count | B–D | 28 | 32 | 6 | 8 | 0 | 4 | — | notStarted (generated) |
-| `BO-080` | Stock Transfers | B–D | 30 | 27 | 6 | 14 | 2 | 4 | — | notStarted (generated) |
-| `BO-081` | Inventory Items | A | 34 | 35 | 6 | 33 | 2 | 4 | — | notStarted (generated) |
-| `BO-082` | Stock Movements | B–D | 23 | 38 | 6 | 24 | 0 | 4 | — | notStarted (generated) |
+| `BO-080` | Stock Transfers | B–D | 18 | 27 | 6 | 8 | 2 | 4 | — | notStarted (generated) |
+| `BO-081` | Inventory Items | A | 33 | 30 | 6 | 33 | 2 | 4 | — | notStarted (generated) |
+| `BO-082` | Stock Movements | B–D | 14 | 24 | 6 | 18 | 0 | 4 | — | notStarted (generated) |
 | `BO-083` | Suppliers | B–D | 36 | 19 | 6 | 7 | 1 | 4 | — | notStarted (generated) |
 
 ## Thin screens in this batch
@@ -106,6 +138,25 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 **What the spec says about it.** Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. **Improved 20 August against the client design board**, answering 2 board screen(s): F&B Stock & Operations Command Center; Outlet Stock & Ingredient Availability. **The id, flows and navigation are unchanged** — a board specifies a screen further; it does not replace it.
 
+**Known gaps.** Removed 2 October 2026 (CHG-WIR-008): "Save item availability" (the F&B 86 operation) acts on a menu item, not a stock item, and has its own screen (BO-140) (R254, R110; design-notes correction …
+
+**From the Food, Beverage & Retail process.** Stock Levels answers "what is on the shelf, and where" for one venue: on hand, allocated and available, by item and by stock location, valued where the user may see value. It is the storekeeper's start screen (F92 step 1) and the place a short store raises a transfer (F35 step 1). The one thing to get right is that available is on hand minus allocated, and a negative position is shown as negative, never hidden or clamped to zero.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **The main list is "Every stock location" (location rows with id, code, parent id, active). Stock positions sit only in a side panel.** Why: The screen's purpose is what is on the shelf. Positions are the list; locations are a filter (tree). Raw id columns leak plumbing. *(source: screens/P08-venue-back-office.yaml#BO-049 / R254; Food, Beverage & Retail)*
+- **"No results" is declared as never shown because the location list takes no filter.** Why: Stock positions do take filters (location, item, include zero), so a filter that matches nothing is a real state. *(source: contracts/satellite/inventory.yaml#getStockPositions; Food, Beverage & Retail)*
+- **The first-run state offers "Create stock transfer".** Why: With no items or locations there is nothing to transfer. First run should point to setting up locations and items (BO-081). *(source: designer default; Food, Beverage & Retail)*
+
+**Fixed on main** (the package already carries these; draw what it says): "Save item availability" (the F&B 86 operation, setItemAvailability) is the primary button. (CHG-WIR-008).
+
+#### Decided on this screen
+
+Answered questions: draw the decision, not the old default. Where a decision and the tables below differ, the decision wins.
+
+- **The client's command centre asks for "low-stock / critical / out-of-stock". The contract has only "below reorder point" and zero. What makes an item "critical"?** → Drawn default accepted: Draw two flags, "Below reorder point" and "Out of stock". No "Critical" badge until it is defined. *(decided by Chinmay, 2026-10-02; DEC-284 / CHG-NOTE-004)* **Reviewable:** a default the lead may still overrule before the block is tasked.
+- **Does Allocated include merchandise held for collection and online orders awaiting pickup or shipment, or only inventory stock reservations?** → Drawn default accepted: Draw Allocated as one number, with a tooltip "Reserved for orders and collections". *(decided by Chinmay, 2026-10-02; DEC-285 / CHG-NOTE-004)* **Reviewable:** a default the lead may still overrule before the block is tasked.
+
 #### Inputs: what the user enters or picks
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
@@ -117,20 +168,6 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Include zero | toggle | off | — | `getStockPositions` ?includeZero |
 | As at | date picker | — | — | `getStockValuation` ?asAt |
 | Location | picker: choose a location | — | — | `getStockValuation` ?locationId |
-
-**Form: Save item availability** (modal, opened by *Save item availability*; *Save item availability* calls `setItemAvailability`, *Cancel* sends nothing)
-
-**Collects what `setItemAvailability` sends before it is called.** Required: `isAvailable`, `recordedAt`. Optional: `reason`, `restoreAt`. Dismissing sends nothing; the screen behind is unchanged.
-
-| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
-|---|---|---|---|---|---|---|---|
-| Is available `isAvailable` | toggle | required | — | — | — | — | `setItemAvailability` body |
-| Reason `reason` | radio group | optional | — | Sold out · Ingredient unavailable · Equipment down · Seasonal · Other; A reason of `other` with no note is refused `400`, and the notes are reviewed quarterly so the common ones become real reasons. | — | `other` is allowed only with a `note`, which it then requires (decided 28 September, audit R222). | `setItemAvailability` body |
-| Note `note` | text area | optional | — | max length 500 | — | Free text. Required where the reason is `other` (audit R222). | `setItemAvailability` body |
-| Restore at `restoreAt` | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | Automatic restore, typically at next service. Kept as `MenuItem.restoreAt`. | `setItemAvailability` body |
-| Recorded at `recordedAt` | date and time picker | required | — | — | 1 Oct 2026, 14:30 (venue time zone) | Device time of the act (offline-capable; replayed in this order). | `setItemAvailability` body |
-
-Errors to draw in the form: 400 Validation failed; 412 The row changed since the `If-Match` version was read (SD-013). Re-read and retry.
 
 **Form: Create stock transfer** (modal, opened by *Create stock transfer*; *Create stock transfer* calls `createStockTransfer`, *Cancel* sends nothing)
 
@@ -167,6 +204,12 @@ Errors to draw in the form: 409 Insufficient stock at the source
 | Recorded at `recordedAt` | date and time picker | required | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `createStockMovement` body |
 
 Errors to draw in the form: 400 Validation failed, including an `adjustmentIn`, `adjustmentOut` or `waste` movement with no `reason` (audit R171).; 409 Insufficient stock, and the item does not permit negative balances
+
+**Rules for these inputs** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
+
+- **Location**: A tree picker over the venue's stock locations, following the warehouse hierarchy (for example Main Store > Food Store > Cold Room). Choosing a parent includes its children. Default is "All locations". Never a text field for an id. *(source: DI-345 / contracts/satellite/inventory.yaml#/components/schemas/StockLocation)*
+- **Item search**: Name, SKU or barcode, with scan support on a device that has a scanner. Sends the chosen item as the item filter. *(source: contracts/satellite/inventory.yaml#lookupInventoryItem / DI-233)*
+- **Show zero stock**: Off by default. On, it lists items with nothing on hand at the location (the out-of-stock check). *(source: contracts/satellite/inventory.yaml#getStockPositions / DI-340)*
 
 #### Outputs: what the screen shows and produces
 
@@ -226,9 +269,22 @@ Errors to draw in the form: 400 Validation failed, including an `adjustmentIn`, 
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Save item availability (primary button) | `setItemAvailability` PUT `/menu-items/{itemId}/availability` | inline | MenuItem | 400 Validation failed; 412 The row changed since the `If-Match` version was read (SD-013). Re-read and retry. | opens modal first |
 | Create stock transfer (secondary button) | `createStockTransfer` POST `/stock-transfers` | CreateStockTransferRequest | StockTransfer | 409 Insufficient stock at the source | opens modal first |
 | Create stock movement (secondary button) | `createStockMovement` POST `/stock-movements` | CreateStockMovementRequest | StockMovement | 400 Validation failed, including an `adjustmentIn`, `adjustmentOut` or `waste` movement with no `reason` (audit R171).; 409 Insufficient stock, and the item does not permit negative balances | opens modal first |
+
+**Rules for what is shown** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
+
+- **Stock table (the main list)**: One row per item and location: item name, SKU, location, On hand, Allocated, Available, unit, value, last counted, last movement. Show Available most prominently, because it is what a sale or an issue can still draw on. Label the three numbers "On hand", "Allocated" and "Available", never "Inventory". Sort by Available ascending so problems come first. *(source: R171 / DI-361 / contracts/satellite/inventory.yaml#/components/schemas/StockPosition)*
+- **Negative positions**: Shown with a minus sign and an alert colour, for example "-4 pcs". Never shown as 0. A position that cannot go negative hides an oversell that already happened. *(source: F35 step 6)*
+- **Low / out of stock flags**: "Below reorder point" when the item's flag is set. "Out of stock" when on hand is zero or less. These are the client's command-centre indicators. *(source: DI-340 / DI-345 / contracts/satellite/inventory.yaml#/components/schemas/InventoryItem)*
+- **Stock value panel**: Total value as at today, by location and by category, in AED with 2 decimals. Visible only to users who hold the ledger-view right. For others the value column and panel are absent (not zero). Valued by each item's own costing method, so the panel carries the note "Valued at each item's costing method (weighted average or FIFO)". *(source: contracts/satellite/inventory.yaml#getStockValuation / DI-344)*
+- **In transit**: Stock dispatched on a transfer and not yet received belongs to neither location. Show it as a separate "In transit" line in the value panel, so the totals reconcile. *(source: contracts/satellite/inventory.yaml#createStockTransfer)*
+
+**What each action does** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
+
+- **Transfer stock**: Opens the transfer form with the selected item and its location prefilled as the source (Stock Transfers, BO-080, owns the full form). The server refuses with "Not enough stock at <location>" when the source is short. Success shows the transfer number and the item as "In transit". *(source: F35 step 1 / contracts/satellite/inventory.yaml#createStockTransfer)*
+- **Adjust stock**: Opens the adjustment form (Stock Movements, BO-082, owns it): Adjustment in, Adjustment out, Waste or Issue, with a positive quantity and a required reason. The list refreshes with the new balance. *(source: R171 / contracts/satellite/inventory.yaml#createStockMovement)*
+- **Open item / Count this item**: Row links to the item record (BO-081) and to Stock Count (BO-079) to start a spot count on that item. *(source: F92 step 1 / F35 step 8)*
 
 **Data it reads**: `getStockPositions` (onLoad, Stock on hand by item and location); `getStockValuation` (onLoad, Stock value by location and category); `listStockLocations` (onLoad, List stock locations)
 
@@ -237,7 +293,7 @@ Errors to draw in the form: 400 Validation failed, including an `adjustmentIn`, 
 - → `BO-082` Stock Movements: *The four orders are sourced from another store instead*; calls `createStockMovement`
 - → `BO-079` Stock Count: *Stock Count*
 - → `BO-080` Stock Transfers: *Stock Transfers*
-- → `EMP-065` Receiving & Store Put-Away: *The delivery arrives*
+- → `EMP-065` Receiving: *The delivery arrives*
 - → `BO-081` Inventory Items: *Inventory Items*; carries `itemId`
 
 #### States
@@ -250,13 +306,67 @@ Errors to draw in the form: 400 Validation failed, including an `adjustmentIn`, 
 | Empty, no results (`?state=emptyNoResults`) | Never shown: `listStockLocations` takes no filter, so an empty list is always the first-run state above. |
 | Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_VIEW`, which `getStockPositions` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 400 Validation failed, including an `adjustmentIn`, `adjustmentOut` or `waste` movement with no `reason` (audit R171).; 409 Insufficient stock at the source; 409 Insufficient stock, and the item does not permit negative balances |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed, including an `adjustmentIn`, `adjustmentOut` or `waste` movement with no `reason` (audit R171).; 409 Insufficient stock at the source; 409 Insufficient stock, and the item does not permit negative balances |
+
+#### Edge cases to draw
+
+- **The user has stock rights but not the ledger-view right**: Quantities show and value is hidden. This is a partial-access state, not an error. The no-access state applies only when stock positions themselves are refused. *(source: contracts/satellite/inventory.yaml#getStockValuation / contracts/satellite/inventory.yaml#getStockPositions)*
+- **Online orders already took stock that a delivery was expected to cover (oversell)**: The position goes negative and the row says so. Nothing on this screen refuses it. Resolution is a transfer from another store, or a refund recorded as an oversell. *(source: F35 step 5 / F35 step 6)*
+- **Offline device**: Positions read from cache with a "Last updated hh:mm" stamp. Adjustments are not offered offline, because stock depletion is real time. *(source: contracts/satellite/inventory.yaml#getStockPositions / contracts/satellite/inventory.yaml#createStockMovement)*
+
+#### Consistency with other screens
+
+- Match `EMP-062`: The same three numbers with the same labels, in the same order (On hand · Allocated · Available).
+- Match `POS-023`: Available here is what the till and web shop sell against. A sale is gated on system stock per venue, not physical stock.
+- Match `BO-050`: The value panel and BO-050 use one valuation read. Same figures, same "as at" date.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+locations:
+- Main Store
+- Main Store > Food Store
+- Main Store > Beverage Store
+- Oasis Bistro Kitchen
+- Pool Bar
+- Marina Bay Retail Floor
+rows:
+- item: Coca-Cola 330 ml can
+  sku: BEV-CC-330
+  location: Pool Bar
+  onHand: 182
+  allocated: 0
+  available: 182
+  unit: can
+  value: AED 345.80
+- item: Full-cream milk 2 L
+  sku: DRY-MLK-2L
+  location: Oasis Bistro Kitchen
+  onHand: 6
+  allocated: 0
+  available: 6
+  unit: bottle
+  flag: Below reorder point
+- item: Aqua Park logo T-shirt, green, M
+  sku: TSH-AQP-GRN-M
+  location: Marina Bay Retail Floor
+  onHand: 3
+  allocated: 7
+  available: -4
+  unit: pcs
+  flag: Negative
+valuation:
+  asAt: '2026-10-14'
+  total: AED 412,906.35
+  inTransit: AED 3,120.00
+```
 
 #### Permissions
 
 - `getStockPositions` → `PRODUCT_VIEW` (read) · staff
 - `getStockValuation` → `LEDGER_VIEW` (read) · staff
-- `setItemAvailability` → `PRODUCT_CONFIGURE` (configure) · staff
 - `createStockTransfer` → `PRODUCT_CONFIGURE` (configure) · staff
 - `createStockMovement` → `PRODUCT_CONFIGURE` (configure) · staff
 - `listStockLocations` → `PRODUCT_VIEW` (read) · staff
@@ -265,7 +375,7 @@ Errors to draw in the form: 400 Validation failed, including an `adjustmentIn`, 
 
 #### Requirements it meets
 
-35 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+34 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
 
 | Ref | Requirement (shortened) | Domain | Verdict | Via |
 |---|---|---|---|---|
@@ -281,7 +391,7 @@ Errors to draw in the form: 400 Validation failed, including an `adjustmentIn`, 
 | 18.7.2 | Stock Count - Users shall perform stock counts. | Employee Mobile App & AI Assistant | CONTRACTED | `getStockPositions` |
 | 18.7.3 | Inventory Transfers - Users shall execute inventory transfers. | Employee Mobile App & AI Assistant | CONTRACTED | `getStockPositions` |
 | 18.7.4 | Goods Receipt - Users shall record goods receipt transactions. | Employee Mobile App & AI Assistant | CONTRACTED | `getStockPositions` |
-| … 23 more | | | | `traceability.json` |
+| … 22 more | | | | `traceability.json` |
 
 #### Client meeting inputs
 
@@ -315,13 +425,16 @@ Also apply: 2 for P08 · Stock & Supply, 24 for all of P08, 29 for every app (se
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (23), with its required mark, default, format and its error state (400, 409, 412).
+- [ ] Every input above is drawn (18), with its required mark, default, format and its error state (400, 409).
 - [ ] Every output is drawn (30 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-049?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: Save item availability, Create stock transfer, Create stock movement.
+- [ ] Every action is wired with its success and its failure: Create stock transfer, Create stock movement.
 - [ ] Every transition is wired: `BO-082`, `BO-079`, `BO-080`, `EMP-065`, `BO-081`.
 - [ ] Every gated control is gated: `LEDGER_VIEW`, `PRODUCT_CONFIGURE`, `PRODUCT_VIEW`.
 - [ ] The 2 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 3 edge case(s) from the process notes are drawn.
+- [ ] The 3 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
+- [ ] The 2 decision(s) taken on this screen are drawn as decided, not as the old default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -344,6 +457,20 @@ Also apply: 2 for P08 · Stock & Supply, 24 for all of P08, 29 for every app (se
 
 **What the spec says about it.** Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. **Named `Stock Count` and carrying `getStockPositions` and `getStockValuation`** — two screens with one name, while `BO-079 Stock Count` holds the actual counting operations. Renamed 20 August; the operations were right.
 
+**From the Food, Beverage & Retail process.** Stock Position & Valuation is the finance-facing view of stock: what the venue's stock is worth on a date, by location and by category, under each item's costing method (weighted average or FIFO). It is read-only. The one thing to get right is that it is a valuation report, not a counting screen. The current definition is half renamed from "Stock Count".
+
+**Known correction pending (do not draw the wrong version)**
+
+- **The route is /venue-operations/stock-count and the component StockCountDetail.tsx. The purpose reads "Count the shelf and account for the difference". The pattern is a single-record status tracker.** Why: The 20 August rename stopped at the name. Stock counting is BO-079. This screen is a read-only valuation report, so it needs a valuation route and component name, a valuation purpose and a report pattern. *(source: screens/P08-venue-back-office.yaml#BO-050; Food, Beverage & Retail)*
+- **The no-access state names only the stock-view permission.** Why: Valuation needs the ledger-view permission. A user with only stock view sees a broken page rather than an explanation. *(source: contracts/satellite/inventory.yaml#getStockValuation; Food, Beverage & Retail)*
+- **The client asked for a breakdown by department and sub-department. The valuation returns only by location and by category.** Why: Department is not a valuation dimension in the contract. *(source: DI-342 / contracts/satellite/inventory.yaml#/components/schemas/StockValuation; Food, Beverage & Retail)*
+
+#### Decided on this screen
+
+Answered questions: draw the decision, not the old default. Where a decision and the tables below differ, the decision wins.
+
+- **Item costing offers four methods (weighted average, FIFO, standard cost, last purchase price). The workshop agreed weighted average and FIFO. Should the other two be offered?** → Drawn default accepted: The note names weighted average and FIFO only. The item form (BO-081) offers those two. *(decided by Chinmay, 2026-10-02; DEC-286 / CHG-NOTE-004)* **Reviewable:** a default the lead may still overrule before the block is tasked.
+
 #### Inputs: what the user enters or picks
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
@@ -357,6 +484,11 @@ Also apply: 2 for P08 · Stock & Supply, 24 for all of P08, 29 for every app (se
 | Location | picker: choose a location | — | — | `getStockValuation` ?locationId |
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+
+**Rules for these inputs** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
+
+- **As at**: A date. Default today. A past date gives the value on that date (served from the reporting replica, so allow for a short lag). *(source: contracts/satellite/inventory.yaml#getStockValuation)*
+- **Location**: Tree picker as on Stock Levels; default all locations. *(source: DI-345)*
 
 #### Outputs: what the screen shows and produces
 
@@ -388,6 +520,12 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | By location | list or chips (count when long) | — |
 | By category | list or chips (count when long) | — |
 
+**Rules for what is shown** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
+
+- **Headline**: Total stock value in AED with 2 decimals, the as-at date, and the item count. Out-of-stock item count beside it. *(source: DI-342 / contracts/satellite/inventory.yaml#/components/schemas/StockValuation)*
+- **Breakdown**: Two tables: by location (value and item count) and by category (value). Sort by value, highest first. A bar per row is enough; no pie chart. *(source: DI-342 / DI-041)*
+- **Costing method note**: One line under the headline: "Each item is valued at its own costing method: weighted average or FIFO." Name the method on the item rows when drilling in (from the item master). *(source: DI-344 / contracts/satellite/inventory.yaml#/components/schemas/CostingMethod)*
+
 **Data it reads**: `getStockPositions` (onLoad, Stock on hand by item and location); `getStockValuation` (onLoad, Stock value by location and category)
 
 #### States
@@ -399,6 +537,42 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, first run (`?state=emptyFirstRun`) | No stock position valuation yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table. |
 | Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_VIEW`, which `getStockPositions` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+
+#### Edge cases to draw
+
+- **User can see stock but not ledger value**: The valuation needs the ledger-view right. Without it, say "Stock value is visible to finance roles", and link to Stock Levels for quantities. *(source: contracts/satellite/inventory.yaml#getStockValuation)*
+- **As-at date before the venue's first stock movement**: Show zero value with "No stock recorded on this date", not an error. *(source: designer default)*
+
+#### Consistency with other screens
+
+- Match `BO-049`: Same valuation read and same totals as the Stock Levels value panel.
+- Match `BO-081`: The costing method shown per item is the one set (and locked) on the item master.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+asAt: '2026-10-31'
+total: AED 412,906.35
+itemCount: 1284
+outOfStock: 37
+byLocation:
+- location: Main Store
+  value: AED 198,440.10
+  items: 612
+- location: Oasis Bistro Kitchen
+  value: AED 41,215.75
+  items: 188
+- location: Marina Bay Retail Floor
+  value: AED 96,780.00
+  items: 341
+byCategory:
+- category: Beverages
+  value: AED 88,302.40
+- category: Apparel
+  value: AED 71,950.00
+```
 
 #### Permissions
 
@@ -456,6 +630,9 @@ Also apply: 2 for P08 · Stock & Supply, 24 for all of P08, 29 for every app (se
 - [ ] No transition is declared; back returns where the user came from.
 - [ ] Every gated control is gated: `LEDGER_VIEW`, `PRODUCT_VIEW`.
 - [ ] The 2 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 2 edge case(s) from the process notes are drawn.
+- [ ] The 3 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
+- [ ] The 1 decision(s) taken on this screen are drawn as decided, not as the old default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -469,7 +646,7 @@ Also apply: 2 for P08 · Stock & Supply, 24 for all of P08, 29 for every app (se
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Stock & Supply · wave 2 · needs the `inventory` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `PROCUREMENT_MANAGE`, `PROCUREMENT_VIEW` (1 configure, 1 read) |
+| Who uses it | venue staff holding `PROCUREMENT_MANAGE`, `PROCUREMENT_VIEW` (1 configure, 1 read); in the flows as storekeeper |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listPurchaseOrders` reads the population and `getPurchaseOrder` reads one of them — list, select, act |
 | Offline | online only |
@@ -477,6 +654,22 @@ Also apply: 2 for P08 · Stock & Supply, 24 for all of P08, 29 for every app (se
 | Route | `/venue-operations/purchase-orders` |
 
 **What the spec says about it.** Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. **Rebound 28 September to the inventory purchase-order operations** (decided 28 September, audit R254): it carried 13 sales-order operations (`listOrders`, `voidOrder`, `holdOrder` and the rest), attached by name resemblance as BO-070 was, and none of them orders stock. It now lists, raises, sends, acknowledges, cancels and short-closes purchase orders; receiving is BO-052. Guards are the procurement permissions (audit R091 (4)), and cancel and close-short may answer 202 pending a finance approver (audit R144).
+
+**From the Food, Beverage & Retail process.** Purchase Orders is where the buyer turns an approved requisition and its chosen quotation into an order, sends it, records the supplier's acknowledgement, and later cancels it or closes it short. The one thing to get right is the chain: no order without an approved requisition and a selected quotation, with the price taken from the quotation and changed only with a reason. Cancelling or short-closing goes to a finance approver.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **PO types do not match the agreed decision. The client agreed three types: Regular (item, quantity, price), Contract (pre-agreed fixed price for a period, picked up automatically on later orders) and Service (non-inventory items and services). The contract's PurchaseOrder.kind is standard / blanket …** Why: Regular maps to standard. Contract maps only partly to blanket plus release: the supplier contract record has no price lines, so nothing can "auto-pick" a contract price. Service has no counterpart: every PO line needs an inventory item and every receipt adds stock. rfqAward is a sourcing origin, not a type, because every standard order already needs a quotation. Also, the create request has no … *(source: DI-348 / TRACKER Workshops/Actions row 91 / contracts/satellite/inventory.yaml#/components/schemas/PurchaseOrder / contracts/satellite/inventory.yaml#/components/schemas/CreatePurchaseOrderRequest / …; Food, Beverage & Retail)*
+- **The list shows a match-status column (matched / price variance / quantity variance) and the order has a supplier invoice reference, but no operation records a supplier invoice or sets the match status.** Why: Three-way match has only two legs. The column would always be empty. Hide it until an invoice-capture operation exists, or add one. *(source: contracts/satellite/inventory.yaml#/components/schemas/PurchaseOrder; Food, Beverage & Retail)*
+- **The order is "still ours to change" while Raised, but no operation updates a raised order.** Why: A wrong line on a raised order can only be fixed by cancelling (which may need finance approval) and raising again. *(source: contracts/satellite/inventory.yaml#sendPurchaseOrder; Food, Beverage & Retail)*
+- **The filters are text fields "Status" and "Supplier id". The list shows approvalRequestId as a column.** Why: These leak plumbing. Use status chips, a supplier picker and a "Pending approval" badge. *(source: screens/P08-venue-back-office.yaml#BO-051; Food, Beverage & Retail)*
+
+#### Decided on this screen
+
+Answered questions: draw the decision, not the old default. Where a decision and the tables below differ, the decision wins.
+
+- **How does "Send to supplier" reach the supplier: an emailed PDF from TICVAI, or a status change after the buyer sends it themselves?** → Drawn default accepted: Draw "Send" as emailing a PDF to the supplier's contact email, with a "Download PDF" secondary action. *(decided by Chinmay, 2026-10-02; DEC-287 / CHG-NOTE-004)* **Reviewable:** a default the lead may still overrule before the block is tasked.
+- **Is the proposed PO number format PO-<venue code>-<six-digit sequence> accepted?** → Drawn default accepted: Use PO-AQP-000214 in all mock-ups. *(decided by Chinmay, 2026-10-02; DEC-288 / CHG-NOTE-004)* **Reviewable:** a default the lead may still overrule before the block is tasked.
 
 #### Inputs: what the user enters or picks
 
@@ -531,6 +724,15 @@ Errors to draw in the form: 409 Not in a state that permits this
 |---|---|---|---|---|---|---|---|
 | Reason `reason` | text area | required | — | — | — | Kept as `PurchaseOrder.closeShortReason`. | `closePurchaseOrderShort` body |
 
+**Rules for these inputs** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
+
+- **Requisition**: Picker limited to approved requisitions of this venue (number, department, required-by date, estimated total). It is the first field and drives the rest. *(source: contracts/satellite/inventory.yaml#createPurchaseOrder / DI-348)*
+- **Quotation**: Picker of the quotations recorded for that requisition, showing supplier, total, lead time and validity. "Lowest total" and "Shortest lead time" badges as in the comparison. Choosing one sets the supplier, which is read-only on the order. *(source: contracts/satellite/inventory.yaml#compareQuotations / R171)*
+- **Lines**: Prefilled from the quotation: item, quantity, unit, unit price. Quantity may be lowered, not raised beyond the approved quantity. If the unit price is changed, the line shows the quoted price beside it and asks for a price reason inline. Without the reason the order cannot be raised. *(source: R171 / contracts/satellite/inventory.yaml#/components/schemas/CreatePurchaseOrderRequest)*
+- **Deliver to**: Location picker. Default is the venue's main store. Choosing an outlet kitchen is allowed for fast-moving perishables received directly. *(source: DI-345 / contracts/satellite/inventory.yaml#/components/schemas/PurchaseOrder)*
+- **Expected delivery**: Date, required, not in the past. It is the date supplier on-time performance is measured against. *(source: contracts/satellite/inventory.yaml#createPurchaseOrder / contracts/satellite/reporting.yaml#getSupplierPerformance)*
+- **Status filter / Supplier filter**: Status as chips (see outputs). Supplier as a searchable picker of the tenant's suppliers. Not text fields. *(source: contracts/satellite/inventory.yaml#listPurchaseOrders)*
+
 #### Outputs: what the screen shows and produces
 
 **Shown**
@@ -576,6 +778,21 @@ Errors to draw in the form: 409 Not in a state that permits this
 | Cancel purchase order (destructive button) | `cancelPurchaseOrder` POST `/purchase-orders/{purchaseOrderId}/cancel` | inline | PurchaseOrder | 409 The order is not `raised` or `sent`. | gated `PROCUREMENT_MANAGE` |
 | Close purchase order short (destructive button) | `closePurchaseOrderShort` POST `/purchase-orders/{purchaseOrderId}/close-short` | inline | PurchaseOrder | 409 Not in a state that permits this | gated `PROCUREMENT_MANAGE` |
 
+**Rules for what is shown** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
+
+- **Order list**: Columns: PO number (e.g. PO-AQP-000214), supplier, type, status, expected delivery, total (AED incl. 5% VAT), received progress ("12 of 20 lines"). A row awaiting a finance decision shows a "Pending approval" badge beside its status ("Cancellation pending approval" or "Close-short pending approval"). Never an approval id. *(source: R144 / R171 / contracts/satellite/inventory.yaml#/components/schemas/PurchaseOrder)*
+- **Status labels**: Raised (not yet sent, still editable by us), Sent, Acknowledged, Partly received, Received, Closed short, Cancelled. Use exactly these words. *(source: contracts/satellite/inventory.yaml#/components/schemas/PurchaseOrderStatus / contracts/satellite/inventory.yaml#sendPurchaseOrder)*
+- **Order detail**: Header: supplier, supplier's reference (once acknowledged), deliver-to, requisition number (linked), quotation (linked to the comparison). Lines: item, ordered, received, outstanding, unit price, quoted price (struck through with the reason, when overridden), line total. Footer: subtotal, VAT 5%, total. *(source: contracts/satellite/inventory.yaml#getPurchaseOrder)*
+- **Printable / sendable order**: A clean PO document (venue legal name, TRN, supplier, lines, VAT, total, delivery address and date) for sending. *(source: designer default)*
+
+**What each action does** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
+
+- **Raise purchase order**: Creates the order in Raised with its number assigned by the server (per venue, in sequence). Refused when the requisition is not approved or the quotation does not belong to it. Say which, and offer the requisition. *(source: R171 / contracts/satellite/inventory.yaml#createPurchaseOrder)*
+- **Send to supplier**: Confirm "Send PO-AQP-000214 to Gulf Fresh Dairy LLC? After sending, the order can no longer be changed." The status becomes Sent. *(source: contracts/satellite/inventory.yaml#sendPurchaseOrder)*
+- **Record acknowledgement**: Asks for the supplier's own order reference. Optional in practice: goods often arrive without one. It feeds supplier performance. *(source: contracts/satellite/inventory.yaml#acknowledgePurchaseOrder)*
+- **Cancel order**: Only for Raised or Sent orders. Asks for a reason (at least 3 characters) and names the order, the supplier and the value not yet received. If finance approval is needed, the order stays as it is with "Cancellation pending approval". It cancels when the finance approver agrees, and the requester can never approve it. A partly received order offers "Close short" instead. *(source: R144 / contracts/satellite/inventory.yaml#cancelPurchaseOrder)*
+- **Close short**: For a partly received order. Asks for a reason and names the balance that will no longer be expected. It goes to a finance approver ("Close-short pending approval"). Closing writes off a committed cost. *(source: R144 / contracts/satellite/inventory.yaml#closePurchaseOrderShort)*
+
 **Data it reads**: `listPurchaseOrders` (onLoad, List purchase orders)
 
 **Where the user goes next**
@@ -598,6 +815,53 @@ Errors to draw in the form: 409 Not in a state that permits this
 | Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PROCUREMENT_VIEW`, which `listPurchaseOrders` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 A line price differs from the selected quotation with no `priceOverrideReason` (audit R171).; 409 Not in a state that permits this; 409 Requisition is not approved, or the quotation does not match it; 409 The order is not `raised` or `sent`. |
+
+#### Edge cases to draw
+
+- **Supplier put on hold after the quotation was recorded**: A supplier on hold stops appearing in new orders. Show the quotation as not selectable, with "Supplier on hold". *(source: contracts/satellite/inventory.yaml#updateSupplier)*
+- **Quotation expired (valid-until passed)**: Show it as expired in the picker. Raising against it is the buyer's call; show the warning. *(source: contracts/satellite/inventory.yaml#/components/schemas/CreateQuotationRequest)*
+- **Approval request rejected by finance**: The badge clears and the order is unchanged. Show the approver's note in the order history. *(source: R144)*
+- **Minimum order value**: If the order total is below the supplier's minimum order value, warn before raising. The contract does not refuse it. *(source: contracts/satellite/inventory.yaml#/components/schemas/Supplier)*
+
+#### Consistency with other screens
+
+- Match `BO-078`: The requisition, its approved quantities and its quotation comparison come from Requisitions. "Raise purchase order" on an approved requisition opens this form prefilled.
+- Match `BO-052`: Received and outstanding quantities update from goods receipts. The same status words are used on both screens.
+- Match `BO-084`: Cancel and close-short approvals appear in the finance approver's queue there.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+- number: PO-AQP-000214
+  supplier: Gulf Fresh Dairy LLC
+  type: Regular
+  status: Sent
+  expectedDelivery: '2026-10-16'
+  deliverTo: Oasis Bistro Kitchen
+  lines:
+  - item: Full-cream milk 2 L
+    ordered: 60
+    unit: bottle
+    unitPrice: AED 12.50
+    lineTotal: AED 750.00
+  - item: Greek yoghurt 1 kg
+    ordered: 24
+    unit: tub
+    unitPrice: AED 18.75
+    quoted: AED 17.90
+    priceReason: Supplier price increase from 1 Oct, confirmed by email
+    lineTotal: AED 450.00
+  subtotal: AED 1,200.00
+  vat: AED 60.00
+  total: AED 1,260.00
+- number: PO-AQP-000209
+  supplier: Emirates Beverage Trading LLC
+  status: Partly received
+  badge: Close-short pending approval
+  total: AED 8,412.60
+```
 
 #### Permissions
 
@@ -649,6 +913,8 @@ Also apply: 2 for P08 · Stock & Supply, 24 for all of P08, 29 for every app (se
 
 - Wireframe frame: `wireframes/P08 Venue Management.dc.html#bo-051` · status **notStarted** · provenance generated
 - Client design-board frames: `Inventory Board 5.dc.html#inv-5a`, `Inventory Board 5.dc.html#inv-5h`, `Inventory Board 5.dc.html#inv-5j`
+- Flow F76 *Stock is counted, requested, transferred and received*, step 5: Goods Receipt. → **Drawn by the client as RET-4E.** 7 operations on this step.
+- Flow F92 *Store stock is watched, replenished and reconciled*, step 5: Goods Receipt. → **Drawn by the client as RET-4E.**
 
 #### Acceptance for the design
 
@@ -659,6 +925,9 @@ Also apply: 2 for P08 · Stock & Supply, 24 for all of P08, 29 for every app (se
 - [ ] Every transition is wired: `BO-052`.
 - [ ] Every gated control is gated: `PROCUREMENT_MANAGE`, `PROCUREMENT_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 4 edge case(s) from the process notes are drawn.
+- [ ] The 4 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
+- [ ] The 2 decision(s) taken on this screen are drawn as decided, not as the old default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -672,14 +941,31 @@ Also apply: 2 for P08 · Stock & Supply, 24 for all of P08, 29 for every app (se
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Stock & Supply · wave 2 · needs the `inventory` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `LEDGER_APPROVE`, `PROCUREMENT_MANAGE`, `PROCUREMENT_RECEIVE`, `PROCUREMENT_VIEW`, `PRODUCT_VIEW` (2 operate, 1 configure, 2 read); in the flows as storekeeper, technician |
+| Who uses it | venue staff holding `PROCUREMENT_RECEIVE`, `PROCUREMENT_VIEW` (1 operate, 1 read); in the flows as technician |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listPurchaseOrders` reads the population and `getPurchaseOrder` reads one of them — list, select, act |
 | Offline | online only |
-| Opens with | `purchaseOrderId` (deepLink), `receiptId` (deepLink), `transferId` (deepLink) · cold entry: **A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know … |
+| Opens with | `purchaseOrderId` (deepLink), `receiptId` (deepLink) · cold entry: **A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know … |
 | Route | `/venue-operations/goods-receipt` |
 
 **What the spec says about it.** Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. Pulled to Wave 2 (CF-101). Requisitions are Wave 1 and receipt was Wave 3 — **the end of the chain arriving two waves after the start.** **Cross-platform navigation removed 24 August**: EMP-005. **A till does not navigate to a back office and a guest app does not navigate to either** — those are device handovers, and a flow declares them with `crossesDevice` rather than a screen pretending there is a link.
+
+**Known gaps.** Removed 2 October 2026 (CHG-WIR-008): The purchase-order lifecycle belongs to BO-051 and the transfer actions to BO-080; F76 step 5 and F92 step 5 attached them here before BO-051 existed in the … Removed 2 October 2026 (CHG-WIR-008): The purchase-order lifecycle belongs to BO-051 and the transfer actions to BO-080; F76 step 5 and F92 step 5 attached them here before BO-051 existed in the … Removed 2 October 2026 (CHG-WIR-008): The purchase-order lifecycle belongs to BO-051 and the transfer actions to BO-080; F76 step 5 and F92 step 5 attached them here before BO-051 existed in the …
+
+**From the Food, Beverage & Retail process.** Goods Receipt is where the storekeeper books in what actually arrived against a purchase order. Partial deliveries are normal. Batch and expiry are captured per line. Over-delivery beyond the tolerance is refused, and damaged or wrong goods are rejected by receipt line. The one thing to get right is that a receipt records what arrived, line by line and batch by batch. It is not a confirmation of the order. The screen must not also be the purchase-order and transfer screen it currently is.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **The rejection reasons are a fixed list.** Why: The client asked for a user-defined reason list that can be extended in the backend without development. *(source: DI-363 / contracts/satellite/inventory.yaml#rejectReceivedGoods; Food, Beverage & Retail)*
+- **The filters are text fields "Status" and "Supplier id". Both tables show every raw column (ids, scope path, journal id).** Why: These leak plumbing. *(source: screens/P08-venue-back-office.yaml#BO-052; Food, Beverage & Retail)*
+
+**Fixed on main** (the package already carries these; draw what it says): The screen carries the purchase-order lifecycle (raise, send, acknowledge, cancel, close short) and the transfer actions (close transfer … (CHG-WIR-008); F35 step 4 receives the remainder of a stock transfer with createGoodsReceipt. F15 branch at 4 answers a short delivery with … (CHG-WIR-008).
+
+#### Decided on this screen
+
+Answered questions: draw the decision, not the old default. Where a decision and the tables below differ, the decision wins.
+
+- **Is the over-receipt tolerance of 5% accepted as the tenant default?** → Drawn default accepted: Show "Up to <outstanding + 5%>". *(decided by Chinmay, 2026-10-02; DEC-289 / CHG-NOTE-004)* **Reviewable:** a default the lead may still overrule before the block is tasked.
 
 #### Inputs: what the user enters or picks
 
@@ -717,50 +1003,6 @@ Also apply: 2 for P08 · Stock & Supply, 24 for all of P08, 29 for every app (se
 
 Errors to draw in the form: 409 Over-receipt beyond `VenueSettings.inventory.overReceiptTolerancePercent` (proposed default 5, audit R094), or the purchase order is closed
 
-**Form: Acknowledge purchase order** (modal, opened by *Acknowledge purchase order*; *Acknowledge purchase order* calls `acknowledgePurchaseOrder`, *Cancel* sends nothing)
-
-**Collects what `acknowledgePurchaseOrder` sends before it is called.** Required: `supplierReference`. Dismissing sends nothing; the screen behind is unchanged.
-
-| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
-|---|---|---|---|---|---|---|---|
-| Supplier reference `supplierReference` | text field | required | — | — | — | Kept as `PurchaseOrder.supplierReference`; the time is `acknowledgedAt`. | `acknowledgePurchaseOrder` body |
-
-Errors to draw in the form: 409 Not in a state that permits this
-
-**Form: Create purchase order** (modal, opened by *Create purchase order*; *Create purchase order* calls `createPurchaseOrder`, *Cancel* sends nothing)
-
-**Collects what `createPurchaseOrder` sends before it is called.** Required: `id`, `requisitionId`, `supplierId`, `quotationId`, `lines`, `expectedDelivery`. Optional: `deliverToLocationId`, `note`. **Each line's `unitPrice` is prefilled from the selected quotation**; if the user changes it, the line asks for `priceOverrideReason`, which the server requires (400) whenever the price differs from the quotation (decided 28 September, audit R171). Dismissing sends nothing; the screen behind is unchanged.
-
-| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
-|---|---|---|---|---|---|---|---|
-| ID `id` | picker: choose an id | required | — | — | shows names, sends the id | — | `createPurchaseOrder` body |
-| Requisition `requisitionId` | picker: choose a requisition | required | — | — | shows names, sends the id | — | `createPurchaseOrder` body |
-| Supplier `supplierId` | picker: choose a supplier | required | — | — | shows names, sends the id | — | `createPurchaseOrder` body |
-| Quotation `quotationId` | picker: choose a quotation | required | — | — | shows names, sends the id | — | `createPurchaseOrder` body |
-| Deliver to location `deliverToLocationId` | picker: choose a deliver to location | optional | — | — | shows names, sends the id | — | `createPurchaseOrder` body |
-| Lines `lines` | repeatable rows | required | — | at least 1 | — | — | `createPurchaseOrder` body |
-| Item `lines[].itemId` | picker: choose an item | required | — | — | shows names, sends the id | — | `createPurchaseOrder` body |
-| Quantity `lines[].quantity` | number field | required | — | min 0 | — | — | `createPurchaseOrder` body |
-| Unit `lines[].unit` | text field | optional | — | — | — | — | `createPurchaseOrder` body |
-| Unit price `lines[].unitPrice` | money field | optional | — | — | AED, 2 decimals shown (up to 4 accepted), currency from the … | Omitted, the selected quotation line's price. Editable with a reason (decided 28 September, audit R171). | `createPurchaseOrder` body |
-| Price override reason `lines[].priceOverrideReason` | text area | optional | — | max length 500; Required when `unitPrice` differs from the quotation line (audit R171). | — | Required when `unitPrice` differs from the quotation line (audit R171). | `createPurchaseOrder` body |
-| Expected delivery `expectedDelivery` | date picker | required | — | — | 1 Oct 2026 (dd MMM yyyy) | — | `createPurchaseOrder` body |
-| Note `note` | text area | optional | — | max length 1000 | — | — | `createPurchaseOrder` body |
-
-Errors to draw in the form: 400 A line price differs from the selected quotation with no `priceOverrideReason` (audit R171).; 409 Requisition is not approved, or the quotation does not match it
-
-**Sent by *Cancel purchase order*** (`cancelPurchaseOrder`; no form is declared, so these are filled from the screen or collected inline)
-
-| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
-|---|---|---|---|---|---|---|---|
-| Reason `reason` | text area | required | — | min length 3; max length 500 | — | Kept as `PurchaseOrder.cancelReason`. | `cancelPurchaseOrder` body |
-
-**Sent by *Close purchase order short*** (`closePurchaseOrderShort`; no form is declared, so these are filled from the screen or collected inline)
-
-| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
-|---|---|---|---|---|---|---|---|
-| Reason `reason` | text area | required | — | — | — | Kept as `PurchaseOrder.closeShortReason`. | `closePurchaseOrderShort` body |
-
 **Sent by *Reject received goods*** (`rejectReceivedGoods`; no form is declared, so these are filled from the screen or collected inline)
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
@@ -771,14 +1013,13 @@ Errors to draw in the form: 400 A line price differs from the selected quotation
 | Reason `reason` | select | required | — | Damaged · Wrong item · Quality failure · Short dated · Over delivery · Other | — | `other` requires `note` (decided 28 September, audit R222). | `rejectReceivedGoods` body |
 | Note `note` | text area | optional | — | max length 1000 | — | Required, at least 3 characters, when `reason` is `other` (audit R222). | `rejectReceivedGoods` body |
 
-**Sent by *Close transfer short*** (`closeTransferShort`; no form is declared, so these are filled from the screen or collected inline)
+**Rules for these inputs** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
 
-| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
-|---|---|---|---|---|---|---|---|
-| Reason `reason` | text area | required | — | — | — | Kept as `StockTransfer.closeShortReason`. | `closeTransferShort` body |
-| Supervisor step up `supervisorStepUp` | group | required | — | — | — | A supervisor signs the act in place, on the device making the call (decided 28 September, audit R144). | `closeTransferShort` body |
-| Principal `supervisorStepUp.principalId` | picker: choose a principal | required | — | — | shows names, sends the id | The supervisor signing. Recorded against the act. | `closeTransferShort` body |
-| Credential `supervisorStepUp.credential` | text area | required | — | max length 512 | — | The supervisor's staff PIN, as they sign in at a till with it. A PIN, never a password (audit R123 (7)). | `closeTransferShort` body |
+- **Purchase order**: Chosen from "Expected deliveries": orders that are Sent, Acknowledged or Partly received for this venue, soonest expected first. Searchable by PO number, supplier or delivery note. *(source: contracts/satellite/inventory.yaml#listPurchaseOrders / contracts/satellite/inventory.yaml#createGoodsReceipt)*
+- **Receive into**: Location picker. Defaults to the order's deliver-to location. *(source: DI-345 / contracts/satellite/inventory.yaml#/components/schemas/CreateGoodsReceiptRequest)*
+- **Delivery note number**: Optional, up to 128 characters. Printed on the supplier's delivery note. *(source: contracts/satellite/inventory.yaml#/components/schemas/CreateGoodsReceiptRequest)*
+- **Received quantity (per line)**: Blank by default, with a "Receive as ordered" shortcut per line and for all lines. Show ordered, already received and outstanding beside it. The maximum allowed is outstanding plus the venue's over-receipt tolerance (proposed 5%). Show the limit, e.g. "Up to 63". *(source: R094 / contracts/satellite/inventory.yaml#createGoodsReceipt)*
+- **Batch and expiry (per line)**: Batch number up to 64 characters. The expiry date is required for perishable items (flagged on the item master). One order line can be split into several batch lines ("Add batch"), because one item can arrive on two batches with two expiry dates. *(source: R171 / DI-345 / contracts/satellite/inventory.yaml#/components/schemas/CreateGoodsReceiptRequest)*
 
 #### Outputs: what the screen shows and produces
 
@@ -840,38 +1081,25 @@ Errors to draw in the form: 400 A line price differs from the selected quotation
 | Subtotal | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Tax amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 
-**The stock transfer** (detail panel, from `getStockTransfer`)
-
-| Shows | Format | Notes |
-|---|---|---|
-| ID | the name it points at, never the id | — |
-| Transfer number | text | — |
-| From location | the name it points at, never the id | — |
-| To location | the name it points at, never the id | — |
-| Status | chip: Dispatched, In transit, Received, Partially received, Cancelled | — |
-| Lines | list or chips (count when long) | — |
-| Dispatched by principal | the name it points at, never the id | — |
-| Received by principal | the name it points at, never the id | — |
-| Dispatched at | 1 Oct 2026, 14:30 | — |
-| Received at | 1 Oct 2026, 14:30 | — |
-| Close short reason | text | Why the balance was written off, from `closeTransferShort`. |
-| Scope path | text | The partition key (ADR-0005). `fromLocationId` and `toLocationId` give the endpoints; this gives the owner, the source venue's scope. |
-
 **Actions and what each produces**
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
 | Confirm (confirm dialog) | navigation or local | — | — | — | — |
 | Create goods receipt (primary button) | `createGoodsReceipt` POST `/goods-receipts` | CreateGoodsReceiptRequest | GoodsReceipt | 409 Over-receipt beyond `VenueSettings.inventory.overReceiptTolerancePercent` (proposed default 5, audit R094), or the purchase order is closed | gated `PROCUREMENT_RECEIVE`; opens modal first; produces a document or message: Receive goods against a purchase order |
-| Acknowledge purchase order (secondary button) | `acknowledgePurchaseOrder` POST `/purchase-orders/{purchaseOrderId}/acknowledge` | inline | PurchaseOrder | 409 Not in a state that permits this | gated `PROCUREMENT_MANAGE`; opens modal first |
-| Cancel purchase order (destructive button) | `cancelPurchaseOrder` POST `/purchase-orders/{purchaseOrderId}/cancel` | inline | PurchaseOrder | 409 The order is not `raised` or `sent`. | gated `PROCUREMENT_MANAGE` |
-| Close purchase order short (destructive button) | `closePurchaseOrderShort` POST `/purchase-orders/{purchaseOrderId}/close-short` | inline | PurchaseOrder | 409 Not in a state that permits this | gated `PROCUREMENT_MANAGE` |
-| Create purchase order (secondary button) | `createPurchaseOrder` POST `/purchase-orders` | CreatePurchaseOrderRequest | PurchaseOrder | 400 A line price differs from the selected quotation with no `priceOverrideReason` (audit R171).; 409 Requisition is not approved, or the quotation does not match it | gated `PROCUREMENT_MANAGE`; opens modal first |
 | Reject received goods (destructive button) | `rejectReceivedGoods` POST `/goods-receipts/{receiptId}/reject` | inline | GoodsReceipt | 400 `reason` is `other` with no `note` (audit R222).; 409 A line rejects more than was received and not already rejected on it, or names a `lineId` the receipt does not hold (audit R171) | gated `PROCUREMENT_RECEIVE` |
-| Send purchase order (secondary button) | `sendPurchaseOrder` POST `/purchase-orders/{purchaseOrderId}/send` | — | PurchaseOrder | 409 Not in a state that permits this | gated `PROCUREMENT_MANAGE` |
-| Close transfer short (destructive button) | `closeTransferShort` POST `/stock-transfers/{transferId}/close-short` | inline | StockTransfer | 403 The supervisor step-up failed (audit R144). The PIN did not verify, or the principal does not hold `LEDGER_APPROVE` at this venue.; 409 Not in a state that permits this | step-up: pin (Writes off stock in transit; a supervisor signs it in place (proposed by the coordinator, client to confirm, audit …) |
 
-**Data it reads**: `listPurchaseOrders` (onLoad, List purchase orders); `listGoodsReceipts` (onLoad, List goods receipts); `getStockTransfer` (onLoad, One transfer, its manifest and where it is)
+**Rules for what is shown** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
+
+- **Receipt confirmation**: Receipt number (venue prefix plus sequence, e.g. AQP-GR-000431), lines received, total value, and "Stock updated". "Accrual posted" shows as text, never as a journal id. The order's status moves to Partly received or Received. *(source: R152 / contracts/satellite/inventory.yaml#/components/schemas/GoodsReceipt)*
+- **Receipt history**: Per order: each receipt with date, receiver, delivery note, lines, rejected quantities with reasons. *(source: contracts/satellite/inventory.yaml#listGoodsReceipts)*
+
+**What each action does** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
+
+- **Post receipt**: Adds stock and creates the accrual. Refused for over-receipt beyond the tolerance. Name the line and the maximum. Refused if the order was closed meanwhile. *(source: R094 / contracts/satellite/inventory.yaml#createGoodsReceipt)*
+- **Reject lines**: Pick receipt lines (each batch or expiry line), the quantity rejected and a reason: Damaged, Wrong item, Quality failure, Short-dated, Over-delivery, Other. Other requires a note of at least 3 characters. The rejection reverses the stock and raises a supplier return. The dialog names the receipt and the lines. *(source: R171 / R222 / contracts/satellite/inventory.yaml#rejectReceivedGoods)*
+
+**Data it reads**: `listPurchaseOrders` (onLoad, List purchase orders); `listGoodsReceipts` (onLoad, List goods receipts)
 
 **Where the user goes next**
 
@@ -880,10 +1108,7 @@ Errors to draw in the form: 400 A line price differs from the selected quotation
 
 **What opens over it**
 
-- confirmDialog *Cancel purchase order*: **Names what `cancelPurchaseOrder` changes and what it leaves alone**, in the consequence rather than the verb. A goods receipt this affects should be identified in the dialog, not just counted. **Collects what `cancelPurchaseOrder` sends before it is called.** Required: `reason`. **It may answer …
-- confirmDialog *Close purchase order short*: **Names what `closePurchaseOrderShort` changes and what it leaves alone**, in the consequence rather than the verb. A goods receipt this affects should be identified in the dialog, not just counted. **Collects what `closePurchaseOrderShort` sends before it is called.** Required: `reason`. **It may …
 - confirmDialog *Reject received goods*: **Names what `rejectReceivedGoods` changes and what it leaves alone**, in the consequence rather than the verb. A goods receipt this affects should be identified in the dialog, not just counted. **Collects what `rejectReceivedGoods` sends before it is called.** Required: `lines` — each a receipt …
-- confirmDialog *Close transfer short*: **Names what `closeTransferShort` changes and what it leaves alone**, in the consequence rather than the verb. A goods receipt this affects should be identified in the dialog, not just counted. **Collects what `closeTransferShort` sends before it is called.** Required: `reason` and …
 
 #### States
 
@@ -895,28 +1120,61 @@ Errors to draw in the form: 400 A line price differs from the selected quotation
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on status, supplierId and the goods receipt are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PROCUREMENT_VIEW`, which `listPurchaseOrders` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 400 A line price differs from the selected quotation with no `priceOverrideReason` (audit R171).; 400 `reason` is `other` with no `note` (audit R222).; 409 A line rejects more than was received and not already rejected on it, or names a `lineId` the receipt does not hold (audit R171); 409 Not in a state that permits this |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 `reason` is `other` with no `note` (audit R222).; 409 A line rejects more than was received and not already rejected on it, or names a `lineId` the receipt does not hold (audit R171); 409 Over-receipt beyond `VenueSettings.inventory.overReceiptTolerancePercent` (proposed default 5, audit R094), or the purchase order is closed |
+
+#### Edge cases to draw
+
+- **A chilled or frozen delivery arrives warm**: The temperature is recorded before the receipt is posted, and the delivery is refused at the door. On the handheld this is Receiving (EMP-065). Here, show the cold-chain reading on the receipt if one was taken. *(source: F28 step 1 / contracts/satellite/fnb.yaml#logColdChain)*
+- **The same item arrives on two batches**: Two receipt lines for one order line. A rejection can name one batch and leave the other. *(source: R171)*
+- **Partial delivery and the rest will never come**: The order stays Partly received. Link to Purchase Orders to close it short (finance approval). *(source: R144 / contracts/satellite/inventory.yaml#closePurchaseOrderShort)*
+
+#### Consistency with other screens
+
+- Match `EMP-065`: The same receipt form in handheld layout: same fields, same reasons, same tolerance message. The handheld is where most receipts happen.
+- Match `BO-051`: Same status words. Order lifecycle actions (send, cancel, close short) live only on Purchase Orders.
+- Match `BO-083`: Rejections and lateness feed supplier performance (on time in full, rejection reasons).
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+order: PO-AQP-000214 · Gulf Fresh Dairy LLC · expected 16 Oct 2026
+deliveryNote: GFD-DN-778120
+receivedAt: 2026-10-16 07:42 GST
+lines:
+- item: Full-cream milk 2 L
+  ordered: 60
+  received: 36
+  batch: L2610A
+  expiry: '2026-10-23'
+- item: Full-cream milk 2 L
+  ordered: (same line)
+  received: 24
+  batch: L2610B
+  expiry: '2026-10-24'
+- item: Greek yoghurt 1 kg
+  ordered: 24
+  received: 20
+  rejected: 4
+  reason: Damaged
+receiptNumber: AQP-GR-000431
+totalValue: AED 1,125.00
+```
 
 #### Permissions
 
 - `createGoodsReceipt` → `PROCUREMENT_RECEIVE` (operate) · staff
 - `listPurchaseOrders` → `PROCUREMENT_VIEW` (read) · staff
-- `acknowledgePurchaseOrder` → `PROCUREMENT_MANAGE` (configure) · staff
-- `cancelPurchaseOrder` → `PROCUREMENT_MANAGE` (configure) · staff
-- `closePurchaseOrderShort` → `PROCUREMENT_MANAGE` (configure) · staff
-- `createPurchaseOrder` → `PROCUREMENT_MANAGE` (configure) · staff
 - `getPurchaseOrder` → `PROCUREMENT_VIEW` (read) · staff
 - `listGoodsReceipts` → `PROCUREMENT_VIEW` (read) · staff
 - `rejectReceivedGoods` → `PROCUREMENT_RECEIVE` (operate) · staff
-- `sendPurchaseOrder` → `PROCUREMENT_MANAGE` (configure) · staff
-- `closeTransferShort` → `LEDGER_APPROVE` (operate) · staff · step-up pin
-- `getStockTransfer` → `PRODUCT_VIEW` (read) · staff
 
 **A refused user sees:** Shown when the caller lacks `PROCUREMENT_VIEW`, which `listPurchaseOrders` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
 #### Requirements it meets
 
-18 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+12 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
 
 | Ref | Requirement (shortened) | Domain | Verdict | Via |
 |---|---|---|---|---|
@@ -926,13 +1184,12 @@ Errors to draw in the form: 400 A line price differs from the selected quotation
 | 15.2.5 | Purchase Receiving - System shall support receiving operations. | Inventory Management | CONTRACTED | `createGoodsReceipt` |
 | 15.2.6 | Receiving Validation - System shall validate received goods. | Inventory Management | CONTRACTED | `createGoodsReceipt` |
 | 15.2.7 | Receiving Discrepancy Management - System shall manage receiving discrepancies. | Inventory Management | CONTRACTED | `createGoodsReceipt` |
-| 4.4.18 | Support creation, approval, tracking, and management of supplier purchase orders. | Bundles and Promotions | CONTRACTED | `createPurchaseOrder` |
-| 4.4.19 | Support inventory receiving, partial deliveries, discrepancy management, and automatic stock updates. | Bundles and Promotions | CONTRACTED | `createPurchaseOrder` |
-| 4.5.8 | Convert approved requisitions into supplier purchase orders. | Bundles and Promotions | CONTRACTED | `createPurchaseOrder` |
-| 15.3.10 | Purchase Orders - System shall support purchase orders. | Inventory Management | CONTRACTED | `createPurchaseOrder` |
-| 15.3.13 | Goods Receipt Notes - System shall support GRNs. | Inventory Management | CONTRACTED | `createPurchaseOrder` |
-| 15.3.14 | Purchase Receipt Validation - System shall validate received purchases. | Inventory Management | CONTRACTED | `createPurchaseOrder` |
-| … 6 more | | | | `traceability.json` |
+| 15.1.14 | On-Order Stock Tracking - System shall track inventory on purchase orders. | Inventory Management | CONTRACTED | `getPurchaseOrder` |
+| 4.5.33 | Manage supplier invoices. | Bundles and Promotions | CONTRACTED | data `PurchaseOrder` |
+| 15.3.7 | Request for Quotation - System shall support RFQs. | Inventory Management | CONTRACTED | data `PurchaseOrder` |
+| 15.3.11 | Blanket Purchase Orders - System shall support blanket purchase orders. | Inventory Management | CONTRACTED | data `PurchaseOrder` |
+| 15.3.12 | Contract Purchasing - System shall support contract purchasing. | Inventory Management | CONTRACTED | data `PurchaseOrder` |
+| 15.3.15 | Three-Way Matching - System shall support PO, GRN and invoice matching. | Inventory Management | CONTRACTED | data `PurchaseOrder` |
 
 #### Client meeting inputs
 
@@ -953,21 +1210,21 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Drawn by: Claude Design Retail pack, 24 August
 - Client design-board frames: `Retail Board 4.dc.html#ret-4e`, `Inventory Board 6.dc.html#inv-6a`, `Inventory Board 6.dc.html#inv-6b`, `Inventory Board 6.dc.html#inv-6c`, `Inventory Board 6.dc.html#inv-6d`, `Inventory Board 6.dc.html#inv-6e`
 - Flow F15 *A part is needed and ordered*, step 4: The goods arrive and are received → Stock rises at the venue
-- Flow F35 *Stock arrives short and an oversell is resolved*, step 4: The rest is received and the transfer closes short. → **Closing short records that the balance will not arrive** — which is the claim. The board called it `raiseTransferClaim`; the contract calls it what it is.
-- Flow F76 *Stock is counted, requested, transferred and received*, step 5: Goods Receipt. → **Drawn by the client as RET-4E.** 7 operations on this step.
-- Flow F92 *Store stock is watched, replenished and reconciled*, step 5: Goods Receipt. → **Drawn by the client as RET-4E.**
 - Flow F15 branch at step 4 (requiresStaff): when The delivery is short, `closeTransferShort` or a partial receipt. **The difference is a discrepancy to investigate, not a silent adjustment.**
 - Flow F15 branch at step 4 (requiresStaff): when The wrong part arrived, Received and rejected as a separate movement. The work order stays blocked and the requisition is raised again.
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (39), with its required mark, default, format and its error state (400, 403, 404, 409).
-- [ ] Every output is drawn (53 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (19), with its required mark, default, format and its error state (400, 404, 409).
+- [ ] Every output is drawn (41 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-052?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: Confirm, Create goods receipt, Acknowledge purchase order, Cancel purchase order, Close purchase order short, Create purchase order, Reject received goods, Send purchase order, Close transfer short.
+- [ ] Every action is wired with its success and its failure: Confirm, Create goods receipt, Reject received goods.
 - [ ] Every transition is wired: `EMP-005`, `BO-049`.
-- [ ] Every gated control is gated: `LEDGER_APPROVE`, `PROCUREMENT_MANAGE`, `PROCUREMENT_RECEIVE`, `PROCUREMENT_VIEW`, `PRODUCT_VIEW`.
+- [ ] Every gated control is gated: `PROCUREMENT_RECEIVE`, `PROCUREMENT_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 3 edge case(s) from the process notes are drawn.
+- [ ] The 2 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
+- [ ] The 1 decision(s) taken on this screen are drawn as decided, not as the old default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -989,6 +1246,23 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Route | `/inventory/requisitions` |
 
 **What the spec says about it.** Added 17 August because the contract had operations no screen declared. **Not on the wireframe board** — needs drawing. **Improved 20 August against the client design board**, answering 2 board screen(s): Requisition & Smart Replenishment; Store Inventory & Replenishment Configuration. **The id, flows and navigation are unchanged** — a board specifies a screen further; it does not replace it. **Retail board operations wired 24 August.**
+
+**From the Food, Beverage & Retail process.** Requisitions is the purchase request: a department asks to buy, its head approves, returns or rejects it, quotations are compared, and the approved request becomes a purchase order. It serves two people: the requester (raise, track, answer questions) and the approver (decide). The one thing to get right is that the approver is never the requester, and approval may only lower quantities, never raise them.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **A requisition can only become a supplier purchase. The client also uses requisitions for outlets replenishing from the central warehouse, and for inter-store requests approved before a transfer. Flow F35 says "a requisition asks a supplier". Transfers have no approval state.** Why: Internal replenishment has no model. Either the requisition gets a fulfilment type (buy from a supplier / transfer from a store) that ends in a transfer, or transfers get a request-and-approve step. *(source: DI-341 / DI-362 / F35 step 1 / contracts/satellite/inventory.yaml#/components/schemas/Requisition / contracts/satellite/inventory.yaml#/components/schemas/TransferStatus; Food, Beverage & Retail)*
+- **The approval of a requisition exists twice: approveRequisition on this screen (F76) and the generic approval queue on BO-084 (F15 step 3). Also, approveRequisition's decision allows rejected and returnedForInfo, which duplicate rejectRequisition and returnRequisition.** Why: One approval path per request, and one way to reject. Otherwise a request can be decided in two places. *(source: F15 step 3 / F76 step 3 / contracts/satellite/inventory.yaml#approveRequisition; Food, Beverage & Retail)*
+- **F15 step 2 raises a requisition "against the work order" so the job and the purchase find each other. The request has no work-order field.** Why: The link the flow promises cannot be stored. *(source: F15 step 2 / contracts/satellite/inventory.yaml#/components/schemas/CreateRequisitionRequest; Food, Beverage & Retail)*
+- **The status "draft" exists, but nothing creates or submits a draft. Creating raises the request straight into approval, and suggestions are not drafts.** Why: The client expects below-par-level stock to create a draft request for review. Today that state cannot be reached. *(source: DI-234 / contracts/satellite/inventory.yaml#/components/schemas/RequisitionStatus; Food, Beverage & Retail)*
+- **The first-run state "offers no create action". The filters are text fields "Status" and "Raised by principal id". An "Every stock location" table is on the screen. There is no exit to Purchase Orders.** Why: The purpose includes raising requests. Locations are only a picker for suggestions. The approved request's next step is BO-051. *(source: screens/P08-venue-back-office.yaml#BO-078 / R251; Food, Beverage & Retail)*
+
+#### Decided on this screen
+
+Answered questions: draw the decision, not the old default. Where a decision and the tables below differ, the decision wins.
+
+- **Should internal replenishment (outlet from warehouse, store to store) go through requisitions with approval, or through transfers with an approval step?** → Drawn default accepted: Draw supplier purchase only. Mark internal replenishment as pending. *(decided by Chinmay, 2026-10-02; DEC-290 / CHG-NOTE-004)* **Reviewable:** a default the lead may still overrule before the block is tasked.
+- **What is the requisition number format?** → Drawn default accepted: REQ-<venue code>-<six-digit sequence>, as an example only. *(decided by Chinmay, 2026-10-02; DEC-291 / CHG-NOTE-004)* **Reviewable:** a default the lead may still overrule before the block is tasked.
 
 #### Inputs: what the user enters or picks
 
@@ -1074,6 +1348,15 @@ Errors to draw in the form: 409 Already approved: the requisition is `approved`,
 |---|---|---|---|---|---|---|---|
 | Reason `reason` | text area | required | — | — | — | Kept as `Requisition.cancelReason`. | `cancelRequisition` body |
 
+**Rules for these inputs** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
+
+- **Lines**: Item picker (inventory items), quantity, unit. Units offer the item's base unit and purchase unit ("can" or "case of 24"). When the request came from a suggestion, the suggested quantity stays visible beside the requested one. A different quantity asks for a short reason. *(source: DI-343 / contracts/satellite/inventory.yaml#updateRequisitionLines / contracts/satellite/inventory.yaml#/components/schemas/Requisition)*
+- **Required by**: Date, required, today or later. *(source: contracts/satellite/inventory.yaml#/components/schemas/CreateRequisitionRequest)*
+- **Department / cost centre**: Pickers. Department defaults to the requester's own. The cost centre is what finance books it to. *(source: contracts/satellite/inventory.yaml#/components/schemas/CreateRequisitionRequest)*
+- **Justification**: Optional, up to 1,000 characters. It is what the approver reads first. *(source: contracts/satellite/inventory.yaml#/components/schemas/CreateRequisitionRequest)*
+- **Approver's amended quantity**: On approval each line can be lowered, never raised above the requested quantity. Enforce it in the field (the maximum is the requested quantity). *(source: contracts/satellite/inventory.yaml#approveRequisition)*
+- **Filters**: Status chips, plus "Raised by me" / "Waiting for my decision" tabs. Never a "Raised by principal id" text field. *(source: contracts/satellite/inventory.yaml#listRequisitions)*
+
 #### Outputs: what the screen shows and produces
 
 **Shown**
@@ -1156,6 +1439,22 @@ Errors to draw in the form: 409 Already approved: the requisition is `approved`,
 | Compare quotations (secondary button) | `compareQuotations` GET `/requisitions/{requisitionId}/quotations` | — | QuotationComparison | — | gated `PROCUREMENT_VIEW` |
 | Save requisition lines (secondary button) | `updateRequisitionLines` PUT `/requisitions/{requisitionId}/lines` | inline | Requisition | 409 Already approved: the requisition is `approved`, `ordered` or `closed` (audit R171), or it is `rejected` or `cancelled`. | gated `PROCUREMENT_REQUEST`; opens modal first |
 
+**Rules for what is shown** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
+
+- **Two tabs**: "Waiting for my decision" (pending approval, not raised by me; an empty tab is the good outcome) and "Requests" (everything for the venue, filterable). The empty decision tab says "Nothing waiting for you". *(source: screens/P08-venue-back-office.yaml#BO-078)*
+- **Status labels**: Pending approval, Approved, Returned for information, Rejected, Ordered, Closed, Cancelled. A returned request shows the approver's question prominently to the requester. A rejected one shows the reason and offers "Copy to new request". *(source: contracts/satellite/inventory.yaml#/components/schemas/RequisitionStatus / contracts/satellite/inventory.yaml#rejectRequisition / contracts/satellite/inventory.yaml#returnRequisition)*
+- **Suggestions panel**: "Below reorder point" items for a chosen location: on hand, reorder point, par level, average daily use, days of cover left, suggested quantity, preferred supplier, lead time. Sort by days of cover ascending. A suggestion is a draft for a person to review and is never raised automatically. *(source: DI-234 / contracts/satellite/inventory.yaml#getSuggestedRequisitions)*
+- **Quotation comparison**: Side by side per supplier: total, lead time, valid until, and per line unit prices with the lowest per line highlighted. Badges "Lowest total" and "Shortest lead time". The cheapest total is not always the cheapest line. *(source: contracts/satellite/inventory.yaml#compareQuotations / DI-348)*
+
+**What each action does** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
+
+- **New request**: Raises the request straight into Pending approval. It shows in the approver's tab. *(source: contracts/satellite/inventory.yaml#createRequisition)*
+- **Create from suggestions**: Opens a new request prefilled with the selected suggestions. The suggested quantities are kept beside any change. *(source: contracts/satellite/inventory.yaml#getSuggestedRequisitions / contracts/satellite/inventory.yaml#updateRequisitionLines)*
+- **Edit lines**: Allowed until approval. After approval it is refused, and the message says a new request is needed. *(source: R171 / contracts/satellite/inventory.yaml#updateRequisitionLines)*
+- **Approve · Return with a question · Reject**: Three distinct buttons for the approver. Return asks a question and Reject asks a reason. The buttons are hidden on a request the user raised; the server refuses it anyway. *(source: contracts/satellite/inventory.yaml#approveRequisition / contracts/satellite/inventory.yaml#returnRequisition / contracts/satellite/inventory.yaml#rejectRequisition)*
+- **Cancel request**: Requester only, with a reason. The confirmation names the request number and its estimated total. *(source: contracts/satellite/inventory.yaml#cancelRequisition)*
+- **Record quotation · Compare · Raise purchase order**: On an approved request: record supplier quotes against it, compare them, select one, then "Raise purchase order", which opens BO-051 prefilled. *(source: DI-348 / contracts/satellite/inventory.yaml#recordQuotation / contracts/satellite/inventory.yaml#createPurchaseOrder)*
+
 **Data it reads**: `listRequisitions` (onLoad, List requisitions); `getSuggestedRequisitions` (onLoad, Draft requisitions from reorder points); `listStockLocations` (onLoad, List stock locations)
 
 **Where the user goes next**
@@ -1181,6 +1480,45 @@ Errors to draw in the form: 409 Already approved: the requisition is `approved`,
 | Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PROCUREMENT_VIEW`, which `listRequisitions` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 An amended quantity exceeds the requested quantity; 400 Validation failed; 409 Already approved: the requisition is `approved`, `ordered` or `closed` (audit R171), or it is `rejected` or `cancelled`.; 409 Not in a state that permits this |
+
+#### Edge cases to draw
+
+- **No supplier is set up for an item**: The request can be approved but cannot become an order. Show "No supplier for <item>" with a link to Suppliers. *(source: F15 step 2)*
+- **Offline (handheld or weak signal)**: Raising and editing a request queue offline. Approving, rejecting and returning need a connection. *(source: contracts/satellite/inventory.yaml#createRequisition / contracts/satellite/inventory.yaml#approveRequisition)*
+
+#### Consistency with other screens
+
+- Match `EMP-063`: Same request form and status words in handheld layout.
+- Match `BO-051`: "Raise purchase order" carries the requisition and the selected quotation.
+- Match `BO-083`: Quotations recorded on Suppliers appear in this comparison, and the reverse.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+- number: REQ-AQP-000118
+  department: Oasis Bistro (F&B)
+  raisedBy: Priya Nair
+  requiredBy: '2026-10-18'
+  status: Pending approval
+  lines:
+  - item: Full-cream milk 2 L
+    suggested: 72
+    requested: 60
+    unit: bottle
+    reason: Weekend menu change, less demand
+  - item: Greek yoghurt 1 kg
+    requested: 24
+    unit: tub
+  estimatedTotal: AED 1,180.00
+  justification: Weekly dairy replenishment for Oasis Bistro dinner service
+- number: REQ-AQP-000117
+  department: Marina Bay Store
+  raisedBy: Omar Ziad
+  status: Returned for information
+  question: Why 300 T-shirts in size S when last month sold 40?
+```
 
 #### Permissions
 
@@ -1251,6 +1589,9 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every transition is wired: `BO-080`, `BO-084`, `BO-079`, `BO-081`.
 - [ ] Every gated control is gated: `APPROVAL_ACT`, `PROCUREMENT_REQUEST`, `PROCUREMENT_VIEW`, `PRODUCT_VIEW`.
 - [ ] The 3 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 2 edge case(s) from the process notes are drawn.
+- [ ] The 5 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
+- [ ] The 2 decision(s) taken on this screen are drawn as decided, not as the old default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -1272,6 +1613,22 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Route | `/inventory/stock-count` |
 
 **What the spec says about it.** Added 17 August because the contract had operations no screen declared. **Not on the wireframe board** — needs drawing. **Improved 20 August against the client design board**, answering 1 board screen(s): Stock Count, Reconciliation & Variance. **The id, flows and navigation are unchanged** — a board specifies a screen further; it does not replace it. **Operations from the 24 August F&B build wired here** — the contract grew and the screens had not caught up, which is how 92 operations reached 49% of screens. **Blind counting (decided 28 September, audit R110)**: while a count is open or counting the screen shows the pre-filled item list with a blank count and no expected quantity or variance; variance appears only after submission.
+
+**From the Food, Beverage & Retail process.** Stock Count is the supervisor's side of counting: start a full, cycle or spot count at a location, watch progress, review the variance once counting is submitted, send lines back for recount, and post. Counting itself mostly happens on the handheld (EMP-066). The one thing to get right is blindness. While a count is open or counting, nobody sees the expected quantity or the variance. Variance appears only after submission, and then never as zero by default.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **Two counting APIs exist side by side. The inventory one (submit counted quantities; recount the whole count with a supervisor PIN) and the F&B one (enter a line; send lines back for recount with no PIN). Flow F30 uses the F&B pair.** Why: The decision says a stock recount needs a supervisor's step-up on the same device. The line recount in F30 has none. One counting model should be chosen, and the recount should carry the step-up. *(source: R144 / F30 step 5 / contracts/satellite/fnb.yaml#requestRecount / contracts/satellite/inventory.yaml#recountStockCount; Food, Beverage & Retail)*
+- **No operation ends counting. Statuses go Open → Counting → Closed → Variance review → Posted, but nothing moves a count from Counting to Closed. Variance is "hidden until the count is submitted".** Why: The moment variance is revealed has no action behind it. Draw a "Finish counting" step; the contract needs the operation. *(source: R110 / contracts/satellite/inventory.yaml#/components/schemas/CountStatus; Food, Beverage & Retail)*
+- **Posting above the approval amount answers 409 "approval is required". F30's branch says it routes through an approval request.** Why: Other approvals (PO cancel) return a pending state with the request attached. Here the post just fails and nothing raises the approval. *(source: F30 step 4 / contracts/satellite/inventory.yaml#postStockCount; Food, Beverage & Retail)*
+- **The first-run state offers "Request recount". The location filter is a "Location id" text field. The status filter is a text field.** Why: First run should offer "Start count". Filters are pickers. *(source: screens/P08-venue-back-office.yaml#BO-079; Food, Beverage & Retail)*
+
+#### Decided on this screen
+
+Answered questions: draw the decision, not the old default. Where a decision and the tables below differ, the decision wins.
+
+- **Which counting API is the build target, the inventory one or the F&B one?** → Drawn default accepted: Draw per-line entry and per-line recount (F30), with the supervisor PIN on recount. *(decided by Chinmay, 2026-10-02; DEC-292 / CHG-NOTE-004)* **Reviewable:** a default the lead may still overrule before the block is tasked.
+- **Are a 2% line tolerance and an AED 1,000.00 posting approval amount accepted?** → Drawn default accepted: Use them in mock-ups. *(decided by Chinmay, 2026-10-02; DEC-293 / CHG-NOTE-004)* **Reviewable:** a default the lead may still overrule before the block is tasked.
 
 #### Inputs: what the user enters or picks
 
@@ -1361,6 +1718,13 @@ Errors to draw in the form: 403 The supervisor step-up failed (audit R144). The 
 |---|---|---|---|---|---|---|---|
 | Reason `reason` | text area | required | — | — | — | Kept as `StockCount.cancelReason`. | `cancelStockCount` body |
 
+**Rules for these inputs** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
+
+- **Location**: Location tree picker. Only one open count per location; locations with an open count show "Count in progress". *(source: contracts/satellite/inventory.yaml#startStockCount)*
+- **Count type**: Full (everything at the location), Cycle (chosen categories, on rota) or Spot (a few items, e.g. after a damaged delivery). Cycle asks for categories. *(source: contracts/satellite/inventory.yaml#/components/schemas/StartStockCountRequest / F35 step 8)*
+- **Blind count**: On by default. Turning it off asks for confirmation ("Counters will see expected quantities"). *(source: R110 / contracts/satellite/inventory.yaml#/components/schemas/StartStockCountRequest)*
+- **Recount reason and supervisor PIN**: Sending a whole count back needs a reason and a supervisor's PIN entered on this device. A refused PIN changes nothing. *(source: R144 / contracts/satellite/inventory.yaml#recountStockCount)*
+
 #### Outputs: what the screen shows and produces
 
 **Shown**
@@ -1424,6 +1788,19 @@ Errors to draw in the form: 403 The supervisor step-up failed (audit R144). The 
 | Enter count line (secondary button) | `enterCountLine` POST `/fnb-stock-counts/{countId}/lines` | inline | inline | — | opens modal first |
 | Request recount (secondary button) | `requestRecount` POST `/fnb-stock-counts/{countId}/recount` | inline | RecountResult | — | opens modal first |
 
+**Rules for what is shown** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
+
+- **Count list**: Location, type (Full / Cycle / Spot), status, progress "38 of 46 lines counted", started by, started at. Variance columns are blank (not zero) while Open or Counting. Status words: Open, Counting, Closed, Variance review, Posted, Cancelled. *(source: R110 / contracts/satellite/inventory.yaml#/components/schemas/StockCount)*
+- **Variance review**: After submission: per line expected, counted, variance (quantity and %), variance value, times counted, note. Lines beyond the tolerance (proposed 2%) are flagged "Review" and sorted first. Header: total variance value (AED, signed) and the number of exceptions. Before submission the panel reads "Variance appears once the count is submitted". *(source: R110 / R094 / contracts/satellite/inventory.yaml#getCountVariance)*
+- **Clean count warning**: A count with no variance at all is shown with a gentle prompt, "No differences found. Check every line was counted", rather than as a success. *(source: F30 step 4)*
+
+**What each action does** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
+
+- **Start count**: Creates the count with one line per item that has stock at the location (filtered by category for a cycle count). The count is blank. Refused if a count is already open there. *(source: R171 / contracts/satellite/inventory.yaml#startStockCount)*
+- **Send lines for recount**: Select lines and give a reason. Those lines reopen on the handheld. The original figure is kept beside the recount. *(source: F30 step 5 / F30 step 6 / contracts/satellite/fnb.yaml#requestRecount)*
+- **Post count**: Writes Count gain / Count loss movements for every variance and posts the value. Refused while any exception line is unreviewed. Above the venue's approval amount (proposed AED 1,000.00 total variance) it needs approval. Show "Waiting for approval" rather than an error. *(source: R094 / R171 / contracts/satellite/inventory.yaml#postStockCount / F30 step 4)*
+- **Cancel count**: Only before counting starts, with a reason. Once lines are counted the count must be finished or recounted. Hide Cancel then. *(source: contracts/satellite/inventory.yaml#cancelStockCount)*
+
 **Data it reads**: `listStockCounts` (onLoad, List stock counts)
 
 **Where the user goes next**
@@ -1450,6 +1827,53 @@ Errors to draw in the form: 403 The supervisor step-up failed (audit R144). The 
 | Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_VIEW`, which `listStockCounts` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 A count is already open for this location; 409 Count is still open.; 409 Not in a state that permits this; 409 Unreviewed variance lines remain, or approval is required |
+
+#### Edge cases to draw
+
+- **Stock moved during the count (a sale, a transfer)**: Variance uses the expected quantity snapshotted when each line was entered, not the current one. Say so in the variance header ("Expected = system quantity when each line was counted"). *(source: F30 step 7 / contracts/satellite/inventory.yaml#/components/schemas/CountLine)*
+- **Counter is offline in a cellar**: Lines queue on the handheld and the count stays Counting. Progress here updates when they sync. *(source: F30 step 2)*
+
+#### Consistency with other screens
+
+- Match `EMP-066`: Same count, same line order, same status words. The handheld enters and this screen reviews and posts.
+- Match `BO-082`: Posted variances appear in the movement ledger as Count gain / Count loss, linked to the count.
+- Match `BO-137`: Posted variance feeds theoretical-against-actual for F&B.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+count:
+  location: Oasis Bistro Kitchen
+  type: Cycle
+  categories:
+  - Dairy
+  - Beverages
+  blind: true
+  status: Variance review
+  lines: 46
+  counted: 46
+  startedBy: Khalid Al Mansoori
+  startedAt: 2026-10-20 06:15 GST
+variance:
+  total: -AED 412.75
+  exceptions: 3
+  lines:
+  - item: Full-cream milk 2 L
+    expected: 18
+    counted: 12
+    variance: -6
+    pct: -33.3%
+    value: -AED 75.00
+    flag: Review
+  - item: Coca-Cola 330 ml can
+    expected: 240
+    counted: 238
+    variance: -2
+    pct: -0.8%
+    value: -AED 3.80
+```
 
 #### Permissions
 
@@ -1518,6 +1942,9 @@ Also apply: 2 for P08 · Stock & Supply, 24 for all of P08, 29 for every app (se
 - [ ] Every transition is wired: `BO-049`, `BO-078`, `BO-080`, `BO-081`, `BO-137`, `EMP-066`.
 - [ ] Every gated control is gated: `LEDGER_APPROVE`, `LEDGER_POST`, `PRODUCT_CONFIGURE`, `PRODUCT_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 2 edge case(s) from the process notes are drawn.
+- [ ] The 4 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
+- [ ] The 2 decision(s) taken on this screen are drawn as decided, not as the old default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -1531,7 +1958,7 @@ Also apply: 2 for P08 · Stock & Supply, 24 for all of P08, 29 for every app (se
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Stock & Supply · wave 2 · needs the `inventory` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `LEDGER_APPROVE`, `PROCUREMENT_RECEIVE`, `PRODUCT_CONFIGURE`, `PRODUCT_VIEW` (2 operate, 1 configure, 1 read); in the flows as storekeeper |
+| Who uses it | venue staff holding `LEDGER_APPROVE`, `PRODUCT_CONFIGURE`, `PRODUCT_VIEW` (1 operate, 1 configure, 1 read); in the flows as storekeeper |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listStockTransfers` reads the population and `getStockTransfer` reads one of them — list, select, act |
 | Offline | online only |
@@ -1539,6 +1966,25 @@ Also apply: 2 for P08 · Stock & Supply, 24 for all of P08, 29 for every app (se
 | Route | `/inventory/stock-transfers` |
 
 **What the spec says about it.** Added 17 August because the contract had operations no screen declared. **Not on the wireframe board** — needs drawing. **Improved 20 August against the client design board**, answering 1 board screen(s): Transfers, Distribution & Outlet Receiving. **The id, flows and navigation are unchanged** — a board specifies a screen further; it does not replace it. **Retail board operations wired 24 August.**
+
+**Known gaps.** Removed 2 October 2026 (CHG-WIR-008): Transfers are received with Receive; a goods receipt needs a supplier purchase order and was attached by resemblance (R254; design-notes correction fnb-retail …
+
+**From the Food, Beverage & Retail process.** Stock Transfers moves stock between any two stock locations: outlet to outlet, warehouse to outlet, outlet to warehouse, and between venues. It shows both outbound and inbound transfers for the venue. Dispatch takes stock out at once and puts it in transit; the receiving store confirms what arrived. The one thing to get right is that a difference between sent and received stays visible at both ends until someone closes it short, with a reason and a supervisor PIN.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **A transfer has no request or approval step. createStockTransfer dispatches immediately. The client and matrix say "transfer with approval workflow".** Why: An outlet cannot ask the warehouse for stock and wait for approval. The person with the stock simply sends it. *(source: DI-362 / MATRIX 4.5.5 / MATRIX 4.5.14 / contracts/satellite/inventory.yaml#/components/schemas/TransferStatus; Food, Beverage & Retail)*
+- **The transfer statuses include both "dispatched" and "inTransit", and "cancelled", but no operation cancels a transfer.** Why: Two words for one state goes against the simplicity principle (no granular dispatch statuses). A status no operation reaches is dead. Draw one "In transit" state and no Cancel. *(source: DI-346 / contracts/satellite/inventory.yaml#/components/schemas/TransferStatus; Food, Beverage & Retail)*
+- **The table shows fromVenueId, toVenueId and scopePath columns, and the status filter is a text field.** Why: These leak plumbing. Show venue names and a direction badge. *(source: screens/P08-venue-back-office.yaml#BO-080; Food, Beverage & Retail)*
+
+**Fixed on main** (the package already carries these; draw what it says): "Create goods receipt" is an action on this screen. (CHG-WIR-008).
+
+#### Decided on this screen
+
+Answered questions: draw the decision, not the old default. Where a decision and the tables below differ, the decision wins.
+
+- **Closing a transfer short with a supervisor PIN (rather than an approval request) was proposed by the coordinator. The R144 decision did not name this act.** → Drawn default accepted: Draw the supervisor PIN on the same device. *(decided by Chinmay, 2026-10-02; DEC-294 / CHG-NOTE-004)* **Reviewable:** a default the lead may still overrule before the block is tasked.
+- **What is the transfer number format?** → Drawn default accepted: TRF-<venue code>-<six-digit sequence>, as an example only. *(decided by Chinmay, 2026-10-02; DEC-295 / CHG-NOTE-004)* **Reviewable:** a default the lead may still overrule before the block is tasked.
 
 #### Inputs: what the user enters or picks
 
@@ -1579,27 +2025,6 @@ Errors to draw in the form: 409 Insufficient stock at the source
 
 Errors to draw in the form: 409 The transfer is not `inTransit` or `partiallyReceived` — it has already been received in full, or closed short
 
-**Form: Create goods receipt** (modal, opened by *Create goods receipt*; *Create goods receipt* calls `createGoodsReceipt`, *Cancel* sends nothing)
-
-**Collects what `createGoodsReceipt` sends before it is called.** Required: `id`, `purchaseOrderId`, `locationId`, `lines`, `recordedAt`. Optional: `deliveryNoteReference`. Dismissing sends nothing; the screen behind is unchanged.
-
-| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
-|---|---|---|---|---|---|---|---|
-| ID `id` | picker: choose an id | required | — | — | shows names, sends the id | — | `createGoodsReceipt` body |
-| Purchase order `purchaseOrderId` | picker: choose a purchase order | required | — | — | shows names, sends the id | — | `createGoodsReceipt` body |
-| Location `locationId` | picker: choose a location | required | — | — | shows names, sends the id | — | `createGoodsReceipt` body |
-| Delivery note reference `deliveryNoteReference` | text field | optional | — | max length 128 | — | — | `createGoodsReceipt` body |
-| Lines `lines` | repeatable rows | required | — | at least 1 | — | — | `createGoodsReceipt` body |
-| Item `lines[].itemId` | picker: choose an item | required | — | — | shows names, sends the id | — | `createGoodsReceipt` body |
-| Received quantity `lines[].receivedQuantity` | number field | required | — | min 0 | — | — | `createGoodsReceipt` body |
-| Unit `lines[].unit` | text field | optional | — | — | — | — | `createGoodsReceipt` body |
-| Batch number `lines[].batchNumber` | text field | optional | — | max length 64 | — | — | `createGoodsReceipt` body |
-| Expiry date `lines[].expiryDate` | date picker | optional | — | — | 1 Oct 2026 (dd MMM yyyy) | Required for perishable items. | `createGoodsReceipt` body |
-| Note `lines[].note` | text area | optional | — | max length 200 | — | — | `createGoodsReceipt` body |
-| Recorded at `recordedAt` | date and time picker | required | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `createGoodsReceipt` body |
-
-Errors to draw in the form: 409 Over-receipt beyond `VenueSettings.inventory.overReceiptTolerancePercent` (proposed default 5, audit R094), or the purchase order is closed
-
 **Sent by *Close transfer short*** (`closeTransferShort`; no form is declared, so these are filled from the screen or collected inline)
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
@@ -1608,6 +2033,13 @@ Errors to draw in the form: 409 Over-receipt beyond `VenueSettings.inventory.ove
 | Supervisor step up `supervisorStepUp` | group | required | — | — | — | A supervisor signs the act in place, on the device making the call (decided 28 September, audit R144). | `closeTransferShort` body |
 | Principal `supervisorStepUp.principalId` | picker: choose a principal | required | — | — | shows names, sends the id | The supervisor signing. Recorded against the act. | `closeTransferShort` body |
 | Credential `supervisorStepUp.credential` | text area | required | — | max length 512 | — | The supervisor's staff PIN, as they sign in at a till with it. A PIN, never a password (audit R123 (7)). | `closeTransferShort` body |
+
+**Rules for these inputs** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
+
+- **From / To**: Location pickers. From defaults to a location at this venue. To may be at another venue of the tenant, and the picker groups locations by venue. From and To cannot be the same. *(source: DI-362 / DI-294 / R183 / contracts/satellite/inventory.yaml#/components/schemas/CreateStockTransferRequest)*
+- **Lines**: Item (scan or search), quantity and unit. Show available at the source beside each line; a quantity above it is refused by the server. *(source: contracts/satellite/inventory.yaml#createStockTransfer)*
+- **Received quantity (receiving)**: Per line, blank with "Received as sent" shortcut. The difference from the dispatched quantity is shown live as a discrepancy. *(source: contracts/satellite/inventory.yaml#receiveStockTransfer)*
+- **Close-short reason and supervisor PIN**: Reason required. A supervisor with stock-approval rights enters their PIN on this device. *(source: R144 / contracts/satellite/inventory.yaml#closeTransferShort)*
 
 #### Outputs: what the screen shows and produces
 
@@ -1657,7 +2089,17 @@ Errors to draw in the form: 409 Over-receipt beyond `VenueSettings.inventory.ove
 | Create stock transfer (primary button) | `createStockTransfer` POST `/stock-transfers` | CreateStockTransferRequest | StockTransfer | 409 Insufficient stock at the source | opens modal first |
 | Receive stock transfer (secondary button) | `receiveStockTransfer` POST `/stock-transfers/{transferId}/receive` | inline | StockTransfer | 409 The transfer is not `inTransit` or `partiallyReceived` — it has already been received in full, or closed short | opens modal first |
 | Close transfer short (destructive button) | `closeTransferShort` POST `/stock-transfers/{transferId}/close-short` | inline | StockTransfer | 403 The supervisor step-up failed (audit R144). The PIN did not verify, or the principal does not hold `LEDGER_APPROVE` at this venue.; 409 Not in a state that permits this | step-up: pin (Writes off stock in transit; a supervisor signs it in place (proposed by the coordinator, client to confirm, audit …) |
-| Create goods receipt (secondary button) | `createGoodsReceipt` POST `/goods-receipts` | CreateGoodsReceiptRequest | GoodsReceipt | 409 Over-receipt beyond `VenueSettings.inventory.overReceiptTolerancePercent` (proposed default 5, audit R094), or the purchase order is closed | opens modal first; produces a document or message: Receive goods against a purchase order |
+
+**Rules for what is shown** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
+
+- **Transfer list**: Direction badge (Outbound / Inbound), transfer number, from, to (venue name shown when different), lines, dispatched at, status. Direction is a filter tab: All · Outbound · Inbound. Status words: In transit, Partly received, Received, Closed short, Cancelled. *(source: R183 / contracts/satellite/inventory.yaml#listStockTransfers / DI-346)*
+- **Transfer manifest**: What was sent, what arrived, what is missing, per line, plus the cold-chain reading where one was taken. Discrepancies sit with the transfer, not on another screen. *(source: contracts/satellite/inventory.yaml#getStockTransfer)*
+
+**What each action does** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
+
+- **Send stock (create transfer)**: Dispatches at once. The source decreases and the quantity is "In transit". Refused with "Not enough stock at <location>" when short. *(source: contracts/satellite/inventory.yaml#createStockTransfer)*
+- **Receive**: Offered only on inbound transfers that are In transit or Partly received. Received quantities may differ; the difference is recorded against both locations. *(source: R183 / contracts/satellite/inventory.yaml#receiveStockTransfer)*
+- **Close short**: Writes off the balance that will not arrive, with a reason and a supervisor PIN. A wrong PIN changes nothing. *(source: R144 / contracts/satellite/inventory.yaml#closeTransferShort)*
 
 **Data it reads**: `listStockTransfers` (onLoad, Inbound and outbound transfers for this venue (decided 28 …)
 
@@ -1666,7 +2108,9 @@ Errors to draw in the form: 409 Over-receipt beyond `VenueSettings.inventory.ove
 - → `BO-078` Requisitions: *Requisitions*
 - → `BO-079` Stock Count: *Stock Count*
 - → `BO-081` Inventory Items: *Inventory Items*; carries `itemId`
-- → `BO-052` Goods Receipt: *Goods Receipt*; carries `purchaseOrderId`, `transferId`
+- → `BO-052` Goods Receipt: *Goods Receipt*
+- → `BO-049` Stock Levels: *The website has already sold four of the damaged units*; carries `itemId`
+- → `BO-051` Purchase Orders: *Goods Receipt*
 
 **What opens over it**
 
@@ -1682,7 +2126,44 @@ Errors to draw in the form: 409 Over-receipt beyond `VenueSettings.inventory.ove
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on status and the stock transfers are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_VIEW`, which `listStockTransfers` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 409 Insufficient stock at the source; 409 Not in a state that permits this; 409 Over-receipt beyond `VenueSettings.inventory.overReceiptTolerancePercent` (proposed default 5, audit R094), or the purchase order is closed; 409 The transfer is not `inTransit` or `partiallyReceived` — it has already been received in full, or closed short |
+| Validation and conflict | the form keeps what was entered and marks the problem: 409 Insufficient stock at the source; 409 Not in a state that permits this; 409 The transfer is not `inTransit` or `partiallyReceived` — it has already been received in full, or closed short |
+
+#### Edge cases to draw
+
+- **Damage found only after the cases are opened**: The transfer is received in full, and the damage is a separate adjustment with a damage reason. The claim against the sending store is a separate conversation. *(source: F35 step 3)*
+- **Transfer between two venues**: Both venues see it. The sending venue cannot receive it and the receiving venue cannot dispatch it. *(source: R183)*
+
+#### Consistency with other screens
+
+- Match `EMP-064`: Same transfer form, statuses and manifest on the handheld.
+- Match `EMP-065`: Receiving a transfer at the door uses the same manifest and the same discrepancy wording.
+- Match `BO-049`: In-transit stock appears in valuation as its own line.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+- number: TRF-AQP-000087
+  direction: Outbound
+  from: Main Store
+  to: Marina Bay Retail Floor
+  status: In transit
+  dispatchedAt: 2026-10-21 09:10 GST
+  lines:
+  - item: Aqua Park logo T-shirt, green, M
+    sent: 24
+- number: TRF-WWD-000031
+  direction: Inbound
+  from: Wild Wadi Store (other venue)
+  to: Main Store
+  status: Partly received
+  lines:
+  - item: Kids swim goggles, blue
+    sent: 100
+    received: 92
+    missing: 8
+```
 
 #### Permissions
 
@@ -1690,14 +2171,13 @@ Errors to draw in the form: 409 Over-receipt beyond `VenueSettings.inventory.ove
 - `createStockTransfer` → `PRODUCT_CONFIGURE` (configure) · staff
 - `receiveStockTransfer` → `PRODUCT_CONFIGURE` (configure) · staff
 - `closeTransferShort` → `LEDGER_APPROVE` (operate) · staff · step-up pin
-- `createGoodsReceipt` → `PROCUREMENT_RECEIVE` (operate) · staff
 - `getStockTransfer` → `PRODUCT_VIEW` (read) · staff
 
 **A refused user sees:** Shown when the caller lacks `PRODUCT_VIEW`, which `listStockTransfers` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
 #### Requirements it meets
 
-14 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+8 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
 
 | Ref | Requirement (shortened) | Domain | Verdict | Via |
 |---|---|---|---|---|
@@ -1709,11 +2189,6 @@ Errors to draw in the form: 409 Over-receipt beyond `VenueSettings.inventory.ove
 | 15.2.17 | Replenishment Management - System shall support warehouse replenishment. | Inventory Management | CONTRACTED | `createStockTransfer` |
 | 15.5.3 | Inter-Venue Transfers - System shall support inter-venue transfers. | Inventory Management | CONTRACTED | `createStockTransfer` |
 | 15.2.15 | Shipment Tracking - System shall support shipment tracking. | Inventory Management | CONTRACTED | `receiveStockTransfer` |
-| 4.5.10 | Receive inventory against purchase orders. | Bundles and Promotions | CONTRACTED | `createGoodsReceipt` |
-| 4.5.30 | Receive goods against purchase orders. | Bundles and Promotions | CONTRACTED | `createGoodsReceipt` |
-| 4.5.32 | Support partial deliveries. | Bundles and Promotions | CONTRACTED | `createGoodsReceipt` |
-| 15.2.5 | Purchase Receiving - System shall support receiving operations. | Inventory Management | CONTRACTED | `createGoodsReceipt` |
-| … 2 more | | | | `traceability.json` |
 
 #### Client meeting inputs
 
@@ -1737,18 +2212,23 @@ Also apply: 2 for P08 · Stock & Supply, 24 for all of P08, 29 for every app (se
 - Derived from `wireframes/reference/Retail Board 4.dc.html`
 - Drawn by: Claude Design Retail pack, 24 August
 - Client design-board frames: `Retail Board 4.dc.html#ret-4d`, `Inventory Board 3.dc.html#inv-3b`, `Inventory Board 3.dc.html#inv-3c`
+- Flow F35 *Stock arrives short and an oversell is resolved*, step 4: The rest is received and the transfer closes short. → **Closing short records that the balance will not arrive** — which is the claim. The board called it `raiseTransferClaim`; the contract calls it what it is.
+- Flow F35 *Stock arrives short and an oversell is resolved*, step 7: The four orders are sourced from another store instead. → **Sourced rather than cancelled.** A guest who ordered and paid does not care which store it came from, and **cancelling is the outcome a venue reaches when it cannot see the alternative.**
 - Flow F76 *Stock is counted, requested, transferred and received*, step 4: Stock Transfers. → **Drawn by the client as RET-4D.** 2 operations on this step.
 - Flow F92 *Store stock is watched, replenished and reconciled*, step 4: Stock Transfers. → **Drawn by the client as RET-4D.**
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (30), with its required mark, default, format and its error state (403, 409).
+- [ ] Every input above is drawn (18), with its required mark, default, format and its error state (403, 409).
 - [ ] Every output is drawn (27 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-080?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: Create stock transfer, Receive stock transfer, Close transfer short, Create goods receipt.
-- [ ] Every transition is wired: `BO-078`, `BO-079`, `BO-081`, `BO-052`.
-- [ ] Every gated control is gated: `LEDGER_APPROVE`, `PROCUREMENT_RECEIVE`, `PRODUCT_CONFIGURE`, `PRODUCT_VIEW`.
+- [ ] Every action is wired with its success and its failure: Create stock transfer, Receive stock transfer, Close transfer short.
+- [ ] Every transition is wired: `BO-078`, `BO-079`, `BO-081`, `BO-052`, `BO-049`, `BO-051`.
+- [ ] Every gated control is gated: `LEDGER_APPROVE`, `PRODUCT_CONFIGURE`, `PRODUCT_VIEW`.
 - [ ] The 2 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 2 edge case(s) from the process notes are drawn.
+- [ ] The 3 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
+- [ ] The 2 decision(s) taken on this screen are drawn as decided, not as the old default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -1771,16 +2251,38 @@ Also apply: 2 for P08 · Stock & Supply, 24 for all of P08, 29 for every app (se
 
 **What the spec says about it.** Added 17 August because the contract had operations no screen declared. **Not on the wireframe board** — needs drawing.
 
+**From the Food, Beverage & Retail process.** Inventory Items is the item master: what the venue stocks, in which unit, how it is bought, how it is costed, when it needs reordering, and where it can be held (the location hierarchy). The one thing to get right is which fields lock once stock has moved. Base unit and costing method cannot change after the first movement, and the form must show this before someone tries.
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- Only one purchase unit and factor per item. The client's examples need several conversions ("1 carton = 24 pieces"; "1 case = 2 litres = 2,000 ml"). (CHG-SBO-005)
+- The item master has no "item type" and no status beyond active. (CHG-SBO-005)
+- The update operation cannot change barcode, purchase unit, factor, perishable, shelf life or allow-negative-stock. (CHG-SBO-005)
+- Stock locations can be created but never renamed, moved in the tree or deactivated. "Transit" is offered as a kind a user can create. (CHG-SBO-005)
+
+**Fixed on main** (the package already carries these; draw what it says): The filters are text fields "Venue id" and "Category id". An "Every stock location" table with raw columns sits beside the item table. (CHG-SBO-008).
+
+#### Decided on this screen
+
+Answered questions: draw the decision, not the old default. Where a decision and the tables below differ, the decision wins.
+
+- **Offer only weighted average and FIFO (agreed), or also standard cost and last purchase price (in the contract)?** → Drawn default stands (answer: "Default / recommended accepted"): Two options. *(decided by Chinmay, 2026-10-02; DEC-041 / CHG-NOTE-004)*
+
 #### Inputs: what the user enters or picks
 
 **On the screen**
 
 | Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
 |---|---|---|---|---|---|---|---|
-| Venue id | picker: choose a venue (drawn as a picker, not a text box) | optional | — | — | shows names, sends the id | Sends `?venueId=` to `listInventoryItems`. | `listInventoryItems` ?venueId |
-| Category id | picker: choose a category (drawn as a picker, not a text box) | optional | — | — | shows names, sends the id | Sends `?categoryId=` to `listInventoryItems`. | `listInventoryItems` ?categoryId |
+| Category | picker: choose a category | optional | — | — | shows names, sends the id | A pick list of categories by name; the venue comes from the session. | `InventoryItem.categoryId` |
 | Below reorder point | toggle | optional | — | — | — | Sends `?belowReorderPoint=` to `listInventoryItems`. | `listInventoryItems` ?belowReorderPoint |
 | Search | text field | optional | — | min length 1; max length 200 | — | Sends `?search=` to `listInventoryItems`. | `listInventoryItems` ?search |
+
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Category | picker: choose a category | — | — | `listInventoryItems` ?categoryId |
 
 **Form: Create inventory item** (modal, opened by *Create inventory item*; *Create inventory item* calls `createInventoryItem`, *Cancel* sends nothing)
 
@@ -1837,19 +2339,29 @@ Errors to draw in the form: 409 Attempt to change costing method or base unit af
 | Kind `kind` | select | required | — | Main store · Sub store · Kitchen · Bar · Retail floor · Cellar · Transit | — | — | `createStockLocation` body |
 | Parent location `parentLocationId` | picker: choose a parent location | optional | — | — | shows names, sends the id | — | `createStockLocation` body |
 
+**Rules for these inputs** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
+
+- **Base unit**: The unit stock is held and counted in (piece, can, bottle, kg, litre, ml). Required. Locked with a lock icon and "Used in stock movements, cannot change" once the item has movements. *(source: contracts/satellite/inventory.yaml#/components/schemas/InventoryItem / contracts/satellite/inventory.yaml#updateInventoryItem)*
+- **Purchase unit and factor**: How the supplier sells it, written as a sentence the user completes: "1 [case] = [24] [can]". Default factor 1. *(source: DI-343 / contracts/satellite/inventory.yaml#/components/schemas/CreateInventoryItemRequest)*
+- **Costing method**: Weighted average or FIFO. Required at creation. Locked once the item has movements, with the reason shown. *(source: DI-344 / contracts/satellite/inventory.yaml#createInventoryItem)*
+- **Reorder point / Reorder quantity / Par level**: Helper text: reorder point is when to reorder, reorder quantity is how much a suggestion orders, and par level is the level to top up to. All three are in the base unit. Reorder alerts and suggested requisitions run from them. *(source: DI-345 / DI-234 / contracts/satellite/inventory.yaml#getSuggestedRequisitions)*
+- **Preferred supplier**: Picker of the tenant's active suppliers. Suppliers on hold are not offered. Can be cleared with "None". *(source: R171 / R183 / contracts/satellite/inventory.yaml#updateInventoryItem)*
+- **Perishable and shelf life**: Perishable off by default. On, "Shelf life (days)" shows, and every goods receipt of this item needs an expiry date. *(source: DI-345 / contracts/satellite/inventory.yaml#/components/schemas/CreateGoodsReceiptRequest)*
+- **Allow negative stock**: Off by default. Turning it on shows "Only for bar items mid-service. Issues can exceed what is recorded on hand." *(source: contracts/satellite/inventory.yaml#/components/schemas/CreateInventoryItemRequest)*
+- **Kit components**: For a retail bundle sold as one item: components and the quantity per kit. A component cannot itself be a kit, and an item with its own movements cannot become one. Kit availability is "fewest whole kits the components make". *(source: MATRIX 4.4.20 / contracts/satellite/inventory.yaml#setInventoryKitDefinition)*
+- **Stock location (setup)**: Code, name, kind (Main store, Sub-store, Kitchen, Bar, Retail floor, Cellar) and parent location. Shown as an editable tree on its own "Locations" tab. *(source: DI-345 / contracts/satellite/inventory.yaml#createStockLocation)*
+
 #### Outputs: what the screen shows and produces
 
 **Shown**
 
-**Every inventory** (data table, from `listInventoryItems`)
+**Items** (data table, from `listInventoryItems`)
 
 | Shows | Format | Notes |
 |---|---|---|
 | SKU | text | — |
 | Barcode | text | — |
 | Name | text | — |
-| Venue | the name it points at, never the id | — |
-| Category | the name it points at, never the id | — |
 | Base unit | text | The unit stock is held in. Immutable once movements exist. |
 | Purchase unit | text | How the supplier sells it — a case of 24 against a base unit of one. |
 | Purchase unit factor | 1,234.5 | — |
@@ -1858,16 +2370,13 @@ Errors to draw in the form: 409 Attempt to change costing method or base unit af
 | Reorder quantity | 1,234.5 | — |
 | Par level | 1,234.5 | — |
 
-**Every stock location** (data table, from `listStockLocations`)
+**Stock locations** (tree nav, from `listStockLocations`): On its own tab, as a tree (parent and children), not a raw table beside the items.
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Code | text | — |
 | Name | text | — |
-| Venue | the name it points at, never the id | — |
 | Kind | chip: Main store, Sub store, Kitchen, Bar, Retail floor, Cellar… | — |
-| Parent location | the name it points at, never the id | — |
 | Is active | yes / no (icon or chip) | — |
 
 **The selected inventory** (detail panel, from `getInventoryItem`)
@@ -1900,6 +2409,17 @@ Errors to draw in the form: 409 Attempt to change costing method or base unit af
 | Lookup inventory item (secondary button) | `lookupInventoryItem` GET `/inventory-items/lookup` | — | InventoryItem | 400 Neither barcode nor SKU supplied; 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path. | — |
 | Create stock location (secondary button) | `createStockLocation` POST `/stock-locations` | inline | StockLocation | — | opens modal first |
 
+**Rules for what is shown** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
+
+- **Item list**: Name, SKU, category, base unit, purchase unit ("case of 24"), costing method, on hand (all locations), reorder point, and a "Below reorder point" badge. Filters: category, below reorder point, search (name, SKU, barcode), scan. *(source: contracts/satellite/inventory.yaml#listInventoryItems)*
+- **Item detail**: Stock by location (on hand, allocated, available), on order, in transit, average cost and last purchase price (AED), and an "In use since <date>, base unit and costing method locked" note when it has movements. *(source: contracts/satellite/inventory.yaml#getInventoryItem)*
+
+**What each action does** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
+
+- **Add item**: Refused when the SKU is already used in this venue. The SKU field shows the error. *(source: contracts/satellite/inventory.yaml#createInventoryItem)*
+- **Save changes**: Changing a locked field is refused. The form never offers it once locked, so the refusal should not normally be reached. *(source: contracts/satellite/inventory.yaml#updateInventoryItem)*
+- **Add location**: Adds a node to the location tree under the chosen parent. *(source: contracts/satellite/inventory.yaml#createStockLocation)*
+
 **Data it reads**: `listInventoryItems` (onLoad, List inventory items); `listStockLocations` (onLoad, List stock locations); `getInventoryKitDefinition` (onLoad, Show kit components)
 
 **Where the user goes next**
@@ -1919,6 +2439,62 @@ Errors to draw in the form: 409 Attempt to change costing method or base unit af
 | Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_VIEW`, which `listInventoryItems` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Neither barcode nor SKU supplied; 400 Validation failed; 409 Attempt to change costing method or base unit after movements exist; 409 SKU already in use in this venue |
+
+#### Edge cases to draw
+
+- **Item deactivated while stock is on hand**: Warn "<n> still on hand at <locations>". Deactivation does not remove stock. *(source: designer default)*
+- **Scan with no signal in a store room**: Item lookup by barcode works offline from cache. *(source: contracts/satellite/inventory.yaml#lookupInventoryItem)*
+
+#### Consistency with other screens
+
+- Match `BO-048`: A merchandise item links to an inventory item from this master. Retail and F&B share one item master.
+- Match `BO-078`: The units offered on a requisition line are this item's base and purchase units.
+- Match `BO-052`: The perishable flag here makes expiry mandatory at receipt.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+items:
+- name: Coca-Cola 330 ml can
+  sku: BEV-CC-330
+  category: Beverages
+  baseUnit: can
+  purchase: 1 case = 24 can
+  costing: Weighted average
+  reorderPoint: 240
+  reorderQuantity: 480
+  parLevel: 720
+  preferredSupplier: Emirates Beverage Trading LLC
+  averageCost: AED 1.90
+- name: Full-cream milk 2 L
+  sku: DRY-MLK-2L
+  category: Dairy
+  baseUnit: bottle
+  purchase: 1 crate = 6 bottle
+  costing: FIFO
+  perishable: true
+  shelfLifeDays: 7
+  preferredSupplier: Gulf Fresh Dairy LLC
+- name: Beach day kit (towel + goggles + pouch)
+  sku: KIT-BCH-01
+  kit:
+  - component: Beach towel, blue
+    qty: 1
+  - component: Kids swim goggles, blue
+    qty: 1
+  - component: Waterproof phone pouch
+    qty: 1
+locations:
+- Main Store (main store)
+- '  Food Store (sub-store)'
+- '    Cold Room (sub-store)'
+- '  Beverage Store (sub-store)'
+- Oasis Bistro Kitchen (kitchen)
+- Pool Bar (bar)
+- Marina Bay Retail Floor (retail floor)
+```
 
 #### Permissions
 
@@ -1981,13 +2557,15 @@ Also apply: 2 for P08 · Stock & Supply, 24 for all of P08, 29 for every app (se
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (34), with its required mark, default, format and its error state (400, 403, 404, 409, 422).
-- [ ] Every output is drawn (35 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (33), with its required mark, default, format and its error state (400, 403, 404, 409, 422).
+- [ ] Every output is drawn (30 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-081?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Create inventory item, Save inventory item, Lookup inventory item, Create stock location.
 - [ ] Every transition is wired: `BO-078`, `BO-079`, `BO-080`.
 - [ ] Every gated control is gated: `PRODUCT_CONFIGURE`, `PRODUCT_VIEW`.
 - [ ] The 2 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 2 edge case(s) from the process notes are drawn.
+- [ ] The 1 decision(s) taken on this screen are drawn as decided, not as the old default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -2001,7 +2579,7 @@ Also apply: 2 for P08 · Stock & Supply, 24 for all of P08, 29 for every app (se
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Stock & Supply · wave 1 · needs the `inventory` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `ORDER_VIEW`, `PRODUCT_CONFIGURE`, `PRODUCT_VIEW` (2 read, 1 configure); in the flows as cashier, storekeeper |
+| Who uses it | venue staff holding `PRODUCT_CONFIGURE`, `PRODUCT_VIEW` (1 configure, 1 read) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listStockMovements` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
 | Offline | online only |
@@ -2010,15 +2588,25 @@ Also apply: 2 for P08 · Stock & Supply, 24 for all of P08, 29 for every app (se
 
 **What the spec says about it.** Added 17 August because the contract had operations no screen declared. **Not on the wireframe board** — needs drawing. **Moved to wave 1 on 24 August.** F34 walks a retail sale and its return, which is a wave-1 journey — **a venue that can take a return and cannot disposition the item puts damaged stock back on the shelf**, and the count finds it three weeks later.
 
+**Known gaps.** Removed 2 October 2026 (CHG-WIR-008): An "Every order" table (sales orders) and "Create stock transfer" sit on the movement ledger, attached through F35 step 7; sourcing belongs with transfers … Removed 2 October 2026 (CHG-WIR-008): An "Every order" table (sales orders) and "Create stock transfer" sit on the movement ledger, attached through F35 step 7; sourcing belongs with transfers …
+
+**From the Food, Beverage & Retail process.** Stock Movements is the ledger. Every change to stock is a movement with a kind, a reason, a person and a source: receipts, sales, transfers, counts, waste, adjustments. On hand is derived from it. It is also where a manager records a manual adjustment, issue or waste. The one thing to get right is direction. Quantity is always entered positive, and the kind decides whether stock goes up or down.
+
+**Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
+
+- The reason is free text only (up to 500 characters). (CHG-SBO-005)
+
+**Fixed on main** (the package already carries these; draw what it says): An "Every order" table (sales orders) and a "Create stock transfer" button sit on the ledger. (CHG-WIR-008); F34 step 8 dispositions a returned item here with a manual movement. The retail return already restocks or writes off by condition. (CHG-CLN-005); The item, location and kind filters are text fields ("Item id", "Location id", "Kind"). (CHG-SBO-008).
+
 #### Inputs: what the user enters or picks
 
 **On the screen**
 
 | Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
 |---|---|---|---|---|---|---|---|
-| Item id | picker: choose an item (drawn as a picker, not a text box) | optional | — | — | shows names, sends the id | Sends `?itemId=` to `listStockMovements`. | `listStockMovements` ?itemId |
-| Location id | picker: choose a location (drawn as a picker, not a text box) | optional | — | — | shows names, sends the id | Sends `?locationId=` to `listStockMovements`. | `listStockMovements` ?locationId |
-| Kind | select | optional | — | Receipt · Issue · Sale depletion · Waste · Adjustment in · Adjustment out · Transfer out · Transfer in · Count gain · Count loss · Supplier return · Production | — | Sends `?kind=` to `listStockMovements`. Offers every `MovementKind`, including `adjustmentIn`/`adjustmentOut` and `countGain`/`countLoss`, which replaced `adjustment` and `countAdjustment` (audit … | `listStockMovements` ?kind |
+| Item | picker: choose an id | optional | — | — | shows names, sends the id | A pick list in words, never a typed id (design-note correction, 2 October 2026). | `InventoryItem.id` |
+| Location | picker: choose an id | optional | — | — | shows names, sends the id | A pick list in words, never a typed id (design-note correction, 2 October 2026). | `StockLocation.id` |
+| Kind | select | optional | — | Receipt · Issue · Sale depletion · Waste · Adjustment in · Adjustment out · Transfer out · Transfer in · Count gain · Count loss · Supplier return · Production | — | Movement kinds in words, as chips. | `StockMovement.kind` |
 | Recorded from | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | Sends `?recordedFrom=` to `listStockMovements`. | `listStockMovements` ?recordedFrom |
 | Recorded to | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | Sends `?recordedTo=` to `listStockMovements`. | `listStockMovements` ?recordedTo |
 
@@ -2026,14 +2614,12 @@ Also apply: 2 for P08 · Stock & Supply, 24 for all of P08, 29 for every app (se
 
 | Filter | Drawn as | Default | Allowed values, rules | Source |
 |---|---|---|---|---|
-| Principal | picker: choose a principal | — | — | `listOrders` ?principalId |
-| Shift | picker: choose a shift | — | — | `listOrders` ?shiftId |
-| Status | select | — | Pending · Held · Paid · Partially paid · Completed · Voided · Refunded · Partially refunded · Failed; It holds no inventory and expires, because a till that accumulates parked sales across a shift cannot be closed. | `listOrders` ?status |
-| Created from | date and time picker | — | — | `listOrders` ?createdFrom |
-| Created to | date and time picker | — | — | `listOrders` ?createdTo |
-| Workstation | picker: choose a workstation | — | — | `listOrders` ?workstationId |
-| Subject | picker: choose a subject | — | — | `listOrders` ?subjectId |
-| Tender | select | — | Cash · Card · Wallet · Voucher · Bank transfer · Hotel charge · Installment · Gift card · Complimentary | `listOrders` ?tender |
+| Item | picker: choose an item | — | — | `listStockMovements` ?itemId |
+| Location | picker: choose a location | — | — | `listStockMovements` ?locationId |
+| Kind | select | — | Receipt · Issue · Sale depletion · Waste · Adjustment in · Adjustment out · Transfer out · Transfer in · Count gain · Count loss · Supplier return · Production | `listStockMovements` ?kind |
+| Category | picker: choose a category | — | — | `listInventoryItems` ?categoryId |
+| Below reorder point | toggle | — | — | `listInventoryItems` ?belowReorderPoint |
+| Search | text field | — | min length 1; max length 200 | `listInventoryItems` ?search |
 
 **Form: Create stock movement** (modal, opened by *Create stock movement*; *Create stock movement* calls `createStockMovement`, *Cancel* sends nothing)
 
@@ -2053,59 +2639,30 @@ Also apply: 2 for P08 · Stock & Supply, 24 for all of P08, 29 for every app (se
 
 Errors to draw in the form: 400 Validation failed, including an `adjustmentIn`, `adjustmentOut` or `waste` movement with no `reason` (audit R171).; 409 Insufficient stock, and the item does not permit negative balances
 
-**Form: Create stock transfer** (modal, opened by *Create stock transfer*; *Create stock transfer* calls `createStockTransfer`, *Cancel* sends nothing)
+**Rules for these inputs** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
 
-**Collects what `createStockTransfer` sends before it is called.** Required: `id`, `fromLocationId`, `toLocationId`, `lines`, `recordedAt`. Optional: `note`. Dismissing sends nothing; the screen behind is unchanged.
-
-| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
-|---|---|---|---|---|---|---|---|
-| ID `id` | picker: choose an id | required | — | — | shows names, sends the id | — | `createStockTransfer` body |
-| From location `fromLocationId` | picker: choose a from location | required | — | — | shows names, sends the id | — | `createStockTransfer` body |
-| To location `toLocationId` | picker: choose a to location | required | — | — | shows names, sends the id | — | `createStockTransfer` body |
-| Lines `lines` | repeatable rows | required | — | at least 1 | — | — | `createStockTransfer` body |
-| Item `lines[].itemId` | picker: choose an item | required | — | — | shows names, sends the id | — | `createStockTransfer` body |
-| Quantity `lines[].quantity` | number field | required | — | min 0 | — | — | `createStockTransfer` body |
-| Unit `lines[].unit` | text field | optional | — | — | — | — | `createStockTransfer` body |
-| Note `note` | text area | optional | — | max length 500 | — | — | `createStockTransfer` body |
-| Recorded at `recordedAt` | date and time picker | required | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `createStockTransfer` body |
-
-Errors to draw in the form: 409 Insufficient stock at the source
+- **Kind (manual entry)**: Offer only the kinds a person records by hand: Issue (to a cost centre), Waste, Adjustment in, Adjustment out, Return to supplier. Receipt, Sale, Transfer in/out, Count gain/loss and Production are written by their own screens and appear only in the ledger. *(source: R171 / contracts/satellite/inventory.yaml#/components/schemas/MovementKind)*
+- **Quantity**: Positive number only; the field refuses a sign. Beside it, a live preview "Stock after: 42 → 36 can" in the item's unit. *(source: R171 / contracts/satellite/inventory.yaml#/components/schemas/CreateStockMovementRequest)*
+- **Reason**: Required for Adjustment in, Adjustment out and Waste (up to 500 characters). Draw it as a reason list plus a note, with "Other" requiring the note. *(source: R171 / R222 / DI-363)*
+- **Cost centre**: Picker, shown for Issue. It decides where the cost is booked. *(source: contracts/satellite/inventory.yaml#/components/schemas/CreateStockMovementRequest)*
+- **Ledger filters**: Item (search or scan), location (tree), kind (multi-select of the words below), date range (Recorded from / to). Never id text fields. *(source: contracts/satellite/inventory.yaml#listStockMovements)*
 
 #### Outputs: what the screen shows and produces
 
 **Shown**
 
-**Every stock movement** (data table, from `listStockMovements`): `countGain` and `countLoss` rows are shown (posted by a stock count), never entered here; quantity is always positive and the kind shows the direction (decided 28 September, audit R171).
+**Movements** (data table, from `listStockMovements`): `countGain` and `countLoss` rows are shown (posted by a stock count), never entered here; quantity is always positive and the kind shows the direction (decided 28 September, audit R171).
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Item | the name it points at, never the id | — |
-| Location | the name it points at, never the id | — |
 | Kind | chip: Receipt, Issue, Sale depletion, Waste, Adjustment in, Adjustment out… | The kind decides the direction (decided 28 September, audit R171). In: `receipt`, `transferIn`, `adjustmentIn`, `countGain`, `production` … |
 | Quantity | 1,234.5 | Always positive. The `kind` decides whether it adds or removes stock, not the sign (decided 28 September, audit R171). |
 | Unit | text | — |
 | Reason | text | Required for `adjustmentIn`, `adjustmentOut` and `waste` (decided 28 September, audit R171); adjustments are reported separately. |
-| Cost center | the name it points at, never the id | — |
 | Recorded at | 1 Oct 2026, 14:30 | — |
 | Balance after | 1,234.5 | — |
 | Unit cost | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Total cost | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-
-**Every order** (data table, from `listOrders`)
-
-| Shows | Format | Notes |
-|---|---|---|
-| ID | the name it points at, never the id | — |
-| Order number | text | — |
-| Status | chip: Pending, Held, Paid, Partially paid, Completed, Voided… | `held` is a parked sale — the cashier freed the till and the guest will return. It holds no inventory and expires, because a till that … |
-| Gross amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Refunded amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Channel | chip: POS, Kiosk, Guest app, Guest web, Call centre, Partner… | The same vocabulary as `Order.channel`, which this projects. |
-| Line count | 1,234 | — |
-| Principal | the name it points at, never the id | The cashier who raised it — what the held-orders list shows. |
-| Hold label | text | As `Order.holdLabel`. |
-| Held until | 1 Oct 2026, 14:30 | As `Order.heldUntil`, so a held-orders list can warn about the ones about to lapse. |
 
 **The selected stock movement** (detail panel, from `listStockMovements`)
 
@@ -2133,9 +2690,18 @@ Errors to draw in the form: 409 Insufficient stock at the source
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
 | Create stock movement (primary button) | `createStockMovement` POST `/stock-movements` | CreateStockMovementRequest | StockMovement | 400 Validation failed, including an `adjustmentIn`, `adjustmentOut` or `waste` movement with no `reason` (audit R171).; 409 Insufficient stock, and the item does not permit negative balances | opens modal first |
-| Create stock transfer (secondary button) | `createStockTransfer` POST `/stock-transfers` | CreateStockTransferRequest | StockTransfer | 409 Insufficient stock at the source | opens modal first |
 
-**Data it reads**: `listStockMovements` (onLoad, The movement ledger); `listOrders` (onLoad, List orders)
+**Rules for what is shown** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
+
+- **Ledger table**: Date and time (GST), item, location, kind in words, signed quantity derived from the kind (green +12, red -6), balance after, unit cost and total cost (AED), reason, by whom, and source as a readable link ("Sale AQP-104582", "Count 20 Oct, Oasis Bistro Kitchen", "Transfer TRF-AQP-000087"). Newest first. *(source: R171 / contracts/satellite/inventory.yaml#/components/schemas/StockMovement)*
+- **Kind words**: Receipt · Issue · Sale · Waste · Adjustment in · Adjustment out · Transfer out · Transfer in · Count gain · Count loss · Return to supplier · Production. *(source: contracts/satellite/inventory.yaml#/components/schemas/MovementKind / R131)*
+- **Adjustments view**: A saved filter "Adjustments and waste", because adjustments are reported separately. Frequent adjustments on one item are the shrinkage signal; sort that view by count per item. *(source: contracts/satellite/inventory.yaml#createStockMovement)*
+
+**What each action does** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
+
+- **Record movement**: Writes the movement and shows the new balance. Refused when stock is insufficient and the item does not allow negative stock; say "Only 4 on hand at Pool Bar". Not available offline. *(source: contracts/satellite/inventory.yaml#createStockMovement)*
+
+**Data it reads**: `listStockMovements` (onLoad, The movement ledger); `listInventoryItems` (onLoad, List inventory items (the pick list)); `listStockLocations` (onLoad, List stock locations (the pick list))
 
 **Where the user goes next**
 
@@ -2153,20 +2719,58 @@ Errors to draw in the form: 409 Insufficient stock at the source
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on itemId, locationId, kind, recordedFrom, recordedTo and the stock movements are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_VIEW`, which `listStockMovements` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed, including an `adjustmentIn`, `adjustmentOut` or `waste` movement with no `reason` (audit R171).; 409 Insufficient stock at the source; 409 Insufficient stock, and the item does not permit negative balances |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed, including an `adjustmentIn`, `adjustmentOut` or `waste` movement with no `reason` (audit R171).; 409 Insufficient stock, and the item does not permit negative balances |
+
+#### Edge cases to draw
+
+- **A returned retail item is resaleable, damaged or going back to the supplier**: The retail return already restocks or writes off by condition. This screen records only the supplier return of written-off stock. It must not restock a second time. *(source: F34 step 7 / contracts/satellite/retail.yaml#createRetailReturn)*
+- **Kit sold**: The ledger shows one Sale line per component, never a line for the kit itself. *(source: contracts/satellite/inventory.yaml#setInventoryKitDefinition)*
+
+#### Consistency with other screens
+
+- Match `EMP-067`: The handheld's damage/loss form records the same kinds with the same reason list.
+- Match `BO-139`: F&B wastage uses the same reason list and appears in this ledger as Waste.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+- at: 2026-10-21 14:05 GST
+  item: Coca-Cola 330 ml can
+  location: Pool Bar
+  kind: Sale
+  qty: '-2'
+  balanceAfter: 180
+  source: Sale AQP-104582
+- at: 2026-10-21 11:30 GST
+  item: Full-cream milk 2 L
+  location: Oasis Bistro Kitchen
+  kind: Waste
+  qty: '-3'
+  reason: Spoiled, fridge door left open
+  by: Fatima Al Suwaidi
+  totalCost: AED 37.50
+- at: 2026-10-20 18:40 GST
+  item: Full-cream milk 2 L
+  location: Oasis Bistro Kitchen
+  kind: Count loss
+  qty: '-6'
+  source: Count 20 Oct, Oasis Bistro Kitchen
+```
 
 #### Permissions
 
 - `listStockMovements` → `PRODUCT_VIEW` (read) · staff
 - `createStockMovement` → `PRODUCT_CONFIGURE` (configure) · staff
-- `createStockTransfer` → `PRODUCT_CONFIGURE` (configure) · staff
-- `listOrders` → `ORDER_VIEW` (read) · staff, guest, partner
+- `listInventoryItems` → `PRODUCT_VIEW` (read) · staff
+- `listStockLocations` → `PRODUCT_VIEW` (read) · staff
 
 **A refused user sees:** Shown when the caller lacks `PRODUCT_VIEW`, which `listStockMovements` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
 #### Requirements it meets
 
-24 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+18 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
 
 | Ref | Requirement (shortened) | Domain | Verdict | Via |
 |---|---|---|---|---|
@@ -2182,7 +2786,7 @@ Errors to draw in the form: 409 Insufficient stock at the source
 | 15.1.22 | Inventory Movement History - System shall maintain inventory movement history. | Inventory Management | CONTRACTED | `createStockMovement` |
 | 15.1.23 | Inventory Audit Trail - System shall maintain inventory audit logs. | Inventory Management | CONTRACTED | `createStockMovement` |
 | 17.6.4 | Maintenance Inventory Integration - System shall integrate with inventory management. | Maintenance & Safety Management | CONTRACTED | `createStockMovement` |
-| … 12 more | | | | `traceability.json` |
+| … 6 more | | | | `traceability.json` |
 
 #### Client meeting inputs
 
@@ -2203,18 +2807,17 @@ Also apply: 2 for P08 · Stock & Supply, 24 for all of P08, 29 for every app (se
 - Derived from `wireframes/reference/Retail Board 4.dc.html`
 - Drawn by: Claude Design Retail pack, 24 August
 - Client design-board frames: `Retail Board 4.dc.html#ret-4g`, `Inventory Board 1.dc.html#inv-8`, `Inventory Board 2.dc.html#inv-2j`
-- Flow F34 *A retail sale, from scan to return*, step 8: The returned item is dispositioned — resaleable, damaged, or back to the supplier. → **Three different movements, and only one of them is saleable stock.** A damaged return that goes back on the shelf is the shrinkage a count finds three weeks later.
-- Flow F35 *Stock arrives short and an oversell is resolved*, step 7: The four orders are sourced from another store instead. → **Sourced rather than cancelled.** A guest who ordered and paid does not care which store it came from, and **cancelling is the outcome a venue reaches when it cannot see the alternative.**
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (23), with its required mark, default, format and its error state (400, 403, 409).
-- [ ] Every output is drawn (38 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (14), with its required mark, default, format and its error state (400, 403, 409).
+- [ ] Every output is drawn (24 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-082?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: Create stock movement, Create stock transfer.
+- [ ] Every action is wired with its success and its failure: Create stock movement.
 - [ ] Every transition is wired: `BO-079`, `BO-078`, `BO-080`.
-- [ ] Every gated control is gated: `ORDER_VIEW`, `PRODUCT_CONFIGURE`, `PRODUCT_VIEW`.
+- [ ] Every gated control is gated: `PRODUCT_CONFIGURE`, `PRODUCT_VIEW`.
 - [ ] The module and platform inputs below are applied.
+- [ ] The 2 edge case(s) from the process notes are drawn.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -2238,6 +2841,16 @@ Also apply: 2 for P08 · Stock & Supply, 24 for all of P08, 29 for every app (se
 **What the spec says about it.** Added 17 August because the contract had operations no screen declared. **Not on the wireframe board** — needs drawing. **Retail board operations wired 24 August.**
 
 **Known gaps.** **`getSupplierPerformance` declares its response inline**, so the component that shows it names fields but binds to no schema. The contract should name the shape.
+
+**From the Food, Beverage & Retail process.** Suppliers is the tenant's supplier master, read-only at venue level, together with what each supplier quoted, their contracts and their performance. The one thing to get right is ownership. Suppliers are created and edited at tenant level. A venue user sees them read-only and records quotations against them for the venue.
+
+**Known correction pending (do not draw the wrong version)**
+
+- **The supplier has no category (F&B, retail, engineering), no linked item categories and no compliance documents.** Why: The client's supplier master and the matrix ("Supplier master with classification") need them, and spend by category depends on them. *(source: DI-347 / MATRIX 15.3.1; Food, Beverage & Retail)*
+- **The update request names the field "paymentTermDays" and takes a "contacts" array. The supplier record has "paymentTermsDays" and flat contact fields. Create takes both "isActive" and "status".** Why: The names mismatch and the duplicated active flag will drift. *(source: contracts/satellite/inventory.yaml#updateSupplier / contracts/satellite/inventory.yaml#/components/schemas/Supplier; Food, Beverage & Retail)*
+- **The supplier contract carries validity and terms but no prices or items.** Why: The agreed Contract PO type picks a pre-agreed price automatically on later orders. Without price lines nothing can be picked. *(source: DI-348 / contracts/satellite/inventory.yaml#/components/schemas/InventorySupplierContract; Food, Beverage & Retail)*
+
+**Fixed on main** (the package already carries these; draw what it says): Navigation exits to Stock Count and Stock Transfers. (CHG-WIR-009).
 
 #### Inputs: what the user enters or picks
 
@@ -2308,6 +2921,13 @@ Errors to draw in the form: 409 A business code the request names is already use
 | Email `contacts[].email` | text field | optional | — | — | — | — | `updateSupplier` body |
 | Phone `contacts[].phone` | phone field | optional | — | — | +971 5X XXX XXXX (E.164) | — | `updateSupplier` body |
 
+**Rules for these inputs** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
+
+- **Supplier details (tenant scope)**: Code (unique in the tenant), name, contact, TRN (tax registration number), currency (ISO, default AED), payment terms in days, lead time in days, minimum order value. At venue scope every field is read-only and the edit button is absent. *(source: R183 / R108 / contracts/satellite/inventory.yaml#createSupplier)*
+- **Status**: Active, On hold, Suspended, Terminated, with a reason when not active. On hold stops the supplier appearing in new requisitions and orders; history stays. *(source: contracts/satellite/inventory.yaml#updateSupplier)*
+- **Quotation**: Recorded against an approved request: supplier's reference, lines (item, quantity, unit price), lead time, valid until (required). Chosen from the request side (BO-078) or here with a request picker. *(source: R183 / contracts/satellite/inventory.yaml#recordQuotation)*
+- **Supplier contract**: Number (unique per supplier), name, valid from / to, currency, payment terms, signed document. Created as Draft, or Active when the signed document is attached. *(source: contracts/satellite/inventory.yaml#createSupplierContract)*
+
 #### Outputs: what the screen shows and produces
 
 **Shown**
@@ -2349,13 +2969,22 @@ Errors to draw in the form: 409 A business code the request names is already use
 | Record quotation (secondary button) | `recordQuotation` POST `/suppliers/{supplierId}/quotations` | CreateQuotationRequest | Quotation | — | gated `PROCUREMENT_MANAGE`; opens modal first |
 | Save supplier (secondary button) | `updateSupplier` PUT `/suppliers/{supplierId}` | inline | Supplier | — | gated `PROCUREMENT_MANAGE`; opens modal first |
 
+**Rules for what is shown** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
+
+- **Supplier list**: Code, name, status badge, currency, payment terms, lead time, active contracts count. No raw account or id columns. *(source: contracts/satellite/inventory.yaml#listSuppliers)*
+- **Performance scorecard**: For a chosen period: orders placed, on time in full %, average days late, short delivery %, rejection % with reasons, price variance % (quoted vs invoiced). OTIF is the headline number. *(source: DI-347 / R158 / contracts/satellite/reporting.yaml#getSupplierPerformance)*
+- **Contracts tab**: Contracts sorted by expiry. "Expiring within 30 days" highlighted, because someone has to renew them. *(source: contracts/satellite/inventory.yaml#listSupplierContracts)*
+
+**What each action does** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
+
+- **Add supplier / Save supplier**: Tenant scope only. A duplicate code is refused, and the code field says so. *(source: R183 / R108)*
+- **End contract**: Terminate with a reason. A terminated or expired contract is never reopened; renewal is a new contract. *(source: contracts/satellite/inventory.yaml#updateSupplierContract)*
+
 **Data it reads**: `listSuppliers` (onLoad, List suppliers); `listSupplierContracts` (onLoad, Supplier contracts list)
 
 **Where the user goes next**
 
 - → `BO-078` Requisitions: *Requisitions*; carries `requisitionId`
-- → `BO-079` Stock Count: *Stock Count*
-- → `BO-080` Stock Transfers: *Stock Transfers*
 - → `BO-007` Product Directory: *The new range becomes products in the directory*
 
 #### States
@@ -2369,6 +2998,42 @@ Errors to draw in the form: 409 A business code the request names is already use
 | Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PROCUREMENT_VIEW`, which `listSuppliers` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 A business code the request names is already used within its uniqueness scope (the scope the property's `x-ticvai-unique` names; decided 28 September, audit …; 409 The contract is `terminated` or `expired`; a renewal is a new contract.; 422 `validTo` before `validFrom`, or `active` without a `documentReference`. |
+
+#### Edge cases to draw
+
+- **Venue user with no suppliers set up**: Says "Suppliers are set up by your head office" rather than offering to add one. *(source: R183 / screens/P08-venue-back-office.yaml#BO-083)*
+
+#### Consistency with other screens
+
+- Match `BO-078`: Quotations recorded here appear in the request's comparison.
+- Match `BO-052`: Receipts and rejections there feed this scorecard.
+
+#### Sample data for the mock-up
+
+Seed the screen with these (realistic, in the venue's world). They outrank invented data; the schema outranks them where a value would not validate.
+
+```yaml
+- code: SUP-0042
+  name: Gulf Fresh Dairy LLC
+  status: Active
+  currency: AED
+  paymentTermsDays: 30
+  leadTimeDays: 2
+  otif: 91.4%
+  rejection: 2.1% (Damaged, Short-dated)
+- code: SUP-0057
+  name: Desert Rose Merchandise FZE
+  status: On hold
+  statusReason: Trade licence renewal pending
+  currency: AED
+- code: SUP-0063
+  name: Emirates Beverage Trading LLC
+  contract:
+    number: EBT-2026-07
+    validFrom: '2026-01-01'
+    validTo: '2026-12-31'
+    paymentTermsDays: 45
+```
 
 #### Permissions
 
@@ -2427,9 +3092,11 @@ Also apply: 2 for P08 · Stock & Supply, 24 for all of P08, 29 for every app (se
 - [ ] Every output is drawn (19 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-083?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Create supplier, Record quotation, Save supplier.
-- [ ] Every transition is wired: `BO-078`, `BO-079`, `BO-080`, `BO-007`.
+- [ ] Every transition is wired: `BO-078`, `BO-007`.
 - [ ] Every gated control is gated: `PROCUREMENT_MANAGE`, `PROCUREMENT_VIEW`, `REPORT_VIEW_VENUE`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
+- [ ] The 1 edge case(s) from the process notes are drawn.
+- [ ] The 3 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
 ---
@@ -2560,7 +3227,6 @@ Method, path, parameters, request and response for every operation these screens
 "getSupplierPerformance": {"method":"GET","path":"/suppliers/{supplierId}/performance","contract":"reporting","summary":"On-time, in-full, and what was rejected","permission":"REPORT_VIEW_VENUE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"from","in":"query","required":null},{"name":"to","in":"query","required":null}],"requestBody":null,"responds":null},
 "listGoodsReceipts": {"method":"GET","path":"/goods-receipts","contract":"inventory","summary":"List goods receipts","permission":"PROCUREMENT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"purchaseOrderId","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listInventoryItems": {"method":"GET","path":"/inventory-items","contract":"inventory","summary":"List inventory items","permission":"PRODUCT_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"venueId","in":"query","required":null},{"name":"categoryId","in":"query","required":null},{"name":"belowReorderPoint","in":"query","required":null},{"name":"search","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
-"listOrders": {"method":"GET","path":"/orders","contract":"orders","summary":"List orders","permission":"ORDER_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"venueId","in":"query","required":null},{"name":"principalId","in":"query","required":null},{"name":"shiftId","in":"query","required":null},{"name":"status","in":"query","required":null},{"name":"createdFrom","in":"query","required":null},{"name":"createdTo","in":"query","required":null},{"name":"workstationId","in":"query","required":null},{"name":"subjectId","in":"query","required":null},{"name":"tender","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listPurchaseOrders": {"method":"GET","path":"/purchase-orders","contract":"inventory","summary":"List purchase orders","permission":"PROCUREMENT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"status","in":"query","required":null},{"name":"supplierId","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listRequisitions": {"method":"GET","path":"/requisitions","contract":"inventory","summary":"List requisitions","permission":"PROCUREMENT_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"status","in":"query","required":null},{"name":"raisedByPrincipalId","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listStockCounts": {"method":"GET","path":"/stock-counts","contract":"inventory","summary":"List stock counts","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"locationId","in":"query","required":null},{"name":"status","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
@@ -2580,7 +3246,6 @@ Method, path, parameters, request and response for every operation these screens
 "returnRequisition": {"method":"POST","path":"/requisitions/{requisitionId}/return","contract":"inventory","summary":"Return a requisition for more information","permission":"APPROVAL_ACT","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Requisition"},
 "sendPurchaseOrder": {"method":"POST","path":"/purchase-orders/{purchaseOrderId}/send","contract":"inventory","summary":"Issue the order to the supplier","permission":"PROCUREMENT_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"PurchaseOrder"},
 "setInventoryKitDefinition": {"method":"PUT","path":"/inventory-items/{itemId}/kit-definition","contract":"inventory","summary":"Make an item a kit of other stocked items","permission":"PRODUCT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"InventoryKitDefinition","responds":"InventoryKitDefinition"},
-"setItemAvailability": {"method":"PUT","path":"/menu-items/{itemId}/availability","contract":"fnb","summary":"Mark an item available or eighty-sixed","permission":"PRODUCT_CONFIGURE","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"MenuItem"},
 "startStockCount": {"method":"POST","path":"/stock-counts","contract":"inventory","summary":"Start a stock count","permission":"PRODUCT_CONFIGURE","offlineCapable":true,"conflictPolicy":"append","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"StartStockCountRequest","responds":"StockCount"},
 "submitCountLines": {"method":"POST","path":"/stock-counts/{countId}/lines","contract":"inventory","summary":"Submit counted quantities","permission":"PRODUCT_CONFIGURE","offlineCapable":true,"conflictPolicy":"append","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":null},
 "updateInventoryItem": {"method":"PATCH","path":"/inventory-items/{itemId}","contract":"inventory","summary":"Amend an item","permission":"PRODUCT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"InventoryItem"},
@@ -2596,7 +3261,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
-"AllergenCode": {"type":"string","description":"**The fourteen declarable allergens, as one closed list.** Every allergen field in this contract uses it — the menu claim, the ticket line, a substitution's delta, a modifier option, the label on a bag — so a declared set and an actual set compare without anybody normalising case or synonyms. It was the `Allergen.contains` enum; the other fields were free text.\n","enum":["gluten","crustaceans","eggs","fish","peanuts","soybeans","milk","nuts","celery","mustard","sesame","sulphites","lupin","molluscs"]},
 "CostingMethod": {"type":"string","description":"Fixed at item creation. Immutable once movements exist.","enum":["weightedAverage","fifo","standardCost","lastPurchasePrice"]},
 "CountStatus": {"type":"string","enum":["open","counting","closed","variancePending","posted","cancelled"]},
 "CountVariance": {"x-ticvai-persistence":"none — computed at close","type":"object","required":["countId","totalVarianceValue","lines"],"properties":{"countId":{"type":"string","format":"uuid"},"totalVarianceValue":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"exceptionCount":{"type":"integer","description":"Lines beyond `VenueSettings.inventory.countVarianceTolerancePercent` (proposed default 2 per cent, audit R094), requiring review before posting."},"lines":{"type":"array","items":{"type":"object","required":["itemId","expectedQuantity","countedQuantity","variance","isException"],"properties":{"itemId":{"type":"string","format":"uuid"},"itemName":{"type":"string"},"sku":{"type":"string"},"expectedQuantity":{"type":"number"},"countedQuantity":{"type":"number"},"variance":{"type":"number"},"variancePercentage":{"type":"number"},"varianceValue":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"isException":{"type":"boolean"},"recountCount":{"type":"integer","description":"A line counted several times is itself a finding."},"note":{"type":"string","nullable":true}}}}}},
@@ -2613,12 +3277,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "InventoryKitDefinition": {"x-ticvai-persistence":"none — composed of the item's inventory.kit_component rows","type":"object","description":"4.4.20. Also the `setInventoryKitDefinition` body.","required":["components"],"properties":{"kitItemId":{"type":"string","format":"uuid","readOnly":true},"components":{"type":"array","items":{"$ref":"#/components/schemas/InventoryKitComponent"}}}},
 "InventorySupplierContract": {"type":"object","x-ticvai-persistence":"inventory.supplier_contract","description":"**Taken from the backend workbook, 20 September.** Stores purchasing agreements, validity dates, and commercial terms agreed with a supplier.","required":["supplierId","number","name","validFrom","status","createdAt"],"properties":{"id":{"type":"string","format":"uuid"},"supplierId":{"type":"string","format":"uuid"},"number":{"type":"string","maxLength":100},"name":{"type":"string","maxLength":200},"validFrom":{"type":"string","format":"date"},"validTo":{"type":"string","format":"date","nullable":true},"currencyCode":{"type":"string","maxLength":10,"nullable":true},"paymentTermsDays":{"type":"integer","nullable":true},"documentReference":{"type":"string","maxLength":500,"nullable":true},"status":{"type":"string","maxLength":30,"enum":["draft","active","expired","terminated"],"description":"Written by `createSupplierContract` and `updateSupplierContract`; `expired` is set by the server once `validTo` has passed (29 September, writers pass)."},"statusReason":{"type":"string","maxLength":500,"nullable":true},"createdByPrincipalId":{"type":"string","format":"uuid","nullable":true},"createdAt":{"type":"string","format":"date-time"}}},
 "LocationKind": {"type":"string","enum":["mainStore","subStore","kitchen","bar","retailFloor","cellar","transit"]},
-"MenuItem": {"x-ticvai-persistence":"fnb.menu_item","type":"object","required":["id","productVariantId","name","price","isAvailable"],"properties":{"id":{"type":"string","format":"uuid"},"productVariantId":{"type":"string","format":"uuid","description":"The catalogue variant this item sells. Pricing and tax come from there — a menu is a presentation of the catalogue, not a second catalogue.\n"},"name":{"type":"string"},"description":{"type":"string","nullable":true},"price":{"x-ticvai-column":"list_price","$ref":"../shared/common.yaml#/components/schemas/Money"},"sortOrder":{"type":"integer"},"modifierGroupIds":{"type":"array","items":{"type":"string","format":"uuid"}},"stationId":{"type":"string","format":"uuid","nullable":true},"menuSectionId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"The section the item sits in, set by `setMenuSections` and `applyMenuActions` (`moveSection`)."},"isStockTracked":{"type":"boolean","description":"True where a recipe exists. Stock-tracked items cannot be sold offline."},"isAvailable":{"type":"boolean"},"unavailableReason":{"type":"string","nullable":true},"restoreAt":{"type":"string","format":"date-time","nullable":true,"description":"When an unavailable item comes back on its own (`setItemAvailability`). Null means by hand."},"preparationMinutes":{"type":"integer","nullable":true},"allergens":{"type":"array","items":{"$ref":"#/components/schemas/AllergenCode"}}}},
 "Money": {"type":"object","x-ticvai-persistence-kind":"valueObject","x-ticvai-persistence-column":"numeric(18,4)","description":"**On the wire this is three fields; in the database it is one column.**\n24 August. Every column typed `Money` was landing as `jsonb` — 129 of them, including `orders.shift.opening_float`, `inventory.purchase_order.total` and `promotions.voucher.balance`. **`orders.cash_movement.amount` was `numeric(18,4)` because somebody hand-typed that one**, and the inconsistency is what made it visible.\n**A jsonb price cannot be summed in SQL.** Every total, variance and reconciliation moves into application code — and a shift variance computed in .NET against a ledger computed in Postgres is two answers to one question. That is F13 month-end and F98 takings-to-ledger, both walked, both assuming the arithmetic is in the database.\n**`currency` and `scale` are not stored per row.** ADR-0018 makes them region-scoped and not overridable below, so they resolve from the scope walk — storing AED against nine million rows in a UAE region is nine million copies of a fact that cannot differ. A row that needed its own currency would be a row in the wrong region.\n**They stay on the wire** because a client reading a figure should not have to walk a hierarchy to know what it means.\n","required":["amount","currency","scale"],"properties":{"amount":{"type":"string","description":"Decimal string, never a float. Up to 4 decimal places. **Persisted as `numeric(18,4)`** — the string is a transport choice, so a JavaScript client cannot round a fare in transit.\n","pattern":"^-?\\d+(\\.\\d{1,4})?$"},"currency":{"type":"string","description":"**Resolved from the region, not stored on the row** (ADR-0018). OMR uses 3 decimal places and AED uses 2 — a venue on a different scale from its region is a ledger that cannot consolidate.\n","pattern":"^[A-Z]{3}$"},"scale":{"type":"integer","description":"Resolved from the region alongside `currency`.","minimum":0,"maximum":4}}},
 "MovementKind": {"type":"string","description":"**The kind decides the direction** (decided 28 September, audit R171). In: `receipt`, `transferIn`, `adjustmentIn`, `countGain`, `production` (the finished item entering stock; the ingredients leave as `issue`). Out: `issue`, `saleDepletion`, `waste`, `adjustmentOut`, `transferOut`, `countLoss`, `supplierReturn`. `adjustment` and `countAdjustment` were split into an in and an out kind so that no kind has two directions.\n","enum":["receipt","issue","saleDepletion","waste","adjustmentIn","adjustmentOut","transferOut","transferIn","countGain","countLoss","supplierReturn","production"]},
-"OrderChannel": {"type":"string","description":"Where the order originated. Added when guest self-ordering was contracted — an order a guest placed on their own phone is commercially and operationally different from one a cashier typed, and reporting that cannot separate them cannot answer whether self-ordering is working.\n","enum":["pos","kiosk","guestApp","guestWeb","callCentre","partner","api","backOffice"]},
-"OrderStatus": {"type":"string","enum":["pending","held","paid","partiallyPaid","completed","voided","refunded","partiallyRefunded","failed"],"description":"`held` is a parked sale — the cashier freed the till and the guest will return. It holds no inventory and expires, because a till that accumulates parked sales across a shift cannot be closed.\n"},
-"OrderSummary": {"x-ticvai-persistence":"none — projection","type":"object","required":["id","orderNumber","status","grossAmount","createdAt"],"properties":{"id":{"type":"string","format":"uuid"},"orderNumber":{"type":"string"},"status":{"$ref":"#/components/schemas/OrderStatus"},"grossAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"refundedAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"channel":{"allOf":[{"$ref":"#/components/schemas/OrderChannel"}],"description":"The same vocabulary as `Order.channel`, which this projects."},"lineCount":{"type":"integer"},"principalId":{"type":"string","format":"uuid","description":"The cashier who raised it — what the held-orders list shows."},"holdLabel":{"type":"string","nullable":true,"description":"As `Order.holdLabel`."},"heldUntil":{"type":"string","format":"date-time","nullable":true,"description":"As `Order.heldUntil`, so a held-orders list can warn about the ones about to lapse."},"createdAt":{"type":"string","format":"date-time"}}},
 "Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}},
 "PurchaseOrder": {"x-ticvai-persistence":"inventory.purchase_order + inventory.purchase_order_line","type":"object","required":["id","purchaseOrderNumber","supplierId","status","lines","total","createdAt"],"properties":{"id":{"type":"string","format":"uuid"},"purchaseOrderNumber":{"type":"string","readOnly":true,"description":"**Per venue, in sequence** (decided 28 September, audit R171). Assigned by the server from the venue's gap-free sequence, or the tenant's for an order with no venue. Proposed format `PO-<venue code>-<sequence, six digits>`, client to correct.\n"},"requisitionId":{"type":"string","format":"uuid","nullable":true,"description":"Null on a blanket order or an RFQ award, which are raised without one."},"quotationId":{"type":"string","format":"uuid","nullable":true,"description":"The quotation selected when the order was raised (`createPurchaseOrder` requires it). **The link that shows the comparison was made**, which `rfqId` alone does not."},"supplierId":{"type":"string","format":"uuid"},"supplierName":{"type":"string"},"kind":{"type":"string","enum":["standard","blanket","release","rfqAward"],"default":"standard","description":"BL-159. **A blanket order is a price and a commitment, not a delivery.** Releases draw against it, and modelling each release as its own purchase order loses the contract that makes the price valid.\n"},"blanketParentId":{"type":"string","format":"uuid","nullable":true,"description":"The blanket order this release draws against — another purchase order, so the same id type."},"contractPriceValidUntil":{"type":"string","format":"date","nullable":true},"rfqId":{"type":"string","format":"uuid","nullable":true,"description":"Where this order came from a quotation round. **Keeping the link is what lets a venue show it took the best of three**, which is usually the procurement rule rather than a preference.\n"},"supplierInvoiceRef":{"type":"string","nullable":true,"description":"BL-123. **Purchase orders and goods receipts both existed — the third leg did not.** A three-way match with two legs is a two-way match, and it is the supplier invoice that carries the price nobody has checked yet.\n"},"matchStatus":{"type":"string","nullable":true,"enum":["unmatched","matched","priceVariance","quantityVariance","bothVariance"],"description":"**The variance kinds are separated because they have different owners** — a price variance is a buyer's problem and a quantity variance is a receiving one.\n"},"status":{"$ref":"#/components/schemas/PurchaseOrderStatus"},"deliverToLocationId":{"type":"string","format":"uuid","nullable":true,"description":"**Scoped 31 August.** A purchase order is raised by somebody, for somewhere, and carried neither. `requisitionId` reaches a venue through a join, but **a purchase order raised without a requisition — a blanket order, an RFQ award — had no scope at all**, so nothing could answer *whose budget is this* without guessing.\n\n**`deliverToLocationId` is separate from `venueId` on purpose.** A tenant buying centrally and delivering to three venues is one order and three destinations; collapsing them would force one order per venue and lose the volume the tenant negotiated for."},"lines":{"type":"array","items":{"type":"object","properties":{"lineId":{"type":"string"},"itemId":{"type":"string","format":"uuid"},"itemName":{"type":"string"},"orderedQuantity":{"type":"number"},"receivedQuantity":{"type":"number"},"outstandingQuantity":{"type":"number"},"unitPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"quotedUnitPrice":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"nullable":true,"description":"The selected quotation line's price, kept beside `unitPrice` (audit R171)."},"priceOverrideReason":{"type":"string","nullable":true,"description":"Why `unitPrice` differs from `quotedUnitPrice` (audit R171)."},"lineTotal":{"$ref":"../shared/common.yaml#/components/schemas/Money"}}}},"subtotal":{"x-ticvai-column":"net_amount","$ref":"../shared/common.yaml#/components/schemas/Money"},"taxAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"total":{"x-ticvai-column":"gross_amount","$ref":"../shared/common.yaml#/components/schemas/Money"},"expectedDelivery":{"type":"string","format":"date"},"raisedByPrincipalId":{"type":"string","format":"uuid"},"createdAt":{"type":"string","format":"date-time"},"closedAt":{"type":"string","format":"date-time","nullable":true},"supplierReference":{"type":"string","nullable":true,"description":"The supplier's own order reference, from `acknowledgePurchaseOrder`."},"acknowledgedAt":{"type":"string","format":"date-time","nullable":true,"description":"**Null is the supplier performance figure** — goods arriving against an order never acknowledged."},"closeShortReason":{"type":"string","nullable":true,"description":"Why the balance was written off, from `closePurchaseOrderShort`."},"cancelReason":{"type":"string","nullable":true,"description":"From `cancelPurchaseOrder`."},"approvalRequestId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"The pending approval request raised by `cancelPurchaseOrder` or `closePurchaseOrderShort` (kinds `purchaseOrderCancel`, `purchaseOrderShortClose`; audit R144). Null when none is open."},"cancelledAt":{"type":"string","format":"date-time","nullable":true},"venueId":{"type":"string","format":"uuid","nullable":true,"description":"Which venue is buying. **Null on a tenant-level order** — see `deliverToLocationId`."},"scopePath":{"type":"string","description":"**The partition key** (ADR-0005). Present on every order regardless of whether a venue is named, because a tenant-level order still belongs to a tenant."}}},
 "PurchaseOrderStatus": {"type":"string","enum":["raised","sent","acknowledged","partiallyReceived","received","closedShort","cancelled"]},

@@ -245,7 +245,6 @@
    "inferred": true,
    "exitTo": [
     "GST-001",
-    "GST-002",
     "GST-003",
     "GST-023",
     "GST-059"
@@ -412,7 +411,7 @@
   "density": "comfortable",
   "pattern": "statusTracker",
   "patternReason": "`getWaitingGuest` reads one record and nothing reads a population — the screen is about that one thing",
-  "purpose": "Find the right one quickly, and act on it without opening it.",
+  "purpose": "Hold a place in a ride queue without standing in it.",
   "layout": {
    "template": "detail",
    "regions": [
@@ -466,25 +465,15 @@
        "provenance": "contract queue.yaml GET /queues/wait-times"
       },
       {
-       "kind": "dataTable",
-       "label": "Every queue",
+       "kind": "cardList",
+       "label": "Rides with a virtual queue",
        "bindsTo": "Queue",
        "columns": [
-        "Queue.code",
-        "Queue.name",
-        "Queue.venueId",
-        "Queue.attractionProductId",
-        "Queue.assetId",
-        "Queue.accessPointId",
-        "Queue.kind",
-        "Queue.operatingWindows",
-        "Queue.parentQueueId",
-        "Queue.loadBalanceWithQueueIds",
-        "Queue.inQueueOfferEnabled",
-        "Queue.notifyBeforeCallMinutes"
+        "Queue.name"
        ],
        "operation": "listQueues",
-       "provenance": "contract queue.yaml GET /queues"
+       "provenance": "corrected 2 October 2026 (CHG-SGU-021, design-notes correction)",
+       "notes": "Each ride by name with its current wait (`getWaitTimes`) and Join; no codes, asset or access-point ids, operating windows or load-balance lists."
       }
      ]
     },
@@ -664,7 +653,7 @@
     },
     {
      "to": "GST-009",
-     "trigger": "Pays",
+     "trigger": "Pays for the food order on its own",
      "provenance": "flow F11 step 3→4",
      "operation": "createGuestFnbOrder",
      "carries": [
@@ -681,10 +670,10 @@
     }
    ]
   },
-  "notes": "The inventory cited `GET /menu`, which never existed. Now getGuestMenu. Ordering to a cabana or a seat uses the same claimLocationSession as a table (4.6.26). States derived from the screen pattern on 17 August, not individually considered. **Cross-surface parity, 31 August**: added claimTableSession, listModifierGroups. **The same screen on web and app was calling different operations** — one side could do something the other could not, and nothing recorded the difference as deliberate.\n\n**Rev 3 (decided 29 September).** Add on an item with modifier groups opens the modifier side panel (GST-061, REV3-9); delivery fee, minimum, area and full slots are unchanged (DG-5).",
+  "notes": "The inventory cited `GET /menu`, which never existed. Now getGuestMenu. Ordering to a cabana or a seat uses the same claimLocationSession as a table (4.6.26). States derived from the screen pattern on 17 August, not individually considered. **Cross-surface parity, 31 August**: added claimTableSession, listModifierGroups. **The same screen on web and app was calling different operations** — one side could do something the other could not, and nothing recorded the difference as deliberate.\n\n**Rev 3 (decided 29 September).** Add on an item with modifier groups opens the modifier side panel (GST-061, REV3-9); delivery fee, minimum, area and full slots are unchanged (DG-5).\n\n**Where the outlet is (decided by Chinmay, 2 October 2026; DEC-070, DEC-206).** An outlet is *Inside the venue (needs an admission ticket)* or *Standalone (no ticket)* (`Outlet.admissionContext`). Ordering from an inside-the-venue outlet needs admission: a ticket, or a location claimed inside the venue; `createGuestFnbOrder` refuses 403 `entry-ticket-required` otherwise, and the screen says so and offers the tickets. A standalone restaurant sells takeaway and delivery without a ticket. **F&B keeps its own payment step and its own receipt** (DEC-071, DEC-052): DI-293's one cart and one receipt does not apply to F&B, so the food order is paid on its own pay step and its receipt does not join the guest's ticket receipt (CHG-SGU-001).",
   "density": "comfortable",
   "pattern": "listDetail",
-  "patternReason": "`listDiningOutlets` reads the population and `getGuestMenu` reads one of them — list, select, act",
+  "patternReason": "Location, menu, basket, pay: the guest picks an outlet, then orders from its menu (CHG-SGU-018)",
   "purpose": "Order food to where the guest is sitting, or for collection.",
   "layout": {
    "template": "split",
@@ -694,157 +683,88 @@
      "slot": "collection",
      "components": [
       {
-       "kind": "dataTable",
-       "label": "Every browse order",
+       "kind": "cardList",
+       "label": "Where you can eat now",
        "bindsTo": "DiningOutlet",
        "columns": [
-        "DiningOutlet.outletId",
         "DiningOutlet.name",
-        "DiningOutlet.kind",
         "DiningOutlet.zone",
         "DiningOutlet.cuisine",
-        "DiningOutlet.isOpenNow",
-        "DiningOutlet.opensAt",
-        "DiningOutlet.closesAt",
         "DiningOutlet.orderingMethod",
+        "DiningOutlet.closesAt",
         "DiningOutlet.estimatedWaitMinutes",
-        "DiningOutlet.imageAssetRef",
-        "DiningOutlet.menuId"
+        "DiningOutlet.imageAssetRef"
        ],
        "operation": "listDiningOutlets",
-       "provenance": "contract fnb.yaml GET /venues/{venueId}/dining"
+       "notes": "Outlets open now: photo, name, zone, cuisine, how to order (\"Order to your seat\", \"Collect\", \"Counter only\") and closing time; a wait only when the outlet reports one. No ids.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-018, design-notes correction)"
+      },
+      {
+       "kind": "textField",
+       "label": "Lounger, table or seat number",
+       "operation": "claimLocationSession",
+       "notes": "A scanned code arrives with the link and is claimed at once; this short box is the fallback when the QR is damaged (\"Lounger B-14\", \"Table 12\"). Party size is asked only at a table.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-018, design-notes correction)",
+       "bindsTo": "LocationSession.label"
       },
       {
        "kind": "selectField",
-       "label": "Mode",
+       "label": "How you get it",
        "operation": "listFulfilmentSlots",
-       "notes": "Sends `?mode=` to `listFulfilmentSlots`.",
-       "provenance": "contract fnb.yaml GET /outlets/{outletId}/fulfilment-slots"
+       "notes": "Only what the outlet supports: to my table, seat or lounger; collect from the counter; delivery to an address. Sends `mode`.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-018, design-notes correction)",
+       "bindsTo": "DiningOutlet.orderingMethod"
       },
       {
-       "kind": "datePicker",
-       "label": "Date",
+       "kind": "selectField",
+       "label": "When",
+       "bindsTo": "FulfilmentSlots.slots",
        "operation": "listFulfilmentSlots",
-       "notes": "Sends `?date=` to `listFulfilmentSlots`.",
-       "provenance": "contract fnb.yaml GET /outlets/{outletId}/fulfilment-slots"
+       "notes": "ASAP first (\"About 25 min\"), then the open slots; a date only for advance takeaway or delivery.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-018, design-notes correction)"
       },
       {
-       "kind": "dataTable",
-       "label": "Every fulfilment slots",
-       "bindsTo": "FulfilmentSlots",
-       "columns": [
-        "FulfilmentSlots.slots"
-       ],
-       "operation": "listFulfilmentSlots",
-       "provenance": "contract fnb.yaml GET /outlets/{outletId}/fulfilment-slots"
-      },
-      {
-       "kind": "dataTable",
-       "label": "Every delivery location",
-       "bindsTo": "DeliveryLocation",
-       "columns": [
-        "DeliveryLocation.id",
-        "DeliveryLocation.venueId",
-        "DeliveryLocation.kind",
-        "DeliveryLocation.label",
-        "DeliveryLocation.zone",
-        "DeliveryLocation.tableId",
-        "DeliveryLocation.seatId",
-        "DeliveryLocation.servingOutletIds",
-        "DeliveryLocation.isServiceable",
-        "DeliveryLocation.unserviceableReason",
-        "DeliveryLocation.walkTimeMinutes"
-       ],
+       "kind": "selectField",
+       "label": "Deliver to",
        "operation": "listDeliveryLocations",
-       "provenance": "contract fnb.yaml GET /venues/{venueId}/delivery-locations"
-      },
-      {
-       "kind": "dataTable",
-       "label": "Every modifier group",
-       "bindsTo": "ModifierGroup",
-       "columns": [
-        "ModifierGroup.id",
-        "ModifierGroup.code",
-        "ModifierGroup.name",
-        "ModifierGroup.minSelections",
-        "ModifierGroup.maxSelections",
-        "ModifierGroup.options",
-        "ModifierGroup.scopePath"
-       ],
-       "operation": "listModifierGroups",
-       "provenance": "contract fnb.yaml GET /modifier-groups"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected fulfilment slots",
-       "bindsTo": "FulfilmentSlots",
-       "columns": [
-        "FulfilmentSlots.slots"
-       ],
-       "operation": "listFulfilmentSlots",
-       "provenance": "contract fnb.yaml GET /outlets/{outletId}/fulfilment-slots"
+       "notes": "The delivery area check before the menu; an address outside it never reaches a basket. Building, unit, emirate (from the outlet's emirates) and directions.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-018, design-notes correction)",
+       "bindsTo": "DeliveryLocation.label"
       },
       {
        "kind": "detailPanel",
-       "label": "The F&B delivery policy",
-       "bindsTo": "FnbDeliveryPolicy",
-       "columns": [
-        "FnbDeliveryPolicy.id",
-        "FnbDeliveryPolicy.outletId",
-        "FnbDeliveryPolicy.collectionEnabled",
-        "FnbDeliveryPolicy.deliveryEnabled",
-        "FnbDeliveryPolicy.collectionPoint",
-        "FnbDeliveryPolicy.collectionHoldMinutes",
-        "FnbDeliveryPolicy.asapCollectionMinutes",
-        "FnbDeliveryPolicy.asapDeliveryMinutes",
-        "FnbDeliveryPolicy.slotMinutes",
-        "FnbDeliveryPolicy.minimumOrder",
-        "FnbDeliveryPolicy.deliveryFee",
-        "FnbDeliveryPolicy.freeDeliveryAbove",
-        "FnbDeliveryPolicy.radiusKm",
-        "FnbDeliveryPolicy.emiratesServed",
-        "FnbDeliveryPolicy.cutleryOptIn",
-        "FnbDeliveryPolicy.scopePath"
-       ],
-       "operation": "getFnbDeliveryPolicy",
-       "provenance": "contract fnb.yaml GET /fnb-delivery-policy"
-      },
-      {
-       "kind": "detailPanel",
-       "label": "The guest order status",
-       "bindsTo": "GuestOrderStatus",
-       "columns": [
-        "GuestOrderStatus.orderId",
-        "GuestOrderStatus.orderNumber",
-        "GuestOrderStatus.status",
-        "GuestOrderStatus.estimatedReadyAt",
-        "GuestOrderStatus.isReadyForCollection",
-        "GuestOrderStatus.lines"
-       ],
-       "operation": "getGuestOrderStatus",
-       "provenance": "contract fnb.yaml GET /guest-orders/{orderId}"
-      },
-      {
-       "kind": "detailPanel",
-       "label": "The guest menu",
+       "label": "Menu",
        "bindsTo": "GuestMenu",
        "columns": [
-        "GuestMenu.outletId",
-        "GuestMenu.menuId",
         "GuestMenu.name",
         "GuestMenu.inForceUntil",
-        "GuestMenu.currency",
-        "GuestMenu.currencyScale",
         "GuestMenu.sections"
        ],
        "operation": "getGuestMenu",
-       "provenance": "contract fnb.yaml GET /outlets/{outletId}/guest-menu"
+       "notes": "Sections in the outlet's order, \"Lunch menu until 16:00\" from `inForceUntil`; each dish with photo, price and allergens; a dish's modifier groups come inside the menu (no venue-wide modifier list). Sold out stays in place, greyed.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-018, design-notes correction)"
+      },
+      {
+       "kind": "cartPanel",
+       "label": "Your order",
+       "operation": "getFnbDeliveryPolicy",
+       "notes": "Lines with choices and a 1-20 stepper, the kitchen note per dish; for delivery the fee, the free-delivery threshold and the minimum order.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-018, design-notes correction)"
+      },
+      {
+       "kind": "banner",
+       "label": "Order placed",
+       "bindsTo": "GuestOrderStatus",
+       "operation": "getGuestOrderStatus",
+       "notes": "The order number large, where it is going, the ready time as a clock time; then tracking (WEB-038 / GST-025).",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-018, design-notes correction)"
+      },
+      {
+       "kind": "banner",
+       "label": "Needs an admission ticket",
+       "operation": "createGuestFnbOrder",
+       "notes": "**Where the outlet is (decided by Chinmay, 2 October 2026; DEC-070, DEC-206).** An outlet is *Inside the venue (needs an admission ticket)* or *Standalone (no ticket)* (`Outlet.admissionContext`). Ordering from an inside-the-venue outlet needs admission: a ticket, or a location claimed inside the venue; `createGuestFnbOrder` refuses 403 `entry-ticket-required` otherwise, and the screen says so and offers the tickets. A standalone restaurant sells takeaway and delivery without a ticket. **F&B keeps its own payment step and its own receipt** (DEC-071, DEC-052): DI-293's one cart and one receipt does not apply to F&B, so the food order is paid on its own pay step and its receipt does not join the guest's ticket receipt (CHG-SGU-001).",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-001, decided by Chinmay 2 October 2026, DEC-070/071/052/206)"
       }
      ]
     },
@@ -854,21 +774,10 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Claim location session",
-       "operation": "claimLocationSession",
-       "provenance": "contract fnb.yaml POST /location-sessions"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Create guest F&B order",
+       "label": "Pay",
        "operation": "createGuestFnbOrder",
-       "provenance": "contract fnb.yaml POST /guest-orders"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Claim table session",
-       "operation": "claimTableSession",
-       "provenance": "contract fnb.yaml POST /table-sessions"
+       "notes": "Reads \"Pay AED 86.00\", never \"Send to the kitchen\". The order and the total the guest saw go to the server, then card or wallet on the F&B order's own pay step; the kitchen sees it only once payment succeeds, unless it goes on an open table tab. Its own receipt (DEC-071).",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-001, decided by Chinmay 2 October 2026, DEC-070/071/052/206)"
       }
      ]
     }
@@ -877,8 +786,8 @@
   "states": {
    "loading": "The browse order list.",
    "error": "Could not load. Names which read failed and leaves the browse order untouched.",
-   "emptyFirstRun": "No browse order yet. Offers Create guest F&B order (`createGuestFnbOrder`); distinct from a filter that matched nothing.",
-   "emptyNoResults": "Nothing matches the filter on mode, date and the browse order are still there. Names the active filter and offers to clear it.",
+   "emptyFirstRun": "No outlet takes orders here now. Names when the next one opens; a counter-only outlet's menu can still be read.",
+   "emptyNoResults": "No outlet open now matches: says so, with the next opening time.",
    "emptyNoAccess": "**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** The menu already loaded stays with its age. Ordering, claiming a table and booking wait for the connection — an order placed offline is food nobody is making."
   },
@@ -916,7 +825,7 @@
    {
     "operationId": "createGuestFnbOrder",
     "contract": "fnb",
-    "purpose": "Place the order",
+    "purpose": "A guest orders food; refused 403 entry-ticket-required at an inside-the-venue outlet without admission; paid on its own pay step with its own receipt (DEC-070, DEC-071)",
     "trigger": "onAction"
    },
    {
@@ -929,21 +838,6 @@
     "operationId": "listDeliveryLocations",
     "contract": "fnb",
     "purpose": "Where an order can be delivered",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "claimTableSession",
-    "contract": "fnb",
-    "purpose": "Identify which table a guest is sitting at",
-    "trigger": "onAction",
-    "invalidates": [
-     "listDiningOutlets"
-    ]
-   },
-   {
-    "operationId": "listModifierGroups",
-    "contract": "fnb",
-    "purpose": "List modifier groups",
     "trigger": "onLoad"
    }
   ],
@@ -980,70 +874,6 @@
    }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 8 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
-  "overlays": [
-   {
-    "id": "formClaimLocationSession",
-    "component": "modal",
-    "trigger": "Claim location session",
-    "body": "**Collects what `claimLocationSession` sends before it is called.** Nothing in the body is required. Optional: `locationCode`, `seatReference`, `partySize`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Claim location session",
-     "operation": "claimLocationSession"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "locationCode",
-      "seatReference",
-      "partySize"
-     ]
-    },
-    "provenance": "client-verified"
-   },
-   {
-    "id": "formCreateGuestFnbOrder",
-    "component": "modal",
-    "trigger": "Create guest F&B order",
-    "body": "**Collects what `createGuestFnbOrder` sends before it is called.** Required: `id`, `lines`, `quotedTotal`, `recordedAt`. Optional: `locationSessionId`, `outletId`, `fulfilment`, `paymentMethod`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "CreateGuestOrderRequest",
-    "confirm": {
-     "label": "Create guest F&B order",
-     "operation": "createGuestFnbOrder"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "id",
-      "lines",
-      "quotedTotal",
-      "recordedAt",
-      "locationSessionId",
-      "outletId",
-      "fulfilment",
-      "paymentMethod"
-     ]
-    },
-    "provenance": "client-verified"
-   },
-   {
-    "id": "formClaimTableSession",
-    "component": "modal",
-    "trigger": "Claim table session",
-    "body": "**Collects what `claimTableSession` sends before it is called.** Required: `tableCode`. Optional: `partySize`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Claim table session",
-     "operation": "claimTableSession"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "tableCode",
-      "partySize"
-     ]
-    },
-    "provenance": "client-verified"
-   }
-  ],
   "_platform": {
    "code": "P02",
    "audience": "guest",
@@ -1134,7 +964,7 @@
   "density": "comfortable",
   "pattern": "statusTracker",
   "patternReason": "`getGuestOrderStatus` reads one record and nothing reads a population — the screen is about that one thing",
-  "purpose": "Track an order to the point it reaches the guest.",
+  "purpose": "Watch it being made, and see the table bill; it is paid at the table.",
   "layout": {
    "template": "detail",
    "regions": [
@@ -1172,29 +1002,18 @@
         "Bill.total"
        ],
        "operation": "getGuestBill",
-       "provenance": "contract fnb.yaml GET /table-sessions/{sessionId}/bill"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Claim table session",
-       "operation": "claimTableSession",
-       "provenance": "contract fnb.yaml POST /table-sessions"
+       "provenance": "contract fnb.yaml GET /table-sessions/{sessionId}/bill",
+       "notes": "The table bill, read through the table session the guest holds. A guest who claimed with `claimLocationSession` holds a visit, not a table session, and cannot read it yet (CHG-SGU-024); \"Pay at the table\" until a guest payment of the visit's bill exists."
       }
      ]
     }
    ]
   },
   "states": {
-   "loading": "Availability is live, never cached",
+   "loading": "Loading the order.",
    "error": "Availability unavailable. **Selection is blocked** — overselling is worse than waiting",
-   "emptyFirstRun": "**Sold out is a real answer.** Offers the next available rather than a dead end",
-   "offline": "**The offline banner shows.** The last status stays on screen with its age and is never presented as current. Settling the bill waits for the connection."
+   "emptyFirstRun": "The order is not found or was refunded (a cold link): says which, with the way back to ordering.",
+   "offline": "**The offline banner shows.** The last status stays with its age (\"Preparing, 2 min ago\"); nothing refreshes until the connection returns."
   },
   "apis": [
    {
@@ -1208,12 +1027,6 @@
     "contract": "fnb",
     "purpose": "Everything ordered at this location this sitting",
     "trigger": "onLoad"
-   },
-   {
-    "operationId": "claimTableSession",
-    "contract": "fnb",
-    "purpose": "Identify which table a guest is sitting at",
-    "trigger": "onAction"
    }
   ],
   "entryState": {
@@ -1243,26 +1056,6 @@
    }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
-  "overlays": [
-   {
-    "id": "formClaimTableSession",
-    "component": "modal",
-    "trigger": "Claim table session",
-    "body": "**Collects what `claimTableSession` sends before it is called.** Required: `tableCode`. Optional: `partySize`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Claim table session",
-     "operation": "claimTableSession"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "tableCode",
-      "partySize"
-     ]
-    },
-    "provenance": "client-verified"
-   }
-  ],
   "_platform": {
    "code": "P02",
    "audience": "guest",
@@ -1315,6 +1108,7 @@
    "exitTo": [
     "GST-001",
     "GST-002",
+    "GST-009",
     "GST-028"
    ],
    "transitions": [
@@ -1330,6 +1124,15 @@
      "carries": [
       "orderId"
      ]
+    },
+    {
+     "to": "GST-009",
+     "trigger": "They pay in the basket, and the parking entitlement is issued (R166;",
+     "provenance": "flow F50 step 1→2",
+     "operation": "addCartLine",
+     "carries": [
+      "token"
+     ]
     }
    ]
   },
@@ -1337,7 +1140,7 @@
   "density": "comfortable",
   "pattern": "listDetail",
   "patternReason": "`listParkingFacilities` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
-  "purpose": "Take the money, and be unambiguous about whether it worked.",
+  "purpose": "Choose a car park and add parking to the basket; change the plate on parking already bought.",
   "layout": {
    "template": "split",
    "regions": [
@@ -1561,6 +1364,7 @@
   "navigation": {
    "entryFrom": [
     "GST-001",
+    "GST-009",
     "GST-027"
    ],
    "inferred": true,
@@ -1714,7 +1518,7 @@
   "id": "GST-029",
   "name": "Venue Info & Services",
   "module": "In-venue Services",
-  "requiresModule": "fnb",
+  "requiresModule": "core",
   "wave": 2,
   "capability": "C17",
   "implementation": {
@@ -1744,7 +1548,7 @@
   "density": "comfortable",
   "pattern": "listDetail",
   "patternReason": "`listDiningOutlets` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
-  "purpose": "See venue info & services for this venue.",
+  "purpose": "How to reach the venue, its contact details, and where to eat.",
   "layout": {
    "template": "split",
    "regions": [
@@ -1775,79 +1579,34 @@
        "provenance": "contract fnb.yaml GET /venues/{venueId}/dining"
       },
       {
-       "kind": "textField",
-       "label": "Ordering method",
+       "kind": "selectField",
+       "label": "How to order",
        "operation": "listDiningOutlets",
-       "notes": "Sends `?orderingMethod=` to `listDiningOutlets`.",
-       "provenance": "contract fnb.yaml GET /venues/{venueId}/dining"
+       "notes": "Chips: order to your seat, collect, counter only. Sends `orderingMethod`.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-018, design-notes correction)",
+       "bindsTo": "DiningOutlet.orderingMethod"
       },
       {
-       "kind": "dataTable",
-       "label": "Every dining outlet",
+       "kind": "cardList",
+       "label": "Dining",
        "bindsTo": "DiningOutlet",
        "columns": [
-        "DiningOutlet.outletId",
         "DiningOutlet.name",
-        "DiningOutlet.kind",
         "DiningOutlet.zone",
         "DiningOutlet.cuisine",
         "DiningOutlet.isOpenNow",
-        "DiningOutlet.opensAt",
-        "DiningOutlet.closesAt",
-        "DiningOutlet.orderingMethod",
-        "DiningOutlet.estimatedWaitMinutes",
-        "DiningOutlet.imageAssetRef",
-        "DiningOutlet.menuId"
+        "DiningOutlet.closesAt"
        ],
        "operation": "listDiningOutlets",
-       "provenance": "contract fnb.yaml GET /venues/{venueId}/dining"
+       "notes": "Shown only where the tenant licenses F&B; contact and venue information show for every venue.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-018, design-notes correction)"
       },
       {
-       "kind": "dataTable",
-       "label": "Every delivery location",
-       "bindsTo": "DeliveryLocation",
-       "columns": [
-        "DeliveryLocation.id",
-        "DeliveryLocation.venueId",
-        "DeliveryLocation.kind",
-        "DeliveryLocation.label",
-        "DeliveryLocation.zone",
-        "DeliveryLocation.tableId",
-        "DeliveryLocation.seatId",
-        "DeliveryLocation.servingOutletIds",
-        "DeliveryLocation.isServiceable",
-        "DeliveryLocation.unserviceableReason",
-        "DeliveryLocation.walkTimeMinutes"
-       ],
+       "kind": "cardList",
+       "label": "Where food can be brought to you",
        "operation": "listDeliveryLocations",
-       "provenance": "contract fnb.yaml GET /venues/{venueId}/delivery-locations"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected dining outlet",
-       "bindsTo": "DiningOutlet",
-       "columns": [
-        "DiningOutlet.outletId",
-        "DiningOutlet.name",
-        "DiningOutlet.kind",
-        "DiningOutlet.zone",
-        "DiningOutlet.cuisine",
-        "DiningOutlet.isOpenNow",
-        "DiningOutlet.opensAt",
-        "DiningOutlet.closesAt",
-        "DiningOutlet.orderingMethod",
-        "DiningOutlet.estimatedWaitMinutes",
-        "DiningOutlet.imageAssetRef",
-        "DiningOutlet.menuId"
-       ],
-       "operation": "listDiningOutlets",
-       "provenance": "contract fnb.yaml GET /venues/{venueId}/dining"
+       "notes": "Names of the zones served (pool deck, beach), never ids.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-018, design-notes correction)"
       }
      ]
     }
@@ -2170,13 +1929,13 @@
   "id": "GST-070",
   "name": "Reserve a Table",
   "module": "In-venue Services",
-  "requiresModule": "core",
+  "requiresModule": "fnb",
   "wave": 2,
   "capability": "read-write",
   "implementation": {
    "app": "guest-app",
-   "route": "/account/reserve-table-cabana",
-   "component": "apps/guest-app/src/routes/account/ReserveTableCabana.tsx",
+   "route": "/reserve-table",
+   "component": "apps/guest-app/src/routes/ReserveTable.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -2225,40 +1984,28 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Create table reservation",
+       "label": "Reserve",
        "operation": "createTableReservation",
        "provenance": "contract fnb.yaml POST /table-reservations"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save table reservation",
+       "label": "Change or cancel",
        "operation": "updateTableReservation",
        "provenance": "contract fnb.yaml PATCH /table-reservations/{reservationId}"
       },
       {
        "kind": "secondaryButton",
-       "label": "Join restaurant waitlist",
+       "label": "Join the waitlist",
        "operation": "joinRestaurantWaitlist",
        "provenance": "contract fnb.yaml POST /waitlist"
       },
       {
        "kind": "destructiveButton",
-       "label": "Leave restaurant waitlist",
+       "label": "Leave the waitlist",
        "operation": "leaveRestaurantWaitlist",
        "notes": "Leaves the guest's own entry (POST /waitlist/{entryId}/leave); the entry returns `cancelled` and the table goes to the next party (decided 28 September, audit R073 (d)).",
        "provenance": "contract fnb.yaml POST /waitlist/{entryId}/leave"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Join waitlist",
-       "operation": "joinWaitlist",
-       "provenance": "contract catalogue.yaml POST /waitlist-entries"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Leave waitlist",
-       "operation": "leaveWaitlist",
-       "provenance": "contract catalogue.yaml DELETE /waitlist-entries/{entryId}"
       }
      ]
     }
@@ -2296,18 +2043,6 @@
     "operationId": "leaveRestaurantWaitlist",
     "contract": "fnb",
     "purpose": "Leave the restaurant waitlist; the entry returns cancelled (decided 28 September, audit R073 (d))",
-    "trigger": "onAction"
-   },
-   {
-    "operationId": "joinWaitlist",
-    "contract": "catalogue",
-    "purpose": "Ask to be told if capacity frees up",
-    "trigger": "onAction"
-   },
-   {
-    "operationId": "leaveWaitlist",
-    "contract": "catalogue",
-    "purpose": "Stop waiting",
     "trigger": "onAction"
    },
    {
@@ -2349,7 +2084,7 @@
     "verified": "2026-09-28",
     "match": "partial",
     "view": "Account → All screens → Wave 2 → Reserve a table or cabana; Rev 3 feedback → Book a table (fixed)",
-    "differences": "The YAML covers tables only (cabanas are staff-booked, R073c) and has no deposit (R077a). The prototype also reserves cabanas and shows a deposit on the reservation, and the Rev 3 web flow has a deposit-hold variant at AED 100 per guest."
+    "differences": "The YAML covers tables only (cabanas are staff-booked, R073c) and has no deposit (R077a). The prototype also reserves cabanas and shows a deposit on the reservation, and the Rev 3 web flow has a deposit-hold variant at AED 100 per guest. **Stale since 29 September: REV3-8b superseded R077 (a); the dining deposit is a venue option, off by default** (CHG-SGU-018)."
    }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
@@ -2357,11 +2092,11 @@
    {
     "id": "formCreateTableReservation",
     "component": "modal",
-    "trigger": "Create table reservation",
-    "body": "**Collects what `createTableReservation` sends before it is called.** Required: `outletId`, `partySize`, `startsAt`. Optional: `id`, `subjectId`, `guestName`, `contactPoint`, `durationMinutes`, `tables`, `status`, `groupId`, `notes`, `actualPartySize`, `tableVisitId`. The form says **no card is needed** unless the venue enabled a dining deposit; then it shows the deposit amount and basis, when it stops being refundable and the late-cancel and no-show terms (decided 29 September, rev 3 REV3-8b, superseding audit R077 (a)). Dismissing sends nothing; the screen behind is unchanged.",
+    "trigger": "Reserve",
+    "body": "Restaurant, date, time and party size on one screen; an optional note for allergies or requests; optional seating preference (`seatingPreference`) and occasion (`occasion`), fields on the booking since 2 October (DEC-204). Name and contact come from the profile. Nothing the server or staff set is asked (id, status, tables, group, actual party size, table visit).",
     "bindsTo": "TableReservation",
     "confirm": {
-     "label": "Create table reservation",
+     "label": "Reserve",
      "operation": "createTableReservation"
     },
     "dismiss": {
@@ -2383,16 +2118,16 @@
       "tableVisitId"
      ]
     },
-    "provenance": "client-verified"
+    "provenance": "corrected 2 October 2026 (CHG-SGU-002, decided by Chinmay 2 October 2026, DEC-204)"
    },
    {
     "id": "formUpdateTableReservation",
     "component": "modal",
-    "trigger": "Save table reservation",
-    "body": "**Collects what `updateTableReservation` sends before it is called.** Required: `outletId`, `partySize`, `startsAt`. Optional: `id`, `subjectId`, `guestName`, `contactPoint`, `durationMinutes`, `tables`, `status`, `groupId`, `notes`, `actualPartySize`, `tableVisitId`. Cancelling says **it is free** where no deposit was taken; where one was, whether it is returned or kept under the venue's terms (decided 29 September, rev 3 REV3-8b, superseding audit R077 (a)). Dismissing sends nothing; the screen behind is unchanged.",
+    "trigger": "Change or cancel",
+    "body": "Party size and time only; the restaurant is fixed. With a per-guest deposit, the difference or the release is stated before saving.",
     "bindsTo": "TableReservation",
     "confirm": {
-     "label": "Save table reservation",
+     "label": "Change or cancel",
      "operation": "updateTableReservation"
     },
     "dismiss": {
@@ -2414,16 +2149,16 @@
       "tableVisitId"
      ]
     },
-    "provenance": "client-verified"
+    "provenance": "corrected 2 October 2026 (CHG-SGU-018, design-notes correction)"
    },
    {
     "id": "formJoinRestaurantWaitlist",
     "component": "modal",
-    "trigger": "Join restaurant waitlist",
-    "body": "**Collects what `joinRestaurantWaitlist` sends before it is called.** Required: `id`, `outletId`, `partySize`, `status`, `recordedAt`. Optional: `subjectId`, `quotedWaitMinutes`, `seatingPreference`, `notifiedAt`, `syncedAt`, `holdExpiresAt`. Dismissing sends nothing; the screen behind is unchanged.",
+    "trigger": "Join the waitlist",
+    "body": "Party size and seating (Any, Indoor, Outdoor, Bar, Booth, High chair needed). Name and contact come from the profile; id, status and times are the server's.",
     "bindsTo": "RestaurantWaitlist",
     "confirm": {
-     "label": "Join restaurant waitlist",
+     "label": "Join the waitlist",
      "operation": "joinRestaurantWaitlist"
     },
     "dismiss": {
@@ -2442,40 +2177,12 @@
       "holdExpiresAt"
      ]
     },
-    "provenance": "client-verified"
-   },
-   {
-    "id": "formJoinWaitlist",
-    "component": "modal",
-    "trigger": "Join waitlist",
-    "body": "**Collects what `joinWaitlist` sends before it is called.** Required: `performanceId`, `partySize`. Optional: `id`, `variantId`, `subjectId`, `contactPoint`, `status`, `position`, `offeredAt`, `offerExpiresAt`, `joinedAt`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "WaitlistEntry",
-    "confirm": {
-     "label": "Join waitlist",
-     "operation": "joinWaitlist"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "performanceId",
-      "partySize",
-      "id",
-      "variantId",
-      "subjectId",
-      "contactPoint",
-      "status",
-      "position",
-      "offeredAt",
-      "offerExpiresAt",
-      "joinedAt"
-     ]
-    },
-    "provenance": "client-verified"
+    "provenance": "corrected 2 October 2026 (CHG-SGU-018, design-notes correction)"
    },
    {
     "id": "confirmLeaveRestaurantWaitlist",
     "component": "confirmDialog",
-    "trigger": "Leave restaurant waitlist",
+    "trigger": "Leave the waitlist",
     "body": "**Says the place is given up and the next party moves up**, naming the restaurant and the party size. Leaving cannot be undone; joining again goes to the back (audit R073 (d)).",
     "provenance": "client-verified"
    }

@@ -18,6 +18,49 @@
   "requestBody": "WaiverApprovalTestingPublicationWorkspaceInput",
   "responds": "WaiverApprovalTestingPublicationWorkspaceView"
  },
+ "createForm": {
+  "method": "POST",
+  "path": "/forms",
+  "contract": "marketing-crm",
+  "summary": "Define a waiver, survey or capture form",
+  "permission": "MARKETING_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "FormDefinition",
+  "responds": "FormDefinition"
+ },
+ "getLocalizationBrandingCustomer": {
+  "method": "GET",
+  "path": "/localization-branding-customer",
+  "contract": "marketing-crm",
+  "summary": "Load a waiver version's languages, branding and channels",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "formId",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "version",
+    "in": "query",
+    "required": false
+   }
+  ],
+  "requestBody": null,
+  "responds": "LocalizationBrandingCustomerExperienceConfigurationView"
+ },
  "listDynamicFieldQuestion": {
   "method": "GET",
   "path": "/dynamic-field-question",

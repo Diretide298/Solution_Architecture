@@ -12,17 +12,17 @@
    "page": 75
   },
   "implementation": {
-   "app": "ticvai-web",
+   "app": "venue-management-web",
    "route": "/commercial/dynamic-pricing-strategy-command-center-adm-088",
-   "component": "apps/ticvai-web/src/routes/commercial/DynamicPricingStrategyCommandCenter.tsx",
+   "component": "apps/venue-management-web/src/routes/commercial/DynamicPricingStrategyCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
    "entryFrom": [
-    "ADM-002"
+    "BO-100"
    ],
    "exitTo": [
-    "ADM-002",
+    "BO-100",
     "ADM-089",
     "ADM-090",
     "ADM-091",
@@ -31,15 +31,17 @@
     "ADM-094",
     "ADM-095",
     "ADM-096",
-    "ADM-097"
+    "ADM-097",
+    "BO-441"
    ],
    "inferred": false,
    "notes": "**The board's hub.** The workshop specified this module as boards of ten and opened each with a command centre; the other nine screens are that board's detail, so they are reached from here and return here.",
    "transitions": [
     {
-     "to": "ADM-002",
-     "trigger": "Platform Dashboard",
-     "provenance": "derived — ADM-002 declares entryState.params  and ADM-088 holds none of them. The edge carries nothing: ADM-088 is opened from ADM-002, so this edge is the way back and ADM-002 keeps its own state"
+     "to": "BO-100",
+     "trigger": "Back to Venue Home",
+     "provenance": "moved to Venue Management 2 October 2026 (CHG-MOV-001); it returned to the console's Platform Dashboard (ADM-002)",
+     "back": true
     },
     {
      "to": "ADM-090",
@@ -100,9 +102,16 @@
      "carries": [
       "strategyId"
      ]
+    },
+    {
+     "to": "BO-441",
+     "trigger": "Works in Rule Priority, Conflict Resolution & Dynamic Pricing Test Console",
+     "provenance": "flow F147 step 17→18",
+     "operation": "listDynamicPricingStrategy"
     }
    ]
   },
+  "notes": "**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: \"they are venue screens\"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.\n\n**BO-528 Dynamic Pricing & AI Recommendation merged in (2 October 2026, duplicate rule; CHG-SBO-021):** the rental view of dynamic pricing is this strategy list filtered to rental resources; activate, pause, resume and retire come with it.",
   "density": "compact",
   "purposeNote": "Authorized users can view and manage the complete dynamic-pricing strategy portfolio from one centralized workspace.",
   "pattern": "commandCentre",
@@ -302,7 +311,8 @@
        "operation": "transitionDynamicPricingStrategy",
        "permission": "PRICE_CONFIGURE",
        "notes": "**The strategy's status moves, as calls** (29 September, writers pass).",
-       "provenance": "contract catalogue.yaml POST /dynamic-pricing-strategies/{strategyId}/lifecycle"
+       "provenance": "contract catalogue.yaml POST /dynamic-pricing-strategies/{strategyId}/lifecycle",
+       "tab": "Rentals"
       }
      ]
     }
@@ -327,18 +337,25 @@
     "contract": "catalogue",
     "purpose": "Activate, pause, resume or retire a dynamic pricing strategy",
     "trigger": "onAction",
-    "invalidates": [
-     "listDynamicPricingStrategy"
-    ]
+    "provenance": "merged from BO-528, 2 October 2026"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-088",
+   "board": "wireframes/P08 Venue Management.dc.html#adm-088",
    "workshopBoard": "wireframes/WS99 Pricing   Revenue Management Board 5.dc.html#adm-088"
   },
-  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 75. 25 of 25 labels bound to a contract property; 38 of 55 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 75. 25 of 25 labels bound to a contract property; 38 of 55 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **2 October 2026 (CHG-MOV-002):** activating, pausing or retiring a strategy happens on ADM-089, the strategy builder, which declares transitionDynamicPricingStrategy; the command centre lists, so one surface changes a strategy's state (and BO-528, the rental view, is not its twin).",
+  "entryState": {
+   "params": [
+    {
+     "name": "strategyId",
+     "from": "navigation",
+     "optional": true
+    }
+   ]
+  },
   "overlays": [
    {
     "id": "formTransitionDynamicPricingStrategy",
@@ -359,35 +376,25 @@
     "provenance": "contract catalogue.yaml POST /dynamic-pricing-strategies/{strategyId}/lifecycle"
    }
   ],
-  "entryState": {
-   "params": [
-    {
-     "name": "strategyId",
-     "from": "navigation",
-     "optional": true
-    }
-   ]
-  },
   "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
+   "code": "P08",
+   "audience": "staff",
    "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
    "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
+   "app": "venue-management-web",
+   "operator": "venue",
    "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
     "shell": "web",
     "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
+     "P12",
+     "P13",
+     "P16"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
     "decided": "10 September 2026"
    }
   }
@@ -405,9 +412,9 @@
    "page": 76
   },
   "implementation": {
-   "app": "ticvai-web",
+   "app": "venue-management-web",
    "route": "/commercial/dynamic-pricing-strategy-builder-adm-089",
-   "component": "apps/ticvai-web/src/routes/commercial/DynamicPricingStrategyBuilder.tsx",
+   "component": "apps/venue-management-web/src/routes/commercial/DynamicPricingStrategyBuilder.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -431,6 +438,7 @@
     }
    ]
   },
+  "notes": "**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: \"they are venue screens\"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.",
   "density": "compact",
   "purposeNote": "Administrators can create reusable dynamic-pricing strategies linked to governed commercial base prices and clearly defined product/event scopes.",
   "pattern": "configEditor",
@@ -552,6 +560,13 @@
        "kind": "selectField",
        "label": "Acts as Fallback",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 76 §Configure whether a strategy"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Strategies",
+       "bindsTo": "Dyn",
+       "operation": "listDynamicPricingStrategy",
+       "provenance": "contract catalogue.yaml GET /dynamic-pricing-strategy; wiring fix, 2 October 2026"
       }
      ]
     },
@@ -594,12 +609,19 @@
     "contract": "catalogue",
     "purpose": "Activate, pause, resume or retire a dynamic pricing strategy",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "listDynamicPricingStrategy",
+    "contract": "catalogue",
+    "purpose": "The dynamic pricing strategies, to open one in the builder",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-089",
+   "board": "wireframes/P08 Venue Management.dc.html#adm-089",
    "workshopBoard": "wireframes/WS99 Pricing   Revenue Management Board 5.dc.html#adm-089"
   },
   "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 76. 0 of 0 labels bound to a contract property; 22 of 45 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
@@ -633,25 +655,24 @@
    ]
   },
   "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
+   "code": "P08",
+   "audience": "staff",
    "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
    "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
+   "app": "venue-management-web",
+   "operator": "venue",
    "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
     "shell": "web",
     "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
+     "P12",
+     "P13",
+     "P16"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
     "decided": "10 September 2026"
    }
   }
@@ -669,9 +690,9 @@
    "page": 78
   },
   "implementation": {
-   "app": "ticvai-web",
+   "app": "venue-management-web",
    "route": "/commercial/demand-occupancy-availability-rule-builder-adm-090",
-   "component": "apps/ticvai-web/src/routes/commercial/DemandOccupancyAvailabilityRuleBuilder.tsx",
+   "component": "apps/venue-management-web/src/routes/commercial/DemandOccupancyAvailabilityRuleBuilder.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -695,6 +716,7 @@
     }
    ]
   },
+  "notes": "**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: \"they are venue screens\"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
@@ -734,6 +756,13 @@
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
        "impliedBy": "setDemandOccupancyAvailability"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Dynamic rules",
+       "bindsTo": "PricingDynamicPriceRule",
+       "operation": "listDynamicPriceRules",
+       "provenance": "contract catalogue.yaml GET /pricing/dynamic-rules; wiring fix, 2 October 2026"
       }
      ]
     }
@@ -752,35 +781,42 @@
     "contract": "catalogue",
     "purpose": "Demand, Occupancy & Availability Rule Builder",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "listDynamicPriceRules",
+    "contract": "catalogue",
+    "purpose": "The dynamic price rules already in force",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-090",
+   "board": "wireframes/P08 Venue Management.dc.html#adm-090",
    "workshopBoard": "wireframes/WS99 Pricing   Revenue Management Board 5.dc.html#adm-090"
   },
   "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 78. 0 of 0 labels bound to a contract property; 0 of 15 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {},
   "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
+   "code": "P08",
+   "audience": "staff",
    "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
    "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
+   "app": "venue-management-web",
+   "operator": "venue",
    "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
     "shell": "web",
     "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
+     "P12",
+     "P13",
+     "P16"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
     "decided": "10 September 2026"
    }
   }
@@ -798,9 +834,9 @@
    "page": 80
   },
   "implementation": {
-   "app": "ticvai-web",
+   "app": "venue-management-web",
    "route": "/commercial/booking-velocity-time-to-event-rule-builder-adm-091",
-   "component": "apps/ticvai-web/src/routes/commercial/BookingVelocityTimeToEventRuleBuilder.tsx",
+   "component": "apps/venue-management-web/src/routes/commercial/BookingVelocityTimeToEventRuleBuilder.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -824,6 +860,7 @@
     }
    ]
   },
+  "notes": "**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: \"they are venue screens\"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.",
   "density": "compact",
   "purposeNote": "Dynamic pricing can respond to both booking pace and remaining selling time rather than relying solely on current occupancy.",
   "pattern": "listDetail",
@@ -892,7 +929,15 @@
     },
     {
      "name": "contentBody",
-     "components": []
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Dynamic rules",
+       "bindsTo": "PricingDynamicPriceRule",
+       "operation": "listDynamicPriceRules",
+       "provenance": "contract catalogue.yaml GET /pricing/dynamic-rules; wiring fix, 2 October 2026"
+      }
+     ]
     }
    ]
   },
@@ -909,35 +954,42 @@
     "contract": "catalogue",
     "purpose": "Booking Velocity & Time-to-Event Rule Builder",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "listDynamicPriceRules",
+    "contract": "catalogue",
+    "purpose": "The dynamic price rules already in force",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-091",
+   "board": "wireframes/P08 Venue Management.dc.html#adm-091",
    "workshopBoard": "wireframes/WS99 Pricing   Revenue Management Board 5.dc.html#adm-091"
   },
   "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 80. 0 of 0 labels bound to a contract property; 7 of 41 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {},
   "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
+   "code": "P08",
+   "audience": "staff",
    "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
    "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
+   "app": "venue-management-web",
+   "operator": "venue",
    "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
     "shell": "web",
     "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
+     "P12",
+     "P13",
+     "P16"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
     "decided": "10 September 2026"
    }
   }
@@ -955,9 +1007,9 @@
    "page": 81
   },
   "implementation": {
-   "app": "ticvai-web",
+   "app": "venue-management-web",
    "route": "/commercial/seasonal-calendar-day-timeslot-dynamic-rules-adm-092",
-   "component": "apps/ticvai-web/src/routes/commercial/SeasonalCalendarDayTimeslotDynamicRules.tsx",
+   "component": "apps/venue-management-web/src/routes/commercial/SeasonalCalendarDayTimeslotDynamicRules.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -981,6 +1033,7 @@
     }
    ]
   },
+  "notes": "**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: \"they are venue screens\"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.",
   "density": "compact",
   "purposeNote": "performances, and timeslots without creating conflicting temporal rules.",
   "pattern": "listDetail",
@@ -1096,7 +1149,7 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-092",
+   "board": "wireframes/P08 Venue Management.dc.html#adm-092",
    "workshopBoard": "wireframes/WS99 Pricing   Revenue Management Board 5.dc.html#adm-092"
   },
   "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 81. 0 of 0 labels bound to a contract property; 0 of 33 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
@@ -1138,25 +1191,24 @@
    }
   ],
   "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
+   "code": "P08",
+   "audience": "staff",
    "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
    "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
+   "app": "venue-management-web",
+   "operator": "venue",
    "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
     "shell": "web",
     "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
+     "P12",
+     "P13",
+     "P16"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
     "decided": "10 September 2026"
    }
   }
@@ -1174,9 +1226,9 @@
    "page": 83
   },
   "implementation": {
-   "app": "ticvai-web",
+   "app": "venue-management-web",
    "route": "/commercial/channel-customer-segment-location-dynamic-rules-adm-093",
-   "component": "apps/ticvai-web/src/routes/commercial/ChannelCustomerSegmentLocationDynamicRules.tsx",
+   "component": "apps/venue-management-web/src/routes/commercial/ChannelCustomerSegmentLocationDynamicRules.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1200,6 +1252,7 @@
     }
    ]
   },
+  "notes": "**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: \"they are venue screens\"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.",
   "density": "compact",
   "purposeNote": "Dynamic pricing can vary appropriately by channel, customer segment, and location without violating protected commercial agreements.",
   "pattern": "listDetail",
@@ -1220,6 +1273,11 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Pricing___Revenue_Management_Reference.pdf, page 83"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-027): No write for channel, segment and location dynamic pricing rules (unless setDynamicPriceRule carries them).",
+    "source": "contracts/spine/catalogue.yaml#listChannelCustomerSegment"
    }
   ],
   "layout": {
@@ -1275,30 +1333,29 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-093",
+   "board": "wireframes/P08 Venue Management.dc.html#adm-093",
    "workshopBoard": "wireframes/WS99 Pricing   Revenue Management Board 5.dc.html#adm-093"
   },
   "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 83. 0 of 0 labels bound to a contract property; 3 of 38 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
+   "code": "P08",
+   "audience": "staff",
    "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
    "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
+   "app": "venue-management-web",
+   "operator": "venue",
    "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
     "shell": "web",
     "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
+     "P12",
+     "P13",
+     "P16"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
     "decided": "10 September 2026"
    }
   }
@@ -1316,9 +1373,9 @@
    "page": 84
   },
   "implementation": {
-   "app": "ticvai-web",
+   "app": "venue-management-web",
    "route": "/commercial/dynamic-price-bands-ladders-adjustment-matrix-adm-094",
-   "component": "apps/ticvai-web/src/routes/commercial/DynamicPriceBandsLaddersAdjustmentMatrix.tsx",
+   "component": "apps/venue-management-web/src/routes/commercial/DynamicPriceBandsLaddersAdjustmentMatrix.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1342,6 +1399,7 @@
     }
    ]
   },
+  "notes": "**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: \"they are venue screens\"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.",
   "density": "compact",
   "purposeNote": "Dynamic prices move through controlled commercial price bands or adjustment ranges rather than generating arbitrary uncontrolled selling prices.",
   "pattern": "configEditor",
@@ -1438,7 +1496,7 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-094",
+   "board": "wireframes/P08 Venue Management.dc.html#adm-094",
    "workshopBoard": "wireframes/WS99 Pricing   Revenue Management Board 5.dc.html#adm-094"
   },
   "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 84. 0 of 0 labels bound to a contract property; 8 of 40 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
@@ -1489,25 +1547,24 @@
    ]
   },
   "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
+   "code": "P08",
+   "audience": "staff",
    "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
    "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
+   "app": "venue-management-web",
+   "operator": "venue",
    "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
     "shell": "web",
     "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
+     "P12",
+     "P13",
+     "P16"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
     "decided": "10 September 2026"
    }
   }
@@ -1525,9 +1582,9 @@
    "page": 86
   },
   "implementation": {
-   "app": "ticvai-web",
+   "app": "venue-management-web",
    "route": "/commercial/dynamic-pricing-guardrails-commercial-protection-adm-095",
-   "component": "apps/ticvai-web/src/routes/commercial/DynamicPricingGuardrailsCommercialProtection.tsx",
+   "component": "apps/venue-management-web/src/routes/commercial/DynamicPricingGuardrailsCommercialProtection.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1548,6 +1605,7 @@
     }
    ]
   },
+  "notes": "**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: \"they are venue screens\"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.",
   "density": "compact",
   "purposeNote": "No dynamic pricing strategy can generate a selling price outside approved financial, contractual, operational, or regulatory boundaries.",
   "pattern": "configEditor",
@@ -1670,7 +1728,7 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-095",
+   "board": "wireframes/P08 Venue Management.dc.html#adm-095",
    "workshopBoard": "wireframes/WS99 Pricing   Revenue Management Board 5.dc.html#adm-095"
   },
   "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 86. 0 of 0 labels bound to a contract property; 18 of 32 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
@@ -1712,25 +1770,24 @@
    }
   ],
   "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
+   "code": "P08",
+   "audience": "staff",
    "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
    "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
+   "app": "venue-management-web",
+   "operator": "venue",
    "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
     "shell": "web",
     "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
+     "P12",
+     "P13",
+     "P16"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
     "decided": "10 September 2026"
    }
   }
@@ -1748,9 +1805,9 @@
    "page": 87
   },
   "implementation": {
-   "app": "ticvai-web",
+   "app": "venue-management-web",
    "route": "/commercial/dynamic-pricing-automation-policy-control-adm-096",
-   "component": "apps/ticvai-web/src/routes/commercial/DynamicPricingAutomationPolicyControl.tsx",
+   "component": "apps/venue-management-web/src/routes/commercial/DynamicPricingAutomationPolicyControl.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1771,6 +1828,7 @@
     }
    ]
   },
+  "notes": "**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: \"they are venue screens\"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.",
   "density": "compact",
   "purposeNote": "authorized boundaries into the central governance process.",
   "pattern": "configEditor",
@@ -1902,7 +1960,7 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-096",
+   "board": "wireframes/P08 Venue Management.dc.html#adm-096",
    "workshopBoard": "wireframes/WS99 Pricing   Revenue Management Board 5.dc.html#adm-096"
   },
   "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 87. 0 of 0 labels bound to a contract property; 15 of 41 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
@@ -1944,25 +2002,24 @@
    }
   ],
   "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
+   "code": "P08",
+   "audience": "staff",
    "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
    "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
+   "app": "venue-management-web",
+   "operator": "venue",
    "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
     "shell": "web",
     "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
+     "P12",
+     "P13",
+     "P16"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
     "decided": "10 September 2026"
    }
   }
@@ -1980,9 +2037,9 @@
    "page": 89
   },
   "implementation": {
-   "app": "ticvai-web",
+   "app": "venue-management-web",
    "route": "/commercial/rule-priority-conflict-resolution-dynamic-pricing-test-c-adm-097",
-   "component": "apps/ticvai-web/src/routes/commercial/RulePriorityConflictResolutionDynamicPricingTest.tsx",
+   "component": "apps/venue-management-web/src/routes/commercial/RulePriorityConflictResolutionDynamicPricingTest.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1990,7 +2047,8 @@
     "ADM-088"
    ],
    "exitTo": [
-    "ADM-088"
+    "ADM-088",
+    "BO-441"
    ],
    "inferred": false,
    "notes": "**Reached from ADM-088, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
@@ -1999,14 +2057,20 @@
      "to": "ADM-088",
      "trigger": "Dynamic Pricing Strategy Command Center",
      "provenance": "derived — ADM-088 declares entryState.params strategyId and ADM-097 holds none of them. The edge carries nothing: ADM-097 is opened from ADM-088, so this edge is the way back and ADM-088 keeps its own state"
+    },
+    {
+     "to": "BO-441",
+     "trigger": "Open Price Priority & Conflict Rules",
+     "provenance": "merged into BO-441 2 October 2026 (CHG-MOV-002)"
     }
    ]
   },
+  "notes": "**Merged into BO-441 Price Priority & Conflict Rules** (decided 2 October 2026, Chinmay: DEC-100 and the pre-apply round, \"duplicate screens: merge as proposed\"; CHG-MOV-002). On one platform it declared the same operations as BO-441 (check-screen-wiring S-DUP-SCREEN). **One implementation, both ids kept**, as the M24-03 merges do: this id stays for traceability and routes to BO-441, and nothing on it is built separately.\n\n**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: \"they are venue screens\"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.",
   "density": "compact",
   "purposeNote": "For any configured commercial scenario, TICVAI can deterministically calculate, test, and explain the final dynamic price before the strategy is activated. Board 5 — Final Screen Register # Backend Screen Primary Responsibility 10.5. Dynamic Pricing Strategy Command Center Strategy portfolio 1 10.5. Strategy master",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Identify; Show) and no metric row",
-  "purpose": "Determine the final dynamic price when multiple strategies and rules are simultaneously applicable. This is the final and most important control screen of Board 5.",
+  "purpose": "Determine the final dynamic price when multiple strategies and rules are simultaneously applicable. This is the final and most important control screen of Board 5. (merged into BO-441 Price Priority & Conflict Rules).",
   "layout": {
    "template": "split",
    "regions": [
@@ -2018,49 +2082,42 @@
        "kind": "metricTile",
        "label": "Contradictory rules",
        "bindsTo": "RulePriorityConflictResolutionDynamicPricingTestConsSummary.contradictoryRules",
-       "operation": "listRulePriorityConflict",
        "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
       },
       {
        "kind": "metricTile",
        "label": "Same priority",
        "bindsTo": "RulePriorityConflictResolutionDynamicPricingTestConsSummary.samePriority",
-       "operation": "listRulePriorityConflict",
        "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
       },
       {
        "kind": "metricTile",
        "label": "Impossible condition",
        "bindsTo": "RulePriorityConflictResolutionDynamicPricingTestConsSummary.impossibleCondition",
-       "operation": "listRulePriorityConflict",
        "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
       },
       {
        "kind": "metricTile",
        "label": "Overlapping strategy",
        "bindsTo": "RulePriorityConflictResolutionDynamicPricingTestConsSummary.overlappingStrategy",
-       "operation": "listRulePriorityConflict",
        "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
       },
       {
        "kind": "metricTile",
        "label": "Circular dependency",
        "bindsTo": "RulePriorityConflictResolutionDynamicPricingTestConsSummary.circularDependency",
-       "operation": "listRulePriorityConflict",
        "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
       },
       {
        "kind": "metricTile",
        "label": "Missing fallback",
        "bindsTo": "RulePriorityConflictResolutionDynamicPricingTestConsSummary.missingFallback",
-       "operation": "listRulePriorityConflict",
        "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
       },
       {
        "kind": "metricTile",
        "label": "Guardrail conflict",
        "bindsTo": "RulePriorityConflictResolutionDynamicPricingTestConsSummary.guardrailConflict",
-       "operation": "listRulePriorityConflict",
        "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
       }
      ]
@@ -2076,7 +2133,6 @@
         "RulePriorityConflictResolutionDynamicPricingTestConsView.calculationPath"
        ],
        "bindsTo": "RulePriorityConflictResolutionDynamicPricingTestConsView",
-       "operation": "listRulePriorityConflict",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 89 §Identify"
       }
      ]
@@ -2104,25 +2160,21 @@
       {
        "kind": "primaryButton",
        "label": "Most Specific Rule Wins",
-       "operation": "setRulePriorityConflict",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 89 §Support"
       },
       {
        "kind": "destructiveButton",
        "label": "Stop Processing",
-       "operation": "setRulePriorityConflict",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 89 §Support"
       },
       {
        "kind": "primaryButton",
        "label": "Run Test",
-       "operation": "setRulePriorityConflict",
        "provenance": "contract catalogue.yaml PUT /rule-priority-conflict (decided 29 September, readiness close-out)"
       },
       {
        "kind": "secondaryButton",
        "label": "Save Case",
-       "operation": "setRulePriorityConflict",
        "provenance": "contract catalogue.yaml PUT /rule-priority-conflict (decided 29 September, readiness close-out)"
       }
      ]
@@ -2143,22 +2195,9 @@
    "error": "Could not load. Names which read failed and leaves the rule priority conflict untouched.",
    "emptyFirstRun": "No rule priority conflict yet. Carries the create action; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the rule priority conflict are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks the permission BO-441 Price Priority & Conflict Rules requires; this id has no operation of its own since the merge, so it names that screen's."
   },
-  "apis": [
-   {
-    "operationId": "listRulePriorityConflict",
-    "contract": "catalogue",
-    "purpose": "Rule Priority, Conflict Resolution & Dynamic Pricing Test Console",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "setRulePriorityConflict",
-    "contract": "catalogue",
-    "purpose": "Reorder, validate, test or save the pricing rule priority",
-    "trigger": "onAction"
-   }
-  ],
+  "apis": [],
   "entryState": {
    "preloaded": [
     "RulePriorityConflictResolutionDynamicPricingTestConsSummary.contradictoryRules",
@@ -2172,30 +2211,29 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-097",
+   "board": "wireframes/P08 Venue Management.dc.html#adm-097",
    "workshopBoard": "wireframes/WS99 Pricing   Revenue Management Board 5.dc.html#adm-097"
   },
-  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 89. 8 of 8 labels bound to a contract property; 10 of 143 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "No operations of its own since 2 October 2026 (CHG-MOV-002): merged into BO-441 Price Priority & Conflict Rules, whose operations it routes to (listRulePriorityConflict, setRulePriorityConflict).",
   "_platform": {
-   "code": "P09",
-   "audience": "platformAdmin",
+   "code": "P08",
+   "audience": "staff",
    "formFactor": "web",
-   "shortName": "TICVAI Web",
-   "name": "TICVAI Web — Platform Console",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
    "offlineCapable": false,
-   "app": "ticvai-web",
-   "operator": "ticvai",
+   "app": "venue-management-web",
+   "operator": "venue",
    "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
     "shell": "web",
     "siblings": [
-     "P10",
-     "P11",
-     "P14",
-     "P17"
+     "P12",
+     "P13",
+     "P16"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
     "decided": "10 September 2026"
    }
   }

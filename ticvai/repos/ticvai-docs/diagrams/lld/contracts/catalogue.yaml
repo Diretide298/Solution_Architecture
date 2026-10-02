@@ -1,5 +1,5 @@
 id: LLD-catalogue
-title: catalogue — 241 operations
+title: catalogue — 245 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: spine
@@ -123,6 +123,16 @@ operations:
   - cache:idempotency
   - catalogue.price_list
   - catalogue.product_version
+- operation: bulkUpdateCatalogueProducts
+  verb: POST
+  path: /products/bulk-update
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: cancelPerformance
   verb: POST
   path: /performances/{performanceId}/cancel
@@ -256,24 +266,6 @@ operations:
   writes:
   - cache:idempotency
   - catalogue.price_list
-- operation: createBulkProductCatalogue
-  verb: POST
-  path: /bulk-product-catalogue
-  scope: venue
-  permission: PRODUCT_CONFIGURE
-  audience:
-  - staff
-  offline: false
-  reads:
-  - cache:idempotency
-  - catalogue.import_job
-  - catalogue.product
-  writes:
-  - cache:idempotency
-  - catalogue.audit_entry
-  - catalogue.import_job
-  - catalogue.product
-  - catalogue.variant
 - operation: createChannelCapacity
   verb: POST
   path: /channel-capacities
@@ -582,6 +574,17 @@ operations:
   offline: false
   reads:
   - catalogue.event
+  writes: []
+- operation: getEventChangeTreatmentPolicy
+  verb: GET
+  path: /venues/{venueId}/event-change-treatment-policy
+  scope: venue
+  permission: PERFORMANCE_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - catalogue.event_change_treatment_policy
   writes: []
 - operation: getEventResourcePlan
   verb: GET
@@ -1754,6 +1757,16 @@ operations:
   - catalogue.price_list
   - catalogue.price_list_version
   writes: []
+- operation: listProductApprovalWorkflows
+  verb: GET
+  path: /product-approval-workflows
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: listProductCategories
   verb: GET
   path: /product-categories
@@ -2085,6 +2098,17 @@ operations:
   - pricing.dynamic_price_action
   - pricing.dynamic_price_condition
   - pricing.dynamic_price_rule
+  writes: []
+- operation: listSeatPricingRules
+  verb: GET
+  path: /seat-pricing-rules
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - catalogue.seat_pricing_rule
   writes: []
 - operation: listSignalDataQuality
   verb: GET
@@ -2710,6 +2734,17 @@ operations:
   - cache:idempotency
   - catalogue.audit_entry
   - catalogue.dynamic_pricing_strategy
+- operation: setEntitlementTemplateBlackoutDates
+  verb: PUT
+  path: /entitlement-templates/{templateId}/blackout-dates
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - catalogue.entitlement_template
+  writes: []
 - operation: setEventCapacityProfile
   verb: PUT
   path: /events/{eventId}/capacity-profile
@@ -2722,6 +2757,18 @@ operations:
   - catalogue.event_capacity_profile
   writes:
   - catalogue.event_capacity_profile
+- operation: setEventChangeTreatmentPolicy
+  verb: PUT
+  path: /venues/{venueId}/event-change-treatment-policy
+  scope: venue
+  permission: PERFORMANCE_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - catalogue.event_change_treatment_policy
+  writes:
+  - catalogue.event_change_treatment_policy
 - operation: setEventLifecycleState
   verb: POST
   path: /events/{eventId}/lifecycle
@@ -3012,24 +3059,6 @@ operations:
   - cache:idempotency
   - catalogue.audit_entry
   - catalogue.price_ladder
-- operation: setPriceListMaster
-  verb: PUT
-  path: /price-list-master
-  scope: venue
-  permission: PRODUCT_CONFIGURE
-  audience:
-  - staff
-  offline: false
-  reads:
-  - cache:idempotency
-  - catalogue.price_category
-  - catalogue.price_list
-  - catalogue.price_resolution_policy
-  - catalogue.rounding_profile
-  writes:
-  - cache:idempotency
-  - catalogue.audit_entry
-  - catalogue.price_list
 - operation: setPrices
   verb: PUT
   path: /price-lists/{priceListId}/prices
@@ -3219,25 +3248,6 @@ operations:
   - cache:idempotency
   - catalogue.audit_entry
   - catalogue.price_assignment
-- operation: setRateStructure
-  verb: PUT
-  path: /rate-structure
-  scope: venue
-  permission: PRODUCT_CONFIGURE
-  audience:
-  - staff
-  offline: false
-  reads:
-  - cache:idempotency
-  - catalogue.price
-  - catalogue.price_category
-  - catalogue.price_list
-  - catalogue.rate
-  - catalogue.rounding_profile
-  writes:
-  - cache:idempotency
-  - catalogue.audit_entry
-  - catalogue.rate
 - operation: setRulePriorityConflict
   verb: PUT
   path: /rule-priority-conflict
@@ -3260,6 +3270,18 @@ operations:
   - catalogue.price_resolution_policy
   - catalogue.pricing_test_case
   - pricing.dynamic_price_rule
+- operation: setSeatPricingRule
+  verb: PUT
+  path: /seat-pricing-rules/{ruleId}
+  scope: venue
+  permission: PRICE_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - catalogue.seat_pricing_rule
+  writes:
+  - catalogue.seat_pricing_rule
 - operation: setSignalRegistryPolicy
   verb: PUT
   path: /signal-registry

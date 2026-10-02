@@ -76,6 +76,11 @@
     "required": null
    },
    {
+    "name": "chargeable",
+    "in": "query",
+    "required": null
+   },
+   {
     "name": null,
     "in": null,
     "required": null
@@ -89,45 +94,25 @@
   "requestBody": null,
   "responds": "Page"
  },
- "listOrders": {
+ "listMyOrders": {
   "method": "GET",
-  "path": "/orders",
+  "path": "/my/orders",
   "contract": "orders",
-  "summary": "List orders",
-  "permission": "ORDER_VIEW",
-  "offlineCapable": true,
+  "summary": "The orders this guest placed",
+  "permission": null,
+  "offlineCapable": false,
   "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
+  "scopeLevel": "tenant",
   "parameters": [
    {
-    "name": "venueId",
-    "in": "query",
+    "name": null,
+    "in": null,
     "required": null
    },
    {
-    "name": "principalId",
+    "name": "since",
     "in": "query",
-    "required": null
-   },
-   {
-    "name": "shiftId",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "status",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "createdFrom",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "createdTo",
-    "in": "query",
-    "required": null
+    "required": false
    },
    {
     "name": null,

@@ -18,24 +18,67 @@
   "requestBody": null,
   "responds": "AccreditationProgramme"
  },
- "createAccreditationProgramme": {
-  "method": "POST",
-  "path": "/accreditation-programmes",
+ "listAccessProfiles": {
+  "method": "GET",
+  "path": "/accreditation-access-profiles",
   "contract": "accreditation",
-  "summary": "Define a programme, its categories and its window",
-  "permission": "ACCREDITATION_CONFIGURE",
+  "summary": "Named bundles of zones, dates and times",
+  "permission": "ACCREDITATION_VIEW",
   "offlineCapable": null,
-  "conflictPolicy": "serverWins",
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "AccessProfile"
+ },
+ "listAccreditationDocuments": {
+  "method": "GET",
+  "path": "/accreditation-documents",
+  "contract": "accreditation",
+  "summary": "Documents supplied, by holder, application, requirement or state",
+  "permission": "ACCREDITATION_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": "applicationId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "holderId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "requirementCode",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "expiringWithinDays",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": null,
     "in": null,
     "required": null
    }
   ],
-  "requestBody": "AccreditationProgramme",
-  "responds": "AccreditationProgramme"
+  "requestBody": null,
+  "responds": "Page"
  },
  "listAccreditationHolders": {
   "method": "GET",
@@ -70,6 +113,25 @@
   ],
   "requestBody": null,
   "responds": "AccreditationHolder"
+ },
+ "listAccreditationProgrammes": {
+  "method": "GET",
+  "path": "/accreditation-programmes",
+  "contract": "accreditation",
+  "summary": "Programmes, their categories and their applicant types",
+  "permission": "ACCREDITATION_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "isTemplate",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AccreditationProgramme"
  },
  "renewAccreditation": {
   "method": "POST",
@@ -146,5 +208,24 @@
   ],
   "requestBody": "AccreditationValidity",
   "responds": "AccreditationValidity"
+ },
+ "updateAccreditationProgramme": {
+  "method": "PUT",
+  "path": "/accreditation-programmes/{programmeId}",
+  "contract": "accreditation",
+  "summary": "Amend a programme, link its registration form, or mark it a template",
+  "permission": "ACCREDITATION_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AccreditationProgramme",
+  "responds": "AccreditationProgramme"
  }
 }

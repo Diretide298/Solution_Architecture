@@ -1167,14 +1167,9 @@
   "density": "compact",
   "purposeNote": "Sharing, export and subscription cannot be used to bypass the underlying TICVAI permission model.",
   "pattern": "listDetail",
-  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "patternReason": "`listAuthorisationPolicies` reads the population and the selected policy is edited in place — list, select, act. Chosen 2 October 2026 (CHG-SOT-013); the pack gave no directory.",
   "purpose": "Provide centralized security for reports, dashboards and analytical information. The matrix specifically requires reporting access based on group rights, operating-area rights and user access rights.",
   "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
-    "source": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 47"
-   },
    {
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
@@ -1186,12 +1181,93 @@
    "regions": [
     {
      "name": "contentBody",
+     "slot": "collection",
      "components": [
       {
+       "kind": "selectField",
+       "label": "Status",
+       "operation": "listAuthorisationPolicies",
+       "notes": "Sends `?status=`: draft, pending approval, active, suspended or retired.",
+       "provenance": "contract identity.yaml GET /authorisation-policies"
+      },
+      {
        "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listAuthorisationPolicies",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "label": "Who may see which reports",
+       "bindsTo": "AuthorisationPolicy",
+       "columns": [
+        "AuthorisationPolicy.name",
+        "AuthorisationPolicy.effect",
+        "AuthorisationPolicy.permissions",
+        "AuthorisationPolicy.appliesToRoleIds",
+        "AuthorisationPolicy.scopePath",
+        "AuthorisationPolicy.status",
+        "AuthorisationPolicy.effectiveFrom"
+       ],
+       "operation": "listAuthorisationPolicies",
+       "notes": "The policies whose permissions include a reporting permission (`REPORT_*`). Roles and scopes are shown by name (group rights, operating-area rights, user rights), never as ids. **Cursor pagination, never offset.**",
+       "provenance": "contract identity.yaml GET /authorisation-policies; correction applied 2 October 2026 (CHG-SOT-013)"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected access policy",
+       "bindsTo": "AuthorisationPolicy",
+       "columns": [
+        "AuthorisationPolicy.code",
+        "AuthorisationPolicy.name",
+        "AuthorisationPolicy.description",
+        "AuthorisationPolicy.effect",
+        "AuthorisationPolicy.permissions",
+        "AuthorisationPolicy.conditions",
+        "AuthorisationPolicy.combining",
+        "AuthorisationPolicy.priority",
+        "AuthorisationPolicy.appliesToRoleIds",
+        "AuthorisationPolicy.scopePath",
+        "AuthorisationPolicy.status",
+        "AuthorisationPolicy.version",
+        "AuthorisationPolicy.effectiveFrom",
+        "AuthorisationPolicy.effectiveTo"
+       ],
+       "operation": "listAuthorisationPolicies",
+       "provenance": "contract identity.yaml GET /authorisation-policies"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Sharing and export rules",
+       "bindsTo": "AnalyticsGovernancePolicy",
+       "columns": [
+        "AnalyticsGovernancePolicy.sharing",
+        "AnalyticsGovernancePolicy.export",
+        "AnalyticsGovernancePolicy.masking"
+       ],
+       "operation": "getAnalyticsGovernancePolicy",
+       "notes": "Read-only here; edited on ANL-070 by holders of `REPORT_GOVERNANCE_MANAGE` (DEC-225, CHG-FUP-007). **Sharing, export and subscription cannot bypass the permission model** (the pack's acceptance condition).",
+       "provenance": "contract reporting.yaml GET /analytics-governance-policy (CHG-CSA-021)"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "New access policy",
+       "operation": "createAuthorisationPolicy",
+       "notes": "Created as a draft; it applies only once activated (`setAuthorisationPolicyState`, on the role and policy screens).",
+       "provenance": "contract identity.yaml POST /authorisation-policies"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save access policy",
+       "operation": "updateAuthorisationPolicy",
+       "notes": "Writes a new version of the selected policy.",
+       "provenance": "contract identity.yaml PUT /authorisation-policies/{policyId}"
       }
      ]
     }
@@ -1200,17 +1276,44 @@
   "states": {
    "loading": "The report access sharing list.",
    "error": "Could not load. Names which read failed and leaves the report access sharing untouched.",
-   "emptyFirstRun": "No report access sharing yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the report access sharing are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No report access policy yet: reports follow the roles' own reporting permissions alone. Offers New access policy (`createAuthorisationPolicy`) to narrow or widen that by group, operating area or user; distinct from a filter that matched nothing.",
+   "emptyNoResults": "Nothing matches the status filter, and the access policies are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `PERMISSION_VIEW`, which `listAuthorisationPolicies` requires, and names that permission. **Never an empty table** — that reads as *there is no data*."
   },
   "apis": [
    {
     "operationId": "listAuthorisationPolicies",
     "contract": "identity",
-    "purpose": "Who may see which report",
+    "purpose": "Who may see which report: the policies that speak to reporting permissions",
     "trigger": "onLoad",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "createAuthorisationPolicy",
+    "contract": "identity",
+    "purpose": "A new report access policy, as a draft",
+    "trigger": "onAction",
+    "invalidates": [
+     "listAuthorisationPolicies"
+    ],
+    "provenance": "design-notes correction ANL-047, 2 October 2026 (CHG-SOT-013)"
+   },
+   {
+    "operationId": "updateAuthorisationPolicy",
+    "contract": "identity",
+    "purpose": "A new version of a report access policy",
+    "trigger": "onAction",
+    "invalidates": [
+     "listAuthorisationPolicies"
+    ],
+    "provenance": "design-notes correction ANL-047, 2 October 2026 (CHG-SOT-013)"
+   },
+   {
+    "operationId": "getAnalyticsGovernancePolicy",
+    "contract": "reporting",
+    "purpose": "The sharing and export rules that apply to every report",
+    "trigger": "onLoad",
+    "provenance": "decided 2 October 2026 (DEC-225, CHG-CSA-021); bound by CHG-SOT-009"
    }
   ],
   "wireframe": {
@@ -1219,6 +1322,74 @@
    "workshopBoard": "wireframes/WS175 Unified BI Reporting and AI Analytics Platform Board 4.dc.html#anl-047"
   },
   "apisNote": "Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf page 47. 0 of 0 labels bound to a contract property; 0 of 22 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formCreateAuthorisationPolicy",
+    "component": "drawer",
+    "trigger": "New access policy",
+    "body": "**Collects what `createAuthorisationPolicy` sends.** Required: `code`, `name`, `effect` (permit or deny; deny wins). Optional: `description`, `permissions` (the reporting permissions it speaks to), `conditions`, `combining`, `priority`, `scopePath` (the operating area), `appliesToRoleIds` (the groups), `effectiveFrom`, `effectiveTo`. Never `id`, `status` or `version`: the server sets them. Dismissing sends nothing.",
+    "bindsTo": "AuthorisationPolicy",
+    "confirm": {
+     "label": "Create access policy",
+     "operation": "createAuthorisationPolicy"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "code",
+      "name",
+      "effect",
+      "description",
+      "permissions",
+      "conditions",
+      "combining",
+      "priority",
+      "scopePath",
+      "appliesToRoleIds",
+      "effectiveFrom",
+      "effectiveTo"
+     ]
+    },
+    "provenance": "contract identity.yaml POST /authorisation-policies"
+   },
+   {
+    "id": "formUpdateAuthorisationPolicy",
+    "component": "drawer",
+    "trigger": "Save access policy",
+    "body": "**The selected policy, editable.** The same fields as creating one; saving writes a new version and the panel shows it. Dismissing sends nothing.",
+    "bindsTo": "AuthorisationPolicy",
+    "confirm": {
+     "label": "Save access policy",
+     "operation": "updateAuthorisationPolicy"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "name",
+      "effect",
+      "description",
+      "permissions",
+      "conditions",
+      "combining",
+      "priority",
+      "scopePath",
+      "appliesToRoleIds",
+      "effectiveFrom",
+      "effectiveTo"
+     ]
+    },
+    "provenance": "contract identity.yaml PUT /authorisation-policies/{policyId}"
+   }
+  ],
+  "permission": "PERMISSION_VIEW",
+  "entryState": {
+   "params": [
+    {
+     "name": "policyId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P16",
    "formFactor": "web",
@@ -1763,20 +1934,10 @@
   "states": {
    "loading": "The retention archive governance configuration as saved.",
    "error": "Could not load. Names which read failed and leaves the retention archive governance untouched.",
-   "emptyFirstRun": "No retention archive governance configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyFirstRun": "No retention archive governance configured yet. Offers no create action — this screen declares no operation that makes one and says what the platform does in the meantime.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
-   {
-    "operationId": "setApprovalRetentionPolicy",
-    "contract": "approvals",
-    "purpose": "Retention and archive",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026",
-    "invalidates": [
-     "getApprovalRecord"
-    ]
-   },
    {
     "operationId": "listDataRetentionSettings",
     "contract": "tenancy",
@@ -1806,6 +1967,14 @@
     }
    ]
   },
+  "gaps": [
+   {
+    "operation": "setApprovalRetentionPolicy",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-021): setApprovalRetentionPolicy on the analytics retention screen; approval decision records are not reports, and ADM-346 keeps the operation (design-notes correction platform-foundation ANL-050).",
+    "source": "contracts/spine/approvals.yaml#setApprovalRetentionPolicy"
+   }
+  ],
   "_platform": {
    "code": "P16",
    "formFactor": "web",

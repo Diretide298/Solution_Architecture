@@ -37,55 +37,6 @@
   "requestBody": null,
   "responds": "CampaignPromotionPerformanceExplorerView"
  },
- "listChannelCustomerSegment": {
-  "method": "GET",
-  "path": "/channel-customer-segment",
-  "contract": "catalogue",
-  "summary": "Channel, Customer Segment & Location Dynamic Rules",
-  "permission": "PRODUCT_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "dimension",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "strategyId",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "channel",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "customerSegment",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "locationLevel",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- },
  "listCommercialCampaigns": {
   "method": "GET",
   "path": "/commercial-campaigns",

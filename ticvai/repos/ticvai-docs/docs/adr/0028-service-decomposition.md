@@ -10,6 +10,26 @@ rather than once per cell.
 
 ---
 
+## Amended 2 October 2026: F&B owns its own catalogue, so ticketing scales on its own
+
+**Decided by Chinmay, 2 October 2026** (DEC-034 in `docs/registers/decisions-2-october.md`, the BO-045
+question; change entry CHG-DOC-009). *"The split was deliberate, so the ticketing service can scale on its
+own."*
+
+**F&B prices are owned by the F&B module.** F&B has its own catalogue table: F&B prices were migrated into
+F&B, an outlet prices from it, and an outlet may set its own price. **The central catalogue (Catalogue,
+in the `commerce` deployable since ADR-0055) prices tickets and single-price booths only.** The reason is the
+deployment shape: an F&B sale reads no central catalogue row, so the sale path of tickets (Catalogue and
+Order) scales on ticket traffic alone and is not loaded by two F&B rush hours a day, and F&B (in
+`operations`) can change its menus and prices without a release of the ticketing core.
+
+This narrows the "splitting by module" alternative below: the central catalogue is still written by
+ticketing and retail, and F&B now keeps its prices out of it. The F&B contract text that said "pricing and
+tax come from the catalogue variant" is stale and is corrected in `contracts/satellite/fnb.yaml` by its
+owner, and the F&B screens read F&B's catalogue (BO-045, POS-021).
+
+---
+
 ## Amended 30 September 2026 by ADR-0055
 
 **The module map below stands. Two things in this ADR no longer hold.**

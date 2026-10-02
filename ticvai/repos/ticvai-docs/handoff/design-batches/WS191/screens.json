@@ -97,6 +97,17 @@
     "operation": null,
     "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
     "source": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 62 §Display"
+   },
+   {
+    "operation": "setWalletChannelRules",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-025): A command centre declared only the channel-rules write (setWalletChannelRules), which its children BO-1134 to BO-1140 own; usage needs a read of transactions by channel, recorded as a contract gap (design-notes correction ticketing-backoffice BO-1133)",
+    "source": "contracts/satellite/wallet.yaml#setWalletChannelRules"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-027): A venue read of wallet usage and transactions aggregated by channel and touchpoint (listWalletTransactions is per wallet).",
+    "source": "contracts/satellite/wallet.yaml#setWalletChannelRules | screens/P08-venue-back-office.yaml#BO-1133"
    }
   ],
   "layout": {
@@ -195,22 +206,11 @@
   "states": {
    "loading": "The wallet usage channel list.",
    "error": "Could not load. Names which read failed and leaves the wallet usage channel untouched.",
-   "emptyFirstRun": "No wallet usage channel yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No wallet usage channel yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the wallet usage channel are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Not shown: nothing on this screen needs a permission of its own; the app's sign-in decides access."
   },
-  "apis": [
-   {
-    "operationId": "setWalletChannelRules",
-    "contract": "wallet",
-    "purpose": "Where wallets are accepted",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026",
-    "invalidates": [
-     "getWalletFundingRules"
-    ]
-   }
-  ],
+  "apis": [],
   "entryState": {
    "preloaded": [
     "Wallet Transactions Today",
@@ -475,6 +475,13 @@
    "workshopBoard": "wireframes/WS191 Wallet Configuration Backend Structure v1.0 Board 6.dc.html#bo-1134"
   },
   "apisNote": "Regenerated 9 September 2026 from Wallet_Configuration_Backend_Structure_v1.0.pdf page 63. 0 of 0 labels bound to a contract property; 32 of 38 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-027): A read (get or list) of the wallet channel rules that setWalletChannelRules writes.",
+    "source": "contracts/satellite/wallet.yaml#setWalletChannelRules | screens/P08-venue-back-office.yaml#BO-1134"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -653,6 +660,13 @@
    "workshopBoard": "wireframes/WS191 Wallet Configuration Backend Structure v1.0 Board 6.dc.html#bo-1135"
   },
   "apisNote": "Regenerated 9 September 2026 from Wallet_Configuration_Backend_Structure_v1.0.pdf page 64. 0 of 0 labels bound to a contract property; 16 of 34 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-027): A read (get or list) of the wallet channel rules that setWalletChannelRules writes.",
+    "source": "contracts/satellite/wallet.yaml#setWalletChannelRules | screens/P08-venue-back-office.yaml#BO-1135"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -877,6 +891,13 @@
    "workshopBoard": "wireframes/WS191 Wallet Configuration Backend Structure v1.0 Board 6.dc.html#bo-1136"
   },
   "apisNote": "Regenerated 9 September 2026 from Wallet_Configuration_Backend_Structure_v1.0.pdf page 65. 0 of 0 labels bound to a contract property; 24 of 34 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** RFID Card, NFC Card, Mobile Wallet Credential, Digital Key are choices sent by `setWalletChannelRules` (allowedCredentialKinds rfid|nfc|mobileApp|digitalKey); Hotel Key, Event Badge are choices sent by `setWalletChannelRules` (field gap: extend credential kind enum with hotelKey|eventBadge).",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-027): A read (get or list) of the wallet channel rules that setWalletChannelRules writes.",
+    "source": "contracts/satellite/wallet.yaml#setWalletChannelRules | screens/P08-venue-back-office.yaml#BO-1136"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1095,6 +1116,13 @@
    "workshopBoard": "wireframes/WS191 Wallet Configuration Backend Structure v1.0 Board 6.dc.html#bo-1137"
   },
   "apisNote": "Regenerated 9 September 2026 from Wallet_Configuration_Backend_Structure_v1.0.pdf page 66. 0 of 0 labels bound to a contract property; 24 of 44 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-027): A read (get or list) of the credentials linked to a wallet that linkWalletCredential writes.",
+    "source": "contracts/satellite/wallet.yaml#linkWalletCredential | screens/P08-venue-back-office.yaml#BO-1137"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1248,6 +1276,13 @@
    "workshopBoard": "wireframes/WS191 Wallet Configuration Backend Structure v1.0 Board 6.dc.html#bo-1138"
   },
   "apisNote": "Regenerated 9 September 2026 from Wallet_Configuration_Backend_Structure_v1.0.pdf page 67. 0 of 0 labels bound to a contract property; 11 of 45 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-027): A read (get or list) of the wallet channel rules that setWalletChannelRules writes.",
+    "source": "contracts/satellite/wallet.yaml#setWalletChannelRules | screens/P08-venue-back-office.yaml#BO-1138"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1434,6 +1469,13 @@
    "workshopBoard": "wireframes/WS191 Wallet Configuration Backend Structure v1.0 Board 6.dc.html#bo-1139"
   },
   "apisNote": "Regenerated 9 September 2026 from Wallet_Configuration_Backend_Structure_v1.0.pdf page 68. 0 of 0 labels bound to a contract property; 14 of 33 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** still owed by a contract change: `setWalletAuthenticationPolicy`.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-027): A read (get or list) of the wallet channel rules and authentication policy that setWalletChannelRules and setWalletAuthenticationPolicy writes.",
+    "source": "contracts/satellite/wallet.yaml#setWalletChannelRules | contracts/satellite/wallet.yaml#setWalletAuthenticationPolicy | screens/P08-venue-back-office.yaml#BO-1139"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1632,6 +1674,13 @@
    "workshopBoard": "wireframes/WS191 Wallet Configuration Backend Structure v1.0 Board 6.dc.html#bo-1140"
   },
   "apisNote": "Regenerated 9 September 2026 from Wallet_Configuration_Backend_Structure_v1.0.pdf page 69. 0 of 0 labels bound to a contract property; 20 of 39 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-027): A read (get or list) of the wallet channel rules that setWalletChannelRules writes.",
+    "source": "contracts/satellite/wallet.yaml#setWalletChannelRules | screens/P08-venue-back-office.yaml#BO-1140"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",

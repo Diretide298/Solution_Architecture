@@ -12,7 +12,7 @@
 | Question | Who | Where it is asked |
 |---|---|---|
 | Which services does the 99.99% commitment cover? Does the client accept the SLO per tier below (99.99% for venue operations locally, 99.95% for cloud commerce)? | The client | Drafted in the client email of 30 September, item 3. **Not yet in the Decisions Register** |
-| Does the client accept the cost of zone-redundant HA for every tenant (the cost workbook's HA sheet, about $8,050 a month for a production cell, against about $4,530 without HA)? | The client | Not yet in the Decisions Register |
+| Does the client accept the cost of zone-redundant HA for every tenant (the cost workbook's HA sheet, about $8,050 a month for a production cell, against about $5,550 without HA, re-priced 1 October)? | The client | In the Decisions Register (1 October) |
 | One production HA mode for PostgreSQL: the Terraform sets `SameZone` for the shared tier and `ZoneRedundant` only for dedicated and isolated tiers; the LLD promises zone-redundant for production. This ADR proposes zone-redundant for every production tenant | Chinmay | LLD open point (`docs/active/infra-answers-30-september.md` section 2) |
 | Access to UAE Central for the DR module (access-restricted; needs a support request) | Dinesh, with Azure support | — |
 

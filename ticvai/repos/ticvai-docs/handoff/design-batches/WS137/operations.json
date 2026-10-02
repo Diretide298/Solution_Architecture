@@ -214,6 +214,19 @@
   "requestBody": null,
   "responds": "SegmentPreview"
  },
+ "previewSegmentDraft": {
+  "method": "POST",
+  "path": "/segments/preview",
+  "contract": "marketing-crm",
+  "summary": "Estimate an unsaved segment's size and reachability",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": "CreateSegmentRequest",
+  "responds": "SegmentDraftPreview"
+ },
  "proposeLookalikeSegment": {
   "method": "POST",
   "path": "/ai/segment-suggestions",

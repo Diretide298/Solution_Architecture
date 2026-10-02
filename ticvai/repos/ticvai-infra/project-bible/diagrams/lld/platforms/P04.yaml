@@ -1,5 +1,5 @@
 id: LLD-P04
-title: P04 Venue POS — Terminal and Tablet — 30 screens
+title: P04 Venue POS — Terminal and Tablet — 32 screens
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/00-platform.yaml
 audience: staff
@@ -20,9 +20,9 @@ deployment:
 why: null
 modulesUsed:
 - module: core
-  screens: 11
+  screens: 12
 - module: ticketing
-  screens: 10
+  screens: 11
 - module: fnb
   screens: 5
 - module: analytics
@@ -33,35 +33,35 @@ modulesUsed:
   screens: 1
 servicesCalled:
 - service: OrderService
-  operationCalls: 117
+  operationCalls: 89
 - service: CatalogueService
-  operationCalls: 31
-- service: TenancyService
-  operationCalls: 23
+  operationCalls: 26
 - service: FnbService
-  operationCalls: 22
+  operationCalls: 26
 - service: RetailService
-  operationCalls: 18
+  operationCalls: 19
+- service: TenancyService
+  operationCalls: 14
 - service: IdentityService
-  operationCalls: 10
-- service: ReportingService
-  operationCalls: 10
-- service: VenueOpsService
-  operationCalls: 6
+  operationCalls: 9
 - service: MarketingService
-  operationCalls: 6
+  operationCalls: 9
+- service: ReportingService
+  operationCalls: 7
 - service: LedgerService
-  operationCalls: 5
-- service: AccessService
-  operationCalls: 3
+  operationCalls: 6
+- service: VenueOpsService
+  operationCalls: 2
 - service: WalletService
-  operationCalls: 1
+  operationCalls: 2
+- service: AccessService
+  operationCalls: 2
 - service: InventoryService
   operationCalls: 1
 coverage:
-  screens: 30
-  inAFlow: 19
-  drawn: 30
+  screens: 32
+  inAFlow: 20
+  drawn: 32
   note: '**A screen in no flow has been specified and never walked.** Every flow written in this package
     has found a defect.'
 screens:
@@ -104,23 +104,13 @@ screens:
   wave: 1
   density: touchLarge
   operations:
-  - acceptShiftVariance
-  - adjustDepositBoxFloat
   - approveShiftOpen
-  - closeShift
-  - createCashMovement
   - getCurrentShift
-  - getShift
   - getWorkstationHealth
-  - listCashMovements
   - listDenominations
-  - listShifts
   - openShift
-  - recordNoSale
-  - reopenShift
   - resumeShift
   - selectRole
-  - suspendShift
   states:
   - denied
   - emptyFirstRun
@@ -172,16 +162,12 @@ screens:
   - createApprovalRequest
   - createOrder
   - createPayment
-  - createRefund
-  - createRetailReturn
   - createRetailSale
   - evaluateApprovalRequirement
   - evaluatePromotions
-  - exchangeOrderLines
+  - getGuestLoyalty
   - getLatestBundle
-  - getLoyaltyPosition
   - getOrder
-  - getOrderStatement
   - getProduct
   - getPromotion
   - getPromotionUsage
@@ -191,7 +177,6 @@ screens:
   - listAlternativeCodes
   - listMerchandise
   - listMyEntitlements
-  - listOrderRefunds
   - listOrders
   - listProductVariants
   - listProducts
@@ -199,15 +184,10 @@ screens:
   - listSaleBoards
   - loadGameCredits
   - lookupMerchandise
-  - modifyOrder
   - redeemLoyaltyPoints
   - reprintOrder
-  - rescheduleOrder
   - resolveProductByCode
   - resumeOrder
-  - syncOrders
-  - transferGameCard
-  - voidOrder
   states:
   - denied
   - emptyFirstRun
@@ -224,8 +204,8 @@ screens:
   - orderId<-deepLink
   - productId<-deepLink
   - promotionId<-deepLink
+  - subjectId<-session
   goesTo:
-  - BO-045
   - POS-003
   - POS-004
   - POS-005
@@ -236,7 +216,10 @@ screens:
   - POS-010
   - POS-011
   - POS-013
+  - POS-018
   - POS-020
+  - POS-030
+  - POS-031
   boardFrames:
   - Retail Board 3.dc.html#ret-3b
   - Retail Board 3.dc.html#ret-3c
@@ -266,8 +249,6 @@ screens:
   - listInventoryHolds
   - listProductVariants
   - listProducts
-  - relinquishInventoryHold
-  - renewInventoryHold
   - resolveProductByCode
   states:
   - denied
@@ -300,14 +281,10 @@ screens:
   - createOrder
   - createPayment
   - createSeatHold
-  - evaluateApprovalRequirement
-  - extendSeatHold
   - getPerformance
   - getSeatAvailability
   - getSeatHold
-  - recommendSeats
   - relinquishSeatHold
-  - updatePerformance
   states:
   - denied
   - emptyFirstRun
@@ -342,6 +319,7 @@ screens:
   - createOrder
   - createPayment
   - createRetailSale
+  - createShopAndDrop
   - enrolFaceTag
   - getRetailSale
   - inquirePaymentStatus
@@ -366,6 +344,7 @@ screens:
   - POS-010
   - POS-022
   - POS-023
+  - POS-026
   boardFrames:
   - Retail Board 3.dc.html#ret-3e
   wireframe: wireframes/P04 Venue POS.dc.html#pos-005
@@ -425,22 +404,13 @@ screens:
   density: touchLarge
   operations:
   - acceptShiftVariance
-  - adjustDepositBoxFloat
-  - approveShiftOpen
-  - closeDepositBoxes
   - closeShift
-  - createCashMovement
   - getCurrentShift
-  - getShift
+  - getShiftCountLines
   - listCashMovements
   - listDenominations
-  - listShifts
-  - openShift
-  - recordNoSale
-  - reopenShift
-  - reprintReceipt
-  - resumeShift
-  - suspendShift
+  - rejectShiftVariance
+  - submitShiftCount
   states:
   - denied
   - emptyFirstRun
@@ -450,11 +420,11 @@ screens:
   - loading
   - offline
   - pendingVariance
+  - recountRequested
   offlineState: true
   entryParams:
   - shiftId<-session
   - boxId<-session
-  - saleId<-deepLink
   goesTo:
   - POS-001
   - POS-008
@@ -475,12 +445,9 @@ screens:
   density: touchLarge
   operations:
   - askReportingQuestion
-  - deleteReport
-  - getFinancialReport
   - getReport
   - listReports
   - runReport
-  - saveNaturalLanguageQuery
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -505,22 +472,9 @@ screens:
   wave: 2
   density: touchLarge
   operations:
-  - acceptShiftVariance
-  - approveShiftOpen
-  - closeShift
-  - createRotaAssignment
-  - getCurrentShift
-  - getShift
-  - listAlerts
-  - listCashMovements
   - listRotaAssignments
   - listShifts
-  - listWorkstations
-  - openShift
-  - recordNoSale
-  - reopenShift
-  - resumeShift
-  - suspendShift
+  - recordAttendance
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -580,14 +534,11 @@ screens:
   wave: 1
   density: touchLarge
   operations:
-  - adjustDepositBoxFloat
   - createRefund
   - createRetailReturn
   - exchangeOrderLines
   - getReturnPolicy
   - issueCreditMemo
-  - listDenominations
-  - listOutlets
   - listSerialisedItems
   - lookupRetailSale
   states:
@@ -602,7 +553,6 @@ screens:
   - workstationId<-session
   - orderId<-deepLink
   - outletId<-deepLink
-  - boxId<-session
   - invoiceId<-navigation
   goesTo:
   - POS-002
@@ -622,11 +572,10 @@ screens:
   wave: 1
   density: touchLarge
   operations:
-  - adjustDepositBoxFloat
+  - collectShopAndDrop
   - getCurrentShift
-  - listDenominations
   - listOrders
-  - openShift
+  - lookupShopAndDrop
   - recordOrderHandover
   - reserveMerchandise
   states:
@@ -641,7 +590,7 @@ screens:
   - workstationId<-session
   - orderId<-deepLink
   - outletId<-deepLink
-  - boxId<-session
+  - dropId<-POS-012
   goesTo:
   - POS-001
   - POS-013
@@ -650,6 +599,8 @@ screens:
   - Retail Board 3.dc.html#ret-3h
   wireframe: wireframes/P04 Venue POS.dc.html#pos-012
   inFlows:
+  - F17 A guest buys merchandise and collects later
+  - F51 A guest shops in the venue and collects on the way out
   - F60 An online order is collected at the counter
   - F87 A till handles a return, a collection and a safe drop
 - screen: POS-013
@@ -659,14 +610,9 @@ screens:
   wave: 1
   density: touchLarge
   operations:
-  - adjustDepositBoxFloat
-  - createCashMovement
   - createOrder
-  - getOfflinePackage
-  - listCashMovements
-  - listDenominations
+  - listSyncRejections
   - syncOrders
-  - withdrawFromDepositBox
   states:
   - denied
   - emptyFirstRun
@@ -678,7 +624,6 @@ screens:
   offlineState: true
   entryParams:
   - workstationId<-session
-  - boxId<-session
   - shiftId<-session
   goesTo:
   - POS-002
@@ -689,7 +634,7 @@ screens:
   - POS Frontline Board 2.dc.html#pos-2e
   wireframe: wireframes/P04 Venue POS.dc.html#pos-013
   inFlows:
-  - F32 A till opens, trades and settles
+  - F33 A till goes offline and comes back
   - F87 A till handles a return, a collection and a safe drop
 - screen: POS-014
   name: Sales Exceptions, Controls & Operational Actions
@@ -702,6 +647,7 @@ screens:
   - recordNoSale
   - voidOrder
   states:
+  - approvalRejected
   - emptyFirstRun
   - emptyNoAccess
   - error
@@ -754,7 +700,6 @@ screens:
   - allocateDepositBox
   - configureWorkstation
   - listDevices
-  - recordDeviceHeartbeat
   - setDeviceAssignment
   states:
   - emptyFirstRun
@@ -806,9 +751,7 @@ screens:
   density: touchLarge
   operations:
   - createCashMovement
-  - createRotaAssignment
-  - listPrincipals
-  - listRotaAssignments
+  - listDepositBoxes
   - withdrawFromDepositBox
   states:
   - emptyFirstRun
@@ -824,10 +767,12 @@ screens:
   - shiftId<-deepLink
   goesTo:
   - POS-001
+  - POS-020
   boardFrames:
   - POS Board 3.dc.html#pos-3b
   wireframe: wireframes/P04 Venue POS.dc.html#pos-018
   inFlows:
+  - F32 A till opens, trades and settles
   - F73 A till is configured and its cash rules set
 - screen: POS-019
   name: Shift Templates & Policies
@@ -836,9 +781,9 @@ screens:
   wave: 1
   density: touchLarge
   operations:
-  - getVenueSettings
+  - getTillShiftPolicy
   - listShifts
-  - setVenueSettings
+  - setTillShiftPolicy
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -849,7 +794,7 @@ screens:
   offlineState: true
   entryParams:
   - workstationId<-session
-  - venueId<-deepLink
+  - venueId<-session
   goesTo:
   - POS-001
   - POS-015
@@ -901,8 +846,6 @@ screens:
   - addCartLine
   - evaluatePromotions
   - getGuestMenu
-  - listMenus
-  - listModifierGroups
   - setItemAvailability
   states:
   - denied
@@ -912,6 +855,7 @@ screens:
   - error
   - loading
   - offline
+  - soldOutByCount
   offlineState: true
   entryParams:
   - workstationId<-session
@@ -933,6 +877,7 @@ screens:
   wave: 1
   density: touchLarge
   operations:
+  - cancelFnbOrder
   - createFnbOrder
   - listKitchenTickets
   - markOrderCollected
@@ -968,7 +913,6 @@ screens:
   - addCartLine
   - createRetailSale
   - evaluatePromotions
-  - listMerchandise
   - lookupMerchandise
   states:
   - denied
@@ -997,8 +941,7 @@ screens:
   wave: 1
   density: touchLarge
   operations:
-  - listMenus
-  - listOutlets
+  - getTableMap
   - setItemAvailability
   - setTableCombinations
   - setTableLayout
@@ -1026,11 +969,13 @@ screens:
   wave: 1
   density: touchLarge
   operations:
-  - getCurrentShift
   - getWorkstationHealth
+  - getWorkstationShift
   - listAlerts
   - listDevices
   - listSaleBoards
+  - reopenShift
+  - suspendShift
   states:
   - denied
   - emptyFirstRun
@@ -1041,6 +986,7 @@ screens:
   offlineState: true
   entryParams:
   - workstationId<-session
+  - shiftId<-session
   goesTo:
   - POS-002
   - POS-006
@@ -1051,9 +997,12 @@ screens:
   - POS-027
   - POS-028
   - POS-029
+  - POS-030
+  - POS-031
   boardFrames: null
   wireframe: wireframes/P04 Venue POS.dc.html#pos-025
-  inFlows: null
+  inFlows:
+  - F81 A retail sale runs from overview to tender
 - screen: POS-026
   name: Receipt & Reprint
   module: Sell
@@ -1094,8 +1043,11 @@ screens:
   wave: 1
   density: touchLarge
   operations:
+  - getGuestLoyalty
   - identifyGuest
+  - recordConsent
   - searchGuests
+  - topUpWallet
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -1105,6 +1057,7 @@ screens:
   offlineState: true
   entryParams:
   - workstationId<-session
+  - subjectId<-navigation
   goesTo:
   - POS-002
   - POS-025
@@ -1120,12 +1073,17 @@ screens:
   operations:
   - clearTable
   - closeTableVisit
+  - createTableReservationForGuest
+  - getBill
   - getTableMap
+  - getTableVisit
   - listTableReservations
-  - mergeTableVisits
-  - moveTableVisit
   - openTableVisit
+  - requestBill
   - seatTableReservation
+  - splitBill
+  - transferTableVisit
+  - updateTableVisit
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -1153,10 +1111,7 @@ screens:
   wave: 1
   density: touchLarge
   operations:
-  - getQueue
-  - getQueueFeedHealth
   - listFnbOrders
-  - listQueueEntries
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -1167,11 +1122,85 @@ screens:
   entryParams:
   - workstationId<-session
   - outletId<-session
-  - queueId<-navigation
-  - feedId<-navigation
   goesTo:
   - POS-022
   - POS-025
   boardFrames: null
   wireframe: wireframes/P04 Venue POS.dc.html#pos-029
+  inFlows: null
+- screen: POS-030
+  name: Sales Journal
+  module: Sell
+  requiresModule: core
+  wave: 1
+  density: touchLarge
+  operations:
+  - addCartLine
+  - getOrder
+  - getTaxDocumentRendition
+  - issueTaxInvoice
+  - listOrders
+  - reprintOrder
+  - reprintReceipt
+  - searchGuests
+  states:
+  - denied
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - workstationId<-session
+  - shiftId<-session
+  - cartId<-session
+  - orderId<-navigation
+  - documentId<-navigation
+  - saleId<-navigation
+  goesTo:
+  - POS-002
+  - POS-011
+  - POS-025
+  - POS-026
+  boardFrames: null
+  wireframe: wireframes/P04 Venue POS.dc.html#pos-030
+  inFlows: null
+- screen: POS-031
+  name: Reservations & Group Arrivals
+  module: Sell
+  requiresModule: ticketing
+  wave: 1
+  density: touchLarge
+  operations:
+  - cancelReservation
+  - convertReservation
+  - createReservation
+  - extendReservation
+  - getGroupBooking
+  - getReservation
+  - listGroupArrivalCheck
+  - listReservations
+  - recordGroupCheckIn
+  states:
+  - denied
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - workstationId<-session
+  - venueId<-session
+  - cartId<-POS-002
+  - reservationId<-navigation
+  - groupBookingId<-navigation
+  goesTo:
+  - POS-005
+  - POS-025
+  boardFrames: null
+  wireframe: wireframes/P04 Venue POS.dc.html#pos-031
   inFlows: null

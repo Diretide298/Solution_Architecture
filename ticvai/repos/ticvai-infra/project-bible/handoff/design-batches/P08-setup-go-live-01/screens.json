@@ -39,7 +39,7 @@
     }
    ]
   },
-  "notes": "**Moved from P09 `ADM-428` on 11 September 2026.** Board 6 is worked by the new customer's own administrator inside their tenant, not by TICVAI; `tools/applied/apply-subscription-placement.py` records why. `ADM-428` is retired and never reissued.",
+  "notes": "**Moved from P09 `ADM-428` on 11 September 2026.** Board 6 is worked by the new customer's own administrator inside their tenant, not by TICVAI; `tools/applied/apply-subscription-placement.py` records why. `ADM-428` is retired and never reissued.\n\nThe pack's flow text (\"Initial Configuration - 42%\", arrows, board headings) is narrative, not fields; the screen tells the customer the environment is ready and hands over to AI setup (BO-595).",
   "density": "compact",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configuration Status; AI Configuration prepares; Initial Configuration Prepared) and no display directory — it is settings, not a population",
@@ -59,34 +59,10 @@
      "slot": "fields",
      "components": [
       {
-       "kind": "selectField",
-       "label": "Initial Configuration: 42%",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 80 §Configuration Status"
-      },
-      {
-       "kind": "textField",
-       "label": "Board 6 — Zero-Touch Requirement",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 80 §AI Configuration prepares"
-      },
-      {
-       "kind": "selectField",
-       "label": "↓",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 80 §Initial Configuration Prepared"
-      },
-      {
-       "kind": "textField",
-       "label": "Customer Receives “Environment Ready”",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 80 §Initial Configuration Prepared"
-      },
-      {
-       "kind": "textField",
-       "label": "Board 6 — Trial Handling",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 80 §Initial Configuration Prepared"
-      },
-      {
-       "kind": "textField",
-       "label": "Tenant Type = Trial",
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 80 §Initial Configuration Prepared"
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listTenants",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
       }
      ]
     }
@@ -95,7 +71,7 @@
   "states": {
    "loading": "The environment ready handoff configuration as saved.",
    "error": "Could not load. Names which read failed and leaves the environment ready handoff untouched.",
-   "emptyFirstRun": "No environment ready handoff configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyFirstRun": "No environment ready handoff configured yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },

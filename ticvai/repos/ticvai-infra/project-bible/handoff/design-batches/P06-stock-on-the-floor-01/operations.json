@@ -18,6 +18,44 @@
   "requestBody": null,
   "responds": "Alert"
  },
+ "cancelMerchandiseReservation": {
+  "method": "POST",
+  "path": "/merchandise-reservations/{reservationId}/cancel",
+  "contract": "retail",
+  "summary": "Release a reservation",
+  "permission": "ORDER_CREATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "collectMerchandiseReservation": {
+  "method": "POST",
+  "path": "/merchandise-reservations/{reservationId}/collect",
+  "contract": "retail",
+  "summary": "The guest picked it up",
+  "permission": "ORDER_CREATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
  "createGoodsReceipt": {
   "method": "POST",
   "path": "/goods-receipts",
@@ -113,19 +151,6 @@
   "requestBody": null,
   "responds": null
  },
- "getCountVariance": {
-  "method": "GET",
-  "path": "/stock-counts/{countId}/variance",
-  "contract": "inventory",
-  "summary": "Variance between counted and expected",
-  "permission": "PRODUCT_VIEW",
-  "offlineCapable": true,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "CountVariance"
- },
  "getDashboard": {
   "method": "GET",
   "path": "/dashboards/{dashboardId}",
@@ -202,10 +227,49 @@
     "name": "groupBy",
     "in": "query",
     "required": null
+   },
+   {
+    "name": "module",
+    "in": "query",
+    "required": null
    }
   ],
   "requestBody": null,
   "responds": "KpiValue"
+ },
+ "getOutletStock": {
+  "method": "GET",
+  "path": "/outlets/{outletId}/stock-check",
+  "contract": "retail",
+  "summary": "Stock across an outlet",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "categoryId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "lowStockFirst",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
  },
  "getStockPositions": {
   "method": "GET",
@@ -259,6 +323,25 @@
   "requestBody": null,
   "responds": "StockTransfer"
  },
+ "getSuggestedRequisitions": {
+  "method": "GET",
+  "path": "/requisitions/suggested",
+  "contract": "inventory",
+  "summary": "Draft requisitions from reorder points",
+  "permission": "PROCUREMENT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "locationId",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
  "listAlerts": {
   "method": "GET",
   "path": "/alerts",
@@ -297,6 +380,40 @@
   ],
   "requestBody": null,
   "responds": "Alert"
+ },
+ "listPurchaseOrders": {
+  "method": "GET",
+  "path": "/purchase-orders",
+  "contract": "inventory",
+  "summary": "List purchase orders",
+  "permission": "PROCUREMENT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "supplierId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
  },
  "listRequisitions": {
   "method": "GET",
@@ -344,6 +461,40 @@
   "parameters": [
    {
     "name": "serial",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listStockCounts": {
+  "method": "GET",
+  "path": "/stock-counts",
+  "contract": "inventory",
+  "summary": "List stock counts",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "locationId",
     "in": "query",
     "required": null
    },
@@ -439,6 +590,35 @@
   "requestBody": null,
   "responds": "Page"
  },
+ "listStockTransfers": {
+  "method": "GET",
+  "path": "/stock-transfers",
+  "contract": "inventory",
+  "summary": "List transfers",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "logColdChain": {
   "method": "POST",
   "path": "/food-safety/cold-chain",
@@ -511,12 +691,12 @@
   "requestBody": null,
   "responds": "PriceCheck"
  },
- "postStockCount": {
+ "receiveStockTransfer": {
   "method": "POST",
-  "path": "/stock-counts/{countId}/post",
+  "path": "/stock-transfers/{transferId}/receive",
   "contract": "inventory",
-  "summary": "Post a count and adjust stock",
-  "permission": "LEDGER_POST",
+  "summary": "Receive a transfer",
+  "permission": "PRODUCT_CONFIGURE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
@@ -528,7 +708,7 @@
    }
   ],
   "requestBody": null,
-  "responds": "StockCount"
+  "responds": "StockTransfer"
  },
  "recordWaste": {
   "method": "POST",
@@ -568,25 +748,6 @@
   "requestBody": null,
   "responds": "GoodsReceipt"
  },
- "requestRecount": {
-  "method": "POST",
-  "path": "/fnb-stock-counts/{countId}/recount",
-  "contract": "fnb",
-  "summary": "Send a line back to be counted again",
-  "permission": "PRODUCT_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "RecountResult"
- },
  "reserveMerchandise": {
   "method": "POST",
   "path": "/outlets/{outletId}/reserve",
@@ -625,30 +786,6 @@
   "requestBody": null,
   "responds": null
  },
- "setItemAvailability": {
-  "method": "PUT",
-  "path": "/menu-items/{itemId}/availability",
-  "contract": "fnb",
-  "summary": "Mark an item available or eighty-sixed",
-  "permission": "PRODUCT_CONFIGURE",
-  "offlineCapable": true,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "MenuItem"
- },
  "signCorrectiveAction": {
   "method": "POST",
   "path": "/food-safety/corrective-actions/{actionId}/sign",
@@ -686,5 +823,24 @@
   ],
   "requestBody": "StartStockCountRequest",
   "responds": "StockCount"
+ },
+ "updateRequisitionLines": {
+  "method": "PUT",
+  "path": "/requisitions/{requisitionId}/lines",
+  "contract": "inventory",
+  "summary": "Change what an outlet is asking for, before it is approved",
+  "permission": "PROCUREMENT_REQUEST",
+  "offlineCapable": true,
+  "conflictPolicy": "lastWriterWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Requisition"
  }
 }

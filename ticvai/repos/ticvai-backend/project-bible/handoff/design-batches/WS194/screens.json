@@ -443,6 +443,13 @@
    "workshopBoard": "wireframes/WS194 Wallet Configuration Backend Structure v1.0 Board 9.dc.html#bo-1164"
   },
   "apisNote": "Regenerated 9 September 2026 from Wallet_Configuration_Backend_Structure_v1.0.pdf page 103. 0 of 0 labels bound to a contract property; 23 of 48 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-027): A read (get or list) of the wallet accounting mapping that setWalletAccountingMapping writes.",
+    "source": "contracts/satellite/wallet.yaml#setWalletAccountingMapping | screens/P08-venue-back-office.yaml#BO-1164"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1327,6 +1334,11 @@
     "operation": null,
     "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
     "source": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 108 §Gift Card"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-027): A read (get or list) of the wallet accounting mapping that setWalletAccountingMapping writes.",
+    "source": "contracts/satellite/wallet.yaml#setWalletAccountingMapping | screens/P08-venue-back-office.yaml#BO-1169"
    }
   ],
   "layout": {
@@ -1559,6 +1571,21 @@
        "kind": "selectField",
        "label": "Export close package",
        "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 109 §Capture"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Wallet movement summary",
+       "bindsTo": "WalletMovementSummary",
+       "operation": "getWalletMovementSummary",
+       "provenance": "contract wallet.yaml GET /wallet-movement-summary"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Wallet pre-close checks",
+       "bindsTo": "WalletPreCloseCheck",
+       "operation": "getWalletPreCloseChecks",
+       "notes": "**A wallet movement summary and wallet pre-close checks (decided 2 October 2026 by Chinmay, DEC-220; CHG-CSA-027, CHG-CSP-040)**; the period close waits in the approvals inbox (DEC-221) with a deep link here.",
+       "provenance": "contract wallet.yaml GET /wallet-pre-close-checks"
       }
      ]
     }
@@ -1585,6 +1612,20 @@
     "purpose": "Closing balance",
     "trigger": "onLoad",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "getWalletMovementSummary",
+    "contract": "wallet",
+    "purpose": "Wallet movements for the period (DEC-220)",
+    "trigger": "onLoad",
+    "provenance": "design-note correction, 2 October 2026 (BO-1170)"
+   },
+   {
+    "operationId": "getWalletPreCloseChecks",
+    "contract": "wallet",
+    "purpose": "The wallet checks that must pass before the period closes (DEC-220)",
+    "trigger": "onLoad",
+    "provenance": "design-note correction, 2 October 2026 (BO-1170)"
    }
   ],
   "wireframe": {
@@ -1998,6 +2039,7 @@
    "workshopBoard": "wireframes/WS194 Wallet Configuration Backend Structure v1.0 Board 9.dc.html#bo-1172"
   },
   "apisNote": "Regenerated 9 September 2026 from Wallet_Configuration_Backend_Structure_v1.0.pdf page 111. 0 of 5 labels bound to a contract property; 23 of 99 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Generate Reconciliation Report are choices sent by `getWalletReconciliation` (the screen's reconciliation read is the report); Run Finance Validation: `getUnifiedReconciliation`; Submit Close: `beginPeriodClose`; Approve Close: `closeFiscalPeriod`; Generate Liability Report: `getWalletLiability`; Review Exceptions dropped (navigation to the exception workbench); Export Audit dropped (export exists on the audit/reporting screens); Send to Finance … dropped (no hand-off step: wallet postings reach the ledger through the accounting mapping).",
+  "notes": "**Reconciliation is daily, per venue** (decided 2 October 2026, Chinmay; CHG-FIN-009; audit R110 (b)). The unit of work and of sign-off is one venue-day: POS cash, gateway settlements, bank and wallet against the ledger for that day. A longer range reviews days already reconciled; a provider's monthly file (DI-268) is matched day by day.",
   "_platform": {
    "code": "P08",
    "audience": "staff",

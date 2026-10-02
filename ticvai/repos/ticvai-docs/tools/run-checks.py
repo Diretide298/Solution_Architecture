@@ -47,11 +47,35 @@ CHECKS = [
     # 1 October (plan item 1C, C3): after the tag r1 the baseline migrations are frozen; a table change is
     # a new forward migration. check-key-stability (C4) and check-contract-compat also compare with r1.
     "check-migration-freeze",
-    # 1 October (plan item 1F, C12): the audit-class guards (audit/ticvai/ROOT-CLASSES.md). Each fails
+    # 2 October (Chinmay's finance decisions, CHG-FIN-001..011): revenue labels, blind close, one taxable base,
+    # the finance KPIs and chart encodings, the guest-selected currency.
+    "check-finance-rules",
+    # 1 October (plan item 1F, C12): the audit-class guards (docs/active/root-classes.md). Each fails
     # only on a member not in handoff/audit-baseline.json; --update-baseline after a fix tightens it.
     "check-ticket-text", "check-screen-wiring", "check-navigation", "check-contract-shapes",
     "check-ddl-conventions", "check-contract-storage", "check-starter-fit", "check-glossary-terms",
     "check-wireframe-coverage",
+    # 1 October: the process design notes (handoff/design-notes/*.yaml) reach every design session through
+    # BUNDLE.md; every rule there must carry a source that exists. Passes while the folder is empty.
+    "check-design-notes",
+    # 2 October (council of 2 October, docs/active/council/council-report-2026-10-02-opus.html): every change is a changes/entries/
+    # file with its decision and why, and closes only on a prevention that exists and runs here.
+    "check-changelog",
+    # 2 October (same council, "the one thing to do first"): the design-handoff generator's three binding
+    # counts (unbound controls, undefined operations, unknown fields) per app and block may only fall.
+    "check-binding-ratchet",
+    # 2 October (same council, typed properties): audience, needs-a-session, caller or named customer.
+    "check-audience-match", "check-preauth-session", "check-subject",
+    # 2 October (Chinmay's answers, CHG-SEED-005 and -012): a design import's differences carry a decision, and
+    # decision documents cite only files git tracks.
+    "check-candidate-decisions", "check-cited-sources",
+    # 2 October (CHG-DOOR-001..006): every app has a sign-in door, every staff and partner door is a sign-in
+    # form with the second factor, the role prompt and (in a browser) SSO and no workstation, no form asks a
+    # person for a token, and no door lands on a read gated by a right to act.
+    "check-doors",
+    # 2 October (Chinmay, pre-apply round, CHG-SBO-001): every TICVAI Console screen acting in a tenant carries
+    # the R098 tenant picker and platform-staff grant, and every Console screen is core.
+    "check-console-grant",
 ]
 
 # Report, do not gate. Each needs its reason stated here or it does not belong in this list.
@@ -71,6 +95,18 @@ REPORT_ONLY = {
         "whether a charge with no configuration is a missing control or an amount a provider "
         "set is a judgement; the answers live in handoff/values-without-configuration.md and "
         "the tool reads them back, so an answered row stops being reported",
+    # 2 October: the three typed-property checks start as reports. They have no baseline yet, and their
+    # current findings are the guest fixes (public theme and policy reads, staff fields off guest screens)
+    # and the POS loyalty swap, which are in flight. When those land, the lead records the baseline
+    # (--update-baseline) and takes each out of this list; from then a new finding blocks.
+    "check-audience-match":
+        "gates once the guest fixes land and the lead records its baseline (council of 2 October)",
+    "check-preauth-session":
+        "gates once the public theme and policy reads land and the lead records its baseline",
+    "check-subject":
+        "gates once the POS loyalty swap lands and the lead records its baseline",
+    # check-candidate-decisions gates since 2 October 2026 (CHG-CLN-011): the five POS v2 candidates are decided
+    # (POSV2-9..13, applied by CHG-SPO-001) and it passes with an empty baseline.
 }
 
 

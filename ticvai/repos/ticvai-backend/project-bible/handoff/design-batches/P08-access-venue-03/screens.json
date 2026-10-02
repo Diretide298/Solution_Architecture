@@ -71,11 +71,6 @@
        "provenance": "carried from the previous definition"
       },
       {
-       "kind": "primaryButton",
-       "label": "Book",
-       "provenance": "carried from the previous definition"
-      },
-      {
        "kind": "banner",
        "notes": "Conflicts, named with times. *Not available* on something a guest can see is not an answer",
        "provenance": "carried from the previous definition"
@@ -264,6 +259,13 @@
        "kind": "secondaryButton",
        "label": "Check in",
        "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "One booking, its timeline and its readiness",
+       "bindsTo": "RentalBooking",
+       "operation": "getRentalBooking",
+       "provenance": "contract rental.yaml GET /rental-bookings/{bookingId}; wiring fix, 2 October 2026"
       }
      ]
     },
@@ -346,6 +348,13 @@
     "invalidates": [
      "getStoredValueAuthorisation"
     ]
+   },
+   {
+    "operationId": "getRentalBooking",
+    "contract": "rental",
+    "purpose": "One booking, its timeline and its readiness",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
    }
   ],
   "entryState": {
@@ -537,6 +546,13 @@
        "kind": "banner",
        "notes": "Expired qualifications held by staff on today rota",
        "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Qualifications",
+       "bindsTo": "Qualification",
+       "operation": "getResourceQualifications",
+       "provenance": "contract resources.yaml GET /resources/{resourceId}/qualifications; wiring fix, 2 October 2026"
       }
      ]
     },
@@ -566,6 +582,13 @@
     "contract": "resources",
     "purpose": "Set qualifications",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "getResourceQualifications",
+    "contract": "resources",
+    "purpose": "The qualifications as saved",
+    "trigger": "onLoad",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-001)"
    }
   ],
   "entryState": {
@@ -806,7 +829,6 @@
     "BO-005",
     "BO-006",
     "BO-030",
-    "BO-031",
     "BO-032",
     "BO-033",
     "BO-034",
@@ -828,12 +850,12 @@
     {
      "to": "BO-001",
      "trigger": "Queue Directory",
-     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId and BO-103 holds none of them. The edge carries nothing: eventId, feedId, queueId only pre-select (deep link or optional), and BO-001 opens on its own"
+     "provenance": "derived — BO-001 declares entryState.params feedId, queueId and BO-103 holds none of them. The edge carries nothing: feedId, queueId only pre-select (deep link or optional), and BO-001 opens on its own"
     },
     {
      "to": "BO-002",
      "trigger": "Queue Configuration",
-     "provenance": "derived — BO-002 declares entryState.params performanceId, queueId and BO-103 holds none of them. The edge carries nothing: BO-002 finds queueId (createQueue) itself; BO-002 opens on getWaitTimes, and performanceId has no source on BO-002 yet (a gap in BO-002, not in this edge)"
+     "provenance": "derived — BO-002 declares entryState.params queueId and BO-103 holds none of them. The edge carries nothing: BO-002 finds queueId (createQueue) itself, and BO-002 opens on its own"
     },
     {
      "to": "BO-003",
@@ -843,30 +865,22 @@
     {
      "to": "BO-004",
      "trigger": "Manual Wait Time Entry",
-     "provenance": "derived — BO-004 declares entryState.params queueId, refundId and BO-103 holds none of them. The edge carries nothing: refundId only pre-selects (deep link or optional); BO-004 finds queueId (listQueues) itself, and BO-004 opens on its own"
+     "provenance": "derived — BO-004 declares entryState.params queueId and BO-103 holds none of them. The edge carries nothing: BO-004 finds queueId (listQueues) itself, and BO-004 opens on its own"
     },
     {
      "to": "BO-005",
      "trigger": "Queue Monitor",
-     "provenance": "derived — BO-005 declares entryState.params campaignId, queueId and BO-103 holds none of them. The edge carries nothing: campaignId only pre-selects (deep link or optional); BO-005 finds queueId (getWaitTimes) itself, and BO-005 opens on its own"
+     "provenance": "derived — BO-005 declares entryState.params queueId and BO-103 holds none of them. The edge carries nothing: BO-005 finds queueId (getWaitTimes) itself, and BO-005 opens on its own"
     },
     {
      "to": "BO-006",
      "trigger": "Parking Configuration",
-     "carries": [
-      "accessPointId"
-     ],
-     "provenance": "derived — BO-006 declares entryState.params accessPointId and BO-103 holds accessPointId, so an edge into it carries them"
+     "provenance": "derived — BO-006 declares entryState.params  and BO-103 holds none of them. The edge carries nothing: BO-006 needs nothing to open"
     },
     {
      "to": "BO-030",
      "trigger": "Work Order Verification",
      "provenance": "derived — BO-030 declares entryState.params workOrderId and BO-103 holds none of them. The edge carries nothing: workOrderId only pre-selects (deep link or optional), and BO-030 opens on its own"
-    },
-    {
-     "to": "BO-031",
-     "trigger": "Asset Register",
-     "provenance": "derived — BO-031 declares entryState.params assetId and BO-103 holds none of them. The edge carries nothing: assetId only pre-selects (deep link or optional), and BO-031 opens on its own"
     },
     {
      "to": "BO-032",
@@ -884,17 +898,17 @@
     {
      "to": "BO-038",
      "trigger": "Reconciliation Queue",
-     "provenance": "derived — BO-038 declares entryState.params queueId and BO-103 holds none of them. The edge carries nothing: queueId only pre-selects (deep link or optional), and BO-038 opens on its own"
+     "provenance": "derived — BO-038 declares entryState.params  and BO-103 holds none of them. The edge carries nothing: BO-038 needs nothing to open"
     },
     {
      "to": "BO-069",
      "trigger": "Asset Register",
-     "provenance": "derived — BO-069 declares entryState.params assetId, gameId and BO-103 holds none of them. The edge carries nothing: assetId, gameId only pre-select (deep link or optional), and BO-069 opens on its own"
+     "provenance": "derived — BO-069 declares entryState.params assetId and BO-103 holds none of them. The edge carries nothing: assetId only pre-selects (deep link or optional), and BO-069 opens on its own"
     },
     {
      "to": "BO-071",
      "trigger": "Planned Maintenance",
-     "provenance": "derived — BO-071 declares entryState.params roleId and BO-103 holds none of them. The edge carries nothing: roleId only pre-selects (deep link or optional), and BO-071 opens on its own"
+     "provenance": "derived — BO-071 declares entryState.params  and BO-103 holds none of them. The edge carries nothing: BO-071 needs nothing to open"
     },
     {
      "to": "BO-072",
@@ -1051,24 +1065,6 @@
        ],
        "operation": "listAccessPoints",
        "provenance": "contract access.yaml GET /access-points"
-      },
-      {
-       "kind": "detailPanel",
-       "label": "The venue settings",
-       "bindsTo": "VenueSettings",
-       "columns": [
-        "VenueSettings.id",
-        "VenueSettings.venueId",
-        "VenueSettings.currencyCode",
-        "VenueSettings.currencyScale",
-        "VenueSettings.supportHours",
-        "VenueSettings.quietHours",
-        "VenueSettings.biometrics",
-        "VenueSettings.segregatedAccess",
-        "VenueSettings.alerting"
-       ],
-       "operation": "getVenueSettings",
-       "provenance": "contract tenancy.yaml GET /venues/{venueId}/settings"
       }
      ]
     }
@@ -1086,12 +1082,6 @@
     "operationId": "getKpiValues",
     "contract": "reporting",
     "purpose": "Today's takings and admissions tiles — `kpiCodes=takings,admissions`, period defaulting to today (decided 28 September, audit R283)",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "getVenueSettings",
-    "contract": "tenancy",
-    "purpose": "What is enabled here",
     "trigger": "onLoad"
    },
    {
@@ -1129,6 +1119,14 @@
    "board": "wireframes/P08 Venue Management.dc.html#bo-103"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "gaps": [
+   {
+    "operation": "getVenueSettings",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): Venue settings are not access state and getVenueSettings carries no module enablement (R279); the hub's \"What is enabled here\" panel cannot be filled from it (design-notes correction venue-operations BO-103).",
+    "source": "contracts/spine/tenancy.yaml#getVenueSettings | R279 | R254"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",

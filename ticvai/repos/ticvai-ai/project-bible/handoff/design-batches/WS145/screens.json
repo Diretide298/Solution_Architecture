@@ -462,6 +462,11 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 53"
+   },
+   {
+    "operation": null,
+    "why": "Spacing, shadow, breakpoint and transition tokens per brand are outside the agreed boundary (graphics, colours, fonts, tabs only; DI-223, DI-285): recorded as not built.",
+    "source": "DI-223"
    }
   ],
   "layout": {
@@ -720,6 +725,18 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 54"
+   },
+   {
+    "operation": "createForm",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-005): The screen is merged into P13 (DI-996) and still declared createForm and searchMedia as its own operations; they are the CMS screens' (design-notes correction customer-marketing BO-838).",
+    "source": "DI-996"
+   },
+   {
+    "operation": "searchMedia",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-005): The screen is merged into P13 (DI-996) and still declared createForm and searchMedia as its own operations; they are the CMS screens' (design-notes correction customer-marketing BO-838).",
+    "source": "DI-996"
    }
   ],
   "layout": {
@@ -727,55 +744,18 @@
    "regions": [
     {
      "name": "contentBody",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "createForm",
-       "label": "Create form",
-       "notes": "The act the screen exists for."
-      },
-      {
-       "kind": "searchField",
-       "derived": true,
-       "impliedBy": "searchMedia",
-       "label": "Search",
-       "notes": "A search that returns nothing must say so differently from a search not yet run."
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "createForm"
-      }
-     ]
+     "components": []
     }
    ]
   },
   "states": {
    "loading": "The content media forms list.",
    "error": "Could not load. Names which read failed and leaves the content media forms untouched.",
-   "emptyFirstRun": "No content media forms yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the content media forms are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No content media forms yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
+   "emptyNoResults": "Never shown: nothing on this screen filters its list.",
+   "emptyNoAccess": "Not shown: nothing on this screen needs a permission of its own; the app's sign-in decides access."
   },
-  "apis": [
-   {
-    "operationId": "createForm",
-    "contract": "marketing-crm",
-    "purpose": "Forms on a page",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026"
-   },
-   {
-    "operationId": "searchMedia",
-    "contract": "assets",
-    "purpose": "Media to place",
-    "trigger": "onLoad",
-    "provenance": "board reading, 19 September 2026"
-   }
-  ],
+  "apis": [],
   "wireframe": {
    "status": "notStarted",
    "board": "wireframes/P08 Venue Management.dc.html#bo-838",
@@ -1094,6 +1074,12 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 55"
+   },
+   {
+    "operation": "setLocalizationBrandingCustomer",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-005): setLocalizationBrandingCustomer sets a waiver version's languages and branding, unrelated to personalisation, and the screen is merged into P13 (DI-996) (design-notes correction customer-marketing BO-841).",
+    "source": "contracts/satellite/marketing-crm.yaml#setLocalizationBrandingCustomer | DI-996"
    }
   ],
   "layout": {
@@ -1101,41 +1087,18 @@
    "regions": [
     {
      "name": "contentBody",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "setLocalizationBrandingCustomer",
-       "label": "Save",
-       "notes": "The act the screen exists for."
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "setLocalizationBrandingCustomer"
-      }
-     ]
+     "components": []
     }
    ]
   },
   "states": {
    "loading": "The personalization localization list.",
    "error": "Could not load. Names which read failed and leaves the personalization localization untouched.",
-   "emptyFirstRun": "No personalization localization yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No personalization localization yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the personalization localization are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Not shown: nothing on this screen needs a permission of its own; the app's sign-in decides access."
   },
-  "apis": [
-   {
-    "operationId": "setLocalizationBrandingCustomer",
-    "contract": "marketing-crm",
-    "purpose": "Personalisation and localisation",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026"
-   }
-  ],
+  "apis": [],
   "wireframe": {
    "status": "notStarted",
    "board": "wireframes/P08 Venue Management.dc.html#bo-841",

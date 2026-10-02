@@ -1,10 +1,10 @@
 {
- "createLegalEntity": {
+ "previewSubscriptionChange": {
   "method": "POST",
-  "path": "/legal-entities",
-  "contract": "finance",
-  "summary": "Create a legal entity",
-  "permission": "ACCOUNT_CONFIGURE",
+  "path": "/tenants/{tenantId}/subscription/preview",
+  "contract": "subscription",
+  "summary": "Preview the effect of a plan change",
+  "permission": "PLATFORM_TENANT_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
@@ -15,8 +15,27 @@
     "required": null
    }
   ],
-  "requestBody": "LegalEntity",
-  "responds": "LegalEntity"
+  "requestBody": "SetSubscriptionRequest",
+  "responds": "SubscriptionPreview"
+ },
+ "setAgreementContractTerm": {
+  "method": "PUT",
+  "path": "/agreement-contract-term",
+  "contract": "subscription",
+  "summary": "Agreement & Contract Terms Builder",
+  "permission": "PLATFORM_CELL_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AgreementContractTermsBuilderInput",
+  "responds": "AgreementContractTermsBuilderView"
  },
  "setPaymentProvider": {
   "method": "PUT",
@@ -41,5 +60,43 @@
   ],
   "requestBody": "SetPaymentProviderRequest",
   "responds": "PaymentProvider"
+ },
+ "setSubscription": {
+  "method": "PUT",
+  "path": "/tenants/{tenantId}/subscription",
+  "contract": "subscription",
+  "summary": "Assign or change a subscription",
+  "permission": "PLATFORM_TENANT_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "SetSubscriptionRequest",
+  "responds": "Subscription"
+ },
+ "submitOnboardingApplication": {
+  "method": "POST",
+  "path": "/onboarding-applications",
+  "contract": "subscription",
+  "summary": "A prospect signs themselves up",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "OnboardingApplication",
+  "responds": "OnboardingApplication"
  }
 }

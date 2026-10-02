@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Platform Operations
   version: 0.1.0
-  x-ticvai-screen-count: 36
+  x-ticvai-screen-count: 39
   x-ticvai-tier: satellite
   x-ticvai-module: Cross-cutting — Control Plane release and environment management
   x-ticvai-capabilities:
@@ -957,6 +957,8 @@ paths:
   /config-packages:
     post:
       operationId: exportConfigPackage
+      x-ticvai-consumed-by:
+        - "P09 ADM-700 Configuration Promotion"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '2 October: Chinmay, workbook Q168 (ADM-122: "industry standard: forward-only migrations; config
@@ -1019,6 +1021,8 @@ paths:
         format: uuid
     post:
       operationId: diffConfigPackage
+      x-ticvai-consumed-by:
+        - "P09 ADM-700 Configuration Promotion"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '2 October: Chinmay, workbook Q168; shape follows planMigration'
@@ -1079,6 +1083,8 @@ paths:
         format: uuid
     post:
       operationId: applyConfigPackage
+      x-ticvai-consumed-by:
+        - "P09 ADM-700 Configuration Promotion"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '2 October: Chinmay, workbook Q168; shape follows applyMigration'

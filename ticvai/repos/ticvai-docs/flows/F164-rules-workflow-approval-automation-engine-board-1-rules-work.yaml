@@ -1,11 +1,11 @@
 id: F164
 name: 'Rules  Workflow  Approval   Automation Engine board 1: Rules & Workflow Command Center'
-actor: platformAdmin
+actor: venueManager
 wave: 3
 frequency: routine
 criticality: operational
 platforms:
-- P09 TICVAI Web
+- P08 Venue Management
 provenance: derived-from-board
 offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
   not guess.
@@ -60,7 +60,7 @@ steps:
   - listRuleWorkflow
   outcome: Ready for the next screen on this board
 - step: 8
-  screen: ADM-242
+  screen: BO-086
   action: Works in Approval Matrix & Multi-Level Approval Configuration
   operations:
   - listApprovalMatrices

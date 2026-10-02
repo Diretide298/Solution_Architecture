@@ -344,8 +344,6 @@
        "label": "Every partner agreement",
        "bindsTo": "PartnerAgreement",
        "columns": [
-        "PartnerAgreement.id",
-        "PartnerAgreement.partnerId",
         "PartnerAgreement.partnerName",
         "PartnerAgreement.status",
         "PartnerAgreement.rateMode",
@@ -354,11 +352,11 @@
         "PartnerAgreement.volumeWindow",
         "PartnerAgreement.seasonalRates",
         "PartnerAgreement.segmentTier",
-        "PartnerAgreement.brandingAssetId",
         "PartnerAgreement.storefrontSubdomain"
        ],
        "operation": "listPartnerAgreements",
-       "provenance": "contract subscription.yaml GET /partner-agreements"
+       "provenance": "contract subscription.yaml GET /partner-agreements",
+       "notes": "The partner is shown by name; ids stay in the detail panel with a copy action."
       }
      ]
     },
@@ -418,7 +416,7 @@
   "states": {
    "loading": "The commission statement list.",
    "error": "Could not load. Names which read failed and leaves the commission statement untouched.",
-   "emptyFirstRun": "No commission statement yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyFirstRun": "No commission statement for this agreement and period yet: nothing has settled against it. Offers no action; the statement fills as bookings settle.",
    "emptyNoResults": "Nothing matches the filter on expiringWithinDays, status and the commission statement are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Shown when the caller lacks `PARTNER_VIEW`, which `getCommissionStatement` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },

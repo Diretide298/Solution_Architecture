@@ -199,6 +199,11 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 42"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-027): A write for seat-level dynamic pricing rules (section, row and seat, with floor, ceiling and step) and its read.",
+    "source": "screens/P08-venue-back-office.yaml#BO-1044"
    }
   ],
   "layout": {
@@ -302,11 +307,6 @@
   "purpose": "Maintain the commercial hierarchy applied to seat inventory. Configure price band, seat category, display label, color, currency, channel, customer segment and effective period. Map bands to venue sections, rows or seats and support event/performance overrides with inheritance. Detect overlapping dates, unmapped inventory, invalid currency, missing products and conflicting priority. Configuration Scope of Work | Version 1.0 42 Pricing changes require explainable inputs, min/max guardrails, effective dates, approval, versioning and rollback; AI may recommend but cannot publish outside delegated authority. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.",
   "gaps": [
    {
-    "operation": "createSeatCategory",
-    "why": "**Price bands on seat categories are kept** (decided 28 September, audit R275 (d)) and the contract has none: `SeatCategory` needs a price-band list (code, display label, colour, currency, channel, customer segment, effective from/to). Handed to the contracts group.",
-    "source": "audit R275 (d)"
-   },
-   {
     "operation": null,
     "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
     "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 42"
@@ -315,6 +315,11 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 42"
+   },
+   {
+    "operation": null,
+    "why": "Mapping bands to sections, rows or seats, and event or performance overrides, are not in the contract (SeatCategory carries priceBands since R275 d).",
+    "source": "contracts/satellite/seating.yaml#createSeatCategory"
    }
   ],
   "layout": {
@@ -687,6 +692,11 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 43"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-014): No operation stores seat-upgrade offer rules.",
+    "source": "ADR-0052"
    }
   ],
   "layout": {
@@ -805,6 +815,11 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, page 44"
+   },
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-027): A read (get or list) of the saved what-if scenarios and their assumptions that simulatePriceBreakdownCalculation writes.",
+    "source": "contracts/spine/catalogue.yaml#simulatePriceBreakdownCalculation | screens/P08-venue-back-office.yaml#BO-1049"
    }
   ],
   "layout": {

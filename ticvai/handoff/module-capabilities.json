@@ -4,9 +4,20 @@
  "modules": {
   "access": {
    "title": "3 — Admission and Access",
-   "capabilityCount": 17,
+   "capabilityCount": 20,
    "unguardedOperations": 5,
    "capabilities": [
+    {
+     "key": "ACCESS_DIRECTION_SET",
+     "label": "switch a running gate's direction live, logged (workbook Q255, BO-230; R221 amended)",
+     "group": "Decided 2 October (CHG-FUP-003)",
+     "operationCount": 1,
+     "operations": [
+      "setAccessPointDirection"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
     {
      "key": "ACCESS_OVERRIDE",
      "label": "admit against a failed validation, logged",
@@ -66,6 +77,17 @@
      "segregationConstrained": false
     },
     {
+     "key": "BIOMETRIC_IMAGE_VIEW",
+     "label": "open the enrolled face and the new capture behind \"View images (logged)\"",
+     "group": "Decided 2 October (CHG-FUP-003)",
+     "operationCount": 1,
+     "operations": [
+      "getFaceReenrolmentImages"
+     ],
+     "elevated": true,
+     "segregationConstrained": false
+    },
+    {
      "key": "DEVICE_CONFIGURE",
      "label": null,
      "group": "Operations",
@@ -82,11 +104,23 @@
      "segregationConstrained": false
     },
     {
+     "key": "DEVICE_MANAGE",
+     "label": "enrol, assign, re-key, roll out firmware, retire",
+     "group": "Operations",
+     "operationCount": 1,
+     "operations": [
+      "setHardwareModelCertification"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
      "key": "DEVICE_VIEW",
      "label": null,
      "group": "Operations",
-     "operationCount": 4,
+     "operationCount": 5,
      "operations": [
+      "getHardwareModelCertification",
       "listDeviceGate",
       "listDeviceTypeHardware",
       "listHardwareCompatibilityHealth",
@@ -363,14 +397,14 @@
      "key": "AI_APPROVE",
      "label": null,
      "group": "Operations",
-     "operationCount": 15,
+     "operationCount": 13,
      "operations": [
       "closeAiIncident",
       "containAiIncident",
       "createAiPolicyException",
       "overrideAiDecision",
       "pauseActionPlan",
-      "promoteAiRelease"
+      "publishAiGovernancePolicy"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -395,7 +429,7 @@
      "key": "AI_CONFIGURE",
      "label": null,
      "group": "Operations",
-     "operationCount": 33,
+     "operationCount": 35,
      "operations": [
       "backtestRiskStrategy",
       "configureAiCapability",
@@ -411,7 +445,7 @@
      "key": "AI_USE",
      "label": null,
      "group": "Operations",
-     "operationCount": 63,
+     "operationCount": 65,
      "operations": [
       "answerConfigurationQuestion",
       "attachConfigurationSource",
@@ -503,8 +537,9 @@
      "key": "TENANT_CONFIGURE",
      "label": "edit branding, content, navigation, modules",
      "group": "Tenant experience",
-     "operationCount": 1,
+     "operationCount": 2,
      "operations": [
+      "getTranslationProposals",
       "proposeTranslations"
      ],
      "elevated": false,
@@ -546,14 +581,14 @@
      "key": "APPROVAL_CONFIGURE",
      "label": null,
      "group": "Operations",
-     "operationCount": 16,
+     "operationCount": 17,
      "operations": [
       "approveMatrixMultiLevel",
       "approveRoleAuthorityDelegation",
       "approveVersioningGovernance",
+      "cancelApprovalRequest",
       "createAutomationAutonomouAction",
-      "listApprovalMatrices",
-      "listStepUpPolicies"
+      "listApprovalMatrices"
      ],
      "elevated": true,
      "segregationConstrained": false
@@ -562,14 +597,14 @@
      "key": "APPROVAL_DECIDE",
      "label": null,
      "group": "Operations",
-     "operationCount": 7,
+     "operationCount": 8,
      "operations": [
       "approveUnifiedDecision",
+      "assignApprovalRequest",
       "createApprovalDelegation",
       "decideApprovalRequest",
       "recordExternalApprovalDecision",
-      "revokeApprovalDelegation",
-      "setApproverAvailability"
+      "revokeApprovalDelegation"
      ],
      "elevated": true,
      "segregationConstrained": false
@@ -578,10 +613,11 @@
      "key": "APPROVAL_REQUEST",
      "label": null,
      "group": "Operations",
-     "operationCount": 5,
+     "operationCount": 6,
      "operations": [
       "createApprovalRequest",
       "escalateApprovalRequest",
+      "reopenApprovalRequest",
       "resubmitApprovalRequest",
       "submitApprovalRequest",
       "withdrawApprovalRequest"
@@ -593,7 +629,7 @@
      "key": "APPROVAL_VIEW",
      "label": null,
      "group": "Operations",
-     "operationCount": 20,
+     "operationCount": 21,
      "operations": [
       "createApprovalEvidencePackage",
       "evaluateApprovalRequirement",
@@ -768,14 +804,14 @@
      "key": "PERFORMANCE_CONFIGURE",
      "label": null,
      "group": "Catalogue",
-     "operationCount": 8,
+     "operationCount": 10,
      "operations": [
       "cancelPerformance",
       "createPerformances",
+      "getEventChangeTreatmentPolicy",
       "listPerformanceTemplates",
       "rescheduleEvent",
-      "setEventSchedule",
-      "setPerformanceTemplate"
+      "setEventChangeTreatmentPolicy"
      ],
      "elevated": true,
      "segregationConstrained": false
@@ -784,7 +820,7 @@
      "key": "PRICE_CONFIGURE",
      "label": null,
      "group": "Catalogue",
-     "operationCount": 18,
+     "operationCount": 19,
      "operations": [
       "cancelPricingRollback",
       "copyPriceList",
@@ -826,14 +862,14 @@
      "key": "PRODUCT_CONFIGURE",
      "label": null,
      "group": "Catalogue",
-     "operationCount": 65,
+     "operationCount": 64,
      "operations": [
       "approvePricingWorkflowAuthority",
       "approveReviewDecision",
       "approveWorkflow",
       "assessProductChange",
       "bulkChangePrices",
-      "cloneProduct"
+      "bulkUpdateCatalogueProducts"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -842,7 +878,7 @@
      "key": "PRODUCT_VIEW",
      "label": null,
      "group": "Catalogue",
-     "operationCount": 112,
+     "operationCount": 114,
      "operations": [
       "checkBookingEligibility",
       "getAvailability",
@@ -1092,10 +1128,11 @@
      "key": "ORDER_CREATE",
      "label": null,
      "group": "Selling",
-     "operationCount": 3,
+     "operationCount": 4,
      "operations": [
       "closeTableVisit",
       "createFnbOrder",
+      "createTableReservationForGuest",
       "openTableVisit"
      ],
      "elevated": false,
@@ -1137,7 +1174,7 @@
      "key": "PRODUCT_CONFIGURE",
      "label": null,
      "group": "Catalogue",
-     "operationCount": 38,
+     "operationCount": 42,
      "operations": [
       "applyMenuActions",
       "attachModifierGroup",
@@ -1153,14 +1190,14 @@
      "key": "PRODUCT_VIEW",
      "label": null,
      "group": "Catalogue",
-     "operationCount": 19,
+     "operationCount": 25,
      "operations": [
       "getAllergenVerification",
+      "getCourseRules",
       "getFnbDeliveryPolicy",
       "getFnbReservationPolicy",
       "getFnbServiceChargePolicy",
-      "getMenu",
-      "getProductionRun"
+      "getKitchenRoutingRules"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -1301,7 +1338,7 @@
   "identity": {
    "title": "19 — Guest Mobile App & Branding (auth) + cross-cutting staff auth",
    "capabilityCount": 12,
-   "unguardedOperations": 27,
+   "unguardedOperations": 31,
    "capabilities": [
     {
      "key": "AUDIT_VIEW",
@@ -1415,12 +1452,13 @@
      "key": "ROLE_MANAGE",
      "label": "create roles and attach grants",
      "group": "Session and identity",
-     "operationCount": 4,
+     "operationCount": 5,
      "operations": [
       "createRole",
       "listRoles",
       "setCapabilityTemplate",
-      "setSegregationRules"
+      "setSegregationRules",
+      "updateRole"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -1793,7 +1831,7 @@
   },
   "marketing-crm": {
    "title": "22 — Marketing & CRM",
-   "capabilityCount": 15,
+   "capabilityCount": 16,
    "unguardedOperations": 26,
    "capabilities": [
     {
@@ -1871,7 +1909,7 @@
      "key": "GUEST_VIEW",
      "label": "profiles, behavioural attributes, consent state",
      "group": "Guest engagement",
-     "operationCount": 55,
+     "operationCount": 57,
      "operations": [
       "getConsentHistory",
       "getDigitalWaiverForm",
@@ -1954,8 +1992,9 @@
      "key": "MARKETING_SEND",
      "label": "launch or stop a campaign. Separate from MANAGE",
      "group": "Guest engagement",
-     "operationCount": 5,
+     "operationCount": 6,
      "operations": [
+      "activateChallenge",
       "activateJourney",
       "launchCampaign",
       "retryMessageDispatch",
@@ -1969,14 +2008,14 @@
      "key": "MARKETING_VIEW",
      "label": "segments, campaigns, loyalty, reviews",
      "group": "Guest engagement",
-     "operationCount": 34,
+     "operationCount": 38,
      "operations": [
       "getAudienceOverlap",
       "getCampaign",
       "getCampaignPerformance",
+      "getChallenge",
       "getGuestMatchPolicy",
-      "getJourneyPerformance",
-      "getLoyaltyRules"
+      "getJourneyPerformance"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -1999,6 +2038,17 @@
      "operationCount": 1,
      "operations": [
       "setRefundCompensationService"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "PLATFORM_PLAN_MANAGE",
+     "label": null,
+     "group": "Control Plane",
+     "operationCount": 1,
+     "operations": [
+      "setTrackingTechnologyCatalogueEntry"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -2113,9 +2163,10 @@
      "key": "ORDER_REFUND",
      "label": "initiate, subject to threshold",
      "group": "Selling",
-     "operationCount": 1,
+     "operationCount": 2,
      "operations": [
-      "createRefund"
+      "createRefund",
+      "simulateRefund"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -2230,10 +2281,11 @@
      "key": "PRODUCT_VIEW",
      "label": null,
      "group": "Catalogue",
-     "operationCount": 2,
+     "operationCount": 3,
      "operations": [
       "getDepositPolicy",
-      "listTicketTemplates"
+      "listTicketTemplates",
+      "previewProductTickets"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -2346,14 +2398,14 @@
      "key": "PAYMENT_VIEW",
      "label": "methods, providers, routing, health, economics",
      "group": "Payment orchestration",
-     "operationCount": 18,
+     "operationCount": 19,
      "operations": [
+      "getB2bPaymentTerms",
       "getInstalmentPolicy",
       "getMixedTenderRules",
       "getPaymentPerformance",
       "getPaymentProviderEconomics",
-      "getPaymentProviderHealth",
-      "getPaymentRules"
+      "getPaymentProviderHealth"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -2401,8 +2453,9 @@
      "key": "PLATFORM_MIGRATION_APPLY",
      "label": "apply a plan. Requires step-up",
      "group": "Control Plane",
-     "operationCount": 2,
+     "operationCount": 3,
      "operations": [
+      "applyConfigPackage",
       "applyMigration",
       "rollbackMigrationRun"
      ],
@@ -2427,9 +2480,10 @@
      "key": "PLATFORM_RELEASE_MANAGE",
      "label": "cut releases, register environments, schedule upgrades",
      "group": "Control Plane",
-     "operationCount": 5,
+     "operationCount": 6,
      "operations": [
       "createRelease",
+      "exportConfigPackage",
       "publishSupportNotice",
       "registerEnvironment",
       "scheduleTenantUpgrade",
@@ -2457,14 +2511,14 @@
      "key": "PLATFORM_RELEASE_VIEW",
      "label": null,
      "group": "Control Plane",
-     "operationCount": 8,
+     "operationCount": 9,
      "operations": [
+      "diffConfigPackage",
       "getRelease",
       "getReleaseReadiness",
       "getRollout",
       "listEnvironments",
-      "listReleases",
-      "listRollouts"
+      "listReleases"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -2503,7 +2557,7 @@
      "key": "PRICE_CONFIGURE",
      "label": null,
      "group": "Catalogue",
-     "operationCount": 32,
+     "operationCount": 22,
      "operations": [
       "approveCampaignWorkflow",
       "approveDecision",
@@ -2797,7 +2851,7 @@
   },
   "reporting": {
    "title": "8 — Unified Operations Dashboard  ·  cross-cutting",
-   "capabilityCount": 5,
+   "capabilityCount": 7,
    "unguardedOperations": 0,
    "capabilities": [
     {
@@ -2808,6 +2862,17 @@
      "operations": [
       "exportReportResult",
       "getReportExport"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "REPORT_GOVERNANCE_MANAGE",
+     "label": "analytics governance: masking, export restriction, retention, sharing,",
+     "group": "Decided 2 October (CHG-FUP-003)",
+     "operationCount": 1,
+     "operations": [
+      "setAnalyticsGovernancePolicy"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -2843,17 +2908,28 @@
      "segregationConstrained": false
     },
     {
+     "key": "REPORT_VIEW_OWN",
+     "label": "self-scoped. Not resolved against the tree",
+     "group": "Reporting",
+     "operationCount": 1,
+     "operations": [
+      "getServiceSummary"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
      "key": "REPORT_VIEW_TENANT",
      "label": null,
      "group": "Reporting",
-     "operationCount": 7,
+     "operationCount": 8,
      "operations": [
       "getAnalyticsBenchmark",
+      "getAnalyticsGovernancePolicy",
       "getAnalyticsUsage",
       "getSemanticModel",
       "listAnalyticsPipelines",
-      "listKpis",
-      "listReportDeliveries"
+      "listKpis"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -3174,7 +3250,7 @@
   },
   "shift": {
    "title": "2 — Ticketing Sales (cash handling)",
-   "capabilityCount": 12,
+   "capabilityCount": 14,
    "unguardedOperations": 0,
    "capabilities": [
     {
@@ -3197,7 +3273,7 @@
       "createCashMovement",
       "withdrawFromDepositBox"
      ],
-     "elevated": false,
+     "elevated": true,
      "segregationConstrained": false
     },
     {
@@ -3215,9 +3291,10 @@
      "key": "OVERSHORT_ACCEPT",
      "label": "accept a variance beyond the configured threshold",
      "group": "Shift and cash",
-     "operationCount": 1,
+     "operationCount": 2,
      "operations": [
-      "acceptShiftVariance"
+      "acceptShiftVariance",
+      "rejectShiftVariance"
      ],
      "elevated": true,
      "segregationConstrained": false
@@ -3237,12 +3314,24 @@
      "key": "REPORT_VIEW_WORKSTATION",
      "label": null,
      "group": "Reporting",
-     "operationCount": 4,
+     "operationCount": 5,
      "operations": [
       "getShift",
+      "getShiftCountLines",
       "getWorkstationShift",
       "listCashMovements",
       "listShifts"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "SCOPE_VIEW",
+     "label": "read the hierarchy",
+     "group": "Organisation",
+     "operationCount": 1,
+     "operations": [
+      "getTillShiftPolicy"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -3279,7 +3368,7 @@
       "closeShift",
       "submitShiftCount"
      ],
-     "elevated": false,
+     "elevated": true,
      "segregationConstrained": false
     },
     {
@@ -3316,6 +3405,17 @@
      "operationCount": 1,
      "operations": [
       "suspendShift"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "WORKSTATION_CONFIGURE",
+     "label": "sale board, device bindings, access point",
+     "group": "Organisation",
+     "operationCount": 1,
+     "operations": [
+      "setTillShiftPolicy"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -3393,12 +3493,14 @@
      "key": "PARTNER_VIEW",
      "label": null,
      "group": "Operations",
-     "operationCount": 4,
+     "operationCount": 12,
      "operations": [
       "getCommissionStatement",
       "listChannelListings",
-      "listPartnerQuotes",
-      "listPartnerUsers"
+      "listCommercialAllocationQuota",
+      "listCommissionCalculationSettlement",
+      "listCommissionMarginIncentive",
+      "listCreditLimitExposure"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -3407,7 +3509,7 @@
      "key": "PLATFORM_BILLING_MANAGE",
      "label": null,
      "group": "Control Plane",
-     "operationCount": 9,
+     "operationCount": 10,
      "operations": [
       "addCapacityPack",
       "cancelInvoice",
@@ -3423,8 +3525,9 @@
      "key": "PLATFORM_BILLING_VIEW",
      "label": null,
      "group": "Control Plane",
-     "operationCount": 5,
+     "operationCount": 6,
      "operations": [
+      "getBillingEntity",
       "getBillingReconciliation",
       "getLicenceEnforcement",
       "getPlanRecommendations",
@@ -3513,7 +3616,7 @@
      "key": "PLATFORM_TENANT_VIEW",
      "label": null,
      "group": "Control Plane",
-     "operationCount": 44,
+     "operationCount": 36,
      "operations": [
       "getEntitlementUsage",
       "getPlan",
@@ -3583,14 +3686,14 @@
      "key": "DEVICE_MANAGE",
      "label": "enrol, assign, re-key, roll out firmware, retire",
      "group": "Operations",
-     "operationCount": 8,
+     "operationCount": 9,
      "operations": [
+      "approveDevice",
       "createDeviceFirmware",
       "enrolDevice",
       "issueDeviceCredential",
       "revokeDeviceCredential",
-      "rollbackDeviceFirmware",
-      "setDeviceAssignment"
+      "rollbackDeviceFirmware"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -3850,7 +3953,7 @@
      "key": "WALLET_VIEW",
      "label": "balances, lots, liability, disputes",
      "group": "Wallet and stored value",
-     "operationCount": 20,
+     "operationCount": 22,
      "operations": [
       "diffWalletConfigurationVersion",
       "getCreditConsumptionPolicy",
@@ -3884,14 +3987,14 @@
      "key": "TENANT_CONFIGURE",
      "label": "edit branding, content, navigation, modules",
      "group": "Tenant experience",
-     "operationCount": 67,
+     "operationCount": 74,
      "operations": [
+      "buildDeepLink",
       "claimCustomDomain",
       "createBanner",
       "createBookingFlowDefinition",
       "createContentBlock",
-      "createContentPage",
-      "createGuidedChoice"
+      "createContentPage"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -3900,14 +4003,14 @@
      "key": "TENANT_PUBLISH",
      "label": "publish a configuration version, restore a prior one",
      "group": "Tenant experience",
-     "operationCount": 6,
+     "operationCount": 9,
      "operations": [
+      "exportSitePackage",
+      "getSitePackage",
       "publishContentBlock",
       "publishGuidedChoice",
       "publishTenantConfig",
-      "requestAppBuild",
-      "restoreConfigVersion",
-      "unpublishGuidedChoice"
+      "requestAppBuild"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -4019,19 +4122,19 @@
     "approveMatrixMultiLevel",
     "approveRoleAuthorityDelegation",
     "approveVersioningGovernance",
-    "createAutomationAutonomouAction"
+    "cancelApprovalRequest"
    ],
    "APPROVAL_DECIDE": [
     "approveUnifiedDecision",
+    "assignApprovalRequest",
     "createApprovalDelegation",
-    "decideApprovalRequest",
-    "recordExternalApprovalDecision"
+    "decideApprovalRequest"
    ],
    "APPROVAL_REQUEST": [
     "createApprovalRequest",
     "escalateApprovalRequest",
-    "resubmitApprovalRequest",
-    "submitApprovalRequest"
+    "reopenApprovalRequest",
+    "resubmitApprovalRequest"
    ],
    "APPROVAL_VIEW": [
     "createApprovalEvidencePackage",
@@ -4085,7 +4188,7 @@
     "getDevice",
     "getDeviceFirmware",
     "getDeviceTelemetry",
-    "getWorkstationHealth"
+    "getHardwareModelCertification"
    ],
    "EVENT_CONFIGURE": [
     "assignPerformanceMedia",
@@ -4180,8 +4283,8 @@
    "PARTNER_VIEW": [
     "getCommissionStatement",
     "listChannelListings",
-    "listPartnerQuotes",
-    "listPartnerUsers"
+    "listCommercialAllocationQuota",
+    "listCommissionCalculationSettlement"
    ],
    "PAYMENT_VOID": [
     "voidPayment"
@@ -4189,8 +4292,8 @@
    "PERFORMANCE_CONFIGURE": [
     "cancelPerformance",
     "createPerformances",
-    "listPerformanceTemplates",
-    "rescheduleEvent"
+    "getEventChangeTreatmentPolicy",
+    "listPerformanceTemplates"
    ],
    "PLATFORM_BILLING_MANAGE": [
     "addCapacityPack",
@@ -4199,10 +4302,10 @@
     "disputeInvoice"
    ],
    "PLATFORM_BILLING_VIEW": [
+    "getBillingEntity",
     "getBillingReconciliation",
     "getLicenceEnforcement",
-    "getPlanRecommendations",
-    "listCreditNotes"
+    "getPlanRecommendations"
    ],
    "PLATFORM_CELL_MANAGE": [
     "approveBookingLimitCommercial",
@@ -4229,10 +4332,10 @@
     "getVsiModel"
    ],
    "PLATFORM_RELEASE_VIEW": [
+    "diffConfigPackage",
     "getRelease",
     "getReleaseReadiness",
-    "getRollout",
-    "listEnvironments"
+    "getRollout"
    ],
    "PLATFORM_TENANT_MANAGE": [
     "addLicenceAddOn",
@@ -4287,9 +4390,9 @@
    ],
    "REPORT_VIEW_TENANT": [
     "getAnalyticsBenchmark",
+    "getAnalyticsGovernancePolicy",
     "getAnalyticsUsage",
-    "getSemanticModel",
-    "listAnalyticsPipelines"
+    "getSemanticModel"
    ],
    "REPORT_VIEW_VENUE": [
     "acknowledgeAlert",
@@ -4299,9 +4402,9 @@
    ],
    "REPORT_VIEW_WORKSTATION": [
     "getShift",
+    "getShiftCountLines",
     "getWorkstationShift",
-    "listCashMovements",
-    "listShifts"
+    "listCashMovements"
    ],
    "RESOURCE_VIEW": [
     "getExperienceResourceRequirements",

@@ -106,10 +106,7 @@
      "to": "CMS-003",
      "trigger": "5 Look and feel — fonts",
      "provenance": "authored 29 September, W12",
-     "back": true,
-     "carries": [
-      "version"
-     ]
+     "back": true
     },
     {
      "to": "CMS-009",
@@ -133,10 +130,7 @@
      "to": "CMS-006",
      "trigger": "7 Preview",
      "provenance": "authored 29 September, W12 (step 7 is CMS-006, CMS-012 and CMS-014)",
-     "back": true,
-     "carries": [
-      "version"
-     ]
+     "back": true
     },
     {
      "to": "CMS-012",
@@ -148,7 +142,10 @@
      "to": "CMS-014",
      "trigger": "7 Publish",
      "provenance": "authored 29 September, W12",
-     "back": true
+     "back": true,
+     "carries": [
+      "version"
+     ]
     },
     {
      "to": "CMS-015",
@@ -455,7 +452,10 @@
     {
      "to": "CMS-014",
      "trigger": "Publish with the site",
-     "provenance": "authored 29 September, W12 (flows publish through publishTenantConfig)"
+     "provenance": "authored 29 September, W12 (flows publish through publishTenantConfig)",
+     "carries": [
+      "version"
+     ]
     }
    ]
   },
@@ -965,6 +965,25 @@
        ],
        "operation": "listAppBuilds",
        "provenance": "contract white-label.yaml GET /tenant-config/app-builds"
+      },
+      {
+       "kind": "toggle",
+       "label": "Show \"Powered by TICVAI\"",
+       "bindsTo": "BrandIdentity.showPoweredBy",
+       "operation": "setBrandIdentity",
+       "notes": "**A configuration toggle, on by default** (decided by Chinmay, 2 October 2026; DEC-160; CHG-CSA-036). The credit shows on the launch screen under the splash and at the foot of Account (DI-250, DI-297); switching it off is refused 403 `powered-by-locked` unless the tenant's licence carries the powered-by removal add-on, and the toggle says so (CHG-SGU-011).",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-011, decided by Chinmay 2 October 2026, DEC-160)"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Credit shown",
+       "bindsTo": "BrandIdentity",
+       "columns": [
+        "BrandIdentity.showPoweredBy"
+       ],
+       "operation": "getBrandIdentity",
+       "notes": "Whether the \"Powered by TICVAI\" credit shows now, and whether the licence lets it be switched off.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-011, decided by Chinmay 2 October 2026, DEC-160)"
       }
      ]
     },
@@ -1078,6 +1097,18 @@
     "operationId": "sendAiMessage",
     "contract": "ai",
     "purpose": "Ask the app publishing guide a question",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "getBrandIdentity",
+    "contract": "white-label",
+    "purpose": "Whether \"Powered by TICVAI\" shows (BrandIdentity.showPoweredBy)",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "setBrandIdentity",
+    "contract": "white-label",
+    "purpose": "Switch \"Powered by TICVAI\" off where the licence allows (DEC-160)",
     "trigger": "onAction"
    }
   ],

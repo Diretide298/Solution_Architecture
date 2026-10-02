@@ -43,6 +43,29 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "selectField",
+       "label": "What did you lose?",
+       "bindsTo": "LostItem.kind",
+       "operation": "recordLostItem",
+       "notes": "Kind (bag, phone, wallet, keys, clothing, jewellery, documents, toy, buggy, other), colour, brand, description, where and when it was last seen, and photos. Sent as `recordLostItem` with foundOrLost lost and the caseId of the case raised with it, so the register (BO-073) can match it to a found item.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)"
+      },
+      {
+       "kind": "textField",
+       "label": "Colour, brand and description",
+       "bindsTo": "LostItem.description",
+       "operation": "recordLostItem",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)"
+      },
+      {
+       "kind": "fileUpload",
+       "label": "Photos",
+       "bindsTo": "LostItem.photoAssetIds",
+       "operation": "recordLostItem",
+       "notes": "Optional photos of the item.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)"
+      },
+      {
        "kind": "dataTable",
        "label": "Every case",
        "bindsTo": "Case",
@@ -147,13 +170,19 @@
     "invalidates": [
      "listMyCases"
     ]
+   },
+   {
+    "operationId": "recordLostItem",
+    "contract": "marketing-crm",
+    "purpose": "The lost-item record BO-073 matches, linked to the guest's case",
+    "trigger": "onAction"
    }
   ],
   "entryState": {
    "params": [
     {
-     "name": "orderId",
-     "from": "deepLink"
+     "name": "subjectId",
+     "from": "session"
     },
     {
      "name": "caseId",
@@ -188,7 +217,7 @@
     "id": "formRaiseMyCase",
     "component": "modal",
     "trigger": "Raise my case",
-    "body": "**Collects what `raiseMyCase` sends before it is called.** Required: `id`, `kind`, `summary`, `recordedAt`. Optional: `detail`, `venueId`, `orderRef`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "Raises the case (`raiseMyCase`, kind lost property) and records the lost item (`recordLostItem`, foundOrLost lost, caseId) in the same act; the guest fills one form.",
     "confirm": {
      "label": "Raise my case",
      "operation": "raiseMyCase"
@@ -205,7 +234,7 @@
       "orderRef"
      ]
     },
-    "provenance": "client-verified"
+    "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)"
    },
    {
     "id": "formReplyToMyCase",

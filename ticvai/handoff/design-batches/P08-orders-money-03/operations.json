@@ -75,44 +75,6 @@
   "requestBody": null,
   "responds": "PeriodCloseResult"
  },
- "createAccount": {
-  "method": "POST",
-  "path": "/accounts",
-  "contract": "finance",
-  "summary": "Create an account",
-  "permission": "ACCOUNT_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "region",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "CreateAccountRequest",
-  "responds": "Account"
- },
- "createCostCenter": {
-  "method": "POST",
-  "path": "/cost-centers",
-  "contract": "finance",
-  "summary": "Create a cost centre",
-  "permission": "ACCOUNT_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "region",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "CostCenter"
- },
  "createJournalEntry": {
   "method": "POST",
   "path": "/journal-entries",
@@ -131,25 +93,6 @@
   ],
   "requestBody": "CreateJournalEntryRequest",
   "responds": "JournalEntry"
- },
- "createLegalEntity": {
-  "method": "POST",
-  "path": "/legal-entities",
-  "contract": "finance",
-  "summary": "Create a legal entity",
-  "permission": "ACCOUNT_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "LegalEntity",
-  "responds": "LegalEntity"
  },
  "createRecognitionSchedule": {
   "method": "POST",
@@ -207,19 +150,6 @@
   ],
   "requestBody": "TaxExemption",
   "responds": "TaxExemption"
- },
- "getAccount": {
-  "method": "GET",
-  "path": "/accounts/{accountId}",
-  "contract": "finance",
-  "summary": "Read an account",
-  "permission": "LEDGER_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "region",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "Account"
  },
  "getDeferredRevenue": {
   "method": "GET",
@@ -316,19 +246,6 @@
   "requestBody": null,
   "responds": "FinVatReturn"
  },
- "getVenueSettings": {
-  "method": "GET",
-  "path": "/venues/{venueId}/settings",
-  "contract": "tenancy",
-  "summary": "Operational settings for this venue",
-  "permission": "TENANT_VIEW",
-  "offlineCapable": true,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "VenueSettings"
- },
  "ingestFxRates": {
   "method": "POST",
   "path": "/fx-rates/ingest",
@@ -353,69 +270,6 @@
   "path": "/account-mappings",
   "contract": "finance",
   "summary": "Which account each transaction type posts to",
-  "permission": "LEDGER_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "region",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- },
- "listAccounts": {
-  "method": "GET",
-  "path": "/accounts",
-  "contract": "finance",
-  "summary": "List the chart of accounts",
-  "permission": "LEDGER_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "region",
-  "parameters": [
-   {
-    "name": "legalEntityId",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "type",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "isPostable",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- },
- "listCostCenters": {
-  "method": "GET",
-  "path": "/cost-centers",
-  "contract": "finance",
-  "summary": "List cost centres",
   "permission": "LEDGER_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
@@ -495,6 +349,11 @@
     "required": null
    },
    {
+    "name": "chargeable",
+    "in": "query",
+    "required": null
+   },
+   {
     "name": null,
     "in": null,
     "required": null
@@ -533,30 +392,6 @@
     "in": "query",
     "required": null
    },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- },
- "listLegalEntities": {
-  "method": "GET",
-  "path": "/legal-entities",
-  "contract": "finance",
-  "summary": "List legal entities",
-  "permission": "LEDGER_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
    {
     "name": null,
     "in": null,
@@ -937,25 +772,6 @@
   ],
   "requestBody": "FxRate",
   "responds": "FxRate"
- },
- "updateAccount": {
-  "method": "PATCH",
-  "path": "/accounts/{accountId}",
-  "contract": "finance",
-  "summary": "Rename, remap or deactivate an account",
-  "permission": "ACCOUNT_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "region",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Account"
  },
  "updateTaxCode": {
   "method": "PATCH",

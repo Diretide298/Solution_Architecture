@@ -561,6 +561,17 @@
    }
   }
  },
+ "InspectionItemKind": {
+  "type": "string",
+  "enum": [
+   "passFail",
+   "yesNo",
+   "numeric",
+   "text",
+   "photo",
+   "signature"
+  ]
+ },
  "InspectionOutcome": {
   "type": "string",
   "enum": [
@@ -614,6 +625,112 @@
       "nullable": true
      }
     }
+   }
+  }
+ },
+ "InspectionTemplate": {
+  "x-ticvai-persistence": "maintenance.inspection_template + maintenance.inspection_template_item",
+  "type": "object",
+  "required": [
+   "id",
+   "code",
+   "name",
+   "items"
+  ],
+  "properties": {
+   "instructions": {
+    "type": "string",
+    "description": "**The procedure itself.** A technician asking how to isolate a chiller is asking a safety question, and the answer has to come from the template rather than from its title.\n"
+   },
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string",
+    "maxLength": 64
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "appliesToAssetCategoryId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "frequency": {
+    "type": "string",
+    "enum": [
+     "preOpening",
+     "postClosing",
+     "daily",
+     "weekly",
+     "monthly",
+     "annual",
+     "adHoc"
+    ]
+   },
+   "items": {
+    "type": "array",
+    "minItems": 1,
+    "items": {
+     "type": "object",
+     "required": [
+      "key",
+      "label",
+      "kind",
+      "isRequired"
+     ],
+     "properties": {
+      "key": {
+       "type": "string"
+      },
+      "label": {
+       "type": "string"
+      },
+      "kind": {
+       "$ref": "#/components/schemas/InspectionItemKind"
+      },
+      "isRequired": {
+       "type": "boolean"
+      },
+      "isSafetyCritical": {
+       "type": "boolean",
+       "default": false,
+       "description": "A failed safety-critical item **blocks the inspection from passing** and cannot be overridden by completing the rest.\n"
+      },
+      "requiresPhotoOnFail": {
+       "type": "boolean",
+       "default": true
+      },
+      "minValue": {
+       "type": "number",
+       "nullable": true
+      },
+      "maxValue": {
+       "type": "number",
+       "nullable": true
+      },
+      "guidance": {
+       "type": "string",
+       "nullable": true
+      }
+     }
+    }
+   },
+   "retentionYears": {
+    "type": "integer",
+    "default": 7,
+    "description": "Compliance inspections are retained alongside the financial trail."
+   },
+   "isActive": {
+    "type": "boolean"
    }
   }
  },
@@ -868,7 +985,8 @@
    "depositAuthorisationId": {
     "type": "string",
     "format": "uuid",
-    "nullable": true
+    "nullable": true,
+    "description": "The card deposit's terminal pre-authorisation, written by `checkOutRental` (workbook Q304; CHG-CSA-029). The hold is kept whole until every unit is back (workbook Q306)."
    },
    "accruedLateFee": {
     "$ref": "../shared/common.yaml#/components/schemas/Money"
@@ -914,6 +1032,12 @@
    "depositInstrument": {
     "type": "string",
     "nullable": true
+   },
+   "depositAuthorisationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**The terminal pre-authorisation of a card deposit** (workbook Q304; CHG-CSA-029), as the payments terminal returned it. Required where the deposit is on a card; stored on the booking."
    },
    "conditionNote": {
     "type": "string",

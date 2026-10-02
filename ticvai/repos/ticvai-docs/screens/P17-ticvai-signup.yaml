@@ -108,20 +108,15 @@ screens:
   states:
     loading: The welcome start your configuration as saved.
     error: Could not load. Names which read failed and leaves the welcome start your untouched.
-    emptyFirstRun: No welcome start your configured yet. Carries the create action and says what the platform
-      does in the meantime.
+    emptyFirstRun: No welcome start your configured yet. Offers no create action — this screen declares
+      no operation that makes one; distinct from a filter that matched nothing.
     emptyNoAccess: TODO — not decided. A prospect is signed out and holds no permission, so the operator
       wording on the P09 twin does not apply. The book offers *Continue Saved Setup* and *Sign In* on
       2.1, which is where somebody without access to a saved setup would be sent; no minute has decided
       it.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis:
-  - operationId: scoreVsiAssessment
-    contract: subscription
-    purpose: Begin the assessment
-    trigger: onAction
-    provenance: board reading, 19 September 2026
+  apis: []
   apisNote: Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 21. 0 of
     0 labels bound to a contract property; 4 of 16 pack bullets carried onto the screen — the rest are
     acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather
@@ -136,6 +131,13 @@ screens:
       provenance: structural — the book's own journey, 2.1 "Journey Preview", 11 September 2026
     entryFrom:
     - SGN-002
+  gaps:
+  - operation: scoreVsiAssessment
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-021): The welcome page scores nothing (scoreVsiAssessment is
+      called on the assessment screens SGN-003 to SGN-010); the operator-led copy ADM-379 loses it too,
+      so the two stay in step (design-notes correction platform-foundation SGN-001).'
+    source: screens/P17-ticvai-signup.yaml#SGN-001
 - id: SGN-002
   name: Customer & Organization Registration
   module: Onboarding & Assessment
@@ -169,6 +171,28 @@ screens:
     regions:
     - name: contentBody
       components:
+      - kind: textField
+        label: Work email
+        bindsTo: StartProspectSignupRequest.email
+        notes: 'Step one of the prospect sign-up session (DEC-167, "Email + one-time code"): the code
+          goes to this address; "Continue saved setup" is the same field (CHG-CLN-019).'
+        provenance: contract identity.yaml POST /auth/prospect/signup
+      - kind: secondaryButton
+        label: Send code
+        operation: startProspectSignup
+        notes: Sends the one-time code; the answer is the same whether or not the email has a saved setup.
+        provenance: contract identity.yaml POST /auth/prospect/signup
+      - kind: textField
+        label: One-time code
+        bindsTo: VerifyProspectSignupCodeRequest.code
+        notes: Six digits from the email; a right code opens the sign-up session (prospectAuth) the rest
+          of the journey runs on and resumes a saved setup (CHG-CLN-019).
+        provenance: contract identity.yaml POST /auth/prospect/signup/{challengeId}/verify
+      - kind: secondaryButton
+        label: Verify code
+        operation: verifyProspectSignupCode
+        notes: A wrong code says so and counts against the challenge; after five, Send code again.
+        provenance: contract identity.yaml POST /auth/prospect/signup/{challengeId}/verify
       - kind: primaryButton
         derived: true
         impliedBy: submitOnboardingApplication
@@ -207,6 +231,16 @@ screens:
     purpose: Register the organisation
     trigger: onAction
     provenance: board reading, 19 September 2026
+  - operationId: startProspectSignup
+    contract: identity
+    purpose: Send the one-time code that opens (or resumes) the sign-up
+    trigger: onAction
+    provenance: DEC-167, 2 October 2026 (CHG-CLN-019)
+  - operationId: verifyProspectSignupCode
+    contract: identity
+    purpose: Prove the email and receive the prospect sign-up session
+    trigger: onAction
+    provenance: DEC-167, 2 October 2026 (CHG-CLN-019)
   apisNote: Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 22. 0 of
     0 labels bound to a contract property; 0 of 22 pack bullets carried onto the screen — the rest are
     acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather
@@ -226,6 +260,10 @@ screens:
     - to: SGN-003
       trigger: Venue Type & Business Profile
       provenance: structural — the book's own journey, 2.1 "Journey Preview", 11 September 2026
+  entryState:
+    params:
+    - name: challengeId
+      from: navigation
 - id: SGN-003
   name: Venue Type & Business Profile
   module: Onboarding & Assessment
@@ -258,24 +296,14 @@ screens:
     - name: contentBody
       slot: collection
       components:
-      - kind: dataTable
-        label: Every venue type business
-        columns:
-        - Museum
-        - Attraction
-        - Theme Park
-        - Waterpark
-        - Stadium
-        - Theatre
-        - Exhibition / Event Venue
-        - Zoo / Aquarium
-        - Tour Operator
-        - Entertainment Center
-        - Multi-Venue Operator
-        - Other
+      - kind: multiSelect
+        label: Venue type
         bindsTo: null
         operation: null
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 23 §Visual cards
+        notes: The venue types the prospect chooses from (Museum, Attraction, Theme Park, Waterpark, Stadium,
+          Theatre, Exhibition / Event Venue, Zoo / Aquarium, Tour Operator, Entertainment Center, Multi-Venue
+          Operator, Other), a choice, not table columns (design-note correction SGN-003, CHG-SOT-017).
     - name: contextPanel
       slot: selection
       components:
@@ -300,8 +328,8 @@ screens:
   states:
     loading: The venue type business list.
     error: Could not load. Names which read failed and leaves the venue type business untouched.
-    emptyFirstRun: No venue type business yet. Carries the create action; distinct from a filter that
-      matched nothing.
+    emptyFirstRun: No venue type business yet. Offers no create action — this screen declares no operation
+      that makes one; distinct from a filter that matched nothing.
     emptyNoResults: The filter narrowed it and the venue type business are still there. Names the active
       filter and offers to clear it.
     emptyNoAccess: TODO — not decided. A prospect is signed out and holds no permission, so the operator
@@ -392,8 +420,8 @@ screens:
   states:
     loading: The visitor capacity operational list.
     error: Could not load. Names which read failed and leaves the visitor capacity operational untouched.
-    emptyFirstRun: No visitor capacity operational yet. Carries the create action; distinct from a filter
-      that matched nothing.
+    emptyFirstRun: No visitor capacity operational yet. Offers no create action — this screen declares
+      no operation that makes one; distinct from a filter that matched nothing.
     emptyNoResults: The filter narrowed it and the visitor capacity operational are still there. Names
       the active filter and offers to clear it.
     emptyNoAccess: TODO — not decided. A prospect is signed out and holds no permission, so the operator
@@ -505,19 +533,15 @@ screens:
   states:
     loading: The sales channel assessment configuration as saved.
     error: Could not load. Names which read failed and leaves the sales channel assessment untouched.
-    emptyFirstRun: No sales channel assessment configured yet. Carries the create action and says what
-      the platform does in the meantime.
+    emptyFirstRun: No sales channel assessment configured yet. Offers no create action — this screen declares
+      no operation that makes one and says what the platform does in the meantime.
+    emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
+      somebody concluding the record does not exist'
     emptyNoAccess: TODO — not decided. A prospect is signed out and holds no permission, so the operator
       wording on the P09 twin does not apply. The book offers *Continue Saved Setup* and *Sign In* on
       2.1, which is where somebody without access to a saved setup would be sent; no minute has decided
       it.
-    emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
-      somebody concluding the record does not exist'
   apis:
-  - operationId: listSaleChannel
-    contract: catalogue
-    purpose: Sales Channel Command Center
-    trigger: onLoad
   - operationId: scoreVsiAssessment
     contract: subscription
     purpose: Record the answers and score them
@@ -542,6 +566,13 @@ screens:
     - to: SGN-006
       trigger: Ticketing & Product Requirements
       provenance: structural — the book's own journey, 2.1 "Journey Preview", 11 September 2026
+  gaps:
+  - operation: listSaleChannel
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-025): listSaleChannel reads a live tenant''s configured channels,
+      and a prospect has no cell and no channels; the assessment uses the answers only (scoreVsiAssessment)
+      (design-notes correction ticketing-backoffice ADM-383)'
+    source: contracts/spine/catalogue.yaml#listSaleChannel
 - id: SGN-006
   name: Ticketing & Product Requirements
   module: Onboarding & Assessment
@@ -623,8 +654,8 @@ screens:
   states:
     loading: The ticketing product requirements configuration as saved.
     error: Could not load. Names which read failed and leaves the ticketing product requirements untouched.
-    emptyFirstRun: No ticketing product requirements configured yet. Carries the create action and says
-      what the platform does in the meantime.
+    emptyFirstRun: No ticketing product requirements configured yet. Offers no create action — this screen
+      declares no operation that makes one; distinct from a filter that matched nothing.
     emptyNoAccess: TODO — not decided. A prospect is signed out and holds no permission, so the operator
       wording on the P09 twin does not apply. The book offers *Continue Saved Setup* and *Sign In* on
       2.1, which is where somebody without access to a saved setup would be sent; no minute has decided
@@ -701,8 +732,8 @@ screens:
   states:
     loading: The access queue visitor list.
     error: Could not load. Names which read failed and leaves the access queue visitor untouched.
-    emptyFirstRun: No access queue visitor yet. Carries the create action; distinct from a filter that
-      matched nothing.
+    emptyFirstRun: No access queue visitor yet. Offers no create action — this screen declares no operation
+      that makes one; distinct from a filter that matched nothing.
     emptyNoResults: The filter narrowed it and the access queue visitor are still there. Names the active
       filter and offers to clear it.
     emptyNoAccess: TODO — not decided. A prospect is signed out and holds no permission, so the operator
@@ -795,8 +826,8 @@ screens:
   states:
     loading: The additional business module list.
     error: Could not load. Names which read failed and leaves the additional business module untouched.
-    emptyFirstRun: No additional business module yet. Carries the create action; distinct from a filter
-      that matched nothing.
+    emptyFirstRun: No additional business module yet. Offers no create action — this screen declares no
+      operation that makes one; distinct from a filter that matched nothing.
     emptyNoResults: The filter narrowed it and the additional business module are still there. Names the
       active filter and offers to clear it.
     emptyNoAccess: TODO — not decided. A prospect is signed out and holds no permission, so the operator
@@ -890,8 +921,8 @@ screens:
   states:
     loading: The integration payment technical list.
     error: Could not load. Names which read failed and leaves the integration payment technical untouched.
-    emptyFirstRun: No integration payment technical yet. Carries the create action; distinct from a filter
-      that matched nothing.
+    emptyFirstRun: No integration payment technical yet. Offers no create action — this screen declares
+      no operation that makes one; distinct from a filter that matched nothing.
     emptyNoResults: The filter narrowed it and the integration payment technical are still there. Names
       the active filter and offers to clear it.
     emptyNoAccess: TODO — not decided. A prospect is signed out and holds no permission, so the operator
@@ -980,8 +1011,8 @@ screens:
   states:
     loading: The assessment summary handoff list.
     error: Could not load. Names which read failed and leaves the assessment summary handoff untouched.
-    emptyFirstRun: No assessment summary handoff yet. Carries the create action; distinct from a filter
-      that matched nothing.
+    emptyFirstRun: No assessment summary handoff yet. Offers no create action — this screen declares no
+      operation that makes one; distinct from a filter that matched nothing.
     emptyNoResults: The filter narrowed it and the assessment summary handoff are still there. Names the
       active filter and offers to clear it.
     emptyNoAccess: TODO — not decided. A prospect is signed out and holds no permission, so the operator
@@ -1071,8 +1102,8 @@ screens:
   states:
     loading: The recommended package overview list.
     error: Could not load. Names which read failed and leaves the recommended package overview untouched.
-    emptyFirstRun: No recommended package overview yet. Carries the create action; distinct from a filter
-      that matched nothing.
+    emptyFirstRun: No recommended package overview yet. Offers no create action — this screen declares
+      no operation that makes one; distinct from a filter that matched nothing.
     emptyNoResults: The filter narrowed it and the recommended package overview are still there. Names
       the active filter and offers to clear it.
     emptyNoAccess: TODO — not decided. A prospect is signed out and holds no permission, so the operator
@@ -1197,8 +1228,8 @@ screens:
   states:
     loading: The commercial model tier list.
     error: Could not load. Names which read failed and leaves the commercial model tier untouched.
-    emptyFirstRun: No commercial model tier yet. Carries the create action; distinct from a filter that
-      matched nothing.
+    emptyFirstRun: No commercial model tier yet. Offers no create action — this screen declares no operation
+      that makes one; distinct from a filter that matched nothing.
     emptyNoResults: The filter narrowed it and the commercial model tier are still there. Names the active
       filter and offers to clear it.
     emptyNoAccess: TODO — not decided. A prospect is signed out and holds no permission, so the operator
@@ -1311,8 +1342,8 @@ screens:
   states:
     loading: The module marketplace list.
     error: Could not load. Names which read failed and leaves the module marketplace untouched.
-    emptyFirstRun: No module marketplace yet. Carries the create action; distinct from a filter that matched
-      nothing.
+    emptyFirstRun: No module marketplace yet. Offers no create action — this screen declares no operation
+      that makes one; distinct from a filter that matched nothing.
     emptyNoResults: The filter narrowed it and the module marketplace are still there. Names the active
       filter and offers to clear it.
     emptyNoAccess: TODO — not decided. A prospect is signed out and holds no permission, so the operator
@@ -1420,8 +1451,8 @@ screens:
   states:
     loading: The module package recommendations list.
     error: Could not load. Names which read failed and leaves the module package recommendations untouched.
-    emptyFirstRun: No module package recommendations yet. Carries the create action; distinct from a filter
-      that matched nothing.
+    emptyFirstRun: No module package recommendations yet. Offers no create action — this screen declares
+      no operation that makes one; distinct from a filter that matched nothing.
     emptyNoResults: The filter narrowed it and the module package recommendations are still there. Names
       the active filter and offers to clear it.
     emptyNoAccess: TODO — not decided. A prospect is signed out and holds no permission, so the operator
@@ -1503,8 +1534,8 @@ screens:
   states:
     loading: The module detail commercial list.
     error: Could not load. Names which read failed and leaves the module detail commercial untouched.
-    emptyFirstRun: No module detail commercial yet. Carries the create action; distinct from a filter
-      that matched nothing.
+    emptyFirstRun: No module detail commercial yet. Offers no create action — this screen declares no
+      operation that makes one; distinct from a filter that matched nothing.
     emptyNoResults: The filter narrowed it and the module detail commercial are still there. Names the
       active filter and offers to clear it.
     emptyNoAccess: TODO — not decided. A prospect is signed out and holds no permission, so the operator
@@ -1575,26 +1606,16 @@ screens:
     regions:
     - name: contentBody
       components:
-      - kind: primaryButton
-        derived: true
-        impliedBy: setModuleListing
-        label: Save module listing
-        notes: The act the screen exists for.
       - kind: dataTable
         derived: true
         impliedBy: listModuleCatalogue
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: setModuleListing
   states:
     loading: The module dependency compatibility list.
     error: Could not load. Names which read failed and leaves the module dependency compatibility untouched.
-    emptyFirstRun: No module dependency compatibility yet. Carries the create action; distinct from a
-      filter that matched nothing.
+    emptyFirstRun: No module dependency compatibility yet. Offers no create action — this screen declares
+      no operation that makes one; distinct from a filter that matched nothing.
     emptyNoResults: The filter narrowed it and the module dependency compatibility are still there. Names
       the active filter and offers to clear it.
     emptyNoAccess: TODO — not decided. A prospect is signed out and holds no permission, so the operator
@@ -1618,14 +1639,12 @@ screens:
     why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
       a default rather than a reading. It needs a person before it is built.'
     source: pack Subscription_Licensing_AI_Self_Service.pdf, page 49
+  - operation: setModuleListing
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-021): setModuleListing edits TICVAI''s module catalogue and
+      was offered to a prospect; ADM-404 keeps it (design-notes correction platform-foundation SGN-016).'
+    source: contracts/satellite/subscription.yaml#setModuleListing
   apis:
-  - operationId: setModuleListing
-    contract: subscription
-    purpose: Dependencies and compatibility
-    trigger: onAction
-    provenance: board reading, 19 September 2026
-    invalidates:
-    - listModuleCatalogue
   - operationId: listModuleCatalogue
     contract: subscription
     purpose: What depends on what
@@ -1766,22 +1785,12 @@ screens:
     template: split
     regions:
     - name: contentBody
-      components:
-      - kind: primaryButton
-        derived: true
-        impliedBy: setTrialConfiguration
-        label: Save trial configuration
-        notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: setTrialConfiguration
+      components: []
   states:
     loading: The purchase trial journey list.
     error: Could not load. Names which read failed and leaves the purchase trial journey untouched.
-    emptyFirstRun: No purchase trial journey yet. Carries the create action; distinct from a filter that
-      matched nothing.
+    emptyFirstRun: No purchase trial journey yet. Offers no create action — this screen declares no operation
+      that makes one; distinct from a filter that matched nothing.
     emptyNoResults: The filter narrowed it and the purchase trial journey are still there. Names the active
       filter and offers to clear it.
     emptyNoAccess: TODO — not decided. A prospect is signed out and holds no permission, so the operator
@@ -1799,12 +1808,17 @@ screens:
     why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
       a default rather than a reading. It needs a person before it is built.'
     source: pack Subscription_Licensing_AI_Self_Service.pdf, page 58
-  apis:
-  - operationId: setTrialConfiguration
-    contract: subscription
-    purpose: Purchase or trial
-    trigger: onAction
-    provenance: board reading, 19 September 2026
+  - operation: setTrialConfiguration
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-021): setTrialConfiguration sets TICVAI''s trial rules (PLATFORM_PLAN_MANAGE);
+      the prospect chooses, TICVAI configures trials on ADM-413 (design-notes correction platform-foundation
+      SGN-018). See the CHG-WIR-024 gap.'
+    source: contracts/satellite/subscription.yaml#setTrialConfiguration
+  - operation: null
+    why: 'Contract gap recorded 2 October 2026 (CHG-WIR-024): No prospect-callable operation records whether
+      the prospect buys or starts a trial.'
+    source: screens/P17-ticvai-signup.yaml#SGN-018
+  apis: []
   apisNote: Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 58. 0 of
     0 labels bound to a contract property; 0 of 22 pack bullets carried onto the screen — the rest are
     acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather
@@ -1930,7 +1944,6 @@ screens:
   requiresModule: core
   wave: 3
   source:
-    sameAs: ADM-411
     book: Subscription_Licensing_AI_Self_Service.pdf
     board: '5'
     number: '3'
@@ -1947,59 +1960,105 @@ screens:
   wireframe:
     status: notStarted
     board: wireframes/P17 TICVAI Sign-up.dc.html#sgn-020
-  purpose: Capture the legally correct customer and billing information.
-  pattern: listDetail
-  patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no
-    display directory, no configuration directory. It falls to the default, and the fallback is recorded
-    rather than passed off as a decision'
+  purpose: Capture the company TICVAI will invoice and its trade licence and tax registration, in plain
+    language, saved on the application.
+  pattern: configEditor
+  patternReason: One record (the billing entity) entered and saved on the application; no population to
+    list (CHG-SOT-017).
   layout:
-    template: split
+    template: form
     regions:
+    - name: contentBody
+      slot: fields
+      components:
+      - kind: textField
+        label: Company to be invoiced (legal name)
+        bindsTo: BillingEntity.legalName
+        operation: submitOnboardingApplication
+        notes: Prints on the tax invoice exactly as entered. **The commercial customer may differ from
+          the operating venue** (the pack's "Commercial Customer ≠ Operating Venue").
+        provenance: contract subscription.yaml BillingEntity (CHG-CSA-030)
+      - kind: selectField
+        label: Country
+        bindsTo: BillingEntity.countryCode
+        operation: submitOnboardingApplication
+        notes: Decides which documents are required (tenancy `RegionSettings`).
+        provenance: contract subscription.yaml BillingEntity (CHG-CSA-030)
+      - kind: textField
+        label: Trade licence number
+        bindsTo: BillingEntity.tradeLicenceNumber
+        operation: submitOnboardingApplication
+        provenance: contract subscription.yaml BillingEntity (CHG-CSA-030)
+      - kind: textField
+        label: Tax registration number (TRN)
+        bindsTo: BillingEntity.trn
+        operation: submitOnboardingApplication
+        notes: Optional. Entering one makes the VAT certificate required (decided 2 October 2026, workbook
+          Q210, DEC-210).
+        provenance: contract subscription.yaml BillingEntity (CHG-CSA-030)
+      - kind: textField
+        label: Billing address
+        bindsTo: BillingEntity.address
+        operation: submitOnboardingApplication
+        provenance: contract subscription.yaml BillingEntity (CHG-CSA-030)
+      - kind: textField
+        label: Invoice email
+        bindsTo: BillingEntity.invoiceEmail
+        operation: submitOnboardingApplication
+        provenance: contract subscription.yaml BillingEntity (CHG-CSA-030)
+      - kind: detailPanel
+        label: Documents required
+        bindsTo: BillingEntity.documents
+        columns:
+        - BillingEntity.documents
+        - BillingEntity.missingDocuments
+        operation: submitOnboardingApplication
+        notes: A trade licence always; a VAT certificate when a TRN is entered. Each shows missing, uploaded,
+          verified, rejected or expired. **Nothing is provisioned until verification passes** (DEC-223).
+        provenance: contract subscription.yaml BillingEntity.documents (CHG-CSA-030)
     - name: actionBar
-      slot: rowActions
+      slot: publish
       components:
       - kind: primaryButton
-        label: Commercial Customer ≠ Operating Venue
-        provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 60 §Allow
+        label: Save and continue
+        operation: submitOnboardingApplication
+        notes: 'Sends the application with `billingEntity` (decided 2 October 2026, Chinmay, workbook
+          Q209 and Q223: "Yes: saved on the application; nothing provisioned until verified"; DEC-209,
+          DEC-223, CHG-CSA-030).'
+        provenance: contract subscription.yaml POST /onboarding-applications
       - kind: secondaryButton
-        label: Validate Entity / Save / Continue
-        provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 60 §Actions
-    - name: contentBody
-      components: []
+        label: Back
+        notes: Leaves without sending; what was typed stays on the sign-up session.
+        provenance: derived
   states:
-    loading: The billing legal entity list.
-    error: Could not load. Names which read failed and leaves the billing legal entity untouched.
-    emptyFirstRun: No billing legal entity yet. Carries the create action; distinct from a filter that
-      matched nothing.
-    emptyNoResults: The filter narrowed it and the billing legal entity are still there. Names the active
-      filter and offers to clear it.
-    emptyNoAccess: TODO — not decided. A prospect is signed out and holds no permission, so the operator
-      wording on the P09 twin does not apply. The book offers *Continue Saved Setup* and *Sign In* on
-      2.1, which is where somebody without access to a saved setup would be sent; no minute has decided
-      it.
+    loading: The application as saved so far.
+    error: Could not save. Names what failed; nothing typed is lost.
+    emptyFirstRun: Nothing entered yet. Says why each item is asked (it prints on the tax invoice) and
+      that nothing is provisioned until it is verified. The prospect's answers are kept on their sign-up
+      session and they can come back with a one-time code to "Continue saved setup" (decided 2 October
+      2026, DEC-167).
+    emptyNoAccess: 'Not applicable: a prospect holds no permission. A signed-out prospect without a saved
+      setup is sent to SGN-001 to start or continue one.'
   gaps:
+  - operation: createLegalEntity
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-SOT-017, design-notes correction SGN-020): `createLegalEntity` is
+      a tenant-scoped, staff-only ledger operation needing ACCOUNT_CONFIGURE, and a prospect on P17 has
+      no tenant and no cell. The billing entity rides on the onboarding application instead (CHG-CSA-030);
+      TICVAI staff maintain it on ADM-411 with `setBillingEntity`.'
+    source: contracts/spine/finance.yaml#createLegalEntity | contracts/satellite/subscription.yaml#submitOnboardingApplication
   - operation: null
-    why: '**The pack names 2 actions on this screen and the screen declares 0 operations.** Unserved:
-      Commercial Customer ≠ Operating Venue, Validate Entity / Save / Continue. Each needs an operation,
-      or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side
-      rather than the contract side.'
-    source: pack Subscription_Licensing_AI_Self_Service.pdf, page 60 §Allow
-  - operation: null
-    why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
-      acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere
-      in them. The screen has no content region rather than an empty one, and it needs a person before
-      it is built.'
-    source: pack Subscription_Licensing_AI_Self_Service.pdf, page 60
-  - operation: null
-    why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
-      a default rather than a reading. It needs a person before it is built.'
-    source: pack Subscription_Licensing_AI_Self_Service.pdf, page 60
+    why: '**No public upload for the trade licence and VAT certificate, and no operation amends a submitted
+      application.** `createUpload` is staff-only, and the application is created once (SGN-002), so the
+      billing entity and its documents cannot be added from here after it is submitted. Logged as contract
+      gaps 2 October 2026 (CHG-SOT-016).'
+    source: contracts/satellite/assets.yaml#createUpload | contracts/satellite/subscription.yaml#submitOnboardingApplication
   apis:
-  - operationId: createLegalEntity
-    contract: finance
-    purpose: Billing and legal entity
+  - operationId: submitOnboardingApplication
+    contract: subscription
+    purpose: The billing entity rides on the onboarding application, saved before verification (DEC-223)
     trigger: onAction
-    provenance: board reading, 19 September 2026
+    provenance: decided 2 October 2026 (DEC-209, DEC-223, CHG-CSA-030); bound by CHG-SOT-017
   apisNote: Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 60. 0 of
     0 labels bound to a contract property; 2 of 21 pack bullets carried onto the screen — the rest are
     acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather
@@ -2019,6 +2078,10 @@ screens:
     - to: SGN-021
       trigger: Payment Method & Settlement Setup
       provenance: structural — the book's own journey, 2.1 "Journey Preview", 11 September 2026
+  sourceNote: '**No longer a copy of ADM-411** (2 October 2026, CHG-SOT-017). Chinmay decided the billing
+    entity rides on the onboarding application for a prospect (workbook Q223, DEC-223) while TICVAI staff
+    maintain it on ADM-411 with setBillingEntity (Q209, DEC-209), so the two screens call different operations
+    and `source.sameAs` would force them back together. The pack anchor (board 5.3) is kept.'
 - id: SGN-021
   name: Payment Method & Settlement Setup
   module: Purchase & Activation
@@ -2063,10 +2126,10 @@ screens:
         columns:
         - PaymentProvider.supportedMethods
         operation: setPaymentProvider
-        notes: '**The methods follow the contract (decided 28 September, audit R275 (a))**: the options are
-          the `PaymentProvider.supportedMethods` enum that `setPaymentProvider` accepts. The pack''s Credit
-          / Debit Card is `card` and its Bank Transfer is `bankTransfer`; its Other Approved Method is not
-          in the contract and is dropped.'
+        notes: '**The methods follow the contract (decided 28 September, audit R275 (a))**: the options
+          are the `PaymentProvider.supportedMethods` enum that `setPaymentProvider` accepts. The pack''s
+          Credit / Debit Card is `card` and its Bank Transfer is `bankTransfer`; its Other Approved Method
+          is not in the contract and is dropped.'
         provenance: contract orders.yaml PUT /payment-providers
       - kind: primaryButton
         label: Save payment provider
@@ -2188,8 +2251,8 @@ screens:
   states:
     loading: The order commercial pricing list.
     error: Could not load. Names which read failed and leaves the order commercial pricing untouched.
-    emptyFirstRun: No order commercial pricing yet. Carries the create action; distinct from a filter
-      that matched nothing.
+    emptyFirstRun: No order commercial pricing yet. Offers no create action — this screen declares no
+      operation that makes one; distinct from a filter that matched nothing.
     emptyNoResults: The filter narrowed it and the order commercial pricing are still there. Names the
       active filter and offers to clear it.
     emptyNoAccess: TODO — not decided. A prospect is signed out and holds no permission, so the operator

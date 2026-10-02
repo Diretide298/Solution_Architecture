@@ -32,10 +32,15 @@
     {
      "to": "GST-020",
      "trigger": "Saved items carry across sessions",
-     "provenance": "flow F53 step 4→5",
-     "carries": [
-      "subjectId"
-     ]
+     "provenance": "flow F53 step 4→5"
+    },
+    {
+     "to": "BO-395",
+     "trigger": "Machine records the play",
+     "provenance": "flow F18 step 2→3",
+     "operation": "getGameCard",
+     "crossesDevice": true,
+     "back": false
     }
    ]
   },
@@ -43,7 +48,7 @@
   "density": "comfortable",
   "pattern": "listDetail",
   "patternReason": "`listWalletTransactions` reads the population and `getWallet` reads one of them — list, select, act",
-  "purpose": "The screen this app sits on. Everything else is entered from here and returns to it.",
+  "purpose": "My wallet: balance, activity and auto top-up, and what is due or refundable at exit.",
   "layout": {
    "template": "split",
    "regions": [
@@ -88,6 +93,25 @@
        ],
        "operation": "getWallet",
        "provenance": "contract wallet.yaml GET /wallets/{subjectId}"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The game card",
+       "bindsTo": "GameCard",
+       "columns": [
+        "GameCard.cardCode",
+        "GameCard.kind",
+        "GameCard.credits",
+        "GameCard.bonusCredits",
+        "GameCard.points",
+        "GameCard.status",
+        "GameCard.blockedReason",
+        "GameCard.lastPlayedAt",
+        "GameCard.expiresAt"
+       ],
+       "operation": "getGameCard",
+       "notes": "An arcade card's balance, read by its code, as the web wallet WEB-021 shows it (flow F18 step 2; CHG-CLN-006).",
+       "provenance": "contract games.yaml GET /game-cards/{cardCode}"
       }
      ]
     }
@@ -141,10 +165,21 @@
     "purpose": "Settle the wallet at exit",
     "trigger": "onAction",
     "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "getGameCard",
+    "contract": "games",
+    "purpose": "Balance on a game card",
+    "trigger": "onAction",
+    "provenance": "flow F18 step 2, 2 October 2026 (CHG-CLN-006)"
    }
   ],
   "entryState": {
    "params": [
+    {
+     "name": "cardCode",
+     "from": "deepLink"
+    },
     {
      "name": "subjectId",
      "from": "session"
@@ -540,7 +575,7 @@
     "id": "formGrantDelegation",
     "component": "modal",
     "trigger": "Let a family member use it",
-    "body": "**Pick the family member, then what they may do, in plain words** (book with it, enter with it, see the bills), and how many times. `grantDelegation` with the person and the permission the choice stands for; no subject id, delegation kind or permission key is shown.",
+    "body": "**In plain words:** pick a family member and what they may do with this membership (\"use it to get in\", \"book with it\", \"spend up to AED 200\"). The delegation kind, the permission and the quota are set from those choices; no subject ids are shown.",
     "confirm": {
      "label": "Allow",
      "operation": "grantDelegation"
@@ -557,7 +592,7 @@
       "isRevocableBySubject"
      ]
     },
-    "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
+    "provenance": "corrected 2 October 2026 (CHG-SGU-020, design-notes correction)"
    }
   ],
   "gaps": [
@@ -693,6 +728,27 @@
        ],
        "operation": "listPromotions",
        "provenance": "contract promotions.yaml GET /promotions"
+      },
+      {
+       "kind": "cardList",
+       "label": "Rewards",
+       "operation": "listRewards",
+       "notes": "What points can be turned into, with the points each needs; Redeem on a reward the guest can afford.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)"
+      },
+      {
+       "kind": "cardList",
+       "label": "My badges",
+       "operation": "listCustomerBadges",
+       "notes": "Status badges the guest holds (DI-392).",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)"
+      },
+      {
+       "kind": "cardList",
+       "label": "Leaderboard",
+       "operation": "listLeaderboard",
+       "notes": "Standings by nickname; the guest sets theirs with Choose my name.",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)"
       }
      ]
     },
@@ -706,6 +762,30 @@
        "operation": "getLoyaltyPosition",
        "notes": "Shows `subjectId`, `programmeId`, `pointsBalance`, `pointsPending`, `tier`, `nextTier`, `pointsToNextTier`, `expiringPoints`, `expiringAt` from `getLoyaltyPosition`'s inline response. **The response has no named schema**, so this cannot bind until the contract names one.",
        "provenance": "contract marketing-crm.yaml GET /loyalty/position"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "secondaryButton",
+       "label": "Redeem",
+       "operation": "redeemLoyaltyPoints",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Invite a friend",
+       "operation": "createReferral",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Choose my name",
+       "operation": "setLeaderboardNickname",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)"
       }
      ]
     }
@@ -751,6 +831,42 @@
     "purpose": "Report impressions, clicks and declines of recommended items",
     "trigger": "onAction",
     "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "listRewards",
+    "contract": "marketing-crm",
+    "purpose": "What points can be turned into",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listCustomerBadges",
+    "contract": "marketing-crm",
+    "purpose": "Badges the guest holds",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listLeaderboard",
+    "contract": "marketing-crm",
+    "purpose": "Standings, by nickname",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "setLeaderboardNickname",
+    "contract": "marketing-crm",
+    "purpose": "Choose the name shown on the board",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "redeemLoyaltyPoints",
+    "contract": "marketing-crm",
+    "purpose": "Spend points on a reward",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "createReferral",
+    "contract": "marketing-crm",
+    "purpose": "Issue my referral code",
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
@@ -772,9 +888,57 @@
     {
      "name": "subjectId",
      "from": "session"
+    },
+    {
+     "name": "customerId",
+     "from": "session"
     }
    ]
   },
+  "overlays": [
+   {
+    "id": "confirmCreateReferral",
+    "component": "confirmDialog",
+    "trigger": "Invite a friend",
+    "body": "One tap: the code that comes back is shown with Share. Code, status, qualifying action, rewards and expiry are set by the platform; the guest types nothing.",
+    "confirm": {
+     "label": "Invite a friend",
+     "operation": "createReferral"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)"
+   },
+   {
+    "id": "formRedeemLoyaltyPoints",
+    "component": "modal",
+    "trigger": "Redeem",
+    "body": "The reward chosen from the list and its points; the guest is the caller, so no subject or programme is asked.",
+    "confirm": {
+     "label": "Redeem",
+     "operation": "redeemLoyaltyPoints"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)"
+   },
+   {
+    "id": "formSetLeaderboardNickname",
+    "component": "modal",
+    "trigger": "Choose my name",
+    "body": "The nickname shown on the leaderboard.",
+    "confirm": {
+     "label": "Choose my name",
+     "operation": "setLeaderboardNickname"
+    },
+    "dismiss": {
+     "label": "Cancel"
+    },
+    "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)"
+   }
+  ],
   "_platform": {
    "code": "P02",
    "audience": "guest",

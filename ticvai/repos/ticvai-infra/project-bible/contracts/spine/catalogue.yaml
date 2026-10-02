@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Catalogue & Entitlement
   version: 0.1.0
-  x-ticvai-screen-count: 234
+  x-ticvai-screen-count: 227
   x-ticvai-tier: spine
   x-ticvai-module: 1 — Ticketing Catalogue
   x-ticvai-requirements: 312
@@ -91,6 +91,12 @@ paths:
         - "P08 BO-115 Category, Brand & Merchandise Hierarchy"
         - "P13 CMS-101 Help Me Choose"
         - "P13 CMS-103 Booking Flows"
+      # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
+      # or staff token is still accepted. `{}` makes the credential optional.
+      security:
+      - {}
+      - guestAuth: []
+      - bearerAuth: []
       summary: The merchandise hierarchy — categories, brands, collections
       description: 'Retail Board 2. **`listSeatCategories` existed and a product category did not** —
         a seat category prices a seat; this groups a catalogue.
@@ -264,6 +270,9 @@ paths:
         - "P01 WEB-022 Membership Plans"
         - "P01 WEB-023 Membership Management"
         - "P02 GST-015 Memberships"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       summary: A guest's own memberships, benefits and history
       description: '19.2.26 to 19.2.28. **`membership` is a `ProductKind`, so purchase and renewal already
         ride the order path — and nothing returned a guest their own membership.** No active list, no
@@ -433,10 +442,9 @@ paths:
   /guest/memberships:
     get:
       operationId: listGuestMemberships
-      x-ticvai-consumed-by:
-        - "P01 WEB-022 Membership Plans"
-        - "P01 WEB-023 Membership Management"
-        - "P02 GST-015 Memberships"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       summary: A guest's memberships, benefits and history
       description: '19.2.26 to 19.2.28. **`membership` is a `ProductKind`, so purchase and renewal already
         ride the order path — and nothing returned a guest their own memberships.**
@@ -497,8 +505,8 @@ paths:
     get:
       operationId: listProductVersions
       x-ticvai-consumed-by:
+        - "P08 ADM-131 Product Version Management"
         - "P08 BO-008 Product Detail & Variants"
-        - "P09 ADM-131 Product Version Management"
       summary: What this product used to be
       description: '1.1.47, 1.4.9. **The fourth appearance of one mechanism** — product versioning at
         1.1, event templates at 1.3, version-restore at 1.4, and `white-label` already implements the
@@ -651,6 +659,144 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProductChangeImpact'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /products/bulk-update:
+    post:
+      operationId: bulkUpdateCatalogueProducts
+      x-ticvai-consumed-by:
+        - "P08 BO-007 Product Directory"
+      x-ticvai-agreed: '2 October: Chinmay, contract follow-ups ("BO-007 bulk edit: a new catalogue operation"); the
+        BO-007 correction of CHG-WIR-027; shape follows bulkChangePrices and inventory bulkUpdateProducts'
+      summary: Change many products at once, with a preview
+      description: '**The catalogue owns a bulk edit of its own products** (Chinmay, 2 October, contract follow-ups;
+        CHG-FUP-011; the BO-007 correction logged in CHG-WIR-027 and CHG-CSP-054). It replaces inventory''s
+        `bulkUpdateProducts`, which wrote catalogue products from the inventory service and is deprecated, kept
+        for clients built at r1 and retired at the next major version. Board 2C: **retire a season, re-file a
+        category, move a range to another channel** across two hundred products without two hundred edits.
+
+
+        **A selection, not only a list of ids**, the shape `bulkChangePrices` takes: a category, a product kind, a
+        lifecycle state or up to 500 named products; an empty selection is refused. **Previewed by default**
+        (`previewOnly`), and the preview counts what would change, because a bulk act that cannot be seen before
+        it runs is one somebody runs twice. **Partial failure is reported, not rolled back**: each refused product
+        is listed with the rule it failed.
+
+
+        **What it changes** is typed in `changes`; a field left out is untouched. Prices are not here
+        (`bulkChangePrices`), and nor is the lifecycle (`transitionProductLifecycle`): stopping a range selling is
+        `onSaleTo`. Setting `taxCodeId`, which changes what a guest pays, also needs `PRICE_CONFIGURE`; without it
+        the run is refused `403 price-permission-required`. Each changed product is versioned as `updateProduct`
+        versions it.
+
+        '
+      tags:
+      - catalogue
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - selection
+              - changes
+              properties:
+                previewOnly:
+                  type: boolean
+                  default: true
+                selection:
+                  type: object
+                  description: At least one of these; they narrow together.
+                  properties:
+                    categoryId:
+                      type: string
+                      format: uuid
+                      nullable: true
+                    productKind:
+                      $ref: '#/components/schemas/ProductKind'
+                    lifecycleState:
+                      $ref: '#/components/schemas/ProductLifecycleState'
+                    productIds:
+                      type: array
+                      maxItems: 500
+                      items:
+                        type: string
+                        format: uuid
+                changes:
+                  type: object
+                  description: The fields to set on every matched product; a field left out is untouched.
+                  properties:
+                    categoryId:
+                      type: string
+                      format: uuid
+                      nullable: true
+                    responsibleDepartmentId:
+                      type: string
+                      format: uuid
+                      nullable: true
+                    onSaleFrom:
+                      type: string
+                      format: date-time
+                      nullable: true
+                    onSaleTo:
+                      type: string
+                      format: date-time
+                      nullable: true
+                      description: Retires the matched products automatically at that time (retiring a season).
+                    channels:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/Channel'
+                      description: Replaces the products' channels.
+                    addSegmentTags:
+                      type: array
+                      items:
+                        type: string
+                    removeSegmentTags:
+                      type: array
+                      items:
+                        type: string
+                    taxCodeId:
+                      type: string
+                      format: uuid
+                      nullable: true
+                      description: Set on every price of the matched products; needs `PRICE_CONFIGURE` as well.
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: ../shared/common.yaml#/components/headers/ConsistencyToken
+          description: The preview, or the result with per-product outcomes
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BulkProductUpdateResult'
+        '400':
+          description: The selection names nothing (`empty-selection`), or `changes` sets nothing.
+          x-ticvai-problem-types:
+          - empty-selection
+          - validation
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '403':
+          description: '`changes` sets `taxCodeId` and the caller lacks `PRICE_CONFIGURE` (`price-permission-required`).'
+          x-ticvai-problem-types:
+          - price-permission-required
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /products/bulk-price:
@@ -841,6 +987,9 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-298 Membership Freeze, Suspension & Reactivation Management"
         - "P08 BO-301 Member Exceptions, Overrides & Service Recovery"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       summary: Pause a membership at the guest's request
       description: '2.14.13. **The opposite act to a suspension, and it needed its own operation.** `suspendEntitlement`
         is a sanction — its own description names fraud, a chargeback and a behavioural ban, and it denies
@@ -996,6 +1145,12 @@ paths:
         - "P02 GST-002 Explore"
         - "P02 GST-003 Buy Tickets"
         - "P02 GST-063 Explore – Search Results"
+      # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
+      # or staff token is still accepted. `{}` makes the credential optional.
+      security:
+      - {}
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-audience:
       - guest
       summary: Find something by name
@@ -1280,8 +1435,9 @@ paths:
     post:
       operationId: joinWaitlist
       x-ticvai-consumed-by:
-        - "P01 WEB-040 Virtual Queue"
-        - "P02 GST-070 Reserve a Table"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-audience:
       - guest
       summary: Ask to be told if capacity frees up
@@ -1344,8 +1500,9 @@ paths:
     delete:
       operationId: leaveWaitlist
       x-ticvai-consumed-by:
-        - "P01 WEB-040 Virtual Queue"
-        - "P02 GST-070 Reserve a Table"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-audience:
       - guest
       summary: Stop waiting
@@ -1455,6 +1612,12 @@ paths:
         - "P13 CMS-101 Help Me Choose"
         - "P13 CMS-103 Booking Flows"
         - "P16 ANL-004 Product Performance"
+      # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
+      # or staff token is still accepted. `{}` makes the credential optional.
+      security:
+      - {}
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-api-scope: ticketing.read
       x-ticvai-audience:
       - staff
@@ -1582,10 +1745,9 @@ paths:
     post:
       operationId: createProduct
       x-ticvai-consumed-by:
+        - "P08 ADM-119 Product Creation Workspace"
         - "P08 BO-007 Product Directory"
         - "P08 BO-012 Membership Products"
-        - "P08 BO-014 Catalogue Publishing"
-        - "P09 ADM-119 Product Creation Workspace"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: M17-04 (MoM 17 September): partners never create products, prices
@@ -1655,6 +1817,12 @@ paths:
         - "P01 WEB-004 Attraction Details"
         - "P02 GST-004 Item Detail"
         - "P08 BO-161 Guest, Companion & Eligibility Rules"
+      # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
+      # or staff token is still accepted. `{}` makes the credential optional.
+      security:
+      - {}
+      - guestAuth: []
+      - bearerAuth: []
       summary: 'Who may take part: age, height, supervision'
       description: '**A product with no rule set answers `200`, not `404`.** The schema''s own reading
         of absence is "anyone may take part", so an unset rule comes back with every limit null and every
@@ -1753,6 +1921,9 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-006 Date & Performance Selection"
         - "P02 GST-007 Select Date & Time"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       summary: Can this party take part
       description: 'Checks a party''s declared ages and heights against every product in the booking before
         payment, and says per guest who cannot take part and why, and whether a guardian signature or waiver
@@ -1794,6 +1965,12 @@ paths:
         - "P01 WEB-031 My Reservations"
         - "P02 GST-072 Share & Group Booking"
         - "P08 BO-011 Packages & Bundles"
+      # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
+      # or staff token is still accepted. `{}` makes the credential optional.
+      security:
+      - {}
+      - guestAuth: []
+      - bearerAuth: []
       summary: A school-trip format or party package
       tags:
       - product
@@ -1879,6 +2056,13 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-031 My Reservations"
         - "P02 GST-072 Share & Group Booking"
+        - "P08 BO-268 Group Package & Experience Builder"
+      # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
+      # or staff token is still accepted. `{}` makes the credential optional.
+      security:
+      - {}
+      - guestAuth: []
+      - bearerAuth: []
       summary: The school-trip formats or party packages on offer
       tags:
       - product
@@ -1941,6 +2125,12 @@ paths:
         - "P08 BO-012 Membership Products"
         - "P08 BO-014 Catalogue Publishing"
         - "P10 PTR-006 Product Catalog (B2B Pricing)"
+      # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
+      # or staff token is still accepted. `{}` makes the credential optional.
+      security:
+      - {}
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-api-scope: ticketing.read
       x-ticvai-audience:
       - staff
@@ -1977,7 +2167,6 @@ paths:
         - "P08 BO-007 Product Directory"
         - "P08 BO-008 Product Detail & Variants"
         - "P08 BO-012 Membership Products"
-        - "P08 BO-014 Catalogue Publishing"
         - "P13 CMS-103 Booking Flows"
       x-ticvai-audience:
       - staff
@@ -2052,11 +2241,9 @@ paths:
     put:
       operationId: setProductAttributes
       x-ticvai-consumed-by:
-        - "P06 EMP-034 Walk-up sale"
         - "P08 BO-007 Product Directory"
         - "P08 BO-008 Product Detail & Variants"
         - "P08 BO-012 Membership Products"
-        - "P08 BO-014 Catalogue Publishing"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: M17-04 (MoM 17 September): partners never create products, prices
@@ -2165,8 +2352,13 @@ paths:
         - "P08 BO-007 Product Directory"
         - "P08 BO-008 Product Detail & Variants"
         - "P08 BO-012 Membership Products"
-        - "P08 BO-014 Catalogue Publishing"
         - "P10 PTR-006 Product Catalog (B2B Pricing)"
+      # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
+      # or staff token is still accepted. `{}` makes the credential optional.
+      security:
+      - {}
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-api-scope: ticketing.read
       x-ticvai-audience:
       - staff
@@ -2297,6 +2489,7 @@ paths:
     get:
       operationId: listPriceLists
       x-ticvai-consumed-by:
+        - "P08 ADM-049 Price List Master Configuration"
         - "P08 BO-009 Pricing Rules"
         - "P08 BO-291 Membership Commercial, Pricing & Channel Association"
         - "P10 PTR-006 Product Catalog (B2B Pricing)"
@@ -2396,8 +2589,10 @@ paths:
     get:
       operationId: listPrices
       x-ticvai-consumed-by:
+        - "P08 ADM-051 Rate Structure Builder"
         - "P08 BO-009 Pricing Rules"
         - "P08 BO-014 Catalogue Publishing"
+        - "P08 BO-601 Product, Pricing & Sales Channel Setup"
         - "P10 PTR-006 Product Catalog (B2B Pricing)"
       x-ticvai-api-scope: ticketing.read
       x-ticvai-audience:
@@ -2498,10 +2693,8 @@ paths:
     get:
       operationId: listEvents
       x-ticvai-consumed-by:
-        - "P08 BO-001 Queue Directory"
         - "P08 BO-015 Performance Calendar"
         - "P08 BO-019 Closures & Blackouts"
-        - "P08 BO-063 Opening Hours & Calendar"
         - "P08 BO-694 Event Catalogue Command Center"
         - "P13 CMS-101 Help Me Choose"
       x-ticvai-audience:
@@ -2536,10 +2729,8 @@ paths:
     post:
       operationId: createEvent
       x-ticvai-consumed-by:
-        - "P08 BO-001 Queue Directory"
         - "P08 BO-015 Performance Calendar"
         - "P08 BO-019 Closures & Blackouts"
-        - "P08 BO-063 Opening Hours & Calendar"
       x-ticvai-audience:
       - staff
       summary: Create an event
@@ -2591,10 +2782,15 @@ paths:
         - "P02 GST-005 What's On"
         - "P02 GST-007 Select Date & Time"
         - "P02 GST-049 Interactive Seat Selection"
-        - "P08 BO-001 Queue Directory"
         - "P08 BO-015 Performance Calendar"
         - "P08 BO-019 Closures & Blackouts"
-        - "P08 BO-063 Opening Hours & Calendar"
+        - "P08 BO-725 Performance Operations Command Center"
+      # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
+      # or staff token is still accepted. `{}` makes the credential optional.
+      security:
+      - {}
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-audience:
       - staff
       - guest
@@ -2665,10 +2861,8 @@ paths:
     post:
       operationId: createPerformances
       x-ticvai-consumed-by:
-        - "P08 BO-001 Queue Directory"
         - "P08 BO-015 Performance Calendar"
         - "P08 BO-019 Closures & Blackouts"
-        - "P08 BO-063 Opening Hours & Calendar"
       x-ticvai-audience:
       - staff
       summary: Create performances, singly or by schedule
@@ -2770,7 +2964,6 @@ paths:
     post:
       operationId: createChannelCapacity
       x-ticvai-consumed-by:
-        - "P06 EMP-033 Capacity view"
         - "P08 BO-013 Channel & Distribution"
         - "P08 BO-017 Capacity Management"
       x-ticvai-audience:
@@ -2856,7 +3049,7 @@ paths:
     put:
       operationId: setChannelAllocations
       x-ticvai-consumed-by:
-        - "P06 EMP-033 Capacity view"
+        - "P08 ADM-272 Channel Allocation & Rebalancing Operations"
         - "P08 BO-013 Channel & Distribution"
         - "P08 BO-017 Capacity Management"
       x-ticvai-audience:
@@ -2988,13 +3181,17 @@ paths:
     get:
       operationId: listCatalogueBundles
       x-ticvai-consumed-by:
-        - "P01 WEB-008 Add-ons & Upsell"
         - "P02 GST-052 Suggested Itineraries"
-        - "P02 GST-056 Bundle Package"
         - "P06 EMP-018 Offline package"
         - "P08 BO-011 Packages & Bundles"
         - "P08 BO-037 Offline Package Status"
         - "P08 BO-094 Map Editor & Publish"
+      # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
+      # or staff token is still accepted. `{}` makes the credential optional.
+      security:
+      - {}
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-audience:
       - staff
       - guest
@@ -3031,7 +3228,6 @@ paths:
     post:
       operationId: publishBundle
       x-ticvai-consumed-by:
-        - "P08 BO-011 Packages & Bundles"
         - "P08 BO-013 Channel & Distribution"
         - "P08 BO-014 Catalogue Publishing"
         - "P08 BO-037 Offline Package Status"
@@ -3165,7 +3361,6 @@ paths:
       operationId: reportBundleApplied
       x-ticvai-consumed-by:
         - "P06 EMP-018 Offline package"
-        - "P08 BO-011 Packages & Bundles"
         - "P08 BO-037 Offline Package Status"
       x-ticvai-audience:
       - staff
@@ -3217,7 +3412,6 @@ paths:
       x-ticvai-consumed-by:
         - "P04 POS-003 Sell — Timed Entry"
         - "P08 BO-018 Allocation & Holds"
-        - "P08 BO-1057 Hold Inventory Reporting"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: primary
@@ -3269,7 +3463,6 @@ paths:
       operationId: acquireInventoryHold
       x-ticvai-consumed-by:
         - "P04 POS-003 Sell — Timed Entry"
-        - "P08 BO-018 Allocation & Holds"
       x-ticvai-audience:
       - staff
       - service
@@ -3381,9 +3574,6 @@ paths:
         format: uuid
     delete:
       operationId: relinquishInventoryHold
-      x-ticvai-consumed-by:
-        - "P04 POS-003 Sell — Timed Entry"
-        - "P08 BO-018 Allocation & Holds"
       x-ticvai-audience:
       - staff
       summary: Return unsold units
@@ -3464,9 +3654,6 @@ paths:
         format: uuid
     post:
       operationId: renewInventoryHold
-      x-ticvai-consumed-by:
-        - "P04 POS-003 Sell — Timed Entry"
-        - "P08 BO-018 Allocation & Holds"
       x-ticvai-audience:
       - staff
       summary: Extend an inventory hold's TTL
@@ -3710,6 +3897,12 @@ paths:
         - "P05 KSK-005 Choose a performance"
         - "P05 KSK-015 Assistant"
         - "P10 PTR-007 Availability Search"
+      # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
+      # or staff token is still accepted. `{}` makes the credential optional.
+      security:
+      - {}
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-api-scope: ticketing.read
       x-ticvai-audience:
       - staff
@@ -3792,7 +3985,6 @@ paths:
     post:
       operationId: transitionProductLifecycle
       x-ticvai-consumed-by:
-        - "P06 EMP-034 Walk-up sale"
         - "P08 BO-007 Product Directory"
         - "P08 BO-012 Membership Products"
         - "P08 BO-014 Catalogue Publishing"
@@ -3905,7 +4097,6 @@ paths:
         - "P06 EMP-034 Walk-up sale"
         - "P08 BO-007 Product Directory"
         - "P08 BO-012 Membership Products"
-        - "P08 BO-014 Catalogue Publishing"
         - "P10 PTR-006 Product Catalog (B2B Pricing)"
       x-ticvai-api-scope: ticketing.read
       x-ticvai-audience:
@@ -3937,10 +4128,8 @@ paths:
     put:
       operationId: setAlternativeCodes
       x-ticvai-consumed-by:
-        - "P06 EMP-034 Walk-up sale"
         - "P08 BO-007 Product Directory"
         - "P08 BO-012 Membership Products"
-        - "P08 BO-014 Catalogue Publishing"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: M17-04 (MoM 17 September): partners never create products, prices
@@ -4011,7 +4200,6 @@ paths:
         - "P06 EMP-034 Walk-up sale"
         - "P08 BO-007 Product Directory"
         - "P08 BO-012 Membership Products"
-        - "P08 BO-014 Catalogue Publishing"
         - "P10 PTR-006 Product Catalog (B2B Pricing)"
       x-ticvai-api-scope: ticketing.read
       x-ticvai-audience:
@@ -4132,6 +4320,68 @@ paths:
                   type: integer
                 isActive:
                   type: boolean
+                description:
+                  type: string
+                  nullable: true
+                  description: >-
+                    **The price list master fields** (data model DM3) are written here since setPriceListMaster was
+                    retired in r2 (BC-008, CHG-CLN-001); each is optional and means what it means on `PriceList`.
+                priceListType:
+                  type: string
+                  enum: [standardRetail, venue, attraction, event, membership, group, corporate, b2b, reseller, ota,
+                         internal, specialMarket]
+                ownerPrincipalId:
+                  type: string
+                  format: uuid
+                  nullable: true
+                tags:
+                  type: array
+                  items:
+                    type: string
+                legalEntityId:
+                  type: string
+                  format: uuid
+                  nullable: true
+                brand:
+                  type: string
+                  maxLength: 100
+                  nullable: true
+                businessUnit:
+                  type: string
+                  maxLength: 100
+                  nullable: true
+                countryCode:
+                  type: string
+                  maxLength: 2
+                  nullable: true
+                  pattern: ^[A-Z]{2}$
+                marketCode:
+                  type: string
+                  maxLength: 40
+                  nullable: true
+                scopeLevel:
+                  type: string
+                  enum: [global, country, market, brand, venue, event, businessUnit]
+                defaultPriceCategoryId:
+                  type: string
+                  format: uuid
+                  nullable: true
+                roundingProfileId:
+                  type: string
+                  format: uuid
+                  nullable: true
+                priceResolutionPolicyId:
+                  type: string
+                  format: uuid
+                  nullable: true
+                allowOverrides:
+                  type: boolean
+                allowInheritance:
+                  type: boolean
+                allowMultipleCurrencies:
+                  type: boolean
+                allowProductSpecificRates:
+                  type: boolean
       responses:
         '200':
           headers:
@@ -4233,10 +4483,22 @@ paths:
     get:
       operationId: getEvent
       x-ticvai-consumed-by:
-        - "P08 BO-001 Queue Directory"
         - "P08 BO-015 Performance Calendar"
         - "P08 BO-019 Closures & Blackouts"
-        - "P08 BO-063 Opening Hours & Calendar"
+        - "P08 BO-696 Event Duplication & Clone Configuration"
+        - "P08 BO-697 Event Schedule Command Center"
+        - "P08 BO-698 Dynamic Performance Duration Configuration"
+        - "P08 BO-699 Schedule Change & Rescheduling Configuration"
+        - "P08 BO-703 Seating & Capacity Command Center"
+        - "P08 BO-704 Event Capacity Profile Configuration"
+        - "P08 BO-705 Seating Mode & Reservation Configuration"
+        - "P08 BO-706 Registration & Attendance Command Center"
+        - "P08 BO-707 Attendee Data & Registration Form Configuration"
+        - "P08 BO-709 Event Admission & Entry Policy Configuration"
+        - "P08 BO-716 Event Lifecycle & Change Command Center"
+        - "P08 BO-717 Lifecycle Transition Configuration"
+        - "P08 BO-719 Event Cancellation Workflow Configuration"
+        - "P08 BO-720 Ticket, Reservation & Customer Treatment Configuration"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -4261,10 +4523,8 @@ paths:
     patch:
       operationId: updateEvent
       x-ticvai-consumed-by:
-        - "P08 BO-001 Queue Directory"
         - "P08 BO-015 Performance Calendar"
         - "P08 BO-019 Closures & Blackouts"
-        - "P08 BO-063 Opening Hours & Calendar"
       x-ticvai-audience:
       - staff
       summary: Amend an event
@@ -4321,10 +4581,15 @@ paths:
         - "P02 GST-006 Item Detail – Event / Exhibition"
         - "P02 GST-041 Checkout Entry"
         - "P04 POS-004 Sell — Seat Map"
-        - "P08 BO-002 Queue Configuration"
         - "P08 BO-015 Performance Calendar"
         - "P08 BO-019 Closures & Blackouts"
-        - "P08 BO-063 Opening Hours & Calendar"
+        - "P08 BO-726 Participant Photo & Video Assignment"
+      # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
+      # or staff token is still accepted. `{}` makes the credential optional.
+      security:
+      - {}
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-audience:
       - staff
       - guest
@@ -4356,11 +4621,9 @@ paths:
     patch:
       operationId: updatePerformance
       x-ticvai-consumed-by:
-        - "P04 POS-004 Sell — Seat Map"
-        - "P08 BO-002 Queue Configuration"
         - "P08 BO-015 Performance Calendar"
         - "P08 BO-019 Closures & Blackouts"
-        - "P08 BO-063 Opening Hours & Calendar"
+        - "P08 BO-978 Multi-Performance Assignment"
       x-ticvai-audience:
       - staff
       summary: Amend a performance
@@ -4441,10 +4704,8 @@ paths:
     post:
       operationId: cancelPerformance
       x-ticvai-consumed-by:
-        - "P08 BO-002 Queue Configuration"
         - "P08 BO-015 Performance Calendar"
         - "P08 BO-019 Closures & Blackouts"
-        - "P08 BO-063 Opening Hours & Calendar"
         - "P08 BO-1187 Transport Departure Board"
       x-ticvai-audience:
       - staff
@@ -4547,7 +4808,6 @@ paths:
     patch:
       operationId: updateChannelCapacity
       x-ticvai-consumed-by:
-        - "P06 EMP-033 Capacity view"
         - "P08 BO-013 Channel & Distribution"
         - "P08 BO-017 Capacity Management"
       x-ticvai-audience:
@@ -4749,7 +5009,7 @@ paths:
     get:
       operationId: listProductLifecycle
       x-ticvai-consumed-by:
-        - "P09 ADM-118 Product Lifecycle Command Center"
+        - "P08 ADM-118 Product Lifecycle Command Center"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Product_Lifecycle___Catalogue_Governance_Reference.pdf'' pp.3-4
@@ -4877,7 +5137,7 @@ paths:
     put:
       operationId: setLifecycleStatuWorkflow
       x-ticvai-consumed-by:
-        - "P09 ADM-120 Lifecycle Status & Workflow Configuration"
+        - "P08 ADM-120 Lifecycle Status & Workflow Configuration"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Product_Lifecycle___Catalogue_Governance_Reference.pdf'' pp.5-6
@@ -4922,62 +5182,11 @@ paths:
                 $ref: '#/components/schemas/LifecycleStatusWorkflowConfigurationView'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
-  /bulk-product-catalogue:
-    post:
-      operationId: createBulkProductCatalogue
-      x-ticvai-consumed-by:
-        - "P09 ADM-121 Bulk Product Creation & Catalogue Import"
-      x-ticvai-audience:
-        - staff
-      x-ticvai-agreed: '29 September: pack ''Product_Lifecycle___Catalogue_Governance_Reference.pdf'' pp.6-7
-        (Screen 4 Bulk Product Creation & Catalogue Import: Supported Sources, Backend Functions, AI Capability,
-        Acceptance Condition); MoM 31 Aug 2026 §4.10 (bulk product creation via template import/export)'
-      summary: Bulk Product Creation & Catalogue Import
-      description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.** Product
-        Lifecycle   Catalogue Governance, page 6. The screen says: Allow large catalogues to be created efficiently
-        rather than configuring every product manually. This directly addresses the matrix requirement for catalogue
-        creation through bulk-file upload.
-
-
-        **Agreed (decided 29 September, readiness close-out).** the six supported sources became one sourceFormat
-        enum; preview, error correction and exclusion became typed lists; job id, counts, column mapping, target
-        venue, default template and validate/commit mode added (shape follows CatalogueImportJob). Two-phase
-        like CatalogueImportJob: mode validate parses and returns preview and validationIssues, mode commit
-        creates the non-excluded rows as draft products. Download template, download error report (errorReportUrl)
-        and roll back an import where permitted are actions on ADM-121. Nothing the AI proposes becomes live:
-        every created product is draft.'
-      tags:
-        - drafted
-      x-ticvai-permission: PRODUCT_CONFIGURE
-      x-ticvai-scope-level: venue
-      x-ticvai-offline-capable: false
-      x-ticvai-conflict-policy: serverWins
-      x-ticvai-read-routing: primary
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/BulkProductCreationCatalogueImportInput'
-      parameters:
-        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
-      responses:
-        '200':
-          headers:
-            X-Consistency-Token:
-              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
-          description: Bulk Product Creation & Catalogue Import
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BulkProductCreationCatalogueImportView'
-        '429':
-          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /product-import-export:
     get:
       operationId: listProductImportExport
       x-ticvai-consumed-by:
-        - "P09 ADM-122 Product Import / Export & Environment Transfer"
+        - "P08 ADM-122 Product Import / Export & Environment Transfer"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Product_Lifecycle___Catalogue_Governance_Reference.pdf'' pp.7-8
@@ -5059,7 +5268,7 @@ paths:
     put:
       operationId: setProductContextOwnership
       x-ticvai-consumed-by:
-        - "P09 ADM-123 Product Context, Ownership & Assignment"
+        - "P08 ADM-123 Product Context, Ownership & Assignment"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Product_Lifecycle___Catalogue_Governance_Reference.pdf'' pp.8-9
@@ -5106,8 +5315,9 @@ paths:
     put:
       operationId: publishChannelAvailability
       x-ticvai-consumed-by:
+        - "P08 ADM-124 Channel Publication & Availability"
         - "P08 BO-291 Membership Commercial, Pricing & Channel Association"
-        - "P09 ADM-124 Channel Publication & Availability"
+        - "P08 BO-601 Product, Pricing & Sales Channel Setup"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Product_Lifecycle___Catalogue_Governance_Reference.pdf'' pp.9-10
@@ -5157,7 +5367,7 @@ paths:
     put:
       operationId: publishActivationScheduler
       x-ticvai-consumed-by:
-        - "P09 ADM-125 Publication & Activation Scheduler"
+        - "P08 ADM-125 Publication & Activation Scheduler"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Product_Lifecycle___Catalogue_Governance_Reference.pdf'' pp.10-11
@@ -5206,7 +5416,7 @@ paths:
     get:
       operationId: listScheduledLifecycleActions
       x-ticvai-consumed-by:
-        - "P09 ADM-125 Publication & Activation Scheduler"
+        - "P08 ADM-125 Publication & Activation Scheduler"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: readiness close-out (QB: ADM-125''s calendar view had no read over scheduled actions); pack ''Product_Lifecycle___Catalogue_Governance_Reference.pdf'' pp.10-11 (Calendar View); MoM 31 Aug 2026 §4.10 (start/stop selling at defined times); shape follows publishActivationScheduler'
@@ -5304,7 +5514,7 @@ paths:
     get:
       operationId: listProductDuplicationTemplate
       x-ticvai-consumed-by:
-        - "P09 ADM-126 Product Duplication & Template Library"
+        - "P08 ADM-126 Product Duplication & Template Library"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Product_Lifecycle___Catalogue_Governance_Reference.pdf'' pp.11-12
@@ -5387,7 +5597,7 @@ paths:
     put:
       operationId: setCatalogueReview
       x-ticvai-consumed-by:
-        - "P09 ADM-127 AI Catalogue Builder & Configuration Review"
+        - "P08 ADM-127 AI Catalogue Builder & Configuration Review"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Product_Lifecycle___Catalogue_Governance_Reference.pdf'' pp.12-13
@@ -5438,7 +5648,7 @@ paths:
     get:
       operationId: listProductGovernance
       x-ticvai-consumed-by:
-        - "P09 ADM-128 Product Governance Command Center"
+        - "P08 ADM-128 Product Governance Command Center"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Product_Lifecycle___Catalogue_Governance_Reference.pdf'' pp.15-17
@@ -5572,14 +5782,54 @@ paths:
                           $ref: '#/components/schemas/ProductGovernanceCommandCenterView'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /product-approval-workflows:
+    get:
+      operationId: listProductApprovalWorkflows
+      x-ticvai-audience:
+        - staff
+      x-ticvai-read-routing: replica
+      summary: The product approval workflows `approveWorkflow` saved
+      description: '**The read the workflow builder opens on** (design-notes correction on BO-637, Block B: "No read operation:
+        the screen declares only approveWorkflow and nothing that returns the current configuration. It opens as an empty
+        form even where a configuration exists"; PR-9; CHG-CSP-048). Returns the product approval workflows of the venue:
+        each workflow''s product types and change types, its stages in order, and its rejection and resubmission rules, as
+        `approveWorkflow` wrote them. Despite its name `approveWorkflow` designs a workflow; it keeps its r1 name. **Ordered
+        by workflow name, `workflowId` as the tiebreak.** These are product and catalogue workflows; accreditation approval
+        workflows are not here.
+
+        '
+      tags:
+        - drafted
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: ../shared/common.yaml#/components/parameters/PageSize
+        - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: Workflows
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: ../shared/common.yaml#/components/schemas/Page
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/ApprovalWorkflowDesignerView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /workflow:
     put:
       operationId: approveWorkflow
       x-ticvai-consumed-by:
+        - "P08 ADM-129 Approval Workflow Designer"
+        - "P08 ADM-319 Approval Workflow Library"
         - "P08 BO-637 Approval Workflow Builder"
-        - "P09 ADM-129 Approval Workflow Designer"
-        - "P09 ADM-319 Approval Workflow Library"
-        - "P09 ADM-492 Configuration Approval Workflow"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Product_Lifecycle___Catalogue_Governance_Reference.pdf'' pp.17-18
@@ -5627,7 +5877,7 @@ paths:
     put:
       operationId: approveReviewDecision
       x-ticvai-consumed-by:
-        - "P09 ADM-130 Approval Review & Decision Workspace"
+        - "P08 ADM-130 Approval Review & Decision Workspace"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Product_Lifecycle___Catalogue_Governance_Reference.pdf'' pp.18-19
@@ -5677,7 +5927,7 @@ paths:
     get:
       operationId: listRollbackRecovery
       x-ticvai-consumed-by:
-        - "P09 ADM-132 Rollback & Recovery Management"
+        - "P08 ADM-132 Rollback & Recovery Management"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Product_Lifecycle___Catalogue_Governance_Reference.pdf'' pp.20-21
@@ -5759,8 +6009,8 @@ paths:
     get:
       operationId: listChangeImpactAnalysis
       x-ticvai-consumed-by:
-        - "P09 ADM-082 Pricing Change Impact Analysis"
-        - "P09 ADM-133 Change Impact Analysis"
+        - "P08 ADM-082 Pricing Change Impact Analysis"
+        - "P08 ADM-133 Change Impact Analysis"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Product_Lifecycle___Catalogue_Governance_Reference.pdf'' pp.21-22
@@ -5855,7 +6105,7 @@ paths:
     get:
       operationId: listChangePropagationDependency
       x-ticvai-consumed-by:
-        - "P09 ADM-134 Change Propagation & Dependency Control"
+        - "P08 ADM-134 Change Propagation & Dependency Control"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Product_Lifecycle___Catalogue_Governance_Reference.pdf'' pp.22-23
@@ -5944,7 +6194,7 @@ paths:
     get:
       operationId: listProductRetirementSuspension
       x-ticvai-consumed-by:
-        - "P09 ADM-135 Product Retirement, Suspension & Archive"
+        - "P08 ADM-135 Product Retirement, Suspension & Archive"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Product_Lifecycle___Catalogue_Governance_Reference.pdf'' pp.23-24
@@ -6025,7 +6275,7 @@ paths:
     get:
       operationId: listProductTrailChange
       x-ticvai-consumed-by:
-        - "P09 ADM-136 Product Audit Trail & Change History"
+        - "P08 ADM-136 Product Audit Trail & Change History"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Product_Lifecycle___Catalogue_Governance_Reference.pdf'' pp.24-25
@@ -6183,9 +6433,8 @@ paths:
     get:
       operationId: listGovernanceRiskMonitoring
       x-ticvai-consumed-by:
-        - "P09 ADM-137 Governance Risk, AI Monitoring & Control Center"
-        - "P09 ADM-365 Risk & Governance Analytics"
-        - "P09 ADM-549 AI Governance Monitoring Command Center"
+        - "P08 ADM-137 Governance Risk, AI Monitoring & Control Center"
+        - "P08 ADM-365 Risk & Governance Analytics"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Product_Lifecycle___Catalogue_Governance_Reference.pdf'' pp.26-27
@@ -6285,9 +6534,7 @@ paths:
     get:
       operationId: listSaleChannel
       x-ticvai-consumed-by:
-        - "P09 ADM-258 Sales Channel Command Center"
-        - "P09 ADM-383 Sales Channel Assessment"
-        - "P17 SGN-005 Sales Channel Assessment"
+        - "P08 ADM-258 Sales Channel Command Center"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Sales_Channel_Management_Reference.pdf'' pp.3-5 (Channel Types,
@@ -6394,7 +6641,7 @@ paths:
     post:
       operationId: createChannelProfile
       x-ticvai-consumed-by:
-        - "P09 ADM-259 Channel Creation & Profile Configuration"
+        - "P08 ADM-259 Channel Creation & Profile Configuration"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Sales_Channel_Management_Reference.pdf'' pp.5-6 (Basic Configuration,
@@ -6444,7 +6691,7 @@ paths:
     put:
       operationId: setProductCatalogue
       x-ticvai-consumed-by:
-        - "P09 ADM-260 Product & Catalogue Assignment"
+        - "P08 ADM-260 Product & Catalogue Assignment"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Sales_Channel_Management_Reference.pdf'' pp.7-8 (Assignment Methods,
@@ -6493,8 +6740,7 @@ paths:
     put:
       operationId: setChannelPricingCommercial
       x-ticvai-consumed-by:
-        - "P09 ADM-261 Channel Pricing & Commercial Profile Assignment"
-        - "P09 ADM-483 Pricing & Commercial Configuration"
+        - "P08 ADM-261 Channel Pricing & Commercial Profile Assignment"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Sales_Channel_Management_Reference.pdf'' pp.8-9 (Pricing Associations,
@@ -6541,7 +6787,7 @@ paths:
     get:
       operationId: listInventoryCapacityChannel
       x-ticvai-consumed-by:
-        - "P09 ADM-262 Inventory, Capacity & Channel Allocation"
+        - "P08 ADM-262 Inventory, Capacity & Channel Allocation"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Sales_Channel_Management_Reference.pdf'' pp.10-11 (Allocation Types,
@@ -6626,8 +6872,8 @@ paths:
     get:
       operationId: listChannelSaleSchedule
       x-ticvai-consumed-by:
-        - "P09 ADM-258 Sales Channel Command Center"
-        - "P09 ADM-263 Channel Sales Schedule & Availability Windows"
+        - "P08 ADM-258 Sales Channel Command Center"
+        - "P08 ADM-263 Channel Sales Schedule & Availability Windows"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Sales_Channel_Management_Reference.pdf'' pp.11-12 (Schedule Configuration,
@@ -6708,7 +6954,7 @@ paths:
     get:
       operationId: listCustomerEligibilityRule
       x-ticvai-consumed-by:
-        - "P09 ADM-264 Customer & Eligibility Rules by Channel"
+        - "P08 ADM-264 Customer & Eligibility Rules by Channel"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Sales_Channel_Management_Reference.pdf'' pp.12-13 (Eligibility
@@ -6786,8 +7032,8 @@ paths:
     get:
       operationId: listChannelSaleRule
       x-ticvai-consumed-by:
-        - "P09 ADM-258 Sales Channel Command Center"
-        - "P09 ADM-265 Channel Sales Rules, Limits & Restrictions"
+        - "P08 ADM-258 Sales Channel Command Center"
+        - "P08 ADM-265 Channel Sales Rules, Limits & Restrictions"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Sales_Channel_Management_Reference.pdf'' pp.13-14 (Sales Limits,
@@ -6857,7 +7103,7 @@ paths:
     put:
       operationId: setChannelFeePayment
       x-ticvai-consumed-by:
-        - "P09 ADM-266 Channel Fees, Payment & Fulfillment Configuration"
+        - "P08 ADM-266 Channel Fees, Payment & Fulfillment Configuration"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Sales_Channel_Management_Reference.pdf'' pp.14-16 (Fee Associations,
@@ -6905,7 +7151,7 @@ paths:
     put:
       operationId: publishChannelReadinessValidation
       x-ticvai-consumed-by:
-        - "P09 ADM-267 Channel Publication, Readiness & AI Validation"
+        - "P08 ADM-267 Channel Publication, Readiness & AI Validation"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Sales_Channel_Management_Reference.pdf'' pp.16-18 (Readiness Checklist,
@@ -6955,8 +7201,8 @@ paths:
     get:
       operationId: listChannel
       x-ticvai-consumed-by:
-        - "P09 ADM-268 Channel Operations Command Center"
-        - "P09 ADM-277 AI Channel Optimization & Intelligence Center"
+        - "P08 ADM-268 Channel Operations Command Center"
+        - "P08 ADM-277 AI Channel Optimization & Intelligence Center"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Sales_Channel_Management_Reference.pdf'' pp.20-22 (KPI Dashboard,
@@ -7046,7 +7292,7 @@ paths:
     get:
       operationId: listChannelConnectionIntegration
       x-ticvai-consumed-by:
-        - "P09 ADM-269 Channel Connection & Integration Manager"
+        - "P08 ADM-269 Channel Connection & Integration Manager"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Sales_Channel_Management_Reference.pdf'' pp.22-23 (Connection Types,
@@ -7134,7 +7380,7 @@ paths:
     get:
       operationId: listProductPriceAvailability
       x-ticvai-consumed-by:
-        - "P09 ADM-270 Product, Price & Availability Synchronization"
+        - "P08 ADM-270 Product, Price & Availability Synchronization"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Sales_Channel_Management_Reference.pdf'' pp.23-25 (Synchronization
@@ -7223,7 +7469,7 @@ paths:
     get:
       operationId: listRealTimeChannel
       x-ticvai-consumed-by:
-        - "P09 ADM-271 Real-Time Channel Availability & Inventory Monitor"
+        - "P08 ADM-271 Real-Time Channel Availability & Inventory Monitor"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Sales_Channel_Management_Reference.pdf'' pp.25-26 (Availability
@@ -7302,7 +7548,7 @@ paths:
     get:
       operationId: listChannelAllocationRebalancing
       x-ticvai-consumed-by:
-        - "P09 ADM-272 Channel Allocation & Rebalancing Operations"
+        - "P08 ADM-272 Channel Allocation & Rebalancing Operations"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Sales_Channel_Management_Reference.pdf'' pp.26-27 (Allocation Workspace,
@@ -7370,7 +7616,7 @@ paths:
     get:
       operationId: listChannelExceptionIncident
       x-ticvai-consumed-by:
-        - "P09 ADM-273 Channel Exceptions, Incidents & Recovery"
+        - "P08 ADM-273 Channel Exceptions, Incidents & Recovery"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Sales_Channel_Management_Reference.pdf'' pp.27-29 (Exception Categories,
@@ -7474,7 +7720,7 @@ paths:
     get:
       operationId: listChannelPerformanceCommercial
       x-ticvai-consumed-by:
-        - "P09 ADM-274 Channel Performance & Commercial Analytics"
+        - "P08 ADM-274 Channel Performance & Commercial Analytics"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Sales_Channel_Management_Reference.pdf'' pp.29-30 (KPIs, Compare
@@ -7593,7 +7839,7 @@ paths:
     get:
       operationId: listChannelLogTransaction
       x-ticvai-consumed-by:
-        - "P09 ADM-275 Channel Audit, Logs & Transaction Traceability"
+        - "P08 ADM-275 Channel Audit, Logs & Transaction Traceability"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Sales_Channel_Management_Reference.pdf'' pp.30-32 (Unified Search,
@@ -7731,7 +7977,7 @@ paths:
     get:
       operationId: listChannelGovernanceSla
       x-ticvai-consumed-by:
-        - "P09 ADM-276 Channel Governance, SLA & Partner Control"
+        - "P08 ADM-276 Channel Governance, SLA & Partner Control"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Sales_Channel_Management_Reference.pdf'' pp.32-33 (Governance Profile,
@@ -7815,8 +8061,8 @@ paths:
     get:
       operationId: listChannel2
       x-ticvai-consumed-by:
-        - "P09 ADM-268 Channel Operations Command Center"
-        - "P09 ADM-277 AI Channel Optimization & Intelligence Center"
+        - "P08 ADM-268 Channel Operations Command Center"
+        - "P08 ADM-277 AI Channel Optimization & Intelligence Center"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Sales_Channel_Management_Reference.pdf'' pp.33-35 (AI Analysis,
@@ -7894,8 +8140,7 @@ paths:
     get:
       operationId: listCommercialPricing
       x-ticvai-consumed-by:
-        - "P08 BO-533 Pricing Simulation, Validation & AI Commercial Intelligence"
-        - "P09 ADM-048 Commercial Pricing Command Center"
+        - "P08 ADM-048 Commercial Pricing Command Center"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.6-8 (10.1.1 KPI
@@ -7911,7 +8156,7 @@ paths:
         **Agreed (decided 29 September, readiness close-out).** the 12 KPI cards moved to CommercialPricingCommandCenterSummary
         on a paged list, with the AI assistance lines beside them; the price-list type and status became enums/descriptions;
         Effective Period split into two dates; the ''Modify Pricing Structure'' permission removed from the
-        row; the pack''s filters became query parameters. Quick actions Create Price List (setPriceListMaster),
+        row; the pack''s filters became query parameters. Quick actions Create Price List (createPriceList on BO-009; setPriceListMaster retired in r2, BC-008),
         Duplicate (the clone on ADM-056, listPriceListTemplate), Open, Compare, Validate (listCommercialPricingStructure),
         View Dependencies, Export and Archive are buttons on ADM-048; approval and publication belong to Board
         4 governance.'
@@ -8025,59 +8270,11 @@ paths:
                           $ref: '#/components/schemas/CommercialPricingCommandCenterView'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
-  /price-list-master:
-    put:
-      operationId: setPriceListMaster
-      x-ticvai-consumed-by:
-        - "P09 ADM-049 Price List Master Configuration"
-      x-ticvai-audience:
-        - staff
-      x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.8-9 (10.1.2 General
-        Configuration, Scope, Commercial Types, Default Behaviors, Dependencies, Duplicate); MoM 1 Sep 2026
-        §4.1 (price lists per channel, segment or category; multiple lists coexist; cloning)'
-      summary: Price List Master Configuration
-      description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.** Pricing   Revenue
-        Management, page 8. The screen says: Create the master container that holds commercial rates. A Price
-        List should be reusable across products and channels.
-
-
-        **Agreed (decided 29 September, readiness close-out).** the scope options (Global, Event, ...) became
-        one scope enum; a price list id and the clone source were added; name/code/type typed as strings (they
-        were Money); tags an array; the consuming modules of the Dependencies panel added to the response. Duplicate
-        on ADM-049 creates a new list with clonedFromPriceListId set; approval and publication of a list belong
-        to Board 4.'
-      tags:
-        - drafted
-      x-ticvai-permission: PRODUCT_CONFIGURE
-      x-ticvai-scope-level: venue
-      x-ticvai-offline-capable: false
-      x-ticvai-conflict-policy: serverWins
-      x-ticvai-read-routing: primary
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/PriceListMasterConfigurationInput'
-      parameters:
-        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
-      responses:
-        '200':
-          headers:
-            X-Consistency-Token:
-              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
-          description: Price List Master Configuration
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PriceListMasterConfigurationView'
-        '429':
-          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /price-category-rate:
     get:
       operationId: listPriceCategoryRate
       x-ticvai-consumed-by:
-        - "P09 ADM-050 Price Category & Rate Type Library"
+        - "P08 ADM-050 Price Category & Rate Type Library"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.9-11 (10.1.3 Standard
@@ -8149,60 +8346,11 @@ paths:
                           $ref: '#/components/schemas/PriceCategoryRateTypeLibraryView'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
-  /rate-structure:
-    put:
-      operationId: setRateStructure
-      x-ticvai-consumed-by:
-        - "P09 ADM-051 Rate Structure Builder"
-      x-ticvai-audience:
-        - staff
-      x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.11-13 (10.1.4 Rate
-        Matrix, Rate Configuration, Unit Basis, Derived Rates, Matrix Editing, Validation); MoM 1 Sep 2026 §4.1
-        (rate structure sets the amount against a category), §4.5 (up to three decimal places)'
-      summary: Rate Structure Builder
-      description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.** Pricing   Revenue
-        Management, page 11. The screen says: Define the actual monetary rates contained within a price list.
-        This is the core commercial configuration screen.
-
-
-        **Agreed (decided 29 September, readiness close-out).** example rows (Adult 250, Child 180, ...) removed;
-        the nine unit bases became the unitBasis enum; the four validation checks became validationIssues; derived
-        rates carry their base rate and adjustment; types corrected (names/codes strings, precision an integer,
-        currency ISO code). Matrix editing actions Add Rate, Duplicate Rate, Edit, Disable, Sort, Copy Across
-        Categories and Compare are buttons on ADM-051; Duplicate Rates, Missing Amounts, Unsupported Currency,
-        Invalid Derived Rate and Circular Rate Relationship are detected on save.'
-      tags:
-        - drafted
-      x-ticvai-permission: PRODUCT_CONFIGURE
-      x-ticvai-scope-level: venue
-      x-ticvai-offline-capable: false
-      x-ticvai-conflict-policy: serverWins
-      x-ticvai-read-routing: primary
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/RateStructureBuilderInput'
-      parameters:
-        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
-      responses:
-        '200':
-          headers:
-            X-Consistency-Token:
-              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
-          description: Rate Structure Builder
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RateStructureBuilderView'
-        '429':
-          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /product-service-price:
     put:
       operationId: setProductServicePrice
       x-ticvai-consumed-by:
-        - "P09 ADM-052 Product & Service Price Assignment"
+        - "P08 ADM-052 Product & Service Price Assignment"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.13-14 (10.1.5 Supported
@@ -8250,7 +8398,7 @@ paths:
     get:
       operationId: listPackageBundleAdd
       x-ticvai-consumed-by:
-        - "P09 ADM-053 Package, Bundle & Add-On Pricing"
+        - "P08 ADM-053 Package, Bundle & Add-On Pricing"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.14-15 (10.1.6 Package
@@ -8336,7 +8484,7 @@ paths:
     get:
       operationId: listMarketVenueCurrency
       x-ticvai-consumed-by:
-        - "P09 ADM-054 Market, Venue & Currency Pricing Structure"
+        - "P08 ADM-054 Market, Venue & Currency Pricing Structure"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.15-17 (10.1.7 Market
@@ -8427,7 +8575,7 @@ paths:
     put:
       operationId: setPriceHierarchyInheritance
       x-ticvai-consumed-by:
-        - "P09 ADM-055 Price Hierarchy & Inheritance Configuration"
+        - "P08 ADM-055 Price Hierarchy & Inheritance Configuration"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.17-18 (10.1.8 Example
@@ -8476,7 +8624,7 @@ paths:
     get:
       operationId: listPriceListTemplate
       x-ticvai-consumed-by:
-        - "P09 ADM-056 Price List Templates, Clone & Reuse"
+        - "P08 ADM-056 Price List Templates, Clone & Reuse"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.18-19 (10.1.9 Template
@@ -8547,8 +8695,8 @@ paths:
     get:
       operationId: listCommercialPricingStructure
       x-ticvai-consumed-by:
-        - "P09 ADM-048 Commercial Pricing Command Center"
-        - "P09 ADM-057 Commercial Pricing Structure Validation"
+        - "P08 ADM-048 Commercial Pricing Command Center"
+        - "P08 ADM-057 Commercial Pricing Structure Validation"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.19-21 (10.1.10
@@ -8625,8 +8773,8 @@ paths:
     get:
       operationId: listPricingRule
       x-ticvai-consumed-by:
-        - "P09 ADM-058 Pricing Rule Command Center"
-        - "P09 ADM-067 Pricing Rule Priority, Conflict Resolution & Testing"
+        - "P08 ADM-058 Pricing Rule Command Center"
+        - "P08 ADM-067 Pricing Rule Priority, Conflict Resolution & Testing"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.23-25 (10.2.1 KPI
@@ -8726,8 +8874,7 @@ paths:
     get:
       operationId: listCustomerSegmentProfile
       x-ticvai-consumed-by:
-        - "P08 BO-737 Customer 360 Profile"
-        - "P09 ADM-059 Customer Segment & Profile Pricing Rules"
+        - "P08 ADM-059 Customer Segment & Profile Pricing Rules"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.25-26 (10.2.2 Supported
@@ -8826,7 +8973,7 @@ paths:
     get:
       operationId: listMembershipLoyaltyPricing
       x-ticvai-consumed-by:
-        - "P09 ADM-060 Membership & Loyalty Pricing Rules"
+        - "P08 ADM-060 Membership & Loyalty Pricing Rules"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.26-27 (10.2.3 Membership
@@ -8906,7 +9053,7 @@ paths:
     get:
       operationId: listResidencyNationalityMarket
       x-ticvai-consumed-by:
-        - "P09 ADM-061 Residency, Nationality & Market Pricing Rules"
+        - "P08 ADM-061 Residency, Nationality & Market Pricing Rules"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.27-28 (10.2.4 Eligibility
@@ -8985,7 +9132,7 @@ paths:
     get:
       operationId: listChannelBasedPricing
       x-ticvai-consumed-by:
-        - "P09 ADM-062 Channel-Based Pricing Rules"
+        - "P08 ADM-062 Channel-Based Pricing Rules"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.29-30 (10.2.5 Supported
@@ -9061,7 +9208,7 @@ paths:
     get:
       operationId: listLocationVenueEvent
       x-ticvai-consumed-by:
-        - "P09 ADM-063 Location, Venue & Event Pricing Rules"
+        - "P08 ADM-063 Location, Venue & Event Pricing Rules"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.30-31 (10.2.6 Pricing
@@ -9140,7 +9287,7 @@ paths:
     get:
       operationId: listQuantityGroupVolume
       x-ticvai-consumed-by:
-        - "P09 ADM-064 Quantity, Group & Volume Pricing Rules"
+        - "P08 ADM-064 Quantity, Group & Volume Pricing Rules"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.31-32 (10.2.7 Quantity
@@ -9225,7 +9372,7 @@ paths:
     get:
       operationId: listEffectiveDateSeason
       x-ticvai-consumed-by:
-        - "P09 ADM-065 Effective Date, Season & Day-Based Pricing Rules"
+        - "P08 ADM-065 Effective Date, Season & Day-Based Pricing Rules"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.32-33 (10.2.8 Effective
@@ -9321,7 +9468,7 @@ paths:
     get:
       operationId: listTimeslotPerformanceTime
       x-ticvai-consumed-by:
-        - "P09 ADM-066 Timeslot, Performance & Time-of-Day Pricing Rules"
+        - "P08 ADM-066 Timeslot, Performance & Time-of-Day Pricing Rules"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.33-34 (10.2.9 Supported
@@ -9397,8 +9544,8 @@ paths:
     get:
       operationId: listPricingRulePriority
       x-ticvai-consumed-by:
-        - "P09 ADM-058 Pricing Rule Command Center"
-        - "P09 ADM-067 Pricing Rule Priority, Conflict Resolution & Testing"
+        - "P08 ADM-058 Pricing Rule Command Center"
+        - "P08 ADM-067 Pricing Rule Priority, Conflict Resolution & Testing"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.34-37 (10.2.10
@@ -9628,7 +9775,7 @@ paths:
     put:
       operationId: setTaxProfileJurisdiction
       x-ticvai-consumed-by:
-        - "P09 ADM-069 Tax Profile & Jurisdiction Configuration"
+        - "P08 ADM-069 Tax Profile & Jurisdiction Configuration"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.40-41 (10.3.2 Tax
@@ -9679,7 +9826,7 @@ paths:
     put:
       operationId: setTaxRuleTreatment
       x-ticvai-consumed-by:
-        - "P09 ADM-070 Tax Rule & Treatment Builder"
+        - "P08 ADM-070 Tax Rule & Treatment Builder"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.41-43 (10.3.3 Tax
@@ -9728,7 +9875,7 @@ paths:
     get:
       operationId: listFeeSurcharge
       x-ticvai-consumed-by:
-        - "P09 ADM-071 Fee & Surcharge Library"
+        - "P08 ADM-071 Fee & Surcharge Library"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.43-44 (10.3.4 Fee
@@ -9814,7 +9961,7 @@ paths:
     put:
       operationId: setFeeApplicabilityCharging
       x-ticvai-consumed-by:
-        - "P09 ADM-072 Fee Applicability & Charging Rule Builder"
+        - "P08 ADM-072 Fee Applicability & Charging Rule Builder"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.44-46 (10.3.5 Conditions,
@@ -9864,7 +10011,7 @@ paths:
     get:
       operationId: listFeeWaiverTax
       x-ticvai-consumed-by:
-        - "P09 ADM-073 Fee Waiver, Tax Exemption & Exception Rules"
+        - "P08 ADM-073 Fee Waiver, Tax Exemption & Exception Rules"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.46-47 (10.3.6 Exception
@@ -9956,7 +10103,7 @@ paths:
     get:
       operationId: listPriceCalculationSequence
       x-ticvai-consumed-by:
-        - "P09 ADM-074 Price Calculation Sequence & Formula Engine"
+        - "P08 ADM-074 Price Calculation Sequence & Formula Engine"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.47-49 (10.3.7 Recommended
@@ -10018,7 +10165,7 @@ paths:
     get:
       operationId: listCurrencyPrecisionRounding
       x-ticvai-consumed-by:
-        - "P09 ADM-075 Currency Precision, Rounding & Monetary Rules"
+        - "P08 ADM-075 Currency Precision, Rounding & Monetary Rules"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.49-50 (10.3.8 Currency
@@ -10059,8 +10206,8 @@ paths:
     put:
       operationId: simulatePriceBreakdownCalculation
       x-ticvai-consumed-by:
+        - "P08 ADM-076 Price Breakdown, Calculation Simulation & Explainability"
         - "P08 BO-1049 Scenario & What-If Planning"
-        - "P09 ADM-076 Price Breakdown, Calculation Simulation & Explainability"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.50-51 (10.3.9 Simulation
@@ -10107,7 +10254,7 @@ paths:
     get:
       operationId: listCalculationValidationReconciliation
       x-ticvai-consumed-by:
-        - "P09 ADM-077 Calculation Validation, Reconciliation & Service Interface"
+        - "P08 ADM-077 Calculation Validation, Reconciliation & Service Interface"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.52-54 (10.3.10
@@ -10195,7 +10342,7 @@ paths:
     get:
       operationId: listPricingGovernance
       x-ticvai-consumed-by:
-        - "P09 ADM-078 Pricing Governance Command Center"
+        - "P08 ADM-078 Pricing Governance Command Center"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.57-58 (KPI Cards,
@@ -10356,7 +10503,7 @@ paths:
     put:
       operationId: setPricingChangeRequest
       x-ticvai-consumed-by:
-        - "P09 ADM-079 Pricing Change Request & Workspace"
+        - "P08 ADM-079 Pricing Change Request & Workspace"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.58-60 (Change Request,
@@ -10407,7 +10554,7 @@ paths:
     get:
       operationId: listBulkPricingUpdate
       x-ticvai-consumed-by:
-        - "P09 ADM-080 Bulk Pricing Update, Import & Mass Maintenance"
+        - "P08 ADM-080 Bulk Pricing Update, Import & Mass Maintenance"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.60-61 (Bulk Selection,
@@ -10497,7 +10644,7 @@ paths:
     get:
       operationId: listPricingVersionBaseline
       x-ticvai-consumed-by:
-        - "P09 ADM-081 Pricing Version & Baseline Management"
+        - "P08 ADM-081 Pricing Version & Baseline Management"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.62-63 (Version
@@ -10581,7 +10728,7 @@ paths:
     get:
       operationId: listPricingChangeImpact
       x-ticvai-consumed-by:
-        - "P09 ADM-082 Pricing Change Impact Analysis"
+        - "P08 ADM-082 Pricing Change Impact Analysis"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.63-64 (Impact Dimensions,
@@ -10647,7 +10794,7 @@ paths:
     put:
       operationId: approvePricingWorkflowAuthority
       x-ticvai-consumed-by:
-        - "P09 ADM-083 Pricing Approval Workflow & Authority Matrix"
+        - "P08 ADM-083 Pricing Approval Workflow & Authority Matrix"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.64-66 (Approval
@@ -10700,8 +10847,8 @@ paths:
     put:
       operationId: publishPricingEffectiveDate
       x-ticvai-consumed-by:
+        - "P08 ADM-084 Pricing Publication & Effective-Date Scheduler"
         - "P08 BO-443 Pricing Audit, Approval & Publication"
-        - "P09 ADM-084 Pricing Publication & Effective-Date Scheduler"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.66-67 (Publication
@@ -10751,7 +10898,7 @@ paths:
     get:
       operationId: listPricingDistributionSynchronization
       x-ticvai-consumed-by:
-        - "P09 ADM-085 Pricing Distribution, Synchronization & Publication Monitor"
+        - "P08 ADM-085 Pricing Distribution, Synchronization & Publication Monitor"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.67-69 (Distribution
@@ -10843,7 +10990,7 @@ paths:
     get:
       operationId: listPricingRollbackEmergency
       x-ticvai-consumed-by:
-        - "P09 ADM-086 Pricing Rollback & Emergency Control Center"
+        - "P08 ADM-086 Pricing Rollback & Emergency Control Center"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.69-70 (Rollback
@@ -10935,7 +11082,8 @@ paths:
     post:
       operationId: requestPricingRollback
       x-ticvai-consumed-by:
-        - "P09 ADM-086 Pricing Rollback & Emergency Control Center"
+        - "P08 ADM-086 Pricing Rollback & Emergency Control Center"
+        - "P08 ADM-132 Rollback & Recovery Management"
       summary: Roll pricing back, or take an emergency pricing action
       description: '**A pricing rollback or emergency action, as a record first** (29 September, writers pass).
         Writes a `catalogue.rollback_action` with `subject: pricing`: a rollback restores an earlier
@@ -11002,7 +11150,7 @@ paths:
     get:
       operationId: listPricingCompliance
       x-ticvai-consumed-by:
-        - "P09 ADM-087 Pricing History, Audit & Compliance Explorer"
+        - "P08 ADM-087 Pricing History, Audit & Compliance Explorer"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.70-72 (Audit Search,
@@ -11142,13 +11290,137 @@ paths:
                           $ref: '#/components/schemas/PricingHistoryAuditComplianceExplorerView'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /seat-pricing-rules:
+    get:
+      operationId: listSeatPricingRules
+      x-ticvai-audience:
+        - staff
+      x-ticvai-read-routing: replica
+      summary: Seat-level dynamic pricing rules
+      description: '**The rules Dynamic Seat Pricing edits, read back** (design-notes correction on BO-1044, Block B: "The
+        screen only lists strategies; nothing writes a seat pricing rule"; CHG-CSP-049). Filter by strategy, seat map or
+        performance. **Ordered by priority, highest first, then `id`.**
+
+        '
+      tags:
+        - drafted
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: strategyId
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: seatMapId
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: performanceId
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - $ref: ../shared/common.yaml#/components/parameters/PageSize
+        - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: Rules
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: ../shared/common.yaml#/components/schemas/Page
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/SeatPricingRule'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /seat-pricing-rules/{ruleId}:
+    parameters:
+    - name: ruleId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    put:
+      operationId: setSeatPricingRule
+      x-ticvai-audience:
+        - staff
+      x-ticvai-config-scope: venue
+      summary: Create or replace a seat-level dynamic pricing rule
+      description: '**Rules that move assigned-seat prices within bounds** (design-notes correction on BO-1044, Block B;
+        CHG-CSP-049): which seats (a section, rows, single seats or a seat category on a seat map, optionally one
+        performance), the dynamic pricing strategy that drives them (`setDynamicPricingStrategy`), the floor and ceiling
+        the price may move between and the step it moves by. The strategy decides when to move (pace, demand, time to
+        event); the rule bounds where. A move never goes below the floor or above the ceiling, and a seat already sold
+        keeps its price.
+
+
+        **PUT to the rule''s key: an idempotent upsert.** `ruleId` is a client-generated UUIDv7; a key with no rule creates
+        it (`201`), a key with one replaces it whole (`200`). Two rules of equal priority covering the same seat are refused `422
+        overlapping-rule-same-priority`; a floor above the ceiling is `422`.
+
+        '
+      tags:
+        - drafted
+      x-ticvai-permission: PRICE_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: primary
+      parameters:
+        - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SeatPricingRule'
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: An existing rule, replaced
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SeatPricingRule'
+        '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: A new rule, created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SeatPricingRule'
+        '422':
+          description: The floor is above the ceiling, or another rule of the same priority covers a seat this one covers
+            (`overlapping-rule-same-priority`).
+          x-ticvai-problem-types:
+            - overlapping-rule-same-priority
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /dynamic-pricing-strategy:
     get:
       operationId: listDynamicPricingStrategy
       x-ticvai-consumed-by:
+        - "P08 ADM-088 Dynamic Pricing Strategy Command Center"
+        - "P08 ADM-089 Dynamic Pricing Strategy Builder"
         - "P08 BO-1044 Dynamic Seat Pricing"
-        - "P08 BO-528 Dynamic Pricing & AI Recommendation"
-        - "P09 ADM-088 Dynamic Pricing Strategy Command Center"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.75-76 (KPI Cards,
@@ -11259,7 +11531,7 @@ paths:
     put:
       operationId: setDynamicPricingStrategy
       x-ticvai-consumed-by:
-        - "P09 ADM-089 Dynamic Pricing Strategy Builder"
+        - "P08 ADM-089 Dynamic Pricing Strategy Builder"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.76-78 (Strategy
@@ -11309,7 +11581,7 @@ paths:
     put:
       operationId: setDemandOccupancyAvailability
       x-ticvai-consumed-by:
-        - "P09 ADM-090 Demand, Occupancy & Availability Rule Builder"
+        - "P08 ADM-090 Demand, Occupancy & Availability Rule Builder"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.78-79 (Supported
@@ -11360,7 +11632,7 @@ paths:
     put:
       operationId: setBookingVelocityTime
       x-ticvai-consumed-by:
-        - "P09 ADM-091 Booking Velocity & Time-to-Event Rule Builder"
+        - "P08 ADM-091 Booking Velocity & Time-to-Event Rule Builder"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.80-81 (Booking
@@ -11411,7 +11683,7 @@ paths:
     get:
       operationId: listSeasonalCalendarDay
       x-ticvai-consumed-by:
-        - "P09 ADM-092 Seasonal, Calendar, Day & Timeslot Dynamic Rules"
+        - "P08 ADM-092 Seasonal, Calendar, Day & Timeslot Dynamic Rules"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.81-82 (Supported
@@ -11506,8 +11778,7 @@ paths:
     get:
       operationId: listChannelCustomerSegment
       x-ticvai-consumed-by:
-        - "P09 ADM-093 Channel, Customer Segment & Location Dynamic Rules"
-        - "P09 ADM-234 Customer, Segment, Channel & Partner Analytics"
+        - "P08 ADM-093 Channel, Customer Segment & Location Dynamic Rules"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.83-84 (Channel
@@ -11608,7 +11879,7 @@ paths:
     get:
       operationId: listDynamicPriceBand
       x-ticvai-consumed-by:
-        - "P09 ADM-094 Dynamic Price Bands, Ladders & Adjustment Matrix"
+        - "P08 ADM-094 Dynamic Price Bands, Ladders & Adjustment Matrix"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.84-86 (Price Ladder
@@ -11674,7 +11945,7 @@ paths:
     get:
       operationId: listDynamicPricingGuardrail
       x-ticvai-consumed-by:
-        - "P09 ADM-095 Dynamic Pricing Guardrails & Commercial Protection"
+        - "P08 ADM-095 Dynamic Pricing Guardrails & Commercial Protection"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.86-87 (Core Guardrails,
@@ -11742,7 +12013,7 @@ paths:
     get:
       operationId: listDynamicPricingAutomation
       x-ticvai-consumed-by:
-        - "P09 ADM-096 Dynamic Pricing Automation Policy & Control"
+        - "P08 ADM-096 Dynamic Pricing Automation Policy & Control"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.87-89 (Automation
@@ -11819,7 +12090,6 @@ paths:
       operationId: listRulePriorityConflict
       x-ticvai-consumed-by:
         - "P08 BO-441 Price Priority & Conflict Rules"
-        - "P09 ADM-097 Rule Priority, Conflict Resolution & Dynamic Pricing Test Console"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.89-91 (Example,
@@ -11909,7 +12179,6 @@ paths:
       operationId: setRulePriorityConflict
       x-ticvai-consumed-by:
         - "P08 BO-441 Price Priority & Conflict Rules"
-        - "P09 ADM-097 Rule Priority, Conflict Resolution & Dynamic Pricing Test Console"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: VM close-out; pack labels on BO-441 (Reorder | Validate | Test | Save); pack ''Pricing___Revenue_Management_Reference.pdf'' pp.89-91; MoM 1 Sep 2026 §4.4 (configurable hierarchy, not lowest-price-wins); shape follows listRulePriorityConflict'
@@ -11978,8 +12247,7 @@ paths:
     get:
       operationId: listPricing
       x-ticvai-consumed-by:
-        - "P08 BO-443 Pricing Audit, Approval & Publication"
-        - "P09 ADM-098 AI Pricing Intelligence Command Center"
+        - "P08 ADM-098 AI Pricing Intelligence Command Center"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.94-95 (10.6.1 AI
@@ -12069,7 +12337,7 @@ paths:
     get:
       operationId: listInternalDemandBooking
       x-ticvai-consumed-by:
-        - "P09 ADM-099 Internal Demand & Booking Signal Hub"
+        - "P08 ADM-099 Internal Demand & Booking Signal Hub"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.95-97 (10.6.2 Internal
@@ -12196,7 +12464,7 @@ paths:
     get:
       operationId: listWeatherDemandImpact
       x-ticvai-consumed-by:
-        - "P09 ADM-100 Weather Intelligence & Demand Impact Configuration"
+        - "P08 ADM-100 Weather Intelligence & Demand Impact Configuration"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.97-99 (10.6.3 Weather
@@ -12279,7 +12547,7 @@ paths:
     get:
       operationId: listNearbyEventExhibition
       x-ticvai-consumed-by:
-        - "P09 ADM-101 Nearby Event, Exhibition & Local Demand Intelligence"
+        - "P08 ADM-101 Nearby Event, Exhibition & Local Demand Intelligence"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.99-100 (10.6.4
@@ -12378,7 +12646,7 @@ paths:
     get:
       operationId: listCompetitorPricingMarket
       x-ticvai-consumed-by:
-        - "P09 ADM-102 Competitor Pricing & Market Position Intelligence"
+        - "P08 ADM-102 Competitor Pricing & Market Position Intelligence"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.100-102 (10.6.5
@@ -12465,7 +12733,7 @@ paths:
     get:
       operationId: listMarketTourismHoliday
       x-ticvai-consumed-by:
-        - "P09 ADM-103 Market, Tourism, Holiday & Contextual Signal Hub"
+        - "P08 ADM-103 Market, Tourism, Holiday & Contextual Signal Hub"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.102-103 (10.6.6
@@ -12567,12 +12835,12 @@ paths:
     get:
       operationId: listDemandBookingCurve
       x-ticvai-consumed-by:
+        - "P08 ADM-104 AI Demand Forecasting & Booking Curve Studio"
         - "P08 BO-1046 Inventory Forecasting"
         - "P08 BO-1047 Section Revenue Forecast"
         - "P08 BO-1058 Sales Pace & Pick Curves"
         - "P08 BO-591 Rental Forecasting & Demand Intelligence"
         - "P08 BO-946 Demand Forecast Accuracy & Planning Performance"
-        - "P09 ADM-104 AI Demand Forecasting & Booking Curve Studio"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.103-105 (10.6.7
@@ -12702,7 +12970,7 @@ paths:
     get:
       operationId: listPriceElasticityRevenue
       x-ticvai-consumed-by:
-        - "P09 ADM-105 Price Elasticity & Revenue Response Intelligence"
+        - "P08 ADM-105 Price Elasticity & Revenue Response Intelligence"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.105-107 (10.6.8
@@ -12807,7 +13075,7 @@ paths:
     get:
       operationId: listPricingRecommendationExplainability
       x-ticvai-consumed-by:
-        - "P09 ADM-106 AI Pricing Recommendation & Explainability Center"
+        - "P08 ADM-106 AI Pricing Recommendation & Explainability Center"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.107-108 (10.6.9
@@ -12931,7 +13199,7 @@ paths:
     get:
       operationId: listSignalDataQuality
       x-ticvai-consumed-by:
-        - "P09 ADM-107 AI Signal Registry, Data Quality & Model Governance"
+        - "P08 ADM-107 AI Signal Registry, Data Quality & Model Governance"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.108-110 (10.6.10
@@ -13022,9 +13290,9 @@ paths:
     get:
       operationId: listRevenue
       x-ticvai-consumed-by:
+        - "P08 ADM-108 Revenue Optimization Command Center"
         - "P08 BO-1043 Revenue Command Center"
         - "P08 BO-1050 Revenue Analytics & Audit"
-        - "P09 ADM-108 Revenue Optimization Command Center"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.114-115 (10.7.1
@@ -13122,7 +13390,7 @@ paths:
     put:
       operationId: setPricing
       x-ticvai-consumed-by:
-        - "P09 ADM-109 Pricing Simulation Studio"
+        - "P08 ADM-109 Pricing Simulation Studio"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.115-117 (10.7.2
@@ -13181,7 +13449,7 @@ paths:
     get:
       operationId: listScenarioModelingWhat
       x-ticvai-consumed-by:
-        - "P09 ADM-110 Scenario Modeling & What-If Analysis"
+        - "P08 ADM-110 Scenario Modeling & What-If Analysis"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.117-119 (10.7.3
@@ -13264,7 +13532,7 @@ paths:
     put:
       operationId: setPricingExperiment
       x-ticvai-consumed-by:
-        - "P09 ADM-111 A/B Pricing Experiment Studio"
+        - "P08 ADM-111 A/B Pricing Experiment Studio"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.119-120 (10.7.4
@@ -13319,7 +13587,7 @@ paths:
     get:
       operationId: listRevenueDemandImpact
       x-ticvai-consumed-by:
-        - "P09 ADM-112 Revenue & Demand Impact Forecasting"
+        - "P08 ADM-112 Revenue & Demand Impact Forecasting"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.120-122 (10.7.5
@@ -13394,7 +13662,7 @@ paths:
     get:
       operationId: listRecommendationReviewDecision
       x-ticvai-consumed-by:
-        - "P09 ADM-113 AI Recommendation Review & Decision Queue"
+        - "P08 ADM-113 AI Recommendation Review & Decision Queue"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.122-123 (10.7.6
@@ -13489,7 +13757,7 @@ paths:
     get:
       operationId: listAutomationPolicyAutonomous
       x-ticvai-consumed-by:
-        - "P09 ADM-114 Automation Policy & Autonomous Pricing Orchestrator"
+        - "P08 ADM-114 Automation Policy & Autonomous Pricing Orchestrator"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.123-125 (10.7.7
@@ -13574,7 +13842,7 @@ paths:
     post:
       operationId: createLiveDynamicPrice
       x-ticvai-consumed-by:
-        - "P09 ADM-115 Live Dynamic Price Execution & Deployment Monitor"
+        - "P08 ADM-115 Live Dynamic Price Execution & Deployment Monitor"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.125-126 (10.7.8
@@ -13629,7 +13897,7 @@ paths:
     get:
       operationId: listDynamicPricingPerformance
       x-ticvai-consumed-by:
-        - "P09 ADM-116 Dynamic Pricing Performance & Optimization Analytics"
+        - "P08 ADM-116 Dynamic Pricing Performance & Optimization Analytics"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.126-128 (10.7.9
@@ -13746,7 +14014,7 @@ paths:
     get:
       operationId: listLearningModelPerformance
       x-ticvai-consumed-by:
-        - "P09 ADM-117 AI Learning, Model Performance & Optimization Feedback"
+        - "P08 ADM-117 AI Learning, Model Performance & Optimization Feedback"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.128-130 (10.7.10
@@ -14027,6 +14295,146 @@ paths:
                 $ref: '#/components/schemas/EventSchedule'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /venues/{venueId}/event-change-treatment-policy:
+    parameters:
+    - name: venueId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    get:
+      operationId: getEventChangeTreatmentPolicy
+      x-ticvai-audience:
+        - staff
+      x-ticvai-read-routing: replica
+      summary: What happens to tickets, reservations and guests when an event changes, by default
+      description: '**The venue''s default treatment per kind of event change, read back** (design-notes correction on BO-720,
+        Block B; CHG-CSP-050); a venue with none saved reads the defaults below.
+
+        '
+      tags:
+        - events
+      x-ticvai-permission: PERFORMANCE_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: The policy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventChangeTreatmentPolicy'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+    put:
+      operationId: setEventChangeTreatmentPolicy
+      x-ticvai-audience:
+        - staff
+      x-ticvai-config-scope: venue
+      summary: Set the default treatment per kind of event change
+      description: '**Made once and applied consistently, rather than per guest at a desk** (design-notes correction on BO-720,
+        Block B: "rescheduleEvent performs a change; there is no operation storing default treatments per change kind";
+        CHG-CSP-050). For each kind of change (`moveTime`, `moveDate`, `moveVenue`, `cancel`), the ticket treatment, whether
+        reservations follow, whether fees are refunded and whether guests are told. `rescheduleEvent` starts from these
+        defaults: a request that names no `ticketTreatment` takes the policy''s for its kind, and one that names a different
+        one is recorded as an override. PUT replaces the policy whole; one per venue.
+
+        '
+      tags:
+        - events
+      x-ticvai-permission: PERFORMANCE_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventChangeTreatmentPolicy'
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Set
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventChangeTreatmentPolicy'
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /entitlement-templates/{templateId}/blackout-dates:
+    parameters:
+    - name: templateId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    put:
+      operationId: setEntitlementTemplateBlackoutDates
+      x-ticvai-audience:
+        - staff
+      x-ticvai-config-scope: venue
+      summary: Set the dates a product's entitlement does not admit
+      description: '**Blackouts from the closures screen** (design-notes correction on BO-019, Block B: "No operation sets
+        product blackout dates or a venue closure day; the screen only cancels performances and closes paths. Blackouts
+        live on entitlement templates (blackoutDates) and are edited on BO-012; a closures screen needs a write for them";
+        DI-452; CHG-CSP-051). Replaces `EntitlementTemplate.blackoutDates` of one template, which until now could be set
+        only when the template was created. An annual pass that excludes public holidays is the usual case. Applies to
+        entitlements issued from the template from now on and to existing ones at their next validation; a date already
+        admitted on is not undone. A whole-venue closure day is the access operating calendar''s
+        (`setOperatingCalendarEntry` with `venueClosed`).
+
+        '
+      tags:
+        - entitlement
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - blackoutDates
+              properties:
+                blackoutDates:
+                  type: array
+                  description: The whole list; an empty list clears it.
+                  items:
+                    type: string
+                    format: date
+                reason:
+                  type: string
+                  maxLength: 300
+                  nullable: true
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: The template, with its blackout dates replaced
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EntitlementTemplate'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /events/{eventId}/reschedule:
     parameters:
     - name: eventId
@@ -14082,6 +14490,8 @@ paths:
       operationId: listSpaces
       x-ticvai-consumed-by:
         - "P08 BO-700 Venue & Space Command Center"
+        - "P08 BO-701 Venue Master Configuration"
+        - "P08 BO-702 Space Access Rules Configuration"
         - "P08 BO-915 Venue & Space Allocation"
       summary: Halls, rooms and areas an event can occupy
       description: 'Event boards 3.2 and 3.3. **A space is bookable and a venue map zone is
@@ -14254,7 +14664,12 @@ paths:
       operationId: getEventResourcePlan
       x-ticvai-consumed-by:
         - "P08 BO-710 Event Resource Command Center"
+        - "P08 BO-711 Event Resource Requirement Configuration"
+        - "P08 BO-712 Staff & Role Assignment Configuration"
+        - "P08 BO-713 Contractor & External Workforce Configuration"
+        - "P08 BO-715 Resource Location & Deployment Configuration"
         - "P08 BO-913 Event Resource Planning Command Center"
+        - "P08 BO-914 Event Resource Requirement Builder"
         - "P08 BO-920 Event Resource Cost Estimator"
         - "P08 BO-922 Event Resource Approval & Readiness Gate"
       summary: Everything an event needs, and whether it has been secured
@@ -14393,6 +14808,8 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-016 Performance Template"
         - "P08 BO-721 Activity Performance & Slot Template Configuration"
+        - "P08 BO-723 Peak, Off-Peak & Super Prime Time Configuration"
+        - "P08 BO-724 Walk-In / There-and-Then Booking Configuration"
         - "P08 BO-725 Performance Operations Command Center"
       summary: Slot templates, peak bands and walk-in rules
       description: 'Event board 8. **An activity venue sells time, not seats**, and the template is how
@@ -14792,6 +15209,12 @@ paths:
   /membership-programmes:
     get:
       operationId: listMembershipProgrammes
+      # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
+      # or staff token is still accepted. `{}` makes the credential optional.
+      security:
+      - {}
+      - guestAuth: []
+      - bearerAuth: []
       summary: Membership schemes, the level above a plan
       description: 'Decision 9 of the schema merge. **A programme groups plans**; the plan itself is
         `catalogue.entitlement_template`, which the TAKE BODY verdict settled — validity kind,
@@ -14852,6 +15275,12 @@ paths:
   /membership-benefits:
     get:
       operationId: listMembershipBenefits
+      # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
+      # or staff token is still accepted. `{}` makes the credential optional.
+      security:
+      - {}
+      - guestAuth: []
+      - bearerAuth: []
       summary: Benefits a plan can grant
       description: 'Decision 9. **Benefits were columns on `entitlement_template`**, so adding one
         was a schema change — `can_share_media`, `can_claim_shop_and_drop`, `included_value`. Its 15
@@ -14912,6 +15341,12 @@ paths:
   /entitlement-templates/{templateId}/benefits:
     get:
       operationId: getPlanBenefits
+      # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
+      # or staff token is still accepted. `{}` makes the credential optional.
+      security:
+      - {}
+      - guestAuth: []
+      - bearerAuth: []
       summary: Which benefits a plan grants, and how much of each
       description: '**Keyed by the entitlement template because that is the plan.** `plan_benefit`
         carries the usage limit and the period, which is the part a benefit definition cannot hold —
@@ -14995,6 +15430,8 @@ paths:
     get:
       operationId: listDynamicPriceRules
       x-ticvai-consumed-by:
+        - "P08 ADM-090 Demand, Occupancy & Availability Rule Builder"
+        - "P08 ADM-091 Booking Velocity & Time-to-Event Rule Builder"
         - "P08 BO-009 Pricing Rules"
         - "P08 BO-443 Pricing Audit, Approval & Publication"
       summary: Dynamic pricing rules
@@ -15169,8 +15606,8 @@ paths:
     post:
       operationId: testPricingRule
       x-ticvai-consumed-by:
-        - "P09 ADM-058 Pricing Rule Command Center"
-        - "P09 ADM-067 Pricing Rule Priority, Conflict Resolution & Testing"
+        - "P08 ADM-058 Pricing Rule Command Center"
+        - "P08 ADM-067 Pricing Rule Priority, Conflict Resolution & Testing"
       x-ticvai-idempotency-exempt: A test run that writes nothing; a replay returns the same evaluation and duplicates no row.
       x-ticvai-audience:
         - staff
@@ -15229,7 +15666,7 @@ paths:
     post:
       operationId: submitPricingChangeRequest
       x-ticvai-consumed-by:
-        - "P09 ADM-079 Pricing Change Request & Workspace"
+        - "P08 ADM-079 Pricing Change Request & Workspace"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: readiness close-out (QB: Submit is a button on ADM-079); pack ''Pricing___Revenue_Management_Reference.pdf'' pp.58-60 and p.65 (approval workflow); MoM 1 Sep 2026 §4.6 (approval before publishing); shape follows setPricingChangeRequest'
@@ -15297,8 +15734,8 @@ paths:
     post:
       operationId: decidePricingChangeRequest
       x-ticvai-consumed-by:
-        - "P09 ADM-078 Pricing Governance Command Center"
-        - "P09 ADM-079 Pricing Change Request & Workspace"
+        - "P08 ADM-078 Pricing Governance Command Center"
+        - "P08 ADM-079 Pricing Change Request & Workspace"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: readiness close-out (QB: approve is an action on the ADM-078 change queue); pack ''Pricing___Revenue_Management_Reference.pdf'' pp.57-58 and p.65; MoM 1 Sep 2026 §4.6 (approval workflow before publishing); shape follows approveReviewDecision'
@@ -15378,7 +15815,8 @@ paths:
     post:
       operationId: decidePricingRecommendation
       x-ticvai-consumed-by:
-        - "P09 ADM-113 AI Recommendation Review & Decision Queue"
+        - "P08 ADM-106 AI Pricing Recommendation & Explainability Center"
+        - "P08 ADM-113 AI Recommendation Review & Decision Queue"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: readiness close-out (QB: Accept / Modify / Reject are actions, the row carries the decision record); pack ''Pricing___Revenue_Management_Reference.pdf'' pp.94, 107-112 (an LLM alone must not set prices; guardrails before execution); MoM 1 Sep 2026 §4.8; shape follows approveReviewDecision'
@@ -15458,8 +15896,8 @@ paths:
     put:
       operationId: setProductLinks
       x-ticvai-consumed-by:
-        - "P09 ADM-133 Change Impact Analysis"
-        - "P09 ADM-134 Change Propagation & Dependency Control"
+        - "P08 ADM-133 Change Impact Analysis"
+        - "P08 ADM-134 Change Propagation & Dependency Control"
       summary: Replace what depends on a product
       description: '**Set whole, per source product** (29 September, writers pass). Writes the product''s
         `catalogue.product_link` rows: each dependent object, its `dependencyType`, whether an approved change
@@ -15523,8 +15961,8 @@ paths:
     put:
       operationId: setConfigurationTemplate
       x-ticvai-consumed-by:
-        - "P09 ADM-056 Price List Templates, Clone & Reuse"
-        - "P09 ADM-126 Product Duplication & Template Library"
+        - "P08 ADM-056 Price List Templates, Clone & Reuse"
+        - "P08 ADM-126 Product Duplication & Template Library"
       summary: Create or update a product or price-list template
       description: '**One template library for products and price lists** (29 September, writers pass). Creates
         or updates a `catalogue.configuration_template`, keyed by `subject` and `name`: the components a clone
@@ -15591,7 +16029,7 @@ paths:
     post:
       operationId: cancelPricingRollback
       x-ticvai-consumed-by:
-        - "P09 ADM-086 Pricing Rollback & Emergency Control Center"
+        - "P08 ADM-086 Pricing Rollback & Emergency Control Center"
       summary: Cancel a rollback that has not started
       description: '**Only before it runs** (29 September, writers pass). Moves a `requested` or `scheduled`
         pricing rollback action to `cancelled`; an open approval request for it is withdrawn. One already
@@ -15657,9 +16095,9 @@ paths:
     post:
       operationId: decideCatalogueAiFinding
       x-ticvai-consumed-by:
-        - "P09 ADM-128 Product Governance Command Center"
-        - "P09 ADM-137 Governance Risk, AI Monitoring & Control Center"
-        - "P09 ADM-277 AI Channel Optimization & Intelligence Center"
+        - "P08 ADM-128 Product Governance Command Center"
+        - "P08 ADM-137 Governance Risk, AI Monitoring & Control Center"
+        - "P08 ADM-277 AI Channel Optimization & Intelligence Center"
       summary: Acknowledge, accept, dismiss or resolve an AI finding
       description: '**The human control on a governance risk or a channel recommendation** (29 September, writers
         pass). Moves a `catalogue.ai_finding` along `states/catalogue-ai-finding.yaml` and may set its owner and
@@ -15744,7 +16182,7 @@ paths:
     put:
       operationId: setChannelConnectionConfiguration
       x-ticvai-consumed-by:
-        - "P09 ADM-269 Channel Connection & Integration Manager"
+        - "P08 ADM-269 Channel Connection & Integration Manager"
       summary: Create or update a channel connection
       description: '**How TICVAI reaches one channel, per environment** (29 September, writers pass). Creates or
         updates a `catalogue.channel_connection`, keyed by `salesChannelId`, `connectorName` and `environment`.
@@ -15805,7 +16243,7 @@ paths:
     post:
       operationId: testChannelConnection
       x-ticvai-consumed-by:
-        - "P09 ADM-269 Channel Connection & Integration Manager"
+        - "P08 ADM-269 Channel Connection & Integration Manager"
       summary: Test a channel connection now
       description: '**Runs the connection tests and records the result** (29 September, writers pass). Calls the
         channel with the connection''s settings and writes the latest result per test to `lastTests` and the
@@ -15878,7 +16316,7 @@ paths:
     put:
       operationId: setChannelSyncSetting
       x-ticvai-consumed-by:
-        - "P09 ADM-270 Product, Price & Availability Synchronization"
+        - "P08 ADM-270 Product, Price & Availability Synchronization"
       summary: Set how one kind of data synchronises with a channel
       description: '**The person''s half of `catalogue.channel_sync`** (29 September, writers pass). Creates or
         updates the row for a `salesChannelId` and `domain`, setting `direction`, `frequency`, `isPaused` and the
@@ -15932,9 +16370,9 @@ paths:
     put:
       operationId: setChannelSalesRule
       x-ticvai-consumed-by:
-        - "P09 ADM-263 Channel Sales Schedule & Availability Windows"
-        - "P09 ADM-264 Customer & Eligibility Rules by Channel"
-        - "P09 ADM-265 Channel Sales Rules, Limits & Restrictions"
+        - "P08 ADM-263 Channel Sales Schedule & Availability Windows"
+        - "P08 ADM-264 Customer & Eligibility Rules by Channel"
+        - "P08 ADM-265 Channel Sales Rules, Limits & Restrictions"
       summary: Create or replace a channel sales window, limit or eligibility rule
       description: '**One rule on a channel** (29 September, writers pass). Creates or replaces a
         `catalogue.channel_sales_rule`: a sales window (`ruleKind: salesWindow`), a sales limit or restriction
@@ -16007,7 +16445,7 @@ paths:
     patch:
       operationId: updateChannelIncident
       x-ticvai-consumed-by:
-        - "P09 ADM-273 Channel Exceptions, Incidents & Recovery"
+        - "P08 ADM-273 Channel Exceptions, Incidents & Recovery"
       summary: Own, investigate, resolve or close a channel incident
       description: '**The person''s moves on a channel incident** (29 September, writers pass). Sets the owner,
         the SLA due time and the status of a `catalogue.channel_incident` along `states/channel-incident.yaml`:
@@ -16091,7 +16529,7 @@ paths:
     post:
       operationId: retryChannelIncident
       x-ticvai-consumed-by:
-        - "P09 ADM-273 Channel Exceptions, Incidents & Recovery"
+        - "P08 ADM-273 Channel Exceptions, Incidents & Recovery"
       summary: Retry the failed channel call behind an incident
       description: '**Retry, as a call** (29 September, writers pass). Moves an `open` or `investigating`
         `catalogue.channel_incident` to `retrying`, increments `retryCount` and queues the failed call again with
@@ -16137,7 +16575,7 @@ paths:
     put:
       operationId: setPriceCategoryRateType
       x-ticvai-consumed-by:
-        - "P09 ADM-050 Price Category & Rate Type Library"
+        - "P08 ADM-050 Price Category & Rate Type Library"
       summary: Create or update a price category or rate type
       description: '**The tenant''s library of price categories and rate types** (29 September, writers pass).
         Creates or updates a `catalogue.price_category`, keyed by `entryKind` and `code` (unique per `entryKind`
@@ -16197,8 +16635,8 @@ paths:
     put:
       operationId: setPackagePricingDefinition
       x-ticvai-consumed-by:
+        - "P08 ADM-053 Package, Bundle & Add-On Pricing"
         - "P08 BO-011 Packages & Bundles"
-        - "P09 ADM-053 Package, Bundle & Add-On Pricing"
       summary: Set how a package, bundle or add-on is priced
       description: '**The pricing model of a package, bundle or add-on** (29 September, writers pass). Creates or
         updates the `catalogue.package_pricing` row for a `productId` and `priceListId`: the model
@@ -16262,7 +16700,7 @@ paths:
     put:
       operationId: setMarketPricingConfiguration
       x-ticvai-consumed-by:
-        - "P09 ADM-054 Market, Venue & Currency Pricing Structure"
+        - "P08 ADM-054 Market, Venue & Currency Pricing Structure"
       summary: Create or update a node of the market pricing structure
       description: '**Global, country, region, market or venue** (29 September, writers pass). Creates or updates a
         `catalogue.pricing_market`: which price list and rounding profile the node uses and whether it inherits from
@@ -16315,7 +16753,7 @@ paths:
     put:
       operationId: setFeeDefinition
       x-ticvai-consumed-by:
-        - "P09 ADM-071 Fee & Surcharge Library"
+        - "P08 ADM-071 Fee & Surcharge Library"
       summary: Create or update a fee or surcharge
       description: '**The fee and surcharge library** (29 September, writers pass). Creates or updates a
         `catalogue.fee`, keyed by `code`: what the fee is and how it computes. When it applies is a
@@ -16378,7 +16816,7 @@ paths:
     put:
       operationId: setPriceCalculationPolicy
       x-ticvai-consumed-by:
-        - "P09 ADM-074 Price Calculation Sequence & Formula Engine"
+        - "P08 ADM-074 Price Calculation Sequence & Formula Engine"
       summary: Save a price calculation sequence, whole
       description: '**The ordered steps that turn a rate into a payable amount** (29 September, writers pass).
         Writes a `catalogue.calculation_profile` and its `catalogue.calculation_step` rows, whole, keyed by `code`
@@ -16442,7 +16880,7 @@ paths:
     put:
       operationId: setCurrencyRoundingRule
       x-ticvai-consumed-by:
-        - "P09 ADM-075 Currency Precision, Rounding & Monetary Rules"
+        - "P08 ADM-075 Currency Precision, Rounding & Monetary Rules"
       summary: Set precision and rounding for a currency
       description: '**One rounding profile per currency the tenant sells in** (29 September, writers pass).
         Creates or updates the `catalogue.rounding_profile` for `currency`: decimal places (up to three, and the
@@ -16495,9 +16933,9 @@ paths:
     put:
       operationId: setDynamicPricingGuardrailPolicy
       x-ticvai-consumed-by:
-        - "P09 ADM-095 Dynamic Pricing Guardrails & Commercial Protection"
-        - "P09 ADM-096 Dynamic Pricing Automation Policy & Control"
-        - "P09 ADM-114 Automation Policy & Autonomous Pricing Orchestrator"
+        - "P08 ADM-095 Dynamic Pricing Guardrails & Commercial Protection"
+        - "P08 ADM-096 Dynamic Pricing Automation Policy & Control"
+        - "P08 ADM-114 Automation Policy & Autonomous Pricing Orchestrator"
       summary: Set the guardrails and automation level of dynamic pricing at one scope
       description: '**Guardrails and automation policy, one row per scope** (29 September, writers pass). Creates or
         updates the `catalogue.dynamic_pricing_control` for `scopeLevel` and `scopeId`: price floors and ceilings,
@@ -16567,7 +17005,7 @@ paths:
     put:
       operationId: setPriceLadderMatrix
       x-ticvai-consumed-by:
-        - "P09 ADM-094 Dynamic Price Bands, Ladders & Adjustment Matrix"
+        - "P08 ADM-094 Dynamic Price Bands, Ladders & Adjustment Matrix"
       summary: Set a strategy's price ladder
       description: '**The bands a strategy''s price moves between, and how fast** (29 September, writers pass).
         Creates or replaces the strategy''s `catalogue.price_ladder`: the adjustment model, the bands (ascending),
@@ -16639,9 +17077,8 @@ paths:
     post:
       operationId: transitionDynamicPricingStrategy
       x-ticvai-consumed-by:
-        - "P08 BO-528 Dynamic Pricing & AI Recommendation"
-        - "P09 ADM-088 Dynamic Pricing Strategy Command Center"
-        - "P09 ADM-089 Dynamic Pricing Strategy Builder"
+        - "P08 ADM-088 Dynamic Pricing Strategy Command Center"
+        - "P08 ADM-089 Dynamic Pricing Strategy Builder"
       summary: Activate, pause, resume or retire a dynamic pricing strategy
       description: '**The strategy''s status moves, as calls** (29 September, writers pass). Moves a
         `catalogue.dynamic_pricing_strategy` along `states/dynamic-pricing-strategy.yaml`: `activate` (from
@@ -16724,11 +17161,11 @@ paths:
     put:
       operationId: setDemandSignalConfiguration
       x-ticvai-consumed-by:
-        - "P09 ADM-092 Seasonal, Calendar, Day & Timeslot Dynamic Rules"
-        - "P09 ADM-100 Weather Intelligence & Demand Impact Configuration"
-        - "P09 ADM-101 Nearby Event, Exhibition & Local Demand Intelligence"
-        - "P09 ADM-102 Competitor Pricing & Market Position Intelligence"
-        - "P09 ADM-103 Market, Tourism, Holiday & Contextual Signal Hub"
+        - "P08 ADM-092 Seasonal, Calendar, Day & Timeslot Dynamic Rules"
+        - "P08 ADM-100 Weather Intelligence & Demand Impact Configuration"
+        - "P08 ADM-101 Nearby Event, Exhibition & Local Demand Intelligence"
+        - "P08 ADM-102 Competitor Pricing & Market Position Intelligence"
+        - "P08 ADM-103 Market, Tourism, Holiday & Contextual Signal Hub"
       summary: Enter a calendar signal or configure how a demand signal is used
       description: '**The person''s half of `catalogue.demand_signal`** (29 September, writers pass). Two uses:
         entering a tenant calendar signal by hand (`signalKind: calendar`, `source: tenant`: Ramadan, Eid, school
@@ -16793,8 +17230,8 @@ paths:
     put:
       operationId: setSignalRegistryPolicy
       x-ticvai-consumed-by:
-        - "P09 ADM-107 AI Signal Registry, Data Quality & Model Governance"
-        - "P09 ADM-117 AI Learning, Model Performance & Optimization Feedback"
+        - "P08 ADM-107 AI Signal Registry, Data Quality & Model Governance"
+        - "P08 ADM-117 AI Learning, Model Performance & Optimization Feedback"
       summary: Register a signal or model and set how far AI may trust it
       description: '**AI governance of signals and models** (29 September, writers pass). Creates or updates a
         `catalogue.signal_registry` entry, keyed by `registryKind` and `name`: provider, refresh, `trustLevel`,
@@ -17806,6 +18243,139 @@ components:
             '
         scopePath:
           type: string
+    EventChangeTreatmentPolicy:
+      type: object
+      x-ticvai-persistence: catalogue.event_change_treatment_policy
+      description: '**The venue''s default treatment per kind of event change** (CHG-CSP-050; BO-720). One per venue.'
+      required:
+      - treatments
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        scopePath:
+          type: string
+          readOnly: true
+        treatments:
+          x-ticvai-persistence-kind: valueObject
+          x-ticvai-persistence-column: jsonb
+          type: array
+          description: One row per change kind; a kind left out takes the defaults shown on each field.
+          items:
+            type: object
+            required:
+            - changeKind
+            - ticketTreatment
+            properties:
+              changeKind:
+                type: string
+                enum:
+                - moveTime
+                - moveDate
+                - moveVenue
+                - cancel
+              ticketTreatment:
+                type: string
+                enum:
+                - moveAutomatically
+                - offerChoice
+                - refund
+                - creditToWallet
+                - honourAtAnyPerformance
+                description: As `EventReschedule.ticketTreatment`. Proposed defaults, client to correct - moveTime
+                  moveAutomatically, moveDate offerChoice, moveVenue offerChoice, cancel refund.
+              reservationsFollow:
+                type: boolean
+                default: true
+                description: Table, rental and add-on reservations tied to the performance move with it, or are released.
+              refundFees:
+                type: boolean
+                default: true
+              notifyGuests:
+                type: boolean
+                default: true
+              notificationTemplateId:
+                type: string
+                format: uuid
+                nullable: true
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+    SeatPricingRule:
+      type: object
+      x-ticvai-persistence: catalogue.seat_pricing_rule
+      description: '**One seat-level dynamic pricing rule: which seats, which strategy, and the bounds** (CHG-CSP-049; BO-1044).'
+      required:
+      - name
+      - strategyId
+      - seatMapId
+      - floorPrice
+      - ceilingPrice
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+          description: The `ruleId` of the path.
+        name:
+          type: string
+          maxLength: 200
+        strategyId:
+          type: string
+          format: uuid
+          description: The dynamic pricing strategy that decides when to move (`setDynamicPricingStrategy`).
+        seatMapId:
+          type: string
+          format: uuid
+        performanceId:
+          type: string
+          format: uuid
+          nullable: true
+          description: One performance only; null for every performance on the seat map.
+        seatSectionCodes:
+          type: array
+          items:
+            type: string
+          description: The seat map's sections the rule covers, by `Section.code` (the `Seat.sectionCode` of their
+            seats); empty or absent for none.
+        rows:
+          type: array
+          items:
+            type: string
+        seatIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+        seatCategory:
+          type: string
+          nullable: true
+          maxLength: 64
+        floorPrice:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        ceilingPrice:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        stepPrice:
+          allOf:
+          - $ref: ../shared/common.yaml#/components/schemas/Money
+          nullable: true
+          description: How far one move changes the price; null lets the strategy choose within the bounds.
+        priority:
+          type: integer
+          minimum: 0
+          default: 0
+        isActive:
+          type: boolean
+          default: true
+        scopePath:
+          type: string
+          readOnly: true
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
     EventReschedule:
       type: object
       x-ticvai-persistence: catalogue.event_reschedule
@@ -18730,6 +19300,42 @@ components:
           description: Reasons the change would be refused outright.
           items:
             type: string
+    BulkProductUpdateResult:
+      type: object
+      description: What `bulkUpdateCatalogueProducts` matched and changed, or would change in a preview (CHG-FUP-011).
+      required:
+      - applied
+      - matched
+      properties:
+        applied:
+          type: boolean
+          description: False for a preview.
+        matched:
+          type: integer
+          minimum: 0
+        succeeded:
+          type: integer
+          minimum: 0
+        failed:
+          type: integer
+          minimum: 0
+        failures:
+          type: array
+          description: One entry per product the change was refused for. Empty on a clean run.
+          items:
+            type: object
+            required:
+            - productId
+            - code
+            properties:
+              productId:
+                type: string
+                format: uuid
+              code:
+                type: string
+                description: The validation rule the product failed, as in `Problem.errors[].code`.
+              message:
+                type: string
     BulkPriceResult:
       type: object
       description: 2.9.9. Dry run or applied — the shape is the same, `applied` says which.
@@ -20280,7 +20886,7 @@ components:
           type: string
           nullable: true
           description: >-
-            Price list master fields (29 September, data model DM3), set with `setPriceListMaster` (ADM-058).
+            Price list master fields (29 September, data model DM3), set with `createPriceList` and `updatePriceList` since setPriceListMaster was retired in r2 (BC-008, CHG-CLN-001).
         priceListType:
           type: string
           enum:
@@ -20405,6 +21011,68 @@ components:
         priority:
           type: integer
           default: 0
+        description:
+          type: string
+          nullable: true
+          description: >-
+            **The price list master fields** (data model DM3) are written here since setPriceListMaster was
+            retired in r2 (BC-008, CHG-CLN-001); each is optional and means what it means on `PriceList`.
+        priceListType:
+          type: string
+          enum: [standardRetail, venue, attraction, event, membership, group, corporate, b2b, reseller, ota,
+                 internal, specialMarket]
+        ownerPrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+        tags:
+          type: array
+          items:
+            type: string
+        legalEntityId:
+          type: string
+          format: uuid
+          nullable: true
+        brand:
+          type: string
+          maxLength: 100
+          nullable: true
+        businessUnit:
+          type: string
+          maxLength: 100
+          nullable: true
+        countryCode:
+          type: string
+          maxLength: 2
+          nullable: true
+          pattern: ^[A-Z]{2}$
+        marketCode:
+          type: string
+          maxLength: 40
+          nullable: true
+        scopeLevel:
+          type: string
+          enum: [global, country, market, brand, venue, event, businessUnit]
+        defaultPriceCategoryId:
+          type: string
+          format: uuid
+          nullable: true
+        roundingProfileId:
+          type: string
+          format: uuid
+          nullable: true
+        priceResolutionPolicyId:
+          type: string
+          format: uuid
+          nullable: true
+        allowOverrides:
+          type: boolean
+        allowInheritance:
+          type: boolean
+        allowMultipleCurrencies:
+          type: boolean
+        allowProductSpecificRates:
+          type: boolean
     Price:
       x-ticvai-persistence: catalogue.price
       type: object
@@ -21608,6 +22276,7 @@ components:
           description: 'Status-specific edit permissions: who may edit a product in each state, and which sections
             are locked'
     BulkProductCreationCatalogueImportView:
+      x-ticvai-retired: 'createBulkProductCatalogue was removed in r2 (BC-010, CHG-CLN-001); no operation takes this shape. Kept because the design notes and the readiness close-out cite it; the venue screen''s typed writer carries the record.'
       type: object
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: none — projection over catalogue state, assembled at read time from tables that
@@ -21693,6 +22362,7 @@ components:
           format: uri
           nullable: true
     BulkProductCreationCatalogueImportInput:
+      x-ticvai-retired: 'createBulkProductCatalogue was removed in r2 (BC-010, CHG-CLN-001); no operation takes this shape. Kept because the design notes and the readiness close-out cite it; the venue screen''s typed writer carries the record.'
       type: object
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: none — request only; **no existing table shares a single field with this**,
@@ -26040,6 +26710,7 @@ components:
             type: string
           description: AI observations for this screen; advisory only, never applied automatically
     PriceListMasterConfigurationView:
+      x-ticvai-retired: 'setPriceListMaster was removed in r2 (BC-008, CHG-CLN-001); no operation takes this shape. Kept because the design notes and the readiness close-out cite it; the venue screen''s typed writer carries the record.'
       type: object
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: none — projection over catalogue state, assembled at read time from tables that
@@ -26164,6 +26835,7 @@ components:
               - rental
           description: 'Dependencies: the modules that consume this list (p.9); read-only'
     PriceListMasterConfigurationInput:
+      x-ticvai-retired: 'setPriceListMaster was removed in r2 (BC-008, CHG-CLN-001); no operation takes this shape. Kept because the design notes and the readiness close-out cite it; the venue screen''s typed writer carries the record.'
       type: object
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: none — request only; **no existing table shares a single field with this**,
@@ -26336,6 +27008,7 @@ components:
           description: 'AI Standardization: ids of categories that appear to mean the same thing (Kids / Child
             / Children Rate); advisory'
     RateStructureBuilderView:
+      x-ticvai-retired: 'setRateStructure was removed in r2 (BC-009, CHG-CLN-001); no operation takes this shape. Kept because the design notes and the readiness close-out cite it; the venue screen''s typed writer carries the record.'
       type: object
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: none — projection over catalogue state, assembled at read time from tables that
@@ -26426,6 +27099,7 @@ components:
               message:
                 type: string
     RateStructureBuilderInput:
+      x-ticvai-retired: 'setRateStructure was removed in r2 (BC-009, CHG-CLN-001); no operation takes this shape. Kept because the design notes and the readiness close-out cite it; the venue screen''s typed writer carries the record.'
       type: object
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: none — request only; **no existing table covers these fields** — the closest
@@ -38571,6 +39245,11 @@ components:
           default: discountedPrice
           description: >-
             Region-configurable; `preDiscountPrice` where the region taxes the undiscounted price (MoM 1 Sep 2026 §4.5).
+            **The one source of truth for the taxable base** (decided 2 October 2026, Chinmay; CHG-FIN-004):
+            `finance.calculateTax` reads it per tax code and its own `discountsAreTaxInclusive` is deprecated
+            and ignored. Worked example shown where it is set (ADM-069): Egypt, 14% VAT, a ticket listed at
+            EGP 100.00 with 20% off is paid at EGP 80.00; on `discountedPrice` the VAT is EGP 11.20, on
+            `preDiscountPrice` it is EGP 14.00 and the guest pays EGP 94.00.
         effectiveFrom:
           type: string
           format: date

@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Tenancy & Organisation
   version: 1.0.0
-  x-ticvai-screen-count: 42
+  x-ticvai-screen-count: 44
   x-ticvai-tier: spine
   x-ticvai-module: "Cross-cutting — organisation hierarchy"
   x-ticvai-capabilities: [C95, C20]
@@ -129,6 +129,19 @@ paths:
         control database, cached (a verified domain changes rarely); an unknown host is `404` and never falls
         through to a default tenant.
 
+
+        **Two kinds of host, decided 2 October 2026** (Chinmay, batch 5, "Domains: subdomain plus CNAME";
+        DEC-546, DEC-547; CHG-CSP-010). Every tenant has a **platform subdomain** under its cell''s stem,
+        `<venue>.<cell>.ticvai.app` (for example `*.ae.ticvai.app`, one wildcard certificate per cell, cookies
+        host-only). A tenant may add **custom domains** (`tickets.venue.com`) by a CNAME straight to the cell''s
+        Front Door endpoint, validated by a `_dnsauth` TXT record, with a Front Door managed certificate; a
+        delegated subdomain is an option, the apex only on request, and there is no path proxy. The row
+        answers which host is the tenant''s primary: a request on any other active host of the same channel
+        is answered with a redirect to `redirectToHostname` by the edge. A custom domain whose CNAME stopped
+        resolving to us stays routed while white-label''s `CustomDomain` is `pendingRevalidation`, and is
+        `detached` here when that times out, so a released hostname cannot be served for somebody else
+        (the takeover warning on CMS-017).
+
         '
       tags:
       - tenancy
@@ -162,6 +175,13 @@ paths:
         tenant is provisioned with its platform subdomain; removed-by-status when a domain is detached.
         `hostname` is unique across every tenant: a host already routed to another tenant is refused `409`
         (`hostname-taken`).
+
+
+        **Also written when a tenant names its primary domain and when a custom domain''s revalidation times
+        out** (DEC-546, DEC-547; CHG-CSP-010): white-label `setPrimaryDomain` sets `isPrimary` on one host per
+        channel and `redirectToHostname` on the others; white-label''s revalidation job records
+        `lastValidatedAt` and, on `timedOut`, sets `status: detached`. A platform subdomain is never
+        detached while the tenant exists, so a tenant always has a host that works.
 
         '
       tags:
@@ -202,9 +222,12 @@ paths:
     get:
       operationId: listOrgUnits
       x-ticvai-consumed-by:
+        - "P08 BO-055 Rota & Scheduling"
         - "P08 BO-064 Zones & Areas"
+        - "P08 BO-068 Audit Log"
         - "P08 BO-145 Venue & Park Access Structure"
         - "P09 ADM-006 Tenant Hierarchy Explorer"
+        - "P09 ADM-412 Payment Method & Settlement Setup"
         - "P13 CMS-016 Site Settings"
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
@@ -252,6 +275,7 @@ paths:
         - "P08 BO-145 Venue & Park Access Structure"
         - "P09 ADM-006 Tenant Hierarchy Explorer"
         - "P09 ADM-420 Tenant & Organization Provisioning"
+        - "P09 ADM-421 Venue & Operational Structure Creation"
       x-ticvai-audience: [staff]
       summary: Create a scope node
       tags: [scope]
@@ -285,13 +309,14 @@ paths:
       operationId: listAuditRecords
       x-ticvai-consumed-by:
         - "P08 BO-035 Override Audit"
-        - "P08 BO-036 Device Registry"
         - "P08 BO-068 Audit Log"
+        - "P08 BO-1079 Immutable Seat Audit Logs"
         - "P08 BO-1162 Security Governance, Audit & Rule Publication"
-        - "P08 BO-124 Layout & Journey Builder"
         - "P08 BO-126 Deployment, Preview & Audit"
         - "P08 BO-133 Offline Alerts, Limits & Audit"
         - "P08 BO-503 Product Validation, Approval & Publication"
+        - "P09 ADM-004 Platform Audit Log"
+        - "P16 ANL-070 Analytics Governance, Security & Audit Center"
       summary: Who did what, where, and when
       description: >
         POS board 1 and 4, 24 August. **`platform.audit_record` existed and nothing read it** —
@@ -382,8 +407,7 @@ paths:
     put:
       operationId: setRolePermissions
       x-ticvai-consumed-by:
-        - "P08 BO-071 Planned Maintenance"
-        - "P08 BO-116 Merchandising & Product Presentation"
+        - "P08 BO-054 Role Assignment"
       summary: What this role may do
       description: >
         POS board 4B. **`Role.permissions` was added on 20 August after Hrushikant found
@@ -404,6 +428,11 @@ paths:
         The control is `ROLE_MANAGE` itself, which requires MFA (audit R135). **Removing a
         permission ends the live sessions of every principal holding the role at once** (audit
         R126); an addition takes effect at their next sign-in.
+
+        **The checklist a preset filled stays editable here** (decided 2 October 2026, Chinmay, pre-apply
+        round: roles are preset permission configurations; DEC-007; CHG-CSP-003). A role started from the
+        Viewer preset is given more ticks with this call like any other role; the preset is not consulted
+        and not changed.
       tags: [identity]
       x-ticvai-permission: ROLE_MANAGE
       x-ticvai-audience: [staff]
@@ -464,8 +493,6 @@ paths:
         - "P04 POS-001 Begin Shift"
         - "P04 POS-025 Till Home"
         - "P08 BO-036 Device Registry"
-        - "P08 BO-1069 Platform Health & Observability"
-        - "P08 BO-125 Product & Category Button Configuration"
         - "P08 BO-128 Live Workstation Health Monitor"
         - "P08 BO-129 Software, Configuration & Version Management"
       summary: A score a manager can sort by, and what is dragging it down
@@ -511,6 +538,8 @@ paths:
   /configuration-profiles:
     get:
       operationId: listConfigurationProfiles
+      x-ticvai-consumed-by:
+        - "P08 BO-1070 Setup, Clone & Inheritance"
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: Every configuration profile, at its current version
@@ -701,7 +730,6 @@ paths:
     post:
       operationId: deployConfigurationProfile
       x-ticvai-consumed-by:
-        - "P08 BO-036 Device Registry"
         - "P08 BO-1068 Lifecycle & Environment Promotion"
         - "P08 BO-124 Layout & Journey Builder"
         - "P08 BO-126 Deployment, Preview & Audit"
@@ -799,13 +827,7 @@ paths:
       operationId: setOfflinePolicy
       x-ticvai-consumed-by:
         - "P08 BO-037 Offline Package Status"
-        - "P08 BO-128 Live Workstation Health Monitor"
         - "P08 BO-130 Offline Policy & Rules Configuration"
-        - "P08 BO-171 Offline Cryptographic Validation Profile"
-        - "P08 BO-206 Offline Validation Policy Builder"
-        - "P08 BO-208 Offline Credential & Revocation Cache"
-        - "P08 BO-210 Connectivity Failure & Degraded Mode Policy"
-        - "P08 BO-241 Policy Evaluation Architecture & Offline Distribution"
       summary: What a workstation may do with no network, and for how long
       description: >
         Board 5 of the client's POS set, and **one of only two things in 36 board screens the package
@@ -895,9 +917,7 @@ paths:
     put:
       operationId: setConnectivityThresholds
       x-ticvai-consumed-by:
-        - "P08 BO-129 Software, Configuration & Version Management"
         - "P08 BO-131 Connectivity & Auto-Switch Settings"
-        - "P08 BO-210 Connectivity Failure & Degraded Mode Policy"
       summary: When a workstation decides it is offline, and when it is back
       description: >
         Board 5 of the client's POS set, and the second genuine gap. **Nothing held a threshold**, so
@@ -958,22 +978,16 @@ paths:
     get:
       operationId: getVenueSettings
       x-ticvai-consumed-by:
-        - "P04 POS-019 Shift Templates & Policies"
+        - "P08 BO-042 Banking & Safe"
         - "P08 BO-063 Opening Hours & Calendar"
         - "P08 BO-065 Venue Configuration"
         - "P08 BO-100 Venue Home"
-        - "P08 BO-101 Orders & Money"
         - "P08 BO-102 Sell"
-        - "P08 BO-103 Access & Venue"
-        - "P08 BO-104 Food & Beverage"
-        - "P08 BO-105 Stock & Supply"
         - "P08 BO-106 People & Access Rights"
         - "P08 BO-1063 Venue-Specific Configuration"
         - "P08 BO-107 Guests & Marketing"
-        - "P08 BO-108 Venue Operations"
         - "P08 BO-136 F&B Global Settings & Controls"
-        - "P08 BO-142 Store Rules, Controls & Permissions"
-        - "P08 BO-143 Retail Global Settings & Controls"
+        - "P08 BO-187 Biometric Consent & Guardian Management"
       summary: Operational settings for this venue
       description: >
         **What this returns, and what it does not.** `VenueSettings` holds the venue's trading
@@ -1013,14 +1027,11 @@ paths:
     put:
       operationId: setVenueSettings
       x-ticvai-consumed-by:
-        - "P04 POS-019 Shift Templates & Policies"
         - "P08 BO-065 Venue Configuration"
         - "P08 BO-1063 Venue-Specific Configuration"
-        - "P08 BO-116 Merchandising & Product Presentation"
         - "P08 BO-136 F&B Global Settings & Controls"
-        - "P08 BO-143 Retail Global Settings & Controls"
+        - "P08 BO-187 Biometric Consent & Guardian Management"
         - "P08 BO-600 Venue, Calendar & Operational Setup"
-        - "P15 KIT-009 SLA, Priority & Service Rules"
       summary: Set support hours, quiet hours, segregated access and alerting
       description: >
         **The four things a venue answers and no other level can** (CF-100, CF-130, CF-134).
@@ -1045,6 +1056,12 @@ paths:
         cannot evidence: `biometrics.isEnabled` true without both `dpiaReference` and
         `consentNoticeAcknowledgedAt`, or `segregatedAccess.genderVerification: deviceAssisted`
         where no device in the venue reports the `genderClassification` capability.
+
+        **And, from 2 October 2026** (Chinmay; CHG-CSP-018, CHG-CSP-022): biometrics switched on
+        without the venue's own `biometrics.consentFormId` (DEC-128), and accreditation face matching
+        switched on without `legalSignOffReference` (DEC-461). `cashDrawerLimit` (CHG-CSP-016) is a venue
+        override like the other limits; `fnb.tableReservedLeadMinutes` (CHG-CSP-017) is deprecated in favour of
+        `fnb.FnbReservationPolicy.reservedLeadMinutes` (CHG-CLN-009).
       tags: [tenancy]
       x-ticvai-permission: TENANT_CONFIGURE
       x-ticvai-audience: [staff]
@@ -1075,7 +1092,10 @@ paths:
             **An enable the venue cannot evidence.** Biometrics switched on without a DPIA
             reference and a consent-notice acknowledgement, or device-assisted gender
             verification where no device in the venue reports `genderClassification`. `errors[]`
-            names each missing field or the missing capability.
+            names each missing field or the missing capability. Also biometrics on without the
+            venue's consent form (`consent-form-required`) and accreditation face matching on without a
+            legal sign-off reference (`legal-sign-off-required`) (CHG-CSP-018, CHG-CSP-022).
+          x-ticvai-problem-types: [consent-form-required, legal-sign-off-required]
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
@@ -1088,6 +1108,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-1062 Tenant & Brand Context"
         - "P09 ADM-019 Global Configuration & Defaults"
+        - "P09 ADM-426 Initial Configuration & Regional Defaults"
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: The tenant's default for every venue setting
@@ -1117,6 +1138,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-1062 Tenant & Brand Context"
         - "P09 ADM-019 Global Configuration & Defaults"
+        - "P09 ADM-426 Initial Configuration & Regional Defaults"
       x-ticvai-audience: [staff]
       summary: Set the tenant's default for every venue setting
       description: >
@@ -1237,7 +1259,9 @@ paths:
       operationId: getRegionSettings
       x-ticvai-consumed-by:
         - "P08 BO-1064 Naming, Numbering & Localization"
+        - "P08 BO-1065 Currency, Timezone & Channels"
         - "P09 ADM-037 AI Provider & Credentials"
+        - "P09 ADM-426 Initial Configuration & Regional Defaults"
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: Read region settings
@@ -1263,7 +1287,7 @@ paths:
       operationId: updateRegionSettings
       x-ticvai-consumed-by:
         - "P08 BO-1065 Currency, Timezone & Channels"
-        - "P09 ADM-425 Venue Template Application"
+        - "P09 ADM-426 Initial Configuration & Regional Defaults"
       x-ticvai-audience: [staff]
       x-ticvai-config-scope: region
       summary: Update region settings
@@ -1303,7 +1327,17 @@ paths:
         '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
         '409':
           description: >
-            Currency or scale change rejected because transactions exist in this region.
+            Currency or scale change rejected because transactions exist in this region, or a change
+            to `aiResidencyClass` on a tenant TICVAI locked to `uaeOnly` (`residency-class-locked`;
+            CHG-CSP-009).
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '422':
+          description: >
+            `aiResidencyClass` `globalAllowed` without the three references of `aiResidencyOptIn`
+            (`residency-opt-in-required`; PDPL Article 23; DEC-539; CHG-CSP-009).
+          x-ticvai-problem-types: [residency-opt-in-required]
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
@@ -1314,14 +1348,16 @@ paths:
     get:
       operationId: listWorkstations
       x-ticvai-consumed-by:
-        - "P04 POS-009 Staff Roster"
         - "P08 BO-036 Device Registry"
         - "P08 BO-037 Offline Package Status"
+        - "P08 BO-039 Shift Directory"
+        - "P08 BO-040 Variance Approval"
+        - "P08 BO-068 Audit Log"
         - "P08 BO-116 Merchandising & Product Presentation"
         - "P08 BO-126 Deployment, Preview & Audit"
         - "P08 BO-128 Live Workstation Health Monitor"
         - "P08 BO-129 Software, Configuration & Version Management"
-        - "P08 BO-135 Order Routing & KDS/Printer Rules"
+        - "P08 BO-133 Offline Alerts, Limits & Audit"
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: List workstations
@@ -1401,7 +1437,6 @@ paths:
       x-ticvai-consumed-by:
         - "P04 POS-016 Till Configuration"
         - "P08 BO-036 Device Registry"
-        - "P08 BO-129 Software, Configuration & Version Management"
         - "P08 BO-602 POS, Payment & Access Setup"
       x-ticvai-audience: [staff]
       x-ticvai-config-scope: venue
@@ -1415,6 +1450,13 @@ paths:
         **Refused while a shift is open on this workstation** (F73, pull audit R078). Changing
         the rules under an open shift means it closes against rules it did not open under, so
         the change waits for the shift to close.
+
+        **The till layout is the outlet's unless this till overrides it** (decided 2 October 2026,
+        Chinmay, BO-109; DEC-183; CHG-CSP-006). `saleBoardId` is optional since 2 October: absent or
+        null, the workstation uses its outlet's `Outlet.saleBoardId`; set, it overrides it for this
+        till alone. A workstation with neither an outlet board nor its own is refused `422
+        sale-board-required`, because a till must open on something. `cashDrawerLimit` overrides the
+        venue's drawer limit for this till (DEC-179; CHG-CSP-016).
       tags: [workstation]
       x-ticvai-permission: WORKSTATION_CONFIGURE
       x-ticvai-scope-level: venue
@@ -1445,6 +1487,14 @@ paths:
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '422':
+          description: >
+            No board would apply: the request sends no `saleBoardId` and the workstation's outlet has
+            none (`sale-board-required`; CHG-CSP-006).
+          x-ticvai-problem-types: [sale-board-required]
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
@@ -1452,12 +1502,13 @@ paths:
     get:
       operationId: listOutlets
       x-ticvai-consumed-by:
-        - "P04 POS-011 Returns, Refunds & Exchanges"
-        - "P04 POS-024 Outlet Setup"
+        - "P08 BO-020 F&B Order Management"
         - "P08 BO-044 F&B Outlets"
+        - "P08 BO-045 Menu Management"
+        - "P08 BO-048 Retail Products"
         - "P08 BO-134 Kitchen & Preparation Stations"
         - "P08 BO-727 F&B Command Center"
-        - "P08 BO-728 Outlet Management"
+        - "P08 BO-731 Operating Hours & Service Periods"
         - "P08 BO-732 POS & Device Assignment"
       x-ticvai-audience: [staff]
       summary: List outlets
@@ -1525,6 +1576,16 @@ paths:
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '422':
+          description: >
+            The region requires a local-language name and `nameTranslations` lacks it
+            (`local-name-required`), an opening window ends before it starts (`window-ends-before-start`),
+            or `producesForOutletIds` names the outlet itself, an outlet of another venue or one that
+            produces for it (`outlet-not-in-venue`) (CHG-CSP-005, CHG-CSP-007).
+          x-ticvai-problem-types: [local-name-required, window-ends-before-start, outlet-not-in-venue]
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
@@ -1536,6 +1597,7 @@ paths:
         schema: { type: string, format: uuid }
     get:
       operationId: getOutlet
+      x-ticvai-consumed-by: []
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: Read an outlet
@@ -1563,6 +1625,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-044 F&B Outlets"
         - "P08 BO-063 Opening Hours & Calendar"
+        - "P08 BO-731 Operating Hours & Service Periods"
       x-ticvai-audience: [staff]
       summary: Amend an outlet
       tags: [workstation]
@@ -1581,8 +1644,19 @@ paths:
               minProperties: 1
               properties:
                 name: { type: string, maxLength: 200 }
+                nameTranslations:
+                  $ref: '#/components/schemas/OutletNameTranslations'
                 stockLocationId: { type: string, format: uuid }
                 costCenterId: { type: string, format: uuid }
+                departmentId: { type: string, format: uuid, nullable: true }
+                outletType: { $ref: '#/components/schemas/OutletType' }
+                paymentTiming: { $ref: '#/components/schemas/OutletPaymentTiming' }
+                admissionContext: { $ref: '#/components/schemas/OutletAdmissionContext' }
+                producesForOutletIds:
+                  type: array
+                  description: Replaces the whole list of outlets this one produces for (CHG-CSP-005).
+                  items: { type: string, format: uuid }
+                saleBoardId: { type: string, format: uuid, nullable: true }
                 openingHours:
                   type: array
                   description: Replaces the whole weekly pattern. An empty array clears it.
@@ -1599,6 +1673,15 @@ paths:
         '400': { $ref: '../shared/common.yaml#/components/responses/BadRequest' }
         '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
         '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+        '422':
+          description: >
+            As `createOutlet`: a missing required local-language name (`local-name-required`), a window
+            that ends before it starts (`window-ends-before-start`), or a producing-outlet list naming the
+            outlet itself, another venue's outlet or a cycle (`outlet-not-in-venue`).
+          x-ticvai-problem-types: [local-name-required, window-ends-before-start, outlet-not-in-venue]
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
@@ -1608,12 +1691,11 @@ paths:
       x-ticvai-consumed-by:
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-025 Till Home"
-        - "P08 BO-115 Category, Brand & Merchandise Hierarchy"
+        - "P08 BO-109 Menu Builder & POS Layout Designer"
         - "P08 BO-116 Merchandising & Product Presentation"
-        - "P08 BO-117 Product Import, Governance & AI Configuration Assistant"
-        - "P08 BO-118 Campaign & Audience Management"
         - "P08 BO-122 POS Experience Dashboard"
         - "P08 BO-123 POS Profile Management"
+        - "P08 BO-124 Layout & Journey Builder"
         - "P08 BO-126 Deployment, Preview & Audit"
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
@@ -1647,6 +1729,7 @@ paths:
     post:
       operationId: createSaleBoard
       x-ticvai-consumed-by:
+        - "P08 BO-109 Menu Builder & POS Layout Designer"
         - "P08 BO-124 Layout & Journey Builder"
       x-ticvai-audience: [staff]
       x-ticvai-config-scope: venue
@@ -1695,8 +1778,6 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-109 Menu Builder & POS Layout Designer"
         - "P08 BO-116 Merchandising & Product Presentation"
-        - "P08 BO-117 Product Import, Governance & AI Configuration Assistant"
-        - "P08 BO-118 Campaign & Audience Management"
         - "P08 BO-124 Layout & Journey Builder"
         - "P08 BO-125 Product & Category Button Configuration"
         - "P08 BO-126 Deployment, Preview & Audit"
@@ -1748,9 +1829,11 @@ paths:
         - "P04 POS-016 Till Configuration"
         - "P04 POS-025 Till Home"
         - "P06 EMP-043 Device settings"
+        - "P08 ADM-580 Payment Terminal & Device Inventory"
         - "P08 BO-036 Device Registry"
         - "P08 BO-124 Layout & Journey Builder"
-        - "P09 ADM-580 Payment Terminal & Device Inventory\t49"
+        - "P08 BO-405 Reader Directory"
+        - "P08 BO-732 POS & Device Assignment"
         - "P16 ANL-003 Operational Performance"
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
@@ -1804,7 +1887,6 @@ paths:
       x-ticvai-consumed-by:
         - "P06 EMP-043 Device settings"
         - "P08 BO-036 Device Registry"
-        - "P08 BO-194 Device & Gate Command Center"
         - "P08 BO-196 Physical Device Registration & Provisioning"
         - "P08 BO-405 Reader Directory"
       x-ticvai-audience: [staff]
@@ -1824,6 +1906,12 @@ paths:
         It is bound to no workstation, so `workstationId` is omitted for it and required for every
         other kind; a body that breaks either rule is `422`. With `pushToken` and `pushPlatform` it
         is the device a staff-facing push is delivered to (reporting `AlertRule.deliverTo: push`).
+
+        **A secure enrolment code, and approval before it goes live** (decided 2 October 2026, Chinmay,
+        critical set 1, BO-196: "Secure enrolment code + pending approval"; DEC-241; CHG-CSP-011; MoM
+        15 September, DI-892, DI-906). The response carries `enrolmentCode` and its expiry, once; the
+        device presents it to `enrolDevice`. The device starts `approvalStatus: pendingApproval` and
+        cannot become `active` until a second person approves it (`approveDevice`, DEC-245).
       tags: [workstation]
       x-ticvai-permission: DEVICE_CONFIGURE
       x-ticvai-scope-level: venue
@@ -1871,6 +1959,8 @@ paths:
         schema: { type: string, format: uuid }
     get:
       operationId: getDevice
+      x-ticvai-consumed-by:
+        - "P08 BO-406 Reader Profile & Device Setup"
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: Read one registered device
@@ -1902,11 +1992,6 @@ paths:
         schema: { type: string, format: uuid }
     post:
       operationId: recordDeviceHeartbeat
-      x-ticvai-consumed-by:
-        - "P04 POS-016 Till Configuration"
-        - "P08 BO-036 Device Registry"
-        - "P08 BO-124 Layout & Journey Builder"
-        - "P08 BO-125 Product & Category Button Configuration"
       security:
       - apiKeyAuth: []
       - serviceAuth: []
@@ -1973,8 +2058,8 @@ paths:
     post:
       operationId: enrolDevice
       x-ticvai-consumed-by:
-        - "P08 BO-407 Reader Credit & Payment Configuration"
-        - "P09 ADM-581 Terminal Provisioning & Device Configuration\t51"
+        - "P08 ADM-581 Terminal Provisioning & Device Configuration"
+        - "P08 BO-196 Physical Device Registration & Provisioning"
       x-ticvai-conflict-policy: serverWins
       summary: Take a registered device through enrolment to activation
       description: '16.1.2, 16.1.3, 16.1.6. **`registerDevice` created a row; nothing turned it into a
@@ -1988,6 +2073,14 @@ paths:
         The transitions are the matrix''s own: registered → enrolled → provisioned → active →
         deactivated → retired. **Retirement revokes the credential** — a retired device whose certificate
         still validates is a spare key in a drawer.
+
+
+        **The enrolment code and the approval gate** (decided 2 October 2026, Chinmay, critical set 1,
+        BO-196 and BO-203; DEC-241, DEC-245; CHG-CSP-011). The move to `enrolled` needs the one-time
+        `enrolmentCode` `registerDevice` issued (`422 enrolment-code-invalid` when wrong, spent or
+        expired). The move to `provisioned` records the acceptance test (`testResult`) and its tester. The
+        move to `active` is refused `409 device-approval-required` until `approveDevice` has approved the
+        device.
 
         '
       tags:
@@ -2017,7 +2110,102 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
-          description: The transition is not allowed from the current state
+          description: The transition is not allowed from the current state, or the move to `active` comes
+            before the device is approved (`device-approval-required`; CHG-CSP-011).
+          x-ticvai-problem-types:
+          - device-approval-required
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '422':
+          description: The enrolment code is wrong, already used or expired (`enrolment-code-invalid`; CHG-CSP-011).
+          x-ticvai-problem-types:
+          - enrolment-code-invalid
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /devices/{deviceId}/approval:
+    parameters:
+    - name: deviceId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: approveDevice
+      x-ticvai-consumed-by:
+        - "P08 BO-203 Hardware Compatibility, Health, Testing & Deployment"
+      x-ticvai-audience:
+      - staff
+      x-ticvai-conflict-policy: serverWins
+      summary: Approve a device into production, or reject it
+      description: '**The second person''s decision before a device goes live** (decided 2 October 2026, Chinmay,
+        critical set 1, BO-196: "Secure enrolment code + pending approval" and BO-203: "Approver must differ
+        from the tester"; DEC-241, DEC-245; CHG-CSP-011; MoM 15 September, DI-892, DI-906). Moves
+        `approvalStatus` from `pendingApproval` to `approved` or `rejected`
+        (`states/registered-device-approval.yaml`); the approver and the time are recorded and a
+        `tenancy.device_audit` row written. **The approver may not be the person who recorded the device''s
+        acceptance test** (`403 approver-is-tester`), nor the person who registered it. A rejected device
+        never reaches `active`; it is retired with `enrolDevice`.
+
+        '
+      tags:
+      - devices
+      x-ticvai-permission: DEVICE_MANAGE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - decision
+              properties:
+                decision:
+                  type: string
+                  enum:
+                  - approve
+                  - reject
+                reason:
+                  type: string
+                  maxLength: 500
+                  nullable: true
+                  description: Required to reject.
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: ../shared/common.yaml#/components/headers/ConsistencyToken
+          description: Decided
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegisteredDevice'
+        '403':
+          description: The caller recorded the device's acceptance test or registered it (`approver-is-tester`).
+          x-ticvai-problem-types:
+          - approver-is-tester
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '409':
+          description: The device is not awaiting approval (`device-not-pending-approval`), or has no recorded
+            acceptance test yet (`device-not-tested`).
+          x-ticvai-problem-types:
+          - device-not-pending-approval
+          - device-not-tested
           content:
             application/problem+json:
               schema:
@@ -2036,7 +2224,8 @@ paths:
       operationId: setDeviceAssignment
       x-ticvai-consumed-by:
         - "P04 POS-016 Till Configuration"
-        - "P09 ADM-582 POS, Kiosk & Terminal Assignment Manager\t52"
+        - "P08 ADM-582 POS, Kiosk & Terminal Assignment Manager"
+        - "P08 BO-732 POS & Device Assignment"
       x-ticvai-conflict-policy: serverWins
       summary: Who owns it, who holds it, and where it is
       description: '16.2.9, 16.2.10 and 16.2.11. **Ownership, custody and location are three facts and
@@ -2094,9 +2283,9 @@ paths:
     get:
       operationId: getDeviceTelemetry
       x-ticvai-consumed-by:
+        - "P08 ADM-584 Payment Server & Terminal Connectivity Manager"
+        - "P08 ADM-587 Terminal Health, Maintenance & Incident Center"
         - "P08 BO-466 Reader & Device Health Monitor"
-        - "P09 ADM-584 Payment Server & Terminal Connectivity Manager\t54"
-        - "P09 ADM-587 Terminal Health, Maintenance & Incident Center\t57"
       summary: Battery, performance and consumables over time
       description: '16.4.21 and 16.4.22. **The heartbeat already carries consumables and nothing kept
         them.** A point-in-time reading answers *is it alive*; the matrix asks *is it degrading*, and
@@ -2146,8 +2335,8 @@ paths:
     get:
       operationId: listDeviceFirmware
       x-ticvai-consumed-by:
+        - "P08 ADM-587 Terminal Health, Maintenance & Incident Center"
         - "P08 BO-129 Software, Configuration & Version Management"
-        - "P09 ADM-587 Terminal Health, Maintenance & Incident Center\t57"
       summary: Firmware and software versions, and what is running where
       description: '16.6.30 and 16.6.32. **The fleet view, which is the only useful one.** *Which version
         is this scanner on* is rarely asked; *how many scanners are still on the version with the scan
@@ -2184,8 +2373,8 @@ paths:
     post:
       operationId: createDeviceFirmware
       x-ticvai-consumed-by:
+        - "P08 ADM-587 Terminal Health, Maintenance & Incident Center"
         - "P08 BO-129 Software, Configuration & Version Management"
-        - "P09 ADM-587 Terminal Health, Maintenance & Incident Center\t57"
       x-ticvai-agreed: '29 September: re-trace 16.6.30 and 16.6.33 (nothing wrote the table the rollout
         references); our build plan; shape follows startDeviceFirmwareRollout'
       summary: Register a firmware or software release before it is deployed
@@ -2252,8 +2441,8 @@ paths:
     get:
       operationId: getDeviceFirmware
       x-ticvai-consumed-by:
+        - "P08 ADM-587 Terminal Health, Maintenance & Incident Center"
         - "P08 BO-129 Software, Configuration & Version Management"
-        - "P09 ADM-587 Terminal Health, Maintenance & Incident Center\t57"
       x-ticvai-agreed: '29 September: re-trace 16.6.30 (release read beside the new write); our build
         plan; shape follows getDevice'
       summary: Read one firmware release, and how much of the fleet is on it
@@ -2701,9 +2890,9 @@ paths:
     get:
       operationId: listDataRetentionSettings
       x-ticvai-consumed-by:
+        - "P08 ADM-346 Approval Record Retention Policy"
         - "P08 BO-192 Biometric Lifecycle, Retention & Deletion"
         - "P08 BO-751 Retention & Anonymization"
-        - "P09 ADM-346 Approval Record Retention Policy"
         - "P09 ADM-524 AI Data Access & Usage Policy"
         - "P16 ANL-050 Retention, Archive & Governance Policy"
       x-ticvai-agreed: '29 September: decided by Chinmay (all data retention is tenant configuration, one
@@ -2763,8 +2952,8 @@ paths:
     put:
       operationId: setDataRetentionSetting
       x-ticvai-consumed-by:
+        - "P08 ADM-346 Approval Record Retention Policy"
         - "P08 BO-751 Retention & Anonymization"
-        - "P09 ADM-346 Approval Record Retention Policy"
         - "P09 ADM-524 AI Data Access & Usage Policy"
         - "P16 ANL-050 Retention, Archive & Governance Policy"
       x-ticvai-agreed: '29 September: decided by Chinmay (all data retention moves to tenant
@@ -3138,6 +3327,16 @@ components:
           type: string
           pattern: '^([01][0-9]|2[0-3]):[0-5][0-9]$'
           description: Local time, 24-hour `HH:MM`, when the outlet closes.
+        endsNextDay:
+          type: boolean
+          default: false
+          description: >
+            **A late-night window is one window past midnight** (decided 2 October 2026, Chinmay, batch 6
+            set 6a, BO-731; DEC-197; CHG-CSP-007). A bar open 23:00 to 01:00 on Friday is `day: fri`,
+            `from: '23:00'`, `to: '01:00'`, `endsNextDay: true`: one service period, and its takings
+            belong to Friday's trading day, not split across two days. With `endsNextDay` false, `to`
+            must be later than `from` (`422 window-ends-before-start`); with it true, `to` must be
+            earlier than or equal to `from`, so a window never spans more than 24 hours.
 
     TenantDomain:
       type: object
@@ -3179,6 +3378,9 @@ components:
           enum:
           - platformSubdomain
           - customDomain
+          description: '`platformSubdomain` is `<venue>.<cell>.ticvai.app`, issued at provisioning under the cell''s
+            wildcard certificate; `customDomain` is a CNAME to the cell''s Front Door endpoint with a Front Door
+            managed certificate (decided 2 October 2026, Chinmay, batch 5; DEC-546, DEC-547; CHG-CSP-010).'
         channel:
           type: string
           nullable: true
@@ -3196,6 +3398,25 @@ components:
           type: string
           format: date-time
           nullable: true
+        isPrimary:
+          type: boolean
+          default: false
+          description: '**The host the tenant''s channel is canonically served on** (DEC-547; CHG-CSP-010). One
+            active host per tenant and channel is primary; the platform subdomain is primary until the tenant
+            names a custom domain with white-label `setPrimaryDomain`.'
+        redirectToHostname:
+          type: string
+          maxLength: 253
+          nullable: true
+          description: '**Where the edge redirects a request on this host** (DEC-547; CHG-CSP-010): the channel''s
+            primary host, on every active host that is not primary; null on the primary. A redirect, never a
+            second copy of the site, so cookies and the UAE Pass and Apple Pay domain checks see one origin.'
+        lastValidatedAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: '**When the custom domain''s CNAME and `_dnsauth` record last resolved to us** (DEC-547;
+            CHG-CSP-010), written by white-label''s revalidation job. Null on a platform subdomain.'
     PlatformIdempotencyRecord:
       type: object
       x-ticvai-persistence: platform.idempotency_record
@@ -3686,6 +3907,56 @@ components:
       type: string
       enum: [shop, restaurant, bar, cafe, kiosk, gameFloor, ticketOffice, mobile]
 
+    OutletType:
+      type: string
+      description: >
+        **How an F&B or retail outlet trades, which switches features on or off** (decided 2 October
+        2026, Chinmay, batch 6 set 6a, BO-729: "Add both fields: outlet type and department (DI-319)";
+        DEC-196; CHG-CSP-005). DI-319: a quick-service outlet needs no table booking, a fine-dining
+        outlet needs a table layout. `kind` stays the physical place (a shop, a restaurant, a kiosk);
+        this is the service model inside it. `commissary` is a producing kitchen (DEC-186, DEC-188).
+      enum: [fineDining, casualDining, quickService, coffeeShop, barLounge, foodCourt, buffet, commissary, retail]
+
+    OutletPaymentTiming:
+      type: string
+      description: >
+        **When an F&B order is paid, per outlet** (decided 2 October 2026, Chinmay, batch 1, POS-021:
+        "Two configurations: one takes the bill (payment) first, the other sends first and charges
+        after"; DEC-064; CHG-CSP-004). `sendFirst` (the default, R261 as decided on 28 September): the
+        order goes to the kitchen and is charged afterwards, as dine-in. `payFirst`: the order is paid
+        before it is sent, as quick service; fnb `createFnbOrder` and `fireCourse` do not send an unpaid
+        order from a `payFirst` outlet. Refines R261 per outlet.
+      enum: [sendFirst, payFirst]
+
+    OutletAdmissionContext:
+      type: string
+      description: >
+        **Whether an outlet sits behind the admission gate** (decided 2 October 2026, Chinmay, batch 1,
+        WEB-036: "Inside the venue, a ticket is needed. A restaurant outside the venue (standalone) can
+        sell without one"; DEC-070; CHG-CSP-004). `insideVenue` (the default): a guest ordering food
+        needs an admission ticket or a place inside, as DI-292 (14 August) decided. `standalone`: a
+        restaurant outside the gate, which may sell takeaway and delivery (DI-1039) with no ticket.
+        DI-292 is amended for standalone outlets only. The admission check itself stays in Access
+        (ADR-0068). F&B keeps its own payment and its own receipt either way.
+        **The canonical name** (2 October 2026, CHG-CLN-008): the field is `admissionContext` on the
+        outlet and on F&B's guest `DiningOutlet`; common `OutletSiting` and the word "siting" are
+        deprecated aliases of this.
+      enum: [insideVenue, standalone]
+
+    OutletNameTranslations:
+      type: object
+      x-ticvai-persistence: none — jsonb column on platform.outlet
+      description: >
+        **The outlet's name in other languages, keyed by ISO 639-1 code** (decided 2 October 2026,
+        Chinmay, batch 2 #26, BO-044: "Yes, where a country needs it: the local language plus English";
+        DEC-031; CHG-CSP-005). `Outlet.name` stays the English name. Where the region requires a local
+        name (`RegionSettings.localLanguageNameLocales`, Arabic in the UAE), creating or amending an
+        outlet without it is refused `422 local-name-required`. The same shape as catalogue's
+        `LocalisedText` (DI-210).
+      additionalProperties:
+        type: string
+        maxLength: 200
+
     ConfigurationProfile:
       type: object
       x-ticvai-persistence: "platform.configuration_profile"
@@ -3906,9 +4177,27 @@ components:
       properties:
         id: { type: string, format: uuid, readOnly: true }
         code: { type: string, maxLength: 64 }
-        name: { type: string, maxLength: 200 }
+        name:
+          type: string
+          maxLength: 200
+          description: The outlet's name in English. Other languages are `nameTranslations` (CHG-CSP-005).
+        nameTranslations:
+          $ref: '#/components/schemas/OutletNameTranslations'
         venueId: { type: string, format: uuid }
         kind: { $ref: '#/components/schemas/OutletKind' }
+        outletType:
+          allOf:
+            - $ref: '#/components/schemas/OutletType'
+          nullable: true
+          description: The service model (DI-319; DEC-196; CHG-CSP-005). Null on an outlet that is not F&B or retail.
+        departmentId:
+          type: string
+          format: uuid
+          nullable: true
+          description: >
+            **The department the outlet belongs to** (DI-319: department, sub-department, cost centre and
+            status; DEC-196; CHG-CSP-005): an `OrgUnit` of kind department, as `Workstation.departmentId`.
+            The outlet itself is the sub-department, so it needs no second field.
         zone: { type: string, nullable: true }
         stockLocationId:
           type: string
@@ -3922,6 +4211,38 @@ components:
           format: uuid
           nullable: true
           description: Revenue and cost attribution. Outlet is the natural grain for both.
+        paymentTiming:
+          allOf:
+            - $ref: '#/components/schemas/OutletPaymentTiming'
+          default: sendFirst
+          description: Pay first, or send to the kitchen first then pay (DEC-064; CHG-CSP-004).
+        admissionContext:
+          allOf:
+            - $ref: '#/components/schemas/OutletAdmissionContext'
+          default: insideVenue
+          description: Inside the venue (needs an admission ticket) or standalone (no ticket) (DEC-070; CHG-CSP-004).
+        producesForOutletIds:
+          type: array
+          default: []
+          description: >
+            **One kitchen serving several outlets is a producing outlet** (decided 2 October 2026, Chinmay,
+            batch 6 set 5, BO-134: "Yes: via a producing outlet (one kitchen outlet produces for several)";
+            DEC-188; CHG-CSP-005). The outlets this one prepares food for, in the same venue. The model
+            stays per outlet (DI-330): each outlet keeps its own menu and stations, and an order at a
+            listed outlet may route to this outlet's kitchen stations (fnb `KitchenStation`). Empty on an
+            outlet that only produces for itself. An outlet may not list itself, an outlet of another venue
+            (`422 outlet-not-in-venue`), or one that lists it back.
+          items: { type: string, format: uuid }
+        saleBoardId:
+          type: string
+          format: uuid
+          nullable: true
+          description: >
+            **The till layout every till in this outlet uses, unless a till overrides it** (decided 2 October
+            2026, Chinmay, batch 6 set 4, BO-109: "Per outlet, with a till override"; DEC-183; CHG-CSP-006).
+            DI-326 puts the layout at the outlet; MATRIX 2.1.9 binds a board to a workstation. Both hold: a
+            workstation with no board of its own (`ConfigureWorkstationRequest.saleBoardId` absent or null)
+            uses this one, and `Workstation.saleBoardSource` says which applied.
         openingHours:
           type: array
           description: The weekly pattern, one entry per window. Several windows on a day are allowed.
@@ -4188,6 +4509,64 @@ components:
             **The profile this device was provisioned with.** `enrolDevice` has accepted one since
             16.1.3 and there was nowhere to keep it, so the answer to *"what is this reader
             configured as"* lived only in the request that set it.
+        approvalStatus:
+          allOf:
+            - $ref: '#/components/schemas/DeviceApprovalStatus'
+          default: pendingApproval
+          readOnly: true
+          description: >
+            **A new device waits for approval before it may go live** (decided 2 October 2026, Chinmay,
+            critical set 1, BO-196: "Secure enrolment code + pending approval"; DEC-241; CHG-CSP-011; MoM
+            15 September, DI-892, DI-906). Every device registers `pendingApproval`. It may enrol and be
+            provisioned and tested, but `enrolDevice` refuses `active` until `approveDevice` approves it
+            (`409 device-approval-required`). A separate axis from `enrolmentState`, which keeps its r1
+            values; the model is `states/registered-device-approval.yaml`.
+        enrolmentCode:
+          type: string
+          nullable: true
+          readOnly: true
+          maxLength: 12
+          description: >
+            **A one-time code the device must present to enrol** (DEC-241; CHG-CSP-011). Issued by
+            `registerDevice` and returned once, in its response only; every later read returns null. The
+            installer enters it on the device, and `enrolDevice` to `enrolled` must carry the same code
+            before `enrolmentCodeExpiresAt` (`422 enrolment-code-invalid`). A device that never presents it
+            never gets an identity, so a box plugged into the venue network cannot claim to be a reader.
+        enrolmentCodeExpiresAt:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+          description: When the enrolment code stops working (24 hours after registration, proposed; client to correct).
+        testedByPrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          description: >
+            Who recorded the device's acceptance test (`DeviceEnrolment.testResult` on the move to
+            `provisioned`). The approver must be someone else (DEC-245).
+        approvedByPrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          description: >
+            **Who approved the device into production, never the person who tested it** (decided 2 October
+            2026, Chinmay, critical set 1, BO-203: "Approver must differ from the tester"; DEC-245;
+            CHG-CSP-011). `approveDevice` refuses the tester with `403 approver-is-tester`.
+        approvedAt:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+
+    DeviceApprovalStatus:
+      type: string
+      description: >
+        Whether a registered device may go into production (DEC-241, DEC-245; CHG-CSP-011). The model is
+        `states/registered-device-approval.yaml`.
+      enum: [pendingApproval, approved, rejected]
 
     DeviceEnrolment:
       x-ticvai-persistence: "platform.device"
@@ -4228,6 +4607,24 @@ components:
             **Recorded on the `tenancy.device_audit` row, not on the device.** Required in
             practice for `deactivated` and `retired`, where an investigation six months later
             needs to know why a gate stopped working.
+        enrolmentCode:
+          type: string
+          nullable: true
+          maxLength: 12
+          writeOnly: true
+          description: >
+            **The one-time code `registerDevice` issued, as the device presents it** (DEC-241;
+            CHG-CSP-011). Needed on the move to `enrolled`; a wrong or expired code is `422
+            enrolment-code-invalid`, and the code is spent on success.
+        testResult:
+          type: object
+          nullable: true
+          description: >
+            **The acceptance test, recorded on the move to `provisioned`** (DEC-245; CHG-CSP-011). The
+            caller is recorded as `RegisteredDevice.testedByPrincipalId` and may not approve the device.
+          properties:
+            passed: { type: boolean, description: 'Whether the device passed; always sent with `testResult` (422 otherwise).' }
+            notes: { type: string, maxLength: 1000, nullable: true }
 
     DeviceCapability:
       type: string
@@ -4487,6 +4884,68 @@ components:
                 A non-zero value is an operational allowance for a late reconciliation, not a
                 retention period — **`facePass` ignores this entirely** and is bounded by its
                 entitlement.
+            consentFormId:
+              type: string
+              format: uuid
+              nullable: true
+              description: >
+                **The venue's own consent form, which every biometric capture is taken on** (decided
+                2 October 2026, Chinmay, batch 4, BO-188: "Consent first, on the venue's consent form";
+                DEC-128, DEC-549; CHG-CSP-018). A form from the venue's consent-form builder in Venue
+                Management (the one builder Face Pass, Face Tag, marketing and waivers share; marketing-crm
+                `setDigitalWaiverForm`). Turning `isEnabled` on without one is refused `422
+                consent-form-required`, as a missing DPIA is; each Face Pass and Face Tag capture records
+                the form and its version it was consented on (access `enrolFacePass`, `enrolFaceTag`).
+            templatesHeldByTicvai:
+              type: boolean
+              readOnly: true
+              description: >
+                **True where TICVAI's platform stores this venue's biometric templates** (rather than the
+                venue's own on-premises reader estate). Derived from the venue's access deployment. While
+                true, Venue Management shows the venue a standing warning that every guest must accept the
+                venue's consent form before capture, because the data sits with TICVAI as the venue's
+                processor (decided 2 October 2026, Chinmay, batch 4, BO-188: "If we store the data,
+                highlight or notify the venue that the client must accept a consent form"; DEC-128;
+                CHG-CSP-018).
+            allowMinors:
+              type: boolean
+              default: true
+              description: >
+                **Whether this venue enrols minors at all** (decided 2 October 2026, Chinmay, critical set 1,
+                BO-187 and CMS-029: "Guardian consent on the venue's form; minor age per country; the venue
+                can switch minors off"; supersedes the GST-069 default; DEC-237; CHG-CSP-019). On: a minor
+                (below `RegionSettings.minorAgeThreshold`) is enrolled only with a guardian's consent on the
+                venue's consent form. Off: a minor's enrolment is refused (`422 minors-not-enrolled`) and the
+                guest uses another verification method.
+            accreditationFaceMatching:
+              type: object
+              nullable: true
+              description: >
+                **Face matching to find duplicate accreditation applicants, off unless the venue enables
+                it** (decided 2 October 2026, Chinmay, critical set 3, BO-631: "Only where the venue enables
+                it, with applicant consent and the venue's legal sign-off; off by default"; DEC-461;
+                CHG-CSP-022). Enabling it is refused without `legalSignOffReference` (`422
+                legal-sign-off-required`); each applicant matched must have consented on the application
+                (accreditation's own record). Null is off.
+              properties:
+                isEnabled:
+                  type: boolean
+                  default: false
+                legalSignOffReference:
+                  type: string
+                  nullable: true
+                  maxLength: 200
+                  description: The venue's own reference for its legal sign-off; the platform records that one was named, by whom and when.
+                signedOffByPrincipalId:
+                  type: string
+                  format: uuid
+                  nullable: true
+                  readOnly: true
+                signedOffAt:
+                  type: string
+                  format: date-time
+                  nullable: true
+                  readOnly: true
         segregatedAccess:
           type: object
           nullable: true
@@ -4581,6 +5040,18 @@ components:
             rates to these. Null or empty shows the trading currency only. A code the region has no
             rate for is refused `400`.
           items: { type: string, pattern: '^[A-Z]{3}$' }
+        chargeCurrencies:
+          type: array
+          nullable: true
+          description: >
+            **Which currencies a guest may select and pay in** (decided 2 October 2026, Chinmay;
+            CHG-FIN-001; MoM 10 Aug 2026 4.7 option (b), DI-211). A subset of `displayCurrencies`:
+            each code must also be one the venue's payment provider can charge
+            (`orders.PaymentProvider.presentmentCurrencies`) and one the region holds a `tender` rate
+            for; anything else is refused `400`. Null or empty: guests pay in the trading (base)
+            currency only and the other display currencies stay approximate. The ledger is always
+            in the base currency, with the rate recorded on every payment and refund.
+          items: { type: string, pattern: '^[A-Z]{3}$' }
         cartLeaseSeconds:
           type: integer
           nullable: true
@@ -4640,6 +5111,21 @@ components:
             Over or short at shift close beyond which the shift waits in `pendingVariance` for
             `shift.acceptShiftVariance`. **Proposed tenant default AED 20.00, bounds 0 to 1,000 in
             the venue currency; client finance to correct (audit R094).**
+        cashDrawerLimit:
+          # oneOf with one member is Money: check-contract-compat reads an allOf'd Money's own required
+          # fields as newly required request fields of an optional new property (CHG-CSP-016 notes).
+          oneOf:
+            - $ref: '../shared/common.yaml#/components/schemas/Money'
+          nullable: true
+          description: >
+            **The most cash a till drawer should hold before some is lifted to the safe** (decided 2 October
+            2026, Chinmay, batch 6 set 3, BO-042: "Add drawer limit setting (warn + offer cash lift)"; DEC-179;
+            CHG-CSP-016; DI-274: on a busy day the cashier unloads excess cash mid-shift and it is reconciled
+            at close). The venue default; a till may set its own (`Workstation.cashDrawerLimit`). When the
+            cash a till has taken since its last count takes the drawer over it, the till warns and offers a
+            cash lift (`shift.createCashMovement` kind `lift`) and BO-042 flags the box
+            (`shift.DepositBox.overDrawerLimit`). A warning, never a block: a sale is not refused because
+            the drawer is full. Null sets no limit. **No proposed default: the client's finance team sets it.**
         catalogue:
           type: object
           nullable: true
@@ -4758,6 +5244,24 @@ components:
               maximum: 60
               default: 10
               description: Minutes after a bump during which `recallKitchenTicket` still recalls; after it the act is a refire. Proposed, client to correct (audit R094).
+            tableReservedLeadMinutes:
+              type: integer
+              nullable: true
+              minimum: 0
+              maximum: 240
+              default: 30
+              deprecated: true
+              description: >
+                **Deprecated (2 October 2026, CHG-CLN-009): `fnb.FnbReservationPolicy.reservedLeadMinutes`
+                is canonical.** The table state model reads the reservation policy (`states/table.yaml`);
+                this venue setting is kept for compatibility, never read, and not drawn. Its former meaning:
+                **How long before a pre-allocated booking its table shows Reserved** (decided 2 October 2026,
+                Chinmay, batch 6 set 6b, EMP-052: "Reserved when a booking names the table, or N minutes
+                (venue-set) before a pre-allocated booking"; DEC-202; CHG-CSP-017; DI-689, DI-336). A booking
+                that names its table holds it as Reserved for the booking's whole slot; a booking the host
+                pre-allocated shows its table Reserved from this many minutes before it. Zero shows Reserved
+                only once the booking is due. The fnb table state model applies it (`states/table.yaml`,
+                owned by fnb). Proposed default 30 minutes, client to correct.
             compEscalationAmount:
               allOf:
                 - $ref: '../shared/common.yaml#/components/schemas/Money'
@@ -4906,8 +5410,105 @@ components:
             means no restriction. `ai.setAiProvider` refuses any other residency with
             `409 residency-refused`. A prompt carrying guest data that reaches a provider hosted
             elsewhere is a cross-border transfer, and this is where a region says which it allows.
+
+            **Derived from `aiResidencyClass` since 2 October 2026** (CHG-CSP-009): the class names the
+            residencies, and this list narrows them further where a region needs it; it never widens them.
           default: []
           items: { type: string }
+        aiResidencyClass:
+          type: string
+          enum: [uaeOnly, globalAllowed, onPrem]
+          default: uaeOnly
+          description: >
+            **The tenant's AI residency class** (decided 2 October 2026, Chinmay, "AI residency: per-tenant
+            residency class"; DEC-539; CHG-CSP-009; amends AI-D02 and ADR-0009 section 1). Which AI
+            endpoints the AI engine may route this tenant's calls to:
+
+            - `uaeOnly` (the default, and mandatory for government, bank and health tenants): the small tier
+              is Core42 Compass GPT-4.1 mini (or Seraj if it wins the Arabic golden set), the strong tier
+              Compass GPT-5, reached through `AiProviderKind` `openaiCompatible`; fallback OpenAI UAE, then
+              the in-cell gpt-oss-120b. No call leaves the UAE.
+            - `globalAllowed`: a private venue that opts in under PDPL Article 23, with a vendor contract, a
+              DPIA and a notice to guests (`aiResidencyOptIn`). Azure gpt-5-mini and gpt-6-sol Global, or
+              the tenant's BYOK provider; fallback the `uaeOnly` chain. The tenant is listed in ADR-0009's
+              transfer register.
+            - `onPrem`: models in the tenant's own estate (Qwen3.5 or gpt-oss; strong tier Qwen3.5-122B,
+              Falcon-H1 Arabic or Jais 2).
+
+            **Every LLM call is scrubbed of personal data in-cell first, whatever the class** (DEC-542): the
+            class decides where a call may go, never whether personal data may travel. Moving from
+            `uaeOnly` to `globalAllowed` without `aiResidencyOptIn` is refused `422 residency-opt-in-required`;
+            on a tenant `aiResidencyClassLocked` holds, any change is refused `409 residency-class-locked`.
+            The model choice per class is the AI engine's (ai `AiProvider`, ai-system-design 3.3), not a
+            setting here.
+        aiResidencyClassLocked:
+          type: boolean
+          readOnly: true
+          default: false
+          description: >
+            **Set by TICVAI at onboarding for a government, bank or health tenant** (DEC-539), which must stay
+            `uaeOnly`. Read-only to the tenant.
+        aiResidencyOptIn:
+          type: object
+          nullable: true
+          description: >
+            **The evidence a `globalAllowed` opt-in needs under PDPL Article 23** (DEC-539; CHG-CSP-009): the
+            tenant's references to its vendor contract, its DPIA and the notice guests see. The platform
+            records that they were named, by whom and when; it does not hold or judge the documents. Null
+            while the class is `uaeOnly` or `onPrem`.
+          properties:
+            vendorContractReference: { type: string, maxLength: 200 }
+            dpiaReference: { type: string, maxLength: 200 }
+            guestNoticeReference: { type: string, maxLength: 200 }
+            confirmedByPrincipalId: { type: string, format: uuid, readOnly: true }
+            confirmedAt: { type: string, format: date-time, readOnly: true }
+        localLanguageNameLocales:
+          type: array
+          default: []
+          description: >
+            **The languages an outlet name must also be given in, in this country** (decided 2 October 2026,
+            Chinmay, batch 2 #26: "English plus the local language where the country needs it"; DEC-031;
+            CHG-CSP-005). ISO 639-1 codes; `[ar]` in the UAE. Empty asks for English only. `createOutlet`
+            and `updateOutlet` refuse an outlet whose `nameTranslations` lacks one of them
+            (`422 local-name-required`).
+          items: { type: string, pattern: '^[a-z]{2}$' }
+        requiredBillingDocuments:
+          x-ticvai-persistence-kind: valueObject
+          x-ticvai-persistence-column: jsonb
+          type: array
+          description: >
+            **Which documents a TICVAI customer's billing entity must upload, in this country** (decided
+            2 October 2026, Chinmay, batch 6 set 7, ADM-411: "Trade licence always; VAT certificate when a
+            TRN is entered; configurable per country"; DEC-210; CHG-CSP-008). The default for every country
+            is the two rows below; TICVAI staff change them per country. The subscription contract's
+            billing entity and `PartnerDocument` read this list; a missing required document holds the
+            entity in verification.
+          default:
+            - { documentType: tradeLicence, requiredWhen: always }
+            - { documentType: vatCertificate, requiredWhen: trnEntered }
+          items:
+            type: object
+            properties:
+              documentType:
+                type: string
+                maxLength: 64
+                description: The document kind, as the subscription contract's `PartnerDocument` names it (`tradeLicence`, `vatCertificate`, ...).
+              requiredWhen:
+                type: string
+                enum: [always, trnEntered]
+        minorAgeThreshold:
+          type: integer
+          minimum: 0
+          maximum: 21
+          default: 18
+          description: >
+            **The age below which a guest is a minor here, set per country** (decided 2 October 2026,
+            Chinmay, critical set 1, BO-187: "Guardian consent on the venue's form; minor age per country";
+            DEC-237; CHG-CSP-019). A minor's biometric enrolment needs a guardian's consent on the venue's
+            consent form (access `enrolFacePass`, `consent.guardianSubjectId`); a subject with no date of
+            birth is treated as a minor (audit R126). The default 18 is the UAE's age of majority and is
+            marked for counsel to confirm per country (R205); whether minors may enrol at all is the
+            venue's switch (`VenueSettings.biometrics.allowMinors`).
         placement:
           $ref: '#/components/schemas/Placement'
         cellName:
@@ -5036,6 +5637,14 @@ components:
         venueId: { type: string, format: uuid }
         regionId: { type: string, format: uuid }
         departmentId: { type: string, format: uuid, nullable: true }
+        outletId:
+          type: string
+          format: uuid
+          nullable: true
+          description: >
+            **The outlet this till stands in** (CHG-CSP-006). Its board is the till's board unless the
+            till overrides it. Null on a workstation that belongs to no outlet (a ticket office counter
+            set up before outlets), which must then carry its own board.
         scopePath: { type: string }
         saleBoard:
           type: object
@@ -5043,11 +5652,31 @@ components:
             Determines which front end loads. Bound to the workstation, not the role — the
             F&B terminal opens the F&B board. What the operator may then DO within it is
             governed by their permissions.
+
+            **The effective board** since 2 October 2026 (DEC-183; CHG-CSP-006): the till's own when it
+            overrides the outlet, otherwise the outlet's (`saleBoardSource`).
           required: [id, kind]
           properties:
             id: { type: string, format: uuid }
             kind: { $ref: '#/components/schemas/SaleBoardKind' }
             name: { type: string }
+        saleBoardSource:
+          type: string
+          enum: [outlet, workstation]
+          readOnly: true
+          description: >
+            **Where `saleBoard` came from** (decided 2 October 2026, Chinmay, BO-109: "Per outlet, with a
+            till override"; DEC-183; CHG-CSP-006): `outlet` when the till uses its outlet's layout,
+            `workstation` when this till overrides it. BO-109 shows which tills differ from their outlet.
+        cashDrawerLimit:
+          # oneOf with one member is Money: check-contract-compat reads an allOf'd Money's own required
+          # fields as newly required request fields of an optional new property (CHG-CSP-016 notes).
+          oneOf:
+            - $ref: '../shared/common.yaml#/components/schemas/Money'
+          nullable: true
+          description: >
+            **This till's drawer limit, overriding the venue's** (`VenueSettings.cashDrawerLimit`; DEC-179;
+            CHG-CSP-016). Null inherits the venue's. Above it the till warns and offers a cash lift.
         accessPointId:
           type: string
           format: uuid
@@ -5137,7 +5766,7 @@ components:
 
     ConfigureWorkstationRequest:
       type: object
-      required: [name, saleBoardId]
+      required: [name]
       properties:
         cashierInputMode:
           type: string
@@ -5170,7 +5799,21 @@ components:
             read-only because the count comes from what was printed rather than from somebody's
             estimate.
         name: { type: string, maxLength: 200 }
-        saleBoardId: { type: string, format: uuid }
+        saleBoardId:
+          type: string
+          format: uuid
+          nullable: true
+          description: >
+            **This till's own layout, overriding its outlet's** (DEC-183; CHG-CSP-006). Optional since
+            2 October 2026: absent or null, the till uses `Outlet.saleBoardId`.
+        outletId: { type: string, format: uuid, nullable: true, description: The outlet this till stands in (CHG-CSP-006). }
+        cashDrawerLimit:
+          # oneOf with one member is Money: check-contract-compat reads an allOf'd Money's own required
+          # fields as newly required request fields of an optional new property (CHG-CSP-016 notes).
+          oneOf:
+            - $ref: '../shared/common.yaml#/components/schemas/Money'
+          nullable: true
+          description: This till's drawer limit; null inherits `VenueSettings.cashDrawerLimit` (DEC-179; CHG-CSP-016).
         departmentId: { type: string, format: uuid, nullable: true }
         accessPointId: { type: string, format: uuid, nullable: true }
         devices:

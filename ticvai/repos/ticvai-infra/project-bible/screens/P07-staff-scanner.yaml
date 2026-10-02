@@ -77,270 +77,161 @@ screens:
     - to: SCN-003
       trigger: Ready to scan
       provenance: structural — SCN-001 is P07's home screen and its exits are its launcher
-  notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
-    still to be written. **createCashMovement removed 18 August** — attached by module resemblance, not
-    by what this screen does. A screen that does not handle money should not be able to move it (CF-87''s
-    class). **Sign in.** The session carries the workstation, so the device cannot scan before it knows
-    who is holding it. **Declared 20 August** — `isEntryPoint` existed in the schema and five platforms
-    used none, so every screen in them read as unreachable. **`selectRole` and `resolvePermissions` wired
-    24 August.** ADR-0002 makes authorisation user-driven and **a sign-in screen that does not resolve
-    a role is a sign-in that grants nothing** — found by walking F61. **Removed 24 August**: acceptShiftVariance,
-    approveShiftOpen, closeShift, forceLogout, getShift, listActiveSessions, listCashMovements, listShifts,
-    openShift, recordNoSale, reopenShift, resumeShift, revokeAllSessions, suspendShift. **Bulk-attach
-    residue** — the 18 August defect that put identical operation sets on unrelated screens. A till does
-    not cancel a performance, a staff app does not create roles, and **a scanner does not run a cash shift.**'
+  notes: '**Rebuilt as a sign-in form on 2 October 2026 (CHG-DOOR-002/003; Chinmay, 2 October 2026: fix
+    the Block A blockers now).** It was generated as a list over active sessions, MFA methods and SSO
+    providers with Force logout and Revoke all sessions on the door, which a person who is not yet signed
+    in can never use (platform-foundation process notes). The sequence is the same on every staff and
+    partner door: credentials (or the organisation''s SSO) -> the authentication code only when a permission
+    demands it (R135) -> the role prompt when several roles are held (ADR-0003) -> the landing. Managing
+    sessions moved to the staff directory (BO-053); managing MFA methods stays on each app''s own security
+    or profile screen. **resolvePermissions and getCurrentShift left the door**: simulating a principal''s
+    permissions is an administration tool (BO-068), and a scanner runs no cash shift, so a steward was
+    shown a SHIFT_OPEN no-access state at sign-in.'
   density: comfortable
-  pattern: listDetail
-  patternReason: '`listMfaMethods` reads the population and `getCurrentShift` reads one of them — list,
-    select, act'
-  purpose: PIN or badge. Session carries the workstation.
+  pattern: form
+  patternReason: PIN or badge on a gate scanner, then the role - a form, not a list.
+  purpose: PIN or badge, so every scan is attributable to a person at this gate. The scanner sends its
+    workstation.
   layout:
-    template: split
+    template: form
     regions:
     - name: contentBody
-      slot: collection
+      slot: form
       components:
-      - kind: dataTable
-        label: Every MFA method
-        bindsTo: MfaMethod
-        columns:
-        - MfaMethod.id
-        - MfaMethod.kind
-        - MfaMethod.label
-        - MfaMethod.maskedTarget
-        - MfaMethod.isActive
-        - MfaMethod.isPrimary
-        - MfaMethod.enrolledAt
-        - MfaMethod.lastUsedAt
-        operation: listMfaMethods
-        provenance: contract identity.yaml GET /auth/mfa/methods
-      - kind: dataTable
-        label: Every SSO provider
-        bindsTo: SsoProvider
-        columns:
-        - SsoProvider.id
-        - SsoProvider.displayName
-        - SsoProvider.protocol
-        - SsoProvider.iconAssetRef
-        - SsoProvider.isEnforced
-        - SsoProvider.scopePath
-        operation: listSsoProviders
-        provenance: contract identity.yaml GET /auth/sso/providers
-    - name: contextPanel
-      slot: selection
-      components:
-      - kind: detailPanel
-        label: The selected MFA method
-        bindsTo: MfaMethod
-        columns:
-        - MfaMethod.id
-        - MfaMethod.kind
-        - MfaMethod.label
-        - MfaMethod.maskedTarget
-        - MfaMethod.isActive
-        - MfaMethod.isPrimary
-        - MfaMethod.enrolledAt
-        - MfaMethod.lastUsedAt
-        operation: listMfaMethods
-        provenance: contract identity.yaml GET /auth/mfa/methods
-      - kind: detailPanel
-        label: The session
-        bindsTo: Session
-        columns:
-        - Session.sessionId
-        - Session.principalId
-        - Session.roleId
-        - Session.displayName
-        - Session.scope
-        - Session.effectivePermissions
-        - Session.permissionsByScope
-        - Session.saleBoardId
-        - Session.workstation
-        - Session.openedAt
-        - Session.expiresAt
-        operation: getCurrentSession
-        provenance: contract identity.yaml GET /auth/session
-      - kind: detailPanel
-        label: The shift
-        bindsTo: Shift
-        columns:
-        - Shift.id
-        - Shift.workstationId
-        - Shift.venueId
-        - Shift.scopePath
-        - Shift.principalId
-        - Shift.principalDisplayName
-        - Shift.incidents
-        - Shift.status
-        - Shift.currency
-        - Shift.currencyScale
-        - Shift.depositBoxCode
-        - Shift.bagNumber
-        - Shift.openingFloat
-        - Shift.salesTotal
-        - Shift.refundsTotal
-        - Shift.liftsTotal
-        operation: getCurrentShift
-        provenance: contract shift.yaml GET /shifts/current
-    - name: actionBar
-      slot: rowActions
-      components:
+      - kind: textField
+        label: Employee number
+        notes: Goes into `LoginRequest.username`; a badge tap fills it.
+      - kind: textField
+        label: PIN
+        notes: 'Goes into `LoginRequest.credential` with `method: pin`, or the badge with `method: card`
+          or `rfid`. The scanner sends its own `workstationId` (CHG-DOOR-001), so every scan is attributable
+          to a person at this gate.'
       - kind: primaryButton
-        label: Login
+        label: Sign in
         operation: login
+        notes: 'Sends `LoginRequest`. 409 means this person already holds a session elsewhere (audit R184):
+          the screen says where and since when, and that only a holder of SESSION_FORCE_LOGOUT can end
+          it; signing in never ends the other session.'
         provenance: contract identity.yaml POST /auth/login
+    - name: secondFactor
+      slot: form
+      components:
       - kind: textField
         label: Authentication code
         operation: verifyMfaChallenge
+        notes: 'Shown only when the sign-in comes back `requiresMfa`: the person holds a permission in
+          `PasswordPolicy.mfaRequiredForPermissions` (ROLE_MANAGE, LEDGER_APPROVE, every PLATFORM_* permission,
+          or one the tenant added; audit R135). Six digits from the authenticator app.'
         provenance: contract identity.yaml POST /auth/mfa/challenge/{challengeId}/verify
-        notes: Shown only in the mfaRequired state (audit R135).
       - kind: primaryButton
         label: Verify
         operation: verifyMfaChallenge
+        notes: Completes the sign-in; the session is usable only after it. Five wrong codes lock step-up
+          for the policy's lockout minutes, never permanently (audit R126 (6)), and the screen says until
+          when.
         provenance: contract identity.yaml POST /auth/mfa/challenge/{challengeId}/verify
       - kind: secondaryButton
         label: Email me a code instead
         operation: createMfaChallenge
+        notes: '`action: signIn`. The authenticator app is the primary method and an emailed code the
+          fallback (audit R126 (5)).'
         provenance: contract identity.yaml POST /auth/mfa/challenge
-        notes: The fallback -- issues the challenge against the principal's email (`emailOtp`) method
-          (audit R126 (5)).
+    - name: actionBar
+      slot: rowActions
+      components:
+      - kind: banner
+        label: Signed in as
+        operation: getCurrentSession
+        notes: 'Read once the sign-in is complete (after the code and the role, where asked): the person''s
+          name and role, then straight on. Then the access point is confirmed (SCN-002).'
+        provenance: contract identity.yaml GET /auth/session
       - kind: secondaryButton
-        label: Select role
+        label: Choose role
         operation: selectRole
+        notes: Only when sign-in returns several roles (ADR-0003; F61 step 1). One role goes straight
+          to confirming the access point (SCN-002).
         provenance: contract identity.yaml POST /auth/select-role
-      - kind: secondaryButton
-        label: Resolve permissions
-        operation: resolvePermissions
-        provenance: contract identity.yaml POST /permissions/resolve
+      - kind: textField
+        label: New PIN
+        operation: changeOwnCredential
+        notes: Only when the PIN was reset and is temporary (audit R132).
+        provenance: contract identity.yaml POST /auth/credential
   states:
-    loading: The sign list.
-    error: Could not load. Names which read failed and leaves the sign untouched.
-    emptyFirstRun: No sign yet. **Offers no create action** — this screen declares no operation that makes
-      one — and says so rather than showing an empty table.
-    emptyNoResults: 'Never shown: `listMfaMethods` takes no filter, so an empty list is always the first-run
-      state above.'
-    emptyNoAccess: Shown when the caller lacks `SHIFT_OPEN`, which `getCurrentShift` requires, and names
-      that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    loading: Checking the credential. The form stays visible and disabled.
+    emptyFirstRun: '**Nobody signed in** - the normal state of a door. A scanner between shifts shows
+      the keypad and a badge prompt.'
+    error: Identity could not be reached. **Says so rather than saying the password is wrong**, and keeps
+      what was typed.
+    denied: The credential does not match, or the account is locked. One message for both, with the attempts
+      left before the lock; a locked account says when to try again.
+    emptyNoAccess: Signed in, and the person holds no role in this app. Says who at the tenant grants
+      access; distinct from a wrong password. A door has no permission of its own to name, because the
+      person is not signed in until it succeeds.
+    sessionHeld: '`login` answered 409: this person already holds a session elsewhere (audit R184, ADR-0004).
+      Says where and since when; only a holder of SESSION_FORCE_LOGOUT ends it, on the staff directory
+      (BO-053), and signing in never ends it by itself.'
     mfaRequired: '**Signed in, not yet through.** The principal holds a permission that requires MFA (ROLE_MANAGE,
-      LEDGER_APPROVE, any platform-staff permission, or one the tenant added), so after `login` the screen
-      calls `createMfaChallenge` and asks for the authenticator code; `verifyMfaChallenge` completes the
-      sign-in. **Email me a code instead** is the fallback. Five wrong codes lock step-up for the policy''s
-      lockout minutes and the screen says so. A principal with no enrolled method is sent to enrol first
-      (decided 28 September, audit R135, R126).'
+      LEDGER_APPROVE, any PLATFORM_* permission, or one the tenant added), so the screen calls `createMfaChallenge`
+      (`action: signIn`) and asks for the authentication code; `verifyMfaChallenge` completes the sign-in.
+      **Email me a code instead** is the fallback. Five wrong codes lock step-up for the policy''s lockout
+      minutes and the screen says until when (audit R135, R126). A person without such a permission never
+      reaches this state.'
     offline: '**Signs in against the cached principal list from the last bundle.** A steward locked out
-      at 08:00 because the venue wifi is down is a gate that does not open'
+      at 08:00 because the venue wifi is down is a gate that does not open.'
   apis:
   - operationId: login
     contract: identity
-    purpose: From the flow it appears in
+    purpose: Authenticate at this scanner with PIN or badge; the device sends its workstationId
     trigger: onAction
-  - operationId: getCurrentShift
-    contract: shift
-    purpose: From the flow it appears in
-    trigger: onLoad
-  - operationId: getCurrentSession
-    contract: identity
-    purpose: Current session and effective permissions
-    trigger: onLoad
-  - operationId: listMfaMethods
-    contract: identity
-    purpose: Enrolled MFA methods
-    trigger: onLoad
-  - operationId: listSsoProviders
-    contract: identity
-    purpose: Identity providers configured for this tenant
-    trigger: onLoad
-  - operationId: selectRole
-    contract: identity
-    purpose: Choose a role for a multi-role session
-    trigger: onAction
-    invalidates:
-    - listMfaMethods
-  - operationId: resolvePermissions
-    contract: identity
-    purpose: Simulate a principal's effective permissions
-    trigger: onAction
-    invalidates:
-    - listMfaMethods
   - operationId: createMfaChallenge
     contract: identity
-    purpose: Second factor after login when the principal holds a permission in mfaRequiredForPermissions;
-      action `signIn`, the primary method (authenticator app), or the email method as the fallback (decided
-      28 September, audit R135, R126 (5))
+    purpose: Second factor after sign-in when the principal holds a permission in mfaRequiredForPermissions;
+      action `signIn`, the authenticator app, or the email method as the fallback (audit R135, R126 (5))
     trigger: onAction
   - operationId: verifyMfaChallenge
     contract: identity
     purpose: Completes sign-in with the code; the session is usable only after it. Five wrong codes lock
       step-up (audit R126 (6))
     trigger: onAction
+  - operationId: selectRole
+    contract: identity
+    purpose: Choose which role to work as when sign-in returns more than one (ADR-0003)
+    trigger: onAction
+  - operationId: changeOwnCredential
+    contract: identity
+    purpose: Replace a temporary password or PIN at the first sign-in after a reset (audit R132)
+    trigger: onAction
+  - operationId: getCurrentSession
+    contract: identity
+    purpose: Read the session the sign-in just opened, for the landing
+    trigger: onAction
   entryState:
     params:
-    - name: shiftId
-      from: session
     - name: challengeId
       from: navigation
-    coldEntry: Resolves from the session; a cold arrival is the ordinary case.
-    preloaded:
-    - MfaMethod.id
-    - MfaMethod.kind
-    - MfaMethod.label
-    - MfaMethod.maskedTarget
-    - MfaMethod.isActive
+    coldEntry: '**The only screen of the scanner that needs nothing.** The scanner''s `workstationId`
+      travels in the sign-in request from the device itself (CHG-DOOR-001).'
+  apisNote: 'Declared by hand on 2 October 2026 (CHG-DOOR-003): sign-in by PIN or badge, the second factor,
+    the role prompt, a temporary PIN''s replacement and the session read.'
   wireframe:
     status: notStarted
     provenance: generated
     board: wireframes/P07 Venue Scanner.dc.html#scn-001
-  apisNote: Rebuilt 9 September 2026 from the 8 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
-  overlays:
-  - id: formLogin
-    component: modal
-    trigger: Login
-    body: '**Collects what `login` sends before it is called.** Required: `username`, `credential`, `workstationId`.
-      Optional: `method`, `deviceFingerprint`. Dismissing sends nothing; the screen behind is unchanged.'
-    bindsTo: LoginRequest
-    confirm:
-      label: Login
-      operation: login
-    dismiss:
-      label: Cancel
-      discards:
-      - username
-      - credential
-      - workstationId
-      - method
-      - deviceFingerprint
-    provenance: contract identity.yaml POST /auth/login
-  - id: formSelectRole
-    component: modal
-    trigger: Select role
-    body: '**Collects what `selectRole` sends before it is called.** Required: `roleId`. Dismissing sends
-      nothing; the screen behind is unchanged.'
-    confirm:
-      label: Select role
-      operation: selectRole
-    dismiss:
-      label: Cancel
-      discards:
-      - roleId
-    provenance: contract identity.yaml POST /auth/select-role
-  - id: formResolvePermissions
-    component: modal
-    trigger: Resolve permissions
-    body: '**Collects what `resolvePermissions` sends before it is called.** Required: `principalId`,
-      `roleId`. Optional: `atScopePath`. Dismissing sends nothing; the screen behind is unchanged.'
-    confirm:
-      label: Resolve permissions
-      operation: resolvePermissions
-    dismiss:
-      label: Cancel
-      discards:
-      - principalId
-      - roleId
-      - atScopePath
-    provenance: contract identity.yaml POST /permissions/resolve
+  gaps:
+  - operation: getCurrentShift
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-021): resolvePermissions (an administration simulator, PERMISSION_VIEW)
+      and getCurrentShift (SHIFT_OPEN, a cash shift) were on the scanner sign-in; a steward never calls
+      the first and a scanner has no cash shift, so the second showed a missing-permission state at sign-in
+      (design-notes correction platform-foundation SCN-001).'
+    source: screens/P07-staff-scanner.yaml#SCN-001 | contracts/spine/identity.yaml#resolvePermissions
+  - operation: resolvePermissions
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-021): resolvePermissions (an administration simulator, PERMISSION_VIEW)
+      and getCurrentShift (SHIFT_OPEN, a cash shift) were on the scanner sign-in; a steward never calls
+      the first and a scanner has no cash shift, so the second showed a missing-permission state at sign-in
+      (design-notes correction platform-foundation SCN-001).'
+    source: screens/P07-staff-scanner.yaml#SCN-001 | contracts/spine/identity.yaml#resolvePermissions
 - id: SCN-002
   name: Access point & direction
   module: Access
@@ -451,10 +342,6 @@ screens:
     - name: actionBar
       slot: rowActions
       components:
-      - kind: primaryButton
-        label: Save gate mode
-        operation: setTurnstileMode
-        provenance: contract access.yaml PUT /access-points/{accessPointId}/mode
       - kind: secondaryButton
         label: Start podium shift
         operation: startPodiumShift
@@ -488,13 +375,6 @@ screens:
     contract: access
     purpose: Read an access point
     trigger: onAction
-  - operationId: setTurnstileMode
-    contract: access
-    purpose: Set the gate's operating mode (required), optionally narrowed by the turnstile mode; the
-      direction is display-only (audit R221)
-    trigger: onAction
-    invalidates:
-    - listAccessPoints
   - operationId: startPodiumShift
     contract: access
     purpose: Start an operator shift on a podium
@@ -534,25 +414,6 @@ screens:
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
   overlays:
-  - id: formSetTurnstileMode
-    component: modal
-    trigger: Save gate mode
-    body: '**Collects what `setTurnstileMode` sends before it is called.** Required: `operatingMode` (normal,
-      freeFlow, dropArm, closed, podium, maintenance). Optional: `mode` (freeRotation or closed), offered
-      only with normal or podium, since the other four already decide the arm and the server refuses it
-      400; and `reason`. **Direction is not on this form**: it is fixed per access point and set in the
-      back office (BO-064) with createAccessPoint/updateAccessPoint (decided 28 September, audit R221).
-      Dismissing sends nothing; the screen behind is unchanged.'
-    confirm:
-      label: Save gate mode
-      operation: setTurnstileMode
-    dismiss:
-      label: Cancel
-      discards:
-      - operatingMode
-      - mode
-      - reason
-    provenance: contract access.yaml PUT /access-points/{accessPointId}/mode
   - id: formStartPodiumShift
     component: modal
     trigger: Start podium shift
@@ -580,6 +441,13 @@ screens:
       discards:
       - handoverNote
     provenance: contract access.yaml POST /podium-shifts/{shiftId}/end
+  gaps:
+  - operation: setTurnstileMode
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-001): Setting the gate''s operating mode is the live podium
+      act on SCN-016 Gate mode (R221); on SCN-002 the primary act is confirming the access point and starting
+      the podium shift (design-notes corrections venue-operations SCN-002, BO-064).'
+    source: R221 | contracts/spine/access.yaml#setTurnstileMode | screens/P07-staff-scanner.yaml#SCN-016
 - id: SCN-003
   name: Ready to scan
   module: Access
@@ -604,9 +472,6 @@ screens:
     inferred: true
     fromFlows: true
     transitions:
-    - to: SCN-007
-      trigger: A school party of forty arrives on one booking
-      provenance: flow F61 step 4→5
     - to: SCN-014
       trigger: Syncs the journal when signal returns
       provenance: flow F06 step 5→6, F19 step 3→4
@@ -640,6 +505,10 @@ screens:
       - rightId
       provenance: derived — SCN-011 declares entryState.params rightId and SCN-003 holds rightId, so an
         edge into it carries them
+    - to: SCN-007
+      trigger: A school party of forty arrives on one booking
+      provenance: flow F61 step 4→5
+      operation: validateAccess
   notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written. **Absorbed SCN-004, SCN-005, SCN-006, SCN-010, SCN-012 on 18 August.** A scanner
     is one screen the device sits on all day, and an outcome is a state of it — **routing to `/access/admitted`
@@ -659,68 +528,6 @@ screens:
     - name: contentBody
       slot: collection
       components:
-      - kind: textField
-        label: Access point id
-        operation: listScans
-        notes: Sends `?accessPointId=` to `listScans`.
-        provenance: contract access.yaml GET /access/scans
-      - kind: textField
-        label: Ticket id
-        operation: listScans
-        notes: Sends `?ticketId=` to `listScans`.
-        provenance: contract access.yaml GET /access/scans
-      - kind: textField
-        label: Outcome
-        operation: listScans
-        notes: Sends `?outcome=` to `listScans`.
-        provenance: contract access.yaml GET /access/scans
-      - kind: datePicker
-        label: Recorded from
-        operation: listScans
-        notes: Sends `?recordedFrom=` to `listScans`.
-        provenance: contract access.yaml GET /access/scans
-      - kind: datePicker
-        label: Recorded to
-        operation: listScans
-        notes: Sends `?recordedTo=` to `listScans`.
-        provenance: contract access.yaml GET /access/scans
-      - kind: dataTable
-        label: Every scan event
-        bindsTo: ScanEvent
-        columns:
-        - ScanEvent.id
-        - ScanEvent.accessPointId
-        - ScanEvent.venueId
-        - ScanEvent.scopePath
-        - ScanEvent.ticketId
-        - ScanEvent.mediaCode
-        - ScanEvent.outcome
-        - ScanEvent.denyReason
-        - ScanEvent.direction
-        - ScanEvent.operatorPrincipalId
-        - ScanEvent.deviceId
-        - ScanEvent.overridesScanId
-        operation: listScans
-        provenance: contract access.yaml GET /access/scans
-      - kind: dataTable
-        label: Every blacklist entry
-        bindsTo: BlacklistEntry
-        columns:
-        - BlacklistEntry.mediaCode
-        - BlacklistEntry.reason
-        - BlacklistEntry.addedAt
-        - BlacklistEntry.addedByPrincipalId
-        - BlacklistEntry.expiresAt
-        - BlacklistEntry.scopePath
-        operation: listBlacklist
-        provenance: contract access.yaml GET /blacklist
-      - kind: scanTarget
-        derived: true
-        impliedBy: listScans
-        notes: '**A screen that validates a credential needs somewhere to point the camera.** `denied`
-          and `hardwareError` look different because an operator facing a guest needs to know whether
-          to try again or explain something.'
-        provenance: carried from the previous definition
       - kind: searchField
         derived: true
         impliedBy: lookupTicket
@@ -729,49 +536,10 @@ screens:
         provenance: carried from the previous definition
     - name: contextPanel
       slot: selection
-      components:
-      - kind: detailPanel
-        label: The selected scan event
-        bindsTo: ScanEvent
-        columns:
-        - ScanEvent.id
-        - ScanEvent.accessPointId
-        - ScanEvent.venueId
-        - ScanEvent.scopePath
-        - ScanEvent.ticketId
-        - ScanEvent.mediaCode
-        - ScanEvent.outcome
-        - ScanEvent.denyReason
-        - ScanEvent.direction
-        - ScanEvent.operatorPrincipalId
-        - ScanEvent.deviceId
-        - ScanEvent.overridesScanId
-        - ScanEvent.overrideReason
-        - ScanEvent.recordedAt
-        - ScanEvent.syncedAt
-        operation: listScans
-        provenance: contract access.yaml GET /access/scans
-      - kind: detailPanel
-        label: The offline package
-        bindsTo: OfflinePackage
-        columns:
-        - OfflinePackage.generatedAt
-        - OfflinePackage.validFrom
-        - OfflinePackage.validTo
-        - OfflinePackage.accessPointId
-        - OfflinePackage.entitlements
-        - OfflinePackage.delegatedRights
-        - OfflinePackage.blacklist
-        - OfflinePackage.admissionRules
-        operation: getOfflinePackage
-        provenance: contract access.yaml GET /access/offline-package
+      components: []
     - name: actionBar
       slot: rowActions
       components:
-      - kind: primaryButton
-        label: Sync scans
-        operation: syncScans
-        provenance: contract access.yaml POST /access/scans
       - kind: secondaryButton
         label: Lookup ticket
         operation: lookupTicket
@@ -800,20 +568,6 @@ screens:
       than the verb. A ready scan this affects should be identified in the dialog, not just counted. **Collects
       what `overrideAccess` sends before it is called.** Required: `id`, `scanId`, `reason`, `recordedAt`.'
     provenance: contract access.yaml POST /access/override
-  - id: formSyncScans
-    component: modal
-    trigger: Sync scans
-    body: '**Collects what `syncScans` sends before it is called.** Required: `deviceId`, `scans`. Dismissing
-      sends nothing; the screen behind is unchanged.'
-    confirm:
-      label: Sync scans
-      operation: syncScans
-    dismiss:
-      label: Cancel
-      discards:
-      - deviceId
-      - scans
-    provenance: contract access.yaml POST /access/scans
   - id: formValidateAccess
     component: modal
     trigger: Validate access
@@ -876,7 +630,7 @@ screens:
       that makes one — and says so rather than showing an empty table.
     emptyNoResults: Nothing matches the filter on accessPointId, ticketId, outcome, recordedFrom, recordedTo
       and the ready scan are still there. Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `REPORT_VIEW_VENUE`, which `listScans` requires, and names
+    emptyNoAccess: Shown when the caller lacks `TICKET_LOOKUP`, which `lookupTicket` requires, and names
       that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
       to support with the wrong question.
     offline: '**Same loop, different truth. Amber says so.** Was a separate screen until 18 August, and
@@ -884,27 +638,18 @@ screens:
       disagree.'
     admitted: '**Green, and gone in 1.5 seconds.** The absorbed SCN-004. Shows what was admitted and against
       which right; at a gate doing 40 a minute this is the state the device is in most of the time.'
-    denied: Denied with the reason and the time of the previous scan. **The reason matters more than the
-      refusal** — a steward has to explain it to somebody standing in front of them. The absorbed SCN-005.
+    denied: 'Denied with the reason and the time of the previous scan. **The reason matters more than
+      the refusal** — a steward has to explain it to somebody standing in front of them. The absorbed
+      SCN-005. Two causes read differently on the device: **"Time window ended"** for a time-bound entitlement
+      scanned after its N minutes from the first scan (`timeBoundWindowElapsed`, CHG-CSP-030), and **"Reader
+      offline too long"** when the reader is past the venue''s maximum offline duration and must reconnect
+      before admitting anyone offline (`offlineLimitExceeded`, CHG-CSP-035). Both hold offline too, from
+      the offline package.'
     overrideRequired: A supervisor override, which requires a permission a steward may not hold, and records
       who, why and when. The absorbed SCN-006.
     blocked: Blacklisted or otherwise barred. **No override is offered on the device** — this is not a
       judgement a steward makes at a lane. The absorbed SCN-010.
   apis:
-  - operationId: listScans
-    contract: access
-    purpose: List scan events
-    trigger: onLoad
-  - operationId: syncScans
-    contract: access
-    purpose: Replay scans recorded offline
-    trigger: onAction
-    invalidates:
-    - listScans
-  - operationId: getOfflinePackage
-    contract: access
-    purpose: Entitlement and rule set for offline validation
-    trigger: onLoad
   - operationId: lookupTicket
     contract: access
     purpose: Read-only validity check without admitting
@@ -913,30 +658,18 @@ screens:
     contract: access
     purpose: Admit against a failed validation
     trigger: onAction
-    invalidates:
-    - listScans
   - operationId: validateAccess
     contract: access
     purpose: Validate media at an access point and admit or deny
     trigger: onAction
-    invalidates:
-    - listScans
   - operationId: validateGroupAccess
     contract: access
     purpose: Admit a group on one read
     trigger: onAction
-    invalidates:
-    - listScans
   - operationId: consumeCrossRegionEntitlement
     contract: cross-region
     purpose: Consume entries against a right, locally authoritative
     trigger: onAction
-    invalidates:
-    - listScans
-  - operationId: listBlacklist
-    contract: access
-    purpose: From the flow it appears in
-    trigger: onLoad
   - operationId: verifyAccreditationCredential
     contract: accreditation
     purpose: Verify an accreditation credential presented at a service gate
@@ -966,6 +699,35 @@ screens:
   apisNote: Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
+  gaps:
+  - operation: getOfflinePackage
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-001): F06 step 4 says the ready screen calls nothing and is
+      idle by design; the scan history (listScans needs the venue report permission) belongs to SCN-009,
+      sync to SCN-014, the package to SCN-015, and the blacklist travels in the offline package (design-notes
+      correction venue-operations SCN-003).'
+    source: F06 step 4 | contracts/spine/access.yaml#listScans
+  - operation: listBlacklist
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-001): F06 step 4 says the ready screen calls nothing and is
+      idle by design; the scan history (listScans needs the venue report permission) belongs to SCN-009,
+      sync to SCN-014, the package to SCN-015, and the blacklist travels in the offline package (design-notes
+      correction venue-operations SCN-003).'
+    source: F06 step 4 | contracts/spine/access.yaml#listScans
+  - operation: listScans
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-001): F06 step 4 says the ready screen calls nothing and is
+      idle by design; the scan history (listScans needs the venue report permission) belongs to SCN-009,
+      sync to SCN-014, the package to SCN-015, and the blacklist travels in the offline package (design-notes
+      correction venue-operations SCN-003).'
+    source: F06 step 4 | contracts/spine/access.yaml#listScans
+  - operation: syncScans
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-001): F06 step 4 says the ready screen calls nothing and is
+      idle by design; the scan history (listScans needs the venue report permission) belongs to SCN-009,
+      sync to SCN-014, the package to SCN-015, and the blacklist travels in the offline package (design-notes
+      correction venue-operations SCN-003).'
+    source: F06 step 4 | contracts/spine/access.yaml#listScans
 - id: SCN-007
   name: Group admission
   module: Access
@@ -982,6 +744,7 @@ screens:
     - SCN-001
     - SCN-002
     - SCN-003
+    - SCN-014
     inferred: false
     entryFrom:
     - SCN-003
@@ -1000,12 +763,14 @@ screens:
       provenance: derived — SCN-002 declares entryState.params accessPointId and SCN-007 holds accessPointId,
         so an edge into it carries them
     - to: SCN-003
-      trigger: The session ends and the device syncs
-      provenance: flow F61 step 6→7
-      operation: listScans
+      trigger: Ready to scan
+      provenance: 'wiring fix, 2 October 2026 (CHG-WIR-001): flow F61 step 6→7'
       carries:
       - mediaCode
       - rightId
+    - to: SCN-014
+      trigger: The session ends and the device syncs
+      provenance: 'wiring fix, 2 October 2026 (CHG-WIR-001): flow F61 step 6→7'
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written.
   density: comfortable
@@ -1019,56 +784,6 @@ screens:
     - name: contentBody
       slot: collection
       components:
-      - kind: textField
-        label: Access point id
-        operation: listScans
-        notes: Sends `?accessPointId=` to `listScans`.
-        provenance: contract access.yaml GET /access/scans
-      - kind: textField
-        label: Ticket id
-        operation: listScans
-        notes: Sends `?ticketId=` to `listScans`.
-        provenance: contract access.yaml GET /access/scans
-      - kind: textField
-        label: Outcome
-        operation: listScans
-        notes: Sends `?outcome=` to `listScans`.
-        provenance: contract access.yaml GET /access/scans
-      - kind: datePicker
-        label: Recorded from
-        operation: listScans
-        notes: Sends `?recordedFrom=` to `listScans`.
-        provenance: contract access.yaml GET /access/scans
-      - kind: datePicker
-        label: Recorded to
-        operation: listScans
-        notes: Sends `?recordedTo=` to `listScans`.
-        provenance: contract access.yaml GET /access/scans
-      - kind: dataTable
-        label: Every scan event
-        bindsTo: ScanEvent
-        columns:
-        - ScanEvent.id
-        - ScanEvent.accessPointId
-        - ScanEvent.venueId
-        - ScanEvent.scopePath
-        - ScanEvent.ticketId
-        - ScanEvent.mediaCode
-        - ScanEvent.outcome
-        - ScanEvent.denyReason
-        - ScanEvent.direction
-        - ScanEvent.operatorPrincipalId
-        - ScanEvent.deviceId
-        - ScanEvent.overridesScanId
-        operation: listScans
-        provenance: contract access.yaml GET /access/scans
-      - kind: scanTarget
-        derived: true
-        impliedBy: listScans
-        notes: '**A screen that validates a credential needs somewhere to point the camera.** `denied`
-          and `hardwareError` look different because an operator facing a guest needs to know whether
-          to try again or explain something.'
-        provenance: carried from the previous definition
       - kind: searchField
         derived: true
         impliedBy: lookupTicket
@@ -1078,27 +793,6 @@ screens:
     - name: contextPanel
       slot: selection
       components:
-      - kind: detailPanel
-        label: The selected scan event
-        bindsTo: ScanEvent
-        columns:
-        - ScanEvent.id
-        - ScanEvent.accessPointId
-        - ScanEvent.venueId
-        - ScanEvent.scopePath
-        - ScanEvent.ticketId
-        - ScanEvent.mediaCode
-        - ScanEvent.outcome
-        - ScanEvent.denyReason
-        - ScanEvent.direction
-        - ScanEvent.operatorPrincipalId
-        - ScanEvent.deviceId
-        - ScanEvent.overridesScanId
-        - ScanEvent.overrideReason
-        - ScanEvent.recordedAt
-        - ScanEvent.syncedAt
-        operation: listScans
-        provenance: contract access.yaml GET /access/scans
       - kind: detailPanel
         label: The offline package
         bindsTo: OfflinePackage
@@ -1124,27 +818,7 @@ screens:
         label: Lookup ticket
         operation: lookupTicket
         provenance: contract access.yaml GET /access/lookup
-      - kind: destructiveButton
-        label: Override access
-        operation: overrideAccess
-        provenance: contract access.yaml POST /access/override
-      - kind: secondaryButton
-        label: Sync scans
-        operation: syncScans
-        provenance: contract access.yaml POST /access/scans
-      - kind: secondaryButton
-        label: Validate access
-        operation: validateAccess
-        provenance: contract access.yaml POST /access/validate
   overlays:
-  - id: confirmOverrideAccess
-    component: confirmDialog
-    trigger: Override access
-    body: '**Names what `overrideAccess` changes and what it leaves alone**, in the consequence rather
-      than the verb. A group admission this affects should be identified in the dialog, not just counted.
-      **Collects what `overrideAccess` sends before it is called.** Required: `id`, `scanId`, `reason`,
-      `recordedAt`.'
-    provenance: contract access.yaml POST /access/override
   - id: formValidateGroupAccess
     component: modal
     trigger: Validate group access
@@ -1163,41 +837,6 @@ screens:
       - recordedAt
       - direction
     provenance: contract access.yaml POST /access/group-validate
-  - id: formSyncScans
-    component: modal
-    trigger: Sync scans
-    body: '**Collects what `syncScans` sends before it is called.** Required: `deviceId`, `scans`. Dismissing
-      sends nothing; the screen behind is unchanged.'
-    confirm:
-      label: Sync scans
-      operation: syncScans
-    dismiss:
-      label: Cancel
-      discards:
-      - deviceId
-      - scans
-    provenance: contract access.yaml POST /access/scans
-  - id: formValidateAccess
-    component: modal
-    trigger: Validate access
-    body: '**Collects what `validateAccess` sends before it is called.** Required: `id`, `mediaCode`,
-      `mediaKind`, `direction`, `recordedAt`. Optional: `groupSize`, `proximityToken`. Dismissing sends
-      nothing; the screen behind is unchanged.'
-    bindsTo: ValidateRequest
-    confirm:
-      label: Validate access
-      operation: validateAccess
-    dismiss:
-      label: Cancel
-      discards:
-      - id
-      - mediaCode
-      - mediaKind
-      - direction
-      - recordedAt
-      - groupSize
-      - proximityToken
-    provenance: contract access.yaml POST /access/validate
   states:
     loading: The group admission list.
     error: Could not load. Names which read failed and leaves the group admission untouched.
@@ -1218,32 +857,10 @@ screens:
     contract: access
     purpose: Entitlement and rule set for offline validation
     trigger: onLoad
-  - operationId: listScans
-    contract: access
-    purpose: List scan events
-    trigger: onLoad
   - operationId: lookupTicket
     contract: access
     purpose: Read-only validity check without admitting
     trigger: onAction
-  - operationId: overrideAccess
-    contract: access
-    purpose: Admit against a failed validation
-    trigger: onAction
-    invalidates:
-    - listScans
-  - operationId: syncScans
-    contract: access
-    purpose: Replay scans recorded offline
-    trigger: onAction
-    invalidates:
-    - listScans
-  - operationId: validateAccess
-    contract: access
-    purpose: Validate media at an access point and admit or deny
-    trigger: onAction
-    invalidates:
-    - listScans
   entryState:
     preloaded:
     - ScanEvent.id
@@ -1258,6 +875,31 @@ screens:
   apisNote: Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
+  gaps:
+  - operation: listScans
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-001): Scan history, sync, override and single-validate actions
+      were generated from the scanner set; the group screen needs the group counter and the admit stepper
+      (validateGroupAccess) (design-notes correction venue-operations SCN-007).'
+    source: screens/P07-staff-scanner.yaml#SCN-007 | R254
+  - operation: overrideAccess
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-001): Scan history, sync, override and single-validate actions
+      were generated from the scanner set; the group screen needs the group counter and the admit stepper
+      (validateGroupAccess) (design-notes correction venue-operations SCN-007).'
+    source: screens/P07-staff-scanner.yaml#SCN-007 | R254
+  - operation: syncScans
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-001): Scan history, sync, override and single-validate actions
+      were generated from the scanner set; the group screen needs the group counter and the admit stepper
+      (validateGroupAccess) (design-notes correction venue-operations SCN-007).'
+    source: screens/P07-staff-scanner.yaml#SCN-007 | R254
+  - operation: validateAccess
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-001): Scan history, sync, override and single-validate actions
+      were generated from the scanner set; the group screen needs the group counter and the admit stepper
+      (validateGroupAccess) (design-notes correction venue-operations SCN-007).'
+    source: screens/P07-staff-scanner.yaml#SCN-007 | R254
 - id: SCN-008
   name: Manual entry
   module: Access
@@ -1316,86 +958,15 @@ screens:
     - name: contentBody
       slot: collection
       components:
-      - kind: textField
-        label: Access point id
-        operation: listScans
-        notes: Sends `?accessPointId=` to `listScans`.
-        provenance: contract access.yaml GET /access/scans
-      - kind: textField
-        label: Ticket id
-        operation: listScans
-        notes: Sends `?ticketId=` to `listScans`.
-        provenance: contract access.yaml GET /access/scans
-      - kind: textField
-        label: Outcome
-        operation: listScans
-        notes: Sends `?outcome=` to `listScans`.
-        provenance: contract access.yaml GET /access/scans
-      - kind: datePicker
-        label: Recorded from
-        operation: listScans
-        notes: Sends `?recordedFrom=` to `listScans`.
-        provenance: contract access.yaml GET /access/scans
-      - kind: datePicker
-        label: Recorded to
-        operation: listScans
-        notes: Sends `?recordedTo=` to `listScans`.
-        provenance: contract access.yaml GET /access/scans
-      - kind: dataTable
-        label: Every scan event
-        bindsTo: ScanEvent
-        columns:
-        - ScanEvent.id
-        - ScanEvent.accessPointId
-        - ScanEvent.venueId
-        - ScanEvent.scopePath
-        - ScanEvent.ticketId
-        - ScanEvent.mediaCode
-        - ScanEvent.outcome
-        - ScanEvent.denyReason
-        - ScanEvent.direction
-        - ScanEvent.operatorPrincipalId
-        - ScanEvent.deviceId
-        - ScanEvent.overridesScanId
-        operation: listScans
-        provenance: contract access.yaml GET /access/scans
       - kind: searchField
         derived: true
         impliedBy: lookupTicket
         label: Search
         notes: A search that returns nothing must say so differently from a search not yet run.
         provenance: carried from the previous definition
-      - kind: scanTarget
-        derived: true
-        impliedBy: listScans
-        notes: '**A screen that validates a credential needs somewhere to point the camera.** `denied`
-          and `hardwareError` look different because an operator facing a guest needs to know whether
-          to try again or explain something.'
-        provenance: carried from the previous definition
     - name: contextPanel
       slot: selection
       components:
-      - kind: detailPanel
-        label: The selected scan event
-        bindsTo: ScanEvent
-        columns:
-        - ScanEvent.id
-        - ScanEvent.accessPointId
-        - ScanEvent.venueId
-        - ScanEvent.scopePath
-        - ScanEvent.ticketId
-        - ScanEvent.mediaCode
-        - ScanEvent.outcome
-        - ScanEvent.denyReason
-        - ScanEvent.direction
-        - ScanEvent.operatorPrincipalId
-        - ScanEvent.deviceId
-        - ScanEvent.overridesScanId
-        - ScanEvent.overrideReason
-        - ScanEvent.recordedAt
-        - ScanEvent.syncedAt
-        operation: listScans
-        provenance: contract access.yaml GET /access/scans
       - kind: detailPanel
         label: The offline package
         bindsTo: OfflinePackage
@@ -1417,45 +988,11 @@ screens:
         label: Lookup ticket
         operation: lookupTicket
         provenance: contract access.yaml GET /access/lookup
-      - kind: destructiveButton
-        label: Override access
-        operation: overrideAccess
-        provenance: contract access.yaml POST /access/override
-      - kind: secondaryButton
-        label: Sync scans
-        operation: syncScans
-        provenance: contract access.yaml POST /access/scans
       - kind: secondaryButton
         label: Validate access
         operation: validateAccess
         provenance: contract access.yaml POST /access/validate
-      - kind: secondaryButton
-        label: Validate group access
-        operation: validateGroupAccess
-        provenance: contract access.yaml POST /access/group-validate
   overlays:
-  - id: confirmOverrideAccess
-    component: confirmDialog
-    trigger: Override access
-    body: '**Names what `overrideAccess` changes and what it leaves alone**, in the consequence rather
-      than the verb. A manual entry this affects should be identified in the dialog, not just counted.
-      **Collects what `overrideAccess` sends before it is called.** Required: `id`, `scanId`, `reason`,
-      `recordedAt`.'
-    provenance: contract access.yaml POST /access/override
-  - id: formSyncScans
-    component: modal
-    trigger: Sync scans
-    body: '**Collects what `syncScans` sends before it is called.** Required: `deviceId`, `scans`. Dismissing
-      sends nothing; the screen behind is unchanged.'
-    confirm:
-      label: Sync scans
-      operation: syncScans
-    dismiss:
-      label: Cancel
-      discards:
-      - deviceId
-      - scans
-    provenance: contract access.yaml POST /access/scans
   - id: formValidateAccess
     component: modal
     trigger: Validate access
@@ -1477,24 +1014,6 @@ screens:
       - groupSize
       - proximityToken
     provenance: contract access.yaml POST /access/validate
-  - id: formValidateGroupAccess
-    component: modal
-    trigger: Validate group access
-    body: '**Collects what `validateGroupAccess` sends before it is called.** Required: `id`, `mediaCode`,
-      `admitCount`, `recordedAt`. Optional: `direction`. Dismissing sends nothing; the screen behind is
-      unchanged.'
-    confirm:
-      label: Validate group access
-      operation: validateGroupAccess
-    dismiss:
-      label: Cancel
-      discards:
-      - id
-      - mediaCode
-      - admitCount
-      - recordedAt
-      - direction
-    provenance: contract access.yaml POST /access/group-validate
   states:
     loading: The manual entry list.
     error: Could not load. Names which read failed and leaves the manual entry untouched.
@@ -1516,34 +1035,10 @@ screens:
     contract: access
     purpose: Entitlement and rule set for offline validation
     trigger: onLoad
-  - operationId: listScans
-    contract: access
-    purpose: List scan events
-    trigger: onLoad
-  - operationId: overrideAccess
-    contract: access
-    purpose: Admit against a failed validation
-    trigger: onAction
-    invalidates:
-    - listScans
-  - operationId: syncScans
-    contract: access
-    purpose: Replay scans recorded offline
-    trigger: onAction
-    invalidates:
-    - listScans
   - operationId: validateAccess
     contract: access
     purpose: Validate media at an access point and admit or deny
     trigger: onAction
-    invalidates:
-    - listScans
-  - operationId: validateGroupAccess
-    contract: access
-    purpose: Admit a group on one read
-    trigger: onAction
-    invalidates:
-    - listScans
   entryState:
     preloaded:
     - ScanEvent.id
@@ -1558,6 +1053,31 @@ screens:
   apisNote: Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
+  gaps:
+  - operation: listScans
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-001): Manual entry needs the reference field and the validate
+      result only; the scan table, sync, override and group validation were generated from the scanner
+      set (design-notes correction venue-operations SCN-008).'
+    source: screens/P07-staff-scanner.yaml#SCN-008 | R254
+  - operation: overrideAccess
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-001): Manual entry needs the reference field and the validate
+      result only; the scan table, sync, override and group validation were generated from the scanner
+      set (design-notes correction venue-operations SCN-008).'
+    source: screens/P07-staff-scanner.yaml#SCN-008 | R254
+  - operation: syncScans
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-001): Manual entry needs the reference field and the validate
+      result only; the scan table, sync, override and group validation were generated from the scanner
+      set (design-notes correction venue-operations SCN-008).'
+    source: screens/P07-staff-scanner.yaml#SCN-008 | R254
+  - operation: validateGroupAccess
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-001): Manual entry needs the reference field and the validate
+      result only; the scan table, sync, override and group validation were generated from the scanner
+      set (design-notes correction venue-operations SCN-008).'
+    source: screens/P07-staff-scanner.yaml#SCN-008 | R254
 - id: SCN-009
   name: Ticket lookup
   module: Access
@@ -1715,84 +1235,6 @@ screens:
         label: Lookup ticket
         operation: lookupTicket
         provenance: contract access.yaml GET /access/lookup
-      - kind: destructiveButton
-        label: Override access
-        operation: overrideAccess
-        provenance: contract access.yaml POST /access/override
-      - kind: secondaryButton
-        label: Sync scans
-        operation: syncScans
-        provenance: contract access.yaml POST /access/scans
-      - kind: secondaryButton
-        label: Validate access
-        operation: validateAccess
-        provenance: contract access.yaml POST /access/validate
-      - kind: secondaryButton
-        label: Validate group access
-        operation: validateGroupAccess
-        provenance: contract access.yaml POST /access/group-validate
-  overlays:
-  - id: confirmOverrideAccess
-    component: confirmDialog
-    trigger: Override access
-    body: '**Names what `overrideAccess` changes and what it leaves alone**, in the consequence rather
-      than the verb. A ticket lookup this affects should be identified in the dialog, not just counted.
-      **Collects what `overrideAccess` sends before it is called.** Required: `id`, `scanId`, `reason`,
-      `recordedAt`.'
-    provenance: contract access.yaml POST /access/override
-  - id: formSyncScans
-    component: modal
-    trigger: Sync scans
-    body: '**Collects what `syncScans` sends before it is called.** Required: `deviceId`, `scans`. Dismissing
-      sends nothing; the screen behind is unchanged.'
-    confirm:
-      label: Sync scans
-      operation: syncScans
-    dismiss:
-      label: Cancel
-      discards:
-      - deviceId
-      - scans
-    provenance: contract access.yaml POST /access/scans
-  - id: formValidateAccess
-    component: modal
-    trigger: Validate access
-    body: '**Collects what `validateAccess` sends before it is called.** Required: `id`, `mediaCode`,
-      `mediaKind`, `direction`, `recordedAt`. Optional: `groupSize`, `proximityToken`. Dismissing sends
-      nothing; the screen behind is unchanged.'
-    bindsTo: ValidateRequest
-    confirm:
-      label: Validate access
-      operation: validateAccess
-    dismiss:
-      label: Cancel
-      discards:
-      - id
-      - mediaCode
-      - mediaKind
-      - direction
-      - recordedAt
-      - groupSize
-      - proximityToken
-    provenance: contract access.yaml POST /access/validate
-  - id: formValidateGroupAccess
-    component: modal
-    trigger: Validate group access
-    body: '**Collects what `validateGroupAccess` sends before it is called.** Required: `id`, `mediaCode`,
-      `admitCount`, `recordedAt`. Optional: `direction`. Dismissing sends nothing; the screen behind is
-      unchanged.'
-    confirm:
-      label: Validate group access
-      operation: validateGroupAccess
-    dismiss:
-      label: Cancel
-      discards:
-      - id
-      - mediaCode
-      - admitCount
-      - recordedAt
-      - direction
-    provenance: contract access.yaml POST /access/group-validate
   states:
     loading: The ticket lookup list.
     error: Could not load. Names which read failed and leaves the ticket lookup untouched.
@@ -1817,30 +1259,6 @@ screens:
     contract: access
     purpose: List scan events
     trigger: onLoad
-  - operationId: overrideAccess
-    contract: access
-    purpose: Admit against a failed validation
-    trigger: onAction
-    invalidates:
-    - listScans
-  - operationId: syncScans
-    contract: access
-    purpose: Replay scans recorded offline
-    trigger: onAction
-    invalidates:
-    - listScans
-  - operationId: validateAccess
-    contract: access
-    purpose: Validate media at an access point and admit or deny
-    trigger: onAction
-    invalidates:
-    - listScans
-  - operationId: validateGroupAccess
-    contract: access
-    purpose: Admit a group on one read
-    trigger: onAction
-    invalidates:
-    - listScans
   entryState:
     preloaded:
     - ScanEvent.id
@@ -1855,6 +1273,31 @@ screens:
   apisNote: Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
+  gaps:
+  - operation: overrideAccess
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-001): Validate, group validate, sync and override contradict
+      the screen''s own purpose ("Reads. Does not admit, does not decrement") and lookupTicket''s contract
+      (design-notes correction venue-operations SCN-009).'
+    source: contracts/spine/access.yaml#lookupTicket | screens/P07-staff-scanner.yaml#SCN-009
+  - operation: syncScans
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-001): Validate, group validate, sync and override contradict
+      the screen''s own purpose ("Reads. Does not admit, does not decrement") and lookupTicket''s contract
+      (design-notes correction venue-operations SCN-009).'
+    source: contracts/spine/access.yaml#lookupTicket | screens/P07-staff-scanner.yaml#SCN-009
+  - operation: validateAccess
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-001): Validate, group validate, sync and override contradict
+      the screen''s own purpose ("Reads. Does not admit, does not decrement") and lookupTicket''s contract
+      (design-notes correction venue-operations SCN-009).'
+    source: contracts/spine/access.yaml#lookupTicket | screens/P07-staff-scanner.yaml#SCN-009
+  - operation: validateGroupAccess
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-001): Validate, group validate, sync and override contradict
+      the screen''s own purpose ("Reads. Does not admit, does not decrement") and lookupTicket''s contract
+      (design-notes correction venue-operations SCN-009).'
+    source: contracts/spine/access.yaml#lookupTicket | screens/P07-staff-scanner.yaml#SCN-009
 - id: SCN-011
   name: Delegated right
   module: Access
@@ -1939,8 +1382,8 @@ screens:
   states:
     loading: The delegated right, read by `getCrossRegionEntitlement`.
     error: Could not load. Names which read failed and leaves the delegated right untouched.
-    emptyFirstRun: No delegated right yet. **Offers no create action** — this screen declares no operation
-      that makes one — and says so rather than showing an empty table.
+    emptyFirstRun: 'Never a create action: a delegated right arrives by scan. With nothing scanned the
+      screen says "Scan the ticket from the other venue".'
     emptyNoAccess: Shown when the caller lacks `TICKET_LOOKUP`, which `getCrossRegionEntitlement` requires,
       and names that permission. **Never an empty table** — that reads as *there is no data* and sends
       somebody to support with the wrong question.
@@ -1975,15 +1418,14 @@ screens:
   - id: formConsumeCrossRegionEntitlement
     component: modal
     trigger: Consume cross region entitlement
-    body: '**Collects what `consumeCrossRegionEntitlement` sends before it is called.** Required: `id`,
-      `entries`, `scanId`, `recordedAt`. Dismissing sends nothing; the screen behind is unchanged.'
+    body: '**Confirms the redemption.** The id is a UUIDv7 the device generates; status and time are the
+      server''s, so nothing here is typed (design-notes correction platform-foundation SCN-011).'
     confirm:
       label: Consume cross region entitlement
       operation: consumeCrossRegionEntitlement
     dismiss:
       label: Cancel
       discards:
-      - id
       - entries
       - scanId
       - recordedAt
@@ -2016,7 +1458,6 @@ screens:
     - to: SCN-014
       trigger: The network returns and the journal posts
       provenance: flow F63 step 2→3
-      operation: listScans
     - to: SCN-001
       trigger: Sign in
       provenance: 'derived — SCN-001 declares entryState.params challengeId and SCN-013 holds none of
@@ -2048,56 +1489,6 @@ screens:
     - name: contentBody
       slot: collection
       components:
-      - kind: textField
-        label: Access point id
-        operation: listScans
-        notes: Sends `?accessPointId=` to `listScans`.
-        provenance: contract access.yaml GET /access/scans
-      - kind: textField
-        label: Ticket id
-        operation: listScans
-        notes: Sends `?ticketId=` to `listScans`.
-        provenance: contract access.yaml GET /access/scans
-      - kind: textField
-        label: Outcome
-        operation: listScans
-        notes: Sends `?outcome=` to `listScans`.
-        provenance: contract access.yaml GET /access/scans
-      - kind: datePicker
-        label: Recorded from
-        operation: listScans
-        notes: Sends `?recordedFrom=` to `listScans`.
-        provenance: contract access.yaml GET /access/scans
-      - kind: datePicker
-        label: Recorded to
-        operation: listScans
-        notes: Sends `?recordedTo=` to `listScans`.
-        provenance: contract access.yaml GET /access/scans
-      - kind: dataTable
-        label: Every scan event
-        bindsTo: ScanEvent
-        columns:
-        - ScanEvent.id
-        - ScanEvent.accessPointId
-        - ScanEvent.venueId
-        - ScanEvent.scopePath
-        - ScanEvent.ticketId
-        - ScanEvent.mediaCode
-        - ScanEvent.outcome
-        - ScanEvent.denyReason
-        - ScanEvent.direction
-        - ScanEvent.operatorPrincipalId
-        - ScanEvent.deviceId
-        - ScanEvent.overridesScanId
-        operation: listScans
-        provenance: contract access.yaml GET /access/scans
-      - kind: scanTarget
-        derived: true
-        impliedBy: listScans
-        notes: '**A screen that validates a credential needs somewhere to point the camera.** `denied`
-          and `hardwareError` look different because an operator facing a guest needs to know whether
-          to try again or explain something.'
-        provenance: carried from the previous definition
       - kind: searchField
         derived: true
         impliedBy: lookupTicket
@@ -2107,27 +1498,6 @@ screens:
     - name: contextPanel
       slot: selection
       components:
-      - kind: detailPanel
-        label: The selected scan event
-        bindsTo: ScanEvent
-        columns:
-        - ScanEvent.id
-        - ScanEvent.accessPointId
-        - ScanEvent.venueId
-        - ScanEvent.scopePath
-        - ScanEvent.ticketId
-        - ScanEvent.mediaCode
-        - ScanEvent.outcome
-        - ScanEvent.denyReason
-        - ScanEvent.direction
-        - ScanEvent.operatorPrincipalId
-        - ScanEvent.deviceId
-        - ScanEvent.overridesScanId
-        - ScanEvent.overrideReason
-        - ScanEvent.recordedAt
-        - ScanEvent.syncedAt
-        operation: listScans
-        provenance: contract access.yaml GET /access/scans
       - kind: detailPanel
         label: The offline package
         bindsTo: OfflinePackage
@@ -2234,15 +1604,11 @@ screens:
       that makes one — and says so rather than showing an empty table.
     emptyNoResults: Nothing matches the filter on accessPointId, ticketId, outcome, recordedFrom, recordedTo
       and the offline journal are still there. Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `REPORT_VIEW_VENUE`, which `listScans` requires, and names
-      that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    emptyNoAccess: Shown when the caller lacks `ACCESS_VALIDATE`, which `getOfflinePackage` requires,
+      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
+      somebody to support with the wrong question.
     offline: The journal is the offline record. It is why an offline admit is recoverable
   apis:
-  - operationId: listScans
-    contract: access
-    purpose: From the flow it appears in
-    trigger: onLoad
   - operationId: getOfflinePackage
     contract: access
     purpose: Entitlement and rule set for offline validation
@@ -2255,26 +1621,18 @@ screens:
     contract: access
     purpose: Admit against a failed validation
     trigger: onAction
-    invalidates:
-    - listScans
   - operationId: syncScans
     contract: access
     purpose: Replay scans recorded offline
     trigger: onAction
-    invalidates:
-    - listScans
   - operationId: validateAccess
     contract: access
     purpose: Validate media at an access point and admit or deny
     trigger: onAction
-    invalidates:
-    - listScans
   - operationId: validateGroupAccess
     contract: access
     purpose: Admit a group on one read
     trigger: onAction
-    invalidates:
-    - listScans
   entryState:
     preloaded:
     - ScanEvent.id
@@ -2289,6 +1647,13 @@ screens:
   apisNote: Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
+  gaps:
+  - operation: listScans
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-001): The offline journal is local to the device and needs no
+      server read; listScans returns server scans and needs the venue report permission (F63 step 2; design-notes
+      correction venue-operations SCN-013).'
+    source: F63 step 2 | contracts/spine/access.yaml#listScans
 - id: SCN-014
   name: Sync & reconciliation
   module: Access
@@ -2310,6 +1675,7 @@ screens:
     entryFrom:
     - SCN-003
     - SCN-013
+    - SCN-007
     notes: '**Reached from SCN-013** — reconciliation follows the journal it reconciles. Stated on 4 September:
       this screen exited somewhere and nothing exited to it, so it was outside the navigation graph entirely.'
     transitions:
@@ -2463,10 +1829,6 @@ screens:
         operation: overrideAccess
         provenance: contract access.yaml POST /access/override
       - kind: secondaryButton
-        label: Sync orders
-        operation: syncOrders
-        provenance: contract orders.yaml POST /sync/orders
-      - kind: secondaryButton
         label: Validate access
         operation: validateAccess
         provenance: contract access.yaml POST /access/validate
@@ -2497,20 +1859,6 @@ screens:
       - deviceId
       - scans
     provenance: contract access.yaml POST /access/scans
-  - id: formSyncOrders
-    component: modal
-    trigger: Sync orders
-    body: '**Collects what `syncOrders` sends before it is called.** Required: `deviceId`, `orders`. Dismissing
-      sends nothing; the screen behind is unchanged.'
-    confirm:
-      label: Sync orders
-      operation: syncOrders
-    dismiss:
-      label: Cancel
-      discards:
-      - deviceId
-      - orders
-    provenance: contract orders.yaml POST /sync/orders
   - id: formValidateAccess
     component: modal
     trigger: Validate access
@@ -2588,12 +1936,6 @@ screens:
     trigger: onAction
     invalidates:
     - listSyncRejections
-  - operationId: syncOrders
-    contract: orders
-    purpose: Replay orders recorded offline
-    trigger: onAction
-    invalidates:
-    - listSyncRejections
   - operationId: validateAccess
     contract: access
     purpose: Validate media at an access point and admit or deny
@@ -2620,6 +1962,12 @@ screens:
   apisNote: Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
+  gaps:
+  - operation: syncOrders
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-001): A scanner replays scans; syncOrders replays till sales
+      and belongs to the POS (design-notes correction venue-operations SCN-014).'
+    source: contracts/spine/orders.yaml#syncOrders | R254
 - id: SCN-015
   name: Offline package
   module: Access
@@ -2675,56 +2023,6 @@ screens:
     - name: contentBody
       slot: collection
       components:
-      - kind: textField
-        label: Access point id
-        operation: listScans
-        notes: Sends `?accessPointId=` to `listScans`.
-        provenance: contract access.yaml GET /access/scans
-      - kind: textField
-        label: Ticket id
-        operation: listScans
-        notes: Sends `?ticketId=` to `listScans`.
-        provenance: contract access.yaml GET /access/scans
-      - kind: textField
-        label: Outcome
-        operation: listScans
-        notes: Sends `?outcome=` to `listScans`.
-        provenance: contract access.yaml GET /access/scans
-      - kind: datePicker
-        label: Recorded from
-        operation: listScans
-        notes: Sends `?recordedFrom=` to `listScans`.
-        provenance: contract access.yaml GET /access/scans
-      - kind: datePicker
-        label: Recorded to
-        operation: listScans
-        notes: Sends `?recordedTo=` to `listScans`.
-        provenance: contract access.yaml GET /access/scans
-      - kind: dataTable
-        label: Every scan event
-        bindsTo: ScanEvent
-        columns:
-        - ScanEvent.id
-        - ScanEvent.accessPointId
-        - ScanEvent.venueId
-        - ScanEvent.scopePath
-        - ScanEvent.ticketId
-        - ScanEvent.mediaCode
-        - ScanEvent.outcome
-        - ScanEvent.denyReason
-        - ScanEvent.direction
-        - ScanEvent.operatorPrincipalId
-        - ScanEvent.deviceId
-        - ScanEvent.overridesScanId
-        operation: listScans
-        provenance: contract access.yaml GET /access/scans
-      - kind: scanTarget
-        derived: true
-        impliedBy: listScans
-        notes: '**A screen that validates a credential needs somewhere to point the camera.** `denied`
-          and `hardwareError` look different because an operator facing a guest needs to know whether
-          to try again or explain something.'
-        provenance: carried from the previous definition
       - kind: searchField
         derived: true
         impliedBy: lookupTicket
@@ -2734,27 +2032,6 @@ screens:
     - name: contextPanel
       slot: selection
       components:
-      - kind: detailPanel
-        label: The selected scan event
-        bindsTo: ScanEvent
-        columns:
-        - ScanEvent.id
-        - ScanEvent.accessPointId
-        - ScanEvent.venueId
-        - ScanEvent.scopePath
-        - ScanEvent.ticketId
-        - ScanEvent.mediaCode
-        - ScanEvent.outcome
-        - ScanEvent.denyReason
-        - ScanEvent.direction
-        - ScanEvent.operatorPrincipalId
-        - ScanEvent.deviceId
-        - ScanEvent.overridesScanId
-        - ScanEvent.overrideReason
-        - ScanEvent.recordedAt
-        - ScanEvent.syncedAt
-        operation: listScans
-        provenance: contract access.yaml GET /access/scans
       - kind: detailPanel
         label: The offline package
         bindsTo: OfflinePackage
@@ -2776,84 +2053,6 @@ screens:
         label: Lookup ticket
         operation: lookupTicket
         provenance: contract access.yaml GET /access/lookup
-      - kind: destructiveButton
-        label: Override access
-        operation: overrideAccess
-        provenance: contract access.yaml POST /access/override
-      - kind: secondaryButton
-        label: Sync scans
-        operation: syncScans
-        provenance: contract access.yaml POST /access/scans
-      - kind: secondaryButton
-        label: Validate access
-        operation: validateAccess
-        provenance: contract access.yaml POST /access/validate
-      - kind: secondaryButton
-        label: Validate group access
-        operation: validateGroupAccess
-        provenance: contract access.yaml POST /access/group-validate
-  overlays:
-  - id: confirmOverrideAccess
-    component: confirmDialog
-    trigger: Override access
-    body: '**Names what `overrideAccess` changes and what it leaves alone**, in the consequence rather
-      than the verb. A offline package this affects should be identified in the dialog, not just counted.
-      **Collects what `overrideAccess` sends before it is called.** Required: `id`, `scanId`, `reason`,
-      `recordedAt`.'
-    provenance: contract access.yaml POST /access/override
-  - id: formSyncScans
-    component: modal
-    trigger: Sync scans
-    body: '**Collects what `syncScans` sends before it is called.** Required: `deviceId`, `scans`. Dismissing
-      sends nothing; the screen behind is unchanged.'
-    confirm:
-      label: Sync scans
-      operation: syncScans
-    dismiss:
-      label: Cancel
-      discards:
-      - deviceId
-      - scans
-    provenance: contract access.yaml POST /access/scans
-  - id: formValidateAccess
-    component: modal
-    trigger: Validate access
-    body: '**Collects what `validateAccess` sends before it is called.** Required: `id`, `mediaCode`,
-      `mediaKind`, `direction`, `recordedAt`. Optional: `groupSize`, `proximityToken`. Dismissing sends
-      nothing; the screen behind is unchanged.'
-    bindsTo: ValidateRequest
-    confirm:
-      label: Validate access
-      operation: validateAccess
-    dismiss:
-      label: Cancel
-      discards:
-      - id
-      - mediaCode
-      - mediaKind
-      - direction
-      - recordedAt
-      - groupSize
-      - proximityToken
-    provenance: contract access.yaml POST /access/validate
-  - id: formValidateGroupAccess
-    component: modal
-    trigger: Validate group access
-    body: '**Collects what `validateGroupAccess` sends before it is called.** Required: `id`, `mediaCode`,
-      `admitCount`, `recordedAt`. Optional: `direction`. Dismissing sends nothing; the screen behind is
-      unchanged.'
-    confirm:
-      label: Validate group access
-      operation: validateGroupAccess
-    dismiss:
-      label: Cancel
-      discards:
-      - id
-      - mediaCode
-      - admitCount
-      - recordedAt
-      - direction
-    provenance: contract access.yaml POST /access/group-validate
   states:
     loading: The offline package list.
     error: Could not load. Names which read failed and leaves the offline package untouched.
@@ -2870,38 +2069,10 @@ screens:
     contract: access
     purpose: From the flow it appears in
     trigger: onLoad
-  - operationId: listScans
-    contract: access
-    purpose: List scan events
-    trigger: onLoad
   - operationId: lookupTicket
     contract: access
     purpose: Read-only validity check without admitting
     trigger: onAction
-  - operationId: overrideAccess
-    contract: access
-    purpose: Admit against a failed validation
-    trigger: onAction
-    invalidates:
-    - listScans
-  - operationId: syncScans
-    contract: access
-    purpose: Replay scans recorded offline
-    trigger: onAction
-    invalidates:
-    - listScans
-  - operationId: validateAccess
-    contract: access
-    purpose: Validate media at an access point and admit or deny
-    trigger: onAction
-    invalidates:
-    - listScans
-  - operationId: validateGroupAccess
-    contract: access
-    purpose: Admit a group on one read
-    trigger: onAction
-    invalidates:
-    - listScans
   entryState:
     preloaded:
     - ScanEvent.id
@@ -2916,6 +2087,37 @@ screens:
   apisNote: Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
+  gaps:
+  - operation: listScans
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-001): The package screen shows the package; the scan table,
+      override, validate and sync actions were the generated scanner set (design-notes correction venue-operations
+      SCN-015).'
+    source: screens/P07-staff-scanner.yaml#SCN-015 | R254
+  - operation: overrideAccess
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-001): The package screen shows the package; the scan table,
+      override, validate and sync actions were the generated scanner set (design-notes correction venue-operations
+      SCN-015).'
+    source: screens/P07-staff-scanner.yaml#SCN-015 | R254
+  - operation: syncScans
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-001): The package screen shows the package; the scan table,
+      override, validate and sync actions were the generated scanner set (design-notes correction venue-operations
+      SCN-015).'
+    source: screens/P07-staff-scanner.yaml#SCN-015 | R254
+  - operation: validateAccess
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-001): The package screen shows the package; the scan table,
+      override, validate and sync actions were the generated scanner set (design-notes correction venue-operations
+      SCN-015).'
+    source: screens/P07-staff-scanner.yaml#SCN-015 | R254
+  - operation: validateGroupAccess
+    removed: true
+    why: 'Removed 2 October 2026 (CHG-WIR-001): The package screen shows the package; the scan table,
+      override, validate and sync actions were the generated scanner set (design-notes correction venue-operations
+      SCN-015).'
+    source: screens/P07-staff-scanner.yaml#SCN-015 | R254
 - id: SCN-016
   name: Gate mode
   module: Access
@@ -3033,6 +2235,16 @@ screens:
         permission: TURNSTILE_MODE_SET
         notes: Cancels a `pending` gate mode change, one `setTurnstileMode` scheduled with a future `effectiveAt`.
         provenance: contract access.yaml POST /gate-mode-changes/{changeId}/cancel
+      - kind: secondaryButton
+        label: Switch direction
+        operation: setAccessPointDirection
+        permission: ACCESS_DIRECTION_SET
+        notes: '**Live, with a specific permission, and logged** (decided 2 October 2026, Chinmay, critical
+          set 1, BO-230: "Live direction switch with permission, logged; R221 amended"; DEC-255; CHG-CSP-032).
+          The permission is ACCESS_DIRECTION_SET, the operation''s own (CHG-FUP-006; CHG-CLN-013). Entry
+          to Exit or back, with a reason and an optional time it takes effect; the gate mode change records
+          the from and to direction. Hidden without the permission.'
+        provenance: contract access.yaml PUT /access-points/{accessPointId}/direction
   states:
     loading: The gate mode list.
     error: Could not load. Names which read failed and leaves the gate mode untouched.
@@ -3062,6 +2274,13 @@ screens:
   - operationId: cancelGateModeChange
     contract: access
     purpose: Cancel a scheduled gate mode change
+    trigger: onAction
+    invalidates:
+    - listAccessPoints
+  - operationId: setAccessPointDirection
+    contract: access
+    purpose: Switch the gate's direction live (Entry to Exit), with a reason; the switch is logged (DEC-255;
+      CHG-CSP-032)
     trigger: onAction
     invalidates:
     - listAccessPoints
@@ -3118,3 +2337,16 @@ screens:
       not just counted. **Collects what `cancelGateModeChange` sends before it is called.** Nothing in
       the body is required. Optional: `reason`.'
     provenance: contract access.yaml POST /gate-mode-changes/{changeId}/cancel
+  - id: formSetAccessPointDirection
+    component: modal
+    trigger: Switch direction
+    body: '**Collects what `setAccessPointDirection` sends**: the new direction (Entry or Exit), a reason,
+      and optionally when it takes effect. Names the gate and its current direction. Dismissing sends
+      nothing.'
+    confirm:
+      label: Switch direction
+      operation: setAccessPointDirection
+    dismiss:
+      label: Cancel
+      discards: []
+    provenance: contract access.yaml PUT /access-points/{accessPointId}/direction

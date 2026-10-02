@@ -101,19 +101,6 @@
   "requestBody": null,
   "responds": "CellHealth"
  },
- "getCrossRegionEntitlement": {
-  "method": "GET",
-  "path": "/cross-region-entitlements/{rightId}",
-  "contract": "cross-region",
-  "summary": "Read a redemption right",
-  "permission": "TICKET_LOOKUP",
-  "offlineCapable": true,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "CrossRegionEntitlement"
- },
  "getEntitlementUsage": {
   "method": "GET",
   "path": "/tenants/{tenantId}/entitlement-usage",
@@ -140,19 +127,6 @@
   "requestBody": null,
   "responds": "RolloutDetail"
  },
- "getSsoConfig": {
-  "method": "GET",
-  "path": "/tenants/sso-config",
-  "contract": "identity",
-  "summary": "Read SSO configuration",
-  "permission": "USER_MANAGE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "SsoProviderConfig"
- },
  "getTenant": {
   "method": "GET",
   "path": "/tenants/{tenantId}",
@@ -178,25 +152,6 @@
   "parameters": [],
   "requestBody": null,
   "responds": "LicencePosition"
- },
- "getWalletAllocation": {
-  "method": "GET",
-  "path": "/wallet-allocations",
-  "contract": "cross-region",
-  "summary": "The consuming cell's bounded offline allocation",
-  "permission": "ORDER_VIEW",
-  "offlineCapable": true,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "guestLinkId",
-    "in": "query",
-    "required": true
-   }
-  ],
-  "requestBody": null,
-  "responds": "WalletAllocation"
  },
  "listAiInteractions": {
   "method": "GET",
@@ -237,6 +192,70 @@
   "requestBody": null,
   "responds": "Page"
  },
+ "listAuditRecords": {
+  "method": "GET",
+  "path": "/audit-records",
+  "contract": "tenancy",
+  "summary": "Who did what, where, and when",
+  "permission": "AUDIT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "orgUnitId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "principalId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "workstationId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "action",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "subjectRef",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "platformStaffGrantId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "listCellJobs": {
   "method": "GET",
   "path": "/cells/{cellId}/jobs",
@@ -247,6 +266,35 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listOwnPlatformStaffGrants": {
+  "method": "GET",
+  "path": "/platform-staff-grants/mine",
+  "contract": "identity",
+  "summary": "The calling platform operator's own grants into this tenant",
+  "permission": "PLATFORM_TENANT_ACCESS",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "activeOnly",
+    "in": "query",
+    "required": null
+   },
    {
     "name": null,
     "in": null,
@@ -337,6 +385,25 @@
   "requestBody": null,
   "responds": "Page"
  },
+ "openPlatformStaffGrant": {
+  "method": "POST",
+  "path": "/platform-staff-grants",
+  "contract": "identity",
+  "summary": "A platform operator opens a time-boxed grant into this tenant",
+  "permission": "PLATFORM_TENANT_ACCESS",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "PlatformStaffGrant"
+ },
  "pauseRollout": {
   "method": "POST",
   "path": "/rollouts/{rolloutId}/pause",
@@ -356,44 +423,6 @@
   "requestBody": null,
   "responds": "RolloutDetail"
  },
- "propagateCrossRegionEntitlement": {
-  "method": "POST",
-  "path": "/cross-region-entitlements",
-  "contract": "cross-region",
-  "summary": "Propagate a right from the issuing cell to a consuming cell",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "append",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "PropagateRightRequest",
-  "responds": "CrossRegionEntitlement"
- },
- "reconcileRedemptions": {
-  "method": "POST",
-  "path": "/cross-region-entitlements/reconcile",
-  "contract": "cross-region",
-  "summary": "Report consumption back to the issuing cell",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "append",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": null
- },
  "rollbackRollout": {
   "method": "POST",
   "path": "/rollouts/{rolloutId}/rollback",
@@ -412,25 +441,6 @@
   ],
   "requestBody": null,
   "responds": null
- },
- "setWalletAllocationPolicy": {
-  "method": "PUT",
-  "path": "/wallet-allocations",
-  "contract": "cross-region",
-  "summary": "Set the allocation cap policy",
-  "permission": "REGION_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "region",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "WalletAllocation"
  },
  "startRollout": {
   "method": "POST",

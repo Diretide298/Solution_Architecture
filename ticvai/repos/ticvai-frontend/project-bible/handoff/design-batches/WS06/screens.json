@@ -48,15 +48,6 @@
      "operation": "listDeviceGate"
     },
     {
-     "to": "BO-196",
-     "trigger": "Works in Physical Device Registration & Provisioning",
-     "provenance": "flow F116 step 3→4",
-     "operation": "listDeviceGate",
-     "carries": [
-      "placementId"
-     ]
-    },
-    {
      "to": "BO-197",
      "trigger": "Works in Turnstile & Lane Behavior Configuration",
      "provenance": "flow F116 step 5→6",
@@ -96,7 +87,19 @@
      "to": "BO-203",
      "trigger": "Works in Hardware Compatibility, Health, Testing & Deployment",
      "provenance": "flow F116 step 17→18",
-     "operation": "listDeviceGate"
+     "operation": "listDeviceGate",
+     "carries": [
+      "deviceId"
+     ]
+    },
+    {
+     "to": "BO-196",
+     "trigger": "Works in Physical Device Registration & Provisioning",
+     "provenance": "flow F116 step 3→4",
+     "operation": "listDeviceGate",
+     "carries": [
+      "placementId"
+     ]
     }
    ]
   },
@@ -259,23 +262,14 @@
     {
      "name": "actionBar",
      "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Save access device",
-       "operation": "updateAccessDevicePlacement",
-       "permission": "DEVICE_CONFIGURE",
-       "notes": "Changes where a placed device sits: area, access point, lane, role, label, group label, controller reference, proximity threshold and `isActive` (ADR-0067). What the device is (model, serial, versions) is the register's, tenancy `platform.device`.",
-       "provenance": "contract access.yaml PUT /device-placements/{placementId}"
-      }
-     ]
+     "components": []
     }
    ]
   },
   "states": {
    "loading": "The device gate list.",
    "error": "Could not load. Names which read failed and leaves the device gate untouched.",
-   "emptyFirstRun": "No device gate yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No device gate yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the device gate are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -287,37 +281,10 @@
     "trigger": "onLoad"
    },
    {
-    "operationId": "registerDevice",
-    "contract": "tenancy",
-    "purpose": "Register a gate device from the command centre",
-    "trigger": "onAction",
-    "provenance": "decided 29 September, VM close-out (venue management and configuration)"
-   },
-   {
-    "operationId": "setTurnstileMode",
-    "contract": "access",
-    "purpose": "Open, close or change the mode of a gate",
-    "trigger": "onAction",
-    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
-    "invalidates": [
-     "listDeviceGate"
-    ]
-   },
-   {
     "operationId": "listAccessPoints",
     "contract": "access",
     "purpose": "The gates and turnstiles whose mode is set",
     "trigger": "onLoad"
-   },
-   {
-    "operationId": "updateAccessDevicePlacement",
-    "contract": "access",
-    "purpose": "Replace a device's placement",
-    "trigger": "onAction",
-    "invalidates": [
-     "listDeviceGate",
-     "listAccessPoints"
-    ]
    }
   ],
   "entryState": {
@@ -353,37 +320,24 @@
    "workshopBoard": "wireframes/WS23 Access Control Board 6.dc.html#bo-194"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 70. 21 of 21 labels bound to a contract property; 21 of 34 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "overlays": [
+  "gaps": [
    {
-    "id": "formUpdateAccessDevice",
-    "component": "modal",
-    "trigger": "Save access device",
-    "body": "**Collects what `updateAccessDevicePlacement` sends before it is called.** Required: `id`, `venueId`, `deviceId`, `role`, `isActive`, `scopePath`. Optional: `accessAreaId`, `accessPointId`, `gateLaneId`, `name`, `deviceGroupId`, `controllerReference`, `proximityThresholdMeters`, `installationDate`. The device itself (serial, hardware model, versions) is registered in `platform.device` first, with tenancy `registerDevice` (ADR-0067). Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "AccessDevicePlacement",
-    "confirm": {
-     "label": "Save access device",
-     "operation": "updateAccessDevicePlacement"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "id",
-      "venueId",
-      "deviceId",
-      "role",
-      "isActive",
-      "scopePath",
-      "accessAreaId",
-      "accessPointId",
-      "gateLaneId",
-      "name",
-      "deviceGroupId",
-      "controllerReference",
-      "proximityThresholdMeters",
-      "installationDate"
-     ]
-    },
-    "provenance": "contract access.yaml PUT /device-placements/{placementId}"
+    "operation": "registerDevice",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): The command centre monitors (VO-R02): placement and registration belong to BO-196, gate mode changes to the gate mode screens (BO-201, SCN-016) (design-notes correction venue-operations BO-194).",
+    "source": "contracts/spine/access.yaml#updateAccessDevicePlacement | contracts/spine/tenancy.yaml#registerDevice | contracts/spine/access.yaml#setTurnstileMode"
+   },
+   {
+    "operation": "setTurnstileMode",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): The command centre monitors (VO-R02): placement and registration belong to BO-196, gate mode changes to the gate mode screens (BO-201, SCN-016) (design-notes correction venue-operations BO-194).",
+    "source": "contracts/spine/access.yaml#updateAccessDevicePlacement | contracts/spine/tenancy.yaml#registerDevice | contracts/spine/access.yaml#setTurnstileMode"
+   },
+   {
+    "operation": "updateAccessDevicePlacement",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-001): The command centre monitors (VO-R02): placement and registration belong to BO-196, gate mode changes to the gate mode screens (BO-201, SCN-016) (design-notes correction venue-operations BO-194).",
+    "source": "contracts/spine/access.yaml#updateAccessDevicePlacement | contracts/spine/tenancy.yaml#registerDevice | contracts/spine/access.yaml#setTurnstileMode"
    }
   ],
   "_platform": {
@@ -727,6 +681,13 @@
        "permission": "DEVICE_CONFIGURE",
        "notes": "Changes where a placed device sits: area, access point, lane, role, label, group label, controller reference, proximity threshold and `isActive` (ADR-0067). What the device is (model, serial, versions) is the register's, tenancy `platform.device`.",
        "provenance": "contract access.yaml PUT /device-placements/{placementId}"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Enrol with code",
+       "operation": "enrolDevice",
+       "notes": "**A new device gets a one-time enrolment code and waits in \"Pending approval\" (decided 2 October 2026 by Chinmay, DEC-241; CHG-CSP-011).**",
+       "provenance": "contract tenancy.yaml POST /devices/{deviceId}/enrolment"
       }
      ]
     }
@@ -769,6 +730,13 @@
     "invalidates": [
      "listPhysicalDeviceRegistration"
     ]
+   },
+   {
+    "operationId": "enrolDevice",
+    "contract": "tenancy",
+    "purpose": "Take a registered device through enrolment to activation",
+    "trigger": "onAction",
+    "provenance": "design-note correction, 2 October 2026 (BO-196)"
    }
   ],
   "wireframe": {
@@ -865,6 +833,27 @@
      ]
     },
     "provenance": "contract access.yaml PUT /device-placements/{placementId}"
+   },
+   {
+    "id": "formEnrolDevice",
+    "component": "modal",
+    "trigger": "Enrol with code",
+    "body": "**Collects what `enrolDevice` sends before it is called.** Required: `state`. Optional: `configurationProfileId`, `reason`, `enrolmentCode`, `testResult`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Enrol with code",
+     "operation": "enrolDevice"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "state",
+      "configurationProfileId",
+      "reason",
+      "enrolmentCode",
+      "testResult"
+     ]
+    },
+    "provenance": "contract tenancy.yaml POST /devices/{deviceId}/enrolment"
    }
   ],
   "entryState": {
@@ -1060,6 +1049,13 @@
    "workshopBoard": "wireframes/WS23 Access Control Board 6.dc.html#bo-197"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 74. 0 of 0 labels bound to a contract property; 14 of 26 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-004): No read of turnstile and lane behaviour (setTurnstileLaneBehavior has no list or get).",
+    "source": "contracts/spine/access.yaml#setTurnstileLaneBehavior"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1222,6 +1218,13 @@
    "workshopBoard": "wireframes/WS23 Access Control Board 6.dc.html#bo-198"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 76. 0 of 0 labels bound to a contract property; 11 of 33 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-004): No read of validation outcome and guest feedback profiles (setValidationOutcomeGuest has no list or get).",
+    "source": "contracts/spine/access.yaml#setValidationOutcomeGuest"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1538,6 +1541,13 @@
    "workshopBoard": "wireframes/WS23 Access Control Board 6.dc.html#bo-200"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 78. 0 of 0 labels bound to a contract property; 14 of 28 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Scan Ticket, Search Ticket, Entry, Manual Attendance, Override, View History are choices sent by `setHandheldMobileAccess`.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-004): No read of handheld device configurations and no remote-revoke operation for a lost device.",
+    "source": "contracts/spine/access.yaml#/components/schemas/HandheldMobileAccessDeviceConfigurationInput"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1610,34 +1620,40 @@
      "slot": "fields",
      "components": [
       {
-       "kind": "selectField",
+       "kind": "multiSelect",
        "label": "Who can activate",
-       "provenance": "pack Access Control Module_Reference.pdf, page 79 §Configure"
-      },
-      {
-       "kind": "selectField",
-       "label": "Venue scope",
-       "provenance": "pack Access Control Module_Reference.pdf, page 79 §Configure"
+       "provenance": "pack Access Control Module_Reference.pdf, page 79 §Configure",
+       "operation": "setGateModePolicy",
+       "bindsTo": "AccessGateModePolicy.whoCanActivate"
       },
       {
        "kind": "selectField",
        "label": "Gate group",
-       "provenance": "pack Access Control Module_Reference.pdf, page 79 §Configure"
+       "provenance": "pack Access Control Module_Reference.pdf, page 79 §Configure",
+       "operation": "setGateModePolicy",
+       "bindsTo": "AccessGateModePolicy.accessPointGroupId"
       },
       {
-       "kind": "selectField",
-       "label": "reason",
-       "provenance": "pack Access Control Module_Reference.pdf, page 79 §Configure"
+       "kind": "toggle",
+       "label": "Reason required",
+       "provenance": "pack Access Control Module_Reference.pdf, page 79 §Configure",
+       "operation": "setGateModePolicy",
+       "bindsTo": "AccessGateModePolicy.reasonRequired"
       },
       {
-       "kind": "selectField",
-       "label": "emergency code",
-       "provenance": "pack Access Control Module_Reference.pdf, page 79 §Configure"
+       "kind": "textField",
+       "label": "Emergency code",
+       "provenance": "pack Access Control Module_Reference.pdf, page 79 §Configure",
+       "operation": "setGateModePolicy",
+       "bindsTo": "AccessGateModePolicy.emergencyCode",
+       "notes": "Masked; never shown back once saved."
       },
       {
-       "kind": "selectField",
-       "label": "automatic notification",
-       "provenance": "pack Access Control Module_Reference.pdf, page 79 §Configure"
+       "kind": "toggle",
+       "label": "Notify automatically",
+       "provenance": "pack Access Control Module_Reference.pdf, page 79 §Configure",
+       "operation": "setGateModePolicy",
+       "bindsTo": "AccessGateModePolicy.automaticNotification"
       }
      ]
     },
@@ -1853,6 +1869,13 @@
    "workshopBoard": "wireframes/WS23 Access Control Board 6.dc.html#bo-202"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 81. 0 of 0 labels bound to a contract property; 6 of 31 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-004): No read of the device software package, its versions or its rollout progress, and no rollback.",
+    "source": "contracts/spine/access.yaml#setDeviceSoftwareContent | DI-898"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1959,6 +1982,13 @@
        "operation": "publishHardwareDeployment",
        "notes": "**Names the version, the target (pilot, selected gates, device group or venue) and the devices that failed the compatibility test and will be skipped**, before it runs. Devices pick the version up at their next package refresh.",
        "provenance": "contract access.yaml POST /hardware-deployments (decided 29 September, VM close-out)"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Approve into production",
+       "operation": "approveDevice",
+       "notes": "**The approver must differ from the person who tested it (decided 2 October 2026 by Chinmay, DEC-245; CHG-CSP-011)**; the button is disabled for the tester.",
+       "provenance": "contract tenancy.yaml POST /devices/{deviceId}/approval"
       }
      ]
     },
@@ -1987,12 +2017,26 @@
     "contract": "access",
     "purpose": "Deploy configuration version",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "approveDevice",
+    "contract": "tenancy",
+    "purpose": "Approve a device into production, or reject it",
+    "trigger": "onAction",
+    "provenance": "design-note correction, 2 October 2026 (BO-203)"
    }
   ],
   "entryState": {
    "preloaded": [
     "HardwareCompatibilityHealthTestingDeploymentView.capabilities",
     "HardwareCompatibilityHealthTestingDeploymentView.rolloutScope"
+   ],
+   "params": [
+    {
+     "name": "deviceId",
+     "from": "navigation",
+     "optional": true
+    }
    ]
   },
   "wireframe": {
@@ -2002,6 +2046,26 @@
    "workshopBoard": "wireframes/WS23 Access Control Board 6.dc.html#bo-203"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 82. 0 of 0 labels bound to a contract property; 3 of 76 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** still owed by a contract change: `publishHardwareDeployment`.",
+  "overlays": [
+   {
+    "id": "formApproveDevice",
+    "component": "modal",
+    "trigger": "Approve into production",
+    "body": "**Collects what `approveDevice` sends before it is called.** Required: `decision`. Optional: `reason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Approve into production",
+     "operation": "approveDevice"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "decision",
+      "reason"
+     ]
+    },
+    "provenance": "contract tenancy.yaml POST /devices/{deviceId}/approval"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",

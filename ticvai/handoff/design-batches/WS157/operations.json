@@ -69,6 +69,19 @@
   "requestBody": null,
   "responds": "Principal"
  },
+ "getResourceQualifications": {
+  "method": "GET",
+  "path": "/resources/{resourceId}/qualifications",
+  "contract": "resources",
+  "summary": "What an instructor or staff resource is certified to do, and until when — as saved",
+  "permission": "RESOURCE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "Qualification"
+ },
  "getResourceSchedule": {
   "method": "GET",
   "path": "/resources/{resourceId}/schedule",
@@ -94,6 +107,19 @@
   "parameters": [],
   "requestBody": null,
   "responds": "WorkforceIntegrationSource"
+ },
+ "listJobTitles": {
+  "method": "GET",
+  "path": "/job-titles",
+  "contract": "workforce",
+  "summary": "The job titles a posting can name",
+  "permission": "WORKFORCE_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "WorkforceJobTitle"
  },
  "listLeaveBalances": {
   "method": "GET",
@@ -214,50 +240,6 @@
   "requestBody": null,
   "responds": "Resource"
  },
- "listRotaAssignments": {
-  "method": "GET",
-  "path": "/rota-assignments",
-  "contract": "workforce",
-  "summary": "The rota",
-  "permission": "WORKFORCE_VIEW",
-  "offlineCapable": true,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "from",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "to",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "principalId",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "departmentId",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- },
  "listShiftPatterns": {
   "method": "GET",
   "path": "/shift-patterns",
@@ -356,6 +338,35 @@
   ],
   "requestBody": null,
   "responds": "Page"
+ },
+ "listWorkAssignments": {
+  "method": "GET",
+  "path": "/work-assignments",
+  "contract": "workforce",
+  "summary": "Where each person is posted, and from when",
+  "permission": "WORKFORCE_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "employeeId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "activeOn",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "WorkforceWorkAssignment"
  },
  "requestLeave": {
   "method": "POST",

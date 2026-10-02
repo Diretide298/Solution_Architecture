@@ -146,6 +146,60 @@
   "requestBody": null,
   "responds": "Page"
  },
+ "listApprovalRequests": {
+  "method": "GET",
+  "path": "/approval-requests",
+  "contract": "approvals",
+  "summary": "Requests awaiting a decision, or already decided",
+  "permission": "APPROVAL_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "assignedToMe",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "raisedByMe",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "kind",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "breachingWithinMinutes",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "sort",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "listAuthorisationPolicies": {
   "method": "GET",
   "path": "/authorisation-policies",
@@ -199,6 +253,30 @@
   "requestBody": null,
   "responds": "Page"
  },
+ "listWalletConfigurationVersions": {
+  "method": "GET",
+  "path": "/wallet-configuration/versions",
+  "contract": "wallet",
+  "summary": "Wallet configuration versions, newest first",
+  "permission": "WALLET_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "listWalletDisputes": {
   "method": "GET",
   "path": "/wallet-disputes",
@@ -217,19 +295,6 @@
   ],
   "requestBody": null,
   "responds": "WalletDispute"
- },
- "listWalletTypes": {
-  "method": "GET",
-  "path": "/wallet-types",
-  "contract": "wallet",
-  "summary": "The kinds of wallet that may exist — who owns one",
-  "permission": "WALLET_VIEW",
-  "offlineCapable": null,
-  "conflictPolicy": null,
-  "scopeLevel": "tenant",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "WalletType"
  },
  "listWebhookSubscriptions": {
   "method": "GET",

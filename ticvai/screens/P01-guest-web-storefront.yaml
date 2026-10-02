@@ -161,9 +161,8 @@ screens:
       provenance: structural — WEB-001 is P01's home screen and its exits are its launcher
     - to: WEB-008
       trigger: Add-ons & Upsell
-      provenance: 'derived — WEB-008 declares entryState.params bundleId and WEB-001 holds none of them.
-        The edge carries nothing: WEB-008 opens on listCatalogueBundles, and bundleId has no source on
-        WEB-008 yet (a gap in WEB-008, not in this edge)'
+      provenance: derived — WEB-008 declares entryState.params bundleId and WEB-001 holds none of them,
+        so the edge carries nothing and WEB-008 opens cold
     - to: WEB-009
       trigger: Wishlist
       provenance: 'derived — WEB-009 declares entryState.params itemId and WEB-001 holds none of them.
@@ -171,9 +170,9 @@ screens:
         its own'
     - to: WEB-017
       trigger: My Account Dashboard
-      provenance: 'derived — WEB-017 declares entryState.params deviceId, itemId, token and WEB-001 holds
-        none of them. The edge carries nothing: deviceId, itemId, token only pre-select (deep link or
-        optional), and WEB-017 opens on its own'
+      provenance: 'derived — WEB-017 declares entryState.params token and WEB-001 holds none of them.
+        The edge carries nothing: token only pre-selects (deep link or optional), and WEB-017 opens on
+        its own'
     - to: WEB-018
       trigger: My Tickets
       carries:
@@ -212,9 +211,9 @@ screens:
         and enrolmentId has no source on WEB-024 yet (a gap in WEB-024, not in this edge)'
     - to: WEB-027
       trigger: Newsletter Subscription
-      provenance: 'derived — WEB-027 declares entryState.params deviceId, itemId and WEB-001 holds none
-        of them. The edge carries nothing: deviceId, itemId only pre-select (deep link or optional), and
-        WEB-027 opens on its own'
+      provenance: 'derived — WEB-027 declares entryState.params unsubscribeToken and WEB-001 holds none
+        of them. The edge carries nothing: unsubscribeToken only pre-selects (deep link or optional),
+        and WEB-027 opens on its own'
     - to: WEB-032
       trigger: Offers & Promotions
       provenance: 'derived — WEB-032 declares entryState.params promotionId and WEB-001 holds none of
@@ -1109,9 +1108,8 @@ screens:
         holds eventId, so an edge into it carries them
     - to: WEB-008
       trigger: Add-ons & Upsell
-      provenance: 'derived — WEB-008 declares entryState.params bundleId and WEB-005 holds none of them.
-        The edge carries nothing: WEB-008 opens on listCatalogueBundles, and bundleId has no source on
-        WEB-008 yet (a gap in WEB-008, not in this edge)'
+      provenance: derived — WEB-008 declares entryState.params bundleId and WEB-005 holds none of them,
+        so the edge carries nothing and WEB-008 opens cold
     - to: WEB-010
       trigger: Shopping Cart
       carries:
@@ -1401,9 +1399,8 @@ screens:
       - performanceId
     - to: WEB-008
       trigger: Add-ons & Upsell
-      provenance: 'derived — WEB-008 declares entryState.params bundleId and WEB-006 holds none of them.
-        The edge carries nothing: WEB-008 opens on listCatalogueBundles, and bundleId has no source on
-        WEB-008 yet (a gap in WEB-008, not in this edge)'
+      provenance: derived — WEB-008 declares entryState.params bundleId and WEB-006 holds none of them,
+        so the edge carries nothing and WEB-008 opens cold
     - to: WEB-010
       trigger: Reviews the cart and may enter a promotion code
       provenance: flow F01 step 4→5
@@ -1713,9 +1710,8 @@ screens:
         its own'
     - to: WEB-008
       trigger: Add-ons & Upsell
-      provenance: 'derived — WEB-008 declares entryState.params bundleId and WEB-007 holds none of them.
-        The edge carries nothing: WEB-008 opens on listCatalogueBundles, and bundleId has no source on
-        WEB-008 yet (a gap in WEB-008, not in this edge)'
+      provenance: derived — WEB-008 declares entryState.params bundleId and WEB-007 holds none of them,
+        so the edge carries nothing and WEB-008 opens cold
     - to: WEB-006
       trigger: Date & Performance Selection
       carries:
@@ -2050,10 +2046,10 @@ screens:
         - AiRecommendationItem.rank
         operation: decideRecommendations
         provenance: corrected 2 October 2026 (CHG-SGU-016, design-notes correction)
-        notes: "The engine's slot (`decideRecommendations`, placement cart, maxItems 3: the client set
+        notes: 'The engine''s slot (`decideRecommendations`, placement cart, maxItems 3: the client set
           at most three, DI-959), answered in Block A from the Promotions relationship map (ADR-0052).
           Each card shows the price from Pricing and the template reason; impressions and clicks go to
-          `recordRecommendationEvents`."
+          `recordRecommendationEvents`.'
       - kind: detailPanel
         label: The bundle
         bindsTo: Bundle
@@ -2936,9 +2932,9 @@ screens:
         and WEB-012 holds performanceId, so an edge into it carries them
     - to: WEB-011
       trigger: Guest Details & Attendee Forms
-      provenance: 'derived — WEB-011 declares entryState.params deviceId, itemId and WEB-012 holds none
-        of them. The edge carries nothing: WEB-012 is opened from WEB-011, so this edge is the way back
-        and WEB-011 keeps its own state'
+      provenance: 'derived — WEB-011 declares entryState.params  and WEB-012 holds none of them. The edge
+        carries nothing: WEB-012 is opened from WEB-011, so this edge is the way back and WEB-011 keeps
+        its own state'
     - to: WEB-016
       trigger: Sign in or use a guest code (when sign-in is asked at payment)
       carries:
@@ -3195,9 +3191,8 @@ screens:
         and WEB-013 holds lineId, performanceId, so an edge into it carries them
     - to: WEB-011
       trigger: Guest Details & Attendee Forms
-      provenance: 'derived — WEB-011 declares entryState.params deviceId, itemId and WEB-013 holds none
-        of them. The edge carries nothing: deviceId, itemId only pre-select (deep link or optional), and
-        WEB-011 opens on its own'
+      provenance: 'derived — WEB-011 declares entryState.params  and WEB-013 holds none of them. The edge
+        carries nothing: WEB-011 needs nothing to open'
     - to: WEB-012
       trigger: Checkout — Payment
       carries:
@@ -3311,9 +3306,9 @@ screens:
       verified: 2026-09-28
       match: exact
       view: Book → final step 'Confirmed' after paying
-      differences: "Prototype adds editing attendee details after purchase ('Change your details', signed-in
-        only) and Reissue QR. No 'unpaid — pay now' route to WEB-014. **Leave out** editing attendee details
-        after purchase and Reissue QR: no operation on this screen declares them (CHG-SGU-020)."
+      differences: 'Prototype adds editing attendee details after purchase (''Change your details'', signed-in
+        only) and Reissue QR. No ''unpaid — pay now'' route to WEB-014. **Leave out** editing attendee
+        details after purchase and Reissue QR: no operation on this screen declares them (CHG-SGU-020).'
   apisNote: Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
@@ -3577,11 +3572,11 @@ screens:
       match: partial
       view: Only when the host tweak 'waitingRoom' is on; it is not in the Config drawer lists, so a reviewer
         cannot switch it on from the page
-      differences: "Drawn but unreachable from the Config drawer. The prototype holds the place by keeping
-        the page open ('refreshing puts you at the back'); the room keeps it across a refresh, because
+      differences: 'Drawn but unreachable from the Config drawer. The prototype holds the place by keeping
+        the page open (''refreshing puts you at the back''); the room keeps it across a refresh, because
         `enterWaitingRoom` returns the same entry for the same `Idempotency-Key` (ADR-0066). **The copy
-        must not say \"refreshing puts you at the back\"**: the room keeps the place across a refresh
-        (same entry for the same Idempotency-Key, ADR-0066) (CHG-SGU-020)."
+        must not say "refreshing puts you at the back"**: the room keeps the place across a refresh (same
+        entry for the same Idempotency-Key, ADR-0066) (CHG-SGU-020).'
   apisNote: Rebuilt 1 October 2026 on the two waiting-room operations (ADR-0066). Columns are the entry's
     guest-facing fields; `pollAfterSeconds` and `admission` are plumbing the page acts on rather than
     shows.
@@ -3616,9 +3611,10 @@ screens:
     transitions:
     - to: WEB-017
       trigger: My Account Dashboard
-      provenance: 'derived — WEB-017 declares entryState.params deviceId, itemId, token and WEB-016 holds
-        none of them. The edge carries nothing: deviceId, itemId, token only pre-select (deep link or
-        optional), and WEB-017 opens on its own'
+      carries:
+      - token
+      provenance: derived — WEB-017 declares entryState.params token and WEB-016 holds token, so an edge
+        into it carries them
     - to: WEB-018
       trigger: My Tickets
       provenance: 'derived — WEB-018 declares entryState.params entitlementId, orderId and WEB-016 holds
@@ -3639,9 +3635,8 @@ screens:
         per-site guestCheckout off by default (matrix 2.6.28)
     - to: WEB-011
       trigger: Guest Details & Attendee Forms
-      provenance: 'derived — WEB-011 declares entryState.params deviceId, itemId and WEB-016 holds none
-        of them. The edge carries nothing: deviceId, itemId only pre-select (deep link or optional), and
-        WEB-011 opens on its own'
+      provenance: 'derived — WEB-011 declares entryState.params  and WEB-016 holds none of them. The edge
+        carries nothing: WEB-011 needs nothing to open'
     - to: WEB-012
       trigger: Checkout — Payment
       provenance: 'derived — WEB-012 declares entryState.params orderId, paymentId and WEB-016 holds none
@@ -4027,15 +4022,17 @@ screens:
         challengeId, subjectId, so an edge into it carries them
     - to: WEB-018
       trigger: My Tickets
-      provenance: 'derived — WEB-018 declares entryState.params entitlementId, orderId and WEB-017 holds
-        none of them. The edge carries nothing: entitlementId, orderId only pre-select (deep link or optional),
-        and WEB-018 opens on its own'
+      carries:
+      - entitlementId
+      - orderId
+      provenance: derived — WEB-018 declares entryState.params entitlementId, orderId and WEB-017 holds
+        entitlementId, orderId, so an edge into it carries them
     - to: WEB-019
       trigger: Order History
-      provenance: 'derived — WEB-019 declares entryState.params documentId, invoiceId, orderId and WEB-017
-        holds none of them. The edge carries nothing: orderId only pre-selects (deep link or optional);
-        WEB-019 finds invoiceId (listTaxInvoices) itself; WEB-019 opens on listMyOrders, and documentId
-        has no source on WEB-019 yet (a gap in WEB-019, not in this edge)'
+      carries:
+      - orderId
+      provenance: derived — WEB-019 declares entryState.params documentId, invoiceId, orderId and WEB-017
+        holds orderId, so an edge into it carries them
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
     **Drawn 26 August** — `Dashboards Board` frame `web-017`. **One board draws five dashboards across
     five platforms** — platform admin, partner, support, guest web and cross-tenant health. A dashboard
@@ -4233,14 +4230,15 @@ screens:
     transitions:
     - to: WEB-016
       trigger: Login / Register
-      provenance: 'derived — WEB-016 declares entryState.params challengeId, subjectId and WEB-018 holds
-        none of them. The edge carries nothing: WEB-016 finds challengeId (createMfaChallenge), subjectId
-        (registerGuest) itself, and WEB-016 opens on its own'
+      carries:
+      - subjectId
+      provenance: derived — WEB-016 declares entryState.params challengeId, subjectId and WEB-018 holds
+        subjectId, so an edge into it carries them
     - to: WEB-017
       trigger: My Account Dashboard
-      provenance: 'derived — WEB-017 declares entryState.params deviceId, itemId, token and WEB-018 holds
-        none of them. The edge carries nothing: deviceId, itemId, token only pre-select (deep link or
-        optional), and WEB-017 opens on its own'
+      provenance: 'derived — WEB-017 declares entryState.params token and WEB-018 holds none of them.
+        The edge carries nothing: token only pre-selects (deep link or optional), and WEB-017 opens on
+        its own'
     - to: WEB-019
       trigger: Order History
       carries:
@@ -4534,9 +4532,9 @@ screens:
         subjectId, so an edge into it carries them
     - to: WEB-017
       trigger: My Account Dashboard
-      provenance: 'derived — WEB-017 declares entryState.params deviceId, itemId, token and WEB-019 holds
-        none of them. The edge carries nothing: deviceId, itemId, token only pre-select (deep link or
-        optional), and WEB-017 opens on its own'
+      provenance: 'derived — WEB-017 declares entryState.params token and WEB-019 holds none of them.
+        The edge carries nothing: token only pre-selects (deep link or optional), and WEB-017 opens on
+        its own'
     - to: WEB-018
       trigger: My Tickets
       carries:
@@ -4798,9 +4796,9 @@ screens:
         subjectId, so an edge into it carries them
     - to: WEB-017
       trigger: My Account Dashboard
-      provenance: 'derived — WEB-017 declares entryState.params deviceId, itemId, token and WEB-020 holds
-        none of them. The edge carries nothing: deviceId, itemId, token only pre-select (deep link or
-        optional), and WEB-017 opens on its own'
+      provenance: 'derived — WEB-017 declares entryState.params token and WEB-020 holds none of them.
+        The edge carries nothing: token only pre-selects (deep link or optional), and WEB-017 opens on
+        its own'
     - to: WEB-018
       trigger: My Tickets
       provenance: 'derived — WEB-018 declares entryState.params entitlementId, orderId and WEB-020 holds
@@ -6133,9 +6131,14 @@ screens:
     transitions:
     - to: WEB-027
       trigger: Newsletter Subscription
-      provenance: 'derived — WEB-027 declares entryState.params deviceId, itemId and WEB-025 holds none
-        of them. The edge carries nothing: deviceId, itemId only pre-select (deep link or optional), and
-        WEB-027 opens on its own'
+      provenance: 'derived — WEB-027 declares entryState.params unsubscribeToken and WEB-025 holds none
+        of them. The edge carries nothing: unsubscribeToken only pre-selects (deep link or optional),
+        and WEB-027 opens on its own'
+    - to: WEB-026
+      trigger: Survey & Feedback
+      provenance: 'derived — WEB-026 declares entryState.params formId and WEB-025 holds none of them.
+        The edge carries nothing: formId only pre-selects (deep link or optional), and WEB-026 opens on
+        its own'
   notes: 'Same content the AI concierge grounds on. One source, two surfaces. Purpose derived from the
     screen name and its operations on 17 August, not from a requirement.
 
@@ -6262,6 +6265,10 @@ screens:
     dismiss:
       label: Cancel
     provenance: corrected 2 October 2026 (CHG-SGU-017, design-notes correction)
+  entryState:
+    params:
+    - name: caseId
+      from: navigation
 - id: WEB-026
   name: Survey & Feedback
   module: Engagement & Support
@@ -6285,9 +6292,9 @@ screens:
     transitions:
     - to: WEB-027
       trigger: Newsletter Subscription
-      provenance: 'derived — WEB-027 declares entryState.params deviceId, itemId and WEB-026 holds none
-        of them. The edge carries nothing: deviceId, itemId only pre-select (deep link or optional), and
-        WEB-027 opens on its own'
+      provenance: 'derived — WEB-027 declares entryState.params unsubscribeToken and WEB-026 holds none
+        of them. The edge carries nothing: unsubscribeToken only pre-selects (deep link or optional),
+        and WEB-027 opens on its own'
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
   density: compact
   pattern: configEditor
@@ -6434,6 +6441,12 @@ screens:
     - WEB-026
     - WEB-028
     inferred: true
+    transitions:
+    - to: WEB-026
+      trigger: Survey & Feedback
+      provenance: 'derived — WEB-026 declares entryState.params formId and WEB-027 holds none of them.
+        The edge carries nothing: formId only pre-selects (deep link or optional), and WEB-026 opens on
+        its own'
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
   density: compact
   pattern: listDetail
@@ -6582,9 +6595,14 @@ screens:
     transitions:
     - to: WEB-027
       trigger: Newsletter Subscription
-      provenance: 'derived — WEB-027 declares entryState.params deviceId, itemId and WEB-028 holds none
-        of them. The edge carries nothing: deviceId, itemId only pre-select (deep link or optional), and
-        WEB-027 opens on its own'
+      provenance: 'derived — WEB-027 declares entryState.params unsubscribeToken and WEB-028 holds none
+        of them. The edge carries nothing: unsubscribeToken only pre-selects (deep link or optional),
+        and WEB-027 opens on its own'
+    - to: WEB-026
+      trigger: Survey & Feedback
+      provenance: 'derived — WEB-026 declares entryState.params formId and WEB-028 holds none of them.
+        The edge carries nothing: formId only pre-selects (deep link or optional), and WEB-026 opens on
+        its own'
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
     **Contact bound 28 September** to `getTenantAppStatus.contact` (decided 28 September, audit R073 (f)).
   density: compact
@@ -6738,10 +6756,10 @@ screens:
       verified: 2026-09-28
       match: exact
       view: Footer 'Service status', or Discover → 'Service status'
-      differences: "Prototype has 'Maintenance' where YAML has 'closed'; sold-out offers 'Join the waitlist'
-        (holds a returned place for 15 minutes), which the YAML screen (getTenantAppStatus only) cannot
-        call. **Do not draw \"Join the waitlist\" on the sold-out page**: this screen calls no waitlist
-        operation; a sold-out performance waitlist belongs to the event booking screens (CHG-SGU-022)."
+      differences: 'Prototype has ''Maintenance'' where YAML has ''closed''; sold-out offers ''Join the
+        waitlist'' (holds a returned place for 15 minutes), which the YAML screen (getTenantAppStatus
+        only) cannot call. **Do not draw "Join the waitlist" on the sold-out page**: this screen calls
+        no waitlist operation; a sold-out performance waitlist belongs to the event booking screens (CHG-SGU-022).'
   apisNote: Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
@@ -7719,8 +7737,8 @@ screens:
   - id: formRaiseMyCase
     component: modal
     trigger: Raise my case
-    body: 'Raises the case (`raiseMyCase`, kind lost property) and records the lost item (`recordLostItem`,
-      foundOrLost lost, caseId) in the same act; the guest fills one form.'
+    body: Raises the case (`raiseMyCase`, kind lost property) and records the lost item (`recordLostItem`,
+      foundOrLost lost, caseId) in the same act; the guest fills one form.
     confirm:
       label: Raise my case
       operation: raiseMyCase
@@ -7839,7 +7857,8 @@ screens:
         - FxRate.fetchedAt
         - FxRate.chargeable
         operation: listFxRates
-        provenance: decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3); currency choice CHG-FIN-001
+        provenance: decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3); currency choice
+          CHG-FIN-001
         notes: 'Fixed by the screen: the venue from Home, as at now, purpose tender. A guest never chooses
           a purpose: that would let them browse internal treasury rates. Was the generated table ''Every
           FX rate''; staff and plumbing columns removed (decided by Chinmay, fix before Block A starts,
@@ -8042,14 +8061,14 @@ screens:
       - kind: banner
         label: Needs an admission ticket
         operation: createGuestFnbOrder
-        notes: "**Where the outlet is (decided by Chinmay, 2 October 2026; DEC-070, DEC-206).** An outlet
+        notes: '**Where the outlet is (decided by Chinmay, 2 October 2026; DEC-070, DEC-206).** An outlet
           is *Inside the venue (needs an admission ticket)* or *Standalone (no ticket)* (`Outlet.admissionContext`).
           Ordering from an inside-the-venue outlet needs admission: a ticket, or a location claimed inside
           the venue; `createGuestFnbOrder` refuses 403 `entry-ticket-required` otherwise, and the screen
           says so and offers the tickets. A standalone restaurant sells takeaway and delivery without
-          a ticket. **F&B keeps its own payment step and its own receipt** (DEC-071, DEC-052): DI-293's
+          a ticket. **F&B keeps its own payment step and its own receipt** (DEC-071, DEC-052): DI-293''s
           one cart and one receipt does not apply to F&B, so the food order is paid on its own pay step
-          and its receipt does not join the guest's ticket receipt (CHG-SGU-001)."
+          and its receipt does not join the guest''s ticket receipt (CHG-SGU-001).'
         provenance: corrected 2 October 2026 (CHG-SGU-001, decided by Chinmay 2 October 2026, DEC-070/071/052/206)
     - name: actionBar
       slot: rowActions
@@ -8082,8 +8101,8 @@ screens:
   states:
     loading: Content resolves in place.
     error: Could not load. **The rest of the site is unaffected.**
-    emptyFirstRun: 'No outlet takes orders here now. Names when the next one opens; a counter-only outlet''s
-      menu can still be read.'
+    emptyFirstRun: No outlet takes orders here now. Names when the next one opens; a counter-only outlet's
+      menu can still be read.
     emptyNoResults: 'No outlet open now matches: says so, with the next opening time.'
     emptyNoAccess: '**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission`
       is what a staff caller must hold; a guest call resolves to the guest''s own data; decided by Chinmay,
@@ -8167,6 +8186,8 @@ screens:
     - name: cartId
       from: session
       optional: true
+    - name: reservationId
+      from: navigation
     coldEntry: '**A guest arriving cold on a link that no longer resolves is shown what happened and one
       way onward — never a 404.** A shared link, a scanned code and a forwarded confirmation all land
       here, and the person holding it did nothing wrong. Arrives with `outletId`. **`venueId` is the venue
@@ -8257,7 +8278,7 @@ screens:
     groups.'
   density: compact
   pattern: listDetail
-  patternReason: 'One dish from the outlet''s guest menu, with its modifiers and allergens (CHG-SGU-018)'
+  patternReason: One dish from the outlet's guest menu, with its modifiers and allergens (CHG-SGU-018)
   purpose: What is in it, and what may be changed.
   layout:
     template: split
@@ -8278,10 +8299,10 @@ screens:
         - GuestMenu.sections
         operation: getGuestMenu
         provenance: corrected 2 October 2026 (CHG-SGU-018, design-notes correction)
-        notes: "The dish `menuItemId` resolved inside the outlet's `getGuestMenu`: photo, name, description,
+        notes: 'The dish `menuItemId` resolved inside the outlet''s `getGuestMenu`: photo, name, description,
           price, its modifier groups (min and max per group) and allergens. Until the guest menu carries
-          the Allergen object, \"Contains\" is drawn from the current list and \"May contain\" and the
-          diet badges (vegetarian, vegan, halal) are drawn as pending (CHG-SGU-024)."
+          the Allergen object, "Contains" is drawn from the current list and "May contain" and the diet
+          badges (vegetarian, vegan, halal) are drawn as pending (CHG-SGU-024).'
   states:
     loading: Content resolves in place.
     error: Could not load. **The rest of the site is unaffected.**
@@ -8924,11 +8945,10 @@ screens:
       verified: '2026-10-01'
       match: partial
       view: Summit Peaks → header 'At the venue' → Parking
-      differences: "Shows live free-bay counts, which the YAML says it does not have (no live availability;
-        full = soldOutForDay). Pays directly with 'Reserve and pay' rather than through cart and checkout
-        (R166). Also a plate field in the cabana/party flows. **Do not draw live free-bay counts or \"\
-        Reserve and pay\"**: no live count in the first release, and parking goes through the basket (R166)
-        (CHG-SGU-020)."
+      differences: 'Shows live free-bay counts, which the YAML says it does not have (no live availability;
+        full = soldOutForDay). Pays directly with ''Reserve and pay'' rather than through cart and checkout
+        (R166). Also a plate field in the cabana/party flows. **Do not draw live free-bay counts or "Reserve
+        and pay"**: no live count in the first release, and parking goes through the basket (R166) (CHG-SGU-020).'
   apisNote: Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
@@ -8993,6 +9013,9 @@ screens:
     - to: WEB-010
       trigger: 'Go to basket: one cart and one checkout for tickets, F&B add-ons and retail (DI-293, R236)'
       provenance: corrected 2 October 2026 (CHG-SGU-018, design-notes correction)
+      carries:
+      - cartId
+      - performanceId
   notes: '**The web could sell merchandise and could not arrange collection.** `lookupShopAndDrop` was
     app-only, which made the service half-available on the surface most guests use. **Paid online at checkout**
     (decided 28 September, audit R236): the guest adds the item to the cart for collection, checks out
@@ -9121,8 +9144,8 @@ screens:
   - id: formAddCartLine
     component: modal
     trigger: Add to basket
-    body: 'The item and quantity (a size switches between sibling items); collection point or home delivery
-      is chosen at checkout. No variant, performance or seat ids are asked.'
+    body: The item and quantity (a size switches between sibling items); collection point or home delivery
+      is chosen at checkout. No variant, performance or seat ids are asked.
     bindsTo: AddCartLineRequest
     confirm:
       label: Add to basket
@@ -9401,8 +9424,8 @@ screens:
     is on (default on), otherwise as a plain button.'
   density: compact
   pattern: statusTracker
-  patternReason: 'The conversation and its state (thinking, answered, handed to a person) are the content;
-    the menu is only a shortcut (design-notes correction ai, CHG-SGU-016)'
+  patternReason: The conversation and its state (thinking, answered, handed to a person) are the content;
+    the menu is only a shortcut (design-notes correction ai, CHG-SGU-016)
   purpose: Ask, and be answered or handed to a person.
   layout:
     template: detail
@@ -9413,10 +9436,10 @@ screens:
       - kind: assistantPanel
         label: Ask Sahli
         operation: sendAiMessage
-        notes: "**The conversation is the content.** The question shows at once and the answer streams
-          with its sources; on 503 (every provider failed) \"Sahli can't answer right now\" with Hand
-          over to a person and Try again. The conversation is opened silently (`createAiConversation`)
-          on the first message, its scope taken from the session; the guest never picks a module."
+        notes: '**The conversation is the content.** The question shows at once and the answer streams
+          with its sources; on 503 (every provider failed) "Sahli can''t answer right now" with Hand over
+          to a person and Try again. The conversation is opened silently (`createAiConversation`) on the
+          first message, its scope taken from the session; the guest never picks a module.'
         provenance: corrected 2 October 2026 (CHG-SGU-016, design-notes correction)
       - kind: textField
         label: Your question

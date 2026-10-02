@@ -129,11 +129,12 @@ def main() -> int:
     total_ops = len(audience_of)
     doc = {
         "generated": __import__("datetime").date.today().isoformat(),
-        "note": ("Derived from `x-ticvai-audience` on every operation. **One field, five values** — "
+        "note": ("Derived from `x-ticvai-audience` on every operation. **One field, eight values** — "
                  "`x-ticvai-guest-callable` and `x-ticvai-auth` were two vocabularies answering the "
                  "same question differently and were collapsed on 18 August (ADR-0025)."),
         "field": "x-ticvai-audience",
-        "values": ["staff", "guest", "anonymous", "device", "service"],
+        # The closed set check-package enforces (ADR-0025; `prospect` added 2 October, CHG-GTB-001).
+        "values": ["staff", "guest", "partner", "public", "anonymous", "device", "service", "prospect"],
         "platformAudience": platforms,
         "totals": {"operations": total_ops, "screens": len(screens), "flows": len(flows)},
         "audiences": out,

@@ -90,6 +90,15 @@
    }
   }
  },
+ "DeviceApprovalStatus": {
+  "type": "string",
+  "description": "Whether a registered device may go into production (DEC-241, DEC-245; CHG-CSP-011). The model is `states/registered-device-approval.yaml`.\n",
+  "enum": [
+   "pendingApproval",
+   "approved",
+   "rejected"
+  ]
+ },
  "DeviceAssignment": {
   "type": "object",
   "x-ticvai-persistence": "tenancy.device_assignment",
@@ -196,6 +205,29 @@
     "type": "string",
     "nullable": true,
     "description": "**Recorded on the `tenancy.device_audit` row, not on the device.** Required in practice for `deactivated` and `retired`, where an investigation six months later needs to know why a gate stopped working.\n"
+   },
+   "enrolmentCode": {
+    "type": "string",
+    "nullable": true,
+    "maxLength": 12,
+    "writeOnly": true,
+    "description": "**The one-time code `registerDevice` issued, as the device presents it** (DEC-241; CHG-CSP-011). Needed on the move to `enrolled`; a wrong or expired code is `422 enrolment-code-invalid`, and the code is spent on success.\n"
+   },
+   "testResult": {
+    "type": "object",
+    "nullable": true,
+    "description": "**The acceptance test, recorded on the move to `provisioned`** (DEC-245; CHG-CSP-011). The caller is recorded as `RegisteredDevice.testedByPrincipalId` and may not approve the device.\n",
+    "properties": {
+     "passed": {
+      "type": "boolean",
+      "description": "Whether the device passed; always sent with `testResult` (422 otherwise)."
+     },
+     "notes": {
+      "type": "string",
+      "maxLength": 1000,
+      "nullable": true
+     }
+    }
    }
   }
  },
@@ -863,6 +895,50 @@
     "nullable": true,
     "readOnly": true,
     "description": "**The profile this device was provisioned with.** `enrolDevice` has accepted one since 16.1.3 and there was nowhere to keep it, so the answer to *\"what is this reader configured as\"* lived only in the request that set it.\n"
+   },
+   "approvalStatus": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/DeviceApprovalStatus"
+     }
+    ],
+    "default": "pendingApproval",
+    "readOnly": true,
+    "description": "**A new device waits for approval before it may go live** (decided 2 October 2026, Chinmay, critical set 1, BO-196: \"Secure enrolment code + pending approval\"; DEC-241; CHG-CSP-011; MoM 15 September, DI-892, DI-906). Every device registers `pendingApproval`. It may enrol and be provisioned and tested, but `enrolDevice` refuses `active` until `approveDevice` approves it (`409 device-approval-required`). A separate axis from `enrolmentState`, which keeps its r1 values; the model is `states/registered-device-approval.yaml`.\n"
+   },
+   "enrolmentCode": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "maxLength": 12,
+    "description": "**A one-time code the device must present to enrol** (DEC-241; CHG-CSP-011). Issued by `registerDevice` and returned once, in its response only; every later read returns null. The installer enters it on the device, and `enrolDevice` to `enrolled` must carry the same code before `enrolmentCodeExpiresAt` (`422 enrolment-code-invalid`). A device that never presents it never gets an identity, so a box plugged into the venue network cannot claim to be a reader.\n"
+   },
+   "enrolmentCodeExpiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "When the enrolment code stops working (24 hours after registration, proposed; client to correct)."
+   },
+   "testedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "Who recorded the device's acceptance test (`DeviceEnrolment.testResult` on the move to `provisioned`). The approver must be someone else (DEC-245).\n"
+   },
+   "approvedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**Who approved the device into production, never the person who tested it** (decided 2 October 2026, Chinmay, critical set 1, BO-203: \"Approver must differ from the tester\"; DEC-245; CHG-CSP-011). `approveDevice` refuses the tester with `403 approver-is-tester`.\n"
+   },
+   "approvedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
    }
   }
  },

@@ -669,57 +669,6 @@
    }
   ]
  },
- "BundleSummary": {
-  "x-ticvai-persistence": "none — projection over bundle",
-  "type": "object",
-  "description": "One published catalogue bundle — the signed snapshot terminals pull (ADR-0013). Not `promotions.Bundle`, which is a sellable product made of other products.",
-  "required": [
-   "version",
-   "venueId",
-   "publishedAt",
-   "publishedBy",
-   "contentHash",
-   "staleAfter",
-   "sizeBytes"
-  ],
-  "properties": {
-   "version": {
-    "type": "string"
-   },
-   "venueId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "publishedAt": {
-    "type": "string",
-    "format": "date-time"
-   },
-   "publishedBy": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "contentHash": {
-    "type": "string"
-   },
-   "signatureKeyId": {
-    "type": "string",
-    "description": "Key that signed this bundle. A terminal offline across a key rotation needs a grace window, or it cannot verify the next bundle.\n"
-   },
-   "staleAfter": {
-    "type": "string",
-    "format": "date-time"
-   },
-   "sizeBytes": {
-    "type": "integer"
-   },
-   "note": {
-    "type": "string"
-   },
-   "appliedByWorkstations": {
-    "type": "integer"
-   }
-  }
- },
  "Cart": {
   "type": "object",
   "x-ticvai-persistence": "orders.cart",

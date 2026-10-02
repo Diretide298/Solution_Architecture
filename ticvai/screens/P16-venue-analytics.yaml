@@ -4390,6 +4390,8 @@ screens:
     params:
     - name: dashboardId
       from: navigation
+    - name: reportId
+      from: navigation
   notes: '**The nine new marks bind** (decided 2 October 2026, Chinmay; CHG-FIN-007). The canvas offers
     all twenty marks of `DashboardTile.visualisation` and, for each, field wells filled from the report''s
     columns (`ReportColumn.role`, `encoding`, `axis`, `seriesType`, `hierarchyLevel`, `unitLabel`): combo
@@ -7404,6 +7406,10 @@ screens:
       - effectiveTo
     provenance: contract identity.yaml PUT /authorisation-policies/{policyId}
   permission: PERMISSION_VIEW
+  entryState:
+    params:
+    - name: policyId
+      from: navigation
 - id: ANL-048
   name: Delivery Monitoring & Failure Management
   module: Analytics
@@ -10864,8 +10870,8 @@ screens:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-072
     workshopBoard: wireframes/WS163 TICVAI Finance Backend Structure Reference v1.0 Board 1.dc.html#bo-1081
-    note: The client's workshop frame for this dashboard is the one drawn for BO-1081 (the same pack, board 1, number
-      1), whose content ANL-072 carries since DEC-219 (CHG-SOT-008; CHG-GTB-006).
+    note: The client's workshop frame for this dashboard is the one drawn for BO-1081 (the same pack,
+      board 1, number 1), whose content ANL-072 carries since DEC-219 (CHG-SOT-008; CHG-GTB-006).
   notes: '**Issued 2 October 2026 (CHG-SOT-008, DEC-219).** The Finance standard dashboard of the one
     reporting area (DI-721), carrying DI-260''s content from BO-1081, which becomes a link card on Orders
     & Money (P08, the back-office agent''s change). The design notes of BO-1081 (finance-insights) apply

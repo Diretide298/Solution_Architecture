@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Promotions & Bundles
   version: 0.1.0
-  x-ticvai-screen-count: 144
+  x-ticvai-screen-count: 134
   x-ticvai-tier: satellite
   x-ticvai-module: 4 — Bundles and Promotions
   x-ticvai-requirements: 229
@@ -85,6 +85,8 @@ paths:
     post:
       operationId: simulatePromotion
       x-ticvai-consumed-by:
+        - "P08 ADM-157 Rule Test, Simulation & AI Recommendation Workspace"
+        - "P08 ADM-177 Offer Simulation, Basket Trace & AI Optimization"
         - "P08 BO-010 Promotions & Coupons"
       summary: What this promotion would have cost on real history
       description: 'BL-114. **A promotion is priced by guessing until it runs.** Run it against a past
@@ -157,6 +159,7 @@ paths:
     put:
       operationId: setPromotionVariants
       x-ticvai-consumed-by:
+        - "P08 ADM-226 Campaign Experiment & A/B Test Manager"
         - "P08 BO-010 Promotions & Coupons"
       summary: A/B test two versions against each other
       description: 'BL-114. **Split by a stable hash of the subject, not at random per request** — a guest
@@ -227,6 +230,9 @@ paths:
   /recommendations:
     post:
       operationId: getRecommendations
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       summary: What else this guest might want
       description: '**A channel adapter of the one recommendation engine** (ADR-0052, accepted 1 October). This operation stays as the guest browse surface, with its path, id and response shape. **Block A**: the promotions module answers it from the relationship map (rules; strategy, relationships, business priority and suppression are configured in promotions). **Block B**: it forwards to the engine in `ticvai-ai` (ai `decideRecommendations`, placement `surface`) with no contract change, under a hard 200 ms budget and failing open to the rules answer, so checkout never waits on it. New screens may bind either; the deprecation of 29 September is withdrawn.
         The text below describes the behaviour both producers carry.
@@ -374,11 +380,16 @@ paths:
         - "P02 GST-036 Loyalty & Rewards"
         - "P02 GST-037 Offers & Promotions"
         - "P04 POS-002 Sell — Ticket Catalogue"
+        - "P08 ADM-138 Promotion Command Center Dashboard"
+        - "P08 ADM-145 Promotion Approval Inbox"
         - "P08 BO-010 Promotions & Coupons"
-        - "P09 ADM-138 Promotion Command Center Dashboard"
-        - "P09 ADM-140 Promotion Overview"
-        - "P09 ADM-145 Promotion Approval Inbox"
         - "P10 PTR-010 Cart & Quote"
+      # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
+      # or staff token is still accepted. `{}` makes the credential optional.
+      security:
+      - {}
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-api-scope: ticketing.read
       x-ticvai-audience:
       - staff
@@ -515,8 +526,15 @@ paths:
         - "P01 WEB-032 Offers & Promotions"
         - "P02 GST-037 Offers & Promotions"
         - "P04 POS-002 Sell — Ticket Catalogue"
+        - "P08 ADM-140 Promotion Overview"
         - "P08 BO-010 Promotions & Coupons"
         - "P10 PTR-010 Cart & Quote"
+      # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
+      # or staff token is still accepted. `{}` makes the credential optional.
+      security:
+      - {}
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-api-scope: ticketing.read
       x-ticvai-audience:
       - staff
@@ -626,6 +644,7 @@ paths:
     post:
       operationId: pausePromotion
       x-ticvai-consumed-by:
+        - "P08 ADM-141 Promotion Lifecycle & Status Manager"
         - "P08 BO-010 Promotions & Coupons"
       x-ticvai-api-scope: ticketing.write
       x-ticvai-audience:
@@ -683,6 +702,7 @@ paths:
     post:
       operationId: endPromotion
       x-ticvai-consumed-by:
+        - "P08 ADM-141 Promotion Lifecycle & Status Manager"
         - "P08 BO-010 Promotions & Coupons"
       x-ticvai-api-scope: ticketing.write
       x-ticvai-audience:
@@ -741,6 +761,7 @@ paths:
     post:
       operationId: unschedulePromotion
       x-ticvai-consumed-by:
+        - "P08 ADM-141 Promotion Lifecycle & Status Manager"
         - "P08 BO-010 Promotions & Coupons"
       x-ticvai-api-scope: ticketing.write
       x-ticvai-audience:
@@ -787,6 +808,7 @@ paths:
     post:
       operationId: publishPromotion
       x-ticvai-consumed-by:
+        - "P08 ADM-141 Promotion Lifecycle & Status Manager"
         - "P08 BO-010 Promotions & Coupons"
       x-ticvai-api-scope: ticketing.write
       x-ticvai-audience:
@@ -849,7 +871,6 @@ paths:
       x-ticvai-consumed-by:
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P08 BO-010 Promotions & Coupons"
-        - "P10 PTR-010 Cart & Quote"
       x-ticvai-api-scope: ticketing.read
       x-ticvai-audience:
       - staff
@@ -893,8 +914,9 @@ paths:
       operationId: getPromotionUsage
       x-ticvai-consumed-by:
         - "P04 POS-002 Sell — Ticket Catalogue"
+        - "P08 ADM-138 Promotion Command Center Dashboard"
+        - "P08 ADM-140 Promotion Overview"
         - "P08 BO-010 Promotions & Coupons"
-        - "P09 ADM-138 Promotion Command Center Dashboard"
         - "P10 PTR-010 Cart & Quote"
       x-ticvai-api-scope: ticketing.read
       x-ticvai-audience:
@@ -929,6 +951,7 @@ paths:
     get:
       operationId: listCouponCampaigns
       x-ticvai-consumed-by:
+        - "P08 ADM-159 Coupon & Promo Code Builder"
         - "P08 BO-010 Promotions & Coupons"
       x-ticvai-audience:
       - staff
@@ -1012,8 +1035,9 @@ paths:
     get:
       operationId: listCouponCodes
       x-ticvai-consumed-by:
+        - "P08 ADM-158 Coupon & Promo Code Command Center"
+        - "P08 ADM-164 Code Distribution & Assignment Manager"
         - "P08 BO-010 Promotions & Coupons"
-        - "P09 ADM-158 Coupon & Promo Code Command Center"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -1056,6 +1080,7 @@ paths:
     post:
       operationId: generateCouponCodes
       x-ticvai-consumed-by:
+        - "P08 ADM-160 Unique Code Generation & Batch Manager"
         - "P08 BO-010 Promotions & Coupons"
       x-ticvai-audience:
       - staff
@@ -1161,6 +1186,8 @@ paths:
         format: uuid
     get:
       operationId: getCouponCodeBatch
+      x-ticvai-consumed-by:
+        - "P08 ADM-160 Unique Code Generation & Batch Manager"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: primary
@@ -1200,6 +1227,9 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-010 Shopping Cart"
         - "P02 GST-037 Offers & Promotions"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-audience:
       - staff
       - guest
@@ -1593,6 +1623,15 @@ paths:
         - "P01 WEB-008 Add-ons & Upsell"
         - "P02 GST-004 Item Detail"
         - "P02 GST-056 Bundle Package"
+        - "P08 ADM-180 Bundle Component Builder"
+        - "P08 ADM-181 Guest Choice & Build-Your-Own Bundle Designer"
+        - "P08 ADM-187 Bundle Preview, Simulation & AI Recommendation"
+      # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
+      # or staff token is still accepted. `{}` makes the credential optional.
+      security:
+      - {}
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-audience:
       - staff
       - guest
@@ -1791,6 +1830,7 @@ paths:
       operationId: listUpsellRules
       x-ticvai-consumed-by:
         - "P08 BO-102 Sell"
+        - "P08 BO-119 Cross-Sell, Upsell & Recommendation Rules"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -1911,6 +1951,9 @@ paths:
   /upsell-suggestions:
     post:
       operationId: getUpsellSuggestions
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-audience:
       - staff
       - guest
@@ -1987,8 +2030,13 @@ paths:
         - "P04 POS-021 Sell — Food & Drink"
         - "P04 POS-023 Sell — Merchandise"
         - "P05 KSK-006 Review"
+        - "P08 ADM-157 Rule Test, Simulation & AI Recommendation Workspace"
+        - "P08 ADM-177 Offer Simulation, Basket Trace & AI Optimization"
         - "P08 BO-010 Promotions & Coupons"
         - "P10 PTR-010 Cart & Quote"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-api-scope: ticketing.write
       x-ticvai-audience:
       - staff
@@ -2045,8 +2093,8 @@ paths:
     get:
       operationId: listPromotionCampaign
       x-ticvai-consumed-by:
-        - "P09 ADM-139 Promotion & Campaign Directory"
-        - "P09 ADM-229 Campaign & Promotion Performance Explorer"
+        - "P08 ADM-139 Promotion & Campaign Directory"
+        - "P08 ADM-229 Campaign & Promotion Performance Explorer"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.8; no promotions minutes on file (the 3 September walkthrough was not minuted), so our build plan; shape fixed (19 filters to query parameters; 12 non-field properties removed)'
@@ -2211,7 +2259,7 @@ paths:
     get:
       operationId: listPromotionLifecycleStatus
       x-ticvai-consumed-by:
-        - "P09 ADM-141 Promotion Lifecycle & Status Manager"
+        - "P08 ADM-141 Promotion Lifecycle & Status Manager"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.11; no promotions minutes on file (the 3 September walkthrough was not minuted), so our build plan; shape fixed (2 non-field properties removed; enums failedActivationChecks, suspensionReason; added promotionId, promotionName, status, lifecycleStage)'
@@ -2259,8 +2307,8 @@ paths:
     get:
       operationId: listCampaignCalendarTimeline
       x-ticvai-consumed-by:
+        - "P08 ADM-142 Campaign Calendar & Timeline"
         - "P08 BO-765 Campaign Library & Calendar"
-        - "P09 ADM-142 Campaign Calendar & Timeline"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.12; no promotions minutes on file (the 3 September walkthrough was not minuted), so our build plan; shape fixed (7 filters to query parameters; 13 non-field properties removed; enums calendarState; added promotionId, promotionName, startDate, endDate, venue, channel)'
@@ -2358,7 +2406,7 @@ paths:
     get:
       operationId: listPromotionChannel
       x-ticvai-consumed-by:
-        - "P09 ADM-143 Promotion Channel & Publication Monitor"
+        - "P08 ADM-143 Promotion Channel & Publication Monitor"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.13; no promotions minutes on file (the 3 September walkthrough was not minuted), so our build plan; shape fixed (2 non-field properties removed; enums publicationStatus)'
@@ -2404,7 +2452,7 @@ paths:
     get:
       operationId: listPromotionAlertException
       x-ticvai-consumed-by:
-        - "P09 ADM-144 Promotion Alerts & Exception Center"
+        - "P08 ADM-144 Promotion Alerts & Exception Center"
         - "P16 ANL-018 Alerts & Exception Center"
       x-ticvai-audience:
         - staff
@@ -2447,8 +2495,8 @@ paths:
     get:
       operationId: listPromotionHealthPerformance
       x-ticvai-consumed-by:
-        - "P09 ADM-146 Promotion Health & Performance Monitor"
-        - "P09 ADM-228 Promotion Performance Command Center"
+        - "P08 ADM-146 Promotion Health & Performance Monitor"
+        - "P08 ADM-228 Promotion Performance Command Center"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -2491,7 +2539,7 @@ paths:
     get:
       operationId: listPromotionActivityVersion
       x-ticvai-consumed-by:
-        - "P09 ADM-147 Promotion Audit, Activity & Version History"
+        - "P08 ADM-147 Promotion Audit, Activity & Version History"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.17; no promotions minutes on file (the 3 September walkthrough was not minuted), so our build plan; shape fixed (2 filters to query parameters; 14 non-field properties removed; enums eventType; added promotionId)'
@@ -2548,64 +2596,11 @@ paths:
                   $ref: '#/components/schemas/PromotionAuditActivityVersionHistoryView'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
-  /promotion-rule:
-    put:
-      operationId: setPromotionRule
-      x-ticvai-consumed-by:
-        - "P09 ADM-148 Promotion Rule Builder"
-        - "P09 ADM-210 Promotion Stacking Rule Builder"
-      x-ticvai-audience:
-        - staff
-      x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.22; no promotions minutes on file (the 3 September walkthrough was not minuted), so our build plan; shape fixed (1 non-field properties removed)'
-      summary: Promotion Rule Builder
-      description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
-        Promotions   Bundles Management, page 22. The screen says: Provide the main no-code workspace
-        for creating the commercial logic behind a promotion.
-
-
-        **Every property carries the sentence it came from.** 21 were read from the screen''s own bulleted
-        directory and 11 bullets were dropped as prose, examples or hierarchy illustrations rather than
-        bent into fields. Names and types are this package''s reading of those sentences and are the part
-        to check; the sentences themselves are the client''s.
-
-
-        **Agreed 29 September (decided 29 September, readiness close-out).** Checked against the
-        pack page and the minutes: no promotions minutes on file (the 3 September walkthrough was
-        not minuted), so our build plan. Shape: 1 properties removed that were filters, actions,
-        behaviour, roles, examples or prose fragments rather than fields.'
-      tags:
-        - drafted
-      x-ticvai-permission: PRICE_CONFIGURE
-      x-ticvai-scope-level: venue
-      x-ticvai-config-scope: venue
-      x-ticvai-offline-capable: false
-      x-ticvai-conflict-policy: serverWins
-      x-ticvai-read-routing: primary
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/PromotionRuleBuilderInput'
-      parameters:
-        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
-      responses:
-        '200':
-          headers:
-            X-Consistency-Token:
-              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
-          description: Promotion Rule Builder
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PromotionRuleBuilderView'
-        '429':
-          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /percentage-fixed-discount:
     get:
       operationId: listPercentageFixedDiscount
       x-ticvai-consumed-by:
-        - "P09 ADM-149 Percentage & Fixed Discount Configurator"
+        - "P08 ADM-149 Percentage & Fixed Discount Configurator"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.24; no promotions minutes on file (the 3 September walkthrough was not minuted), so our build plan; shape fixed (5 non-field properties removed; enums priceBasis)'
@@ -2654,7 +2649,7 @@ paths:
     get:
       operationId: listCartTransactionThreshold
       x-ticvai-consumed-by:
-        - "P09 ADM-150 Cart & Transaction Threshold Rules"
+        - "P08 ADM-150 Cart & Transaction Threshold Rules"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.25; no promotions minutes on file (the 3 September walkthrough was not minuted), so our build plan; shape fixed (4 non-field properties removed)'
@@ -2697,7 +2692,7 @@ paths:
     get:
       operationId: listVolumeBulkTier
       x-ticvai-consumed-by:
-        - "P09 ADM-151 Volume, Bulk & Tier Discount Configurator"
+        - "P08 ADM-151 Volume, Bulk & Tier Discount Configurator"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.26; no promotions minutes on file (the 3 September walkthrough was not minuted), so our build plan; shape fixed (2 non-field properties removed)'
@@ -2740,7 +2735,7 @@ paths:
     get:
       operationId: listTimeBasedSeasonal
       x-ticvai-consumed-by:
-        - "P09 ADM-152 Time-Based & Seasonal Discount Rules"
+        - "P08 ADM-152 Time-Based & Seasonal Discount Rules"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.27; no promotions minutes on file (the 3 September walkthrough was not minuted), so our build plan; shape fixed (enums seasonType)'
@@ -2782,7 +2777,7 @@ paths:
     get:
       operationId: listCustomerMembershipSegment
       x-ticvai-consumed-by:
-        - "P09 ADM-153 Customer, Membership & Segment Discount Rules"
+        - "P08 ADM-153 Customer, Membership & Segment Discount Rules"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -2825,7 +2820,7 @@ paths:
     get:
       operationId: listPaymentMethodBank
       x-ticvai-consumed-by:
-        - "P09 ADM-154 Payment Method, Bank & Partner Discount Rules"
+        - "P08 ADM-154 Payment Method, Bank & Partner Discount Rules"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.29; MoM 9 Sep (discounts apply on the cart, never the payment screen); shape fixed (enums paymentConditions, partnerType)'
@@ -2872,7 +2867,7 @@ paths:
     get:
       operationId: listSpecialPriceGuest
       x-ticvai-consumed-by:
-        - "P09 ADM-155 Special Price & Guest Offer Configurator"
+        - "P08 ADM-155 Special Price & Guest Offer Configurator"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.30; no promotions minutes on file (the 3 September walkthrough was not minuted), so our build plan; shape fixed (5 non-field properties removed)'
@@ -2914,7 +2909,7 @@ paths:
     get:
       operationId: listDiscountLimitGuardrail
       x-ticvai-consumed-by:
-        - "P09 ADM-156 Discount Limits, Guardrails & Commercial Controls"
+        - "P08 ADM-156 Discount Limits, Guardrails & Commercial Controls"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.31; audit R096 (5); shape fixed (5 non-field properties removed)'
@@ -2954,8 +2949,6 @@ paths:
   /rule-test-recommendation:
     put:
       operationId: setRuleTestRecommendation
-      x-ticvai-consumed-by:
-        - "P09 ADM-157 Rule Test, Simulation & AI Recommendation Workspace"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.32; MoM 14 Aug (phase-one AI is a configuration assistant); shape fixed (26 non-field properties removed; added appliedRules, rejectedRules, discount, finalAmount, marginImpact, aiRecommendation)'
@@ -3006,64 +2999,11 @@ paths:
                 $ref: '#/components/schemas/RuleTestSimulationAiRecommendationWorkspaceView'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
-  /coupon-promo-code:
-    put:
-      operationId: setCouponPromoCode
-      x-ticvai-consumed-by:
-        - "P09 ADM-159 Coupon & Promo Code Builder"
-      x-ticvai-audience:
-        - staff
-      x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.37; MoM 7 Aug 17 (shared codes and batches of unique single-use codes); shape fixed (1 non-field properties removed; enums codeType, benefitType; added benefitValue, campaign, code, maximumDiscount, eligibleProducts, channels, validFrom, validTo)'
-      summary: Coupon & Promo Code Builder
-      description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
-        Promotions   Bundles Management, page 37. The screen says: Create the commercial definition of
-        a coupon or promo-code campaign.
-
-
-        **Every property carries the sentence it came from.** 20 were read from the screen''s own bulleted
-        directory and 3 bullets were dropped as prose, examples or hierarchy illustrations rather than
-        bent into fields. Names and types are this package''s reading of those sentences and are the part
-        to check; the sentences themselves are the client''s.
-
-
-        **Agreed 29 September (decided 29 September, readiness close-out).** Checked against the
-        pack page and the minutes: MoM 7 Aug 17 (shared codes and batches of unique single-use
-        codes). Shape: 1 properties removed that were filters, actions, behaviour, roles, examples
-        or prose fragments rather than fields; 19 one-value-per-field properties folded into enums
-        (codeType, benefitType); added benefitValue, campaign, code, maximumDiscount,
-        eligibleProducts, channels, validFrom, validTo.'
-      tags:
-        - drafted
-      x-ticvai-permission: PRICE_CONFIGURE
-      x-ticvai-scope-level: venue
-      x-ticvai-offline-capable: false
-      x-ticvai-conflict-policy: serverWins
-      x-ticvai-read-routing: primary
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CouponPromoCodeBuilderInput'
-      parameters:
-        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
-      responses:
-        '200':
-          headers:
-            X-Consistency-Token:
-              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
-          description: Coupon & Promo Code Builder
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/CouponPromoCodeBuilderView'
-        '429':
-          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /unique-code-generation:
     get:
       operationId: listUniqueCodeGeneration
       x-ticvai-consumed-by:
-        - "P09 ADM-160 Unique Code Generation & Batch Manager"
+        - "P08 ADM-160 Unique Code Generation & Batch Manager"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.38; MoM 7 Aug 17 (batches of unique single-use codes); shape fixed (2 non-field properties removed)'
@@ -3105,7 +3045,7 @@ paths:
     get:
       operationId: listCodeEligibilityRestriction
       x-ticvai-consumed-by:
-        - "P09 ADM-161 Code Eligibility & Restriction Manager"
+        - "P08 ADM-161 Code Eligibility & Restriction Manager"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.39; no promotions minutes on file (the 3 September walkthrough was not minuted), so our build plan; shape fixed (1 non-field properties removed; enums productScopes, customerScopes, channels)'
@@ -3150,7 +3090,7 @@ paths:
     get:
       operationId: listUsageCapacityFrequency
       x-ticvai-consumed-by:
-        - "P09 ADM-162 Usage, Capacity & Frequency Control"
+        - "P08 ADM-162 Usage, Capacity & Frequency Control"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -3197,7 +3137,7 @@ paths:
     get:
       operationId: listValidityDateTime
       x-ticvai-consumed-by:
-        - "P09 ADM-163 Validity, Date & Time Control"
+        - "P08 ADM-163 Validity, Date & Time Control"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.41; no promotions minutes on file (the 3 September walkthrough was not minuted), so our build plan; shape fixed (3 non-field properties removed)'
@@ -3239,7 +3179,7 @@ paths:
     put:
       operationId: setCodeDistributionManager
       x-ticvai-consumed-by:
-        - "P09 ADM-164 Code Distribution & Assignment Manager"
+        - "P08 ADM-164 Code Distribution & Assignment Manager"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.42; no promotions minutes on file (the 3 September walkthrough was not minuted), so our build plan; shape fixed (6 non-field properties removed; enums assigneeType; added batchId, partner)'
@@ -3296,7 +3236,7 @@ paths:
     get:
       operationId: listRedemptionCodeLookup
       x-ticvai-consumed-by:
-        - "P09 ADM-165 Redemption Monitor & Code Lookup"
+        - "P08 ADM-165 Redemption Monitor & Code Lookup"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.43; no promotions minutes on file (the 3 September walkthrough was not minuted), so our build plan; shape fixed (9 filters to query parameters; 21 non-field properties removed; added validationResult)'
@@ -3396,7 +3336,7 @@ paths:
     get:
       operationId: listCodeSecurityFraud
       x-ticvai-consumed-by:
-        - "P09 ADM-166 Code Security, Fraud & Exception Center"
+        - "P08 ADM-166 Code Security, Fraud & Exception Center"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -3444,8 +3384,7 @@ paths:
     get:
       operationId: listRedemption
       x-ticvai-consumed-by:
-        - "P08 BO-444 Redemption Operations Dashboard"
-        - "P09 ADM-167 Redemption Analytics, Audit & AI Optimization"
+        - "P08 ADM-167 Redemption Analytics, Audit & AI Optimization"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.45; no promotions minutes on file (the 3 September walkthrough was not minuted), so our build plan; shape fixed (10 non-field properties removed; enums auditEvent)'
@@ -3538,7 +3477,7 @@ paths:
     get:
       operationId: listAdvancedOffer
       x-ticvai-consumed-by:
-        - "P09 ADM-168 Advanced Offer Command Center"
+        - "P08 ADM-168 Advanced Offer Command Center"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.50; MoM 7 Aug 17 and MoM 1 Sep 4.7 (automatic rule-based offers such as buy-2-get-1, BOGO); shape fixed (4 filters to query parameters)'
@@ -3650,61 +3589,11 @@ paths:
                   $ref: '#/components/schemas/AdvancedOfferCommandCenterView'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
-  /buy-get-bogo:
-    put:
-      operationId: setBuyGetBogo
-      x-ticvai-consumed-by:
-        - "P09 ADM-169 Buy X Get Y / BOGO Rule Builder"
-      x-ticvai-audience:
-        - staff
-      x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.52; MoM 1 Sep 4.7 (BOGO and ''buy 2, get the 3rd free''); shape agreed as drafted'
-      summary: Buy X Get Y / BOGO Rule Builder
-      description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
-        Promotions   Bundles Management, page 52. The screen says: Configure the fundamental qualifier
-        → reward relationship.
-
-
-        **Every property carries the sentence it came from.** 15 were read from the screen''s own bulleted
-        directory and 10 bullets were dropped as prose, examples or hierarchy illustrations rather than
-        bent into fields. Names and types are this package''s reading of those sentences and are the part
-        to check; the sentences themselves are the client''s.
-
-
-        **Agreed 29 September (decided 29 September, readiness close-out).** Checked against the
-        pack page and the minutes: MoM 1 Sep 4.7 (BOGO and ''buy 2, get the 3rd free''). Shape:
-        agreed as drafted.'
-      tags:
-        - drafted
-      x-ticvai-permission: PRICE_CONFIGURE
-      x-ticvai-scope-level: venue
-      x-ticvai-offline-capable: false
-      x-ticvai-conflict-policy: serverWins
-      x-ticvai-read-routing: primary
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/BuyXGetYBogoRuleBuilderInput'
-      parameters:
-        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
-      responses:
-        '200':
-          headers:
-            X-Consistency-Token:
-              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
-          description: Buy X Get Y / BOGO Rule Builder
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BuyXGetYBogoRuleBuilderView'
-        '429':
-          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /multi-buy-quantity:
     get:
       operationId: listMultiBuyQuantity
       x-ticvai-consumed-by:
-        - "P09 ADM-170 Multi-Buy & Quantity Offer Configurator"
+        - "P08 ADM-170 Multi-Buy & Quantity Offer Configurator"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.53; MoM 1 Sep 4.7; shape agreed as drafted'
@@ -3745,7 +3634,7 @@ paths:
     get:
       operationId: listCheapestLowestValue
       x-ticvai-consumed-by:
-        - "P09 ADM-171 Cheapest / Lowest-Value Item Promotion"
+        - "P08 ADM-171 Cheapest / Lowest-Value Item Promotion"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.53; no promotions minutes on file (the 3 September walkthrough was not minuted), so our build plan; shape fixed (3 non-field properties removed)'
@@ -3785,167 +3674,11 @@ paths:
                   $ref: '#/components/schemas/CheapestLowestValueItemPromotionView'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
-  /fixed-price-offer:
-    put:
-      operationId: setFixedPriceOffer
-      x-ticvai-consumed-by:
-        - "P09 ADM-172 Fixed-Price & “N for X” Offer Builder"
-      x-ticvai-audience:
-        - staff
-      x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.54; no promotions minutes on file (the 3 September walkthrough was not minuted), so our build plan; shape fixed (6 non-field properties removed)'
-      summary: Fixed-Price & “N for X” Offer Builder
-      description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
-        Promotions   Bundles Management, page 54. The screen says: Configure promotions where a qualifying
-        collection of products is sold for a fixed promotional total.
-
-
-        **Every property carries the sentence it came from.** 14 were read from the screen''s own bulleted
-        directory and 7 bullets were dropped as prose, examples or hierarchy illustrations rather than
-        bent into fields. Names and types are this package''s reading of those sentences and are the part
-        to check; the sentences themselves are the client''s.
-
-
-        **Agreed 29 September (decided 29 September, readiness close-out).** Checked against the
-        pack page and the minutes: no promotions minutes on file (the 3 September walkthrough was
-        not minuted), so our build plan. Shape: 6 properties removed that were filters, actions,
-        behaviour, roles, examples or prose fragments rather than fields.
-
-
-        The fixed promotional price is allocated back across the qualifying lines, and that
-        allocation is what refunds, tax, revenue recognition, partner settlement and reporting use.'
-      tags:
-        - drafted
-      x-ticvai-permission: PRICE_CONFIGURE
-      x-ticvai-scope-level: venue
-      x-ticvai-offline-capable: false
-      x-ticvai-conflict-policy: serverWins
-      x-ticvai-read-routing: primary
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/FixedPriceNForXOfferBuilderInput'
-      parameters:
-        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
-      responses:
-        '200':
-          headers:
-            X-Consistency-Token:
-              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
-          description: Fixed-Price & “N for X” Offer Builder
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/FixedPriceNForXOfferBuilderView'
-        '429':
-          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
-  /gift-free-product:
-    put:
-      operationId: setGiftFreeProduct
-      x-ticvai-consumed-by:
-        - "P09 ADM-173 Gift, Free Product & Added-Value Offer Builder"
-      x-ticvai-audience:
-        - staff
-      x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.55; no promotions minutes on file (the 3 September walkthrough was not minuted), so our build plan; shape agreed as drafted'
-      summary: Gift, Free Product & Added-Value Offer Builder
-      description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
-        Promotions   Bundles Management, page 55. The screen says: Configure promotions where a purchase
-        generates an additional entitlement rather than simply reducing price. The matrix explicitly provides
-        the example: “Buy for more than 200 AED and get a free pencil.”
-
-
-        **Every property carries the sentence it came from.** 15 were read from the screen''s own bulleted
-        directory and 7 bullets were dropped as prose, examples or hierarchy illustrations rather than
-        bent into fields. Names and types are this package''s reading of those sentences and are the part
-        to check; the sentences themselves are the client''s.
-
-
-        **Agreed 29 September (decided 29 September, readiness close-out).** Checked against the
-        pack page and the minutes: no promotions minutes on file (the 3 September walkthrough was
-        not minuted), so our build plan. Shape: agreed as drafted.'
-      tags:
-        - drafted
-      x-ticvai-permission: PRICE_CONFIGURE
-      x-ticvai-scope-level: venue
-      x-ticvai-offline-capable: false
-      x-ticvai-conflict-policy: serverWins
-      x-ticvai-read-routing: primary
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/GiftFreeProductAddedValueOfferBuilderInput'
-      parameters:
-        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
-      responses:
-        '200':
-          headers:
-            X-Consistency-Token:
-              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
-          description: Gift, Free Product & Added-Value Offer Builder
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GiftFreeProductAddedValueOfferBuilderView'
-        '429':
-          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
-  /cross-category-promotion:
-    put:
-      operationId: setCrossCategoryPromotion
-      x-ticvai-consumed-by:
-        - "P09 ADM-174 Cross-Category Promotion Builder"
-      x-ticvai-audience:
-        - staff
-      x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.56; no promotions minutes on file (the 3 September walkthrough was not minuted), so our build plan; shape agreed as drafted'
-      summary: Cross-Category Promotion Builder
-      description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
-        Promotions   Bundles Management, page 56. The screen says: Create promotions spanning different
-        TICVAI commercial domains.
-
-
-        **Every property carries the sentence it came from.** 10 were read from the screen''s own bulleted
-        directory and 7 bullets were dropped as prose, examples or hierarchy illustrations rather than
-        bent into fields. Names and types are this package''s reading of those sentences and are the part
-        to check; the sentences themselves are the client''s.
-
-
-        **Agreed 29 September (decided 29 September, readiness close-out).** Checked against the
-        pack page and the minutes: no promotions minutes on file (the 3 September walkthrough was
-        not minuted), so our build plan. Shape: agreed as drafted.'
-      tags:
-        - drafted
-      x-ticvai-permission: PRICE_CONFIGURE
-      x-ticvai-scope-level: venue
-      x-ticvai-offline-capable: false
-      x-ticvai-conflict-policy: serverWins
-      x-ticvai-read-routing: primary
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CrossCategoryPromotionBuilderInput'
-      parameters:
-        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
-      responses:
-        '200':
-          headers:
-            X-Consistency-Token:
-              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
-          description: Cross-Category Promotion Builder
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/CrossCategoryPromotionBuilderView'
-        '429':
-          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /reward-selection-substitution:
     get:
       operationId: listRewardSelectionSubstitution
       x-ticvai-consumed-by:
-        - "P09 ADM-175 Reward Selection, Substitution & Customer Choice"
+        - "P08 ADM-175 Reward Selection, Substitution & Customer Choice"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.57; no promotions minutes on file (the 3 September walkthrough was not minuted), so our build plan; shape fixed (2 non-field properties removed; added offerId, rewardOptions, selectionModel, substitutes, maximumSubstituteValue)'
@@ -3988,8 +3721,8 @@ paths:
     get:
       operationId: listAdvancedOfferGuardrail
       x-ticvai-consumed-by:
-        - "P09 ADM-168 Advanced Offer Command Center"
-        - "P09 ADM-176 Advanced Offer Guardrails & Conflict Controls"
+        - "P08 ADM-168 Advanced Offer Command Center"
+        - "P08 ADM-176 Advanced Offer Guardrails & Conflict Controls"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.58; no promotions minutes on file (the 3 September walkthrough was not minuted), so our build plan; shape fixed (enums combinationBehavior)'
@@ -4032,7 +3765,7 @@ paths:
     get:
       operationId: listOfferBasketTrace
       x-ticvai-consumed-by:
-        - "P09 ADM-177 Offer Simulation, Basket Trace & AI Optimization"
+        - "P08 ADM-177 Offer Simulation, Basket Trace & AI Optimization"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.59; no promotions minutes on file (the 3 September walkthrough was not minuted), so our build plan; shape fixed (1 filters to query parameters; 32 non-field properties removed; added basketLines, qualifiers, rewards, guardrailsPassed, originalTotal, promotionAmount, finalTotal)'
@@ -4089,7 +3822,7 @@ paths:
     get:
       operationId: listBundleCombo
       x-ticvai-consumed-by:
-        - "P09 ADM-178 Bundle & Combo Command Center"
+        - "P08 ADM-178 Bundle & Combo Command Center"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.63; MoM 10 Aug 4.10 (predefined and dynamically built packages); shape fixed (6 filters to query parameters)'
@@ -4213,168 +3946,12 @@ paths:
                   $ref: '#/components/schemas/BundleComboCommandCenterView'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
-  /bundle-definition:
-    put:
-      operationId: setBundleDefinition
-      x-ticvai-consumed-by:
-        - "P09 ADM-179 Bundle Definition & Setup"
-      x-ticvai-audience:
-        - staff
-      x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.65; MoM 10 Aug 4.10; shape fixed (5 non-field properties removed; added bundleType)'
-      summary: Bundle Definition & Setup
-      description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
-        Promotions   Bundles Management, page 65. The screen says: Create the commercial identity and
-        high-level behavior of a bundle.
-
-
-        **Every property carries the sentence it came from.** 19 were read from the screen''s own bulleted
-        directory and 8 bullets were dropped as prose, examples or hierarchy illustrations rather than
-        bent into fields. Names and types are this package''s reading of those sentences and are the part
-        to check; the sentences themselves are the client''s.
-
-
-        **Agreed 29 September (decided 29 September, readiness close-out).** Checked against the
-        pack page and the minutes: MoM 10 Aug 4.10. Shape: 5 properties removed that were filters,
-        actions, behaviour, roles, examples or prose fragments rather than fields; added bundleType.'
-      tags:
-        - drafted
-      x-ticvai-permission: PRICE_CONFIGURE
-      x-ticvai-scope-level: venue
-      x-ticvai-config-scope: venue
-      x-ticvai-offline-capable: false
-      x-ticvai-conflict-policy: serverWins
-      x-ticvai-read-routing: primary
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/BundleDefinitionSetupInput'
-      parameters:
-        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
-      responses:
-        '200':
-          headers:
-            X-Consistency-Token:
-              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
-          description: Bundle Definition & Setup
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BundleDefinitionSetupView'
-        '429':
-          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
-  /bundle-component:
-    put:
-      operationId: setBundleComponent
-      x-ticvai-consumed-by:
-        - "P09 ADM-180 Bundle Component Builder"
-      x-ticvai-audience:
-        - staff
-      x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.66; no promotions minutes on file (the 3 September walkthrough was not minuted), so our build plan; shape fixed (2 non-field properties removed; enums componentType)'
-      summary: Bundle Component Builder
-      description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
-        Promotions   Bundles Management, page 66. The screen says: Define exactly what products and services
-        make up the bundle.
-
-
-        **Every property carries the sentence it came from.** 26 were read from the screen''s own bulleted
-        directory and 2 bullets were dropped as prose, examples or hierarchy illustrations rather than
-        bent into fields. Names and types are this package''s reading of those sentences and are the part
-        to check; the sentences themselves are the client''s.
-
-
-        **Agreed 29 September (decided 29 September, readiness close-out).** Checked against the
-        pack page and the minutes: no promotions minutes on file (the 3 September walkthrough was
-        not minuted), so our build plan. Shape: 2 properties removed that were filters, actions,
-        behaviour, roles, examples or prose fragments rather than fields; 18 one-value-per-field
-        properties folded into enums (componentType).'
-      tags:
-        - drafted
-      x-ticvai-permission: PRICE_CONFIGURE
-      x-ticvai-scope-level: venue
-      x-ticvai-offline-capable: false
-      x-ticvai-conflict-policy: serverWins
-      x-ticvai-read-routing: primary
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/BundleComponentBuilderInput'
-      parameters:
-        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
-      responses:
-        '200':
-          headers:
-            X-Consistency-Token:
-              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
-          description: Bundle Component Builder
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BundleComponentBuilderView'
-        '429':
-          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
-  /guest-choice-build:
-    put:
-      operationId: setGuestChoiceBuild
-      x-ticvai-consumed-by:
-        - "P09 ADM-181 Guest Choice & Build-Your-Own Bundle Designer"
-      x-ticvai-audience:
-        - staff
-      x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.67; no promotions minutes on file (the 3 September walkthrough was not minuted), so our build plan; shape fixed (11 non-field properties removed)'
-      summary: Guest Choice & Build-Your-Own Bundle Designer
-      description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
-        Promotions   Bundles Management, page 67. The screen says: Configure bundles where the guest chooses
-        products from predefined groups. The matrix specifically requires the guest to be able to choose
-        attractions, experiences, F&B, retail products, or services from predefined categories while maintaining
-        bundle pricing rules.
-
-
-        **Every property carries the sentence it came from.** 19 were read from the screen''s own bulleted
-        directory and 5 bullets were dropped as prose, examples or hierarchy illustrations rather than
-        bent into fields. Names and types are this package''s reading of those sentences and are the part
-        to check; the sentences themselves are the client''s.
-
-
-        **Agreed 29 September (decided 29 September, readiness close-out).** Checked against the
-        pack page and the minutes: no promotions minutes on file (the 3 September walkthrough was
-        not minuted), so our build plan. Shape: 11 properties removed that were filters, actions,
-        behaviour, roles, examples or prose fragments rather than fields.'
-      tags:
-        - drafted
-      x-ticvai-permission: PRICE_CONFIGURE
-      x-ticvai-scope-level: venue
-      x-ticvai-offline-capable: false
-      x-ticvai-conflict-policy: serverWins
-      x-ticvai-read-routing: primary
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/GuestChoiceBuildYourOwnBundleDesignerInput'
-      parameters:
-        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
-      responses:
-        '200':
-          headers:
-            X-Consistency-Token:
-              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
-          description: Guest Choice & Build-Your-Own Bundle Designer
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GuestChoiceBuildYourOwnBundleDesignerView'
-        '429':
-          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /bundle-pricing-commercial:
     get:
       operationId: listBundlePricingCommercial
       x-ticvai-consumed-by:
-        - "P09 ADM-048 Commercial Pricing Command Center"
-        - "P09 ADM-182 Bundle Pricing & Commercial Model"
+        - "P08 ADM-048 Commercial Pricing Command Center"
+        - "P08 ADM-182 Bundle Pricing & Commercial Model"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.68; no promotions minutes on file (the 3 September walkthrough was not minuted), so our build plan; shape fixed (4 non-field properties removed; added pricingModel, upgradeCharge)'
@@ -4417,7 +3994,7 @@ paths:
     get:
       operationId: listBundleAvailabilityCapacity
       x-ticvai-consumed-by:
-        - "P09 ADM-183 Bundle Availability, Capacity & Validation"
+        - "P08 ADM-183 Bundle Availability, Capacity & Validation"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.69; no promotions minutes on file (the 3 September walkthrough was not minuted), so our build plan; shape fixed (1 non-field properties removed; enums componentStatus; added bundleId, componentId, componentName, available, failureBehavior)'
@@ -4466,7 +4043,7 @@ paths:
     get:
       operationId: listBundleValidityScheduling
       x-ticvai-consumed-by:
-        - "P09 ADM-184 Bundle Validity, Scheduling & Redemption Rules"
+        - "P08 ADM-184 Bundle Validity, Scheduling & Redemption Rules"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.70; no promotions minutes on file (the 3 September walkthrough was not minuted), so our build plan; shape fixed (1 non-field properties removed; enums redemptionModel)'
@@ -4509,7 +4086,7 @@ paths:
     get:
       operationId: listPartnerExternalProduct
       x-ticvai-consumed-by:
-        - "P09 ADM-185 Partner & External Product Bundle Manager"
+        - "P08 ADM-185 Partner & External Product Bundle Manager"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.71; no promotions minutes on file (the 3 September walkthrough was not minuted), so our build plan; shape fixed (5 non-field properties removed; enums connectionStatus)'
@@ -4553,7 +4130,7 @@ paths:
     get:
       operationId: listRevenueAllocationCost
       x-ticvai-consumed-by:
-        - "P09 ADM-186 Revenue Allocation, Cost & Settlement Rules"
+        - "P08 ADM-186 Revenue Allocation, Cost & Settlement Rules"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.72; no promotions minutes on file (the 3 September walkthrough was not minuted), so our build plan; shape fixed (5 non-field properties removed; enums allocationMethod)'
@@ -4601,7 +4178,7 @@ paths:
     put:
       operationId: simulateBundlePreviewRecommendation
       x-ticvai-consumed-by:
-        - "P09 ADM-187 Bundle Preview, Simulation & AI Recommendation"
+        - "P08 ADM-187 Bundle Preview, Simulation & AI Recommendation"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.73; MoM 14 Aug (AI advisory in phase one); shape fixed (rewritten from the pack page)'
@@ -4652,8 +4229,8 @@ paths:
     get:
       operationId: listDynamicBundle
       x-ticvai-consumed-by:
-        - "P09 ADM-188 Dynamic Bundle Operations Command Center"
-        - "P09 ADM-197 Dynamic Bundle Simulation & AI Optimization"
+        - "P08 ADM-188 Dynamic Bundle Operations Command Center"
+        - "P08 ADM-197 Dynamic Bundle Simulation & AI Optimization"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -4698,7 +4275,7 @@ paths:
     get:
       operationId: listComponentInventoryAvailability
       x-ticvai-consumed-by:
-        - "P09 ADM-189 Component Inventory & Availability Matrix"
+        - "P08 ADM-189 Component Inventory & Availability Matrix"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.79; no promotions minutes on file (the 3 September walkthrough was not minuted), so our build plan; shape fixed (3 non-field properties removed; enums availabilitySource, componentStatus; added componentId, componentName, inventory, capacity, schedule)'
@@ -4742,7 +4319,7 @@ paths:
     get:
       operationId: listBundleSellabilityDependency
       x-ticvai-consumed-by:
-        - "P09 ADM-190 Bundle Sellability & Dependency Rule Engine"
+        - "P08 ADM-190 Bundle Sellability & Dependency Rule Engine"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.80; no promotions minutes on file (the 3 September walkthrough was not minuted), so our build plan; shape fixed (3 non-field properties removed; enums dependencyRule; added bundleId, componentIds, minimumCount)'
@@ -4785,7 +4362,7 @@ paths:
     get:
       operationId: listCapacityPoolReservation
       x-ticvai-consumed-by:
-        - "P09 ADM-191 Capacity Pool & Reservation Manager"
+        - "P08 ADM-191 Capacity Pool & Reservation Manager"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.81; no promotions minutes on file (the 3 September walkthrough was not minuted), so our build plan; shape fixed (5 non-field properties removed; enums capacitySource)'
@@ -4832,7 +4409,7 @@ paths:
     get:
       operationId: listDynamicComponentSubstitution
       x-ticvai-consumed-by:
-        - "P09 ADM-192 Dynamic Component Substitution Engine"
+        - "P08 ADM-192 Dynamic Component Substitution Engine"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.82; no promotions minutes on file (the 3 September walkthrough was not minuted), so our build plan; shape fixed (enums substitutionTriggers)'
@@ -4874,9 +4451,9 @@ paths:
     get:
       operationId: listDynamicBundleRule
       x-ticvai-consumed-by:
-        - "P09 ADM-188 Dynamic Bundle Operations Command Center"
-        - "P09 ADM-193 Dynamic Bundle Rule & Composition Engine"
-        - "P09 ADM-197 Dynamic Bundle Simulation & AI Optimization"
+        - "P08 ADM-188 Dynamic Bundle Operations Command Center"
+        - "P08 ADM-193 Dynamic Bundle Rule & Composition Engine"
+        - "P08 ADM-197 Dynamic Bundle Simulation & AI Optimization"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.83; no promotions minutes on file (the 3 September walkthrough was not minuted), so our build plan; shape agreed as drafted'
@@ -4919,10 +4496,9 @@ paths:
     get:
       operationId: listRealTimeAvailability
       x-ticvai-consumed-by:
+        - "P08 ADM-194 Real-Time Availability & Checkout Validation"
+        - "P08 ADM-271 Real-Time Channel Availability & Inventory Monitor"
         - "P08 BO-518 Real-Time Availability Calendar"
-        - "P08 BO-997 Real-Time Availability & Locking"
-        - "P09 ADM-194 Real-Time Availability & Checkout Validation"
-        - "P09 ADM-271 Real-Time Channel Availability & Inventory Monitor"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.84; no promotions minutes on file (the 3 September walkthrough was not minuted), so our build plan; shape fixed (enums failedChecks; added bundleId, sellable)'
@@ -4965,7 +4541,7 @@ paths:
     get:
       operationId: listBundleAvailabilityChannel
       x-ticvai-consumed-by:
-        - "P09 ADM-195 Bundle Availability by Channel, Venue & Partner"
+        - "P08 ADM-195 Bundle Availability by Channel, Venue & Partner"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.85; no promotions minutes on file (the 3 September walkthrough was not minuted), so our build plan; shape fixed (1 non-field properties removed)'
@@ -5007,7 +4583,7 @@ paths:
     get:
       operationId: listBundleAvailabilityForecast
       x-ticvai-consumed-by:
-        - "P09 ADM-196 Bundle Availability Forecast, Alerts & Recovery"
+        - "P08 ADM-196 Bundle Availability Forecast, Alerts & Recovery"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -5050,8 +4626,8 @@ paths:
     get:
       operationId: listDynamicBundle2
       x-ticvai-consumed-by:
-        - "P09 ADM-188 Dynamic Bundle Operations Command Center"
-        - "P09 ADM-197 Dynamic Bundle Simulation & AI Optimization"
+        - "P08 ADM-188 Dynamic Bundle Operations Command Center"
+        - "P08 ADM-197 Dynamic Bundle Simulation & AI Optimization"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.87; MoM 14 Aug (AI advisory in phase one); shape fixed (27 non-field properties removed)'
@@ -5093,7 +4669,7 @@ paths:
     get:
       operationId: listTargetingEligibility
       x-ticvai-consumed-by:
-        - "P09 ADM-198 Targeting & Eligibility Command Center"
+        - "P08 ADM-198 Targeting & Eligibility Command Center"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.94; MoM 20 Aug (offers are pre-configured and system-validated); shape fixed (6 filters to query parameters; enums ruleHealth)'
@@ -5217,64 +4793,11 @@ paths:
                   $ref: '#/components/schemas/TargetingEligibilityCommandCenterView'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
-  /eligibility-rule:
-    put:
-      operationId: setEligibilityRule
-      x-ticvai-consumed-by:
-        - "P09 ADM-199 Eligibility Rule Builder"
-        - "P09 ADM-279 Resale Eligibility Rule Configuration"
-      x-ticvai-audience:
-        - staff
-      x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.95; no promotions minutes on file (the 3 September walkthrough was not minuted), so our build plan; shape fixed (enums ruleEffect)'
-      summary: Eligibility Rule Builder
-      description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
-        Promotions   Bundles Management, page 95. The screen says: Provide a no-code rule engine for determining
-        promotion eligibility.
-
-
-        **Every property carries the sentence it came from.** 21 were read from the screen''s own bulleted
-        directory and 12 bullets were dropped as prose, examples or hierarchy illustrations rather than
-        bent into fields. Names and types are this package''s reading of those sentences and are the part
-        to check; the sentences themselves are the client''s.
-
-
-        **Agreed 29 September (decided 29 September, readiness close-out).** Checked against the
-        pack page and the minutes: no promotions minutes on file (the 3 September walkthrough was
-        not minuted), so our build plan. Shape: 2 one-value-per-field properties folded into enums
-        (ruleEffect).'
-      tags:
-        - drafted
-      x-ticvai-permission: PRICE_CONFIGURE
-      x-ticvai-scope-level: venue
-      x-ticvai-config-scope: venue
-      x-ticvai-offline-capable: false
-      x-ticvai-conflict-policy: serverWins
-      x-ticvai-read-routing: primary
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/EligibilityRuleBuilderInput'
-      parameters:
-        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
-      responses:
-        '200':
-          headers:
-            X-Consistency-Token:
-              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
-          description: Eligibility Rule Builder
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/EligibilityRuleBuilderView'
-        '429':
-          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /crm-customer-segment:
     get:
       operationId: listCrmCustomerSegment
       x-ticvai-consumed-by:
-        - "P09 ADM-200 CRM & Customer Segment Manager"
+        - "P08 ADM-200 CRM & Customer Segment Manager"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -5319,7 +4842,7 @@ paths:
     get:
       operationId: listMembershipLoyaltyGuest
       x-ticvai-consumed-by:
-        - "P09 ADM-201 Membership, Loyalty & Guest Eligibility"
+        - "P08 ADM-201 Membership, Loyalty & Guest Eligibility"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -5364,7 +4887,7 @@ paths:
     get:
       operationId: listBehavioralTransactionTargeting
       x-ticvai-consumed-by:
-        - "P09 ADM-202 Behavioral & Transaction Targeting"
+        - "P08 ADM-202 Behavioral & Transaction Targeting"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -5408,7 +4931,7 @@ paths:
     get:
       operationId: listContextLocationChannel
       x-ticvai-consumed-by:
-        - "P09 ADM-203 Context, Location, Channel & Time Targeting"
+        - "P08 ADM-203 Context, Location, Channel & Time Targeting"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.99; no promotions minutes on file (the 3 September walkthrough was not minuted), so our build plan; shape fixed (enums channels)'
@@ -5450,7 +4973,7 @@ paths:
     get:
       operationId: listPartnerPaymentEligibility
       x-ticvai-consumed-by:
-        - "P09 ADM-204 Partner, B2B & Payment Eligibility"
+        - "P08 ADM-204 Partner, B2B & Payment Eligibility"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.100; MoM 9 Sep (payment-dependent offers evaluate on the cart); shape agreed as drafted'
@@ -5491,7 +5014,7 @@ paths:
     get:
       operationId: listAudiencePreviewReach
       x-ticvai-consumed-by:
-        - "P09 ADM-205 Audience Preview, Reach & Eligibility Simulator"
+        - "P08 ADM-205 Audience Preview, Reach & Eligibility Simulator"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -5535,7 +5058,7 @@ paths:
     get:
       operationId: listTargetingConflictFrequency
       x-ticvai-consumed-by:
-        - "P09 ADM-206 Targeting Conflict, Frequency & Exclusion Controls"
+        - "P08 ADM-206 Targeting Conflict, Frequency & Exclusion Controls"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -5578,8 +5101,8 @@ paths:
     get:
       operationId: listAudienceDiscoveryTargeting
       x-ticvai-consumed-by:
+        - "P08 ADM-207 AI Audience Discovery & Targeting Optimization"
         - "P08 BO-761 AI Audience Discovery"
-        - "P09 ADM-207 AI Audience Discovery & Targeting Optimization"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -5629,7 +5152,7 @@ paths:
     get:
       operationId: listStackingConflict
       x-ticvai-consumed-by:
-        - "P09 ADM-208 Stacking & Conflict Command Center"
+        - "P08 ADM-208 Stacking & Conflict Command Center"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -5672,7 +5195,7 @@ paths:
     get:
       operationId: listPromotionPriorityHierarchy
       x-ticvai-consumed-by:
-        - "P09 ADM-209 Promotion Priority & Hierarchy Manager"
+        - "P08 ADM-209 Promotion Priority & Hierarchy Manager"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.110; MoM 1 Sep 4.4 (configurable hierarchy); shape fixed (2 non-field properties removed)'
@@ -5714,8 +5237,8 @@ paths:
     put:
       operationId: setPromotionStackingRule
       x-ticvai-consumed-by:
-        - "P09 ADM-148 Promotion Rule Builder"
-        - "P09 ADM-210 Promotion Stacking Rule Builder"
+        - "P08 ADM-148 Promotion Rule Builder"
+        - "P08 ADM-210 Promotion Stacking Rule Builder"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.111; MoM 1 Sep 4.4; shape fixed (4 non-field properties removed; enums scope; added stackingModel, maximumPromotions, promotionTypeA, promotionTypeB, canStack)'
@@ -5767,7 +5290,7 @@ paths:
     get:
       operationId: listPromotionExclusionCompatibility
       x-ticvai-consumed-by:
-        - "P09 ADM-211 Promotion Exclusion & Compatibility Matrix"
+        - "P08 ADM-211 Promotion Exclusion & Compatibility Matrix"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.112; no promotions minutes on file (the 3 September walkthrough was not minuted), so our build plan; shape fixed (1 non-field properties removed; enums relationship; added promotionTypeA, promotionTypeB)'
@@ -5810,7 +5333,7 @@ paths:
     get:
       operationId: listDiscountCalculationApplication
       x-ticvai-consumed-by:
-        - "P09 ADM-212 Discount Calculation & Application Sequence"
+        - "P08 ADM-212 Discount Calculation & Application Sequence"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.113; MoM 1 Sep 4.5 (tax on the pre-discount price is region-configurable; up to three decimals); shape fixed (4 non-field properties removed; enums calculationModel, taxBasis, feeBasis, applicationLevel)'
@@ -5859,7 +5382,7 @@ paths:
     get:
       operationId: listBestOfferCustomer
       x-ticvai-consumed-by:
-        - "P09 ADM-213 Best Offer & Customer Benefit Resolver"
+        - "P08 ADM-213 Best Offer & Customer Benefit Resolver"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.114; MoM 1 Sep 4.4 (hierarchy, not lowest-price-wins); shape fixed (7 non-field properties removed; added resolutionStrategy, eligibleOffers, appliedOffers, saving, customerMessage)'
@@ -5902,7 +5425,7 @@ paths:
     get:
       operationId: listDiscountCapMaximum
       x-ticvai-consumed-by:
-        - "P09 ADM-214 Discount Cap & Maximum Benefit Controller"
+        - "P08 ADM-214 Discount Cap & Maximum Benefit Controller"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.115; audit R096 (5); shape fixed (3 non-field properties removed; enums limitLevel, onExceed)'
@@ -5945,7 +5468,7 @@ paths:
     get:
       operationId: listConflictDetectionResolution
       x-ticvai-consumed-by:
-        - "P09 ADM-215 Conflict Detection & Resolution Center"
+        - "P08 ADM-215 Conflict Detection & Resolution Center"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.116; MoM 1 Sep 4.4; shape fixed (4 non-field properties removed; enums conflictType, resolutionMethod; added conflictId, promotions, detectedAt, resolved)'
@@ -5988,7 +5511,7 @@ paths:
     get:
       operationId: listPromotionDecisionTrace
       x-ticvai-consumed-by:
-        - "P09 ADM-216 Promotion Decision Trace & Transaction Explainer"
+        - "P08 ADM-216 Promotion Decision Trace & Transaction Explainer"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -6035,7 +5558,7 @@ paths:
     get:
       operationId: listConflict
       x-ticvai-consumed-by:
-        - "P09 ADM-217 Conflict Simulation & AI Optimization"
+        - "P08 ADM-217 Conflict Simulation & AI Optimization"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.118; no promotions minutes on file (the 3 September walkthrough was not minuted), so our build plan; shape fixed (30 non-field properties removed; added combinations, recommendedCombination)'
@@ -6078,7 +5601,7 @@ paths:
     get:
       operationId: listCampaignGovernanceBudget
       x-ticvai-consumed-by:
-        - "P09 ADM-218 Campaign Governance & Budget Command Center"
+        - "P08 ADM-218 Campaign Governance & Budget Command Center"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -6124,7 +5647,7 @@ paths:
     put:
       operationId: setCampaignBudgetFinancial
       x-ticvai-consumed-by:
-        - "P09 ADM-219 Campaign Budget & Financial Limit Setup"
+        - "P08 ADM-219 Campaign Budget & Financial Limit Setup"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.126; no promotions minutes on file (the 3 September walkthrough was not minuted), so our build plan; shape agreed as drafted'
@@ -6175,7 +5698,7 @@ paths:
     get:
       operationId: listRedemptionDiscountExposure
       x-ticvai-consumed-by:
-        - "P09 ADM-220 Redemption, Discount & Exposure Limit Manager"
+        - "P08 ADM-220 Redemption, Discount & Exposure Limit Manager"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.128; no promotions minutes on file (the 3 September walkthrough was not minuted), so our build plan; shape fixed (1 non-field properties removed)'
@@ -6217,7 +5740,7 @@ paths:
     get:
       operationId: listBudgetConsumptionForecast
       x-ticvai-consumed-by:
-        - "P09 ADM-221 Budget Consumption & Forecast Monitor"
+        - "P08 ADM-221 Budget Consumption & Forecast Monitor"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -6261,7 +5784,7 @@ paths:
     get:
       operationId: listThresholdActionAutomatic
       x-ticvai-consumed-by:
-        - "P09 ADM-222 Threshold Actions & Automatic Suspension"
+        - "P08 ADM-222 Threshold Actions & Automatic Suspension"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.130; no promotions minutes on file (the 3 September walkthrough was not minuted), so our build plan; shape fixed (9 non-field properties removed; added campaignId, thresholdPercent, action)'
@@ -6304,8 +5827,8 @@ paths:
     put:
       operationId: approveCampaignWorkflow
       x-ticvai-consumed-by:
+        - "P08 ADM-223 Campaign Approval Workflow Designer"
         - "P08 BO-770 Campaign Approval Workflow"
-        - "P09 ADM-223 Campaign Approval Workflow Designer"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.131; no promotions minutes on file (the 3 September walkthrough was not minuted), so our build plan; shape fixed (1 non-field properties removed)'
@@ -6354,9 +5877,7 @@ paths:
     put:
       operationId: approveDecision
       x-ticvai-consumed-by:
-        - "P08 BO-374 Approval Decision Workspace"
-        - "P08 BO-642 Approval Decision History"
-        - "P09 ADM-224 Approval Inbox & Decision Workspace"
+        - "P08 ADM-224 Approval Inbox & Decision Workspace"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.132; no promotions minutes on file (the 3 September walkthrough was not minuted), so our build plan; shape fixed (6 non-field properties removed; added decision, comment)'
@@ -6408,7 +5929,7 @@ paths:
     get:
       operationId: listCampaignFinancialCommercial
       x-ticvai-consumed-by:
-        - "P09 ADM-225 Campaign Financial & Commercial Simulator"
+        - "P08 ADM-225 Campaign Financial & Commercial Simulator"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -6451,7 +5972,7 @@ paths:
     get:
       operationId: listCampaignExperimentTest
       x-ticvai-consumed-by:
-        - "P09 ADM-226 Campaign Experiment & A/B Test Manager"
+        - "P08 ADM-226 Campaign Experiment & A/B Test Manager"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -6496,8 +6017,8 @@ paths:
     get:
       operationId: listGovernanceRiskLaunch
       x-ticvai-consumed-by:
-        - "P09 ADM-227 Governance Audit, AI Risk & Launch Readiness"
-        - "P09 ADM-365 Risk & Governance Analytics"
+        - "P08 ADM-227 Governance Audit, AI Risk & Launch Readiness"
+        - "P08 ADM-365 Risk & Governance Analytics"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.136; MoM 14 Aug (AI advisory in phase one); shape fixed (19 non-field properties removed)'
@@ -6539,9 +6060,9 @@ paths:
     get:
       operationId: listPromotionPerformance
       x-ticvai-consumed-by:
-        - "P09 ADM-146 Promotion Health & Performance Monitor"
-        - "P09 ADM-228 Promotion Performance Command Center"
-        - "P09 ADM-229 Campaign & Promotion Performance Explorer"
+        - "P08 ADM-146 Promotion Health & Performance Monitor"
+        - "P08 ADM-228 Promotion Performance Command Center"
+        - "P08 ADM-229 Campaign & Promotion Performance Explorer"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.142; no promotions minutes on file (the 3 September walkthrough was not minuted), so our build plan; shape fixed (13 filters to query parameters; 14 non-field properties removed)'
@@ -6665,9 +6186,9 @@ paths:
     get:
       operationId: listCampaignPromotionPerformance
       x-ticvai-consumed-by:
-        - "P09 ADM-139 Promotion & Campaign Directory"
-        - "P09 ADM-228 Promotion Performance Command Center"
-        - "P09 ADM-229 Campaign & Promotion Performance Explorer"
+        - "P08 ADM-139 Promotion & Campaign Directory"
+        - "P08 ADM-228 Promotion Performance Command Center"
+        - "P08 ADM-229 Campaign & Promotion Performance Explorer"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -6712,7 +6233,7 @@ paths:
     get:
       operationId: listRedemptionConversionFunnel
       x-ticvai-consumed-by:
-        - "P09 ADM-230 Redemption, Conversion & Funnel Analytics"
+        - "P08 ADM-230 Redemption, Conversion & Funnel Analytics"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.144; no promotions minutes on file (the 3 September walkthrough was not minuted), so our build plan; shape agreed as drafted'
@@ -6803,7 +6324,7 @@ paths:
     get:
       operationId: listDiscountMarginProfitability
       x-ticvai-consumed-by:
-        - "P09 ADM-231 Discount, Margin & Profitability Analytics"
+        - "P08 ADM-231 Discount, Margin & Profitability Analytics"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -6848,7 +6369,7 @@ paths:
     get:
       operationId: listBundleBogoAdvanced
       x-ticvai-consumed-by:
-        - "P09 ADM-232 Bundle, BOGO & Advanced Offer Analytics"
+        - "P08 ADM-232 Bundle, BOGO & Advanced Offer Analytics"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -6893,8 +6414,8 @@ paths:
     get:
       operationId: listUpsellCrossSell
       x-ticvai-consumed-by:
-        - "P09 ADM-233 Upsell, Cross-Sell & Attach-Rate Analytics"
-        - "P09 ADM-659 Cross-Sell Command Center"
+        - "P08 ADM-233 Upsell, Cross-Sell & Attach-Rate Analytics"
+        - "P08 ADM-659 Cross-Sell Command Center"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -6938,7 +6459,7 @@ paths:
     get:
       operationId: listCustomerSegmentChannel
       x-ticvai-consumed-by:
-        - "P09 ADM-234 Customer, Segment, Channel & Partner Analytics"
+        - "P08 ADM-234 Customer, Segment, Channel & Partner Analytics"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -6983,7 +6504,7 @@ paths:
     get:
       operationId: listIncrementalityAttributionCannibalization
       x-ticvai-consumed-by:
-        - "P09 ADM-235 Incrementality, Attribution & Cannibalization Analysis"
+        - "P08 ADM-235 Incrementality, Attribution & Cannibalization Analysis"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -7029,7 +6550,7 @@ paths:
     get:
       operationId: listNextBestAction
       x-ticvai-consumed-by:
-        - "P09 ADM-236 AI Optimization & Next-Best-Action Center"
+        - "P08 ADM-236 AI Optimization & Next-Best-Action Center"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -7078,7 +6599,7 @@ paths:
     get:
       operationId: listExecutivePromotionReporting
       x-ticvai-consumed-by:
-        - "P09 ADM-237 Executive Promotion Intelligence & Reporting Studio"
+        - "P08 ADM-237 Executive Promotion Intelligence & Reporting Studio"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.151; no promotions minutes on file (the 3 September walkthrough was not minuted), so our build plan; shape fixed (6 filters to query parameters; 35 non-field properties removed; added campaign, revenue, attentionReason)'
@@ -7169,12 +6690,34 @@ paths:
     get:
       operationId: listRecommendationStrategies
       x-ticvai-consumed-by:
-        - "P09 ADM-639 Recommendation Command Center"
-        - "P09 ADM-640 Recommendation Strategy Manager"
-        - "P09 ADM-647 Recommendation Policy, AI Control & Governance"
-        - "P09 ADM-670 Customer Journey Map & Touchpoint Designer"
-        - "P09 ADM-676 Omnichannel Recommendation Synchronization"
-        - "P09 ADM-695 Recommendation Governance & Deployment Control"
+        - "P08 ADM-639 Recommendation Command Center"
+        - "P08 ADM-640 Recommendation Strategy Manager"
+        - "P08 ADM-641 Recommendation Objective & KPI Configuration"
+        - "P08 ADM-643 Recommendation Placement & Touchpoint Manager"
+        - "P08 ADM-644 Channel & Journey Strategy Manager"
+        - "P08 ADM-645 Recommendation Priority, Ranking & Suppression Manager17"
+        - "P08 ADM-646 Recommendation Guardrails & Business Controls"
+        - "P08 ADM-647 Recommendation Policy, AI Control & Governance"
+        - "P08 ADM-648 Recommendation Strategy Simulator & AI Advisor"
+        - "P08 ADM-651 Upsell Eligibility & Qualification Rules"
+        - "P08 ADM-655 Pre-Purchase, Cart & Checkout Upsell Manager"
+        - "P08 ADM-656 Post-Purchase & In-Journey Upgrade Manager"
+        - "P08 ADM-658 Upgrade Simulator, Comparison & AI Advisor"
+        - "P08 ADM-665 Basket-Aware Cross-Sell & Duplicate Prevention"
+        - "P08 ADM-666 Availability, Inventory & Capacity-Aware Cross-Sell"
+        - "P08 ADM-668 Cross-Sell Simulator & AI Opportunity Advisor"
+        - "P08 ADM-670 Customer Journey Map & Touchpoint Designer"
+        - "P08 ADM-671 Real-Time Context Rule Engine"
+        - "P08 ADM-672 Pre-Purchase & Booking Journey Recommendation Manager"
+        - "P08 ADM-673 Post-Purchase & Pre-Visit Recommendation Manager"
+        - "P08 ADM-674 In-Venue & Location-Aware Recommendation Engine"
+        - "P08 ADM-675 Visit State, Itinerary & Time-Aware Recommendation"
+        - "P08 ADM-676 Omnichannel Recommendation Synchronization"
+        - "P08 ADM-681 Customer Feature & Signal Configuration"
+        - "P08 ADM-684 Personalized Ranking & Decision Policy Builder"
+        - "P08 ADM-688 Personalization Simulator & Next-Best-Offer Lab"
+        - "P08 ADM-695 Recommendation Governance & Deployment Control"
+        - "P08 ADM-698 AI Optimization & Recommendation Intelligence Lab"
       summary: The strategies deciding what gets offered where
       description: 'Upsell board 1. **A strategy is the unit, not an individual recommendation.** The
         board asks for objectives, placements, channels, ranking, suppression and guardrails — six things
@@ -7212,7 +6755,7 @@ paths:
     post:
       operationId: createRecommendationStrategy
       x-ticvai-consumed-by:
-        - "P09 ADM-640 Recommendation Strategy Manager"
+        - "P08 ADM-640 Recommendation Strategy Manager"
       summary: Define objective, placements, ranking and guardrails
       description: 'Upsell boards 1.3 and 1.8. **The objective and the guardrail are stated together
         because one without the other is dangerous.** *Maximise attach revenue* with no cap produces a
@@ -7272,26 +6815,28 @@ paths:
     put:
       operationId: updateRecommendationStrategy
       x-ticvai-consumed-by:
-        - "P09 ADM-640 Recommendation Strategy Manager"
-        - "P09 ADM-641 Recommendation Objective & KPI Configuration"
-        - "P09 ADM-643 Recommendation Placement & Touchpoint Manager"
-        - "P09 ADM-644 Channel & Journey Strategy Manager"
-        - "P09 ADM-645 Recommendation Priority, Ranking & Suppression Manager17"
-        - "P09 ADM-646 Recommendation Guardrails & Business Controls"
-        - "P09 ADM-651 Upsell Eligibility & Qualification Rules"
-        - "P09 ADM-655 Pre-Purchase, Cart & Checkout Upsell Manager"
-        - "P09 ADM-656 Post-Purchase & In-Journey Upgrade Manager"
-        - "P09 ADM-665 Basket-Aware Cross-Sell & Duplicate Prevention"
-        - "P09 ADM-666 Availability, Inventory & Capacity-Aware Cross-Sell"
-        - "P09 ADM-671 Real-Time Context Rule Engine"
-        - "P09 ADM-672 Pre-Purchase & Booking Journey Recommendation Manager"
-        - "P09 ADM-673 Post-Purchase & Pre-Visit Recommendation Manager"
-        - "P09 ADM-674 In-Venue & Location-Aware Recommendation Engine"
-        - "P09 ADM-675 Visit State, Itinerary & Time-Aware Recommendation"
-        - "P09 ADM-681 Customer Feature & Signal Configuration"
-        - "P09 ADM-683 Next-Best-Offer Decision Studio"
-        - "P09 ADM-684 Personalized Ranking & Decision Policy Builder"
-        - "P09 ADM-695 Recommendation Governance & Deployment Control"
+        - "P08 ADM-640 Recommendation Strategy Manager"
+        - "P08 ADM-641 Recommendation Objective & KPI Configuration"
+        - "P08 ADM-643 Recommendation Placement & Touchpoint Manager"
+        - "P08 ADM-644 Channel & Journey Strategy Manager"
+        - "P08 ADM-645 Recommendation Priority, Ranking & Suppression Manager17"
+        - "P08 ADM-646 Recommendation Guardrails & Business Controls"
+        - "P08 ADM-647 Recommendation Policy, AI Control & Governance"
+        - "P08 ADM-651 Upsell Eligibility & Qualification Rules"
+        - "P08 ADM-655 Pre-Purchase, Cart & Checkout Upsell Manager"
+        - "P08 ADM-656 Post-Purchase & In-Journey Upgrade Manager"
+        - "P08 ADM-665 Basket-Aware Cross-Sell & Duplicate Prevention"
+        - "P08 ADM-666 Availability, Inventory & Capacity-Aware Cross-Sell"
+        - "P08 ADM-670 Customer Journey Map & Touchpoint Designer"
+        - "P08 ADM-671 Real-Time Context Rule Engine"
+        - "P08 ADM-672 Pre-Purchase & Booking Journey Recommendation Manager"
+        - "P08 ADM-673 Post-Purchase & Pre-Visit Recommendation Manager"
+        - "P08 ADM-674 In-Venue & Location-Aware Recommendation Engine"
+        - "P08 ADM-675 Visit State, Itinerary & Time-Aware Recommendation"
+        - "P08 ADM-681 Customer Feature & Signal Configuration"
+        - "P08 ADM-683 Next-Best-Offer Decision Studio"
+        - "P08 ADM-684 Personalized Ranking & Decision Policy Builder"
+        - "P08 ADM-695 Recommendation Governance & Deployment Control"
       summary: Change a strategy
       description: '**Accepts `Prefer: validate-only`** (29 September, build): validates and answers 200
         with the would-be result without writing, for the AI executor''s plan validation.
@@ -7334,8 +6879,14 @@ paths:
     get:
       operationId: listProductRelationships
       x-ticvai-consumed-by:
-        - "P09 ADM-642 Recommendation Type & Product Relationship Manager"
-        - "P09 ADM-650 Upgrade Path & Product Ladder Builder"
+        - "P08 ADM-642 Recommendation Type & Product Relationship Manager"
+        - "P08 ADM-650 Upgrade Path & Product Ladder Builder"
+        - "P08 ADM-652 Upgrade Price Difference & Value Proposition Manager"
+        - "P08 ADM-653 Ticket, Experience & Bundle Upgrade Manager"
+        - "P08 ADM-654 Membership & Pass Upgrade Engine"
+        - "P08 ADM-660 Cross-Sell Relationship Builder"
+        - "P08 ADM-663 Cross-Category Recommendation Manager"
+        - "P08 ADM-664 Multi-Attraction, Destination & Partner Cross-Sell"
       summary: Upgrade ladders, cross-sells, affinities and substitutes
       description: 'Upsell boards 2.2, 3.2 and 3.3. **One table, because they are one kind of fact.** An
         upgrade ladder is an ordered relationship between two products; a cross-sell is an unordered one;
@@ -7377,11 +6928,11 @@ paths:
     put:
       operationId: setProductRelationships
       x-ticvai-consumed-by:
-        - "P09 ADM-642 Recommendation Type & Product Relationship Manager"
-        - "P09 ADM-650 Upgrade Path & Product Ladder Builder"
-        - "P09 ADM-660 Cross-Sell Relationship Builder"
-        - "P09 ADM-663 Cross-Category Recommendation Manager"
-        - "P09 ADM-664 Multi-Attraction, Destination & Partner Cross-Sell"
+        - "P08 ADM-642 Recommendation Type & Product Relationship Manager"
+        - "P08 ADM-650 Upgrade Path & Product Ladder Builder"
+        - "P08 ADM-660 Cross-Sell Relationship Builder"
+        - "P08 ADM-663 Cross-Category Recommendation Manager"
+        - "P08 ADM-664 Multi-Attraction, Destination & Partner Cross-Sell"
       summary: Declare what upgrades to, pairs with or replaces what
       description: '**Publishes `promotions.recommendationStrategyPublished`** (29 September, AI system
         design 2.2 A and 5.4) through `platform.outbox` in the same transaction as the write, on every
@@ -7428,9 +6979,9 @@ paths:
     get:
       operationId: getProductAffinity
       x-ticvai-consumed-by:
-        - "P09 ADM-661 Product Affinity Matrix & Relationship Map"
-        - "P09 ADM-662 Frequently Bought Together & Basket Pattern Engine"
-        - "P09 ADM-667 AI Cross-Sell Discovery, Scoring & Ranking Engine"
+        - "P08 ADM-661 Product Affinity Matrix & Relationship Map"
+        - "P08 ADM-662 Frequently Bought Together & Basket Pattern Engine"
+        - "P08 ADM-667 AI Cross-Sell Discovery, Scoring & Ranking Engine"
       summary: What is actually bought together
       description: 'Upsell boards 3.3 and 3.4. **Measured from baskets, not declared.** *Frequently bought
         together* is a fact about what happened, and a merchandiser''s intuition about what should pair
@@ -7517,6 +7068,9 @@ paths:
   /recommendations/outcomes:
     post:
       operationId: recordRecommendationOutcome
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       summary: Shown, clicked, accepted or dismissed
       deprecated: true
       x-ticvai-superseded-by: 'recordRecommendationEvents'
@@ -7561,8 +7115,8 @@ paths:
     get:
       operationId: listRecommendationExperiments
       x-ticvai-consumed-by:
-        - "P09 ADM-691 Recommendation Experiment & A/B Test Studio"
-        - "P09 ADM-692 Experiment Results & Winner Decision Workspace"
+        - "P08 ADM-691 Recommendation Experiment & A/B Test Studio"
+        - "P08 ADM-692 Experiment Results & Winner Decision Workspace"
       summary: A/B tests on placements and strategies
       tags:
       - recommendations
@@ -7585,7 +7139,7 @@ paths:
     post:
       operationId: createRecommendationExperiment
       x-ticvai-consumed-by:
-        - "P09 ADM-691 Recommendation Experiment & A/B Test Studio"
+        - "P08 ADM-691 Recommendation Experiment & A/B Test Studio"
       summary: Split traffic between strategies
       description: 'Upsell boards 6.3 and 6.4. **The allocation is fixed at creation and the winner is
         declared explicitly.** An experiment whose split drifts is not an experiment, and one that is
@@ -7632,7 +7186,7 @@ paths:
     post:
       operationId: concludeRecommendationExperiment
       x-ticvai-consumed-by:
-        - "P09 ADM-692 Experiment Results & Winner Decision Workspace"
+        - "P08 ADM-692 Experiment Results & Winner Decision Workspace"
       summary: Declare a winner and roll it out
       tags:
       - recommendations
@@ -7688,17 +7242,17 @@ paths:
     get:
       operationId: getRecommendationPerformance
       x-ticvai-consumed-by:
-        - "P09 ADM-639 Recommendation Command Center"
-        - "P09 ADM-649 Upsell & Upgrade Command Center"
-        - "P09 ADM-657 Upsell Ranking, Propensity & AI Opportunity Engine"
-        - "P09 ADM-659 Cross-Sell Command Center"
-        - "P09 ADM-669 Journey & Context Command Center"
-        - "P09 ADM-679 Personalization & NBO Command Center"
-        - "P09 ADM-682 Propensity Model & Customer Intent Manager"
-        - "P09 ADM-689 Recommendation Performance Command Center"
-        - "P09 ADM-690 Recommendation Strategy & Placement Analytics"
-        - "P09 ADM-693 Recommendation Attribution & Incrementality Analytics"
-        - "P09 ADM-694 AI Model Performance & Drift Monitor"
+        - "P08 ADM-639 Recommendation Command Center"
+        - "P08 ADM-649 Upsell & Upgrade Command Center"
+        - "P08 ADM-657 Upsell Ranking, Propensity & AI Opportunity Engine"
+        - "P08 ADM-659 Cross-Sell Command Center"
+        - "P08 ADM-669 Journey & Context Command Center"
+        - "P08 ADM-679 Personalization & NBO Command Center"
+        - "P08 ADM-682 Propensity Model & Customer Intent Manager"
+        - "P08 ADM-689 Recommendation Performance Command Center"
+        - "P08 ADM-690 Recommendation Strategy & Placement Analytics"
+        - "P08 ADM-693 Recommendation Attribution & Incrementality Analytics"
+        - "P08 ADM-694 AI Model Performance & Drift Monitor"
       summary: Impressions, acceptance, revenue and incremental lift
       description: 'Upsell boards 6.1, 6.2 and 6.5. **Attributed revenue and incremental revenue are
         reported apart**, because the first flatters and the second is true. A strategy that shows an
@@ -7748,9 +7302,9 @@ paths:
     put:
       operationId: setRecommendationSuppression
       x-ticvai-consumed-by:
-        - "P09 ADM-645 Recommendation Priority, Ranking & Suppression Manager17"
-        - "P09 ADM-677 Contextual Trigger, Frequency & Experience Controls"
-        - "P09 ADM-685 Customer Preference, Fatigue & Suppression Intelligence"
+        - "P08 ADM-645 Recommendation Priority, Ranking & Suppression Manager17"
+        - "P08 ADM-677 Contextual Trigger, Frequency & Experience Controls"
+        - "P08 ADM-685 Customer Preference, Fatigue & Suppression Intelligence"
       summary: Fatigue limits, frequency caps and hard exclusions
       description: 'Upsell boards 1.7 and 5.7. **Fatigue is the reason a good recommender stops working.**
         A guest offered the same parking upsell at every touchpoint for three visits has learned to
@@ -7795,12 +7349,12 @@ paths:
     post:
       operationId: simulateRecommendationStrategy
       x-ticvai-consumed-by:
-        - "P09 ADM-648 Recommendation Strategy Simulator & AI Advisor"
-        - "P09 ADM-658 Upgrade Simulator, Comparison & AI Advisor"
-        - "P09 ADM-668 Cross-Sell Simulator & AI Opportunity Advisor"
-        - "P09 ADM-678 Journey Simulator, Decision Trace & AI Optimization"
-        - "P09 ADM-688 Personalization Simulator & Next-Best-Offer Lab"
-        - "P09 ADM-698 AI Optimization & Recommendation Intelligence Lab"
+        - "P08 ADM-648 Recommendation Strategy Simulator & AI Advisor"
+        - "P08 ADM-658 Upgrade Simulator, Comparison & AI Advisor"
+        - "P08 ADM-668 Cross-Sell Simulator & AI Opportunity Advisor"
+        - "P08 ADM-678 Journey Simulator, Decision Trace & AI Optimization"
+        - "P08 ADM-688 Personalization Simulator & Next-Best-Offer Lab"
+        - "P08 ADM-698 AI Optimization & Recommendation Intelligence Lab"
       summary: Replay a strategy against history before it goes live
       description: 'Upsell boards 1.10, 2.10, 3.10 and 4.10 — **four boards ask for a simulator, which is
         the pack telling us something.** Recommendation changes are invisible until they are live and
@@ -7857,13 +7411,13 @@ paths:
     get:
       operationId: listCommercialCampaigns
       x-ticvai-consumed-by:
+        - "P08 ADM-139 Promotion & Campaign Directory"
+        - "P08 ADM-142 Campaign Calendar & Timeline"
+        - "P08 ADM-179 Bundle Definition & Setup"
+        - "P08 ADM-219 Campaign Budget & Financial Limit Setup"
+        - "P08 ADM-229 Campaign & Promotion Performance Explorer"
         - "P08 BO-010 Promotions & Coupons"
         - "P08 BO-011 Packages & Bundles"
-        - "P09 ADM-139 Promotion & Campaign Directory"
-        - "P09 ADM-142 Campaign Calendar & Timeline"
-        - "P09 ADM-179 Bundle Definition & Setup"
-        - "P09 ADM-219 Campaign Budget & Financial Limit Setup"
-        - "P09 ADM-229 Campaign & Promotion Performance Explorer"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: writers pass; pack Promotions___Bundles_Management_Reference.pdf p.8 (Promotion & Campaign Directory lists every commercial campaign) and p.12 (Campaign Calendar & Timeline); no promotions minutes on file, so our build plan; shape follows listPromotions'
@@ -7930,8 +7484,8 @@ paths:
     post:
       operationId: createCommercialCampaign
       x-ticvai-consumed-by:
-        - "P09 ADM-139 Promotion & Campaign Directory"
-        - "P09 ADM-219 Campaign Budget & Financial Limit Setup"
+        - "P08 ADM-139 Promotion & Campaign Directory"
+        - "P08 ADM-219 Campaign Budget & Financial Limit Setup"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: writers pass; pack Promotions___Bundles_Management_Reference.pdf p.8 (every commercial campaign created within TICVAI) and p.126 (campaign, owner, business entity and effective dates); no promotions minutes on file, so our build plan; shape follows createPromotion'
@@ -7995,8 +7549,8 @@ paths:
     patch:
       operationId: updateCommercialCampaign
       x-ticvai-consumed-by:
-        - "P09 ADM-139 Promotion & Campaign Directory"
-        - "P09 ADM-219 Campaign Budget & Financial Limit Setup"
+        - "P08 ADM-139 Promotion & Campaign Directory"
+        - "P08 ADM-219 Campaign Budget & Financial Limit Setup"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: writers pass; pack Promotions___Bundles_Management_Reference.pdf p.8 and p.126; no promotions minutes on file, so our build plan; shape follows updatePromotion'
@@ -8095,8 +7649,8 @@ paths:
     get:
       operationId: listBundleCapacityPolicies
       x-ticvai-consumed-by:
-        - "P09 ADM-191 Capacity Pool & Reservation Manager"
-        - "P09 ADM-195 Bundle Availability by Channel, Venue & Partner"
+        - "P08 ADM-191 Capacity Pool & Reservation Manager"
+        - "P08 ADM-195 Bundle Availability by Channel, Venue & Partner"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: writers pass; pack Promotions___Bundles_Management_Reference.pdf p.81 (Capacity Pool & Reservation Manager) and p.85 (Bundle Availability by Channel, Venue & Partner); no promotions minutes on file, so our build plan; shape follows listBundles'
@@ -8138,8 +7692,8 @@ paths:
     put:
       operationId: setBundleCapacityPolicy
       x-ticvai-consumed-by:
-        - "P09 ADM-191 Capacity Pool & Reservation Manager"
-        - "P09 ADM-195 Bundle Availability by Channel, Venue & Partner"
+        - "P08 ADM-191 Capacity Pool & Reservation Manager"
+        - "P08 ADM-195 Bundle Availability by Channel, Venue & Partner"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: writers pass; pack Promotions___Bundles_Management_Reference.pdf p.81 and p.85; no promotions minutes on file, so our build plan; shape follows setPromotionVariants (the set replaces the one before)'
@@ -8224,7 +7778,7 @@ paths:
     get:
       operationId: listBundlePartnerProductMappings
       x-ticvai-consumed-by:
-        - "P09 ADM-185 Partner & External Product Bundle Manager"
+        - "P08 ADM-185 Partner & External Product Bundle Manager"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: writers pass; pack Promotions___Bundles_Management_Reference.pdf p.71 (Partner & External Product Bundle Manager); no promotions minutes on file, so our build plan; shape follows listBundles'
@@ -8265,7 +7819,7 @@ paths:
     put:
       operationId: setBundlePartnerProductMappings
       x-ticvai-consumed-by:
-        - "P09 ADM-185 Partner & External Product Bundle Manager"
+        - "P08 ADM-185 Partner & External Product Bundle Manager"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: writers pass; pack Promotions___Bundles_Management_Reference.pdf p.71; no promotions minutes on file, so our build plan; shape follows setPromotionVariants (the set replaces the one before)'
@@ -9001,14 +8555,14 @@ components:
             type: string
             format: uuid
           description: 'The reward products, where the reward is not the qualifying product: the free
-            gift of `freeItem`, the "different product" of a `buyXGetY` (setGiftFreeProduct, setBuyGetBogo).
+            gift of `freeItem`, the "different product" of a `buyXGetY` (createPromotion; the builders setGiftFreeProduct and setBuyGetBogo were retired in r2, CHG-CLN-001).
             Absent means the reward is taken from the qualifying lines. (DM5, 29 September: data model for the agreed operations)'
         maxApplicationsPerBasket:
           type: integer
           minimum: 1
           nullable: true
           description: 'How many times the offer repeats in one basket: the "maximum repetitions" of
-            an N-for-X offer (setFixedPriceOffer). Null repeats for every complete set. (DM5, 29 September: data model for the agreed operations)'
+            an N-for-X offer (createPromotion; setFixedPriceOffer was retired in r2, CHG-CLN-001). Null repeats for every complete set. (DM5, 29 September: data model for the agreed operations)'
     PromotionConditions:
       x-ticvai-persistence: none — embedded in promotion
       type: object
@@ -9124,7 +8678,7 @@ components:
             type: string
             format: uuid
           description: 'Reusable eligibility rules (`promotions.promotion_rule` rows of `ruleType: eligibility`
-            with no promotion of their own, saved by setEligibilityRule) that must also hold. Each is
+            with no promotion of their own) that must also hold. **Deprecated in r2** (CHG-CLN-001): setEligibilityRule, which saved library rules, was retired (BC-017), so no operation creates one; send the conditions inline. Rules already saved still apply. Each is
             evaluated with its own `effect`. (DM5, 29 September: data model for the agreed operations)'
     StackingMode:
       type: string
@@ -9447,8 +9001,10 @@ components:
     PromotionRule:
       x-ticvai-persistence: promotions.promotion_rule
       type: object
-      description: 'A rule made in the Promotion Rule Builder (setPromotionRule, `ruleType: benefit`) or
-        the Eligibility Rule Builder (setEligibilityRule, `ruleType: eligibility`). **One table for
+      description: 'A rule made in the Promotion Rule Builder (`ruleType: benefit`) or the Eligibility Rule
+        Builder (`ruleType: eligibility`). **No operation writes it since r2**: setPromotionRule and
+        setEligibilityRule were retired (BC-011, BC-017, CHG-CLN-001) and createPromotion carries
+        the conditions; the table stays until a forward migration drops it. **One table for
         both**: each is a named, prioritised set of nested condition groups; a benefit rule adds its
         outcomes, an eligibility rule its include/exclude effect. A rule with a `promotionId` belongs
         to that promotion; one without is a reusable library rule that promotions name in
@@ -11788,6 +11344,7 @@ components:
           type: string
           description: Promotion ID
     PromotionRuleBuilderView:
+      x-ticvai-retired: 'setPromotionRule was removed in r2 (BC-011, CHG-CLN-001); no operation takes this shape. Kept because the design notes and the readiness close-out cite it; the venue screen''s typed writer carries the record.'
       type: object
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: none — projection over promotions state, assembled at read time from tables
@@ -11857,6 +11414,7 @@ components:
           type: string
           description: Rule ordering
     PromotionRuleBuilderInput:
+      x-ticvai-retired: 'setPromotionRule was removed in r2 (BC-011, CHG-CLN-001); no operation takes this shape. Kept because the design notes and the readiness close-out cite it; the venue screen''s typed writer carries the record.'
       type: object
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: 'none — request only; saved as a `promotions.promotion_rule` row (PromotionRule,
@@ -12425,6 +11983,7 @@ components:
           type: string
           description: Promo code
     CouponPromoCodeBuilderView:
+      x-ticvai-retired: 'setCouponPromoCode was removed in r2 (BC-012, CHG-CLN-001); no operation takes this shape. Kept because the design notes and the readiness close-out cite it; the venue screen''s typed writer carries the record.'
       type: object
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: none — projection over promotions state, assembled at read time from tables
@@ -12493,6 +12052,7 @@ components:
           format: date-time
           description: Valid to
     CouponPromoCodeBuilderInput:
+      x-ticvai-retired: 'setCouponPromoCode was removed in r2 (BC-012, CHG-CLN-001); no operation takes this shape. Kept because the design notes and the readiness close-out cite it; the venue screen''s typed writer carries the record.'
       type: object
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: none — request only; **no existing table shares a single field with this**,
@@ -13142,6 +12702,7 @@ components:
           type: string
           description: Archived
     BuyXGetYBogoRuleBuilderView:
+      x-ticvai-retired: 'setBuyGetBogo was removed in r2 (BC-013, CHG-CLN-001); no operation takes this shape. Kept because the design notes and the readiness close-out cite it; the venue screen''s typed writer carries the record.'
       type: object
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: none — projection over promotions state, assembled at read time from tables
@@ -13197,6 +12758,7 @@ components:
           $ref: ../shared/common.yaml#/components/schemas/Money
           description: Fixed reward price
     BuyXGetYBogoRuleBuilderInput:
+      x-ticvai-retired: 'setBuyGetBogo was removed in r2 (BC-013, CHG-CLN-001); no operation takes this shape. Kept because the design notes and the readiness close-out cite it; the venue screen''s typed writer carries the record.'
       type: object
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: none — request only; **no existing table covers these fields** — the closest
@@ -13331,6 +12893,7 @@ components:
           type: string
           description: N cheapest items free
     FixedPriceNForXOfferBuilderView:
+      x-ticvai-retired: 'setFixedPriceOffer was removed in r2 (BC-014, CHG-CLN-001); no operation takes this shape. Kept because the design notes and the readiness close-out cite it; the venue screen''s typed writer carries the record.'
       type: object
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: none — projection over promotions state, assembled at read time from tables
@@ -13364,6 +12927,7 @@ components:
           type: string
           description: Minimum/maximum product values
     FixedPriceNForXOfferBuilderInput:
+      x-ticvai-retired: 'setFixedPriceOffer was removed in r2 (BC-014, CHG-CLN-001); no operation takes this shape. Kept because the design notes and the readiness close-out cite it; the venue screen''s typed writer carries the record.'
       type: object
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: none — request only; **no existing table shares a single field with this**,
@@ -13397,6 +12961,7 @@ components:
           type: string
           description: Minimum/maximum product values
     GiftFreeProductAddedValueOfferBuilderView:
+      x-ticvai-retired: 'setGiftFreeProduct was removed in r2 (BC-015, CHG-CLN-001); no operation takes this shape. Kept because the design notes and the readiness close-out cite it; the venue screen''s typed writer carries the record.'
       type: object
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: none — projection over promotions state, assembled at read time from tables
@@ -13462,6 +13027,7 @@ components:
           type: boolean
           description: Allow later fulfillment
     GiftFreeProductAddedValueOfferBuilderInput:
+      x-ticvai-retired: 'setGiftFreeProduct was removed in r2 (BC-015, CHG-CLN-001); no operation takes this shape. Kept because the design notes and the readiness close-out cite it; the venue screen''s typed writer carries the record.'
       type: object
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: none — request only; **no existing table covers these fields** — the closest
@@ -13527,6 +13093,7 @@ components:
           type: boolean
           description: Allow later fulfillment
     CrossCategoryPromotionBuilderView:
+      x-ticvai-retired: 'setCrossCategoryPromotion was removed in r2 (BC-016, CHG-CLN-001); no operation takes this shape. Kept because the design notes and the readiness close-out cite it; the venue screen''s typed writer carries the record.'
       type: object
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: none — projection over promotions state, assembled at read time from tables
@@ -13566,6 +13133,7 @@ components:
           type: string
           description: Services
     CrossCategoryPromotionBuilderInput:
+      x-ticvai-retired: 'setCrossCategoryPromotion was removed in r2 (BC-016, CHG-CLN-001); no operation takes this shape. Kept because the design notes and the readiness close-out cite it; the venue screen''s typed writer carries the record.'
       type: object
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: none — request only; **no existing table shares a single field with this**,
@@ -13810,6 +13378,7 @@ components:
           type: string
           description: Archived
     BundleDefinitionSetupView:
+      x-ticvai-retired: 'setBundleDefinition was removed in r2 (BC-018, CHG-CLN-001); no operation takes this shape. Kept because the design notes and the readiness close-out cite it; the venue screen''s typed writer carries the record.'
       type: object
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: none — projection over promotions state, assembled at read time from tables
@@ -13872,6 +13441,7 @@ components:
             selects from permitted categories; changes with availability or rules; contains internal
             and external products'
     BundleDefinitionSetupInput:
+      x-ticvai-retired: 'setBundleDefinition was removed in r2 (BC-018, CHG-CLN-001); no operation takes this shape. Kept because the design notes and the readiness close-out cite it; the venue screen''s typed writer carries the record.'
       type: object
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: none — request only; **no existing table covers these fields** — the closest
@@ -13933,6 +13503,7 @@ components:
             - partner
           description: Bundle type
     BundleComponentBuilderView:
+      x-ticvai-retired: 'setBundleComponent was removed in r2 (BC-019, CHG-CLN-001); no operation takes this shape. Kept because the design notes and the readiness close-out cite it; the venue screen''s typed writer carries the record.'
       type: object
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: none — projection over promotions state, assembled at read time from tables
@@ -13988,6 +13559,7 @@ components:
             - externalProduct
           description: What the component is.
     BundleComponentBuilderInput:
+      x-ticvai-retired: 'setBundleComponent was removed in r2 (BC-019, CHG-CLN-001); no operation takes this shape. Kept because the design notes and the readiness close-out cite it; the venue screen''s typed writer carries the record.'
       type: object
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: none — request only; **no existing table shares a single field with this**,
@@ -14043,6 +13615,7 @@ components:
             - externalProduct
           description: What the component is.
     GuestChoiceBuildYourOwnBundleDesignerView:
+      x-ticvai-retired: 'setGuestChoiceBuild was removed in r2 (BC-020, CHG-CLN-001); no operation takes this shape. Kept because the design notes and the readiness close-out cite it; the venue screen''s typed writer carries the record.'
       type: object
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: none — projection over promotions state, assembled at read time from tables
@@ -14077,6 +13650,7 @@ components:
           type: string
           description: Selection order
     GuestChoiceBuildYourOwnBundleDesignerInput:
+      x-ticvai-retired: 'setGuestChoiceBuild was removed in r2 (BC-020, CHG-CLN-001); no operation takes this shape. Kept because the design notes and the readiness close-out cite it; the venue screen''s typed writer carries the record.'
       type: object
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: none — request only; **no existing table shares a single field with this**,
@@ -14955,6 +14529,7 @@ components:
             - missingData
           description: Health of the targeting rule.
     EligibilityRuleBuilderView:
+      x-ticvai-retired: 'setEligibilityRule was removed in r2 (BC-017, CHG-CLN-001); no operation takes this shape. Kept because the design notes and the readiness close-out cite it; the venue screen''s typed writer carries the record.'
       type: object
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: none — projection over promotions state, assembled at read time from tables
@@ -15028,6 +14603,7 @@ components:
             - exclude
           description: Whether matching guests are included or excluded.
     EligibilityRuleBuilderInput:
+      x-ticvai-retired: 'setEligibilityRule was removed in r2 (BC-017, CHG-CLN-001); no operation takes this shape. Kept because the design notes and the readiness close-out cite it; the venue screen''s typed writer carries the record.'
       type: object
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: 'none — request only; saved as a `promotions.promotion_rule` row (PromotionRule,

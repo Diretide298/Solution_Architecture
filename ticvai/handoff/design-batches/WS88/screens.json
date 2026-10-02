@@ -1708,12 +1708,6 @@
   },
   "apis": [
    {
-    "operationId": "approveMembershipProductValidation",
-    "contract": "subscription",
-    "purpose": "Membership Product Validation, Approval, Publication & Versioning",
-    "trigger": "onAction"
-   },
-   {
     "operationId": "validateRentalProduct",
     "contract": "rental",
     "purpose": "The readiness checklist",
@@ -1753,6 +1747,14 @@
     }
    ]
   },
+  "gaps": [
+   {
+    "operation": "approveMembershipProductValidation",
+    "removed": true,
+    "why": "Removed 2 October 2026 (CHG-WIR-008): approveMembershipProductValidation (a membership operation) was bulk-attached by name; rental publication is publishRentalProduct (R254; design-notes correction fnb-retail BO-503).",
+    "source": "R254 | screens/P08-venue-back-office.yaml#BO-503"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
